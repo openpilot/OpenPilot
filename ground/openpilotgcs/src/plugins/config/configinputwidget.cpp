@@ -1317,37 +1317,34 @@ void ConfigInputWidget::moveFMSlider()
 {
     ManualControlSettings::DataFields manualSettingsDataPriv = manualSettingsObj->getData();
     ManualControlCommand::DataFields manualCommandDataPriv=manualCommandObj->getData();
-    uint chIndex = manualSettingsDataPriv.ChannelNumber[ManualControlSettings::CHANNELNUMBER_FLIGHTMODE];
-    if (chIndex < 8) {
-        float valueScaled;
 
-        int chMin = manualSettingsDataPriv.ChannelMin[ManualControlSettings::CHANNELMIN_FLIGHTMODE];
-        int chMax = manualSettingsDataPriv.ChannelMax[ManualControlSettings::CHANNELMAX_FLIGHTMODE];
-        int chNeutral = manualSettingsDataPriv.ChannelNeutral[ManualControlSettings::CHANNELNEUTRAL_FLIGHTMODE];
+    float valueScaled;
+    int chMin = manualSettingsDataPriv.ChannelMin[ManualControlSettings::CHANNELMIN_FLIGHTMODE];
+    int chMax = manualSettingsDataPriv.ChannelMax[ManualControlSettings::CHANNELMAX_FLIGHTMODE];
+    int chNeutral = manualSettingsDataPriv.ChannelNeutral[ManualControlSettings::CHANNELNEUTRAL_FLIGHTMODE];
 
-        int value = manualCommandDataPriv.Channel[chIndex];
-        if ((chMax > chMin && value >= chNeutral) || (chMin > chMax && value <= chNeutral))
-        {
-            if (chMax != chNeutral)
-                valueScaled = (float)(value - chNeutral) / (float)(chMax - chNeutral);
-            else
-                valueScaled = 0;
-        }
+    int value = manualCommandDataPriv.Channel[ManualControlSettings::CHANNELMIN_FLIGHTMODE];
+    if ((chMax > chMin && value >= chNeutral) || (chMin > chMax && value <= chNeutral))
+    {
+        if (chMax != chNeutral)
+            valueScaled = (float)(value - chNeutral) / (float)(chMax - chNeutral);
         else
-        {
-            if (chMin != chNeutral)
-                valueScaled = (float)(value - chNeutral) / (float)(chNeutral - chMin);
-            else
-                valueScaled = 0;
-        }
-
-        if(valueScaled < -(1.0 / 3.0))
-            m_config->fmsSlider->setValue(-100);
-        else if (valueScaled > (1.0/3.0))
-            m_config->fmsSlider->setValue(100);
-        else
-            m_config->fmsSlider->setValue(0);
+            valueScaled = 0;
     }
+    else
+    {
+        if (chMin != chNeutral)
+            valueScaled = (float)(value - chNeutral) / (float)(chNeutral - chMin);
+        else
+            valueScaled = 0;
+    }
+
+    if(valueScaled < -(1.0 / 3.0))
+        m_config->fmsSlider->setValue(-100);
+    else if (valueScaled > (1.0/3.0))
+        m_config->fmsSlider->setValue(100);
+    else
+        m_config->fmsSlider->setValue(0);
 }
 
 void ConfigInputWidget::updateCalibration()

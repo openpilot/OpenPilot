@@ -156,8 +156,8 @@ extern uint32_t pios_com_serial_id;
 //#define PIOS_COM_DEBUG                  PIOS_COM_SERIAL           // uncomment this to send debug info out the serial port
 
 #if defined(PIOS_INCLUDE_USB_HID)
-extern uint32_t pios_com_telem_usb_hid_id;
-#define PIOS_COM_TELEM_USB_HID          (pios_com_telem_usb_hid_id)
+extern uint32_t pios_com_telem_usb_id;
+#define PIOS_COM_TELEM_USB              (pios_com_telem_usb_id)
 #endif
 
 #if defined(PIOS_COM_DEBUG)

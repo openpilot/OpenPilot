@@ -777,7 +777,7 @@ void apiconfig_process(void)
 		if (PIOS_USB_HID_CheckAvailable(0))
 		{	// USB comms is up, use the USB comm-port instead of the USART comm-port
 			apiconfig_usb_comms = true;
-			apiconfig_comm_port = PIOS_COM_TELEM_USB_HID;
+			apiconfig_comm_port = PIOS_COM_TELEM_USB;
 		}
 	#endif
 

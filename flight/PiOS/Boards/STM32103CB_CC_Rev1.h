@@ -141,11 +141,8 @@ extern uint32_t pios_com_gps_id;
 #define PIOS_COM_GPS                    (pios_com_gps_id)
 #endif	/* PIOS_INCLUDE_GPS */
 
-extern uint32_t pios_com_telem_usb_hid_id;
-#define PIOS_COM_TELEM_USB_HID          (pios_com_telem_usb_hid_id)
-
-extern uint32_t pios_com_telem_usb_cdc_id;
-#define PIOS_COM_TELEM_USB_CDC          (pios_com_telem_usb_cdc_id)
+extern uint32_t pios_com_telem_usb_id;
+#define PIOS_COM_TELEM_USB              (pios_com_telem_usb_id)
 
 //-------------------------
 // ADC

@@ -339,8 +339,7 @@ const struct pios_usb_com_cfg pios_usb_com_hid_cfg = {
 #endif	/* PIOS_INCLUDE_USB_COM */
 
 uint32_t pios_com_serial_id;
-uint32_t pios_com_telem_usb_hid_id;
-uint32_t pios_com_telem_usb_cdc_id;
+uint32_t pios_com_telem_usb_id;
 
 /**
  * PIOS_Board_Init()
@@ -378,7 +377,7 @@ void PIOS_Board_Init(void) {
 	if (PIOS_USB_COM_Init(&pios_usb_com_id, &pios_usb_com_hid_cfg, pios_usb_id)) {
 		PIOS_Assert(0);
 	}
-	if (PIOS_COM_Init(&pios_com_telem_usb_hid_id, &pios_usb_hid_com_driver, pios_usb_com_id,
+	if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_hid_com_driver, pios_usb_com_id,
 			  pios_com_telem_usb_rx_buffer, sizeof(pios_com_telem_usb_rx_buffer),
 			  pios_com_telem_usb_tx_buffer, sizeof(pios_com_telem_usb_tx_buffer))) {
 		PIOS_Assert(0);

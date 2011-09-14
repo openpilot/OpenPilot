@@ -31,26 +31,28 @@
 
 #include <QAbstractTableModel>
 #include <QList>
-#include "notifypluginconfiguration.h"
+#include "notificationitem.h"
+
+enum ColumnNames { eMESSAGE_NAME, eREPEAT_VALUE, eEXPIRE_TIME, eENABLE_NOTIFICATION };
 
 class NotifyTableModel : public QAbstractTableModel
 {
 	Q_OBJECT
-  public:
-	NotifyTableModel(QList<NotifyPluginConfiguration*> *parentList, const QStringList& parentHeaderList, QObject *parent = 0)
-		 : QAbstractTableModel(parent),
-		  _list(parentList),
-		  headerStrings(parentHeaderList)
-	{ }
 
-	int rowCount(const QModelIndex &parent = QModelIndex()) const
+	enum {eColumnCount = 4 };
+
+public:
+
+	NotifyTableModel(QList<NotificationItem*>* parentList, QObject* parent = 0);
+
+	int rowCount(const QModelIndex& parent = QModelIndex()) const
 	{
 		return _list->count();
 	}
 
 	int columnCount(const QModelIndex &/*parent*/) const
 	{
-		return 3;
+		return eColumnCount;
 	}
 
 	Qt::ItemFlags flags(const QModelIndex &index) const
@@ -71,8 +73,8 @@ private slots:
 	void entryUpdated(int offset);
 	void entryAdded(int position);
 private:
-	QList<NotifyPluginConfiguration*> *_list;
-	QStringList headerStrings;
+	QScopedPointer<QList<NotificationItem*> > _list;
+	QStringList _headerStrings;
 };
 
 

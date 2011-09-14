@@ -32,7 +32,7 @@
 #include "uavtalk/telemetrymanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
-#include "notifypluginconfiguration.h"
+#include "notificationitem.h"
 
 #include <QSettings>
 #include <phonon/MediaObject>
@@ -44,9 +44,11 @@ class NotifyPluginOptionsPage;
 
 typedef struct {
 	Phonon::MediaObject* mo;
-	NotifyPluginConfiguration* notify;
-        bool firstPlay;
+	NotificationItem* notify;
+	bool firstPlay;
 } PhononObject, *pPhononObject;
+
+
 
 class SoundNotifyPlugin : public Core::IConfigurablePlugin
 { 
@@ -62,48 +64,42 @@ public:
    void shutdown();
 
 
-   QList<NotifyPluginConfiguration*> getListNotifications() { return lstNotifications; }
-   //void setListNotifications(QList<NotifyPluginConfiguration*>& list_notify) {  }
-   NotifyPluginConfiguration* getCurrentNotification(){ return &currentNotification;}
+   QList<NotificationItem*> getListNotifications() { return lstNotifications; }
+   NotificationItem* getCurrentNotification(){ return &currentNotification;}
 
    bool getEnableSound() const { return enableSound; }
    void setEnableSound(bool value) {enableSound = value; }
-
-
 
 private:
    bool configured; // just for migration,delete later
    bool enableSound;
    QList< QList<Phonon::MediaSource>* > lstMediaSource;
    QStringList mediaSource;
-   //QMap<QString, Phonon::MediaObject*> mapMediaObjects;
    QMultiMap<QString, PhononObject> mapMediaObjects;
-
    QSettings* settings;
 
    QList<UAVDataObject*> lstNotifiedUAVObjects;
+   QList<NotificationItem*> lstNotifications;
+   QList<NotificationItem*> pendingNotifications;
+   QList<NotificationItem*> removedNotifies;
 
-   QList<NotifyPluginConfiguration*> lstNotifications;
-   QList<NotifyPluginConfiguration*> pendingNotifications;
-   QList<NotifyPluginConfiguration*> removedNotifies;
-
-   NotifyPluginConfiguration currentNotification;
-   NotifyPluginConfiguration* nowPlayingConfiguration;
+   NotificationItem currentNotification;
+   NotificationItem* nowPlayingConfiguration;
 
    QString m_field;
    PhononObject phonon;
    NotifyPluginOptionsPage *mop;
    TelemetryManager* telMngr;
 
-   bool playNotification(NotifyPluginConfiguration* notification);
-   void checkNotificationRule(NotifyPluginConfiguration* notification, UAVObject* object);
+   bool playNotification(NotificationItem* notification);
+   void checkNotificationRule(NotificationItem* notification, UAVObject* object);
    void readConfig_0_0_0();
 
 private slots:
    void onTelemetryManagerAdded(QObject* obj);
    void onAutopilotDisconnect();
    void connectNotifications();
-   void updateNotificationList(QList<NotifyPluginConfiguration*> list);
+   void updateNotificationList(QList<NotificationItem*> list);
    void resetNotification(void);
    void appendNotification(UAVObject *object);
    void repeatTimerHandler(void);

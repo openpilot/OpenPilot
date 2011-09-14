@@ -26,17 +26,30 @@
  */
 
 #include "notifytablemodel.h"
+#include <qdebug.h>
+
+NotifyTableModel::NotifyTableModel(QList<NotificationItem*>* parentList, QObject* parent)
+	: QAbstractTableModel(parent)
+{
+	_headerStrings << "Name" << "Repeats" << "Lifetime,sec" << "Enable";
+	_list.reset(parentList);
+}
+
 
 bool NotifyTableModel::setData(const QModelIndex &index,
 							   const QVariant &value, int role)
 {
 	if (index.isValid() && role == Qt::EditRole) {
-		if(index.column()==1)
+		if(eREPEAT_VALUE == index.column())
 			_list->at(index.row())->setRepeatFlag(value.toString());
-		else
-			if(index.column()==2)
+		else {
+			if(eEXPIRE_TIME == index.column())
 				_list->at(index.row())->setExpireTimeout(value.toInt());
-
+			else {
+				if(eENABLE_NOTIFICATION == index.column())
+					_list->at(index.row())->setEnableFlag(value.toBool());
+			}
+		}
 		emit dataChanged(index, index);
 		return true;
 	}
@@ -45,9 +58,10 @@ bool NotifyTableModel::setData(const QModelIndex &index,
 
 QVariant NotifyTableModel::data(const QModelIndex &index, int role) const
 {
-
-	if (!index.isValid())
+	if (!index.isValid()) {
+		qWarning() << "NotifyTableModel::data - index.isValid()";
 		return QVariant();
+	}
 
 	if (index.row() >= _list->size())
 		return QVariant();
@@ -56,14 +70,17 @@ QVariant NotifyTableModel::data(const QModelIndex &index, int role) const
 	{
 		switch(index.column())
 		{
-		case 0:
+		case eMESSAGE_NAME:
 			return _list->at(index.row())->parseNotifyMessage();
 
-		case 1:
+		case eREPEAT_VALUE:
 			return _list->at(index.row())->getRepeatFlag();
 
-		case 2:
+		case eEXPIRE_TIME:
 			return _list->at(index.row())->getExpireTimeout();
+
+		case eENABLE_NOTIFICATION:
+			return _list->at(index.row())->getEnableFlag();
 
 		default:
 			return QVariant();
@@ -72,12 +89,8 @@ QVariant NotifyTableModel::data(const QModelIndex &index, int role) const
 	else
 	{
 		if (Qt::SizeHintRole == role){
-			//QVariant size = data(index, Qt::SizeHintRole);
 			return  QVariant(10);
 		}
-		//			if(role == Qt::DecorationRole)
-		//				if (index.column() == 0)
-		//					return defectsIcons[defectList->at(index.row()).id-1];
 	}
 	return QVariant();
 }
@@ -88,7 +101,7 @@ QVariant NotifyTableModel::headerData(int section, Qt::Orientation orientation, 
 		return QVariant();
 
 	if (orientation == Qt::Horizontal)
-		return headerStrings.at(section);
+		return _headerStrings.at(section);
 	else
 		if(orientation == Qt::Vertical)
 			return QString("%1").arg(section);
@@ -100,12 +113,6 @@ bool NotifyTableModel::insertRows(int position, int rows, const QModelIndex &ind
 {
 	Q_UNUSED(index);
 	beginInsertRows(QModelIndex(), position, position+rows-1);
-
-//	 for (int row=0; row < rows; ++row) {
-//		 _list->append(position);
-//	 }
-
-
 	endInsertRows();
 	return true;
 }

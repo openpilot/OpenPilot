@@ -26,7 +26,7 @@
  */
 
 #include "notifyplugin.h"
-#include "notifypluginconfiguration.h"
+#include "notificationitem.h"
 #include "notifypluginoptionspage.h"
 #include <coreplugin/icore.h>
 #include <QDebug>
@@ -37,15 +37,29 @@
 
 #include <iostream>
 #include "qxttimer.h"
+#include "backendcapabilities.h"
 
 static const QString VERSION = "1.0.0";
 
 //#define DEBUG_NOTIFIES
 
+#ifdef DEBUG_NOTIFIES
+QDebug qNotifyDebug()
+#endif
+#ifndef DEBUG_NOTIFIES
+QNoDebug qNotifyDebug()
+#endif
+{
+#ifdef DEBUG_NOTIFIES
+    return qDebug();
+#endif
+    return QNoDebug();
+}
+
 SoundNotifyPlugin::SoundNotifyPlugin()
 {
-	phonon.mo = NULL;
-        configured = false;
+    phonon.mo = NULL;
+    configured = false;
    // Do nothing
 }
 
@@ -121,7 +135,7 @@ void SoundNotifyPlugin::readConfig( QSettings* settings, UAVConfigInfo *configIn
     int size = settings->beginReadArray("listNotifies");
     for (int i = 0; i < size; ++i) {
              settings->setArrayIndex(i);
-             NotifyPluginConfiguration* notification = new NotifyPluginConfiguration;
+			 NotificationItem* notification = new NotificationItem;
              notification->restoreState(settings);
              lstNotifications.append(notification);
     }
@@ -145,7 +159,7 @@ void SoundNotifyPlugin::readConfig_0_0_0(){
        int size = settings->beginReadArray("listNotifies");
        for (int i = 0; i < size; ++i) {
                 settings->setArrayIndex(i);
-                NotifyPluginConfiguration* notification = new NotifyPluginConfiguration;
+				NotificationItem* notification = new NotificationItem;
                 notification->restoreState(settings);
                 lstNotifications.append(notification);
        }
@@ -185,7 +199,7 @@ void SoundNotifyPlugin::onAutopilotDisconnect()
 void SoundNotifyPlugin::resetNotification(void)
 {
 	//first, reject empty args and unknown fields.
-	foreach(NotifyPluginConfiguration* notify,lstNotifications) {
+	foreach(NotificationItem* notify,lstNotifications) {
 		if(notify->timer)
 		{
 			disconnect(notify->timer, SIGNAL(timeout()), this, SLOT(repeatTimerHandler()));
@@ -207,7 +221,7 @@ void SoundNotifyPlugin::resetNotification(void)
 	update list of notifies;
 	will be perform on OK or APPLY press of option page
  */
-void SoundNotifyPlugin::updateNotificationList(QList<NotifyPluginConfiguration*> list)
+void SoundNotifyPlugin::updateNotificationList(QList<NotificationItem*> list)
 {
 	removedNotifies.clear();
         resetNotification();
@@ -224,10 +238,10 @@ void SoundNotifyPlugin::connectNotifications()
 		if (obj != NULL)
 			disconnect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(appendNotification(UAVObject*)));
 	}
-        if(phonon.mo != NULL) {
-            delete phonon.mo;
-            phonon.mo = NULL;
-        }
+	if(phonon.mo != NULL) {
+		delete phonon.mo;
+		phonon.mo = NULL;
+	}
 
 	if(!enableSound) return;
 
@@ -240,24 +254,9 @@ void SoundNotifyPlugin::connectNotifications()
 	removedNotifies.clear();
 
 	//first, reject empty args and unknown fields.
-	foreach(NotifyPluginConfiguration* notify,lstNotifications) {
+	foreach(NotificationItem* notify, lstNotifications) {
 		notify->firstStart=true;
 		notify->isNowPlaying=false;
-
-//		if(notify->timer)
-//		{
-//			disconnect(notify->timer, SIGNAL(timeout()), this, SLOT(repeatTimerHandler()));
-//			notify->timer->stop();
-//			delete notify->timer;
-//			notify->timer = NULL;
-//		}
-//		if(notify->expireTimer)
-//		{
-//			disconnect(notify->expireTimer, SIGNAL(timeout()), this, SLOT(expireTimerHandler()));
-//			notify->expireTimer->stop();
-//			delete notify->expireTimer;
-//			notify->expireTimer = NULL;
-//		}
 
 		UAVDataObject* obj = dynamic_cast<UAVDataObject*>( objManager->getObject(notify->getDataObject()) );
 		if (obj != NULL ) {
@@ -269,27 +268,25 @@ void SoundNotifyPlugin::connectNotifications()
 			std::cout << "Error: Object is unknown (" << notify->getDataObject().toStdString() << ")." << std::endl;
 	}
 
-	if(lstNotifications.isEmpty()) return;
-	// set notification message to current event
-        phonon.mo = Phonon::createPlayer(Phonon::NotificationCategory);
-        phonon.mo->clearQueue();
-        phonon.firstPlay = true;
-#ifdef DEBUG_NOTIFIES
-        QList<Phonon::AudioOutputDevice> audioOutputDevices =
-                     Phonon::BackendCapabilities::availableAudioOutputDevices();
-        foreach(Phonon::AudioOutputDevice dev, audioOutputDevices) {
-            qDebug() << "Notify: Audio Output device: " << dev.name() << " - " << dev.description();
-        }
-#endif
-	connect(phonon.mo,SIGNAL(stateChanged(Phonon::State,Phonon::State)),
-			this,SLOT(stateChanged(Phonon::State,Phonon::State)));
+    if(lstNotifications.isEmpty()) return;
+    // set notification message to current event
+    phonon.mo = Phonon::createPlayer(Phonon::NotificationCategory);
+    phonon.mo->clearQueue();
+    phonon.firstPlay = true;
+    QList<Phonon::AudioOutputDevice> audioOutputDevices =
+              Phonon::BackendCapabilities::availableAudioOutputDevices();
+    foreach(Phonon::AudioOutputDevice dev, audioOutputDevices) {
+        qNotifyDebug() << "Notify: Audio Output device: " << dev.name() << " - " << dev.description();
+    }
+    connect(phonon.mo, SIGNAL(stateChanged(Phonon::State,Phonon::State)),
+        this, SLOT(stateChanged(Phonon::State,Phonon::State)));
 }
 
 void SoundNotifyPlugin::appendNotification(UAVObject *object)
 {
 	disconnect(object, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(appendNotification(UAVObject*)));
 
-	foreach(NotifyPluginConfiguration* notification, lstNotifications) {
+	foreach(NotificationItem* notification, lstNotifications) {
 		if(object->getName()!=notification->getDataObject())
 			continue;
 
@@ -306,7 +303,7 @@ void SoundNotifyPlugin::appendNotification(UAVObject *object)
 }
 
 
-void SoundNotifyPlugin::checkNotificationRule(NotifyPluginConfiguration* notification, UAVObject* object)
+void SoundNotifyPlugin::checkNotificationRule(NotificationItem* notification, UAVObject* object)
 {
 	bool condition=false;
 	double threshold;
@@ -350,7 +347,7 @@ void SoundNotifyPlugin::checkNotificationRule(NotifyPluginConfiguration* notific
 #endif
 				// if audio is busy, start expiration timer
 				//ms = (notification->getExpiredTimeout()[in sec])*1000
-				//QxtTimer::singleShot(notification->getExpireTimeout()*1000, this, SLOT(expirationTimerHandler(NotifyPluginConfiguration*)), qVariantFromValue(notification));
+				//QxtTimer::singleShot(notification->getExpireTimeout()*1000, this, SLOT(expirationTimerHandler(NotificationItem*)), qVariantFromValue(notification));
 				pendingNotifications.append(notification);
 				if(!notification->expireTimer)
 				{
@@ -363,21 +360,22 @@ void SoundNotifyPlugin::checkNotificationRule(NotifyPluginConfiguration* notific
 	}
 }
 
-bool SoundNotifyPlugin::playNotification(NotifyPluginConfiguration* notification)
+bool SoundNotifyPlugin::playNotification(NotificationItem* notification)
 {
     // Check: race condition, if phonon.mo got deleted don't go further
     if (phonon.mo == NULL)
         return false;
 
+	if(!notification->getEnableFlag()) return true;
+
 #ifdef DEBUG_NOTIFIES
     qDebug() << "Phonon State: " << phonon.mo->state();
 #endif
-	if((phonon.mo->state()==Phonon::PausedState) ||
-                (phonon.mo->state()==Phonon::StoppedState) ||
-                phonon.firstPlay)
+	if((phonon.mo->state()==Phonon::PausedState)
+		|| (phonon.mo->state()==Phonon::StoppedState)
+		   || phonon.firstPlay)
 	{
 		// don't fire expire timer
-		//notification->expire = false;
 		nowPlayingConfiguration = notification;
 		if(notification->expireTimer)
 			notification->expireTimer->stop();
@@ -385,7 +383,6 @@ bool SoundNotifyPlugin::playNotification(NotifyPluginConfiguration* notification
 		if(notification->getRepeatFlag()=="Repeat Once")
 		{
 			removedNotifies.append(lstNotifications.takeAt(lstNotifications.indexOf(notification)));
-			//if(!notification->firstStart) return true;
 		}
 		else {
 			if(notification->getRepeatFlag()!="Repeat Instantly")
@@ -407,24 +404,21 @@ bool SoundNotifyPlugin::playNotification(NotifyPluginConfiguration* notification
 				}
 				if(!notification->timer->isActive())
 					notification->timer->start();
-
-				//QxtTimer::singleShot(timer_value, this, SLOT(repeatTimerHandler(NotifyPluginConfiguration*)), qVariantFromValue(notification));
 			}
 		}
 		notification->firstStart=false;
-                phonon.mo->clear();
+		phonon.mo->clear();
 		QString str = notification->parseNotifyMessage();
-#ifdef DEBUG_NOTIFIES
-		qDebug() << "play notification - " << str;
-#endif
-                foreach(QString item, notification->getNotifyMessageList()) {
-                    Phonon::MediaSource *ms = new Phonon::MediaSource(item);
-                    ms->setAutoDelete(true);
-                    phonon.mo->enqueue(*ms);
-                }
+		qNotifyDebug() << "play notification - " << str;
+
+		foreach(QString item, notification->getMessageSequence()) {
+			Phonon::MediaSource *ms = new Phonon::MediaSource(item);
+			ms->setAutoDelete(true);
+			phonon.mo->enqueue(*ms);
+		}
 		phonon.mo->play();
-                phonon.firstPlay = false; // On Linux, you sometimes have to nudge Phonon to play 1 time before
-                                          // the state is not "Loading" anymore.
+		phonon.firstPlay = false; // On Linux, you sometimes have to nudge Phonon to play 1 time before
+								  // the state is not "Loading" anymore.
 	}
 	else
 		return false; // if audio is busy
@@ -432,20 +426,9 @@ bool SoundNotifyPlugin::playNotification(NotifyPluginConfiguration* notification
 	return true;
 }
 
-//void SoundNotifyPlugin::repeatTimerHandler(NotifyPluginConfiguration* notification)
-//{
-//	qDebug() << "repeatTimerHandler - " << notification->parseNotifyMessage();
-
-//	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-//	UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-//	UAVObject* object = objManager->getObject(notification->getDataObject());
-//	if(object)
-//		checkNotificationRule(notification,object);
-//}
-
 void SoundNotifyPlugin::repeatTimerHandler()
 {
-	NotifyPluginConfiguration* notification = static_cast<NotifyPluginConfiguration*>(sender()->parent());
+	NotificationItem* notification = static_cast<NotificationItem*>(sender()->parent());
 #ifdef DEBUG_NOTIFIES
 	qDebug() << "repeatTimerHandler - " << notification->parseNotifyMessage();
 #endif
@@ -459,7 +442,7 @@ void SoundNotifyPlugin::repeatTimerHandler()
 void SoundNotifyPlugin::expireTimerHandler()
 {
 	// fire expire timer
-	NotifyPluginConfiguration* notification = static_cast<NotifyPluginConfiguration*>(sender()->parent());
+	NotificationItem* notification = static_cast<NotificationItem*>(sender()->parent());
 	notification->expireTimer->stop();
 
 	if(!pendingNotifications.isEmpty())
@@ -494,7 +477,7 @@ void SoundNotifyPlugin::stateChanged(Phonon::State newstate, Phonon::State oldst
 		nowPlayingConfiguration=NULL;
 		if(!pendingNotifications.isEmpty())
 		{
-			NotifyPluginConfiguration* notification = pendingNotifications.takeFirst();
+			NotificationItem* notification = pendingNotifications.takeFirst();
 #ifdef DEBUG_NOTIFIES
 			qDebug() << "play audioFree - " << notification->parseNotifyMessage();
 #endif

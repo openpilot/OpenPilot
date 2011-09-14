@@ -45,7 +45,7 @@
 
 class NotifyTableModel;
 
-class NotifyPluginConfiguration;
+class NotificationItem;
 class SoundNotifyPlugin;
 
 namespace Ui {
@@ -59,7 +59,7 @@ class NotifyPluginOptionsPage : public IOptionsPage
 {
 	Q_OBJECT
 public:
-    explicit NotifyPluginOptionsPage(/*NotifyPluginConfiguration *config, */QObject *parent = 0);
+	explicit NotifyPluginOptionsPage(/*NotificationItem *config, */QObject *parent = 0);
 
 	QString id() const { return QLatin1String("settings"); }
 	QString trName() const { return tr("settings"); }
@@ -73,8 +73,8 @@ public:
 	void finish();
 	void restoreFromSettings();
 
-	void updateConfigView(NotifyPluginConfiguration* notification);
-	void getOptionsPageValues(NotifyPluginConfiguration* notification);
+	void updateConfigView(NotificationItem* notification);
+	void getOptionsPageValues(NotificationItem* notification);
 
 private:
 	UAVObjectManager *objManager;
@@ -90,24 +90,18 @@ private:
 	QStringList delegateItems;
 	NotifyTableModel* notifyRulesModel;
 	QItemSelectionModel *notifyRulesSelection;
-	QList<NotifyPluginConfiguration*> privListNotifications;
+	QList<NotificationItem*> privListNotifications;
 
 	Ui::NotifyPluginOptionsPage *options_page;
-	//NotifyPluginConfiguration *notify;
 
 signals:
-	void updateNotifications(QList<NotifyPluginConfiguration*> list);
+	void updateNotifications(QList<NotificationItem*> list);
 	void resetNotification(void);
 	void entryUpdated(int index);
 	void entryAdded(int position);
 
 
 private slots:
-	void showPersistentComboBox( const QModelIndex & parent, int start, int end );
-	void showPersistentComboBox2 ( const QModelIndex & topLeft, const QModelIndex & bottomRight );
-
-//	void on_buttonTestSound1_clicked();
-//	void on_buttonTestSound2_clicked();
 	void on_buttonTestSoundNotification_clicked();
 
 	void on_buttonAddNotification_clicked();
@@ -119,6 +113,9 @@ private slots:
 	void on_UAVObject_indexChanged(QString val);
 	void changeButtonText(Phonon::State newstate, Phonon::State oldstate);
 	void on_chkEnableSound_toggled(bool state);
+
+	void onFinishedPlaying(void);
+
 };
 
 #endif // NOTIFYPLUGINOPTIONSPAGE_H

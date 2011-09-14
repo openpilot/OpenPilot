@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       notifyPluginConfiguration.cpp
+ * @file       NotificationItem.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      Notify Plugin configuration
  * @see        The GNU Public License (GPL) Version 3
@@ -25,60 +25,60 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "notifypluginconfiguration.h"
+#include "NotificationItem.h"
 #include <QtCore/QDataStream>
 #include <QFile>
 #include "utils/pathutils.h"
 
 
-NotifyPluginConfiguration::NotifyPluginConfiguration(QObject *parent) :
+NotificationItem::NotificationItem(QObject *parent) :
 	QObject(parent),
 	isNowPlaying(0),
 	firstStart(1),
-	soundCollectionPath(""),
-	currentLanguage("default"),
-	dataObject(""),
-	objectField(""),
-	value("Equal to"),
-	sound1(""),
-	sound2(""),
-	sound3(""),
-	sayOrder("Never"),
-	spinBoxValue(0),
-	repeatString("Repeat Instantly"),
-	repeatTimeout(true),
-	expireTimeout(15)
+	_soundCollectionPath(""),
+	_currentLanguage("default"),
+	_dataObject(""),
+	_objectField(""),
+	_dataValue("Equal to"),
+	_sound1(""),
+	_sound2(""),
+	_sound3(""),
+	_sayOrder("Never"),
+	_spinBoxValue(0),
+	_repeatString("Repeat Instantly"),
+	_repeatTimeout(true),
+	_expireTimeout(15)
 
 {
 	timer = NULL;
 	expireTimer = NULL;
 }
 
-void NotifyPluginConfiguration::copyTo(NotifyPluginConfiguration* that) const
+void NotificationItem::copyTo(NotificationItem* that) const
 {
 
 	that->isNowPlaying = isNowPlaying;
 	that->firstStart = firstStart;
-	that->soundCollectionPath = soundCollectionPath;
-	that->currentLanguage = currentLanguage;
-	that->soundCollectionPath = soundCollectionPath;
-	that->dataObject = dataObject;
-	that->objectField = objectField;
-	that->value = value;
-	that->sound1 = sound1;
-	that->sound2 = sound2;
-	that->sound3 = sound3;
-	that->sayOrder = sayOrder;
-	that->spinBoxValue = spinBoxValue;
-	that->repeatString = repeatString;
-	that->repeatTimeout = repeatTimeout;
-	that->expireTimeout = expireTimeout;
+	that->_soundCollectionPath = _soundCollectionPath;
+	that->_currentLanguage = _currentLanguage;
+	that->_soundCollectionPath = _soundCollectionPath;
+	that->_dataObject = _dataObject;
+	that->_objectField = _objectField;
+	that->_dataValue = _dataValue;
+	that->_sound1 = _sound1;
+	that->_sound2 = _sound2;
+	that->_sound3 = _sound3;
+	that->_sayOrder = _sayOrder;
+	that->_spinBoxValue = _spinBoxValue;
+	that->_repeatString = _repeatString;
+	that->_repeatTimeout = _repeatTimeout;
+	that->_expireTimeout = _expireTimeout;
 }
 
 
-void NotifyPluginConfiguration::saveState(QSettings* settings) const
+void NotificationItem::saveState(QSettings* settings) const
 {
-        settings->setValue("SoundCollectionPath", Utils::PathUtils().RemoveDataPath(getSoundCollectionPath()));
+	settings->setValue("SoundCollectionPath", Utils::PathUtils().RemoveDataPath(getSoundCollectionPath()));
 	settings->setValue(QLatin1String("CurrentLanguage"), getCurrentLanguage());
 	settings->setValue(QLatin1String("ObjectField"), getObjectField());
 	settings->setValue(QLatin1String("DataObject"), getDataObject());
@@ -92,7 +92,7 @@ void NotifyPluginConfiguration::saveState(QSettings* settings) const
 	settings->setValue(QLatin1String("ExpireTimeout"), getExpireTimeout());
 }
 
-void NotifyPluginConfiguration::restoreState(QSettings* settings)
+void NotificationItem::restoreState(QSettings* settings)
 {
 	//settings = Core::ICore::instance()->settings();
         setSoundCollectionPath(Utils::PathUtils().InsertDataPath(settings->value(QLatin1String("SoundCollectionPath"), tr("")).toString()));
@@ -110,7 +110,7 @@ void NotifyPluginConfiguration::restoreState(QSettings* settings)
 }
 
 
-QString NotifyPluginConfiguration::parseNotifyMessage()
+QString NotificationItem::parseNotifyMessage()
 {
 	// tips:
 	// check of *.wav files exist needed for playing phonon queues;
@@ -121,30 +121,30 @@ QString NotifyPluginConfiguration::parseNotifyMessage()
 	str = QString("%L1 ").arg(getSpinBoxValue());
 	int position = 0xFF;
 	// generate queue of sound files to play
-	notifyMessageList.clear();
+	_messageSequence.clear();
 
-        if(QFile::exists(QDir::toNativeSeparators(getSoundCollectionPath() + "/" + getCurrentLanguage()+"/"+getSound1()+".wav")))
-                notifyMessageList.append(QDir::toNativeSeparators(getSoundCollectionPath() + "/" + getCurrentLanguage()+"/"+getSound1()+".wav"));
+	if(QFile::exists(QDir::toNativeSeparators(getSoundCollectionPath() + "/" + getCurrentLanguage()+"/"+getSound1()+".wav")))
+		_messageSequence.append(QDir::toNativeSeparators(getSoundCollectionPath() + "/" + getCurrentLanguage()+"/"+getSound1()+".wav"));
 	else
-                if(QFile::exists(QDir::toNativeSeparators(getSoundCollectionPath() + "/default/"+getSound1()+".wav")))
-                        notifyMessageList.append(QDir::toNativeSeparators(getSoundCollectionPath() + "/default/"+getSound1()+".wav"));
+		if(QFile::exists(QDir::toNativeSeparators(getSoundCollectionPath() + "/default/"+getSound1()+".wav")))
+			_messageSequence.append(QDir::toNativeSeparators(getSoundCollectionPath() + "/default/"+getSound1()+".wav"));
 
-	if(getSound2()!="")
+	if("" != getSound2())
 	{
-                if(QFile::exists(QDir::toNativeSeparators(getSoundCollectionPath() + "/" +  getCurrentLanguage()+"/"+getSound2()+".wav")))
-                        notifyMessageList.append(QDir::toNativeSeparators(getSoundCollectionPath() + "/" +  getCurrentLanguage()+"/"+getSound2()+".wav"));
+		if(QFile::exists(QDir::toNativeSeparators(getSoundCollectionPath() + "/" +  getCurrentLanguage()+"/"+getSound2()+".wav")))
+			_messageSequence.append(QDir::toNativeSeparators(getSoundCollectionPath() + "/" +  getCurrentLanguage()+"/"+getSound2()+".wav"));
 		else
-                        if(QFile::exists(QDir::toNativeSeparators(getSoundCollectionPath() + "/default/"+getSound2()+".wav")))
-                                notifyMessageList.append(QDir::toNativeSeparators(getSoundCollectionPath() + "/default/"+getSound2()+".wav"));
+			if(QFile::exists(QDir::toNativeSeparators(getSoundCollectionPath() + "/default/"+getSound2()+".wav")))
+				_messageSequence.append(QDir::toNativeSeparators(getSoundCollectionPath() + "/default/"+getSound2()+".wav"));
 	}
 
-	if(getSound3()!="")
+	if("" != getSound3())
 	{
-                if(QFile::exists(QDir::toNativeSeparators(getSoundCollectionPath()+ "/" + getCurrentLanguage()+"/"+getSound3()+".wav")))
-                        notifyMessageList.append(QDir::toNativeSeparators(getSoundCollectionPath()+ "/" + getCurrentLanguage()+"/"+getSound3()+".wav"));
+		if(QFile::exists(QDir::toNativeSeparators(getSoundCollectionPath()+ "/" + getCurrentLanguage()+"/"+getSound3()+".wav")))
+			_messageSequence.append(QDir::toNativeSeparators(getSoundCollectionPath()+ "/" + getCurrentLanguage()+"/"+getSound3()+".wav"));
 		else
-                        if(QFile::exists(QDir::toNativeSeparators(getSoundCollectionPath()+"/default/"+getSound3()+".wav")))
-                                notifyMessageList.append(QDir::toNativeSeparators(getSoundCollectionPath()+"/default/"+getSound3()+".wav"));
+			if(QFile::exists(QDir::toNativeSeparators(getSoundCollectionPath()+"/default/"+getSound3()+".wav")))
+				_messageSequence.append(QDir::toNativeSeparators(getSoundCollectionPath()+"/default/"+getSound3()+".wav"));
 	}
 
 	switch(str1.at(0).toAscii())
@@ -178,7 +178,7 @@ QString NotifyPluginConfiguration::parseNotifyMessage()
 			break;
 	}
 
-	if(position!=0xFF)
+	if(position != 0xFF)
 	{
 		QStringList numberParts = QString("%1").arg(getSpinBoxValue()).trimmed().split(".");
 		QStringList numberFiles;
@@ -212,9 +212,9 @@ QString NotifyPluginConfiguration::parseNotifyMessage()
 			}
 		}
 
-		if(numberParts.size()>1) {
+		if(1 < numberParts.size()) {
 			numberFiles.append("point");
-			if((numberParts.at(1).size()==1)  /*|| (numberParts.at(1).toInt()<20)*/)
+			if((numberParts.at(1).size()==1))
 				numberFiles.append(numberParts.at(1));
 			else {
 				if(numberParts.at(1).left(1)=="0")
@@ -226,20 +226,18 @@ QString NotifyPluginConfiguration::parseNotifyMessage()
 		}
 		foreach(QString fileName,numberFiles) {
 			fileName+=".wav";
-                        QString filePath = QDir::toNativeSeparators(getSoundCollectionPath()+"/"+ getCurrentLanguage()+"/"+fileName);
+			QString filePath = QDir::toNativeSeparators(getSoundCollectionPath()+"/"+ getCurrentLanguage()+"/"+fileName);
 			if(QFile::exists(filePath))
-                                notifyMessageList.insert(position++,QDir::toNativeSeparators(getSoundCollectionPath()+ "/"+getCurrentLanguage()+"/"+fileName));
+				_messageSequence.insert(position++,QDir::toNativeSeparators(getSoundCollectionPath()+ "/"+getCurrentLanguage()+"/"+fileName));
 			else {
-                                if(QFile::exists(QDir::toNativeSeparators(getSoundCollectionPath()+"/default/"+fileName)))
-                                        notifyMessageList.insert(position++,QDir::toNativeSeparators(getSoundCollectionPath()+"/default/"+fileName));
+				if(QFile::exists(QDir::toNativeSeparators(getSoundCollectionPath()+"/default/"+fileName)))
+					_messageSequence.insert(position++,QDir::toNativeSeparators(getSoundCollectionPath()+"/default/"+fileName));
 				else {
-					notifyMessageList.clear();
+					_messageSequence.clear();
 					break; // if no some of *.wav files, then don't play number!
 				}
 			}
 		}
 	}
-
-	//str.replace(QString(".wav | .mp3"), QString(""));
 	return str;
 }

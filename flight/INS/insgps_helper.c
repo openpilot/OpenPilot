@@ -14,8 +14,6 @@
  /* If GPS is more than this distance on any dimension then wait a few updates */
  /* and reinitialize there */
 #define INSGPS_GPS_FAR     10 
-#define timer_rate() 100000
-#define timer_count() 1
 
 //! Contains the data from the mag sensor chip
 extern struct mag_sensor mag_data;
@@ -46,8 +44,6 @@ extern volatile int8_t ahrs_algorithm;
 extern void get_accel_gyro_data();
 extern void get_mag_data();
 
-static uint32_t ins_last_time;
-
 /* INS functions */
 /**
  * @brief Update the EKF when in outdoor mode.  The primary difference is using the GPS values.
@@ -56,6 +52,7 @@ uint32_t total_far_count = 0;
 uint32_t relocated = 0;
 void ins_outdoor_update()
 {
+	static uint32_t ins_last_time;
 	float gyro[3], accel[3], vel[3];
 	float dT;
 	uint16_t sensors;
@@ -160,8 +157,6 @@ void ins_outdoor_update()
 	}
 }
 
-uint32_t time_val_a;
-uint32_t indoor_time;
 /**
  * @brief Update the EKF when in indoor mode
  */
@@ -169,10 +164,9 @@ void ins_indoor_update()
 {
 	static uint32_t updated_without_gps = 0;
 	
-	time_val_a = PIOS_DELAY_GetRaw();
-	
-	float gyro[3], accel[3], vel[3];
-	static uint32_t last_indoor_time = 0;
+	float gyro[3], accel[3];
+	float zeros[3] = {0, 0, 0};
+	static uint32_t ins_last_time = 0;
 	uint16_t sensors = 0;
 	float dT;
 
@@ -200,28 +194,7 @@ void ins_indoor_update()
 	INSCovariancePrediction(dT);
 	
 	/* Indoors, update with zero position and velocity and high covariance */
-	vel[0] = 0;
-	vel[1] = 0;
-	vel[2] = 0;
-	
-	uint32_t this_indoor_time = timer_count();
-	float indoor_delay;
-	
-	/*
-	 * Detect if greater than certain time since last gps update and if so
-	 * reset EKF to that position since probably drifted too far for safe
-	 * update
-	 */
-	if (this_indoor_time < last_indoor_time)
-		indoor_delay = ((0xFFFF - last_indoor_time) - this_indoor_time) / timer_rate();
-	else
-		indoor_delay = (this_indoor_time - last_indoor_time) / timer_rate();
-	last_indoor_time = this_indoor_time;
-	
-	if(indoor_delay > INSGPS_GPS_TIMEOUT)
-		INSPosVelReset(vel,vel);
-	else
-		sensors = HORIZ_SENSORS | VERT_SENSORS;
+	sensors = HORIZ_SENSORS | VERT_SENSORS;
 	
 	if(mag_data.updated && (ahrs_algorithm == INSSETTINGS_ALGORITHM_INSGPS_INDOOR)) {
 		sensors |= MAG_SENSORS;
@@ -277,8 +250,7 @@ void ins_indoor_update()
 	 * TODO: Need to add a general sanity check for all the inputs to make sure their kosher
 	 * although probably should occur within INS itself
 	 */
-	INSCorrection(mag_data.scaled.axis, gps_data.NED, vel, altitude_data.altitude, sensors | HORIZ_SENSORS | VERT_SENSORS);
-	indoor_time = PIOS_DELAY_DiffuS(time_val_a);
+	INSCorrection(mag_data.scaled.axis, zeros, zeros, altitude_data.altitude, sensors);
 	
 	if(fabs(Nav.gyro_bias[0]) > 0.1 || fabs(Nav.gyro_bias[1]) > 0.1 || fabs(Nav.gyro_bias[2]) > 0.1) {
 		float zeros[3] = {0,0,0};

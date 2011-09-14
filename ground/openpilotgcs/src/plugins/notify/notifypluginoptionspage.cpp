@@ -238,7 +238,7 @@ void NotifyPluginOptionsPage::on_soundLanguage_indexChanged(int index)
 
 void  NotifyPluginOptionsPage::changeButtonText(Phonon::State newstate, Phonon::State oldstate)
 {
-	Q_ASSERT(Phonon::ErrorState != newstate);
+	//Q_ASSERT(Phonon::ErrorState != newstate);
 
 	if (newstate  == Phonon::PausedState || newstate  == Phonon::StoppedState) {
 		options_page->buttonPlayNotification->setText("Play");

@@ -262,7 +262,6 @@ int main()
 		
 		print_ekf_binary(true);
 		
-		
 		switch(ahrs_algorithm) {
 			case INSSETTINGS_ALGORITHM_SIMPLE:
 				simple_update();
@@ -330,7 +329,7 @@ static void print_ekf_binary(bool ekf)
 	
 	PIOS_DELAY_WaituS(500);
 	
-	uint8_t framing[2] = { 0xff, 0x00 };
+	uint8_t framing[] = { 0xff, 0x00, 0xc3, 0x7d };
 	// Dump raw buffer
 	
 	PIOS_COM_SendBuffer(PIOS_COM_AUX, &framing[0], sizeof(framing));

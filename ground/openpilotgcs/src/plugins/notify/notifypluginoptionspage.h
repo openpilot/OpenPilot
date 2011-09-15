@@ -42,15 +42,12 @@
 #include <phonon/Path>
 #include <phonon/AudioOutput>
 #include <phonon/Global>
+#include "ui_notifypluginoptionspage.h"
+//#include "notifytablemodel.h"
 
 class NotifyTableModel;
-
 class NotificationItem;
 class SoundNotifyPlugin;
-
-namespace Ui {
-    class NotifyPluginOptionsPage;
-}
 
 
 using namespace Core;
@@ -60,7 +57,7 @@ class NotifyPluginOptionsPage : public IOptionsPage
 	Q_OBJECT
 public:
 	explicit NotifyPluginOptionsPage(/*NotificationItem *config, */QObject *parent = 0);
-
+	~NotifyPluginOptionsPage();
 	QString id() const { return QLatin1String("settings"); }
 	QString trName() const { return tr("settings"); }
 	QString category() const { return QLatin1String("Notify Plugin");}
@@ -77,7 +74,14 @@ public:
 	void getOptionsPageValues(NotificationItem* notification);
 
 private:
-	UAVObjectManager *objManager;
+    //Q_DISABLE_COPY(NotifyPluginOptionsPage)
+    void initButtons();
+    void initPhononPlayer();
+    void initRulesTableModel();
+    void initRulesTableView();
+
+private:
+	UAVObjectManager& objManager;
 	SoundNotifyPlugin* owner;
 	QStringList listDirCollections;
 	QStringList listSoundFiles;
@@ -88,11 +92,11 @@ private:
 	Phonon::MediaObject *notifySound;
 	Phonon::AudioOutput *audioOutput;
 	QStringList delegateItems;
-	NotifyTableModel* notifyRulesModel;
+	QScopedPointer<NotifyTableModel> notifyRulesModel;
 	QItemSelectionModel *notifyRulesSelection;
 	QList<NotificationItem*> privListNotifications;
 
-	Ui::NotifyPluginOptionsPage *options_page;
+	QScopedPointer<Ui::NotifyPluginOptionsPage> options_page;
 
 signals:
 	void updateNotifications(QList<NotificationItem*> list);

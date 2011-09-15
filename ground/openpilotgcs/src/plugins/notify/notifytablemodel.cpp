@@ -109,26 +109,26 @@ QVariant NotifyTableModel::headerData(int section, Qt::Orientation orientation, 
 	return QVariant();
 }
 
-bool NotifyTableModel::insertRows(int position, int rows, const QModelIndex &index)
+bool NotifyTableModel::insertRows(int position, int rows, const QModelIndex& index)
 {
-	Q_UNUSED(index);
-	beginInsertRows(QModelIndex(), position, position+rows-1);
-	endInsertRows();
-	return true;
+    Q_UNUSED(index);
+    beginInsertRows(QModelIndex(), position, position+rows-1);
+    endInsertRows();
+    return true;
 }
 
- bool NotifyTableModel::removeRows(int position, int rows, const QModelIndex &index)
- {
-	 Q_UNUSED(index);
-	 beginRemoveRows(QModelIndex(), position, position+rows-1);
+bool NotifyTableModel::removeRows(int position, int rows, const QModelIndex& index)
+{
+    Q_UNUSED(index);
+    beginRemoveRows(QModelIndex(), position, position+rows-1);
 
-	 for (int row=0; row < rows; ++row) {
-		 _list->removeAt(position);
-	 }
+    for (int row=0; row < rows; ++row) {
+        _list->removeAt(position);
+    }
 
-	 endRemoveRows();
-	 return true;
- }
+    endRemoveRows();
+    return true;
+}
 
 void NotifyTableModel::entryUpdated(int offset)
 {

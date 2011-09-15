@@ -44,24 +44,26 @@
 #include "notifyitemdelegate.h"
 #include "notifytablemodel.h"
 
-NotifyPluginOptionsPage::NotifyPluginOptionsPage(/*NotificationItem *config,*/ QObject *parent) :
-		IOptionsPage(parent),
-		owner((SoundNotifyPlugin*)parent),
-		currentCollectionPath(""),
-		privListNotifications(((SoundNotifyPlugin*)parent)->getListNotifications())
+NotifyPluginOptionsPage::NotifyPluginOptionsPage(/*NotificationItem *config,*/ QObject *parent)
+    : IOptionsPage(parent)
+    , objManager(*ExtensionSystem::PluginManager::instance()->getObject<UAVObjectManager>())
+    , owner(qobject_cast<SoundNotifyPlugin*>(parent))
+    , currentCollectionPath("")
+    , privListNotifications((qobject_cast<SoundNotifyPlugin*>(parent))->getListNotifications())
 {
-
 }
 
+NotifyPluginOptionsPage::~NotifyPluginOptionsPage()
+{
+}
 
 //creates options page widget (uses the UI file)
 QWidget *NotifyPluginOptionsPage::createPage(QWidget *parent)
 {
-
-	options_page = new Ui::NotifyPluginOptionsPage();
-	//main widget
-	QWidget *optionsPageWidget = new QWidget;
-	//main layout
+    options_page.reset(new Ui::NotifyPluginOptionsPage());
+    //main widget
+    QWidget *optionsPageWidget = new QWidget;
+    //main layout
 	options_page->setupUi(optionsPageWidget);
 
 	delegateItems.clear();
@@ -73,17 +75,11 @@ QWidget *NotifyPluginOptionsPage::createPage(QWidget *parent)
 			 << "Repeat 30 seconds"
 			 << "Repeat 1 minute";
 
-	options_page->chkEnableSound->setChecked(owner->getEnableSound());
 	options_page->SoundDirectoryPathChooser->setExpectedKind(Utils::PathChooser::Directory);
 	options_page->SoundDirectoryPathChooser->setPromptDialogTitle(tr("Choose sound collection directory"));
 
-
-
-	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-	objManager = pm->getObject<UAVObjectManager>();
-
 	// Fills the combo boxes for the UAVObjects
-	QList< QList<UAVDataObject*> > objList = objManager->getDataObjects();
+	QList< QList<UAVDataObject*> > objList = objManager.getDataObjects();
 	foreach (QList<UAVDataObject*> list, objList) {
 		foreach (UAVDataObject* obj, list) {
 			options_page->UAVObject->addItem(obj->getName());
@@ -92,13 +88,8 @@ QWidget *NotifyPluginOptionsPage::createPage(QWidget *parent)
 
 	connect(options_page->SoundDirectoryPathChooser, SIGNAL(changed(const QString&)), this, SLOT(on_buttonSoundFolder_clicked(const QString&)));
 	connect(options_page->SoundCollectionList, SIGNAL(currentIndexChanged (int)), this, SLOT(on_soundLanguage_indexChanged(int)));
-	connect(options_page->buttonAdd, SIGNAL(pressed()), this, SLOT(on_buttonAddNotification_clicked()));
-	connect(options_page->buttonDelete, SIGNAL(pressed()), this, SLOT(on_buttonDeleteNotification_clicked()));
-	connect(options_page->buttonModify, SIGNAL(pressed()), this, SLOT(on_buttonModifyNotification_clicked()));
-	connect(options_page->buttonPlayNotification, SIGNAL(clicked()), this, SLOT(on_buttonTestSoundNotification_clicked()));
-	connect(options_page->chkEnableSound, SIGNAL(toggled(bool)), this, SLOT(on_chkEnableSound_toggled(bool)));
-
 	connect(options_page->UAVObject, SIGNAL(currentIndexChanged(QString)), this, SLOT(on_UAVObject_indexChanged(QString)));
+
 	connect(this, SIGNAL(updateNotifications(QList<NotificationItem*>)),
 			owner, SLOT(updateNotificationList(QList<NotificationItem*>)));
 	connect(this, SIGNAL(resetNotification()),owner, SLOT(resetNotification()));
@@ -115,20 +106,52 @@ QWidget *NotifyPluginOptionsPage::createPage(QWidget *parent)
 
 	updateConfigView(owner->getCurrentNotification());
 
+	initButtons();
+	initRulesTableModel();
+	initRulesTableView();
+	initPhononPlayer();
+
+	return optionsPageWidget;
+}
+
+void NotifyPluginOptionsPage::initButtons()
+{
 	options_page->chkEnableSound->setChecked(owner->getEnableSound());
+	connect(options_page->chkEnableSound, SIGNAL(toggled(bool)), this, SLOT(on_chkEnableSound_toggled(bool)));
 
-	notifyRulesModel = new NotifyTableModel(&privListNotifications);
-	options_page->notifyRulesView->setModel(notifyRulesModel);
+	options_page->buttonModify->setEnabled(false);
+	options_page->buttonDelete->setEnabled(false);
+	options_page->buttonPlayNotification->setEnabled(false);
+	connect(options_page->buttonAdd, SIGNAL(pressed()), this, SLOT(on_buttonAddNotification_clicked()));
+	connect(options_page->buttonDelete, SIGNAL(pressed()), this, SLOT(on_buttonDeleteNotification_clicked()));
+	connect(options_page->buttonModify, SIGNAL(pressed()), this, SLOT(on_buttonModifyNotification_clicked()));
+	connect(options_page->buttonPlayNotification, SIGNAL(clicked()), this, SLOT(on_buttonTestSoundNotification_clicked()));
+}
+
+void NotifyPluginOptionsPage::initPhononPlayer()
+{
+    notifySound = Phonon::createPlayer(Phonon::NotificationCategory);
+    connect(notifySound,SIGNAL(stateChanged(Phonon::State,Phonon::State)),
+        this,SLOT(changeButtonText(Phonon::State,Phonon::State)));
+    connect(notifySound, SIGNAL(finished(void)), this, SLOT(onFinishedPlaying(void)));
+}
+
+void NotifyPluginOptionsPage::initRulesTableModel()
+{
+    notifyRulesModel.reset(new NotifyTableModel(&privListNotifications));
+    notifyRulesSelection = new QItemSelectionModel(notifyRulesModel.data());
+    connect(notifyRulesSelection, SIGNAL(selectionChanged ( const QItemSelection &, const QItemSelection & )),
+        this, SLOT(on_tableNotification_changeSelection( const QItemSelection & , const QItemSelection & )));
+    connect(this, SIGNAL(entryUpdated(int)),
+        notifyRulesModel.data(), SLOT(entryUpdated(int)));
+    connect(this, SIGNAL(entryAdded(int)),
+        notifyRulesModel.data(), SLOT(entryAdded(int)));
+}
+
+void NotifyPluginOptionsPage::initRulesTableView()
+{
+	options_page->notifyRulesView->setModel(notifyRulesModel.data());
 	options_page->notifyRulesView->resizeRowsToContents();
-	notifyRulesSelection = new QItemSelectionModel(notifyRulesModel);
-	connect(notifyRulesSelection, SIGNAL(selectionChanged ( const QItemSelection &, const QItemSelection & )),
-			this, SLOT(on_tableNotification_changeSelection( const QItemSelection & , const QItemSelection & )));
-	connect(this, SIGNAL(entryUpdated(int)),
-			notifyRulesModel, SLOT(entryUpdated(int)));
-	connect(this, SIGNAL(entryAdded(int)),
-			notifyRulesModel, SLOT(entryAdded(int)));
-
-
 	options_page->notifyRulesView->setSelectionModel(notifyRulesSelection);
 	options_page->notifyRulesView->setItemDelegate(new NotifyItemDelegate(delegateItems,this));
 
@@ -136,17 +159,9 @@ QWidget *NotifyPluginOptionsPage::createPage(QWidget *parent)
 	options_page->notifyRulesView->setColumnWidth(eREPEAT_VALUE,120);
 	options_page->notifyRulesView->setColumnWidth(eEXPIRE_TIME,100);
 	options_page->notifyRulesView->setColumnWidth(eENABLE_NOTIFICATION,60);
-
-	options_page->buttonModify->setEnabled(false);
-	options_page->buttonDelete->setEnabled(false);
-	options_page->buttonPlayNotification->setEnabled(false);
-
-	notifySound = Phonon::createPlayer(Phonon::NotificationCategory);
-	connect(notifySound,SIGNAL(stateChanged(Phonon::State,Phonon::State)),
-			this,SLOT(changeButtonText(Phonon::State,Phonon::State)));
-	connect(notifySound, SIGNAL(finished(void)), this, SLOT(onFinishedPlaying(void)));
-
-	return optionsPageWidget;
+	options_page->notifyRulesView->setDragEnabled(true);
+	options_page->notifyRulesView->setAcceptDrops(true);
+	options_page->notifyRulesView->setDropIndicatorShown(true);
 }
 
 void NotifyPluginOptionsPage::getOptionsPageValues(NotificationItem* notification)
@@ -183,8 +198,6 @@ void NotifyPluginOptionsPage::finish()
 		notifySound->stop();
 		notifySound->clear();
 	}
-	if (options_page)
-		delete options_page;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -306,7 +319,7 @@ void NotifyPluginOptionsPage::updateConfigView(NotificationItem* notification)
 	// Now load the object field values:
 	options_page->UAVObjectField->clear();
 	QString uavDataObject = notification->getDataObject();
-	UAVDataObject* obj = dynamic_cast<UAVDataObject*>( objManager->getObject(uavDataObject/*objList.at(0).at(0)->getName()*/) );
+	UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager.getObject(uavDataObject));
 	if (obj != NULL ) {
 		QList<UAVObjectField*> fieldList = obj->getFields();
 		foreach (UAVObjectField* field, fieldList) {

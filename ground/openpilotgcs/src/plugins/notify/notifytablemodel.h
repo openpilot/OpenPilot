@@ -58,10 +58,15 @@ public:
 	Qt::ItemFlags flags(const QModelIndex &index) const
 	{
 		if (!index.isValid())
-			return Qt::ItemIsEnabled;
+			return Qt::ItemIsEnabled | Qt::ItemIsDropEnabled;
 
-		return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
+		return QAbstractItemModel::flags(index) | Qt::ItemIsEditable | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
 	}
+
+    Qt::DropActions supportedDropActions() const
+    {
+        return Qt::MoveAction;
+    }
 
 	bool setData(const QModelIndex &index, const QVariant &value, int role);
 	QVariant data(const QModelIndex &index, int role) const;

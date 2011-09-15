@@ -71,6 +71,26 @@ public:
    void setEnableSound(bool value) {enableSound = value; }
 
 private:
+   SoundNotifyPlugin(const SoundNotifyPlugin& rhs);
+   SoundNotifyPlugin& operator= (const SoundNotifyPlugin& rhs);
+
+   bool playNotification(NotificationItem* notification);
+   void checkNotificationRule(NotificationItem* notification, UAVObject* object);
+   void readConfig_0_0_0();
+
+private slots:
+   void onTelemetryManagerAdded(QObject* obj);
+   void onAutopilotDisconnect();
+   void connectNotifications();
+   void updateNotificationList(QList<NotificationItem*> list);
+   void resetNotification(void);
+   void appendNotification(UAVObject *object);
+   void repeatTimerHandler(void);
+   void expireTimerHandler(void);
+   void stateChanged(Phonon::State newstate, Phonon::State oldstate);
+
+private:
+
    bool configured; // just for migration,delete later
    bool enableSound;
    QList< QList<Phonon::MediaSource>* > lstMediaSource;
@@ -90,21 +110,6 @@ private:
    PhononObject phonon;
    NotifyPluginOptionsPage *mop;
    TelemetryManager* telMngr;
-
-   bool playNotification(NotificationItem* notification);
-   void checkNotificationRule(NotificationItem* notification, UAVObject* object);
-   void readConfig_0_0_0();
-
-private slots:
-   void onTelemetryManagerAdded(QObject* obj);
-   void onAutopilotDisconnect();
-   void connectNotifications();
-   void updateNotificationList(QList<NotificationItem*> list);
-   void resetNotification(void);
-   void appendNotification(UAVObject *object);
-   void repeatTimerHandler(void);
-   void expireTimerHandler(void);
-   void stateChanged(Phonon::State newstate, Phonon::State oldstate);
 }; 
 
 #endif // SOUNDNOTIFYPLUGIN_H

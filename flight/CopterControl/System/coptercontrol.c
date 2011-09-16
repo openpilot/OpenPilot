@@ -37,6 +37,7 @@
 #include "uavobjectsinit.h"
 #include "hwsettings.h"
 #include "camerastab.h"
+#include "txpid.h"
 #include "systemmod.h"
 
 /* Task Priorities */
@@ -80,6 +81,9 @@ int main()
 	HwSettingsOptionalModulesGet(optionalModules);
 	if(optionalModules[HWSETTINGS_OPTIONALMODULES_CAMERASTABILIZATION] == HWSETTINGS_OPTIONALMODULES_ENABLED) {
 		CameraStabInitialize();
+	}
+	if(optionalModules[HWSETTINGS_OPTIONALMODULES_TXPID] == HWSETTINGS_OPTIONALMODULES_ENABLED) {
+		TxPIDInitialize();
 	}
 
 	/* swap the stack to use the IRQ stack */

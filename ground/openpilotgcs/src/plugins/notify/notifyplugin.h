@@ -49,7 +49,6 @@ typedef struct {
 } PhononObject, *pPhononObject;
 
 
-
 class SoundNotifyPlugin : public Core::IConfigurablePlugin
 { 
 	Q_OBJECT

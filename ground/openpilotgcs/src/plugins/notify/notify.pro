@@ -12,13 +12,15 @@ HEADERS += notifyplugin.h \
     notifypluginoptionspage.h \
     notifyitemdelegate.h \
     notifytablemodel.h \
-    notificationitem.h
+    notificationitem.h \
+    notifylogging.h
 
 SOURCES += notifyplugin.cpp \  
     notifypluginoptionspage.cpp \
     notifyitemdelegate.cpp \
     notifytablemodel.cpp \
-    notificationitem.cpp
+    notificationitem.cpp \
+    notifylogging.cpp
  
 OTHER_FILES += NotifyPlugin.pluginspec
 
@@ -27,3 +29,5 @@ FORMS += \
 
 RESOURCES += \
     res.qrc
+
+

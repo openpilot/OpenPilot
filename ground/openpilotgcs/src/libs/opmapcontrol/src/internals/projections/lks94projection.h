@@ -28,7 +28,7 @@
 #define LKS94PROJECTION_H
 #include <QVector>
 #include "cmath"
-#include "D:\!Work\OpenSource\OpenPilot\OpenPilot\ground\openpilotgcs\src\libs\opmapcontrol\src\internals\pureprojection.h"
+#include "D:\!Work\OpenPilot\OpenPilot\ground\openpilotgcs\src\libs\opmapcontrol\src\internals\pureprojection.h"
 
  
 namespace projections {

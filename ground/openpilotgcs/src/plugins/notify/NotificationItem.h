@@ -40,113 +40,129 @@ using namespace Core;
 	QString getSound##number() const { return _sound##number; } \
 	void setSound##number(QString text) { _sound##number = text; } \
 
-//	QString getSound2() const { return _sound2; }
-//	void setSound2(QString text) { _sound2 = text; }
-
-//	QString getSound3() const { return _sound3; }
-//	void setSound3(QString text) { _sound3 = text; }
 
 class NotificationItem : public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	explicit NotificationItem(QObject *parent = 0);
+    explicit NotificationItem(QObject *parent = 0);
 
-	void copyTo(NotificationItem*) const;
+    void copyTo(NotificationItem*) const;
 
-	DECLARE_SOUND(1)
-	DECLARE_SOUND(2)
-	DECLARE_SOUND(3)
+    DECLARE_SOUND(1)
+    DECLARE_SOUND(2)
+    DECLARE_SOUND(3)
 
-	QString getValue() const { return _dataValue; }
-	void setValue(QString text) { _dataValue = text; }
+    QString getValue() const { return _dataValue; }
+    void setValue(QString text) { _dataValue = text; }
 
-	QString getSayOrder() const { return _sayOrder; }
-	void setSayOrder(QString text) { _sayOrder = text; }
+    QString getSayOrder() const { return _sayOrder; }
+    void setSayOrder(QString text) { _sayOrder = text; }
 
-	double getSpinBoxValue() const { return _spinBoxValue; }
-	void setSpinBoxValue(double value) { _spinBoxValue = value; }
+    double getSpinBoxValue() const { return _spinBoxValue; }
+    void setSpinBoxValue(double value) { _spinBoxValue = value; }
 
 
-	QString getDataObject() const { return _dataObject; }
-	void setDataObject(QString text) { _dataObject = text; }
+    QString getDataObject() const { return _dataObject; }
+    void setDataObject(QString text) { _dataObject = text; }
 
-	QString getObjectField() const { return _objectField; }
-	void setObjectField(QString text) { _objectField = text; }
+    QString getObjectField() const { return _objectField; }
+    void setObjectField(QString text) { _objectField = text; }
 
-	QString getSoundCollectionPath() const { return _soundCollectionPath; }
-	void setSoundCollectionPath(QString path) { _soundCollectionPath = path; }
+    QString getSoundCollectionPath() const { return _soundCollectionPath; }
+    void setSoundCollectionPath(QString path) { _soundCollectionPath = path; }
 
-	QString getCurrentLanguage() const { return _currentLanguage; }
-	void setCurrentLanguage(QString text) { _currentLanguage = text; }
+    QString getCurrentLanguage() const { return _currentLanguage; }
+    void setCurrentLanguage(QString text) { _currentLanguage = text; }
 
-	QStringList getMessageSequence() const { return _messageSequence; }
-	void setMessageSequence(QStringList sequence) { _messageSequence = sequence; }
+    QStringList getMessageSequence() const { return _messageSequence; }
+    void setMessageSequence(QStringList sequence) { _messageSequence = sequence; }
 
-	QString getRepeatFlag() const { return _repeatString; }
-	void setRepeatFlag(QString value) { _repeatString = value; }
+    QString getRepeatFlag() const { return _repeatString; }
+    void setRepeatFlag(QString value) { _repeatString = value; }
 
-	bool getRepeatTimeout() const { return _repeatTimeout; }
-	void setRepeatTimeout(bool value) { _repeatTimeout = value; }
+    bool getRepeatTimeout() const { return _repeatTimeout; }
+    void setRepeatTimeout(bool value) { _repeatTimeout = value; }
 
-	int getExpireTimeout() const { return _expireTimeout; }
-	void setExpireTimeout(int value) { _expireTimeout = value; }
+    int getExpireTimeout() const { return _expireTimeout; }
+    void setExpireTimeout(int value) { _expireTimeout = value; }
 
-	bool getEnableFlag() const { return _enableFlag; }
-	void setEnableFlag(bool value) { _enableFlag = value; }
+    bool getEnableFlag() const { return _enableFlag; }
+    void setEnableFlag(bool value) { _enableFlag = value; }
 
-	void saveState(QSettings* settings) const;
-	void restoreState(QSettings* settings);
-	QString parseNotifyMessage();
+    void saveState(QSettings* settings) const;
+    void restoreState(QSettings* settings);
 
-	QTimer* timer;
-	QTimer* expireTimer;
-	bool isNowPlaying; //
-	bool firstStart;
+    QString parseNotifyMessage();
+
+    QTimer* getTimer() const { return _timer; }
+    void startTimer(int value);
+    void stopTimer();
+    void disposeTimer();
+
+    QTimer* getExpireTimer() const { return _expireTimer; }
+    void startExpireTimer();
+    void stopExpireTimer();
+
+    void disposeExpireTimer();
+
+    bool isNowPlaying;
+    bool firstStart;
 
 private:
+    void checkSoundFilesExisting();
 
-	QStringList _messageSequence;
+private:
+    QTimer* _timer;
 
-	//! path to folder with sound files
-	QString _soundCollectionPath;
+    //! time from putting notification in queue till moment when notification became out-of-date
+    //! NOTE: each notification has it lifetime, this time setups individually for each notification
+    //!       according to its priority
+    QTimer* _expireTimer;
 
-	//! language in what notifications will be spelled
-	QString _currentLanguage;
 
-	//! one UAV object per one notification
-	QString _dataObject;
 
-	//! one field value change can be assigned to one notification
-	QString _objectField;
+    QStringList _messageSequence;
 
-	//! poled UAV field value
-	QString _dataValue;
+    //! path to folder with sound files
+    QString _soundCollectionPath;
 
-	//! possible sounds(at least one required to play notification)
-	QString _sound1;
-	QString _sound2;
-	QString _sound3;
+    //! language in what notifications will be spelled
+    QString _currentLanguage;
 
-	//! order in what sounds 1-3 will be played
-	QString _sayOrder;
+    //! one UAV object per one notification
+    QString _dataObject;
 
-	double _spinBoxValue;
+    //! one field value change can be assigned to one notification
+    QString _objectField;
 
-	QString _repeatString;
+    //! poled UAV field value
+    QString _dataValue;
 
-	//! time when next notification must be fired
-	bool _repeatTimeout;
+    //! possible sounds(at least one required to play notification)
+    QString _sound1;
+    QString _sound2;
+    QString _sound3;
 
-	//! how often or what periodicaly notification should be played
-	int _repeatTimerValue;
+    //! order in what sounds 1-3 will be played
+    QString _sayOrder;
 
-	//! time after event occured till notification became invalid
-	//! and will be removed from list
-	int _expireTimeout;
+    double _spinBoxValue;
 
-	//! enables/disables playing of current notification
-	bool _enableFlag;
+    QString _repeatString;
+
+    //! time when next notification must be fired
+    bool _repeatTimeout;
+
+    //! how often or what periodicaly notification should be played
+    int _repeatTimerValue;
+
+    //! time after event occured till notification became invalid
+    //! and will be removed from list
+    int _expireTimeout;
+
+    //! enables/disables playing of current notification
+    bool _enableFlag;
 };
 
 Q_DECLARE_METATYPE(NotificationItem*)

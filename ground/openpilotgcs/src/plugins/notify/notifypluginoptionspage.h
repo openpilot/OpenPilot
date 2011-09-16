@@ -100,7 +100,7 @@ private:
 
 signals:
 	void updateNotifications(QList<NotificationItem*> list);
-	void resetNotification(void);
+        //void resetNotification(void);
 	void entryUpdated(int index);
 	void entryAdded(int position);
 

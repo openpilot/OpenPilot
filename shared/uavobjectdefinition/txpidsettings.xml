@@ -1,6 +1,11 @@
 <xml>
     <object name="TxPIDSettings" singleinstance="true" settings="true">
         <description>Settings used by @ref TxPID optional module to tune PID settings using R/C transmitter</description>
+        <field name="Inputs" units="channel" type="enum"
+		elementnames="Instance1,Instance2,Instance3"
+		options="Throttle,Accessory0,Accessory1,Accessory2,Accessory3,Accessory4,Accessory5"
+		defaultvalue="Throttle,Accessory0,Accessory1"/>
+        <field name="ThrottleRange" units="percent" type="float" elements="2" elementnames="Min,Max" defaultvalue="0.20,0.80"/>
         <field name="PIDs" units="option" type="enum"
 		elementnames="Instance1,Instance2,Instance3"
 		options="Disabled,
@@ -10,12 +15,8 @@
 			Roll Attitude.Kp, Pitch Attitude.Kp, Roll+Pitch Attitude.Kp, Yaw Attitude.Kp,
 			Roll Attitude.Ki, Pitch Attitude.Ki, Roll+Pitch Attitude.Ki, Yaw Attitude.Ki"
 		defaultvalue="Disabled"/>
-        <field name="Inputs" units="channel" type="enum"
-		elementnames="Instance1,Instance2,Instance3"
-		options="Accessory0,Accessory1,Accessory2,Accessory3,Accessory4,Accessory5"
-		defaultvalue="Accessory0"/>
-        <field name="Min" units="" type="float" elementnames="Instance1,Instance2,Instance3" defaultvalue="0"/>
-        <field name="Max" units="" type="float" elementnames="Instance1,Instance2,Instance3" defaultvalue="0"/>
+        <field name="MinPID" units="" type="float" elementnames="Instance1,Instance2,Instance3" defaultvalue="0"/>
+        <field name="MaxPID" units="" type="float" elementnames="Instance1,Instance2,Instance3" defaultvalue="0"/>
 
 	<access gcs="readwrite" flight="readwrite"/>
 	<telemetrygcs acked="true" updatemode="onchange" period="0"/>

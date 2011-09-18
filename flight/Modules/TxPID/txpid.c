@@ -54,18 +54,19 @@
 
 #include "txpidsettings.h"
 #include "accessorydesired.h"
+#include "manualcontrolcommand.h"
 #include "stabilizationsettings.h"
 
 //
 // Configuration
 //
-#define SAMPLE_PERIOD_MS		200
-#define TELEMETRY_UPDATE_PERIOD_MS	1000	// 0 = update on change
+#define SAMPLE_PERIOD_MS		100
+#define TELEMETRY_UPDATE_PERIOD_MS	1000	// 0 = update on change (default)
 
 // Sanity checks
 #if (TXPIDSETTINGS_PIDS_NUMELEM != TXPIDSETTINGS_INPUTS_NUMELEM) || \
-    (TXPIDSETTINGS_PIDS_NUMELEM != TXPIDSETTINGS_MIN_NUMELEM) || \
-    (TXPIDSETTINGS_PIDS_NUMELEM != TXPIDSETTINGS_MAX_NUMELEM)
+    (TXPIDSETTINGS_PIDS_NUMELEM != TXPIDSETTINGS_MINPID_NUMELEM) || \
+    (TXPIDSETTINGS_PIDS_NUMELEM != TXPIDSETTINGS_MAXPID_NUMELEM)
 #error Invalid TxPID UAVObject definition (inconsistent number of field elements)
 #endif
 
@@ -76,7 +77,7 @@
 // Private functions
 static void updatePIDs(UAVObjEvent* ev);
 static uint8_t update(float *var, float val);
-static float scale(float val, float min, float max);
+static float scale(float val, float inMin, float inMax, float outMin, float outMax);
 
 /**
  * Initialise the module, called on startup
@@ -129,76 +130,86 @@ static void updatePIDs(UAVObjEvent* ev)
 	// Loop through every enabled instance
 	for (uint8_t i = 0; i < TXPIDSETTINGS_PIDS_NUMELEM; i++) {
 		if (inst.PIDs[i] != TXPIDSETTINGS_PIDS_DISABLED) {
-			if (AccessoryDesiredInstGet(inst.Inputs[i] - TXPIDSETTINGS_INPUTS_ACCESSORY0, &accessory) == 0) {
-				float value = scale(accessory.AccessoryVal, inst.Min[i], inst.Max[i]);
 
-				switch (inst.PIDs[i]) {
-				case TXPIDSETTINGS_PIDS_ROLLRATEKP:
-					needsUpdate |= update(&stab.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KP], value);
-					break;
-				case TXPIDSETTINGS_PIDS_ROLLRATEKI:
-					needsUpdate |= update(&stab.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KI], value);
-					break;
-				case TXPIDSETTINGS_PIDS_ROLLRATEKD:
-					needsUpdate |= update(&stab.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KD], value);
-					break;
-				case TXPIDSETTINGS_PIDS_ROLLATTITUDEKP:
-					needsUpdate |= update(&stab.RollPI[STABILIZATIONSETTINGS_ROLLPI_KP], value);
-					break;
-				case TXPIDSETTINGS_PIDS_ROLLATTITUDEKI:
-					needsUpdate |= update(&stab.RollPI[STABILIZATIONSETTINGS_ROLLPI_KI], value);
-					break;
-				case TXPIDSETTINGS_PIDS_PITCHRATEKP:
-					needsUpdate |= update(&stab.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KP], value);
-					break;
-				case TXPIDSETTINGS_PIDS_PITCHRATEKI:
-					needsUpdate |= update(&stab.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KI], value);
-					break;
-				case TXPIDSETTINGS_PIDS_PITCHRATEKD:
-					needsUpdate |= update(&stab.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KD], value);
-					break;
-				case TXPIDSETTINGS_PIDS_PITCHATTITUDEKP:
-					needsUpdate |= update(&stab.PitchPI[STABILIZATIONSETTINGS_PITCHPI_KP], value);
-					break;
-				case TXPIDSETTINGS_PIDS_PITCHATTITUDEKI:
-					needsUpdate |= update(&stab.PitchPI[STABILIZATIONSETTINGS_PITCHPI_KI], value);
-					break;
-				case TXPIDSETTINGS_PIDS_ROLLPITCHRATEKP:
-					needsUpdate |= update(&stab.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KP], value);
-					needsUpdate |= update(&stab.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KP], value);
-					break;
-				case TXPIDSETTINGS_PIDS_ROLLPITCHRATEKI:
-					needsUpdate |= update(&stab.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KI], value);
-					needsUpdate |= update(&stab.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KI], value);
-					break;
-				case TXPIDSETTINGS_PIDS_ROLLPITCHRATEKD:
-					needsUpdate |= update(&stab.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KD], value);
-					needsUpdate |= update(&stab.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KD], value);
-					break;
-				case TXPIDSETTINGS_PIDS_ROLLPITCHATTITUDEKP:
-					needsUpdate |= update(&stab.RollPI[STABILIZATIONSETTINGS_ROLLPI_KP], value);
-					needsUpdate |= update(&stab.PitchPI[STABILIZATIONSETTINGS_PITCHPI_KP], value);
-					break;
-				case TXPIDSETTINGS_PIDS_ROLLPITCHATTITUDEKI:
-					needsUpdate |= update(&stab.RollPI[STABILIZATIONSETTINGS_ROLLPI_KI], value);
-					needsUpdate |= update(&stab.PitchPI[STABILIZATIONSETTINGS_PITCHPI_KI], value);
-					break;
-				case TXPIDSETTINGS_PIDS_YAWRATEKP:
-					needsUpdate |= update(&stab.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_KP], value);
-					break;
-				case TXPIDSETTINGS_PIDS_YAWRATEKI:
-					needsUpdate |= update(&stab.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_KI], value);
-					break;
-				case TXPIDSETTINGS_PIDS_YAWRATEKD:
-					needsUpdate |= update(&stab.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_KD], value);
-					break;
-				case TXPIDSETTINGS_PIDS_YAWATTITUDEKP:
-					needsUpdate |= update(&stab.YawPI[STABILIZATIONSETTINGS_YAWPI_KP], value);
-					break;
-				case TXPIDSETTINGS_PIDS_YAWATTITUDEKI:
-					needsUpdate |= update(&stab.YawPI[STABILIZATIONSETTINGS_YAWPI_KI], value);
-					break;
-				}
+			float value;
+			if (inst.Inputs[i] == TXPIDSETTINGS_INPUTS_THROTTLE) {
+				ManualControlCommandThrottleGet(&value);
+				value = scale(value,
+						inst.ThrottleRange[TXPIDSETTINGS_THROTTLERANGE_MIN],
+						inst.ThrottleRange[TXPIDSETTINGS_THROTTLERANGE_MAX],
+						inst.MinPID[i], inst.MaxPID[i]);
+			} else if (AccessoryDesiredInstGet(inst.Inputs[i] - TXPIDSETTINGS_INPUTS_ACCESSORY0, &accessory) == 0) {
+				value = scale(accessory.AccessoryVal, -1.0, 1.0, inst.MinPID[i], inst.MaxPID[i]);
+			} else {
+				continue;
+			}
+
+			switch (inst.PIDs[i]) {
+			case TXPIDSETTINGS_PIDS_ROLLRATEKP:
+				needsUpdate |= update(&stab.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KP], value);
+				break;
+			case TXPIDSETTINGS_PIDS_ROLLRATEKI:
+				needsUpdate |= update(&stab.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KI], value);
+				break;
+			case TXPIDSETTINGS_PIDS_ROLLRATEKD:
+				needsUpdate |= update(&stab.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KD], value);
+				break;
+			case TXPIDSETTINGS_PIDS_ROLLATTITUDEKP:
+				needsUpdate |= update(&stab.RollPI[STABILIZATIONSETTINGS_ROLLPI_KP], value);
+				break;
+			case TXPIDSETTINGS_PIDS_ROLLATTITUDEKI:
+				needsUpdate |= update(&stab.RollPI[STABILIZATIONSETTINGS_ROLLPI_KI], value);
+				break;
+			case TXPIDSETTINGS_PIDS_PITCHRATEKP:
+				needsUpdate |= update(&stab.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KP], value);
+				break;
+			case TXPIDSETTINGS_PIDS_PITCHRATEKI:
+				needsUpdate |= update(&stab.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KI], value);
+				break;
+			case TXPIDSETTINGS_PIDS_PITCHRATEKD:
+				needsUpdate |= update(&stab.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KD], value);
+				break;
+			case TXPIDSETTINGS_PIDS_PITCHATTITUDEKP:
+				needsUpdate |= update(&stab.PitchPI[STABILIZATIONSETTINGS_PITCHPI_KP], value);
+				break;
+			case TXPIDSETTINGS_PIDS_PITCHATTITUDEKI:
+				needsUpdate |= update(&stab.PitchPI[STABILIZATIONSETTINGS_PITCHPI_KI], value);
+				break;
+			case TXPIDSETTINGS_PIDS_ROLLPITCHRATEKP:
+				needsUpdate |= update(&stab.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KP], value);
+				needsUpdate |= update(&stab.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KP], value);
+				break;
+			case TXPIDSETTINGS_PIDS_ROLLPITCHRATEKI:
+				needsUpdate |= update(&stab.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KI], value);
+				needsUpdate |= update(&stab.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KI], value);
+				break;
+			case TXPIDSETTINGS_PIDS_ROLLPITCHRATEKD:
+				needsUpdate |= update(&stab.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KD], value);
+				needsUpdate |= update(&stab.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KD], value);
+				break;
+			case TXPIDSETTINGS_PIDS_ROLLPITCHATTITUDEKP:
+				needsUpdate |= update(&stab.RollPI[STABILIZATIONSETTINGS_ROLLPI_KP], value);
+				needsUpdate |= update(&stab.PitchPI[STABILIZATIONSETTINGS_PITCHPI_KP], value);
+				break;
+			case TXPIDSETTINGS_PIDS_ROLLPITCHATTITUDEKI:
+				needsUpdate |= update(&stab.RollPI[STABILIZATIONSETTINGS_ROLLPI_KI], value);
+				needsUpdate |= update(&stab.PitchPI[STABILIZATIONSETTINGS_PITCHPI_KI], value);
+				break;
+			case TXPIDSETTINGS_PIDS_YAWRATEKP:
+				needsUpdate |= update(&stab.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_KP], value);
+				break;
+			case TXPIDSETTINGS_PIDS_YAWRATEKI:
+				needsUpdate |= update(&stab.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_KI], value);
+				break;
+			case TXPIDSETTINGS_PIDS_YAWRATEKD:
+				needsUpdate |= update(&stab.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_KD], value);
+				break;
+			case TXPIDSETTINGS_PIDS_YAWATTITUDEKP:
+				needsUpdate |= update(&stab.YawPI[STABILIZATIONSETTINGS_YAWPI_KP], value);
+				break;
+			case TXPIDSETTINGS_PIDS_YAWATTITUDEKI:
+				needsUpdate |= update(&stab.YawPI[STABILIZATIONSETTINGS_YAWPI_KI], value);
+				break;
 			}
 		}
 	}
@@ -207,31 +218,41 @@ static void updatePIDs(UAVObjEvent* ev)
 }
 
 /**
- * Scale input value to [min..max] (min can be greater than max)
+ * Scales input val from [inMin..inMax] range to [outMin..outMax].
+ * If val is out of input range (inMin <= inMax), it will be bound.
+ * (outMin > outMax) is ok, in that case output will be decreasing.
+ *
  * \returns scaled value
  */
-static float scale(float val, float min, float max) {
-	float v;
+static float scale(float val, float inMin, float inMax, float outMin, float outMax)
+{
+	// bound input value
+	if (val > inMax) val = inMax;
+	if (val < inMin) val = inMin;
 
-	if (min > max) {
-		val = -val;
-		v = min;
-		min = max;
-		max = v;
+	// normalize input value to [0..1]
+	if (inMax <= inMin)
+		val = 0.0;
+	else
+		val = (val - inMin) / (inMax - inMin);
+
+	// update output bounds
+	if (outMin > outMax) {
+		float t = outMin;
+		outMin = outMax;
+		outMax = t;
+		val = 1.0 - val;
 	}
 
-	v = min  + (max - min) * (val + 1.0) * 0.5;
-	if (v > max) v = max;
-	if (v < min) v = min;
-
-	return v;
+	return (outMax - outMin) * val + outMin;
 }
 
 /**
- * Updates value
- * \returns 1 if update needed or 0 if not
+ * Updates var using val if needed.
+ * \returns 1 if updated, 0 otherwise
  */
-static uint8_t update(float *var, float val) {
+static uint8_t update(float *var, float val)
+{
 	if (*var != val) {
 		*var = val;
 		return 1;

@@ -272,8 +272,8 @@ void SoundNotifyPlugin::appendNotification(UAVObject *object)
         if (nowPlayingConfiguration == ntf)
             continue;
 
-        if (ntf->getRepeatFlag()!= "Repeat Instantly" &&
-                ntf->getRepeatFlag()!= "Repeat Once" && !ntf->firstStart)
+        if (ntf->retryString() != "Repeat Instantly" &&
+                ntf->retryString() != "Repeat Once" && !ntf->firstStart)
            continue;
 
         checkNotificationRule(ntf,object);
@@ -288,46 +288,47 @@ void SoundNotifyPlugin::checkNotificationRule(NotificationItem* notification, UA
     double threshold;
     QString direction;
     QString fieldName;
+
     threshold = notification->getSpinBoxValue();
     direction = notification->getValue();
     fieldName = notification->getObjectField();
     UAVObjectField* field = object->getField(fieldName);
-    if (field->getName()!="") {
-        double value = field->getDouble();
 
-        switch(direction[0].toAscii())
-        {
-        case 'E':
-                if (value==threshold)
-                        condition = true;
-                break;
-        case 'G':
-                if (value>threshold)
-                        condition = true;
-                break;
-        case 'L':
-                if (value<threshold)
-                        condition = true;
-                break;
-        }
+    if (field->getName() == "")
+        return;
+
+    double value = field->getDouble();
+    switch(direction[0].toAscii())
+    {
+    case 'E':
+        condition = (value == threshold);
+        break;
+
+    case 'G':
+        condition = (value > threshold);
+        break;
+
+    case 'L':
+        condition = (value < threshold);
+        break;
     }
 
-    if (condition)
-    {
-        if (!playNotification(notification))
-        {
-            if (!pendingNotifications.contains(notification))
-            {
-                notification->stopTimer();
+    if (!condition)
+        return;
 
-                qNotifyDebug() << "add to pending list - " << notification->parseNotifyMessage();
-                // if audio is busy, start expiration timer
-                //ms = (notification->getExpiredTimeout()[in sec])*1000
-                //QxtTimer::singleShot(notification->getExpireTimeout()*1000, this, SLOT(expirationTimerHandler(NotificationItem*)), qVariantFromValue(notification));
-                pendingNotifications.append(notification);
-                notification->startExpireTimer();
-                connect(notification->getExpireTimer(), SIGNAL(timeout()), this, SLOT(expireTimerHandler()));
-            }
+    if (!playNotification(notification))
+    {
+        if (!pendingNotifications.contains(notification))
+        {
+            notification->stopTimer();
+
+            qNotifyDebug() << "add to pending list - " << notification->parseNotifyMessage();
+            // if audio is busy, start expiration timer
+            //ms = (notification->getExpiredTimeout()[in sec])*1000
+            //QxtTimer::singleShot(notification->getExpireTimeout()*1000, this, SLOT(expirationTimerHandler(NotificationItem*)), qVariantFromValue(notification));
+            pendingNotifications.append(notification);
+            notification->startExpireTimer();
+            connect(notification->getExpireTimer(), SIGNAL(timeout()), this, SLOT(expireTimerHandler()));
         }
     }
 }
@@ -338,26 +339,26 @@ bool SoundNotifyPlugin::playNotification(NotificationItem* notification)
     if (phonon.mo == NULL)
         return false;
 
-    if (!notification->getEnableFlag()) return true;
+    if (!notification->mute())
+        return true;
 
     qNotifyDebug() << "Phonon State: " << phonon.mo->state();
     if ((phonon.mo->state()==Phonon::PausedState)
-            || (phonon.mo->state()==Phonon::StoppedState)
-               || phonon.firstPlay)
+        || (phonon.mo->state()==Phonon::StoppedState)
+            || phonon.firstPlay)
     {
         // don't fire expire timer
         nowPlayingConfiguration = notification;
         notification->stopExpireTimer();
 
-        if (notification->getRepeatFlag()=="Repeat Once") {
+        if (notification->retryString() == "Repeat Once") {
             removedNotifies.append(lstNotifications.takeAt(lstNotifications.indexOf(notification)));
         } else {
-            if (notification->getRepeatFlag()!="Repeat Instantly")
-            {
+            if (notification->retryString() != "Repeat Instantly") {
                 QRegExp rxlen("(\\d+)");
                 QString value;
                 int timer_value;
-                int pos = rxlen.indexIn(notification->getRepeatFlag());
+                int pos = rxlen.indexIn(notification->retryString());
                 if (pos > -1) {
                     value = rxlen.cap(1); // "189"
                     timer_value = (value.toInt()+8)*1000; //ms*1000 + average duration of meassage
@@ -379,10 +380,9 @@ bool SoundNotifyPlugin::playNotification(NotificationItem* notification)
         phonon.mo->play();
         phonon.firstPlay = false; // On Linux, you sometimes have to nudge Phonon to play 1 time before
                                                           // the state is not "Loading" anymore.
-    }
-    else
+    } else {
         return false; // if audio is busy
-
+    }
     return true;
 }
 

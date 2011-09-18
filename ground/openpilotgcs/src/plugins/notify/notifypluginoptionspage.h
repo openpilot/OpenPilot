@@ -42,13 +42,15 @@
 #include <phonon/Path>
 #include <phonon/AudioOutput>
 #include <phonon/Global>
-#include "ui_notifypluginoptionspage.h"
 //#include "notifytablemodel.h"
 
 class NotifyTableModel;
 class NotificationItem;
 class SoundNotifyPlugin;
 
+namespace Ui {
+	class NotifyPluginOptionsPage;
+};
 
 using namespace Core;
 
@@ -74,11 +76,11 @@ public:
 	void getOptionsPageValues(NotificationItem* notification);
 
 private:
-    //Q_DISABLE_COPY(NotifyPluginOptionsPage)
+    Q_DISABLE_COPY(NotifyPluginOptionsPage)
+
     void initButtons();
     void initPhononPlayer();
-    void initRulesTableModel();
-    void initRulesTableView();
+    void initRulesTable();
 
 private:
 	UAVObjectManager& objManager;
@@ -86,14 +88,13 @@ private:
 	QStringList listDirCollections;
 	QStringList listSoundFiles;
 	QString currentCollectionPath;
-	int sizeNotifyList;
 	Phonon::MediaObject *sound1;
 	Phonon::MediaObject *sound2;
-	Phonon::MediaObject *notifySound;
+	QScopedPointer<Phonon::MediaObject> notifySound;
 	Phonon::AudioOutput *audioOutput;
-	QStringList delegateItems;
-	QScopedPointer<NotifyTableModel> notifyRulesModel;
-	QItemSelectionModel *notifyRulesSelection;
+
+	QScopedPointer<NotifyTableModel> _notifyRulesModel;
+	QItemSelectionModel* _notifyRulesSelection;
 	QList<NotificationItem*> privListNotifications;
 
 	QScopedPointer<Ui::NotifyPluginOptionsPage> options_page;

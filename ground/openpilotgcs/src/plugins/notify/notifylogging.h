@@ -31,12 +31,16 @@
 
 #include "QDebug.h"
 
-#ifdef DEBUG_NOTIFIES
+#define DEBUG_NOTIFIES_ENABLE
+
+#ifdef DEBUG_NOTIFIES_ENABLE
 QDebug qNotifyDebug();
 #endif
-#ifndef DEBUG_NOTIFIES
+
+#ifndef DEBUG_NOTIFIES_ENABLE
 QNoDebug qNotifyDebug();
 #endif
 
+#define qNotifyDebug_if(test) if(test) qNotifyDebug()
 
 #endif // NOTIFYLOGGING_H

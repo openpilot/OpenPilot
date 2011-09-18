@@ -37,7 +37,7 @@ class NotifyItemDelegate : public QItemDelegate
 	Q_OBJECT
 
 public:
-	NotifyItemDelegate(QStringList items, QObject *parent = 0);
+	NotifyItemDelegate(QObject *parent = 0);
 	QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &,
 						  const QModelIndex &index) const;
 	void setEditorData(QWidget *editor, const QModelIndex &index) const;
@@ -51,7 +51,7 @@ private slots:
 
 private:
 	QObject* _parent;
-	QStringList _items;
+	QStringList _titles;
 
 };
 

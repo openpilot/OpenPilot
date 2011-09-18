@@ -47,8 +47,8 @@ NotificationItem::NotificationItem(QObject *parent)
     , _sayOrder("Never")
     , _spinBoxValue(0)
     , _repeatString("Repeat Instantly")
-    , _repeatTimeout(true)
     , _expireTimeout(15)
+    , _mute(false)
 
 {
     _timer = NULL;
@@ -71,8 +71,9 @@ void NotificationItem::copyTo(NotificationItem* that) const
     that->_sayOrder = _sayOrder;
     that->_spinBoxValue = _spinBoxValue;
     that->_repeatString = _repeatString;
-    that->_repeatTimeout = _repeatTimeout;
     that->_expireTimeout = _expireTimeout;
+    that->_mute = _mute;
+
 }
 
 
@@ -88,8 +89,10 @@ void NotificationItem::saveState(QSettings* settings) const
     settings->setValue(QLatin1String("Sound2"), getSound2());
     settings->setValue(QLatin1String("Sound3"), getSound3());
     settings->setValue(QLatin1String("SayOrder"), getSayOrder());
-    settings->setValue(QLatin1String("Repeat"), getRepeatFlag());
-    settings->setValue(QLatin1String("ExpireTimeout"), getExpireTimeout());
+    settings->setValue(QLatin1String("Repeat"), retryString());
+    settings->setValue(QLatin1String("ExpireTimeout"), lifetime());
+    settings->setValue(QLatin1String("Mute"), mute());
+
 }
 
 void NotificationItem::restoreState(QSettings* settings)
@@ -105,10 +108,45 @@ void NotificationItem::restoreState(QSettings* settings)
     setSound3(settings->value(QLatin1String("Sound3"), tr("")).toString());
     setSayOrder(settings->value(QLatin1String("SayOrder"), tr("")).toString());
     setSpinBoxValue(settings->value(QLatin1String("ValueSpinBox"), tr("")).toDouble());
-    setRepeatFlag(settings->value(QLatin1String("Repeat"), tr("")).toString());
-    setExpireTimeout(settings->value(QLatin1String("ExpireTimeout"), tr("")).toInt());
+    setRetryString(settings->value(QLatin1String("Repeat"), tr("")).toString());
+    setLifetime(settings->value(QLatin1String("ExpireTimeout"), tr("")).toInt());
+    setMute(settings->value(QLatin1String("Mute"), tr("")).toInt());
+
 }
 
+void NotificationItem::seriaize(QDataStream& stream)
+{
+    stream << this->_soundCollectionPath;
+    stream << this->_currentLanguage;
+    stream << this->_dataObject;
+    stream << this->_objectField;
+    stream << this->_dataValue;
+    stream << this->_sound1;
+    stream << this->_sound2;
+    stream << this->_sound3;
+    stream << this->_sayOrder;
+    stream << this->_spinBoxValue;
+    stream << this->_repeatString;
+    stream << this->_expireTimeout;
+    stream << this->_mute;
+}
+
+void NotificationItem::deseriaize(QDataStream& stream)
+{
+    stream >> this->_soundCollectionPath;
+    stream >> this->_currentLanguage;
+    stream >> this->_dataObject;
+    stream >> this->_objectField;
+    stream >> this->_dataValue;
+    stream >> this->_sound1;
+    stream >> this->_sound2;
+    stream >> this->_sound3;
+    stream >> this->_sayOrder;
+    stream >> this->_spinBoxValue;
+    stream >> this->_repeatString;
+    stream >> this->_expireTimeout;
+    stream >> this->_mute;
+}
 
 void NotificationItem::startTimer(int value) {
     if (!_timer) {

@@ -78,20 +78,21 @@ public:
     QStringList getMessageSequence() const { return _messageSequence; }
     void setMessageSequence(QStringList sequence) { _messageSequence = sequence; }
 
-    QString getRepeatFlag() const { return _repeatString; }
-    void setRepeatFlag(QString value) { _repeatString = value; }
+    QString retryString() const { return _repeatString; }
+    void setRetryString(QString value) { _repeatString = value; }
 
-    bool getRepeatTimeout() const { return _repeatTimeout; }
-    void setRepeatTimeout(bool value) { _repeatTimeout = value; }
+    int lifetime() const { return _expireTimeout; }
+    void setLifetime(int value) { _expireTimeout = value; }
 
-    int getExpireTimeout() const { return _expireTimeout; }
-    void setExpireTimeout(int value) { _expireTimeout = value; }
-
-    bool getEnableFlag() const { return _enableFlag; }
-    void setEnableFlag(bool value) { _enableFlag = value; }
+    bool mute() const { return _mute; }
+    void setMute(bool value) { _mute = value; }
 
     void saveState(QSettings* settings) const;
     void restoreState(QSettings* settings);
+
+
+    void seriaize(QDataStream& stream);
+    void deseriaize(QDataStream& stream);
 
     QString parseNotifyMessage();
 
@@ -120,8 +121,6 @@ private:
     //!       according to its priority
     QTimer* _expireTimer;
 
-
-
     QStringList _messageSequence;
 
     //! path to folder with sound files
@@ -149,20 +148,15 @@ private:
 
     double _spinBoxValue;
 
-    QString _repeatString;
-
-    //! time when next notification must be fired
-    bool _repeatTimeout;
-
     //! how often or what periodicaly notification should be played
-    int _repeatTimerValue;
+    QString _repeatString;
 
     //! time after event occured till notification became invalid
     //! and will be removed from list
     int _expireTimeout;
 
     //! enables/disables playing of current notification
-    bool _enableFlag;
+    bool _mute;
 };
 
 Q_DECLARE_METATYPE(NotificationItem*)

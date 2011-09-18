@@ -30,11 +30,15 @@
 #include "notifytablemodel.h"
 #include "notifylogging.h"
 
-NotifyItemDelegate::NotifyItemDelegate(QStringList items, QObject* parent)
+NotifyItemDelegate::NotifyItemDelegate(QObject* parent)
     : QItemDelegate(parent)
     , _parent(parent)
-    , _items(items)
 {
+    _titles << "Repeat Once"
+            << "Repeat Instantly"
+            << "Repeat 10 seconds"
+            << "Repeat 30 seconds"
+            << "Repeat 1 minute";
 
 }
 
@@ -44,7 +48,7 @@ QWidget *NotifyItemDelegate::createEditor(QWidget* parent, const QStyleOptionVie
     if (eREPEAT_VALUE == index.column()) {
         QComboBox* editor = new QComboBox(parent);
         editor->clear();
-        editor->addItems(_items);
+        editor->addItems(_titles);
         return editor;
     } else {
         if (eEXPIRE_TIME == index.column()) {

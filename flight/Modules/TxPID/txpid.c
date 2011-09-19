@@ -56,12 +56,13 @@
 #include "accessorydesired.h"
 #include "manualcontrolcommand.h"
 #include "stabilizationsettings.h"
+#include "flightstatus.h"
 
 //
 // Configuration
 //
-#define SAMPLE_PERIOD_MS		100
-#define TELEMETRY_UPDATE_PERIOD_MS	1000	// 0 = update on change (default)
+#define SAMPLE_PERIOD_MS		200
+#define TELEMETRY_UPDATE_PERIOD_MS	0	// 0 = update on change (default)
 
 // Sanity checks
 #if (TXPIDSETTINGS_PIDS_NUMELEM != TXPIDSETTINGS_INPUTS_NUMELEM) || \
@@ -97,6 +98,9 @@ int32_t TxPIDInitialize(void)
 	// Change StabilizationSettings update rate from OnChange to periodic
 	// to prevent telemetry link flooding with frequent updates in case of
 	// control channel jitter.
+	// Warning: saving to flash with this code active will change the
+	// StabilizationSettings update rate permanently. Use Metadata via
+	// browser to reset to defaults (telemetryAcked=true, OnChange).
 	UAVObjMetadata metadata;
 	StabilizationSettingsGetMetadata(&metadata);
 	metadata.telemetryAcked = 0;
@@ -121,6 +125,16 @@ static void updatePIDs(UAVObjEvent* ev)
 
 	TxPIDSettingsData inst;
 	TxPIDSettingsGet(&inst);
+
+	if (inst.UpdateMode == TXPIDSETTINGS_UPDATEMODE_NEVER)
+		return;
+
+	uint8_t armed;
+	FlightStatusArmedGet(&armed);
+	if ((inst.UpdateMode == TXPIDSETTINGS_UPDATEMODE_WHENARMED) &&
+			(armed == FLIGHTSTATUS_ARMED_DISARMED))
+		return;
+
 	StabilizationSettingsData stab;
 	StabilizationSettingsGet(&stab);
 	AccessoryDesiredData accessory;

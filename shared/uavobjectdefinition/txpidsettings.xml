@@ -1,6 +1,7 @@
 <xml>
     <object name="TxPIDSettings" singleinstance="true" settings="true">
         <description>Settings used by @ref TxPID optional module to tune PID settings using R/C transmitter</description>
+        <field name="UpdateMode" units="option" type="enum" elements="1" options="Never,When Armed,Always" defaultvalue="When Armed"/>
         <field name="Inputs" units="channel" type="enum"
 		elementnames="Instance1,Instance2,Instance3"
 		options="Throttle,Accessory0,Accessory1,Accessory2,Accessory3,Accessory4,Accessory5"

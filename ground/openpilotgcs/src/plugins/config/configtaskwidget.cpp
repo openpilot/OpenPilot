@@ -62,6 +62,8 @@ void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString fiel
     {
         obj = objManager->getObject(QString(object));
         Q_ASSERT(obj);
+        objectUpdates.insert(obj,false);
+        connect(obj, SIGNAL(objectUpdated(UAVObject*)),this, SLOT(objectUpdated(UAVObject*)));
         connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshWidgetsValues()));
     }
     //smartsave->addObject(obj);
@@ -153,6 +155,10 @@ void ConfigTaskWidget::onAutopilotDisconnect()
 {
     isConnected=false;
     enableControls(false);
+    foreach(UAVObject *obj, objectUpdates.keys())
+    {
+        objectUpdates[obj]=false;
+    }
 }
 
 void ConfigTaskWidget::onAutopilotConnect()
@@ -306,6 +312,22 @@ void ConfigTaskWidget::enableObjUpdates()
         if(obj->object)
             connect(obj->object, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshWidgetsValues()));
     }
+}
+
+void ConfigTaskWidget::objectUpdated(UAVObject *obj)
+{
+    objectUpdates[obj]=true;
+}
+
+bool ConfigTaskWidget::allObjectsUpdated()
+{
+    bool ret=true;
+    foreach(UAVObject *obj, objectUpdates.keys())
+    {
+        ret=ret & objectUpdates[obj];
+    }
+    qDebug()<<"ALL OBJECTS UPDATE:"<<ret;
+    return ret;
 }
 
 

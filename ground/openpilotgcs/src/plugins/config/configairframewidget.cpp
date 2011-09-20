@@ -36,6 +36,9 @@
 #include <math.h>
 #include <QDesktopServices>
 #include <QUrl>
+#include "systemsettings.h"
+#include "mixersettings.h"
+#include "actuatorsettings.h"
 
 /**
   Helper delegate for the custom mixer editor table.
@@ -443,6 +446,13 @@ void ConfigAirframeWidget::updateCustomThrottle2CurveValue(QList<double> list, d
   */
 void ConfigAirframeWidget::refreshWidgetsValues()
 {
+    if(!allObjectsUpdated())
+    {
+        SystemSettings::GetInstance(getObjectManager())->requestUpdate();
+        MixerSettings::GetInstance(getObjectManager())->requestUpdate();
+        ActuatorSettings::GetInstance(getObjectManager())->requestUpdate();
+        return;
+    }
     bool dirty=isDirty();
     // Get the Airframe type from the system settings:
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("SystemSettings")));

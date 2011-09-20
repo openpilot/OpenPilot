@@ -71,6 +71,7 @@ public:
     bool isDirty();
     void setDirty(bool value);
     void addUAVObjectToWidgetRelation(QString object, QString field, QWidget *widget, QString index);
+    bool allObjectsUpdated();
 public slots:
     void onAutopilotDisconnect();
     void onAutopilotConnect();
@@ -78,6 +79,7 @@ public slots:
 private slots:
     virtual void refreshValues();
     virtual void updateObjectsFromWidgets();
+    void objectUpdated(UAVObject*);
 private:
     bool isConnected;
     QStringList objectsList;
@@ -85,6 +87,7 @@ private:
     ExtensionSystem::PluginManager *pm;
     UAVObjectManager *objManager;
     smartSaveButton *smartsave;
+    QMap<UAVObject *,bool> objectUpdates;
     bool dirty;
 protected slots:
     virtual void disableObjUpdates();

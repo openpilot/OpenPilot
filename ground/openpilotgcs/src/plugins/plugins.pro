@@ -107,6 +107,7 @@ SUBDIRS += plugin_systemhealth
 plugin_config.subdir = config
 plugin_config.depends = plugin_coreplugin
 plugin_config.depends += plugin_uavobjects
+plugin_config.depends += plugin_uavsettingsimportexport
 SUBDIRS += plugin_config
 
 #GPS Display gadget

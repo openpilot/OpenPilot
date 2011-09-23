@@ -75,6 +75,7 @@ public:
 public slots:
     void onAutopilotDisconnect();
     void onAutopilotConnect();
+    void invalidateObjects();
 
 private slots:
     virtual void refreshValues();

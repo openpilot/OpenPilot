@@ -115,6 +115,7 @@ void UAVSettingsImportExportFactory::importUAVSettings()
     }
     file.close();
     emit importAboutToBegin();
+    qDebug()<<"Import about to begin";
     QDomElement root = doc.documentElement();
     if (root.tagName() != "settings") {
         QMessageBox msgBox;
@@ -188,6 +189,7 @@ void UAVSettingsImportExportFactory::importUAVSettings()
         }
         node = node.nextSibling();
     }
+    qDebug()<<"End import";
     swui.exec();
 
 

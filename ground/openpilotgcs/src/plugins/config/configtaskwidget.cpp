@@ -65,7 +65,7 @@ void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString fiel
     {
         obj = objManager->getObject(QString(object));
         Q_ASSERT(obj);
-        objectUpdates.insert(obj,false);
+        objectUpdates.insert(obj,true);
         connect(obj, SIGNAL(objectUpdated(UAVObject*)),this, SLOT(objectUpdated(UAVObject*)));
         connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshWidgetsValues()));
     }
@@ -163,6 +163,7 @@ void ConfigTaskWidget::onAutopilotDisconnect()
 
 void ConfigTaskWidget::onAutopilotConnect()
 {
+    invalidateObjects();
     dirty=false;
     isConnected=true;
     enableControls(true);

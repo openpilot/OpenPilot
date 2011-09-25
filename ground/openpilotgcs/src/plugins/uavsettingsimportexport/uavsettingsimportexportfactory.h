@@ -48,6 +48,7 @@ private slots:
    void exportUAVData();
 signals:
    void importAboutToBegin();
+   void importEnded();
 
 };
 

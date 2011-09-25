@@ -80,29 +80,26 @@ DFUObject::DFUObject(bool _debug,bool _use_serial,QString portname):
     }
     else
     {
-        send_delay=10;
-        use_delay=true;
-//        int numDevices=0;
         QList<USBPortInfo> devices;
-        int count=0;
-        while((devices.length()==0) && count < 10)
-        {
-            if (debug)
-                qDebug() << ".";
-            delay::msleep(500);
-            // processEvents enables XP to process the system
-            // plug/unplug events, otherwise it will not process
-            // those events before the end of the call!
-            QApplication::processEvents();
-            devices = USBMonitor::instance()->availableDevices(0x20a0,-1,-1,USBMonitor::Bootloader);
-            count++;
-        }
-       if (devices.length()==1) {
+        devices = USBMonitor::instance()->availableDevices(0x20a0,-1,-1,USBMonitor::Bootloader);
+        if (devices.length()==1) {
            hidHandle.open(1,devices.first().vendorID,devices.first().productID,0,0);
         } else {
-           qDebug() << devices.length()  << " device(s) detected, don't know what to do!";
-           mready = false;
-       }
+            // Wait for the board to appear on the USB bus:
+            QEventLoop m_eventloop;
+            connect(USBMonitor::instance(), SIGNAL(deviceDiscovered(USBPortInfo)),&m_eventloop, SLOT(quit()));
+            QTimer::singleShot(5000,&m_eventloop, SLOT(quit()));
+            m_eventloop.exec();
+            devices = USBMonitor::instance()->availableDevices(0x20a0,-1,-1,USBMonitor::Bootloader);
+            if (devices.length()==1) {
+               delay::msleep(2000); // Let the USB Subsystem settle (especially important on Mac!)
+               hidHandle.open(1,devices.first().vendorID,devices.first().productID,0,0);
+            }
+             else {
+                qDebug() << devices.length()  << " device(s) detected, don't know what to do!";
+                mready = false;
+            }
+        }
 
     }
 }

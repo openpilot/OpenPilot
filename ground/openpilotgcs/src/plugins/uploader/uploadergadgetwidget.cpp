@@ -235,9 +235,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
         currentStep = IAP_STATE_BOOTLOADER;
 
         // Tell the mainboard to get into bootloader state:
-        log("Detecting devices, please wait 5 seconds...");
-        this->repaint();
-        delay::msleep(5100); // Required to let the board(s) settle
+        log("Detecting devices, please wait a few seconds...");
         if (!dfu) {
             if (dlj.startsWith("USB"))
                 dfu = new DFUObject(DFU_DEBUG, false, QString());

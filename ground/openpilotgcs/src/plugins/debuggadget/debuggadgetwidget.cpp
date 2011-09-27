@@ -38,6 +38,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QScrollBar>
+#include <QTime>
 DebugGadgetWidget::DebugGadgetWidget(QWidget *parent) : QLabel(parent)
 {
     m_config = new Ui_Form();
@@ -56,22 +57,21 @@ DebugGadgetWidget::~DebugGadgetWidget()
 
 void DebugGadgetWidget::dbgMsg(const QString &level, const QList<QVariant> &msgs)
 {
-    m_config->plainTextEdit->setTextColor(Qt::black);
-    foreach(QVariant str,msgs)
-    {
-        m_config->plainTextEdit->append(QString("[%0]%1").arg(level).arg(str.toString()));
-    }
+    m_config->plainTextEdit->setTextColor(Qt::red);
+
+        m_config->plainTextEdit->append(QString("%2[%0]%1").arg(level).arg(msgs[0].toString()).arg(QTime::currentTime().toString()));
+
     QScrollBar *sb = m_config->plainTextEdit->verticalScrollBar();
     sb->setValue(sb->maximum());
 }
 
 void DebugGadgetWidget::dbgMsgError(const QString &level, const QList<QVariant> &msgs)
 {
-    m_config->plainTextEdit->setTextColor(Qt::red);
-    foreach(QVariant str,msgs)
-    {
-        m_config->plainTextEdit->append(QString("[%0]%1").arg(level).arg(str.toString()));
-    }
+    m_config->plainTextEdit->setTextColor(Qt::black);
+
+
+        m_config->plainTextEdit->append(QString("%2[%0]%1").arg(level).arg(msgs[0].toString()).arg(QTime::currentTime().toString()));
+
     QScrollBar *sb = m_config->plainTextEdit->verticalScrollBar();
     sb->setValue(sb->maximum());
 }

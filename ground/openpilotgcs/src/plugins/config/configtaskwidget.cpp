@@ -128,6 +128,7 @@ ConfigTaskWidget::~ConfigTaskWidget()
 
 void ConfigTaskWidget::saveObjectToSD(UAVObject *obj)
 {
+    qDebug()<<"ConfigTaskWidget::saveObjectToSD";
     // saveObjectToSD is now handled by the UAVUtils plugin in one
     // central place (and one central queue)
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();

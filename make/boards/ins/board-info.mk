@@ -9,7 +9,7 @@ BOARD               := STM32F2xx_INS
 MODEL               := HD
 MODEL_SUFFIX        := 
 
-OPENOCD_CONFIG      := stm32f1x.cfg
+OPENOCD_CONFIG      := stm32f2x.cfg
 
 # Note: These must match the values in link_$(BOARD)_memory.ld
 BL_BANK_BASE        := 0x08000000  # Start of bootloader flash

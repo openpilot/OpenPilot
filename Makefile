@@ -202,8 +202,8 @@ arm_sdk_clean:
 OPENOCD_DIR := $(TOOLS_DIR)/openocd
 
 .PHONY: openocd_install
-openocd_install: OPENOCD_URL  := http://sourceforge.net/projects/openocd/files/openocd/0.4.0/openocd-0.4.0.tar.bz2/download
-openocd_install: OPENOCD_FILE := openocd-0.4.0.tar.bz2
+openocd_install: OPENOCD_URL  := http://sourceforge.net/projects/openocd/files/openocd/0.5.0/openocd-0.5.0.tar.bz2/download
+openocd_install: OPENOCD_FILE := openocd-0.5.0.tar.bz2
 # order-only prereq on directory existance:
 openocd_install: | $(DL_DIR) $(TOOLS_DIR)
 openocd_install: openocd_clean
@@ -218,8 +218,8 @@ openocd_install: openocd_clean
         # build and install
 	$(V1) mkdir -p "$(OPENOCD_DIR)"
 	$(V1) ( \
-	  cd $(DL_DIR)/openocd-build/openocd-0.4.0 ; \
-	  ./configure --prefix="$(OPENOCD_DIR)" --enable-ft2232_libftdi ; \
+	  cd $(DL_DIR)/openocd-build/openocd-0.5.0 ; \
+	  ./configure --prefix="$(OPENOCD_DIR)" --enable-ft2232_libftdi --enable-buspirate; \
 	  $(MAKE) ; \
 	  $(MAKE) install ; \
 	)

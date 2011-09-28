@@ -57,7 +57,6 @@ typedef struct {
     uint ccpmCollectivePassthroughState:1;
     uint ccpmLinkCyclicState:1;
     uint ccpmLinkRollState:1;
-    uint CollectiveChannel:3;//20bits
     uint SliderValue0:7;
     uint SliderValue1:7;
     uint SliderValue2:7;//41bits
@@ -81,6 +80,8 @@ class ConfigccpmWidget: public ConfigTaskWidget
 public:
     ConfigccpmWidget(QWidget *parent = 0);
     ~ConfigccpmWidget();
+
+    friend class ConfigAirframeWidget;
 
 private:
         Ui_ccpmWidget *m_ccpm;
@@ -134,8 +135,8 @@ private:
         void SwashLvlCancelButtonPressed();
         void SwashLvlFinishButtonPressed();
 
-        void UpdatCCPMOptionsFromUI();
-        void UpdatCCPMUIFromOptions();
+        void UpdateCCPMOptionsFromUI();
+        void UpdateCCPMUIFromOptions();
 
         void SetUIComponentVisibilities();
         void ccpmChannelCheck();
@@ -143,8 +144,6 @@ private:
         void enableSwashplateLevellingControl(bool state);
         void setSwashplateLevel(int percent);
         void SwashLvlSpinBoxChanged(int value);
-        void FocusChanged(QWidget *oldFocus, QWidget *newFocus);
-
         virtual void refreshValues() {}; // Not used
 
     public slots:

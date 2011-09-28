@@ -601,21 +601,21 @@ When you change one, the other is updated.</string>
           <item row="2" column="1">
            <widget class="QSpinBox" name="manualRoll">
             <property name="maximum">
-             <number>300</number>
+             <number>500</number>
             </property>
            </widget>
           </item>
           <item row="2" column="2">
            <widget class="QSpinBox" name="manualPitch">
             <property name="maximum">
-             <number>300</number>
+             <number>500</number>
             </property>
            </widget>
           </item>
           <item row="2" column="3">
            <widget class="QSpinBox" name="manualYaw">
             <property name="maximum">
-             <number>300</number>
+             <number>500</number>
             </property>
            </widget>
           </item>
@@ -644,21 +644,21 @@ When you change one, the other is updated.</string>
           <item row="3" column="1">
            <widget class="QSpinBox" name="maximumRoll">
             <property name="maximum">
-             <number>300</number>
+             <number>500</number>
             </property>
            </widget>
           </item>
           <item row="3" column="2">
            <widget class="QSpinBox" name="maximumPitch">
             <property name="maximum">
-             <number>300</number>
+             <number>500</number>
             </property>
            </widget>
           </item>
           <item row="3" column="3">
            <widget class="QSpinBox" name="maximumYaw">
             <property name="maximum">
-             <number>300</number>
+             <number>500</number>
             </property>
            </widget>
           </item>

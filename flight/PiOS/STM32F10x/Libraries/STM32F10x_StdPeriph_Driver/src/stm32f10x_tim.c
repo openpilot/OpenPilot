@@ -221,7 +221,7 @@ void TIM_DeInit(TIM_TypeDef* TIMx)
   *   structure that contains the configuration information for the specified TIM peripheral.
   * @retval None
   */
-void TIM_TimeBaseInit(TIM_TypeDef* TIMx, TIM_TimeBaseInitTypeDef* TIM_TimeBaseInitStruct)
+void TIM_TimeBaseInit(TIM_TypeDef* TIMx, const TIM_TimeBaseInitTypeDef* TIM_TimeBaseInitStruct)
 {
   uint16_t tmpcr1 = 0;
 
@@ -274,7 +274,7 @@ void TIM_TimeBaseInit(TIM_TypeDef* TIMx, TIM_TimeBaseInitTypeDef* TIM_TimeBaseIn
   *   that contains the configuration information for the specified TIM peripheral.
   * @retval None
   */
-void TIM_OC1Init(TIM_TypeDef* TIMx, TIM_OCInitTypeDef* TIM_OCInitStruct)
+void TIM_OC1Init(TIM_TypeDef* TIMx, const TIM_OCInitTypeDef* TIM_OCInitStruct)
 {
   uint16_t tmpccmrx = 0, tmpccer = 0, tmpcr2 = 0;
    
@@ -357,7 +357,7 @@ void TIM_OC1Init(TIM_TypeDef* TIMx, TIM_OCInitTypeDef* TIM_OCInitStruct)
   *   that contains the configuration information for the specified TIM peripheral.
   * @retval None
   */
-void TIM_OC2Init(TIM_TypeDef* TIMx, TIM_OCInitTypeDef* TIM_OCInitStruct)
+void TIM_OC2Init(TIM_TypeDef* TIMx, const TIM_OCInitTypeDef* TIM_OCInitStruct)
 {
   uint16_t tmpccmrx = 0, tmpccer = 0, tmpcr2 = 0;
    
@@ -439,7 +439,7 @@ void TIM_OC2Init(TIM_TypeDef* TIMx, TIM_OCInitTypeDef* TIM_OCInitStruct)
   *   that contains the configuration information for the specified TIM peripheral.
   * @retval None
   */
-void TIM_OC3Init(TIM_TypeDef* TIMx, TIM_OCInitTypeDef* TIM_OCInitStruct)
+void TIM_OC3Init(TIM_TypeDef* TIMx, const TIM_OCInitTypeDef* TIM_OCInitStruct)
 {
   uint16_t tmpccmrx = 0, tmpccer = 0, tmpcr2 = 0;
    
@@ -518,7 +518,7 @@ void TIM_OC3Init(TIM_TypeDef* TIMx, TIM_OCInitTypeDef* TIM_OCInitStruct)
   *   that contains the configuration information for the specified TIM peripheral.
   * @retval None
   */
-void TIM_OC4Init(TIM_TypeDef* TIMx, TIM_OCInitTypeDef* TIM_OCInitStruct)
+void TIM_OC4Init(TIM_TypeDef* TIMx, const TIM_OCInitTypeDef* TIM_OCInitStruct)
 {
   uint16_t tmpccmrx = 0, tmpccer = 0, tmpcr2 = 0;
    
@@ -582,7 +582,7 @@ void TIM_OC4Init(TIM_TypeDef* TIMx, TIM_OCInitTypeDef* TIM_OCInitStruct)
   *   that contains the configuration information for the specified TIM peripheral.
   * @retval None
   */
-void TIM_ICInit(TIM_TypeDef* TIMx, TIM_ICInitTypeDef* TIM_ICInitStruct)
+void TIM_ICInit(TIM_TypeDef* TIMx, const TIM_ICInitTypeDef* TIM_ICInitStruct)
 {
   /* Check the parameters */
   assert_param(IS_TIM_CHANNEL(TIM_ICInitStruct->TIM_Channel));  

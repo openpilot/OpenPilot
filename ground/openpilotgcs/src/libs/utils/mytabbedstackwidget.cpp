@@ -65,7 +65,7 @@ MyTabbedStackWidget::MyTabbedStackWidget(QWidget *parent, bool isVertical, bool 
     m_stackWidget->setContentsMargins(0, 0, 0, 0);
     setLayout(toplevelLayout);
 
-    connect(m_listWidget, SIGNAL(currentRowChanged(int)), this, SLOT(showWidget(int)));
+    connect(m_listWidget, SIGNAL(currentRowChanged(int)), this, SLOT(showWidget(int)),Qt::QueuedConnection);
 }
 
 void MyTabbedStackWidget::insertTab(const int index, QWidget *tab, const QIcon &icon, const QString &label)
@@ -97,9 +97,19 @@ void MyTabbedStackWidget::setCurrentIndex(int index)
 
 void MyTabbedStackWidget::showWidget(int index)
 {
-    emit currentAboutToShow(index);
-    m_stackWidget->setCurrentIndex(index);
-    emit currentChanged(index);
+    if(m_stackWidget->currentIndex()==index)
+        return;
+    bool proceed=false;
+    emit currentAboutToShow(index,&proceed);
+    if(proceed)
+    {
+        m_stackWidget->setCurrentIndex(index);
+        emit currentChanged(index);
+    }
+    else
+    {
+        m_listWidget->setCurrentRow(m_stackWidget->currentIndex(),QItemSelectionModel::ClearAndSelect);
+    }
 }
 
 void MyTabbedStackWidget::insertCornerWidget(int index, QWidget *widget)

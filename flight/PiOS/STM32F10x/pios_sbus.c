@@ -34,8 +34,6 @@
 
 #if defined(PIOS_INCLUDE_SBUS)
 
-/* Global Variables */
-
 /* Provide a RCVR driver */
 static int32_t PIOS_SBUS_Get(uint32_t rcvr_id, uint8_t channel);
 
@@ -59,27 +57,23 @@ static void PIOS_SBUS_Supervisor(uint32_t sbus_id);
 static void reset_channels(void)
 {
 	for (int i = 0; i < SBUS_NUMBER_OF_CHANNELS; i++) {
-		channel_data[i] = 0;
+		channel_data[i] = PIOS_RCVR_TIMEOUT;
 	}
 }
 
 /**
  * unroll_channels() function computes channel_data[] from received_data[]
- * For efficiency it unrolls first 8 channels without loops. If other
- * 8 channels are needed they can be unrolled using the same code
- * starting from s[11] instead of s[0]. Two extra digital channels are
- * accessible using (s[22] & SBUS_FLAG_DGx) logical expressions.
+ * For efficiency it unrolls first 8 channels without loops and does the
+ * same for other 8 channels. Also 2 discrete channels will be set.
  */
 static void unroll_channels(void)
 {
 	uint8_t *s = received_data;
 	uint16_t *d = channel_data;
 
-#if (SBUS_NUMBER_OF_CHANNELS != 8)
-#error Current S.Bus code unrolls only first 8 channels
-#endif
-
 #define F(v,s) ((v) >> s) & 0x7ff
+
+	/* unroll channels 1-8 */
 	*d++ = F(s[0] | s[1] << 8, 0);
 	*d++ = F(s[1] | s[2] << 8, 3);
 	*d++ = F(s[2] | s[3] << 8 | s[4] << 16, 6);
@@ -88,6 +82,20 @@ static void unroll_channels(void)
 	*d++ = F(s[6] | s[7] << 8 | s[8] << 16, 7);
 	*d++ = F(s[8] | s[9] << 8, 2);
 	*d++ = F(s[9] | s[10] << 8, 5);
+
+	/* unroll channels 9-16 */
+	*d++ = F(s[11] | s[12] << 8, 0);
+	*d++ = F(s[12] | s[13] << 8, 3);
+	*d++ = F(s[13] | s[14] << 8 | s[15] << 16, 6);
+	*d++ = F(s[15] | s[16] << 8, 1);
+	*d++ = F(s[16] | s[17] << 8, 4);
+	*d++ = F(s[17] | s[18] << 8 | s[19] << 16, 7);
+	*d++ = F(s[19] | s[20] << 8, 2);
+	*d++ = F(s[20] | s[21] << 8, 5);
+
+	/* unroll discrete channels 17 and 18 */
+	*d++ = (s[22] & SBUS_FLAG_DC1) ? SBUS_VALUE_MAX : SBUS_VALUE_MIN;
+	*d++ = (s[22] & SBUS_FLAG_DC2) ? SBUS_VALUE_MAX : SBUS_VALUE_MIN;
 }
 
 /**
@@ -183,7 +191,7 @@ static int32_t PIOS_SBUS_Get(uint32_t rcvr_id, uint8_t channel)
 {
 	/* return error if channel is not available */
 	if (channel >= SBUS_NUMBER_OF_CHANNELS) {
-		return -1;
+		return PIOS_RCVR_INVALID;
 	}
 	return channel_data[channel];
 }

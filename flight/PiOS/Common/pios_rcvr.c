@@ -20,12 +20,12 @@ static bool PIOS_RCVR_validate(struct pios_rcvr_dev * rcvr_dev)
   return (rcvr_dev->magic == PIOS_RCVR_DEV_MAGIC);
 }
 
-#if defined(PIOS_INCLUDE_FREERTOS) && 0
+#if defined(PIOS_INCLUDE_FREERTOS)
 static struct pios_rcvr_dev * PIOS_RCVR_alloc(void)
 {
   struct pios_rcvr_dev * rcvr_dev;
 
-  rcvr_dev = (struct pios_rcvr_dev *)malloc(sizeof(*rcvr_dev));
+  rcvr_dev = (struct pios_rcvr_dev *)pvPortMalloc(sizeof(*rcvr_dev));
   if (!rcvr_dev) return (NULL);
 
   rcvr_dev->magic = PIOS_RCVR_DEV_MAGIC;
@@ -76,8 +76,26 @@ out_fail:
   return(-1);
 }
 
+/**
+ * @brief Reads an input channel from the appropriate driver
+ * @param[in] rcvr_id driver to read from
+ * @param[in] channel channel to read
+ * @returns Unitless input value
+ *  @retval PIOS_RCVR_TIMEOUT indicates a failsafe or timeout from that channel
+ *  @retval PIOS_RCVR_INVALID invalid channel for this driver (usually out of range supported)
+ *  @retval PIOS_RCVR_NODRIVER driver was not initialized
+ */
 int32_t PIOS_RCVR_Read(uint32_t rcvr_id, uint8_t channel)
 {
+	// Publicly facing API uses channel 1 for first channel
+	if(channel == 0)
+		return PIOS_RCVR_INVALID;
+	else
+		channel--;
+
+  if (rcvr_id == 0) 
+    return PIOS_RCVR_NODRIVER;
+
   struct pios_rcvr_dev * rcvr_dev = (struct pios_rcvr_dev *)rcvr_id;
 
   if (!PIOS_RCVR_validate(rcvr_dev)) {

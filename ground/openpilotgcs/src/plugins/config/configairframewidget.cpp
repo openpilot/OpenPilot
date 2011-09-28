@@ -92,26 +92,7 @@ ConfigAirframeWidget::ConfigAirframeWidget(QWidget *parent) : ConfigTaskWidget(p
     m_aircraft->setupUi(this);
 
     setupButtons(m_aircraft->saveAircraftToRAM,m_aircraft->saveAircraftToSD);
-    addWidget(m_aircraft->customMixerTable);
-    addWidget(m_aircraft->customThrottle2Curve);
-    addWidget(m_aircraft->customThrottle1Curve);
-    addWidget(m_aircraft->multiThrottleCurve);
-    addWidget(m_aircraft->fixedWingThrottle);
-    addWidget(m_aircraft->fixedWingType);
-    addWidget(m_aircraft->feedForwardSlider);
-    addWidget(m_aircraft->accelTime);
-    addWidget(m_aircraft->decelTime);
-    addWidget(m_aircraft->maxAccelSlider);
-    addWidget(m_aircraft->multirotorFrameType);
-    addWidget(m_aircraft->multiMotor1);
-    addWidget(m_aircraft->multiMotor2);
-    addWidget(m_aircraft->multiMotor3);
-    addWidget(m_aircraft->multiMotor4);
-    addWidget(m_aircraft->multiMotor5);
-    addWidget(m_aircraft->multiMotor6);
-    addWidget(m_aircraft->multiMotor7);
-    addWidget(m_aircraft->multiMotor8);
-    addWidget(m_aircraft->triYawChannel);
+
     addUAVObject("SystemSettings");
     addUAVObject("MixerSettings");
     addUAVObject("ActuatorSettings");
@@ -217,7 +198,7 @@ ConfigAirframeWidget::ConfigAirframeWidget(QWidget *parent) : ConfigTaskWidget(p
 
     // Connect the help button
     connect(m_aircraft->airframeHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
-
+    addToDirtyMonitor();
 }
 
 ConfigAirframeWidget::~ConfigAirframeWidget()
@@ -462,6 +443,7 @@ void ConfigAirframeWidget::updateCustomThrottle2CurveValue(QList<double> list, d
   */
 void ConfigAirframeWidget::refreshWidgetsValues()
 {
+    bool dirty=isDirty();
     // Get the Airframe type from the system settings:
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("SystemSettings")));
     Q_ASSERT(obj);
@@ -913,6 +895,7 @@ void ConfigAirframeWidget::refreshWidgetsValues()
      }
 
     updateCustomAirframeUI();
+    setDirty(dirty);
 }
 
 /**
@@ -921,6 +904,7 @@ void ConfigAirframeWidget::refreshWidgetsValues()
   */
 void ConfigAirframeWidget::setupAirframeUI(QString frameType)
 {
+    bool dirty=isDirty();
     if (frameType == "FixedWing" || frameType == "Elevator aileron rudder") {
         // Setup the UI
         m_aircraft->aircraftType->setCurrentIndex(m_aircraft->aircraftType->findText("Fixed Wing"));
@@ -1118,6 +1102,7 @@ void ConfigAirframeWidget::setupAirframeUI(QString frameType)
     }
     m_aircraft->quadShape->setSceneRect(quad->boundingRect());
     m_aircraft->quadShape->fitInView(quad, Qt::KeepAspectRatio);
+    setDirty(dirty);
 }
 
 /**
@@ -2137,5 +2122,79 @@ void ConfigAirframeWidget::openHelp()
 {
 
     QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/Airframe+configuration", QUrl::StrictMode) );
+}
+
+void ConfigAirframeWidget::addToDirtyMonitor()
+{
+    addWidget(m_aircraft->customMixerTable);
+    addWidget(m_aircraft->customThrottle2Curve);
+    addWidget(m_aircraft->customThrottle1Curve);
+    addWidget(m_aircraft->multiThrottleCurve);
+    addWidget(m_aircraft->fixedWingThrottle);
+    addWidget(m_aircraft->fixedWingType);
+    addWidget(m_aircraft->feedForwardSlider);
+    addWidget(m_aircraft->accelTime);
+    addWidget(m_aircraft->decelTime);
+    addWidget(m_aircraft->maxAccelSlider);
+    addWidget(m_aircraft->multirotorFrameType);
+    addWidget(m_aircraft->multiMotor1);
+    addWidget(m_aircraft->multiMotor2);
+    addWidget(m_aircraft->multiMotor3);
+    addWidget(m_aircraft->multiMotor4);
+    addWidget(m_aircraft->multiMotor5);
+    addWidget(m_aircraft->multiMotor6);
+    addWidget(m_aircraft->multiMotor7);
+    addWidget(m_aircraft->multiMotor8);
+    addWidget(m_aircraft->triYawChannel);
+    addWidget(m_aircraft->aircraftType);
+    addWidget(m_aircraft->fwEngineChannel);
+    addWidget(m_aircraft->fwAileron1Channel);
+    addWidget(m_aircraft->fwAileron2Channel);
+    addWidget(m_aircraft->fwElevator1Channel);
+    addWidget(m_aircraft->fwElevator2Channel);
+    addWidget(m_aircraft->fwRudder1Channel);
+    addWidget(m_aircraft->fwRudder2Channel);
+    addWidget(m_aircraft->elevonSlider1);
+    addWidget(m_aircraft->elevonSlider2);
+    addWidget(m_aircraft->widget_3->m_ccpm->ccpmType);
+    addWidget(m_aircraft->widget_3->m_ccpm->TabObject);
+    addWidget(m_aircraft->widget_3->m_ccpm->ccpmTailChannel);
+    addWidget(m_aircraft->widget_3->m_ccpm->ccpmEngineChannel);
+    addWidget(m_aircraft->widget_3->m_ccpm->ccpmServoWChannel);
+    addWidget(m_aircraft->widget_3->m_ccpm->ccpmServoXChannel);
+    addWidget(m_aircraft->widget_3->m_ccpm->ccpmServoYChannel);
+    addWidget(m_aircraft->widget_3->m_ccpm->ccpmSingleServo);
+    addWidget(m_aircraft->widget_3->m_ccpm->ccpmServoZChannel);
+    addWidget(m_aircraft->widget_3->m_ccpm->ccpmAngleW);
+    addWidget(m_aircraft->widget_3->m_ccpm->ccpmAngleX);
+    addWidget(m_aircraft->widget_3->m_ccpm->ccpmCorrectionAngle);
+    addWidget(m_aircraft->widget_3->m_ccpm->ccpmAngleZ);
+    addWidget(m_aircraft->widget_3->m_ccpm->ccpmAngleY);
+    addWidget(m_aircraft->widget_3->m_ccpm->ccpmCollectivePassthrough);
+    addWidget(m_aircraft->widget_3->m_ccpm->ccpmLinkRoll);
+    addWidget(m_aircraft->widget_3->m_ccpm->ccpmLinkCyclic);
+    addWidget(m_aircraft->widget_3->m_ccpm->ccpmRevoSlider);
+    addWidget(m_aircraft->widget_3->m_ccpm->ccpmREVOspinBox);
+    addWidget(m_aircraft->widget_3->m_ccpm->ccpmCollectiveSlider);
+    addWidget(m_aircraft->widget_3->m_ccpm->ccpmCollectivespinBox);
+    addWidget(m_aircraft->widget_3->m_ccpm->ccpmCollectiveScale);
+    addWidget(m_aircraft->widget_3->m_ccpm->ccpmCollectiveScaleBox);
+    addWidget(m_aircraft->widget_3->m_ccpm->ccpmCyclicScale);
+    addWidget(m_aircraft->widget_3->m_ccpm->ccpmPitchScale);
+    addWidget(m_aircraft->widget_3->m_ccpm->ccpmPitchScaleBox);
+    addWidget(m_aircraft->widget_3->m_ccpm->ccpmRollScale);
+    addWidget(m_aircraft->widget_3->m_ccpm->ccpmRollScaleBox);
+    addWidget(m_aircraft->widget_3->m_ccpm->SwashLvlPositionSlider);
+    addWidget(m_aircraft->widget_3->m_ccpm->SwashLvlPositionSpinBox);
+    addWidget(m_aircraft->widget_3->m_ccpm->CurveType);
+    addWidget(m_aircraft->widget_3->m_ccpm->NumCurvePoints);
+    addWidget(m_aircraft->widget_3->m_ccpm->CurveValue1);
+    addWidget(m_aircraft->widget_3->m_ccpm->CurveValue2);
+    addWidget(m_aircraft->widget_3->m_ccpm->CurveValue3);
+    addWidget(m_aircraft->widget_3->m_ccpm->CurveToGenerate);
+    addWidget(m_aircraft->widget_3->m_ccpm->CurveSettings);
+    addWidget(m_aircraft->widget_3->m_ccpm->ThrottleCurve);
+    addWidget(m_aircraft->widget_3->m_ccpm->PitchCurve);
+    addWidget(m_aircraft->widget_3->m_ccpm->ccpmAdvancedSettingsTable);
 }
 

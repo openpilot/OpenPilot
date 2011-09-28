@@ -76,7 +76,8 @@
 static uint32_t idleCounter;
 static uint32_t idleCounterClear;
 static xTaskHandle systemTaskHandle;
-static int32_t stackOverflow;
+static bool stackOverflow;
+static bool mallocFailed;
 
 // Private functions
 static void objectUpdatedCb(UAVObjEvent * ev);
@@ -94,7 +95,8 @@ static void updateWDGstats();
 int32_t SystemModStart(void)
 {
 	// Initialize vars
-	stackOverflow = 0;
+	stackOverflow = false;
+	mallocFailed = false;
 	// Create system task
 	xTaskCreate(systemTask, (signed char *)"System", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &systemTaskHandle);
 	// Register task
@@ -423,10 +425,17 @@ static void updateSystemAlarms()
 	}
 
 	// Check for stack overflow
-	if (stackOverflow == 1) {
+	if (stackOverflow) {
 		AlarmsSet(SYSTEMALARMS_ALARM_STACKOVERFLOW, SYSTEMALARMS_ALARM_CRITICAL);
 	} else {
 		AlarmsClear(SYSTEMALARMS_ALARM_STACKOVERFLOW);
+	}
+
+	// Check for malloc failures
+	if (mallocFailed) {
+		AlarmsSet(SYSTEMALARMS_ALARM_OUTOFMEMORY, SYSTEMALARMS_ALARM_CRITICAL);
+	} else {
+		AlarmsClear(SYSTEMALARMS_ALARM_OUTOFMEMORY);
 	}
 
 #if defined(PIOS_INCLUDE_SDCARD)
@@ -467,9 +476,29 @@ void vApplicationIdleHook(void)
 /**
  * Called by the RTOS when a stack overflow is detected.
  */
+#define DEBUG_STACK_OVERFLOW 0
 void vApplicationStackOverflowHook(xTaskHandle * pxTask, signed portCHAR * pcTaskName)
 {
-	stackOverflow = 1;
+	stackOverflow = true;
+#if DEBUG_STACK_OVERFLOW
+	static volatile bool wait_here = true;
+	while(wait_here);
+	wait_here = true;
+#endif
+}
+
+/**
+ * Called by the RTOS when a malloc call fails.
+ */
+#define DEBUG_MALLOC_FAILURES 0
+void vApplicationMallocFailedHook(void)
+{
+	mallocFailed = true;
+#if DEBUG_MALLOC_FAILURES
+	static volatile bool wait_here = true;
+	while(wait_here);
+	wait_here = true;
+#endif
 }
 
 /**

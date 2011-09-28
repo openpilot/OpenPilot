@@ -956,7 +956,7 @@ quint32 DFUObject::CRC32WideFast(quint32 Crc, quint32 Size, quint32 *Buffer)
   */
 quint32 DFUObject::CRCFromQBArray(QByteArray array, quint32 Size)
 {
-    int pad=Size-array.length();
+    quint32 pad=Size-array.length();
     array.append(QByteArray(pad,255));
     quint32 t[Size/4];
     for(int x=0;x<array.length()/4;x++)

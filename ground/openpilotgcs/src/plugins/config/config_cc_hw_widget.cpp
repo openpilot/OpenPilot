@@ -2,7 +2,7 @@
  ******************************************************************************
  *
  * @file       configtelemetrywidget.h
- * @author     E. Lafargue & The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup ConfigPlugin Config Plugin
@@ -43,7 +43,7 @@ ConfigCCHWWidget::ConfigCCHWWidget(QWidget *parent) : ConfigTaskWidget(parent)
     addUAVObjectToWidgetRelation("TelemetrySettings","Speed",m_telemetry->telemetrySpeed);
     addUAVObjectToWidgetRelation("HwSettings","CC_FlexiPort",m_telemetry->cbFlexi);
     addUAVObjectToWidgetRelation("HwSettings","CC_MainPort",m_telemetry->cbTele);
-    addUAVObjectToWidgetRelation("ManualControlSettings","InputMode",m_telemetry->receiverType);
+    addUAVObjectToWidgetRelation("HwSettings","CC_RcvrPort",m_telemetry->cbRcvr);
     connect(m_telemetry->cchwHelp,SIGNAL(clicked()),this,SLOT(openHelp()));
     enableControls(false);
     populateWidgets();
@@ -66,22 +66,6 @@ void ConfigCCHWWidget::widgetsContentsChanged()
     if((m_telemetry->cbFlexi->currentText()==m_telemetry->cbTele->currentText()) && m_telemetry->cbTele->currentText()!="Disabled")
     {
         m_telemetry->problems->setText("Warning: you have configured the MainPort and the FlexiPort for the same function, this is currently not suported");
-    }
-    else if((m_telemetry->cbTele->currentText()=="Spektrum" ||m_telemetry->cbFlexi->currentText()=="Spektrum") && m_telemetry->receiverType->currentText()!="Spektrum")
-    {
-        m_telemetry->problems->setText("Warning: you have a port configured as 'Spektrum' however that is not your selected receiver type");
-    }
-    else if(m_telemetry->cbTele->currentText()=="S.Bus"  && m_telemetry->receiverType->currentText()!="S.Bus")
-    {
-        m_telemetry->problems->setText("Warning: you have a port configured as 'S.Bus' however that is not your selected receiver type");
-    }
-    else if(m_telemetry->cbTele->currentText()!="S.Bus"  && m_telemetry->receiverType->currentText()=="S.Bus")
-    {
-        m_telemetry->problems->setText("Warning: you have selected 'S.Bus' as your receiver type however you have no port configured for that protocol");
-    }
-    else if((m_telemetry->cbTele->currentText()!="Spektrum" && m_telemetry->cbFlexi->currentText()!="Spektrum") && m_telemetry->receiverType->currentText()=="Spektrum")
-    {
-        m_telemetry->problems->setText("Warning: you have selected 'Spektrum' as your receiver type however you have no port configured for that protocol");
     }
     else
     {

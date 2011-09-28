@@ -33,25 +33,18 @@
 
 #include <pios.h>
 #include <pios_stm32.h>
-
-struct pios_servo_channel {
-	TIM_TypeDef * timer;
-	GPIO_TypeDef * port;
-	uint8_t channel;
-	uint16_t pin;
-};
+#include <pios_tim_priv.h>
 
 struct pios_servo_cfg {
 	TIM_TimeBaseInitTypeDef tim_base_init;
 	TIM_OCInitTypeDef tim_oc_init;
 	GPIO_InitTypeDef gpio_init;
 	uint32_t remap;
-	const struct pios_servo_channel *const channels;
+	const struct pios_tim_channel * channels;
 	uint8_t num_channels;
 };
 
-
-extern const struct pios_servo_cfg pios_servo_cfg;
+extern int32_t PIOS_Servo_Init(const struct pios_servo_cfg * cfg);
 
 #endif /* PIOS_SERVO_PRIV_H */
 

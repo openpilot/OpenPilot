@@ -38,6 +38,7 @@ HEADERS += configplugin.h \
     defaultattitudewidget.h \
     smartsavebutton.h \
     defaulthwsettingswidget.h \
+    inputchannelform.h \
     configcamerastabilizationwidget.h
 
 SOURCES += configplugin.cpp \
@@ -67,6 +68,7 @@ SOURCES += configplugin.cpp \
     defaultattitudewidget.cpp \
     smartsavebutton.cpp \
     defaulthwsettingswidget.cpp \
+    inputchannelform.cpp \
     configcamerastabilizationwidget.cpp
     
 FORMS +=  \
@@ -81,6 +83,7 @@ FORMS +=  \
     ccattitude.ui \
     defaultattitude.ui \
     defaulthwsettings.ui \
+    inputchannelform.ui \
     camerastabilization.ui
 
 RESOURCES += configgadget.qrc

@@ -42,7 +42,7 @@
 #include "mixersettings.h"
 #include "mixerstatus.h"
 #include "cameradesired.h"
-
+#include "manualcontrolcommand.h"
 
 // Private constants
 #define MAX_QUEUE_SIZE 2
@@ -74,7 +74,7 @@ static void actuatorTask(void* parameters);
 static void actuator_update_rate(UAVObjEvent *);
 static int16_t scaleChannel(float value, int16_t max, int16_t min, int16_t neutral);
 static void setFailsafe();
-static float MixerCurve(const float throttle, const float* curve);
+static float MixerCurve(const float throttle, const float* curve, uint8_t elements);
 static bool set_channel(uint8_t mixer_channel, uint16_t value);
 float ProcessMixer(const int index, const float curve1, const float curve2,
 		   MixerSettingsData* mixerSettings, ActuatorDesiredData* desired,
@@ -219,22 +219,29 @@ static void actuatorTask(void* parameters)
 		bool positiveThrottle = desired.Throttle >= 0.00;
 		bool spinWhileArmed = MotorsSpinWhileArmed == ACTUATORSETTINGS_MOTORSSPINWHILEARMED_TRUE;
 
-		float curve1 = MixerCurve(desired.Throttle,mixerSettings.ThrottleCurve1);
+		float curve1 = MixerCurve(desired.Throttle,mixerSettings.ThrottleCurve1,MIXERSETTINGS_THROTTLECURVE1_NUMELEM);
+		
 		//The source for the secondary curve is selectable
 		float curve2 = 0;
 		AccessoryDesiredData accessory;
 		switch(mixerSettings.Curve2Source) {
 			case MIXERSETTINGS_CURVE2SOURCE_THROTTLE:
-				curve2 = MixerCurve(desired.Throttle,mixerSettings.ThrottleCurve2);
+				curve2 = MixerCurve(desired.Throttle,mixerSettings.ThrottleCurve2,MIXERSETTINGS_THROTTLECURVE2_NUMELEM);
 				break;
 			case MIXERSETTINGS_CURVE2SOURCE_ROLL:
-				curve2 = MixerCurve(desired.Roll,mixerSettings.ThrottleCurve2);
+				curve2 = MixerCurve(desired.Roll,mixerSettings.ThrottleCurve2,MIXERSETTINGS_THROTTLECURVE2_NUMELEM);
 				break;
 			case MIXERSETTINGS_CURVE2SOURCE_PITCH:
-				curve2 = MixerCurve(desired.Pitch,mixerSettings.ThrottleCurve2);
+				curve2 = MixerCurve(desired.Pitch,mixerSettings.ThrottleCurve2,
+				MIXERSETTINGS_THROTTLECURVE2_NUMELEM);
 				break;
 			case MIXERSETTINGS_CURVE2SOURCE_YAW:
-				curve2 = MixerCurve(desired.Yaw,mixerSettings.ThrottleCurve2);
+				curve2 = MixerCurve(desired.Yaw,mixerSettings.ThrottleCurve2,MIXERSETTINGS_THROTTLECURVE2_NUMELEM);
+				break;
+			case MIXERSETTINGS_CURVE2SOURCE_COLLECTIVE:
+				ManualControlCommandCollectiveGet(&curve2);
+				curve2 = MixerCurve(curve2,mixerSettings.ThrottleCurve2,
+				MIXERSETTINGS_THROTTLECURVE2_NUMELEM);
 				break;
 			case MIXERSETTINGS_CURVE2SOURCE_ACCESSORY0:
 			case MIXERSETTINGS_CURVE2SOURCE_ACCESSORY1:
@@ -243,7 +250,7 @@ static void actuatorTask(void* parameters)
 			case MIXERSETTINGS_CURVE2SOURCE_ACCESSORY4:
 			case MIXERSETTINGS_CURVE2SOURCE_ACCESSORY5:
 				if(AccessoryDesiredInstGet(mixerSettings.Curve2Source - MIXERSETTINGS_CURVE2SOURCE_ACCESSORY0,&accessory) == 0)
-					curve2 = MixerCurve(accessory.AccessoryVal,mixerSettings.ThrottleCurve2);
+					curve2 = MixerCurve(accessory.AccessoryVal,mixerSettings.ThrottleCurve2,MIXERSETTINGS_THROTTLECURVE2_NUMELEM);
 				else
 					curve2 = 0;
 				break;
@@ -423,12 +430,9 @@ float ProcessMixer(const int index, const float curve1, const float curve2,
  *Interpolate a throttle curve. Throttle input should be in the range 0 to 1.
  *Output is in the range 0 to 1.
  */
-
-#define MIXER_CURVE_ENTRIES 5
-
-static float MixerCurve(const float throttle, const float* curve)
+static float MixerCurve(const float throttle, const float* curve, uint8_t elements)
 {
-	float scale = throttle * MIXER_CURVE_ENTRIES;
+	float scale = throttle * (elements - 1);
 	int idx1 = scale;
 	scale -= (float)idx1; //remainder
 	if(curve[0] < -1)
@@ -441,12 +445,12 @@ static float MixerCurve(const float throttle, const float* curve)
 		scale = 0;
 	}
 	int idx2 = idx1 + 1;
-	if(idx2 >= MIXER_CURVE_ENTRIES)
+	if(idx2 >= elements)
 	{
-		idx2 = MIXER_CURVE_ENTRIES -1; //clamp to highest entry in table
-		if(idx1 >= MIXER_CURVE_ENTRIES)
+		idx2 = elements -1; //clamp to highest entry in table
+		if(idx1 >= elements)
 		{
-			idx1 = MIXER_CURVE_ENTRIES -1;
+			idx1 = elements -1;
 		}
 	}
 	return((curve[idx1] * (1 - scale)) + (curve[idx2] * scale));

@@ -1,15 +1,18 @@
 <xml>
     <object name="ManualControlSettings" singleinstance="true" settings="true">
         <description>Settings to indicate how to decode receiver input by @ref ManualControlModule.</description>
-        <field name="InputMode" units="" type="enum" elements="1" options="PWM,PPM,Spektrum,S.Bus" defaultvalue="PWM"/>
-        <field name="Roll" units="channel" type="enum" elements="1" options="Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,Channel8,None" defaultvalue="None"/>
-        <field name="Pitch" units="channel" type="enum" elements="1" options="Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,Channel8,None" defaultvalue="None"/>
-        <field name="Yaw" units="channel" type="enum" elements="1" options="Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,Channel8,None" defaultvalue="None"/>
-        <field name="Throttle" units="channel" type="enum" elements="1" options="Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,Channel8,None" defaultvalue="None"/>
-        <field name="FlightMode" units="channel" type="enum" elements="1" options="Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,Channel8,None" defaultvalue="None"/>
-        <field name="Accessory0" units="channel" type="enum" elements="1" options="Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,Channel8,None" defaultvalue="None"/>
-        <field name="Accessory1" units="channel" type="enum" elements="1" options="Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,Channel8,None" defaultvalue="None"/>
-        <field name="Accessory2" units="channel" type="enum" elements="1" options="Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,Channel8,None" defaultvalue="None"/>
+        <field name="ChannelGroups" units="Channel Group" type="enum" 
+	       elementnames="Throttle,Roll,Pitch,Yaw,FlightMode,Collective,Accessory0,Accessory1,Accessory2"
+	       options="PWM,PPM,Spektrum1,Spektrum2,S.Bus,GCS,None" defaultvalue="None"/>
+	<field name="ChannelNumber" units="channel" type="uint8" defaultvalue="0"
+	       elementnames="Throttle,Roll,Pitch,Yaw,FlightMode,Collective,Accessory0,Accessory1,Accessory2"/>
+	<field name="ChannelMin" units="us" type="int16" defaultvalue="1000"
+	       elementnames="Throttle,Roll,Pitch,Yaw,FlightMode,Collective,Accessory0,Accessory1,Accessory2"/>
+	<field name="ChannelNeutral" units="us" type="int16" defaultvalue="1500"
+	       elementnames="Throttle,Roll,Pitch,Yaw,FlightMode,Collective,Accessory0,Accessory1,Accessory2"/>
+	<field name="ChannelMax" units="us" type="int16" defaultvalue="2000"
+	       elementnames="Throttle,Roll,Pitch,Yaw,FlightMode,Collective,Accessory0,Accessory1,Accessory2"/>
+	       
         <field name="Arming" units="" type="enum" elements="1" options="Always Disarmed,Always Armed,Roll Left,Roll Right,Pitch Forward,Pitch Aft,Yaw Left,Yaw Right" defaultvalue="Always Disarmed"/>
 
 	<!-- Note these options should be identical to those in StabilizationDesired.StabilizationMode -->
@@ -20,9 +23,6 @@
 	<!-- Note these options values should be identical to those defined in FlightMode -->
         <field name="FlightModePosition" units="" type="enum" elements="3" options="Manual,Stabilized1,Stabilized2,Stabilized3,VelocityControl,PositionHold" defaultvalue="Manual,Stabilized1,Stabilized2"/>
 
-        <field name="ChannelMax" units="us" type="int16" elements="8" defaultvalue="2000"/>
-        <field name="ChannelNeutral" units="us" type="int16" elements="8" defaultvalue="1500"/>
-        <field name="ChannelMin" units="us" type="int16" elements="8" defaultvalue="1000"/>
         <field name="ArmedTimeout" units="ms" type="uint16" elements="1" defaultvalue="30000"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>

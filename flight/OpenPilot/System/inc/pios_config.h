@@ -78,12 +78,6 @@
 /* Enable a priority queue in telemetry */
 #define PIOS_TELEM_PRIORITY_QUEUE
 
-/* COM Module */
-#define GPS_BAUDRATE			19200
-#define TELEM_BAUDRATE			19200
-#define AUXUART_ENABLED			0
-#define AUXUART_BAUDRATE		19200
-
 /* Alarm Thresholds */
 #define HEAP_LIMIT_WARNING		4000
 #define HEAP_LIMIT_CRITICAL		1000

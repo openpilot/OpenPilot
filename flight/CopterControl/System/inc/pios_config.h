@@ -81,12 +81,6 @@
 #define LOG_FILENAME 			"PIOS.LOG"
 #define STARTUP_LOG_ENABLED		1
 
-/* COM Module */
-#define GPS_BAUDRATE			19200
-#define TELEM_BAUDRATE			19200
-#define AUXUART_ENABLED			0
-#define AUXUART_BAUDRATE		19200
-
 /* Alarm Thresholds */
 #define HEAP_LIMIT_WARNING             220
 #define HEAP_LIMIT_CRITICAL             40

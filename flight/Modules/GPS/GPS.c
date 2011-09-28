@@ -99,12 +99,17 @@ static uint32_t numParsingErrors;
 
 int32_t GPSStart(void)
 {
-	// Start gps task
-	xTaskCreate(gpsTask, (signed char *)"GPS", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &gpsTaskHandle);
-	TaskMonitorAdd(TASKINFO_RUNNING_GPS, gpsTaskHandle);
+	if (gpsPort) {
+		// Start gps task
+		xTaskCreate(gpsTask, (signed char *)"GPS", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &gpsTaskHandle);
+		TaskMonitorAdd(TASKINFO_RUNNING_GPS, gpsTaskHandle);
+		return 0;
+	}
 
-	return 0;
+	AlarmsSet(SYSTEMALARMS_ALARM_GPS, SYSTEMALARMS_ALARM_CRITICAL);
+	return -1;
 }
+
 /**
  * Initialise the gps module
  * \return -1 if initialisation failed
@@ -112,29 +117,33 @@ int32_t GPSStart(void)
  */
 int32_t GPSInitialize(void)
 {
-	GPSPositionInitialize();
-#if !defined(PIOS_GPS_MINIMAL)
-	GPSTimeInitialize();
-	GPSSatellitesInitialize();
-#endif
-#ifdef PIOS_GPS_SETS_HOMELOCATION
-	HomeLocationInitialize();
-#endif
-	HwSettingsInitialize();
-	
-	// Update GPS settings
-	updateSettings();
-
-	// Listen for settings updates, connect a callback function
-	HwSettingsConnectCallback(&SettingsUpdatedCb);
-
-	// TODO: Get gps settings object
 	gpsPort = PIOS_COM_GPS;
 
-	gps_rx_buffer = pvPortMalloc(NMEA_MAX_PACKET_LENGTH);
-	PIOS_Assert(gps_rx_buffer);
+	if (gpsPort) {
 
-	return 0;
+		GPSPositionInitialize();
+#if !defined(PIOS_GPS_MINIMAL)
+		GPSTimeInitialize();
+		GPSSatellitesInitialize();
+#endif
+#ifdef PIOS_GPS_SETS_HOMELOCATION
+		HomeLocationInitialize();
+#endif
+		HwSettingsInitialize();
+
+		// TODO: Get gps settings object
+		updateSettings();
+
+		// Listen for settings updates, connect a callback function
+		HwSettingsConnectCallback(&SettingsUpdatedCb);
+
+		gps_rx_buffer = pvPortMalloc(NMEA_MAX_PACKET_LENGTH);
+		PIOS_Assert(gps_rx_buffer);
+
+		return 0;
+	}
+
+	return -1;
 }
 
 // ****************
@@ -360,9 +369,6 @@ static void SettingsUpdatedCb(UAVObjEvent * ev)
  */
 static void updateSettings()
 {
-	// Set port
-	gpsPort = PIOS_COM_GPS;
-
 	if (gpsPort) {
 
 		// Retrieve settings
@@ -395,7 +401,6 @@ static void updateSettings()
 		}
 	}
 }
-
 
 /** 
   * @}

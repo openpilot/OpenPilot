@@ -9,6 +9,9 @@
 		<field name="OP_MainPort" units="function" type="enum" elements="1" options="Disabled,Telemetry" defaultvalue="Telemetry"/>
 		<field name="OP_RcvrPort" units="function" type="enum" elements="1" options="Disabled,Debug,Spektrum1,PWM,PPM" defaultvalue="PWM"/>
 
+		<field name="TelemetrySpeed" units="bps" type="enum" elements="1" options="2400,4800,9600,19200,38400,57600,115200" defaultvalue="57600"/>
+		<field name="GPSSpeed" units="bps" type="enum" elements="1" options="2400,4800,9600,19200,38400,57600,115200" defaultvalue="57600"/>
+
 		<field name="OptionalModules" units="" type="enum" elementnames="CameraStab,GPS" options="Disabled,Enabled" defaultvalue="Disabled"/>
 		<field name="DSMxBind" units=""  type="uint8"  elements="1" defaultvalue="0"/>
 

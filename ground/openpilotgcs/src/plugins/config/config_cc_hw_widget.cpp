@@ -40,10 +40,11 @@ ConfigCCHWWidget::ConfigCCHWWidget(QWidget *parent) : ConfigTaskWidget(parent)
     m_telemetry = new Ui_CC_HW_Widget();
     m_telemetry->setupUi(this);
     setupButtons(m_telemetry->saveTelemetryToRAM,m_telemetry->saveTelemetryToSD);
-    addUAVObjectToWidgetRelation("TelemetrySettings","Speed",m_telemetry->telemetrySpeed);
     addUAVObjectToWidgetRelation("HwSettings","CC_FlexiPort",m_telemetry->cbFlexi);
     addUAVObjectToWidgetRelation("HwSettings","CC_MainPort",m_telemetry->cbTele);
     addUAVObjectToWidgetRelation("HwSettings","CC_RcvrPort",m_telemetry->cbRcvr);
+    addUAVObjectToWidgetRelation("HwSettings","TelemetrySpeed",m_telemetry->telemetrySpeed);
+    addUAVObjectToWidgetRelation("HwSettings","GPSSpeed",m_telemetry->gpsSpeed);
     connect(m_telemetry->cchwHelp,SIGNAL(clicked()),this,SLOT(openHelp()));
     enableControls(false);
     populateWidgets();

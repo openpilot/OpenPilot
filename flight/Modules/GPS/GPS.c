@@ -43,11 +43,15 @@
 #include "gpssatellites.h"
 #include "WorldMagModel.h"
 #include "CoordinateConversions.h"
+#include "hwsettings.h"
+
 
 // ****************
 // Private functions
 
 static void gpsTask(void *parameters);
+static void SettingsUpdatedCb(UAVObjEvent * ev);
+static void updateSettings();
 
 #ifdef PIOS_GPS_SETS_HOMELOCATION
 static void setHomeLocation(GPSPositionData * gpsData);
@@ -116,7 +120,14 @@ int32_t GPSInitialize(void)
 #ifdef PIOS_GPS_SETS_HOMELOCATION
 	HomeLocationInitialize();
 #endif
+	HwSettingsInitialize();
 	
+	// Update GPS settings
+	updateSettings();
+
+	// Listen for settings updates, connect a callback function
+	HwSettingsConnectCallback(&SettingsUpdatedCb);
+
 	// TODO: Get gps settings object
 	gpsPort = PIOS_COM_GPS;
 
@@ -332,6 +343,59 @@ static void setHomeLocation(GPSPositionData * gpsData)
 #endif
 
 // ****************
+
+/**
+ * Settings callback, called each time the settings object is updated
+ */
+static void SettingsUpdatedCb(UAVObjEvent * ev)
+{
+	if (ev->obj == HwSettingsHandle())
+		updateSettings();
+}
+
+
+/**
+ * Update the GPS settings, called on startup and
+ * each time the settings object is updated
+ */
+static void updateSettings()
+{
+	// Set port
+	gpsPort = PIOS_COM_GPS;
+
+	if (gpsPort) {
+
+		// Retrieve settings
+		uint8_t speed;
+		HwSettingsGPSSpeedGet(&speed);
+
+		// Set port speed
+		switch (speed) {
+		case HWSETTINGS_GPSSPEED_2400:
+			PIOS_COM_ChangeBaud(gpsPort, 2400);
+			break;
+		case HWSETTINGS_GPSSPEED_4800:
+			PIOS_COM_ChangeBaud(gpsPort, 4800);
+			break;
+		case HWSETTINGS_GPSSPEED_9600:
+			PIOS_COM_ChangeBaud(gpsPort, 9600);
+			break;
+		case HWSETTINGS_GPSSPEED_19200:
+			PIOS_COM_ChangeBaud(gpsPort, 19200);
+			break;
+		case HWSETTINGS_GPSSPEED_38400:
+			PIOS_COM_ChangeBaud(gpsPort, 38400);
+			break;
+		case HWSETTINGS_GPSSPEED_57600:
+			PIOS_COM_ChangeBaud(gpsPort, 57600);
+			break;
+		case HWSETTINGS_GPSSPEED_115200:
+			PIOS_COM_ChangeBaud(gpsPort, 115200);
+			break;
+		}
+	}
+}
+
 
 /** 
   * @}

@@ -98,6 +98,8 @@
 /* GPS options */
 #define PIOS_GPS_SETS_HOMELOCATION
 
+/* PIOS Initcall infrastructure */
+#define PIOS_INCLUDE_INITCALL
 
 #endif /* PIOS_CONFIG_H */
 /**

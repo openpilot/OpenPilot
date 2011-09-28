@@ -108,6 +108,9 @@
 // This can't be too high to stop eventdispatcher thread overflowing
 #define PIOS_EVENTDISAPTCHER_QUEUE      10
 
+/* PIOS Initcall infrastructure */
+#define PIOS_INCLUDE_INITCALL
+
 #endif /* PIOS_CONFIG_H */
 /**
  * @}

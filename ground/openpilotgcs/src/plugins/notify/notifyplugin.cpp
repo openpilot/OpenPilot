@@ -289,8 +289,8 @@ void SoundNotifyPlugin::checkNotificationRule(NotificationItem* notification, UA
     QString direction;
     QString fieldName;
 
-    threshold = notification->getSpinBoxValue();
-    direction = notification->getValue();
+    threshold = notification->singleValue();
+    direction = notification->range();
     fieldName = notification->getObjectField();
     UAVObjectField* field = object->getField(fieldName);
 
@@ -311,6 +311,11 @@ void SoundNotifyPlugin::checkNotificationRule(NotificationItem* notification, UA
     case 'L':
         condition = (value < threshold);
         break;
+
+    case 'R':
+        condition = (value > threshold) && (value < notification->valueRange2());
+        break;
+
     }
 
     if (!condition)

@@ -86,12 +86,13 @@ public:
 	bool insertRows(int position, int rows, const QModelIndex &index);
 	bool removeRows(int position, int rows, const QModelIndex &index);
 
+	void entryAdded(NotificationItem* item);
+
 signals:
 	void dragRows(int position, int count);
 
 private slots:
 	void entryUpdated(int offset);
-	void entryAdded(int position);
 	void dropRows(int position, int count) const;
 
 private:

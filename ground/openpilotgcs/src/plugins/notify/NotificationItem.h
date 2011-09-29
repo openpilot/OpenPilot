@@ -40,11 +40,15 @@ using namespace Core;
 	QString getSound##number() const { return _sound##number; } \
 	void setSound##number(QString text) { _sound##number = text; } \
 
+class UAVDataObject;
+class UAVObjectField;
 
 class NotificationItem : public QObject
 {
     Q_OBJECT
 public:
+    enum { eDefaultTimeout = 15 }; // in sec
+
     explicit NotificationItem(QObject *parent = 0);
 
     void copyTo(NotificationItem*) const;
@@ -53,15 +57,17 @@ public:
     DECLARE_SOUND(2)
     DECLARE_SOUND(3)
 
-    QString getValue() const { return _dataValue; }
-    void setValue(QString text) { _dataValue = text; }
+    QString range() const { return _rangeLimit; }
+    void setRange(QString text) { _rangeLimit = text; }
 
     QString getSayOrder() const { return _sayOrder; }
     void setSayOrder(QString text) { _sayOrder = text; }
 
-    double getSpinBoxValue() const { return _spinBoxValue; }
-    void setSpinBoxValue(double value) { _spinBoxValue = value; }
+    double singleValue() const { return _singleValue; }
+    void setSingleValue(double value) { _singleValue = value; }
 
+    double valueRange2() const { return _valueRange2; }
+    void setValueRange2(double value) { _valueRange2 = value; }
 
     QString getDataObject() const { return _dataObject; }
     void setDataObject(QString text) { _dataObject = text; }
@@ -91,6 +97,9 @@ public:
     void restoreState(QSettings* settings);
 
 
+    UAVDataObject* getUAVObject(void);
+    UAVObjectField* getUAVObjectField(void);
+
     void seriaize(QDataStream& stream);
     void deseriaize(QDataStream& stream);
 
@@ -111,7 +120,7 @@ public:
     bool firstStart;
 
 private:
-    void checkSoundFilesExisting();
+    void checkSoundFilesExisting(bool& missed1, bool& missed2, bool& missed3);
 
 private:
     QTimer* _timer;
@@ -135,8 +144,8 @@ private:
     //! one field value change can be assigned to one notification
     QString _objectField;
 
-    //! poled UAV field value
-    QString _dataValue;
+    //! fire condition for UAV field value (lower, greater, in range)
+    QString _rangeLimit;
 
     //! possible sounds(at least one required to play notification)
     QString _sound1;
@@ -146,7 +155,12 @@ private:
     //! order in what sounds 1-3 will be played
     QString _sayOrder;
 
-    double _spinBoxValue;
+    //! one-side range, value maybe lower or greater
+    double _singleValue;
+
+    //! both-side range, value should be inside the range
+    //double _valueRange1;
+    double _valueRange2;
 
     //! how often or what periodicaly notification should be played
     QString _repeatString;

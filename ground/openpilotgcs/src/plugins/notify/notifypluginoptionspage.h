@@ -42,7 +42,8 @@
 #include <phonon/Path>
 #include <phonon/AudioOutput>
 #include <phonon/Global>
-//#include "notifytablemodel.h"
+#include <QComboBox>
+#include <QSpinBox>
 
 class NotifyTableModel;
 class NotificationItem;
@@ -65,8 +66,6 @@ public:
 	QString category() const { return QLatin1String("Notify Plugin");}
 	QString trCategory() const { return tr("Notify Plugin");}
 
-
-
     QWidget *createPage(QWidget *parent);
     void apply();
 	void finish();
@@ -75,12 +74,38 @@ public:
 	void updateConfigView(NotificationItem* notification);
 	void getOptionsPageValues(NotificationItem* notification);
 
+signals:
+    void updateNotifications(QList<NotificationItem*> list);
+        //void resetNotification(void);
+    void entryUpdated(int index);
+
 private:
     Q_DISABLE_COPY(NotifyPluginOptionsPage)
 
+    void resetValueRange();
+    void setDynamicValueField(NotificationItem* notification);
+    void addDynamicField(UAVObjectField* objField);
+    void addDynamicValueLayout();
     void initButtons();
     void initPhononPlayer();
     void initRulesTable();
+
+private slots:
+	void on_buttonTestSoundNotification_clicked();
+
+	void on_buttonAddNotification_clicked();
+	void on_buttonDeleteNotification_clicked();
+	void on_buttonModifyNotification_clicked();
+	void on_tableNotification_changeSelection( const QItemSelection & selected, const QItemSelection & deselected );
+	void on_soundLanguage_indexChanged(int index);
+	void on_buttonSoundFolder_clicked(const QString& path);
+	void on_UAVObject_indexChanged(QString val);
+	void onUAVField_indexChanged(QString val);
+	void changeButtonText(Phonon::State newstate, Phonon::State oldstate);
+	void on_chkEnableSound_toggled(bool state);
+	void on_rangeValue_indexChanged(QString);
+
+	void onFinishedPlaying(void);
 
 private:
 	UAVObjectManager& objManager;
@@ -99,28 +124,12 @@ private:
 
 	QScopedPointer<Ui::NotifyPluginOptionsPage> options_page;
 
-signals:
-	void updateNotifications(QList<NotificationItem*> list);
-        //void resetNotification(void);
-	void entryUpdated(int index);
-	void entryAdded(int position);
-
-
-private slots:
-	void on_buttonTestSoundNotification_clicked();
-
-	void on_buttonAddNotification_clicked();
-	void on_buttonDeleteNotification_clicked();
-	void on_buttonModifyNotification_clicked();
-	void on_tableNotification_changeSelection( const QItemSelection & selected, const QItemSelection & deselected );
-	void on_soundLanguage_indexChanged(int index);
-	void on_buttonSoundFolder_clicked(const QString& path);
-	void on_UAVObject_indexChanged(QString val);
-	void changeButtonText(Phonon::State newstate, Phonon::State oldstate);
-	void on_chkEnableSound_toggled(bool state);
-
-	void onFinishedPlaying(void);
-
+    QComboBox* _valueRange;
+    QComboBox* _sayOrder;
+    QWidget* _fieldValue;
+    int _fieldType;
+    QWidget* _form;
+    NotificationItem* _selectedNotification;
 };
 
 #endif // NOTIFYPLUGINOPTIONSPAGE_H

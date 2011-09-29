@@ -162,9 +162,13 @@ void NotifyTableModel::entryUpdated(int offset)
     emit dataChanged(idx, idx);
 }
 
-void NotifyTableModel::entryAdded(int position)
+void NotifyTableModel::entryAdded(NotificationItem* item)
 {
-    insertRows(position, 1,QModelIndex());
+    insertRows(rowCount(), 1, QModelIndex());
+    NotificationItem* tmp = _list.at(rowCount() - 1);
+    _list.replace(rowCount() - 1, item);
+    delete tmp;
+    entryUpdated(rowCount() - 1);
 }
 
 

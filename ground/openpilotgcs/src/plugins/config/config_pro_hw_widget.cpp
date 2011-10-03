@@ -2,7 +2,7 @@
  ******************************************************************************
  *
  * @file       configtelemetrywidget.h
- * @author     E. Lafargue & The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup ConfigPlugin Config Plugin

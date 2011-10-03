@@ -37,10 +37,10 @@
 //#include <QtWebKit/QWebView>
 #include <QTextBrowser>
 #include "utils/pathutils.h"
-
+#include <QMessageBox>
 //#include "fancytabwidget.h"
 #include "utils/mytabbedstackwidget.h"
-
+#include "configtaskwidget.h"
 
 class ConfigGadgetWidget: public QWidget
 {
@@ -50,11 +50,12 @@ class ConfigGadgetWidget: public QWidget
 public:
     ConfigGadgetWidget(QWidget *parent = 0);
     ~ConfigGadgetWidget();
-    enum widgetTabs {hardware=0, aircraft, input, output, ins, stabilization};
+    enum widgetTabs {hardware=0, aircraft, input, output, ins, stabilization, camerastabilization};
 
 public slots:
     void onAutopilotConnect();
     void onAutopilotDisconnect();
+    void tabAboutToChange(int i,bool *);
 
 signals:
     void autopilotConnected();

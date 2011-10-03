@@ -79,8 +79,15 @@ void PIOS_DEBUG_Panic(const char *msg)
 	PIOS_COM_SendFormattedStringNonBlocking(PIOS_COM_DEBUG, "\r%s @0x%x\r", msg, lr);
 #endif
 
-	// Stay put
-	while (1) ;
+	// tell the user whats going on on commandline too
+	fprintf(stderr,"CRITICAL ERROR: %s\n",msg);
+
+	// this helps debugging: causing a div by zero allows a backtrace
+	// and/or ends execution
+	int b = 0;
+	int a = (2/b);
+	b=a;
+
 }
 
 /**

@@ -29,11 +29,11 @@ CLEAN_GROUND := YES
 CLEAN_FLIGHT := YES
 endif
 
-# Set up targets (PPM target seems to be broken at the moment)
-FW_TARGETS        := $(addprefix fw_, ahrs pipxtreme coptercontrol openpilot)
+# Set up targets
+FW_TARGETS        := $(addprefix fw_, coptercontrol)
 FW_TARGETS_TOOLS  := $(addprefix fw_, coptercontrol)
-BL_TARGETS        := $(addprefix bl_, coptercontrol openpilot ahrs pipxtreme)
-BU_TARGETS        := $(addprefix bu_, coptercontrol openpilot ahrs pipxtreme)
+BL_TARGETS        := $(addprefix bl_, coptercontrol)
+BU_TARGETS        := $(addprefix bu_, coptercontrol)
 
 help:
 	@echo

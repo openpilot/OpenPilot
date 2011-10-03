@@ -117,6 +117,19 @@ int32_t PIOS_FLASHFS_Init()
 }
 
 /**
+ * @brief Erase the whole flash chip and create the file system
+ * @return 0 if successful, -1 if not
+ */
+int32_t PIOS_FLASHFS_Format() 
+{
+	if(PIOS_Flash_W25X_EraseChip() != 0)
+		return -1;
+	if(PIOS_FLASHFS_ClearObjectTableHeader() != 0)
+		return -1;
+	return 0;
+}
+
+/**
  * @brief Erase the headers for all objects in the flash chip
  * @return 0 if successful, -1 if not
  */

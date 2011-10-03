@@ -24,6 +24,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#include "pios.h"
 #include "ahrs_spi_comm.h"
 #include "pios_debug.h"
 
@@ -79,6 +80,7 @@ CREATEHANDLE(10, FirmwareIAPObj);
 static void ObjectUpdatedCb(UAVObjEvent * ev);
 
 #define ADDHANDLE(idx,obj) {\
+		obj##Initialize();\
 		int n = idx;\
 		objectHandles[n].data = &obj;\
 		objectHandles[n].uavHandle = obj##Handle();\

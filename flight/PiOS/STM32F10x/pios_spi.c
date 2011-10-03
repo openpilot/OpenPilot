@@ -46,10 +46,10 @@ static bool PIOS_SPI_validate(struct pios_spi_dev * com_dev)
 	return(true);
 }
 
-#if defined(PIOS_INCLUDE_FREERTOS) && 0
+#if defined(PIOS_INCLUDE_FREERTOS)
 static struct pios_spi_dev * PIOS_SPI_alloc(void)
 {
-	return (malloc(sizeof(struct pios_spi_dev)));
+	return (pvPortMalloc(sizeof(struct pios_spi_dev)));
 }
 #else
 static struct pios_spi_dev pios_spi_devs[PIOS_SPI_MAX_DEVS];

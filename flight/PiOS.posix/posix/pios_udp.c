@@ -64,6 +64,7 @@ static pios_udp_dev * find_udp_dev_by_id (uint8_t udp)
 {
   if (udp >= pios_udp_num_devices) {
     /* Undefined UDP port for this board (see pios_board.c) */
+	PIOS_Assert(0);
     return NULL;
   }
 
@@ -153,6 +154,8 @@ int32_t PIOS_UDP_Init(uint32_t * udp_id, const struct pios_udp_cfg * cfg)
   pthread_create(&udp_dev->rxThread, NULL, PIOS_UDP_RxThread, (void*)udp_dev);
 
   printf("udp dev %i - socket %i opened - result %i\n",pios_udp_num_devices-1,udp_dev->socket,res);
+
+  *udp_id = pios_udp_num_devices-1;
 
   return res;
 }

@@ -17,8 +17,8 @@ public:
     Q_OBJECT
 public:
     smartSaveButton(QPushButton * update,QPushButton * save);
-    void setObjects(QList<UAVObject *>);
-    void addObject(UAVObject *);
+    void setObjects(QList<UAVDataObject *>);
+    void addObject(UAVDataObject *);
     void clearObjects();
 signals:
     void preProcessOperations();
@@ -34,11 +34,11 @@ private:
     QPushButton *bupdate;
     QPushButton *bsave;
     quint32 current_objectID;
-    UAVObject * current_object;
+    UAVDataObject * current_object;
     bool up_result;
     bool sv_result;
     QEventLoop loop;
-    QList<UAVObject *> objects;
+    QList<UAVDataObject *> objects;
 protected:
 public slots:
     void enableControls(bool value);

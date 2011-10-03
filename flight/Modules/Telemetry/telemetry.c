@@ -67,6 +67,7 @@ static uint32_t txErrors;
 static uint32_t txRetries;
 static TelemetrySettingsData settings;
 static uint32_t timeOfLastObjectUpdate;
+static UAVTalkConnection uavTalkCon;
 
 // Private functions
 static void telemetryTxTask(void *parameters);
@@ -88,7 +89,13 @@ static void updateSettings();
  */
 int32_t TelemetryStart(void)
 {
-
+	// Process all registered objects and connect queue for updates
+	UAVObjIterate(&registerObject);
+    
+	// Listen to objects of interest
+	GCSTelemetryStatsConnectQueue(priorityQueue);
+	TelemetrySettingsConnectQueue(priorityQueue);
+    
 	// Start telemetry tasks
 	xTaskCreate(telemetryTxTask, (signed char *)"TelTx", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY_TX, &telemetryTxTaskHandle);
 	xTaskCreate(telemetryRxTask, (signed char *)"TelRx", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY_RX, &telemetryRxTaskHandle);
@@ -111,6 +118,10 @@ int32_t TelemetryStart(void)
 int32_t TelemetryInitialize(void)
 {
 	UAVObjEvent ev;
+    
+	FlightTelemetryStatsInitialize();
+	GCSTelemetryStatsInitialize();
+	TelemetrySettingsInitialize();
 
 	// Initialize vars
 	timeOfLastObjectUpdate = 0;
@@ -120,25 +131,19 @@ int32_t TelemetryInitialize(void)
 #if defined(PIOS_TELEM_PRIORITY_QUEUE)
 	priorityQueue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
 #endif
-	
-	// Get telemetry settings object
+
+    // Get telemetry settings object
 	updateSettings();
-
+    
 	// Initialise UAVTalk
-	UAVTalkInitialize(&transmitData);
-
-	// Process all registered objects and connect queue for updates
-	UAVObjIterate(&registerObject);
-
+	uavTalkCon = UAVTalkInitialize(&transmitData,256);
+    
 	// Create periodic event that will be used to update the telemetry stats
 	txErrors = 0;
 	txRetries = 0;
 	memset(&ev, 0, sizeof(UAVObjEvent));
 	EventPeriodicQueueCreate(&ev, priorityQueue, STATS_UPDATE_PERIOD_MS);
-
-	// Listen to objects of interest
-	GCSTelemetryStatsConnectQueue(priorityQueue);
-	TelemetrySettingsConnectQueue(priorityQueue);
+    
 
 	return 0;
 }
@@ -235,7 +240,7 @@ static void processObjEvent(UAVObjEvent * ev)
 			if (ev->event == EV_UPDATED || ev->event == EV_UPDATED_MANUAL) {
 				// Send update to GCS (with retries)
 				while (retries < MAX_RETRIES && success == -1) {
-					success = UAVTalkSendObject(ev->obj, ev->instId, metadata.telemetryAcked, REQ_TIMEOUT_MS);	// call blocks until ack is received or timeout
+					success = UAVTalkSendObject(uavTalkCon, ev->obj, ev->instId, metadata.telemetryAcked, REQ_TIMEOUT_MS);	// call blocks until ack is received or timeout
 					++retries;
 				}
 				// Update stats
@@ -246,7 +251,7 @@ static void processObjEvent(UAVObjEvent * ev)
 			} else if (ev->event == EV_UPDATE_REQ) {
 				// Request object update from GCS (with retries)
 				while (retries < MAX_RETRIES && success == -1) {
-					success = UAVTalkSendObjectRequest(ev->obj, ev->instId, REQ_TIMEOUT_MS);	// call blocks until update is received or timeout
+					success = UAVTalkSendObjectRequest(uavTalkCon, ev->obj, ev->instId, REQ_TIMEOUT_MS);	// call blocks until update is received or timeout
 					++retries;
 				}
 				// Update stats
@@ -326,7 +331,7 @@ static void telemetryRxTask(void *parameters)
 			bytes_to_process = PIOS_COM_ReceiveBuffer(inputPort, serial_data, sizeof(serial_data), 500);
 			if (bytes_to_process > 0) {
 				for (uint8_t i = 0; i < bytes_to_process; i++) {
-					UAVTalkProcessInputStream(serial_data[i]);
+					UAVTalkProcessInputStream(uavTalkCon,serial_data[i]);
 				}
 			}
 		} else {
@@ -426,8 +431,8 @@ static void updateTelemetryStats()
 	uint32_t timeNow;
 
 	// Get stats
-	UAVTalkGetStats(&utalkStats);
-	UAVTalkResetStats();
+	UAVTalkGetStats(uavTalkCon, &utalkStats);
+	UAVTalkResetStats(uavTalkCon);
 
 	// Get object data
 	FlightTelemetryStatsGet(&flightStats);

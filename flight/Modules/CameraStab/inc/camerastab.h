@@ -2,16 +2,13 @@
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
  * @{ 
- * @addtogroup GSPModule GPS Module
- * @brief Process GPS information
+ * @addtogroup BatteryModule Battery Module
  * @{ 
  *
- * @file       gps_mode.h
+ * @file       battery.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Include file of the GPS module.
- * 	       As with all modules only the initialize function is exposed all other
- * 	       interactions with the module take place through the event queue and
- *             objects.
+ * @brief      Module to read the battery Voltage and Current periodically and set alarms appropriately.
+ *
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -30,27 +27,14 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+#ifndef BATTERY_H
+#define BATTERY_H
 
-#ifndef GPS_MODE_H
-#define GPS_MODE_H
+#include "openpilot.h"
 
-// ****************
-// you MUST have one of these uncommented - and ONLY one
+int32_t CameraStabInitialize(void);
 
-//#define ENABLE_GPS_BINARY_GTOP      // uncomment this if we are using GTOP BINARY mode
-//#define ENABLE_GPS_ONESENTENCE_GTOP // uncomment this if we are using GTOP SINGLE SENTENCE mode
-#define ENABLE_GPS_NMEA               // uncomment this if we are using NMEA mode
-
-// ****************
-// make sure they have defined a protocol to use
-
-#if !defined(ENABLE_GPS_BINARY_GTOP) && !defined(ENABLE_GPS_ONESENTENCE_GTOP) && !defined(ENABLE_GPS_NMEA)
-	#error YOU MUST SELECT THE DESIRED GPS PROTOCOL IN gps_mode.h!
-#endif
-
-// ****************
-
-#endif
+#endif // BATTERY_H
 
 /**
   * @}

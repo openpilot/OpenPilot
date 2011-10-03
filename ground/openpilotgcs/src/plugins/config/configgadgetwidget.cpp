@@ -33,6 +33,7 @@
 #include "configinputwidget.h"
 #include "configoutputwidget.h"
 #include "configstabilizationwidget.h"
+#include "configcamerastabilizationwidget.h"
 #include "config_pro_hw_widget.h"
 #include "config_cc_hw_widget.h"
 #include "defaultattitudewidget.h"
@@ -81,6 +82,8 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     qwd = new ConfigStabilizationWidget(this);
     ftw->insertTab(ConfigGadgetWidget::stabilization, qwd, QIcon(":/configgadget/images/gyroscope.png"), QString("Stabilization"));
 
+    qwd = new ConfigCameraStabilizationWidget(this);
+    ftw->insertTab(ConfigGadgetWidget::camerastabilization, qwd, QIcon(":/configgadget/images/camera.png"), QString("Camera Stab"));
 
 
 //    qwd = new ConfigPipXtremeWidget(this);
@@ -99,6 +102,8 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
         onAutopilotConnect();    
 
     help = 0;
+    connect(ftw,SIGNAL(currentAboutToShow(int,bool*)),this,SLOT(tabAboutToChange(int,bool*)));//,Qt::BlockingQueuedConnection);
+
 }
 
 ConfigGadgetWidget::~ConfigGadgetWidget()
@@ -115,6 +120,15 @@ void ConfigGadgetWidget::resizeEvent(QResizeEvent *event)
 }
 
 void ConfigGadgetWidget::onAutopilotDisconnect() {
+    ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
+    ftw->removeTab(ConfigGadgetWidget::ins);
+    QWidget *qwd = new DefaultAttitudeWidget(this);
+    ftw->insertTab(ConfigGadgetWidget::ins, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("INS"));
+    ftw->removeTab(ConfigGadgetWidget::hardware);
+    qwd = new DefaultHwSettingsWidget(this);
+    ftw->insertTab(ConfigGadgetWidget::hardware, qwd, QIcon(":/configgadget/images/hw_config.png"), QString("HW Settings"));
+    ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
+
     emit autopilotDisconnected();
 }
 
@@ -151,6 +165,25 @@ void ConfigGadgetWidget::onAutopilotConnect() {
         }
     }
     emit autopilotConnected();
+}
+
+void ConfigGadgetWidget::tabAboutToChange(int i,bool * proceed)
+{
+    Q_UNUSED(i);
+    *proceed=true;
+    ConfigTaskWidget * wid=qobject_cast<ConfigTaskWidget *>(ftw->currentWidget());
+    if(!wid)
+        return;
+    if(wid->isDirty())
+    {
+        int ans=QMessageBox::warning(this,tr("Unsaved changes"),tr("The tab you are leaving has unsaved changes,"
+                                                           "if you proceed they will be lost."
+                                                           "Do you still want to proceed?"),QMessageBox::Yes,QMessageBox::No);
+        if(ans==QMessageBox::No)
+            *proceed=false;
+        else
+            wid->setDirty(false);
+    }
 }
 
 

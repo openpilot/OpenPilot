@@ -42,9 +42,9 @@ struct pios_spektrum_cfg {
 
 extern const struct pios_rcvr_driver pios_spektrum_rcvr_driver;
 
-extern int32_t PIOS_SPEKTRUM_Init(uint32_t * spektrum_id, const struct pios_spektrum_cfg *cfg, const struct pios_com_driver * driver, uint32_t lower_id, bool bind);
+extern int32_t PIOS_SPEKTRUM_Init(uint32_t * spektrum_id, const struct pios_spektrum_cfg *cfg, const struct pios_com_driver * driver, uint32_t lower_id, uint8_t bind);
 
-#endif /* PIOS_PWM_PRIV_H */
+#endif /* PIOS_SPEKTRUM_PRIV_H */
 
 /**
  * @}

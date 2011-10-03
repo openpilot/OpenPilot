@@ -40,10 +40,28 @@
 #include "notifylogging.h"
 
 
+static const QString cStrNever("Never");
+static const QString cStrBefore1st("Before first");
+static const QString cStrBefore2nd("Before second");
+static const QString cStrAfter2nd("After second");
+
+static const QString cStrRetryOnce("Repeat Once");
+static const QString cStrRetryInstantly("Repeat Instantly");
+static const QString cStrRetry10sec("Repeat 10 seconds");
+static const QString cStrRetry30sec("Repeat 30 seconds");
+static const QString cStrRetry1min("Repeat 1 minute");
+
+
+QStringList NotificationItem::sayOrderValues;
+QStringList NotificationItem::retryValues;
+
+
 NotificationItem::NotificationItem(QObject *parent)
     : QObject(parent)
     , isNowPlaying(0)
     , firstStart(true)
+    , _timer(NULL)
+    , _expireTimer(NULL)
     , _soundCollectionPath("")
     , _currentLanguage("default")
     , _dataObject("")
@@ -52,16 +70,23 @@ NotificationItem::NotificationItem(QObject *parent)
     , _sound1("")
     , _sound2("")
     , _sound3("")
-    , _sayOrder("Never")
+    , _sayOrder(cStrNever)
     , _singleValue(0)
     , _valueRange2(0)
-    , _repeatString("Repeat Instantly")
+    , _repeatString(cStrRetryInstantly)
     , _expireTimeout(eDefaultTimeout)
     , _mute(false)
-
 {
-    _timer = NULL;
-    _expireTimer = NULL;
+    NotificationItem::sayOrderValues.append(cStrBefore1st);
+    NotificationItem::sayOrderValues.append(cStrBefore2nd);
+    NotificationItem::sayOrderValues.append(cStrAfter2nd);
+
+    NotificationItem::retryValues.append(cStrRetryOnce);
+    NotificationItem::retryValues.append(cStrRetryInstantly);
+    NotificationItem::retryValues.append(cStrRetry10sec);
+    NotificationItem::retryValues.append(cStrRetry30sec);
+    NotificationItem::retryValues.append(cStrRetry1min);
+
 }
 
 void NotificationItem::copyTo(NotificationItem* that) const
@@ -103,7 +128,6 @@ void NotificationItem::saveState(QSettings* settings) const
     settings->setValue(QLatin1String("Repeat"), retryString());
     settings->setValue(QLatin1String("ExpireTimeout"), lifetime());
     settings->setValue(QLatin1String("Mute"), mute());
-
 }
 
 void NotificationItem::restoreState(QSettings* settings)
@@ -123,7 +147,6 @@ void NotificationItem::restoreState(QSettings* settings)
     setRetryString(settings->value(QLatin1String("Repeat"), tr("")).toString());
     setLifetime(settings->value(QLatin1String("ExpireTimeout"), tr("")).toInt());
     setMute(settings->value(QLatin1String("Mute"), tr("")).toInt());
-
 }
 
 void NotificationItem::seriaize(QDataStream& stream)
@@ -162,7 +185,8 @@ void NotificationItem::deseriaize(QDataStream& stream)
     stream >> this->_mute;
 }
 
-void NotificationItem::startTimer(int value) {
+void NotificationItem::startTimer(int value)
+{
     if (!_timer) {
         _timer = new QTimer(this);
         _timer->setInterval(value);
@@ -171,14 +195,16 @@ void NotificationItem::startTimer(int value) {
         _timer->start();
 }
 
-void NotificationItem::stopTimer() {
+void NotificationItem::stopTimer()
+{
     if (_timer) {
         if (_timer->isActive())
             _timer->stop();
     }
 }
 
-void NotificationItem::disposeTimer() {
+void NotificationItem::disposeTimer()
+{
     if (_timer) {
         _timer->stop();
         delete _timer;
@@ -186,22 +212,24 @@ void NotificationItem::disposeTimer() {
     }
 }
 
-void NotificationItem::startExpireTimer() {
-    if (!_expireTimer)
-    {
+void NotificationItem::startExpireTimer()
+{
+    if (!_expireTimer) {
         _expireTimer = new QTimer(this);
     }
     _expireTimer->start(_expireTimeout * 1000);
 }
 
-void NotificationItem::stopExpireTimer() {
+void NotificationItem::stopExpireTimer()
+{
     if (_expireTimer) {
         if (_expireTimer)
             _expireTimer->stop();
     }
 }
 
-void NotificationItem::disposeExpireTimer() {
+void NotificationItem::disposeExpireTimer()
+{
     if (_expireTimer) {
         _expireTimer->stop();
         delete _expireTimer;
@@ -209,91 +237,33 @@ void NotificationItem::disposeExpireTimer() {
     }
 }
 
-#define missed "missed sound"
-#define CHECK_ADD_SOUND(n) ((!_missedSound##n) ? getSound##n() : (missed#n))
-#define CHECK_REPLACE_SOUND(n) ((!_missedSound##n) ? str.replace(missed#n, getSound##n()) : (missed#n))
-
-QString NotificationItem::parseNotifyMessage()
+int getValuePosition(QString sayOrder)
 {
-    // tips:
-    // check of *.wav files exist needed for playing phonon queues;
-    // if phonon player don't find next file in queue, it buzz
+    return NotificationItem::sayOrderValues.indexOf(sayOrder);
+}
 
-    QString str;
-    QString value;
-    QString sayOrder = getSayOrder();
-    UAVObjectField* field = getUAVObjectField();
-    if (UAVObjectField::ENUM == field->getType()) {
-        Q_ASSERT(singleValue() < field->getOptions().size());
-        value = QString("%L1").arg(field->getOptions().at(singleValue()));
-    } else {
-        value = QString("%L1").arg(singleValue());
+QString NotificationItem::checkSoundExists(QString fileName)
+{
+    QString name(fileName + ".wav");
+    QString filePath = QDir::toNativeSeparators(getSoundCollectionPath() + "/" +
+                                                getCurrentLanguage() + "/" +
+                                                name);
+    if(QFile::exists(filePath))
+        return filePath;
+    else {
+        filePath = QDir::toNativeSeparators(getSoundCollectionPath() +
+                                            "/default/" +
+                                            name);
+        if(!QFile::exists(filePath))
+            filePath.clear();
     }
+    return filePath;
+}
 
-    int position = -1; // default don't play value wav file
-
-    // generate queue of sound files to play
-    _messageSequence.clear();
-
-    bool _missedSound1 = false;
-    bool _missedSound2 = false;
-    bool _missedSound3 = false;
-
-    checkSoundFilesExisting(_missedSound1, _missedSound2, _missedSound3);
-    str = CHECK_ADD_SOUND(1)+" "+CHECK_ADD_SOUND(2)+" "+CHECK_ADD_SOUND(3);
-
-    if(!_messageSequence.size()) {
-        qNotifyDebug() << "no any files in message queue";
-    }
-
-    sayOrder = sayOrder.trimmed();
-    switch(sayOrder.at(0).toUpper().toAscii())
-    {
-    case 'B'://BEFORE:        
-        CHECK_REPLACE_SOUND(1);
-        CHECK_REPLACE_SOUND(2);
-        CHECK_REPLACE_SOUND(3);
-        str.prepend(value + " ");
-        position = 0;
-        break;
-
-    case 'A'://AFTER:
-        switch(sayOrder.at(6).toLower().toAscii())
-        {
-        case 'f':
-            str = CHECK_ADD_SOUND(1)+" "+value+" "+CHECK_ADD_SOUND(2)+" "+CHECK_ADD_SOUND(3);
-            position = 1;
-            break;
-
-        case 's':
-            str = CHECK_ADD_SOUND(1)+" "+CHECK_ADD_SOUND(2)+" "+value+" "+CHECK_ADD_SOUND(3);
-            position = 2;
-            break;
-
-        case 't':
-            CHECK_REPLACE_SOUND(1);
-            CHECK_REPLACE_SOUND(2);
-            CHECK_REPLACE_SOUND(3);
-            str.append(" "+value);
-            position = 3;
-            break;
-        }
-        break;
-
-    default:
-        CHECK_REPLACE_SOUND(1);
-        CHECK_REPLACE_SOUND(2);
-        CHECK_REPLACE_SOUND(3);
-        break;
-    }
-
-    if(-1 == position) {
-        qNotifyDebug() << "NotificationItem::parseNotifyMessage() | value position undefined";
-        return str;
-    }
-
-    if (UAVObjectField::ENUM == field->getType()) return str;
-
+QStringList valueToSoundList(QString value)
+{
+    // replace point chr if exists
+    value = value.replace(',', '.');
     QStringList numberParts = value.trimmed().split(".");
     QStringList digitWavs;
 
@@ -338,21 +308,98 @@ QString NotificationItem::parseNotifyMessage()
             digitWavs.append(numberParts.at(1).right(1));
         }
     }
-    foreach(QString fileName, digitWavs) {
-        fileName+=".wav";
-        QString filePath = QDir::toNativeSeparators(getSoundCollectionPath()+"/"+ getCurrentLanguage()+"/"+fileName);
-        if(QFile::exists(filePath))
-            _messageSequence.insert(position++,QDir::toNativeSeparators(getSoundCollectionPath()+ "/"+getCurrentLanguage()+"/"+fileName));
-        else {
-            if(QFile::exists(QDir::toNativeSeparators(getSoundCollectionPath()+"/default/"+fileName)))
-                _messageSequence.insert(position++,QDir::toNativeSeparators(getSoundCollectionPath()+"/default/"+fileName));
-            else {
-                _messageSequence.clear();
-                break; // if no some of *.wav files, then don't play number!
-            }
+    return digitWavs;
+}
+
+QString NotificationItem::toString()
+{
+    QString str;
+    QString value;
+    UAVObjectField* field = getUAVObjectField();
+    if (UAVObjectField::ENUM == field->getType()) {
+        Q_ASSERT(singleValue() < field->getOptions().size());
+        value = field->getOptions().at(singleValue());
+    } else {
+        value = QString("%L1").arg(singleValue());
+    }
+
+    int pos = getValuePosition(getSayOrder().trimmed());
+    QStringList lst;
+    lst.append(getSoundCaption(getSound1()));
+    lst.append(getSoundCaption(getSound2()));
+    lst.append(getSoundCaption(getSound3()));
+    QStringList valueSounds = valueToSoundList(value);
+    bool missed = false;
+    foreach(QString sound, valueSounds) {
+        if(checkSoundExists(sound).isEmpty()) {
+         missed = true;
+         break;
         }
     }
+
+    // if not "Never" case
+    if(-1 != pos) {
+        if(missed)
+            lst.insert(pos, "[missed]" + value);
+        else
+            lst.insert(pos, value);
+    }
+    str = lst.join(" ");
     return str;
+}
+
+QStringList& NotificationItem::toSoundList()
+{
+    // tips:
+    // check of *.wav files exist needed for playing phonon queues;
+    // if phonon player don't find next file in queue, it buzz
+
+    QString value;
+    UAVObjectField* field = getUAVObjectField();
+    if (UAVObjectField::ENUM == field->getType()) {
+        Q_ASSERT(singleValue() < field->getOptions().size());
+        value = field->getOptions().at(singleValue());
+    } else {
+        value = QString("%L1").arg(singleValue());
+    }
+
+    // generate queue of sound files to play
+    _messageSequence.clear();
+    int pos = getValuePosition(getSayOrder().trimmed());
+    QStringList lst;
+    if(!getSound1().isEmpty())
+        lst.append(getSound1());
+    if(!getSound2().isEmpty())
+        lst.append(getSound2());
+    if(!getSound3().isEmpty())
+        lst.append(getSound3());
+
+    // if not "Never" case
+    if(-1 != pos) {
+        QStringList valueSounds = valueToSoundList(value);
+        foreach(QString sound, valueSounds)
+            lst.insert(pos++, sound);
+    }
+
+    foreach(QString sound, lst) {
+        QString path = checkSoundExists(sound);
+        if (!path.isEmpty()) {
+            _messageSequence.append(path);
+        } else {
+            _messageSequence.clear();
+            break;
+        }
+    }
+    return _messageSequence;
+}
+
+QString NotificationItem::getSoundCaption(QString fileName)
+{
+    if(fileName.isEmpty()) return QString();
+    if(checkSoundExists(fileName).isEmpty()) {
+        return QString("[missed]") + fileName;
+    }
+    return fileName;
 }
 
 UAVObjectField* NotificationItem::getUAVObjectField() {
@@ -361,40 +408,4 @@ UAVObjectField* NotificationItem::getUAVObjectField() {
 
 UAVDataObject* NotificationItem::getUAVObject() {
     return dynamic_cast<UAVDataObject*>((ExtensionSystem::PluginManager::instance()->getObject<UAVObjectManager>())->getObject(getDataObject()));
-}
-
-
-void NotificationItem::checkSoundFilesExisting(bool& missed1, bool& missed2, bool& missed3)
-{
-
-    if(QFile::exists(QDir::toNativeSeparators(getSoundCollectionPath() + "/" + getCurrentLanguage()+"/"+getSound1()+".wav")))
-        _messageSequence.append(QDir::toNativeSeparators(getSoundCollectionPath() + "/" + getCurrentLanguage()+"/"+getSound1()+".wav"));
-    else {
-        if(QFile::exists(QDir::toNativeSeparators(getSoundCollectionPath() + "/default/"+getSound1()+".wav")))
-            _messageSequence.append(QDir::toNativeSeparators(getSoundCollectionPath() + "/default/"+getSound1()+".wav"));
-        else
-            missed1 = true;
-    }
-
-    if(getSound2().size()) {
-        if(QFile::exists(QDir::toNativeSeparators(getSoundCollectionPath() + "/" +  getCurrentLanguage()+"/"+getSound2()+".wav")))
-            _messageSequence.append(QDir::toNativeSeparators(getSoundCollectionPath() + "/" +  getCurrentLanguage()+"/"+getSound2()+".wav"));
-        else {
-            if(QFile::exists(QDir::toNativeSeparators(getSoundCollectionPath() + "/default/"+getSound2()+".wav")))
-                _messageSequence.append(QDir::toNativeSeparators(getSoundCollectionPath() + "/default/"+getSound2()+".wav"));
-            else
-                missed2 = true;
-        }
-    }
-
-    if(getSound3().size()) {
-        if(QFile::exists(QDir::toNativeSeparators(getSoundCollectionPath()+ "/" + getCurrentLanguage()+"/"+getSound3()+".wav")))
-            _messageSequence.append(QDir::toNativeSeparators(getSoundCollectionPath()+ "/" + getCurrentLanguage()+"/"+getSound3()+".wav"));
-        else {
-            if(QFile::exists(QDir::toNativeSeparators(getSoundCollectionPath()+"/default/"+getSound3()+".wav")))
-                _messageSequence.append(QDir::toNativeSeparators(getSoundCollectionPath()+"/default/"+getSound3()+".wav"));
-            else
-                missed3 = true;
-        }
-    }
 }

@@ -103,7 +103,31 @@ public:
     void seriaize(QDataStream& stream);
     void deseriaize(QDataStream& stream);
 
-    QString parseNotifyMessage();
+    /**
+    * Convert notification item fields in single string,
+    * to show in table for example
+    *
+    * @return string which describe notification
+    */
+    QString toString();
+
+    /**
+    * Generate list of sound files needed to play notification
+    *
+    * @return success - reference to non-empty _messageSequence;
+    *         error   - if one of sounds doesn't exist returns
+    *                   reference to empty _messageSequence;
+    */
+    QStringList& toSoundList();
+
+    /**
+    * Returns sound caption name, needed to create string representation of notification.
+    *
+    * @return success - string  == <sound filename>, if sound file exists
+    *         error   - string  == [missind]<sound filename>, if sound file doesn't exist
+    */
+    QString getSoundCaption(QString fileName);
+
 
     QTimer* getTimer() const { return _timer; }
     void startTimer(int value);
@@ -119,10 +143,14 @@ public:
     bool isNowPlaying;
     bool firstStart;
 
-private:
-    void checkSoundFilesExisting(bool& missed1, bool& missed2, bool& missed3);
+    static QStringList sayOrderValues;
+    static QStringList retryValues;
 
 private:
+    QString checkSoundExists(QString fileName);
+
+private:
+
     QTimer* _timer;
 
     //! time from putting notification in queue till moment when notification became out-of-date
@@ -130,6 +158,7 @@ private:
     //!       according to its priority
     QTimer* _expireTimer;
 
+    //! list of wav files from which notification consists
     QStringList _messageSequence;
 
     //! path to folder with sound files

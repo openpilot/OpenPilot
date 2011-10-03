@@ -266,7 +266,7 @@ p, li { white-space: pre-wrap; }
       <item>
        <widget class="QTableView" name="notifyRulesView">
         <property name="selectionMode">
-         <enum>QAbstractItemView::SingleSelection</enum>
+         <enum>QAbstractItemView::ContiguousSelection</enum>
         </property>
         <property name="selectionBehavior">
          <enum>QAbstractItemView::SelectRows</enum>

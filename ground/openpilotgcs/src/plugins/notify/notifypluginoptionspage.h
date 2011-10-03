@@ -57,78 +57,130 @@ using namespace Core;
 
 class NotifyPluginOptionsPage : public IOptionsPage
 {
-	Q_OBJECT
+    Q_OBJECT
+
 public:
-	explicit NotifyPluginOptionsPage(/*NotificationItem *config, */QObject *parent = 0);
-	~NotifyPluginOptionsPage();
-	QString id() const { return QLatin1String("settings"); }
-	QString trName() const { return tr("settings"); }
-	QString category() const { return QLatin1String("Notify Plugin");}
-	QString trCategory() const { return tr("Notify Plugin");}
+
+    explicit NotifyPluginOptionsPage(QObject *parent = 0);
+    ~NotifyPluginOptionsPage();
+    QString id() const { return QLatin1String("settings"); }
+    QString trName() const { return tr("settings"); }
+    QString category() const { return QLatin1String("Notify Plugin");}
+    QString trCategory() const { return tr("Notify Plugin");}
 
     QWidget *createPage(QWidget *parent);
     void apply();
-	void finish();
-	void restoreFromSettings();
+    void finish();
+    void restoreFromSettings();
 
-	void updateConfigView(NotificationItem* notification);
-	void getOptionsPageValues(NotificationItem* notification);
+    void updateConfigView(NotificationItem* notification);
+    void getOptionsPageValues(NotificationItem* notification);
+    UAVObjectField* getObjectFieldFromPage();
+    UAVObjectField* getObjectFieldFromSelected();
 
 signals:
     void updateNotifications(QList<NotificationItem*> list);
-        //void resetNotification(void);
     void entryUpdated(int index);
+
+private slots:
+    void on_button_TestSoundNotification_clicked();
+    void on_button_AddNotification_clicked();
+    void on_button_DeleteNotification_clicked();
+    void on_button_ModifyNotification_clicked();
+
+    /**
+     * We can use continuous selection, to select simultaneously
+     * multiple rows to move them(using drag & drop) inside table ranges.
+     */
+    void on_table_changeSelection( const QItemSelection & selected, const QItemSelection & deselected );
+
+    void on_soundLanguage_indexChanged(int index);
+    void on_buttonSoundFolder_clicked(const QString& path);
+    void on_UAVObject_indexChanged(QString val);
+    void on_UAVField_indexChanged(QString val);
+    void on_changeButtonText(Phonon::State newstate, Phonon::State oldstate);
+    void on_checkEnableSound_toggled(bool state);
+
+    /**
+     * Important when we change to or from "In range" value
+     * For enums UI layout stayed the same, but for numeric values
+     * we need to change UI to show edit line,
+     * to have possibility assign range limits for value.
+     */
+    void on_rangeValue_indexChanged(QString);
+
+    void on_FinishedPlaying(void);
+
 
 private:
     Q_DISABLE_COPY(NotifyPluginOptionsPage)
 
     void resetValueRange();
+    void resetFieldType();
+
     void setDynamicValueField(NotificationItem* notification);
     void addDynamicField(UAVObjectField* objField);
     void addDynamicValueLayout();
+    void setDynamicValueWidget(UAVObjectField* objField);
+
     void initButtons();
     void initPhononPlayer();
     void initRulesTable();
 
-private slots:
-	void on_buttonTestSoundNotification_clicked();
-
-	void on_buttonAddNotification_clicked();
-	void on_buttonDeleteNotification_clicked();
-	void on_buttonModifyNotification_clicked();
-	void on_tableNotification_changeSelection( const QItemSelection & selected, const QItemSelection & deselected );
-	void on_soundLanguage_indexChanged(int index);
-	void on_buttonSoundFolder_clicked(const QString& path);
-	void on_UAVObject_indexChanged(QString val);
-	void onUAVField_indexChanged(QString val);
-	void changeButtonText(Phonon::State newstate, Phonon::State oldstate);
-	void on_chkEnableSound_toggled(bool state);
-	void on_rangeValue_indexChanged(QString);
-
-	void onFinishedPlaying(void);
-
 private:
-	UAVObjectManager& objManager;
-	SoundNotifyPlugin* owner;
-	QStringList listDirCollections;
-	QStringList listSoundFiles;
-	QString currentCollectionPath;
-	Phonon::MediaObject *sound1;
-	Phonon::MediaObject *sound2;
-	QScopedPointer<Phonon::MediaObject> notifySound;
-	Phonon::AudioOutput *audioOutput;
 
-	QScopedPointer<NotifyTableModel> _notifyRulesModel;
-	QItemSelectionModel* _notifyRulesSelection;
-	QList<NotificationItem*> privListNotifications;
+    UAVObjectManager& _objManager;
+    SoundNotifyPlugin* _owner;
+    QStringList _listDirCollections;
+    QStringList _listSoundFiles;
+    QString _currentCollectionPath;
+    Phonon::MediaObject* _sound1;
+    Phonon::MediaObject* _sound2;
+    QScopedPointer<Phonon::MediaObject> _notifySound;
+    Phonon::AudioOutput* _audioOutput;
 
-	QScopedPointer<Ui::NotifyPluginOptionsPage> options_page;
+    QScopedPointer<NotifyTableModel> _notifyRulesModel;
+    QItemSelectionModel* _notifyRulesSelection;
 
+    /**
+     * Local copy of notification list, which owned by notify plugin.
+     * Notification list readed once on application loaded, during
+     * notify plugin startup, then on open options page.
+     * This copy is simple assignment, but due to implicitly sharing
+     * we don't have additional cost for that, copy will created
+     * only after modification of private notify list.
+     */
+    QList<NotificationItem*> _privListNotifications;
+
+    QScopedPointer<Ui::NotifyPluginOptionsPage> _optionsPage;
+
+    //! widget to convinient selection of condition for field value (equal, lower, greater)
     QComboBox* _valueRange;
+
+    //! widget to convinient selection of order in which sounds will be played
     QComboBox* _sayOrder;
+
+    //! widget to represent edit widget for UAVObjectfield,
+    //! can be spinbox - for numerics, combobox - enums, or
+    //! lineedit - for range limits
     QWidget* _fieldValue;
+
+    //! type of UAVObjectField - numeric or ENUM
+    //! this variable needs to correctly set dynamic UI elemen _fieldValue
+    //! NOTE: ocassionaly it should be invalidated (= -1) to reset _fieldValue
     int _fieldType;
+
+    //! actualy reference to optionsPageWidget,
+    //! we MUST hold it beyond the scope of createPage func
+    //! to have possibility change dynamic parts of options page layout in future
     QWidget* _form;
+
+    //! needs to correctly update UI during transitions from "In Range" to other
+    //! _valueRange entries and back direction as well
+    QString _prevRangeValue;
+
+    //! Currently selected notification, all controls filled accroding to it.
+    //! On options page startup, always points to first row.
     NotificationItem* _selectedNotification;
 };
 

@@ -50,65 +50,65 @@ typedef struct {
 
 
 class SoundNotifyPlugin : public Core::IConfigurablePlugin
-{ 
-	Q_OBJECT
-public: 
-   SoundNotifyPlugin();
-   ~SoundNotifyPlugin();
+{
+    Q_OBJECT
+public:
+    SoundNotifyPlugin();
+    ~SoundNotifyPlugin();
 
-   void extensionsInitialized(); 
-   bool initialize(const QStringList & arguments, QString * errorString); 
-   void readConfig( QSettings* qSettings, Core::UAVConfigInfo *configInfo);
-   void saveConfig( QSettings* qSettings, Core::UAVConfigInfo *configInfo);
-   void shutdown();
+    void extensionsInitialized();
+    bool initialize(const QStringList & arguments, QString * errorString);
+    void readConfig( QSettings* qSettings, Core::UAVConfigInfo *configInfo);
+    void saveConfig( QSettings* qSettings, Core::UAVConfigInfo *configInfo);
+    void shutdown();
 
 
-   QList<NotificationItem*> getListNotifications() { return lstNotifications; }
-   NotificationItem* getCurrentNotification(){ return &currentNotification;}
+    QList<NotificationItem*> getListNotifications() { return lstNotifications; }
+    NotificationItem* getCurrentNotification(){ return &currentNotification;}
 
-   bool getEnableSound() const { return enableSound; }
-   void setEnableSound(bool value) {enableSound = value; }
+    bool getEnableSound() const { return enableSound; }
+    void setEnableSound(bool value) {enableSound = value; }
 
 private:
-   SoundNotifyPlugin(const SoundNotifyPlugin& rhs);
-   SoundNotifyPlugin& operator= (const SoundNotifyPlugin& rhs);
+    Q_DISABLE_COPY(SoundNotifyPlugin)
 
-   bool playNotification(NotificationItem* notification);
-   void checkNotificationRule(NotificationItem* notification, UAVObject* object);
-   void readConfig_0_0_0();
+    bool playNotification(NotificationItem* notification);
+    void checkNotificationRule(NotificationItem* notification, UAVObject* object);
+    void readConfig_0_0_0();
 
 private slots:
-   void onTelemetryManagerAdded(QObject* obj);
-   void onAutopilotDisconnect();
-   void connectNotifications();
-   void updateNotificationList(QList<NotificationItem*> list);
-   void resetNotification(void);
-   void appendNotification(UAVObject *object);
-   void repeatTimerHandler(void);
-   void expireTimerHandler(void);
-   void stateChanged(Phonon::State newstate, Phonon::State oldstate);
+
+    void onTelemetryManagerAdded(QObject* obj);
+    void onAutopilotDisconnect();
+    void connectNotifications();
+    void updateNotificationList(QList<NotificationItem*> list);
+    void resetNotification(void);
+    void appendNotification(UAVObject *object);
+    void repeatTimerHandler(void);
+    void expireTimerHandler(void);
+    void stateChanged(Phonon::State newstate, Phonon::State oldstate);
 
 private:
 
-   bool configured; // just for migration,delete later
-   bool enableSound;
-   QList< QList<Phonon::MediaSource>* > lstMediaSource;
-   QStringList mediaSource;
-   QMultiMap<QString, PhononObject> mapMediaObjects;
-   QSettings* settings;
+    bool configured; // just for migration,delete later
+    bool enableSound;
+    QList< QList<Phonon::MediaSource>* > lstMediaSource;
+    QStringList mediaSource;
+    QMultiMap<QString, PhononObject> mapMediaObjects;
+    QSettings* settings;
 
-   QList<UAVDataObject*> lstNotifiedUAVObjects;
-   QList<NotificationItem*> lstNotifications;
-   QList<NotificationItem*> pendingNotifications;
-   QList<NotificationItem*> removedNotifies;
+    QList<UAVDataObject*> lstNotifiedUAVObjects;
+    QList<NotificationItem*> lstNotifications;
+    QList<NotificationItem*> pendingNotifications;
+    QList<NotificationItem*> removedNotifies;
 
-   NotificationItem currentNotification;
-   NotificationItem* nowPlayingConfiguration;
+    NotificationItem currentNotification;
+    NotificationItem* nowPlayingConfiguration;
 
-   QString m_field;
-   PhononObject phonon;
-   NotifyPluginOptionsPage *mop;
-   TelemetryManager* telMngr;
+    QString m_field;
+    PhononObject phonon;
+    NotifyPluginOptionsPage *mop;
+    TelemetryManager* telMngr;
 }; 
 
 #endif // SOUNDNOTIFYPLUGIN_H

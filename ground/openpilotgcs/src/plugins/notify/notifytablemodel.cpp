@@ -30,8 +30,6 @@
 #include <qdebug.h>
 #include <QMimeData>
 
-static int _dragStartRow = -1;
-static int _dragNumRows = -1;
 const char* mime_type_notify_table = "openpilot/notify_plugin_table";
 
 NotifyTableModel::NotifyTableModel(QList<NotificationItem*>& parentList, QObject* parent)
@@ -47,19 +45,19 @@ bool NotifyTableModel::setData(const QModelIndex &index,
 							   const QVariant &value, int role)
 {
     if (index.isValid() && role == Qt::DisplayRole) {
-        if(eMESSAGE_NAME == index.column()) {
+        if(eMessageName == index.column()) {
             emit dataChanged(index, index);
             return true;
         }
     }
     if (index.isValid() && role == Qt::EditRole) {
-        if(eREPEAT_VALUE == index.column())
+        if(eRepeatValue == index.column())
              _list.at(index.row())->setRetryString(value.toString());
         else {
-            if(eEXPIRE_TIME == index.column())
+            if(eExpireTimer == index.column())
                 _list.at(index.row())->setLifetime(value.toInt());
             else {
-                if(eENABLE_NOTIFICATION == index.column())
+                if(eTurnOn == index.column())
                     _list.at(index.row())->setMute(value.toBool());
             }
         }
@@ -83,16 +81,16 @@ QVariant NotifyTableModel::data(const QModelIndex &index, int role) const
     {
         switch(index.column())
         {
-        case eMESSAGE_NAME:
-            return _list.at(index.row())->parseNotifyMessage();
+        case eMessageName:
+            return _list.at(index.row())->toString();
 
-        case eREPEAT_VALUE:
+        case eRepeatValue:
             return _list.at(index.row())->retryString();
 
-        case eEXPIRE_TIME:
+        case eExpireTimer:
             return _list.at(index.row())->lifetime();
 
-        case eENABLE_NOTIFICATION:
+        case eTurnOn:
             return _list.at(index.row())->mute();
 
         default:
@@ -126,13 +124,13 @@ bool NotifyTableModel::insertRows(int position, int rows, const QModelIndex& ind
 {
     Q_UNUSED(index);
 
-    if((-1 == position) || (-1 == rows) )
+    if (-1 == position || -1 == rows)
         return false;
 
     beginInsertRows(QModelIndex(), position, position + rows - 1);
 
-    for (int row = 0; row < rows; ++row) {
-        _list.insert(position, new NotificationItem());
+    for (int i = 0; i < rows; ++i) {
+        _list.insert(position + i, new NotificationItem());
     }
 
     endInsertRows();
@@ -171,6 +169,17 @@ void NotifyTableModel::entryAdded(NotificationItem* item)
     entryUpdated(rowCount() - 1);
 }
 
+Qt::DropActions NotifyTableModel::supportedDropActions() const
+{
+    return Qt::MoveAction;
+}
+
+QStringList NotifyTableModel::mimeTypes() const
+{
+    QStringList types;
+    types << mime_type_notify_table;
+    return types;
+}
 
 bool NotifyTableModel::dropMimeData( const QMimeData * data, Qt::DropAction action, int row,
                    int column, const QModelIndex& parent)
@@ -198,48 +207,31 @@ bool NotifyTableModel::dropMimeData( const QMimeData * data, Qt::DropAction acti
     QByteArray encodedData = data->data(mime_type_notify_table);
     QDataStream stream(&encodedData, QIODevice::ReadOnly);
     int rows = beginRow;
+    // read next item from input MIME and drop into the table line by line
     while(!stream.atEnd()) {
         qint32 ptr;
         stream >> ptr;
         NotificationItem* item = reinterpret_cast<NotificationItem*>(ptr);
         int dragged = _list.indexOf(item);
+        // we can drag item from top rows to bottom (DOWN_DIRECTION),
+        // or from bottom rows to top rows (UP_DIRECTION)
+        enum { UP_DIRECTION, DOWN_DIRECTION };
+        int direction = (dragged < rows) ? DOWN_DIRECTION : (dragged += 1, UP_DIRECTION);
+        Q_ASSERT(insertRows(rows + direction, 1, QModelIndex()));
         if(-1 == dragged || rows >= _list.size() || dragged == rows) {
             qNotifyDebug() << "no such item";
+
             return false;
         }
-        removeRows(rows, 1, QModelIndex());
-        insertRows(rows, 1, QModelIndex());
-        _list.replace(dragged, item);
-        //        _list.swap(dragged, rows);
-        ++rows;
+        _list.replace(rows + direction, item);
+        Q_ASSERT(removeRows(dragged, 1, QModelIndex()));
+        if(direction == UP_DIRECTION)
+            ++rows;
     };
 
     QModelIndex idxTopLeft = index(beginRow, 0, QModelIndex());
     QModelIndex idxBotRight = index(beginRow, columnCount(QModelIndex()), QModelIndex());
     emit dataChanged(idxTopLeft, idxBotRight);
-    //QStringList newItems;
-
-    //removeRows(_dragStartRow, _dragNumRows, QModelIndex());
-    //insertRows(beginRow, rows, QModelIndex());
-//    int rows = beginRow;
-//    while (!stream.atEnd()) {
-//        _list.at(index.row())->deserialize(stream);
-//        ++rows;
-//    }
-
-//    while(rows) {
-//        int column = 0;
-//        foreach (const QString& text, newItems) {
-//            QModelIndex idx = index(beginRow, column, QModelIndex());
-//            if(!column)
-//                setData(const_cast<const QModelIndex&>(idx), text, Qt::DisplayRole);
-//            else
-//                setData(const_cast<const QModelIndex&>(idx), text, Qt::EditRole);
-//            ++column;
-//        }
-//        ++beginRow;
-//        --rows;
-//    }
     return true;
 }
 
@@ -251,35 +243,13 @@ QMimeData* NotifyTableModel::mimeData(const QModelIndexList& indexes) const
     QDataStream stream(&encodedData, QIODevice::WriteOnly);
     int rows = 0;
     foreach (const QModelIndex& index, indexes) {
-        if(!index.column()) {
+        if (!index.column()) {
             qint32 item = reinterpret_cast<qint32>(_list.at(index.row()));
             stream << item;
+            ++rows;
         }
-        ++rows;
     }
-
-//    int numRows = 0;
-//    foreach (const QModelIndex& index, indexes) {
-//        if (index.isValid() && index.column()) {
-//            _list.at(index.row())->serialize(stream);
-////            if(!index.column()) {
-////                numRows++;
-////                QString name = data(index, Qt::DisplayRole).toString();
-////                stream << name;
-////            } else {
-////                QString text = data(index, Qt::EditRole).toString();
-////                stream << text;
-////            }
-//        }
-//    }
-
     mimeData->setData(mime_type_notify_table, encodedData);
-
-    //emit dragRows(indexes.at(0).row(), rows);
-    dropRows(indexes.at(0).row(), rows);
-    //_dragStartRow = indexes.at(0).row();
-    //_dragNumRows = 1/*numRows*/;
-
     return mimeData;
 }
 

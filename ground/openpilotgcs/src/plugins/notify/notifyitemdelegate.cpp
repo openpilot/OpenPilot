@@ -29,34 +29,29 @@
 #include "notifyitemdelegate.h"
 #include "notifytablemodel.h"
 #include "notifylogging.h"
+#include "notificationitem.h"
 
 NotifyItemDelegate::NotifyItemDelegate(QObject* parent)
     : QItemDelegate(parent)
     , _parent(parent)
 {
-    _titles << "Repeat Once"
-            << "Repeat Instantly"
-            << "Repeat 10 seconds"
-            << "Repeat 30 seconds"
-            << "Repeat 1 minute";
-
 }
 
 QWidget *NotifyItemDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& /*none*/,
                                             const QModelIndex& index) const
 {
-    if (eREPEAT_VALUE == index.column()) {
+    if (eRepeatValue == index.column()) {
         QComboBox* editor = new QComboBox(parent);
         editor->clear();
-        editor->addItems(_titles);
+        editor->addItems(NotificationItem::retryValues);
         return editor;
     } else {
-        if (eEXPIRE_TIME == index.column()) {
+        if (eExpireTimer == index.column()) {
             QSpinBox* editor = new QSpinBox(parent);
             connect(editor, SIGNAL(editingFinished()), this, SLOT(commitAndCloseEditor()));
             return editor;
         } else {
-            if (eENABLE_NOTIFICATION == index.column()) {
+            if (eTurnOn == index.column()) {
                 QCheckBox* editor = new QCheckBox(parent);
                 connect(editor, SIGNAL(editingFinished()), this, SLOT(commitAndCloseEditor()));
                 return editor;

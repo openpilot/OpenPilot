@@ -44,6 +44,17 @@
 #include <IOKit/hid/IOHIDLib.h>
 #include <CoreFoundation/CFString.h>
 #include <QString>
+#include <QThread>
+#include <QTimer>
+
+class delay : public QThread
+{
+public:
+    static void msleep(unsigned long msecs)
+    {
+        QThread::msleep(msecs);
+    }
+};
 
 #define BUFFER_SIZE 64
 
@@ -75,7 +86,6 @@ static void free_all_hid(void);
 static void hid_close(hid_t *);
 static void attach_callback(void *, IOReturn, void *, IOHIDDeviceRef);
 static void detach_callback(void *, IOReturn, void *hid_mgr, IOHIDDeviceRef dev);
-static void timeout_callback(CFRunLoopTimerRef, void *);
 static void input_callback(void *, IOReturn, void *, IOHIDReportType, uint32_t, uint8_t *, CFIndex);
 static void output_callback(hid_t *context, IOReturn ret, void *sender, IOHIDReportType type, uint32_t id, uint8_t *data, CFIndex len);
 
@@ -108,6 +118,8 @@ int pjrc_rawhid::open(int max, int vid, int pid, int usage_page, int usage)
     IOReturn ret;
     hid_t *p;
     int count=0;
+
+    connect(&m_timer, SIGNAL(timeout()), this, SLOT(timeout_callback()));
 
     if (first_hid) free_all_hid();
     //printf("pjrc_rawhid_open, max=%d\n", max);
@@ -185,9 +197,7 @@ int pjrc_rawhid::receive(int num, void *buf, int len, int timeout)
 {
     hid_t *hid;
     buffer_t *b;
-    CFRunLoopTimerRef timer=NULL;
-    CFRunLoopTimerContext context;
-    int ret=0, timeout_occurred=0;
+    int ret=0;
 
     if (len < 1) return 0;
     hid = get_hid(num);
@@ -197,21 +207,28 @@ int pjrc_rawhid::receive(int num, void *buf, int len, int timeout)
         memcpy(buf, b->buf, len);
         hid->first_buffer = b->next;
         free(b);
+        //printf("packet already, returning before loop");
         return len;
     }
-    memset(&context, 0, sizeof(context));
-    context.info = &timeout_occurred;
-    timer = CFRunLoopTimerCreate(NULL, CFAbsoluteTimeGetCurrent() +
-                                 (double)timeout / 1000.0, 0, 0, 0, timeout_callback, &context);
-    CFRunLoopAddTimer(CFRunLoopGetCurrent(), timer, kCFRunLoopDefaultMode);
-    while (1) {
+
+    // This does not work while in a "while" loop!! Come on...
+    // BEWARE: this area is broken.
+    // We need a way (probably thread?) to wait for USB data
+    // while also accepting a timeout.
+    timeout_occurred = 1;
+    m_timer.start(timeout);
+    while (true) {
+        // CFRunLoopRun does not work properly with Qt's event loop...
         CFRunLoopRun();
+        printf(".");
+        delay::msleep(20);
         if ((b = hid->first_buffer) != NULL) {
             if (len > b->len) len = b->len;
             memcpy(buf, b->buf, len);
             hid->first_buffer = b->next;
             free(b);
             ret = len;
+            // printf("got packet, exit waiting loop with %i bytes",ret);
             break;
         }
         if (!hid->open) {
@@ -219,10 +236,12 @@ int pjrc_rawhid::receive(int num, void *buf, int len, int timeout)
             ret = -1;
             break;
         }
-        if (timeout_occurred) break;
+        if (timeout_occurred) {
+            qDebug("Timeout while waiting for packet");
+            break;
+        }
     }
-    CFRunLoopTimerInvalidate(timer);
-    CFRelease(timer);
+    m_timer.stop();
     return ret;
 }
 
@@ -335,10 +354,11 @@ static void input_callback(void *context, IOReturn ret, void *sender, IOHIDRepor
     buffer_t *n;
     hid_t *hid;
 
-    printf("input_callback, report id: %i buf: %x %x, len: %d\n", id, data[0], data[1], len);
+    //printf("input_callback, ret: %i - report id: %i buf: %x %x, len: %d\n", ret, id, data[0], data[1], len);
     if (ret != kIOReturnSuccess || len < 1) return;
     hid = (hid_t*)context;
     if (!hid || hid->ref != sender) return;
+    printf("Processing packet");
     n = (buffer_t *)malloc(sizeof(buffer_t));
     if (!n) return;
     if (len > BUFFER_SIZE) len = BUFFER_SIZE;
@@ -355,11 +375,10 @@ static void input_callback(void *context, IOReturn ret, void *sender, IOHIDRepor
     CFRunLoopStop(CFRunLoopGetCurrent());
 }
 
-static void timeout_callback(CFRunLoopTimerRef timer, void *info)
+void pjrc_rawhid::timeout_callback()
 {
-    printf("timeout_callback\n");
-    *(int *)info = 1;
-    CFRunLoopStop(CFRunLoopGetCurrent());
+    qDebug("[pjrc_rawhid_mac] timeout_callback");
+    timeout_occurred = 1;
 }
 
 static void add_hid(hid_t *h)

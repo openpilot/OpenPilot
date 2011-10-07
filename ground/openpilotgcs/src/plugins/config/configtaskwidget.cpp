@@ -26,14 +26,17 @@
  */
 #include "configtaskwidget.h"
 #include <QtGui/QWidget>
-
+#include "uavsettingsimportexport/uavsettingsimportexportfactory.h"
+#include "configgadgetwidget.h"
 
 ConfigTaskWidget::ConfigTaskWidget(QWidget *parent) : QWidget(parent),isConnected(false),smartsave(NULL),dirty(false)
 {
     pm = ExtensionSystem::PluginManager::instance();
     objManager = pm->getObject<UAVObjectManager>();
-    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(onAutopilotConnect()));
-    connect(parent, SIGNAL(autopilotDisconnected()),this, SLOT(onAutopilotDisconnect()));
+    connect((ConfigGadgetWidget*)parent, SIGNAL(autopilotConnected()),this, SLOT(onAutopilotConnect()));
+    connect((ConfigGadgetWidget*)parent, SIGNAL(autopilotDisconnected()),this, SLOT(onAutopilotDisconnect()));
+    UAVSettingsImportExportFactory * importexportplugin =  pm->getObject<UAVSettingsImportExportFactory>();
+    connect(importexportplugin,SIGNAL(importAboutToBegin()),this,SLOT(invalidateObjects()));
 }
 void ConfigTaskWidget::addWidget(QWidget * widget)
 {
@@ -62,6 +65,8 @@ void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString fiel
     {
         obj = objManager->getObject(QString(object));
         Q_ASSERT(obj);
+        objectUpdates.insert(obj,true);
+        connect(obj, SIGNAL(objectUpdated(UAVObject*)),this, SLOT(objectUpdated(UAVObject*)));
         connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshWidgetsValues()));
     }
     //smartsave->addObject(obj);
@@ -123,6 +128,7 @@ ConfigTaskWidget::~ConfigTaskWidget()
 
 void ConfigTaskWidget::saveObjectToSD(UAVObject *obj)
 {
+    qDebug()<<"ConfigTaskWidget::saveObjectToSD";
     // saveObjectToSD is now handled by the UAVUtils plugin in one
     // central place (and one central queue)
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
@@ -153,10 +159,12 @@ void ConfigTaskWidget::onAutopilotDisconnect()
 {
     isConnected=false;
     enableControls(false);
+    invalidateObjects();
 }
 
 void ConfigTaskWidget::onAutopilotConnect()
 {
+    invalidateObjects();
     dirty=false;
     isConnected=true;
     enableControls(true);
@@ -305,6 +313,30 @@ void ConfigTaskWidget::enableObjUpdates()
     {
         if(obj->object)
             connect(obj->object, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshWidgetsValues()));
+    }
+}
+
+void ConfigTaskWidget::objectUpdated(UAVObject *obj)
+{
+    objectUpdates[obj]=true;
+}
+
+bool ConfigTaskWidget::allObjectsUpdated()
+{
+    bool ret=true;
+    foreach(UAVObject *obj, objectUpdates.keys())
+    {
+        ret=ret & objectUpdates[obj];
+    }
+    qDebug()<<"ALL OBJECTS UPDATE:"<<ret;
+    return ret;
+}
+
+void ConfigTaskWidget::invalidateObjects()
+{
+    foreach(UAVObject *obj, objectUpdates.keys())
+    {
+        objectUpdates[obj]=false;
     }
 }
 

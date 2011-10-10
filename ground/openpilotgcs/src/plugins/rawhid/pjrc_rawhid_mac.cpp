@@ -46,6 +46,7 @@
 #include <QString>
 #include <QThread>
 #include <QTimer>
+#include <QCoreApplication>
 
 class delay : public QThread
 {
@@ -65,6 +66,8 @@ typedef struct hid_struct hid_t;
 typedef struct buffer_struct buffer_t;
 static hid_t *first_hid = NULL;
 static hid_t *last_hid = NULL;
+// Make sure we use the correct runloop
+CFRunLoopRef the_correct_runloop = NULL;
 struct hid_struct {
         IOHIDDeviceRef ref;
         int open;
@@ -88,6 +91,8 @@ static void attach_callback(void *, IOReturn, void *, IOHIDDeviceRef);
 static void detach_callback(void *, IOReturn, void *hid_mgr, IOHIDDeviceRef dev);
 static void input_callback(void *, IOReturn, void *, IOHIDReportType, uint32_t, uint8_t *, CFIndex);
 static void output_callback(hid_t *context, IOReturn ret, void *sender, IOHIDReportType type, uint32_t id, uint8_t *data, CFIndex len);
+static void timeout_callback(CFRunLoopTimerRef, void *);
+
 
 pjrc_rawhid::pjrc_rawhid()
 {
@@ -118,8 +123,6 @@ int pjrc_rawhid::open(int max, int vid, int pid, int usage_page, int usage)
     IOReturn ret;
     hid_t *p;
     int count=0;
-
-    connect(&m_timer, SIGNAL(timeout()), this, SLOT(timeout_callback()));
 
     if (first_hid) free_all_hid();
     //printf("pjrc_rawhid_open, max=%d\n", max);
@@ -176,6 +179,8 @@ int pjrc_rawhid::open(int max, int vid, int pid, int usage_page, int usage)
         CFRelease(hid_manager);
         return 0;
     }
+    // Set the run loop reference:
+    the_correct_runloop = CFRunLoopGetCurrent();
     printf("run loop\n");
     // let it do the callback for all devices
     while (CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0, true) == kCFRunLoopRunHandledSource) ;
@@ -195,54 +200,56 @@ int pjrc_rawhid::open(int max, int vid, int pid, int usage_page, int usage)
 //
 int pjrc_rawhid::receive(int num, void *buf, int len, int timeout)
 {
-    hid_t *hid;
-    buffer_t *b;
-    int ret=0;
+   hid_t *hid;
+   buffer_t *b;
+   CFRunLoopTimerRef timer=NULL;
+   CFRunLoopTimerContext context;
+   int ret=0, timeout_occurred=0;
 
-    if (len < 1) return 0;
-    hid = get_hid(num);
-    if (!hid || !hid->open) return -1;
-    if ((b = hid->first_buffer) != NULL) {
-        if (len > b->len) len = b->len;
-        memcpy(buf, b->buf, len);
-        hid->first_buffer = b->next;
-        free(b);
-        //printf("packet already, returning before loop");
-        return len;
-    }
+   if (len < 1) return 0;
+   hid = get_hid(num);
+   if (!hid || !hid->open) return -1;
+   if ((b = hid->first_buffer) != NULL) {
+       if (len > b->len) len = b->len;
+       memcpy(buf, b->buf, len);
+       hid->first_buffer = b->next;
+       free(b);
+       return len;
+   }
+   memset(&context, 0, sizeof(context));
+   context.info = &timeout_occurred;
+   timer = CFRunLoopTimerCreate(NULL, CFAbsoluteTimeGetCurrent() +
+                                (double)timeout / 1000.0, 0, 0, 0, timeout_callback, &context);
+   CFRunLoopAddTimer(CFRunLoopGetCurrent(), timer, kCFRunLoopDefaultMode);
+   the_correct_runloop = CFRunLoopGetCurrent();
+   //qDebug("--");
+   while (1) {
+       //qDebug(".");
+       CFRunLoopRun(); // Found the problem: somehow the input_callback does not
+                       // stop this CFRunLoopRun because it is hooked to a different run loop !!!
+                       // Hence the use of the "correct_runloop" variable above.
+       //qDebug("  ..");
 
-    // This does not work while in a "while" loop!! Come on...
-    // BEWARE: this area is broken.
-    // We need a way (probably thread?) to wait for USB data
-    // while also accepting a timeout.
-    timeout_occurred = 1;
-    m_timer.start(timeout);
-    while (true) {
-        // CFRunLoopRun does not work properly with Qt's event loop...
-        CFRunLoopRun();
-        printf(".");
-        delay::msleep(20);
-        if ((b = hid->first_buffer) != NULL) {
-            if (len > b->len) len = b->len;
-            memcpy(buf, b->buf, len);
-            hid->first_buffer = b->next;
-            free(b);
-            ret = len;
-            // printf("got packet, exit waiting loop with %i bytes",ret);
+       if ((b = hid->first_buffer) != NULL) {
+           if (len > b->len) len = b->len;
+           memcpy(buf, b->buf, len);
+           hid->first_buffer = b->next;
+           free(b);
+           ret = len;
+           //qDebug("*************");
+           break;
+       }
+       if (!hid->open) {
+           printf("pjrc_rawhid_recv, device not open\n");
+           ret = -1;
+           break;
+       }
+       if (timeout_occurred)
             break;
-        }
-        if (!hid->open) {
-            printf("pjrc_rawhid_recv, device not open\n");
-            ret = -1;
-            break;
-        }
-        if (timeout_occurred) {
-            qDebug("Timeout while waiting for packet");
-            break;
-        }
-    }
-    m_timer.stop();
-    return ret;
+   }
+   CFRunLoopTimerInvalidate(timer);
+   CFRelease(timer);
+   return ret;
 }
 
 //  send - send a packet
@@ -354,7 +361,7 @@ static void input_callback(void *context, IOReturn ret, void *sender, IOHIDRepor
     buffer_t *n;
     hid_t *hid;
 
-    //printf("input_callback, ret: %i - report id: %i buf: %x %x, len: %d\n", ret, id, data[0], data[1], len);
+    //qDebug("input_callback, ret: %i - report id: %i buf: %x %x, len: %d\n", ret, id, data[0], data[1], len);
     if (ret != kIOReturnSuccess || len < 1) return;
     hid = (hid_t*)context;
     if (!hid || hid->ref != sender) return;
@@ -372,13 +379,16 @@ static void input_callback(void *context, IOReturn ret, void *sender, IOHIDRepor
             hid->last_buffer->next = n;
             hid->last_buffer = n;
     }
-    CFRunLoopStop(CFRunLoopGetCurrent());
+    //qDebug() << "Stop CFRunLoop from input_callback" << CFRunLoopGetCurrent();
+    CFRunLoopStop(the_correct_runloop);
 }
 
-void pjrc_rawhid::timeout_callback()
+static void timeout_callback(CFRunLoopTimerRef timer, void *info)
 {
-    qDebug("[pjrc_rawhid_mac] timeout_callback");
-    timeout_occurred = 1;
+   //qDebug("timeout_callback\n");
+   *(int *)info = 1;
+   //qDebug() << "Stop CFRunLoop from timeout_callback" << CFRunLoopGetCurrent();
+   CFRunLoopStop(CFRunLoopGetCurrent());
 }
 
 static void add_hid(hid_t *h)

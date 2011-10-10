@@ -37,8 +37,6 @@
 
 #if defined( Q_OS_MAC)
 
-#include <QTimer>
-// todo:
 
 #elif defined(Q_OS_UNIX)
 //#elif defined(Q_OS_LINUX)
@@ -106,15 +104,11 @@ public:
 signals:
      void deviceUnplugged(int);//just to make pips changes compile
 #if defined( Q_OS_MAC)
-public slots:
-     void timeout_callback();
+
 #endif
 
 private:
 #if defined( Q_OS_MAC)
-
-    int timeout_occurred;
-    QTimer m_timer;
 
 #elif defined(Q_OS_UNIX)
     //#elif defined(Q_OS_LINUX)

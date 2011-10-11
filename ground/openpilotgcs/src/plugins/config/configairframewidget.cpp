@@ -105,10 +105,13 @@ ConfigAirframeWidget::ConfigAirframeWidget(QWidget *parent) : ConfigTaskWidget(p
     ffTuningInProgress = false;
     ffTuningPhase = false;
 
-    mixerTypes << "Mixer1Type" << "Mixer2Type" << "Mixer3Type"
-            << "Mixer4Type" << "Mixer5Type" << "Mixer6Type" << "Mixer7Type" << "Mixer8Type";
-    mixerVectors << "Mixer1Vector" << "Mixer2Vector" << "Mixer3Vector"
-            << "Mixer4Vector" << "Mixer5Vector" << "Mixer6Vector" << "Mixer7Vector" << "Mixer8Vector";
+    QStringList channels;
+    channels << "None";
+    for (int i = 0; i < ActuatorSettings::CHANNELADDR_NUMELEM; i++) {
+        mixerTypes << QString("Mixer%1Type").arg(i+1);
+        mixerVectors << QString("Mixer%1Vector").arg(i+1);
+        channels << QString("Channel%1").arg(i+1);
+    }
 
     QStringList airframeTypes;
     airframeTypes << "Fixed Wing" << "Multirotor" << "Helicopter" << "Custom";
@@ -124,11 +127,6 @@ ConfigAirframeWidget::ConfigAirframeWidget(QWidget *parent) : ConfigTaskWidget(p
             << "Octo Coax X" << "Hexacopter Y6" << "Tricopter Y";
     m_aircraft->multirotorFrameType->addItems(multiRotorTypes);
 
-
-
-    QStringList channels;
-    channels << "None" << "Channel1" << "Channel2" << "Channel3" <<
-            "Channel4" << "Channel5" << "Channel6" << "Channel7" << "Channel8";
     // Now load all the channel assignements for fixed wing
     m_aircraft->fwElevator1Channel->addItems(channels);
     m_aircraft->fwElevator2Channel->addItems(channels);

@@ -41,11 +41,25 @@
 #include "camerastabsettings.h"
 #include "hwsettings.h"
 #include "mixersettings.h"
+#include "actuatorcommand.h"
 
 ConfigCameraStabilizationWidget::ConfigCameraStabilizationWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
     m_camerastabilization = new Ui_CameraStabilizationWidget();
     m_camerastabilization->setupUi(this);
+
+    QComboBox * selectors[3] = {
+        m_camerastabilization->rollChannel,
+        m_camerastabilization->pitchChannel,
+        m_camerastabilization->yawChannel
+    };
+
+    for (int i = 0; i < 3; i++) {
+        selectors[i]->clear();
+        selectors[i]->addItem("None");
+        for (int j = 0; j < ActuatorCommand::CHANNEL_NUMELEM; j++)
+            selectors[i]->addItem(QString("Channel %1").arg(j+1));
+    }
 
     connectUpdates();
 

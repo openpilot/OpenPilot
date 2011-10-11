@@ -456,7 +456,7 @@ static bool updateRcvrActivityCompare(uint32_t rcvr_id, struct rcvr_activity_fsm
 				break;
 			}
 
-			ReceiverActivityActiveGroupSet(&group);
+			ReceiverActivityActiveGroupSet((uint8_t*)&group);
 			ReceiverActivityActiveChannelSet(&channel);
 			activity_updated = true;
 		}

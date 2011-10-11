@@ -37,7 +37,6 @@
 
 #if defined( Q_OS_MAC)
 
-// todo:
 
 #elif defined(Q_OS_UNIX)
 //#elif defined(Q_OS_LINUX)
@@ -104,10 +103,12 @@ public:
     void mytest(int num);
 signals:
      void deviceUnplugged(int);//just to make pips changes compile
-private:
 #if defined( Q_OS_MAC)
 
-    // todo:
+#endif
+
+private:
+#if defined( Q_OS_MAC)
 
 #elif defined(Q_OS_UNIX)
     //#elif defined(Q_OS_LINUX)

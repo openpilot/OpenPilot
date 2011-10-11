@@ -1345,6 +1345,7 @@ void PIOS_Board_Init(void) {
 #endif	/* PIOS_INCLUDE_PWM */
 		break;
 	case HWSETTINGS_CC_RCVRPORT_PPM:
+	case HWSETTINGS_CC_RCVRPORT_PPM_SERVO:
 #if defined(PIOS_INCLUDE_PPM)
 		{
 			uint32_t pios_ppm_id;
@@ -1374,7 +1375,16 @@ void PIOS_Board_Init(void) {
 	GPIO_PinRemapConfig( GPIO_Remap_SWJ_NoJTRST, ENABLE);
 
 #ifndef PIOS_DEBUG_ENABLE_DEBUG_PINS
-	PIOS_Servo_Init(&pios_servo_cfg);
+	switch (hwsettings_rcvrport) {
+		case HWSETTINGS_CC_RCVRPORT_DISABLED:
+		case HWSETTINGS_CC_RCVRPORT_PWM:
+		case HWSETTINGS_CC_RCVRPORT_PPM:
+			PIOS_Servo_Init(&pios_servo_cfg);
+			break;
+		case HWSETTINGS_CC_RCVRPORT_PPM_SERVO:
+			PIOS_Servo_Init(&pios_servo_rcvr_cfg);
+			break;
+	}
 #else
 	PIOS_DEBUG_Init(&pios_tim_servo_all_channels, NELEMENTS(pios_tim_servo_all_channels));
 #endif	/* PIOS_DEBUG_ENABLE_DEBUG_PINS */

@@ -3,7 +3,7 @@
 		<description>Selection of optional hardware configurations.</description>
 		<field name="CC_FlexiPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,Spektrum1,Spektrum2,ComAux,I2C" defaultvalue="Disabled"/>
 		<field name="CC_MainPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,S.Bus,GPS,Spektrum1,Spektrum2,ComAux" defaultvalue="Telemetry"/>
-		<field name="CC_RcvrPort" units="function" type="enum" elements="1" options="Disabled,PWM,PPM" defaultvalue="PWM"/>
+		<field name="CC_RcvrPort" units="function" type="enum" elements="1" options="Disabled,PWM,PPM,PPM_SERVO" defaultvalue="PWM"/>
 
 		<field name="OP_FlexiPort" units="function" type="enum" elements="1" options="Disabled,GPS" defaultvalue="GPS"/>
 		<field name="OP_MainPort" units="function" type="enum" elements="1" options="Disabled,Telemetry" defaultvalue="Telemetry"/>

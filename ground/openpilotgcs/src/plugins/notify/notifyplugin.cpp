@@ -48,7 +48,6 @@ static const QString VERSION = "1.0.0";
 SoundNotifyPlugin::SoundNotifyPlugin()
 {
     phonon.mo = NULL;
-    configured = false;
 }
 
 SoundNotifyPlugin::~SoundNotifyPlugin()
@@ -72,13 +71,10 @@ bool SoundNotifyPlugin::initialize(const QStringList& args, QString *errMsg)
 void SoundNotifyPlugin::extensionsInitialized()
 { 
     Core::ICore::instance()->readSettings(this);
-    if ( !configured ){
-        readConfig_0_0_0();
-    }
 
     ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
     connect(pm, SIGNAL(objectAdded(QObject*)), this, SLOT(onTelemetryManagerAdded(QObject*)));
-    removedNotifies.clear();
+    _toRemoveNotifications.clear();
     connectNotifications();
 } 
 
@@ -96,46 +92,19 @@ void SoundNotifyPlugin::saveConfig( QSettings* settings, UAVConfigInfo *configIn
     settings->endGroup();
 
     settings->beginWriteArray("listNotifies");
-    for (int i = 0; i < lstNotifications.size(); i++) {
+    for (int i = 0; i < _notificationList.size(); i++) {
         settings->setArrayIndex(i);
-        lstNotifications.at(i)->saveState(settings);
+        _notificationList.at(i)->saveState(settings);
     }
     settings->endArray();
     settings->setValue(QLatin1String("EnableSound"), enableSound);
 
 }
 
-void SoundNotifyPlugin::readConfig( QSettings* settings, UAVConfigInfo *configInfo){
-
-    if ( configInfo->version() == UAVConfigVersion() ){
-        // Just for migration to the new format.
-        configured = false;
-        return;
-    }
-
-    settings->beginReadArray("Current");
-    settings->setArrayIndex(0);
-    currentNotification.restoreState(settings);
-    settings->endArray();
-
-    // read list of notifications from settings
-    int size = settings->beginReadArray("listNotifies");
-    for (int i = 0; i < size; ++i) {
-             settings->setArrayIndex(i);
-			 NotificationItem* notification = new NotificationItem;
-             notification->restoreState(settings);
-             lstNotifications.append(notification);
-    }
-    settings->endArray();
-    setEnableSound(settings->value(QLatin1String("EnableSound"),0).toBool());
-
-    configured = true;
-}
-
-void SoundNotifyPlugin::readConfig_0_0_0(){
-
-    settings = Core::ICore::instance()->settings();
-    settings->beginGroup(QLatin1String("NotifyPlugin"));
+void SoundNotifyPlugin::readConfig( QSettings* settings, UAVConfigInfo *configInfo)
+{
+    // Just for migration to the new format.
+    //Q_ASSERT(configInfo->version() == UAVConfigVersion());
 
     settings->beginReadArray("Current");
     settings->setArrayIndex(0);
@@ -148,18 +117,10 @@ void SoundNotifyPlugin::readConfig_0_0_0(){
         settings->setArrayIndex(i);
         NotificationItem* notification = new NotificationItem;
         notification->restoreState(settings);
-        lstNotifications.append(notification);
+        _notificationList.append(notification);
     }
     settings->endArray();
     setEnableSound(settings->value(QLatin1String("EnableSound"),0).toBool());
-    settings->endGroup();
-
-    ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
-    connect(pm, SIGNAL(objectAdded(QObject*)), this, SLOT(onTelemetryManagerAdded(QObject*)));
-    removedNotifies.clear();
-    connectNotifications();
-
-    configured = true;
 }
 
 void SoundNotifyPlugin::onTelemetryManagerAdded(QObject* obj)
@@ -186,11 +147,11 @@ void SoundNotifyPlugin::onAutopilotDisconnect()
 void SoundNotifyPlugin::resetNotification(void)
 {
     //first, reject empty args and unknown fields.
-    foreach(NotificationItem* ntf, lstNotifications) {
+    foreach(NotificationItem* ntf, _notificationList) {
         ntf->disposeTimer();
-        disconnect(ntf->getTimer(), SIGNAL(timeout()), this, SLOT(repeatTimerHandler()));
+        disconnect(ntf->getTimer(), SIGNAL(timeout()), this, SLOT(on_timerRepeated_Notification()));
         ntf->disposeExpireTimer();
-        disconnect(ntf->getExpireTimer(), SIGNAL(timeout()), this, SLOT(repeatTimerHandler()));
+        disconnect(ntf->getExpireTimer(), SIGNAL(timeout()), this, SLOT(on_timerRepeated_Notification()));
     }
 }
 
@@ -200,10 +161,10 @@ void SoundNotifyPlugin::resetNotification(void)
  */
 void SoundNotifyPlugin::updateNotificationList(QList<NotificationItem*> list)
 {
-    removedNotifies.clear();
+    _toRemoveNotifications.clear();
     resetNotification();
-    lstNotifications.clear();
-    lstNotifications=list;
+    _notificationList.clear();
+    _notificationList=list;
     connectNotifications();
 
     Core::ICore::instance()->saveSettings(this);
@@ -213,7 +174,7 @@ void SoundNotifyPlugin::connectNotifications()
 {
     foreach(UAVDataObject* obj,lstNotifiedUAVObjects) {
         if (obj != NULL)
-            disconnect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(appendNotification(UAVObject*)));
+            disconnect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(on_arrived_Notification(UAVObject*)));
     }
     if (phonon.mo != NULL) {
         delete phonon.mo;
@@ -226,29 +187,33 @@ void SoundNotifyPlugin::connectNotifications()
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
     lstNotifiedUAVObjects.clear();
-    pendingNotifications.clear();
-    lstNotifications.append(removedNotifies);
-    removedNotifies.clear();
+    _pendingNotifications.clear();
+    _notificationList.append(_toRemoveNotifications);
+    _toRemoveNotifications.clear();
 
     //first, reject empty args and unknown fields.
-    foreach(NotificationItem* notify, lstNotifications) {
-        notify->firstStart=true;
+    foreach(NotificationItem* notify, _notificationList) {
+        notify->_isPlayed = false;
         notify->isNowPlaying=false;
 
         if(notify->mute()) continue;
+        // check is all sounds presented for notification,
+        // if not - we must not subscribe to it at all
+        if(notify->toSoundList().isEmpty()) continue;
 
         UAVDataObject* obj = dynamic_cast<UAVDataObject*>( objManager->getObject(notify->getDataObject()) );
         if (obj != NULL ) {
             if (!lstNotifiedUAVObjects.contains(obj)) {
                 lstNotifiedUAVObjects.append(obj);
-                connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(appendNotification(UAVObject*)));
+
+                connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(on_arrived_Notification(UAVObject*)));
             }
         } else {
             qNotifyDebug() << "Error: Object is unknown (" << notify->getDataObject() << ").";
         }
     }
 
-    if (lstNotifications.isEmpty()) return;
+    if (_notificationList.isEmpty()) return;
     // set notification message to current event
     phonon.mo = Phonon::createPlayer(Phonon::NotificationCategory);
     phonon.mo->clearQueue();
@@ -262,138 +227,66 @@ void SoundNotifyPlugin::connectNotifications()
         this, SLOT(stateChanged(Phonon::State,Phonon::State)));
 }
 
-void SoundNotifyPlugin::appendNotification(UAVObject *object)
+void SoundNotifyPlugin::on_arrived_Notification(UAVObject *object)
 {
-    disconnect(object, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(appendNotification(UAVObject*)));
-
-    foreach(NotificationItem* ntf, lstNotifications) {
+    foreach(NotificationItem* ntf, _notificationList) {
         if (object->getName() != ntf->getDataObject())
             continue;
 
-        if (nowPlayingConfiguration == ntf)
+
+        // skip duplicate notifications
+        if (_nowPlayingNotification == ntf)
             continue;
 
+        // skip periodical notifications
+        // this condition accepts:
+        // 1. Periodical notifications played firstly;
+        //    NOTE: At first time it will be played, then it played only by timer,
+        //          when conditions became false firstStart flag has been cleared and
+        //          notification can be accepted again;
+        // 2. Once time notifications, they removed immediately after first playing;
+        // 3. Instant notifications(played one by one without interval);
         if (ntf->retryString() != "Repeat Instantly" &&
-                ntf->retryString() != "Repeat Once" && !ntf->firstStart)
+                ntf->retryString() != "Repeat Once" && ntf->_isPlayed)
            continue;
 
-        checkNotificationRule(ntf,object);
+        qNotifyDebug() << QString("new notification: | %1 | %2 | val1: %3 | val2: %4")
+                                      .arg(ntf->getDataObject())
+                                        .arg(ntf->getObjectField())
+                                        .arg(ntf->singleValue().toString())
+                                        .arg(ntf->valueRange2());
+
+        QString fieldName = ntf->getObjectField();
+        UAVObjectField* field = object->getField(fieldName);
+
+        qNotifyDebug() << QString("UAV object: %1 | value: %2")
+                                      .arg(object->getName())
+                                      .arg(field->getValue().toString());
+
+        checkNotificationRule(ntf, object);
     }
-    connect(object, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(appendNotification(UAVObject*)));
+    connect(object, SIGNAL(objectUpdated(UAVObject*)),
+            this, SLOT(on_arrived_Notification(UAVObject*)), Qt::UniqueConnection);
 }
 
 
-void SoundNotifyPlugin::checkNotificationRule(NotificationItem* notification, UAVObject* object)
-{
-    bool condition=false;
-    double threshold;
-    QString direction;
-    QString fieldName;
-
-    threshold = notification->singleValue();
-    direction = notification->range();
-    fieldName = notification->getObjectField();
-    UAVObjectField* field = object->getField(fieldName);
-
-    if (field->getName().isEmpty())
-        return;
-
-    double value = field->getDouble();
-    switch(direction[0].toAscii())
-    {
-    case 'E':
-        condition = (value == threshold);
-        break;
-
-    case 'G':
-        condition = (value > threshold);
-        break;
-
-    case 'L':
-        condition = (value < threshold);
-        break;
-
-    case 'R':
-        condition = (value > threshold) && (value < notification->valueRange2());
-        break;
-
-    }
-
-    if (!condition)
-        return;
-
-    if (!playNotification(notification)) {
-        if (!pendingNotifications.contains(notification)) {
-            notification->stopTimer();
-
-            qNotifyDebug() << "add to pending list - " << notification->toString();
-            // if audio is busy, start expiration timer
-            //ms = (notification->getExpiredTimeout()[in sec])*1000
-            //QxtTimer::singleShot(notification->getExpireTimeout()*1000, this, SLOT(expirationTimerHandler(NotificationItem*)), qVariantFromValue(notification));
-            pendingNotifications.append(notification);
-            notification->startExpireTimer();
-            connect(notification->getExpireTimer(), SIGNAL(timeout()), this, SLOT(expireTimerHandler()));
-        }
-    }
-}
-
-bool SoundNotifyPlugin::playNotification(NotificationItem* notification)
-{
-    // Check: race condition, if phonon.mo got deleted don't go further
-    if (phonon.mo == NULL)
-        return false;
-
-    if (notification->mute())
-        return false;
-
-    qNotifyDebug() << "Phonon State: " << phonon.mo->state();
-    if ((phonon.mo->state()==Phonon::PausedState)
-        || (phonon.mo->state()==Phonon::StoppedState)
-            || phonon.firstPlay)
-    {
-        // don't fire expire timer
-        nowPlayingConfiguration = notification;
-        notification->stopExpireTimer();
-
-        if (notification->retryString() == "Repeat Once") {
-            removedNotifies.append(lstNotifications.takeAt(lstNotifications.indexOf(notification)));
-        } else {
-            if (notification->retryString() != "Repeat Instantly") {
-                QRegExp rxlen("(\\d+)");
-                QString value;
-                int timer_value;
-                int pos = rxlen.indexIn(notification->retryString());
-                if (pos > -1) {
-                    value = rxlen.cap(1); // "189"
-                    timer_value = (value.toInt()+8)*1000; //ms*1000 + average duration of meassage
-                }
-
-                notification->startTimer(timer_value);
-                connect(notification->getTimer(), SIGNAL(timeout()), this, SLOT(repeatTimerHandler()));
-            }
-        }
-        notification->firstStart=false;
-        phonon.mo->clear();
-        qNotifyDebug() << "play notification - " << notification->toString();
-        foreach (QString item, notification->toSoundList()) {
-            Phonon::MediaSource *ms = new Phonon::MediaSource(item);
-            ms->setAutoDelete(true);
-            phonon.mo->enqueue(*ms);
-        }
-        phonon.mo->play();
-        phonon.firstPlay = false; // On Linux, you sometimes have to nudge Phonon to play 1 time before
-                                                          // the state is not "Loading" anymore.
-    } else {
-        return false; // if audio is busy
-    }
-    return true;
-}
-
-void SoundNotifyPlugin::repeatTimerHandler()
+void SoundNotifyPlugin::on_timerRepeated_Notification()
 {
     NotificationItem* notification = static_cast<NotificationItem*>(sender()->parent());
+    if (!notification)
+        return;
+    // skip duplicate notifications
+    // WARNING: generally we shoudn't ever trap here
+    //          this means, that timer fires to early and notification overlap itself
+    if (_nowPlayingNotification == notification) {
+        qNotifyDebug() << "WARN: on_timerRepeated - notification was skipped!";
+        notification->restartTimer();
+        return;
+    }
 
-    qNotifyDebug() << "repeatTimerHandler - " << notification->toString();
+    qNotifyDebug() << QString("repeatTimer: %1% | %2 | %3").arg(notification->getDataObject())
+                                                    .arg(notification->getObjectField())
+                                                    .arg(notification->toString());
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
@@ -402,15 +295,23 @@ void SoundNotifyPlugin::repeatTimerHandler()
         checkNotificationRule(notification,object);
 }
 
-void SoundNotifyPlugin::expireTimerHandler()
+
+void SoundNotifyPlugin::on_expiredTimer_Notification()
 {
     // fire expire timer
     NotificationItem* notification = static_cast<NotificationItem*>(sender()->parent());
+    if(!notification)
+        return;
     notification->stopExpireTimer();
 
-    if (!pendingNotifications.isEmpty()) {
-        qNotifyDebug() << "expireTimerHandler - " << notification->toString();
-        pendingNotifications.removeOne(notification);
+    volatile QMutexLocker lock(&_mutex);
+
+    if (!_pendingNotifications.isEmpty()) {
+        qNotifyDebug() << QString("expireTimer: %1% | %2 | %3").arg(notification->getDataObject())
+                                                        .arg(notification->getObjectField())
+                                                        .arg(notification->toString());
+
+        _pendingNotifications.removeOne(notification);
     }
 }
 
@@ -418,8 +319,7 @@ void SoundNotifyPlugin::stateChanged(Phonon::State newstate, Phonon::State oldst
 {
     Q_UNUSED(oldstate)
 
-    qNotifyDebug() << "File length (ms): " << phonon.mo->totalTime();
-    qNotifyDebug() << "New State: " << newstate;
+    //qNotifyDebug() << "File length (ms): " << phonon.mo->totalTime();
 
 #ifndef Q_OS_WIN
     // This is a hack to force Linux to wait until the end of the
@@ -432,11 +332,18 @@ void SoundNotifyPlugin::stateChanged(Phonon::State newstate, Phonon::State oldst
     if ((newstate  == Phonon::PausedState) ||
        (newstate  == Phonon::StoppedState))
     {
-        nowPlayingConfiguration=NULL;
-        if (!pendingNotifications.isEmpty())
+        qNotifyDebug() << "New State: " << QVariant(newstate).toString();
+
+        volatile QMutexLocker lock(&_mutex);
+        // assignment to NULL needed to detect that palying is finished
+        // it's useful in repeat timer handler, where we can detect
+        // that notification has not overlap with itself
+        _nowPlayingNotification = NULL;
+
+        if (!_pendingNotifications.isEmpty())
         {
-            NotificationItem* notification = pendingNotifications.takeFirst();
-            qNotifyDebug() << "play audioFree - " << notification->toString();
+            NotificationItem* notification = _pendingNotifications.takeFirst();
+            qNotifyDebug_if(notification) << "play audioFree - " << notification->toString();
             playNotification(notification);
         }
     } else {
@@ -447,6 +354,165 @@ void SoundNotifyPlugin::stateChanged(Phonon::State newstate, Phonon::State oldst
             }
         }
     }
+}
+
+bool checkRange(QString fieldValue, QString enumValue, QStringList values, char direction)
+{
+
+    bool ret = false;
+    switch(direction)
+    {
+    case 'E':
+        ret = !QString::compare(enumValue, fieldValue, Qt::CaseInsensitive) ? true : false;
+        break;
+
+    default:
+        ret = true;
+        break;
+    };
+    return ret;
+}
+
+bool checkRange(double fieldValue, double min, double max, char direction)
+{
+    bool ret = false;
+    Q_ASSERT(min < max);
+    switch(direction)
+    {
+    case 'E':
+        ret = (fieldValue == min);
+        break;
+
+    case 'G':
+        ret = (fieldValue > min);
+        break;
+
+    case 'L':
+        ret = (fieldValue < min);
+        break;
+
+    default:
+        ret = (fieldValue > min) && (fieldValue < max);
+        break;
+    };
+
+    return ret;
+}
+
+void SoundNotifyPlugin::checkNotificationRule(NotificationItem* notification, UAVObject* object)
+{
+    bool condition=false;
+
+    if (notification->mute())
+        return;
+
+    QString direction = notification->range();
+    QString fieldName = notification->getObjectField();
+    UAVObjectField* field = object->getField(fieldName);
+
+    if (field->getName().isEmpty())
+        return;
+
+    QVariant value = field->getValue();
+    if(UAVObjectField::ENUM == field->getType()) {
+        condition = checkRange(value.toString(),
+                               notification->singleValue().toString(),
+                               field->getOptions(),
+                               direction[0].toAscii());
+    } else {
+        condition = checkRange(value.toDouble(),
+                               notification->singleValue().toDouble(),
+                               notification->valueRange2(),
+                               direction[0].toAscii());
+    }
+
+    notification->_isPlayed = condition;
+    // if condition has been changed, and already in false state
+    // we should reset _isPlayed flag and stop repeat timer
+    if (!notification->_isPlayed) {
+        notification->stopTimer();
+        return;
+    }
+
+    volatile QMutexLocker lock(&_mutex);
+
+    if (!playNotification(notification)) {
+        if (!_pendingNotifications.contains(notification)
+                && (_nowPlayingNotification != notification)) {
+            notification->stopTimer();
+
+            qNotifyDebug() << "add to pending list - " << notification->toString();
+            // if audio is busy, start expiration timer
+            //ms = (notification->getExpiredTimeout()[in sec])*1000
+            //QxtTimer::singleShot(notification->getExpireTimeout()*1000, this, SLOT(expirationTimerHandler(NotificationItem*)), qVariantFromValue(notification));
+            _pendingNotifications.append(notification);
+            notification->startExpireTimer();
+            connect(notification->getExpireTimer(), SIGNAL(timeout()),
+                    this, SLOT(on_expiredTimer_Notification()), Qt::UniqueConnection);
+        }
+    }
+}
+
+bool SoundNotifyPlugin::playNotification(NotificationItem* notification)
+{
+    if(!notification)
+        return false;
+
+    // Check: race condition, if phonon.mo got deleted don't go further
+    if (phonon.mo == NULL)
+        return false;
+
+    //qNotifyDebug() << "Phonon State: " << phonon.mo->state();
+
+    if ((phonon.mo->state()==Phonon::PausedState)
+        || (phonon.mo->state()==Phonon::StoppedState)
+            || phonon.firstPlay)
+    {
+        _nowPlayingNotification = notification;
+        notification->stopExpireTimer();
+
+        if (notification->retryString() == "Repeat Once") {
+            _toRemoveNotifications.append(_notificationList.takeAt(_notificationList.indexOf(notification)));
+        } else {
+            if (notification->retryString() != "Repeat Instantly") {
+                QRegExp rxlen("(\\d+)");
+                QString value;
+                int timer_value;
+                int pos = rxlen.indexIn(notification->retryString());
+                if (pos > -1) {
+                    value = rxlen.cap(1); // "189"
+
+                    // needs to correct repeat timer value,
+                    // acording to message play duration,
+                    // we don't measure duration of each message,
+                    // simply take average duration
+                    enum { eAverageDurationSec = 8 };
+
+                    enum { eSecToMsec = 1000 };
+
+                    timer_value = (value.toInt() + eAverageDurationSec) * eSecToMsec;
+                }
+
+                notification->startTimer(timer_value);
+                connect(notification->getTimer(), SIGNAL(timeout()),
+                        this, SLOT(on_timerRepeated_Notification()), Qt::UniqueConnection);
+            }
+        }
+        phonon.mo->clear();
+        qNotifyDebug() << "play: " << notification->toString();
+        foreach (QString item, notification->toSoundList()) {
+            Phonon::MediaSource *ms = new Phonon::MediaSource(item);
+            ms->setAutoDelete(true);
+            phonon.mo->enqueue(*ms);
+        }
+        phonon.mo->play();
+        phonon.firstPlay = false; // On Linux, you sometimes have to nudge Phonon to play 1 time before
+                                  // the state is not "Loading" anymore.
+        return true;
+
+    }
+
+    return false;
 }
 
 Q_EXPORT_PLUGIN(SoundNotifyPlugin)

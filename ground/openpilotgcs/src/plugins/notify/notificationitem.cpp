@@ -59,7 +59,7 @@ QStringList NotificationItem::retryValues;
 NotificationItem::NotificationItem(QObject *parent)
     : QObject(parent)
     , isNowPlaying(0)
-    , firstStart(true)
+    , _isPlayed(false)
     , _timer(NULL)
     , _expireTimer(NULL)
     , _soundCollectionPath("")
@@ -77,10 +77,12 @@ NotificationItem::NotificationItem(QObject *parent)
     , _expireTimeout(eDefaultTimeout)
     , _mute(false)
 {
+    NotificationItem::sayOrderValues.clear();
     NotificationItem::sayOrderValues.append(cStrBefore1st);
     NotificationItem::sayOrderValues.append(cStrBefore2nd);
     NotificationItem::sayOrderValues.append(cStrAfter2nd);
 
+    NotificationItem::retryValues.clear();
     NotificationItem::retryValues.append(cStrRetryOnce);
     NotificationItem::retryValues.append(cStrRetryInstantly);
     NotificationItem::retryValues.append(cStrRetry10sec);
@@ -92,7 +94,7 @@ NotificationItem::NotificationItem(QObject *parent)
 void NotificationItem::copyTo(NotificationItem* that) const
 {
     that->isNowPlaying = isNowPlaying;
-    that->firstStart = firstStart;
+    that->_isPlayed = _isPlayed;
     that->_soundCollectionPath = _soundCollectionPath;
     that->_currentLanguage = _currentLanguage;
     that->_soundCollectionPath = _soundCollectionPath;
@@ -142,7 +144,8 @@ void NotificationItem::restoreState(QSettings* settings)
     setSound2(settings->value(QLatin1String("Sound2"), tr("")).toString());
     setSound3(settings->value(QLatin1String("Sound3"), tr("")).toString());
     setSayOrder(settings->value(QLatin1String("SayOrder"), tr("")).toString());
-    setSingleValue(settings->value(QLatin1String("Value1"), tr("")).toDouble());
+    QVariant value = settings->value(QLatin1String("Value1"), tr(""));
+    setSingleValue(value);
     setValueRange2(settings->value(QLatin1String("Value2"), tr("")).toDouble());
     setRetryString(settings->value(QLatin1String("Repeat"), tr("")).toString());
     setLifetime(settings->value(QLatin1String("ExpireTimeout"), tr("")).toInt());
@@ -185,15 +188,25 @@ void NotificationItem::deseriaize(QDataStream& stream)
     stream >> this->_mute;
 }
 
-void NotificationItem::startTimer(int value)
+void NotificationItem::startTimer(int msec)
 {
     if (!_timer) {
         _timer = new QTimer(this);
-        _timer->setInterval(value);
+        _timer->setInterval(msec);
     }
     if (!_timer->isActive())
         _timer->start();
 }
+
+
+void NotificationItem::restartTimer()
+{
+    if (!_timer) {
+        if (!_timer->isActive())
+            _timer->start();
+    }
+}
+
 
 void NotificationItem::stopTimer()
 {
@@ -311,17 +324,26 @@ QStringList valueToSoundList(QString value)
     return digitWavs;
 }
 
+QString stringFromValue(QVariant value, UAVObjectField* field)
+{
+    Q_ASSERT(field);
+    Q_ASSERT(!value.isNull());
+    QString str;
+    if (UAVObjectField::ENUM == field->getType()) {
+        if(!field->getOptions().contains(value.toString()))
+            return QString();
+        str = value.toString();
+    } else {
+        str = QString("%L1").arg(value.toDouble());
+    }
+    return str;
+}
+
 QString NotificationItem::toString()
 {
     QString str;
-    QString value;
     UAVObjectField* field = getUAVObjectField();
-    if (UAVObjectField::ENUM == field->getType()) {
-        Q_ASSERT(singleValue() < field->getOptions().size());
-        value = field->getOptions().at(singleValue());
-    } else {
-        value = QString("%L1").arg(singleValue());
-    }
+    QString value = stringFromValue(singleValue(), field);
 
     int pos = getValuePosition(getSayOrder().trimmed());
     QStringList lst;
@@ -353,15 +375,8 @@ QStringList& NotificationItem::toSoundList()
     // tips:
     // check of *.wav files exist needed for playing phonon queues;
     // if phonon player don't find next file in queue, it buzz
-
-    QString value;
     UAVObjectField* field = getUAVObjectField();
-    if (UAVObjectField::ENUM == field->getType()) {
-        Q_ASSERT(singleValue() < field->getOptions().size());
-        value = field->getOptions().at(singleValue());
-    } else {
-        value = QString("%L1").arg(singleValue());
-    }
+    QString value = stringFromValue(singleValue(), field);
 
     // generate queue of sound files to play
     _messageSequence.clear();

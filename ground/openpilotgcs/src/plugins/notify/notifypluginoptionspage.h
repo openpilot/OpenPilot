@@ -73,33 +73,28 @@ public:
     void finish();
     void restoreFromSettings();
 
-    void updateConfigView(NotificationItem* notification);
-    void getOptionsPageValues(NotificationItem* notification);
-    UAVObjectField* getObjectFieldFromPage();
-    UAVObjectField* getObjectFieldFromSelected();
-
 signals:
     void updateNotifications(QList<NotificationItem*> list);
     void entryUpdated(int index);
 
 private slots:
-    void on_button_TestSoundNotification_clicked();
-    void on_button_AddNotification_clicked();
-    void on_button_DeleteNotification_clicked();
-    void on_button_ModifyNotification_clicked();
+    void on_clicked_buttonTestSoundNotification();
+    void on_clicked_buttonAddNotification();
+    void on_clicked_buttonDeleteNotification();
+    void on_clicked_buttonModifyNotification();
 
     /**
      * We can use continuous selection, to select simultaneously
      * multiple rows to move them(using drag & drop) inside table ranges.
      */
-    void on_table_changeSelection( const QItemSelection & selected, const QItemSelection & deselected );
+    void on_changedSelection_notifyTable( const QItemSelection & selected, const QItemSelection & deselected );
 
-    void on_soundLanguage_indexChanged(int index);
-    void on_buttonSoundFolder_clicked(const QString& path);
-    void on_UAVObject_indexChanged(QString val);
-    void on_UAVField_indexChanged(QString val);
-    void on_changeButtonText(Phonon::State newstate, Phonon::State oldstate);
-    void on_checkEnableSound_toggled(bool state);
+    void on_changedIndex_soundLanguage(int index);
+    void on_clicked_buttonSoundFolder(const QString& path);
+    void on_changedIndex_UAVObject(QString val);
+    void on_changedIndex_UAVField(QString val);
+    void on_changed_playButtonText(Phonon::State newstate, Phonon::State oldstate);
+    void on_toggled_checkEnableSound(bool state);
 
     /**
      * Important when we change to or from "In range" value
@@ -107,7 +102,7 @@ private slots:
      * we need to change UI to show edit line,
      * to have possibility assign range limits for value.
      */
-    void on_rangeValue_indexChanged(QString);
+    void on_changedIndex_rangeValue(QString);
 
     void on_FinishedPlaying(void);
 
@@ -115,29 +110,31 @@ private slots:
 private:
     Q_DISABLE_COPY(NotifyPluginOptionsPage)
 
-    void resetValueRange();
-    void resetFieldType();
-
-    void setDynamicValueField(NotificationItem* notification);
-    void addDynamicField(UAVObjectField* objField);
-    void addDynamicValueLayout();
-    void setDynamicValueWidget(UAVObjectField* objField);
-
     void initButtons();
     void initPhononPlayer();
     void initRulesTable();
+
+    void setSelectedNotification(NotificationItem* ntf);
+    void resetValueRange();
+    void resetFieldType();
+
+    void updateConfigView(NotificationItem* notification);
+    void getOptionsPageValues(NotificationItem* notification);
+    UAVObjectField* getObjectFieldFromPage();
+    UAVObjectField* getObjectFieldFromSelected();
+
+    void addDynamicFieldLayout();
+    void addDynamicField(UAVObjectField* objField);
+    void addDynamicFieldWidget(UAVObjectField* objField);
+    void setDynamicFieldValue(NotificationItem* notification);
 
 private:
 
     UAVObjectManager& _objManager;
     SoundNotifyPlugin* _owner;
-    QStringList _listDirCollections;
-    QStringList _listSoundFiles;
-    QString _currentCollectionPath;
-    Phonon::MediaObject* _sound1;
-    Phonon::MediaObject* _sound2;
-    QScopedPointer<Phonon::MediaObject> _notifySound;
-    Phonon::AudioOutput* _audioOutput;
+
+    //! Media object uses to test sound playing
+    QScopedPointer<Phonon::MediaObject> _testSound;
 
     QScopedPointer<NotifyTableModel> _notifyRulesModel;
     QItemSelectionModel* _notifyRulesSelection;
@@ -154,34 +151,36 @@ private:
 
     QScopedPointer<Ui::NotifyPluginOptionsPage> _optionsPage;
 
-    //! widget to convinient selection of condition for field value (equal, lower, greater)
-    QComboBox* _valueRange;
+    //! Widget to convinient selection of condition for field value (equal, lower, greater)
+    QComboBox* _dynamicFieldLimit;
 
-    //! widget to convinient selection of order in which sounds will be played
+    //! Represents edit widget for dynamic UAVObjectfield,
+    //! can be spinbox - for numerics, combobox - enums, or
+    //! lineedit - for numerics with range constraints
+    QWidget* _dynamicFieldWidget;
+
+    //! Type of UAVObjectField - numeric or ENUM,
+    //! this variable needs to correctly set appropriate dynamic UI element (_dynamicFieldWidget)
+    //! NOTE: ocassionaly it should be invalidated (= -1) to reset _dynamicFieldWidget
+    int _dynamicFieldType;
+
+    //! Widget to convinient selection of position of <dynamic field value>
+    //! between sounds[1..3]
     QComboBox* _sayOrder;
 
-    //! widget to represent edit widget for UAVObjectfield,
-    //! can be spinbox - for numerics, combobox - enums, or
-    //! lineedit - for range limits
-    QWidget* _fieldValue;
-
-    //! type of UAVObjectField - numeric or ENUM
-    //! this variable needs to correctly set dynamic UI elemen _fieldValue
-    //! NOTE: ocassionaly it should be invalidated (= -1) to reset _fieldValue
-    int _fieldType;
-
-    //! actualy reference to optionsPageWidget,
+    //! Actualy reference to optionsPageWidget,
     //! we MUST hold it beyond the scope of createPage func
     //! to have possibility change dynamic parts of options page layout in future
     QWidget* _form;
 
-    //! needs to correctly update UI during transitions from "In Range" to other
-    //! _valueRange entries and back direction as well
-    QString _prevRangeValue;
-
     //! Currently selected notification, all controls filled accroding to it.
     //! On options page startup, always points to first row.
     NotificationItem* _selectedNotification;
+
+    //! Retrieved from UAVObjectManager by name from _selectedNotification,
+    //! if UAVObjectManager doesn't have such object, this field will be NULL
+    UAVDataObject* _currUAVObject;
+
 };
 
 #endif // NOTIFYPLUGINOPTIONSPAGE_H

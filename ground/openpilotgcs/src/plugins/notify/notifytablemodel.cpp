@@ -45,19 +45,19 @@ bool NotifyTableModel::setData(const QModelIndex &index,
 							   const QVariant &value, int role)
 {
     if (index.isValid() && role == Qt::DisplayRole) {
-        if(eMessageName == index.column()) {
+        if (eMessageName == index.column()) {
             emit dataChanged(index, index);
             return true;
         }
     }
     if (index.isValid() && role == Qt::EditRole) {
-        if(eRepeatValue == index.column())
+        if (eRepeatValue == index.column())
              _list.at(index.row())->setRetryString(value.toString());
         else {
-            if(eExpireTimer == index.column())
+            if (eExpireTimer == index.column())
                 _list.at(index.row())->setLifetime(value.toInt());
             else {
-                if(eTurnOn == index.column())
+                if (eTurnOn == index.column())
                     _list.at(index.row())->setMute(value.toBool());
             }
         }
@@ -114,7 +114,7 @@ QVariant NotifyTableModel::headerData(int section, Qt::Orientation orientation, 
     if (orientation == Qt::Horizontal)
         return _headerStrings.at(section);
     else
-        if(orientation == Qt::Vertical)
+        if (orientation == Qt::Vertical)
             return QString("%1").arg(section);
 
     return QVariant();
@@ -141,7 +141,7 @@ bool NotifyTableModel::removeRows(int position, int rows, const QModelIndex& ind
 {
     Q_UNUSED(index);
 
-    if((-1 == position) || (-1 == rows) )
+    if ((-1 == position) || (-1 == rows) )
         return false;
 
     beginRemoveRows(QModelIndex(), position, position + rows - 1);
@@ -201,7 +201,7 @@ bool NotifyTableModel::dropMimeData( const QMimeData * data, Qt::DropAction acti
             beginRow = rowCount(QModelIndex());
     }
 
-    if(-1 == beginRow)
+    if (-1 == beginRow)
         return false;
 
     QByteArray encodedData = data->data(mime_type_notify_table);
@@ -217,15 +217,18 @@ bool NotifyTableModel::dropMimeData( const QMimeData * data, Qt::DropAction acti
         // or from bottom rows to top rows (UP_DIRECTION)
         enum { UP_DIRECTION, DOWN_DIRECTION };
         int direction = (dragged < rows) ? DOWN_DIRECTION : (dragged += 1, UP_DIRECTION);
-        Q_ASSERT(insertRows(rows + direction, 1, QModelIndex()));
-        if(-1 == dragged || rows >= _list.size() || dragged == rows) {
+        // check drop bounds
+        if (dragged < 0 || ((dragged + 1) >= _list.size() && direction == DOWN_DIRECTION)  || dragged == rows) {
             qNotifyDebug() << "no such item";
-
-            return false;
+            continue;
         }
+        // addiional check in case dropping of multiple rows
+        if(rows + direction > _list.size()) continue;
+
+        Q_ASSERT(insertRows(rows + direction, 1, QModelIndex()));
         _list.replace(rows + direction, item);
         Q_ASSERT(removeRows(dragged, 1, QModelIndex()));
-        if(direction == UP_DIRECTION)
+        if (direction == UP_DIRECTION)
             ++rows;
     };
 

@@ -31,7 +31,7 @@
 #ifdef DEBUG_NOTIFIES_ENABLE
 QDebug qNotifyDebug()
 {
-    return qDebug();
+    return qDebug() << "[NOTIFY_PLG]";
 }
 #endif
 

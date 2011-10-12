@@ -63,8 +63,8 @@ public:
     QString getSayOrder() const { return _sayOrder; }
     void setSayOrder(QString text) { _sayOrder = text; }
 
-    double singleValue() const { return _singleValue; }
-    void setSingleValue(double value) { _singleValue = value; }
+    QVariant singleValue() const { return _singleValue; }
+    void setSingleValue(QVariant value) { _singleValue = value; }
 
     double valueRange2() const { return _valueRange2; }
     void setValueRange2(double value) { _valueRange2 = value; }
@@ -131,6 +131,7 @@ public:
 
     QTimer* getTimer() const { return _timer; }
     void startTimer(int value);
+    void restartTimer();
     void stopTimer();
     void disposeTimer();
 
@@ -141,7 +142,7 @@ public:
     void disposeExpireTimer();
 
     bool isNowPlaying;
-    bool firstStart;
+    bool _isPlayed;
 
     static QStringList sayOrderValues;
     static QStringList retryValues;
@@ -184,8 +185,8 @@ private:
     //! order in what sounds 1-3 will be played
     QString _sayOrder;
 
-    //! one-side range, value maybe lower or greater
-    double _singleValue;
+    //! one-side range, value(numeric or ENUM type) maybe lower, greater or in range
+    QVariant _singleValue;
 
     //! both-side range, value should be inside the range
     //double _valueRange1;

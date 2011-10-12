@@ -63,7 +63,7 @@ public:
     void shutdown();
 
 
-    QList<NotificationItem*> getListNotifications() { return lstNotifications; }
+    QList<NotificationItem*> getListNotifications() { return _notificationList; }
     NotificationItem* getCurrentNotification(){ return &currentNotification;}
 
     bool getEnableSound() const { return enableSound; }
@@ -83,14 +83,12 @@ private slots:
     void connectNotifications();
     void updateNotificationList(QList<NotificationItem*> list);
     void resetNotification(void);
-    void appendNotification(UAVObject *object);
-    void repeatTimerHandler(void);
-    void expireTimerHandler(void);
+    void on_arrived_Notification(UAVObject *object);
+    void on_timerRepeated_Notification(void);
+    void on_expiredTimer_Notification(void);
     void stateChanged(Phonon::State newstate, Phonon::State oldstate);
 
 private:
-
-    bool configured; // just for migration,delete later
     bool enableSound;
     QList< QList<Phonon::MediaSource>* > lstMediaSource;
     QStringList mediaSource;
@@ -98,17 +96,17 @@ private:
     QSettings* settings;
 
     QList<UAVDataObject*> lstNotifiedUAVObjects;
-    QList<NotificationItem*> lstNotifications;
-    QList<NotificationItem*> pendingNotifications;
-    QList<NotificationItem*> removedNotifies;
+    QList<NotificationItem*> _notificationList;
+    QList<NotificationItem*> _pendingNotifications;
+    QList<NotificationItem*> _toRemoveNotifications;
 
     NotificationItem currentNotification;
-    NotificationItem* nowPlayingConfiguration;
+    NotificationItem* _nowPlayingNotification;
 
-    QString m_field;
     PhononObject phonon;
-    NotifyPluginOptionsPage *mop;
+    NotifyPluginOptionsPage* mop;
     TelemetryManager* telMngr;
+    QMutex _mutex;
 }; 
 
 #endif // SOUNDNOTIFYPLUGIN_H

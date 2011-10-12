@@ -197,6 +197,10 @@ void ConfigTaskWidget::populateWidgets()
         {
             cb->setValue(ow->field->getValue(ow->index).toInt()/ow->scale);
         }
+        else if(QCheckBox * cb=qobject_cast<QCheckBox *>(ow->widget))
+        {
+            cb->setChecked(ow->field->getValue(ow->index).toBool());
+        }
     }
     setDirty(dirtyBack);
 }
@@ -226,6 +230,10 @@ void ConfigTaskWidget::refreshWidgetsValues()
         {
             cb->setValue(ow->field->getValue(ow->index).toInt()/ow->scale);
         }
+        else if(QCheckBox * cb=qobject_cast<QCheckBox *>(ow->widget))
+        {
+            cb->setChecked(ow->field->getValue(ow->index).toBool());
+        }
     }
     setDirty(dirtyBack);
 }
@@ -253,6 +261,10 @@ void ConfigTaskWidget::updateObjectsFromWidgets()
         else if(QSlider * cb=qobject_cast<QSlider *>(ow->widget))
         {
             ow->field->setValue(cb->value()* ow->scale,ow->index);
+        }
+        else if(QCheckBox * cb=qobject_cast<QCheckBox *>(ow->widget))
+        {
+            ow->field->setValue((cb->isChecked()?"TRUE":"FALSE"),ow->index);
         }
     }
 }

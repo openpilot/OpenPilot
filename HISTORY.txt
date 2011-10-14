@@ -63,3 +63,4 @@ selected from ManualControlSettings.InputMode and the aircraft must be rebooted
 after changing this.  Also for CopterControl the HwSettings object must
 indicate which modules are connected to which ports.  PPM currently not
 working.
+

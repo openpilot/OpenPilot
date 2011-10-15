@@ -38,14 +38,19 @@
 #include <QMessageBox>
 #include <QDesktopServices>
 #include <QUrl>
+#include "uavsettingsimportexport/uavsettingsimportexportfactory.h"
 
 ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
     m_config = new Ui_OutputWidget();
     m_config->setupUi(this);
 
-	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-        setupButtons(m_config->saveRCOutputToRAM,m_config->saveRCOutputToSD);
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+
+    UAVSettingsImportExportFactory * importexportplugin =  pm->getObject<UAVSettingsImportExportFactory>();
+    connect(importexportplugin,SIGNAL(importAboutToBegin()),this,SLOT(stopTests()));
+
+    setupButtons(m_config->saveRCOutputToRAM,m_config->saveRCOutputToSD);
         addUAVObject("ActuatorSettings");
 
 	// First of all, put all the channel widgets into lists, so that we can
@@ -583,4 +588,7 @@ void ConfigOutputWidget::openHelp()
     QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/Output+Configuration", QUrl::StrictMode) );
 }
 
-
+void ConfigOutputWidget::stopTests()
+{
+    m_config->channelOutTest->setChecked(false);
+}

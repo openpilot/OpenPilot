@@ -391,6 +391,8 @@ endif
 # OP has enough memory to always enable optional objects
 CFLAGS += -DDIAGNOSTICS
 
+CFLAGS += -DDIAGNOSTICSi -DUAVTALKBUS
+
 CFLAGS += -O$(OPT)
 CFLAGS += -mcpu=$(MCU)
 CFLAGS += $(CDEFS)

@@ -46,6 +46,7 @@
 #define MAX_RETRIES 2
 #define STATS_UPDATE_PERIOD_MS 4000
 #define CONNECTION_TIMEOUT_MS 8000
+#define LINK_MIN_GRACE_TIME 10
 
 // Private types
 
@@ -63,6 +64,9 @@ static void uavtalkbusTxTask(void *parameters);
 static void uavtalkbusRxTask(void *parameters);
 static int32_t transmitData(uint8_t * data, int32_t length);
 static void registerObject(UAVObjHandle obj);
+static int32_t addObject(UAVObjHandle obj);
+static void updateObject(UAVObjHandle obj,uint8_t onchange);
+static int32_t setUpdatePeriod(UAVObjHandle obj, int32_t updatePeriodMs);
 static void processObjEvent(UAVObjEvent * ev);
 
 /**
@@ -117,8 +121,67 @@ MODULE_INITCALL(UAVTalkBusInitialize, UAVTalkBusStart)
 static void registerObject(UAVObjHandle obj)
 {
 	// Setup object for periodic updates
-	UAVObjConnectQueue(obj, queue, EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ);
+	addObject(obj);
 
+	// Setup object for telemetry updates
+	updateObject(obj,1);
+}
+
+/**
+ * Setup object for periodic updates.
+ * \param[in] obj The object to update
+ * \return 0 Success
+ * \return -1 Failure
+ */
+static int32_t addObject(UAVObjHandle obj)
+{
+	UAVObjEvent ev;
+
+	// Add object for periodic updates
+	ev.obj = obj;
+	ev.instId = UAVOBJ_ALL_INSTANCES;
+	ev.event = EV_UPDATED_MANUAL;
+	return EventPeriodicQueueCreate(&ev, queue, 0);
+}
+
+/**
+ * Update object's queue connections and timer, depending on object's settings
+ * \param[in] obj Object to updates
+ */
+static void updateObject(UAVObjHandle obj,uint8_t onchange)
+{
+	int32_t eventMask;
+
+	if (onchange) {
+		// Set update period
+		setUpdatePeriod(obj, 0);
+		// Connect queue
+		eventMask = EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ;
+	} else {
+		// Set update period
+		setUpdatePeriod(obj, LINK_MIN_GRACE_TIME);
+		// Connect queue
+		eventMask = EV_UPDATED_MANUAL | EV_UPDATE_REQ;
+	}
+	UAVObjConnectQueue(obj, queue, eventMask);
+}
+
+/**
+ * Set update period of object (it must be already setup for periodic updates)
+ * \param[in] obj The object to update
+ * \param[in] updatePeriodMs The update period in ms, if zero then periodic updates are disabled
+ * \return 0 Success
+ * \return -1 Failure
+ */
+static int32_t setUpdatePeriod(UAVObjHandle obj, int32_t updatePeriodMs)
+{
+	UAVObjEvent ev;
+
+	// Add object for periodic updates
+	ev.obj = obj;
+	ev.instId = UAVOBJ_ALL_INSTANCES;
+	ev.event = EV_UPDATED_MANUAL;
+	return EventPeriodicQueueUpdate(&ev, queue, updatePeriodMs);
 }
 
 /**
@@ -139,10 +202,16 @@ static void processObjEvent(UAVObjEvent * ev)
 		ev->obj != TaskInfoHandle() &&
 		ev->obj != WatchdogStatusHandle()
 	   ) {
+
 		// Act on event
 		retries = 0;
 		success = -1;
 		if (ev->event == EV_UPDATED || ev->event == EV_UPDATED_MANUAL) {
+			if (ev->event == EV_UPDATED) {
+				updateObject(ev->obj,0);
+			} else {
+				updateObject(ev->obj,1);
+			}
 			// Send update to GCS (with retries)
 			while (retries < MAX_RETRIES && success == -1) {
 				success = UAVTalkSendObject(uavTalkCon, ev->obj, ev->instId, 0, REQ_TIMEOUT_MS);	// call blocks until ack is received or timeout

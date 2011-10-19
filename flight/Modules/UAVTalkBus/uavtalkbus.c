@@ -32,6 +32,10 @@
 
 #include "openpilot.h"
 #include "uavtalkbus.h"
+#include "gcstelemetrystats.h"
+#include "flighttelemetrystats.h"
+#include "systemstats.h"
+#include "watchdogstatus.h"
 
 // Private constants
 #define MAX_QUEUE_SIZE   TELEM_QUEUE_SIZE
@@ -125,7 +129,16 @@ static void processObjEvent(UAVObjEvent * ev)
 	int32_t retries;
 	int32_t success;
 
-	if (ev->obj != 0) {
+	// Some UAVObjects should not be synced since they would conflict.
+	if (
+		ev->obj &&
+		ev->obj != GCSTelemetryStatsHandle() &&
+		ev->obj != FlightTelemetryStatsHandle() &&
+		ev->obj != SystemStatsHandle() &&
+		ev->obj != SystemAlarmsHandle() &&
+		ev->obj != TaskInfoHandle() &&
+		ev->obj != WatchdogStatusHandle()
+	   ) {
 		// Act on event
 		retries = 0;
 		success = -1;

@@ -46,7 +46,7 @@
 #define MAX_RETRIES 2
 #define STATS_UPDATE_PERIOD_MS 4000
 #define CONNECTION_TIMEOUT_MS 8000
-#define LINK_MIN_GRACE_TIME 10
+#define LINK_MIN_GRACE_TIME 30
 
 // Private types
 
@@ -206,12 +206,9 @@ static void processObjEvent(UAVObjEvent * ev)
 		// Act on event
 		retries = 0;
 		success = -1;
-		if (ev->event == EV_UPDATED || ev->event == EV_UPDATED_MANUAL) {
-			if (ev->event == EV_UPDATED) {
-				updateObject(ev->obj,0);
-			} else {
-				updateObject(ev->obj,1);
-			}
+		if (ev->event == EV_UPDATED) {
+			updateObject(ev->obj,0);
+
 			// Send update to GCS (with retries)
 			while (retries < MAX_RETRIES && success == -1) {
 				success = UAVTalkSendObject(uavTalkCon, ev->obj, ev->instId, 0, REQ_TIMEOUT_MS);	// call blocks until ack is received or timeout
@@ -222,6 +219,8 @@ static void processObjEvent(UAVObjEvent * ev)
 			if (success == -1) {
 				++txErrors;
 			}
+		} else if (ev->event == EV_UPDATED_MANUAL) {
+			updateObject(ev->obj,1);
 		} else if (ev->event == EV_UPDATE_REQ) {
 			// Request object update from GCS (with retries)
 			while (retries < MAX_RETRIES && success == -1) {

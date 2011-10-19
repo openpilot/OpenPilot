@@ -79,10 +79,8 @@ static int32_t usbhid_send(usb_dev_handle *device, int32_t endpoint, void *buf, 
 	if (!endpoint) return -EINVAL;
 
 	int32_t ret=usb_interrupt_write(device, endpoint, (char *)buf, len, timeout);
-	if (ret>0) {
-		fprintf(stderr,">");
-	} else {
-		fprintf(stderr,"tr error %i\n",ret);
+	if (ret<0) {
+		fprintf(stderr,"usb tx error %i\n",ret);
 	}
 	return ret;
 }
@@ -94,10 +92,8 @@ static int32_t usbhid_receive(usb_dev_handle *device, int32_t endpoint, void *bu
 	if (!endpoint) return -EINVAL;
 
 	int32_t ret=usb_interrupt_read(device, endpoint, (char *)buf, len, timeout);
-	if (ret>=0) {
-		fprintf(stderr,"<");
-	} else {
-		fprintf(stderr,"rc error %i\n",ret);
+	if (ret<0 &&ret!=-ETIMEDOUT) {
+		fprintf(stderr,"usb rx error %i\n",ret);
 	}
 	return ret;
 }

@@ -198,7 +198,7 @@ static void processObjEvent(UAVObjEvent * ev)
 		ev->obj != GCSTelemetryStatsHandle() &&
 		ev->obj != FlightTelemetryStatsHandle() &&
 		ev->obj != SystemStatsHandle() &&
-		ev->obj != SystemAlarmsHandle() &&
+//		ev->obj != SystemAlarmsHandle() &&
 		ev->obj != TaskInfoHandle() &&
 		ev->obj != WatchdogStatusHandle()
 	   ) {

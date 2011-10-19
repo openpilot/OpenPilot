@@ -61,6 +61,7 @@
 #include <pios_irq.h>
 #include <pios_sdcard.h>
 #include <pios_udp.h>
+#include <pios_usb_hid.h>
 #include <pios_com.h>
 #include <pios_servo.h>
 #include <pios_wdg.h>

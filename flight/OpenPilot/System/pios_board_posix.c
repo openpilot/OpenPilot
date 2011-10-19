@@ -46,6 +46,16 @@ uint32_t pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE];
 
 #endif /* PIOS_INCLUDE_RCVR */
 
+#if defined(PIOS_INCLUDE_USB_HID)
+#include "pios_usb_hid_priv.h"
+
+static const struct pios_usb_hid_cfg pios_usb_hid_main_cfg = {
+  // which USB device (board) to connect to
+  .vendor = 0x20a0,
+  .product = 0x415a,
+};
+#endif	/* PIOS_INCLUDE_USB_HID */
+
 
 void Stack_Change() {
 }
@@ -117,12 +127,14 @@ uint8_t pios_udp_num_devices = NELEMENTS(pios_udp_devs);
  */
 extern const struct pios_com_driver pios_serial_com_driver;
 extern const struct pios_com_driver pios_udp_com_driver;
+extern const struct pios_com_driver pios_usb_com_driver;
 
-uint32_t pios_com_telem_rf_id;
-uint32_t pios_com_telem_usb_id;
-uint32_t pios_com_gps_id;
-uint32_t pios_com_aux_id;
-uint32_t pios_com_spectrum_id;
+uint32_t pios_com_telem_rf_id = 0;
+uint32_t pios_com_telem_usb_id = 0;
+uint32_t pios_com_link_usb_id = 0;
+uint32_t pios_com_gps_id = 0;
+uint32_t pios_com_aux_id = 0;
+uint32_t pios_com_spectrum_id = 0;
 
 /**
  * PIOS_Board_Init()
@@ -181,6 +193,23 @@ void PIOS_Board_Init(void) {
 	}
 #endif	/* PIOS_INCLUDE_GPS */
 #endif
+
+#if defined(PIOS_INCLUDE_USB_HID)
+	uint32_t pios_usb_hid_id;
+	PIOS_USB_HID_Init(&pios_usb_hid_id, &pios_usb_hid_main_cfg);
+#if defined(PIOS_INCLUDE_COM)
+
+	uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_RX_BUF_LEN);
+	uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_TX_BUF_LEN);
+	PIOS_Assert(rx_buffer);
+	PIOS_Assert(tx_buffer);
+	if (PIOS_COM_Init(&pios_com_link_usb_id, &pios_usb_com_driver, pios_usb_hid_id,
+			  rx_buffer, PIOS_COM_TELEM_RF_RX_BUF_LEN,
+			  tx_buffer, PIOS_COM_TELEM_RF_TX_BUF_LEN)) {
+		PIOS_Assert(0);
+	}
+#endif	/* PIOS_INCLUDE_COM */
+#endif	/* PIOS_INCLUDE_USB_HID */
 
 	// Initialize these here as posix has no AHRSComms
 	AttitudeRawInitialize();

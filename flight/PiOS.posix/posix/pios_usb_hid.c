@@ -99,65 +99,6 @@ static int32_t usbhid_receive(usb_dev_handle *device, int32_t endpoint, void *bu
 }
 
 /**
- * RxThread
- */
-void * PIOS_USB_RxThread(void * usb_dev_n)
-{
-
-	/* needed because of FreeRTOS.posix scheduling */
-	sigset_t set;
-	sigfillset(&set);
-	sigprocmask(SIG_BLOCK, &set, NULL);
-
-	pios_usb_dev * usb_dev = (pios_usb_dev*) usb_dev_n;
-
-	const struct timespec sleeptime = {
-		.tv_sec=0,
-		.tv_nsec=1000*100,
-	};
-
-	/**
-	* com devices never get closed except by application "reboot"
-	* we also never give up our mutex except for waiting
-	*/
-	while(1) {
-
-		/**
-		 * receive 
-		 */
-		int32_t received;
-		if ((received = usbhid_receive(usb_dev->device,
-				usb_dev->endpoint_in,
-				&usb_dev->rx_buffer,
-				PIOS_USB_RX_BUFFER_SIZE,
-				0)) >= 0)
-		{
-
-			/* copy received data to buffer if possible */
-			/* we do NOT buffer data locally. If the com buffer can't receive, data is discarded! */
-			/* (thats what the USART driver does too!) */
-			bool rx_need_yield = false;
-			if (usb_dev->rx_in_cb) {
-			  (void) (usb_dev->rx_in_cb)(usb_dev->rx_in_context, usb_dev->rx_buffer, received, NULL, &rx_need_yield);
-			}
-
-#if defined(PIOS_INCLUDE_FREERTOS)
-			if (rx_need_yield) {
-				vPortYieldFromISR();
-			}
-#endif	/* PIOS_INCLUDE_FREERTOS */
-
-		}
-		if (received <0 && received != -EINVAL && received != -ETIMEDOUT) {
-			usb_dev->device=NULL;
-		}
-		// delay if no device
-		if (!usb_dev->device) nanosleep(&sleeptime,NULL);
-	}
-}
-
-
-/**
 * Open USB socket
 */
 uint32_t usbhid_open(pios_usb_dev * usb_dev) {
@@ -172,7 +113,7 @@ uint32_t usbhid_open(pios_usb_dev * usb_dev) {
   usb_find_busses();
   usb_find_devices();
 
-  printf("opening USB device...\n");
+//  printf("opening USB device...\n");
   uint8_t claimed = 0;
   for (bus = usb_get_busses(); bus; bus = bus->next) {
 	for (dev = bus->devices; dev; dev = dev->next) {
@@ -265,12 +206,75 @@ uint32_t usbhid_open(pios_usb_dev * usb_dev) {
   }
 
   if (!claimed) {
-  	printf("NO USB device found!!!\n");
+//  	printf("NO USB device found!!!\n");
   	return -1;
   }
 
   return 0;
 }
+
+/**
+ * RxThread
+ */
+void * PIOS_USB_RxThread(void * usb_dev_n)
+{
+
+	/* needed because of FreeRTOS.posix scheduling */
+	sigset_t set;
+	sigfillset(&set);
+	sigprocmask(SIG_BLOCK, &set, NULL);
+
+	pios_usb_dev * usb_dev = (pios_usb_dev*) usb_dev_n;
+
+	const struct timespec sleeptime = {
+		.tv_sec=1,
+		.tv_nsec=0,
+	};
+
+	/**
+	* com devices never get closed except by application "reboot"
+	* we also never give up our mutex except for waiting
+	*/
+	while(1) {
+
+		/**
+		 * receive 
+		 */
+		int32_t received;
+		if ((received = usbhid_receive(usb_dev->device,
+				usb_dev->endpoint_in,
+				&usb_dev->rx_buffer,
+				PIOS_USB_RX_BUFFER_SIZE,
+				0)) >= 0)
+		{
+
+			/* copy received data to buffer if possible */
+			/* we do NOT buffer data locally. If the com buffer can't receive, data is discarded! */
+			/* (thats what the USART driver does too!) */
+			bool rx_need_yield = false;
+			if (usb_dev->rx_in_cb) {
+			  (void) (usb_dev->rx_in_cb)(usb_dev->rx_in_context, usb_dev->rx_buffer, received, NULL, &rx_need_yield);
+			}
+
+#if defined(PIOS_INCLUDE_FREERTOS)
+			if (rx_need_yield) {
+				vPortYieldFromISR();
+			}
+#endif	/* PIOS_INCLUDE_FREERTOS */
+
+		}
+		if (received <0 && received != -EINVAL && received != -ETIMEDOUT) {
+			usb_dev->device=NULL;
+		}
+		// delay if no device
+		if (!usb_dev->device) {
+			nanosleep(&sleeptime,NULL);
+  			usbhid_open(usb_dev);
+		}
+	}
+}
+
+
 
 /**
 * Init USB
@@ -287,8 +291,7 @@ int32_t PIOS_USB_HID_Init(uint32_t * usb_id, const struct pios_usb_hid_cfg * cfg
   usb_dev->rx_in_cb = NULL;
   usb_dev->tx_out_cb = NULL;
   usb_dev->cfg=cfg;
-
-  usbhid_open(usb_dev);
+  usb_dev->device = NULL;
 
   int res=0;
 
@@ -377,10 +380,7 @@ static void PIOS_USB_RegisterTxCallback(uint32_t usb_id, pios_com_callback tx_ou
 int32_t PIOS_USB_HID_CheckAvailable(uint8_t id) {
 	pios_usb_dev * usb_dev = find_usb_dev_by_id(id);
 	if (!usb_dev) return false;
-	if (!usb_dev->device) {
-  		usbhid_open(usb_dev);
-		if (!usb_dev->device) return false;
-	}
+	if (!usb_dev->device) return false;
 	return true;
 }
 

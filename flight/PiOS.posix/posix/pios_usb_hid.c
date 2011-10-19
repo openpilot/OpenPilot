@@ -33,6 +33,7 @@
 #if defined(PIOS_INCLUDE_USB_HID)
 
 #include <signal.h>
+#include <errno.h>
 #include <pios_usb_hid_priv.h>
 
 /* We need a list of USB devices */
@@ -73,35 +74,33 @@ static pios_usb_dev * find_usb_dev_by_id (uint8_t usb)
 
 static int32_t usbhid_send(usb_dev_handle *device, int32_t endpoint, void *buf, int32_t len, int32_t timeout)
 {
-    if (!buf) return -1;
-    if (!device) return -1;
-    if (!endpoint) return -1;
+	if (!buf) return -EINVAL;
+	if (!device) return -EINVAL;
+	if (!endpoint) return -EINVAL;
 
-    int32_t ret=usb_interrupt_write(device, endpoint, (char *)buf, len, timeout);
-    if (ret>0) {
-    	fprintf(stderr,">");
-    } else {
-    	fprintf(stderr,"tr error %i\n",ret);
-    }
-    return ret;
+	int32_t ret=usb_interrupt_write(device, endpoint, (char *)buf, len, timeout);
+	if (ret>0) {
+		fprintf(stderr,">");
+	} else {
+		fprintf(stderr,"tr error %i\n",ret);
+	}
+	return ret;
 }
 
 static int32_t usbhid_receive(usb_dev_handle *device, int32_t endpoint, void *buf, int32_t len, int32_t timeout)
 {
-	if (!buf) return -1;
-	if (!device) return -1;
-	if (!endpoint) return -1;
+	if (!buf) return -EINVAL;
+	if (!device) return -EINVAL;
+	if (!endpoint) return -EINVAL;
 
 	int32_t ret=usb_interrupt_read(device, endpoint, (char *)buf, len, timeout);
-    if (ret>0) {
-    	fprintf(stderr,"<");
-    } else {
-    	fprintf(stderr,"rc error %i\n",ret);
-    }
-    return ret;
+	if (ret>=0) {
+		fprintf(stderr,"<");
+	} else {
+		fprintf(stderr,"rc error %i\n",ret);
+	}
+	return ret;
 }
-
-
 
 /**
  * RxThread
@@ -116,6 +115,11 @@ void * PIOS_USB_RxThread(void * usb_dev_n)
 
 	pios_usb_dev * usb_dev = (pios_usb_dev*) usb_dev_n;
 
+	const struct timespec sleeptime = {
+		.tv_sec=0,
+		.tv_nsec=1000*100,
+	};
+
 	/**
 	* com devices never get closed except by application "reboot"
 	* we also never give up our mutex except for waiting
@@ -125,12 +129,12 @@ void * PIOS_USB_RxThread(void * usb_dev_n)
 		/**
 		 * receive 
 		 */
-		int received;
+		int32_t received;
 		if ((received = usbhid_receive(usb_dev->device,
 				usb_dev->endpoint_in,
 				&usb_dev->rx_buffer,
 				PIOS_USB_RX_BUFFER_SIZE,
-				100)) >= 0)
+				0)) >= 0)
 		{
 
 			/* copy received data to buffer if possible */
@@ -148,8 +152,11 @@ void * PIOS_USB_RxThread(void * usb_dev_n)
 #endif	/* PIOS_INCLUDE_FREERTOS */
 
 		}
-
-
+		if (received <0 && received != -EINVAL && received != -ETIMEDOUT) {
+			usb_dev->device=NULL;
+		}
+		// delay if no device
+		if (!usb_dev->device) nanosleep(&sleeptime,NULL);
 	}
 }
 
@@ -157,19 +164,7 @@ void * PIOS_USB_RxThread(void * usb_dev_n)
 /**
 * Open USB socket
 */
-int32_t PIOS_USB_HID_Init(uint32_t * usb_id, const struct pios_usb_hid_cfg * cfg)
-{
-
-  pios_usb_dev * usb_dev = &pios_usb_devices[pios_usb_num_devices];
-
-  pios_usb_num_devices++;
-
-
-  /* initialize */
-  usb_dev->rx_in_cb = NULL;
-  usb_dev->tx_out_cb = NULL;
-  usb_dev->cfg=cfg;
-
+uint32_t usbhid_open(pios_usb_dev * usb_dev) {
   /* find and open USB device */
   struct usb_bus *bus;
   struct usb_device *dev;
@@ -185,8 +180,8 @@ int32_t PIOS_USB_HID_Init(uint32_t * usb_id, const struct pios_usb_hid_cfg * cfg
   uint8_t claimed = 0;
   for (bus = usb_get_busses(); bus; bus = bus->next) {
 	for (dev = bus->devices; dev; dev = dev->next) {
-		if (dev->descriptor.idVendor != cfg->vendor) continue;
-		if (dev->descriptor.idProduct != cfg->product) continue;
+		if (dev->descriptor.idVendor != usb_dev->cfg->vendor) continue;
+		if (dev->descriptor.idProduct != usb_dev->cfg->product) continue;
 		if (!dev->config) continue;
 		if (dev->config->bNumInterfaces < 1) continue;
 		printf("USB: found device: vid=%04X, pic=%04X, with %d interfaces\n",
@@ -278,12 +273,33 @@ int32_t PIOS_USB_HID_Init(uint32_t * usb_id, const struct pios_usb_hid_cfg * cfg
   	return -1;
   }
 
+  return 0;
+}
+
+/**
+* Init USB
+*/
+int32_t PIOS_USB_HID_Init(uint32_t * usb_id, const struct pios_usb_hid_cfg * cfg)
+{
+
+  pios_usb_dev * usb_dev = &pios_usb_devices[pios_usb_num_devices];
+
+  pios_usb_num_devices++;
+
+
+  /* initialize */
+  usb_dev->rx_in_cb = NULL;
+  usb_dev->tx_out_cb = NULL;
+  usb_dev->cfg=cfg;
+
+  usbhid_open(usb_dev);
+
   int res=0;
 
   /* Create transmit thread for this connection */
   pthread_create(&usb_dev->rxThread, NULL, PIOS_USB_RxThread, (void*)usb_dev);
 
-  printf("USB dev %i opened :)\n",pios_usb_num_devices-1);
+  printf("USB dev %i opened...\n",pios_usb_num_devices-1);
 
   *usb_id = pios_usb_num_devices-1;
 
@@ -323,6 +339,10 @@ static void PIOS_USB_TxStart(uint32_t usb_id, uint16_t tx_bytes_avail)
 				} else {
 					rem -= len;
 				}
+				if (len <0 && len != -EINVAL && len != -ETIMEDOUT) {
+					usb_dev->device=NULL;
+					return;
+				}
 			}
 			tx_bytes_avail -= length;
 		}
@@ -361,6 +381,10 @@ static void PIOS_USB_RegisterTxCallback(uint32_t usb_id, pios_com_callback tx_ou
 int32_t PIOS_USB_HID_CheckAvailable(uint8_t id) {
 	pios_usb_dev * usb_dev = find_usb_dev_by_id(id);
 	if (!usb_dev) return false;
+	if (!usb_dev->device) {
+  		usbhid_open(usb_dev);
+		if (!usb_dev->device) return false;
+	}
 	return true;
 }
 

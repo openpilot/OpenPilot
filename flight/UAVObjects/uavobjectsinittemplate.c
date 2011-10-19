@@ -36,7 +36,5 @@ $(OBJINC)
  */
 void UAVObjectsInitializeAll()
 {
-return;
-// This function is no longer used anyway
 $(OBJINIT)
 }

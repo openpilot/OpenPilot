@@ -1059,11 +1059,12 @@ static const struct pios_usb_hid_cfg pios_usb_hid_main_cfg = {
 
 extern const struct pios_com_driver pios_usb_com_driver;
 
-uint32_t pios_com_telem_rf_id;
-uint32_t pios_com_telem_usb_id;
-uint32_t pios_com_gps_id;
-uint32_t pios_com_aux_id;
-uint32_t pios_com_spektrum_id;
+uint32_t pios_com_telem_rf_id = 0;
+uint32_t pios_com_telem_usb_id = 0;
+uint32_t pios_com_link_usb_id = 0;
+uint32_t pios_com_gps_id = 0;
+uint32_t pios_com_aux_id = 0;
+uint32_t pios_com_spektrum_id = 0;
 
 #include "ahrs_spi_comm.h"
 
@@ -1259,14 +1260,30 @@ void PIOS_Board_Init(void) {
 	uint32_t pios_usb_hid_id;
 	PIOS_USB_HID_Init(&pios_usb_hid_id, &pios_usb_hid_main_cfg);
 #if defined(PIOS_INCLUDE_COM)
-	uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_USB_RX_BUF_LEN);
-	uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_USB_TX_BUF_LEN);
-	PIOS_Assert(rx_buffer);
-	PIOS_Assert(tx_buffer);
-	if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_com_driver, pios_usb_hid_id,
-			  rx_buffer, PIOS_COM_TELEM_USB_RX_BUF_LEN,
-			  tx_buffer, PIOS_COM_TELEM_USB_TX_BUF_LEN)) {
-		PIOS_Assert(0);
+
+	/* Configure the usb IO port */
+	uint8_t hwsettings_op_usbport;
+	HwSettingsOP_USBPortGet(&hwsettings_op_usbport);
+
+	uint32_t * used_usb_link = &pios_com_link_usb_id;
+
+	switch (hwsettings_op_usbport) {
+	case HWSETTINGS_OP_USBPORT_DISABLED:
+		break;
+	case HWSETTINGS_OP_USBPORT_TELEMETRY:
+		used_usb_link = &pios_com_telem_usb_id;
+	case HWSETTINGS_OP_USBPORT_DATALINK:
+		{
+			uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_USB_RX_BUF_LEN);
+			uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_USB_TX_BUF_LEN);
+			PIOS_Assert(rx_buffer);
+			PIOS_Assert(tx_buffer);
+			if (PIOS_COM_Init(used_usb_link, &pios_usb_com_driver, pios_usb_hid_id,
+					  rx_buffer, PIOS_COM_TELEM_USB_RX_BUF_LEN,
+					  tx_buffer, PIOS_COM_TELEM_USB_TX_BUF_LEN)) {
+				PIOS_Assert(0);
+			}
+		}
 	}
 #endif	/* PIOS_INCLUDE_COM */
 #endif	/* PIOS_INCLUDE_USB_HID */

@@ -182,9 +182,9 @@ static void uavtalkbusRxTask(void *parameters)
 	// Task loop
 	while (1) {
 		// Determine input port (USB takes priority over uavtalkbus port)
-#if defined(PIOS_INCLUDE_USB_HID) && defined(UAVTALKBUS)
-		if (PIOS_USB_HID_CheckAvailable(0)) {
-			inputPort = PIOS_COM_TELEM_USB;
+#if defined(PIOS_INCLUDE_USB_HID)
+		if (PIOS_USB_HID_CheckAvailable(0) && PIOS_COM_LINK_USB) {
+			inputPort = PIOS_COM_LINK_USB;
 		} else
 #endif
 		{
@@ -219,9 +219,9 @@ static int32_t transmitData(uint8_t * data, int32_t length)
 	uint32_t outputPort;
 
 	// Determine input port (USB takes priority over uavtalkbus port)
-#if defined(PIOS_INCLUDE_USB_HID) && defined(UAVTALKBUS)
-	if (PIOS_USB_HID_CheckAvailable(0)) {
-		outputPort = PIOS_COM_TELEM_USB;
+#if defined(PIOS_INCLUDE_USB_HID)
+	if (PIOS_USB_HID_CheckAvailable(0) && PIOS_COM_LINK_USB) {
+		outputPort = PIOS_COM_LINK_USB;
 	} else
 #endif
 	{

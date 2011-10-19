@@ -7,6 +7,7 @@
 
 		<field name="OP_FlexiPort" units="function" type="enum" elements="1" options="Disabled,GPS" defaultvalue="GPS"/>
 		<field name="OP_MainPort" units="function" type="enum" elements="1" options="Disabled,Telemetry" defaultvalue="Telemetry"/>
+		<field name="OP_USBPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,DataLink" defaultvalue="Telemetry"/>
 		<field name="OP_RcvrPort" units="function" type="enum" elements="1" options="Disabled,Debug,Spektrum1,PWM,PPM" defaultvalue="PWM"/>
 
 		<field name="OptionalModules" units="" type="enum" elementnames="CameraStabilization,GPS" options="Disabled,Enabled" defaultvalue="Disabled"/>

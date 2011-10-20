@@ -85,9 +85,8 @@ int32_t UAVTalkBusStart(void)
 	// Start uavtalkbus tasks
 	xTaskCreate(uavtalkbusTxTask, (signed char *)"BusTx", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY_TX, &uavtalkbusTxTaskHandle);
 	xTaskCreate(uavtalkbusRxTask, (signed char *)"BusRx", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY_RX, &uavtalkbusRxTaskHandle);
-	// no monitoring...
-	//TaskMonitorAdd(TASKINFO_RUNNING_UAVTALKBUSTX, uavtalkbusTxTaskHandle);
-	//TaskMonitorAdd(TASKINFO_RUNNING_UAVTALKBUSRX, uavtalkbusRxTaskHandle);
+	TaskMonitorAdd(TASKINFO_RUNNING_UAVTALKBUSTX, uavtalkbusTxTaskHandle);
+	TaskMonitorAdd(TASKINFO_RUNNING_UAVTALKBUSRX, uavtalkbusRxTaskHandle);
 
 	return 0;
 }

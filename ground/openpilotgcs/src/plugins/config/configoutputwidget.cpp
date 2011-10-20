@@ -39,6 +39,7 @@
 #include <QDesktopServices>
 #include <QUrl>
 #include "actuatorcommand.h"
+#include "systemalarms.h"
 
 ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
@@ -202,6 +203,22 @@ void ConfigOutputWidget::linkToggled(bool state)
   */
 void ConfigOutputWidget::runChannelTests(bool state)
 {
+    SystemAlarms * systemAlarmsObj = SystemAlarms::GetInstance(getObjectManager());
+    SystemAlarms::DataFields systemAlarms = systemAlarmsObj->getData();
+
+    if(state && systemAlarms.Alarm[SystemAlarms::ALARM_ACTUATOR] != SystemAlarms::ALARM_OK) {
+        QMessageBox mbox;
+        mbox.setText(QString(tr("The actuator module is in an error state.  This can also occur because there are no inputs.  Please fix these before testing outputs.")));
+        mbox.setStandardButtons(QMessageBox::Ok);
+        mbox.exec();
+
+        // Unfortunately must cache this since callback will reoccur
+        accInitialData = ActuatorCommand::GetInstance(getObjectManager())->getMetadata();
+
+        m_config->channelOutTest->setChecked(false);
+        return;
+    }
+
     // Confirm this is definitely what they want
     if(state) {
         QMessageBox mbox;
@@ -216,11 +233,7 @@ void ConfigOutputWidget::runChannelTests(bool state)
         }
     }
 
-    qDebug() << "Running with state " << state;
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorCommand")));
+    ActuatorCommand * obj = ActuatorCommand::GetInstance(getObjectManager());
     UAVObject::Metadata mdata = obj->getMetadata();
     if (state)
     {

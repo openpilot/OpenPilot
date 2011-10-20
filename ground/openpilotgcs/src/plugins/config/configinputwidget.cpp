@@ -631,12 +631,16 @@ void ConfigInputWidget::setChannel(int newChan)
         m_config->wzText->setText(QString(tr("Please move each control once at a time according to the instructions and picture below.\n\n"
                                  "Move the %1 stick")).arg(manualSettingsObj->getField("ChannelGroups")->getElementNames().at(newChan)));
 
-    if(manualSettingsObj->getField("ChannelGroups")->getElementNames().at(newChan).contains("Accessory"))
+    if(manualSettingsObj->getField("ChannelGroups")->getElementNames().at(newChan).contains("Accessory")) {
         m_config->wzNext->setEnabled(true);
+        m_config->wzText->setText(m_config->wzText->text() + tr(" or click next to skip this channel."));
+    } else
+        m_config->wzNext->setEnabled(false);
 
     setMoveFromCommand(newChan);
 
     currentChannelNum = newChan;
+    channelDetected = false;
 }
 
 /**
@@ -689,6 +693,8 @@ void ConfigInputWidget::identifyControls()
     receiverActivityData=receiverActivityObj->getData();
     if(receiverActivityData.ActiveChannel==255)
         return;
+    if(channelDetected)
+        return;
     else
     {
         receiverActivityData=receiverActivityObj->getData();
@@ -700,6 +706,7 @@ void ConfigInputWidget::identifyControls()
         lastChannel.number=currentChannel.number;
         if(!usedChannels.contains(lastChannel) && debounce>1)
         {
+            channelDetected = true;
             debounce=0;
             usedChannels.append(lastChannel);
             manualSettingsData=manualSettingsObj->getData();
@@ -714,7 +721,7 @@ void ConfigInputWidget::identifyControls()
     m_config->wzText->clear();
     setTxMovement(nothing);
 
-    QTimer::singleShot(300, this, SLOT(wzNext()));
+    QTimer::singleShot(500, this, SLOT(wzNext()));
 }
 
 void ConfigInputWidget::identifyLimits()

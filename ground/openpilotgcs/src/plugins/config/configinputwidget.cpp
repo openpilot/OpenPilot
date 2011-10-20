@@ -1157,6 +1157,8 @@ void ConfigInputWidget::updateCalibration()
 void ConfigInputWidget::simpleCalibration(bool enable)
 {
     if (enable) {
+        m_config->configurationWizard->setEnabled(false);
+
         QMessageBox msgBox;
         msgBox.setText(tr("Arming Settings are now set to Always Disarmed for your safety."));
         msgBox.setDetailedText(tr("You will have to reconfigure arming settings yourself afterwards."));
@@ -1181,6 +1183,8 @@ void ConfigInputWidget::simpleCalibration(bool enable)
 
         connect(manualCommandObj, SIGNAL(objectUnpacked(UAVObject*)), this, SLOT(updateCalibration()));
     } else {
+        m_config->configurationWizard->setEnabled(true);
+
         manualCommandData = manualCommandObj->getData();
         manualSettingsData = manualSettingsObj->getData();
 

@@ -288,6 +288,12 @@ void ConfigOutputWidget::assignOutputChannel(UAVDataObject *obj, QString str)
     case 7:
         m_config->ch7Output->setText(str);
         break;
+    case 8:
+        m_config->ch8Output->setText(str);
+        break;
+    case 9:
+        m_config->ch9Output->setText(str);
+        break;
     }
 }
 

@@ -48,7 +48,7 @@ static void updateAck(UAVTalkConnectionData *connection, UAVObjHandle obj, uint1
  * \return 0 Success
  * \return -1 Failure
  */
-UAVTalkConnection UAVTalkInitialize(UAVTalkOutputStream outputStream, uint32_t maxPacketSize)
+UAVTalkConnection UAVTalkInitialize(UAVTalkOutputStream outputStream, uint32_t maxPacketSize, UAVObjEventType unpackevent)
 {
 	if (maxPacketSize<1) return 0;
 	// allocate object
@@ -61,6 +61,7 @@ UAVTalkConnection UAVTalkInitialize(UAVTalkOutputStream outputStream, uint32_t m
 	connection->lock = xSemaphoreCreateRecursiveMutex();
 	connection->transLock = xSemaphoreCreateRecursiveMutex();
 	connection->txSize = maxPacketSize;
+	connection->unpackevent = unpackevent;
 	// allocate buffers
 	connection->rxBuffer = pvPortMalloc(UAVTALK_MAX_PACKET_LENGTH);
 	if (!connection->rxBuffer) return 0;
@@ -493,7 +494,7 @@ static int32_t receiveObject(UAVTalkConnectionData *connection, uint8_t type, ui
 			if (instId != UAVOBJ_ALL_INSTANCES)
 			{
 				// Unpack object, if the instance does not exist it will be created!
-				UAVObjUnpack(obj, instId, data);
+				UAVObjUnpack(obj, instId, data, connection->unpackevent);
 				// Check if an ack is pending
 				updateAck(connection, obj, instId);
 			}
@@ -507,7 +508,7 @@ static int32_t receiveObject(UAVTalkConnectionData *connection, uint8_t type, ui
 			if (instId != UAVOBJ_ALL_INSTANCES)
 			{
 				// Unpack object, if the instance does not exist it will be created!
-				if ( UAVObjUnpack(obj, instId, data) == 0 )
+				if ( UAVObjUnpack(obj, instId, data, connection->unpackevent) == 0 )
 				{
 					// Transmit ACK
 					sendObject(connection, obj, instId, UAVTALK_TYPE_ACK);

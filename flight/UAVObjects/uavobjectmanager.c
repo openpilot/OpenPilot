@@ -434,7 +434,7 @@ int32_t UAVObjIsSettings(UAVObjHandle obj)
  * \return 0 if success or -1 if failure
  */
 int32_t UAVObjUnpack(UAVObjHandle obj, uint16_t instId,
-		     const uint8_t * dataIn)
+		     const uint8_t * dataIn, UAVObjEventType unpackevent)
 {
 	  ObjectList *objEntry;
 	  ObjectInstList *instEntry;
@@ -461,7 +461,7 @@ int32_t UAVObjUnpack(UAVObjHandle obj, uint16_t instId,
 	  memcpy(instEntry->data, dataIn, objEntry->numBytes);
 
 	  // Fire event
-	  sendEvent(objEntry, instId, EV_UNPACKED);
+	  sendEvent(objEntry, instId, unpackevent);
 
 	  // Unlock
 	  xSemaphoreGiveRecursive(mutex);

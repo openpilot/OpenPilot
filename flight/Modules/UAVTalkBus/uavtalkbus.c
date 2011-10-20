@@ -47,6 +47,7 @@
 #define STATS_UPDATE_PERIOD_MS 4000
 #define CONNECTION_TIMEOUT_MS 8000
 #define LINK_MIN_GRACE_TIME 30
+#define LINK_MAX_REFRESH_TIME 5000
 
 // Private types
 
@@ -102,7 +103,7 @@ int32_t UAVTalkBusInitialize(void)
 	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
 
 	// Initialise UAVTalk
-	uavTalkCon = UAVTalkInitialize(&transmitData,256);
+	uavTalkCon = UAVTalkInitialize(&transmitData,256,EV_SYNCED);
     
 	// Create periodic event that will be used to update the uavtalkbus stats
 	txErrors = 0;
@@ -140,6 +141,13 @@ static int32_t addObject(UAVObjHandle obj)
 	// Add object for periodic updates
 	ev.obj = obj;
 	ev.instId = UAVOBJ_ALL_INSTANCES;
+
+	// force an UPDATED event every MAX_REFRESH_TIME milliseconds to sync
+	// missed updates of rarely updating objects
+	//ev.event = EV_UPDATED;
+	//EventPeriodicQueueCreate(&ev, queue, LINK_MAX_REFRESH_TIME);
+
+	// this is the event for our normal UPDATED_MANUAL grace wait time
 	ev.event = EV_UPDATED_MANUAL;
 	return EventPeriodicQueueCreate(&ev, queue, 0);
 }
@@ -156,11 +164,13 @@ static void updateObject(UAVObjHandle obj,uint8_t onchange)
 		// Set update period
 		setUpdatePeriod(obj, 0);
 		// Connect queue
-		eventMask = EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ;
+		// we react to all events except EV_SYNCED which is our own events
+		eventMask =  EV_UNPACKED | EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ;
 	} else {
 		// Set update period
 		setUpdatePeriod(obj, LINK_MIN_GRACE_TIME);
 		// Connect queue
+		// we react only to manual (timer) updates and update requests
 		eventMask = EV_UPDATED_MANUAL | EV_UPDATE_REQ;
 	}
 	UAVObjConnectQueue(obj, queue, eventMask);
@@ -206,7 +216,7 @@ static void processObjEvent(UAVObjEvent * ev)
 		// Act on event
 		retries = 0;
 		success = -1;
-		if (ev->event == EV_UPDATED) {
+		if (ev->event == EV_UPDATED || ev->event == EV_UNPACKED) {
 			updateObject(ev->obj,0);
 
 			// Send update to GCS (with retries)

@@ -136,7 +136,7 @@ int32_t TelemetryInitialize(void)
 	updateSettings();
     
 	// Initialise UAVTalk
-	uavTalkCon = UAVTalkInitialize(&transmitData,256);
+	uavTalkCon = UAVTalkInitialize(&transmitData,256,EV_UNPACKED);
     
 	// Create periodic event that will be used to update the telemetry stats
 	txErrors = 0;
@@ -190,7 +190,7 @@ static void updateObject(UAVObjHandle obj)
 		// Set update period
 		setUpdatePeriod(obj, 0);
 		// Connect queue
-		eventMask = EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ;
+		eventMask = EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ | EV_SYNCED;
 		if (UAVObjIsMetaobject(obj)) {
 			eventMask |= EV_UNPACKED;	// we also need to act on remote updates (unpack events)
 		}
@@ -237,7 +237,7 @@ static void processObjEvent(UAVObjEvent * ev)
 			// Act on event
 			retries = 0;
 			success = -1;
-			if (ev->event == EV_UPDATED || ev->event == EV_UPDATED_MANUAL) {
+			if ( ev->event == EV_UPDATED || ev->event == EV_UPDATED_MANUAL || ev->event == EV_SYNCED ) {
 				// Send update to GCS (with retries)
 				while (retries < MAX_RETRIES && success == -1) {
 					success = UAVTalkSendObject(uavTalkCon, ev->obj, ev->instId, metadata.telemetryAcked, REQ_TIMEOUT_MS);	// call blocks until ack is received or timeout

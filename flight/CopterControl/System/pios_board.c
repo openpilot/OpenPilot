@@ -487,19 +487,7 @@ static const struct pios_tim_channel pios_tim_servoport_rcvrport_pins[] = {
 	},
 
 	// Receiver port pins
-	{
-		.timer = TIM3,
-		.timer_chan = TIM_Channel_2,
-		.pin = {
-			.gpio = GPIOB,
-			.init = {
-				.GPIO_Pin   = GPIO_Pin_5,
-				.GPIO_Mode  = GPIO_Mode_IPD,
-				.GPIO_Speed = GPIO_Speed_2MHz,
-			},
-		},
-		.remap = GPIO_PartialRemap_TIM3,
-	},
+	// S3-S6 inputs are used as outputs in this case
 	{
 		.timer = TIM3,
 		.timer_chan = TIM_Channel_3,
@@ -507,7 +495,7 @@ static const struct pios_tim_channel pios_tim_servoport_rcvrport_pins[] = {
 			.gpio = GPIOB,
 			.init = {
 				.GPIO_Pin   = GPIO_Pin_0,
-				.GPIO_Mode  = GPIO_Mode_IPD,
+				.GPIO_Mode  = GPIO_Mode_AF_PP,
 				.GPIO_Speed = GPIO_Speed_2MHz,
 			},
 		},
@@ -519,7 +507,7 @@ static const struct pios_tim_channel pios_tim_servoport_rcvrport_pins[] = {
 			.gpio = GPIOB,
 			.init = {
 				.GPIO_Pin   = GPIO_Pin_1,
-				.GPIO_Mode  = GPIO_Mode_IPD,
+				.GPIO_Mode  = GPIO_Mode_AF_PP,
 				.GPIO_Speed = GPIO_Speed_2MHz,
 			},
 		},
@@ -531,7 +519,7 @@ static const struct pios_tim_channel pios_tim_servoport_rcvrport_pins[] = {
 			.gpio = GPIOA,
 			.init = {
 				.GPIO_Pin   = GPIO_Pin_0,
-				.GPIO_Mode  = GPIO_Mode_IPD,
+				.GPIO_Mode  = GPIO_Mode_AF_PP,
 				.GPIO_Speed = GPIO_Speed_2MHz,
 			},
 		},
@@ -543,7 +531,7 @@ static const struct pios_tim_channel pios_tim_servoport_rcvrport_pins[] = {
 			.gpio = GPIOA,
 			.init = {
 				.GPIO_Pin   = GPIO_Pin_1,
-				.GPIO_Mode  = GPIO_Mode_IPD,
+				.GPIO_Mode  = GPIO_Mode_AF_PP,
 				.GPIO_Speed = GPIO_Speed_2MHz,
 			},
 		},

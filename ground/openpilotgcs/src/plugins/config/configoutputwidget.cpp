@@ -252,6 +252,9 @@ void ConfigOutputWidget::runChannelTests(bool state)
         foreach (QSpinBox* box, outMax) {
             box->setEnabled(false);
         }
+        foreach (QCheckBox* box, reversals) {
+            box->setEnabled(false);
+        }
 
     }
     else
@@ -261,6 +264,9 @@ void ConfigOutputWidget::runChannelTests(bool state)
             box->setEnabled(true);
         }
         foreach (QSpinBox* box, outMax) {
+            box->setEnabled(true);
+        }
+        foreach (QCheckBox* box, reversals) {
             box->setEnabled(true);
         }
 

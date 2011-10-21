@@ -34,6 +34,7 @@
 #define PIOS_CONFIG_H
 
 #define MOVECOPTER
+#define PIOS_INCLUDE_MARG_MAHONY
 
 /* Enable/Disable PiOS Modules */
 #define PIOS_INCLUDE_ADC

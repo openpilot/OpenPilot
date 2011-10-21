@@ -351,9 +351,15 @@ int32_t UAVTalkProcessInputStream(UAVTalkConnection connectionHandle, uint8_t rx
 			
 			// Determine data length
 			if (iproc->type == UAVTALK_TYPE_OBJ_REQ || iproc->type == UAVTALK_TYPE_ACK || iproc->type == UAVTALK_TYPE_NACK)
+			{
 				iproc->length = 0;
+				iproc->instanceLength = 0;
+			}
 			else
+			{
 				iproc->length = UAVObjGetNumBytes(iproc->obj);
+				iproc->instanceLength = (UAVObjIsSingleInstance(iproc->obj) ? 0 : 2);
+			}
 			
 			// Check length and determine next state
 			if (iproc->length >= UAVTALK_MAX_PAYLOAD_LENGTH)
@@ -364,7 +370,7 @@ int32_t UAVTalkProcessInputStream(UAVTalkConnection connectionHandle, uint8_t rx
 			}
 			
 			// Check the lengths match
-			if ((iproc->rxPacketLength + iproc->length) != iproc->packet_size)
+			if ((iproc->rxPacketLength + iproc->instanceLength + iproc->length) != iproc->packet_size)
 			{   // packet error - mismatched packet size
 				connection->stats.rxErrors++;
 				iproc->state = UAVTALK_STATE_SYNC;

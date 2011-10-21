@@ -589,7 +589,6 @@ static const struct pios_spektrum_cfg pios_spektrum_cfg = {
 			.GPIO_Mode  = GPIO_Mode_Out_PP,
 		},
 	},
-	.remap = 0,
 };
 
 #endif	/* PIOS_COM_SPEKTRUM */
@@ -1213,7 +1212,7 @@ void PIOS_Board_Init(void) {
 			}
 
 			uint32_t pios_spektrum_id;
-			if (PIOS_SPEKTRUM_Init(&pios_spektrum_id, &pios_spektrum_cfg, &pios_usart_com_driver, pios_usart_spektrum_id, false)) {
+			if (PIOS_Spektrum_Init(&pios_spektrum_id, &pios_spektrum_cfg, &pios_usart_com_driver, pios_usart_spektrum_id, false)) {
 				PIOS_Assert(0);
 			}
 

@@ -2,13 +2,12 @@
  ******************************************************************************
  * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
- * @addtogroup   PIOS_SPEKTRUM Spektrum receiver functions
+ * @addtogroup PIOS_Spektrum Spektrum/JR DSMx satellite receiver functions
  * @{
  *
- * @file       pios_spektrum.h  
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * 	       Parts by Thorsten Klose (tk@midibox.org)
- * @brief      Spektrum satellite functions header.
+ * @file       pios_spektrum.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2011.
+ * @brief      Spektrum/JR DSMx satellite receiver functions header.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -38,6 +37,6 @@
 #endif /* PIOS_SPEKTRUM_H */
 
 /**
-  * @}
-  * @}
-  */
+ * @}
+ * @}
+ */

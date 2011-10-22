@@ -48,7 +48,7 @@ ENABLE_DEBUG_PINS ?= NO
 # Set to Yes to enable the AUX UART which is mapped on the S1 (Tx) and S2 (Rx) servo outputs
 ENABLE_AUX_UART ?= NO
 
-USE_GPS ?= NO
+USE_GPS ?= YES
 
 USE_I2C ?= NO
 
@@ -65,8 +65,11 @@ endif
 FLASH_TOOL = OPENOCD
 
 # List of modules to include
-OPTMODULES  = CameraStab
+OPTMODULES = CameraStab
+ifeq ($(USE_GPS), YES)
 OPTMODULES += GPS
+endif
+
 MODULES = Attitude Stabilization Actuator ManualControl FirmwareIAP
 # Telemetry must be last to grab the optional modules (why?)
 MODULES += Telemetry

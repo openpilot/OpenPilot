@@ -1,5 +1,12 @@
 Short summary of changes.  For a complete list see the git log.
 
+2011-10-11
+Fix for the Mac telemetry rates and specifically how long enumeration took.
+
+2011-10-08
+Make the flash chip need to be have bad magic for a full second before erasing
+settings.  Should avoid random lost settings.
+
 2011-09-12
 Max rate now ONLY applies to attitude and axis lock mode.  Manual rate is the
 only term that limits the rate mode now (and in axis lock when you push stick
@@ -56,3 +63,4 @@ selected from ManualControlSettings.InputMode and the aircraft must be rebooted
 after changing this.  Also for CopterControl the HwSettings object must
 indicate which modules are connected to which ports.  PPM currently not
 working.
+

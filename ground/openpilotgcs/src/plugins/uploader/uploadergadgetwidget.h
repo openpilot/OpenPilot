@@ -85,6 +85,7 @@ private:
      QLineEdit* openFileNameLE;
      QEventLoop m_eventloop;
 private slots:
+    void onPhisicalHWConnect();
     void error(QString errorString,int errorNumber);
     void info(QString infoString,int infoNumber);
     void goToBootloader(UAVObject* = NULL, bool = false);

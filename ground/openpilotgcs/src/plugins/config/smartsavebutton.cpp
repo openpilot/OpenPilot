@@ -49,7 +49,7 @@ void smartSaveButton::processClick()
         }
         if(up_result==false)
         {
-            //qDebug()<<"Object upload error:"<<obj->getName();
+            qDebug()<<"Object upload error:"<<obj->getName();
             error=true;
             continue;
         }
@@ -59,7 +59,7 @@ void smartSaveButton::processClick()
         {
             for(int i=0;i<3;++i)
             {
-                //qDebug()<<"try to save:"<<obj->getName();
+                qDebug()<<"try to save:"<<obj->getName();
                 connect(utilMngr,SIGNAL(saveCompleted(int,bool)),this,SLOT(saving_finished(int,bool)));
                 connect(&timer,SIGNAL(timeout()),&loop,SLOT(quit()));
                 utilMngr->saveObjectToSD(obj);
@@ -73,6 +73,7 @@ void smartSaveButton::processClick()
             }
             if(sv_result==false)
             {
+                qDebug()<<"failed to save:"<<obj->getName();
                 error=true;
             }
         }

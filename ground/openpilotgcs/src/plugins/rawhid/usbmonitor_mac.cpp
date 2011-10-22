@@ -117,7 +117,7 @@ void USBMonitor::removeDevice(IOHIDDeviceRef dev) {
   */
 void USBMonitor::detach_callback(void *context, IOReturn r, void *hid_mgr, IOHIDDeviceRef dev)
 {
-
+    qDebug() << "USBMonitor: Device detached event";
     instance()->removeDevice(dev);
 }
 
@@ -136,6 +136,8 @@ void USBMonitor::attach_callback(void *context, IOReturn r, void *hid_mgr, IOHID
 
     deviceInfo.dev_handle = dev;
 
+    qDebug() << "USBMonitor: Device attached event";
+
     // Populate the device info structure
     got_properties &= HID_GetIntProperty(dev, CFSTR( kIOHIDVendorIDKey ), &deviceInfo.vendorID);
     got_properties &= HID_GetIntProperty(dev, CFSTR( kIOHIDProductIDKey ), &deviceInfo.productID);
@@ -149,6 +151,7 @@ void USBMonitor::attach_callback(void *context, IOReturn r, void *hid_mgr, IOHID
 
     // Currently only enumerating objects that have the complete list of properties
     if(got_properties) {
+        qDebug() << "USBMonitor: Adding device";
         instance()->addDevice(deviceInfo);
     }
 }

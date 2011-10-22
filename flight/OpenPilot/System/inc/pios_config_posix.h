@@ -64,6 +64,14 @@
 /* Stabilization options */
 #define PIOS_QUATERNION_STABILIZATION
 
+/* Alarm Thresholds */
+#define HEAP_LIMIT_WARNING		4000
+#define HEAP_LIMIT_CRITICAL		1000
+#define IRQSTACK_LIMIT_WARNING		150
+#define IRQSTACK_LIMIT_CRITICAL		80
+#define CPULOAD_LIMIT_WARNING		80
+#define CPULOAD_LIMIT_CRITICAL		95
+
 /* GPS options */
 #define PIOS_GPS_SETS_HOMELOCATION
 

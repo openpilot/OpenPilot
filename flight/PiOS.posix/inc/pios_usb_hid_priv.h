@@ -47,6 +47,7 @@ struct pios_usb_hid_cfg {
 typedef struct {
   const struct pios_usb_hid_cfg * cfg;
   pthread_t rxThread;
+  pthread_t txThread;
 
   usb_dev_handle *device;
   uint32_t endpoint_in;

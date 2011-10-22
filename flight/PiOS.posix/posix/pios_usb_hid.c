@@ -80,7 +80,7 @@ static int32_t usbhid_send(usb_dev_handle *device, int32_t endpoint, void *buf, 
 
 	int32_t ret=usb_interrupt_write(device, endpoint, (char *)buf, len, timeout);
 	if (ret<0) {
-		fprintf(stderr,"usb tx error %i\n",ret);
+		fprintf(stderr,"usb tx error %i\n (%s)\n",ret,strerror(-ret));
 	}
 	return ret;
 }
@@ -93,7 +93,7 @@ static int32_t usbhid_receive(usb_dev_handle *device, int32_t endpoint, void *bu
 
 	int32_t ret=usb_interrupt_read(device, endpoint, (char *)buf, len, timeout);
 	if (ret<0 &&ret!=-ETIMEDOUT) {
-		fprintf(stderr,"usb rx error %i\n",ret);
+		fprintf(stderr,"usb rx error %i : (%s)\n",ret,strerror(-ret));
 	}
 	return ret;
 }
@@ -113,7 +113,6 @@ uint32_t usbhid_open(pios_usb_dev * usb_dev) {
   usb_find_busses();
   usb_find_devices();
 
-//  printf("opening USB device...\n");
   uint8_t claimed = 0;
   for (bus = usb_get_busses(); bus; bus = bus->next) {
 	for (dev = bus->devices; dev; dev = dev->next) {
@@ -206,11 +205,61 @@ uint32_t usbhid_open(pios_usb_dev * usb_dev) {
   }
 
   if (!claimed) {
-//  	printf("NO USB device found!!!\n");
   	return -1;
   }
 
   return 0;
+}
+
+/**
+ * TxThread
+ */
+void * PIOS_USB_TxThread(void * usb_dev_n)
+{
+	/* needed because of FreeRTOS.posix scheduling */
+	sigset_t set;
+	sigfillset(&set);
+	sigprocmask(SIG_BLOCK, &set, NULL);
+
+	pios_usb_dev * usb_dev = (pios_usb_dev*) usb_dev_n;
+
+	/**
+	* com devices never get closed except by application "reboot"
+	* we also never give up our mutex except for waiting
+	*/
+	while(1) {
+		int32_t length,remaining;
+		bool tx_need_yield = false;
+
+		if (usb_dev->tx_out_cb) {
+			do {
+				remaining = (usb_dev->tx_out_cb)(usb_dev->tx_out_context, usb_dev->tx_buffer+2, PIOS_USB_RX_BUFFER_SIZE-2, NULL, &tx_need_yield);
+				if (remaining>0) {
+					usb_dev->tx_buffer[0]=2;
+					usb_dev->tx_buffer[1]=(uint8_t)(remaining & 0xff);
+					
+					length = usbhid_send(usb_dev->device, usb_dev->endpoint_out, usb_dev->tx_buffer, PIOS_USB_RX_BUFFER_SIZE, 100); 
+					if (length <0 && length != -EINVAL && length != -ETIMEDOUT) {
+						usb_dev->device=NULL;
+						break;
+					}
+				}
+			} while (remaining>0);
+		}
+#if defined(PIOS_INCLUDE_FREERTOS)
+		if (tx_need_yield) {
+			vPortYieldFromISR();
+		}
+#endif	/* PIOS_INCLUDE_FREERTOS */
+
+		// wait until data is ready to be sent
+		pthread_mutex_lock( &usb_dev->mutex );
+		pthread_cond_wait( &usb_dev->cond, &usb_dev->mutex );
+		pthread_mutex_unlock( &usb_dev->mutex );
+
+	}
+
+
 }
 
 /**
@@ -236,7 +285,6 @@ void * PIOS_USB_RxThread(void * usb_dev_n)
 	* we also never give up our mutex except for waiting
 	*/
 	while(1) {
-
 		/**
 		 * receive 
 		 */
@@ -247,13 +295,12 @@ void * PIOS_USB_RxThread(void * usb_dev_n)
 				PIOS_USB_RX_BUFFER_SIZE,
 				0)) >= 0)
 		{
-
-			/* copy received data to buffer if possible */
-			/* we do NOT buffer data locally. If the com buffer can't receive, data is discarded! */
-			/* (thats what the USART driver does too!) */
+			
 			bool rx_need_yield = false;
-			if (usb_dev->rx_in_cb) {
-			  (void) (usb_dev->rx_in_cb)(usb_dev->rx_in_context, usb_dev->rx_buffer, received, NULL, &rx_need_yield);
+			if (received==PIOS_USB_RX_BUFFER_SIZE && usb_dev->rx_in_cb) {
+				received = usb_dev->rx_buffer[1];
+				if (received>PIOS_USB_RX_BUFFER_SIZE-2) received = PIOS_USB_RX_BUFFER_SIZE-2;
+				(void) (usb_dev->rx_in_cb)(usb_dev->rx_in_context, usb_dev->rx_buffer+2, received, NULL, &rx_need_yield);
 			}
 
 #if defined(PIOS_INCLUDE_FREERTOS)
@@ -290,13 +337,14 @@ int32_t PIOS_USB_HID_Init(uint32_t * usb_id, const struct pios_usb_hid_cfg * cfg
   /* initialize */
   usb_dev->rx_in_cb = NULL;
   usb_dev->tx_out_cb = NULL;
-  usb_dev->cfg=cfg;
+  usb_dev->cfg = cfg;
   usb_dev->device = NULL;
 
   int res=0;
 
   /* Create transmit thread for this connection */
   pthread_create(&usb_dev->rxThread, NULL, PIOS_USB_RxThread, (void*)usb_dev);
+  pthread_create(&usb_dev->txThread, NULL, PIOS_USB_TxThread, (void*)usb_dev);
 
   printf("USB dev %i opened...\n",pios_usb_num_devices-1);
 
@@ -310,7 +358,7 @@ int32_t PIOS_USB_HID_Init(uint32_t * usb_id, const struct pios_usb_hid_cfg * cfg
 static void PIOS_USB_RxStart(uint32_t usb_id, uint16_t rx_bytes_avail)
 {
 	/**
-	 * lazy!
+	 * lazy! (and it doesn't make sense to do any intermediate buffering)
 	 */
 }
 
@@ -321,31 +369,8 @@ static void PIOS_USB_TxStart(uint32_t usb_id, uint16_t tx_bytes_avail)
 
 	PIOS_Assert(usb_dev);
 
-	int32_t length,len,rem;
+	pthread_cond_signal(&usb_dev->cond);
 
-	/**
-	 * we send everything directly whenever notified of data to send (lazy!)
-	 */
-	if (usb_dev->tx_out_cb) {
-		while (tx_bytes_avail>0) {
-			bool tx_need_yield = false;
-			length = (usb_dev->tx_out_cb)(usb_dev->tx_out_context, usb_dev->tx_buffer, PIOS_USB_RX_BUFFER_SIZE, NULL, &tx_need_yield);
-			rem = length;
-			while (rem>0) {
-				len = usbhid_send(usb_dev->device, usb_dev->endpoint_out, usb_dev->tx_buffer+(length-rem), rem, 10); 
-				if (len<=0) {
-					rem=0;
-				} else {
-					rem -= len;
-				}
-				if (len <0 && len != -EINVAL && len != -ETIMEDOUT) {
-					usb_dev->device=NULL;
-					return;
-				}
-			}
-			tx_bytes_avail -= length;
-		}
-	}
 }
 
 static void PIOS_USB_RegisterRxCallback(uint32_t usb_id, pios_com_callback rx_in_cb, uint32_t context)

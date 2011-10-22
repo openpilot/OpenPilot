@@ -34,6 +34,7 @@
 #include "uavtalkbus.h"
 #include "gcstelemetrystats.h"
 #include "flighttelemetrystats.h"
+#include "uavlinkstats.h"
 #include "systemstats.h"
 #include "watchdogstatus.h"
 
@@ -69,6 +70,7 @@ static int32_t addObject(UAVObjHandle obj);
 static void updateObject(UAVObjHandle obj,uint8_t onchange);
 static int32_t setUpdatePeriod(UAVObjHandle obj, int32_t updatePeriodMs);
 static void processObjEvent(UAVObjEvent * ev);
+static void updateTelemetryStats();
 
 /**
  * Initialise the uavtalkbus module
@@ -79,6 +81,10 @@ int32_t UAVTalkBusStart(void)
 {
 	// Process all registered objects and connect queue for updates
 	UAVObjIterate(&registerObject);
+
+	FlightTelemetryStatsInitialize();
+	GCSTelemetryStatsInitialize();
+	UAVLinkStatsInitialize();
     
 	// Listen to objects of interest
     
@@ -98,6 +104,8 @@ int32_t UAVTalkBusStart(void)
  */
 int32_t UAVTalkBusInitialize(void)
 {
+	UAVObjEvent ev;
+
 	// Create object queues
 	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
 
@@ -107,6 +115,8 @@ int32_t UAVTalkBusInitialize(void)
 	// Create periodic event that will be used to update the uavtalkbus stats
 	txErrors = 0;
 	txRetries = 0;
+	memset(&ev, 0, sizeof(UAVObjEvent));
+	EventPeriodicQueueCreate(&ev, queue, STATS_UPDATE_PERIOD_MS);
 
 	return 0;
 }
@@ -204,10 +214,12 @@ static void processObjEvent(UAVObjEvent * ev)
 	int32_t success;
 
 	// Some UAVObjects should not be synced since they would conflict.
-	if (
-		ev->obj &&
+	if (ev->obj == 0) {
+		updateTelemetryStats();
+	} else if (
 		ev->obj != GCSTelemetryStatsHandle() &&
 		ev->obj != FlightTelemetryStatsHandle() &&
+		ev->obj != UAVLinkStatsHandle() &&
 		ev->obj != SystemStatsHandle() &&
 //		ev->obj != SystemAlarmsHandle() &&
 		ev->obj != TaskInfoHandle() &&
@@ -325,6 +337,34 @@ static int32_t transmitData(uint8_t * data, int32_t length)
 	} else {
 		return -1;
 	}
+}
+
+/**
+ * Update telemetry statistics
+ */
+static void updateTelemetryStats()
+{
+	UAVTalkStats utalkStats;
+	UAVLinkStatsData flightStats;
+
+	// Get stats
+	UAVTalkGetStats(uavTalkCon, &utalkStats);
+	UAVTalkResetStats(uavTalkCon);
+
+	// Get object data
+	UAVLinkStatsGet(&flightStats);
+
+	flightStats.RxDataRate = (float)utalkStats.rxBytes / ((float)STATS_UPDATE_PERIOD_MS / 1000.0);
+	flightStats.TxDataRate = (float)utalkStats.txBytes / ((float)STATS_UPDATE_PERIOD_MS / 1000.0);
+	flightStats.RxFailures += utalkStats.rxErrors;
+	flightStats.TxFailures += txErrors;
+	flightStats.TxRetries += txRetries;
+	txErrors = 0;
+	txRetries = 0;
+
+	// Update object
+	UAVLinkStatsSet(&flightStats);
+
 }
 
 /**

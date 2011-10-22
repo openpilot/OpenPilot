@@ -1,0 +1,14 @@
+<xml>
+    <object name="UAVLinkStats" singleinstance="true" settings="false">
+        <description>Maintains the statistics for the local side of an UAVTalk link.</description>
+        <field name="TxDataRate" units="bytes/sec" type="float" elements="1"/>
+        <field name="RxDataRate" units="bytes/sec" type="float" elements="1"/>
+        <field name="TxFailures" units="count" type="uint32" elements="1"/>
+        <field name="RxFailures" units="count" type="uint32" elements="1"/>
+        <field name="TxRetries" units="count" type="uint32" elements="1"/>
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="true" updatemode="manual" period="0"/>
+        <telemetryflight acked="true" updatemode="periodic" period="5000"/>
+        <logging updatemode="periodic" period="5000"/>
+    </object>
+</xml>

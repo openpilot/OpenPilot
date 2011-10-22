@@ -46,8 +46,8 @@
 #define MAX_RETRIES 2
 #define STATS_UPDATE_PERIOD_MS 4000
 #define CONNECTION_TIMEOUT_MS 8000
-#define LINK_MIN_GRACE_TIME 30
-#define LINK_MAX_REFRESH_TIME 5000
+#define LINK_MIN_GRACE_TIME_MS 30
+#define LINK_MAX_REFRESH_TIME_MS 15000
 
 // Private types
 
@@ -143,8 +143,8 @@ static int32_t addObject(UAVObjHandle obj)
 
 	// force an UPDATED event every MAX_REFRESH_TIME milliseconds to sync
 	// missed updates of rarely updating objects
-	//ev.event = EV_UPDATED;
-	//EventPeriodicQueueCreate(&ev, queue, LINK_MAX_REFRESH_TIME);
+	ev.event = EV_UPDATED;
+	EventPeriodicQueueCreate(&ev, queue, LINK_MAX_REFRESH_TIME_MS);
 
 	// this is the event for our normal UPDATED_MANUAL grace wait time
 	ev.event = EV_UPDATED_MANUAL;
@@ -160,14 +160,16 @@ static void updateObject(UAVObjHandle obj,uint8_t onchange)
 	int32_t eventMask;
 
 	if (onchange) {
+		// regular operation - we update objects when they change, or when they havent changed for a loooong time
 		// Set update period
 		setUpdatePeriod(obj, 0);
 		// Connect queue
 		// we react to all events except EV_SYNCED which is our own events
 		eventMask =  EV_UNPACKED | EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ;
 	} else {
+		// sleep operation - we update objects not at all until after LINK_MIN_GRACE_TIME_MS
 		// Set update period
-		setUpdatePeriod(obj, LINK_MIN_GRACE_TIME);
+		setUpdatePeriod(obj, LINK_MIN_GRACE_TIME_MS);
 		// Connect queue
 		// we react only to manual (timer) updates and update requests
 		eventMask = EV_UPDATED_MANUAL | EV_UPDATE_REQ;

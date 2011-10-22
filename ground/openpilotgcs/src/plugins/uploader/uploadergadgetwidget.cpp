@@ -48,7 +48,8 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
     connect(m_config->resetButton, SIGNAL(clicked()), this, SLOT(systemReset()));
     connect(m_config->bootButton, SIGNAL(clicked()), this, SLOT(systemBoot()));
     connect(m_config->rescueButton, SIGNAL(clicked()), this, SLOT(systemRescue()));
-
+    Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
+    connect(cm,SIGNAL(deviceConnected(QIODevice*)),this,SLOT(onPhisicalHWConnect()));
     getSerialPorts();
 
     QIcon rbi;
@@ -105,7 +106,12 @@ QString UploaderGadgetWidget::getPortDevice(const QString &friendName)
         }
     return "";
 }
-
+void UploaderGadgetWidget::onPhisicalHWConnect()
+{
+    m_config->bootButton->setEnabled(false);
+    m_config->rescueButton->setEnabled(false);
+    m_config->telemetryLink->setEnabled(false);
+}
 
 /**
   Enables widget buttons if autopilot connected
@@ -235,9 +241,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
         currentStep = IAP_STATE_BOOTLOADER;
 
         // Tell the mainboard to get into bootloader state:
-        log("Detecting devices, please wait 5 seconds...");
-        this->repaint();
-        delay::msleep(5100); // Required to let the board(s) settle
+        log("Detecting devices, please wait a few seconds...");
         if (!dfu) {
             if (dlj.startsWith("USB"))
                 dfu = new DFUObject(DFU_DEBUG, false, QString());

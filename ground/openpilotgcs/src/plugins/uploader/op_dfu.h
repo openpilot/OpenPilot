@@ -17,6 +17,7 @@
 #include "delay.h"
 #include <qextserialport/src/qextserialport.h>
 #include <QTime>
+#include <QTimer>
 #include "SSP/qssp.h"
 #include "SSP/port.h"
 #include "SSP/qsspt.h"

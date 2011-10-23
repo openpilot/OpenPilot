@@ -38,28 +38,32 @@
 #include <QMessageBox>
 #include <QDesktopServices>
 #include <QUrl>
+#include "actuatorcommand.h"
+#include "systemalarms.h"
 
 ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
     m_config = new Ui_OutputWidget();
     m_config->setupUi(this);
 
-	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-        setupButtons(m_config->saveRCOutputToRAM,m_config->saveRCOutputToSD);
-        addUAVObject("ActuatorSettings");
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    setupButtons(m_config->saveRCOutputToRAM,m_config->saveRCOutputToSD);
+    addUAVObject("ActuatorSettings");
 
-	// First of all, put all the channel widgets into lists, so that we can
+    // First of all, put all the channel widgets into lists, so that we can
     // manipulate those:
 
-	// NOTE: for historical reasons, we have objects below called ch0 to ch7, but the convention for OP is Channel 1 to Channel 8.
+    // NOTE: for historical reasons, we have objects below called ch0 to ch7, but the convention for OP is Channel 1 to Channel 8.
     outLabels << m_config->ch0OutValue
-            << m_config->ch1OutValue
-            << m_config->ch2OutValue
-            << m_config->ch3OutValue
-            << m_config->ch4OutValue
-            << m_config->ch5OutValue
-            << m_config->ch6OutValue
-            << m_config->ch7OutValue;
+              << m_config->ch1OutValue
+              << m_config->ch2OutValue
+              << m_config->ch3OutValue
+              << m_config->ch4OutValue
+              << m_config->ch5OutValue
+              << m_config->ch6OutValue
+            << m_config->ch7OutValue
+            << m_config->ch8OutValue
+            << m_config->ch9OutValue;
 
     outSliders << m_config->ch0OutSlider
             << m_config->ch1OutSlider
@@ -68,7 +72,9 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
             << m_config->ch4OutSlider
             << m_config->ch5OutSlider
             << m_config->ch6OutSlider
-            << m_config->ch7OutSlider;
+            << m_config->ch7OutSlider
+            << m_config->ch8OutSlider
+            << m_config->ch9OutSlider;
 
     outMin << m_config->ch0OutMin
             << m_config->ch1OutMin
@@ -77,7 +83,9 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
             << m_config->ch4OutMin
             << m_config->ch5OutMin
             << m_config->ch6OutMin
-            << m_config->ch7OutMin;
+            << m_config->ch7OutMin
+            << m_config->ch8OutMin
+            << m_config->ch9OutMin;
 
     outMax << m_config->ch0OutMax
             << m_config->ch1OutMax
@@ -86,7 +94,9 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
             << m_config->ch4OutMax
             << m_config->ch5OutMax
             << m_config->ch6OutMax
-            << m_config->ch7OutMax;
+            << m_config->ch7OutMax
+            << m_config->ch8OutMax
+            << m_config->ch9OutMax;
 
     reversals << m_config->ch0Rev
             << m_config->ch1Rev
@@ -95,7 +105,9 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
             << m_config->ch4Rev
             << m_config->ch5Rev
             << m_config->ch6Rev
-            << m_config->ch7Rev;
+            << m_config->ch7Rev
+            << m_config->ch8Rev
+            << m_config->ch9Rev;
 
     links << m_config->ch0Link
           << m_config->ch1Link
@@ -104,15 +116,23 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
           << m_config->ch4Link
           << m_config->ch5Link
           << m_config->ch6Link
-          << m_config->ch7Link;
+          << m_config->ch7Link
+          << m_config->ch8Link
+          << m_config->ch9Link;
 
     // Register for ActuatorSettings changes:
-     for (int i = 0; i < 8; i++) {
+     for (int i = 0; i < ActuatorCommand::CHANNEL_NUMELEM; i++) {
         connect(outMin[i], SIGNAL(editingFinished()), this, SLOT(setChOutRange()));
         connect(outMax[i], SIGNAL(editingFinished()), this, SLOT(setChOutRange()));
         connect(reversals[i], SIGNAL(toggled(bool)), this, SLOT(reverseChannel(bool)));
         // Now connect the channel out sliders to our signal to send updates in test mode
         connect(outSliders[i], SIGNAL(valueChanged(int)), this, SLOT(sendChannelTest(int)));
+
+        addWidget(outMin[i]);
+        addWidget(outMax[i]);
+        addWidget(reversals[i]);
+        addWidget(outSliders[i]);
+        addWidget(links[i]);
     }
 
     connect(m_config->channelOutTest, SIGNAL(toggled(bool)), this, SLOT(runChannelTests(bool)));
@@ -134,39 +154,7 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
     addWidget(m_config->outputRate3);
     addWidget(m_config->outputRate2);
     addWidget(m_config->outputRate1);
-    addWidget(m_config->ch0OutMin);
-    addWidget(m_config->ch0OutSlider);
-    addWidget(m_config->ch0OutMax);
-    addWidget(m_config->ch0Rev);
-    addWidget(m_config->ch0Link);
-    addWidget(m_config->ch1OutMin);
-    addWidget(m_config->ch1OutSlider);
-    addWidget(m_config->ch1OutMax);
-    addWidget(m_config->ch1Rev);
-    addWidget(m_config->ch2OutMin);
-    addWidget(m_config->ch2OutSlider);
-    addWidget(m_config->ch2OutMax);
-    addWidget(m_config->ch2Rev);
-    addWidget(m_config->ch3OutMin);
-    addWidget(m_config->ch3OutSlider);
-    addWidget(m_config->ch3OutMax);
-    addWidget(m_config->ch3Rev);
-    addWidget(m_config->ch4OutMin);
-    addWidget(m_config->ch4OutSlider);
-    addWidget(m_config->ch4OutMax);
-    addWidget(m_config->ch4Rev);
-    addWidget(m_config->ch5OutMin);
-    addWidget(m_config->ch5OutSlider);
-    addWidget(m_config->ch5OutMax);
-    addWidget(m_config->ch5Rev);
-    addWidget(m_config->ch6OutMin);
-    addWidget(m_config->ch6OutSlider);
-    addWidget(m_config->ch6OutMax);
-    addWidget(m_config->ch6Rev);
-    addWidget(m_config->ch7OutMin);
-    addWidget(m_config->ch7OutSlider);
-    addWidget(m_config->ch7OutMax);
-    addWidget(m_config->ch7Rev);
+
     addWidget(m_config->spinningArmed);
 }
 
@@ -215,6 +203,22 @@ void ConfigOutputWidget::linkToggled(bool state)
   */
 void ConfigOutputWidget::runChannelTests(bool state)
 {
+    SystemAlarms * systemAlarmsObj = SystemAlarms::GetInstance(getObjectManager());
+    SystemAlarms::DataFields systemAlarms = systemAlarmsObj->getData();
+
+    if(state && systemAlarms.Alarm[SystemAlarms::ALARM_ACTUATOR] != SystemAlarms::ALARM_OK) {
+        QMessageBox mbox;
+        mbox.setText(QString(tr("The actuator module is in an error state.  This can also occur because there are no inputs.  Please fix these before testing outputs.")));
+        mbox.setStandardButtons(QMessageBox::Ok);
+        mbox.exec();
+
+        // Unfortunately must cache this since callback will reoccur
+        accInitialData = ActuatorCommand::GetInstance(getObjectManager())->getMetadata();
+
+        m_config->channelOutTest->setChecked(false);
+        return;
+    }
+
     // Confirm this is definitely what they want
     if(state) {
         QMessageBox mbox;
@@ -229,11 +233,7 @@ void ConfigOutputWidget::runChannelTests(bool state)
         }
     }
 
-    qDebug() << "Running with state " << state;
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorCommand")));
+    ActuatorCommand * obj = ActuatorCommand::GetInstance(getObjectManager());
     UAVObject::Metadata mdata = obj->getMetadata();
     if (state)
     {
@@ -306,6 +306,12 @@ void ConfigOutputWidget::assignOutputChannel(UAVDataObject *obj, QString str)
         break;
     case 7:
         m_config->ch7Output->setText(str);
+        break;
+    case 8:
+        m_config->ch8Output->setText(str);
+        break;
+    case 9:
+        m_config->ch9Output->setText(str);
         break;
     }
 }
@@ -390,14 +396,8 @@ void ConfigOutputWidget::refreshWidgetsValues()
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
     // Reset all channel assignements:
-    m_config->ch0Output->setText("-");
-    m_config->ch1Output->setText("-");
-    m_config->ch2Output->setText("-");
-    m_config->ch3Output->setText("-");
-    m_config->ch4Output->setText("-");
-    m_config->ch5Output->setText("-");
-    m_config->ch6Output->setText("-");
-    m_config->ch7Output->setText("-");
+    for (int i = 0; i < ActuatorCommand::CHANNEL_NUMELEM; i++)
+        outLabels[i]->setText("-");
 
     // Get the channel assignements:
     UAVDataObject * obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorSettings")));
@@ -449,7 +449,7 @@ void ConfigOutputWidget::refreshWidgetsValues()
 
 
     // Get Channel ranges:
-    for (int i=0;i<8;i++) {
+    for (int i=0;i<ActuatorCommand::CHANNEL_NUMELEM;i++) {
         field = obj->getField(QString("ChannelMin"));
         int minValue = field->getValue(i).toInt();
         outMin[i]->setValue(minValue);
@@ -468,7 +468,7 @@ void ConfigOutputWidget::refreshWidgetsValues()
     }
 
     field = obj->getField(QString("ChannelNeutral"));
-    for (int i=0; i<8; i++) {
+    for (int i=0; i<ActuatorCommand::CHANNEL_NUMELEM; i++) {
         int value = field->getValue(i).toInt();
         outSliders[i]->setValue(value);
         outLabels[i]->setText(QString::number(value));
@@ -489,17 +489,17 @@ void ConfigOutputWidget::updateObjectsFromWidgets()
 
     // Now send channel ranges:
     UAVObjectField * field = obj->getField(QString("ChannelMax"));
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < ActuatorCommand::CHANNEL_NUMELEM; i++) {
         field->setValue(outMax[i]->value(),i);
     }
 
     field = obj->getField(QString("ChannelMin"));
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < ActuatorCommand::CHANNEL_NUMELEM; i++) {
         field->setValue(outMin[i]->value(),i);
     }
 
     field = obj->getField(QString("ChannelNeutral"));
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < ActuatorCommand::CHANNEL_NUMELEM; i++) {
         field->setValue(outSliders[i]->value(),i);
     }
 

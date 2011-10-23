@@ -81,6 +81,7 @@ private:
         }lastChannel;
         channelsStruct currentChannel;
         QList<channelsStruct> usedChannels;
+        bool channelDetected;
         QEventLoop * loop;
         bool skipflag;
 

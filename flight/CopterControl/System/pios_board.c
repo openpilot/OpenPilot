@@ -674,7 +674,7 @@ static const struct pios_spektrum_cfg pios_spektrum_flexi_cfg = {
 
 #if defined(PIOS_INCLUDE_SBUS)
 /*
- * SBUS USART
+ * S.Bus USART
  */
 #include <pios_sbus_priv.h>
 
@@ -1025,7 +1025,7 @@ void PIOS_Board_Init(void) {
 			}
 
 			uint32_t pios_sbus_id;
-			if (PIOS_SBUS_Init(&pios_sbus_id, &pios_sbus_cfg, &pios_usart_com_driver, pios_usart_sbus_id)) {
+			if (PIOS_SBus_Init(&pios_sbus_id, &pios_sbus_cfg, &pios_usart_com_driver, pios_usart_sbus_id)) {
 				PIOS_Assert(0);
 			}
 

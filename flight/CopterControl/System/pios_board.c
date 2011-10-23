@@ -1370,6 +1370,7 @@ void PIOS_Board_Init(void) {
 			PIOS_Servo_Init(&pios_servo_cfg);
 			break;
 		case HWSETTINGS_CC_RCVRPORT_PPM_SERVO:
+		case HWSETTINGS_CC_RCVRPORT_SERVO:
 			PIOS_Servo_Init(&pios_servo_rcvr_cfg);
 			break;
 	}

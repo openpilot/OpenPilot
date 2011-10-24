@@ -1,6 +1,6 @@
 /*
-	Copyright (C) 2009 William Davy - william.davy@wittenstein.co.uk
-	Contributed to FreeRTOS.org V5.3.0.
+	Copyright (C) 2011 Corvus Corax from OpenPilot.org
+	based on linux port from William Davy
 
 	This file is part of the FreeRTOS.org distribution.
 
@@ -54,6 +54,41 @@
  * Implementation of functions defined in portable.h for the Posix port.
  *----------------------------------------------------------*/
 
+
+/** Description of scheduler behavior:
+
+
+This scheduler is based on posix signals to halt or preempt tasks, and on
+pthread conditions to resume them.
+
+Each FreeRTOS thread is created as a posix thread, with a signal handler to
+SIGUSR1 (SIG_SUSPEND) signals.
+
+Suspension of a thread is done by setting the threads state to "PAUSING",
+then signaling the thread until the signal handler changes that state to "SLEEPING",
+thus acknowledging the suspend.
+
+The thread will then wait within the signal handler for a thread specific
+condition to be set, which allows it to resume operation, setting its state to "RUNNING"
+
+The running thread also always holds a mutex (xRunningThreadMutex) which is
+given up only when the thread suspends.
+
+On thread creation the new thread will acquire this mutex, then yield.
+
+Both preemption and yielding is done using the same mechanism,
+sending a SIG_SUSPEND to the preempted thread respectively to itself. 
+
+Preemption is done by a handler for SIG_TICK, supposed to run in the main
+scheduler thread. The other threads block this signal, which initiates periodic
+tasks switches
+
+Task switching is protected by another mutex called xSwitchingThreadMutex which
+prevents the tick handler and regular yield's from interfering with each other.
+
+
+*/
+
 #include <pthread.h>
 #include <sched.h>
 #include <signal.h>
@@ -101,7 +136,7 @@ static xThreadState *pxThreads;
 static pthread_once_t hSigSetupThread = PTHREAD_ONCE_INIT;
 static pthread_attr_t xThreadAttributes;
 static pthread_mutex_t xRunningThreadMutex = PTHREAD_MUTEX_INITIALIZER;
-static pthread_mutex_t xYieldThreadMutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t xSwitchingThreadMutex = PTHREAD_MUTEX_INITIALIZER;
 /*-----------------------------------------------------------*/
 
 static volatile portBASE_TYPE xSchedulerEnd = pdFALSE;
@@ -141,14 +176,15 @@ void vPortSystemTickHandler( int sig );
 void vPortStartFirstTask( void );
 /*-----------------------------------------------------------*/
 
-/*
- * See header file for description.
+/**
+ * Creates a new thread.
  */
 portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE pxCode, void *pvParameters )
 {
-/* Should actually keep this struct on the stack. */
-xParams *pxThisThreadParams = pvPortMalloc( sizeof( xParams ) );
+	/* Should actually keep this struct on the stack. */
+	xParams *pxThisThreadParams = pvPortMalloc( sizeof( xParams ) );
 
+	/* Initialize scheduler during first call */
 	(void)pthread_once( &hSigSetupThread, prvSetupSignalsAndSchedulerPolicy );
 
 	/* No need to join the threads. */
@@ -159,6 +195,7 @@ xParams *pxThisThreadParams = pvPortMalloc( sizeof( xParams ) );
 	pxThisThreadParams->pxCode = pxCode;
 	pxThisThreadParams->pvParams = pvParameters;
 
+	/* Prevent preemption during task creation */
 	vPortEnterCritical();
 
 	lIndexOfLastAddedTask = prvGetFreeThreadState();
@@ -174,12 +211,17 @@ xParams *pxThisThreadParams = pvPortMalloc( sizeof( xParams ) );
 	PORT_ASSERT( 0 == pthread_mutex_unlock( &xRunningThreadMutex ) );
 	while ( pxThreads[ lIndexOfLastAddedTask ].threadStatus == THREAD_STARTING ) sched_yield();
 	PORT_ASSERT( 0 == pthread_mutex_lock( &xRunningThreadMutex ) );
+
 	vPortExitCritical();
 
 	return pxTopOfStack;
 }
 /*-----------------------------------------------------------*/
 
+/**
+ * Initially the schedulers main thread holds the running thread mutex.
+ * it needs to be given up, to allow the first running task to execute
+ */
 void vPortStartFirstTask( void )
 {
 	/* Initialise the critical nesting count ready for the first task. */
@@ -196,8 +238,9 @@ void vPortStartFirstTask( void )
 }
 /*-----------------------------------------------------------*/
 
-/*
- * See header file for description.
+/**
+ * After tasks have been set up the main thread goes into a sleeping loop, but
+ * allows to be interrupted by timer ticks.
  */
 portBASE_TYPE xPortStartScheduler( void )
 {
@@ -208,7 +251,7 @@ portLONG lIndex;
 	/* just in case*/
 	vPortDisableInterrupts();
 
-	/* do not respond to SUSPEND signal (but all others)*/
+	/* do not respond to SUSPEND signal (but all others) */
 	sigemptyset( &xSignalToBlock );
 	(void)pthread_sigmask( SIG_SETMASK, &xSignalToBlock, NULL );
 	sigemptyset(&xSignalToBlock);
@@ -224,7 +267,7 @@ portLONG lIndex;
 	here already. */
 	prvSetupTimerInterrupt();
 
-	/* Start the first task. Will not return unless all threads are killed. */
+	/* Start the first task. This gives up the RunningThreadMutex*/
 	vPortStartFirstTask();
 
 	while ( pdTRUE != xSchedulerEnd )
@@ -236,7 +279,7 @@ portLONG lIndex;
 	PORT_PRINT( "Cleaning Up, Exiting.\n" );
 	/* Cleanup the mutexes */
 	xResult = pthread_mutex_destroy( &xRunningThreadMutex );
-	xResult = pthread_mutex_destroy( &xYieldThreadMutex );
+	xResult = pthread_mutex_destroy( &xSwitchingThreadMutex );
 	vPortFree( (void *)pxThreads );
 
 	/* Should not get here! */
@@ -264,8 +307,9 @@ portBASE_TYPE xResult;
 
 void vPortYieldFromISR( void )
 {
-	/* same as when the tick handler hit TODO */
-	if( 0 == pthread_mutex_trylock( &xYieldThreadMutex ) ) {
+	/* yielding from an ISR must return immediately. We cannot wait for the
+	 * mutex */
+	if( 0 == pthread_mutex_trylock( &xSwitchingThreadMutex ) ) {
 		prvSwitchTasks();
 	} else {
 		xPendYield = pdTRUE;
@@ -301,10 +345,14 @@ void vPortExitCritical( void )
 	}
 }
 /*-----------------------------------------------------------*/
+/**
+ * The task switching works identically for both preemption and
+ * yielding, therefore it sits in this shared function
+ */
 static void prvSwitchTasks(void)
 {
 	/**
-	 * needs to be called with YieldThreadMutex locked!!!
+	 * needs to be called with xSwitchingThreadMutex locked!!!
 	 */
 
 	xThreadState *xTaskToSuspend, *xTaskToResume;
@@ -322,7 +370,7 @@ static void prvSwitchTasks(void)
 		prvResumeThread( xTaskToResume );
 		prvSuspendThread( xTaskToSuspend );
 	} else {
-		(void)pthread_mutex_unlock( &xYieldThreadMutex );
+		(void)pthread_mutex_unlock( &xSwitchingThreadMutex );
 	}
 }
 /*-----------------------------------------------------------*/
@@ -330,7 +378,7 @@ static void prvSwitchTasks(void)
 void vPortYield( void )
 {
 
-	PORT_ASSERT( 0 == pthread_mutex_lock( &xYieldThreadMutex ) );
+	PORT_ASSERT( 0 == pthread_mutex_lock( &xSwitchingThreadMutex ) );
 
 	prvSwitchTasks();
 
@@ -404,7 +452,7 @@ void vPortSystemTickHandler( int sig )
 		vTaskIncrementTick();
 
 #if ( configUSE_PREEMPTION == 1 )
-		if ( 0 == pthread_mutex_trylock( &xYieldThreadMutex ) )
+		if ( 0 == pthread_mutex_trylock( &xSwitchingThreadMutex ) )
 		{
 			prvSwitchTasks();
 		}
@@ -430,7 +478,7 @@ xThreadState* xTaskToDelete;
 xThreadState* xTaskToResume;
 portBASE_TYPE xResult;
 
-	PORT_ASSERT( 0 == pthread_mutex_lock( &xYieldThreadMutex ));
+	PORT_ASSERT( 0 == pthread_mutex_lock( &xSwitchingThreadMutex ));
 
 	xTaskToDelete = prvGetThreadHandle( hTaskToDelete );
 	xTaskToResume = prvGetThreadHandle( xTaskGetCurrentTaskHandle() );
@@ -454,7 +502,7 @@ portBASE_TYPE xResult;
 		xResult = pthread_cancel( xTaskToDelete->hThread );
 
 		/* Pthread Clean-up function will note the cancellation. */
-		(void)pthread_mutex_unlock( &xYieldThreadMutex );
+		(void)pthread_mutex_unlock( &xSwitchingThreadMutex );
 	}
 	else
 	{
@@ -465,13 +513,17 @@ portBASE_TYPE xResult;
 		uxCriticalNesting = 0;
 		vPortEnableInterrupts();
 		(void)pthread_mutex_unlock( &xRunningThreadMutex );
-		(void)pthread_mutex_unlock( &xYieldThreadMutex );
+		(void)pthread_mutex_unlock( &xSwitchingThreadMutex );
 		/* Commit suicide */
 		pthread_exit( (void *)1 );
 	}
 }
 /*-----------------------------------------------------------*/
 
+/**
+ * any new thread first acquires the runningThreadMutex, but then suspends
+ * immediately, giving control back to the thread starting the new one
+ */
 void *prvWaitForStart( void * pvParams )
 {
 xParams * pxParams = ( xParams * )pvParams;
@@ -489,13 +541,14 @@ sigset_t xSignalToBlock;
 	sigaddset(&xSignalToBlock,SIG_TICK);
 	(void)pthread_sigmask(SIG_BLOCK, &xSignalToBlock, NULL);
 
-
+	/* acquire mutexes */
 	PORT_ASSERT( 0 == pthread_mutex_lock( &xRunningThreadMutex ) );
-	PORT_ASSERT( 0 == pthread_mutex_lock( &xYieldThreadMutex ) );
-	{
-		prvSuspendThread( prvGetThreadHandleByThread(pthread_self()) );
-	}
+	PORT_ASSERT( 0 == pthread_mutex_lock( &xSwitchingThreadMutex ) );
+		
+	/* suspend until further notice */
+	prvSuspendThread( prvGetThreadHandleByThread(pthread_self()) );
 
+	/* run the actual task */
 	pvCode( pParams );
 
 	pthread_cleanup_pop( 1 );
@@ -510,7 +563,8 @@ void prvSuspendSignalHandler(int sig)
 	PORT_ASSERT( myself );
 
 	if (myself->threadStatus != THREAD_PAUSING) {
-		/* outdated signal has arrived, we are not supposed to halt. not a problem, we ignore that */
+		/* Spurious signal has arrived, we are not really supposed to halt.
+		 * Not a real problem, we just ignore that. */
 		return;
 	}
 
@@ -546,12 +600,22 @@ void prvSuspendSignalHandler(int sig)
 void prvSuspendThread( xThreadState* xThreadId )
 {
 	/**
-	 * needs to be called with xYieldThreadMutex locked!!!
+	 * needs to be called with xSwitchingThreadMutex locked!!!
 	 */
 	PORT_ASSERT(xThreadId);
 	PORT_ASSERT(xThreadId->threadStatus != THREAD_PAUSING);
 	xThreadId->threadStatus = THREAD_PAUSING;
-	(void)pthread_mutex_unlock( &xYieldThreadMutex );
+	/* It would be optimal if we could keep the mutex until after the suspend
+	 * has worked however if we suspend ourselfes (yield) that would cause a
+	 * deadlock since we cannot give back the mutex when sleeping
+	 */
+	(void)pthread_mutex_unlock( &xSwitchingThreadMutex );
+	/**
+	 * Send signals until the signal handler acknowledges.  how long that takes
+	 * depends on the systems signal implementation.  During a preemption we
+	 * will see the actual THREAD_SLEEPING STATE when yielding we would only
+	 * see a future THREAD_RUNNING after having woken up both is OK
+	 */
 	while ( xThreadId->threadStatus == THREAD_PAUSING ) {
 		pthread_kill( xThreadId->hThread, SIG_SUSPEND );
 		sched_yield();
@@ -560,6 +624,11 @@ void prvSuspendThread( xThreadState* xThreadId )
 }
 /*-----------------------------------------------------------*/
 
+/**
+ * Signal the condition.
+ * Unlike pthread_kill this actually is supposed to be reliable, so we need no
+ * checks on the outcome.
+ */
 void prvResumeThread( xThreadState* xThreadId )
 {
 	PORT_ASSERT(xThreadId);

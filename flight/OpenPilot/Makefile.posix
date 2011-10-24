@@ -183,14 +183,8 @@ SRC += $(FLIGHTLIB)/CoordinateConversions.c
 ## RTOS and RTOS Portable 
 SRC += $(RTOSSRCDIR)/list.c
 SRC += $(RTOSSRCDIR)/queue.c
-UNAME := $(shell uname)
-ifeq ($(UNAME), Linux)
-  SRC += $(RTOSSRCDIR)/tasks_linux.c
-  SRC += $(RTOSSRCDIR)/portable/GCC/Posix/port_linux.c
-else
-  SRC += $(RTOSSRCDIR)/tasks_posix.c
-  SRC += $(RTOSSRCDIR)/portable/GCC/Posix/port_posix.c
-endif
+SRC += $(RTOSSRCDIR)/tasks.c
+SRC += $(RTOSSRCDIR)/portable/GCC/Posix/port.c
 SRC += $(RTOSSRCDIR)/portable/MemMang/heap_3.c
 
 

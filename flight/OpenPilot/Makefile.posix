@@ -65,7 +65,7 @@ MODULES =  Telemetry Actuator Stabilization Guidance ManualControl FlightPlan GP
 # - MCU used for compiler-option (-mtune)
 # - MODEL used for linker-script name (-T) and passed as define
 # - BOARD just passed as define (optional)
-MCU      = i686
+#MCU      = i686
 #CHIP     = STM32F103RET
 #BOARD    = STM3210E_OP
 MODEL	 = HD
@@ -303,7 +303,8 @@ endif
 CFLAGS += $(CFLAGS_UAVOBJECTS)
 CFLAGS += -DARCH_POSIX
 CFLAGS += -O$(OPT)
-CFLAGS += -mtune=$(MCU)
+#CFLAGS += -mtune=$(MCU)
+# no mtune, should run on any platform!
 CFLAGS += $(CDEFS)
 CFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS)) -I.
 

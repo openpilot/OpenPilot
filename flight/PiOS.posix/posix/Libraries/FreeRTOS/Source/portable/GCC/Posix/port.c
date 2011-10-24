@@ -55,8 +55,7 @@
  *----------------------------------------------------------*/
 
 
-/** Description of scheduler behavior:
-
+/** Description of scheduler:
 
 This scheduler is based on posix signals to halt or preempt tasks, and on
 pthread conditions to resume them.
@@ -79,13 +78,14 @@ On thread creation the new thread will acquire this mutex, then yield.
 Both preemption and yielding is done using the same mechanism,
 sending a SIG_SUSPEND to the preempted thread respectively to itself. 
 
-Preemption is done by a handler for SIG_TICK, supposed to run in the main
-scheduler thread. The other threads block this signal, which initiates periodic
-tasks switches
+Preemption is done by the main scheduler thread which attempts to run a tick
+handler at accurate intervals using nanosleep and gettimeofday, which allows
+accurate high frequency ticks.
 
-Task switching is protected by another mutex called xSwitchingThreadMutex which
-prevents the tick handler and regular yield's from interfering with each other.
+Task switching is protected by xSwitchingThreadMutex which prevents the tick
+handler and regular yields from interfering with each other.
 
+This approach is tested and works both on Linux and BSD style Unix (MAC OS X)
 
 */
 
@@ -149,7 +149,6 @@ static volatile unsigned portBASE_TYPE uxCriticalNesting;
 /*
  * Setup the timer to generate the tick interrupts.
  */
-static void prvSetupTimerInterrupt( void );
 static void *prvWaitForStart( void * pvParams );
 static void prvSuspendSignalHandler(int sig);
 static void prvSetupSignalsAndSchedulerPolicy( void );
@@ -168,7 +167,7 @@ static void prvSwitchTasks(void);
  * Exception handlers.
  */
 void vPortYield( void );
-void vPortSystemTickHandler( int sig );
+void vPortSystemTickHandler( void );
 
 /*
  * Start first task is a separate function so it can be tested in isolation.
@@ -263,17 +262,49 @@ portLONG lIndex;
 		pxThreads[ lIndex ].uxCriticalNesting = 0;
 	}
 
-	/* Start the timer that generates the tick ISR.  Interrupts are disabled
-	here already. */
-	prvSetupTimerInterrupt();
-
 	/* Start the first task. This gives up the RunningThreadMutex*/
 	vPortStartFirstTask();
 
+	/** Main scheduling loop. Call the tick handler every
+	 * portTICK_RATE_MICROSECONDS
+	 */
+	portLONG sleepTimeUS = portTICK_RATE_MICROSECONDS;
+	portLONG actualSleepTime;
+	struct timeval lastTime,currentTime;
+	gettimeofday( &lastTime, NULL );
+	struct timespec wait;
+	
 	while ( pdTRUE != xSchedulerEnd )
 	{
-		const struct timespec wait = { .tv_sec=1, .tv_nsec=0 };
-		nanosleep( &wait,NULL);
+		/* wait for the specified wait time */
+		wait.tv_sec = sleepTimeUS / 1000000;
+		wait.tv_nsec = 1000 * ( sleepTimeUS % 1000000 );
+		nanosleep( &wait, NULL );
+
+		/* check the time */
+		gettimeofday( &currentTime, NULL);
+		actualSleepTime = 1000000 * ( currentTime.tv_sec - lastTime.tv_sec ) + ( currentTime.tv_usec - lastTime.tv_usec );
+
+		/* only hit the tick if we slept at least half the period */
+		if ( actualSleepTime >= sleepTimeUS/2 ) {
+
+			vPortSystemTickHandler();
+
+			/* check the time again */
+			gettimeofday( &currentTime, NULL);
+			actualSleepTime = 1000000 * ( currentTime.tv_sec - lastTime.tv_sec ) + ( currentTime.tv_usec - lastTime.tv_usec );
+
+			/* sleep until the next tick is due */
+			sleepTimeUS += portTICK_RATE_MICROSECONDS;
+		}
+
+		/* reduce remaining sleep time by the slept time */
+		sleepTimeUS -= actualSleepTime;
+		lastTime = currentTime;
+
+		/* safety checks */
+		if (sleepTimeUS <=0 || sleepTimeUS >= 3 * portTICK_RATE_MICROSECONDS) sleepTimeUS = portTICK_RATE_MICROSECONDS;
+
 	}
 
 	PORT_PRINT( "Cleaning Up, Exiting.\n" );
@@ -411,40 +442,7 @@ void vPortClearInterruptMask( portBASE_TYPE xMask )
 }
 /*-----------------------------------------------------------*/
 
-/*
- * Setup the systick timer to generate the tick interrupts at the required
- * frequency.
- */
-void prvSetupTimerInterrupt( void )
-{
-struct itimerval itimer, oitimer;
-portTickType xMicroSeconds = portTICK_RATE_MICROSECONDS;
-
-	/* Initialise the structure with the current timer information. */
-	if ( 0 == getitimer( TIMER_TYPE, &itimer ) )
-	{
-		/* Set the interval between timer events. */
-		itimer.it_interval.tv_sec = 0;
-		itimer.it_interval.tv_usec = xMicroSeconds;
-
-		/* Set the current count-down. */
-		itimer.it_value.tv_sec = 0;
-		itimer.it_value.tv_usec = xMicroSeconds;
-
-		/* Set-up the timer interrupt. */
-		if ( 0 != setitimer( TIMER_TYPE, &itimer, &oitimer ) )
-		{
-			PORT_PRINT( "Set Timer problem.\n" );
-		}
-	}
-	else
-	{
-		PORT_PRINT( "Get Timer problem.\n" );
-	}
-}
-/*-----------------------------------------------------------*/
-
-void vPortSystemTickHandler( int sig )
+void vPortSystemTickHandler()
 {
 	if ( ( pdTRUE == xInterruptsEnabled ) )
 	{
@@ -534,12 +532,9 @@ sigset_t xSignalToBlock;
 
 	pthread_cleanup_push( prvDeleteThread, (void *)pthread_self() );
 
-	/* do not respond to timer tick (but all others)*/
+	/* do respond to signals */
 	sigemptyset( &xSignalToBlock );
 	(void)pthread_sigmask( SIG_SETMASK, &xSignalToBlock, NULL );
-	sigemptyset(&xSignalToBlock);
-	sigaddset(&xSignalToBlock,SIG_TICK);
-	(void)pthread_sigmask(SIG_BLOCK, &xSignalToBlock, NULL);
 
 	/* acquire mutexes */
 	PORT_ASSERT( 0 == pthread_mutex_lock( &xRunningThreadMutex ) );
@@ -648,7 +643,7 @@ int iSchedulerPriority;
 	iPolicy = SCHED_FIFO;
 	iResult = pthread_setschedparam( pthread_self(), iPolicy, &iSchedulerPriority );		*/
 
-struct sigaction sigsuspendself, sigtick;
+struct sigaction sigsuspendself;
 portLONG lIndex;
 
 	pxThreads = ( xThreadState *)pvPortMalloc( sizeof( xThreadState ) * MAX_NUMBER_OF_TASKS );
@@ -668,17 +663,9 @@ portLONG lIndex;
 	sigsuspendself.sa_handler = prvSuspendSignalHandler;
 	sigfillset( &sigsuspendself.sa_mask );
 
-	sigtick.sa_flags = 0;
-	sigtick.sa_handler = vPortSystemTickHandler;
-	sigfillset( &sigtick.sa_mask );
-
 	if ( 0 != sigaction( SIG_SUSPEND, &sigsuspendself, NULL ) )
 	{
 		PORT_PRINT( "Problem installing SIG_SUSPEND_SELF\n" );
-	}
-	if ( 0 != sigaction( SIG_TICK, &sigtick, NULL ) )
-	{
-		PORT_PRINT( "Problem installing SIG_TICK\n" );
 	}
 	PORT_PRINT( "Running as PID: %d\n", getpid() );
 

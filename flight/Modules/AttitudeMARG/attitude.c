@@ -160,13 +160,13 @@ static void AttitudeTask(void *parameters)
 			// For first 7 seconds use accels to get gyro bias
 			accelKp = 500;
 			accelKi = 250;
-			yawBiasRate = 0.23;
+			yawBiasRate = 0.1;
 			init = 0;
 		} 	
 		else if (zero_during_arming && (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMING)) {
 			accelKp = 500;
 			accelKi = 250;
-			yawBiasRate = 0.23;
+			yawBiasRate = 0.1;
 			init = 0;			
 		} else if (init == 0) {
 			settingsUpdatedCb(AttitudeSettingsHandle());
@@ -209,6 +209,7 @@ static void updateSensors(AttitudeRawData * attitudeRaw)
 	attitudeRaw->gyros[ATTITUDERAW_GYROS_Y] =  (sensors[5] - GYRO_NEUTRAL) * gyroGain + integralFBy*RAD2DEG;
 	attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] = -(sensors[6] - GYRO_NEUTRAL) * gyroGain + integralFBz*RAD2DEG;
 
+	integralFBz += -attitudeRaw->gyros[ATTITUDERAW_GYROS_Z]*DEG2RAD * yawBiasRate;
 
 #if defined(PIOS_INCLUDE_KXSC4)
 	float accel[3] = {sensors[0], sensors[1], -sensors[2]};
@@ -274,6 +275,7 @@ static void updateAttitude(AttitudeRawData * attitudeRaw)
 	}
 
 #if defined (PIOS_INCLUDE_MARG_MAHONY)
+#if defined(PIOS_INCLUDE_AK8974)
 	MahonyAHRSupdate(
 			attitudeRaw->gyros[ATTITUDERAW_GYROS_X]*DEG2RAD,
 			attitudeRaw->gyros[ATTITUDERAW_GYROS_Y]*DEG2RAD,
@@ -285,12 +287,16 @@ static void updateAttitude(AttitudeRawData * attitudeRaw)
 			attitudeRaw->magnetometers[ATTITUDERAW_MAGNETOMETERS_Y],
 			attitudeRaw->magnetometers[ATTITUDERAW_MAGNETOMETERS_Z]
 		);
-/*
+#else
 	MahonyAHRSupdateIMU(
-			attitudeRaw->gyros[0]*DEG2RAD,attitudeRaw->gyros[1]*DEG2RAD,attitudeRaw->gyros[2]*DEG2RAD,
-			-attitudeRaw->accels[0],-attitudeRaw->accels[1],-attitudeRaw->accels[2]
+			attitudeRaw->gyros[ATTITUDERAW_GYROS_X]*DEG2RAD,
+			attitudeRaw->gyros[ATTITUDERAW_GYROS_Y]*DEG2RAD,
+			attitudeRaw->gyros[ATTITUDERAW_GYROS_Z]*DEG2RAD,
+			-attitudeRaw->accels[ATTITUDERAW_ACCELS_X],
+			-attitudeRaw->accels[ATTITUDERAW_ACCELS_Y],
+			-attitudeRaw->accels[ATTITUDERAW_ACCELS_Z]
 		);
-*/
+#endif // PIOS_INCLUDE_AK8974
 #endif
 
 	AttitudeActualData attitudeActual;

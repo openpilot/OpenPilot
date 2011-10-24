@@ -448,13 +448,12 @@ portBASE_TYPE xResult;
 	if ( pthread_self() != xTaskToDelete->hThread )
 	{
 		/* Cancelling a thread that is not me. */
-		if ( xTaskToDelete != ( pthread_t )NULL )
-		{
-			/* Send a signal to wake the task so that it definitely cancels. */
-			pthread_testcancel();
-			xResult = pthread_cancel( xTaskToDelete->hThread );
-			/* Pthread Clean-up function will note the cancellation. */
-		}
+
+		/* Send a signal to wake the task so that it definitely cancels. */
+		pthread_testcancel();
+		xResult = pthread_cancel( xTaskToDelete->hThread );
+
+		/* Pthread Clean-up function will note the cancellation. */
 		(void)pthread_mutex_unlock( &xYieldThreadMutex );
 	}
 	else

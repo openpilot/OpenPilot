@@ -424,8 +424,8 @@ void ConfigOutputWidget::refreshWidgetsValues()
             // CopterControl family
             m_config->chBank1->setText("1-3");
             m_config->chBank2->setText("4");
-            m_config->chBank3->setText("5");
-            m_config->chBank4->setText("6");
+            m_config->chBank3->setText("5,7-8");
+            m_config->chBank4->setText("6,9-10");
             m_config->outputRate1->setEnabled(true);
             m_config->outputRate2->setEnabled(true);
             m_config->outputRate3->setEnabled(true);

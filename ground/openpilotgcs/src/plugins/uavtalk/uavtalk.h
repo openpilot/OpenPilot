@@ -107,6 +107,7 @@ private:
     quint16 rxInstId;
     quint16 rxLength;
     quint16 rxPacketLength;
+    quint8 rxInstanceLength;
 
     quint8 rxCSPacket, rxCS;
     qint32 rxCount;

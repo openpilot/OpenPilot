@@ -24,6 +24,10 @@
         <field name="Mixer7Vector" units="" type="int8" elements="5" elementnames="ThrottleCurve1,ThrottleCurve2,Roll,Pitch,Yaw" defaultvalue="0"/>
         <field name="Mixer8Type" units="" type="enum" elements="1" options="Disabled,Motor,Servo,CameraRoll,CameraPitch,CameraYaw,Accessory0,Accessory1,Accessory2,Accessory3,Accessory4,Accessory5" defaultvalue="Disabled"/>
         <field name="Mixer8Vector" units="" type="int8" elements="5" elementnames="ThrottleCurve1,ThrottleCurve2,Roll,Pitch,Yaw" defaultvalue="0"/>
+        <field name="Mixer9Type" units="" type="enum" elements="1" options="Disabled,Motor,Servo,CameraRoll,CameraPitch,CameraYaw,Accessory0,Accessory1,Accessory2,Accessory3,Accessory4,Accessory5" defaultvalue="Disabled"/>
+        <field name="Mixer9Vector" units="" type="int8" elements="5" elementnames="ThrottleCurve1,ThrottleCurve2,Roll,Pitch,Yaw" defaultvalue="0"/>
+        <field name="Mixer10Type" units="" type="enum" elements="1" options="Disabled,Motor,Servo,CameraRoll,CameraPitch,CameraYaw,Accessory0,Accessory1,Accessory2,Accessory3,Accessory4,Accessory5" defaultvalue="Disabled"/>
+        <field name="Mixer10Vector" units="" type="int8" elements="5" elementnames="ThrottleCurve1,ThrottleCurve2,Roll,Pitch,Yaw" defaultvalue="0"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

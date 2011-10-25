@@ -203,7 +203,7 @@ extern uint32_t pios_com_aux_id;
 //-------------------------
 // Receiver S.Bus input
 //-------------------------
-#define PIOS_SBUS_MAX_DEVS			1
+#define PIOS_SBUS_MAX_DEVS			0
 #define PIOS_SBUS_NUM_INPUTS			(16+2)
 
 //-------------------------

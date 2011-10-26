@@ -192,64 +192,86 @@ static void AttitudeTask(void *parameters)
 
 static void updateSensors(AttitudeRawData * attitudeRaw) 
 {	
+	// use temp. values instead of messing up UAVOjects during scaling & rotation
+	float accel[3],gyro[3];
 
 #if defined(PIOS_INCLUDE_KXSC4)
 	float sensors[PIOS_ADC_NUM_PINS];
 
 #endif
-
-	
+	// Aquire sensor data and rotate into board coordinate frame
 	// Only wait the time for two nominal updates before setting an alarm
 	if(xQueueReceive(sensor_queue, (void * const) sensors, UPDATE_RATE * 2) == errQUEUE_EMPTY) {
 		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
 		return;
 	}
 	
-	attitudeRaw->gyros[ATTITUDERAW_GYROS_X] = -(sensors[4] - GYRO_NEUTRAL) * gyroGain + integralFBx*RAD2DEG;
-	attitudeRaw->gyros[ATTITUDERAW_GYROS_Y] =  (sensors[5] - GYRO_NEUTRAL) * gyroGain + integralFBy*RAD2DEG;
-	attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] = -(sensors[6] - GYRO_NEUTRAL) * gyroGain + integralFBz*RAD2DEG;
-
-	integralFBz += -attitudeRaw->gyros[ATTITUDERAW_GYROS_Z]*DEG2RAD * yawBiasRate;
-
 #if defined(PIOS_INCLUDE_KXSC4)
-	float accel[3] = {sensors[0], sensors[1], -sensors[2]};
+	accel[0] = sensors[0];
+	accel[1] = sensors[1];
+	accel[2] = -sensors[2];
 #endif
-	
+
+	gyro[0] = -(sensors[4] - GYRO_NEUTRAL);
+	gyro[1] =   sensors[5] - GYRO_NEUTRAL;
+	gyro[2] = -(sensors[6] - GYRO_NEUTRAL);
+
+#if defined(PIOS_INCLUDE_AK8974)
+	bool mag_update;
+	int16_t magbuffer[3];
+	float mag[3];
+
+	// experimental magnetometer support for MoveCopter
+	mag_update = PIOS_AK8974_NewDataAvailable();
+	if (mag_update) {
+		PIOS_AK8974_ReadMag (magbuffer);
+		mag[0] =  (float)magbuffer[1];
+		mag[1] = -(float)magbuffer[0];
+		mag[2] =  (float)magbuffer[2];
+	}
+#endif
+	// Rotate into airframe coordinate frame
 	if(rotate) {
 		// TODO: rotate sensors too so stabilization is well behaved
 		float vec_out[3];
 		rot_mult(R, accel, vec_out);
-		attitudeRaw->accels[0] = vec_out[0];
-		attitudeRaw->accels[1] = vec_out[1];
-		attitudeRaw->accels[2] = vec_out[2];
-		rot_mult(R, attitudeRaw->gyros, vec_out);
-		attitudeRaw->gyros[0] = vec_out[0];
-		attitudeRaw->gyros[1] = vec_out[1];
-		attitudeRaw->gyros[2] = vec_out[2];
-	} else {
-		attitudeRaw->accels[0] = accel[0];
-		attitudeRaw->accels[1] = accel[1];
-		attitudeRaw->accels[2] = accel[2];
-	}		
-	
-	// Scale accels and correct bias
-	attitudeRaw->accels[ATTITUDERAW_ACCELS_X] = (attitudeRaw->accels[ATTITUDERAW_ACCELS_X] - accelbias[0]) * 0.00366f * 9.81f;
-	attitudeRaw->accels[ATTITUDERAW_ACCELS_Y] = (attitudeRaw->accels[ATTITUDERAW_ACCELS_Y] - accelbias[1]) * 0.00366f * 9.81f;
-	attitudeRaw->accels[ATTITUDERAW_ACCELS_Z] = (attitudeRaw->accels[ATTITUDERAW_ACCELS_Z] - accelbias[2]) * 0.00366f * 9.81f;
-
+		accel[0] = vec_out[0];
+		accel[1] = vec_out[1];
+		accel[2] = vec_out[2];
+		rot_mult(R, gyro, vec_out);
+		gyro[0] = vec_out[0];
+		gyro[1] = vec_out[1];
+		gyro[2] = vec_out[2];
 #if defined(PIOS_INCLUDE_AK8974)
-
-	int16_t magbuffer[3];
-
-	// experimetal magnetometer support for MoveCopter
-
-		if (PIOS_AK8974_NewDataAvailable() ) {
-			PIOS_AK8974_ReadMag (magbuffer);
-			attitudeRaw->magnetometers[ATTITUDERAW_MAGNETOMETERS_X] = (float)magbuffer[1]-magbias[0];
-			attitudeRaw->magnetometers[ATTITUDERAW_MAGNETOMETERS_Y] = -(float)magbuffer[0]-magbias[1];
-			attitudeRaw->magnetometers[ATTITUDERAW_MAGNETOMETERS_Z] = (float)magbuffer[2]-magbias[2];
+		if (mag_update) {
+			rot_mult(R, mag, vec_out);
+			mag[0] = vec_out[0];
+			mag[1] = vec_out[1];
+			mag[2] = vec_out[2];
 		}
 #endif
+	}
+	
+	// Scale and correct bias
+	attitudeRaw->accels[ATTITUDERAW_ACCELS_X] = (accel[0] - accelbias[0]) * 0.00366f * 9.81f;
+	attitudeRaw->accels[ATTITUDERAW_ACCELS_Y] = (accel[1] - accelbias[1]) * 0.00366f * 9.81f;
+	attitudeRaw->accels[ATTITUDERAW_ACCELS_Z] = (accel[2] - accelbias[2]) * 0.00366f * 9.81f;
+
+	attitudeRaw->gyros[ATTITUDERAW_GYROS_X] = gyro[0] * gyroGain + integralFBx*RAD2DEG;
+	attitudeRaw->gyros[ATTITUDERAW_GYROS_Y] = gyro[1] * gyroGain + integralFBy*RAD2DEG;
+	attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] = gyro[2] * gyroGain + integralFBz*RAD2DEG;
+
+#if defined(PIOS_INCLUDE_AK8974)
+	if (mag_update) {
+		attitudeRaw->magnetometers[ATTITUDERAW_MAGNETOMETERS_X] =  mag[0]-magbias[0];
+		attitudeRaw->magnetometers[ATTITUDERAW_MAGNETOMETERS_Y] =  mag[1]-magbias[1];
+		attitudeRaw->magnetometers[ATTITUDERAW_MAGNETOMETERS_Z] =  mag[2]-magbias[2];
+	}
+#else
+	// need to use yawBiasRate only if we don't have mags.
+	integralFBz += -attitudeRaw->gyros[ATTITUDERAW_GYROS_Z]*DEG2RAD * yawBiasRate;
+#endif
+
 }
 
 static void updateAttitude(AttitudeRawData * attitudeRaw)

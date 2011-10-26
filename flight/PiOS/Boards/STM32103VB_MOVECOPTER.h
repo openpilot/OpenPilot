@@ -266,7 +266,7 @@ extern uint32_t pios_com_spektrum_id;
 // PCKL2 = HCLK / 16
 // ADCCLK = PCLK2 / 2
 #define PIOS_ADC_RATE		(72.0e6 / 4.0 / 2.0 / 252.0 / (PIOS_ADC_NUM_CHANNELS >> PIOS_ADC_USE_ADC2))
-#define PIOS_ADC_MAX_OVERSAMPLING              16
+#define PIOS_ADC_MAX_OVERSAMPLING              18
 
 //------------------------
 // PIOS_RCVR

@@ -410,6 +410,133 @@ static const struct pios_tim_channel pios_tim_servoport_all_pins[] = {
 	},
 };
 
+
+static const struct pios_tim_channel pios_tim_servoport_rcvrport_pins[] = {
+	{
+		.timer = TIM4,
+		.timer_chan = TIM_Channel_4,
+		.pin = {
+			.gpio = GPIOB,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_9,
+				.GPIO_Mode  = GPIO_Mode_AF_PP,
+				.GPIO_Speed = GPIO_Speed_2MHz,
+			},
+		},
+	},
+	{
+		.timer = TIM4,
+		.timer_chan = TIM_Channel_3,
+		.pin = {
+			.gpio = GPIOB,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_8,
+				.GPIO_Mode  = GPIO_Mode_AF_PP,
+				.GPIO_Speed = GPIO_Speed_2MHz,
+			},
+		},
+	},
+	{
+		.timer = TIM4,
+		.timer_chan = TIM_Channel_2,
+		.pin = {
+			.gpio = GPIOB,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_7,
+				.GPIO_Mode  = GPIO_Mode_AF_PP,
+				.GPIO_Speed = GPIO_Speed_2MHz,
+			},
+		},
+	},
+	{
+		.timer = TIM1,
+		.timer_chan = TIM_Channel_1,
+		.pin = {
+			.gpio = GPIOA,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_8,
+				.GPIO_Mode  = GPIO_Mode_AF_PP,
+				.GPIO_Speed = GPIO_Speed_2MHz,
+			},
+		},
+	},
+	{
+		.timer = TIM3,
+		.timer_chan = TIM_Channel_1,
+		.pin = {
+			.gpio = GPIOB,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_4,
+				.GPIO_Mode  = GPIO_Mode_AF_PP,
+				.GPIO_Speed = GPIO_Speed_2MHz,
+			},
+		},
+		.remap = GPIO_PartialRemap_TIM3,
+	},
+	{
+		.timer = TIM2,
+		.timer_chan = TIM_Channel_3,
+		.pin = {
+			.gpio = GPIOA,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_2,
+				.GPIO_Mode  = GPIO_Mode_AF_PP,
+				.GPIO_Speed = GPIO_Speed_2MHz,
+			},
+		},
+	},
+
+	// Receiver port pins
+	// S3-S6 inputs are used as outputs in this case
+	{
+		.timer = TIM3,
+		.timer_chan = TIM_Channel_3,
+		.pin = {
+			.gpio = GPIOB,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_0,
+				.GPIO_Mode  = GPIO_Mode_AF_PP,
+				.GPIO_Speed = GPIO_Speed_2MHz,
+			},
+		},
+	},
+	{
+		.timer = TIM3,
+		.timer_chan = TIM_Channel_4,
+		.pin = {
+			.gpio = GPIOB,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_1,
+				.GPIO_Mode  = GPIO_Mode_AF_PP,
+				.GPIO_Speed = GPIO_Speed_2MHz,
+			},
+		},
+	},
+	{
+		.timer = TIM2,
+		.timer_chan = TIM_Channel_1,
+		.pin = {
+			.gpio = GPIOA,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_0,
+				.GPIO_Mode  = GPIO_Mode_AF_PP,
+				.GPIO_Speed = GPIO_Speed_2MHz,
+			},
+		},
+	},
+	{
+		.timer = TIM2,
+		.timer_chan = TIM_Channel_2,
+		.pin = {
+			.gpio = GPIOA,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_1,
+				.GPIO_Mode  = GPIO_Mode_AF_PP,
+				.GPIO_Speed = GPIO_Speed_2MHz,
+			},
+		},
+	},
+};
 #if defined(PIOS_INCLUDE_USART)
 
 #include "pios_usart_priv.h"
@@ -674,7 +801,7 @@ static const struct pios_spektrum_cfg pios_spektrum_flexi_cfg = {
 
 #if defined(PIOS_INCLUDE_SBUS)
 /*
- * SBUS USART
+ * S.Bus USART
  */
 #include <pios_sbus_priv.h>
 
@@ -794,6 +921,22 @@ const struct pios_servo_cfg pios_servo_cfg = {
 	.channels = pios_tim_servoport_all_pins,
 	.num_channels = NELEMENTS(pios_tim_servoport_all_pins),
 };
+
+const struct pios_servo_cfg pios_servo_rcvr_cfg = {
+	.tim_oc_init = {
+		.TIM_OCMode = TIM_OCMode_PWM1,
+		.TIM_OutputState = TIM_OutputState_Enable,
+		.TIM_OutputNState = TIM_OutputNState_Disable,
+		.TIM_Pulse = PIOS_SERVOS_INITIAL_POSITION,
+		.TIM_OCPolarity = TIM_OCPolarity_High,
+		.TIM_OCNPolarity = TIM_OCPolarity_High,
+		.TIM_OCIdleState = TIM_OCIdleState_Reset,
+		.TIM_OCNIdleState = TIM_OCNIdleState_Reset,
+	},
+	.channels = pios_tim_servoport_rcvrport_pins,
+	.num_channels = NELEMENTS(pios_tim_servoport_rcvrport_pins),
+};
+
 
 /*
  * PPM Inputs
@@ -1025,7 +1168,7 @@ void PIOS_Board_Init(void) {
 			}
 
 			uint32_t pios_sbus_id;
-			if (PIOS_SBUS_Init(&pios_sbus_id, &pios_sbus_cfg, &pios_usart_com_driver, pios_usart_sbus_id)) {
+			if (PIOS_SBus_Init(&pios_sbus_id, &pios_sbus_cfg, &pios_usart_com_driver, pios_usart_sbus_id)) {
 				PIOS_Assert(0);
 			}
 
@@ -1190,6 +1333,7 @@ void PIOS_Board_Init(void) {
 #endif	/* PIOS_INCLUDE_PWM */
 		break;
 	case HWSETTINGS_CC_RCVRPORT_PPM:
+	case HWSETTINGS_CC_RCVRPORT_PPMSERVO:
 #if defined(PIOS_INCLUDE_PPM)
 		{
 			uint32_t pios_ppm_id;
@@ -1219,7 +1363,17 @@ void PIOS_Board_Init(void) {
 	GPIO_PinRemapConfig( GPIO_Remap_SWJ_NoJTRST, ENABLE);
 
 #ifndef PIOS_DEBUG_ENABLE_DEBUG_PINS
-	PIOS_Servo_Init(&pios_servo_cfg);
+	switch (hwsettings_rcvrport) {
+		case HWSETTINGS_CC_RCVRPORT_DISABLED:
+		case HWSETTINGS_CC_RCVRPORT_PWM:
+		case HWSETTINGS_CC_RCVRPORT_PPM:
+			PIOS_Servo_Init(&pios_servo_cfg);
+			break;
+		case HWSETTINGS_CC_RCVRPORT_PPMSERVO:
+		case HWSETTINGS_CC_RCVRPORT_SERVO:
+			PIOS_Servo_Init(&pios_servo_rcvr_cfg);
+			break;
+	}
 #else
 	PIOS_DEBUG_Init(&pios_tim_servo_all_channels, NELEMENTS(pios_tim_servo_all_channels));
 #endif	/* PIOS_DEBUG_ENABLE_DEBUG_PINS */

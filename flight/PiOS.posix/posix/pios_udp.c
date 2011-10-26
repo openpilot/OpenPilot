@@ -194,7 +194,7 @@ static void PIOS_UDP_TxStart(uint32_t udp_id, uint16_t tx_bytes_avail)
 			length = (udp_dev->tx_out_cb)(udp_dev->tx_out_context, udp_dev->tx_buffer, PIOS_UDP_RX_BUFFER_SIZE, NULL, &tx_need_yield);
 			rem = length;
 			while (rem>0) {
-				len = sendto(udp_dev->socket, udp_dev->tx_buffer, length, 0,
+				len = sendto(udp_dev->socket, udp_dev->tx_buffer+length-rem, rem, 0,
 						 (struct sockaddr *) &udp_dev->client,
 						 sizeof(udp_dev->client));
 				if (len<=0) {

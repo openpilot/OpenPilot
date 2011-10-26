@@ -1,12 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       generator_common.h
+ * @file       debuggadgetfactory.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      common functions for generating uavobjects code
- *
- * @see        The GNU Public License (GPL) Version 3
- *
+ * @addtogroup GCSPlugins GCS Plugins
+ * @{
+ * @addtogroup DebugGadgetPlugin Debug Gadget Plugin
+ * @{
+ * @brief A place holder gadget plugin 
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -24,18 +25,26 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef UAVOBJECTGENERATORCOMMON_H
-#define UAVOBJECTGENERATORCOMMON_H
+#ifndef DEBUGGADGETFACTORY_H_
+#define DEBUGGADGETFACTORY_H_
 
-#include "../uavobjectparser.h"
-#include "generator_io.h"
+#include <coreplugin/iuavgadgetfactory.h>
 
-// These special chars (regexp) will be removed from C/java identifiers
-#define ENUM_SPECIAL_CHARS "[\\.\\-\\s\\+/]"
+namespace Core {
+class IUAVGadget;
+class IUAVGadgetFactory;
+}
 
-void replaceCommonTags(QString& out, ObjectInfo* info);
-void replaceCommonTags(QString& out);
-QString boolTo01String(bool value);
-QString boolToTRUEFALSEString(bool value);
+using namespace Core;
 
-#endif
+class DebugGadgetFactory : public IUAVGadgetFactory
+{
+    Q_OBJECT
+public:
+    DebugGadgetFactory(QObject *parent = 0);
+    ~DebugGadgetFactory();
+
+    IUAVGadget *createGadget(QWidget *parent);
+};
+
+#endif // DEBUGGADGETFACTORY_H_

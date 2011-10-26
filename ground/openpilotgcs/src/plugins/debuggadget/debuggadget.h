@@ -1,12 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       generator_common.h
+ * @file       debuggadget.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      common functions for generating uavobjects code
- *
- * @see        The GNU Public License (GPL) Version 3
- *
+ * @addtogroup GCSPlugins GCS Plugins
+ * @{
+ * @addtogroup DebugGadgetPlugin Debug Gadget Plugin
+ * @{
+ * @brief A place holder gadget plugin 
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -24,18 +25,35 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef UAVOBJECTGENERATORCOMMON_H
-#define UAVOBJECTGENERATORCOMMON_H
+#ifndef DEBUGGADGET_H_
+#define DEBUGGADGET_H_
 
-#include "../uavobjectparser.h"
-#include "generator_io.h"
+#include <coreplugin/iuavgadget.h>
 
-// These special chars (regexp) will be removed from C/java identifiers
-#define ENUM_SPECIAL_CHARS "[\\.\\-\\s\\+/]"
+namespace Core {
+class IUAVGadget;
+}
+//class QWidget;
+//class QString;
+class DebugGadgetWidget;
 
-void replaceCommonTags(QString& out, ObjectInfo* info);
-void replaceCommonTags(QString& out);
-QString boolTo01String(bool value);
-QString boolToTRUEFALSEString(bool value);
+using namespace Core;
 
-#endif
+class DebugGadget : public Core::IUAVGadget
+{
+    Q_OBJECT
+public:
+    DebugGadget(QString classId, DebugGadgetWidget *widget, QWidget *parent = 0);
+    ~DebugGadget();
+
+    QList<int> context() const { return m_context; }
+    QWidget *widget() { return m_widget; }
+    QString contextHelpId() const { return QString(); }
+
+private:
+        QWidget *m_widget;
+	QList<int> m_context;
+};
+
+
+#endif // DEBUGGADGET_H_

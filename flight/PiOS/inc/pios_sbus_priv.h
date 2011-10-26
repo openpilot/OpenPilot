@@ -2,7 +2,7 @@
  ******************************************************************************
  * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
- * @addtogroup   PIOS_SBUS S.Bus Functions
+ * @addtogroup   PIOS_SBus S.Bus Functions
  * @brief PIOS interface to read and write from Futaba S.Bus port
  * @{
  *
@@ -63,7 +63,9 @@
  * S.Bus protocol provides 16 proportional and 2 discrete channels.
  * Do not change unless driver code is updated accordingly.
  */
-#define	SBUS_NUMBER_OF_CHANNELS		(16 + 2)
+#if (PIOS_SBUS_NUM_INPUTS != (16+2))
+#error "S.Bus protocol provides 16 proportional and 2 discrete channels"
+#endif
 
 /* Discrete channels represented as bits, provide values for them */
 #define	SBUS_VALUE_MIN			352
@@ -81,7 +83,10 @@ struct pios_sbus_cfg {
 
 extern const struct pios_rcvr_driver pios_sbus_rcvr_driver;
 
-extern int32_t PIOS_SBUS_Init(uint32_t * sbus_id, const struct pios_sbus_cfg *cfg, const struct pios_com_driver * driver, uint32_t lower_id);
+extern int32_t PIOS_SBus_Init(uint32_t *sbus_id,
+			      const struct pios_sbus_cfg *cfg,
+			      const struct pios_com_driver *driver,
+			      uint32_t lower_id);
 
 #endif /* PIOS_SBUS_PRIV_H */
 

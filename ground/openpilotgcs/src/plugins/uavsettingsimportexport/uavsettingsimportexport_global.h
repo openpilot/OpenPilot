@@ -1,12 +1,14 @@
 /**
  ******************************************************************************
  *
- * @file       generator_common.h
+ * @file       uavsettingsimportexport_global.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      common functions for generating uavobjects code
- *
  * @see        The GNU Public License (GPL) Version 3
- *
+ * @addtogroup GCSPlugins GCS Plugins
+ * @{
+ * @addtogroup
+ * @{
+ * @brief
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -24,18 +26,15 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef UAVOBJECTGENERATORCOMMON_H
-#define UAVOBJECTGENERATORCOMMON_H
+#ifndef UAVSETTINGSIMPORTEXPORT_GLOBAL_H
+#define UAVSETTINGSIMPORTEXPORT_GLOBAL_H
 
-#include "../uavobjectparser.h"
-#include "generator_io.h"
+#include <QtCore/qglobal.h>
 
-// These special chars (regexp) will be removed from C/java identifiers
-#define ENUM_SPECIAL_CHARS "[\\.\\-\\s\\+/]"
-
-void replaceCommonTags(QString& out, ObjectInfo* info);
-void replaceCommonTags(QString& out);
-QString boolTo01String(bool value);
-QString boolToTRUEFALSEString(bool value);
-
+#if defined(UAVSETTINGSIMPORTEXPORT_LIBRARY)
+#  define UAVSETTINGSIMPORTEXPORT_EXPORT Q_DECL_EXPORT
+#else
+#  define UAVSETTINGSIMPORTEXPORT_EXPORT Q_DECL_IMPORT
 #endif
+
+#endif // UAVSETTINGSIMPORTEXPORT_GLOBAL_H

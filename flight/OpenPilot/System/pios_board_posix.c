@@ -33,11 +33,19 @@
 #include "attitudeactual.h"
 #include "positionactual.h"
 #include "velocityactual.h"
+#include "manualcontrolsettings.h"
 
+#if defined(PIOS_INCLUDE_RCVR)
 #include "pios_rcvr_priv.h"
 
-struct pios_rcvr_channel_map pios_rcvr_channel_to_id_map[PIOS_RCVR_MAX_CHANNELS];
-uint32_t pios_rcvr_max_channel;
+/* One slot per selectable receiver group.
+ *  eg. PWM, PPM, GCS, SPEKTRUM1, SPEKTRUM2, SBUS
+ * NOTE: No slot in this map for NONE.
+ */
+uint32_t pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE];
+
+#endif /* PIOS_INCLUDE_RCVR */
+
 
 void Stack_Change() {
 }

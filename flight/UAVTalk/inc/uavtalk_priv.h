@@ -64,6 +64,7 @@ typedef struct {
     uint32_t objId;
     uint16_t instId;
     uint32_t length;
+    uint8_t instanceLength;
     uint8_t cs;
     int32_t rxCount;
     UAVTalkRxState state;

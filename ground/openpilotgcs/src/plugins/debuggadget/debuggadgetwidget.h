@@ -1,12 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       generator_common.h
+ * @file       debuggadgetwidget.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      common functions for generating uavobjects code
- *
- * @see        The GNU Public License (GPL) Version 3
- *
+ * @addtogroup GCSPlugins GCS Plugins
+ * @{
+ * @addtogroup DebugGadgetPlugin Debug Gadget Plugin
+ * @{
+ * @brief A place holder gadget plugin 
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -24,18 +25,25 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef UAVOBJECTGENERATORCOMMON_H
-#define UAVOBJECTGENERATORCOMMON_H
+#ifndef DEBUGGADGETWIDGET_H_
+#define DEBUGGADGETWIDGET_H_
 
-#include "../uavobjectparser.h"
-#include "generator_io.h"
+#include <QtGui/QLabel>
+#include "ui_debug.h"
+class DebugGadgetWidget : public QLabel
+{
+    Q_OBJECT
 
-// These special chars (regexp) will be removed from C/java identifiers
-#define ENUM_SPECIAL_CHARS "[\\.\\-\\s\\+/]"
+public:
+    DebugGadgetWidget(QWidget *parent = 0);
+    ~DebugGadgetWidget();
 
-void replaceCommonTags(QString& out, ObjectInfo* info);
-void replaceCommonTags(QString& out);
-QString boolTo01String(bool value);
-QString boolToTRUEFALSEString(bool value);
+private:
+    Ui_Form *m_config;
+private slots:
+        void saveLog();
+        void dbgMsgError( const QString & level, const QList<QVariant> & msgs );
+        void dbgMsg( const QString & level, const QList<QVariant> & msgs );
+};
 
-#endif
+#endif /* DEBUGGADGETWIDGET_H_ */

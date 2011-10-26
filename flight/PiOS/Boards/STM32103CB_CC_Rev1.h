@@ -228,6 +228,12 @@ extern uint32_t pios_com_telem_usb_id;
 #define PIOS_SPEKTRUM_NUM_INPUTS                12
 
 //-------------------------
+// Receiver S.Bus input
+//-------------------------
+#define PIOS_SBUS_MAX_DEVS			1
+#define PIOS_SBUS_NUM_INPUTS			(16+2)
+
+//-------------------------
 // Servo outputs
 //-------------------------
 #define PIOS_SERVO_UPDATE_HZ                    50

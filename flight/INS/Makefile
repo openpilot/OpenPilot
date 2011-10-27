@@ -38,7 +38,7 @@ OUTDIR := $(TOP)/build/$(TARGET)
 DEBUG ?= NO
 
 # Set to YES when using Code Sourcery toolchain
-CODE_SOURCERY ?= YES
+CODE_SOURCERY ?= NO
 
 ifeq ($(CODE_SOURCERY), YES)
 REMOVE_CMD = cs-rm
@@ -115,7 +115,7 @@ SRC += $(PIOSCOMMON)/pios_bl_helper.c
 
 ## CMSIS for STM32
 SRC += $(CMSISDIR)/core_cm3.c
-SRC += $(CMSISDIR)/system_stm32f2xx.c
+SRC += $(CMSISDIR)/system_stm32f4xx.c
 
 ## Used parts of the STM-Library
 SRC += $(STMSPDSRCDIR)/stm32f2xx_adc.c
@@ -199,8 +199,10 @@ ifeq ($(DEBUG),YES)
 CFLAGS += -O0
 CFLAGS += -DGENERAL_COV
 else
-CFLAGS += -Os
+CFLAGS += -O0
 endif
+
+CFLAGS += -mfloat-abi=hard
 
 # This is not the best place for these.  Really should abstract out
 # to the board file or something
@@ -264,8 +266,8 @@ ifeq ($(CODE_SOURCERY), YES)
 CFLAGS += -fpromote-loop-indices
 endif
 
-CFLAGS += -Wall
-CFLAGS += -Werror
+#CFLAGS += -Wall
+#CFLAGS += -Werror
 CFLAGS += -Wa,-adhlns=$(addprefix $(OUTDIR)/, $(notdir $(addsuffix .lst, $(basename $<))))
 # Compiler flags to generate dependency files:
 CFLAGS += -MD -MP -MF $(OUTDIR)/dep/$(@F).d

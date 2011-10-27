@@ -117,6 +117,7 @@ g_pfnVectors:
 	.word     DCMI_IRQHandler                   // DCMI
 	.word     CRYP_IRQHandler                   // CRYP crypto
 	.word     HASH_RNG_IRQHandler               // Hash and Rng
+	.word     FPU_IRQHandler                    // FPU
 
 /*******************************************************************************
  *
@@ -395,6 +396,12 @@ g_pfnVectors:
 	
 	.weak		HASH_RNG_IRQHandler
 	.thumb_set	HASH_RNG_IRQHandler,Default_Handler
+
+	.weak		HASH_RNG_IRQHandler
+	.thumb_set	HASH_RNG_IRQHandler,Default_Handler
+
+	.weak       FPU_IRQHandler                  
+	.thumb_set  FPU_IRQHandler,Default_Handler  
 	
 	
 /***	************** (C) COPYRIGHT 2010 STMicroelectronics *****END OF FILE****/

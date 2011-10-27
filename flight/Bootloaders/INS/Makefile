@@ -38,7 +38,7 @@ OUTDIR := $(TOP)/build/$(TARGET)
 DEBUG ?= NO
 
 # Set to YES when using Code Sourcery toolchain
-CODE_SOURCERY ?= YES
+CODE_SOURCERY ?= NO
 
 ifeq ($(CODE_SOURCERY), YES)
 REMOVE_CMD = cs-rm
@@ -98,7 +98,7 @@ SRC += $(PIOSCOMMON)/pios_bl_helper.c
 
 ## CMSIS for STM32
 SRC += $(CMSISDIR)/core_cm3.c
-SRC += $(CMSISDIR)/system_stm32f2xx.c
+SRC += $(CMSISDIR)/system_stm32f4xx.c
 
 ## Used parts of the STM-Library
 SRC += $(STMSPDSRCDIR)/stm32f2xx_adc.c

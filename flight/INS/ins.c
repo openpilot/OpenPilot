@@ -145,11 +145,8 @@ int32_t sclk_count;
 uint32_t loop_time;
 int main()
 {	
-	gps_data.quality = -1;
-	ahrs_algorithm = INSSETTINGS_ALGORITHM_SIMPLE;
-	
-	reset_values();
-	
+//	*(volatile unsigned long *)0xE000ED88 |= (0xf << 20);
+
 	PIOS_Board_Init();
 	PIOS_LED_Off(LED1);
 	PIOS_LED_On(LED2);
@@ -157,6 +154,9 @@ int main()
 	// Sensors need a second to start
 	PIOS_DELAY_WaitmS(100);
 
+	ahrs_algorithm = INSSETTINGS_ALGORITHM_SIMPLE;
+	reset_values();	
+	gps_data.quality = -1;
 #if 0
 	// Sensor test
 	if(PIOS_IMU3000_Test() != 0)

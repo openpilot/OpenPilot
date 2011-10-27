@@ -464,7 +464,7 @@ void ConfigInputWidget::wizardSetUpStep(enum wizardSteps step)
     case wizardIdentifyLimits:
     {
         dimOtherControls(false);
-        setTxMovement(moveAll);
+        setTxMovement(nothing);
         m_config->wzText->setText(QString(tr("Please move all controls to their maximum extents on both directions and press next when ready")));
         fastMdata();
         manualSettingsData=manualSettingsObj->getData();
@@ -474,6 +474,7 @@ void ConfigInputWidget::wizardSetUpStep(enum wizardSteps step)
             manualSettingsData.ChannelMax[i]=manualSettingsData.ChannelNeutral[i];
         }
         connect(manualCommandObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(identifyLimits()));
+        connect(manualCommandObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(moveSticks()));
     }
         break;
     case wizardIdentifyInverted:
@@ -570,6 +571,7 @@ void ConfigInputWidget::wizardTearDownStep(enum wizardSteps step)
         break;
     case wizardIdentifyLimits:
         disconnect(manualCommandObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(identifyLimits()));
+        disconnect(manualCommandObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(moveSticks()));
         manualSettingsObj->setData(manualSettingsData);
         restoreMdata();
         break;
@@ -734,6 +736,7 @@ void ConfigInputWidget::identifyLimits()
         if(manualSettingsData.ChannelMax[i]<manualCommandData.Channel[i])
             manualSettingsData.ChannelMax[i]=manualCommandData.Channel[i];
     }
+    manualSettingsObj->setData(manualSettingsData);
 }
 void ConfigInputWidget::setMoveFromCommand(int command)
 {

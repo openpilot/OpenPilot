@@ -66,11 +66,13 @@
  *        data (01 or 10 are known to the moment, which means 1 or 2 frames).
  *        Three values for the transmitter information byte have been seen
  *        thus far: 0x01, 0x02, 0x12.
- *   - for DSMX this byte contains just 0xB2 value for any resolution.
- *     Hopefully it always uses 11 bit resolution for 2-frame mode and
- *     10 bit otherwise. Also some weird throttle channel (0) behavior
- *     was found in some streams (all zeroes). Thus DSMX needs special
- *     processing.
+ *   - for DSMX this byte contains just 0xB2 or 0xA2 value for any resolution.
+ *     It is not known at the moment how to find the exact resolution from the
+ *     DSMX data stream. The frame number (1 or 2) and 10/11 bit resolution were
+ *     found in different data streams. So it is safer at the moment to ask user
+ *     explicitly choose the resolution.
+ *     Also some weird throttle channel (0) behavior was found in some streams
+ *     from DX8 transmitter (all zeroes). Thus DSMX needs special processing.
  *
  * Channel data are:
  * - for 10 bit: [F 0 C3 C2 C1 C0 D9 D8 D7 D6 D5 D4 D3 D2 D1 D0]
@@ -100,14 +102,22 @@
 #define SPEKTRUM_CHANNELS_PER_FRAME	7
 #define SPEKTRUM_FRAME_LENGTH		(1+1+SPEKTRUM_CHANNELS_PER_FRAME*2)
 #define SPEKTRUM_DSM2_RES_MASK		0x0010
-#define SPEKTRUM_DSM2_FNUM_MASK		0x0003
 #define SPEKTRUM_2ND_FRAME_MASK		0x8000
 
-#undef	SPEKTRUM_LOST_FRAME_COUNTER	/* include lost frame counter, not used by OP */
-
 /*
- * Spektrum receiver instance configuration
+ * Include lost frame counter and provide it as a last channel value
+ * for debugging. Currently is not used by the receiver layer.
  */
+#define	SPEKTRUM_LOST_FRAME_COUNTER	0
+
+/* Spektrum protocol variations */
+enum pios_dsm_proto {
+	PIOS_DSM_PROTO_DSM2,
+	PIOS_DSM_PROTO_DSMX10BIT,
+	PIOS_DSM_PROTO_DSMX11BIT,
+};
+
+/* Spektrum receiver instance configuration */
 struct pios_spektrum_cfg {
 	struct stm32_gpio bind;
 };
@@ -118,6 +128,7 @@ extern int32_t PIOS_Spektrum_Init(uint32_t *spektrum_id,
 				  const struct pios_spektrum_cfg *cfg,
 				  const struct pios_com_driver *driver,
 				  uint32_t lower_id,
+				  enum pios_dsm_proto proto,
 				  uint8_t bind);
 
 #endif /* PIOS_SPEKTRUM_PRIV_H */

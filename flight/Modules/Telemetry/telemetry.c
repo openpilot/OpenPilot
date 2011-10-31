@@ -93,7 +93,6 @@ int32_t TelemetryStart(void)
     
 	// Listen to objects of interest
 	GCSTelemetryStatsConnectQueue(priorityQueue);
-	HwSettingsConnectQueue(priorityQueue);
     
 	// Start telemetry tasks
 	xTaskCreate(telemetryTxTask, (signed char *)"TelTx", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY_TX, &telemetryTxTaskHandle);
@@ -116,11 +115,8 @@ int32_t TelemetryStart(void)
  */
 int32_t TelemetryInitialize(void)
 {
-	UAVObjEvent ev;
-    
 	FlightTelemetryStatsInitialize();
 	GCSTelemetryStatsInitialize();
-	HwSettingsInitialize();
 
 	// Initialize vars
 	timeOfLastObjectUpdate = 0;
@@ -132,6 +128,8 @@ int32_t TelemetryInitialize(void)
 #endif
 
 	// Update telemetry settings
+	telemetryPort = PIOS_COM_TELEM_RF;
+	HwSettingsInitialize();
 	updateSettings();
     
 	// Initialise UAVTalk
@@ -140,9 +138,9 @@ int32_t TelemetryInitialize(void)
 	// Create periodic event that will be used to update the telemetry stats
 	txErrors = 0;
 	txRetries = 0;
+	UAVObjEvent ev;
 	memset(&ev, 0, sizeof(UAVObjEvent));
 	EventPeriodicQueueCreate(&ev, priorityQueue, STATS_UPDATE_PERIOD_MS);
-    
 
 	return 0;
 }
@@ -225,8 +223,6 @@ static void processObjEvent(UAVObjEvent * ev)
 		updateTelemetryStats();
 	} else if (ev->obj == GCSTelemetryStatsHandle()) {
 		gcsTelemetryStatsUpdated();
-	} else if (ev->obj == HwSettingsHandle()) {
-		updateSettings();
 	} else {
 		// Only process event if connected to GCS or if object FlightTelemetryStats is updated
 		FlightTelemetryStatsGet(&flightStats);
@@ -508,14 +504,14 @@ static void updateTelemetryStats()
 }
 
 /**
- * Update the telemetry settings, called on startup and
- * each time the settings object is updated
+ * Update the telemetry settings, called on startup.
+ * FIXME: This should be in the TelemetrySettings object. But objects
+ * have too much overhead yet. Also the telemetry has no any specific
+ * settings, etc. Thus the HwSettings object which contains the
+ * telemetry port speed is used for now.
  */
 static void updateSettings()
 {
-	// Set port
-	telemetryPort = PIOS_COM_TELEM_RF;
-
 	if (telemetryPort) {
 
 		// Retrieve settings

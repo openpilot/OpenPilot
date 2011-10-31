@@ -50,7 +50,6 @@
 // Private functions
 
 static void gpsTask(void *parameters);
-static void SettingsUpdatedCb(UAVObjEvent * ev);
 static void updateSettings();
 
 #ifdef PIOS_GPS_SETS_HOMELOCATION
@@ -120,7 +119,6 @@ int32_t GPSInitialize(void)
 	gpsPort = PIOS_COM_GPS;
 
 	if (gpsPort) {
-
 		GPSPositionInitialize();
 #if !defined(PIOS_GPS_MINIMAL)
 		GPSTimeInitialize();
@@ -130,12 +128,7 @@ int32_t GPSInitialize(void)
 		HomeLocationInitialize();
 #endif
 		HwSettingsInitialize();
-
-		// TODO: Get gps settings object
 		updateSettings();
-
-		// Listen for settings updates, connect a callback function
-		HwSettingsConnectCallback(&SettingsUpdatedCb);
 
 		gps_rx_buffer = pvPortMalloc(NMEA_MAX_PACKET_LENGTH);
 		PIOS_Assert(gps_rx_buffer);
@@ -351,21 +344,12 @@ static void setHomeLocation(GPSPositionData * gpsData)
 }
 #endif
 
-// ****************
-
 /**
- * Settings callback, called each time the settings object is updated
- */
-static void SettingsUpdatedCb(UAVObjEvent * ev)
-{
-	if (ev->obj == HwSettingsHandle())
-		updateSettings();
-}
-
-
-/**
- * Update the GPS settings, called on startup and
- * each time the settings object is updated
+ * Update the GPS settings, called on startup.
+ * FIXME: This should be in the GPSSettings object. But objects have
+ * too much overhead yet. Also the GPS has no any specific settings
+ * like protocol, etc. Thus the HwSettings object which contains the
+ * GPS port speed is used for now.
  */
 static void updateSettings()
 {

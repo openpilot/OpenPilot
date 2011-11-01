@@ -150,7 +150,7 @@ typedef struct
 void EXTI_DeInit(void);
 
 /* Initialization and Configuration functions *********************************/
-void EXTI_Init(EXTI_InitTypeDef* EXTI_InitStruct);
+void EXTI_Init(const EXTI_InitTypeDef* EXTI_InitStruct);
 void EXTI_StructInit(EXTI_InitTypeDef* EXTI_InitStruct);
 void EXTI_GenerateSWInterrupt(uint32_t EXTI_Line);
 

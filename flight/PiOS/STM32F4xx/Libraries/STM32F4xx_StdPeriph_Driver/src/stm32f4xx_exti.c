@@ -116,7 +116,7 @@ void EXTI_DeInit(void)
   *         that contains the configuration information for the EXTI peripheral.
   * @retval None
   */
-void EXTI_Init(EXTI_InitTypeDef* EXTI_InitStruct)
+void EXTI_Init(const EXTI_InitTypeDef* EXTI_InitStruct)
 {
   uint32_t tmp = 0;
 

@@ -48,11 +48,20 @@ endif
 
 FLASH_TOOL = OPENOCD
 
+# List of modules to include
+MODULES = Actuator Telemetry ManualControl Stabilization FirmwareIAP
+PYMODULES = FlightPlan
+
 # Paths
-INS = ./
-INSINC = $(INS)/inc
+OPSYSTEM = ./System
+OPSYSTEMINC = $(OPSYSTEM)/inc
+OPUAVTALK = ../UAVTalk
+OPUAVTALKINC = $(OPUAVTALK)/inc
+OPUAVOBJ = ../UAVObjects
+OPUAVOBJINC = $(OPUAVOBJ)/inc
 PIOS = ../PiOS
 PIOSINC = $(PIOS)/inc
+OPMODULEDIR = ../Modules
 FLIGHTLIB = ../Libraries
 FLIGHTLIBINC = ../Libraries/inc
 PIOSSTM32F4XX = $(PIOS)/STM32F4xx
@@ -64,37 +73,58 @@ STMLIBDIR = $(APPLIBDIR)
 STMSPDDIR = $(STMLIBDIR)/STM32F4xx_StdPeriph_Driver
 STMSPDSRCDIR = $(STMSPDDIR)/src
 STMSPDINCDIR = $(STMSPDDIR)/inc
-OPDIR = ../OpenPilot
 OPUAVOBJ = ../UAVObjects
 OPUAVOBJINC = $(OPUAVOBJ)/inc
-OPSYSINC = $(OPDIR)/System/inc
 BOOT = ../Bootloaders/INS
 BOOTINC = $(BOOT)/inc
+PYMITE = $(FLIGHTLIB)/PyMite
+PYMITELIB = $(PYMITE)/lib
+PYMITEPLAT = $(PYMITE)/platform/openpilot
+PYMITETOOLS = $(PYMITE)/tools
+PYMITEVM = $(PYMITE)/vm
+PYMITEINC = $(PYMITEVM)
+PYMITEINC += $(PYMITEPLAT)
+PYMITEINC += $(OUTDIR)
+FLIGHTPLANLIB = $(OPMODULEDIR)/FlightPlan/lib
+FLIGHTPLANS = $(OPMODULEDIR)/FlightPlan/flightplans
 
-OPUAVSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
+UAVOBJSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
 
 SRC = 
 # optional component libraries
-include $(PIOSCOMMONLIB)/FreeRTOS/library.mk                                                                                                                                                                                  
+include $(PIOSCOMMONLIB)/FreeRTOS/library.mk
 #include $(PIOSCOMMONLIB)/dosfs/library.mk
 include $(PIOSCOMMONLIB)/msheap/library.mk
 
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files
 
-## INS:
-SRC += ins.c
-SRC += pios_board.c
-SRC += insgps13state.c
-SRC += insgps_helper.c
+## PyMite files and modules
+SRC += $(OUTDIR)/pmlib_img.c
+SRC += $(OUTDIR)/pmlib_nat.c
+SRC += $(OUTDIR)/pmlibusr_img.c
+SRC += $(OUTDIR)/pmlibusr_nat.c
+PYSRC += $(wildcard ${PYMITEVM}/*.c)
+PYSRC += $(wildcard ${PYMITEPLAT}/*.c)
+PYSRC += ${foreach MOD, ${PYMODULES}, ${wildcard ${OPMODULEDIR}/${MOD}/*.c}}
+SRC += $(PYSRC)
+
+## MODULES
+SRC += ${foreach MOD, ${MODULES}, ${wildcard ${OPMODULEDIR}/${MOD}/*.c}}
+## OPENPILOT CORE:
+SRC += ${OPMODULEDIR}/System/systemmod.c
+SRC += $(OPSYSTEM)/revolution.c
+SRC += $(OPSYSTEM)/pios_board.c
+SRC += $(OPSYSTEM)/alarms.c
+SRC += $(OPSYSTEM)/taskmonitor.c
+SRC += $(OPUAVTALK)/uavtalk.c
+SRC += $(OPUAVOBJ)/uavobjectmanager.c
+SRC += $(OPUAVOBJ)/eventdispatcher.c
+SRC += $(OPSYSTEM)/cm3_fault_handlers.c
+
 SRC += $(FLIGHTLIB)/CoordinateConversions.c
 SRC += $(FLIGHTLIB)/fifo_buffer.c
-SRC += $(FLIGHTLIB)/ahrs_spi_comm.c
-SRC += $(FLIGHTLIB)/ahrs_comm_objects.c
 SRC += $(FLIGHTLIB)/NMEA.c
-SRC += $(BOOT)/ahrs_spi_program_slave.c
-SRC += $(BOOT)/ahrs_slave_test.c
-SRC += $(BOOT)/ahrs_spi_program.c
 
 ## PIOS Hardware (STM32F4xx)
 include $(PIOS)/STM32F4xx/library.mk
@@ -103,7 +133,10 @@ include $(PIOS)/STM32F4xx/library.mk
 SRC += $(PIOSCOMMON)/pios_com.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c
 
-SRC += $(PIOSCOMMON)/pios_bl_helper.c
+#SRC += $(PIOSCOMMON)/pios_bl_helper.c
+
+include ./UAVObjects.inc
+SRC += $(UAVOBJSRC)
 
 # List C source files here which must be compiled in ARM-Mode (no -mthumb).
 # use file-extension c for "c-only"-files
@@ -135,15 +168,36 @@ ASRCARM =
 #    Each directory must be seperated by a space.
 EXTRAINCDIRS  += $(PIOS)
 EXTRAINCDIRS  += $(PIOSINC)
+EXTRAINCDIRS  += $(OPSYSTEMINC)
+EXTRAINCDIRS  += $(OPUAVTALK)
+EXTRAINCDIRS  += $(OPUAVTALKINC)
+EXTRAINCDIRS  += $(OPUAVOBJ)
+EXTRAINCDIRS  += $(OPUAVOBJINC)
+EXTRAINCDIRS  += $(UAVOBJSYNTHDIR)
 EXTRAINCDIRS  += $(FLIGHTLIBINC)
 EXTRAINCDIRS  += $(PIOSSTM32F4XX)
 EXTRAINCDIRS  += $(PIOSCOMMON)
 EXTRAINCDIRS  += $(PIOSBOARDS)
 EXTRAINCDIRS  += $(STMSPDINCDIR)
 EXTRAINCDIRS  += $(CMSISDIR)
-EXTRAINCDIRS  += $(INSINC)
 EXTRAINCDIRS  += $(OPUAVSYNTHDIR)
 EXTRAINCDIRS  += $(BOOTINC)
+EXTRAINCDIRS  += $(PYMITEINC)
+
+# Generate intermediate code
+gencode: ${OUTDIR}/pmlib_img.c ${OUTDIR}/pmlib_nat.c ${OUTDIR}/pmlibusr_img.c ${OUTDIR}/pmlibusr_nat.c ${OUTDIR}/pmfeatures.h 
+
+$(PYSRC): gencode
+
+PYTHON = python
+
+# Generate code for PyMite
+${OUTDIR}/pmlib_img.c ${OUTDIR}/pmlib_nat.c ${OUTDIR}/pmlibusr_img.c ${OUTDIR}/pmlibusr_nat.c ${OUTDIR}/pmfeatures.h: $(wildcard ${PYMITELIB}/*.py) $(wildcard ${PYMITEPLAT}/*.py) $(wildcard ${FLIGHTPLANLIB}/*.py) $(wildcard ${FLIGHTPLANS}/*.py) 
+	@echo $(MSG_PYMITEINIT) $(call toprel, $@)
+	@$(PYTHON) $(PYMITETOOLS)/pmImgCreator.py -f $(PYMITEPLAT)/pmfeatures.py -c -s --memspace=flash -o $(OUTDIR)/pmlib_img.c --native-file=$(OUTDIR)/pmlib_nat.c $(PYMITELIB)/list.py $(PYMITELIB)/dict.py $(PYMITELIB)/__bi.py $(PYMITELIB)/sys.py $(PYMITELIB)/string.py $(wildcard $(FLIGHTPLANLIB)/*.py)
+	@$(PYTHON) $(PYMITETOOLS)/pmGenPmFeatures.py $(PYMITEPLAT)/pmfeatures.py > $(OUTDIR)/pmfeatures.h
+	@$(PYTHON) $(PYMITETOOLS)/pmImgCreator.py -f $(PYMITEPLAT)/pmfeatures.py -c -u -o $(OUTDIR)/pmlibusr_img.c --native-file=$(OUTDIR)/pmlibusr_nat.c $(FLIGHTPLANS)/test.py
+EXTRAINCDIRS += ${foreach MOD, ${MODULES} ${PYMODULES}, $(OPMODULEDIR)/${MOD}/inc} ${OPMODULEDIR}/System/inc
 
 # List any extra directories to look for library files here.
 # Also add directories where the linker should search for
@@ -282,6 +336,7 @@ LDFLAGS += $(addprefix -T,$(LINKER_SCRIPTS_APP))
 
 # Define programs and commands.
 REMOVE  = $(REMOVE_CMD) -f
+PYHON   = python
 
 # List of all source files.
 ALLSRC     = $(ASRCARM) $(ASRC) $(SRCARM) $(SRC) $(CPPSRCARM) $(CPPSRC)
@@ -312,6 +367,7 @@ $(error "$(MSG_FORMATERROR) $(FORMAT)")
 endif
 endif
 endif
+
 
 # Link: create ELF output file from object files.
 $(eval $(call LINK_TEMPLATE, $(OUTDIR)/$(TARGET).elf, $(ALLOBJ)))

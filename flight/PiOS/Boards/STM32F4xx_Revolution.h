@@ -95,6 +95,16 @@ TIM8  |           |           |           |
 #define PIOS_SPI_MAX_DEVS                       2
 
 //------------------------
+// PIOS_WDG
+//------------------------
+#define PIOS_WATCHDOG_TIMEOUT    250
+#define PIOS_WDG_REGISTER        RTC_BKP_DR4
+#define PIOS_WDG_ACTUATOR        0x0001
+#define PIOS_WDG_STABILIZATION   0x0002
+#define PIOS_WDG_AHRS            0x0004
+#define PIOS_WDG_MANUAL          0x0008
+
+//------------------------
 // PIOS_I2C
 // See also pios_board.c
 //------------------------
@@ -116,16 +126,26 @@ extern uint32_t pios_i2c_gyro_adapter_id;
 //
 // See also pios_board.c
 //-------------------------
-#define PIOS_COM_MAX_DEVS               2
+#define PIOS_COM_MAX_DEVS               4
+extern uint32_t pios_com_telem_rf_id;
 extern uint32_t pios_com_gps_id;
 extern uint32_t pios_com_aux_id;
+extern uint32_t pios_com_telem_usb_id;
 #define PIOS_COM_AUX                    (pios_com_aux_id)
+#define PIOS_COM_TELEM_USB              (pios_com_telem_usb_id)
+#define PIOS_COM_TELEM_RF               (pios_com_telem_rf_id)
 #define PIOS_COM_DEBUG                  PIOS_COM_AUX
+
+//------------------------
+// TELEMETRY 
+//------------------------
+#define TELEM_QUEUE_SIZE         20
+#define PIOS_TELEM_STACK_SIZE    624
 
 //-------------------------
 // System Settings
 //-------------------------
-#define PIOS_MASTER_CLOCK                       120000000
+#define PIOS_MASTER_CLOCK                       168000000
 #define PIOS_PERIPHERAL_CLOCK                   (PIOS_MASTER_CLOCK / 2)
 
 //-------------------------
@@ -135,6 +155,48 @@ extern uint32_t pios_com_aux_id;
 #define PIOS_IRQ_PRIO_MID                       8               // higher than RTOS
 #define PIOS_IRQ_PRIO_HIGH                      5               // for SPI, ADC, I2C etc...
 #define PIOS_IRQ_PRIO_HIGHEST                   4               // for USART etc...
+
+//------------------------
+// PIOS_RCVR
+// See also pios_board.c
+//------------------------
+#define PIOS_RCVR_MAX_DEVS			1
+#define PIOS_RCVR_MAX_CHANNELS			12
+
+//-------------------------
+// Receiver PPM input
+//-------------------------
+#define PIOS_PPM_MAX_DEVS			1
+#define PIOS_PPM_NUM_INPUTS                     12
+
+//-------------------------
+// Receiver PWM input
+//-------------------------
+#define PIOS_PWM_MAX_DEVS			1
+#define PIOS_PWM_NUM_INPUTS                     8
+
+//-------------------------
+// Receiver SPEKTRUM input
+//-------------------------
+#define PIOS_SPEKTRUM_MAX_DEVS			1
+#define PIOS_SPEKTRUM_NUM_INPUTS                12
+
+//-------------------------
+// Receiver S.Bus input
+//-------------------------
+#define PIOS_SBUS_MAX_DEVS			0
+#define PIOS_SBUS_NUM_INPUTS			(16+2)
+
+//-------------------------
+// Servo outputs
+//-------------------------
+#define PIOS_SERVO_UPDATE_HZ                    50
+#define PIOS_SERVOS_INITIAL_POSITION            0 /* dont want to start motors, have no pulse till settings loaded */
+
+//--------------------------
+// Timer controller settings
+//--------------------------
+#define PIOS_TIM_MAX_DEVS			3
 
 //-------------------------
 // ADC

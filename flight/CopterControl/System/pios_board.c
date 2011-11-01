@@ -1204,6 +1204,9 @@ void PIOS_Board_Init(void) {
 		{
 			enum pios_dsm_proto proto;
 			switch (hwsettings_cc_mainport) {
+			case HWSETTINGS_CC_MAINPORT_DSM2:
+				proto = PIOS_DSM_PROTO_DSM2;
+				break;
 			case HWSETTINGS_CC_MAINPORT_DSMX10BIT:
 				proto = PIOS_DSM_PROTO_DSMX10BIT;
 				break;
@@ -1211,7 +1214,7 @@ void PIOS_Board_Init(void) {
 				proto = PIOS_DSM_PROTO_DSMX11BIT;
 				break;
 			default:
-				proto = PIOS_DSM_PROTO_DSM2;
+				PIOS_Assert(0);
 				break;
 			}
 
@@ -1291,6 +1294,9 @@ void PIOS_Board_Init(void) {
 		{
 			enum pios_dsm_proto proto;
 			switch (hwsettings_cc_flexiport) {
+			case HWSETTINGS_CC_FLEXIPORT_DSM2:
+				proto = PIOS_DSM_PROTO_DSM2;
+				break;
 			case HWSETTINGS_CC_FLEXIPORT_DSMX10BIT:
 				proto = PIOS_DSM_PROTO_DSMX10BIT;
 				break;
@@ -1298,7 +1304,7 @@ void PIOS_Board_Init(void) {
 				proto = PIOS_DSM_PROTO_DSMX11BIT;
 				break;
 			default:
-				proto = PIOS_DSM_PROTO_DSM2;
+				PIOS_Assert(0);
 				break;
 			}
 

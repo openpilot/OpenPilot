@@ -35,7 +35,6 @@
 #include <QtGui/QWidget>
 #include <QList>
 #include "smartsavebutton.h"
-#include "hwsettings.h"
 
 class ConfigCCHWWidget: public ConfigTaskWidget
 {

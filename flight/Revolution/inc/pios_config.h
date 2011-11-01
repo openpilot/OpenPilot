@@ -55,6 +55,7 @@
 #define PIOS_INCLUDE_EXTI
 
 #define PIOS_INCLUDE_BMA180
+#define PIOS_INCLUDE_FREERTOS
 
 /* COM Module */
 #define GPS_BAUDRATE			19200

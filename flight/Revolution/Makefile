@@ -64,7 +64,6 @@ STMLIBDIR = $(APPLIBDIR)
 STMSPDDIR = $(STMLIBDIR)/STM32F4xx_StdPeriph_Driver
 STMSPDSRCDIR = $(STMSPDDIR)/src
 STMSPDINCDIR = $(STMSPDDIR)/inc
-CMSISDIR  = $(STMLIBDIR)/CMSIS/Core/CM3
 OPDIR = ../OpenPilot
 OPUAVOBJ = ../UAVObjects
 OPUAVOBJINC = $(OPUAVOBJ)/inc
@@ -74,16 +73,17 @@ BOOTINC = $(BOOT)/inc
 
 OPUAVSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
 
+SRC = 
 # optional component libraries
 include $(PIOSCOMMONLIB)/FreeRTOS/library.mk                                                                                                                                                                                  
-include $(PIOSCOMMONLIB)/dosfs/library.mk
+#include $(PIOSCOMMONLIB)/dosfs/library.mk
 include $(PIOSCOMMONLIB)/msheap/library.mk
 
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files
 
 ## INS:
-SRC = ins.c
+SRC += ins.c
 SRC += pios_board.c
 SRC += insgps13state.c
 SRC += insgps_helper.c
@@ -97,13 +97,7 @@ SRC += $(BOOT)/ahrs_slave_test.c
 SRC += $(BOOT)/ahrs_spi_program.c
 
 ## PIOS Hardware (STM32F4xx)
-
 include $(PIOS)/STM32F4xx/library.mk
-#SRC += $(PIOSSTM32F4XX)/pios_iap.c
-SRC += $(PIOSSTM32F4XX)/pios_bma180.c
-SRC += $(PIOSSTM32F4XX)/pios_hmc5883.c
-SRC += $(PIOSSTM32F4XX)/pios_bmp085.c
-SRC += $(PIOSSTM32F4XX)/pios_imu3000.c
 
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_com.c
@@ -111,25 +105,6 @@ SRC += $(PIOSCOMMON)/printf-stdarg.c
 
 SRC += $(PIOSCOMMON)/pios_bl_helper.c
 
-SRC = $(PIOSSTM32F4XX)/startup.c
-
-## Used parts of the STM-Library
-SRC += $(STMSPDSRCDIR)/stm32f4xx_adc.c
-SRC += $(STMSPDSRCDIR)/stm32f4xx_crc.c
-SRC += $(STMSPDSRCDIR)/stm32f4xx_dac.c
-SRC += $(STMSPDSRCDIR)/stm32f4xx_dma.c
-SRC += $(STMSPDSRCDIR)/stm32f4xx_exti.c
-SRC += $(STMSPDSRCDIR)/stm32f4xx_flash.c
-SRC += $(STMSPDSRCDIR)/stm32f4xx_gpio.c
-SRC += $(STMSPDSRCDIR)/stm32f4xx_i2c.c
-SRC += $(STMSPDSRCDIR)/stm32f4xx_pwr.c
-SRC += $(STMSPDSRCDIR)/stm32f4xx_rcc.c
-SRC += $(STMSPDSRCDIR)/stm32f4xx_rtc.c
-SRC += $(STMSPDSRCDIR)/stm32f4xx_spi.c
-SRC += $(STMSPDSRCDIR)/stm32f4xx_syscfg.c
-SRC += $(STMSPDSRCDIR)/stm32f4xx_tim.c
-SRC += $(STMSPDSRCDIR)/stm32f4xx_usart.c
-SRC += $(STMSPDSRCDIR)/misc.c
 # List C source files here which must be compiled in ARM-Mode (no -mthumb).
 # use file-extension c for "c-only"-files
 ## just for testing, timer.c could be compiled in thumb-mode too
@@ -226,6 +201,7 @@ DEBUGF = dwarf-2
 # Place project-specific -D (define) and/or
 # -U options for C here.
 CDEFS = -DSTM32F10X_$(MODEL)
+CDEFS += -DSYSCLK_FREQ=$(SYSCLK_FREQ)
 CDEFS += -DUSE_STDPERIPH_DRIVER
 CDEFS += -DUSE_$(BOARD)
 CDEFS += -DIN_AHRS

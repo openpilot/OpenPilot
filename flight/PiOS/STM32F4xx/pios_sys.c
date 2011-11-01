@@ -60,9 +60,6 @@ void PIOS_SYS_Init(void)
 	PIOS_DELAY_Init();
 	PIOS_DELAY_WaitmS(500);		/* XXX wait for the OpenOCD DCC stuff to get its act together */
 
-	/* Debug services */
-	PIOS_DEBUG_Init();
-
 	/*
 	 * Turn on all the peripheral clocks.
 	 * Micromanaging clocks makes no sense given the power situation in the system, so

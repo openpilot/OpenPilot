@@ -48,7 +48,9 @@
 
 #include "pios_config.h"
 /* STM32 Std Perf Lib */
-#if defined(STM32F2XX)
+#if defined(STM32F4XX)
+# include <stm32f4xx.h>
+#elif defined(STM32F2XX)
 #include <stm32f2xx.h>
 #include <stm32f2xx_syscfg.h>
 #else

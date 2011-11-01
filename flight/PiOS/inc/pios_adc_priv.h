@@ -52,9 +52,11 @@ struct pios_adc_dev {
 	volatile uint8_t adc_oversample;
 	uint8_t dma_block_size;
 	uint16_t dma_half_buffer_size;
+#if defined(PIOS_INCLUDE_ADC)
 	int16_t fir_coeffs[PIOS_ADC_MAX_SAMPLES+1]  __attribute__ ((aligned(4)));
 	volatile int16_t raw_data_buffer[PIOS_ADC_MAX_SAMPLES]  __attribute__ ((aligned(4)));	// Double buffer that DMA just used
 	float downsampled_buffer[PIOS_ADC_NUM_CHANNELS]  __attribute__ ((aligned(4)));
+#endif
 };
 
 extern struct pios_adc_dev pios_adc_devs[];

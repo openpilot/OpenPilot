@@ -45,7 +45,7 @@ typedef enum {
 
 /* Public Functions */
 extern int32_t PIOS_SPI_SetClockSpeed(uint32_t spi_id, SPIPrescalerTypeDef spi_prescaler);
-#ifdef STM32F2XX /* XXX harmonise these */
+#if defined(STM32F2XX) || defined(STM32F4XX) /* XXX harmonise these */
 extern int32_t PIOS_SPI_RC_PinSet(uint32_t spi_id, uint32_t slave_id, uint8_t pin_value);
 #else
 extern int32_t PIOS_SPI_RC_PinSet(uint32_t spi_id, uint8_t pin_value);

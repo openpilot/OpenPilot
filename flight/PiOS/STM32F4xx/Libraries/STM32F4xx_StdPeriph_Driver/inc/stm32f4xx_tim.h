@@ -1018,7 +1018,7 @@ typedef struct
 
 /* TimeBase management ********************************************************/
 void TIM_DeInit(TIM_TypeDef* TIMx);
-void TIM_TimeBaseInit(TIM_TypeDef* TIMx, TIM_TimeBaseInitTypeDef* TIM_TimeBaseInitStruct);
+void TIM_TimeBaseInit(TIM_TypeDef* TIMx, const TIM_TimeBaseInitTypeDef* TIM_TimeBaseInitStruct);
 void TIM_TimeBaseStructInit(TIM_TimeBaseInitTypeDef* TIM_TimeBaseInitStruct);
 void TIM_PrescalerConfig(TIM_TypeDef* TIMx, uint16_t Prescaler, uint16_t TIM_PSCReloadMode);
 void TIM_CounterModeConfig(TIM_TypeDef* TIMx, uint16_t TIM_CounterMode);
@@ -1034,10 +1034,10 @@ void TIM_SetClockDivision(TIM_TypeDef* TIMx, uint16_t TIM_CKD);
 void TIM_Cmd(TIM_TypeDef* TIMx, FunctionalState NewState);
 
 /* Output Compare management **************************************************/
-void TIM_OC1Init(TIM_TypeDef* TIMx, TIM_OCInitTypeDef* TIM_OCInitStruct);
-void TIM_OC2Init(TIM_TypeDef* TIMx, TIM_OCInitTypeDef* TIM_OCInitStruct);
-void TIM_OC3Init(TIM_TypeDef* TIMx, TIM_OCInitTypeDef* TIM_OCInitStruct);
-void TIM_OC4Init(TIM_TypeDef* TIMx, TIM_OCInitTypeDef* TIM_OCInitStruct);
+void TIM_OC1Init(TIM_TypeDef* TIMx, const TIM_OCInitTypeDef* TIM_OCInitStruct);
+void TIM_OC2Init(TIM_TypeDef* TIMx, const TIM_OCInitTypeDef* TIM_OCInitStruct);
+void TIM_OC3Init(TIM_TypeDef* TIMx, const TIM_OCInitTypeDef* TIM_OCInitStruct);
+void TIM_OC4Init(TIM_TypeDef* TIMx, const TIM_OCInitTypeDef* TIM_OCInitStruct);
 void TIM_OCStructInit(TIM_OCInitTypeDef* TIM_OCInitStruct);
 void TIM_SelectOCxM(TIM_TypeDef* TIMx, uint16_t TIM_Channel, uint16_t TIM_OCMode);
 void TIM_SetCompare1(TIM_TypeDef* TIMx, uint32_t Compare1);

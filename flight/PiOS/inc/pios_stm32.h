@@ -38,7 +38,7 @@ struct stm32_irq {
 };
 
 struct stm32_dma_chan {
-#if defined(STM32F2XX)
+#if defined(STM32F2XX) || defined(STM32F4XX)
 	DMA_Stream_TypeDef *channel;
 #else
 	DMA_Channel_TypeDef *channel;

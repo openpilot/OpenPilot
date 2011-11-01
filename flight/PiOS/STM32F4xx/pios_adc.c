@@ -62,12 +62,14 @@ struct adc_accumulator {
 	uint32_t		count;
 };
 
+#if defined(PIOS_INCLUDE_ADC)
 static struct dma_config config[] = PIOS_DMA_PIN_CONFIG;
 #define PIOS_ADC_NUM_PINS	(sizeof(config) / sizeof(config[0]))
 
 static struct adc_accumulator accumulator[PIOS_ADC_NUM_PINS];
 
 static uint16_t adc_raw_buffer[2][PIOS_ADC_MAX_SAMPLES][PIOS_ADC_NUM_PINS];
+#endif
 
 #define PIOS_ADC_TIMER		TIM3		/* might want this to come from the config */
 #define PIOS_LOWRATE_ADC	ADC1
@@ -75,6 +77,7 @@ static uint16_t adc_raw_buffer[2][PIOS_ADC_MAX_SAMPLES][PIOS_ADC_NUM_PINS];
 static void
 init_pins(void)
 {
+#if defined(PIOS_INCLUDE_ADC)
 	/* Setup analog pins */
 	GPIO_InitTypeDef GPIO_InitStructure;
 	GPIO_StructInit(&GPIO_InitStructure);
@@ -85,11 +88,13 @@ init_pins(void)
 		GPIO_InitStructure.GPIO_Pin = config[i].pin;
 		GPIO_Init(config[i].port, &GPIO_InitStructure);
 	}
+#endif
 }
 
 static void
 init_dma(void)
 {
+#if defined(PIOS_INCLUDE_ADC)
 	/* Disable interrupts */
 	DMA_ITConfig(pios_adc_cfg.dma.rx.channel, pios_adc_cfg.dma.irq.flags, DISABLE);
 
@@ -126,11 +131,13 @@ init_dma(void)
 	NVICInit.NVIC_IRQChannelSubPriority			= 0;
 	NVICInit.NVIC_IRQChannelCmd					= ENABLE;
 	NVIC_Init(&NVICInit);
+#endif
 }
 
 static void
 init_timer(void)
 {
+#if defined(PIOS_INCLUDE_ADC)
 	RCC_ClocksTypeDef	clocks;
 	TIM_TimeBaseInitTypeDef TIMInit;
 
@@ -153,11 +160,13 @@ init_timer(void)
 	/* configure trigger output on reload */
 	TIM_SelectOutputTrigger(PIOS_ADC_TIMER, TIM_TRGOSource_Update);
 	TIM_Cmd(PIOS_ADC_TIMER, ENABLE);
+#endif
 }
 
 static void
 init_adc(void)
 {
+#if defined(PIOS_INCLUDE_ADC)
 	ADC_DeInit();
 
 	/* turn on VREFInt in case we need it */
@@ -198,6 +207,7 @@ init_adc(void)
 
 	/* Finally start initial conversion */
 	ADC_Cmd(PIOS_LOWRATE_ADC, ENABLE);
+#endif
 }
 
 /**
@@ -205,10 +215,12 @@ init_adc(void)
  */
 void PIOS_ADC_Init()
 {
+#if defined(PIOS_INCLUDE_ADC)
 	init_pins();
 	init_dma();
 	init_timer();
 	init_adc();
+#endif
 }
 
 /**
@@ -228,6 +240,7 @@ void PIOS_ADC_Config(uint32_t oversampling)
  */
 int32_t PIOS_ADC_PinGet(uint32_t pin)
 {
+#if defined(PIOS_INCLUDE_ADC)
 	int32_t	result;
 
 	/* Check if pin exists */
@@ -239,8 +252,10 @@ int32_t PIOS_ADC_PinGet(uint32_t pin)
 	result = accumulator[pin].accumulator / (accumulator[pin].count ?: 1);
 	accumulator[pin].accumulator = 0;
 	accumulator[pin].count = 0;
-	
+
 	return result;
+#endif
+	return -1;
 }
 
 /**
@@ -309,6 +324,7 @@ void PIOS_ADC_SetFIRCoefficients(float * new_filter)
  */
 void accumulate(uint16_t *buffer, uint32_t count)
 {
+#if defined(PIOS_INCLUDE_ADC)
 	uint16_t	*sp = buffer;
 
 	/*
@@ -339,7 +355,7 @@ void accumulate(uint16_t *buffer, uint32_t count)
 	}
 #endif
 #endif
-
+#endif
 	// XXX callback?
 }
 
@@ -350,6 +366,7 @@ void accumulate(uint16_t *buffer, uint32_t count)
  */
 void PIOS_ADC_DMA_Handler(void)
 {
+#if defined(PIOS_INCLUDE_ADC)
 	/* terminal count, buffer has flipped */
 	if (DMA_GetITStatus(pios_adc_cfg.dma.rx.channel, pios_adc_cfg.full_flag)) {
 		DMA_ClearITPendingBit(pios_adc_cfg.dma.rx.channel, pios_adc_cfg.full_flag);
@@ -365,6 +382,7 @@ void PIOS_ADC_DMA_Handler(void)
 //			}
 //		outputcounter++;
 	}
+#endif
 }
 
 /** 

@@ -4,8 +4,8 @@ BOOTLOADER_VERSION  := 0x00
 HW_TYPE             := 0x00
 
 MCU                 := cortex-m4
-CHIP                := STM32F205RGT
-BOARD               := STM32F2xx_INS
+CHIP                := STM32F405RGT
+BOARD               := STM32F4xx_OP
 MODEL               := HD
 MODEL_SUFFIX        := 
 

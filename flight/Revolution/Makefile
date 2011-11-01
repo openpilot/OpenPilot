@@ -55,12 +55,13 @@ PIOS = ../PiOS
 PIOSINC = $(PIOS)/inc
 FLIGHTLIB = ../Libraries
 FLIGHTLIBINC = ../Libraries/inc
-PIOSSTM32F2XX = $(PIOS)/STM32F2xx
+PIOSSTM32F4XX = $(PIOS)/STM32F4xx
 PIOSCOMMON = $(PIOS)/Common
 PIOSBOARDS = $(PIOS)/Boards
-APPLIBDIR = $(PIOSSTM32F2XX)/Libraries
+PIOSCOMMONLIB = $(PIOSCOMMON)/Libraries
+APPLIBDIR = $(PIOSSTM32F4XX)/Libraries
 STMLIBDIR = $(APPLIBDIR)
-STMSPDDIR = $(STMLIBDIR)/STM32F2xx_StdPeriph_Driver
+STMSPDDIR = $(STMLIBDIR)/STM32F4xx_StdPeriph_Driver
 STMSPDSRCDIR = $(STMSPDDIR)/src
 STMSPDINCDIR = $(STMSPDDIR)/inc
 CMSISDIR  = $(STMLIBDIR)/CMSIS/Core/CM3
@@ -72,6 +73,11 @@ BOOT = ../Bootloaders/INS
 BOOTINC = $(BOOT)/inc
 
 OPUAVSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
+
+# optional component libraries
+include $(PIOSCOMMONLIB)/FreeRTOS/library.mk                                                                                                                                                                                  
+include $(PIOSCOMMONLIB)/dosfs/library.mk
+include $(PIOSCOMMONLIB)/msheap/library.mk
 
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files
@@ -90,22 +96,14 @@ SRC += $(BOOT)/ahrs_spi_program_slave.c
 SRC += $(BOOT)/ahrs_slave_test.c
 SRC += $(BOOT)/ahrs_spi_program.c
 
-## PIOS Hardware (STM32F2xx)
-SRC += $(PIOSSTM32F2XX)/pios_sys.c
-SRC += $(PIOSSTM32F2XX)/pios_led.c
-SRC += $(PIOSSTM32F2XX)/pios_delay.c
-SRC += $(PIOSSTM32F2XX)/pios_usart.c
-SRC += $(PIOSSTM32F2XX)/pios_irq.c
-SRC += $(PIOSSTM32F2XX)/pios_i2c.c
-#SRC += $(PIOSSTM32F2XX)/pios_debug.c
-#SRC += $(PIOSSTM32F2XX)/pios_gpio.c
-SRC += $(PIOSSTM32F2XX)/pios_spi.c
-#SRC += $(PIOSSTM32F2XX)/pios_exti.c
-SRC += $(PIOSSTM32F2XX)/pios_iap.c
-SRC += $(PIOSSTM32F2XX)/pios_bma180.c
-SRC += $(PIOSSTM32F2XX)/pios_hmc5883.c
-SRC += $(PIOSSTM32F2XX)/pios_bmp085.c
-SRC += $(PIOSSTM32F2XX)/pios_imu3000.c
+## PIOS Hardware (STM32F4xx)
+
+include $(PIOS)/STM32F4xx/library.mk
+#SRC += $(PIOSSTM32F4XX)/pios_iap.c
+SRC += $(PIOSSTM32F4XX)/pios_bma180.c
+SRC += $(PIOSSTM32F4XX)/pios_hmc5883.c
+SRC += $(PIOSSTM32F4XX)/pios_bmp085.c
+SRC += $(PIOSSTM32F4XX)/pios_imu3000.c
 
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_com.c
@@ -113,26 +111,24 @@ SRC += $(PIOSCOMMON)/printf-stdarg.c
 
 SRC += $(PIOSCOMMON)/pios_bl_helper.c
 
-## CMSIS for STM32
-SRC += $(CMSISDIR)/core_cm3.c
-SRC += $(CMSISDIR)/system_stm32f4xx.c
+SRC = $(PIOSSTM32F4XX)/startup.c
 
 ## Used parts of the STM-Library
-SRC += $(STMSPDSRCDIR)/stm32f2xx_adc.c
-SRC += $(STMSPDSRCDIR)/stm32f2xx_crc.c
-SRC += $(STMSPDSRCDIR)/stm32f2xx_dac.c
-SRC += $(STMSPDSRCDIR)/stm32f2xx_dma.c
-SRC += $(STMSPDSRCDIR)/stm32f2xx_exti.c
-SRC += $(STMSPDSRCDIR)/stm32f2xx_flash.c
-SRC += $(STMSPDSRCDIR)/stm32f2xx_gpio.c
-SRC += $(STMSPDSRCDIR)/stm32f2xx_i2c.c
-SRC += $(STMSPDSRCDIR)/stm32f2xx_pwr.c
-SRC += $(STMSPDSRCDIR)/stm32f2xx_rcc.c
-SRC += $(STMSPDSRCDIR)/stm32f2xx_rtc.c
-SRC += $(STMSPDSRCDIR)/stm32f2xx_spi.c
-SRC += $(STMSPDSRCDIR)/stm32f2xx_syscfg.c
-SRC += $(STMSPDSRCDIR)/stm32f2xx_tim.c
-SRC += $(STMSPDSRCDIR)/stm32f2xx_usart.c
+SRC += $(STMSPDSRCDIR)/stm32f4xx_adc.c
+SRC += $(STMSPDSRCDIR)/stm32f4xx_crc.c
+SRC += $(STMSPDSRCDIR)/stm32f4xx_dac.c
+SRC += $(STMSPDSRCDIR)/stm32f4xx_dma.c
+SRC += $(STMSPDSRCDIR)/stm32f4xx_exti.c
+SRC += $(STMSPDSRCDIR)/stm32f4xx_flash.c
+SRC += $(STMSPDSRCDIR)/stm32f4xx_gpio.c
+SRC += $(STMSPDSRCDIR)/stm32f4xx_i2c.c
+SRC += $(STMSPDSRCDIR)/stm32f4xx_pwr.c
+SRC += $(STMSPDSRCDIR)/stm32f4xx_rcc.c
+SRC += $(STMSPDSRCDIR)/stm32f4xx_rtc.c
+SRC += $(STMSPDSRCDIR)/stm32f4xx_spi.c
+SRC += $(STMSPDSRCDIR)/stm32f4xx_syscfg.c
+SRC += $(STMSPDSRCDIR)/stm32f4xx_tim.c
+SRC += $(STMSPDSRCDIR)/stm32f4xx_usart.c
 SRC += $(STMSPDSRCDIR)/misc.c
 # List C source files here which must be compiled in ARM-Mode (no -mthumb).
 # use file-extension c for "c-only"-files
@@ -155,7 +151,7 @@ CPPSRCARM =
 # Even though the DOS/Win* filesystem matches both .s and .S the same,
 # it will preserve the spelling of the filenames, and gcc itself does
 # care about how the name is spelled on its command-line.
-ASRC = $(PIOSSTM32F2XX)/startup_stm32f2xx.S
+
 
 # List Assembler source files here which must be assembled in ARM-Mode..
 ASRCARM =
@@ -165,7 +161,7 @@ ASRCARM =
 EXTRAINCDIRS  += $(PIOS)
 EXTRAINCDIRS  += $(PIOSINC)
 EXTRAINCDIRS  += $(FLIGHTLIBINC)
-EXTRAINCDIRS  += $(PIOSSTM32F2XX)
+EXTRAINCDIRS  += $(PIOSSTM32F4XX)
 EXTRAINCDIRS  += $(PIOSCOMMON)
 EXTRAINCDIRS  += $(PIOSBOARDS)
 EXTRAINCDIRS  += $(STMSPDINCDIR)
@@ -189,7 +185,7 @@ EXTRA_LIBDIRS =
 EXTRA_LIBS =
 
 # Path to Linker-Scripts
-LINKERSCRIPTPATH = $(PIOSSTM32F2XX)
+LINKERSCRIPTPATH = $(PIOSSTM32F4XX)
 
 # Optimization level, can be [0, 1, 2, 3, s].
 # 0 = turn off optimization. s = optimize for size.
@@ -214,7 +210,7 @@ CFLAGS += -DDIAGNOSTICS
 # This is not the best place for these.  Really should abstract out
 # to the board file or something
 CFLAGS += -DHSE_VALUE=$(OSCILLATOR_FREQ)
-CFLAGS += -DSTM32F2XX
+CFLAGS += -DSTM32F4XX
 CFLAGS += -DMEM_SIZE=1024000000
 
 # Output format. (can be ihex or binary or both)
@@ -304,9 +300,9 @@ LDFLAGS += $(patsubst %,-l%,$(EXTRA_LIBS))
 LDFLAGS += $(MATH_LIB)
 LDFLAGS += -lc -lgcc
 
-# Set linker-script name depending on selected submodel name
-LDFLAGS += -T$(LINKERSCRIPTPATH)/link_$(BOARD)_memory.ld
-LDFLAGS += -T$(LINKERSCRIPTPATH)/link_$(BOARD)_sections.ld
+#Linker scripts                                                                                                                                                                                                              
+LDFLAGS += $(addprefix -T,$(LINKER_SCRIPTS_APP))
+
 
 # Define programs and commands.
 REMOVE  = $(REMOVE_CMD) -f

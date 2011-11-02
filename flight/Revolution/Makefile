@@ -50,7 +50,8 @@ FLASH_TOOL = OPENOCD
 
 # List of modules to include
 MODULES = Actuator Telemetry ManualControl Stabilization
-PYMODULES = FlightPlan
+PYMODULES = 
+#FlightPlan
 
 # Paths
 OPSYSTEM = ./System

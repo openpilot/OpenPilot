@@ -49,7 +49,7 @@ endif
 FLASH_TOOL = OPENOCD
 
 # List of modules to include
-MODULES = Actuator Telemetry ManualControl Stabilization FirmwareIAP
+MODULES = Actuator Telemetry ManualControl Stabilization
 PYMODULES = FlightPlan
 
 # Paths
@@ -120,7 +120,11 @@ SRC += $(OPSYSTEM)/taskmonitor.c
 SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
 SRC += $(OPUAVOBJ)/eventdispatcher.c
+
+#ifeq ($(DEBUG),YES)
+SRC += $(OPSYSTEM)/dcc_stdio.c                                                                                                                                                                                                
 SRC += $(OPSYSTEM)/cm3_fault_handlers.c
+#endif
 
 SRC += $(FLIGHTLIB)/CoordinateConversions.c
 SRC += $(FLIGHTLIB)/fifo_buffer.c
@@ -130,7 +134,9 @@ SRC += $(FLIGHTLIB)/NMEA.c
 include $(PIOS)/STM32F4xx/library.mk
 
 ## PIOS Hardware (Common)
+SRC += $(PIOSCOMMON)/pios_crc.c
 SRC += $(PIOSCOMMON)/pios_com.c
+SRC += $(PIOSCOMMON)/pios_rcvr.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c
 
 #SRC += $(PIOSCOMMON)/pios_bl_helper.c

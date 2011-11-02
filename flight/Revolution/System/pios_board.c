@@ -33,7 +33,11 @@
 
 #if defined(PIOS_INCLUDE_SPI)
 
+#include <openpilot.h>
 #include <pios_spi_priv.h>
+#include <uavobjectsinit.h>
+#include <hwsettings.h>
+#include "manualcontrolsettings.h"
 
 /* SPI2 Interface
  *      - Used for mainboard communications
@@ -548,11 +552,22 @@ void PIOS_I2C_gyro_adapter_er_irq_handler(void)
 
 #endif /* PIOS_INCLUDE_I2C */
 
+#if defined(PIOS_INCLUDE_RCVR)
+#include "pios_rcvr_priv.h"
+
+/* One slot per selectable receiver group.
+ *  eg. PWM, PPM, GCS, SPEKTRUM1, SPEKTRUM2, SBUS
+ * NOTE: No slot in this map for NONE.
+ */
+uint32_t pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE];
+#endif
 
 extern const struct pios_com_driver pios_usart_com_driver;
 
 uint32_t pios_com_aux_id;
 uint32_t pios_com_gps_id;
+uint32_t pios_com_telem_usb_id;
+uint32_t pios_com_telem_rf_id;
 
 
 /**
@@ -776,15 +791,6 @@ void PIOS_Board_Init(void) {
 	PIOS_HMC5883_Init(&pios_hmc5883_cfg);
 	PIOS_BMP085_Init(&pios_bmp085_cfg);
 	
-	
-	/* Set up the SPI interface to the OP board */
-#include "ahrs_spi_comm.h"
-	AhrsInitComms();
-	if (PIOS_SPI_Init(&pios_spi_op_id, &pios_spi_op_cfg)) {
-		PIOS_DEBUG_Assert(0);
-	}
-	
-	AhrsConnect(pios_spi_op_id);
 }
 
 /**

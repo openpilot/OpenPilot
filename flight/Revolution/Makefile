@@ -245,7 +245,6 @@ CFLAGS += -DDIAGNOSTICS
 
 # This is not the best place for these.  Really should abstract out
 # to the board file or something
-CFLAGS += -DHSE_VALUE=$(OSCILLATOR_FREQ)
 CFLAGS += -DSTM32F4XX
 CFLAGS += -DMEM_SIZE=1024000000
 
@@ -261,11 +260,10 @@ DEBUGF = dwarf-2
 
 # Place project-specific -D (define) and/or
 # -U options for C here.
-CDEFS = -DSTM32F10X_$(MODEL)
+CDEFS += -DSTM32F10X_$(MODEL)
 CDEFS += -DSYSCLK_FREQ=$(SYSCLK_FREQ)
 CDEFS += -DUSE_STDPERIPH_DRIVER
 CDEFS += -DUSE_$(BOARD)
-CDEFS += -DIN_AHRS
 
 # Place project-specific -D and/or -U options for
 # Assembler with preprocessor here.

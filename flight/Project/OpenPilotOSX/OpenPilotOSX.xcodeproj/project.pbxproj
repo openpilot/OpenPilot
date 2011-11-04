@@ -261,12 +261,6 @@
 		6589A983131DE24F006BD67C /* taskmonitor.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = taskmonitor.c; sourceTree = "<group>"; };
 		6589A9DB131DEE76006BD67C /* pios_rtc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_rtc.c; sourceTree = "<group>"; };
 		6589A9E2131DF1C7006BD67C /* pios_rtc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_rtc.h; sourceTree = "<group>"; };
-		65904E40146128A500FD9482 /* .Makefile.swp */ = {isa = PBXFileReference; lastKnownFileType = file; path = .Makefile.swp; sourceTree = "<group>"; };
-		65904E42146128A500FD9482 /* ahrs_timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs_timer.h; sourceTree = "<group>"; };
-		65904E43146128A500FD9482 /* ins.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ins.h; sourceTree = "<group>"; };
-		65904E44146128A500FD9482 /* ins_fsm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ins_fsm.h; sourceTree = "<group>"; };
-		65904E45146128A500FD9482 /* insgps.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = insgps.h; sourceTree = "<group>"; };
-		65904E46146128A500FD9482 /* insgps_helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = insgps_helper.h; sourceTree = "<group>"; };
 		65904E47146128A500FD9482 /* ins.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ins.c; sourceTree = "<group>"; };
 		65904E48146128A500FD9482 /* insgps13state.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = insgps13state.c; sourceTree = "<group>"; };
 		65904E49146128A500FD9482 /* insgps16state.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = insgps16state.c; sourceTree = "<group>"; };
@@ -416,6 +410,23 @@
 		65904F0314613BBD00FD9482 /* msheap.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = msheap.c; sourceTree = "<group>"; };
 		65904F0414613BBD00FD9482 /* msheap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = msheap.h; sourceTree = "<group>"; };
 		65904F0514613BBD00FD9482 /* pios_msheap.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_msheap.c; sourceTree = "<group>"; };
+		65904F1814632C1700FD9482 /* firmware-defs.mk */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "firmware-defs.mk"; sourceTree = "<group>"; };
+		65904F2214632C1700FD9482 /* board-info.mk */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "board-info.mk"; sourceTree = "<group>"; };
+		65904F2314632C1700FD9482 /* board-info.mk */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "board-info.mk"; sourceTree = "<group>"; };
+		65904F2414632C1700FD9482 /* board-info.mk */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "board-info.mk"; sourceTree = "<group>"; };
+		65904F2514632C1700FD9482 /* board-info.mk */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "board-info.mk"; sourceTree = "<group>"; };
+		65904F2614632C1700FD9482 /* board-info.mk */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "board-info.mk"; sourceTree = "<group>"; };
+		65904F2714632C1700FD9482 /* board-info.mk */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "board-info.mk"; sourceTree = "<group>"; };
+		65904F2814632C1700FD9482 /* version-info.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = "version-info.py"; sourceTree = "<group>"; };
+		65904F2914632C1700FD9482 /* firmwareinfotemplate.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = firmwareinfotemplate.c; sourceTree = "<group>"; };
+		65904F2A14632C1700FD9482 /* gcsversioninfotemplate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gcsversioninfotemplate.h; sourceTree = "<group>"; };
+		65904F2D14632C1700FD9482 /* README.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.txt; sourceTree = "<group>"; };
+		65904F2E14632C1700FD9482 /* shell_script.reg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = shell_script.reg; sourceTree = "<group>"; };
+		65904F2F14632C1700FD9482 /* install */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = install; sourceTree = "<group>"; };
+		65904F3014632C1700FD9482 /* make */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = make; sourceTree = "<group>"; };
+		65904F3114632C1700FD9482 /* make.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = make.sh; sourceTree = "<group>"; };
+		65904F3214632C1700FD9482 /* sh.cmd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = sh.cmd; sourceTree = "<group>"; };
+		65904F34146362F300FD9482 /* board-info.mk */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "board-info.mk"; sourceTree = "<group>"; };
 		659ED317122226B60011010E /* ahrssettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ahrssettings.xml; sourceTree = "<group>"; };
 		65B35D7F121C261E003EAD18 /* bin.pro */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = bin.pro; sourceTree = "<group>"; };
 		65B35D80121C261E003EAD18 /* openpilotgcs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = openpilotgcs; sourceTree = "<group>"; };
@@ -3508,6 +3519,7 @@
 		08FB7794FE84155DC02AAC07 /* OpenPilotOSX */ = {
 			isa = PBXGroup;
 			children = (
+				65904F1614632C1700FD9482 /* make */,
 				65C35E4E12EFB2F3004811C2 /* shared */,
 				65173C9F12EBFD1700D6A7CB /* Makefile */,
 				657CEEB5121DBC49007A1FBE /* flight */,
@@ -4270,8 +4282,6 @@
 		65904E3F146128A500FD9482 /* Revolution */ = {
 			isa = PBXGroup;
 			children = (
-				65904E40146128A500FD9482 /* .Makefile.swp */,
-				65904E41146128A500FD9482 /* inc */,
 				65904E47146128A500FD9482 /* ins.c */,
 				65904E48146128A500FD9482 /* insgps13state.c */,
 				65904E49146128A500FD9482 /* insgps16state.c */,
@@ -4283,18 +4293,6 @@
 			);
 			name = Revolution;
 			path = ../../Revolution;
-			sourceTree = "<group>";
-		};
-		65904E41146128A500FD9482 /* inc */ = {
-			isa = PBXGroup;
-			children = (
-				65904E42146128A500FD9482 /* ahrs_timer.h */,
-				65904E43146128A500FD9482 /* ins.h */,
-				65904E44146128A500FD9482 /* ins_fsm.h */,
-				65904E45146128A500FD9482 /* insgps.h */,
-				65904E46146128A500FD9482 /* insgps_helper.h */,
-			);
-			path = inc;
 			sourceTree = "<group>";
 		};
 		65904E4C146128A500FD9482 /* System */ = {
@@ -4770,6 +4768,135 @@
 				65904F0514613BBD00FD9482 /* pios_msheap.c */,
 			);
 			path = msheap;
+			sourceTree = "<group>";
+		};
+		65904F1614632C1700FD9482 /* make */ = {
+			isa = PBXGroup;
+			children = (
+				65904F1714632C1700FD9482 /* boards */,
+				65904F1814632C1700FD9482 /* firmware-defs.mk */,
+				65904F1914632C1700FD9482 /* scripts */,
+				65904F1A14632C1700FD9482 /* templates */,
+				65904F1B14632C1700FD9482 /* winx86 */,
+			);
+			name = make;
+			path = OpenPilotOSX.xcodeproj/../../../../make;
+			sourceTree = "<group>";
+		};
+		65904F1714632C1700FD9482 /* boards */ = {
+			isa = PBXGroup;
+			children = (
+				65904F33146362F300FD9482 /* revolution */,
+				65904F1C14632C1700FD9482 /* ahrs */,
+				65904F1D14632C1700FD9482 /* coptercontrol */,
+				65904F1E14632C1700FD9482 /* esc */,
+				65904F1F14632C1700FD9482 /* ins */,
+				65904F2014632C1700FD9482 /* openpilot */,
+				65904F2114632C1700FD9482 /* pipxtreme */,
+			);
+			path = boards;
+			sourceTree = "<group>";
+		};
+		65904F1914632C1700FD9482 /* scripts */ = {
+			isa = PBXGroup;
+			children = (
+				65904F2814632C1700FD9482 /* version-info.py */,
+			);
+			path = scripts;
+			sourceTree = "<group>";
+		};
+		65904F1A14632C1700FD9482 /* templates */ = {
+			isa = PBXGroup;
+			children = (
+				65904F2914632C1700FD9482 /* firmwareinfotemplate.c */,
+				65904F2A14632C1700FD9482 /* gcsversioninfotemplate.h */,
+			);
+			path = templates;
+			sourceTree = "<group>";
+		};
+		65904F1B14632C1700FD9482 /* winx86 */ = {
+			isa = PBXGroup;
+			children = (
+				65904F2B14632C1700FD9482 /* bin */,
+				65904F2C14632C1700FD9482 /* cmd */,
+				65904F2D14632C1700FD9482 /* README.txt */,
+				65904F2E14632C1700FD9482 /* shell_script.reg */,
+			);
+			path = winx86;
+			sourceTree = "<group>";
+		};
+		65904F1C14632C1700FD9482 /* ahrs */ = {
+			isa = PBXGroup;
+			children = (
+				65904F2214632C1700FD9482 /* board-info.mk */,
+			);
+			path = ahrs;
+			sourceTree = "<group>";
+		};
+		65904F1D14632C1700FD9482 /* coptercontrol */ = {
+			isa = PBXGroup;
+			children = (
+				65904F2314632C1700FD9482 /* board-info.mk */,
+			);
+			path = coptercontrol;
+			sourceTree = "<group>";
+		};
+		65904F1E14632C1700FD9482 /* esc */ = {
+			isa = PBXGroup;
+			children = (
+				65904F2414632C1700FD9482 /* board-info.mk */,
+			);
+			path = esc;
+			sourceTree = "<group>";
+		};
+		65904F1F14632C1700FD9482 /* ins */ = {
+			isa = PBXGroup;
+			children = (
+				65904F2514632C1700FD9482 /* board-info.mk */,
+			);
+			path = ins;
+			sourceTree = "<group>";
+		};
+		65904F2014632C1700FD9482 /* openpilot */ = {
+			isa = PBXGroup;
+			children = (
+				65904F2614632C1700FD9482 /* board-info.mk */,
+			);
+			path = openpilot;
+			sourceTree = "<group>";
+		};
+		65904F2114632C1700FD9482 /* pipxtreme */ = {
+			isa = PBXGroup;
+			children = (
+				65904F2714632C1700FD9482 /* board-info.mk */,
+			);
+			path = pipxtreme;
+			sourceTree = "<group>";
+		};
+		65904F2B14632C1700FD9482 /* bin */ = {
+			isa = PBXGroup;
+			children = (
+				65904F2F14632C1700FD9482 /* install */,
+				65904F3014632C1700FD9482 /* make */,
+			);
+			path = bin;
+			sourceTree = "<group>";
+		};
+		65904F2C14632C1700FD9482 /* cmd */ = {
+			isa = PBXGroup;
+			children = (
+				65904F3114632C1700FD9482 /* make.sh */,
+				65904F3214632C1700FD9482 /* sh.cmd */,
+			);
+			path = cmd;
+			sourceTree = "<group>";
+		};
+		65904F33146362F300FD9482 /* revolution */ = {
+			isa = PBXGroup;
+			children = (
+				65904F34146362F300FD9482 /* board-info.mk */,
+			);
+			path = revolution;
 			sourceTree = "<group>";
 		};
 		65B35D7D121C261E003EAD18 /* ground */ = {

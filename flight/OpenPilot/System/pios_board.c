@@ -538,13 +538,13 @@ void PIOS_RTC_IRQ_Handler (void)
 
 #endif
 
-#if defined(PIOS_INCLUDE_SPEKTRUM)
+#if defined(PIOS_INCLUDE_DSM)
 /*
- * SPEKTRUM USART
+ * Spektrum/JR DSM USART
  */
-#include <pios_spektrum_priv.h>
+#include <pios_dsm_priv.h>
 
-static const struct pios_usart_cfg pios_usart_spektrum_cfg = {
+static const struct pios_usart_cfg pios_usart_dsm_cfg = {
   .regs = USART1,
   .init = {
     .USART_BaudRate            = 115200,
@@ -580,7 +580,7 @@ static const struct pios_usart_cfg pios_usart_spektrum_cfg = {
   },
 };
 
-static const struct pios_spektrum_cfg pios_spektrum_cfg = {
+static const struct pios_dsm_cfg pios_dsm_cfg = {
 	.bind = {
 		.gpio = GPIOA,
 		.init = {
@@ -591,7 +591,7 @@ static const struct pios_spektrum_cfg pios_spektrum_cfg = {
 	},
 };
 
-#endif	/* PIOS_COM_SPEKTRUM */
+#endif	/* PIOS_COM_DSM */
 
 #if defined(PIOS_INCLUDE_SBUS)
 #error PIOS_INCLUDE_SBUS not implemented
@@ -1062,7 +1062,7 @@ uint32_t pios_com_telem_rf_id;
 uint32_t pios_com_telem_usb_id;
 uint32_t pios_com_gps_id;
 uint32_t pios_com_aux_id;
-uint32_t pios_com_spektrum_id;
+uint32_t pios_com_dsm_id;
 
 #include "ahrs_spi_comm.h"
 
@@ -1206,7 +1206,7 @@ void PIOS_Board_Init(void) {
 	case HWSETTINGS_OP_RCVRPORT_DSM2:
 	case HWSETTINGS_OP_RCVRPORT_DSMX10BIT:
 	case HWSETTINGS_OP_RCVRPORT_DSMX11BIT:
-#if defined(PIOS_INCLUDE_SPEKTRUM)
+#if defined(PIOS_INCLUDE_DSM)
 		{
 			enum pios_dsm_proto proto;
 			switch (hwsettings_rcvrport) {
@@ -1224,25 +1224,25 @@ void PIOS_Board_Init(void) {
 				break;
 			}
 
-			uint32_t pios_usart_spektrum_id;
-			if (PIOS_USART_Init(&pios_usart_spektrum_id, &pios_usart_spektrum_cfg)) {
+			uint32_t pios_usart_dsm_id;
+			if (PIOS_USART_Init(&pios_usart_dsm_id, &pios_usart_dsm_cfg)) {
 				PIOS_Assert(0);
 			}
 
-			uint32_t pios_spektrum_id;
-			if (PIOS_Spektrum_Init(&pios_spektrum_id,
-					       &pios_spektrum_cfg,
-					       &pios_usart_com_driver,
-					       pios_usart_spektrum_id,
-					       proto, 0)) {
+			uint32_t pios_dsm_id;
+			if (PIOS_DSM_Init(&pios_dsm_id,
+					  &pios_dsm_cfg,
+					  &pios_usart_com_driver,
+					  pios_usart_dsm_id,
+					  proto, 0)) {
 				PIOS_Assert(0);
 			}
 
-			uint32_t pios_spektrum_rcvr_id;
-			if (PIOS_RCVR_Init(&pios_spektrum_rcvr_id, &pios_spektrum_rcvr_driver, pios_spektrum_id)) {
+			uint32_t pios_dsm_rcvr_id;
+			if (PIOS_RCVR_Init(&pios_dsm_rcvr_id, &pios_dsm_rcvr_driver, pios_dsm_id)) {
 				PIOS_Assert(0);
 			}
-			pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_DSMMAINPORT] = pios_spektrum_rcvr_id;
+			pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_DSMMAINPORT] = pios_dsm_rcvr_id;
 		}
 #endif
 		break;

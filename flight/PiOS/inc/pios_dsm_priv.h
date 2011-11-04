@@ -2,11 +2,11 @@
  ******************************************************************************
  * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
- * @addtogroup PIOS_Spektrum Spektrum/JR DSMx satellite receiver functions
+ * @addtogroup PIOS_DSM Spektrum/JR DSMx satellite receiver functions
  * @brief PIOS interface to bind and read Spektrum/JR DSMx satellite receiver
  * @{
  *
- * @file       pios_spektrum_priv.h
+ * @file       pios_dsm_priv.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2011.
  * @brief      Spektrum/JR DSMx satellite receiver private structures.
  * @see        The GNU Public License (GPL) Version 3
@@ -28,8 +28,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_SPEKTRUM_PRIV_H
-#define PIOS_SPEKTRUM_PRIV_H
+#ifndef PIOS_DSM_PRIV_H
+#define PIOS_DSM_PRIV_H
 
 #include <pios.h>
 #include <pios_stm32.h>
@@ -99,39 +99,39 @@
  * to bind in low resolution mode.
  */
 
-#define SPEKTRUM_CHANNELS_PER_FRAME	7
-#define SPEKTRUM_FRAME_LENGTH		(1+1+SPEKTRUM_CHANNELS_PER_FRAME*2)
-#define SPEKTRUM_DSM2_RES_MASK		0x0010
-#define SPEKTRUM_2ND_FRAME_MASK		0x8000
+#define DSM_CHANNELS_PER_FRAME		7
+#define DSM_FRAME_LENGTH		(1+1+DSM_CHANNELS_PER_FRAME*2)
+#define DSM_DSM2_RES_MASK		0x0010
+#define DSM_2ND_FRAME_MASK		0x8000
 
 /*
  * Include lost frame counter and provide it as a last channel value
  * for debugging. Currently is not used by the receiver layer.
  */
-#define	SPEKTRUM_LOST_FRAME_COUNTER	0
+//#define DSM_LOST_FRAME_COUNTER
 
-/* Spektrum protocol variations */
+/* DSM protocol variations */
 enum pios_dsm_proto {
 	PIOS_DSM_PROTO_DSM2,
 	PIOS_DSM_PROTO_DSMX10BIT,
 	PIOS_DSM_PROTO_DSMX11BIT,
 };
 
-/* Spektrum receiver instance configuration */
-struct pios_spektrum_cfg {
+/* DSM receiver instance configuration */
+struct pios_dsm_cfg {
 	struct stm32_gpio bind;
 };
 
-extern const struct pios_rcvr_driver pios_spektrum_rcvr_driver;
+extern const struct pios_rcvr_driver pios_dsm_rcvr_driver;
 
-extern int32_t PIOS_Spektrum_Init(uint32_t *spektrum_id,
-				  const struct pios_spektrum_cfg *cfg,
-				  const struct pios_com_driver *driver,
-				  uint32_t lower_id,
-				  enum pios_dsm_proto proto,
-				  uint8_t bind);
+extern int32_t PIOS_DSM_Init(uint32_t *dsm_id,
+			     const struct pios_dsm_cfg *cfg,
+			     const struct pios_com_driver *driver,
+			     uint32_t lower_id,
+			     enum pios_dsm_proto proto,
+			     uint8_t bind);
 
-#endif /* PIOS_SPEKTRUM_PRIV_H */
+#endif /* PIOS_DSM_PRIV_H */
 
 /**
  * @}

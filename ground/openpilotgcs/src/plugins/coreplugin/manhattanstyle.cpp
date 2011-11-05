@@ -55,6 +55,7 @@
 #include <QtGui/QStyleOption>
 #include <QtGui/QToolBar>
 #include <QtGui/QToolButton>
+#include <QtGui/QAbstractItemView>
 
 // We define a currently unused state for indicating animations
 #define State_Animating 0x00000040
@@ -217,7 +218,29 @@ QRect ManhattanStyle::subControlRect(ComplexControl control, const QStyleOptionC
                                      SubControl subControl, const QWidget *widget) const
 {
     QRect rect;
-    rect = d->style->subControlRect(control, option, subControl, widget);
+    // Need to check for Mac style and use the default behaviour for that
+    if(control == CC_ComboBox && subControl == SC_ComboBoxListBoxPopup)
+    {
+        const QStyleOptionComboBox *cb = qstyleoption_cast<const QStyleOptionComboBox *>(option);
+        const QComboBox* combo = qobject_cast<const QComboBox*>(widget);
+        QRect comboRect = cb->rect;
+        int newWidth = combo->view()->sizeHintForColumn(0);
+        if(newWidth > comboRect.width())
+        {
+            // Set new rectangle, only width matters, list height is set by
+            // combination of number of combo box items and setMaxVisibleItems
+            rect.setRect(comboRect.x(), comboRect.y(), newWidth, comboRect.height());
+            rect = visualRect(cb->direction, cb->rect, rect);
+        }
+        else
+        {
+            rect = d->style->subControlRect(control, option, subControl, widget);
+        }
+    }
+    else
+    {
+        rect = d->style->subControlRect(control, option, subControl, widget);
+    }
     return rect;
 }
 

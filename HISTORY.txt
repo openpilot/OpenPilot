@@ -1,5 +1,13 @@
 Short summary of changes.  For a complete list see the git log.
 
+2011-11-04
+New Spektrum/JR satellite receiver driver implementation.
+It now provides explicit selection of DSM2 (and DSMJ), DSMX (10bit) and
+DSMX (11bit) serial protocol variations to better serve different frame
+and resolution modes. The protocol name used now is DSM instead of
+previously used Spektrum to make it less ambiguous when used with JR
+2.4GHz radios.
+
 2011-10-20
 Inputs can be remapped to outputs to allow up to 10 channels of control.  The
 receiver inputs remap as follows:

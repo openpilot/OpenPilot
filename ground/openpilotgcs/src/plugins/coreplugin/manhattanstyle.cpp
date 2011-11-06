@@ -218,7 +218,8 @@ QRect ManhattanStyle::subControlRect(ComplexControl control, const QStyleOptionC
                                      SubControl subControl, const QWidget *widget) const
 {
     QRect rect;
-    // Need to check for Mac style and use the default behaviour for that
+#ifndef Q_WS_MACX
+    // Not using OSX, size combo dropdown to fit contents
     if(control == CC_ComboBox && subControl == SC_ComboBoxListBoxPopup)
     {
         const QStyleOptionComboBox *cb = qstyleoption_cast<const QStyleOptionComboBox *>(option);
@@ -241,6 +242,11 @@ QRect ManhattanStyle::subControlRect(ComplexControl control, const QStyleOptionC
     {
         rect = d->style->subControlRect(control, option, subControl, widget);
     }
+#else
+    // Using OSX, use default style behaviour as this already sizes the
+    // combo dropdown to fit
+    rect = d->style->subControlRect(control, option, subControl, widget);
+#endif
     return rect;
 }
 

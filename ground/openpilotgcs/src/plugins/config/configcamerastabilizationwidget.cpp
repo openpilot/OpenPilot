@@ -109,7 +109,7 @@ void ConfigCameraStabilizationWidget::applySettings()
     // Update the mixer settings
     MixerSettings * mixerSettings = MixerSettings::GetInstance(getObjectManager());
     MixerSettings::DataFields mixerSettingsData = mixerSettings->getData();
-    const int NUM_MIXERS = 8;
+    const int NUM_MIXERS = 10;
 
     QComboBox * selectors[3] = {
         m_camerastabilization->rollChannel,
@@ -128,8 +128,11 @@ void ConfigCameraStabilizationWidget::applySettings()
         &mixerSettingsData.Mixer6Type,
         &mixerSettingsData.Mixer7Type,
         &mixerSettingsData.Mixer8Type,
+        &mixerSettingsData.Mixer9Type,
+        &mixerSettingsData.Mixer10Type,
     };
 
+    m_camerastabilization->message->setText("");
     for (int i = 0; i < 3; i++)
     {
         // Channel 1 is second entry, so becomes zero
@@ -141,6 +144,7 @@ void ConfigCameraStabilizationWidget::applySettings()
             // If the mixer channel already to something that isn't what we are
             // about to set it to reset to none
             selectors[i]->setCurrentIndex(0);
+            m_camerastabilization->message->setText("One of the channels is already assigned, reverted to none");
         } else {
             // Make sure no other channels have this output set
             for (int j = 0; j < NUM_MIXERS; j++)

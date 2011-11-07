@@ -206,7 +206,7 @@ void ConfigCameraStabilizationWidget::refreshValues()
 
     MixerSettings * mixerSettings = MixerSettings::GetInstance(getObjectManager());
     MixerSettings::DataFields mixerSettingsData = mixerSettings->getData();
-    const int NUM_MIXERS = 8;
+    const int NUM_MIXERS = 10;
     QComboBox * selectors[3] = {
         m_camerastabilization->rollChannel,
         m_camerastabilization->pitchChannel,
@@ -224,6 +224,8 @@ void ConfigCameraStabilizationWidget::refreshValues()
         &mixerSettingsData.Mixer6Type,
         &mixerSettingsData.Mixer7Type,
         &mixerSettingsData.Mixer8Type,
+        &mixerSettingsData.Mixer9Type,
+        &mixerSettingsData.Mixer10Type,
     };
 
     for (int i = 0; i < 3; i++)

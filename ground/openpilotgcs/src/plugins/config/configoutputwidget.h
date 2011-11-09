@@ -37,6 +37,7 @@
 #include <QList>
 
 class Ui_OutputWidget;
+class OutputChannelForm;
 
 class ConfigOutputWidget: public ConfigTaskWidget
 {
@@ -55,17 +56,11 @@ private:
 
 	void assignChannel(UAVDataObject *obj, QString str);
 	void assignOutputChannel(UAVDataObject *obj, QString str);
+        OutputChannelForm* getOutputChannelForm(const int index) const;
 
 	int mccDataRate;
 
 	UAVObject::Metadata accInitialData;
-
-	QList<QSlider*> outSliders;
-	QList<QSpinBox*> outMin;
-	QList<QSpinBox*> outMax;
-	QList<QCheckBox*> reversals;
-	QList<QCheckBox*> links;
-	QList<QLabel*> outLabels;
 
 	bool firstUpdate;
 
@@ -74,10 +69,9 @@ private slots:
         virtual void refreshWidgetsValues();
         void updateObjectsFromWidgets();
 	void runChannelTests(bool state);
-	void sendChannelTest(int value);
-	void setChOutRange();
-	void reverseChannel(bool state);
-	void linkToggled(bool state);
+        void sendChannelTest(int index, int value);
+        void setChOutRange();
+        void reverseChannel(bool state);
         void setSpinningArmed(bool val);
         void openHelp();
 };

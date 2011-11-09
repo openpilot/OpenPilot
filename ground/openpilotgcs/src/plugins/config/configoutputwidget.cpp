@@ -26,6 +26,7 @@
  */
 
 #include "configoutputwidget.h"
+#include "outputchannelform.h"
 
 #include "uavtalk/telemetrymanager.h"
 
@@ -46,102 +47,22 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
     m_config = new Ui_OutputWidget();
     m_config->setupUi(this);
 
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     setupButtons(m_config->saveRCOutputToRAM,m_config->saveRCOutputToSD);
     addUAVObject("ActuatorSettings");
 
-    // First of all, put all the channel widgets into lists, so that we can
-    // manipulate those:
-
-    // NOTE: for historical reasons, we have objects below called ch0 to ch7, but the convention for OP is Channel 1 to Channel 8.
-    outLabels << m_config->ch0OutValue
-              << m_config->ch1OutValue
-              << m_config->ch2OutValue
-              << m_config->ch3OutValue
-              << m_config->ch4OutValue
-              << m_config->ch5OutValue
-              << m_config->ch6OutValue
-            << m_config->ch7OutValue
-            << m_config->ch8OutValue
-            << m_config->ch9OutValue;
-
-    outSliders << m_config->ch0OutSlider
-            << m_config->ch1OutSlider
-            << m_config->ch2OutSlider
-            << m_config->ch3OutSlider
-            << m_config->ch4OutSlider
-            << m_config->ch5OutSlider
-            << m_config->ch6OutSlider
-            << m_config->ch7OutSlider
-            << m_config->ch8OutSlider
-            << m_config->ch9OutSlider;
-
-    outMin << m_config->ch0OutMin
-            << m_config->ch1OutMin
-            << m_config->ch2OutMin
-            << m_config->ch3OutMin
-            << m_config->ch4OutMin
-            << m_config->ch5OutMin
-            << m_config->ch6OutMin
-            << m_config->ch7OutMin
-            << m_config->ch8OutMin
-            << m_config->ch9OutMin;
-
-    outMax << m_config->ch0OutMax
-            << m_config->ch1OutMax
-            << m_config->ch2OutMax
-            << m_config->ch3OutMax
-            << m_config->ch4OutMax
-            << m_config->ch5OutMax
-            << m_config->ch6OutMax
-            << m_config->ch7OutMax
-            << m_config->ch8OutMax
-            << m_config->ch9OutMax;
-
-    reversals << m_config->ch0Rev
-            << m_config->ch1Rev
-            << m_config->ch2Rev
-            << m_config->ch3Rev
-            << m_config->ch4Rev
-            << m_config->ch5Rev
-            << m_config->ch6Rev
-            << m_config->ch7Rev
-            << m_config->ch8Rev
-            << m_config->ch9Rev;
-
-    links << m_config->ch0Link
-          << m_config->ch1Link
-          << m_config->ch2Link
-          << m_config->ch3Link
-          << m_config->ch4Link
-          << m_config->ch5Link
-          << m_config->ch6Link
-          << m_config->ch7Link
-          << m_config->ch8Link
-          << m_config->ch9Link;
-
+    // NOTE: we have channel indices from 0 to 9, but the convention for OP is Channel 1 to Channel 10.
     // Register for ActuatorSettings changes:
-     for (int i = 0; i < ActuatorCommand::CHANNEL_NUMELEM; i++) {
-        connect(outMin[i], SIGNAL(editingFinished()), this, SLOT(setChOutRange()));
-        connect(outMax[i], SIGNAL(editingFinished()), this, SLOT(setChOutRange()));
-        connect(reversals[i], SIGNAL(toggled(bool)), this, SLOT(reverseChannel(bool)));
-        // Now connect the channel out sliders to our signal to send updates in test mode
-        connect(outSliders[i], SIGNAL(valueChanged(int)), this, SLOT(sendChannelTest(int)));
-
-        addWidget(outMin[i]);
-        addWidget(outMax[i]);
-        addWidget(reversals[i]);
-        addWidget(outSliders[i]);
-        addWidget(links[i]);
+    for (unsigned int i = 0; i < ActuatorCommand::CHANNEL_NUMELEM; i++)
+    {
+        OutputChannelForm *form = new OutputChannelForm(i, this, i==0);
+        connect(m_config->channelOutTest, SIGNAL(toggled(bool)),
+                form, SLOT(enableChannelTest(bool)));
+        connect(form, SIGNAL(channelChanged(int,int)),
+                this, SLOT(sendChannelTest(int,int)));
+        m_config->channelLayout->addWidget(form);
     }
 
     connect(m_config->channelOutTest, SIGNAL(toggled(bool)), this, SLOT(runChannelTests(bool)));
-
-    for (int i = 0; i < links.count(); i++)
-        links[i]->setChecked(false);
-    for (int i = 0; i < links.count(); i++)
-        connect(links[i], SIGNAL(toggled(bool)), this, SLOT(linkToggled(bool)));
-
 
     refreshWidgetsValues();
 
@@ -165,37 +86,6 @@ ConfigOutputWidget::~ConfigOutputWidget()
 
 
 // ************************************
-
-/**
-  Toggles the channel linked state for use in testing mode
-  */
-void ConfigOutputWidget::linkToggled(bool state)
-{
-    Q_UNUSED(state)
-    // find the minimum slider value for the linked ones
-    int min = 10000;
-    int linked_count = 0;
-    for (int i = 0; i < outSliders.count(); i++)
-    {
-        if (!links[i]->checkState()) continue;
-        int value = outSliders[i]->value();
-        if (min > value) min = value;
-        linked_count++;
-    }
-
-    if (linked_count <= 0)
-        return;		// no linked channels
-
-    if (!m_config->channelOutTest->checkState())
-            return;	// we are not in Test Output mode
-
-    // set the linked channels to the same value
-    for (int i = 0; i < outSliders.count(); i++)
-    {
-        if (!links[i]->checkState()) continue;
-        outSliders[i]->setValue(min);
-    }
-}
 
 /**
   Toggles the channel testing mode by making the GCS take over
@@ -243,36 +133,26 @@ void ConfigOutputWidget::runChannelTests(bool state)
         mdata.gcsTelemetryAcked = false;
         mdata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
         mdata.gcsTelemetryUpdatePeriod = 100;
-
-        // Prevent stupid users from touching the minimum & maximum ranges while
-        // moving the sliders. Thanks Ivan for the tip :)
-        foreach (QSpinBox* box, outMin) {
-            box->setEnabled(false);
-        }
-        foreach (QSpinBox* box, outMax) {
-            box->setEnabled(false);
-        }
-        foreach (QCheckBox* box, reversals) {
-            box->setEnabled(false);
-        }
-
     }
     else
     {
         mdata = accInitialData; // Restore metadata
-        foreach (QSpinBox* box, outMin) {
-            box->setEnabled(true);
-        }
-        foreach (QSpinBox* box, outMax) {
-            box->setEnabled(true);
-        }
-        foreach (QCheckBox* box, reversals) {
-            box->setEnabled(true);
-        }
-
     }
     obj->setMetadata(mdata);
 
+}
+
+OutputChannelForm* ConfigOutputWidget::getOutputChannelForm(const int index) const
+{
+    QList<OutputChannelForm*> outputChannelForms = findChildren<OutputChannelForm*>();
+    foreach(OutputChannelForm *outputChannelForm, outputChannelForms)
+    {
+        if( outputChannelForm->index() == index)
+            return outputChannelForm;
+    }
+
+    // no OutputChannelForm found with given index
+    return NULL;
 }
 
 /**
@@ -280,40 +160,14 @@ void ConfigOutputWidget::runChannelTests(bool state)
   */
 void ConfigOutputWidget::assignOutputChannel(UAVDataObject *obj, QString str)
 {
+    //FIXME: use signal/ slot approach
     UAVObjectField* field = obj->getField(str);
     QStringList options = field->getOptions();
-    switch (options.indexOf(field->getValue().toString())) {
-    case 0:
-        m_config->ch0Output->setText(str);
-        break;
-    case 1:
-        m_config->ch1Output->setText(str);
-        break;
-    case 2:
-        m_config->ch2Output->setText(str);
-        break;
-    case 3:
-        m_config->ch3Output->setText(str);
-        break;
-    case 4:
-        m_config->ch4Output->setText(str);
-        break;
-    case 5:
-        m_config->ch5Output->setText(str);
-        break;
-    case 6:
-        m_config->ch6Output->setText(str);
-        break;
-    case 7:
-        m_config->ch7Output->setText(str);
-        break;
-    case 8:
-        m_config->ch8Output->setText(str);
-        break;
-    case 9:
-        m_config->ch9Output->setText(str);
-        break;
-    }
+    int index = options.indexOf(field->getValue().toString());
+
+    OutputChannelForm *outputChannelForm = getOutputChannelForm(index);
+    if(outputChannelForm)
+        outputChannelForm->setAssignment(str);
 }
 
 /**
@@ -335,48 +189,19 @@ void ConfigOutputWidget::setSpinningArmed(bool val)
   Sends the channel value to the UAV to move the servo.
   Returns immediately if we are not in testing mode
   */
-void ConfigOutputWidget::sendChannelTest(int value)
+void ConfigOutputWidget::sendChannelTest(int index, int value)
 {
-	int in_value = value;
+    if (!m_config->channelOutTest->isChecked())
+        return;
 
-	QSlider *ob = (QSlider *)QObject::sender();
-	if (!ob) return;
-    int index = outSliders.indexOf(ob);
-	if (index < 0) return;
+    if(index < 0 || (unsigned)index >= ActuatorCommand::CHANNEL_NUMELEM)
+        return;
 
-	if (reversals[index]->isChecked())
-		value = outMin[index]->value() - value + outMax[index]->value();	// the chsnnel is reversed
-
-	// update the label
-	outLabels[index]->setText(QString::number(value));
-
-	if (links[index]->checkState())
-	{	// the channel is linked to other channels
-		// set the linked channels to the same value
-		for (int i = 0; i < outSliders.count(); i++)
-		{
-			if (i == index) continue;
-			if (!links[i]->checkState()) continue;
-
-			int val = in_value;
-			if (val < outSliders[i]->minimum()) val = outSliders[i]->minimum();
-			if (val > outSliders[i]->maximum()) val = outSliders[i]->maximum();
-
-			if (outSliders[i]->value() == val) continue;
-
-			outSliders[i]->setValue(val);
-			outLabels[i]->setText(QString::number(val));
-		}
-	}
-
-	if (!m_config->channelOutTest->isChecked())
-		return;
-
-	UAVDataObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorCommand")));
-	if (!obj) return;
-	UAVObjectField *channel = obj->getField("Channel");
-	if (!channel) return;
-	channel->setValue(value, index);
+    UAVDataObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorCommand")));
+    if (!obj) return;
+    UAVObjectField *channel = obj->getField("Channel");
+    if (!channel) return;
+    channel->setValue(value, index);
     obj->updated();
 }
 
@@ -396,8 +221,11 @@ void ConfigOutputWidget::refreshWidgetsValues()
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
     // Reset all channel assignements:
-    for (int i = 0; i < ActuatorCommand::CHANNEL_NUMELEM; i++)
-        outLabels[i]->setText("-");
+    QList<OutputChannelForm*> outputChannelForms = findChildren<OutputChannelForm*>();
+    foreach(OutputChannelForm *outputChannelForm, outputChannelForms)
+    {
+        outputChannelForm->setAssignment("-");
+    }
 
     // Get the channel assignements:
     UAVDataObject * obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorSettings")));
@@ -447,34 +275,21 @@ void ConfigOutputWidget::refreshWidgetsValues()
         }
     }
 
-
     // Get Channel ranges:
-    for (int i=0;i<ActuatorCommand::CHANNEL_NUMELEM;i++) {
+    foreach(OutputChannelForm *outputChannelForm, outputChannelForms)
+    {
         field = obj->getField(QString("ChannelMin"));
-        int minValue = field->getValue(i).toInt();
-        outMin[i]->setValue(minValue);
+        int minValue = field->getValue(outputChannelForm->index()).toInt();
         field = obj->getField(QString("ChannelMax"));
-        int maxValue = field->getValue(i).toInt();
-        outMax[i]->setValue(maxValue);
-        if (maxValue>minValue) {
-            outSliders[i]->setMinimum(minValue);
-            outSliders[i]->setMaximum(maxValue);
-            reversals[i]->setChecked(false);
-        } else {
-            outSliders[i]->setMinimum(maxValue);
-            outSliders[i]->setMaximum(minValue);
-            reversals[i]->setChecked(true);
-        }
+        int maxValue = field->getValue(outputChannelForm->index()).toInt();
+        outputChannelForm->minmax(minValue, maxValue);
+
+        field = obj->getField(QString("ChannelNeutral"));
+        int value = field->getValue(outputChannelForm->index()).toInt();
+        outputChannelForm->neutral(value);
     }
 
-    field = obj->getField(QString("ChannelNeutral"));
-    for (int i=0; i<ActuatorCommand::CHANNEL_NUMELEM; i++) {
-        int value = field->getValue(i).toInt();
-        outSliders[i]->setValue(value);
-        outLabels[i]->setText(QString::number(value));
-    }
     setDirty(dirty);
-
 }
 
 /**
@@ -488,99 +303,29 @@ void ConfigOutputWidget::updateObjectsFromWidgets()
     Q_ASSERT(obj);
 
     // Now send channel ranges:
-    UAVObjectField * field = obj->getField(QString("ChannelMax"));
-    for (int i = 0; i < ActuatorCommand::CHANNEL_NUMELEM; i++) {
-        field->setValue(outMax[i]->value(),i);
-    }
+    UAVObjectField * field;
+    QList<OutputChannelForm*> outputChannelForms = findChildren<OutputChannelForm*>();
+    foreach(OutputChannelForm *outputChannelForm, outputChannelForms)
+    {
+        field = obj->getField(QString("ChannelMax"));
+        Q_ASSERT(field);
+        field->setValue(outputChannelForm->max(), outputChannelForm->index());
 
-    field = obj->getField(QString("ChannelMin"));
-    for (int i = 0; i < ActuatorCommand::CHANNEL_NUMELEM; i++) {
-        field->setValue(outMin[i]->value(),i);
-    }
+        field = obj->getField(QString("ChannelMin"));
+        Q_ASSERT(field);
+        field->setValue(outputChannelForm->min(), outputChannelForm->index());
 
-    field = obj->getField(QString("ChannelNeutral"));
-    for (int i = 0; i < ActuatorCommand::CHANNEL_NUMELEM; i++) {
-        field->setValue(outSliders[i]->value(),i);
+        field = obj->getField(QString("ChannelNeutral"));
+        Q_ASSERT(field);
+        field->setValue(outputChannelForm->neutral(), outputChannelForm->index());
     }
 
     field = obj->getField(QString("ChannelUpdateFreq"));
+    Q_ASSERT(field);
     field->setValue(m_config->outputRate1->value(),0);
     field->setValue(m_config->outputRate2->value(),1);
     field->setValue(m_config->outputRate3->value(),2);
     field->setValue(m_config->outputRate4->value(),3);
-}
-
-/**
-  Sets the minimum/maximum value of the channel 0 to seven output sliders.
-  Have to do it here because setMinimum is not a slot.
-
-  One added trick: if the slider is at its min when the value
-  is changed, then keep it on the min.
-  */
-void ConfigOutputWidget::setChOutRange()
-{
-    QSpinBox *spinbox = (QSpinBox*)QObject::sender();
-
-    int index = outMin.indexOf(spinbox); // This is the channel number
-    if (index < 0)
-        index = outMax.indexOf(spinbox); // We can't know if the signal came from min or max
-
-    QSlider *slider = outSliders[index];
-
-    int oldMini = slider->minimum();
-//    int oldMaxi = slider->maximum();
-
-    if (outMin[index]->value()<outMax[index]->value())
-    {
-        slider->setRange(outMin[index]->value(), outMax[index]->value());
-        reversals[index]->setChecked(false);
-    }
-    else
-    {
-        slider->setRange(outMax[index]->value(), outMin[index]->value());
-        reversals[index]->setChecked(true);
-    }
-
-    if (slider->value() == oldMini)
-        slider->setValue(slider->minimum());
-
-//    if (slider->value() == oldMaxi)
-//        slider->setValue(slider->maximum());  // this can be dangerous if it happens to be controlling a motor at the time!
-}
-
-/**
-  Reverses the channel when the checkbox is clicked
-  */
-void ConfigOutputWidget::reverseChannel(bool state)
-{
-    QCheckBox *checkbox = (QCheckBox*)QObject::sender();
-    int index = reversals.indexOf(checkbox); // This is the channel number
-
-    // Sanity check: if state became true, make sure the Maxvalue was higher than Minvalue
-    // the situations below can happen!
-    if (state && (outMax[index]->value()<outMin[index]->value()))
-        return;
-    if (!state && (outMax[index]->value()>outMin[index]->value()))
-        return;
-
-    // Now, swap the min & max values (only on the spinboxes, the slider
-    // does not change!
-    int temp = outMax[index]->value();
-    outMax[index]->setValue(outMin[index]->value());
-    outMin[index]->setValue(temp);
-
-    // Also update the channel value
-    // This is a trick to force the slider to update its value and
-    // emit the right signal itself, because our sendChannelTest(int) method
-    // relies on the object sender's identity.
-    if (outSliders[index]->value()<outSliders[index]->maximum()) {
-        outSliders[index]->setValue(outSliders[index]->value()+1);
-        outSliders[index]->setValue(outSliders[index]->value()-1);
-    } else {
-        outSliders[index]->setValue(outSliders[index]->value()-1);
-        outSliders[index]->setValue(outSliders[index]->value()+1);
-    }
-
 }
 
 void ConfigOutputWidget::openHelp()

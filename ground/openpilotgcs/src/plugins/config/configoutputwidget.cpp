@@ -40,6 +40,7 @@
 #include <QUrl>
 #include "actuatorcommand.h"
 #include "systemalarms.h"
+#include "uavsettingsimportexport/uavsettingsimportexportfactory.h"
 
 ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
@@ -49,6 +50,12 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     setupButtons(m_config->saveRCOutputToRAM,m_config->saveRCOutputToSD);
     addUAVObject("ActuatorSettings");
+
+    UAVSettingsImportExportFactory * importexportplugin =  pm->getObject<UAVSettingsImportExportFactory>();
+    connect(importexportplugin,SIGNAL(importAboutToBegin()),this,SLOT(stopTests()));
+
+    setupButtons(m_config->saveRCOutputToRAM,m_config->saveRCOutputToSD);
+        addUAVObject("ActuatorSettings");
 
     // First of all, put all the channel widgets into lists, so that we can
     // manipulate those:
@@ -589,4 +596,7 @@ void ConfigOutputWidget::openHelp()
     QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/Output+Configuration", QUrl::StrictMode) );
 }
 
-
+void ConfigOutputWidget::stopTests()
+{
+    m_config->channelOutTest->setChecked(false);
+}

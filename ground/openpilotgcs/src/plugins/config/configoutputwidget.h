@@ -71,6 +71,7 @@ private:
 
 
 private slots:
+        void stopTests();
         virtual void refreshWidgetsValues();
         void updateObjectsFromWidgets();
 	void runChannelTests(bool state);

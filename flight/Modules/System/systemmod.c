@@ -138,11 +138,6 @@ static void systemTask(void *parameters)
 	/* create all modules thread */
 	MODULE_TASKCREATE_ALL
 
-	/* create optional module threads */
-	uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
-	HwSettingsOptionalModulesGet(optionalModules);
-	MODULE_TASKCREATE_OPTIONAL(optionalModules)
-
 	// Initialize vars
 	idleCounter = 0;
 	idleCounterClear = 0;

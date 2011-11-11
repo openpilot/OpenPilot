@@ -31,8 +31,6 @@
 #ifndef PIOS_INITCALL_H
 #define PIOS_INITCALL_H
 
-#include "InitOptMods.h"
-
 /**
  * Just a stub define to make things compile.
  * Automatically link based initialization currently doesn't work
@@ -65,16 +63,6 @@ extern void StartModules();
 	InitModules(); \
 	/* Initialize the system thread */ \
 	SystemModInitialize();}
-
-#define OPTMODULE_INIT(list,moduc,mod) \
-	if(list[ HWSETTINGS_OPTIONALMODULES_##moduc ] == HWSETTINGS_OPTIONALMODULES_ENABLED) { \
-		mod##Initialize(); \
-	}
-
-#define OPTMODULE_START(list,moduc,mod) \
-	if(list[ HWSETTINGS_OPTIONALMODULES_##moduc ] == HWSETTINGS_OPTIONALMODULES_ENABLED) { \
-		mod##Start(); \
-	}
 
 #endif	/* PIOS_INITCALL_H */
 

@@ -522,21 +522,6 @@ endif
 endif
 endif
 
-$(SRC): gencode
-
-gencode: ${OUTDIR}/InitOptMods.h
-
-# this is supposed to be  standard function, but apparently it is not
-uc = $(subst a,A,$(subst b,B,$(subst c,C,$(subst d,D,$(subst e,E,$(subst f,F,$(subst g,G,$(subst h,H,$(subst i,I,$(subst j,J,$(subst k,K,$(subst l,L,$(subst m,M,$(subst n,N,$(subst o,O,$(subst p,P,$(subst q,Q,$(subst r,R,$(subst s,S,$(subst t,T,$(subst u,U,$(subst v,V,$(subst w,W,$(subst x,X,$(subst y,Y,$(subst z,Z,$1))))))))))))))))))))))))))
-
-${OUTDIR}/InitOptMods.h: Makefile
-	@echo ${quote}${foreach MOD, ${OPTMODULES}, int32_t ${MOD}Initialize(); }${quote} > ${OUTDIR}/InitOptMods.h
-	@echo ${quote}${foreach MOD, ${OPTMODULES}, int32_t ${MOD}Start(); }${quote} >> ${OUTDIR}/InitOptMods.h
-	@echo ${quote}#define MODULE_INITIALISE_OPTIONAL(list) \${quote} >> ${OUTDIR}/InitOptMods.h
-	@echo ${quote}${foreach MOD, ${OPTMODULES}, OPTMODULE_INIT(list, $(call uc, ${MOD}), ${MOD});}${quote} >> ${OUTDIR}/InitOptMods.h
-	@echo ${quote}#define MODULE_TASKCREATE_OPTIONAL(list) \${quote} >> ${OUTDIR}/InitOptMods.h
-	@echo ${quote}${foreach MOD, ${OPTMODULES}, OPTMODULE_START(list, $(call uc, ${MOD}), ${MOD});}${quote} >> ${OUTDIR}/InitOptMods.h
-
 # Generate code for PyMite
 #$(OUTDIR)/pmlib_img.c $(OUTDIR)/pmlib_nat.c $(OUTDIR)/pmlibusr_img.c $(OUTDIR)/pmlibusr_nat.c $(OUTDIR)/pmfeatures.h: $(wildcard $(PYMITELIB)/*.py) $(wildcard $(PYMITEPLAT)/*.py) $(wildcard $(FLIGHTPLANLIB)/*.py) $(wildcard $(FLIGHTPLANS)/*.py)
 #	@echo $(MSG_PYMITEINIT) $(call toprel, $@)

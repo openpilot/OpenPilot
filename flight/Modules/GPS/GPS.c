@@ -78,6 +78,7 @@ static float GravityAccel(float latitude, float longitude, float altitude);
 // Private variables
 
 static uint32_t gpsPort;
+static uint8_t gpsEnabled = 0;
 
 static xTaskHandle gpsTaskHandle;
 
@@ -98,14 +99,16 @@ static uint32_t numParsingErrors;
 
 int32_t GPSStart(void)
 {
-	if (gpsPort) {
-		// Start gps task
-		xTaskCreate(gpsTask, (signed char *)"GPS", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &gpsTaskHandle);
-		TaskMonitorAdd(TASKINFO_RUNNING_GPS, gpsTaskHandle);
-		return 0;
-	}
+	if (gpsEnabled) {
+		if (gpsPort) {
+			// Start gps task
+			xTaskCreate(gpsTask, (signed char *)"GPS", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &gpsTaskHandle);
+			TaskMonitorAdd(TASKINFO_RUNNING_GPS, gpsTaskHandle);
+			return 0;
+		}
 
-	AlarmsSet(SYSTEMALARMS_ALARM_GPS, SYSTEMALARMS_ALARM_CRITICAL);
+		AlarmsSet(SYSTEMALARMS_ALARM_GPS, SYSTEMALARMS_ALARM_CRITICAL);
+	}
 	return -1;
 }
 
@@ -117,8 +120,16 @@ int32_t GPSStart(void)
 int32_t GPSInitialize(void)
 {
 	gpsPort = PIOS_COM_GPS;
+	HwSettingsInitialize();
+	uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
+	HwSettingsOptionalModulesGet(optionalModules);
+    if (optionalModules[HWSETTINGS_OPTIONALMODULES_GPS]==HWSETTINGS_OPTIONALMODULES_ENABLED) {
+		gpsEnabled=1;
+	} else {
+		gpsEnabled=0;
+	}
 
-	if (gpsPort) {
+	if (gpsPort && gpsEnabled) {
 		GPSPositionInitialize();
 #if !defined(PIOS_GPS_MINIMAL)
 		GPSTimeInitialize();
@@ -138,8 +149,7 @@ int32_t GPSInitialize(void)
 
 	return -1;
 }
-// optional module, gets initialized separately
-//MODULE_INITCALL(GPSInitialize, GPSStart)
+MODULE_INITCALL(GPSInitialize, GPSStart)
 
 // ****************
 /**

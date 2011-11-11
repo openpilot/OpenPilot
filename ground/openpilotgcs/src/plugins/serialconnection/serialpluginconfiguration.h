@@ -6,9 +6,9 @@
  * @see        The GNU Public License (GPL) Version 3
  * @addtogroup GCSPlugins GCS Plugins
  * @{
- * @addtogroup SerialPlugin Serial Plugin
+ * @addtogroup SerialPlugin Serial Connection Plugin
  * @{
- * @brief Plots flight information rotary style Serials
+ * @brief Impliments serial connection to the flight hardware for Telemetry
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -46,7 +46,7 @@ public:
     IUAVGadgetConfiguration *clone();
     void savesettings() const;
     void restoresettings();
-
+    virtual ~SerialPluginConfiguration();
 private:
     QString m_speed;
     QSettings* settings;

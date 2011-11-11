@@ -1,16 +1,16 @@
 /**
  ******************************************************************************
  *
- * @file       dialpluginoptionspage.cpp
+ * @file       serialpluginoptionspage.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @see        The GNU Public License (GPL) Version 3
  * @addtogroup GCSPlugins GCS Plugins
  * @{
- * @addtogroup DialPlugin Dial Plugin
+ * @addtogroup SerialPlugin Serial Connection Plugin
  * @{
- * @brief Plots flight information rotary style dials 
+ * @brief Impliments serial connection to the flight hardware for Telemetry
  *****************************************************************************/
-/*
+ /*
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
@@ -67,5 +67,5 @@ void SerialPluginOptionsPage::apply()
 
 void SerialPluginOptionsPage::finish()
 {
-    delete m_config;
+    delete options_page;
 }

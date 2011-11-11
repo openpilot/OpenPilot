@@ -92,6 +92,16 @@ namespace OP_DFU {
 
     };
 
+    enum eBoardType
+    {
+        eBoardUnkwn = 0,
+        eBoardMainbrd = 1,
+        eBoardINS,
+        eBoardPip,
+        eBoardCC,
+        eBoardPro,
+    };
+
     struct device
     {
             int ID;
@@ -154,6 +164,7 @@ namespace OP_DFU {
         // Helper functions:
         QString StatusToString(OP_DFU::Status  const & status);
         static quint32 CRC32WideFast(quint32 Crc, quint32 Size, quint32 *Buffer);
+        OP_DFU::eBoardType GetBoardType(int boardNum);
 
 
 

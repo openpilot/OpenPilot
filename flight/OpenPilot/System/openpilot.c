@@ -35,7 +35,6 @@
 /* OpenPilot Includes */
 #include "openpilot.h"
 #include "uavobjectsinit.h"
-#include "hwsettings.h"
 #include "systemmod.h"
 
 /* Task Priorities */
@@ -93,12 +92,6 @@ int main()
 
 	/* Initialize modules */
 	MODULE_INITIALISE_ALL
-
-	/* Optional module initialization.  This code might want to go somewhere else as
-	 * it grows */
-	uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
-	HwSettingsOptionalModulesGet(optionalModules);
-	MODULE_INITIALISE_OPTIONAL(optionalModules)
 
 #if INCLUDE_TEST_TASKS
 	/* Create test tasks */

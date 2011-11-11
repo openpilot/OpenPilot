@@ -64,8 +64,10 @@ private:
 
 	bool firstUpdate;
 
-
+        bool wasItMe;
 private slots:
+        void stopTests();
+        void disableIfNotMe(UAVObject *obj);
         virtual void refreshWidgetsValues();
         void updateObjectsFromWidgets();
 	void runChannelTests(bool state);

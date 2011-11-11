@@ -41,11 +41,17 @@
 #include <QUrl>
 #include "actuatorcommand.h"
 #include "systemalarms.h"
+#include "uavsettingsimportexport/uavsettingsimportexportfactory.h"
 
-ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(parent)
+ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(parent),wasItMe(false)
 {
     m_config = new Ui_OutputWidget();
     m_config->setupUi(this);
+
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    Q_ASSERT(pm);
+    UAVSettingsImportExportFactor * importexportplugin =  pm->getObject<UAVSettingsImportExportFactory>();
+    connect(importexportplugin,SIGNAL(importAboutToBegin()),this,SLOT(stopTests()));
 
     setupButtons(m_config->saveRCOutputToRAM,m_config->saveRCOutputToSD);
     addUAVObject("ActuatorSettings");
@@ -77,6 +83,12 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
     addWidget(m_config->outputRate1);
 
     addWidget(m_config->spinningArmed);
+
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    UAVObject* obj = objManager->getObject(QString("ActuatorCommand"));
+    if(obj->getMetadata().gcsTelemetryUpdateMode == UAVObject::UPDATEMODE_ONCHANGE)
+        this->setEnabled(false);
+    connect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(disableIfNotMe(UAVObject*)));
 }
 
 ConfigOutputWidget::~ConfigOutputWidget()
@@ -127,6 +139,7 @@ void ConfigOutputWidget::runChannelTests(bool state)
     UAVObject::Metadata mdata = obj->getMetadata();
     if (state)
     {
+        wasItMe=true;
         accInitialData = mdata;
         mdata.flightAccess = UAVObject::ACCESS_READONLY;
         mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
@@ -136,9 +149,11 @@ void ConfigOutputWidget::runChannelTests(bool state)
     }
     else
     {
+        wasItMe=false;
         mdata = accInitialData; // Restore metadata
     }
     obj->setMetadata(mdata);
+    obj->updated();
 
 }
 
@@ -334,4 +349,18 @@ void ConfigOutputWidget::openHelp()
     QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/Output+Configuration", QUrl::StrictMode) );
 }
 
+void ConfigOutputWidget::stopTests()
+{
+    m_config->channelOutTest->setChecked(false);
+}
 
+void ConfigOutputWidget::disableIfNotMe(UAVObject* obj)
+{
+    if(obj->getMetadata().gcsTelemetryUpdateMode == UAVObject::UPDATEMODE_ONCHANGE)
+    {
+        if(!wasItMe)
+            this->setEnabled(false);
+    }
+    else
+        this->setEnabled(true);
+}

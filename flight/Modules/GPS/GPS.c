@@ -138,6 +138,8 @@ int32_t GPSInitialize(void)
 
 	return -1;
 }
+// optional module, gets initialized separately
+//MODULE_INITCALL(GPSInitialize, GPSStart)
 
 // ****************
 /**

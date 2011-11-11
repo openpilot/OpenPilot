@@ -31,46 +31,26 @@
 #include <QItemDelegate>
 #include <QComboBox>
 
-//class RepeatCounterDelegate : public QItemDelegate
-//{
-//	Q_OBJECT
-
-//public:
-//	RepeatCounterDelegate(QObject *parent = 0);
-//	QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &,
-//						  const QModelIndex &index) const;
-//	void setEditorData(QWidget *editor, const QModelIndex &index) const;
-//	void setModelData(QWidget *editor, QAbstractItemModel *model,
-//					  const QModelIndex &index) const;
-
-//private slots:
-//	void commitAndCloseEditor();
-//};
 
 class NotifyItemDelegate : public QItemDelegate
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	NotifyItemDelegate(QStringList items, QObject *parent = 0);
-	QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &,
-						  const QModelIndex &index) const;
-	void setEditorData(QWidget *editor, const QModelIndex &index) const;
-	void setModelData(QWidget *editor, QAbstractItemModel *model,
-					  const QModelIndex &index) const;
-//	bool editorEvent(QEvent * event, QAbstractItemModel * model,
-//					 const QStyleOptionViewItem & option, const QModelIndex & index );
-	QSize  sizeHint ( const QStyleOptionViewItem  & option, const QModelIndex & index ) const;
-
-private:
-	QObject* m_parent;
-	QStringList m_items;
-	QComboBox* repeatEditor;
-
+    NotifyItemDelegate(QObject *parent = 0);
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &,
+                                              const QModelIndex &index) const;
+    void setEditorData(QWidget *editor, const QModelIndex &index) const;
+    void setModelData(QWidget *editor, QAbstractItemModel *model,
+                                      const QModelIndex &index) const;
+    QSize  sizeHint ( const QStyleOptionViewItem  & option, const QModelIndex & index ) const;
 
 private slots:
-	void selectRow(const QString & text);
-	void commitAndCloseEditor();
+    void selectRow(const QString & text);
+    void commitAndCloseEditor();
+
+private:
+    QObject* _parent;
 };
 
 #endif // NOTIFYITEMDELEGATE_H

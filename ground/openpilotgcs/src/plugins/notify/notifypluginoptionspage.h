@@ -42,83 +42,145 @@
 #include <phonon/Path>
 #include <phonon/AudioOutput>
 #include <phonon/Global>
+#include <QComboBox>
+#include <QSpinBox>
 
 class NotifyTableModel;
-
-class NotifyPluginConfiguration;
+class NotificationItem;
 class SoundNotifyPlugin;
 
 namespace Ui {
-    class NotifyPluginOptionsPage;
-}
-
+	class NotifyPluginOptionsPage;
+};
 
 using namespace Core;
 
 class NotifyPluginOptionsPage : public IOptionsPage
 {
-	Q_OBJECT
+    Q_OBJECT
+
 public:
-    explicit NotifyPluginOptionsPage(/*NotifyPluginConfiguration *config, */QObject *parent = 0);
 
-	QString id() const { return QLatin1String("settings"); }
-	QString trName() const { return tr("settings"); }
-	QString category() const { return QLatin1String("Notify Plugin");}
-	QString trCategory() const { return tr("Notify Plugin");}
-
-
+    explicit NotifyPluginOptionsPage(QObject *parent = 0);
+    ~NotifyPluginOptionsPage();
+    QString id() const { return QLatin1String("settings"); }
+    QString trName() const { return tr("settings"); }
+    QString category() const { return QLatin1String("Notify Plugin");}
+    QString trCategory() const { return tr("Notify Plugin");}
 
     QWidget *createPage(QWidget *parent);
     void apply();
-	void finish();
-	void restoreFromSettings();
-
-	void updateConfigView(NotifyPluginConfiguration* notification);
-	void getOptionsPageValues(NotifyPluginConfiguration* notification);
-
-private:
-	UAVObjectManager *objManager;
-	SoundNotifyPlugin* owner;
-	QStringList listDirCollections;
-	QStringList listSoundFiles;
-	QString currentCollectionPath;
-	int sizeNotifyList;
-	Phonon::MediaObject *sound1;
-	Phonon::MediaObject *sound2;
-	Phonon::MediaObject *notifySound;
-	Phonon::AudioOutput *audioOutput;
-	QStringList delegateItems;
-	NotifyTableModel* notifyRulesModel;
-	QItemSelectionModel *notifyRulesSelection;
-	QList<NotifyPluginConfiguration*> privListNotifications;
-
-	Ui::NotifyPluginOptionsPage *options_page;
-	//NotifyPluginConfiguration *notify;
+    void finish();
+    void restoreFromSettings();
 
 signals:
-	void updateNotifications(QList<NotifyPluginConfiguration*> list);
-	void resetNotification(void);
-	void entryUpdated(int index);
-	void entryAdded(int position);
-
+    void updateNotifications(QList<NotificationItem*> list);
+    void entryUpdated(int index);
 
 private slots:
-	void showPersistentComboBox( const QModelIndex & parent, int start, int end );
-	void showPersistentComboBox2 ( const QModelIndex & topLeft, const QModelIndex & bottomRight );
+    void on_clicked_buttonTestSoundNotification();
+    void on_clicked_buttonAddNotification();
+    void on_clicked_buttonDeleteNotification();
+    void on_clicked_buttonModifyNotification();
 
-//	void on_buttonTestSound1_clicked();
-//	void on_buttonTestSound2_clicked();
-	void on_buttonTestSoundNotification_clicked();
+    /**
+     * We can use continuous selection, to select simultaneously
+     * multiple rows to move them(using drag & drop) inside table ranges.
+     */
+    void on_changedSelection_notifyTable( const QItemSelection & selected, const QItemSelection & deselected );
 
-	void on_buttonAddNotification_clicked();
-	void on_buttonDeleteNotification_clicked();
-	void on_buttonModifyNotification_clicked();
-	void on_tableNotification_changeSelection( const QItemSelection & selected, const QItemSelection & deselected );
-	void on_soundLanguage_indexChanged(int index);
-	void on_buttonSoundFolder_clicked(const QString& path);
-	void on_UAVObject_indexChanged(QString val);
-	void changeButtonText(Phonon::State newstate, Phonon::State oldstate);
-	void on_chkEnableSound_toggled(bool state);
+    void on_changedIndex_soundLanguage(int index);
+    void on_clicked_buttonSoundFolder(const QString& path);
+    void on_changedIndex_UAVObject(QString val);
+    void on_changedIndex_UAVField(QString val);
+    void on_changed_playButtonText(Phonon::State newstate, Phonon::State oldstate);
+    void on_toggled_checkEnableSound(bool state);
+
+    /**
+     * Important when we change to or from "In range" value
+     * For enums UI layout stayed the same, but for numeric values
+     * we need to change UI to show edit line,
+     * to have possibility assign range limits for value.
+     */
+    void on_changedIndex_rangeValue(QString);
+
+    void on_FinishedPlaying(void);
+
+
+private:
+    Q_DISABLE_COPY(NotifyPluginOptionsPage)
+
+    void initButtons();
+    void initPhononPlayer();
+    void initRulesTable();
+
+    void setSelectedNotification(NotificationItem* ntf);
+    void resetValueRange();
+    void resetFieldType();
+
+    void updateConfigView(NotificationItem* notification);
+    void getOptionsPageValues(NotificationItem* notification);
+    UAVObjectField* getObjectFieldFromPage();
+    UAVObjectField* getObjectFieldFromSelected();
+
+    void addDynamicFieldLayout();
+    void addDynamicField(UAVObjectField* objField);
+    void addDynamicFieldWidget(UAVObjectField* objField);
+    void setDynamicFieldValue(NotificationItem* notification);
+
+private:
+
+    UAVObjectManager& _objManager;
+    SoundNotifyPlugin* _owner;
+
+    //! Media object uses to test sound playing
+    QScopedPointer<Phonon::MediaObject> _testSound;
+
+    QScopedPointer<NotifyTableModel> _notifyRulesModel;
+    QItemSelectionModel* _notifyRulesSelection;
+
+    /**
+     * Local copy of notification list, which owned by notify plugin.
+     * Notification list readed once on application loaded, during
+     * notify plugin startup, then on open options page.
+     * This copy is simple assignment, but due to implicitly sharing
+     * we don't have additional cost for that, copy will created
+     * only after modification of private notify list.
+     */
+    QList<NotificationItem*> _privListNotifications;
+
+    QScopedPointer<Ui::NotifyPluginOptionsPage> _optionsPage;
+
+    //! Widget to convinient selection of condition for field value (equal, lower, greater)
+    QComboBox* _dynamicFieldLimit;
+
+    //! Represents edit widget for dynamic UAVObjectfield,
+    //! can be spinbox - for numerics, combobox - enums, or
+    //! lineedit - for numerics with range constraints
+    QWidget* _dynamicFieldWidget;
+
+    //! Type of UAVObjectField - numeric or ENUM,
+    //! this variable needs to correctly set appropriate dynamic UI element (_dynamicFieldWidget)
+    //! NOTE: ocassionaly it should be invalidated (= -1) to reset _dynamicFieldWidget
+    int _dynamicFieldType;
+
+    //! Widget to convinient selection of position of <dynamic field value>
+    //! between sounds[1..3]
+    QComboBox* _sayOrder;
+
+    //! Actualy reference to optionsPageWidget,
+    //! we MUST hold it beyond the scope of createPage func
+    //! to have possibility change dynamic parts of options page layout in future
+    QWidget* _form;
+
+    //! Currently selected notification, all controls filled accroding to it.
+    //! On options page startup, always points to first row.
+    NotificationItem* _selectedNotification;
+
+    //! Retrieved from UAVObjectManager by name from _selectedNotification,
+    //! if UAVObjectManager doesn't have such object, this field will be NULL
+    UAVDataObject* _currUAVObject;
+
 };
 
 #endif // NOTIFYPLUGINOPTIONSPAGE_H

@@ -81,7 +81,7 @@
 #include <pios_ppm.h>
 #include <pios_pwm.h>
 #include <pios_rcvr.h>
-#include <pios_spektrum.h>
+#include <pios_dsm.h>
 #include <pios_sbus.h>
 #include <pios_usb_hid.h>
 #include <pios_debug.h>

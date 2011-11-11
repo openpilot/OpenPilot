@@ -25,6 +25,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "config_cc_hw_widget.h"
+#include "hwsettings.h"
 
 #include <QDebug>
 #include <QStringList>
@@ -63,10 +64,13 @@ void ConfigCCHWWidget::refreshValues()
 void ConfigCCHWWidget::widgetsContentsChanged()
 {
     ConfigTaskWidget::widgetsContentsChanged();
-    enableControls(false);
-    if((m_telemetry->cbFlexi->currentText()==m_telemetry->cbTele->currentText()) && m_telemetry->cbTele->currentText()!="Disabled")
+
+    if (((m_telemetry->cbTele->currentIndex() == HwSettings::CC_MAINPORT_TELEMETRY) && (m_telemetry->cbFlexi->currentIndex() == HwSettings::CC_FLEXIPORT_TELEMETRY)) ||
+        ((m_telemetry->cbTele->currentIndex() == HwSettings::CC_MAINPORT_GPS) && (m_telemetry->cbFlexi->currentIndex() == HwSettings::CC_FLEXIPORT_GPS)) ||
+        ((m_telemetry->cbTele->currentIndex() == HwSettings::CC_MAINPORT_COMAUX) && (m_telemetry->cbFlexi->currentIndex() == HwSettings::CC_FLEXIPORT_COMAUX)))
     {
-        m_telemetry->problems->setText("Warning: you have configured the MainPort and the FlexiPort for the same function, this is currently not suported");
+        enableControls(false);
+        m_telemetry->problems->setText(tr("Warning: you have configured both MainPort and FlexiPort for the same function, this currently is not supported"));
     }
     else
     {
@@ -84,4 +88,3 @@ void ConfigCCHWWidget::openHelp()
   * @}
   * @}
   */
-

@@ -148,6 +148,7 @@ QIODevice *SerialConnection::openDevice(const QString &deviceName)
             //we need to handle port settings here...
             PortSettings set;
             set.BaudRate = stringToBaud(m_config->speed());
+            qDebug()<<"Serial telemetry running at "<<m_config->speed();
             set.DataBits = DATA_8;
             set.Parity = PAR_NONE;
             set.StopBits = STOP_1;
@@ -227,6 +228,8 @@ BaudRateType SerialConnection::stringToBaud(QString str)
         return BAUD460800;
     else if(str== "921600")
         return BAUD921600;
+    else
+        return BAUD56000;
 }
 
 SerialPlugin::SerialPlugin()

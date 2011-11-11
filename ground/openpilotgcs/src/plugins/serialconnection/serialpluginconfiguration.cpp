@@ -1,14 +1,14 @@
 /**
  ******************************************************************************
  *
- * @file       dialpluginconfiguration.cpp
+ * @file       serialpluginconfiguration.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @see        The GNU Public License (GPL) Version 3
  * @addtogroup GCSPlugins GCS Plugins
  * @{
- * @addtogroup DialPlugin Dial Plugin
+ * @addtogroup SerialPlugin Serial Connection Plugin
  * @{
- * @brief Plots flight information rotary style dials 
+ * @brief Impliments serial connection to the flight hardware for Telemetry
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -62,13 +62,12 @@ void SerialPluginConfiguration::saveConfig(QSettings* settings) const {
 void SerialPluginConfiguration::restoresettings()
 {
     settings->beginGroup(QLatin1String("SerialConnection"));
-
-        QString str=(settings->value(QLatin1String("speed"), tr("")).toString());
-        if(str.isEmpty())
-            m_speed="57600";
-        else
-            m_speed=str;
-        settings->endGroup();
+    QString str=(settings->value(QLatin1String("speed"), tr("")).toString());
+    if(str.isEmpty())
+        m_speed="57600";
+    else
+        m_speed=str;
+    settings->endGroup();
 
 }
 void SerialPluginConfiguration::savesettings() const
@@ -76,4 +75,7 @@ void SerialPluginConfiguration::savesettings() const
     settings->beginGroup(QLatin1String("SerialConnection"));
     settings->setValue(QLatin1String("speed"), m_speed);
     settings->endGroup();
+}
+SerialPluginConfiguration::~SerialPluginConfiguration()
+{
 }

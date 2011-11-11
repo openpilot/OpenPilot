@@ -19,10 +19,9 @@ plugin_emptygadget.subdir = emptygadget
 plugin_emptygadget.depends = plugin_coreplugin
 SUBDIRS += plugin_emptygadget
 
-# UAV Settings Import/Export plugin
+# Debug Gadget plugin
 plugin_debuggadget.subdir = debuggadget
-#plugin_debughelper.depends = plugin_coreplugin
-#plugin_debughelper.depends += plugin_uavobjects
+plugin_debuggadget.depends = plugin_coreplugin
 SUBDIRS += plugin_debuggadget
 
 # Welcome plugin

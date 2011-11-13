@@ -212,8 +212,9 @@ QString UAVSettingsImportExportFactory::createXMLDocument(
     QDomElement fw=doc.createElement("Embedded");
     UAVObjectUtilManager* utilMngr = pm->getObject<UAVObjectUtilManager>();
 
-    fw.setAttribute("gitcommittag",utilMngr->getBoardDescriptionStruct().gitTag);
-    fw.setAttribute("fwtag",utilMngr->getBoardDescriptionStruct().description);
+    deviceDescriptorStruct struc=utilMngr->getBoardDescriptionStruct();
+    fw.setAttribute("gitcommittag",struc.gitTag);
+    fw.setAttribute("fwtag",struc.description);
     fw.setAttribute("cpuSerial",QString(utilMngr->getBoardCPUSerial().toHex()));
 
     versionInfo.appendChild(fw);

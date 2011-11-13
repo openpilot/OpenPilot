@@ -25,6 +25,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "uploadergadgetwidget.h"
+#include <coreplugin/coreconstants.h>
+#include <QErrorMessage>
 
 #define DFU_DEBUG true
 
@@ -42,6 +44,8 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     TelemetryManager* telMngr = pm->getObject<TelemetryManager>();
     connect(telMngr, SIGNAL(connected()), this, SLOT(onAutopilotConnect()));
+    connect(telMngr, SIGNAL(connected()), this, SLOT(versionMatchCheck()));
+
     connect(telMngr, SIGNAL(disconnected()), this, SLOT(onAutopilotDisconnect()));
 
     connect(m_config->haltButton, SIGNAL(clicked()), this, SLOT(goToBootloader()));
@@ -602,4 +606,22 @@ void UploaderGadgetWidget::info(QString infoString, int infoNumber)
 {
     Q_UNUSED(infoNumber);
     m_config->boardStatus->setText(infoString);
+}
+
+void UploaderGadgetWidget::versionMatchCheck()
+{
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectUtilManager* utilMngr = pm->getObject<UAVObjectUtilManager>();
+    deviceDescriptorStruct boardDescription=utilMngr->getBoardDescriptionStruct();
+    QString gcsDescription=QString::fromLatin1(Core::Constants::GCS_REVISION_STR);
+    /*TODO compare logic
+      if()
+      {
+      }*/
+    QString version;
+    QErrorMessage msg(this);
+    msg.showMessage(QString("Incompatible GCS and FW detected, you should upgrade your GCS to %1 version").arg(version));
+    msg.showMessage(QString("Incompatible GCS and FW detected, you should upgrade your board's Firmware to %1 version").arg(version));
+
+
 }

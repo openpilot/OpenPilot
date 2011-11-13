@@ -86,6 +86,7 @@ private:
      QEventLoop m_eventloop;
 private slots:
     void onPhisicalHWConnect();
+    void versionMatchCheck();
     void error(QString errorString,int errorNumber);
     void info(QString infoString,int infoNumber);
     void goToBootloader(UAVObject* = NULL, bool = false);

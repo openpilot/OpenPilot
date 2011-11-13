@@ -25,8 +25,10 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "uploadergadgetwidget.h"
+#include "../../../../../build/ground/openpilotgcs/gcsversioninfo.h"
 #include <coreplugin/coreconstants.h>
 #include <QErrorMessage>
+#include <QDebug>
 
 #define DFU_DEBUG true
 
@@ -64,7 +66,10 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
 
     // And check whether by any chance we are not already connected
     if (telMngr->isConnected())
+    {
         onAutopilotConnect();
+        versionMatchCheck();
+    }
 
 
 }
@@ -614,14 +619,16 @@ void UploaderGadgetWidget::versionMatchCheck()
     UAVObjectUtilManager* utilMngr = pm->getObject<UAVObjectUtilManager>();
     deviceDescriptorStruct boardDescription=utilMngr->getBoardDescriptionStruct();
     QString gcsDescription=QString::fromLatin1(Core::Constants::GCS_REVISION_STR);
-    /*TODO compare logic
-      if()
-      {
-      }*/
-    QString version;
-    QErrorMessage msg(this);
-    msg.showMessage(QString("Incompatible GCS and FW detected, you should upgrade your GCS to %1 version").arg(version));
-    msg.showMessage(QString("Incompatible GCS and FW detected, you should upgrade your board's Firmware to %1 version").arg(version));
+    if(boardDescription.gitTag!=gcsDescription.mid(gcsDescription.indexOf(":")+1,8))
+    {
+        qDebug()<<QDate::fromString(boardDescription.buildDate.mid(0,8),"yyyyMMdd");
+        qDebug()<<QDate::fromString(gcsDescription.mid(gcsDescription.indexOf(" ")+1,8),"yyyyMMdd");
+        qDebug()<<QDate::fromString(boardDescription.buildDate.mid(0,8),"yyyyMMdd").daysTo(QDate::fromString(gcsDescription.mid(gcsDescription.indexOf(" ")+1,8),"yyyyMMdd"));
+        QErrorMessage * msg=new QErrorMessage(this);
+        if(QDate::fromString(boardDescription.buildDate.mid(0,8),"yyyyMMdd").daysTo(QDate::fromString(gcsDescription.mid(gcsDescription.indexOf(" ")+1,8),"yyyyMMdd"))>0)
+            msg->showMessage(QString("Incompatible GCS and FW detected, you should upgrade your board's Firmware to %1 version.").arg(gcsDescription));
+        else
+            msg->showMessage(QString("Incompatible GCS and FW detected, you should upgrade your GCS to %1 version.").arg(boardDescription.gitTag+":"+boardDescription.buildDate));
 
-
-}
+    }
+  }

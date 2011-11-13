@@ -46,7 +46,6 @@
 #include "systemsettings.h"
 #include "i2cstats.h"
 #include "taskinfo.h"
-#include "hwsettings.h"
 #include "watchdogstatus.h"
 #include "taskmonitor.h"
 

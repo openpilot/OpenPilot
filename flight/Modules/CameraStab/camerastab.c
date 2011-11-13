@@ -79,7 +79,7 @@ int32_t CameraStabInitialize(void)
 	HwSettingsInitialize();
 	uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
 	HwSettingsOptionalModulesGet(optionalModules);
-    if (optionalModules[HWSETTINGS_OPTIONALMODULES_CAMERASTAB]==HWSETTINGS_OPTIONALMODULES_ENABLED) {
+	if (optionalModules[HWSETTINGS_OPTIONALMODULES_CAMERASTAB] == HWSETTINGS_OPTIONALMODULES_ENABLED) {
 		camerastabEnabled=1;
 	} else {
 		camerastabEnabled=0;

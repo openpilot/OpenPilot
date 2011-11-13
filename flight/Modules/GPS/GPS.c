@@ -78,7 +78,7 @@ static float GravityAccel(float latitude, float longitude, float altitude);
 // Private variables
 
 static uint32_t gpsPort;
-static uint8_t gpsEnabled = 0;
+static bool gpsEnabled = false;
 
 static xTaskHandle gpsTaskHandle;
 
@@ -123,10 +123,10 @@ int32_t GPSInitialize(void)
 	HwSettingsInitialize();
 	uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
 	HwSettingsOptionalModulesGet(optionalModules);
-    if (optionalModules[HWSETTINGS_OPTIONALMODULES_GPS]==HWSETTINGS_OPTIONALMODULES_ENABLED) {
-		gpsEnabled=1;
+	if (optionalModules[HWSETTINGS_OPTIONALMODULES_GPS] == HWSETTINGS_OPTIONALMODULES_ENABLED) {
+		gpsEnabled = true;
 	} else {
-		gpsEnabled=0;
+		gpsEnabled = false;
 	}
 
 	if (gpsPort && gpsEnabled) {

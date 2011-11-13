@@ -1,15 +1,18 @@
 <xml>
 	<object name="HwSettings" singleinstance="true" settings="true">
 		<description>Selection of optional hardware configurations.</description>
-		<field name="CC_FlexiPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,Spektrum1,Spektrum2,ComAux,I2C" defaultvalue="Disabled"/>
-		<field name="CC_MainPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,S.Bus,GPS,Spektrum1,Spektrum2,ComAux" defaultvalue="Telemetry"/>
-		<field name="CC_RcvrPort" units="function" type="enum" elements="1" options="Disabled,PWM,PPM" defaultvalue="PWM"/>
+		<field name="CC_RcvrPort" units="function" type="enum" elements="1" options="Disabled,PWM,PPM,PPM+Servo,Servo" defaultvalue="PWM"/>
+		<field name="CC_MainPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,S.Bus,DSM2,DSMX (10bit),DSMX (11bit),ComAux" defaultvalue="Disabled"/>
+		<field name="CC_FlexiPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,I2C,DSM2,DSMX (10bit),DSMX (11bit),ComAux" defaultvalue="Disabled"/>
 
-		<field name="OP_FlexiPort" units="function" type="enum" elements="1" options="Disabled,GPS" defaultvalue="GPS"/>
+		<field name="OP_RcvrPort" units="function" type="enum" elements="1" options="Disabled,PWM,PPM,DSM2,DSMX (10bit),DSMX (11bit),Debug" defaultvalue="PWM"/>
 		<field name="OP_MainPort" units="function" type="enum" elements="1" options="Disabled,Telemetry" defaultvalue="Telemetry"/>
-		<field name="OP_RcvrPort" units="function" type="enum" elements="1" options="Disabled,Debug,Spektrum1,PWM,PPM" defaultvalue="PWM"/>
+		<field name="OP_FlexiPort" units="function" type="enum" elements="1" options="Disabled,GPS" defaultvalue="GPS"/>
 
-		<field name="OptionalModules" units="" type="enum" elementnames="CameraStabilization,GPS,TxPID" options="Disabled,Enabled" defaultvalue="Disabled"/>
+		<field name="TelemetrySpeed" units="bps" type="enum" elements="1" options="2400,4800,9600,19200,38400,57600,115200" defaultvalue="57600"/>
+		<field name="GPSSpeed" units="bps" type="enum" elements="1" options="2400,4800,9600,19200,38400,57600,115200" defaultvalue="57600"/>
+
+		<field name="OptionalModules" units="" type="enum" elementnames="CameraStab,GPS,TxPID" options="Disabled,Enabled" defaultvalue="Disabled"/>
 		<field name="DSMxBind" units=""  type="uint8"  elements="1" defaultvalue="0"/>
 
 		<access gcs="readwrite" flight="readwrite"/>

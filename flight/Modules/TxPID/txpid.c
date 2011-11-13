@@ -57,6 +57,7 @@
 #include "manualcontrolcommand.h"
 #include "stabilizationsettings.h"
 #include "flightstatus.h"
+#include "hwsettings.h"
 
 //
 // Configuration
@@ -87,33 +88,57 @@ static float scale(float val, float inMin, float inMax, float outMin, float outM
 int32_t TxPIDInitialize(void)
 {
 	static UAVObjEvent ev;
-	ev.obj = AccessoryDesiredHandle();
-	ev.instId = 0;
-	ev.event = 0;
 
-	// Initialize settings object
-	TxPIDSettingsInitialize();
+	bool txPIDEnabled;
+	uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
+
+	HwSettingsInitialize();
+	HwSettingsOptionalModulesGet(optionalModules);
+
+	if (optionalModules[HWSETTINGS_OPTIONALMODULES_TXPID] == HWSETTINGS_OPTIONALMODULES_ENABLED)
+		txPIDEnabled = true;
+	else
+		txPIDEnabled = false;
+
+	if (txPIDEnabled) {
+		ev.obj = AccessoryDesiredHandle();
+		ev.instId = 0;
+		ev.event = 0;
+
+		// Initialize settings object
+		TxPIDSettingsInitialize();
 
 #if (TELEMETRY_UPDATE_PERIOD_MS != 0)
-	// Change StabilizationSettings update rate from OnChange to periodic
-	// to prevent telemetry link flooding with frequent updates in case of
-	// control channel jitter.
-	// Warning: saving to flash with this code active will change the
-	// StabilizationSettings update rate permanently. Use Metadata via
-	// browser to reset to defaults (telemetryAcked=true, OnChange).
-	UAVObjMetadata metadata;
-	StabilizationSettingsGetMetadata(&metadata);
-	metadata.telemetryAcked = 0;
-	metadata.telemetryUpdateMode = UPDATEMODE_PERIODIC;
-	metadata.telemetryUpdatePeriod = TELEMETRY_UPDATE_PERIOD_MS;
-	StabilizationSettingsSetMetadata(&metadata);
+		// Change StabilizationSettings update rate from OnChange to periodic
+		// to prevent telemetry link flooding with frequent updates in case of
+		// control channel jitter.
+		// Warning: saving to flash with this code active will change the
+		// StabilizationSettings update rate permanently. Use Metadata via
+		// browser to reset to defaults (telemetryAcked=true, OnChange).
+		UAVObjMetadata metadata;
+		StabilizationSettingsGetMetadata(&metadata);
+		metadata.telemetryAcked = 0;
+		metadata.telemetryUpdateMode = UPDATEMODE_PERIODIC;
+		metadata.telemetryUpdatePeriod = TELEMETRY_UPDATE_PERIOD_MS;
+		StabilizationSettingsSetMetadata(&metadata);
 #endif
 
-	// Setup the callback function
-	EventPeriodicCallbackCreate(&ev, updatePIDs, SAMPLE_PERIOD_MS / portTICK_RATE_MS);
+		// Setup the callback function
+		EventPeriodicCallbackCreate(&ev, updatePIDs, SAMPLE_PERIOD_MS / portTICK_RATE_MS);
 
+		return 0;
+	}
+
+	return -1;
+}
+
+/* stub: module has no module thread */
+int32_t TxPIDStart(void)
+{
 	return 0;
 }
+
+MODULE_INITCALL(TxPIDInitialize, TxPIDStart)
 
 /**
  * Update PIDs callback function

@@ -29,6 +29,7 @@
 #include <openpilot.h>
 #include <uavobjectsinit.h>
 
+#include "hwsettings.h"
 #include "attituderaw.h"
 #include "attitudeactual.h"
 #include "positionactual.h"
@@ -39,7 +40,7 @@
 #include "pios_rcvr_priv.h"
 
 /* One slot per selectable receiver group.
- *  eg. PWM, PPM, GCS, SPEKTRUM1, SPEKTRUM2, SBUS
+ *  eg. PWM, PPM, GCS, DSMMAINPORT, DSMFLEXIPORT, SBUS
  * NOTE: No slot in this map for NONE.
  */
 uint32_t pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE];
@@ -187,6 +188,7 @@ void PIOS_Board_Init(void) {
 	AttitudeActualInitialize();
 	VelocityActualInitialize();
 	PositionActualInitialize();
+	HwSettingsInitialize();
 
 }
 

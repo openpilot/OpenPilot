@@ -317,16 +317,56 @@ static void updateAttitude(AttitudeRawData * attitudeRaw)
 		float accel_err[3];
 
 		// Rotate gravity to body frame and cross with accels
+		// grot is a simplified version of [0,0,1] * RotationMatrix(q)
 		grot[0] = -(2 * (q[1] * q[3] - q[0] * q[2]));
 		grot[1] = -(2 * (q[2] * q[3] + q[0] * q[1]));
 		grot[2] = -(q[0] * q[0] - q[1]*q[1] - q[2]*q[2] + q[3]*q[3]);
+		// grot is now 0,0,1 turned by q - down vector of length 1 in body frame
 		CrossProduct((const float *) accels, (const float *) grot, accel_err);
+		// cross product is a suitable rotation vector, but we need a suitable magnitude too (accels*sin(phi) is useless)
+		float error_phi = acosf( accels[0]*grot[0] + accels[1]*grot[1] + accels[2]*grot[2] );
+		
+		// normalize x-product and stretch by rotation length (makes a "Rv" style rotation vector)
+		float accel_err_mag = sqrt(accel_err[0]*accel_err[0] + accel_err[1]*accel_err[1] + accel_err[2]*accel_err[2]);
+		if (accel_err_mag>0.0f) {
+			accel_err[0] *= error_phi/accel_err_mag;
+			accel_err[1] *= error_phi/accel_err_mag;
+			accel_err[2] *= error_phi/accel_err_mag;
+		}
 
-		// Account for accel magnitude
+		// we assume that the only continuous maneuver able to skew the accelerometers is a continuous change in direction - a turn
+		// all other accelerations that change the total speed of the vehicle will eventually reach an equalibrium with drag
+		// (terminal velocity) (only works on earth though)
+		// furthermore only horizontal turns cause a continuous skew, since vertical components cause alternating skews that cancel each other out over time
+		// the total acceleration is always a = G + x - and since we only have to take into account horizontal accelerations x is perpendicular to G
+		// so a = sqrt(G*G + x*x) and cos(phi)=G/a
+		//  ____>x
+		// |\    |
+		// | \ a |
+		// |--\  |
+		// |phi\ |
+		// V____\|
+		// G
 		float accel_mag = sqrt(accels[0]*accels[0] + accels[1]*accels[1] + accels[2]*accels[2]);
-		accel_err[0] /= accel_mag;
-		accel_err[1] /= accel_mag;
-		accel_err[2] /= accel_mag;
+		if (accel_mag <= 9.8f || accel_mag>1.5f*9.8f) {
+			// sanity check - extreme accelerations are unlikely to yield useful results
+			// forces less than 1g imply falling - below orbit that is always temporary ;)
+			// to cope with badly calibrated accels and local gravity we use 9.8f instead of 9.81f
+			accel_err[0] = 0;
+			accel_err[1] = 0;
+			accel_err[2] = 0;
+		} else {
+			// we do not know the direction of the displacement, however we can assume that the
+			// direction of the "current rotation" is a good 'educated guess' therefore
+			// make sure the error "length" is modified accordingly
+			float displacement = acosf(9.8f/accel_mag);
+			float length =  sqrt(accel_err[0]*accel_err[0] + accel_err[1]*accel_err[1] + accel_err[2]*accel_err[2]);
+			if (length>0.0f) {
+				accel_err[0] -= accel_err[0] * displacement / length;
+				accel_err[1] -= accel_err[1] * displacement / length;
+				accel_err[2] -= accel_err[2] * displacement / length;
+			}
+		}
 
 		// Accumulate integral of error.  Scale here so that units are (deg/s) but Ki has units of s
 		gyro_correct_int[0] += accel_err[0] * accelKi;

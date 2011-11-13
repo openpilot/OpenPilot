@@ -120,14 +120,16 @@ int32_t GPSStart(void)
 int32_t GPSInitialize(void)
 {
 	gpsPort = PIOS_COM_GPS;
+
 	HwSettingsInitialize();
 	uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
+
 	HwSettingsOptionalModulesGet(optionalModules);
-	if (optionalModules[HWSETTINGS_OPTIONALMODULES_GPS] == HWSETTINGS_OPTIONALMODULES_ENABLED) {
+
+	if (optionalModules[HWSETTINGS_OPTIONALMODULES_GPS] == HWSETTINGS_OPTIONALMODULES_ENABLED)
 		gpsEnabled = true;
-	} else {
+	else
 		gpsEnabled = false;
-	}
 
 	if (gpsPort && gpsEnabled) {
 		GPSPositionInitialize();
@@ -149,6 +151,7 @@ int32_t GPSInitialize(void)
 
 	return -1;
 }
+
 MODULE_INITCALL(GPSInitialize, GPSStart)
 
 // ****************

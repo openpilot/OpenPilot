@@ -123,9 +123,7 @@
 #include <pios_adxl345.h>
 #endif
 
-#if defined(PIOS_INCLUDE_BMA180)
 #include <pios_bma180.h>
-#endif
 
 #if defined(PIOS_INCLUDE_FLASH)
 #include <pios_flash_w25x.h>

@@ -210,21 +210,6 @@
 		6560A38D13EE26B700105DA5 /* vectors_stm32f2xx.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = vectors_stm32f2xx.S; sourceTree = "<group>"; };
 		6560A39B13EE270C00105DA5 /* startup_stm32f10x_HD_OP.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = startup_stm32f10x_HD_OP.S; sourceTree = "<group>"; };
 		6560A39C13EE270C00105DA5 /* startup_stm32f10x_MD_CC.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = startup_stm32f10x_MD_CC.S; sourceTree = "<group>"; };
-		6560A3A013EE2E8B00105DA5 /* ahrs_slave_test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ahrs_slave_test.c; path = INS/ahrs_slave_test.c; sourceTree = "<group>"; };
-		6560A3A113EE2E8B00105DA5 /* ahrs_spi_program_master.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ahrs_spi_program_master.c; path = INS/ahrs_spi_program_master.c; sourceTree = "<group>"; };
-		6560A3A213EE2E8B00105DA5 /* ahrs_spi_program_slave.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ahrs_spi_program_slave.c; path = INS/ahrs_spi_program_slave.c; sourceTree = "<group>"; };
-		6560A3A313EE2E8B00105DA5 /* ahrs_spi_program.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ahrs_spi_program.c; path = INS/ahrs_spi_program.c; sourceTree = "<group>"; };
-		6560A3A413EE2E8B00105DA5 /* bl_fsm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bl_fsm.c; path = INS/bl_fsm.c; sourceTree = "<group>"; };
-		6560A3A613EE2E8B00105DA5 /* ahrs_bl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs_bl.h; sourceTree = "<group>"; };
-		6560A3A713EE2E8B00105DA5 /* ahrs_spi_program.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs_spi_program.h; sourceTree = "<group>"; };
-		6560A3A813EE2E8B00105DA5 /* ahrs_spi_program_master.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs_spi_program_master.h; sourceTree = "<group>"; };
-		6560A3A913EE2E8B00105DA5 /* ahrs_spi_program_slave.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs_spi_program_slave.h; sourceTree = "<group>"; };
-		6560A3AA13EE2E8B00105DA5 /* bl_fsm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bl_fsm.h; sourceTree = "<group>"; };
-		6560A3AB13EE2E8B00105DA5 /* ins_bl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ins_bl.h; sourceTree = "<group>"; };
-		6560A3AC13EE2E8B00105DA5 /* pios_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_config.h; sourceTree = "<group>"; };
-		6560A3AD13EE2E8B00105DA5 /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = main.c; path = INS/main.c; sourceTree = "<group>"; };
-		6560A3AE13EE2E8B00105DA5 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = INS/Makefile; sourceTree = "<group>"; };
-		6560A3AF13EE2E8B00105DA5 /* pios_board.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pios_board.c; path = INS/pios_board.c; sourceTree = "<group>"; };
 		6560A3B313EE2FCB00105DA5 /* ahrs_timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs_timer.h; sourceTree = "<group>"; };
 		6560A3B413EE2FCB00105DA5 /* ins.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ins.h; sourceTree = "<group>"; };
 		6560A3B513EE2FCB00105DA5 /* ins_fsm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ins_fsm.h; sourceTree = "<group>"; };
@@ -3461,6 +3446,21 @@
 		65F93D0612EE09290047DB36 /* transparent_comms.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = transparent_comms.c; sourceTree = "<group>"; };
 		65F93D0712EE09290047DB36 /* uavtalk_comms.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = uavtalk_comms.c; sourceTree = "<group>"; };
 		65F93D0812EE09290047DB36 /* watchdog.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = watchdog.c; sourceTree = "<group>"; };
+		65FA9B61147078450019A260 /* ahrs_slave_test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ahrs_slave_test.c; sourceTree = "<group>"; };
+		65FA9B62147078450019A260 /* ahrs_spi_program.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ahrs_spi_program.c; sourceTree = "<group>"; };
+		65FA9B63147078450019A260 /* ahrs_spi_program_master.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ahrs_spi_program_master.c; sourceTree = "<group>"; };
+		65FA9B64147078450019A260 /* ahrs_spi_program_slave.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ahrs_spi_program_slave.c; sourceTree = "<group>"; };
+		65FA9B65147078450019A260 /* bl_fsm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bl_fsm.c; sourceTree = "<group>"; };
+		65FA9B67147078450019A260 /* ahrs_bl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs_bl.h; sourceTree = "<group>"; };
+		65FA9B68147078450019A260 /* ahrs_spi_program.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs_spi_program.h; sourceTree = "<group>"; };
+		65FA9B69147078450019A260 /* ahrs_spi_program_master.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs_spi_program_master.h; sourceTree = "<group>"; };
+		65FA9B6A147078450019A260 /* ahrs_spi_program_slave.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs_spi_program_slave.h; sourceTree = "<group>"; };
+		65FA9B6B147078450019A260 /* bl_fsm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bl_fsm.h; sourceTree = "<group>"; };
+		65FA9B6C147078450019A260 /* ins_bl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ins_bl.h; sourceTree = "<group>"; };
+		65FA9B6D147078450019A260 /* pios_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_config.h; sourceTree = "<group>"; };
+		65FA9B6E147078450019A260 /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		65FA9B6F147078450019A260 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		65FA9B70147078450019A260 /* pios_board.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_board.c; sourceTree = "<group>"; };
 		65FAA03F133B669400F6F5CD /* GTOP_BIN.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = GTOP_BIN.c; sourceTree = "<group>"; };
 		65FBE14412E7C98100176B5A /* pios_servo_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_servo_priv.h; sourceTree = "<group>"; };
 		65FC66AA123F30F100B04F74 /* ahrs_timer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ahrs_timer.c; path = ../../AHRS/ahrs_timer.c; sourceTree = SOURCE_ROOT; };
@@ -4156,37 +4156,6 @@
 				6560A37813EE26B700105DA5 /* stm32f2xx_wwdg.c */,
 			);
 			path = src;
-			sourceTree = "<group>";
-		};
-		6560A39F13EE2E6E00105DA5 /* INS */ = {
-			isa = PBXGroup;
-			children = (
-				6560A3A013EE2E8B00105DA5 /* ahrs_slave_test.c */,
-				6560A3A113EE2E8B00105DA5 /* ahrs_spi_program_master.c */,
-				6560A3A213EE2E8B00105DA5 /* ahrs_spi_program_slave.c */,
-				6560A3A313EE2E8B00105DA5 /* ahrs_spi_program.c */,
-				6560A3A413EE2E8B00105DA5 /* bl_fsm.c */,
-				6560A3A513EE2E8B00105DA5 /* inc */,
-				6560A3AD13EE2E8B00105DA5 /* main.c */,
-				6560A3AE13EE2E8B00105DA5 /* Makefile */,
-				6560A3AF13EE2E8B00105DA5 /* pios_board.c */,
-			);
-			name = INS;
-			sourceTree = "<group>";
-		};
-		6560A3A513EE2E8B00105DA5 /* inc */ = {
-			isa = PBXGroup;
-			children = (
-				6560A3A613EE2E8B00105DA5 /* ahrs_bl.h */,
-				6560A3A713EE2E8B00105DA5 /* ahrs_spi_program.h */,
-				6560A3A813EE2E8B00105DA5 /* ahrs_spi_program_master.h */,
-				6560A3A913EE2E8B00105DA5 /* ahrs_spi_program_slave.h */,
-				6560A3AA13EE2E8B00105DA5 /* bl_fsm.h */,
-				6560A3AB13EE2E8B00105DA5 /* ins_bl.h */,
-				6560A3AC13EE2E8B00105DA5 /* pios_config.h */,
-			);
-			name = inc;
-			path = INS/inc;
 			sourceTree = "<group>";
 		};
 		6560A3B013EE2FCB00105DA5 /* INS */ = {
@@ -9612,15 +9581,45 @@
 			path = inc;
 			sourceTree = "<group>";
 		};
+		65FA9B60147078450019A260 /* Revolution */ = {
+			isa = PBXGroup;
+			children = (
+				65FA9B61147078450019A260 /* ahrs_slave_test.c */,
+				65FA9B62147078450019A260 /* ahrs_spi_program.c */,
+				65FA9B63147078450019A260 /* ahrs_spi_program_master.c */,
+				65FA9B64147078450019A260 /* ahrs_spi_program_slave.c */,
+				65FA9B65147078450019A260 /* bl_fsm.c */,
+				65FA9B66147078450019A260 /* inc */,
+				65FA9B6E147078450019A260 /* main.c */,
+				65FA9B6F147078450019A260 /* Makefile */,
+				65FA9B70147078450019A260 /* pios_board.c */,
+			);
+			path = Revolution;
+			sourceTree = "<group>";
+		};
+		65FA9B66147078450019A260 /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				65FA9B67147078450019A260 /* ahrs_bl.h */,
+				65FA9B68147078450019A260 /* ahrs_spi_program.h */,
+				65FA9B69147078450019A260 /* ahrs_spi_program_master.h */,
+				65FA9B6A147078450019A260 /* ahrs_spi_program_slave.h */,
+				65FA9B6B147078450019A260 /* bl_fsm.h */,
+				65FA9B6C147078450019A260 /* ins_bl.h */,
+				65FA9B6D147078450019A260 /* pios_config.h */,
+			);
+			path = inc;
+			sourceTree = "<group>";
+		};
 		65FF4BB313791C3300146BE4 /* Bootloaders */ = {
 			isa = PBXGroup;
 			children = (
-				6560A39F13EE2E6E00105DA5 /* INS */,
 				65FF4BB413791C3300146BE4 /* AHRS */,
 				65FF4BC413791C3300146BE4 /* BootloaderUpdater */,
 				65FF4BCB13791C3300146BE4 /* CopterControl */,
 				65FF4BD513791C3300146BE4 /* OpenPilot */,
 				65FF4BE213791C3300146BE4 /* PipXtreme */,
+				65FA9B60147078450019A260 /* Revolution */,
 			);
 			name = Bootloaders;
 			path = ../../Bootloaders;

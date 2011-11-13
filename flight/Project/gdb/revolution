@@ -1,8 +1,8 @@
 define connect
 	target remote localhost:3334
 	monitor cortex_m3 vector_catch all
-	file ./build/fw_revolution/fw_revolution.elf	
-#	file ./build/bl_ins/bl_ins.elf
+#	file ./build/fw_revolution/fw_revolution.elf	
+	file ./build/bl_ins/bl_ins.elf
 end
 
 source CortexM3

@@ -36,7 +36,7 @@
 #include <pios_board_info.h>
 #include "pios_opahrs_proto.h"
 #include "bl_fsm.h"		/* lfsm_state */
-#include "stm32f2xx_flash.h"
+//#include "stm32f2xx_flash.h"
 
 extern void PIOS_Board_Init(void);
 

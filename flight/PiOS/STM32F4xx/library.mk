@@ -13,7 +13,7 @@ PIOS_DEVLIB			:=	$(dir $(lastword $(MAKEFILE_LIST)))
 LINKER_SCRIPTS_APP	 =	$(PIOS_DEVLIB)/link_STM32F4xx_OP_memory.ld \
 						$(PIOS_DEVLIB)/link_STM32F4xx_sections.ld
 
-LINKER_SCRIPTS_BL	 =	$(PIOS_DEVLIB)/link_STM32F4xx_OP_memory.ld \
+LINKER_SCRIPTS_BL	 =	$(PIOS_DEVLIB)/link_STM32F4xx_BL_memory.ld \
 						$(PIOS_DEVLIB)/link_STM32F4xx_sections.ld
 
 #

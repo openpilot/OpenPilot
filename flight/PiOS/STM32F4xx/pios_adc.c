@@ -46,10 +46,12 @@
 
 extern struct pios_adc_cfg pios_adc_cfg;
 
+#if defined(PIOS_INCLUDE_ADC)
 static void init_pins(void);
 static void init_dma(void);
 static void init_timer(void);
 static void init_adc(void);
+#endif
 
 struct dma_config {
 	GPIO_TypeDef	*port;
@@ -74,10 +76,10 @@ static uint16_t adc_raw_buffer[2][PIOS_ADC_MAX_SAMPLES][PIOS_ADC_NUM_PINS];
 #define PIOS_ADC_TIMER		TIM3		/* might want this to come from the config */
 #define PIOS_LOWRATE_ADC	ADC1
 
+#if defined(PIOS_INCLUDE_ADC)
 static void
 init_pins(void)
 {
-#if defined(PIOS_INCLUDE_ADC)
 	/* Setup analog pins */
 	GPIO_InitTypeDef GPIO_InitStructure;
 	GPIO_StructInit(&GPIO_InitStructure);
@@ -88,13 +90,11 @@ init_pins(void)
 		GPIO_InitStructure.GPIO_Pin = config[i].pin;
 		GPIO_Init(config[i].port, &GPIO_InitStructure);
 	}
-#endif
 }
 
 static void
 init_dma(void)
 {
-#if defined(PIOS_INCLUDE_ADC)
 	/* Disable interrupts */
 	DMA_ITConfig(pios_adc_cfg.dma.rx.channel, pios_adc_cfg.dma.irq.flags, DISABLE);
 
@@ -131,13 +131,11 @@ init_dma(void)
 	NVICInit.NVIC_IRQChannelSubPriority			= 0;
 	NVICInit.NVIC_IRQChannelCmd					= ENABLE;
 	NVIC_Init(&NVICInit);
-#endif
 }
 
 static void
 init_timer(void)
 {
-#if defined(PIOS_INCLUDE_ADC)
 	RCC_ClocksTypeDef	clocks;
 	TIM_TimeBaseInitTypeDef TIMInit;
 
@@ -160,13 +158,11 @@ init_timer(void)
 	/* configure trigger output on reload */
 	TIM_SelectOutputTrigger(PIOS_ADC_TIMER, TIM_TRGOSource_Update);
 	TIM_Cmd(PIOS_ADC_TIMER, ENABLE);
-#endif
 }
 
 static void
 init_adc(void)
 {
-#if defined(PIOS_INCLUDE_ADC)
 	ADC_DeInit();
 
 	/* turn on VREFInt in case we need it */
@@ -207,8 +203,8 @@ init_adc(void)
 
 	/* Finally start initial conversion */
 	ADC_Cmd(PIOS_LOWRATE_ADC, ENABLE);
-#endif
 }
+#endif
 
 /**
  * @brief Init the ADC.

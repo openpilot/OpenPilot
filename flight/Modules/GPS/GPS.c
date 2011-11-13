@@ -43,11 +43,14 @@
 #include "gpssatellites.h"
 #include "WorldMagModel.h"
 #include "CoordinateConversions.h"
+#include "hwsettings.h"
+
 
 // ****************
 // Private functions
 
 static void gpsTask(void *parameters);
+static void updateSettings();
 
 #ifdef PIOS_GPS_SETS_HOMELOCATION
 static void setHomeLocation(GPSPositionData * gpsData);
@@ -75,6 +78,7 @@ static float GravityAccel(float latitude, float longitude, float altitude);
 // Private variables
 
 static uint32_t gpsPort;
+static uint8_t gpsEnabled = 0;
 
 static xTaskHandle gpsTaskHandle;
 
@@ -95,12 +99,19 @@ static uint32_t numParsingErrors;
 
 int32_t GPSStart(void)
 {
-	// Start gps task
-	xTaskCreate(gpsTask, (signed char *)"GPS", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &gpsTaskHandle);
-	TaskMonitorAdd(TASKINFO_RUNNING_GPS, gpsTaskHandle);
+	if (gpsEnabled) {
+		if (gpsPort) {
+			// Start gps task
+			xTaskCreate(gpsTask, (signed char *)"GPS", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &gpsTaskHandle);
+			TaskMonitorAdd(TASKINFO_RUNNING_GPS, gpsTaskHandle);
+			return 0;
+		}
 
-	return 0;
+		AlarmsSet(SYSTEMALARMS_ALARM_GPS, SYSTEMALARMS_ALARM_CRITICAL);
+	}
+	return -1;
 }
+
 /**
  * Initialise the gps module
  * \return -1 if initialisation failed
@@ -108,20 +119,35 @@ int32_t GPSStart(void)
  */
 int32_t GPSInitialize(void)
 {
-	GPSPositionInitialize();
-	GPSTimeInitialize();
-	GPSSatellitesInitialize();
-#ifdef PIOS_GPS_SETS_HOMELOCATION
-	HomeLocationInitialize();
-#endif
-	
-	// TODO: Get gps settings object
 	gpsPort = PIOS_COM_GPS;
+	HwSettingsInitialize();
+	uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
+	HwSettingsOptionalModulesGet(optionalModules);
+    if (optionalModules[HWSETTINGS_OPTIONALMODULES_GPS]==HWSETTINGS_OPTIONALMODULES_ENABLED) {
+		gpsEnabled=1;
+	} else {
+		gpsEnabled=0;
+	}
 
-	gps_rx_buffer = pvPortMalloc(NMEA_MAX_PACKET_LENGTH);
-	PIOS_Assert(gps_rx_buffer);
+	if (gpsPort && gpsEnabled) {
+		GPSPositionInitialize();
+#if !defined(PIOS_GPS_MINIMAL)
+		GPSTimeInitialize();
+		GPSSatellitesInitialize();
+#endif
+#ifdef PIOS_GPS_SETS_HOMELOCATION
+		HomeLocationInitialize();
+#endif
+		HwSettingsInitialize();
+		updateSettings();
 
-	return 0;
+		gps_rx_buffer = pvPortMalloc(NMEA_MAX_PACKET_LENGTH);
+		PIOS_Assert(gps_rx_buffer);
+
+		return 0;
+	}
+
+	return -1;
 }
 MODULE_INITCALL(GPSInitialize, GPSStart)
 
@@ -330,7 +356,47 @@ static void setHomeLocation(GPSPositionData * gpsData)
 }
 #endif
 
-// ****************
+/**
+ * Update the GPS settings, called on startup.
+ * FIXME: This should be in the GPSSettings object. But objects have
+ * too much overhead yet. Also the GPS has no any specific settings
+ * like protocol, etc. Thus the HwSettings object which contains the
+ * GPS port speed is used for now.
+ */
+static void updateSettings()
+{
+	if (gpsPort) {
+
+		// Retrieve settings
+		uint8_t speed;
+		HwSettingsGPSSpeedGet(&speed);
+
+		// Set port speed
+		switch (speed) {
+		case HWSETTINGS_GPSSPEED_2400:
+			PIOS_COM_ChangeBaud(gpsPort, 2400);
+			break;
+		case HWSETTINGS_GPSSPEED_4800:
+			PIOS_COM_ChangeBaud(gpsPort, 4800);
+			break;
+		case HWSETTINGS_GPSSPEED_9600:
+			PIOS_COM_ChangeBaud(gpsPort, 9600);
+			break;
+		case HWSETTINGS_GPSSPEED_19200:
+			PIOS_COM_ChangeBaud(gpsPort, 19200);
+			break;
+		case HWSETTINGS_GPSSPEED_38400:
+			PIOS_COM_ChangeBaud(gpsPort, 38400);
+			break;
+		case HWSETTINGS_GPSSPEED_57600:
+			PIOS_COM_ChangeBaud(gpsPort, 57600);
+			break;
+		case HWSETTINGS_GPSSPEED_115200:
+			PIOS_COM_ChangeBaud(gpsPort, 115200);
+			break;
+		}
+	}
+}
 
 /** 
   * @}

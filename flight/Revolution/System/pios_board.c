@@ -285,9 +285,9 @@ void PIOS_SPI_accel_irq_handler(void)
 
 
 
-#if defined(PIOS_INCLUDE_GPS)
 #include <pios_usart_priv.h>
 
+#if defined(PIOS_INCLUDE_GPS)
 /*
  * GPS USART
  */
@@ -392,6 +392,57 @@ static uint8_t pios_com_gps_tx_buffer[PIOS_COM_GPS_TX_BUF_LEN];
 static uint8_t pios_com_gps_rx_buffer[PIOS_COM_GPS_RX_BUF_LEN];
 
 #endif /* PIOS_COM_AUX */
+
+#ifdef PIOS_INCLUDE_COM_TELEM
+/*
+ * Telemetry on main USART
+ */
+static const struct pios_usart_cfg pios_usart_telem_main_cfg = {
+	.regs = UART4,
+	.remap = GPIO_AF_UART4,
+	.init = {
+		.USART_BaudRate = 57600,
+		.USART_WordLength = USART_WordLength_8b,
+		.USART_Parity = USART_Parity_No,
+		.USART_StopBits = USART_StopBits_1,
+		.USART_HardwareFlowControl =
+		USART_HardwareFlowControl_None,
+		.USART_Mode = USART_Mode_Rx | USART_Mode_Tx,
+	},
+	.irq = {
+		.init = {
+			.NVIC_IRQChannel = UART4_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+			.NVIC_IRQChannelSubPriority = 0,
+			.NVIC_IRQChannelCmd = ENABLE,
+		},
+	},
+	.rx = {
+		.gpio = GPIOC,
+		.init = {
+			.GPIO_Pin = GPIO_Pin_11,
+			.GPIO_Speed = GPIO_Speed_2MHz,
+			.GPIO_Mode  = GPIO_Mode_AF,
+			.GPIO_OType = GPIO_OType_PP,
+			.GPIO_PuPd  = GPIO_PuPd_UP
+		},
+	},
+	.tx = {
+		.gpio = GPIOC,
+		.init = {
+			.GPIO_Pin = GPIO_Pin_10,
+			.GPIO_Speed = GPIO_Speed_2MHz,
+			.GPIO_Mode  = GPIO_Mode_AF,
+			.GPIO_OType = GPIO_OType_PP,
+			.GPIO_PuPd  = GPIO_PuPd_UP
+		},
+	},
+};
+
+#define PIOS_COM_TELEM_RF_RX_BUF_LEN 512
+#define PIOS_COM_TELEM_RF_TX_BUF_LEN 512
+
+#endif /* PIOS_COM_TELEM */
 
 
 #if defined(PIOS_INCLUDE_COM)
@@ -758,6 +809,7 @@ void PIOS_Board_Init(void) {
 	
 #if defined(PIOS_INCLUDE_COM)
 #if defined(PIOS_INCLUDE_GPS)
+
 	uint32_t pios_usart_gps_id;
 	if (PIOS_USART_Init(&pios_usart_gps_id, &pios_usart_gps_cfg)) {
 		PIOS_DEBUG_Assert(0);
@@ -780,7 +832,27 @@ void PIOS_Board_Init(void) {
 					  pios_com_aux_tx_buffer, sizeof(pios_com_aux_tx_buffer))) {
 		PIOS_DEBUG_Assert(0);
 	}
+#endif
+
+#if defined(PIOS_INCLUDE_COM_TELEM)
+{ /* Eventually add switch for this port function */
+	uint32_t pios_usart_telem_rf_id;
+	if (PIOS_USART_Init(&pios_usart_telem_rf_id, &pios_usart_telem_main_cfg)) {
+		PIOS_Assert(0);
+	}
+	
+	uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_RX_BUF_LEN);
+	uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_TX_BUF_LEN);
+	PIOS_Assert(rx_buffer);
+	PIOS_Assert(tx_buffer);
+	if (PIOS_COM_Init(&pios_com_telem_rf_id, &pios_usart_com_driver, pios_usart_telem_rf_id,
+					  rx_buffer, PIOS_COM_TELEM_RF_RX_BUF_LEN,
+					  tx_buffer, PIOS_COM_TELEM_RF_TX_BUF_LEN)) {
+		PIOS_Assert(0);
+	}
+}
 #endif	/* PIOS_INCLUDE_COM_AUX */
+
 #endif	/* PIOS_INCLUDE_COM */
 	
 	if (PIOS_I2C_Init(&pios_i2c_pres_mag_adapter_id, &pios_i2c_pres_mag_adapter_cfg)) {

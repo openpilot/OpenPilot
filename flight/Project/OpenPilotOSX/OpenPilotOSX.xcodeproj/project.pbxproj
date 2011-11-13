@@ -3461,6 +3461,7 @@
 		65FA9B6E147078450019A260 /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		65FA9B6F147078450019A260 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		65FA9B70147078450019A260 /* pios_board.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_board.c; sourceTree = "<group>"; };
+		65FA9B71147087020019A260 /* STM32F4xx_Revolution.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STM32F4xx_Revolution.h; sourceTree = "<group>"; };
 		65FAA03F133B669400F6F5CD /* GTOP_BIN.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = GTOP_BIN.c; sourceTree = "<group>"; };
 		65FBE14412E7C98100176B5A /* pios_servo_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_servo_priv.h; sourceTree = "<group>"; };
 		65FC66AA123F30F100B04F74 /* ahrs_timer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ahrs_timer.c; path = ../../AHRS/ahrs_timer.c; sourceTree = SOURCE_ROOT; };
@@ -4189,6 +4190,7 @@
 		65632DF41251650300469B77 /* Boards */ = {
 			isa = PBXGroup;
 			children = (
+				65FA9B71147087020019A260 /* STM32F4xx_Revolution.h */,
 				65632DF51251650300469B77 /* pios_board.h */,
 				65632DF71251650300469B77 /* STM3210E_OP.h */,
 				65632DF61251650300469B77 /* STM32103CB_AHRS.h */,

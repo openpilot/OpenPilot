@@ -1,7 +1,13 @@
+/**
+ * This is a small test program that connects to OpenPilot/CC via USB and writes a .opl compatible stream to stdout
+ */
+
 #include <usb.h>
-#include <libudev.h>
+//#include <libudev.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdint.h>
+#include <sys/time.h>
 
 //  recveive - receive a packet
 //    Inputs:
@@ -11,34 +17,35 @@
 //    Output:
 //	number of bytes received, or -1 on error
 //
-int opreceive(usb_dev_handle *device, int endpoint, void *buf, int len, int timeout)
+int opreceive(usb_dev_handle *device, int endpoint, void *buf, int timeout)
 {
+	int8_t tmpBuffer[64];
 	if (!buf) return -1;
     if (!device) return -1;
     if (!endpoint) return -1;
+	int received=0;
 
-	return usb_interrupt_read(device, endpoint, (char *)buf, len, timeout);
+
+	received=usb_interrupt_read(device, endpoint, tmpBuffer, 64, timeout);
+	if (received>=0) {
+		received=tmpBuffer[1];
+		if (received>62) received=62;
+		memcpy(buf,&tmpBuffer[2],received);
+		return received;
+	}
+	return received;
 }
 
-//  send - send a packet
-//    Inputs:
-//	buf = buffer containing packet to send
-//	len = number of bytes to transmit
-//	timeout = time to wait, in milliseconds
-//    Output:
-//	number of bytes sent, or -1 on error
-//
-int opsend(usb_dev_handle *device, int endpoint, void *buf, int len, int timeout)
-{
-	if (!buf) return -1;
-    if (!device) return -1;
-    if (!endpoint) return -1;
+int64_t timeDifference(struct timeval * old, struct timeval * new) {
+	time_t seconds;
+	int64_t mseconds;
 
-	return usb_interrupt_write(device, endpoint, (char *)buf, len, timeout);
+	mseconds = (new->tv_usec - old->tv_usec)/1000;
+	mseconds = mseconds + ( new->tv_sec - old->tv_sec ) *1000;
+
+	return mseconds;
+
 }
-
-
-
 
 int main() {
 
@@ -58,17 +65,20 @@ int main() {
 
 	int claimed;
 
+	usb_set_debug(99);
 	usb_init();
 	usb_find_busses();
 	usb_find_devices();
 
 	for (bus = usb_get_busses(); bus; bus = bus->next) {
+		fprintf(stderr,"usbbus found\n");
 		for (dev = bus->devices; dev; dev = dev->next) {
+			fprintf(stderr,"usbdevice found - %04X:%04X\n",dev->descriptor.idVendor,dev->descriptor.idProduct);
 			if (dev->descriptor.idVendor != vendor) continue;
 			if (dev->descriptor.idProduct != product) continue;
 			if (!dev->config) continue;
 			if (dev->config->bNumInterfaces < 1) continue;
-			printf("device: vid=%04X, pic=%04X, with %d iface",
+			fprintf(stderr,"device: vid=%04X, pic=%04X, with %d iface",
                    dev->descriptor.idVendor,
                    dev->descriptor.idProduct,
                    dev->config->bNumInterfaces);
@@ -81,7 +91,7 @@ int main() {
 				desc = iface->altsetting;
 				if (!desc) continue;
 
-				printf("  type %d, %d, %d", desc->bInterfaceClass, desc->bInterfaceSubClass, desc->bInterfaceProtocol);
+				fprintf(stderr,"  type %d, %d, %d", desc->bInterfaceClass, desc->bInterfaceSubClass, desc->bInterfaceProtocol);
 
 				if (desc->bInterfaceClass != 3) continue;
 				if (desc->bInterfaceSubClass != 0) continue;
@@ -95,12 +105,12 @@ int main() {
 					if (ep->bEndpointAddress & 0x80)
 					{
 						if (!ep_in) ep_in = ep->bEndpointAddress & 0x7F;
-						printf("    IN endpoint %X\n",ep_in);
+						fprintf(stderr,"    IN endpoint %X\n",ep_in);
 					}
 					else
 					{
 						if (!ep_out) ep_out = ep->bEndpointAddress;
-						printf("    OUT endpoint %X\n",ep_out);
+						fprintf(stderr,"    OUT endpoint %X\n",ep_out);
 					}
 				}
 				if (!ep_in) continue;
@@ -110,30 +120,30 @@ int main() {
 					dev_handle = usb_open(dev);
 					if (!dev_handle)
 					{
-						printf("  unable to open device\n");
+						fprintf(stderr,"  unable to open device\n");
 						break;
 					}
 				}
-				printf("  hid interface (generic)\n");
+				fprintf(stderr,"  hid interface (generic)\n");
 				if (usb_get_driver_np(dev_handle, i, (char *)buf, sizeof(buf)) >= 0)
 				{
-					printf("  in use by driver \"%s\"", buf);
+					fprintf(stderr,"  in use by driver \"%s\"", buf);
 					if (usb_detach_kernel_driver_np(dev_handle, i) < 0)
 					{
-						printf("  unable to detach from kernel");
+						fprintf(stderr,"  unable to detach from kernel");
 						continue;
 					}
 				}
 
 				if (usb_claim_interface(dev_handle, i) < 0)
 				{
-					printf("  unable claim interface %d", i);
+					fprintf(stderr,"  unable claim interface %d", i);
 					continue;
 				}
 
 				int len;
 				len = usb_control_msg(dev_handle, 0x81, 6, 0x2200, i, (char *)buf, sizeof(buf), 250);
-				printf("  descriptor, len=%d\n", len);
+				fprintf(stderr,"  descriptor, len=%d\n", len);
 				if (len < 2)
 				{
 					usb_release_interface(dev_handle, i);
@@ -147,7 +157,7 @@ int main() {
 					continue;
 				}*/
 
-				printf("found :)))) \n");
+				fprintf(stderr,"found :)))) \n");
 				/*
 				hid->usb = dev_handle;
 				hid->iface = i;
@@ -167,15 +177,25 @@ int main() {
 			
 		}
 	}
-if (!OpenPilot) return 0;
+if (!OpenPilot) {
+	fprintf(stderr,"no such device\n");
+	return -1;
+}
 
-	char* buffer[1024];
-	while (1) {
-		int n = opreceive(OpenPilot,ep_in,buffer,1024,100);
-		if (n>0) {
-			fwrite( buffer, 1,n,stdout);
-			opsend(OpenPilot,ep_out,buffer,n,100);
-		} else printf("read error\n");
+	char buffer[64];
+	struct timeval starttime,ctime;
+	gettimeofday(&starttime,NULL);
+	int n = opreceive(OpenPilot,ep_in,buffer,0);
+	while (n>0) {
+		gettimeofday(&ctime,NULL);
+		uint32_t timestamp = timeDifference(&starttime,&ctime);
+		uint64_t dataSize  = n;
+
+		fwrite( (uint8_t*) &timestamp,sizeof(timestamp),1,stdout);
+		fwrite( (uint8_t*) &dataSize,sizeof(dataSize),1,stdout);
+		fwrite( buffer, 1,dataSize,stdout);
+		fprintf(stderr," %i: %i\n",timestamp,(uint32_t)dataSize);
+		n = opreceive(OpenPilot,ep_in,buffer,0);
 	}
 
 }

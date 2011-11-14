@@ -88,9 +88,8 @@ static void PIOS_MPU6050_Config(struct pios_mpu6050_cfg const * cfg)
 	mpu6050_cb_ready = true;
 	
 	// Reset chip and fifo
-	while (PIOS_MPU6050_Write(PIOS_MPU6050_USER_CTRL_REG, 0x01 | 0x02) != 0);
+	while (PIOS_MPU6050_Write(PIOS_MPU6050_USER_CTRL_REG, 0x01 | 0x02 | 0x04) != 0);
 	PIOS_DELAY_WaituS(20);
-	while (PIOS_MPU6050_Write(PIOS_MPU6050_USER_CTRL_REG, 0x00) != 0);
 
 	// FIFO storage
 	while (PIOS_MPU6050_Write(PIOS_MPU6050_FIFO_EN_REG, cfg->Fifo_store) != 0);
@@ -99,7 +98,10 @@ static void PIOS_MPU6050_Config(struct pios_mpu6050_cfg const * cfg)
 	while (PIOS_MPU6050_Write(PIOS_MPU6050_SMPLRT_DIV_REG, cfg->Smpl_rate_div) != 0) ;
 
 	// Digital low-pass filter and scale
-	while (PIOS_MPU6050_Write(PIOS_MPU6050_DLPF_CFG_REG, cfg->filter | (cfg->range << 3)) != 0) ;
+	while (PIOS_MPU6050_Write(PIOS_MPU6050_DLPF_CFG_REG, cfg->filter) != 0) ;
+
+	// Digital low-pass filter and scale
+	while (PIOS_MPU6050_Write(PIOS_MPU6050_GYRO_CFG_REG, cfg->gyro_range) != 0) ;
 
 	// Interrupt configuration
 	while (PIOS_MPU6050_Write(PIOS_MPU6050_USER_CTRL_REG, cfg->User_ctl) != 0) ;
@@ -123,9 +125,9 @@ int32_t PIOS_MPU6050_ReadGyros(struct pios_mpu6050_data * data)
 	uint8_t buf[6];
 	if(PIOS_MPU6050_Read(PIOS_MPU6050_GYRO_X_OUT_MSB, (uint8_t *) buf, sizeof(buf)) < 0)
 		return -1;
-	data->x = buf[0] << 8 | buf[1];
-	data->y = buf[2] << 8 | buf[3];
-	data->z = buf[4] << 8 | buf[5];
+	data->gyro_x = buf[0] << 8 | buf[1];
+	data->gyro_y = buf[2] << 8 | buf[3];
+	data->gyro_z = buf[4] << 8 | buf[5];
 	return 0;
 }
 
@@ -260,7 +262,7 @@ static int32_t PIOS_MPU6050_Write(uint8_t address, uint8_t buffer)
 
 float PIOS_MPU6050_GetScale() 
 {
-	switch (cfg->range) {
+	switch (cfg->gyro_range) {
 		case PIOS_MPU6050_SCALE_250_DEG:
 			return DEG_TO_RAD / 131.0;
 		case PIOS_MPU6050_SCALE_500_DEG:
@@ -300,17 +302,17 @@ static void MPU6050_callback()
 
 	if(mpu6050_first_read) {
 		data.temperature = mpu6050_read_buffer[0] << 8 | mpu6050_read_buffer[1];
-		data.x = mpu6050_read_buffer[2] << 8 | mpu6050_read_buffer[3];
-		data.y = mpu6050_read_buffer[4] << 8 | mpu6050_read_buffer[5];
-		data.z = mpu6050_read_buffer[6] << 8 | mpu6050_read_buffer[7];
+		data.gyro_x = mpu6050_read_buffer[2] << 8 | mpu6050_read_buffer[3];
+		data.gyro_y = mpu6050_read_buffer[4] << 8 | mpu6050_read_buffer[5];
+		data.gyro_z = mpu6050_read_buffer[6] << 8 | mpu6050_read_buffer[7];
 		
 		mpu6050_first_read = false;
 	} else {
 		// First two bytes are left over fifo from last call
 		data.temperature = mpu6050_read_buffer[2] << 8 | mpu6050_read_buffer[3];
-		data.x = mpu6050_read_buffer[4] << 8 | mpu6050_read_buffer[5];
-		data.y = mpu6050_read_buffer[6] << 8 | mpu6050_read_buffer[7];
-		data.z = mpu6050_read_buffer[8] << 8 | mpu6050_read_buffer[9];
+		data.gyro_x = mpu6050_read_buffer[4] << 8 | mpu6050_read_buffer[5];
+		data.gyro_y = mpu6050_read_buffer[6] << 8 | mpu6050_read_buffer[7];
+		data.gyro_z = mpu6050_read_buffer[8] << 8 | mpu6050_read_buffer[9];
 	}
 	
 	fifoBuf_putData(&pios_mpu6050_fifo, (uint8_t *) &data, sizeof(data));

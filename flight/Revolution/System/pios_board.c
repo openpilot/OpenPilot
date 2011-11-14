@@ -723,14 +723,13 @@ static const struct pios_mpu6050_cfg pios_mpu6050_cfg = {
 			.NVIC_IRQChannelCmd = ENABLE,
 		},
 	},
-	.Fifo_store = PIOS_MPU6050_FIFO_TEMP_OUT | PIOS_MPU6050_FIFO_GYRO_X_OUT | PIOS_MPU6050_FIFO_GYRO_Y_OUT 
-	| PIOS_MPU6050_FIFO_GYRO_Z_OUT | PIOS_MPU6050_FIFO_FOOTER,
-	// Clock at 8 khz, downsampled by 4 for 2khz
+	.Fifo_store = PIOS_MPU6050_FIFO_TEMP_OUT | PIOS_MPU6050_FIFO_GYRO_X_OUT | PIOS_MPU6050_FIFO_GYRO_Y_OUT | PIOS_MPU6050_FIFO_GYRO_Z_OUT,
+	// Clock at 8 khz, downsampled by 8 for 1khz
 	.Smpl_rate_div = 7, 
 	.Interrupt_cfg = PIOS_MPU6050_INT_DATA_RDY | PIOS_MPU6050_INT_CLR_ANYRD,
 	.User_ctl = PIOS_MPU6050_USERCTL_FIFO_EN,
 	.Pwr_mgmt_clk = PIOS_MPU6050_PWRMGMT_PLL_X_CLK,
-	.range = PIOS_MPU6050_SCALE_500_DEG,
+	.gyro_range = PIOS_MPU6050_SCALE_500_DEG,
 	.filter = PIOS_MPU6050_LOWPASS_256_HZ
 
 };

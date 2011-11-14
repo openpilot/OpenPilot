@@ -37,30 +37,32 @@
 
 /* MPU6050 Addresses */
 #define PIOS_MPU6050_I2C_ADDR             0x69
-#define PIOS_MPU6050_X_MSB_OFFSET_REG     0x43
-#define PIOS_MPU6050_X_LSB_OFFSET_REG     0x44
-#define PIOS_MPU6050_Y_MSB_OFFSET_REG     0x45
-#define PIOS_MPU6050_Y_LSB_OFFSET_REG     0x46
-#define PIOS_MPU6050_Z_MSB_OFFSET_REG     0x47
-#define PIOS_MPU6050_Z_LSB_OFFSET_REG     0x48
-#define PIOS_MPU6050_FIFO_EN_REG          0x23
 #define PIOS_MPU6050_SMPLRT_DIV_REG       0X19
-#define PIOS_MPU6050_DLPF_CFG_REG         0X16
+#define PIOS_MPU6050_DLPF_CFG_REG         0X1A
+#define PIOS_MPU6050_GYRO_CFG_REG         0X1B
+#define PIOS_MPU6050_ACCEL_CFG_REG        0X1C
+#define PIOS_MPU6050_FIFO_EN_REG          0x23
 #define PIOS_MPU6050_INT_CFG_REG          0x37
 #define PIOS_MPU6050_INT_STATUS_REG       0x3A
+#define PIOS_MPU6050_ACCEL_X_OUT_MSB      0x3B
+#define PIOS_MPU6050_ACCEL_X_OUT_LSB      0x3C
+#define PIOS_MPU6050_ACCEL_Y_OUT_MSB      0x3D
+#define PIOS_MPU6050_ACCEL_Y_OUT_LSB      0x3E
+#define PIOS_MPU6050_ACCEL_Z_OUT_MSB      0x3F
+#define PIOS_MPU6050_ACCEL_Z_OUT_LSB      0x40
 #define PIOS_MPU6050_TEMP_OUT_MSB         0x41
 #define PIOS_MPU6050_TEMP_OUT_LSB         0x42
-#define PIOS_MPU6050_GYRO_X_OUT_MSB       0x1D
-#define PIOS_MPU6050_GYRO_X_OUT_LSB       0x1E
-#define PIOS_MPU6050_GYRO_Y_OUT_MSB       0x1F
-#define PIOS_MPU6050_GYRO_Y_OUT_LSB       0x20
-#define PIOS_MPU6050_GYRO_Z_OUT_MSB       0x21
-#define PIOS_MPU6050_GYRO_Z_OUT_LSB       0x22
+#define PIOS_MPU6050_GYRO_X_OUT_MSB       0x43
+#define PIOS_MPU6050_GYRO_X_OUT_LSB       0x44
+#define PIOS_MPU6050_GYRO_Y_OUT_MSB       0x45
+#define PIOS_MPU6050_GYRO_Y_OUT_LSB       0x46
+#define PIOS_MPU6050_GYRO_Z_OUT_MSB       0x47
+#define PIOS_MPU6050_GYRO_Z_OUT_LSB       0x48
+#define PIOS_MPU6050_USER_CTRL_REG        0x6A
+#define PIOS_MPU6050_PWR_MGMT_REG         0x6B
 #define PIOS_MPU6050_FIFO_CNT_MSB         0x72
 #define PIOS_MPU6050_FIFO_CNT_LSB         0x73
 #define PIOS_MPU6050_FIFO_REG             0x74
-#define PIOS_MPU6050_USER_CTRL_REG        0x6A
-#define PIOS_MPU6050_PWR_MGMT_REG         0x6C
 #define PIOS_MPU6050_WHOAMI               0x75
 
 /* FIFO enable for storing different values */
@@ -68,8 +70,7 @@
 #define PIOS_MPU6050_FIFO_GYRO_X_OUT      0x40
 #define PIOS_MPU6050_FIFO_GYRO_Y_OUT      0x20
 #define PIOS_MPU6050_FIFO_GYRO_Z_OUT      0x10
-#define PIOS_MPU6050_FIFO_FOOTER          0x01
-
+#define PIOS_MPU6050_ACCEL_OUT            0x04
 
 /* Interrupt Configuration */
 #define PIOS_MPU6050_INT_ACTL             0x80
@@ -99,9 +100,9 @@
 
 enum pios_mpu6050_range {
 	PIOS_MPU6050_SCALE_250_DEG  = 0x00,
-	PIOS_MPU6050_SCALE_500_DEG  = 0x01,
-	PIOS_MPU6050_SCALE_1000_DEG = 0x02,
-	PIOS_MPU6050_SCALE_2000_DEG = 0x03
+	PIOS_MPU6050_SCALE_500_DEG  = 0x08,
+	PIOS_MPU6050_SCALE_1000_DEG = 0x10,
+	PIOS_MPU6050_SCALE_2000_DEG = 0x18
 };
 
 enum pios_mpu6050_filter {
@@ -115,9 +116,9 @@ enum pios_mpu6050_filter {
 };
 
 struct pios_mpu6050_data {
-	int16_t x;
-	int16_t y;
-	int16_t z;
+	int16_t gyro_x;
+	int16_t gyro_y;
+	int16_t gyro_z;
 	int16_t temperature;
 };
 
@@ -131,7 +132,7 @@ struct pios_mpu6050_cfg {
 	uint8_t Interrupt_cfg;	/* Interrupt configuration (See datasheet page 35 for more details) */
 	uint8_t User_ctl;		/* User control settings (See datasheet page 41 for more details)  */
 	uint8_t Pwr_mgmt_clk;	/* Power management and clock selection (See datasheet page 32 for more details) */
-	enum pios_mpu6050_range range;
+	enum pios_mpu6050_range gyro_range;
 	enum pios_mpu6050_filter filter;
 };
 

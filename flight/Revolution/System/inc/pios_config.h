@@ -77,6 +77,8 @@
 #define LOG_FILENAME 			"PIOS.LOG"
 #define STARTUP_LOG_ENABLED		1
 
+#define PIOS_INCLUDE_INITCALL
+
 /* Enable a priority queue in telemetry */
 #define PIOS_TELEM_PRIORITY_QUEUE
 

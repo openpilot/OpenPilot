@@ -51,7 +51,8 @@ int main() {
 
 
 	int vendor = 0x20a0;
-	int product = 0x415a;
+	int product_op = 0x415a;
+	int product_cc = 0x415b;
 
 
 	struct usb_bus *bus;
@@ -75,7 +76,7 @@ int main() {
 		for (dev = bus->devices; dev; dev = dev->next) {
 			fprintf(stderr,"usbdevice found - %04X:%04X\n",dev->descriptor.idVendor,dev->descriptor.idProduct);
 			if (dev->descriptor.idVendor != vendor) continue;
-			if (dev->descriptor.idProduct != product) continue;
+			if (dev->descriptor.idProduct != product_op && dev->descriptor.idProduct != product_cc) continue;
 			if (!dev->config) continue;
 			if (dev->config->bNumInterfaces < 1) continue;
 			fprintf(stderr,"device: vid=%04X, pic=%04X, with %d iface",

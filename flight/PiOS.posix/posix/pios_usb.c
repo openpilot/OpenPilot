@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
+#include <errno.h>
 #include <sys/time.h>
 
 //  recveive - receive a packet
@@ -186,8 +187,12 @@ if (!OpenPilot) {
 	char buffer[64];
 	struct timeval starttime,ctime;
 	gettimeofday(&starttime,NULL);
-	int n = opreceive(OpenPilot,ep_in,buffer,0);
-	while (n>0) {
+	int n=0;
+	while (1) {
+		do {
+			n = opreceive(OpenPilot,ep_in,buffer,1000);
+		} while (n==-ETIMEDOUT);
+		if (n<=0) break;
 		gettimeofday(&ctime,NULL);
 		uint32_t timestamp = timeDifference(&starttime,&ctime);
 		uint64_t dataSize  = n;
@@ -196,8 +201,8 @@ if (!OpenPilot) {
 		fwrite( (uint8_t*) &dataSize,sizeof(dataSize),1,stdout);
 		fwrite( buffer, 1,dataSize,stdout);
 		fprintf(stderr," %i: %i\n",timestamp,(uint32_t)dataSize);
-		n = opreceive(OpenPilot,ep_in,buffer,0);
 	}
+	fprintf(stderr,"aborting: %s\n",strerror(-n));
 
 }
 

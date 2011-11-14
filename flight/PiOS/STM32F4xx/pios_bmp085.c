@@ -38,11 +38,7 @@
 
 /* Glocal Variables */
 ConversionTypeTypeDef CurrentRead;
-#if defined(PIOS_INCLUDE_FREERTOS)
-xSemaphoreHandle PIOS_BMP085_EOC;
-#else
-int32_t PIOS_BMP085_EOC;
-#endif
+int32_t pios_bmp085_eoc;
 
 /* Local Variables */
 static BMP085CalibDataTypeDef CalibData;
@@ -67,7 +63,7 @@ static const struct pios_bmp085_cfg * dev_cfg;
 */
 void PIOS_BMP085_Init(const struct pios_bmp085_cfg * cfg)
 {
-	PIOS_BMP085_EOC = 0;
+	pios_bmp085_eoc = 0;
 
 	oversampling = cfg->oversampling;
 	dev_cfg = cfg;	// Store cfg before enabling interrupt
@@ -122,7 +118,7 @@ void PIOS_BMP085_Init(const struct pios_bmp085_cfg * cfg)
 */
 int32_t PIOS_BMP085_StartADC(ConversionTypeTypeDef Type)
 {
-	if(PIOS_BMP085_EOC)
+	if(pios_bmp085_eoc)
 		return -1;
 
 	/* Start the conversion */
@@ -151,10 +147,10 @@ int32_t PIOS_BMP085_ReadADC(void)
 	Data[1] = 0;
 	Data[2] = 0;
 	
-	if(!PIOS_BMP085_EOC)
+	if(!pios_bmp085_eoc)
 		return -1;
 		
-	PIOS_BMP085_EOC = 0;
+	pios_bmp085_eoc = 0;
 		
 	/* Read and store the 16bit result */
 	if (CurrentRead == TemperatureConv) {
@@ -300,11 +296,14 @@ int32_t PIOS_BMP085_Test()
 /**
  * Handle external line 2 interrupt requests
  */
+uint32_t bmp085_irqs = 0;
+
 void EXTI2_IRQHandler(void)
 {
 	if (EXTI_GetITStatus(dev_cfg->eoc_exti.init.EXTI_Line) != RESET) {
+		bmp085_irqs++;
 		/* Read the ADC Value */
-		PIOS_BMP085_EOC=1;
+		pios_bmp085_eoc=1;
 		/* Clear the EXTI line pending bit */
 		EXTI_ClearITPendingBit(dev_cfg->eoc_exti.init.EXTI_Line);
 	}

@@ -117,6 +117,9 @@
 #if defined(PIOS_INCLUDE_IMU3000)
 #include <pios_imu3000.h>
 #endif
+#if defined(PIOS_INCLUDE_MPU6050)
+#include <pios_mpu6050.h>
+#endif
 #include <pios_iap.h>
 
 #if defined(PIOS_INCLUDE_ADXL345)

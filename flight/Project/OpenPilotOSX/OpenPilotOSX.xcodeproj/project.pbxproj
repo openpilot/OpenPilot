@@ -3320,6 +3320,18 @@
 		65FA9B71147087020019A260 /* STM32F4xx_Revolution.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STM32F4xx_Revolution.h; sourceTree = "<group>"; };
 		65FA9B77147095D40019A260 /* attitude.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = attitude.c; sourceTree = "<group>"; };
 		65FA9B79147095D40019A260 /* attitude.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = attitude.h; sourceTree = "<group>"; };
+		65FA9B7A14709E700019A260 /* pios_mpu6050.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_mpu6050.c; sourceTree = "<group>"; };
+		65FA9B7B14709E9E0019A260 /* pios_board_info.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_board_info.h; sourceTree = "<group>"; };
+		65FA9B7C14709E9E0019A260 /* pios_gcsrcvr_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_gcsrcvr_priv.h; sourceTree = "<group>"; };
+		65FA9B7D14709E9E0019A260 /* pios_hcsr04.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_hcsr04.h; sourceTree = "<group>"; };
+		65FA9B7E14709E9E0019A260 /* pios_i2c_esc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_i2c_esc.h; sourceTree = "<group>"; };
+		65FA9B7F14709E9E0019A260 /* pios_iap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_iap.h; sourceTree = "<group>"; };
+		65FA9B8014709E9E0019A260 /* pios_initcall.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_initcall.h; sourceTree = "<group>"; };
+		65FA9B8114709E9E0019A260 /* pios_mpu6050.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_mpu6050.h; sourceTree = "<group>"; };
+		65FA9B8214709E9E0019A260 /* pios_ppm_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_ppm_priv.h; sourceTree = "<group>"; };
+		65FA9B8314709E9E0019A260 /* pios_tim_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_tim_priv.h; sourceTree = "<group>"; };
+		65FA9B8414709E9F0019A260 /* pios_tim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_tim.h; sourceTree = "<group>"; };
+		65FA9B8514709E9F0019A260 /* pios_usb_hid_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_usb_hid_priv.h; sourceTree = "<group>"; };
 		65FAA03F133B669400F6F5CD /* GTOP_BIN.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = GTOP_BIN.c; sourceTree = "<group>"; };
 		65FBE14412E7C98100176B5A /* pios_servo_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_servo_priv.h; sourceTree = "<group>"; };
 		65FC66AA123F30F100B04F74 /* ahrs_timer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ahrs_timer.c; path = ../../AHRS/ahrs_timer.c; sourceTree = SOURCE_ROOT; };
@@ -3862,6 +3874,7 @@
 				65904ECF14613B6100FD9482 /* pios_imu3000.c */,
 				65904ED014613B6100FD9482 /* pios_irq.c */,
 				65904ED114613B6100FD9482 /* pios_led.c */,
+				65FA9B7A14709E700019A260 /* pios_mpu6050.c */,
 				65904ED214613B6100FD9482 /* pios_ppm.c */,
 				65904ED314613B6100FD9482 /* pios_servo.c */,
 				65904ED414613B6100FD9482 /* pios_spi.c */,
@@ -8490,6 +8503,7 @@
 		65E8F03811EFF25C00BBF654 /* inc */ = {
 			isa = PBXGroup;
 			children = (
+				65FA9B8514709E9F0019A260 /* pios_usb_hid_priv.h */,
 				65DEA78513F0FE6000095B06 /* stm32f2xx_conf.h */,
 				65E8F03A11EFF25C00BBF654 /* pios_adc.h */,
 				6528CCE212E40F6700CF5144 /* pios_adxl345.h */,
@@ -8497,6 +8511,7 @@
 				65E6E09912E037C800058553 /* pios_adc_priv.h */,
 				65DEA78613F1118400095B06 /* pios_bma180.h */,
 				65E8F03B11EFF25C00BBF654 /* pios_bmp085.h */,
+				65FA9B7B14709E9E0019A260 /* pios_board_info.h */,
 				65E8F03C11EFF25C00BBF654 /* pios_com.h */,
 				65E8F03D11EFF25C00BBF654 /* pios_com_priv.h */,
 				65E8C745139A6D1A00E1F979 /* pios_crc.h */,
@@ -8505,17 +8520,24 @@
 				65E8F04011EFF25C00BBF654 /* pios_exti.h */,
 				6512D60512ED4CA2008175E5 /* pios_flash_w25x.h */,
 				65FF4D61137EFA4F00146BE4 /* pios_flashfs_objlist.h */,
+				65FA9B7C14709E9E0019A260 /* pios_gcsrcvr_priv.h */,
 				65E8F04111EFF25C00BBF654 /* pios_gpio.h */,
+				65FA9B7D14709E9E0019A260 /* pios_hcsr04.h */,
 				65E8F04211EFF25C00BBF654 /* pios_hmc5843.h */,
 				65D1FBD413F504C9006374A6 /* pios_hmc5883.h */,
+				65FA9B7F14709E9E0019A260 /* pios_iap.h */,
 				65E8F04311EFF25C00BBF654 /* pios_i2c.h */,
+				65FA9B7E14709E9E0019A260 /* pios_i2c_esc.h */,
 				6526645A122DF972006F9A3C /* pios_i2c_priv.h */,
 				65D1FBDA13F51AE1006374A6 /* pios_imu3000.h */,
+				65FA9B8014709E9E0019A260 /* pios_initcall.h */,
 				65E8F04411EFF25C00BBF654 /* pios_irq.h */,
 				65E8F04511EFF25C00BBF654 /* pios_led.h */,
+				65FA9B8114709E9E0019A260 /* pios_mpu6050.h */,
 				65E8F04611EFF25C00BBF654 /* pios_opahrs.h */,
 				65E8F04711EFF25C00BBF654 /* pios_opahrs_proto.h */,
 				65E8F04811EFF25C00BBF654 /* pios_ppm.h */,
+				65FA9B8214709E9E0019A260 /* pios_ppm_priv.h */,
 				65E8F04911EFF25C00BBF654 /* pios_pwm.h */,
 				657FF86A12EA8BFB00801617 /* pios_pwm_priv.h */,
 				65643CAC1413322000A32F59 /* pios_rcvr.h */,
@@ -8533,6 +8555,8 @@
 				65E8F04E11EFF25C00BBF654 /* pios_spi_priv.h */,
 				65E8F04F11EFF25C00BBF654 /* pios_stm32.h */,
 				65E8F05011EFF25C00BBF654 /* pios_sys.h */,
+				65FA9B8314709E9E0019A260 /* pios_tim_priv.h */,
+				65FA9B8414709E9F0019A260 /* pios_tim.h */,
 				65E8F05111EFF25C00BBF654 /* pios_usart.h */,
 				65E8F05211EFF25C00BBF654 /* pios_usart_priv.h */,
 				65E8F05311EFF25C00BBF654 /* pios_usb.h */,

@@ -59,7 +59,9 @@
 #endif
 
 /* Generic initcall infrastructure */
+#if defined(PIOS_INCLUDE_INITCALL)
 #include "pios_initcall.h"
+#endif
 
 /* PIOS Board Specific Device Configuration */
 #include "pios_board.h"

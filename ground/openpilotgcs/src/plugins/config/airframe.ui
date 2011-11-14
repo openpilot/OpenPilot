@@ -172,7 +172,7 @@
                   </size>
                  </property>
                  <property name="title">
-                  <string>Output channel asignmets</string>
+                  <string>Output channel assignments</string>
                  </property>
                  <layout class="QFormLayout" name="formLayout_3">
                   <item row="0" column="0">

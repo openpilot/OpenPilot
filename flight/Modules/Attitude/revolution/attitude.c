@@ -257,7 +257,7 @@ static int8_t updateSensors(AttitudeRawData * attitudeRaw)
 	attitudeRaw->accels[ATTITUDERAW_ACCELS_Z] = accel_accum[2] * scaling;
 
 
-	/*
+	
 	// Make sure we get one sample
 	count = 0;
 	while((read_good = PIOS_MPU6050_ReadFifo(&gyro)) != 0);
@@ -271,13 +271,6 @@ static int8_t updateSensors(AttitudeRawData * attitudeRaw)
 		read_good = PIOS_MPU6050_ReadFifo(&gyro);
 	}
 	gyro_samples = count;	
-	*/
-	
-	PIOS_MPU6050_ReadGyros(&gyro);
-	gyro_accum[0] = gyro.gyro_x;
-	gyro_accum[1] = gyro.gyro_y;
-	gyro_accum[2] = gyro.gyro_z;
-	gyro_samples = 1;
 	
 	scaling = PIOS_MPU6050_GetScale() / gyro_samples;
 	attitudeRaw->gyros[ATTITUDERAW_GYROS_X] = -((float) gyro_accum[1]) * scaling;

@@ -82,8 +82,6 @@ void PIOS_MPU6050_Init(const struct pios_mpu6050_cfg * new_cfg)
  * \param[in] PIOS_MPU6050_ConfigTypeDef struct to be used to configure sensor.
 *
 */
-uint8_t reg_val;
-
 static void PIOS_MPU6050_Config(struct pios_mpu6050_cfg const * cfg)
 {
 	mpu6050_first_read = true;
@@ -117,8 +115,6 @@ static void PIOS_MPU6050_Config(struct pios_mpu6050_cfg const * cfg)
 	// Interrupt configuration
 	while (PIOS_MPU6050_Write(PIOS_MPU6050_INT_EN_REG, cfg->interrupt_en) != 0) ;
 
-	
-	PIOS_MPU6050_Read(PIOS_MPU6050_INT_CFG_REG, &reg_val, 1);
 	mpu6050_configured = true;
 }
 
@@ -299,28 +295,18 @@ uint8_t PIOS_MPU6050_Test(void)
 	return 0;
 }
 
-static uint8_t mpu6050_read_buffer[sizeof(struct pios_mpu6050_data) + 2]; // Right now using ,Y,Z,fifo_footer
+static uint8_t mpu6050_read_buffer[sizeof(struct pios_mpu6050_data)]; // Right now using ,Y,Z,fifo_footer
 static void MPU6050_callback()
 {
 	struct pios_mpu6050_data data;
 
 	if(fifoBuf_getFree(&pios_mpu6050_fifo) < sizeof(data))
 		goto out;
-
-	if(mpu6050_first_read) {
-		data.temperature = mpu6050_read_buffer[0] << 8 | mpu6050_read_buffer[1];
-		data.gyro_x = mpu6050_read_buffer[2] << 8 | mpu6050_read_buffer[3];
-		data.gyro_y = mpu6050_read_buffer[4] << 8 | mpu6050_read_buffer[5];
-		data.gyro_z = mpu6050_read_buffer[6] << 8 | mpu6050_read_buffer[7];
-		
-		mpu6050_first_read = false;
-	} else {
-		// First two bytes are left over fifo from last call
-		data.temperature = mpu6050_read_buffer[2] << 8 | mpu6050_read_buffer[3];
-		data.gyro_x = mpu6050_read_buffer[4] << 8 | mpu6050_read_buffer[5];
-		data.gyro_y = mpu6050_read_buffer[6] << 8 | mpu6050_read_buffer[7];
-		data.gyro_z = mpu6050_read_buffer[8] << 8 | mpu6050_read_buffer[9];
-	}
+	
+	data.temperature = mpu6050_read_buffer[0] << 8 | mpu6050_read_buffer[1];
+	data.gyro_x = mpu6050_read_buffer[2] << 8 | mpu6050_read_buffer[3];
+	data.gyro_y = mpu6050_read_buffer[4] << 8 | mpu6050_read_buffer[5];
+	data.gyro_z = mpu6050_read_buffer[6] << 8 | mpu6050_read_buffer[7];
 	
 	fifoBuf_putData(&pios_mpu6050_fifo, (uint8_t *) &data, sizeof(data));
 	
@@ -344,7 +330,6 @@ void PIOS_MPU6050_IRQHandler(void)
 	if(!mpu6050_configured)
 		return;
 		
-	return;
 	//PIOS_Assert(MPU6050_cb_ready);
 	if(!mpu6050_cb_ready) {
 		PIOS_LED_Toggle(LED2);
@@ -352,36 +337,18 @@ void PIOS_MPU6050_IRQHandler(void)
 		return;
 	}
 
-	// If at least one read doesnt succeed then the irq not reset and we will stall
-	while(PIOS_MPU6050_Read(PIOS_MPU6050_FIFO_CNT_MSB, (uint8_t *) &fifo_level_data, sizeof(fifo_level_data)) != 0)
-		PIOS_DELAY_WaituS(10);
+	/*// If at least one read doesnt succeed then the irq not reset and we will stall
+	if(PIOS_MPU6050_Read(PIOS_MPU6050_FIFO_CNT_MSB, (uint8_t *) &fifo_level_data, sizeof(fifo_level_data)) != 0)
+		return;
 				
 	fifo_level = (fifo_level_data[0] << 8) + fifo_level_data[1];
 	
 	PIOS_DELAY_WaituS(10);
+	*/
 	
-	if(mpu6050_first_read) {
-		// Stupid system for MPU6050.  If first read from buffer then we will read 4 sensors without fifo
-		// footer.  After this we will read out a fifo footer
-		if(fifo_level < sizeof(mpu6050_read_buffer))
-			return;
-			
-		mpu6050_cb_ready = false;
 		
-		// Leave footer in buffer
-		PIOS_MPU6050_Read_Callback(PIOS_MPU6050_FIFO_REG, mpu6050_read_buffer, sizeof(mpu6050_read_buffer) - 2, MPU6050_callback);
-		
-	} else {
-		// Stupid system for MPU6050.  Ensure something is left in buffer
-		if(fifo_level < (sizeof(mpu6050_read_buffer) + 2))
-			return;
-		
-		mpu6050_cb_ready = false;
-		
-		// Leave footer in buffer
-		PIOS_MPU6050_Read_Callback(PIOS_MPU6050_FIFO_REG, mpu6050_read_buffer, sizeof(mpu6050_read_buffer), MPU6050_callback);
-		
-	}
+	// Leave footer in buffer
+	PIOS_MPU6050_Read_Callback(PIOS_MPU6050_FIFO_REG, mpu6050_read_buffer, sizeof(mpu6050_read_buffer), MPU6050_callback);
 }
 
 /**

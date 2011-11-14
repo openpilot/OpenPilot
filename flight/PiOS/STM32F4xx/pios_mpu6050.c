@@ -82,6 +82,8 @@ void PIOS_MPU6050_Init(const struct pios_mpu6050_cfg * new_cfg)
  * \param[in] PIOS_MPU6050_ConfigTypeDef struct to be used to configure sensor.
 *
 */
+uint8_t reg_val;
+
 static void PIOS_MPU6050_Config(struct pios_mpu6050_cfg const * cfg)
 {
 	mpu6050_first_read = true;
@@ -110,8 +112,13 @@ static void PIOS_MPU6050_Config(struct pios_mpu6050_cfg const * cfg)
 	while (PIOS_MPU6050_Write(PIOS_MPU6050_PWR_MGMT_REG, cfg->Pwr_mgmt_clk) != 0) ;
 	
 	// Interrupt configuration
-	while (PIOS_MPU6050_Write(PIOS_MPU6050_INT_CFG_REG, cfg->Interrupt_cfg) != 0) ;
+	while (PIOS_MPU6050_Write(PIOS_MPU6050_INT_CFG_REG, cfg->interrupt_cfg) != 0) ;
+
+	// Interrupt configuration
+	while (PIOS_MPU6050_Write(PIOS_MPU6050_INT_EN_REG, cfg->interrupt_en) != 0) ;
+
 	
+	PIOS_MPU6050_Read(PIOS_MPU6050_INT_CFG_REG, &reg_val, 1);
 	mpu6050_configured = true;
 }
 
@@ -337,6 +344,7 @@ void PIOS_MPU6050_IRQHandler(void)
 	if(!mpu6050_configured)
 		return;
 		
+	return;
 	//PIOS_Assert(MPU6050_cb_ready);
 	if(!mpu6050_cb_ready) {
 		PIOS_LED_Toggle(LED2);

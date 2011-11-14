@@ -43,6 +43,7 @@
 #define PIOS_MPU6050_ACCEL_CFG_REG        0X1C
 #define PIOS_MPU6050_FIFO_EN_REG          0x23
 #define PIOS_MPU6050_INT_CFG_REG          0x37
+#define PIOS_MPU6050_INT_EN_REG           0x38
 #define PIOS_MPU6050_INT_STATUS_REG       0x3A
 #define PIOS_MPU6050_ACCEL_X_OUT_MSB      0x3B
 #define PIOS_MPU6050_ACCEL_X_OUT_LSB      0x3C
@@ -77,8 +78,9 @@
 #define PIOS_MPU6050_INT_OPEN             0x40
 #define PIOS_MPU6050_INT_LATCH_EN         0x20
 #define PIOS_MPU6050_INT_CLR_ANYRD        0x10
-#define PIOS_MPU6050_INT_IMU_RDY          0x04
-#define PIOS_MPU6050_INT_DATA_RDY         0x01
+
+#define PIOS_MPU6050_INTEN_OVERFLOW       0x10
+#define PIOS_MPU6050_INTEN_DATA_RDY       0x01
 
 /* Interrupt status */
 #define PIOS_MPU6050_INT_STATUS_FIFO_FULL 0x80
@@ -129,7 +131,8 @@ struct pios_mpu6050_cfg {
 	
 	uint8_t Fifo_store;		/* FIFO storage of different readings (See datasheet page 31 for more details) */
 	uint8_t Smpl_rate_div;	/* Sample rate divider to use (See datasheet page 32 for more details) */
-	uint8_t Interrupt_cfg;	/* Interrupt configuration (See datasheet page 35 for more details) */
+	uint8_t interrupt_cfg;	/* Interrupt configuration (See datasheet page 35 for more details) */
+	uint8_t interrupt_en;	/* Interrupt configuration (See datasheet page 35 for more details) */
 	uint8_t User_ctl;		/* User control settings (See datasheet page 41 for more details)  */
 	uint8_t Pwr_mgmt_clk;	/* Power management and clock selection (See datasheet page 32 for more details) */
 	enum pios_mpu6050_range gyro_range;

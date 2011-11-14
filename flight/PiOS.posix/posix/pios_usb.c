@@ -27,7 +27,7 @@ int opreceive(usb_dev_handle *device, int endpoint, void *buf, int timeout)
 
 
 	received=usb_interrupt_read(device, endpoint, tmpBuffer, 64, timeout);
-	if (received>=0) {
+	if (received>0) {
 		received=tmpBuffer[1];
 		if (received>62) received=62;
 		memcpy(buf,&tmpBuffer[2],received);

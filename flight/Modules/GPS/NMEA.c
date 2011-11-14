@@ -70,8 +70,10 @@ static bool nmeaProcessGPGGA(GPSPositionData * GpsData, bool* gpsDataUpdated, ch
 static bool nmeaProcessGPRMC(GPSPositionData * GpsData, bool* gpsDataUpdated, char* param[], uint8_t nbParam);
 static bool nmeaProcessGPVTG(GPSPositionData * GpsData, bool* gpsDataUpdated, char* param[], uint8_t nbParam);
 static bool nmeaProcessGPGSA(GPSPositionData * GpsData, bool* gpsDataUpdated, char* param[], uint8_t nbParam);
-static bool nmeaProcessGPZDA(GPSPositionData * GpsData, bool* gpsDataUpdated, char* param[], uint8_t nbParam);
-static bool nmeaProcessGPGSV(GPSPositionData * GpsData, bool* gpsDataUpdated, char* param[], uint8_t nbParam);
+#if !defined(PIOS_GPS_MINIMAL)
+	static bool nmeaProcessGPZDA(GPSPositionData * GpsData, bool* gpsDataUpdated, char* param[], uint8_t nbParam);
+	static bool nmeaProcessGPGSV(GPSPositionData * GpsData, bool* gpsDataUpdated, char* param[], uint8_t nbParam);
+#endif //PIOS_GPS_MINIMAL
 
 
 static struct nmea_parser nmea_parsers[] = {
@@ -95,6 +97,7 @@ static struct nmea_parser nmea_parsers[] = {
 		.handler = nmeaProcessGPRMC,
 		.cnt = 0,
 	},
+#if !defined(PIOS_GPS_MINIMAL)
 	{
 		.prefix = "GPZDA",
 		.handler = nmeaProcessGPZDA,
@@ -105,6 +108,7 @@ static struct nmea_parser nmea_parsers[] = {
 		.handler = nmeaProcessGPGSV,
 		.cnt = 0,
 	},
+#endif //PIOS_GPS_MINIMAL
 };
 
 static struct nmea_parser *NMEA_find_parser_by_prefix(const char *prefix)
@@ -428,6 +432,7 @@ static bool nmeaProcessGPRMC(GPSPositionData * GpsData, bool* gpsDataUpdated, ch
 
 	*gpsDataUpdated = true;
 
+#if !defined(PIOS_GPS_MINIMAL)
 	GPSTimeData gpst;
 	GPSTimeGet(&gpst);
 
@@ -436,6 +441,7 @@ static bool nmeaProcessGPRMC(GPSPositionData * GpsData, bool* gpsDataUpdated, ch
 	gpst.Second = (int)hms % 100;
 	gpst.Minute = (((int)hms - gpst.Second) / 100) % 100;
 	gpst.Hour = (int)hms / 10000;
+#endif //PIOS_GPS_MINIMAL
 
 	// get latitude [DDMM.mmmmm] [N|S]
 	if (!NMEA_latlon_to_fixed_point(&GpsData->Latitude, param[3], param[4][0] == 'S')) {
@@ -453,6 +459,7 @@ static bool nmeaProcessGPRMC(GPSPositionData * GpsData, bool* gpsDataUpdated, ch
 	// get True course
 	GpsData->Heading = NMEA_real_to_float(param[8]);
 
+#if !defined(PIOS_GPS_MINIMAL)
 	// get Date of fix
 	// TODO: Should really not use a float here to be safe
 	float date = NMEA_real_to_float(param[9]);
@@ -461,6 +468,7 @@ static bool nmeaProcessGPRMC(GPSPositionData * GpsData, bool* gpsDataUpdated, ch
 	gpst.Day = (int)(date / 10000);
 	gpst.Year += 2000;
 	GPSTimeSet(&gpst);
+#endif //PIOS_GPS_MINIMAL
 
 	return true;
 }
@@ -488,6 +496,7 @@ static bool nmeaProcessGPVTG(GPSPositionData * GpsData, bool* gpsDataUpdated, ch
 	return true;
 }
 
+#if !defined(PIOS_GPS_MINIMAL)
 /**
  * Parse an NMEA GPZDA sentence and update the @ref GPSTime object
  * \param[in] A pointer to a GPSPosition UAVObject to be updated (unused).
@@ -610,6 +619,7 @@ static bool nmeaProcessGPGSV(GPSPositionData * GpsData, bool* gpsDataUpdated, ch
 
 	return true;
 }
+#endif //PIOS_GPS_MINIMAL
 
 /**
  * Parse an NMEA GPGSA sentence and update the given UAVObject

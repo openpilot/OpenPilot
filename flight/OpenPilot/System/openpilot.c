@@ -143,8 +143,8 @@ static void TaskTesting(void *pvParameters)
 		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "%u\r", PIOS_BMP085_GetPressure());
 		*/
 
-#if defined(PIOS_INCLUDE_SPEKTRUM)
-		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "%u,%u,%u,%u,%u,%u,%u,%u\r", PIOS_SPEKTRUM_Get(0), PIOS_SPEKTRUM_Get(1), PIOS_SPEKTRUM_Get(2), PIOS_SPEKTRUM_Get(3), PIOS_SPEKTRUM_Get(4), PIOS_SPEKTRUM_Get(5), PIOS_SPEKTRUM_Get(6), PIOS_SPEKTRUM_Get(7));
+#if defined(PIOS_INCLUDE_DSM)
+		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "%u,%u,%u,%u,%u,%u,%u,%u\r", PIOS_DSM_Get(0), PIOS_DSM_Get(1), PIOS_DSM_Get(2), PIOS_DSM_Get(3), PIOS_DSM_Get(4), PIOS_DSM_Get(5), PIOS_DSM_Get(6), PIOS_DSM_Get(7));
 #endif
 #if defined(PIOS_INCLUDE_SBUS)
 		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "%u,%u,%u,%u,%u,%u,%u,%u\r", PIOS_SBus_Get(0), PIOS_SBus_Get(1), PIOS_SBus_Get(2), PIOS_SBus_Get(3), PIOS_SBus_Get(4), PIOS_SBus_Get(5), PIOS_SBus_Get(6), PIOS_SBus_Get(7));

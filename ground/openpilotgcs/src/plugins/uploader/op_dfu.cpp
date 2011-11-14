@@ -1017,3 +1017,43 @@ int DFUObject::receiveData(void * data,int size)
         }
     }
 }
+
+#define BOARD_ID_MB     1
+#define BOARD_ID_INS    2
+#define BOARD_ID_PIP    3
+#define BOARD_ID_CC     4
+//#define BOARD_ID_PRO     ?
+
+/**
+  Gets the type of board connected
+  */
+OP_DFU::eBoardType DFUObject::GetBoardType(int boardNum)
+{
+    OP_DFU::eBoardType brdType = eBoardUnkwn;
+
+    // First of all, check what Board type we are talking to
+    int board = devices[boardNum].ID;
+    qDebug() << "Board model: " << board;
+    switch (board >> 8) {
+        case BOARD_ID_MB: // Mainboard family
+            brdType = eBoardMainbrd;
+            break;
+        case BOARD_ID_INS: // Inertial Nav
+            brdType = eBoardINS;
+            break;
+        case BOARD_ID_PIP: // PIP RF Modem
+            brdType = eBoardPip;
+            break;
+        case BOARD_ID_CC: // CopterControl family
+            brdType = eBoardCC;
+            break;
+#if 0 // Someday ;-)
+        case BOARD_ID_PRO: // Pro board
+            brdType = eBoardPro;
+            break;
+#endif
+    } 
+    return brdType;
+}
+
+

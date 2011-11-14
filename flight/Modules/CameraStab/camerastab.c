@@ -51,6 +51,7 @@
 #include "attitudeactual.h"
 #include "camerastabsettings.h"
 #include "cameradesired.h"
+#include "hwsettings.h"
 
 //
 // Configuration
@@ -60,6 +61,8 @@
 // Private types
 
 // Private variables
+
+static uint8_t camerastabEnabled = 0;
 
 // Private functions
 static void attitudeUpdated(UAVObjEvent* ev);
@@ -72,17 +75,42 @@ static float bound(float val);
 int32_t CameraStabInitialize(void)
 {
 	static UAVObjEvent ev;
-	ev.obj = AttitudeActualHandle();
-	ev.instId = 0;
-	ev.event = 0;
 
-	CameraStabSettingsInitialize();
-	CameraDesiredInitialize();
+	HwSettingsInitialize();
+	uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
+	HwSettingsOptionalModulesGet(optionalModules);
+	if (optionalModules[HWSETTINGS_OPTIONALMODULES_CAMERASTAB] == HWSETTINGS_OPTIONALMODULES_ENABLED) {
+		camerastabEnabled=1;
+	} else {
+		camerastabEnabled=0;
+	}
 
-	EventPeriodicCallbackCreate(&ev, attitudeUpdated, SAMPLE_PERIOD_MS / portTICK_RATE_MS);
+	if (camerastabEnabled) {
 
+		AttitudeActualInitialize();
+
+		ev.obj = AttitudeActualHandle();
+		ev.instId = 0;
+		ev.event = 0;
+
+		CameraStabSettingsInitialize();
+		CameraDesiredInitialize();
+
+		EventPeriodicCallbackCreate(&ev, attitudeUpdated, SAMPLE_PERIOD_MS / portTICK_RATE_MS);
+
+		return 0;
+	}
+
+	return -1;
+}
+
+/* stub: module has no module thread */
+int32_t CameraStabStart(void)
+{
 	return 0;
 }
+
+MODULE_INITCALL(CameraStabInitialize, CameraStabStart)
 
 static void attitudeUpdated(UAVObjEvent* ev)
 {

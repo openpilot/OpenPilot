@@ -695,13 +695,13 @@ static const struct pios_usart_cfg pios_usart_gps_flexi_cfg = {
 };
 #endif	/* PIOS_INCLUDE_GPS */
 
-#if defined(PIOS_INCLUDE_SPEKTRUM)
+#if defined(PIOS_INCLUDE_DSM)
 /*
- * SPEKTRUM USART
+ * Spektrum/JR DSM USART
  */
-#include <pios_spektrum_priv.h>
+#include <pios_dsm_priv.h>
 
-static const struct pios_usart_cfg pios_usart_spektrum_main_cfg = {
+static const struct pios_usart_cfg pios_usart_dsm_main_cfg = {
 	.regs = USART1,
 	.init = {
 		.USART_BaudRate            = 115200,
@@ -737,7 +737,7 @@ static const struct pios_usart_cfg pios_usart_spektrum_main_cfg = {
 	},
 };
 
-static const struct pios_spektrum_cfg pios_spektrum_main_cfg = {
+static const struct pios_dsm_cfg pios_dsm_main_cfg = {
 	.bind = {
 		.gpio = GPIOA,
 		.init = {
@@ -746,10 +746,9 @@ static const struct pios_spektrum_cfg pios_spektrum_main_cfg = {
 			.GPIO_Mode  = GPIO_Mode_Out_PP,
 		},
 	},
-	.remap = 0,
 };
 
-static const struct pios_usart_cfg pios_usart_spektrum_flexi_cfg = {
+static const struct pios_usart_cfg pios_usart_dsm_flexi_cfg = {
 	.regs = USART3,
 	.init = {
 		.USART_BaudRate            = 115200,
@@ -785,7 +784,7 @@ static const struct pios_usart_cfg pios_usart_spektrum_flexi_cfg = {
 	},
 };
 
-static const struct pios_spektrum_cfg pios_spektrum_flexi_cfg = {
+static const struct pios_dsm_cfg pios_dsm_flexi_cfg = {
 	.bind = {
 		.gpio = GPIOB,
 		.init = {
@@ -794,10 +793,9 @@ static const struct pios_spektrum_cfg pios_spektrum_flexi_cfg = {
 			.GPIO_Mode  = GPIO_Mode_Out_PP,
 		},
 	},
-	.remap = 0,
 };
 
-#endif	/* PIOS_INCLUDE_SPEKTRUM */
+#endif	/* PIOS_INCLUDE_DSM */
 
 #if defined(PIOS_INCLUDE_SBUS)
 /*
@@ -867,7 +865,7 @@ static const struct pios_sbus_cfg pios_sbus_cfg = {
 #define PIOS_COM_TELEM_RF_RX_BUF_LEN 192
 #define PIOS_COM_TELEM_RF_TX_BUF_LEN 192
 
-#define PIOS_COM_GPS_RX_BUF_LEN 96
+#define PIOS_COM_GPS_RX_BUF_LEN 32
 
 #define PIOS_COM_TELEM_USB_RX_BUF_LEN 192
 #define PIOS_COM_TELEM_USB_TX_BUF_LEN 192
@@ -1059,7 +1057,7 @@ void PIOS_I2C_main_adapter_er_irq_handler(void)
 #include "pios_rcvr_priv.h"
 
 /* One slot per selectable receiver group.
- *  eg. PWM, PPM, GCS, SPEKTRUM1, SPEKTRUM2, SBUS
+ *  eg. PWM, PPM, GCS, DSMMAINPORT, DSMFLEXIPORT, SBUS
  * NOTE: No slot in this map for NONE.
  */
 uint32_t pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE];
@@ -1199,31 +1197,48 @@ void PIOS_Board_Init(void) {
 		}
 #endif	/* PIOS_INCLUDE_GPS */
 		break;
-	case HWSETTINGS_CC_MAINPORT_SPEKTRUM1:
-	case HWSETTINGS_CC_MAINPORT_SPEKTRUM2:
-#if defined(PIOS_INCLUDE_SPEKTRUM)
+	case HWSETTINGS_CC_MAINPORT_DSM2:
+	case HWSETTINGS_CC_MAINPORT_DSMX10BIT:
+	case HWSETTINGS_CC_MAINPORT_DSMX11BIT:
+#if defined(PIOS_INCLUDE_DSM)
 		{
-			uint32_t pios_usart_spektrum_id;
-			if (PIOS_USART_Init(&pios_usart_spektrum_id, &pios_usart_spektrum_main_cfg)) {
+			enum pios_dsm_proto proto;
+			switch (hwsettings_cc_mainport) {
+			case HWSETTINGS_CC_MAINPORT_DSM2:
+				proto = PIOS_DSM_PROTO_DSM2;
+				break;
+			case HWSETTINGS_CC_MAINPORT_DSMX10BIT:
+				proto = PIOS_DSM_PROTO_DSMX10BIT;
+				break;
+			case HWSETTINGS_CC_MAINPORT_DSMX11BIT:
+				proto = PIOS_DSM_PROTO_DSMX11BIT;
+				break;
+			default:
+				PIOS_Assert(0);
+				break;
+			}
+
+			uint32_t pios_usart_dsm_id;
+			if (PIOS_USART_Init(&pios_usart_dsm_id, &pios_usart_dsm_main_cfg)) {
 				PIOS_Assert(0);
 			}
 
-			uint32_t pios_spektrum_id;
-			if (PIOS_SPEKTRUM_Init(&pios_spektrum_id, &pios_spektrum_main_cfg, &pios_usart_com_driver, pios_usart_spektrum_id, 0)) {
+			uint32_t pios_dsm_id;
+			if (PIOS_DSM_Init(&pios_dsm_id,
+					  &pios_dsm_main_cfg,
+					  &pios_usart_com_driver,
+					  pios_usart_dsm_id,
+					  proto, 0)) {
 				PIOS_Assert(0);
 			}
 
-			uint32_t pios_spektrum_rcvr_id;
-			if (PIOS_RCVR_Init(&pios_spektrum_rcvr_id, &pios_spektrum_rcvr_driver, pios_spektrum_id)) {
+			uint32_t pios_dsm_rcvr_id;
+			if (PIOS_RCVR_Init(&pios_dsm_rcvr_id, &pios_dsm_rcvr_driver, pios_dsm_id)) {
 				PIOS_Assert(0);
 			}
-			if (hwsettings_cc_mainport == HWSETTINGS_CC_MAINPORT_SPEKTRUM1) {
-				pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_SPEKTRUM1] = pios_spektrum_rcvr_id;
-			} else {
-				pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_SPEKTRUM2] = pios_spektrum_rcvr_id;
-			}
+			pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_DSMMAINPORT] = pios_dsm_rcvr_id;
 		}
-#endif	/* PIOS_INCLUDE_SPEKTRUM */
+#endif	/* PIOS_INCLUDE_DSM */
 		break;
 	case HWSETTINGS_CC_MAINPORT_COMAUX:
 		break;
@@ -1272,31 +1287,48 @@ void PIOS_Board_Init(void) {
 		}
 #endif	/* PIOS_INCLUDE_GPS */
 		break;
-	case HWSETTINGS_CC_FLEXIPORT_SPEKTRUM1:
-	case HWSETTINGS_CC_FLEXIPORT_SPEKTRUM2:
-#if defined(PIOS_INCLUDE_SPEKTRUM)
+	case HWSETTINGS_CC_FLEXIPORT_DSM2:
+	case HWSETTINGS_CC_FLEXIPORT_DSMX10BIT:
+	case HWSETTINGS_CC_FLEXIPORT_DSMX11BIT:
+#if defined(PIOS_INCLUDE_DSM)
 		{
-			uint32_t pios_usart_spektrum_id;
-			if (PIOS_USART_Init(&pios_usart_spektrum_id, &pios_usart_spektrum_flexi_cfg)) {
+			enum pios_dsm_proto proto;
+			switch (hwsettings_cc_flexiport) {
+			case HWSETTINGS_CC_FLEXIPORT_DSM2:
+				proto = PIOS_DSM_PROTO_DSM2;
+				break;
+			case HWSETTINGS_CC_FLEXIPORT_DSMX10BIT:
+				proto = PIOS_DSM_PROTO_DSMX10BIT;
+				break;
+			case HWSETTINGS_CC_FLEXIPORT_DSMX11BIT:
+				proto = PIOS_DSM_PROTO_DSMX11BIT;
+				break;
+			default:
+				PIOS_Assert(0);
+				break;
+			}
+
+			uint32_t pios_usart_dsm_id;
+			if (PIOS_USART_Init(&pios_usart_dsm_id, &pios_usart_dsm_flexi_cfg)) {
 				PIOS_Assert(0);
 			}
 
-			uint32_t pios_spektrum_id;
-			if (PIOS_SPEKTRUM_Init(&pios_spektrum_id, &pios_spektrum_flexi_cfg, &pios_usart_com_driver, pios_usart_spektrum_id, hwsettings_DSMxBind)) {
+			uint32_t pios_dsm_id;
+			if (PIOS_DSM_Init(&pios_dsm_id,
+					  &pios_dsm_flexi_cfg,
+					  &pios_usart_com_driver,
+					  pios_usart_dsm_id,
+					  proto, hwsettings_DSMxBind)) {
 				PIOS_Assert(0);
 			}
 
-			uint32_t pios_spektrum_rcvr_id;
-			if (PIOS_RCVR_Init(&pios_spektrum_rcvr_id, &pios_spektrum_rcvr_driver, pios_spektrum_id)) {
+			uint32_t pios_dsm_rcvr_id;
+			if (PIOS_RCVR_Init(&pios_dsm_rcvr_id, &pios_dsm_rcvr_driver, pios_dsm_id)) {
 				PIOS_Assert(0);
 			}
-			if (hwsettings_cc_flexiport == HWSETTINGS_CC_FLEXIPORT_SPEKTRUM1) {
-				pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_SPEKTRUM1] = pios_spektrum_rcvr_id;
-			} else {
-				pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_SPEKTRUM2] = pios_spektrum_rcvr_id;
-			}
+			pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_DSMFLEXIPORT] = pios_dsm_rcvr_id;
 		}
-#endif	/* PIOS_INCLUDE_SPEKTRUM */
+#endif	/* PIOS_INCLUDE_DSM */
 		break;
 	case HWSETTINGS_CC_FLEXIPORT_COMAUX:
 		break;

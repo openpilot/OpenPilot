@@ -28,6 +28,7 @@ UAVOBJSRCFILENAMES += accessorydesired
 UAVOBJSRCFILENAMES += actuatorcommand
 UAVOBJSRCFILENAMES += actuatordesired
 UAVOBJSRCFILENAMES += actuatorsettings
+UAVOBJSRCFILENAMES += attitudesettings
 UAVOBJSRCFILENAMES += inssettings
 UAVOBJSRCFILENAMES += insstatus
 UAVOBJSRCFILENAMES += attitudeactual

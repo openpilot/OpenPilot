@@ -27,7 +27,7 @@
 #define configTICK_RATE_HZ						((portTickType )1000)
 #define configMAX_PRIORITIES					((unsigned portBASE_TYPE)5)
 #define configMINIMAL_STACK_SIZE				((unsigned short)512)
-#define configTOTAL_HEAP_SIZE					((size_t)(64 * 1024))	// this is minimum, not total
+#define configTOTAL_HEAP_SIZE					((size_t)(180 * 1024))	// this is minimum, not total
 #define configMAX_TASK_NAME_LEN					(16)
 
 #define configUSE_PREEMPTION					1

@@ -101,7 +101,7 @@ TIM8  |           |           |           |
 #define PIOS_WDG_REGISTER        RTC_BKP_DR4
 #define PIOS_WDG_ACTUATOR        0x0001
 #define PIOS_WDG_STABILIZATION   0x0002
-#define PIOS_WDG_AHRS            0x0004
+#define PIOS_WDG_ATTITUDE        0x0004
 #define PIOS_WDG_MANUAL          0x0008
 
 //------------------------

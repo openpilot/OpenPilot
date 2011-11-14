@@ -693,8 +693,8 @@ static const struct pios_bma180_cfg pios_bma180_cfg = {
 	},
 };
 
-#include "pios_imu3000.h"
-static const struct pios_imu3000_cfg pios_imu3000_cfg = {
+#include "pios_mpu6050.h"
+static const struct pios_mpu6050_cfg pios_mpu6050_cfg = {
 	.drdy = {
 		.gpio = GPIOB,
 		.init = {
@@ -723,15 +723,15 @@ static const struct pios_imu3000_cfg pios_imu3000_cfg = {
 			.NVIC_IRQChannelCmd = ENABLE,
 		},
 	},
-	.Fifo_store = PIOS_IMU3000_FIFO_TEMP_OUT | PIOS_IMU3000_FIFO_GYRO_X_OUT | PIOS_IMU3000_FIFO_GYRO_Y_OUT 
-	| PIOS_IMU3000_FIFO_GYRO_Z_OUT | PIOS_IMU3000_FIFO_FOOTER,
+	.Fifo_store = PIOS_MPU6050_FIFO_TEMP_OUT | PIOS_MPU6050_FIFO_GYRO_X_OUT | PIOS_MPU6050_FIFO_GYRO_Y_OUT 
+	| PIOS_MPU6050_FIFO_GYRO_Z_OUT | PIOS_MPU6050_FIFO_FOOTER,
 	// Clock at 8 khz, downsampled by 4 for 2khz
 	.Smpl_rate_div = 7, 
-	.Interrupt_cfg = PIOS_IMU3000_INT_DATA_RDY | PIOS_IMU3000_INT_CLR_ANYRD,
-	.User_ctl = PIOS_IMU3000_USERCTL_FIFO_EN,
-	.Pwr_mgmt_clk = PIOS_IMU3000_PWRMGMT_PLL_X_CLK,
-	.range = PIOS_IMU3000_SCALE_500_DEG,
-	.filter = PIOS_IMU3000_LOWPASS_256_HZ
+	.Interrupt_cfg = PIOS_MPU6050_INT_DATA_RDY | PIOS_MPU6050_INT_CLR_ANYRD,
+	.User_ctl = PIOS_MPU6050_USERCTL_FIFO_EN,
+	.Pwr_mgmt_clk = PIOS_MPU6050_PWRMGMT_PLL_X_CLK,
+	.range = PIOS_MPU6050_SCALE_500_DEG,
+	.filter = PIOS_MPU6050_LOWPASS_256_HZ
 
 };
 
@@ -867,11 +867,15 @@ void PIOS_Board_Init(void) {
 		PIOS_DEBUG_Assert(0);
 	}
 
+	uint32_t test_val = PIOS_MPU6050_Test();
+
 	PIOS_BMA180_Attach(pios_spi_accel_id);
 	PIOS_BMA180_Init(&pios_bma180_cfg);
-	PIOS_IMU3000_Init(&pios_imu3000_cfg);
+	PIOS_MPU6050_Init(&pios_mpu6050_cfg);
 	PIOS_BMP085_Init(&pios_bmp085_cfg);
 	PIOS_HMC5883_Init(&pios_hmc5883_cfg);
+		
+	test_val ++;
 
 }
 

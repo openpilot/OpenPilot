@@ -271,8 +271,13 @@ static int8_t updateSensors(AttitudeRawData * attitudeRaw)
 		read_good = PIOS_MPU6050_ReadFifo(&gyro);
 	}
 	gyro_samples = count;	
+	*/
 	
-	
+	PIOS_MPU6050_ReadGyros(&gyro);
+	gyro_accum[0] = gyro.gyro_x;
+	gyro_accum[1] = gyro.gyro_y;
+	gyro_accum[2] = gyro.gyro_z;
+	gyro_samples = 1;
 	
 	scaling = PIOS_MPU6050_GetScale() / gyro_samples;
 	attitudeRaw->gyros[ATTITUDERAW_GYROS_X] = -((float) gyro_accum[1]) * scaling;
@@ -281,7 +286,7 @@ static int8_t updateSensors(AttitudeRawData * attitudeRaw)
 	
 	// From data sheet 35 deg C corresponds to -13200, and 280 LSB per C
 	attitudeRaw->temperature[ATTITUDERAW_TEMPERATURE_GYRO] = gyro.temperature = 35.0f + ((float) gyro.temperature + 13200) / 280;
-	*/
+	
 	// From the data sheet 25 deg C corresponds to 2 and 2 LSB per C
 	attitudeRaw->temperature[ATTITUDERAW_TEMPERATURE_ACCEL] = 25.0f + ((float) accel.temperature - 2) / 2;
 	

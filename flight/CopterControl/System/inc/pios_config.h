@@ -54,7 +54,8 @@
 
 /* Supported USART-based PIOS modules */
 #define PIOS_INCLUDE_TELEMETRY_RF
-//#define PIOS_INCLUDE_GPS
+#define PIOS_INCLUDE_GPS
+#define PIOS_GPS_MINIMAL
 
 #define PIOS_INCLUDE_SERVO
 #define PIOS_INCLUDE_SPI
@@ -80,12 +81,6 @@
 #define LOG_FILENAME 			"PIOS.LOG"
 #define STARTUP_LOG_ENABLED		1
 
-/* COM Module */
-#define GPS_BAUDRATE			19200
-#define TELEM_BAUDRATE			19200
-#define AUXUART_ENABLED			0
-#define AUXUART_BAUDRATE		19200
-
 /* Alarm Thresholds */
 #define HEAP_LIMIT_WARNING             220
 #define HEAP_LIMIT_CRITICAL             40
@@ -106,6 +101,9 @@
 
 // This can't be too high to stop eventdispatcher thread overflowing
 #define PIOS_EVENTDISAPTCHER_QUEUE      10
+
+/* PIOS Initcall infrastructure */
+#define PIOS_INCLUDE_INITCALL
 
 #endif /* PIOS_CONFIG_H */
 /**

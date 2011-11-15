@@ -54,13 +54,7 @@
 
 #define PIOS_INCLUDE_BMA180
 
-/* COM Module */
-#define GPS_BAUDRATE			19200
-#define AUXUART_ENABLED			0
-#define AUXUART_BAUDRATE		19200
-
 #endif /* PIOS_CONFIG_H */
-
 /**
  * @}
  * @}

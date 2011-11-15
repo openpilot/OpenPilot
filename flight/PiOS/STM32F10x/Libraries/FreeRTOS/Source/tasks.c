@@ -1,12 +1,12 @@
 /*
     FreeRTOS V7.0.1 - Copyright (C) 2011 Real Time Engineers Ltd.
-	
+
 
 	FreeRTOS supports many tools and architectures. V7.0.0 is sponsored by:
 	Atollic AB - Atollic provides professional embedded systems development 
 	tools for C/C++ development, code analysis and test automation.  
 	See http://www.atollic.com
-	
+
 
     ***************************************************************************
      *                                                                       *
@@ -1985,7 +1985,6 @@ static portTASK_FUNCTION( prvIdleTask, pvParameters )
 			CALL A FUNCTION THAT MIGHT BLOCK. */
 
 			/* send stack remaining */
-			//vApplicationIdleHook((void *)uxTaskGetStackHighWaterMark( idleTaskHandle ));
 			vApplicationIdleHook((void *)idleTaskHandle);
 		}
 		#endif

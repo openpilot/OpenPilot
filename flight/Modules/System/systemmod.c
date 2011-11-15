@@ -475,7 +475,7 @@ void vApplicationIdleHook(void *data)
 		idleCounterClear = 0;
 	}
 
-	/* update idle stack remaining */
+	/* grab idle stack handle */
 	if (data != NULL)
 	{
 		idleTaskHandle = (xTaskHandle) data;

@@ -52,22 +52,24 @@ class ConfigInputWidget: public ConfigTaskWidget
 public:
         ConfigInputWidget(QWidget *parent = 0);
         ~ConfigInputWidget();
-        enum wizardSteps{wizardWelcome,wizardChooseMode,wizardIdentifySticks,wizardIdentifyCenter,wizardIdentifyLimits,wizardIdentifyInverted,wizardFinish};
+        enum wizardSteps{wizardWelcome,wizardChooseMode,wizardChooseType,wizardIdentifySticks,wizardIdentifyCenter,wizardIdentifyLimits,wizardIdentifyInverted,wizardFinish,wizardNone};
         enum txMode{mode1,mode2};
         enum txMovements{moveLeftVerticalStick,moveRightVerticalStick,moveLeftHorizontalStick,moveRightHorizontalStick,moveAccess0,moveAccess1,moveAccess2,moveFlightMode,centerAll,moveAll,nothing};
         enum txMovementType{vertical,horizontal,jump,mix};
+        enum txType {acro, heli};
 public slots:
 
 private:
         bool growing;
+        bool reverse[ManualControlSettings::CHANNELNEUTRAL_NUMELEM];
         txMovements currentMovement;
         int movePos;
         void setTxMovement(txMovements movement);
         Ui_InputWidget *m_config;
         wizardSteps wizardStep;
-        void setupWizardWidget(int step);
         QList<QWidget*> extraWidgets;
         txMode transmitterMode;
+        txType transmitterType;
         struct channelsStruct
         {
             bool operator ==(const channelsStruct& rhs) const
@@ -79,15 +81,20 @@ private:
         }lastChannel;
         channelsStruct currentChannel;
         QList<channelsStruct> usedChannels;
+        bool channelDetected;
         QEventLoop * loop;
         bool skipflag;
 
-        uint currentCommand;
+        int currentChannelNum;
+        QList<int> heliChannelOrder;
+        QList<int> acroChannelOrder;
 
         ManualControlCommand * manualCommandObj;
         ManualControlCommand::DataFields manualCommandData;
+        UAVObject::Metadata manualControlMdata;
         ManualControlSettings * manualSettingsObj;
         ManualControlSettings::DataFields manualSettingsData;
+        ManualControlSettings::DataFields previousManualSettingsData;
         ReceiverActivity * receiverActivityObj;
         ReceiverActivity::DataFields receiverActivityData;
 
@@ -116,16 +123,22 @@ private:
         QTimer * animate;
         void resetTxControls();
         void setMoveFromCommand(int command);
-        QPushButton * goWizard;
-        QPushButton * goSimpleWizard;
-        bool isSimple;
-        void goToWizard();
+
+        void fastMdata();
+        void restoreMdata();
+
+        void setChannel(int);
+        void nextChannel();
+        void prevChannel();
+
+        void wizardSetUpStep(enum wizardSteps);
+        void wizardTearDownStep(enum wizardSteps);
 private slots:
         void wzNext();
         void wzBack();
         void wzCancel();
-        void goToNormalWizard();
-        void goToSimpleWizard();
+        void goToWizard();
+
         void openHelp();
         void identifyControls();
         void identifyLimits();
@@ -134,6 +147,8 @@ private slots:
         void dimOtherControls(bool value);
         void moveFMSlider();
         void invertControls();
+        void simpleCalibration(bool state);
+        void updateCalibration();
 protected:
         void resizeEvent(QResizeEvent *event);
         virtual void enableControls(bool enable);

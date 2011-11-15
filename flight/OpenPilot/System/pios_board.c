@@ -538,13 +538,13 @@ void PIOS_RTC_IRQ_Handler (void)
 
 #endif
 
-#if defined(PIOS_INCLUDE_SPEKTRUM)
+#if defined(PIOS_INCLUDE_DSM)
 /*
- * SPEKTRUM USART
+ * Spektrum/JR DSM USART
  */
-#include <pios_spektrum_priv.h>
+#include <pios_dsm_priv.h>
 
-static const struct pios_usart_cfg pios_usart_spektrum_cfg = {
+static const struct pios_usart_cfg pios_usart_dsm_cfg = {
   .regs = USART1,
   .init = {
     .USART_BaudRate            = 115200,
@@ -580,7 +580,7 @@ static const struct pios_usart_cfg pios_usart_spektrum_cfg = {
   },
 };
 
-static const struct pios_spektrum_cfg pios_spektrum_cfg = {
+static const struct pios_dsm_cfg pios_dsm_cfg = {
 	.bind = {
 		.gpio = GPIOA,
 		.init = {
@@ -589,10 +589,9 @@ static const struct pios_spektrum_cfg pios_spektrum_cfg = {
 			.GPIO_Mode  = GPIO_Mode_Out_PP,
 		},
 	},
-	.remap = 0,
 };
 
-#endif	/* PIOS_COM_SPEKTRUM */
+#endif	/* PIOS_COM_DSM */
 
 #if defined(PIOS_INCLUDE_SBUS)
 #error PIOS_INCLUDE_SBUS not implemented
@@ -736,7 +735,7 @@ const struct pios_servo_cfg pios_servo_cfg = {
 /* 
  * PWM Inputs 
  */
-#if defined(PIOS_INCLUDE_PWM)
+#if defined(PIOS_INCLUDE_PWM) || defined(PIOS_INCLUDE_PPM)
 #include <pios_pwm_priv.h>
 static const struct pios_tim_channel pios_tim_rcvrport_all_channels[] = {
 	{
@@ -1035,7 +1034,7 @@ static const struct stm32_gpio pios_debug_pins[] = {
 #include "pios_rcvr_priv.h"
 
 /* One slot per selectable receiver group.
- *  eg. PWM, PPM, GCS, SPEKTRUM1, SPEKTRUM2, SBUS
+ *  eg. PWM, PPM, GCS, DSMMAINPORT, DSMFLEXIPORT, SBUS
  * NOTE: No slot in this map for NONE.
  */
 uint32_t pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE];
@@ -1063,7 +1062,7 @@ uint32_t pios_com_telem_rf_id;
 uint32_t pios_com_telem_usb_id;
 uint32_t pios_com_gps_id;
 uint32_t pios_com_aux_id;
-uint32_t pios_com_spektrum_id;
+uint32_t pios_com_dsm_id;
 
 #include "ahrs_spi_comm.h"
 
@@ -1098,6 +1097,8 @@ void PIOS_Board_Init(void) {
 	/* Initialize UAVObject libraries */
 	EventDispatcherInitialize();
 	UAVObjInitialize();
+
+	HwSettingsInitialize();
 
 #if defined(PIOS_INCLUDE_RTC)
 	/* Initialize the real-time clock and its associated tick */
@@ -1191,47 +1192,61 @@ void PIOS_Board_Init(void) {
 	PIOS_ADC_Init();
 	PIOS_GPIO_Init();
 
-	/* Configure the aux port */
-	uint8_t hwsettings_op_auxport;
-	HwSettingsOP_AuxPortGet(&hwsettings_op_auxport);
+	/* Configure the rcvr port */
+	uint8_t hwsettings_rcvrport;
+	HwSettingsOP_RcvrPortGet(&hwsettings_rcvrport);
 
-	switch (hwsettings_op_auxport) {
-	case HWSETTINGS_OP_AUXPORT_DISABLED:
+
+	switch (hwsettings_rcvrport) {
+	case HWSETTINGS_OP_RCVRPORT_DISABLED:
 		break;
-	case HWSETTINGS_OP_AUXPORT_DEBUG:
+	case HWSETTINGS_OP_RCVRPORT_DEBUG:
 		/* Not supported yet */
 		break;
-	case HWSETTINGS_OP_AUXPORT_SPEKTRUM1:
-#if defined(PIOS_INCLUDE_SPEKTRUM)
+	case HWSETTINGS_OP_RCVRPORT_DSM2:
+	case HWSETTINGS_OP_RCVRPORT_DSMX10BIT:
+	case HWSETTINGS_OP_RCVRPORT_DSMX11BIT:
+#if defined(PIOS_INCLUDE_DSM)
 		{
-			uint32_t pios_usart_spektrum_id;
-			if (PIOS_USART_Init(&pios_usart_spektrum_id, &pios_usart_spektrum_cfg)) {
+			enum pios_dsm_proto proto;
+			switch (hwsettings_rcvrport) {
+			case HWSETTINGS_OP_RCVRPORT_DSM2:
+				proto = PIOS_DSM_PROTO_DSM2;
+				break;
+			case HWSETTINGS_OP_RCVRPORT_DSMX10BIT:
+				proto = PIOS_DSM_PROTO_DSMX10BIT;
+				break;
+			case HWSETTINGS_OP_RCVRPORT_DSMX11BIT:
+				proto = PIOS_DSM_PROTO_DSMX11BIT;
+				break;
+			default:
+				PIOS_Assert(0);
+				break;
+			}
+
+			uint32_t pios_usart_dsm_id;
+			if (PIOS_USART_Init(&pios_usart_dsm_id, &pios_usart_dsm_cfg)) {
 				PIOS_Assert(0);
 			}
 
-			uint32_t pios_spektrum_id;
-			if (PIOS_SPEKTRUM_Init(&pios_spektrum_id, &pios_spektrum_cfg, &pios_usart_com_driver, pios_usart_spektrum_id, false)) {
+			uint32_t pios_dsm_id;
+			if (PIOS_DSM_Init(&pios_dsm_id,
+					  &pios_dsm_cfg,
+					  &pios_usart_com_driver,
+					  pios_usart_dsm_id,
+					  proto, 0)) {
 				PIOS_Assert(0);
 			}
 
-			uint32_t pios_spektrum_rcvr_id;
-			if (PIOS_RCVR_Init(&pios_spektrum_rcvr_id, &pios_spektrum_rcvr_driver, pios_spektrum_id)) {
+			uint32_t pios_dsm_rcvr_id;
+			if (PIOS_RCVR_Init(&pios_dsm_rcvr_id, &pios_dsm_rcvr_driver, pios_dsm_id)) {
 				PIOS_Assert(0);
 			}
-			pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_SPEKTRUM1] = pios_spektrum_rcvr_id;
+			pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_DSMMAINPORT] = pios_dsm_rcvr_id;
 		}
 #endif
 		break;
-	}
-
-	/* Configure the rcvr port */
-	uint8_t hwsettings_rcvrport;
-	HwSettingsRcvrPortGet(&hwsettings_rcvrport);
-
-	switch (hwsettings_rcvrport) {
-	case HWSETTINGS_RCVRPORT_DISABLED:
-		break;
-	case HWSETTINGS_RCVRPORT_PWM:
+	case HWSETTINGS_OP_RCVRPORT_PWM:
 #if defined(PIOS_INCLUDE_PWM)
 		{
 			uint32_t pios_pwm_id;
@@ -1245,7 +1260,7 @@ void PIOS_Board_Init(void) {
 		}
 #endif	/* PIOS_INCLUDE_PWM */
 		break;
-	case HWSETTINGS_RCVRPORT_PPM:
+	case HWSETTINGS_OP_RCVRPORT_PPM:
 #if defined(PIOS_INCLUDE_PPM)
 		{
 			uint32_t pios_ppm_id;

@@ -147,9 +147,6 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
     UAVObjectField * curve2source = mixerSettings->getField("Curve2Source");
     Q_ASSERT(curve2source);
 
-    m_ccpm->ccpmCollectiveChannel->addItems(curve2source->getOptions());
-    m_ccpm->ccpmCollectiveChannel->setCurrentIndex(0);
-
     QStringList channels;
     channels << "Channel1" << "Channel2" << "Channel3" << "Channel4" <<
                 "Channel5" << "Channel6" << "Channel7" << "Channel8" << "None";
@@ -219,7 +216,6 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
     connect(m_ccpm->SwashLvlCancelButton, SIGNAL(clicked()), this, SLOT(SwashLvlCancelButtonPressed()));
     connect(m_ccpm->SwashLvlFinishButton, SIGNAL(clicked()), this, SLOT(SwashLvlFinishButtonPressed()));
 
-    connect(m_ccpm->ccpmCollectivePassthrough, SIGNAL(clicked()), this, SLOT(SetUIComponentVisibilities()));
     connect(m_ccpm->ccpmLinkCyclic, SIGNAL(clicked()), this, SLOT(SetUIComponentVisibilities()));
     connect(m_ccpm->ccpmLinkRoll, SIGNAL(clicked()), this, SLOT(SetUIComponentVisibilities()));
 
@@ -1016,9 +1012,6 @@ void ConfigccpmWidget::UpdateCCPMOptionsFromUI()
     //correction angle
     GUIConfigData.heli.CorrectionAngle = m_ccpm->ccpmCorrectionAngle->value();
     
-    //CollectiveChannel
-    GUIConfigData.heli.CollectiveChannel = m_ccpm->ccpmCollectiveChannel->currentIndex();
-    
     //update sliders
     if (useCCPM) 
     {
@@ -1058,10 +1051,7 @@ void ConfigccpmWidget::UpdateCCPMUIFromOptions()
     
     //correction angle
     m_ccpm->ccpmCorrectionAngle->setValue(GUIConfigData.heli.CorrectionAngle);
-    
-    //CollectiveChannel
-    m_ccpm->ccpmCollectiveChannel->setCurrentIndex(GUIConfigData.heli.CollectiveChannel);
-    
+        
     //update sliders
     m_ccpm->ccpmCollectiveScale->setValue(GUIConfigData.heli.SliderValue0);
     m_ccpm->ccpmCollectiveScaleBox->setValue(GUIConfigData.heli.SliderValue0);
@@ -1091,9 +1081,6 @@ void ConfigccpmWidget::SetUIComponentVisibilities()
     
     m_ccpm->ccpmPitchMixingBox->setVisible(!GUIConfigData.heli.ccpmCollectivePassthroughState && GUIConfigData.heli.ccpmLinkCyclicState);
     m_ccpm->ccpmCollectiveScalingBox->setVisible(GUIConfigData.heli.ccpmCollectivePassthroughState || !GUIConfigData.heli.ccpmLinkCyclicState);
-
-    m_ccpm->ccpmCollectiveChLabel->setVisible(GUIConfigData.heli.ccpmCollectivePassthroughState);
-    m_ccpm->ccpmCollectiveChannel->setVisible(GUIConfigData.heli.ccpmCollectivePassthroughState);
 
     m_ccpm->ccpmLinkCyclic->setVisible(!GUIConfigData.heli.ccpmCollectivePassthroughState);
     
@@ -1316,7 +1303,7 @@ void ConfigccpmWidget::sendccpmUpdate()
     //MixerSettings.Curve2Source = Throttle,Roll,Pitch,Yaw,Accessory0,Accessory1,Accessory2,Accessory3,Accessory4,Accessory5
     //check if we are using throttle or directly from a channel...
     if (GUIConfigData.heli.ccpmCollectivePassthroughState)
-        mixerSettingsData.Curve2Source = GUIConfigData.heli.CollectiveChannel;
+        mixerSettingsData.Curve2Source = MixerSettings::CURVE2SOURCE_COLLECTIVE;
     else
         mixerSettingsData.Curve2Source = MixerSettings::CURVE2SOURCE_THROTTLE;
     

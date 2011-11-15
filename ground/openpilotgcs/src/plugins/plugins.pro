@@ -19,6 +19,11 @@ plugin_emptygadget.subdir = emptygadget
 plugin_emptygadget.depends = plugin_coreplugin
 SUBDIRS += plugin_emptygadget
 
+# Debug Gadget plugin
+plugin_debuggadget.subdir = debuggadget
+plugin_debuggadget.depends = plugin_coreplugin
+SUBDIRS += plugin_debuggadget
+
 # Welcome plugin
 plugin_welcome.subdir = welcome
 plugin_welcome.depends = plugin_coreplugin
@@ -107,6 +112,7 @@ SUBDIRS += plugin_systemhealth
 plugin_config.subdir = config
 plugin_config.depends = plugin_coreplugin
 plugin_config.depends += plugin_uavobjects
+plugin_config.depends += plugin_uavsettingsimportexport
 SUBDIRS += plugin_config
 
 #GPS Display gadget

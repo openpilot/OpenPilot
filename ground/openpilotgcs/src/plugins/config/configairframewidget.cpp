@@ -36,6 +36,10 @@
 #include <math.h>
 #include <QDesktopServices>
 #include <QUrl>
+#include "systemsettings.h"
+#include "mixersettings.h"
+#include "actuatorsettings.h"
+#include <QEventLoop>
 
 /**
   Helper delegate for the custom mixer editor table.
@@ -101,10 +105,13 @@ ConfigAirframeWidget::ConfigAirframeWidget(QWidget *parent) : ConfigTaskWidget(p
     ffTuningInProgress = false;
     ffTuningPhase = false;
 
-    mixerTypes << "Mixer1Type" << "Mixer2Type" << "Mixer3Type"
-            << "Mixer4Type" << "Mixer5Type" << "Mixer6Type" << "Mixer7Type" << "Mixer8Type";
-    mixerVectors << "Mixer1Vector" << "Mixer2Vector" << "Mixer3Vector"
-            << "Mixer4Vector" << "Mixer5Vector" << "Mixer6Vector" << "Mixer7Vector" << "Mixer8Vector";
+    QStringList channels;
+    channels << "None";
+    for (int i = 0; i < ActuatorSettings::CHANNELADDR_NUMELEM; i++) {
+        mixerTypes << QString("Mixer%1Type").arg(i+1);
+        mixerVectors << QString("Mixer%1Vector").arg(i+1);
+        channels << QString("Channel%1").arg(i+1);
+    }
 
     QStringList airframeTypes;
     airframeTypes << "Fixed Wing" << "Multirotor" << "Helicopter" << "Custom";
@@ -120,11 +127,6 @@ ConfigAirframeWidget::ConfigAirframeWidget(QWidget *parent) : ConfigTaskWidget(p
             << "Octo Coax X" << "Hexacopter Y6" << "Tricopter Y";
     m_aircraft->multirotorFrameType->addItems(multiRotorTypes);
 
-
-
-    QStringList channels;
-    channels << "None" << "Channel1" << "Channel2" << "Channel3" <<
-            "Channel4" << "Channel5" << "Channel6" << "Channel7" << "Channel8";
     // Now load all the channel assignements for fixed wing
     m_aircraft->fwElevator1Channel->addItems(channels);
     m_aircraft->fwElevator2Channel->addItems(channels);
@@ -443,6 +445,8 @@ void ConfigAirframeWidget::updateCustomThrottle2CurveValue(QList<double> list, d
   */
 void ConfigAirframeWidget::refreshWidgetsValues()
 {
+    if(!allObjectsUpdated())
+        return;
     bool dirty=isDirty();
     // Get the Airframe type from the system settings:
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("SystemSettings")));
@@ -1516,6 +1520,16 @@ bool ConfigAirframeWidget::setupFrameVtail()
   */
 bool ConfigAirframeWidget::setupMixer(double mixerFactors[8][3])
 {
+    qDebug()<<"Mixer factors";
+    qDebug()<<mixerFactors[0][0]<<" "<<mixerFactors[0][1]<<" "<<mixerFactors[0][2];
+    qDebug()<<mixerFactors[1][0]<<" "<<mixerFactors[1][1]<<" "<<mixerFactors[1][2];
+    qDebug()<<mixerFactors[2][0]<<" "<<mixerFactors[2][1]<<" "<<mixerFactors[2][2];
+    qDebug()<<mixerFactors[3][0]<<" "<<mixerFactors[3][1]<<" "<<mixerFactors[3][2];
+    qDebug()<<mixerFactors[4][0]<<" "<<mixerFactors[4][1]<<" "<<mixerFactors[4][2];
+    qDebug()<<mixerFactors[5][0]<<" "<<mixerFactors[5][1]<<" "<<mixerFactors[5][2];
+    qDebug()<<mixerFactors[6][0]<<" "<<mixerFactors[6][1]<<" "<<mixerFactors[6][2];
+    qDebug()<<mixerFactors[7][0]<<" "<<mixerFactors[7][1]<<" "<<mixerFactors[7][2];
+
     UAVObjectField *field;
     QList<QComboBox*> mmList;
     mmList << m_aircraft->multiMotor1 << m_aircraft->multiMotor2 << m_aircraft->multiMotor3
@@ -1533,11 +1547,15 @@ bool ConfigAirframeWidget::setupMixer(double mixerFactors[8][3])
     double pFactor = (double)m_aircraft->mrPitchMixLevel->value()/100;
     double rFactor = (double)m_aircraft->mrRollMixLevel->value()/100;
     double yFactor = (double)m_aircraft->mrYawMixLevel->value()/100;
+    qDebug()<<QString("pFactor=%0 rFactor=%1 yFactor=%2").arg(pFactor).arg(rFactor).arg(yFactor);
     for (int i=0 ; i<8; i++) {
-        int channel = mmList.at(i)->currentIndex()-1;
-        if (channel > -1)
-            setupQuadMotor(channel, mixerFactors[i][0]*pFactor,
-                       rFactor*mixerFactors[i][1], yFactor*mixerFactors[i][2]);
+        if(mmList.at(i)->isEnabled())
+        {
+            int channel = mmList.at(i)->currentIndex()-1;
+            if (channel > -1)
+                setupQuadMotor(channel, mixerFactors[i][0]*pFactor,
+                           rFactor*mixerFactors[i][1], yFactor*mixerFactors[i][2]);
+        }
     }
 //    obj->updated();
     return true;
@@ -1549,6 +1567,7 @@ bool ConfigAirframeWidget::setupMixer(double mixerFactors[8][3])
   */
 void ConfigAirframeWidget::setupQuadMotor(int channel, double pitch, double roll, double yaw)
 {
+    qDebug()<<QString("Setup quad motor channel=%0 pitch=%1 roll=%2 yaw=%3").arg(channel).arg(pitch).arg(roll).arg(yaw);
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(obj);
     UAVObjectField *field = obj->getField(mixerTypes.at(channel));
@@ -1560,10 +1579,13 @@ void ConfigAirframeWidget::setupQuadMotor(int channel, double pitch, double roll
     field->setValue(127, ti);
     ti = field->getElementNames().indexOf("Roll");
     field->setValue(roll*127,ti);
+    qDebug()<<"Set roll="<<roll*127;
     ti = field->getElementNames().indexOf("Pitch");
     field->setValue(pitch*127,ti);
+    qDebug()<<"Set pitch="<<pitch*127;
     ti = field->getElementNames().indexOf("Yaw");
     field->setValue(yaw*127,ti);
+    qDebug()<<"Set yaw="<<yaw*127;
 }
 
 /**
@@ -2173,7 +2195,6 @@ void ConfigAirframeWidget::addToDirtyMonitor()
     addWidget(m_aircraft->widget_3->m_ccpm->ccpmCollectivePassthrough);
     addWidget(m_aircraft->widget_3->m_ccpm->ccpmLinkRoll);
     addWidget(m_aircraft->widget_3->m_ccpm->ccpmLinkCyclic);
-    addWidget(m_aircraft->widget_3->m_ccpm->ccpmCollectiveChannel);
     addWidget(m_aircraft->widget_3->m_ccpm->ccpmRevoSlider);
     addWidget(m_aircraft->widget_3->m_ccpm->ccpmREVOspinBox);
     addWidget(m_aircraft->widget_3->m_ccpm->ccpmCollectiveSlider);

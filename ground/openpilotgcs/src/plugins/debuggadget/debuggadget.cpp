@@ -1,16 +1,13 @@
 /**
  ******************************************************************************
- * @addtogroup PIOS PIOS Core hardware abstraction layer
- * @{
- * @addtogroup   PIOS_SPEKTRUM SPEKTRUM Functions
- * @brief PIOS interface to read and write from spektrum port
- * @{
  *
- * @file       pios_spektrum_priv.h
+ * @file       debuggadget.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Servo private structures.
- * @see        The GNU Public License (GPL) Version 3
- *
+ * @addtogroup GCSPlugins GCS Plugins
+ * @{
+ * @addtogroup DebugGadgetPlugin Debug Gadget Plugin
+ * @{
+ * @brief A place holder gadget plugin 
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -27,26 +24,16 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+#include "debuggadget.h"
+#include "debuggadgetwidget.h"
 
-#ifndef PIOS_SPEKTRUM_PRIV_H
-#define PIOS_SPEKTRUM_PRIV_H
+DebugGadget::DebugGadget(QString classId, DebugGadgetWidget *widget, QWidget *parent) :
+        IUAVGadget(classId, parent),
+        m_widget(widget)
+{
+}
 
-#include <pios.h>
-#include <pios_stm32.h>
-#include <pios_usart_priv.h>
-
-struct pios_spektrum_cfg {
-	struct stm32_gpio bind;
-	uint32_t remap;		/* GPIO_Remap_* */
-};
-
-extern const struct pios_rcvr_driver pios_spektrum_rcvr_driver;
-
-extern int32_t PIOS_SPEKTRUM_Init(uint32_t * spektrum_id, const struct pios_spektrum_cfg *cfg, const struct pios_com_driver * driver, uint32_t lower_id, uint8_t bind);
-
-#endif /* PIOS_SPEKTRUM_PRIV_H */
-
-/**
- * @}
- * @}
- */
+DebugGadget::~DebugGadget()
+{
+    delete m_widget;
+}

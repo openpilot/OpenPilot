@@ -26,14 +26,17 @@
  */
 #include "configtaskwidget.h"
 #include <QtGui/QWidget>
-
+#include "uavsettingsimportexport/uavsettingsimportexportfactory.h"
+#include "configgadgetwidget.h"
 
 ConfigTaskWidget::ConfigTaskWidget(QWidget *parent) : QWidget(parent),isConnected(false),smartsave(NULL),dirty(false)
 {
     pm = ExtensionSystem::PluginManager::instance();
     objManager = pm->getObject<UAVObjectManager>();
-    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(onAutopilotConnect()));
-    connect(parent, SIGNAL(autopilotDisconnected()),this, SLOT(onAutopilotDisconnect()));
+    connect((ConfigGadgetWidget*)parent, SIGNAL(autopilotConnected()),this, SLOT(onAutopilotConnect()));
+    connect((ConfigGadgetWidget*)parent, SIGNAL(autopilotDisconnected()),this, SLOT(onAutopilotDisconnect()));
+    UAVSettingsImportExportFactory * importexportplugin =  pm->getObject<UAVSettingsImportExportFactory>();
+    connect(importexportplugin,SIGNAL(importAboutToBegin()),this,SLOT(invalidateObjects()));
 }
 void ConfigTaskWidget::addWidget(QWidget * widget)
 {
@@ -48,7 +51,9 @@ void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString fiel
     UAVObject *obj=NULL;
     UAVObjectField *_field=NULL;
     obj = objManager->getObject(QString(object));
+    Q_ASSERT(obj);
     _field = obj->getField(QString(field));
+    Q_ASSERT(_field);
     addUAVObjectToWidgetRelation(object,field,widget,_field->getElementNames().indexOf(index));
 }
 
@@ -59,6 +64,9 @@ void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString fiel
     if(!object.isEmpty())
     {
         obj = objManager->getObject(QString(object));
+        Q_ASSERT(obj);
+        objectUpdates.insert(obj,true);
+        connect(obj, SIGNAL(objectUpdated(UAVObject*)),this, SLOT(objectUpdated(UAVObject*)));
         connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshWidgetsValues()));
     }
     //smartsave->addObject(obj);
@@ -120,6 +128,7 @@ ConfigTaskWidget::~ConfigTaskWidget()
 
 void ConfigTaskWidget::saveObjectToSD(UAVObject *obj)
 {
+    qDebug()<<"ConfigTaskWidget::saveObjectToSD";
     // saveObjectToSD is now handled by the UAVUtils plugin in one
     // central place (and one central queue)
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
@@ -150,10 +159,12 @@ void ConfigTaskWidget::onAutopilotDisconnect()
 {
     isConnected=false;
     enableControls(false);
+    invalidateObjects();
 }
 
 void ConfigTaskWidget::onAutopilotConnect()
 {
+    invalidateObjects();
     dirty=false;
     isConnected=true;
     enableControls(true);
@@ -182,6 +193,14 @@ void ConfigTaskWidget::populateWidgets()
         {
             cb->setValue(ow->field->getValue(ow->index).toInt()/ow->scale);
         }
+        else if(QSlider * cb=qobject_cast<QSlider *>(ow->widget))
+        {
+            cb->setValue(ow->field->getValue(ow->index).toInt()/ow->scale);
+        }
+        else if(QCheckBox * cb=qobject_cast<QCheckBox *>(ow->widget))
+        {
+            cb->setChecked(ow->field->getValue(ow->index).toBool());
+        }
     }
     setDirty(dirtyBack);
 }
@@ -207,6 +226,14 @@ void ConfigTaskWidget::refreshWidgetsValues()
         {
             cb->setValue(ow->field->getValue(ow->index).toInt()/ow->scale);
         }
+        else if(QSlider * cb=qobject_cast<QSlider *>(ow->widget))
+        {
+            cb->setValue(ow->field->getValue(ow->index).toInt()/ow->scale);
+        }
+        else if(QCheckBox * cb=qobject_cast<QCheckBox *>(ow->widget))
+        {
+            cb->setChecked(ow->field->getValue(ow->index).toBool());
+        }
     }
     setDirty(dirtyBack);
 }
@@ -230,6 +257,14 @@ void ConfigTaskWidget::updateObjectsFromWidgets()
         else if(QSpinBox * cb=qobject_cast<QSpinBox *>(ow->widget))
         {
             ow->field->setValue(cb->value()* ow->scale,ow->index);
+        }
+        else if(QSlider * cb=qobject_cast<QSlider *>(ow->widget))
+        {
+            ow->field->setValue(cb->value()* ow->scale,ow->index);
+        }
+        else if(QCheckBox * cb=qobject_cast<QCheckBox *>(ow->widget))
+        {
+            ow->field->setValue((cb->isChecked()?"TRUE":"FALSE"),ow->index);
         }
     }
 }
@@ -290,6 +325,30 @@ void ConfigTaskWidget::enableObjUpdates()
     {
         if(obj->object)
             connect(obj->object, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshWidgetsValues()));
+    }
+}
+
+void ConfigTaskWidget::objectUpdated(UAVObject *obj)
+{
+    objectUpdates[obj]=true;
+}
+
+bool ConfigTaskWidget::allObjectsUpdated()
+{
+    bool ret=true;
+    foreach(UAVObject *obj, objectUpdates.keys())
+    {
+        ret=ret & objectUpdates[obj];
+    }
+    qDebug()<<"ALL OBJECTS UPDATE:"<<ret;
+    return ret;
+}
+
+void ConfigTaskWidget::invalidateObjects()
+{
+    foreach(UAVObject *obj, objectUpdates.keys())
+    {
+        objectUpdates[obj]=false;
     }
 }
 

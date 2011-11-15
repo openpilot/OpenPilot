@@ -2,7 +2,7 @@
  ******************************************************************************
  * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
- * @addtogroup   PIOS_SBUS S.Bus Functions
+ * @addtogroup   PIOS_SBus S.Bus Functions
  * @brief PIOS interface to read and write from Futaba S.Bus port
  * @{
  *
@@ -44,8 +44,8 @@
  *  1 byte  - 0x0f (start of frame byte)
  * 22 bytes - channel data (11 bit/channel, 16 channels, LSB first)
  *  1 byte  - bit flags:
- *                   0x01 - digital channel 1,
- *                   0x02 - digital channel 2,
+ *                   0x01 - discrete channel 1,
+ *                   0x02 - discrete channel 2,
  *                   0x04 - lost frame flag,
  *                   0x08 - failsafe flag,
  *                   0xf0 - reserved
@@ -54,16 +54,22 @@
 #define SBUS_FRAME_LENGTH		(1+22+1+1)
 #define SBUS_SOF_BYTE			0x0f
 #define SBUS_EOF_BYTE			0x00
-#define SBUS_FLAG_DG1			0x01
-#define SBUS_FLAG_DG2			0x02
+#define SBUS_FLAG_DC1			0x01
+#define SBUS_FLAG_DC2			0x02
 #define SBUS_FLAG_FL			0x04
 #define SBUS_FLAG_FS			0x08
 
 /*
- * S.Bus protocol provides up to 16 analog and 2 digital channels.
- * Only 8 channels are currently supported by the OpenPilot.
+ * S.Bus protocol provides 16 proportional and 2 discrete channels.
+ * Do not change unless driver code is updated accordingly.
  */
-#define	SBUS_NUMBER_OF_CHANNELS		8
+#if (PIOS_SBUS_NUM_INPUTS != (16+2))
+#error "S.Bus protocol provides 16 proportional and 2 discrete channels"
+#endif
+
+/* Discrete channels represented as bits, provide values for them */
+#define	SBUS_VALUE_MIN			352
+#define	SBUS_VALUE_MAX			1696
 
 /*
  * S.Bus configuration programmable invertor
@@ -77,7 +83,10 @@ struct pios_sbus_cfg {
 
 extern const struct pios_rcvr_driver pios_sbus_rcvr_driver;
 
-extern int32_t PIOS_SBUS_Init(uint32_t * sbus_id, const struct pios_sbus_cfg *cfg, const struct pios_com_driver * driver, uint32_t lower_id);
+extern int32_t PIOS_SBus_Init(uint32_t *sbus_id,
+			      const struct pios_sbus_cfg *cfg,
+			      const struct pios_com_driver *driver,
+			      uint32_t lower_id);
 
 #endif /* PIOS_SBUS_PRIV_H */
 

@@ -98,7 +98,7 @@ void ConfigCCAttitudeWidget::attitudeRawUpdated(UAVObject * obj) {
         attitudeSettingsData.GyroBias[0] = -x_gyro_bias;
         attitudeSettingsData.GyroBias[1] = -y_gyro_bias;
         attitudeSettingsData.GyroBias[2] = -z_gyro_bias;
-        attitudeSettingsData.BiasCorrectGyro = initialBiasCorrected;
+        attitudeSettingsData.BiasCorrectGyro = AttitudeSettings::BIASCORRECTGYRO_TRUE;
         AttitudeSettings::GetInstance(getObjectManager())->setData(attitudeSettingsData);
 
     } else {
@@ -134,7 +134,6 @@ void ConfigCCAttitudeWidget::startAccelCalibration() {
 
     // Disable gyro bias correction to see raw data
     AttitudeSettings::DataFields attitudeSettingsData = AttitudeSettings::GetInstance(getObjectManager())->getData();
-    initialBiasCorrected = attitudeSettingsData.BiasCorrectGyro;
     attitudeSettingsData.BiasCorrectGyro = AttitudeSettings::BIASCORRECTGYRO_FALSE;
     AttitudeSettings::GetInstance(getObjectManager())->setData(attitudeSettingsData);
 

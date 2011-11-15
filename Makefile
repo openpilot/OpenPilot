@@ -183,13 +183,13 @@ qt_sdk_clean:
 ARM_SDK_DIR := $(TOOLS_DIR)/arm-2011.03
 
 .PHONY: arm_sdk_install
-arm_sdk_install: ARM_SDK_URL  := http://www.codesourcery.com/sgpp/lite/arm/portal/package8734/public/arm-none-eabi/arm-2011.03-42-arm-none-eabi-i686-pc-linux-gnu.tar.bz2
+arm_sdk_install: ARM_SDK_URL  := https://sourcery.mentor.com/sgpp/lite/arm/portal/package8736/public/arm-none-eabi/arm-2011.03-42-arm-none-eabi-i686-pc-linux-gnu.tar.bz2
 arm_sdk_install: ARM_SDK_FILE := $(notdir $(ARM_SDK_URL))
 # order-only prereq on directory existance:
 arm_sdk_install: | $(DL_DIR) $(TOOLS_DIR)
 arm_sdk_install: arm_sdk_clean
         # download the source only if it's newer than what we already have
-	$(V1) wget -N -P "$(DL_DIR)" "$(ARM_SDK_URL)"
+	$(V1) wget --no-check-certificate -N -P "$(DL_DIR)" "$(ARM_SDK_URL)"
 
         # binary only release so just extract it
 	$(V1) tar -C $(TOOLS_DIR) -xjf "$(DL_DIR)/$(ARM_SDK_FILE)"
@@ -202,8 +202,8 @@ arm_sdk_clean:
 OPENOCD_DIR := $(TOOLS_DIR)/openocd
 
 .PHONY: openocd_install
-openocd_install: OPENOCD_URL  := http://sourceforge.net/projects/openocd/files/openocd/0.4.0/openocd-0.4.0.tar.bz2/download
-openocd_install: OPENOCD_FILE := openocd-0.4.0.tar.bz2
+openocd_install: OPENOCD_URL  := http://sourceforge.net/projects/openocd/files/openocd/0.5.0/openocd-0.5.0.tar.bz2/download
+openocd_install: OPENOCD_FILE := openocd-0.5.0.tar.bz2
 # order-only prereq on directory existance:
 openocd_install: | $(DL_DIR) $(TOOLS_DIR)
 openocd_install: openocd_clean
@@ -218,8 +218,8 @@ openocd_install: openocd_clean
         # build and install
 	$(V1) mkdir -p "$(OPENOCD_DIR)"
 	$(V1) ( \
-	  cd $(DL_DIR)/openocd-build/openocd-0.4.0 ; \
-	  ./configure --prefix="$(OPENOCD_DIR)" --enable-ft2232_libftdi ; \
+	  cd $(DL_DIR)/openocd-build/openocd-0.5.0 ; \
+	  ./configure --prefix="$(OPENOCD_DIR)" --enable-ft2232_libftdi --enable-buspirate; \
 	  $(MAKE) ; \
 	  $(MAKE) install ; \
 	)

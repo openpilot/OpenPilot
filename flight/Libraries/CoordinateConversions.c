@@ -31,8 +31,9 @@
 #include <stdint.h>
 #include "CoordinateConversions.h"
 
-#define RAD2DEG (180.0/M_PI)
-#define DEG2RAD (M_PI/180.0)
+#define F_PI 3.14159265358979323846f
+#define RAD2DEG (180.0f/ F_PI)
+#define DEG2RAD (F_P I /180.0f)
 
 // ****** convert Lat,Lon,Alt to ECEF  ************
 void LLA2ECEF(double LLA[3], double ECEF[3])
@@ -128,10 +129,10 @@ void Quaternion2RPY(const float q[4], float rpy[3])
 	float q2s = q[2] * q[2];
 	float q3s = q[3] * q[3];
 
-	R13 = 2 * (q[1] * q[3] - q[0] * q[2]);
+	R13 = 2.0f * (q[1] * q[3] - q[0] * q[2]);
 	R11 = q0s + q1s - q2s - q3s;
-	R12 = 2 * (q[1] * q[2] + q[0] * q[3]);
-	R23 = 2 * (q[2] * q[3] + q[0] * q[1]);
+	R12 = 2.0f * (q[1] * q[2] + q[0] * q[3]);
+	R23 = 2.0f * (q[2] * q[3] + q[0] * q[1]);
 	R33 = q0s - q1s - q2s + q3s;
 
 	rpy[1] = RAD2DEG * asinf(-R13);	// pitch always between -pi/2 to pi/2

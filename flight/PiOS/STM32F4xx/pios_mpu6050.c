@@ -267,13 +267,13 @@ float PIOS_MPU6050_GetScale()
 {
 	switch (cfg->gyro_range) {
 		case PIOS_MPU6050_SCALE_250_DEG:
-			return DEG_TO_RAD / 131.0;
+			return 1.0f / 131.0f;
 		case PIOS_MPU6050_SCALE_500_DEG:
-			return DEG_TO_RAD / 65.5;
+			return 1.0f / 65.5f;
 		case PIOS_MPU6050_SCALE_1000_DEG:
-			return DEG_TO_RAD / 32.8;
+			return 1.0f / 32.8f;
 		case PIOS_MPU6050_SCALE_2000_DEG:
-			return DEG_TO_RAD / 16.4;
+			return 1.0f / 16.4f;
 	}
 	return 0;
 }
@@ -336,16 +336,6 @@ void PIOS_MPU6050_IRQHandler(void)
 		cb_not_ready++;
 		return;
 	}
-
-	/*// If at least one read doesnt succeed then the irq not reset and we will stall
-	if(PIOS_MPU6050_Read(PIOS_MPU6050_FIFO_CNT_MSB, (uint8_t *) &fifo_level_data, sizeof(fifo_level_data)) != 0)
-		return;
-				
-	fifo_level = (fifo_level_data[0] << 8) + fifo_level_data[1];
-	
-	PIOS_DELAY_WaituS(10);
-	*/
-	
 		
 	// Leave footer in buffer
 	PIOS_MPU6050_Read_Callback(PIOS_MPU6050_FIFO_REG, mpu6050_read_buffer, sizeof(mpu6050_read_buffer), MPU6050_callback);

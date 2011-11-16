@@ -58,10 +58,11 @@
 #include "CoordinateConversions.h"
 
 // Private constants
-#define STACK_SIZE_BYTES 540
+#define STACK_SIZE_BYTES 1540
 #define TASK_PRIORITY (tskIDLE_PRIORITY+3)
 
-#define PI_MOD(x) (fmod(x + M_PI, M_PI * 2) - M_PI)
+#define F_PI 3.14159265358979323846f
+#define PI_MOD(x) (fmod(x + F_PI, F_PI * 2) - F_PI)
 // Private types
 
 // Private variables
@@ -81,7 +82,6 @@ static float accelKp = 0;
 static float yawBiasRate = 0;
 static float gyroGain = 0.42;
 static int16_t accelbias[3];
-static float q[4] = {1,0,0,0};
 static float R[3][3];
 static int8_t rotate = 0;
 static bool zero_during_arming = false;
@@ -127,10 +127,6 @@ int32_t AttitudeInitialize(void)
 	gyro_correct_int[1] = 0;
 	gyro_correct_int[2] = 0;
 
-	q[0] = 1;
-	q[1] = 0;
-	q[2] = 0;
-	q[3] = 0;
 	for(uint8_t i = 0; i < 3; i++)
 		for(uint8_t j = 0; j < 3; j++)
 			R[i][j] = 0;
@@ -200,7 +196,7 @@ static void AttitudeTask(void *parameters)
 			AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
 		else {
 			// Only update attitude when sensor data is good
-			//updateAttitude(&attitudeRaw);
+			updateAttitude(&attitudeRaw);
 			AttitudeRawSet(&attitudeRaw);
 			AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
 		}
@@ -253,8 +249,8 @@ static int8_t updateSensors(AttitudeRawData * attitudeRaw)
 	// Not the swaping of channel orders
 	scaling = PIOS_BMA180_GetScale() / accel_samples;
 	attitudeRaw->accels[ATTITUDERAW_ACCELS_X] = accel_accum[0] * scaling;
-	attitudeRaw->accels[ATTITUDERAW_ACCELS_Y] = accel_accum[1] * scaling;
-	attitudeRaw->accels[ATTITUDERAW_ACCELS_Z] = accel_accum[2] * scaling;
+	attitudeRaw->accels[ATTITUDERAW_ACCELS_Y] = -accel_accum[1] * scaling;
+	attitudeRaw->accels[ATTITUDERAW_ACCELS_Z] = -accel_accum[2] * scaling;
 
 
 	
@@ -331,12 +327,19 @@ static int8_t updateSensors(AttitudeRawData * attitudeRaw)
 	return 0;
 }
 
+float accel_mag;
+float qmag;
 static void updateAttitude(AttitudeRawData * attitudeRaw)
 {
 	float dT;
 	portTickType thisSysTime = xTaskGetTickCount();
 	static portTickType lastSysTime = 0;
+	float q[4];
+	
+	AttitudeActualData attitudeActual;
+	AttitudeActualGet(&attitudeActual);
 
+	
 	dT = (thisSysTime == lastSysTime) ? 0.001 : (portMAX_DELAY & (thisSysTime - lastSysTime)) / portTICK_RATE_MS / 1000.0f;
 	lastSysTime = thisSysTime;
 
@@ -346,60 +349,62 @@ static void updateAttitude(AttitudeRawData * attitudeRaw)
 	gyro[1] = attitudeRaw->gyros[1];
 	gyro[2] = attitudeRaw->gyros[2];
 
-	{
-		float * accels = attitudeRaw->accels;
-		float grot[3];
-		float accel_err[3];
+	float accels[3];
+	accels[0] = attitudeRaw->accels[0];
+	accels[1] = attitudeRaw->accels[1];
+	accels[2] = attitudeRaw->accels[2];
+	
+	float grot[3];
+	float accel_err[3];
+	
+	// Get the current attitude estimate
+	quat_copy(&attitudeActual.q1, q);
+	
+	// Rotate gravity to body frame and cross with accels
+	grot[0] = -(2 * (q[1] * q[3] - q[0] * q[2]));
+	grot[1] = -(2 * (q[2] * q[3] + q[0] * q[1]));
+	grot[2] = -(q[0] * q[0] - q[1]*q[1] - q[2]*q[2] + q[3]*q[3]);
+	CrossProduct((const float *) accels, (const float *) grot, accel_err);
 
-		// Rotate gravity to body frame and cross with accels
-		grot[0] = -(2 * (q[1] * q[3] - q[0] * q[2]));
-		grot[1] = -(2 * (q[2] * q[3] + q[0] * q[1]));
-		grot[2] = -(q[0] * q[0] - q[1]*q[1] - q[2]*q[2] + q[3]*q[3]);
-		CrossProduct((const float *) accels, (const float *) grot, accel_err);
-
-		// Account for accel magnitude
-		float accel_mag = sqrt(accels[0]*accels[0] + accels[1]*accels[1] + accels[2]*accels[2]);
-		accel_err[0] /= accel_mag;
-		accel_err[1] /= accel_mag;
-		accel_err[2] /= accel_mag;
-
-		// Accumulate integral of error.  Scale here so that units are (deg/s) but Ki has units of s
-		gyro_correct_int[0] += accel_err[0] * accelKi;
-		gyro_correct_int[1] += accel_err[1] * accelKi;
-			
-		//gyro_correct_int[2] += accel_err[2] * settings.AccelKI * dT;
-
-		// Correct rates based on error, integral component dealt with in updateSensors
-		gyro[0] += accel_err[0] * accelKp / dT;
-		gyro[1] += accel_err[1] * accelKp / dT;
-		gyro[2] += accel_err[2] * accelKp / dT;
-	}
-
-	{ // scoping variables to save memory
-		// Work out time derivative from INSAlgo writeup
-		// Also accounts for the fact that gyros are in deg/s
-		float qdot[4];
-		qdot[0] = (-q[1] * gyro[0] - q[2] * gyro[1] - q[3] * gyro[2]) * dT * M_PI / 180 / 2;
-		qdot[1] = (q[0] * gyro[0] - q[3] * gyro[1] + q[2] * gyro[2]) * dT * M_PI / 180 / 2;
-		qdot[2] = (q[3] * gyro[0] + q[0] * gyro[1] - q[1] * gyro[2]) * dT * M_PI / 180 / 2;
-		qdot[3] = (-q[2] * gyro[0] + q[1] * gyro[1] + q[0] * gyro[2]) * dT * M_PI / 180 / 2;
-
-		// Take a time step
-		q[0] = q[0] + qdot[0];
-		q[1] = q[1] + qdot[1];
-		q[2] = q[2] + qdot[2];
-		q[3] = q[3] + qdot[3];
+	// Account for accel magnitude
+	accel_mag = accels[0]*accels[0] + accels[1]*accels[1] + accels[2]*accels[2];
+	accel_mag = sqrtf(accel_mag);
+	accel_err[0] /= accel_mag;
+	accel_err[1] /= accel_mag;
+	accel_err[2] /= accel_mag;	
+	
+	// Accumulate integral of error.  Scale here so that units are (deg/s) but Ki has units of s
+	gyro_correct_int[0] += accel_err[0] * accelKi;
+	gyro_correct_int[1] += accel_err[1] * accelKi;
 		
-		if(q[0] < 0) {
-			q[0] = -q[0];
-			q[1] = -q[1];
-			q[2] = -q[2];
-			q[3] = -q[3];
-		}
-	}
+	// Correct rates based on error, integral component dealt with in updateSensors
+	gyro[0] += accel_err[0] * accelKp / dT;
+	gyro[1] += accel_err[1] * accelKp / dT;
+	gyro[2] += accel_err[2] * accelKp / dT;
 
+	// Work out time derivative from INSAlgo writeup
+	// Also accounts for the fact that gyros are in deg/s
+	float qdot[4];
+	qdot[0] = (-q[1] * gyro[0] - q[2] * gyro[1] - q[3] * gyro[2]) * dT * F_PI / 180 / 2;
+	qdot[1] = (q[0] * gyro[0] - q[3] * gyro[1] + q[2] * gyro[2]) * dT * F_PI / 180 / 2;
+	qdot[2] = (q[3] * gyro[0] + q[0] * gyro[1] - q[1] * gyro[2]) * dT * F_PI / 180 / 2;
+	qdot[3] = (-q[2] * gyro[0] + q[1] * gyro[1] + q[0] * gyro[2]) * dT * F_PI / 180 / 2;
+	
+	// Take a time step
+	q[0] = q[0] + qdot[0];
+	q[1] = q[1] + qdot[1];
+	q[2] = q[2] + qdot[2];
+	q[3] = q[3] + qdot[3];
+	
+	if(q[0] < 0) {
+		q[0] = -q[0];
+		q[1] = -q[1];
+		q[2] = -q[2];
+		q[3] = -q[3];
+	}
+	
 	// Renomalize
-	float qmag = sqrt(q[0]*q[0] + q[1]*q[1] + q[2]*q[2] + q[3]*q[3]);
+	qmag = sqrtf(q[0]*q[0] + q[1]*q[1] + q[2]*q[2] + q[3]*q[3]);
 	q[0] = q[0] / qmag;
 	q[1] = q[1] / qmag;
 	q[2] = q[2] / qmag;
@@ -407,15 +412,12 @@ static void updateAttitude(AttitudeRawData * attitudeRaw)
 
 	// If quaternion has become inappropriately short or is nan reinit.
 	// THIS SHOULD NEVER ACTUALLY HAPPEN
-	if((fabs(qmag) < 1e-3) || (qmag != qmag)) {
+	if((fabs(qmag) < 1.0e-3f) || (qmag != qmag)) {
 		q[0] = 1;
 		q[1] = 0;
 		q[2] = 0;
 		q[3] = 0;
 	}
-
-	AttitudeActualData attitudeActual;
-	AttitudeActualGet(&attitudeActual);
 
 	quat_copy(q, &attitudeActual.q1);
 

@@ -33,7 +33,7 @@
 
 #define F_PI 3.14159265358979323846f
 #define RAD2DEG (180.0f/ F_PI)
-#define DEG2RAD (F_P I /180.0f)
+#define DEG2RAD (F_PI /180.0f)
 
 // ****** convert Lat,Lon,Alt to ECEF  ************
 void LLA2ECEF(double LLA[3], double ECEF[3])

@@ -341,6 +341,7 @@ void PIOS_MPU6050_IRQHandler(void)
 	PIOS_MPU6050_Read_Callback(PIOS_MPU6050_FIFO_REG, mpu6050_read_buffer, sizeof(mpu6050_read_buffer), MPU6050_callback);
 }
 
+#if defined(PIOS_INCLUDE_MPU6050)
 /**
  * The physical IRQ handler
  * Soon this will be generic in pios_exti and the BMA180 will register
@@ -354,6 +355,7 @@ void EXTI1_IRQHandler(void)
 		EXTI_ClearITPendingBit(EXTI_Line1);
 	}
 }
+#endif
 
 #endif
 

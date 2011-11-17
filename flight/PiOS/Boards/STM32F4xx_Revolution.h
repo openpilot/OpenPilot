@@ -109,10 +109,8 @@ TIM8  |           |           |           |
 // See also pios_board.c
 //------------------------
 #define PIOS_I2C_MAX_DEVS			3
-extern uint32_t pios_i2c_pres_mag_adapter_id;
-#define PIOS_I2C_MAIN_ADAPTER			(pios_i2c_pres_mag_adapter_id)
-extern uint32_t pios_i2c_gyro_adapter_id;
-#define PIOS_I2C_GYRO_ADAPTER			(pios_i2c_gyro_adapter_id)
+extern uint32_t pios_i2c_mag_adapter_id;
+#define PIOS_I2C_MAIN_ADAPTER			(pios_i2c_mag_adapter_id)
 
 //-------------------------
 // PIOS_USART

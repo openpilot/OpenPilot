@@ -77,6 +77,8 @@
 		652C856A132B6EA600BFCC70 /* sonaraltitude.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = sonaraltitude.xml; sourceTree = "<group>"; };
 		65322D3B122841F60046CD7C /* gpstime.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = gpstime.xml; sourceTree = "<group>"; };
 		65345C871288668B00A5E4E8 /* guidancesettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = guidancesettings.xml; sourceTree = "<group>"; };
+		6534B5571474F78B003DF47C /* pios_mpu6000.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_mpu6000.h; sourceTree = "<group>"; };
+		6534B5581474F7B1003DF47C /* pios_mpu6000.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_mpu6000.c; sourceTree = "<group>"; };
 		6536D47B1307962C0042A298 /* stabilizationdesired.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = stabilizationdesired.xml; sourceTree = "<group>"; };
 		6536D4881307AB950042A298 /* UAVObjects.inc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.pascal; path = UAVObjects.inc; sourceTree = "<group>"; };
 		65408AA812BB1648004DACC5 /* i2cstats.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = i2cstats.xml; sourceTree = "<group>"; };
@@ -3874,6 +3876,7 @@
 				65904ECF14613B6100FD9482 /* pios_imu3000.c */,
 				65904ED014613B6100FD9482 /* pios_irq.c */,
 				65904ED114613B6100FD9482 /* pios_led.c */,
+				6534B5581474F7B1003DF47C /* pios_mpu6000.c */,
 				65FA9B7A14709E700019A260 /* pios_mpu6050.c */,
 				65904ED214613B6100FD9482 /* pios_ppm.c */,
 				65904ED314613B6100FD9482 /* pios_servo.c */,
@@ -8533,6 +8536,7 @@
 				65FA9B8014709E9E0019A260 /* pios_initcall.h */,
 				65E8F04411EFF25C00BBF654 /* pios_irq.h */,
 				65E8F04511EFF25C00BBF654 /* pios_led.h */,
+				6534B5571474F78B003DF47C /* pios_mpu6000.h */,
 				65FA9B8114709E9E0019A260 /* pios_mpu6050.h */,
 				65E8F04611EFF25C00BBF654 /* pios_opahrs.h */,
 				65E8F04711EFF25C00BBF654 /* pios_opahrs_proto.h */,

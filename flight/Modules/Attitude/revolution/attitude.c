@@ -141,7 +141,7 @@ MODULE_INITCALL(AttitudeInitialize, AttitudeStart)
 int32_t accel_test;
 int32_t gyro_test;
 int32_t mag_test;
-int32_t pressure_test;
+//int32_t pressure_test;
 
 /**
  * Module thread, should not return.
@@ -155,12 +155,12 @@ static void AttitudeTask(void *parameters)
 	settingsUpdatedCb(AttitudeSettingsHandle());
 
 	accel_test = PIOS_BMA180_Test();
-	gyro_test = PIOS_MPU6050_Test();
+	gyro_test = PIOS_MPU6000_Test();
 	mag_test = PIOS_HMC5883_Test();
-	pressure_test = PIOS_BMP085_Test();
+//	pressure_test = PIOS_BMP085_Test();
 
 	// Kick of pressure conversions
-	PIOS_BMP085_StartADC(TemperatureConv);
+//	PIOS_BMP085_StartADC(TemperatureConv);
 	
 	// Main task loop
 	while (1) {
@@ -209,7 +209,7 @@ static void AttitudeTask(void *parameters)
 uint32_t accel_samples;
 uint32_t gyro_samples;
 struct pios_bma180_data accel;
-struct pios_mpu6050_data gyro;
+struct pios_mpu6000_data gyro;
 AttitudeRawData raw;
 int32_t accel_accum[3] = {0, 0, 0};
 int32_t gyro_accum[3] = {0,0,0};
@@ -256,7 +256,7 @@ static int8_t updateSensors(AttitudeRawData * attitudeRaw)
 	
 	// Make sure we get one sample
 	count = 0;
-	while((read_good = PIOS_MPU6050_ReadFifo(&gyro)) != 0);
+	while((read_good = PIOS_MPU6000_ReadFifo(&gyro)) != 0);
 	while(read_good == 0) {
 		count++;
 		
@@ -264,11 +264,11 @@ static int8_t updateSensors(AttitudeRawData * attitudeRaw)
 		gyro_accum[1] += gyro.gyro_y;
 		gyro_accum[2] += gyro.gyro_z;
 		
-		read_good = PIOS_MPU6050_ReadFifo(&gyro);
+		read_good = PIOS_MPU6000_ReadFifo(&gyro);
 	}
 	gyro_samples = count;	
 	
-	scaling = PIOS_MPU6050_GetScale() / gyro_samples;
+	scaling = PIOS_MPU6000_GetScale() / gyro_samples;
 	attitudeRaw->gyros[ATTITUDERAW_GYROS_X] = -((float) gyro_accum[1]) * scaling;
 	attitudeRaw->gyros[ATTITUDERAW_GYROS_Y] = -((float) gyro_accum[0]) * scaling;
 	attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] = -((float) gyro_accum[2]) * scaling;
@@ -300,7 +300,7 @@ static int8_t updateSensors(AttitudeRawData * attitudeRaw)
 	}
 
 	AttitudeRawSet(&raw);
-	
+	/*
 	int32_t retval = PIOS_BMP085_ReadADC();
 	if (retval == 0) { // Conversion completed 
 		static uint32_t baro_conversions;
@@ -322,7 +322,7 @@ static int8_t updateSensors(AttitudeRawData * attitudeRaw)
 			BaroAltitudeSet(&data);
 
 		}
-	}
+	}*/
 	
 	return 0;
 }

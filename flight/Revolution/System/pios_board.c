@@ -175,7 +175,7 @@ static const struct pios_spi_cfg pios_spi_gyro_cfg = {
 		.SPI_CRCPolynomial     = 7,
 		.SPI_CPOL              = SPI_CPOL_High,
 		.SPI_CPHA              = SPI_CPHA_2Edge,
-//		.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_4,
+		.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_2,
 	},
 	.use_crc = false,
 	.dma = {

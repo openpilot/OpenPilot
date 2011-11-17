@@ -43,7 +43,7 @@
 
 #include <pios_spi_priv.h>
 
-#define SPI_MAX_BLOCK_PIO	64
+#define SPI_MAX_BLOCK_PIO	128
 
 static bool PIOS_SPI_validate(struct pios_spi_dev * com_dev)
 {

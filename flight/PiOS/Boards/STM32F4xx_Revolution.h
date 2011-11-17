@@ -77,12 +77,12 @@ TIM8  |           |           |           |
 //------------------------
 // PIOS_LED
 //------------------------
-#define PIOS_LED_LED1_GPIO_PORT                 GPIOA
-#define PIOS_LED_LED1_GPIO_PIN                  GPIO_Pin_3
-#define PIOS_LED_LED1_GPIO_CLK                  RCC_APB2Periph_GPIOA
-#define PIOS_LED_LED2_GPIO_PORT                 GPIOA
-#define PIOS_LED_LED2_GPIO_PIN                  GPIO_Pin_2
-#define PIOS_LED_LED2_GPIO_CLK                  RCC_APB2Periph_GPIOA
+#define PIOS_LED_LED1_GPIO_PORT                 GPIOE
+#define PIOS_LED_LED1_GPIO_PIN                  GPIO_Pin_2
+#define PIOS_LED_LED1_GPIO_CLK                  RCC_APB2Periph_GPIOE
+#define PIOS_LED_LED2_GPIO_PORT                 GPIOE
+#define PIOS_LED_LED2_GPIO_PIN                  GPIO_Pin_3
+#define PIOS_LED_LED2_GPIO_CLK                  RCC_APB2Periph_GPIOE
 #define PIOS_LED_NUM                            2
 #define PIOS_LED_PORTS                          { PIOS_LED_LED1_GPIO_PORT, PIOS_LED_LED2_GPIO_PORT }
 #define PIOS_LED_PINS                           { PIOS_LED_LED1_GPIO_PIN, PIOS_LED_LED2_GPIO_PIN }

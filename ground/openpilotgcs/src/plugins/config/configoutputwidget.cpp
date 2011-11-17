@@ -1,13 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       configservowidget.cpp
+ * @file       configoutputwidget.cpp
  * @author     E. Lafargue & The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup ConfigPlugin Config Plugin
  * @{
- * @brief Servo input/output configuration panel for the config gadget
+ * @brief Servo output configuration panel for the config gadget
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -40,6 +40,7 @@
 #include <QDesktopServices>
 #include <QUrl>
 #include "actuatorcommand.h"
+#include "actuatorsettings.h"
 #include "systemalarms.h"
 #include "uavsettingsimportexport/uavsettingsimportexportfactory.h"
 
@@ -192,14 +193,17 @@ void ConfigOutputWidget::assignOutputChannel(UAVDataObject *obj, QString str)
   */
 void ConfigOutputWidget::setSpinningArmed(bool val)
 {
-    UAVDataObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorSettings")));
-    if (!obj) return;
-    UAVObjectField *field = obj->getField("MotorsSpinWhileArmed");
-    if (!field) return;
+    ActuatorSettings *actuatorSettings = ActuatorSettings::GetInstance(getObjectManager());
+    Q_ASSERT(actuatorSettings);
+    ActuatorSettings::DataFields actuatorSettingsData = actuatorSettings->getData();
+
     if(val)
-        field->setValue("TRUE");
+        actuatorSettingsData.MotorsSpinWhileArmed = ActuatorSettings::MOTORSSPINWHILEARMED_TRUE;
     else
-        field->setValue("FALSE");
+        actuatorSettingsData.MotorsSpinWhileArmed = ActuatorSettings::MOTORSSPINWHILEARMED_FALSE;
+
+    // Apply settings
+    actuatorSettings->setData(actuatorSettingsData);
 }
 
 /**
@@ -214,12 +218,11 @@ void ConfigOutputWidget::sendChannelTest(int index, int value)
     if(index < 0 || (unsigned)index >= ActuatorCommand::CHANNEL_NUMELEM)
         return;
 
-    UAVDataObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorCommand")));
-    if (!obj) return;
-    UAVObjectField *channel = obj->getField("Channel");
-    if (!channel) return;
-    channel->setValue(value, index);
-    obj->updated();
+    ActuatorCommand *actuatorCommand = ActuatorCommand::GetInstance(getObjectManager());
+    Q_ASSERT(actuatorCommand);
+    ActuatorCommand::DataFields actuatorCommandFields = actuatorCommand->getData();
+    actuatorCommandFields.Channel[index] = value;
+    actuatorCommand->setData(actuatorCommandFields);
 }
 
 
@@ -234,8 +237,6 @@ void ConfigOutputWidget::sendChannelTest(int index, int value)
 void ConfigOutputWidget::refreshWidgetsValues()
 {
     bool dirty=isDirty();
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
     // Reset all channel assignements:
     QList<OutputChannelForm*> outputChannelForms = findChildren<OutputChannelForm*>();
@@ -244,7 +245,13 @@ void ConfigOutputWidget::refreshWidgetsValues()
         outputChannelForm->setAssignment("-");
     }
 
-    // Get the channel assignements:
+    // FIXME: Use static accessor method for retrieving channel assignments
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    Q_ASSERT(pm);
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    Q_ASSERT(objManager);
+
+   // Get the channel assignements:
     UAVDataObject * obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorSettings")));
     Q_ASSERT(obj);
     QList<UAVObjectField*> fieldList = obj->getFields();
@@ -254,15 +261,17 @@ void ConfigOutputWidget::refreshWidgetsValues()
         }
     }
 
+    ActuatorSettings *actuatorSettings = ActuatorSettings::GetInstance(getObjectManager());
+    Q_ASSERT(actuatorSettings);
+    ActuatorSettings::DataFields actuatorSettingsData = actuatorSettings->getData();
+
     // Get the SpinWhileArmed setting
-    UAVObjectField *field = obj->getField(QString("MotorsSpinWhileArmed"));
-    m_config->spinningArmed->setChecked(field->getValue().toString().contains("TRUE"));
+    m_config->spinningArmed->setChecked(actuatorSettingsData.MotorsSpinWhileArmed == ActuatorSettings::MOTORSSPINWHILEARMED_TRUE);
 
     // Get Output rates for both banks
-    field = obj->getField(QString("ChannelUpdateFreq"));
+    m_config->outputRate1->setValue(actuatorSettingsData.ChannelUpdateFreq[0]);
+    m_config->outputRate2->setValue(actuatorSettingsData.ChannelUpdateFreq[1]);
     UAVObjectUtilManager* utilMngr = pm->getObject<UAVObjectUtilManager>();
-    m_config->outputRate1->setValue(field->getValue(0).toInt());
-    m_config->outputRate2->setValue(field->getValue(1).toInt());
     if (utilMngr) {
         int board = utilMngr->getBoardModel();
         if ((board & 0xff00) == 1024) {
@@ -275,8 +284,8 @@ void ConfigOutputWidget::refreshWidgetsValues()
             m_config->outputRate2->setEnabled(true);
             m_config->outputRate3->setEnabled(true);
             m_config->outputRate4->setEnabled(true);
-            m_config->outputRate3->setValue(field->getValue(2).toInt());
-            m_config->outputRate4->setValue(field->getValue(3).toInt());
+            m_config->outputRate3->setValue(actuatorSettingsData.ChannelUpdateFreq[2]);
+            m_config->outputRate4->setValue(actuatorSettingsData.ChannelUpdateFreq[3]);
         } else if ((board & 0xff00) == 256 ) {
             // Mainboard family
             m_config->outputRate1->setEnabled(true);
@@ -295,15 +304,12 @@ void ConfigOutputWidget::refreshWidgetsValues()
     // Get Channel ranges:
     foreach(OutputChannelForm *outputChannelForm, outputChannelForms)
     {
-        field = obj->getField(QString("ChannelMin"));
-        int minValue = field->getValue(outputChannelForm->index()).toInt();
-        field = obj->getField(QString("ChannelMax"));
-        int maxValue = field->getValue(outputChannelForm->index()).toInt();
+        int minValue = actuatorSettingsData.ChannelMin[outputChannelForm->index()];
+        int maxValue = actuatorSettingsData.ChannelMax[outputChannelForm->index()];
         outputChannelForm->minmax(minValue, maxValue);
 
-        field = obj->getField(QString("ChannelNeutral"));
-        int value = field->getValue(outputChannelForm->index()).toInt();
-        outputChannelForm->neutral(value);
+        int neutral = actuatorSettingsData.ChannelNeutral[outputChannelForm->index()];
+        outputChannelForm->neutral(neutral);
     }
 
     setDirty(dirty);
@@ -314,35 +320,27 @@ void ConfigOutputWidget::refreshWidgetsValues()
   */
 void ConfigOutputWidget::updateObjectsFromWidgets()
 {
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorSettings")));
-    Q_ASSERT(obj);
+    ActuatorSettings *actuatorSettings = ActuatorSettings::GetInstance(getObjectManager());
+    Q_ASSERT(actuatorSettings);
+    ActuatorSettings::DataFields actuatorSettingsData = actuatorSettings->getData();
 
-    // Now send channel ranges:
-    UAVObjectField * field;
+    // Set channel ranges
     QList<OutputChannelForm*> outputChannelForms = findChildren<OutputChannelForm*>();
     foreach(OutputChannelForm *outputChannelForm, outputChannelForms)
     {
-        field = obj->getField(QString("ChannelMax"));
-        Q_ASSERT(field);
-        field->setValue(outputChannelForm->max(), outputChannelForm->index());
-
-        field = obj->getField(QString("ChannelMin"));
-        Q_ASSERT(field);
-        field->setValue(outputChannelForm->min(), outputChannelForm->index());
-
-        field = obj->getField(QString("ChannelNeutral"));
-        Q_ASSERT(field);
-        field->setValue(outputChannelForm->neutral(), outputChannelForm->index());
+        actuatorSettingsData.ChannelMax[outputChannelForm->index()] = outputChannelForm->max();
+        actuatorSettingsData.ChannelMin[outputChannelForm->index()] = outputChannelForm->min();
+        actuatorSettingsData.ChannelNeutral[outputChannelForm->index()] = outputChannelForm->neutral();
     }
 
-    field = obj->getField(QString("ChannelUpdateFreq"));
-    Q_ASSERT(field);
-    field->setValue(m_config->outputRate1->value(),0);
-    field->setValue(m_config->outputRate2->value(),1);
-    field->setValue(m_config->outputRate3->value(),2);
-    field->setValue(m_config->outputRate4->value(),3);
+    // Set update rates
+    actuatorSettingsData.ChannelUpdateFreq[0] = m_config->outputRate1->value();
+    actuatorSettingsData.ChannelUpdateFreq[1] = m_config->outputRate2->value();
+    actuatorSettingsData.ChannelUpdateFreq[2] = m_config->outputRate3->value();
+    actuatorSettingsData.ChannelUpdateFreq[3] = m_config->outputRate4->value();
+
+    // Apply settings
+    actuatorSettings->setData(actuatorSettingsData);
 }
 
 void ConfigOutputWidget::openHelp()

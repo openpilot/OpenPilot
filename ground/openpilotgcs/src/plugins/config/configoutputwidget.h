@@ -1,13 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       configservowidget.h
+ * @file       configoutputwidget.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup ConfigPlugin Config Plugin
  * @{
- * @brief Servo input/output configuration panel for the config gadget
+ * @brief Servo output configuration panel for the config gadget
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -72,8 +72,6 @@ private slots:
         void updateObjectsFromWidgets();
 	void runChannelTests(bool state);
         void sendChannelTest(int index, int value);
-        void setChOutRange();
-        void reverseChannel(bool state);
         void setSpinningArmed(bool val);
         void openHelp();
 };

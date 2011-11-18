@@ -29,6 +29,7 @@
 #include <openpilot.h>
 #include <uavobjectsinit.h>
 
+#include "hwsettings.h"
 #include "attituderaw.h"
 #include "attitudeactual.h"
 #include "positionactual.h"
@@ -216,6 +217,7 @@ void PIOS_Board_Init(void) {
 	AttitudeActualInitialize();
 	VelocityActualInitialize();
 	PositionActualInitialize();
+	HwSettingsInitialize();
 
 }
 

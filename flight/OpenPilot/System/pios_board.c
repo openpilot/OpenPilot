@@ -31,7 +31,7 @@
 #include <openpilot.h>
 #include <uavobjectsinit.h>
 #include <hwsettings.h>
-#include "manualcontrolsettings.h"
+#include <manualcontrolsettings.h>
 
 //#define I2C_DEBUG_PIN			0
 //#define USART_GPS_DEBUG_PIN		1

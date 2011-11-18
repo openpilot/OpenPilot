@@ -248,8 +248,8 @@ static int8_t updateSensors(AttitudeRawData * attitudeRaw)
 
 	// Not the swaping of channel orders
 	scaling = PIOS_BMA180_GetScale() / accel_samples;
-	attitudeRaw->accels[ATTITUDERAW_ACCELS_X] = accel_accum[0] * scaling;
-	attitudeRaw->accels[ATTITUDERAW_ACCELS_Y] = -accel_accum[1] * scaling;
+	attitudeRaw->accels[ATTITUDERAW_ACCELS_X] = accel_accum[1] * scaling;
+	attitudeRaw->accels[ATTITUDERAW_ACCELS_Y] = accel_accum[0] * scaling;
 	attitudeRaw->accels[ATTITUDERAW_ACCELS_Z] = -accel_accum[2] * scaling;
 
 
@@ -269,8 +269,8 @@ static int8_t updateSensors(AttitudeRawData * attitudeRaw)
 	gyro_samples = count;	
 	
 	scaling = PIOS_MPU6000_GetScale() / gyro_samples;
-	attitudeRaw->gyros[ATTITUDERAW_GYROS_X] = -((float) gyro_accum[1]) * scaling;
-	attitudeRaw->gyros[ATTITUDERAW_GYROS_Y] = -((float) gyro_accum[0]) * scaling;
+	attitudeRaw->gyros[ATTITUDERAW_GYROS_X] = ((float) gyro_accum[1]) * scaling;
+	attitudeRaw->gyros[ATTITUDERAW_GYROS_Y] = ((float) gyro_accum[0]) * scaling;
 	attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] = -((float) gyro_accum[2]) * scaling;
 	
 	// From data sheet 35 deg C corresponds to -13200, and 280 LSB per C

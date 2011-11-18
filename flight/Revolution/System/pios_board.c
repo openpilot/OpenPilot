@@ -910,6 +910,7 @@ void PIOS_Board_Init(void) {
 	PIOS_BMA180_Attach(pios_spi_accel_id);
 	PIOS_BMA180_Init(&pios_bma180_cfg);
 	
+	
 /*
 	test_val = PIOS_HMC5883_Test();
 	 */

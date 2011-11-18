@@ -208,17 +208,9 @@ int32_t PIOS_MPU6000_ReadGyros(struct pios_mpu6000_data * data)
 	
 	if(PIOS_MPU6000_ClaimBus() != 0)
 		return -1;
-/*
+
 	if(PIOS_SPI_TransferBlock(pios_spi_gyro, &buf[0], &rec[0], sizeof(buf), NULL) < 0)
 		return -2;
-*/
-	PIOS_SPI_TransferByte(pios_spi_gyro,(0x80 | PIOS_MPU6000_GYRO_X_OUT_MSB) ); // request byte
-	rec[1] = PIOS_SPI_TransferByte(pios_spi_gyro,0 );     // receive response
-	rec[2] = PIOS_SPI_TransferByte(pios_spi_gyro,0 );     // receive response
-	rec[3] = PIOS_SPI_TransferByte(pios_spi_gyro,0 );     // receive response
-	rec[4] = PIOS_SPI_TransferByte(pios_spi_gyro,0 );     // receive response
-	rec[5] = PIOS_SPI_TransferByte(pios_spi_gyro,0 );     // receive response
-	rec[6] = PIOS_SPI_TransferByte(pios_spi_gyro,0 );     // receive response
 		
 	PIOS_MPU6000_ReleaseBus();
 	
@@ -296,12 +288,10 @@ uint8_t PIOS_MPU6000_Test(void)
 /**
 * @brief IRQ Handler.  Read all the data from onboard buffer
 */
-#define MPU6000_MAX_BLOCK_READ 12
 uint32_t mpu6000_irq = 0;
 uint32_t mpu6000_count;
 uint32_t mpu6000_fifo_full = 0;
-uint8_t mpu6000_send_buf[1+MPU6000_MAX_BLOCK_READ * sizeof(struct pios_mpu6000_data)];
-uint8_t mpu6000_rec_buf[1+MPU6000_MAX_BLOCK_READ * sizeof(struct pios_mpu6000_data)];
+
 uint8_t mpu6000_last_read_count = 0;
 uint32_t mpu6000_fails = 0;
 
@@ -311,39 +301,20 @@ uint32_t mpu6000_transfer_size;
 
 void PIOS_MPU6000_IRQHandler(void)
 {
+	static uint32_t timeval;
+	mpu6000_interval_us = PIOS_DELAY_DiffuS(timeval);
+	timeval = PIOS_DELAY_GetRaw();
+
 	if(!mpu6000_configured)
 		return;
 
 	if(PIOS_MPU6000_ClaimBus() != 0)
 		return;		
 		
-	static uint32_t timeval;
-	mpu6000_interval_us = PIOS_DELAY_DiffuS(timeval);
-	timeval = PIOS_DELAY_GetRaw();
+	uint8_t mpu6000_send_buf[1+sizeof(struct pios_mpu6000_data)] = {PIOS_MPU6000_FIFO_REG | 0x80, 0, 0, 0, 0, 0, 0, 0, 0};
+	uint8_t mpu6000_rec_buf[1+sizeof(struct pios_mpu6000_data)];
 	
-	// Get number of bytes in the fifo
-	mpu6000_send_buf[0] = PIOS_MPU6000_FIFO_CNT_MSB | 0x80;
-	mpu6000_send_buf[1] = mpu6000_send_buf[2] = 0;
-	if(PIOS_SPI_TransferBlock(pios_spi_gyro, &mpu6000_send_buf[0], &mpu6000_rec_buf[0], 3, NULL) < 0) {
-		PIOS_MPU6000_ReleaseBus();
-		return;
-	}
-	
-	mpu6000_count = (mpu6000_rec_buf[1] << 8 | mpu6000_rec_buf[2]) / sizeof(struct pios_mpu6000_data);
-	mpu6000_last_read_count = mpu6000_count > MPU6000_MAX_BLOCK_READ ? MPU6000_MAX_BLOCK_READ : mpu6000_count;
-	
-	if (mpu6000_count == 0) {
-		PIOS_MPU6000_ReleaseBus();
-		return;		
-	}
-	
-	mpu6000_last_read_count = 1;
-	
-	mpu6000_send_buf[0] = PIOS_MPU6000_FIFO_REG | 0x80;
-	for(uint32_t i = 1; i < (1 + mpu6000_last_read_count * sizeof(struct pios_mpu6000_data)); i++)
-		mpu6000_send_buf[i] = 0;
-	mpu6000_transfer_size = 1+mpu6000_last_read_count * sizeof(struct pios_mpu6000_data);
-	if(PIOS_SPI_TransferBlock(pios_spi_gyro, &mpu6000_send_buf[0], &mpu6000_rec_buf[0], mpu6000_transfer_size, NULL) < 0) {
+	if(PIOS_SPI_TransferBlock(pios_spi_gyro, &mpu6000_send_buf[0], &mpu6000_rec_buf[0], sizeof(mpu6000_send_buf), NULL) < 0) {
 		PIOS_MPU6000_ReleaseBus();
 		mpu6000_fails++;
 		return;
@@ -351,23 +322,19 @@ void PIOS_MPU6000_IRQHandler(void)
 
 	PIOS_MPU6000_ReleaseBus();
 	
-	for(int32_t i = 0; i < mpu6000_last_read_count; i++) {
-		
-		struct pios_mpu6000_data data;
-		
-		if(fifoBuf_getFree(&pios_mpu6000_fifo) < sizeof(data)) {
-			mpu6000_fifo_full++;
-			return;			
-		}
-		
-		uint32_t start = 1 + i * sizeof(struct pios_mpu6000_data);
-		data.temperature = mpu6000_rec_buf[start] << 8 | mpu6000_rec_buf[start+1];
-		data.gyro_x = mpu6000_rec_buf[start+2] << 8 | mpu6000_rec_buf[start+3];
-		data.gyro_y = mpu6000_rec_buf[start+4] << 8 | mpu6000_rec_buf[start+5];
-		data.gyro_z = mpu6000_rec_buf[start+6] << 8 | mpu6000_rec_buf[start+7];
-		
-		fifoBuf_putData(&pios_mpu6000_fifo, (uint8_t *) &data, sizeof(data));	
+	struct pios_mpu6000_data data;
+	
+	if(fifoBuf_getFree(&pios_mpu6000_fifo) < sizeof(data)) {
+		mpu6000_fifo_full++;
+		return;			
 	}
+	
+	data.temperature = mpu6000_rec_buf[1] << 8 | mpu6000_rec_buf[2];
+	data.gyro_x = mpu6000_rec_buf[3] << 8 | mpu6000_rec_buf[4];
+	data.gyro_y = mpu6000_rec_buf[5] << 8 | mpu6000_rec_buf[6];
+	data.gyro_z = mpu6000_rec_buf[7] << 8 | mpu6000_rec_buf[8];
+	
+	fifoBuf_putData(&pios_mpu6000_fifo, (uint8_t *) &data, sizeof(data));	
 	mpu6000_irq++;
 	
 	mpu6000_time_us = PIOS_DELAY_DiffuS(timeval);

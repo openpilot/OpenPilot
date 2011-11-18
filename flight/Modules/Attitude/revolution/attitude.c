@@ -274,10 +274,10 @@ static int8_t updateSensors(AttitudeRawData * attitudeRaw)
 	attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] = -((float) gyro_accum[2]) * scaling;
 	
 	// From data sheet 35 deg C corresponds to -13200, and 280 LSB per C
-	attitudeRaw->temperature[ATTITUDERAW_TEMPERATURE_GYRO] = gyro.temperature = 35.0f + ((float) gyro.temperature + 13200) / 280;
+	attitudeRaw->temperature[ATTITUDERAW_TEMPERATURE_GYRO] = 35.0f + ((float) gyro.temperature + 512.0f) / 340.0f;
 	
 	// From the data sheet 25 deg C corresponds to 2 and 2 LSB per C
-	attitudeRaw->temperature[ATTITUDERAW_TEMPERATURE_ACCEL] = 25.0f + ((float) accel.temperature - 2) / 2;
+	attitudeRaw->temperature[ATTITUDERAW_TEMPERATURE_ACCEL] = 25.0f + ((float) accel.temperature - 2.0f) / 2.0f;
 	
 	if(bias_correct_gyro) {
 		// Applying integral component here so it can be seen on the gyros and correct bias

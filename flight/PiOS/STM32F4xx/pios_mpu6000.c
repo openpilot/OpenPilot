@@ -286,10 +286,33 @@ uint8_t PIOS_MPU6000_Test(void)
 }
 
 /**
+ * @brief Run self-test operation.
+ * \return 0 if test succeeded
+ * \return non-zero value if test succeeded
+ */
+static int32_t PIOS_MPU6000_FifoDepth(void)
+{
+	uint8_t mpu6000_send_buf[3] = {PIOS_MPU6000_FIFO_CNT_MSB | 0x80, 0, 0};
+	uint8_t mpu6000_rec_buf[3];
+
+	if(PIOS_MPU6000_ClaimBus() != 0)
+		return -1;
+
+	if(PIOS_SPI_TransferBlock(pios_spi_gyro, &mpu6000_send_buf[0], &mpu6000_rec_buf[0], sizeof(mpu6000_send_buf), NULL) < 0) {
+		PIOS_MPU6000_ReleaseBus();
+		return -1;
+	}
+
+	PIOS_MPU6000_ReleaseBus();
+	
+	return (mpu6000_rec_buf[1] << 8) | mpu6000_rec_buf[2];
+}
+
+/**
 * @brief IRQ Handler.  Read all the data from onboard buffer
 */
 uint32_t mpu6000_irq = 0;
-uint32_t mpu6000_count;
+int32_t mpu6000_count;
 uint32_t mpu6000_fifo_full = 0;
 
 uint8_t mpu6000_last_read_count = 0;
@@ -308,6 +331,10 @@ void PIOS_MPU6000_IRQHandler(void)
 	if(!mpu6000_configured)
 		return;
 
+	mpu6000_count = PIOS_MPU6000_FifoDepth();
+	if(mpu6000_count < sizeof(struct pios_mpu6000_data))
+		return;
+		
 	if(PIOS_MPU6000_ClaimBus() != 0)
 		return;		
 		

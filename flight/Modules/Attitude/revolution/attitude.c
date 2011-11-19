@@ -343,7 +343,6 @@ static void updateAttitude(AttitudeRawData * attitudeRaw)
 	dT = (thisSysTime == lastSysTime) ? 0.001 : (portMAX_DELAY & (thisSysTime - lastSysTime)) / portTICK_RATE_MS / 1000.0f;
 	lastSysTime = thisSysTime;
 
-	// Bad practice to assume structure order, but saves memory
 	float gyro[3];
 	gyro[0] = attitudeRaw->gyros[0];
 	gyro[1] = attitudeRaw->gyros[1];

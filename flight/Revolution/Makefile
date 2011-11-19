@@ -138,6 +138,8 @@ include $(PIOS)/STM32F4xx/library.mk
 SRC += $(PIOSCOMMON)/pios_crc.c
 SRC += $(PIOSCOMMON)/pios_com.c
 SRC += $(PIOSCOMMON)/pios_rcvr.c
+SRC += $(PIOSCOMMON)/pios_flash_w25x.c
+SRC += $(PIOSCOMMON)/pios_flashfs_objlist.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c
 
 #SRC += $(PIOSCOMMON)/pios_bl_helper.c

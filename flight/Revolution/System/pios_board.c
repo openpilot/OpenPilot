@@ -278,6 +278,127 @@ void PIOS_SPI_gyro_irq_handler(void)
 	PIOS_SPI_IRQ_Handler(pios_spi_gyro_id);
 }
 
+
+/* SPI3 Interface
+ *      - Used for gyro communications
+ */
+void PIOS_SPI_flash_irq_handler(void);
+void DMA1_Stream0_IRQHandler(void) __attribute__((alias("PIOS_SPI_flash_irq_handler")));
+void DMA1_Stream2_IRQHandler(void) __attribute__((alias("PIOS_SPI_flash_irq_handler")));
+static const struct pios_spi_cfg pios_spi_flash_cfg = {
+	.regs = SPI3,
+	.remap = GPIO_AF_SPI3,
+	.init = {
+		.SPI_Mode              = SPI_Mode_Master,
+		.SPI_Direction         = SPI_Direction_2Lines_FullDuplex,
+		.SPI_DataSize          = SPI_DataSize_8b,
+		.SPI_NSS               = SPI_NSS_Soft,
+		.SPI_FirstBit          = SPI_FirstBit_MSB,
+		.SPI_CRCPolynomial     = 7,
+		.SPI_CPOL              = SPI_CPOL_High,
+		.SPI_CPHA              = SPI_CPHA_2Edge,
+		.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_2,
+	},
+	.use_crc = false,
+	.dma = {
+		.irq = {
+			// Note this is the stream ID that triggers interrupts (in this case RX)
+			.flags = (DMA_IT_TCIF3 | DMA_IT_TEIF3 | DMA_IT_HTIF3),
+			.init = {
+				.NVIC_IRQChannel = DMA1_Stream0_IRQn,
+				.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+				.NVIC_IRQChannelSubPriority = 0,
+				.NVIC_IRQChannelCmd = ENABLE,
+			},
+		},
+		
+		.rx = {
+			.channel = DMA1_Stream0,
+			.init = {
+				.DMA_Channel            = DMA_Channel_0,
+				.DMA_PeripheralBaseAddr = (uint32_t) & (SPI3->DR),
+				.DMA_DIR                = DMA_DIR_PeripheralToMemory,
+				.DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
+				.DMA_MemoryInc          = DMA_MemoryInc_Enable,
+				.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte,
+				.DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte,
+				.DMA_Mode               = DMA_Mode_Normal,
+				.DMA_Priority           = DMA_Priority_Medium,
+				//TODO: Enable FIFO
+				.DMA_FIFOMode           = DMA_FIFOMode_Disable,
+                .DMA_FIFOThreshold      = DMA_FIFOThreshold_Full,
+                .DMA_MemoryBurst        = DMA_MemoryBurst_Single,
+                .DMA_PeripheralBurst    = DMA_PeripheralBurst_Single,
+			},
+		},
+		.tx = {
+			.channel = DMA1_Stream2,
+			.init = {
+				.DMA_Channel            = DMA_Channel_0,
+				.DMA_PeripheralBaseAddr = (uint32_t) & (SPI3->DR),
+				.DMA_DIR                = DMA_DIR_MemoryToPeripheral,
+				.DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
+				.DMA_MemoryInc          = DMA_MemoryInc_Enable,
+				.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte,
+				.DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte,
+				.DMA_Mode               = DMA_Mode_Normal,
+				.DMA_Priority           = DMA_Priority_Medium,
+				.DMA_FIFOMode           = DMA_FIFOMode_Disable,
+                .DMA_FIFOThreshold      = DMA_FIFOThreshold_Full,
+                .DMA_MemoryBurst        = DMA_MemoryBurst_Single,
+                .DMA_PeripheralBurst    = DMA_PeripheralBurst_Single,
+			},
+		},
+	},
+	.sclk = {
+		.gpio = GPIOC,
+		.init = {
+			.GPIO_Pin = GPIO_Pin_10,
+			.GPIO_Speed = GPIO_Speed_100MHz,
+			.GPIO_Mode = GPIO_Mode_AF,
+			.GPIO_OType = GPIO_OType_PP,
+			.GPIO_PuPd = GPIO_PuPd_NOPULL
+		},
+	},
+	.miso = {
+		.gpio = GPIOC,
+		.init = {
+			.GPIO_Pin = GPIO_Pin_11,
+			.GPIO_Speed = GPIO_Speed_50MHz,
+			.GPIO_Mode = GPIO_Mode_AF,
+			.GPIO_OType = GPIO_OType_PP,
+			.GPIO_PuPd = GPIO_PuPd_NOPULL
+		},
+	},
+	.mosi = {
+		.gpio = GPIOC,
+		.init = {
+			.GPIO_Pin = GPIO_Pin_12,
+			.GPIO_Speed = GPIO_Speed_50MHz,
+			.GPIO_Mode = GPIO_Mode_AF,
+			.GPIO_OType = GPIO_OType_PP,
+			.GPIO_PuPd = GPIO_PuPd_NOPULL
+		},
+	},
+	.slave_count = 1,
+	.ssel = { {
+		.gpio = GPIOD,
+		.init = {
+			.GPIO_Pin = GPIO_Pin_2,
+			.GPIO_Speed = GPIO_Speed_50MHz,
+			.GPIO_Mode  = GPIO_Mode_OUT,
+			.GPIO_OType = GPIO_OType_PP,
+			.GPIO_PuPd = GPIO_PuPd_UP
+		},
+	} },
+};
+
+uint32_t pios_spi_flash_id;
+void PIOS_SPI_flash_irq_handler(void)
+{
+	/* Call into the generic code to handle the IRQ for this specific device */
+	PIOS_SPI_IRQ_Handler(pios_spi_flash_id);
+}
 #endif /* PIOS_INCLUDE_SPI */
 
 
@@ -614,7 +735,7 @@ static const struct pios_i2c_adapter_cfg pios_i2c_pressure_adapter_cfg = {
 		.I2C_Ack                 = I2C_Ack_Enable,
 		.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit,
 		.I2C_DutyCycle           = I2C_DutyCycle_2,
-		.I2C_ClockSpeed          = 400000,	/* bits/s */
+		.I2C_ClockSpeed          = 40000,	/* bits/s */
 	},
 	.transfer_timeout_ms = 50,
 	.scl = {
@@ -640,7 +761,7 @@ static const struct pios_i2c_adapter_cfg pios_i2c_pressure_adapter_cfg = {
 	.event = {
 		.flags   = 0,		/* FIXME: check this */
 		.init = {
-			.NVIC_IRQChannel                   = I2C2_EV_IRQn,
+			.NVIC_IRQChannel                   = I2C3_EV_IRQn,
 			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGHEST,
 			.NVIC_IRQChannelSubPriority        = 0,
 			.NVIC_IRQChannelCmd                = ENABLE,
@@ -649,7 +770,7 @@ static const struct pios_i2c_adapter_cfg pios_i2c_pressure_adapter_cfg = {
 	.error = {
 		.flags   = 0,		/* FIXME: check this */
 		.init = {
-			.NVIC_IRQChannel                   = I2C2_ER_IRQn,
+			.NVIC_IRQChannel                   = I2C3_ER_IRQn,
 			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGHEST,
 			.NVIC_IRQChannelSubPriority        = 0,
 			.NVIC_IRQChannelCmd                = ENABLE,
@@ -809,8 +930,8 @@ static const struct pios_mpu6000_cfg pios_mpu6000_cfg = {
  * called from System/openpilot.c
  */
 int32_t test_val;
-uint8_t buf[2];
-uint8_t rec[2];
+uint8_t buf[4];
+uint8_t rec[4];
 struct pios_mpu6000_data test_gyro_data;
 void PIOS_Board_Init(void) {
 	/* Brings up System using CMSIS functions, enables the LEDs. */
@@ -822,6 +943,14 @@ void PIOS_Board_Init(void) {
 #ifdef PIOS_DEBUG_ENABLE_DEBUG_PINS
 	PIOS_DEBUG_Init(&pios_tim_servo_all_channels, NELEMENTS(pios_tim_servo_all_channels));
 #endif	/* PIOS_DEBUG_ENABLE_DEBUG_PINS */
+	
+	
+	/* Set up the SPI interface to the flash */
+	if (PIOS_SPI_Init(&pios_spi_flash_id, &pios_spi_flash_cfg)) {
+		PIOS_DEBUG_Assert(0);
+	}
+	PIOS_Flash_W25X_Init(pios_spi_flash_id);
+	PIOS_FLASHFS_Init();
 	
 	/* Initialize UAVObject libraries */
 	EventDispatcherInitialize();
@@ -902,24 +1031,73 @@ void PIOS_Board_Init(void) {
 	}
 
 
-	PIOS_HMC5883_Init(&pios_hmc5883_cfg);
-
 	PIOS_MPU6000_Attach(pios_spi_gyro_id);
 	PIOS_MPU6000_Init(&pios_mpu6000_cfg);
 
 	PIOS_BMA180_Attach(pios_spi_accel_id);
 	PIOS_BMA180_Init(&pios_bma180_cfg);
+
+	PIOS_HMC5883_Init(&pios_hmc5883_cfg);
+
+	uint8_t addr_buffer[] = {
+		0x1E,
+	};
+	uint8_t addr_buffer2[] = {
+		0x10,
+	};
+	
+	struct pios_i2c_txn txn_list1[] = {
+		{
+			.info = __func__,
+			.addr = 0x77,
+			.rw = PIOS_I2C_TXN_WRITE,
+			.len = sizeof(addr_buffer),
+			.buf = addr_buffer,
+		},
+	};
+	const struct pios_i2c_txn txn_list2[] = {
+		{
+			.info = __func__,
+			.addr = 0x77,
+			.rw = PIOS_I2C_TXN_WRITE,
+			.len = sizeof(addr_buffer),
+			.buf = addr_buffer2,
+		},
+		{
+			.info = __func__,
+			.addr = 0x77,
+			.rw = PIOS_I2C_TXN_READ,
+			.len = sizeof(rec),
+			.buf = rec,
+		},
+	};
+	
+	for(int i = 0; i < 0x80; i++) {
+		txn_list1[0].addr = i;
+		test_val = PIOS_I2C_Transfer(pios_i2c_pressure_adapter_id, txn_list1, NELEMENTS(txn_list1));
+		if(test_val == 0) {
+			rec[0] = i;
+			while(1) {
+				PIOS_LED_On(0);
+				PIOS_LED_On(1);
+				
+			}
+		}
+		PIOS_DELAY_WaituS(100);
+	}
 	
 	
-/*
-	test_val = PIOS_HMC5883_Test();
-	 */
-	 
-/*
-	PIOS_MPU6050_Init(&pios_mpu6050_cfg);
-	PIOS_BMP085_Init(&pios_bmp085_cfg);
-		*/
-//	test_val = PIOS_BMA180_Test();
+	
+		test_val = PIOS_I2C_Transfer(pios_i2c_pressure_adapter_id, txn_list1, NELEMENTS(txn_list1));
+		test_val += PIOS_I2C_Transfer(pios_i2c_pressure_adapter_id, txn_list2, NELEMENTS(txn_list2));
+		PIOS_DELAY_WaituS(100);
+	
+	if(test_val == 0)
+		return;
+		
+	while(1);
+
+	
 
 }
 

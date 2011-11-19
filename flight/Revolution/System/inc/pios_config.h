@@ -71,6 +71,10 @@
 
 #define PIOS_INCLUDE_COM_TELEM
 
+#define PIOS_INCLUDE_FLASH
+/* A really shitty setting saving implementation */
+#define PIOS_INCLUDE_FLASH_SECTOR_SETTINGS
+
 /* Defaults for Logging */
 #define LOG_FILENAME 			"PIOS.LOG"
 #define STARTUP_LOG_ENABLED		1

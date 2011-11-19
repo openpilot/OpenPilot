@@ -201,6 +201,12 @@ extern uint32_t pios_com_telem_usb_id;
 // None.
 //-------------------------
 
+//--------------------------
+// Flash chip
+//--------------------------
+#define PIOS_FLASH_ENABLE                       PIOS_SPI_RC_PinSet(PIOS_SPI_FLASH,0,0)
+#define PIOS_FLASH_DISABLE                      PIOS_SPI_RC_PinSet(PIOS_SPI_FLASH,0,1);
+
 
 
 

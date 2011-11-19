@@ -90,7 +90,9 @@ int8_t PIOS_Flash_W25X_Init(uint32_t spi_id)
 {
 	PIOS_SPI_FLASH = spi_id;
 
+#if defined(PIOS_FLASH_CS_PIN)
 	PIOS_GPIO_Enable(PIOS_FLASH_CS_PIN);
+#endif
 	device_type = PIOS_Flash_W25X_ReadID();
 	return 0;
 }

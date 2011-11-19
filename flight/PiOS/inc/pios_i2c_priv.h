@@ -94,6 +94,7 @@ struct pios_i2c_adapter {
 #endif
 
 	bool bus_error;
+	bool nack;
 
 	volatile enum i2c_adapter_state curr_state;
 	const struct pios_i2c_txn *first_txn;

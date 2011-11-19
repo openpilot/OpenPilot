@@ -592,6 +592,7 @@ static void go_w_last_txn_last(struct pios_i2c_adapter *i2c_adapter)
 
 static void go_nack(struct pios_i2c_adapter *i2c_adapter) 
 {
+	i2c_adapter->nack = true;
 	I2C_ITConfig(i2c_adapter->cfg->regs, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR, DISABLE);
 	I2C_AcknowledgeConfig(i2c_adapter->cfg->regs, DISABLE);
 	I2C_GenerateSTOP(i2c_adapter->cfg->regs, ENABLE);
@@ -994,6 +995,7 @@ int32_t PIOS_I2C_Transfer(uint32_t i2c_id, const struct pios_i2c_txn txn_list[],
 
 	i2c_adapter->callback = NULL;
 	i2c_adapter->bus_error = false;
+	i2c_adapter->nack = false;
 	i2c_adapter_inject_event(i2c_adapter, I2C_EVENT_START);
 
 	/* Wait for the transfer to complete */
@@ -1024,6 +1026,7 @@ int32_t PIOS_I2C_Transfer(uint32_t i2c_id, const struct pios_i2c_txn txn_list[],
 
 	return !semaphore_success ? -2 :
 	i2c_adapter->bus_error ? -1 :
+	i2c_adapter->nack ? -3 :
 	0;
 }
 

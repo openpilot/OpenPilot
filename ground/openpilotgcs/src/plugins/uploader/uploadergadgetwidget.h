@@ -54,6 +54,7 @@
 #include <QTimer>
 #include "devicedescriptorstruct.h"
 #include <QProgressDialog>
+#include <QErrorMessage>
 
 using namespace OP_DFU;
 
@@ -84,6 +85,7 @@ private:
      QTimer* m_timer;
      QLineEdit* openFileNameLE;
      QEventLoop m_eventloop;
+     QErrorMessage * msg;
 private slots:
     void onPhisicalHWConnect();
     void versionMatchCheck();

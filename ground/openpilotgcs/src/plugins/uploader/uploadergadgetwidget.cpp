@@ -27,7 +27,6 @@
 #include "uploadergadgetwidget.h"
 #include "../../../../../build/ground/openpilotgcs/gcsversioninfo.h"
 #include <coreplugin/coreconstants.h>
-#include <QErrorMessage>
 #include <QDebug>
 
 #define DFU_DEBUG true
@@ -41,7 +40,7 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
     dfu = NULL;
     m_timer = 0;
     m_progress = 0;
-
+    msg=new QErrorMessage(this);
     // Listen to autopilot connection events
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     TelemetryManager* telMngr = pm->getObject<TelemetryManager>();
@@ -624,7 +623,6 @@ void UploaderGadgetWidget::versionMatchCheck()
         qDebug()<<QDate::fromString(boardDescription.buildDate.mid(0,8),"yyyyMMdd");
         qDebug()<<QDate::fromString(gcsDescription.mid(gcsDescription.indexOf(" ")+1,8),"yyyyMMdd");
         qDebug()<<QDate::fromString(boardDescription.buildDate.mid(0,8),"yyyyMMdd").daysTo(QDate::fromString(gcsDescription.mid(gcsDescription.indexOf(" ")+1,8),"yyyyMMdd"));
-        QErrorMessage * msg=new QErrorMessage(this);
         if(QDate::fromString(boardDescription.buildDate.mid(0,8),"yyyyMMdd").daysTo(QDate::fromString(gcsDescription.mid(gcsDescription.indexOf(" ")+1,8),"yyyyMMdd"))>0)
             msg->showMessage(QString("Incompatible GCS and FW detected, you should upgrade your board's Firmware to %1 version.").arg(gcsDescription));
         else

@@ -56,7 +56,7 @@ public:
     qint32 pack(quint8* dataOut);
     qint32 unpack(const quint8* dataIn);
     QVariant getValue(quint32 index = 0);
-    void setValue(const QVariant& data, quint32 index = 0);
+    bool setValue(const QVariant& data, quint32 index = 0);
     double getDouble(quint32 index = 0);
     void setDouble(double value, quint32 index = 0);
     quint32 getDataOffset();

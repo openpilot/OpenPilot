@@ -532,7 +532,7 @@ static void setFailsafe()
 	}
 
 	// Update output object's parts that we changed
-	ActuatorCommandChannelGet(Channel);
+	ActuatorCommandChannelSet(Channel);
 }
 
 

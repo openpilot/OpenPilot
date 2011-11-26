@@ -237,22 +237,22 @@ static int8_t updateSensors(AttitudeRawData * attitudeRaw)
 	while((read_good = PIOS_BMA180_ReadFifo(&accel)) != 0);
 	while(read_good == 0) {	
 		count++;
-		
+
 		accel_accum[0] += accel.x;
 		accel_accum[1] += accel.y;
 		accel_accum[2] += accel.z;
-		
+
 		read_good = PIOS_BMA180_ReadFifo(&accel);
 	}
 	accel_samples = count;
+	
+	float accels[3] = {(float) accel_accum[1] / accel_samples, (float) accel_accum[0] / accel_samples, -(float) accel_accum[2] / accel_samples};
 
 	// Not the swaping of channel orders
-	scaling = PIOS_BMA180_GetScale() / accel_samples;
-	attitudeRaw->accels[ATTITUDERAW_ACCELS_X] = accel_accum[1] * scaling;
-	attitudeRaw->accels[ATTITUDERAW_ACCELS_Y] = accel_accum[0] * scaling;
-	attitudeRaw->accels[ATTITUDERAW_ACCELS_Z] = -accel_accum[2] * scaling;
-
-
+	scaling = PIOS_BMA180_GetScale();
+	attitudeRaw->accels[ATTITUDERAW_ACCELS_X] = (accels[0] - accelbias[0]) * scaling;
+	attitudeRaw->accels[ATTITUDERAW_ACCELS_Y] = (accels[1] - accelbias[1]) * scaling;
+	attitudeRaw->accels[ATTITUDERAW_ACCELS_Z] = (accels[2] - accelbias[2]) * scaling;
 	
 	// Make sure we get one sample
 	count = 0;
@@ -266,12 +266,14 @@ static int8_t updateSensors(AttitudeRawData * attitudeRaw)
 		
 		read_good = PIOS_MPU6000_ReadFifo(&gyro);
 	}
-	gyro_samples = count;	
+	gyro_samples = count;
+
+	float gyros[3] = {(float) gyro_accum[1] / gyro_samples, (float) gyro_accum[0] / gyro_samples, -(float) gyro_accum[2] / gyro_samples};
 	
-	scaling = PIOS_MPU6000_GetScale() / gyro_samples;
-	attitudeRaw->gyros[ATTITUDERAW_GYROS_X] = ((float) gyro_accum[1]) * scaling;
-	attitudeRaw->gyros[ATTITUDERAW_GYROS_Y] = ((float) gyro_accum[0]) * scaling;
-	attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] = -((float) gyro_accum[2]) * scaling;
+	scaling = PIOS_MPU6000_GetScale();
+	attitudeRaw->gyros[ATTITUDERAW_GYROS_X] = gyros[0] * scaling;
+	attitudeRaw->gyros[ATTITUDERAW_GYROS_Y] = gyros[1] * scaling;
+	attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] = gyros[2] * scaling;
 	
 	// From data sheet 35 deg C corresponds to -13200, and 280 LSB per C
 	attitudeRaw->temperature[ATTITUDERAW_TEMPERATURE_GYRO] = 35.0f + ((float) gyro.temperature + 512.0f) / 340.0f;

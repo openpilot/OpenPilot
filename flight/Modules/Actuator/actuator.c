@@ -216,7 +216,7 @@ static void actuatorTask(void* parameters)
 		AlarmsClear(SYSTEMALARMS_ALARM_ACTUATOR);
 
 		bool armed = flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED;
-		bool positiveThrottle = desired.Throttle >= 0.00;
+		bool positiveThrottle = desired.Throttle >= 0.00f;
 		bool spinWhileArmed = MotorsSpinWhileArmed == ACTUATORSETTINGS_MOTORSSPINWHILEARMED_TRUE;
 
 		float curve1 = MixerCurve(desired.Throttle,mixerSettings.ThrottleCurve1,MIXERSETTINGS_THROTTLECURVE1_NUMELEM);
@@ -325,25 +325,28 @@ static void actuatorTask(void* parameters)
 				else
 					status[ct] = -1;
 			}
-
-			command.Channel[ct] = scaleChannel(status[ct],
-							   ChannelMax[ct],
-							   ChannelMin[ct],
-							   ChannelNeutral[ct]);
 		}
-#if defined(DIAGNOSTICS)
-		MixerStatusSet(&mixerStatus);
-#endif
-
+		
+		for(int i = 0; i < MAX_MIX_ACTUATORS; i++) 
+			command.Channel[i] = scaleChannel(status[i],
+							   ChannelMax[i],
+							   ChannelMin[i],
+							   ChannelNeutral[i]);
+			
 		// Store update time
-		command.UpdateTime = 1000*dT;
-		if(1000*dT > command.MaxUpdateTime)
-			command.MaxUpdateTime = 1000*dT;
-
+		command.UpdateTime = 1000.0f*dT;
+		if(1000.0f*dT > command.MaxUpdateTime)
+			command.MaxUpdateTime = 1000.0f*dT;
+		
 		// Update output object
 		ActuatorCommandSet(&command);
 		// Update in case read only (eg. during servo configuration)
 		ActuatorCommandGet(&command);
+
+#if defined(DIAGNOSTICS)
+		MixerStatusSet(&mixerStatus);
+#endif
+		
 
 		// Update servo outputs
 		bool success = true;
@@ -367,22 +370,21 @@ static void actuatorTask(void* parameters)
 /**
  *Process mixing for one actuator
  */
-
 float ProcessMixer(const int index, const float curve1, const float curve2,
 		   MixerSettingsData* mixerSettings, ActuatorDesiredData* desired, const float period)
 {
 	Mixer_t * mixers = (Mixer_t *)&mixerSettings->Mixer1Type; //pointer to array of mixers in UAVObjects
 	Mixer_t * mixer = &mixers[index];
-	float result = ((mixer->matrix[MIXERSETTINGS_MIXER1VECTOR_THROTTLECURVE1] / 128.0f) * curve1) +
-	((mixer->matrix[MIXERSETTINGS_MIXER1VECTOR_THROTTLECURVE2] / 128.0f) * curve2) +
-	((mixer->matrix[MIXERSETTINGS_MIXER1VECTOR_ROLL] / 128.0f) * desired->Roll) +
-	((mixer->matrix[MIXERSETTINGS_MIXER1VECTOR_PITCH] / 128.0f) * desired->Pitch) +
-	((mixer->matrix[MIXERSETTINGS_MIXER1VECTOR_YAW] / 128.0f) * desired->Yaw);
+	float result = (((float)mixer->matrix[MIXERSETTINGS_MIXER1VECTOR_THROTTLECURVE1] / 128.0f) * curve1) +
+	(((float)mixer->matrix[MIXERSETTINGS_MIXER1VECTOR_THROTTLECURVE2] / 128.0f) * curve2) +
+	(((float)mixer->matrix[MIXERSETTINGS_MIXER1VECTOR_ROLL] / 128.0f) * desired->Roll) +
+	(((float)mixer->matrix[MIXERSETTINGS_MIXER1VECTOR_PITCH] / 128.0f) * desired->Pitch) +
+	(((float)mixer->matrix[MIXERSETTINGS_MIXER1VECTOR_YAW] / 128.0f) * desired->Yaw);
 	if(mixer->type == MIXERSETTINGS_MIXER1TYPE_MOTOR)
 	{
-		if(result < 0) //idle throttle
+		if(result < 0.0f) //idle throttle
 		{
-			result = 0;
+			result = 0.0f;
 		}
 
 		//feed forward
@@ -392,7 +394,7 @@ float ProcessMixer(const int index, const float curve1, const float curve2,
 		result += accumulator;
 		if(period !=0)
 		{
-			if(accumulator > 0)
+			if(accumulator > 0.0f)
 			{
 				float filter = mixerSettings->AccelTime / period;
 				if(filter <1)
@@ -422,6 +424,7 @@ float ProcessMixer(const int index, const float curve1, const float curve2,
 		}
 		lastFilteredResult[index] = result;
 	}
+
 	return(result);
 }
 
@@ -432,7 +435,7 @@ float ProcessMixer(const int index, const float curve1, const float curve2,
  */
 static float MixerCurve(const float throttle, const float* curve, uint8_t elements)
 {
-	float scale = throttle * (elements - 1);
+	float scale = throttle * (float) (elements - 1);
 	int idx1 = scale;
 	scale -= (float)idx1; //remainder
 	if(curve[0] < -1)
@@ -453,7 +456,7 @@ static float MixerCurve(const float throttle, const float* curve, uint8_t elemen
 			idx1 = elements -1;
 		}
 	}
-	return((curve[idx1] * (1 - scale)) + (curve[idx2] * scale));
+	return curve[idx1] * (1.0f - scale) + curve[idx2] * scale;
 }
 
 
@@ -464,7 +467,7 @@ static int16_t scaleChannel(float value, int16_t max, int16_t min, int16_t neutr
 {
 	int16_t valueScaled;
 	// Scale
-	if ( value >= 0.0)
+	if ( value >= 0.0f)
 	{
 		valueScaled = (int16_t)(value*((float)(max-neutral))) + neutral;
 	}
@@ -520,6 +523,8 @@ static void setFailsafe()
 		{
 			Channel[n] = 0;
 		}
+		
+		
 	}
 
 	// Set alarm

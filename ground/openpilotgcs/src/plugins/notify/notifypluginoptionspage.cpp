@@ -47,10 +47,12 @@
 #include "notifytablemodel.h"
 #include "notifylogging.h"
 
-static const char* cStrEqualTo = "Equal to";
-static const char* cStrLargeThan = "Large than";
-static const char* cStrLowerThan = "Lower than";
-static const char* cStrInRange = "In range";
+// Use symbols for greater than/less than is it removes the need to
+// internationalise these later...
+static const char* cStrEqualTo = "=";
+static const char* cStrLargeThan = ">";
+static const char* cStrLowerThan = "<";
+static const char* cStrInRange = "In range"; // TODO: Symbolise 'in range'
 
 
 NotifyPluginOptionsPage::NotifyPluginOptionsPage(QObject *parent)
@@ -218,7 +220,12 @@ void NotifyPluginOptionsPage::addDynamicFieldLayout()
     _optionsPage->dynamicValueLayout->addWidget(labelSayOrder);
     _sayOrder = new QComboBox(_form);
     _optionsPage->dynamicValueLayout->addWidget(_sayOrder);
-    _sayOrder->addItems(NotificationItem::sayOrderValues);
+    for(QMap<QString, NotificationItem::ESayOrder>::iterator pItem = NotificationItem::sayOrderValues.begin();
+        pItem != NotificationItem::sayOrderValues.end();
+        ++pItem)
+    {
+        _sayOrder->addItem(pItem.key(), pItem.value());
+    }
 
     QLabel* labelValueIs = new QLabel("Value is ", _form);
     labelValueIs->setSizePolicy(labelSizePolicy);
@@ -350,7 +357,7 @@ void NotifyPluginOptionsPage::getOptionsPageValues(NotificationItem* notificatio
     notification->setSound1(_optionsPage->Sound1->currentText());
     notification->setSound2(_optionsPage->Sound2->currentText());
     notification->setSound3(_optionsPage->Sound3->currentText());
-    notification->setSayOrder(_sayOrder->currentText());
+    notification->setSayOrder((NotificationItem::ESayOrder)_sayOrder->itemData(_sayOrder->currentIndex()).toInt());
     notification->setRange(_dynamicFieldLimit->currentText());
     if (QDoubleSpinBox* spinValue = dynamic_cast<QDoubleSpinBox*>(_dynamicFieldWidget))
         notification->setSingleValue(spinValue->value());
@@ -440,8 +447,9 @@ void NotifyPluginOptionsPage::updateConfigView(NotificationItem* notification)
         _dynamicFieldLimit->setCurrentIndex(_dynamicFieldLimit->findText(notification->range()));
     }
 
-    if (-1 != _sayOrder->findText(notification->getSayOrder())) {
-        _sayOrder->setCurrentIndex(_sayOrder->findText(notification->getSayOrder()));
+    int index = _sayOrder->findData(notification->getSayOrder());
+    if (-1 != index) {
+        _sayOrder->setCurrentIndex(index);
     }
 
     setDynamicFieldValue(notification);
@@ -586,12 +594,13 @@ void NotifyPluginOptionsPage::on_clicked_buttonAddNotification()
     }
     getOptionsPageValues(notification);
 
-    if ( ((!_optionsPage->Sound2->currentText().isEmpty()) && (_sayOrder->currentText()=="After second"))
-         || ((!_optionsPage->Sound3->currentText().isEmpty()) && (_sayOrder->currentText()=="After third")) ) {
+    NotificationItem::ESayOrder currentSayOrder = (NotificationItem::ESayOrder)_sayOrder->itemData(_sayOrder->currentIndex()).toInt();
+    if ( ((!_optionsPage->Sound2->currentText().isEmpty()) && (NotificationItem::eAfterSecond == currentSayOrder))
+         || ((!_optionsPage->Sound3->currentText().isEmpty())/* && (_sayOrder->currentText()=="After third")*/) ) {
         delete notification;
         return;
     } else {
-        notification->setSayOrder(_sayOrder->currentText());
+        notification->setSayOrder(currentSayOrder);
     }
 
     _notifyRulesModel->entryAdded(notification);
@@ -616,7 +625,7 @@ void NotifyPluginOptionsPage::on_clicked_buttonModifyNotification()
 {
     NotificationItem* notification = new NotificationItem;
     getOptionsPageValues(notification);
-    notification->setRetryString(_privListNotifications.at(_notifyRulesSelection->currentIndex().row())->retryString());
+    notification->setRetryValue(_privListNotifications.at(_notifyRulesSelection->currentIndex().row())->retryValue());
     notification->setLifetime(_privListNotifications.at(_notifyRulesSelection->currentIndex().row())->lifetime());
     notification->setMute(_privListNotifications.at(_notifyRulesSelection->currentIndex().row())->mute());
 

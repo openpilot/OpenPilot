@@ -246,8 +246,8 @@ void SoundNotifyPlugin::on_arrived_Notification(UAVObject *object)
         //          notification can be accepted again;
         // 2. Once time notifications, they removed immediately after first playing;
         // 3. Instant notifications(played one by one without interval);
-        if (ntf->retryString() != "Repeat Instantly" &&
-                ntf->retryString() != "Repeat Once" && ntf->_isPlayed)
+        if (ntf->retryValue() != NotificationItem::eInstantly &&
+                ntf->retryValue() != NotificationItem::eOnce && ntf->_isPlayed)
            continue;
 
         qNotifyDebug() << QString("new notification: | %1 | %2 | val1: %3 | val2: %4")
@@ -376,22 +376,22 @@ bool checkRange(QString fieldValue, QString enumValue, QStringList values, char 
 bool checkRange(double fieldValue, double min, double max, char direction)
 {
     bool ret = false;
-    Q_ASSERT(min < max);
     switch(direction)
     {
-    case 'E':
+    case '=':
         ret = (fieldValue == min);
         break;
 
-    case 'G':
+    case '>':
         ret = (fieldValue > min);
         break;
 
-    case 'L':
+    case '<':
         ret = (fieldValue < min);
         break;
 
     default:
+        Q_ASSERT(min < max);
         ret = (fieldValue > min) && (fieldValue < max);
         break;
     };
@@ -471,27 +471,22 @@ bool SoundNotifyPlugin::playNotification(NotificationItem* notification)
         _nowPlayingNotification = notification;
         notification->stopExpireTimer();
 
-        if (notification->retryString() == "Repeat Once") {
+        if (notification->retryValue() == NotificationItem::eOnce) {
             _toRemoveNotifications.append(_notificationList.takeAt(_notificationList.indexOf(notification)));
         } else {
-            if (notification->retryString() != "Repeat Instantly") {
-                QRegExp rxlen("(\\d+)");
-                QString value;
+            if (notification->retryValue() != NotificationItem::eInstantly) {
                 int timer_value;
-                int pos = rxlen.indexIn(notification->retryString());
-                if (pos > -1) {
-                    value = rxlen.cap(1); // "189"
 
-                    // needs to correct repeat timer value,
-                    // acording to message play duration,
-                    // we don't measure duration of each message,
-                    // simply take average duration
-                    enum { eAverageDurationSec = 8 };
+                // needs to correct repeat timer value,
+                // acording to message play duration,
+                // we don't measure duration of each message,
+                // simply take average duration
+                enum { eAverageDurationSec = 8 };
 
-                    enum { eSecToMsec = 1000 };
+                enum { eSecToMsec = 1000 };
 
-                    timer_value = (value.toInt() + eAverageDurationSec) * eSecToMsec;
-                }
+                timer_value = ((int)notification->retryValue() + eAverageDurationSec) * eSecToMsec;
+
 
                 notification->startTimer(timer_value);
                 connect(notification->getTimer(), SIGNAL(timeout()),

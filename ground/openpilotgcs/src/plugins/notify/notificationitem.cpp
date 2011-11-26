@@ -28,6 +28,7 @@
 //Qt headers
 #include <QtCore/QDataStream>
 #include <QFile>
+#include <QMap>
 
 // GCS headers
 #include "extensionsystem/pluginmanager.h"
@@ -40,20 +41,19 @@
 #include "notifylogging.h"
 
 
-static const QString cStrNever("Never");
-static const QString cStrBefore1st("Before first");
-static const QString cStrBefore2nd("Before second");
-static const QString cStrAfter2nd("After second");
+static const QString cStrNever(QT_TR_NOOP("Never"));
+static const QString cStrBefore1st(QT_TR_NOOP("Before first"));
+static const QString cStrBefore2nd(QT_TR_NOOP("Before second"));
+static const QString cStrAfter2nd(QT_TR_NOOP("After second"));
 
-static const QString cStrRetryOnce("Repeat Once");
-static const QString cStrRetryInstantly("Repeat Instantly");
-static const QString cStrRetry10sec("Repeat 10 seconds");
-static const QString cStrRetry30sec("Repeat 30 seconds");
-static const QString cStrRetry1min("Repeat 1 minute");
+static const QString cStrRetryOnce(QT_TR_NOOP("Repeat Once"));
+static const QString cStrRetryInstantly(QT_TR_NOOP("Repeat Instantly"));
+static const QString cStrRetry10sec(QT_TR_NOOP("Repeat 10 seconds"));
+static const QString cStrRetry30sec(QT_TR_NOOP("Repeat 30 seconds"));
+static const QString cStrRetry1min(QT_TR_NOOP("Repeat 1 minute"));
 
-
-QStringList NotificationItem::sayOrderValues;
-QStringList NotificationItem::retryValues;
+QMap<QString, NotificationItem::ESayOrder> NotificationItem::sayOrderValues;
+QMap<QString, NotificationItem::ERetryValues> NotificationItem::retryValues;
 
 
 NotificationItem::NotificationItem(QObject *parent)
@@ -70,24 +70,25 @@ NotificationItem::NotificationItem(QObject *parent)
     , _sound1("")
     , _sound2("")
     , _sound3("")
-    , _sayOrder(cStrNever)
+    , _sayOrder(eNever)
     , _singleValue(0)
     , _valueRange2(0)
-    , _repeatString(cStrRetryInstantly)
+    , _repeatValue(eInstantly)
     , _expireTimeout(eDefaultTimeout)
     , _mute(false)
 {
     NotificationItem::sayOrderValues.clear();
-    NotificationItem::sayOrderValues.append(cStrBefore1st);
-    NotificationItem::sayOrderValues.append(cStrBefore2nd);
-    NotificationItem::sayOrderValues.append(cStrAfter2nd);
+    NotificationItem::sayOrderValues[cStrNever] = eNever;
+    NotificationItem::sayOrderValues[cStrBefore1st] = eBeforeFirst;
+    NotificationItem::sayOrderValues[cStrBefore2nd] = eBeforeSecond;
+    NotificationItem::sayOrderValues[cStrAfter2nd] = eAfterSecond;
 
     NotificationItem::retryValues.clear();
-    NotificationItem::retryValues.append(cStrRetryOnce);
-    NotificationItem::retryValues.append(cStrRetryInstantly);
-    NotificationItem::retryValues.append(cStrRetry10sec);
-    NotificationItem::retryValues.append(cStrRetry30sec);
-    NotificationItem::retryValues.append(cStrRetry1min);
+    NotificationItem::retryValues[cStrRetryOnce] = eOnce;
+    NotificationItem::retryValues[cStrRetryInstantly] = eInstantly;
+    NotificationItem::retryValues[cStrRetry10sec] = eRepeatTenSec;
+    NotificationItem::retryValues[cStrRetry30sec] = eRepeatThirtySec;
+    NotificationItem::retryValues[cStrRetry1min] = eRepeatOneMin;
 
 }
 
@@ -107,7 +108,7 @@ void NotificationItem::copyTo(NotificationItem* that) const
     that->_sayOrder = _sayOrder;
     that->_singleValue = _singleValue;
     that->_valueRange2 = _valueRange2;
-    that->_repeatString = _repeatString;
+    that->_repeatValue = _repeatValue;
     that->_expireTimeout = _expireTimeout;
     that->_mute = _mute;
 
@@ -127,7 +128,7 @@ void NotificationItem::saveState(QSettings* settings) const
     settings->setValue(QLatin1String("Sound2"), getSound2());
     settings->setValue(QLatin1String("Sound3"), getSound3());
     settings->setValue(QLatin1String("SayOrder"), getSayOrder());
-    settings->setValue(QLatin1String("Repeat"), retryString());
+    settings->setValue(QLatin1String("Repeat"), retryValue());
     settings->setValue(QLatin1String("ExpireTimeout"), lifetime());
     settings->setValue(QLatin1String("Mute"), mute());
 }
@@ -143,16 +144,16 @@ void NotificationItem::restoreState(QSettings* settings)
     setSound1(settings->value(QLatin1String("Sound1"), tr("")).toString());
     setSound2(settings->value(QLatin1String("Sound2"), tr("")).toString());
     setSound3(settings->value(QLatin1String("Sound3"), tr("")).toString());
-    setSayOrder(settings->value(QLatin1String("SayOrder"), tr("")).toString());
+    setSayOrder((ESayOrder)settings->value(QLatin1String("SayOrder"), eNever).toInt());
     QVariant value = settings->value(QLatin1String("Value1"), tr(""));
     setSingleValue(value);
     setValueRange2(settings->value(QLatin1String("Value2"), tr("")).toDouble());
-    setRetryString(settings->value(QLatin1String("Repeat"), tr("")).toString());
+    setRetryValue((ERetryValues)settings->value(QLatin1String("Repeat"), eOnce).toInt());
     setLifetime(settings->value(QLatin1String("ExpireTimeout"), tr("")).toInt());
     setMute(settings->value(QLatin1String("Mute"), tr("")).toInt());
 }
 
-void NotificationItem::seriaize(QDataStream& stream)
+void NotificationItem::serialize(QDataStream& stream)
 {
     stream << this->_soundCollectionPath;
     stream << this->_currentLanguage;
@@ -165,13 +166,15 @@ void NotificationItem::seriaize(QDataStream& stream)
     stream << this->_sayOrder;
     stream << this->_singleValue;
     stream << this->_valueRange2;
-    stream << this->_repeatString;
+    stream << this->_repeatValue;
     stream << this->_expireTimeout;
     stream << this->_mute;
 }
 
-void NotificationItem::deseriaize(QDataStream& stream)
+void NotificationItem::deserialize(QDataStream& stream)
 {
+    int sayOrderInt = 0;
+    int repeatValueInt = 0;
     stream >> this->_soundCollectionPath;
     stream >> this->_currentLanguage;
     stream >> this->_dataObject;
@@ -180,10 +183,12 @@ void NotificationItem::deseriaize(QDataStream& stream)
     stream >> this->_sound1;
     stream >> this->_sound2;
     stream >> this->_sound3;
-    stream >> this->_sayOrder;
+    stream >> sayOrderInt;
+    this->_sayOrder = (ESayOrder)sayOrderInt;
     stream >> this->_singleValue;
     stream >> this->_valueRange2;
-    stream >> this->_repeatString;
+    stream >> repeatValueInt;
+    this->_repeatValue = (ERetryValues)repeatValueInt;
     stream >> this->_expireTimeout;
     stream >> this->_mute;
 }
@@ -250,9 +255,9 @@ void NotificationItem::disposeExpireTimer()
     }
 }
 
-int getValuePosition(QString sayOrder)
+NotificationItem::ESayOrder getValuePosition(QString sayOrder)
 {
-    return NotificationItem::sayOrderValues.indexOf(sayOrder);
+    return NotificationItem::sayOrderValues.find(sayOrder).value();
 }
 
 QString NotificationItem::checkSoundExists(QString fileName)
@@ -345,7 +350,6 @@ QString NotificationItem::toString()
     UAVObjectField* field = getUAVObjectField();
     QString value = stringFromValue(singleValue(), field);
 
-    int pos = getValuePosition(getSayOrder().trimmed());
     QStringList lst;
     lst.append(getSoundCaption(getSound1()));
     lst.append(getSoundCaption(getSound2()));
@@ -360,11 +364,11 @@ QString NotificationItem::toString()
     }
 
     // if not "Never" case
-    if(-1 != pos) {
+    if(eNever != _sayOrder) {
         if(missed)
-            lst.insert(pos, "[missed]" + value);
+            lst.insert((int)_sayOrder, "[missed]" + value);
         else
-            lst.insert(pos, value);
+            lst.insert((int)_sayOrder, value);
     }
     str = lst.join(" ");
     return str;
@@ -380,7 +384,6 @@ QStringList& NotificationItem::toSoundList()
 
     // generate queue of sound files to play
     _messageSequence.clear();
-    int pos = getValuePosition(getSayOrder().trimmed());
     QStringList lst;
     if(!getSound1().isEmpty())
         lst.append(getSound1());
@@ -390,8 +393,9 @@ QStringList& NotificationItem::toSoundList()
         lst.append(getSound3());
 
     // if not "Never" case
-    if(-1 != pos) {
+    if(eNever != _sayOrder) {
         QStringList valueSounds = valueToSoundList(value);
+        int pos = (int)_sayOrder;
         foreach(QString sound, valueSounds)
             lst.insert(pos++, sound);
     }

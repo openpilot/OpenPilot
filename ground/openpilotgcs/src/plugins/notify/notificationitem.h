@@ -49,6 +49,10 @@ class NotificationItem : public QObject
 public:
     enum { eDefaultTimeout = 15 }; // in sec
 
+    enum ESayOrder { eNever = -1, eBeforeFirst, eBeforeSecond, eAfterSecond};
+
+    enum ERetryValues { eOnce = 1, eInstantly = 2, eRepeatTenSec = 10, eRepeatThirtySec = 30, eRepeatOneMin = 60 };
+
     explicit NotificationItem(QObject *parent = 0);
 
     void copyTo(NotificationItem*) const;
@@ -60,8 +64,8 @@ public:
     QString range() const { return _rangeLimit; }
     void setRange(QString text) { _rangeLimit = text; }
 
-    QString getSayOrder() const { return _sayOrder; }
-    void setSayOrder(QString text) { _sayOrder = text; }
+    ESayOrder getSayOrder() const { return _sayOrder; }
+    void setSayOrder(ESayOrder sayOrder) { _sayOrder = sayOrder; }
 
     QVariant singleValue() const { return _singleValue; }
     void setSingleValue(QVariant value) { _singleValue = value; }
@@ -84,8 +88,8 @@ public:
     QStringList getMessageSequence() const { return _messageSequence; }
     void setMessageSequence(QStringList sequence) { _messageSequence = sequence; }
 
-    QString retryString() const { return _repeatString; }
-    void setRetryString(QString value) { _repeatString = value; }
+    ERetryValues retryValue() const { return _repeatValue; }
+    void setRetryValue(ERetryValues value) { _repeatValue = value; }
 
     int lifetime() const { return _expireTimeout; }
     void setLifetime(int value) { _expireTimeout = value; }
@@ -100,8 +104,8 @@ public:
     UAVDataObject* getUAVObject(void);
     UAVObjectField* getUAVObjectField(void);
 
-    void seriaize(QDataStream& stream);
-    void deseriaize(QDataStream& stream);
+    void serialize(QDataStream& stream);
+    void deserialize(QDataStream& stream);
 
     /**
     * Convert notification item fields in single string,
@@ -144,8 +148,8 @@ public:
     bool isNowPlaying;
     bool _isPlayed;
 
-    static QStringList sayOrderValues;
-    static QStringList retryValues;
+    static QMap<QString, ESayOrder> sayOrderValues;
+    static QMap<QString, ERetryValues> retryValues;
 
 private:
     QString checkSoundExists(QString fileName);
@@ -183,7 +187,7 @@ private:
     QString _sound3;
 
     //! order in what sounds 1-3 will be played
-    QString _sayOrder;
+    ESayOrder _sayOrder;
 
     //! one-side range, value(numeric or ENUM type) maybe lower, greater or in range
     QVariant _singleValue;
@@ -193,7 +197,7 @@ private:
     double _valueRange2;
 
     //! how often or what periodicaly notification should be played
-    QString _repeatString;
+    ERetryValues _repeatValue;
 
     //! time after event occured till notification became invalid
     //! and will be removed from list

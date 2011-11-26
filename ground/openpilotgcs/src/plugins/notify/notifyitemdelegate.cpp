@@ -43,7 +43,12 @@ QWidget *NotifyItemDelegate::createEditor(QWidget* parent, const QStyleOptionVie
     if (eRepeatValue == index.column()) {
         QComboBox* editor = new QComboBox(parent);
         editor->clear();
-        editor->addItems(NotificationItem::retryValues);
+        for(QMap<QString, NotificationItem::ERetryValues>::iterator pItem = NotificationItem::retryValues.begin();
+            pItem != NotificationItem::retryValues.end();
+            ++pItem)
+        {
+            editor->addItem(pItem.key(), pItem.value());
+        }
         return editor;
     } else {
         if (eExpireTimer == index.column()) {
@@ -122,7 +127,7 @@ void NotifyItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model
     } else {
         QComboBox * repeatEditor = qobject_cast<QComboBox *>(editor);
         if (repeatEditor) {
-            model->setData(index, repeatEditor->currentText());
+            model->setData(index, repeatEditor->itemData(repeatEditor->currentIndex()));
         } else {
             QSpinBox * expireEditor = qobject_cast<QSpinBox *>(editor);
             if (expireEditor) {

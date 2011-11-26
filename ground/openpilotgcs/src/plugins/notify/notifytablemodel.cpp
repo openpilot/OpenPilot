@@ -52,7 +52,7 @@ bool NotifyTableModel::setData(const QModelIndex &index,
     }
     if (index.isValid() && role == Qt::EditRole) {
         if (eRepeatValue == index.column())
-             _list.at(index.row())->setRetryString(value.toString());
+             _list.at(index.row())->setRetryValue((NotificationItem::ERetryValues)value.toInt());
         else {
             if (eExpireTimer == index.column())
                 _list.at(index.row())->setLifetime(value.toInt());
@@ -85,7 +85,7 @@ QVariant NotifyTableModel::data(const QModelIndex &index, int role) const
             return _list.at(index.row())->toString();
 
         case eRepeatValue:
-            return _list.at(index.row())->retryString();
+            return NotificationItem::retryValues.key(_list.at(index.row())->retryValue());
 
         case eExpireTimer:
             return _list.at(index.row())->lifetime();
@@ -247,7 +247,7 @@ QMimeData* NotifyTableModel::mimeData(const QModelIndexList& indexes) const
     int rows = 0;
     foreach (const QModelIndex& index, indexes) {
         if (!index.column()) {
-            qint32 item = reinterpret_cast<qint32>(_list.at(index.row()));
+            qint64 item = reinterpret_cast<qint64>(_list.at(index.row()));
             stream << item;
             ++rows;
         }

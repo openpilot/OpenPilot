@@ -947,7 +947,9 @@ static const struct pios_tim_channel pios_tim_servoport_all_pins[] = {
 				.GPIO_OType = GPIO_OType_PP,
 				.GPIO_PuPd  = GPIO_PuPd_UP
 			},
+			.pin_source = GPIO_PinSource5,
 		},
+		.remap = GPIO_AF_TIM9,
 	},
 	{
 		.timer = TIM9,
@@ -961,7 +963,9 @@ static const struct pios_tim_channel pios_tim_servoport_all_pins[] = {
 				.GPIO_OType = GPIO_OType_PP,
 				.GPIO_PuPd  = GPIO_PuPd_UP
 			},
+			.pin_source = GPIO_PinSource6,
 		},
+		.remap = GPIO_AF_TIM9,		
 	},
 	{
 		.timer = TIM10,
@@ -975,7 +979,9 @@ static const struct pios_tim_channel pios_tim_servoport_all_pins[] = {
 				.GPIO_OType = GPIO_OType_PP,
 				.GPIO_PuPd  = GPIO_PuPd_UP
 			},
+			.pin_source = GPIO_PinSource8,
 		},
+		.remap = GPIO_AF_TIM10,
 	},
 	{
 		.timer = TIM11,
@@ -989,7 +995,9 @@ static const struct pios_tim_channel pios_tim_servoport_all_pins[] = {
 				.GPIO_OType = GPIO_OType_PP,
 				.GPIO_PuPd  = GPIO_PuPd_UP
 			},
+			.pin_source = GPIO_PinSource9,
 		},
+		.remap = GPIO_AF_TIM11,
 	},
 	{
 		.timer = TIM5,
@@ -1003,7 +1011,9 @@ static const struct pios_tim_channel pios_tim_servoport_all_pins[] = {
 				.GPIO_OType = GPIO_OType_PP,
 				.GPIO_PuPd  = GPIO_PuPd_UP
 			},
+			.pin_source = GPIO_PinSource2,
 		},
+		.remap = GPIO_AF_TIM5,
 	},
 	{
 		.timer = TIM5,
@@ -1017,7 +1027,9 @@ static const struct pios_tim_channel pios_tim_servoport_all_pins[] = {
 				.GPIO_OType = GPIO_OType_PP,
 				.GPIO_PuPd  = GPIO_PuPd_UP
 			},
+			.pin_source = GPIO_PinSource3,
 		},
+		.remap = GPIO_AF_TIM5,
 	},
 	{
 		.timer = TIM3,
@@ -1031,7 +1043,9 @@ static const struct pios_tim_channel pios_tim_servoport_all_pins[] = {
 				.GPIO_OType = GPIO_OType_PP,
 				.GPIO_PuPd  = GPIO_PuPd_UP
 			},
+			.pin_source = GPIO_PinSource0,
 		},
+		.remap = GPIO_AF_TIM3,
 	},
 	{
 		.timer = TIM3,
@@ -1045,7 +1059,9 @@ static const struct pios_tim_channel pios_tim_servoport_all_pins[] = {
 				.GPIO_OType = GPIO_OType_PP,
 				.GPIO_PuPd  = GPIO_PuPd_UP
 			},
+			.pin_source = GPIO_PinSource1,
 		},
+		.remap = GPIO_AF_TIM3,
 	},
 };
 
@@ -1083,7 +1099,9 @@ static const struct pios_tim_channel pios_tim_rcvrport_all_channels[] = {
 				.GPIO_OType = GPIO_OType_PP,
 				.GPIO_PuPd  = GPIO_PuPd_UP
 			},
+			.pin_source = GPIO_PinSource15,
 		},
+		.remap = GPIO_AF_TIM4,
 	},
 	{
 		.timer = TIM4,
@@ -1097,7 +1115,9 @@ static const struct pios_tim_channel pios_tim_rcvrport_all_channels[] = {
 				.GPIO_OType = GPIO_OType_PP,
 				.GPIO_PuPd  = GPIO_PuPd_UP
 			},
+			.pin_source = GPIO_PinSource14,
 		},
+		.remap = GPIO_AF_TIM4,
 	},
 	{
 		.timer = TIM4,
@@ -1111,7 +1131,9 @@ static const struct pios_tim_channel pios_tim_rcvrport_all_channels[] = {
 				.GPIO_OType = GPIO_OType_PP,
 				.GPIO_PuPd  = GPIO_PuPd_UP
 			},
+			.pin_source = GPIO_PinSource13,
 		},
+		.remap = GPIO_AF_TIM4,
 	},
 	{
 		.timer = TIM4,
@@ -1125,7 +1147,9 @@ static const struct pios_tim_channel pios_tim_rcvrport_all_channels[] = {
 				.GPIO_OType = GPIO_OType_PP,
 				.GPIO_PuPd  = GPIO_PuPd_UP
 			},
+			.pin_source = GPIO_PinSource12,
 		},
+		.remap = GPIO_AF_TIM4,
 	},
 	{
 		.timer = TIM1,
@@ -1139,7 +1163,9 @@ static const struct pios_tim_channel pios_tim_rcvrport_all_channels[] = {
 				.GPIO_OType = GPIO_OType_PP,
 				.GPIO_PuPd  = GPIO_PuPd_UP
 			},
+			.pin_source = GPIO_PinSource14,
 		},
+		.remap = GPIO_AF_TIM1,
 	},
 	{
 		.timer = TIM1,
@@ -1153,7 +1179,9 @@ static const struct pios_tim_channel pios_tim_rcvrport_all_channels[] = {
 				.GPIO_OType = GPIO_OType_PP,
 				.GPIO_PuPd  = GPIO_PuPd_UP
 			},
+			.pin_source = GPIO_PinSource13,
 		},
+		.remap = GPIO_AF_TIM1,
 	},
 	{
 		.timer = TIM1,
@@ -1167,7 +1195,9 @@ static const struct pios_tim_channel pios_tim_rcvrport_all_channels[] = {
 				.GPIO_OType = GPIO_OType_PP,
 				.GPIO_PuPd  = GPIO_PuPd_UP
 			},
+			.pin_source = GPIO_PinSource11,
 		},
+		.remap = GPIO_AF_TIM1,
 	},
 	{
 		.timer = TIM1,
@@ -1181,7 +1211,9 @@ static const struct pios_tim_channel pios_tim_rcvrport_all_channels[] = {
 				.GPIO_OType = GPIO_OType_PP,
 				.GPIO_PuPd  = GPIO_PuPd_UP
 			},
+			.pin_source = GPIO_PinSource1,
 		},
+		.remap = GPIO_AF_TIM1,
 	},
 };
 

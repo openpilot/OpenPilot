@@ -74,6 +74,8 @@ public:
     int scalePower; //This is the power to which each value must be raised
     int interpolationSamples;
     double interpolationSum;
+    double correctionSum;
+    int correctionCount;
     double yMinimum;
     double yMaximum;
     double m_xWindowSize;

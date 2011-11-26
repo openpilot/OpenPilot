@@ -162,7 +162,7 @@
        <item row="9" column="0">
         <widget class="QLabel" name="label_10">
          <property name="text">
-          <string>Smooth Interpolation:</string>
+          <string>Display smoothed interpolation:</string>
          </property>
         </widget>
        </item>
@@ -294,7 +294,7 @@ Update</string>
        <item>
         <widget class="QCheckBox" name="LoggingEnable">
          <property name="text">
-          <string>Log data to csv file</string>
+          <string>Log data to csv file (not interpolated)</string>
          </property>
         </widget>
        </item>

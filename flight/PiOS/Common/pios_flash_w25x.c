@@ -18,9 +18,9 @@
 #define W25X_READ_DATA              0x03
 #define W25X_FAST_READ              0x0b
 #define W25X_DEVICE_ID              0x90
-#define W25X_SECTOR_ERASE           0x20
+#define W25X_SECTOR_ERASE           0xD8
 #define W25X_PAGE_WRITE             0x02
-#define W25X_CHIP_ERASE             0x60
+#define W25X_CHIP_ERASE             0xC7
 
 #define W25X_STATUS_BUSY            0x01
 #define W25X_STATUS_WRITEPROTECT    0x02
@@ -144,10 +144,7 @@ int8_t PIOS_Flash_W25X_EraseSector(uint32_t addr)
 	PIOS_SPI_TransferBlock(PIOS_SPI_FLASH,out,NULL,sizeof(out),NULL);
 	PIOS_Flash_W25X_ReleaseBus();
 
-	uint32_t i = 1;
 	while(PIOS_Flash_W25X_Busy()) {
-		if(++i == 0)
-			return -1;
 	}
 
 	return 0;
@@ -170,10 +167,7 @@ int8_t PIOS_Flash_W25X_EraseChip()
 	PIOS_SPI_TransferBlock(PIOS_SPI_FLASH,out,NULL,sizeof(out),NULL);
 	PIOS_Flash_W25X_ReleaseBus();
 
-	uint32_t i = 1;
 	while(PIOS_Flash_W25X_Busy()) {
-		if(++i == 0)
-			return -1;
 	}
 
 	return 0;
@@ -216,10 +210,7 @@ int8_t PIOS_Flash_W25X_WriteData(uint32_t addr, uint8_t * data, uint16_t len)
 
 	PIOS_Flash_W25X_ReleaseBus();
 
-	uint32_t i = 1;
 	while(PIOS_Flash_W25X_Busy()) {
-		if(++i == 0)
-			return -1;
 	}
 
 	return 0;

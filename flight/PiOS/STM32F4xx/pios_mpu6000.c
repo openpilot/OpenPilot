@@ -48,7 +48,6 @@ static int16_t pios_mpu6000_buffer[PIOS_MPU6000_MAX_DOWNSAMPLE * sizeof(struct p
 static t_fifo_buffer pios_mpu6000_fifo;
 
 volatile bool mpu6000_configured = false;
-volatile bool mpu6000_cb_ready = true;
 
 static struct pios_mpu6000_cfg const * cfg;
 
@@ -62,6 +61,9 @@ void PIOS_MPU6000_Init(const struct pios_mpu6000_cfg * new_cfg)
 	
 	fifoBuf_init(&pios_mpu6000_fifo, (uint8_t *) pios_mpu6000_buffer, sizeof(pios_mpu6000_buffer));
 
+	/* Configure the MPU6050 Sensor */
+	PIOS_MPU6000_Config(cfg);
+
 	/* Configure EOC pin as input floating */
 	GPIO_Init(cfg->drdy.gpio, &cfg->drdy.init);
 	
@@ -72,8 +74,6 @@ void PIOS_MPU6000_Init(const struct pios_mpu6000_cfg * new_cfg)
 	/* Enable and set EOC EXTI Interrupt to the lowest priority */
 	NVIC_Init(&cfg->eoc_irq.init);
 
-	/* Configure the MPU6050 Sensor */
-	PIOS_MPU6000_Config(cfg);
 }
 
 /**
@@ -84,38 +84,46 @@ void PIOS_MPU6000_Init(const struct pios_mpu6000_cfg * new_cfg)
 */
 static void PIOS_MPU6000_Config(struct pios_mpu6000_cfg const * cfg)
 {
-	mpu6000_cb_ready = true;
-	
 	// Reset chip and fifo
 	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_USER_CTRL_REG, 0x01 | 0x02 | 0x04) != 0);
-	PIOS_DELAY_WaituS(20);
-
-	// FIFO storage
-	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_FIFO_EN_REG, cfg->Fifo_store) != 0);
-
-	// Sample rate divider
-	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_SMPLRT_DIV_REG, cfg->Smpl_rate_div) != 0) ;
-
-	// Digital low-pass filter and scale
-	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_DLPF_CFG_REG, cfg->filter) != 0) ;
-
-	// Digital low-pass filter and scale
-	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_GYRO_CFG_REG, cfg->gyro_range) != 0) ;
-
-	// Interrupt configuration
-	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_USER_CTRL_REG, cfg->User_ctl) != 0) ;
-
-	// Interrupt configuration
-	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_PWR_MGMT_REG, cfg->Pwr_mgmt_clk) != 0) ;
+	// Wait for reset to finish
+	while (PIOS_MPU6000_GetReg(PIOS_MPU6000_USER_CTRL_REG) & 0x07);
 	
+	//Power management configuration
+	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_PWR_MGMT_REG, cfg->Pwr_mgmt_clk) != 0) ;
+
 	// Interrupt configuration
 	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_INT_CFG_REG, cfg->interrupt_cfg) != 0) ;
 
 	// Interrupt configuration
 	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_INT_EN_REG, cfg->interrupt_en) != 0) ;
-	if(PIOS_MPU6000_GetReg(PIOS_MPU6000_INT_EN_REG) != cfg->interrupt_en)
-		return;
 
+	// FIFO storage
+	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_FIFO_EN_REG, cfg->Fifo_store) != 0);
+	
+	// Sample rate divider
+	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_SMPLRT_DIV_REG, cfg->Smpl_rate_div) != 0) ;
+	
+	// Digital low-pass filter and scale
+	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_DLPF_CFG_REG, cfg->filter) != 0) ;
+	
+	// Digital low-pass filter and scale
+	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_GYRO_CFG_REG, cfg->gyro_range) != 0) ;
+	
+	// Interrupt configuration
+	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_USER_CTRL_REG, cfg->User_ctl) != 0) ;
+	
+	// Interrupt configuration
+	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_PWR_MGMT_REG, cfg->Pwr_mgmt_clk) != 0) ;
+	
+	// Interrupt configuration
+	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_INT_CFG_REG, cfg->interrupt_cfg) != 0) ;
+	
+	// Interrupt configuration
+	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_INT_EN_REG, cfg->interrupt_en) != 0) ;
+	if((PIOS_MPU6000_GetReg(PIOS_MPU6000_INT_EN_REG)) != cfg->interrupt_en)
+		return;
+	
 	mpu6000_configured = true;
 }
 

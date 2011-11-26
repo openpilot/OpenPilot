@@ -1039,64 +1039,6 @@ void PIOS_Board_Init(void) {
 
 	PIOS_HMC5883_Init(&pios_hmc5883_cfg);
 
-	uint8_t addr_buffer[] = {
-		0x1E,
-	};
-	uint8_t addr_buffer2[] = {
-		0x10,
-	};
-	
-	struct pios_i2c_txn txn_list1[] = {
-		{
-			.info = __func__,
-			.addr = 0x77,
-			.rw = PIOS_I2C_TXN_WRITE,
-			.len = sizeof(addr_buffer),
-			.buf = addr_buffer,
-		},
-	};
-	const struct pios_i2c_txn txn_list2[] = {
-		{
-			.info = __func__,
-			.addr = 0x77,
-			.rw = PIOS_I2C_TXN_WRITE,
-			.len = sizeof(addr_buffer),
-			.buf = addr_buffer2,
-		},
-		{
-			.info = __func__,
-			.addr = 0x77,
-			.rw = PIOS_I2C_TXN_READ,
-			.len = sizeof(rec),
-			.buf = rec,
-		},
-	};
-	
-	for(int i = 0; i < 0x80; i++) {
-		txn_list1[0].addr = i;
-		test_val = PIOS_I2C_Transfer(pios_i2c_pressure_adapter_id, txn_list1, NELEMENTS(txn_list1));
-		if(test_val == 0) {
-			rec[0] = i;
-			while(1) {
-				PIOS_LED_On(0);
-				PIOS_LED_On(1);
-				
-			}
-		}
-		PIOS_DELAY_WaituS(100);
-	}
-	
-	
-	
-		test_val = PIOS_I2C_Transfer(pios_i2c_pressure_adapter_id, txn_list1, NELEMENTS(txn_list1));
-		test_val += PIOS_I2C_Transfer(pios_i2c_pressure_adapter_id, txn_list2, NELEMENTS(txn_list2));
-		PIOS_DELAY_WaituS(100);
-	
-	if(test_val == 0)
-		return;
-		
-	while(1);
-
 	
 
 }

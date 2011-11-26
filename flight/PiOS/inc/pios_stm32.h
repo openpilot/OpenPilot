@@ -56,6 +56,7 @@ struct stm32_dma {
 struct stm32_gpio {
 	GPIO_TypeDef *gpio;
 	GPIO_InitTypeDef init;
+	uint8_t pin_source;
 };
 
 struct stm32_exti {

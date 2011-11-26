@@ -87,6 +87,15 @@ int32_t PIOS_TIM_InitClock(const struct pios_tim_clock_cfg * cfg)
 		case (uint32_t)TIM8:
 			RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM8, ENABLE);
 			break;
+		case (uint32_t)TIM9:
+			RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM9, ENABLE);
+			break;
+		case (uint32_t)TIM10:
+			RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM10, ENABLE);
+			break;
+		case (uint32_t)TIM11:
+			RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM11, ENABLE);
+			break;
 #endif
 	}
 
@@ -142,10 +151,10 @@ int32_t PIOS_TIM_InitChannels(uint32_t * tim_id, const struct pios_tim_channel *
 */ // commented out for now as f4 starts all clocks
 		GPIO_Init(chan->pin.gpio, &chan->pin.init);
 
-		// F4 remaps pins differently
-/*		if (chan->remap) {
-			GPIO_PinRemapConfig(chan->remap, ENABLE);
-		} */
+		PIOS_DEBUG_Assert(chan->remaP);
+			
+		// Second parameter should technically be PinSource but they are numerically the same
+		GPIO_PinAFConfig(chan->pin.gpio, chan->pin.pin_source,chan->remap);
 	}
 
 	*tim_id = (uint32_t)tim_dev;
@@ -425,5 +434,27 @@ void TIM8_CC_IRQHandler(void) __attribute__ ((alias ("PIOS_TIM_8_CC_irq_handler"
 static void PIOS_TIM_8_CC_irq_handler (void)
 {
 	PIOS_TIM_generic_irq_handler (TIM8);
+}
+
+
+void TIM1_BRK_TIM9_IRQHandler(void) __attribute__ ((alias ("PIOS_TIM_9_CC_irq_handler")));
+static void PIOS_TIM_9_CC_irq_handler (void)
+{
+	// TODO: Check for TIM1_BRK
+	PIOS_TIM_generic_irq_handler (TIM9);
+}
+
+void TIM1_UP_TIM10_IRQHandler(void) __attribute__ ((alias ("PIOS_TIM_10_CC_irq_handler")));
+static void PIOS_TIM_10_CC_irq_handler (void)
+{
+	// TODO: Check for TIM1_UP
+	PIOS_TIM_generic_irq_handler (TIM10);
+}
+
+void TIM1_TRG_COM_TIM11_IRQHandler(void) __attribute__ ((alias ("PIOS_TIM_11_CC_irq_handler")));
+static void PIOS_TIM_11_CC_irq_handler (void)
+{
+	// TODO: Check for TIM1_TRG
+	PIOS_TIM_generic_irq_handler (TIM11);
 }
 

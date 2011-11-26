@@ -55,6 +55,8 @@ PlotData::PlotData(QString p_uavObject, QString p_uavField)
     scalePower = 0;
     interpolationSamples = 1;
     interpolationSum = 0.0f;
+    correctionSum = 0.0f;
+    correctionCount = 0;
     yMinimum = 0;
     yMaximum = 0;
 
@@ -95,11 +97,22 @@ bool SequencialPlotData::append(UAVObject* obj)
         if (field) {
 
             //Shift data forward and put the new value at the front
-            yDataHistory->append( valueAsDouble(obj, field) * pow(10, scalePower));
-            interpolationSum += valueAsDouble(obj, field) * pow(10, scalePower);
+
+            // calculate interpolated (smoothed) value
+            double currentValue = valueAsDouble(obj, field) * pow(10, scalePower);
+            yDataHistory->append( currentValue );
+            interpolationSum += currentValue;
             if(yDataHistory->size() > interpolationSamples) {
                 interpolationSum -= yDataHistory->first();
                 yDataHistory->pop_front();
+            }
+            // make sure to correct the sum every interpolationSamples steps to prevent it
+            // from running away due to flouting point rounding errors
+            correctionSum += currentValue;
+            if (++correctionCount >= interpolationSamples) {
+                interpolationSum = correctionSum;
+                correctionSum = 0.0f;
+                correctionCount = 0;
             }
             yData->append(interpolationSum/yDataHistory->size());
             if (yData->size() > m_xWindowSize) {
@@ -127,11 +140,21 @@ bool ChronoPlotData::append(UAVObject* obj)
             //Put the new value at the front
             QDateTime NOW = QDateTime::currentDateTime();
 
-            yDataHistory->append( valueAsDouble(obj, field) * pow(10, scalePower));
-            interpolationSum += valueAsDouble(obj, field) * pow(10, scalePower);
+            // calculate interpolated (smoothed) value
+            double currentValue = valueAsDouble(obj, field) * pow(10, scalePower);
+            yDataHistory->append( currentValue );
+            interpolationSum += currentValue;
             if(yDataHistory->size() > interpolationSamples) {
                 interpolationSum -= yDataHistory->first();
                 yDataHistory->pop_front();
+            }
+            // make sure to correct the sum every interpolationSamples steps to prevent it
+            // from running away due to flouting point rounding errors
+            correctionSum += currentValue;
+            if (++correctionCount >= interpolationSamples) {
+                interpolationSum = correctionSum;
+                correctionSum = 0.0f;
+                correctionCount = 0;
             }
 
             double valueX = NOW.toTime_t() + NOW.time().msec() / 1000.0;

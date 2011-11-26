@@ -106,6 +106,7 @@ extern uint32_t pios_i2c_gyro_adapter_id;
 //------------------------
 // PIOS_BMP085
 //------------------------
+#define PIOS_BMP085_HAS_GPIOS
 #define PIOS_BMP085_EOC_GPIO_PORT               GPIOC
 #define PIOS_BMP085_EOC_GPIO_PIN                GPIO_Pin_2
 #define PIOS_BMP085_EOC_PORT_SOURCE             GPIO_PortSourceGPIOC

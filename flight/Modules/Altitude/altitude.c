@@ -144,13 +144,21 @@ static void altitudeTask(void *parameters)
 #endif
 		// Update the temperature data
 		PIOS_BMP085_StartADC(TemperatureConv);
+#ifdef PIOS_BMP085_HAS_GPIOS
 		xSemaphoreTake(PIOS_BMP085_EOC, portMAX_DELAY);
+#else
+		vTaskDelay(5 / portTICK_RATE_MS);
+#endif
 		PIOS_BMP085_ReadADC();
 		alt_ds_temp += PIOS_BMP085_GetTemperature();
 
 		// Update the pressure data
 		PIOS_BMP085_StartADC(PressureConv);
+#ifdef PIOS_BMP085_HAS_GPIOS
 		xSemaphoreTake(PIOS_BMP085_EOC, portMAX_DELAY);
+#else
+		vTaskDelay(26 / portTICK_RATE_MS);
+#endif
 		PIOS_BMP085_ReadADC();
 		alt_ds_pres += PIOS_BMP085_GetPressure();
 

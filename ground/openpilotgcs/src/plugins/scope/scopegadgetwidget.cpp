@@ -710,7 +710,7 @@ int ScopeGadgetWidget::csvLoggingInsertData()
             }
             else
             {
-                ss  << QString().sprintf("%3.6g",plotData2->yData->last()/pow(10,plotData2->scalePower));
+                ss  << QString().sprintf("%3.6g",plotData2->yDataHistory->last()/pow(10,plotData2->scalePower));
                 m_csvLoggingDataValid=1;
             }
         }

@@ -1430,7 +1430,9 @@ void PIOS_Board_Init(void) {
 #endif	/* PIOS_INCLUDE_USB_HID */
 
 	PIOS_IAP_Init();
+#ifndef ERASE_FLASH
 	PIOS_WDG_Init();
+#endif
 }
 
 /**

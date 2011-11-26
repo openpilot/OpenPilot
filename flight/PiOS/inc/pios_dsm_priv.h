@@ -91,12 +91,11 @@
  * if this receiver is a master (provides receiver capabilities info to
  * the transmitter to choose data format) or slave (does not respond to
  * the transmitter which falls back to the old DSM mode in that case).
- * Currently known are 3(4) pulses for low resolution (10 bit) mode, and
- * 5(6) pulses for high resolution (11 bit) mode. Thus only 3 or 5 pulses
- * should be used for stand-alone satellite receiver to be bound correctly
- * as the master. 5 pulses (high resolution) mode simulates high-end
- * receivers which should work in all cases except user explicitly wants
- * to bind in low resolution mode.
+ * Currently known are 3(4) pulses for low resolution (10 bit) DSM2 mode,
+ * 5(6) pulses for high resolution (11 bit) DSM2 mode, and also 7(8) and
+ * 9(10) pulses for DSMX modes. Thus only 3, 5, 7 or 9 pulses should be
+ * used for stand-alone satellite receiver to be bound correctly as the
+ * master.
  */
 
 #define DSM_CHANNELS_PER_FRAME		7

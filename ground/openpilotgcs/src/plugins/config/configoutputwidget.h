@@ -1,13 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       configservowidget.h
+ * @file       configoutputwidget.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup ConfigPlugin Config Plugin
  * @{
- * @brief Servo input/output configuration panel for the config gadget
+ * @brief Servo output configuration panel for the config gadget
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -37,6 +37,7 @@
 #include <QList>
 
 class Ui_OutputWidget;
+class OutputChannelForm;
 
 class ConfigOutputWidget: public ConfigTaskWidget
 {
@@ -45,6 +46,7 @@ class ConfigOutputWidget: public ConfigTaskWidget
 public:
         ConfigOutputWidget(QWidget *parent = 0);
         ~ConfigOutputWidget();
+
 
 private:
         Ui_OutputWidget *m_config;
@@ -55,17 +57,11 @@ private:
 
 	void assignChannel(UAVDataObject *obj, QString str);
 	void assignOutputChannel(UAVDataObject *obj, QString str);
+        OutputChannelForm* getOutputChannelForm(const int index) const;
 
 	int mccDataRate;
 
 	UAVObject::Metadata accInitialData;
-
-	QList<QSlider*> outSliders;
-	QList<QSpinBox*> outMin;
-	QList<QSpinBox*> outMax;
-	QList<QCheckBox*> reversals;
-	QList<QCheckBox*> links;
-	QList<QLabel*> outLabels;
 
 	bool firstUpdate;
 
@@ -76,12 +72,11 @@ private slots:
         virtual void refreshWidgetsValues();
         void updateObjectsFromWidgets();
 	void runChannelTests(bool state);
-	void sendChannelTest(int value);
-	void setChOutRange();
-	void reverseChannel(bool state);
-	void linkToggled(bool state);
+        void sendChannelTest(int index, int value);
         void setSpinningArmed(bool val);
         void openHelp();
+protected:
+        void enableControls(bool enable);
 };
 
 #endif

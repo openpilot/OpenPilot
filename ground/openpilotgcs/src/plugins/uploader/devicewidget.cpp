@@ -183,7 +183,7 @@ bool deviceWidget::populateBoardStructuredDescription(QByteArray desc)
     if(UAVObjectUtilManager::descriptionToStructure(desc,&onBoardDescrition))
     {
         myDevice->lblGitTag->setText(onBoardDescrition.gitTag);
-        myDevice->lblBuildDate->setText(onBoardDescrition.buildDate);
+        myDevice->lblBuildDate->setText(onBoardDescrition.buildDate.insert(4,"-").insert(7,"-"));
         if(onBoardDescrition.description.startsWith("release",Qt::CaseInsensitive))
         {
             myDevice->lblDescription->setText(QString("Firmware tag: ")+onBoardDescrition.description);
@@ -213,7 +213,7 @@ bool deviceWidget::populateLoadedStructuredDescription(QByteArray desc)
     if(UAVObjectUtilManager::descriptionToStructure(desc,&LoadedDescrition))
     {
         myDevice->lblGitTagL->setText(LoadedDescrition.gitTag);
-        myDevice->lblBuildDateL->setText( LoadedDescrition.buildDate);
+        myDevice->lblBuildDateL->setText( LoadedDescrition.buildDate.insert(4,"-").insert(7,"-"));
         if(LoadedDescrition.description.startsWith("release",Qt::CaseInsensitive))
         {
             myDevice->lblDescritpionL->setText(LoadedDescrition.description);

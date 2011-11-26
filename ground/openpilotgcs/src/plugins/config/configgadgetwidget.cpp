@@ -134,6 +134,7 @@ void ConfigGadgetWidget::onAutopilotDisconnect() {
 
 void ConfigGadgetWidget::onAutopilotConnect() {
 
+    qDebug()<<"ConfigGadgetWidget onAutopilotConnect";
     // First of all, check what Board type we are talking to, and
     // if necessary, remove/add tabs in the config gadget:
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();

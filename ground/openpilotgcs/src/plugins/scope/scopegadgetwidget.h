@@ -166,11 +166,13 @@ private:
 
     QString m_csvLoggingName;
     QString m_csvLoggingPath;
+    QString m_csvLoggingBuffer;
     QFile m_csvLoggingFile;
 
 	QMutex mutex;
 
     int csvLoggingInsertHeader();
+    int csvLoggingAddData();
     int csvLoggingInsertData();
 
 	void deleteLegend();

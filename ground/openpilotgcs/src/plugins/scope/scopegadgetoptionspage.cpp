@@ -101,9 +101,10 @@ QWidget* ScopeGadgetOptionsPage::createPage(QWidget *parent)
         QString uavObject = plotData->uavObject;
         QString uavField = plotData->uavField;
         int scale = plotData->yScalePower;
+        int interpolation = plotData->yInterpolationSamples;
         QVariant varColor = plotData->color;
 
-        addPlotCurveConfig(uavObject,uavField,scale,varColor);
+        addPlotCurveConfig(uavObject,uavField,scale,interpolation,varColor);
     }
 
     if(m_config->plotCurveConfigs().count() > 0)
@@ -163,6 +164,10 @@ void ScopeGadgetOptionsPage::setYAxisWidgetFromPlotCurve()
     int rgb = varColor.toInt(&parseOK);
 
     setButtonColor(QColor((QRgb)rgb));
+
+    int interpolation = listItem->data(Qt::UserRole + 4).toInt(&parseOK);
+    if(!parseOK) interpolation = 1;
+    options_page->spnInterpolationSamples->setValue(interpolation);
 }
 
 void ScopeGadgetOptionsPage::setButtonColor(const QColor &color)
@@ -235,6 +240,10 @@ void ScopeGadgetOptionsPage::apply()
             newPlotCurveConfigs->color = QColor(Qt::black).rgb();
         else
             newPlotCurveConfigs->color = (QRgb)rgb;
+	
+	newPlotCurveConfigs->yInterpolationSamples = listItem->data(Qt::UserRole + 4).toInt(&parseOK);
+        if(!parseOK)
+            newPlotCurveConfigs->yInterpolationSamples = 1;
 
         plotCurveConfigs.append(newPlotCurveConfigs);
     }
@@ -261,6 +270,7 @@ void ScopeGadgetOptionsPage::on_btnAddCurve_clicked()
     if(!parseOK)
        scale = 0;
 
+    int interpolation = options_page->spnInterpolationSamples->value();
 
     QVariant varColor = (int)QColor(options_page->btnColor->text()).rgb();
 
@@ -270,27 +280,27 @@ void ScopeGadgetOptionsPage::on_btnAddCurve_clicked()
        options_page->lstCurves->currentItem()->text() == uavObject + "." + uavField)
     {
         QListWidgetItem *listWidgetItem = options_page->lstCurves->currentItem();
-        setCurvePlotProperties(listWidgetItem,uavObject,uavField,scale,varColor);
+        setCurvePlotProperties(listWidgetItem,uavObject,uavField,scale,interpolation,varColor);
     }else
     {
-        addPlotCurveConfig(uavObject,uavField,scale,varColor);
+        addPlotCurveConfig(uavObject,uavField,scale,interpolation,varColor);
 
         options_page->lstCurves->setCurrentRow(options_page->lstCurves->count() - 1);
     }
 }
 
-void ScopeGadgetOptionsPage::addPlotCurveConfig(QString uavObject, QString uavField, int scale, QVariant varColor)
+void ScopeGadgetOptionsPage::addPlotCurveConfig(QString uavObject, QString uavField, int scale, int interpolation, QVariant varColor)
 {
     //Add a new curve config to the list
     QString listItemDisplayText = uavObject + "." + uavField;
     options_page->lstCurves->addItem(listItemDisplayText);
     QListWidgetItem *listWidgetItem = options_page->lstCurves->item(options_page->lstCurves->count() - 1);
 
-    setCurvePlotProperties(listWidgetItem,uavObject,uavField,scale,varColor);
+    setCurvePlotProperties(listWidgetItem,uavObject,uavField,scale,interpolation,varColor);
 
 }
 
-void ScopeGadgetOptionsPage::setCurvePlotProperties(QListWidgetItem *listWidgetItem,QString uavObject, QString uavField, int scale, QVariant varColor)
+void ScopeGadgetOptionsPage::setCurvePlotProperties(QListWidgetItem *listWidgetItem,QString uavObject, QString uavField, int scale, int interpolation, QVariant varColor)
 {
     bool parseOK = false;
 
@@ -306,6 +316,7 @@ void ScopeGadgetOptionsPage::setCurvePlotProperties(QListWidgetItem *listWidgetI
     listWidgetItem->setData(Qt::UserRole + 1,QVariant(uavField));
     listWidgetItem->setData(Qt::UserRole + 2,QVariant(scale));
     listWidgetItem->setData(Qt::UserRole + 3,varColor);
+    listWidgetItem->setData(Qt::UserRole + 4,QVariant(interpolation));
 }
 
 /*!

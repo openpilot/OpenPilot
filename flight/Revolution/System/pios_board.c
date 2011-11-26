@@ -792,6 +792,34 @@ void PIOS_I2C_pressure_adapter_er_irq_handler(void)
 }
 #endif /* PIOS_INCLUDE_I2C */
 
+#if defined(PIOS_INCLUDE_RTC)
+/*
+ * Realtime Clock (RTC)
+ */
+#include <pios_rtc_priv.h>
+
+void PIOS_RTC_IRQ_Handler (void);
+void RTC_IRQHandler() __attribute__ ((alias ("PIOS_RTC_IRQ_Handler")));
+static const struct pios_rtc_cfg pios_rtc_main_cfg = {
+	.clksrc = RCC_RTCCLKSource_HSE_Div128,
+	.prescaler = 100,
+	.irq = {
+		.init = {
+			.NVIC_IRQChannel                   = RTC_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
+			.NVIC_IRQChannelSubPriority        = 0,
+			.NVIC_IRQChannelCmd                = ENABLE,
+		},
+	},
+};
+
+void PIOS_RTC_IRQ_Handler (void)
+{
+	PIOS_RTC_irq_handler ();
+}
+
+#endif
+
 #include "pios_tim_priv.h"
 
 static const TIM_TimeBaseInitTypeDef tim_3_5_9_10_11_time_base = {
@@ -1331,8 +1359,6 @@ uint8_t buf[4];
 uint8_t rec[4];
 struct pios_mpu6000_data test_gyro_data;
 void PIOS_Board_Init(void) {
-	/* Brings up System using CMSIS functions, enables the LEDs. */
-	PIOS_SYS_Init();
 	
 	/* Delay system */
 	PIOS_DELAY_Init();
@@ -1353,14 +1379,30 @@ void PIOS_Board_Init(void) {
 	EventDispatcherInitialize();
 	UAVObjInitialize();
 	
+	HwSettingsInitialize();
+	
+#if defined(PIOS_INCLUDE_RTC)
+	PIOS_RTC_Init(&pios_rtc_main_cfg);
+#endif
+
 	/* Initialize the alarms library */
 	AlarmsInitialize();
 
 	/* Initialize the task monitor library */
 	TaskMonitorInitialize();
 
+	/* Set up pulse timers */
+	PIOS_TIM_InitClock(&tim_1_cfg);
+	PIOS_TIM_InitClock(&tim_3_cfg);
+	PIOS_TIM_InitClock(&tim_4_cfg);
+	PIOS_TIM_InitClock(&tim_4_cfg);
+	PIOS_TIM_InitClock(&tim_5_cfg);
+	PIOS_TIM_InitClock(&tim_9_cfg);
+	PIOS_TIM_InitClock(&tim_10_cfg);
+	PIOS_TIM_InitClock(&tim_11_cfg);
+
 	/* IAP System Setup */
-	PIOS_IAP_Init();
+	//PIOS_IAP_Init();
 	
 #if defined(PIOS_INCLUDE_COM)
 #if defined(PIOS_INCLUDE_GPS)
@@ -1410,6 +1452,20 @@ void PIOS_Board_Init(void) {
 
 #endif	/* PIOS_INCLUDE_COM */
 	
+	
+	/* Set up the receiver port.  Later this should be optional */
+	uint32_t pios_pwm_id;
+	PIOS_PWM_Init(&pios_pwm_id, &pios_pwm_cfg);
+	
+	uint32_t pios_pwm_rcvr_id;
+	if (PIOS_RCVR_Init(&pios_pwm_rcvr_id, &pios_pwm_rcvr_driver, pios_pwm_id)) {
+		PIOS_Assert(0);
+	}
+	pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_PWM] = pios_pwm_rcvr_id;
+
+	/* Set up the servo outputs */
+	PIOS_Servo_Init(&pios_servo_cfg);
+
 	if (PIOS_I2C_Init(&pios_i2c_mag_adapter_id, &pios_i2c_mag_adapter_cfg)) {
 		PIOS_DEBUG_Assert(0);
 	}

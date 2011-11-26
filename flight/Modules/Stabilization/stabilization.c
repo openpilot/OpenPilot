@@ -373,24 +373,24 @@ float ApplyPid(pid_type * pid, const float err)
 	pid->lastErr = err;
 
 	// Scale up accumulator by 1000 while computing to avoid losing precision
-	pid->iAccumulator += err * (pid->i * dT * 1000);
-	if(pid->iAccumulator > (pid->iLim * 1000)) {
-		pid->iAccumulator = pid->iLim * 1000;
-	} else if (pid->iAccumulator < -(pid->iLim * 1000)) {
-		pid->iAccumulator = -pid->iLim * 1000;
+	pid->iAccumulator += err * (pid->i * dT * 1000.0f);
+	if(pid->iAccumulator > (pid->iLim * 1000.0f)) {
+		pid->iAccumulator = pid->iLim * 1000.0f;
+	} else if (pid->iAccumulator < -(pid->iLim * 1000.0f)) {
+		pid->iAccumulator = -pid->iLim * 1000.0f;
 	}
-	return ((err * pid->p) + pid->iAccumulator / 1000 + (diff * pid->d / dT));
+	return ((err * pid->p) + pid->iAccumulator / 1000.0f + (diff * pid->d / dT));
 }
 
 
 static void ZeroPids(void)
 {
 	for(int8_t ct = 0; ct < PID_MAX; ct++) {
-		pids[ct].iAccumulator = 0;
-		pids[ct].lastErr = 0;
+		pids[ct].iAccumulator = 0.0f;
+		pids[ct].lastErr = 0.0f;
 	}
 	for(uint8_t i = 0; i < 3; i++)
-		axis_lock_accum[i] = 0;
+		axis_lock_accum[i] = 0.0f;
 }
 
 
@@ -399,10 +399,10 @@ static void ZeroPids(void)
  */
 static float bound(float val)
 {
-	if(val < -1) {
-		val = -1;
-	} else if(val > 1) {
-		val = 1;
+	if(val < -1.0f) {
+		val = -1.0f;
+	} else if(val > 1.0f) {
+		val = 1.0f;
 	}
 	return val;
 }

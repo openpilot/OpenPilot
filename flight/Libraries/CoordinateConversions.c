@@ -240,7 +240,7 @@ void R2Quaternion(float R[3][3], float q[4])
 			index = i;
 		}
 	}
-	mag = 2*sqrt(mag);
+	mag = 2*sqrtf(mag);
 
 	if (index == 0) {
 		q[0] = mag/4;
@@ -374,7 +374,7 @@ void CrossProduct(const float v1[3], const float v2[3], float result[3])
 // ****** Vector Magnitude ********
 float VectorMagnitude(const float v[3])
 {
-	return(sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]));
+	return(sqrtf(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]));
 }
 
 /**

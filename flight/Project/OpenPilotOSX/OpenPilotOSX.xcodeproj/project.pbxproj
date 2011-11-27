@@ -3340,6 +3340,7 @@
 		65FAA03F133B669400F6F5CD /* GTOP_BIN.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = GTOP_BIN.c; sourceTree = "<group>"; };
 		65FAB8FC1480DA19000FF8B2 /* pios_dsm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_dsm.c; sourceTree = "<group>"; };
 		65FAB8FD1480DA19000FF8B2 /* pios_pwm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_pwm.c; sourceTree = "<group>"; };
+		65FAB8FE1481A5C5000FF8B2 /* pios_rtc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_rtc.c; sourceTree = "<group>"; };
 		65FBE14412E7C98100176B5A /* pios_servo_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_servo_priv.h; sourceTree = "<group>"; };
 		65FC66AA123F30F100B04F74 /* ahrs_timer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ahrs_timer.c; path = ../../AHRS/ahrs_timer.c; sourceTree = SOURCE_ROOT; };
 		65FC66AB123F312A00B04F74 /* ahrs_timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs_timer.h; sourceTree = "<group>"; };
@@ -3862,8 +3863,6 @@
 		65904E5D14613B6100FD9482 /* STM32F4xx */ = {
 			isa = PBXGroup;
 			children = (
-				65FAB8FC1480DA19000FF8B2 /* pios_dsm.c */,
-				65FAB8FD1480DA19000FF8B2 /* pios_pwm.c */,
 				65904E5E14613B6100FD9482 /* inc */,
 				65904E6214613B6100FD9482 /* Libraries */,
 				65904EC114613B6100FD9482 /* library.mk */,
@@ -3875,6 +3874,7 @@
 				65904EC714613B6100FD9482 /* pios_bmp085.c */,
 				65904EC814613B6100FD9482 /* pios_debug.c */,
 				65904EC914613B6100FD9482 /* pios_delay.c */,
+				65FAB8FC1480DA19000FF8B2 /* pios_dsm.c */,
 				65904ECA14613B6100FD9482 /* pios_exti.c */,
 				65904ECB14613B6100FD9482 /* pios_gpio.c */,
 				65904ECC14613B6100FD9482 /* pios_hmc5883.c */,
@@ -3886,6 +3886,8 @@
 				6534B5581474F7B1003DF47C /* pios_mpu6000.c */,
 				65FA9B7A14709E700019A260 /* pios_mpu6050.c */,
 				65904ED214613B6100FD9482 /* pios_ppm.c */,
+				65FAB8FD1480DA19000FF8B2 /* pios_pwm.c */,
+				65FAB8FE1481A5C5000FF8B2 /* pios_rtc.c */,
 				65904ED314613B6100FD9482 /* pios_servo.c */,
 				65904ED414613B6100FD9482 /* pios_spi.c */,
 				65904ED514613B6100FD9482 /* pios_sys.c */,

@@ -117,7 +117,7 @@ extern uint32_t pios_i2c_mag_adapter_id;
 //
 // See also pios_board.c
 //-------------------------
-#define PIOS_USART_MAX_DEVS             2
+#define PIOS_USART_MAX_DEVS             5
 
 //-------------------------
 // PIOS_COM
@@ -184,6 +184,12 @@ extern uint32_t pios_com_telem_usb_id;
 //-------------------------
 #define PIOS_SBUS_MAX_DEVS           1
 #define PIOS_SBUS_NUM_INPUTS         (16+2)
+
+//-------------------------
+// Receiver DSM input
+//-------------------------
+#define PIOS_DSM_MAX_DEVS			2
+#define PIOS_DSM_NUM_INPUTS			12
 
 //-------------------------
 // Servo outputs

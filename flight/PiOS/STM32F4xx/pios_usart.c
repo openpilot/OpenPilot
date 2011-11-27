@@ -74,14 +74,18 @@ static bool PIOS_USART_validate(struct pios_usart_dev * usart_dev)
 	return (usart_dev->magic == PIOS_USART_DEV_MAGIC);
 }
 
-#if defined(PIOS_INCLUDE_FREERTOS) && 0
+#if defined(PIOS_INCLUDE_FREERTOS)
 static struct pios_usart_dev * PIOS_USART_alloc(void)
 {
 	struct pios_usart_dev * usart_dev;
 
-	usart_dev = (struct pios_usart_dev *)malloc(sizeof(*usart_dev));
+	usart_dev = (struct pios_usart_dev *)pvPortMalloc(sizeof(*usart_dev));
 	if (!usart_dev) return(NULL);
 
+	usart_dev->rx_in_cb = 0;
+	usart_dev->rx_in_context = 0;
+	usart_dev->tx_out_cb = 0;
+	usart_dev->tx_out_context = 0;
 	usart_dev->magic = PIOS_USART_DEV_MAGIC;
 	return(usart_dev);
 }
@@ -111,21 +115,47 @@ static struct pios_usart_dev * PIOS_USART_alloc(void)
  */
 static void PIOS_USART_generic_irq_handler(uint32_t usart_id);
 
-#define USART_HANDLER(_n)									\
-	static uint32_t PIOS_USART_ ## _n ## _id;				\
-	void USART ## _n ## _IRQHandler(void) __attribute__ ((alias ("PIOS_USART_" #_n "_irq_handler"))); \
-	static void PIOS_USART_ ## _n ## _irq_handler (void)	\
-	{														\
-		PIOS_USART_generic_irq_handler (PIOS_USART_ ## _n ## _id); \
-	}														\
-	struct hack
+static uint32_t PIOS_USART_1_id;
+void USART1_IRQHandler(void) __attribute__ ((alias ("PIOS_USART_1_irq_handler")));
+static void PIOS_USART_1_irq_handler (void)
+{
+	PIOS_USART_generic_irq_handler (PIOS_USART_1_id);
+}
 
-USART_HANDLER(1);
-USART_HANDLER(2);
-USART_HANDLER(3);
-USART_HANDLER(4);
-USART_HANDLER(5);
-USART_HANDLER(6);
+static uint32_t PIOS_USART_2_id;
+void USART2_IRQHandler(void) __attribute__ ((alias ("PIOS_USART_2_irq_handler")));
+static void PIOS_USART_2_irq_handler (void)
+{
+	PIOS_USART_generic_irq_handler (PIOS_USART_2_id);
+}
+
+static uint32_t PIOS_USART_3_id;
+void USART3_IRQHandler(void) __attribute__ ((alias ("PIOS_USART_3_irq_handler")));
+static void PIOS_USART_3_irq_handler (void)
+{
+	PIOS_USART_generic_irq_handler (PIOS_USART_3_id);
+}
+
+static uint32_t PIOS_USART_4_id;
+void USART4_IRQHandler(void) __attribute__ ((alias ("PIOS_USART_4_irq_handler")));
+static void PIOS_USART_4_irq_handler (void)
+{
+	PIOS_USART_generic_irq_handler (PIOS_USART_4_id);
+}
+
+static uint32_t PIOS_USART_5_id;
+void USART5_IRQHandler(void) __attribute__ ((alias ("PIOS_USART_5_irq_handler")));
+static void PIOS_USART_5_irq_handler (void)
+{
+	PIOS_USART_generic_irq_handler (PIOS_USART_5_id);
+}
+
+static uint32_t PIOS_USART_6_id;
+void USART6_IRQHandler(void) __attribute__ ((alias ("PIOS_USART_6_irq_handler")));
+static void PIOS_USART_6_irq_handler (void)
+{
+	PIOS_USART_generic_irq_handler (PIOS_USART_6_id);
+}
 
 /**
 * Initialise a single USART device
@@ -185,6 +215,8 @@ int32_t PIOS_USART_Init(uint32_t * usart_id, const struct pios_usart_cfg * cfg)
 		break;
 	}
 	NVIC_Init((NVIC_InitTypeDef *)&(usart_dev->cfg->irq.init));
+	USART_ITConfig(usart_dev->cfg->regs, USART_IT_RXNE, ENABLE);
+	USART_ITConfig(usart_dev->cfg->regs, USART_IT_TXE,  ENABLE);
 
 	// FIXME XXX Clear / reset uart here - sends NUL char else
 

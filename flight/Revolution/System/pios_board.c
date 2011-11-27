@@ -517,8 +517,7 @@ static uint8_t pios_com_gps_rx_buffer[PIOS_COM_GPS_RX_BUF_LEN];
  */
 static const struct pios_usart_cfg pios_usart_telem_main_cfg = {
 	.regs = USART6,
-	.regs = USART1,
-	.remap = GPIO_AF_USART1,
+	.remap = GPIO_AF_USART6,
 	.init = {
 		.USART_BaudRate = 57600,
 		.USART_WordLength = USART_WordLength_8b,
@@ -530,10 +529,62 @@ static const struct pios_usart_cfg pios_usart_telem_main_cfg = {
 	},
 	.irq = {
 		.init = {
-			.NVIC_IRQChannel = USART1_IRQn,
+			.NVIC_IRQChannel = USART6_IRQn,
 			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
 			.NVIC_IRQChannelSubPriority = 0,
 			.NVIC_IRQChannelCmd = ENABLE,
+		},
+	},
+	.rx = {
+		.gpio = GPIOC,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_7,
+			.GPIO_Speed = GPIO_Speed_2MHz,
+			.GPIO_Mode  = GPIO_Mode_AF,
+			.GPIO_OType = GPIO_OType_PP,
+			.GPIO_PuPd  = GPIO_PuPd_UP
+		},
+	},
+	.tx = {
+		.gpio = GPIOC,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_6,
+			.GPIO_Speed = GPIO_Speed_2MHz,
+			.GPIO_Mode  = GPIO_Mode_AF,
+			.GPIO_OType = GPIO_OType_PP,
+			.GPIO_PuPd  = GPIO_PuPd_UP
+		},
+	},
+};
+
+#define PIOS_COM_TELEM_RF_RX_BUF_LEN 512
+#define PIOS_COM_TELEM_RF_TX_BUF_LEN 512
+
+#endif /* PIOS_COM_TELEM */
+
+#if defined(PIOS_INCLUDE_DSM)
+/*
+ * Spektrum/JR DSM USART
+ */
+#include <pios_dsm_priv.h>
+
+static const struct pios_usart_cfg pios_usart_dsm_main_cfg = {
+	.regs = USART1,
+	.remap = GPIO_AF_USART1,
+	.init = {
+		.USART_BaudRate            = 115200,
+		.USART_WordLength          = USART_WordLength_8b,
+		.USART_Parity              = USART_Parity_No,
+		.USART_StopBits            = USART_StopBits_1,
+		.USART_HardwareFlowControl = USART_HardwareFlowControl_None,
+		.USART_Mode                = USART_Mode_Rx,
+	},
+	.irq = {
+		.init = {
+			.NVIC_IRQChannel                   = USART1_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+			.NVIC_IRQChannelSubPriority        = 0,
+			.NVIC_IRQChannelCmd                = ENABLE,
 		},
 	},
 	.rx = {
@@ -558,10 +609,76 @@ static const struct pios_usart_cfg pios_usart_telem_main_cfg = {
 	},
 };
 
-#define PIOS_COM_TELEM_RF_RX_BUF_LEN 512
-#define PIOS_COM_TELEM_RF_TX_BUF_LEN 512
+static const struct pios_dsm_cfg pios_dsm_main_cfg = {
+	.bind = {
+		.gpio = GPIOA,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_10,
+			.GPIO_Speed = GPIO_Speed_2MHz,
+			.GPIO_Mode  = GPIO_Mode_OUT,
+			.GPIO_OType = GPIO_OType_PP,
+			.GPIO_PuPd  = GPIO_PuPd_NOPULL
+		},
+	},
+};
 
-#endif /* PIOS_COM_TELEM */
+
+static const struct pios_usart_cfg pios_usart_dsm_flexi_cfg = {
+	.regs = USART3,
+	.remap = GPIO_AF_USART3,
+	.init = {
+		.USART_BaudRate            = 115200,
+		.USART_WordLength          = USART_WordLength_8b,
+		.USART_Parity              = USART_Parity_No,
+		.USART_StopBits            = USART_StopBits_1,
+		.USART_HardwareFlowControl = USART_HardwareFlowControl_None,
+		.USART_Mode                = USART_Mode_Rx,
+	},
+	.irq = {
+		.init = {
+			.NVIC_IRQChannel                   = USART3_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+			.NVIC_IRQChannelSubPriority        = 0,
+			.NVIC_IRQChannelCmd                = ENABLE,
+		},
+	},
+	.rx = {
+		.gpio = GPIOB,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_11,
+			.GPIO_Speed = GPIO_Speed_2MHz,
+			.GPIO_Mode  = GPIO_Mode_AF,
+			.GPIO_OType = GPIO_OType_PP,
+			.GPIO_PuPd  = GPIO_PuPd_UP
+		},
+	},
+	.tx = {
+		.gpio = GPIOB,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_10,
+			.GPIO_Speed = GPIO_Speed_2MHz,
+			.GPIO_Mode  = GPIO_Mode_AF,
+			.GPIO_OType = GPIO_OType_PP,
+			.GPIO_PuPd  = GPIO_PuPd_UP
+		},
+	},
+};
+
+static const struct pios_dsm_cfg pios_dsm_flexi_cfg = {
+	.bind = {
+		.gpio = GPIOB,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_11,
+			.GPIO_Speed = GPIO_Speed_2MHz,
+			.GPIO_Mode  = GPIO_Mode_OUT,
+			.GPIO_OType = GPIO_OType_PP,
+			.GPIO_PuPd  = GPIO_PuPd_NOPULL
+		},
+	},
+};
+
+
+#endif	/* PIOS_INCLUDE_DSM */
 
 
 #if defined(PIOS_INCLUDE_COM)
@@ -1388,10 +1505,6 @@ static const struct pios_mpu6000_cfg pios_mpu6000_cfg = {
  * initializes all the core subsystems on this specific hardware
  * called from System/openpilot.c
  */
-int32_t test_val;
-uint8_t buf[4];
-uint8_t rec[4];
-struct pios_mpu6000_data test_gyro_data;
 void PIOS_Board_Init(void) {
 	
 	/* Delay system */
@@ -1486,16 +1599,39 @@ void PIOS_Board_Init(void) {
 
 #endif	/* PIOS_INCLUDE_COM */
 	
+	// Set up spektrum receiver
+	enum pios_dsm_proto proto;
+	proto = PIOS_DSM_PROTO_DSM2;
 	
+	uint32_t pios_usart_dsm_id;
+	if (PIOS_USART_Init(&pios_usart_dsm_id, &pios_usart_dsm_main_cfg)) {
+		PIOS_Assert(0);
+	}
+
+	uint32_t pios_dsm_id;
+	if (PIOS_DSM_Init(&pios_dsm_id,
+					  &pios_dsm_main_cfg,
+					  &pios_usart_com_driver,
+					  pios_usart_dsm_id,
+					  proto, 0)) {
+		PIOS_Assert(0);
+	}
+	
+	uint32_t pios_dsm_rcvr_id;
+	if (PIOS_RCVR_Init(&pios_dsm_rcvr_id, &pios_dsm_rcvr_driver, pios_dsm_id)) {
+		PIOS_Assert(0);
+	}
+	pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_DSMMAINPORT] = pios_dsm_rcvr_id;
+
 	/* Set up the receiver port.  Later this should be optional */
-	uint32_t pios_pwm_id;
-	PIOS_PWM_Init(&pios_pwm_id, &pios_pwm_cfg);
+	//uint32_t pios_pwm_id;
+	//PIOS_PWM_Init(&pios_pwm_id, &pios_pwm_cfg);
 	
-	uint32_t pios_pwm_rcvr_id;
+	/*uint32_t pios_pwm_rcvr_id;
 	if (PIOS_RCVR_Init(&pios_pwm_rcvr_id, &pios_pwm_rcvr_driver, pios_pwm_id)) {
 		PIOS_Assert(0);
 	}
-	pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_PWM] = pios_pwm_rcvr_id;
+	pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_PWM] = pios_pwm_rcvr_id;*/
 
 	/* Set up the servo outputs */
 	PIOS_Servo_Init(&pios_servo_cfg);
@@ -1517,7 +1653,6 @@ void PIOS_Board_Init(void) {
 		PIOS_DEBUG_Assert(0);
 	}
 
-
 	PIOS_MPU6000_Attach(pios_spi_gyro_id);
 	PIOS_MPU6000_Init(&pios_mpu6000_cfg);
 
@@ -1525,9 +1660,6 @@ void PIOS_Board_Init(void) {
 	PIOS_BMA180_Init(&pios_bma180_cfg);
 
 	PIOS_HMC5883_Init(&pios_hmc5883_cfg);
-
-	
-
 }
 
 /**

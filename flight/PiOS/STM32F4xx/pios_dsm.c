@@ -34,6 +34,10 @@
 
 #if defined(PIOS_INCLUDE_DSM)
 
+#if !defined(PIOS_INCLUDE_RTC)
+#error PIOS_INCLUDE_RTC must be used to use DSM
+#endif
+
 /* Forward Declarations */
 static int32_t PIOS_DSM_Get(uint32_t rcvr_id, uint8_t channel);
 static uint16_t PIOS_DSM_RxInCallback(uint32_t context,
@@ -113,10 +117,8 @@ static void PIOS_DSM_Bind(struct pios_dsm_dev *dsm_dev, uint8_t bind)
 {
 	const struct pios_dsm_cfg *cfg = dsm_dev->cfg;
 
-	GPIO_InitTypeDef GPIO_InitStructure;
-	GPIO_InitStructure.GPIO_Pin = cfg->bind.init.GPIO_Pin;
-	GPIO_InitStructure.GPIO_Speed = cfg->bind.init.GPIO_Speed;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
+	GPIO_InitTypeDef GPIO_InitStructure = cfg->bind.init;
+	GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_UP;
 
 	/* just to limit bind pulses */
 	if (bind > 10)

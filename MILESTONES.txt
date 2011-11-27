@@ -149,8 +149,13 @@ V: http://www.youtube.com/watch?v=8SrfIS7OkB4
 
 M: First CopterControl Return to Base Fixed Wing
 C: Eric Price (Corvus Corax)
-D: AUgust 2011
+D: August 2011
 V: http://www.youtube.com/watch?v=CugI0oBSQn8
+
+M: First CopterControl flip on a Flybarless Heli
+C: Anders Johansson (dezent)
+D: November 2011
+V: http://www.youtube.com/watch?v=Xfas2TUhOPw
 
 
 M: First Altitude Hold using Sonar
@@ -164,11 +169,6 @@ D:
 V: 
 
 M: First CopterControl Navigation on RC Water Vechicle
-C: 
-D: 
-V: 
-
-M: First CopterControl flip on a Flybarless Heli
 C: 
 D: 
 V: 

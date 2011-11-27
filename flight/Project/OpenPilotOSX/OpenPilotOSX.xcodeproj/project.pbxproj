@@ -3341,6 +3341,7 @@
 		65FAB8FC1480DA19000FF8B2 /* pios_dsm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_dsm.c; sourceTree = "<group>"; };
 		65FAB8FD1480DA19000FF8B2 /* pios_pwm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_pwm.c; sourceTree = "<group>"; };
 		65FAB8FE1481A5C5000FF8B2 /* pios_rtc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_rtc.c; sourceTree = "<group>"; };
+		65FAB8CF147FFD76000FF8B2 /* receiveractivity.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = receiveractivity.xml; sourceTree = "<group>"; };
 		65FBE14412E7C98100176B5A /* pios_servo_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_servo_priv.h; sourceTree = "<group>"; };
 		65FC66AA123F30F100B04F74 /* ahrs_timer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ahrs_timer.c; path = ../../AHRS/ahrs_timer.c; sourceTree = SOURCE_ROOT; };
 		65FC66AB123F312A00B04F74 /* ahrs_timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs_timer.h; sourceTree = "<group>"; };
@@ -8294,6 +8295,7 @@
 				65C35E6E12EFB2F3004811C2 /* positionactual.xml */,
 				65C35E6F12EFB2F3004811C2 /* positiondesired.xml */,
 				65C35E7012EFB2F3004811C2 /* ratedesired.xml */,
+				65FAB8CF147FFD76000FF8B2 /* receiveractivity.xml */,
 				652C856A132B6EA600BFCC70 /* sonaraltitude.xml */,
 				6536D47B1307962C0042A298 /* stabilizationdesired.xml */,
 				65C35E7112EFB2F3004811C2 /* stabilizationsettings.xml */,

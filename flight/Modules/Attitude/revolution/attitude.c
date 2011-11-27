@@ -288,6 +288,12 @@ static int8_t updateSensors(AttitudeRawData * attitudeRaw)
 		attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] += gyro_correct_int[2];
 	}
 
+	// Hack for tweaking gyro gains with the old settings
+	scaling = gyroGain / 0.42;
+	attitudeRaw->gyros[ATTITUDERAW_GYROS_X] *= scaling;
+	attitudeRaw->gyros[ATTITUDERAW_GYROS_Y] *= scaling;
+	attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] *= scaling;
+
 	// Because most crafts wont get enough information from gravity to zero yaw gyro, we try
 	// and make it average zero (weakly)
 	gyro_correct_int[2] += - attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] * yawBiasRate;
@@ -333,17 +339,14 @@ float accel_mag;
 float qmag;
 static void updateAttitude(AttitudeRawData * attitudeRaw)
 {
-	float dT;
-	portTickType thisSysTime = xTaskGetTickCount();
-	static portTickType lastSysTime = 0;
+	static int32_t timeval;
+	float dT = PIOS_DELAY_DiffuS(timeval) / 1000000.0f;
+	timeval = PIOS_DELAY_GetRaw();
+	
 	float q[4];
 	
 	AttitudeActualData attitudeActual;
 	AttitudeActualGet(&attitudeActual);
-
-	
-	dT = (thisSysTime == lastSysTime) ? 0.001 : (portMAX_DELAY & (thisSysTime - lastSysTime)) / portTICK_RATE_MS / 1000.0f;
-	lastSysTime = thisSysTime;
 
 	float gyro[3];
 	gyro[0] = attitudeRaw->gyros[0];

@@ -364,6 +364,31 @@ void PIOS_MPU6000_IRQHandler(void)
 		return;			
 	}
 	
+	// In the case where extras samples backed up grabbed an extra
+	if (mpu6000_count >= (sizeof(data) * 2)) {
+		if(PIOS_MPU6000_ClaimBus() != 0)
+			return;		
+		
+		uint8_t mpu6000_send_buf[1+sizeof(struct pios_mpu6000_data)] = {PIOS_MPU6000_FIFO_REG | 0x80, 0, 0, 0, 0, 0, 0, 0, 0};
+		uint8_t mpu6000_rec_buf[1+sizeof(struct pios_mpu6000_data)];
+		
+		if(PIOS_SPI_TransferBlock(pios_spi_gyro, &mpu6000_send_buf[0], &mpu6000_rec_buf[0], sizeof(mpu6000_send_buf), NULL) < 0) {
+			PIOS_MPU6000_ReleaseBus();
+			mpu6000_fails++;
+			return;
+		}
+		
+		PIOS_MPU6000_ReleaseBus();
+		
+		struct pios_mpu6000_data data;
+		
+		if(fifoBuf_getFree(&pios_mpu6000_fifo) < sizeof(data)) {
+			mpu6000_fifo_full++;
+			return;			
+		}
+
+	}
+	
 	data.temperature = mpu6000_rec_buf[1] << 8 | mpu6000_rec_buf[2];
 	data.gyro_x = mpu6000_rec_buf[3] << 8 | mpu6000_rec_buf[4];
 	data.gyro_y = mpu6000_rec_buf[5] << 8 | mpu6000_rec_buf[6];

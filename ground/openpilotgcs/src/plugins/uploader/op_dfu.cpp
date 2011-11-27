@@ -80,20 +80,26 @@ DFUObject::DFUObject(bool _debug,bool _use_serial,QString portname):
     }
     else
     {
+        QEventLoop m_eventloop;
+        QTimer::singleShot(200,&m_eventloop, SLOT(quit()));
+        m_eventloop.exec();
         QList<USBPortInfo> devices;
         devices = USBMonitor::instance()->availableDevices(0x20a0,-1,-1,USBMonitor::Bootloader);
         if (devices.length()==1) {
            hidHandle.open(1,devices.first().vendorID,devices.first().productID,0,0);
+           qDebug()<<"OP_DFU detected first time";
         } else {
             // Wait for the board to appear on the USB bus:
-            QEventLoop m_eventloop;
             connect(USBMonitor::instance(), SIGNAL(deviceDiscovered(USBPortInfo)),&m_eventloop, SLOT(quit()));
-            QTimer::singleShot(5000,&m_eventloop, SLOT(quit()));
+            QTimer::singleShot(15000,&m_eventloop, SLOT(quit()));
             m_eventloop.exec();
+            disconnect(USBMonitor::instance(), SIGNAL(deviceDiscovered(USBPortInfo)),&m_eventloop, SLOT(quit()));
             devices = USBMonitor::instance()->availableDevices(0x20a0,-1,-1,USBMonitor::Bootloader);
             if (devices.length()==1) {
-               delay::msleep(2000); // Let the USB Subsystem settle (especially important on Mac!)
+               QTimer::singleShot(1000,&m_eventloop, SLOT(quit()));
+               m_eventloop.exec();
                hidHandle.open(1,devices.first().vendorID,devices.first().productID,0,0);
+               qDebug()<<"OP_DFU detected after delay";
             }
              else {
                 qDebug() << devices.length()  << " device(s) detected, don't know what to do!";

@@ -28,7 +28,8 @@
 #include <QMetaType>
 #include <QString>
 #include <initguid.h>
-
+#include <QEventLoop>
+#include <QTimer>
 #include "usbmonitor.h"
 #include <QDebug>
 #define printf qDebug
@@ -78,9 +79,9 @@ QList<USBPortInfo> USBMonitor::availableDevices(int vid, int pid, int bcdDeviceM
 {
     QList<USBPortInfo> allPorts = availableDevices();
     QList<USBPortInfo> thePortsWeWant;
-
+    qDebug()<<"USBMonitor::availableDevices bcdLSB="<<bcdDeviceLSB;
     foreach (USBPortInfo port, allPorts) {
-        //qDebug()<<"USBMonitorWin:Port VID="<<port.vendorID<<"PID="<<port.productID<<"bcddevice="<<port.bcdDevice;
+        qDebug()<<"USBMonitorWin:Port VID="<<port.vendorID<<"PID="<<port.productID<<"bcddevice="<<port.bcdDevice;
         if((port.vendorID==vid || vid==-1) && (port.productID==pid || pid==-1) && ((port.bcdDevice>>8)==bcdDeviceMSB || bcdDeviceMSB==-1) &&
                 ( (port.bcdDevice&0x00ff) ==bcdDeviceLSB || bcdDeviceLSB==-1))
             thePortsWeWant.append(port);
@@ -178,9 +179,23 @@ bool USBMonitor::matchAndDispatchChangedDevice(const QString & deviceID, const G
                 if( wParam == DBT_DEVICEARRIVAL )
                 {
                     qDebug()<<"INSERTION";
-                    if(infoFromHandle(guid,info,devInfo,i)==0)
+                    QEventLoop m_eventloop;
+                    QTimer::singleShot(1000,&m_eventloop, SLOT(quit()));
+                    m_eventloop.exec();
+                    if(infoFromHandle(guid,info,devInfo,i)!=1)
+                    {
+                        qDebug()<<"USB_MONITOR infoFromHandle failed on matchAndDispatchChangedDevice";
+                        break;
+                    }
+                    bool m_break=false;
+                    foreach (USBPortInfo m_info, knowndevices) {
+                        if(m_info.serialNumber==info.serialNumber && m_info.productID==info.productID)
+                            m_break=true;
+                    }
+                    if(m_break)
                         break;
                     knowndevices.append(info);
+                    qDebug()<<"USB_MONITOR emit device discovered on device:"<<info.product<<info.bcdDevice;
                     emit deviceDiscovered(info);
                     break;
 

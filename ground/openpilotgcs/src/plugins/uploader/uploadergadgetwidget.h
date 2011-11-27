@@ -73,7 +73,7 @@ public:
 public slots:
     void onAutopilotConnect();
     void onAutopilotDisconnect();
-
+    void populate();
 private:
      Ui_UploaderWidget *m_config;
      DFUObject *dfu;

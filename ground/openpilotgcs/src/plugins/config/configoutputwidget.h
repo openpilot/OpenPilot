@@ -47,6 +47,7 @@ public:
         ConfigOutputWidget(QWidget *parent = 0);
         ~ConfigOutputWidget();
 
+
 private:
         Ui_OutputWidget *m_config;
 
@@ -74,6 +75,8 @@ private slots:
         void sendChannelTest(int index, int value);
         void setSpinningArmed(bool val);
         void openHelp();
+protected:
+        void enableControls(bool enable);
 };
 
 #endif

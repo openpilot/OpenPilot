@@ -93,6 +93,13 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
         this->setEnabled(false);
     connect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(disableIfNotMe(UAVObject*)));
 }
+void ConfigOutputWidget::enableControls(bool enable)
+{
+    ConfigTaskWidget::enableControls(enable);
+    if(!enable)
+        m_config->channelOutTest->setChecked(false);
+    m_config->channelOutTest->setEnabled(enable);
+}
 
 ConfigOutputWidget::~ConfigOutputWidget()
 {
@@ -108,6 +115,7 @@ ConfigOutputWidget::~ConfigOutputWidget()
   */
 void ConfigOutputWidget::runChannelTests(bool state)
 {
+    qDebug()<<"configoutputwidget runChannelTests"<<state;
     SystemAlarms * systemAlarmsObj = SystemAlarms::GetInstance(getObjectManager());
     SystemAlarms::DataFields systemAlarms = systemAlarmsObj->getData();
 

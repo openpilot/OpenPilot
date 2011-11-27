@@ -125,6 +125,11 @@ void UploaderGadgetWidget::onPhisicalHWConnect()
   Enables widget buttons if autopilot connected
   */
 void UploaderGadgetWidget::onAutopilotConnect(){
+    QTimer::singleShot(1000,this,SLOT(populate()));
+}
+
+void UploaderGadgetWidget::populate()
+{
     m_config->haltButton->setEnabled(true);
     m_config->resetButton->setEnabled(true);
     m_config->bootButton->setEnabled(false);
@@ -141,7 +146,6 @@ void UploaderGadgetWidget::onAutopilotConnect(){
     runningDeviceWidget* dw = new runningDeviceWidget(this);
     dw->populate();
     m_config->systemElements->addTab(dw, QString("Connected Device"));
-
 }
 
 /**

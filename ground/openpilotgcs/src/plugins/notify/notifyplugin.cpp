@@ -356,13 +356,13 @@ void SoundNotifyPlugin::stateChanged(Phonon::State newstate, Phonon::State oldst
     }
 }
 
-bool checkRange(QString fieldValue, QString enumValue, QStringList values, char direction)
+bool checkRange(QString fieldValue, QString enumValue, QStringList values, NotificationItem::ERange direction)
 {
 
     bool ret = false;
     switch(direction)
     {
-    case 'E':
+    case NotificationItem::eEqualTo:
         ret = !QString::compare(enumValue, fieldValue, Qt::CaseInsensitive) ? true : false;
         break;
 
@@ -373,20 +373,20 @@ bool checkRange(QString fieldValue, QString enumValue, QStringList values, char 
     return ret;
 }
 
-bool checkRange(double fieldValue, double min, double max, char direction)
+bool checkRange(double fieldValue, double min, double max, NotificationItem::ERange direction)
 {
     bool ret = false;
     switch(direction)
     {
-    case '=':
+    case NotificationItem::eEqualTo:
         ret = (fieldValue == min);
         break;
 
-    case '>':
+    case NotificationItem::eGreaterThan:
         ret = (fieldValue > min);
         break;
 
-    case '<':
+    case NotificationItem::eLessThan:
         ret = (fieldValue < min);
         break;
 
@@ -406,7 +406,7 @@ void SoundNotifyPlugin::checkNotificationRule(NotificationItem* notification, UA
     if (notification->mute())
         return;
 
-    QString direction = notification->range();
+    NotificationItem::ERange direction = notification->range();
     QString fieldName = notification->getObjectField();
     UAVObjectField* field = object->getField(fieldName);
 
@@ -418,12 +418,12 @@ void SoundNotifyPlugin::checkNotificationRule(NotificationItem* notification, UA
         condition = checkRange(value.toString(),
                                notification->singleValue().toString(),
                                field->getOptions(),
-                               direction[0].toAscii());
+                               direction);
     } else {
         condition = checkRange(value.toDouble(),
                                notification->singleValue().toDouble(),
                                notification->valueRange2(),
-                               direction[0].toAscii());
+                               direction);
     }
 
     notification->_isPlayed = condition;

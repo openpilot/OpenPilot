@@ -52,8 +52,14 @@ static const QString cStrRetry10sec(QT_TR_NOOP("Repeat 10 seconds"));
 static const QString cStrRetry30sec(QT_TR_NOOP("Repeat 30 seconds"));
 static const QString cStrRetry1min(QT_TR_NOOP("Repeat 1 minute"));
 
+static const QString cStrEqualTo(QT_TR_NOOP("is equal to"));
+static const QString cStrLargeThan(QT_TR_NOOP("is greater than"));
+static const QString cStrLowerThan(QT_TR_NOOP("is less than"));
+static const QString cStrInRange(QT_TR_NOOP("is in range"));
+
 QMap<QString, NotificationItem::ESayOrder> NotificationItem::sayOrderValues;
 QMap<QString, NotificationItem::ERetryValues> NotificationItem::retryValues;
+QMap<QString, NotificationItem::ERange> NotificationItem::rangeValues;
 
 
 NotificationItem::NotificationItem(QObject *parent)
@@ -66,7 +72,7 @@ NotificationItem::NotificationItem(QObject *parent)
     , _currentLanguage("default")
     , _dataObject("")
     , _objectField("")
-    , _rangeLimit("Equal to")
+    , _rangeLimit(eEqualTo)
     , _sound1("")
     , _sound2("")
     , _sound3("")
@@ -89,6 +95,12 @@ NotificationItem::NotificationItem(QObject *parent)
     NotificationItem::retryValues[cStrRetry10sec] = eRepeatTenSec;
     NotificationItem::retryValues[cStrRetry30sec] = eRepeatThirtySec;
     NotificationItem::retryValues[cStrRetry1min] = eRepeatOneMin;
+
+    NotificationItem::rangeValues.clear();
+    NotificationItem::rangeValues[cStrEqualTo] = eEqualTo;
+    NotificationItem::rangeValues[cStrLargeThan] = eGreaterThan;
+    NotificationItem::rangeValues[cStrLowerThan] = eLessThan;
+    NotificationItem::rangeValues[cStrInRange] = eInRange;
 
 }
 
@@ -140,7 +152,7 @@ void NotificationItem::restoreState(QSettings* settings)
     setCurrentLanguage(settings->value(QLatin1String("CurrentLanguage"), tr("")).toString());
     setDataObject(settings->value(QLatin1String("DataObject"), tr("")).toString());
     setObjectField(settings->value(QLatin1String("ObjectField"), tr("")).toString());
-    setRange(settings->value(QLatin1String("RangeLimit"), tr("")).toString());
+    setRange((ERange)settings->value(QLatin1String("RangeLimit"), eEqualTo).toInt());
     setSound1(settings->value(QLatin1String("Sound1"), tr("")).toString());
     setSound2(settings->value(QLatin1String("Sound2"), tr("")).toString());
     setSound3(settings->value(QLatin1String("Sound3"), tr("")).toString());
@@ -173,13 +185,15 @@ void NotificationItem::serialize(QDataStream& stream)
 
 void NotificationItem::deserialize(QDataStream& stream)
 {
+    int rangeInt = 0;
     int sayOrderInt = 0;
     int repeatValueInt = 0;
     stream >> this->_soundCollectionPath;
     stream >> this->_currentLanguage;
     stream >> this->_dataObject;
     stream >> this->_objectField;
-    stream >> this->_rangeLimit;
+    stream >> rangeInt;
+    this->_rangeLimit = (ERange)rangeInt;
     stream >> this->_sound1;
     stream >> this->_sound2;
     stream >> this->_sound3;

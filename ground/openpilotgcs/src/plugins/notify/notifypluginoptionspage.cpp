@@ -47,14 +47,6 @@
 #include "notifytablemodel.h"
 #include "notifylogging.h"
 
-// Use symbols for greater than/less than is it removes the need to
-// internationalise these later...
-static const char* cStrEqualTo = "=";
-static const char* cStrLargeThan = ">";
-static const char* cStrLowerThan = "<";
-static const char* cStrInRange = "In range"; // TODO: Symbolise 'in range'
-
-
 NotifyPluginOptionsPage::NotifyPluginOptionsPage(QObject *parent)
     : IOptionsPage(parent)
     , _objManager(*ExtensionSystem::PluginManager::instance()->getObject<UAVObjectManager>())
@@ -256,15 +248,20 @@ void NotifyPluginOptionsPage::addDynamicField(UAVObjectField* objField)
         this, SLOT(on_changedIndex_rangeValue(QString)));
 
     _dynamicFieldLimit->clear();
-    QStringList rangeValues;
-    if (UAVObjectField::ENUM == objField->getType()) {
-        rangeValues << cStrEqualTo << cStrInRange;
-        _dynamicFieldLimit->addItems(rangeValues);
-        _dynamicFieldLimit->setCurrentIndex(rangeValues.indexOf(_selectedNotification->range()));
-
-    } else {
-        rangeValues << cStrEqualTo << cStrLargeThan << cStrLowerThan << cStrInRange;
-        _dynamicFieldLimit->addItems(rangeValues);
+    if (UAVObjectField::ENUM == objField->getType())
+    {
+        _dynamicFieldLimit->addItem(NotificationItem::rangeValues.key(NotificationItem::eEqualTo), NotificationItem::eEqualTo);
+        _dynamicFieldLimit->addItem(NotificationItem::rangeValues.key(NotificationItem::eInRange), NotificationItem::eInRange);
+        _dynamicFieldLimit->setCurrentIndex(_dynamicFieldLimit->findData(_selectedNotification->range()));
+    }
+    else
+    {
+        for(QMap<QString, NotificationItem::ERange>::iterator pItem = NotificationItem::rangeValues.begin();
+            pItem != NotificationItem::rangeValues.end();
+            ++pItem)
+        {
+            _dynamicFieldLimit->addItem(pItem.key(), pItem.value());
+        }
         connect(_dynamicFieldLimit, SIGNAL(currentIndexChanged(QString)),
                 this, SLOT(on_changedIndex_rangeValue(QString)));
     }
@@ -303,13 +300,16 @@ void NotifyPluginOptionsPage::addDynamicFieldWidget(UAVObjectField* objField)
 
     default:
         Q_ASSERT(_dynamicFieldLimit);
-        if (_dynamicFieldLimit->currentText() == cStrInRange) {
+        if (NotificationItem::eInRange == _dynamicFieldLimit->itemData(_dynamicFieldLimit->currentIndex()))
+        {
             _dynamicFieldWidget = new QLineEdit(_form);
 
             (static_cast<QLineEdit*>(_dynamicFieldWidget))->setInputMask("999.99 - 999.99;");
             (static_cast<QLineEdit*>(_dynamicFieldWidget))->setText("0000000000");
             (static_cast<QLineEdit*>(_dynamicFieldWidget))->setCursorPosition(0);
-        } else {
+        }
+        else
+        {
             _dynamicFieldWidget = new QDoubleSpinBox(_form);
             (dynamic_cast<QDoubleSpinBox*>(_dynamicFieldWidget))->setRange(000.00, 999.99);
         }
@@ -358,7 +358,7 @@ void NotifyPluginOptionsPage::getOptionsPageValues(NotificationItem* notificatio
     notification->setSound2(_optionsPage->Sound2->currentText());
     notification->setSound3(_optionsPage->Sound3->currentText());
     notification->setSayOrder((NotificationItem::ESayOrder)_sayOrder->itemData(_sayOrder->currentIndex()).toInt());
-    notification->setRange(_dynamicFieldLimit->currentText());
+    notification->setRange((NotificationItem::ERange)_dynamicFieldLimit->itemData(_dynamicFieldLimit->currentIndex()).toInt());
     if (QDoubleSpinBox* spinValue = dynamic_cast<QDoubleSpinBox*>(_dynamicFieldWidget))
         notification->setSingleValue(spinValue->value());
     else {
@@ -443,8 +443,8 @@ void NotifyPluginOptionsPage::updateConfigView(NotificationItem* notification)
         _optionsPage->Sound3->setCurrentIndex(_optionsPage->Sound3->findText(notification->getSound3()));
     }
 
-    if (-1 != _dynamicFieldLimit->findText(notification->range())) {
-        _dynamicFieldLimit->setCurrentIndex(_dynamicFieldLimit->findText(notification->range()));
+    if (-1 != _dynamicFieldLimit->findData(notification->range())) {
+        _dynamicFieldLimit->setCurrentIndex(_dynamicFieldLimit->findData(notification->range()));
     }
 
     int index = _sayOrder->findData(notification->getSayOrder());

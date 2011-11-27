@@ -53,6 +53,8 @@ public:
 
     enum ERetryValues { eOnce = 1, eInstantly = 2, eRepeatTenSec = 10, eRepeatThirtySec = 30, eRepeatOneMin = 60 };
 
+    enum ERange{eEqualTo, eLessThan, eGreaterThan, eInRange};
+
     explicit NotificationItem(QObject *parent = 0);
 
     void copyTo(NotificationItem*) const;
@@ -61,8 +63,8 @@ public:
     DECLARE_SOUND(2)
     DECLARE_SOUND(3)
 
-    QString range() const { return _rangeLimit; }
-    void setRange(QString text) { _rangeLimit = text; }
+    ERange range() const { return _rangeLimit; }
+    void setRange(ERange range) { _rangeLimit = range; }
 
     ESayOrder getSayOrder() const { return _sayOrder; }
     void setSayOrder(ESayOrder sayOrder) { _sayOrder = sayOrder; }
@@ -150,6 +152,7 @@ public:
 
     static QMap<QString, ESayOrder> sayOrderValues;
     static QMap<QString, ERetryValues> retryValues;
+    static QMap<QString, ERange> rangeValues;
 
 private:
     QString checkSoundExists(QString fileName);
@@ -178,8 +181,8 @@ private:
     //! one field value change can be assigned to one notification
     QString _objectField;
 
-    //! fire condition for UAV field value (lower, greater, in range)
-    QString _rangeLimit;
+    //! fire condition for UAV field value (equal, lower, greater, in range)
+    ERange _rangeLimit;
 
     //! possible sounds(at least one required to play notification)
     QString _sound1;

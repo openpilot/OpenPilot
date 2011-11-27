@@ -49,7 +49,7 @@ endif
 FLASH_TOOL = OPENOCD
 
 # List of modules to include
-MODULES = Telemetry Attitude/revolution ManualControl Stabilization Actuator
+MODULES = Telemetry Attitude/revolution ManualControl Stabilization Altitude/revolution Actuator
 PYMODULES = 
 #FlightPlan
 

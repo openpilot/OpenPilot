@@ -1426,6 +1426,11 @@ static const struct pios_hmc5883_cfg pios_hmc5883_cfg = {
 
 };
 
+#include "pios_ms5611.h"
+static const struct pios_ms5611_cfg pios_ms5611_cfg = {
+	.oversampling = 1,
+};
+
 #include "pios_bma180.h"
 static const struct pios_bma180_cfg pios_bma180_cfg = {
 	.drdy = {
@@ -1660,6 +1665,8 @@ void PIOS_Board_Init(void) {
 	PIOS_BMA180_Init(&pios_bma180_cfg);
 
 	PIOS_HMC5883_Init(&pios_hmc5883_cfg);
+	
+	PIOS_MS5611_Init(&pios_ms5611_cfg, pios_i2c_pressure_adapter_id);
 }
 
 /**

@@ -53,9 +53,11 @@
 #define PIOS_INCLUDE_USART
 //#define PIOS_INCLUDE_USB_HID
 
+/* Select the sensors to include */
 #define PIOS_INCLUDE_BMA180
 #define PIOS_INCLUDE_HMC5883
 #define PIOS_INCLUDE_MPU6000
+#define PIOS_INCLUDE_MS5611
 
 //#define PIOS_INCLUDE_HCSR04
 #define PIOS_INCLUDE_COM

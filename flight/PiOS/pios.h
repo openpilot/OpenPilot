@@ -125,6 +125,9 @@
 #if defined(PIOS_INCLUDE_MPU6000)
 #include <pios_mpu6000.h>
 #endif
+#if defined(PIOS_INCLUDE_MS5611)
+#include <pios_ms5611.h>
+#endif
 #include <pios_iap.h>
 
 #if defined(PIOS_INCLUDE_ADXL345)

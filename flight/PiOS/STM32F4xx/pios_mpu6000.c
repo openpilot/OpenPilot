@@ -63,6 +63,7 @@ void PIOS_MPU6000_Init(const struct pios_mpu6000_cfg * new_cfg)
 
 	/* Configure the MPU6050 Sensor */
 	PIOS_MPU6000_Config(cfg);
+	PIOS_MPU6000_Config(cfg);
 
 	/* Configure EOC pin as input floating */
 	GPIO_Init(cfg->drdy.gpio, &cfg->drdy.init);

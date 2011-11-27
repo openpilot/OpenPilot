@@ -799,13 +799,15 @@ void PIOS_I2C_pressure_adapter_er_irq_handler(void)
 #include <pios_rtc_priv.h>
 
 void PIOS_RTC_IRQ_Handler (void);
-void RTC_IRQHandler() __attribute__ ((alias ("PIOS_RTC_IRQ_Handler")));
+void RTC_WKUP_IRQHandler() __attribute__ ((alias ("PIOS_RTC_IRQ_Handler")));
 static const struct pios_rtc_cfg pios_rtc_main_cfg = {
-	.clksrc = RCC_RTCCLKSource_HSE_Div128,
-	.prescaler = 100,
+	.clksrc = RCC_RTCCLKSource_HSE_Div16, // Divide 8 Mhz crystal down to 1
+	// For some reason it's acting like crystal is 16 Mhz.  This clock is then divided
+	// by another 16 to give a nominal 62.5 khz clock
+	.prescaler = 100, // Every 100 cycles gives 625 Hz
 	.irq = {
 		.init = {
-			.NVIC_IRQChannel                   = RTC_IRQn,
+			.NVIC_IRQChannel                   = RTC_WKUP_IRQn,
 			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
 			.NVIC_IRQChannelSubPriority        = 0,
 			.NVIC_IRQChannelCmd                = ENABLE,

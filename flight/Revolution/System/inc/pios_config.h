@@ -64,12 +64,20 @@
 #define PIOS_INCLUDE_FREERTOS
 //#define PIOS_INCLUDE_GPIO
 //#define PIOS_INCLUDE_EXTI
-//#define PIOS_INCLUDE_RTC
+#define PIOS_INCLUDE_RTC
 #define PIOS_INCLUDE_WDG
 //#define PIOS_INCLUDE_I2C_ESC
 #define PIOS_INCLUDE_BL_HELPER
 
 #define PIOS_INCLUDE_COM_TELEM
+
+/* Supported receiver interfaces */
+#define PIOS_INCLUDE_DSM
+//#define PIOS_INCLUDE_SBUS
+//#define PIOS_INCLUDE_PPM
+//#define PIOS_INCLUDE_PWM
+//#define PIOS_INCLUDE_GCSRCVR
+
 
 #define PIOS_INCLUDE_FLASH
 /* A really shitty setting saving implementation */

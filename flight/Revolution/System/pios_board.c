@@ -1624,14 +1624,14 @@ void PIOS_Board_Init(void) {
 	pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_DSMMAINPORT] = pios_dsm_rcvr_id;
 
 	/* Set up the receiver port.  Later this should be optional */
-	//uint32_t pios_pwm_id;
-	//PIOS_PWM_Init(&pios_pwm_id, &pios_pwm_cfg);
+	uint32_t pios_pwm_id;
+	PIOS_PWM_Init(&pios_pwm_id, &pios_pwm_cfg);
 	
-	/*uint32_t pios_pwm_rcvr_id;
+	uint32_t pios_pwm_rcvr_id;
 	if (PIOS_RCVR_Init(&pios_pwm_rcvr_id, &pios_pwm_rcvr_driver, pios_pwm_id)) {
 		PIOS_Assert(0);
 	}
-	pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_PWM] = pios_pwm_rcvr_id;*/
+	pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_PWM] = pios_pwm_rcvr_id;
 
 	/* Set up the servo outputs */
 	PIOS_Servo_Init(&pios_servo_cfg);

@@ -376,16 +376,35 @@ static void PIOS_TIM_generic_irq_handler(TIM_TypeDef * timer)
  * Map all valid TIM IRQs to the common interrupt handler
  * and give it enough context to properly demux the various timers
  */
-void TIM1_UP_IRQHandler(void) __attribute__ ((alias ("PIOS_TIM_1_UP_irq_handler")));
-static void PIOS_TIM_1_UP_irq_handler (void)
-{
-	PIOS_TIM_generic_irq_handler (TIM1);
-}
-
 void TIM1_CC_IRQHandler(void) __attribute__ ((alias ("PIOS_TIM_1_CC_irq_handler")));
 static void PIOS_TIM_1_CC_irq_handler (void)
 {
 	PIOS_TIM_generic_irq_handler (TIM1);
+}
+
+// The rest of TIM1 interrupts are overlapped
+void TIM1_BRK_TIM9_IRQHandler(void) __attribute__ ((alias ("PIOS_TIM_9_CC_irq_handler")));
+static void PIOS_TIM_9_CC_irq_handler (void)
+{
+	// TODO: Check for TIM1_BRK
+	PIOS_TIM_generic_irq_handler (TIM9);
+}
+
+void TIM1_UP_TIM10_IRQHandler(void) __attribute__ ((alias ("PIOS_TIM_10_CC_irq_handler")));
+static void PIOS_TIM_10_CC_irq_handler (void)
+{
+	if (TIM_GetITStatus(TIM1, TIM_IT_Update)) {
+		PIOS_TIM_generic_irq_handler(TIM1);
+	} else if (TIM_GetITStatus(TIM10, TIM_IT_CC1 | TIM_IT_CC2 | TIM_IT_CC3 | TIM_IT_CC4)) {
+		PIOS_TIM_generic_irq_handler (TIM10);
+	}
+}
+
+void TIM1_TRG_COM_TIM11_IRQHandler(void) __attribute__ ((alias ("PIOS_TIM_11_CC_irq_handler")));
+static void PIOS_TIM_11_CC_irq_handler (void)
+{
+	// TODO: Check for TIM1_TRG
+	PIOS_TIM_generic_irq_handler (TIM11);
 }
 
 void TIM2_IRQHandler(void) __attribute__ ((alias ("PIOS_TIM_2_irq_handler")));
@@ -435,26 +454,3 @@ static void PIOS_TIM_8_CC_irq_handler (void)
 {
 	PIOS_TIM_generic_irq_handler (TIM8);
 }
-
-
-void TIM1_BRK_TIM9_IRQHandler(void) __attribute__ ((alias ("PIOS_TIM_9_CC_irq_handler")));
-static void PIOS_TIM_9_CC_irq_handler (void)
-{
-	// TODO: Check for TIM1_BRK
-	PIOS_TIM_generic_irq_handler (TIM9);
-}
-
-void TIM1_UP_TIM10_IRQHandler(void) __attribute__ ((alias ("PIOS_TIM_10_CC_irq_handler")));
-static void PIOS_TIM_10_CC_irq_handler (void)
-{
-	// TODO: Check for TIM1_UP
-	PIOS_TIM_generic_irq_handler (TIM10);
-}
-
-void TIM1_TRG_COM_TIM11_IRQHandler(void) __attribute__ ((alias ("PIOS_TIM_11_CC_irq_handler")));
-static void PIOS_TIM_11_CC_irq_handler (void)
-{
-	// TODO: Check for TIM1_TRG
-	PIOS_TIM_generic_irq_handler (TIM11);
-}
-

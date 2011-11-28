@@ -155,6 +155,9 @@ extern uint32_t pios_com_gps_id;
 extern uint32_t pios_com_telem_usb_id;
 #define PIOS_COM_TELEM_USB              (pios_com_telem_usb_id)
 
+extern uint32_t pios_com_link_usb_id;
+#define PIOS_COM_LINK_USB               (pios_com_link_usb_id)
+
 #ifdef PIOS_ENABLE_AUX_UART
 extern uint32_t pios_com_aux_id;
 #define PIOS_COM_AUX                    (pios_com_aux_id)

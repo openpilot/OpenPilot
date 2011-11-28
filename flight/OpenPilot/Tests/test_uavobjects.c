@@ -102,7 +102,7 @@ static void testTask(void *pvParameters)
 	UAVObjPack(ExampleObject1Handle(), 0, buffer);
 	memset(&data, 0, sizeof(data));
 	ExampleObject1Set(&data);
-	UAVObjUnpack(ExampleObject1Handle(), 0, buffer);
+	UAVObjUnpack(ExampleObject1Handle(), 0, buffer,EV_UNPACKED);
 	ExampleObject1Get(&data);
 
 	// Test object saving/loading to SD card

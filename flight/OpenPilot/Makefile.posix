@@ -56,8 +56,8 @@ FLASH_TOOL = OPENOCD
 USE_THUMB_MODE = YES
 
 # List of modules to include
-OPTMODULES = CameraStab GPS
-MODULES =  Telemetry Actuator Stabilization Guidance ManualControl 
+OPTMODULES = 
+MODULES =  Telemetry UAVTalkBus
 #MODULES =  Telemetry ManualControl Actuator Attitude Stabilization
 #MODULES = Telemetry Example
 #MODULES = Telemetry MK/MKSerial
@@ -178,6 +178,7 @@ SRC += $(PIOSPOSIX)/pios_irq.c
 SRC += $(PIOSPOSIX)/pios_delay.c
 SRC += $(PIOSPOSIX)/pios_sdcard.c
 SRC += $(PIOSPOSIX)/pios_udp.c
+SRC += $(PIOSPOSIX)/pios_usb_hid.c
 SRC += $(PIOSPOSIX)/pios_com.c
 SRC += $(PIOSPOSIX)/pios_servo.c
 SRC += $(PIOSPOSIX)/pios_wdg.c
@@ -358,6 +359,7 @@ LDFLAGS += $(patsubst %,-L%,$(EXTRA_LIBDIRS))
 LDFLAGS += -lc
 LDFLAGS += $(patsubst %,-l%,$(EXTRA_LIBS))
 LDFLAGS += $(MATH_LIB)
+LDFLAGS += -lusb
 LDFLAGS += -lc -lgcc
 
 

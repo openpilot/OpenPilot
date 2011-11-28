@@ -84,6 +84,7 @@ typedef struct {
     uint8_t *rxBuffer;
     uint32_t txSize;
     uint8_t *txBuffer;
+    UAVObjEventType unpackevent;
 } UAVTalkConnectionData;
 
 #define UAVTALK_CANARI         0xCA

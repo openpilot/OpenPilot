@@ -49,7 +49,7 @@ endif
 FLASH_TOOL = OPENOCD
 
 # List of modules to include
-MODULES = Telemetry Attitude/revolution ManualControl Stabilization Altitude/revolution Actuator
+MODULES = Telemetry Attitude/revolution ManualControl Stabilization Altitude/revolution Actuator GPS
 PYMODULES = 
 #FlightPlan
 
@@ -129,7 +129,7 @@ SRC += $(OPSYSTEM)/cm3_fault_handlers.c
 
 SRC += $(FLIGHTLIB)/CoordinateConversions.c
 SRC += $(FLIGHTLIB)/fifo_buffer.c
-SRC += $(FLIGHTLIB)/NMEA.c
+SRC += $(FLIGHTLIB)/WorldMagModel.c
 
 ## PIOS Hardware (STM32F4xx)
 include $(PIOS)/STM32F4xx/library.mk

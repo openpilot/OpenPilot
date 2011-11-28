@@ -71,7 +71,7 @@
 #define PIOS_INCLUDE_DSM
 //#define PIOS_INCLUDE_SBUS
 //#define PIOS_INCLUDE_PPM
-//#define PIOS_INCLUDE_PWM
+#define PIOS_INCLUDE_PWM
 //#define PIOS_INCLUDE_GCSRCVR
 
 #define PIOS_INCLUDE_SETTINGS
@@ -82,11 +82,11 @@
 /* Other Interfaces */
 //#define PIOS_INCLUDE_I2C_ESC
 
-/* Flags that alter behaviors */
+/* Flags that alter behaviors - mostly to lower resources for CC */
 #define PIOS_INCLUDE_INITCALL           /* Include init call structures */
 #define PIOS_TELEM_PRIORITY_QUEUE       /* Enable a priority queue in telemetry */
 #define PIOS_QUATERNION_STABILIZATION   /* Stabilization options */
-#define PIOS_GPS_SETS_HOMELOCATION      /* GPS options */
+//#define PIOS_GPS_SETS_HOMELOCATION      /* GPS options */
 
 /* Alarm Thresholds */
 #define HEAP_LIMIT_WARNING		4000

@@ -451,10 +451,7 @@ static const struct pios_usart_cfg pios_usart_gps_cfg = {
 	},
 };
 
-#define PIOS_COM_AUX_TX_BUF_LEN 150
-static uint8_t pios_com_aux_tx_buffer[PIOS_COM_AUX_TX_BUF_LEN];
-#define PIOS_COM_AUX_RX_BUF_LEN 10
-static uint8_t pios_com_aux_rx_buffer[PIOS_COM_AUX_RX_BUF_LEN];
+#define PIOS_COM_GPS_RX_BUF_LEN 192
 
 #endif /* PIOS_INCLUDE_GPS */
 
@@ -503,11 +500,6 @@ static const struct pios_usart_cfg pios_usart_aux_cfg = {
 		},
 	},
 };
-
-#define PIOS_COM_GPS_TX_BUF_LEN 10
-static uint8_t pios_com_gps_tx_buffer[PIOS_COM_GPS_TX_BUF_LEN];
-#define PIOS_COM_GPS_RX_BUF_LEN 192
-static uint8_t pios_com_gps_rx_buffer[PIOS_COM_GPS_RX_BUF_LEN];
 
 #endif /* PIOS_COM_AUX */
 
@@ -569,8 +561,8 @@ static const struct pios_usart_cfg pios_usart_telem_main_cfg = {
 #include <pios_dsm_priv.h>
 
 static const struct pios_usart_cfg pios_usart_dsm_main_cfg = {
-	.regs = USART1,
-	.remap = GPIO_AF_USART1,
+	.regs = USART3,
+	.remap = GPIO_AF_USART3,
 	.init = {
 		.USART_BaudRate            = 115200,
 		.USART_WordLength          = USART_WordLength_8b,
@@ -581,16 +573,16 @@ static const struct pios_usart_cfg pios_usart_dsm_main_cfg = {
 	},
 	.irq = {
 		.init = {
-			.NVIC_IRQChannel                   = USART1_IRQn,
+			.NVIC_IRQChannel                   = USART3_IRQn,
 			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
 			.NVIC_IRQChannelSubPriority        = 0,
 			.NVIC_IRQChannelCmd                = ENABLE,
 		},
 	},
 	.rx = {
-		.gpio = GPIOA,
+		.gpio = GPIOB,
 		.init = {
-			.GPIO_Pin   = GPIO_Pin_10,
+			.GPIO_Pin   = GPIO_Pin_11,
 			.GPIO_Speed = GPIO_Speed_2MHz,
 			.GPIO_Mode  = GPIO_Mode_AF,
 			.GPIO_OType = GPIO_OType_PP,
@@ -598,9 +590,9 @@ static const struct pios_usart_cfg pios_usart_dsm_main_cfg = {
 		},
 	},
 	.tx = {
-		.gpio = GPIOA,
+		.gpio = GPIOB,
 		.init = {
-			.GPIO_Pin   = GPIO_Pin_9,
+			.GPIO_Pin   = GPIO_Pin_10,
 			.GPIO_Speed = GPIO_Speed_2MHz,
 			.GPIO_Mode  = GPIO_Mode_AF,
 			.GPIO_OType = GPIO_OType_PP,
@@ -611,9 +603,9 @@ static const struct pios_usart_cfg pios_usart_dsm_main_cfg = {
 
 static const struct pios_dsm_cfg pios_dsm_main_cfg = {
 	.bind = {
-		.gpio = GPIOA,
+		.gpio = GPIOB,
 		.init = {
-			.GPIO_Pin   = GPIO_Pin_10,
+			.GPIO_Pin   = GPIO_Pin_11,
 			.GPIO_Speed = GPIO_Speed_2MHz,
 			.GPIO_Mode  = GPIO_Mode_OUT,
 			.GPIO_OType = GPIO_OType_PP,
@@ -1561,13 +1553,17 @@ void PIOS_Board_Init(void) {
 
 	uint32_t pios_usart_gps_id;
 	if (PIOS_USART_Init(&pios_usart_gps_id, &pios_usart_gps_cfg)) {
-		PIOS_DEBUG_Assert(0);
+		PIOS_Assert(0);
 	}
+	
+	uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_GPS_RX_BUF_LEN);
+	PIOS_Assert(rx_buffer);
 	if (PIOS_COM_Init(&pios_com_gps_id, &pios_usart_com_driver, pios_usart_gps_id,
-					  pios_com_gps_rx_buffer, sizeof(pios_com_gps_rx_buffer),
-					  pios_com_gps_tx_buffer, sizeof(pios_com_gps_tx_buffer))) {
-		PIOS_DEBUG_Assert(0);
+					  rx_buffer, PIOS_COM_GPS_RX_BUF_LEN,
+					  NULL, 0)) {
+		PIOS_Assert(0);
 	}
+
 #endif	/* PIOS_INCLUDE_GPS */
 	
 #if defined(PIOS_INCLUDE_COM_AUX)
@@ -1628,6 +1624,7 @@ void PIOS_Board_Init(void) {
 	}
 	pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_DSMMAINPORT] = pios_dsm_rcvr_id;
 
+#if defined(PIOS_INCLUDE_PWM) && defined(PIOS_INCLUDE_RCVR)
 	/* Set up the receiver port.  Later this should be optional */
 	uint32_t pios_pwm_id;
 	PIOS_PWM_Init(&pios_pwm_id, &pios_pwm_cfg);
@@ -1637,6 +1634,7 @@ void PIOS_Board_Init(void) {
 		PIOS_Assert(0);
 	}
 	pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_PWM] = pios_pwm_rcvr_id;
+#endif
 
 	/* Set up the servo outputs */
 	PIOS_Servo_Init(&pios_servo_cfg);

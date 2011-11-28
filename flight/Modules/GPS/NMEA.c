@@ -216,7 +216,7 @@ static float NMEA_real_to_float(char *nmea_real)
 	}
 
 	/* Convert to float */
-	return (((float)whole) + fract * pow(10, -fract_units));
+	return (((float)whole) + fract * powf(10, -fract_units));
 }
 
 /*

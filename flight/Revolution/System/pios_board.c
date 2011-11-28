@@ -1657,6 +1657,8 @@ void PIOS_Board_Init(void) {
 	if (PIOS_SPI_Init(&pios_spi_gyro_id, &pios_spi_gyro_cfg)) {
 		PIOS_DEBUG_Assert(0);
 	}
+	
+	PIOS_DELAY_WaitmS(500);
 
 	PIOS_MPU6000_Attach(pios_spi_gyro_id);
 	PIOS_MPU6000_Init(&pios_mpu6000_cfg);

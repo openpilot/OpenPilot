@@ -58,7 +58,6 @@ void PIOS_SYS_Init(void)
 
 	/* Init the delay system */
 	PIOS_DELAY_Init();
-	PIOS_DELAY_WaitmS(500);		/* XXX wait for the OpenOCD DCC stuff to get its act together */
 
 	/*
 	 * Turn on all the peripheral clocks.

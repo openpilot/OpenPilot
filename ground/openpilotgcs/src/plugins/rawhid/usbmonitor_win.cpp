@@ -78,6 +78,15 @@ USBMonitor::~USBMonitor()
 QList<USBPortInfo> USBMonitor::availableDevices(int vid, int pid, int bcdDeviceMSB, int bcdDeviceLSB)
 {
     QList<USBPortInfo> allPorts = availableDevices();
+    qDebug()<<"USBMonitor::availableDevices list off all ports:";
+    qDebug()<<"USBMonitor::availableDevices total ports:"<<allPorts.length();
+    foreach (USBPortInfo info, allPorts) {
+        qDebug()<<"----------";
+        qDebug()<<"bcdDevice:"<<info.bcdDevice;
+        qDebug()<<"devicePath:"<<info.devicePath;
+        qDebug()<<"product:"<<info.product;
+    }
+    qDebug()<<"END OF LIST";
     QList<USBPortInfo> thePortsWeWant;
     qDebug()<<"USBMonitor::availableDevices bcdLSB="<<bcdDeviceLSB;
     foreach (USBPortInfo port, allPorts) {
@@ -86,6 +95,15 @@ QList<USBPortInfo> USBMonitor::availableDevices(int vid, int pid, int bcdDeviceM
                 ( (port.bcdDevice&0x00ff) ==bcdDeviceLSB || bcdDeviceLSB==-1))
             thePortsWeWant.append(port);
     }
+    qDebug()<<"USBMonitor::availableDevices list off matching ports vid pid bcdMSD bcdLSD:"<<vid<<pid<<bcdDeviceMSB<<bcdDeviceLSB;
+    qDebug()<<"USBMonitor::availableDevices total matching ports:"<<thePortsWeWant.length();
+    foreach (USBPortInfo info, thePortsWeWant) {
+        qDebug()<<"----------";
+        qDebug()<<"bcdDevice:"<<info.bcdDevice;
+        qDebug()<<"devicePath:"<<info.devicePath;
+        qDebug()<<"product:"<<info.product;
+    }
+    qDebug()<<"END OF LIST";
     return thePortsWeWant;
 }
 
@@ -160,6 +178,7 @@ bool USBRegistrationWidget::winEvent( MSG* message, long* result )
 #endif
 bool USBMonitor::matchAndDispatchChangedDevice(const QString & deviceID, const GUID & guid, WPARAM wParam)
 {
+    qDebug()<<"USB_MONITOR matchAndDispatchChangedDevice deviceID="<<deviceID;
     bool rv = false;
     DWORD dwFlag = (DBT_DEVICEARRIVAL == wParam) ? DIGCF_PRESENT : DIGCF_ALLCLASSES;
     HDEVINFO devInfo;
@@ -178,10 +197,7 @@ bool USBMonitor::matchAndDispatchChangedDevice(const QString & deviceID, const G
                 info.devicePath=deviceID;
                 if( wParam == DBT_DEVICEARRIVAL )
                 {
-                    qDebug()<<"INSERTION";
-                    QEventLoop m_eventloop;
-                    QTimer::singleShot(1000,&m_eventloop, SLOT(quit()));
-                    m_eventloop.exec();
+                    qDebug()<<"USB_MONITOR INSERTION";
                     if(infoFromHandle(guid,info,devInfo,i)!=1)
                     {
                         qDebug()<<"USB_MONITOR infoFromHandle failed on matchAndDispatchChangedDevice";
@@ -189,11 +205,20 @@ bool USBMonitor::matchAndDispatchChangedDevice(const QString & deviceID, const G
                     }
                     bool m_break=false;
                     foreach (USBPortInfo m_info, knowndevices) {
-                        if(m_info.serialNumber==info.serialNumber && m_info.productID==info.productID)
+                        if(m_info.serialNumber==info.serialNumber && m_info.productID==info.productID && m_info.bcdDevice==info.bcdDevice && m_info.devicePath==info.devicePath)
+                        {
+                            qDebug()<<"USB_MONITOR device already present don't emit signal";
                             m_break=true;
+                        }
+
                     }
                     if(m_break)
                         break;
+                    if(info.bcdDevice==0 || info.product.isEmpty())
+                    {
+                        qDebug()<<"USB_MONITOR empty information on device not emiting signal";
+                        break;
+                    }
                     knowndevices.append(info);
                     qDebug()<<"USB_MONITOR emit device discovered on device:"<<info.product<<info.bcdDevice;
                     emit deviceDiscovered(info);
@@ -208,13 +233,18 @@ bool USBMonitor::matchAndDispatchChangedDevice(const QString & deviceID, const G
                         if(knowndevices[x].devicePath==deviceID)
                         {
                             USBPortInfo temp=knowndevices.at(x);
+                            knowndevices.removeAt(x);
+                            qDebug()<<"USB_MONITOR emit device removed on device:"<<temp.product<<temp.bcdDevice;
                             emit deviceRemoved(temp);
                             found=true;
                             break;
                         }
                     }
                     if(!found)
+                    {
+                        qDebug()<<"USB_MONITOR emit device removed on unknown device";
                         emit deviceRemoved(info);
+                    }
                 }
                 break;
 

@@ -34,6 +34,9 @@
 #ifndef PIOS_CONFIG_H
 #define PIOS_CONFIG_H
 
+/* Major features */
+#define PIOS_INCLUDE_FREERTOS
+#define PIOS_INCLUDE_BL_HELPER
 
 /* Enable/Disable PiOS Modules */
 //#define PIOS_INCLUDE_ADC
@@ -41,64 +44,49 @@
 #define PIOS_INCLUDE_I2C
 #define PIOS_INCLUDE_IRQ
 #define PIOS_INCLUDE_LED
-#define PIOS_INCLUDE_RCVR
-#define PIOS_INCLUDE_SPEKTRUM
-#define PIOS_INCLUDE_SBUS
-#define PIOS_INCLUDE_PWM
-#define PIOS_INCLUDE_PPM
-#define PIOS_INCLUDE_TELEMETRY_RF
 #define PIOS_INCLUDE_SERVO
 #define PIOS_INCLUDE_SPI
 #define PIOS_INCLUDE_SYS
 #define PIOS_INCLUDE_USART
 //#define PIOS_INCLUDE_USB_HID
+//#define PIOS_INCLUDE_GPIO
+//#define PIOS_INCLUDE_EXTI
+#define PIOS_INCLUDE_RTC
+#define PIOS_INCLUDE_WDG
 
 /* Select the sensors to include */
 #define PIOS_INCLUDE_BMA180
 #define PIOS_INCLUDE_HMC5883
 #define PIOS_INCLUDE_MPU6000
 #define PIOS_INCLUDE_MS5611
-
 //#define PIOS_INCLUDE_HCSR04
-#define PIOS_INCLUDE_COM
-//#define PIOS_INCLUDE_GPS
-#define PIOS_INCLUDE_SETTINGS
-#define PIOS_INCLUDE_FREERTOS
-//#define PIOS_INCLUDE_GPIO
-//#define PIOS_INCLUDE_EXTI
-#define PIOS_INCLUDE_RTC
-#define PIOS_INCLUDE_WDG
-//#define PIOS_INCLUDE_I2C_ESC
-#define PIOS_INCLUDE_BL_HELPER
 
+/* Com systems to include */
+#define PIOS_INCLUDE_COM
 #define PIOS_INCLUDE_COM_TELEM
+#define PIOS_INCLUDE_GPS
 
 /* Supported receiver interfaces */
+#define PIOS_INCLUDE_RCVR
 #define PIOS_INCLUDE_DSM
 //#define PIOS_INCLUDE_SBUS
 //#define PIOS_INCLUDE_PPM
 //#define PIOS_INCLUDE_PWM
 //#define PIOS_INCLUDE_GCSRCVR
 
-
+#define PIOS_INCLUDE_SETTINGS
 #define PIOS_INCLUDE_FLASH
 /* A really shitty setting saving implementation */
 #define PIOS_INCLUDE_FLASH_SECTOR_SETTINGS
 
-/* Defaults for Logging */
-#define LOG_FILENAME 			"PIOS.LOG"
-#define STARTUP_LOG_ENABLED		1
+/* Other Interfaces */
+//#define PIOS_INCLUDE_I2C_ESC
 
-#define PIOS_INCLUDE_INITCALL
-
-/* Enable a priority queue in telemetry */
-#define PIOS_TELEM_PRIORITY_QUEUE
-
-/* COM Module */
-#define GPS_BAUDRATE			19200
-#define TELEM_BAUDRATE			19200
-#define AUXUART_ENABLED			0
-#define AUXUART_BAUDRATE		19200
+/* Flags that alter behaviors */
+#define PIOS_INCLUDE_INITCALL           /* Include init call structures */
+#define PIOS_TELEM_PRIORITY_QUEUE       /* Enable a priority queue in telemetry */
+#define PIOS_QUATERNION_STABILIZATION   /* Stabilization options */
+#define PIOS_GPS_SETS_HOMELOCATION      /* GPS options */
 
 /* Alarm Thresholds */
 #define HEAP_LIMIT_WARNING		4000
@@ -110,13 +98,6 @@
 
 // This actually needs calibrating
 #define IDLE_COUNTS_PER_SEC_AT_NO_LOAD (8379692)
-
-/* Stabilization options */
-#define PIOS_QUATERNION_STABILIZATION
-
-/* GPS options */
-#define PIOS_GPS_SETS_HOMELOCATION
-
 
 #endif /* PIOS_CONFIG_H */
 /**

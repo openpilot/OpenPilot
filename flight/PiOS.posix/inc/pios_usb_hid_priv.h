@@ -46,8 +46,14 @@ struct pios_usb_hid_cfg {
 
 typedef struct {
   const struct pios_usb_hid_cfg * cfg;
+#if defined(PIOS_INCLUDE_FREERTOS)
+  xTaskHandle rxThread;
+  xTaskHandle txThread;
+  volatile uint8_t txBytesAvailable;
+#else
   pthread_t rxThread;
   pthread_t txThread;
+#endif
 
   usb_dev_handle *device;
   uint32_t endpoint_in;

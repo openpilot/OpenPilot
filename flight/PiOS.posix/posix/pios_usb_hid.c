@@ -216,10 +216,6 @@ uint32_t usbhid_open(pios_usb_dev * usb_dev) {
  */
 void * PIOS_USB_TxThread(void * usb_dev_n)
 {
-	/* needed because of FreeRTOS.posix scheduling */
-	sigset_t set;
-	sigfillset(&set);
-	sigprocmask(SIG_BLOCK, &set, NULL);
 
 	pios_usb_dev * usb_dev = (pios_usb_dev*) usb_dev_n;
 
@@ -247,15 +243,17 @@ void * PIOS_USB_TxThread(void * usb_dev_n)
 			} while (remaining>0);
 		}
 #if defined(PIOS_INCLUDE_FREERTOS)
-		if (tx_need_yield) {
-			vPortYieldFromISR();
+		usb_dev->txBytesAvailable = 0;
+		while (usb_dev->txBytesAvailable == 0) {
+			vPortYield();
 		}
-#endif	/* PIOS_INCLUDE_FREERTOS */
-
+#else
 		// wait until data is ready to be sent
 		pthread_mutex_lock( &usb_dev->mutex );
 		pthread_cond_wait( &usb_dev->cond, &usb_dev->mutex );
 		pthread_mutex_unlock( &usb_dev->mutex );
+#endif	/* PIOS_INCLUDE_FREERTOS */
+
 
 	}
 
@@ -268,10 +266,6 @@ void * PIOS_USB_TxThread(void * usb_dev_n)
 void * PIOS_USB_RxThread(void * usb_dev_n)
 {
 
-	/* needed because of FreeRTOS.posix scheduling */
-	sigset_t set;
-	sigfillset(&set);
-	sigprocmask(SIG_BLOCK, &set, NULL);
 
 	pios_usb_dev * usb_dev = (pios_usb_dev*) usb_dev_n;
 
@@ -305,7 +299,7 @@ void * PIOS_USB_RxThread(void * usb_dev_n)
 
 #if defined(PIOS_INCLUDE_FREERTOS)
 			if (rx_need_yield) {
-				vPortYieldFromISR();
+				vPortYield();
 			}
 #endif	/* PIOS_INCLUDE_FREERTOS */
 
@@ -343,8 +337,13 @@ int32_t PIOS_USB_HID_Init(uint32_t * usb_id, const struct pios_usb_hid_cfg * cfg
   int res=0;
 
   /* Create transmit thread for this connection */
+#if defined(PIOS_INCLUDE_FREERTOS)
+  xTaskCreate((pdTASK_CODE)PIOS_USB_RxThread, (const signed char *)"USBHID_Rx_Thread",1024,(void*)usb_dev,(tskIDLE_PRIORITY + 1),&usb_dev->rxThread);
+  xTaskCreate((pdTASK_CODE)PIOS_USB_TxThread, (const signed char *)"USBHID_Tx_Thread",1024,(void*)usb_dev,(tskIDLE_PRIORITY + 1),&usb_dev->txThread);
+#else
   pthread_create(&usb_dev->rxThread, NULL, PIOS_USB_RxThread, (void*)usb_dev);
   pthread_create(&usb_dev->txThread, NULL, PIOS_USB_TxThread, (void*)usb_dev);
+#endif
 
   printf("USB dev %i opened...\n",pios_usb_num_devices-1);
 
@@ -369,7 +368,11 @@ static void PIOS_USB_TxStart(uint32_t usb_id, uint16_t tx_bytes_avail)
 
 	PIOS_Assert(usb_dev);
 
+#if defined(PIOS_INCLUDE_FREERTOS)
+	usb_dev->txBytesAvailable = tx_bytes_avail;
+#else
 	pthread_cond_signal(&usb_dev->cond);
+#endif
 
 }
 

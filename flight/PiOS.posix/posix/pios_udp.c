@@ -78,11 +78,6 @@ static pios_udp_dev * find_udp_dev_by_id (uint8_t udp)
 void * PIOS_UDP_RxThread(void * udp_dev_n)
 {
 
-	/* needed because of FreeRTOS.posix scheduling */
-	//sigset_t set;
-	//sigfillset(&set);
-	//sigprocmask(SIG_BLOCK, &set, NULL);
-
 	pios_udp_dev * udp_dev = (pios_udp_dev*) udp_dev_n;
 
    /**

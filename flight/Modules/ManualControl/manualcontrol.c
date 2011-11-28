@@ -54,10 +54,10 @@
 
 #define TASK_PRIORITY (tskIDLE_PRIORITY+4)
 #define UPDATE_PERIOD_MS 20
-#define THROTTLE_FAILSAFE -0.1
-#define FLIGHT_MODE_LIMIT 1.0/3.0
+#define THROTTLE_FAILSAFE -0.1f
+#define FLIGHT_MODE_LIMIT 1.0f/3.0f
 #define ARMED_TIME_MS      1000
-#define ARMED_THRESHOLD    0.50
+#define ARMED_THRESHOLD    0.50f
 //safe band to allow a bit of calibration error or trim offset (in microseconds)
 #define CONNECTION_OFFSET 150
 

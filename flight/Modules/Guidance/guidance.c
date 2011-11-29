@@ -52,6 +52,7 @@
 #include "positionactual.h"
 #include "manualcontrol.h"
 #include "flightstatus.h"
+#include "homelocation.h"
 #include "nedaccel.h"
 #include "stabilizationdesired.h"
 #include "stabilizationsettings.h"
@@ -218,7 +219,7 @@ static void guidanceTask(void *parameters)
 			(systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_QUADX) ||
 			(systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_HEXA) ))
 		{
-			if(positionHoldLast == 0) {
+			if(positionHoldLast == 0 && flightStatus.FlightMode == FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD) {
 				/* When enter position hold mode save current position */
 				PositionDesiredData positionDesired;
 				PositionActualData positionActual;
@@ -229,9 +230,18 @@ static void guidanceTask(void *parameters)
 				positionDesired.Down = positionActual.Down;
 				PositionDesiredSet(&positionDesired);
 				positionHoldLast = 1;
+			} else if (flightStatus.FlightMode == FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE) {
+				/* Fly to home position - NED coordinates [0,0, -altitude offset] */
+				PositionDesiredData positionDesired;
+				PositionDesiredGet(&positionDesired);
+				positionDesired.North = 0;
+				positionDesired.East = 0;
+				positionDesired.Down = -guidanceSettings.ReturnTobaseAltitudeOffset;
+				PositionDesiredSet(&positionDesired);
+				positionHoldLast = 0;
 			}
 			
-			if( flightStatus.FlightMode == FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD ) 
+			if( flightStatus.FlightMode == FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD || flightStatus.FlightMode == FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE ) 
 				updateVtolDesiredVelocity();
 			else
 				manualSetDesiredVelocity();			

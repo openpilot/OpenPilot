@@ -2,6 +2,7 @@
     <object name="GuidanceSettings" singleinstance="true" settings="true">
         <description>Settings for the @ref GuidanceModule</description>
         <field name="GuidanceMode" units="" type="enum" elements="1" options="DUAL_LOOP,VELOCITY_CONTROL" defaultvalue="DUAL_LOOP"/>
+	<field name="ReturnTobaseAltitudeOffset" units="cm" type="int16" elements="1" defaultvalue="7500"/>
         <field name="HorizontalVelMax" units="cm/s" type="uint16" elements="1" defaultvalue="300"/>
         <field name="VerticalVelMax" units="cm/s" type="uint16" elements="1" defaultvalue="150"/>
         <field name="HorizontalPosPI" units="(cm/s)/cm" type="float" elementnames="Kp,Ki,ILimit" defaultvalue="0.1,0,300"/>

@@ -480,7 +480,9 @@ void prvPortYield()
 		/**
 		 * no context switch - keep running
 		 */
-		xInterruptsEnabled = pdTRUE;
+		if (xTaskToResume->uxCriticalNesting==0) {
+			xInterruptsEnabled = pdTRUE;
+		}
 	}
 
 }

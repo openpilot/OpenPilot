@@ -314,12 +314,19 @@ void updateVtolDesiredVelocity()
 		guidanceSettings.HorizontalPosPI[GUIDANCESETTINGS_HORIZONTALPOSPI_ILIMIT]);
 	eastCommand = (eastError * guidanceSettings.HorizontalPosPI[GUIDANCESETTINGS_HORIZONTALPOSPI_KP] +
 		eastPosIntegral);
-	
-	
-	velocityDesired.North = bound(northCommand,-guidanceSettings.HorizontalVelMax,guidanceSettings.HorizontalVelMax);
-	velocityDesired.East = bound(eastCommand,-guidanceSettings.HorizontalVelMax,guidanceSettings.HorizontalVelMax);
 
-	downError = positionDesired.Down - positionActual.Down;
+	/**
+	 * make sure we do not introduce direction errors through overflow
+	 */
+	float speed = sqrt( northCommand*northCommand + eastCommand*eastCommand );
+	if (speed>=guidanceSettings.HorizontalVelMax) {
+		northCommand *= (float)guidanceSettings.HorizontalVelMax / speed;
+		eastCommand *= (float)guidanceSettings.HorizontalVelMax / speed;
+	}
+	velocityDesired.North = northCommand;
+	velocityDesired.East = eastCommand;
+
+	downError = (float)positionDesired.Down - (float)positionActual.Down;
 	downPosIntegral = bound(downPosIntegral + downError * dT * guidanceSettings.VerticalPosPI[GUIDANCESETTINGS_VERTICALPOSPI_KI], 
 		-guidanceSettings.VerticalPosPI[GUIDANCESETTINGS_VERTICALPOSPI_ILIMIT],
 		guidanceSettings.VerticalPosPI[GUIDANCESETTINGS_VERTICALPOSPI_ILIMIT]);

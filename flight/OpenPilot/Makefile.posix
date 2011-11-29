@@ -57,8 +57,8 @@ USE_THUMB_MODE = YES
 
 # List of modules to include
 OPTMODULES = 
-MODULES =  Telemetry UAVTalkBus
-#MODULES =  Telemetry ManualControl Actuator Attitude Stabilization
+#MODULES =  Telemetry UAVTalkBus
+MODULES =  Telemetry ManualControl Actuator Stabilization Guidance
 #MODULES = Telemetry Example
 #MODULES = Telemetry MK/MKSerial
 PYMODULES = FlightPlan
@@ -312,10 +312,6 @@ endif
 
 ifeq ($(DIAGNOSTICS),YES)
 CFLAGS += -DDIAGNOSTICS
-endif
-
-ifeq ($(DIAGNOSTICS),YES)
-CFLAGS = -DDIAGNOSTICS
 endif
 
 CFLAGS += $(CFLAGS_UAVOBJECTS)

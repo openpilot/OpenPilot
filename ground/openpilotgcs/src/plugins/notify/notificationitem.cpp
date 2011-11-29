@@ -82,6 +82,7 @@ NotificationItem::NotificationItem(QObject *parent)
     , _repeatValue(eInstantly)
     , _expireTimeout(eDefaultTimeout)
     , _mute(false)
+    , _previousTriggerValue()
 {
     NotificationItem::sayOrderValues.clear();
     NotificationItem::sayOrderValues[cStrNever] = eNever;

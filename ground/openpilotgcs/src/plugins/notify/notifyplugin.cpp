@@ -414,16 +414,25 @@ void SoundNotifyPlugin::checkNotificationRule(NotificationItem* notification, UA
         return;
 
     QVariant value = field->getValue();
-    if(UAVObjectField::ENUM == field->getType()) {
-        condition = checkRange(value.toString(),
-                               notification->singleValue().toString(),
-                               field->getOptions(),
-                               direction);
-    } else {
-        condition = checkRange(value.toDouble(),
-                               notification->singleValue().toDouble(),
-                               notification->valueRange2(),
-                               direction);
+
+    // Only trigger if we haven't already triggered for this value. As notifications
+    // occur on a UAVObject by UAVObject basis rather than individual fields, we would
+    // trigger notifications for multiple fields in an object if they happen to still
+    // match a trigger value the next time round
+    if(value != notification->previousTriggerValue())
+    {
+        notification->setPreviousTriggerValue(value);
+        if(UAVObjectField::ENUM == field->getType()) {
+            condition = checkRange(value.toString(),
+                                   notification->singleValue().toString(),
+                                   field->getOptions(),
+                                   direction);
+        } else {
+            condition = checkRange(value.toDouble(),
+                                   notification->singleValue().toDouble(),
+                                   notification->valueRange2(),
+                                   direction);
+        }
     }
 
     notification->_isPlayed = condition;

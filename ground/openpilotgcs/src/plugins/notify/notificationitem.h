@@ -75,6 +75,9 @@ public:
     double valueRange2() const { return _valueRange2; }
     void setValueRange2(double value) { _valueRange2 = value; }
 
+    QVariant previousTriggerValue(){ return _previousTriggerValue; }
+    void setPreviousTriggerValue(QVariant value){ _previousTriggerValue = value; }
+
     QString getDataObject() const { return _dataObject; }
     void setDataObject(QString text) { _dataObject = text; }
 
@@ -183,6 +186,10 @@ private:
 
     //! fire condition for UAV field value (equal, lower, greater, in range)
     ERange _rangeLimit;
+
+    //! store previous value that triggered notification to ensure notification fires
+    //! only when value chnages
+    QVariant _previousTriggerValue;
 
     //! possible sounds(at least one required to play notification)
     QString _sound1;

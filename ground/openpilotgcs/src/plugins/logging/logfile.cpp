@@ -88,9 +88,12 @@ void LogFile::timerFired()
     if(file.bytesAvailable() > 4)
     {
 
-        // TODO: going back in time will be a problem
-        while ((myTime.elapsed() - timeOffset) * playbackSpeed > lastTimeStamp) {
+	int time;
+	time = myTime.elapsed();
 
+        // TODO: going back in time will be a problem
+        while ((lastPlayed + ((time - timeOffset)* playbackSpeed) > lastTimeStamp)) {
+	    lastPlayed += ((time - timeOffset)* playbackSpeed);
             if(file.bytesAvailable() < 4) {
                 stopReplay();
                 return;
@@ -98,6 +101,11 @@ void LogFile::timerFired()
 
             file.read((char *) &dataSize, sizeof(dataSize));
 
+	    if (dataSize<1 || dataSize>(1024*1024)) {
+	        qDebug() << "Error: Logfile corrupted! Unlikely packet size: " << dataSize << "\n";
+		stopReplay();
+		return;
+	    }
             if(file.bytesAvailable() < dataSize) {
                 stopReplay();
                 return;
@@ -113,7 +121,19 @@ void LogFile::timerFired()
                 return;
             }
 
+            int save=lastTimeStamp;
             file.read((char *) &lastTimeStamp,sizeof(lastTimeStamp));
+	    // some validity checks
+	    if (lastTimeStamp<save // logfile goies back in time
+		    || (lastTimeStamp-save) > (60*60*1000)) { // gap of more than 60 minutes)
+		qDebug() << "Error: Logfile corrupted! Unlikely timestamp " << lastTimeStamp << " after "<< save << "\n";
+		stopReplay();
+		return;
+            }
+
+            timeOffset = time;
+            time = myTime.elapsed();
+
         }
     } else {
         stopReplay();
@@ -125,6 +145,7 @@ bool LogFile::startReplay() {
     dataBuffer.clear();
     myTime.restart();
     timeOffset = 0;
+    lastPlayed = 0;
     playbackSpeed = 1;
     file.read((char *) &lastTimeStamp,sizeof(lastTimeStamp));
     timer.setInterval(10);
@@ -142,12 +163,11 @@ bool LogFile::stopReplay() {
 void LogFile::pauseReplay()
 {
     timer.stop();
-    pausedTime = myTime.elapsed();
 }
 
 void LogFile::resumeReplay()
 {
-    timeOffset += myTime.elapsed() - pausedTime;
+    timeOffset = myTime.elapsed();
     timer.start();
 }
 

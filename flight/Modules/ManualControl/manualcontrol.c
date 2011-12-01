@@ -189,19 +189,19 @@ static void manualControlTask(void *parameters)
 			lastActivityTime = lastSysTime;
 		}
 
-		if (ManualControlCommandReadOnly(&cmd)) {
+		if (ManualControlCommandReadOnly()) {
 			FlightTelemetryStatsData flightTelemStats;
 			FlightTelemetryStatsGet(&flightTelemStats);
 			if(flightTelemStats.Status != FLIGHTTELEMETRYSTATS_STATUS_CONNECTED) {
 				/* trying to fly via GCS and lost connection.  fall back to transmitter */
 				UAVObjMetadata metadata;
-				UAVObjGetMetadata(&cmd, &metadata);
+				ManualControlCommandGetMetadata(&metadata);
 				metadata.access = ACCESS_READWRITE;
-				UAVObjSetMetadata(&cmd, &metadata);
+				ManualControlCommandSetMetadata(&metadata);
 			}
 		}
 
-		if (!ManualControlCommandReadOnly(&cmd)) {
+		if (!ManualControlCommandReadOnly()) {
 
 			bool valid_input_detected = true;
 			

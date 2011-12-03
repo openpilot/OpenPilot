@@ -57,7 +57,7 @@ NotifyPluginOptionsPage::NotifyPluginOptionsPage(QObject *parent)
     : IOptionsPage(parent)
     , _objManager(*ExtensionSystem::PluginManager::instance()->getObject<UAVObjectManager>())
     , _owner(qobject_cast<SoundNotifyPlugin*>(parent))
-    , _dynamicFieldLimit(NULL)
+    , _dynamicFieldCondition(NULL)
     , _dynamicFieldWidget(NULL)
     , _dynamicFieldType(-1)
     , _sayOrder(NULL)
@@ -74,7 +74,7 @@ QWidget *NotifyPluginOptionsPage::createPage(QWidget *parent)
     //main widget
     QWidget* optionsPageWidget = new QWidget;
     _dynamicFieldWidget = NULL;
-    _dynamicFieldLimit = NULL;
+    _dynamicFieldCondition = NULL;
     resetFieldType();
     //save ref to form, needed for binding dynamic fields in future
     _form = optionsPageWidget;
@@ -224,8 +224,8 @@ void NotifyPluginOptionsPage::addDynamicFieldLayout()
     labelValueIs->setSizePolicy(labelSizePolicy);
     _optionsPage->dynamicValueLayout->addWidget(labelValueIs);
 
-    _dynamicFieldLimit = new QComboBox(_form);
-    _optionsPage->dynamicValueLayout->addWidget(_dynamicFieldLimit);
+    _dynamicFieldCondition = new QComboBox(_form);
+    _optionsPage->dynamicValueLayout->addWidget(_dynamicFieldCondition);
     UAVObjectField* field = getObjectFieldFromSelected();
     addDynamicField(field);
 }
@@ -245,23 +245,42 @@ void NotifyPluginOptionsPage::addDynamicField(UAVObjectField* objField)
         return;
     }
 
-    disconnect(_dynamicFieldLimit, SIGNAL(currentIndexChanged(QString)),
+    disconnect(_dynamicFieldCondition, SIGNAL(currentIndexChanged(QString)),
         this, SLOT(on_changedIndex_rangeValue(QString)));
 
-    _dynamicFieldLimit->clear();
+    _dynamicFieldCondition->clear();
     QStringList rangeValues;
+    QList<int> rangeCode;
     if (UAVObjectField::ENUM == objField->getType()) {
         rangeValues << cStrEqualTo << cStrInRange;
-        _dynamicFieldLimit->addItems(rangeValues);
-        _dynamicFieldLimit->setCurrentIndex(rangeValues.indexOf(_selectedNotification->range()));
+        rangeCode<<NotificationItem::equal<<NotificationItem::inrange;
+        int x=0;
+        int selected=0;
+        foreach (QString value, rangeValues) {
+            _dynamicFieldCondition->addItem(value,rangeCode[x]);
+            if(_selectedNotification->getCondition()==rangeCode[x])
+                selected=x;
+            ++x;
+        }
+        qNotifyDebug()<<"setcurrentindex"<<x;
+        _dynamicFieldCondition->setCurrentIndex(selected);
 
     } else {
         rangeValues << cStrEqualTo << cStrLargeThan << cStrLowerThan << cStrInRange;
-        _dynamicFieldLimit->addItems(rangeValues);
-        connect(_dynamicFieldLimit, SIGNAL(currentIndexChanged(QString)),
+        rangeCode<<NotificationItem::equal<<NotificationItem::bigger<<NotificationItem::smaller<<NotificationItem::inrange;
+        int x=0;
+        int selected=0;
+        foreach (QString value, rangeValues) {
+            _dynamicFieldCondition->addItem(value,rangeCode[x]);
+            if(_selectedNotification->getCondition()==rangeCode[x])
+                selected=x;
+            ++x;
+        }
+        qNotifyDebug()<<"setcurrentindex"<<x;
+        _dynamicFieldCondition->setCurrentIndex(selected);
+        connect(_dynamicFieldCondition, SIGNAL(currentIndexChanged(QString)),
                 this, SLOT(on_changedIndex_rangeValue(QString)));
     }
-
     addDynamicFieldWidget(objField);
 }
 
@@ -295,16 +314,16 @@ void NotifyPluginOptionsPage::addDynamicFieldWidget(UAVObjectField* objField)
         break;
 
     default:
-        Q_ASSERT(_dynamicFieldLimit);
-        if (_dynamicFieldLimit->currentText() == cStrInRange) {
+        Q_ASSERT(_dynamicFieldCondition);
+        if (_dynamicFieldCondition->currentText() == cStrInRange) {
             _dynamicFieldWidget = new QLineEdit(_form);
 
-            (static_cast<QLineEdit*>(_dynamicFieldWidget))->setInputMask("999.99 - 999.99;");
+            (static_cast<QLineEdit*>(_dynamicFieldWidget))->setInputMask("#999.99 : #999.99;");
             (static_cast<QLineEdit*>(_dynamicFieldWidget))->setText("0000000000");
             (static_cast<QLineEdit*>(_dynamicFieldWidget))->setCursorPosition(0);
         } else {
             _dynamicFieldWidget = new QDoubleSpinBox(_form);
-            (dynamic_cast<QDoubleSpinBox*>(_dynamicFieldWidget))->setRange(000.00, 999.99);
+            (dynamic_cast<QDoubleSpinBox*>(_dynamicFieldWidget))->setRange(-999.99, 999.99);
         }
         break;
     };
@@ -351,7 +370,8 @@ void NotifyPluginOptionsPage::getOptionsPageValues(NotificationItem* notificatio
     notification->setSound2(_optionsPage->Sound2->currentText());
     notification->setSound3(_optionsPage->Sound3->currentText());
     notification->setSayOrder(_sayOrder->currentText());
-    notification->setRange(_dynamicFieldLimit->currentText());
+    notification->setCondition(_dynamicFieldCondition->itemData(_dynamicFieldCondition->currentIndex()).toInt());
+    qNotifyDebug()<<"getOptionsPageValues SETRANGE"<<_dynamicFieldCondition->currentIndex()<<_dynamicFieldCondition->itemData(_dynamicFieldCondition->currentIndex()).toInt();
     if (QDoubleSpinBox* spinValue = dynamic_cast<QDoubleSpinBox*>(_dynamicFieldWidget))
         notification->setSingleValue(spinValue->value());
     else {
@@ -360,7 +380,7 @@ void NotifyPluginOptionsPage::getOptionsPageValues(NotificationItem* notificatio
         else {
             if (QLineEdit* rangeValue = dynamic_cast<QLineEdit*>(_dynamicFieldWidget)) {
                 QString str = rangeValue->text();
-                QStringList range = str.split('-');
+                QStringList range = str.split(':');
                 notification->setSingleValue(range.at(0).toDouble());
                 notification->setValueRange2(range.at(1).toDouble());
             }
@@ -435,11 +455,12 @@ void NotifyPluginOptionsPage::updateConfigView(NotificationItem* notification)
         _optionsPage->SoundCollectionList->setCurrentIndex(_optionsPage->SoundCollectionList->findText("default"));
         _optionsPage->Sound3->setCurrentIndex(_optionsPage->Sound3->findText(notification->getSound3()));
     }
-
-    if (-1 != _dynamicFieldLimit->findText(notification->range())) {
-        _dynamicFieldLimit->setCurrentIndex(_dynamicFieldLimit->findText(notification->range()));
+    for(int x=0;x<_dynamicFieldCondition->count();++x)
+    {
+        if (_dynamicFieldCondition->itemData(x)==notification->getCondition()) {
+            _dynamicFieldCondition->setCurrentIndex(x);
+        }
     }
-
     if (-1 != _sayOrder->findText(notification->getSayOrder())) {
         _sayOrder->setCurrentIndex(_sayOrder->findText(notification->getSayOrder()));
     }
@@ -505,6 +526,7 @@ void NotifyPluginOptionsPage::on_changedIndex_soundLanguage(int index)
     _optionsPage->Sound1->clear();
     _optionsPage->Sound2->clear();
     _optionsPage->Sound3->clear();
+    _optionsPage->Sound1->addItem("");
     _optionsPage->Sound1->addItems(listSoundFiles);
     _optionsPage->Sound2->addItem("");
     _optionsPage->Sound2->addItems(listSoundFiles);

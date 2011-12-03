@@ -49,6 +49,7 @@ class NotificationItem : public QObject
 public:
     enum { eDefaultTimeout = 15 }; // in sec
 
+    enum {equal,bigger,smaller,inrange};
     explicit NotificationItem(QObject *parent = 0);
 
     void copyTo(NotificationItem*) const;
@@ -57,8 +58,11 @@ public:
     DECLARE_SOUND(2)
     DECLARE_SOUND(3)
 
-    QString range() const { return _rangeLimit; }
-    void setRange(QString text) { _rangeLimit = text; }
+    bool getCurrentUpdatePlayed() const {return _currentUpdatePlayed;}
+    void setCurrentUpdatePlayed(bool value){_currentUpdatePlayed=value;}
+
+    int getCondition() const { return _condition; }
+    void setCondition(int value) { _condition = value; }
 
     QString getSayOrder() const { return _sayOrder; }
     void setSayOrder(QString text) { _sayOrder = text; }
@@ -100,8 +104,8 @@ public:
     UAVDataObject* getUAVObject(void);
     UAVObjectField* getUAVObjectField(void);
 
-    void seriaize(QDataStream& stream);
-    void deseriaize(QDataStream& stream);
+    void serialize(QDataStream& stream);
+    void deserialize(QDataStream& stream);
 
     /**
     * Convert notification item fields in single string,
@@ -152,6 +156,8 @@ private:
 
 private:
 
+    bool _currentUpdatePlayed;
+
     QTimer* _timer;
 
     //! time from putting notification in queue till moment when notification became out-of-date
@@ -175,7 +181,7 @@ private:
     QString _objectField;
 
     //! fire condition for UAV field value (lower, greater, in range)
-    QString _rangeLimit;
+    int _condition;
 
     //! possible sounds(at least one required to play notification)
     QString _sound1;

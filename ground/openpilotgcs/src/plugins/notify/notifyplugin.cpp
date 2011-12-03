@@ -246,7 +246,7 @@ void SoundNotifyPlugin::on_arrived_Notification(UAVObject *object)
         //          notification can be accepted again;
         // 2. Once time notifications, they removed immediately after first playing;
         // 3. Instant notifications(played one by one without interval);
-        if (ntf->retryString() != "Repeat Instantly" &&
+        if (ntf->retryString() != "Repeat Instantly" && ntf->retryString() != "Repeat Once per update" &&
                 ntf->retryString() != "Repeat Once" && ntf->_isPlayed)
            continue;
 
@@ -345,6 +345,7 @@ void SoundNotifyPlugin::stateChanged(Phonon::State newstate, Phonon::State oldst
             NotificationItem* notification = _pendingNotifications.takeFirst();
             qNotifyDebug_if(notification) << "play audioFree - " << notification->toString();
             playNotification(notification);
+            qNotifyDebug()<<"end playNotification";
         }
     } else {
         if (newstate  == Phonon::ErrorState) {
@@ -356,13 +357,13 @@ void SoundNotifyPlugin::stateChanged(Phonon::State newstate, Phonon::State oldst
     }
 }
 
-bool checkRange(QString fieldValue, QString enumValue, QStringList values, char direction)
+bool checkRange(QString fieldValue, QString enumValue, QStringList values, int direction)
 {
 
     bool ret = false;
     switch(direction)
     {
-    case 'E':
+    case NotificationItem::equal:
         ret = !QString::compare(enumValue, fieldValue, Qt::CaseInsensitive) ? true : false;
         break;
 
@@ -373,21 +374,21 @@ bool checkRange(QString fieldValue, QString enumValue, QStringList values, char 
     return ret;
 }
 
-bool checkRange(double fieldValue, double min, double max, char direction)
+bool checkRange(double fieldValue, double min, double max, int direction)
 {
     bool ret = false;
     Q_ASSERT(min < max);
     switch(direction)
     {
-    case 'E':
+    case NotificationItem::equal:
         ret = (fieldValue == min);
         break;
 
-    case 'G':
+    case NotificationItem::bigger:
         ret = (fieldValue > min);
         break;
 
-    case 'L':
+    case NotificationItem::smaller:
         ret = (fieldValue < min);
         break;
 
@@ -406,7 +407,7 @@ void SoundNotifyPlugin::checkNotificationRule(NotificationItem* notification, UA
     if (notification->mute())
         return;
 
-    QString direction = notification->range();
+    int direction = notification->getCondition();
     QString fieldName = notification->getObjectField();
     UAVObjectField* field = object->getField(fieldName);
 
@@ -415,15 +416,25 @@ void SoundNotifyPlugin::checkNotificationRule(NotificationItem* notification, UA
 
     QVariant value = field->getValue();
     if(UAVObjectField::ENUM == field->getType()) {
+        qNotifyDebug()<<"Check range ENUM"<<value.toString()<<"|"<<notification->singleValue().toString()<<"|"<<field->getOptions()<<"|"<<
+                  direction<<checkRange(value.toString(),
+                                        notification->singleValue().toString(),
+                                        field->getOptions(),
+                                        direction);;
         condition = checkRange(value.toString(),
                                notification->singleValue().toString(),
                                field->getOptions(),
-                               direction[0].toAscii());
+                               direction);
     } else {
+        qNotifyDebug()<<"Check range VAL"<<value.toString()<<"|"<<notification->singleValue().toString()<<"|"<<field->getOptions()<<"|"<<
+                  direction<<checkRange(value.toDouble(),
+                                        notification->singleValue().toDouble(),
+                                        notification->valueRange2(),
+                                        direction);
         condition = checkRange(value.toDouble(),
                                notification->singleValue().toDouble(),
                                notification->valueRange2(),
-                               direction[0].toAscii());
+                               direction);
     }
 
     notification->_isPlayed = condition;
@@ -431,9 +442,11 @@ void SoundNotifyPlugin::checkNotificationRule(NotificationItem* notification, UA
     // we should reset _isPlayed flag and stop repeat timer
     if (!notification->_isPlayed) {
         notification->stopTimer();
+        notification->setCurrentUpdatePlayed(false);
         return;
     }
-
+    if(notification->retryString() == "Repeat Once per update" && notification->getCurrentUpdatePlayed())
+        return;
     volatile QMutexLocker lock(&_mutex);
 
     if (!playNotification(notification)) {
@@ -473,7 +486,10 @@ bool SoundNotifyPlugin::playNotification(NotificationItem* notification)
 
         if (notification->retryString() == "Repeat Once") {
             _toRemoveNotifications.append(_notificationList.takeAt(_notificationList.indexOf(notification)));
-        } else {
+        }
+        else if(notification->retryString() == "Repeat Once per update")
+            notification->setCurrentUpdatePlayed(true);
+        else {
             if (notification->retryString() != "Repeat Instantly") {
                 QRegExp rxlen("(\\d+)");
                 QString value;
@@ -505,7 +521,9 @@ bool SoundNotifyPlugin::playNotification(NotificationItem* notification)
             ms->setAutoDelete(true);
             phonon.mo->enqueue(*ms);
         }
+        qNotifyDebug()<<"begin play";
         phonon.mo->play();
+        qNotifyDebug()<<"end play";
         phonon.firstPlay = false; // On Linux, you sometimes have to nudge Phonon to play 1 time before
                                   // the state is not "Loading" anymore.
         return true;

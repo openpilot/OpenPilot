@@ -152,7 +152,7 @@ private:
     QScopedPointer<Ui::NotifyPluginOptionsPage> _optionsPage;
 
     //! Widget to convinient selection of condition for field value (equal, lower, greater)
-    QComboBox* _dynamicFieldLimit;
+    QComboBox* _dynamicFieldCondition;
 
     //! Represents edit widget for dynamic UAVObjectfield,
     //! can be spinbox - for numerics, combobox - enums, or

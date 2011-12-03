@@ -45,7 +45,9 @@ static const QString cStrBefore1st("Before first");
 static const QString cStrBefore2nd("Before second");
 static const QString cStrAfter2nd("After second");
 
+static const QString cStrRetryOncePUpdate("Repeat Once per update");
 static const QString cStrRetryOnce("Repeat Once");
+
 static const QString cStrRetryInstantly("Repeat Instantly");
 static const QString cStrRetry10sec("Repeat 10 seconds");
 static const QString cStrRetry30sec("Repeat 30 seconds");
@@ -58,6 +60,7 @@ QStringList NotificationItem::retryValues;
 
 NotificationItem::NotificationItem(QObject *parent)
     : QObject(parent)
+    , _currentUpdatePlayed(false)
     , isNowPlaying(0)
     , _isPlayed(false)
     , _timer(NULL)
@@ -66,7 +69,7 @@ NotificationItem::NotificationItem(QObject *parent)
     , _currentLanguage("default")
     , _dataObject("")
     , _objectField("")
-    , _rangeLimit("Equal to")
+    , _condition(0)
     , _sound1("")
     , _sound2("")
     , _sound3("")
@@ -78,12 +81,14 @@ NotificationItem::NotificationItem(QObject *parent)
     , _mute(false)
 {
     NotificationItem::sayOrderValues.clear();
+    NotificationItem::sayOrderValues.append(cStrNever);
     NotificationItem::sayOrderValues.append(cStrBefore1st);
     NotificationItem::sayOrderValues.append(cStrBefore2nd);
     NotificationItem::sayOrderValues.append(cStrAfter2nd);
 
     NotificationItem::retryValues.clear();
     NotificationItem::retryValues.append(cStrRetryOnce);
+    NotificationItem::retryValues.append(cStrRetryOncePUpdate);
     NotificationItem::retryValues.append(cStrRetryInstantly);
     NotificationItem::retryValues.append(cStrRetry10sec);
     NotificationItem::retryValues.append(cStrRetry30sec);
@@ -100,7 +105,7 @@ void NotificationItem::copyTo(NotificationItem* that) const
     that->_soundCollectionPath = _soundCollectionPath;
     that->_dataObject = _dataObject;
     that->_objectField = _objectField;
-    that->_rangeLimit = _rangeLimit;
+    that->_condition = _condition;
     that->_sound1 = _sound1;
     that->_sound2 = _sound2;
     that->_sound3 = _sound3;
@@ -120,7 +125,7 @@ void NotificationItem::saveState(QSettings* settings) const
     settings->setValue(QLatin1String("CurrentLanguage"), getCurrentLanguage());
     settings->setValue(QLatin1String("ObjectField"), getObjectField());
     settings->setValue(QLatin1String("DataObject"), getDataObject());
-    settings->setValue(QLatin1String("RangeLimit"), range());
+    settings->setValue(QLatin1String("RangeLimit"), getCondition());
     settings->setValue(QLatin1String("Value1"), singleValue());
     settings->setValue(QLatin1String("Value2"), valueRange2());
     settings->setValue(QLatin1String("Sound1"), getSound1());
@@ -139,7 +144,7 @@ void NotificationItem::restoreState(QSettings* settings)
     setCurrentLanguage(settings->value(QLatin1String("CurrentLanguage"), tr("")).toString());
     setDataObject(settings->value(QLatin1String("DataObject"), tr("")).toString());
     setObjectField(settings->value(QLatin1String("ObjectField"), tr("")).toString());
-    setRange(settings->value(QLatin1String("RangeLimit"), tr("")).toString());
+    setCondition(settings->value(QLatin1String("RangeLimit"), tr("")).toInt());
     setSound1(settings->value(QLatin1String("Sound1"), tr("")).toString());
     setSound2(settings->value(QLatin1String("Sound2"), tr("")).toString());
     setSound3(settings->value(QLatin1String("Sound3"), tr("")).toString());
@@ -152,13 +157,14 @@ void NotificationItem::restoreState(QSettings* settings)
     setMute(settings->value(QLatin1String("Mute"), tr("")).toInt());
 }
 
-void NotificationItem::seriaize(QDataStream& stream)
+void NotificationItem::serialize(QDataStream& stream)
 {
     stream << this->_soundCollectionPath;
     stream << this->_currentLanguage;
     stream << this->_dataObject;
     stream << this->_objectField;
-    stream << this->_rangeLimit;
+    stream << this->_condition;
+    qNotifyDebug()<<"getOptionsPageValues seriaize"<<_condition;
     stream << this->_sound1;
     stream << this->_sound2;
     stream << this->_sound3;
@@ -170,13 +176,13 @@ void NotificationItem::seriaize(QDataStream& stream)
     stream << this->_mute;
 }
 
-void NotificationItem::deseriaize(QDataStream& stream)
+void NotificationItem::deserialize(QDataStream& stream)
 {
     stream >> this->_soundCollectionPath;
     stream >> this->_currentLanguage;
     stream >> this->_dataObject;
     stream >> this->_objectField;
-    stream >> this->_rangeLimit;
+    stream >> this->_condition;
     stream >> this->_sound1;
     stream >> this->_sound2;
     stream >> this->_sound3;
@@ -252,7 +258,7 @@ void NotificationItem::disposeExpireTimer()
 
 int getValuePosition(QString sayOrder)
 {
-    return NotificationItem::sayOrderValues.indexOf(sayOrder);
+    return NotificationItem::sayOrderValues.indexOf(sayOrder)-1;
 }
 
 QString NotificationItem::checkSoundExists(QString fileName)
@@ -275,11 +281,16 @@ QString NotificationItem::checkSoundExists(QString fileName)
 
 QStringList valueToSoundList(QString value)
 {
+
     // replace point chr if exists
     value = value.replace(',', '.');
     QStringList numberParts = value.trimmed().split(".");
     QStringList digitWavs;
-
+    if(numberParts.at(0).toInt()<0)
+    {
+        digitWavs.append("moved");
+        numberParts[0]=QString::number(numberParts.at(0).toInt()*-1);
+    }
     if ( (numberParts.at(0).size() == 1) || (numberParts.at(0).toInt() < 20) ) {
         // [1] check, is this number < 20, these numbers played by one wav file
         digitWavs.append(numberParts.at(0));

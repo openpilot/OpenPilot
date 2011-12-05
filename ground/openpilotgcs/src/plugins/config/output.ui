@@ -38,102 +38,6 @@
       <property name="spacing">
        <number>2</number>
       </property>
-      <item row="1" column="4">
-       <widget class="QSpinBox" name="outputRate4">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="toolTip">
-         <string>Setup &quot;TurboPWM&quot; here: usual value is 400 Hz for multirotor airframes.
-Leave at 50Hz for fixed wing.</string>
-        </property>
-        <property name="maximum">
-         <number>400</number>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="3">
-       <widget class="QLabel" name="chBank3">
-        <property name="text">
-         <string>-</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2">
-       <widget class="QLabel" name="chBank2">
-        <property name="text">
-         <string>-</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QLabel" name="chBank1">
-        <property name="text">
-         <string>-</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="3">
-       <widget class="QSpinBox" name="outputRate3">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="toolTip">
-         <string>Setup &quot;TurboPWM&quot; here: usual value is 400 Hz for multirotor airframes.
-Leave at 50Hz for fixed wing.</string>
-        </property>
-        <property name="maximum">
-         <number>400</number>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2">
-       <widget class="QSpinBox" name="outputRate2">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="toolTip">
-         <string>Setup &quot;TurboPWM&quot; here: usual value is 400 Hz for multirotor airframes.
-Leave at 50Hz for fixed wing.</string>
-        </property>
-        <property name="maximum">
-         <number>400</number>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QSpinBox" name="outputRate1">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="toolTip">
-         <string>Setup &quot;TurboPWM&quot; here: usual value is 400 Hz for multirotor airframes.
-Leave at 50Hz for fixed wing.</string>
-        </property>
-        <property name="maximum">
-         <number>400</number>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="4">
-       <widget class="QLabel" name="chBank4">
-        <property name="text">
-         <string>-</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_6">
         <item>
@@ -205,6 +109,230 @@ Leave at 50Hz for fixed wing.</string>
          </widget>
         </item>
        </layout>
+      </item>
+      <item row="1" column="1">
+       <widget class="QComboBox" name="cb_outputRate1">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>Setup &quot;TurboPWM&quot; here: usual value is 400 Hz for multirotor airframes.
+Leave at 50Hz for fixed wing.</string>
+        </property>
+        <item>
+         <property name="text">
+          <string>50</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>60</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>125</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>165</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>270</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>330</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>400</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QComboBox" name="cb_outputRate2">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>Setup &quot;TurboPWM&quot; here: usual value is 400 Hz for multirotor airframes.
+Leave at 50Hz for fixed wing.</string>
+        </property>
+        <item>
+         <property name="text">
+          <string>50</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>60</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>125</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>165</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>270</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>330</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>400</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="QComboBox" name="cb_outputRate3">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>Setup &quot;TurboPWM&quot; here: usual value is 400 Hz for multirotor airframes.
+Leave at 50Hz for fixed wing.</string>
+        </property>
+        <item>
+         <property name="text">
+          <string>50</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>60</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>125</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>165</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>270</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>330</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>400</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="1" column="4">
+       <widget class="QComboBox" name="cb_outputRate4">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>Setup &quot;TurboPWM&quot; here: usual value is 400 Hz for multirotor airframes.
+Leave at 50Hz for fixed wing.</string>
+        </property>
+        <item>
+         <property name="text">
+          <string>50</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>60</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>125</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>165</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>270</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>330</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>400</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="chBank1">
+        <property name="text">
+         <string>-</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QLabel" name="chBank2">
+        <property name="text">
+         <string>-</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QLabel" name="chBank3">
+        <property name="text">
+         <string>-</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="4">
+       <widget class="QLabel" name="chBank4">
+        <property name="text">
+         <string>-</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -351,10 +479,6 @@ Applies and Saves all settings to SD</string>
   </layout>
  </widget>
  <tabstops>
-  <tabstop>outputRate1</tabstop>
-  <tabstop>outputRate2</tabstop>
-  <tabstop>outputRate3</tabstop>
-  <tabstop>outputRate4</tabstop>
   <tabstop>channelOutTest</tabstop>
   <tabstop>saveRCOutputToRAM</tabstop>
   <tabstop>saveRCOutputToSD</tabstop>

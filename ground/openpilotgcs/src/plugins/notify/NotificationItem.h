@@ -49,7 +49,10 @@ class NotificationItem : public QObject
 public:
     enum { eDefaultTimeout = 15 }; // in sec
 
-    enum {equal,bigger,smaller,inrange};
+    enum {never,beforeFirst,beforeSecond,afterSecond};
+    enum {repeatOncePerUpdate,repeatOnce,repeatInstantly,repeat10seconds,
+          repeat30seconds,repeat1minute};
+
     explicit NotificationItem(QObject *parent = 0);
 
     void copyTo(NotificationItem*) const;
@@ -64,8 +67,8 @@ public:
     int getCondition() const { return _condition; }
     void setCondition(int value) { _condition = value; }
 
-    QString getSayOrder() const { return _sayOrder; }
-    void setSayOrder(QString text) { _sayOrder = text; }
+    int getSayOrder() const { return _sayOrder; }
+    void setSayOrder(int text) { _sayOrder = text; }
 
     QVariant singleValue() const { return _singleValue; }
     void setSingleValue(QVariant value) { _singleValue = value; }
@@ -88,8 +91,8 @@ public:
     QStringList getMessageSequence() const { return _messageSequence; }
     void setMessageSequence(QStringList sequence) { _messageSequence = sequence; }
 
-    QString retryString() const { return _repeatString; }
-    void setRetryString(QString value) { _repeatString = value; }
+    int retryValue() const { return _repeatValue; }
+    void setRetryValue(int value) { _repeatValue = value; }
 
     int lifetime() const { return _expireTimeout; }
     void setLifetime(int value) { _expireTimeout = value; }
@@ -189,7 +192,7 @@ private:
     QString _sound3;
 
     //! order in what sounds 1-3 will be played
-    QString _sayOrder;
+    int _sayOrder;
 
     //! one-side range, value(numeric or ENUM type) maybe lower, greater or in range
     QVariant _singleValue;
@@ -199,7 +202,7 @@ private:
     double _valueRange2;
 
     //! how often or what periodicaly notification should be played
-    QString _repeatString;
+    int _repeatValue;
 
     //! time after event occured till notification became invalid
     //! and will be removed from list

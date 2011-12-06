@@ -47,11 +47,7 @@
 #include "notifytablemodel.h"
 #include "notifylogging.h"
 
-static const char* cStrEqualTo = "Equal to";
-static const char* cStrLargeThan = "Large than";
-static const char* cStrLowerThan = "Lower than";
-static const char* cStrInRange = "In range";
-
+QStringList NotifyPluginOptionsPage::conditionValues;
 
 NotifyPluginOptionsPage::NotifyPluginOptionsPage(QObject *parent)
     : IOptionsPage(parent)
@@ -63,7 +59,13 @@ NotifyPluginOptionsPage::NotifyPluginOptionsPage(QObject *parent)
     , _sayOrder(NULL)
     , _form(NULL)
     , _selectedNotification(NULL)
-{}
+{
+    NotifyPluginOptionsPage::conditionValues.insert(equal,tr("Equal to"));
+    NotifyPluginOptionsPage::conditionValues.insert(bigger,tr("Large than"));
+    NotifyPluginOptionsPage::conditionValues.insert(smaller,tr("Lower than"));
+    NotifyPluginOptionsPage::conditionValues.insert(inrange,tr("In range"));
+
+}
 
 NotifyPluginOptionsPage::~NotifyPluginOptionsPage()
 {}
@@ -246,41 +248,19 @@ void NotifyPluginOptionsPage::addDynamicField(UAVObjectField* objField)
     }
 
     disconnect(_dynamicFieldCondition, SIGNAL(currentIndexChanged(QString)),
-        this, SLOT(on_changedIndex_rangeValue(QString)));
+               this, SLOT(on_changedIndex_rangeValue(QString)));
 
     _dynamicFieldCondition->clear();
-    QStringList rangeValues;
-    QList<int> rangeCode;
+    _dynamicFieldCondition->addItems(NotifyPluginOptionsPage::conditionValues);
     if (UAVObjectField::ENUM == objField->getType()) {
-        rangeValues << cStrEqualTo << cStrInRange;
-        rangeCode<<NotificationItem::equal<<NotificationItem::inrange;
-        int x=0;
-        int selected=0;
-        foreach (QString value, rangeValues) {
-            _dynamicFieldCondition->addItem(value,rangeCode[x]);
-            if(_selectedNotification->getCondition()==rangeCode[x])
-                selected=x;
-            ++x;
-        }
-        qNotifyDebug()<<"setcurrentindex"<<x;
-        _dynamicFieldCondition->setCurrentIndex(selected);
-
-    } else {
-        rangeValues << cStrEqualTo << cStrLargeThan << cStrLowerThan << cStrInRange;
-        rangeCode<<NotificationItem::equal<<NotificationItem::bigger<<NotificationItem::smaller<<NotificationItem::inrange;
-        int x=0;
-        int selected=0;
-        foreach (QString value, rangeValues) {
-            _dynamicFieldCondition->addItem(value,rangeCode[x]);
-            if(_selectedNotification->getCondition()==rangeCode[x])
-                selected=x;
-            ++x;
-        }
-        qNotifyDebug()<<"setcurrentindex"<<x;
-        _dynamicFieldCondition->setCurrentIndex(selected);
-        connect(_dynamicFieldCondition, SIGNAL(currentIndexChanged(QString)),
-                this, SLOT(on_changedIndex_rangeValue(QString)));
+        _dynamicFieldCondition->removeItem(smaller);
+        _dynamicFieldCondition->removeItem(bigger);
     }
+    _dynamicFieldCondition->setCurrentIndex(_dynamicFieldCondition->findText(NotifyPluginOptionsPage::conditionValues.at(_selectedNotification->getCondition())));
+
+            connect(_dynamicFieldCondition, SIGNAL(currentIndexChanged(QString)),
+                    this, SLOT(on_changedIndex_rangeValue(QString)));
+
     addDynamicFieldWidget(objField);
 }
 
@@ -315,7 +295,7 @@ void NotifyPluginOptionsPage::addDynamicFieldWidget(UAVObjectField* objField)
 
     default:
         Q_ASSERT(_dynamicFieldCondition);
-        if (_dynamicFieldCondition->currentText() == cStrInRange) {
+        if (NotifyPluginOptionsPage::conditionValues.indexOf(_dynamicFieldCondition->currentText()) == NotifyPluginOptionsPage::inrange) {
             _dynamicFieldWidget = new QLineEdit(_form);
 
             (static_cast<QLineEdit*>(_dynamicFieldWidget))->setInputMask("#999.99 : #999.99;");
@@ -369,9 +349,8 @@ void NotifyPluginOptionsPage::getOptionsPageValues(NotificationItem* notificatio
     notification->setSound1(_optionsPage->Sound1->currentText());
     notification->setSound2(_optionsPage->Sound2->currentText());
     notification->setSound3(_optionsPage->Sound3->currentText());
-    notification->setSayOrder(_sayOrder->currentText());
-    notification->setCondition(_dynamicFieldCondition->itemData(_dynamicFieldCondition->currentIndex()).toInt());
-    qNotifyDebug()<<"getOptionsPageValues SETRANGE"<<_dynamicFieldCondition->currentIndex()<<_dynamicFieldCondition->itemData(_dynamicFieldCondition->currentIndex()).toInt();
+    notification->setSayOrder(_sayOrder->currentIndex());
+    notification->setCondition(NotifyPluginOptionsPage::conditionValues.indexOf(_dynamicFieldCondition->currentText()));
     if (QDoubleSpinBox* spinValue = dynamic_cast<QDoubleSpinBox*>(_dynamicFieldWidget))
         notification->setSingleValue(spinValue->value());
     else {
@@ -455,15 +434,10 @@ void NotifyPluginOptionsPage::updateConfigView(NotificationItem* notification)
         _optionsPage->SoundCollectionList->setCurrentIndex(_optionsPage->SoundCollectionList->findText("default"));
         _optionsPage->Sound3->setCurrentIndex(_optionsPage->Sound3->findText(notification->getSound3()));
     }
-    for(int x=0;x<_dynamicFieldCondition->count();++x)
-    {
-        if (_dynamicFieldCondition->itemData(x)==notification->getCondition()) {
-            _dynamicFieldCondition->setCurrentIndex(x);
-        }
-    }
-    if (-1 != _sayOrder->findText(notification->getSayOrder())) {
-        _sayOrder->setCurrentIndex(_sayOrder->findText(notification->getSayOrder()));
-    }
+
+    _dynamicFieldCondition->setCurrentIndex(_dynamicFieldCondition->findText(NotifyPluginOptionsPage::conditionValues.at(notification->getCondition())));
+
+    _sayOrder->setCurrentIndex(notification->getSayOrder());
 
     setDynamicFieldValue(notification);
 
@@ -613,7 +587,7 @@ void NotifyPluginOptionsPage::on_clicked_buttonAddNotification()
         delete notification;
         return;
     } else {
-        notification->setSayOrder(_sayOrder->currentText());
+        notification->setSayOrder(_sayOrder->currentIndex());
     }
 
     _notifyRulesModel->entryAdded(notification);
@@ -638,7 +612,7 @@ void NotifyPluginOptionsPage::on_clicked_buttonModifyNotification()
 {
     NotificationItem* notification = new NotificationItem;
     getOptionsPageValues(notification);
-    notification->setRetryString(_privListNotifications.at(_notifyRulesSelection->currentIndex().row())->retryString());
+    notification->setRetryValue(_privListNotifications.at(_notifyRulesSelection->currentIndex().row())->retryValue());
     notification->setLifetime(_privListNotifications.at(_notifyRulesSelection->currentIndex().row())->lifetime());
     notification->setMute(_privListNotifications.at(_notifyRulesSelection->currentIndex().row())->mute());
 

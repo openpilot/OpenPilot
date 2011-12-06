@@ -60,7 +60,7 @@ class NotifyPluginOptionsPage : public IOptionsPage
     Q_OBJECT
 
 public:
-
+    enum {equal,bigger,smaller,inrange};
     explicit NotifyPluginOptionsPage(QObject *parent = 0);
     ~NotifyPluginOptionsPage();
     QString id() const { return QLatin1String("settings"); }
@@ -72,6 +72,7 @@ public:
     void apply();
     void finish();
     void restoreFromSettings();
+    static QStringList conditionValues;
 
 signals:
     void updateNotifications(QList<NotificationItem*> list);

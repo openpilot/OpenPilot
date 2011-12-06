@@ -246,8 +246,8 @@ void SoundNotifyPlugin::on_arrived_Notification(UAVObject *object)
         //          notification can be accepted again;
         // 2. Once time notifications, they removed immediately after first playing;
         // 3. Instant notifications(played one by one without interval);
-        if (ntf->retryString() != "Repeat Instantly" && ntf->retryString() != "Repeat Once per update" &&
-                ntf->retryString() != "Repeat Once" && ntf->_isPlayed)
+        if (ntf->retryValue() != NotificationItem::repeatInstantly && ntf->retryValue() != NotificationItem::repeatOncePerUpdate &&
+                ntf->retryValue() != NotificationItem::repeatOnce && ntf->_isPlayed)
            continue;
 
         qNotifyDebug() << QString("new notification: | %1 | %2 | val1: %3 | val2: %4")
@@ -363,7 +363,7 @@ bool checkRange(QString fieldValue, QString enumValue, QStringList values, int d
     bool ret = false;
     switch(direction)
     {
-    case NotificationItem::equal:
+    case NotifyPluginOptionsPage::equal:
         ret = !QString::compare(enumValue, fieldValue, Qt::CaseInsensitive) ? true : false;
         break;
 
@@ -377,18 +377,18 @@ bool checkRange(QString fieldValue, QString enumValue, QStringList values, int d
 bool checkRange(double fieldValue, double min, double max, int direction)
 {
     bool ret = false;
-    Q_ASSERT(min < max);
+    //Q_ASSERT(min < max);
     switch(direction)
     {
-    case NotificationItem::equal:
+    case NotifyPluginOptionsPage::equal:
         ret = (fieldValue == min);
         break;
 
-    case NotificationItem::bigger:
+    case NotifyPluginOptionsPage::bigger:
         ret = (fieldValue > min);
         break;
 
-    case NotificationItem::smaller:
+    case NotifyPluginOptionsPage::smaller:
         ret = (fieldValue < min);
         break;
 
@@ -445,7 +445,7 @@ void SoundNotifyPlugin::checkNotificationRule(NotificationItem* notification, UA
         notification->setCurrentUpdatePlayed(false);
         return;
     }
-    if(notification->retryString() == "Repeat Once per update" && notification->getCurrentUpdatePlayed())
+    if(notification->retryValue() == NotificationItem::repeatOncePerUpdate && notification->getCurrentUpdatePlayed())
         return;
     volatile QMutexLocker lock(&_mutex);
 
@@ -484,17 +484,17 @@ bool SoundNotifyPlugin::playNotification(NotificationItem* notification)
         _nowPlayingNotification = notification;
         notification->stopExpireTimer();
 
-        if (notification->retryString() == "Repeat Once") {
+        if (notification->retryValue() == NotificationItem::repeatOnce) {
             _toRemoveNotifications.append(_notificationList.takeAt(_notificationList.indexOf(notification)));
         }
-        else if(notification->retryString() == "Repeat Once per update")
+        else if(notification->retryValue() == NotificationItem::repeatOncePerUpdate)
             notification->setCurrentUpdatePlayed(true);
         else {
-            if (notification->retryString() != "Repeat Instantly") {
+            if (notification->retryValue() != NotificationItem::repeatInstantly) {
                 QRegExp rxlen("(\\d+)");
                 QString value;
-                int timer_value;
-                int pos = rxlen.indexIn(notification->retryString());
+                int timer_value=0;
+                int pos = rxlen.indexIn(NotificationItem::retryValues.at(notification->retryValue()));
                 if (pos > -1) {
                     value = rxlen.cap(1); // "189"
 

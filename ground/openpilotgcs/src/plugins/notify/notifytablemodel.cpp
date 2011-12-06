@@ -52,7 +52,7 @@ bool NotifyTableModel::setData(const QModelIndex &index,
     }
     if (index.isValid() && role == Qt::EditRole) {
         if (eRepeatValue == index.column())
-             _list.at(index.row())->setRetryString(value.toString());
+             _list.at(index.row())->setRetryValue(NotificationItem::retryValues.indexOf(value.toString()));
         else {
             if (eExpireTimer == index.column())
                 _list.at(index.row())->setLifetime(value.toInt());
@@ -85,7 +85,7 @@ QVariant NotifyTableModel::data(const QModelIndex &index, int role) const
             return _list.at(index.row())->toString();
 
         case eRepeatValue:
-            return _list.at(index.row())->retryString();
+            return (NotificationItem::retryValues.at(_list.at(index.row())->retryValue()));
 
         case eExpireTimer:
             return _list.at(index.row())->lifetime();

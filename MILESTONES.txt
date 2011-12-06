@@ -188,4 +188,3 @@ An incomplete list of some future Milestones is below:
 * First over 5km navigation flight
 * First "Follow Me" navigation flight
 * First Channel Crossing with OpenPilot
-

@@ -271,14 +271,16 @@ QString NotificationItem::checkSoundExists(QString fileName)
 
 QStringList valueToSoundList(QString value)
 {
-
+    qNotifyDebug()<<"notificationItem valueToSoundList input param"<<value;
     // replace point chr if exists
     value = value.replace(',', '.');
     QStringList numberParts = value.trimmed().split(".");
     QStringList digitWavs;
+    bool negative=false;
     if(numberParts.at(0).toInt()<0)
     {
-        digitWavs.append("moved");
+        negative=true;
+        digitWavs.append("minus");
         numberParts[0]=QString::number(numberParts.at(0).toInt()*-1);
     }
     if ( (numberParts.at(0).size() == 1) || (numberParts.at(0).toInt() < 20) ) {
@@ -296,17 +298,20 @@ QStringList valueToSoundList(QString value)
         // [3] prepend 100 and 1000 digits of number
         for (;i<numberParts.at(0).size();i++)
         {
-            digitWavs.prepend(numberParts.at(0).at(numberParts.at(0).size()-i-1));
-            if(digitWavs.first()==QString("0")) {
-                digitWavs.removeFirst();
+            int offset=0;
+            if(negative)
+                offset=1;
+            digitWavs.insert(offset,numberParts.at(0).at(numberParts.at(0).size()-i-1));
+            if(digitWavs.at(offset)==QString("0")) {
+                digitWavs.removeAt(offset);
                 continue;
             }
             if (i==1)
-                digitWavs.replace(0,digitWavs.first()+'0');
+                digitWavs.replace(0+offset,digitWavs.at(offset)+'0');
             if (i==2)
-                digitWavs.insert(1,"100");
+                digitWavs.insert(1+offset,"100");
             if (i==3)
-                digitWavs.insert(1,"1000");
+                digitWavs.insert(1+offset,"1000");
         }
     }
     // check, is there fractional part of number?
@@ -322,6 +327,7 @@ QStringList valueToSoundList(QString value)
             digitWavs.append(numberParts.at(1).right(1));
         }
     }
+    qNotifyDebug()<<"notificationItem valueToSoundList return value"<<digitWavs;
     return digitWavs;
 }
 

@@ -162,19 +162,22 @@ void UAVSettingsImportExportFactory::importUAVSettings()
                      if (uavfield) {
                          QStringList list = f.attribute("values").split(",");
                          if (list.length() == 1) {
-                             if (false == uavfield->setValue(f.attribute("values"))) {
-                                 qDebug() << "setValue returned false on: " << uavObjectName << f.attribute("values");
+                             if (false == uavfield->checkValue(f.attribute("values"))) {
+                                 qDebug() << "checkValue returned false on: " << uavObjectName << f.attribute("values");
                                  setError = true;
-                             }
+                             } else
+                            	 uavfield->setValue(f.attribute("values"));
                          } else {
                          // This is an enum:
                              int i=0;
                              QStringList list = f.attribute("values").split(",");
                              foreach (QString element, list) {
-                            	 if (false == uavfield->setValue(element,i++)) {
-                            	     qDebug() << "setValue returned false on: " << uavObjectName << list;
+                            	 if (false == uavfield->checkValue(element,i)) {
+                            	     qDebug() << "checkValue(list) returned false on: " << uavObjectName << list;
                             		 setError = true;
-                            	 }
+                            	 } else
+                            		 uavfield->setValue(element,i);
+                            	 i++;
                              }
                          }
                      } else {

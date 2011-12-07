@@ -492,13 +492,52 @@ QVariant UAVObjectField::getValue(quint32 index)
     return QVariant();
 }
 
-bool UAVObjectField::setValue(const QVariant& value, quint32 index)
+bool UAVObjectField::checkValue(const QVariant& value, quint32 index)
 {
     QMutexLocker locker(obj->getMutex());
     // Check that index is not out of bounds
     if ( index >= numElements )
     {
         return false;
+    } 
+    // Get metadata
+    UAVObject::Metadata mdata = obj->getMetadata();
+    // Update value if the access mode permits
+    if ( mdata.gcsAccess == UAVObject::ACCESS_READWRITE )
+    {
+        switch (type)
+        {
+            case INT8:
+            case INT16:
+            case INT32:
+            case UINT8:
+            case UINT16:
+            case UINT32:
+            case FLOAT32:
+            case STRING:
+                return true;
+                break;
+            case ENUM:
+            {
+                qint8 tmpenum = options.indexOf( value.toString() );
+                return ((tmpenum < 0) ? false : true);
+                break;
+            }
+            default:
+            	qDebug() << "checkValue: other types" << type;
+                Q_ASSERT(0); // To catch any programming errors where we tried to test invalid values
+                break;
+        }
+    }
+}
+
+void UAVObjectField::setValue(const QVariant& value, quint32 index)
+{
+    QMutexLocker locker(obj->getMutex());
+    // Check that index is not out of bounds
+    if ( index >= numElements )
+    {
+        return;
     } 
     // Get metadata
     UAVObject::Metadata mdata = obj->getMetadata();
@@ -552,11 +591,8 @@ bool UAVObjectField::setValue(const QVariant& value, quint32 index)
             case ENUM:
             {
                 qint8 tmpenum = options.indexOf( value.toString() );
-//                Q_ASSERT(tmpenum >= 0); // To catch any programming errors where we set invalid values
-                if(tmpenum < 0)
-                	return false;
-                else
-                	memcpy(&data[offset + numBytesPerElement*index], &tmpenum, numBytesPerElement);
+                Q_ASSERT(tmpenum >= 0); // To catch any programming errors where we set invalid values
+                memcpy(&data[offset + numBytesPerElement*index], &tmpenum, numBytesPerElement);
                 break;
             }
             case STRING:
@@ -573,7 +609,6 @@ bool UAVObjectField::setValue(const QVariant& value, quint32 index)
             }
         }
     }
-    return true;
 }
 
 double UAVObjectField::getDouble(quint32 index)

@@ -110,7 +110,7 @@ public:
     int refreshInterval(){return m_refreshInterval;}
 
 
-    void addCurvePlot(QString uavObject, QString uavFieldSubField, int scaleOrderFactor = 0, QPen pen = QPen(Qt::black));
+    void addCurvePlot(QString uavObject, QString uavFieldSubField, int scaleOrderFactor = 0, int interpolationSamples = 1, QPen pen = QPen(Qt::black));
     //void removeCurvePlot(QString uavObject, QString uavField);
     void clearCurvePlots();
     int csvLoggingStart();
@@ -166,11 +166,13 @@ private:
 
     QString m_csvLoggingName;
     QString m_csvLoggingPath;
+    QString m_csvLoggingBuffer;
     QFile m_csvLoggingFile;
 
 	QMutex mutex;
 
     int csvLoggingInsertHeader();
+    int csvLoggingAddData();
     int csvLoggingInsertData();
 
 	void deleteLegend();

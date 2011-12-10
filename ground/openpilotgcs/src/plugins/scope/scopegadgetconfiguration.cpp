@@ -65,6 +65,7 @@ ScopeGadgetConfiguration::ScopeGadgetConfiguration(QString classId, QSettings* q
             color = qSettings->value("color").value<QRgb>();
             plotCurveConf->color = color;
             plotCurveConf->yScalePower = qSettings->value("yScalePower").toInt();
+            plotCurveConf->yInterpolationSamples = qSettings->value("yInterpolationSamples").toInt();
             plotCurveConf->yMinimum = qSettings->value("yMinimum").toDouble();
             plotCurveConf->yMaximum = qSettings->value("yMaximum").toDouble();
 
@@ -118,6 +119,7 @@ IUAVGadgetConfiguration *ScopeGadgetConfiguration::clone()
         newPlotCurveConf->uavField = currentPlotCurveConf->uavField;
         newPlotCurveConf->color = currentPlotCurveConf->color;
         newPlotCurveConf->yScalePower = currentPlotCurveConf->yScalePower;
+        newPlotCurveConf->yInterpolationSamples = currentPlotCurveConf->yInterpolationSamples;
         newPlotCurveConf->yMinimum = currentPlotCurveConf->yMinimum;
         newPlotCurveConf->yMaximum = currentPlotCurveConf->yMaximum;
 
@@ -157,6 +159,7 @@ void ScopeGadgetConfiguration::saveConfig(QSettings* qSettings) const {
         qSettings->setValue("uavField",  plotCurveConf->uavField);
         qSettings->setValue("color",  plotCurveConf->color);
         qSettings->setValue("yScalePower",  plotCurveConf->yScalePower);
+        qSettings->setValue("yInterpolationSamples",  plotCurveConf->yInterpolationSamples);
         qSettings->setValue("yMinimum",  plotCurveConf->yMinimum);
         qSettings->setValue("yMaximum",  plotCurveConf->yMaximum);
 

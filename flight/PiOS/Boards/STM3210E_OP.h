@@ -116,6 +116,7 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
 extern uint32_t pios_i2c_main_adapter_id;
 #define PIOS_I2C_MAIN_ADAPTER			(pios_i2c_main_adapter_id)
 #define PIOS_I2C_ESC_ADAPTER			(pios_i2c_main_adapter_id)
+#define PIOS_I2C_BMP085_ADAPTER			(pios_i2c_main_adapter_id)
 
 //------------------------
 // PIOS_BMP085

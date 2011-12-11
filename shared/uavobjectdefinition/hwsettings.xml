@@ -1,7 +1,7 @@
 <xml>
 	<object name="HwSettings" singleinstance="true" settings="true">
 		<description>Selection of optional hardware configurations.</description>
-		<field name="CC_RcvrPort" units="function" type="enum" elements="1" options="Disabled,PWM,PPM,PPM+Servo,Servo" defaultvalue="PWM"/>
+		<field name="CC_RcvrPort" units="function" type="enum" elements="1" options="Disabled,PWM,PPM,PPM+Outputs,Outputs" defaultvalue="PWM"/>
 		<field name="CC_MainPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,S.Bus,DSM2,DSMX (10bit),DSMX (11bit),ComAux" defaultvalue="Disabled"/>
 		<field name="CC_FlexiPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,I2C,DSM2,DSMX (10bit),DSMX (11bit),ComAux" defaultvalue="Disabled"/>
 

@@ -38,7 +38,7 @@
 #include "ratedesired.h"
 #include "stabilizationdesired.h"
 #include "attitudeactual.h"
-#include "attituderaw.h"
+#include "gyros.h"
 #include "flightstatus.h"
 #include "manualcontrol.h" // Just to get a macro
 #include "CoordinateConversions.h"
@@ -124,7 +124,7 @@ int32_t StabilizationInitialize()
 
 	// Listen for updates.
 	//	AttitudeActualConnectQueue(queue);
-	AttitudeRawConnectQueue(queue);
+	GyrosConnectQueue(queue);
 
 	StabilizationSettingsConnectCallback(SettingsUpdatedCb);
 	SettingsUpdatedCb(StabilizationSettingsHandle());
@@ -149,7 +149,7 @@ static void stabilizationTask(void* parameters)
 	StabilizationDesiredData stabDesired;
 	RateDesiredData rateDesired;
 	AttitudeActualData attitudeActual;
-	AttitudeRawData attitudeRaw;
+	GyrosData gyrosData;
 	FlightStatusData flightStatus;
 
 	SettingsUpdatedCb((UAVObjEvent *) NULL);
@@ -176,7 +176,7 @@ static void stabilizationTask(void* parameters)
 		FlightStatusGet(&flightStatus);
 		StabilizationDesiredGet(&stabDesired);
 		AttitudeActualGet(&attitudeActual);
-		AttitudeRawGet(&attitudeRaw);
+		GyrosGet(&gyrosData);
 
 #if defined(DIAGNOSTICS)
 		RateDesiredGet(&rateDesired);
@@ -220,9 +220,9 @@ static void stabilizationTask(void* parameters)
 #endif
 
 
-		for(uint8_t i = 0; i < MAX_AXES; i++) {
-			gyro_filtered[i] = gyro_filtered[i] * gyro_alpha + attitudeRaw.gyros[i] * (1 - gyro_alpha);
-		}
+		gyro_filtered[0] = gyro_filtered[0] * gyro_alpha + gyrosData.x * (1 - gyro_alpha);
+		gyro_filtered[1] = gyro_filtered[1] * gyro_alpha + gyrosData.y * (1 - gyro_alpha);
+		gyro_filtered[2] = gyro_filtered[2] * gyro_alpha + gyrosData.z * (1 - gyro_alpha);
 
 		float *attitudeDesiredAxis = &stabDesired.Roll;
 		float *actuatorDesiredAxis = &actuatorDesired.Roll;

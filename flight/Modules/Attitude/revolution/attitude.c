@@ -55,7 +55,6 @@
 #include "gyros.h"
 #include "attitudeactual.h"
 #include "attitudesettings.h"
-#include "baroaltitude.h"
 #include "flightstatus.h"
 #include "CoordinateConversions.h"
 
@@ -80,10 +79,8 @@ const uint32_t SENSOR_QUEUE_SIZE = 10;
 static void SensorTask(void *parameters);
 static void AttitudeTask(void *parameters);
 
-static float gyro_correct_int[3] = {0,0,0};
-
-static int8_t updateSensors(AttitudeRawData *);
-static void updateAttitude();
+static int32_t updateSensors();
+static int32_t updateAttitudeComplimentary();
 static void settingsUpdatedCb(UAVObjEvent * objEv);
 
 static float accelKi = 0;
@@ -94,7 +91,10 @@ static int16_t accelbias[3];
 static float R[3][3];
 static int8_t rotate = 0;
 static bool zero_during_arming = false;
+
+// These values are initialized by settings but can be updated by the attitude algorithm
 static bool bias_correct_gyro = true;
+static float gyro_bias[3] = {0,0,0};
 
 /**
  * API for sensor fusion algorithms:
@@ -133,9 +133,10 @@ int32_t AttitudeStart(void)
 int32_t AttitudeInitialize(void)
 {
 	AttitudeActualInitialize();
-	AttitudeRawInitialize();
+	GyrosInitialize();
+	AccelsInitialize();
+	MagnetometerInitialize();
 	AttitudeSettingsInitialize();
-	BaroAltitudeInitialize();
 	
 	// Initialize quaternion
 	AttitudeActualData attitude;
@@ -147,9 +148,9 @@ int32_t AttitudeInitialize(void)
 	AttitudeActualSet(&attitude);
 
 	// Cannot trust the values to init right above if BL runs
-	gyro_correct_int[0] = 0;
-	gyro_correct_int[1] = 0;
-	gyro_correct_int[2] = 0;
+	gyro_bias[0] = 0;
+	gyro_bias[1] = 0;
+	gyro_bias[2] = 0;
 
 	for(uint8_t i = 0; i < 3; i++)
 		for(uint8_t j = 0; j < 3; j++)
@@ -218,15 +219,10 @@ static void SensorTask(void *parameters)
 			init = 1;
 		}
 	
-		// Update the sensor readings
-		AttitudeRawData attitudeRaw;
-		AttitudeRawGet(&attitudeRaw);
 		
-		if(updateSensors(&attitudeRaw) != 0)
+		if(updateSensors() != 0)
 			AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
 		else {
-			// Only update attitude when sensor data is good
-			AttitudeRawSet(&attitudeRaw);
 			// TODO: Push data onto queue 
 			AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
 		}
@@ -251,7 +247,7 @@ static void AttitudeTask(void *parameters)
 	while (1) {
 	
 		// This  function blocks on data queue
-		updateAttitude();
+		updateAttitudeComplimentary();
 		
 		PIOS_WDG_UpdateFlag(PIOS_WDG_ATTITUDE);
 	}
@@ -262,7 +258,6 @@ uint32_t accel_samples;
 uint32_t gyro_samples;
 struct pios_bma180_data accel;
 struct pios_mpu6000_data gyro;
-AttitudeRawData raw;
 int32_t accel_accum[3] = {0, 0, 0};
 int32_t gyro_accum[3] = {0,0,0};
 float scaling;
@@ -272,7 +267,7 @@ float scaling;
  * @param[in] attitudeRaw Populate the UAVO instead of saving right here
  * @return 0 if successfull, -1 if not
  */
-static int8_t updateSensors(AttitudeRawData * attitudeRaw)
+static int32_t updateSensors()
 {
 	int32_t read_good;
 	int32_t count;
@@ -302,16 +297,15 @@ static int8_t updateSensors(AttitudeRawData * attitudeRaw)
 
 	// Not the swaping of channel orders
 	scaling = PIOS_BMA180_GetScale();
-	attitudeRaw->accels[ATTITUDERAW_ACCELS_X] = (accels[0] - accelbias[0]) * scaling;
-	attitudeRaw->accels[ATTITUDERAW_ACCELS_Y] = (accels[1] - accelbias[1]) * scaling;
-	attitudeRaw->accels[ATTITUDERAW_ACCELS_Z] = (accels[2] - accelbias[2]) * scaling;
+	AccelsData accelsData; // Skip get as we set all the fields
+	accelsData.x = (accels[0] - accelbias[0]) * scaling;
+	accelsData.y = (accels[1] - accelbias[1]) * scaling;
+	accelsData.z = (accels[2] - accelbias[2]) * scaling;
+	accelsData.temperature = 25.0f + ((float) accel.temperature - 2.0f) / 2.0f;
+	AccelsSet(&accelsData);
 	
 	// Push the data onto the queue for attitude to consume
-	struct accel_data accel_data;
-	accel_data.x = attitudeRaw->accels[ATTITUDERAW_ACCELS_X];
-	accel_data.y = attitudeRaw->accels[ATTITUDERAW_ACCELS_X];
-	accel_data.z = attitudeRaw->accels[ATTITUDERAW_ACCELS_X];
-	if(xQueueSendToBack(accelQueue, (void *) &accel_data, 0) != pdTRUE) {
+	if(xQueueSendToBack(accelQueue, (void *) &accelsData, 0) != pdTRUE) {
 		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_WARNING);
 	}
 	
@@ -332,67 +326,54 @@ static int8_t updateSensors(AttitudeRawData * attitudeRaw)
 	float gyros[3] = {(float) gyro_accum[1] / gyro_samples, (float) gyro_accum[0] / gyro_samples, -(float) gyro_accum[2] / gyro_samples};
 	
 	scaling = PIOS_MPU6000_GetScale();
-	attitudeRaw->gyros[ATTITUDERAW_GYROS_X] = gyros[0] * scaling;
-	attitudeRaw->gyros[ATTITUDERAW_GYROS_Y] = gyros[1] * scaling;
-	attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] = gyros[2] * scaling;
+	GyrosData gyrosData; // Skip get as we set all the fields
+	gyrosData.x = gyros[0] * scaling;
+	gyrosData.y = gyros[1] * scaling;
+	gyrosData.z = gyros[2] * scaling;
+	gyrosData.temperature = 35.0f + ((float) gyro.temperature + 512.0f) / 340.0f;
+	// Don't set yet.  We push raw data to queue but then bias correct for other modules
 	
 	// Push the data onto the queue for attitude to consume
-	struct gyro_data gyro_data;
-	gyro_data.x = attitudeRaw->gyros[ATTITUDERAW_GYROS_X];
-	gyro_data.y = attitudeRaw->gyros[ATTITUDERAW_GYROS_Y];
-	gyro_data.z = attitudeRaw->gyros[ATTITUDERAW_GYROS_Z];
-	if(xQueueSendToBack(gyroQueue, (void *) &gyro_data, 0) != pdTRUE) {
+	if(xQueueSendToBack(gyroQueue, (void *) &gyrosData, 0) != pdTRUE) {
 		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_WARNING);
 	}
 		
-	// From data sheet 35 deg C corresponds to -13200, and 280 LSB per C
-	attitudeRaw->temperature[ATTITUDERAW_TEMPERATURE_GYRO] = 35.0f + ((float) gyro.temperature + 512.0f) / 340.0f;
-	
-	// From the data sheet 25 deg C corresponds to 2 and 2 LSB per C
-	attitudeRaw->temperature[ATTITUDERAW_TEMPERATURE_ACCEL] = 25.0f + ((float) accel.temperature - 2.0f) / 2.0f;
-	
+	// Apply bias correction to the gyros
 	if(bias_correct_gyro) {
-		// Applying integral component here so it can be seen on the gyros and correct bias
-		attitudeRaw->gyros[ATTITUDERAW_GYROS_X] += gyro_correct_int[0];
-		attitudeRaw->gyros[ATTITUDERAW_GYROS_Y] += gyro_correct_int[1];
-		attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] += gyro_correct_int[2];
+		gyrosData.x += gyro_bias[0];
+		gyrosData.y += gyro_bias[1];
+		gyrosData.z += gyro_bias[2];
 	}
-
-	// Hack for tweaking gyro gains with the old settings
-	scaling = gyroGain / 0.42;
-	attitudeRaw->gyros[ATTITUDERAW_GYROS_X] *= scaling;
-	attitudeRaw->gyros[ATTITUDERAW_GYROS_Y] *= scaling;
-	attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] *= scaling;
+	GyrosSet(&gyrosData);
 
 	// Because most crafts wont get enough information from gravity to zero yaw gyro, we try
 	// and make it average zero (weakly)
-	gyro_correct_int[2] += - attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] * yawBiasRate;
-
+	gyro_bias[2] += - gyrosData.z * yawBiasRate;
 
 	if (PIOS_HMC5883_NewDataAvailable()) {
 		int16_t values[3];
 		PIOS_HMC5883_ReadMag(values);
-		attitudeRaw->magnetometers[ATTITUDERAW_MAGNETOMETERS_X] = -values[0];
-		attitudeRaw->magnetometers[ATTITUDERAW_MAGNETOMETERS_Y] = -values[1];
-		attitudeRaw->magnetometers[ATTITUDERAW_MAGNETOMETERS_Z] = -values[2];
+		MagnetometerData mag; // Skip get as we set all the fields
+		mag.x = -values[0];
+		mag.y = -values[1];
+		mag.z = -values[2];
+		MagnetometerSet(&mag);
 	}
-
-	AttitudeRawSet(&raw);
 	
 	return 0;
 }
 
 float accel_mag;
 float qmag;
-static void updateAttitude()
+static int32_t updateAttitudeComplimentary()
 {
-	struct gyro_data gyro_data;
-	struct accel_data accel_data;
+	GyrosData gyrosData;
+	AccelsData accelsData;
 	
-	if(xQueueReceive(gyroQueue, (void *) &gyro_data, 10 / portTICK_RATE_MS) != pdTRUE ||
-	   xQueueReceive(accelQueue, (void *) &accel_data, 10 / portTICK_RATE_MS) != pdTRUE) {
+	if(xQueueReceive(gyroQueue, (void *) &gyrosData, 10 / portTICK_RATE_MS) != pdTRUE ||
+	   xQueueReceive(accelQueue, (void *) &accelsData, 10 / portTICK_RATE_MS) != pdTRUE) {
 		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
-		return;
+		return -1;
 	}
 
 	static int32_t timeval;
@@ -414,32 +395,32 @@ static void updateAttitude()
 	grot[0] = -(2 * (q[1] * q[3] - q[0] * q[2]));
 	grot[1] = -(2 * (q[2] * q[3] + q[0] * q[1]));
 	grot[2] = -(q[0] * q[0] - q[1]*q[1] - q[2]*q[2] + q[3]*q[3]);
-	CrossProduct((const float *) &accel_data.x, (const float *) grot, accel_err);
+	CrossProduct((const float *) &accelsData.x, (const float *) grot, accel_err);
 
 	// Account for accel magnitude
-	accel_mag = accel_data.x*accel_data.x + accel_data.y*accel_data.y + accel_data.z*accel_data.z;
+	accel_mag = accelsData.x*accelsData.x + accelsData.y*accelsData.y + accelsData.z*accelsData.z;
 	accel_mag = sqrtf(accel_mag);
 	accel_err[0] /= accel_mag;
 	accel_err[1] /= accel_mag;
 	accel_err[2] /= accel_mag;	
 	
 	// Accumulate integral of error.  Scale here so that units are (deg/s) but Ki has units of s
-	gyro_correct_int[0] += accel_err[0] * accelKi;
-	gyro_correct_int[1] += accel_err[1] * accelKi;
+	gyro_bias[0] += accel_err[0] * accelKi;
+	gyro_bias[1] += accel_err[1] * accelKi;
 		
 	// Correct rates based on error, integral component dealt with in updateSensors
-	gyro_data.x += accel_err[0] * accelKp / dT;
-	gyro_data.y += accel_err[1] * accelKp / dT;
-	gyro_data.z += accel_err[2] * accelKp / dT;
+	gyrosData.x += accel_err[0] * accelKp / dT;
+	gyrosData.y += accel_err[1] * accelKp / dT;
+	gyrosData.z += accel_err[2] * accelKp / dT;
 
 
 	// Work out time derivative from INSAlgo writeup
 	// Also accounts for the fact that gyros are in deg/s
 	float qdot[4];
-	qdot[0] = (-q[1] * gyro_data.x - q[2] * gyro_data.y - q[3] * gyro_data.z) * dT * F_PI / 180 / 2;
-	qdot[1] = (q[0] * gyro_data.x - q[3] * gyro_data.y + q[2] * gyro_data.z) * dT * F_PI / 180 / 2;
-	qdot[2] = (q[3] * gyro_data.x + q[0] * gyro_data.y - q[1] * gyro_data.z) * dT * F_PI / 180 / 2;
-	qdot[3] = (-q[2] * gyro_data.x + q[1] * gyro_data.y + q[0] * gyro_data.z) * dT * F_PI / 180 / 2;
+	qdot[0] = (-q[1] * gyrosData.x - q[2] * gyrosData.y - q[3] * gyrosData.z) * dT * F_PI / 180 / 2;
+	qdot[1] = (q[0] * gyrosData.x - q[3] * gyrosData.y + q[2] * gyrosData.z) * dT * F_PI / 180 / 2;
+	qdot[2] = (q[3] * gyrosData.x + q[0] * gyrosData.y - q[1] * gyrosData.z) * dT * F_PI / 180 / 2;
+	qdot[3] = (-q[2] * gyrosData.x + q[1] * gyrosData.y + q[0] * gyrosData.z) * dT * F_PI / 180 / 2;
 	
 	// Take a time step
 	q[0] = q[0] + qdot[0];
@@ -479,6 +460,7 @@ static void updateAttitude()
 	
 	AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
 
+	return 0;
 }
 
 static void settingsUpdatedCb(UAVObjEvent * objEv) {
@@ -498,9 +480,9 @@ static void settingsUpdatedCb(UAVObjEvent * objEv) {
 	accelbias[1] = attitudeSettings.AccelBias[ATTITUDESETTINGS_ACCELBIAS_Y];
 	accelbias[2] = attitudeSettings.AccelBias[ATTITUDESETTINGS_ACCELBIAS_Z];
 
-	gyro_correct_int[0] = attitudeSettings.GyroBias[ATTITUDESETTINGS_GYROBIAS_X] / 100.0f;
-	gyro_correct_int[1] = attitudeSettings.GyroBias[ATTITUDESETTINGS_GYROBIAS_Y] / 100.0f;
-	gyro_correct_int[2] = attitudeSettings.GyroBias[ATTITUDESETTINGS_GYROBIAS_Z] / 100.0f;
+	gyro_bias[0] = attitudeSettings.GyroBias[ATTITUDESETTINGS_GYROBIAS_X] / 100.0f;
+	gyro_bias[1] = attitudeSettings.GyroBias[ATTITUDESETTINGS_GYROBIAS_Y] / 100.0f;
+	gyro_bias[2] = attitudeSettings.GyroBias[ATTITUDESETTINGS_GYROBIAS_Z] / 100.0f;
 
 	// Indicates not to expend cycles on rotation
 	if(attitudeSettings.BoardRotation[0] == 0 && attitudeSettings.BoardRotation[1] == 0 &&

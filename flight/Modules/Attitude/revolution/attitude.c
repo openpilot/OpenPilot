@@ -50,7 +50,9 @@
 
 #include "pios.h"
 #include "attitude.h"
-#include "attituderaw.h"
+#include "magnetometer.h"
+#include "accels.h"
+#include "gyros.h"
 #include "attitudeactual.h"
 #include "attitudesettings.h"
 #include "baroaltitude.h"
@@ -94,23 +96,13 @@ static int8_t rotate = 0;
 static bool zero_during_arming = false;
 static bool bias_correct_gyro = true;
 
-struct gyro_data {
-	float x;
-	float y;
-	float z;
-};
-
-struct accel_data {
-	float x;
-	float y;
-	float z;
-};
-
-struct mag_data {
-	float x;
-	float y;
-	float z;
-};
+/**
+ * API for sensor fusion algorithms:
+ * Configure(xQueueHandle gyro, xQueueHandle accel, xQueueHandle mag, xQueueHandle baro)
+ *   Stores all the queues the algorithm will pull data from
+ * FinalizeSensors() -- before saving the sensors modifies them based on internal state (gyro bias)
+ * Update() -- queries queues and updates the attitude estiamte
+ */
 
 /**
  * Initialise the module, called on startup
@@ -119,10 +111,10 @@ struct mag_data {
 int32_t AttitudeStart(void)
 {
 	// Create the queues for the sensors
-	gyroQueue = xQueueCreate(SENSOR_QUEUE_SIZE, sizeof(struct gyro_data));
-	accelQueue = xQueueCreate(SENSOR_QUEUE_SIZE, sizeof(struct accel_data));
-	magQueue = xQueueCreate(SENSOR_QUEUE_SIZE, sizeof(struct mag_data));
-		
+	gyroQueue = xQueueCreate(SENSOR_QUEUE_SIZE, sizeof(GyrosData));
+	accelQueue = xQueueCreate(SENSOR_QUEUE_SIZE, sizeof(AccelsData));
+	magQueue = xQueueCreate(SENSOR_QUEUE_SIZE, sizeof(MagnetometerData));
+
 	// Start main task
 	xTaskCreate(SensorTask, (signed char *)"Sensors", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &sensorTaskHandle);
 	xTaskCreate(AttitudeTask, (signed char *)"Attitude", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &attitudeTaskHandle);

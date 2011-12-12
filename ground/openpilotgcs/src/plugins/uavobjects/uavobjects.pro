@@ -29,7 +29,9 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/attitudeactual.h \
     $$UAVOBJECT_SYNTHETICS/inssettings.h \
     $$UAVOBJECT_SYNTHETICS/gcstelemetrystats.h \
-    $$UAVOBJECT_SYNTHETICS/attituderaw.h \
+    $$UAVOBJECT_SYNTHETICS/gyros.h \
+    $$UAVOBJECT_SYNTHETICS/accels.h \
+    $$UAVOBJECT_SYNTHETICS/magnetometer.h \
     $$UAVOBJECT_SYNTHETICS/camerastabsettings.h \
     $$UAVOBJECT_SYNTHETICS/flighttelemetrystats.h \
     $$UAVOBJECT_SYNTHETICS/systemstats.h \
@@ -79,7 +81,9 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/attitudeactual.cpp \
     $$UAVOBJECT_SYNTHETICS/inssettings.cpp \
     $$UAVOBJECT_SYNTHETICS/gcstelemetrystats.cpp \
-    $$UAVOBJECT_SYNTHETICS/attituderaw.cpp \
+    $$UAVOBJECT_SYNTHETICS/accels.cpp \
+    $$UAVOBJECT_SYNTHETICS/gyros.cpp \
+    $$UAVOBJECT_SYNTHETICS/magnetometer.cpp \
     $$UAVOBJECT_SYNTHETICS/camerastabsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/flighttelemetrystats.cpp \
     $$UAVOBJECT_SYNTHETICS/systemstats.cpp \

@@ -66,15 +66,22 @@
 // Private types
 
 // Private variables
-static xTaskHandle taskHandle;
+static xTaskHandle sensorTaskHandle;
+static xTaskHandle attitudeTaskHandle;
+
+static xQueueHandle gyroQueue;
+static xQueueHandle accelQueue;
+static xQueueHandle magQueue;
+const uint32_t SENSOR_QUEUE_SIZE = 10;
 
 // Private functions
+static void SensorTask(void *parameters);
 static void AttitudeTask(void *parameters);
 
 static float gyro_correct_int[3] = {0,0,0};
 
 static int8_t updateSensors(AttitudeRawData *);
-static void updateAttitude(AttitudeRawData *);
+static void updateAttitude();
 static void settingsUpdatedCb(UAVObjEvent * objEv);
 
 static float accelKi = 0;
@@ -87,17 +94,42 @@ static int8_t rotate = 0;
 static bool zero_during_arming = false;
 static bool bias_correct_gyro = true;
 
+struct gyro_data {
+	float x;
+	float y;
+	float z;
+};
+
+struct accel_data {
+	float x;
+	float y;
+	float z;
+};
+
+struct mag_data {
+	float x;
+	float y;
+	float z;
+};
+
 /**
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
  */
 int32_t AttitudeStart(void)
 {
-
+	// Create the queues for the sensors
+	gyroQueue = xQueueCreate(SENSOR_QUEUE_SIZE, sizeof(struct gyro_data));
+	accelQueue = xQueueCreate(SENSOR_QUEUE_SIZE, sizeof(struct accel_data));
+	magQueue = xQueueCreate(SENSOR_QUEUE_SIZE, sizeof(struct mag_data));
+		
 	// Start main task
-	xTaskCreate(AttitudeTask, (signed char *)"Attitude", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
-	TaskMonitorAdd(TASKINFO_RUNNING_ATTITUDE, taskHandle);
+	xTaskCreate(SensorTask, (signed char *)"Sensors", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &sensorTaskHandle);
+	xTaskCreate(AttitudeTask, (signed char *)"Attitude", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &attitudeTaskHandle);
+	TaskMonitorAdd(TASKINFO_RUNNING_SENSORS, sensorTaskHandle);
+	TaskMonitorAdd(TASKINFO_RUNNING_ATTITUDE, attitudeTaskHandle);
 	PIOS_WDG_RegisterFlag(PIOS_WDG_ATTITUDE);
+	PIOS_WDG_RegisterFlag(PIOS_WDG_SENSORS);
 
 	return 0;
 }
@@ -144,30 +176,36 @@ int32_t mag_test;
 //int32_t pressure_test;
 
 /**
- * Module thread, should not return.
+ * The sensor task.  This polls the gyros at 500 Hz and pumps that data to
+ * stabilization and to the attitude loop
  */
-static void AttitudeTask(void *parameters)
+static void SensorTask(void *parameters)
 {
 	uint8_t init = 0;
-	AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
+	portTickType lastSysTime;
 
-	// Force settings update to make sure rotation loaded
-	settingsUpdatedCb(AttitudeSettingsHandle());
+	AlarmsClear(SYSTEMALARMS_ALARM_SENSORS);
 
 	accel_test = PIOS_BMA180_Test();
 	gyro_test = PIOS_MPU6000_Test();
 	mag_test = PIOS_HMC5883_Test();
-//	pressure_test = PIOS_BMP085_Test();
-
-	// Kick of pressure conversions
-//	PIOS_BMP085_StartADC(TemperatureConv);
+	
+	if(accel_test < 0 || gyro_test < 0 || mag_test < 0) {
+		AlarmsSet(SYSTEMALARMS_ALARM_SENSORS, SYSTEMALARMS_ALARM_CRITICAL);
+		while(1) {
+			PIOS_WDG_UpdateFlag(PIOS_WDG_SENSORS);
+			vTaskDelay(1);
+		}
+	}
 	
 	// Main task loop
+	lastSysTime = xTaskGetTickCount();
 	while (1) {
 	
+		// TODO: This initialization stuff should be refactored from here
 		FlightStatusData flightStatus;
 		FlightStatusGet(&flightStatus);
-
+		
 		if((xTaskGetTickCount() < 7000) && (xTaskGetTickCount() > 1000)) {
 			// For first 7 seconds use accels to get gyro bias
 			accelKp = 1;
@@ -187,21 +225,43 @@ static void AttitudeTask(void *parameters)
 			AttitudeSettingsYawBiasRateGet(&yawBiasRate);
 			init = 1;
 		}
-
-		PIOS_WDG_UpdateFlag(PIOS_WDG_ATTITUDE);
-
+	
+		// Update the sensor readings
 		AttitudeRawData attitudeRaw;
 		AttitudeRawGet(&attitudeRaw);
+		
 		if(updateSensors(&attitudeRaw) != 0)
 			AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
 		else {
 			// Only update attitude when sensor data is good
-			updateAttitude(&attitudeRaw);
 			AttitudeRawSet(&attitudeRaw);
+			// TODO: Push data onto queue 
 			AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
 		}
+
+		PIOS_WDG_UpdateFlag(PIOS_WDG_SENSORS);
+		vTaskDelayUntil(&lastSysTime, 2 / portTICK_RATE_MS);
+	}
+}
+
+/**
+ * Module thread, should not return.
+ */
+static void AttitudeTask(void *parameters)
+{
+	uint8_t init = 0;
+	AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
+
+	// Force settings update to make sure rotation loaded
+	settingsUpdatedCb(AttitudeSettingsHandle());
 		
-		vTaskDelay(1);
+	// Main task loop
+	while (1) {
+	
+		// This  function blocks on data queue
+		updateAttitude();
+		
+		PIOS_WDG_UpdateFlag(PIOS_WDG_ATTITUDE);
 	}
 }
 
@@ -254,6 +314,15 @@ static int8_t updateSensors(AttitudeRawData * attitudeRaw)
 	attitudeRaw->accels[ATTITUDERAW_ACCELS_Y] = (accels[1] - accelbias[1]) * scaling;
 	attitudeRaw->accels[ATTITUDERAW_ACCELS_Z] = (accels[2] - accelbias[2]) * scaling;
 	
+	// Push the data onto the queue for attitude to consume
+	struct accel_data accel_data;
+	accel_data.x = attitudeRaw->accels[ATTITUDERAW_ACCELS_X];
+	accel_data.y = attitudeRaw->accels[ATTITUDERAW_ACCELS_X];
+	accel_data.z = attitudeRaw->accels[ATTITUDERAW_ACCELS_X];
+	if(xQueueSendToBack(accelQueue, (void *) &accel_data, 0) != pdTRUE) {
+		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_WARNING);
+	}
+	
 	// Make sure we get one sample
 	count = 0;
 	while((read_good = PIOS_MPU6000_ReadFifo(&gyro)) != 0);
@@ -275,6 +344,15 @@ static int8_t updateSensors(AttitudeRawData * attitudeRaw)
 	attitudeRaw->gyros[ATTITUDERAW_GYROS_Y] = gyros[1] * scaling;
 	attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] = gyros[2] * scaling;
 	
+	// Push the data onto the queue for attitude to consume
+	struct gyro_data gyro_data;
+	gyro_data.x = attitudeRaw->gyros[ATTITUDERAW_GYROS_X];
+	gyro_data.y = attitudeRaw->gyros[ATTITUDERAW_GYROS_Y];
+	gyro_data.z = attitudeRaw->gyros[ATTITUDERAW_GYROS_Z];
+	if(xQueueSendToBack(gyroQueue, (void *) &gyro_data, 0) != pdTRUE) {
+		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_WARNING);
+	}
+		
 	// From data sheet 35 deg C corresponds to -13200, and 280 LSB per C
 	attitudeRaw->temperature[ATTITUDERAW_TEMPERATURE_GYRO] = 35.0f + ((float) gyro.temperature + 512.0f) / 340.0f;
 	
@@ -308,37 +386,23 @@ static int8_t updateSensors(AttitudeRawData * attitudeRaw)
 	}
 
 	AttitudeRawSet(&raw);
-	/*
-	int32_t retval = PIOS_BMP085_ReadADC();
-	if (retval == 0) { // Conversion completed 
-		static uint32_t baro_conversions;
-		
-		if((baro_conversions++) % 2)
-			PIOS_BMP085_StartADC(PressureConv);
-		else {
-			PIOS_BMP085_StartADC(TemperatureConv);
-
-			float pressure;
-			
-			pressure = PIOS_BMP085_GetPressure();
-			
-			BaroAltitudeData data;
-			BaroAltitudeGet(&data);
-			data.Altitude = (1.0f - powf(pressure / BMP085_P0, (1.0f / 5.255f))) * 44330.0f;
-			data.Pressure = pressure  / 1000.0f;
-			data.Temperature = PIOS_BMP085_GetTemperature() / 10.0f;  // Convert to deg C
-			BaroAltitudeSet(&data);
-
-		}
-	}*/
 	
 	return 0;
 }
 
 float accel_mag;
 float qmag;
-static void updateAttitude(AttitudeRawData * attitudeRaw)
+static void updateAttitude()
 {
+	struct gyro_data gyro_data;
+	struct accel_data accel_data;
+	
+	if(xQueueReceive(gyroQueue, (void *) &gyro_data, 10 / portTICK_RATE_MS) != pdTRUE ||
+	   xQueueReceive(accelQueue, (void *) &accel_data, 10 / portTICK_RATE_MS) != pdTRUE) {
+		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
+		return;
+	}
+
 	static int32_t timeval;
 	float dT = PIOS_DELAY_DiffuS(timeval) / 1000000.0f;
 	timeval = PIOS_DELAY_GetRaw();
@@ -348,16 +412,6 @@ static void updateAttitude(AttitudeRawData * attitudeRaw)
 	AttitudeActualData attitudeActual;
 	AttitudeActualGet(&attitudeActual);
 
-	float gyro[3];
-	gyro[0] = attitudeRaw->gyros[0];
-	gyro[1] = attitudeRaw->gyros[1];
-	gyro[2] = attitudeRaw->gyros[2];
-
-	float accels[3];
-	accels[0] = attitudeRaw->accels[0];
-	accels[1] = attitudeRaw->accels[1];
-	accels[2] = attitudeRaw->accels[2];
-	
 	float grot[3];
 	float accel_err[3];
 	
@@ -368,10 +422,10 @@ static void updateAttitude(AttitudeRawData * attitudeRaw)
 	grot[0] = -(2 * (q[1] * q[3] - q[0] * q[2]));
 	grot[1] = -(2 * (q[2] * q[3] + q[0] * q[1]));
 	grot[2] = -(q[0] * q[0] - q[1]*q[1] - q[2]*q[2] + q[3]*q[3]);
-	CrossProduct((const float *) accels, (const float *) grot, accel_err);
+	CrossProduct((const float *) &accel_data.x, (const float *) grot, accel_err);
 
 	// Account for accel magnitude
-	accel_mag = accels[0]*accels[0] + accels[1]*accels[1] + accels[2]*accels[2];
+	accel_mag = accel_data.x*accel_data.x + accel_data.y*accel_data.y + accel_data.z*accel_data.z;
 	accel_mag = sqrtf(accel_mag);
 	accel_err[0] /= accel_mag;
 	accel_err[1] /= accel_mag;
@@ -382,17 +436,18 @@ static void updateAttitude(AttitudeRawData * attitudeRaw)
 	gyro_correct_int[1] += accel_err[1] * accelKi;
 		
 	// Correct rates based on error, integral component dealt with in updateSensors
-	gyro[0] += accel_err[0] * accelKp / dT;
-	gyro[1] += accel_err[1] * accelKp / dT;
-	gyro[2] += accel_err[2] * accelKp / dT;
+	gyro_data.x += accel_err[0] * accelKp / dT;
+	gyro_data.y += accel_err[1] * accelKp / dT;
+	gyro_data.z += accel_err[2] * accelKp / dT;
+
 
 	// Work out time derivative from INSAlgo writeup
 	// Also accounts for the fact that gyros are in deg/s
 	float qdot[4];
-	qdot[0] = (-q[1] * gyro[0] - q[2] * gyro[1] - q[3] * gyro[2]) * dT * F_PI / 180 / 2;
-	qdot[1] = (q[0] * gyro[0] - q[3] * gyro[1] + q[2] * gyro[2]) * dT * F_PI / 180 / 2;
-	qdot[2] = (q[3] * gyro[0] + q[0] * gyro[1] - q[1] * gyro[2]) * dT * F_PI / 180 / 2;
-	qdot[3] = (-q[2] * gyro[0] + q[1] * gyro[1] + q[0] * gyro[2]) * dT * F_PI / 180 / 2;
+	qdot[0] = (-q[1] * gyro_data.x - q[2] * gyro_data.y - q[3] * gyro_data.z) * dT * F_PI / 180 / 2;
+	qdot[1] = (q[0] * gyro_data.x - q[3] * gyro_data.y + q[2] * gyro_data.z) * dT * F_PI / 180 / 2;
+	qdot[2] = (q[3] * gyro_data.x + q[0] * gyro_data.y - q[1] * gyro_data.z) * dT * F_PI / 180 / 2;
+	qdot[3] = (-q[2] * gyro_data.x + q[1] * gyro_data.y + q[0] * gyro_data.z) * dT * F_PI / 180 / 2;
 	
 	// Take a time step
 	q[0] = q[0] + qdot[0];
@@ -429,6 +484,9 @@ static void updateAttitude(AttitudeRawData * attitudeRaw)
 	Quaternion2RPY(&attitudeActual.q1,&attitudeActual.Roll);
 
 	AttitudeActualSet(&attitudeActual);
+	
+	AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
+
 }
 
 static void settingsUpdatedCb(UAVObjEvent * objEv) {

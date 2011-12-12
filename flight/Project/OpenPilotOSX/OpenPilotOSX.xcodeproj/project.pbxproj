@@ -53,6 +53,8 @@
 		650D8ED212DFE17500D05CC9 /* uavtalk.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = uavtalk.c; sourceTree = "<group>"; };
 		6512D60512ED4CA2008175E5 /* pios_flash_w25x.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_flash_w25x.h; sourceTree = "<group>"; };
 		6512D60712ED4CB8008175E5 /* pios_flash_w25x.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_flash_w25x.c; sourceTree = "<group>"; };
+		65140DFA1496927D00E01D11 /* sensors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sensors.h; sourceTree = "<group>"; };
+		65140DFB1496927D00E01D11 /* sensors.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sensors.c; sourceTree = "<group>"; };
 		65173C9F12EBFD1700D6A7CB /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = ../../../Makefile; sourceTree = SOURCE_ROOT; };
 		651913371256C5240039C0A3 /* ahrs_comm_objects.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ahrs_comm_objects.c; sourceTree = "<group>"; };
 		651913381256C5240039C0A3 /* ahrs_spi_comm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ahrs_spi_comm.c; sourceTree = "<group>"; };
@@ -3434,6 +3436,7 @@
 				650D8E5112DFE16400D05CC9 /* ManualControl */,
 				650D8E5512DFE16400D05CC9 /* MK */,
 				650D8E5A12DFE16400D05CC9 /* Osd */,
+				65140DF81496927D00E01D11 /* Sensors */,
 				650D8E5D12DFE16400D05CC9 /* Stabilization */,
 				650D8E6112DFE16400D05CC9 /* System */,
 				650D8E6512DFE16400D05CC9 /* Telemetry */,
@@ -3759,6 +3762,23 @@
 			isa = PBXGroup;
 			children = (
 				650D8ED112DFE17500D05CC9 /* uavtalk.h */,
+			);
+			path = inc;
+			sourceTree = "<group>";
+		};
+		65140DF81496927D00E01D11 /* Sensors */ = {
+			isa = PBXGroup;
+			children = (
+				65140DF91496927D00E01D11 /* inc */,
+				65140DFB1496927D00E01D11 /* sensors.c */,
+			);
+			path = Sensors;
+			sourceTree = "<group>";
+		};
+		65140DF91496927D00E01D11 /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				65140DFA1496927D00E01D11 /* sensors.h */,
 			);
 			path = inc;
 			sourceTree = "<group>";

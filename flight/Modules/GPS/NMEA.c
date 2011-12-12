@@ -216,7 +216,7 @@ static float NMEA_real_to_float(char *nmea_real)
 	}
 
 	/* Convert to float */
-	return (((float)whole) + fract * powf(10, -fract_units));
+	return (((float)whole) + fract * powf(10.0f, -fract_units));
 }
 
 /*
@@ -244,32 +244,32 @@ static bool NMEA_latlon_to_fixed_point(int32_t * latlon, char *nmea_latlon, bool
 		/* no digits, value is zero so no scaling */
 		break;
 	case 1:		/* m       */
-		num_m *= 1e6;	/* m000000 */
+		num_m *= 1e6f;	/* m000000 */
 		break;
 	case 2:		/* mm      */
-		num_m *= 1e5;	/* mm00000 */
+		num_m *= 1e5f;	/* mm00000 */
 		break;
 	case 3:		/* mmm     */
-		num_m *= 1e4;	/* mmm0000 */
+		num_m *= 1e4f;	/* mmm0000 */
 		break;
 	case 4:		/* mmmm    */
-		num_m *= 1e3;	/* mmmm000 */
+		num_m *= 1e3f;	/* mmmm000 */
 		break;
 	case 5:		/* mmmmm   */
-		num_m *= 1e2;	/* mmmmm00 */
+		num_m *= 1e2f;	/* mmmmm00 */
 		break;
 	case 6:		/* mmmmmm  */
-		num_m *= 1e1;	/* mmmmmm0 */
+		num_m *= 1e1f;	/* mmmmmm0 */
 		break;
 	default:
 		/* unhandled format */
-		num_m = 0;
+		num_m = 0.0f;
 		break;
 	}
 
-	*latlon = (num_DDDMM / 100) * 1e7;	/* scale the whole degrees */
-	*latlon += (num_DDDMM % 100) * 1e7 / 60;	/* add in the scaled decimal whole minutes */
-	*latlon += num_m / 60;	/* add in the scaled decimal fractional minutes */
+	*latlon = (num_DDDMM / 100) * 1e7f;	/* scale the whole degrees */
+	*latlon += (num_DDDMM % 100) * 1e7f / 60.0f;	/* add in the scaled decimal whole minutes */
+	*latlon += num_m / 60.0f;	/* add in the scaled decimal fractional minutes */
 
 	if (negative)
 		*latlon *= -1;

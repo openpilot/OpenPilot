@@ -157,6 +157,11 @@ C: Anders Johansson (dezent)
 D: November 2011
 V: http://www.youtube.com/watch?v=Xfas2TUhOPw
 
+M: First OpenPilot over 1km FixedWing navigation flight
+C: Eric Price (Corvus Corax)
+D: December 2011
+V: http://www.youtube.com/watch?v=nWNWuUiUTNg
+
 
 M: First Altitude Hold using Sonar
 C: 
@@ -184,8 +189,6 @@ An incomplete list of some future Milestones is below:
 * First fixed wing navigation flight 
 * First Multirotor navigation flight
 * First Helicopter navigation flight
-* First over 1km navigation flight
 * First over 5km navigation flight
 * First "Follow Me" navigation flight
 * First Channel Crossing with OpenPilot
-

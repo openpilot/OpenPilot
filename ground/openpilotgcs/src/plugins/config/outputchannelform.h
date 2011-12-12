@@ -30,7 +30,7 @@
 #include <QWidget>
 #include "ui_outputchannelform.h"
 
-class ConfigInputWidget;
+class ConfigOnputWidget;
 
 class OutputChannelForm : public QWidget
 {
@@ -39,7 +39,7 @@ class OutputChannelForm : public QWidget
 public:
     explicit OutputChannelForm(const int index, QWidget *parent = NULL, const bool showLegend = false);
     ~OutputChannelForm();
-    friend class ConfigInputWidget;
+    friend class ConfigOnputWidget;
 
     void setAssignment(const QString &assignment);
     int index() const;

@@ -81,10 +81,10 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
 
     // Connect the help button
     connect(m_config->outputHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
-    addWidget(m_config->outputRate3);
-    addWidget(m_config->outputRate2);
-    addWidget(m_config->outputRate1);
-
+    addWidget(m_config->cb_outputRate4);
+    addWidget(m_config->cb_outputRate3);
+    addWidget(m_config->cb_outputRate2);
+    addWidget(m_config->cb_outputRate1);
     addWidget(m_config->spinningArmed);
 
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
@@ -277,8 +277,17 @@ void ConfigOutputWidget::refreshWidgetsValues()
     m_config->spinningArmed->setChecked(actuatorSettingsData.MotorsSpinWhileArmed == ActuatorSettings::MOTORSSPINWHILEARMED_TRUE);
 
     // Get Output rates for both banks
-    m_config->outputRate1->setValue(actuatorSettingsData.ChannelUpdateFreq[0]);
-    m_config->outputRate2->setValue(actuatorSettingsData.ChannelUpdateFreq[1]);
+    if(m_config->cb_outputRate1->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[0]))==-1)
+    {
+        m_config->cb_outputRate1->addItem(QString::number(actuatorSettingsData.ChannelUpdateFreq[0]));
+    }
+    if(m_config->cb_outputRate2->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[1]))==-1)
+    {
+        m_config->cb_outputRate2->addItem(QString::number(actuatorSettingsData.ChannelUpdateFreq[1]));
+    }
+    m_config->cb_outputRate1->setCurrentIndex(m_config->cb_outputRate1->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[0])));
+    m_config->cb_outputRate2->setCurrentIndex(m_config->cb_outputRate2->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[1])));
+
     UAVObjectUtilManager* utilMngr = pm->getObject<UAVObjectUtilManager>();
     if (utilMngr) {
         int board = utilMngr->getBoardModel();
@@ -288,24 +297,34 @@ void ConfigOutputWidget::refreshWidgetsValues()
             m_config->chBank2->setText("4");
             m_config->chBank3->setText("5,7-8");
             m_config->chBank4->setText("6,9-10");
-            m_config->outputRate1->setEnabled(true);
-            m_config->outputRate2->setEnabled(true);
-            m_config->outputRate3->setEnabled(true);
-            m_config->outputRate4->setEnabled(true);
-            m_config->outputRate3->setValue(actuatorSettingsData.ChannelUpdateFreq[2]);
-            m_config->outputRate4->setValue(actuatorSettingsData.ChannelUpdateFreq[3]);
+            m_config->cb_outputRate1->setEnabled(true);
+            m_config->cb_outputRate2->setEnabled(true);
+            m_config->cb_outputRate3->setEnabled(true);
+            m_config->cb_outputRate4->setEnabled(true);
+            if(m_config->cb_outputRate3->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[2]))==-1)
+            {
+                m_config->cb_outputRate3->addItem(QString::number(actuatorSettingsData.ChannelUpdateFreq[2]));
+            }
+            if(m_config->cb_outputRate4->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[3]))==-1)
+            {
+                m_config->cb_outputRate4->addItem(QString::number(actuatorSettingsData.ChannelUpdateFreq[3]));
+            }
+            m_config->cb_outputRate3->setCurrentIndex(m_config->cb_outputRate3->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[2])));
+            m_config->cb_outputRate4->setCurrentIndex(m_config->cb_outputRate4->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[3])));
         } else if ((board & 0xff00) == 256 ) {
             // Mainboard family
-            m_config->outputRate1->setEnabled(true);
-            m_config->outputRate2->setEnabled(true);
-            m_config->outputRate3->setEnabled(false);
-            m_config->outputRate4->setEnabled(false);
+            m_config->cb_outputRate1->setEnabled(true);
+            m_config->cb_outputRate2->setEnabled(true);
+            m_config->cb_outputRate3->setEnabled(false);
+            m_config->cb_outputRate4->setEnabled(false);
             m_config->chBank1->setText("1-4");
             m_config->chBank2->setText("5-8");
             m_config->chBank3->setText("-");
             m_config->chBank4->setText("-");
-            m_config->outputRate3->setValue(0);
-            m_config->outputRate4->setValue(0);
+            m_config->cb_outputRate3->addItem("0");
+            m_config->cb_outputRate3->setCurrentIndex(m_config->cb_outputRate3->findText("0"));
+            m_config->cb_outputRate4->addItem("0");
+            m_config->cb_outputRate4->setCurrentIndex(m_config->cb_outputRate4->findText("0"));
         }
     }
 
@@ -342,11 +361,10 @@ void ConfigOutputWidget::updateObjectsFromWidgets()
     }
 
     // Set update rates
-    actuatorSettingsData.ChannelUpdateFreq[0] = m_config->outputRate1->value();
-    actuatorSettingsData.ChannelUpdateFreq[1] = m_config->outputRate2->value();
-    actuatorSettingsData.ChannelUpdateFreq[2] = m_config->outputRate3->value();
-    actuatorSettingsData.ChannelUpdateFreq[3] = m_config->outputRate4->value();
-
+    actuatorSettingsData.ChannelUpdateFreq[0] = m_config->cb_outputRate1->currentText().toUInt();
+    actuatorSettingsData.ChannelUpdateFreq[1] = m_config->cb_outputRate2->currentText().toUInt();
+    actuatorSettingsData.ChannelUpdateFreq[2] = m_config->cb_outputRate3->currentText().toUInt();
+    actuatorSettingsData.ChannelUpdateFreq[3] = m_config->cb_outputRate4->currentText().toUInt();
     // Apply settings
     actuatorSettings->setData(actuatorSettingsData);
 }

@@ -202,5 +202,4 @@ private:
 #endif
 
 };
-
 #endif // USBMONITOR_H

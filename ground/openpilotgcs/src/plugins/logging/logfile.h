@@ -27,7 +27,7 @@ public:
     bool stopReplay();
 
 public slots:
-    void setReplaySpeed(double val) { playbackSpeed = pow(10,(val)/100); qDebug() << playbackSpeed; };
+    void setReplaySpeed(double val) { playbackSpeed = val; qDebug() << playbackSpeed; };
     void pauseReplay();
     void resumeReplay();
 
@@ -45,11 +45,11 @@ protected:
     QTime myTime;
     QFile file;
     qint32 lastTimeStamp;
+    qint32 lastPlayed;
     QMutex mutex;
 
 
     int timeOffset;
-    int pausedTime;
     double playbackSpeed;
 };
 

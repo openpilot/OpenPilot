@@ -153,6 +153,7 @@ void UAVSettingsImportExportFactory::importUAVSettings()
              //  - Update each field
              //  - Issue and "updated" command
              bool error=false;
+             bool setError=false;
              QDomNode field = node.firstChild();
              while(!field.isNull()) {
                  QDomElement f = field.toElement();
@@ -161,16 +162,24 @@ void UAVSettingsImportExportFactory::importUAVSettings()
                      if (uavfield) {
                          QStringList list = f.attribute("values").split(",");
                          if (list.length() == 1) {
-                             uavfield->setValue(f.attribute("values"));
+                             if (false == uavfield->checkValue(f.attribute("values"))) {
+                                 qDebug() << "checkValue returned false on: " << uavObjectName << f.attribute("values");
+                                 setError = true;
+                             } else
+                            	 uavfield->setValue(f.attribute("values"));
                          } else {
                          // This is an enum:
                              int i=0;
                              QStringList list = f.attribute("values").split(",");
                              foreach (QString element, list) {
-                                 uavfield->setValue(element,i++);
+                            	 if (false == uavfield->checkValue(element,i)) {
+                            	     qDebug() << "checkValue(list) returned false on: " << uavObjectName << list;
+                            		 setError = true;
+                            	 } else
+                            		 uavfield->setValue(element,i);
+                            	 i++;
                              }
                          }
-                         error = false;
                      } else {
                          error = true;
                      }
@@ -183,7 +192,9 @@ void UAVSettingsImportExportFactory::importUAVSettings()
              } else if (uavObjectID != obj->getObjID()) {
                   qDebug() << "Mismatch for Object " << uavObjectName << uavObjectID << " - " << obj->getObjID();
                  swui.addLine(uavObjectName, "Warning (ObjectID mismatch)", true);
-              } else
+             } else if (setError) {
+                 swui.addLine(uavObjectName, "Warning (Objects field value(s) invalid)", false);
+             } else
                  swui.addLine(uavObjectName, "OK", true);
          }
         }

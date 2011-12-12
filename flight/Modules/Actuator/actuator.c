@@ -207,7 +207,7 @@ static void actuatorTask(void* parameters)
 				nMixers ++;
 			}
 		}
-		if((nMixers < 2) && !ActuatorCommandReadOnly(dummy)) //Nothing can fly with less than two mixers.
+		if((nMixers < 2) && !ActuatorCommandReadOnly()) //Nothing can fly with less than two mixers.
 		{
 			setFailsafe(); // So that channels like PWM buzzer keep working
 			continue;

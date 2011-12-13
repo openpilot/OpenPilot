@@ -110,7 +110,7 @@ public:
     int refreshInterval(){return m_refreshInterval;}
 
 
-    void addCurvePlot(QString uavObject, QString uavFieldSubField, int scaleOrderFactor = 0, int interpolationSamples = 1, QPen pen = QPen(Qt::black));
+    void addCurvePlot(QString uavObject, QString uavFieldSubField, int scaleOrderFactor = 0, QPen pen = QPen(Qt::black));
     //void removeCurvePlot(QString uavObject, QString uavField);
     void clearCurvePlots();
     int csvLoggingStart();

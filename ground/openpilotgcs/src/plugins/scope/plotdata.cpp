@@ -49,12 +49,9 @@ PlotData::PlotData(QString p_uavObject, QString p_uavField)
 
     xData = new QVector<double>();
     yData = new QVector<double>();
-    yDataHistory = new QVector<double>();
 
     curve = 0;
     scalePower = 0;
-    interpolationSamples = 1;
-    interpolationSum = 0.0f;
     yMinimum = 0;
     yMaximum = 0;
 
@@ -81,7 +78,6 @@ PlotData::~PlotData()
 {
     delete xData;
     delete yData;
-    delete yDataHistory;
 }
 
 
@@ -95,13 +91,7 @@ bool SequencialPlotData::append(UAVObject* obj)
         if (field) {
 
             //Shift data forward and put the new value at the front
-            yDataHistory->append( valueAsDouble(obj, field) * pow(10, scalePower));
-            interpolationSum += valueAsDouble(obj, field) * pow(10, scalePower);
-            if(yDataHistory->size() > interpolationSamples) {
-                interpolationSum -= yDataHistory->first();
-                yDataHistory->pop_front();
-            }
-            yData->append(interpolationSum/yDataHistory->size());
+            yData->append( valueAsDouble(obj, field) * pow(10, scalePower));
             if (yData->size() > m_xWindowSize) {
                 yData->pop_front();
             } else
@@ -127,15 +117,8 @@ bool ChronoPlotData::append(UAVObject* obj)
             //Put the new value at the front
             QDateTime NOW = QDateTime::currentDateTime();
 
-            yDataHistory->append( valueAsDouble(obj, field) * pow(10, scalePower));
-            interpolationSum += valueAsDouble(obj, field) * pow(10, scalePower);
-            if(yDataHistory->size() > interpolationSamples) {
-                interpolationSum -= yDataHistory->first();
-                yDataHistory->pop_front();
-            }
-
             double valueX = NOW.toTime_t() + NOW.time().msec() / 1000.0;
-            double valueY = interpolationSum/yDataHistory->size();
+            double valueY = valueAsDouble(obj, field) * pow(10, scalePower);
             xData->append(valueX);
             yData->append(valueY);
 

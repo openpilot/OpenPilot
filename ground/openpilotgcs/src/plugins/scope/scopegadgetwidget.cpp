@@ -635,6 +635,15 @@ int ScopeGadgetWidget::csvLoggingAddData()
         ss  << ", ";
         if (plotData2->xData->isEmpty ())
         {
+            ss  << ", ";
+            if (plotData2->xData->isEmpty ())
+            {
+            }
+            else
+            {
+                ss  << QString().sprintf("%3.6g",plotData2->yData->last());
+                m_csvLoggingDataValid=1;
+            }
         }
         else
         {

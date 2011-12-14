@@ -103,6 +103,9 @@ bool UAVObjectGeneratorMatlab::process_object(ObjectInfo* info)
 	}
 	else{
 		matlabAllocationCode.append("\t" + objectTableName + "=struct('timestamp', 0");
+		if (!info->isSingleInst) {
+			allocfields.append(",...\n\t\t 'instanceID', 0");
+		}
 		for (int n = 0; n < info->fields.length(); ++n) {
 			// Determine type
 			type = fieldTypeStrMatlab[info->fields[n]->type];

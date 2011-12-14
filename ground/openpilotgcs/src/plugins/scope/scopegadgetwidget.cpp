@@ -54,15 +54,10 @@
 
 using namespace Core;
 
-TestDataGen* ScopeGadgetWidget::testDataGen;
-
 // ******************************************************************
 
 ScopeGadgetWidget::ScopeGadgetWidget(QWidget *parent) : QwtPlot(parent)
 {
-    //if(testDataGen == 0)
-    //    testDataGen = new TestDataGen();
-
 	setMouseTracking(true);
 //	canvas()->setMouseTracking(true);
 
@@ -531,68 +526,6 @@ void ScopeGadgetWidget::clearCurvePlots()
     m_curvesData.clear();
 }
 
-
-TestDataGen::TestDataGen()
-{
-    // Get required UAVObjects
-    ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager* objManager = pm->getObject<UAVObjectManager>();
-
-    baroAltitude = BaroAltitude::GetInstance(objManager);
-    gps = PositionActual::GetInstance(objManager);
-    attRaw = AttitudeRaw::GetInstance(objManager);
-    manCtrlCmd = ManualControlCommand::GetInstance(objManager);
-
-    //Setup timer
-    periodMs = 20;
-    timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(genTestData()));
-    timer->start(periodMs);
-
-    debugCounter = 0;
-    testTime = 0;
-}
-
-void TestDataGen::genTestData()
-{
-    // Update BaroAltitude object
-    BaroAltitude::DataFields baroAltitudeData;
-    baroAltitudeData.Altitude = 500 * sin(1 * testTime) + 200 * cos(4 * testTime) + 800;
-    baroAltitudeData.Temperature = 30 * sin(0.5 * testTime);
-    baroAltitudeData.Pressure = baroAltitudeData.Altitude * 0.01 + baroAltitudeData.Temperature;
-    baroAltitude->setData(baroAltitudeData);
-
-    // Update Attitude Raw data
-    AttitudeRaw::DataFields attData;
-//    attData.accels[0] = 4 *  sin(2 * testTime) + 1 * cos(6 * testTime) + 4;
-//    attData.accels[1] = 3 * sin(2.3 * testTime) + 1.5 * cos(3.3 * testTime) + 2;
-//    attData.accels[2] = 4 * sin(5.3 * testTime) + 1.5 * cos(1.3 * testTime) + 1;
-    attData.accels[0] = 1;
-    attData.accels[1] = 4;
-    attData.accels[2] = 9;
-    attRaw->setData(attData);
-
-
-    ManualControlCommand::DataFields manCtlData;
-    manCtlData.Channel[0] = 400 * cos(2 * testTime) + 100 * sin(6 * testTime) + 400;
-    manCtlData.Channel[1] = 350 * cos(2.3 * testTime) + 150 * sin(3.3 * testTime) + 200;
-    manCtlData.Channel[2] = 450 * cos(5.3 * testTime) + 150 * sin(1.3 * testTime) + 150;
-    manCtrlCmd->setData(manCtlData);
-
-    testTime += (periodMs / 1000.0);
-
-//    debugCounter++;
-//    if (debugCounter % (100/periodMs) == 0 )
-//        qDebug() << "Test Time = " << testTime;
-}
-
-TestDataGen::~TestDataGen()
-{
-    if (timer)
-        timer->stop();
-
-    delete timer;
-}
 
 /*
 int csvLoggingEnable;

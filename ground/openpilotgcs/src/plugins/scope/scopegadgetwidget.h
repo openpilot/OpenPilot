@@ -62,35 +62,6 @@ private:
 //    double baseTime;
 };
 
-/*!
-  \brief This class is used to inject UAVTalk messages for testing.
-  */
-class TestDataGen : QObject
-{
-    Q_OBJECT
-
-public:
-
-    TestDataGen();
-    ~TestDataGen();
-
-private:
-    BaroAltitude* baroAltitude;
-    PositionActual* gps;
-    AttitudeRaw* attRaw;
-    ManualControlCommand* manCtrlCmd;
-
-    QTimer *timer;
-    double testTime;
-    int periodMs;
-
-    int debugCounter;
-
-private slots:
-    void genTestData();
-};
-
-
 class ScopeGadgetWidget : public QwtPlot
 {
     Q_OBJECT
@@ -147,8 +118,6 @@ private:
     int m_refreshInterval;
     QList<QString> m_connectedUAVObjects;
     QMap<QString, PlotData*> m_curvesData;
-
-    static TestDataGen* testDataGen;    
 
     QTimer *replotTimer;
 

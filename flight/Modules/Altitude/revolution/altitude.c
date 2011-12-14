@@ -68,9 +68,7 @@ static void altitudeTask(void *parameters);
  * \returns 0 on success or -1 if initialisation failed
  */
 int32_t AltitudeStart()
-{
-	
-	BaroAltitudeInitialize();
+{	
 #if defined(PIOS_INCLUDE_HCSR04)
 	SonarAltitudeInitialze();
 #endif
@@ -88,6 +86,7 @@ int32_t AltitudeStart()
  */
 int32_t AltitudeInitialize()
 {
+	BaroAltitudeInitialize();
 
 	// init down-sampling data
 	alt_ds_temp = 0;

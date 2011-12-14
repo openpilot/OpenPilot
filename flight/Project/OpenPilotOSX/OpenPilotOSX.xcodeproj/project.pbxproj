@@ -3104,6 +3104,9 @@
 		65E8F0EE11EFF25C00BBF654 /* startup_stm32f10x_HD.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = startup_stm32f10x_HD.S; path = ../../PiOS/STM32F10x/startup_stm32f10x_HD.S; sourceTree = SOURCE_ROOT; };
 		65E8F0F111EFF25C00BBF654 /* startup_stm32f10x_MD.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = startup_stm32f10x_MD.S; path = ../../PiOS/STM32F10x/startup_stm32f10x_MD.S; sourceTree = SOURCE_ROOT; };
 		65EA2E171273C55200636061 /* ratedesired.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ratedesired.xml; sourceTree = "<group>"; };
+		65F53D2E14984BB300A62D5D /* insgps_helper.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = insgps_helper.c; sourceTree = "<group>"; };
+		65F53D2F14984BB300A62D5D /* insgps13state.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = insgps13state.c; sourceTree = "<group>"; };
+		65F53D3014984BB300A62D5D /* insgps16state.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = insgps16state.c; sourceTree = "<group>"; };
 		65F93C3912EE09280047DB36 /* aes.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = aes.c; sourceTree = "<group>"; };
 		65F93C3B12EE09280047DB36 /* aes.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = aes.lst; sourceTree = "<group>"; };
 		65F93C3C12EE09280047DB36 /* aes.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = aes.o; sourceTree = "<group>"; };
@@ -3820,6 +3823,9 @@
 		657CEEB6121DBC63007A1FBE /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				65F53D2E14984BB300A62D5D /* insgps_helper.c */,
+				65F53D2F14984BB300A62D5D /* insgps13state.c */,
+				65F53D3014984BB300A62D5D /* insgps16state.c */,
 				6549E0D21279B3C800C5476F /* fifo_buffer.c */,
 				651913371256C5240039C0A3 /* ahrs_comm_objects.c */,
 				651913381256C5240039C0A3 /* ahrs_spi_comm.c */,

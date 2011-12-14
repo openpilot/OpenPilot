@@ -76,52 +76,52 @@ uint16_t ins_get_num_states()
 
 void INSGPSInit()		//pretty much just a place holder for now
 {
-	Be[0] = 1;
-	Be[1] = 0;
-	Be[2] = 0;		// local magnetic unit vector
+	Be[0] = 1.0f;
+	Be[1] = 0.0f;
+	Be[2] = 0.0f;		// local magnetic unit vector
 
 	for (int i = 0; i < NUMX; i++) {
 		for (int j = 0; j < NUMX; j++) {
-			P[i][j] = 0; // zero all terms
-			F[i][j] = 0;
+			P[i][j] = 0.0f; // zero all terms
+			F[i][j] = 0.0f;
 		}
 		
 		for (int j = 0; j < NUMW; j++)
-			G[i][j] = 0;
+			G[i][j] = 0.0f;
 			
 		for (int j = 0; j < NUMV; j++) {
-			H[j][i] = 0;
-			K[i][j] = 0;
+			H[j][i] = 0.0f;
+			K[i][j] = 0.0f;
 		}
 			
-		X[i] = 0;
+		X[i] = 0.0f;
 	}
 	for (int i = 0; i < NUMW; i++)
-		Q[i] = 0;
+		Q[i] = 0.0f;
 	for (int i = 0; i < NUMV; i++) 
-		R[i] = 0;
+		R[i] = 0.0f;
 
 	
-	P[0][0] = P[1][1] = P[2][2] = 25;	// initial position variance (m^2)
-	P[3][3] = P[4][4] = P[5][5] = 5;	// initial velocity variance (m/s)^2
-	P[6][6] = P[7][7] = P[8][8] = P[9][9] = 1e-5;	// initial quaternion variance
-	P[10][10] = P[11][11] = P[12][12] = 1e-9;	// initial gyro bias variance (rad/s)^2
+	P[0][0] = P[1][1] = P[2][2] = 25.0f;            // initial position variance (m^2)
+	P[3][3] = P[4][4] = P[5][5] = 5.0f;             // initial velocity variance (m/s)^2
+	P[6][6] = P[7][7] = P[8][8] = P[9][9] = 1e-5f;  // initial quaternion variance
+	P[10][10] = P[11][11] = P[12][12] = 1e-9f;      // initial gyro bias variance (rad/s)^2
 
-	X[0] = X[1] = X[2] = X[3] = X[4] = X[5] = 0;	// initial pos and vel (m)
-	X[6] = 1;
-	X[7] = X[8] = X[9] = 0;	// initial quaternion (level and North) (m/s)
-	X[10] = X[11] = X[12] = 0;	// initial gyro bias (rad/s)
+	X[0] = X[1] = X[2] = X[3] = X[4] = X[5] = 0.0f;	// initial pos and vel (m)
+	X[6] = 1.0f;
+	X[7] = X[8] = X[9] = 0.0f;	    // initial quaternion (level and North) (m/s)
+	X[10] = X[11] = X[12] = 0.0f;	// initial gyro bias (rad/s)
 
-	Q[0] = Q[1] = Q[2] = 50e-8;	// gyro noise variance (rad/s)^2
-	Q[3] = Q[4] = Q[5] = 0.01;	// accelerometer noise variance (m/s^2)^2
-	Q[6] = Q[7] = Q[8] = 2e-15;	// gyro bias random walk variance (rad/s^2)^2
+	Q[0] = Q[1] = Q[2] = 50e-4f;	// gyro noise variance (rad/s)^2
+	Q[3] = Q[4] = Q[5] = 0.00001f;	// accelerometer noise variance (m/s^2)^2
+	Q[6] = Q[7] = Q[8] = 2e-8f;	    // gyro bias random walk variance (rad/s^2)^2
 
-	R[0] = R[1] = 0.004;	// High freq GPS horizontal position noise variance (m^2)
-	R[2] = 0.036;		// High freq GPS vertical position noise variance (m^2)
-	R[3] = R[4] = 0.004;	// High freq GPS horizontal velocity noise variance (m/s)^2
-	R[5] = 100;		// High freq GPS vertical velocity noise variance (m/s)^2
-	R[6] = R[7] = R[8] = 0.005;	// magnetometer unit vector noise variance
-	R[9] = .05;		// High freq altimeter noise variance (m^2)
+	R[0] = R[1] = 0.004f;	// High freq GPS horizontal position noise variance (m^2)
+	R[2] = 0.036f;          // High freq GPS vertical position noise variance (m^2)
+	R[3] = R[4] = 0.004f;   // High freq GPS horizontal velocity noise variance (m/s)^2
+	R[5] = 100.0f;          // High freq GPS vertical velocity noise variance (m/s)^2
+	R[6] = R[7] = R[8] = 0.005f;    // magnetometer unit vector noise variance
+	R[9] = .05f;                    // High freq altimeter noise variance (m^2)
 }
 
 void INSResetP(float PDiag[NUMX])
@@ -132,7 +132,7 @@ void INSResetP(float PDiag[NUMX])
 	for (i=0;i<NUMX;i++){
 		if (PDiag != 0){
 			for (j=0;j<NUMX;j++)
-				P[i][j]=P[j][i]=0;
+				P[i][j]=P[j][i]=0.0f;
 			P[i][i]=PDiag[i];
 		}
 	}
@@ -239,7 +239,7 @@ void INSStatePrediction(float gyro_data[3], float accel_data[3], float dT)
 	// EKF prediction step
 	LinearizeFG(X, U, F, G);
 	RungeKutta(X, U, dT);
-	qmag = sqrt(X[6] * X[6] + X[7] * X[7] + X[8] * X[8] + X[9] * X[9]);
+	qmag = sqrtf(X[6] * X[6] + X[7] * X[7] + X[8] * X[8] + X[9] * X[9]);
 	X[6] /= qmag;
 	X[7] /= qmag;
 	X[8] /= qmag;
@@ -323,7 +323,7 @@ void INSCorrection(float mag_data[3], float Pos[3], float Vel[3],
 
 	// magnetometer data in any units (use unit vector) and in body frame
 	Bmag =
-	    sqrt(mag_data[0] * mag_data[0] + mag_data[1] * mag_data[1] +
+	    sqrtf(mag_data[0] * mag_data[0] + mag_data[1] * mag_data[1] +
 		 mag_data[2] * mag_data[2]);
 	Z[6] = mag_data[0] / Bmag;
 	Z[7] = mag_data[1] / Bmag;
@@ -336,7 +336,7 @@ void INSCorrection(float mag_data[3], float Pos[3], float Vel[3],
 	LinearizeH(X, Be, H);
 	MeasurementEq(X, Be, Y);
 	SerialUpdate(H, R, Z, Y, P, X, SensorsUsed);
-	qmag = sqrt(X[6] * X[6] + X[7] * X[7] + X[8] * X[8] + X[9] * X[9]);
+	qmag = sqrtf(X[6] * X[6] + X[7] * X[7] + X[8] * X[8] + X[9] * X[9]);
 	X[6] /= qmag;
 	X[7] /= qmag;
 	X[8] /= qmag;

@@ -56,11 +56,13 @@
 #include "gyrosbias.h"
 #include "attitudeactual.h"
 #include "attitudesettings.h"
+#include "baroaltitude.h"
 #include "flightstatus.h"
+#include "homelocation.h"
 #include "CoordinateConversions.h"
 
 // Private constants
-#define STACK_SIZE_BYTES 1540
+#define STACK_SIZE_BYTES 5540
 #define TASK_PRIORITY (tskIDLE_PRIORITY+3)
 #define FAILSAFE_TIMEOUT_MS 10
 
@@ -75,6 +77,7 @@ static xTaskHandle attitudeTaskHandle;
 static xQueueHandle gyroQueue;
 static xQueueHandle accelQueue;
 static xQueueHandle magQueue;
+static xQueueHandle baroQueue;
 const uint32_t SENSOR_QUEUE_SIZE = 10;
 
 // Private functions
@@ -83,6 +86,7 @@ static void AttitudeTask(void *parameters);
 
 static int32_t updateSensors();
 static int32_t updateAttitudeComplimentary(bool first_run);
+static int32_t updateAttitudeINSGPS(bool first_run);
 static void settingsUpdatedCb(UAVObjEvent * objEv);
 
 static float accelKi = 0;
@@ -147,13 +151,19 @@ int32_t AttitudeStart(void)
 {
 	// Create the queues for the sensors
 	gyroQueue = xQueueCreate(1, sizeof(UAVObjEvent));
-
+	accelQueue = xQueueCreate(1, sizeof(UAVObjEvent));
+	magQueue = xQueueCreate(1, sizeof(UAVObjEvent));
+	baroQueue = xQueueCreate(1, sizeof(UAVObjEvent));
+			
 	// Start main task
 	xTaskCreate(AttitudeTask, (signed char *)"Attitude", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &attitudeTaskHandle);
 	TaskMonitorAdd(TASKINFO_RUNNING_ATTITUDE, attitudeTaskHandle);
 	PIOS_WDG_RegisterFlag(PIOS_WDG_ATTITUDE);
 	
 	GyrosConnectQueue(gyroQueue);
+	AccelsConnectQueue(accelQueue);
+	MagnetometerConnectQueue(magQueue);
+	BaroAltitudeConnectQueue(baroQueue);
 
 	return 0;
 }
@@ -171,13 +181,19 @@ static void AttitudeTask(void *parameters)
 	settingsUpdatedCb(AttitudeSettingsHandle());
 	
 	bool first_run = true;
-		
+	
+	// Wait for all the sensors be to read
+	vTaskDelay(100);
+	
 	// Main task loop
 	while (1) {
 	
 		// This  function blocks on data queue
-		updateAttitudeComplimentary(first_run);
-		
+		if(0) 
+			updateAttitudeComplimentary(first_run);
+		else
+			updateAttitudeINSGPS(first_run);
+			
 		if (first_run)
 			first_run = false;
 		
@@ -199,7 +215,7 @@ static int32_t updateAttitudeComplimentary(bool first_run)
 	// Wait until the AttitudeRaw object is updated, if a timeout then go to failsafe
 	if ( xQueueReceive(gyroQueue, &ev, FAILSAFE_TIMEOUT_MS / portTICK_RATE_MS) != pdTRUE )
 	{
-		AlarmsSet(SYSTEMALARMS_ALARM_STABILIZATION,SYSTEMALARMS_ALARM_WARNING);
+		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE,SYSTEMALARMS_ALARM_WARNING);
 		return -1;
 	}
 	
@@ -320,7 +336,138 @@ static int32_t updateAttitudeComplimentary(bool first_run)
 	return 0;
 }
 
-static void settingsUpdatedCb(UAVObjEvent * objEv) {
+#include "insgps.h"
+int32_t ins_failed = 0;
+extern struct NavStruct Nav;
+static int32_t updateAttitudeINSGPS(bool first_run)
+{
+	UAVObjEvent ev;
+	GyrosData gyrosData;
+	AccelsData accelsData;
+	MagnetometerData magData;
+	BaroAltitudeData baroData;
+	
+	static uint32_t ins_last_time = 0;
+
+	static bool inited;
+	if (first_run)
+		inited = false;
+	
+	// Wait until the gyro and accel object is updated, if a timeout then go to failsafe
+	if ( (xQueueReceive(gyroQueue, &ev, 10 / portTICK_RATE_MS) != pdTRUE) ||
+		(xQueueReceive(accelQueue, &ev, 10 / portTICK_RATE_MS) != pdTRUE) )
+	{
+		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE,SYSTEMALARMS_ALARM_WARNING);
+		return -1;
+	}
+	
+	// Get most recent data
+	// TODO: Acquire all data in a queue
+	GyrosGet(&gyrosData);
+	AccelsGet(&accelsData);
+	MagnetometerGet(&magData);
+	BaroAltitudeGet(&baroData);
+	
+	bool mag_updated;
+	bool baro_updated;
+	
+	if (inited) {
+		mag_updated = 0;
+		baro_updated = 0;
+	}
+	
+	mag_updated |= xQueueReceive(magQueue, &ev, 0 / portTICK_RATE_MS) == pdTRUE;
+	baro_updated |= xQueueReceive(baroQueue, &ev, 0 / portTICK_RATE_MS) == pdTRUE;
+	
+	if (!inited && (!mag_updated || !baro_updated)) {
+		// Don't initialize until all sensors are read
+		return -1;
+	} else if (!inited ) {
+		inited = true;
+
+		float Rbe[3][3], q[4], accels[3], rpy[3], mag;
+		float ge[3]={0.0f,0.0f,-9.81f};
+		float zeros[3]={0.0f,0.0f,0.0f};
+		float Pdiag[16]={25.0f,25.0f,25.0f,5.0f,5.0f,5.0f,1e-5f,1e-5f,1e-5f,1e-5f,1e-5f,1e-5f,1e-5f,1e-4f,1e-4f,1e-4f};
+		bool using_mags, using_gps;
+		
+		INSGPSInit();
+		
+		HomeLocationData home;
+		HomeLocationGet(&home);
+		
+		RotFrom2Vectors(&accelsData.x, ge, &magData.x, home.Be, Rbe);
+		R2Quaternion(Rbe,q);
+		INSSetState(zeros, zeros, q, zeros, zeros);
+		
+		INSResetP(Pdiag);
+		
+/*		GyrosBiasData gyrosBias;
+		gyrosBias.x = gyrosData.x;
+		gyrosBias.y = gyrosData.y;
+		gyrosBias.z = gyrosData.z;
+		GyrosBiasSet(&gyrosBias);*/
+		
+		ins_last_time = PIOS_DELAY_GetRaw();	
+		return 0;
+	}
+	
+	// Perform the update
+	static uint32_t updated_without_gps = 0;
+	
+	float zeros[3] = {0, 0, 0};
+	uint16_t sensors = 0;
+	float dT;
+	
+	dT = PIOS_DELAY_DiffuS(ins_last_time) / 1.0e6f;
+	ins_last_time = PIOS_DELAY_GetRaw();
+	
+	// This should only happen at start up or at mode switches
+	if(dT > 0.01f)
+		dT = 0.01f;
+	else if(dT <= 0.001f)
+		dT = 0.001f;
+	
+	float gyros[3] = {gyrosData.x * F_PI / 180.0f, gyrosData.y * F_PI / 180.0f, gyrosData.z * F_PI / 180.0f};
+	
+	// Advance the state estimate
+	INSStatePrediction(gyros, &accelsData.x, dT);
+	
+	AttitudeActualData attitude;
+	AttitudeActualGet(&attitude);
+	attitude.q1 = Nav.q[0];
+	attitude.q2 = Nav.q[1];
+	attitude.q3 = Nav.q[2];
+	attitude.q4 = Nav.q[3];
+	Quaternion2RPY(&attitude.q1,&attitude.Roll);
+	AttitudeActualSet(&attitude);
+	
+	// Advance the covariance estimate
+	INSCovariancePrediction(dT);
+	
+	/* Indoors, update with zero position and velocity and high covariance */
+	sensors = HORIZ_SENSORS | VERT_SENSORS;
+
+	if(mag_updated)
+		sensors |= MAG_SENSORS;
+	if(baro_updated)
+		sensors |= BARO_SENSOR;
+
+	/*
+	 * TODO: Need to add a general sanity check for all the inputs to make sure their kosher
+	 * although probably should occur within INS itself
+	 */
+	INSCorrection(&magData.x, zeros, zeros, baroData.Altitude, sensors);
+	
+	if(fabs(Nav.gyro_bias[0]) > 0.1f || fabs(Nav.gyro_bias[1]) > 0.1f || fabs(Nav.gyro_bias[2]) > 0.1f) {
+		float zeros[3] = {0.0f,0.0f,0.0f};
+		INSSetGyroBias(zeros);
+	}
+
+}
+
+static void settingsUpdatedCb(UAVObjEvent * objEv) 
+{
 	AttitudeSettingsData attitudeSettings;
 	AttitudeSettingsGet(&attitudeSettings);
 

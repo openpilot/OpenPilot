@@ -23,7 +23,6 @@ HEADERS += configplugin.h \
     configairframewidget.h \
     config_pro_hw_widget.h \
     config_cc_hw_widget.h \
-    configahrswidget.h \
     configccattitudewidget.h \
     mixercurvewidget.h \
     mixercurvepoint.h \
@@ -51,7 +50,6 @@ SOURCES += configplugin.cpp \
     configairframewidget.cpp \
     config_pro_hw_widget.cpp \
     config_cc_hw_widget.cpp \
-    configahrswidget.cpp \
     configccattitudewidget.cpp \
     mixercurvewidget.cpp \
     mixercurvepoint.cpp \
@@ -71,7 +69,6 @@ SOURCES += configplugin.cpp \
 FORMS += airframe.ui \
     cc_hw_settings.ui \
     pro_hw_settings.ui \
-    ahrs.ui \
     ccpm.ui \
     stabilization.ui \
     input.ui \

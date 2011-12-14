@@ -157,12 +157,14 @@ void ConfigGadgetWidget::onAutopilotConnect() {
             // Mainboard family
             ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
             ftw->removeTab(ConfigGadgetWidget::ins);
-            QWidget *qwd = new ConfigAHRSWidget(this);
+            Q_ASSERT(0);
+/*            QWidget *qwd = new ConfigAHRSWidget(this);
             ftw->insertTab(ConfigGadgetWidget::ins, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("INS"));
             ftw->removeTab(ConfigGadgetWidget::hardware);
             qwd = new ConfigProHWWidget(this);
             ftw->insertTab(ConfigGadgetWidget::hardware, qwd, QIcon(":/configgadget/images/hw_config.png"), QString("HW Settings"));
             ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
+            */
         }
     }
     emit autopilotConnected();

@@ -56,6 +56,9 @@
 #include "gyrosbias.h"
 #include "attitudeactual.h"
 #include "attitudesettings.h"
+#include "positionactual.h"
+#include "velocityactual.h"
+#include "gpsposition.h"
 #include "baroaltitude.h"
 #include "flightstatus.h"
 #include "homelocation.h"
@@ -78,6 +81,7 @@ static xQueueHandle gyroQueue;
 static xQueueHandle accelQueue;
 static xQueueHandle magQueue;
 static xQueueHandle baroQueue;
+static xQueueHandle gpsQueue;
 const uint32_t SENSOR_QUEUE_SIZE = 10;
 
 // Private functions
@@ -116,6 +120,8 @@ int32_t AttitudeInitialize(void)
 {
 	AttitudeActualInitialize();
 	AttitudeSettingsInitialize();
+	PositionActualInitialize();
+	VelocityActualInitialize();
 	
 	// Initialize quaternion
 	AttitudeActualData attitude;
@@ -154,6 +160,7 @@ int32_t AttitudeStart(void)
 	accelQueue = xQueueCreate(1, sizeof(UAVObjEvent));
 	magQueue = xQueueCreate(1, sizeof(UAVObjEvent));
 	baroQueue = xQueueCreate(1, sizeof(UAVObjEvent));
+	gpsQueue = xQueueCreate(1, sizeof(UAVObjEvent));
 			
 	// Start main task
 	xTaskCreate(AttitudeTask, (signed char *)"Attitude", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &attitudeTaskHandle);
@@ -164,7 +171,8 @@ int32_t AttitudeStart(void)
 	AccelsConnectQueue(accelQueue);
 	MagnetometerConnectQueue(magQueue);
 	BaroAltitudeConnectQueue(baroQueue);
-
+	GPSPositionConnectQueue(gpsQueue);
+	
 	return 0;
 }
 
@@ -370,6 +378,7 @@ static int32_t updateAttitudeINSGPS(bool first_run)
 	
 	bool mag_updated;
 	bool baro_updated;
+	bool gps_updated;
 	
 	if (inited) {
 		mag_updated = 0;
@@ -378,8 +387,9 @@ static int32_t updateAttitudeINSGPS(bool first_run)
 	
 	mag_updated |= xQueueReceive(magQueue, &ev, 0 / portTICK_RATE_MS) == pdTRUE;
 	baro_updated |= xQueueReceive(baroQueue, &ev, 0 / portTICK_RATE_MS) == pdTRUE;
+	gps_updated |= xQueueReceive(gpsQueue, &ev, 0 / portTICK_RATE_MS) == pdTRUE;
 	
-	if (!inited && (!mag_updated || !baro_updated)) {
+	if (!inited && (!mag_updated || !baro_updated || !gps_updated)) {
 		// Don't initialize until all sensors are read
 		return -1;
 	} else if (!inited ) {
@@ -389,6 +399,7 @@ static int32_t updateAttitudeINSGPS(bool first_run)
 		float ge[3]={0.0f,0.0f,-9.81f};
 		float zeros[3]={0.0f,0.0f,0.0f};
 		float Pdiag[16]={25.0f,25.0f,25.0f,5.0f,5.0f,5.0f,1e-5f,1e-5f,1e-5f,1e-5f,1e-5f,1e-5f,1e-5f,1e-4f,1e-4f,1e-4f};
+		float vel[3], NED[3];
 		bool using_mags, using_gps;
 		
 		INSGPSInit();
@@ -396,17 +407,24 @@ static int32_t updateAttitudeINSGPS(bool first_run)
 		HomeLocationData home;
 		HomeLocationGet(&home);
 		
+		GPSPositionData gpsPosition;
+		GPSPositionGet(&gpsPosition);
+		
+		vel[0] = gpsPosition.Groundspeed * cosf(gpsPosition.Heading * F_PI / 180.0f);
+		vel[1] = gpsPosition.Groundspeed * sinf(gpsPosition.Heading * F_PI / 180.0f);
+		vel[2] = 0;
+		
+		// convert from cm back to meters
+		float LLA[3] = {(float) gpsPosition.Latitude / 1e7f, (float) gpsPosition.Longitude / 1e7f, (float) (gpsPosition.GeoidSeparation + gpsPosition.Altitude)};
+		// put in local NED frame
+		float ECEF[3] = {(float) (home.ECEF[0] / 100.0f), (float) (home.ECEF[1] / 100.0f), (float) (home.ECEF[2] / 100.0f)};
+		LLA2Base(LLA, ECEF, (float (*)[3]) home.RNE, NED);
+
 		RotFrom2Vectors(&accelsData.x, ge, &magData.x, home.Be, Rbe);
 		R2Quaternion(Rbe,q);
-		INSSetState(zeros, zeros, q, zeros, zeros);
-		
+		INSSetState(NED, vel, q, &gyrosData.x, zeros);
+		INSSetGyroBias(&gyrosData.x);
 		INSResetP(Pdiag);
-		
-/*		GyrosBiasData gyrosBias;
-		gyrosBias.x = gyrosData.x;
-		gyrosBias.y = gyrosData.y;
-		gyrosBias.z = gyrosData.z;
-		GyrosBiasSet(&gyrosBias);*/
 		
 		ins_last_time = PIOS_DELAY_GetRaw();	
 		return 0;
@@ -428,11 +446,18 @@ static int32_t updateAttitudeINSGPS(bool first_run)
 	else if(dT <= 0.001f)
 		dT = 0.001f;
 	
-	float gyros[3] = {gyrosData.x * F_PI / 180.0f, gyrosData.y * F_PI / 180.0f, gyrosData.z * F_PI / 180.0f};
+	
+	GyrosBiasData gyrosBias;
+	GyrosBiasGet(&gyrosBias);
+
+	float gyros[3] = {(gyrosData.x + gyrosBias.x) * F_PI / 180.0f, 
+		(gyrosData.y + gyrosBias.y) * F_PI / 180.0f, 
+		(gyrosData.z + gyrosBias.z) * F_PI / 180.0f};
 	
 	// Advance the state estimate
 	INSStatePrediction(gyros, &accelsData.x, dT);
 	
+	// Copy the attitude into the UAVO
 	AttitudeActualData attitude;
 	AttitudeActualGet(&attitude);
 	attitude.q1 = Nav.q[0];
@@ -442,23 +467,65 @@ static int32_t updateAttitudeINSGPS(bool first_run)
 	Quaternion2RPY(&attitude.q1,&attitude.Roll);
 	AttitudeActualSet(&attitude);
 	
+	// Copy the gyro bias into the UAVO
+	gyrosBias.x = Nav.gyro_bias[0];
+	gyrosBias.y = Nav.gyro_bias[1];
+	gyrosBias.z = Nav.gyro_bias[2];
+	GyrosBiasSet(&gyrosBias);
+	
 	// Advance the covariance estimate
 	INSCovariancePrediction(dT);
 	
-	/* Indoors, update with zero position and velocity and high covariance */
-	sensors = HORIZ_SENSORS | VERT_SENSORS;
-
 	if(mag_updated)
 		sensors |= MAG_SENSORS;
 	if(baro_updated)
 		sensors |= BARO_SENSOR;
 
+	float NED[3] = {0,0,0};
+	float vel[3] = {0,0,0};
+	
+	if(gps_updated)
+	{
+		sensors = HORIZ_SENSORS | VERT_SENSORS;
+		GPSPositionData gpsPosition;
+		GPSPositionGet(&gpsPosition);
+		
+		vel[0] = gpsPosition.Groundspeed * cosf(gpsPosition.Heading * F_PI / 180.0f);
+		vel[1] = gpsPosition.Groundspeed * sinf(gpsPosition.Heading * F_PI / 180.0f);
+		vel[2] = 0;
+
+		HomeLocationData home;
+		HomeLocationGet(&home);
+
+		// convert from cm back to meters
+		float LLA[3] = {(float) gpsPosition.Latitude / 1e7f, (float) gpsPosition.Longitude / 1e7f, (float) (gpsPosition.GeoidSeparation + gpsPosition.Altitude)};
+		// put in local NED frame
+		float ECEF[3] = {(float) (home.ECEF[0] / 100.0f), (float) (home.ECEF[1] / 100.0f), (float) (home.ECEF[2] / 100.0f)};
+		LLA2Base(LLA, ECEF, (float (*)[3]) home.RNE, NED);
+	}
+	
 	/*
 	 * TODO: Need to add a general sanity check for all the inputs to make sure their kosher
 	 * although probably should occur within INS itself
 	 */
-	INSCorrection(&magData.x, zeros, zeros, baroData.Altitude, sensors);
+	INSCorrection(&magData.x, NED, vel, baroData.Altitude, sensors);
 	
+	// Copy the position and velocity into the UAVO
+	PositionActualData positionActual;
+	PositionActualGet(&positionActual);
+	positionActual.North = Nav.Pos[0];
+	positionActual.East = Nav.Pos[1];
+	positionActual.Down = Nav.Pos[2];
+	PositionActualSet(&positionActual);
+	
+	VelocityActualData velocityActual;
+	VelocityActualGet(&velocityActual);
+	velocityActual.North = Nav.Vel[0];
+	velocityActual.East = Nav.Vel[1];
+	velocityActual.Down = Nav.Vel[2];
+	VelocityActualSet(&velocityActual);
+	
+
 	if(fabs(Nav.gyro_bias[0]) > 0.1f || fabs(Nav.gyro_bias[1]) > 0.1f || fabs(Nav.gyro_bias[2]) > 0.1f) {
 		float zeros[3] = {0.0f,0.0f,0.0f};
 		INSSetGyroBias(zeros);

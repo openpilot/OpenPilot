@@ -123,6 +123,9 @@ int32_t AttitudeInitialize(void)
 	PositionActualInitialize();
 	VelocityActualInitialize();
 	
+	// Initialize this here while we aren't setting the homelocation in GPS
+	HomeLocationInitialize();
+	
 	// Initialize quaternion
 	AttitudeActualData attitude;
 	AttitudeActualGet(&attitude);

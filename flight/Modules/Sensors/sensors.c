@@ -102,6 +102,7 @@ int32_t SensorsInitialize(void)
 	AccelsInitialize();
 	MagnetometerInitialize();
 	AttitudeSettingsInitialize();
+	AttitudeSettingsInitialize();
 	
 	for(uint8_t i = 0; i < 3; i++)
 		for(uint8_t j = 0; j < 3; j++)
@@ -152,6 +153,9 @@ static void SensorsTask(void *parameters)
 
 	AlarmsClear(SYSTEMALARMS_ALARM_SENSORS);
 
+	UAVObjEvent ev;
+	settingsUpdatedCb(&ev);
+	
 	accel_test = PIOS_BMA180_Test();
 	gyro_test = PIOS_MPU6000_Test();
 	mag_test = PIOS_HMC5883_Test();

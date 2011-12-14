@@ -36,12 +36,12 @@
 #define DEG2RAD (F_PI /180.0f)
 
 // ****** convert Lat,Lon,Alt to ECEF  ************
-void LLA2ECEF(double LLA[3], double ECEF[3])
+void LLA2ECEF(float LLA[3], float ECEF[3])
 {
-	const double a = 6378137.0;	// Equatorial Radius
-	const double e = 8.1819190842622e-2;	// Eccentricity
-	double sinLat, sinLon, cosLat, cosLon;
-	double N;
+	const float a = 6378137.0;	// Equatorial Radius
+	const float e = 8.1819190842622e-2;	// Eccentricity
+	float sinLat, sinLon, cosLat, cosLon;
+	float N;
 
 	sinLat = sin(DEG2RAD * LLA[0]);
 	sinLon = sin(DEG2RAD * LLA[1]);
@@ -56,7 +56,7 @@ void LLA2ECEF(double LLA[3], double ECEF[3])
 }
 
 // ****** convert ECEF to Lat,Lon,Alt (ITERATIVE!) *********
-uint16_t ECEF2LLA(double ECEF[3], double LLA[3])
+uint16_t ECEF2LLA(float ECEF[3], float LLA[3])
 {
 	/**
 	 * LLA parameter is used to prime the iteration.
@@ -67,10 +67,10 @@ uint16_t ECEF2LLA(double ECEF[3], double LLA[3])
 	 * Suggestion: [0,0,0]
 	 **/
 
-	const double a = 6378137.0;	// Equatorial Radius
-	const double e = 8.1819190842622e-2;	// Eccentricity
-	double x = ECEF[0], y = ECEF[1], z = ECEF[2];
-	double Lat, N, NplusH, delta, esLat;
+	const float a = 6378137.0;	// Equatorial Radius
+	const float e = 8.1819190842622e-2;	// Eccentricity
+	float x = ECEF[0], y = ECEF[1], z = ECEF[2];
+	float Lat, N, NplusH, delta, esLat;
 	uint16_t iter;
 #define MAX_ITER 10		// should not take more than 5 for valid coordinates
 #define ACCURACY 1.0e-11	// used to be e-14, but we don't need sub micrometer exact calculations
@@ -100,7 +100,7 @@ uint16_t ECEF2LLA(double ECEF[3], double LLA[3])
 }
 
 // ****** find ECEF to NED rotation matrix ********
-void RneFromLLA(double LLA[3], float Rne[3][3])
+void RneFromLLA(float LLA[3], float Rne[3][3])
 {
 	float sinLat, sinLon, cosLat, cosLon;
 
@@ -189,9 +189,9 @@ void Quaternion2R(float q[4], float Rbe[3][3])
 }
 
 // ****** Express LLA in a local NED Base Frame ********
-void LLA2Base(double LLA[3], double BaseECEF[3], float Rne[3][3], float NED[3])
+void LLA2Base(float LLA[3], float BaseECEF[3], float Rne[3][3], float NED[3])
 {
-	double ECEF[3];
+	float ECEF[3];
 	float diff[3];
 
 	LLA2ECEF(LLA, ECEF);
@@ -206,7 +206,7 @@ void LLA2Base(double LLA[3], double BaseECEF[3], float Rne[3][3], float NED[3])
 }
 
 // ****** Express ECEF in a local NED Base Frame ********
-void ECEF2Base(double ECEF[3], double BaseECEF[3], float Rne[3][3], float NED[3])
+void ECEF2Base(float ECEF[3], float BaseECEF[3], float Rne[3][3], float NED[3])
 {
 	float diff[3];
 

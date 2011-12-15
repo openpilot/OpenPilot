@@ -250,8 +250,8 @@ static void SensorsTask(void *parameters)
 			int16_t values[3];
 			PIOS_HMC5883_ReadMag(values);
 			MagnetometerData mag; // Skip get as we set all the fields
-			mag.x = -values[0];
-			mag.y = -values[1];
+			mag.x = values[1];
+			mag.y = values[0];
 			mag.z = -values[2];
 			MagnetometerSet(&mag);
 		}

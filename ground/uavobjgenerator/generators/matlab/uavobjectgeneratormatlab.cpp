@@ -142,13 +142,13 @@ bool UAVObjectGeneratorMatlab::process_object(ObjectInfo* info)
 	//=================================================================//
 	//Generate function description comment
     matlabFunctionsCode.append("function [" + objectName + "] = " + functionCall + "\n");
+    matlabFunctionsCode.append("\t" + objectName + ".timestamp = timestamp;\n");
     matlabFunctionsCode.append("\tif " + isSingleInst + "\n");
     matlabFunctionsCode.append("\t\theaderSize = 8;\n");
     matlabFunctionsCode.append("\telse\n");
     matlabFunctionsCode.append("\t\t" + objectName + ".instanceID = fread(fid, 1, 'uint16');\n");
     matlabFunctionsCode.append("\t\theaderSize = 10;\n");
     matlabFunctionsCode.append("\tend\n\n");
-    matlabFunctionsCode.append("\t" + objectName + ".timestamp = timestamp;\n");
 
     // Generate functions code, actual fields of the object
     QString funcfields;

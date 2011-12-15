@@ -200,7 +200,7 @@ static void AttitudeTask(void *parameters)
 	while (1) {
 	
 		// This  function blocks on data queue
-		if(0) 
+		if(1) 
 			updateAttitudeComplimentary(first_run);
 		else
 			updateAttitudeINSGPS(first_run);
@@ -214,6 +214,11 @@ static void AttitudeTask(void *parameters)
 
 float accel_mag;
 float qmag;
+float attitudeDt;
+float mag_err[3];
+float magKi = 0.000001f;
+float magKp = 0.0001f;
+
 static int32_t updateAttitudeComplimentary(bool first_run)
 {
 	UAVObjEvent ev;
@@ -285,18 +290,49 @@ static int32_t updateAttitudeComplimentary(bool first_run)
 	accel_err[1] /= accel_mag;
 	accel_err[2] /= accel_mag;	
 	
+	if (1) {
+		// Rotate gravity to body frame and cross with accels
+		float brot[3];
+		float Rbe[3][3];
+		MagnetometerData mag;
+		HomeLocationData home;
+
+		Quaternion2R(q, Rbe);
+		MagnetometerGet(&mag);
+		HomeLocationGet(&home);
+		rot_mult(Rbe, home.Be, brot);
+		
+		float mag_len = sqrtf(mag.x * mag.x + mag.y * mag.y + mag.z * mag.z);
+		mag.x /= mag_len;
+		mag.y /= mag_len;
+		mag.z /= mag_len;
+		
+		float bmag = sqrtf(brot[0] * brot[0] + brot[1] * brot[1] + brot[2] * brot[2]);
+		brot[0] /= bmag;
+		brot[1] /= bmag;
+		brot[2] /= bmag;
+		
+		// Only compute if neither vector is null
+		if (bmag < 1 || mag_len < 1)
+			mag_err[0] = mag_err[1] = mag_err[2] = 0;
+		else
+			CrossProduct((const float *) &mag.x, (const float *) brot, mag_err);
+	} else {
+		mag_err[0] = mag_err[1] = mag_err[2] = 0;
+	}
+	
 	// Accumulate integral of error.  Scale here so that units are (deg/s) but Ki has units of s
 	GyrosBiasData gyrosBias;
 	GyrosBiasGet(&gyrosBias);
 	gyrosBias.x += accel_err[0] * accelKi;
 	gyrosBias.y += accel_err[1] * accelKi;
-	gyrosBias.z += - gyrosData.z * yawBiasRate;
+	gyrosBias.z += mag_err[2] * magKi;
 	GyrosBiasSet(&gyrosBias);
 
 	// Correct rates based on error, integral component dealt with in updateSensors
 	gyrosData.x += accel_err[0] * accelKp / dT;
 	gyrosData.y += accel_err[1] * accelKp / dT;
-	gyrosData.z += accel_err[2] * accelKp / dT;
+	gyrosData.z += accel_err[2] * accelKp / dT + mag_err[2] * magKp / dT;
 
 	// Work out time derivative from INSAlgo writeup
 	// Also accounts for the fact that gyros are in deg/s

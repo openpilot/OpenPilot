@@ -82,6 +82,8 @@ static bool zero_during_arming = false;
 static bool bias_correct_gyro = true;
 static float gyro_bias[3] = {0,0,0};
 
+float mag_bias[3] = {-140.0f,150.0f,0};
+
 /**
  * API for sensor fusion algorithms:
  * Configure(xQueueHandle gyro, xQueueHandle accel, xQueueHandle mag, xQueueHandle baro)
@@ -250,9 +252,9 @@ static void SensorsTask(void *parameters)
 			int16_t values[3];
 			PIOS_HMC5883_ReadMag(values);
 			MagnetometerData mag; // Skip get as we set all the fields
-			mag.x = values[1];
-			mag.y = values[0];
-			mag.z = -values[2];
+			mag.x = values[1] - mag_bias[0];
+			mag.y = values[0] - mag_bias[1];
+			mag.z = -values[2] - mag_bias[2];
 			MagnetometerSet(&mag);
 		}
 		

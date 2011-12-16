@@ -51,6 +51,7 @@ bool UAVObjectGeneratorMatlab::generate(UAVObjectParser* parser,QString template
 
     matlabCodeTemplate.replace( QString("$(ALLOCATIONCODE)"), matlabAllocationCode);
     matlabCodeTemplate.replace( QString("$(SWITCHCODE)"), matlabSwitchCode);
+    matlabCodeTemplate.replace( QString("$(CLEANUPCODE)"), matlabCleanupCode);
     matlabCodeTemplate.replace( QString("$(SAVEOBJECTSCODE)"), matlabSaveObjectsCode);
     matlabCodeTemplate.replace( QString("$(FUNCTIONSCODE)"), matlabFunctionsCode);
 
@@ -127,7 +128,17 @@ bool UAVObjectGeneratorMatlab::process_object(ObjectInfo* info)
     matlabSwitchCode.append("\t\tcase " + objectTableName.toUpper() + "_OBJID\n");
     matlabSwitchCode.append("\t\t\t" + objectTableName + "(" + tableIdxName +") = " + functionCall + ";\n");
     matlabSwitchCode.append("\t\t\t" + tableIdxName + " = " + tableIdxName +" + 1;\n");
-
+    matlabSwitchCode.append("\t\t\tif " + tableIdxName + " > length(" + objectTableName +")\n");
+    matlabSwitchCode.append("\t\t\t\t" + objectTableName + "(" + tableIdxName + "+100+1) = " + objectTableName +"(end);\n");
+    matlabSwitchCode.append("\t\t\t\t" + objectTableName +"(end)=[];\n");
+    matlabSwitchCode.append("\t\t\tend\n");
+	
+	
+	//=============================================================//
+    // Generate 'Cleanup:' code (will replace the $(CLEANUP) tag) //
+	//=============================================================//
+    matlabCleanupCode.append(objectTableName + "(" + tableIdxName +":end) = [];\n");
+	
 	
 	//=============================================================================//
     // Generate objects saving code code (will replace the $(SAVEOBJECTSCODE) tag) //

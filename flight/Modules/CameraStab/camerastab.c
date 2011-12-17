@@ -154,14 +154,15 @@ static void attitudeUpdated(UAVObjEvent* ev)
 					break;
 				case CAMERASTABSETTINGS_STABILIZATIONMODE_AXISLOCK:
 					input_rate = accessory.AccessoryVal * cameraStab.InputRate[i];
-					if (abs(input_rate) > cameraStab.MaxAxisLockRate)
+					if (fabs(input_rate) > cameraStab.MaxAxisLockRate)
 						csd->inputs[i] = bound(csd->inputs[i] + input_rate * csd->dT / 1000.0f, cameraStab.InputRange[i]);
 					break;
 				default:
 					PIOS_Assert(0);
 				}
-				csd->inputs_filtered[i] = (cameraStab.ResponseTime[i] / (cameraStab.ResponseTime[i] + csd->dT)) * csd->inputs_filtered[i]
-							+ (csd->dT / (cameraStab.ResponseTime[i] + csd->dT)) * csd->inputs[i];
+				float rt = (float)cameraStab.ResponseTime[i];
+				csd->inputs_filtered[i] = (rt / (rt + csd->dT)) * csd->inputs_filtered[i]
+							+ (csd->dT / (rt + csd->dT)) * csd->inputs[i];
 			}
 		}
 	}

@@ -160,9 +160,14 @@ static void attitudeUpdated(UAVObjEvent* ev)
 				default:
 					PIOS_Assert(0);
 				}
+
+				// bypass LPF calculation if ResponseTime is zero
 				float rt = (float)cameraStab.ResponseTime[i];
-				csd->inputs_filtered[i] = (rt / (rt + csd->dT)) * csd->inputs_filtered[i]
-							+ (csd->dT / (rt + csd->dT)) * csd->inputs[i];
+				if (rt)
+					csd->inputs_filtered[i] = (rt / (rt + csd->dT)) * csd->inputs_filtered[i]
+								+ (csd->dT / (rt + csd->dT)) * csd->inputs[i];
+				else
+					csd->inputs_filtered[i] = csd->inputs[i];
 			}
 		}
 	}

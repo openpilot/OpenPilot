@@ -1,0 +1,12 @@
+<!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN"
+ "http://www.freedesktop.org/standards/menu-spec/1.0/menu.dtd">
+<Menu>
+  <Name>Applications</Name>
+  <Menu>
+    <Name>RCApplications</Name>
+    <Directory>rc_applications.directory</Directory>
+    <Include>
+        <Category>RCApplications</Category>
+    </Include>
+  </Menu> <!-- End RC Applications -->
+</Menu>

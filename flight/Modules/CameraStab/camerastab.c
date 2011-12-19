@@ -62,9 +62,7 @@
 
 // Private variables
 static struct CameraStab_data {
-	UAVObjEvent ev;
 	portTickType lastSysTime;
-	float dT;
 	float inputs[CAMERASTABSETTINGS_INPUTS_NUMELEM];
 	float inputs_filtered[CAMERASTABSETTINGS_INPUTS_NUMELEM];
 } *csd;
@@ -100,18 +98,17 @@ int32_t CameraStabInitialize(void)
 		// make sure that all inputs[] and inputs_filtered[] are zeroed
 		memset(csd, 0, sizeof(struct CameraStab_data));
 		csd->lastSysTime = xTaskGetTickCount();
-		csd->dT = 1;
 
 		AttitudeActualInitialize();
-
-		csd->ev.obj = AttitudeActualHandle();
-		csd->ev.instId = 0;
-		csd->ev.event = 0;
-
 		CameraStabSettingsInitialize();
 		CameraDesiredInitialize();
 
-		EventPeriodicCallbackCreate(&(csd->ev), attitudeUpdated, SAMPLE_PERIOD_MS / portTICK_RATE_MS);
+		UAVObjEvent ev = {
+			.obj = AttitudeActualHandle(),
+			.instId = 0,
+			.event = 0,
+		};
+		EventPeriodicCallbackCreate(&ev, attitudeUpdated, SAMPLE_PERIOD_MS / portTICK_RATE_MS);
 
 		return 0;
 	}
@@ -139,8 +136,9 @@ static void attitudeUpdated(UAVObjEvent* ev)
 
 	// Check how long since last update, time delta between calls in ms
 	portTickType thisSysTime = xTaskGetTickCount();
-	if (thisSysTime > csd->lastSysTime) // reuse dt in case of wraparound
-		csd->dT = (thisSysTime - csd->lastSysTime) / portTICK_RATE_MS;
+	float dT = (thisSysTime > csd->lastSysTime) ?
+			(thisSysTime - csd->lastSysTime) / portTICK_RATE_MS :
+			(float)SAMPLE_PERIOD_MS / 1000.0f;
 	csd->lastSysTime = thisSysTime;
 
 	// Read any input channels and apply LPF
@@ -155,7 +153,7 @@ static void attitudeUpdated(UAVObjEvent* ev)
 				case CAMERASTABSETTINGS_STABILIZATIONMODE_AXISLOCK:
 					input_rate = accessory.AccessoryVal * cameraStab.InputRate[i];
 					if (fabs(input_rate) > cameraStab.MaxAxisLockRate)
-						csd->inputs[i] = bound(csd->inputs[i] + input_rate * csd->dT / 1000.0f, cameraStab.InputRange[i]);
+						csd->inputs[i] = bound(csd->inputs[i] + input_rate * dT / 1000.0f, cameraStab.InputRange[i]);
 					break;
 				default:
 					PIOS_Assert(0);
@@ -164,8 +162,8 @@ static void attitudeUpdated(UAVObjEvent* ev)
 				// bypass LPF calculation if ResponseTime is zero
 				float rt = (float)cameraStab.ResponseTime[i];
 				if (rt)
-					csd->inputs_filtered[i] = (rt / (rt + csd->dT)) * csd->inputs_filtered[i]
-								+ (csd->dT / (rt + csd->dT)) * csd->inputs[i];
+					csd->inputs_filtered[i] = (rt / (rt + dT)) * csd->inputs_filtered[i]
+								+ (dT / (rt + dT)) * csd->inputs[i];
 				else
 					csd->inputs_filtered[i] = csd->inputs[i];
 			}

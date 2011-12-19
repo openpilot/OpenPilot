@@ -1,5 +1,17 @@
 Short summary of changes.  For a complete list see the git log.
 
+2011-12-19
+Added new camera stabilization features: AxisLock mode and LPF.
+New options:
+  StabilizationMode: Attitude (default) or AxisLock.
+  InputRate: 50deg/s by default.  Changes stick sensitivity in AxisLock mode.
+  MaxAxisLockRate: 1deg/s by default.  The same meaning as similar option
+    for AxisLock stabilization.
+  ResponseTime: 150ms by default.  Zero value disables LPF.
+The GUI does not currently expose the configuration for using the transmitter
+to change the view angle and advanced options but this is supported by the
+hardware.
+
 2011-12-10
 Merged a change that sorts the UAVO fields based on size.  Because this changes
 all of the objects, erase all existing flash files based on this.

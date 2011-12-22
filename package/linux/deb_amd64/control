@@ -5,8 +5,8 @@ Maintainer: naiiawah <naiiawah@openpilot.org>
 Build-Depends: debhelper (>= 7.0.50~)
 Standards-Version: 3.8.4
 Homepage: http://www.openpilot.org
-#Vcs-Git: git://git.debian.org/collab-maint/openpilot.git
-#Vcs-Browser: http://git.debian.org/?p=collab-maint/openpilot.git;a=summary
+Vcs-Git: git://git.openpilot.org/OpenPilot.git
+Vcs-Browser: http://git.openpilot.org/changelog/OpenPilot
 
 Package: openpilot
 Architecture: amd64

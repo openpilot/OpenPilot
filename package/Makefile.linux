@@ -3,7 +3,7 @@
 #
 
 define CP_DEB_FILES_TEMPLATE
-.PHONY: $(1)
+.PHONY: $(2)/$(1)
 $(2)/$(1): $(3)/$(1)
 	$(V1)cp -a $$< $$@
 endef
@@ -40,17 +40,19 @@ ALL_DEB_FILES += $(foreach f, $(DEB_MACHINE_FILES), $(DEB_BUILD_DIR)/$(f))
 
 DEB_PACKAGE_NAME	:= openpilot_$(VERSION_FULL)_$(DEB_PLATFORM)
 
-linux_deb_package: gcs deb_build package_flight
+linux_deb_package: deb_build gcs
 	@echo $@ starting
 	cd .. && dpkg-buildpackage -b
 	$(V1)mv $(ROOT_DIR)/../$(DEB_PACKAGE_NAME).deb $(BUILD_DIR)
 	$(V1)mv $(ROOT_DIR)/../$(DEB_PACKAGE_NAME).changes $(BUILD_DIR)
 	$(V1)rm -rf $(DEB_BUILD_DIR)
 
-deb_build: | $(DEB_BUILD_DIR) $(ALL_DEB_FILES)
+deb_build: | $(DEB_BUILD_DIR) $(ALL_DEB_FILES) $(BUILD_DIR)/build 
 	@echo $@ starting
 	$(V1)$(shell echo $(PACKAGE_DIR) > $(BUILD_DIR)/package_dir)
 	$(V1)sed -i -e "$(SED_SCRIPT)" $(DEB_BUILD_DIR)/changelog
+
+$(BUILD_DIR)/build: package_flight
 
 $(DEB_BUILD_DIR): 
 	@echo $@ starting
@@ -68,7 +70,6 @@ identify:
 	@echo ""
 	@echo "We are in the Linux Package Make system."
 	@echo ""
-	$(V1)rm -rf $(DEB_BUILD_DIR)
 
 ground_package: | identify linux_deb_package
 

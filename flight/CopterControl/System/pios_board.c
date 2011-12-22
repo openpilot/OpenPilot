@@ -541,11 +541,7 @@ static const struct pios_tim_channel pios_tim_servoport_rcvrport_pins[] = {
 
 #include "pios_usart_priv.h"
 
-#if defined(PIOS_INCLUDE_TELEMETRY_RF)
-/*
- * Telemetry USART
- */
-static const struct pios_usart_cfg pios_usart_telem_main_cfg = {
+static const struct pios_usart_cfg pios_usart_generic_main_cfg = {
   .regs  = USART1,
   .init = {
     .USART_BaudRate            = 57600,
@@ -581,7 +577,7 @@ static const struct pios_usart_cfg pios_usart_telem_main_cfg = {
   },
 };
 
-static const struct pios_usart_cfg pios_usart_telem_flexi_cfg = {
+static const struct pios_usart_cfg pios_usart_generic_flexi_cfg = {
   .regs  = USART3,
   .init = {
     .USART_BaudRate            = 57600,
@@ -616,84 +612,6 @@ static const struct pios_usart_cfg pios_usart_telem_flexi_cfg = {
     },
   },
 };
-#endif /* PIOS_INCLUDE_TELEMETRY_RF */
-
-#if defined(PIOS_INCLUDE_GPS)
-/*
- * GPS USART
- */
-static const struct pios_usart_cfg pios_usart_gps_main_cfg = {
-  .regs = USART1,
-  .init = {
-    .USART_BaudRate            = 57600,
-    .USART_WordLength          = USART_WordLength_8b,
-    .USART_Parity              = USART_Parity_No,
-    .USART_StopBits            = USART_StopBits_1,
-    .USART_HardwareFlowControl = USART_HardwareFlowControl_None,
-    .USART_Mode                = USART_Mode_Rx | USART_Mode_Tx,
-  },
-  .irq = {
-    .init    = {
-      .NVIC_IRQChannel                   = USART1_IRQn,
-      .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
-      .NVIC_IRQChannelSubPriority        = 0,
-      .NVIC_IRQChannelCmd                = ENABLE,
-    },
-  },
-  .rx   = {
-    .gpio = GPIOA,
-    .init = {
-      .GPIO_Pin   = GPIO_Pin_10,
-      .GPIO_Speed = GPIO_Speed_2MHz,
-      .GPIO_Mode  = GPIO_Mode_IPU,
-    },
-  },
-  .tx   = {
-    .gpio = GPIOA,
-    .init = {
-      .GPIO_Pin   = GPIO_Pin_9,
-      .GPIO_Speed = GPIO_Speed_2MHz,
-      .GPIO_Mode  = GPIO_Mode_AF_PP,
-    },
-  },
-};
-
-static const struct pios_usart_cfg pios_usart_gps_flexi_cfg = {
-  .regs = USART3,
-  .init = {
-    .USART_BaudRate            = 57600,
-    .USART_WordLength          = USART_WordLength_8b,
-    .USART_Parity              = USART_Parity_No,
-    .USART_StopBits            = USART_StopBits_1,
-    .USART_HardwareFlowControl = USART_HardwareFlowControl_None,
-    .USART_Mode                = USART_Mode_Rx | USART_Mode_Tx,
-  },
-  .irq = {
-    .init    = {
-      .NVIC_IRQChannel                   = USART3_IRQn,
-      .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
-      .NVIC_IRQChannelSubPriority        = 0,
-      .NVIC_IRQChannelCmd                = ENABLE,
-    },
-  },
-  .rx   = {
-    .gpio = GPIOB,
-    .init = {
-      .GPIO_Pin   = GPIO_Pin_11,
-      .GPIO_Speed = GPIO_Speed_2MHz,
-      .GPIO_Mode  = GPIO_Mode_IPU,
-    },
-  },
-  .tx   = {
-    .gpio = GPIOB,
-    .init = {
-      .GPIO_Pin   = GPIO_Pin_10,
-      .GPIO_Speed = GPIO_Speed_2MHz,
-      .GPIO_Mode  = GPIO_Mode_AF_PP,
-    },
-  },
-};
-#endif	/* PIOS_INCLUDE_GPS */
 
 #if defined(PIOS_INCLUDE_DSM)
 /*
@@ -1159,8 +1077,8 @@ void PIOS_Board_Init(void) {
 	case HWSETTINGS_CC_MAINPORT_TELEMETRY:
 #if defined(PIOS_INCLUDE_TELEMETRY_RF)
 		{
-			uint32_t pios_usart_telem_rf_id;
-			if (PIOS_USART_Init(&pios_usart_telem_rf_id, &pios_usart_telem_main_cfg)) {
+			uint32_t pios_usart_generic_id;
+			if (PIOS_USART_Init(&pios_usart_generic_id, &pios_usart_generic_main_cfg)) {
 				PIOS_Assert(0);
 			}
 
@@ -1168,7 +1086,7 @@ void PIOS_Board_Init(void) {
 			uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_TX_BUF_LEN);
 			PIOS_Assert(rx_buffer);
 			PIOS_Assert(tx_buffer);
-			if (PIOS_COM_Init(&pios_com_telem_rf_id, &pios_usart_com_driver, pios_usart_telem_rf_id,
+			if (PIOS_COM_Init(&pios_com_telem_rf_id, &pios_usart_com_driver, pios_usart_generic_id,
 					  rx_buffer, PIOS_COM_TELEM_RF_RX_BUF_LEN,
 					  tx_buffer, PIOS_COM_TELEM_RF_TX_BUF_LEN)) {
 				PIOS_Assert(0);
@@ -1201,14 +1119,14 @@ void PIOS_Board_Init(void) {
 	case HWSETTINGS_CC_MAINPORT_GPS:
 #if defined(PIOS_INCLUDE_GPS)
 		{
-			uint32_t pios_usart_gps_id;
-			if (PIOS_USART_Init(&pios_usart_gps_id, &pios_usart_gps_main_cfg)) {
+			uint32_t pios_usart_generic_id;
+			if (PIOS_USART_Init(&pios_usart_generic_id, &pios_usart_generic_main_cfg)) {
 				PIOS_Assert(0);
 			}
 
 			uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_GPS_RX_BUF_LEN);
 			PIOS_Assert(rx_buffer);
-			if (PIOS_COM_Init(&pios_com_gps_id, &pios_usart_com_driver, pios_usart_gps_id,
+			if (PIOS_COM_Init(&pios_com_gps_id, &pios_usart_com_driver, pios_usart_generic_id,
 					  rx_buffer, PIOS_COM_GPS_RX_BUF_LEN,
 					  NULL, 0)) {
 				PIOS_Assert(0);
@@ -1273,15 +1191,15 @@ void PIOS_Board_Init(void) {
 	case HWSETTINGS_CC_FLEXIPORT_TELEMETRY:
 #if defined(PIOS_INCLUDE_TELEMETRY_RF)
 		{
-			uint32_t pios_usart_telem_rf_id;
-			if (PIOS_USART_Init(&pios_usart_telem_rf_id, &pios_usart_telem_flexi_cfg)) {
+			uint32_t pios_usart_generic_id;
+			if (PIOS_USART_Init(&pios_usart_generic_id, &pios_usart_generic_flexi_cfg)) {
 				PIOS_Assert(0);
 			}
 			uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_RX_BUF_LEN);
 			uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_TX_BUF_LEN);
 			PIOS_Assert(rx_buffer);
 			PIOS_Assert(tx_buffer);
-			if (PIOS_COM_Init(&pios_com_telem_rf_id, &pios_usart_com_driver, pios_usart_telem_rf_id,
+			if (PIOS_COM_Init(&pios_com_telem_rf_id, &pios_usart_com_driver, pios_usart_generic_id,
   					  rx_buffer, PIOS_COM_TELEM_RF_RX_BUF_LEN,
 					  tx_buffer, PIOS_COM_TELEM_RF_TX_BUF_LEN)) {
 				PIOS_Assert(0);
@@ -1292,13 +1210,13 @@ void PIOS_Board_Init(void) {
 	case HWSETTINGS_CC_FLEXIPORT_GPS:
 #if defined(PIOS_INCLUDE_GPS)
 		{
-			uint32_t pios_usart_gps_id;
-			if (PIOS_USART_Init(&pios_usart_gps_id, &pios_usart_gps_flexi_cfg)) {
+			uint32_t pios_usart_generic_id;
+			if (PIOS_USART_Init(&pios_usart_generic_id, &pios_usart_generic_flexi_cfg)) {
 				PIOS_Assert(0);
 			}
 			uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_GPS_RX_BUF_LEN);
 			PIOS_Assert(rx_buffer);
-			if (PIOS_COM_Init(&pios_com_gps_id, &pios_usart_com_driver, pios_usart_gps_id,
+			if (PIOS_COM_Init(&pios_com_gps_id, &pios_usart_com_driver, pios_usart_generic_id,
 					  rx_buffer, PIOS_COM_GPS_RX_BUF_LEN,
 					  NULL, 0)) {
 				PIOS_Assert(0);

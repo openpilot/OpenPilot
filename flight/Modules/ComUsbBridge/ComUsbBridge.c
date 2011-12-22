@@ -1,0 +1,135 @@
+/**
+ ******************************************************************************
+ * @addtogroup OpenPilotModules OpenPilot Modules
+ * @{ 
+ * @addtogroup ComUsbBridgeModule Com Port to USB VCP Bridge Module
+ * @brief Bridge Com and USB VCP ports
+ * @{ 
+ *
+ * @file       ComUsbBridge.c
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2011.
+ * @brief      Bridges selected Com Port to the USB VCP emulated serial port
+ * @see        The GNU Public License (GPL) Version 3
+ *
+ *****************************************************************************/
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
+
+// ****************
+
+#include "openpilot.h"
+
+#include <stdbool.h>
+
+// ****************
+// Private functions
+
+static void com2UsbBridgeTask(void *parameters);
+static void usb2ComBridgeTask(void *parameters);
+
+// ****************
+// Private constants
+
+#define STACK_SIZE_BYTES            280
+#define TASK_PRIORITY                   (tskIDLE_PRIORITY + 1)
+
+#define BRIDGE_BUF_LEN 10
+
+// ****************
+// Private variables
+
+static xTaskHandle com2UsbBridgeTaskHandle;
+static xTaskHandle usb2ComBridgeTaskHandle;
+
+static uint8_t * com2usb_buf;
+static uint8_t * usb2com_buf;
+
+static uint32_t usart_port;
+static uint32_t vcp_port;
+
+/**
+ * Initialise the module
+ * \return -1 if initialisation failed
+ * \return 0 on success
+ */
+
+static int32_t comUsbBridgeStart(void)
+{
+	if (usart_port && vcp_port) {
+		// Start tasks
+		xTaskCreate(com2UsbBridgeTask, (signed char *)"Com2UsbBridge", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &com2UsbBridgeTaskHandle);
+		xTaskCreate(usb2ComBridgeTask, (signed char *)"Usb2ComBridge", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &usb2ComBridgeTaskHandle);
+	}
+
+	return 0;
+}
+/**
+ * Initialise the module
+ * \return -1 if initialisation failed
+ * \return 0 on success
+ */
+static int32_t comUsbBridgeInitialize(void)
+{
+	// TODO: Get from settings object
+	usart_port = PIOS_COM_BRIDGE;
+	vcp_port = PIOS_COM_VCP;
+
+	com2usb_buf = pvPortMalloc(BRIDGE_BUF_LEN);
+	PIOS_Assert(com2usb_buf);
+	usb2com_buf = pvPortMalloc(BRIDGE_BUF_LEN);
+	PIOS_Assert(usb2com_buf);
+
+	return 0;
+}
+MODULE_INITCALL(comUsbBridgeInitialize, comUsbBridgeStart)
+
+/**
+ * Main task. It does not return.
+ */
+
+static void com2UsbBridgeTask(void *parameters)
+{
+	/* Handle usart -> vcp direction */
+	while (1) {
+		uint32_t rx_bytes;
+
+		rx_bytes = PIOS_COM_ReceiveBuffer(usart_port, com2usb_buf, BRIDGE_BUF_LEN, 500);
+		if (rx_bytes > 0) {
+			if (PIOS_COM_SendBuffer(vcp_port, com2usb_buf, rx_bytes)) {
+				vTaskDelay(10 / portTICK_RATE_MS);
+			}
+		} else {
+			vTaskDelay(10 / portTICK_RATE_MS);
+		}
+	}
+}
+
+static void usb2ComBridgeTask(void * parameters)
+{
+	/* Handle vcp -> usart direction */
+	while (1) {
+		uint32_t rx_bytes;
+
+		rx_bytes = PIOS_COM_ReceiveBuffer(vcp_port, usb2com_buf, BRIDGE_BUF_LEN, 500);
+		if (rx_bytes > 0) {
+			if (PIOS_COM_SendBuffer(usart_port, usb2com_buf, rx_bytes)) {
+				vTaskDelay(10 / portTICK_RATE_MS);
+			}
+		} else {
+			vTaskDelay(10 / portTICK_RATE_MS);
+		}
+	}
+}

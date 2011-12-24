@@ -87,8 +87,6 @@ static float scale(float val, float inMin, float inMax, float outMin, float outM
  */
 int32_t TxPIDInitialize(void)
 {
-	static UAVObjEvent ev;
-
 	bool txPIDEnabled;
 	uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
 
@@ -101,12 +99,16 @@ int32_t TxPIDInitialize(void)
 		txPIDEnabled = false;
 
 	if (txPIDEnabled) {
-		ev.obj = AccessoryDesiredHandle();
-		ev.instId = 0;
-		ev.event = 0;
 
-		// Initialize settings object
 		TxPIDSettingsInitialize();
+		AccessoryDesiredInitialize();
+
+		UAVObjEvent ev = {
+			.obj = AccessoryDesiredHandle(),
+			.instId = 0,
+			.event = 0,
+		};
+		EventPeriodicCallbackCreate(&ev, updatePIDs, SAMPLE_PERIOD_MS / portTICK_RATE_MS);
 
 #if (TELEMETRY_UPDATE_PERIOD_MS != 0)
 		// Change StabilizationSettings update rate from OnChange to periodic
@@ -116,15 +118,13 @@ int32_t TxPIDInitialize(void)
 		// StabilizationSettings update rate permanently. Use Metadata via
 		// browser to reset to defaults (telemetryAcked=true, OnChange).
 		UAVObjMetadata metadata;
+		StabilizationSettingsInitialize();
 		StabilizationSettingsGetMetadata(&metadata);
 		metadata.telemetryAcked = 0;
 		metadata.telemetryUpdateMode = UPDATEMODE_PERIODIC;
 		metadata.telemetryUpdatePeriod = TELEMETRY_UPDATE_PERIOD_MS;
 		StabilizationSettingsSetMetadata(&metadata);
 #endif
-
-		// Setup the callback function
-		EventPeriodicCallbackCreate(&ev, updatePIDs, SAMPLE_PERIOD_MS / portTICK_RATE_MS);
 
 		return 0;
 	}
@@ -249,6 +249,8 @@ static void updatePIDs(UAVObjEvent* ev)
 			case TXPIDSETTINGS_PIDS_YAWATTITUDEKI:
 				needsUpdate |= update(&stab.YawPI[STABILIZATIONSETTINGS_YAWPI_KI], value);
 				break;
+			default:
+				PIOS_Assert(0);
 			}
 		}
 	}

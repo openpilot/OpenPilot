@@ -259,24 +259,21 @@ static void SensorsTask(void *parameters)
  * Locally cache some variables from the AtttitudeSettings object
  */
 static void settingsUpdatedCb(UAVObjEvent * objEv) {
-	if(objEv->obj == RevoCalibrationHandle()) {
-		RevoCalibrationData cal;
-		RevoCalibrationGet(&cal);
-		
-		mag_bias[0] = cal.mag_bias[REVOCALIBRATION_MAG_BIAS_X];
-		mag_bias[1] = cal.mag_bias[REVOCALIBRATION_MAG_BIAS_Y];
-		mag_bias[2] = cal.mag_bias[REVOCALIBRATION_MAG_BIAS_Z];
-		mag_scale[0] = cal.mag_scale[REVOCALIBRATION_MAG_SCALE_X];
-		mag_scale[1] = cal.mag_scale[REVOCALIBRATION_MAG_SCALE_Y];
-		mag_scale[2] = cal.mag_scale[REVOCALIBRATION_MAG_SCALE_Z];
-		accel_bias[0] = cal.accel_bias[REVOCALIBRATION_ACCEL_BIAS_X];
-		accel_bias[1] = cal.accel_bias[REVOCALIBRATION_ACCEL_BIAS_Y];
-		accel_bias[2] = cal.accel_bias[REVOCALIBRATION_ACCEL_BIAS_Z];
-		accel_scale[0] = cal.accel_scale[REVOCALIBRATION_ACCEL_SCALE_X];
-		accel_scale[1] = cal.accel_scale[REVOCALIBRATION_ACCEL_SCALE_Y];
-		accel_scale[2] = cal.accel_scale[REVOCALIBRATION_ACCEL_SCALE_Z];
-	}
+	RevoCalibrationData cal;
+	RevoCalibrationGet(&cal);
 	
+	mag_bias[0] = cal.mag_bias[REVOCALIBRATION_MAG_BIAS_X];
+	mag_bias[1] = cal.mag_bias[REVOCALIBRATION_MAG_BIAS_Y];
+	mag_bias[2] = cal.mag_bias[REVOCALIBRATION_MAG_BIAS_Z];
+	mag_scale[0] = cal.mag_scale[REVOCALIBRATION_MAG_SCALE_X];
+	mag_scale[1] = cal.mag_scale[REVOCALIBRATION_MAG_SCALE_Y];
+	mag_scale[2] = cal.mag_scale[REVOCALIBRATION_MAG_SCALE_Z];
+	accel_bias[0] = cal.accel_bias[REVOCALIBRATION_ACCEL_BIAS_X];
+	accel_bias[1] = cal.accel_bias[REVOCALIBRATION_ACCEL_BIAS_Y];
+	accel_bias[2] = cal.accel_bias[REVOCALIBRATION_ACCEL_BIAS_Z];
+	accel_scale[0] = cal.accel_scale[REVOCALIBRATION_ACCEL_SCALE_X];
+	accel_scale[1] = cal.accel_scale[REVOCALIBRATION_ACCEL_SCALE_Y];
+	accel_scale[2] = cal.accel_scale[REVOCALIBRATION_ACCEL_SCALE_Z];
 }
 /**
   * @}

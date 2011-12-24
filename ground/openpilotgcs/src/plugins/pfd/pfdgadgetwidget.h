@@ -54,6 +54,7 @@ public:
    void setHqFonts(bool flag) { hqFonts = flag; }
    void enableSmoothUpdates(bool flag) { beSmooth = flag; }
 
+
 public slots:
    void updateAttitude(UAVObject *object1);
    void updateHeading(UAVObject *object1);
@@ -72,7 +73,7 @@ private slots:
    void moveNeedles();
    void moveVerticalScales();
    void moveSky();
-
+   void setToolTipPrivate();
 private:
    QSvgRenderer *m_renderer;
 

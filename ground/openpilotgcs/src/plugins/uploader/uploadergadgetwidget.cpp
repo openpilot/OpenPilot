@@ -25,6 +25,9 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "uploadergadgetwidget.h"
+#include "../../../../../build/ground/openpilotgcs/gcsversioninfo.h"
+#include <coreplugin/coreconstants.h>
+#include <QDebug>
 
 #define DFU_DEBUG true
 
@@ -37,11 +40,13 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
     dfu = NULL;
     m_timer = 0;
     m_progress = 0;
-
+    msg=new QErrorMessage(this);
     // Listen to autopilot connection events
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     TelemetryManager* telMngr = pm->getObject<TelemetryManager>();
     connect(telMngr, SIGNAL(connected()), this, SLOT(onAutopilotConnect()));
+    connect(telMngr, SIGNAL(connected()), this, SLOT(versionMatchCheck()));
+
     connect(telMngr, SIGNAL(disconnected()), this, SLOT(onAutopilotDisconnect()));
 
     connect(m_config->haltButton, SIGNAL(clicked()), this, SLOT(goToBootloader()));
@@ -60,7 +65,10 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
 
     // And check whether by any chance we are not already connected
     if (telMngr->isConnected())
+    {
         onAutopilotConnect();
+        versionMatchCheck();
+    }
 
 
 }
@@ -117,6 +125,11 @@ void UploaderGadgetWidget::onPhisicalHWConnect()
   Enables widget buttons if autopilot connected
   */
 void UploaderGadgetWidget::onAutopilotConnect(){
+    QTimer::singleShot(1000,this,SLOT(populate()));
+}
+
+void UploaderGadgetWidget::populate()
+{
     m_config->haltButton->setEnabled(true);
     m_config->resetButton->setEnabled(true);
     m_config->bootButton->setEnabled(false);
@@ -133,7 +146,6 @@ void UploaderGadgetWidget::onAutopilotConnect(){
     runningDeviceWidget* dw = new runningDeviceWidget(this);
     dw->populate();
     m_config->systemElements->addTab(dw, QString("Connected Device"));
-
 }
 
 /**
@@ -603,3 +615,22 @@ void UploaderGadgetWidget::info(QString infoString, int infoNumber)
     Q_UNUSED(infoNumber);
     m_config->boardStatus->setText(infoString);
 }
+
+void UploaderGadgetWidget::versionMatchCheck()
+{
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectUtilManager* utilMngr = pm->getObject<UAVObjectUtilManager>();
+    deviceDescriptorStruct boardDescription=utilMngr->getBoardDescriptionStruct();
+    QString gcsDescription=QString::fromLatin1(Core::Constants::GCS_REVISION_STR);
+    if(boardDescription.gitTag!=gcsDescription.mid(gcsDescription.indexOf(":")+1,8))
+    {
+        qDebug()<<QDate::fromString(boardDescription.buildDate.mid(0,8),"yyyyMMdd");
+        qDebug()<<QDate::fromString(gcsDescription.mid(gcsDescription.indexOf(" ")+1,8),"yyyyMMdd");
+        qDebug()<<QDate::fromString(boardDescription.buildDate.mid(0,8),"yyyyMMdd").daysTo(QDate::fromString(gcsDescription.mid(gcsDescription.indexOf(" ")+1,8),"yyyyMMdd"));
+        if(QDate::fromString(boardDescription.buildDate.mid(0,8),"yyyyMMdd").daysTo(QDate::fromString(gcsDescription.mid(gcsDescription.indexOf(" ")+1,8),"yyyyMMdd"))>0)
+            msg->showMessage(QString("Incompatible GCS and FW detected, you should upgrade your board's Firmware to %1 version.").arg(gcsDescription));
+        else
+            msg->showMessage(QString("Incompatible GCS and FW detected, you should upgrade your GCS to %1 version.").arg(boardDescription.gitTag+":"+boardDescription.buildDate));
+
+    }
+  }

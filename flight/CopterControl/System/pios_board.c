@@ -1365,7 +1365,7 @@ void PIOS_Board_Init(void) {
 #endif	/* PIOS_INCLUDE_PWM */
 		break;
 	case HWSETTINGS_CC_RCVRPORT_PPM:
-	case HWSETTINGS_CC_RCVRPORT_PPMSERVO:
+	case HWSETTINGS_CC_RCVRPORT_PPMOUTPUTS:
 #if defined(PIOS_INCLUDE_PPM)
 		{
 			uint32_t pios_ppm_id;
@@ -1401,8 +1401,8 @@ void PIOS_Board_Init(void) {
 		case HWSETTINGS_CC_RCVRPORT_PPM:
 			PIOS_Servo_Init(&pios_servo_cfg);
 			break;
-		case HWSETTINGS_CC_RCVRPORT_PPMSERVO:
-		case HWSETTINGS_CC_RCVRPORT_SERVO:
+		case HWSETTINGS_CC_RCVRPORT_PPMOUTPUTS:
+		case HWSETTINGS_CC_RCVRPORT_OUTPUTS:
 			PIOS_Servo_Init(&pios_servo_rcvr_cfg);
 			break;
 	}
@@ -1430,7 +1430,9 @@ void PIOS_Board_Init(void) {
 #endif	/* PIOS_INCLUDE_USB_HID */
 
 	PIOS_IAP_Init();
+#ifndef ERASE_FLASH
 	PIOS_WDG_Init();
+#endif
 }
 
 /**

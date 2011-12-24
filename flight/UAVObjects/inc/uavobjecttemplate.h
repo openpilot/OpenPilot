@@ -67,7 +67,7 @@
 #define $(NAME)InstUpdated(instId) UAVObjUpdated($(NAME)Handle(), instId)
 #define $(NAME)GetMetadata(dataOut) UAVObjGetMetadata($(NAME)Handle(), dataOut)
 #define $(NAME)SetMetadata(dataIn) UAVObjSetMetadata($(NAME)Handle(), dataIn)
-#define $(NAME)ReadOnly(dataIn) UAVObjReadOnly($(NAME)Handle())
+#define $(NAME)ReadOnly() UAVObjReadOnly($(NAME)Handle())
 
 // Object data
 typedef struct {

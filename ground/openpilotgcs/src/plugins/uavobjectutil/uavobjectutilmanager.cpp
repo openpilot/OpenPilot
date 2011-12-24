@@ -34,7 +34,6 @@
 #include <QDebug>
 #include <QEventLoop>
 #include <QTimer>
-#include <QErrorMessage>
 #include <objectpersistence.h>
 
 // ******************************
@@ -185,11 +184,6 @@ void UAVObjectUtilManager::objectPersistenceOperationFailed()
 
         saveState = IDLE;
         emit saveCompleted(obj->getObjID(), false);
-
-        // For now cause error message here to make sure user knows
-        QErrorMessage err;
-        err.showMessage("Saving object " + obj->getName() + " failed.  Please try again");
-        err.exec();
 
         saveNextObject();
     }

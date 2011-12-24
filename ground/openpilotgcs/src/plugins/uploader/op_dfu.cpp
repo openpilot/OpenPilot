@@ -80,24 +80,41 @@ DFUObject::DFUObject(bool _debug,bool _use_serial,QString portname):
     }
     else
     {
+        mready = false;
+        QEventLoop m_eventloop;
+        QTimer::singleShot(200,&m_eventloop, SLOT(quit()));
+        m_eventloop.exec();
         QList<USBPortInfo> devices;
         devices = USBMonitor::instance()->availableDevices(0x20a0,-1,-1,USBMonitor::Bootloader);
-        if (devices.length()==1) {
-           hidHandle.open(1,devices.first().vendorID,devices.first().productID,0,0);
+        if (devices.length()==1  && hidHandle.open(1,devices.first().vendorID,devices.first().productID,0,0)==1) {
+           qDebug()<<"OP_DFU detected first time";
+           mready=true;
         } else {
             // Wait for the board to appear on the USB bus:
-            QEventLoop m_eventloop;
-            connect(USBMonitor::instance(), SIGNAL(deviceDiscovered(USBPortInfo)),&m_eventloop, SLOT(quit()));
-            QTimer::singleShot(5000,&m_eventloop, SLOT(quit()));
-            m_eventloop.exec();
-            devices = USBMonitor::instance()->availableDevices(0x20a0,-1,-1,USBMonitor::Bootloader);
-            if (devices.length()==1) {
-               delay::msleep(2000); // Let the USB Subsystem settle (especially important on Mac!)
-               hidHandle.open(1,devices.first().vendorID,devices.first().productID,0,0);
-            }
-             else {
-                qDebug() << devices.length()  << " device(s) detected, don't know what to do!";
-                mready = false;
+            USBSignalFilter filter(0x20a0,-1,-1,USBMonitor::Bootloader);
+            connect(&filter, SIGNAL(deviceDiscovered()),&m_eventloop, SLOT(quit()));
+            for(int x=0;x<4;++x)
+            {
+                qDebug()<<"OP_DFU trying to detect bootloader:"<<x;
+
+                if(x==0)
+                    QTimer::singleShot(10000,&m_eventloop, SLOT(quit()));
+                else
+                    QTimer::singleShot(2000,&m_eventloop, SLOT(quit()));
+                m_eventloop.exec();
+                devices = USBMonitor::instance()->availableDevices(0x20a0,-1,-1,USBMonitor::Bootloader);
+                if (devices.length()==1) {
+                   if(hidHandle.open(1,devices.first().vendorID,devices.first().productID,0,0)==1)
+                    {
+                        qDebug()<<"OP_DFU detected after delay";
+                        mready=true;
+                        break;
+                    }
+                }
+                else {
+                    qDebug() << devices.length()  << " device(s) detected, don't know what to do!";
+                    mready = false;
+                }
             }
         }
 

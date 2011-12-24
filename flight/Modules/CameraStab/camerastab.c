@@ -62,8 +62,6 @@
 
 // Private variables
 
-static uint8_t camerastabEnabled = 0;
-
 // Private functions
 static void attitudeUpdated(UAVObjEvent* ev);
 static float bound(float val);
@@ -76,16 +74,18 @@ int32_t CameraStabInitialize(void)
 {
 	static UAVObjEvent ev;
 
-	HwSettingsInitialize();
+	bool cameraStabEnabled;
 	uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
-	HwSettingsOptionalModulesGet(optionalModules);
-	if (optionalModules[HWSETTINGS_OPTIONALMODULES_CAMERASTAB] == HWSETTINGS_OPTIONALMODULES_ENABLED) {
-		camerastabEnabled=1;
-	} else {
-		camerastabEnabled=0;
-	}
 
-	if (camerastabEnabled) {
+	HwSettingsInitialize();
+	HwSettingsOptionalModulesGet(optionalModules);
+
+	if (optionalModules[HWSETTINGS_OPTIONALMODULES_CAMERASTAB] == HWSETTINGS_OPTIONALMODULES_ENABLED)
+		cameraStabEnabled = true;
+	else
+		cameraStabEnabled = false;
+
+	if (cameraStabEnabled) {
 
 		AttitudeActualInitialize();
 

@@ -497,13 +497,13 @@
           <needle2MaxValue>20</needle2MaxValue>
           <needle2MinValue>-20</needle2MinValue>
           <needle2Move>Horizontal</needle2Move>
-          <needle2ObjectField>X</needle2ObjectField>
+          <needle2ObjectField>x</needle2ObjectField>
           <needle3DataObject>Accels</needle3DataObject>
           <needle3Factor>-1</needle3Factor>
           <needle3MaxValue>360</needle3MaxValue>
           <needle3MinValue>0</needle3MinValue>
           <needle3Move>Rotate</needle3Move>
-          <needle3ObjectField>X</needle3ObjectField>
+          <needle3ObjectField>x</needle3ObjectField>
           <useOpenGLFlag>false</useOpenGLFlag>
         </data>
       </Deluxe__PCT__20Turn__PCT__20Coordinator>
@@ -1006,7 +1006,7 @@
           <redMax>11</redMax>
           <redMin>-11</redMin>
           <sourceDataObject>Accels</sourceDataObject>
-          <sourceObjectField>X</sourceObjectField>
+          <sourceObjectField>x</sourceObjectField>
           <useOpenGLFlag>false</useOpenGLFlag>
           <yellowMax>-5</yellowMax>
           <yellowMin>-11</yellowMin>
@@ -1029,7 +1029,7 @@
           <redMax>11</redMax>
           <redMin>-11</redMin>
           <sourceDataObject>Accels</sourceDataObject>
-          <sourceObjectField>Y</sourceObjectField>
+          <sourceObjectField>y</sourceObjectField>
           <useOpenGLFlag>false</useOpenGLFlag>
           <yellowMax>-5</yellowMax>
           <yellowMin>-11</yellowMin>
@@ -1052,7 +1052,7 @@
           <redMax>11</redMax>
           <redMin>-11</redMin>
           <sourceDataObject>Accels</sourceDataObject>
-          <sourceObjectField>Z</sourceObjectField>
+          <sourceObjectField>z</sourceObjectField>
           <useOpenGLFlag>false</useOpenGLFlag>
           <yellowMax>-5</yellowMax>
           <yellowMin>-11</yellowMin>
@@ -1734,7 +1734,7 @@
           <dataSize>60</dataSize>
           <plotCurve0>
             <color>4294901760</color>
-            <uavField>X</uavField>
+            <uavField>x</uavField>
             <uavObject>Accels</uavObject>
             <yMaximum>0</yMaximum>
             <yMinimum>0</yMinimum>
@@ -1742,7 +1742,7 @@
           </plotCurve0>
           <plotCurve1>
             <color>4283782655</color>
-            <uavField>Y</uavField>
+            <uavField>y</uavField>
             <uavObject>Accels</uavObject>
             <yMaximum>0</yMaximum>
             <yMinimum>0</yMinimum>
@@ -1750,7 +1750,7 @@
           </plotCurve1>
           <plotCurve2>
             <color>4283804160</color>
-            <uavField>Z</uavField>
+            <uavField>z</uavField>
             <uavObject>Accels</uavObject>
             <yMaximum>0</yMaximum>
             <yMinimum>0</yMinimum>
@@ -1966,7 +1966,7 @@
           <dataSize>60</dataSize>
           <plotCurve0>
             <color>4294901760</color>
-            <uavField>X</uavField>
+            <uavField>x</uavField>
             <uavObject>Accels</uavObject>
             <yMaximum>0</yMaximum>
             <yMinimum>0</yMinimum>
@@ -1974,7 +1974,7 @@
           </plotCurve0>
           <plotCurve1>
             <color>4283782655</color>
-            <uavField>Y</uavField>
+            <uavField>y</uavField>
             <uavObject>Accels</uavObject>
             <yMaximum>0</yMaximum>
             <yMinimum>0</yMinimum>
@@ -1982,7 +1982,7 @@
           </plotCurve1>
           <plotCurve2>
             <color>4283804160</color>
-            <uavField>Z</uavField>
+            <uavField>z</uavField>
             <uavObject>Accels</uavObject>
             <yMaximum>0</yMaximum>
             <yMinimum>0</yMinimum>

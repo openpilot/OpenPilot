@@ -40,6 +40,8 @@
 #include <QMutex>
 #include <inssettings.h>
 
+class Ui_Widget;
+
 class ConfigRevoWidget: public ConfigTaskWidget
 {
     Q_OBJECT
@@ -84,32 +86,27 @@ private:
     QList<double> mag_accum_x;
     QList<double> mag_accum_y;
     QList<double> mag_accum_z;
-    quint8 algorithm;
+
+    double accel_data_x[6], accel_data_y[6], accel_data_z[6];
+    double mag_data_x[6], mag_data_y[6], mag_data_z[6];
 
     UAVObject::Metadata initialMdata;
+    int position;
 
 private slots:
-    void enableHomeLocSave(UAVObject *obj);
-    void measureNoise();
-    void noiseMeasured();
-    void saveRevoCalibration();
     void openHelp();
     void launchAccelBiasCalibration();
     void incrementProgress();
 
     virtual void refreshValues();
     //void ahrsSettingsRequest();
-    void SettingsSaveRAM();
-    void SettingsSaveSD();
+    void SettingsToRAM();
+    void SettingsToFlash();
     void savePositionData();
     void computeScaleBias();
-    void sixPointCalibrationMode();      // this function no longer exists
-    void attitudeRawUpdated(UAVObject * obj);
+    void sixPointCalibrationMode();
+    void sensorsUpdated(UAVObject * obj);
     void accelBiasattitudeRawUpdated(UAVObject*);
-    void driftCalibrationAttitudeRawUpdated(UAVObject*);
-    void launchGyroDriftCalibration();
-    void resetCalibrationDefaults();
-    void cacheCurrentCalibration();
 
 protected:
     void showEvent(QShowEvent *event);

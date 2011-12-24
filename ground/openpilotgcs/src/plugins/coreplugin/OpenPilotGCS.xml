@@ -989,29 +989,6 @@
       </default>
     </ImportExportGadget>
     <LineardialGadget>
-      <AHRS__PCT__20CPU>
-        <configInfo>
-          <locked>false</locked>
-          <version>0.0.0</version>
-        </configInfo>
-        <data>
-          <dFile>%%DATAPATH%%dials/deluxe/lineardial-vertical.svg</dFile>
-          <decimalPlaces>0</decimalPlaces>
-          <factor>1</factor>
-          <font>Andale Mono,12,-1,5,75,0,0,0,0,0</font>
-          <greenMax>50</greenMax>
-          <greenMin>0</greenMin>
-          <maxValue>100</maxValue>
-          <minValue>0</minValue>
-          <redMax>100</redMax>
-          <redMin>80</redMin>
-          <sourceDataObject>AhrsStatus</sourceDataObject>
-          <sourceObjectField>CPULoad</sourceObjectField>
-          <useOpenGLFlag>false</useOpenGLFlag>
-          <yellowMax>80</yellowMax>
-          <yellowMin>50</yellowMin>
-        </data>
-      </AHRS__PCT__20CPU>
       <Accel__PCT__20Horizontal__PCT__20X>
         <configInfo>
           <locked>false</locked>
@@ -2260,21 +2237,13 @@
           <configurationStreamVersion>1000</configurationStreamVersion>
           <dataSize>240</dataSize>
           <plotCurve0>
-            <color>4289374847</color>
-            <uavField>RunningTime</uavField>
-            <uavObject>InsStatus</uavObject>
-            <yMaximum>0</yMaximum>
-            <yMinimum>0</yMinimum>
-            <yScalePower>0</yScalePower>
-          </plotCurve0>
-          <plotCurve1>
             <color>4294945407</color>
             <uavField>FlightTime</uavField>
             <uavObject>SystemStats</uavObject>
             <yMaximum>0</yMaximum>
             <yMinimum>0</yMinimum>
             <yScalePower>0</yScalePower>
-          </plotCurve1>
+          </plotCurve0>
           <plotCurveCount>2</plotCurveCount>
           <plotType>1</plotType>
           <refreshInterval>800</refreshInterval>

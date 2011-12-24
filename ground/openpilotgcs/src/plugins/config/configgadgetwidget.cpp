@@ -36,6 +36,7 @@
 #include "configcamerastabilizationwidget.h"
 #include "config_pro_hw_widget.h"
 #include "config_cc_hw_widget.h"
+#include "configrevowidget.h"
 #include "defaultattitudewidget.h"
 #include "defaulthwsettingswidget.h"
 #include "uavobjectutilmanager.h"

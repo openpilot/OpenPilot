@@ -115,6 +115,7 @@
 		657CEEBB121DBC63007A1FBE /* WorldMagModel.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = WorldMagModel.c; sourceTree = "<group>"; };
 		657CF024121F49CD007A1FBE /* WMMInternal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WMMInternal.h; sourceTree = "<group>"; };
 		657FF86A12EA8BFB00801617 /* pios_pwm_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_pwm_priv.h; sourceTree = "<group>"; };
+		6581785414A65B9B0007885F /* pios_bl_helper.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_bl_helper.c; sourceTree = "<group>"; };
 		6589A972131DDE93006BD67C /* FreeRTOSConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FreeRTOSConfig.h; sourceTree = "<group>"; };
 		6589A983131DE24F006BD67C /* taskmonitor.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = taskmonitor.c; sourceTree = "<group>"; };
 		6589A9DB131DEE76006BD67C /* pios_rtc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_rtc.c; sourceTree = "<group>"; };
@@ -3901,6 +3902,7 @@
 				65904EC314613B6100FD9482 /* link_STM32F4xx_OP_memory.ld */,
 				65904EC414613B6100FD9482 /* link_STM32F4xx_sections.ld */,
 				65904EC514613B6100FD9482 /* pios_adc.c */,
+				6581785414A65B9B0007885F /* pios_bl_helper.c */,
 				65904EC614613B6100FD9482 /* pios_bma180.c */,
 				65904EC714613B6100FD9482 /* pios_bmp085.c */,
 				65904EC814613B6100FD9482 /* pios_debug.c */,

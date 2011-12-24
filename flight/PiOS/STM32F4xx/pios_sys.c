@@ -35,6 +35,8 @@
 
 #if defined(PIOS_INCLUDE_SYS)
 
+#define MEM8(addr)  (*((volatile uint8_t  *)(addr)))
+
 /* Private Function Prototypes */
 static void NVIC_Configuration(void);
 
@@ -222,6 +224,27 @@ int32_t PIOS_SYS_Reset(void)
 uint32_t PIOS_SYS_getCPUFlashSize(void)
 {
 	return ((uint32_t) MEM_SIZE);	// it might be possible to locate in the OTP area, but haven't looked and not documented
+}
+
+/**
+ * Returns the serial number as a string
+ * param[out] str pointer to a string which can store at least 32 digits + zero terminator!
+ * (24 digits returned for STM32)
+ * return < 0 if feature not supported
+ */
+int32_t PIOS_SYS_SerialNumberGetBinary(uint8_t *array)
+{
+	int i;
+	
+	/* Stored in the so called "electronic signature" */
+	for (i = 0; i < 12; ++i) {
+		uint8_t b = MEM8(0x1ffff7e8 + i);
+		
+		array[i] = b;
+	}
+	
+	/* No error */
+	return 0;
 }
 
 /**

@@ -32,7 +32,7 @@
 #include "pios.h"
 #if defined(PIOS_INCLUDE_BL_HELPER)
 #include <pios_board_info.h>
-#include "stm32f10x_flash.h"
+#include "stm32f4xx_flash.h"
 
 uint8_t *PIOS_BL_HELPER_FLASH_If_Read(uint32_t SectorAddress)
 {
@@ -97,6 +97,5 @@ void PIOS_BL_HELPER_FLASH_Read_Description(uint8_t * array, uint8_t size)
 
 void PIOS_BL_HELPER_CRC_Ini()
 {
-	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_CRC, ENABLE);
 }
 #endif

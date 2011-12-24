@@ -581,9 +581,9 @@ void ConfigRevoWidget::computeScaleBias()
    revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_Y] = fabs(S[1]);
    revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_Z] = fabs(S[2]);
 
-   revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_X] = sign(S[0]) * b[0];
-   revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Y] = sign(S[1]) * b[1];
-   revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Z] = sign(S[2]) * b[2];
+   revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_X] = -sign(S[0]) * b[0];
+   revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Y] = -sign(S[1]) * b[1];
+   revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Z] = -sign(S[2]) * b[2];
 
    // Calibration mag
    SixPointInConstFieldCal( 1000, mag_data_x, mag_data_y, mag_data_z, S, b);
@@ -591,9 +591,9 @@ void ConfigRevoWidget::computeScaleBias()
    revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_Y] = fabs(S[1]);
    revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_Z] = fabs(S[2]);
 
-   revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_X] = sign(S[0]) * b[0];
-   revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Y] = sign(S[1]) * b[1];
-   revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Z] = sign(S[2]) * b[2];
+   revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_X] = -sign(S[0]) * b[0];
+   revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Y] = -sign(S[1]) * b[1];
+   revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Z] = -sign(S[2]) * b[2];
 
    revoCalibration->setData(revoCalibrationData);
 

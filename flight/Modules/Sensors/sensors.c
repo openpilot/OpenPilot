@@ -54,6 +54,7 @@
 #include "gyrosbias.h"
 #include "attitudeactual.h"
 #include "attitudesettings.h"
+#include "revocalibration.h"
 #include "flightstatus.h"
 #include "CoordinateConversions.h"
 
@@ -72,17 +73,13 @@ static xTaskHandle sensorsTaskHandle;
 static void SensorsTask(void *parameters);
 static void settingsUpdatedCb(UAVObjEvent * objEv);
 
-static float gyroGain = 0.42;
-static int16_t accelbias[3];
-static float R[3][3];
-static int8_t rotate = 0;
-static bool zero_during_arming = false;
-
 // These values are initialized by settings but can be updated by the attitude algorithm
 static bool bias_correct_gyro = true;
-static float gyro_bias[3] = {0,0,0};
 
-float mag_bias[3] = {-140.0f,150.0f,0};
+static float mag_bias[3] = {0,0,0};
+static float mag_scale[3] = {0,0,0};
+static float accel_bias[3] = {0,0,0};
+static float accel_scale[3] = {0,0,0};
 
 /**
  * API for sensor fusion algorithms:
@@ -103,15 +100,10 @@ int32_t SensorsInitialize(void)
 	GyrosBiasInitialize();
 	AccelsInitialize();
 	MagnetometerInitialize();
-	AttitudeSettingsInitialize();
-	AttitudeSettingsInitialize();
-	
-	for(uint8_t i = 0; i < 3; i++)
-		for(uint8_t j = 0; j < 3; j++)
-			R[i][j] = 0;
-	
-	AttitudeSettingsConnectCallback(&settingsUpdatedCb);
-	
+	RevoCalibrationInitialize();
+
+	RevoCalibrationConnectCallback(&settingsUpdatedCb);
+
 	return 0;
 }
 
@@ -204,9 +196,9 @@ static void SensorsTask(void *parameters)
 		// Not the swaping of channel orders
 		scaling = PIOS_BMA180_GetScale();
 		AccelsData accelsData; // Skip get as we set all the fields
-		accelsData.x = (accels[0] - accelbias[0]) * scaling;
-		accelsData.y = (accels[1] - accelbias[1]) * scaling;
-		accelsData.z = (accels[2] - accelbias[2]) * scaling;
+		accelsData.x = accels[0] * scaling * accel_scale[0] - accel_bias[0];
+		accelsData.y = accels[1] * scaling * accel_scale[1] - accel_bias[1];
+		accelsData.z = accels[2] * scaling * accel_scale[2] - accel_bias[2];
 		accelsData.temperature = 25.0f + ((float) accel.temperature - 2.0f) / 2.0f;
 		AccelsSet(&accelsData);
 		
@@ -252,9 +244,9 @@ static void SensorsTask(void *parameters)
 			int16_t values[3];
 			PIOS_HMC5883_ReadMag(values);
 			MagnetometerData mag; // Skip get as we set all the fields
-			mag.x = values[1] - mag_bias[0];
-			mag.y = values[0] - mag_bias[1];
-			mag.z = -values[2] - mag_bias[2];
+			mag.x = values[1] * mag_scale[0] - mag_bias[0];
+			mag.y = values[0] * mag_scale[1] - mag_bias[1];
+			mag.z = -values[2] * mag_scale[2] - mag_bias[2];
 			MagnetometerSet(&mag);
 		}
 		
@@ -267,35 +259,24 @@ static void SensorsTask(void *parameters)
  * Locally cache some variables from the AtttitudeSettings object
  */
 static void settingsUpdatedCb(UAVObjEvent * objEv) {
-	AttitudeSettingsData attitudeSettings;
-	AttitudeSettingsGet(&attitudeSettings);
-
-	gyroGain = attitudeSettings.GyroGain;
-
-	zero_during_arming = attitudeSettings.ZeroDuringArming == ATTITUDESETTINGS_ZERODURINGARMING_TRUE;
-	bias_correct_gyro = attitudeSettings.BiasCorrectGyro == ATTITUDESETTINGS_BIASCORRECTGYRO_TRUE;
-
-	accelbias[0] = attitudeSettings.AccelBias[ATTITUDESETTINGS_ACCELBIAS_X];
-	accelbias[1] = attitudeSettings.AccelBias[ATTITUDESETTINGS_ACCELBIAS_Y];
-	accelbias[2] = attitudeSettings.AccelBias[ATTITUDESETTINGS_ACCELBIAS_Z];
-
-	// Indicates not to expend cycles on rotation
-	if(attitudeSettings.BoardRotation[0] == 0 && attitudeSettings.BoardRotation[1] == 0 &&
-	   attitudeSettings.BoardRotation[2] == 0) {
-		rotate = 0;
-
-		// Shouldn't be used but to be safe
-		float rotationQuat[4] = {1,0,0,0};
-		Quaternion2R(rotationQuat, R);
-	} else {
-		float rotationQuat[4];
-		const float rpy[3] = {attitudeSettings.BoardRotation[ATTITUDESETTINGS_BOARDROTATION_ROLL],
-			attitudeSettings.BoardRotation[ATTITUDESETTINGS_BOARDROTATION_PITCH],
-			attitudeSettings.BoardRotation[ATTITUDESETTINGS_BOARDROTATION_YAW]};
-		RPY2Quaternion(rpy, rotationQuat);
-		Quaternion2R(rotationQuat, R);
-		rotate = 1;
+	if(objEv->obj == RevoCalibrationHandle()) {
+		RevoCalibrationData cal;
+		RevoCalibrationGet(&cal);
+		
+		mag_bias[0] = cal.mag_bias[REVOCALIBRATION_MAG_BIAS_X];
+		mag_bias[1] = cal.mag_bias[REVOCALIBRATION_MAG_BIAS_Y];
+		mag_bias[2] = cal.mag_bias[REVOCALIBRATION_MAG_BIAS_Z];
+		mag_scale[0] = cal.mag_scale[REVOCALIBRATION_MAG_SCALE_X];
+		mag_scale[1] = cal.mag_scale[REVOCALIBRATION_MAG_SCALE_Y];
+		mag_scale[2] = cal.mag_scale[REVOCALIBRATION_MAG_SCALE_Z];
+		accel_bias[0] = cal.accel_bias[REVOCALIBRATION_ACCEL_BIAS_X];
+		accel_bias[1] = cal.accel_bias[REVOCALIBRATION_ACCEL_BIAS_Y];
+		accel_bias[2] = cal.accel_bias[REVOCALIBRATION_ACCEL_BIAS_Z];
+		accel_scale[0] = cal.accel_scale[REVOCALIBRATION_ACCEL_SCALE_X];
+		accel_scale[1] = cal.accel_scale[REVOCALIBRATION_ACCEL_SCALE_Y];
+		accel_scale[2] = cal.accel_scale[REVOCALIBRATION_ACCEL_SCALE_Z];
 	}
+	
 }
 /**
   * @}

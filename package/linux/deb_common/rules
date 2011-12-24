@@ -31,6 +31,7 @@ install:
 	dh_testroot
 	dh_prep
 	dh_installdirs
+	dh_installudev --priority=45
 	# Add here commands to install the package into debian/<packagename>
 	cp -arp build/ground/openpilotgcs/bin   debian/openpilot/usr/local/OpenPilot
 	cp -arp build/ground/openpilotgcs/lib   debian/openpilot/usr/local/OpenPilot
@@ -42,7 +43,6 @@ install:
 	cp -arp package/linux/rc_applications.png     debian/openpilot/usr/share/pixmaps
 	cp -arp package/linux/rc_applications.menu debian/openpilot/etc/xdg/menus/applications-merged
 	cp -arp package/linux/rc_applications.directory debian/openpilot/usr/share/desktop-directories
-	cp -arp package/linux/45-openpilot-permissions.rules debian/openpilot/etc/udev/rules.d
 ifdef $(PACKAGE_DIR)
 	cp -ar $(PACKAGE_DIR)/* debian/openpilot/usr/local/OpenPilot/firmware/
 endif

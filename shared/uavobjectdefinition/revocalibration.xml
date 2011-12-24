@@ -1,7 +1,6 @@
 <xml>
-    <object name="InsSettings" singleinstance="true" settings="true">
+    <object name="RevoCalibration" singleinstance="true" settings="true">
         <description>Settings for the INS to control the algorithm and what is updated</description>
-        <field name="Algorithm" units="" type="enum" elements="1" options="NONE,SIMPLE,CALIBRATION,INSGPS_INDOOR_NOMAG,INSGPS_INDOOR,INSGPS_OUTDOOR,SENSORRAW,ZEROGYROS" defaultvalue="INSGPS_INDOOR_NOMAG"/>
         <field name="BiasCorrectedRaw" units="" type="enum" elements="1" options="TRUE,FALSE" defaultvalue="TRUE"/>
 
 	<!-- Sensor noises -->
@@ -15,8 +14,6 @@
         <field name="mag_bias" units="mGau" type="float" elementnames="X,Y,Z" defaultvalue="0,0,0"/>
         <field name="mag_scale" units="gain" type="float" elementnames="X,Y,Z" defaultvalue="1"/>
         <field name="mag_var" units="mGau^2" type="float" elementnames="X,Y,Z" defaultvalue="50"/>
-        <field name="vel_var" units="(m/s)^2" type="float" elements="1" defaultvalue="10"/>
-        <field name="pos_var" units="m^2" type="float" elements="1" defaultvalue="0.04"/>
 
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>

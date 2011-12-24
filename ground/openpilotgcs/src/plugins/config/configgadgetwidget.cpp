@@ -77,7 +77,7 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     ftw->insertTab(ConfigGadgetWidget::output, qwd, QIcon(":/configgadget/images/Servo.png"), QString("Output"));
 
     qwd = new DefaultAttitudeWidget(this);
-    ftw->insertTab(ConfigGadgetWidget::ins, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("INS"));
+    ftw->insertTab(ConfigGadgetWidget::sensors, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("INS"));
 
     qwd = new ConfigStabilizationWidget(this);
     ftw->insertTab(ConfigGadgetWidget::stabilization, qwd, QIcon(":/configgadget/images/gyroscope.png"), QString("Stabilization"));
@@ -121,9 +121,9 @@ void ConfigGadgetWidget::resizeEvent(QResizeEvent *event)
 
 void ConfigGadgetWidget::onAutopilotDisconnect() {
     ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
-    ftw->removeTab(ConfigGadgetWidget::ins);
+    ftw->removeTab(ConfigGadgetWidget::sensors);
     QWidget *qwd = new DefaultAttitudeWidget(this);
-    ftw->insertTab(ConfigGadgetWidget::ins, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("INS"));
+    ftw->insertTab(ConfigGadgetWidget::sensors, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("INS"));
     ftw->removeTab(ConfigGadgetWidget::hardware);
     qwd = new DefaultHwSettingsWidget(this);
     ftw->insertTab(ConfigGadgetWidget::hardware, qwd, QIcon(":/configgadget/images/hw_config.png"), QString("HW Settings"));
@@ -141,30 +141,40 @@ void ConfigGadgetWidget::onAutopilotConnect() {
     UAVObjectUtilManager* utilMngr = pm->getObject<UAVObjectUtilManager>();
     if (utilMngr) {
         int board = utilMngr->getBoardModel();
-        qDebug() << "Board model: " << board;
         if ((board & 0xff00) == 1024) {
             // CopterControl family
             // Delete the INS panel, replace with CC Panel:
             ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
-            ftw->removeTab(ConfigGadgetWidget::ins);
+            ftw->removeTab(ConfigGadgetWidget::sensors);
             QWidget *qwd = new ConfigCCAttitudeWidget(this);
-            ftw->insertTab(ConfigGadgetWidget::ins, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("Attitude"));
+            ftw->insertTab(ConfigGadgetWidget::sensors, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("Attitude"));
             ftw->removeTab(ConfigGadgetWidget::hardware);
             qwd = new ConfigCCHWWidget(this);
             ftw->insertTab(ConfigGadgetWidget::hardware, qwd, QIcon(":/configgadget/images/hw_config.png"), QString("HW Settings"));
             ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
         } else if ((board & 0xff00) == 256 ) {
             // Mainboard family
-            ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
-            ftw->removeTab(ConfigGadgetWidget::ins);
             Q_ASSERT(0);
-/*            QWidget *qwd = new ConfigAHRSWidget(this);
-            ftw->insertTab(ConfigGadgetWidget::ins, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("INS"));
+            /*
+            ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
+            ftw->removeTab(ConfigGadgetWidget::sensors);
+            QWidget *qwd = new ConfigAHRSWidget(this);
+            ftw->insertTab(ConfigGadgetWidget::sensors, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("INS"));
             ftw->removeTab(ConfigGadgetWidget::hardware);
             qwd = new ConfigProHWWidget(this);
             ftw->insertTab(ConfigGadgetWidget::hardware, qwd, QIcon(":/configgadget/images/hw_config.png"), QString("HW Settings"));
             ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
             */
+        } else if ((board & 0xff00) == 0x0900) {
+            // Revolution sensor calibration
+            ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
+            ftw->removeTab(ConfigGadgetWidget::sensors);
+            QWidget *qwd = new ConfigRevoWidget(this);
+            ftw->insertTab(ConfigGadgetWidget::sensors, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("Revo"));
+            ftw->removeTab(ConfigGadgetWidget::hardware);
+            qwd = new ConfigProHWWidget(this);
+            ftw->insertTab(ConfigGadgetWidget::hardware, qwd, QIcon(":/configgadget/images/hw_config.png"), QString("HW Settings"));
+            ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
         }
     }
     emit autopilotConnected();

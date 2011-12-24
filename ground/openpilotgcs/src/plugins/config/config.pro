@@ -36,7 +36,8 @@ HEADERS += configplugin.h \
     defaulthwsettingswidget.h \
     inputchannelform.h \
     configcamerastabilizationwidget.h \
-    outputchannelform.h
+    outputchannelform.h \
+    configrevowidget.h
 SOURCES += configplugin.cpp \
     configgadgetconfiguration.cpp \
     configgadgetwidget.cpp \
@@ -65,7 +66,8 @@ SOURCES += configplugin.cpp \
     defaulthwsettingswidget.cpp \
     inputchannelform.cpp \
     configcamerastabilizationwidget.cpp \
-    outputchannelform.cpp
+    outputchannelform.cpp \
+    configrevowidget.cpp
 FORMS += airframe.ui \
     cc_hw_settings.ui \
     pro_hw_settings.ui \
@@ -78,5 +80,6 @@ FORMS += airframe.ui \
     defaulthwsettings.ui \
     inputchannelform.ui \
     camerastabilization.ui \
-    outputchannelform.ui
+    outputchannelform.ui \
+    revosensors.ui
 RESOURCES += configgadget.qrc

@@ -50,7 +50,7 @@ class ConfigGadgetWidget: public QWidget
 public:
     ConfigGadgetWidget(QWidget *parent = 0);
     ~ConfigGadgetWidget();
-    enum widgetTabs {hardware=0, aircraft, input, output, ins, stabilization, camerastabilization};
+    enum widgetTabs {hardware=0, aircraft, input, output, sensors, stabilization, camerastabilization};
 
 public slots:
     void onAutopilotConnect();

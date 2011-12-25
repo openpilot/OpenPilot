@@ -3,10 +3,10 @@
 <Menu>
   <Name>Applications</Name>
   <Menu>
-    <Name>RCApplications</Name>
-    <Directory>rc_applications.directory</Directory>
+    <Name>OpenPilot</Name>
+    <Directory>openpilot_menu.directory</Directory>
     <Include>
-        <Category>RCApplications</Category>
+        <Category>OpenPilotMenu</Category>
     </Include>
-  </Menu> <!-- End RC Applications -->
+  </Menu> <!-- End OpenPilot Menu-->
 </Menu>

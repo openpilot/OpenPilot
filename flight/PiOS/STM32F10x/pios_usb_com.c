@@ -481,7 +481,7 @@ static void PIOS_USB_COM_CDC_DATA_EP_OUT_Callback(void)
 	bool need_yield = false;
 	(usb_com_dev->rx_in_cb)(usb_com_dev->rx_in_context,
 				usb_com_dev->rx_packet_buffer,
-				sizeof(usb_com_dev->rx_packet_buffer),
+				DataLength,
 				&headroom,
 				&need_yield);
 

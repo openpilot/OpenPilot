@@ -64,6 +64,7 @@
 /* Com systems to include */
 #define PIOS_INCLUDE_COM
 #define PIOS_INCLUDE_COM_TELEM
+//#define PIOS_INCLUDE_COM_AUX
 #define PIOS_INCLUDE_GPS
 
 /* Supported receiver interfaces */

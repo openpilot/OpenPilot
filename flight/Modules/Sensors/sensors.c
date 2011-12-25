@@ -56,6 +56,8 @@
 #include "attitudesettings.h"
 #include "revocalibration.h"
 #include "flightstatus.h"
+#include "gpsposition.h"
+#include "baroaltitude.h"
 #include "CoordinateConversions.h"
 
 // Private constants
@@ -68,10 +70,13 @@
 
 // Private variables
 static xTaskHandle sensorsTaskHandle;
+static bool gps_updated = false;
+static bool baro_updated = false;
 
 // Private functions
 static void SensorsTask(void *parameters);
 static void settingsUpdatedCb(UAVObjEvent * objEv);
+static void sensorsUpdatedCb(UAVObjEvent * objEv);
 
 // These values are initialized by settings but can be updated by the attitude algorithm
 static bool bias_correct_gyro = true;
@@ -103,7 +108,6 @@ int32_t SensorsInitialize(void)
 	RevoCalibrationInitialize();
 
 	RevoCalibrationConnectCallback(&settingsUpdatedCb);
-
 	return 0;
 }
 
@@ -160,6 +164,12 @@ static void SensorsTask(void *parameters)
 			PIOS_WDG_UpdateFlag(PIOS_WDG_SENSORS);
 			vTaskDelay(10);
 		}
+	}
+	
+	// If debugging connect callback
+	if(pios_com_aux_id != 0) {
+		BaroAltitudeConnectCallback(&sensorsUpdatedCb);
+		GPSPositionConnectCallback(&sensorsUpdatedCb);
 	}
 	
 	// Main task loop
@@ -239,20 +249,78 @@ static void SensorsTask(void *parameters)
 		
 		// Because most crafts wont get enough information from gravity to zero yaw gyro, we try
 		// and make it average zero (weakly)
-		
+		MagnetometerData mag;
+		bool mag_updated = false;
 		if (PIOS_HMC5883_NewDataAvailable()) {
+			mag_updated = true;
 			int16_t values[3];
 			PIOS_HMC5883_ReadMag(values);
-			MagnetometerData mag; // Skip get as we set all the fields
 			mag.x = values[1] * mag_scale[0] - mag_bias[0];
 			mag.y = values[0] * mag_scale[1] - mag_bias[1];
 			mag.z = -values[2] * mag_scale[2] - mag_bias[2];
 			MagnetometerSet(&mag);
 		}
+
+		// For debugging purposes here we can output all of the sensors.  Do it as a single transaction
+		// so the message isn't split if anything else is writing to it
+		if(pios_com_aux_id != 0) {
+			uint32_t message_size = 3;
+			uint8_t message[200] = {0xff, (lastSysTime & 0xff00) >> 8, lastSysTime & 0x00ff};
+			
+			// Add accel data
+			memcpy(&message[message_size], &accelsData.x, sizeof(accelsData.x) * 3);
+			message_size += sizeof(accelsData.x) * 3;
+			
+			// Add gyro data with temp
+			memcpy(&message[message_size], &gyrosData, sizeof(gyrosData));
+			message_size += sizeof(gyrosData);
+			
+			if(mag_updated) { // Add mag data
+				message[message_size] = 0x01; // Indicate mag data here
+				message_size++;
+				memcpy(&message[message_size], &mag, sizeof(mag));
+				message_size += sizeof(mag);
+			}
+			
+			if(gps_updated) { // Add GPS data
+				gps_updated = false;
+				GPSPositionData gps;
+				GPSPositionGet(&gps);
+				message[message_size] = 0x02; // Indicate gps data here
+				message_size++;
+				memcpy(&message[message_size], &gps, sizeof(gps));
+				message_size += sizeof(gps);
+			}
+			
+			if(baro_updated) { // Add baro data
+				baro_updated = false;
+				BaroAltitudeData baro;
+				BaroAltitudeGet(&baro);
+				message[message_size] = 0x03; // Indicate mag data here
+				message_size++;
+				memcpy(&message[message_size], &baro, sizeof(baro));
+				message_size += sizeof(baro);
+			}
+			
+			PIOS_COM_SendBufferNonBlocking(pios_com_aux_id, message, message_size);
+
+		}
 		
 		PIOS_WDG_UpdateFlag(PIOS_WDG_SENSORS);
 		vTaskDelayUntil(&lastSysTime, 2 / portTICK_RATE_MS);
+		
 	}
+}
+
+/**
+ * Indicate that these sensors have been updated
+ */
+static void sensorsUpdatedCb(UAVObjEvent * objEv)
+{
+	if(objEv->obj == GPSPositionHandle())
+		gps_updated = true;
+	if(objEv->obj == BaroAltitudeHandle())
+		baro_updated = true;
 }
 
 /**

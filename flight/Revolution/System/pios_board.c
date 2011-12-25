@@ -460,8 +460,8 @@ static const struct pios_usart_cfg pios_usart_gps_cfg = {
  * AUX USART
  */
 static const struct pios_usart_cfg pios_usart_aux_cfg = {
-	.regs = UART4,
-	.remap = GPIO_AF_UART4,
+	.regs = USART6,
+	.remap = GPIO_AF_USART6,
 	.init = {
 		.USART_BaudRate = 230400,
 		.USART_WordLength = USART_WordLength_8b,
@@ -473,8 +473,8 @@ static const struct pios_usart_cfg pios_usart_aux_cfg = {
 	},
 	.irq = {
 		.init = {
-			.NVIC_IRQChannel = UART4_IRQn,
-			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+			.NVIC_IRQChannel = USART6_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
 			.NVIC_IRQChannelSubPriority = 0,
 			.NVIC_IRQChannelCmd = ENABLE,
 		},
@@ -482,7 +482,7 @@ static const struct pios_usart_cfg pios_usart_aux_cfg = {
 	.rx = {
 		.gpio = GPIOC,
 		.init = {
-			.GPIO_Pin = GPIO_Pin_11,
+			.GPIO_Pin   = GPIO_Pin_7,
 			.GPIO_Speed = GPIO_Speed_2MHz,
 			.GPIO_Mode  = GPIO_Mode_AF,
 			.GPIO_OType = GPIO_OType_PP,
@@ -492,7 +492,7 @@ static const struct pios_usart_cfg pios_usart_aux_cfg = {
 	.tx = {
 		.gpio = GPIOC,
 		.init = {
-			.GPIO_Pin = GPIO_Pin_10,
+			.GPIO_Pin   = GPIO_Pin_6,
 			.GPIO_Speed = GPIO_Speed_2MHz,
 			.GPIO_Mode  = GPIO_Mode_AF,
 			.GPIO_OType = GPIO_OType_PP,
@@ -1567,36 +1567,49 @@ void PIOS_Board_Init(void) {
 #endif	/* PIOS_INCLUDE_GPS */
 	
 #if defined(PIOS_INCLUDE_COM_AUX)
-	uint32_t pios_usart_aux_id;
-
-    if (PIOS_USART_Init(&pios_usart_aux_id, &pios_usart_aux_cfg)) {
-		PIOS_DEBUG_Assert(0);
+	{
+		uint32_t pios_usart_aux_id;
+		
+		if (PIOS_USART_Init(&pios_usart_aux_id, &pios_usart_aux_cfg)) {
+			PIOS_DEBUG_Assert(0);
+		}
+		
+		const uint32_t BUF_SIZE = 512;
+		uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(BUF_SIZE);
+		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(BUF_SIZE);
+		PIOS_Assert(rx_buffer);
+		PIOS_Assert(tx_buffer);
+		
+		if (PIOS_COM_Init(&pios_com_aux_id, &pios_usart_com_driver, pios_usart_aux_id,
+						  rx_buffer, BUF_SIZE,
+						  tx_buffer, BUF_SIZE)) {
+			PIOS_DEBUG_Assert(0);
+		}
 	}
-	if (PIOS_COM_Init(&pios_com_aux_id, &pios_usart_com_driver, pios_usart_aux_id,
-					  pios_com_aux_rx_buffer, sizeof(pios_com_aux_rx_buffer),
-					  pios_com_aux_tx_buffer, sizeof(pios_com_aux_tx_buffer))) {
-		PIOS_DEBUG_Assert(0);
-	}
-#endif
+#else
+	pios_com_aux_id = 0;
+#endif  /* PIOS_INCLUDE_COM_AUX */
 
 #if defined(PIOS_INCLUDE_COM_TELEM)
-{ /* Eventually add switch for this port function */
-	uint32_t pios_usart_telem_rf_id;
-	if (PIOS_USART_Init(&pios_usart_telem_rf_id, &pios_usart_telem_main_cfg)) {
-		PIOS_Assert(0);
+	{ /* Eventually add switch for this port function */
+		uint32_t pios_usart_telem_rf_id;
+		if (PIOS_USART_Init(&pios_usart_telem_rf_id, &pios_usart_telem_main_cfg)) {
+			PIOS_Assert(0);
+		}
+		
+		uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_RX_BUF_LEN);
+		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_TX_BUF_LEN);
+		PIOS_Assert(rx_buffer);
+		PIOS_Assert(tx_buffer);
+		if (PIOS_COM_Init(&pios_com_telem_rf_id, &pios_usart_com_driver, pios_usart_telem_rf_id,
+						  rx_buffer, PIOS_COM_TELEM_RF_RX_BUF_LEN,
+						  tx_buffer, PIOS_COM_TELEM_RF_TX_BUF_LEN)) {
+			PIOS_Assert(0);
+		}
 	}
-	
-	uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_RX_BUF_LEN);
-	uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_TX_BUF_LEN);
-	PIOS_Assert(rx_buffer);
-	PIOS_Assert(tx_buffer);
-	if (PIOS_COM_Init(&pios_com_telem_rf_id, &pios_usart_com_driver, pios_usart_telem_rf_id,
-					  rx_buffer, PIOS_COM_TELEM_RF_RX_BUF_LEN,
-					  tx_buffer, PIOS_COM_TELEM_RF_TX_BUF_LEN)) {
-		PIOS_Assert(0);
-	}
-}
-#endif	/* PIOS_INCLUDE_COM_AUX */
+#else
+	pios_com_telem_rf_id = 0;
+#endif	/* PIOS_INCLUDE_COM_TELEM */
 
 #endif	/* PIOS_INCLUDE_COM */
 	

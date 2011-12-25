@@ -266,7 +266,7 @@ static void PIOS_USB_COM_HID_RxStart(uint32_t usbcom_id, uint16_t rx_bytes_avail
 	// If endpoint was stalled and there is now space make it valid
 	PIOS_IRQ_Disable();
 	if ((GetEPRxStatus(usb_com_dev->cfg->data_rx_ep) != EP_RX_VALID) && 
-	    (rx_bytes_avail > PIOS_USB_COM_DATA_LENGTH)) {
+	    (rx_bytes_avail >= PIOS_USB_COM_DATA_LENGTH)) {
 		SetEPRxStatus(usb_com_dev->cfg->data_rx_ep, EP_RX_VALID);
 	}
 	PIOS_IRQ_Enable();
@@ -355,7 +355,7 @@ static void PIOS_USB_COM_HID_EP_OUT_Callback(void)
 				&headroom,
 				&need_yield);
 #endif
-	if (headroom > PIOS_USB_COM_DATA_LENGTH) {
+	if (headroom >= PIOS_USB_COM_DATA_LENGTH) {
 		/* We have room for a maximum length message */
 		SetEPRxStatus(usb_com_dev->cfg->data_rx_ep, EP_RX_VALID);
 	} else {
@@ -385,7 +385,7 @@ static void PIOS_USB_COM_CDC_RxStart(uint32_t usbcom_id, uint16_t rx_bytes_avail
 	// If endpoint was stalled and there is now space make it valid
 	PIOS_IRQ_Disable();
 	if ((GetEPRxStatus(usb_com_dev->cfg->data_rx_ep) != EP_RX_VALID) && 
-		(rx_bytes_avail > sizeof(usb_com_dev->rx_packet_buffer))) {
+		(rx_bytes_avail >= sizeof(usb_com_dev->rx_packet_buffer))) {
 		SetEPRxStatus(usb_com_dev->cfg->data_rx_ep, EP_RX_VALID);
 	}
 	PIOS_IRQ_Enable();
@@ -485,7 +485,7 @@ static void PIOS_USB_COM_CDC_DATA_EP_OUT_Callback(void)
 				&headroom,
 				&need_yield);
 
-	if (headroom > sizeof(usb_com_dev->rx_packet_buffer)) {
+	if (headroom >= sizeof(usb_com_dev->rx_packet_buffer)) {
 		/* We have room for a maximum length message */
 		SetEPRxStatus(usb_com_dev->cfg->data_rx_ep, EP_RX_VALID);
 	} else {

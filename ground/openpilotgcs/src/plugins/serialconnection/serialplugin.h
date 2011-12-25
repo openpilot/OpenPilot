@@ -33,6 +33,8 @@
 #include <qextserialenumerator.h>
 #include "coreplugin/iconnection.h"
 #include <extensionsystem/iplugin.h>
+#include "serialpluginconfiguration.h"
+#include "serialpluginoptionspage.h"
 #include <QThread>
 
 class IConnection;
@@ -87,12 +89,16 @@ public:
     virtual void resumePolling();
 
     bool deviceOpened() {return m_deviceOpened;}
+    SerialPluginConfiguration * Config() const { return m_config; }
+    SerialPluginOptionsPage * Optionspage() const { return m_optionspage; }
 
 
 private:
     QextSerialPort*  serialHandle;
     bool enablePolling;
-
+    SerialPluginConfiguration *m_config;
+    SerialPluginOptionsPage *m_optionspage;
+    BaudRateType stringToBaud(QString str);
 
 protected slots:
     void onEnumerationChanged();
@@ -116,6 +122,8 @@ public:
 
     virtual bool initialize(const QStringList &arguments, QString *error_message);
     virtual void extensionsInitialized();
+private:
+    SerialConnection *m_connection;
 };
 
 

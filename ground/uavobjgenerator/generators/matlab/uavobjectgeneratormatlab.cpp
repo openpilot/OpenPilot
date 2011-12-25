@@ -129,7 +129,7 @@ bool UAVObjectGeneratorMatlab::process_object(ObjectInfo* info)
     matlabSwitchCode.append("\t\t\t" + objectTableName + "(" + tableIdxName +") = " + functionCall + ";\n");
     matlabSwitchCode.append("\t\t\t" + tableIdxName + " = " + tableIdxName +" + 1;\n");
     matlabSwitchCode.append("\t\t\tif " + tableIdxName + " > length(" + objectTableName +")\n");
-    matlabSwitchCode.append("\t\t\t\t" + objectTableName + "(" + tableIdxName + "+100+1) = " + objectTableName +"(end);\n");
+    matlabSwitchCode.append("\t\t\t\t" + objectTableName + "(" + tableIdxName + "*2+1) = " + objectTableName +"(end);\n");
     matlabSwitchCode.append("\t\t\t\t" + objectTableName +"(end)=[];\n");
     matlabSwitchCode.append("\t\t\tend\n");
 	

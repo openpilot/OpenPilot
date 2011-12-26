@@ -490,7 +490,7 @@ static void PIOS_USB_COM_CDC_DATA_EP_OUT_Callback(void)
 		SetEPRxStatus(usb_com_dev->cfg->data_rx_ep, EP_RX_VALID);
 	} else {
 		/* Not enough room left for a message, apply backpressure */
-		SetEPRxStatus(usb_com_dev->cfg->data_rx_ep, EP_RX_STALL);
+		SetEPRxStatus(usb_com_dev->cfg->data_rx_ep, EP_RX_NAK);
 	}
 
 #if defined(PIOS_INCLUDE_FREERTOS)

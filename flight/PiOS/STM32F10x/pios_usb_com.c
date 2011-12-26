@@ -81,6 +81,8 @@ struct pios_usb_com_dev {
 
 	uint8_t rx_packet_buffer[PIOS_USB_COM_DATA_LENGTH + 2];
 	uint8_t tx_packet_buffer[PIOS_USB_COM_DATA_LENGTH + 2];
+
+	uint32_t rx_dropped;
 };
 
 static bool PIOS_USB_COM_validate(struct pios_usb_com_dev * usb_com_dev)
@@ -479,11 +481,17 @@ static void PIOS_USB_COM_CDC_DATA_EP_OUT_Callback(void)
 
 	uint16_t headroom;
 	bool need_yield = false;
-	(usb_com_dev->rx_in_cb)(usb_com_dev->rx_in_context,
+	uint16_t rc;
+	rc = (usb_com_dev->rx_in_cb)(usb_com_dev->rx_in_context,
 				usb_com_dev->rx_packet_buffer,
 				DataLength,
 				&headroom,
 				&need_yield);
+
+	if (rc < DataLength) {
+		/* Lost bytes on rx */
+		usb_com_dev->rx_dropped += (DataLength - rc);
+	}
 
 	if (headroom >= sizeof(usb_com_dev->rx_packet_buffer)) {
 		/* We have room for a maximum length message */

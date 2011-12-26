@@ -59,7 +59,7 @@ static float GravityAccel(float latitude, float longitude, float altitude);
 // ****************
 // Private constants
 
-#define GPS_TIMEOUT_MS                  500
+#define GPS_TIMEOUT_MS                  1500
 #define NMEA_MAX_PACKET_LENGTH          96 // 82 max NMEA msg size plus 12 margin (because some vendors add custom crap) plus CR plus Linefeed
 // same as in COM buffer
 

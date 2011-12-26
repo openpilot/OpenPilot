@@ -197,8 +197,8 @@ namespace gdhe {
 			
 			void setBackgroundColor(ColorRGB &_color) 
 				{ backgroundColor = _color; }
-			void setBackgroundColor(unsigned char _R, unsigned char _G, unsigned char _B) 
-				{ backgroundColor.R = _R; backgroundColor.G = _G; backgroundColor.B = _B; }
+			void setBackgroundColor(unsigned char R_, unsigned char G_, unsigned char B_) 
+				{ backgroundColor.R = R_; backgroundColor.G = G_; backgroundColor.B = B_; }
 			
 			void addObject(Object *object, bool visible = true);
 			void addSubObject(Object *object, Object *parent, std::string suffix, bool visible = true);
@@ -267,9 +267,9 @@ namespace gdhe {
 			Object(double _x, double _y, double _z, double _yaw, double _pitch, double _roll): 
 				poseModified(true), attributesModified(true), label(NULL), ownId(false), id(0), ids(""), client(NULL) 
 				{ setPose(_x,_y,_z,_yaw,_pitch,_roll); }
-			Object(double _x, double _y, double _z, double _yaw, double _pitch, double _roll, unsigned char _R, unsigned char _G, unsigned char _B): 
+			Object(double _x, double _y, double _z, double _yaw, double _pitch, double _roll, unsigned char R_, unsigned char G_, unsigned char B_): 
 				poseModified(true), attributesModified(true), label(NULL), ownId(false), id(0), ids(""), client(NULL) 
-				{ setPose(_x,_y,_z,_yaw,_pitch,_roll); setColor(_R,_G,_B); }
+				{ setPose(_x,_y,_z,_yaw,_pitch,_roll); setColor(R_,G_,B_); }
 			virtual ~Object();
 
 			virtual const std::string construct_string() const = 0;
@@ -336,12 +336,12 @@ namespace gdhe {
 			
 			void setColor(ColorRGB &_color) 
 				{ color = _color; touch(); }
-			void setColor(unsigned char _R, unsigned char _G, unsigned char _B) 
-				{ color.R = _R; color.G = _G; color.B = _B; touch(); }
+			void setColor(unsigned char R_, unsigned char G_, unsigned char B_) 
+				{ color.R = R_; color.G = G_; color.B = B_; touch(); }
 			
 			void setLabel(std::string text);
 			void setLabelColor(ColorRGB &_color);
-			void setLabelColor(unsigned char _R, unsigned char _G, unsigned char _B);
+			void setLabelColor(unsigned char R_, unsigned char G_, unsigned char B_);
 			void setLabelShift(double x_, double y_, double z_);
 			
 			friend class Client;

@@ -60,8 +60,8 @@ namespace gdhe {
 	}
 	void Object::setLabelColor(ColorRGB &_color)
 		{ if (!label) createLabel(); label->setColor(_color); }
-	void Object::setLabelColor(unsigned char _R, unsigned char _G, unsigned char _B)
-		{ if (!label) createLabel(); label->setColor(_R,_G,_B); }
+	void Object::setLabelColor(unsigned char R_, unsigned char G_, unsigned char B_)
+		{ if (!label) createLabel(); label->setColor(R_,G_,B_); }
 	void Object::setLabelShift(double x_, double y_, double z_)
 		{ if (!label) createLabel(); label->setShift(x_,y_,z_); }
 	

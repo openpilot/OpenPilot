@@ -527,6 +527,13 @@ RESULT PIOS_CDC_SetControlLineState(void)
 	return USB_SUCCESS;
 }
 
+static uint8_t line_coding[] = {
+	0x00, 0xE1, 0x00, 0x00, /* 57600bps */
+	0x00,			/* 1 stop bit */
+	0x00,			/* Even parity */
+	0x08,			/* 8 data bits */
+};
+
 RESULT PIOS_CDC_SetLineCoding(void)
 {
 	struct pios_usb_com_dev * usb_com_dev = (struct pios_usb_com_dev *)pios_usb_com_cdc_id;
@@ -544,7 +551,12 @@ uint8_t *PIOS_CDC_GetLineCoding(uint16_t Length)
 	bool valid = PIOS_USB_COM_validate(usb_com_dev);
 	PIOS_Assert(valid);
 
-	return NULL;
+	if (Length == 0) {
+		pInformation->Ctrl_Info.Usb_wLength = sizeof(line_coding);
+		return NULL;
+	} else {
+		return (line_coding);
+	}
 }
 
 static uint8_t serial_state[] = {

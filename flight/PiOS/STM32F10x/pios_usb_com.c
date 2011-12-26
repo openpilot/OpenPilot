@@ -83,6 +83,7 @@ struct pios_usb_com_dev {
 	uint8_t tx_packet_buffer[PIOS_USB_COM_DATA_LENGTH + 2];
 
 	uint32_t rx_dropped;
+	uint32_t rx_oversize;
 };
 
 static bool PIOS_USB_COM_validate(struct pios_usb_com_dev * usb_com_dev)
@@ -465,6 +466,7 @@ static void PIOS_USB_COM_CDC_DATA_EP_OUT_Callback(void)
 	/* Get the number of received data on the selected Endpoint */
 	DataLength = GetEPRxCount(usb_com_dev->cfg->data_rx_ep);
 	if (DataLength > sizeof(usb_com_dev->rx_packet_buffer)) {
+		usb_com_dev->rx_oversize++;
 		DataLength = sizeof(usb_com_dev->rx_packet_buffer);
 	}
 

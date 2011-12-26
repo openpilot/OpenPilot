@@ -285,7 +285,7 @@ int32_t PIOS_COM_SendBufferNonBlocking(uint32_t com_id, const uint8_t *buffer, u
 
 	PIOS_Assert(com_dev->has_tx);
 
-	if (len >= fifoBuf_getFree(&com_dev->tx)) {
+	if (len > fifoBuf_getFree(&com_dev->tx)) {
 		/* Buffer cannot accept all requested bytes (retry) */
 		return -2;
 	}

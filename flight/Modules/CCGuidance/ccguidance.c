@@ -50,6 +50,7 @@
 #include "homelocation.h"
 #include "stabilizationdesired.h"
 #include "systemsettings.h"
+#include "attitudeactual.h"
 
 // Private constants
 #define MAX_QUEUE_SIZE 1
@@ -121,6 +122,7 @@ static void ccguidanceTask(UAVObjEvent * ev)
 	float dT;
 
 	float courseError;
+	AttitudeActualData attitudeActual;
 
 	CCGuidanceSettingsGet(&ccguidanceSettings);
 
@@ -166,6 +168,12 @@ static void ccguidanceTask(UAVObjEvent * ev)
 			positionDesired.East = homeLocation.Longitude;
 			positionDesired.Down = homeLocation.Altitude + ccguidanceSettings.ReturnTobaseAltitudeOffset ;
 			PositionDesiredSet(&positionDesired);
+			
+			//
+			AttitudeActualGet(&attitudeActual);
+			attitudeActual.Yaw = 23;
+			AttitudeActualSet(&attitudeActual);
+			//
 		}
 
 		/* safety */

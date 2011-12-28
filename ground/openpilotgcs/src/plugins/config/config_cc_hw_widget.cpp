@@ -44,6 +44,8 @@ ConfigCCHWWidget::ConfigCCHWWidget(QWidget *parent) : ConfigTaskWidget(parent)
     addUAVObjectToWidgetRelation("HwSettings","CC_FlexiPort",m_telemetry->cbFlexi);
     addUAVObjectToWidgetRelation("HwSettings","CC_MainPort",m_telemetry->cbTele);
     addUAVObjectToWidgetRelation("HwSettings","CC_RcvrPort",m_telemetry->cbRcvr);
+    addUAVObjectToWidgetRelation("HwSettings","USB_HIDPort",m_telemetry->cbUsbHid);
+    addUAVObjectToWidgetRelation("HwSettings","USB_VCPPort",m_telemetry->cbUsbVcp);
     addUAVObjectToWidgetRelation("HwSettings","TelemetrySpeed",m_telemetry->telemetrySpeed);
     addUAVObjectToWidgetRelation("HwSettings","GPSSpeed",m_telemetry->gpsSpeed);
     addUAVObjectToWidgetRelation("HwSettings","ComUsbBridgeSpeed",m_telemetry->comUsbBridgeSpeed);
@@ -73,6 +75,11 @@ void ConfigCCHWWidget::widgetsContentsChanged()
     {
         enableControls(false);
         m_telemetry->problems->setText(tr("Warning: you have configured both MainPort and FlexiPort for the same function, this currently is not supported"));
+    }
+    else if ((m_telemetry->cbUsbHid->currentIndex() == HwSettings::USB_HIDPORT_USBTELEMETRY) && (m_telemetry->cbUsbVcp->currentIndex() == HwSettings::USB_VCPPORT_USBTELEMETRY))
+    {
+        enableControls(false);
+        m_telemetry->problems->setText(tr("Warning: you have configured both USB HID Port and USB VCP Port for the same function, this currently is not supported"));
     }
     else
     {

@@ -188,6 +188,7 @@ static void SensorsTask(void *parameters)
 		gyro_samples = 0;
 		
 		// Make sure we get one sample
+#if !defined(PIOS_MPU6000_ACCEL)
 		count = 0;
 		while((read_good = PIOS_BMA180_ReadFifo(&accel)) != 0);
 		while(read_good == 0) {	
@@ -199,20 +200,13 @@ static void SensorsTask(void *parameters)
 			
 			read_good = PIOS_BMA180_ReadFifo(&accel);
 		}
-		accel_samples = count;
-		
-		float accels[3] = {(float) accel_accum[1] / accel_samples, (float) accel_accum[0] / accel_samples, -(float) accel_accum[2] / accel_samples};
-		
-		// Not the swaping of channel orders
-		scaling = PIOS_BMA180_GetScale();
-		AccelsData accelsData; // Skip get as we set all the fields
-		accelsData.x = accels[0] * scaling * accel_scale[0] - accel_bias[0];
-		accelsData.y = accels[1] * scaling * accel_scale[1] - accel_bias[1];
-		accelsData.z = accels[2] * scaling * accel_scale[2] - accel_bias[2];
-		accelsData.temperature = 25.0f + ((float) accel.temperature - 2.0f) / 2.0f;
-		AccelsSet(&accelsData);
-		
-		
+		accel_samples = count;		
+#endif
+
+#if defined(PIOS_MPU6000_ACCEL)
+		accel_accum[0] = accel_accum[1] = accel_accum[2] = 0;
+#endif
+
 		// Make sure we get one sample
 		count = 0;
 		while((read_good = PIOS_MPU6000_ReadFifo(&gyro)) != 0);
@@ -223,12 +217,34 @@ static void SensorsTask(void *parameters)
 			gyro_accum[1] += gyro.gyro_y;
 			gyro_accum[2] += gyro.gyro_z;
 			
+#if defined(PIOS_MPU6000_ACCEL)
+			accel_accum[0] += gyro.accel_x;
+			accel_accum[1] += gyro.accel_y;
+			accel_accum[2] += gyro.accel_z;
+			accel_samples = count;
+#endif
+
 			read_good = PIOS_MPU6000_ReadFifo(&gyro);
 		}
 		gyro_samples = count;
-		
+
+		float accels[3] = {(float) accel_accum[1] / accel_samples, (float) accel_accum[0] / accel_samples, -(float) accel_accum[2] / accel_samples};
+
+		// Not the swaping of channel orders
+#if defined(PIOS_MPU6000_ACCEL)
+		scaling = PIOS_MPU6000_GetAccelScale();
+#else
+		scaling = PIOS_BMA180_GetScale();
+#endif
+		AccelsData accelsData; // Skip get as we set all the fields
+		accelsData.x = accels[0] * scaling * accel_scale[0] - accel_bias[0];
+		accelsData.y = accels[1] * scaling * accel_scale[1] - accel_bias[1];
+		accelsData.z = accels[2] * scaling * accel_scale[2] - accel_bias[2];
+		accelsData.temperature = 25.0f + ((float) accel.temperature - 2.0f) / 2.0f;
+		AccelsSet(&accelsData);
+
 		float gyros[3] = {(float) gyro_accum[1] / gyro_samples, (float) gyro_accum[0] / gyro_samples, -(float) gyro_accum[2] / gyro_samples};
-		
+
 		scaling = PIOS_MPU6000_GetScale();
 		GyrosData gyrosData; // Skip get as we set all the fields
 		gyrosData.x = gyros[0] * scaling;

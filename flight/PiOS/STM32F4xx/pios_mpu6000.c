@@ -51,6 +51,8 @@ volatile bool mpu6000_configured = false;
 
 static struct pios_mpu6000_cfg const * cfg;
 
+#define GRAV 9.81f
+
 /**
  * @brief Initialize the MPU6050 3-axis gyro sensor.
  * @return none
@@ -86,6 +88,10 @@ void PIOS_MPU6000_Init(const struct pios_mpu6000_cfg * new_cfg)
 */
 static void PIOS_MPU6000_Config(struct pios_mpu6000_cfg const * cfg)
 {
+	// Reset chip
+	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_PWR_MGMT_REG, 0x80) != 0);
+	PIOS_DELAY_WaitmS(100);
+	
 	// Reset chip and fifo
 	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_USER_CTRL_REG, 0x01 | 0x02 | 0x04) != 0);
 	// Wait for reset to finish
@@ -101,7 +107,14 @@ static void PIOS_MPU6000_Config(struct pios_mpu6000_cfg const * cfg)
 	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_INT_EN_REG, cfg->interrupt_en) != 0) ;
 
 	// FIFO storage
+#if defined(PIOS_MPU6000_ACCEL)
+	// Set the accel to 8g mode
+	while(PIOS_MPU6000_SetReg(PIOS_MPU6000_ACCEL_CFG_REG, 0x10) != 0);
+	
+	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_FIFO_EN_REG, cfg->Fifo_store | PIOS_MPU6000_ACCEL_OUT) != 0);
+#else
 	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_FIFO_EN_REG, cfg->Fifo_store) != 0);
+#endif
 	
 	// Sample rate divider
 	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_SMPLRT_DIV_REG, cfg->Smpl_rate_div) != 0) ;
@@ -277,6 +290,12 @@ float PIOS_MPU6000_GetScale()
 	}
 	return 0;
 }
+
+float PIOS_MPU6000_GetAccelScale()
+{
+	return GRAV / 2048.0f;
+}
+
 /**
  * @brief Run self-test operation.
  * \return 0 if test succeeded
@@ -391,11 +410,21 @@ void PIOS_MPU6000_IRQHandler(void)
 
 	}
 	
+#if defined(PIOS_MPU6000_ACCEL)
+	data.accel_x = mpu6000_rec_buf[1] << 8 | mpu6000_rec_buf[2];
+	data.accel_y = mpu6000_rec_buf[3] << 8 | mpu6000_rec_buf[4];
+	data.accel_z = mpu6000_rec_buf[5] << 8 | mpu6000_rec_buf[6];
+	data.temperature = mpu6000_rec_buf[7] << 8 | mpu6000_rec_buf[8];
+	data.gyro_x  = mpu6000_rec_buf[9] << 8  | mpu6000_rec_buf[10];
+	data.gyro_y  = mpu6000_rec_buf[11] << 8 | mpu6000_rec_buf[12];
+	data.gyro_z  = mpu6000_rec_buf[13] << 8 | mpu6000_rec_buf[14];
+#else
 	data.temperature = mpu6000_rec_buf[1] << 8 | mpu6000_rec_buf[2];
 	data.gyro_x = mpu6000_rec_buf[3] << 8 | mpu6000_rec_buf[4];
 	data.gyro_y = mpu6000_rec_buf[5] << 8 | mpu6000_rec_buf[6];
 	data.gyro_z = mpu6000_rec_buf[7] << 8 | mpu6000_rec_buf[8];
-	
+#endif
+
 	fifoBuf_putData(&pios_mpu6000_fifo, (uint8_t *) &data, sizeof(data));	
 	mpu6000_irq++;
 	

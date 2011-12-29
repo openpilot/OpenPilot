@@ -70,7 +70,7 @@
 #define PIOS_MPU6000_FIFO_GYRO_X_OUT      0x40
 #define PIOS_MPU6000_FIFO_GYRO_Y_OUT      0x20
 #define PIOS_MPU6000_FIFO_GYRO_Z_OUT      0x10
-#define PIOS_MPU6000_ACCEL_OUT            0x04
+#define PIOS_MPU6000_ACCEL_OUT            0x08
 
 /* Interrupt Configuration */
 #define PIOS_MPU6000_INT_ACTL             0x80
@@ -120,9 +120,11 @@ struct pios_mpu6000_data {
 	int16_t gyro_x;
 	int16_t gyro_y;
 	int16_t gyro_z;
-/*	int16_t accel_x;
+#if defined(PIOS_MPU6000_ACCEL)
+	int16_t accel_x;
 	int16_t accel_y;
-	int16_t accel_z; */
+	int16_t accel_z;
+#endif /* PIOS_MPU6000_ACCEL */
 	int16_t temperature;
 };
 
@@ -149,6 +151,7 @@ extern int32_t PIOS_MPU6000_ReadGyros(struct pios_mpu6000_data * buffer);
 extern int32_t PIOS_MPU6000_ReadID();
 extern uint8_t PIOS_MPU6000_Test();
 extern float PIOS_MPU6000_GetScale();
+extern float PIOS_MPU6000_GetAccelScale();
 
 #endif /* PIOS_MPU6000_H */
 

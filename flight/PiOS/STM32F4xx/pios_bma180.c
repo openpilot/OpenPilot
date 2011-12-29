@@ -49,7 +49,8 @@ static t_fifo_buffer pios_bma180_fifo;
 static const struct pios_bma180_cfg * dev_cfg;
 static enum bma180_range range;
 
-#define GRAV 9.81
+#define GRAV 9.81f
+
 /**
  * @brief Initialize with good default settings
  */
@@ -285,19 +286,19 @@ float PIOS_BMA180_GetScale()
 {
 	switch (range) {
 		case BMA_RANGE_1G:
-			return GRAV / 8192.0;
+			return GRAV / 8192.0f;
 		case BMA_RANGE_1_5G:
-			return GRAV / 5460.0;
+			return GRAV / 5460.0f;
 		case BMA_RANGE_2G:
-			return GRAV / 4096.0;
+			return GRAV / 4096.0f;
 		case BMA_RANGE_3G:
-			return GRAV / 2730.0;
+			return GRAV / 2730.0f;
 		case BMA_RANGE_4G:
-			return GRAV / 2048.0;
+			return GRAV / 2048.0f;
 		case BMA_RANGE_8G:
-			return GRAV / 1024.0;
+			return GRAV / 1024.0f;
 		case BMA_RANGE_16G:
-			return GRAV / 512.0;
+			return GRAV / 512.0f;
 	}
 	return 0;
 }

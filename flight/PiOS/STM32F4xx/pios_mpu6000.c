@@ -62,8 +62,9 @@ void PIOS_MPU6000_Init(const struct pios_mpu6000_cfg * new_cfg)
 	fifoBuf_init(&pios_mpu6000_fifo, (uint8_t *) pios_mpu6000_buffer, sizeof(pios_mpu6000_buffer));
 
 	/* Configure the MPU6050 Sensor */
+	PIOS_SPI_SetPrescalar(pios_spi_gyro, SPI_BaudRatePrescaler_256);
 	PIOS_MPU6000_Config(cfg);
-	PIOS_MPU6000_Config(cfg);
+	PIOS_SPI_SetPrescalar(pios_spi_gyro, SPI_BaudRatePrescaler_8);
 
 	/* Configure EOC pin as input floating */
 	GPIO_Init(cfg->drdy.gpio, &cfg->drdy.init);

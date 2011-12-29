@@ -582,6 +582,17 @@ int32_t PIOS_SPI_Busy(uint32_t spi_id)
 	return(0);
 }
 
+void PIOS_SPI_SetPrescalar(uint32_t spi_id, uint32_t prescaler)
+{
+	struct pios_spi_dev * spi_dev = (struct pios_spi_dev *)spi_id;
+	
+	bool valid = PIOS_SPI_validate(spi_dev);
+	PIOS_Assert(valid);
+	PIOS_Assert(IS_SPI_BAUDRATE_PRESCALER(prescaler));
+	
+	spi_dev->cfg->regs->CR1 = (spi_dev->cfg->regs->CR1 & ~0x0038) | prescaler;
+}
+
 
 void PIOS_SPI_IRQ_Handler(uint32_t spi_id)
 {

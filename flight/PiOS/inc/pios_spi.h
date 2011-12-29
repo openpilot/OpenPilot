@@ -56,6 +56,7 @@ extern int32_t PIOS_SPI_Busy(uint32_t spi_id);
 extern int32_t PIOS_SPI_ClaimBus(uint32_t spi_id);
 extern int32_t PIOS_SPI_ReleaseBus(uint32_t spi_id);
 extern void    PIOS_SPI_IRQ_Handler(uint32_t spi_id);
+extern void    PIOS_SPI_SetPrescalar(uint32_t spi_id, uint32_t prescalar);
 
 #endif /* PIOS_SPI_H */
 

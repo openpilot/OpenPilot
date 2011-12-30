@@ -63,8 +63,8 @@
 // Private variables
 static struct CameraStab_data {
 	portTickType lastSysTime;
-	float inputs[CAMERASTABSETTINGS_INPUTS_NUMELEM];
-	float inputs_filtered[CAMERASTABSETTINGS_INPUTS_NUMELEM];
+	float inputs[CAMERASTABSETTINGS_INPUT_NUMELEM];
+	float inputs_filtered[CAMERASTABSETTINGS_INPUT_NUMELEM];
 } *csd;
 
 // Private functions
@@ -142,9 +142,9 @@ static void attitudeUpdated(UAVObjEvent* ev)
 	csd->lastSysTime = thisSysTime;
 
 	// Read any input channels and apply LPF
-	for (uint8_t i = 0; i < CAMERASTABSETTINGS_INPUTS_NUMELEM; i++) {
-		if (cameraStab.Inputs[i] != CAMERASTABSETTINGS_INPUTS_NONE) {
-			if (AccessoryDesiredInstGet(cameraStab.Inputs[i] - CAMERASTABSETTINGS_INPUTS_ACCESSORY0, &accessory) == 0) {
+	for (uint8_t i = 0; i < CAMERASTABSETTINGS_INPUT_NUMELEM; i++) {
+		if (cameraStab.Input[i] != CAMERASTABSETTINGS_INPUT_NONE) {
+			if (AccessoryDesiredInstGet(cameraStab.Input[i] - CAMERASTABSETTINGS_INPUT_ACCESSORY0, &accessory) == 0) {
 				float input_rate;
 				switch (cameraStab.StabilizationMode[i]) {
 				case CAMERASTABSETTINGS_STABILIZATIONMODE_ATTITUDE:
@@ -175,15 +175,15 @@ static void attitudeUpdated(UAVObjEvent* ev)
 	float output;
 
 	AttitudeActualRollGet(&attitude);
-	output = bound((attitude + csd->inputs_filtered[CAMERASTABSETTINGS_INPUTS_ROLL]) / cameraStab.OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_ROLL], 1.0f);
+	output = bound((attitude + csd->inputs_filtered[CAMERASTABSETTINGS_INPUT_ROLL]) / cameraStab.OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_ROLL], 1.0f);
 	CameraDesiredRollSet(&output);
 
 	AttitudeActualPitchGet(&attitude);
-	output = bound((attitude + csd->inputs_filtered[CAMERASTABSETTINGS_INPUTS_PITCH]) / cameraStab.OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_PITCH], 1.0f);
+	output = bound((attitude + csd->inputs_filtered[CAMERASTABSETTINGS_INPUT_PITCH]) / cameraStab.OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_PITCH], 1.0f);
 	CameraDesiredPitchSet(&output);
 
 	AttitudeActualYawGet(&attitude);
-	output = bound((attitude + csd->inputs_filtered[CAMERASTABSETTINGS_INPUTS_YAW]) / cameraStab.OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_YAW], 1.0f);
+	output = bound((attitude + csd->inputs_filtered[CAMERASTABSETTINGS_INPUT_YAW]) / cameraStab.OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_YAW], 1.0f);
 	CameraDesiredYawSet(&output);
 }
 

@@ -75,11 +75,11 @@ ConfigCameraStabilizationWidget::ConfigCameraStabilizationWidget(QWidget *parent
 
         UAVObjectField *field;
 
-        field = cameraStab->getField("Inputs");
+        field = cameraStab->getField("Input");
         Q_ASSERT(field);
         inputs[i]->clear();
         inputs[i]->addItems(field->getOptions());
-        inputs[i]->setCurrentIndex(cameraStabData.Inputs[i]);
+        inputs[i]->setCurrentIndex(cameraStabData.Input[i]);
 
         field = cameraStab->getField("StabilizationMode");
         Q_ASSERT(field);
@@ -193,9 +193,9 @@ void ConfigCameraStabilizationWidget::applySettings()
     cameraStabData.OutputRange[CameraStabSettings::OUTPUTRANGE_PITCH] = m_camerastabilization->pitchOutputRange->value();
     cameraStabData.OutputRange[CameraStabSettings::OUTPUTRANGE_YAW] = m_camerastabilization->yawOutputRange->value();
 
-    cameraStabData.Inputs[CameraStabSettings::INPUTS_ROLL] = m_camerastabilization->rollInputChannel->currentIndex();
-    cameraStabData.Inputs[CameraStabSettings::INPUTS_PITCH] = m_camerastabilization->pitchInputChannel->currentIndex();
-    cameraStabData.Inputs[CameraStabSettings::INPUTS_YAW] = m_camerastabilization->yawInputChannel->currentIndex();
+    cameraStabData.Input[CameraStabSettings::INPUT_ROLL] = m_camerastabilization->rollInputChannel->currentIndex();
+    cameraStabData.Input[CameraStabSettings::INPUT_PITCH] = m_camerastabilization->pitchInputChannel->currentIndex();
+    cameraStabData.Input[CameraStabSettings::INPUT_YAW] = m_camerastabilization->yawInputChannel->currentIndex();
 
     cameraStabData.StabilizationMode[CameraStabSettings::STABILIZATIONMODE_ROLL] = m_camerastabilization->rollStabilizationMode->currentIndex();
     cameraStabData.StabilizationMode[CameraStabSettings::STABILIZATIONMODE_PITCH] = m_camerastabilization->pitchStabilizationMode->currentIndex();
@@ -255,9 +255,9 @@ void ConfigCameraStabilizationWidget::refreshValues()
     m_camerastabilization->pitchOutputRange->setValue(cameraStab.OutputRange[CameraStabSettings::OUTPUTRANGE_PITCH]);
     m_camerastabilization->yawOutputRange->setValue(cameraStab.OutputRange[CameraStabSettings::OUTPUTRANGE_YAW]);
 
-    m_camerastabilization->rollInputChannel->setCurrentIndex(cameraStab.Inputs[CameraStabSettings::INPUTS_ROLL]);
-    m_camerastabilization->pitchInputChannel->setCurrentIndex(cameraStab.Inputs[CameraStabSettings::INPUTS_PITCH]);
-    m_camerastabilization->yawInputChannel->setCurrentIndex(cameraStab.Inputs[CameraStabSettings::INPUTS_YAW]);
+    m_camerastabilization->rollInputChannel->setCurrentIndex(cameraStab.Input[CameraStabSettings::INPUT_ROLL]);
+    m_camerastabilization->pitchInputChannel->setCurrentIndex(cameraStab.Input[CameraStabSettings::INPUT_PITCH]);
+    m_camerastabilization->yawInputChannel->setCurrentIndex(cameraStab.Input[CameraStabSettings::INPUT_YAW]);
 
     m_camerastabilization->rollStabilizationMode->setCurrentIndex(cameraStab.StabilizationMode[CameraStabSettings::STABILIZATIONMODE_ROLL]);
     m_camerastabilization->pitchStabilizationMode->setCurrentIndex(cameraStab.StabilizationMode[CameraStabSettings::STABILIZATIONMODE_PITCH]);

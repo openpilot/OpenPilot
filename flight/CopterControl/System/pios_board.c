@@ -1124,11 +1124,6 @@ void PIOS_Board_Init(void) {
 	uint8_t hwsettings_usb_hidport;
 	HwSettingsUSB_HIDPortGet(&hwsettings_usb_hidport);
 
-	/* Make sure we have at least one telemetry link over USB */
-	if (hwsettings_usb_vcpport != HWSETTINGS_USB_VCPPORT_USBTELEMETRY) {
-		hwsettings_usb_hidport = HWSETTINGS_USB_HIDPORT_USBTELEMETRY;
-	}
-
 	switch (hwsettings_usb_hidport) {
 	case HWSETTINGS_USB_HIDPORT_DISABLED:
 		break;

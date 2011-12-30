@@ -81,6 +81,11 @@ void ConfigCCHWWidget::widgetsContentsChanged()
         enableControls(false);
         m_telemetry->problems->setText(tr("Warning: you have configured both USB HID Port and USB VCP Port for the same function, this currently is not supported"));
     }
+    else if ((m_telemetry->cbUsbHid->currentIndex() != HwSettings::USB_HIDPORT_USBTELEMETRY) && (m_telemetry->cbUsbVcp->currentIndex() != HwSettings::USB_VCPPORT_USBTELEMETRY))
+    {
+        enableControls(false);
+        m_telemetry->problems->setText(tr("Warning: you have disabled USB Telemetry on both USB HID Port and USB VCP Port, this currently is not supported"));
+    }
     else
     {
         m_telemetry->problems->setText("");

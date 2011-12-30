@@ -435,6 +435,10 @@ ifeq ($(DIAGNOSTICS),YES)
 CFLAGS = -DDIAGNOSTICS
 endif
 
+ifeq ($(DIAG_TASKS),YES)
+CFLAGS = -DDIAG_TASKS
+endif
+
 CFLAGS += -g$(DEBUGF)
 CFLAGS += -O$(OPT)
 CFLAGS += -mcpu=$(MCU)

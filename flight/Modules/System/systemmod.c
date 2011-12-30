@@ -115,8 +115,10 @@ int32_t SystemModInitialize(void)
 	SystemStatsInitialize();
 	FlightStatusInitialize();
 	ObjectPersistenceInitialize();
-#if defined(DIAGNOSTICS)
+#if defined(DIAG_TASKS)
 	TaskInfoInitialize();
+#endif
+#if defined(DIAGNOSTICS)
 	I2CStatsInitialize();
 	WatchdogStatusInitialize();
 #endif

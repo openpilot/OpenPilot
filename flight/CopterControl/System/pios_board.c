@@ -1052,14 +1052,31 @@ void PIOS_Board_Init(void) {
 	UAVObjInitialize();
 
 	HwSettingsInitialize();
-	
-#if defined(PIOS_INCLUDE_RTC)
-	/* Initialize the real-time clock and its associated tick */
-	PIOS_RTC_Init(&pios_rtc_main_cfg);
+
+#ifndef ERASE_FLASH
+	/* Initialize watchdog as early as possible to catch faults during init */
+	PIOS_WDG_Init();
 #endif
 
 	/* Initialize the alarms library */
 	AlarmsInitialize();
+
+	/* Check for repeated boot failures */
+	PIOS_IAP_Init();
+	uint16_t boot_count = PIOS_IAP_ReadBootCount();
+	if (boot_count < 3) {
+		PIOS_IAP_WriteBootCount(++boot_count);
+		AlarmsClear(SYSTEMALARMS_ALARM_BOOTFAULT);
+	} else {
+		/* Too many failed boot attempts, force hwsettings to defaults */
+		HwSettingsSetDefaults(HwSettingsHandle(), 0);
+		AlarmsSet(SYSTEMALARMS_ALARM_BOOTFAULT, SYSTEMALARMS_ALARM_CRITICAL);
+	}
+
+#if defined(PIOS_INCLUDE_RTC)
+	/* Initialize the real-time clock and its associated tick */
+	PIOS_RTC_Init(&pios_rtc_main_cfg);
+#endif
 
 	/* Initialize the task monitor library */
 	TaskMonitorInitialize();
@@ -1450,7 +1467,7 @@ void PIOS_Board_Init(void) {
 	pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_GCS] = pios_gcsrcvr_rcvr_id;
 #endif	/* PIOS_INCLUDE_GCSRCVR */
 
-	/* Remap AFIO pin */
+	/* Remap AFIO pin for PB4 (Servo 5 Out)*/
 	GPIO_PinRemapConfig( GPIO_Remap_SWJ_NoJTRST, ENABLE);
 
 #ifndef PIOS_DEBUG_ENABLE_DEBUG_PINS
@@ -1471,10 +1488,6 @@ void PIOS_Board_Init(void) {
 	
 	PIOS_ADC_Init();
 	PIOS_GPIO_Init();
-	PIOS_IAP_Init();
-#ifndef ERASE_FLASH
-	PIOS_WDG_Init();
-#endif
 }
 
 /**

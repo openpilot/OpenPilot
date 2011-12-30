@@ -20,17 +20,6 @@
 #define IAP_MAGIC_WORD_1	0x1122
 #define IAP_MAGIC_WORD_2	0xAA55
 
-#define IAP_REQLOC_1		BKP_DR1
-#define IAP_CRCLOC_LOW		BKP_DR2
-#define IAP_CRCLOC_UPPER	BKP_DR3
-#define IAP_PORTLOC			BKP_DR4
-#define IAP_REQLOC_2		BKP_RR5
-
-#define IAP_UPLOAD_REQ_1	0x20AA
-#define	IAP_UPLOAD_REQ_2	0x2055
-#define IAP_DNLOAD_REQ_1	0x30AA
-#define IAP_DNLOAD_REQ_2	0x3055
-
 #define UPPERWORD16(lw)	(uint16_t)((uint32_t)(lw)>>16)
 #define LOWERWORD16(lw)	(uint16_t)((uint32_t)(lw)&0x0000ffff)
 #define UPPERBYTE(w)	(uint8_t)((w)>>8)
@@ -120,4 +109,14 @@ void	PIOS_IAP_ClearRequest(void)
 {
 	BKP_WriteBackupRegister( MAGIC_REG_1, 0);
 	BKP_WriteBackupRegister( MAGIC_REG_2, 0);
+}
+
+uint16_t PIOS_IAP_ReadBootCount(void)
+{
+	return BKP_ReadBackupRegister ( IAP_BOOTCOUNT );
+}
+
+void PIOS_IAP_WriteBootCount (uint16_t boot_count)
+{
+	BKP_WriteBackupRegister ( IAP_BOOTCOUNT, boot_count );
 }

@@ -352,7 +352,7 @@ int32_t PIOS_COM_SendBuffer(uint32_t com_id, const uint8_t *buffer, uint16_t len
 								fifoBuf_getUsed(&com_dev->tx));
 				}
 #if defined(PIOS_INCLUDE_FREERTOS)
-				if (xSemaphoreTake(com_dev->tx_sem, portMAX_DELAY) != pdTRUE) {
+				if (xSemaphoreTake(com_dev->tx_sem, 5000) != pdTRUE) {
 					return -3;
 				}
 #endif

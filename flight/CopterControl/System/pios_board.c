@@ -780,12 +780,12 @@ static const struct pios_sbus_cfg pios_sbus_cfg = {
 
 #include "pios_com_priv.h"
 
-#define PIOS_COM_TELEM_RF_RX_BUF_LEN 96
+#define PIOS_COM_TELEM_RF_RX_BUF_LEN 32
 #define PIOS_COM_TELEM_RF_TX_BUF_LEN 12
 
 #define PIOS_COM_GPS_RX_BUF_LEN 32
 
-#define PIOS_COM_TELEM_USB_RX_BUF_LEN 96
+#define PIOS_COM_TELEM_USB_RX_BUF_LEN 65
 #define PIOS_COM_TELEM_USB_TX_BUF_LEN 65
 
 #define PIOS_COM_BRIDGE_RX_BUF_LEN 65
@@ -1023,9 +1023,9 @@ const struct pios_usb_com_cfg pios_usb_com_cdc_cfg = {
 
 uint32_t pios_com_telem_rf_id;
 uint32_t pios_com_telem_usb_id;
-uint32_t pios_com_vcp_id = 0;
+uint32_t pios_com_vcp_id;
 uint32_t pios_com_gps_id;
-uint32_t pios_com_bridge_id = 0;
+uint32_t pios_com_bridge_id;
 
 /**
  * PIOS_Board_Init()

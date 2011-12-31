@@ -65,12 +65,12 @@ endif
 FLASH_TOOL = OPENOCD
 
 # List of modules to include
-OPTMODULES = CameraStab
+OPTMODULES = CameraStab ComUsbBridge
 ifeq ($(USE_GPS), YES)
 OPTMODULES += GPS
 endif
 
-MODULES = Attitude Stabilization Actuator ManualControl FirmwareIAP ComUsbBridge
+MODULES = Attitude Stabilization Actuator ManualControl FirmwareIAP
 # Telemetry must be last to grab the optional modules (why?)
 MODULES += Telemetry
 

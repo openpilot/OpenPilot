@@ -1488,6 +1488,9 @@ void PIOS_Board_Init(void) {
 	
 	PIOS_ADC_Init();
 	PIOS_GPIO_Init();
+
+	/* Make sure we have at least one telemetry link configured or else fail initialization */
+	PIOS_Assert(pios_com_telem_rf_id || pios_com_telem_usb_id);
 }
 
 /**

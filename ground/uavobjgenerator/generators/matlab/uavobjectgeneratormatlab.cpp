@@ -50,7 +50,8 @@ bool UAVObjectGeneratorMatlab::generate(UAVObjectParser* parser,QString template
     }
 
     matlabCodeTemplate.replace( QString("$(ALLOCATIONCODE)"), matlabAllocationCode);
-    matlabCodeTemplate.replace( QString("$(SWITCHCODE)"), matlabSwithCode);
+    matlabCodeTemplate.replace( QString("$(SWITCHCODE)"), matlabSwitchCode);
+    matlabCodeTemplate.replace( QString("$(CLEANUPCODE)"), matlabCleanupCode);
     matlabCodeTemplate.replace( QString("$(SAVEOBJECTSCODE)"), matlabSaveObjectsCode);
     matlabCodeTemplate.replace( QString("$(FUNCTIONSCODE)"), matlabFunctionsCode);
 
@@ -71,6 +72,7 @@ bool UAVObjectGeneratorMatlab::process_object(ObjectInfo* info)
     if (info == NULL)
         return false;
 
+	//Declare variables
     QString objectName(info->name);
     // QString objectTableName(objectName + "Objects");
     QString objectTableName(objectName);
@@ -80,39 +82,84 @@ bool UAVObjectGeneratorMatlab::process_object(ObjectInfo* info)
     QString objectID(QString().setNum(info->id));
     QString isSingleInst = boolTo01String( info->isSingleInst );
 
-    // Generate allocation code (will replace the $(ALLOCATIONCODE) tag)
-    matlabAllocationCode.append("\n    " + tableIdxName + " = 1;\n");
-    matlabAllocationCode.append("    " + objectTableName + ".timestamp = 0;\n");
-    QString type;
-    QString allocfields;
-    for (int n = 0; n < info->fields.length(); ++n) {
-        // Determine type
-        type = fieldTypeStrMatlab[info->fields[n]->type];
-        // Append field
-        if ( info->fields[n]->numElements > 1 )
-            allocfields.append("    " + objectTableName + "(1)." + info->fields[n]->name + " = zeros(1," + QString::number(info->fields[n]->numElements, 10) + ");\n");
-        else
-            allocfields.append("    " + objectTableName + "(1)." + info->fields[n]->name + " = 0;\n");
-    }
+	
+	//===================================================================//
+    // Generate allocation code (will replace the $(ALLOCATIONCODE) tag) //
+	//===================================================================//
+	//    matlabSwitchCode.append("\t\tcase " + objectID + "\n");
+    matlabAllocationCode.append("\n\t" + tableIdxName + " = 1;\n");
+	QString type;
+	QString allocfields;
+	if (0){
+		matlabAllocationCode.append("\t" + objectTableName + ".timestamp = 0;\n");
+		for (int n = 0; n < info->fields.length(); ++n) {
+			// Determine type
+			type = fieldTypeStrMatlab[info->fields[n]->type];
+			// Append field
+			if ( info->fields[n]->numElements > 1 )
+				allocfields.append("\t" + objectTableName + "(1)." + info->fields[n]->name + " = zeros(1," + QString::number(info->fields[n]->numElements, 10) + ");\n");
+			else
+				allocfields.append("\t" + objectTableName + "(1)." + info->fields[n]->name + " = 0;\n");
+		}
+	}
+	else{
+		matlabAllocationCode.append("\t" + objectTableName + "=struct('timestamp', 0");
+		if (!info->isSingleInst) {
+			allocfields.append(",...\n\t\t 'instanceID', 0");
+		}
+		for (int n = 0; n < info->fields.length(); ++n) {
+			// Determine type
+			type = fieldTypeStrMatlab[info->fields[n]->type];
+			// Append field
+			if ( info->fields[n]->numElements > 1 )
+				allocfields.append(",...\n\t\t '" + info->fields[n]->name + "', zeros(1," + QString::number(info->fields[n]->numElements, 10) + ")");
+			else
+				allocfields.append(",...\n\t\t '" + info->fields[n]->name + "', 0");
+		}
+		allocfields.append(");\n");
+	}
     matlabAllocationCode.append(allocfields);
+	matlabAllocationCode.append("\t" + objectTableName.toUpper() + "_OBJID=" + objectID + ";\n");
 
-    // Generate 'swith:' code (will replace the $(SWITCHCODE) tag)
-    matlabSwithCode.append("            case " + objectID + "\n");
-    matlabSwithCode.append("                " + objectTableName + "(" + tableIdxName +") = " + functionCall + ";\n");
-    matlabSwithCode.append("                " + tableIdxName + " = " + tableIdxName +" + 1;\n");
 
-    // Generate objects saving code code (will replace the $(SAVEOBJECTSCODE) tag)
+	//=============================================================//
+    // Generate 'Switch:' code (will replace the $(SWITCHCODE) tag) //
+	//=============================================================//
+    matlabSwitchCode.append("\t\tcase " + objectTableName.toUpper() + "_OBJID\n");
+    matlabSwitchCode.append("\t\t\t" + objectTableName + "(" + tableIdxName +") = " + functionCall + ";\n");
+    matlabSwitchCode.append("\t\t\t" + tableIdxName + " = " + tableIdxName +" + 1;\n");
+    matlabSwitchCode.append("\t\t\tif " + tableIdxName + " > length(" + objectTableName +")\n");
+    matlabSwitchCode.append("\t\t\t\t" + objectTableName + "(" + tableIdxName + "*2+1) = " + objectTableName +"(end);\n");
+    matlabSwitchCode.append("\t\t\t\t" + objectTableName +"(end)=[];\n");
+    matlabSwitchCode.append("\t\t\tend\n");
+	
+	
+	//=============================================================//
+    // Generate 'Cleanup:' code (will replace the $(CLEANUP) tag) //
+	//=============================================================//
+    matlabCleanupCode.append(objectTableName + "(" + tableIdxName +":end) = [];\n");
+	
+	
+	//=============================================================================//
+    // Generate objects saving code code (will replace the $(SAVEOBJECTSCODE) tag) //
+	//=============================================================================//
     matlabSaveObjectsCode.append(",'"+objectTableName+"'");
 
-    // Generate functions code (will replace the $(FUNCTIONSCODE) tag)
+    matlabFunctionsCode.append("%%\n% " + objectName + " read function\n");
+
+	
+	//=================================================================//
+    // Generate functions code (will replace the $(FUNCTIONSCODE) tag) //
+	//=================================================================//
+	//Generate function description comment
     matlabFunctionsCode.append("function [" + objectName + "] = " + functionCall + "\n");
-    matlabFunctionsCode.append("    if " + isSingleInst + "\n");
-    matlabFunctionsCode.append("        headerSize = 8;\n");
-    matlabFunctionsCode.append("    else\n");
-    matlabFunctionsCode.append("        " + objectName + ".instanceID = fread(fid, 1, 'uint16');\n");
-    matlabFunctionsCode.append("        headerSize = 10;\n");
-    matlabFunctionsCode.append("    end\n\n");
-    matlabFunctionsCode.append("    " + objectName + ".timestamp = timestamp;\n");
+    matlabFunctionsCode.append("\t" + objectName + ".timestamp = timestamp;\n");
+    matlabFunctionsCode.append("\tif " + isSingleInst + "\n");
+    matlabFunctionsCode.append("\t\theaderSize = 8;\n");
+    matlabFunctionsCode.append("\telse\n");
+    matlabFunctionsCode.append("\t\t" + objectName + ".instanceID = fread(fid, 1, 'uint16');\n");
+    matlabFunctionsCode.append("\t\theaderSize = 10;\n");
+    matlabFunctionsCode.append("\tend\n\n");
 
     // Generate functions code, actual fields of the object
     QString funcfields;
@@ -122,16 +169,16 @@ bool UAVObjectGeneratorMatlab::process_object(ObjectInfo* info)
         type = fieldTypeStrMatlab[info->fields[n]->type];
         // Append field
         if ( info->fields[n]->numElements > 1 )
-            funcfields.append("    " + objectName + "." + info->fields[n]->name + " = double(fread(fid, " + QString::number(info->fields[n]->numElements, 10) + ", '" + type + "'));\n");
+            funcfields.append("\t" + objectName + "." + info->fields[n]->name + " = double(fread(fid, " + QString::number(info->fields[n]->numElements, 10) + ", '" + type + "'));\n");
         else
-            funcfields.append("    " + objectName + "." + info->fields[n]->name + " = double(fread(fid, 1, '" + type + "'));\n");
+            funcfields.append("\t" + objectName + "." + info->fields[n]->name + " = double(fread(fid, 1, '" + type + "'));\n");
     }
     matlabFunctionsCode.append(funcfields);
 
-    matlabFunctionsCode.append("    % read CRC\n");
-    matlabFunctionsCode.append("    fread(fid, 1, 'uint8');\n");
+    matlabFunctionsCode.append("\t% read CRC\n");
+    matlabFunctionsCode.append("\tfread(fid, 1, 'uint8');\n");
 
-    matlabFunctionsCode.append("end\n\n");
+    matlabFunctionsCode.append("\n\n");
 
     return true;
 }

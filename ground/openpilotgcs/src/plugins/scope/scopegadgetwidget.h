@@ -62,35 +62,6 @@ private:
 //    double baseTime;
 };
 
-/*!
-  \brief This class is used to inject UAVTalk messages for testing.
-  */
-class TestDataGen : QObject
-{
-    Q_OBJECT
-
-public:
-
-    TestDataGen();
-    ~TestDataGen();
-
-private:
-    BaroAltitude* baroAltitude;
-    PositionActual* gps;
-    AttitudeRaw* attRaw;
-    ManualControlCommand* manCtrlCmd;
-
-    QTimer *timer;
-    double testTime;
-    int periodMs;
-
-    int debugCounter;
-
-private slots:
-    void genTestData();
-};
-
-
 class ScopeGadgetWidget : public QwtPlot
 {
     Q_OBJECT
@@ -110,7 +81,7 @@ public:
     int refreshInterval(){return m_refreshInterval;}
 
 
-    void addCurvePlot(QString uavObject, QString uavFieldSubField, int scaleOrderFactor = 0, QPen pen = QPen(Qt::black));
+    void addCurvePlot(QString uavObject, QString uavFieldSubField, int scaleOrderFactor = 0, int interpolationSamples = 1, QPen pen = QPen(Qt::black));
     //void removeCurvePlot(QString uavObject, QString uavField);
     void clearCurvePlots();
     int csvLoggingStart();
@@ -148,8 +119,6 @@ private:
     QList<QString> m_connectedUAVObjects;
     QMap<QString, PlotData*> m_curvesData;
 
-    static TestDataGen* testDataGen;    
-
     QTimer *replotTimer;
 
     bool m_csvLoggingStarted;
@@ -166,11 +135,13 @@ private:
 
     QString m_csvLoggingName;
     QString m_csvLoggingPath;
+    QString m_csvLoggingBuffer;
     QFile m_csvLoggingFile;
 
 	QMutex mutex;
 
     int csvLoggingInsertHeader();
+    int csvLoggingAddData();
     int csvLoggingInsertData();
 
 	void deleteLegend();

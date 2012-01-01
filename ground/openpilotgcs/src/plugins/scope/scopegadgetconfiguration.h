@@ -41,6 +41,7 @@ struct PlotCurveConfiguration
     QString uavField;
     int yScalePower; //This is the power to which each value must be raised
     QRgb color;
+    int yInterpolationSamples;
     double yMinimum;
     double yMaximum;
 };

@@ -492,18 +492,18 @@
           <needle1MinValue>0</needle1MinValue>
           <needle1Move>Rotate</needle1Move>
           <needle1ObjectField>Roll</needle1ObjectField>
-          <needle2DataObject>AttitudeRaw</needle2DataObject>
+          <needle2DataObject>Accels</needle2DataObject>
           <needle2Factor>1</needle2Factor>
           <needle2MaxValue>20</needle2MaxValue>
           <needle2MinValue>-20</needle2MinValue>
           <needle2Move>Horizontal</needle2Move>
-          <needle2ObjectField>accels-X</needle2ObjectField>
-          <needle3DataObject>AttitudeRaw</needle3DataObject>
+          <needle2ObjectField>x</needle2ObjectField>
+          <needle3DataObject>Accels</needle3DataObject>
           <needle3Factor>-1</needle3Factor>
           <needle3MaxValue>360</needle3MaxValue>
           <needle3MinValue>0</needle3MinValue>
           <needle3Move>Rotate</needle3Move>
-          <needle3ObjectField>accels-X</needle3ObjectField>
+          <needle3ObjectField>x</needle3ObjectField>
           <useOpenGLFlag>false</useOpenGLFlag>
         </data>
       </Deluxe__PCT__20Turn__PCT__20Coordinator>
@@ -995,7 +995,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <dFile>%%DATAPATH%%dials/default/lineardial-horizontal.svg</dFile>
+          <dFile>%%DATAPATH%%dials/deluxe/lineardial-horizontal.svg</dFile>
           <decimalPlaces>2</decimalPlaces>
           <factor>1</factor>
           <font>Andale Mono,8,-1,5,50,0,0,0,0,0</font>
@@ -1005,8 +1005,8 @@
           <minValue>-11</minValue>
           <redMax>11</redMax>
           <redMin>-11</redMin>
-          <sourceDataObject>AttitudeRaw</sourceDataObject>
-          <sourceObjectField>accels-X</sourceObjectField>
+          <sourceDataObject>Accels</sourceDataObject>
+          <sourceObjectField>x</sourceObjectField>
           <useOpenGLFlag>false</useOpenGLFlag>
           <yellowMax>-5</yellowMax>
           <yellowMin>-11</yellowMin>
@@ -1018,7 +1018,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <dFile>%%DATAPATH%%dials/default/lineardial-horizontal.svg</dFile>
+          <dFile>%%DATAPATH%%dials/deluxe/lineardial-horizontal.svg</dFile>
           <decimalPlaces>2</decimalPlaces>
           <factor>1</factor>
           <font>Andale Mono,6,-1,5,50,0,0,0,0,0</font>
@@ -1028,8 +1028,8 @@
           <minValue>-11</minValue>
           <redMax>11</redMax>
           <redMin>-11</redMin>
-          <sourceDataObject>AttitudeRaw</sourceDataObject>
-          <sourceObjectField>accels-Y</sourceObjectField>
+          <sourceDataObject>Accels</sourceDataObject>
+          <sourceObjectField>y</sourceObjectField>
           <useOpenGLFlag>false</useOpenGLFlag>
           <yellowMax>-5</yellowMax>
           <yellowMin>-11</yellowMin>
@@ -1041,7 +1041,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <dFile>%%DATAPATH%%dials/default/lineardial-horizontal.svg</dFile>
+          <dFile>%%DATAPATH%%dials/deluxe/lineardial-horizontal.svg</dFile>
           <decimalPlaces>2</decimalPlaces>
           <factor>1</factor>
           <font>Andale Mono,8,-1,5,50,0,0,0,0,0</font>
@@ -1051,8 +1051,8 @@
           <minValue>-11</minValue>
           <redMax>11</redMax>
           <redMin>-11</redMin>
-          <sourceDataObject>AttitudeRaw</sourceDataObject>
-          <sourceObjectField>accels-Z</sourceObjectField>
+          <sourceDataObject>Accels</sourceDataObject>
+          <sourceObjectField>z</sourceObjectField>
           <useOpenGLFlag>false</useOpenGLFlag>
           <yellowMax>-5</yellowMax>
           <yellowMin>-11</yellowMin>
@@ -1179,7 +1179,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <dFile>%%DATAPATH%%dials/default/lineardial-vertical.svg</dFile>
+          <dFile>%%DATAPATH%%dials/deluxe/lineardial-vertical.svg</dFile>
           <decimalPlaces>0</decimalPlaces>
           <factor>1</factor>
           <font>Andale Mono,12,-1,5,75,0,0,0,0,0</font>
@@ -1202,7 +1202,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <dFile>%%DATAPATH%%dials/default/lineardial-vertical.svg</dFile>
+          <dFile>%%DATAPATH%%dials/deluxe/lineardial-vertical.svg</dFile>
           <decimalPlaces>2</decimalPlaces>
           <factor>1</factor>
           <font>Andale Mono,12,-1,5,75,0,0,0,0,0</font>
@@ -1225,7 +1225,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <dFile>%%DATAPATH%%dials/default/lineardial-vertical.svg</dFile>
+          <dFile>%%DATAPATH%%dials/deluxe/lineardial-vertical.svg</dFile>
           <decimalPlaces>2</decimalPlaces>
           <factor>1</factor>
           <font>Andale Mono,12,-1,5,75,0,0,0,0,0</font>
@@ -1248,7 +1248,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <dFile>%%DATAPATH%%dials/default/lineardial-vertical.svg</dFile>
+          <dFile>%%DATAPATH%%dials/deluxe/lineardial-vertical.svg</dFile>
           <decimalPlaces>2</decimalPlaces>
           <factor>1</factor>
           <font>Andale Mono,12,-1,5,75,0,0,0,0,0</font>
@@ -1271,7 +1271,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <dFile>%%DATAPATH%%dials/default/lineardial-vertical.svg</dFile>
+          <dFile>%%DATAPATH%%dials/deluxe/lineardial-vertical.svg</dFile>
           <decimalPlaces>2</decimalPlaces>
           <factor>1</factor>
           <font>Andale Mono,12,-1,5,75,0,0,0,0,0</font>
@@ -1294,7 +1294,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <dFile>%%DATAPATH%%dials/default/lineardial-vertical.svg</dFile>
+          <dFile>%%DATAPATH%%dials/deluxe/lineardial-vertical.svg</dFile>
           <decimalPlaces>2</decimalPlaces>
           <factor>1</factor>
           <font>Andale Mono,12,-1,5,75,0,0,0,0,0</font>
@@ -1317,7 +1317,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <dFile>%%DATAPATH%%dials/default/lineardial-horizontal.svg</dFile>
+          <dFile>%%DATAPATH%%dials/deluxe/lineardial-horizontal.svg</dFile>
           <decimalPlaces>0</decimalPlaces>
           <factor>1</factor>
           <font>Andale Mono,12,-1,5,75,0,0,0,0,0</font>
@@ -1340,7 +1340,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <dFile>%%DATAPATH%%dials/default/lineardial-horizontal.svg</dFile>
+          <dFile>%%DATAPATH%%dials/deluxe/lineardial-horizontal.svg</dFile>
           <decimalPlaces>0</decimalPlaces>
           <factor>1</factor>
           <font>Andale Mono,12,-1,5,75,0,0,0,0,0</font>
@@ -1363,7 +1363,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <dFile>%%DATAPATH%%dials/default/lineardial-vertical.svg</dFile>
+          <dFile>%%DATAPATH%%dials/deluxe/lineardial-vertical.svg</dFile>
           <decimalPlaces>2</decimalPlaces>
           <factor>1</factor>
           <font>Andale Mono,12,-1,5,75,0,0,0,0,0</font>
@@ -1386,7 +1386,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <dFile>%%DATAPATH%%dials/default/lineardial-vertical.svg</dFile>
+          <dFile>%%DATAPATH%%dials/deluxe/lineardial-vertical.svg</dFile>
           <decimalPlaces>2</decimalPlaces>
           <factor>1</factor>
           <font>Andale Mono,12,-1,5,75,0,0,0,0,0</font>
@@ -1409,7 +1409,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <dFile>%%DATAPATH%%dials/default/lineardial-vertical.svg</dFile>
+          <dFile>%%DATAPATH%%dials/deluxe/lineardial-vertical.svg</dFile>
           <decimalPlaces>2</decimalPlaces>
           <factor>1</factor>
           <font>Andale Mono,12,-1,5,75,0,0,0,0,0</font>
@@ -1604,6 +1604,17 @@
           <enableVbo>false</enableVbo>
         </data>
       </Test__PCT__20Quad__PCT__20X>
+      <Ricoo>
+        <configInfo>
+          <locked>false</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <acFilename>%%DATAPATH%%models/multi/ricoo/ricoo.3DS</acFilename>
+          <bgFilename>%%DATAPATH%%models/backgrounds/default_background.png</bgFilename>
+          <enableVbo>false</enableVbo>
+        </data>
+      </Ricoo>
       <CopterControl>
         <configInfo>
           <locked>false</locked>
@@ -1723,24 +1734,24 @@
           <dataSize>60</dataSize>
           <plotCurve0>
             <color>4294901760</color>
-            <uavField>accels-X</uavField>
-            <uavObject>AttitudeRaw</uavObject>
+            <uavField>x</uavField>
+            <uavObject>Accels</uavObject>
             <yMaximum>0</yMaximum>
             <yMinimum>0</yMinimum>
             <yScalePower>0</yScalePower>
           </plotCurve0>
           <plotCurve1>
             <color>4283782655</color>
-            <uavField>accels-Y</uavField>
-            <uavObject>AttitudeRaw</uavObject>
+            <uavField>y</uavField>
+            <uavObject>Accels</uavObject>
             <yMaximum>0</yMaximum>
             <yMinimum>0</yMinimum>
             <yScalePower>0</yScalePower>
           </plotCurve1>
           <plotCurve2>
             <color>4283804160</color>
-            <uavField>accels-Z</uavField>
-            <uavObject>AttitudeRaw</uavObject>
+            <uavField>z</uavField>
+            <uavObject>Accels</uavObject>
             <yMaximum>0</yMaximum>
             <yMinimum>0</yMinimum>
             <yScalePower>0</yScalePower>
@@ -1955,24 +1966,24 @@
           <dataSize>60</dataSize>
           <plotCurve0>
             <color>4294901760</color>
-            <uavField>accels-X</uavField>
-            <uavObject>AttitudeRaw</uavObject>
+            <uavField>x</uavField>
+            <uavObject>Accels</uavObject>
             <yMaximum>0</yMaximum>
             <yMinimum>0</yMinimum>
             <yScalePower>0</yScalePower>
           </plotCurve0>
           <plotCurve1>
             <color>4283782655</color>
-            <uavField>accels-Y</uavField>
-            <uavObject>AttitudeRaw</uavObject>
+            <uavField>y</uavField>
+            <uavObject>Accels</uavObject>
             <yMaximum>0</yMaximum>
             <yMinimum>0</yMinimum>
             <yScalePower>0</yScalePower>
           </plotCurve1>
           <plotCurve2>
             <color>4283804160</color>
-            <uavField>accels-Z</uavField>
-            <uavObject>AttitudeRaw</uavObject>
+            <uavField>z</uavField>
+            <uavObject>Accels</uavObject>
             <yMaximum>0</yMaximum>
             <yMinimum>0</yMinimum>
             <yScalePower>0</yScalePower>
@@ -1995,24 +2006,24 @@
           <dataSize>60</dataSize>
           <plotCurve0>
             <color>4283804160</color>
-            <uavField>gyros-Z</uavField>
-            <uavObject>AttitudeRaw</uavObject>
+            <uavField>Z</uavField>
+            <uavObject>Gyros</uavObject>
             <yMaximum>0</yMaximum>
             <yMinimum>0</yMinimum>
             <yScalePower>0</yScalePower>
           </plotCurve0>
           <plotCurve1>
             <color>4283782655</color>
-            <uavField>gyros-Y</uavField>
-            <uavObject>AttitudeRaw</uavObject>
+            <uavField>Y</uavField>
+            <uavObject>Gyros</uavObject>
             <yMaximum>0</yMaximum>
             <yMinimum>0</yMinimum>
             <yScalePower>0</yScalePower>
           </plotCurve1>
           <plotCurve2>
             <color>4294901760</color>
-            <uavField>gyros-X</uavField>
-            <uavObject>AttitudeRaw</uavObject>
+            <uavField>X</uavField>
+            <uavObject>Gyros</uavObject>
             <yMaximum>0</yMaximum>
             <yMinimum>0</yMinimum>
             <yScalePower>0</yScalePower>
@@ -2035,24 +2046,24 @@
           <dataSize>60</dataSize>
           <plotCurve0>
             <color>4294901760</color>
-            <uavField>magnetometers-X</uavField>
-            <uavObject>AttitudeRaw</uavObject>
+            <uavField>X</uavField>
+            <uavObject>Magnetometer</uavObject>
             <yMaximum>0</yMaximum>
             <yMinimum>0</yMinimum>
             <yScalePower>0</yScalePower>
           </plotCurve0>
           <plotCurve1>
             <color>4283782655</color>
-            <uavField>magnetometers-Y</uavField>
-            <uavObject>AttitudeRaw</uavObject>
+            <uavField>Y</uavField>
+            <uavObject>Magnetometer</uavObject>
             <yMaximum>0</yMaximum>
             <yMinimum>0</yMinimum>
             <yScalePower>0</yScalePower>
           </plotCurve1>
           <plotCurve2>
             <color>4283804160</color>
-            <uavField>magnetometers-Z</uavField>
-            <uavObject>AttitudeRaw</uavObject>
+            <uavField>Z</uavField>
+            <uavObject>Magnetometer</uavObject>
             <yMaximum>0</yMaximum>
             <yMinimum>0</yMinimum>
             <yScalePower>0</yScalePower>
@@ -2226,21 +2237,13 @@
           <configurationStreamVersion>1000</configurationStreamVersion>
           <dataSize>240</dataSize>
           <plotCurve0>
-            <color>4289374847</color>
-            <uavField>RunningTime</uavField>
-            <uavObject>InsStatus</uavObject>
-            <yMaximum>0</yMaximum>
-            <yMinimum>0</yMinimum>
-            <yScalePower>0</yScalePower>
-          </plotCurve0>
-          <plotCurve1>
             <color>4294945407</color>
             <uavField>FlightTime</uavField>
             <uavObject>SystemStats</uavObject>
             <yMaximum>0</yMaximum>
             <yMinimum>0</yMinimum>
             <yScalePower>0</yScalePower>
-          </plotCurve1>
+          </plotCurve0>
           <plotCurveCount>2</plotCurveCount>
           <plotType>1</plotType>
           <refreshInterval>800</refreshInterval>

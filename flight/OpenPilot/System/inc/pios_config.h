@@ -44,7 +44,7 @@
 
 #define PIOS_INCLUDE_RCVR
 
-#define PIOS_INCLUDE_SPEKTRUM
+#define PIOS_INCLUDE_DSM
 //#define PIOS_INCLUDE_SBUS
 #define PIOS_INCLUDE_PWM
 #define PIOS_INCLUDE_PPM
@@ -55,7 +55,7 @@
 #define PIOS_INCLUDE_SPI
 #define PIOS_INCLUDE_SYS
 #define PIOS_INCLUDE_USART
-#define PIOS_INCLUDE_USB_HID
+##define PIOS_INCLUDE_USB_HID
 #define PIOS_INCLUDE_BMP085
 //#define PIOS_INCLUDE_HCSR04
 #define PIOS_INCLUDE_OPAHRS
@@ -78,12 +78,6 @@
 /* Enable a priority queue in telemetry */
 #define PIOS_TELEM_PRIORITY_QUEUE
 
-/* COM Module */
-#define GPS_BAUDRATE			19200
-#define TELEM_BAUDRATE			19200
-#define AUXUART_ENABLED			0
-#define AUXUART_BAUDRATE		19200
-
 /* Alarm Thresholds */
 #define HEAP_LIMIT_WARNING		4000
 #define HEAP_LIMIT_CRITICAL		1000
@@ -98,6 +92,8 @@
 /* GPS options */
 #define PIOS_GPS_SETS_HOMELOCATION
 
+/* PIOS Initcall infrastructure */
+#define PIOS_INCLUDE_INITCALL
 
 #endif /* PIOS_CONFIG_H */
 /**

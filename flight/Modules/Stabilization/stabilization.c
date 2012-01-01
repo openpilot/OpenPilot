@@ -38,7 +38,7 @@
 #include "ratedesired.h"
 #include "stabilizationdesired.h"
 #include "attitudeactual.h"
-#include "attituderaw.h"
+#include "gyros.h"
 #include "flightstatus.h"
 #include "manualcontrol.h" // Just to get a macro
 #include "CoordinateConversions.h"
@@ -124,7 +124,7 @@ int32_t StabilizationInitialize()
 
 	// Listen for updates.
 	//	AttitudeActualConnectQueue(queue);
-	AttitudeRawConnectQueue(queue);
+	GyrosConnectQueue(queue);
 
 	StabilizationSettingsConnectCallback(SettingsUpdatedCb);
 	SettingsUpdatedCb(StabilizationSettingsHandle());
@@ -149,7 +149,7 @@ static void stabilizationTask(void* parameters)
 	StabilizationDesiredData stabDesired;
 	RateDesiredData rateDesired;
 	AttitudeActualData attitudeActual;
-	AttitudeRawData attitudeRaw;
+	GyrosData gyrosData;
 	FlightStatusData flightStatus;
 
 	SettingsUpdatedCb((UAVObjEvent *) NULL);
@@ -176,7 +176,7 @@ static void stabilizationTask(void* parameters)
 		FlightStatusGet(&flightStatus);
 		StabilizationDesiredGet(&stabDesired);
 		AttitudeActualGet(&attitudeActual);
-		AttitudeRawGet(&attitudeRaw);
+		GyrosGet(&gyrosData);
 
 #if defined(DIAGNOSTICS)
 		RateDesiredGet(&rateDesired);
@@ -220,9 +220,9 @@ static void stabilizationTask(void* parameters)
 #endif
 
 
-		for(uint8_t i = 0; i < MAX_AXES; i++) {
-			gyro_filtered[i] = gyro_filtered[i] * gyro_alpha + attitudeRaw.gyros[i] * (1 - gyro_alpha);
-		}
+		gyro_filtered[0] = gyro_filtered[0] * gyro_alpha + gyrosData.x * (1 - gyro_alpha);
+		gyro_filtered[1] = gyro_filtered[1] * gyro_alpha + gyrosData.y * (1 - gyro_alpha);
+		gyro_filtered[2] = gyro_filtered[2] * gyro_alpha + gyrosData.z * (1 - gyro_alpha);
 
 		float *attitudeDesiredAxis = &stabDesired.Roll;
 		float *actuatorDesiredAxis = &actuatorDesired.Roll;
@@ -373,24 +373,24 @@ float ApplyPid(pid_type * pid, const float err)
 	pid->lastErr = err;
 
 	// Scale up accumulator by 1000 while computing to avoid losing precision
-	pid->iAccumulator += err * (pid->i * dT * 1000);
-	if(pid->iAccumulator > (pid->iLim * 1000)) {
-		pid->iAccumulator = pid->iLim * 1000;
-	} else if (pid->iAccumulator < -(pid->iLim * 1000)) {
-		pid->iAccumulator = -pid->iLim * 1000;
+	pid->iAccumulator += err * (pid->i * dT * 1000.0f);
+	if(pid->iAccumulator > (pid->iLim * 1000.0f)) {
+		pid->iAccumulator = pid->iLim * 1000.0f;
+	} else if (pid->iAccumulator < -(pid->iLim * 1000.0f)) {
+		pid->iAccumulator = -pid->iLim * 1000.0f;
 	}
-	return ((err * pid->p) + pid->iAccumulator / 1000 + (diff * pid->d / dT));
+	return ((err * pid->p) + pid->iAccumulator / 1000.0f + (diff * pid->d / dT));
 }
 
 
 static void ZeroPids(void)
 {
 	for(int8_t ct = 0; ct < PID_MAX; ct++) {
-		pids[ct].iAccumulator = 0;
-		pids[ct].lastErr = 0;
+		pids[ct].iAccumulator = 0.0f;
+		pids[ct].lastErr = 0.0f;
 	}
 	for(uint8_t i = 0; i < 3; i++)
-		axis_lock_accum[i] = 0;
+		axis_lock_accum[i] = 0.0f;
 }
 
 
@@ -399,10 +399,10 @@ static void ZeroPids(void)
  */
 static float bound(float val)
 {
-	if(val < -1) {
-		val = -1;
-	} else if(val > 1) {
-		val = 1;
+	if(val < -1.0f) {
+		val = -1.0f;
+	} else if(val > 1.0f) {
+		val = 1.0f;
 	}
 	return val;
 }

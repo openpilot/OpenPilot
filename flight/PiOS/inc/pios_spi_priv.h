@@ -36,7 +36,7 @@
 #include <pios_stm32.h>
 
 /* XXX these two should be reconciled - separate for now to avoid breaking other targets */
-#ifdef STM32F2XX
+#if defined(STM32F2XX) || defined(STM32F4XX)
 struct pios_spi_cfg {
 	SPI_TypeDef *regs;
 	uint32_t remap;				/* GPIO_Remap_* or GPIO_AF_* */

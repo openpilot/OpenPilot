@@ -128,7 +128,7 @@ void runningDeviceWidget::populate()
             myDevice->lblCertified->setToolTip(tr("Untagged or custom firmware build"));
         }
         myDevice->lblGitCommitTag->setText("Git commit tag: "+devDesc.gitTag);
-        myDevice->lblFWDate->setText(QString("Firmware date: ") + devDesc.buildDate);
+        myDevice->lblFWDate->setText(QString("Firmware date: ") + devDesc.buildDate.insert(4,"-").insert(7,"-"));
     }
     else
     {

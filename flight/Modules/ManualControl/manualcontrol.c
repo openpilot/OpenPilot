@@ -51,15 +51,15 @@
 #if defined(PIOS_MANUAL_STACK_SIZE)
 #define STACK_SIZE_BYTES PIOS_MANUAL_STACK_SIZE
 #else
-#define STACK_SIZE_BYTES 824
+#define STACK_SIZE_BYTES 1024
 #endif
 
 #define TASK_PRIORITY (tskIDLE_PRIORITY+4)
 #define UPDATE_PERIOD_MS 20
-#define THROTTLE_FAILSAFE -0.1
-#define FLIGHT_MODE_LIMIT 1.0/3.0
+#define THROTTLE_FAILSAFE -0.1f
+#define FLIGHT_MODE_LIMIT 1.0f/3.0f
 #define ARMED_TIME_MS      1000
-#define ARMED_THRESHOLD    0.50
+#define ARMED_THRESHOLD    0.50f
 //safe band to allow a bit of calibration error or trim offset (in microseconds)
 #define CONNECTION_OFFSET 150
 
@@ -192,19 +192,19 @@ static void manualControlTask(void *parameters)
 			lastActivityTime = lastSysTime;
 		}
 
-		if (ManualControlCommandReadOnly(&cmd)) {
+		if (ManualControlCommandReadOnly()) {
 			FlightTelemetryStatsData flightTelemStats;
 			FlightTelemetryStatsGet(&flightTelemStats);
 			if(flightTelemStats.Status != FLIGHTTELEMETRYSTATS_STATUS_CONNECTED) {
 				/* trying to fly via GCS and lost connection.  fall back to transmitter */
 				UAVObjMetadata metadata;
-				UAVObjGetMetadata(&cmd, &metadata);
+				ManualControlCommandGetMetadata(&metadata);
 				metadata.access = ACCESS_READWRITE;
-				UAVObjSetMetadata(&cmd, &metadata);
+				ManualControlCommandSetMetadata(&metadata);
 			}
 		}
 
-		if (!ManualControlCommandReadOnly(&cmd)) {
+		if (!ManualControlCommandReadOnly()) {
 
 			bool valid_input_detected = true;
 			
@@ -448,11 +448,11 @@ static bool updateRcvrActivityCompare(uint32_t rcvr_id, struct rcvr_activity_fsm
 			case MANUALCONTROLSETTINGS_CHANNELGROUPS_PPM:
 				group = RECEIVERACTIVITY_ACTIVEGROUP_PPM;
 				break;
-			case MANUALCONTROLSETTINGS_CHANNELGROUPS_SPEKTRUM1:
-				group = RECEIVERACTIVITY_ACTIVEGROUP_SPEKTRUM1;
+			case MANUALCONTROLSETTINGS_CHANNELGROUPS_DSMMAINPORT:
+				group = RECEIVERACTIVITY_ACTIVEGROUP_DSMMAINPORT;
 				break;
-			case MANUALCONTROLSETTINGS_CHANNELGROUPS_SPEKTRUM2:
-				group = RECEIVERACTIVITY_ACTIVEGROUP_SPEKTRUM2;
+			case MANUALCONTROLSETTINGS_CHANNELGROUPS_DSMFLEXIPORT:
+				group = RECEIVERACTIVITY_ACTIVEGROUP_DSMFLEXIPORT;
 				break;
 			case MANUALCONTROLSETTINGS_CHANNELGROUPS_SBUS:
 				group = RECEIVERACTIVITY_ACTIVEGROUP_SBUS;
@@ -465,7 +465,7 @@ static bool updateRcvrActivityCompare(uint32_t rcvr_id, struct rcvr_activity_fsm
 				break;
 			}
 
-			ReceiverActivityActiveGroupSet(&group);
+			ReceiverActivityActiveGroupSet((uint8_t*)&group);
 			ReceiverActivityActiveChannelSet(&channel);
 			activity_updated = true;
 		}

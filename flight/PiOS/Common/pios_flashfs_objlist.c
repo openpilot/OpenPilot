@@ -56,12 +56,12 @@ struct fileHeader {
 } __attribute__((packed));
 
 
-#define OBJECT_TABLE_MAGIC 0x85FB3C35
-#define OBJ_MAGIC          0x3015AE71
+#define OBJECT_TABLE_MAGIC 0x85FB3D35
+#define OBJ_MAGIC          0x3015A371
 #define OBJECT_TABLE_START 0x00000010
-#define OBJECT_TABLE_END   0x00001000
-#define SECTOR_SIZE        0x00001000
-#define MAX_BADMAGIC       4
+#define OBJECT_TABLE_END   0x00010000
+#define SECTOR_SIZE        0x00010000
+#define MAX_BADMAGIC       1000
 
 /**
  * @brief Initialize the flash object setting FS
@@ -72,7 +72,7 @@ int32_t PIOS_FLASHFS_Init()
 
 	// Check for valid object table or create one
 	uint32_t object_table_magic;
-	uint8_t magic_fail_count = 0;
+	uint32_t magic_fail_count = 0;
 	bool magic_good = false;
 
 	while(!magic_good) {
@@ -85,7 +85,7 @@ int32_t PIOS_FLASHFS_Init()
 				magic_fail_count = 0;
 				magic_good = true;
 			} else {
-				PIOS_DELAY_WaituS(100);
+				PIOS_DELAY_WaituS(1000);
 			}
 
 		}

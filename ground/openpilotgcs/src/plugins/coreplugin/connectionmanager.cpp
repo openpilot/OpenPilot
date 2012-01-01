@@ -358,7 +358,10 @@ void ConnectionManager::devChanged(IConnection *connection)
             if(m_mainWindow->generalSettings()->autoConnect() || m_mainWindow->generalSettings()->autoSelect())
                 m_availableDevList->setCurrentIndex(m_availableDevList->count()-1);
             if(m_mainWindow->generalSettings()->autoConnect())
+            {
                 connectDevice();
+                qDebug()<<"ConnectionManager::devChanged autoconnected USB device";
+            }
         }
     }
     if(m_ioDev)//if a device is connected make it the one selected on the dropbox

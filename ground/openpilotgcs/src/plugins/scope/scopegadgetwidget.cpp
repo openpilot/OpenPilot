@@ -54,15 +54,10 @@
 
 using namespace Core;
 
-TestDataGen* ScopeGadgetWidget::testDataGen;
-
 // ******************************************************************
 
 ScopeGadgetWidget::ScopeGadgetWidget(QWidget *parent) : QwtPlot(parent)
 {
-    //if(testDataGen == 0)
-    //    testDataGen = new TestDataGen();
-
 	setMouseTracking(true);
 //	canvas()->setMouseTracking(true);
 
@@ -356,7 +351,7 @@ void ScopeGadgetWidget::setupChronoPlot()
 //	scaleWidget->setMinBorderDist(0, fmw);
 }
 
-void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavFieldSubField, int scaleOrderFactor, QPen pen)
+void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavFieldSubField, int scaleOrderFactor, int interpolationSamples, QPen pen)
 {
     PlotData* plotData;
 
@@ -369,6 +364,7 @@ void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavFieldSubField
 
     plotData->m_xWindowSize = m_xWindowSize;
     plotData->scalePower = scaleOrderFactor;
+    plotData->interpolationSamples = interpolationSamples;
 
     //If the y-bounds are supplied, set them
     if (plotData->yMinimum != plotData->yMaximum)
@@ -446,6 +442,7 @@ void ScopeGadgetWidget::uavObjectReceived(UAVObject* obj)
     foreach(PlotData* plotData, m_curvesData.values()) {
         if (plotData->append(obj)) m_csvLoggingDataUpdated=1;
     }
+    csvLoggingAddData();
 }
 
 void ScopeGadgetWidget::replotNewData()
@@ -530,68 +527,6 @@ void ScopeGadgetWidget::clearCurvePlots()
 }
 
 
-TestDataGen::TestDataGen()
-{
-    // Get required UAVObjects
-    ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager* objManager = pm->getObject<UAVObjectManager>();
-
-    baroAltitude = BaroAltitude::GetInstance(objManager);
-    gps = PositionActual::GetInstance(objManager);
-    attRaw = AttitudeRaw::GetInstance(objManager);
-    manCtrlCmd = ManualControlCommand::GetInstance(objManager);
-
-    //Setup timer
-    periodMs = 20;
-    timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(genTestData()));
-    timer->start(periodMs);
-
-    debugCounter = 0;
-    testTime = 0;
-}
-
-void TestDataGen::genTestData()
-{
-    // Update BaroAltitude object
-    BaroAltitude::DataFields baroAltitudeData;
-    baroAltitudeData.Altitude = 500 * sin(1 * testTime) + 200 * cos(4 * testTime) + 800;
-    baroAltitudeData.Temperature = 30 * sin(0.5 * testTime);
-    baroAltitudeData.Pressure = baroAltitudeData.Altitude * 0.01 + baroAltitudeData.Temperature;
-    baroAltitude->setData(baroAltitudeData);
-
-    // Update Attitude Raw data
-    AttitudeRaw::DataFields attData;
-//    attData.accels[0] = 4 *  sin(2 * testTime) + 1 * cos(6 * testTime) + 4;
-//    attData.accels[1] = 3 * sin(2.3 * testTime) + 1.5 * cos(3.3 * testTime) + 2;
-//    attData.accels[2] = 4 * sin(5.3 * testTime) + 1.5 * cos(1.3 * testTime) + 1;
-    attData.accels[0] = 1;
-    attData.accels[1] = 4;
-    attData.accels[2] = 9;
-    attRaw->setData(attData);
-
-
-    ManualControlCommand::DataFields manCtlData;
-    manCtlData.Channel[0] = 400 * cos(2 * testTime) + 100 * sin(6 * testTime) + 400;
-    manCtlData.Channel[1] = 350 * cos(2.3 * testTime) + 150 * sin(3.3 * testTime) + 200;
-    manCtlData.Channel[2] = 450 * cos(5.3 * testTime) + 150 * sin(1.3 * testTime) + 150;
-    manCtrlCmd->setData(manCtlData);
-
-    testTime += (periodMs / 1000.0);
-
-//    debugCounter++;
-//    if (debugCounter % (100/periodMs) == 0 )
-//        qDebug() << "Test Time = " << testTime;
-}
-
-TestDataGen::~TestDataGen()
-{
-    if (timer)
-        timer->stop();
-
-    delete timer;
-}
-
 /*
 int csvLoggingEnable;
 int csvLoggingHeaderSaved;
@@ -609,6 +544,7 @@ int ScopeGadgetWidget::csvLoggingStart()
         m_csvLoggingStartTime = NOW;
         m_csvLoggingHeaderSaved=0;
         m_csvLoggingDataSaved=0;
+	    m_csvLoggingBuffer.clear();
         QDir PathCheck(m_csvLoggingPath);
         if (!PathCheck.exists())
         {
@@ -676,32 +612,28 @@ int ScopeGadgetWidget::csvLoggingInsertHeader()
     return 0;
 }
 
-int ScopeGadgetWidget::csvLoggingInsertData()
+int ScopeGadgetWidget::csvLoggingAddData()
 {
     if (!m_csvLoggingStarted) return -1;
-    m_csvLoggingDataSaved=1;
     m_csvLoggingDataValid=0;
     QDateTime NOW = QDateTime::currentDateTime();
     QString tempString;
 
-    if(m_csvLoggingFile.open(QIODevice::WriteOnly | QIODevice::Append)== FALSE)
-    {
-        qDebug() << "Unable to open " << m_csvLoggingFile.fileName() << " for csv logging Data";
-    }
-    else
-    {
-        QTextStream ss( &tempString );
-        ss << NOW.toString("yyyy-MM-dd") << ", " << NOW.toString("hh:mm:ss.z") << ", " ;
+    QTextStream ss( &tempString );
+    ss << NOW.toString("yyyy-MM-dd") << ", " << NOW.toString("hh:mm:ss.z") << ", " ;
 
 #if QT_VERSION >= 0x040700
-        ss <<(NOW.toMSecsSinceEpoch() - m_csvLoggingStartTime.toMSecsSinceEpoch())/1000.00;
+    ss <<(NOW.toMSecsSinceEpoch() - m_csvLoggingStartTime.toMSecsSinceEpoch())/1000.00;
 #else
-        ss <<(NOW.toTime_t() - m_csvLoggingStartTime.toTime_t());
+    ss <<(NOW.toTime_t() - m_csvLoggingStartTime.toTime_t());
 #endif
-        ss << ", " << m_csvLoggingConnected << ", " << m_csvLoggingDataUpdated;
-        m_csvLoggingDataUpdated=0;
+    ss << ", " << m_csvLoggingConnected << ", " << m_csvLoggingDataUpdated;
+    m_csvLoggingDataUpdated=0;
 
-        foreach(PlotData* plotData2, m_curvesData.values())
+    foreach(PlotData* plotData2, m_curvesData.values())
+    {
+        ss  << ", ";
+        if (plotData2->xData->isEmpty ())
         {
             ss  << ", ";
             if (plotData2->xData->isEmpty ())
@@ -709,19 +641,42 @@ int ScopeGadgetWidget::csvLoggingInsertData()
             }
             else
             {
-                ss  << QString().sprintf("%3.6g",plotData2->yData->last()/pow(10,plotData2->scalePower));
+                ss  << QString().sprintf("%3.6g",plotData2->yData->last());
                 m_csvLoggingDataValid=1;
             }
         }
-        ss << endl;
-        if (m_csvLoggingDataValid)
+        else
         {
-            QTextStream ts( &m_csvLoggingFile );
-            ts << tempString;
+            ss  << QString().sprintf("%3.6g",plotData2->yDataHistory->last()/pow(10,plotData2->scalePower));
+            m_csvLoggingDataValid=1;
         }
-        m_csvLoggingFile.close();
+    }
+    ss << endl;
+    if (m_csvLoggingDataValid)
+    {
+        QTextStream ts( &m_csvLoggingBuffer );
+        ts << tempString;
     }
 
+    return 0;
+}
+
+int ScopeGadgetWidget::csvLoggingInsertData()
+{
+    if (!m_csvLoggingStarted) return -1;
+    m_csvLoggingDataSaved=1;
+
+    if(m_csvLoggingFile.open(QIODevice::WriteOnly | QIODevice::Append)== FALSE)
+    {
+        qDebug() << "Unable to open " << m_csvLoggingFile.fileName() << " for csv logging Data";
+    }
+    else
+    {
+        QTextStream ts( &m_csvLoggingFile );
+        ts << m_csvLoggingBuffer;
+        m_csvLoggingFile.close();
+    }
+    m_csvLoggingBuffer.clear();
 
     return 0;
 }

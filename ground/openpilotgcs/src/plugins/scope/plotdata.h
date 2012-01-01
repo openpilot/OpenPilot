@@ -29,11 +29,6 @@
 #define PLOTDATA_H
 
 #include "uavobject.h"
-#include "baroaltitude.h"
-#include "positionactual.h"
-#include "attituderaw.h"
-#include "manualcontrolcommand.h"
-
 
 #include "qwt/src/qwt.h"
 #include "qwt/src/qwt_plot.h"
@@ -72,12 +67,17 @@ public:
     QString uavSubField;
     bool haveSubField;
     int scalePower; //This is the power to which each value must be raised
+    int interpolationSamples;
+    double interpolationSum;
+    double correctionSum;
+    int correctionCount;
     double yMinimum;
     double yMaximum;
     double m_xWindowSize;
     QwtPlotCurve* curve;
     QVector<double>* xData;
     QVector<double>* yData;
+    QVector<double>* yDataHistory;
 
     virtual bool append(UAVObject* obj) = 0;
     virtual PlotType plotType() = 0;

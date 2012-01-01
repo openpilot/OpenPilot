@@ -40,6 +40,7 @@ private:
     QString matlabSwitchCode;
     QString matlabCleanupCode;
     QString matlabSaveObjectsCode;
+    QString matlabExportCsvCode;
     QString matlabFunctionsCode;
     QStringList fieldTypeStrMatlab;
 

@@ -67,7 +67,6 @@ GCSControlGadgetWidget::GCSControlGadgetWidget(QWidget *parent) : QLabel(parent)
     // Connect object updated event from UAVObject to also update check boxes and dropdown
     connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(mccChanged(UAVObject*)));
 
-
     leftX = 0;
     leftY = 0;
     rightX = 0;

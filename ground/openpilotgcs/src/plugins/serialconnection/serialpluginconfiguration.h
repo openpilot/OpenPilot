@@ -1,12 +1,14 @@
 /**
  ******************************************************************************
  *
- * @file       uavobjectgeneratormatlab.h
+ * @file       serialpluginconfiguration.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      produce matlab code for uavobjects
- *
  * @see        The GNU Public License (GPL) Version 3
- *
+ * @addtogroup GCSPlugins GCS Plugins
+ * @{
+ * @addtogroup SerialPlugin Serial Connection Plugin
+ * @{
+ * @brief Impliments serial connection to the flight hardware for Telemetry
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -24,26 +26,33 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef UAVOBJECTGENERATORMATLAB_H
-#define UAVOBJECTGENERATORMATLAB_H
+#ifndef SERIALPLUGINCONFIGURATION_H
+#define SERIALPLUGINCONFIGURATION_H
 
-#include "../generator_common.h"
+#include <coreplugin/iuavgadgetconfiguration.h>
 
-class UAVObjectGeneratorMatlab
+using namespace Core;
+
+/* Despite its name, this is actually a generic analog Serial
+   supporting up to two rotating "needle" indicators.
+  */
+class SerialPluginConfiguration : public IUAVGadgetConfiguration
 {
+Q_OBJECT
 public:
-    bool generate(UAVObjectParser* gen,QString templatepath,QString outputpath);
-
+    explicit SerialPluginConfiguration(QString classId, QSettings* qSettings = 0, QObject *parent = 0);
+    QString speed() {return m_speed;}
+    void saveConfig(QSettings* settings) const;
+    IUAVGadgetConfiguration *clone();
+    void savesettings() const;
+    void restoresettings();
+    virtual ~SerialPluginConfiguration();
 private:
-    bool process_object(ObjectInfo* info);
-    QString matlabAllocationCode;
-    QString matlabSwitchCode;
-    QString matlabCleanupCode;
-    QString matlabSaveObjectsCode;
-    QString matlabExportCsvCode;
-    QString matlabFunctionsCode;
-    QStringList fieldTypeStrMatlab;
+    QString m_speed;
+    QSettings* settings;
+public slots:
+    void setSpeed(QString speed) { m_speed = speed; }
 
 };
 
-#endif
+#endif // SERIALPLUGINCONFIGURATION_H

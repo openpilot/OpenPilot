@@ -1,5 +1,8 @@
 Short summary of changes.  For a complete list see the git log.
 
+2012-01-02
+Added new camera stabilization features: AxisLock mode and LPF.
+
 2011-12-10
 Merged a change that sorts the UAVO fields based on size.  Because this changes
 all of the objects, erase all existing flash files based on this.

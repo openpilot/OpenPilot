@@ -792,13 +792,8 @@ void apiconfig_process(void)
 	else
 	if (apiconfig_usb_comms)
 	{	// we're using the USB for comms - keep the USART rx buffer empty
-		int32_t bytes = PIOS_COM_ReceiveBufferUsed(PIOS_COM_SERIAL);
-		while (bytes > 0)
-		{
-			uint8_t c;
-			PIOS_COM_ReceiveBuffer(PIOS_COM_SERIAL, &c, 1, 0);
-			bytes--;
-		}
+		uint8_t c;
+		while (PIOS_COM_ReceiveBuffer(PIOS_COM_SERIAL, &c, 1, 0) > 0);
 	}
 	apiconfig_previous_com_port = apiconfig_comm_port;		// remember the current comm-port we are using
 
@@ -808,20 +803,9 @@ void apiconfig_process(void)
 	// fetch the data received via the comm-port
 
 	// get the number of data bytes received down the comm-port
-	int32_t com_num = PIOS_COM_ReceiveBufferUsed(apiconfig_comm_port);
+	uint16_t buf_avail = sizeof(apiconfig_rx_buffer) - apiconfig_rx_buffer_wr;
 
-	// limit number of bytes we will get to how much space we have in our RX buffer
-	if (com_num > sizeof(apiconfig_rx_buffer) - apiconfig_rx_buffer_wr)
-		com_num = sizeof(apiconfig_rx_buffer) - apiconfig_rx_buffer_wr;
-
-	
-	while (com_num > 0)
-	{	// fetch a byte from the comm-port RX buffer and save it into our RX buffer
-		uint8_t c;
-		PIOS_COM_ReceiveBuffer(apiconfig_comm_port, &c, 1, 0);
-		apiconfig_rx_buffer[apiconfig_rx_buffer_wr++] = c;
-		com_num--;
-	}
+	PIOS_COM_ReceiveBuffer(apiconfig_comm_port, &(apiconfig_rx_buffer[apiconfig_rx_buffer_wr]), buf_avail, 0);
 
 	apiconfig_processTx();
 	apiconfig_processRx();

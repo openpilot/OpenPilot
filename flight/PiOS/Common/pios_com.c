@@ -511,24 +511,6 @@ uint16_t PIOS_COM_ReceiveBuffer(uint32_t com_id, uint8_t * buf, uint16_t buf_len
 	return (bytes_from_fifo);
 }
 
-/**
-* Get the number of bytes waiting in the buffer
-* \param[in] port COM port
-* \return Number of bytes used in buffer
-*/
-int32_t PIOS_COM_ReceiveBufferUsed(uint32_t com_id)
-{
-	struct pios_com_dev * com_dev = (struct pios_com_dev *)com_id;
-
-	if (!PIOS_COM_validate(com_dev)) {
-		/* Undefined COM port for this board (see pios_board.c) */
-		PIOS_Assert(0);
-	}
-
-	PIOS_Assert(com_dev->has_rx);
-	return (fifoBuf_getUsed(&com_dev->rx));
-}
-
 #endif
 
 /**

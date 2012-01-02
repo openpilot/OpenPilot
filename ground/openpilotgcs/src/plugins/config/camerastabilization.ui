@@ -89,6 +89,12 @@
          <layout class="QGridLayout" name="gridLayout_9">
           <item row="2" column="3">
            <widget class="QSpinBox" name="yawOutputRange">
+            <property name="toolTip">
+             <string>Camera yaw angle for 100% output value, deg.
+
+This value should be tuned for particular gimbal and servo. You also
+have to define channel output range using Output configuration tab.</string>
+            </property>
             <property name="maximum">
              <number>180</number>
             </property>
@@ -99,6 +105,12 @@
           </item>
           <item row="2" column="2">
            <widget class="QSpinBox" name="pitchOutputRange">
+            <property name="toolTip">
+             <string>Camera pitch angle for 100% output value, deg.
+
+This value should be tuned for particular gimbal and servo. You also
+have to define channel output range using Output configuration tab.</string>
+            </property>
             <property name="maximum">
              <number>180</number>
             </property>
@@ -109,6 +121,12 @@
           </item>
           <item row="2" column="1">
            <widget class="QSpinBox" name="rollOutputRange">
+            <property name="toolTip">
+             <string>Camera roll angle for 100% output value, deg.
+
+This value should be tuned for particular gimbal and servo. You also
+have to define channel output range using Output configuration tab.</string>
+            </property>
             <property name="maximum">
              <number>180</number>
             </property>
@@ -119,6 +137,9 @@
           </item>
           <item row="1" column="3">
            <widget class="QComboBox" name="yawChannel">
+            <property name="toolTip">
+             <string>Yaw output channel for camera gimbal</string>
+            </property>
             <item>
              <property name="text">
               <string>None</string>
@@ -128,6 +149,9 @@
           </item>
           <item row="1" column="2">
            <widget class="QComboBox" name="pitchChannel">
+            <property name="toolTip">
+             <string>Pitch output channel for camera gimbal</string>
+            </property>
             <item>
              <property name="text">
               <string>None</string>
@@ -137,6 +161,9 @@
           </item>
           <item row="1" column="1">
            <widget class="QComboBox" name="rollChannel">
+            <property name="toolTip">
+             <string>Roll output channel for camera gimbal</string>
+            </property>
             <item>
              <property name="text">
               <string>None</string>
@@ -257,6 +284,11 @@
           </item>
           <item row="1" column="3">
            <widget class="QComboBox" name="yawInputChannel">
+            <property name="toolTip">
+             <string>Input channel to control camera yaw
+
+Don't forget to map this channel using Input configuration tab.</string>
+            </property>
             <item>
              <property name="text">
               <string>None</string>
@@ -266,6 +298,11 @@
           </item>
           <item row="1" column="2">
            <widget class="QComboBox" name="pitchInputChannel">
+            <property name="toolTip">
+             <string>Input channel to control camera pitch
+
+Don't forget to map this channel using Input configuration tab.</string>
+            </property>
             <item>
              <property name="text">
               <string>None</string>
@@ -275,6 +312,11 @@
           </item>
           <item row="1" column="1">
            <widget class="QComboBox" name="rollInputChannel">
+            <property name="toolTip">
+             <string>Input channel to control camera roll
+
+Don't forget to map this channel using Input configuration tab.</string>
+            </property>
             <item>
              <property name="text">
               <string>None</string>
@@ -291,6 +333,12 @@
           </item>
           <item row="2" column="3">
            <widget class="QComboBox" name="yawStabilizationMode">
+            <property name="toolTip">
+             <string>Axis stabilization mode
+
+Attitude: camera tracks level for the axis. Input controls the deflection.
+AxisLock: camera remembers tracking attitude. Input controls the rate of deflection.</string>
+            </property>
             <item>
              <property name="text">
               <string>Attitude</string>
@@ -300,6 +348,9 @@
           </item>
           <item row="3" column="3">
            <widget class="QSpinBox" name="yawInputRange">
+            <property name="toolTip">
+             <string>Maximum camera yaw deflection for 100% input in Attitude mode, deg.</string>
+            </property>
             <property name="maximum">
              <number>180</number>
             </property>
@@ -310,6 +361,9 @@
           </item>
           <item row="4" column="3">
            <widget class="QSpinBox" name="yawInputRate">
+            <property name="toolTip">
+             <string>Maximum camera yaw rate for 100% input in AxisLock mode, deg/s.</string>
+            </property>
             <property name="maximum">
              <number>180</number>
             </property>
@@ -320,6 +374,11 @@
           </item>
           <item row="5" column="3">
            <widget class="QSpinBox" name="yawResponseTime">
+            <property name="toolTip">
+             <string>Input low-pass filter response time for yaw axis, ms.
+
+This option smoothes the stick input. Zero value disables LPF.</string>
+            </property>
             <property name="maximum">
              <number>1000</number>
             </property>
@@ -330,6 +389,12 @@
           </item>
           <item row="2" column="2">
            <widget class="QComboBox" name="pitchStabilizationMode">
+            <property name="toolTip">
+             <string>Axis stabilization mode
+
+Attitude: camera tracks level for the axis. Input controls the deflection.
+AxisLock: camera remembers tracking attitude. Input controls the rate of deflection.</string>
+            </property>
             <item>
              <property name="text">
               <string>Attitude</string>
@@ -339,6 +404,9 @@
           </item>
           <item row="3" column="2">
            <widget class="QSpinBox" name="pitchInputRange">
+            <property name="toolTip">
+             <string>Maximum camera pitch deflection for 100% input in Attitude mode, deg.</string>
+            </property>
             <property name="maximum">
              <number>180</number>
             </property>
@@ -349,6 +417,9 @@
           </item>
           <item row="4" column="2">
            <widget class="QSpinBox" name="pitchInputRate">
+            <property name="toolTip">
+             <string>Maximum camera pitch rate for 100% input in AxisLock mode, deg/s.</string>
+            </property>
             <property name="maximum">
              <number>180</number>
             </property>
@@ -359,6 +430,11 @@
           </item>
           <item row="5" column="2">
            <widget class="QSpinBox" name="pitchResponseTime">
+            <property name="toolTip">
+             <string>Input low-pass filter response time for pitch axis, ms.
+
+This option smoothes the stick input. Zero value disables LPF.</string>
+            </property>
             <property name="maximum">
              <number>1000</number>
             </property>
@@ -369,6 +445,12 @@
           </item>
           <item row="2" column="1">
            <widget class="QComboBox" name="rollStabilizationMode">
+            <property name="toolTip">
+             <string>Axis stabilization mode
+
+Attitude: camera tracks level for the axis. Input controls the deflection.
+AxisLock: camera remembers tracking attitude. Input controls the rate of deflection.</string>
+            </property>
             <item>
              <property name="text">
               <string>Attitude</string>
@@ -378,6 +460,9 @@
           </item>
           <item row="3" column="1">
            <widget class="QSpinBox" name="rollInputRange">
+            <property name="toolTip">
+             <string>Maximum camera roll deflection for 100% input in Attitude mode, deg.</string>
+            </property>
             <property name="maximum">
              <number>180</number>
             </property>
@@ -388,6 +473,9 @@
           </item>
           <item row="4" column="1">
            <widget class="QSpinBox" name="rollInputRate">
+            <property name="toolTip">
+             <string>Maximum camera roll rate for 100% input in AxisLock mode, deg/s.</string>
+            </property>
             <property name="maximum">
              <number>180</number>
             </property>
@@ -398,6 +486,11 @@
           </item>
           <item row="5" column="1">
            <widget class="QSpinBox" name="rollResponseTime">
+            <property name="toolTip">
+             <string>Input low-pass filter response time for roll axis, ms.
+
+This option smoothes the stick input. Zero value disables LPF.</string>
+            </property>
             <property name="maximum">
              <number>1000</number>
             </property>
@@ -450,6 +543,16 @@
           </item>
           <item row="6" column="1">
            <widget class="QDoubleSpinBox" name="MaxAxisLockRate">
+            <property name="toolTip">
+             <string>Stick input deadband for all axes in AxisLock mode, deg/s.
+
+When stick input is within the MaxAxisLockRate range, camera tracks
+current attitude. Otherwise it starts moving according to input with
+rate depending on input value.
+
+If you have drift in your Tx controls, you may want to increase this
+value.</string>
+            </property>
             <property name="decimals">
              <number>1</number>
             </property>

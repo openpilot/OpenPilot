@@ -607,6 +607,12 @@ value.</string>
        </item>
        <item>
         <widget class="QPushButton" name="camerastabilizationResetToDefaults">
+         <property name="toolTip">
+          <string>Load default CameraStabilization settings except output channels
+
+Loaded settings are not applied automatically. You have to click the
+Apply or Save button afterwards.</string>
+         </property>
          <property name="text">
           <string>Reset To Defaults</string>
          </property>
@@ -671,10 +677,7 @@ value.</string>
        <item>
         <widget class="QPushButton" name="camerastabilizationSaveRAM">
          <property name="toolTip">
-          <string>Save settings to the board (RAM only).
-
-This does not save the calibration settings, this is done using the
-specific calibration button on top of the screen.</string>
+          <string>Send settings to the board but do not save to the non-volatile memory</string>
          </property>
          <property name="text">
           <string>Apply</string>
@@ -684,7 +687,7 @@ specific calibration button on top of the screen.</string>
        <item>
         <widget class="QPushButton" name="camerastabilizationSaveSD">
          <property name="toolTip">
-          <string>Send settings to the board, and save to the non-volatile memory.</string>
+          <string>Send settings to the board and save to the non-volatile memory</string>
          </property>
          <property name="text">
           <string>Save</string>

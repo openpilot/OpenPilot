@@ -503,6 +503,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="camerastabilizationResetToDefaults">
+         <property name="text">
+          <string>Reset To Defaults</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="horizontalSpacer">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -614,6 +621,7 @@ specific calibration button on top of the screen.</string>
   <tabstop>pitchResponseTime</tabstop>
   <tabstop>yawResponseTime</tabstop>
   <tabstop>MaxAxisLockRate</tabstop>
+  <tabstop>camerastabilizationResetToDefaults</tabstop>
   <tabstop>camerastabilizationHelp</tabstop>
   <tabstop>camerastabilizationSaveRAM</tabstop>
   <tabstop>camerastabilizationSaveSD</tabstop>

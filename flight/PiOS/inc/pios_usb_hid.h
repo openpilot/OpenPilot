@@ -31,22 +31,10 @@
 #ifndef PIOS_USB_HID_H
 #define PIOS_USB_HID_H
 
-/* Global Definitions */
-#define PIOS_USB_HID_SIZ_REPORT_DESC		36
-#define PIOS_USB_HID_REPORT_DESCRIPTOR		0x22
-#define PIOS_USB_HID_HID_DESCRIPTOR_TYPE	0x21
-#define PIOS_USB_HID_OFF_HID_DESC		0x12
-#define PIOS_USB_HID_SIZ_HID_DESC		0x09
-
-#define PIOS_USB_COM_DATA_LENGTH		62
-
 /* Global functions */
 extern int32_t PIOS_USB_HID_Reenumerate();
 extern int32_t PIOS_USB_HID_ChangeConnectionState(uint32_t Connected);
 extern bool PIOS_USB_HID_CheckAvailable(uint8_t id);
-
-extern int32_t PIOS_USB_HID_CB_Data_Setup(uint8_t RequestNo);
-extern int32_t PIOS_USB_HID_CB_NoData_Setup(uint8_t RequestNo);
 
 #endif /* PIOS_USB_HID_H */
 

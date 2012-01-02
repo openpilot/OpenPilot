@@ -35,6 +35,7 @@
 #include "saved_settings.h"
 #include "crc.h"
 #include "main.h"
+#include "pios_usb.h"		/* PIOS_USB_* */
 
 #if defined(PIOS_COM_DEBUG)
 //	#define APICONFIG_DEBUG
@@ -773,8 +774,8 @@ void apiconfig_process(void)
 	// decide which comm-port we are using (usart or usb)
 	apiconfig_usb_comms = false;					// TRUE if we are using the usb port for comms.
 	apiconfig_comm_port = PIOS_COM_SERIAL;		// default to using the usart comm-port
-	#if defined(PIOS_INCLUDE_USB_HID)
-		if (PIOS_USB_HID_CheckAvailable(0))
+	#if defined(PIOS_INCLUDE_USB)
+		if (PIOS_USB_CheckAvailable(0))
 		{	// USB comms is up, use the USB comm-port instead of the USART comm-port
 			apiconfig_usb_comms = true;
 			apiconfig_comm_port = PIOS_COM_TELEM_USB;

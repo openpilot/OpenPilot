@@ -35,6 +35,7 @@
 #include "flighttelemetrystats.h"
 #include "gcstelemetrystats.h"
 #include "hwsettings.h"
+#include "pios_usb.h"		/* PIOS_USB_* */
 
 // Private constants
 #define MAX_QUEUE_SIZE   TELEM_QUEUE_SIZE
@@ -308,12 +309,12 @@ static void telemetryRxTask(void *parameters)
 
 	// Task loop
 	while (1) {
-#if defined(PIOS_INCLUDE_USB_HID)
+#if defined(PIOS_INCLUDE_USB)
 		// Determine input port (USB takes priority over telemetry port)
-		if (PIOS_USB_HID_CheckAvailable(0) && PIOS_COM_TELEM_USB) {
+		if (PIOS_USB_CheckAvailable(0) && PIOS_COM_TELEM_USB) {
 			inputPort = PIOS_COM_TELEM_USB;
 		} else
-#endif /* PIOS_INCLUDE_USB_HID */
+#endif /* PIOS_INCLUDE_USB */
 		{
 			inputPort = telemetryPort;
 		}
@@ -347,11 +348,11 @@ static int32_t transmitData(uint8_t * data, int32_t length)
 	uint32_t outputPort;
 
 	// Determine input port (USB takes priority over telemetry port)
-#if defined(PIOS_INCLUDE_USB_HID)
-	if (PIOS_USB_HID_CheckAvailable(0) && PIOS_COM_TELEM_USB) {
+#if defined(PIOS_INCLUDE_USB)
+	if (PIOS_USB_CheckAvailable(0) && PIOS_COM_TELEM_USB) {
 		outputPort = PIOS_COM_TELEM_USB;
 	} else
-#endif /* PIOS_INCLUDE_USB_HID */
+#endif /* PIOS_INCLUDE_USB */
 	{
 		outputPort = telemetryPort;
 	}

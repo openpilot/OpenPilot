@@ -1,42 +1,18 @@
-/******************** (C) COPYRIGHT 2010 STMicroelectronics ********************
-* File Name          : pios_usbhook.c
-* Author             : MCD Application Team
-* Version            : V3.2.1
-* Date               : 07/05/2010
-* Description        : All processings related to Custom HID Demo
-********************************************************************************
-* THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
-* WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE TIME.
-* AS A RESULT, STMICROELECTRONICS SHALL NOT BE HELD LIABLE FOR ANY DIRECT,
-* INDIRECT OR CONSEQUENTIAL DAMAGES WITH RESPECT TO ANY CLAIMS ARISING FROM THE
-* CONTENT OF SUCH FIRMWARE AND/OR THE USE MADE BY CUSTOMERS OF THE CODING
-* INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
-*******************************************************************************/
-
-/* Includes ------------------------------------------------------------------*/
-#include "stm32f10x.h"
-#include "usb_lib.h"
-#include "usb_conf.h"
 #include "pios.h"
+#include "pios_usb.h"		/* PIOS_USB_* */
 #include "pios_usbhook.h"
-#include "pios_usb_hid_desc.h"
+#include "pios_usb_defs.h"	/* struct usb_* */
 #include "pios_usb_hid_pwr.h"
-#include "pios_usb_hid.h"
-#include "pios_usb_com_priv.h"
+#include "pios_usb_cdc_priv.h"	/* PIOS_USB_CDC_* */
+#include "pios_usb_board_data.h" /* PIOS_USB_BOARD_* */
 
-/* Private typedef -----------------------------------------------------------*/
-/* Private define ------------------------------------------------------------*/
-/* Private macro -------------------------------------------------------------*/
-/* Private variables ---------------------------------------------------------*/
-uint32_t ProtocolValue;
+#include "stm32f10x.h"		/* __IO */
 __IO uint8_t EXTI_Enable;
 
-/* -------------------------------------------------------------------------- */
-/*  Structures initializations */
-/* -------------------------------------------------------------------------- */
+uint32_t ProtocolValue;
 
 DEVICE Device_Table = {
-	EP_NUM,
+	PIOS_USB_BOARD_EP_NUM,
 	1
 };
 
@@ -81,44 +57,49 @@ USER_STANDARD_REQUESTS User_Standard_Requests = {
 	.User_SetDeviceAddress   = PIOS_USBHOOK_SetDeviceAddress
 };
 
-static ONE_DESCRIPTOR Device_Descriptor = {
-	(uint8_t *) PIOS_HID_DeviceDescriptor,
-	PIOS_HID_SIZ_DEVICE_DESC
+const static ONE_DESCRIPTOR Device_Descriptor = {
+	(uint8_t *) &PIOS_USB_BOARD_DeviceDescriptor,
+	sizeof(PIOS_USB_BOARD_DeviceDescriptor),
 };
 
 static ONE_DESCRIPTOR Config_Descriptor = {
-	(uint8_t *) PIOS_HID_ConfigDescriptor,
-	PIOS_HID_SIZ_CONFIG_DESC
+	(uint8_t *) &PIOS_USB_BOARD_Configuration,
+	sizeof(PIOS_USB_BOARD_Configuration),
 };
 
-static ONE_DESCRIPTOR PIOS_HID_Report_Descriptor = {
-	(uint8_t *) PIOS_HID_ReportDescriptor,
-	PIOS_HID_SIZ_REPORT_DESC
+const static ONE_DESCRIPTOR Hid_Report_Descriptor = {
+	(uint8_t *) &PIOS_USB_BOARD_HidReportDescriptor,
+	sizeof(PIOS_USB_BOARD_HidReportDescriptor),
 };
 
-static ONE_DESCRIPTOR PIOS_HID_Hid_Descriptor = {
-	(uint8_t *) PIOS_HID_ConfigDescriptor + PIOS_HID_OFF_HID_DESC,
-	PIOS_HID_SIZ_HID_DESC
+const static ONE_DESCRIPTOR Hid_Interface_Descriptor = {
+	(uint8_t *) &PIOS_USB_BOARD_Configuration.hid_if,
+	sizeof(PIOS_USB_BOARD_Configuration.hid_if),
 };
 
-static ONE_DESCRIPTOR String_Descriptor[4] = {
-	{(uint8_t *) PIOS_HID_StringLangID, PIOS_HID_SIZ_STRING_LANGID}
-	,
-	{(uint8_t *) PIOS_HID_StringVendor, PIOS_HID_SIZ_STRING_VENDOR}
-	,
-	{(uint8_t *) PIOS_HID_StringProduct, PIOS_HID_SIZ_STRING_PRODUCT}
-	,
-	{(uint8_t *) PIOS_HID_StringSerial, PIOS_HID_SIZ_STRING_SERIAL}
+const static ONE_DESCRIPTOR String_Descriptor[] = {
+	{
+		(uint8_t *) &PIOS_USB_BOARD_StringLangID,
+		sizeof(PIOS_USB_BOARD_StringLangID),
+	},
+	{
+		(uint8_t *) PIOS_USB_BOARD_StringVendorID,
+		sizeof(PIOS_USB_BOARD_StringVendorID),
+	},
+	{
+		(uint8_t *) PIOS_USB_BOARD_StringProductID,
+		sizeof(PIOS_USB_BOARD_StringProductID),
+	},
+	{
+		(uint8_t *) PIOS_USB_BOARD_StringSerial,
+		sizeof(PIOS_USB_BOARD_StringSerial),
+	},
 };
 
-/* Extern variables ----------------------------------------------------------*/
-/* Private function prototypes -----------------------------------------------*/
 static RESULT PIOS_USBHOOK_SetProtocol(void);
 static uint8_t *PIOS_USBHOOK_GetProtocolValue(uint16_t Length);
 static uint8_t *PIOS_USBHOOK_GetReportDescriptor(uint16_t Length);
 static uint8_t *PIOS_USBHOOK_GetHIDDescriptor(uint16_t Length);
-/* Extern function prototypes ------------------------------------------------*/
-/* Private functions ---------------------------------------------------------*/
 
 /*******************************************************************************
 * Function Name  : PIOS_USBHOOK_Init.
@@ -157,7 +138,7 @@ static void PIOS_USBHOOK_Reset(void)
 	pInformation->Current_Interface = 0;	/*the default Interface */
 
 	/* Current Feature initialization */
-	pInformation->Current_Feature = PIOS_HID_ConfigDescriptor[7];
+	pInformation->Current_Feature = 0;
 
 #ifdef STM32F10X_CL
 	/* EP0 is already configured in DFU_Init() by USB_SIL_Init() function */
@@ -180,24 +161,26 @@ static void PIOS_USBHOOK_Reset(void)
 	SetEPRxCount(ENDP0, Device_Property.MaxPacketSize);
 	SetEPRxValid(ENDP0);
 
+#if defined(PIOS_INCLUDE_USB_HID)
 	/* Initialize Endpoint 1 (HID) */
 	SetEPType(ENDP1, EP_INTERRUPT);
 	SetEPTxAddr(ENDP1, ENDP1_TXADDR);
-	SetEPTxCount(ENDP1, PIOS_USB_COM_DATA_LENGTH + 2);
+	SetEPTxCount(ENDP1, PIOS_USB_BOARD_HID_DATA_LENGTH);
 	SetEPTxStatus(ENDP1, EP_TX_NAK);
 
 	SetEPRxAddr(ENDP1, ENDP1_RXADDR);
-	SetEPRxCount(ENDP1, PIOS_USB_COM_DATA_LENGTH + 2);
+	SetEPRxCount(ENDP1, PIOS_USB_BOARD_HID_DATA_LENGTH);
 	SetEPRxStatus(ENDP1, EP_RX_VALID);
+#endif	/* PIOS_INCLUDE_USB_HID */
 
-#if defined(PIOS_INCLUDE_USB_COM_CDC)
+#if defined(PIOS_INCLUDE_USB_CDC)
 	/* Initialize Endpoint 2 (CDC Call Control) */
 	SetEPType(ENDP2, EP_INTERRUPT);
 	SetEPTxAddr(ENDP2, ENDP2_TXADDR);
 	SetEPTxStatus(ENDP2, EP_TX_NAK);
 
 	SetEPRxAddr(ENDP2, ENDP2_RXADDR);
-	SetEPRxCount(ENDP2, PIOS_USB_COM_DATA_LENGTH + 2);
+	SetEPRxCount(ENDP2, PIOS_USB_BOARD_CDC_MGMT_LENGTH);
 	SetEPRxStatus(ENDP2, EP_RX_DIS);
 
 	/* Initialize Endpoint 3 (CDC Data) */
@@ -206,10 +189,10 @@ static void PIOS_USBHOOK_Reset(void)
 	SetEPTxStatus(ENDP3, EP_TX_NAK);
 
 	SetEPRxAddr(ENDP3, ENDP3_RXADDR);
-	SetEPRxCount(ENDP3, PIOS_USB_COM_DATA_LENGTH + 2);
+	SetEPRxCount(ENDP3, PIOS_USB_BOARD_CDC_DATA_LENGTH);
 	SetEPRxStatus(ENDP3, EP_RX_VALID);
 
-#endif	/* PIOS_INCLUDE_USB_COM_CDC */
+#endif	/* PIOS_INCLUDE_USB_CDC */
 
 	/* Set this device to response on default address */
 	SetDeviceAddress(0);
@@ -233,7 +216,7 @@ static void PIOS_USBHOOK_SetConfiguration(void)
 	}
 
 	/* Enable transfers */
-	PIOS_USB_HID_ChangeConnectionState(pInformation->Current_Configuration != 0);
+	PIOS_USB_ChangeConnectionState(pInformation->Current_Configuration != 0);
 }
 
 /*******************************************************************************
@@ -290,10 +273,10 @@ static RESULT PIOS_USBHOOK_Data_Setup(uint8_t RequestNo)
 			switch (RequestNo) {
 			case GET_DESCRIPTOR:
 				switch (pInformation->USBwValue1) {
-				case REPORT_DESCRIPTOR:
+				case USB_DESC_TYPE_REPORT:
 					CopyRoutine = PIOS_USBHOOK_GetReportDescriptor;
 					break;
-				case HID_DESCRIPTOR_TYPE:
+				case USB_DESC_TYPE_HID:
 					CopyRoutine = PIOS_USBHOOK_GetHIDDescriptor;
 					break;
 				}
@@ -311,11 +294,11 @@ static RESULT PIOS_USBHOOK_Data_Setup(uint8_t RequestNo)
 			}
 
 			break;
-#if defined(PIOS_INCLUDE_USB_COM_CDC)
+#if defined(PIOS_INCLUDE_USB_CDC)
 		case 1:		/* CDC Call Control Interface */
 			switch (RequestNo) {
 			case GET_LINE_CODING:
-				CopyRoutine = PIOS_CDC_GetLineCoding;
+				CopyRoutine = PIOS_USB_CDC_GetLineCoding;
 				break;
 			}
 
@@ -328,7 +311,7 @@ static RESULT PIOS_USBHOOK_Data_Setup(uint8_t RequestNo)
 			}
 
 			break;
-#endif	/* PIOS_INCLUDE_USB_COM_CDC */
+#endif	/* PIOS_INCLUDE_USB_CDC */
 		}
 		break;
 	}
@@ -364,19 +347,19 @@ static RESULT PIOS_USBHOOK_NoData_Setup(uint8_t RequestNo)
 
 			break;
 
-#if defined(PIOS_INCLUDE_USB_COM_CDC)
+#if defined(PIOS_INCLUDE_USB_CDC)
 		case 1:		/* CDC Call Control Interface */
 			switch (RequestNo) {
 			case SET_LINE_CODING:
-				return PIOS_CDC_SetLineCoding();
+				return PIOS_USB_CDC_SetLineCoding();
 				break;
 			case SET_CONTROL_LINE_STATE:
-				return PIOS_CDC_SetControlLineState();
+				return PIOS_USB_CDC_SetControlLineState();
 				break;
 			}
 
 			break;
-#endif	/* PIOS_INCLUDE_USB_COM_CDC */
+#endif	/* PIOS_INCLUDE_USB_CDC */
 		}
 
 		break;
@@ -435,7 +418,7 @@ static uint8_t *PIOS_USBHOOK_GetStringDescriptor(uint16_t Length)
 *******************************************************************************/
 static uint8_t *PIOS_USBHOOK_GetReportDescriptor(uint16_t Length)
 {
-	return Standard_GetDescriptorData(Length, &PIOS_HID_Report_Descriptor);
+	return Standard_GetDescriptorData(Length, &Hid_Report_Descriptor);
 }
 
 /*******************************************************************************
@@ -447,7 +430,7 @@ static uint8_t *PIOS_USBHOOK_GetReportDescriptor(uint16_t Length)
 *******************************************************************************/
 static uint8_t *PIOS_USBHOOK_GetHIDDescriptor(uint16_t Length)
 {
-	return Standard_GetDescriptorData(Length, &PIOS_HID_Hid_Descriptor);
+	return Standard_GetDescriptorData(Length, &Hid_Interface_Descriptor);
 }
 
 /*******************************************************************************

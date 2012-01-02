@@ -311,7 +311,7 @@ extern uint32_t pios_com_aux_id;
 #define PIOS_USB_ENABLED                        1
 #define PIOS_USB_DETECT_GPIO_PORT               GPIOC
 #define PIOS_USB_MAX_DEVS                       1
-#define PIOS_USB_COM_MAX_DEVS                   1
+#define PIOS_USB_HID_MAX_DEVS                   1
 #define PIOS_USB_DETECT_GPIO_PIN                GPIO_Pin_4
 #define PIOS_USB_DETECT_EXTI_LINE               EXTI_Line4
 #define PIOS_IRQ_USB_PRIORITY                   PIOS_IRQ_PRIO_MID

@@ -31,6 +31,7 @@
 #include "packet_handler.h"
 #include "saved_settings.h"
 #include "main.h"
+#include "pios_usb.h"		/* PIOS_USB_* */
 
 #if defined(PIOS_COM_DEBUG)
   #define TRANS_DEBUG
@@ -70,8 +71,8 @@ void trans_process(void)
     bool usb_comms = false;						// TRUE if we are using the usb port for comms.
     uint32_t comm_port = PIOS_COM_SERIAL;		// default to using the usart comm-port
 
-    #if defined(PIOS_INCLUDE_USB_HID)
-        if (PIOS_USB_HID_CheckAvailable(0))
+    #if defined(PIOS_INCLUDE_USB)
+        if (PIOS_USB_CheckAvailable(0))
         {	// USB comms is up, use the USB comm-port instead of the USART comm-port
             usb_comms = true;
             comm_port = PIOS_COM_TELEM_USB;

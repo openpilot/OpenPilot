@@ -1,14 +1,14 @@
-/**
+ /**
  ******************************************************************************
  * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
- * @addtogroup PIOS_USB_COM USB COM layer functions
- * @brief Hardware communication layer
+ * @addtogroup   PIOS_USB USB Setup Functions
+ * @brief PIOS interface for USB device driver
  * @{
  *
- * @file       pios_usb_com_priv.h
+ * @file       pios_usb_priv.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      USB COM private definitions.
+ * @brief      USB private definitions.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -28,39 +28,22 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_USB_COM_PRIV_H
-#define PIOS_USB_COM_PRIV_H
+#ifndef PIOS_USB_PRIV_H
+#define PIOS_USB_PRIV_H
 
-#include "usb_core.h"		/* RESULT */
+#include <pios.h>
+#include <pios_stm32.h>
 
-enum pios_usb_com_type {
-	PIOS_USB_COM_CDC,
-	PIOS_USB_COM_HID,
+struct pios_usb_cfg {
+	struct stm32_irq irq;
 };
 
-struct pios_usb_com_cfg {
-	enum pios_usb_com_type type;
+extern int32_t PIOS_USB_Init(uint32_t * usb_id, const struct pios_usb_cfg * cfg);
 
-	uint8_t ctrl_if;
-	uint8_t ctrl_tx_ep;
-
-	uint8_t data_if;
-	uint8_t data_rx_ep;
-	uint8_t data_tx_ep;
-};
-
-extern const struct pios_com_driver pios_usb_hid_com_driver;
-extern const struct pios_com_driver pios_usb_cdc_com_driver;
-
-extern int32_t PIOS_USB_COM_Init(uint32_t * usbcom_id, const struct pios_usb_com_cfg * cfg, uint32_t lower_id);
-
-extern uint8_t *PIOS_CDC_GetLineCoding(uint16_t Length);
-extern RESULT PIOS_CDC_SetControlLineState(void);
-extern RESULT PIOS_CDC_SetLineCoding(void);
-
-#endif /* PIOS_USB_COM_PRIV_H */
+#endif /* PIOS_USB_PRIV_H */
 
 /**
   * @}
   * @}
   */
+

@@ -1041,8 +1041,8 @@ uint32_t pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE];
 
 #endif /* PIOS_INCLUDE_RCVR */
 
-#if defined(PIOS_INCLUDE_USB_HID)
-#include "pios_usb_hid_priv.h"
+#if defined(PIOS_INCLUDE_USB)
+#include "pios_usb_priv.h"
 
 static const struct pios_usb_cfg pios_usb_main_cfg = {
   .irq = {
@@ -1054,19 +1054,18 @@ static const struct pios_usb_cfg pios_usb_main_cfg = {
     },
   },
 };
-#endif	/* PIOS_INCLUDE_USB_HID */
+#endif	/* PIOS_INCLUDE_USB */
 
-#if defined(PIOS_INCLUDE_USB_COM)
-#include <pios_usb_com_priv.h>
+#if defined(PIOS_INCLUDE_USB_HID)
+#include <pios_usb_hid_priv.h>
 
-const struct pios_usb_com_cfg pios_usb_com_hid_cfg = {
-	.type = PIOS_USB_COM_HID,
+const struct pios_usb_hid_cfg pios_usb_hid_cfg = {
 	.data_if = 0,
 	.data_rx_ep = 1,
 	.data_tx_ep = 1,
 };
 
-#endif	/* PIOS_INCLUDE_USB_COM */
+#endif	/* PIOS_INCLUDE_USB_HID */
 
 uint32_t pios_com_telem_rf_id;
 uint32_t pios_com_telem_usb_id;
@@ -1286,25 +1285,28 @@ void PIOS_Board_Init(void) {
 		break;
 	}
 
-#if defined(PIOS_INCLUDE_USB_HID)
+#if defined(PIOS_INCLUDE_USB)
 	uint32_t pios_usb_id;
-	PIOS_USB_Init(&pios_usb_id, &pios_usb_main_cfg);
-#if defined(PIOS_INCLUDE_COM)
-	uint32_t pios_usb_com_id;
-	if (PIOS_USB_COM_Init(&pios_usb_com_id, &pios_usb_com_hid_cfg, pios_usb_id)) {
+	if (PIOS_USB_Init(&pios_usb_id, &pios_usb_main_cfg)) {
+		PIOS_Assert(0);
+	}
+#if defined(PIOS_INCLUDE_USB_HID) && defined(PIOS_INCLUDE_COM)
+	uint32_t pios_usb_hid_id;
+	if (PIOS_USB_HID_Init(&pios_usb_hid_id, &pios_usb_hid_cfg, pios_usb_id)) {
 		PIOS_Assert(0);
 	}
 	uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_USB_RX_BUF_LEN);
 	uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_USB_TX_BUF_LEN);
 	PIOS_Assert(rx_buffer);
 	PIOS_Assert(tx_buffer);
-	if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_hid_com_driver, pios_usb_com_id,
+	if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_hid_com_driver, pios_usb_hid_id,
 			  rx_buffer, PIOS_COM_TELEM_USB_RX_BUF_LEN,
 			  tx_buffer, PIOS_COM_TELEM_USB_TX_BUF_LEN)) {
 		PIOS_Assert(0);
 	}
-#endif	/* PIOS_INCLUDE_COM */
-#endif	/* PIOS_INCLUDE_USB_HID */
+#endif	/* PIOS_INCLUDE_USB_HID && PIOS_INCLUDE_COM */
+
+#endif	/* PIOS_INCLUDE_USB */
 
 #if defined(PIOS_INCLUDE_I2C)
 	if (PIOS_I2C_Init(&pios_i2c_main_adapter_id, &pios_i2c_main_adapter_cfg)) {

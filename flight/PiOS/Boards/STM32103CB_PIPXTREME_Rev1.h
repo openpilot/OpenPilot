@@ -399,7 +399,7 @@ extern uint32_t pios_com_telem_usb_id;
 	#define PIOS_USB_DETECT_EXTI_LINE		EXTI_Line4
 	#define PIOS_IRQ_USB_PRIORITY			8
 #endif
-#define PIOS_USB_COM_MAX_DEVS           1
+#define PIOS_USB_HID_MAX_DEVS           1
 
 // *****************************************************************
 // RFM22

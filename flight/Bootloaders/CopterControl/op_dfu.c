@@ -294,6 +294,10 @@ void processComand(uint8_t *xReceive_Buffer) {
 		sendData(Buffer + 1, 63);
 		break;
 	case JumpFW:
+		if (Data == 0x5AFE) {
+			/* Force board into safe mode */
+			PIOS_IAP_WriteBootCount(0xFFFF);
+		}
 		FLASH_Lock();
 		JumpToApp = 1;
 		break;

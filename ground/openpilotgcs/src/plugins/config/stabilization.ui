@@ -748,7 +748,23 @@ automatically every 300ms, which will help for fast tuning.</string>
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="stabilizationResetToDefaults">
+       <property name="toolTip">
+        <string>Load default Stabilization settings
+
+Loaded settings are not applied automatically. You have to click the
+Apply or Save button afterwards.</string>
+       </property>
+       <property name="text">
+        <string>Reset To Defaults</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="saveStabilizationToRAM">
+       <property name="toolTip">
+        <string>Send settings to the board but do not save to the non-volatile memory</string>
+       </property>
        <property name="text">
         <string>Apply</string>
        </property>
@@ -756,6 +772,9 @@ automatically every 300ms, which will help for fast tuning.</string>
      </item>
      <item>
       <widget class="QPushButton" name="saveStabilizationToSD">
+       <property name="toolTip">
+        <string>Send settings to the board and save to the non-volatile memory</string>
+       </property>
        <property name="text">
         <string>Save</string>
        </property>
@@ -765,6 +784,44 @@ automatically every 300ms, which will help for fast tuning.</string>
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>scrollArea</tabstop>
+  <tabstop>rateRollKp</tabstop>
+  <tabstop>rateRollKi</tabstop>
+  <tabstop>rateRollILimit</tabstop>
+  <tabstop>linkRateRP</tabstop>
+  <tabstop>ratePitchKp</tabstop>
+  <tabstop>ratePitchKi</tabstop>
+  <tabstop>ratePitchILimit</tabstop>
+  <tabstop>rateYawKp</tabstop>
+  <tabstop>rateYawKi</tabstop>
+  <tabstop>rateYawILimit</tabstop>
+  <tabstop>rollKp</tabstop>
+  <tabstop>rollKi</tabstop>
+  <tabstop>rollILimit</tabstop>
+  <tabstop>linkAttitudeRP</tabstop>
+  <tabstop>pitchKp</tabstop>
+  <tabstop>pitchKi</tabstop>
+  <tabstop>pitchILimit</tabstop>
+  <tabstop>yawKp</tabstop>
+  <tabstop>yawKi</tabstop>
+  <tabstop>yawILimit</tabstop>
+  <tabstop>rollMax</tabstop>
+  <tabstop>pitchMax</tabstop>
+  <tabstop>yawMax</tabstop>
+  <tabstop>manualRoll</tabstop>
+  <tabstop>manualPitch</tabstop>
+  <tabstop>manualYaw</tabstop>
+  <tabstop>maximumRoll</tabstop>
+  <tabstop>maximumPitch</tabstop>
+  <tabstop>maximumYaw</tabstop>
+  <tabstop>lowThrottleZeroIntegral</tabstop>
+  <tabstop>realTimeUpdates</tabstop>
+  <tabstop>stabilizationHelp</tabstop>
+  <tabstop>stabilizationResetToDefaults</tabstop>
+  <tabstop>saveStabilizationToRAM</tabstop>
+  <tabstop>saveStabilizationToSD</tabstop>
+ </tabstops>
  <resources>
   <include location="../coreplugin/core.qrc"/>
  </resources>

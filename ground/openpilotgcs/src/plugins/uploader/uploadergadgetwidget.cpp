@@ -52,6 +52,7 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
     connect(m_config->haltButton, SIGNAL(clicked()), this, SLOT(goToBootloader()));
     connect(m_config->resetButton, SIGNAL(clicked()), this, SLOT(systemReset()));
     connect(m_config->bootButton, SIGNAL(clicked()), this, SLOT(systemBoot()));
+    connect(m_config->safeBootButton, SIGNAL(clicked()), this, SLOT(systemSafeBoot()));
     connect(m_config->rescueButton, SIGNAL(clicked()), this, SLOT(systemRescue()));
     Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
     connect(cm,SIGNAL(deviceConnected(QIODevice*)),this,SLOT(onPhisicalHWConnect()));
@@ -117,6 +118,7 @@ QString UploaderGadgetWidget::getPortDevice(const QString &friendName)
 void UploaderGadgetWidget::onPhisicalHWConnect()
 {
     m_config->bootButton->setEnabled(false);
+    m_config->safeBootButton->setEnabled(false);
     m_config->rescueButton->setEnabled(false);
     m_config->telemetryLink->setEnabled(false);
 }
@@ -132,6 +134,7 @@ void UploaderGadgetWidget::populate()
 {
     m_config->haltButton->setEnabled(true);
     m_config->resetButton->setEnabled(true);
+    m_config->safeBootButton->setEnabled(false);
     m_config->bootButton->setEnabled(false);
     m_config->rescueButton->setEnabled(false);
     m_config->telemetryLink->setEnabled(false);
@@ -155,6 +158,7 @@ void UploaderGadgetWidget::onAutopilotDisconnect(){
     m_config->haltButton->setEnabled(false);
     m_config->resetButton->setEnabled(false);
     m_config->bootButton->setEnabled(true);
+    m_config->safeBootButton->setEnabled(true);
     if (currentStep == IAP_STATE_BOOTLOADER) {
         m_config->rescueButton->setEnabled(false);
         m_config->telemetryLink->setEnabled(false);
@@ -311,6 +315,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
         */
         // Need to re-enable in case we were not connected
         m_config->bootButton->setEnabled(true);
+        m_config->safeBootButton->setEnabled(true);
         /*
         m_config->telemetryLink->setEnabled(false);
         m_config->rescueButton->setEnabled(false);
@@ -348,14 +353,25 @@ void UploaderGadgetWidget::systemReset()
     goToBootloader();
 }
 
+void UploaderGadgetWidget::systemBoot()
+{
+  commonSystemBoot(false);
+}
+
+void UploaderGadgetWidget::systemSafeBoot()
+{
+  commonSystemBoot(true);
+}
+
 /**
   Tells the system to boot (from Bootloader state)
   */
-void UploaderGadgetWidget::systemBoot()
+void UploaderGadgetWidget::commonSystemBoot(bool safeboot)
 {
 
     clearLog();
     m_config->bootButton->setEnabled(false);
+    m_config->safeBootButton->setEnabled(false);
 
     // Suspend telemety & polling in case it is not done yet
     Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
@@ -379,11 +395,12 @@ void UploaderGadgetWidget::systemBoot()
         delete dfu;
         dfu = NULL;
         m_config->bootButton->setEnabled(true);
+        m_config->safeBootButton->setEnabled(true);
         m_config->rescueButton->setEnabled(true); // Boot not possible, maybe Rescue OK?
         return;
     }
     log("Booting system...");
-    dfu->JumpToApp();
+    dfu->JumpToApp(safeboot);
     // Restart the polling thread
     cm->resumePolling();
     m_config->rescueButton->setEnabled(true);
@@ -530,6 +547,7 @@ void UploaderGadgetWidget::systemRescue()
     m_config->haltButton->setEnabled(false);
     m_config->resetButton->setEnabled(false);
     m_config->bootButton->setEnabled(true);
+    m_config->safeBootButton->setEnabled(true);
     m_config->rescueButton->setEnabled(false);
     currentStep = IAP_STATE_BOOTLOADER; // So that we can boot from the GUI afterwards.
 }

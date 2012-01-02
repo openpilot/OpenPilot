@@ -61,6 +61,7 @@ static xQueueHandle queue;
 
 // Private functions
 static void altitudeHoldTask(void *parameters);
+static void SettingsUpdatedCb(UAVObjEvent * ev);
 
 /**
  * Initialise the module, called on startup
@@ -90,6 +91,8 @@ int32_t AltitudeHoldInitialize()
 	// Listen for updates.
 	AltitudeHoldDesiredConnectQueue(queue);
 	
+	AltitudeHoldSettingsConnectCallback(&SettingsUpdatedCb);
+	
 	return 0;
 }
 MODULE_INITCALL(AltitudeHoldInitialize, AltitudeHoldStart)
@@ -110,6 +113,9 @@ static void altitudeHoldTask(void *parameters)
 	portTickType lastSysTime;
 	UAVObjEvent ev;
 	
+	// Force update of the settings
+	SettingsUpdatedCb(&ev);
+	
 	// Main task loop
 	lastSysTime = xTaskGetTickCount();
 	while (1) {
@@ -121,8 +127,6 @@ static void altitudeHoldTask(void *parameters)
 			throttleIntegral = 0;
 			continue;
 		} else {
-			AltitudeHoldDesiredGet(&altitudeHoldDesired);
-			AltitudeHoldSettingsGet(&altitudeHoldSettings);
 			PositionActualGet(&positionActual);
 			StabilizationDesiredGet(&stabilizationDesired);
 			float dT;
@@ -131,9 +135,14 @@ static void altitudeHoldTask(void *parameters)
 			if(thisTime > lastSysTime) // reuse dt in case of wraparound
 				dT = (thisTime - lastSysTime) / portTICK_RATE_MS / 1000.0f;
 			lastSysTime = thisTime;
+
+			static float altitude;
+			const float altitudeTau = 0.1;
+			
 			
 			// Flipping sign on error since altitude is "down"
 			float error = - (altitudeHoldDesired.Down - positionActual.Down);
+			static float 
 			throttleIntegral += error * altitudeHoldSettings.Ki * dT * 1000;
 			if(throttleIntegral > altitudeHoldSettings.ILimit)
 				throttleIntegral = altitudeHoldSettings.ILimit;
@@ -155,4 +164,17 @@ static void altitudeHoldTask(void *parameters)
 		}
 	
 	}
+}
+
+static void SettingsUpdatedCb(UAVObjEvent * ev)
+{
+	AltitudeHoldDesiredGet(&altitudeHoldDesired);
+	AltitudeHoldSettingsGet(&altitudeHoldSettings);
+
+	const float fakeDt = 0.0025;
+	if(settings.GyroTau < 0.0001)
+		gyro_alpha = 0;   // not trusting this to resolve to 0
+	else
+		gyro_alpha = expf(-fakeDt  / settings.GyroTau);
+
 }

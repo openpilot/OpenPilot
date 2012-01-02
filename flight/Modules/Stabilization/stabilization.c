@@ -466,7 +466,7 @@ static void SettingsUpdatedCb(UAVObjEvent * ev)
 	if(settings.GyroTau < 0.0001)
 		gyro_alpha = 0;   // not trusting this to resolve to 0
 	else
-		gyro_alpha = exp(-fakeDt  / settings.GyroTau);
+		gyro_alpha = expf(-fakeDt  / settings.GyroTau);
 }
 
 

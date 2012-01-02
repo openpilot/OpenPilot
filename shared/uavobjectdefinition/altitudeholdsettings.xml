@@ -1,9 +1,10 @@
 <xml>
     <object name="AltitudeHoldSettings" singleinstance="true" settings="true">
         <description>Settings for the @ref AltitudeHold module</description>
-	<field name="Kp" units="throttle/m" type="float" elements="1" defaultvalue="0.25"/>
+	<field name="Kp" units="throttle/m" type="float" elements="1" defaultvalue="0.025"/>
 	<field name="Ki" units="throttle/m" type="float" elements="1" defaultvalue="0.025"/>
-	<field name="ILimit" units="throttle" type="float" elements="1" defaultvalue ="0.5"/>
+	<field name="Kd" units="throttle/m" type="float" elements="1" defaultvalue="0.25"/>
+	<field name="AltitudeTau" units="s" type="float" elements="1" defaultvalue="0.1"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

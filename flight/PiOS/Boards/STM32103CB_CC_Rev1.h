@@ -206,29 +206,43 @@ extern uint32_t pios_com_telem_usb_id;
 // PIOS_RCVR
 // See also pios_board.c
 //------------------------
-#define PIOS_RCVR_MAX_DEVS                      1
+#define PIOS_RCVR_MAX_DEVS                      3
 #define PIOS_RCVR_MAX_CHANNELS			12
 
 //-------------------------
 // Receiver PPM input
 //-------------------------
+#define PIOS_PPM_MAX_DEVS			1
 #define PIOS_PPM_NUM_INPUTS                     12
 
 //-------------------------
 // Receiver PWM input
 //-------------------------
+#define PIOS_PWM_MAX_DEVS			1
 #define PIOS_PWM_NUM_INPUTS                     6
 
 //-------------------------
-// Receiver SPEKTRUM input
+// Receiver DSM input
 //-------------------------
-#define PIOS_SPEKTRUM_NUM_INPUTS                12
+#define PIOS_DSM_MAX_DEVS			2
+#define PIOS_DSM_NUM_INPUTS			12
+
+//-------------------------
+// Receiver S.Bus input
+//-------------------------
+#define PIOS_SBUS_MAX_DEVS			1
+#define PIOS_SBUS_NUM_INPUTS			(16+2)
 
 //-------------------------
 // Servo outputs
 //-------------------------
 #define PIOS_SERVO_UPDATE_HZ                    50
 #define PIOS_SERVOS_INITIAL_POSITION            0 /* dont want to start motors, have no pulse till settings loaded */
+
+//--------------------------
+// Timer controller settings
+//--------------------------
+#define PIOS_TIM_MAX_DEVS			3
 
 //-------------------------
 // GPIO

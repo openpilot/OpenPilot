@@ -35,6 +35,7 @@
 /* OpenPilot Includes */
 #include "openpilot.h"
 #include "uavobjectsinit.h"
+#include "hwsettings.h"
 #include "systemmod.h"
 
 /* Task Priorities */
@@ -69,6 +70,12 @@ int main()
 	 * */
 	PIOS_Board_Init();
 
+#ifdef ERASE_FLASH
+	PIOS_Flash_W25X_EraseChip();
+	PIOS_LED_Off(LED1);
+	while (1) ;
+#endif
+
 	/* Initialize modules */
 	MODULE_INITIALISE_ALL
 
@@ -81,11 +88,11 @@ int main()
 	/* If all is well we will never reach here as the scheduler will now be running. */
 
 	/* Do some indication to user that something bad just happened */
-	PIOS_LED_Off(LED1); \
-	for(;;) { \
-		PIOS_LED_Toggle(LED1); \
-		PIOS_DELAY_WaitmS(100); \
-	};
+	PIOS_LED_Off(LED1);
+	while (1) {
+		PIOS_LED_Toggle(LED1);
+		PIOS_DELAY_WaitmS(100);
+	}
 
     return 0;
 }

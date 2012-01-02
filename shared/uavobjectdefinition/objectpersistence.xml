@@ -1,7 +1,7 @@
 <xml>
     <object name="ObjectPersistence" singleinstance="true" settings="false">
         <description>Someone who knows please enter this</description>
-        <field name="Operation" units="" type="enum" elements="1" options="NOP,Load,Save,Delete,Completed"/>
+        <field name="Operation" units="" type="enum" elements="1" options="NOP,Load,Save,Delete,FullErase,Completed"/>
         <field name="Selection" units="" type="enum" elements="1" options="SingleObject,AllSettings,AllMetaObjects,AllObjects"/>
         <field name="ObjectID" units="" type="uint32" elements="1"/>
         <field name="InstanceID" units="" type="uint32" elements="1"/>

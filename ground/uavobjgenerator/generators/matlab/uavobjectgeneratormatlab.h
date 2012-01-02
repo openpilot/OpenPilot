@@ -37,8 +37,10 @@ public:
 private:
     bool process_object(ObjectInfo* info);
     QString matlabAllocationCode;
-    QString matlabSwithCode;
+    QString matlabSwitchCode;
+    QString matlabCleanupCode;
     QString matlabSaveObjectsCode;
+    QString matlabExportCsvCode;
     QString matlabFunctionsCode;
     QStringList fieldTypeStrMatlab;
 

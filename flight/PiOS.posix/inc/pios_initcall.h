@@ -51,7 +51,6 @@ extern initmodule_t __module_initcall_start[], __module_initcall_end[];
 extern void InitModules();
 extern void StartModules();
 
-#define UAVOBJ_INITCALL(fn)
 #define MODULE_INITCALL(ifn, sfn)
 
 #define MODULE_TASKCREATE_ALL { \

@@ -31,13 +31,6 @@
 #ifndef PIOS_RCVR_H
 #define PIOS_RCVR_H
 
-struct pios_rcvr_channel_map {
-	uint32_t id;
-	uint8_t  channel;
-};
-
-extern struct pios_rcvr_channel_map pios_rcvr_channel_to_id_map[];
-
 struct pios_rcvr_driver {
 	void    (*init)(uint32_t id);
 	int32_t (*read)(uint32_t id, uint8_t channel);
@@ -45,6 +38,16 @@ struct pios_rcvr_driver {
 
 /* Public Functions */
 extern int32_t PIOS_RCVR_Read(uint32_t rcvr_id, uint8_t channel);
+
+/*! Define error codes for PIOS_RCVR_Get */
+enum PIOS_RCVR_errors {
+	/*! Indicates that a failsafe condition or missing receiver detected for that channel */
+	PIOS_RCVR_TIMEOUT = 0,
+	/*! Channel is invalid for this driver (usually out of range supported) */
+	PIOS_RCVR_INVALID = -1,
+	/*! Indicates that the driver for this channel has not been initialized */
+	PIOS_RCVR_NODRIVER = -2
+};
 
 #endif /* PIOS_RCVR_H */
 

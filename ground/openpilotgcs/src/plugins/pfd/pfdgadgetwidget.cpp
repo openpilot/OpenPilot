@@ -27,6 +27,7 @@
 
 #include "pfdgadgetwidget.h"
 #include <utils/stylehelper.h>
+#include <utils/cachedsvgitem.h>
 #include <iostream>
 #include <QDebug>
 #include <QPainter>
@@ -73,12 +74,21 @@ PFDGadgetWidget::PFDGadgetWidget(QWidget *parent) : QGraphicsView(parent)
     connect(&skyDialTimer, SIGNAL(timeout()), this, SLOT(moveSky()));
     skyDialTimer.start(30);
 
+
 }
 
 PFDGadgetWidget::~PFDGadgetWidget()
 {
     skyDialTimer.stop();
     dialTimer.stop();
+}
+
+void PFDGadgetWidget::setToolTipPrivate()
+{
+    static qint32 updateRate=0;
+    UAVObject::Metadata mdata=attitudeObj->getMetadata();
+    if(mdata.flightTelemetryUpdatePeriod!=updateRate)
+        this->setToolTip("Current refresh rate:"+QString::number(mdata.flightTelemetryUpdatePeriod)+" miliseconds"+"\nIf you want to change it please edit the AttitudeActual metadata on the object browser.");
 }
 
 /*!
@@ -173,7 +183,6 @@ void PFDGadgetWidget::connectNeedles() {
             qDebug() << "Error: Object is unknown (FlightBatteryState).";
        }
    }
-
 }
 
 
@@ -228,6 +237,7 @@ void PFDGadgetWidget::updateLinkStatus(UAVObject *object1) {
   Resolution is 1 degree roll & 1/7.5 degree pitch.
   */
 void PFDGadgetWidget::updateAttitude(UAVObject *object1) {
+    setToolTipPrivate();
     UAVObjectField * rollField = object1->getField(QString("Roll"));
     UAVObjectField * yawField = object1->getField(QString("Yaw"));
     UAVObjectField * pitchField = object1->getField(QString("Pitch"));
@@ -383,7 +393,7 @@ void PFDGadgetWidget::setDialFile(QString dfn)
      - Battery stats: battery-txt
  */
          l_scene->clear(); // Deletes all items contained in the scene as well.
-         m_background = new QGraphicsSvgItem();
+         m_background = new CachedSvgItem();
          // All other items will be clipped to the shape of the background
          m_background->setFlags(QGraphicsItem::ItemClipsChildrenToShape|
                                 QGraphicsItem::ItemClipsToShape);
@@ -391,28 +401,28 @@ void PFDGadgetWidget::setDialFile(QString dfn)
          m_background->setElementId("background");
          l_scene->addItem(m_background);
 
-         m_world = new QGraphicsSvgItem();
+         m_world = new CachedSvgItem();
          m_world->setParentItem(m_background);
          m_world->setSharedRenderer(m_renderer);
          m_world->setElementId("world");
          l_scene->addItem(m_world);
 
          // red Roll scale: rollscale
-         m_rollscale = new QGraphicsSvgItem();
+         m_rollscale = new CachedSvgItem();
          m_rollscale->setSharedRenderer(m_renderer);
          m_rollscale->setElementId("rollscale");
          l_scene->addItem(m_rollscale);
 
          // Home point:
-         m_homewaypoint = new QGraphicsSvgItem();
+         m_homewaypoint = new CachedSvgItem();
          // Next point:
-         m_nextwaypoint = new QGraphicsSvgItem();
+         m_nextwaypoint = new CachedSvgItem();
          // Home point bearing:
-         m_homepointbearing = new QGraphicsSvgItem();
+         m_homepointbearing = new CachedSvgItem();
          // Next point bearing:
-         m_nextpointbearing = new QGraphicsSvgItem();
+         m_nextpointbearing = new CachedSvgItem();
 
-         QGraphicsSvgItem *m_foreground = new QGraphicsSvgItem();
+         QGraphicsSvgItem *m_foreground = new CachedSvgItem();
          m_foreground->setParentItem(m_background);
          m_foreground->setSharedRenderer(m_renderer);
          m_foreground->setElementId("foreground");
@@ -429,7 +439,7 @@ void PFDGadgetWidget::setDialFile(QString dfn)
          // into a QGraphicsSvgItem which we will display at the same
          // place: we do this so that the heading scale can be clipped to
          // the compass dial region.
-         m_compass = new QGraphicsSvgItem();
+         m_compass = new CachedSvgItem();
          m_compass->setSharedRenderer(m_renderer);
          m_compass->setElementId("compass");
          m_compass->setFlags(QGraphicsItem::ItemClipsChildrenToShape|
@@ -440,7 +450,7 @@ void PFDGadgetWidget::setDialFile(QString dfn)
          m_compass->setTransform(matrix,false);
 
          // Now place the compass scale inside:
-         m_compassband = new QGraphicsSvgItem();
+         m_compassband = new CachedSvgItem();
          m_compassband->setSharedRenderer(m_renderer);
          m_compassband->setElementId("compass-band");
          m_compassband->setParentItem(m_compass);
@@ -462,7 +472,7 @@ void PFDGadgetWidget::setDialFile(QString dfn)
          compassMatrix = m_renderer->matrixForElement("speed-bg");
          startX = compassMatrix.mapRect(m_renderer->boundsOnElement("speed-bg")).x();
          startY = compassMatrix.mapRect(m_renderer->boundsOnElement("speed-bg")).y();
-         QGraphicsSvgItem *verticalbg = new QGraphicsSvgItem();
+         QGraphicsSvgItem *verticalbg = new CachedSvgItem();
          verticalbg->setSharedRenderer(m_renderer);
          verticalbg->setElementId("speed-bg");
          verticalbg->setFlags(QGraphicsItem::ItemClipsChildrenToShape|
@@ -477,7 +487,7 @@ void PFDGadgetWidget::setDialFile(QString dfn)
          m_speedscale = new QGraphicsItemGroup();
          m_speedscale->setParentItem(verticalbg);
 
-         QGraphicsSvgItem *speedscalelines = new QGraphicsSvgItem();
+         QGraphicsSvgItem *speedscalelines = new CachedSvgItem();
          speedscalelines->setSharedRenderer(m_renderer);
          speedscalelines->setElementId("speed-scale");
          speedScaleHeight = m_renderer->matrixForElement("speed-scale").mapRect(
@@ -523,7 +533,7 @@ void PFDGadgetWidget::setDialFile(QString dfn)
          startX = compassMatrix.mapRect(m_renderer->boundsOnElement("speed-window")).x();
          startY = compassMatrix.mapRect(m_renderer->boundsOnElement("speed-window")).y();
          qreal speedWindowHeight = compassMatrix.mapRect(m_renderer->boundsOnElement("speed-window")).height();
-         QGraphicsSvgItem *speedwindow = new QGraphicsSvgItem();
+         QGraphicsSvgItem *speedwindow = new CachedSvgItem();
          speedwindow->setSharedRenderer(m_renderer);
          speedwindow->setElementId("speed-window");
          speedwindow->setFlags(QGraphicsItem::ItemClipsChildrenToShape|
@@ -548,7 +558,7 @@ void PFDGadgetWidget::setDialFile(QString dfn)
          compassMatrix = m_renderer->matrixForElement("altitude-bg");
          startX = compassMatrix.mapRect(m_renderer->boundsOnElement("altitude-bg")).x();
          startY = compassMatrix.mapRect(m_renderer->boundsOnElement("altitude-bg")).y();
-         verticalbg = new QGraphicsSvgItem();
+         verticalbg = new CachedSvgItem();
          verticalbg->setSharedRenderer(m_renderer);
          verticalbg->setElementId("altitude-bg");
          verticalbg->setFlags(QGraphicsItem::ItemClipsChildrenToShape|
@@ -563,7 +573,7 @@ void PFDGadgetWidget::setDialFile(QString dfn)
          m_altitudescale = new QGraphicsItemGroup();
          m_altitudescale->setParentItem(verticalbg);
 
-         QGraphicsSvgItem *altitudescalelines = new QGraphicsSvgItem();
+         QGraphicsSvgItem *altitudescalelines = new CachedSvgItem();
          altitudescalelines->setSharedRenderer(m_renderer);
          altitudescalelines->setElementId("altitude-scale");
          altitudeScaleHeight = m_renderer->matrixForElement("altitude-scale").mapRect(
@@ -604,7 +614,7 @@ void PFDGadgetWidget::setDialFile(QString dfn)
          startX = compassMatrix.mapRect(m_renderer->boundsOnElement("altitude-window")).x();
          startY = compassMatrix.mapRect(m_renderer->boundsOnElement("altitude-window")).y();
          qreal altitudeWindowHeight = compassMatrix.mapRect(m_renderer->boundsOnElement("altitude-window")).height();
-         QGraphicsSvgItem *altitudewindow = new QGraphicsSvgItem();
+         QGraphicsSvgItem *altitudewindow = new CachedSvgItem();
          altitudewindow->setSharedRenderer(m_renderer);
          altitudewindow->setElementId("altitude-window");
          altitudewindow->setFlags(QGraphicsItem::ItemClipsChildrenToShape|
@@ -633,7 +643,7 @@ void PFDGadgetWidget::setDialFile(QString dfn)
              compassMatrix = m_renderer->matrixForElement("gcstelemetry-Disconnected");
              startX = compassMatrix.mapRect(m_renderer->boundsOnElement("gcstelemetry-Disconnected")).x();
              startY = compassMatrix.mapRect(m_renderer->boundsOnElement("gcstelemetry-Disconnected")).y();
-             gcsTelemetryArrow = new QGraphicsSvgItem();
+             gcsTelemetryArrow = new CachedSvgItem();
              gcsTelemetryArrow->setSharedRenderer(m_renderer);
              gcsTelemetryArrow->setElementId("gcstelemetry-Disconnected");
              l_scene->addItem(gcsTelemetryArrow);
@@ -669,7 +679,7 @@ void PFDGadgetWidget::setDialFile(QString dfn)
          compassMatrix = m_renderer->matrixForElement("gcstelemetry-Disconnected");
          startX = compassMatrix.mapRect(m_renderer->boundsOnElement("gcstelemetry-Disconnected")).x();
          startY = compassMatrix.mapRect(m_renderer->boundsOnElement("gcstelemetry-Disconnected")).y();
-         gcsTelemetryArrow = new QGraphicsSvgItem();
+         gcsTelemetryArrow = new CachedSvgItem();
          gcsTelemetryArrow->setSharedRenderer(m_renderer);
          gcsTelemetryArrow->setElementId("gcstelemetry-Disconnected");
          l_scene->addItem(gcsTelemetryArrow);
@@ -702,7 +712,7 @@ void PFDGadgetWidget::setDialFile(QString dfn)
          compassMatrix = m_renderer->matrixForElement("gcstelemetry-Disconnected");
          startX = compassMatrix.mapRect(m_renderer->boundsOnElement("gcstelemetry-Disconnected")).x();
          startY = compassMatrix.mapRect(m_renderer->boundsOnElement("gcstelemetry-Disconnected")).y();
-         gcsTelemetryArrow = new QGraphicsSvgItem();
+         gcsTelemetryArrow = new CachedSvgItem();
          gcsTelemetryArrow->setSharedRenderer(m_renderer);
          gcsTelemetryArrow->setElementId("gcstelemetry-Disconnected");
          l_scene->addItem(gcsTelemetryArrow);
@@ -771,7 +781,7 @@ void PFDGadgetWidget::setDialFile(QString dfn)
    { qDebug()<<"Error on PFD artwork file.";
        m_renderer->load(QString(":/pfd/images/pfd-default.svg"));
        l_scene->clear(); // This also deletes all items contained in the scene.
-       m_background = new QGraphicsSvgItem();
+       m_background = new CachedSvgItem();
        m_background->setSharedRenderer(m_renderer);
        l_scene->addItem(m_background);
        pfdError = true;

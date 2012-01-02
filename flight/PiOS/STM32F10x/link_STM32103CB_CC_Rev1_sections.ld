@@ -1,5 +1,5 @@
 /* This is the size of the stack for all FreeRTOS IRQs */
-_irq_stack_size = 0x180;
+_irq_stack_size = 0x1E6;
 /* This is the size of the stack for early init: life span is until scheduler starts */
 _init_stack_size = 0x100;
 
@@ -21,16 +21,6 @@ SECTIONS
         *(.glue_7t) *(.glue_7)
         *(.rodata .rodata* .gnu.linkonce.r.*)
     } > FLASH
-
-    /* init sections */
-    .initcalluavobj.init :
-    {
-        . = ALIGN(4);
-	__uavobj_initcall_start = .;
-        KEEP(*(.initcalluavobj.init))
-	. = ALIGN(4);
-	__uavobj_initcall_end   = .;
-    } >FLASH
 
     /* module sections */
     .initcallmodule.init :

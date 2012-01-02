@@ -2,7 +2,7 @@
  ******************************************************************************
  *
  * @file       configtelemetrywidget.h
- * @author     E. Lafargue & The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup ConfigPlugin Config Plugin
@@ -40,7 +40,7 @@ ConfigProHWWidget::ConfigProHWWidget(QWidget *parent) : ConfigTaskWidget(parent)
     m_telemetry->setupUi(this);
 
     setupButtons(m_telemetry->saveTelemetryToRAM,m_telemetry->saveTelemetryToSD);
-    addUAVObjectToWidgetRelation("TelemetrySettings","Speed",m_telemetry->telemetrySpeed);
+    addUAVObjectToWidgetRelation("HwSettings","TelemetrySpeed",m_telemetry->telemetrySpeed);
     enableControls(false);
     populateWidgets();
     refreshWidgetsValues();

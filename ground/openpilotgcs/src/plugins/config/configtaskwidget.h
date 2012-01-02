@@ -41,6 +41,9 @@
 #include <QTableWidget>
 #include <QDoubleSpinBox>
 #include <QSpinBox>
+#include <QCheckBox>
+#include <QPushButton>
+
 class ConfigTaskWidget: public QWidget
 {
     Q_OBJECT
@@ -51,6 +54,8 @@ public:
         UAVObject * object;
         UAVObjectField * field;
         QWidget * widget;
+        int index;
+        int scale;
     };
 
     ConfigTaskWidget(QWidget *parent = 0);
@@ -60,21 +65,30 @@ public:
     static double listMean(QList<double> list);
     void addUAVObject(QString objectName);
     void addWidget(QWidget * widget);
-    void addUAVObjectToWidgetRelation(QString object,QString field,QWidget * widget);
+    void addUAVObjectToWidgetRelation(QString object,QString field,QWidget * widget,int index=0,int scale=1);
+
     void setupButtons(QPushButton * update,QPushButton * save);
     bool isDirty();
+    void setDirty(bool value);
+    void addUAVObjectToWidgetRelation(QString object, QString field, QWidget *widget, QString index);
+    bool allObjectsUpdated();
 public slots:
     void onAutopilotDisconnect();
     void onAutopilotConnect();
+    void invalidateObjects();
 
 private slots:
     virtual void refreshValues();
     virtual void updateObjectsFromWidgets();
+    void objectUpdated(UAVObject*);
 private:
+    bool isConnected;
+    QStringList objectsList;
     QList <objectToWidget*> objOfInterest;
     ExtensionSystem::PluginManager *pm;
     UAVObjectManager *objManager;
     smartSaveButton *smartsave;
+    QMap<UAVObject *,bool> objectUpdates;
     bool dirty;
 protected slots:
     virtual void disableObjUpdates();

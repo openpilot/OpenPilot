@@ -37,6 +37,9 @@ OUTDIR := $(TOP)/build/$(TARGET)
 # Set to YES to compile for debugging
 DEBUG ?= YES
 
+# Include objects that are just nice information to show
+DIAGNOSTICS ?= YES
+
 # Set to YES to use the Servo output pins for debugging via scope or logic analyser
 ENABLE_DEBUG_PINS ?= NO
 
@@ -55,13 +58,16 @@ endif
 
 FLASH_TOOL = OPENOCD
 
+
 # List of modules to include
-MODULES = Actuator Telemetry GPS ManualControl Altitude AHRSComms Stabilization Guidance FirmwareIAP
+OPTMODULES = CameraStab GPS
+MODULES = Actuator ManualControl Altitude AHRSComms Stabilization Guidance FirmwareIAP
 PYMODULES = FlightPlan
 #MODULES = Telemetry Example
 #MODULES = Telemetry MK/MKSerial
 #MODULES = Telemetry
 #MODULES += Osd/OsdEtStd
+MODULES += Telemetry
 
 # Paths
 OPSYSTEM = ./System
@@ -125,6 +131,7 @@ PYSRC += ${foreach MOD, ${PYMODULES}, ${wildcard ${OPMODULEDIR}/${MOD}/*.c}}
 SRC += $(PYSRC)
 
 ## MODULES
+SRC += ${foreach MOD, ${OPTMODULES}, ${wildcard ${OPMODULEDIR}/${MOD}/*.c}}
 SRC += ${foreach MOD, ${MODULES}, ${wildcard ${OPMODULEDIR}/${MOD}/*.c}}
 ## OPENPILOT CORE:
 SRC += ${OPMODULEDIR}/System/systemmod.c
@@ -135,7 +142,6 @@ SRC += $(OPSYSTEM)/taskmonitor.c
 SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
 SRC += $(OPUAVOBJ)/eventdispatcher.c
-SRC += $(OPUAVOBJ)/uavobjectsinit_linker.c
 else
 ## TESTCODE
 SRC += $(OPTESTS)/test_common.c
@@ -163,8 +169,9 @@ SRC += $(PIOSSTM32F10X)/pios_i2c.c
 SRC += $(PIOSSTM32F10X)/pios_spi.c
 SRC += $(PIOSSTM32F10X)/pios_ppm.c
 SRC += $(PIOSSTM32F10X)/pios_pwm.c
-SRC += $(PIOSSTM32F10X)/pios_spektrum.c
+SRC += $(PIOSSTM32F10X)/pios_dsm.c
 SRC += $(PIOSSTM32F10X)/pios_sbus.c
+SRC += $(PIOSSTM32F10X)/pios_tim.c
 SRC += $(PIOSSTM32F10X)/pios_debug.c
 SRC += $(PIOSSTM32F10X)/pios_gpio.c
 SRC += $(PIOSSTM32F10X)/pios_exti.c
@@ -307,7 +314,7 @@ EXTRAINCDIRS  += $(RTOSSRCDIR)/portable/GCC/ARM_CM3
 EXTRAINCDIRS  += $(AHRSBOOTLOADERINC)
 EXTRAINCDIRS  += $(PYMITEINC)
 
-EXTRAINCDIRS += ${foreach MOD, ${MODULES} ${PYMODULES}, $(OPMODULEDIR)/${MOD}/inc} ${OPMODULEDIR}/System/inc
+EXTRAINCDIRS += ${foreach MOD, ${OPTMODULES} ${MODULES} ${PYMODULES}, $(OPMODULEDIR)/${MOD}/inc} ${OPMODULEDIR}/System/inc
 
 
 # List any extra directories to look for library files here.
@@ -385,9 +392,14 @@ CSTANDARD = -std=gnu99
 # Flags for C and C++ (arm-elf-gcc/arm-elf-g++)
 
 ifeq ($(DEBUG),YES)
-CFLAGS = -g$(DEBUGF) -DDEBUG
+CFLAGS = -DDEBUG
 endif
 
+ifeq ($(DIAGNOSTICS),YES)
+CFLAGS = -DDIAGNOSTICS
+endif
+
+CFLAGS += -g$(DEBUGF)
 CFLAGS += -O$(OPT)
 CFLAGS += -mcpu=$(MCU)
 CFLAGS += $(CDEFS)
@@ -469,9 +481,6 @@ endif
 endif
 
 # Generate intermediate code
-gencode: ${OUTDIR}/pmlib_img.c ${OUTDIR}/pmlib_nat.c ${OUTDIR}/pmlibusr_img.c ${OUTDIR}/pmlibusr_nat.c ${OUTDIR}/pmfeatures.h 
-
-$(PYSRC): gencode
 
 # Generate code for PyMite
 ${OUTDIR}/pmlib_img.c ${OUTDIR}/pmlib_nat.c ${OUTDIR}/pmlibusr_img.c ${OUTDIR}/pmlibusr_nat.c ${OUTDIR}/pmfeatures.h: $(wildcard ${PYMITELIB}/*.py) $(wildcard ${PYMITEPLAT}/*.py) $(wildcard ${FLIGHTPLANLIB}/*.py) $(wildcard ${FLIGHTPLANS}/*.py) 
@@ -512,7 +521,7 @@ $(OUTDIR)/$(TARGET).bin.o: $(OUTDIR)/$(TARGET).bin
 $(eval $(call OPFW_TEMPLATE,$(OUTDIR)/$(TARGET).bin,$(BOARD_TYPE),$(BOARD_REVISION)))
 
 # Add jtag targets (program and wipe)
-$(eval $(call JTAG_TEMPLATE,$(OUTDIR)/$(TARGET).bin,$(FW_BANK_BASE),$(FW_BANK_SIZE)))
+$(eval $(call JTAG_TEMPLATE,$(OUTDIR)/$(TARGET).bin,$(FW_BANK_BASE),$(FW_BANK_SIZE),$(OPENOCD_CONFIG)))
 
 .PHONY: elf lss sym hex bin bino opfw
 elf:  $(OUTDIR)/$(TARGET).elf
@@ -579,4 +588,4 @@ else
 endif
 
 # Listing of phony targets.
-.PHONY : all build clean clean_list gencode install
+.PHONY : all build clean clean_list install

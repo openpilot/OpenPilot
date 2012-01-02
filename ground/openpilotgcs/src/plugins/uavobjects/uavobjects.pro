@@ -31,11 +31,11 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/ahrssettings.h \
     $$UAVOBJECT_SYNTHETICS/gcstelemetrystats.h \
     $$UAVOBJECT_SYNTHETICS/attituderaw.h \
+    $$UAVOBJECT_SYNTHETICS/camerastabsettings.h \
     $$UAVOBJECT_SYNTHETICS/flighttelemetrystats.h \
     $$UAVOBJECT_SYNTHETICS/systemstats.h \
     $$UAVOBJECT_SYNTHETICS/systemalarms.h \
     $$UAVOBJECT_SYNTHETICS/objectpersistence.h \
-    $$UAVOBJECT_SYNTHETICS/telemetrysettings.h \
     $$UAVOBJECT_SYNTHETICS/systemsettings.h \
     $$UAVOBJECT_SYNTHETICS/stabilizationsettings.h \
     $$UAVOBJECT_SYNTHETICS/manualcontrolsettings.h \
@@ -69,7 +69,10 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/sonaraltitude.h \
     $$UAVOBJECT_SYNTHETICS/flightstatus.h \
     $$UAVOBJECT_SYNTHETICS/hwsettings.h \
-    $$UAVOBJECT_SYNTHETICS/attitudesettings.h
+    $$UAVOBJECT_SYNTHETICS/gcsreceiver.h \
+    $$UAVOBJECT_SYNTHETICS/receiveractivity.h \
+    $$UAVOBJECT_SYNTHETICS/attitudesettings.h \
+    $$UAVOBJECT_SYNTHETICS/cameradesired.h
 
 SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/ahrsstatus.cpp \
@@ -79,11 +82,11 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/ahrssettings.cpp \
     $$UAVOBJECT_SYNTHETICS/gcstelemetrystats.cpp \
     $$UAVOBJECT_SYNTHETICS/attituderaw.cpp \
+    $$UAVOBJECT_SYNTHETICS/camerastabsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/flighttelemetrystats.cpp \
     $$UAVOBJECT_SYNTHETICS/systemstats.cpp \
     $$UAVOBJECT_SYNTHETICS/systemalarms.cpp \
     $$UAVOBJECT_SYNTHETICS/objectpersistence.cpp \
-    $$UAVOBJECT_SYNTHETICS/telemetrysettings.cpp \
     $$UAVOBJECT_SYNTHETICS/systemsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/stabilizationsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/manualcontrolsettings.cpp \
@@ -118,4 +121,7 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/uavobjectsinit.cpp \
     $$UAVOBJECT_SYNTHETICS/flightstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/hwsettings.cpp \
-    $$UAVOBJECT_SYNTHETICS/attitudesettings.cpp
+    $$UAVOBJECT_SYNTHETICS/gcsreceiver.cpp \
+    $$UAVOBJECT_SYNTHETICS/receiveractivity.cpp \
+    $$UAVOBJECT_SYNTHETICS/attitudesettings.cpp \
+    $$UAVOBJECT_SYNTHETICS/cameradesired.cpp

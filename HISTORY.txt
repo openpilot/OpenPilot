@@ -1,5 +1,60 @@
 Short summary of changes.  For a complete list see the git log.
 
+2011-12-10
+Merged a change that sorts the UAVO fields based on size.  Because this changes
+all of the objects, erase all existing flash files based on this.
+
+2011-11-04
+New Spektrum/JR satellite receiver driver implementation.
+It now provides explicit selection of DSM2 (and DSMJ), DSMX (10bit) and
+DSMX (11bit) serial protocol variations to better serve different frame
+and resolution modes. The protocol name used now is DSM instead of
+previously used Spektrum to make it less ambiguous when used with JR
+2.4GHz radios.
+
+2011-10-20
+Inputs can be remapped to outputs to allow up to 10 channels of control.  The
+receiver inputs remap as follows:
+Receiver 3 because output channel 7
+Receiver 4 because output channel 8
+Receiver 5 because output channel 9
+Receiver 6 because output channel 10
+
+2011-10-11
+Fix for the Mac telemetry rates and specifically how long enumeration took.
+
+2011-10-08
+Make the flash chip need to be have bad magic for a full second before erasing
+settings.  Should avoid random lost settings.
+
+2011-09-12
+Max rate now ONLY applies to attitude and axis lock mode.  Manual rate is the
+only term that limits the rate mode now (and in axis lock when you push stick
+only manual rate applies).  Also integrals are reset when unused.
+
+2011-09-09
+Some large updates to the input system.  Now multiple receivers can be
+connected at once.  A wizard was added for configuring the input channels.  A
+specific collective pitch channel was added.
+
+2011-09-04
+Improvements to the failsafe handling code for inputs.  PWM power off is now
+detected properly.  Powering on transmitter for Spektrum Satellite no longer
+causes a glitch on servos.
+
+2011-08-10
+Added Camera Stabilization and a gui to configure this.  This is a software
+selectable module from the GUI.  However, a restart is required to make it
+active.  The GUI does not currently expose the configuration for using the
+transmitter to change the view angle but this is supported by the hardware.
+
+2011-08-10
+By default a lot of diagnostic objects that were enabled by default are now
+disabled in the build.  This include TaskInfo (and all the FreeRTOS options
+that provide that debugging information).  Also MixerStatus, I2CStatus,
+WatchdogStatus and RateDesired.  These can be reenabled for debugging with
+-DDIAGNOSTICS.
+
 2011-08-04
 Fixed packaging aesthetic issues.  Also avoid runtime issues on OSX Lion by
 disabling the ModelView and Notify plugins for now (sorry).
@@ -28,3 +83,4 @@ selected from ManualControlSettings.InputMode and the aircraft must be rebooted
 after changing this.  Also for CopterControl the HwSettings object must
 indicate which modules are connected to which ports.  PPM currently not
 working.
+

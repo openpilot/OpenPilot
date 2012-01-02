@@ -50,9 +50,6 @@ private slots:
     void attitudeRawUpdated(UAVObject * obj);
     void timeout();
     void startAccelCalibration();
-    void saveAttitudeSettings();
-    void applyAttitudeSettings();
-    virtual void refreshValues();
     void openHelp();
 
 private:
@@ -60,7 +57,6 @@ private:
     Ui_ccattitude *ui;
     QTimer timer;
     UAVObject::Metadata initialMdata;
-    quint8 initialBiasCorrected;
 
     int updates;
 
@@ -69,6 +65,7 @@ private:
 
     static const int NUM_ACCEL_UPDATES = 60;
     static const float ACCEL_SCALE = 0.004f * 9.81f;
+protected:
     virtual void enableControls(bool enable);
 
 };

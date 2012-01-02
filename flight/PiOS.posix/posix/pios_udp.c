@@ -64,6 +64,7 @@ static pios_udp_dev * find_udp_dev_by_id (uint8_t udp)
 {
   if (udp >= pios_udp_num_devices) {
     /* Undefined UDP port for this board (see pios_board.c) */
+	PIOS_Assert(0);
     return NULL;
   }
 
@@ -154,6 +155,8 @@ int32_t PIOS_UDP_Init(uint32_t * udp_id, const struct pios_udp_cfg * cfg)
 
   printf("udp dev %i - socket %i opened - result %i\n",pios_udp_num_devices-1,udp_dev->socket,res);
 
+  *udp_id = pios_udp_num_devices-1;
+
   return res;
 }
 
@@ -191,7 +194,7 @@ static void PIOS_UDP_TxStart(uint32_t udp_id, uint16_t tx_bytes_avail)
 			length = (udp_dev->tx_out_cb)(udp_dev->tx_out_context, udp_dev->tx_buffer, PIOS_UDP_RX_BUFFER_SIZE, NULL, &tx_need_yield);
 			rem = length;
 			while (rem>0) {
-				len = sendto(udp_dev->socket, udp_dev->tx_buffer, length, 0,
+				len = sendto(udp_dev->socket, udp_dev->tx_buffer+length-rem, rem, 0,
 						 (struct sockaddr *) &udp_dev->client,
 						 sizeof(udp_dev->client));
 				if (len<=0) {

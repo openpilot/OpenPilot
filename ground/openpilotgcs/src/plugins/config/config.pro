@@ -1,18 +1,15 @@
 TEMPLATE = lib
 TARGET = Config
 QT += svg
-
 include(../../openpilotgcsplugin.pri)
 include(../../libs/utils/utils.pri)
 include(../../plugins/uavtalk/uavtalk.pri)
 include(../../plugins/coreplugin/coreplugin.pri)
 include(../../plugins/uavobjects/uavobjects.pri)
 include(../../plugins/uavobjectutil/uavobjectutil.pri)
-
+include(../../plugins/uavsettingsimportexport/uavsettingsimportexport.pri)
 INCLUDEPATH += ../../libs/eigen
-
 OTHER_FILES += Config.pluginspec
-
 HEADERS += configplugin.h \
     configgadgetconfiguration.h \
     configgadgetwidget.h \
@@ -37,8 +34,10 @@ HEADERS += configplugin.h \
     calibration.h \
     defaultattitudewidget.h \
     smartsavebutton.h \
-    defaulthwsettingswidget.h
-
+    defaulthwsettingswidget.h \
+    inputchannelform.h \
+    configcamerastabilizationwidget.h \
+    outputchannelform.h
 SOURCES += configplugin.cpp \
     configgadgetconfiguration.cpp \
     configgadgetwidget.cpp \
@@ -65,10 +64,11 @@ SOURCES += configplugin.cpp \
     alignment-calibration.cpp \
     defaultattitudewidget.cpp \
     smartsavebutton.cpp \
-    defaulthwsettingswidget.cpp
-    
-FORMS +=  \
-    airframe.ui \
+    defaulthwsettingswidget.cpp \
+    inputchannelform.cpp \
+    configcamerastabilizationwidget.cpp \
+    outputchannelform.cpp
+FORMS += airframe.ui \
     cc_hw_settings.ui \
     pro_hw_settings.ui \
     ahrs.ui \
@@ -78,6 +78,8 @@ FORMS +=  \
     output.ui \
     ccattitude.ui \
     defaultattitude.ui \
-    defaulthwsettings.ui
-
+    defaulthwsettings.ui \
+    inputchannelform.ui \
+    camerastabilization.ui \
+    outputchannelform.ui
 RESOURCES += configgadget.qrc

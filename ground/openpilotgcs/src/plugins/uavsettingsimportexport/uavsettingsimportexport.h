@@ -29,9 +29,10 @@
 
 #include <extensionsystem/iplugin.h> 
 #include "uavobjectutil/uavobjectutilmanager.h"
-#include "importsummary.h"
+#include "uavsettingsimportexport_global.h"
 #include "../../../../../build/ground/openpilotgcs/gcsversioninfo.h"
-class UAVSettingsImportExportPlugin : public ExtensionSystem::IPlugin 
+#include "uavsettingsimportexportfactory.h"
+class UAVSETTINGSIMPORTEXPORT_EXPORT UAVSettingsImportExportPlugin : public ExtensionSystem::IPlugin
 { 
     Q_OBJECT
 
@@ -42,16 +43,10 @@ public:
    void extensionsInitialized(); 
    bool initialize(const QStringList & arguments, QString * errorString); 
    void shutdown(); 
-
 private:
-   QString createXMLDocument(const QString docName,
-                             const bool isSettings,
-                             const bool fullExport);
+   UAVSettingsImportExportFactory *mf;
 
-private slots:
-   void importUAVSettings();
-   void exportUAVSettings();
-   void exportUAVData();
+
 
 }; 
 

@@ -29,10 +29,24 @@
 #include <openpilot.h>
 #include <uavobjectsinit.h>
 
+#include "hwsettings.h"
+#include "attituderaw.h"
+#include "attitudeactual.h"
+#include "positionactual.h"
+#include "velocityactual.h"
+#include "manualcontrolsettings.h"
+
+#if defined(PIOS_INCLUDE_RCVR)
 #include "pios_rcvr_priv.h"
 
-struct pios_rcvr_channel_map pios_rcvr_channel_to_id_map[PIOS_RCVR_MAX_CHANNELS];
-uint32_t pios_rcvr_max_channel;
+/* One slot per selectable receiver group.
+ *  eg. PWM, PPM, GCS, DSMMAINPORT, DSMFLEXIPORT, SBUS
+ * NOTE: No slot in this map for NONE.
+ */
+uint32_t pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE];
+
+#endif /* PIOS_INCLUDE_RCVR */
+
 
 void Stack_Change() {
 }
@@ -66,6 +80,7 @@ const struct pios_udp_cfg pios_udp_aux_cfg = {
 
 #define PIOS_COM_TELEM_RF_RX_BUF_LEN 192
 #define PIOS_COM_TELEM_RF_TX_BUF_LEN 192
+#define PIOS_COM_GPS_RX_BUF_LEN 96
 
 /*
  * Board specific number of devices.
@@ -154,7 +169,7 @@ void PIOS_Board_Init(void) {
 #if defined(PIOS_INCLUDE_GPS)
 	{
 		uint32_t pios_udp_gps_id;
-		if (PIOS_USART_Init(&pios_udp_gps_id, &pios_udp_gps_cfg)) {
+		if (PIOS_UDP_Init(&pios_udp_gps_id, &pios_udp_gps_cfg)) {
 			PIOS_Assert(0);
 		}
 		uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_GPS_RX_BUF_LEN);
@@ -168,6 +183,12 @@ void PIOS_Board_Init(void) {
 #endif	/* PIOS_INCLUDE_GPS */
 #endif
 
+	// Initialize these here as posix has no AHRSComms
+	AttitudeRawInitialize();
+	AttitudeActualInitialize();
+	VelocityActualInitialize();
+	PositionActualInitialize();
+	HwSettingsInitialize();
 
 }
 

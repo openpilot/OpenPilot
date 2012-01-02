@@ -40,33 +40,24 @@ ConfigCCAttitudeWidget::ConfigCCAttitudeWidget(QWidget *parent) :
 {
     ui->setupUi(this);
     connect(ui->zeroBias,SIGNAL(clicked()),this,SLOT(startAccelCalibration()));
-    connect(ui->saveButton,SIGNAL(clicked()),this,SLOT(saveAttitudeSettings()));        
-    connect(ui->applyButton,SIGNAL(clicked()),this,SLOT(applyAttitudeSettings()));
 
-    // Make it smart:
-    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(onAutopilotConnect()));
-    connect(parent, SIGNAL(autopilotDisconnected()), this, SLOT(onAutopilotDisconnect()));
 
-    enableControls(true);
-    refreshValues(); // The 1st time this panel is instanciated, the autopilot is already connected.
-    UAVObject * settings = AttitudeSettings::GetInstance(getObjectManager());
-    connect(settings,SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshValues()));
+    setupButtons(ui->applyButton,ui->saveButton);
+    addUAVObject("AttitudeSettings");
 
     // Connect the help button
     connect(ui->ccAttitudeHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
+    addUAVObjectToWidgetRelation("AttitudeSettings","ZeroDuringArming",ui->zeroGyroBiasOnArming);
 
-
+    addUAVObjectToWidgetRelation("AttitudeSettings","BoardRotation",ui->rollBias,AttitudeSettings::BOARDROTATION_ROLL);
+    addUAVObjectToWidgetRelation("AttitudeSettings","BoardRotation",ui->pitchBias,AttitudeSettings::BOARDROTATION_PITCH);
+    addUAVObjectToWidgetRelation("AttitudeSettings","BoardRotation",ui->yawBias,AttitudeSettings::BOARDROTATION_YAW);
+    addWidget(ui->zeroBias);
 }
 
 ConfigCCAttitudeWidget::~ConfigCCAttitudeWidget()
 {
     delete ui;
-}
-
-void ConfigCCAttitudeWidget::enableControls(bool enable)
-{
-    //ui->applyButton->setEnabled(enable);
-    ui->saveButton->setEnabled(enable);
 }
 
 void ConfigCCAttitudeWidget::attitudeRawUpdated(UAVObject * obj) {
@@ -107,7 +98,7 @@ void ConfigCCAttitudeWidget::attitudeRawUpdated(UAVObject * obj) {
         attitudeSettingsData.GyroBias[0] = -x_gyro_bias;
         attitudeSettingsData.GyroBias[1] = -y_gyro_bias;
         attitudeSettingsData.GyroBias[2] = -z_gyro_bias;
-        attitudeSettingsData.BiasCorrectGyro = initialBiasCorrected;
+        attitudeSettingsData.BiasCorrectGyro = AttitudeSettings::BIASCORRECTGYRO_TRUE;
         AttitudeSettings::GetInstance(getObjectManager())->setData(attitudeSettingsData);
 
     } else {
@@ -130,26 +121,6 @@ void ConfigCCAttitudeWidget::timeout() {
 
 }
 
-void ConfigCCAttitudeWidget::applyAttitudeSettings() {
-    AttitudeSettings::DataFields attitudeSettingsData = AttitudeSettings::GetInstance(getObjectManager())->getData();
-    attitudeSettingsData.BoardRotation[AttitudeSettings::BOARDROTATION_ROLL] = ui->rollBias->value();
-    attitudeSettingsData.BoardRotation[AttitudeSettings::BOARDROTATION_PITCH] = ui->pitchBias->value();
-    attitudeSettingsData.BoardRotation[AttitudeSettings::BOARDROTATION_YAW] = ui->yawBias->value();
-    attitudeSettingsData.ZeroDuringArming = ui->zeroGyroBiasOnArming->isChecked() ? AttitudeSettings::ZERODURINGARMING_TRUE :
-                                                                                 AttitudeSettings::ZERODURINGARMING_FALSE;
-    AttitudeSettings::GetInstance(getObjectManager())->setData(attitudeSettingsData);
-}
-
-void ConfigCCAttitudeWidget::refreshValues() {
-    AttitudeSettings::DataFields attitudeSettingsData = AttitudeSettings::GetInstance(getObjectManager())->getData();
-
-    ui->rollBias->setValue(attitudeSettingsData.BoardRotation[0]);
-    ui->pitchBias->setValue(attitudeSettingsData.BoardRotation[1]);
-    ui->yawBias->setValue(attitudeSettingsData.BoardRotation[2]);
-    ui->zeroGyroBiasOnArming->setChecked(attitudeSettingsData.ZeroDuringArming == AttitudeSettings::ZERODURINGARMING_TRUE);
-
-}
-
 void ConfigCCAttitudeWidget::startAccelCalibration() {
     QMutexLocker locker(&startStop);
 
@@ -163,7 +134,6 @@ void ConfigCCAttitudeWidget::startAccelCalibration() {
 
     // Disable gyro bias correction to see raw data
     AttitudeSettings::DataFields attitudeSettingsData = AttitudeSettings::GetInstance(getObjectManager())->getData();
-    initialBiasCorrected = attitudeSettingsData.BiasCorrectGyro;
     attitudeSettingsData.BiasCorrectGyro = AttitudeSettings::BIASCORRECTGYRO_FALSE;
     AttitudeSettings::GetInstance(getObjectManager())->setData(attitudeSettingsData);
 
@@ -184,16 +154,16 @@ void ConfigCCAttitudeWidget::startAccelCalibration() {
 
 }
 
-void ConfigCCAttitudeWidget::saveAttitudeSettings() {
-    applyAttitudeSettings();
-
-    UAVDataObject * obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AttitudeSettings")));
-    saveObjectToSD(obj);
-}
-
 void ConfigCCAttitudeWidget::openHelp()
 {
 
     QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/CopterControl+Attitude+Configuration", QUrl::StrictMode) );
 }
 
+void ConfigCCAttitudeWidget::enableControls(bool enable)
+{
+    if(ui->zeroBias)
+        ui->zeroBias->setEnabled(enable);
+    ConfigTaskWidget::enableControls(enable);
+
+}

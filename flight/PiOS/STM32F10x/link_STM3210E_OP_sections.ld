@@ -1,7 +1,7 @@
 /* This is the size of the stack for early init and for all FreeRTOS IRQs */
-_irq_stack_size = 0x400;
+_irq_stack_size = 0x800;
 /* This is the size of the stack for early init: life span is until scheduler starts */
-_init_stack_size = 0x400;
+_init_stack_size = 0x800;
 
 /* Check valid alignment for VTOR */
 ASSERT(ORIGIN(FLASH) == ALIGN(ORIGIN(FLASH), 0x80), "Start of memory region flash not aligned for startup vector table");
@@ -180,17 +180,6 @@ SECTIONS
         . = ALIGN(4);
         *(.flashtext)            /* Startup code */
         . = ALIGN(4);
-    } >FLASH
- 
-    
-    /* init sections */
-    .initcalluavobj.init :
-    {
-        . = ALIGN(4);
-	__uavobj_initcall_start = .;
-        KEEP(*(.initcalluavobj.init))
-	. = ALIGN(4);
-	__uavobj_initcall_end   = .;
     } >FLASH
 
     /* module sections */

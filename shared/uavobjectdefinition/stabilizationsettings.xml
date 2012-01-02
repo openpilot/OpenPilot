@@ -1,8 +1,8 @@
 <xml>
     <object name="StabilizationSettings" singleinstance="true" settings="true">
         <description>PID settings used by the Stabilization module to combine the @ref AttitudeActual and @ref AttitudeDesired to compute @ref ActuatorDesired</description>
-	<field name="RollMax" units="degrees" type="uint8" elements="1" defaultvalue="35"/>
-	<field name="PitchMax" units="degrees" type="uint8" elements="1" defaultvalue="35"/>
+	<field name="RollMax" units="degrees" type="uint8" elements="1" defaultvalue="55"/>
+	<field name="PitchMax" units="degrees" type="uint8" elements="1" defaultvalue="55"/>
 	<field name="YawMax" units="degrees" type="uint8" elements="1" defaultvalue="35"/>
 	<field name="ManualRate" units="degrees/sec" type="float" elementnames="Roll,Pitch,Yaw" defaultvalue="150,150,150"/>
 	<field name="MaximumRate" units="degrees/sec" type="float" elementnames="Roll,Pitch,Yaw" defaultvalue="300,300,300"/>
@@ -16,7 +16,7 @@
 
 	<field name="GyroTau" units="" type="float" elements="1" defaultvalue="0.005"/>
 
-	<field name="MaxAxisLock" units="deg" type="uint8" elements="1" defaultvalue="5"/>
+	<field name="MaxAxisLock" units="deg" type="uint8" elements="1" defaultvalue="15"/>
 	<field name="MaxAxisLockRate" units="deg/s" type="uint8" elements="1" defaultvalue="2"/>
 
 	<field name="WeakLevelingKp" units="(deg/s)/deg" type="float" elements="1" defaultvalue="0.1"/>

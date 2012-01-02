@@ -137,10 +137,30 @@ C: Mat Wellington
 D: July 2011
 V: http://www.youtube.com/watch?v=YE4Fd9vdg1I
 
+M: First CopterControl Flybared Heli inverted flight (2:33)
+C: Maxim Izergin (Maximus43)
+D: August 2011
+V: http://www.youtube.com/watch?v=8SrfIS7OkB4
+
+M: First CopterControl Flybared Heli funnel (4:18), loop (5:35)
+C: Sergey Solodennikov (alconaft43)
+D: August 2011
+V: http://www.youtube.com/watch?v=8SrfIS7OkB4
+
 M: First CopterControl Return to Base Fixed Wing
 C: Eric Price (Corvus Corax)
-D: AUgust 2011
+D: August 2011
 V: http://www.youtube.com/watch?v=CugI0oBSQn8
+
+M: First CopterControl flip on a Flybarless Heli
+C: Anders Johansson (dezent)
+D: November 2011
+V: http://www.youtube.com/watch?v=Xfas2TUhOPw
+
+M: First OpenPilot over 1km FixedWing navigation flight
+C: Eric Price (Corvus Corax)
+D: December 2011
+V: http://www.youtube.com/watch?v=nWNWuUiUTNg
 
 
 M: First Altitude Hold using Sonar
@@ -158,11 +178,6 @@ C:
 D: 
 V: 
 
-M: First CopterControl flip on a Flybarless Heli
-C: 
-D: 
-V: 
-
 
 An incomplete list of some future Milestones is below:
 
@@ -174,8 +189,6 @@ An incomplete list of some future Milestones is below:
 * First fixed wing navigation flight 
 * First Multirotor navigation flight
 * First Helicopter navigation flight
-* First over 1km navigation flight
 * First over 5km navigation flight
 * First "Follow Me" navigation flight
 * First Channel Crossing with OpenPilot
-

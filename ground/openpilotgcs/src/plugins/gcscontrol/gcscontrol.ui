@@ -19,6 +19,9 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <property name="spacing">
     <number>2</number>
@@ -27,37 +30,36 @@
     <number>5</number>
    </property>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout">
+    <layout class="QVBoxLayout" name="verticalLayout"/>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QCheckBox" name="checkBoxGcsControl">
-         <property name="text">
-          <string>GCS Control</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="checkBoxArmed">
-         <property name="text">
-          <string>Armed</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>Flight Mode:</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QComboBox" name="comboBoxFlightMode"/>
-       </item>
-      </layout>
+      <widget class="QCheckBox" name="checkBoxGcsControl">
+       <property name="text">
+        <string>GCS Control</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="checkBoxArmed">
+       <property name="text">
+        <string>Armed</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Flight Mode:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="comboBoxFlightMode"/>
      </item>
     </layout>
    </item>
@@ -86,21 +88,8 @@
        <property name="mouseTracking">
         <bool>false</bool>
        </property>
-      </widget>
-     </item>
-     <item row="0" column="2">
-      <widget class="JoystickControl" name="widgetRightStick" native="true">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>100</width>
-         <height>100</height>
-        </size>
+       <property name="styleSheet">
+        <string notr="true">background:transparent</string>
        </property>
       </widget>
      </item>
@@ -116,6 +105,25 @@
         </size>
        </property>
       </spacer>
+     </item>
+     <item row="0" column="2">
+      <widget class="JoystickControl" name="widgetRightStick" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>100</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background:transparent</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

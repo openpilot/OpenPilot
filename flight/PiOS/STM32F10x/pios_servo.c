@@ -31,97 +31,55 @@
 /* Project Includes */
 #include "pios.h"
 #include "pios_servo_priv.h"
+#include "pios_tim_priv.h"
 
 /* Private Function Prototypes */
+
+static const struct pios_servo_cfg * servo_cfg;
 
 /**
 * Initialise Servos
 */
-void PIOS_Servo_Init(void)
+int32_t PIOS_Servo_Init(const struct pios_servo_cfg * cfg)
 {
-#ifndef PIOS_ENABLE_DEBUG_PINS
-#if defined(PIOS_INCLUDE_SERVO)
+	uint32_t tim_id;
+	if (PIOS_TIM_InitChannels(&tim_id, cfg->channels, cfg->num_channels, NULL, 0)) {
+		return -1;
+	}
 
+	/* Store away the requested configuration */
+	servo_cfg = cfg;
 
-	for (uint8_t i = 0; i < pios_servo_cfg.num_channels; i++) {
-		GPIO_InitTypeDef GPIO_InitStructure = pios_servo_cfg.gpio_init;
-		TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure = pios_servo_cfg.tim_base_init;
-		TIM_OCInitTypeDef TIM_OCInitStructure = pios_servo_cfg.tim_oc_init;
-
-		struct pios_servo_channel channel = pios_servo_cfg.channels[i];
-
-		/* Enable appropriate clock to timer module */
-		switch((int32_t) channel.timer) {
-			case (int32_t)TIM1:
-				RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE);
-				break;
-			case (int32_t)TIM2:
-				RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
-				break;
-			case (int32_t)TIM3:
-				RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
-				break;
-			case (int32_t)TIM4:
-				RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
-				break;
-			case (int32_t)TIM5:
-				RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM5, ENABLE);
-				break;
-			case (int32_t)TIM6:
-				RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM6, ENABLE);
-				break;
-			case (int32_t)TIM7:
-				RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM7, ENABLE);
-				break;
-			case (int32_t)TIM8:
-				RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM8, ENABLE);
-				break;
-		}
-
-		/* Enable GPIO */
-		GPIO_InitStructure.GPIO_Pin = channel.pin;
-		GPIO_Init(channel.port, &GPIO_InitStructure);
-
-		/* Enable time base */
-		TIM_TimeBaseInit(channel.timer,  &TIM_TimeBaseStructure);
-
-		channel.timer->PSC = (PIOS_MASTER_CLOCK / 1000000) - 1;
+	/* Configure the channels to be in output compare mode */
+	for (uint8_t i = 0; i < cfg->num_channels; i++) {
+		const struct pios_tim_channel * chan = &cfg->channels[i];
 
 		/* Set up for output compare function */
-		switch(channel.channel) {
+		switch(chan->timer_chan) {
 			case TIM_Channel_1:
-				TIM_OC1Init(channel.timer, &TIM_OCInitStructure);
-				TIM_OC1PreloadConfig(channel.timer, TIM_OCPreload_Enable);
+				TIM_OC1Init(chan->timer, &cfg->tim_oc_init);
+				TIM_OC1PreloadConfig(chan->timer, TIM_OCPreload_Enable);
 				break;
 			case TIM_Channel_2:
-				TIM_OC2Init(channel.timer, &TIM_OCInitStructure);
-				TIM_OC2PreloadConfig(channel.timer, TIM_OCPreload_Enable);
+				TIM_OC2Init(chan->timer, &cfg->tim_oc_init);
+				TIM_OC2PreloadConfig(chan->timer, TIM_OCPreload_Enable);
 				break;
 			case TIM_Channel_3:
-				TIM_OC3Init(channel.timer, &TIM_OCInitStructure);
-				TIM_OC3PreloadConfig(channel.timer, TIM_OCPreload_Enable);
+				TIM_OC3Init(chan->timer, &cfg->tim_oc_init);
+				TIM_OC3PreloadConfig(chan->timer, TIM_OCPreload_Enable);
 				break;
 			case TIM_Channel_4:
-				TIM_OC4Init(channel.timer, &TIM_OCInitStructure);
-				TIM_OC4PreloadConfig(channel.timer, TIM_OCPreload_Enable);
+				TIM_OC4Init(chan->timer, &cfg->tim_oc_init);
+				TIM_OC4PreloadConfig(chan->timer, TIM_OCPreload_Enable);
 				break;
 		}
 
-		RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
-		TIM_ARRPreloadConfig(channel.timer, ENABLE);
-		TIM_CtrlPWMOutputs(channel.timer, ENABLE);
-		TIM_Cmd(channel.timer, ENABLE);
-
+		TIM_ARRPreloadConfig(chan->timer, ENABLE);
+		TIM_CtrlPWMOutputs(chan->timer, ENABLE);
+		TIM_Cmd(chan->timer, ENABLE);
 	}
 
-	if(pios_servo_cfg.remap) {
-		/* Warning, I don't think this will work for multiple remaps at once */
-		GPIO_PinRemapConfig(pios_servo_cfg.remap, ENABLE);
-	}
-
-
-#endif // PIOS_INCLUDE_SERVO
-#endif // PIOS_ENABLE_DEBUG_PINS
+	return 0;
 }
 
 /**
@@ -131,31 +89,31 @@ void PIOS_Servo_Init(void)
 */
 void PIOS_Servo_SetHz(uint16_t * speeds, uint8_t banks)
 {
-#ifndef PIOS_ENABLE_DEBUG_PINS
-#if defined(PIOS_INCLUDE_SERVO)
-	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure = pios_servo_cfg.tim_base_init;
+	if (!servo_cfg) {
+		return;
+	}
+
+	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure = servo_cfg->tim_base_init;
 	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
 	TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1;
 
 	uint8_t set = 0;
 
-	for(uint8_t i = 0; (i < pios_servo_cfg.num_channels) && (set < banks); i++) {
+	for(uint8_t i = 0; (i < servo_cfg->num_channels) && (set < banks); i++) {
 		bool new = true;
-		struct pios_servo_channel channel = pios_servo_cfg.channels[i];
+		const struct pios_tim_channel * chan = &servo_cfg->channels[i];
 
 		/* See if any previous channels use that same timer */
 		for(uint8_t j = 0; (j < i) && new; j++)
-			new &= channel.timer != pios_servo_cfg.channels[j].timer;
+			new &= chan->timer != servo_cfg->channels[j].timer;
 
 		if(new) {
 			TIM_TimeBaseStructure.TIM_Period = ((1000000 / speeds[set]) - 1);
-			TIM_TimeBaseInit(channel.timer,  &TIM_TimeBaseStructure);
+			TIM_TimeBaseInit(chan->timer, &TIM_TimeBaseStructure);
 			set++;
 		}
 	}
-#endif // PIOS_INCLUDE_SERVO
-#endif // PIOS_ENABLE_DEBUG_PINS
 }
 
 /**
@@ -163,29 +121,27 @@ void PIOS_Servo_SetHz(uint16_t * speeds, uint8_t banks)
 * \param[in] Servo Servo number (0-7)
 * \param[in] Position Servo position in microseconds
 */
-void PIOS_Servo_Set(uint8_t Servo, uint16_t Position)
+void PIOS_Servo_Set(uint8_t servo, uint16_t position)
 {
-#ifndef PIOS_ENABLE_DEBUG_PINS
-#if defined(PIOS_INCLUDE_SERVO)
 	/* Make sure servo exists */
-	if (Servo < pios_servo_cfg.num_channels && Servo >= 0) {
-		/* Update the position */
-
-		switch(pios_servo_cfg.channels[Servo].channel) {
-			case TIM_Channel_1:
-				TIM_SetCompare1(pios_servo_cfg.channels[Servo].timer, Position);
-				break;
-			case TIM_Channel_2:
-				TIM_SetCompare2(pios_servo_cfg.channels[Servo].timer, Position);
-				break;
-			case TIM_Channel_3:
-				TIM_SetCompare3(pios_servo_cfg.channels[Servo].timer, Position);
-				break;
-			case TIM_Channel_4:
-				TIM_SetCompare4(pios_servo_cfg.channels[Servo].timer, Position);
-				break;
-		}
+	if (!servo_cfg || servo >= servo_cfg->num_channels) {
+		return;
 	}
-#endif // PIOS_INCLUDE_SERVO
-#endif // PIOS_ENABLE_DEBUG_PINS
+
+	/* Update the position */
+	const struct pios_tim_channel * chan = &servo_cfg->channels[servo];
+	switch(chan->timer_chan) {
+		case TIM_Channel_1:
+			TIM_SetCompare1(chan->timer, position);
+			break;
+		case TIM_Channel_2:
+			TIM_SetCompare2(chan->timer, position);
+			break;
+		case TIM_Channel_3:
+			TIM_SetCompare3(chan->timer, position);
+			break;
+		case TIM_Channel_4:
+			TIM_SetCompare4(chan->timer, position);
+			break;
+	}
 }

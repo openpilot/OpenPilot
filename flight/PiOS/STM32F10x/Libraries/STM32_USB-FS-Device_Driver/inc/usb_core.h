@@ -225,7 +225,7 @@ uint8_t *Standard_GetConfiguration(uint16_t Length);
 RESULT Standard_SetConfiguration(void);
 uint8_t *Standard_GetInterface(uint16_t Length);
 RESULT Standard_SetInterface(void);
-uint8_t *Standard_GetDescriptorData(uint16_t Length, PONE_DESCRIPTOR pDesc);
+uint8_t *Standard_GetDescriptorData(uint16_t Length, const ONE_DESCRIPTOR * pDesc);
 
 uint8_t *Standard_GetStatus(uint16_t Length);
 RESULT Standard_ClearFeature(void);

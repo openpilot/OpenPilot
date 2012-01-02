@@ -606,19 +606,6 @@ value.</string>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="camerastabilizationResetToDefaults">
-         <property name="toolTip">
-          <string>Load default CameraStabilization settings except output channels
-
-Loaded settings are not applied automatically. You have to click the
-Apply or Save button afterwards.</string>
-         </property>
-         <property name="text">
-          <string>Reset To Defaults</string>
-         </property>
-        </widget>
-       </item>
-       <item>
         <spacer name="horizontalSpacer">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -675,6 +662,19 @@ Apply or Save button afterwards.</string>
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="camerastabilizationResetToDefaults">
+         <property name="toolTip">
+          <string>Load default CameraStabilization settings except output channels
+
+Loaded settings are not applied automatically. You have to click the
+Apply or Save button afterwards.</string>
+         </property>
+         <property name="text">
+          <string>Reset To Defaults</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="camerastabilizationSaveRAM">
          <property name="toolTip">
           <string>Send settings to the board but do not save to the non-volatile memory</string>
@@ -727,8 +727,8 @@ Apply or Save button afterwards.</string>
   <tabstop>pitchResponseTime</tabstop>
   <tabstop>yawResponseTime</tabstop>
   <tabstop>MaxAxisLockRate</tabstop>
-  <tabstop>camerastabilizationResetToDefaults</tabstop>
   <tabstop>camerastabilizationHelp</tabstop>
+  <tabstop>camerastabilizationResetToDefaults</tabstop>
   <tabstop>camerastabilizationSaveRAM</tabstop>
   <tabstop>camerastabilizationSaveSD</tabstop>
   <tabstop>scrollArea</tabstop>

@@ -65,10 +65,12 @@
 //static xTaskHandle ccguidanceTaskHandle;
 //static xQueueHandle queue;
 static uint8_t positionHoldLast = 0;
+float DistanceToTarget = 0;
 
 // Private functions
 static void ccguidanceTask(UAVObjEvent * ev);
-static float bound(float val, float min, float max);
+//static float bound(float val, float min, float max);
+//static float Deg360ToDeg180(float angle);
 static float sphereDistance(float lat1,float long1,float lat2,float long2);
 static float sphereCourse(float lat1,float long1,float lat2,float long2);
 
@@ -121,7 +123,9 @@ static void ccguidanceTask(UAVObjEvent * ev)
 
 	float dT;
 
-	float courseError;
+	float courseTrue, courseRelative;  //courseError;
+	//float actHeading = 0;
+	static float diffHeadingYaw/*, oldHeading*/;
 	AttitudeActualData attitudeActual;
 
 	CCGuidanceSettingsGet(&ccguidanceSettings);
@@ -139,6 +143,11 @@ static void ccguidanceTask(UAVObjEvent * ev)
 	FlightStatusGet(&flightStatus);
 	SystemSettingsGet(&systemSettings);
 	HomeLocationGet(&homeLocation);
+	
+	//Activate failsave mode, activate return to base
+//	if (AlarmsGet(SYSTEMALARMS_ALARM_MANUALCONTROL) != SYSTEMALARMS_ALARM_OK) {
+//		flightStatus.FlightMode = FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE;
+//	}
 	
 	if ((PARSE_FLIGHT_MODE(flightStatus.FlightMode) == FLIGHTMODE_GUIDANCE) &&
 		((systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_FIXEDWING) ||
@@ -168,17 +177,15 @@ static void ccguidanceTask(UAVObjEvent * ev)
 			positionDesired.East = homeLocation.Longitude;
 			positionDesired.Down = homeLocation.Altitude + ccguidanceSettings.ReturnTobaseAltitudeOffset ;
 			PositionDesiredSet(&positionDesired);
-			
-			//
-			AttitudeActualGet(&attitudeActual);
-			attitudeActual.Yaw = 23;
-			AttitudeActualSet(&attitudeActual);
-			//
-		}
+			}
+
+
+		stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_ROLL] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+		stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_PITCH] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+		stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
 
 		/* safety */
 		if (positionActual.Status==GPSPOSITION_STATUS_FIX3D) {
-					
 			/* main position hold loop */
 			/* 1. Altitude */
 
@@ -189,7 +196,8 @@ static void ccguidanceTask(UAVObjEvent * ev)
 			}
 
 			/* 2. Heading */
-			courseError = sphereCourse(
+			
+/*			courseError = sphereCourse(
 				positionActual.Latitude * 1e-7,
 				positionActual.Longitude * 1e-7,
 				positionDesired.North * 1e-7,
@@ -213,7 +221,45 @@ static void ccguidanceTask(UAVObjEvent * ev)
 			} else {
 				stabDesired.Yaw = 0;
 			}
+*/
+			// calculate meter to target
+/*			DistanceToTarget = 111111 * sphereDistance(
+				positionActual.Latitude * 1e-7,
+				positionActual.Longitude * 1e-7,
+				positionDesired.North * 1e-7,
+				positionDesired.East * 1e-7
+				);*/
+				
+			// calculate course to target
+			courseTrue = sphereCourse(
+				positionActual.Latitude * 1e-7,
+				positionActual.Longitude * 1e-7,
+				positionDesired.North * 1e-7,
+				positionDesired.East * 1e-7
+				);
 
+			if (positionActual.Groundspeed > 2 ) {
+				/*if (positionActual.Heading<-180.) actHeading = positionActual.Heading + 360.;
+				if (positionActual.Heading>180.)  actHeading = positionActual.Heading - 360.;
+				if (abs(oldHeading - actHeading) < 10)*/ {
+					AttitudeActualGet(&attitudeActual);
+					diffHeadingYaw = attitudeActual.Yaw - positionActual.Heading;
+					while (diffHeadingYaw<-180.) diffHeadingYaw+=360.;
+					while (diffHeadingYaw>180.)  diffHeadingYaw-=360.;
+				}
+				//oldHeading = actHeading;
+			} //else oldHeading = 400;	//any number > 0-360 degree
+			
+			if ( abs(DistanceToTarget) > 8) {
+				courseRelative = courseTrue + diffHeadingYaw;
+				while (courseRelative<-180.) courseRelative+=360.;
+				while (courseRelative>180.)  courseRelative-=360.;
+				stabDesired.Yaw = courseRelative;			
+			} /*else {
+				stabDesired.Yaw = 0;
+				stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW] = STABILIZATIONDESIRED_STABILIZATIONMODE_RATE;
+			  }*/
+			
 			AlarmsClear(SYSTEMALARMS_ALARM_GUIDANCE);
 
 		} else {
@@ -221,19 +267,14 @@ static void ccguidanceTask(UAVObjEvent * ev)
 			stabDesired.Yaw = 0;
 			stabDesired.Pitch = ccguidanceSettings.Pitch[CCGUIDANCESETTINGS_PITCH_CLIMB];
 			stabDesired.Roll = ccguidanceSettings.Roll[CCGUIDANCESETTINGS_ROLL_MAX];
-
+			stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW] = STABILIZATIONDESIRED_STABILIZATIONMODE_RATE;
 			AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_WARNING);
 		}
 
 		/* 3. Throttle (manual) */
-
 		stabDesired.Throttle = manualControl.Throttle;
-		stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_ROLL] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
-		stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_PITCH] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
-		stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW] = STABILIZATIONDESIRED_STABILIZATIONMODE_RATE;
 		
 		StabilizationDesiredSet(&stabDesired);
-
 
 	} else {
 		// reset globals...
@@ -247,6 +288,7 @@ static void ccguidanceTask(UAVObjEvent * ev)
 /**
  * Bound input value between limits
  */
+/*
 static float bound(float val, float min, float max)
 {
 	if (val < min) {
@@ -256,12 +298,20 @@ static float bound(float val, float min, float max)
 	}
 	return val;
 }
+*/
 
+/*static float Deg360ToDeg180(float angle)
+{
+	while (angle<-180.) angle+=360.;
+	while (angle>180. ) angle-=360.;
+	return angle;
+}
+*/
 /**
  * calculate spherical distance and course between two coordinate pairs
  * see http://de.wikipedia.org/wiki/Orthodrome for details
  */
-static float sphereDistance(float lat1, float long1, float lat2, float long2)
+ static float sphereDistance(float lat1, float long1, float lat2, float long2)
 {
 	float zeta=(RAD2DEG * acos (
 		sin(DEG2RAD*lat1) * sin(DEG2RAD*lat2)
@@ -276,6 +326,7 @@ static float sphereDistance(float lat1, float long1, float lat2, float long2)
 static float sphereCourse(float lat1, float long1, float lat2, float long2)
 {
 	float zeta = sphereDistance(lat1,long1,lat2,long2);
+	DistanceToTarget = 111111 * zeta;
 	float angle = RAD2DEG * acos(
 			( sin(DEG2RAD*lat2) - sin(DEG2RAD*lat1) * cos(DEG2RAD*zeta) )
 			/ ( cos(DEG2RAD*lat1) * sin(DEG2RAD*zeta) )

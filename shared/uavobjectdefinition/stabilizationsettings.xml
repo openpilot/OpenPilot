@@ -1,28 +1,28 @@
 <xml>
     <object name="StabilizationSettings" singleinstance="true" settings="true">
         <description>PID settings used by the Stabilization module to combine the @ref AttitudeActual and @ref AttitudeDesired to compute @ref ActuatorDesired</description>
-	<field name="RollMax" units="degrees" type="uint8" elements="1" defaultvalue="35"/>
-	<field name="PitchMax" units="degrees" type="uint8" elements="1" defaultvalue="35"/>
-	<field name="YawMax" units="degrees" type="uint8" elements="1" defaultvalue="35"/>
+	<field name="RollMax" units="degrees" type="uint8" elements="1" defaultvalue="90"/>
+	<field name="PitchMax" units="degrees" type="uint8" elements="1" defaultvalue="90"/>
+	<field name="YawMax" units="degrees" type="uint8" elements="1" defaultvalue="150"/>
 	<field name="ManualRate" units="degrees/sec" type="float" elementnames="Roll,Pitch,Yaw" defaultvalue="150,150,150"/>
 	<field name="MaximumRate" units="degrees/sec" type="float" elementnames="Roll,Pitch,Yaw" defaultvalue="300,300,300"/>
 
-	<field name="RollRatePID" units="" type="float" elementnames="Kp,Ki,Kd,ILimit" defaultvalue="0.002,0,0,0.3"/>
-	<field name="PitchRatePID" units="" type="float" elementnames="Kp,Ki,Kd,ILimit" defaultvalue="0.002,0,0,0.3"/>
+	<field name="RollRatePID" units="" type="float" elementnames="Kp,Ki,Kd,ILimit" defaultvalue="0.003,0,0,0.5"/>
+	<field name="PitchRatePID" units="" type="float" elementnames="Kp,Ki,Kd,ILimit" defaultvalue="0.003,0,0,0.5"/>
 	<field name="YawRatePID" units="" type="float" elementnames="Kp,Ki,Kd,ILimit" defaultvalue="0.0035,0.0035,0,0.3"/>
-	<field name="RollPI" units="" type="float" elementnames="Kp,Ki,ILimit" defaultvalue="2,0,50"/>
+	<field name="RollPI" units="" type="float" elementnames="Kp,Ki,ILimit" defaultvalue="5,0,50"/>
 	<field name="PitchPI" units="" type="float" elementnames="Kp,Ki,ILimit" defaultvalue="2,0,50"/>
-	<field name="YawPI" units="" type="float" elementnames="Kp,Ki,ILimit" defaultvalue="2,0,50"/>
+	<field name="YawPI" units="" type="float" elementnames="Kp,Ki,ILimit" defaultvalue="4,0,50"/>
 
 	<field name="GyroTau" units="" type="float" elements="1" defaultvalue="0.005"/>
 
-	<field name="MaxAxisLock" units="deg" type="uint8" elements="1" defaultvalue="15"/>
-	<field name="MaxAxisLockRate" units="deg/s" type="uint8" elements="1" defaultvalue="2"/>
+	<field name="MaxAxisLock" units="deg" type="uint8" elements="1" defaultvalue="70"/>
+	<field name="MaxAxisLockRate" units="deg/s" type="uint8" elements="1" defaultvalue="7"/>
 
 	<field name="WeakLevelingKp" units="(deg/s)/deg" type="float" elements="1" defaultvalue="0.1"/>
 	<field name="MaxWeakLevelingRate" units="deg/s" type="uint8" elements="1" defaultvalue="5"/>
 
-	<field name="LowThrottleZeroIntegral" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="TRUE"/>
+	<field name="LowThrottleZeroIntegral" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>
 
 	<access gcs="readwrite" flight="readwrite"/>
 	<telemetrygcs acked="true" updatemode="onchange" period="0"/>

@@ -10,8 +10,10 @@ SUBDIRS   = \
     opmapcontrol \
     qwt \
     qextserialport \
-    glc_lib\
-    sdlgamepad \
     libqxt
 
+!android-g++{
+    SUBDIRS += glc_lib \
+    sdlgamepad
+}
 SUBDIRS +=

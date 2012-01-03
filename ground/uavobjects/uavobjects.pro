@@ -62,7 +62,12 @@ win32 {
 
     uavobjects.commands += cd ../ground/openpilotgcs &&
     uavobjects.commands += $(QMAKE) ../../../ground/openpilotgcs/openpilotgcs.pro
-    uavobjects.commands += -spec $$SPEC CONFIG+=$${BUILD_CONFIG} -r $$addNewline()
+    android-g++{
+        uavobjects.commands += -spec android-g++ CONFIG+=$${BUILD_CONFIG} -r $$addNewline()
+    }
+    else{
+        uavobjects.commands += -spec $$SPEC CONFIG+=$${BUILD_CONFIG} -r $$addNewline()
+    }
 }
 
 uavobjects.target = FORCE

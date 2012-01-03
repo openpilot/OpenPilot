@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <array name="bundled_libs">
+        <item>Utils</item>
+        <item>Aggregation</item>
+        <item>ExtensionSystem</item>
+        <item>QxtCore</item>
+        <item>core</item>
+        <item>internals</item>
+        <item>opmapwidget</item>
+        <item>QExtSerialPort</item>
+        <item>QScienceSpinBox</item>
+        <item>QtConcurrent</item>
+        <item>Qwt</item>
+        <item>Config</item>
+        <item>Core</item>
+        <item>DebugGadget</item>
+        <item>DialGadget</item>
+        <item>EmptyGadget</item>
+        <item>GCSControl</item>
+        <item>GpsDisplayGadget</item>
+        <item>HITLNEW</item>
+        <item>ImportExportGadget</item>
+        <item>IPconnection</item>
+        <item>LineardialGadget</item>
+        <item>LoggingGadget</item>
+        <item>MagicWaypoint</item>
+        <item>NotifyPlugin</item>
+        <item>OPMapGadget</item>
+        <item>PFDGadget</item>
+        <item>ScopeGadget</item>
+        <item>Serial</item>
+        <item>SystemHealthGadget</item>
+        <item>UAVObjectBrowser</item>
+        <item>UAVObjects</item>
+        <item>UAVObjectUtil</item>
+        <item>UAVSettingsImportExport</item>
+        <item>UAVTalk</item>
+        <item>Welcome</item>
+    </array>
+    <array name="qt_libs">
+        <item>QtCore</item>
+        <item>QtGui</item>
+        <item>QtXml</item>
+        <item>QtSvg</item>
+        <item>QtNetwork</item>
+        <item>QtOpenGL</item>
+        <item>QtScript</item>
+        <item>QtSql</item>
+        <item>QtTest</item>
+    </array>
+</resources>

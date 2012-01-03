@@ -30,9 +30,11 @@ plugin_welcome.depends = plugin_coreplugin
 SUBDIRS += plugin_welcome
 
 # RawHID connection plugin
-SUBDIRS += plugin_rawhid
-plugin_rawhid.subdir = rawhid
-plugin_rawhid.depends = plugin_coreplugin
+!android-g++{
+    SUBDIRS += plugin_rawhid
+    plugin_rawhid.subdir = rawhid
+    plugin_rawhid.depends = plugin_coreplugin
+}
 
 # Serial port connection plugin
 SUBDIRS += plugin_serial
@@ -84,11 +86,13 @@ SUBDIRS += plugin_notify
 }
 
 #Uploader gadget
-plugin_uploader.subdir = uploader
-plugin_uploader.depends = plugin_coreplugin
-plugin_uploader.depends += plugin_uavobjects
-plugin_uploader.depends += plugin_rawhid
-SUBDIRS += plugin_uploader
+!android-g++{
+    plugin_uploader.subdir = uploader
+    plugin_uploader.depends = plugin_coreplugin
+    plugin_uploader.depends += plugin_uavobjects
+    plugin_uploader.depends += plugin_rawhid
+    SUBDIRS += plugin_uploader
+}
 
 #Dial gadget
 plugin_dial.subdir = dial
@@ -152,11 +156,13 @@ plugin_logging.depends += plugin_uavtalk
 SUBDIRS += plugin_logging
 
 #GCS Control of UAV gadget
-plugin_gcscontrol.subdir = gcscontrol
-plugin_gcscontrol.depends = plugin_coreplugin
-plugin_gcscontrol.depends += plugin_uavobjects
-plugin_gcscontrol.depends += plugin_uavtalk
-SUBDIRS += plugin_gcscontrol
+!android-g++{
+    plugin_gcscontrol.subdir = gcscontrol
+    plugin_gcscontrol.depends = plugin_coreplugin
+    plugin_gcscontrol.depends += plugin_uavobjects
+    plugin_gcscontrol.depends += plugin_uavtalk
+    SUBDIRS += plugin_gcscontrol
+}
 
 # Antenna tracker
 #plugin_antennatrack.subdir = antennatrack
@@ -165,11 +171,13 @@ SUBDIRS += plugin_gcscontrol
 #SUBDIRS += plugin_antennatrack
 
 #PipXtreme gadget
-plugin_pipxtreme.subdir = pipxtreme
-plugin_pipxtreme.depends = plugin_coreplugin
-plugin_pipxtreme.depends += plugin_uavobjects
-plugin_pipxtreme.depends += plugin_rawhid
-SUBDIRS += plugin_pipxtreme
+!android-g++{
+    plugin_pipxtreme.subdir = pipxtreme
+    plugin_pipxtreme.depends = plugin_coreplugin
+    plugin_pipxtreme.depends += plugin_uavobjects
+    plugin_pipxtreme.depends += plugin_rawhid
+    SUBDIRS += plugin_pipxtreme
+}
 
 #Scope OpenGL Gadget
 #plugin_scopeogl.subdir = scopeogl

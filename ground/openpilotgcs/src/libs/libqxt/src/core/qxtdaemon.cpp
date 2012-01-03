@@ -161,8 +161,10 @@ bool QxtDaemon::daemonize(bool pidfile)
         QFile f("/var/run/" + m_name + ".pid");
         if (!f.open(QIODevice::WriteOnly | QIODevice::Text))
             qFatal("cannot open pidfile \"/var/run/%s.pid\"", qPrintable(m_name));
+#ifndef ANDROID
         if (lockf(f.handle(), F_TEST, 0) < 0)
             qFatal("can't get a lock on \"/var/run/%s.pid\". another instance is propably already running.", qPrintable(m_name));
+#endif
         f.close();
     }
 
@@ -202,8 +204,10 @@ bool QxtDaemon::daemonize(bool pidfile)
         int lfp =::open(qPrintable("/var/run/" + m_name + ".pid"), O_RDWR | O_CREAT, 0640);
         if (lfp < 0)
             qFatal("cannot open pidfile \"/var/run/%s.pid\"", qPrintable(m_name));
+#ifndef ANDROID
         if (lockf(lfp, F_TLOCK, 0) < 0)
             qFatal("can't get a lock on \"/var/run/%s.pid\". another instance is propably already running.", qPrintable(m_name));
+#endif
 
         QByteArray d = QByteArray::number(pid());
         Q_UNUSED(::write(lfp, d.constData(), d.size()));

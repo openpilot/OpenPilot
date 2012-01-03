@@ -147,12 +147,14 @@ void CachedSvgItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
     qreal tw = br.width()*m_scale/textureWidth;
     qreal th = br.height()*m_scale/textureHeight;
 
+#ifndef ANDROID
     glBegin(GL_QUADS);
     glTexCoord2d(0,  0 ); glVertex3d(br.left(), br.top(), -1);
     glTexCoord2d(tw, 0 ); glVertex3d(br.right(), br.top(), -1);
     glTexCoord2d(tw, th); glVertex3d(br.right(), br.bottom(), -1);
     glTexCoord2d(0,  th); glVertex3d(br.left(), br.bottom(), -1);
     glEnd();
+#endif
     glDisable(GL_TEXTURE_2D);
 
     painter->endNativePainting();

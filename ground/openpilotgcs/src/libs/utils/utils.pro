@@ -8,6 +8,7 @@ QT += gui \
     opengl
 
 DEFINES += QTCREATOR_UTILS_LIB
+INCLUDEPATH += /home/violator/android/android-ndk-r7/platforms/android-9/arch-arm/usr/include
 
 include(../../openpilotgcslibrary.pri)
 

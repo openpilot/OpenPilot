@@ -60,6 +60,9 @@ QList<QextPortInfo> QextSerialEnumerator::getPorts()
         else if (str.contains("rfcomm")) {
             inf.friendName = "Bluetooth-serial adapter "+str.remove(0, 6);
         }
+	else if (str.contains("ttyACM")) {
+	    inf.friendName = "USB VCP adapter "+str.remove(0, 6);
+	}
         inf.enumName = "/dev"; // is there a more helpful name for this?
         infoList.append(inf);
     }

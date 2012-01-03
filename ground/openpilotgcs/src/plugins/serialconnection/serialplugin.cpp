@@ -209,9 +209,9 @@ BaudRateType SerialConnection::stringToBaud(QString str)
     if(str=="1200")
         return BAUD1200;
     else if(str=="2400")
-        return BAUD1200;
-    else if(str== "4800")
         return BAUD2400;
+    else if(str== "4800")
+        return BAUD4800;
     else if(str== "9600")
         return BAUD9600;
     else if(str== "19200")
@@ -219,7 +219,7 @@ BaudRateType SerialConnection::stringToBaud(QString str)
     else if(str== "38400")
         return BAUD38400;
     else if(str== "57600")
-        return BAUD56000;
+        return BAUD57600;
     else if(str== "115200")
         return BAUD115200;
     else if(str== "230400")
@@ -229,7 +229,7 @@ BaudRateType SerialConnection::stringToBaud(QString str)
     else if(str== "921600")
         return BAUD921600;
     else
-        return BAUD56000;
+        return BAUD57600;
 }
 
 SerialPlugin::SerialPlugin()

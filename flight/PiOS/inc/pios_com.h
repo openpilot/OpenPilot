@@ -8,7 +8,6 @@
  *
  * @file       pios_com.h  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * 	       Parts by Thorsten Klose (tk@midibox.org)
  * @brief      COM layer functions header
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -55,7 +54,6 @@ extern int32_t PIOS_COM_SendString(uint32_t com_id, const char *str);
 extern int32_t PIOS_COM_SendFormattedStringNonBlocking(uint32_t com_id, const char *format, ...);
 extern int32_t PIOS_COM_SendFormattedString(uint32_t com_id, const char *format, ...);
 extern uint16_t PIOS_COM_ReceiveBuffer(uint32_t com_id, uint8_t * buf, uint16_t buf_len, uint32_t timeout_ms);
-extern int32_t PIOS_COM_ReceiveBufferUsed(uint32_t com_id);
 
 #endif /* PIOS_COM_H */
 

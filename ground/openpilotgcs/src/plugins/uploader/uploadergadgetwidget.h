@@ -94,6 +94,8 @@ private slots:
     void goToBootloader(UAVObject* = NULL, bool = false);
     void systemReset();
     void systemBoot();
+    void systemSafeBoot();
+    void commonSystemBoot(bool = false);
     void systemRescue();
     void getSerialPorts();
     void perform();

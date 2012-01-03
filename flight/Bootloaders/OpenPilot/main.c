@@ -249,10 +249,8 @@ uint32_t LedPWM(uint32_t pwm_period, uint32_t pwm_sweep_steps, uint32_t count) {
 
 uint8_t processRX() {
 	if (ProgPort == Usb) {
-		while (PIOS_COM_ReceiveBufferUsed(PIOS_COM_TELEM_USB) >= 63) {
-			if (PIOS_COM_ReceiveBuffer(PIOS_COM_TELEM_USB, mReceive_Buffer, 63, 0) == 63) {
-				processComand(mReceive_Buffer);
-			}
+		if (PIOS_COM_ReceiveBuffer(PIOS_COM_TELEM_USB, mReceive_Buffer, 63, 0) == 63) {
+			processComand(mReceive_Buffer);
 		}
 	} else if (ProgPort == Serial) {
 
@@ -277,15 +275,12 @@ void SSP_CallBack(uint8_t *buf, uint16_t len) {
 	fifoBuf_putData(&ssp_buffer, buf, len);
 }
 int16_t SSP_SerialRead(void) {
-	if (PIOS_COM_ReceiveBufferUsed(PIOS_COM_TELEM_RF) > 0) {
-		uint8_t byte;
-		if (PIOS_COM_ReceiveBuffer(PIOS_COM_TELEM_RF, &byte, 1, 0) == 1) {
-			return byte;
-		} else {
-			return -1;
-		}	    
-	} else
+	uint8_t byte;
+	if (PIOS_COM_ReceiveBuffer(PIOS_COM_TELEM_RF, &byte, 1, 0) == 1) {
+		return byte;
+	} else {
 		return -1;
+	}
 }
 void SSP_SerialWrite(uint8_t value) {
 	PIOS_COM_SendChar(PIOS_COM_TELEM_RF, value);

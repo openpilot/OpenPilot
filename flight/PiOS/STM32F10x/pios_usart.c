@@ -8,7 +8,6 @@
  *
  * @file       pios_usart.c   
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * 	        Parts by Thorsten Klose (tk@midibox.org) (tk@midibox.org)
  * @brief      USART commands. Inits USARTs, controls USARTs & Interupt handlers. (STM32 dependent)
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -63,6 +62,8 @@ struct pios_usart_dev {
 	uint32_t rx_in_context;
 	pios_com_callback tx_out_cb;
 	uint32_t tx_out_context;
+
+	uint32_t rx_dropped;
 };
 
 static bool PIOS_USART_validate(struct pios_usart_dev * usart_dev)
@@ -285,7 +286,12 @@ static void PIOS_USART_generic_irq_handler(uint32_t usart_id)
 	if (sr & USART_SR_RXNE) {
 		uint8_t byte = dr;
 		if (usart_dev->rx_in_cb) {
-		  (void) (usart_dev->rx_in_cb)(usart_dev->rx_in_context, &byte, 1, NULL, &rx_need_yield);
+			uint16_t rc;
+			rc = (usart_dev->rx_in_cb)(usart_dev->rx_in_context, &byte, 1, NULL, &rx_need_yield);
+			if (rc < 1) {
+				/* Lost bytes on rx */
+				usart_dev->rx_dropped += 1;
+			}
 		}
 	}
 

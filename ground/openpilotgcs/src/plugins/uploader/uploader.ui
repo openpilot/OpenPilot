@@ -51,6 +51,24 @@ menu on the right.</string>
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="safeBootButton">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="toolTip">
+        <string>Boots the system into safe mode (ie. default HwSettings).
+Only useful if the system is halted
+(mainboard blue LED blinking slowly, orange LED off)
+
+If telemetry is not running, select the link using the dropdown
+menu on the right.</string>
+       </property>
+       <property name="text">
+        <string>Safe Boot</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="resetButton">
        <property name="enabled">
         <bool>false</bool>

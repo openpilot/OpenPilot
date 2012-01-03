@@ -6,7 +6,7 @@
  * @brief Insert various fault conditions for testing
  * @{ 
  *
- * @file       FaultInsertion.c
+ * @file       Fault.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      Fault module, inserts faults for testing
  * @see        The GNU Public License (GPL) Version 3

@@ -8,7 +8,6 @@
  *
  * @file       pios_i2c.c  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * 	        Parts by Thorsten Klose (tk@midibox.org) (tk@midibox.org)
  * @brief      I2C Enable/Disable routines
  * @see        The GNU Public License (GPL) Version 3
  * 

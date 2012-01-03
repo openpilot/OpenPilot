@@ -8,7 +8,6 @@
  *
  * @file       pios_usart.c   
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * 	        Parts by Thorsten Klose (tk@midibox.org) (tk@midibox.org)
  * @brief      USART commands. Inits USARTs, controls USARTs & Interupt handlers. (STM32 dependent)
  * @see        The GNU Public License (GPL) Version 3
  *

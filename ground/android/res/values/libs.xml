@@ -1,11 +1,21 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
+    <array name="qt_libs">
+        <item>QtCore</item>
+        <item>QtGui</item>
+        <item>QtXml</item>
+        <item>QtSvg</item>
+        <item>QtNetwork</item>
+        <item>QtOpenGL</item>
+        <item>QtScript</item>
+        <item>QtSql</item>
+        <item>QtTest</item>
+    </array>
     <array name="bundled_libs">
         <item>Utils</item>
         <item>Aggregation</item>
         <item>ExtensionSystem</item>
         <item>QxtCore</item>
-        <item>core</item>
         <item>internals</item>
         <item>opmapwidget</item>
         <item>QExtSerialPort</item>
@@ -37,16 +47,5 @@
         <item>UAVSettingsImportExport</item>
         <item>UAVTalk</item>
         <item>Welcome</item>
-    </array>
-    <array name="qt_libs">
-        <item>QtCore</item>
-        <item>QtGui</item>
-        <item>QtXml</item>
-        <item>QtSvg</item>
-        <item>QtNetwork</item>
-        <item>QtOpenGL</item>
-        <item>QtScript</item>
-        <item>QtSql</item>
-        <item>QtTest</item>
     </array>
 </resources>

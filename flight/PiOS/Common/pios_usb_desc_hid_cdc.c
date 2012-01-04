@@ -146,7 +146,7 @@ const struct usb_board_config PIOS_USB_BOARD_Configuration = {
 		.bDescriptorType      = USB_DESC_TYPE_ENDPOINT,
 		.bEndpointAddress     = USB_EP_IN(2),
 		.bmAttributes         = USB_EP_ATTR_TT_INTERRUPT,
-		.wMaxPacketSize       = htousbs(16),
+		.wMaxPacketSize       = htousbs(PIOS_USB_BOARD_CDC_MGMT_LENGTH),
 		.bInterval            = 4, /* ms */
 	},
 	.cdc_data_if = {

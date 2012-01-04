@@ -645,10 +645,8 @@ void UploaderGadgetWidget::versionMatchCheck()
         qDebug()<<QDate::fromString(boardDescription.buildDate.mid(0,8),"yyyyMMdd");
         qDebug()<<QDate::fromString(gcsDescription.mid(gcsDescription.indexOf(" ")+1,8),"yyyyMMdd");
         qDebug()<<QDate::fromString(boardDescription.buildDate.mid(0,8),"yyyyMMdd").daysTo(QDate::fromString(gcsDescription.mid(gcsDescription.indexOf(" ")+1,8),"yyyyMMdd"));
-        if(QDate::fromString(boardDescription.buildDate.mid(0,8),"yyyyMMdd").daysTo(QDate::fromString(gcsDescription.mid(gcsDescription.indexOf(" ")+1,8),"yyyyMMdd"))>0)
-            msg->showMessage(QString("Incompatible GCS and FW detected, you should upgrade your board's Firmware to %1 version.").arg(gcsDescription));
-        else
-            msg->showMessage(QString("Incompatible GCS and FW detected, you should upgrade your GCS to %1 version.").arg(boardDescription.gitTag+":"+boardDescription.buildDate));
-
+        msg->showMessage(QString(tr("GCS and FW versions do not match which can cause configuration problems.")) + "  \n" +
+                                 QString(tr("GCS Versions: ")) + gcsDescription + "  \n" +
+                                 QString(tr("FW Versions: ")) + boardDescription.gitTag+":"+boardDescription.buildDate);
     }
   }

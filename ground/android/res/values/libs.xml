@@ -22,8 +22,12 @@
         <item>QScienceSpinBox</item>
         <item>QtConcurrent</item>
         <item>Qwt</item>
-        <item>Config</item>
         <item>Core</item>
+        <item>UAVObjects</item>
+        <item>UAVTalk</item>
+        <item>UAVObjectUtil</item>
+        <item>UAVSettingsImportExport</item>
+        <item>Config</item>
         <item>DebugGadget</item>
         <item>DialGadget</item>
         <item>EmptyGadget</item>
@@ -33,19 +37,15 @@
         <item>ImportExportGadget</item>
         <item>IPconnection</item>
         <item>LineardialGadget</item>
+        <item>ScopeGadget</item>
         <item>LoggingGadget</item>
         <item>MagicWaypoint</item>
         <item>NotifyPlugin</item>
         <item>OPMapGadget</item>
         <item>PFDGadget</item>
-        <item>ScopeGadget</item>
         <item>Serial</item>
         <item>SystemHealthGadget</item>
         <item>UAVObjectBrowser</item>
-        <item>UAVObjects</item>
-        <item>UAVObjectUtil</item>
-        <item>UAVSettingsImportExport</item>
-        <item>UAVTalk</item>
         <item>Welcome</item>
     </array>
 </resources>

@@ -432,7 +432,7 @@ all_$(1)_clean: $$(addsuffix _clean, $$(filter bl_$(1), $$(BL_TARGETS)))
 all_$(1)_clean: $$(addsuffix _clean, $$(filter bu_$(1), $$(BU_TARGETS)))
 endef
 
-ALL_BOARDS := openpilot ahrs coptercontrol pipxtreme ins revolution
+ALL_BOARDS := coptercontrol pipxtreme ins revolution
 
 # Friendly names of each board (used to find source tree)
 openpilot_friendly     := OpenPilot

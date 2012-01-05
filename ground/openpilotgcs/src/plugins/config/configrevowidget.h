@@ -38,7 +38,6 @@
 #include <QList>
 #include <QTimer>
 #include <QMutex>
-#include <inssettings.h>
 
 class Ui_Widget;
 

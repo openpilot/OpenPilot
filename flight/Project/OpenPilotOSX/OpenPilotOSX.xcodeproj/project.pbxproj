@@ -114,7 +114,6 @@
 		6581785414A65B9B0007885F /* pios_bl_helper.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_bl_helper.c; sourceTree = "<group>"; };
 		6589A9DB131DEE76006BD67C /* pios_rtc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_rtc.c; sourceTree = "<group>"; };
 		6589A9E2131DF1C7006BD67C /* pios_rtc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_rtc.h; sourceTree = "<group>"; };
-		65904E47146128A500FD9482 /* ins.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ins.c; sourceTree = "<group>"; };
 		65904E4B146128A500FD9482 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		65904E4D146128A500FD9482 /* alarms.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = alarms.c; sourceTree = "<group>"; };
 		65904E4E146128A500FD9482 /* cm3_fault_handlers.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cm3_fault_handlers.c; sourceTree = "<group>"; };
@@ -3816,7 +3815,6 @@
 		65904E3F146128A500FD9482 /* Revolution */ = {
 			isa = PBXGroup;
 			children = (
-				65904E47146128A500FD9482 /* ins.c */,
 				65904E4B146128A500FD9482 /* Makefile */,
 				65904E4C146128A500FD9482 /* System */,
 				65904E5B146128A500FD9482 /* test.c */,

@@ -7,7 +7,7 @@
  * @{
  *
  * @file       pios_dsm.c
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2011.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @brief      Code bind and read Spektrum/JR DSMx satellite receiver serial stream
  * @see        The GNU Public License (GPL) Version 3
  *

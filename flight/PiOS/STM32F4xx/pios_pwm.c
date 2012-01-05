@@ -3,11 +3,11 @@
  * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
  * @addtogroup   PIOS_PWM PWM Input Functions
- * @brief		Code to measure with PWM input
+ * @brief Code to measure with PWM input
  * @{
  *
  * @file       pios_pwm.c
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @brief      PWM Input functions (STM32 dependent)
  * @see        The GNU Public License (GPL) Version 3
  *

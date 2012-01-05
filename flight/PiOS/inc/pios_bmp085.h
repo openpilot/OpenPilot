@@ -7,7 +7,7 @@
  * @{
  *
  * @file       pios_bmp085.h  
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @brief      BMP085 functions header.
  * @see        The GNU Public License (GPL) Version 3
  *

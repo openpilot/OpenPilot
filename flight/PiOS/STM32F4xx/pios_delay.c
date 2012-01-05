@@ -7,7 +7,7 @@
  * @{
  *
  * @file       pios_delay.c
- * @author     Michael Smith Copyright (C) 2011
+ * @author     Michael Smith Copyright (C) 2012
  * @brief      Delay Functions 
  *                 - Provides a micro-second granular delay using the CPU
  *                   cycle counter.

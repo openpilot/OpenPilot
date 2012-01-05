@@ -2,14 +2,13 @@
  ******************************************************************************
  * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
- * @addtogroup PIOS_MPU6000 MPU6050 Functions
+ * @addtogroup PIOS_MPU6000 MPU6000 Functions
  * @brief Deals with the hardware interface to the 3-axis gyro
  * @{
  *
  * @file       PIOS_MPU6000.h
- * @author     David "Buzz" Carlson (buzz@chebuzz.com)
- * 				The OpenPilot Team, http://www.openpilot.org Copyright (C) 2011.
- * @brief      MPU6050 3-axis gyor function headers
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @brief      MPU6000 3-axis gyor function headers
  * @see        The GNU Public License (GPL) Version 3
  *
  ******************************************************************************
@@ -35,7 +34,7 @@
 
 #include "pios.h"
 
-/* MPU6050 Addresses */
+/* MPU6000 Addresses */
 #define PIOS_MPU6000_SMPLRT_DIV_REG       0X19
 #define PIOS_MPU6000_DLPF_CFG_REG         0X1A
 #define PIOS_MPU6000_GYRO_CFG_REG         0X1B

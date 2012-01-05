@@ -7,7 +7,7 @@
  * @{
  *
  * @file       pios_mpu000.c
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2011.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @brief      MPU6000 6-axis gyro and accel chip
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -54,7 +54,7 @@ static struct pios_mpu6000_cfg const * cfg;
 #define GRAV 9.81f
 
 /**
- * @brief Initialize the MPU6050 3-axis gyro sensor.
+ * @brief Initialize the MPU6000 3-axis gyro sensor.
  * @return none
  */
 void PIOS_MPU6000_Init(const struct pios_mpu6000_cfg * new_cfg)
@@ -63,7 +63,7 @@ void PIOS_MPU6000_Init(const struct pios_mpu6000_cfg * new_cfg)
 	
 	fifoBuf_init(&pios_mpu6000_fifo, (uint8_t *) pios_mpu6000_buffer, sizeof(pios_mpu6000_buffer));
 
-	/* Configure the MPU6050 Sensor */
+	/* Configure the MPU6000 Sensor */
 	PIOS_SPI_SetPrescalar(pios_spi_gyro, SPI_BaudRatePrescaler_256);
 	PIOS_MPU6000_Config(cfg);
 	PIOS_SPI_SetPrescalar(pios_spi_gyro, SPI_BaudRatePrescaler_8);
@@ -81,7 +81,7 @@ void PIOS_MPU6000_Init(const struct pios_mpu6000_cfg * new_cfg)
 }
 
 /**
- * @brief Initialize the MPU6050 3-axis gyro sensor
+ * @brief Initialize the MPU6000 3-axis gyro sensor
  * \return none
  * \param[in] PIOS_MPU6000_ConfigTypeDef struct to be used to configure sensor.
 *
@@ -244,9 +244,9 @@ int32_t PIOS_MPU6000_ReadGyros(struct pios_mpu6000_data * data)
 	return 0;
 }
 
-/**
- * @brief Read the identification bytes from the MPU6050 sensor
- * \return ID read from MPU6050 or -1 if failure
+/*
+ * @brief Read the identification bytes from the MPU6000 sensor
+ * \return ID read from MPU6000 or -1 if failure
 */
 int32_t PIOS_MPU6000_ReadID()
 {
@@ -257,7 +257,7 @@ int32_t PIOS_MPU6000_ReadID()
 }
 
 /**
- * \brief Reads the data from the MPU6050 FIFO
+ * \brief Reads the data from the MPU6000 FIFO
  * \param[out] buffer destination buffer
  * \param[in] len maximum number of bytes which should be read
  * \note This returns the data as X, Y, Z the temperature
@@ -303,7 +303,7 @@ float PIOS_MPU6000_GetAccelScale()
  */
 uint8_t PIOS_MPU6000_Test(void)
 {
-	/* Verify that ID matches (MPU6050 ID is 0x69) */
+	/* Verify that ID matches (MPU6000 ID is 0x69) */
 	int32_t mpu6000_id = PIOS_MPU6000_ReadID();
 	if(mpu6000_id < 0)
 		return -1;

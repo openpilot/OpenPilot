@@ -7,8 +7,7 @@
  * @{
  *
  * @file       pios_hmc5883.h
- * @author     David "Buzz" Carlson (buzz@chebuzz.com)
- * 				The OpenPilot Team, http://www.openpilot.org Copyright (C) 2011.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @brief      HMC5883 functions header.
  * @see        The GNU Public License (GPL) Version 3
  *

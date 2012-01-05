@@ -5,9 +5,8 @@
  * @addtogroup PIOS_HMC5883 HMC5883 Functions
  * @brief Deals with the hardware interface to the magnetometers
  * @{
- *
  * @file       pios_hmc5883.c
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2011.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @brief      HMC5883 Magnetic Sensor Functions from AHRS
  * @see        The GNU Public License (GPL) Version 3
  *

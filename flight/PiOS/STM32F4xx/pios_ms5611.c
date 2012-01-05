@@ -1,17 +1,17 @@
 /**
-  ******************************************************************************
-  * @addtogroup PIOS PIOS Core hardware abstraction layer
-  * @{
-  * @addtogroup PIOS_BMP085 BMP085 Functions
-  * @brief Hardware functions to deal with the altitude pressure sensor
-  * @{
-  *
-  * @file       pios_ms5611.c  
-  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
-  * @brief      MS5611 Pressure Sensor Routines
-  * @see        The GNU Public License (GPL) Version 3
-  *
-  ******************************************************************************/
+ ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup PIOS_MS5611 MS5611 Functions
+ * @brief Hardware functions to deal with the altitude pressure sensor
+ * @{
+ *
+ * @file       pios_ms5611.c  
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @brief      MS5611 Pressure Sensor Routines
+ * @see        The GNU Public License (GPL) Version 3
+ *
+ ******************************************************************************/
 /* 
  * This program is free software; you can redistribute it and/or modify 
  * it under the terms of the GNU General Public License as published by 

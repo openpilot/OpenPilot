@@ -7,7 +7,7 @@
  * @{
  *
  * @file       pios_bma180.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2011.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @brief      PiOS BMA180 digital accelerometer driver.
  *                 - Driver for the BMA180 digital accelerometer on the SPI bus.
  * @see        The GNU Public License (GPL) Version 3

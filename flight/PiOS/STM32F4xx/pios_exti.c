@@ -1,6 +1,5 @@
 /**
  ******************************************************************************
- *
  * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
  * @addtogroup PIOS_EXTI External Interrupt Handlers
@@ -9,7 +8,7 @@
  * @{
  *
  * @file       pios_exti.c
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @brief      External Interrupt Handlers
  * @see        The GNU Public License (GPL) Version 3
  *

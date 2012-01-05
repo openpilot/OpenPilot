@@ -163,8 +163,6 @@ static void SensorsTask(void *parameters)
 	gyro_test = PIOS_MPU6000_Test();
 #elif defined(PIOS_INCLUDE_L3GD20)
 	gyro_test = PIOS_L3GD20_Test();
-#else
-#error No gyro defined
 #endif
 	mag_test = PIOS_HMC5883_Test();
 	
@@ -263,7 +261,10 @@ static void SensorsTask(void *parameters)
 		gyro_scaling = PIOS_L3GD20_GetScale();
 
 #else
-#error No gyro defined
+//#error No gyro defined
+		struct gyro_data {float x; float y; float z; float temperature;} gyro;
+		gyro_scaling = 0;
+		gyro_samples = 1;
 #endif
 		float accels[3] = {(float) accel_accum[1] / accel_samples, (float) accel_accum[0] / accel_samples, -(float) accel_accum[2] / accel_samples};
 

@@ -409,17 +409,28 @@ void PIOS_HMC5883_IRQHandler(void)
  * Soon this will be generic in pios_exti and the BMA180 will register
  * against it.  Right now this is crap!
  */
+#if defined(PIOS_INCLUDE_MPU6000)
 extern void PIOS_MPU6000_IRQHandler();
+#elif defined(PIOS_INCLUDE_L3GD20)
+extern void PIOS_L3GD20_IRQHandler();
+#endif
 void EXTI9_5_IRQHandler(void)
 {
 	if (EXTI_GetITStatus(dev_cfg->eoc_exti.init.EXTI_Line) != RESET) {
 		PIOS_HMC5883_IRQHandler();
 		EXTI_ClearITPendingBit(dev_cfg->eoc_exti.init.EXTI_Line);
 	}
+#if defined(PIOS_INCLUDE_MPU6000)
 	if (EXTI_GetITStatus(EXTI_Line8) != RESET) {
 		PIOS_MPU6000_IRQHandler();
 		EXTI_ClearITPendingBit(EXTI_Line8);
 	}
+#elif defined(PIOS_INCLUDE_L3GD20)
+	if (EXTI_GetITStatus(EXTI_Line8) != RESET) {
+		PIOS_L3GD20_IRQHandler();
+		EXTI_ClearITPendingBit(EXTI_Line8);
+	}
+#endif
 
 }
 

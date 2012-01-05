@@ -247,15 +247,15 @@ float PIOS_L3GD20_GetScale()
  */
 uint8_t PIOS_L3GD20_Test(void)
 {
-	/* Verify that ID matches (MPU6050 ID is 0x69) */
-	int32_t L3GD20_id = PIOS_L3GD20_ReadID();
-	if(L3GD20_id < 0)
+	int32_t l3gd20_id = PIOS_L3GD20_ReadID();
+	if(l3gd20_id < 0)
 		return -1;
-	
-	if(L3GD20_id != 0x68);
-		return -2;
-	
-	return 0;
+
+	uint8_t id = l3gd20_id;
+	if(id == 0xD4)
+		return 0;
+
+	return -2;
 }
 
 /**

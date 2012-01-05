@@ -62,7 +62,7 @@
 #define PIOS_L3GD20_FIFO_CNT_MSB         0x72
 #define PIOS_L3GD20_FIFO_CNT_LSB         0x73
 #define PIOS_L3GD20_FIFO_REG             0x74
-#define PIOS_L3GD20_WHOAMI               0x75
+#define PIOS_L3GD20_WHOAMI               0x0F
 
 /* FIFO enable for storing different values */
 #define PIOS_L3GD20_FIFO_TEMP_OUT        0x80

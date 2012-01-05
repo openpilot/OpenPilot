@@ -244,7 +244,7 @@ static void SensorsTask(void *parameters)
 #endif
 
 // Using L3DG20 gyro
-#elif defined(PIOS_INCLUDE_L3GD20)
+#elif 0 && defined(PIOS_INCLUDE_L3GD20)
 		struct pios_l3gd20_data gyro;
 		count = 0;
 		while((read_good = PIOS_L3GD20_ReadFifo(&gyro)) != 0);
@@ -288,7 +288,7 @@ static void SensorsTask(void *parameters)
 		gyrosData.y = gyros[1] * gyro_scaling;
 		gyrosData.z = gyros[2] * gyro_scaling;
 		gyrosData.temperature = 35.0f + ((float) gyro.temperature + 512.0f) / 340.0f;
-
+		gyrosData.temperature = PIOS_L3GD20_ReadID();
 		if (bias_correct_gyro) {
 			// Apply bias correction to the gyros
 			GyrosBiasData gyrosBias;

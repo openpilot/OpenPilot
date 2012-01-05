@@ -512,8 +512,11 @@ static void updateTelemetryStats()
  */
 static void updateSettings()
 {
+	
 	if (telemetryPort) {
-
+		PIOS_COM_ChangeBaud(telemetryPort, 115200);
+		return;
+		
 		// Retrieve settings
 		uint8_t speed;
 		HwSettingsTelemetrySpeedGet(&speed);

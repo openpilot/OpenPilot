@@ -1,0 +1,21 @@
+Output: Gerber Files
+Type  : Gerber
+From  : Variant [[No Variations]] of Project [Spektrum Adapter SMD.PrjPCB]
+   Generated File[Spektrum Adapter SMD.GTL]
+   Generated File[Spektrum Adapter SMD.GPB]
+   Generated File[Spektrum Adapter SMD.GPT]
+   Generated File[Spektrum Adapter SMD.GTP]
+   Generated File[Spektrum Adapter SMD.GTS]
+   Generated File[Spektrum Adapter SMD.GM5]
+   Generated File[Spektrum Adapter SMD.GM13]
+   Generated File[Spektrum Adapter SMD.GM15]
+   Generated File[Spektrum Adapter SMD.GKO]
+   Generated File[Spektrum Adapter SMD.RUL]
+   Generated File[Spektrum Adapter SMD.EXTREP]
+   Generated File[Spektrum Adapter SMD.REP]
+
+
+Files Generated   : 12
+Documents Printed : 0
+
+Finished Output Generation At 2:24:15 PM On 2/11/2011

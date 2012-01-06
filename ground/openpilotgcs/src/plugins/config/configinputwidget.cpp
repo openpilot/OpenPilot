@@ -622,6 +622,8 @@ void ConfigInputWidget::setChannel(int newChan)
         m_config->wzText->setText(QString(tr("Please enable throttle hold mode and move the collective pitch stick")));
     else if (newChan == ManualControlSettings::CHANNELGROUPS_FLIGHTMODE)
         m_config->wzText->setText(QString(tr("Please flick the flight mode switch.  For switches you may have to repeat this rapidly.")));
+    else if((transmitterType == heli) && (newChan == ManualControlSettings::CHANNELGROUPS_THROTTLE))
+        m_config->wzText->setText(QString(tr("Please disable throttle hold mode and move the throttle stick")));
     else
         m_config->wzText->setText(QString(tr("Please move each control once at a time according to the instructions and picture below.\n\n"
                                  "Move the %1 stick")).arg(manualSettingsObj->getField("ChannelGroups")->getElementNames().at(newChan)));

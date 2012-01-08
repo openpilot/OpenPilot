@@ -50,6 +50,8 @@ ENABLE_AUX_UART ?= NO
 
 USE_GPS ?= YES
 
+USE_GUIDANCE ?= NO
+
 USE_I2C ?= NO
 
 # Set to YES when using Code Sourcery toolchain
@@ -68,6 +70,10 @@ FLASH_TOOL = OPENOCD
 OPTMODULES = CameraStab
 ifeq ($(USE_GPS), YES)
 OPTMODULES += GPS
+endif
+
+ifeq ($(USE_GUIDANCE), YES)
+OPTMODULES += GUIDANCE
 endif
 
 MODULES = Attitude Stabilization Actuator ManualControl FirmwareIAP

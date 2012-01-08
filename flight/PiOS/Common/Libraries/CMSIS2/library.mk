@@ -3,4 +3,4 @@
 #
 
 CMSIS2_DIR		:=	$(dir $(lastword $(MAKEFILE_LIST)))
-EXTRAINCDIRS		+=	$(CMSIS2_DIR)/include
+EXTRAINCDIRS		+=	$(CMSIS2_DIR)/Include

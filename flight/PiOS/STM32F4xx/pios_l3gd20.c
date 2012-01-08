@@ -66,7 +66,7 @@ void PIOS_L3GD20_Init(const struct pios_l3gd20_cfg * new_cfg)
 	/* Configure the MPU6050 Sensor */
 	PIOS_SPI_SetPrescalar(pios_spi_gyro, SPI_BaudRatePrescaler_256);
 	PIOS_L3GD20_Config(cfg);
-	PIOS_SPI_SetPrescalar(pios_spi_gyro, SPI_BaudRatePrescaler_8);
+	PIOS_SPI_SetPrescalar(pios_spi_gyro, SPI_BaudRatePrescaler_16);
 
 	/* Configure EOC pin as input floating */
 	GPIO_Init(cfg->drdy.gpio, &cfg->drdy.init);
@@ -88,9 +88,25 @@ void PIOS_L3GD20_Init(const struct pios_l3gd20_cfg * new_cfg)
 */
 static void PIOS_L3GD20_Config(struct pios_l3gd20_cfg const * cfg)
 {
-	PIOS_L3GD20_SetReg(PIOS_L3GD20_CTRL_REG1, PIOS_L3GD20_CTRL1_FASTEST | 
-					   PIOS_L3GD20_CTRL1_PD | PIOS_L3GD20_CTRL1_ZEN | 
+	// This register enables the channels and sets the bandwidth
+	PIOS_L3GD20_SetReg(PIOS_L3GD20_CTRL_REG1, PIOS_L3GD20_CTRL1_FASTEST |
+					   PIOS_L3GD20_CTRL1_PD | PIOS_L3GD20_CTRL1_ZEN |
 					   PIOS_L3GD20_CTRL1_YEN | PIOS_L3GD20_CTRL1_XEN);
+					   
+	// Disable the high pass filters
+	PIOS_L3GD20_SetReg(PIOS_L3GD20_CTRL_REG2, 0);
+	
+	// Set int2 to go high on data ready
+	PIOS_L3GD20_SetReg(PIOS_L3GD20_CTRL_REG3, 0x08);
+	
+	// Select SPI interface, 500 deg/s, endianness?
+	PIOS_L3GD20_SetReg(PIOS_L3GD20_CTRL_REG4, 0x10);
+
+	// Enable FIFO, disable HPF
+	PIOS_L3GD20_SetReg(PIOS_L3GD20_CTRL_REG5, 0x40);
+	
+	// Fifo stream mode
+	PIOS_L3GD20_SetReg(PIOS_L3GD20_FIFO_CTRL_REG, 0x40);
 }
 
 /**
@@ -175,22 +191,29 @@ static int32_t PIOS_L3GD20_SetReg(uint8_t reg, uint8_t data)
  * \param[out] int16_t array of size 3 to store X, Z, and Y magnetometer readings
  * \returns The number of samples remaining in the fifo
  */
+uint32_t l3gd20_irq = 0;
 int32_t PIOS_L3GD20_ReadGyros(struct pios_l3gd20_data * data)
 {
-	uint8_t buf[7] = {PIOS_L3GD20_GYRO_X_OUT_MSB | 0x80, 0, 0, 0, 0, 0, 0};
+
+	uint8_t buf[7] = {PIOS_L3GD20_GYRO_X_OUT_LSB | 0x80 | 0x40, 0, 0, 0, 0, 0, 0};
 	uint8_t rec[7];
 	
 	if(PIOS_L3GD20_ClaimBus() != 0)
 		return -1;
 
-	if(PIOS_SPI_TransferBlock(pios_spi_gyro, &buf[0], &rec[0], sizeof(buf), NULL) < 0)
+	if(PIOS_SPI_TransferBlock(pios_spi_gyro, &buf[0], &rec[0], sizeof(buf), NULL) < 0) {
+		PIOS_L3GD20_ReleaseBus();
+		data->gyro_x = 0;
+		data->gyro_y = 0;
+		data->gyro_z = 0;
+		data->temperature = 0;
 		return -2;
+	}
 		
 	PIOS_L3GD20_ReleaseBus();
 	
-	data->gyro_x = rec[1] << 8 | rec[2];
-	data->gyro_y = rec[3] << 8 | rec[4];
-	data->gyro_z = rec[5] << 8 | rec[6];
+	memcpy((uint8_t *) &(data->gyro_x), &rec[1], 6);
+	data->temperature = PIOS_L3GD20_GetReg(PIOS_L3GD20_OUT_TEMP);
 	
 	return 0;
 }
@@ -287,86 +310,26 @@ static int32_t PIOS_L3GD20_FifoDepth(void)
 /**
 * @brief IRQ Handler.  Read all the data from onboard buffer
 */
-uint32_t l3gd20_irq = 0;
 int32_t l3gd20_count;
 uint32_t l3gd20_fifo_full = 0;
 
-uint8_t l3gd20_last_read_count = 0;
-uint32_t l3gd20_fails = 0;
-
-uint32_t l3gd20_interval_us;
-uint32_t l3gd20_time_us;
-uint32_t l3gd20_transfer_size;
-
 void PIOS_L3GD20_IRQHandler(void)
 {
-/*	static uint32_t timeval;
-	l3gd20_interval_us = PIOS_DELAY_DiffuS(timeval);
-	timeval = PIOS_DELAY_GetRaw();
-
-	if(!l3gd20_configured)
-		return;
-
-	l3gd20_count = PIOS_L3GD20_FifoDepth();
-	if(l3gd20_count < sizeof(struct pios_l3gd20_data))
-		return;
-		
-	if(PIOS_L3GD20_ClaimBus() != 0)
-		return;		
-		
-	uint8_t l3gd20_send_buf[1+sizeof(struct pios_l3gd20_data)] = {PIOS_L3GD20_FIFO_REG | 0x80, 0, 0, 0, 0, 0, 0, 0, 0};
-	uint8_t l3gd20_rec_buf[1+sizeof(struct pios_l3gd20_data)];
-	
-	if(PIOS_SPI_TransferBlock(pios_spi_gyro, &l3gd20_send_buf[0], &l3gd20_rec_buf[0], sizeof(l3gd20_send_buf), NULL) < 0) {
-		PIOS_L3GD20_ReleaseBus();
-		l3gd20_fails++;
-		return;
-	}
-
-	PIOS_L3GD20_ReleaseBus();
-	
+/*
 	struct pios_l3gd20_data data;
+	PIOS_L3GD20_ReadGyros(&data);
+	
+	data.temperature = l3gd20_irq;
 	
 	if(fifoBuf_getFree(&pios_l3gd20_fifo) < sizeof(data)) {
 		l3gd20_fifo_full++;
 		return;			
 	}
 	
-	// In the case where extras samples backed up grabbed an extra
-	if (l3gd20_count >= (sizeof(data) * 2)) {
-		if(PIOS_L3GD20_ClaimBus() != 0)
-			return;		
-		
-		uint8_t l3gd20_send_buf[1+sizeof(struct pios_l3gd20_data)] = {PIOS_L3GD20_FIFO_REG | 0x80, 0, 0, 0, 0, 0, 0, 0, 0};
-		uint8_t l3gd20_rec_buf[1+sizeof(struct pios_l3gd20_data)];
-		
-		if(PIOS_SPI_TransferBlock(pios_spi_gyro, &l3gd20_send_buf[0], &l3gd20_rec_buf[0], sizeof(l3gd20_send_buf), NULL) < 0) {
-			PIOS_L3GD20_ReleaseBus();
-			l3gd20_fails++;
-			return;
-		}
-		
-		PIOS_L3GD20_ReleaseBus();
-		
-		struct pios_l3gd20_data data;
-		
-		if(fifoBuf_getFree(&pios_l3gd20_fifo) < sizeof(data)) {
-			l3gd20_fifo_full++;
-			return;			
-		}
-
-	}
-	
-	data.temperature = l3gd20_rec_buf[1] << 8 | l3gd20_rec_buf[2];
-	data.gyro_x = l3gd20_rec_buf[3] << 8 | l3gd20_rec_buf[4];
-	data.gyro_y = l3gd20_rec_buf[5] << 8 | l3gd20_rec_buf[6];
-	data.gyro_z = l3gd20_rec_buf[7] << 8 | l3gd20_rec_buf[8];
-
 	fifoBuf_putData(&pios_l3gd20_fifo, (uint8_t *) &data, sizeof(data));
+*/
 	l3gd20_irq++;
 	
-	l3gd20_time_us = PIOS_DELAY_DiffuS(timeval);
-	*/
 }
 
 #endif /* L3GD20 */

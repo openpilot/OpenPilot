@@ -1709,7 +1709,7 @@ void PIOS_Board_Init(void) {
 #elif defined(PIOS_INCLUDE_L3GD20)
 	PIOS_L3GD20_Attach(pios_spi_gyro_id);
 	PIOS_Assert(PIOS_L3GD20_Test() == 0);
-//	PIOS_L3GD20_Init(&pios_l3gd20_cfg);
+	PIOS_L3GD20_Init(&pios_l3gd20_cfg);
 #else
 	PIOS_Assert(0);
 #endif

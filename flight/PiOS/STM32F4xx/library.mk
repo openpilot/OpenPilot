@@ -36,7 +36,7 @@ EXTRAINCDIRS		+=	$(PIOS_DEVLIB)/inc
 include $(PIOSCOMMONLIB)/CMSIS2/library.mk
 CMSIS2_DEVICEDIR	:=	$(PIOS_DEVLIB)/Libraries/CMSIS2/Device/ST/STM32F4xx
 SRC					+=	$(wildcard $(CMSIS2_DEVICEDIR)/Source/*.c)
-EXTRAINCDIRS		+=	$(CMSIS2_DEVICEDIR)/include
+EXTRAINCDIRS		+=	$(CMSIS2_DEVICEDIR)/Include
 
 #
 # ST Peripheral library

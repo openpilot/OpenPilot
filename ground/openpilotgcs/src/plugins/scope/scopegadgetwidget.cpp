@@ -52,7 +52,7 @@
 #include <QtGui/QPushButton>
 #include <QMutexLocker>
 
-using namespace Core;
+//using namespace Core;
 
 TestDataGen* ScopeGadgetWidget::testDataGen;
 
@@ -195,7 +195,8 @@ void ScopeGadgetWidget::addLegend()
 	QPalette pal = legend->palette();
 	pal.setColor(legend->backgroundRole(), QColor(100, 100, 100));	// background colour
 //	pal.setColor(legend->backgroundRole(), Qt::transparent);		// background colour
-	pal.setColor(QPalette::Text, QColor(255, 255, 255));			// text colour
+//	pal.setColor(QPalette::Text, QColor(255, 255, 255));			// text colour
+	pal.setColor(QPalette::Text, QColor(0, 0, 0));			// text colour
 	legend->setPalette(pal);
 
 	insertLegend(legend, QwtPlot::TopLegend);
@@ -229,7 +230,7 @@ void ScopeGadgetWidget::preparePlot(PlotType plotType)
     setMinimumSize(64, 64);
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 
-	setMargin(1);
+//	setMargin(1);
 
 //	QPalette pal = palette();
 //	QPalette::ColorRole cr = backgroundRole();
@@ -407,7 +408,7 @@ void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavFieldSubField
 
     QwtPlotCurve* plotCurve = new QwtPlotCurve(curveNameScaled);
     plotCurve->setPen(pen);
-    plotCurve->setData(*plotData->xData, *plotData->yData);
+    plotCurve->setSamples(*plotData->xData, *plotData->yData);
     plotCurve->attach(this);
     plotData->curve = plotCurve;
 
@@ -455,7 +456,7 @@ void ScopeGadgetWidget::replotNewData()
 	foreach(PlotData* plotData, m_curvesData.values())
 	{
         plotData->removeStaleData();
-        plotData->curve->setData(*plotData->xData, *plotData->yData);
+        plotData->curve->setSamples(*plotData->xData, *plotData->yData);
     }
 
     QDateTime NOW = QDateTime::currentDateTime();
@@ -503,10 +504,9 @@ void ScopeGadgetWidget::setupExamplePlot()
     curve3->setPen(QPen(Qt::green));
 
     // copy the data into the curves
-    curve1->setData(x, sn, points);
-    curve2->setData(x, cs, points);
-    curve3->setData(x, sg, points);
-
+    curve1->setSamples(x, sn, points);
+    curve2->setSamples(x, cs, points);
+    curve3->setSamples(x, sg, points);
     curve1->attach(this);
     curve2->attach(this);
     curve3->attach(this);
@@ -745,4 +745,3 @@ void ScopeGadgetWidget::csvLoggingDisconnect()
     if (m_csvLoggingNewFileOnConnect)csvLoggingStop();
     return;
 }
-

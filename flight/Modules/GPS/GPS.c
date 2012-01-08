@@ -54,13 +54,15 @@ static void updateSettings();
 
 #ifdef PIOS_GPS_SETS_HOMELOCATION
 static void setHomeLocation(GPSPositionData * gpsData);
+#if !defined(PIOS_GPS_MINIMAL)
 static float GravityAccel(float latitude, float longitude, float altitude);
+#endif
 #endif
 
 // ****************
 // Private constants
 
-#define GPS_TIMEOUT_MS                  500
+#define GPS_TIMEOUT_MS                  1500
 #define NMEA_MAX_PACKET_LENGTH          96 // 82 max NMEA msg size plus 12 margin (because some vendors add custom crap) plus CR plus Linefeed
 // same as in COM buffer
 
@@ -323,11 +325,13 @@ static void setHomeLocation(GPSPositionData * gpsData)
 {
 	HomeLocationData home;
 	HomeLocationGet(&home);
+#if !defined(PIOS_GPS_MINIMAL)
 	GPSTimeData gps;
 	GPSTimeGet(&gps);
 
 	if (gps.Year >= 2000)
 	{
+#endif
 		// Store LLA
 		home.Latitude = gpsData->Latitude;
 		home.Longitude = gpsData->Longitude;
@@ -344,9 +348,11 @@ static void setHomeLocation(GPSPositionData * gpsData)
 		home.ECEF[1] = (int32_t) (ECEF[1] * 100);
 		home.ECEF[2] = (int32_t) (ECEF[2] * 100);
 
+#if !defined(PIOS_GPS_MINIMAL)
 		// Compute magnetic flux direction at home location
 		if (WMM_GetMagVector(LLA[0], LLA[1], LLA[2], gps.Month, gps.Day, gps.Year, &home.Be[0]) >= 0)
 		{   // calculations appeared to go OK
+#endif
 
 			// Compute local acceleration due to gravity.  Vehicles that span a very large
 			// range of altitude (say, weather balloons) may need to update this during the
@@ -354,8 +360,10 @@ static void setHomeLocation(GPSPositionData * gpsData)
 			home.g_e = GravityAccel(LLA[0], LLA[1], LLA[2]);
 			home.Set = HOMELOCATION_SET_TRUE;
 			HomeLocationSet(&home);
+#if !defined(PIOS_GPS_MINIMAL)
 		}
 	}
+#endif
 }
 #endif
 

@@ -34,35 +34,40 @@
 
 #include "pios.h"
 
-/* MPU6050 Addresses */
-#define PIOS_L3GD20_SMPLRT_DIV_REG       0X19
-#define PIOS_L3GD20_DLPF_CFG_REG         0X1A
-#define PIOS_L3GD20_GYRO_CFG_REG         0X1B
-#define PIOS_L3GD20_ACCEL_CFG_REG        0X1C
-#define PIOS_L3GD20_FIFO_EN_REG          0x23
-#define PIOS_L3GD20_INT_CFG_REG          0x37
-#define PIOS_L3GD20_INT_EN_REG           0x38
-#define PIOS_L3GD20_INT_STATUS_REG       0x3A
-#define PIOS_L3GD20_ACCEL_X_OUT_MSB      0x3B
-#define PIOS_L3GD20_ACCEL_X_OUT_LSB      0x3C
-#define PIOS_L3GD20_ACCEL_Y_OUT_MSB      0x3D
-#define PIOS_L3GD20_ACCEL_Y_OUT_LSB      0x3E
-#define PIOS_L3GD20_ACCEL_Z_OUT_MSB      0x3F
-#define PIOS_L3GD20_ACCEL_Z_OUT_LSB      0x40
-#define PIOS_L3GD20_TEMP_OUT_MSB         0x41
-#define PIOS_L3GD20_TEMP_OUT_LSB         0x42
-#define PIOS_L3GD20_GYRO_X_OUT_MSB       0x43
-#define PIOS_L3GD20_GYRO_X_OUT_LSB       0x44
-#define PIOS_L3GD20_GYRO_Y_OUT_MSB       0x45
-#define PIOS_L3GD20_GYRO_Y_OUT_LSB       0x46
-#define PIOS_L3GD20_GYRO_Z_OUT_MSB       0x47
-#define PIOS_L3GD20_GYRO_Z_OUT_LSB       0x48
-#define PIOS_L3GD20_USER_CTRL_REG        0x6A
-#define PIOS_L3GD20_PWR_MGMT_REG         0x6B
-#define PIOS_L3GD20_FIFO_CNT_MSB         0x72
-#define PIOS_L3GD20_FIFO_CNT_LSB         0x73
-#define PIOS_L3GD20_FIFO_REG             0x74
+/* L3GD20 Addresses */
 #define PIOS_L3GD20_WHOAMI               0x0F
+#define PIOS_L3GD20_CTRL_REG1            0X20
+#define PIOS_L3GD20_CTRL_REG2            0X21
+#define PIOS_L3GD20_CTRL_REG3            0X22
+#define PIOS_L3GD20_CTRL_REG4            0X23
+#define PIOS_L3GD20_CTRL_REG5            0X24
+#define PIOS_L3GD20_REFERENCE            0X25
+#define PIOS_L3GD20_OUT_TEMP             0x26
+#define PIOS_L3GD20_STATUS_REG           0x27
+#define PIOS_L3GD20_GYRO_X_OUT_LSB       0x28
+#define PIOS_L3GD20_GYRO_X_OUT_MSB       0x29
+#define PIOS_L3GD20_GYRO_Y_OUT_LSB       0x2A
+#define PIOS_L3GD20_GYRO_Y_OUT_MSB       0x2B
+#define PIOS_L3GD20_GYRO_Z_OUT_LSB       0x2C
+#define PIOS_L3GD20_GYRO_Z_OUT_MSB       0x2D
+#define PIOS_L3GD20_FIFO_CTRL_REG        0x2E
+#define PIOS_L3GD20_FIFO_SRC_REG         0x2F
+#define PIOS_L3GD20_INT1_CFG             0x30
+#define PIOS_L3GD20_INT1_SRC             0x31
+#define PIOS_L3GD20_INT1_TSH_XH          0x32
+#define PIOS_L3GD20_INT1_TSH_XL          0x33
+#define PIOS_L3GD20_INT1_TSH_YH          0x34
+#define PIOS_L3GD20_INT1_TSH_YL          0x35
+#define PIOS_L3GD20_INT1_TSH_ZH          0x36
+#define PIOS_L3GD20_INT1_TSH_ZL          0x37
+#define PIOS_L3GD20_INT1_DURATION        0x38
+
+/* Ctrl1 flags */
+#define PIOS_L3GD20_CTRL1_FASTEST        0xF0
+#define PIOS_L3GD20_CTRL1_PD             0x08
+#define PIOS_L3GD20_CTRL1_ZEN            0x04
+#define PIOS_L3GD20_CTRL1_YEN            0x02
+#define PIOS_L3GD20_CTRL1_XEN            0x01
 
 /* FIFO enable for storing different values */
 #define PIOS_L3GD20_FIFO_TEMP_OUT        0x80
@@ -126,15 +131,7 @@ struct pios_l3gd20_cfg {
 	struct stm32_gpio drdy;
 	struct stm32_exti eoc_exti;
 	struct stm32_irq eoc_irq;
-	
-	uint8_t Fifo_store;		/* FIFO storage of different readings (See datasheet page 31 for more details) */
-	uint8_t Smpl_rate_div;	/* Sample rate divider to use (See datasheet page 32 for more details) */
-	uint8_t interrupt_cfg;	/* Interrupt configuration (See datasheet page 35 for more details) */
-	uint8_t interrupt_en;	/* Interrupt configuration (See datasheet page 35 for more details) */
-	uint8_t User_ctl;		/* User control settings (See datasheet page 41 for more details)  */
-	uint8_t Pwr_mgmt_clk;	/* Power management and clock selection (See datasheet page 32 for more details) */
 	enum pios_l3gd20_range gyro_range;
-	enum pios_l3gd20_filter filter;
 };
 
 /* Public Functions */

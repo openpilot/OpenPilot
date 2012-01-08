@@ -1496,6 +1496,37 @@ static const struct pios_mpu6000_cfg pios_mpu6000_cfg = {
 	.filter = PIOS_MPU6000_LOWPASS_256_HZ
 };
 
+#include "pios_l3gd20.h"
+static const struct pios_l3gd20_cfg pios_l3gd20_cfg = {
+	.drdy = {
+		.gpio = GPIOD,
+		.init = {
+			.GPIO_Pin = GPIO_Pin_8,
+			.GPIO_Speed = GPIO_Speed_100MHz,
+			.GPIO_Mode = GPIO_Mode_IN,
+			.GPIO_OType = GPIO_OType_OD,
+			.GPIO_PuPd = GPIO_PuPd_NOPULL,
+		},
+	},
+	.eoc_exti = {
+		.pin_source = EXTI_PinSource8,
+		.port_source = EXTI_PortSourceGPIOD,
+		.init = {
+			.EXTI_Line = EXTI_Line8, // matches above GPIO pin
+			.EXTI_Mode = EXTI_Mode_Interrupt,
+			.EXTI_Trigger = EXTI_Trigger_Rising,
+			.EXTI_LineCmd = ENABLE,
+		},
+	},
+	.eoc_irq = {
+		.init = {
+			.NVIC_IRQChannel = EXTI9_5_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+			.NVIC_IRQChannelSubPriority = 0,
+			.NVIC_IRQChannelCmd = ENABLE,
+		},
+	},
+};
 
 /**
  * PIOS_Board_Init()

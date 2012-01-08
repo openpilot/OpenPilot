@@ -88,7 +88,9 @@ void PIOS_L3GD20_Init(const struct pios_l3gd20_cfg * new_cfg)
 */
 static void PIOS_L3GD20_Config(struct pios_l3gd20_cfg const * cfg)
 {
-
+	PIOS_L3GD20_SetReg(PIOS_L3GD20_CTRL_REG1, PIOS_L3GD20_CTRL1_FASTEST | 
+					   PIOS_L3GD20_CTRL1_PD | PIOS_L3GD20_CTRL1_ZEN | 
+					   PIOS_L3GD20_CTRL1_YEN | PIOS_L3GD20_CTRL1_XEN);
 }
 
 /**
@@ -265,20 +267,21 @@ uint8_t PIOS_L3GD20_Test(void)
  */
 static int32_t PIOS_L3GD20_FifoDepth(void)
 {
-	uint8_t L3GD20_send_buf[3] = {PIOS_L3GD20_FIFO_CNT_MSB | 0x80, 0, 0};
-	uint8_t L3GD20_rec_buf[3];
+/*	uint8_t l3gd20_send_buf[3] = {PIOS_L3GD20_FIFO_CNT_MSB | 0x80, 0, 0};
+	uint8_t l3gd20_rec_buf[3];
 
 	if(PIOS_L3GD20_ClaimBus() != 0)
 		return -1;
 
-	if(PIOS_SPI_TransferBlock(pios_spi_gyro, &L3GD20_send_buf[0], &L3GD20_rec_buf[0], sizeof(L3GD20_send_buf), NULL) < 0) {
+	if(PIOS_SPI_TransferBlock(pios_spi_gyro, &l3gd20_send_buf[0], &l3gd20_rec_buf[0], sizeof(l3gd20_send_buf), NULL) < 0) {
 		PIOS_L3GD20_ReleaseBus();
 		return -1;
 	}
 
 	PIOS_L3GD20_ReleaseBus();
 	
-	return (L3GD20_rec_buf[1] << 8) | L3GD20_rec_buf[2];
+	return (l3gd20_rec_buf[1] << 8) | l3gd20_rec_buf[2];*/
+	return 0;
 }
 
 /**
@@ -297,7 +300,7 @@ uint32_t l3gd20_transfer_size;
 
 void PIOS_L3GD20_IRQHandler(void)
 {
-	static uint32_t timeval;
+/*	static uint32_t timeval;
 	l3gd20_interval_us = PIOS_DELAY_DiffuS(timeval);
 	timeval = PIOS_DELAY_GetRaw();
 
@@ -363,6 +366,7 @@ void PIOS_L3GD20_IRQHandler(void)
 	l3gd20_irq++;
 	
 	l3gd20_time_us = PIOS_DELAY_DiffuS(timeval);
+	*/
 }
 
 #endif /* L3GD20 */

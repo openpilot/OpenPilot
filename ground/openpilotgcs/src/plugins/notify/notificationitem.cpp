@@ -333,6 +333,8 @@ QStringList valueToSoundList(QString value)
 
 QString stringFromValue(QVariant value, UAVObjectField* field)
 {
+    if(field==NULL)
+        return "";
     Q_ASSERT(field);
     Q_ASSERT(!value.isNull());
     QString str;

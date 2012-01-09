@@ -256,13 +256,6 @@ void SoundNotifyPlugin::on_arrived_Notification(UAVObject *object)
                                         .arg(ntf->singleValue().toString())
                                         .arg(ntf->valueRange2());
 
-        QString fieldName = ntf->getObjectField();
-        UAVObjectField* field = object->getField(fieldName);
-
-        qNotifyDebug() << QString("UAV object: %1 | value: %2")
-                                      .arg(object->getName())
-                                      .arg(field->getValue().toString());
-
         checkNotificationRule(ntf, object);
     }
     connect(object, SIGNAL(objectUpdated(UAVObject*)),
@@ -402,6 +395,8 @@ bool checkRange(double fieldValue, double min, double max, int direction)
 
 void SoundNotifyPlugin::checkNotificationRule(NotificationItem* notification, UAVObject* object)
 {
+    if(notification->getDataObject()!=object->getName() | object->getField(notification->getObjectField())==NULL)
+        return;
     bool condition=false;
 
     if (notification->mute())

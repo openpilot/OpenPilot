@@ -55,6 +55,7 @@
 #include "devicedescriptorstruct.h"
 #include <QProgressDialog>
 #include <QErrorMessage>
+#include <QDesktopServices>
 
 using namespace OP_DFU;
 
@@ -74,6 +75,7 @@ public slots:
     void onAutopilotConnect();
     void onAutopilotDisconnect();
     void populate();
+    void openHelp();
 private:
      Ui_UploaderWidget *m_config;
      DFUObject *dfu;

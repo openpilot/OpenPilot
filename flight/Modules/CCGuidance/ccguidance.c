@@ -43,11 +43,11 @@
 #include "openpilot.h"
 #include "ccguidancesettings.h"
 #include "gpsposition.h"
-#include "positiondesired.h"	// object that will be updated by the module
+//#include "positiondesired.h"	// object that will be updated by the module
 #include "manualcontrol.h"
 #include "manualcontrolcommand.h"
 #include "flightstatus.h"
-#include "homelocation.h"
+//#include "homelocation.h"
 #include "stabilizationdesired.h"
 #include "systemsettings.h"
 #include "attitudeactual.h"
@@ -62,15 +62,12 @@
 // Private types
 
 // Private variables
-//static xTaskHandle ccguidanceTaskHandle;
-//static xQueueHandle queue;
 static uint8_t positionHoldLast = 0;
 float DistanceToTarget = 0;
 
 // Private functions
 static void ccguidanceTask(UAVObjEvent * ev);
 //static float bound(float val, float min, float max);
-//static float Deg360ToDeg180(float angle);
 static float sphereDistance(float lat1,float long1,float lat2,float long2);
 static float sphereCourse(float lat1,float long1,float lat2,float long2);
 
@@ -93,9 +90,8 @@ int32_t CCGuidanceStart()
 int32_t CCGuidanceInitialize()
 {
 	CCGuidanceSettingsInitialize();
-	PositionDesiredInitialize();
 	GPSPositionInitialize();
-	HomeLocationInitialize();
+	//HomeLocationInitialize();
 
 	// connect to GPSPosition
 	GPSPositionConnectCallback(&ccguidanceTask);
@@ -103,7 +99,7 @@ int32_t CCGuidanceInitialize()
 	return 0;
 }
 // no macro - optional module
-
+MODULE_INITCALL(CCGuidanceInitialize, CCGuidanceStart)
 
 /**
  * Main module callback.
@@ -114,16 +110,14 @@ static void ccguidanceTask(UAVObjEvent * ev)
 	CCGuidanceSettingsData ccguidanceSettings;
 	ManualControlCommandData manualControl;
 	FlightStatusData flightStatus;
-	HomeLocationData homeLocation;
+	//HomeLocationData homeLocation;
 
 	portTickType thisTime;
 
 	static portTickType lastUpdateTime = 0;
 	if (!lastUpdateTime) lastUpdateTime = xTaskGetTickCount();
 
-	float dT;
-
-	float courseTrue, courseRelative;  //courseError;
+	float courseTrue, courseRelative;
 	//float actHeading = 0;
 	static float diffHeadingYaw/*, oldHeading*/;
 	AttitudeActualData attitudeActual;
@@ -135,14 +129,14 @@ static void ccguidanceTask(UAVObjEvent * ev)
 	if( (thisTime - lastUpdateTime) < (ccguidanceSettings.UpdatePeriod / portTICK_RATE_MS) )
 		return;
 
-	dT = (thisTime - lastUpdateTime) / portTICK_RATE_MS / 1000.0f;
+	// dT = (thisTime - lastUpdateTime) / portTICK_RATE_MS / 1000.0f;
 
 	lastUpdateTime = thisTime;
 	
 	ManualControlCommandGet(&manualControl);
 	FlightStatusGet(&flightStatus);
 	SystemSettingsGet(&systemSettings);
-	HomeLocationGet(&homeLocation);
+	//HomeLocationGet(&homeLocation);
 	
 	//Activate failsave mode, activate return to base
 //	if (AlarmsGet(SYSTEMALARMS_ALARM_MANUALCONTROL) != SYSTEMALARMS_ALARM_OK) {
@@ -156,29 +150,28 @@ static void ccguidanceTask(UAVObjEvent * ev)
 	{
 		StabilizationDesiredData stabDesired;
 		StabilizationDesiredGet(&stabDesired);
-		PositionDesiredData positionDesired;
-		PositionDesiredGet(&positionDesired);
+		static int positionDesiredNorth, positionDesiredEast, positionDesiredDown = 0;
+		
 		GPSPositionData positionActual;
 		GPSPositionGet(&positionActual);
 
 		if(positionHoldLast == 0 && (flightStatus.FlightMode == FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD ||
-		  (flightStatus.FlightMode == FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE && homeLocation.Set == HOMELOCATION_SET_FALSE)))
+		  (flightStatus.FlightMode == FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE )))//&& homeLocation.Set == HOMELOCATION_SET_FALSE)))
 		  {
 			/* When enter position hold mode save current position */
-			positionDesired.North = positionActual.Latitude;
-			positionDesired.East = positionActual.Longitude;
-			positionDesired.Down = positionActual.Altitude + positionActual.GeoidSeparation + 1;
-			PositionDesiredSet(&positionDesired);
+			positionDesiredNorth = positionActual.Latitude;
+			positionDesiredEast = positionActual.Longitude;
+			positionDesiredDown = positionActual.Altitude + positionActual.GeoidSeparation + 1;
+			//PositionDesiredSet(&positionDesired);
 			positionHoldLast = 1;
-		} else if (flightStatus.FlightMode == FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE && homeLocation.Set == HOMELOCATION_SET_TRUE) {
+		} else if (flightStatus.FlightMode == FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE) {// && homeLocation.Set == HOMELOCATION_SET_TRUE) {
 			/* When we RTB, safe home position */
 			positionHoldLast = 0;
-			positionDesired.North = homeLocation.Latitude;
-			positionDesired.East = homeLocation.Longitude;
-			positionDesired.Down = homeLocation.Altitude + ccguidanceSettings.ReturnTobaseAltitudeOffset ;
-			PositionDesiredSet(&positionDesired);
+			positionDesiredNorth = 23; //homeLocation.Latitude;
+			positionDesiredEast = 24; //homeLocation.Longitude;
+			positionDesiredDown = 25; //homeLocation.Altitude + ccguidanceSettings.ReturnTobaseAltitudeOffset ;
+			
 			}
-
 
 		stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_ROLL] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
 		stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_PITCH] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
@@ -189,7 +182,7 @@ static void ccguidanceTask(UAVObjEvent * ev)
 			/* main position hold loop */
 			/* 1. Altitude */
 
-			if ((positionActual.Altitude + positionActual.GeoidSeparation) < positionDesired.Down) {
+			if ((positionActual.Altitude + positionActual.GeoidSeparation) < positionDesiredDown) {
 				stabDesired.Pitch = ccguidanceSettings.Pitch[CCGUIDANCESETTINGS_PITCH_CLIMB];
 			} else {
 				stabDesired.Pitch = ccguidanceSettings.Pitch[CCGUIDANCESETTINGS_PITCH_SINK];
@@ -197,45 +190,12 @@ static void ccguidanceTask(UAVObjEvent * ev)
 
 			/* 2. Heading */
 			
-/*			courseError = sphereCourse(
-				positionActual.Latitude * 1e-7,
-				positionActual.Longitude * 1e-7,
-				positionDesired.North * 1e-7,
-				positionDesired.East * 1e-7
-				) - positionActual.Heading;
-			if (courseError<-180.) courseError+=360.;
-			if (courseError>180.) courseError-=360.;
-
-			stabDesired.Roll = bound(
-				ccguidanceSettings.Roll[CCGUIDANCESETTINGS_ROLL_NEUTRAL] +
-				ccguidanceSettings.Roll[CCGUIDANCESETTINGS_ROLL_KP] * courseError,
-				-ccguidanceSettings.Roll[CCGUIDANCESETTINGS_ROLL_MAX],
-				ccguidanceSettings.Roll[CCGUIDANCESETTINGS_ROLL_MAX]);
-
-			if (positionActual.Groundspeed>0) {
-
-				stabDesired.Yaw = RAD2DEG * sinf(
-					( stabDesired.Roll - ccguidanceSettings.Roll[CCGUIDANCESETTINGS_ROLL_NEUTRAL]
-					) / RAD2DEG
-					) * GEE / positionActual.Groundspeed;
-			} else {
-				stabDesired.Yaw = 0;
-			}
-*/
-			// calculate meter to target
-/*			DistanceToTarget = 111111 * sphereDistance(
-				positionActual.Latitude * 1e-7,
-				positionActual.Longitude * 1e-7,
-				positionDesired.North * 1e-7,
-				positionDesired.East * 1e-7
-				);*/
-				
 			// calculate course to target
 			courseTrue = sphereCourse(
 				positionActual.Latitude * 1e-7,
 				positionActual.Longitude * 1e-7,
-				positionDesired.North * 1e-7,
-				positionDesired.East * 1e-7
+				positionDesiredNorth * 1e-7,
+				positionDesiredEast * 1e-7
 				);
 
 			if (positionActual.Groundspeed > 2 ) {
@@ -276,12 +236,12 @@ static void ccguidanceTask(UAVObjEvent * ev)
 		
 		StabilizationDesiredSet(&stabDesired);
 
-	} else {
+	} else{
 		// reset globals...
 		positionHoldLast = 0;
 		AlarmsClear(SYSTEMALARMS_ALARM_GUIDANCE);
 	}
-		
+	
 }
 
 
@@ -300,13 +260,6 @@ static float bound(float val, float min, float max)
 }
 */
 
-/*static float Deg360ToDeg180(float angle)
-{
-	while (angle<-180.) angle+=360.;
-	while (angle>180. ) angle-=360.;
-	return angle;
-}
-*/
 /**
  * calculate spherical distance and course between two coordinate pairs
  * see http://de.wikipedia.org/wiki/Orthodrome for details

@@ -46,9 +46,9 @@
 #define PIOS_INCLUDE_RCVR
 
 /* Supported receiver interfaces */
-#define PIOS_INCLUDE_DSM
-#define PIOS_INCLUDE_SBUS
-#define PIOS_INCLUDE_PPM
+//#define PIOS_INCLUDE_DSM
+//#define PIOS_INCLUDE_SBUS
+//#define PIOS_INCLUDE_PPM
 #define PIOS_INCLUDE_PWM
 #define PIOS_INCLUDE_GCSRCVR
 

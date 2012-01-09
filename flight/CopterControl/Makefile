@@ -50,7 +50,7 @@ ENABLE_AUX_UART ?= NO
 
 USE_GPS ?= YES
 
-USE_GUIDANCE ?= NO
+USE_GUIDANCE ?= YES
 
 USE_I2C ?= NO
 
@@ -66,17 +66,17 @@ endif
 
 FLASH_TOOL = OPENOCD
 
-# List of modules to include
-OPTMODULES = CameraStab
+# List of modules to include CameraStab
+OPTMODULES = 
 ifeq ($(USE_GPS), YES)
 OPTMODULES += GPS
 endif
 
-ifeq ($(USE_GUIDANCE), YES)
-OPTMODULES += GUIDANCE
-endif
+#ifeq ($(USE_GUIDANCE), YES)
+#OPTMODULES += CCGUIDANCE
+#endif
 
-MODULES = Attitude Stabilization Actuator ManualControl FirmwareIAP
+MODULES = Attitude Stabilization Actuator ManualControl FirmwareIAP CCGuidance
 # Telemetry must be last to grab the optional modules (why?)
 MODULES += Telemetry
 
@@ -178,8 +178,8 @@ SRC += $(OPUAVSYNTHDIR)/attitudesettings.c
 SRC += $(OPUAVSYNTHDIR)/camerastabsettings.c
 SRC += $(OPUAVSYNTHDIR)/cameradesired.c
 SRC += $(OPUAVSYNTHDIR)/gpsposition.c
-SRC += $(OPUAVSYNTHDIR)/homelocation.c
-SRC += $(OPUAVSYNTHDIR)/positiondesired.c
+#SRC += $(OPUAVSYNTHDIR)/homelocation.c
+#SRC += $(OPUAVSYNTHDIR)/positiondesired.c
 SRC += $(OPUAVSYNTHDIR)/ccguidancesettings.c
 SRC += $(OPUAVSYNTHDIR)/hwsettings.c
 SRC += $(OPUAVSYNTHDIR)/gcsreceiver.c

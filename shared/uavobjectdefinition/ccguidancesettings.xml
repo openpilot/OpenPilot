@@ -1,10 +1,18 @@
 <xml>
     <object name="CCGuidanceSettings" singleinstance="true" settings="true">
         <description>Settings for the @ref CCGuidanceModule</description>
+		<field name="Yaw" units="deg" type="float" elementnames="1" defaultvalue="0"/>
         <field name="Pitch" units="deg" type="float" elementnames="Climb,Sink" defaultvalue="15,-5"/>
         <field name="Roll" units="deg" type="float" elementnames="Kp,Max,Neutral" defaultvalue="2,35,0"/>
         <field name="ReturnTobaseAltitudeOffset" units="meter" type="int16" elements="1" defaultvalue="75"/>
+		<field name="RadiusBase" units="deg" type="int16" elementnames="1" defaultvalue="25"/>
+		<field name="GroundspeedMinimal" units="deg" type="int16" elementnames="1" defaultvalue="2"/>
+		<field name="failesaveEnableRTB" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>
         <field name="UpdatePeriod" units="" type="int32" elements="1" defaultvalue="100"/>
+		<field name="HomeLocationSet" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>
+        <field name="HomeLocationLatitude" units="deg * 10e6" type="int32" elements="1" defaultvalue="0"/>
+        <field name="HomeLocationLongitude" units="deg * 10e6" type="int32" elements="1" defaultvalue="0"/>
+        <field name="HomeLocationAltitude" units="m over geoid" type="float" elements="1" defaultvalue="0"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

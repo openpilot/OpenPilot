@@ -70,7 +70,7 @@ NotifyPluginOptionsPage::NotifyPluginOptionsPage(QObject *parent)
 NotifyPluginOptionsPage::~NotifyPluginOptionsPage()
 {}
 
-QWidget *NotifyPluginOptionsPage::createPage(QWidget *parent)
+QWidget *NotifyPluginOptionsPage::createPage(QWidget * /* parent */)
 {
     _optionsPage.reset(new Ui::NotifyPluginOptionsPage());
     //main widget
@@ -448,7 +448,7 @@ void NotifyPluginOptionsPage::updateConfigView(NotificationItem* notification)
 
 }
 
-void NotifyPluginOptionsPage::on_changedIndex_rangeValue(QString rangeStr)
+void NotifyPluginOptionsPage::on_changedIndex_rangeValue(QString /* rangeStr */)
 {
     Q_ASSERT(_dynamicFieldWidget);
     UAVObjectField* field = getObjectFieldFromSelected();
@@ -509,7 +509,7 @@ void NotifyPluginOptionsPage::on_changedIndex_soundLanguage(int index)
 }
 
 
-void  NotifyPluginOptionsPage::on_changed_playButtonText(Phonon::State newstate, Phonon::State oldstate)
+void  NotifyPluginOptionsPage::on_changed_playButtonText(Phonon::State newstate, Phonon::State /* oldstate */)
 {
     //Q_ASSERT(Phonon::ErrorState != newstate);
 
@@ -524,7 +524,7 @@ void  NotifyPluginOptionsPage::on_changed_playButtonText(Phonon::State newstate,
     }
 }
 
-void NotifyPluginOptionsPage::on_changedSelection_notifyTable(const QItemSelection & selected, const QItemSelection & deselected )
+void NotifyPluginOptionsPage::on_changedSelection_notifyTable(const QItemSelection & selected, const QItemSelection & /* deselected */ )
 {
     bool select = false;
     _testSound->stop();

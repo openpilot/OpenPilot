@@ -83,7 +83,7 @@ private slots:
     void dropRows(int position, int count) const;
 
 private:
-    mutable QList<NotificationItem*>& _list;
+    QList<NotificationItem*>& _list;
     QStringList _headerStrings;
 };
 

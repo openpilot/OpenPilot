@@ -29,7 +29,7 @@
 #ifndef NOTIFYLOGGING_H
 #define NOTIFYLOGGING_H
 
-#include "QDebug.h"
+#include "qdebug.h"
 
 #define DEBUG_NOTIFIES_ENABLE
 

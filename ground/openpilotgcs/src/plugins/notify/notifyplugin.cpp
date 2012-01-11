@@ -101,7 +101,7 @@ void SoundNotifyPlugin::saveConfig( QSettings* settings, UAVConfigInfo *configIn
 
 }
 
-void SoundNotifyPlugin::readConfig( QSettings* settings, UAVConfigInfo *configInfo)
+void SoundNotifyPlugin::readConfig( QSettings* settings, UAVConfigInfo * /* configInfo */)
 {
     // Just for migration to the new format.
     //Q_ASSERT(configInfo->version() == UAVConfigVersion());
@@ -350,7 +350,7 @@ void SoundNotifyPlugin::stateChanged(Phonon::State newstate, Phonon::State oldst
     }
 }
 
-bool checkRange(QString fieldValue, QString enumValue, QStringList values, int direction)
+bool checkRange(QString fieldValue, QString enumValue, QStringList /* values */, int direction)
 {
 
     bool ret = false;
@@ -395,7 +395,7 @@ bool checkRange(double fieldValue, double min, double max, int direction)
 
 void SoundNotifyPlugin::checkNotificationRule(NotificationItem* notification, UAVObject* object)
 {
-    if(notification->getDataObject()!=object->getName() | object->getField(notification->getObjectField())==NULL)
+    if(notification->getDataObject()!=object->getName() || object->getField(notification->getObjectField())==NULL)
         return;
     bool condition=false;
 

@@ -207,9 +207,15 @@ static void PIOS_USB_HID_RxStart(uint32_t usbhid_id, uint16_t rx_bytes_avail) {
 	}
 
 	// If endpoint was stalled and there is now space make it valid
+#ifdef PIOS_USB_BOARD_BL_HID_HAS_NO_LENGTH_BYTE
+	uint16_t max_payload_length = PIOS_USB_BOARD_HID_DATA_LENGTH - 1;
+#else
+	uint16_t max_payload_length = PIOS_USB_BOARD_HID_DATA_LENGTH - 2;
+#endif
+
 	PIOS_IRQ_Disable();
 	if ((GetEPRxStatus(usb_hid_dev->cfg->data_rx_ep) != EP_RX_VALID) && 
-	    (rx_bytes_avail >= PIOS_USB_BOARD_HID_DATA_LENGTH)) {
+	    (rx_bytes_avail >= max_payload_length)) {
 		SetEPRxStatus(usb_hid_dev->cfg->data_rx_ep, EP_RX_VALID);
 	}
 	PIOS_IRQ_Enable();
@@ -328,7 +334,15 @@ static void PIOS_USB_HID_EP_OUT_Callback(void)
 				&headroom,
 				&need_yield);
 #endif
-	if (headroom >= PIOS_USB_BOARD_HID_DATA_LENGTH) {
+
+#ifdef PIOS_USB_BOARD_BL_HID_HAS_NO_LENGTH_BYTE
+	uint16_t max_payload_length = PIOS_USB_BOARD_HID_DATA_LENGTH - 1;
+#else
+	uint16_t max_payload_length = PIOS_USB_BOARD_HID_DATA_LENGTH - 2;
+#endif
+
+	if (headroom >= max_payload_length) {
+
 		/* We have room for a maximum length message */
 		SetEPRxStatus(usb_hid_dev->cfg->data_rx_ep, EP_RX_VALID);
 	} else {

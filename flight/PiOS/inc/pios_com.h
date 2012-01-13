@@ -31,6 +31,9 @@
 #ifndef PIOS_COM_H
 #define PIOS_COM_H
 
+#include <stdint.h>		/* uint*_t */
+#include <stdbool.h>		/* bool */
+
 typedef uint16_t (*pios_com_callback)(uint32_t context, uint8_t * buf, uint16_t buf_len, uint16_t * headroom, bool * task_woken);
 
 struct pios_com_driver {
@@ -43,7 +46,6 @@ struct pios_com_driver {
 };
 
 /* Public Functions */
-extern int32_t PIOS_COM_Init(uint32_t * com_id, const struct pios_com_driver * driver, uint32_t lower_id, uint8_t * rx_buffer, uint16_t rx_buffer_len, uint8_t * tx_buffer, uint16_t tx_buffer_len);
 extern int32_t PIOS_COM_ChangeBaud(uint32_t com_id, uint32_t baud);
 extern int32_t PIOS_COM_SendCharNonBlocking(uint32_t com_id, char c);
 extern int32_t PIOS_COM_SendChar(uint32_t com_id, char c);

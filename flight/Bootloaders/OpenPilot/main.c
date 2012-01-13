@@ -35,6 +35,7 @@
 #include "pios_iap.h"
 #include "ssp.h"
 #include "fifo_buffer.h"
+#include "pios_com_msg.h"
 /* Prototype of PIOS_Board_Init() function */
 extern void PIOS_Board_Init(void);
 extern void FLASH_Download();
@@ -90,7 +91,7 @@ uint8_t JumpToApp = FALSE;
 uint8_t GO_dfu = FALSE;
 uint8_t USB_connected = FALSE;
 uint8_t User_DFU_request = FALSE;
-static uint8_t mReceive_Buffer[64];
+static uint8_t mReceive_Buffer[63];
 /* Private function prototypes -----------------------------------------------*/
 uint32_t LedPWM(uint32_t pwm_period, uint32_t pwm_sweep_steps, uint32_t count);
 uint8_t processRX();
@@ -249,7 +250,7 @@ uint32_t LedPWM(uint32_t pwm_period, uint32_t pwm_sweep_steps, uint32_t count) {
 
 uint8_t processRX() {
 	if (ProgPort == Usb) {
-		if (PIOS_COM_ReceiveBuffer(PIOS_COM_TELEM_USB, mReceive_Buffer, 63, 0) == 63) {
+		if (PIOS_COM_MSG_Receive(PIOS_COM_TELEM_USB, mReceive_Buffer, sizeof(mReceive_Buffer))) {
 			processComand(mReceive_Buffer);
 		}
 	} else if (ProgPort == Serial) {

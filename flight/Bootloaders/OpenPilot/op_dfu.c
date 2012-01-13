@@ -30,6 +30,7 @@
 #include "pios.h"
 #include "op_dfu.h"
 #include "pios_bl_helper.h"
+#include "pios_com_msg.h"
 #include <pios_board_info.h>
 #include "pios_opahrs.h"
 #include "ssp.h"
@@ -299,7 +300,6 @@ void processComand(uint8_t *xReceive_Buffer) {
 
 					++Next_Packet;
 				} else {
-
 					DeviceState = wrong_packet_received;
 					Aditionals = Count;
 				}
@@ -508,6 +508,7 @@ uint32_t baseOfAdressType(DFUTransfer type) {
 		return currentDevice.startOfUserCode + currentDevice.sizeOfCode;
 		break;
 	default:
+
 		return 0;
 	}
 }
@@ -550,11 +551,7 @@ uint32_t CalcFirmCRC() {
 }
 void sendData(uint8_t * buf, uint16_t size) {
 	if (ProgPort == Usb) {
-
-		PIOS_COM_SendBuffer(PIOS_COM_TELEM_USB, buf, size);
-		if (DeviceState == downloading)
-			PIOS_DELAY_WaitmS(10);
-
+		PIOS_COM_MSG_Send(PIOS_COM_TELEM_USB, buf, size);
 	} else if (ProgPort == Serial) {
 		ssp_SendData(&ssp_port, buf, size);
 	}

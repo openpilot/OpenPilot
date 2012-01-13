@@ -116,7 +116,7 @@ SRC += $(PIOSCOMMON)/pios_usb_desc_hid_only.c
 
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_board_info.c
-SRC += $(PIOSCOMMON)/pios_com.c
+SRC += $(PIOSCOMMON)/pios_com_msg.c
 SRC += $(PIOSCOMMON)/pios_bl_helper.c
 SRC += $(PIOSCOMMON)/pios_iap.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c

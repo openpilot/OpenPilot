@@ -27,17 +27,11 @@
 
 // ***********************************************************************************
 
-#if defined(PIOS_INCLUDE_COM)
+#if defined(PIOS_INCLUDE_COM_MSG)
 
-#include <pios_com_priv.h>
+#include <pios_com_msg_priv.h>
 
-#define PIOS_COM_TELEM_USB_RX_BUF_LEN 192
-#define PIOS_COM_TELEM_USB_TX_BUF_LEN 192
-
-static uint8_t pios_com_telem_usb_rx_buffer[PIOS_COM_TELEM_USB_RX_BUF_LEN];
-static uint8_t pios_com_telem_usb_tx_buffer[PIOS_COM_TELEM_USB_TX_BUF_LEN];
-
-#endif /* PIOS_INCLUDE_COM */
+#endif /* PIOS_INCLUDE_COM_MSG */
 
 // ***********************************************************************************
 
@@ -97,17 +91,15 @@ void PIOS_Board_Init(void) {
 	if (PIOS_USB_Init(&pios_usb_id, &pios_usb_main_cfg)) {
 		PIOS_Assert(0);
 	}
-#if defined(PIOS_INCLUDE_USB_HID) && defined(PIOS_INCLUDE_COM)
+#if defined(PIOS_INCLUDE_USB_HID) && defined(PIOS_INCLUDE_COM_MSG)
 	uint32_t pios_usb_hid_id;
 	if (PIOS_USB_HID_Init(&pios_usb_hid_id, &pios_usb_hid_cfg, pios_usb_id)) {
 		PIOS_Assert(0);
 	}
-	if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_hid_com_driver, pios_usb_hid_id,
-			  pios_com_telem_usb_rx_buffer, sizeof(pios_com_telem_usb_rx_buffer),
-			  pios_com_telem_usb_tx_buffer, sizeof(pios_com_telem_usb_tx_buffer))) {
+	if (PIOS_COM_MSG_Init(&pios_com_telem_usb_id, &pios_usb_hid_com_driver, pios_usb_hid_id)) {
 		PIOS_Assert(0);
 	}
-#endif	/* PIOS_INCLUDE_USB_HID && PIOS_INCLUDE_COM */
+#endif	/* PIOS_INCLUDE_USB_HID && PIOS_INCLUDE_COM_MSG */
 
 #endif	/* PIOS_INCLUDE_USB */
 

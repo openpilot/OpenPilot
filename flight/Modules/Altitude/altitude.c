@@ -92,7 +92,9 @@ int32_t AltitudeStart()
  */
 int32_t AltitudeInitialize()
 {
-
+#ifdef MODULE_Altitude_BUILTIN
+	altitudeEnabled = 1;
+#else
 	HwSettingsInitialize();
 	uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
 	HwSettingsOptionalModulesGet(optionalModules);
@@ -101,6 +103,7 @@ int32_t AltitudeInitialize()
 	} else {
 		altitudeEnabled = 0;
 	}
+#endif
 
 	// init down-sampling data
 	alt_ds_temp = 0;

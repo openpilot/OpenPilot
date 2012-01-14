@@ -412,6 +412,9 @@ ifeq ($(USE_I2C), YES)
 CDEFS += -DUSE_I2C
 endif
 
+# Declare all non-optional modules as built-in to force inclusion
+CDEFS += ${foreach MOD, ${MODULES}, -DMODULE_$(MOD)_BUILTIN }
+
 # Place project-specific -D and/or -U options for
 # Assembler with preprocessor here.
 #ADEFS = -DUSE_IRQ_ASM_WRAPPER

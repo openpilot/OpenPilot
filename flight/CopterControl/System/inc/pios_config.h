@@ -76,6 +76,8 @@
 #define PIOS_INCLUDE_ADXL345
 #define PIOS_INCLUDE_FLASH
 
+#define PIOS_INCLUDE_BMP085
+
 /* A really shitty setting saving implementation */
 #define PIOS_INCLUDE_FLASH_SECTOR_SETTINGS
 

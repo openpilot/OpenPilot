@@ -70,8 +70,10 @@ void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString fiel
         connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshWidgetsValues()));
     }
     //smartsave->addObject(obj);
-    if(!field.isEmpty() && obj)
+    if(!field.isEmpty() && obj) {
         _field = obj->getField(QString(field));
+        qDebug() << "Non-existent object field " << object + "." + field << " in " << __func__;
+    }
     objectToWidget * ow=new objectToWidget();
     ow->field=_field;
     ow->object=obj;
@@ -116,6 +118,10 @@ void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString fiel
     else if(QPushButton * cb=qobject_cast<QPushButton *>(widget))
     {
         connect(cb,SIGNAL(clicked()),this,SLOT(widgetsContentsChanged()));
+    }
+    else
+    {
+        qDebug() << "Unhandled widget type in " << __func__;
     }
 
 }
@@ -205,6 +211,10 @@ void ConfigTaskWidget::populateWidgets()
         {
             cb->setChecked(ow->field->getValue(ow->index).toBool());
         }
+        else
+        {
+             qDebug() << "Unhandled widget type in " << __func__;
+        }
     }
     setDirty(dirtyBack);
 }
@@ -242,6 +252,10 @@ void ConfigTaskWidget::refreshWidgetsValues()
         {
             cb->setChecked(ow->field->getValue(ow->index).toBool());
         }
+        else
+        {
+            qDebug() << "Unhandled widget type in " << __func__;
+        }
     }
     setDirty(dirtyBack);
 }
@@ -277,6 +291,10 @@ void ConfigTaskWidget::updateObjectsFromWidgets()
         else if(QCheckBox * cb=qobject_cast<QCheckBox *>(ow->widget))
         {
             ow->field->setValue((cb->isChecked()?"TRUE":"FALSE"),ow->index);
+        }
+        else
+        {
+            qDebug() << "Unhandled widget type in " << __func__;
         }
     }
 }

@@ -6,7 +6,7 @@
 		elementnames="Instance1,Instance2,Instance3"
 		options="Throttle,Accessory0,Accessory1,Accessory2,Accessory3,Accessory4,Accessory5"
 		defaultvalue="Throttle,Accessory0,Accessory1"/>
-        <field name="ThrottleRange" units="percent" type="float" elements="2" elementnames="Min,Max" defaultvalue="0.20,0.80"/>
+        <field name="ThrottleRange" units="%" type="float" elements="2" elementnames="Min,Max" defaultvalue="0.20,0.80"/>
         <field name="PIDs" units="option" type="enum"
 		elementnames="Instance1,Instance2,Instance3"
 		options="Disabled,

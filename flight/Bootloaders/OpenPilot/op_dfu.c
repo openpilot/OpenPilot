@@ -353,10 +353,18 @@ void processComand(uint8_t *xReceive_Buffer) {
 				DeviceState = failed_jump;
 				break;
 			} else {
+				if (Data == 0x5AFE) {
+					/* Force board into safe mode */
+					PIOS_IAP_WriteBootCount(0xFFFF);
+				}
 				FLASH_Lock();
 				JumpToApp = 1;
 			}
 		} else {
+			if (Data == 0x5AFE) {
+				/* Force board into safe mode */
+				PIOS_IAP_WriteBootCount(0xFFFF);
+			}
 			FLASH_Lock();
 			JumpToApp = 1;
 		}

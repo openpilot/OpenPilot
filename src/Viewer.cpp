@@ -417,6 +417,7 @@ void MouseGraphicsScene::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 		qdisplay::Viewer *viewer = dynamic_cast<qdisplay::Viewer*>(*it);
 		if (viewer) viewer->setTitleWithMouseCoordinates(pos.x(), pos.y());
 	}
+	emit viewer->onMouseMove(event);
 	QGraphicsScene::mouseMoveEvent(event);
 }
 

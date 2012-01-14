@@ -120,7 +120,8 @@ class Viewer : public QGraphicsView {
 	signals:
 		void onKeyPress(QKeyEvent *event);
 		void onMouseClick(QGraphicsSceneMouseEvent *mouseEvent, bool isClick);
-  protected:
+		void onMouseMove(QGraphicsSceneMouseEvent *mouseEvent);
+	protected:
     virtual void contextMenuEvent ( QContextMenuEvent * event );
     virtual void keyPressEvent ( QKeyEvent * event );
     virtual void wheelEvent(QWheelEvent *event);

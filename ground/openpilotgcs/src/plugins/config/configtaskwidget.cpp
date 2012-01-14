@@ -193,6 +193,10 @@ void ConfigTaskWidget::populateWidgets()
         {
             cb->setValue(ow->field->getValue(ow->index).toInt()/ow->scale);
         }
+        else if (QDoubleSpinBox * cb = qobject_cast<QDoubleSpinBox *>(ow->widget))
+        {
+            cb->setValue(ow->field->getValue(ow->index).toDouble()/ow->scale);
+        }
         else if(QSlider * cb=qobject_cast<QSlider *>(ow->widget))
         {
             cb->setValue(ow->field->getValue(ow->index).toInt()/ow->scale);
@@ -226,6 +230,10 @@ void ConfigTaskWidget::refreshWidgetsValues()
         {
             cb->setValue(ow->field->getValue(ow->index).toInt()/ow->scale);
         }
+        else if (QDoubleSpinBox * cb = qobject_cast<QDoubleSpinBox *>(ow->widget))
+        {
+            cb->setValue(ow->field->getValue(ow->index).toDouble()/ow->scale);
+        }
         else if(QSlider * cb=qobject_cast<QSlider *>(ow->widget))
         {
             cb->setValue(ow->field->getValue(ow->index).toInt()/ow->scale);
@@ -255,6 +263,10 @@ void ConfigTaskWidget::updateObjectsFromWidgets()
             ow->field->setValue(cb->text(),ow->index);
         }
         else if(QSpinBox * cb=qobject_cast<QSpinBox *>(ow->widget))
+        {
+            ow->field->setValue(cb->value()* ow->scale,ow->index);
+        }
+        else if (QDoubleSpinBox * cb = qobject_cast<QDoubleSpinBox *>(ow->widget))
         {
             ow->field->setValue(cb->value()* ow->scale,ow->index);
         }

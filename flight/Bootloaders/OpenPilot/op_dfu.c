@@ -34,10 +34,6 @@
 #include <pios_board_info.h>
 #include "pios_opahrs.h"
 #include "ssp.h"
-/* Private typedef -----------------------------------------------------------*/
-/* Private define ------------------------------------------------------------*/
-/* Private macro -------------------------------------------------------------*/
-/* Private variables ---------------------------------------------------------*/
 //programmable devices
 Device devicesTable[10];
 uint8_t numberOfDevices = 0;
@@ -223,7 +219,7 @@ void processComand(uint8_t *xReceive_Buffer) {
 						}
 					}
 					if (result != 1) {
-						DeviceState = Last_operation_failed;//ok
+						DeviceState = Last_operation_failed;
 						Aditionals = (uint32_t) Command;
 					} else {
 
@@ -392,7 +388,6 @@ void processComand(uint8_t *xReceive_Buffer) {
 				DeviceState = too_few_packets;
 			}
 		}
-
 		break;
 	case Download_Req:
 #ifdef DEBUG_SSP

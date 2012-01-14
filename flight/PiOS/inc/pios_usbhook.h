@@ -47,5 +47,18 @@ typedef enum CDC_REQUESTS {
 	SET_CONTROL_LINE_STATE = 0x23,
 } CDC_REQUESTS;
 
+enum usb_string_desc {
+	USB_STRING_DESC_LANG    = 0,
+	USB_STRING_DESC_VENDOR  = 1,
+	USB_STRING_DESC_PRODUCT = 2,
+	USB_STRING_DESC_SERIAL  = 3,
+} __attribute__((packed));
+
+extern void PIOS_USBHOOK_RegisterDevice(const uint8_t * desc, uint16_t desc_size);
+extern void PIOS_USBHOOK_RegisterConfig(uint8_t config_id, const uint8_t * desc, uint16_t desc_size);
+extern void PIOS_USBHOOK_RegisterString(enum usb_string_desc string_id, const uint8_t * desc, uint16_t desc_size);
+extern void PIOS_USBHOOK_RegisterHidInterface(const uint8_t * desc, uint16_t desc_size);
+extern void PIOS_USBHOOK_RegisterHidReport(const uint8_t * desc, uint16_t desc_size);
+
 #endif /* PIOS_USBHOOK_H */
 

@@ -72,10 +72,6 @@ void jump_to_app();
 #define BLUE LED1
 #define RED	LED4
 int main() {
-	/* NOTE: Do NOT modify the following start-up sequence */
-	/* Any new initialization functions should be added in OpenPilotInit() */
-
-	/* Brings up System using CMSIS functions, enables the LEDs. */
 	PIOS_SYS_Init();
 	if (BSL_HOLD_STATE == 0)
 		USB_connected = TRUE;
@@ -182,7 +178,6 @@ void jump_to_app() {
 		RCC_APB1PeriphResetCmd(0xffffffff, DISABLE);
 		_SetCNTR(0); // clear interrupt mask
 		_SetISTR(0); // clear all requests
-
 		JumpAddress = *(__IO uint32_t*) (bdinfo->fw_base + 4);
 		Jump_To_Application = (pFunction) JumpAddress;
 		/* Initialize user application's Stack Pointer */

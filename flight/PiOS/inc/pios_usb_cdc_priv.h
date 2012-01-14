@@ -46,7 +46,7 @@ extern const struct pios_com_driver pios_usb_cdc_com_driver;
 
 extern int32_t PIOS_USB_CDC_Init(uint32_t * usbcdc_id, const struct pios_usb_cdc_cfg * cfg, uint32_t lower_id);
 
-extern uint8_t *PIOS_USB_CDC_GetLineCoding(uint16_t Length);
+extern const uint8_t *PIOS_USB_CDC_GetLineCoding(uint16_t Length);
 extern RESULT PIOS_USB_CDC_SetControlLineState(void);
 extern RESULT PIOS_USB_CDC_SetLineCoding(void);
 

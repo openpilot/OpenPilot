@@ -32,10 +32,6 @@
 #include "pios_bl_helper.h"
 #include "pios_com_msg.h"
 #include <pios_board_info.h>
-/* Private typedef -----------------------------------------------------------*/
-/* Private define ------------------------------------------------------------*/
-/* Private macro -------------------------------------------------------------*/
-/* Private variables ---------------------------------------------------------*/
 //programmable devices
 Device devicesTable[10];
 uint8_t numberOfDevices = 0;
@@ -145,7 +141,7 @@ void processComand(uint8_t *xReceive_Buffer) {
 	case EnterDFU:
 		if (((DeviceState == BLidle) && (Data0 < numberOfDevices))
 				|| (DeviceState == DFUidle)) {
-			if (Data0 > 0)//PORQUE???
+			if (Data0 > 0)
 				OPDfuIni(TRUE);
 			DeviceState = DFUidle;
 			currentProgrammingDestination = devicesTable[Data0].programmingType;
@@ -202,7 +198,7 @@ void processComand(uint8_t *xReceive_Buffer) {
 						}
 					}
 					if (result != 1) {
-						DeviceState = Last_operation_failed;//ok
+						DeviceState = Last_operation_failed;
 						Aditionals = (uint32_t) Command;
 					} else {
 
@@ -253,11 +249,9 @@ void processComand(uint8_t *xReceive_Buffer) {
 
 					++Next_Packet;
 				} else {
-
 					DeviceState = wrong_packet_received;
 					Aditionals = Count;
 				}
-				// FLASH_ProgramWord(MemLocations[TransferType]+4,++Next_Packet);//+Count,Data);
 			} else {
 				DeviceState = Last_operation_failed;
 				Aditionals = (uint32_t) Command;
@@ -331,7 +325,6 @@ void processComand(uint8_t *xReceive_Buffer) {
 				DeviceState = too_few_packets;
 			}
 		}
-
 		break;
 	case Download_Req:
 #ifdef DEBUG_SSP

@@ -215,7 +215,11 @@ static const struct pios_usb_cfg pios_usb_main_cfg = {
     },
   },
 };
-#endif	/* PIOS_INCLUDE_USB_HID */
+
+#include "pios_usb_board_data_priv.h"
+#include "pios_usb_desc_hid_only_priv.h"
+
+#endif	/* PIOS_INCLUDE_USB */
 
 #if defined(PIOS_INCLUDE_USB_HID)
 #include <pios_usb_hid_priv.h>
@@ -270,6 +274,12 @@ void PIOS_Board_Init(void) {
 	PIOS_GPIO_Init();
 
 #if defined(PIOS_INCLUDE_USB)
+	/* Initialize board specific USB data */
+	PIOS_USB_BOARD_DATA_Init();
+
+	/* Activate the HID-only USB configuration */
+	PIOS_USB_DESC_HID_ONLY_Init();
+
 	uint32_t pios_usb_id;
 	if (PIOS_USB_Init(&pios_usb_id, &pios_usb_main_cfg)) {
 		PIOS_Assert(0);

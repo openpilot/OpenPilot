@@ -29,9 +29,11 @@
  */
 
 #include "pios_usb_board_data.h" /* struct usb_*, USB_* */
+#include "pios_sys.h"		 /* PIOS_SYS_SerialNumberGet */
+#include "pios_usbhook.h"	 /* PIOS_USBHOOK_* */
 
-const uint8_t PIOS_USB_BOARD_StringProductID[] = {
-	sizeof(PIOS_USB_BOARD_StringProductID),
+static const uint8_t usb_product_id[20] = {
+	sizeof(usb_product_id),
 	USB_DESC_TYPE_STRING,
 	'P', 0,
 	'i', 0,
@@ -44,3 +46,74 @@ const uint8_t PIOS_USB_BOARD_StringProductID[] = {
 	'e', 0,
 };
 
+static uint8_t usb_serial_number[52] = {
+	sizeof(usb_serial_number),
+	USB_DESC_TYPE_STRING,
+	0, 0,
+	0, 0,
+	0, 0,
+	0, 0,
+	0, 0,
+	0, 0,
+	0, 0,
+	0, 0,
+	0, 0,
+	0, 0,
+	0, 0,
+	0, 0,
+	0, 0,
+	0, 0,
+	0, 0,
+	0, 0,
+	0, 0,
+	0, 0,
+	0, 0,
+	0, 0,
+	0, 0,
+	0, 0,
+	0, 0,
+	0, 0,
+	0, 0
+};
+
+static const struct usb_string_langid usb_lang_id = {
+	.bLength = sizeof(usb_lang_id),
+	.bDescriptorType = USB_DESC_TYPE_STRING,
+	.bLangID = htousbs(USB_LANGID_ENGLISH_UK),
+};
+
+static const uint8_t usb_vendor_id[28] = {
+	sizeof(usb_vendor_id),
+	USB_DESC_TYPE_STRING,
+	'o', 0,
+	'p', 0,
+	'e', 0,
+	'n', 0,
+	'p', 0,
+	'i', 0,
+	'l', 0,
+	'o', 0,
+	't', 0,
+	'.', 0,
+	'o', 0,
+	'r', 0,
+	'g', 0
+};
+
+int32_t PIOS_USB_BOARD_DATA_Init(void)
+{
+	/* Load device serial number into serial number string */
+	uint8_t sn[25];
+	PIOS_SYS_SerialNumberGet((char *)sn);
+	for (uint8_t i = 0; sn[i] != '\0' && (2 * i) < usb_serial_number[0]; i++) {
+		usb_serial_number[2 + 2 * i] = sn[i];
+	}
+
+	PIOS_USBHOOK_RegisterString(USB_STRING_DESC_PRODUCT, (uint8_t *)&usb_product_id, sizeof(usb_product_id));
+	PIOS_USBHOOK_RegisterString(USB_STRING_DESC_SERIAL, (uint8_t *)&usb_serial_number, sizeof(usb_serial_number));
+
+	PIOS_USBHOOK_RegisterString(USB_STRING_DESC_LANG, (uint8_t *)&usb_lang_id, sizeof(usb_lang_id));
+	PIOS_USBHOOK_RegisterString(USB_STRING_DESC_VENDOR, (uint8_t *)&usb_vendor_id, sizeof(usb_vendor_id));
+
+	return 0;
+}

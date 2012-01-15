@@ -170,8 +170,11 @@ static void systemTask(void *parameters)
 		updateI2Cstats();
 		updateWDGstats();
 #endif
+
+#if defined(DIAG_TASKS)
 		// Update the task status object
 		TaskMonitorUpdateAll();
+#endif
 
 		// Flash the heartbeat LED
 		PIOS_LED_Toggle(LED1);

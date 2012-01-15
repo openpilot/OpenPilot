@@ -72,6 +72,24 @@ int32_t TaskMonitorAdd(TaskInfoRunningElem task, xTaskHandle handle)
 }
 
 /**
+ * Remove a task handle from the library
+ */
+int32_t TaskMonitorRemove(TaskInfoRunningElem task)
+{
+	if (task < TASKINFO_RUNNING_NUMELEM)
+	{
+	    xSemaphoreTakeRecursive(lock, portMAX_DELAY);
+		handles[task] = 0;
+		xSemaphoreGiveRecursive(lock);
+		return 0;
+	}
+	else
+	{
+		return -1;
+	}
+}
+
+/**
  * Update the status of all tasks
  */
 void TaskMonitorUpdateAll(void)
@@ -79,10 +97,10 @@ void TaskMonitorUpdateAll(void)
 #if defined(DIAG_TASKS)
 	TaskInfoData data;
 	int n;
-	
+
 	// Lock
 	xSemaphoreTakeRecursive(lock, portMAX_DELAY);
-	
+
 #if ( configGENERATE_RUN_TIME_STATS == 1 )
 	uint32_t currentTime;
 	uint32_t deltaTime;
@@ -121,10 +139,10 @@ void TaskMonitorUpdateAll(void)
 			data.RunningTime[n] = 0;
 		}
 	}
-	
+
 	// Update object
 	TaskInfoSet(&data);
-	
+
 	// Done
 	xSemaphoreGiveRecursive(lock);
 #endif

@@ -218,20 +218,37 @@ QString UAVSettingsImportExportFactory::createXMLDocument(
     QDomDocument doc(docName);
     QDomElement root = doc.createElement(isSettings ? "settings" : "data");
     doc.appendChild(root);
-    QDomElement versionInfo =doc.createElement("versionInfo");
+
+    // add hardware, firmware and GCS version info
+    QDomElement versionInfo = doc.createElement("version");
     root.appendChild(versionInfo);
-    QDomElement fw=doc.createElement("Embedded");
-    UAVObjectUtilManager* utilMngr = pm->getObject<UAVObjectUtilManager>();
 
-    deviceDescriptorStruct struc=utilMngr->getBoardDescriptionStruct();
-    fw.setAttribute("gitcommittag",struc.gitTag);
-    fw.setAttribute("fwtag",struc.description);
-    fw.setAttribute("cpuSerial",QString(utilMngr->getBoardCPUSerial().toHex()));
+    UAVObjectUtilManager *utilMngr = pm->getObject<UAVObjectUtilManager>();
+    deviceDescriptorStruct board = utilMngr->getBoardDescriptionStruct();
 
+    QDomElement hw = doc.createElement("hardware");
+    hw.setAttribute("type", QString().setNum(board.boardType, 16));
+    hw.setAttribute("revision", QString().setNum(board.boardRevision, 16));
+    hw.setAttribute("serial", QString(utilMngr->getBoardCPUSerial().toHex()));
+    versionInfo.appendChild(hw);
+
+    QDomElement fw = doc.createElement("firmware");
+    fw.setAttribute("date", board.gitDate);
+    fw.setAttribute("hash", board.gitHash);
+    fw.setAttribute("tag", board.gitTag);
     versionInfo.appendChild(fw);
-    QDomElement gcs=doc.createElement("GCS");
-    gcs.setAttribute("revision",QString::fromLatin1(Core::Constants::GCS_REVISION_STR));
+
+    QString gcsRevision = QString::fromLatin1(Core::Constants::GCS_REVISION_STR);
+    QString gcsGitDate = gcsRevision.mid(gcsRevision.indexOf(" ") + 1, 14);
+    QString gcsGitHash = gcsRevision.mid(gcsRevision.indexOf(":") + 1, 8);
+    QString gcsGitTag = gcsRevision.left(gcsRevision.indexOf(":"));
+
+    QDomElement gcs = doc.createElement("gcs");
+    gcs.setAttribute("date", gcsGitDate);
+    gcs.setAttribute("hash", gcsGitHash);
+    gcs.setAttribute("tag", gcsGitTag);
     versionInfo.appendChild(gcs);
+
     // iterate over settings objects
     QList< QList<UAVDataObject*> > objList = objManager->getDataObjects();
     foreach (QList<UAVDataObject*> list, objList) {

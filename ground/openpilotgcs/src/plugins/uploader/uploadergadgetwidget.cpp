@@ -619,16 +619,20 @@ void UploaderGadgetWidget::info(QString infoString, int infoNumber)
 void UploaderGadgetWidget::versionMatchCheck()
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectUtilManager* utilMngr = pm->getObject<UAVObjectUtilManager>();
-    deviceDescriptorStruct boardDescription=utilMngr->getBoardDescriptionStruct();
-    QString gcsDescription=QString::fromLatin1(Core::Constants::GCS_REVISION_STR);
-    if(boardDescription.gitTag!=gcsDescription.mid(gcsDescription.indexOf(":")+1,8))
-    {
-        qDebug()<<QDate::fromString(boardDescription.buildDate.mid(0,8),"yyyyMMdd");
-        qDebug()<<QDate::fromString(gcsDescription.mid(gcsDescription.indexOf(" ")+1,8),"yyyyMMdd");
-        qDebug()<<QDate::fromString(boardDescription.buildDate.mid(0,8),"yyyyMMdd").daysTo(QDate::fromString(gcsDescription.mid(gcsDescription.indexOf(" ")+1,8),"yyyyMMdd"));
-        msg->showMessage(QString(tr("GCS and FW versions do not match which can cause configuration problems.")) + "  \n" +
-                                 QString(tr("GCS Versions: ")) + gcsDescription + "  \n" +
-                                 QString(tr("FW Versions: ")) + boardDescription.gitTag+":"+boardDescription.buildDate);
+    UAVObjectUtilManager *utilMngr = pm->getObject<UAVObjectUtilManager>();
+    deviceDescriptorStruct boardDescription = utilMngr->getBoardDescriptionStruct();
+
+    QString gcsDescription = QString::fromLatin1(Core::Constants::GCS_REVISION_STR);
+    QString gcsGitHash = gcsDescription.mid(gcsDescription.indexOf(":")+1, 8);
+    QString gcsGitDate = gcsDescription.mid(gcsDescription.indexOf(" ")+1, 14);
+
+    QString gcsVersion = gcsGitDate + " (" + gcsGitHash + ")";
+    QString fwVersion = boardDescription.gitDate + " (" + boardDescription.gitHash + ")";
+
+    if (boardDescription.gitHash != gcsGitHash) {
+        QString warning = QString(tr(
+            "GCS and firmware versions do not match which can cause configuration problems. "
+            "GCS version: %1. Firmware version: %2.")).arg(gcsVersion).arg(fwVersion);
+        msg->showMessage(warning);
     }
   }

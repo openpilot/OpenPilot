@@ -31,6 +31,7 @@
 #include <QDebug>
 #include <QCheckBox>
 #include "importsummary.h"
+
 // for menu item
 #include <coreplugin/coreconstants.h>
 #include <coreplugin/actionmanager/actionmanager.h>
@@ -49,20 +50,18 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
-
-
 UAVSettingsImportExportFactory::~UAVSettingsImportExportFactory()
 {
    // Do nothing
 }
 
-UAVSettingsImportExportFactory::UAVSettingsImportExportFactory(QObject * parent):QObject(parent)
+UAVSettingsImportExportFactory::UAVSettingsImportExportFactory(QObject *parent):QObject(parent)
 {
 
    // Add Menu entry
-   Core::ActionManager* am = Core::ICore::instance()->actionManager();
-   Core::ActionContainer* ac = am->actionContainer(Core::Constants::M_FILE);
-   Core::Command* cmd = am->registerAction(new QAction(this),
+   Core::ActionManager *am = Core::ICore::instance()->actionManager();
+   Core::ActionContainer *ac = am->actionContainer(Core::Constants::M_FILE);
+   Core::Command *cmd = am->registerAction(new QAction(this),
                                            "UAVSettingsImportExportPlugin.UAVSettingsExport",
                                            QList<int>() <<
                                            Core::Constants::C_GLOBAL_ID);
@@ -95,7 +94,7 @@ void UAVSettingsImportExportFactory::importUAVSettings()
 {
     // ask for file name
     QString fileName;
-    QString filters = tr("UAVSettings XML files (*.uav);; XML files (*.xml)");
+    QString filters = tr("UAVObjects XML files (*.uav);; XML files (*.xml)");
     fileName = QFileDialog::getOpenFileName(0, tr("Import UAV Settings"), "", filters);
     if (fileName.isEmpty()) {
         return;
@@ -103,7 +102,7 @@ void UAVSettingsImportExportFactory::importUAVSettings()
 
     // Now open the file
     QFile file(fileName);
-    QDomDocument doc("UAVSettings");
+    QDomDocument doc("UAVObjects");
     file.open(QFile::ReadOnly|QFile::Text);
     if (!doc.setContent(file.readAll())) {
         QMessageBox msgBox;
@@ -114,13 +113,19 @@ void UAVSettingsImportExportFactory::importUAVSettings()
         return;
     }
     file.close();
+
+    // find the root of settings subtree
     emit importAboutToBegin();
     qDebug()<<"Import about to begin";
+
     QDomElement root = doc.documentElement();
-    if (root.tagName() != "settings") {
+    if (root.tagName() == "uavobjects") {
+        root = root.firstChildElement("settings");
+    }
+    if (root.isNull() || (root.tagName() != "settings")) {
         QMessageBox msgBox;
-        msgBox.setText(tr("Wrong file contents."));
-        msgBox.setInformativeText(tr("This file is not a correct UAVSettings file"));
+        msgBox.setText(tr("Wrong file contents"));
+        msgBox.setInformativeText(tr("This file does not contain correct UAVSettings"));
         msgBox.setStandardButtons(QMessageBox::Ok);
         msgBox.exec();
         return;
@@ -138,85 +143,86 @@ void UAVSettingsImportExportFactory::importUAVSettings()
     while (!node.isNull()) {
         QDomElement e = node.toElement();
         if (e.tagName() == "object") {
-        //  - Read each object
-         QString uavObjectName  = e.attribute("name");
-         uint uavObjectID = e.attribute("id").toUInt(NULL,16);
 
-         // Sanity Check:
-         UAVObject* obj = objManager->getObject(uavObjectName);
-         if (obj == NULL) {
-             // This object is unknown!
-             qDebug() << "Object unknown:" << uavObjectName << uavObjectID;
-             swui.addLine(uavObjectName, "Error (Object unknown)", false);
+            //  - Read each object
+            QString uavObjectName  = e.attribute("name");
+            uint uavObjectID = e.attribute("id").toUInt(NULL,16);
 
-         } else {
-             //  - Update each field
-             //  - Issue and "updated" command
-             bool error=false;
-             bool setError=false;
-             QDomNode field = node.firstChild();
-             while(!field.isNull()) {
-                 QDomElement f = field.toElement();
-                 if (f.tagName() == "field") {
-                     UAVObjectField *uavfield = obj->getField(f.attribute("name"));
-                     if (uavfield) {
-                         QStringList list = f.attribute("values").split(",");
-                         if (list.length() == 1) {
-                             if (false == uavfield->checkValue(f.attribute("values"))) {
-                                 qDebug() << "checkValue returned false on: " << uavObjectName << f.attribute("values");
-                                 setError = true;
-                             } else
-                            	 uavfield->setValue(f.attribute("values"));
-                         } else {
-                         // This is an enum:
-                             int i=0;
-                             QStringList list = f.attribute("values").split(",");
-                             foreach (QString element, list) {
-                            	 if (false == uavfield->checkValue(element,i)) {
-                            	     qDebug() << "checkValue(list) returned false on: " << uavObjectName << list;
-                            		 setError = true;
-                            	 } else
+            // Sanity Check:
+            UAVObject *obj = objManager->getObject(uavObjectName);
+            if (obj == NULL) {
+                // This object is unknown!
+                qDebug() << "Object unknown:" << uavObjectName << uavObjectID;
+                swui.addLine(uavObjectName, "Error (Object unknown)", false);
+            } else {
+                //  - Update each field
+                //  - Issue and "updated" command
+                bool error = false;
+                bool setError = false;
+                QDomNode field = node.firstChild();
+                while(!field.isNull()) {
+                    QDomElement f = field.toElement();
+                    if (f.tagName() == "field") {
+                        UAVObjectField *uavfield = obj->getField(f.attribute("name"));
+                        if (uavfield) {
+                            QStringList list = f.attribute("values").split(",");
+                            if (list.length() == 1) {
+                                if (false == uavfield->checkValue(f.attribute("values"))) {
+                                    qDebug() << "checkValue returned false on: " << uavObjectName << f.attribute("values");
+                                    setError = true;
+                                } else {
+                                    uavfield->setValue(f.attribute("values"));
+                                }
+                            } else {
+                                // This is an enum:
+                                int i = 0;
+                                QStringList list = f.attribute("values").split(",");
+                                foreach (QString element, list) {
+                                    if (false == uavfield->checkValue(element, i)) {
+                                        qDebug() << "checkValue(list) returned false on: " << uavObjectName << list;
+                                        setError = true;
+                                    } else {
                             		 uavfield->setValue(element,i);
-                            	 i++;
-                             }
-                         }
-                     } else {
-                         error = true;
-                     }
-                 }
-                 field = field.nextSibling();
-             }
-             obj->updated();
-             if (error) {
-                 swui.addLine(uavObjectName, "Warning (Object field unknown)", true);
-             } else if (uavObjectID != obj->getObjID()) {
-                  qDebug() << "Mismatch for Object " << uavObjectName << uavObjectID << " - " << obj->getObjID();
-                 swui.addLine(uavObjectName, "Warning (ObjectID mismatch)", true);
-             } else if (setError) {
-                 swui.addLine(uavObjectName, "Warning (Objects field value(s) invalid)", false);
-             } else
-                 swui.addLine(uavObjectName, "OK", true);
-         }
+                                    }
+                                    i++;
+                                }
+                            }
+                        } else {
+                            error = true;
+                        }
+                    }
+                    field = field.nextSibling();
+                }
+                obj->updated();
+
+                if (error) {
+                    swui.addLine(uavObjectName, "Warning (Object field unknown)", true);
+                } else if (uavObjectID != obj->getObjID()) {
+                    qDebug() << "Mismatch for Object " << uavObjectName << uavObjectID << " - " << obj->getObjID();
+                    swui.addLine(uavObjectName, "Warning (ObjectID mismatch)", true);
+                } else if (setError) {
+                    swui.addLine(uavObjectName, "Warning (Objects field value(s) invalid)", false);
+                } else {
+                    swui.addLine(uavObjectName, "OK", true);
+                }
+            }
         }
         node = node.nextSibling();
     }
-    qDebug()<<"End import";
+    qDebug() << "End import";
     swui.exec();
-
-
-
 }
 
 // Create an XML document from UAVObject database
-QString UAVSettingsImportExportFactory::createXMLDocument(
-        const QString docName, const bool isSettings, const bool fullExport)
+QString UAVSettingsImportExportFactory::createXMLDocument(const enum storedData what, const bool fullExport)
 {
     // generate an XML first (used for all export formats as a formatted data source)
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
-    QDomDocument doc(docName);
-    QDomElement root = doc.createElement(isSettings ? "settings" : "data");
+    // create an XML root
+    QDomDocument doc("UAVObjects");
+    QDomElement root = doc.createElement("uavobjects");
     doc.appendChild(root);
 
     // add hardware, firmware and GCS version info
@@ -249,11 +255,31 @@ QString UAVSettingsImportExportFactory::createXMLDocument(
     gcs.setAttribute("tag", gcsGitTag);
     versionInfo.appendChild(gcs);
 
+    // create settings and/or data elements
+    QDomElement settings = doc.createElement("settings");
+    QDomElement data = doc.createElement("data");
+
+    switch (what)
+    {
+    case Settings:
+        root.appendChild(settings);
+        break;
+    case Data:
+        root.appendChild(data);
+        break;
+    case Both:
+        root.appendChild(data);
+        root.appendChild(settings);
+        break;
+    }
+
     // iterate over settings objects
     QList< QList<UAVDataObject*> > objList = objManager->getDataObjects();
     foreach (QList<UAVDataObject*> list, objList) {
-        foreach (UAVDataObject* obj, list) {
-            if (obj->isSettings() == isSettings) {
+        foreach (UAVDataObject *obj, list) {
+            if (((what == Settings) && obj->isSettings()) ||
+                ((what == Data) && !obj->isSettings()) ||
+                 (what == Both)) {
 
                 // add each object to the XML
                 QDomElement o = doc.createElement("object");
@@ -292,7 +318,12 @@ QString UAVSettingsImportExportFactory::createXMLDocument(
                     }
                     o.appendChild(f);
                 }
-                root.appendChild(o);
+
+                // append to the settings or data element
+                if (obj->isSettings())
+                    settings.appendChild(o);
+                else
+                    data.appendChild(o);
             }
         }
     }
@@ -305,15 +336,15 @@ void UAVSettingsImportExportFactory::exportUAVSettings()
 {
     // ask for file name
     QString fileName;
-    QString filters = tr("UAVSettings XML files (*.uav)");
+    QString filters = tr("UAVObjects XML files (*.uav)");
 
-    fileName = QFileDialog::getSaveFileName(0, tr("Save UAV Settings File As"), "", filters);
+    fileName = QFileDialog::getSaveFileName(0, tr("Save UAVSettings File As"), "", filters);
     if (fileName.isEmpty()) {
         return;
     }
 
-    bool fullExport = false;
     // If the filename ends with .xml, we will do a full export, otherwise, a simple export
+    bool fullExport = false;
     if (fileName.endsWith(".xml")) {
         fullExport = true;
     } else if (!fileName.endsWith(".uav")) {
@@ -321,7 +352,7 @@ void UAVSettingsImportExportFactory::exportUAVSettings()
     }
 
     // generate an XML first (used for all export formats as a formatted data source)
-    QString xml = createXMLDocument("UAVSettings", true, fullExport);
+    QString xml = createXMLDocument(Settings, fullExport);
 
     // save file
     QFile file(fileName);
@@ -356,15 +387,15 @@ void UAVSettingsImportExportFactory::exportUAVData()
 
     // ask for file name
     QString fileName;
-    QString filters = tr("UAVData XML files (*.uav)");
+    QString filters = tr("UAVObjects XML files (*.uav)");
 
-    fileName = QFileDialog::getSaveFileName(0, tr("Save UAV Data File As"), "", filters);
+    fileName = QFileDialog::getSaveFileName(0, tr("Save UAVData File As"), "", filters);
     if (fileName.isEmpty()) {
         return;
     }
 
-    bool fullExport = false;
     // If the filename ends with .xml, we will do a full export, otherwise, a simple export
+    bool fullExport = false;
     if (fileName.endsWith(".xml")) {
         fullExport = true;
     } else if (!fileName.endsWith(".uav")) {
@@ -372,7 +403,7 @@ void UAVSettingsImportExportFactory::exportUAVData()
     }
 
     // generate an XML first (used for all export formats as a formatted data source)
-    QString xml = createXMLDocument("UAVData", false, fullExport);
+    QString xml = createXMLDocument(Both, fullExport);
 
     // save file
     QFile file(fileName);

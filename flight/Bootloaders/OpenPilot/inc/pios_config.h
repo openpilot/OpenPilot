@@ -44,6 +44,7 @@
 #define PIOS_INCLUDE_COM
 #define PIOS_INCLUDE_COM_MSG
 #define PIOS_INCLUDE_GPIO
+#define PIOS_INCLUDE_IAP
 //#define DEBUG_SSP
 
 /* Defaults for Logging */

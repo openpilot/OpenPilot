@@ -40,6 +40,7 @@
 #define PIOS_INCLUDE_USB_HID
 #define PIOS_INCLUDE_COM_MSG
 #define PIOS_INCLUDE_GPIO
+#define PIOS_INCLUDE_IAP
 
 /* Defaults for Logging */
 #define LOG_FILENAME 			"PIOS.LOG"

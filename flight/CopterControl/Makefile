@@ -436,15 +436,15 @@ CSTANDARD = -std=gnu99
 # Flags for C and C++ (arm-elf-gcc/arm-elf-g++)
 
 ifeq ($(DEBUG),YES)
-CFLAGS = -DDEBUG
+CFLAGS += -DDEBUG
 endif
 
 ifeq ($(DIAGNOSTICS),YES)
-CFLAGS = -DDIAGNOSTICS
+CFLAGS += -DDIAGNOSTICS
 endif
 
 ifeq ($(DIAG_TASKS),YES)
-CFLAGS = -DDIAG_TASKS
+CFLAGS += -DDIAG_TASKS
 endif
 
 CFLAGS += -g$(DEBUGF)

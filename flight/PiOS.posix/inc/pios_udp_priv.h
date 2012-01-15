@@ -45,7 +45,11 @@ struct pios_udp_cfg {
 
 typedef struct {
   const struct pios_udp_cfg * cfg;
+#if defined(PIOS_INCLUDE_FREERTOS)
+  xTaskHandle rxThread;
+#else
   pthread_t rxThread;
+#endif
 
   int socket;
   struct sockaddr_in server;

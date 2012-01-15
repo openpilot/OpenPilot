@@ -70,7 +70,7 @@ PYMODULES = FlightPlan
 # - MCU used for compiler-option (-mtune)
 # - MODEL used for linker-script name (-T) and passed as define
 # - BOARD just passed as define (optional)
-MCU      = i686
+#MCU      = i686
 #CHIP     = STM32F103RET
 #BOARD    = STM3210E_OP
 MODEL	 = HD
@@ -192,14 +192,8 @@ SRC += $(FLIGHTLIB)/CoordinateConversions.c
 ## RTOS and RTOS Portable 
 SRC += $(RTOSSRCDIR)/list.c
 SRC += $(RTOSSRCDIR)/queue.c
-UNAME := $(shell uname)
-ifeq ($(UNAME), Linux)
-  SRC += $(RTOSSRCDIR)/tasks_linux.c
-  SRC += $(RTOSSRCDIR)/portable/GCC/Posix/port_linux.c
-else
-  SRC += $(RTOSSRCDIR)/tasks_posix.c
-  SRC += $(RTOSSRCDIR)/portable/GCC/Posix/port_posix.c
-endif
+SRC += $(RTOSSRCDIR)/tasks.c
+SRC += $(RTOSSRCDIR)/portable/GCC/Posix/port.c
 SRC += $(RTOSSRCDIR)/portable/MemMang/heap_3.c
 
 
@@ -312,7 +306,11 @@ CSTANDARD = -std=gnu99
 # Flags for C and C++ (arm-elf-gcc/arm-elf-g++)
 
 ifeq ($(DEBUG),YES)
-CFLAGS = -g$(DEBUGF) -DDEBUG
+CFLAGS += -g$(DEBUGF) -DDEBUG
+endif
+
+ifeq ($(DIAGNOSTICS),YES)
+CFLAGS += -DDIAGNOSTICS
 endif
 
 ifeq ($(DIAGNOSTICS),YES)
@@ -322,7 +320,8 @@ endif
 CFLAGS += $(CFLAGS_UAVOBJECTS)
 CFLAGS += -DARCH_POSIX
 CFLAGS += -O$(OPT)
-CFLAGS += -mtune=$(MCU)
+#CFLAGS += -mtune=$(MCU)
+# no mtune, should run on any platform!
 CFLAGS += $(CDEFS)
 CFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS)) -I.
 

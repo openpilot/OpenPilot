@@ -57,7 +57,11 @@ void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString fiel
     addUAVObjectToWidgetRelation(object,field,widget,_field->getElementNames().indexOf(index));
 }
 
-void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString field, QWidget * widget, int index,int scale)
+void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object,
+                                                    QString field,
+                                                    QWidget *widget,
+                                                    int index,
+                                                    float scale)
 {
     UAVObject *obj=NULL;
     UAVObjectField *_field=NULL;
@@ -191,7 +195,7 @@ void ConfigTaskWidget::populateWidgets()
         }
         else if(QSpinBox * cb=qobject_cast<QSpinBox *>(ow->widget))
         {
-            cb->setValue(ow->field->getValue(ow->index).toInt()/ow->scale);
+            cb->setValue(ow->field->getValue(ow->index).toInt()/(int)ow->scale);
         }
         else if (QDoubleSpinBox * cb = qobject_cast<QDoubleSpinBox *>(ow->widget))
         {
@@ -199,7 +203,7 @@ void ConfigTaskWidget::populateWidgets()
         }
         else if(QSlider * cb=qobject_cast<QSlider *>(ow->widget))
         {
-            cb->setValue(ow->field->getValue(ow->index).toInt()/ow->scale);
+            cb->setValue(ow->field->getValue(ow->index).toInt()/(int)ow->scale);
         }
         else if(QCheckBox * cb=qobject_cast<QCheckBox *>(ow->widget))
         {
@@ -228,7 +232,7 @@ void ConfigTaskWidget::refreshWidgetsValues()
         }
         else if(QSpinBox * cb=qobject_cast<QSpinBox *>(ow->widget))
         {
-            cb->setValue(ow->field->getValue(ow->index).toInt()/ow->scale);
+            cb->setValue(ow->field->getValue(ow->index).toInt()/(int)ow->scale);
         }
         else if (QDoubleSpinBox * cb = qobject_cast<QDoubleSpinBox *>(ow->widget))
         {
@@ -236,7 +240,7 @@ void ConfigTaskWidget::refreshWidgetsValues()
         }
         else if(QSlider * cb=qobject_cast<QSlider *>(ow->widget))
         {
-            cb->setValue(ow->field->getValue(ow->index).toInt()/ow->scale);
+            cb->setValue(ow->field->getValue(ow->index).toInt()/(int)ow->scale);
         }
         else if(QCheckBox * cb=qobject_cast<QCheckBox *>(ow->widget))
         {
@@ -264,7 +268,7 @@ void ConfigTaskWidget::updateObjectsFromWidgets()
         }
         else if(QSpinBox * cb=qobject_cast<QSpinBox *>(ow->widget))
         {
-            ow->field->setValue(cb->value()* ow->scale,ow->index);
+            ow->field->setValue(cb->value()* (int)ow->scale,ow->index);
         }
         else if (QDoubleSpinBox * cb = qobject_cast<QDoubleSpinBox *>(ow->widget))
         {
@@ -272,7 +276,7 @@ void ConfigTaskWidget::updateObjectsFromWidgets()
         }
         else if(QSlider * cb=qobject_cast<QSlider *>(ow->widget))
         {
-            ow->field->setValue(cb->value()* ow->scale,ow->index);
+            ow->field->setValue(cb->value()* (int)ow->scale,ow->index);
         }
         else if(QCheckBox * cb=qobject_cast<QCheckBox *>(ow->widget))
         {

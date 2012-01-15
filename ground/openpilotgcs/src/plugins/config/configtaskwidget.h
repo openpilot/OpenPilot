@@ -55,7 +55,7 @@ public:
         UAVObjectField * field;
         QWidget * widget;
         int index;
-        int scale;
+        float scale;
     };
 
     ConfigTaskWidget(QWidget *parent = 0);
@@ -65,7 +65,11 @@ public:
     static double listMean(QList<double> list);
     void addUAVObject(QString objectName);
     void addWidget(QWidget * widget);
-    void addUAVObjectToWidgetRelation(QString object,QString field,QWidget * widget,int index=0,int scale=1);
+    void addUAVObjectToWidgetRelation(QString object,
+                                      QString field,
+                                      QWidget *widget,
+                                      int index = 0,
+                                      float scale = 1.0f);
 
     void setupButtons(QPushButton * update,QPushButton * save);
     bool isDirty();

@@ -137,6 +137,7 @@
 #if defined(PIOS_INCLUDE_USB)
 /* USB Libs */
 #include <usb_lib.h>
+#include <pios_usb.h>
 #endif
 
 #include <pios_crc.h>

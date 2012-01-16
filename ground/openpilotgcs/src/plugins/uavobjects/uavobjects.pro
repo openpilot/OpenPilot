@@ -41,6 +41,7 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/manualcontrolsettings.h \
     $$UAVOBJECT_SYNTHETICS/manualcontrolcommand.h \
     $$UAVOBJECT_SYNTHETICS/stabilizationdesired.h \
+    $$UAVOBJECT_SYNTHETICS/stabilizationstatus.h \
     $$UAVOBJECT_SYNTHETICS/actuatorsettings.h \
     $$UAVOBJECT_SYNTHETICS/actuatordesired.h \
     $$UAVOBJECT_SYNTHETICS/actuatorcommand.h \
@@ -93,6 +94,7 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/manualcontrolsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/manualcontrolcommand.cpp \
     $$UAVOBJECT_SYNTHETICS/stabilizationdesired.cpp \
+    $$UAVOBJECT_SYNTHETICS/stabilizationstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/actuatorsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/actuatordesired.cpp \
     $$UAVOBJECT_SYNTHETICS/actuatorcommand.cpp \

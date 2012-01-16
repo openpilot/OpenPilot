@@ -1,0 +1,12 @@
+<xml>
+    <object name="StabilizationStatus" singleinstance="true" settings="false">
+        <description>Object Storing Debugging Information on PID internals</description>
+	<field name="IAccumulator" units="raw" type="float" elementnames="Roll,Pitch,Yaw,X,Y,Z" />
+	<field name="E1" units="raw" type="float" elementnames="Roll,Pitch,Yaw,X,Y,Z" />
+	<field name="E2" units="raw" type="float" elementnames="Roll,Pitch,Yaw,X,Y,Z" />
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetryflight acked="false" updatemode="periodic" period="250"/>
+        <logging updatemode="never" period="0"/>
+    </object>
+</xml>

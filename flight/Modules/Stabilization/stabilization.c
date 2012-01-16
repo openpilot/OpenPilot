@@ -34,6 +34,7 @@
 #include "openpilot.h"
 #include "stabilization.h"
 #include "stabilizationsettings.h"
+#include "stabilizationstatus.h"
 #include "actuatordesired.h"
 #include "ratedesired.h"
 #include "stabilizationdesired.h"
@@ -68,6 +69,10 @@ typedef struct {
 	float iLim;
 	float iAccumulator;
 	float lastErr;
+#if defined(DIAGNOSTICS)
+	int index;
+	StabilizationStatusData * sdata;
+#endif
 } pid_type;
 
 // Private variables
@@ -76,6 +81,7 @@ static StabilizationSettingsData settings;
 static xQueueHandle queue;
 float dT = 1;
 float gyro_alpha = 0;
+float error_alpha = 0;
 float gyro_filtered[3] = {0,0,0};
 float axis_lock_accum[3] = {0,0,0};
 uint8_t max_axis_lock = 0;
@@ -117,6 +123,7 @@ int32_t StabilizationInitialize()
 	ActuatorDesiredInitialize();
 #if defined(DIAGNOSTICS)
 	RateDesiredInitialize();
+	StabilizationStatusInitialize();
 #endif
 
 	// Create object queue
@@ -151,8 +158,13 @@ static void stabilizationTask(void* parameters)
 	AttitudeActualData attitudeActual;
 	AttitudeRawData attitudeRaw;
 	FlightStatusData flightStatus;
+	StabilizationStatusData stabilizationStatus;
 
 	SettingsUpdatedCb((UAVObjEvent *) NULL);
+
+#if defined(DIAGNOSTICS)
+	StabilizationStatusGet(&stabilizationStatus);
+#endif
 
 	// Main task loop
 	lastSysTime = xTaskGetTickCount();
@@ -231,6 +243,10 @@ static void stabilizationTask(void* parameters)
 		//Calculate desired rate
 		for(uint8_t i=0; i< MAX_AXES; i++)
 		{
+#if defined(DIAGNOSTICS)
+				pids[PID_ROLL + i].index=PID_ROLL+i;
+				pids[PID_ROLL + i].sdata = &stabilizationStatus;
+#endif
 			switch(stabDesired.StabilizationMode[i])
 			{
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_RATE:
@@ -302,6 +318,10 @@ static void stabilizationTask(void* parameters)
 		//Calculate desired command
 		for(int8_t ct=0; ct< MAX_AXES; ct++)
 		{
+#if defined(DIAGNOSTICS)
+				pids[PID_RATE_ROLL + ct].index=PID_ROLL+ct;
+				pids[PID_RATE_ROLL + ct].sdata = &stabilizationStatus;
+#endif
 			switch(stabDesired.StabilizationMode[ct])
 			{
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_RATE:
@@ -339,6 +359,10 @@ static void stabilizationTask(void* parameters)
 
 			}
 		}
+
+#if defined(DIAGNOSTICS)
+		StabilizationStatusSet(&stabilizationStatus);
+#endif
 
 		// Save dT
 		actuatorDesired.UpdateTime = dT * 1000;
@@ -379,6 +403,12 @@ float ApplyPid(pid_type * pid, const float err)
 	} else if (pid->iAccumulator < -(pid->iLim * 1000)) {
 		pid->iAccumulator = -pid->iLim * 1000;
 	}
+#if defined(DIAGNOSTICS)
+	// calculate error indicators
+	pid->sdata->E1[pid->index] = pid->sdata->E1[pid->index] * error_alpha + err * ( 1 - error_alpha );
+	pid->sdata->E2[pid->index] = pid->sdata->E2[pid->index] * error_alpha + (err>=0?err:-err) * ( 1 - error_alpha );
+#endif
+
 	return ((err * pid->p) + pid->iAccumulator / 1000 + (diff * pid->d / dT));
 }
 
@@ -467,6 +497,10 @@ static void SettingsUpdatedCb(UAVObjEvent * ev)
 		gyro_alpha = 0;   // not trusting this to resolve to 0
 	else
 		gyro_alpha = exp(-fakeDt  / settings.GyroTau);
+	if(settings.ErrorTau < 0.0001)
+		error_alpha = 0;   // not trusting this to resolve to 0
+	else
+		error_alpha = exp(-fakeDt  / settings.GyroTau);
 }
 
 

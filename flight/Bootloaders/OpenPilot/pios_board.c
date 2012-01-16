@@ -184,12 +184,6 @@ const struct pios_usart_cfg pios_usart_telem_cfg = {
 
 #include "pios_com_priv.h"
 
-#define PIOS_COM_TELEM_USB_RX_BUF_LEN 192
-#define PIOS_COM_TELEM_USB_TX_BUF_LEN 192
-
-static uint8_t pios_com_telem_usb_rx_buffer[PIOS_COM_TELEM_USB_RX_BUF_LEN];
-static uint8_t pios_com_telem_usb_tx_buffer[PIOS_COM_TELEM_USB_TX_BUF_LEN];
-
 #define PIOS_COM_TELEM_RF_RX_BUF_LEN 192
 #define PIOS_COM_TELEM_RF_TX_BUF_LEN 192
 
@@ -197,6 +191,16 @@ static uint8_t pios_com_telem_rf_rx_buffer[PIOS_COM_TELEM_RF_RX_BUF_LEN];
 static uint8_t pios_com_telem_rf_tx_buffer[PIOS_COM_TELEM_RF_TX_BUF_LEN];
 
 #endif	/* PIOS_INCLUDE_COM */
+
+// ***********************************************************************************
+
+#if defined(PIOS_INCLUDE_COM_MSG)
+
+#include <pios_com_msg_priv.h>
+
+#endif /* PIOS_INCLUDE_COM_MSG */
+
+// ***********************************************************************************
 
 #if defined(PIOS_INCLUDE_USB)
 #include "pios_usb_priv.h"
@@ -211,7 +215,11 @@ static const struct pios_usb_cfg pios_usb_main_cfg = {
     },
   },
 };
-#endif	/* PIOS_INCLUDE_USB_HID */
+
+#include "pios_usb_board_data_priv.h"
+#include "pios_usb_desc_hid_only_priv.h"
+
+#endif	/* PIOS_INCLUDE_USB */
 
 #if defined(PIOS_INCLUDE_USB_HID)
 #include <pios_usb_hid_priv.h>
@@ -266,21 +274,25 @@ void PIOS_Board_Init(void) {
 	PIOS_GPIO_Init();
 
 #if defined(PIOS_INCLUDE_USB)
+	/* Initialize board specific USB data */
+	PIOS_USB_BOARD_DATA_Init();
+
+	/* Activate the HID-only USB configuration */
+	PIOS_USB_DESC_HID_ONLY_Init();
+
 	uint32_t pios_usb_id;
 	if (PIOS_USB_Init(&pios_usb_id, &pios_usb_main_cfg)) {
 		PIOS_Assert(0);
 	}
-#if defined(PIOS_INCLUDE_USB_HID) && defined(PIOS_INCLUDE_COM)
+#if defined(PIOS_INCLUDE_USB_HID) && defined(PIOS_INCLUDE_COM_MSG)
 	uint32_t pios_usb_hid_id;
 	if (PIOS_USB_HID_Init(&pios_usb_hid_id, &pios_usb_hid_cfg, pios_usb_id)) {
 		PIOS_Assert(0);
 	}
-	if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_hid_com_driver, pios_usb_hid_id,
-			  pios_com_telem_usb_rx_buffer, sizeof(pios_com_telem_usb_rx_buffer),
-			  pios_com_telem_usb_tx_buffer, sizeof(pios_com_telem_usb_tx_buffer))) {
+	if (PIOS_COM_MSG_Init(&pios_com_telem_usb_id, &pios_usb_hid_com_driver, pios_usb_hid_id)) {
 		PIOS_Assert(0);
 	}
-#endif	/* PIOS_INCLUDE_USB_HID && PIOS_INCLUDE_COM */
+#endif	/* PIOS_INCLUDE_USB_HID && PIOS_INCLUDE_COM_MSG */
 
 #endif	/* PIOS_INCLUDE_USB */
 

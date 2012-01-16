@@ -42,6 +42,7 @@
 #endif
 #define PIOS_INCLUDE_IRQ
 #define PIOS_INCLUDE_LED
+#define PIOS_INCLUDE_IAP
 
 #define PIOS_INCLUDE_RCVR
 
@@ -75,6 +76,8 @@
 
 #define PIOS_INCLUDE_ADXL345
 #define PIOS_INCLUDE_FLASH
+
+#define PIOS_INCLUDE_BMP085
 
 /* A really shitty setting saving implementation */
 #define PIOS_INCLUDE_FLASH_SECTOR_SETTINGS

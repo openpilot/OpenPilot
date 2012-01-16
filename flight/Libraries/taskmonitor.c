@@ -47,7 +47,7 @@ int32_t TaskMonitorInitialize(void)
 	lock = xSemaphoreCreateRecursiveMutex();
 	memset(handles, 0, sizeof(xTaskHandle)*TASKINFO_RUNNING_NUMELEM);
 	lastMonitorTime = 0;
-#if defined(DIAGNOSTICS)
+#if defined(DIAG_TASKS)
 	lastMonitorTime = portGET_RUN_TIME_COUNTER_VALUE();
 #endif
 	TaskInfoInitialize();
@@ -95,7 +95,7 @@ int32_t TaskMonitorRemove(TaskInfoRunningElem task)
  */
 void TaskMonitorUpdateAll(void)
 {
-#if defined(DIAGNOSTICS)
+#if defined(DIAG_TASKS)
 	TaskInfoData data;
 	int n;
 
@@ -129,7 +129,6 @@ void TaskMonitorUpdateAll(void)
 #if ( configGENERATE_RUN_TIME_STATS == 1 )
 			/* Generate run time stats */
 			data.RunningTime[n] = uxTaskGetRunTime(handles[n]) / deltaTime;
-			
 #endif
 #endif
 			

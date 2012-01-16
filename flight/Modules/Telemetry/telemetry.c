@@ -35,9 +35,6 @@
 #include "flighttelemetrystats.h"
 #include "gcstelemetrystats.h"
 #include "hwsettings.h"
-#if defined(PIOS_INCLUDE_USB)
-#include "pios_usb.h"		/* PIOS_USB_* */
-#endif
 
 // Private constants
 #define MAX_QUEUE_SIZE   TELEM_QUEUE_SIZE

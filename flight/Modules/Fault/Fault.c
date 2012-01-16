@@ -40,6 +40,9 @@ static uint8_t active_fault;
 
 static int32_t fault_initialize(void)
 {
+#ifdef MODULE_Fault_BUILTIN
+	module_enabled = true;
+#else
 	HwSettingsInitialize();
 	uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
 
@@ -50,6 +53,7 @@ static int32_t fault_initialize(void)
 	} else {
 		module_enabled = false;
 	}
+#endif
 
 	/* Do this outside the module_enabled test so that it
 	 * can be changed even when the module has been disabled.

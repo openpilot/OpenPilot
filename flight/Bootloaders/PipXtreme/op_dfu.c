@@ -30,11 +30,8 @@
 #include "pios.h"
 #include "op_dfu.h"
 #include "pios_bl_helper.h"
+#include "pios_com_msg.h"
 #include <pios_board_info.h>
-/* Private typedef -----------------------------------------------------------*/
-/* Private define ------------------------------------------------------------*/
-/* Private macro -------------------------------------------------------------*/
-/* Private variables ---------------------------------------------------------*/
 //programmable devices
 Device devicesTable[10];
 uint8_t numberOfDevices = 0;
@@ -102,33 +99,9 @@ void DataDownload(DownloadAction action) {
 					currentProgrammingDestination)) {
 				DeviceState = Last_operation_failed;
 			}
-			/*
-			 switch (currentProgrammingDestination) {
-			 case Remote_flash_via_spi:
-			 if (downType == Descript) {
-			 SendBuffer[6 + (x * 4)]
-			 = spi_dev_desc[(uint8_t) partoffset];
-			 SendBuffer[7 + (x * 4)] = spi_dev_desc[(uint8_t) partoffset
-			 + 1];
-			 SendBuffer[8 + (x * 4)] = spi_dev_desc[(uint8_t) partoffset
-			 + 2];
-			 SendBuffer[9 + (x * 4)] = spi_dev_desc[(uint8_t) partoffset
-			 + 3];
-			 }
-			 break;
-			 case Self_flash:
-			 SendBuffer[6 + (x * 4)] = *PIOS_BL_HELPER_FLASH_If_Read(offset);
-			 SendBuffer[7 + (x * 4)] = *PIOS_BL_HELPER_FLASH_If_Read(offset + 1);
-			 SendBuffer[8 + (x * 4)] = *PIOS_BL_HELPER_FLASH_If_Read(offset + 2);
-			 SendBuffer[9 + (x * 4)] = *PIOS_BL_HELPER_FLASH_If_Read(offset + 3);
-			 break;
-			 }
-			 */
 		}
-		//PIOS USB_SIL_Write(EP1_IN, (uint8_t*) SendBuffer, 64);
 		downPacketCurrent = downPacketCurrent + 1;
 		if (downPacketCurrent > downPacketTotal - 1) {
-			// STM_EVAL_LEDOn(LED2);
 			DeviceState = Last_operation_Success;
 			Aditionals = (uint32_t) Download;
 		}
@@ -168,7 +141,7 @@ void processComand(uint8_t *xReceive_Buffer) {
 	case EnterDFU:
 		if (((DeviceState == BLidle) && (Data0 < numberOfDevices))
 				|| (DeviceState == DFUidle)) {
-			if (Data0 > 0)//PORQUE???
+			if (Data0 > 0)
 				OPDfuIni(TRUE);
 			DeviceState = DFUidle;
 			currentProgrammingDestination = devicesTable[Data0].programmingType;
@@ -225,7 +198,7 @@ void processComand(uint8_t *xReceive_Buffer) {
 						}
 					}
 					if (result != 1) {
-						DeviceState = Last_operation_failed;//ok
+						DeviceState = Last_operation_failed;
 						Aditionals = (uint32_t) Command;
 					} else {
 
@@ -276,11 +249,9 @@ void processComand(uint8_t *xReceive_Buffer) {
 
 					++Next_Packet;
 				} else {
-
 					DeviceState = wrong_packet_received;
 					Aditionals = Count;
 				}
-				// FLASH_ProgramWord(MemLocations[TransferType]+4,++Next_Packet);//+Count,Data);
 			} else {
 				DeviceState = Last_operation_failed;
 				Aditionals = (uint32_t) Command;
@@ -322,9 +293,12 @@ void processComand(uint8_t *xReceive_Buffer) {
 			Buffer[15] = devicesTable[Data0 - 1].devID;
 		}
 		sendData(Buffer + 1, 63);
-		//PIOS_COM_SendBuffer(PIOS_COM_TELEM_USB, Buffer + 1, 63);//FIX+1
 		break;
 	case JumpFW:
+		if (Data == 0x5AFE) {
+			/* Force board into safe mode */
+			PIOS_IAP_WriteBootCount(0xFFFF);
+		}
 		FLASH_Lock();
 		JumpToApp = 1;
 		break;
@@ -351,7 +325,6 @@ void processComand(uint8_t *xReceive_Buffer) {
 				DeviceState = too_few_packets;
 			}
 		}
-
 		break;
 	case Download_Req:
 #ifdef DEBUG_SSP
@@ -474,9 +447,7 @@ uint32_t CalcFirmCRC() {
 
 }
 void sendData(uint8_t * buf, uint16_t size) {
-	PIOS_COM_SendBuffer(PIOS_COM_TELEM_USB, buf, size);
-	if (DeviceState == downloading)
-		PIOS_DELAY_WaitmS(10);
+	PIOS_COM_MSG_Send(PIOS_COM_TELEM_USB, buf, size);
 }
 
 bool flash_read(uint8_t * buffer, uint32_t adr, DFUProgType type) {

@@ -1,10 +1,14 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup PIOS_COM COM MSG layer functions
+ * @brief Hardware communication layer
+ * @{
  *
- * @file       pios_config.h  
+ * @file       pios_com_msg.h  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      PiOS configuration header. 
- *                 - Central compile time config for the project.
+ * @brief      COM MSG layer functions header
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -24,23 +28,18 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_CONFIG_H
-#define PIOS_CONFIG_H
+#ifndef PIOS_COM_MSG_H
+#define PIOS_COM_MSG_H
 
-/* Enable/Disable PiOS Modules */
-#define PIOS_INCLUDE_ADC
-#define PIOS_INCLUDE_DELAY
-#define PIOS_INCLUDE_I2C
-#define PIOS_INCLUDE_IRQ
-#define PIOS_INCLUDE_LED
-#define PIOS_INCLUDE_SPI
-#define PIOS_INCLUDE_SYS
-#define PIOS_INCLUDE_USART
-#define PIOS_INCLUDE_COM
-#define PIOS_INCLUDE_HMC5843
-#define PIOS_INCLUDE_GPIO
-#define PIOS_INCLUDE_EXTI
-#define PIOS_INCLUDE_BL_HELPER
-#define PIOS_INCLUDE_IAP
+#include <stdint.h>		/* uint*_t */
 
-#endif /* PIOS_CONFIG_H */
+/* Public Functions */
+extern int32_t PIOS_COM_MSG_Send(uint32_t com_id, const uint8_t *msg, uint16_t msg_len);
+extern uint16_t PIOS_COM_MSG_Receive(uint32_t com_id, uint8_t * buf, uint16_t buf_len);
+
+#endif /* PIOS_COM_MSG_H */
+
+/**
+  * @}
+  * @}
+  */

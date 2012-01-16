@@ -123,13 +123,6 @@ int32_t PIOS_USB_Init(uint32_t * usb_id, const struct pios_usb_cfg * cfg)
 	/* Enable the USB clock */
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USB, ENABLE);
 
-	/* Update the USB serial number from the chip */
-	uint8_t sn[25];
-	PIOS_SYS_SerialNumberGet((char *)sn);
-	for (uint8_t i = 0; sn[i] != '\0' && (2 * i) < PIOS_USB_BOARD_StringSerial[0]; i++) {
-		PIOS_USB_BOARD_StringSerial[2 + 2 * i] = sn[i];
-	}
-
 	USB_Init();
 	USB_SIL_Init();
 

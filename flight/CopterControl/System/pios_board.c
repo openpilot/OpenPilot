@@ -903,12 +903,12 @@ const struct pios_pwm_cfg pios_pwm_cfg = {
  * I2C Adapters
  */
 
-void PIOS_I2C_main_adapter_ev_irq_handler(void);
-void PIOS_I2C_main_adapter_er_irq_handler(void);
-void I2C2_EV_IRQHandler() __attribute__ ((alias ("PIOS_I2C_main_adapter_ev_irq_handler")));
-void I2C2_ER_IRQHandler() __attribute__ ((alias ("PIOS_I2C_main_adapter_er_irq_handler")));
+void PIOS_I2C_flexi_adapter_ev_irq_handler(void);
+void PIOS_I2C_flexi_adapter_er_irq_handler(void);
+void I2C2_EV_IRQHandler() __attribute__ ((alias ("PIOS_I2C_flexi_adapter_ev_irq_handler")));
+void I2C2_ER_IRQHandler() __attribute__ ((alias ("PIOS_I2C_flexi_adapter_er_irq_handler")));
 
-static const struct pios_i2c_adapter_cfg pios_i2c_main_adapter_cfg = {
+static const struct pios_i2c_adapter_cfg pios_i2c_flexi_adapter_cfg = {
   .regs = I2C2,
   .init = {
     .I2C_Mode                = I2C_Mode_I2C,
@@ -955,17 +955,17 @@ static const struct pios_i2c_adapter_cfg pios_i2c_main_adapter_cfg = {
   },
 };
 
-uint32_t pios_i2c_main_adapter_id;
-void PIOS_I2C_main_adapter_ev_irq_handler(void)
+uint32_t pios_i2c_flexi_adapter_id;
+void PIOS_I2C_flexi_adapter_ev_irq_handler(void)
 {
   /* Call into the generic code to handle the IRQ for this specific device */
-  PIOS_I2C_EV_IRQ_Handler(pios_i2c_main_adapter_id);
+  PIOS_I2C_EV_IRQ_Handler(pios_i2c_flexi_adapter_id);
 }
 
-void PIOS_I2C_main_adapter_er_irq_handler(void)
+void PIOS_I2C_flexi_adapter_er_irq_handler(void)
 {
   /* Call into the generic code to handle the IRQ for this specific device */
-  PIOS_I2C_ER_IRQ_Handler(pios_i2c_main_adapter_id);
+  PIOS_I2C_ER_IRQ_Handler(pios_i2c_flexi_adapter_id);
 }
 
 #endif /* PIOS_INCLUDE_I2C */
@@ -998,6 +998,11 @@ static const struct pios_usb_cfg pios_usb_main_cfg = {
     },
   },
 };
+
+#include "pios_usb_board_data_priv.h"
+#include "pios_usb_desc_hid_cdc_priv.h"
+#include "pios_usb_desc_hid_only_priv.h"
+
 #endif	/* PIOS_INCLUDE_USB */
 
 #if defined(PIOS_INCLUDE_USB_HID)
@@ -1090,13 +1095,49 @@ void PIOS_Board_Init(void) {
 	PIOS_TIM_InitClock(&tim_4_cfg);
 
 #if defined(PIOS_INCLUDE_USB)
+	/* Initialize board specific USB data */
+	PIOS_USB_BOARD_DATA_Init();
+
+	/* Flags to determine if various USB interfaces are advertised */
+	bool usb_hid_present = false;
+	bool usb_cdc_present = false;
+
+	uint8_t hwsettings_usb_devicetype;
+	HwSettingsUSB_DeviceTypeGet(&hwsettings_usb_devicetype);
+
+	switch (hwsettings_usb_devicetype) {
+	case HWSETTINGS_USB_DEVICETYPE_HIDONLY:
+		if (PIOS_USB_DESC_HID_ONLY_Init()) {
+			PIOS_Assert(0);
+		}
+		usb_hid_present = true;
+		break;
+	case HWSETTINGS_USB_DEVICETYPE_HIDVCP:
+		if (PIOS_USB_DESC_HID_CDC_Init()) {
+			PIOS_Assert(0);
+		}
+		usb_hid_present = true;
+		usb_cdc_present = true;
+		break;
+	case HWSETTINGS_USB_DEVICETYPE_VCPONLY:
+		break;
+	default:
+		PIOS_Assert(0);
+	}
+
 	uint32_t pios_usb_id;
 	PIOS_USB_Init(&pios_usb_id, &pios_usb_main_cfg);
 
 #if defined(PIOS_INCLUDE_USB_CDC)
-	/* Configure the USB VCP port */
+
 	uint8_t hwsettings_usb_vcpport;
+	/* Configure the USB VCP port */
 	HwSettingsUSB_VCPPortGet(&hwsettings_usb_vcpport);
+
+	if (!usb_cdc_present) {
+		/* Force VCP port function to disabled if we haven't advertised VCP in our USB descriptor */
+		hwsettings_usb_vcpport = HWSETTINGS_USB_VCPPORT_DISABLED;
+	}
 
 	switch (hwsettings_usb_vcpport) {
 	case HWSETTINGS_USB_VCPPORT_DISABLED:
@@ -1136,7 +1177,6 @@ void PIOS_Board_Init(void) {
 						tx_buffer, PIOS_COM_BRIDGE_TX_BUF_LEN)) {
 				PIOS_Assert(0);
 			}
-
 		}
 #endif	/* PIOS_INCLUDE_COM */
 		break;
@@ -1147,6 +1187,11 @@ void PIOS_Board_Init(void) {
 	/* Configure the usb HID port */
 	uint8_t hwsettings_usb_hidport;
 	HwSettingsUSB_HIDPortGet(&hwsettings_usb_hidport);
+
+	if (!usb_hid_present) {
+		/* Force HID port function to disabled if we haven't advertised HID in our USB descriptor */
+		hwsettings_usb_hidport = HWSETTINGS_USB_HIDPORT_DISABLED;
+	}
 
 	switch (hwsettings_usb_hidport) {
 	case HWSETTINGS_USB_HIDPORT_DISABLED:
@@ -1419,7 +1464,7 @@ void PIOS_Board_Init(void) {
 	case HWSETTINGS_CC_FLEXIPORT_I2C:
 #if defined(PIOS_INCLUDE_I2C)
 		{
-			if (PIOS_I2C_Init(&pios_i2c_main_adapter_id, &pios_i2c_main_adapter_cfg)) {
+			if (PIOS_I2C_Init(&pios_i2c_flexi_adapter_id, &pios_i2c_flexi_adapter_cfg)) {
 				PIOS_Assert(0);
 			}
 		}

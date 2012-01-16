@@ -1450,6 +1450,9 @@ void PIOS_Board_Init(void) {
 		PIOS_Assert(0);
 	}
 #endif	/* PIOS_INCLUDE_I2C */
+
+	/* Make sure we have at least one telemetry link configured or else fail initialization */
+	PIOS_Assert(pios_com_telem_rf_id || pios_com_telem_usb_id);
 }
 
 /**

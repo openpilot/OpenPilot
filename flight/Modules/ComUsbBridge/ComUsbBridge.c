@@ -94,6 +94,9 @@ static int32_t comUsbBridgeInitialize(void)
 	usart_port = PIOS_COM_BRIDGE;
 	vcp_port = PIOS_COM_VCP;
 
+#ifdef MODULE_ComUsbBridge_BUILTIN
+	bridge_enabled = true;
+#else
 	HwSettingsInitialize();
 	uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
 
@@ -104,6 +107,7 @@ static int32_t comUsbBridgeInitialize(void)
 		bridge_enabled = true;
 	else
 		bridge_enabled = false;
+#endif
 
 	if (bridge_enabled) {
 		com2usb_buf = pvPortMalloc(BRIDGE_BUF_LEN);

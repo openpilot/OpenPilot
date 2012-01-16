@@ -75,6 +75,10 @@ int32_t CameraStabInitialize(void)
 	static UAVObjEvent ev;
 
 	bool cameraStabEnabled;
+
+#ifdef MODULE_CameraStab_BUILTIN
+	cameraStabEnabled = true;
+#else
 	uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
 
 	HwSettingsInitialize();
@@ -84,6 +88,7 @@ int32_t CameraStabInitialize(void)
 		cameraStabEnabled = true;
 	else
 		cameraStabEnabled = false;
+#endif
 
 	if (cameraStabEnabled) {
 

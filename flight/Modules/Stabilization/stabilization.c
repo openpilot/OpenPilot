@@ -500,7 +500,7 @@ static void SettingsUpdatedCb(UAVObjEvent * ev)
 	if(settings.ErrorTau < 0.0001)
 		error_alpha = 0;   // not trusting this to resolve to 0
 	else
-		error_alpha = exp(-fakeDt  / settings.GyroTau);
+		error_alpha = exp(-fakeDt  / settings.ErrorTau);
 }
 
 

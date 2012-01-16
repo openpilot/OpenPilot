@@ -70,8 +70,8 @@ typedef struct {
 	float iAccumulator;
 	float lastErr;
 #if defined(DIAGNOSTICS)
-	int index;
-	StabilizationStatusData * sdata;
+	float e1;
+	float e2;
 #endif
 } pid_type;
 
@@ -243,10 +243,6 @@ static void stabilizationTask(void* parameters)
 		//Calculate desired rate
 		for(uint8_t i=0; i< MAX_AXES; i++)
 		{
-#if defined(DIAGNOSTICS)
-				pids[PID_ROLL + i].index=PID_ROLL+i;
-				pids[PID_ROLL + i].sdata = &stabilizationStatus;
-#endif
 			switch(stabDesired.StabilizationMode[i])
 			{
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_RATE:
@@ -275,6 +271,11 @@ static void stabilizationTask(void* parameters)
 				}
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE:
 					rateDesiredAxis[i] = ApplyPid(&pids[PID_ROLL + i], local_error[i]);
+#if defined(DIAGNOSTICS)
+					stabilizationStatus.IAccumulator[PID_ROLL + i] = pids[PID_ROLL + i].iAccumulator;
+					stabilizationStatus.E1[PID_ROLL + i] = pids[PID_ROLL + i].e1;
+					stabilizationStatus.E2[PID_ROLL + i] = pids[PID_ROLL + i].e2;
+#endif
 					
 					if(rateDesiredAxis[i] > settings.MaximumRate[i])
 						rateDesiredAxis[i] = settings.MaximumRate[i];
@@ -299,6 +300,11 @@ static void stabilizationTask(void* parameters)
 							axis_lock_accum[i] = -max_axis_lock;
 
 						rateDesiredAxis[i] = ApplyPid(&pids[PID_ROLL + i], axis_lock_accum[i]);
+#if defined(DIAGNOSTICS)
+						stabilizationStatus.IAccumulator[PID_ROLL + i] = pids[PID_ROLL + i].iAccumulator;
+						stabilizationStatus.E1[PID_ROLL + i] = pids[PID_ROLL + i].e1;
+						stabilizationStatus.E2[PID_ROLL + i] = pids[PID_ROLL + i].e2;
+#endif
 					}
 					
 					if(rateDesiredAxis[i] > settings.MaximumRate[i])
@@ -318,10 +324,6 @@ static void stabilizationTask(void* parameters)
 		//Calculate desired command
 		for(int8_t ct=0; ct< MAX_AXES; ct++)
 		{
-#if defined(DIAGNOSTICS)
-				pids[PID_RATE_ROLL + ct].index=PID_ROLL+ct;
-				pids[PID_RATE_ROLL + ct].sdata = &stabilizationStatus;
-#endif
 			switch(stabDesired.StabilizationMode[ct])
 			{
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_RATE:
@@ -330,6 +332,11 @@ static void stabilizationTask(void* parameters)
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_WEAKLEVELING:
 				{
 					float command = ApplyPid(&pids[PID_RATE_ROLL + ct],  rateDesiredAxis[ct] - gyro_filtered[ct]);
+#if defined(DIAGNOSTICS)
+					stabilizationStatus.IAccumulator[PID_ROLL + ct] = pids[PID_ROLL + ct].iAccumulator;
+					stabilizationStatus.E1[PID_ROLL + ct] = pids[PID_ROLL + ct].e1;
+					stabilizationStatus.E2[PID_ROLL + ct] = pids[PID_ROLL + ct].e2;
+#endif
 					actuatorDesiredAxis[ct] = bound(command);
 					break;
 				}
@@ -403,11 +410,29 @@ float ApplyPid(pid_type * pid, const float err)
 	} else if (pid->iAccumulator < -(pid->iLim * 1000)) {
 		pid->iAccumulator = -pid->iLim * 1000;
 	}
-#if defined(DIAGNOSTICS)
-	// calculate error indicators
-	pid->sdata->E1[pid->index] = pid->sdata->E1[pid->index] * error_alpha + err * ( 1 - error_alpha );
-	pid->sdata->E2[pid->index] = pid->sdata->E2[pid->index] * error_alpha + (err>=0?err:-err) * ( 1 - error_alpha );
-#endif
+
+	// Calculate error indicators
+	// The first indicator is 'average error'. The long term average error
+	// should be near zero, unless the PID loop does not converge.
+	// This is simply a low pass filter of sorts.
+	// High e1 (in absolute values) indicates coefficients too low.
+	pid->e1 = pid->e1 * error_alpha + err * ( 1 - error_alpha );
+	// The second indicator is the absolute deviance from that average.
+	// This is an integration over the high frequencies and as such
+	// indicates the behaviour of oscillation.
+	// If the oscillations converges to zero, this will stay low, however
+	// any continuous or diverging oscillation will accumulate to a high
+	// e2.
+	// High e2 indicates coefficients too high.
+	pid->e2 = pid->e1 * error_alpha + (err>=pid->e1?err-pid->e1:pid->e1-err) * ( 1 - error_alpha );
+	// The critical part here is the error_tau. It should be set safely
+	// above the systems oscillation period.  However the oscillation
+	// period in stabilization, while system dependant, is still within a
+	// certain order of magnitude that can be estimated for the vast
+	// majority of frames and might only be need to be adjusted for
+	// extremely slow reacting systems (ships, large scale  zeppelins, ...)
+	// Any automatic coefficients tuning should likely try to minimize
+	// (e1 * e2) With the "safe" side of that minimum at e1 > e2.
 
 	return ((err * pid->p) + pid->iAccumulator / 1000 + (diff * pid->d / dT));
 }
@@ -418,6 +443,8 @@ static void ZeroPids(void)
 	for(int8_t ct = 0; ct < PID_MAX; ct++) {
 		pids[ct].iAccumulator = 0;
 		pids[ct].lastErr = 0;
+		pids[ct].e1 = 0;
+		pids[ct].e2 = 0;
 	}
 	for(uint8_t i = 0; i < 3; i++)
 		axis_lock_accum[i] = 0;

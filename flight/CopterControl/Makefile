@@ -72,11 +72,11 @@ ifeq ($(USE_GPS), YES)
 OPTMODULES += GPS
 endif
 
-#ifeq ($(USE_GUIDANCE), YES)
-#OPTMODULES += CCGUIDANCE
-#endif
+ifeq ($(USE_GUIDANCE), YES)
+OPTMODULES += CCGuidance
+endif
 
-MODULES = Attitude Stabilization Actuator ManualControl FirmwareIAP CCGuidance
+MODULES = Attitude Stabilization Actuator ManualControl FirmwareIAP
 # Telemetry must be last to grab the optional modules (why?)
 MODULES += Telemetry
 

@@ -417,22 +417,20 @@ float ApplyPid(pid_type * pid, const float err)
 	// This is simply a low pass filter of sorts.
 	// High e1 (in absolute values) indicates coefficients too low.
 	pid->e1 = pid->e1 * error_alpha + err * ( 1 - error_alpha );
-	// The second indicator is the absolute deviance from that average.
-	// This is an integration over the high frequencies and as such
+	// The second indicator is the average (absolute) derivative.
+	// This is an integration over the high frequency components and as such
 	// indicates the behaviour of oscillation.
 	// If the oscillations converges to zero, this will stay low, however
 	// any continuous or diverging oscillation will accumulate to a high
 	// e2.
 	// High e2 indicates coefficients too high.
-	pid->e2 = pid->e1 * error_alpha + (err>=pid->e1?err-pid->e1:pid->e1-err) * ( 1 - error_alpha );
+	pid->e2 = pid->e2 * error_alpha + (diff>=0?diff:-diff) * ( 1 - error_alpha );
 	// The critical part here is the error_tau. It should be set safely
 	// above the systems oscillation period.  However the oscillation
 	// period in stabilization, while system dependant, is still within a
 	// certain order of magnitude that can be estimated for the vast
 	// majority of frames and might only be need to be adjusted for
 	// extremely slow reacting systems (ships, large scale  zeppelins, ...)
-	// Any automatic coefficients tuning should likely try to minimize
-	// (e1 * e2) With the "safe" side of that minimum at e1 > e2.
 
 	return ((err * pid->p) + pid->iAccumulator / 1000 + (diff * pid->d / dT));
 }

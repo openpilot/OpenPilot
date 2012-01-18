@@ -1526,6 +1526,7 @@ static const struct pios_l3gd20_cfg pios_l3gd20_cfg = {
 			.NVIC_IRQChannelCmd = ENABLE,
 		},
 	},
+	.gyro_range = PIOS_L3GD20_SCALE_500_DEG,
 };
 
 /**

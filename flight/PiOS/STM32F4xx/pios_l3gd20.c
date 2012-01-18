@@ -256,15 +256,14 @@ int32_t PIOS_L3GD20_ReadFifo(struct pios_l3gd20_data * buffer)
 
 float PIOS_L3GD20_GetScale() 
 {
+	return 0.01750f;
 	switch (cfg->gyro_range) {
 		case PIOS_L3GD20_SCALE_250_DEG:
-			return 1.0f / 131.0f;
+			return 0.00875f;
 		case PIOS_L3GD20_SCALE_500_DEG:
-			return 1.0f / 65.5f;
-		case PIOS_L3GD20_SCALE_1000_DEG:
-			return 1.0f / 32.8f;
+			return 0.01750f;
 		case PIOS_L3GD20_SCALE_2000_DEG:
-			return 1.0f / 16.4f;
+			return 0.070f;
 	}
 	return 0;
 }

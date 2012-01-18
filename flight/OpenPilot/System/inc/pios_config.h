@@ -91,6 +91,7 @@
 
 /* Stabilization options */
 #define PIOS_QUATERNION_STABILIZATION
+#define PIOS_SELFADJUSTING_STABILIZATION
 
 /* GPS options */
 #define PIOS_GPS_SETS_HOMELOCATION

@@ -63,6 +63,7 @@
 
 /* Stabilization options */
 #define PIOS_QUATERNION_STABILIZATION
+#define PIOS_SELFADJUSTING_STABILIZATION
 
 /* Alarm Thresholds */
 #define HEAP_LIMIT_WARNING		4000

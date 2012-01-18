@@ -60,7 +60,6 @@ enum {PID_RATE_ROLL, PID_RATE_PITCH, PID_RATE_YAW, PID_ROLL, PID_PITCH, PID_YAW,
 
 enum {ROLL,PITCH,YAW,MAX_AXES};
 
-
 // Private types
 typedef struct {
 	float p;
@@ -69,9 +68,15 @@ typedef struct {
 	float iLim;
 	float iAccumulator;
 	float lastErr;
-#if defined(DIAGNOSTICS)
+#if defined(PIOS_SELFADJUSTING_STABILIZATION) || defined(DIAGNOSTICS)
 	float e1;
 	float e2;
+#endif
+#if defined(PIOS_SELFADJUSTING_STABILIZATION)
+	float maxScale;
+	float attack;
+	float decay;
+	float scale;
 #endif
 } pid_type;
 
@@ -98,6 +103,9 @@ static float ApplyPid(pid_type * pid, const float err);
 static float bound(float val);
 static void ZeroPids(void);
 static void SettingsUpdatedCb(UAVObjEvent * ev);
+#if defined(PIOS_SELFADJUSTING_STABILIZATION)
+static float fakePow(const float n,const float x);
+#endif
 
 /**
  * Module initialization
@@ -158,7 +166,9 @@ static void stabilizationTask(void* parameters)
 	AttitudeActualData attitudeActual;
 	AttitudeRawData attitudeRaw;
 	FlightStatusData flightStatus;
+#if defined(DIAGNOSTICS)
 	StabilizationStatusData stabilizationStatus;
+#endif
 
 	SettingsUpdatedCb((UAVObjEvent *) NULL);
 
@@ -275,6 +285,9 @@ static void stabilizationTask(void* parameters)
 					stabilizationStatus.IAccumulator[PID_ROLL + i] = pids[PID_ROLL + i].iAccumulator;
 					stabilizationStatus.E1[PID_ROLL + i] = pids[PID_ROLL + i].e1;
 					stabilizationStatus.E2[PID_ROLL + i] = pids[PID_ROLL + i].e2;
+#if defined(PIOS_SELFADJUSTING_STABILIZATION)
+					stabilizationStatus.ScaleFactor[PID_ROLL + i] = fakePow(pids[PID_ROLL + i].maxScale, pids[PID_ROLL + i].scale);
+#endif
 #endif
 					
 					if(rateDesiredAxis[i] > settings.MaximumRate[i])
@@ -304,6 +317,9 @@ static void stabilizationTask(void* parameters)
 						stabilizationStatus.IAccumulator[PID_ROLL + i] = pids[PID_ROLL + i].iAccumulator;
 						stabilizationStatus.E1[PID_ROLL + i] = pids[PID_ROLL + i].e1;
 						stabilizationStatus.E2[PID_ROLL + i] = pids[PID_ROLL + i].e2;
+#if defined(PIOS_SELFADJUSTING_STABILIZATION)
+						stabilizationStatus.ScaleFactor[PID_ROLL + i] = fakePow(pids[PID_ROLL + i].maxScale, pids[PID_ROLL + i].scale);
+#endif
 #endif
 					}
 					
@@ -333,9 +349,12 @@ static void stabilizationTask(void* parameters)
 				{
 					float command = ApplyPid(&pids[PID_RATE_ROLL + ct],  rateDesiredAxis[ct] - gyro_filtered[ct]);
 #if defined(DIAGNOSTICS)
-					stabilizationStatus.IAccumulator[PID_ROLL + ct] = pids[PID_ROLL + ct].iAccumulator;
-					stabilizationStatus.E1[PID_ROLL + ct] = pids[PID_ROLL + ct].e1;
-					stabilizationStatus.E2[PID_ROLL + ct] = pids[PID_ROLL + ct].e2;
+					stabilizationStatus.IAccumulator[PID_RATE_ROLL + ct] = pids[PID_RATE_ROLL + ct].iAccumulator;
+					stabilizationStatus.E1[PID_RATE_ROLL + ct] = pids[PID_RATE_ROLL + ct].e1;
+					stabilizationStatus.E2[PID_RATE_ROLL + ct] = pids[PID_RATE_ROLL + ct].e2;
+#if defined(PIOS_SELFADJUSTING_STABILIZATION)
+					stabilizationStatus.ScaleFactor[PID_RATE_ROLL + ct] = fakePow(pids[PID_RATE_ROLL + ct].maxScale, pids[PID_RATE_ROLL + ct].scale);
+#endif
 #endif
 					actuatorDesiredAxis[ct] = bound(command);
 					break;
@@ -400,39 +419,63 @@ static void stabilizationTask(void* parameters)
 
 float ApplyPid(pid_type * pid, const float err)
 {
+
+#if defined(PIOS_SELFADJUSTING_STABILIZATION)
+	float scaling = fakePow(pid->maxScale,pid->scale);
+#else
+	#define scaling 1.0
+#endif
 	float diff = (err - pid->lastErr);
 	pid->lastErr = err;
 
 	// Scale up accumulator by 1000 while computing to avoid losing precision
-	pid->iAccumulator += err * (pid->i * dT * 1000);
+	pid->iAccumulator += scaling * err * (pid->i * dT * 1000);
 	if(pid->iAccumulator > (pid->iLim * 1000)) {
 		pid->iAccumulator = pid->iLim * 1000;
 	} else if (pid->iAccumulator < -(pid->iLim * 1000)) {
 		pid->iAccumulator = -pid->iLim * 1000;
 	}
 
-	// Calculate error indicators
-	// The first indicator is 'average error'. The long term average error
-	// should be near zero, unless the PID loop does not converge.
-	// This is simply a low pass filter of sorts.
-	// High e1 (in absolute values) indicates coefficients too low.
-	pid->e1 = pid->e1 * error_alpha + err * ( 1 - error_alpha );
-	// The second indicator is the average (absolute) derivative.
-	// This is an integration over the high frequency components and as such
-	// indicates the behaviour of oscillation.
-	// If the oscillations converges to zero, this will stay low, however
-	// any continuous or diverging oscillation will accumulate to a high
-	// e2.
-	// High e2 indicates coefficients too high.
-	pid->e2 = pid->e2 * error_alpha + (diff>=0?diff:-diff) * ( 1 - error_alpha );
-	// The critical part here is the error_tau. It should be set safely
-	// above the systems oscillation period.  However the oscillation
-	// period in stabilization, while system dependant, is still within a
-	// certain order of magnitude that can be estimated for the vast
-	// majority of frames and might only be need to be adjusted for
-	// extremely slow reacting systems (ships, large scale  zeppelins, ...)
+#if defined(PIOS_SELFADJUSTING_STABILIZATION) || defined(DIAGNOSTICS)
+	float abs = (err>0?err:-err);
 
-	return ((err * pid->p) + pid->iAccumulator / 1000 + (diff * pid->d / dT));
+	// Calculate error indicators
+	
+	// High E1 indicates coefficients too low.
+	// E1 is just the 'average error'. E1 should remain near zero, unless
+	// the PID loop does not converge.
+	// Simple low pass filter:
+
+	pid->e1 = pid->e1 * error_alpha + abs * ( 1 - error_alpha );
+
+	// High E2 indicates coefficients too high.
+	// E2 is the 'zero crossing speed', which is the derivative of error
+	// divided by the error itself.
+	// Reasoning: High derivatives are acceptable, when there is a
+	// considerate error to compensate and as such the direct result of Kp.
+	// A high derivative at low error however indicates overcompensation
+	// and oscillation Note that we cap at error 1 to prevent div by zero
+	// issues and small noise causing extreme values.
+	
+	float derivative = 0;
+	if ( dT > 0.0001) {
+		derivative = (diff>0?diff:-diff) / dT;
+	}
+	if (abs>1) {
+		pid->e2 = pid->e2 * error_alpha + ( derivative/abs ) * ( 1 - error_alpha );
+	} else {
+		pid->e2 = pid->e2 * error_alpha + ( derivative ) * ( 1 - error_alpha );
+	}
+
+#endif // defined(PIOS_SELFADJUSTING_STABILIZATION) || defined(DIAGNOSTICS)
+#if defined(PIOS_SELFADJUSTING_STABILIZATION)
+	// Adjust scaling coefficient
+	pid->scale = pid->scale + (1 - error_alpha) * (pid->e1 * pid->attack - pid->e2 * pid->decay);
+	if (pid->scale > 1) pid->scale=1;
+	if (pid->scale < -1) pid->scale=-1;
+
+#endif // defined(PIOS_SELFADJUSTING_STABILIZATION)
+	return ((scaling * err * pid->p) + pid->iAccumulator / 1000 + (scaling * diff * pid->d / dT));
 }
 
 
@@ -441,8 +484,13 @@ static void ZeroPids(void)
 	for(int8_t ct = 0; ct < PID_MAX; ct++) {
 		pids[ct].iAccumulator = 0;
 		pids[ct].lastErr = 0;
+#if defined(PIOS_SELFADJUSTING_STABILIZATION) || defined(DIAGNOSTICS)
 		pids[ct].e1 = 0;
 		pids[ct].e2 = 0;
+#endif
+#if defined(PIOS_SELFADJUSTING_STABILIZATION)
+		pids[ct].scale = 0;
+#endif
 	}
 	for(uint8_t i = 0; i < 3; i++)
 		axis_lock_accum[i] = 0;
@@ -473,18 +521,33 @@ static void SettingsUpdatedCb(UAVObjEvent * ev)
 	pids[0].i = settings.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KI];
 	pids[0].d = settings.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KD];
 	pids[0].iLim = settings.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_ILIMIT];
+#if defined(PIOS_SELFADJUSTING_STABILIZATION)
+	pids[0].maxScale = settings.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_MAXSCALE];
+	pids[0].attack = settings.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_ATTACK];
+	pids[0].decay = settings.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_DECAY];
+#endif
 
 	// Set the pitch rate PID constants
 	pids[1].p = settings.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KP];
 	pids[1].i = settings.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KI];
 	pids[1].d = settings.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KD];
 	pids[1].iLim = settings.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_ILIMIT];
+#if defined(PIOS_SELFADJUSTING_STABILIZATION)
+	pids[1].maxScale = settings.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_MAXSCALE];
+	pids[1].attack = settings.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_ATTACK];
+	pids[1].decay = settings.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_DECAY];
+#endif
 
 	// Set the yaw rate PID constants
 	pids[2].p = settings.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_KP];
 	pids[2].i = settings.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_KI];
 	pids[2].d = settings.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_KD];
 	pids[2].iLim = settings.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_ILIMIT];
+#if defined(PIOS_SELFADJUSTING_STABILIZATION)
+	pids[2].maxScale = settings.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_MAXSCALE];
+	pids[2].attack = settings.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_ATTACK];
+	pids[2].decay = settings.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_DECAY];
+#endif
 
 	// Set the roll attitude PI constants
 	pids[3].p = settings.RollPI[STABILIZATIONSETTINGS_ROLLPI_KP];
@@ -528,6 +591,29 @@ static void SettingsUpdatedCb(UAVObjEvent * ev)
 		error_alpha = exp(-fakeDt  / settings.ErrorTau);
 }
 
+#if defined(PIOS_SELFADJUSTING_STABILIZATION)
+// We need a performant implementation of y=n^x in the interval -1,+1
+// for n>=1
+// this is done using a hyperbolican aproximation:
+// f(x) = (a / (b+x) + c)
+// f(-1) = 1/n
+// f(0) = 1
+// f(1) = n
+// ----------------
+// a = -2*(n + 1)/(n - 1)
+// b = -(v + 1)/(v - 1)
+// c = -1
+static float fakePow(const float n,const float x) {
+	// make sure we are defined
+	// prevent div by zero
+    if (n<=1) return 1;
+	if (x<-1) return 1/n;
+	if (x>1) return n;
+
+	//fprintf(stderr,"debug: %4f ^ %4f = %4f\n",n,x,( ( ( -2 * (n+1) / (n-1) ) / ( x - (n+1) / (n-1) ) ) - 1 ));
+	return ( ( ( -2 * (n+1) / (n-1) ) / ( x - (n+1) / (n-1) ) ) - 1 );
+}
+#endif
 
 /**
  * @}

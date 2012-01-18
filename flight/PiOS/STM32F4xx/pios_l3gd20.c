@@ -77,6 +77,10 @@ void PIOS_L3GD20_Init(const struct pios_l3gd20_cfg * new_cfg)
 	
 	/* Enable and set EOC EXTI Interrupt to the lowest priority */
 	NVIC_Init(&cfg->eoc_irq.init);
+	
+	// An initial read is needed to get it running
+	struct pios_l3gd20_data data;
+	PIOS_L3GD20_ReadGyros(&data);
 
 }
 
@@ -315,7 +319,6 @@ uint32_t l3gd20_fifo_full = 0;
 
 void PIOS_L3GD20_IRQHandler(void)
 {
-/*
 	struct pios_l3gd20_data data;
 	PIOS_L3GD20_ReadGyros(&data);
 	
@@ -323,11 +326,11 @@ void PIOS_L3GD20_IRQHandler(void)
 	
 	if(fifoBuf_getFree(&pios_l3gd20_fifo) < sizeof(data)) {
 		l3gd20_fifo_full++;
-		return;			
+		return;	
 	}
 	
 	fifoBuf_putData(&pios_l3gd20_fifo, (uint8_t *) &data, sizeof(data));
-*/
+
 	l3gd20_irq++;
 	
 }

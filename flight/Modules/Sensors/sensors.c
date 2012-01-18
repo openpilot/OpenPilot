@@ -247,7 +247,7 @@ static void SensorsTask(void *parameters)
 #elif defined(PIOS_INCLUDE_L3GD20)
 		struct pios_l3gd20_data gyro;
 		count = 0;
-		/*while((read_good = PIOS_L3GD20_ReadFifo(&gyro)) != 0);
+		while((read_good = PIOS_L3GD20_ReadFifo(&gyro)) != 0);
 		while(read_good == 0) {
 			count++;
 			
@@ -256,14 +256,8 @@ static void SensorsTask(void *parameters)
 			gyro_accum[2] += gyro.gyro_z;
 			
 			read_good = PIOS_L3GD20_ReadFifo(&gyro);
-		} */
-		
-		PIOS_L3GD20_ReadGyros(&gyro);
-		gyro_accum[0] = gyro.gyro_x;
-		gyro_accum[1] = gyro.gyro_y;
-		gyro_accum[2] = gyro.gyro_z;
-		count = 1;
-		
+		}
+				
 		gyro_samples = count;
 		gyro_scaling = PIOS_L3GD20_GetScale();
 

@@ -52,6 +52,8 @@ USE_GPS ?= YES
 
 USE_I2C ?= YES
 
+USE_GUIDANCE ?= YES
+
 # Set to YES when using Code Sourcery toolchain
 CODE_SOURCERY ?= YES
 
@@ -64,10 +66,14 @@ endif
 
 FLASH_TOOL = OPENOCD
 
-# List of modules to include
+# List of modules to include CameraStab
 OPTMODULES = CameraStab ComUsbBridge Altitude
 ifeq ($(USE_GPS), YES)
 OPTMODULES += GPS
+endif
+
+ifeq ($(USE_GUIDANCE), YES)
+OPTMODULES += CCGuidance
 endif
 
 ifeq ($(TEST_FAULTS), YES)
@@ -136,6 +142,7 @@ SRC += ${OPMODULEDIR}/System/systemmod.c
 SRC += $(OPSYSTEM)/coptercontrol.c
 SRC += $(OPSYSTEM)/pios_board.c
 SRC += $(OPSYSTEM)/alarms.c
+
 SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
 SRC += $(OPUAVOBJ)/eventdispatcher.c
@@ -175,6 +182,9 @@ SRC += $(OPUAVSYNTHDIR)/attitudesettings.c
 SRC += $(OPUAVSYNTHDIR)/camerastabsettings.c
 SRC += $(OPUAVSYNTHDIR)/cameradesired.c
 SRC += $(OPUAVSYNTHDIR)/gpsposition.c
+#SRC += $(OPUAVSYNTHDIR)/homelocation.c
+#SRC += $(OPUAVSYNTHDIR)/positiondesired.c
+SRC += $(OPUAVSYNTHDIR)/ccguidancesettings.c
 SRC += $(OPUAVSYNTHDIR)/hwsettings.c
 SRC += $(OPUAVSYNTHDIR)/gcsreceiver.c
 SRC += $(OPUAVSYNTHDIR)/receiveractivity.c

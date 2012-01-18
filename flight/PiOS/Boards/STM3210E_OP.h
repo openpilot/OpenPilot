@@ -115,10 +115,13 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
 #define PIOS_I2C_MAX_DEVS			1
 extern uint32_t pios_i2c_main_adapter_id;
 #define PIOS_I2C_MAIN_ADAPTER			(pios_i2c_main_adapter_id)
+#define PIOS_I2C_ESC_ADAPTER			(pios_i2c_main_adapter_id)
+#define PIOS_I2C_BMP085_ADAPTER			(pios_i2c_main_adapter_id)
 
 //------------------------
 // PIOS_BMP085
 //------------------------
+#define PIOS_BMP085_HAS_GPIOS
 #define PIOS_BMP085_EOC_GPIO_PORT               GPIOC
 #define PIOS_BMP085_EOC_GPIO_PIN                GPIO_Pin_15
 #define PIOS_BMP085_EOC_PORT_SOURCE             GPIO_PortSourceGPIOC

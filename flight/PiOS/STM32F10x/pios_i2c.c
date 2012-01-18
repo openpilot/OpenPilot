@@ -891,6 +891,10 @@ int32_t PIOS_I2C_Init(uint32_t * i2c_id, const struct pios_i2c_adapter_cfg * cfg
 		break;
 	}
 
+	if (i2c_adapter->cfg->remap) {
+		GPIO_PinRemapConfig(i2c_adapter->cfg->remap, ENABLE);
+	}
+
 	/* Initialize the state machine */
 	i2c_adapter_fsm_init(i2c_adapter);
 

@@ -28,9 +28,12 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "pios_usb_board_data.h" /* struct usb_*, USB_* */
+#include "pios_usb_desc_hid_only_priv.h" /* exported API */
+#include "pios_usb_defs.h"		 /* struct usb_*, USB_* */
+#include "pios_usb_board_data.h"	 /* PIOS_USB_BOARD_* */
+#include "pios_usbhook.h"		 /* PIOS_USBHOOK_Register* */
 
-const struct usb_device_desc PIOS_USB_BOARD_DeviceDescriptor = {
+static const struct usb_device_desc device_desc = {
 	.bLength            = sizeof(struct usb_device_desc),
 	.bDescriptorType    = USB_DESC_TYPE_DEVICE,
 	.bcdUSB             = htousbs(0x0200),
@@ -47,56 +50,7 @@ const struct usb_device_desc PIOS_USB_BOARD_DeviceDescriptor = {
 	.bNumConfigurations = 1,
 };
 
-const struct usb_board_config PIOS_USB_BOARD_Configuration = {
-	.config = {
-		.bLength              = sizeof(struct usb_configuration_desc),
-		.bDescriptorType      = USB_DESC_TYPE_CONFIGURATION,
-		.wTotalLength         = htousbs(sizeof(struct usb_board_config)),
-		.bNumInterfaces       = 1,
-		.bConfigurationValue  = 1,
-		.iConfiguration       = 0,
-		.bmAttributes         = 0xC0,
-		.bMaxPower            = 250/2, /* in units of 2ma */
-	},
-	.hid_if = {
-		.bLength              = sizeof(struct usb_interface_desc),
-		.bDescriptorType      = USB_DESC_TYPE_INTERFACE,
-		.bInterfaceNumber     = 0,
-		.bAlternateSetting    = 0,
-		.bNumEndpoints        = 2,
-		.bInterfaceClass      = USB_INTERFACE_CLASS_HID,
-		.bInterfaceSubClass   = 0, /* no boot */
-		.nInterfaceProtocol   = 0, /* none */
-		.iInterface           = 0,
-	},
-	.hid = {
-		.bLength = sizeof(struct usb_hid_desc),
-		.bDescriptorType      = USB_DESC_TYPE_HID,
-		.bcdHID               = htousbs(0x0110),
-		.bCountryCode         = 0,
-		.bNumDescriptors      = 1,
-		.bClassDescriptorType = USB_DESC_TYPE_REPORT,
-		.wItemLength          = htousbs(sizeof(PIOS_USB_BOARD_HidReportDescriptor)),
-	},
-	.hid_in = {
-		.bLength              = sizeof(struct usb_endpoint_desc),
-		.bDescriptorType      = USB_DESC_TYPE_ENDPOINT,
-		.bEndpointAddress     = USB_EP_IN(1),
-		.bmAttributes         = USB_EP_ATTR_TT_INTERRUPT,
-		.wMaxPacketSize       = htousbs(PIOS_USB_BOARD_HID_DATA_LENGTH),
-		.bInterval            = 4, /* ms */
-	},
-	.hid_out = {
-		.bLength              = sizeof(struct usb_endpoint_desc),
-		.bDescriptorType      = USB_DESC_TYPE_ENDPOINT,
-		.bEndpointAddress     = USB_EP_OUT(1),
-		.bmAttributes         = USB_EP_ATTR_TT_INTERRUPT,
-		.wMaxPacketSize       = htousbs(PIOS_USB_BOARD_HID_DATA_LENGTH),
-		.bInterval            = 4, /* ms */
-	},
-};
-
-const uint8_t PIOS_USB_BOARD_HidReportDescriptor[] = {
+static const uint8_t hid_report_desc[36] = {
 	HID_GLOBAL_ITEM_2 (HID_TAG_GLOBAL_USAGE_PAGE),
 	0x9C, 0xFF,		/* Usage Page 0xFF9C (Vendor Defined) */
 	HID_LOCAL_ITEM_1  (HID_TAG_LOCAL_USAGE),
@@ -140,56 +94,71 @@ const uint8_t PIOS_USB_BOARD_HidReportDescriptor[] = {
 	HID_MAIN_ITEM_0 (HID_TAG_MAIN_ENDCOLLECTION),
 };
 
-const struct usb_string_langid PIOS_USB_BOARD_StringLangID = {
-	.bLength = sizeof(PIOS_USB_BOARD_StringLangID),
-	.bDescriptorType = USB_DESC_TYPE_STRING,
-	.bLangID = htousbs(USB_LANGID_ENGLISH_UK),
+struct usb_config_hid_only {
+	struct usb_configuration_desc         config;
+	struct usb_interface_desc             hid_if;
+	struct usb_hid_desc                   hid;
+	struct usb_endpoint_desc              hid_in;
+	struct usb_endpoint_desc              hid_out;
+} __attribute__((packed));
+
+const struct usb_config_hid_only config_hid_only = {
+	.config = {
+		.bLength              = sizeof(struct usb_configuration_desc),
+		.bDescriptorType      = USB_DESC_TYPE_CONFIGURATION,
+		.wTotalLength         = htousbs(sizeof(struct usb_config_hid_only)),
+		.bNumInterfaces       = 1,
+		.bConfigurationValue  = 1,
+		.iConfiguration       = 0,
+		.bmAttributes         = 0xC0,
+		.bMaxPower            = 250/2, /* in units of 2ma */
+	},
+	.hid_if = {
+		.bLength              = sizeof(struct usb_interface_desc),
+		.bDescriptorType      = USB_DESC_TYPE_INTERFACE,
+		.bInterfaceNumber     = 0,
+		.bAlternateSetting    = 0,
+		.bNumEndpoints        = 2,
+		.bInterfaceClass      = USB_INTERFACE_CLASS_HID,
+		.bInterfaceSubClass   = 0, /* no boot */
+		.nInterfaceProtocol   = 0, /* none */
+		.iInterface           = 0,
+	},
+	.hid = {
+		.bLength = sizeof(struct usb_hid_desc),
+		.bDescriptorType      = USB_DESC_TYPE_HID,
+		.bcdHID               = htousbs(0x0110),
+		.bCountryCode         = 0,
+		.bNumDescriptors      = 1,
+		.bClassDescriptorType = USB_DESC_TYPE_REPORT,
+		.wItemLength          = htousbs(sizeof(hid_report_desc)),
+	},
+	.hid_in = {
+		.bLength              = sizeof(struct usb_endpoint_desc),
+		.bDescriptorType      = USB_DESC_TYPE_ENDPOINT,
+		.bEndpointAddress     = USB_EP_IN(1),
+		.bmAttributes         = USB_EP_ATTR_TT_INTERRUPT,
+		.wMaxPacketSize       = htousbs(PIOS_USB_BOARD_HID_DATA_LENGTH),
+		.bInterval            = 4, /* ms */
+	},
+	.hid_out = {
+		.bLength              = sizeof(struct usb_endpoint_desc),
+		.bDescriptorType      = USB_DESC_TYPE_ENDPOINT,
+		.bEndpointAddress     = USB_EP_OUT(1),
+		.bmAttributes         = USB_EP_ATTR_TT_INTERRUPT,
+		.wMaxPacketSize       = htousbs(PIOS_USB_BOARD_HID_DATA_LENGTH),
+		.bInterval            = 4, /* ms */
+	},
 };
 
-const uint8_t PIOS_USB_BOARD_StringVendorID[] = {
-	sizeof(PIOS_USB_BOARD_StringVendorID),
-	USB_DESC_TYPE_STRING,
-	'o', 0,
-	'p', 0,
-	'e', 0,
-	'n', 0,
-	'p', 0,
-	'i', 0,
-	'l', 0,
-	'o', 0,
-	't', 0,
-	'.', 0,
-	'o', 0,
-	'r', 0,
-	'g', 0
-};
+int32_t PIOS_USB_DESC_HID_ONLY_Init(void)
+{
+	PIOS_USBHOOK_RegisterConfig(1, (uint8_t *)&config_hid_only, sizeof(config_hid_only));
 
-uint8_t PIOS_USB_BOARD_StringSerial[] = {
-	sizeof(PIOS_USB_BOARD_StringSerial),
-	USB_DESC_TYPE_STRING,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0
-};
+	PIOS_USBHOOK_RegisterDevice((uint8_t *)&device_desc, sizeof(device_desc));
+
+	PIOS_USBHOOK_RegisterHidInterface((uint8_t *)&(config_hid_only.hid_if), sizeof(config_hid_only.hid_if));
+	PIOS_USBHOOK_RegisterHidReport((uint8_t *)hid_report_desc, sizeof(hid_report_desc));
+
+	return 0;
+}

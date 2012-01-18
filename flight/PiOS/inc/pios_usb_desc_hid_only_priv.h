@@ -1,10 +1,13 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup PIOS_USB_DESC USB descriptor layer functions
+ * @{
  *
- * @file       pios_config.h  
+ * @file       pios_usb_desc_hid_only_priv.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      PiOS configuration header. 
- *                 - Central compile time config for the project.
+ * @brief      Defines the API to set up the HID-only USB descriptor config
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -24,23 +27,16 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_CONFIG_H
-#define PIOS_CONFIG_H
+#ifndef PIOS_USB_DESC_HID_ONLY_PRIV_H
+#define PIOS_USB_DESC_HID_ONLY_PRIV_H
 
-/* Enable/Disable PiOS Modules */
-#define PIOS_INCLUDE_ADC
-#define PIOS_INCLUDE_DELAY
-#define PIOS_INCLUDE_I2C
-#define PIOS_INCLUDE_IRQ
-#define PIOS_INCLUDE_LED
-#define PIOS_INCLUDE_SPI
-#define PIOS_INCLUDE_SYS
-#define PIOS_INCLUDE_USART
-#define PIOS_INCLUDE_COM
-#define PIOS_INCLUDE_HMC5843
-#define PIOS_INCLUDE_GPIO
-#define PIOS_INCLUDE_EXTI
-#define PIOS_INCLUDE_BL_HELPER
-#define PIOS_INCLUDE_IAP
+#include <stdint.h>
 
-#endif /* PIOS_CONFIG_H */
+extern int32_t PIOS_USB_DESC_HID_ONLY_Init(void);
+
+#endif	/* PIOS_USB_DESC_HID_ONLY_PRIV_H */
+
+/**
+  * @}
+  * @}
+  */

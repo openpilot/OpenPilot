@@ -28,9 +28,12 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "pios_usb_board_data.h" /* struct usb_*, USB_* */
+#include "pios_usb_desc_hid_cdc_priv.h" /* exported API */
+#include "pios_usb_defs.h"		/* struct usb_*, USB_* */
+#include "pios_usb_board_data.h"	/* PIOS_USB_BOARD_* */
+#include "pios_usbhook.h"		/* PIOS_USBHOOK_Register* */
 
-const struct usb_device_desc PIOS_USB_BOARD_DeviceDescriptor = {
+static const struct usb_device_desc device_desc = {
 	.bLength            = sizeof(struct usb_device_desc),
 	.bDescriptorType    = USB_DESC_TYPE_DEVICE,
 	.bcdUSB             = htousbs(0x0200),
@@ -41,17 +44,79 @@ const struct usb_device_desc PIOS_USB_BOARD_DeviceDescriptor = {
 	.idVendor           = htousbs(USB_VENDOR_ID_OPENPILOT),
 	.idProduct          = htousbs(PIOS_USB_BOARD_PRODUCT_ID),
 	.bcdDevice          = htousbs(PIOS_USB_BOARD_DEVICE_VER),
-	.iManufacturer      = 1,
-	.iProduct           = 2,
-	.iSerialNumber      = 3,
+	.iManufacturer      = USB_STRING_DESC_VENDOR,
+	.iProduct           = USB_STRING_DESC_PRODUCT,
+	.iSerialNumber      = USB_STRING_DESC_SERIAL,
 	.bNumConfigurations = 1,
 };
 
-const struct usb_board_config PIOS_USB_BOARD_Configuration = {
+static const uint8_t hid_report_desc[36] = {
+	HID_GLOBAL_ITEM_2 (HID_TAG_GLOBAL_USAGE_PAGE),
+	0x9C, 0xFF,		/* Usage Page 0xFF9C (Vendor Defined) */
+	HID_LOCAL_ITEM_1  (HID_TAG_LOCAL_USAGE),
+	0x01,			/* Usage ID 0x0001 (0x01-0x1F uaually for top-level collections) */
+
+	HID_MAIN_ITEM_1   (HID_TAG_MAIN_COLLECTION),
+	0x01,			/* Application */
+
+	/* Device -> Host emulated serial channel */
+	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_REPORT_ID),
+	0x01,		        /* OpenPilot emulated serial channel (Device -> Host) */
+	HID_LOCAL_ITEM_1  (HID_TAG_LOCAL_USAGE),
+	0x02,
+	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_LOGICAL_MIN),
+	0x00,			/* Values range from min = 0x00 */
+	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_LOGICAL_MAX),
+	0xFF,			/* Values range to max = 0xFF */
+	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_REPORT_SIZE),
+	0x08,			/* 8 bits wide */
+	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_REPORT_CNT),
+	PIOS_USB_BOARD_HID_DATA_LENGTH-1, /* Need to leave room for a report ID */
+	HID_MAIN_ITEM_1 (HID_TAG_MAIN_INPUT),
+	0x03,			/* Variable, Constant (read-only) */
+
+	/* Host -> Host emulated serial channel */
+	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_REPORT_ID),
+	0x02,                   /* OpenPilot emulated Serial Channel (Host -> Device) */
+	HID_LOCAL_ITEM_1  (HID_TAG_LOCAL_USAGE),
+	0x02,
+	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_LOGICAL_MIN),
+	0x00,			/* Values range from min = 0x00 */
+	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_LOGICAL_MAX),
+	0xFF,			/* Values range to max = 0xFF */
+	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_REPORT_SIZE),
+	0x08,			/* 8 bits wide */
+	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_REPORT_CNT),
+	PIOS_USB_BOARD_HID_DATA_LENGTH-1, /* Need to leave room for a report ID */
+	HID_MAIN_ITEM_1 (HID_TAG_MAIN_OUTPUT),
+	0x82,			/* Volatile, Variable */
+
+	HID_MAIN_ITEM_0 (HID_TAG_MAIN_ENDCOLLECTION),
+};
+
+struct usb_config_hid_cdc {
+	struct usb_configuration_desc         config;
+	struct usb_interface_association_desc iad;
+	struct usb_interface_desc             hid_if;
+	struct usb_hid_desc                   hid;
+	struct usb_endpoint_desc              hid_in;
+	struct usb_endpoint_desc              hid_out;
+	struct usb_interface_desc             cdc_control_if;
+	struct usb_cdc_header_func_desc       cdc_header;
+	struct usb_cdc_callmgmt_func_desc     cdc_callmgmt;
+	struct usb_cdc_acm_func_desc          cdc_acm;
+	struct usb_cdc_union_func_desc        cdc_union;
+	struct usb_endpoint_desc              cdc_mgmt_in;
+	struct usb_interface_desc             cdc_data_if;
+	struct usb_endpoint_desc              cdc_in;
+	struct usb_endpoint_desc              cdc_out;
+} __attribute__((packed));
+
+static const struct usb_config_hid_cdc config_hid_cdc = {
 	.config = {
 		.bLength              = sizeof(struct usb_configuration_desc),
 		.bDescriptorType      = USB_DESC_TYPE_CONFIGURATION,
-		.wTotalLength         = htousbs(sizeof(struct usb_board_config)),
+		.wTotalLength         = htousbs(sizeof(struct usb_config_hid_cdc)),
 		.bNumInterfaces       = 3,
 		.bConfigurationValue  = 1,
 		.iConfiguration       = 0,
@@ -86,7 +151,7 @@ const struct usb_board_config PIOS_USB_BOARD_Configuration = {
 		.bCountryCode         = 0,
 		.bNumDescriptors      = 1,
 		.bClassDescriptorType = USB_DESC_TYPE_REPORT,
-		.wItemLength          = htousbs(sizeof(PIOS_USB_BOARD_HidReportDescriptor)),
+		.wItemLength          = htousbs(sizeof(hid_report_desc)),
 	},
 	.hid_in = {
 		.bLength              = sizeof(struct usb_endpoint_desc),
@@ -178,100 +243,14 @@ const struct usb_board_config PIOS_USB_BOARD_Configuration = {
 	},
 };
 
-const uint8_t PIOS_USB_BOARD_HidReportDescriptor[] = {
-	HID_GLOBAL_ITEM_2 (HID_TAG_GLOBAL_USAGE_PAGE),
-	0x9C, 0xFF,		/* Usage Page 0xFF9C (Vendor Defined) */
-	HID_LOCAL_ITEM_1  (HID_TAG_LOCAL_USAGE),
-	0x01,			/* Usage ID 0x0001 (0x01-0x1F uaually for top-level collections) */
+int32_t PIOS_USB_DESC_HID_CDC_Init(void)
+{
+	PIOS_USBHOOK_RegisterConfig(1, (uint8_t *)&config_hid_cdc, sizeof(config_hid_cdc));
 
-	HID_MAIN_ITEM_1   (HID_TAG_MAIN_COLLECTION),
-	0x01,			/* Application */
+	PIOS_USBHOOK_RegisterDevice((uint8_t *)&device_desc, sizeof(device_desc));
 
-	/* Device -> Host emulated serial channel */
-	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_REPORT_ID),
-	0x01,		        /* OpenPilot emulated serial channel (Device -> Host) */
-	HID_LOCAL_ITEM_1  (HID_TAG_LOCAL_USAGE),
-	0x02,
-	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_LOGICAL_MIN),
-	0x00,			/* Values range from min = 0x00 */
-	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_LOGICAL_MAX),
-	0xFF,			/* Values range to max = 0xFF */
-	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_REPORT_SIZE),
-	0x08,			/* 8 bits wide */
-	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_REPORT_CNT),
-	PIOS_USB_BOARD_HID_DATA_LENGTH-1, /* Need to leave room for a report ID */
-	HID_MAIN_ITEM_1 (HID_TAG_MAIN_INPUT),
-	0x03,			/* Variable, Constant (read-only) */
+	PIOS_USBHOOK_RegisterHidInterface((uint8_t *)&(config_hid_cdc.hid_if), sizeof(config_hid_cdc.hid_if));
+	PIOS_USBHOOK_RegisterHidReport((uint8_t *)hid_report_desc, sizeof(hid_report_desc));
 
-	/* Host -> Host emulated serial channel */
-	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_REPORT_ID),
-	0x02,                   /* OpenPilot emulated Serial Channel (Host -> Device) */
-	HID_LOCAL_ITEM_1  (HID_TAG_LOCAL_USAGE),
-	0x02,
-	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_LOGICAL_MIN),
-	0x00,			/* Values range from min = 0x00 */
-	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_LOGICAL_MAX),
-	0xFF,			/* Values range to max = 0xFF */
-	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_REPORT_SIZE),
-	0x08,			/* 8 bits wide */
-	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_REPORT_CNT),
-	PIOS_USB_BOARD_HID_DATA_LENGTH-1, /* Need to leave room for a report ID */
-	HID_MAIN_ITEM_1 (HID_TAG_MAIN_OUTPUT),
-	0x82,			/* Volatile, Variable */
-
-	HID_MAIN_ITEM_0 (HID_TAG_MAIN_ENDCOLLECTION),
-};
-
-const struct usb_string_langid PIOS_USB_BOARD_StringLangID = {
-	.bLength = sizeof(PIOS_USB_BOARD_StringLangID),
-	.bDescriptorType = USB_DESC_TYPE_STRING,
-	.bLangID = htousbs(USB_LANGID_ENGLISH_UK),
-};
-
-const uint8_t PIOS_USB_BOARD_StringVendorID[] = {
-	sizeof(PIOS_USB_BOARD_StringVendorID),
-	USB_DESC_TYPE_STRING,
-	'o', 0,
-	'p', 0,
-	'e', 0,
-	'n', 0,
-	'p', 0,
-	'i', 0,
-	'l', 0,
-	'o', 0,
-	't', 0,
-	'.', 0,
-	'o', 0,
-	'r', 0,
-	'g', 0
-};
-
-uint8_t PIOS_USB_BOARD_StringSerial[] = {
-	sizeof(PIOS_USB_BOARD_StringSerial),
-	USB_DESC_TYPE_STRING,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0
-};
+	return 0;
+}

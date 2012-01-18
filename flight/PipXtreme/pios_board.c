@@ -324,6 +324,10 @@ static const struct pios_usb_cfg pios_usb_main_cfg = {
     },
   },
 };
+
+#include "pios_usb_board_data_priv.h"
+#include "pios_usb_desc_hid_only_priv.h"
+
 #endif	/* PIOS_INCLUDE_USB */
 
 #if defined(PIOS_INCLUDE_USB_HID)
@@ -369,10 +373,16 @@ void PIOS_Board_Init(void) {
 	}
 
 #if defined(PIOS_INCLUDE_USB)
-	uint32_t pios_usb_id;
-	if (PIOS_USB_Init(&pios_usb_id, &pios_usb_main_cfg)) {
+	/* Initialize board specific USB data */
+	PIOS_USB_BOARD_DATA_Init();
+
+	if (PIOS_USB_DESC_HID_ONLY_Init()) {
 		PIOS_Assert(0);
 	}
+
+	uint32_t pios_usb_id;
+	PIOS_USB_Init(&pios_usb_id, &pios_usb_main_cfg);
+
 #if defined(PIOS_INCLUDE_USB_HID) && defined(PIOS_INCLUDE_COM)
 	uint32_t pios_usb_hid_id;
 	if (PIOS_USB_HID_Init(&pios_usb_hid_id, &pios_usb_hid_cfg, pios_usb_id)) {

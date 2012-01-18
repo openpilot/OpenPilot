@@ -2,13 +2,13 @@
  ******************************************************************************
  * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
- * @addtogroup PIOS_USB_BOARD Board specific USB definitions
- * @brief Board specific USB definitions
+ * @addtogroup PIOS_COM COM MSG layer functions
+ * @brief Hardware communication layer
  * @{
  *
- * @file       pios_usb_board_data.h
+ * @file       pios_com_msg_priv.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Board specific USB definitions
+ * @brief      COM MSG private definitions.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -28,18 +28,17 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_USB_BOARD_DATA_H
-#define PIOS_USB_BOARD_DATA_H
+#ifndef PIOS_COM_MSG_PRIV_H
+#define PIOS_COM_MSG_PRIV_H
 
-#define PIOS_USB_BOARD_CDC_DATA_LENGTH 64
-#define PIOS_USB_BOARD_CDC_MGMT_LENGTH 32
-#define PIOS_USB_BOARD_HID_DATA_LENGTH 64
+#include <stdint.h>		/* uint*_t */
+#include "pios_com_priv.h"	/* struct pios_com_driver */
 
-#define PIOS_USB_BOARD_EP_NUM 4
+extern int32_t PIOS_COM_MSG_Init(uint32_t * com_id, const struct pios_com_driver * driver, uint32_t lower_id);
 
-#include "pios_usb_defs.h" 	/* struct usb_* */
+#endif /* PIOS_COM_MSG_PRIV_H */
 
-#define PIOS_USB_BOARD_PRODUCT_ID USB_PRODUCT_ID_OPENPILOT_MAIN
-#define PIOS_USB_BOARD_DEVICE_VER USB_OP_DEVICE_VER(USB_OP_BOARD_ID_OPENPILOT_MAIN, USB_OP_BOARD_MODE_FW)
-
-#endif	/* PIOS_USB_BOARD_DATA_H */
+/**
+  * @}
+  * @}
+  */

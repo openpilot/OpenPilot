@@ -149,7 +149,6 @@ SRC += ${OPMODULEDIR}/System/systemmod.c
 SRC += $(OPSYSTEM)/openpilot.c
 SRC += $(OPSYSTEM)/pios_board_posix.c
 SRC += $(OPSYSTEM)/alarms.c
-SRC += $(OPSYSTEM)/taskmonitor.c
 SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
 SRC += $(OPUAVOBJ)/eventdispatcher.c
@@ -189,6 +188,7 @@ SRC += $(PIOSPOSIX)/pios_rcvr.c
 SRC += $(FLIGHTLIB)/fifo_buffer.c
 SRC += $(FLIGHTLIB)/WorldMagModel.c
 SRC += $(FLIGHTLIB)/CoordinateConversions.c
+SRC += $(FLIGHTLIB)/taskmonitor.c
 ## RTOS and RTOS Portable 
 SRC += $(RTOSSRCDIR)/list.c
 SRC += $(RTOSSRCDIR)/queue.c

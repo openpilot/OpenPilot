@@ -136,7 +136,6 @@ SRC += ${OPMODULEDIR}/System/systemmod.c
 SRC += $(OPSYSTEM)/coptercontrol.c
 SRC += $(OPSYSTEM)/pios_board.c
 SRC += $(OPSYSTEM)/alarms.c
-SRC += $(OPSYSTEM)/taskmonitor.c
 SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
 SRC += $(OPUAVOBJ)/eventdispatcher.c
@@ -216,6 +215,7 @@ SRC += $(PIOSSTM32F10X)/pios_usb_hid_istr.c
 SRC += $(PIOSSTM32F10X)/pios_usb_hid_pwr.c
 SRC += $(OPSYSTEM)/pios_usb_board_data.c
 SRC += $(PIOSCOMMON)/pios_usb_desc_hid_cdc.c
+SRC += $(PIOSCOMMON)/pios_usb_desc_hid_only.c
 
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_crc.c
@@ -232,6 +232,7 @@ SRC += $(PIOSCOMMON)/printf-stdarg.c
 ## Libraries for flight calculations
 SRC += $(FLIGHTLIB)/fifo_buffer.c
 SRC += $(FLIGHTLIB)/CoordinateConversions.c
+SRC += $(FLIGHTLIB)/taskmonitor.c
 
 ## CMSIS for STM32
 SRC += $(CMSISDIR)/core_cm3.c
@@ -435,15 +436,15 @@ CSTANDARD = -std=gnu99
 # Flags for C and C++ (arm-elf-gcc/arm-elf-g++)
 
 ifeq ($(DEBUG),YES)
-CFLAGS = -DDEBUG
+CFLAGS += -DDEBUG
 endif
 
 ifeq ($(DIAGNOSTICS),YES)
-CFLAGS = -DDIAGNOSTICS
+CFLAGS += -DDIAGNOSTICS
 endif
 
 ifeq ($(DIAG_TASKS),YES)
-CFLAGS = -DDIAG_TASKS
+CFLAGS += -DDIAG_TASKS
 endif
 
 CFLAGS += -g$(DEBUGF)

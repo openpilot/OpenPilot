@@ -119,6 +119,7 @@ SRC += $(PIOSCOMMON)/pios_usb_desc_hid_only.c
 
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_board_info.c
+SRC += $(PIOSCOMMON)/pios_com_msg.c
 SRC += $(PIOSCOMMON)/pios_com.c
 SRC += $(PIOSCOMMON)/pios_opahrs_v0.c
 SRC += $(PIOSCOMMON)/pios_bl_helper.c
@@ -292,7 +293,7 @@ CSTANDARD = -std=gnu99
 # Flags for C and C++ (arm-elf-gcc/arm-elf-g++)
 
 ifeq ($(DEBUG),YES)
-CFLAGS = -DDEBUG
+CFLAGS += -DDEBUG
 endif
 
 CFLAGS += -g$(DEBUGF)

@@ -48,8 +48,6 @@
 #include "taskinfo.h"
 #include "watchdogstatus.h"
 #include "taskmonitor.h"
-#include "pios_iap.h"
-
 
 // Private constants
 #define SYSTEM_UPDATE_PERIOD_MS 1000
@@ -148,8 +146,10 @@ static void systemTask(void *parameters)
 		PIOS_SYS_Reset();
 	}
 
+#if defined(PIOS_INCLUDE_IAP)
 	/* Record a successful boot */
 	PIOS_IAP_WriteBootCount(0);
+#endif
 
 	// Initialize vars
 	idleCounter = 0;
@@ -170,8 +170,11 @@ static void systemTask(void *parameters)
 		updateI2Cstats();
 		updateWDGstats();
 #endif
+
+#if defined(DIAG_TASKS)
 		// Update the task status object
 		TaskMonitorUpdateAll();
+#endif
 
 		// Flash the heartbeat LED
 		PIOS_LED_Toggle(LED1);

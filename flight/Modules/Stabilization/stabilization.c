@@ -446,7 +446,7 @@ float ApplyPid(pid_type * pid, const float err)
 	// the PID loop does not converge.
 	// Simple low pass filter:
 
-	pid->e1 = pid->e1 * error_alpha + abs * ( 1 - error_alpha );
+	pid->e1 = pid->e1 * error_alpha + err * ( 1 - error_alpha );
 
 	// High E2 indicates coefficients too high.
 	// E2 is the 'zero crossing speed', which is the derivative of error
@@ -470,7 +470,7 @@ float ApplyPid(pid_type * pid, const float err)
 #endif // defined(PIOS_SELFADJUSTING_STABILIZATION) || defined(DIAGNOSTICS)
 #if defined(PIOS_SELFADJUSTING_STABILIZATION)
 	// Adjust scaling coefficient
-	pid->scale = pid->scale + (1 - error_alpha) * (pid->e1 * pid->attack - pid->e2 * pid->decay);
+	pid->scale = pid->scale + (1 - error_alpha) * ((pid->e1>0?pid->e1:-pid->e1) * pid->attack - pid->e2 * pid->decay);
 	if (pid->scale > 1) pid->scale=1;
 	if (pid->scale < -1) pid->scale=-1;
 

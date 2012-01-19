@@ -50,7 +50,7 @@ ENABLE_AUX_UART ?= NO
 
 USE_GPS ?= YES
 
-USE_I2C ?= YES
+USE_I2C ?= NO
 
 USE_GUIDANCE ?= YES
 
@@ -66,8 +66,8 @@ endif
 
 FLASH_TOOL = OPENOCD
 
-# List of modules to include CameraStab
-OPTMODULES = CameraStab ComUsbBridge Altitude
+# List of modules to include Altitude
+OPTMODULES = CameraStab ComUsbBridge
 ifeq ($(USE_GPS), YES)
 OPTMODULES += GPS
 endif

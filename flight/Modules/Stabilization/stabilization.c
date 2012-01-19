@@ -421,15 +421,18 @@ float ApplyPid(pid_type * pid, const float err)
 {
 
 #if defined(PIOS_SELFADJUSTING_STABILIZATION)
-	float scaling = fakePow(pid->maxScale,pid->scale);
+	float scaleFactor = fakePow(pid->maxScale,pid->scale);
+	// note that the scaling factor is always 1.0 if maxScale is set to 1 or
+	// lower (the default) regardless of scale.
 #else
-	#define scaling 1.0
+	#define scaleFactor 1.0
 #endif
+
 	float diff = (err - pid->lastErr);
 	pid->lastErr = err;
 
 	// Scale up accumulator by 1000 while computing to avoid losing precision
-	pid->iAccumulator += scaling * err * (pid->i * dT * 1000);
+	pid->iAccumulator += scaleFactor * err * (pid->i * dT * 1000);
 	if(pid->iAccumulator > (pid->iLim * 1000)) {
 		pid->iAccumulator = pid->iLim * 1000;
 	} else if (pid->iAccumulator < -(pid->iLim * 1000)) {
@@ -437,45 +440,58 @@ float ApplyPid(pid_type * pid, const float err)
 	}
 
 #if defined(PIOS_SELFADJUSTING_STABILIZATION) || defined(DIAGNOSTICS)
-	float abs = (err>0?err:-err);
+
+	float derivative = 0;
+	if ( dT > 0.0001) {
+		derivative = fabs(diff) / dT;
+	}
 
 	// Calculate error indicators
 	
+	// We have two indicators, E1 for insufficient control loop efficiency
+	// (indicated by the loop being unable to compensate an error in time), E2
+	// for overcompensation (indicated by oscillation)
+	
 	// High E1 indicates coefficients too low.
-	// E1 is just the 'average error'. E1 should remain near zero, unless
-	// the PID loop does not converge.
-	// Simple low pass filter:
+	// E1 is the 'resident error' which is the error divided by its derivative.
+	// E1 is high, if the error is high and does not change.
+	// E1 is low if the error is low.
+	// E1 is low if the error changes fast (In the hope that this change is a
+	// decrease as the control loop tries to compensate).
 
-	pid->e1 = pid->e1 * error_alpha + err * ( 1 - error_alpha );
+	if (derivative>1) {
+		pid->e1 = pid->e1 * error_alpha + (fabs(err)/derivative) * ( 1 - error_alpha );
+	} else {
+		pid->e1 = pid->e1 * error_alpha + ( fabs(err) ) * ( 1 - error_alpha );
+	}
 
 	// High E2 indicates coefficients too high.
 	// E2 is the 'zero crossing speed', which is the derivative of error
-	// divided by the error itself.
-	// Reasoning: High derivatives are acceptable, when there is a
-	// considerate error to compensate and as such the direct result of Kp.
-	// A high derivative at low error however indicates overcompensation
-	// and oscillation Note that we cap at error 1 to prevent div by zero
-	// issues and small noise causing extreme values.
+	// divided by the error.
+	// E2 is high if the error is low but changes fast.
+	// E2 is low if the error is high.
+	// E2 is low if the error doesn't change much.
 	
-	float derivative = 0;
-	if ( dT > 0.0001) {
-		derivative = (diff>0?diff:-diff) / dT;
-	}
-	if (abs>1) {
-		pid->e2 = pid->e2 * error_alpha + ( derivative/abs ) * ( 1 - error_alpha );
+	if (fabs(err)>1) {
+		pid->e2 = pid->e2 * error_alpha + ( derivative/fabs(err) ) * ( 1 - error_alpha );
 	} else {
 		pid->e2 = pid->e2 * error_alpha + ( derivative ) * ( 1 - error_alpha );
 	}
 
+	// Is the capping at "1" sensible? We need to prevent div by zero somehow, and
+	// a cap at 1 prevents undesired amplification, but renders calculation nonlinear.
+
 #endif // defined(PIOS_SELFADJUSTING_STABILIZATION) || defined(DIAGNOSTICS)
 #if defined(PIOS_SELFADJUSTING_STABILIZATION)
-	// Adjust scaling coefficient
-	pid->scale = pid->scale + (1 - error_alpha) * ((pid->e1>0?pid->e1:-pid->e1) * pid->attack - pid->e2 * pid->decay);
+
+	// Adjust scale coefficient according to E1 and E2
+	pid->scale = pid->scale + (1 - error_alpha) * ( pid->e1 * pid->attack - pid->e2 * pid->decay);
 	if (pid->scale > 1) pid->scale=1;
 	if (pid->scale < -1) pid->scale=-1;
 
 #endif // defined(PIOS_SELFADJUSTING_STABILIZATION)
-	return ((scaling * err * pid->p) + pid->iAccumulator / 1000 + (scaling * diff * pid->d / dT));
+
+	return ((scaleFactor * err * pid->p) + pid->iAccumulator / 1000 + (scaleFactor * diff * pid->d / dT));
 }
 
 

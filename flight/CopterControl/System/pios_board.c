@@ -1166,6 +1166,8 @@ static const struct pios_l3gd20_cfg pios_l3gd20_cfg = {
 	.gyro_range = PIOS_L3GD20_SCALE_500_DEG,
 };
 
+
+#include <pios_board_info.h>
 /**
  * PIOS_Board_Init()
  * initializes all the core subsystems on this specific hardware
@@ -1670,8 +1672,29 @@ void PIOS_Board_Init(void) {
 #else
 	PIOS_DEBUG_Init(&pios_tim_servo_all_channels, NELEMENTS(pios_tim_servo_all_channels));
 #endif	/* PIOS_DEBUG_ENABLE_DEBUG_PINS */
+
+	const struct pios_board_info * bdinfo = &pios_board_info_blob;
+
+	switch(bdinfo->board_rev == 0x01) {
+		case 0x01:
+			// Revision 1 with invensense gyros, start the ADC
+			PIOS_ADC_Init();
+			break;
+		case 0x02:
+			// Revision 2 with L3GD20 gyros, start a SPI interface and connect to it
+
+			/* Set up the SPI interface to the serial flash */
+			if (PIOS_SPI_Init(&pios_spi_gyro_id, &pios_spi_gyro_cfg)) {
+				PIOS_Assert(0);
+			}
+
+			PIOS_L3GD20_Attach(pios_spi_gyro_id);
+			PIOS_L3GD20_Init(&pios_l3gd20_cfg);
+			break;
+		default:
+			PIOS_Assert(0);
+	}
 	
-	PIOS_ADC_Init();
 	PIOS_GPIO_Init();
 
 	/* Make sure we have at least one telemetry link configured or else fail initialization */

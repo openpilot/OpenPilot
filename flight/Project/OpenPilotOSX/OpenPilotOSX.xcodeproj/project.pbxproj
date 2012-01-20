@@ -2935,6 +2935,7 @@
 		65EA2E171273C55200636061 /* ratedesired.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ratedesired.xml; sourceTree = "<group>"; };
 		65F5FB9914C9FAC500261DE0 /* pios_l3gd20.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_l3gd20.h; sourceTree = "<group>"; };
 		65F5FB9A14C9FB2C00261DE0 /* pios_l3gd20.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_l3gd20.c; sourceTree = "<group>"; };
+		65F5FBAB14CA08FD00261DE0 /* pios_board_info.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_board_info.h; sourceTree = "<group>"; };
 		65F93C3912EE09280047DB36 /* aes.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = aes.c; sourceTree = "<group>"; };
 		65F93C3B12EE09280047DB36 /* aes.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = aes.lst; sourceTree = "<group>"; };
 		65F93C3C12EE09280047DB36 /* aes.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = aes.o; sourceTree = "<group>"; };
@@ -7711,6 +7712,7 @@
 		65E8F03811EFF25C00BBF654 /* inc */ = {
 			isa = PBXGroup;
 			children = (
+				65F5FBAB14CA08FD00261DE0 /* pios_board_info.h */,
 				6528CCE212E40F6700CF5144 /* pios_adxl345.h */,
 				65E8C745139A6D1A00E1F979 /* pios_crc.h */,
 				65E8F03A11EFF25C00BBF654 /* pios_adc.h */,

@@ -31,6 +31,7 @@
 
 /* Project Includes */
 #include "pios.h"
+#include <fifo_buffer.h>
 
 #if defined(PIOS_INCLUDE_L3GD20)
 
@@ -64,15 +65,13 @@ void PIOS_L3GD20_Init(const struct pios_l3gd20_cfg * new_cfg)
 	fifoBuf_init(&pios_l3gd20_fifo, (uint8_t *) pios_l3gd20_buffer, sizeof(pios_l3gd20_buffer));
 
 	/* Configure the MPU6050 Sensor */
-	PIOS_SPI_SetPrescalar(pios_spi_gyro, SPI_BaudRatePrescaler_256);
 	PIOS_L3GD20_Config(cfg);
-	PIOS_SPI_SetPrescalar(pios_spi_gyro, SPI_BaudRatePrescaler_16);
 
 	/* Configure EOC pin as input floating */
 	GPIO_Init(cfg->drdy.gpio, &cfg->drdy.init);
 	
 	/* Configure the End Of Conversion (EOC) interrupt */
-	SYSCFG_EXTILineConfig(cfg->eoc_exti.port_source, cfg->eoc_exti.pin_source);
+	GPIO_EXTILineConfig(cfg->eoc_exti.port_source, cfg->eoc_exti.pin_source);
 	EXTI_Init(&cfg->eoc_exti.init);
 	
 	/* Enable and set EOC EXTI Interrupt to the lowest priority */
@@ -121,7 +120,7 @@ int32_t PIOS_L3GD20_ClaimBus()
 {
 	if(PIOS_SPI_ClaimBus(pios_spi_gyro) != 0)
 		return -1;
-	PIOS_SPI_RC_PinSet(pios_spi_gyro,0,0);
+	PIOS_SPI_RC_PinSet(pios_spi_gyro,0);
 	return 0;
 }
 
@@ -131,7 +130,7 @@ int32_t PIOS_L3GD20_ClaimBus()
  */
 int32_t PIOS_L3GD20_ReleaseBus()
 {
-	PIOS_SPI_RC_PinSet(pios_spi_gyro,0,1);
+	PIOS_SPI_RC_PinSet(pios_spi_gyro,1);
 	return PIOS_SPI_ReleaseBus(pios_spi_gyro);
 }
 
@@ -287,30 +286,6 @@ uint8_t PIOS_L3GD20_Test(void)
 }
 
 /**
- * @brief Run self-test operation.
- * \return 0 if test succeeded
- * \return non-zero value if test succeeded
- */
-static int32_t PIOS_L3GD20_FifoDepth(void)
-{
-/*	uint8_t l3gd20_send_buf[3] = {PIOS_L3GD20_FIFO_CNT_MSB | 0x80, 0, 0};
-	uint8_t l3gd20_rec_buf[3];
-
-	if(PIOS_L3GD20_ClaimBus() != 0)
-		return -1;
-
-	if(PIOS_SPI_TransferBlock(pios_spi_gyro, &l3gd20_send_buf[0], &l3gd20_rec_buf[0], sizeof(l3gd20_send_buf), NULL) < 0) {
-		PIOS_L3GD20_ReleaseBus();
-		return -1;
-	}
-
-	PIOS_L3GD20_ReleaseBus();
-	
-	return (l3gd20_rec_buf[1] << 8) | l3gd20_rec_buf[2];*/
-	return 0;
-}
-
-/**
 * @brief IRQ Handler.  Read all the data from onboard buffer
 */
 int32_t l3gd20_count;
@@ -333,6 +308,15 @@ void PIOS_L3GD20_IRQHandler(void)
 	l3gd20_irq++;
 	
 }
+
+void EXTI4_IRQHandler(void)
+{
+	if (EXTI_GetITStatus(PIOS_USB_DETECT_EXTI_LINE) != RESET) {
+		/* Clear the EXTI line pending bit */
+		EXTI_ClearITPendingBit(PIOS_USB_DETECT_EXTI_LINE);
+	}
+}
+
 
 #endif /* L3GD20 */
 

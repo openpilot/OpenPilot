@@ -2933,6 +2933,8 @@
 		65E8F0EE11EFF25C00BBF654 /* startup_stm32f10x_HD.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = startup_stm32f10x_HD.S; path = ../../PiOS/STM32F10x/startup_stm32f10x_HD.S; sourceTree = SOURCE_ROOT; };
 		65E8F0F111EFF25C00BBF654 /* startup_stm32f10x_MD.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = startup_stm32f10x_MD.S; path = ../../PiOS/STM32F10x/startup_stm32f10x_MD.S; sourceTree = SOURCE_ROOT; };
 		65EA2E171273C55200636061 /* ratedesired.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ratedesired.xml; sourceTree = "<group>"; };
+		65F5FB9914C9FAC500261DE0 /* pios_l3gd20.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_l3gd20.h; sourceTree = "<group>"; };
+		65F5FB9A14C9FB2C00261DE0 /* pios_l3gd20.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_l3gd20.c; sourceTree = "<group>"; };
 		65F93C3912EE09280047DB36 /* aes.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = aes.c; sourceTree = "<group>"; };
 		65F93C3B12EE09280047DB36 /* aes.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = aes.lst; sourceTree = "<group>"; };
 		65F93C3C12EE09280047DB36 /* aes.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = aes.o; sourceTree = "<group>"; };
@@ -7726,6 +7728,7 @@
 				65E8F04311EFF25C00BBF654 /* pios_i2c.h */,
 				6526645A122DF972006F9A3C /* pios_i2c_priv.h */,
 				65E8F04411EFF25C00BBF654 /* pios_irq.h */,
+				65F5FB9914C9FAC500261DE0 /* pios_l3gd20.h */,
 				65E8F04511EFF25C00BBF654 /* pios_led.h */,
 				65E8F04611EFF25C00BBF654 /* pios_opahrs.h */,
 				65E8F04711EFF25C00BBF654 /* pios_opahrs_proto.h */,
@@ -7778,6 +7781,7 @@
 				65E8F0E011EFF25C00BBF654 /* pios_gpio.c */,
 				65E8F0E111EFF25C00BBF654 /* pios_i2c.c */,
 				65E8F0E211EFF25C00BBF654 /* pios_irq.c */,
+				65F5FB9A14C9FB2C00261DE0 /* pios_l3gd20.c */,
 				65E8F0E311EFF25C00BBF654 /* pios_led.c */,
 				65E8F0E411EFF25C00BBF654 /* pios_ppm.c */,
 				65E8F0E511EFF25C00BBF654 /* pios_pwm.c */,

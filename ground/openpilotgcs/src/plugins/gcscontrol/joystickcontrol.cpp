@@ -7,7 +7,7 @@
  * @{
  * @addtogroup GCSControlGadgetPlugin GCSControl Gadget Plugin
  * @{
- * @brief A that mimics a transmitter joystick and updates the MCC
+ * @brief The plugin that mimics a transmitter joystick and updates the MCC
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -28,30 +28,24 @@
 #include "joystickcontrol.h"
 #include "extensionsystem/pluginmanager.h"
 #include <QDebug>
-#include <QStringList>
 #include <QtGui/QWidget>
-#include <QtGui/QTextEdit>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QPushButton>
-#include <QtGui/QMessageBox>
-#include <QMouseEvent>
 #include <QtOpenGL/QGLWidget>
-#include <QtGlobal>
+#include <QMouseEvent>
 
 /**
   * @brief Constructor for JoystickControl widget.  Sets up the image of a joystick
   */
-JoystickControl::JoystickControl(QWidget *parent) :
-    QGraphicsView(parent)
+JoystickControl::JoystickControl(QWidget *parent) : QGraphicsView(parent)
 {
-    setMinimumSize(64,64);
+    setMinimumSize(64, 64);
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     setScene(new QGraphicsScene(this));
     setRenderHints(QPainter::Antialiasing);
 
     m_renderer = new QSvgRenderer();
     bool test = m_renderer->load(QString(":/gcscontrol/images/joystick.svg"));
-    Q_ASSERT( test );
+    Q_UNUSED(test);
+    Q_ASSERT(test);
 
     m_background = new QGraphicsSvgItem();
     m_background->setSharedRenderer(m_renderer);
@@ -82,18 +76,18 @@ JoystickControl::JoystickControl(QWidget *parent) :
 
 JoystickControl::~JoystickControl()
 {
-
+    // Do nothing
 }
 
-/*!
-  \brief Enables/Disables OpenGL
+/**
+  * @brief Enables/Disables OpenGL
   */
 void JoystickControl::enableOpenGL(bool flag)
 {
-	if (flag)
-		setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
-	else
-		setViewport(new QWidget);
+    if (flag)
+        setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
+    else
+        setViewport(new QWidget);
 }
 
 /**
@@ -103,8 +97,8 @@ void JoystickControl::changePosition(double x, double y)
 {
     QRectF areaSize = m_joystickArea->boundingRect();
     QPointF point(
-        ((1 + x) * areaSize.width() - m_joystickEnd->boundingRect().width()) * 0.5,
-        ((1 - y) * areaSize.height() - m_joystickEnd->boundingRect().height()) * 0.5
+        ((1.0 + x) * areaSize.width() - m_joystickEnd->boundingRect().width()) * 0.5,
+        ((1.0 - y) * areaSize.height() - m_joystickEnd->boundingRect().height()) * 0.5
     );
     m_joystickEnd->setPos(m_joystickArea->mapToScene(point));
 }
@@ -117,14 +111,14 @@ void JoystickControl::mouseMoveEvent(QMouseEvent *event)
     QPointF point = m_joystickArea->mapFromScene(mapToScene(event->pos()));
     QSizeF areaSize = m_joystickArea->boundingRect().size();
 
-    double Y = - (point.y() / areaSize.height() - .5) * 2;
-    double X = (point.x() / areaSize.width() - .5) * 2;
-    if (Y<-1) Y = -1;
-    if (Y> 1) Y =  1;
-    if (X<-1) X = -1;
-    if (X> 1) X =  1;
+    double y = - (point.y() / areaSize.height() - 0.5) * 2.0;
+    double x = (point.x() / areaSize.width() - 0.5) * 2.0;
+    if (y < -1.0) y = -1.0;
+    if (y >  1.0) y =  1.0;
+    if (x < -1.0) x = -1.0;
+    if (x >  1.0) x =  1.0;
 
-    emit positionClicked(X, Y);
+    emit positionClicked(x, y);
 }
 
 /**
@@ -132,11 +126,10 @@ void JoystickControl::mouseMoveEvent(QMouseEvent *event)
   */
 void JoystickControl::mousePressEvent(QMouseEvent *event)
 {
-    if( event->button() == Qt::LeftButton ) {
+    if (event->button() == Qt::LeftButton) {
         mouseMoveEvent(event);
     }
 }
-
 
 void JoystickControl::paint()
 {
@@ -145,9 +138,9 @@ void JoystickControl::paint()
 
 void JoystickControl::paintEvent(QPaintEvent *event)
 {
-    // Skip painting until the dial file is loaded
-    if (! m_renderer->isValid()) {
-        qDebug()<<"Image file not loaded, not rendering";
+    // Skip painting until the image file is loaded
+    if (!m_renderer->isValid()) {
+        qDebug() << "Image file not loaded, not rendering";
     }
 
     QGraphicsView::paintEvent(event);
@@ -158,7 +151,6 @@ void JoystickControl::resizeEvent(QResizeEvent *event)
     Q_UNUSED(event);
     fitInView(m_background, Qt::IgnoreAspectRatio );
 }
-
 
 /**
   * @}

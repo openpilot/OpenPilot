@@ -79,14 +79,17 @@ void EXTI9_5_IRQHandler(void)
 }
 
 /**
-* Handle external line 4 interrupt requests
+* Handle external line 3 interrupt requests
 */
-#if defined(PIOS_INCLUDE_USB)
-void EXTI4_IRQHandler(void)
+#if defined(PIOS_INCLUDE_L3GD20)
+extern void PIOS_L3GD20_IRQHandler();
+
+void EXTI3_IRQHandler(void)
 {
-	if (EXTI_GetITStatus(PIOS_USB_DETECT_EXTI_LINE) != RESET) {
+	if (EXTI_GetITStatus(EXTI_Line3) != RESET) {
+		PIOS_L3GD20_IRQHandler();
 		/* Clear the EXTI line pending bit */
-		EXTI_ClearITPendingBit(PIOS_USB_DETECT_EXTI_LINE);
+		EXTI_ClearITPendingBit(EXTI_Line3);
 	}
 }
 #endif

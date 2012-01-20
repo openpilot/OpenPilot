@@ -309,14 +309,6 @@ void PIOS_L3GD20_IRQHandler(void)
 	
 }
 
-void EXTI4_IRQHandler(void)
-{
-	if (EXTI_GetITStatus(PIOS_USB_DETECT_EXTI_LINE) != RESET) {
-		/* Clear the EXTI line pending bit */
-		EXTI_ClearITPendingBit(PIOS_USB_DETECT_EXTI_LINE);
-	}
-}
-
 
 #endif /* L3GD20 */
 

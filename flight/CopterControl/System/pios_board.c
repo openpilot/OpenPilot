@@ -1146,6 +1146,8 @@ static const struct pios_l3gd20_cfg pios_l3gd20_cfg = {
 		},
 	},
 	.eoc_exti = {
+		.pin_source = GPIO_PinSource3,
+		.port_source = GPIO_PortSourceGPIOA,
 		.init = {
 			.EXTI_Line = EXTI_Line3, // matches above GPIO pin
 			.EXTI_Mode = EXTI_Mode_Interrupt,

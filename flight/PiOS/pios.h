@@ -121,6 +121,10 @@
 #include <pios_adxl345.h>
 #endif
 
+#if defined(PIOS_INCLUDE_L3GD20)
+#include <pios_l3gd20.h>
+#endif
+
 #if defined(PIOS_INCLUDE_BMA180)
 #include <pios_bma180.h>
 #endif

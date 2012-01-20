@@ -390,8 +390,10 @@ const static uint8_t pios_bma180_req_buf[7] = {BMA_X_LSB_ADDR | 0x80,0,0,0,0,0};
 static void PIOS_BMA180_IRQHandler(void)
 {
 	// If we can't get the bus then just move on for efficiency
-	if(PIOS_BMA180_ClaimBus() == 0)
-		PIOS_SPI_TransferBlock(PIOS_SPI_ACCEL,pios_bma180_req_buf,(uint8_t *) pios_bma180_dmabuf, 
+	if(PIOS_BMA180_ClaimBus() != 0)
+		return; // Something else is using bus, miss this data
+		
+	PIOS_SPI_TransferBlock(PIOS_SPI_ACCEL,pios_bma180_req_buf,(uint8_t *) pios_bma180_dmabuf, 
 							   sizeof(pios_bma180_dmabuf), NULL);	
 	PIOS_BMA180_SPI_Callback();
 }

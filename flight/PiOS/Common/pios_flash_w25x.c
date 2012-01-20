@@ -1,12 +1,32 @@
-/*
- *  pios_flash_w25x.c
- *  OpenPilotOSX
+/**
+ ******************************************************************************
  *
- *  Created by James Cotton on 1/23/11.
- *  Copyright 2011 OpenPilot. All rights reserved.
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup PIOS_FLASH Flash device handler
+ * @{
  *
+ * @file       pios_flash_w25x.c
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @brief      Driver for talking to W25X flash chip (and most JEDEC chips)
+ * @see        The GNU Public License (GPL) Version 3
+ *
+ *****************************************************************************/
+/* 
+ * This program is free software; you can redistribute it and/or modify 
+ * it under the terms of the GNU General Public License as published by 
+ * the Free Software Foundation; either version 3 of the License, or 
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but 
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ * for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along 
+ * with this program; if not, write to the Free Software Foundation, Inc., 
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 #include "pios.h"
 #include "pios_flash_w25x.h"
 #include "pios_adxl345.h"
@@ -33,52 +53,106 @@
 
 static uint8_t device_type;
 
-//! Private functions
-static int8_t PIOS_Flash_W25X_ClaimBus();
-static void PIOS_Flash_W25X_ReleaseBus();
-static uint8_t PIOS_Flash_W25X_WriteEnable();
-static uint8_t PIOS_Flash_W25X_Busy() ;
+enum pios_w25x_dev_magic {
+	PIOS_W25X_DEV_MAGIC = 0xcb55aa55,
+};
 
-static uint32_t PIOS_SPI_FLASH;
+//! Device handle structure
+struct w25x_flash_dev {
+	uint32_t spi_id;
+	uint32_t slave_num;
+	enum pios_w25x_dev_magic magic;
+};
+
+//! Global structure for this flash device
+struct w25x_flash_dev * flash_dev;
+
+//! Private functions
+static int32_t PIOS_Flash_W25X_Validate(struct w25x_flash_dev * dev);
+static struct w25x_flash_dev * PIOS_Flash_W25X_alloc(void);
+static int32_t PIOS_Flash_W25X_ClaimBus();
+static int32_t PIOS_Flash_W25X_ReleaseBus();
+static int32_t PIOS_Flash_W25X_WriteEnable();
+static int32_t PIOS_Flash_W25X_Busy() ;
+
+
+/**
+ * @brief Allocate a new device
+ */
+static struct w25x_flash_dev * PIOS_Flash_W25X_alloc(void)
+{
+	struct w25x_flash_dev * w25x_dev;
+	
+	w25x_dev = (struct w25x_flash_dev *)pvPortMalloc(sizeof(*w25x_dev));
+	if (!w25x_dev) return (NULL);
+	
+	w25x_dev->magic = PIOS_W25X_DEV_MAGIC;
+	return(w25x_dev);
+}
+
+/**
+ * @brief Validate the handle to the spi device
+ */
+static int32_t PIOS_Flash_W25X_Validate(struct w25x_flash_dev * dev) {
+	if (dev == NULL) 
+		return -1;
+	if (dev->magic != PIOS_W25X_DEV_MAGIC)
+		return -2;
+	if (dev->spi_id == 0)
+		return -3;
+	return 0;
+}
 
 /**
  * @brief Claim the SPI bus for flash use and assert CS pin
  * @return 0 for sucess, -1 for failure to get semaphore
  */
-static int8_t PIOS_Flash_W25X_ClaimBus()
+static int32_t PIOS_Flash_W25X_ClaimBus()
 {
-	int8_t ret = PIOS_SPI_ClaimBus(PIOS_SPI_FLASH);
-	PIOS_FLASH_ENABLE;
+	if(PIOS_Flash_W25X_Validate(flash_dev) != 0)
+		return -1;
+
+	int8_t ret = PIOS_SPI_ClaimBus(flash_dev->spi_id);
+	PIOS_SPI_RC_PinSet(flash_dev->spi_id, flash_dev->slave_num, 0);
 	return (ret == 0) ? 0 : -1;
 }
 
 /**
  * @brief Release the SPI bus sempahore and ensure flash chip not using bus
  */
-static void PIOS_Flash_W25X_ReleaseBus()
+static int32_t PIOS_Flash_W25X_ReleaseBus()
 {
-	PIOS_FLASH_DISABLE;
-	PIOS_SPI_ReleaseBus(PIOS_SPI_FLASH);
+	if(PIOS_Flash_W25X_Validate(flash_dev) != 0)
+		return -1;
+	PIOS_SPI_RC_PinSet(flash_dev->spi_id, flash_dev->slave_num, 1);
+	PIOS_SPI_ReleaseBus(flash_dev->spi_id);
 }
 
 /**
  * @brief Returns if the flash chip is busy
+ * @returns -1 for failure, 0 for not busy, 1 for busy
  */
-static uint8_t PIOS_Flash_W25X_Busy()
+static int32_t PIOS_Flash_W25X_Busy()
 {
-	return PIOS_Flash_W25X_ReadStatus() & W25X_STATUS_BUSY;
+	int32_t status = PIOS_Flash_W25X_ReadStatus();
+	if (status < 0)
+		return -1;
+	return status & W25X_STATUS_BUSY;
 }
 
 /**
  * @brief Execute the write enable instruction and returns the status
  * @returns 0 if successful, -1 if unable to claim bus
  */
-static uint8_t PIOS_Flash_W25X_WriteEnable()
+static int32_t PIOS_Flash_W25X_WriteEnable()
 {
+	if(PIOS_Flash_W25X_Validate(flash_dev) != 0)
+		return -1;
+
 	uint8_t out[] = {W25X_WRITE_ENABLE};
 	if(PIOS_Flash_W25X_ClaimBus() != 0)
 		return -1;
-	PIOS_SPI_TransferBlock(PIOS_SPI_FLASH,out,NULL,sizeof(out),NULL);
+	PIOS_SPI_TransferBlock(flash_dev->spi_id,out,NULL,sizeof(out),NULL);
 	PIOS_Flash_W25X_ReleaseBus();
 	return 0;
 }
@@ -86,13 +160,15 @@ static uint8_t PIOS_Flash_W25X_WriteEnable()
 /**
  * @brief Initialize the flash device and enable write access
  */
-int8_t PIOS_Flash_W25X_Init(uint32_t spi_id)
+int32_t PIOS_Flash_W25X_Init(uint32_t spi_id, uint32_t slave_num)
 {
-	PIOS_SPI_FLASH = spi_id;
+	flash_dev = PIOS_Flash_W25X_alloc();
+	if(flash_dev == NULL)
+		return -1;
+	
+	flash_dev->spi_id = spi_id;
+	flash_dev->slave_num = slave_num;
 
-#if defined(PIOS_FLASH_CS_PIN)
-	PIOS_GPIO_Enable(PIOS_FLASH_CS_PIN);
-#endif
 	device_type = PIOS_Flash_W25X_ReadID();
 	return 0;
 }
@@ -101,12 +177,21 @@ int8_t PIOS_Flash_W25X_Init(uint32_t spi_id)
 /**
  * @brief Read the status register from flash chip and return it
  */
-uint8_t PIOS_Flash_W25X_ReadStatus()
+int32_t PIOS_Flash_W25X_ReadStatus()
 {
+	if(PIOS_Flash_W25X_Validate(flash_dev) != 0)
+		return -1;
+
 	uint8_t out[2] = {W25X_READ_STATUS, 0};
 	uint8_t in[2] = {0,0};
-	PIOS_Flash_W25X_ClaimBus();
-	PIOS_SPI_TransferBlock(PIOS_SPI_FLASH,out,in,sizeof(out),NULL);
+	if(PIOS_Flash_W25X_ClaimBus() < 0)
+		return -1;
+		
+	if(PIOS_SPI_TransferBlock(flash_dev->spi_id,out,in,sizeof(out),NULL) < 0) {
+		PIOS_Flash_W25X_ReleaseBus();
+		return -2;
+	}
+	
 	PIOS_Flash_W25X_ReleaseBus();
 	return in[1];
 }
@@ -114,12 +199,20 @@ uint8_t PIOS_Flash_W25X_ReadStatus()
 /**
  * @brief Read the status register from flash chip and return it
  */
-uint8_t PIOS_Flash_W25X_ReadID()
+int32_t PIOS_Flash_W25X_ReadID()
 {
+	if(PIOS_Flash_W25X_Validate(flash_dev) != 0)
+		return -1;
+
 	uint8_t out[] = {W25X_DEVICE_ID, 0, 0, 0, 0, 0};
 	uint8_t in[6];
-	PIOS_Flash_W25X_ClaimBus();
-	PIOS_SPI_TransferBlock(PIOS_SPI_FLASH,out,in,sizeof(out),NULL);
+	if (PIOS_Flash_W25X_ClaimBus() < 0) 
+		return -1;
+	
+	if(PIOS_SPI_TransferBlock(flash_dev->spi_id,out,in,sizeof(out),NULL) < 0) {
+		PIOS_Flash_W25X_ReleaseBus();
+		return -2;
+	}
 	PIOS_Flash_W25X_ReleaseBus();
 	return in[5];
 }
@@ -131,8 +224,11 @@ uint8_t PIOS_Flash_W25X_ReadID()
  * @retval -1 if unable to claim bus
  * @retval
  */
-int8_t PIOS_Flash_W25X_EraseSector(uint32_t addr)
+int32_t PIOS_Flash_W25X_EraseSector(uint32_t addr)
 {
+	if(PIOS_Flash_W25X_Validate(flash_dev) != 0)
+		return -1;
+
 	uint8_t ret;
 	uint8_t out[] = {W25X_SECTOR_ERASE, (addr >> 16) & 0xff, (addr >> 8) & 0xff , addr & 0xff};
 
@@ -141,10 +237,16 @@ int8_t PIOS_Flash_W25X_EraseSector(uint32_t addr)
 
 	if(PIOS_Flash_W25X_ClaimBus() != 0)
 		return -1;
-	PIOS_SPI_TransferBlock(PIOS_SPI_FLASH,out,NULL,sizeof(out),NULL);
+	
+	if(PIOS_SPI_TransferBlock(flash_dev->spi_id,out,NULL,sizeof(out),NULL) < 0) {
+		PIOS_Flash_W25X_ReleaseBus();
+		return -2;
+	}
+	
 	PIOS_Flash_W25X_ReleaseBus();
 
-	while(PIOS_Flash_W25X_Busy()) {
+	// Keep polling when bus is busy too
+	while(PIOS_Flash_W25X_Busy() != 0) {
 	}
 
 	return 0;
@@ -154,8 +256,11 @@ int8_t PIOS_Flash_W25X_EraseSector(uint32_t addr)
  * @brief Execute the whole chip
  * @returns 0 if successful, -1 if unable to claim bus
  */
-int8_t PIOS_Flash_W25X_EraseChip()
+int32_t PIOS_Flash_W25X_EraseChip()
 {
+	if(PIOS_Flash_W25X_Validate(flash_dev) != 0)
+		return -1;
+
 	uint8_t ret;
 	uint8_t out[] = {W25X_CHIP_ERASE};
 
@@ -164,10 +269,16 @@ int8_t PIOS_Flash_W25X_EraseChip()
 
 	if(PIOS_Flash_W25X_ClaimBus() != 0)
 		return -1;
-	PIOS_SPI_TransferBlock(PIOS_SPI_FLASH,out,NULL,sizeof(out),NULL);
+	
+	if(PIOS_SPI_TransferBlock(flash_dev->spi_id,out,NULL,sizeof(out),NULL) < 0) {
+		PIOS_Flash_W25X_ReleaseBus();
+		return -2;
+	}
+	
 	PIOS_Flash_W25X_ReleaseBus();
 
-	while(PIOS_Flash_W25X_Busy()) {
+	// Keep polling when bus is busy too
+	while(PIOS_Flash_W25X_Busy() != 0) {
 	}
 
 	return 0;
@@ -184,8 +295,11 @@ int8_t PIOS_Flash_W25X_EraseChip()
  * @retval -2 Size exceeds 256 bytes
  * @retval -3 Length to write would wrap around page boundary
  */
-int8_t PIOS_Flash_W25X_WriteData(uint32_t addr, uint8_t * data, uint16_t len)
+int32_t PIOS_Flash_W25X_WriteData(uint32_t addr, uint8_t * data, uint16_t len)
 {
+	if(PIOS_Flash_W25X_Validate(flash_dev) != 0)
+		return -1;
+
 	uint8_t ret;
 	uint8_t out[4] = {W25X_PAGE_WRITE, (addr >> 16) & 0xff, (addr >> 8) & 0xff , addr & 0xff};
 
@@ -203,14 +317,22 @@ int8_t PIOS_Flash_W25X_WriteData(uint32_t addr, uint8_t * data, uint16_t len)
 	/* Execute write page command and clock in address.  Keep CS asserted */
 	if(PIOS_Flash_W25X_ClaimBus() != 0)
 		return -1;
-	PIOS_SPI_TransferBlock(PIOS_SPI_FLASH,out,NULL,sizeof(out),NULL);
+	
+	if(PIOS_SPI_TransferBlock(flash_dev->spi_id,out,NULL,sizeof(out),NULL) < 0) {
+		PIOS_Flash_W25X_ReleaseBus();
+		return -1;
+	}
 
 	/* Clock out data to flash */
-	PIOS_SPI_TransferBlock(PIOS_SPI_FLASH,data,NULL,len,NULL);
+	if(PIOS_SPI_TransferBlock(flash_dev->spi_id,data,NULL,len,NULL) < 0) {
+		PIOS_Flash_W25X_ReleaseBus();
+		return -1;
+	}
 
 	PIOS_Flash_W25X_ReleaseBus();
 
-	while(PIOS_Flash_W25X_Busy()) {
+	// Keep polling while bus is busy too
+	while(PIOS_Flash_W25X_Busy() != 0) {
 	}
 
 	return 0;
@@ -224,17 +346,27 @@ int8_t PIOS_Flash_W25X_WriteData(uint32_t addr, uint8_t * data, uint16_t len)
  * @return Zero if success or error code
  * @retval -1 Unable to claim SPI bus
  */
-int8_t PIOS_Flash_W25X_ReadData(uint32_t addr, uint8_t * data, uint16_t len)
+int32_t PIOS_Flash_W25X_ReadData(uint32_t addr, uint8_t * data, uint16_t len)
 {
+	if(PIOS_Flash_W25X_Validate(flash_dev) != 0)
+		return -1;
+
 	if(PIOS_Flash_W25X_ClaimBus() == -1)
 		return -1;
 
 	/* Execute read command and clock in address.  Keep CS asserted */
 	uint8_t out[] = {W25X_READ_DATA, (addr >> 16) & 0xff, (addr >> 8) & 0xff , addr & 0xff};
-	PIOS_SPI_TransferBlock(PIOS_SPI_FLASH,out,NULL,sizeof(out),NULL);
+	
+	if(PIOS_SPI_TransferBlock(flash_dev->spi_id,out,NULL,sizeof(out),NULL) < 0) {
+		PIOS_Flash_W25X_ReleaseBus();
+		return -2;
+	}
 
 	/* Copy the transfer data to the buffer */
-	PIOS_SPI_TransferBlock(PIOS_SPI_FLASH,NULL,data,len,NULL);
+	if(PIOS_SPI_TransferBlock(flash_dev->spi_id,NULL,data,len,NULL) < 0) {
+		PIOS_Flash_W25X_ReleaseBus();
+		return -3;
+	}
 
 	PIOS_Flash_W25X_ReleaseBus();
 

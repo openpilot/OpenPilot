@@ -29,13 +29,15 @@
 
 #include <pios.h>
 
-#if defined(PIOS_INCLUDE_SPI)
-
 #include <openpilot.h>
 #include <pios_spi_priv.h>
 #include <uavobjectsinit.h>
 #include <hwsettings.h>
 #include "manualcontrolsettings.h"
+
+#if defined(PIOS_INCLUDE_SPI)
+
+#define PIOS_FLASH_ON_ACCEL
 
 /* SPI1 Interface
  *    - Used for BMA180 accelerometer
@@ -136,7 +138,7 @@ static const struct pios_spi_cfg pios_spi_accel_cfg = {
 			.GPIO_PuPd = GPIO_PuPd_UP
 		},
 	},
-	.slave_count = 1,
+	.slave_count = 2,
 	.ssel = { {
 		.gpio = GPIOA,
 		.init = {
@@ -145,8 +147,17 @@ static const struct pios_spi_cfg pios_spi_accel_cfg = {
 			.GPIO_Mode  = GPIO_Mode_OUT,
 			.GPIO_OType = GPIO_OType_PP,
 			.GPIO_PuPd = GPIO_PuPd_UP
-		},
-	} },
+		} },
+		{
+		.gpio = GPIOC,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_5,
+			.GPIO_Speed = GPIO_Speed_50MHz,
+			.GPIO_Mode  = GPIO_Mode_OUT,
+			.GPIO_OType = GPIO_OType_PP,
+			.GPIO_PuPd = GPIO_PuPd_UP
+		} },
+	}
 };
 
 static uint32_t pios_spi_accel_id;
@@ -279,6 +290,7 @@ void PIOS_SPI_gyro_irq_handler(void)
 }
 
 
+#if !defined(PIOS_FLASH_ON_ACCEL)
 /* SPI3 Interface
  *      - Used for flash communications
  */
@@ -399,6 +411,7 @@ void PIOS_SPI_flash_irq_handler(void)
 	/* Call into the generic code to handle the IRQ for this specific device */
 	PIOS_SPI_IRQ_Handler(pios_spi_flash_id);
 }
+#endif /* PIOS_FLASH_ON_ACCEL */
 #endif /* PIOS_INCLUDE_SPI */
 
 
@@ -1544,11 +1557,24 @@ void PIOS_Board_Init(void) {
 #endif	/* PIOS_DEBUG_ENABLE_DEBUG_PINS */
 	
 	
+	/* Set up the SPI interface to the accelerometer*/
+	if (PIOS_SPI_Init(&pios_spi_accel_id, &pios_spi_accel_cfg)) {
+		PIOS_DEBUG_Assert(0);
+	}
+	
+	/* Set up the SPI interface to the gyro */
+	if (PIOS_SPI_Init(&pios_spi_gyro_id, &pios_spi_gyro_cfg)) {
+		PIOS_DEBUG_Assert(0);
+	}
+#if !defined(PIOS_FLASH_ON_ACCEL)
 	/* Set up the SPI interface to the flash */
 	if (PIOS_SPI_Init(&pios_spi_flash_id, &pios_spi_flash_cfg)) {
 		PIOS_DEBUG_Assert(0);
 	}
-	PIOS_Flash_W25X_Init(pios_spi_flash_id);
+	PIOS_Flash_W25X_Init(pios_spi_flash_id, 0);
+#else
+	PIOS_Flash_W25X_Init(pios_spi_accel_id, 1);
+#endif
 	PIOS_FLASHFS_Init();
 	
 	/* Initialize UAVObject libraries */
@@ -1689,15 +1715,6 @@ void PIOS_Board_Init(void) {
 	}
 
 	if (PIOS_I2C_Init(&pios_i2c_pressure_adapter_id, &pios_i2c_pressure_adapter_cfg)) {
-		PIOS_DEBUG_Assert(0);
-	}
-	/* Set up the SPI interface to the accelerometer*/
-	if (PIOS_SPI_Init(&pios_spi_accel_id, &pios_spi_accel_cfg)) {
-		PIOS_DEBUG_Assert(0);
-	}
-
-	/* Set up the SPI interface to the gyro */
-	if (PIOS_SPI_Init(&pios_spi_gyro_id, &pios_spi_gyro_cfg)) {
 		PIOS_DEBUG_Assert(0);
 	}
 	

@@ -73,7 +73,9 @@ int32_t PIOS_BMA180_Init(const struct pios_bma180_cfg * cfg)
 	if(PIOS_BMA180_Config() < 0)
 		return -1;
 	PIOS_DELAY_WaituS(50);
-	PIOS_BMA180_EnableIrq();
+	
+	while(PIOS_BMA180_EnableIrq() != 0);
+	
 	return 0;
 }
 
@@ -175,21 +177,14 @@ static int32_t PIOS_BMA180_Config()
 		
 	PIOS_DELAY_WaituS(20);
 	
-	if(PIOS_BMA180_EnableEeprom() < 0)
-		return -1;
-	if(PIOS_BMA180_SetReg(BMA_RESET, BMA_RESET_CODE) < 0)
-		return -1;
-	if(PIOS_BMA180_SetReg(BMA_OFFSET_LSB1, 0x81) < 0)
-		return -1;
-	if(PIOS_BMA180_SetReg(BMA_GAIN_Y, 0x81) < 0)
-		return -1;
-	if(PIOS_BMA180_SetReg(BMA_CTRREG3, 0xFF) < 0)
-		return -1;
-	PIOS_BMA180_SelectBW(BMA_BW_600HZ);
-	PIOS_BMA180_SetRange(BMA_RANGE_8G);
-	
-	if(PIOS_BMA180_DisableEeprom() < 0)
-		return -1;
+	while(PIOS_BMA180_EnableEeprom() != 0);
+	while(PIOS_BMA180_SetReg(BMA_RESET, BMA_RESET_CODE) != 0);
+	while(PIOS_BMA180_SetReg(BMA_OFFSET_LSB1, 0x81) != 0);
+	while(PIOS_BMA180_SetReg(BMA_GAIN_Y, 0x81) != 0);
+	while(PIOS_BMA180_SetReg(BMA_CTRREG3, 0xFF) != 0);
+	while(PIOS_BMA180_SelectBW(BMA_BW_600HZ) != 0);
+	while(PIOS_BMA180_SetRange(BMA_RANGE_8G) != 0);
+	while(PIOS_BMA180_DisableEeprom() != 0);
 
 	return 0;
 }
@@ -326,6 +321,8 @@ int32_t PIOS_BMA180_ReadFifo(struct pios_bma180_data * buffer)
  */
 int32_t PIOS_BMA180_Test()
 {
+	return 0;
+	
 	// Read chip ID then version ID
 	uint8_t buf[3] = {0x80 | BMA_CHIPID_ADDR, 0, 0};
 	uint8_t rec[3] = {0,0, 0};
@@ -390,8 +387,9 @@ const static uint8_t pios_bma180_req_buf[7] = {BMA_X_LSB_ADDR | 0x80,0,0,0,0,0};
 static void PIOS_BMA180_IRQHandler(void)
 {
 	// If we can't get the bus then just move on for efficiency
-	if(PIOS_BMA180_ClaimBus() != 0)
+	if(PIOS_BMA180_ClaimBus() != 0) {
 		return; // Something else is using bus, miss this data
+	}
 		
 	PIOS_SPI_TransferBlock(PIOS_SPI_ACCEL,pios_bma180_req_buf,(uint8_t *) pios_bma180_dmabuf, 
 							   sizeof(pios_bma180_dmabuf), NULL);	
@@ -404,9 +402,12 @@ static void PIOS_BMA180_IRQHandler(void)
  * Soon this will be generic in pios_exti and the BMA180 will register
  * against it
  */
+ 
+int32_t bma180_irq = 0;
 void EXTI4_IRQHandler(void)
 {
 	if (EXTI_GetITStatus(dev_cfg->eoc_exti.init.EXTI_Line) != RESET) {
+		bma180_irq++;
 		PIOS_BMA180_IRQHandler();
 		EXTI_ClearITPendingBit(dev_cfg->eoc_exti.init.EXTI_Line);
 	}

@@ -1562,6 +1562,9 @@ void PIOS_Board_Init(void) {
 		PIOS_DEBUG_Assert(0);
 	}
 	
+	PIOS_BMA180_Attach(pios_spi_accel_id);
+	PIOS_BMA180_Init(&pios_bma180_cfg);
+
 	/* Set up the SPI interface to the gyro */
 	if (PIOS_SPI_Init(&pios_spi_gyro_id, &pios_spi_gyro_cfg)) {
 		PIOS_DEBUG_Assert(0);
@@ -1732,8 +1735,6 @@ void PIOS_Board_Init(void) {
 	PIOS_Assert(0);
 #endif
 
-	PIOS_BMA180_Attach(pios_spi_accel_id);
-	PIOS_BMA180_Init(&pios_bma180_cfg);
 
 	PIOS_HMC5883_Init(&pios_hmc5883_cfg);
 	

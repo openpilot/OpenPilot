@@ -64,6 +64,7 @@ signals:
 private:
      QSvgRenderer *m_renderer;
      QGraphicsSvgItem *m_background;
+     QGraphicsSvgItem *m_joystickArea;
      QGraphicsSvgItem *m_joystickEnd;
  };
 

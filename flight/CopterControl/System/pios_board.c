@@ -1675,21 +1675,28 @@ void PIOS_Board_Init(void) {
 
 	const struct pios_board_info * bdinfo = &pios_board_info_blob;
 
-	switch(bdinfo->board_rev == 0x01) {
+	switch(bdinfo->board_rev) {
 		case 0x01:
 			// Revision 1 with invensense gyros, start the ADC
 			PIOS_ADC_Init();
 			break;
 		case 0x02:
-			// Revision 2 with L3GD20 gyros, start a SPI interface and connect to it
+			GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
 
-			/* Set up the SPI interface to the serial flash */
-			if (PIOS_SPI_Init(&pios_spi_gyro_id, &pios_spi_gyro_cfg)) {
-				PIOS_Assert(0);
+			if(0) {
+				PIOS_ADC_Init();
+			} else
+			{
+				// Revision 2 with L3GD20 gyros, start a SPI interface and connect to it
+				
+				// Set up the SPI interface to the serial flash 
+				if (PIOS_SPI_Init(&pios_spi_gyro_id, &pios_spi_gyro_cfg)) {
+					PIOS_Assert(0);
+				}
+				
+				PIOS_L3GD20_Attach(pios_spi_gyro_id);
+				PIOS_L3GD20_Init(&pios_l3gd20_cfg);
 			}
-
-			PIOS_L3GD20_Attach(pios_spi_gyro_id);
-			PIOS_L3GD20_Init(&pios_l3gd20_cfg);
 			break;
 		default:
 			PIOS_Assert(0);
@@ -1697,6 +1704,7 @@ void PIOS_Board_Init(void) {
 	
 	PIOS_GPIO_Init();
 
+	
 	/* Make sure we have at least one telemetry link configured or else fail initialization */
 	PIOS_Assert(pios_com_telem_rf_id || pios_com_telem_usb_id);
 }

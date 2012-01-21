@@ -248,6 +248,27 @@ int32_t PIOS_SPI_ClaimBus(uint32_t spi_id)
 }
 
 /**
+ * Claim the SPI bus semaphore from an ISR.  Has no timeout.
+ * \param[in] spi SPI number (0 or 1)
+ * \return 0 if no error
+ * \return -1 if timeout before claiming semaphore
+ */
+int32_t PIOS_SPI_ClaimBusISR(uint32_t spi_id)
+{
+#if defined(PIOS_INCLUDE_FREERTOS)
+	struct pios_spi_dev * spi_dev = (struct pios_spi_dev *)spi_id;
+	
+	bool valid = PIOS_SPI_validate(spi_dev);
+	PIOS_Assert(valid)
+	
+	if (xQueueGenericReceive(( xQueueHandle ) spi_dev->busy, NULL, 0x0000 , pdFALSE ) != pdTRUE)
+		return -1;
+#endif
+	return 0;
+}
+
+
+/**
  * Release the SPI bus semaphore.  Calling the SPI functions does not require this
  * \param[in] spi SPI number (0 or 1)
  * \return 0 if no error

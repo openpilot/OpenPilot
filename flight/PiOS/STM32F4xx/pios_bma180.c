@@ -85,8 +85,22 @@ int32_t PIOS_BMA180_Init(const struct pios_bma180_cfg * cfg)
  */
 int32_t PIOS_BMA180_ClaimBus()
 {
-	if(PIOS_SPI_ClaimBus(PIOS_SPI_ACCEL) != 0)
+	if(PIOS_SPI_ClaimBus(PIOS_SPI_ACCEL) != 0) {
 		return -1;
+	}
+	PIOS_SPI_RC_PinSet(PIOS_SPI_ACCEL,0,0);
+	return 0;
+}
+
+/**
+ * @brief Claim the SPI bus for the accel communications and select this chip
+ * @return 0 if successful, -1 if unable to claim bus
+ */
+int32_t PIOS_BMA180_ClaimBusISR()
+{
+	if(PIOS_SPI_ClaimBusISR(PIOS_SPI_ACCEL) != 0) {
+		return -1;
+	}
 	PIOS_SPI_RC_PinSet(PIOS_SPI_ACCEL,0,0);
 	return 0;
 }
@@ -347,17 +361,25 @@ int32_t PIOS_BMA180_Test()
 	return 0;
 }
 
-static uint8_t pios_bma180_dmabuf[8];
 /**
- * @brief Take data from BMA180 read and parse it into structure
- * Leaving this function here in case I want to go back to using
- * callback but at higher speed this it is faster to just transfer
+ * @brief IRQ Handler.  Read data from the BMA180 FIFO and push onto a local fifo.
  */
-static inline void PIOS_BMA180_SPI_Callback() 
-{		
+static void PIOS_BMA180_IRQHandler(void)
+{
+	const static uint8_t pios_bma180_req_buf[7] = {BMA_X_LSB_ADDR | 0x80,0,0,0,0,0};
+	uint8_t pios_bma180_dmabuf[8];
+
+	// If we can't get the bus then just move on for efficiency
+	if(PIOS_BMA180_ClaimBusISR() != 0) {
+		return; // Something else is using bus, miss this data
+	}
+		
+	PIOS_SPI_TransferBlock(PIOS_SPI_ACCEL,pios_bma180_req_buf,(uint8_t *) pios_bma180_dmabuf, 
+							   sizeof(pios_bma180_dmabuf), NULL);
+
 	// TODO: Make this conversion depend on configuration scale
 	struct pios_bma180_data data;
-
+	
 	// Don't release bus till data has copied
 	PIOS_BMA180_ReleaseBus();	
 	
@@ -376,22 +398,7 @@ static inline void PIOS_BMA180_SPI_Callback()
 	data.temperature = pios_bma180_dmabuf[7];
 	
 	fifoBuf_putData(&pios_bma180_fifo, (uint8_t *) &data, sizeof(data));
-}
 
-/**
- * @brief IRQ Handler
- */
-const static uint8_t pios_bma180_req_buf[7] = {BMA_X_LSB_ADDR | 0x80,0,0,0,0,0};
-static void PIOS_BMA180_IRQHandler(void)
-{
-	// If we can't get the bus then just move on for efficiency
-	if(PIOS_BMA180_ClaimBus() != 0) {
-		return; // Something else is using bus, miss this data
-	}
-		
-	PIOS_SPI_TransferBlock(PIOS_SPI_ACCEL,pios_bma180_req_buf,(uint8_t *) pios_bma180_dmabuf, 
-							   sizeof(pios_bma180_dmabuf), NULL);	
-	PIOS_BMA180_SPI_Callback();
 }
 
 

@@ -117,7 +117,6 @@ SRC += ${OPMODULEDIR}/System/systemmod.c
 SRC += $(OPSYSTEM)/revolution.c
 SRC += $(OPSYSTEM)/pios_board.c
 SRC += $(OPSYSTEM)/alarms.c
-SRC += $(OPSYSTEM)/taskmonitor.c
 SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
 SRC += $(OPUAVOBJ)/eventdispatcher.c
@@ -131,6 +130,7 @@ SRC += $(FLIGHTLIB)/CoordinateConversions.c
 SRC += $(FLIGHTLIB)/fifo_buffer.c
 SRC += $(FLIGHTLIB)/WorldMagModel.c
 SRC += $(FLIGHTLIB)/insgps13state.c
+SRC += $(FLIGHTLIB)/taskmonitor.c
 
 ## PIOS Hardware (STM32F4xx)
 include $(PIOS)/STM32F4xx/library.mk

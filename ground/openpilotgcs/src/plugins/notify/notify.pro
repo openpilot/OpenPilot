@@ -10,15 +10,17 @@ QT        += phonon
 
 HEADERS += notifyplugin.h \  
     notifypluginoptionspage.h \
-    notifypluginconfiguration.h \
     notifyitemdelegate.h \
-    notifytablemodel.h
+    notifytablemodel.h \
+    notificationitem.h \
+    notifylogging.h
 
 SOURCES += notifyplugin.cpp \  
     notifypluginoptionspage.cpp \
-    notifypluginconfiguration.cpp \
     notifyitemdelegate.cpp \
-    notifytablemodel.cpp
+    notifytablemodel.cpp \
+    notificationitem.cpp \
+    notifylogging.cpp
  
 OTHER_FILES += NotifyPlugin.pluginspec
 
@@ -27,3 +29,5 @@ FORMS += \
 
 RESOURCES += \
     res.qrc
+
+

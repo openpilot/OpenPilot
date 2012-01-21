@@ -54,6 +54,7 @@ bool UAVObjectGeneratorMatlab::generate(UAVObjectParser* parser,QString template
     matlabCodeTemplate.replace( QString("$(CLEANUPCODE)"), matlabCleanupCode);
     matlabCodeTemplate.replace( QString("$(SAVEOBJECTSCODE)"), matlabSaveObjectsCode);
     matlabCodeTemplate.replace( QString("$(FUNCTIONSCODE)"), matlabFunctionsCode);
+    matlabCodeTemplate.replace( QString("$(EXPORTCSVCODE)"), matlabExportCsvCode);
 
     bool res = writeFile( matlabOutputPath.absolutePath() + "/OPLogConvert.m", matlabCodeTemplate );
     if (!res) {
@@ -78,7 +79,7 @@ bool UAVObjectGeneratorMatlab::process_object(ObjectInfo* info)
     QString objectTableName(objectName);
     QString tableIdxName(objectName.toLower() + "Idx");
     QString functionName("Read" + info->name + "Object");
-    QString functionCall(functionName + "(fid, timestamp)");
+    QString functionCall(functionName + "(fid, timestamp, ");
     QString objectID(QString().setNum(info->id));
     QString isSingleInst = boolTo01String( info->isSingleInst );
 
@@ -87,7 +88,7 @@ bool UAVObjectGeneratorMatlab::process_object(ObjectInfo* info)
     // Generate allocation code (will replace the $(ALLOCATIONCODE) tag) //
 	//===================================================================//
 	//    matlabSwitchCode.append("\t\tcase " + objectID + "\n");
-    matlabAllocationCode.append("\n\t" + tableIdxName + " = 1;\n");
+    matlabAllocationCode.append("\n\t" + tableIdxName + " = 0;\n");
 	QString type;
 	QString allocfields;
 	if (0){
@@ -97,7 +98,7 @@ bool UAVObjectGeneratorMatlab::process_object(ObjectInfo* info)
 			type = fieldTypeStrMatlab[info->fields[n]->type];
 			// Append field
 			if ( info->fields[n]->numElements > 1 )
-				allocfields.append("\t" + objectTableName + "(1)." + info->fields[n]->name + " = zeros(1," + QString::number(info->fields[n]->numElements, 10) + ");\n");
+				allocfields.append("\t" + objectTableName + "(1)." + info->fields[n]->name + " = zeros(" + QString::number(info->fields[n]->numElements, 10) + ",1);\n");
 			else
 				allocfields.append("\t" + objectTableName + "(1)." + info->fields[n]->name + " = 0;\n");
 		}
@@ -112,52 +113,64 @@ bool UAVObjectGeneratorMatlab::process_object(ObjectInfo* info)
 			type = fieldTypeStrMatlab[info->fields[n]->type];
 			// Append field
 			if ( info->fields[n]->numElements > 1 )
-				allocfields.append(",...\n\t\t '" + info->fields[n]->name + "', zeros(1," + QString::number(info->fields[n]->numElements, 10) + ")");
+				allocfields.append(",...\n\t\t '" + info->fields[n]->name + "', zeros(" + QString::number(info->fields[n]->numElements, 10) + ",1)");
 			else
 				allocfields.append(",...\n\t\t '" + info->fields[n]->name + "', 0");
 		}
 		allocfields.append(");\n");
-	}
+    }
     matlabAllocationCode.append(allocfields);
-	matlabAllocationCode.append("\t" + objectTableName.toUpper() + "_OBJID=" + objectID + ";\n");
+    matlabAllocationCode.append("\t" + objectTableName.toUpper() + "_OBJID=" + objectID + ";\n");
 
 
-	//=============================================================//
+    //==============================================================//
     // Generate 'Switch:' code (will replace the $(SWITCHCODE) tag) //
-	//=============================================================//
+    //==============================================================//
+	
+
+	
     matlabSwitchCode.append("\t\tcase " + objectTableName.toUpper() + "_OBJID\n");
-    matlabSwitchCode.append("\t\t\t" + objectTableName + "(" + tableIdxName +") = " + functionCall + ";\n");
-    matlabSwitchCode.append("\t\t\t" + tableIdxName + " = " + tableIdxName +" + 1;\n");
-    matlabSwitchCode.append("\t\t\tif " + tableIdxName + " > length(" + objectTableName +")\n");
-    matlabSwitchCode.append("\t\t\t\t" + objectTableName + "(" + tableIdxName + "*2+1) = " + objectTableName +"(end);\n");
-    matlabSwitchCode.append("\t\t\t\t" + objectTableName +"(end)=[];\n");
+//	matlabSwitchCode.append("\t\t\t" + objectTableName + "(" + tableIdxName +") = " + functionCall + ";\n");
+	matlabSwitchCode.append("\t\t\t" + tableIdxName + " = " + tableIdxName +" + 1;\n");
+	matlabSwitchCode.append("\t\t\t" + objectTableName + "= " + functionCall + objectTableName + ", " + tableIdxName + ");\n");
+    matlabSwitchCode.append("\t\t\tif " + tableIdxName + " >= length(" + objectTableName +") %Check to see if pre-allocated memory is exhausted\n");
+    matlabSwitchCode.append("\t\t\t\tFieldNames= fieldnames(" + objectTableName +");\n");
+    matlabSwitchCode.append("\t\t\t\tfor i=1:length(FieldNames) %Grow structure\n");
+    matlabSwitchCode.append("\t\t\t\t\t" + objectTableName + ".(FieldNames{i})(:," + tableIdxName + "*2+1) = 0;\n");
+    matlabSwitchCode.append("\t\t\t\tend;\n");
     matlabSwitchCode.append("\t\t\tend\n");
 	
 	
-	//=============================================================//
+    //============================================================//
     // Generate 'Cleanup:' code (will replace the $(CLEANUP) tag) //
-	//=============================================================//
-    matlabCleanupCode.append(objectTableName + "(" + tableIdxName +":end) = [];\n");
+    //============================================================//
+    matlabCleanupCode.append(objectTableName + "=PruneStructOfArrays(" + objectTableName + "," + tableIdxName +");  %#ok<NASGU>\n" );
+
 	
-	
-	//=============================================================================//
-    // Generate objects saving code code (will replace the $(SAVEOBJECTSCODE) tag) //
-	//=============================================================================//
+    //========================================================================//
+    // Generate objects saving code (will replace the $(SAVEOBJECTSCODE) tag) //
+    //========================================================================//
     matlabSaveObjectsCode.append(",'"+objectTableName+"'");
 
-    matlabFunctionsCode.append("%%\n% " + objectName + " read function\n");
 
+    //==========================================================================//
+    // Generate objects csv export code (will replace the $(EXPORTCSVCODE) tag) //
+    //==========================================================================//
+    matlabExportCsvCode.append("\tOPLog2csv(" + objectTableName + ", '"+objectTableName+"', logfile);\n");
+//	OPLog2csv(ActuatorCommand, 'ActuatorCommand', logfile)
 	
 	//=================================================================//
     // Generate functions code (will replace the $(FUNCTIONSCODE) tag) //
 	//=================================================================//
-	//Generate function description comment
-    matlabFunctionsCode.append("function [" + objectName + "] = " + functionCall + "\n");
-    matlabFunctionsCode.append("\t" + objectName + ".timestamp = timestamp;\n");
+    //Generate function description comment
+    matlabFunctionsCode.append("%%\n% " + objectName + " read function\n");
+	
+    matlabFunctionsCode.append("function [" + objectName + "] = " + functionCall + objectTableName + ", " + tableIdxName + ")" + "\n");
+    matlabFunctionsCode.append("\t" + objectName + ".timestamp(" + tableIdxName + ")= timestamp;\n");
     matlabFunctionsCode.append("\tif " + isSingleInst + "\n");
     matlabFunctionsCode.append("\t\theaderSize = 8;\n");
     matlabFunctionsCode.append("\telse\n");
-    matlabFunctionsCode.append("\t\t" + objectName + ".instanceID = fread(fid, 1, 'uint16');\n");
+    matlabFunctionsCode.append("\t\t" + objectName + ".instanceID(" + tableIdxName + ") = (fread(fid, 1, 'uint16'));\n");
     matlabFunctionsCode.append("\t\theaderSize = 10;\n");
     matlabFunctionsCode.append("\tend\n\n");
 
@@ -169,14 +182,14 @@ bool UAVObjectGeneratorMatlab::process_object(ObjectInfo* info)
         type = fieldTypeStrMatlab[info->fields[n]->type];
         // Append field
         if ( info->fields[n]->numElements > 1 )
-            funcfields.append("\t" + objectName + "." + info->fields[n]->name + " = double(fread(fid, " + QString::number(info->fields[n]->numElements, 10) + ", '" + type + "'));\n");
+            funcfields.append("\t" + objectName + "." + info->fields[n]->name + "(:," + tableIdxName + ") = double(fread(fid, " + QString::number(info->fields[n]->numElements, 10) + ", '" + type + "'));\n");
         else
-            funcfields.append("\t" + objectName + "." + info->fields[n]->name + " = double(fread(fid, 1, '" + type + "'));\n");
+            funcfields.append("\t" + objectName + "." + info->fields[n]->name + "(" + tableIdxName + ") = double(fread(fid, 1, '" + type + "'));\n");
     }
     matlabFunctionsCode.append(funcfields);
 
     matlabFunctionsCode.append("\t% read CRC\n");
-    matlabFunctionsCode.append("\tfread(fid, 1, 'uint8');\n");
+    matlabFunctionsCode.append("\tfread(fid, 1, '*uint8');\n");
 
     matlabFunctionsCode.append("\n\n");
 

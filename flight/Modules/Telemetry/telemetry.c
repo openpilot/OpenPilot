@@ -133,7 +133,7 @@ int32_t TelemetryInitialize(void)
 	updateSettings();
     
 	// Initialise UAVTalk
-	uavTalkCon = UAVTalkInitialize(&transmitData,256);
+	uavTalkCon = UAVTalkInitialize(&transmitData);
     
 	// Create periodic event that will be used to update the telemetry stats
 	txErrors = 0;
@@ -308,12 +308,12 @@ static void telemetryRxTask(void *parameters)
 
 	// Task loop
 	while (1) {
-#if defined(PIOS_INCLUDE_USB_HID)
+#if defined(PIOS_INCLUDE_USB)
 		// Determine input port (USB takes priority over telemetry port)
-		if (PIOS_USB_HID_CheckAvailable(0)) {
+		if (PIOS_USB_CheckAvailable(0) && PIOS_COM_TELEM_USB) {
 			inputPort = PIOS_COM_TELEM_USB;
 		} else
-#endif /* PIOS_INCLUDE_USB_HID */
+#endif /* PIOS_INCLUDE_USB */
 		{
 			inputPort = telemetryPort;
 		}
@@ -339,24 +339,25 @@ static void telemetryRxTask(void *parameters)
  * Transmit data buffer to the modem or USB port.
  * \param[in] data Data buffer to send
  * \param[in] length Length of buffer
- * \return 0 Success
+ * \return -1 on failure
+ * \return number of bytes transmitted on success
  */
 static int32_t transmitData(uint8_t * data, int32_t length)
 {
 	uint32_t outputPort;
 
 	// Determine input port (USB takes priority over telemetry port)
-#if defined(PIOS_INCLUDE_USB_HID)
-	if (PIOS_USB_HID_CheckAvailable(0)) {
+#if defined(PIOS_INCLUDE_USB)
+	if (PIOS_USB_CheckAvailable(0) && PIOS_COM_TELEM_USB) {
 		outputPort = PIOS_COM_TELEM_USB;
 	} else
-#endif /* PIOS_INCLUDE_USB_HID */
+#endif /* PIOS_INCLUDE_USB */
 	{
 		outputPort = telemetryPort;
 	}
 
 	if (outputPort) {
-		return PIOS_COM_SendBufferNonBlocking(outputPort, data, length);
+		return PIOS_COM_SendBuffer(outputPort, data, length);
 	} else {
 		return -1;
 	}

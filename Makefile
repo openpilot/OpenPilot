@@ -235,7 +235,7 @@ STM32FLASH_DIR := $(TOOLS_DIR)/stm32flash
 
 .PHONY: stm32flash_install
 stm32flash_install: STM32FLASH_URL := http://stm32flash.googlecode.com/svn/trunk
-stm32flash_install: STM32FLASH_REV := 52
+stm32flash_install: STM32FLASH_REV := 61
 stm32flash_install: stm32flash_clean
         # download the source
 	$(V0) @echo " DOWNLOAD     $(STM32FLASH_URL) @ r$(STM32FLASH_REV)"

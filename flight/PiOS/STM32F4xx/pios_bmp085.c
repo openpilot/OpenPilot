@@ -38,7 +38,16 @@
 
 /* Glocal Variables */
 ConversionTypeTypeDef CurrentRead;
-int32_t pios_bmp085_eoc;
+
+#ifdef PIOS_BMP085_HAS_GPIOS
+
+#if defined(PIOS_INCLUDE_FREERTOS)
+xSemaphoreHandle PIOS_BMP085_EOC;
+#else
+int32_t PIOS_BMP085_EOC;
+#endif
+
+#endif	/* PIOS_BMP085_HAS_GPIOS */
 
 /* Local Variables */
 static BMP085CalibDataTypeDef CalibData;
@@ -63,7 +72,28 @@ static const struct pios_bmp085_cfg * dev_cfg;
 */
 void PIOS_BMP085_Init(const struct pios_bmp085_cfg * cfg)
 {
+<<<<<<< HEAD
 	pios_bmp085_eoc = 0;
+=======
+
+#ifdef PIOS_BMP085_HAS_GPIOS
+
+	GPIO_InitTypeDef GPIO_InitStructure;
+	EXTI_InitTypeDef EXTI_InitStructure;
+	NVIC_InitTypeDef NVIC_InitStructure;
+
+#if defined(PIOS_INCLUDE_FREERTOS)
+	/* Semaphore used by ISR to signal End-Of-Conversion */
+	vSemaphoreCreateBinary(PIOS_BMP085_EOC);
+	/* Must start off empty so that first transfer waits for EOC */
+	xSemaphoreTake(PIOS_BMP085_EOC, portMAX_DELAY);
+#else
+	PIOS_BMP085_EOC = 0;
+#endif
+
+	/* Enable EOC GPIO clock */
+	RCC_APB2PeriphClockCmd(PIOS_BMP085_EOC_CLK | RCC_APB2Periph_AFIO, ENABLE);
+>>>>>>> next
 
 	oversampling = cfg->oversampling;
 	dev_cfg = cfg;	// Store cfg before enabling interrupt
@@ -78,10 +108,15 @@ void PIOS_BMP085_Init(const struct pios_bmp085_cfg * cfg)
 	/* Enable and set EOC EXTI Interrupt to the lowest priority */
 	NVIC_Init(&cfg->eoc_irq.init);
 
+<<<<<<< HEAD
 	/* Configure anothing GPIO pin pin as output to set address */
 	GPIO_Init(cfg->xclr.gpio, &cfg->xclr.init);
 	GPIO_SetBits(cfg->xclr.gpio,cfg->xclr.init.GPIO_Pin);
 	
+=======
+#endif	/* PIOS_BMP085_HAS_GPIOS */
+
+>>>>>>> next
 	/* Read all 22 bytes of calibration data in one transfer, this is a very optimized way of doing things */
 	uint8_t Data[BMP085_CALIB_LEN];
 	bool good_cal = false;
@@ -232,7 +267,7 @@ int32_t PIOS_BMP085_Read(uint8_t address, uint8_t * buffer, uint8_t len)
 		 }
 	};
 
-	return PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list));
+	return PIOS_I2C_Transfer(PIOS_I2C_BMP085_ADAPTER, txn_list, NELEMENTS(txn_list));
 }
 
 /**
@@ -260,7 +295,7 @@ int32_t PIOS_BMP085_Write(uint8_t address, uint8_t buffer)
 		,
 	};
 
-	return PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list));
+	return PIOS_I2C_Transfer(PIOS_I2C_BMP085_ADAPTER, txn_list, NELEMENTS(txn_list));
 }
 
 /**

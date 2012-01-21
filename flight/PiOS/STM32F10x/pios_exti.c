@@ -44,7 +44,7 @@ void EXTI15_10_IRQHandler(void)
 	portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
 #endif /* PIOS_INCLUDE_FREERTOS */
 
-#if defined(PIOS_INCLUDE_BMP085)
+#if defined(PIOS_INCLUDE_BMP085) && defined(PIOS_BMP085_HAS_GPIOS)
 	if (EXTI_GetITStatus(PIOS_BMP085_EOC_EXTI_LINE) != RESET) {
 		/* Read the ADC Value */
  #if defined(PIOS_INCLUDE_FREERTOS)

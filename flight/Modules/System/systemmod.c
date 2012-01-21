@@ -49,7 +49,6 @@
 #include "watchdogstatus.h"
 #include "taskmonitor.h"
 
-
 // Private constants
 #define SYSTEM_UPDATE_PERIOD_MS 1000
 #define LED_BLINK_RATE_HZ 5
@@ -115,8 +114,10 @@ int32_t SystemModInitialize(void)
 	SystemStatsInitialize();
 	FlightStatusInitialize();
 	ObjectPersistenceInitialize();
-#if defined(DIAGNOSTICS)
+#if defined(DIAG_TASKS)
 	TaskInfoInitialize();
+#endif
+#if defined(DIAGNOSTICS)
 	I2CStatsInitialize();
 	WatchdogStatusInitialize();
 #endif
@@ -135,7 +136,20 @@ static void systemTask(void *parameters)
 	portTickType lastSysTime;
 
 	/* create all modules thread */
-	MODULE_TASKCREATE_ALL
+	MODULE_TASKCREATE_ALL;
+
+	if (mallocFailed) {
+		/* We failed to malloc during task creation,
+		 * system behaviour is undefined.  Reset and let
+		 * the BootFault code recover for us.
+		 */
+		PIOS_SYS_Reset();
+	}
+
+#if defined(PIOS_INCLUDE_IAP)
+	/* Record a successful boot */
+	PIOS_IAP_WriteBootCount(0);
+#endif
 
 	// Initialize vars
 	idleCounter = 0;
@@ -156,8 +170,11 @@ static void systemTask(void *parameters)
 		updateI2Cstats();
 		updateWDGstats();
 #endif
+
+#if defined(DIAG_TASKS)
 		// Update the task status object
 		TaskMonitorUpdateAll();
+#endif
 
 		// Flash the heartbeat LED
 		PIOS_LED_Toggle(LED1);

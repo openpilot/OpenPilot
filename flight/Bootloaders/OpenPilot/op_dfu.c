@@ -30,13 +30,10 @@
 #include "pios.h"
 #include "op_dfu.h"
 #include "pios_bl_helper.h"
+#include "pios_com_msg.h"
 #include <pios_board_info.h>
 #include "pios_opahrs.h"
 #include "ssp.h"
-/* Private typedef -----------------------------------------------------------*/
-/* Private define ------------------------------------------------------------*/
-/* Private macro -------------------------------------------------------------*/
-/* Private variables ---------------------------------------------------------*/
 //programmable devices
 Device devicesTable[10];
 uint8_t numberOfDevices = 0;
@@ -222,7 +219,7 @@ void processComand(uint8_t *xReceive_Buffer) {
 						}
 					}
 					if (result != 1) {
-						DeviceState = Last_operation_failed;//ok
+						DeviceState = Last_operation_failed;
 						Aditionals = (uint32_t) Command;
 					} else {
 
@@ -299,7 +296,6 @@ void processComand(uint8_t *xReceive_Buffer) {
 
 					++Next_Packet;
 				} else {
-
 					DeviceState = wrong_packet_received;
 					Aditionals = Count;
 				}
@@ -353,10 +349,18 @@ void processComand(uint8_t *xReceive_Buffer) {
 				DeviceState = failed_jump;
 				break;
 			} else {
+				if (Data == 0x5AFE) {
+					/* Force board into safe mode */
+					PIOS_IAP_WriteBootCount(0xFFFF);
+				}
 				FLASH_Lock();
 				JumpToApp = 1;
 			}
 		} else {
+			if (Data == 0x5AFE) {
+				/* Force board into safe mode */
+				PIOS_IAP_WriteBootCount(0xFFFF);
+			}
 			FLASH_Lock();
 			JumpToApp = 1;
 		}
@@ -384,7 +388,6 @@ void processComand(uint8_t *xReceive_Buffer) {
 				DeviceState = too_few_packets;
 			}
 		}
-
 		break;
 	case Download_Req:
 #ifdef DEBUG_SSP
@@ -508,6 +511,7 @@ uint32_t baseOfAdressType(DFUTransfer type) {
 		return currentDevice.startOfUserCode + currentDevice.sizeOfCode;
 		break;
 	default:
+
 		return 0;
 	}
 }
@@ -550,11 +554,7 @@ uint32_t CalcFirmCRC() {
 }
 void sendData(uint8_t * buf, uint16_t size) {
 	if (ProgPort == Usb) {
-
-		PIOS_COM_SendBuffer(PIOS_COM_TELEM_USB, buf, size);
-		if (DeviceState == downloading)
-			PIOS_DELAY_WaitmS(10);
-
+		PIOS_COM_MSG_Send(PIOS_COM_TELEM_USB, buf, size);
 	} else if (ProgPort == Serial) {
 		ssp_SendData(&ssp_port, buf, size);
 	}

@@ -50,7 +50,7 @@ ENABLE_AUX_UART ?= NO
 
 USE_GPS ?= YES
 
-USE_I2C ?= NO
+USE_I2C ?= YES
 
 # Set to YES when using Code Sourcery toolchain
 CODE_SOURCERY ?= YES
@@ -65,9 +65,13 @@ endif
 FLASH_TOOL = OPENOCD
 
 # List of modules to include
-OPTMODULES = CameraStab
+OPTMODULES = CameraStab ComUsbBridge Altitude
 ifeq ($(USE_GPS), YES)
 OPTMODULES += GPS
+endif
+
+ifeq ($(TEST_FAULTS), YES)
+OPTMODULES += Fault
 endif
 
 MODULES = Attitude Stabilization Actuator ManualControl FirmwareIAP
@@ -132,11 +136,9 @@ SRC += ${OPMODULEDIR}/System/systemmod.c
 SRC += $(OPSYSTEM)/coptercontrol.c
 SRC += $(OPSYSTEM)/pios_board.c
 SRC += $(OPSYSTEM)/alarms.c
-SRC += $(OPSYSTEM)/taskmonitor.c
 SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
 SRC += $(OPUAVOBJ)/eventdispatcher.c
-SRC += $(OPSYSTEM)/pios_usb_hid_desc.c
 else
 ## TESTCODE
 SRC += $(OPTESTS)/test_common.c
@@ -151,6 +153,7 @@ SRC += $(OPUAVSYNTHDIR)/accessorydesired.c
 SRC += $(OPUAVSYNTHDIR)/objectpersistence.c
 SRC += $(OPUAVSYNTHDIR)/gcstelemetrystats.c
 SRC += $(OPUAVSYNTHDIR)/flighttelemetrystats.c
+SRC += $(OPUAVSYNTHDIR)/faultsettings.c
 SRC += $(OPUAVSYNTHDIR)/flightstatus.c
 SRC += $(OPUAVSYNTHDIR)/systemstats.c
 SRC += $(OPUAVSYNTHDIR)/systemalarms.c
@@ -178,6 +181,7 @@ SRC += $(OPUAVSYNTHDIR)/receiveractivity.c
 SRC += $(OPUAVSYNTHDIR)/taskinfo.c
 SRC += $(OPUAVSYNTHDIR)/mixerstatus.c
 SRC += $(OPUAVSYNTHDIR)/ratedesired.c
+SRC += $(OPUAVSYNTHDIR)/baroaltitude.c
 
 endif
 
@@ -204,11 +208,16 @@ SRC += $(PIOSSTM32F10X)/pios_iap.c
 SRC += $(PIOSSTM32F10X)/pios_tim.c
 SRC += $(PIOSSTM32F10X)/pios_bl_helper.c
 
-# PIOS USB related files (seperated to make code maintenance more easy)
+# PIOS USB related files (separated to make code maintenance more easy)
+SRC += $(PIOSSTM32F10X)/pios_usb.c
+SRC += $(PIOSSTM32F10X)/pios_usbhook.c
 SRC += $(PIOSSTM32F10X)/pios_usb_hid.c
+SRC += $(PIOSSTM32F10X)/pios_usb_cdc.c
 SRC += $(PIOSSTM32F10X)/pios_usb_hid_istr.c
-SRC += $(PIOSSTM32F10X)/pios_usb_hid_prop.c
 SRC += $(PIOSSTM32F10X)/pios_usb_hid_pwr.c
+SRC += $(OPSYSTEM)/pios_usb_board_data.c
+SRC += $(PIOSCOMMON)/pios_usb_desc_hid_cdc.c
+SRC += $(PIOSCOMMON)/pios_usb_desc_hid_only.c
 
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_crc.c
@@ -217,12 +226,16 @@ SRC += $(PIOSCOMMON)/pios_flash_w25x.c
 SRC += $(PIOSCOMMON)/pios_adxl345.c
 SRC += $(PIOSCOMMON)/pios_com.c
 SRC += $(PIOSCOMMON)/pios_i2c_esc.c
+SRC += $(PIOSCOMMON)/pios_bmp085.c
+SRC += $(PIOSCOMMON)/pios_iap.c
+SRC += $(PIOSCOMMON)/pios_bl_helper.c
 SRC += $(PIOSCOMMON)/pios_rcvr.c
 SRC += $(PIOSCOMMON)/pios_gcsrcvr.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c
 ## Libraries for flight calculations
 SRC += $(FLIGHTLIB)/fifo_buffer.c
 SRC += $(FLIGHTLIB)/CoordinateConversions.c
+SRC += $(FLIGHTLIB)/taskmonitor.c
 
 ## CMSIS for STM32
 SRC += $(CMSISDIR)/core_cm3.c
@@ -400,6 +413,9 @@ ifeq ($(USE_I2C), YES)
 CDEFS += -DUSE_I2C
 endif
 
+# Declare all non-optional modules as built-in to force inclusion
+CDEFS += ${foreach MOD, ${MODULES}, -DMODULE_$(MOD)_BUILTIN }
+
 # Place project-specific -D and/or -U options for
 # Assembler with preprocessor here.
 #ADEFS = -DUSE_IRQ_ASM_WRAPPER
@@ -426,11 +442,15 @@ CSTANDARD = -std=gnu99
 # Flags for C and C++ (arm-elf-gcc/arm-elf-g++)
 
 ifeq ($(DEBUG),YES)
-CFLAGS = -DDEBUG
+CFLAGS += -DDEBUG
 endif
 
 ifeq ($(DIAGNOSTICS),YES)
-CFLAGS = -DDIAGNOSTICS
+CFLAGS += -DDIAGNOSTICS
+endif
+
+ifeq ($(DIAG_TASKS),YES)
+CFLAGS += -DDIAG_TASKS
 endif
 
 CFLAGS += -g$(DEBUGF)

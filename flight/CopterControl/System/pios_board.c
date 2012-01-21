@@ -541,11 +541,7 @@ static const struct pios_tim_channel pios_tim_servoport_rcvrport_pins[] = {
 
 #include "pios_usart_priv.h"
 
-#if defined(PIOS_INCLUDE_TELEMETRY_RF)
-/*
- * Telemetry USART
- */
-static const struct pios_usart_cfg pios_usart_telem_main_cfg = {
+static const struct pios_usart_cfg pios_usart_generic_main_cfg = {
   .regs  = USART1,
   .init = {
     .USART_BaudRate            = 57600,
@@ -581,7 +577,7 @@ static const struct pios_usart_cfg pios_usart_telem_main_cfg = {
   },
 };
 
-static const struct pios_usart_cfg pios_usart_telem_flexi_cfg = {
+static const struct pios_usart_cfg pios_usart_generic_flexi_cfg = {
   .regs  = USART3,
   .init = {
     .USART_BaudRate            = 57600,
@@ -616,84 +612,6 @@ static const struct pios_usart_cfg pios_usart_telem_flexi_cfg = {
     },
   },
 };
-#endif /* PIOS_INCLUDE_TELEMETRY_RF */
-
-#if defined(PIOS_INCLUDE_GPS)
-/*
- * GPS USART
- */
-static const struct pios_usart_cfg pios_usart_gps_main_cfg = {
-  .regs = USART1,
-  .init = {
-    .USART_BaudRate            = 57600,
-    .USART_WordLength          = USART_WordLength_8b,
-    .USART_Parity              = USART_Parity_No,
-    .USART_StopBits            = USART_StopBits_1,
-    .USART_HardwareFlowControl = USART_HardwareFlowControl_None,
-    .USART_Mode                = USART_Mode_Rx | USART_Mode_Tx,
-  },
-  .irq = {
-    .init    = {
-      .NVIC_IRQChannel                   = USART1_IRQn,
-      .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
-      .NVIC_IRQChannelSubPriority        = 0,
-      .NVIC_IRQChannelCmd                = ENABLE,
-    },
-  },
-  .rx   = {
-    .gpio = GPIOA,
-    .init = {
-      .GPIO_Pin   = GPIO_Pin_10,
-      .GPIO_Speed = GPIO_Speed_2MHz,
-      .GPIO_Mode  = GPIO_Mode_IPU,
-    },
-  },
-  .tx   = {
-    .gpio = GPIOA,
-    .init = {
-      .GPIO_Pin   = GPIO_Pin_9,
-      .GPIO_Speed = GPIO_Speed_2MHz,
-      .GPIO_Mode  = GPIO_Mode_AF_PP,
-    },
-  },
-};
-
-static const struct pios_usart_cfg pios_usart_gps_flexi_cfg = {
-  .regs = USART3,
-  .init = {
-    .USART_BaudRate            = 57600,
-    .USART_WordLength          = USART_WordLength_8b,
-    .USART_Parity              = USART_Parity_No,
-    .USART_StopBits            = USART_StopBits_1,
-    .USART_HardwareFlowControl = USART_HardwareFlowControl_None,
-    .USART_Mode                = USART_Mode_Rx | USART_Mode_Tx,
-  },
-  .irq = {
-    .init    = {
-      .NVIC_IRQChannel                   = USART3_IRQn,
-      .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
-      .NVIC_IRQChannelSubPriority        = 0,
-      .NVIC_IRQChannelCmd                = ENABLE,
-    },
-  },
-  .rx   = {
-    .gpio = GPIOB,
-    .init = {
-      .GPIO_Pin   = GPIO_Pin_11,
-      .GPIO_Speed = GPIO_Speed_2MHz,
-      .GPIO_Mode  = GPIO_Mode_IPU,
-    },
-  },
-  .tx   = {
-    .gpio = GPIOB,
-    .init = {
-      .GPIO_Pin   = GPIO_Pin_10,
-      .GPIO_Speed = GPIO_Speed_2MHz,
-      .GPIO_Mode  = GPIO_Mode_AF_PP,
-    },
-  },
-};
-#endif	/* PIOS_INCLUDE_GPS */
 
 #if defined(PIOS_INCLUDE_DSM)
 /*
@@ -862,13 +780,16 @@ static const struct pios_sbus_cfg pios_sbus_cfg = {
 
 #include "pios_com_priv.h"
 
-#define PIOS_COM_TELEM_RF_RX_BUF_LEN 192
-#define PIOS_COM_TELEM_RF_TX_BUF_LEN 192
+#define PIOS_COM_TELEM_RF_RX_BUF_LEN 32
+#define PIOS_COM_TELEM_RF_TX_BUF_LEN 12
 
 #define PIOS_COM_GPS_RX_BUF_LEN 32
 
-#define PIOS_COM_TELEM_USB_RX_BUF_LEN 192
-#define PIOS_COM_TELEM_USB_TX_BUF_LEN 192
+#define PIOS_COM_TELEM_USB_RX_BUF_LEN 65
+#define PIOS_COM_TELEM_USB_TX_BUF_LEN 65
+
+#define PIOS_COM_BRIDGE_RX_BUF_LEN 65
+#define PIOS_COM_BRIDGE_TX_BUF_LEN 12
 
 #endif	/* PIOS_INCLUDE_COM */
 
@@ -982,12 +903,12 @@ const struct pios_pwm_cfg pios_pwm_cfg = {
  * I2C Adapters
  */
 
-void PIOS_I2C_main_adapter_ev_irq_handler(void);
-void PIOS_I2C_main_adapter_er_irq_handler(void);
-void I2C2_EV_IRQHandler() __attribute__ ((alias ("PIOS_I2C_main_adapter_ev_irq_handler")));
-void I2C2_ER_IRQHandler() __attribute__ ((alias ("PIOS_I2C_main_adapter_er_irq_handler")));
+void PIOS_I2C_flexi_adapter_ev_irq_handler(void);
+void PIOS_I2C_flexi_adapter_er_irq_handler(void);
+void I2C2_EV_IRQHandler() __attribute__ ((alias ("PIOS_I2C_flexi_adapter_ev_irq_handler")));
+void I2C2_ER_IRQHandler() __attribute__ ((alias ("PIOS_I2C_flexi_adapter_er_irq_handler")));
 
-static const struct pios_i2c_adapter_cfg pios_i2c_main_adapter_cfg = {
+static const struct pios_i2c_adapter_cfg pios_i2c_flexi_adapter_cfg = {
   .regs = I2C2,
   .init = {
     .I2C_Mode                = I2C_Mode_I2C,
@@ -1034,17 +955,17 @@ static const struct pios_i2c_adapter_cfg pios_i2c_main_adapter_cfg = {
   },
 };
 
-uint32_t pios_i2c_main_adapter_id;
-void PIOS_I2C_main_adapter_ev_irq_handler(void)
+uint32_t pios_i2c_flexi_adapter_id;
+void PIOS_I2C_flexi_adapter_ev_irq_handler(void)
 {
   /* Call into the generic code to handle the IRQ for this specific device */
-  PIOS_I2C_EV_IRQ_Handler(pios_i2c_main_adapter_id);
+  PIOS_I2C_EV_IRQ_Handler(pios_i2c_flexi_adapter_id);
 }
 
-void PIOS_I2C_main_adapter_er_irq_handler(void)
+void PIOS_I2C_flexi_adapter_er_irq_handler(void)
 {
   /* Call into the generic code to handle the IRQ for this specific device */
-  PIOS_I2C_ER_IRQ_Handler(pios_i2c_main_adapter_id);
+  PIOS_I2C_ER_IRQ_Handler(pios_i2c_flexi_adapter_id);
 }
 
 #endif /* PIOS_INCLUDE_I2C */
@@ -1064,10 +985,10 @@ uint32_t pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE];
 
 #endif /* PIOS_INCLUDE_RCVR */
 
-#if defined(PIOS_INCLUDE_USB_HID)
-#include "pios_usb_hid_priv.h"
+#if defined(PIOS_INCLUDE_USB)
+#include "pios_usb_priv.h"
 
-static const struct pios_usb_hid_cfg pios_usb_hid_main_cfg = {
+static const struct pios_usb_cfg pios_usb_main_cfg = {
   .irq = {
     .init    = {
       .NVIC_IRQChannel                   = USB_LP_CAN1_RX0_IRQn,
@@ -1077,13 +998,41 @@ static const struct pios_usb_hid_cfg pios_usb_hid_main_cfg = {
     },
   },
 };
-#endif	/* PIOS_INCLUDE_USB_HID */
 
-extern const struct pios_com_driver pios_usb_com_driver;
+#include "pios_usb_board_data_priv.h"
+#include "pios_usb_desc_hid_cdc_priv.h"
+#include "pios_usb_desc_hid_only_priv.h"
+
+#endif	/* PIOS_INCLUDE_USB */
+
+#if defined(PIOS_INCLUDE_USB_HID)
+#include <pios_usb_hid_priv.h>
+
+const struct pios_usb_hid_cfg pios_usb_hid_cfg = {
+	.data_if = 0,
+	.data_rx_ep = 1,
+	.data_tx_ep = 1,
+};
+#endif /* PIOS_INCLUDE_USB_HID */
+
+#if defined(PIOS_INCLUDE_USB_CDC)
+#include <pios_usb_cdc_priv.h>
+
+const struct pios_usb_cdc_cfg pios_usb_cdc_cfg = {
+	.ctrl_if = 1,
+	.ctrl_tx_ep = 2,
+
+	.data_if = 2,
+	.data_rx_ep = 3,
+	.data_tx_ep = 3,
+};
+#endif	/* PIOS_INCLUDE_USB_CDC */
 
 uint32_t pios_com_telem_rf_id;
 uint32_t pios_com_telem_usb_id;
+uint32_t pios_com_vcp_id;
 uint32_t pios_com_gps_id;
+uint32_t pios_com_bridge_id;
 
 /**
  * PIOS_Board_Init()
@@ -1110,14 +1059,31 @@ void PIOS_Board_Init(void) {
 	UAVObjInitialize();
 
 	HwSettingsInitialize();
-	
-#if defined(PIOS_INCLUDE_RTC)
-	/* Initialize the real-time clock and its associated tick */
-	PIOS_RTC_Init(&pios_rtc_main_cfg);
+
+#ifndef ERASE_FLASH
+	/* Initialize watchdog as early as possible to catch faults during init */
+	PIOS_WDG_Init();
 #endif
 
 	/* Initialize the alarms library */
 	AlarmsInitialize();
+
+	/* Check for repeated boot failures */
+	PIOS_IAP_Init();
+	uint16_t boot_count = PIOS_IAP_ReadBootCount();
+	if (boot_count < 3) {
+		PIOS_IAP_WriteBootCount(++boot_count);
+		AlarmsClear(SYSTEMALARMS_ALARM_BOOTFAULT);
+	} else {
+		/* Too many failed boot attempts, force hwsettings to defaults */
+		HwSettingsSetDefaults(HwSettingsHandle(), 0);
+		AlarmsSet(SYSTEMALARMS_ALARM_BOOTFAULT, SYSTEMALARMS_ALARM_CRITICAL);
+	}
+
+#if defined(PIOS_INCLUDE_RTC)
+	/* Initialize the real-time clock and its associated tick */
+	PIOS_RTC_Init(&pios_rtc_main_cfg);
+#endif
 
 	/* Initialize the task monitor library */
 	TaskMonitorInitialize();
@@ -1127,6 +1093,133 @@ void PIOS_Board_Init(void) {
 	PIOS_TIM_InitClock(&tim_2_cfg);
 	PIOS_TIM_InitClock(&tim_3_cfg);
 	PIOS_TIM_InitClock(&tim_4_cfg);
+
+#if defined(PIOS_INCLUDE_USB)
+	/* Initialize board specific USB data */
+	PIOS_USB_BOARD_DATA_Init();
+
+	/* Flags to determine if various USB interfaces are advertised */
+	bool usb_hid_present = false;
+	bool usb_cdc_present = false;
+
+	uint8_t hwsettings_usb_devicetype;
+	HwSettingsUSB_DeviceTypeGet(&hwsettings_usb_devicetype);
+
+	switch (hwsettings_usb_devicetype) {
+	case HWSETTINGS_USB_DEVICETYPE_HIDONLY:
+		if (PIOS_USB_DESC_HID_ONLY_Init()) {
+			PIOS_Assert(0);
+		}
+		usb_hid_present = true;
+		break;
+	case HWSETTINGS_USB_DEVICETYPE_HIDVCP:
+		if (PIOS_USB_DESC_HID_CDC_Init()) {
+			PIOS_Assert(0);
+		}
+		usb_hid_present = true;
+		usb_cdc_present = true;
+		break;
+	case HWSETTINGS_USB_DEVICETYPE_VCPONLY:
+		break;
+	default:
+		PIOS_Assert(0);
+	}
+
+	uint32_t pios_usb_id;
+	PIOS_USB_Init(&pios_usb_id, &pios_usb_main_cfg);
+
+#if defined(PIOS_INCLUDE_USB_CDC)
+
+	uint8_t hwsettings_usb_vcpport;
+	/* Configure the USB VCP port */
+	HwSettingsUSB_VCPPortGet(&hwsettings_usb_vcpport);
+
+	if (!usb_cdc_present) {
+		/* Force VCP port function to disabled if we haven't advertised VCP in our USB descriptor */
+		hwsettings_usb_vcpport = HWSETTINGS_USB_VCPPORT_DISABLED;
+	}
+
+	switch (hwsettings_usb_vcpport) {
+	case HWSETTINGS_USB_VCPPORT_DISABLED:
+		break;
+	case HWSETTINGS_USB_VCPPORT_USBTELEMETRY:
+#if defined(PIOS_INCLUDE_COM)
+		{
+			uint32_t pios_usb_cdc_id;
+			if (PIOS_USB_CDC_Init(&pios_usb_cdc_id, &pios_usb_cdc_cfg, pios_usb_id)) {
+				PIOS_Assert(0);
+			}
+			uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_USB_RX_BUF_LEN);
+			uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_USB_TX_BUF_LEN);
+			PIOS_Assert(rx_buffer);
+			PIOS_Assert(tx_buffer);
+			if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_cdc_com_driver, pios_usb_cdc_id,
+						rx_buffer, PIOS_COM_TELEM_USB_RX_BUF_LEN,
+						tx_buffer, PIOS_COM_TELEM_USB_TX_BUF_LEN)) {
+				PIOS_Assert(0);
+			}
+		}
+#endif	/* PIOS_INCLUDE_COM */
+		break;
+	case HWSETTINGS_USB_VCPPORT_COMBRIDGE:
+#if defined(PIOS_INCLUDE_COM)
+		{
+			uint32_t pios_usb_cdc_id;
+			if (PIOS_USB_CDC_Init(&pios_usb_cdc_id, &pios_usb_cdc_cfg, pios_usb_id)) {
+				PIOS_Assert(0);
+			}
+			uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_BRIDGE_RX_BUF_LEN);
+			uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_BRIDGE_TX_BUF_LEN);
+			PIOS_Assert(rx_buffer);
+			PIOS_Assert(tx_buffer);
+			if (PIOS_COM_Init(&pios_com_vcp_id, &pios_usb_cdc_com_driver, pios_usb_cdc_id,
+						rx_buffer, PIOS_COM_BRIDGE_RX_BUF_LEN,
+						tx_buffer, PIOS_COM_BRIDGE_TX_BUF_LEN)) {
+				PIOS_Assert(0);
+			}
+		}
+#endif	/* PIOS_INCLUDE_COM */
+		break;
+	}
+#endif	/* PIOS_INCLUDE_USB_CDC */
+
+#if defined(PIOS_INCLUDE_USB_HID)
+	/* Configure the usb HID port */
+	uint8_t hwsettings_usb_hidport;
+	HwSettingsUSB_HIDPortGet(&hwsettings_usb_hidport);
+
+	if (!usb_hid_present) {
+		/* Force HID port function to disabled if we haven't advertised HID in our USB descriptor */
+		hwsettings_usb_hidport = HWSETTINGS_USB_HIDPORT_DISABLED;
+	}
+
+	switch (hwsettings_usb_hidport) {
+	case HWSETTINGS_USB_HIDPORT_DISABLED:
+		break;
+	case HWSETTINGS_USB_HIDPORT_USBTELEMETRY:
+#if defined(PIOS_INCLUDE_COM)
+		{
+			uint32_t pios_usb_hid_id;
+			if (PIOS_USB_HID_Init(&pios_usb_hid_id, &pios_usb_hid_cfg, pios_usb_id)) {
+				PIOS_Assert(0);
+			}
+			uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_USB_RX_BUF_LEN);
+			uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_USB_TX_BUF_LEN);
+			PIOS_Assert(rx_buffer);
+			PIOS_Assert(tx_buffer);
+			if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_hid_com_driver, pios_usb_hid_id,
+						rx_buffer, PIOS_COM_TELEM_USB_RX_BUF_LEN,
+						tx_buffer, PIOS_COM_TELEM_USB_TX_BUF_LEN)) {
+				PIOS_Assert(0);
+			}
+		}
+#endif	/* PIOS_INCLUDE_COM */
+		break;
+	}
+
+#endif	/* PIOS_INCLUDE_USB_HID */
+
+#endif	/* PIOS_INCLUDE_USB */
 
 	/* Configure the main IO port */
 	uint8_t hwsettings_DSMxBind;
@@ -1140,8 +1233,8 @@ void PIOS_Board_Init(void) {
 	case HWSETTINGS_CC_MAINPORT_TELEMETRY:
 #if defined(PIOS_INCLUDE_TELEMETRY_RF)
 		{
-			uint32_t pios_usart_telem_rf_id;
-			if (PIOS_USART_Init(&pios_usart_telem_rf_id, &pios_usart_telem_main_cfg)) {
+			uint32_t pios_usart_generic_id;
+			if (PIOS_USART_Init(&pios_usart_generic_id, &pios_usart_generic_main_cfg)) {
 				PIOS_Assert(0);
 			}
 
@@ -1149,7 +1242,7 @@ void PIOS_Board_Init(void) {
 			uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_TX_BUF_LEN);
 			PIOS_Assert(rx_buffer);
 			PIOS_Assert(tx_buffer);
-			if (PIOS_COM_Init(&pios_com_telem_rf_id, &pios_usart_com_driver, pios_usart_telem_rf_id,
+			if (PIOS_COM_Init(&pios_com_telem_rf_id, &pios_usart_com_driver, pios_usart_generic_id,
 					  rx_buffer, PIOS_COM_TELEM_RF_RX_BUF_LEN,
 					  tx_buffer, PIOS_COM_TELEM_RF_TX_BUF_LEN)) {
 				PIOS_Assert(0);
@@ -1182,14 +1275,14 @@ void PIOS_Board_Init(void) {
 	case HWSETTINGS_CC_MAINPORT_GPS:
 #if defined(PIOS_INCLUDE_GPS)
 		{
-			uint32_t pios_usart_gps_id;
-			if (PIOS_USART_Init(&pios_usart_gps_id, &pios_usart_gps_main_cfg)) {
+			uint32_t pios_usart_generic_id;
+			if (PIOS_USART_Init(&pios_usart_generic_id, &pios_usart_generic_main_cfg)) {
 				PIOS_Assert(0);
 			}
 
 			uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_GPS_RX_BUF_LEN);
 			PIOS_Assert(rx_buffer);
-			if (PIOS_COM_Init(&pios_com_gps_id, &pios_usart_com_driver, pios_usart_gps_id,
+			if (PIOS_COM_Init(&pios_com_gps_id, &pios_usart_com_driver, pios_usart_generic_id,
 					  rx_buffer, PIOS_COM_GPS_RX_BUF_LEN,
 					  NULL, 0)) {
 				PIOS_Assert(0);
@@ -1242,6 +1335,24 @@ void PIOS_Board_Init(void) {
 		break;
 	case HWSETTINGS_CC_MAINPORT_COMAUX:
 		break;
+	case HWSETTINGS_CC_MAINPORT_COMBRIDGE:
+		{
+			uint32_t pios_usart_generic_id;
+			if (PIOS_USART_Init(&pios_usart_generic_id, &pios_usart_generic_main_cfg)) {
+				PIOS_Assert(0);
+			}
+
+			uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_BRIDGE_RX_BUF_LEN);
+			PIOS_Assert(rx_buffer);
+			uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_BRIDGE_TX_BUF_LEN);
+			PIOS_Assert(tx_buffer);
+			if (PIOS_COM_Init(&pios_com_bridge_id, &pios_usart_com_driver, pios_usart_generic_id,
+						rx_buffer, PIOS_COM_BRIDGE_RX_BUF_LEN,
+						tx_buffer, PIOS_COM_BRIDGE_TX_BUF_LEN)) {
+				PIOS_Assert(0);
+			}
+		}
+		break;
 	}
 
 	/* Configure the flexi port */
@@ -1254,15 +1365,15 @@ void PIOS_Board_Init(void) {
 	case HWSETTINGS_CC_FLEXIPORT_TELEMETRY:
 #if defined(PIOS_INCLUDE_TELEMETRY_RF)
 		{
-			uint32_t pios_usart_telem_rf_id;
-			if (PIOS_USART_Init(&pios_usart_telem_rf_id, &pios_usart_telem_flexi_cfg)) {
+			uint32_t pios_usart_generic_id;
+			if (PIOS_USART_Init(&pios_usart_generic_id, &pios_usart_generic_flexi_cfg)) {
 				PIOS_Assert(0);
 			}
 			uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_RX_BUF_LEN);
 			uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_TX_BUF_LEN);
 			PIOS_Assert(rx_buffer);
 			PIOS_Assert(tx_buffer);
-			if (PIOS_COM_Init(&pios_com_telem_rf_id, &pios_usart_com_driver, pios_usart_telem_rf_id,
+			if (PIOS_COM_Init(&pios_com_telem_rf_id, &pios_usart_com_driver, pios_usart_generic_id,
   					  rx_buffer, PIOS_COM_TELEM_RF_RX_BUF_LEN,
 					  tx_buffer, PIOS_COM_TELEM_RF_TX_BUF_LEN)) {
 				PIOS_Assert(0);
@@ -1270,16 +1381,34 @@ void PIOS_Board_Init(void) {
 		}
 #endif /* PIOS_INCLUDE_TELEMETRY_RF */
 		break;
+	case HWSETTINGS_CC_FLEXIPORT_COMBRIDGE:
+		{
+			uint32_t pios_usart_generic_id;
+			if (PIOS_USART_Init(&pios_usart_generic_id, &pios_usart_generic_flexi_cfg)) {
+				PIOS_Assert(0);
+			}
+
+			uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_BRIDGE_RX_BUF_LEN);
+			uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_BRIDGE_TX_BUF_LEN);
+			PIOS_Assert(rx_buffer);
+			PIOS_Assert(tx_buffer);
+			if (PIOS_COM_Init(&pios_com_bridge_id, &pios_usart_com_driver, pios_usart_generic_id,
+						rx_buffer, PIOS_COM_BRIDGE_RX_BUF_LEN,
+						tx_buffer, PIOS_COM_BRIDGE_TX_BUF_LEN)) {
+				PIOS_Assert(0);
+			}
+		}
+		break;
 	case HWSETTINGS_CC_FLEXIPORT_GPS:
 #if defined(PIOS_INCLUDE_GPS)
 		{
-			uint32_t pios_usart_gps_id;
-			if (PIOS_USART_Init(&pios_usart_gps_id, &pios_usart_gps_flexi_cfg)) {
+			uint32_t pios_usart_generic_id;
+			if (PIOS_USART_Init(&pios_usart_generic_id, &pios_usart_generic_flexi_cfg)) {
 				PIOS_Assert(0);
 			}
 			uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_GPS_RX_BUF_LEN);
 			PIOS_Assert(rx_buffer);
-			if (PIOS_COM_Init(&pios_com_gps_id, &pios_usart_com_driver, pios_usart_gps_id,
+			if (PIOS_COM_Init(&pios_com_gps_id, &pios_usart_com_driver, pios_usart_generic_id,
 					  rx_buffer, PIOS_COM_GPS_RX_BUF_LEN,
 					  NULL, 0)) {
 				PIOS_Assert(0);
@@ -1335,7 +1464,7 @@ void PIOS_Board_Init(void) {
 	case HWSETTINGS_CC_FLEXIPORT_I2C:
 #if defined(PIOS_INCLUDE_I2C)
 		{
-			if (PIOS_I2C_Init(&pios_i2c_main_adapter_id, &pios_i2c_main_adapter_cfg)) {
+			if (PIOS_I2C_Init(&pios_i2c_flexi_adapter_id, &pios_i2c_flexi_adapter_cfg)) {
 				PIOS_Assert(0);
 			}
 		}
@@ -1391,7 +1520,7 @@ void PIOS_Board_Init(void) {
 	pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_GCS] = pios_gcsrcvr_rcvr_id;
 #endif	/* PIOS_INCLUDE_GCSRCVR */
 
-	/* Remap AFIO pin */
+	/* Remap AFIO pin for PB4 (Servo 5 Out)*/
 	GPIO_PinRemapConfig( GPIO_Remap_SWJ_NoJTRST, ENABLE);
 
 #ifndef PIOS_DEBUG_ENABLE_DEBUG_PINS
@@ -1413,26 +1542,8 @@ void PIOS_Board_Init(void) {
 	PIOS_ADC_Init();
 	PIOS_GPIO_Init();
 
-#if defined(PIOS_INCLUDE_USB_HID)
-	uint32_t pios_usb_hid_id;
-	PIOS_USB_HID_Init(&pios_usb_hid_id, &pios_usb_hid_main_cfg);
-#if defined(PIOS_INCLUDE_COM)
-	uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_USB_RX_BUF_LEN);
-	uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_USB_TX_BUF_LEN);
-	PIOS_Assert(rx_buffer);
-	PIOS_Assert(tx_buffer);
-	if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_com_driver, pios_usb_hid_id,
-			  rx_buffer, PIOS_COM_TELEM_USB_RX_BUF_LEN,
-			  tx_buffer, PIOS_COM_TELEM_USB_TX_BUF_LEN)) {
-		PIOS_Assert(0);
-	}
-#endif	/* PIOS_INCLUDE_COM */
-#endif	/* PIOS_INCLUDE_USB_HID */
-
-	PIOS_IAP_Init();
-#ifndef ERASE_FLASH
-	PIOS_WDG_Init();
-#endif
+	/* Make sure we have at least one telemetry link configured or else fail initialization */
+	PIOS_Assert(pios_com_telem_rf_id || pios_com_telem_usb_id);
 }
 
 /**

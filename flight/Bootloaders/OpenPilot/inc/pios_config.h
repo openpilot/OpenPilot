@@ -31,7 +31,6 @@
 #define PIOS_CONFIG_H
 #define PIOS_INCLUDE_BL_HELPER
 #define PIOS_INCLUDE_BL_HELPER_WRITE_SUPPORT
-#define USB_HID
 /* Enable/Disable PiOS Modules */
 #define PIOS_INCLUDE_DELAY
 #define PIOS_INCLUDE_IRQ
@@ -39,10 +38,13 @@
 #define PIOS_INCLUDE_SPI
 #define PIOS_INCLUDE_SYS
 #define PIOS_INCLUDE_USART
+#define PIOS_INCLUDE_USB
 #define PIOS_INCLUDE_USB_HID
 #define PIOS_INCLUDE_OPAHRS
 #define PIOS_INCLUDE_COM
+#define PIOS_INCLUDE_COM_MSG
 #define PIOS_INCLUDE_GPIO
+#define PIOS_INCLUDE_IAP
 //#define DEBUG_SSP
 
 /* Defaults for Logging */

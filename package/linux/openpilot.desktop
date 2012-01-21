@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=0.1.0
+Encoding=UTF-8
+Name=OpenPilot GCS
+Exec=openpilot-gcs
+TryExec=openpilot-gcs
+Comment=Configure, Tune, Diagnose, Track, & Upgrade FW for OpenPilot solutions
+Terminal=false
+Categories=OpenPilotMenu;Qt;Other;
+Icon=openpilot
+Type=Application
+MimeType=application/openpilot.snapshot;

@@ -1,8 +1,8 @@
 /**
  ******************************************************************************
  *
- * @file       configahrstwidget.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @file       configcamerastabilizationtwidget.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2011.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup ConfigPlugin Config Plugin
@@ -32,13 +32,6 @@
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
-#include <QtGui/QWidget>
-#include <QtSvg/QSvgRenderer>
-#include <QtSvg/QGraphicsSvgItem>
-#include <QList>
-#include <QTimer>
-#include <QMutex>
-
 #include "camerastabsettings.h"
 
 class ConfigCameraStabilizationWidget: public ConfigTaskWidget
@@ -50,12 +43,13 @@ public:
     ~ConfigCameraStabilizationWidget();
     
 private:
-    virtual void enableControls(bool enable);
-
     Ui_CameraStabilizationWidget *m_camerastabilization;
+    virtual void enableControls(bool enable);
+    void refreshUIValues(CameraStabSettings::DataFields &cameraStabData);
 
 private slots:
     void openHelp();
+    void resetToDefaults();
     void applySettings();
     void saveSettings();
     void refreshValues();
@@ -65,4 +59,4 @@ protected:
     void disconnectUpdates();
 };
 
-#endif // ConfigCameraStabilization_H
+#endif // CONFIGCAMERASTABILIZATIONWIDGET_H

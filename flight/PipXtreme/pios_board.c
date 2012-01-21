@@ -311,10 +311,10 @@ static uint8_t pios_com_serial_tx_buffer[PIOS_COM_SERIAL_TX_BUF_LEN];
 
 // ***********************************************************************************
 
-#if defined(PIOS_INCLUDE_USB_HID)
-#include "pios_usb_hid_priv.h"
+#if defined(PIOS_INCLUDE_USB)
+#include "pios_usb_priv.h"
 
-static const struct pios_usb_hid_cfg pios_usb_hid_main_cfg = {
+static const struct pios_usb_cfg pios_usb_main_cfg = {
   .irq = {
     .init    = {
       .NVIC_IRQChannel                   = USB_LP_CAN1_RX0_IRQn,
@@ -324,9 +324,22 @@ static const struct pios_usb_hid_cfg pios_usb_hid_main_cfg = {
     },
   },
 };
-#endif	/* PIOS_INCLUDE_USB_HID */
 
-extern const struct pios_com_driver pios_usb_com_driver;
+#include "pios_usb_board_data_priv.h"
+#include "pios_usb_desc_hid_only_priv.h"
+
+#endif	/* PIOS_INCLUDE_USB */
+
+#if defined(PIOS_INCLUDE_USB_HID)
+#include <pios_usb_hid_priv.h>
+
+const struct pios_usb_hid_cfg pios_usb_hid_cfg = {
+	.data_if = 0,
+	.data_rx_ep = 1,
+	.data_tx_ep = 1,
+};
+
+#endif	/* PIOS_INCLUDE_USB_HID */
 
 uint32_t pios_com_serial_id;
 uint32_t pios_com_telem_usb_id;
@@ -359,16 +372,29 @@ void PIOS_Board_Init(void) {
 		PIOS_DEBUG_Assert(0);
 	}
 
-#if defined(PIOS_INCLUDE_USB_HID)
+#if defined(PIOS_INCLUDE_USB)
+	/* Initialize board specific USB data */
+	PIOS_USB_BOARD_DATA_Init();
+
+	if (PIOS_USB_DESC_HID_ONLY_Init()) {
+		PIOS_Assert(0);
+	}
+
+	uint32_t pios_usb_id;
+	PIOS_USB_Init(&pios_usb_id, &pios_usb_main_cfg);
+
+#if defined(PIOS_INCLUDE_USB_HID) && defined(PIOS_INCLUDE_COM)
 	uint32_t pios_usb_hid_id;
-	PIOS_USB_HID_Init(&pios_usb_hid_id, &pios_usb_hid_main_cfg);
-#if defined(PIOS_INCLUDE_COM)
-	if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_com_driver, pios_usb_hid_id,
+	if (PIOS_USB_HID_Init(&pios_usb_hid_id, &pios_usb_hid_cfg, pios_usb_id)) {
+		PIOS_Assert(0);
+	}
+	if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_hid_com_driver, pios_usb_hid_id,
 			  pios_com_telem_usb_rx_buffer, sizeof(pios_com_telem_usb_rx_buffer),
 			  pios_com_telem_usb_tx_buffer, sizeof(pios_com_telem_usb_tx_buffer))) {
 		PIOS_Assert(0);
 	}
-#endif	/* PIOS_INCLUDE_COM */
+#endif	/* PIOS_INCLUDE_USB_HID && PIOS_INCLUDE_COM */
+
 #endif	/* PIOS_INCLUDE_USB_HID */
 
 	// ADC system

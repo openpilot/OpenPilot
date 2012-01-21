@@ -3,7 +3,6 @@
  *
  * @file       pios_i2c_priv.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * 	       Parts by Thorsten Klose (tk@midibox.org)
  * @brief      I2C private definitions.
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -39,6 +38,7 @@ struct pios_i2c_adapter_cfg {
 	uint32_t transfer_timeout_ms;
 	struct stm32_gpio scl;
 	struct stm32_gpio sda;
+	uint32_t remap;
 	struct stm32_irq event;
 	struct stm32_irq error;
 };

@@ -214,8 +214,14 @@ static void SensorsTask(void *parameters)
 		count = 0;
 		while((read_good = PIOS_BMA180_ReadFifo(&accel)) != 0 && !error)
 			error = ((xTaskGetTickCount() - lastSysTime) > SENSOR_PERIOD) ? true : error;
-		if (error)
+		if (error) {
+			// Unfortunately if the BMA180 ever misses getting read, then it will not
+			// trigger more interrupts.  In this case we must force a read to kickstarts
+			// it.
+			struct pios_bma180_data data;
+			PIOS_BMA180_ReadAccels(&data);
 			continue;
+		}
 		while(read_good == 0) {	
 			count++;
 			

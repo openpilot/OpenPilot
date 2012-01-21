@@ -61,6 +61,7 @@ enum pios_w25x_dev_magic {
 struct w25x_flash_dev {
 	uint32_t spi_id;
 	uint32_t slave_num;
+	bool claimed;
 	enum pios_w25x_dev_magic magic;
 };
 
@@ -86,6 +87,7 @@ static struct w25x_flash_dev * PIOS_Flash_W25X_alloc(void)
 	w25x_dev = (struct w25x_flash_dev *)pvPortMalloc(sizeof(*w25x_dev));
 	if (!w25x_dev) return (NULL);
 	
+	w25x_dev->claimed = false;
 	w25x_dev->magic = PIOS_W25X_DEV_MAGIC;
 	return(w25x_dev);
 }
@@ -112,9 +114,13 @@ static int32_t PIOS_Flash_W25X_ClaimBus()
 	if(PIOS_Flash_W25X_Validate(flash_dev) != 0)
 		return -1;
 
-	int8_t ret = PIOS_SPI_ClaimBus(flash_dev->spi_id);
+	if(PIOS_SPI_ClaimBus(flash_dev->spi_id) < 0)
+		return -1;
+		
 	PIOS_SPI_RC_PinSet(flash_dev->spi_id, flash_dev->slave_num, 0);
-	return (ret == 0) ? 0 : -1;
+	flash_dev->claimed = true;
+	
+	return 0;
 }
 
 /**
@@ -126,6 +132,8 @@ static int32_t PIOS_Flash_W25X_ReleaseBus()
 		return -1;
 	PIOS_SPI_RC_PinSet(flash_dev->spi_id, flash_dev->slave_num, 1);
 	PIOS_SPI_ReleaseBus(flash_dev->spi_id);
+	flash_dev->claimed = false;
+	return 0;
 }
 
 /**

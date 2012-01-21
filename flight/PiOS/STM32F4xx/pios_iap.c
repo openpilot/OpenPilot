@@ -79,7 +79,7 @@ void PIOS_IAP_Init( void )
 	PWR_BackupAccessCmd(ENABLE);
 
 	/* Clear Tamper pin Event(TE) pending flag */
-	BKP_ClearFlag();
+	RTC_ClearFlag();
 #endif
 }
 
@@ -98,8 +98,8 @@ uint32_t	PIOS_IAP_CheckRequest( void )
 	uint16_t	reg1;
 	uint16_t	reg2;
 
-	reg1 = BKP_ReadBackupRegister( MAGIC_REG_1 );
-	reg2 = BKP_ReadBackupRegister( MAGIC_REG_2 );
+	reg1 = RTC_ReadBackupRegister( MAGIC_REG_1 );
+	reg2 = RTC_ReadBackupRegister( MAGIC_REG_2 );
 
 	if( reg1 == IAP_MAGIC_WORD_1 && reg2 == IAP_MAGIC_WORD_2 ) {
 		// We have a match.
@@ -123,31 +123,31 @@ uint32_t	PIOS_IAP_CheckRequest( void )
 void	PIOS_IAP_SetRequest1(void)
 {
 #if 0
-	BKP_WriteBackupRegister( MAGIC_REG_1, IAP_MAGIC_WORD_1);
+	RTC_WriteBackupRegister( MAGIC_REG_1, IAP_MAGIC_WORD_1);
 #endif
 }
 
 void	PIOS_IAP_SetRequest2(void)
 {
 #if 0
-	BKP_WriteBackupRegister( MAGIC_REG_2, IAP_MAGIC_WORD_2);
+	RTC_WriteBackupRegister( MAGIC_REG_2, IAP_MAGIC_WORD_2);
 #endif
 }
 
 void	PIOS_IAP_ClearRequest(void)
 {
 #if 0
-	BKP_WriteBackupRegister( MAGIC_REG_1, 0);
-	BKP_WriteBackupRegister( MAGIC_REG_2, 0);
+	RTC_WriteBackupRegister( MAGIC_REG_1, 0);
+	RTC_WriteBackupRegister( MAGIC_REG_2, 0);
 #endif
 }
 
 uint16_t PIOS_IAP_ReadBootCount(void)
 {
-	return BKP_ReadBackupRegister ( IAP_BOOTCOUNT );
+	return RTC_ReadBackupRegister ( IAP_BOOTCOUNT );
 }
 
 void PIOS_IAP_WriteBootCount (uint16_t boot_count)
 {
-	BKP_WriteBackupRegister ( IAP_BOOTCOUNT, boot_count );
+	RTC_WriteBackupRegister ( IAP_BOOTCOUNT, boot_count );
 }

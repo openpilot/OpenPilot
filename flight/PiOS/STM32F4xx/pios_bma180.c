@@ -321,8 +321,6 @@ int32_t PIOS_BMA180_ReadFifo(struct pios_bma180_data * buffer)
  */
 int32_t PIOS_BMA180_Test()
 {
-	return 0;
-	
 	// Read chip ID then version ID
 	uint8_t buf[3] = {0x80 | BMA_CHIPID_ADDR, 0, 0};
 	uint8_t rec[3] = {0,0, 0};

@@ -63,6 +63,7 @@
 // Private constants
 #define STACK_SIZE_BYTES 1540
 #define TASK_PRIORITY (tskIDLE_PRIORITY+3)
+#define SENSOR_PERIOD 2
 
 #define F_PI 3.14159265358979323846f
 #define PI_MOD(x) (fmod(x + F_PI, F_PI * 2) - F_PI)
@@ -182,8 +183,19 @@ static void SensorsTask(void *parameters)
 	
 	// Main task loop
 	lastSysTime = xTaskGetTickCount();
+	bool error = false;
 	while (1) {
 		// TODO: add timeouts to the sensor reads and set an error if the fail
+
+		if (error) {
+			PIOS_WDG_UpdateFlag(PIOS_WDG_SENSORS);
+			lastSysTime = xTaskGetTickCount();
+			vTaskDelayUntil(&lastSysTime, SENSOR_PERIOD / portTICK_RATE_MS);
+			AlarmsSet(SYSTEMALARMS_ALARM_SENSORS, SYSTEMALARMS_ALARM_CRITICAL);
+			error = false;
+		} else {
+			AlarmsClear(SYSTEMALARMS_ALARM_SENSORS);
+		}
 
 		int32_t read_good;
 		int32_t count;
@@ -200,7 +212,10 @@ static void SensorsTask(void *parameters)
 		struct pios_bma180_data accel;
 
 		count = 0;
-		while((read_good = PIOS_BMA180_ReadFifo(&accel)) != 0);
+		while((read_good = PIOS_BMA180_ReadFifo(&accel)) != 0 && !error)
+			error = ((xTaskGetTickCount() - lastSysTime) > SENSOR_PERIOD) ? true : error;
+		if (error)
+			continue;
 		while(read_good == 0) {	
 			count++;
 			
@@ -219,7 +234,10 @@ static void SensorsTask(void *parameters)
 		struct pios_mpu6000_data gyro;
 
 		count = 0;
-		while((read_good = PIOS_MPU6000_ReadFifo(&gyro)) != 0);
+		while((read_good = PIOS_MPU6000_ReadFifo(&gyro)) != 0 && !error)
+			error = ((xTaskGetTickCount() - lastSysTime) > SENSOR_PERIOD) ? true : error;
+		if (error)
+			continue;
 		while(read_good == 0) {
 			count++;
 			
@@ -247,7 +265,10 @@ static void SensorsTask(void *parameters)
 #elif defined(PIOS_INCLUDE_L3GD20)
 		struct pios_l3gd20_data gyro;
 		count = 0;
-		while((read_good = PIOS_L3GD20_ReadFifo(&gyro)) != 0);
+		while((read_good = PIOS_L3GD20_ReadFifo(&gyro)) != 0 && !error)
+			error = ((xTaskGetTickCount() - lastSysTime) > SENSOR_PERIOD) ? true : error;
+		if (error)
+			continue;
 		while(read_good == 0) {
 			count++;
 			
@@ -364,7 +385,7 @@ static void SensorsTask(void *parameters)
 		}
 		
 		PIOS_WDG_UpdateFlag(PIOS_WDG_SENSORS);
-		vTaskDelayUntil(&lastSysTime, 2 / portTICK_RATE_MS);
+		vTaskDelayUntil(&lastSysTime, SENSOR_PERIOD / portTICK_RATE_MS);
 		
 	}
 }

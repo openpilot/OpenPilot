@@ -34,6 +34,29 @@
 #include <manualcontrolsettings.h>
 #include <gcsreceiver.h>
 
+#if defined(PIOS_INCLUDE_LED)
+
+#include <pios_led_priv.h>
+static const struct pios_led pios_leds[] = {
+	[PIOS_LED_HEARTBEAT] = {
+		.pin = {
+			.gpio = GPIOA,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_6,
+				.GPIO_Mode  = GPIO_Mode_Out_PP,
+				.GPIO_Speed = GPIO_Speed_50MHz,
+			},
+		},
+	},
+};
+
+static const struct pios_led_cfg pios_led_cfg = {
+	.leds     = pios_leds,
+	.num_leds = NELEMENTS(pios_leds),
+};
+
+#endif	/* PIOS_INCLUDE_LED */
+
 #if defined(PIOS_INCLUDE_SPI)
 
 #include <pios_spi_priv.h>
@@ -1058,6 +1081,15 @@ void PIOS_Board_Init(void) {
 	EventDispatcherInitialize();
 	UAVObjInitialize();
 
+#if defined(PIOS_INCLUDE_RTC)
+	/* Initialize the real-time clock and its associated tick */
+	PIOS_RTC_Init(&pios_rtc_main_cfg);
+#endif
+
+#if defined(PIOS_INCLUDE_LED)
+	PIOS_LED_Init(&pios_led_cfg);
+#endif	/* PIOS_INCLUDE_LED */
+
 	HwSettingsInitialize();
 
 #ifndef ERASE_FLASH
@@ -1079,11 +1111,6 @@ void PIOS_Board_Init(void) {
 		HwSettingsSetDefaults(HwSettingsHandle(), 0);
 		AlarmsSet(SYSTEMALARMS_ALARM_BOOTFAULT, SYSTEMALARMS_ALARM_CRITICAL);
 	}
-
-#if defined(PIOS_INCLUDE_RTC)
-	/* Initialize the real-time clock and its associated tick */
-	PIOS_RTC_Init(&pios_rtc_main_cfg);
-#endif
 
 	/* Initialize the task monitor library */
 	TaskMonitorInitialize();

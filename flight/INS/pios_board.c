@@ -31,6 +31,39 @@
 
 #include <pios.h>
 
+#if defined(PIOS_INCLUDE_LED)
+
+#include <pios_led_priv.h>
+static const struct pios_led pios_leds[] = {
+	[PIOS_LED_HEARTBEAT] = {
+		.pin = {
+			.gpio = GPIOA,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_3,
+				.GPIO_Mode  = GPIO_Mode_Out_PP,
+				.GPIO_Speed = GPIO_Speed_50MHz,
+			},
+		},
+	},
+	[PIOS_LED_ALARM] = {
+		.pin = {
+			.gpio = GPIOA,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_2,
+				.GPIO_Mode  = GPIO_Mode_Out_PP,
+				.GPIO_Speed = GPIO_Speed_50MHz,
+			},
+		},
+	},
+};
+
+static const struct pios_led_cfg pios_led_cfg = {
+	.leds     = pios_leds,
+	.num_leds = NELEMENTS(pios_leds),
+};
+
+#endif	/* PIOS_INCLUDE_LED */
+
 #if defined(PIOS_INCLUDE_SPI)
 
 #include <pios_spi_priv.h>
@@ -519,6 +552,10 @@ uint32_t pios_com_gps_id;
 void PIOS_Board_Init(void) {
 	/* Brings up System using CMSIS functions, enables the LEDs. */
 	PIOS_SYS_Init();
+
+#if defined(PIOS_INCLUDE_LED)
+	PIOS_LED_Init(&pios_led_cfg);
+#endif	/* PIOS_INCLUDE_LED */
 
 	/* Delay system */
 	PIOS_DELAY_Init();

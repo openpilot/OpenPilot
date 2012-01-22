@@ -91,16 +91,8 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
 //------------------------
 // PIOS_LED
 //------------------------
-#define PIOS_LED_LED1_GPIO_PORT                 GPIOC
-#define PIOS_LED_LED1_GPIO_PIN                  GPIO_Pin_12
-#define PIOS_LED_LED1_GPIO_CLK                  RCC_APB2Periph_GPIOC
-#define PIOS_LED_LED2_GPIO_PORT                 GPIOC
-#define PIOS_LED_LED2_GPIO_PIN                  GPIO_Pin_13
-#define PIOS_LED_LED2_GPIO_CLK                  RCC_APB2Periph_GPIOC
-#define PIOS_LED_NUM                            2
-#define PIOS_LED_PORTS                          { PIOS_LED_LED1_GPIO_PORT, PIOS_LED_LED2_GPIO_PORT }
-#define PIOS_LED_PINS                           { PIOS_LED_LED1_GPIO_PIN, PIOS_LED_LED2_GPIO_PIN }
-#define PIOS_LED_CLKS                           { PIOS_LED_LED1_GPIO_CLK, PIOS_LED_LED2_GPIO_CLK }
+#define PIOS_LED_HEARTBEAT	0
+#define PIOS_LED_ALARM		1
 
 //------------------------
 // PIOS_SPI

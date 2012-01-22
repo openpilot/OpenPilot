@@ -105,17 +105,13 @@ int32_t CCGuidanceInitialize()
 		CCGuidanceSettingsInitialize();
 		GPSPositionInitialize();
 		//HomeLocationInitialize();
-		
-		/*AttitudeActualInitialize();
 
-		ev.obj = AttitudeActualHandle();
-		ev.instId = 0;
-		ev.event = 0;*/
 		memset(&ev,0,sizeof(UAVObjEvent));	
 		EventPeriodicCallbackCreate(&ev, ccguidanceTask, SAMPLE_PERIOD_MS / portTICK_RATE_MS);
 
 		// connect to GPSPosition
 		//GPSPositionConnectCallback(&ccguidanceTask);
+
 		// indicate error - can only run correctly if GPSPosition is ever set, which will change the alarm state.
 		AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_ERROR);
 		return 0;
@@ -142,9 +138,9 @@ static void ccguidanceTask(UAVObjEvent * ev)
 	static float diffHeadingYaw, courseRelative;
 	static float positionDesiredNorth = 0, positionDesiredEast = 0, positionDesiredDown = 0;
 	float positionActualNorth = 0, positionActualEast = 0, DistanceToBase = 0;
-	static uint32_t thisTimesRotateForTheCourse;
+	static uint16_t thisTimesRotateToCourse;
 	static bool	firsRunSetCourse = TRUE, StateSaveCurrentPositionToRTB = FALSE;
-	
+
 	CCGuidanceSettingsGet(&ccguidanceSettings);
 
 	if (!lastUpdateTime) lastUpdateTime = xTaskGetTickCount();
@@ -153,7 +149,7 @@ static void ccguidanceTask(UAVObjEvent * ev)
 	thisTime = xTaskGetTickCount();
 	if( (thisTime - lastUpdateTime) < (ccguidanceSettings.UpdatePeriod / portTICK_RATE_MS) ) return;
 
-	thisTimesRotateForTheCourse += (thisTime - lastUpdateTime) / portTICK_RATE_MS;
+	thisTimesRotateToCourse += (thisTime - lastUpdateTime) / portTICK_RATE_MS;
 	lastUpdateTime = thisTime;
 
 	FlightStatusGet(&flightStatus);
@@ -161,7 +157,7 @@ static void ccguidanceTask(UAVObjEvent * ev)
 
 	//Activate failsave mode, activate return to base
 	if ((AlarmsGet(SYSTEMALARMS_ALARM_MANUALCONTROL) != SYSTEMALARMS_ALARM_OK) &&
-		(ccguidanceSettings.failesaveEnableRTB == TRUE))	{
+		(ccguidanceSettings.FaileSaveRTB == TRUE))	{
 		flightStatus.FlightMode = FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE;
 		FlightStatusSet(&flightStatus);
 	}
@@ -196,22 +192,21 @@ static void ccguidanceTask(UAVObjEvent * ev)
 
 		/* safety */
 		if (positionActual.Status==GPSPOSITION_STATUS_FIX3D) {
-		//if (1) {
 			/* main position hold loop */
 
 			// Calculation of the rate after the turn and the beginning of motion in a straight line.
-			if (thisTimesRotateForTheCourse >= ccguidanceSettings.TimesRotateForTheCourse) {
+			if (thisTimesRotateToCourse >= ccguidanceSettings.TimesRotateToCourse) {
 				/* 1. Calculate course */
 				positionActualNorth = positionActual.Latitude * 1e-7;
 				positionActualEast  = positionActual.Longitude * 1e-7;
 				// Calculation errors between the rate of the gyroscope and GPS at a speed not less than the minimum.
-				if (positionActual.Groundspeed > ccguidanceSettings.GroundspeedMinimal ) {
+				if (positionActual.Groundspeed > ccguidanceSettings.GroundSpeedCalcCorrectHeadMin ) {
 					AttitudeActualGet(&attitudeActual);
 					diffHeadingYaw = attitudeActual.Yaw - positionActual.Heading;
 					while (diffHeadingYaw<-180.) diffHeadingYaw+=360.;
 					while (diffHeadingYaw>180.)  diffHeadingYaw-=360.;
 					}
-			
+
 				// calculate course to target
 				DistanceToBase = sphereDistance(
 					positionActualNorth,
@@ -233,40 +228,58 @@ static void ccguidanceTask(UAVObjEvent * ev)
 					while (courseRelative>180.)  courseRelative-=360.;
 				}
 				stabDesired.Yaw = courseRelative;
-				thisTimesRotateForTheCourse = 0;
+				thisTimesRotateToCourse = 0;
 			} else {
-				// Save current location to HomeLocation if flightStatus = DISARMED
-				if (flightStatus.Armed == FLIGHTSTATUS_ARMED_DISARMED && StateSaveCurrentPositionToRTB == FALSE) {
-					ccguidanceSettings.HomeLocationLatitude	= positionActual.Latitude;
-					ccguidanceSettings.HomeLocationLongitude = positionActual.Longitude;
-					ccguidanceSettings.HomeLocationAltitude = positionActual.Altitude;
-					ccguidanceSettings.HomeLocationSet = TRUE;
-					CCGuidanceSettingsSet(&ccguidanceSettings);
-					positionHoldLast = 0;
-					StateSaveCurrentPositionToRTB = TRUE;
-				}
-				
-				stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_ROLL] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
-				stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_PITCH] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
-				stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
-
 				// If first run to activate fixed direction Yaw
-				AttitudeActualGet(&attitudeActual);
 				if (firsRunSetCourse) {
+					// Save current location to HomeLocation if flightStatus = DISARMED
+					if (flightStatus.Armed == FLIGHTSTATUS_ARMED_DISARMED && StateSaveCurrentPositionToRTB == FALSE) {
+						ccguidanceSettings.HomeLocationLatitude	= positionActual.Latitude;
+						ccguidanceSettings.HomeLocationLongitude = positionActual.Longitude;
+						ccguidanceSettings.HomeLocationAltitude = positionActual.Altitude;
+						ccguidanceSettings.HomeLocationSet = TRUE;
+						CCGuidanceSettingsSet(&ccguidanceSettings);
+						positionHoldLast = 0;
+						StateSaveCurrentPositionToRTB = TRUE;
+						if (stabDesired.Throttle < 0) stabDesired.Throttle = 0;
+					}
+
+					stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_ROLL] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+					stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_PITCH] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+					stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+
+					AttitudeActualGet(&attitudeActual);
 					stabDesired.Yaw = attitudeActual.Yaw;
 					firsRunSetCourse = FALSE;
-				} //else stabDesired.Yaw = courseRelative;
+				}
+				/* 2. Altitude */
+				if ((positionActual.Altitude + positionActual.GeoidSeparation) < positionDesiredDown) {
+					stabDesired.Pitch = ccguidanceSettings.Pitch[CCGUIDANCESETTINGS_PITCH_CLIMB];
+				} else {
+					stabDesired.Pitch = ccguidanceSettings.Pitch[CCGUIDANCESETTINGS_PITCH_SINK];
 				}
 
-			/* 2. Altitude */
-			if ((positionActual.Altitude + positionActual.GeoidSeparation) < positionDesiredDown) {
-				stabDesired.Pitch = ccguidanceSettings.Pitch[CCGUIDANCESETTINGS_PITCH_CLIMB];
-			} else {
-				stabDesired.Pitch = ccguidanceSettings.Pitch[CCGUIDANCESETTINGS_PITCH_SINK];
+				/* 3. GroundSpeed */
+				if (ccguidanceSettings.TrottleAutoSet == TRUE) {
+					if (ccguidanceSettings.TrottleMax > 1) ccguidanceSettings.TrottleMax = 1;
+					if (ccguidanceSettings.TrottleMin < 0) ccguidanceSettings.TrottleMin = 0;
+
+					if (positionActual.Groundspeed < ccguidanceSettings.GroundSpeedMax ) {
+						stabDesired.Throttle += 0.1;
+						if (stabDesired.Throttle > ccguidanceSettings.TrottleMax) stabDesired.Throttle = ccguidanceSettings.TrottleMax;
+					} else {
+						stabDesired.Throttle -= 0.1;
+						if (stabDesired.Throttle < ccguidanceSettings.TrottleMin) stabDesired.Throttle = ccguidanceSettings.TrottleMin;
+					}
+				} else {
+					/* Throttle (manual) */
+					ManualControlCommandGet(&manualControl);
+					stabDesired.Throttle = manualControl.Throttle;
 				}
-			
+			}
 			stabDesired.Roll = ccguidanceSettings.Roll[CCGUIDANCESETTINGS_ROLL_NEUTRAL];
 			AlarmsClear(SYSTEMALARMS_ALARM_GUIDANCE);
+
 		} else {
 			/* Fallback, no position data! */
 			stabDesired.Yaw = ccguidanceSettings.Yaw;
@@ -275,16 +288,16 @@ static void ccguidanceTask(UAVObjEvent * ev)
 			stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_ROLL] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
 			stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_PITCH] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
 			stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW] = STABILIZATIONDESIRED_STABILIZATIONMODE_RATE;
+			/* Throttle (manual) */
+			ManualControlCommandGet(&manualControl);
+			stabDesired.Throttle = manualControl.Throttle;
 			AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_WARNING);
-			}
+		}
 
-		/* 3. Throttle (manual) */
-		ManualControlCommandGet(&manualControl);
-		stabDesired.Throttle = manualControl.Throttle;
 		StabilizationDesiredSet(&stabDesired);
-	} else{
+	} else {
 		// reset globals...
-		thisTimesRotateForTheCourse = 0;
+		thisTimesRotateToCourse = 0;
 		positionHoldLast = 0;
 		firsRunSetCourse = TRUE;
 		AlarmsClear(SYSTEMALARMS_ALARM_GUIDANCE);

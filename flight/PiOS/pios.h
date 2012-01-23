@@ -93,9 +93,7 @@
 #include <pios_usb_hid.h>
 #include <pios_debug.h>
 #include <pios_gpio.h>
-#if defined(PIOS_INCLUDE_EXTI)
 #include <pios_exti.h>
-#endif
 #include <pios_wdg.h>
 
 /* PIOS Hardware Includes (Common) */
@@ -134,12 +132,12 @@
 #if defined(PIOS_INCLUDE_IAP)
 #include <pios_iap.h>
 #endif
-
 #if defined(PIOS_INCLUDE_ADXL345)
 #include <pios_adxl345.h>
 #endif
-
+#if defined(PIOS_INCLUDE_BMA180)
 #include <pios_bma180.h>
+#endif
 
 #if defined(PIOS_INCLUDE_FLASH)
 #include <pios_flash_w25x.h>

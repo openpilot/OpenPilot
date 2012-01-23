@@ -91,9 +91,7 @@ struct pios_bma180_data {
 
 
 struct pios_bma180_cfg {
-	struct stm32_gpio drdy;
-	struct stm32_exti eoc_exti;
-	struct stm32_irq eoc_irq;
+	const struct pios_exti_cfg * exti_cfg; /* Pointer to the EXTI configuration */
 };
 
 /* Public Functions */
@@ -103,6 +101,7 @@ extern float PIOS_BMA180_GetScale();
 extern int32_t PIOS_BMA180_ReadFifo(struct pios_bma180_data * buffer);
 extern int32_t PIOS_BMA180_ReadAccels(struct pios_bma180_data * data);
 extern int32_t PIOS_BMA180_Test();
+extern void PIOS_BMA180_IRQHandler();
 
 #endif /* PIOS_BMA180_H */
 

@@ -30,6 +30,9 @@
  */
 
 #include "pios.h"
+
+#if defined(PIOS_INCLUDE_BMA180)
+
 #include "fifo_buffer.h"
 
 static uint32_t PIOS_SPI_ACCEL;
@@ -40,7 +43,6 @@ static int32_t PIOS_BMA180_SelectBW(enum bma180_bandwidth bw);
 static int32_t PIOS_BMA180_SetRange(enum bma180_range range);
 static int32_t PIOS_BMA180_Config();
 static int32_t PIOS_BMA180_EnableIrq();
-static void PIOS_BMA180_IRQHandler(void);
 
 #define PIOS_BMA180_MAX_DOWNSAMPLE 10
 static int16_t pios_bma180_buffer[PIOS_BMA180_MAX_DOWNSAMPLE * sizeof(struct pios_bma180_data)];
@@ -60,15 +62,7 @@ int32_t PIOS_BMA180_Init(const struct pios_bma180_cfg * cfg)
 	
 	fifoBuf_init(&pios_bma180_fifo, (uint8_t *) pios_bma180_buffer, sizeof(pios_bma180_buffer));
 	
-	/* Configure EOC pin as input floating */
-	GPIO_Init(cfg->drdy.gpio, &cfg->drdy.init);
-	
-	/* Configure the End Of Conversion (EOC) interrupt */
-	SYSCFG_EXTILineConfig(cfg->eoc_exti.port_source, cfg->eoc_exti.pin_source);
-	EXTI_Init(&cfg->eoc_exti.init);
-	
-	/* Enable and set EOC EXTI Interrupt to the lowest priority */
-	NVIC_Init(&cfg->eoc_irq.init);
+	PIOS_EXTI_Init(cfg->exti_cfg);
 	
 	if(PIOS_BMA180_Config() < 0)
 		return -1;
@@ -364,7 +358,7 @@ int32_t PIOS_BMA180_Test()
 /**
  * @brief IRQ Handler.  Read data from the BMA180 FIFO and push onto a local fifo.
  */
-static void PIOS_BMA180_IRQHandler(void)
+void PIOS_BMA180_IRQHandler(void)
 {
 	const static uint8_t pios_bma180_req_buf[7] = {BMA_X_LSB_ADDR | 0x80,0,0,0,0,0};
 	uint8_t pios_bma180_dmabuf[8];
@@ -401,24 +395,7 @@ static void PIOS_BMA180_IRQHandler(void)
 
 }
 
-
-/**
- * The physical IRQ handler
- * Soon this will be generic in pios_exti and the BMA180 will register
- * against it
- */
- 
-int32_t bma180_irq = 0;
-void EXTI4_IRQHandler(void)
-{
-	if (EXTI_GetITStatus(dev_cfg->eoc_exti.init.EXTI_Line) != RESET) {
-		bma180_irq++;
-		PIOS_BMA180_IRQHandler();
-		EXTI_ClearITPendingBit(dev_cfg->eoc_exti.init.EXTI_Line);
-	}
-}
-
-
+#endif /* PIOS_INCLUDE_BMA180 */
 /**
  * @}
  * @}

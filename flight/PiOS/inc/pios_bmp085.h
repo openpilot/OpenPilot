@@ -73,10 +73,7 @@ extern int32_t PIOS_BMP085_EOC;
 
 
 struct pios_bmp085_cfg {
-	struct stm32_gpio drdy;
-	struct stm32_gpio xclr;
-	struct stm32_exti eoc_exti;
-	struct stm32_irq eoc_irq;
+	static const struct pios_exti_cfg * exti_cfg; /* Pointer to the EXTI configuration */
 	uint32_t oversampling;
 };
 

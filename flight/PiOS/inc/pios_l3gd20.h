@@ -127,9 +127,8 @@ struct pios_l3gd20_data {
 };
 
 struct pios_l3gd20_cfg {
-	struct stm32_gpio drdy;
-	struct stm32_exti eoc_exti;
-	struct stm32_irq eoc_irq;
+	const struct pios_exti_cfg * exti_cfg; /* Pointer to the EXTI configuration */
+
 	enum pios_l3gd20_range gyro_range;
 };
 
@@ -141,6 +140,7 @@ extern int32_t PIOS_L3GD20_ReadGyros(struct pios_l3gd20_data * buffer);
 extern int32_t PIOS_L3GD20_ReadID();
 extern uint8_t PIOS_L3GD20_Test();
 extern float PIOS_L3GD20_GetScale();
+extern void PIOS_L3GD20_IRQHandler();
 
 #endif /* PIOS_L3GD20_H */
 

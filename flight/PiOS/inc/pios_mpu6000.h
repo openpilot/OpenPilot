@@ -128,9 +128,7 @@ struct pios_mpu6000_data {
 };
 
 struct pios_mpu6000_cfg {
-	struct stm32_gpio drdy;
-	struct stm32_exti eoc_exti;
-	struct stm32_irq eoc_irq;
+	const struct pios_exti_cfg * exti_cfg; /* Pointer to the EXTI configuration */
 	
 	uint8_t Fifo_store;		/* FIFO storage of different readings (See datasheet page 31 for more details) */
 	uint8_t Smpl_rate_div;	/* Sample rate divider to use (See datasheet page 32 for more details) */
@@ -151,6 +149,7 @@ extern int32_t PIOS_MPU6000_ReadID();
 extern uint8_t PIOS_MPU6000_Test();
 extern float PIOS_MPU6000_GetScale();
 extern float PIOS_MPU6000_GetAccelScale();
+extern void PIOS_MPU6000_IRQHandler(void);
 
 #endif /* PIOS_MPU6000_H */
 

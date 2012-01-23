@@ -68,15 +68,8 @@ void PIOS_L3GD20_Init(const struct pios_l3gd20_cfg * new_cfg)
 	PIOS_L3GD20_Config(cfg);
 	PIOS_SPI_SetPrescalar(pios_spi_gyro, SPI_BaudRatePrescaler_16);
 
-	/* Configure EOC pin as input floating */
-	GPIO_Init(cfg->drdy.gpio, &cfg->drdy.init);
-	
-	/* Configure the End Of Conversion (EOC) interrupt */
-	SYSCFG_EXTILineConfig(cfg->eoc_exti.port_source, cfg->eoc_exti.pin_source);
-	EXTI_Init(&cfg->eoc_exti.init);
-	
-	/* Enable and set EOC EXTI Interrupt to the lowest priority */
-	NVIC_Init(&cfg->eoc_irq.init);
+	/* Set up EXTI */
+	PIOS_EXTI_Init(new_cfg->exti_cfg);
 	
 	// An initial read is needed to get it running
 	struct pios_l3gd20_data data;

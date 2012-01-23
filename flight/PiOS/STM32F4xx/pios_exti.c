@@ -73,13 +73,13 @@ static uint8_t PIOS_EXTI_line_to_index (uint32_t line)
 uint8_t PIOS_EXTI_gpio_port_to_exti_source_port(GPIO_TypeDef * gpio_port)
 {
 	switch((uint32_t)gpio_port) {
-	case (uint32_t)GPIOA: return (GPIO_PortSourceGPIOA);
-	case (uint32_t)GPIOB: return (GPIO_PortSourceGPIOB);
-	case (uint32_t)GPIOC: return (GPIO_PortSourceGPIOC);
-	case (uint32_t)GPIOD: return (GPIO_PortSourceGPIOD);
-	case (uint32_t)GPIOE: return (GPIO_PortSourceGPIOE);
-	case (uint32_t)GPIOF: return (GPIO_PortSourceGPIOF);
-	case (uint32_t)GPIOG: return (GPIO_PortSourceGPIOG);
+		case (uint32_t)GPIOA: return (EXTI_PortSourceGPIOA);
+		case (uint32_t)GPIOB: return (EXTI_PortSourceGPIOB);
+		case (uint32_t)GPIOC: return (EXTI_PortSourceGPIOC);
+		case (uint32_t)GPIOD: return (EXTI_PortSourceGPIOD);
+		case (uint32_t)GPIOE: return (EXTI_PortSourceGPIOE);
+		case (uint32_t)GPIOF: return (EXTI_PortSourceGPIOF);
+		case (uint32_t)GPIOG: return (EXTI_PortSourceGPIOG);
 	}
 
 	PIOS_Assert(0);
@@ -137,7 +137,7 @@ int32_t PIOS_EXTI_Init(const struct pios_exti_cfg * cfg)
 	/* Set up the EXTI interrupt source */
 	uint8_t exti_source_port = PIOS_EXTI_gpio_port_to_exti_source_port(cfg->pin.gpio);
 	uint8_t exti_source_pin = PIOS_EXTI_gpio_pin_to_exti_source_pin(cfg->pin.init.GPIO_Pin);
-	GPIO_EXTILineConfig(exti_source_port, exti_source_pin);
+	SYSCFG_EXTILineConfig(exti_source_port, exti_source_pin);
 	EXTI_Init(&cfg->exti.init);
 
 	/* Enable the interrupt channel */

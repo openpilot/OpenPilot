@@ -23,66 +23,16 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+/* Pull in the board-specific static HW definitions.
+ * Including .c files is a bit ugly but this allows all of
+ * the HW definitions to be const and static to limit their
+ * scope.  
+ *
+ * NOTE: THIS IS THE ONLY PLACE THAT SHOULD EVER INCLUDE THIS FILE
+ */
+#include "board_hw_defs.c"
+
 #include <pios.h>
-
-#if defined(PIOS_INCLUDE_LED)
-
-#include <pios_led_priv.h>
-static const struct pios_led pios_leds[] = {
-	[PIOS_LED_HEARTBEAT] = {
-		.pin = {
-			.gpio = GPIOA,
-			.init = {
-				.GPIO_Pin   = GPIO_Pin_6,
-				.GPIO_Mode  = GPIO_Mode_Out_PP,
-				.GPIO_Speed = GPIO_Speed_50MHz,
-			},
-		},
-	},
-};
-
-static const struct pios_led_cfg pios_led_cfg = {
-	.leds     = pios_leds,
-	.num_leds = NELEMENTS(pios_leds),
-};
-
-#endif	/* PIOS_INCLUDE_LED */
-
-#if defined(PIOS_INCLUDE_COM_MSG)
-
-#include <pios_com_msg_priv.h>
-
-#endif /* PIOS_INCLUDE_COM_MSG */
-
-#if defined(PIOS_INCLUDE_USB)
-#include "pios_usb_priv.h"
-
-static const struct pios_usb_cfg pios_usb_main_cfg = {
-  .irq = {
-    .init    = {
-      .NVIC_IRQChannel                   = USB_LP_CAN1_RX0_IRQn,
-      .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
-      .NVIC_IRQChannelSubPriority        = 0,
-      .NVIC_IRQChannelCmd                = ENABLE,
-    },
-  },
-};
-
-#include "pios_usb_board_data_priv.h"
-#include "pios_usb_desc_hid_only_priv.h"
-
-#endif	/* PIOS_INCLUDE_USB */
-
-#if defined(PIOS_INCLUDE_USB_HID)
-#include <pios_usb_hid_priv.h>
-
-const struct pios_usb_hid_cfg pios_usb_hid_cfg = {
-	.data_if = 0,
-	.data_rx_ep = 1,
-	.data_tx_ep = 1,
-};
-
-#endif	/* PIOS_INCLUDE_USB_HID */
 
 uint32_t pios_com_telem_usb_id;
 

@@ -7,7 +7,7 @@
  * @{
  *
  * @file       pios_bmp085.h  
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      BMP085 functions header.
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -30,8 +30,6 @@
 
 #ifndef PIOS_BMP085_H
 #define PIOS_BMP085_H
-
-#include <pios.h>
 
 /* BMP085 Addresses */
 #define BMP085_I2C_ADDR			0x77
@@ -71,18 +69,14 @@ extern xSemaphoreHandle PIOS_BMP085_EOC;
 extern int32_t PIOS_BMP085_EOC;
 #endif
 
-
-struct pios_bmp085_cfg {
-	static const struct pios_exti_cfg * exti_cfg; /* Pointer to the EXTI configuration */
-	uint32_t oversampling;
-};
-
 /* Public Functions */
-extern void PIOS_BMP085_Init(const struct pios_bmp085_cfg * cfg);
-extern int32_t PIOS_BMP085_StartADC(ConversionTypeTypeDef Type);
-extern int32_t PIOS_BMP085_ReadADC(void);
+extern void PIOS_BMP085_Init(void);
+extern void PIOS_BMP085_StartADC(ConversionTypeTypeDef Type);
+extern void PIOS_BMP085_ReadADC(void);
 extern int16_t PIOS_BMP085_GetTemperature(void);
 extern int32_t PIOS_BMP085_GetPressure(void);
+extern bool PIOS_BMP085_Read(uint8_t address, uint8_t * buffer, uint8_t len);
+extern bool PIOS_BMP085_Write(uint8_t address, uint8_t buffer);
 extern int32_t PIOS_BMP085_Test();
 
 #endif /* PIOS_BMP085_H */

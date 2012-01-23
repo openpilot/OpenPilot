@@ -109,11 +109,7 @@ int32_t AltitudeInitialize()
 	alt_ds_temp = 0;
 	alt_ds_pres = 0;
 	alt_ds_count = 0;
-<<<<<<< HEAD
-	
-=======
 
->>>>>>> next
 	return 0;
 }
 MODULE_INITCALL(AltitudeInitialize, AltitudeStart)
@@ -185,24 +181,6 @@ static void altitudeTask(void *parameters)
 		if (++alt_ds_count >= alt_ds_size)
 		{
 			alt_ds_count = 0;
-<<<<<<< HEAD
-			
-			// Convert from 1/10ths of degC to degC
-			data.Temperature = alt_ds_temp / (10.0 * alt_ds_size);
-			alt_ds_temp = 0;
-			
-			// Convert from Pa to kPa
-			data.Pressure = alt_ds_pres / (1000.0f * alt_ds_size);
-			alt_ds_pres = 0;
-			
-			// Compute the current altitude (all pressures in kPa)
-			data.Altitude = 44330.0 * (1.0 - powf((data.Pressure / (BMP085_P0 / 1000.0)), (1.0 / 5.255)));
-			
-			// Update the AltitudeActual UAVObject
-			BaroAltitudeSet(&data);
-		}
-		
-=======
 
 			// Convert from 1/10ths of degC to degC
 			data.Temperature = alt_ds_temp / (10.0 * alt_ds_size);
@@ -219,7 +197,6 @@ static void altitudeTask(void *parameters)
 			BaroAltitudeSet(&data);
 		}
 
->>>>>>> next
 		// Delay until it is time to read the next sample
 		vTaskDelayUntil(&lastSysTime, UPDATE_PERIOD / portTICK_RATE_MS);
 	}

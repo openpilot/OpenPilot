@@ -284,6 +284,4 @@ extern uint32_t pios_com_telem_usb_id;
 #define PIOS_USB_DETECT_GPIO_PORT               GPIOC
 #define PIOS_USB_MAX_DEVS                       1
 #define PIOS_USB_DETECT_GPIO_PIN                GPIO_Pin_15
-#define PIOS_USB_DETECT_EXTI_LINE               EXTI_Line15
-#define PIOS_IRQ_USB_PRIORITY                   PIOS_IRQ_PRIO_MID
 #endif /* STM32103CB_AHRS_H_ */

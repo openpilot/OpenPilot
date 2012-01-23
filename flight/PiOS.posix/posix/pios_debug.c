@@ -72,7 +72,7 @@ void PIOS_DEBUG_PinValue4BitL(uint8_t value)
 /**
  * Report a serious error and halt
  */
-void PIOS_DEBUG_Panic(const char *msg)
+void PIOS_DEBUG_Panic(const char *msg) __attribute__ ((noreturn))
 {
 #ifdef PIOS_COM_DEBUG
 	register int *lr asm("lr");	// Link-register holds the PC of the caller

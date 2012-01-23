@@ -36,6 +36,10 @@ struct stm32_irq {
 	NVIC_InitTypeDef init;
 };
 
+struct stm32_exti {
+	EXTI_InitTypeDef init;
+};
+
 struct stm32_dma_chan {
 	DMA_Channel_TypeDef *channel;
 	DMA_InitTypeDef init;

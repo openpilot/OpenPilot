@@ -36,13 +36,10 @@
 #error PIOS_EXTI Must be included in the project!
 #endif /* PIOS_INCLUDE_EXTI */
 
+#include <pios_exti.h>
+
 /* Glocal Variables */
 ConversionTypeTypeDef CurrentRead;
-#if defined(PIOS_INCLUDE_FREERTOS)
-xSemaphoreHandle PIOS_BMP085_EOC;
-#else
-int32_t PIOS_BMP085_EOC;
-#endif
 
 /* Local Variables */
 static BMP085CalibDataTypeDef CalibData;
@@ -55,14 +52,68 @@ static volatile uint32_t RawPressure;
 static volatile uint32_t Pressure;
 static volatile uint16_t Temperature;
 
-static int32_t PIOS_BMP085_Read(uint8_t address, uint8_t * buffer, uint8_t len);
-static int32_t PIOS_BMP085_Write(uint8_t address, uint8_t buffer);
+#ifdef PIOS_BMP085_HAS_GPIOS
 
+#if defined(PIOS_INCLUDE_FREERTOS)
+xSemaphoreHandle PIOS_BMP085_EOC;
+#else
+int32_t PIOS_BMP085_EOC;
+#endif
+
+void PIOS_BMP085_EndOfConversion (void)
+{
+#if defined(PIOS_INCLUDE_FREERTOS)
+	portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+#endif
+
+	/* Read the ADC Value */
+#if defined(PIOS_INCLUDE_FREERTOS)
+	xSemaphoreGiveFromISR(PIOS_BMP085_EOC, &xHigherPriorityTaskWoken);
+#else
+	PIOS_BMP085_EOC=1;
+#endif
+
+#if defined(PIOS_INCLUDE_FREERTOS)
+	/* Yield From ISR if needed */
+	portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
+#endif
+}
+
+static const struct pios_exti_cfg pios_exti_bmp085_cfg __exti_config = {
+	.vector = PIOS_BMP085_EndOfConversion,
+	.line = PIOS_BMP085_EOC_EXTI_LINE,
+	.pin = {
+		.gpio = PIOS_BMP085_EOC_GPIO_PORT,
+		.init = {
+			.GPIO_Pin = PIOS_BMP085_EOC_GPIO_PIN,
+			.GPIO_Mode = GPIO_Mode_IN_FLOATING,
+		},
+	},
+	.irq = {
+		.init = {
+			.NVIC_IRQChannel = PIOS_BMP085_EOC_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_BMP085_EOC_PRIO,
+			.NVIC_IRQChannelSubPriority = 0,
+			.NVIC_IRQChannelCmd = ENABLE,
+		},
+	},
+	.exti = {
+		.init = {
+			.EXTI_Line = PIOS_BMP085_EOC_EXTI_LINE,
+			.EXTI_Mode = EXTI_Mode_Interrupt,
+			.EXTI_Trigger = EXTI_Trigger_Rising,
+			.EXTI_LineCmd = ENABLE,
+		},
+	},
+};
+
+#endif /* PIOS_BMP085_HAS_GPIOS */
 /**
 * Initialise the BMP085 sensor
 */
 void PIOS_BMP085_Init(const struct pios_bmp085_cfg * cfg)
 {
+#ifdef PIOS_BMP085_HAS_GPIOS
 
 #if defined(PIOS_INCLUDE_FREERTOS)
 	/* Semaphore used by ISR to signal End-Of-Conversion */
@@ -76,16 +127,12 @@ void PIOS_BMP085_Init(const struct pios_bmp085_cfg * cfg)
 	/* Enable EOC GPIO clock */
 	RCC_APB2PeriphClockCmd(PIOS_BMP085_EOC_CLK | RCC_APB2Periph_AFIO, ENABLE);
 
-	/* Configure EOC pin as input floating */
-	GPIO_Init(cfg->drdy.gpio, &cfg->drdy.init);
-	
-	/* Configure the End Of Conversion (EOC) interrupt */
-	EXTI_Init(&cfg->eoc_exti.init);
-	
-	/* Enable and set EOC EXTI Interrupt to the lowest priority */
-	NVIC_Init(&cfg->eoc_irq.init);
+	if (PIOS_EXTI_Init(&pios_exti_bmp085_cfg)) {
+		PIOS_Assert(0);
+	}
 
 	/* Configure XCLR pin as push/pull alternate funtion output */
+	GPIO_InitTypeDef GPIO_InitStructure;
 	GPIO_InitStructure.GPIO_Pin = PIOS_BMP085_XCLR_GPIO_PIN;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
 	GPIO_Init(PIOS_BMP085_XCLR_GPIO_PORT, &GPIO_InitStructure);

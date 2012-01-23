@@ -37,6 +37,10 @@ struct stm32_irq {
 	NVIC_InitTypeDef init;
 };
 
+struct stm32_exti {
+	EXTI_InitTypeDef init;
+};
+
 struct stm32_dma_chan {
 #if defined(STM32F2XX) || defined(STM32F4XX)
 	DMA_Stream_TypeDef *channel;
@@ -57,12 +61,6 @@ struct stm32_gpio {
 	GPIO_TypeDef *gpio;
 	GPIO_InitTypeDef init;
 	uint8_t pin_source;
-};
-
-struct stm32_exti {
-	uint8_t pin_source;
-	uint8_t port_source;
-	EXTI_InitTypeDef init;
 };
 
 /**

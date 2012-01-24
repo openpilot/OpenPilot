@@ -33,6 +33,8 @@
 #include <QDebug>
 #include <QDesktopServices>
 #include <QUrl>
+#include <accels.h>
+#include <gyros.h>
 
 ConfigCCAttitudeWidget::ConfigCCAttitudeWidget(QWidget *parent) :
         ConfigTaskWidget(parent),
@@ -60,25 +62,29 @@ ConfigCCAttitudeWidget::~ConfigCCAttitudeWidget()
     delete ui;
 }
 
-void ConfigCCAttitudeWidget::attitudeRawUpdated(UAVObject * obj) {
+void ConfigCCAttitudeWidget::accelsUpdated(UAVObject * obj) {
     QMutexLocker locker(&startStop);
 
     ui->zeroBiasProgress->setValue((float) updates / NUM_ACCEL_UPDATES * 100);
 
     if(updates < NUM_ACCEL_UPDATES) {
         updates++;
-        UAVObjectField * field = obj->getField(QString("accels"));
-        x_accum.append(field->getDouble(0));
-        y_accum.append(field->getDouble(1));
-        z_accum.append(field->getDouble(2));
-        field = obj->getField(QString("gyros"));
-        x_gyro_accum.append(field->getDouble(0));
-        y_gyro_accum.append(field->getDouble(1));
-        z_gyro_accum.append(field->getDouble(2));;
+        Accels * accels = Accels::GetInstance(getObjectManager());
+        Accels::DataFields accelsData = accels->getData();
+        x_accum.append(accelsData.x);
+        y_accum.append(accelsData.y);
+        z_accum.append(accelsData.z);
+
+        Gyros * gyros = Gyros::GetInstance(getObjectManager());
+        Gyros::DataFields gyrosData = gyros->getData();
+
+        x_gyro_accum.append(gyrosData.x);
+        y_gyro_accum.append(gyrosData.y);
+        z_gyro_accum.append(gyrosData.z);
     } else if ( updates == NUM_ACCEL_UPDATES ) {
 	updates++;
         timer.stop();
-        disconnect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(attitudeRawUpdated(UAVObject*)));
+        disconnect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(accelsUpdated(UAVObject*)));
         disconnect(&timer,SIGNAL(timeout()),this,SLOT(timeout()));
 
         float x_bias = listMean(x_accum) / ACCEL_SCALE;
@@ -109,8 +115,8 @@ void ConfigCCAttitudeWidget::attitudeRawUpdated(UAVObject * obj) {
 
 void ConfigCCAttitudeWidget::timeout() {
     QMutexLocker locker(&startStop);
-    UAVDataObject * obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AttitudeRaw")));
-    disconnect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(attitudeRawUpdated(UAVObject*)));
+    UAVDataObject * obj = Accels::GetInstance(getObjectManager());
+    disconnect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(accelsUpdated(UAVObject*)));
     disconnect(&timer,SIGNAL(timeout()),this,SLOT(timeout()));
 
     QMessageBox msgBox;
@@ -138,8 +144,8 @@ void ConfigCCAttitudeWidget::startAccelCalibration() {
     AttitudeSettings::GetInstance(getObjectManager())->setData(attitudeSettingsData);
 
     // Set up to receive updates
-    UAVDataObject * obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AttitudeRaw")));
-    connect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(attitudeRawUpdated(UAVObject*)));
+    UAVDataObject * obj = Accels::GetInstance(getObjectManager());
+    connect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(accelsUpdated(UAVObject*)));
 
     // Set up timeout timer
     timer.start(10000);

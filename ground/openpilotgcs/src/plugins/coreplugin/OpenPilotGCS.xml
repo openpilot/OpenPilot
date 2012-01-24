@@ -2006,7 +2006,7 @@
           <dataSize>60</dataSize>
           <plotCurve0>
             <color>4283804160</color>
-            <uavField>Z</uavField>
+            <uavField>z</uavField>
             <uavObject>Gyros</uavObject>
             <yMaximum>0</yMaximum>
             <yMinimum>0</yMinimum>
@@ -2014,7 +2014,7 @@
           </plotCurve0>
           <plotCurve1>
             <color>4283782655</color>
-            <uavField>Y</uavField>
+            <uavField>y</uavField>
             <uavObject>Gyros</uavObject>
             <yMaximum>0</yMaximum>
             <yMinimum>0</yMinimum>
@@ -2022,7 +2022,7 @@
           </plotCurve1>
           <plotCurve2>
             <color>4294901760</color>
-            <uavField>X</uavField>
+            <uavField>x</uavField>
             <uavObject>Gyros</uavObject>
             <yMaximum>0</yMaximum>
             <yMinimum>0</yMinimum>

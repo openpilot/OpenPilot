@@ -83,10 +83,6 @@
 /* A really shitty setting saving implementation */
 #define PIOS_INCLUDE_FLASH_SECTOR_SETTINGS
 
-/* Defaults for Logging */
-#define LOG_FILENAME 			"PIOS.LOG"
-#define STARTUP_LOG_ENABLED		1
-
 /* Alarm Thresholds */
 #define HEAP_LIMIT_WARNING             220
 #define HEAP_LIMIT_CRITICAL             40

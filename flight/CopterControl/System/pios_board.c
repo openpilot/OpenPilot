@@ -177,9 +177,22 @@ void PIOS_Board_Init(void) {
 
 #if defined(PIOS_INCLUDE_SPI)
 	/* Set up the SPI interface to the serial flash */
-	if (PIOS_SPI_Init(&pios_spi_flash_accel_id, &pios_spi_flash_accel_cfg)) {
-		PIOS_Assert(0);
+
+	switch(bdinfo->board_rev) {
+		case 0x01: // Revision 1
+			if (PIOS_SPI_Init(&pios_spi_flash_accel_id, &pios_spi_flash_accel_cfg_cc)) {
+				PIOS_Assert(0);
+			}
+			break;
+		case 0x02: // Revision 2
+			if (PIOS_SPI_Init(&pios_spi_flash_accel_id, &pios_spi_flash_accel_cfg_cc3d)) {
+				PIOS_Assert(0);
+			}
+			break;
+		default:
+			PIOS_Assert(0);
 	}
+
 #endif
 	PIOS_Flash_W25X_Init(pios_spi_flash_accel_id, 1);	
 

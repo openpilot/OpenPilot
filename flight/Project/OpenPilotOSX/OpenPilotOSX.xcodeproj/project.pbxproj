@@ -77,6 +77,11 @@
 		6534B55B1476D3A8003DF47C /* pios_ms5611.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_ms5611.h; sourceTree = "<group>"; };
 		6536D47B1307962C0042A298 /* stabilizationdesired.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = stabilizationdesired.xml; sourceTree = "<group>"; };
 		65408AA812BB1648004DACC5 /* i2cstats.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = i2cstats.xml; sourceTree = "<group>"; };
+		6543A04314CF1823004EEC4C /* board_hw_defs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = board_hw_defs.c; sourceTree = "<group>"; };
+		6543A04514CF1823004EEC4C /* board_hw_defs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = board_hw_defs.c; sourceTree = "<group>"; };
+		6543A04714CF1823004EEC4C /* board_hw_defs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = board_hw_defs.c; sourceTree = "<group>"; };
+		6543A04914CF1823004EEC4C /* board_hw_defs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = board_hw_defs.c; sourceTree = "<group>"; };
+		6543A04B14CF1823004EEC4C /* board_hw_defs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = board_hw_defs.c; sourceTree = "<group>"; };
 		6549E0D21279B3C800C5476F /* fifo_buffer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fifo_buffer.c; sourceTree = "<group>"; };
 		6549E0D31279B3CF00C5476F /* fifo_buffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fifo_buffer.h; sourceTree = "<group>"; };
 		655268BC121FBD2900410C6E /* ahrscalibration.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ahrscalibration.xml; sourceTree = "<group>"; };
@@ -3745,6 +3750,63 @@
 			path = inc;
 			sourceTree = "<group>";
 		};
+		6543A04114CF180D004EEC4C /* board_hw_defs */ = {
+			isa = PBXGroup;
+			children = (
+				6543A04214CF1823004EEC4C /* ahrs */,
+				6543A04414CF1823004EEC4C /* coptercontrol */,
+				6543A04614CF1823004EEC4C /* ins */,
+				6543A04814CF1823004EEC4C /* openpilot */,
+				6543A04A14CF1823004EEC4C /* pipxtreme */,
+			);
+			name = board_hw_defs;
+			sourceTree = "<group>";
+		};
+		6543A04214CF1823004EEC4C /* ahrs */ = {
+			isa = PBXGroup;
+			children = (
+				6543A04314CF1823004EEC4C /* board_hw_defs.c */,
+			);
+			name = ahrs;
+			path = ../../board_hw_defs/ahrs;
+			sourceTree = "<group>";
+		};
+		6543A04414CF1823004EEC4C /* coptercontrol */ = {
+			isa = PBXGroup;
+			children = (
+				6543A04514CF1823004EEC4C /* board_hw_defs.c */,
+			);
+			name = coptercontrol;
+			path = ../../board_hw_defs/coptercontrol;
+			sourceTree = "<group>";
+		};
+		6543A04614CF1823004EEC4C /* ins */ = {
+			isa = PBXGroup;
+			children = (
+				6543A04714CF1823004EEC4C /* board_hw_defs.c */,
+			);
+			name = ins;
+			path = ../../board_hw_defs/ins;
+			sourceTree = "<group>";
+		};
+		6543A04814CF1823004EEC4C /* openpilot */ = {
+			isa = PBXGroup;
+			children = (
+				6543A04914CF1823004EEC4C /* board_hw_defs.c */,
+			);
+			name = openpilot;
+			path = ../../board_hw_defs/openpilot;
+			sourceTree = "<group>";
+		};
+		6543A04A14CF1823004EEC4C /* pipxtreme */ = {
+			isa = PBXGroup;
+			children = (
+				6543A04B14CF1823004EEC4C /* board_hw_defs.c */,
+			);
+			name = pipxtreme;
+			path = ../../board_hw_defs/pipxtreme;
+			sourceTree = "<group>";
+		};
 		65632DF41251650300469B77 /* Boards */ = {
 			isa = PBXGroup;
 			children = (
@@ -3761,6 +3823,7 @@
 		657CEEB5121DBC49007A1FBE /* flight */ = {
 			isa = PBXGroup;
 			children = (
+				6543A04114CF180D004EEC4C /* board_hw_defs */,
 				65904E3F146128A500FD9482 /* Revolution */,
 				65FF4BB313791C3300146BE4 /* Bootloaders */,
 				65F93B9012EE09280047DB36 /* PipXtreme */,

@@ -345,22 +345,24 @@ static int32_t updateSensors(AccelsData * accels, GyrosData * gyros)
  * @param[in] attitudeRaw Populate the UAVO instead of saving right here
  * @return 0 if successfull, -1 if not
  */
-struct pios_bma180_data accel;
-struct pios_l3gd20_data gyro;
 static int32_t updateSensorsCC3D(AccelsData * accelsData, GyrosData * gyrosData)
 {
 	static portTickType lastSysTime;
-	int32_t read_good;
-	int32_t count = 0;
-	bool error = false;
-	uint32_t accel_samples;
-	uint32_t gyro_samples;
+	uint32_t accel_samples = 0;
+	uint32_t gyro_samples = 0;
 	int32_t accel_accum[3] = {0, 0, 0};
 	int32_t gyro_accum[3] = {0,0,0};
-	float gyro_scaling;
-	float accel_scaling;
+	float gyro_scaling = 1;
+	float accel_scaling = 1;
 
-	while((read_good = PIOS_BMA180_ReadFifo(&accel)) != 0 && !error)
+#if defined(PIOS_INCLUDE_BMA180)
+	accel_samples = 0;
+	bool error = false;
+	int32_t accel_read_good;
+
+	struct pios_bma180_data accel;
+
+	while((accel_read_good = PIOS_BMA180_ReadFifo(&accel)) != 0 && !error)
 		error = ((xTaskGetTickCount() - lastSysTime) > 5) ? true : error;
 	if (error) {
 		// Unfortunately if the BMA180 ever misses getting read, then it will not
@@ -372,33 +374,37 @@ static int32_t updateSensorsCC3D(AccelsData * accelsData, GyrosData * gyrosData)
 
 		return -1;
 	}
-	while(read_good == 0) {	
-		count++;
+	while(accel_read_good == 0) {	
+		accel_samples++;
 		
 		accel_accum[0] += accel.x;
 		accel_accum[1] += accel.y;
 		accel_accum[2] += accel.z;
 		
-		read_good = PIOS_BMA180_ReadFifo(&accel);
+		accel_read_good = PIOS_BMA180_ReadFifo(&accel);
 	}
-	accel_samples = count;
 	accel_scaling = PIOS_BMA180_GetScale();
+#endif
 
-	count = 0;
-	while((read_good = PIOS_L3GD20_ReadFifo(&gyro)) != 0 && !error)
-		error = ((xTaskGetTickCount() - lastSysTime) > 5) ? true : error;
-	while(read_good == 0) {
-		count++;
+#if defined(PIOS_INCLUDE_L3GD20)
+	int32_t gyro_read_good;
+	gyro_samples = 0;
+	struct pios_l3gd20_data gyro;
+	bool gyro_error = false;
+
+	while(gyro_read_good = PIOS_L3GD20_ReadFifo(&gyro)) != 0 && !gyro_error)
+		gyro_error = ((xTaskGetTickCount() - lastSysTime) > 5) ? true : gyro_error;
+	while(gyro_read_good == 0) {
+		gyro_samples++;
 		
 		gyro_accum[0] += gyro.gyro_x;
 		gyro_accum[1] += gyro.gyro_y;
 		gyro_accum[2] += gyro.gyro_z;
 		
-		read_good = PIOS_L3GD20_ReadFifo(&gyro);
+		gyro_read_good = PIOS_L3GD20_ReadFifo(&gyro);
 	}
-	
-	gyro_samples = count;
 	gyro_scaling = PIOS_L3GD20_GetScale();
+#endif	
 
 	float accels[3] = {(float) accel_accum[1] / accel_samples, (float) accel_accum[0] / accel_samples, -(float) accel_accum[2] / accel_samples};
 	

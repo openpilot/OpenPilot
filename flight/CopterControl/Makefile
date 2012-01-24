@@ -65,7 +65,7 @@ endif
 FLASH_TOOL = OPENOCD
 
 # List of modules to include
-OPTMODULES = CameraStab ComUsbBridge Altitude
+OPTMODULES = CameraStab ComUsbBridge # Altitude
 ifeq ($(USE_GPS), YES)
 OPTMODULES += GPS
 endif
@@ -225,11 +225,11 @@ SRC += $(PIOSCOMMON)/pios_crc.c
 SRC += $(PIOSCOMMON)/pios_flashfs_objlist.c
 SRC += $(PIOSCOMMON)/pios_flash_w25x.c
 SRC += $(PIOSCOMMON)/pios_adxl345.c
-SRC += $(PIOSCOMMON)/pios_l3gd20.c
-SRC += $(PIOSCOMMON)/pios_bma180.c
+#SRC += $(PIOSCOMMON)/pios_l3gd20.c
+#SRC += $(PIOSCOMMON)/pios_bma180.c
 SRC += $(PIOSCOMMON)/pios_com.c
-SRC += $(PIOSCOMMON)/pios_i2c_esc.c
-SRC += $(PIOSCOMMON)/pios_bmp085.c
+#SRC += $(PIOSCOMMON)/pios_i2c_esc.c
+#SRC += $(PIOSCOMMON)/pios_bmp085.c
 SRC += $(PIOSCOMMON)/pios_rcvr.c
 SRC += $(PIOSCOMMON)/pios_gcsrcvr.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c

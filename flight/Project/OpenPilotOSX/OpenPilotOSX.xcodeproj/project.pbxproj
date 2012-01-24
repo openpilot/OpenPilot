@@ -3059,6 +3059,7 @@
 		65E8F0EE11EFF25C00BBF654 /* startup_stm32f10x_HD.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = startup_stm32f10x_HD.S; path = ../../PiOS/STM32F10x/startup_stm32f10x_HD.S; sourceTree = SOURCE_ROOT; };
 		65E8F0F111EFF25C00BBF654 /* startup_stm32f10x_MD.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = startup_stm32f10x_MD.S; path = ../../PiOS/STM32F10x/startup_stm32f10x_MD.S; sourceTree = SOURCE_ROOT; };
 		65EA2E171273C55200636061 /* ratedesired.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ratedesired.xml; sourceTree = "<group>"; };
+		65EC1DE214CF0D6A00EBE144 /* pios_gcsrcvr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_gcsrcvr.c; sourceTree = "<group>"; };
 		65F53D2E14984BB300A62D5D /* insgps_helper.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = insgps_helper.c; sourceTree = "<group>"; };
 		65F53D2F14984BB300A62D5D /* insgps13state.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = insgps13state.c; sourceTree = "<group>"; };
 		65F53D3014984BB300A62D5D /* insgps16state.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = insgps16state.c; sourceTree = "<group>"; };
@@ -8390,6 +8391,7 @@
 		65E8F03011EFF25C00BBF654 /* Common */ = {
 			isa = PBXGroup;
 			children = (
+				65EC1DE214CF0D6A00EBE144 /* pios_gcsrcvr.c */,
 				6528CCB412E406B800CF5144 /* pios_adxl345.c */,
 				65FB1E6614CDBE26009C52B9 /* pios_bma180.c */,
 				65FB1E6714CDBE26009C52B9 /* pios_bmp085.c */,

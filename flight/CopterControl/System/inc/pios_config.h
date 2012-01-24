@@ -36,10 +36,10 @@
 /* Enable/Disable PiOS Modules */
 #define PIOS_INCLUDE_ADC
 #define PIOS_INCLUDE_DELAY
-#if defined(USE_I2C)
-#define PIOS_INCLUDE_I2C
-#define PIOS_INCLUDE_I2C_ESC
-#endif
+//#if defined(USE_I2C)
+//#define PIOS_INCLUDE_I2C
+//#define PIOS_INCLUDE_I2C_ESC
+//#endif
 #define PIOS_INCLUDE_IRQ
 #define PIOS_INCLUDE_LED
 #define PIOS_INCLUDE_IAP
@@ -75,11 +75,14 @@
 #define PIOS_INCLUDE_BL_HELPER
 
 #define PIOS_INCLUDE_ADXL345
+#define PIOS_INCLUDE_FLASH
+/*
 #define PIOS_INCLUDE_BMA180
 #define PIOS_INCLUDE_L3GD20
-#define PIOS_INCLUDE_FLASH
-
+*/
+/*
 #define PIOS_INCLUDE_BMP085
+*/
 
 /* A really shitty setting saving implementation */
 #define PIOS_INCLUDE_FLASH_SECTOR_SETTINGS

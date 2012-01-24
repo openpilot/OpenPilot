@@ -1233,11 +1233,12 @@ void PIOS_Board_Init(void) {
 	/* Delay system */
 	PIOS_DELAY_Init();
 
+#if defined(PIOS_INCLUDE_SPI)
 	/* Set up the SPI interface to the serial flash */
 	if (PIOS_SPI_Init(&pios_spi_flash_accel_id, &pios_spi_flash_accel_cfg)) {
 		PIOS_Assert(0);
 	}
-
+#endif
 	PIOS_Flash_W25X_Init(pios_spi_flash_accel_id, 1);	
 
 	PIOS_FLASHFS_Init();
@@ -1733,18 +1734,19 @@ void PIOS_Board_Init(void) {
 		case 0x01:
 			// Revision 1 with invensense gyros, start the ADC
 			PIOS_ADC_Init();
+#if defined(PIOS_INCLUDE_ADXL345)
 			PIOS_ADXL345_Init(pios_spi_flash_accel_id, 0);
-
+#endif
 			break;
 		case 0x02:
 			// Revision 2 with L3GD20 gyros, start a SPI interface and connect to it
 			GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
 
+#if defined(PIOS_INCLUDE_L3GD20)
 			// Set up the SPI interface to the serial flash 
 			if (PIOS_SPI_Init(&pios_spi_gyro_id, &pios_spi_gyro_cfg)) {
 				PIOS_Assert(0);
 			}
-#if defined(PIOS_INCLUDE_L3GD20)
 			PIOS_L3GD20_Attach(pios_spi_gyro_id);
 			PIOS_L3GD20_Init(&pios_l3gd20_cfg);
 #endif /* PIOS_INCLUDE_L3GD20 */

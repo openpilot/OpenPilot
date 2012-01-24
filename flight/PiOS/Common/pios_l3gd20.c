@@ -37,46 +37,110 @@
 #include "fifo_buffer.h"
 
 /* Global Variables */
-uint32_t pios_spi_gyro;
+enum pios_l3gd20_dev_magic {
+	PIOS_L3GD20_DEV_MAGIC = 0x9d39bced,
+};
 
-/* Local Variables */
-#define DEG_TO_RAD (M_PI / 180.0)
+#define PIOS_L3GD20_MAX_DOWNSAMPLE 10
+struct l3gd20_dev {
+	uint32_t spi_id;
+	uint32_t slave_num;
+	int16_t buffer[PIOS_L3GD20_MAX_DOWNSAMPLE * sizeof(struct pios_l3gd20_data)];
+	t_fifo_buffer fifo;
+	const struct pios_l3gd20_cfg * cfg;
+	enum pios_l3gd20_filter bandwidth;
+	enum pios_l3gd20_range range;
+	enum pios_l3gd20_dev_magic magic;
+};
+
+//! Global structure for this device device
+static struct l3gd20_dev * dev;
+
+//! Private functions
+static struct l3gd20_dev * PIOS_L3GD20_alloc(void);
+static int32_t PIOS_L3GD20_Validate(struct l3gd20_dev * dev);
 static void PIOS_L3GD20_Config(struct pios_l3gd20_cfg const * cfg);
 static int32_t PIOS_L3GD20_SetReg(uint8_t address, uint8_t buffer);
 static int32_t PIOS_L3GD20_GetReg(uint8_t address);
-
-#define PIOS_L3GD20_MAX_DOWNSAMPLE 100
-static int16_t pios_l3gd20_buffer[PIOS_L3GD20_MAX_DOWNSAMPLE * sizeof(struct pios_l3gd20_data)];
-static t_fifo_buffer pios_l3gd20_fifo;
+static int32_t PIOS_L3GD20_ClaimBus();
+static int32_t PIOS_L3GD20_ClaimBusIsr();
+static int32_t PIOS_L3GD20_ReleaseBus();
 
 volatile bool l3gd20_configured = false;
 
-static struct pios_l3gd20_cfg const * cfg;
+/* Local Variables */
+#define DEG_TO_RAD (M_PI / 180.0)
 
-#define GRAV 9.81f
+/**
+ * @brief Allocate a new device
+ */
+static struct l3gd20_dev * PIOS_L3GD20_alloc(void)
+{
+	struct l3gd20_dev * l3gd20_dev;
+	
+	l3gd20_dev = (struct l3gd20_dev *)pvPortMalloc(sizeof(*l3gd20_dev));
+	if (!l3gd20_dev) return (NULL);
+	
+	fifoBuf_init(&l3gd20_dev->fifo, (uint8_t *) l3gd20_dev->buffer, sizeof(l3gd20_dev->buffer));
+	
+	l3gd20_dev->magic = PIOS_L3GD20_DEV_MAGIC;
+	return(l3gd20_dev);
+}
+
+/**
+ * @brief Validate the handle to the spi device
+ * @returns 0 for valid device or -1 otherwise
+ */
+static int32_t PIOS_L3GD20_Validate(struct l3gd20_dev * dev)
+{
+	if (dev == NULL) 
+		return -1;
+	if (dev->magic != PIOS_L3GD20_DEV_MAGIC)
+		return -2;
+	if (dev->spi_id == 0)
+		return -3;
+	return 0;
+}
 
 /**
  * @brief Initialize the MPU6050 3-axis gyro sensor.
  * @return none
  */
-void PIOS_L3GD20_Init(const struct pios_l3gd20_cfg * new_cfg)
+#include <pios_board_info.h>
+int32_t PIOS_L3GD20_Init(uint32_t spi_id, uint32_t slave_num, const struct pios_l3gd20_cfg * cfg)
 {
-	cfg = new_cfg;
-	
-	fifoBuf_init(&pios_l3gd20_fifo, (uint8_t *) pios_l3gd20_buffer, sizeof(pios_l3gd20_buffer));
+	dev = PIOS_L3GD20_alloc();
+	if(dev == NULL)
+		return -1;
+
+	dev->spi_id = spi_id;
+	dev->slave_num = slave_num;
+	dev->cfg = cfg;
 
 	/* Configure the MPU6050 Sensor */
-	PIOS_SPI_SetClockSpeed(pios_spi_gyro, SPI_BaudRatePrescaler_256);
+	PIOS_SPI_SetClockSpeed(dev->spi_id, SPI_BaudRatePrescaler_256);
 	PIOS_L3GD20_Config(cfg);
-	PIOS_SPI_SetClockSpeed(pios_spi_gyro, SPI_BaudRatePrescaler_16);
+
+	/* This should either use a real speed (constant across boards) or pull from */
+	/* the default configuration */
+	const struct pios_board_info * bdinfo = &pios_board_info_blob;
+	switch(bdinfo->board_type) {
+		case 0x04: /* CopterControl */
+			PIOS_SPI_SetClockSpeed(dev->spi_id, SPI_BaudRatePrescaler_8);
+			break;
+		default:
+			PIOS_SPI_SetClockSpeed(dev->spi_id, SPI_BaudRatePrescaler_16);		
+			break;
+	}
 
 	/* Set up EXTI */
-	PIOS_EXTI_Init(new_cfg->exti_cfg);
+	PIOS_EXTI_Init(cfg->exti_cfg);
 	
 	// An initial read is needed to get it running
 	struct pios_l3gd20_data data;
 	PIOS_L3GD20_ReadGyros(&data);
 
+	return 0;
 }
 
 /**
@@ -88,54 +152,82 @@ void PIOS_L3GD20_Init(const struct pios_l3gd20_cfg * new_cfg)
 static void PIOS_L3GD20_Config(struct pios_l3gd20_cfg const * cfg)
 {
 	// This register enables the channels and sets the bandwidth
-	PIOS_L3GD20_SetReg(PIOS_L3GD20_CTRL_REG1, PIOS_L3GD20_CTRL1_FASTEST |
-					   PIOS_L3GD20_CTRL1_PD | PIOS_L3GD20_CTRL1_ZEN |
-					   PIOS_L3GD20_CTRL1_YEN | PIOS_L3GD20_CTRL1_XEN);
+	while(PIOS_L3GD20_SetReg(PIOS_L3GD20_CTRL_REG1, PIOS_L3GD20_CTRL1_FASTEST |
+							 PIOS_L3GD20_CTRL1_PD | PIOS_L3GD20_CTRL1_ZEN |
+							 PIOS_L3GD20_CTRL1_YEN | PIOS_L3GD20_CTRL1_XEN) != 0);
 					   
 	// Disable the high pass filters
-	PIOS_L3GD20_SetReg(PIOS_L3GD20_CTRL_REG2, 0);
-	
+	while(PIOS_L3GD20_SetReg(PIOS_L3GD20_CTRL_REG2, 0) != 0);
 	// Set int2 to go high on data ready
-	PIOS_L3GD20_SetReg(PIOS_L3GD20_CTRL_REG3, 0x08);
-	
+	while(PIOS_L3GD20_SetReg(PIOS_L3GD20_CTRL_REG3, 0x08) != 0);
 	// Select SPI interface, 500 deg/s, endianness?
-	PIOS_L3GD20_SetReg(PIOS_L3GD20_CTRL_REG4, 0x10);
-
+	while(PIOS_L3GD20_SetRange(cfg->range) != 0);
 	// Enable FIFO, disable HPF
-	PIOS_L3GD20_SetReg(PIOS_L3GD20_CTRL_REG5, 0x40);
-	
+	while(PIOS_L3GD20_SetReg(PIOS_L3GD20_CTRL_REG5, 0x40) != 0);
 	// Fifo stream mode
-	PIOS_L3GD20_SetReg(PIOS_L3GD20_FIFO_CTRL_REG, 0x40);
+	while(PIOS_L3GD20_SetReg(PIOS_L3GD20_FIFO_CTRL_REG, 0x40) != 0);
+}
+
+/**
+ * @brief Sets the maximum range of the L3GD20
+ * @returns 0 for success, -1 for invalid device, -2 if unable to set register
+ */
+int32_t PIOS_L3GD20_SetRange(enum pios_l3gd20_range range)
+{
+	if(PIOS_L3GD20_Validate(dev) != 0)
+		return -1;
+
+	dev->range = range;
+	if(PIOS_L3GD20_SetReg(PIOS_L3GD20_CTRL_REG4, dev->range) != 0)
+		return -2;
+	
+	return 0;
 }
 
 /**
  * @brief Claim the SPI bus for the accel communications and select this chip
- * @return 0 if successful, -1 if unable to claim bus
+ * @return 0 if successful, -1 for invalid device, -2 if unable to claim bus
  */
-int32_t PIOS_L3GD20_ClaimBus()
+static int32_t PIOS_L3GD20_ClaimBus()
 {
-	if(PIOS_SPI_ClaimBus(pios_spi_gyro) != 0)
+	if(PIOS_L3GD20_Validate(dev) != 0)
 		return -1;
-	PIOS_SPI_RC_PinSet(pios_spi_gyro,0,0);
+
+	if(PIOS_SPI_ClaimBus(dev->spi_id) != 0)
+		return -2;
+
+	PIOS_SPI_RC_PinSet(dev->spi_id,dev->slave_num,0);
+	return 0;
+}
+
+/**
+ * @brief Claim the SPI bus for the accel communications and select this chip
+ * @return 0 if successful, -1 for invalid device, -2 if unable to claim bus
+ */
+static int32_t PIOS_L3GD20_ClaimBusIsr()
+{
+	if(PIOS_L3GD20_Validate(dev) != 0)
+		return -1;
+
+	if(PIOS_SPI_ClaimBusISR(dev->spi_id) != 0)
+		return -2;
+
+	PIOS_SPI_RC_PinSet(dev->spi_id,dev->slave_num,0);
 	return 0;
 }
 
 /**
  * @brief Release the SPI bus for the accel communications and end the transaction
- * @return 0 if successful
+ * @return 0 if successful, -1 for invalid device
  */
 int32_t PIOS_L3GD20_ReleaseBus()
 {
-	PIOS_SPI_RC_PinSet(pios_spi_gyro,0,1);
-	return PIOS_SPI_ReleaseBus(pios_spi_gyro);
-}
+	if(PIOS_L3GD20_Validate(dev) != 0)
+		return -1;
 
-/**
- * @brief Connect to the correct SPI bus
- */
-void PIOS_L3GD20_Attach(uint32_t spi_id)
-{
-	pios_spi_gyro = spi_id;
+	PIOS_SPI_RC_PinSet(dev->spi_id,dev->slave_num,1);
+
+	return PIOS_SPI_ReleaseBus(dev->spi_id);
 }
 
 /**
@@ -146,12 +238,12 @@ void PIOS_L3GD20_Attach(uint32_t spi_id)
 static int32_t PIOS_L3GD20_GetReg(uint8_t reg)
 {
 	uint8_t data;
-	
+
 	if(PIOS_L3GD20_ClaimBus() != 0)
-		return -1;	
+		return -1;
 	
-	PIOS_SPI_TransferByte(pios_spi_gyro,(0x80 | reg) ); // request byte
-	data = PIOS_SPI_TransferByte(pios_spi_gyro,0 );     // receive response
+	PIOS_SPI_TransferByte(dev->spi_id,(0x80 | reg) ); // request byte
+	data = PIOS_SPI_TransferByte(dev->spi_id,0 );     // receive response
 	
 	PIOS_L3GD20_ReleaseBus();
 	return data;
@@ -170,15 +262,8 @@ static int32_t PIOS_L3GD20_SetReg(uint8_t reg, uint8_t data)
 	if(PIOS_L3GD20_ClaimBus() != 0)
 		return -1;
 	
-	if(PIOS_SPI_TransferByte(pios_spi_gyro, 0x7f & reg) != 0) {
-		PIOS_L3GD20_ReleaseBus();
-		return -2;
-	}
-	
-	if(PIOS_SPI_TransferByte(pios_spi_gyro, data) != 0) {
-		PIOS_L3GD20_ReleaseBus();
-		return -3;
-	}
+	PIOS_SPI_TransferByte(dev->spi_id, 0x7f & reg);
+	PIOS_SPI_TransferByte(dev->spi_id, data);
 	
 	PIOS_L3GD20_ReleaseBus();
 	
@@ -193,14 +278,13 @@ static int32_t PIOS_L3GD20_SetReg(uint8_t reg, uint8_t data)
 uint32_t l3gd20_irq = 0;
 int32_t PIOS_L3GD20_ReadGyros(struct pios_l3gd20_data * data)
 {
-
 	uint8_t buf[7] = {PIOS_L3GD20_GYRO_X_OUT_LSB | 0x80 | 0x40, 0, 0, 0, 0, 0, 0};
 	uint8_t rec[7];
 	
 	if(PIOS_L3GD20_ClaimBus() != 0)
 		return -1;
 
-	if(PIOS_SPI_TransferBlock(pios_spi_gyro, &buf[0], &rec[0], sizeof(buf), NULL) < 0) {
+	if(PIOS_SPI_TransferBlock(dev->spi_id, &buf[0], &rec[0], sizeof(buf), NULL) < 0) {
 		PIOS_L3GD20_ReleaseBus();
 		data->gyro_x = 0;
 		data->gyro_y = 0;
@@ -239,20 +323,23 @@ int32_t PIOS_L3GD20_ReadID()
  */
 int32_t PIOS_L3GD20_ReadFifo(struct pios_l3gd20_data * buffer)
 {
-	if(fifoBuf_getUsed(&pios_l3gd20_fifo) < sizeof(*buffer))
+	if(PIOS_L3GD20_Validate(dev) != 0)
+		return -1;
+
+	if(fifoBuf_getUsed(&dev->fifo) < sizeof(*buffer))
 		return -1;
 		
-	fifoBuf_getData(&pios_l3gd20_fifo, (uint8_t *) buffer, sizeof(*buffer));
+	fifoBuf_getData(&dev->fifo, (uint8_t *) buffer, sizeof(*buffer));
 	
 	return 0;
 }
 
-
-
 float PIOS_L3GD20_GetScale() 
 {
-	return 0.01750f;
-	switch (cfg->gyro_range) {
+	if(PIOS_L3GD20_Validate(dev) != 0)
+		return -1;
+
+	switch (dev->range) {
 		case PIOS_L3GD20_SCALE_250_DEG:
 			return 0.00875f;
 		case PIOS_L3GD20_SCALE_500_DEG:
@@ -284,25 +371,33 @@ uint8_t PIOS_L3GD20_Test(void)
 /**
 * @brief IRQ Handler.  Read all the data from onboard buffer
 */
-int32_t l3gd20_count;
-uint32_t l3gd20_fifo_full = 0;
-
 void PIOS_L3GD20_IRQHandler(void)
 {
+	l3gd20_irq++;
+
 	struct pios_l3gd20_data data;
-	PIOS_L3GD20_ReadGyros(&data);
+	uint8_t buf[7] = {PIOS_L3GD20_GYRO_X_OUT_LSB | 0x80 | 0x40, 0, 0, 0, 0, 0, 0};
+	uint8_t rec[7];
+
+	/* This code duplicates ReadGyros above but uses ClaimBusIsr */
+	if(PIOS_L3GD20_ClaimBusIsr() != 0)
+		return;
 	
-	data.temperature = l3gd20_irq;
+	if(PIOS_SPI_TransferBlock(dev->spi_id, &buf[0], &rec[0], sizeof(buf), NULL) < 0) {
+		PIOS_L3GD20_ReleaseBus();
+		return;
+	}
 	
-	if(fifoBuf_getFree(&pios_l3gd20_fifo) < sizeof(data)) {
-		l3gd20_fifo_full++;
+	PIOS_L3GD20_ReleaseBus();
+	
+	memcpy((uint8_t *) &(data.gyro_x), &rec[1], 6);
+	data.temperature = PIOS_L3GD20_GetReg(PIOS_L3GD20_OUT_TEMP);
+	
+	if(fifoBuf_getFree(&dev->fifo) < sizeof(data)) {
 		return;	
 	}
 	
-	fifoBuf_putData(&pios_l3gd20_fifo, (uint8_t *) &data, sizeof(data));
-
-	l3gd20_irq++;
-	
+	fifoBuf_putData(&dev->fifo, (uint8_t *) &data, sizeof(data));
 }
 
 #endif /* L3GD20 */

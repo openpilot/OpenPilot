@@ -129,17 +129,17 @@ struct pios_l3gd20_data {
 struct pios_l3gd20_cfg {
 	const struct pios_exti_cfg * exti_cfg; /* Pointer to the EXTI configuration */
 
-	enum pios_l3gd20_range gyro_range;
+	enum pios_l3gd20_range range;
 };
 
 /* Public Functions */
-extern void PIOS_L3GD20_Init(const struct pios_l3gd20_cfg * cfg);
-extern void PIOS_L3GD20_Attach(uint32_t spi_id);
+extern int32_t PIOS_L3GD20_Init(uint32_t spi_id, uint32_t slave_num, const struct pios_l3gd20_cfg * cfg);
 extern int32_t PIOS_L3GD20_ReadFifo(struct pios_l3gd20_data * buffer);
 extern int32_t PIOS_L3GD20_ReadGyros(struct pios_l3gd20_data * buffer);
+extern int32_t PIOS_L3GD20_SetRange(enum pios_l3gd20_range range);
+extern float PIOS_L3GD20_GetScale();
 extern int32_t PIOS_L3GD20_ReadID();
 extern uint8_t PIOS_L3GD20_Test();
-extern float PIOS_L3GD20_GetScale();
 extern void PIOS_L3GD20_IRQHandler();
 
 #endif /* PIOS_L3GD20_H */

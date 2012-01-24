@@ -8,7 +8,6 @@
 
 /* Begin PBXFileReference section */
 		65003B31121249CA00C183DD /* pios_wdg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_wdg.c; sourceTree = "<group>"; };
-		650387E514B52B860045AFE4 /* pios_l3gd20.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_l3gd20.h; sourceTree = "<group>"; };
 		65078B09136FCEE600536549 /* flightstatus.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = flightstatus.xml; sourceTree = "<group>"; };
 		650D8E2112DFE16400D05CC9 /* actuator.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = actuator.c; sourceTree = "<group>"; };
 		650D8E2312DFE16400D05CC9 /* actuator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = actuator.h; sourceTree = "<group>"; };
@@ -61,9 +60,7 @@
 		6519133B1256C52B0039C0A3 /* ahrs_spi_comm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs_spi_comm.h; sourceTree = "<group>"; };
 		651CF9E6120B5D8300EEFD70 /* pios_usb_hid_istr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_usb_hid_istr.c; sourceTree = "<group>"; };
 		651CF9E8120B5D8300EEFD70 /* pios_usb_hid_pwr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_usb_hid_pwr.c; sourceTree = "<group>"; };
-		651CF9EF120B700D00EEFD70 /* pios_usb_hid_desc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_usb_hid_desc.h; sourceTree = "<group>"; };
 		651CF9F0120B700D00EEFD70 /* pios_usb_hid_istr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_usb_hid_istr.h; sourceTree = "<group>"; };
-		651CF9F1120B700D00EEFD70 /* pios_usb_hid_prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_usb_hid_prop.h; sourceTree = "<group>"; };
 		651CF9F2120B700D00EEFD70 /* pios_usb_hid_pwr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_usb_hid_pwr.h; sourceTree = "<group>"; };
 		651CF9F3120B700D00EEFD70 /* usb_conf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = usb_conf.h; sourceTree = "<group>"; };
 		65209A1812208B0600453371 /* baroaltitude.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = baroaltitude.xml; sourceTree = "<group>"; };
@@ -2864,10 +2861,8 @@
 		65E6DF7A12E02E8E00058553 /* pios_board_posix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_board_posix.h; sourceTree = "<group>"; };
 		65E6DF7B12E02E8E00058553 /* pios_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_config.h; sourceTree = "<group>"; };
 		65E6DF7C12E02E8E00058553 /* pios_config_posix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_config_posix.h; sourceTree = "<group>"; };
-		65E6DF7D12E02E8E00058553 /* taskmonitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = taskmonitor.h; sourceTree = "<group>"; };
 		65E6DF7E12E02E8E00058553 /* pios_board.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_board.c; sourceTree = "<group>"; };
 		65E6DF7F12E02E8E00058553 /* pios_board_posix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_board_posix.c; sourceTree = "<group>"; };
-		65E6DF8012E02E8E00058553 /* taskmonitor.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = taskmonitor.c; sourceTree = "<group>"; };
 		65E6DF9112E0313E00058553 /* aes.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = aes.c; sourceTree = "<group>"; };
 		65E6E04412E0313F00058553 /* crc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = crc.c; sourceTree = "<group>"; };
 		65E6E04512E0313F00058553 /* gpio_in.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gpio_in.c; sourceTree = "<group>"; };
@@ -3067,6 +3062,8 @@
 		65F53D2E14984BB300A62D5D /* insgps_helper.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = insgps_helper.c; sourceTree = "<group>"; };
 		65F53D2F14984BB300A62D5D /* insgps13state.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = insgps13state.c; sourceTree = "<group>"; };
 		65F53D3014984BB300A62D5D /* insgps16state.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = insgps16state.c; sourceTree = "<group>"; };
+		65F5FB9914C9FAC500261DE0 /* pios_l3gd20.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_l3gd20.h; sourceTree = "<group>"; };
+		65F5FBAB14CA08FD00261DE0 /* pios_board_info.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_board_info.h; sourceTree = "<group>"; };
 		65F93C3912EE09280047DB36 /* aes.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = aes.c; sourceTree = "<group>"; };
 		65F93C3B12EE09280047DB36 /* aes.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = aes.lst; sourceTree = "<group>"; };
 		65F93C3C12EE09280047DB36 /* aes.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = aes.o; sourceTree = "<group>"; };
@@ -8313,7 +8310,6 @@
 				65E6DF7512E02E8E00058553 /* inc */,
 				65E6DF7E12E02E8E00058553 /* pios_board.c */,
 				65E6DF7F12E02E8E00058553 /* pios_board_posix.c */,
-				65E6DF8012E02E8E00058553 /* taskmonitor.c */,
 			);
 			path = System;
 			sourceTree = "<group>";
@@ -8328,7 +8324,6 @@
 				65E6DF7A12E02E8E00058553 /* pios_board_posix.h */,
 				65E6DF7B12E02E8E00058553 /* pios_config.h */,
 				65E6DF7C12E02E8E00058553 /* pios_config_posix.h */,
-				65E6DF7D12E02E8E00058553 /* taskmonitor.h */,
 			);
 			path = inc;
 			sourceTree = "<group>";
@@ -8424,6 +8419,9 @@
 			children = (
 				65FA9B8514709E9F0019A260 /* pios_usb_hid_priv.h */,
 				65DEA78513F0FE6000095B06 /* stm32f2xx_conf.h */,
+				65F5FBAB14CA08FD00261DE0 /* pios_board_info.h */,
+				6528CCE212E40F6700CF5144 /* pios_adxl345.h */,
+				65E8C745139A6D1A00E1F979 /* pios_crc.h */,
 				65E8F03A11EFF25C00BBF654 /* pios_adc.h */,
 				6528CCE212E40F6700CF5144 /* pios_adxl345.h */,
 				65D1FBE713F53477006374A6 /* pios_bl_helper.h */,
@@ -8450,7 +8448,7 @@
 				6526645A122DF972006F9A3C /* pios_i2c_priv.h */,
 				65FA9B8014709E9E0019A260 /* pios_initcall.h */,
 				65E8F04411EFF25C00BBF654 /* pios_irq.h */,
-				650387E514B52B860045AFE4 /* pios_l3gd20.h */,
+				65F5FB9914C9FAC500261DE0 /* pios_l3gd20.h */,
 				65E8F04511EFF25C00BBF654 /* pios_led.h */,
 				6534B55B1476D3A8003DF47C /* pios_ms5611.h */,
 				6534B5571474F78B003DF47C /* pios_mpu6000.h */,
@@ -8481,9 +8479,7 @@
 				65E8F05211EFF25C00BBF654 /* pios_usart_priv.h */,
 				65E8F05311EFF25C00BBF654 /* pios_usb.h */,
 				65E8F05511EFF25C00BBF654 /* pios_usb_hid.h */,
-				651CF9EF120B700D00EEFD70 /* pios_usb_hid_desc.h */,
 				651CF9F0120B700D00EEFD70 /* pios_usb_hid_istr.h */,
-				651CF9F1120B700D00EEFD70 /* pios_usb_hid_prop.h */,
 				651CF9F2120B700D00EEFD70 /* pios_usb_hid_pwr.h */,
 				6526645B122DF972006F9A3C /* pios_wdg.h */,
 				651CF9F3120B700D00EEFD70 /* usb_conf.h */,

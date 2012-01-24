@@ -75,6 +75,17 @@ int main() {
 	if (BSL_HOLD_STATE == 0)
 		USB_connected = TRUE;
 
+	const struct pios_board_info * bdinfo = &pios_board_info_blob;
+	
+	switch(bdinfo->board_rev) {
+		case 0x01:
+			// Original LED, no problem
+			break;
+		case 0x02:
+			GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
+			break;
+	}
+	
 	PIOS_IAP_Init();
 
 	if (PIOS_IAP_CheckRequest() == TRUE) {

@@ -38,6 +38,107 @@
 
 #include <pios_spi_priv.h>
 
+/* Gyro interface */
+void PIOS_SPI_gyro_irq_handler(void);
+void DMA1_Channel2_IRQHandler() __attribute__ ((alias ("PIOS_SPI_gyro_irq_handler")));
+void DMA1_Channel3_IRQHandler() __attribute__ ((alias ("PIOS_SPI_gyro_irq_handler")));
+static const struct pios_spi_cfg pios_spi_gyro_cfg = {
+	.regs   = SPI1,
+	.init   = {
+		.SPI_Mode              = SPI_Mode_Master,
+		.SPI_Direction         = SPI_Direction_2Lines_FullDuplex,
+		.SPI_DataSize          = SPI_DataSize_8b,
+		.SPI_NSS               = SPI_NSS_Soft,
+		.SPI_FirstBit          = SPI_FirstBit_MSB,
+		.SPI_CRCPolynomial     = 7,
+		.SPI_CPOL              = SPI_CPOL_High,
+		.SPI_CPHA              = SPI_CPHA_2Edge,
+		.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_8, /* 10 Mhz */
+	},
+	.dma = {
+		.ahb_clk  = RCC_AHBPeriph_DMA1,
+		
+		.irq = {
+			.flags   = (DMA1_FLAG_TC2 | DMA1_FLAG_TE2 | DMA1_FLAG_HT2 | DMA1_FLAG_GL2),
+			.init    = {
+				.NVIC_IRQChannel                   = DMA1_Channel2_IRQn,
+				.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
+				.NVIC_IRQChannelSubPriority        = 0,
+				.NVIC_IRQChannelCmd                = ENABLE,
+			},
+		},
+		
+		.rx = {
+			.channel = DMA1_Channel2,
+			.init    = {
+				.DMA_PeripheralBaseAddr = (uint32_t)&(SPI1->DR),
+				.DMA_DIR                = DMA_DIR_PeripheralSRC,
+				.DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
+				.DMA_MemoryInc          = DMA_MemoryInc_Enable,
+				.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte,
+				.DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte,
+				.DMA_Mode               = DMA_Mode_Normal,
+				.DMA_Priority           = DMA_Priority_Medium,
+				.DMA_M2M                = DMA_M2M_Disable,
+			},
+		},
+		.tx = {
+			.channel = DMA1_Channel3,
+			.init    = {
+				.DMA_PeripheralBaseAddr = (uint32_t)&(SPI1->DR),
+				.DMA_DIR                = DMA_DIR_PeripheralDST,
+				.DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
+				.DMA_MemoryInc          = DMA_MemoryInc_Enable,
+				.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte,
+				.DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte,
+				.DMA_Mode               = DMA_Mode_Normal,
+				.DMA_Priority           = DMA_Priority_Medium,
+				.DMA_M2M                = DMA_M2M_Disable,
+			},
+		},
+	},
+	.ssel = {
+		.gpio = GPIOA,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_4,
+			.GPIO_Speed = GPIO_Speed_50MHz,
+			.GPIO_Mode  = GPIO_Mode_Out_PP,
+		},
+	},
+	.sclk = {
+		.gpio = GPIOA,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_5,
+			.GPIO_Speed = GPIO_Speed_50MHz,
+			.GPIO_Mode  = GPIO_Mode_AF_PP,
+		},
+	},
+	.miso = {
+		.gpio = GPIOA,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_6,
+			.GPIO_Speed = GPIO_Speed_50MHz,
+			.GPIO_Mode  = GPIO_Mode_IPU,
+		},
+	},
+	.mosi = {
+		.gpio = GPIOA,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_7,
+			.GPIO_Speed = GPIO_Speed_50MHz,
+			.GPIO_Mode  = GPIO_Mode_AF_PP,
+		},
+	},
+};
+
+static uint32_t pios_spi_gyro_id;
+void PIOS_SPI_gyro_irq_handler(void)
+{
+	/* Call into the generic code to handle the IRQ for this specific device */
+	PIOS_SPI_IRQ_Handler(pios_spi_gyro_id);
+}
+
+
 /* Flash/Accel Interface
  * 
  * NOTE: Leave this declared as const data so that it ends up in the 
@@ -1034,6 +1135,39 @@ uint32_t pios_com_vcp_id;
 uint32_t pios_com_gps_id;
 uint32_t pios_com_bridge_id;
 
+#include "pios_l3gd20.h"
+static const struct pios_l3gd20_cfg pios_l3gd20_cfg = {
+	.drdy = {
+		.gpio = GPIOA,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_3,
+			.GPIO_Speed = GPIO_Speed_10MHz,
+			.GPIO_Mode  = GPIO_Mode_IPU,
+		},
+	},
+	.eoc_exti = {
+		.pin_source = GPIO_PinSource3,
+		.port_source = GPIO_PortSourceGPIOA,
+		.init = {
+			.EXTI_Line = EXTI_Line3, // matches above GPIO pin
+			.EXTI_Mode = EXTI_Mode_Interrupt,
+			.EXTI_Trigger = EXTI_Trigger_Rising,
+			.EXTI_LineCmd = ENABLE,
+		},
+	},
+	.eoc_irq = {
+		.init = {
+			.NVIC_IRQChannel = EXTI3_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+			.NVIC_IRQChannelSubPriority = 0,
+			.NVIC_IRQChannelCmd = ENABLE,
+		},
+	},
+	.gyro_range = PIOS_L3GD20_SCALE_500_DEG,
+};
+
+
+#include <pios_board_info.h>
 /**
  * PIOS_Board_Init()
  * initializes all the core subsystems on this specific hardware
@@ -1538,10 +1672,39 @@ void PIOS_Board_Init(void) {
 #else
 	PIOS_DEBUG_Init(&pios_tim_servo_all_channels, NELEMENTS(pios_tim_servo_all_channels));
 #endif	/* PIOS_DEBUG_ENABLE_DEBUG_PINS */
+
+	const struct pios_board_info * bdinfo = &pios_board_info_blob;
+
+	switch(bdinfo->board_rev) {
+		case 0x01:
+			// Revision 1 with invensense gyros, start the ADC
+			PIOS_ADC_Init();
+			break;
+		case 0x02:
+			GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
+
+			if(0) {
+				PIOS_ADC_Init();
+			} else
+			{
+				// Revision 2 with L3GD20 gyros, start a SPI interface and connect to it
+				
+				// Set up the SPI interface to the serial flash 
+				if (PIOS_SPI_Init(&pios_spi_gyro_id, &pios_spi_gyro_cfg)) {
+					PIOS_Assert(0);
+				}
+				
+				PIOS_L3GD20_Attach(pios_spi_gyro_id);
+				PIOS_L3GD20_Init(&pios_l3gd20_cfg);
+			}
+			break;
+		default:
+			PIOS_Assert(0);
+	}
 	
-	PIOS_ADC_Init();
 	PIOS_GPIO_Init();
 
+	
 	/* Make sure we have at least one telemetry link configured or else fail initialization */
 	PIOS_Assert(pios_com_telem_rf_id || pios_com_telem_usb_id);
 }

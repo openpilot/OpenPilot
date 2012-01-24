@@ -228,6 +228,31 @@ int32_t PIOS_ADXL345_Init(uint32_t spi_id, uint32_t slave_num)
 /**
  * @brief Return number of entries in the fifo
  */
+int32_t PIOS_ADXL345_Test()
+{
+	if(PIOS_ADXL345_Validate(dev) != 0)
+		return -1;
+
+	if(PIOS_ADXL345_ClaimBus() != 0)
+		return -2;
+
+	uint8_t buf[2] = {0,0};
+	uint8_t rec[2] = {0,0};
+	buf[0] = ADXL_WHOAMI | ADXL_READ_BIT;
+
+	if(PIOS_SPI_TransferBlock(dev->spi_id,&buf[0],&rec[0],sizeof(buf),NULL) < 0) {
+		PIOS_ADXL345_ReleaseBus();
+		return -3;
+	}
+
+	PIOS_ADXL345_ReleaseBus();		
+
+	return (rec[1] == ADXL_DEVICE_ID) ? 0 : -4;
+}
+
+/**
+ * @brief Return number of entries in the fifo
+ */
 int32_t PIOS_ADXL345_FifoElements()
 {
 	if(PIOS_ADXL345_Validate(dev) != 0)

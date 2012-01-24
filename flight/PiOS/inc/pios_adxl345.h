@@ -34,6 +34,8 @@
 #define ADXL_READ_BIT      0x80
 #define ADXL_MULTI_BIT     0x40
 
+#define ADXL_WHOAMI        0x00
+#define ADXL_DEVICE_ID     0xE5
 #define ADXL_X0_ADDR       0x32
 #define ADXL_FIFOSTATUS_ADDR 0x39
 
@@ -70,7 +72,8 @@ int32_t PIOS_ADXL345_SelectRate(uint8_t rate);
 int32_t PIOS_ADXL345_SetRange(uint8_t range);
 int32_t PIOS_ADXL345_Init(uint32_t spi_id, uint32_t slave_num);
 uint8_t PIOS_ADXL345_Read(struct pios_adxl345_data * data);
-int32_t  PIOS_ADXL345_FifoElements();
+int32_t PIOS_ADXL345_FifoElements();
+int32_t PIOS_ADXL345_Test();
 
 #endif
 

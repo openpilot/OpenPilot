@@ -172,12 +172,15 @@ MODULE_INITCALL(AttitudeInitialize, AttitudeStart)
 /**
  * Module thread, should not return.
  */
+ 
+int32_t adxl_test;
 static void AttitudeTask(void *parameters)
 {
 	uint8_t init = 0;
 	AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
 	
 	PIOS_ADC_Config((PIOS_ADC_RATE / 1000.0f) * UPDATE_RATE);
+	adxl_test = PIOS_ADXL345_Test();
 	
 	// Set critical error and wait until the accel is producing data
 	while(PIOS_ADXL345_FifoElements() == 0) {

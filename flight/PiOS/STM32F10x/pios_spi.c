@@ -7,7 +7,7 @@
  * @{
  *
  * @file       pios_spi.c
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @brief      Hardware Abstraction Layer for SPI ports of STM32
  * @see        The GNU Public License (GPL) Version 3
  * @notes
@@ -70,6 +70,8 @@ static struct pios_spi_dev * PIOS_SPI_alloc(void)
  */
 int32_t PIOS_SPI_Init(uint32_t * spi_id, const struct pios_spi_cfg * cfg)
 {
+	uint32_t	init_ssel = 0;
+
 	PIOS_Assert(spi_id);
 	PIOS_Assert(cfg);
 	
@@ -100,18 +102,20 @@ int32_t PIOS_SPI_Init(uint32_t * spi_id, const struct pios_spi_cfg * cfg)
 			if (spi_dev->cfg->init.SPI_Mode == SPI_Mode_Master) {
 				/* We're a master in soft NSS mode, make sure we see NSS high at all times. */
 				SPI_NSSInternalSoftwareConfig(spi_dev->cfg->regs, SPI_NSSInternalSoft_Set);
-				/* Since we're driving the SSEL pin in software, ensure that the slave is deselected */
-				GPIO_SetBits(spi_dev->cfg->ssel.gpio, spi_dev->cfg->ssel.init.GPIO_Pin);
-				GPIO_Init(spi_dev->cfg->ssel.gpio, &(spi_dev->cfg->ssel.init));
+				/* Init as many slave selects as the config advertises. */
+				init_ssel = spi_dev->cfg->slave_count;
 			} else {
 				/* We're a slave in soft NSS mode, make sure we see NSS low at all times. */
 				SPI_NSSInternalSoftwareConfig(spi_dev->cfg->regs, SPI_NSSInternalSoft_Reset);
 			}
 			break;
 		case SPI_NSS_Hard:
+			/* only legal for single-slave config */
+			PIOS_Assert(spi_dev->cfg->slave_count == 1);
+			init_ssel = 1;
 			/* FIXME: Should this also call SPI_SSOutputCmd()? */
-			GPIO_Init(spi_dev->cfg->ssel.gpio, &(spi_dev->cfg->ssel.init));
 			break;
+			
 		default:
 			PIOS_Assert(0);
 	}
@@ -120,7 +124,13 @@ int32_t PIOS_SPI_Init(uint32_t * spi_id, const struct pios_spi_cfg * cfg)
 	GPIO_Init(spi_dev->cfg->sclk.gpio, &(spi_dev->cfg->sclk.init));
 	GPIO_Init(spi_dev->cfg->mosi.gpio, &(spi_dev->cfg->mosi.init));
 	GPIO_Init(spi_dev->cfg->miso.gpio, &(spi_dev->cfg->miso.init));
-	
+	for (uint32_t i = 0; i < init_ssel; i++) {
+		/* Since we're driving the SSEL pin in software, ensure that the slave is deselected */
+		/* XXX multi-slave support - maybe have another SPI_NSS_ mode? */
+		GPIO_SetBits(spi_dev->cfg->ssel[i].gpio, spi_dev->cfg->ssel[i].init.GPIO_Pin);
+		GPIO_Init(spi_dev->cfg->ssel[i].gpio, (GPIO_InitTypeDef*)&(spi_dev->cfg->ssel[i].init));
+	}
+
 	/* Enable the associated peripheral clock */
 	switch ((uint32_t) spi_dev->cfg->regs) {
 		case (uint32_t) SPI1:
@@ -253,6 +263,26 @@ int32_t PIOS_SPI_ClaimBus(uint32_t spi_id)
 }
 
 /**
+ * Claim the SPI bus semaphore from an ISR.  Has no timeout.
+ * \param[in] spi SPI number (0 or 1)
+ * \return 0 if no error
+ * \return -1 if timeout before claiming semaphore
+ */
+int32_t PIOS_SPI_ClaimBusISR(uint32_t spi_id)
+{
+#if defined(PIOS_INCLUDE_FREERTOS)
+	struct pios_spi_dev * spi_dev = (struct pios_spi_dev *)spi_id;
+	
+	bool valid = PIOS_SPI_validate(spi_dev);
+	PIOS_Assert(valid)
+	
+	if (xQueueGenericReceive(( xQueueHandle ) spi_dev->busy, NULL, 0x0000 , pdFALSE ) != pdTRUE)
+		return -1;
+#endif
+	return 0;
+}
+
+/**
  * Release the SPI bus semaphore.  Calling the SPI functions does not require this
  * \param[in] spi SPI number (0 or 1)
  * \return 0 if no error
@@ -277,24 +307,26 @@ int32_t PIOS_SPI_ReleaseBus(uint32_t spi_id)
 }
 
 /**
-* Controls the RC (Register Clock alias Chip Select) pin of a SPI port
-* \param[in] spi SPI number (0 or 1)
-* \param[in] pin_value 0 or 1
-* \return 0 if no error
-*/
-int32_t PIOS_SPI_RC_PinSet(uint32_t spi_id, uint8_t pin_value)
+ * Controls the RC (Register Clock alias Chip Select) pin of a SPI port
+ * \param[in] spi SPI number (0 or 1)
+ * \param[in] pin_value 0 or 1
+ * \return 0 if no error
+ */
+int32_t PIOS_SPI_RC_PinSet(uint32_t spi_id, uint32_t slave_id, uint8_t pin_value)
 {
 	struct pios_spi_dev * spi_dev = (struct pios_spi_dev *)spi_id;
-
+	
 	bool valid = PIOS_SPI_validate(spi_dev);
 	PIOS_Assert(valid)
-
+	PIOS_Assert(slave_id <= spi_dev->cfg->slave_count)
+	
+	/* XXX multi-slave support? */
 	if (pin_value) {
-		GPIO_SetBits(spi_dev->cfg->ssel.gpio, spi_dev->cfg->ssel.init.GPIO_Pin);
+		GPIO_SetBits(spi_dev->cfg->ssel[slave_id].gpio, spi_dev->cfg->ssel[slave_id].init.GPIO_Pin);
 	} else {
-		GPIO_ResetBits(spi_dev->cfg->ssel.gpio, spi_dev->cfg->ssel.init.GPIO_Pin);
+		GPIO_ResetBits(spi_dev->cfg->ssel[slave_id].gpio, spi_dev->cfg->ssel[slave_id].init.GPIO_Pin);
 	}
-
+	
 	return 0;
 }
 

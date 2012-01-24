@@ -34,8 +34,6 @@
 #include <pios.h>
 #include <pios_stm32.h>
 
-/* XXX these two should be reconciled - separate for now to avoid breaking other targets */
-#if defined(STM32F2XX) || defined(STM32F4XX)
 struct pios_spi_cfg {
 	SPI_TypeDef *regs;
 	uint32_t remap;				/* GPIO_Remap_* or GPIO_AF_* */
@@ -48,18 +46,6 @@ struct pios_spi_cfg {
 	uint32_t slave_count;
 	struct stm32_gpio ssel[];
 };
-#else
-struct pios_spi_cfg {
-	SPI_TypeDef *regs;
-	SPI_InitTypeDef init;
-	bool use_crc;
-	struct stm32_dma dma;
-	struct stm32_gpio ssel;
-	struct stm32_gpio sclk;
-	struct stm32_gpio miso;
-	struct stm32_gpio mosi;
-};
-#endif
 
 struct pios_spi_dev {
 	const struct pios_spi_cfg * cfg;

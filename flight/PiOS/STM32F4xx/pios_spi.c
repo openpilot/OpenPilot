@@ -50,7 +50,7 @@ static bool PIOS_SPI_validate(struct pios_spi_dev * com_dev)
 	return(true);
 }
 
-#if defined(PIOS_INCLUDE_FREERTOS) && 0
+#if defined(PIOS_INCLUDE_FREERTOS)
 static struct pios_spi_dev * PIOS_SPI_alloc(void)
 {
 	return (malloc(sizeof(struct pios_spi_dev)));
@@ -101,27 +101,27 @@ int32_t PIOS_SPI_Init(uint32_t * spi_id, const struct pios_spi_cfg * cfg)
 	spi_dev->tx_dummy_byte = 0xFF;
 
 	switch (spi_dev->cfg->init.SPI_NSS) {
-	case SPI_NSS_Soft:
-		if (spi_dev->cfg->init.SPI_Mode == SPI_Mode_Master) {
-			/* We're a master in soft NSS mode, make sure we see NSS high at all times. */
-			SPI_NSSInternalSoftwareConfig(spi_dev->cfg->regs, SPI_NSSInternalSoft_Set);
-			/* Init as many slave selects as the config advertises. */
-			init_ssel = spi_dev->cfg->slave_count;
-		} else {
-			/* We're a slave in soft NSS mode, make sure we see NSS low at all times. */
-			SPI_NSSInternalSoftwareConfig(spi_dev->cfg->regs, SPI_NSSInternalSoft_Reset);
-		}
-		break;
-
-	case SPI_NSS_Hard:
-		/* only legal for single-slave config */
-		PIOS_Assert(spi_dev->cfg->slave_count == 1);
-		init_ssel = 1;
-		/* FIXME: Should this also call SPI_SSOutputCmd()? */
-		break;
-
-	default:
-		PIOS_Assert(0);
+		case SPI_NSS_Soft:
+			if (spi_dev->cfg->init.SPI_Mode == SPI_Mode_Master) {
+				/* We're a master in soft NSS mode, make sure we see NSS high at all times. */
+				SPI_NSSInternalSoftwareConfig(spi_dev->cfg->regs, SPI_NSSInternalSoft_Set);
+				/* Init as many slave selects as the config advertises. */
+				init_ssel = spi_dev->cfg->slave_count;
+			} else {
+				/* We're a slave in soft NSS mode, make sure we see NSS low at all times. */
+				SPI_NSSInternalSoftwareConfig(spi_dev->cfg->regs, SPI_NSSInternalSoft_Reset);
+			}
+			break;
+			
+		case SPI_NSS_Hard:
+			/* only legal for single-slave config */
+			PIOS_Assert(spi_dev->cfg->slave_count == 1);
+			init_ssel = 1;
+			/* FIXME: Should this also call SPI_SSOutputCmd()? */
+			break;
+			
+		default:
+			PIOS_Assert(0);
 	}
 
 	/* Initialize the GPIO pins */

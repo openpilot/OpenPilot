@@ -27,7 +27,7 @@ ARCHFLAGS			+= -mcpu=cortex-m4 -march=armv7e-m -mfpu=fpv4-sp-d16 -mfloat-abi=har
 #
 # PIOS device library source and includes
 #
-SRC					+=	$(wildcard $(PIOS_DEVLIB)/*.c)
+SRC					+=	$(wildcard $(PIOS_DEVLIB)*.c)
 EXTRAINCDIRS		+=	$(PIOS_DEVLIB)/inc
 
 #

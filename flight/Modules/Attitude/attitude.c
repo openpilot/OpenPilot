@@ -63,7 +63,7 @@
 #define STACK_SIZE_BYTES 540
 #define TASK_PRIORITY (tskIDLE_PRIORITY+3)
 
-#define UPDATE_RATE  2.0f
+#define UPDATE_RATE  25.0f
 #define GYRO_NEUTRAL 1665
 
 #define PI_MOD(x) (fmod(x + M_PI, M_PI * 2) - M_PI)
@@ -154,14 +154,6 @@ int32_t AttitudeInitialize(void)
 	
 	trim_requested = false;
 	
-	// Create queue for passing gyro data, allow 2 back samples in case
-	gyro_queue = xQueueCreate(1, sizeof(float) * 4);
-	if(gyro_queue == NULL)
-		return -1;
-	
-	
-	PIOS_ADC_SetQueue(gyro_queue);
-	
 	AttitudeSettingsConnectCallback(&settingsUpdatedCb);
 	
 	return 0;
@@ -173,14 +165,13 @@ MODULE_INITCALL(AttitudeInitialize, AttitudeStart)
  * Module thread, should not return.
  */
  
-int32_t adxl_test;
+int32_t accel_test;
+int32_t gyro_test;
 static void AttitudeTask(void *parameters)
 {
 	uint8_t init = 0;
+	portTickType lastSysTime;
 	AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
-	
-	PIOS_ADC_Config((PIOS_ADC_RATE / 1000.0f) * UPDATE_RATE);
-	adxl_test = PIOS_ADXL345_Test();
 	
 	// Set critical error and wait until the accel is producing data
 	while(PIOS_ADXL345_FifoElements() == 0) {
@@ -192,9 +183,29 @@ static void AttitudeTask(void *parameters)
 	
 	bool cc3d = bdinfo->board_rev == 0x02;
 
-	
+	if(cc3d) {
+#if defined(PIOS_INCLUDE_BMA180)
+		accel_test = PIOS_BMA180_Test();
+#endif
+#if defined(PIOS_INCLUDE_L3GD20)
+		gyro_test = PIOS_L3GD20_Test();
+#endif
+	} else {
+#if defined(PIOS_INCLUDE_ADXL345)
+		accel_test = PIOS_ADXL345_Test();
+#endif
+		
+		// Create queue for passing gyro data, allow 2 back samples in case
+		gyro_queue = xQueueCreate(1, sizeof(float) * 4);
+		PIOS_Assert(gyro_queue != NULL);
+		PIOS_ADC_SetQueue(gyro_queue);
+		PIOS_ADC_Config((PIOS_ADC_RATE / 1000.0f) * UPDATE_RATE);
+
+	}
 	// Force settings update to make sure rotation loaded
 	settingsUpdatedCb(AttitudeSettingsHandle());
+	
+	lastSysTime = xTaskGetTickCount();
 	
 	// Main task loop
 	while (1) {
@@ -242,6 +253,8 @@ static void AttitudeTask(void *parameters)
 			AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
 		}
 		
+		if(cc3d)
+			vTaskDelayUntil(&lastSysTime, 5);
 	}
 }
 
@@ -345,6 +358,8 @@ static int32_t updateSensors(AccelsData * accels, GyrosData * gyros)
  * @param[in] attitudeRaw Populate the UAVO instead of saving right here
  * @return 0 if successfull, -1 if not
  */
+struct pios_bma180_data accel;
+struct pios_l3gd20_data gyro;
 static int32_t updateSensorsCC3D(AccelsData * accelsData, GyrosData * gyrosData)
 {
 	static portTickType lastSysTime;
@@ -356,53 +371,63 @@ static int32_t updateSensorsCC3D(AccelsData * accelsData, GyrosData * gyrosData)
 	float accel_scaling = 1;
 
 #if defined(PIOS_INCLUDE_BMA180)
-	accel_samples = 0;
-	bool error = false;
-	int32_t accel_read_good;
+//	accel_samples = 0;
+//	bool error = false;
+//	int32_t accel_read_good;
 
-	struct pios_bma180_data accel;
-
-	while((accel_read_good = PIOS_BMA180_ReadFifo(&accel)) != 0 && !error)
-		error = ((xTaskGetTickCount() - lastSysTime) > 5) ? true : error;
-	if (error) {
-		// Unfortunately if the BMA180 ever misses getting read, then it will not
-		// trigger more interrupts.  In this case we must force a read to kickstarts
-		// it.
-		struct pios_bma180_data data;
-		PIOS_BMA180_ReadAccels(&data);
-		lastSysTime = xTaskGetTickCount();
-
+//
+//	while((accel_read_good = PIOS_BMA180_ReadFifo(&accel)) != 0 && !error)
+//		error = ((xTaskGetTickCount() - lastSysTime) > 5) ? true : error;
+//	if (error) {
+//		// Unfortunately if the BMA180 ever misses getting read, then it will not
+//		// trigger more interrupts.  In this case we must force a read to kickstarts
+//		// it.
+//		struct pios_bma180_data data;
+//		PIOS_BMA180_ReadAccels(&data);
+//		lastSysTime = xTaskGetTickCount();
+//
+//		return -1;
+//	}
+//	while(accel_read_good == 0) {	
+//		accel_samples++;
+//		
+//		accel_accum[0] += accel.x;
+//		accel_accum[1] += accel.y;
+//		accel_accum[2] += accel.z;
+//		
+//		accel_read_good = PIOS_BMA180_ReadFifo(&accel);
+//	}
+	if(PIOS_BMA180_ReadAccels(&accel) < 0)
 		return -1;
-	}
-	while(accel_read_good == 0) {	
-		accel_samples++;
-		
-		accel_accum[0] += accel.x;
-		accel_accum[1] += accel.y;
-		accel_accum[2] += accel.z;
-		
-		accel_read_good = PIOS_BMA180_ReadFifo(&accel);
-	}
+	accel_accum[0] += accel.x;
+	accel_accum[1] += accel.y;
+	accel_accum[2] += accel.z;
+	accel_samples = 1;
 	accel_scaling = PIOS_BMA180_GetScale();
 #endif
 
 #if defined(PIOS_INCLUDE_L3GD20)
-	int32_t gyro_read_good;
-	gyro_samples = 0;
-	struct pios_l3gd20_data gyro;
-	bool gyro_error = false;
-
-	while((gyro_read_good = PIOS_L3GD20_ReadFifo(&gyro) != 0) && !gyro_error)
-		gyro_error = ((xTaskGetTickCount() - lastSysTime) > 5) ? true : gyro_error;
-	while(gyro_read_good == 0) {
-		gyro_samples++;
-		
-		gyro_accum[0] += gyro.gyro_x;
-		gyro_accum[1] += gyro.gyro_y;
-		gyro_accum[2] += gyro.gyro_z;
-		
-		gyro_read_good = PIOS_L3GD20_ReadFifo(&gyro);
-	}
+//	int32_t gyro_read_good;
+//	gyro_samples = 0;
+//	bool gyro_error = false;
+//
+//	while((gyro_read_good = PIOS_L3GD20_ReadFifo(&gyro) != 0) && !gyro_error)
+//		gyro_error = ((xTaskGetTickCount() - lastSysTime) > 5) ? true : gyro_error;
+//	while(gyro_read_good == 0) {
+//		gyro_samples++;
+//		
+//		gyro_accum[0] += gyro.gyro_x;
+//		gyro_accum[1] += gyro.gyro_y;
+//		gyro_accum[2] += gyro.gyro_z;
+//		
+//		gyro_read_good = PIOS_L3GD20_ReadFifo(&gyro);
+//	}
+	if(PIOS_L3GD20_ReadGyros(&gyro) < 0)
+		return -1;
+	gyro_accum[0] += gyro.gyro_x;
+	gyro_accum[1] += gyro.gyro_y;
+	gyro_accum[2] += gyro.gyro_z;
+	gyro_samples =1;
 	gyro_scaling = PIOS_L3GD20_GetScale();
 #endif	
 
@@ -446,7 +471,7 @@ static void updateAttitude(AccelsData * accelsData, GyrosData * gyrosData)
 	CrossProduct((const float *) accels, (const float *) grot, accel_err);
 	
 	// Account for accel magnitude
-	float accel_mag = sqrt(accels[0]*accels[0] + accels[1]*accels[1] + accels[2]*accels[2]);
+	float accel_mag = sqrtf(accels[0]*accels[0] + accels[1]*accels[1] + accels[2]*accels[2]);
 	accel_err[0] /= accel_mag;
 	accel_err[1] /= accel_mag;
 	accel_err[2] /= accel_mag;
@@ -486,7 +511,7 @@ static void updateAttitude(AccelsData * accelsData, GyrosData * gyrosData)
 	}
 	
 	// Renomalize
-	float qmag = sqrt(q[0]*q[0] + q[1]*q[1] + q[2]*q[2] + q[3]*q[3]);
+	float qmag = sqrtf(q[0]*q[0] + q[1]*q[1] + q[2]*q[2] + q[3]*q[3]);
 	q[0] = q[0] / qmag;
 	q[1] = q[1] / qmag;
 	q[2] = q[2] / qmag;

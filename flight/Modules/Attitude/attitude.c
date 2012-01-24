@@ -57,8 +57,8 @@
 #include "flightstatus.h"
 #include "manualcontrolcommand.h"
 #include "CoordinateConversions.h"
-#include "pios_flash_w25x.h"
-
+#include <pios_board_info.h>
+ 
 // Private constants
 #define STACK_SIZE_BYTES 540
 #define TASK_PRIORITY (tskIDLE_PRIORITY+3)
@@ -78,7 +78,8 @@ static void AttitudeTask(void *parameters);
 static float gyro_correct_int[3] = {0,0,0};
 static xQueueHandle gyro_queue;
 
-static int8_t updateSensors(AccelsData *, GyrosData *);
+static int32_t updateSensors(AccelsData *, GyrosData *);
+static int32_t updateSensorsCC3D(AccelsData * accelsData, GyrosData * gyrosData);
 static void updateAttitude(AccelsData *, GyrosData *);
 static void settingsUpdatedCb(UAVObjEvent * objEv);
 
@@ -184,6 +185,11 @@ static void AttitudeTask(void *parameters)
 		PIOS_WDG_UpdateFlag(PIOS_WDG_ATTITUDE);
 	}
 	
+	const struct pios_board_info * bdinfo = &pios_board_info_blob;
+	
+	bool cc3d = bdinfo->board_rev == 0x02;
+
+	
 	// Force settings update to make sure rotation loaded
 	settingsUpdatedCb(AttitudeSettingsHandle());
 	
@@ -217,7 +223,13 @@ static void AttitudeTask(void *parameters)
 
 		AccelsData accels;
 		GyrosData gyros;
-		if(updateSensors(&accels, &gyros) != 0)
+		int32_t retval;
+		if(cc3d) 
+			retval = updateSensorsCC3D(&accels, &gyros);
+		else
+			retval = updateSensors(&accels, &gyros);
+
+		if(retval != 0)
 			AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
 		else {
 			// Only update attitude when sensor data is good
@@ -235,7 +247,7 @@ static void AttitudeTask(void *parameters)
  * @param[in] attitudeRaw Populate the UAVO instead of saving right here
  * @return 0 if successfull, -1 if not
  */
-static int8_t updateSensors(AccelsData * accels, GyrosData * gyros)
+static int32_t updateSensors(AccelsData * accels, GyrosData * gyros)
 {
 	struct pios_adxl345_data accel_data;
 	float gyro[4];
@@ -321,6 +333,83 @@ static int8_t updateSensors(AccelsData * accels, GyrosData * gyros)
 	// Because most crafts wont get enough information from gravity to zero yaw gyro, we try
 	// and make it average zero (weakly)
 	gyro_correct_int[2] += - gyros->z * yawBiasRate;
+	
+	return 0;
+}
+
+/**
+ * Get an update from the sensors
+ * @param[in] attitudeRaw Populate the UAVO instead of saving right here
+ * @return 0 if successfull, -1 if not
+ */
+struct pios_bma180_data accel;
+struct pios_l3gd20_data gyro;
+static int32_t updateSensorsCC3D(AccelsData * accelsData, GyrosData * gyrosData)
+{
+	static portTickType lastSysTime;
+	int32_t read_good;
+	int32_t count = 0;
+	bool error = false;
+	uint32_t accel_samples;
+	uint32_t gyro_samples;
+	int32_t accel_accum[3] = {0, 0, 0};
+	int32_t gyro_accum[3] = {0,0,0};
+	float gyro_scaling;
+	float accel_scaling;
+
+	while((read_good = PIOS_BMA180_ReadFifo(&accel)) != 0 && !error)
+		error = ((xTaskGetTickCount() - lastSysTime) > 5) ? true : error;
+	if (error) {
+		// Unfortunately if the BMA180 ever misses getting read, then it will not
+		// trigger more interrupts.  In this case we must force a read to kickstarts
+		// it.
+		struct pios_bma180_data data;
+		PIOS_BMA180_ReadAccels(&data);
+		lastSysTime = xTaskGetTickCount();
+
+		return -1;
+	}
+	while(read_good == 0) {	
+		count++;
+		
+		accel_accum[0] += accel.x;
+		accel_accum[1] += accel.y;
+		accel_accum[2] += accel.z;
+		
+		read_good = PIOS_BMA180_ReadFifo(&accel);
+	}
+	accel_samples = count;
+	accel_scaling = PIOS_BMA180_GetScale();
+
+	count = 0;
+	while((read_good = PIOS_L3GD20_ReadFifo(&gyro)) != 0 && !error)
+		error = ((xTaskGetTickCount() - lastSysTime) > 5) ? true : error;
+	while(read_good == 0) {
+		count++;
+		
+		gyro_accum[0] += gyro.gyro_x;
+		gyro_accum[1] += gyro.gyro_y;
+		gyro_accum[2] += gyro.gyro_z;
+		
+		read_good = PIOS_L3GD20_ReadFifo(&gyro);
+	}
+	
+	gyro_samples = count;
+	gyro_scaling = PIOS_L3GD20_GetScale();
+
+	float accels[3] = {(float) accel_accum[1] / accel_samples, (float) accel_accum[0] / accel_samples, -(float) accel_accum[2] / accel_samples};
+	
+	accelsData->x = accels[0] * accel_scaling - accelbias[0];
+	accelsData->y = accels[1] * accel_scaling - accelbias[1];
+	accelsData->z = accels[2] * accel_scaling - accelbias[2];
+	
+	float gyros[3] = {(float) gyro_accum[1] / gyro_samples, (float) gyro_accum[0] / gyro_samples, -(float) gyro_accum[2] / gyro_samples};
+	
+	gyrosData->x = gyros[0] * gyro_scaling;
+	gyrosData->y = gyros[1] * gyro_scaling;
+	gyrosData->z = gyros[2] * gyro_scaling;
+
+	lastSysTime = xTaskGetTickCount();
 	
 	return 0;
 }

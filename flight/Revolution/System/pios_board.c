@@ -1484,6 +1484,8 @@ static const struct pios_exti_cfg pios_exti_bma180_cfg __exti_config = {
 };
 static const struct pios_bma180_cfg pios_bma180_cfg = {
 	.exti_cfg = &pios_exti_bma180_cfg,
+	.bandwidth = BMA_BW_600HZ,
+	.range = BMA_RANGE_8G,
 };
 #endif /* PIOS_INCLUDE_BMA180 */
 
@@ -1599,9 +1601,6 @@ void PIOS_Board_Init(void) {
 		PIOS_DEBUG_Assert(0);
 	}
 	
-	PIOS_BMA180_Attach(pios_spi_accel_id);
-	PIOS_BMA180_Init(&pios_bma180_cfg);
-
 	/* Set up the SPI interface to the gyro */
 	if (PIOS_SPI_Init(&pios_spi_gyro_id, &pios_spi_gyro_cfg)) {
 		PIOS_DEBUG_Assert(0);
@@ -1760,7 +1759,9 @@ void PIOS_Board_Init(void) {
 	
 	PIOS_DELAY_WaitmS(500);
 
-
+#if defined(PIOS_INCLUDE_BMA180)
+	PIOS_BMA180_Init(pios_spi_accel_id, 0, &pios_bma180_cfg);
+#endif
 #if defined(PIOS_INCLUDE_MPU6000)
 	PIOS_MPU6000_Attach(pios_spi_gyro_id);
 	PIOS_MPU6000_Init(&pios_mpu6000_cfg);

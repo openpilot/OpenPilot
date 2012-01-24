@@ -92,10 +92,12 @@ struct pios_bma180_data {
 
 struct pios_bma180_cfg {
 	const struct pios_exti_cfg * exti_cfg; /* Pointer to the EXTI configuration */
+	enum bma180_bandwidth bandwidth;
+	enum bma180_range range;
 };
 
 /* Public Functions */
-extern int32_t PIOS_BMA180_Init(const struct pios_bma180_cfg * cfg);
+extern int32_t PIOS_BMA180_Init(uint32_t spi_id, uint32_t slave_num, const struct pios_bma180_cfg * cfg);
 extern void PIOS_BMA180_Attach(uint32_t spi_id);
 extern float PIOS_BMA180_GetScale();
 extern int32_t PIOS_BMA180_ReadFifo(struct pios_bma180_data * buffer);

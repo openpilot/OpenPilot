@@ -80,7 +80,7 @@ static const struct pios_exti_cfg pios_exti_bma180_cfg __exti_config = {
 		.init = {
 			.GPIO_Pin = GPIO_Pin_13,
 			.GPIO_Speed = GPIO_Speed_10MHz,
-			.GPIO_Mode = GPIO_Mode_IPU,
+			.GPIO_Mode = GPIO_Mode_IN_FLOATING,
 		},
 	},
 	.irq = {
@@ -102,6 +102,8 @@ static const struct pios_exti_cfg pios_exti_bma180_cfg __exti_config = {
 };
 static const struct pios_bma180_cfg pios_bma180_cfg = {
 	.exti_cfg = &pios_exti_bma180_cfg,
+	.bandwidth = BMA_BW_600HZ,
+	.range = BMA_RANGE_8G,
 };
 #endif /* PIOS_INCLUDE_BMA180 */
 
@@ -118,7 +120,7 @@ static const struct pios_exti_cfg pios_exti_l3gd20_cfg __exti_config = {
 		.init = {
 			.GPIO_Pin   = GPIO_Pin_3,
 			.GPIO_Speed = GPIO_Speed_10MHz,
-			.GPIO_Mode  = GPIO_Mode_IPU,
+			.GPIO_Mode  = GPIO_Mode_IN_FLOATING,
 		},
 	},
 	.irq = {
@@ -690,13 +692,8 @@ void PIOS_Board_Init(void) {
 #endif /* PIOS_INCLUDE_L3GD20 */
 
 #if defined(PIOS_INCLUDE_BMA180)
-			PIOS_BMA180_Attach(pios_spi_flash_accel_id);
-			PIOS_BMA180_Init(&pios_bma180_cfg);
+			PIOS_BMA180_Init(pios_spi_flash_accel_id, 0, &pios_bma180_cfg);
 #endif /* PIOS_INCLUDE_BMA180 */
-#if defined(PIOS_INCLUDE_LED)
-			PIOS_LED_Init(&pios_led_cfg_cc3d);
-#endif	/* PIOS_INCLUDE_LED */
-
 			break;
 		default:
 			PIOS_Assert(0);

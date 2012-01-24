@@ -397,8 +397,9 @@ static int32_t updateSensorsCC3D(AccelsData * accelsData, GyrosData * gyrosData)
 //		
 //		accel_read_good = PIOS_BMA180_ReadFifo(&accel);
 //	}
-	if(PIOS_BMA180_ReadAccels(&accel) < 0)
+	if(PIOS_BMA180_Test() < 0)
 		return -1;
+	PIOS_BMA180_ReadAccels(&accel);
 	accel_accum[0] += accel.x;
 	accel_accum[1] += accel.y;
 	accel_accum[2] += accel.z;

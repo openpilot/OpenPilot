@@ -80,42 +80,29 @@ TIM4  |                     STOPWATCH                    |
 // *****************************************************************
 // PIOS_LED
 
-#define PIOS_LED_LED1_GPIO_PORT			GPIOA					// USB Activity LED
-#define PIOS_LED_LED1_GPIO_PIN			GPIO_Pin_3
-#define PIOS_LED_LED1_GPIO_CLK			RCC_APB2Periph_GPIOA
+#define PIOS_LED_USB	0
+#define PIOS_LED_LINK	1
+#define PIOS_LED_RX	2
+#define PIOS_LED_TX	3
 
-#define PIOS_LED_LED2_GPIO_PORT			GPIOB					// LINK LED
-#define PIOS_LED_LED2_GPIO_PIN			GPIO_Pin_5
-#define PIOS_LED_LED2_GPIO_CLK			RCC_APB2Periph_GPIOB
+#define PIOS_LED_HEARTBEAT PIOS_LED_USB
+#define PIOS_LED_ALARM PIOS_LED_TX
 
-#define PIOS_LED_LED3_GPIO_PORT			GPIOB					// RX LED
-#define PIOS_LED_LED3_GPIO_PIN			GPIO_Pin_6
-#define PIOS_LED_LED3_GPIO_CLK			RCC_APB2Periph_GPIOB
+#define USB_LED_ON					PIOS_LED_On(PIOS_LED_USB)
+#define USB_LED_OFF					PIOS_LED_Off(PIOS_LED_USB)
+#define USB_LED_TOGGLE					PIOS_LED_Toggle(PIOS_LED_USB)
 
-#define PIOS_LED_LED4_GPIO_PORT			GPIOB					// TX LED
-#define PIOS_LED_LED4_GPIO_PIN			GPIO_Pin_7
-#define PIOS_LED_LED4_GPIO_CLK			RCC_APB2Periph_GPIOB
+#define LINK_LED_ON					PIOS_LED_On(PIOS_LED_LINK)
+#define LINK_LED_OFF					PIOS_LED_Off(PIOS_LED_LINK)
+#define LINK_LED_TOGGLE					PIOS_LED_Toggle(PIOS_LED_LINK)
 
-#define PIOS_LED_NUM					4
-#define PIOS_LED_PORTS					{ PIOS_LED_LED1_GPIO_PORT, PIOS_LED_LED2_GPIO_PORT, PIOS_LED_LED3_GPIO_PORT, PIOS_LED_LED4_GPIO_PORT }
-#define PIOS_LED_PINS					{ PIOS_LED_LED1_GPIO_PIN,  PIOS_LED_LED2_GPIO_PIN,  PIOS_LED_LED3_GPIO_PIN,  PIOS_LED_LED4_GPIO_PIN }
-#define PIOS_LED_CLKS					{ PIOS_LED_LED1_GPIO_CLK,  PIOS_LED_LED2_GPIO_CLK,  PIOS_LED_LED3_GPIO_CLK,  PIOS_LED_LED4_GPIO_CLK }
+#define RX_LED_ON					PIOS_LED_On(PIOS_LED_RX)
+#define RX_LED_OFF					PIOS_LED_Off(PIOS_LED_RX)
+#define RX_LED_TOGGLE					PIOS_LED_Toggle(PIOS_LED_RX)
 
-#define USB_LED_ON						PIOS_LED_On(LED1)
-#define USB_LED_OFF						PIOS_LED_Off(LED1)
-#define USB_LED_TOGGLE					PIOS_LED_Toggle(LED1)
-
-#define LINK_LED_ON						PIOS_LED_On(LED2)
-#define LINK_LED_OFF					PIOS_LED_Off(LED2)
-#define LINK_LED_TOGGLE					PIOS_LED_Toggle(LED2)
-
-#define RX_LED_ON						PIOS_LED_On(LED3)
-#define RX_LED_OFF						PIOS_LED_Off(LED3)
-#define RX_LED_TOGGLE					PIOS_LED_Toggle(LED3)
-
-#define TX_LED_ON						PIOS_LED_On(LED4)
-#define TX_LED_OFF						PIOS_LED_Off(LED4)
-#define TX_LED_TOGGLE					PIOS_LED_Toggle(LED4)
+#define TX_LED_ON					PIOS_LED_On(PIOS_LED_TX)
+#define TX_LED_OFF					PIOS_LED_Off(PIOS_LED_TX)
+#define TX_LED_TOGGLE					PIOS_LED_Toggle(PIOS_LED_TX)
 
 // *****************************************************************
 // Timer interrupt

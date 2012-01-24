@@ -69,7 +69,6 @@ uint32_t LedPWM(uint32_t pwm_period, uint32_t pwm_sweep_steps, uint32_t count);
 uint8_t processRX();
 void jump_to_app();
 
-#define BLUE LED1
 int main() {
 	PIOS_SYS_Init();
 	if (BSL_HOLD_STATE == 0)
@@ -112,7 +111,7 @@ int main() {
 		case DFUidle:
 			period1 = 5000;
 			sweep_steps1 = 100;
-			PIOS_LED_Off(BLUE);
+			PIOS_LED_Off(PIOS_LED_HEARTBEAT);
 			period2 = 0;
 			break;
 		case uploading:
@@ -124,12 +123,12 @@ int main() {
 		case downloading:
 			period1 = 2500;
 			sweep_steps1 = 50;
-			PIOS_LED_Off(BLUE);
+			PIOS_LED_Off(PIOS_LED_HEARTBEAT);
 			period2 = 0;
 			break;
 		case BLidle:
 			period1 = 0;
-			PIOS_LED_On(BLUE);
+			PIOS_LED_On(PIOS_LED_HEARTBEAT);
 			period2 = 0;
 			break;
 		default://error
@@ -141,19 +140,19 @@ int main() {
 
 		if (period1 != 0) {
 			if (LedPWM(period1, sweep_steps1, stopwatch))
-				PIOS_LED_On(BLUE);
+				PIOS_LED_On(PIOS_LED_HEARTBEAT);
 			else
-				PIOS_LED_Off(BLUE);
+				PIOS_LED_Off(PIOS_LED_HEARTBEAT);
 		} else
-			PIOS_LED_On(BLUE);
+			PIOS_LED_On(PIOS_LED_HEARTBEAT);
 
 		if (period2 != 0) {
 			if (LedPWM(period2, sweep_steps2, stopwatch))
-				PIOS_LED_On(BLUE);
+				PIOS_LED_On(PIOS_LED_HEARTBEAT);
 			else
-				PIOS_LED_Off(BLUE);
+				PIOS_LED_Off(PIOS_LED_HEARTBEAT);
 		} else
-			PIOS_LED_Off(BLUE);
+			PIOS_LED_Off(PIOS_LED_HEARTBEAT);
 
 		if (stopwatch > 50 * 1000 * 1000)
 			stopwatch = 0;

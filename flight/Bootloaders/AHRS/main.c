@@ -79,12 +79,7 @@ int main() {
 			break;
 		}
 	}
-	//while(TRUE)
-	//	{
-	//		PIOS_LED_Toggle(LED1);
-	//		PIOS_DELAY_WaitmS(1000);
-	//	}
-	//GO_dfu = TRUE;
+
 	PIOS_IAP_Init();
 	GO_dfu = GO_dfu | PIOS_IAP_CheckRequest();// OR with app boot request
 	if (GO_dfu == FALSE) {
@@ -97,7 +92,7 @@ int main() {
 	PIOS_Board_Init();
 	boot_status = idle;
 	Fw_crc = PIOS_BL_HELPER_CRC_Memory_Calc();
-	PIOS_LED_On(LED1);
+	PIOS_LED_On(PIOS_LED_HEARTBEAT);
 	while (1) {
 		process_spi_request();
 	}
@@ -150,7 +145,7 @@ void process_spi_request(void) {
 		Fw_crc = PIOS_BL_HELPER_CRC_Memory_Calc();
 		lfsm_user_set_tx_v0(&user_tx_v0);
 		boot_status = idle;
-		PIOS_LED_Off(LED1);
+		PIOS_LED_Off(PIOS_LED_HEARTBEAT);
 		user_tx_v0.payload.user.v.rsp.fwup_status.status = boot_status;
 		break;
 	case OPAHRS_MSG_V0_REQ_RESET:
@@ -158,7 +153,6 @@ void process_spi_request(void) {
 		PIOS_SYS_Reset();
 		break;
 	case OPAHRS_MSG_V0_REQ_VERSIONS:
-		//PIOS_LED_On(LED1);
 		opahrs_msg_v0_init_user_tx(&user_tx_v0, OPAHRS_MSG_V0_RSP_VERSIONS);
 		user_tx_v0.payload.user.v.rsp.versions.bl_version = BOOTLOADER_VERSION;
 		user_tx_v0.payload.user.v.rsp.versions.hw_version = (BOARD_TYPE << 8)
@@ -191,7 +185,7 @@ void process_spi_request(void) {
 		lfsm_user_set_tx_v0(&user_tx_v0);
 		break;
 	case OPAHRS_MSG_V0_REQ_FWUP_DATA:
-		PIOS_LED_On(LED1);
+		PIOS_LED_On(PIOS_LED_HEARTBEAT);
 		opahrs_msg_v0_init_user_tx(&user_tx_v0, OPAHRS_MSG_V0_RSP_FWUP_STATUS);
 		if (!(user_rx_v0.payload.user.v.req.fwup_data.adress
 				< bdinfo->fw_base)) {
@@ -209,7 +203,7 @@ void process_spi_request(void) {
 		} else {
 			boot_status = outside_dev_capabilities;
 		}
-		PIOS_LED_Off(LED1);
+		PIOS_LED_Off(PIOS_LED_HEARTBEAT);
 		user_tx_v0.payload.user.v.rsp.fwup_status.status = boot_status;
 		lfsm_user_set_tx_v0(&user_tx_v0);
 		break;
@@ -227,10 +221,10 @@ void process_spi_request(void) {
 		opahrs_msg_v0_init_user_tx(&user_tx_v0, OPAHRS_MSG_V0_RSP_FWUP_STATUS);
 		user_tx_v0.payload.user.v.rsp.fwup_status.status = boot_status;
 		lfsm_user_set_tx_v0(&user_tx_v0);
-		PIOS_LED_On(LED1);
+		PIOS_LED_On(PIOS_LED_HEARTBEAT);
 		if (PIOS_BL_HELPER_FLASH_Start() == TRUE) {
 			boot_status = started;
-			PIOS_LED_Off(LED1);
+			PIOS_LED_Off(PIOS_LED_HEARTBEAT);
 		} else {
 			boot_status = start_failed;
 			break;
@@ -254,15 +248,13 @@ void process_spi_request(void) {
 void jump_to_app() {
 	const struct pios_board_info * bdinfo = &pios_board_info_blob;
 
-	PIOS_LED_On(LED1);
+	PIOS_LED_On(PIOS_LED_HEARTBEAT);
 	if (((*(__IO uint32_t*) bdinfo->fw_base) & 0x2FFE0000) == 0x20000000) { /* Jump to user application */
 		FLASH_Lock();
 		RCC_APB2PeriphResetCmd(0xffffffff, ENABLE);
 		RCC_APB1PeriphResetCmd(0xffffffff, ENABLE);
 		RCC_APB2PeriphResetCmd(0xffffffff, DISABLE);
 		RCC_APB1PeriphResetCmd(0xffffffff, DISABLE);
-		//_SetCNTR(0); // clear interrupt mask
-		//_SetISTR(0); // clear all requests
 
 		JumpAddress = *(__IO uint32_t*) (bdinfo->fw_base + 4);
 		Jump_To_Application = (pFunction) JumpAddress;

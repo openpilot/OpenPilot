@@ -230,11 +230,14 @@ static uint32_t get_time(void)
  * Executed by event dispatcher callback to reset INS before resetting OP 
  */
 static void resetTask(UAVObjEvent * ev)
-{		
-	PIOS_LED_Toggle(LED1);
-#if (PIOS_LED_NUM > 1)
-	PIOS_LED_Toggle(LED2);
-#endif
+{
+#if defined (PIOS_LED_HEARTBEAT)
+	PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
+#endif	/* PIOS_LED_HEARTBEAT */
+
+#if defined (PIOS_LED_ALARM)
+	PIOS_LED_Toggle(PIOS_LED_ALARM);
+#endif	/* PIOS_LED_ALARM */
 	
 	if((portTickType) (xTaskGetTickCount() - lastResetSysTime) > RESET_DELAY / portTICK_RATE_MS) {
 		lastResetSysTime = xTaskGetTickCount();

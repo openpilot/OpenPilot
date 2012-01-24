@@ -50,14 +50,14 @@ int main() {
 
 	PIOS_SYS_Init();
 	PIOS_Board_Init();
-	PIOS_LED_On(LED1);
+	PIOS_LED_On(PIOS_LED_HEARTBEAT);
 	PIOS_DELAY_WaitmS(3000);
-	PIOS_LED_Off(LED1);
+	PIOS_LED_Off(PIOS_LED_HEARTBEAT);
 
 	/// Self overwrite check
 	uint32_t base_address = SCB->VTOR;
 	if ((0x08000000 + embedded_image_size) > base_address)
-		error(LED1);
+		error(PIOS_LED_HEARTBEAT);
 	///
 	FLASH_Unlock();
 
@@ -82,7 +82,7 @@ int main() {
 	}
 
 	if (fail == true)
-		error(LED1);
+		error(PIOS_LED_HEARTBEAT);
 
 
 	///
@@ -90,7 +90,7 @@ int main() {
 	/// Bootloader programing
 	for (uint32_t offset = 0; offset < embedded_image_size/sizeof(uint32_t); ++offset) {
 		bool result = false;
-		PIOS_LED_Toggle(LED1);
+		PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
 		for (uint8_t retry = 0; retry < MAX_WRI_RETRYS; ++retry) {
 			if (result == false) {
 				result = (FLASH_ProgramWord(0x08000000 + (offset * 4), embedded_image_start[offset])
@@ -98,13 +98,13 @@ int main() {
 			}
 		}
 		if (result == false)
-			error(LED1);
+			error(PIOS_LED_HEARTBEAT);
 	}
 	///
 	for (uint8_t x = 0; x < 3; ++x) {
-			PIOS_LED_On(LED1);
+			PIOS_LED_On(PIOS_LED_HEARTBEAT);
 			PIOS_DELAY_WaitmS(1000);
-			PIOS_LED_Off(LED1);
+			PIOS_LED_Off(PIOS_LED_HEARTBEAT);
 			PIOS_DELAY_WaitmS(1000);
 	}
 

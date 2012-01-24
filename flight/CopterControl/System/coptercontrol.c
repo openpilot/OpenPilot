@@ -72,7 +72,9 @@ int main()
 
 #ifdef ERASE_FLASH
 	PIOS_Flash_W25X_EraseChip();
-	PIOS_LED_Off(LED1);
+#if defined(PIOS_LED_HEARTBEAT)
+	PIOS_LED_Off(PIOS_LED_HEARTBEAT);
+#endif	/* PIOS_LED_HEARTBEAT */
 	while (1) ;
 #endif
 
@@ -88,13 +90,14 @@ int main()
 	/* If all is well we will never reach here as the scheduler will now be running. */
 
 	/* Do some indication to user that something bad just happened */
-	PIOS_LED_Off(LED1);
 	while (1) {
-		PIOS_LED_Toggle(LED1);
+#if defined(PIOS_LED_HEARTBEAT)
+		PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
+#endif	/* PIOS_LED_HEARTBEAT */
 		PIOS_DELAY_WaitmS(100);
 	}
 
-    return 0;
+	return 0;
 }
 
 /**

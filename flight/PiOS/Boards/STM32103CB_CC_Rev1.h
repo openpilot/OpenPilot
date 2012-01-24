@@ -83,13 +83,7 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 //------------------------
 // PIOS_LED
 //------------------------
-#define PIOS_LED_LED1_GPIO_PORT			GPIOA
-#define PIOS_LED_LED1_GPIO_PIN			GPIO_Pin_6
-#define PIOS_LED_LED1_GPIO_CLK			RCC_APB2Periph_GPIOA
-#define PIOS_LED_NUM				1
-#define PIOS_LED_PORTS				{ PIOS_LED_LED1_GPIO_PORT }
-#define PIOS_LED_PINS				{ PIOS_LED_LED1_GPIO_PIN }
-#define PIOS_LED_CLKS				{ PIOS_LED_LED1_GPIO_CLK }
+#define PIOS_LED_HEARTBEAT	0
 
 //-------------------------
 // System Settings

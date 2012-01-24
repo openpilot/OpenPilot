@@ -1744,12 +1744,15 @@ void PIOS_Board_Init(void) {
 			if (PIOS_SPI_Init(&pios_spi_gyro_id, &pios_spi_gyro_cfg)) {
 				PIOS_Assert(0);
 			}
-
+#if defined(PIOS_INCLUDE_L3GD20)
 			PIOS_L3GD20_Attach(pios_spi_gyro_id);
 			PIOS_L3GD20_Init(&pios_l3gd20_cfg);
+#endif /* PIOS_INCLUDE_L3GD20 */
 
+#if defined(PIOS_INCLUDE_BMA180)
 			PIOS_BMA180_Attach(pios_spi_flash_accel_id);
 			PIOS_BMA180_Init(&pios_bma180_cfg);
+#endif /* PIOS_INCLUDE_BMA180 */
 
 			break;
 		default:

@@ -157,6 +157,22 @@ void PIOS_Board_Init(void) {
 	/* Delay system */
 	PIOS_DELAY_Init();
 
+	const struct pios_board_info * bdinfo = &pios_board_info_blob;
+	
+#if defined(PIOS_INCLUDE_LED)
+	switch(bdinfo->board_rev) {
+		case 0x01: // Revision 1
+			PIOS_LED_Init(&pios_led_cfg_cc);
+			break;
+		case 0x02: // Revision 2
+			GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
+			PIOS_LED_Init(&pios_led_cfg_cc3d);
+			break;
+		default:
+			PIOS_Assert(0);
+	}
+#endif	/* PIOS_INCLUDE_LED */
+
 #if defined(PIOS_INCLUDE_SPI)
 	/* Set up the SPI interface to the serial flash */
 	if (PIOS_SPI_Init(&pios_spi_flash_accel_id, &pios_spi_flash_accel_cfg)) {
@@ -652,8 +668,6 @@ void PIOS_Board_Init(void) {
 	PIOS_DEBUG_Init(&pios_tim_servo_all_channels, NELEMENTS(pios_tim_servo_all_channels));
 #endif	/* PIOS_DEBUG_ENABLE_DEBUG_PINS */
 
-	const struct pios_board_info * bdinfo = &pios_board_info_blob;
-
 	switch(bdinfo->board_rev) {
 		case 0x01:
 			// Revision 1 with invensense gyros, start the ADC
@@ -661,10 +675,6 @@ void PIOS_Board_Init(void) {
 #if defined(PIOS_INCLUDE_ADXL345)
 			PIOS_ADXL345_Init(pios_spi_flash_accel_id, 0);
 #endif
-#if defined(PIOS_INCLUDE_LED)
-			PIOS_LED_Init(&pios_led_cfg_cc);
-#endif	/* PIOS_INCLUDE_LED */
-
 			break;
 		case 0x02:
 			// Revision 2 with L3GD20 gyros, start a SPI interface and connect to it

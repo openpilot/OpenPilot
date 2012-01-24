@@ -121,6 +121,7 @@ static const struct pios_spi_cfg pios_spi_gyro_cfg = {
 			.GPIO_Mode  = GPIO_Mode_AF_PP,
 		},
 	},
+	.slave_count = 1,
 	.ssel = {{
 		.gpio = GPIOA,
 		.init = {
@@ -227,10 +228,11 @@ static const struct pios_spi_cfg pios_spi_flash_accel_cfg = {
 			.GPIO_Mode  = GPIO_Mode_AF_PP,
 		},
 	},
+	.slave_count = 2,
 	.ssel = {{
-		.gpio = GPIOA,
+		.gpio = GPIOB,
 		.init = {
-			.GPIO_Pin   = GPIO_Pin_4,
+			.GPIO_Pin   = GPIO_Pin_12,
 			.GPIO_Speed = GPIO_Speed_50MHz,
 			.GPIO_Mode  = GPIO_Mode_Out_PP,
 		}},{
@@ -1731,36 +1733,31 @@ void PIOS_Board_Init(void) {
 		case 0x01:
 			// Revision 1 with invensense gyros, start the ADC
 			PIOS_ADC_Init();
+			PIOS_ADXL345_Init(pios_spi_flash_accel_id, 0);
+
 			break;
 		case 0x02:
+			// Revision 2 with L3GD20 gyros, start a SPI interface and connect to it
 			GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
 
-			if(0) {
-				PIOS_ADC_Init();
-				PIOS_ADXL345_Init(pios_spi_flash_accel_id, 0);
-			} else
-			{
-				// Revision 2 with L3GD20 gyros, start a SPI interface and connect to it
-				
-				// Set up the SPI interface to the serial flash 
-				if (PIOS_SPI_Init(&pios_spi_gyro_id, &pios_spi_gyro_cfg)) {
-					PIOS_Assert(0);
-				}
-				
-				PIOS_L3GD20_Attach(pios_spi_gyro_id);
-				PIOS_L3GD20_Init(&pios_l3gd20_cfg);
-				
-				PIOS_BMA180_Attach(pios_spi_flash_accel_id);
-				PIOS_BMA180_Init(&pios_bma180_cfg);
+			// Set up the SPI interface to the serial flash 
+			if (PIOS_SPI_Init(&pios_spi_gyro_id, &pios_spi_gyro_cfg)) {
+				PIOS_Assert(0);
 			}
+
+			PIOS_L3GD20_Attach(pios_spi_gyro_id);
+			PIOS_L3GD20_Init(&pios_l3gd20_cfg);
+
+			PIOS_BMA180_Attach(pios_spi_flash_accel_id);
+			PIOS_BMA180_Init(&pios_bma180_cfg);
+
 			break;
 		default:
 			PIOS_Assert(0);
 	}
-	
+
 	PIOS_GPIO_Init();
 
-	
 	/* Make sure we have at least one telemetry link configured or else fail initialization */
 	PIOS_Assert(pios_com_telem_rf_id || pios_com_telem_usb_id);
 }

@@ -392,7 +392,7 @@ static int32_t updateSensorsCC3D(AccelsData * accelsData, GyrosData * gyrosData)
 	struct pios_l3gd20_data gyro;
 	bool gyro_error = false;
 
-	while(gyro_read_good = PIOS_L3GD20_ReadFifo(&gyro)) != 0 && !gyro_error)
+	while((gyro_read_good = PIOS_L3GD20_ReadFifo(&gyro) != 0) && !gyro_error)
 		gyro_error = ((xTaskGetTickCount() - lastSysTime) > 5) ? true : gyro_error;
 	while(gyro_read_good == 0) {
 		gyro_samples++;

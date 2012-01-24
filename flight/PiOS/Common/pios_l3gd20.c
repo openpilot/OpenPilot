@@ -34,6 +34,8 @@
 
 #if defined(PIOS_INCLUDE_L3GD20)
 
+#include "fifo_buffer.h"
+
 /* Global Variables */
 uint32_t pios_spi_gyro;
 
@@ -64,9 +66,9 @@ void PIOS_L3GD20_Init(const struct pios_l3gd20_cfg * new_cfg)
 	fifoBuf_init(&pios_l3gd20_fifo, (uint8_t *) pios_l3gd20_buffer, sizeof(pios_l3gd20_buffer));
 
 	/* Configure the MPU6050 Sensor */
-	PIOS_SPI_SetPrescalar(pios_spi_gyro, SPI_BaudRatePrescaler_256);
+	PIOS_SPI_SetClockSpeed(pios_spi_gyro, SPI_BaudRatePrescaler_256);
 	PIOS_L3GD20_Config(cfg);
-	PIOS_SPI_SetPrescalar(pios_spi_gyro, SPI_BaudRatePrescaler_16);
+	PIOS_SPI_SetClockSpeed(pios_spi_gyro, SPI_BaudRatePrescaler_16);
 
 	/* Set up EXTI */
 	PIOS_EXTI_Init(new_cfg->exti_cfg);
@@ -277,30 +279,6 @@ uint8_t PIOS_L3GD20_Test(void)
 		return 0;
 
 	return -2;
-}
-
-/**
- * @brief Run self-test operation.
- * \return 0 if test succeeded
- * \return non-zero value if test succeeded
- */
-static int32_t PIOS_L3GD20_FifoDepth(void)
-{
-/*	uint8_t l3gd20_send_buf[3] = {PIOS_L3GD20_FIFO_CNT_MSB | 0x80, 0, 0};
-	uint8_t l3gd20_rec_buf[3];
-
-	if(PIOS_L3GD20_ClaimBus() != 0)
-		return -1;
-
-	if(PIOS_SPI_TransferBlock(pios_spi_gyro, &l3gd20_send_buf[0], &l3gd20_rec_buf[0], sizeof(l3gd20_send_buf), NULL) < 0) {
-		PIOS_L3GD20_ReleaseBus();
-		return -1;
-	}
-
-	PIOS_L3GD20_ReleaseBus();
-	
-	return (l3gd20_rec_buf[1] << 8) | l3gd20_rec_buf[2];*/
-	return 0;
 }
 
 /**

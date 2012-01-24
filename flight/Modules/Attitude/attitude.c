@@ -178,10 +178,6 @@ static void AttitudeTask(void *parameters)
 	
 	PIOS_ADC_Config((PIOS_ADC_RATE / 1000.0f) * UPDATE_RATE);
 	
-	// Keep flash CS pin high while talking accel
-	PIOS_FLASH_DISABLE;
-	PIOS_ADXL345_Init();
-	
 	// Set critical error and wait until the accel is producing data
 	while(PIOS_ADXL345_FifoElements() == 0) {
 		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_CRITICAL);

@@ -66,13 +66,11 @@ struct pios_adxl345_data {
 	int16_t z;
 };
 
-void PIOS_ADXL345_SelectRate(uint8_t rate); 
-void PIOS_ADXL345_SetRange(uint8_t range);
-void PIOS_ADXL345_FifoDepth(uint8_t depth);
-void PIOS_ADXL345_Attach(uint32_t spi_id);
-void PIOS_ADXL345_Init();
+int32_t PIOS_ADXL345_SelectRate(uint8_t rate); 
+int32_t PIOS_ADXL345_SetRange(uint8_t range);
+int32_t PIOS_ADXL345_Init(uint32_t spi_id, uint32_t slave_num);
 uint8_t PIOS_ADXL345_Read(struct pios_adxl345_data * data);
-uint8_t  PIOS_ADXL345_FifoElements();
+int32_t  PIOS_ADXL345_FifoElements();
 
 #endif
 

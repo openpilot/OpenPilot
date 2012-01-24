@@ -97,14 +97,6 @@ static const struct pios_spi_cfg pios_spi_gyro_cfg = {
 			},
 		},
 	},
-	.ssel = {
-		.gpio = GPIOA,
-		.init = {
-			.GPIO_Pin   = GPIO_Pin_4,
-			.GPIO_Speed = GPIO_Speed_50MHz,
-			.GPIO_Mode  = GPIO_Mode_Out_PP,
-		},
-	},
 	.sclk = {
 		.gpio = GPIOA,
 		.init = {
@@ -129,6 +121,14 @@ static const struct pios_spi_cfg pios_spi_gyro_cfg = {
 			.GPIO_Mode  = GPIO_Mode_AF_PP,
 		},
 	},
+	.ssel = {{
+		.gpio = GPIOA,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_4,
+			.GPIO_Speed = GPIO_Speed_50MHz,
+			.GPIO_Mode  = GPIO_Mode_Out_PP,
+		},
+	}},	
 };
 
 static uint32_t pios_spi_gyro_id;
@@ -148,93 +148,99 @@ void PIOS_SPI_flash_accel_irq_handler(void);
 void DMA1_Channel4_IRQHandler() __attribute__ ((alias ("PIOS_SPI_flash_accel_irq_handler")));
 void DMA1_Channel5_IRQHandler() __attribute__ ((alias ("PIOS_SPI_flash_accel_irq_handler")));
 static const struct pios_spi_cfg pios_spi_flash_accel_cfg = {
-  .regs   = SPI2,
-  .init   = {
-    .SPI_Mode              = SPI_Mode_Master,
-    .SPI_Direction         = SPI_Direction_2Lines_FullDuplex,
-    .SPI_DataSize          = SPI_DataSize_8b,
-    .SPI_NSS               = SPI_NSS_Soft,
-    .SPI_FirstBit          = SPI_FirstBit_MSB,
-    .SPI_CRCPolynomial     = 7,
-    .SPI_CPOL              = SPI_CPOL_High,
-    .SPI_CPHA              = SPI_CPHA_2Edge,
-    .SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_2, 
-  },
-  .use_crc = FALSE,
-  .dma = {
-    .ahb_clk  = RCC_AHBPeriph_DMA1,
-    
-    .irq = {
-      .flags   = (DMA1_FLAG_TC4 | DMA1_FLAG_TE4 | DMA1_FLAG_HT4 | DMA1_FLAG_GL4),
-      .init    = {
-	.NVIC_IRQChannel                   = DMA1_Channel4_IRQn,
-	.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
-	.NVIC_IRQChannelSubPriority        = 0,
-	.NVIC_IRQChannelCmd                = ENABLE,
-      },
-    },
-
-    .rx = {
-      .channel = DMA1_Channel4,
-      .init    = {
-	.DMA_PeripheralBaseAddr = (uint32_t)&(SPI2->DR),
-	.DMA_DIR                = DMA_DIR_PeripheralSRC,
-	.DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
-	.DMA_MemoryInc          = DMA_MemoryInc_Enable,
-	.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte,
-	.DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte,
-	.DMA_Mode               = DMA_Mode_Normal,
-	.DMA_Priority           = DMA_Priority_High,
-	.DMA_M2M                = DMA_M2M_Disable,
-      },
-    },
-    .tx = {
-      .channel = DMA1_Channel5,
-      .init    = {
-	.DMA_PeripheralBaseAddr = (uint32_t)&(SPI2->DR),
-	.DMA_DIR                = DMA_DIR_PeripheralDST,
-	.DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
-	.DMA_MemoryInc          = DMA_MemoryInc_Enable,
-	.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte,
-	.DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte,
-	.DMA_Mode               = DMA_Mode_Normal,
-	.DMA_Priority           = DMA_Priority_High,
-	.DMA_M2M                = DMA_M2M_Disable,
-      },
-    },
-  },
-  .ssel = {
-    .gpio = GPIOB,
-    .init = {
-      .GPIO_Pin   = GPIO_Pin_12,
-      .GPIO_Speed = GPIO_Speed_10MHz,
-      .GPIO_Mode  = GPIO_Mode_Out_PP,
-    },
-  },
-  .sclk = {
-    .gpio = GPIOB,
-    .init = {
-      .GPIO_Pin   = GPIO_Pin_13,
-      .GPIO_Speed = GPIO_Speed_10MHz,
-      .GPIO_Mode  = GPIO_Mode_AF_PP,
-    },
-  },
-  .miso = {
-    .gpio = GPIOB,
-    .init = {
-      .GPIO_Pin   = GPIO_Pin_14,
-      .GPIO_Speed = GPIO_Speed_10MHz,
-      .GPIO_Mode  = GPIO_Mode_IN_FLOATING,
-    },
-  },
-  .mosi = {
-    .gpio = GPIOB,
-    .init = {
-      .GPIO_Pin   = GPIO_Pin_15,
-      .GPIO_Speed = GPIO_Speed_10MHz,
-      .GPIO_Mode  = GPIO_Mode_AF_PP,
-    },
-  },
+	.regs   = SPI2,
+	.init   = {
+		.SPI_Mode              = SPI_Mode_Master,
+		.SPI_Direction         = SPI_Direction_2Lines_FullDuplex,
+		.SPI_DataSize          = SPI_DataSize_8b,
+		.SPI_NSS               = SPI_NSS_Soft,
+		.SPI_FirstBit          = SPI_FirstBit_MSB,
+		.SPI_CRCPolynomial     = 7,
+		.SPI_CPOL              = SPI_CPOL_High,
+		.SPI_CPHA              = SPI_CPHA_2Edge,
+		.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_2, 
+	},
+	.use_crc = FALSE,
+	.dma = {
+		.ahb_clk  = RCC_AHBPeriph_DMA1,
+		
+		.irq = {
+			.flags   = (DMA1_FLAG_TC4 | DMA1_FLAG_TE4 | DMA1_FLAG_HT4 | DMA1_FLAG_GL4),
+			.init    = {
+				.NVIC_IRQChannel                   = DMA1_Channel4_IRQn,
+				.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+				.NVIC_IRQChannelSubPriority        = 0,
+				.NVIC_IRQChannelCmd                = ENABLE,
+			},
+		},
+		
+		.rx = {
+			.channel = DMA1_Channel4,
+			.init    = {
+				.DMA_PeripheralBaseAddr = (uint32_t)&(SPI2->DR),
+				.DMA_DIR                = DMA_DIR_PeripheralSRC,
+				.DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
+				.DMA_MemoryInc          = DMA_MemoryInc_Enable,
+				.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte,
+				.DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte,
+				.DMA_Mode               = DMA_Mode_Normal,
+				.DMA_Priority           = DMA_Priority_High,
+				.DMA_M2M                = DMA_M2M_Disable,
+			},
+		},
+		.tx = {
+			.channel = DMA1_Channel5,
+			.init    = {
+				.DMA_PeripheralBaseAddr = (uint32_t)&(SPI2->DR),
+				.DMA_DIR                = DMA_DIR_PeripheralDST,
+				.DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
+				.DMA_MemoryInc          = DMA_MemoryInc_Enable,
+				.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte,
+				.DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte,
+				.DMA_Mode               = DMA_Mode_Normal,
+				.DMA_Priority           = DMA_Priority_High,
+				.DMA_M2M                = DMA_M2M_Disable,
+			},
+		},
+	},
+	.sclk = {
+		.gpio = GPIOB,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_13,
+			.GPIO_Speed = GPIO_Speed_10MHz,
+			.GPIO_Mode  = GPIO_Mode_AF_PP,
+		},
+	},
+	.miso = {
+		.gpio = GPIOB,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_14,
+			.GPIO_Speed = GPIO_Speed_10MHz,
+			.GPIO_Mode  = GPIO_Mode_IN_FLOATING,
+		},
+	},
+	.mosi = {
+		.gpio = GPIOB,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_15,
+			.GPIO_Speed = GPIO_Speed_10MHz,
+			.GPIO_Mode  = GPIO_Mode_AF_PP,
+		},
+	},
+	.ssel = {{
+		.gpio = GPIOA,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_4,
+			.GPIO_Speed = GPIO_Speed_50MHz,
+			.GPIO_Mode  = GPIO_Mode_Out_PP,
+		}},{
+			.gpio = GPIOA,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_7,
+				.GPIO_Speed = GPIO_Speed_50MHz,
+				.GPIO_Mode  = GPIO_Mode_Out_PP,
+			},
+		}},
 };
 
 static uint32_t pios_spi_flash_accel_id;
@@ -1135,9 +1141,15 @@ uint32_t pios_com_vcp_id;
 uint32_t pios_com_gps_id;
 uint32_t pios_com_bridge_id;
 
+/**
+ * Configuration for L3GD20 chip
+ */
+#if defined(PIOS_INCLUDE_L3GD20)
 #include "pios_l3gd20.h"
-static const struct pios_l3gd20_cfg pios_l3gd20_cfg = {
-	.drdy = {
+static const struct pios_exti_cfg pios_exti_l3gd20_cfg __exti_config = {
+	.vector = PIOS_L3GD20_IRQHandler,
+	.line = EXTI_Line3,
+	.pin = {
 		.gpio = GPIOA,
 		.init = {
 			.GPIO_Pin   = GPIO_Pin_3,
@@ -1145,17 +1157,7 @@ static const struct pios_l3gd20_cfg pios_l3gd20_cfg = {
 			.GPIO_Mode  = GPIO_Mode_IPU,
 		},
 	},
-	.eoc_exti = {
-		.pin_source = GPIO_PinSource3,
-		.port_source = GPIO_PortSourceGPIOA,
-		.init = {
-			.EXTI_Line = EXTI_Line3, // matches above GPIO pin
-			.EXTI_Mode = EXTI_Mode_Interrupt,
-			.EXTI_Trigger = EXTI_Trigger_Rising,
-			.EXTI_LineCmd = ENABLE,
-		},
-	},
-	.eoc_irq = {
+	.irq = {
 		.init = {
 			.NVIC_IRQChannel = EXTI3_IRQn,
 			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
@@ -1163,8 +1165,21 @@ static const struct pios_l3gd20_cfg pios_l3gd20_cfg = {
 			.NVIC_IRQChannelCmd = ENABLE,
 		},
 	},
+	.exti = {
+		.init = {
+			.EXTI_Line = EXTI_Line3, // matches above GPIO pin
+			.EXTI_Mode = EXTI_Mode_Interrupt,
+			.EXTI_Trigger = EXTI_Trigger_Rising,
+			.EXTI_LineCmd = ENABLE,
+		},
+	},
+};
+
+static const struct pios_l3gd20_cfg pios_l3gd20_cfg = {
+	.exti_cfg = &pios_exti_l3gd20_cfg,
 	.gyro_range = PIOS_L3GD20_SCALE_500_DEG,
 };
+#endif /* PIOS_INCLUDE_L3GD20 */
 
 
 #include <pios_board_info.h>
@@ -1183,8 +1198,8 @@ void PIOS_Board_Init(void) {
 		PIOS_Assert(0);
 	}
 
-	PIOS_Flash_W25X_Init(pios_spi_flash_accel_id);	
-	PIOS_ADXL345_Attach(pios_spi_flash_accel_id);
+	PIOS_Flash_W25X_Init(pios_spi_flash_accel_id, 1);	
+	PIOS_ADXL345_Init(pios_spi_flash_accel_id, 0);
 
 	PIOS_FLASHFS_Init();
 

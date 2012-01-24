@@ -1536,6 +1536,7 @@ static const struct pios_mpu6000_cfg pios_mpu6000_cfg = {
 	.filter = PIOS_MPU6000_LOWPASS_256_HZ
 };
 #endif /* PIOS_INCLUDE_MPU6000 */
+
 /**
  * Configuration for L3GD20 chip
  */

@@ -1142,6 +1142,44 @@ uint32_t pios_com_gps_id;
 uint32_t pios_com_bridge_id;
 
 /**
+ * Configuration for the BMA180 chip
+ */
+#if defined(PIOS_INCLUDE_BMA180)
+#include "pios_bma180.h"
+static const struct pios_exti_cfg pios_exti_bma180_cfg __exti_config = {
+	.vector = PIOS_BMA180_IRQHandler,
+	.line = EXTI_Line13,
+	.pin = {
+		.gpio = GPIOC,
+		.init = {
+			.GPIO_Pin = GPIO_Pin_13,
+			.GPIO_Speed = GPIO_Speed_10MHz,
+			.GPIO_Mode = GPIO_Mode_IPU,
+		},
+	},
+	.irq = {
+		.init = {
+			.NVIC_IRQChannel = EXTI15_10_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
+			.NVIC_IRQChannelSubPriority = 0,
+			.NVIC_IRQChannelCmd = ENABLE,
+		},
+	},
+	.exti = {
+		.init = {
+			.EXTI_Line = EXTI_Line13, // matches above GPIO pin
+			.EXTI_Mode = EXTI_Mode_Interrupt,
+			.EXTI_Trigger = EXTI_Trigger_Rising,
+			.EXTI_LineCmd = ENABLE,
+		},
+	},
+};
+static const struct pios_bma180_cfg pios_bma180_cfg = {
+	.exti_cfg = &pios_exti_bma180_cfg,
+};
+#endif /* PIOS_INCLUDE_BMA180 */
+
+/**
  * Configuration for L3GD20 chip
  */
 #if defined(PIOS_INCLUDE_L3GD20)
@@ -1199,7 +1237,6 @@ void PIOS_Board_Init(void) {
 	}
 
 	PIOS_Flash_W25X_Init(pios_spi_flash_accel_id, 1);	
-	PIOS_ADXL345_Init(pios_spi_flash_accel_id, 0);
 
 	PIOS_FLASHFS_Init();
 
@@ -1700,6 +1737,7 @@ void PIOS_Board_Init(void) {
 
 			if(0) {
 				PIOS_ADC_Init();
+				PIOS_ADXL345_Init(pios_spi_flash_accel_id, 0);
 			} else
 			{
 				// Revision 2 with L3GD20 gyros, start a SPI interface and connect to it
@@ -1711,6 +1749,9 @@ void PIOS_Board_Init(void) {
 				
 				PIOS_L3GD20_Attach(pios_spi_gyro_id);
 				PIOS_L3GD20_Init(&pios_l3gd20_cfg);
+				
+				PIOS_BMA180_Attach(pios_spi_flash_accel_id);
+				PIOS_BMA180_Init(&pios_bma180_cfg);
 			}
 			break;
 		default:

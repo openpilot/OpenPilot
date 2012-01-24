@@ -378,7 +378,9 @@ void deviceWidget::uploadFirmware()
         // - Check whether board type matches firmware:
         int board = m_dfu->devices[deviceID].ID;
         int firmwareBoard = ((desc.at(12)&0xff)<<8) + (desc.at(13)&0xff);
-        if (firmwareBoard != board) {
+        if((board == 0x401 && firmwareBoard == 0x402)) {
+            // These firmwares are designed to be backwards compatible
+        } else if (firmwareBoard != board) {
             status("Error: firmware does not match board", STATUSICON_FAIL);
             myDevice->updateButton->setEnabled(true);
             return;

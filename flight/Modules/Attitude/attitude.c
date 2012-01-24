@@ -50,7 +50,8 @@
 
 #include "pios.h"
 #include "attitude.h"
-#include "attituderaw.h"
+#include "gyros.h"
+#include "accels.h"
 #include "attitudeactual.h"
 #include "attitudesettings.h"
 #include "flightstatus.h"
@@ -77,8 +78,8 @@ static void AttitudeTask(void *parameters);
 static float gyro_correct_int[3] = {0,0,0};
 static xQueueHandle gyro_queue;
 
-static int8_t updateSensors(AttitudeRawData *);
-static void updateAttitude(AttitudeRawData *);
+static int8_t updateSensors(AccelsData *, GyrosData *);
+static void updateAttitude(AccelsData *, GyrosData *);
 static void settingsUpdatedCb(UAVObjEvent * objEv);
 
 static float accelKi = 0;
@@ -124,8 +125,9 @@ int32_t AttitudeStart(void)
 int32_t AttitudeInitialize(void)
 {
 	AttitudeActualInitialize();
-	AttitudeRawInitialize();
 	AttitudeSettingsInitialize();
+	AccelsInitialize();
+	GyrosInitialize();
 	
 	// Initialize quaternion
 	AttitudeActualData attitude;
@@ -216,15 +218,16 @@ static void AttitudeTask(void *parameters)
 		}
 		
 		PIOS_WDG_UpdateFlag(PIOS_WDG_ATTITUDE);
-		
-		AttitudeRawData attitudeRaw;
-		AttitudeRawGet(&attitudeRaw);
-		if(updateSensors(&attitudeRaw) != 0)
+
+		AccelsData accels;
+		GyrosData gyros;
+		if(updateSensors(&accels, &gyros) != 0)
 			AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
 		else {
 			// Only update attitude when sensor data is good
-			updateAttitude(&attitudeRaw);
-			AttitudeRawSet(&attitudeRaw);
+			updateAttitude(&accels, &gyros);
+			AccelsSet(&accels);
+			GyrosSet(&gyros);
 			AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
 		}
 		
@@ -236,7 +239,7 @@ static void AttitudeTask(void *parameters)
  * @param[in] attitudeRaw Populate the UAVO instead of saving right here
  * @return 0 if successfull, -1 if not
  */
-static int8_t updateSensors(AttitudeRawData * attitudeRaw)
+static int8_t updateSensors(AccelsData * accels, GyrosData * gyros)
 {
 	struct pios_adxl345_data accel_data;
 	float gyro[4];
@@ -252,9 +255,9 @@ static int8_t updateSensors(AttitudeRawData * attitudeRaw)
 		return -1;
 	
 	// First sample is temperature
-	attitudeRaw->gyros[ATTITUDERAW_GYROS_X] = -(gyro[1] - GYRO_NEUTRAL) * gyroGain;
-	attitudeRaw->gyros[ATTITUDERAW_GYROS_Y] = (gyro[2] - GYRO_NEUTRAL) * gyroGain;
-	attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] = -(gyro[3] - GYRO_NEUTRAL) * gyroGain;
+	gyros->x = -(gyro[1] - GYRO_NEUTRAL) * gyroGain;
+	gyros->y = (gyro[2] - GYRO_NEUTRAL) * gyroGain;
+	gyros->z = -(gyro[3] - GYRO_NEUTRAL) * gyroGain;
 	
 	int32_t x = 0;
 	int32_t y = 0;
@@ -268,8 +271,7 @@ static int8_t updateSensors(AttitudeRawData * attitudeRaw)
 		y += -accel_data.y;
 		z += -accel_data.z;
 	} while ( (i < 32) && (samples_remaining > 0) );
-	attitudeRaw->temperature[ATTITUDERAW_TEMPERATURE_GYRO] = samples_remaining;
-	attitudeRaw->temperature[ATTITUDERAW_TEMPERATURE_ACCEL] = i;
+	gyros->temperature = samples_remaining;
 
 	float accel[3] = {(float) x / i, (float) y / i, (float) z / i};
 	
@@ -277,17 +279,17 @@ static int8_t updateSensors(AttitudeRawData * attitudeRaw)
 		// TODO: rotate sensors too so stabilization is well behaved
 		float vec_out[3];
 		rot_mult(R, accel, vec_out);
-		attitudeRaw->accels[0] = vec_out[0];
-		attitudeRaw->accels[1] = vec_out[1];
-		attitudeRaw->accels[2] = vec_out[2];
-		rot_mult(R, attitudeRaw->gyros, vec_out);
-		attitudeRaw->gyros[0] = vec_out[0];
-		attitudeRaw->gyros[1] = vec_out[1];
-		attitudeRaw->gyros[2] = vec_out[2];
+		accels->x = vec_out[0];
+		accels->y = vec_out[1];
+		accels->z = vec_out[2];
+		rot_mult(R, &gyros->x, vec_out);
+		gyros->x = vec_out[0];
+		gyros->y = vec_out[1];
+		gyros->z = vec_out[2];
 	} else {
-		attitudeRaw->accels[0] = accel[0];
-		attitudeRaw->accels[1] = accel[1];
-		attitudeRaw->accels[2] = accel[2];
+		accels->x = accel[0];
+		accels->y = accel[1];
+		accels->z = accel[2];
 	}
 	
 	if (trim_requested) {
@@ -301,33 +303,33 @@ static int8_t updateSensors(AttitudeRawData * attitudeRaw)
 			if ((armed == FLIGHTSTATUS_ARMED_ARMED) && (throttle > 0)) {
 				trim_samples++;
 				// Store the digitally scaled version since that is what we use for bias
-				trim_accels[0] += attitudeRaw->accels[ATTITUDERAW_ACCELS_X];
-				trim_accels[1] += attitudeRaw->accels[ATTITUDERAW_ACCELS_Y];
-				trim_accels[2] += attitudeRaw->accels[ATTITUDERAW_ACCELS_Z];	
+				trim_accels[0] += accels->x;
+				trim_accels[1] += accels->y;
+				trim_accels[2] += accels->z;
 			}
 		}
 	}
 	
 	// Scale accels and correct bias
-	attitudeRaw->accels[ATTITUDERAW_ACCELS_X] = (attitudeRaw->accels[ATTITUDERAW_ACCELS_X] - accelbias[0]) * ACCEL_SCALE;
-	attitudeRaw->accels[ATTITUDERAW_ACCELS_Y] = (attitudeRaw->accels[ATTITUDERAW_ACCELS_Y] - accelbias[1]) * ACCEL_SCALE;
-	attitudeRaw->accels[ATTITUDERAW_ACCELS_Z] = (attitudeRaw->accels[ATTITUDERAW_ACCELS_Z] - accelbias[2]) * ACCEL_SCALE;
+	accels->x = (accels->x - accelbias[0]) * ACCEL_SCALE;
+	accels->y = (accels->y - accelbias[1]) * ACCEL_SCALE;
+	accels->z = (accels->z - accelbias[2]) * ACCEL_SCALE;
 	
 	if(bias_correct_gyro) {
 		// Applying integral component here so it can be seen on the gyros and correct bias
-		attitudeRaw->gyros[ATTITUDERAW_GYROS_X] += gyro_correct_int[0];
-		attitudeRaw->gyros[ATTITUDERAW_GYROS_Y] += gyro_correct_int[1];
-		attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] += gyro_correct_int[2];
+		gyros->x += gyro_correct_int[0];
+		gyros->y += gyro_correct_int[1];
+		gyros->z += gyro_correct_int[2];
 	}
 	
 	// Because most crafts wont get enough information from gravity to zero yaw gyro, we try
 	// and make it average zero (weakly)
-	gyro_correct_int[2] += - attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] * yawBiasRate;
+	gyro_correct_int[2] += - gyros->z * yawBiasRate;
 	
 	return 0;
 }
 
-static void updateAttitude(AttitudeRawData * attitudeRaw)
+static void updateAttitude(AccelsData * accelsData, GyrosData * gyrosData)
 {
 	float dT;
 	portTickType thisSysTime = xTaskGetTickCount();
@@ -337,48 +339,43 @@ static void updateAttitude(AttitudeRawData * attitudeRaw)
 	lastSysTime = thisSysTime;
 	
 	// Bad practice to assume structure order, but saves memory
-	float gyro[3];
-	gyro[0] = attitudeRaw->gyros[0];
-	gyro[1] = attitudeRaw->gyros[1];
-	gyro[2] = attitudeRaw->gyros[2];
+	float * gyros = &gyrosData->x;
+	float * accels = &accelsData->x;
 	
-	{
-		float * accels = attitudeRaw->accels;
-		float grot[3];
-		float accel_err[3];
-		
-		// Rotate gravity to body frame and cross with accels
-		grot[0] = -(2 * (q[1] * q[3] - q[0] * q[2]));
-		grot[1] = -(2 * (q[2] * q[3] + q[0] * q[1]));
-		grot[2] = -(q[0] * q[0] - q[1]*q[1] - q[2]*q[2] + q[3]*q[3]);
-		CrossProduct((const float *) accels, (const float *) grot, accel_err);
-		
-		// Account for accel magnitude
-		float accel_mag = sqrt(accels[0]*accels[0] + accels[1]*accels[1] + accels[2]*accels[2]);
-		accel_err[0] /= accel_mag;
-		accel_err[1] /= accel_mag;
-		accel_err[2] /= accel_mag;
-		
-		// Accumulate integral of error.  Scale here so that units are (deg/s) but Ki has units of s
-		gyro_correct_int[0] += accel_err[0] * accelKi;
-		gyro_correct_int[1] += accel_err[1] * accelKi;
-		
-		//gyro_correct_int[2] += accel_err[2] * accelKi;
-		
-		// Correct rates based on error, integral component dealt with in updateSensors
-		gyro[0] += accel_err[0] * accelKp / dT;
-		gyro[1] += accel_err[1] * accelKp / dT;
-		gyro[2] += accel_err[2] * accelKp / dT;
-	}
+	float grot[3];
+	float accel_err[3];
+	
+	// Rotate gravity to body frame and cross with accels
+	grot[0] = -(2 * (q[1] * q[3] - q[0] * q[2]));
+	grot[1] = -(2 * (q[2] * q[3] + q[0] * q[1]));
+	grot[2] = -(q[0] * q[0] - q[1]*q[1] - q[2]*q[2] + q[3]*q[3]);
+	CrossProduct((const float *) accels, (const float *) grot, accel_err);
+	
+	// Account for accel magnitude
+	float accel_mag = sqrt(accels[0]*accels[0] + accels[1]*accels[1] + accels[2]*accels[2]);
+	accel_err[0] /= accel_mag;
+	accel_err[1] /= accel_mag;
+	accel_err[2] /= accel_mag;
+	
+	// Accumulate integral of error.  Scale here so that units are (deg/s) but Ki has units of s
+	gyro_correct_int[0] += accel_err[0] * accelKi;
+	gyro_correct_int[1] += accel_err[1] * accelKi;
+	
+	//gyro_correct_int[2] += accel_err[2] * accelKi;
+	
+	// Correct rates based on error, integral component dealt with in updateSensors
+	gyros[0] += accel_err[0] * accelKp / dT;
+	gyros[1] += accel_err[1] * accelKp / dT;
+	gyros[2] += accel_err[2] * accelKp / dT;
 	
 	{ // scoping variables to save memory
 		// Work out time derivative from INSAlgo writeup
 		// Also accounts for the fact that gyros are in deg/s
 		float qdot[4];
-		qdot[0] = (-q[1] * gyro[0] - q[2] * gyro[1] - q[3] * gyro[2]) * dT * M_PI / 180 / 2;
-		qdot[1] = (q[0] * gyro[0] - q[3] * gyro[1] + q[2] * gyro[2]) * dT * M_PI / 180 / 2;
-		qdot[2] = (q[3] * gyro[0] + q[0] * gyro[1] - q[1] * gyro[2]) * dT * M_PI / 180 / 2;
-		qdot[3] = (-q[2] * gyro[0] + q[1] * gyro[1] + q[0] * gyro[2]) * dT * M_PI / 180 / 2;
+		qdot[0] = (-q[1] * gyros[0] - q[2] * gyros[1] - q[3] * gyros[2]) * dT * M_PI / 180 / 2;
+		qdot[1] = (q[0] * gyros[0] - q[3] * gyros[1] + q[2] * gyros[2]) * dT * M_PI / 180 / 2;
+		qdot[2] = (q[3] * gyros[0] + q[0] * gyros[1] - q[1] * gyros[2]) * dT * M_PI / 180 / 2;
+		qdot[3] = (-q[2] * gyros[0] + q[1] * gyros[1] + q[0] * gyros[2]) * dT * M_PI / 180 / 2;
 		
 		// Take a time step
 		q[0] = q[0] + qdot[0];

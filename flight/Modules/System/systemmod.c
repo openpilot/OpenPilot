@@ -177,16 +177,18 @@ static void systemTask(void *parameters)
 #endif
 
 		// Flash the heartbeat LED
-		PIOS_LED_Toggle(LED1);
+#if defined(PIOS_LED_HEARTBEAT)
+		PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
+#endif	/* PIOS_LED_HEARTBEAT */
 
 		// Turn on the error LED if an alarm is set
-#if (PIOS_LED_NUM > 1)
+#if defined (PIOS_LED_ALARM)
 		if (AlarmsHasWarnings()) {
-			PIOS_LED_On(LED2);
+			PIOS_LED_On(PIOS_LED_ALARM);
 		} else {
-			PIOS_LED_Off(LED2);
+			PIOS_LED_Off(PIOS_LED_ALARM);
 		}
-#endif
+#endif	/* PIOS_LED_ALARM */
 
 		FlightStatusData flightStatus;
 		FlightStatusGet(&flightStatus);

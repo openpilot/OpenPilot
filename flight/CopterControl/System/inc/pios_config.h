@@ -43,6 +43,7 @@
 #define PIOS_INCLUDE_IRQ
 #define PIOS_INCLUDE_LED
 #define PIOS_INCLUDE_IAP
+#define PIOS_INCLUDE_TIM
 
 #define PIOS_INCLUDE_RCVR
 
@@ -81,10 +82,6 @@
 
 /* A really shitty setting saving implementation */
 #define PIOS_INCLUDE_FLASH_SECTOR_SETTINGS
-
-/* Defaults for Logging */
-#define LOG_FILENAME 			"PIOS.LOG"
-#define STARTUP_LOG_ENABLED		1
 
 /* Alarm Thresholds */
 #define HEAP_LIMIT_WARNING             220

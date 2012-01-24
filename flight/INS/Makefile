@@ -71,6 +71,7 @@ OPUAVOBJINC = $(OPUAVOBJ)/inc
 OPSYSINC = $(OPDIR)/System/inc
 BOOT = ../Bootloaders/INS
 BOOTINC = $(BOOT)/inc
+HWDEFSINC = ../board_hw_defs/$(BOARD_NAME)
 
 OPUAVSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
 
@@ -172,6 +173,7 @@ EXTRAINCDIRS  += $(CMSISDIR)
 EXTRAINCDIRS  += $(INSINC)
 EXTRAINCDIRS  += $(OPUAVSYNTHDIR)
 EXTRAINCDIRS  += $(BOOTINC)
+EXTRAINCDIRS  += $(HWDEFSINC)
 
 # List any extra directories to look for library files here.
 # Also add directories where the linker should search for

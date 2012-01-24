@@ -143,7 +143,7 @@ static const struct pios_exti_cfg pios_exti_l3gd20_cfg __exti_config = {
 
 static const struct pios_l3gd20_cfg pios_l3gd20_cfg = {
 	.exti_cfg = &pios_exti_l3gd20_cfg,
-	.gyro_range = PIOS_L3GD20_SCALE_500_DEG,
+	.range = PIOS_L3GD20_SCALE_500_DEG,
 };
 #endif /* PIOS_INCLUDE_L3GD20 */
 
@@ -687,12 +687,13 @@ void PIOS_Board_Init(void) {
 			if (PIOS_SPI_Init(&pios_spi_gyro_id, &pios_spi_gyro_cfg)) {
 				PIOS_Assert(0);
 			}
-			PIOS_L3GD20_Attach(pios_spi_gyro_id);
-			PIOS_L3GD20_Init(&pios_l3gd20_cfg);
+			PIOS_L3GD20_Init(pios_spi_gyro_id, 0, &pios_l3gd20_cfg);
+			PIOS_Assert(PIOS_L3GD20_Test() == 0);
 #endif /* PIOS_INCLUDE_L3GD20 */
 
 #if defined(PIOS_INCLUDE_BMA180)
 			PIOS_BMA180_Init(pios_spi_flash_accel_id, 0, &pios_bma180_cfg);
+			PIOS_Assert(PIOS_BMA180_Test() == 0);
 #endif /* PIOS_INCLUDE_BMA180 */
 			break;
 		default:

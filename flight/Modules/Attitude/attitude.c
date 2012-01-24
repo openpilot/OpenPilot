@@ -381,17 +381,15 @@ static int32_t updateSensorsCC3D(AccelsData * accelsData, GyrosData * gyrosData)
 		// Unfortunately if the BMA180 ever misses getting read, then it will not
 		// trigger more interrupts.  In this case we must force a read to kickstart
 		// it.
-		struct pios_bma180_data data;
-		PIOS_BMA180_ReadAccels(&data);
+		PIOS_BMA180_ReadAccels(&accel);
 		lastSysTime = xTaskGetTickCount();
-
 		return -1;
 	}
 	while(accel_read_good == 0) {	
 		accel_samples++;
 		
-		accel_accum[0] += -accel.x;
-		accel_accum[1] += -accel.y;
+		accel_accum[0] += accel.x;
+		accel_accum[1] += accel.y;
 		accel_accum[2] += accel.z;
 		
 		accel_read_good = PIOS_BMA180_ReadFifo(&accel);
@@ -400,37 +398,40 @@ static int32_t updateSensorsCC3D(AccelsData * accelsData, GyrosData * gyrosData)
 #endif
 
 #if defined(PIOS_INCLUDE_L3GD20)
-//	int32_t gyro_read_good;
-//	gyro_samples = 0;
-//	bool gyro_error = false;
-//
-//	while((gyro_read_good = PIOS_L3GD20_ReadFifo(&gyro) != 0) && !gyro_error)
-//		gyro_error = ((xTaskGetTickCount() - lastSysTime) > 5) ? true : gyro_error;
-//	while(gyro_read_good == 0) {
-//		gyro_samples++;
-//		
-//		gyro_accum[0] += gyro.gyro_x;
-//		gyro_accum[1] += gyro.gyro_y;
-//		gyro_accum[2] += gyro.gyro_z;
-//		
-//		gyro_read_good = PIOS_L3GD20_ReadFifo(&gyro);
-//	}
-	if(PIOS_L3GD20_ReadGyros(&gyro) < 0)
+	int32_t gyro_read_good;
+	gyro_samples = 0;
+	bool gyro_error = false;
+
+	while((gyro_read_good = PIOS_L3GD20_ReadFifo(&gyro) != 0) && !gyro_error)
+		gyro_error = ((xTaskGetTickCount() - lastSysTime) > 5) ? true : gyro_error;
+	if (gyro_error) {
+		// Unfortunately if the L3GD20 ever misses getting read, then it will not
+		// trigger more interrupts.  In this case we must force a read to kickstart
+		// it.
+		PIOS_L3GD20_ReadGyros(&gyro);
+		lastSysTime = xTaskGetTickCount();
 		return -1;
-	gyro_accum[0] += gyro.gyro_x;
-	gyro_accum[1] += gyro.gyro_y;
-	gyro_accum[2] += gyro.gyro_z;
-	gyro_samples =1;
+	}
+
+	while(gyro_read_good == 0) {
+		gyro_samples++;
+		
+		gyro_accum[0] += gyro.gyro_x;
+		gyro_accum[1] += gyro.gyro_y;
+		gyro_accum[2] += gyro.gyro_z;
+		
+		gyro_read_good = PIOS_L3GD20_ReadFifo(&gyro);
+	}
 	gyro_scaling = PIOS_L3GD20_GetScale();
 #endif	
 
-	float accels[3] = {(float) accel_accum[1] / accel_samples, (float) accel_accum[0] / accel_samples, -(float) accel_accum[2] / accel_samples};
+	float accels[3] = {(float) -accel_accum[1] / accel_samples, (float) -accel_accum[0] / accel_samples, -(float) accel_accum[2] / accel_samples};
 	
 	accelsData->x = accels[0] * accel_scaling - accelbias[0];
 	accelsData->y = accels[1] * accel_scaling - accelbias[1];
 	accelsData->z = accels[2] * accel_scaling - accelbias[2];
 	
-	float gyros[3] = {(float) gyro_accum[1] / gyro_samples, (float) gyro_accum[0] / gyro_samples, -(float) gyro_accum[2] / gyro_samples};
+	float gyros[3] = {(float) gyro_accum[0] / gyro_samples, (float) -gyro_accum[1] / gyro_samples, -(float) gyro_accum[2] / gyro_samples};
 	
 	gyrosData->x = gyros[0] * gyro_scaling;
 	gyrosData->y = gyros[1] * gyro_scaling;

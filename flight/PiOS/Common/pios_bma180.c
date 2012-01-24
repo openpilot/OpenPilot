@@ -96,6 +96,7 @@ static int32_t PIOS_BMA180_Validate(struct bma180_dev * dev)
 		return -3;
 	return 0;
 }
+
 /**
  * @brief Initialize with good default settings
  * @returns 0 for success, -1 for failure

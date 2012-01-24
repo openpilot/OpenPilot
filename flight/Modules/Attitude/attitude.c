@@ -371,39 +371,31 @@ static int32_t updateSensorsCC3D(AccelsData * accelsData, GyrosData * gyrosData)
 	float accel_scaling = 1;
 
 #if defined(PIOS_INCLUDE_BMA180)
-//	accel_samples = 0;
-//	bool error = false;
-//	int32_t accel_read_good;
+	accel_samples = 0;
+	bool error = false;
+	int32_t accel_read_good;
 
-//
-//	while((accel_read_good = PIOS_BMA180_ReadFifo(&accel)) != 0 && !error)
-//		error = ((xTaskGetTickCount() - lastSysTime) > 5) ? true : error;
-//	if (error) {
-//		// Unfortunately if the BMA180 ever misses getting read, then it will not
-//		// trigger more interrupts.  In this case we must force a read to kickstarts
-//		// it.
-//		struct pios_bma180_data data;
-//		PIOS_BMA180_ReadAccels(&data);
-//		lastSysTime = xTaskGetTickCount();
-//
-//		return -1;
-//	}
-//	while(accel_read_good == 0) {	
-//		accel_samples++;
-//		
-//		accel_accum[0] += accel.x;
-//		accel_accum[1] += accel.y;
-//		accel_accum[2] += accel.z;
-//		
-//		accel_read_good = PIOS_BMA180_ReadFifo(&accel);
-//	}
-	if(PIOS_BMA180_Test() < 0)
+	while((accel_read_good = PIOS_BMA180_ReadFifo(&accel)) != 0 && !error)
+		error = ((xTaskGetTickCount() - lastSysTime) > 5) ? true : error;
+	if (error) {
+		// Unfortunately if the BMA180 ever misses getting read, then it will not
+		// trigger more interrupts.  In this case we must force a read to kickstart
+		// it.
+		struct pios_bma180_data data;
+		PIOS_BMA180_ReadAccels(&data);
+		lastSysTime = xTaskGetTickCount();
+
 		return -1;
-	PIOS_BMA180_ReadAccels(&accel);
-	accel_accum[0] += accel.x;
-	accel_accum[1] += accel.y;
-	accel_accum[2] += accel.z;
-	accel_samples = 1;
+	}
+	while(accel_read_good == 0) {	
+		accel_samples++;
+		
+		accel_accum[0] += -accel.x;
+		accel_accum[1] += -accel.y;
+		accel_accum[2] += accel.z;
+		
+		accel_read_good = PIOS_BMA180_ReadFifo(&accel);
+	}
 	accel_scaling = PIOS_BMA180_GetScale();
 #endif
 

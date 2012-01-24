@@ -1,9 +1,14 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup   PIOS_LED LED Functions
+ * @brief PIOS interface for LEDs
+ * @{
  *
- * @file       pios_board.c
+ * @file       pios_led_priv.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Defines board specific static initializers for hardware for the PipBee board.
+ * @brief      LED private definitions.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -23,32 +28,27 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Pull in the board-specific static HW definitions.
- * Including .c files is a bit ugly but this allows all of
- * the HW definitions to be const and static to limit their
- * scope.  
- *
- * NOTE: THIS IS THE ONLY PLACE THAT SHOULD EVER INCLUDE THIS FILE
- */
-#include "board_hw_defs.c"
+#ifndef PIOS_LED_PRIV_H
+#define PIOS_LED_PRIV_H
 
 #include <pios.h>
+#include <pios_stm32.h>
 
-void PIOS_Board_Init(void) {
-	/* Enable Prefetch Buffer */
-	FLASH_PrefetchBufferCmd(FLASH_PrefetchBuffer_Enable);
+struct pios_led {
+	struct stm32_gpio pin;
+	uint32_t remap;
+};
 
-	/* Flash 2 wait state */
-	FLASH_SetLatency(FLASH_Latency_2);
+struct pios_led_cfg {
+	const struct pios_led * leds;
+	uint8_t num_leds;
+};
 
-	/* Delay system */
-	PIOS_DELAY_Init();	
-	
-	/* Initialize the PiOS library */
-	PIOS_GPIO_Init();
+extern int32_t PIOS_LED_Init(const struct pios_led_cfg * cfg);
 
-#if defined(PIOS_INCLUDE_LED)
-	PIOS_LED_Init(&pios_led_cfg);
-#endif	/* PIOS_INCLUDE_LED */
+#endif /* PIOS_LED_PRIV_H */
 
-}
+/**
+  * @}
+  * @}
+  */

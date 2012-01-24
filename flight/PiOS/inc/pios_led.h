@@ -30,23 +30,9 @@
 #ifndef PIOS_LED_H
 #define PIOS_LED_H
 
-/* Type Definitions */
-#if (PIOS_LED_NUM == 1)
-typedef enum { LED1 = 0 } LedTypeDef;
-#elif (PIOS_LED_NUM == 2)
-typedef enum { LED1 = 0, LED2 = 1 } LedTypeDef;
-#elif (PIOS_LED_NUM == 3)
-typedef enum { LED1 = 0, LED2 = 1, LED3 = 2 } LedTypeDef;
-#elif (PIOS_LED_NUM == 4)
-typedef enum { LED1 = 0, LED2 = 1, LED3 = 2, LED4 = 3 } LedTypeDef;
-#else
-#error PIOS_LED_NUM not defined
-#endif
-
 /* Public Functions */
-extern void PIOS_LED_Init(void);
-extern void PIOS_LED_On(LedTypeDef LED);
-extern void PIOS_LED_Off(LedTypeDef LED);
-extern void PIOS_LED_Toggle(LedTypeDef LED);
+extern void PIOS_LED_On(uint32_t led_id);
+extern void PIOS_LED_Off(uint32_t led_id);
+extern void PIOS_LED_Toggle(uint32_t led_id);
 
 #endif /* PIOS_LED_H */

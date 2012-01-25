@@ -140,10 +140,9 @@ MODULE_INITCALL(StabilizationInitialize, StabilizationStart)
  */
 static void stabilizationTask(void* parameters)
 {
-	portTickType lastSysTime;
-	portTickType thisSysTime;
 	UAVObjEvent ev;
 
+	uint32_t timeval = PIOS_DELAY_GetRaw();
 
 	ActuatorDesiredData actuatorDesired;
 	StabilizationDesiredData stabDesired;
@@ -155,7 +154,6 @@ static void stabilizationTask(void* parameters)
 	SettingsUpdatedCb((UAVObjEvent *) NULL);
 
 	// Main task loop
-	lastSysTime = xTaskGetTickCount();
 	ZeroPids();
 	while(1) {
 		PIOS_WDG_UpdateFlag(PIOS_WDG_STABILIZATION);
@@ -167,11 +165,8 @@ static void stabilizationTask(void* parameters)
 			continue;
 		}
 
-		// Check how long since last update
-		thisSysTime = xTaskGetTickCount();
-		if(thisSysTime > lastSysTime) // reuse dt in case of wraparound
-			dT = (thisSysTime - lastSysTime) / portTICK_RATE_MS / 1000.0f;
-		lastSysTime = thisSysTime;
+		dT = PIOS_DELAY_DiffuS(timeval) * 1.0e-6f;
+		timeval = PIOS_DELAY_GetRaw();
 
 		FlightStatusGet(&flightStatus);
 		StabilizationDesiredGet(&stabDesired);

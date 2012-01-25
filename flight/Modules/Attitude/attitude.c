@@ -249,7 +249,6 @@ static void AttitudeTask(void *parameters)
 			// Only update attitude when sensor data is good
 			updateAttitude(&accels, &gyros);
 			AccelsSet(&accels);
-			GyrosSet(&gyros);
 			AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
 		}
 	}
@@ -377,7 +376,7 @@ static int32_t updateSensorsCC3D(AccelsData * accelsData, GyrosData * gyrosData)
 	struct pios_l3gd20_data gyro;
 	gyro_scaling = PIOS_L3GD20_GetScale();
 
-	if(xQueueReceive(gyro_queue, (void *) &gyro, 3) == errQUEUE_EMPTY) {
+	if(xQueueReceive(gyro_queue, (void *) &gyro, 2) == errQUEUE_EMPTY) {
 		// Unfortunately if the L3GD20 ever misses getting read, then it will not
 		// trigger more interrupts.  In this case we must force a read to kickstart
 		// it.
@@ -396,7 +395,7 @@ static int32_t updateSensorsCC3D(AccelsData * accelsData, GyrosData * gyrosData)
 	gyros_accum[1] = gyrosData->y;
 	gyros_accum[2] = gyrosData->z;
 	
-	if(xQueueReceive(gyro_queue, (void * const) &gyro, 3) == errQUEUE_EMPTY) {
+	if(xQueueReceive(gyro_queue, (void * const) &gyro, 2) == errQUEUE_EMPTY) {
 		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
 		return -1;
 	}
@@ -410,7 +409,7 @@ static int32_t updateSensorsCC3D(AccelsData * accelsData, GyrosData * gyrosData)
 	gyros_accum[1] += gyrosData->y;
 	gyros_accum[2] += gyrosData->z;
 
-	if(xQueueReceive(gyro_queue, (void * const) &gyro, 3) == errQUEUE_EMPTY) {
+	if(xQueueReceive(gyro_queue, (void * const) &gyro, 2) == errQUEUE_EMPTY) {
 		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
 		return -1;
 	}
@@ -419,6 +418,7 @@ static int32_t updateSensorsCC3D(AccelsData * accelsData, GyrosData * gyrosData)
 	gyrosData->y = -gyro.gyro_y * gyro_scaling;
 	gyrosData->z = -gyro.gyro_z * gyro_scaling;
 	gyrosData->temperature = 0;
+	GyrosSet(gyrosData);
 
 	gyros_accum[0] += gyrosData->x;
 	gyros_accum[1] += gyrosData->y;

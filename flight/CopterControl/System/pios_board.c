@@ -147,6 +147,13 @@ static const struct pios_l3gd20_cfg pios_l3gd20_cfg = {
 };
 #endif /* PIOS_INCLUDE_L3GD20 */
 
+struct flashfs_cfg flashfs_w25x_cfg = {
+	.table_magic = 0x85FB3C35,
+	.obj_magic = 0x3015AE71,
+	.obj_table_start = 0x00000010,
+	.obj_table_end = 0x00001000,
+	.sector_size = 0x00001000,
+};
 
 #include <pios_board_info.h>
 /**
@@ -196,7 +203,7 @@ void PIOS_Board_Init(void) {
 #endif
 	PIOS_Flash_W25X_Init(pios_spi_flash_accel_id, 1);	
 
-	PIOS_FLASHFS_Init();
+	PIOS_FLASHFS_Init(&flashfs_w25x_cfg);
 
 	/* Initialize UAVObject libraries */
 	EventDispatcherInitialize();

@@ -56,20 +56,22 @@ struct fileHeader {
 } __attribute__((packed));
 
 
-#define OBJECT_TABLE_MAGIC 0x85FB3C35
-#define OBJ_MAGIC          0x3015AE71
-#define OBJECT_TABLE_START 0x00000010
-#define OBJECT_TABLE_END   0x00001000
-#define SECTOR_SIZE        0x00001000
+#define OBJECT_TABLE_MAGIC cfg->table_magic
+#define OBJ_MAGIC          cfg->obj_magic
+#define OBJECT_TABLE_START cfg->obj_table_start
+#define OBJECT_TABLE_END   cfg->obj_table_end
+#define SECTOR_SIZE        cfg->sector_size
 #define MAX_BADMAGIC       1000
 
+static const struct flashfs_cfg * cfg;
 /**
  * @brief Initialize the flash object setting FS
  * @return 0 if success, -1 if failure
  */
-int32_t PIOS_FLASHFS_Init()
+int32_t PIOS_FLASHFS_Init(const struct flashfs_cfg * new_cfg)
 {
-
+	cfg = new_cfg;
+	
 	// Check for valid object table or create one
 	uint32_t object_table_magic;
 	uint32_t magic_fail_count = 0;

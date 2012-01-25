@@ -126,7 +126,6 @@
 		65904E56146128A500FD9482 /* pios_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_config.h; sourceTree = "<group>"; };
 		65904E58146128A500FD9482 /* pios_board.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_board.c; sourceTree = "<group>"; };
 		65904E59146128A500FD9482 /* revolution.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = revolution.c; sourceTree = "<group>"; };
-		65904E5B146128A500FD9482 /* test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test.c; sourceTree = "<group>"; };
 		65904E5C146128A500FD9482 /* UAVObjects.inc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.pascal; path = UAVObjects.inc; sourceTree = "<group>"; };
 		65904E5F14613B6100FD9482 /* pios_i2c_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_i2c_config.h; sourceTree = "<group>"; };
 		65904E6014613B6100FD9482 /* pios_usart_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_usart_config.h; sourceTree = "<group>"; };
@@ -3876,7 +3875,6 @@
 			children = (
 				65904E4B146128A500FD9482 /* Makefile */,
 				65904E4C146128A500FD9482 /* System */,
-				65904E5B146128A500FD9482 /* test.c */,
 				65904E5C146128A500FD9482 /* UAVObjects.inc */,
 			);
 			name = Revolution;

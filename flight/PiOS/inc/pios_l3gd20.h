@@ -64,6 +64,7 @@
 
 /* Ctrl1 flags */
 #define PIOS_L3GD20_CTRL1_FASTEST        0xF0
+#define PIOS_L3GD20_CTRL1_380HZ_100HZ    0xB0
 #define PIOS_L3GD20_CTRL1_PD             0x08
 #define PIOS_L3GD20_CTRL1_ZEN            0x04
 #define PIOS_L3GD20_CTRL1_YEN            0x02

@@ -118,20 +118,7 @@ int32_t PIOS_L3GD20_Init(uint32_t spi_id, uint32_t slave_num, const struct pios_
 	dev->cfg = cfg;
 
 	/* Configure the MPU6050 Sensor */
-	PIOS_SPI_SetClockSpeed(dev->spi_id, SPI_BaudRatePrescaler_256);
 	PIOS_L3GD20_Config(cfg);
-
-	/* This should either use a real speed (constant across boards) or pull from */
-	/* the default configuration */
-	const struct pios_board_info * bdinfo = &pios_board_info_blob;
-	switch(bdinfo->board_type) {
-		case 0x04: /* CopterControl */
-			PIOS_SPI_SetClockSpeed(dev->spi_id, SPI_BaudRatePrescaler_8);
-			break;
-		default:
-			PIOS_SPI_SetClockSpeed(dev->spi_id, SPI_BaudRatePrescaler_16);		
-			break;
-	}
 
 	/* Set up EXTI */
 	PIOS_EXTI_Init(cfg->exti_cfg);

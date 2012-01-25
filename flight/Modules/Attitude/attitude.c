@@ -371,6 +371,7 @@ static int32_t updateSensorsCC3D(AccelsData * accelsData, GyrosData * gyrosData)
 	float accel_scaling = 1;
 
 #if defined(PIOS_INCLUDE_BMA180)
+	struct pios_bma180_data accel;
 	accel_samples = 0;
 	bool error = false;
 	int32_t accel_read_good;
@@ -398,6 +399,7 @@ static int32_t updateSensorsCC3D(AccelsData * accelsData, GyrosData * gyrosData)
 #endif
 
 #if defined(PIOS_INCLUDE_L3GD20)
+	struct pios_l3gd20_data gyro;
 	int32_t gyro_read_good;
 	gyro_samples = 0;
 	bool gyro_error = false;

@@ -82,6 +82,7 @@
 		6543A04714CF1823004EEC4C /* board_hw_defs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = board_hw_defs.c; sourceTree = "<group>"; };
 		6543A04914CF1823004EEC4C /* board_hw_defs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = board_hw_defs.c; sourceTree = "<group>"; };
 		6543A04B14CF1823004EEC4C /* board_hw_defs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = board_hw_defs.c; sourceTree = "<group>"; };
+		6543A04C14CF717E004EEC4C /* pios_usb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_usb.c; sourceTree = "<group>"; };
 		6549E0D21279B3C800C5476F /* fifo_buffer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fifo_buffer.c; sourceTree = "<group>"; };
 		6549E0D31279B3CF00C5476F /* fifo_buffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fifo_buffer.h; sourceTree = "<group>"; };
 		655268BC121FBD2900410C6E /* ahrscalibration.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ahrscalibration.xml; sourceTree = "<group>"; };
@@ -8580,6 +8581,7 @@
 				65E8F0E911EFF25C00BBF654 /* pios_sys.c */,
 				65643CB91413456D00A32F59 /* pios_tim.c */,
 				65E8F0EA11EFF25C00BBF654 /* pios_usart.c */,
+				6543A04C14CF717E004EEC4C /* pios_usb.c */,
 				65E8F0ED11EFF25C00BBF654 /* pios_usb_hid.c */,
 				651CF9E6120B5D8300EEFD70 /* pios_usb_hid_istr.c */,
 				651CF9E8120B5D8300EEFD70 /* pios_usb_hid_pwr.c */,

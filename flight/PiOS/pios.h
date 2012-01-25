@@ -140,7 +140,7 @@
 #endif
 
 #if defined(PIOS_INCLUDE_FLASH)
-#include <pios_flash_w25x.h>
+#include <pios_flash_jedec.h>
 #include <pios_flashfs_objlist.h>
 #endif
 

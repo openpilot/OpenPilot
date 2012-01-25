@@ -78,7 +78,7 @@ int32_t PIOS_FLASHFS_Init(const struct flashfs_cfg * new_cfg)
 	bool magic_good = false;
 
 	while(!magic_good) {
-		if (PIOS_Flash_W25X_ReadData(0, (uint8_t *)&object_table_magic, sizeof(object_table_magic)) != 0)
+		if (PIOS_Flash_Jedec_ReadData(0, (uint8_t *)&object_table_magic, sizeof(object_table_magic)) != 0)
 			return -1;
 		if(object_table_magic != OBJECT_TABLE_MAGIC) {
 			if(magic_fail_count++ > MAX_BADMAGIC) {
@@ -106,7 +106,7 @@ int32_t PIOS_FLASHFS_Init(const struct flashfs_cfg * new_cfg)
 	// Loop through header area while objects detect to count how many saved
 	while(addr < OBJECT_TABLE_END) {
 		// Read the instance data
-		if (PIOS_Flash_W25X_ReadData(addr, (uint8_t *)&header, sizeof(header)) != 0)
+		if (PIOS_Flash_Jedec_ReadData(addr, (uint8_t *)&header, sizeof(header)) != 0)
 			return -1;
 
 		// Counting number of valid headers
@@ -126,7 +126,7 @@ int32_t PIOS_FLASHFS_Init(const struct flashfs_cfg * new_cfg)
  */
 int32_t PIOS_FLASHFS_Format() 
 {
-	if(PIOS_Flash_W25X_EraseChip() != 0)
+	if(PIOS_Flash_Jedec_EraseChip() != 0)
 		return -1;
 	if(PIOS_FLASHFS_ClearObjectTableHeader() != 0)
 		return -1;
@@ -139,11 +139,11 @@ int32_t PIOS_FLASHFS_Format()
  */
 static int32_t PIOS_FLASHFS_ClearObjectTableHeader()
 {
-	if(PIOS_Flash_W25X_EraseSector(0) != 0)
+	if(PIOS_Flash_Jedec_EraseSector(0) != 0)
 		return -1;
 
 	uint32_t object_table_magic = OBJECT_TABLE_MAGIC;
-	if (PIOS_Flash_W25X_WriteData(0, (uint8_t *)&object_table_magic, sizeof(object_table_magic)) != 0)
+	if (PIOS_Flash_Jedec_WriteData(0, (uint8_t *)&object_table_magic, sizeof(object_table_magic)) != 0)
 		return -1;
 
 	return 0;
@@ -163,7 +163,7 @@ static int32_t PIOS_FLASHFS_GetObjAddress(uint32_t objId, uint16_t instId)
 	// Loop through header area while objects detect to count how many saved
 	while(addr < OBJECT_TABLE_END) {
 		// Read the instance data
-		if (PIOS_Flash_W25X_ReadData(addr, (uint8_t *) &header, sizeof(header)) != 0)
+		if (PIOS_Flash_Jedec_ReadData(addr, (uint8_t *) &header, sizeof(header)) != 0)
 			return -1;
 		if(header.objMagic != OBJ_MAGIC)
 			break; // stop searching once hit first non-object header
@@ -207,7 +207,7 @@ int32_t PIOS_FLASHFS_GetNewAddress(uint32_t objId, uint16_t instId)
 	if((addr + sizeof(header)) > OBJECT_TABLE_END)
 		return -2;
 
-	if(PIOS_Flash_W25X_WriteData(addr, (uint8_t *) &header, sizeof(header)) != 0)
+	if(PIOS_Flash_Jedec_WriteData(addr, (uint8_t *) &header, sizeof(header)) != 0)
 		return -3;
 
 	// This numObejcts value must stay consistent or there will be a break in the table
@@ -246,26 +246,26 @@ int32_t PIOS_FLASHFS_ObjSave(UAVObjHandle obj, uint16_t instId, uint8_t * data)
 		.size = UAVObjGetNumBytes(obj)
 	};
 
-	if(PIOS_Flash_W25X_EraseSector(addr) != 0)
+	if(PIOS_Flash_Jedec_EraseSector(addr) != 0)
 		return -2;
 
 	// Save header
 	// This information IS redundant with the object table id.  Oh well.  Better safe than sorry.
-	if(PIOS_Flash_W25X_WriteData(addr, (uint8_t *) &header, sizeof(header)) != 0)
+	if(PIOS_Flash_Jedec_WriteData(addr, (uint8_t *) &header, sizeof(header)) != 0)
 		return -3;
 
 	// Update CRC
 	crc = PIOS_CRC_updateCRC(0, (uint8_t *) &header, sizeof(header));
 
 	// Save data
-	if(PIOS_Flash_W25X_WriteData(addr + sizeof(header), data, UAVObjGetNumBytes(obj)) != 0)
+	if(PIOS_Flash_Jedec_WriteData(addr + sizeof(header), data, UAVObjGetNumBytes(obj)) != 0)
 		return -4;
 
 	// Update CRC
 	crc = PIOS_CRC_updateCRC(crc, (uint8_t *) data, UAVObjGetNumBytes(obj));
 
 	// Save CRC (written so will work when CRC changes to uint16)
-	if(PIOS_Flash_W25X_WriteData(addr + sizeof(header) + UAVObjGetNumBytes(obj), (uint8_t *) &crc, sizeof(crc)) != 0)
+	if(PIOS_Flash_Jedec_WriteData(addr + sizeof(header) + UAVObjGetNumBytes(obj), (uint8_t *) &crc, sizeof(crc)) != 0)
 		return -4;
 
 	return 0;
@@ -304,7 +304,7 @@ int32_t PIOS_FLASHFS_ObjLoad(UAVObjHandle obj, uint16_t instId, uint8_t * data)
 
 	// Load header
 	// This information IS redundant with the object table id.  Oh well.  Better safe than sorry.
-	if(PIOS_Flash_W25X_ReadData(addr, (uint8_t *) &header, sizeof(header)) != 0)
+	if(PIOS_Flash_Jedec_ReadData(addr, (uint8_t *) &header, sizeof(header)) != 0)
 		return -2;
 
 	// Update CRC
@@ -316,20 +316,20 @@ int32_t PIOS_FLASHFS_ObjLoad(UAVObjHandle obj, uint16_t instId, uint8_t * data)
 	// To avoid having to allocate the RAM for a copy of the object, we read by chunks
 	// and compute the CRC
 	for(uint32_t i = 0; i < objSize; i += crc_read_step) {
-		PIOS_Flash_W25X_ReadData(addr + sizeof(header) + i, crc_read_buffer, crc_read_step);
+		PIOS_Flash_Jedec_ReadData(addr + sizeof(header) + i, crc_read_buffer, crc_read_step);
 		uint8_t valid_bytes = ((i + crc_read_step) >= objSize) ? objSize - i : crc_read_step;
 		crc = PIOS_CRC_updateCRC(crc, crc_read_buffer, valid_bytes);
 	}
 
 	// Read CRC (written so will work when CRC changes to uint16)
-	if(PIOS_Flash_W25X_ReadData(addr + sizeof(header) + objSize, (uint8_t *) &crcFlash, sizeof(crcFlash)) != 0)
+	if(PIOS_Flash_Jedec_ReadData(addr + sizeof(header) + objSize, (uint8_t *) &crcFlash, sizeof(crcFlash)) != 0)
 		return -5;
 
 	if(crc != crcFlash)
 		return -6;
 
 	// Read the instance data
-	if (PIOS_Flash_W25X_ReadData(addr + sizeof(header), data, objSize) != 0)
+	if (PIOS_Flash_Jedec_ReadData(addr + sizeof(header), data, objSize) != 0)
 		return -4;
 
 	return 0;
@@ -356,7 +356,7 @@ int32_t PIOS_FLASHFS_ObjDelete(UAVObjHandle obj, uint16_t instId)
 	if(addr < 0)
 		return -1;
 
-	if(PIOS_Flash_W25X_EraseSector(addr) != 0)
+	if(PIOS_Flash_Jedec_EraseSector(addr) != 0)
 		return -2;
 
 	return 0;

@@ -224,7 +224,7 @@ SRC += $(PIOSCOMMON)/pios_usb_desc_hid_only.c
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_crc.c
 SRC += $(PIOSCOMMON)/pios_flashfs_objlist.c
-SRC += $(PIOSCOMMON)/pios_flash_w25x.c
+SRC += $(PIOSCOMMON)/pios_flash_jedec.c
 SRC += $(PIOSCOMMON)/pios_adxl345.c
 SRC += $(PIOSCOMMON)/pios_l3gd20.c
 SRC += $(PIOSCOMMON)/pios_bma180.c

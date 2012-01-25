@@ -147,12 +147,17 @@ static const struct pios_l3gd20_cfg pios_l3gd20_cfg = {
 };
 #endif /* PIOS_INCLUDE_L3GD20 */
 
-struct flashfs_cfg flashfs_w25x_cfg = {
+static const struct flashfs_cfg flashfs_w25x_cfg = {
 	.table_magic = 0x85FB3C35,
 	.obj_magic = 0x3015AE71,
 	.obj_table_start = 0x00000010,
 	.obj_table_end = 0x00001000,
 	.sector_size = 0x00001000,
+};
+
+static const struct pios_flash_jedec_cfg flash_w25x_cfg = {
+	.sector_erase = 0x20,
+	.chip_erase = 0x60
 };
 
 #include <pios_board_info.h>
@@ -201,7 +206,7 @@ void PIOS_Board_Init(void) {
 	}
 
 #endif
-	PIOS_Flash_W25X_Init(pios_spi_flash_accel_id, 1);	
+	PIOS_Flash_Jedec_Init(pios_spi_flash_accel_id, 1, &flash_w25x_cfg);	
 
 	PIOS_FLASHFS_Init(&flashfs_w25x_cfg);
 

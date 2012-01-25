@@ -28,77 +28,74 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "pios.h"
-#include "pios_flash_w25x.h"
-#include "pios_adxl345.h"
 
-#define W25X_WRITE_ENABLE           0x06
-#define W25X_WRITE_DISABLE          0x04
-#define W25X_READ_STATUS            0x05
-#define W25X_WRITE_STATUS           0x01
-#define W25X_READ_DATA              0x03
-#define W25X_FAST_READ              0x0b
-#define W25X_DEVICE_ID              0x90
-#define W25X_SECTOR_ERASE           0x20
-#define W25X_PAGE_WRITE             0x02
-#define W25X_CHIP_ERASE             0x60
+#define JEDEC_WRITE_ENABLE           0x06
+#define JEDEC_WRITE_DISABLE          0x04
+#define JEDEC_READ_STATUS            0x05
+#define JEDEC_WRITE_STATUS           0x01
+#define JEDEC_READ_DATA              0x03
+#define JEDEC_FAST_READ              0x0b
+#define JEDEC_DEVICE_ID              0x90
+#define JEDEC_PAGE_WRITE             0x02
 
-#define W25X_STATUS_BUSY            0x01
-#define W25X_STATUS_WRITEPROTECT    0x02
-#define W25X_STATUS_BP0             0x04
-#define W25X_STATUS_BP1             0x08
-#define W25X_STATUS_BP2             0x10
-#define W25X_STATUS_TP              0x20
-#define W25X_STATUS_SEC             0x40
-#define W25X_STATUS_SRP0            0x80
+#define JEDEC_STATUS_BUSY            0x01
+#define JEDEC_STATUS_WRITEPROTECT    0x02
+#define JEDEC_STATUS_BP0             0x04
+#define JEDEC_STATUS_BP1             0x08
+#define JEDEC_STATUS_BP2             0x10
+#define JEDEC_STATUS_TP              0x20
+#define JEDEC_STATUS_SEC             0x40
+#define JEDEC_STATUS_SRP0            0x80
 
 static uint8_t device_type;
 
-enum pios_w25x_dev_magic {
-	PIOS_W25X_DEV_MAGIC = 0xcb55aa55,
+enum pios_jedec_dev_magic {
+	PIOS_JEDEC_DEV_MAGIC = 0xcb55aa55,
 };
 
 //! Device handle structure
-struct w25x_flash_dev {
+struct jedec_flash_dev {
 	uint32_t spi_id;
 	uint32_t slave_num;
 	bool claimed;
-	enum pios_w25x_dev_magic magic;
+	const struct pios_flash_jedec_cfg * cfg;
+	enum pios_jedec_dev_magic magic;
 };
 
 //! Global structure for this flash device
-struct w25x_flash_dev * flash_dev;
+struct jedec_flash_dev * flash_dev;
 
 //! Private functions
-static int32_t PIOS_Flash_W25X_Validate(struct w25x_flash_dev * dev);
-static struct w25x_flash_dev * PIOS_Flash_W25X_alloc(void);
-static int32_t PIOS_Flash_W25X_ClaimBus();
-static int32_t PIOS_Flash_W25X_ReleaseBus();
-static int32_t PIOS_Flash_W25X_WriteEnable();
-static int32_t PIOS_Flash_W25X_Busy() ;
+static int32_t PIOS_Flash_Jedec_Validate(struct jedec_flash_dev * dev);
+static struct jedec_flash_dev * PIOS_Flash_Jedec_alloc(void);
+static int32_t PIOS_Flash_Jedec_ClaimBus();
+static int32_t PIOS_Flash_Jedec_ReleaseBus();
+static int32_t PIOS_Flash_Jedec_WriteEnable();
+static int32_t PIOS_Flash_Jedec_Busy() ;
 
 
 /**
  * @brief Allocate a new device
  */
-static struct w25x_flash_dev * PIOS_Flash_W25X_alloc(void)
+static struct jedec_flash_dev * PIOS_Flash_Jedec_alloc(void)
 {
-	struct w25x_flash_dev * w25x_dev;
+	struct jedec_flash_dev * jedec_dev;
 	
-	w25x_dev = (struct w25x_flash_dev *)pvPortMalloc(sizeof(*w25x_dev));
-	if (!w25x_dev) return (NULL);
+	jedec_dev = (struct jedec_flash_dev *)pvPortMalloc(sizeof(*jedec_dev));
+	if (!jedec_dev) return (NULL);
 	
-	w25x_dev->claimed = false;
-	w25x_dev->magic = PIOS_W25X_DEV_MAGIC;
-	return(w25x_dev);
+	jedec_dev->claimed = false;
+	jedec_dev->magic = PIOS_JEDEC_DEV_MAGIC;
+	return(jedec_dev);
 }
 
 /**
  * @brief Validate the handle to the spi device
  */
-static int32_t PIOS_Flash_W25X_Validate(struct w25x_flash_dev * dev) {
+static int32_t PIOS_Flash_Jedec_Validate(struct jedec_flash_dev * dev) {
 	if (dev == NULL) 
 		return -1;
-	if (dev->magic != PIOS_W25X_DEV_MAGIC)
+	if (dev->magic != PIOS_JEDEC_DEV_MAGIC)
 		return -2;
 	if (dev->spi_id == 0)
 		return -3;
@@ -109,9 +106,9 @@ static int32_t PIOS_Flash_W25X_Validate(struct w25x_flash_dev * dev) {
  * @brief Claim the SPI bus for flash use and assert CS pin
  * @return 0 for sucess, -1 for failure to get semaphore
  */
-static int32_t PIOS_Flash_W25X_ClaimBus()
+static int32_t PIOS_Flash_Jedec_ClaimBus()
 {
-	if(PIOS_Flash_W25X_Validate(flash_dev) != 0)
+	if(PIOS_Flash_Jedec_Validate(flash_dev) != 0)
 		return -1;
 
 	if(PIOS_SPI_ClaimBus(flash_dev->spi_id) < 0)
@@ -126,9 +123,9 @@ static int32_t PIOS_Flash_W25X_ClaimBus()
 /**
  * @brief Release the SPI bus sempahore and ensure flash chip not using bus
  */
-static int32_t PIOS_Flash_W25X_ReleaseBus()
+static int32_t PIOS_Flash_Jedec_ReleaseBus()
 {
-	if(PIOS_Flash_W25X_Validate(flash_dev) != 0)
+	if(PIOS_Flash_Jedec_Validate(flash_dev) != 0)
 		return -1;
 	PIOS_SPI_RC_PinSet(flash_dev->spi_id, flash_dev->slave_num, 1);
 	PIOS_SPI_ReleaseBus(flash_dev->spi_id);
@@ -140,44 +137,48 @@ static int32_t PIOS_Flash_W25X_ReleaseBus()
  * @brief Returns if the flash chip is busy
  * @returns -1 for failure, 0 for not busy, 1 for busy
  */
-static int32_t PIOS_Flash_W25X_Busy()
+static int32_t PIOS_Flash_Jedec_Busy()
 {
-	int32_t status = PIOS_Flash_W25X_ReadStatus();
+	int32_t status = PIOS_Flash_Jedec_ReadStatus();
 	if (status < 0)
 		return -1;
-	return status & W25X_STATUS_BUSY;
+	return status & JEDEC_STATUS_BUSY;
 }
 
 /**
  * @brief Execute the write enable instruction and returns the status
  * @returns 0 if successful, -1 if unable to claim bus
  */
-static int32_t PIOS_Flash_W25X_WriteEnable()
+static int32_t PIOS_Flash_Jedec_WriteEnable()
 {
-	if(PIOS_Flash_W25X_Validate(flash_dev) != 0)
+	if(PIOS_Flash_Jedec_Validate(flash_dev) != 0)
 		return -1;
 
-	uint8_t out[] = {W25X_WRITE_ENABLE};
-	if(PIOS_Flash_W25X_ClaimBus() != 0)
+	uint8_t out[] = {JEDEC_WRITE_ENABLE};
+	if(PIOS_Flash_Jedec_ClaimBus() != 0)
 		return -1;
 	PIOS_SPI_TransferBlock(flash_dev->spi_id,out,NULL,sizeof(out),NULL);
-	PIOS_Flash_W25X_ReleaseBus();
+	PIOS_Flash_Jedec_ReleaseBus();
 	return 0;
 }
 
 /**
  * @brief Initialize the flash device and enable write access
  */
-int32_t PIOS_Flash_W25X_Init(uint32_t spi_id, uint32_t slave_num)
+int32_t PIOS_Flash_Jedec_Init(uint32_t spi_id, uint32_t slave_num, const struct pios_flash_jedec_cfg * cfg)
 {
-	flash_dev = PIOS_Flash_W25X_alloc();
+	flash_dev = PIOS_Flash_Jedec_alloc();
 	if(flash_dev == NULL)
 		return -1;
-	
+
 	flash_dev->spi_id = spi_id;
 	flash_dev->slave_num = slave_num;
+	flash_dev->cfg = cfg;
 
-	device_type = PIOS_Flash_W25X_ReadID();
+	device_type = PIOS_Flash_Jedec_ReadID();
+	if(device_type == 0)
+		return -1;
+
 	return 0;
 }
 
@@ -185,43 +186,43 @@ int32_t PIOS_Flash_W25X_Init(uint32_t spi_id, uint32_t slave_num)
 /**
  * @brief Read the status register from flash chip and return it
  */
-int32_t PIOS_Flash_W25X_ReadStatus()
+int32_t PIOS_Flash_Jedec_ReadStatus()
 {
-	if(PIOS_Flash_W25X_Validate(flash_dev) != 0)
+	if(PIOS_Flash_Jedec_Validate(flash_dev) != 0)
 		return -1;
 
-	uint8_t out[2] = {W25X_READ_STATUS, 0};
+	uint8_t out[2] = {JEDEC_WRITE_STATUS, 0};
 	uint8_t in[2] = {0,0};
-	if(PIOS_Flash_W25X_ClaimBus() < 0)
+	if(PIOS_Flash_Jedec_ClaimBus() < 0)
 		return -1;
 		
 	if(PIOS_SPI_TransferBlock(flash_dev->spi_id,out,in,sizeof(out),NULL) < 0) {
-		PIOS_Flash_W25X_ReleaseBus();
+		PIOS_Flash_Jedec_ReleaseBus();
 		return -2;
 	}
 	
-	PIOS_Flash_W25X_ReleaseBus();
+	PIOS_Flash_Jedec_ReleaseBus();
 	return in[1];
 }
 
 /**
  * @brief Read the status register from flash chip and return it
  */
-int32_t PIOS_Flash_W25X_ReadID()
+int32_t PIOS_Flash_Jedec_ReadID()
 {
-	if(PIOS_Flash_W25X_Validate(flash_dev) != 0)
+	if(PIOS_Flash_Jedec_Validate(flash_dev) != 0)
 		return -1;
 
-	uint8_t out[] = {W25X_DEVICE_ID, 0, 0, 0, 0, 0};
+	uint8_t out[] = {JEDEC_DEVICE_ID, 0, 0, 0, 0, 0};
 	uint8_t in[6];
-	if (PIOS_Flash_W25X_ClaimBus() < 0) 
+	if (PIOS_Flash_Jedec_ClaimBus() < 0) 
 		return -1;
 	
 	if(PIOS_SPI_TransferBlock(flash_dev->spi_id,out,in,sizeof(out),NULL) < 0) {
-		PIOS_Flash_W25X_ReleaseBus();
+		PIOS_Flash_Jedec_ReleaseBus();
 		return -2;
 	}
-	PIOS_Flash_W25X_ReleaseBus();
+	PIOS_Flash_Jedec_ReleaseBus();
 	return in[5];
 }
 
@@ -232,29 +233,29 @@ int32_t PIOS_Flash_W25X_ReadID()
  * @retval -1 if unable to claim bus
  * @retval
  */
-int32_t PIOS_Flash_W25X_EraseSector(uint32_t addr)
+int32_t PIOS_Flash_Jedec_EraseSector(uint32_t addr)
 {
-	if(PIOS_Flash_W25X_Validate(flash_dev) != 0)
+	if(PIOS_Flash_Jedec_Validate(flash_dev) != 0)
 		return -1;
 
 	uint8_t ret;
-	uint8_t out[] = {W25X_SECTOR_ERASE, (addr >> 16) & 0xff, (addr >> 8) & 0xff , addr & 0xff};
+	uint8_t out[] = {flash_dev->cfg->sector_erase, (addr >> 16) & 0xff, (addr >> 8) & 0xff , addr & 0xff};
 
-	if((ret = PIOS_Flash_W25X_WriteEnable()) != 0)
+	if((ret = PIOS_Flash_Jedec_WriteEnable()) != 0)
 		return ret;
 
-	if(PIOS_Flash_W25X_ClaimBus() != 0)
+	if(PIOS_Flash_Jedec_ClaimBus() != 0)
 		return -1;
 	
 	if(PIOS_SPI_TransferBlock(flash_dev->spi_id,out,NULL,sizeof(out),NULL) < 0) {
-		PIOS_Flash_W25X_ReleaseBus();
+		PIOS_Flash_Jedec_ReleaseBus();
 		return -2;
 	}
 	
-	PIOS_Flash_W25X_ReleaseBus();
+	PIOS_Flash_Jedec_ReleaseBus();
 
 	// Keep polling when bus is busy too
-	while(PIOS_Flash_W25X_Busy() != 0);
+	while(PIOS_Flash_Jedec_Busy() != 0);
 
 	return 0;
 }
@@ -263,29 +264,29 @@ int32_t PIOS_Flash_W25X_EraseSector(uint32_t addr)
  * @brief Execute the whole chip
  * @returns 0 if successful, -1 if unable to claim bus
  */
-int32_t PIOS_Flash_W25X_EraseChip()
+int32_t PIOS_Flash_Jedec_EraseChip()
 {
-	if(PIOS_Flash_W25X_Validate(flash_dev) != 0)
+	if(PIOS_Flash_Jedec_Validate(flash_dev) != 0)
 		return -1;
 
 	uint8_t ret;
-	uint8_t out[] = {W25X_CHIP_ERASE};
+	uint8_t out[] = {flash_dev->cfg->chip_erase};
 
-	if((ret = PIOS_Flash_W25X_WriteEnable()) != 0)
+	if((ret = PIOS_Flash_Jedec_WriteEnable()) != 0)
 		return ret;
 
-	if(PIOS_Flash_W25X_ClaimBus() != 0)
+	if(PIOS_Flash_Jedec_ClaimBus() != 0)
 		return -1;
 	
 	if(PIOS_SPI_TransferBlock(flash_dev->spi_id,out,NULL,sizeof(out),NULL) < 0) {
-		PIOS_Flash_W25X_ReleaseBus();
+		PIOS_Flash_Jedec_ReleaseBus();
 		return -2;
 	}
 	
-	PIOS_Flash_W25X_ReleaseBus();
+	PIOS_Flash_Jedec_ReleaseBus();
 
 	// Keep polling when bus is busy too
-	while(PIOS_Flash_W25X_Busy() != 0);
+	while(PIOS_Flash_Jedec_Busy() != 0);
 
 	return 0;
 }
@@ -301,13 +302,13 @@ int32_t PIOS_Flash_W25X_EraseChip()
  * @retval -2 Size exceeds 256 bytes
  * @retval -3 Length to write would wrap around page boundary
  */
-int32_t PIOS_Flash_W25X_WriteData(uint32_t addr, uint8_t * data, uint16_t len)
+int32_t PIOS_Flash_Jedec_WriteData(uint32_t addr, uint8_t * data, uint16_t len)
 {
-	if(PIOS_Flash_W25X_Validate(flash_dev) != 0)
+	if(PIOS_Flash_Jedec_Validate(flash_dev) != 0)
 		return -1;
 
 	uint8_t ret;
-	uint8_t out[4] = {W25X_PAGE_WRITE, (addr >> 16) & 0xff, (addr >> 8) & 0xff , addr & 0xff};
+	uint8_t out[4] = {JEDEC_PAGE_WRITE, (addr >> 16) & 0xff, (addr >> 8) & 0xff , addr & 0xff};
 
 	/* Can only write one page at a time */
 	if(len > 0x100)
@@ -317,28 +318,28 @@ int32_t PIOS_Flash_W25X_WriteData(uint32_t addr, uint8_t * data, uint16_t len)
 	if(((addr & 0xff) + len) > 0x100)
 		return -3;
 
-	if((ret = PIOS_Flash_W25X_WriteEnable()) != 0)
+	if((ret = PIOS_Flash_Jedec_WriteEnable()) != 0)
 		return ret;
 
 	/* Execute write page command and clock in address.  Keep CS asserted */
-	if(PIOS_Flash_W25X_ClaimBus() != 0)
+	if(PIOS_Flash_Jedec_ClaimBus() != 0)
 		return -1;
 	
 	if(PIOS_SPI_TransferBlock(flash_dev->spi_id,out,NULL,sizeof(out),NULL) < 0) {
-		PIOS_Flash_W25X_ReleaseBus();
+		PIOS_Flash_Jedec_ReleaseBus();
 		return -1;
 	}
 
 	/* Clock out data to flash */
 	if(PIOS_SPI_TransferBlock(flash_dev->spi_id,data,NULL,len,NULL) < 0) {
-		PIOS_Flash_W25X_ReleaseBus();
+		PIOS_Flash_Jedec_ReleaseBus();
 		return -1;
 	}
 
-	PIOS_Flash_W25X_ReleaseBus();
+	PIOS_Flash_Jedec_ReleaseBus();
 
 	// Keep polling while bus is busy too
-	while(PIOS_Flash_W25X_Busy() != 0);
+	while(PIOS_Flash_Jedec_Busy() != 0);
 
 	return 0;
 }
@@ -351,29 +352,29 @@ int32_t PIOS_Flash_W25X_WriteData(uint32_t addr, uint8_t * data, uint16_t len)
  * @return Zero if success or error code
  * @retval -1 Unable to claim SPI bus
  */
-int32_t PIOS_Flash_W25X_ReadData(uint32_t addr, uint8_t * data, uint16_t len)
+int32_t PIOS_Flash_Jedec_ReadData(uint32_t addr, uint8_t * data, uint16_t len)
 {
-	if(PIOS_Flash_W25X_Validate(flash_dev) != 0)
+	if(PIOS_Flash_Jedec_Validate(flash_dev) != 0)
 		return -1;
 
-	if(PIOS_Flash_W25X_ClaimBus() == -1)
+	if(PIOS_Flash_Jedec_ClaimBus() == -1)
 		return -1;
 
 	/* Execute read command and clock in address.  Keep CS asserted */
-	uint8_t out[] = {W25X_READ_DATA, (addr >> 16) & 0xff, (addr >> 8) & 0xff , addr & 0xff};
+	uint8_t out[] = {JEDEC_READ_DATA, (addr >> 16) & 0xff, (addr >> 8) & 0xff , addr & 0xff};
 	
 	if(PIOS_SPI_TransferBlock(flash_dev->spi_id,out,NULL,sizeof(out),NULL) < 0) {
-		PIOS_Flash_W25X_ReleaseBus();
+		PIOS_Flash_Jedec_ReleaseBus();
 		return -2;
 	}
 
 	/* Copy the transfer data to the buffer */
 	if(PIOS_SPI_TransferBlock(flash_dev->spi_id,NULL,data,len,NULL) < 0) {
-		PIOS_Flash_W25X_ReleaseBus();
+		PIOS_Flash_Jedec_ReleaseBus();
 		return -3;
 	}
 
-	PIOS_Flash_W25X_ReleaseBus();
+	PIOS_Flash_Jedec_ReleaseBus();
 
 	return 0;
 }

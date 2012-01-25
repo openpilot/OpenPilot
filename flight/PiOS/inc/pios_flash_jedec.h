@@ -28,10 +28,15 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-int32_t PIOS_Flash_W25X_Init(uint32_t spi_id, uint32_t slave_num);
-int32_t PIOS_Flash_W25X_ReadStatus();
-int32_t PIOS_Flash_W25X_ReadID();
-int32_t PIOS_Flash_W25X_EraseChip();
-int32_t PIOS_Flash_W25X_EraseSector(uint32_t add);
-int32_t PIOS_Flash_W25X_WriteData(uint32_t addr, uint8_t * data, uint16_t len);
-int32_t PIOS_Flash_W25X_ReadData(uint32_t addr, uint8_t * data, uint16_t len);
+struct pios_flash_jedec_cfg {
+	uint32_t sector_erase;
+	uint32_t chip_erase;
+};
+
+int32_t PIOS_Flash_Jedec_Init(uint32_t spi_id, uint32_t slave_num, const struct pios_flash_jedec_cfg * cfg);
+int32_t PIOS_Flash_Jedec_ReadStatus();
+int32_t PIOS_Flash_Jedec_ReadID();
+int32_t PIOS_Flash_Jedec_EraseChip();
+int32_t PIOS_Flash_Jedec_EraseSector(uint32_t add);
+int32_t PIOS_Flash_Jedec_WriteData(uint32_t addr, uint8_t * data, uint16_t len);
+int32_t PIOS_Flash_Jedec_ReadData(uint32_t addr, uint8_t * data, uint16_t len);

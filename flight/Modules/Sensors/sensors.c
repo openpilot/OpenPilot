@@ -270,22 +270,17 @@ static void SensorsTask(void *parameters)
 // Using L3DG20 gyro
 #elif defined(PIOS_INCLUDE_L3GD20)
 		struct pios_l3gd20_data gyro;
-		count = 0;
-		while((read_good = PIOS_L3GD20_ReadFifo(&gyro)) != 0 && !error)
-			error = ((xTaskGetTickCount() - lastSysTime) > SENSOR_PERIOD) ? true : error;
-		if (error)
-			continue;
-		while(read_good == 0) {
-			count++;
-			
+		gyro_samples = 0;
+		xQueueHandle gyro_queue = PIOS_L3GD20_GetQueue();
+		
+		while(xQueueReceive(gyro_queue, (void *) &gyro, 0) != errQUEUE_EMPTY) {
+			gyro_samples++;
 			gyro_accum[0] += gyro.gyro_x;
 			gyro_accum[1] += gyro.gyro_y;
 			gyro_accum[2] += gyro.gyro_z;
 			
 			read_good = PIOS_L3GD20_ReadFifo(&gyro);
 		}
-				
-		gyro_samples = count;
 		gyro_scaling = PIOS_L3GD20_GetScale();
 
 #else

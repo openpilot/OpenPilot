@@ -135,7 +135,7 @@ struct pios_l3gd20_cfg {
 
 /* Public Functions */
 extern int32_t PIOS_L3GD20_Init(uint32_t spi_id, uint32_t slave_num, const struct pios_l3gd20_cfg * cfg);
-extern int32_t PIOS_L3GD20_ReadFifo(struct pios_l3gd20_data * buffer);
+extern xQueueHandle PIOS_L3GD20_GetQueue();
 extern int32_t PIOS_L3GD20_ReadGyros(struct pios_l3gd20_data * buffer);
 extern int32_t PIOS_L3GD20_SetRange(enum pios_l3gd20_range range);
 extern float PIOS_L3GD20_GetScale();

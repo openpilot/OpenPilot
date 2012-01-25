@@ -41,12 +41,11 @@ enum pios_l3gd20_dev_magic {
 	PIOS_L3GD20_DEV_MAGIC = 0x9d39bced,
 };
 
-#define PIOS_L3GD20_MAX_DOWNSAMPLE 10
+#define PIOS_L3GD20_MAX_DOWNSAMPLE 2
 struct l3gd20_dev {
 	uint32_t spi_id;
 	uint32_t slave_num;
-	int16_t buffer[PIOS_L3GD20_MAX_DOWNSAMPLE * sizeof(struct pios_l3gd20_data)];
-	t_fifo_buffer fifo;
+	xQueueHandle queue;
 	const struct pios_l3gd20_cfg * cfg;
 	enum pios_l3gd20_filter bandwidth;
 	enum pios_l3gd20_range range;
@@ -77,13 +76,18 @@ volatile bool l3gd20_configured = false;
 static struct l3gd20_dev * PIOS_L3GD20_alloc(void)
 {
 	struct l3gd20_dev * l3gd20_dev;
-	
+
 	l3gd20_dev = (struct l3gd20_dev *)pvPortMalloc(sizeof(*l3gd20_dev));
 	if (!l3gd20_dev) return (NULL);
-	
-	fifoBuf_init(&l3gd20_dev->fifo, (uint8_t *) l3gd20_dev->buffer, sizeof(l3gd20_dev->buffer));
-	
+
 	l3gd20_dev->magic = PIOS_L3GD20_DEV_MAGIC;
+
+	l3gd20_dev->queue = xQueueCreate(PIOS_L3GD20_MAX_DOWNSAMPLE, sizeof(struct pios_l3gd20_data));
+	if(l3gd20_dev->queue == NULL) {
+		vPortFree(l3gd20_dev);
+		return NULL;
+	}
+
 	return(l3gd20_dev);
 }
 
@@ -301,24 +305,15 @@ int32_t PIOS_L3GD20_ReadID()
 }
 
 /**
- * \brief Reads the data from the MPU6050 FIFO
- * \param[out] buffer destination buffer
- * \param[in] len maximum number of bytes which should be read
- * \note This returns the data as X, Y, Z the temperature
- * \return number of bytes transferred if operation was successful
- * \return -1 if error during I2C transfer
+ * \brief Reads the queue handle
+ * \return Handle to the queue or null if invalid device
  */
-int32_t PIOS_L3GD20_ReadFifo(struct pios_l3gd20_data * buffer)
+xQueueHandle PIOS_L3GD20_GetQueue()
 {
 	if(PIOS_L3GD20_Validate(dev) != 0)
-		return -1;
+		return (xQueueHandle) NULL;
 
-	if(fifoBuf_getUsed(&dev->fifo) < sizeof(*buffer))
-		return -1;
-		
-	fifoBuf_getData(&dev->fifo, (uint8_t *) buffer, sizeof(*buffer));
-	
-	return 0;
+	return dev->queue;
 }
 
 float PIOS_L3GD20_GetScale() 
@@ -380,11 +375,7 @@ void PIOS_L3GD20_IRQHandler(void)
 	memcpy((uint8_t *) &(data.gyro_x), &rec[1], 6);
 	data.temperature = PIOS_L3GD20_GetReg(PIOS_L3GD20_OUT_TEMP);
 	
-	if(fifoBuf_getFree(&dev->fifo) < sizeof(data)) {
-		return;	
-	}
-	
-	fifoBuf_putData(&dev->fifo, (uint8_t *) &data, sizeof(data));
+	xQueueSend(dev->queue, (void *) &data, 0);
 }
 
 #endif /* L3GD20 */

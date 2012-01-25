@@ -254,7 +254,7 @@ static void AttitudeTask(void *parameters)
 		}
 		
 		if(cc3d)
-			vTaskDelayUntil(&lastSysTime, 5);
+			vTaskDelayUntil(&lastSysTime, 3);
 	}
 }
 

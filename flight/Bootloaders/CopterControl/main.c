@@ -70,25 +70,13 @@ uint8_t processRX();
 void jump_to_app();
 
 int main() {
-	PIOS_SYS_Init();
-	if (BSL_HOLD_STATE == 0)
-		USB_connected = TRUE;
-
-	const struct pios_board_info * bdinfo = &pios_board_info_blob;
-	
-	switch(bdinfo->board_rev) {
-		case 0x01:
-			// Original LED, no problem
-			break;
-		case 0x02:
-			GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
-			break;
-	}
-	
+	PIOS_SYS_Init();	
+	PIOS_Board_Init();
 	PIOS_IAP_Init();
+	
+	USB_connected = PIOS_USB_CheckAvailable(0);
 
 	if (PIOS_IAP_CheckRequest() == TRUE) {
-		PIOS_Board_Init();
 		PIOS_DELAY_WaitmS(1000);
 		User_DFU_request = TRUE;
 		PIOS_IAP_ClearRequest();

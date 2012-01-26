@@ -61,7 +61,9 @@ struct jedec_flash_dev {
 	uint32_t device_type;
 	uint32_t capacity;
 	const struct pios_flash_jedec_cfg * cfg;
+#if defined(FLASH_FREERTOS)
 	xSemaphoreHandle transaction_lock;
+#endif
 	enum pios_jedec_dev_magic magic;
 };
 
@@ -89,7 +91,9 @@ static struct jedec_flash_dev * PIOS_Flash_Jedec_alloc(void)
 	
 	jedec_dev->claimed = false;
 	jedec_dev->magic = PIOS_JEDEC_DEV_MAGIC;
+#if defined(FLASH_FREERTOS)
 	jedec_dev->transaction_lock = xSemaphoreCreateMutex();
+#endif
 	return(jedec_dev);
 }
 
@@ -192,12 +196,13 @@ int32_t PIOS_Flash_Jedec_Init(uint32_t spi_id, uint32_t slave_num, const struct 
  */
 int32_t PIOS_Flash_Jedec_StartTransaction()
 {
+#if defined(FLASH_FREERTOS)
 	if(PIOS_Flash_Jedec_Validate(flash_dev) != 0)
 		return -1;
 
 	if(xSemaphoreTake(flash_dev->transaction_lock, portMAX_DELAY) != pdTRUE)
 		return -1;
-
+#endif
 	return 0;
 }
 
@@ -207,12 +212,13 @@ int32_t PIOS_Flash_Jedec_StartTransaction()
  */
 int32_t PIOS_Flash_Jedec_EndTransaction()
 {
+#if defined(FLASH_FREERTOS)
 	if(PIOS_Flash_Jedec_Validate(flash_dev) != 0)
 		return -1;
 
 	if(xSemaphoreGive(flash_dev->transaction_lock) != pdTRUE)
 		return -1;
-
+#endif
 	return 0;
 }
 
@@ -288,8 +294,11 @@ int32_t PIOS_Flash_Jedec_EraseSector(uint32_t addr)
 	PIOS_Flash_Jedec_ReleaseBus();
 
 	// Keep polling when bus is busy too
-	while(PIOS_Flash_Jedec_Busy() != 0)
+	while(PIOS_Flash_Jedec_Busy() != 0) {
+#if defined(FLASH_FREERTOS)
 		vTaskDelay(1);
+#endif
+	}
 
 	return 0;
 }
@@ -320,8 +329,11 @@ int32_t PIOS_Flash_Jedec_EraseChip()
 	PIOS_Flash_Jedec_ReleaseBus();
 
 	// Keep polling when bus is busy too
-	while(PIOS_Flash_Jedec_Busy() != 0)
+	while(PIOS_Flash_Jedec_Busy() != 0) {
+#if defined(FLASH_FREERTOS)
 		vTaskDelay(1);
+#endif
+}
 
 	return 0;
 }
@@ -374,9 +386,11 @@ int32_t PIOS_Flash_Jedec_WriteData(uint32_t addr, uint8_t * data, uint16_t len)
 	PIOS_Flash_Jedec_ReleaseBus();
 
 	// Keep polling when bus is busy too
-	while(PIOS_Flash_Jedec_Busy() != 0)
+	while(PIOS_Flash_Jedec_Busy() != 0) {
+#if defined(FLASH_FREERTOS)
 		vTaskDelay(1);
-
+#endif
+	}
 	return 0;
 }
 

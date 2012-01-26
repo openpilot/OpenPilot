@@ -64,7 +64,7 @@
 #define PIOS_INCLUDE_MS5611
 //#define PIOS_INCLUDE_HCSR04
 #define PIOS_FLASH_ON_ACCEL /* true for second revo */
-
+#define FLASH_FREERTOS
 /* Com systems to include */
 #define PIOS_INCLUDE_COM
 #define PIOS_INCLUDE_COM_TELEM

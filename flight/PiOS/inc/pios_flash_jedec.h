@@ -33,6 +33,11 @@ struct pios_flash_jedec_cfg {
 	uint32_t chip_erase;
 };
 
+struct pios_flash_chunk {
+	uint8_t * addr;
+	uint32_t len;
+};
+
 int32_t PIOS_Flash_Jedec_Init(uint32_t spi_id, uint32_t slave_num, const struct pios_flash_jedec_cfg * cfg);
 int32_t PIOS_Flash_Jedec_ReadStatus();
 int32_t PIOS_Flash_Jedec_ReadID();
@@ -40,5 +45,6 @@ int32_t PIOS_Flash_Jedec_EraseChip();
 int32_t PIOS_Flash_Jedec_EraseSector(uint32_t add);
 int32_t PIOS_Flash_Jedec_WriteData(uint32_t addr, uint8_t * data, uint16_t len);
 int32_t PIOS_Flash_Jedec_ReadData(uint32_t addr, uint8_t * data, uint16_t len);
+int32_t PIOS_Flash_Jedec_WriteChunks(uint32_t addr, struct pios_flash_chunk * p_chunk, uint32_t num);
 int32_t PIOS_Flash_Jedec_StartTransaction();
 int32_t PIOS_Flash_Jedec_EndTransaction();

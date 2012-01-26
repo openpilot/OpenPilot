@@ -247,28 +247,30 @@ int32_t PIOS_FLASHFS_ObjSave(UAVObjHandle obj, uint16_t instId, uint8_t * data)
 		.instId = instId,
 		.size = UAVObjGetNumBytes(obj)
 	};
+	
+	// Update CRC
+	crc = PIOS_CRC_updateCRC(crc, (uint8_t *) data, UAVObjGetNumBytes(obj));
 
 	if(PIOS_Flash_Jedec_EraseSector(addr) != 0)
 		return -2;
 
-	// Save header
-	// This information IS redundant with the object table id.  Oh well.  Better safe than sorry.
-	if(PIOS_Flash_Jedec_WriteData(addr, (uint8_t *) &header, sizeof(header)) != 0)
-		return -3;
+	struct pios_flash_chunk chunks[3] = {
+		{
+			.addr = (uint8_t *) &header,
+			.len = sizeof(header),
+		},
+		{
+			.addr = (uint8_t *) data,
+			.len = UAVObjGetNumBytes(obj)
+		},
+		{
+			.addr = (uint8_t *) &crc,
+			.len = sizeof(crc)
+		}
+	};
 
-	// Update CRC
-	crc = PIOS_CRC_updateCRC(0, (uint8_t *) &header, sizeof(header));
-
-	// Save data
-	if(PIOS_Flash_Jedec_WriteData(addr + sizeof(header), data, UAVObjGetNumBytes(obj)) != 0)
-		return -4;
-
-	// Update CRC
-	crc = PIOS_CRC_updateCRC(crc, (uint8_t *) data, UAVObjGetNumBytes(obj));
-
-	// Save CRC (written so will work when CRC changes to uint16)
-	if(PIOS_Flash_Jedec_WriteData(addr + sizeof(header) + UAVObjGetNumBytes(obj), (uint8_t *) &crc, sizeof(crc)) != 0)
-		return -4;
+	if(PIOS_Flash_Jedec_WriteChunks(addr, chunks, NELEMENTS(chunks)) != 0)
+	   return -1;
 
 	if(PIOS_Flash_Jedec_EndTransaction() != 0)
 		return -1;

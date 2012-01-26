@@ -193,7 +193,7 @@ int32_t PIOS_Flash_Jedec_ReadStatus()
 	if(PIOS_Flash_Jedec_Validate(flash_dev) != 0)
 		return -1;
 
-	uint8_t out[2] = {JEDEC_WRITE_STATUS, 0};
+	uint8_t out[2] = {JEDEC_READ_STATUS, 0};
 	uint8_t in[2] = {0,0};
 	if(PIOS_Flash_Jedec_ClaimBus() < 0)
 		return -1;

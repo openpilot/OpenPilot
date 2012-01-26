@@ -228,8 +228,8 @@ static const struct pios_l3gd20_cfg pios_l3gd20_cfg = {
 
 
 static const struct flashfs_cfg flashfs_m25p_cfg = {
-	.table_magic = 0x85FB3C35,
-	.obj_magic = 0x3015AE71,
+	.table_magic = 0x85FB3D35,
+	.obj_magic = 0x3015A371,
 	.obj_table_start = 0x00000010,
 	.obj_table_end = 0x00010000,
 	.sector_size = 0x00010000,

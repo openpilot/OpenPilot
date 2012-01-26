@@ -56,11 +56,6 @@ struct fileHeader {
 } __attribute__((packed));
 
 
-#define OBJECT_TABLE_MAGIC cfg->table_magic
-#define OBJ_MAGIC          cfg->obj_magic
-#define OBJECT_TABLE_START cfg->obj_table_start
-#define OBJECT_TABLE_END   cfg->obj_table_end
-#define SECTOR_SIZE        cfg->sector_size
 #define MAX_BADMAGIC       1000
 
 static const struct flashfs_cfg * cfg;
@@ -80,7 +75,7 @@ int32_t PIOS_FLASHFS_Init(const struct flashfs_cfg * new_cfg)
 	while(!magic_good) {
 		if (PIOS_Flash_Jedec_ReadData(0, (uint8_t *)&object_table_magic, sizeof(object_table_magic)) != 0)
 			return -1;
-		if(object_table_magic != OBJECT_TABLE_MAGIC) {
+		if(object_table_magic != new_cfg->table_magic) {
 			if(magic_fail_count++ > MAX_BADMAGIC) {
 				if(PIOS_FLASHFS_Format() != 0)
 					return -1;
@@ -99,18 +94,18 @@ int32_t PIOS_FLASHFS_Init(const struct flashfs_cfg * new_cfg)
 
 	}
 
-	int32_t addr = OBJECT_TABLE_START;
+	int32_t addr = cfg->obj_table_start;
 	struct objectHeader header;
 	numObjects = 0;
 
 	// Loop through header area while objects detect to count how many saved
-	while(addr < OBJECT_TABLE_END) {
+	while(addr < cfg->obj_table_end) {
 		// Read the instance data
 		if (PIOS_Flash_Jedec_ReadData(addr, (uint8_t *)&header, sizeof(header)) != 0)
 			return -1;
 
 		// Counting number of valid headers
-		if(header.objMagic != OBJ_MAGIC)
+		if(header.objMagic != cfg->obj_magic)
 			break;
 
 		numObjects++;
@@ -142,12 +137,12 @@ static int32_t PIOS_FLASHFS_ClearObjectTableHeader()
 	if(PIOS_Flash_Jedec_EraseSector(0) != 0)
 		return -1;
 
-	uint32_t object_table_magic = OBJECT_TABLE_MAGIC;
-	if (PIOS_Flash_Jedec_WriteData(0, (uint8_t *)&object_table_magic, sizeof(object_table_magic)) != 0)
+	if (PIOS_Flash_Jedec_WriteData(0, (uint8_t *)&cfg->table_magic, sizeof(cfg->table_magic)) != 0)
 		return -1;
 
+	uint32_t object_table_magic;
 	PIOS_Flash_Jedec_ReadData(0, (uint8_t *)&object_table_magic, sizeof(object_table_magic));
-	if(object_table_magic != OBJECT_TABLE_MAGIC)
+	if(object_table_magic != cfg->table_magic)
 		return -1;
 
 	return 0;
@@ -161,15 +156,15 @@ static int32_t PIOS_FLASHFS_ClearObjectTableHeader()
  */
 static int32_t PIOS_FLASHFS_GetObjAddress(uint32_t objId, uint16_t instId)
 {
-	int32_t addr = OBJECT_TABLE_START;
+	int32_t addr = cfg->obj_table_start;
 	struct objectHeader header;
 
 	// Loop through header area while objects detect to count how many saved
-	while(addr < OBJECT_TABLE_END) {
+	while(addr < cfg->obj_table_end) {
 		// Read the instance data
 		if (PIOS_Flash_Jedec_ReadData(addr, (uint8_t *) &header, sizeof(header)) != 0)
 			return -1;
-		if(header.objMagic != OBJ_MAGIC)
+		if(header.objMagic != cfg->obj_magic)
 			break; // stop searching once hit first non-object header
 		else if (header.objId == objId && header.instId == instId)
 			break;
@@ -200,15 +195,15 @@ int32_t PIOS_FLASHFS_GetNewAddress(uint32_t objId, uint16_t instId)
 		return -4;
 
 	// Don't worry about max size of flash chip here, other code will catch that
-	header.objMagic = OBJ_MAGIC;
+	header.objMagic = cfg->obj_magic;
 	header.objId = objId;
 	header.instId = instId;
-	header.address = OBJECT_TABLE_END + SECTOR_SIZE * numObjects;
+	header.address = cfg->obj_table_end + cfg->sector_size * numObjects;
 
-	int32_t addr = OBJECT_TABLE_START + sizeof(header) * numObjects;
+	int32_t addr = cfg->obj_table_start + sizeof(header) * numObjects;
 
 	// No room for this header in object table
-	if((addr + sizeof(header)) > OBJECT_TABLE_END)
+	if((addr + sizeof(header)) > cfg->obj_table_end)
 		return -2;
 
 	if(PIOS_Flash_Jedec_WriteData(addr, (uint8_t *) &header, sizeof(header)) != 0)

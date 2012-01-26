@@ -40,3 +40,5 @@ int32_t PIOS_Flash_Jedec_EraseChip();
 int32_t PIOS_Flash_Jedec_EraseSector(uint32_t add);
 int32_t PIOS_Flash_Jedec_WriteData(uint32_t addr, uint8_t * data, uint16_t len);
 int32_t PIOS_Flash_Jedec_ReadData(uint32_t addr, uint8_t * data, uint16_t len);
+int32_t PIOS_Flash_Jedec_StartTransaction();
+int32_t PIOS_Flash_Jedec_EndTransaction();

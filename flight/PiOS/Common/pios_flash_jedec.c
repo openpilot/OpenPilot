@@ -61,6 +61,7 @@ struct jedec_flash_dev {
 	uint32_t device_type;
 	uint32_t capacity;
 	const struct pios_flash_jedec_cfg * cfg;
+	xSemaphoreHandle transaction_lock;
 	enum pios_jedec_dev_magic magic;
 };
 
@@ -88,6 +89,7 @@ static struct jedec_flash_dev * PIOS_Flash_Jedec_alloc(void)
 	
 	jedec_dev->claimed = false;
 	jedec_dev->magic = PIOS_JEDEC_DEV_MAGIC;
+	jedec_dev->transaction_lock = xSemaphoreCreateMutex();
 	return(jedec_dev);
 }
 
@@ -184,6 +186,35 @@ int32_t PIOS_Flash_Jedec_Init(uint32_t spi_id, uint32_t slave_num, const struct 
 	return 0;
 }
 
+/**
+ * @brief Grab the semaphore to perform a transaction
+ * @return 0 for success, -1 for timeout
+ */
+int32_t PIOS_Flash_Jedec_StartTransaction()
+{
+	if(PIOS_Flash_Jedec_Validate(flash_dev) != 0)
+		return -1;
+
+	if(xSemaphoreTake(flash_dev->transaction_lock, portMAX_DELAY) != pdTRUE)
+		return -1;
+
+	return 0;
+}
+
+/**
+ * @brief Release the semaphore to perform a transaction
+ * @return 0 for success, -1 for timeout
+ */
+int32_t PIOS_Flash_Jedec_EndTransaction()
+{
+	if(PIOS_Flash_Jedec_Validate(flash_dev) != 0)
+		return -1;
+
+	if(xSemaphoreGive(flash_dev->transaction_lock) != pdTRUE)
+		return -1;
+
+	return 0;
+}
 
 /**
  * @brief Read the status register from flash chip and return it

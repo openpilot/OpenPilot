@@ -229,6 +229,9 @@ int32_t PIOS_FLASHFS_ObjSave(UAVObjHandle obj, uint16_t instId, uint8_t * data)
 	uint32_t objId = UAVObjGetID(obj);
 	uint8_t crc = 0;
 
+	if(PIOS_Flash_Jedec_StartTransaction() != 0)
+		return -1;
+
 	int32_t addr = PIOS_FLASHFS_GetObjAddress(objId, instId);
 
 	// Object currently not saved
@@ -267,6 +270,9 @@ int32_t PIOS_FLASHFS_ObjSave(UAVObjHandle obj, uint16_t instId, uint8_t * data)
 	if(PIOS_Flash_Jedec_WriteData(addr + sizeof(header) + UAVObjGetNumBytes(obj), (uint8_t *) &crc, sizeof(crc)) != 0)
 		return -4;
 
+	if(PIOS_Flash_Jedec_EndTransaction() != 0)
+		return -1;
+
 	return 0;
 }
 
@@ -292,6 +298,9 @@ int32_t PIOS_FLASHFS_ObjLoad(UAVObjHandle obj, uint16_t instId, uint8_t * data)
 	uint8_t crcFlash = 0;
 	const uint8_t crc_read_step = 8;
 	uint8_t crc_read_buffer[crc_read_step];
+
+	if(PIOS_Flash_Jedec_StartTransaction() != 0)
+		return -1;
 
 	int32_t addr = PIOS_FLASHFS_GetObjAddress(objId, instId);
 
@@ -330,6 +339,9 @@ int32_t PIOS_FLASHFS_ObjLoad(UAVObjHandle obj, uint16_t instId, uint8_t * data)
 	// Read the instance data
 	if (PIOS_Flash_Jedec_ReadData(addr + sizeof(header), data, objSize) != 0)
 		return -4;
+
+	if(PIOS_Flash_Jedec_EndTransaction() != 0)
+		return -1;
 
 	return 0;
 }

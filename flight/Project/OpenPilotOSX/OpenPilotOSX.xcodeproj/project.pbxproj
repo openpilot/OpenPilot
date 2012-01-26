@@ -67,6 +67,7 @@
 		6526645B122DF972006F9A3C /* pios_wdg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_wdg.h; sourceTree = "<group>"; };
 		6528CCB412E406B800CF5144 /* pios_adxl345.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_adxl345.c; sourceTree = "<group>"; };
 		6528CCE212E40F6700CF5144 /* pios_adxl345.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_adxl345.h; sourceTree = "<group>"; };
+		652A445514D116AE00835B68 /* board_hw_defs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = board_hw_defs.c; path = ../../board_hw_defs/revolution/board_hw_defs.c; sourceTree = "<group>"; };
 		652C8568132B632A00BFCC70 /* firmwareiapobj.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = firmwareiapobj.xml; sourceTree = "<group>"; };
 		652C856A132B6EA600BFCC70 /* sonaraltitude.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = sonaraltitude.xml; sourceTree = "<group>"; };
 		65322D3B122841F60046CD7C /* gpstime.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = gpstime.xml; sourceTree = "<group>"; };
@@ -3750,9 +3751,18 @@
 			path = inc;
 			sourceTree = "<group>";
 		};
+		652A445414D1169E00835B68 /* revolution */ = {
+			isa = PBXGroup;
+			children = (
+				652A445514D116AE00835B68 /* board_hw_defs.c */,
+			);
+			name = revolution;
+			sourceTree = "<group>";
+		};
 		6543A04114CF180D004EEC4C /* board_hw_defs */ = {
 			isa = PBXGroup;
 			children = (
+				652A445414D1169E00835B68 /* revolution */,
 				6543A04214CF1823004EEC4C /* ahrs */,
 				6543A04414CF1823004EEC4C /* coptercontrol */,
 				6543A04614CF1823004EEC4C /* ins */,

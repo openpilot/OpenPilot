@@ -24,14 +24,20 @@
  */
 
 #include <pios.h>
-
 #include "bl_fsm.h"		/* lfsm_* */
+
+#include "board_hw_defs.c"
 
 static bool board_init_complete = false;
 void PIOS_Board_Init() {
 	if (board_init_complete) {
 		return;
 	}
+
+	/* Delay system */
+	PIOS_DELAY_Init();
+	
+	PIOS_LED_Init(&pios_led_cfg);
 
 	board_init_complete = true;
 }

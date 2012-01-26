@@ -170,11 +170,6 @@ void PIOS_SYS_Init(void)
 	GPIO_Init(GPIOG, &GPIO_InitStructure);
 	GPIO_Init(GPIOH, &GPIO_InitStructure);
 	GPIO_Init(GPIOI, &GPIO_InitStructure);
-
-#if defined(PIOS_INCLUDE_LED)
-	/* Initialise LEDs */
-	PIOS_LED_Init();
-#endif
 }
 
 /**
@@ -301,8 +296,12 @@ void assert_failed(uint8_t * file, uint32_t line)
 	/* printf("Wrong parameters value: file %s on line %d\r\n", file, line); */
 
 	/* Setup the LEDs to Alternate */
-	PIOS_LED_On(LED1);
-	PIOS_LED_Off(LED2);
+#if defined(PIOS_LED_ALARM)
+	PIOS_LED_On(PIOS_LED_ALARM);
+#endif
+#if defiend(PIOS_LED_HEARTBEAT)
+	PIOS_LED_Off(PIOS_LED_HEARTBEAT);
+#endif
 
 	/* Infinite loop */
 	while (1) {

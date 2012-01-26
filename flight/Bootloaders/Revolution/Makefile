@@ -68,9 +68,9 @@ OPDIR = ../OpenPilot
 OPUAVOBJ = ../UAVObjects
 OPUAVOBJINC = $(OPUAVOBJ)/inc
 OPSYSINC = $(OPDIR)/System/inc
-BOOT = ../Bootloaders/AHRS
+BOOT = ../Bootloaders/Revolution
 BOOTINC = $(BOOT)/inc
-HWDEFSINC = ../board_hw_defs/$(BOARD_NAME)
+HWDEFSINC = ../../board_hw_defs/$(BOARD_NAME)
 
 OPUAVSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
 
@@ -88,11 +88,9 @@ include $(PIOS)/STM32F4xx/library.mk
 ## Library files
 SRC += $(FLIGHTLIB)/fifo_buffer.c
 
-## PIOS Hardware (Common)
+# PIOS Hardware (Common)
 #SRC += $(PIOSCOMMON)/pios_com.c
-#SRC += $(PIOSCOMMON)/pios_hmc5843.c
 SRC += $(PIOSCOMMON)/pios_board_info.c
-SRC += $(PIOSCOMMON)/pios_opahrs_proto.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c
 
 # List C source files here which must be compiled in ARM-Mode (no -mthumb).

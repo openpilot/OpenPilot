@@ -35,7 +35,7 @@
 #define JEDEC_WRITE_STATUS           0x01
 #define JEDEC_READ_DATA              0x03
 #define JEDEC_FAST_READ              0x0b
-#define JEDEC_DEVICE_ID              0x90
+#define JEDEC_DEVICE_ID              0x9F
 #define JEDEC_PAGE_WRITE             0x02
 
 #define JEDEC_STATUS_BUSY            0x01
@@ -58,6 +58,8 @@ struct jedec_flash_dev {
 	uint32_t spi_id;
 	uint32_t slave_num;
 	bool claimed;
+	uint32_t device_type;
+	uint32_t capacity;
 	const struct pios_flash_jedec_cfg * cfg;
 	enum pios_jedec_dev_magic magic;
 };
@@ -210,11 +212,8 @@ int32_t PIOS_Flash_Jedec_ReadStatus()
  */
 int32_t PIOS_Flash_Jedec_ReadID()
 {
-	if(PIOS_Flash_Jedec_Validate(flash_dev) != 0)
-		return -1;
-
-	uint8_t out[] = {JEDEC_DEVICE_ID, 0, 0, 0, 0, 0};
-	uint8_t in[6];
+	uint8_t out[] = {JEDEC_DEVICE_ID};
+	uint8_t in[4];
 	if (PIOS_Flash_Jedec_ClaimBus() < 0) 
 		return -1;
 	
@@ -223,7 +222,10 @@ int32_t PIOS_Flash_Jedec_ReadID()
 		return -2;
 	}
 	PIOS_Flash_Jedec_ReleaseBus();
-	return in[5];
+	
+	flash_dev->device_type = in[1];
+	flash_dev->capacity = in[3];
+	return in[1];
 }
 
 /**

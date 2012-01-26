@@ -82,7 +82,8 @@ int32_t PIOS_FLASHFS_Init(const struct flashfs_cfg * new_cfg)
 			return -1;
 		if(object_table_magic != OBJECT_TABLE_MAGIC) {
 			if(magic_fail_count++ > MAX_BADMAGIC) {
-				PIOS_FLASHFS_ClearObjectTableHeader();
+				if(PIOS_FLASHFS_Format() != 0)
+					return -1;
 #if defined(PIOS_LED_HEARTBEAT)
 				PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
 #endif	/* PIOS_LED_HEARTBEAT */
@@ -91,7 +92,6 @@ int32_t PIOS_FLASHFS_Init(const struct flashfs_cfg * new_cfg)
 			} else {
 				PIOS_DELAY_WaituS(1000);
 			}
-
 		}
 		else {
 			magic_good = true;
@@ -144,6 +144,10 @@ static int32_t PIOS_FLASHFS_ClearObjectTableHeader()
 
 	uint32_t object_table_magic = OBJECT_TABLE_MAGIC;
 	if (PIOS_Flash_Jedec_WriteData(0, (uint8_t *)&object_table_magic, sizeof(object_table_magic)) != 0)
+		return -1;
+
+	PIOS_Flash_Jedec_ReadData(0, (uint8_t *)&object_table_magic, sizeof(object_table_magic));
+	if(object_table_magic != OBJECT_TABLE_MAGIC)
 		return -1;
 
 	return 0;

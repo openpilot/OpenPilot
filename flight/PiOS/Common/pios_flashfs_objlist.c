@@ -239,8 +239,10 @@ int32_t PIOS_FLASHFS_ObjSave(UAVObjHandle obj, uint16_t instId, uint8_t * data)
 		addr = PIOS_FLASHFS_GetNewAddress(objId, instId);
 
 	// Could not allocate a sector
-	if(addr < 0)
+	if(addr < 0) {
+		PIOS_Flash_Jedec_EndTransaction();
 		return -1;
+	}
 
 	struct fileHeader header = {
 		.id = objId,
@@ -252,8 +254,10 @@ int32_t PIOS_FLASHFS_ObjSave(UAVObjHandle obj, uint16_t instId, uint8_t * data)
 	crc = PIOS_CRC_updateCRC(0, (uint8_t *) &header, sizeof(header));
 	crc = PIOS_CRC_updateCRC(crc, (uint8_t *) data, UAVObjGetNumBytes(obj));
 
-	if(PIOS_Flash_Jedec_EraseSector(addr) != 0)
+	if(PIOS_Flash_Jedec_EraseSector(addr) != 0) {
+		PIOS_Flash_Jedec_EndTransaction();
 		return -2;
+	}
 
 	struct pios_flash_chunk chunks[3] = {
 		{
@@ -270,11 +274,15 @@ int32_t PIOS_FLASHFS_ObjSave(UAVObjHandle obj, uint16_t instId, uint8_t * data)
 		}
 	};
 
-	if(PIOS_Flash_Jedec_WriteChunks(addr, chunks, NELEMENTS(chunks)) != 0)
+	if(PIOS_Flash_Jedec_WriteChunks(addr, chunks, NELEMENTS(chunks)) != 0) {
+		PIOS_Flash_Jedec_EndTransaction();
 	   return -1;
-
-	if(PIOS_Flash_Jedec_EndTransaction() != 0)
+	}
+	
+	if(PIOS_Flash_Jedec_EndTransaction() != 0) {
+		PIOS_Flash_Jedec_EndTransaction();
 		return -1;
+	}
 
 	return 0;
 }
@@ -308,22 +316,28 @@ int32_t PIOS_FLASHFS_ObjLoad(UAVObjHandle obj, uint16_t instId, uint8_t * data)
 	int32_t addr = PIOS_FLASHFS_GetObjAddress(objId, instId);
 
 	// Object currently not saved
-	if(addr < 0)
+	if(addr < 0) {
+		PIOS_Flash_Jedec_EndTransaction();
 		return -1;
+	}
 
 	struct fileHeader header;
 
 	// Load header
 	// This information IS redundant with the object table id.  Oh well.  Better safe than sorry.
-	if(PIOS_Flash_Jedec_ReadData(addr, (uint8_t *) &header, sizeof(header)) != 0)
+	if(PIOS_Flash_Jedec_ReadData(addr, (uint8_t *) &header, sizeof(header)) != 0) {
+		PIOS_Flash_Jedec_EndTransaction();
 		return -2;
-
+	}
+	
 	// Update CRC
 	crc = PIOS_CRC_updateCRC(0, (uint8_t *) &header, sizeof(header));
 
-	if((header.id != objId) || (header.instId != instId))
+	if((header.id != objId) || (header.instId != instId)) {
+		PIOS_Flash_Jedec_EndTransaction();
 		return -3;
-
+	}
+	
 	// To avoid having to allocate the RAM for a copy of the object, we read by chunks
 	// and compute the CRC
 	for(uint32_t i = 0; i < objSize; i += crc_read_step) {
@@ -333,15 +347,21 @@ int32_t PIOS_FLASHFS_ObjLoad(UAVObjHandle obj, uint16_t instId, uint8_t * data)
 	}
 
 	// Read CRC (written so will work when CRC changes to uint16)
-	if(PIOS_Flash_Jedec_ReadData(addr + sizeof(header) + objSize, (uint8_t *) &crcFlash, sizeof(crcFlash)) != 0)
+	if(PIOS_Flash_Jedec_ReadData(addr + sizeof(header) + objSize, (uint8_t *) &crcFlash, sizeof(crcFlash)) != 0) {
+		PIOS_Flash_Jedec_EndTransaction();
 		return -5;
+	}
 
-	if(crc != crcFlash)
+	if(crc != crcFlash) {
+		PIOS_Flash_Jedec_EndTransaction();
 		return -6;
+	}
 
 	// Read the instance data
-	if (PIOS_Flash_Jedec_ReadData(addr + sizeof(header), data, objSize) != 0)
+	if (PIOS_Flash_Jedec_ReadData(addr + sizeof(header), data, objSize) != 0) {
+		PIOS_Flash_Jedec_EndTransaction();
 		return -4;
+	}
 
 	if(PIOS_Flash_Jedec_EndTransaction() != 0)
 		return -1;

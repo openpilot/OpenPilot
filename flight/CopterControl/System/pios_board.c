@@ -102,7 +102,7 @@ static const struct pios_exti_cfg pios_exti_bma180_cfg __exti_config = {
 };
 static const struct pios_bma180_cfg pios_bma180_cfg = {
 	.exti_cfg = &pios_exti_bma180_cfg,
-	.bandwidth = BMA_BW_600HZ,
+	.bandwidth = BMA_BW_300HZ,
 	.range = BMA_RANGE_8G,
 };
 #endif /* PIOS_INCLUDE_BMA180 */

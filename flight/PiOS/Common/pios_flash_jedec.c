@@ -257,7 +257,8 @@ int32_t PIOS_Flash_Jedec_EraseSector(uint32_t addr)
 	PIOS_Flash_Jedec_ReleaseBus();
 
 	// Keep polling when bus is busy too
-	while(PIOS_Flash_Jedec_Busy() != 0);
+	while(PIOS_Flash_Jedec_Busy() != 0)
+		vTaskDelay(1);
 
 	return 0;
 }
@@ -288,7 +289,8 @@ int32_t PIOS_Flash_Jedec_EraseChip()
 	PIOS_Flash_Jedec_ReleaseBus();
 
 	// Keep polling when bus is busy too
-	while(PIOS_Flash_Jedec_Busy() != 0);
+	while(PIOS_Flash_Jedec_Busy() != 0)
+		vTaskDelay(1);
 
 	return 0;
 }
@@ -340,8 +342,9 @@ int32_t PIOS_Flash_Jedec_WriteData(uint32_t addr, uint8_t * data, uint16_t len)
 
 	PIOS_Flash_Jedec_ReleaseBus();
 
-	// Keep polling while bus is busy too
-	while(PIOS_Flash_Jedec_Busy() != 0);
+	// Keep polling when bus is busy too
+	while(PIOS_Flash_Jedec_Busy() != 0)
+		vTaskDelay(1);
 
 	return 0;
 }

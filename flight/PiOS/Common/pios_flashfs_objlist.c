@@ -249,6 +249,7 @@ int32_t PIOS_FLASHFS_ObjSave(UAVObjHandle obj, uint16_t instId, uint8_t * data)
 	};
 	
 	// Update CRC
+	crc = PIOS_CRC_updateCRC(0, (uint8_t *) &header, sizeof(header));
 	crc = PIOS_CRC_updateCRC(crc, (uint8_t *) data, UAVObjGetNumBytes(obj));
 
 	if(PIOS_Flash_Jedec_EraseSector(addr) != 0)

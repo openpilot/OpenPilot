@@ -109,10 +109,10 @@ int main()
 	vTaskStartScheduler();
 
 	/* If all is well we will never reach here as the scheduler will now be running. */
-	/* Do some indication to user that something bad just happened */
-	PIOS_LED_Off(LED1); \
+	/* Do some PIOS_LED_HEARTBEAT to user that something bad just happened */
+	PIOS_LED_Off(PIOS_LED_HEARTBEAT); \
 	for(;;) { \
-		PIOS_LED_Toggle(LED1); \
+		PIOS_LED_Toggle(PIOS_LED_HEARTBEAT); \
 		PIOS_DELAY_WaitmS(100); \
 	};
 

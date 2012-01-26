@@ -196,8 +196,8 @@ EXTRAINCDIRS  += $(STMSPDINCDIR)
 EXTRAINCDIRS  += $(CMSISDIR)
 EXTRAINCDIRS  += $(OPUAVSYNTHDIR)
 EXTRAINCDIRS  += $(BOOTINC)
-<<<<<<< HEAD
 EXTRAINCDIRS  += $(PYMITEINC)
+EXTRAINCDIRS  += $(HWDEFSINC)
 
 # Generate intermediate code
 gencode: ${OUTDIR}/pmlib_img.c ${OUTDIR}/pmlib_nat.c ${OUTDIR}/pmlibusr_img.c ${OUTDIR}/pmlibusr_nat.c ${OUTDIR}/pmfeatures.h 
@@ -213,9 +213,6 @@ ${OUTDIR}/pmlib_img.c ${OUTDIR}/pmlib_nat.c ${OUTDIR}/pmlibusr_img.c ${OUTDIR}/p
 	@$(PYTHON) $(PYMITETOOLS)/pmGenPmFeatures.py $(PYMITEPLAT)/pmfeatures.py > $(OUTDIR)/pmfeatures.h
 	@$(PYTHON) $(PYMITETOOLS)/pmImgCreator.py -f $(PYMITEPLAT)/pmfeatures.py -c -u -o $(OUTDIR)/pmlibusr_img.c --native-file=$(OUTDIR)/pmlibusr_nat.c $(FLIGHTPLANS)/test.py
 EXTRAINCDIRS += ${foreach MOD, ${MODULES} ${PYMODULES}, $(OPMODULEDIR)/${MOD}/inc} ${OPMODULEDIR}/System/inc
-=======
-EXTRAINCDIRS  += $(HWDEFSINC)
->>>>>>> next
 
 # List any extra directories to look for library files here.
 # Also add directories where the linker should search for

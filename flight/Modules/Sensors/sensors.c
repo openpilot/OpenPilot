@@ -384,8 +384,11 @@ static void SensorsTask(void *parameters)
 		}
 		
 		PIOS_WDG_UpdateFlag(PIOS_WDG_SENSORS);
+
+		// For L3GD20 which runs at 760 then one cycle per sample
+#if defined(PIOS_INCLUDE_MPU6000) && !defined(PIOS_INCLUDE_L3GD20)
 		vTaskDelayUntil(&lastSysTime, SENSOR_PERIOD / portTICK_RATE_MS);
-		
+#endif
 	}
 }
 

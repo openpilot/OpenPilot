@@ -90,7 +90,11 @@
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_4">
              <item>
-              <widget class="QGraphicsView" name="graphicsView"/>
+              <widget class="QGraphicsView" name="graphicsView">
+               <property name="styleSheet">
+                <string notr="true">background:transparent</string>
+               </property>
+              </widget>
              </item>
              <item>
               <layout class="QVBoxLayout" name="checkBoxesLayout"/>

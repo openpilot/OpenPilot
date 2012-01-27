@@ -133,6 +133,6 @@ latitude(gps_idx+1:end) = [];
 longitude(gps_idx+1:end) = [];
 altitude(gps_idx+1:end) = [];
 groundspeed(gps_idx+1:end) = [];
-gps_satelites(gps_idx+1:end) = [];
+gps_satellites(gps_idx+1:end) = [];
 gps_time(gps_idx+1:end) = [];
 baro(baro_idx+1:end,:) = [];

@@ -7,6 +7,7 @@
         <field name="ReturnTobaseAltitudeOffset" units="meter" type="int16" elements="1" defaultvalue="75"/>
 		<field name="RadiusBase" units="meter" type="int16" elementnames="1" defaultvalue="25"/>
         <field name="TimesRotateToCourse" units="msec" type="int16" elements="1" defaultvalue="3000"/>
+        <field name="MovingAverageMedianYaw" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>
 		<field name="GroundSpeedCalcCorrectHeadMin" units="m/sec" type="uint8" elementnames="1" defaultvalue="2"/>
 		<field name="GroundSpeedMax" units="m/sec" type="uint8" elementnames="1" defaultvalue="15"/>
 		<field name="FaileSaveRTB" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>

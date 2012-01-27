@@ -44,22 +44,22 @@
 #include "ccguidancesettings.h"
 #include "gpsposition.h"
 //#include "positiondesired.h"	// object that will be updated by the module
+//#include "homelocation.h"
 #include "manualcontrol.h"
 #include "manualcontrolcommand.h"
 #include "flightstatus.h"
-//#include "homelocation.h"
 #include "stabilizationdesired.h"
 #include "systemsettings.h"
 #include "attitudeactual.h"
 #include "hwsettings.h"
 
 // Private constants
-#define MAX_QUEUE_SIZE 1
-#define STACK_SIZE_BYTES 500
-#define TASK_PRIORITY (tskIDLE_PRIORITY+2)
+//#define MAX_QUEUE_SIZE 1
+//#define STACK_SIZE_BYTES 500
+//#define TASK_PRIORITY (tskIDLE_PRIORITY+2)
 #define RAD2DEG (180.0/M_PI)
 #define DEG2RAD (M_PI/180.0)
-#define GEE 9.81
+//#define GEE 9.81
 #define SAMPLE_PERIOD_MS		1050
 // Private types
 
@@ -71,6 +71,7 @@ static void ccguidanceTask(UAVObjEvent * ev);
 //static float bound(float val, float min, float max);
 static float sphereDistance(float lat1,float long1,float lat2,float long2);
 static float sphereCourse(float lat1,float long1,float lat2,float long2, float zeta);
+static float arrayDiffHeadingYaw[5];
 
 /**
  * Initialise the module, called on startup
@@ -139,7 +140,10 @@ static void ccguidanceTask(UAVObjEvent * ev)
 	static float positionDesiredNorth = 0, positionDesiredEast = 0, positionDesiredDown = 0;
 	float positionActualNorth = 0, positionActualEast = 0, DistanceToBase = 0;
 	static uint16_t thisTimesRotateToCourse;
-	static bool	firsRunSetCourse = TRUE, StateSaveCurrentPositionToRTB = FALSE;
+	static bool	firsRunSetCourse = TRUE, StateSaveCurrentPositionToRTB = FALSE, initArrayDiffHeadingYaw = TRUE;
+	static uint8_t indexArrayDiffHeadingYaw;
+	float max, min;
+	int8_t  i;
 
 	CCGuidanceSettingsGet(&ccguidanceSettings);
 
@@ -199,13 +203,41 @@ static void ccguidanceTask(UAVObjEvent * ev)
 				/* 1. Calculate course */
 				positionActualNorth = positionActual.Latitude * 1e-7;
 				positionActualEast  = positionActual.Longitude * 1e-7;
+
 				// Calculation errors between the rate of the gyroscope and GPS at a speed not less than the minimum.
 				if (positionActual.Groundspeed > ccguidanceSettings.GroundSpeedCalcCorrectHeadMin ) {
+
 					AttitudeActualGet(&attitudeActual);
 					diffHeadingYaw = attitudeActual.Yaw - positionActual.Heading;
 					while (diffHeadingYaw<-180.) diffHeadingYaw+=360.;
 					while (diffHeadingYaw>180.)  diffHeadingYaw-=360.;
+
+					/*	Moving average calculation of the median for the correction of the gyroscope axis Yaw.
+						Use to calculate the five element array corrections.
+						On three central elements, we obtain the arithmetic mean.*/
+					if (ccguidanceSettings.MovingAverageMedianYaw == TRUE) {
+						/* Initialize the array first calculated value of the correction.*/
+						if (initArrayDiffHeadingYaw == TRUE) {
+							for (i = 0; i < 5; i++) arrayDiffHeadingYaw[i] = diffHeadingYaw;
+							initArrayDiffHeadingYaw = FALSE;
+						}
+						arrayDiffHeadingYaw[indexArrayDiffHeadingYaw] = diffHeadingYaw;
+						if (indexArrayDiffHeadingYaw < 5 ) {indexArrayDiffHeadingYaw++;} else indexArrayDiffHeadingYaw = 0;
+
+						max = -180;
+						min =  180;
+						diffHeadingYaw = 0;
+
+						for ( i = 0; i < 5; i++) {
+							if (arrayDiffHeadingYaw[i] > max ) { max = arrayDiffHeadingYaw[i];
+							} else if (arrayDiffHeadingYaw[i] < min )  min = arrayDiffHeadingYaw[i];
+
+							diffHeadingYaw += arrayDiffHeadingYaw[i];
+						}
+						diffHeadingYaw -= min + max;
+						diffHeadingYaw /= 3;
 					}
+				}
 
 				// calculate course to target
 				DistanceToBase = sphereDistance(
@@ -241,7 +273,6 @@ static void ccguidanceTask(UAVObjEvent * ev)
 						CCGuidanceSettingsSet(&ccguidanceSettings);
 						positionHoldLast = 0;
 						StateSaveCurrentPositionToRTB = TRUE;
-						if (stabDesired.Throttle < 0) stabDesired.Throttle = 0;
 					}
 
 					stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_ROLL] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
@@ -251,7 +282,11 @@ static void ccguidanceTask(UAVObjEvent * ev)
 					AttitudeActualGet(&attitudeActual);
 					stabDesired.Yaw = attitudeActual.Yaw;
 					firsRunSetCourse = FALSE;
+					initArrayDiffHeadingYaw = TRUE;
+					indexArrayDiffHeadingYaw = 0;
+					if (stabDesired.Throttle < ccguidanceSettings.TrottleMin) stabDesired.Throttle = ccguidanceSettings.TrottleMin;
 				}
+
 				/* 2. Altitude */
 				if ((positionActual.Altitude + positionActual.GeoidSeparation) < positionDesiredDown) {
 					stabDesired.Pitch = ccguidanceSettings.Pitch[CCGUIDANCESETTINGS_PITCH_CLIMB];
@@ -303,7 +338,6 @@ static void ccguidanceTask(UAVObjEvent * ev)
 		AlarmsClear(SYSTEMALARMS_ALARM_GUIDANCE);
 	}
 }
-
 
 /**
  * Bound input value between limits

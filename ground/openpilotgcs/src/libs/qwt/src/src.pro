@@ -4,9 +4,14 @@ DEFINES += QWT_LIBRARY
 include(../../../openpilotgcslibrary.pri)
 include( ../qwtconfig.pri )
 
-#VVERSION = $$[QT_VERSION]
+contains(QWT_CONFIG, QwtDll) {
 
-
+    CONFIG += dll
+    win32|symbian: DEFINES += QT_DLL QWT_DLL QWT_MAKEDLL
+}
+else {
+    CONFIG += staticlib
+}
 HEADERS += \
     qwt.h \
     qwt_abstract_scale_draw.h \

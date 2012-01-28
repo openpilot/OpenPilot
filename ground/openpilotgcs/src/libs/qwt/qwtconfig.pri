@@ -31,6 +31,14 @@ VVERSION = $$[QT_VERSION]
 CONFIG       += QwtPlot
 
 ######################################################################
+# Build the static/shared libraries.
+# If QwtDll is enabled, a shared library is built, otherwise
+# it will be a static library.
+######################################################################
+
+QWT_CONFIG           += QwtDll
+
+######################################################################
 # QwtWidgets enables all classes, that are needed to use the all other
 # widgets (sliders, dials, ...), beside QwtPlot. 
 ######################################################################

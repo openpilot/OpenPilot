@@ -96,7 +96,7 @@ void PIOS_Servo_SetHz(uint16_t * speeds, uint8_t banks)
 	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure = servo_cfg->tim_base_init;
 	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
-	TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1;
+	//
 
 	uint8_t set = 0;
 
@@ -109,6 +109,14 @@ void PIOS_Servo_SetHz(uint16_t * speeds, uint8_t banks)
 			new &= chan->timer != servo_cfg->channels[j].timer;
 
 		if(new) {
+			// Choose the correct prescaler value for the APB the timer is attached
+			if (chan->timer==TIM1 || chan->timer==TIM8 || chan->timer==TIM9 || chan->timer==TIM10 || chan->timer==TIM11 ){
+				TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_PERIPHERAL_APB2_CLOCK / 1000000) - 1;
+			}
+			else {
+				TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_PERIPHERAL_APB1_CLOCK / 1000000) - 1;
+			}
+
 			TIM_TimeBaseStructure.TIM_Period = ((1000000 / speeds[set]) - 1);
 			TIM_TimeBaseInit(chan->timer, &TIM_TimeBaseStructure);
 			set++;

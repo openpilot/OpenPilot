@@ -143,6 +143,8 @@ int32_t mag_test;
  * 2. MPU6000 gyro and accel
  * 3. BMA180 accel and L3GD20 gyro
  */
+
+uint32_t sensor_dt_us;
 static void SensorsTask(void *parameters)
 {
 	uint8_t init = 0;
@@ -153,6 +155,7 @@ static void SensorsTask(void *parameters)
 	int32_t gyro_accum[3] = {0,0,0};
 	float gyro_scaling;
 	float accel_scaling;
+	static int32_t timeval;
 
 	AlarmsClear(SYSTEMALARMS_ALARM_SENSORS);
 
@@ -191,6 +194,8 @@ static void SensorsTask(void *parameters)
 	bool error = false;
 	while (1) {
 		// TODO: add timeouts to the sensor reads and set an error if the fail
+		sensor_dt_us = PIOS_DELAY_DiffuS(timeval);
+		timeval = PIOS_DELAY_GetRaw();
 
 		if (error) {
 			PIOS_WDG_UpdateFlag(PIOS_WDG_SENSORS);
@@ -278,12 +283,16 @@ static void SensorsTask(void *parameters)
 		gyro_samples = 0;
 		xQueueHandle gyro_queue = PIOS_L3GD20_GetQueue();
 		
-		while(xQueueReceive(gyro_queue, (void *) &gyro, 0) != errQUEUE_EMPTY) {
-			gyro_samples++;
-			gyro_accum[0] += gyro.gyro_x;
-			gyro_accum[1] += gyro.gyro_y;
-			gyro_accum[2] += gyro.gyro_z;
+		if(xQueueReceive(gyro_queue, (void *) &gyro, 4) == errQUEUE_EMPTY) {
+			error = true;
+			continue;
 		}
+
+		gyro_samples = 1;
+		gyro_accum[0] += gyro.gyro_x;
+		gyro_accum[1] += gyro.gyro_y;
+		gyro_accum[2] += gyro.gyro_z;
+
 		gyro_scaling = PIOS_L3GD20_GetScale();
 
 #else
@@ -398,6 +407,8 @@ static void SensorsTask(void *parameters)
 		// For L3GD20 which runs at 760 then one cycle per sample
 #if defined(PIOS_INCLUDE_MPU6000) && !defined(PIOS_INCLUDE_L3GD20)
 		vTaskDelayUntil(&lastSysTime, SENSOR_PERIOD / portTICK_RATE_MS);
+#else
+		lastSysTime = xTaskGetTickCount();
 #endif
 	}
 }

@@ -428,7 +428,7 @@ void PIOS_Board_Init(void) {
 #if defined(PIOS_INCLUDE_MPU6000)
 	PIOS_MPU6000_Attach(pios_spi_gyro_id);
 	PIOS_MPU6000_Init(&pios_mpu6000_cfg);
-	PIOS_Assert(PIOS_MPU6000_Test() == 0);
+//	PIOS_Assert(PIOS_MPU6000_Test() == 0);
 #elif defined(PIOS_INCLUDE_L3GD20)
 	PIOS_L3GD20_Init(pios_spi_gyro_id, 0, &pios_l3gd20_cfg);
 	PIOS_Assert(PIOS_L3GD20_Test() == 0);

@@ -34,6 +34,8 @@
 
 #if defined(PIOS_INCLUDE_MPU6000)
 
+#include "fifo_buffer.h"
+
 /* Global Variables */
 uint32_t pios_spi_gyro;
 
@@ -69,11 +71,7 @@ void PIOS_MPU6000_Init(const struct pios_mpu6000_cfg * new_cfg)
 	PIOS_SPI_SetPrescalar(pios_spi_gyro, SPI_BaudRatePrescaler_8);
 
 	/* Set up EXTI line */
-	PIOS_EXTI_Init(&new_cfg->cfg);
-	
-	/* Enable and set EOC EXTI Interrupt to the lowest priority */
-	NVIC_Init(&cfg->eoc_irq.init);
-
+	PIOS_EXTI_Init(cfg->exti_cfg);
 }
 
 /**

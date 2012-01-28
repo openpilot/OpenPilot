@@ -158,12 +158,17 @@ static void SensorsTask(void *parameters)
 
 	UAVObjEvent ev;
 	settingsUpdatedCb(&ev);
-	
-	accel_test = PIOS_BMA180_Test();
+
 #if defined(PIOS_INCLUDE_MPU6000)
 	gyro_test = PIOS_MPU6000_Test();
+#if !defined(PIOS_INCLUDE_BMA180)
+	accel_test = gyro_test;
+#endif
 #elif defined(PIOS_INCLUDE_L3GD20)
 	gyro_test = PIOS_L3GD20_Test();
+#endif
+#if defined(PIOS_INCLUDE_BMA180)
+	accel_test = PIOS_BMA180_Test();
 #endif
 	mag_test = PIOS_HMC5883_Test();
 	
@@ -299,7 +304,12 @@ static void SensorsTask(void *parameters)
 		accelsData.x = accels[0] * accel_scaling * accel_scale[0] - accel_bias[0];
 		accelsData.y = accels[1] * accel_scaling * accel_scale[1] - accel_bias[1];
 		accelsData.z = accels[2] * accel_scaling * accel_scale[2] - accel_bias[2];
+#if defined(BMA180)
 		accelsData.temperature = 25.0f + ((float) accel.temperature - 2.0f) / 2.0f;
+#elif defined(PIOS_MPU6000_ACCEL)
+		accelsData.temperature = 35.0f + ((float) gyro.temperature + 512.0f) / 340.0f;
+#endif
+		accelsData.temperature = 
 		AccelsSet(&accelsData);
 
 		float gyros[3] = {(float) gyro_accum[1] / gyro_samples, (float) gyro_accum[0] / gyro_samples, -(float) gyro_accum[2] / gyro_samples};

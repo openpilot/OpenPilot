@@ -1,47 +1,61 @@
-fn = '~/Desktop/kenn_stationary (2011-12-26 14:51:11 +0000)';
+fn = '~/Documents/Programming/serial_logger/bma180_l3gd20_desk_20120228.dat';
+fn = '~/Documents/Programming/serial_logger/mpu6000_desk_20120228.dat';
+fn = '~/Documents/Programming/serial_logger/mpu6000_desk2_20110228.dat';
+fn = '~/Documents/Programming/serial_logger/output.dat';
 fid = fopen(fn);
 dat = uint8(fread(fid,'uint8'));
 fclose(fid);
 
-accel = [];
+accel = zeros(4096,1);
 accel_idx = 0;
 
-gyro = [];
+gyro = zeros(4096,1);
 gyro_idx = 0;
 
-mag = [];
+mag = zeros(4096,1);
 mag_idx = 0;
 
-latitude = [];
-longitude = [];
-altitude = [];
-heading = [];
-groundspeed = [];
-gps_satellites = [];
-gps_time = [];
+latitude = zeros(4096,1);
+longitude = zeros(4096,1);
+altitude = zeros(4096,1);
+heading = zeros(4096,1);
+groundspeed = zeros(4096,1);
+gps_satellites = zeros(4096,1);
+gps_time = zeros(4096,1);
 gps_idx = 0;
 
-baro = [];
+baro = zeros(4096,1);
 baro_idx = 0;
 
 total = length(dat);
 count = 0;
 head = 0;
 last_time = 0;
+good_samples = 0;
+bad_samples = 0;
 while head < (length(dat) - 200)
     
+    last_head = head;
+    
     count = count + 1;
-    if count >= 100
-        disp(sprintf('%0.3g%%',(head/total) * 100));
+    if count >= 5000
+        disp(sprintf('Processed: %0.3g%% Bad: %0.3g%%',(head/total) * 100,bad_samples * 100 / (bad_samples + good_samples)));
         count = 0;
     end
-    head = head + find(dat(head+1:end)==255,1,'first');
+    idx = find(dat(head+1:head+100)==255,1,'first');
+    if isempty(idx)
+        head = head + 100;
+        continue;
+    end
+    head = head + idx;
+    
     
     % Get the time
-    time = typecast(flipud(dat(head+(1:2))),'uint16');
-    if (time - last_time) ~= 2 && (time-last_time) ~= (hex2dec('10000')-2)
+    time = double(dat(head+1))* 256 + double(dat(head+2));%typecast(flipud(dat(head+(1:2))),'uint16');
+    if min([(time - last_time) (last_time - time)]) > 2
+        disp(['Err' num2str(time-last_time)]);
         last_time = time;
-        disp('Err');
+        bad_samples = bad_samples + (head - last_head);
         continue
     end
     last_time = time;
@@ -124,6 +138,8 @@ while head < (length(dat) - 200)
         baro(baro_idx,1) = typecast(dat(head+(1:4)),'single');
         baro(baro_idx,2) = time;
     end
+    
+    good_samples = good_samples + (head - last_head);
 end
 
 accel(accel_idx+1:end,:) = [];

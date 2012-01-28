@@ -149,7 +149,7 @@ void JoystickControl::paintEvent(QPaintEvent *event)
 void JoystickControl::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event);
-    fitInView(m_background, Qt::IgnoreAspectRatio );
+    fitInView(m_background, Qt::KeepAspectRatio);
 }
 
 /**

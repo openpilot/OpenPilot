@@ -72,6 +72,7 @@ help:
 	@echo "     arm_sdk_install      - Install the Code Sourcery ARM gcc toolchain"
 	@echo "     openocd_install      - Install the OpenOCD JTAG daemon"
 	@echo "     stm32flash_install   - Install the stm32flash tool for unbricking boards"
+	@echo "     dfuutil_install      - Install the dfu-util tool for unbricking F4-based boards"
 	@echo
 	@echo "   [Big Hammer]"
 	@echo "     all                  - Generate UAVObjects, build openpilot firmware and gcs"
@@ -249,6 +250,38 @@ stm32flash_install: stm32flash_clean
 stm32flash_clean:
 	$(V0) @echo " CLEAN        $(STM32FLASH_DIR)"
 	$(V1) [ ! -d "$(STM32FLASH_DIR)" ] || $(RM) -r "$(STM32FLASH_DIR)"
+
+DFUUTIL_DIR := $(TOOLS_DIR)/dfu-util
+
+.PHONY: dfuutil_install
+dfuutil_install: DFUUTIL_URL  := http://dfu-util.gnumonks.org/releases/dfu-util-0.5.tar.gz
+dfuutil_install: DFUUTIL_FILE := $(notdir $(DFUUTIL_URL))
+dfuutil_install: | $(DL_DIR) $(TOOLS_DIR)
+dfuutil_install: dfuutil_clean
+        # download the source
+	$(V0) @echo " DOWNLOAD     $(DFUUTIL_URL)"
+	$(V1) wget -N -P "$(DL_DIR)" "$(DFUUTIL_URL)"
+
+        # extract the source
+	$(V0) @echo " EXTRACT      $(DFUUTIL_FILE)"
+	$(V1) [ ! -d "$(DL_DIR)/dfuutil-build" ] || $(RM) -r "$(DL_DIR)/dfuutil-build"
+	$(V1) mkdir -p "$(DL_DIR)/dfuutil-build"
+	$(V1) tar -C $(DL_DIR)/dfuutil-build -xf "$(DL_DIR)/$(DFUUTIL_FILE)"
+
+        # build
+	$(V0) @echo " BUILD        $(DFUUTIL_DIR)"
+	$(V1) mkdir -p "$(DFUUTIL_DIR)"
+	$(V1) ( \
+	  cd $(DL_DIR)/dfuutil-build/dfu-util-0.5 ; \
+	  ./configure --prefix="$(DFUUTIL_DIR)" ; \
+	  $(MAKE) ; \
+	  $(MAKE) install ; \
+	)
+
+.PHONY: dfuutil_clean
+dfuutil_clean:
+	$(V0) @echo " CLEAN        $(DFUUTIL_DIR)"
+	$(V1) [ ! -d "$(DFUUTIL_DIR)" ] || $(RM) -r "$(DFUUTIL_DIR)"
 
 ##############################
 #

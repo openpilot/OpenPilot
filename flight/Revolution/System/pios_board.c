@@ -240,6 +240,21 @@ static const struct pios_flash_jedec_cfg flash_m25p_cfg = {
 	.chip_erase = 0xC7
 };
 
+/* One slot per selectable receiver group.
+ *  eg. PWM, PPM, GCS, SPEKTRUM1, SPEKTRUM2, SBUS
+ * NOTE: No slot in this map for NONE.
+ */
+uint32_t pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE];
+
+#define PIOS_COM_TELEM_RF_RX_BUF_LEN 512
+#define PIOS_COM_TELEM_RF_TX_BUF_LEN 512
+
+#define PIOS_COM_GPS_RX_BUF_LEN 32
+
+uint32_t pios_com_aux_id;
+uint32_t pios_com_gps_id;
+uint32_t pios_com_telem_usb_id;
+uint32_t pios_com_telem_rf_id;
 
 /**
  * PIOS_Board_Init()

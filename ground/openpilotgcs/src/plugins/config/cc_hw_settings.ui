@@ -30,9 +30,6 @@
           <property name="text">
            <string/>
           </property>
-          <property name="pixmap">
-           <pixmap resource="configgadget.qrc">:/configgadget/images/coptercontrol.svg</pixmap>
-          </property>
           <property name="scaledContents">
            <bool>true</bool>
           </property>
@@ -71,7 +68,11 @@
           </property>
          </widget>
         </item>
+<<<<<<< HEAD
         <item row="1" column="5">
+=======
+        <item row="1" column="4">
+>>>>>>> master
          <spacer name="horizontalSpacer_2">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -84,6 +85,7 @@
           </property>
          </spacer>
         </item>
+<<<<<<< HEAD
         <item row="1" column="4">
          <widget class="QLabel" name="label_8">
           <property name="text">
@@ -110,6 +112,8 @@
         <item row="4" column="4">
          <widget class="QComboBox" name="cbUsbVcp"/>
         </item>
+=======
+>>>>>>> master
         <item row="0" column="1">
          <widget class="QLabel" name="label_7">
           <property name="text">
@@ -149,6 +153,7 @@
             </property>
            </widget>
           </item>
+<<<<<<< HEAD
           <item row="2" column="0">
            <widget class="QLabel" name="ComUsbBridgeSpeedLabel">
             <property name="minimumSize">
@@ -162,6 +167,8 @@
             </property>
            </widget>
           </item>
+=======
+>>>>>>> master
           <item row="0" column="1">
            <widget class="QComboBox" name="telemetrySpeed">
             <property name="toolTip">
@@ -176,6 +183,7 @@
             </property>
            </widget>
           </item>
+<<<<<<< HEAD
           <item row="2" column="1">
            <widget class="QComboBox" name="comUsbBridgeSpeed">
             <property name="toolTip">
@@ -183,6 +191,8 @@
             </property>
            </widget>
           </item>
+=======
+>>>>>>> master
          </layout>
         </item>
         <item>
@@ -346,7 +356,10 @@ Beware of not locking yourself out!</string>
   </layout>
  </widget>
  <resources>
+<<<<<<< HEAD
   <include location="configgadget.qrc"/>
+=======
+>>>>>>> master
   <include location="../coreplugin/core.qrc"/>
  </resources>
  <connections/>

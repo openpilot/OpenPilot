@@ -107,6 +107,7 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
     m_config->graphicsView->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
     m_renderer = new QSvgRenderer();
     QGraphicsScene *l_scene = m_config->graphicsView->scene();
+    m_config->graphicsView->setBackgroundBrush(QBrush(Utils::StyleHelper::baseColor()));
     if (QFile::exists(":/configgadget/images/TX2.svg") && m_renderer->load(QString(":/configgadget/images/TX2.svg")) && m_renderer->isValid())
     {
         l_scene->clear(); // Deletes all items contained in the scene as well.
@@ -400,6 +401,7 @@ void ConfigInputWidget::wizardSetUpStep(enum wizardSteps step)
     case wizardChooseMode:
     {
         m_config->graphicsView->setVisible(true);
+        m_config->graphicsView->fitInView(m_txBackground, Qt::KeepAspectRatio );
         setTxMovement(nothing);
         m_config->wzText->setText(tr("Please choose your transmiter type.\n"
                                      "Mode 1 means your throttle stick is on the right\n"

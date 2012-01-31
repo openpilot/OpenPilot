@@ -76,7 +76,7 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>70</height>
+               <height>90</height>
               </size>
              </property>
              <property name="text">
@@ -90,11 +90,7 @@
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_4">
              <item>
-              <widget class="QGraphicsView" name="graphicsView">
-               <property name="styleSheet">
-                <string notr="true">background:transparent</string>
-               </property>
-              </widget>
+              <widget class="QGraphicsView" name="graphicsView"/>
              </item>
              <item>
               <layout class="QVBoxLayout" name="checkBoxesLayout"/>

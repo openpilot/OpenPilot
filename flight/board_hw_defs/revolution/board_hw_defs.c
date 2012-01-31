@@ -1201,7 +1201,7 @@ static const struct pios_tim_channel pios_tim_servoport_all_pins[] = {
 	},
 	{
 		.timer = TIM3,
-		.timer_chan = TIM_Channel_3,
+		.timer_chan = TIM_Channel_4,
 		.pin = {
 			.gpio = GPIOB,
 			.init = {

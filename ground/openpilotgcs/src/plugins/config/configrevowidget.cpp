@@ -630,7 +630,7 @@ void ConfigRevoWidget::sixPointCalibrationMode()
 
     revoCalibration->setData(revoCalibrationData);
 
-   usleep(100000);
+   Thread::usleep(100000);
 
    gyro_accum_x.clear();
    gyro_accum_y.clear();

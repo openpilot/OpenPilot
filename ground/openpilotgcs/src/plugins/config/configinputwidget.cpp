@@ -717,7 +717,7 @@ void ConfigInputWidget::identifyControls()
     m_config->wzText->clear();
     setTxMovement(nothing);
 
-    QTimer::singleShot(500, this, SLOT(wzNext()));
+    QTimer::singleShot(2500, this, SLOT(wzNext()));
 }
 
 void ConfigInputWidget::identifyLimits()

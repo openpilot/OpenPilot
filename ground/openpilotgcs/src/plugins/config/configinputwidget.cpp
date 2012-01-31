@@ -401,6 +401,7 @@ void ConfigInputWidget::wizardSetUpStep(enum wizardSteps step)
     case wizardChooseMode:
     {
         m_config->graphicsView->setVisible(true);
+        m_config->graphicsView->fitInView(m_txBackground, Qt::KeepAspectRatio );
         setTxMovement(nothing);
         m_config->wzText->setText(tr("Please choose your transmiter type.\n"
                                      "Mode 1 means your throttle stick is on the right\n"

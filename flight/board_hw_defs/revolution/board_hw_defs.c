@@ -1363,7 +1363,7 @@ static const struct pios_tim_channel pios_tim_rcvrport_all_channels[] = {
 				.GPIO_OType = GPIO_OType_PP,
 				.GPIO_PuPd  = GPIO_PuPd_UP
 			},
-			.pin_source = GPIO_PinSource1,
+			.pin_source = GPIO_PinSource9,
 		},
 		.remap = GPIO_AF_TIM1,
 	},

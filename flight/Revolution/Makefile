@@ -123,7 +123,7 @@ SRC += $(OPUAVOBJ)/uavobjectmanager.c
 SRC += $(OPUAVOBJ)/eventdispatcher.c
 
 #ifeq ($(DEBUG),YES)
-SRC += $(OPSYSTEM)/dcc_stdio.c                                                                                                                                                                                                
+SRC += $(OPSYSTEM)/dcc_stdio.c
 SRC += $(OPSYSTEM)/cm3_fault_handlers.c
 #endif
 

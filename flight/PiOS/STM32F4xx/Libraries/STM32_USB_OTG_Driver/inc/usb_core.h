@@ -182,13 +182,13 @@ typedef  struct  usb_setup_req {
 
 typedef struct _Device_TypeDef
 {
-  uint8_t  *(*GetDeviceDescriptor)( uint8_t speed , uint16_t *length);  
-  uint8_t  *(*GetLangIDStrDescriptor)( uint8_t speed , uint16_t *length); 
-  uint8_t  *(*GetManufacturerStrDescriptor)( uint8_t speed , uint16_t *length);  
-  uint8_t  *(*GetProductStrDescriptor)( uint8_t speed , uint16_t *length);  
-  uint8_t  *(*GetSerialStrDescriptor)( uint8_t speed , uint16_t *length);  
-  uint8_t  *(*GetConfigurationStrDescriptor)( uint8_t speed , uint16_t *length);  
-  uint8_t  *(*GetInterfaceStrDescriptor)( uint8_t speed , uint16_t *length);   
+  const uint8_t  *(*GetDeviceDescriptor)( uint8_t speed , uint16_t *length);  
+  const uint8_t  *(*GetLangIDStrDescriptor)( uint8_t speed , uint16_t *length); 
+  const uint8_t  *(*GetManufacturerStrDescriptor)( uint8_t speed , uint16_t *length);  
+  const uint8_t  *(*GetProductStrDescriptor)( uint8_t speed , uint16_t *length);  
+  const uint8_t  *(*GetSerialStrDescriptor)( uint8_t speed , uint16_t *length);  
+  const uint8_t  *(*GetConfigurationStrDescriptor)( uint8_t speed , uint16_t *length);  
+  const uint8_t  *(*GetInterfaceStrDescriptor)( uint8_t speed , uint16_t *length);   
 } USBD_DEVICE, *pUSBD_DEVICE;
 
 typedef struct USB_OTG_hPort
@@ -216,13 +216,13 @@ typedef struct _Device_cb
   uint8_t  (*IsoINIncomplete)  (void *pdev); 
   uint8_t  (*IsoOUTIncomplete)  (void *pdev);   
 
-  uint8_t  *(*GetConfigDescriptor)( uint8_t speed , uint16_t *length); 
+  const uint8_t  *(*GetConfigDescriptor)( uint8_t speed , uint16_t *length); 
 #ifdef USB_OTG_HS_CORE 
-  uint8_t  *(*GetOtherConfigDescriptor)( uint8_t speed , uint16_t *length);   
+  const uint8_t  *(*GetOtherConfigDescriptor)( uint8_t speed , uint16_t *length);   
 #endif
 
 #ifdef USB_SUPPORT_USER_STRING_DESC 
-  uint8_t  *(*GetUsrStrDescriptor)( uint8_t speed ,uint8_t index,  uint16_t *length);   
+  const uint8_t  *(*GetUsrStrDescriptor)( uint8_t speed ,uint8_t index,  uint16_t *length);   
 #endif  
   
 } USBD_Class_cb_TypeDef;

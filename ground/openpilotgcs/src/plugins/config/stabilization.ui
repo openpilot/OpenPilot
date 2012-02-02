@@ -748,6 +748,20 @@ automatically every 300ms, which will help for fast tuning.</string>
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="reloadButton">
+       <property name="text">
+        <string>reload</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="defaultButton">
+       <property name="text">
+        <string>default</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="saveStabilizationToRAM">
        <property name="text">
         <string>Apply</string>

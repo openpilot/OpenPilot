@@ -20,6 +20,8 @@ public:
     void setObjects(QList<UAVDataObject *>);
     void addObject(UAVDataObject *);
     void clearObjects();
+    void removeObject(UAVDataObject *obj);
+    void removeAllObjects();
 signals:
     void preProcessOperations();
     void saveSuccessfull();

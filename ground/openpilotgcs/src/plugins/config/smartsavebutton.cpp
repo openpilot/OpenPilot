@@ -101,7 +101,15 @@ void smartSaveButton::addObject(UAVDataObject * obj)
     if(!objects.contains(obj))
         objects.append(obj);
 }
-
+void smartSaveButton::removeObject(UAVDataObject * obj)
+{
+    if(objects.contains(obj))
+        objects.removeAll(obj);
+}
+void smartSaveButton::removeAllObjects()
+{
+    objects.clear();
+}
 void smartSaveButton::clearObjects()
 {
     objects.clear();

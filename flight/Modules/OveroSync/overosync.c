@@ -134,8 +134,8 @@ static void overoSyncTask(void *parameters)
 	}
 }
 
-uint8_t tx_buffer[OVEROSYNC_PACKET_SIZE];
-uint8_t rx_buffer[OVEROSYNC_PACKET_SIZE];
+uint8_t tx_buffer[OVEROSYNC_PACKET_SIZE] __attribute__ ((aligned(4)));
+uint8_t rx_buffer[OVEROSYNC_PACKET_SIZE] __attribute__ ((aligned(4)));
 
 int32_t transactionsDone = 0;
 static void transmitDataDone(bool crc_ok, uint8_t crc_val)
@@ -154,17 +154,16 @@ int32_t transactionsStarted = 0;
  */
 static int32_t transmitData(uint8_t * data, int32_t length)
 {
-//	memcpy(tx_buffer,data,length);
-	memset(tx_buffer, 6, length);
-	memset(tx_buffer + length, 3, sizeof(tx_buffer) - length);
-	
+	memcpy(tx_buffer,data,length);
+	memset(tx_buffer + length, 0xfe, sizeof(tx_buffer) - length);
+//	memset(tx_buffer, 0x3d, sizeof(tx_buffer));
 	int32_t retval = 0;
 	
 	transactionsStarted++;
-	retval = PIOS_SPI_TransferBlock(pios_spi_overo_id, (uint8_t *) tx_buffer, (uint8_t *) rx_buffer, OVEROSYNC_PACKET_SIZE, &transmitDataDone);
+	retval = PIOS_SPI_TransferBlock(pios_spi_overo_id, (uint8_t *) tx_buffer, (uint8_t *) rx_buffer, sizeof(tx_buffer), &transmitDataDone);
 	
-//	for (uint32_t i = 0; rx_buffer[0] != 0 && i < OVEROSYNC_PACKET_SIZE; i++)
-//		UAVTalkProcessInputStream(uavTalkCon, rx_buffer[i]);
+	for (uint32_t i = 0; rx_buffer[0] != 0 && i < sizeof(rx_buffer) ; i++)
+		UAVTalkProcessInputStream(uavTalkCon, rx_buffer[i]);
 
 	return retval;
 }

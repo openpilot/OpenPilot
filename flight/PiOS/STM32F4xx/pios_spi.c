@@ -613,22 +613,23 @@ void PIOS_SPI_SetPrescalar(uint32_t spi_id, uint32_t prescaler)
 	spi_dev->cfg->regs->CR1 = (spi_dev->cfg->regs->CR1 & ~0x0038) | prescaler;
 }
 
-
 void PIOS_SPI_IRQ_Handler(uint32_t spi_id)
 {
 	struct pios_spi_dev * spi_dev = (struct pios_spi_dev *)spi_id;
 
 	bool valid = PIOS_SPI_validate(spi_dev);
 	PIOS_Assert(valid)
-
+	
 	// FIXME XXX Only RX channel or better clear flags for both channels?
 	DMA_ClearFlag(spi_dev->cfg->dma.rx.channel, spi_dev->cfg->dma.irq.flags);
+	
+	if(spi_dev->cfg->init.SPI_Mode == SPI_Mode_Master) {
+		/* Wait for the final bytes of the transfer to complete, including CRC byte(s). */
+		while (!(SPI_I2S_GetFlagStatus(spi_dev->cfg->regs, SPI_I2S_FLAG_TXE))) ;
 
-	/* Wait for the final bytes of the transfer to complete, including CRC byte(s). */
-	while (!(SPI_I2S_GetFlagStatus(spi_dev->cfg->regs, SPI_I2S_FLAG_TXE))) ;
-
-	/* Wait for the final bytes of the transfer to complete, including CRC byte(s). */
-	while (SPI_I2S_GetFlagStatus(spi_dev->cfg->regs, SPI_I2S_FLAG_BSY)) ;
+		/* Wait for the final bytes of the transfer to complete, including CRC byte(s). */
+		while (SPI_I2S_GetFlagStatus(spi_dev->cfg->regs, SPI_I2S_FLAG_BSY)) ;
+	}
 
 	if (spi_dev->callback != NULL) {
 		bool crc_ok = true;

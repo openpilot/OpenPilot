@@ -117,6 +117,7 @@ int32_t PIOS_SPI_Init(uint32_t * spi_id, const struct pios_spi_cfg * cfg)
 			/* only legal for single-slave config */
 			PIOS_Assert(spi_dev->cfg->slave_count == 1);
 			init_ssel = 1;
+			SPI_SSOutputCmd(spi_dev->cfg->regs, (spi_dev->cfg->init.SPI_Mode == SPI_Mode_Master) ? ENABLE : DISABLE);
 			/* FIXME: Should this also call SPI_SSOutputCmd()? */
 			break;
 			
@@ -145,11 +146,14 @@ int32_t PIOS_SPI_Init(uint32_t * spi_id, const struct pios_spi_cfg * cfg)
 	GPIO_Init(spi_dev->cfg->sclk.gpio, (GPIO_InitTypeDef*)&(spi_dev->cfg->sclk.init));
 	GPIO_Init(spi_dev->cfg->mosi.gpio, (GPIO_InitTypeDef*)&(spi_dev->cfg->mosi.init));
 	GPIO_Init(spi_dev->cfg->miso.gpio, (GPIO_InitTypeDef*)&(spi_dev->cfg->miso.init));
-	for (uint32_t i = 0; i < init_ssel; i++) {
-		/* Since we're driving the SSEL pin in software, ensure that the slave is deselected */
-		/* XXX multi-slave support - maybe have another SPI_NSS_ mode? */
-		GPIO_SetBits(spi_dev->cfg->ssel[i].gpio, spi_dev->cfg->ssel[i].init.GPIO_Pin);
-		GPIO_Init(spi_dev->cfg->ssel[i].gpio, (GPIO_InitTypeDef*)&(spi_dev->cfg->ssel[i].init));
+	
+	if(spi_dev->cfg->init.SPI_NSS != SPI_NSS_Hard) {
+		for (uint32_t i = 0; i < init_ssel; i++) {
+			/* Since we're driving the SSEL pin in software, ensure that the slave is deselected */
+			/* XXX multi-slave support - maybe have another SPI_NSS_ mode? */
+			GPIO_SetBits(spi_dev->cfg->ssel[i].gpio, spi_dev->cfg->ssel[i].init.GPIO_Pin);
+			GPIO_Init(spi_dev->cfg->ssel[i].gpio, (GPIO_InitTypeDef*)&(spi_dev->cfg->ssel[i].init));
+		}
 	}
 
 	/* Configure DMA for SPI Rx */
@@ -402,7 +406,7 @@ static int32_t SPI_DMA_TransferBlock(uint32_t spi_id, const uint8_t *send_buffer
 
 	/* Start with the default configuration for this peripheral */
 	dma_init = spi_dev->cfg->dma.rx.init;
-
+	DMA_DeInit(spi_dev->cfg->dma.rx.channel);
 	if (receive_buffer != NULL) {
 		/* Enable memory addr. increment - bytes written into receive buffer */
 		dma_init.DMA_Memory0BaseAddr = (uint32_t) receive_buffer;
@@ -427,7 +431,7 @@ static int32_t SPI_DMA_TransferBlock(uint32_t spi_id, const uint8_t *send_buffer
 
 	/* Start with the default configuration for this peripheral */
 	dma_init = spi_dev->cfg->dma.tx.init;
-
+	DMA_DeInit(spi_dev->cfg->dma.tx.channel);
 	if (send_buffer != NULL) {
 		/* Enable memory addr. increment - bytes written into receive buffer */
 		dma_init.DMA_Memory0BaseAddr = (uint32_t) send_buffer;

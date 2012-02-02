@@ -155,8 +155,7 @@ int32_t transactionsStarted = 0;
 static int32_t transmitData(uint8_t * data, int32_t length)
 {
 	memcpy(tx_buffer,data,length);
-	memset(tx_buffer + length, 0xfe, sizeof(tx_buffer) - length);
-//	memset(tx_buffer, 0x3d, sizeof(tx_buffer));
+	memset(tx_buffer + length, 0xff, sizeof(tx_buffer) - length);
 	int32_t retval = 0;
 	
 	transactionsStarted++;

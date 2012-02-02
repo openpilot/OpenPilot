@@ -23,6 +23,9 @@ win32|symbian: DEFINES += QT_DLL QWT_DLL QWT_MAKEDLL
 else {
 CONFIG += staticlib
 }
+
+unix:LIBS += -lrt
+
 HEADERS += \
     qwt.h \
     qwt_abstract_scale_draw.h \

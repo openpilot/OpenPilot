@@ -19,7 +19,7 @@
 #QWT_INSTALL_PREFIX = $$[QT_INSTALL_PREFIX]
 
 unix {
-    QWT_INSTALL_PREFIX    = /usr/local/qwt-$$QWT_VERSION
+    #QWT_INSTALL_PREFIX    = /usr/local/qwt-$$QWT_VERSION
 }
 
 win32 {

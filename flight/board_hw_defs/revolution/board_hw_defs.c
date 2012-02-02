@@ -447,7 +447,7 @@ void PIOS_SPI_flash_irq_handler(void)
  */
 void PIOS_SPI_overo_irq_handler(void);
 void DMA1_Stream0_IRQHandler(void) __attribute__((alias("PIOS_SPI_overo_irq_handler")));
-void DMA1_Stream5_IRQHandler(void) __attribute__((alias("PIOS_SPI_overo_irq_handler")));
+void DMA1_Stream7_IRQHandler(void) __attribute__((alias("PIOS_SPI_overo_irq_handler")));
 static const struct pios_spi_cfg pios_spi_overo_cfg = {
 	.regs = SPI3,
 	.remap = GPIO_AF_SPI3,
@@ -495,9 +495,9 @@ static const struct pios_spi_cfg pios_spi_overo_cfg = {
 			},
 		},
 		.tx = {
-			.channel = DMA1_Stream5,
+			.channel = DMA1_Stream7,
 			.init = {
-				.DMA_Channel            = DMA_Channel_5,
+				.DMA_Channel            = DMA_Channel_0,
 				.DMA_PeripheralBaseAddr = (uint32_t) & (SPI3->DR),
 				.DMA_DIR                = DMA_DIR_MemoryToPeripheral,
 				.DMA_PeripheralInc      = DMA_PeripheralInc_Disable,

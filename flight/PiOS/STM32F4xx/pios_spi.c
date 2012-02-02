@@ -153,14 +153,17 @@ int32_t PIOS_SPI_Init(uint32_t * spi_id, const struct pios_spi_cfg * cfg)
 	}
 
 	/* Configure DMA for SPI Rx */
+	DMA_DeInit(spi_dev->cfg->dma.rx.channel);
 	DMA_Cmd(spi_dev->cfg->dma.rx.channel, DISABLE);
 	DMA_Init(spi_dev->cfg->dma.rx.channel, (DMA_InitTypeDef*)&(spi_dev->cfg->dma.rx.init));
 
 	/* Configure DMA for SPI Tx */
+	DMA_DeInit(spi_dev->cfg->dma.tx.channel);
 	DMA_Cmd(spi_dev->cfg->dma.tx.channel, DISABLE);
 	DMA_Init(spi_dev->cfg->dma.tx.channel, (DMA_InitTypeDef*)&(spi_dev->cfg->dma.tx.init));
 
 	/* Initialize the SPI block */
+	SPI_DeInit(spi_dev->cfg->regs);
 	SPI_Init(spi_dev->cfg->regs, (SPI_InitTypeDef*)&(spi_dev->cfg->init));
 
 	/* Configure CRC calculation */
@@ -181,7 +184,7 @@ int32_t PIOS_SPI_Init(uint32_t * spi_id, const struct pios_spi_cfg * cfg)
 
 	/* Configure DMA interrupt */
 	NVIC_Init((NVIC_InitTypeDef*)&(spi_dev->cfg->dma.irq.init));
-	DMA_ITConfig(spi_dev->cfg->dma.tx.channel, spi_dev->cfg->dma.irq.flags, ENABLE);	/* XXX is this correct? */
+//	DMA_ITConfig(spi_dev->cfg->dma.tx.channel, spi_dev->cfg->dma.irq.flags, ENABLE);	/* XXX is this correct? */
 
 	return(0);
 
@@ -627,6 +630,12 @@ void PIOS_SPI_IRQ_Handler(uint32_t spi_id)
 		/* Wait for the final bytes of the transfer to complete, including CRC byte(s). */
 		while (!(SPI_I2S_GetFlagStatus(spi_dev->cfg->regs, SPI_I2S_FLAG_TXE))) ;
 
+		/* Wait for the final bytes of the transfer to complete, including CRC byte(s). */
+		while (SPI_I2S_GetFlagStatus(spi_dev->cfg->regs, SPI_I2S_FLAG_BSY)) ;
+	} else {
+		/* Wait for the final bytes of the transfer to complete, including CRC byte(s). */
+		while (!(SPI_I2S_GetFlagStatus(spi_dev->cfg->regs, SPI_I2S_FLAG_TXE))) ;
+		
 		/* Wait for the final bytes of the transfer to complete, including CRC byte(s). */
 		while (SPI_I2S_GetFlagStatus(spi_dev->cfg->regs, SPI_I2S_FLAG_BSY)) ;
 	}

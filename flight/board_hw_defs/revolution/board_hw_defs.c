@@ -466,7 +466,7 @@ static const struct pios_spi_cfg pios_spi_overo_cfg = {
 	.dma = {
 		.irq = {
 			// Note this is the stream ID that triggers interrupts (in this case RX)
-			.flags = (DMA_IT_TCIF3 | DMA_IT_TEIF3 | DMA_IT_HTIF3),
+			.flags = (DMA_IT_TCIF3 | DMA_IT_TEIF3 | DMA_IT_HTIF3 | DMA_IT_DMEIF3 | DMA_IT_FEIF3),
 			.init = {
 				.NVIC_IRQChannel = DMA1_Stream0_IRQn,
 				.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,

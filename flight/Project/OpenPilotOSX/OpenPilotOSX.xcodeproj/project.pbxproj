@@ -52,6 +52,7 @@
 		65140DFA1496927D00E01D11 /* sensors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sensors.h; sourceTree = "<group>"; };
 		65140DFB1496927D00E01D11 /* sensors.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sensors.c; sourceTree = "<group>"; };
 		65173C9F12EBFD1700D6A7CB /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = ../../../Makefile; sourceTree = SOURCE_ROOT; };
+		6517932B14DA76E200FCDAC0 /* OveroSync */ = {isa = PBXFileReference; lastKnownFileType = folder; path = OveroSync; sourceTree = "<group>"; };
 		651913371256C5240039C0A3 /* ahrs_comm_objects.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ahrs_comm_objects.c; sourceTree = "<group>"; };
 		651913381256C5240039C0A3 /* ahrs_spi_comm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ahrs_spi_comm.c; sourceTree = "<group>"; };
 		6519133A1256C52B0039C0A3 /* ahrs_comm_objects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs_comm_objects.h; sourceTree = "<group>"; };
@@ -3401,6 +3402,7 @@
 				650D8E5112DFE16400D05CC9 /* ManualControl */,
 				650D8E5512DFE16400D05CC9 /* MK */,
 				650D8E5A12DFE16400D05CC9 /* Osd */,
+				6517932B14DA76E200FCDAC0 /* OveroSync */,
 				65140DF81496927D00E01D11 /* Sensors */,
 				650D8E5D12DFE16400D05CC9 /* Stabilization */,
 				650D8E6112DFE16400D05CC9 /* System */,

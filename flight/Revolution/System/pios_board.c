@@ -278,6 +278,13 @@ void PIOS_Board_Init(void) {
 #endif
 	PIOS_FLASHFS_Init(&flashfs_m25p_cfg);
 	
+#if defined(PIOS_OVERO_SPI)
+	/* Set up the SPI interface to the gyro */
+	if (PIOS_SPI_Init(&pios_spi_overo_id, &pios_spi_overo_cfg)) {
+		PIOS_DEBUG_Assert(0);
+	}
+#endif
+
 	/* Initialize UAVObject libraries */
 	EventDispatcherInitialize();
 	UAVObjInitialize();

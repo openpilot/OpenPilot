@@ -70,7 +70,7 @@
 #define PIOS_INCLUDE_COM_TELEM
 //#define PIOS_INCLUDE_COM_AUX
 #define PIOS_INCLUDE_GPS
-
+#define PIOS_OVERO_SPI
 /* Supported receiver interfaces */
 #define PIOS_INCLUDE_RCVR
 #define PIOS_INCLUDE_DSM

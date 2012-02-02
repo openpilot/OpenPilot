@@ -395,7 +395,19 @@ static int32_t SPI_DMA_TransferBlock(uint32_t spi_id, const uint8_t *send_buffer
 	while(DMA_GetCmdStatus(spi_dev->cfg->dma.tx.channel) == ENABLE);
 
 	/* Disable the SPI peripheral */
+	/* Initialize the SPI block */
+	SPI_DeInit(spi_dev->cfg->regs);
+	SPI_Init(spi_dev->cfg->regs, (SPI_InitTypeDef*)&(spi_dev->cfg->init));
 	SPI_Cmd(spi_dev->cfg->regs, DISABLE);
+	/* Configure CRC calculation */
+	if (spi_dev->cfg->use_crc) {
+		SPI_CalculateCRC(spi_dev->cfg->regs, ENABLE);
+	} else {
+		SPI_CalculateCRC(spi_dev->cfg->regs, DISABLE);
+	}
+	
+	/* Enable SPI interrupts to DMA */
+	SPI_I2S_DMACmd(spi_dev->cfg->regs, SPI_I2S_DMAReq_Tx | SPI_I2S_DMAReq_Rx, ENABLE);
 
 	/* Set callback function */
 	spi_dev->callback = callback;

@@ -1,3 +1,4 @@
+/* -*- Mode: c; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: t -*- */
 /**
  ******************************************************************************
  * @addtogroup PIOS PIOS Core hardware abstraction layer
@@ -39,22 +40,97 @@ static GCSReceiverData gcsreceiverdata;
 
 /* Provide a RCVR driver */
 static int32_t PIOS_GCSRCVR_Get(uint32_t rcvr_id, uint8_t channel);
+static void PIOS_gcsrcvr_Supervisor(uint32_t ppm_id);
 
 const struct pios_rcvr_driver pios_gcsrcvr_rcvr_driver = {
 	.read = PIOS_GCSRCVR_Get,
 };
 
+/* Local Variables */
+enum pios_gcsrcvr_dev_magic {
+	PIOS_GCSRCVR_DEV_MAGIC = 0xe9da5c56,
+};
+
+struct pios_gcsrcvr_dev {
+	enum pios_gcsrcvr_dev_magic magic;
+
+	uint8_t supv_timer;
+	bool Fresh;
+};
+
+static struct pios_gcsrcvr_dev *global_gcsrcvr_dev;
+
+static bool PIOS_gcsrcvr_validate(struct pios_gcsrcvr_dev *gcsrcvr_dev)
+{
+	return (gcsrcvr_dev->magic == PIOS_GCSRCVR_DEV_MAGIC);
+}
+
+#if defined(PIOS_INCLUDE_FREERTOS)
+static struct pios_gcsrcvr_dev *PIOS_gcsrcvr_alloc(void)
+{
+	struct pios_gcsrcvr_dev * gcsrcvr_dev;
+
+	gcsrcvr_dev = (struct pios_gcsrcvr_dev *)pvPortMalloc(sizeof(*gcsrcvr_dev));
+	if (!gcsrcvr_dev) return(NULL);
+
+	gcsrcvr_dev->magic = PIOS_GCSRCVR_DEV_MAGIC;
+	gcsrcvr_dev->Fresh = FALSE;
+	gcsrcvr_dev->supv_timer = 0;
+
+	/* The update callback cannot receive the device pointer, so set it in a global */
+	global_gcsrcvr_dev = gcsrcvr_dev;
+
+	return(gcsrcvr_dev);
+}
+#else
+static struct pios_gcsrcvr_dev pios_gcsrcvr_devs[PIOS_GCSRCVR_MAX_DEVS];
+static uint8_t pios_gcsrcvr_num_devs;
+static struct pios_gcsrcvr_dev *PIOS_gcsrcvr_alloc(void)
+{
+	struct pios_gcsrcvr_dev *gcsrcvr_dev;
+
+	if (pios_gcsrcvr_num_devs >= PIOS_GCSRCVR_MAX_DEVS) {
+		return (NULL);
+	}
+
+	gcsrcvr_dev = &pios_gcsrcvr_devs[pios_gcsrcvr_num_devs++];
+	gcsrcvr_dev->magic = PIOS_GCSRCVR_DEV_MAGIC;
+	gcsrcvr_dev->Fresh = FALSE;
+	gcsrcvr_dev->supv_timer = 0;
+
+	global_gcsrcvr_dev = gcsrcvr_dev;
+
+	return (gcsrcvr_dev);
+}
+#endif
+
 static void gcsreceiver_updated(UAVObjEvent * ev)
 {
+	struct pios_gcsrcvr_dev *gcsrcvr_dev = global_gcsrcvr_dev;
 	if (ev->obj == GCSReceiverHandle()) {
 		GCSReceiverGet(&gcsreceiverdata);
+		gcsrcvr_dev->Fresh = TRUE;
 	}
 }
 
-void PIOS_GCSRCVR_Init(void)
+extern int32_t PIOS_GCSRCVR_Init(uint32_t *gcsrcvr_id)
 {
+	struct pios_gcsrcvr_dev *gcsrcvr_dev;
+
+	/* Allocate the device structure */
+	gcsrcvr_dev = (struct pios_gcsrcvr_dev *)PIOS_gcsrcvr_alloc();
+	if (!gcsrcvr_dev)
+		return -1;
+
 	/* Register uavobj callback */
 	GCSReceiverConnectCallback (gcsreceiver_updated);
+
+	/* Register the failsafe timer callback. */
+	if (!PIOS_RTC_RegisterTickCallback(PIOS_gcsrcvr_Supervisor, (uint32_t)gcsrcvr_dev)) {
+		PIOS_DEBUG_Assert(0);
+	}
+
+	return 0;
 }
 
 static int32_t PIOS_GCSRCVR_Get(uint32_t rcvr_id, uint8_t channel)
@@ -65,6 +141,31 @@ static int32_t PIOS_GCSRCVR_Get(uint32_t rcvr_id, uint8_t channel)
 	}
 
 	return (gcsreceiverdata.Channel[channel]);
+}
+
+static void PIOS_gcsrcvr_Supervisor(uint32_t gcsrcvr_id) {
+	/* Recover our device context */
+	struct pios_gcsrcvr_dev * gcsrcvr_dev = (struct pios_gcsrcvr_dev *)gcsrcvr_id;
+
+	if (!PIOS_gcsrcvr_validate(gcsrcvr_dev)) {
+		/* Invalid device specified */
+		return;
+	}
+
+	/* 
+	 * RTC runs at 625Hz so divide down the base rate so
+	 * that this loop runs at 25Hz.
+	 */
+	if(++(gcsrcvr_dev->supv_timer) < 25) {
+		return;
+	}
+	gcsrcvr_dev->supv_timer = 0;
+
+	if (!gcsrcvr_dev->Fresh)
+		for (int32_t i = 0; i < GCSRECEIVER_CHANNEL_NUMELEM; i++)
+			gcsreceiverdata.Channel[i] = PIOS_RCVR_TIMEOUT;
+
+	gcsrcvr_dev->Fresh = FALSE;
 }
 
 #endif	/* PIOS_INCLUDE_GCSRCVR */

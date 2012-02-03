@@ -203,10 +203,9 @@ arm_sdk_clean:
 OPENOCD_DIR := $(TOOLS_DIR)/openocd
 
 .PHONY: openocd_install
+openocd_install: | $(DL_DIR) $(TOOLS_DIR)
 openocd_install: OPENOCD_URL  := http://sourceforge.net/projects/openocd/files/openocd/0.5.0/openocd-0.5.0.tar.bz2/download
 openocd_install: OPENOCD_FILE := openocd-0.5.0.tar.bz2
-# order-only prereq on directory existance:
-openocd_install: | $(DL_DIR) $(TOOLS_DIR)
 openocd_install: openocd_clean
         # download the source only if it's newer than what we already have
 	$(V1) wget -N -P "$(DL_DIR)" --trust-server-name "$(OPENOCD_URL)"
@@ -221,6 +220,44 @@ openocd_install: openocd_clean
 	$(V1) ( \
 	  cd $(DL_DIR)/openocd-build/openocd-0.5.0 ; \
 	  ./configure --prefix="$(OPENOCD_DIR)" --enable-ft2232_libftdi --enable-buspirate; \
+	  $(MAKE) --silent ; \
+	  $(MAKE) --silent install ; \
+	)
+
+        # delete the extracted source when we're done
+	$(V1) [ ! -d "$(DL_DIR)/openocd-build" ] || $(RM) -rf "$(DL_DIR)/openocd-build"
+
+.PHONY: openocd_git_install
+
+openocd_git_install: | $(DL_DIR) $(TOOLS_DIR)
+openocd_git_install: OPENOCD_URL  := git://openocd.git.sourceforge.net/gitroot/openocd/openocd
+openocd_git_install: OPENOCD_REV  := bce7009e31b23250d4325637c7b7cdbae0efed9a
+openocd_git_install: openocd_clean
+        # download the source
+	$(V0) @echo " DOWNLOAD     $(OPENOCD_URL) @ $(OPENOCD_REV)"
+	$(V1) [ ! -d "$(DL_DIR)/openocd-build" ] || $(RM) -rf "$(DL_DIR)/openocd-build"
+	$(V1) mkdir -p "$(DL_DIR)/openocd-build"
+	$(V1) git clone --depth 1 --no-checkout $(OPENOCD_URL) "$(DL_DIR)/openocd-build"
+	$(V1) ( \
+	  cd $(DL_DIR)/openocd-build ; \
+	  git checkout -q $(OPENOCD_REV) ; \
+	)
+
+        # apply patches
+	$(V0) @echo " PATCH        $(OPENOCD_DIR)"
+	$(V1) ( \
+	  cd $(DL_DIR)/openocd-build ; \
+	  git apply < $(ROOT_DIR)/flight/Project/OpenOCD/0001-armv7m-remove-dummy-FP-regs-for-new-gdb.patch ; \
+	  git apply < $(ROOT_DIR)/flight/Project/OpenOCD/0002-rtos-add-stm32_stlink-to-FreeRTOS-targets.patch ; \
+	)
+
+        # build and install
+	$(V0) @echo " BUILD        $(OPENOCD_DIR)"
+	$(V1) mkdir -p "$(OPENOCD_DIR)"
+	$(V1) ( \
+	  cd $(DL_DIR)/openocd-build ; \
+	  ./bootstrap ; \
+	  ./configure --enable-maintainer-mode --prefix="$(OPENOCD_DIR)" --enable-ft2232_libftdi --enable-buspirate --enable-stlink ; \
 	  $(MAKE) ; \
 	  $(MAKE) install ; \
 	)
@@ -230,6 +267,7 @@ openocd_install: openocd_clean
 
 .PHONY: openocd_clean
 openocd_clean:
+	$(V0) @echo " CLEAN        $(OPENOCD_DIR)"
 	$(V1) [ ! -d "$(OPENOCD_DIR)" ] || $(RM) -r "$(OPENOCD_DIR)"
 
 STM32FLASH_DIR := $(TOOLS_DIR)/stm32flash

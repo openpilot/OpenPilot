@@ -49,6 +49,12 @@ class ConfigTaskWidget: public QWidget
     Q_OBJECT
 
 public:
+    struct shadow
+    {
+        QWidget * widget;
+        float scale;
+        bool isLimited;
+    };
     struct objectToWidget
     {
         UAVObject * object;
@@ -57,15 +63,7 @@ public:
         int index;
         float scale;
         bool isLimited;
-        QList<QWidget *> shadows;
-    };
-
-    struct shadows
-    {
-        QWidget * widget;
-        float scale;
-        bool isLimited;
-        QWidget * parent;
+        QList<shadow *> shadowsList;
     };
 
     enum buttonTypeEnum {none,save_button,apply_button,reload_button,default_button};
@@ -83,29 +81,36 @@ public:
 
     ConfigTaskWidget(QWidget *parent = 0);
     ~ConfigTaskWidget();
+
     void saveObjectToSD(UAVObject *obj);
     UAVObjectManager* getObjectManager();
     static double listMean(QList<double> list);
+
     void addUAVObject(QString objectName);
     void addWidget(QWidget * widget);
+
     void addUAVObjectToWidgetRelation(QString object,QString field,QWidget * widget,int index=0,float scale=1,bool isLimited=false,QList<int>* defaultReloadGroups=0);
     void addUAVObjectToWidgetRelation(QString object,QString field,QWidget * widget,QString element,float scale,bool isLimited=false,QList<int>* defaultReloadGroups=0);
+void addUAVObjectToWidgetRelation(QString object, QString field, QWidget *widget, QString index);
 
+    //BUTTONS//
     void addApplySaveButtons(QPushButton * update,QPushButton * save);
-
-
     void addReloadButton(QPushButton * button,int buttonGroup);
     void addDefaultButton(QPushButton * button,int buttonGroup);
+    //////////
+
     void addWidgetToDefaultReloadGroups(QWidget * widget, QList<int> *groups);
+
     bool addShadowWidget(QWidget * masterWidget, QWidget * shadowWidget,float shadowScale=1,bool shadowIsLimited=false);
-    bool addShadowWidget(QString object,QString field,QWidget * widget,int index=0,float scale=1,bool isLimited=false);
+    bool addShadowWidget(QString object,QString field,QWidget * widget,int index=0,float scale=1,bool isLimited=false, QList<int> *defaultReloadGroups=NULL);
 
     void autoLoadWidgets();
 
     bool isDirty();
     void setDirty(bool value);
-    void addUAVObjectToWidgetRelation(QString object, QString field, QWidget *widget, QString index);
+
     bool allObjectsUpdated();
+
 
 public slots:
     void onAutopilotDisconnect();
@@ -117,8 +122,6 @@ signals:
     void objectAdded(UAVObject*);
     void objectRemoved(UAVObject*);
 private slots:
-    virtual void refreshValues();
-    virtual void updateObjectsFromWidgets();
     void objectUpdated(UAVObject*);
     void defaultButtonClicked();
     void reloadButtonClicked();
@@ -131,10 +134,12 @@ private:
     smartSaveButton *smartsave;
     QMap<UAVObject *,bool> objectUpdates;
     QMap<int,QList<objectToWidget*> *> defaultReloadGroups;
-    QList <shadows*> shadowsList;
+    QMap<QWidget *,objectToWidget*> shadowsList;
     bool dirty;
     bool setFieldFromWidget(QWidget *widget, UAVObjectField *field, int index, float scale);
     bool setWidgetFromField(QWidget *widget, UAVObjectField *field, int index, float scale);
+    QVariant getVariantFromWidget(QWidget *widget, float scale);
+    bool setWidgetFromVariant(QWidget *widget,QVariant value,float scale);
     void connectWidgetUpdatesToSlot(QWidget *widget, const char *function);
 protected slots:
     virtual void disableObjUpdates();
@@ -143,6 +148,7 @@ protected slots:
     virtual void widgetsContentsChanged();
     virtual void populateWidgets();
     virtual void refreshWidgetsValues();
+    virtual void updateObjectsFromWidgets();
 protected:
     virtual void enableControls(bool enable);
 

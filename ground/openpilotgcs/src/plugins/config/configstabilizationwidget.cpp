@@ -48,6 +48,7 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     addDefaultButton(m_stabilization->defaultButton,0);
     addReloadButton(m_stabilization->reloadButton,0);
     addWidgetToDefaultReloadGroups(m_stabilization->rateRollKp,rateGroup);
+    addShadowWidget("StabilizationSettings","RollRatePID",m_stabilization->rateRollKi,0,1,false,rateGroup);
 }
 
 

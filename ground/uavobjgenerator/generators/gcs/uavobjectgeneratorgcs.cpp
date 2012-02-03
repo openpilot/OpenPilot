@@ -131,19 +131,21 @@ bool UAVObjectGeneratorGCS::process_object(ObjectInfo* info)
                               .arg(varOptionName)
                               .arg(options[m]) );
             }
-            finit.append( QString("    fields.append( new UAVObjectField(QString(\"%1\"), QString(\"%2\"), UAVObjectField::ENUM, %3, %4) );\n")
+            finit.append( QString("    fields.append( new UAVObjectField(QString(\"%1\"), QString(\"%2\"), UAVObjectField::ENUM, %3, %4, QString(\"%5\")));\n")
                           .arg(info->fields[n]->name)
                           .arg(info->fields[n]->units)
                           .arg(varElemName)
-                          .arg(varOptionName) );
+                          .arg(varOptionName)
+                          .arg(info->fields[n]->limitValues));
         }
         // For all other types
         else {
-            finit.append( QString("    fields.append( new UAVObjectField(QString(\"%1\"), QString(\"%2\"), UAVObjectField::%3, %4, QStringList()) );\n")
+            finit.append( QString("    fields.append( new UAVObjectField(QString(\"%1\"), QString(\"%2\"), UAVObjectField::%3, %4, QStringList(), QString(\"%5\")));\n")
                           .arg(info->fields[n]->name)
                           .arg(info->fields[n]->units)
                           .arg(fieldTypeStrCPPClass[info->fields[n]->type])
-                          .arg(varElemName) );
+                          .arg(varElemName)
+                          .arg(info->fields[n]->limitValues));
         }
     }
     outCode.replace(QString("$(FIELDSINIT)"), finit);

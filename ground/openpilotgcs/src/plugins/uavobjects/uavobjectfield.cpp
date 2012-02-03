@@ -29,7 +29,7 @@
 #include <QtEndian>
 #include <QDebug>
 
-UAVObjectField::UAVObjectField(const QString& name, const QString& units, FieldType type, quint32 numElements, const QStringList& options)
+UAVObjectField::UAVObjectField(const QString& name, const QString& units, FieldType type, quint32 numElements, const QStringList& options, const QString &limits)
 {
     QStringList elementNames;
     // Set element names
@@ -38,16 +38,16 @@ UAVObjectField::UAVObjectField(const QString& name, const QString& units, FieldT
         elementNames.append(QString("%1").arg(n));
     }
     // Initialize
-    constructorInitialize(name, units, type, elementNames, options);
+    constructorInitialize(name, units, type, elementNames, options,limits);
 
 }
 
-UAVObjectField::UAVObjectField(const QString& name, const QString& units, FieldType type, const QStringList& elementNames, const QStringList& options)
+UAVObjectField::UAVObjectField(const QString& name, const QString& units, FieldType type, const QStringList& elementNames, const QStringList& options, const QString &limits)
 {
-    constructorInitialize(name, units, type, elementNames, options);
+    constructorInitialize(name, units, type, elementNames, options,limits);
 }
 
-void UAVObjectField::constructorInitialize(const QString& name, const QString& units, FieldType type, const QStringList& elementNames, const QStringList& options)
+void UAVObjectField::constructorInitialize(const QString& name, const QString& units, FieldType type, const QStringList& elementNames, const QStringList& options,QString &limits)
 {
     // Copy params
     this->name = name;
@@ -91,6 +91,43 @@ void UAVObjectField::constructorInitialize(const QString& name, const QString& u
             break;
         default:
             numBytesPerElement = 0;
+    }
+}
+
+void UAVObjectField::limitsInitialize(QString &limits)
+{
+    /// format
+    /// (TY)->type (EQ-equal;NE-not equal;BE-between;BI-bigger;SM-smaller)
+    /// (VALX)->value
+    /// %TY:VAL1:VAL2:VAL3,%TY,VAL1,VAL2,VAL3
+    /// example: first element bigger than 3 and second element inside [2.3,5]
+    /// "%0BI:3,%1BE:2.3:5"
+    QStringList stringPerElement=limits.split(",");
+    foreach (QString str, stringPerElement) {
+        QStringList valuesPerElement=str.split(":");
+        LimitStruct lstruc;
+        quint32 index=valuesPerElement.at(0).mid(1,valuesPerElement.at(0).length()-3).toULong();
+        if(valuesPerElement.at(0).startsWith("%") && index<numElements)
+        {
+            if(valuesPerElement.at(0).right(2)=="EQ")
+                lstruc.type=EQUAL;
+            else if(valuesPerElement.at(0).right(2)=="NE")
+                lstruc.type=NOT_EQUAL;
+            else if(valuesPerElement.at(0).right(2)=="BE")
+                lstruc.type=BETWEEN;
+            else if(valuesPerElement.at(0).right(2)=="BI")
+                lstruc.type=BIGGER;
+            else if(valuesPerElement.at(0).right(2)=="SM")
+                lstruc.type=SMALLER;
+            else
+                qDebug()<<"limits parsing failed on UAVObjectField"<<name;
+            valuesPerElement.removeAt(0);
+            foreach(QString value,valuesPerElement)
+            {
+                lstruc.values.append(value);
+            }
+            elementLimits.insert(index,lstruc);
+        }
     }
 }
 

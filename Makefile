@@ -491,16 +491,41 @@ bu_$(1)_clean:
 endef
 
 # $(1) = Canonical board name all in lower case (e.g. coptercontrol)
+define EF_TEMPLATE
+.PHONY: ef_$(1)
+EF_$(1)_IMAGE_NAME := $(BUILD_DIR)/ef_$(1)/ef_$(1).bin
+ef_$(1): $(BUILD_DIR)/ef_$(1)/ef_$(1).bin
+
+
+$$(EF_$(1)_IMAGE_NAME): bl_$(1)_bin fw_$(1)_bin
+	$(V0) @echo " FLASH IMG  $$@"
+	$(V1) mkdir -p $(BUILD_DIR)/ef_$(1)
+	$(V1) cat $(BUILD_DIR)/bl_$(1)/bl_$(1).bin $(BUILD_DIR)/fw_$(1)/fw_$(1).bin > $$(EF_$(1)_IMAGE_NAME)
+
+.PHONY: ef_$(1)_dfu
+ef_$(1)_dfu: $$(EF_$(1)_IMAGE_NAME)
+	$(V0) @echo " DFU RESCUE $$@"
+	$(V1) sudo $(DFUUTIL_DIR)/bin/dfu-util -l && sudo $(DFUUTIL_DIR)/bin/dfu-util -d 0483:df11 -c 1 -i 0 -a 0 -D $$< -s 0x08000000
+
+.PHONY: ef_$(1)_clean
+ef_$(1)_clean:
+	$(V0) @echo " CLEAN      $$@"
+	$(V1) $(RM) -fr $(BUILD_DIR)/ef_$(1)
+endef
+
+# $(1) = Canonical board name all in lower case (e.g. coptercontrol)
 define BOARD_PHONY_TEMPLATE
 .PHONY: all_$(1)
 all_$(1): $$(filter fw_$(1), $$(FW_TARGETS))
 all_$(1): $$(filter bl_$(1), $$(BL_TARGETS))
 all_$(1): $$(filter bu_$(1), $$(BU_TARGETS))
+all_$(1): $$(filter ef_$(1), $$(EF_TARGETS))
 
 .PHONY: all_$(1)_clean
 all_$(1)_clean: $$(addsuffix _clean, $$(filter fw_$(1), $$(FW_TARGETS)))
 all_$(1)_clean: $$(addsuffix _clean, $$(filter bl_$(1), $$(BL_TARGETS)))
 all_$(1)_clean: $$(addsuffix _clean, $$(filter bu_$(1), $$(BU_TARGETS)))
+all_$(1)_clean: $$(addsuffix _clean, $$(filter ef_$(1), $$(EF_TARGETS)))
 endef
 
 ALL_BOARDS := coptercontrol pipxtreme revolution
@@ -514,6 +539,7 @@ revolution_friendly    := Revolution
 FW_BOARDS  := $(ALL_BOARDS)
 BL_BOARDS  := $(ALL_BOARDS)
 BU_BOARDS  := $(ALL_BOARDS)
+EF_BOARDS  := $(ALL_BOARDS)
 
 # FIXME: The INS build doesn't have a bootloader or bootloader
 #        updater yet so we need to filter them out to prevent errors.
@@ -524,6 +550,7 @@ BU_BOARDS  := $(filter-out ins, $(ALL_BOARDS))
 FW_TARGETS := $(addprefix fw_, $(FW_BOARDS))
 BL_TARGETS := $(addprefix bl_, $(BL_BOARDS))
 BU_TARGETS := $(addprefix bu_, $(BU_BOARDS))
+EF_TARGETS := $(addprefix ef_, $(EF_BOARDS))
 
 .PHONY: all_fw all_fw_clean
 all_fw:        $(addsuffix _opfw,  $(FW_TARGETS))
@@ -537,9 +564,13 @@ all_bl_clean:  $(addsuffix _clean, $(BL_TARGETS))
 all_bu:        $(addsuffix _opfw,  $(BU_TARGETS))
 all_bu_clean:  $(addsuffix _clean, $(BU_TARGETS))
 
+.PHONY: all_ef all_ef_clean
+all_ef:        $(EF_TARGETS))
+all_ef_clean:  $(addsuffix _clean, $(EF_TARGETS))
+
 .PHONY: all_flight all_flight_clean
-all_flight:       all_fw all_bl all_bu
-all_flight_clean: all_fw_clean all_bl_clean all_bu_clean
+all_flight:       all_fw all_bl all_bu all_ef
+all_flight_clean: all_fw_clean all_bl_clean all_bu_clean all_ef_clean
 
 # Expand the groups of targets for each board
 $(foreach board, $(ALL_BOARDS), $(eval $(call BOARD_PHONY_TEMPLATE,$(board))))
@@ -552,6 +583,9 @@ $(foreach board, $(ALL_BOARDS), $(eval $(call FW_TEMPLATE,$(board),$($(board)_fr
 
 # Expand the bootloader rules
 $(foreach board, $(ALL_BOARDS), $(eval $(call BL_TEMPLATE,$(board),$($(board)_friendly))))
+
+# Expand the entire-flash rules
+$(foreach board, $(ALL_BOARDS), $(eval $(call EF_TEMPLATE,$(board),$($(board)_friendly))))
 
 .PHONY: sim_posix
 sim_posix: sim_posix_elf

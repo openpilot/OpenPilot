@@ -1,4 +1,3 @@
-/* -*- Mode: c; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: t -*- */
 /**
  ******************************************************************************
  * @addtogroup PIOS PIOS Core hardware abstraction layer

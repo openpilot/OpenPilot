@@ -459,9 +459,9 @@ static int32_t updateSensorsCC3D(AccelsData * accelsData, GyrosData * gyrosData)
 	
 	float accels[3] = {(float) -accel_accum[1] / accel_samples, (float) -accel_accum[0] / accel_samples, -(float) accel_accum[2] / accel_samples};
 	
-	accelsData->x = accels[0] * accel_scaling - accelbias[0];
-	accelsData->y = accels[1] * accel_scaling - accelbias[1];
-	accelsData->z = accels[2] * accel_scaling - accelbias[2];
+	accelsData->x = (accels[0] - accelbias[0]) * accel_scaling;
+	accelsData->y = (accels[1] - accelbias[1]) * accel_scaling;
+	accelsData->z = (accels[2] - accelbias[2]) * accel_scaling;
 	
 	lastSysTime = xTaskGetTickCount();
 	

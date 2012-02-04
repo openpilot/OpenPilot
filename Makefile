@@ -493,19 +493,16 @@ endef
 # $(1) = Canonical board name all in lower case (e.g. coptercontrol)
 define EF_TEMPLATE
 .PHONY: ef_$(1)
-EF_$(1)_IMAGE_NAME := $(BUILD_DIR)/ef_$(1)/ef_$(1).bin
-ef_$(1): $(BUILD_DIR)/ef_$(1)/ef_$(1).bin
+ef_$(1): ef_$(1)_bin
 
-
-$$(EF_$(1)_IMAGE_NAME): bl_$(1)_bin fw_$(1)_bin
-	$(V0) @echo " FLASH IMG  $$@"
-	$(V1) mkdir -p $(BUILD_DIR)/ef_$(1)
-	$(V1) cat $(BUILD_DIR)/bl_$(1)/bl_$(1).bin $(BUILD_DIR)/fw_$(1)/fw_$(1).bin > $$(EF_$(1)_IMAGE_NAME)
-
-.PHONY: ef_$(1)_dfu
-ef_$(1)_dfu: $$(EF_$(1)_IMAGE_NAME)
-	$(V0) @echo " DFU RESCUE $$@"
-	$(V1) sudo $(DFUUTIL_DIR)/bin/dfu-util -l && sudo $(DFUUTIL_DIR)/bin/dfu-util -d 0483:df11 -c 1 -i 0 -a 0 -D $$< -s 0x08000000
+ef_$(1)_%: bl_$(1)_bin fw_$(1)_bin
+	$(V1) mkdir -p $(BUILD_DIR)/ef_$(1)/dep
+	$(V1) cd $(ROOT_DIR)/flight/EntireFlash && \
+		$$(MAKE) -r --no-print-directory \
+		BOARD_NAME=$(1) \
+		TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
+		DFU_CMD="$(DFUUTIL_DIR)/bin/dfu-util" \
+		$$*
 
 .PHONY: ef_$(1)_clean
 ef_$(1)_clean:

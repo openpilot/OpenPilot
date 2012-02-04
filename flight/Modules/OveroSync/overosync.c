@@ -43,18 +43,37 @@
 
 // Private variables
 static xQueueHandle queue;
-static xSemaphoreHandle lock;
 static UAVTalkConnection uavTalkCon;
 static xTaskHandle overoSyncTaskHandle;
 
 // Private functions
 static void overoSyncTask(void *parameters);
-static int32_t transmitData(uint8_t * data, int32_t length);
+static int32_t packData(uint8_t * data, int32_t length);
+static int32_t transmitData();
 static void transmitDataDone(bool crc_ok, uint8_t crc_val);
 static void registerObject(UAVObjHandle obj);
 
 // External variables
 extern int32_t pios_spi_overo_id;
+
+struct dma_transaction {
+	uint8_t tx_buffer[OVEROSYNC_PACKET_SIZE] __attribute__ ((aligned(4)));
+	uint8_t rx_buffer[OVEROSYNC_PACKET_SIZE] __attribute__ ((aligned(4)));
+};
+
+struct overosync {
+	struct dma_transaction transactions[2];
+	uint32_t active_transaction_id;
+	uint32_t loading_transaction_id;
+	xSemaphoreHandle transaction_lock;
+	xSemaphoreHandle buffer_lock;
+	uint32_t write_pointer;
+	uint32_t sent_objects;
+	uint32_t failed_objects;
+	uint32_t received_objects;
+};
+
+struct overosync *overosync;
 
 /**
  * Initialise the telemetry module
@@ -66,11 +85,8 @@ int32_t OveroSyncInitialize(void)
 	// Create object queues
 	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
 
-	// Create the semaphore for sending data
-	lock = xSemaphoreCreateMutex();
-
 	// Initialise UAVTalk
-	uavTalkCon = UAVTalkInitialize(&transmitData);
+	uavTalkCon = UAVTalkInitialize(&packData);
 
 	return 0;
 }
@@ -82,6 +98,21 @@ int32_t OveroSyncInitialize(void)
  */
 int32_t OveroSyncStart(void)
 {
+	overosync = (struct overosync *) pvPortMalloc(sizeof(overosync));
+	if(overosync == NULL)
+		return -1;
+
+	overosync->transaction_lock = xSemaphoreCreateMutex();
+	if(overosync->transaction_lock == NULL)
+		return -1;
+
+	overosync->buffer_lock = xSemaphoreCreateMutex();
+	if(overosync->buffer_lock == NULL)
+		return -1;
+
+	overosync->active_transaction_id = 0;
+	overosync->loading_transaction_id = 0;
+
 	// Process all registered objects and connect queue for updates
 	UAVObjIterate(&registerObject);
 	
@@ -89,7 +120,7 @@ int32_t OveroSyncStart(void)
 	if(pios_spi_overo_id != 0)
 		xTaskCreate(overoSyncTask, (signed char *)"OveroSync", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &overoSyncTaskHandle);
 	
-	// TaskMonitorAdd(TASKINFO_RUNNING_TELEMETRYRX, telemetryRxTaskHandle);
+	TaskMonitorAdd(TASKINFO_RUNNING_OVEROSYNC, overoSyncTaskHandle);
 	
 	return 0;
 }
@@ -115,33 +146,46 @@ static void registerObject(UAVObjHandle obj)
 int32_t overosync_transfers = 0;
 /**
  * Telemetry transmit task, regular priority
+ *
+ * Logic: We need to double buffer the DMA transfers.  Pack the buffer until either
+ * 1) it is full (and then we should record the number of missed events then)
+ * 2) the current transaction is done (we should immediately schedule since we are slave)
+ * when done packing the buffer we should call PIOS_SPI_TransferBlock, change the active buffer
+ * and then take the semaphrore
  */
 static void overoSyncTask(void *parameters)
 {
 	UAVObjEvent ev;
 
+	// Kick off SPI transfers (once one is completed another will automatically transmit)
+	transmitData();
+
 	// Loop forever
 	while (1) {
 		// Wait for queue message
 		if (xQueueReceive(queue, &ev, portMAX_DELAY) == pdTRUE) {
-			// Lock
-			xSemaphoreTake(lock, portMAX_DELAY);
-
-			// Process event
+			// Process event.  This calls transmitData
 			UAVTalkSendObject(uavTalkCon, ev.obj, ev.instId, false, 0);
 			overosync_transfers++;
 		}
 	}
 }
 
-uint8_t tx_buffer[OVEROSYNC_PACKET_SIZE] __attribute__ ((aligned(4)));
-uint8_t rx_buffer[OVEROSYNC_PACKET_SIZE] __attribute__ ((aligned(4)));
-
 int32_t transactionsDone = 0;
 static void transmitDataDone(bool crc_ok, uint8_t crc_val)
 {
+	uint8_t *rx_buffer;
 	transactionsDone ++;
-	xSemaphoreGive(lock);
+	rx_buffer = overosync->transactions[overosync->active_transaction_id].rx_buffer;
+
+	// Release the semaphore and start another transaction (which grabs semaphore again but then
+	// returns instantly)
+	xSemaphoreGive(overosync->transaction_lock);
+	transmitData();
+
+	// Parse the data from overo
+	for (uint32_t i = 0; rx_buffer[0] != 0 && i < sizeof(rx_buffer) ; i++)
+		UAVTalkProcessInputStream(uavTalkCon, rx_buffer[i]);
 }
 
 int32_t transactionsStarted = 0;
@@ -152,21 +196,60 @@ int32_t transactionsStarted = 0;
  * \return -1 on failure
  * \return number of bytes transmitted on success
  */
-static int32_t transmitData(uint8_t * data, int32_t length)
+static int32_t packData(uint8_t * data, int32_t length)
 {
-	memcpy(tx_buffer,data,length);
-	memset(tx_buffer + length, 0xff, sizeof(tx_buffer) - length);
-	int32_t retval = 0;
-	
-	transactionsStarted++;
-	retval = PIOS_SPI_TransferBlock(pios_spi_overo_id, (uint8_t *) tx_buffer, (uint8_t *) rx_buffer, sizeof(tx_buffer), &transmitDataDone);
-	
-	for (uint32_t i = 0; rx_buffer[0] != 0 && i < sizeof(rx_buffer) ; i++)
-		UAVTalkProcessInputStream(uavTalkCon, rx_buffer[i]);
+	uint8_t *tx_buffer;
 
-	return retval;
+	// Get the lock for manipulating the buffer
+	xSemaphoreTake(overosync->buffer_lock, portMAX_DELAY);
+	
+	// Check this packet will fit
+	if ((overosync->write_pointer + length) > sizeof(overosync->transactions[overosync->loading_transaction_id].tx_buffer)) {
+		overosync->failed_objects ++;
+		xSemaphoreGive(overosync->buffer_lock);
+		return -1;
+	}
+	
+	// Get offset into buffer and copy contents
+	tx_buffer = overosync->transactions[overosync->loading_transaction_id].tx_buffer +
+		overosync->write_pointer;
+	memcpy(tx_buffer,data,length);
+	overosync->write_pointer += length;
+	
+	overosync->sent_objects++;
+
+	xSemaphoreGive(overosync->buffer_lock);
+	
+	return length;
 }
 
+static int32_t transmitData()
+{
+	uint8_t *tx_buffer, *rx_buffer;
+
+	// Get lock to manipulate buffers
+	xSemaphoreTake(overosync->buffer_lock, portMAX_DELAY);
+
+	// Swap buffers
+	overosync->active_transaction_id = overosync->loading_transaction_id;
+	overosync->loading_transaction_id = (overosync->loading_transaction_id + 1) % 
+		NELEMENTS(overosync->transactions);
+		
+	tx_buffer = overosync->transactions[overosync->active_transaction_id].tx_buffer;
+	rx_buffer = overosync->transactions[overosync->active_transaction_id].rx_buffer;
+	
+	// Prepare the new loading buffer
+	memset(overosync->transactions[overosync->loading_transaction_id].tx_buffer, 0xff, 
+		   sizeof(overosync->transactions[overosync->loading_transaction_id].tx_buffer));
+	overosync->write_pointer = 0;
+
+	xSemaphoreGive(overosync->buffer_lock);
+
+	xSemaphoreTake(overosync->transaction_lock, portMAX_DELAY);
+	transactionsStarted++;
+
+	return PIOS_SPI_TransferBlock(pios_spi_overo_id, (uint8_t *) tx_buffer, (uint8_t *) rx_buffer, sizeof(overosync->transactions[overosync->active_transaction_id].tx_buffer), &transmitDataDone);
+}
 
 /**
   * @}

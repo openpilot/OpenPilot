@@ -51,30 +51,29 @@ public class AHRSCalibration extends UAVDataObject {
 		List<UAVObjectField> fields = new ArrayList<UAVObjectField>();
 		
 
-		List<String> measure_varElemNames = new ArrayList<String>();
-		measure_varElemNames.add("0");
-		List<String> measure_varEnumOptions = new ArrayList<String>();
-		measure_varEnumOptions.add("SET");
-		measure_varEnumOptions.add("MEASURE");
-		fields.add( new UAVObjectField("measure_var", "", UAVObjectField.FieldType.ENUM, measure_varElemNames, measure_varEnumOptions) );
-
 		List<String> accel_biasElemNames = new ArrayList<String>();
 		accel_biasElemNames.add("X");
 		accel_biasElemNames.add("Y");
 		accel_biasElemNames.add("Z");
-		fields.add( new UAVObjectField("accel_bias", "m/s^2", UAVObjectField.FieldType.FLOAT32, accel_biasElemNames, null) );
+		fields.add( new UAVObjectField("accel_bias", "m/s", UAVObjectField.FieldType.FLOAT32, accel_biasElemNames, null) );
 
 		List<String> accel_scaleElemNames = new ArrayList<String>();
 		accel_scaleElemNames.add("X");
 		accel_scaleElemNames.add("Y");
 		accel_scaleElemNames.add("Z");
-		fields.add( new UAVObjectField("accel_scale", "(m/s^2)/lsb", UAVObjectField.FieldType.FLOAT32, accel_scaleElemNames, null) );
+		fields.add( new UAVObjectField("accel_scale", "(m/s)/lsb", UAVObjectField.FieldType.FLOAT32, accel_scaleElemNames, null) );
+
+		List<String> accel_orthoElemNames = new ArrayList<String>();
+		accel_orthoElemNames.add("XY");
+		accel_orthoElemNames.add("XZ");
+		accel_orthoElemNames.add("YZ");
+		fields.add( new UAVObjectField("accel_ortho", "scale", UAVObjectField.FieldType.FLOAT32, accel_orthoElemNames, null) );
 
 		List<String> accel_varElemNames = new ArrayList<String>();
 		accel_varElemNames.add("X");
 		accel_varElemNames.add("Y");
 		accel_varElemNames.add("Z");
-		fields.add( new UAVObjectField("accel_var", "(m/s^2)^2", UAVObjectField.FieldType.FLOAT32, accel_varElemNames, null) );
+		fields.add( new UAVObjectField("accel_var", "(m/s)^2", UAVObjectField.FieldType.FLOAT32, accel_varElemNames, null) );
 
 		List<String> gyro_biasElemNames = new ArrayList<String>();
 		gyro_biasElemNames.add("X");
@@ -126,6 +125,13 @@ public class AHRSCalibration extends UAVDataObject {
 		pos_varElemNames.add("0");
 		fields.add( new UAVObjectField("pos_var", "m^2", UAVObjectField.FieldType.FLOAT32, pos_varElemNames, null) );
 
+		List<String> measure_varElemNames = new ArrayList<String>();
+		measure_varElemNames.add("0");
+		List<String> measure_varEnumOptions = new ArrayList<String>();
+		measure_varEnumOptions.add("SET");
+		measure_varEnumOptions.add("MEASURE");
+		fields.add( new UAVObjectField("measure_var", "", UAVObjectField.FieldType.ENUM, measure_varElemNames, measure_varEnumOptions) );
+
 
 		// Compute the number of bytes for this object
 		int numBytes = 0;
@@ -171,19 +177,21 @@ public class AHRSCalibration extends UAVDataObject {
 	 */
 	public void setDefaultFieldValues()
 	{
-		getField("measure_var").setValue("SET");
 		getField("accel_bias").setValue(-73.5,0);
 		getField("accel_bias").setValue(-73.5,1);
 		getField("accel_bias").setValue(73.5,2);
 		getField("accel_scale").setValue(0.0359,0);
 		getField("accel_scale").setValue(0.0359,1);
-		getField("accel_scale").setValue(-0.0359,2);
+		getField("accel_scale").setValue(0.0359,2);
+		getField("accel_ortho").setValue(0,0);
+		getField("accel_ortho").setValue(0,1);
+		getField("accel_ortho").setValue(0,2);
 		getField("accel_var").setValue(0.0005,0);
 		getField("accel_var").setValue(0.0005,1);
 		getField("accel_var").setValue(0.0005,2);
-		getField("gyro_bias").setValue(23,0);
-		getField("gyro_bias").setValue(-23,1);
-		getField("gyro_bias").setValue(23,2);
+		getField("gyro_bias").setValue(28,0);
+		getField("gyro_bias").setValue(-28,1);
+		getField("gyro_bias").setValue(28,2);
 		getField("gyro_scale").setValue(-0.017,0);
 		getField("gyro_scale").setValue(0.017,1);
 		getField("gyro_scale").setValue(-0.017,2);
@@ -196,14 +204,15 @@ public class AHRSCalibration extends UAVDataObject {
 		getField("mag_bias").setValue(0,0);
 		getField("mag_bias").setValue(0,1);
 		getField("mag_bias").setValue(0,2);
-		getField("mag_scale").setValue(-2,0);
-		getField("mag_scale").setValue(-2,1);
-		getField("mag_scale").setValue(-2,2);
+		getField("mag_scale").setValue(1,0);
+		getField("mag_scale").setValue(1,1);
+		getField("mag_scale").setValue(1,2);
 		getField("mag_var").setValue(50,0);
 		getField("mag_var").setValue(50,1);
 		getField("mag_var").setValue(50,2);
-		getField("vel_var").setValue(0.4);
-		getField("pos_var").setValue(0.4);
+		getField("vel_var").setValue(10);
+		getField("pos_var").setValue(0.04);
+		getField("measure_var").setValue("SET");
 
 	}
 
@@ -232,7 +241,7 @@ public class AHRSCalibration extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0x30101BB2;
+	protected static final int OBJID = 0xFD0EDFC4;
 	protected static final String NAME = "AHRSCalibration";
 	protected static String DESCRIPTION = "Contains the calibration settings for the @ref AHRSCommsModule";
 	protected static final boolean ISSINGLEINST = 1 == 1;

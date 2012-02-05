@@ -51,29 +51,24 @@ public class GuidanceSettings extends UAVDataObject {
 		List<UAVObjectField> fields = new ArrayList<UAVObjectField>();
 		
 
-		List<String> GuidanceModeElemNames = new ArrayList<String>();
-		GuidanceModeElemNames.add("0");
-		List<String> GuidanceModeEnumOptions = new ArrayList<String>();
-		GuidanceModeEnumOptions.add("DUAL_LOOP");
-		GuidanceModeEnumOptions.add("VELOCITY_CONTROL");
-		fields.add( new UAVObjectField("GuidanceMode", "", UAVObjectField.FieldType.ENUM, GuidanceModeElemNames, GuidanceModeEnumOptions) );
-
-		List<String> HorizontalPElemNames = new ArrayList<String>();
-		HorizontalPElemNames.add("Kp");
-		HorizontalPElemNames.add("Max");
-		fields.add( new UAVObjectField("HorizontalP", "", UAVObjectField.FieldType.FLOAT32, HorizontalPElemNames, null) );
+		List<String> HorizontalPosPIElemNames = new ArrayList<String>();
+		HorizontalPosPIElemNames.add("Kp");
+		HorizontalPosPIElemNames.add("Ki");
+		HorizontalPosPIElemNames.add("ILimit");
+		fields.add( new UAVObjectField("HorizontalPosPI", "(cm/s)/cm", UAVObjectField.FieldType.FLOAT32, HorizontalPosPIElemNames, null) );
 
 		List<String> HorizontalVelPIDElemNames = new ArrayList<String>();
 		HorizontalVelPIDElemNames.add("Kp");
 		HorizontalVelPIDElemNames.add("Ki");
 		HorizontalVelPIDElemNames.add("Kd");
 		HorizontalVelPIDElemNames.add("ILimit");
-		fields.add( new UAVObjectField("HorizontalVelPID", "", UAVObjectField.FieldType.FLOAT32, HorizontalVelPIDElemNames, null) );
+		fields.add( new UAVObjectField("HorizontalVelPID", "deg/(cm/s)", UAVObjectField.FieldType.FLOAT32, HorizontalVelPIDElemNames, null) );
 
-		List<String> VerticalPElemNames = new ArrayList<String>();
-		VerticalPElemNames.add("Kp");
-		VerticalPElemNames.add("Max");
-		fields.add( new UAVObjectField("VerticalP", "", UAVObjectField.FieldType.FLOAT32, VerticalPElemNames, null) );
+		List<String> VerticalPosPIElemNames = new ArrayList<String>();
+		VerticalPosPIElemNames.add("Kp");
+		VerticalPosPIElemNames.add("Ki");
+		VerticalPosPIElemNames.add("ILimit");
+		fields.add( new UAVObjectField("VerticalPosPI", "", UAVObjectField.FieldType.FLOAT32, VerticalPosPIElemNames, null) );
 
 		List<String> VerticalVelPIDElemNames = new ArrayList<String>();
 		VerticalVelPIDElemNames.add("Kp");
@@ -82,13 +77,6 @@ public class GuidanceSettings extends UAVDataObject {
 		VerticalVelPIDElemNames.add("ILimit");
 		fields.add( new UAVObjectField("VerticalVelPID", "", UAVObjectField.FieldType.FLOAT32, VerticalVelPIDElemNames, null) );
 
-		List<String> ThrottleControlElemNames = new ArrayList<String>();
-		ThrottleControlElemNames.add("0");
-		List<String> ThrottleControlEnumOptions = new ArrayList<String>();
-		ThrottleControlEnumOptions.add("FALSE");
-		ThrottleControlEnumOptions.add("TRUE");
-		fields.add( new UAVObjectField("ThrottleControl", "", UAVObjectField.FieldType.ENUM, ThrottleControlElemNames, ThrottleControlEnumOptions) );
-
 		List<String> MaxRollPitchElemNames = new ArrayList<String>();
 		MaxRollPitchElemNames.add("0");
 		fields.add( new UAVObjectField("MaxRollPitch", "deg", UAVObjectField.FieldType.FLOAT32, MaxRollPitchElemNames, null) );
@@ -96,6 +84,28 @@ public class GuidanceSettings extends UAVDataObject {
 		List<String> UpdatePeriodElemNames = new ArrayList<String>();
 		UpdatePeriodElemNames.add("0");
 		fields.add( new UAVObjectField("UpdatePeriod", "", UAVObjectField.FieldType.INT32, UpdatePeriodElemNames, null) );
+
+		List<String> HorizontalVelMaxElemNames = new ArrayList<String>();
+		HorizontalVelMaxElemNames.add("0");
+		fields.add( new UAVObjectField("HorizontalVelMax", "cm/s", UAVObjectField.FieldType.UINT16, HorizontalVelMaxElemNames, null) );
+
+		List<String> VerticalVelMaxElemNames = new ArrayList<String>();
+		VerticalVelMaxElemNames.add("0");
+		fields.add( new UAVObjectField("VerticalVelMax", "cm/s", UAVObjectField.FieldType.UINT16, VerticalVelMaxElemNames, null) );
+
+		List<String> GuidanceModeElemNames = new ArrayList<String>();
+		GuidanceModeElemNames.add("0");
+		List<String> GuidanceModeEnumOptions = new ArrayList<String>();
+		GuidanceModeEnumOptions.add("DUAL_LOOP");
+		GuidanceModeEnumOptions.add("VELOCITY_CONTROL");
+		fields.add( new UAVObjectField("GuidanceMode", "", UAVObjectField.FieldType.ENUM, GuidanceModeElemNames, GuidanceModeEnumOptions) );
+
+		List<String> ThrottleControlElemNames = new ArrayList<String>();
+		ThrottleControlElemNames.add("0");
+		List<String> ThrottleControlEnumOptions = new ArrayList<String>();
+		ThrottleControlEnumOptions.add("FALSE");
+		ThrottleControlEnumOptions.add("TRUE");
+		fields.add( new UAVObjectField("ThrottleControl", "", UAVObjectField.FieldType.ENUM, ThrottleControlElemNames, ThrottleControlEnumOptions) );
 
 
 		// Compute the number of bytes for this object
@@ -142,22 +152,26 @@ public class GuidanceSettings extends UAVDataObject {
 	 */
 	public void setDefaultFieldValues()
 	{
-		getField("GuidanceMode").setValue("DUAL_LOOP");
-		getField("HorizontalP").setValue(0.2,0);
-		getField("HorizontalP").setValue(150,1);
-		getField("HorizontalVelPID").setValue(0.1,0);
+		getField("HorizontalPosPI").setValue(0.1,0);
+		getField("HorizontalPosPI").setValue(0.001,1);
+		getField("HorizontalPosPI").setValue(300,2);
+		getField("HorizontalVelPID").setValue(0.05,0);
 		getField("HorizontalVelPID").setValue(0.002,1);
 		getField("HorizontalVelPID").setValue(0,2);
 		getField("HorizontalVelPID").setValue(1000,3);
-		getField("VerticalP").setValue(0.1,0);
-		getField("VerticalP").setValue(200,1);
+		getField("VerticalPosPI").setValue(0.1,0);
+		getField("VerticalPosPI").setValue(0.001,1);
+		getField("VerticalPosPI").setValue(200,2);
 		getField("VerticalVelPID").setValue(0.1,0);
 		getField("VerticalVelPID").setValue(0,1);
 		getField("VerticalVelPID").setValue(0,2);
 		getField("VerticalVelPID").setValue(0,3);
-		getField("ThrottleControl").setValue("FALSE");
 		getField("MaxRollPitch").setValue(10);
 		getField("UpdatePeriod").setValue(100);
+		getField("HorizontalVelMax").setValue(300);
+		getField("VerticalVelMax").setValue(150);
+		getField("GuidanceMode").setValue("DUAL_LOOP");
+		getField("ThrottleControl").setValue("FALSE");
 
 	}
 
@@ -186,7 +200,7 @@ public class GuidanceSettings extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0x74740AA2;
+	protected static final int OBJID = 0x6EA79FB4;
 	protected static final String NAME = "GuidanceSettings";
 	protected static String DESCRIPTION = "Settings for the @ref GuidanceModule";
 	protected static final boolean ISSINGLEINST = 1 == 1;

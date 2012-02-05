@@ -51,6 +51,10 @@ public class GPSTime extends UAVDataObject {
 		List<UAVObjectField> fields = new ArrayList<UAVObjectField>();
 		
 
+		List<String> YearElemNames = new ArrayList<String>();
+		YearElemNames.add("0");
+		fields.add( new UAVObjectField("Year", "", UAVObjectField.FieldType.INT16, YearElemNames, null) );
+
 		List<String> MonthElemNames = new ArrayList<String>();
 		MonthElemNames.add("0");
 		fields.add( new UAVObjectField("Month", "", UAVObjectField.FieldType.INT8, MonthElemNames, null) );
@@ -58,10 +62,6 @@ public class GPSTime extends UAVDataObject {
 		List<String> DayElemNames = new ArrayList<String>();
 		DayElemNames.add("0");
 		fields.add( new UAVObjectField("Day", "", UAVObjectField.FieldType.INT8, DayElemNames, null) );
-
-		List<String> YearElemNames = new ArrayList<String>();
-		YearElemNames.add("0");
-		fields.add( new UAVObjectField("Year", "", UAVObjectField.FieldType.INT16, YearElemNames, null) );
 
 		List<String> HourElemNames = new ArrayList<String>();
 		HourElemNames.add("0");
@@ -148,7 +148,7 @@ public class GPSTime extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0x56FFF0A2;
+	protected static final int OBJID = 0xD4478084;
 	protected static final String NAME = "GPSTime";
 	protected static String DESCRIPTION = "Contains the GPS time from @ref GPSModule.  Required to compute the world magnetic model correctly when setting the home location.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

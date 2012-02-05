@@ -136,7 +136,7 @@ public class PositionActual extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0xE0739636;
+	protected static final int OBJID = 0xF9691DA4;
 	protected static final String NAME = "PositionActual";
 	protected static String DESCRIPTION = "Contains the current position relative to @ref HomeLocation";
 	protected static final boolean ISSINGLEINST = 1 == 1;

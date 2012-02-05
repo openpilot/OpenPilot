@@ -28,13 +28,14 @@
 
 package org.openpilot.uavtalk.uavobjects;
 
-//import org.openpilot.uavtalk.uavobjects.*;
+import org.openpilot.uavtalk.uavobjects.*;
 import org.openpilot.uavtalk.UAVObjectManager;
 
 public class UAVObjectsInitialize {
 	
 	public static void register(UAVObjectManager objMngr) {
 		try {
+			objMngr.registerObject( new AccessoryDesired() );
 			objMngr.registerObject( new ActuatorCommand() );
 			objMngr.registerObject( new ActuatorDesired() );
 			objMngr.registerObject( new ActuatorSettings() );
@@ -45,19 +46,25 @@ public class UAVObjectsInitialize {
 			objMngr.registerObject( new AttitudeRaw() );
 			objMngr.registerObject( new AttitudeSettings() );
 			objMngr.registerObject( new BaroAltitude() );
-			objMngr.registerObject( new BatterySettings() );
+			objMngr.registerObject( new CameraDesired() );
+			objMngr.registerObject( new CameraStabSettings() );
+			objMngr.registerObject( new FaultSettings() );
 			objMngr.registerObject( new FirmwareIAPObj() );
+			objMngr.registerObject( new FlightBatterySettings() );
 			objMngr.registerObject( new FlightBatteryState() );
 			objMngr.registerObject( new FlightPlanControl() );
 			objMngr.registerObject( new FlightPlanSettings() );
 			objMngr.registerObject( new FlightPlanStatus() );
+			objMngr.registerObject( new FlightStatus() );
 			objMngr.registerObject( new FlightTelemetryStats() );
+			objMngr.registerObject( new GCSReceiver() );
 			objMngr.registerObject( new GCSTelemetryStats() );
 			objMngr.registerObject( new GPSPosition() );
 			objMngr.registerObject( new GPSSatellites() );
 			objMngr.registerObject( new GPSTime() );
 			objMngr.registerObject( new GuidanceSettings() );
 			objMngr.registerObject( new HomeLocation() );
+			objMngr.registerObject( new HwSettings() );
 			objMngr.registerObject( new I2CStats() );
 			objMngr.registerObject( new ManualControlCommand() );
 			objMngr.registerObject( new ManualControlSettings() );
@@ -68,6 +75,7 @@ public class UAVObjectsInitialize {
 			objMngr.registerObject( new PositionActual() );
 			objMngr.registerObject( new PositionDesired() );
 			objMngr.registerObject( new RateDesired() );
+			objMngr.registerObject( new ReceiverActivity() );
 			objMngr.registerObject( new SonarAltitude() );
 			objMngr.registerObject( new StabilizationDesired() );
 			objMngr.registerObject( new StabilizationSettings() );
@@ -75,7 +83,6 @@ public class UAVObjectsInitialize {
 			objMngr.registerObject( new SystemSettings() );
 			objMngr.registerObject( new SystemStats() );
 			objMngr.registerObject( new TaskInfo() );
-			objMngr.registerObject( new TelemetrySettings() );
 			objMngr.registerObject( new VelocityActual() );
 			objMngr.registerObject( new VelocityDesired() );
 			objMngr.registerObject( new WatchdogStatus() );

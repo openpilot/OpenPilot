@@ -136,7 +136,7 @@ public class RateDesired extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0xBA41B51C;
+	protected static final int OBJID = 0xCE8C826;
 	protected static final String NAME = "RateDesired";
 	protected static String DESCRIPTION = "Status for the matrix mixer showing the output of each mixer after all scaling";
 	protected static final boolean ISSINGLEINST = 1 == 1;

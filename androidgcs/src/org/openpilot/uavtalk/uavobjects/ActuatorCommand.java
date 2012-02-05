@@ -60,15 +60,17 @@ public class ActuatorCommand extends UAVDataObject {
 		ChannelElemNames.add("5");
 		ChannelElemNames.add("6");
 		ChannelElemNames.add("7");
+		ChannelElemNames.add("8");
+		ChannelElemNames.add("9");
 		fields.add( new UAVObjectField("Channel", "us", UAVObjectField.FieldType.INT16, ChannelElemNames, null) );
-
-		List<String> UpdateTimeElemNames = new ArrayList<String>();
-		UpdateTimeElemNames.add("0");
-		fields.add( new UAVObjectField("UpdateTime", "ms", UAVObjectField.FieldType.UINT8, UpdateTimeElemNames, null) );
 
 		List<String> MaxUpdateTimeElemNames = new ArrayList<String>();
 		MaxUpdateTimeElemNames.add("0");
 		fields.add( new UAVObjectField("MaxUpdateTime", "ms", UAVObjectField.FieldType.UINT16, MaxUpdateTimeElemNames, null) );
+
+		List<String> UpdateTimeElemNames = new ArrayList<String>();
+		UpdateTimeElemNames.add("0");
+		fields.add( new UAVObjectField("UpdateTime", "ms", UAVObjectField.FieldType.UINT8, UpdateTimeElemNames, null) );
 
 		List<String> NumFailedUpdatesElemNames = new ArrayList<String>();
 		NumFailedUpdatesElemNames.add("0");
@@ -147,7 +149,7 @@ public class ActuatorCommand extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0xE8E077D8;
+	protected static final int OBJID = 0x5324CB8;
 	protected static final String NAME = "ActuatorCommand";
 	protected static String DESCRIPTION = "Contains the pulse duration sent to each of the channels.  Set by @ref ActuatorModule";
 	protected static final boolean ISSINGLEINST = 1 == 1;

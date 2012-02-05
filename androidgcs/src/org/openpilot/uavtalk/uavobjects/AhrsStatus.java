@@ -51,6 +51,10 @@ public class AhrsStatus extends UAVDataObject {
 		List<UAVObjectField> fields = new ArrayList<UAVObjectField>();
 		
 
+		List<String> RunningTimeElemNames = new ArrayList<String>();
+		RunningTimeElemNames.add("0");
+		fields.add( new UAVObjectField("RunningTime", "ms", UAVObjectField.FieldType.UINT32, RunningTimeElemNames, null) );
+
 		List<String> SerialNumberElemNames = new ArrayList<String>();
 		SerialNumberElemNames.add("0");
 		SerialNumberElemNames.add("1");
@@ -65,10 +69,6 @@ public class AhrsStatus extends UAVDataObject {
 		List<String> CPULoadElemNames = new ArrayList<String>();
 		CPULoadElemNames.add("0");
 		fields.add( new UAVObjectField("CPULoad", "count", UAVObjectField.FieldType.UINT8, CPULoadElemNames, null) );
-
-		List<String> RunningTimeElemNames = new ArrayList<String>();
-		RunningTimeElemNames.add("0");
-		fields.add( new UAVObjectField("RunningTime", "ms", UAVObjectField.FieldType.UINT32, RunningTimeElemNames, null) );
 
 		List<String> IdleTimePerCyleElemNames = new ArrayList<String>();
 		IdleTimePerCyleElemNames.add("0");
@@ -190,7 +190,7 @@ public class AhrsStatus extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0x37A5F7A2;
+	protected static final int OBJID = 0x706D1AB8;
 	protected static final String NAME = "AhrsStatus";
 	protected static String DESCRIPTION = "Status for the @ref AHRSCommsModule, including communication errors";
 	protected static final boolean ISSINGLEINST = 1 == 1;

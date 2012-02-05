@@ -51,18 +51,6 @@ public class StabilizationSettings extends UAVDataObject {
 		List<UAVObjectField> fields = new ArrayList<UAVObjectField>();
 		
 
-		List<String> RollMaxElemNames = new ArrayList<String>();
-		RollMaxElemNames.add("0");
-		fields.add( new UAVObjectField("RollMax", "degrees", UAVObjectField.FieldType.UINT8, RollMaxElemNames, null) );
-
-		List<String> PitchMaxElemNames = new ArrayList<String>();
-		PitchMaxElemNames.add("0");
-		fields.add( new UAVObjectField("PitchMax", "degrees", UAVObjectField.FieldType.UINT8, PitchMaxElemNames, null) );
-
-		List<String> YawMaxElemNames = new ArrayList<String>();
-		YawMaxElemNames.add("0");
-		fields.add( new UAVObjectField("YawMax", "degrees", UAVObjectField.FieldType.UINT8, YawMaxElemNames, null) );
-
 		List<String> ManualRateElemNames = new ArrayList<String>();
 		ManualRateElemNames.add("Roll");
 		ManualRateElemNames.add("Pitch");
@@ -75,23 +63,26 @@ public class StabilizationSettings extends UAVDataObject {
 		MaximumRateElemNames.add("Yaw");
 		fields.add( new UAVObjectField("MaximumRate", "degrees/sec", UAVObjectField.FieldType.FLOAT32, MaximumRateElemNames, null) );
 
-		List<String> RollRatePIElemNames = new ArrayList<String>();
-		RollRatePIElemNames.add("Kp");
-		RollRatePIElemNames.add("Ki");
-		RollRatePIElemNames.add("ILimit");
-		fields.add( new UAVObjectField("RollRatePI", "", UAVObjectField.FieldType.FLOAT32, RollRatePIElemNames, null) );
+		List<String> RollRatePIDElemNames = new ArrayList<String>();
+		RollRatePIDElemNames.add("Kp");
+		RollRatePIDElemNames.add("Ki");
+		RollRatePIDElemNames.add("Kd");
+		RollRatePIDElemNames.add("ILimit");
+		fields.add( new UAVObjectField("RollRatePID", "", UAVObjectField.FieldType.FLOAT32, RollRatePIDElemNames, null) );
 
-		List<String> PitchRatePIElemNames = new ArrayList<String>();
-		PitchRatePIElemNames.add("Kp");
-		PitchRatePIElemNames.add("Ki");
-		PitchRatePIElemNames.add("ILimit");
-		fields.add( new UAVObjectField("PitchRatePI", "", UAVObjectField.FieldType.FLOAT32, PitchRatePIElemNames, null) );
+		List<String> PitchRatePIDElemNames = new ArrayList<String>();
+		PitchRatePIDElemNames.add("Kp");
+		PitchRatePIDElemNames.add("Ki");
+		PitchRatePIDElemNames.add("Kd");
+		PitchRatePIDElemNames.add("ILimit");
+		fields.add( new UAVObjectField("PitchRatePID", "", UAVObjectField.FieldType.FLOAT32, PitchRatePIDElemNames, null) );
 
-		List<String> YawRatePIElemNames = new ArrayList<String>();
-		YawRatePIElemNames.add("Kp");
-		YawRatePIElemNames.add("Ki");
-		YawRatePIElemNames.add("ILimit");
-		fields.add( new UAVObjectField("YawRatePI", "", UAVObjectField.FieldType.FLOAT32, YawRatePIElemNames, null) );
+		List<String> YawRatePIDElemNames = new ArrayList<String>();
+		YawRatePIDElemNames.add("Kp");
+		YawRatePIDElemNames.add("Ki");
+		YawRatePIDElemNames.add("Kd");
+		YawRatePIDElemNames.add("ILimit");
+		fields.add( new UAVObjectField("YawRatePID", "", UAVObjectField.FieldType.FLOAT32, YawRatePIDElemNames, null) );
 
 		List<String> RollPIElemNames = new ArrayList<String>();
 		RollPIElemNames.add("Kp");
@@ -110,6 +101,45 @@ public class StabilizationSettings extends UAVDataObject {
 		YawPIElemNames.add("Ki");
 		YawPIElemNames.add("ILimit");
 		fields.add( new UAVObjectField("YawPI", "", UAVObjectField.FieldType.FLOAT32, YawPIElemNames, null) );
+
+		List<String> GyroTauElemNames = new ArrayList<String>();
+		GyroTauElemNames.add("0");
+		fields.add( new UAVObjectField("GyroTau", "", UAVObjectField.FieldType.FLOAT32, GyroTauElemNames, null) );
+
+		List<String> WeakLevelingKpElemNames = new ArrayList<String>();
+		WeakLevelingKpElemNames.add("0");
+		fields.add( new UAVObjectField("WeakLevelingKp", "(deg/s)/deg", UAVObjectField.FieldType.FLOAT32, WeakLevelingKpElemNames, null) );
+
+		List<String> RollMaxElemNames = new ArrayList<String>();
+		RollMaxElemNames.add("0");
+		fields.add( new UAVObjectField("RollMax", "degrees", UAVObjectField.FieldType.UINT8, RollMaxElemNames, null) );
+
+		List<String> PitchMaxElemNames = new ArrayList<String>();
+		PitchMaxElemNames.add("0");
+		fields.add( new UAVObjectField("PitchMax", "degrees", UAVObjectField.FieldType.UINT8, PitchMaxElemNames, null) );
+
+		List<String> YawMaxElemNames = new ArrayList<String>();
+		YawMaxElemNames.add("0");
+		fields.add( new UAVObjectField("YawMax", "degrees", UAVObjectField.FieldType.UINT8, YawMaxElemNames, null) );
+
+		List<String> MaxAxisLockElemNames = new ArrayList<String>();
+		MaxAxisLockElemNames.add("0");
+		fields.add( new UAVObjectField("MaxAxisLock", "deg", UAVObjectField.FieldType.UINT8, MaxAxisLockElemNames, null) );
+
+		List<String> MaxAxisLockRateElemNames = new ArrayList<String>();
+		MaxAxisLockRateElemNames.add("0");
+		fields.add( new UAVObjectField("MaxAxisLockRate", "deg/s", UAVObjectField.FieldType.UINT8, MaxAxisLockRateElemNames, null) );
+
+		List<String> MaxWeakLevelingRateElemNames = new ArrayList<String>();
+		MaxWeakLevelingRateElemNames.add("0");
+		fields.add( new UAVObjectField("MaxWeakLevelingRate", "deg/s", UAVObjectField.FieldType.UINT8, MaxWeakLevelingRateElemNames, null) );
+
+		List<String> LowThrottleZeroIntegralElemNames = new ArrayList<String>();
+		LowThrottleZeroIntegralElemNames.add("0");
+		List<String> LowThrottleZeroIntegralEnumOptions = new ArrayList<String>();
+		LowThrottleZeroIntegralEnumOptions.add("FALSE");
+		LowThrottleZeroIntegralEnumOptions.add("TRUE");
+		fields.add( new UAVObjectField("LowThrottleZeroIntegral", "", UAVObjectField.FieldType.ENUM, LowThrottleZeroIntegralElemNames, LowThrottleZeroIntegralEnumOptions) );
 
 
 		// Compute the number of bytes for this object
@@ -156,24 +186,24 @@ public class StabilizationSettings extends UAVDataObject {
 	 */
 	public void setDefaultFieldValues()
 	{
-		getField("RollMax").setValue(35);
-		getField("PitchMax").setValue(35);
-		getField("YawMax").setValue(35);
 		getField("ManualRate").setValue(150,0);
 		getField("ManualRate").setValue(150,1);
 		getField("ManualRate").setValue(150,2);
 		getField("MaximumRate").setValue(300,0);
 		getField("MaximumRate").setValue(300,1);
 		getField("MaximumRate").setValue(300,2);
-		getField("RollRatePI").setValue(0.0015,0);
-		getField("RollRatePI").setValue(0,1);
-		getField("RollRatePI").setValue(0.3,2);
-		getField("PitchRatePI").setValue(0.0015,0);
-		getField("PitchRatePI").setValue(0,1);
-		getField("PitchRatePI").setValue(0.3,2);
-		getField("YawRatePI").setValue(0.003,0);
-		getField("YawRatePI").setValue(0,1);
-		getField("YawRatePI").setValue(0.3,2);
+		getField("RollRatePID").setValue(0.002,0);
+		getField("RollRatePID").setValue(0,1);
+		getField("RollRatePID").setValue(0,2);
+		getField("RollRatePID").setValue(0.3,3);
+		getField("PitchRatePID").setValue(0.002,0);
+		getField("PitchRatePID").setValue(0,1);
+		getField("PitchRatePID").setValue(0,2);
+		getField("PitchRatePID").setValue(0.3,3);
+		getField("YawRatePID").setValue(0.0035,0);
+		getField("YawRatePID").setValue(0.0035,1);
+		getField("YawRatePID").setValue(0,2);
+		getField("YawRatePID").setValue(0.3,3);
 		getField("RollPI").setValue(2,0);
 		getField("RollPI").setValue(0,1);
 		getField("RollPI").setValue(50,2);
@@ -183,6 +213,15 @@ public class StabilizationSettings extends UAVDataObject {
 		getField("YawPI").setValue(2,0);
 		getField("YawPI").setValue(0,1);
 		getField("YawPI").setValue(50,2);
+		getField("GyroTau").setValue(0.005);
+		getField("WeakLevelingKp").setValue(0.1);
+		getField("RollMax").setValue(55);
+		getField("PitchMax").setValue(55);
+		getField("YawMax").setValue(35);
+		getField("MaxAxisLock").setValue(15);
+		getField("MaxAxisLockRate").setValue(2);
+		getField("MaxWeakLevelingRate").setValue(5);
+		getField("LowThrottleZeroIntegral").setValue("TRUE");
 
 	}
 
@@ -211,7 +250,7 @@ public class StabilizationSettings extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0xE2147404;
+	protected static final int OBJID = 0x5F78C51E;
 	protected static final String NAME = "StabilizationSettings";
 	protected static String DESCRIPTION = "PID settings used by the Stabilization module to combine the @ref AttitudeActual and @ref AttitudeDesired to compute @ref ActuatorDesired";
 	protected static final boolean ISSINGLEINST = 1 == 1;

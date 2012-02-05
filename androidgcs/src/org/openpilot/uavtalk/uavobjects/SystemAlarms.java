@@ -68,6 +68,7 @@ public class SystemAlarms extends UAVDataObject {
 		AlarmElemNames.add("FlightTime");
 		AlarmElemNames.add("I2C");
 		AlarmElemNames.add("GPS");
+		AlarmElemNames.add("BootFault");
 		List<String> AlarmEnumOptions = new ArrayList<String>();
 		AlarmEnumOptions.add("Uninitialised");
 		AlarmEnumOptions.add("OK");
@@ -106,8 +107,8 @@ public class SystemAlarms extends UAVDataObject {
 
 		metadata.flightAccess = UAVObject.AccessMode.ACCESS_READWRITE;
 		metadata.flightTelemetryAcked = UAVObject.Acked.TRUE;
-		metadata.flightTelemetryUpdateMode = UAVObject.UpdateMode.UPDATEMODE_PERIODIC;
-		metadata.flightTelemetryUpdatePeriod = 4000;
+		metadata.flightTelemetryUpdateMode = UAVObject.UpdateMode.UPDATEMODE_ONCHANGE;
+		metadata.flightTelemetryUpdatePeriod = 0;
 
 		metadata.loggingUpdateMode = UAVObject.UpdateMode.UPDATEMODE_PERIODIC;
 		metadata.loggingUpdatePeriod = 1000;
@@ -137,6 +138,7 @@ public class SystemAlarms extends UAVDataObject {
 		getField("Alarm").setValue("Uninitialised",13);
 		getField("Alarm").setValue("Uninitialised",14);
 		getField("Alarm").setValue("Uninitialised",15);
+		getField("Alarm").setValue("Uninitialised",16);
 
 	}
 
@@ -165,7 +167,7 @@ public class SystemAlarms extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0x89C3DCB2;
+	protected static final int OBJID = 0x737ADCF2;
 	protected static final String NAME = "SystemAlarms";
 	protected static String DESCRIPTION = "Alarms from OpenPilot to indicate failure conditions or warnings.  Set by various modules.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

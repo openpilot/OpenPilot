@@ -136,7 +136,7 @@ public class PositionDesired extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0x2FC4E5BA;
+	protected static final int OBJID = 0x33C9EAB4;
 	protected static final String NAME = "PositionDesired";
 	protected static String DESCRIPTION = "The position the craft is trying t achieve.  Can come from GCS or @ref PathPlanner ";
 	protected static final boolean ISSINGLEINST = 1 == 1;

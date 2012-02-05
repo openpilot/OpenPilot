@@ -51,15 +51,6 @@ public class GCSTelemetryStats extends UAVDataObject {
 		List<UAVObjectField> fields = new ArrayList<UAVObjectField>();
 		
 
-		List<String> StatusElemNames = new ArrayList<String>();
-		StatusElemNames.add("0");
-		List<String> StatusEnumOptions = new ArrayList<String>();
-		StatusEnumOptions.add("Disconnected");
-		StatusEnumOptions.add("HandshakeReq");
-		StatusEnumOptions.add("HandshakeAck");
-		StatusEnumOptions.add("Connected");
-		fields.add( new UAVObjectField("Status", "", UAVObjectField.FieldType.ENUM, StatusElemNames, StatusEnumOptions) );
-
 		List<String> TxDataRateElemNames = new ArrayList<String>();
 		TxDataRateElemNames.add("0");
 		fields.add( new UAVObjectField("TxDataRate", "bytes/sec", UAVObjectField.FieldType.FLOAT32, TxDataRateElemNames, null) );
@@ -79,6 +70,15 @@ public class GCSTelemetryStats extends UAVDataObject {
 		List<String> TxRetriesElemNames = new ArrayList<String>();
 		TxRetriesElemNames.add("0");
 		fields.add( new UAVObjectField("TxRetries", "count", UAVObjectField.FieldType.UINT32, TxRetriesElemNames, null) );
+
+		List<String> StatusElemNames = new ArrayList<String>();
+		StatusElemNames.add("0");
+		List<String> StatusEnumOptions = new ArrayList<String>();
+		StatusEnumOptions.add("Disconnected");
+		StatusEnumOptions.add("HandshakeReq");
+		StatusEnumOptions.add("HandshakeAck");
+		StatusEnumOptions.add("Connected");
+		fields.add( new UAVObjectField("Status", "", UAVObjectField.FieldType.ENUM, StatusElemNames, StatusEnumOptions) );
 
 
 		// Compute the number of bytes for this object
@@ -153,7 +153,7 @@ public class GCSTelemetryStats extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0x771E1046;
+	protected static final int OBJID = 0xABC72744;
 	protected static final String NAME = "GCSTelemetryStats";
 	protected static String DESCRIPTION = "The telemetry statistics from the ground computer";
 	protected static final boolean ISSINGLEINST = 1 == 1;

@@ -39,6 +39,7 @@
 class UAVOBJECTS_EXPORT $(NAME): public UAVDataObject
 {
     Q_OBJECT
+$(PROPERTIES)
 
 public:
     // Field structure
@@ -66,6 +67,17 @@ $(DATAFIELDINFO)
     UAVDataObject* clone(quint32 instID);
 
     static $(NAME)* GetInstance(UAVObjectManager* objMngr, quint32 instID = 0);
+
+$(PROPERTY_GETTERS)
+
+public slots:
+$(PROPERTY_SETTERS)
+
+signals:
+$(PROPERTY_NOTIFICATIONS)
+
+private slots:
+    void emitNotifications();
 	
 private:
     DataFields data;

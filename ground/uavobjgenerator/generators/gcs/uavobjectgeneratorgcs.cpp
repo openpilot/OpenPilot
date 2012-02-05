@@ -107,6 +107,99 @@ bool UAVObjectGeneratorGCS::process_object(ObjectInfo* info)
     }
     outInclude.replace(QString("$(DATAFIELDS)"), fields);
 
+    // Replace $(PROPERTIES) and related tags
+    QString properties;
+    QString propertiesImpl;
+    QString propertyGetters;
+    QString propertySetters;
+    QString propertyNotifications;
+    QString propertyNotificationsImpl;
+
+    //to avoid name conflicts
+    QStringList reservedProperties;
+    reservedProperties << "Description" << "Metadata";
+
+    for (int n = 0; n < info->fields.length(); ++n)
+    {
+        FieldInfo *field = info->fields[n];
+
+        if (reservedProperties.contains(field->name))
+            continue;
+
+        // Determine type
+        type = fieldTypeStrCPP[field->type];
+        // Append field
+        if ( field->numElements > 1 ) {
+            propertyGetters +=
+                    QString("    Q_INVOKABLE %1 get%2(quint32 index) const;\n")
+                    .arg(type).arg(field->name);
+            propertiesImpl +=
+                    QString("%1 %2::get%3(quint32 index) const\n"
+                            "{\n"
+                            "   QMutexLocker locker(mutex);\n"
+                            "   return data.%3[index];\n"
+                            "}\n")
+                    .arg(type).arg(info->name).arg(field->name);
+            propertySetters +=
+                    QString("    void set%1(quint32 index, %2 value);\n")
+                    .arg(field->name).arg(type);
+            propertiesImpl +=
+                    QString("void %1::set%2(quint32 index, %3 value)\n"
+                            "{\n"
+                            "   mutex->lock();\n"
+                            "   bool changed = data.%2[index] != value;\n"
+                            "   data.%2[index] = value;\n"
+                            "   mutex->unlock();\n"
+                            "   if (changed) emit %2Changed(index,value);\n"
+                            "}\n\n")
+                    .arg(info->name).arg(field->name).arg(type);
+            propertyNotifications +=
+                    QString("    void %1Changed(quint32 index, %2 value);\n")
+                    .arg(field->name).arg(type);
+        } else {
+            properties += QString("    Q_PROPERTY(%1 %2 READ get%2 WRITE set%2 NOTIFY %2Changed);\n")
+                    .arg(type).arg(field->name);
+            propertyGetters +=
+                    QString("    Q_INVOKABLE %1 get%2() const;\n")
+                    .arg(type).arg(field->name);
+            propertiesImpl +=
+                    QString("%1 %2::get%3() const\n"
+                            "{\n"
+                            "   QMutexLocker locker(mutex);\n"
+                            "   return data.%3;\n"
+                            "}\n")
+                    .arg(type).arg(info->name).arg(field->name);
+            propertySetters +=
+                    QString("    void set%1(%2 value);\n")
+                    .arg(field->name).arg(type);
+            propertiesImpl +=
+                    QString("void %1::set%2(%3 value)\n"
+                            "{\n"
+                            "   mutex->lock();\n"
+                            "   bool changed = data.%2 != value;\n"
+                            "   data.%2 = value;\n"
+                            "   mutex->unlock();\n"
+                            "   if (changed) emit %2Changed(value);\n"
+                            "}\n\n")
+                    .arg(info->name).arg(field->name).arg(type);
+            propertyNotifications +=
+                    QString("    void %1Changed(%2 value);\n")
+                    .arg(field->name).arg(type);
+            propertyNotificationsImpl +=
+                    QString("        //if (data.%1 != oldData.%1)\n"
+                            "            emit %1Changed(data.%1);\n")
+                    .arg(field->name);
+        }
+    }
+
+    outInclude.replace(QString("$(PROPERTIES)"), properties);
+    outInclude.replace(QString("$(PROPERTY_GETTERS)"), propertyGetters);
+    outInclude.replace(QString("$(PROPERTY_SETTERS)"), propertySetters);
+    outInclude.replace(QString("$(PROPERTY_NOTIFICATIONS)"), propertyNotifications);
+
+    outCode.replace(QString("$(PROPERTIES_IMPL)"), propertiesImpl);
+    outCode.replace(QString("$(NOTIFY_PROPERTIES_CHANGED)"), propertyNotificationsImpl);
+
     // Replace the $(FIELDSINIT) tag
     QString finit;
     for (int n = 0; n < info->fields.length(); ++n)

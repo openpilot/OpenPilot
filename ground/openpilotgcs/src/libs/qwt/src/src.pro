@@ -24,7 +24,7 @@ else {
 CONFIG += staticlib
 }
 
-unix:LIBS += -lrt
+unix:!mac:LIBS += -lrt
 
 HEADERS += \
     qwt.h \

@@ -28,7 +28,7 @@
 #define CCATTITUDEWIDGET_H
 
 #include "ui_ccattitude.h"
-#include "configtaskwidget.h"
+#include "../uavobjectwidgetutils/configtaskwidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"

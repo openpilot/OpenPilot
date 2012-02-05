@@ -112,6 +112,7 @@ SUBDIRS += plugin_systemhealth
 plugin_config.subdir = config
 plugin_config.depends = plugin_coreplugin
 plugin_config.depends += plugin_uavobjects
+plugin_config.depends += plugin_uavobjectwidgetutils
 plugin_config.depends += plugin_uavsettingsimportexport
 SUBDIRS += plugin_config
 
@@ -182,6 +183,12 @@ plugin_uavobjectutil.subdir = uavobjectutil
 plugin_uavobjectutil.depends = plugin_coreplugin
 plugin_uavobjectutil.depends += plugin_uavobjects
 SUBDIRS += plugin_uavobjectutil
+
+# UAV Object Widget Utility plugin
+plugin_uavobjectwidgetutils.subdir = uavobjectwidgetutils
+plugin_uavobjectwidgetutils.depends = plugin_coreplugin
+plugin_uavobjectwidgetutils.depends += plugin_uavobjects
+SUBDIRS += plugin_uavobjectwidgetutils
 
 # Magic Waypoint gadget
 plugin_magicwaypoint.subdir = magicwaypoint

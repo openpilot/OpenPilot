@@ -2,13 +2,12 @@
  ******************************************************************************
  *
  * @file       mixercurveline.h
- * @author     Edouard Lafargue Copyright (C) 2010.
- *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2010.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
- * @addtogroup ConfigPlugin Configuration Plugin
+ * @addtogroup UAVObjectWidgetUtils Plugin
  * @{
- * @brief A line connecting two mixer points
+ * @brief Utility plugin for UAVObject to Widget relation management
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify

@@ -1,14 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       uavobjectutilplugin.h
+ * @file       uavobjectwidgetutilsplugin.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @see        The GNU Public License (GPL) Version 3
  * @addtogroup GCSPlugins GCS Plugins
  * @{
- * @addtogroup UAVObjectUtilPlugin UAVObjectUtil Plugin
+ * @addtogroup UAVObjectWidgetUtils Plugin
  * @{
- * @brief The UAVUObjectUtil GCS plugin
+ * @brief Utility plugin for UAVObject to Widget relation management
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify 

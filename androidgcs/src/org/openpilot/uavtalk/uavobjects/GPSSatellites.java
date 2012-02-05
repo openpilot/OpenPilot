@@ -51,29 +51,6 @@ public class GPSSatellites extends UAVDataObject {
 		List<UAVObjectField> fields = new ArrayList<UAVObjectField>();
 		
 
-		List<String> SatsInViewElemNames = new ArrayList<String>();
-		SatsInViewElemNames.add("0");
-		fields.add( new UAVObjectField("SatsInView", "", UAVObjectField.FieldType.INT8, SatsInViewElemNames, null) );
-
-		List<String> PRNElemNames = new ArrayList<String>();
-		PRNElemNames.add("0");
-		PRNElemNames.add("1");
-		PRNElemNames.add("2");
-		PRNElemNames.add("3");
-		PRNElemNames.add("4");
-		PRNElemNames.add("5");
-		PRNElemNames.add("6");
-		PRNElemNames.add("7");
-		PRNElemNames.add("8");
-		PRNElemNames.add("9");
-		PRNElemNames.add("10");
-		PRNElemNames.add("11");
-		PRNElemNames.add("12");
-		PRNElemNames.add("13");
-		PRNElemNames.add("14");
-		PRNElemNames.add("15");
-		fields.add( new UAVObjectField("PRN", "", UAVObjectField.FieldType.INT8, PRNElemNames, null) );
-
 		List<String> ElevationElemNames = new ArrayList<String>();
 		ElevationElemNames.add("0");
 		ElevationElemNames.add("1");
@@ -111,6 +88,29 @@ public class GPSSatellites extends UAVDataObject {
 		AzimuthElemNames.add("14");
 		AzimuthElemNames.add("15");
 		fields.add( new UAVObjectField("Azimuth", "degrees", UAVObjectField.FieldType.FLOAT32, AzimuthElemNames, null) );
+
+		List<String> SatsInViewElemNames = new ArrayList<String>();
+		SatsInViewElemNames.add("0");
+		fields.add( new UAVObjectField("SatsInView", "", UAVObjectField.FieldType.INT8, SatsInViewElemNames, null) );
+
+		List<String> PRNElemNames = new ArrayList<String>();
+		PRNElemNames.add("0");
+		PRNElemNames.add("1");
+		PRNElemNames.add("2");
+		PRNElemNames.add("3");
+		PRNElemNames.add("4");
+		PRNElemNames.add("5");
+		PRNElemNames.add("6");
+		PRNElemNames.add("7");
+		PRNElemNames.add("8");
+		PRNElemNames.add("9");
+		PRNElemNames.add("10");
+		PRNElemNames.add("11");
+		PRNElemNames.add("12");
+		PRNElemNames.add("13");
+		PRNElemNames.add("14");
+		PRNElemNames.add("15");
+		fields.add( new UAVObjectField("PRN", "", UAVObjectField.FieldType.INT8, PRNElemNames, null) );
 
 		List<String> SNRElemNames = new ArrayList<String>();
 		SNRElemNames.add("0");
@@ -204,7 +204,7 @@ public class GPSSatellites extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0xD62FA3AE;
+	protected static final int OBJID = 0x920D998;
 	protected static final String NAME = "GPSSatellites";
 	protected static String DESCRIPTION = "Contains information about the GPS satellites in view from @ref GPSModule.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

@@ -51,12 +51,6 @@ public class AttitudeSettings extends UAVDataObject {
 		List<UAVObjectField> fields = new ArrayList<UAVObjectField>();
 		
 
-		List<String> AccelBiasElemNames = new ArrayList<String>();
-		AccelBiasElemNames.add("X");
-		AccelBiasElemNames.add("Y");
-		AccelBiasElemNames.add("Z");
-		fields.add( new UAVObjectField("AccelBias", "lsb", UAVObjectField.FieldType.INT16, AccelBiasElemNames, null) );
-
 		List<String> GyroGainElemNames = new ArrayList<String>();
 		GyroGainElemNames.add("0");
 		fields.add( new UAVObjectField("GyroGain", "(rad/s)/lsb", UAVObjectField.FieldType.FLOAT32, GyroGainElemNames, null) );
@@ -68,6 +62,50 @@ public class AttitudeSettings extends UAVDataObject {
 		List<String> AccelKiElemNames = new ArrayList<String>();
 		AccelKiElemNames.add("0");
 		fields.add( new UAVObjectField("AccelKi", "channel", UAVObjectField.FieldType.FLOAT32, AccelKiElemNames, null) );
+
+		List<String> YawBiasRateElemNames = new ArrayList<String>();
+		YawBiasRateElemNames.add("0");
+		fields.add( new UAVObjectField("YawBiasRate", "channel", UAVObjectField.FieldType.FLOAT32, YawBiasRateElemNames, null) );
+
+		List<String> AccelBiasElemNames = new ArrayList<String>();
+		AccelBiasElemNames.add("X");
+		AccelBiasElemNames.add("Y");
+		AccelBiasElemNames.add("Z");
+		fields.add( new UAVObjectField("AccelBias", "lsb", UAVObjectField.FieldType.INT16, AccelBiasElemNames, null) );
+
+		List<String> GyroBiasElemNames = new ArrayList<String>();
+		GyroBiasElemNames.add("X");
+		GyroBiasElemNames.add("Y");
+		GyroBiasElemNames.add("Z");
+		fields.add( new UAVObjectField("GyroBias", "deg/s * 100", UAVObjectField.FieldType.INT16, GyroBiasElemNames, null) );
+
+		List<String> BoardRotationElemNames = new ArrayList<String>();
+		BoardRotationElemNames.add("Roll");
+		BoardRotationElemNames.add("Pitch");
+		BoardRotationElemNames.add("Yaw");
+		fields.add( new UAVObjectField("BoardRotation", "deg", UAVObjectField.FieldType.INT16, BoardRotationElemNames, null) );
+
+		List<String> ZeroDuringArmingElemNames = new ArrayList<String>();
+		ZeroDuringArmingElemNames.add("0");
+		List<String> ZeroDuringArmingEnumOptions = new ArrayList<String>();
+		ZeroDuringArmingEnumOptions.add("FALSE");
+		ZeroDuringArmingEnumOptions.add("TRUE");
+		fields.add( new UAVObjectField("ZeroDuringArming", "channel", UAVObjectField.FieldType.ENUM, ZeroDuringArmingElemNames, ZeroDuringArmingEnumOptions) );
+
+		List<String> BiasCorrectGyroElemNames = new ArrayList<String>();
+		BiasCorrectGyroElemNames.add("0");
+		List<String> BiasCorrectGyroEnumOptions = new ArrayList<String>();
+		BiasCorrectGyroEnumOptions.add("FALSE");
+		BiasCorrectGyroEnumOptions.add("TRUE");
+		fields.add( new UAVObjectField("BiasCorrectGyro", "channel", UAVObjectField.FieldType.ENUM, BiasCorrectGyroElemNames, BiasCorrectGyroEnumOptions) );
+
+		List<String> TrimFlightElemNames = new ArrayList<String>();
+		TrimFlightElemNames.add("0");
+		List<String> TrimFlightEnumOptions = new ArrayList<String>();
+		TrimFlightEnumOptions.add("NORMAL");
+		TrimFlightEnumOptions.add("START");
+		TrimFlightEnumOptions.add("LOAD");
+		fields.add( new UAVObjectField("TrimFlight", "channel", UAVObjectField.FieldType.ENUM, TrimFlightElemNames, TrimFlightEnumOptions) );
 
 
 		// Compute the number of bytes for this object
@@ -114,12 +152,22 @@ public class AttitudeSettings extends UAVDataObject {
 	 */
 	public void setDefaultFieldValues()
 	{
+		getField("GyroGain").setValue(0.42);
+		getField("AccelKp").setValue(0.05);
+		getField("AccelKi").setValue(0.0001);
+		getField("YawBiasRate").setValue(1e-06);
 		getField("AccelBias").setValue(0,0);
 		getField("AccelBias").setValue(0,1);
 		getField("AccelBias").setValue(0,2);
-		getField("GyroGain").setValue(0.42);
-		getField("AccelKp").setValue(0.01);
-		getField("AccelKi").setValue(0.0001);
+		getField("GyroBias").setValue(0,0);
+		getField("GyroBias").setValue(0,1);
+		getField("GyroBias").setValue(0,2);
+		getField("BoardRotation").setValue(0,0);
+		getField("BoardRotation").setValue(0,1);
+		getField("BoardRotation").setValue(0,2);
+		getField("ZeroDuringArming").setValue("TRUE");
+		getField("BiasCorrectGyro").setValue("TRUE");
+		getField("TrimFlight").setValue("NORMAL");
 
 	}
 
@@ -148,7 +196,7 @@ public class AttitudeSettings extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0x327BF29A;
+	protected static final int OBJID = 0xC307BC4A;
 	protected static final String NAME = "AttitudeSettings";
 	protected static String DESCRIPTION = "Settings for the @ref Attitude module used on CopterControl";
 	protected static final boolean ISSINGLEINST = 1 == 1;

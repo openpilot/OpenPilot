@@ -51,6 +51,11 @@ public class SystemSettings extends UAVDataObject {
 		List<UAVObjectField> fields = new ArrayList<UAVObjectField>();
 		
 
+		List<String> GUIConfigDataElemNames = new ArrayList<String>();
+		GUIConfigDataElemNames.add("0");
+		GUIConfigDataElemNames.add("1");
+		fields.add( new UAVObjectField("GUIConfigData", "bits", UAVObjectField.FieldType.UINT32, GUIConfigDataElemNames, null) );
+
 		List<String> AirframeTypeElemNames = new ArrayList<String>();
 		AirframeTypeElemNames.add("0");
 		List<String> AirframeTypeEnumOptions = new ArrayList<String>();
@@ -117,6 +122,8 @@ public class SystemSettings extends UAVDataObject {
 	 */
 	public void setDefaultFieldValues()
 	{
+		getField("GUIConfigData").setValue(0,0);
+		getField("GUIConfigData").setValue(0,1);
 		getField("AirframeType").setValue("FixedWing");
 
 	}
@@ -146,7 +153,7 @@ public class SystemSettings extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0x3875CEE;
+	protected static final int OBJID = 0x30BD5D7C;
 	protected static final String NAME = "SystemSettings";
 	protected static String DESCRIPTION = "Select airframe type.  Currently used by @ref ActuatorModule to choose mixing from @ref ActuatorDesired to @ref ActuatorCommand";
 	protected static final boolean ISSINGLEINST = 1 == 1;

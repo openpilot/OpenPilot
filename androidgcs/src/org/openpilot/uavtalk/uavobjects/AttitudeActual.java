@@ -110,7 +110,7 @@ public class AttitudeActual extends UAVDataObject {
 		metadata.flightAccess = UAVObject.AccessMode.ACCESS_READWRITE;
 		metadata.flightTelemetryAcked = UAVObject.Acked.FALSE;
 		metadata.flightTelemetryUpdateMode = UAVObject.UpdateMode.UPDATEMODE_PERIODIC;
-		metadata.flightTelemetryUpdatePeriod = 500;
+		metadata.flightTelemetryUpdatePeriod = 100;
 
 		metadata.loggingUpdateMode = UAVObject.UpdateMode.UPDATEMODE_NEVER;
 		metadata.loggingUpdatePeriod = 0;
@@ -152,7 +152,7 @@ public class AttitudeActual extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0xFC5B8CF4;
+	protected static final int OBJID = 0x33DAD5E6;
 	protected static final String NAME = "AttitudeActual";
 	protected static String DESCRIPTION = "The updated Attitude estimation from @ref AHRSCommsModule.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

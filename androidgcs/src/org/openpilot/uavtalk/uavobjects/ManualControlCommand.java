@@ -51,19 +51,9 @@ public class ManualControlCommand extends UAVDataObject {
 		List<UAVObjectField> fields = new ArrayList<UAVObjectField>();
 		
 
-		List<String> ConnectedElemNames = new ArrayList<String>();
-		ConnectedElemNames.add("0");
-		List<String> ConnectedEnumOptions = new ArrayList<String>();
-		ConnectedEnumOptions.add("False");
-		ConnectedEnumOptions.add("True");
-		fields.add( new UAVObjectField("Connected", "", UAVObjectField.FieldType.ENUM, ConnectedElemNames, ConnectedEnumOptions) );
-
-		List<String> ArmedElemNames = new ArrayList<String>();
-		ArmedElemNames.add("0");
-		List<String> ArmedEnumOptions = new ArrayList<String>();
-		ArmedEnumOptions.add("False");
-		ArmedEnumOptions.add("True");
-		fields.add( new UAVObjectField("Armed", "", UAVObjectField.FieldType.ENUM, ArmedElemNames, ArmedEnumOptions) );
+		List<String> ThrottleElemNames = new ArrayList<String>();
+		ThrottleElemNames.add("0");
+		fields.add( new UAVObjectField("Throttle", "%", UAVObjectField.FieldType.FLOAT32, ThrottleElemNames, null) );
 
 		List<String> RollElemNames = new ArrayList<String>();
 		RollElemNames.add("0");
@@ -77,32 +67,9 @@ public class ManualControlCommand extends UAVDataObject {
 		YawElemNames.add("0");
 		fields.add( new UAVObjectField("Yaw", "%", UAVObjectField.FieldType.FLOAT32, YawElemNames, null) );
 
-		List<String> ThrottleElemNames = new ArrayList<String>();
-		ThrottleElemNames.add("0");
-		fields.add( new UAVObjectField("Throttle", "%", UAVObjectField.FieldType.FLOAT32, ThrottleElemNames, null) );
-
-		List<String> FlightModeElemNames = new ArrayList<String>();
-		FlightModeElemNames.add("0");
-		List<String> FlightModeEnumOptions = new ArrayList<String>();
-		FlightModeEnumOptions.add("Manual");
-		FlightModeEnumOptions.add("Stabilized1");
-		FlightModeEnumOptions.add("Stabilized2");
-		FlightModeEnumOptions.add("Stabilized3");
-		FlightModeEnumOptions.add("VelocityControl");
-		FlightModeEnumOptions.add("PositionHold");
-		fields.add( new UAVObjectField("FlightMode", "", UAVObjectField.FieldType.ENUM, FlightModeElemNames, FlightModeEnumOptions) );
-
-		List<String> Accessory1ElemNames = new ArrayList<String>();
-		Accessory1ElemNames.add("0");
-		fields.add( new UAVObjectField("Accessory1", "%", UAVObjectField.FieldType.FLOAT32, Accessory1ElemNames, null) );
-
-		List<String> Accessory2ElemNames = new ArrayList<String>();
-		Accessory2ElemNames.add("0");
-		fields.add( new UAVObjectField("Accessory2", "%", UAVObjectField.FieldType.FLOAT32, Accessory2ElemNames, null) );
-
-		List<String> Accessory3ElemNames = new ArrayList<String>();
-		Accessory3ElemNames.add("0");
-		fields.add( new UAVObjectField("Accessory3", "%", UAVObjectField.FieldType.FLOAT32, Accessory3ElemNames, null) );
+		List<String> CollectiveElemNames = new ArrayList<String>();
+		CollectiveElemNames.add("0");
+		fields.add( new UAVObjectField("Collective", "%", UAVObjectField.FieldType.FLOAT32, CollectiveElemNames, null) );
 
 		List<String> ChannelElemNames = new ArrayList<String>();
 		ChannelElemNames.add("0");
@@ -113,7 +80,15 @@ public class ManualControlCommand extends UAVDataObject {
 		ChannelElemNames.add("5");
 		ChannelElemNames.add("6");
 		ChannelElemNames.add("7");
+		ChannelElemNames.add("8");
 		fields.add( new UAVObjectField("Channel", "us", UAVObjectField.FieldType.UINT16, ChannelElemNames, null) );
+
+		List<String> ConnectedElemNames = new ArrayList<String>();
+		ConnectedElemNames.add("0");
+		List<String> ConnectedEnumOptions = new ArrayList<String>();
+		ConnectedEnumOptions.add("False");
+		ConnectedEnumOptions.add("True");
+		fields.add( new UAVObjectField("Connected", "", UAVObjectField.FieldType.ENUM, ConnectedElemNames, ConnectedEnumOptions) );
 
 
 		// Compute the number of bytes for this object
@@ -188,7 +163,7 @@ public class ManualControlCommand extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0x926794;
+	protected static final int OBJID = 0x1E82C2D2;
 	protected static final String NAME = "ManualControlCommand";
 	protected static String DESCRIPTION = "The output from the @ref ManualControlModule which descodes the receiver inputs.  Overriden by GCS for fly-by-wire control.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

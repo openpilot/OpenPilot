@@ -51,15 +51,6 @@ public class GPSPosition extends UAVDataObject {
 		List<UAVObjectField> fields = new ArrayList<UAVObjectField>();
 		
 
-		List<String> StatusElemNames = new ArrayList<String>();
-		StatusElemNames.add("0");
-		List<String> StatusEnumOptions = new ArrayList<String>();
-		StatusEnumOptions.add("NoGPS");
-		StatusEnumOptions.add("NoFix");
-		StatusEnumOptions.add("Fix2D");
-		StatusEnumOptions.add("Fix3D");
-		fields.add( new UAVObjectField("Status", "", UAVObjectField.FieldType.ENUM, StatusElemNames, StatusEnumOptions) );
-
 		List<String> LatitudeElemNames = new ArrayList<String>();
 		LatitudeElemNames.add("0");
 		fields.add( new UAVObjectField("Latitude", "degrees x 10^-7", UAVObjectField.FieldType.INT32, LatitudeElemNames, null) );
@@ -84,10 +75,6 @@ public class GPSPosition extends UAVDataObject {
 		GroundspeedElemNames.add("0");
 		fields.add( new UAVObjectField("Groundspeed", "m/s", UAVObjectField.FieldType.FLOAT32, GroundspeedElemNames, null) );
 
-		List<String> SatellitesElemNames = new ArrayList<String>();
-		SatellitesElemNames.add("0");
-		fields.add( new UAVObjectField("Satellites", "", UAVObjectField.FieldType.INT8, SatellitesElemNames, null) );
-
 		List<String> PDOPElemNames = new ArrayList<String>();
 		PDOPElemNames.add("0");
 		fields.add( new UAVObjectField("PDOP", "", UAVObjectField.FieldType.FLOAT32, PDOPElemNames, null) );
@@ -99,6 +86,19 @@ public class GPSPosition extends UAVDataObject {
 		List<String> VDOPElemNames = new ArrayList<String>();
 		VDOPElemNames.add("0");
 		fields.add( new UAVObjectField("VDOP", "", UAVObjectField.FieldType.FLOAT32, VDOPElemNames, null) );
+
+		List<String> StatusElemNames = new ArrayList<String>();
+		StatusElemNames.add("0");
+		List<String> StatusEnumOptions = new ArrayList<String>();
+		StatusEnumOptions.add("NoGPS");
+		StatusEnumOptions.add("NoFix");
+		StatusEnumOptions.add("Fix2D");
+		StatusEnumOptions.add("Fix3D");
+		fields.add( new UAVObjectField("Status", "", UAVObjectField.FieldType.ENUM, StatusElemNames, StatusEnumOptions) );
+
+		List<String> SatellitesElemNames = new ArrayList<String>();
+		SatellitesElemNames.add("0");
+		fields.add( new UAVObjectField("Satellites", "", UAVObjectField.FieldType.INT8, SatellitesElemNames, null) );
 
 
 		// Compute the number of bytes for this object
@@ -173,7 +173,7 @@ public class GPSPosition extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0xB5495042;
+	protected static final int OBJID = 0xE2A323B6;
 	protected static final String NAME = "GPSPosition";
 	protected static String DESCRIPTION = "Raw GPS data from @ref GPSModule.  Should only be used by @ref AHRSCommsModule.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

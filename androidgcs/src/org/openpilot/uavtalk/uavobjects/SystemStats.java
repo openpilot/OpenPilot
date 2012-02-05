@@ -59,6 +59,10 @@ public class SystemStats extends UAVDataObject {
 		HeapRemainingElemNames.add("0");
 		fields.add( new UAVObjectField("HeapRemaining", "bytes", UAVObjectField.FieldType.UINT16, HeapRemainingElemNames, null) );
 
+		List<String> IRQStackRemainingElemNames = new ArrayList<String>();
+		IRQStackRemainingElemNames.add("0");
+		fields.add( new UAVObjectField("IRQStackRemaining", "bytes", UAVObjectField.FieldType.UINT16, IRQStackRemainingElemNames, null) );
+
 		List<String> CPULoadElemNames = new ArrayList<String>();
 		CPULoadElemNames.add("0");
 		fields.add( new UAVObjectField("CPULoad", "%", UAVObjectField.FieldType.UINT8, CPULoadElemNames, null) );
@@ -140,7 +144,7 @@ public class SystemStats extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0xAA26FFFA;
+	protected static final int OBJID = 0xD610A0F0;
 	protected static final String NAME = "SystemStats";
 	protected static String DESCRIPTION = "CPU and memory usage from OpenPilot computer. ";
 	protected static final boolean ISSINGLEINST = 1 == 1;

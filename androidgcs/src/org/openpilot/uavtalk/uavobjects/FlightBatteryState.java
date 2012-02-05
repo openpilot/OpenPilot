@@ -154,7 +154,7 @@ public class FlightBatteryState extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0x791A50E;
+	protected static final int OBJID = 0x8C0D756;
 	protected static final String NAME = "FlightBatteryState";
 	protected static String DESCRIPTION = "Battery status information.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

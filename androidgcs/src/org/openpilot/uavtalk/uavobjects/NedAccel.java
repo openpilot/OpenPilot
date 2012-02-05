@@ -136,7 +136,7 @@ public class NedAccel extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0x8E852CE8;
+	protected static final int OBJID = 0x7C7F5BC0;
 	protected static final String NAME = "NedAccel";
 	protected static String DESCRIPTION = "The projection of acceleration in the NED reference frame used by @ref Guidance.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

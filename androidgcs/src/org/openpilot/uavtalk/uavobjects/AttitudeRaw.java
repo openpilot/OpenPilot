@@ -51,28 +51,28 @@ public class AttitudeRaw extends UAVDataObject {
 		List<UAVObjectField> fields = new ArrayList<UAVObjectField>();
 		
 
-		List<String> magnetometersElemNames = new ArrayList<String>();
-		magnetometersElemNames.add("X");
-		magnetometersElemNames.add("Y");
-		magnetometersElemNames.add("Z");
-		fields.add( new UAVObjectField("magnetometers", "mGa", UAVObjectField.FieldType.INT16, magnetometersElemNames, null) );
-
 		List<String> gyrosElemNames = new ArrayList<String>();
 		gyrosElemNames.add("X");
 		gyrosElemNames.add("Y");
 		gyrosElemNames.add("Z");
 		fields.add( new UAVObjectField("gyros", "deg/s", UAVObjectField.FieldType.FLOAT32, gyrosElemNames, null) );
 
-		List<String> gyrotempElemNames = new ArrayList<String>();
-		gyrotempElemNames.add("XY");
-		gyrotempElemNames.add("Z");
-		fields.add( new UAVObjectField("gyrotemp", "raw", UAVObjectField.FieldType.UINT16, gyrotempElemNames, null) );
-
 		List<String> accelsElemNames = new ArrayList<String>();
 		accelsElemNames.add("X");
 		accelsElemNames.add("Y");
 		accelsElemNames.add("Z");
 		fields.add( new UAVObjectField("accels", "m/s^2", UAVObjectField.FieldType.FLOAT32, accelsElemNames, null) );
+
+		List<String> magnetometersElemNames = new ArrayList<String>();
+		magnetometersElemNames.add("X");
+		magnetometersElemNames.add("Y");
+		magnetometersElemNames.add("Z");
+		fields.add( new UAVObjectField("magnetometers", "mGa", UAVObjectField.FieldType.INT16, magnetometersElemNames, null) );
+
+		List<String> gyrotempElemNames = new ArrayList<String>();
+		gyrotempElemNames.add("XY");
+		gyrotempElemNames.add("Z");
+		fields.add( new UAVObjectField("gyrotemp", "raw", UAVObjectField.FieldType.UINT16, gyrotempElemNames, null) );
 
 
 		// Compute the number of bytes for this object
@@ -147,7 +147,7 @@ public class AttitudeRaw extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0x37747DE6;
+	protected static final int OBJID = 0xDB722974;
 	protected static final String NAME = "AttitudeRaw";
 	protected static String DESCRIPTION = "The raw attitude sensor data from @ref AHRSCommsModule.  Not always updated.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

@@ -258,7 +258,7 @@ bool UAVObjectGeneratorJava::process_object(ObjectInfo* info)
     outCode.replace(QString("$(INITFIELDS)"), initfields);
 
     // Write the java code
-    bool res = writeFileIfDiffrent( javaOutputPath.absolutePath() + "/" + info->namelc + ".java", outCode );
+    bool res = writeFileIfDiffrent( javaOutputPath.absolutePath() + "/" + info->name + ".java", outCode );
     if (!res) {
         cout << "Error: Could not write gcs output files" << endl;
         return false;

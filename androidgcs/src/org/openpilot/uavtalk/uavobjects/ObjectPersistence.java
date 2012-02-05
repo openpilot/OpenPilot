@@ -51,12 +51,23 @@ public class ObjectPersistence extends UAVDataObject {
 		List<UAVObjectField> fields = new ArrayList<UAVObjectField>();
 		
 
+		List<String> ObjectIDElemNames = new ArrayList<String>();
+		ObjectIDElemNames.add("0");
+		fields.add( new UAVObjectField("ObjectID", "", UAVObjectField.FieldType.UINT32, ObjectIDElemNames, null) );
+
+		List<String> InstanceIDElemNames = new ArrayList<String>();
+		InstanceIDElemNames.add("0");
+		fields.add( new UAVObjectField("InstanceID", "", UAVObjectField.FieldType.UINT32, InstanceIDElemNames, null) );
+
 		List<String> OperationElemNames = new ArrayList<String>();
 		OperationElemNames.add("0");
 		List<String> OperationEnumOptions = new ArrayList<String>();
+		OperationEnumOptions.add("NOP");
 		OperationEnumOptions.add("Load");
 		OperationEnumOptions.add("Save");
 		OperationEnumOptions.add("Delete");
+		OperationEnumOptions.add("FullErase");
+		OperationEnumOptions.add("Completed");
 		fields.add( new UAVObjectField("Operation", "", UAVObjectField.FieldType.ENUM, OperationElemNames, OperationEnumOptions) );
 
 		List<String> SelectionElemNames = new ArrayList<String>();
@@ -67,14 +78,6 @@ public class ObjectPersistence extends UAVDataObject {
 		SelectionEnumOptions.add("AllMetaObjects");
 		SelectionEnumOptions.add("AllObjects");
 		fields.add( new UAVObjectField("Selection", "", UAVObjectField.FieldType.ENUM, SelectionElemNames, SelectionEnumOptions) );
-
-		List<String> ObjectIDElemNames = new ArrayList<String>();
-		ObjectIDElemNames.add("0");
-		fields.add( new UAVObjectField("ObjectID", "", UAVObjectField.FieldType.UINT32, ObjectIDElemNames, null) );
-
-		List<String> InstanceIDElemNames = new ArrayList<String>();
-		InstanceIDElemNames.add("0");
-		fields.add( new UAVObjectField("InstanceID", "", UAVObjectField.FieldType.UINT32, InstanceIDElemNames, null) );
 
 
 		// Compute the number of bytes for this object
@@ -106,7 +109,7 @@ public class ObjectPersistence extends UAVDataObject {
 
 		metadata.flightAccess = UAVObject.AccessMode.ACCESS_READWRITE;
 		metadata.flightTelemetryAcked = UAVObject.Acked.TRUE;
-		metadata.flightTelemetryUpdateMode = UAVObject.UpdateMode.UPDATEMODE_MANUAL;
+		metadata.flightTelemetryUpdateMode = UAVObject.UpdateMode.UPDATEMODE_ONCHANGE;
 		metadata.flightTelemetryUpdatePeriod = 0;
 
 		metadata.loggingUpdateMode = UAVObject.UpdateMode.UPDATEMODE_NEVER;
@@ -149,7 +152,7 @@ public class ObjectPersistence extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0x22216832;
+	protected static final int OBJID = 0xF69AD8B8;
 	protected static final String NAME = "ObjectPersistence";
 	protected static String DESCRIPTION = "Someone who knows please enter this";
 	protected static final boolean ISSINGLEINST = 1 == 1;

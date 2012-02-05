@@ -51,13 +51,6 @@ public class HomeLocation extends UAVDataObject {
 		List<UAVObjectField> fields = new ArrayList<UAVObjectField>();
 		
 
-		List<String> SetElemNames = new ArrayList<String>();
-		SetElemNames.add("0");
-		List<String> SetEnumOptions = new ArrayList<String>();
-		SetEnumOptions.add("FALSE");
-		SetEnumOptions.add("TRUE");
-		fields.add( new UAVObjectField("Set", "", UAVObjectField.FieldType.ENUM, SetElemNames, SetEnumOptions) );
-
 		List<String> LatitudeElemNames = new ArrayList<String>();
 		LatitudeElemNames.add("0");
 		fields.add( new UAVObjectField("Latitude", "deg * 10e6", UAVObjectField.FieldType.INT32, LatitudeElemNames, null) );
@@ -93,6 +86,17 @@ public class HomeLocation extends UAVDataObject {
 		BeElemNames.add("1");
 		BeElemNames.add("2");
 		fields.add( new UAVObjectField("Be", "", UAVObjectField.FieldType.FLOAT32, BeElemNames, null) );
+
+		List<String> g_eElemNames = new ArrayList<String>();
+		g_eElemNames.add("0");
+		fields.add( new UAVObjectField("g_e", "m/s^2", UAVObjectField.FieldType.FLOAT32, g_eElemNames, null) );
+
+		List<String> SetElemNames = new ArrayList<String>();
+		SetElemNames.add("0");
+		List<String> SetEnumOptions = new ArrayList<String>();
+		SetEnumOptions.add("FALSE");
+		SetEnumOptions.add("TRUE");
+		fields.add( new UAVObjectField("Set", "", UAVObjectField.FieldType.ENUM, SetElemNames, SetEnumOptions) );
 
 
 		// Compute the number of bytes for this object
@@ -139,7 +143,6 @@ public class HomeLocation extends UAVDataObject {
 	 */
 	public void setDefaultFieldValues()
 	{
-		getField("Set").setValue("FALSE");
 		getField("Latitude").setValue(0);
 		getField("Longitude").setValue(0);
 		getField("Altitude").setValue(0);
@@ -158,6 +161,8 @@ public class HomeLocation extends UAVDataObject {
 		getField("Be").setValue(0,0);
 		getField("Be").setValue(0,1);
 		getField("Be").setValue(0,2);
+		getField("g_e").setValue(9.81);
+		getField("Set").setValue("FALSE");
 
 	}
 
@@ -186,7 +191,7 @@ public class HomeLocation extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0xD6008ED2;
+	protected static final int OBJID = 0x5BB3AEFC;
 	protected static final String NAME = "HomeLocation";
 	protected static String DESCRIPTION = "HomeLocation setting which contains the constants to tranlate from longitutde and latitude to NED reference frame.  Automatically set by @ref GPSModule after acquiring a 3D lock.  Used by @ref AHRSCommsModule.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

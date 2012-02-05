@@ -83,12 +83,37 @@ public class MixerSettings extends UAVDataObject {
 		ThrottleCurve2ElemNames.add("100");
 		fields.add( new UAVObjectField("ThrottleCurve2", "percent", UAVObjectField.FieldType.FLOAT32, ThrottleCurve2ElemNames, null) );
 
+		List<String> Curve2SourceElemNames = new ArrayList<String>();
+		Curve2SourceElemNames.add("0");
+		List<String> Curve2SourceEnumOptions = new ArrayList<String>();
+		Curve2SourceEnumOptions.add("Throttle");
+		Curve2SourceEnumOptions.add("Roll");
+		Curve2SourceEnumOptions.add("Pitch");
+		Curve2SourceEnumOptions.add("Yaw");
+		Curve2SourceEnumOptions.add("Collective");
+		Curve2SourceEnumOptions.add("Accessory0");
+		Curve2SourceEnumOptions.add("Accessory1");
+		Curve2SourceEnumOptions.add("Accessory2");
+		Curve2SourceEnumOptions.add("Accessory3");
+		Curve2SourceEnumOptions.add("Accessory4");
+		Curve2SourceEnumOptions.add("Accessory5");
+		fields.add( new UAVObjectField("Curve2Source", "", UAVObjectField.FieldType.ENUM, Curve2SourceElemNames, Curve2SourceEnumOptions) );
+
 		List<String> Mixer1TypeElemNames = new ArrayList<String>();
 		Mixer1TypeElemNames.add("0");
 		List<String> Mixer1TypeEnumOptions = new ArrayList<String>();
 		Mixer1TypeEnumOptions.add("Disabled");
 		Mixer1TypeEnumOptions.add("Motor");
 		Mixer1TypeEnumOptions.add("Servo");
+		Mixer1TypeEnumOptions.add("CameraRoll");
+		Mixer1TypeEnumOptions.add("CameraPitch");
+		Mixer1TypeEnumOptions.add("CameraYaw");
+		Mixer1TypeEnumOptions.add("Accessory0");
+		Mixer1TypeEnumOptions.add("Accessory1");
+		Mixer1TypeEnumOptions.add("Accessory2");
+		Mixer1TypeEnumOptions.add("Accessory3");
+		Mixer1TypeEnumOptions.add("Accessory4");
+		Mixer1TypeEnumOptions.add("Accessory5");
 		fields.add( new UAVObjectField("Mixer1Type", "", UAVObjectField.FieldType.ENUM, Mixer1TypeElemNames, Mixer1TypeEnumOptions) );
 
 		List<String> Mixer1VectorElemNames = new ArrayList<String>();
@@ -105,6 +130,15 @@ public class MixerSettings extends UAVDataObject {
 		Mixer2TypeEnumOptions.add("Disabled");
 		Mixer2TypeEnumOptions.add("Motor");
 		Mixer2TypeEnumOptions.add("Servo");
+		Mixer2TypeEnumOptions.add("CameraRoll");
+		Mixer2TypeEnumOptions.add("CameraPitch");
+		Mixer2TypeEnumOptions.add("CameraYaw");
+		Mixer2TypeEnumOptions.add("Accessory0");
+		Mixer2TypeEnumOptions.add("Accessory1");
+		Mixer2TypeEnumOptions.add("Accessory2");
+		Mixer2TypeEnumOptions.add("Accessory3");
+		Mixer2TypeEnumOptions.add("Accessory4");
+		Mixer2TypeEnumOptions.add("Accessory5");
 		fields.add( new UAVObjectField("Mixer2Type", "", UAVObjectField.FieldType.ENUM, Mixer2TypeElemNames, Mixer2TypeEnumOptions) );
 
 		List<String> Mixer2VectorElemNames = new ArrayList<String>();
@@ -121,6 +155,15 @@ public class MixerSettings extends UAVDataObject {
 		Mixer3TypeEnumOptions.add("Disabled");
 		Mixer3TypeEnumOptions.add("Motor");
 		Mixer3TypeEnumOptions.add("Servo");
+		Mixer3TypeEnumOptions.add("CameraRoll");
+		Mixer3TypeEnumOptions.add("CameraPitch");
+		Mixer3TypeEnumOptions.add("CameraYaw");
+		Mixer3TypeEnumOptions.add("Accessory0");
+		Mixer3TypeEnumOptions.add("Accessory1");
+		Mixer3TypeEnumOptions.add("Accessory2");
+		Mixer3TypeEnumOptions.add("Accessory3");
+		Mixer3TypeEnumOptions.add("Accessory4");
+		Mixer3TypeEnumOptions.add("Accessory5");
 		fields.add( new UAVObjectField("Mixer3Type", "", UAVObjectField.FieldType.ENUM, Mixer3TypeElemNames, Mixer3TypeEnumOptions) );
 
 		List<String> Mixer3VectorElemNames = new ArrayList<String>();
@@ -137,6 +180,15 @@ public class MixerSettings extends UAVDataObject {
 		Mixer4TypeEnumOptions.add("Disabled");
 		Mixer4TypeEnumOptions.add("Motor");
 		Mixer4TypeEnumOptions.add("Servo");
+		Mixer4TypeEnumOptions.add("CameraRoll");
+		Mixer4TypeEnumOptions.add("CameraPitch");
+		Mixer4TypeEnumOptions.add("CameraYaw");
+		Mixer4TypeEnumOptions.add("Accessory0");
+		Mixer4TypeEnumOptions.add("Accessory1");
+		Mixer4TypeEnumOptions.add("Accessory2");
+		Mixer4TypeEnumOptions.add("Accessory3");
+		Mixer4TypeEnumOptions.add("Accessory4");
+		Mixer4TypeEnumOptions.add("Accessory5");
 		fields.add( new UAVObjectField("Mixer4Type", "", UAVObjectField.FieldType.ENUM, Mixer4TypeElemNames, Mixer4TypeEnumOptions) );
 
 		List<String> Mixer4VectorElemNames = new ArrayList<String>();
@@ -153,6 +205,15 @@ public class MixerSettings extends UAVDataObject {
 		Mixer5TypeEnumOptions.add("Disabled");
 		Mixer5TypeEnumOptions.add("Motor");
 		Mixer5TypeEnumOptions.add("Servo");
+		Mixer5TypeEnumOptions.add("CameraRoll");
+		Mixer5TypeEnumOptions.add("CameraPitch");
+		Mixer5TypeEnumOptions.add("CameraYaw");
+		Mixer5TypeEnumOptions.add("Accessory0");
+		Mixer5TypeEnumOptions.add("Accessory1");
+		Mixer5TypeEnumOptions.add("Accessory2");
+		Mixer5TypeEnumOptions.add("Accessory3");
+		Mixer5TypeEnumOptions.add("Accessory4");
+		Mixer5TypeEnumOptions.add("Accessory5");
 		fields.add( new UAVObjectField("Mixer5Type", "", UAVObjectField.FieldType.ENUM, Mixer5TypeElemNames, Mixer5TypeEnumOptions) );
 
 		List<String> Mixer5VectorElemNames = new ArrayList<String>();
@@ -169,6 +230,15 @@ public class MixerSettings extends UAVDataObject {
 		Mixer6TypeEnumOptions.add("Disabled");
 		Mixer6TypeEnumOptions.add("Motor");
 		Mixer6TypeEnumOptions.add("Servo");
+		Mixer6TypeEnumOptions.add("CameraRoll");
+		Mixer6TypeEnumOptions.add("CameraPitch");
+		Mixer6TypeEnumOptions.add("CameraYaw");
+		Mixer6TypeEnumOptions.add("Accessory0");
+		Mixer6TypeEnumOptions.add("Accessory1");
+		Mixer6TypeEnumOptions.add("Accessory2");
+		Mixer6TypeEnumOptions.add("Accessory3");
+		Mixer6TypeEnumOptions.add("Accessory4");
+		Mixer6TypeEnumOptions.add("Accessory5");
 		fields.add( new UAVObjectField("Mixer6Type", "", UAVObjectField.FieldType.ENUM, Mixer6TypeElemNames, Mixer6TypeEnumOptions) );
 
 		List<String> Mixer6VectorElemNames = new ArrayList<String>();
@@ -185,6 +255,15 @@ public class MixerSettings extends UAVDataObject {
 		Mixer7TypeEnumOptions.add("Disabled");
 		Mixer7TypeEnumOptions.add("Motor");
 		Mixer7TypeEnumOptions.add("Servo");
+		Mixer7TypeEnumOptions.add("CameraRoll");
+		Mixer7TypeEnumOptions.add("CameraPitch");
+		Mixer7TypeEnumOptions.add("CameraYaw");
+		Mixer7TypeEnumOptions.add("Accessory0");
+		Mixer7TypeEnumOptions.add("Accessory1");
+		Mixer7TypeEnumOptions.add("Accessory2");
+		Mixer7TypeEnumOptions.add("Accessory3");
+		Mixer7TypeEnumOptions.add("Accessory4");
+		Mixer7TypeEnumOptions.add("Accessory5");
 		fields.add( new UAVObjectField("Mixer7Type", "", UAVObjectField.FieldType.ENUM, Mixer7TypeElemNames, Mixer7TypeEnumOptions) );
 
 		List<String> Mixer7VectorElemNames = new ArrayList<String>();
@@ -201,6 +280,15 @@ public class MixerSettings extends UAVDataObject {
 		Mixer8TypeEnumOptions.add("Disabled");
 		Mixer8TypeEnumOptions.add("Motor");
 		Mixer8TypeEnumOptions.add("Servo");
+		Mixer8TypeEnumOptions.add("CameraRoll");
+		Mixer8TypeEnumOptions.add("CameraPitch");
+		Mixer8TypeEnumOptions.add("CameraYaw");
+		Mixer8TypeEnumOptions.add("Accessory0");
+		Mixer8TypeEnumOptions.add("Accessory1");
+		Mixer8TypeEnumOptions.add("Accessory2");
+		Mixer8TypeEnumOptions.add("Accessory3");
+		Mixer8TypeEnumOptions.add("Accessory4");
+		Mixer8TypeEnumOptions.add("Accessory5");
 		fields.add( new UAVObjectField("Mixer8Type", "", UAVObjectField.FieldType.ENUM, Mixer8TypeElemNames, Mixer8TypeEnumOptions) );
 
 		List<String> Mixer8VectorElemNames = new ArrayList<String>();
@@ -210,6 +298,56 @@ public class MixerSettings extends UAVDataObject {
 		Mixer8VectorElemNames.add("Pitch");
 		Mixer8VectorElemNames.add("Yaw");
 		fields.add( new UAVObjectField("Mixer8Vector", "", UAVObjectField.FieldType.INT8, Mixer8VectorElemNames, null) );
+
+		List<String> Mixer9TypeElemNames = new ArrayList<String>();
+		Mixer9TypeElemNames.add("0");
+		List<String> Mixer9TypeEnumOptions = new ArrayList<String>();
+		Mixer9TypeEnumOptions.add("Disabled");
+		Mixer9TypeEnumOptions.add("Motor");
+		Mixer9TypeEnumOptions.add("Servo");
+		Mixer9TypeEnumOptions.add("CameraRoll");
+		Mixer9TypeEnumOptions.add("CameraPitch");
+		Mixer9TypeEnumOptions.add("CameraYaw");
+		Mixer9TypeEnumOptions.add("Accessory0");
+		Mixer9TypeEnumOptions.add("Accessory1");
+		Mixer9TypeEnumOptions.add("Accessory2");
+		Mixer9TypeEnumOptions.add("Accessory3");
+		Mixer9TypeEnumOptions.add("Accessory4");
+		Mixer9TypeEnumOptions.add("Accessory5");
+		fields.add( new UAVObjectField("Mixer9Type", "", UAVObjectField.FieldType.ENUM, Mixer9TypeElemNames, Mixer9TypeEnumOptions) );
+
+		List<String> Mixer9VectorElemNames = new ArrayList<String>();
+		Mixer9VectorElemNames.add("ThrottleCurve1");
+		Mixer9VectorElemNames.add("ThrottleCurve2");
+		Mixer9VectorElemNames.add("Roll");
+		Mixer9VectorElemNames.add("Pitch");
+		Mixer9VectorElemNames.add("Yaw");
+		fields.add( new UAVObjectField("Mixer9Vector", "", UAVObjectField.FieldType.INT8, Mixer9VectorElemNames, null) );
+
+		List<String> Mixer10TypeElemNames = new ArrayList<String>();
+		Mixer10TypeElemNames.add("0");
+		List<String> Mixer10TypeEnumOptions = new ArrayList<String>();
+		Mixer10TypeEnumOptions.add("Disabled");
+		Mixer10TypeEnumOptions.add("Motor");
+		Mixer10TypeEnumOptions.add("Servo");
+		Mixer10TypeEnumOptions.add("CameraRoll");
+		Mixer10TypeEnumOptions.add("CameraPitch");
+		Mixer10TypeEnumOptions.add("CameraYaw");
+		Mixer10TypeEnumOptions.add("Accessory0");
+		Mixer10TypeEnumOptions.add("Accessory1");
+		Mixer10TypeEnumOptions.add("Accessory2");
+		Mixer10TypeEnumOptions.add("Accessory3");
+		Mixer10TypeEnumOptions.add("Accessory4");
+		Mixer10TypeEnumOptions.add("Accessory5");
+		fields.add( new UAVObjectField("Mixer10Type", "", UAVObjectField.FieldType.ENUM, Mixer10TypeElemNames, Mixer10TypeEnumOptions) );
+
+		List<String> Mixer10VectorElemNames = new ArrayList<String>();
+		Mixer10VectorElemNames.add("ThrottleCurve1");
+		Mixer10VectorElemNames.add("ThrottleCurve2");
+		Mixer10VectorElemNames.add("Roll");
+		Mixer10VectorElemNames.add("Pitch");
+		Mixer10VectorElemNames.add("Yaw");
+		fields.add( new UAVObjectField("Mixer10Vector", "", UAVObjectField.FieldType.INT8, Mixer10VectorElemNames, null) );
 
 
 		// Compute the number of bytes for this object
@@ -261,15 +399,16 @@ public class MixerSettings extends UAVDataObject {
 		getField("AccelTime").setValue(0);
 		getField("DecelTime").setValue(0);
 		getField("ThrottleCurve1").setValue(0,0);
-		getField("ThrottleCurve1").setValue(0.25,1);
-		getField("ThrottleCurve1").setValue(0.5,2);
-		getField("ThrottleCurve1").setValue(0.75,3);
-		getField("ThrottleCurve1").setValue(1,4);
+		getField("ThrottleCurve1").setValue(0,1);
+		getField("ThrottleCurve1").setValue(0,2);
+		getField("ThrottleCurve1").setValue(0,3);
+		getField("ThrottleCurve1").setValue(0,4);
 		getField("ThrottleCurve2").setValue(0,0);
 		getField("ThrottleCurve2").setValue(0.25,1);
 		getField("ThrottleCurve2").setValue(0.5,2);
 		getField("ThrottleCurve2").setValue(0.75,3);
 		getField("ThrottleCurve2").setValue(1,4);
+		getField("Curve2Source").setValue("Throttle");
 		getField("Mixer1Type").setValue("Disabled");
 		getField("Mixer1Vector").setValue(0,0);
 		getField("Mixer1Vector").setValue(0,1);
@@ -318,6 +457,18 @@ public class MixerSettings extends UAVDataObject {
 		getField("Mixer8Vector").setValue(0,2);
 		getField("Mixer8Vector").setValue(0,3);
 		getField("Mixer8Vector").setValue(0,4);
+		getField("Mixer9Type").setValue("Disabled");
+		getField("Mixer9Vector").setValue(0,0);
+		getField("Mixer9Vector").setValue(0,1);
+		getField("Mixer9Vector").setValue(0,2);
+		getField("Mixer9Vector").setValue(0,3);
+		getField("Mixer9Vector").setValue(0,4);
+		getField("Mixer10Type").setValue("Disabled");
+		getField("Mixer10Vector").setValue(0,0);
+		getField("Mixer10Vector").setValue(0,1);
+		getField("Mixer10Vector").setValue(0,2);
+		getField("Mixer10Vector").setValue(0,3);
+		getField("Mixer10Vector").setValue(0,4);
 
 	}
 
@@ -346,7 +497,7 @@ public class MixerSettings extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0x4FAE374E;
+	protected static final int OBJID = 0x5D16D6C4;
 	protected static final String NAME = "MixerSettings";
 	protected static String DESCRIPTION = "Settings for the @ref ActuatorModule that controls the channel assignments for the mixer based on AircraftType";
 	protected static final boolean ISSINGLEINST = 1 == 1;

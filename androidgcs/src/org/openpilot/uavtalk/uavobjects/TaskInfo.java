@@ -65,6 +65,8 @@ public class TaskInfo extends UAVDataObject {
 		StackRemainingElemNames.add("Stabilization");
 		StackRemainingElemNames.add("Guidance");
 		StackRemainingElemNames.add("FlightPlan");
+		StackRemainingElemNames.add("Com2UsbBridge");
+		StackRemainingElemNames.add("Usb2ComBridge");
 		fields.add( new UAVObjectField("StackRemaining", "bytes", UAVObjectField.FieldType.UINT16, StackRemainingElemNames, null) );
 
 		List<String> RunningElemNames = new ArrayList<String>();
@@ -81,10 +83,30 @@ public class TaskInfo extends UAVDataObject {
 		RunningElemNames.add("Stabilization");
 		RunningElemNames.add("Guidance");
 		RunningElemNames.add("FlightPlan");
+		RunningElemNames.add("Com2UsbBridge");
+		RunningElemNames.add("Usb2ComBridge");
 		List<String> RunningEnumOptions = new ArrayList<String>();
 		RunningEnumOptions.add("False");
 		RunningEnumOptions.add("True");
 		fields.add( new UAVObjectField("Running", "bool", UAVObjectField.FieldType.ENUM, RunningElemNames, RunningEnumOptions) );
+
+		List<String> RunningTimeElemNames = new ArrayList<String>();
+		RunningTimeElemNames.add("System");
+		RunningTimeElemNames.add("Actuator");
+		RunningTimeElemNames.add("Attitude");
+		RunningTimeElemNames.add("TelemetryTx");
+		RunningTimeElemNames.add("TelemetryTxPri");
+		RunningTimeElemNames.add("TelemetryRx");
+		RunningTimeElemNames.add("GPS");
+		RunningTimeElemNames.add("ManualControl");
+		RunningTimeElemNames.add("Altitude");
+		RunningTimeElemNames.add("AHRSComms");
+		RunningTimeElemNames.add("Stabilization");
+		RunningTimeElemNames.add("Guidance");
+		RunningTimeElemNames.add("FlightPlan");
+		RunningTimeElemNames.add("Com2UsbBridge");
+		RunningTimeElemNames.add("Usb2ComBridge");
+		fields.add( new UAVObjectField("RunningTime", "%", UAVObjectField.FieldType.UINT8, RunningTimeElemNames, null) );
 
 
 		// Compute the number of bytes for this object
@@ -159,7 +181,7 @@ public class TaskInfo extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0x50F599F0;
+	protected static final int OBJID = 0xE34A7C32;
 	protected static final String NAME = "TaskInfo";
 	protected static String DESCRIPTION = "Task information";
 	protected static final boolean ISSINGLEINST = 1 == 1;

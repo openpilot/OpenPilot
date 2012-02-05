@@ -51,6 +51,22 @@ public class I2CStats extends UAVDataObject {
 		List<UAVObjectField> fields = new ArrayList<UAVObjectField>();
 		
 
+		List<String> evirq_logElemNames = new ArrayList<String>();
+		evirq_logElemNames.add("0");
+		evirq_logElemNames.add("1");
+		evirq_logElemNames.add("2");
+		evirq_logElemNames.add("3");
+		evirq_logElemNames.add("4");
+		fields.add( new UAVObjectField("evirq_log", "", UAVObjectField.FieldType.UINT32, evirq_logElemNames, null) );
+
+		List<String> erirq_logElemNames = new ArrayList<String>();
+		erirq_logElemNames.add("0");
+		erirq_logElemNames.add("1");
+		erirq_logElemNames.add("2");
+		erirq_logElemNames.add("3");
+		erirq_logElemNames.add("4");
+		fields.add( new UAVObjectField("erirq_log", "", UAVObjectField.FieldType.UINT32, erirq_logElemNames, null) );
+
 		List<String> event_errorsElemNames = new ArrayList<String>();
 		event_errorsElemNames.add("0");
 		fields.add( new UAVObjectField("event_errors", "", UAVObjectField.FieldType.UINT8, event_errorsElemNames, null) );
@@ -78,22 +94,6 @@ public class I2CStats extends UAVDataObject {
 		last_error_typeEnumOptions.add("FSM");
 		last_error_typeEnumOptions.add("INTERRUPT");
 		fields.add( new UAVObjectField("last_error_type", "", UAVObjectField.FieldType.ENUM, last_error_typeElemNames, last_error_typeEnumOptions) );
-
-		List<String> evirq_logElemNames = new ArrayList<String>();
-		evirq_logElemNames.add("0");
-		evirq_logElemNames.add("1");
-		evirq_logElemNames.add("2");
-		evirq_logElemNames.add("3");
-		evirq_logElemNames.add("4");
-		fields.add( new UAVObjectField("evirq_log", "", UAVObjectField.FieldType.UINT32, evirq_logElemNames, null) );
-
-		List<String> erirq_logElemNames = new ArrayList<String>();
-		erirq_logElemNames.add("0");
-		erirq_logElemNames.add("1");
-		erirq_logElemNames.add("2");
-		erirq_logElemNames.add("3");
-		erirq_logElemNames.add("4");
-		fields.add( new UAVObjectField("erirq_log", "", UAVObjectField.FieldType.UINT32, erirq_logElemNames, null) );
 
 		List<String> event_logElemNames = new ArrayList<String>();
 		event_logElemNames.add("0");
@@ -227,7 +227,7 @@ public class I2CStats extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0x23CE9E9C;
+	protected static final int OBJID = 0xB714823E;
 	protected static final String NAME = "I2CStats";
 	protected static String DESCRIPTION = "Tracks statistics on the I2C bus.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

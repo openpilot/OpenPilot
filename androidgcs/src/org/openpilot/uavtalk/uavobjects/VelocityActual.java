@@ -136,7 +136,7 @@ public class VelocityActual extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0x48009C88;
+	protected static final int OBJID = 0x43007EB0;
 	protected static final String NAME = "VelocityActual";
 	protected static String DESCRIPTION = "Updated by @ref AHRSCommsModule and used within @ref GuidanceModule for velocity control";
 	protected static final boolean ISSINGLEINST = 1 == 1;

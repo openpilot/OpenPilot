@@ -51,6 +51,19 @@ public class FlightPlanStatus extends UAVDataObject {
 		List<UAVObjectField> fields = new ArrayList<UAVObjectField>();
 		
 
+		List<String> ErrorFileIDElemNames = new ArrayList<String>();
+		ErrorFileIDElemNames.add("0");
+		fields.add( new UAVObjectField("ErrorFileID", "", UAVObjectField.FieldType.UINT32, ErrorFileIDElemNames, null) );
+
+		List<String> ErrorLineNumElemNames = new ArrayList<String>();
+		ErrorLineNumElemNames.add("0");
+		fields.add( new UAVObjectField("ErrorLineNum", "", UAVObjectField.FieldType.UINT32, ErrorLineNumElemNames, null) );
+
+		List<String> DebugElemNames = new ArrayList<String>();
+		DebugElemNames.add("0");
+		DebugElemNames.add("1");
+		fields.add( new UAVObjectField("Debug", "", UAVObjectField.FieldType.FLOAT32, DebugElemNames, null) );
+
 		List<String> StatusElemNames = new ArrayList<String>();
 		StatusElemNames.add("0");
 		List<String> StatusEnumOptions = new ArrayList<String>();
@@ -82,22 +95,6 @@ public class FlightPlanStatus extends UAVDataObject {
 		ErrorTypeEnumOptions.add("Warning");
 		ErrorTypeEnumOptions.add("UnknownError");
 		fields.add( new UAVObjectField("ErrorType", "", UAVObjectField.FieldType.ENUM, ErrorTypeElemNames, ErrorTypeEnumOptions) );
-
-		List<String> ErrorFileIDElemNames = new ArrayList<String>();
-		ErrorFileIDElemNames.add("0");
-		fields.add( new UAVObjectField("ErrorFileID", "", UAVObjectField.FieldType.UINT32, ErrorFileIDElemNames, null) );
-
-		List<String> ErrorLineNumElemNames = new ArrayList<String>();
-		ErrorLineNumElemNames.add("0");
-		fields.add( new UAVObjectField("ErrorLineNum", "", UAVObjectField.FieldType.UINT32, ErrorLineNumElemNames, null) );
-
-		List<String> Debug1ElemNames = new ArrayList<String>();
-		Debug1ElemNames.add("0");
-		fields.add( new UAVObjectField("Debug1", "", UAVObjectField.FieldType.FLOAT32, Debug1ElemNames, null) );
-
-		List<String> Debug2ElemNames = new ArrayList<String>();
-		Debug2ElemNames.add("0");
-		fields.add( new UAVObjectField("Debug2", "", UAVObjectField.FieldType.FLOAT32, Debug2ElemNames, null) );
 
 
 		// Compute the number of bytes for this object
@@ -144,10 +141,10 @@ public class FlightPlanStatus extends UAVDataObject {
 	 */
 	public void setDefaultFieldValues()
 	{
+		getField("Debug").setValue(0,0);
+		getField("Debug").setValue(0,1);
 		getField("Status").setValue("Stopped");
 		getField("ErrorType").setValue("None");
-		getField("Debug1").setValue(0);
-		getField("Debug2").setValue(0);
 
 	}
 
@@ -176,7 +173,7 @@ public class FlightPlanStatus extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0x9FC14812;
+	protected static final int OBJID = 0x2206EE46;
 	protected static final String NAME = "FlightPlanStatus";
 	protected static String DESCRIPTION = "Status of the flight plan script";
 	protected static final boolean ISSINGLEINST = 1 == 1;

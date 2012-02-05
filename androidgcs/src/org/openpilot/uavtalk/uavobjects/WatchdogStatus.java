@@ -132,7 +132,7 @@ public class WatchdogStatus extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0xD646E910;
+	protected static final int OBJID = 0xA207FA7C;
 	protected static final String NAME = "WatchdogStatus";
 	protected static String DESCRIPTION = "For monitoring the flags in the watchdog and especially the bootup flags";
 	protected static final boolean ISSINGLEINST = 1 == 1;

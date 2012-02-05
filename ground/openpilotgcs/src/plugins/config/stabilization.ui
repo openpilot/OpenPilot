@@ -111,6 +111,12 @@
              <string>Slowly raise Kp until you start seeing clear oscillations when you fly.
 Then lower the value by 20% or so.</string>
             </property>
+            <property name="autoFillBackground">
+             <bool>true</bool>
+            </property>
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
             <property name="decimals">
              <number>6</number>
             </property>

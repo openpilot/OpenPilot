@@ -111,7 +111,6 @@ void addUAVObjectToWidgetRelation(QString object, QString field, QWidget *widget
 
     bool allObjectsUpdated();
 
-
 public slots:
     void onAutopilotDisconnect();
     void onAutopilotConnect();
@@ -137,10 +136,12 @@ private:
     QMap<QWidget *,objectToWidget*> shadowsList;
     bool dirty;
     bool setFieldFromWidget(QWidget *widget, UAVObjectField *field, int index, float scale);
-    bool setWidgetFromField(QWidget *widget, UAVObjectField *field, int index, float scale);
+    bool setWidgetFromField(QWidget *widget, UAVObjectField *field, int index, float scale, bool hasLimits);
     QVariant getVariantFromWidget(QWidget *widget, float scale);
     bool setWidgetFromVariant(QWidget *widget,QVariant value,float scale);
     void connectWidgetUpdatesToSlot(QWidget *widget, const char *function);
+    void loadWidgetLimits(QWidget *widget, UAVObjectField *field, int index, bool hasLimits, float sclale);
+    QString outOfLimitsStyle;
 protected slots:
     virtual void disableObjUpdates();
     virtual void enableObjUpdates();
@@ -151,7 +152,7 @@ protected slots:
     virtual void updateObjectsFromWidgets();
 protected:
     virtual void enableControls(bool enable);
-
+    void checkWidgetsLimits(QWidget *widget, UAVObjectField *field, int index, bool hasLimits, QVariant value, float scale);
 };
 
 #endif // CONFIGTASKWIDGET_H

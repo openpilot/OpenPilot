@@ -29,7 +29,7 @@
 #include "uavsettingsimportexport/uavsettingsimportexportfactory.h"
 #include "configgadgetwidget.h"
 
-ConfigTaskWidget::ConfigTaskWidget(QWidget *parent) : QWidget(parent),isConnected(false),smartsave(NULL),dirty(false)
+ConfigTaskWidget::ConfigTaskWidget(QWidget *parent) : QWidget(parent),isConnected(false),smartsave(NULL),dirty(false),outOfLimitsStyle("background-color: rgb(255, 0, 0);")
 {
     pm = ExtensionSystem::PluginManager::instance();
     objManager = pm->getObject<UAVObjectManager>();
@@ -89,6 +89,7 @@ void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString fiel
     ow->widget=widget;
     ow->index=index;
     ow->scale=scale;
+    ow->isLimited=isLimited;
     objOfInterest.append(ow);
     if(obj)
     {
@@ -105,9 +106,10 @@ void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString fiel
     else
     {
         connectWidgetUpdatesToSlot(widget,SLOT(widgetsContentsChanged()));
-    if(defaultReloadGroups)
-        addWidgetToDefaultReloadGroups(widget,defaultReloadGroups);
-    shadowsList.insert(widget,ow);
+        if(defaultReloadGroups)
+            addWidgetToDefaultReloadGroups(widget,defaultReloadGroups);
+        shadowsList.insert(widget,ow);
+        loadWidgetLimits(widget,_field,index,isLimited,scale);
     }
 }
 
@@ -181,8 +183,8 @@ void ConfigTaskWidget::populateWidgets()
         {
             // do nothing
         }
-       else
-            setWidgetFromField(ow->widget,ow->field,ow->index,ow->scale);
+        else
+            setWidgetFromField(ow->widget,ow->field,ow->index,ow->scale,ow->isLimited);
     }
     setDirty(dirtyBack);
 }
@@ -198,7 +200,7 @@ void ConfigTaskWidget::refreshWidgetsValues()
         }
         else
         {
-            setWidgetFromField(ow->widget,ow->field,ow->index,ow->scale);
+            setWidgetFromField(ow->widget,ow->field,ow->index,ow->scale,ow->isLimited);
         }
 
     }
@@ -246,17 +248,21 @@ void ConfigTaskWidget::enableControls(bool enable)
 void ConfigTaskWidget::widgetsContentsChanged()
 {
     float scale;
+    objectToWidget * oTw= shadowsList.value((QWidget*)sender(),NULL);
+
+    /*
     qDebug()<<"sender:"<<(quint32)sender();
     foreach(QWidget * w,shadowsList.keys())
         qDebug()<<"in list:"<<(quint32)w;
-    objectToWidget * oTw= shadowsList.value((QWidget*)sender(),NULL);
     if(oTw)
         qDebug()<<"in oTw OK"<<(quint32)oTw->widget;
+        */
     if(oTw)
     {
         if(oTw->widget==(QWidget*)sender())
         {
             scale=oTw->scale;
+            checkWidgetsLimits((QWidget*)sender(),oTw->field,oTw->index,oTw->isLimited,getVariantFromWidget((QWidget*)sender(),oTw->scale),oTw->scale);
             qDebug()<<"sender was master";
         }
         else
@@ -266,16 +272,23 @@ void ConfigTaskWidget::widgetsContentsChanged()
                 if(sh->widget==(QWidget*)sender())
                 {
                     scale=sh->scale;
+                    checkWidgetsLimits((QWidget*)sender(),oTw->field,oTw->index,sh->isLimited,getVariantFromWidget((QWidget*)sender(),scale),scale);
                     qDebug()<<"sender was shadow";
                 }
             }
         }
         if(oTw->widget!=(QWidget *)sender())
+        {
+             checkWidgetsLimits(oTw->widget,oTw->field,oTw->index,oTw->isLimited,getVariantFromWidget((QWidget*)sender(),scale),oTw->scale);
             setWidgetFromVariant(oTw->widget,getVariantFromWidget((QWidget*)sender(),scale),oTw->scale);
+        }
         foreach (shadow * sh, oTw->shadowsList)
         {
             if(sh->widget!=(QWidget*)sender())
+            {
+                checkWidgetsLimits(sh->widget,oTw->field,oTw->index,sh->isLimited,getVariantFromWidget((QWidget*)sender(),scale),oTw->scale);
                 setWidgetFromVariant(sh->widget,getVariantFromWidget((QWidget*)sender(),scale),sh->scale);
+            }
         }
     }
     setDirty(true);
@@ -540,7 +553,7 @@ void ConfigTaskWidget::defaultButtonClicked()
         if(!oTw->object)
             continue;
         UAVDataObject * temp=((UAVDataObject*)oTw->object)->dirtyClone();
-        setWidgetFromField(oTw->widget,temp->getField(oTw->field->getName()),oTw->index,oTw->scale);
+        setWidgetFromField(oTw->widget,temp->getField(oTw->field->getName()),oTw->index,oTw->scale,oTw->isLimited);
     }
 }
 
@@ -568,7 +581,7 @@ void ConfigTaskWidget::reloadButtonClicked()
             eventLoop->exec();
             if(timeOut->isActive())
             {
-                setWidgetFromField(oTw->widget,oTw->field,oTw->index,oTw->scale);
+                setWidgetFromField(oTw->widget,oTw->field,oTw->index,oTw->scale,oTw->isLimited);
             }
             timeOut->stop();
         }
@@ -614,7 +627,7 @@ void ConfigTaskWidget::connectWidgetUpdatesToSlot(QWidget * widget,const char* f
         connect(cb,SIGNAL(clicked()),this,function);
     }
     else
-       qDebug()<<__FUNCTION__<<"widget to uavobject relation not implemented"<<widget->metaObject()->className();
+        qDebug()<<__FUNCTION__<<"widget to uavobject relation not implemented"<<widget->metaObject()->className();
 
 }
 
@@ -667,8 +680,8 @@ bool ConfigTaskWidget::setWidgetFromVariant(QWidget *widget, QVariant value, flo
 {
     if(QComboBox * cb=qobject_cast<QComboBox *>(widget))
     {
-          cb->setCurrentIndex(cb->findText(value.toString()));
-          return true;
+        cb->setCurrentIndex(cb->findText(value.toString()));
+        return true;
     }
     else if(QLabel * cb=qobject_cast<QLabel *>(widget))
     {
@@ -699,16 +712,17 @@ bool ConfigTaskWidget::setWidgetFromVariant(QWidget *widget, QVariant value, flo
         return false;
 }
 
-bool ConfigTaskWidget::setWidgetFromField(QWidget * widget,UAVObjectField * field,int index,float scale)
+bool ConfigTaskWidget::setWidgetFromField(QWidget * widget,UAVObjectField * field,int index,float scale,bool hasLimits)
 {
     if(!widget || !field)
         return false;
     if(QComboBox * cb=qobject_cast<QComboBox *>(widget))
     {
         if(cb->count()==0)
-            cb->addItems(field->getOptions());
+            loadWidgetLimits(cb,field,index,hasLimits,scale);
     }
     QVariant var=field->getValue(index);
+    checkWidgetsLimits(widget,field,index,hasLimits,var,scale);
     bool ret=setWidgetFromVariant(widget,var,scale);
     if(ret)
         return true;
@@ -716,6 +730,129 @@ bool ConfigTaskWidget::setWidgetFromField(QWidget * widget,UAVObjectField * fiel
     {
         qDebug()<<__FUNCTION__<<"widget to uavobject relation not implemented"<<widget->metaObject()->className();
         return false;
+    }
+}
+void ConfigTaskWidget::checkWidgetsLimits(QWidget * widget,UAVObjectField * field,int index,bool hasLimits, QVariant value, float scale)
+{
+    if(!hasLimits)
+        return;
+    qDebug()<<"check widget"<<widget->accessibleName()<<"value"<<value.toString()<<"result"<<field->isWithinLimits(value,index);
+    if(!field->isWithinLimits(value,index))
+    {
+        if(!widget->property("styleBackup").isValid())
+            widget->setProperty("styleBackup",widget->styleSheet());
+        widget->setStyleSheet(outOfLimitsStyle);
+        widget->setProperty("wasOverLimits",(bool)true);
+        if(QComboBox * cb=qobject_cast<QComboBox *>(widget))
+        {
+            if(cb->findText(value.toString())==-1)
+                cb->addItem(value.toString());
+        }
+        else if(QDoubleSpinBox * cb=qobject_cast<QDoubleSpinBox *>(widget))
+        {
+            if(value.toDouble()/scale>cb->maximum())
+            {
+                cb->setMaximum(value.toDouble()/scale);
+            }
+            else if(value.toDouble()/scale<cb->minimum())
+            {
+                cb->setMinimum(value.toDouble()/scale);
+            }
+
+        }
+        else if(QSpinBox * cb=qobject_cast<QSpinBox *>(widget))
+        {
+            if(value.toInt()/scale>cb->maximum())
+            {
+                cb->setMaximum(value.toInt()/scale);
+            }
+            else if(value.toInt()/scale<cb->minimum())
+            {
+                cb->setMinimum(value.toInt()/scale);
+            }
+        }
+        else if(QSlider * cb=qobject_cast<QSlider *>(widget))
+        {
+            if(value.toInt()/scale>cb->maximum())
+            {
+                cb->setMaximum(value.toInt()/scale);
+            }
+            else if(value.toInt()/scale<cb->minimum())
+            {
+                cb->setMinimum(value.toInt()/scale);
+            }
+        }
+
+    }
+    else if(widget->property("wasOverLimits").isValid())
+    {
+        qDebug()<<"1wasOverLimits";
+        if(widget->property("wasOverLimits").toBool())
+        {
+            qDebug()<<"2";
+            widget->setProperty("wasOverLimits",(bool)false);
+            if(widget->property("styleBackup").isValid())
+            {
+                qDebug()<<"3";
+                QString style=widget->property("styleBackup").toString();
+                qDebug()<<"STYLE"<<style;
+                widget->setStyleSheet(style);
+            }
+            loadWidgetLimits(widget,field,index,hasLimits,scale);
+        }
+    }
+}
+void ConfigTaskWidget::loadWidgetLimits(QWidget * widget,UAVObjectField * field,int index,bool hasLimits,float scale)
+{   
+    if(QComboBox * cb=qobject_cast<QComboBox *>(widget))
+    {
+        cb->clear();
+        QStringList option=field->getOptions();
+        if(hasLimits)
+        {
+            foreach(QString str,option)
+            {
+                if(field->isWithinLimits(str,index))
+                    cb->addItem(str);
+            }
+        }
+        else
+            cb->addItems(option);
+    }
+    if(!hasLimits)
+        return;
+    else if(QDoubleSpinBox * cb=qobject_cast<QDoubleSpinBox *>(widget))
+    {
+        if(field->getMaxLimit(index).isValid())
+        {
+            cb->setMaximum(field->getMaxLimit(index).toDouble()/scale);
+        }
+        if(field->getMinLimit(index).isValid())
+        {
+            cb->setMinimum(field->getMinLimit(index).toDouble()/scale);
+        }
+    }
+    else if(QSpinBox * cb=qobject_cast<QSpinBox *>(widget))
+    {
+        if(field->getMaxLimit(index).isValid())
+        {
+            cb->setMaximum((int)(field->getMaxLimit(index).toInt()/scale));
+        }
+        if(field->getMinLimit(index).isValid())
+        {
+            cb->setMinimum((int)(field->getMinLimit(index).toInt()/scale));
+        }
+    }
+    else if(QSlider * cb=qobject_cast<QSlider *>(widget))
+    {
+        if(field->getMaxLimit(index).isValid())
+        {
+            cb->setMaximum((int)(field->getMaxLimit(index).toInt()/scale));
+        }
+        if(field->getMinLimit(index).isValid())
+        {
+            cb->setMinimum((int)(field->getMinLimit(index).toInt()/scale));
+        }
     }
 }
 

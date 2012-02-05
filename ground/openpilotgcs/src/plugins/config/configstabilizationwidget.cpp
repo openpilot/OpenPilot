@@ -43,12 +43,12 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     QList<int> * rateGroup=new QList<int>();
     rateGroup->append(0);
      addApplySaveButtons(m_stabilization->saveStabilizationToRAM,m_stabilization->saveStabilizationToSD);
-    addUAVObjectToWidgetRelation("StabilizationSettings","RollRatePID",m_stabilization->rateRollKp,"Kp",1,false,rateGroup);
+    addUAVObjectToWidgetRelation("StabilizationSettings","RollRatePID",m_stabilization->rateRollKp,"Kp",1,true,rateGroup);
 
     addDefaultButton(m_stabilization->defaultButton,0);
     addReloadButton(m_stabilization->reloadButton,0);
     addWidgetToDefaultReloadGroups(m_stabilization->rateRollKp,rateGroup);
-    addShadowWidget("StabilizationSettings","RollRatePID",m_stabilization->rateRollKi,0,1,false,rateGroup);
+    addShadowWidget("StabilizationSettings","RollRatePID",m_stabilization->rateRollKi,0,1,true,rateGroup);
 }
 
 

@@ -37,6 +37,7 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/systemstats.h \
     $$UAVOBJECT_SYNTHETICS/systemalarms.h \
     $$UAVOBJECT_SYNTHETICS/objectpersistence.h \
+    $$UAVOBJECT_SYNTHETICS/overosyncstats.h \
     $$UAVOBJECT_SYNTHETICS/systemsettings.h \
     $$UAVOBJECT_SYNTHETICS/stabilizationsettings.h \
     $$UAVOBJECT_SYNTHETICS/manualcontrolsettings.h \
@@ -90,6 +91,7 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/systemstats.cpp \
     $$UAVOBJECT_SYNTHETICS/systemalarms.cpp \
     $$UAVOBJECT_SYNTHETICS/objectpersistence.cpp \
+    $$UAVOBJECT_SYNTHETICS/overosyncstats.cpp \
     $$UAVOBJECT_SYNTHETICS/systemsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/stabilizationsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/manualcontrolsettings.cpp \

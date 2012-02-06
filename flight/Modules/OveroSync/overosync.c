@@ -32,6 +32,7 @@
 
 #include "openpilot.h"
 #include "overosync.h"
+#include "overosyncstats.h"
 
 // Private constants
 #define OVEROSYNC_PACKET_SIZE 256
@@ -68,6 +69,7 @@ struct overosync {
 	xSemaphoreHandle transaction_lock;
 	xSemaphoreHandle buffer_lock;
 	volatile bool transaction_done;
+	uint32_t sent_bytes;
 	uint32_t write_pointer;
 	uint32_t sent_objects;
 	uint32_t failed_objects;
@@ -83,6 +85,11 @@ struct overosync *overosync;
  */
 int32_t OveroSyncInitialize(void)
 {
+	if(pios_spi_overo_id == 0)
+		return -1;
+	
+	OveroSyncStatsInitialize();
+
 	// Create object queues
 	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
 
@@ -99,6 +106,9 @@ int32_t OveroSyncInitialize(void)
  */
 int32_t OveroSyncStart(void)
 {
+	if(pios_spi_overo_id == 0)
+		return -1;
+
 	overosync = (struct overosync *) pvPortMalloc(sizeof(*overosync));
 	if(overosync == NULL)
 		return -1;
@@ -114,13 +124,13 @@ int32_t OveroSyncStart(void)
 	overosync->active_transaction_id = 0;
 	overosync->loading_transaction_id = 0;
 	overosync->write_pointer = 0;
+	overosync->sent_bytes = 0;
 
 	// Process all registered objects and connect queue for updates
 	UAVObjIterate(&registerObject);
 	
 	// Start telemetry tasks
-	if(pios_spi_overo_id != 0)
-		xTaskCreate(overoSyncTask, (signed char *)"OveroSync", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &overoSyncTaskHandle);
+	xTaskCreate(overoSyncTask, (signed char *)"OveroSync", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &overoSyncTaskHandle);
 	
 	TaskMonitorAdd(TASKINFO_RUNNING_OVEROSYNC, overoSyncTaskHandle);
 	
@@ -167,6 +177,9 @@ static void overoSyncTask(void *parameters)
 	
 	transmitData();
 	
+	portTickType lastUpdateTime = xTaskGetTickCount();
+	portTickType updateTime;
+	
 	// Loop forever
 	while (1) {
 		// Wait for queue message
@@ -176,6 +189,17 @@ static void overoSyncTask(void *parameters)
 			
 			//if(overosync->transaction_done)
 			//	transmitData();
+
+			updateTime = xTaskGetTickCount();
+			if(((portTickType) (updateTime - lastUpdateTime)) > 1000) {
+				// Update stats.  This will trigger a local send event too
+				OveroSyncStatsData syncStats;
+				syncStats.Send = overosync->sent_bytes;
+				syncStats.Connected = syncStats.Send > 500 ? OVEROSYNCSTATS_CONNECTED_TRUE : OVEROSYNCSTATS_CONNECTED_FALSE;
+				OveroSyncStatsSet(&syncStats);
+				overosync->sent_bytes = 0;
+				lastUpdateTime = updateTime;
+			}
 
 			overosync_transfers++;
 		}
@@ -233,7 +257,7 @@ static int32_t packData(uint8_t * data, int32_t length)
 		overosync->write_pointer;
 	memcpy(tx_buffer,data,length);
 	overosync->write_pointer += length;
-
+	overosync->sent_bytes += length;
 	overosync->sent_objects++;
 
 	xSemaphoreGive(overosync->buffer_lock);

@@ -55,6 +55,7 @@ UAVOBJSRCFILENAMES += mixersettings
 UAVOBJSRCFILENAMES += mixerstatus
 UAVOBJSRCFILENAMES += nedaccel
 UAVOBJSRCFILENAMES += objectpersistence
+UAVOBJSRCFILENAMES += overosyncstats
 UAVOBJSRCFILENAMES += positionactual
 UAVOBJSRCFILENAMES += positiondesired
 UAVOBJSRCFILENAMES += ratedesired

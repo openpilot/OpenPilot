@@ -35,7 +35,7 @@
 
 // Private constants
 #define OVEROSYNC_PACKET_SIZE 256
-#define MAX_QUEUE_SIZE   3
+#define MAX_QUEUE_SIZE   10
 #define STACK_SIZE_BYTES 512
 #define TASK_PRIORITY (tskIDLE_PRIORITY + 0)
 
@@ -113,6 +113,7 @@ int32_t OveroSyncStart(void)
 
 	overosync->active_transaction_id = 0;
 	overosync->loading_transaction_id = 0;
+	overosync->write_pointer = 0;
 
 	// Process all registered objects and connect queue for updates
 	UAVObjIterate(&registerObject);
@@ -160,7 +161,12 @@ static void overoSyncTask(void *parameters)
 
 	// Kick off SPI transfers (once one is completed another will automatically transmit)
 	overosync->transaction_done = true;
-
+	overosync->sent_objects = 0;
+	overosync->failed_objects = 0;
+	overosync->received_objects = 0;
+	
+	transmitData();
+	
 	// Loop forever
 	while (1) {
 		// Wait for queue message
@@ -168,8 +174,8 @@ static void overoSyncTask(void *parameters)
 			// Process event.  This calls transmitData
 			UAVTalkSendObject(uavTalkCon, ev.obj, ev.instId, false, 0);
 			
-			if(overosync->transaction_done)
-				transmitData();
+			//if(overosync->transaction_done)
+			//	transmitData();
 
 			overosync_transfers++;
 		}
@@ -193,6 +199,8 @@ static void transmitDataDone(bool crc_ok, uint8_t crc_val)
 
 	overosync->transaction_done = true;
 
+	transmitData();
+	
 	// Parse the data from overo
 	for (uint32_t i = 0; rx_buffer[0] != 0 && i < sizeof(rx_buffer) ; i++)
 		UAVTalkProcessInputStream(uavTalkCon, rx_buffer[i]);
@@ -238,8 +246,8 @@ static int32_t transmitData()
 	uint8_t *tx_buffer, *rx_buffer;
 
 	// Get lock to manipulate buffers
-	if(xSemaphoreTake(overosync->buffer_lock, 1) == pdFALSE)
-		return -1;
+	/*if(xSemaphoreTake(overosync->buffer_lock, 1) == pdFALSE)
+		return -1;*/
 
 	overosync->transaction_done = false;
 
@@ -256,7 +264,7 @@ static int32_t transmitData()
 		   sizeof(overosync->transactions[overosync->loading_transaction_id].tx_buffer));
 	overosync->write_pointer = 0;
 
-	xSemaphoreGive(overosync->buffer_lock);
+	//xSemaphoreGive(overosync->buffer_lock);
 
 	xSemaphoreTake(overosync->transaction_lock, portMAX_DELAY);
 	transactionsStarted++;

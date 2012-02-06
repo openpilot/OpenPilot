@@ -250,8 +250,8 @@ endif
 # common architecture-specific flags from the device-specific library makefile
 CFLAGS += $(ARCHFLAGS)
 
-
 CFLAGS += -DDIAGNOSTICS
+CFLAGS += -DDIAG_TASKS
 
 # This is not the best place for these.  Really should abstract out
 # to the board file or something

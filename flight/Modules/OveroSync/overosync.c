@@ -241,12 +241,15 @@ int32_t transactionsStarted = 0;
 static int32_t packData(uint8_t * data, int32_t length)
 {
 	uint8_t *tx_buffer;
+	
+	portTickType tickTime = xTaskGetTickCount();
 
 	// Get the lock for manipulating the buffer
 	xSemaphoreTake(overosync->buffer_lock, portMAX_DELAY);
 
 	// Check this packet will fit
-	if ((overosync->write_pointer + length) > sizeof(overosync->transactions[overosync->loading_transaction_id].tx_buffer)) {
+	if ((overosync->write_pointer + length + sizeof(tickTime)) >
+		sizeof(overosync->transactions[overosync->loading_transaction_id].tx_buffer)) {
 		overosync->failed_objects ++;
 		xSemaphoreGive(overosync->buffer_lock);
 		return -1;
@@ -255,7 +258,8 @@ static int32_t packData(uint8_t * data, int32_t length)
 	// Get offset into buffer and copy contents
 	tx_buffer = overosync->transactions[overosync->loading_transaction_id].tx_buffer +
 		overosync->write_pointer;
-	memcpy(tx_buffer,data,length);
+	memcpy(tx_buffer, &tickTime, sizeof(tickTime));
+	memcpy(tx_buffer + sizeof(tickTime),data,length);
 	overosync->write_pointer += length;
 	overosync->sent_bytes += length;
 	overosync->sent_objects++;

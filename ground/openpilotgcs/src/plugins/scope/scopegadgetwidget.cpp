@@ -356,7 +356,7 @@ void ScopeGadgetWidget::setupChronoPlot()
 //	scaleWidget->setMinBorderDist(0, fmw);
 }
 
-void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavFieldSubField, int scaleOrderFactor, QPen pen)
+void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavFieldSubField, int scaleOrderFactor, int interpolationSamples, QPen pen)
 {
     PlotData* plotData;
 
@@ -369,6 +369,7 @@ void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavFieldSubField
 
     plotData->m_xWindowSize = m_xWindowSize;
     plotData->scalePower = scaleOrderFactor;
+    plotData->interpolationSamples = interpolationSamples;
 
     //If the y-bounds are supplied, set them
     if (plotData->yMinimum != plotData->yMaximum)
@@ -446,6 +447,7 @@ void ScopeGadgetWidget::uavObjectReceived(UAVObject* obj)
     foreach(PlotData* plotData, m_curvesData.values()) {
         if (plotData->append(obj)) m_csvLoggingDataUpdated=1;
     }
+    csvLoggingAddData();
 }
 
 void ScopeGadgetWidget::replotNewData()
@@ -609,6 +611,7 @@ int ScopeGadgetWidget::csvLoggingStart()
         m_csvLoggingStartTime = NOW;
         m_csvLoggingHeaderSaved=0;
         m_csvLoggingDataSaved=0;
+        m_csvLoggingBuffer.clear();
         QDir PathCheck(m_csvLoggingPath);
         if (!PathCheck.exists())
         {
@@ -676,13 +679,50 @@ int ScopeGadgetWidget::csvLoggingInsertHeader()
     return 0;
 }
 
+int ScopeGadgetWidget::csvLoggingAddData()
+{
+    if (!m_csvLoggingStarted) return -1;
+    m_csvLoggingDataValid=0;
+    QDateTime NOW = QDateTime::currentDateTime();
+    QString tempString;
+
+    QTextStream ss( &tempString );
+    ss << NOW.toString("yyyy-MM-dd") << ", " << NOW.toString("hh:mm:ss.z") << ", " ;
+
+#if QT_VERSION >= 0x040700
+    ss <<(NOW.toMSecsSinceEpoch() - m_csvLoggingStartTime.toMSecsSinceEpoch())/1000.00;
+#else
+    ss <<(NOW.toTime_t() - m_csvLoggingStartTime.toTime_t());
+#endif
+    ss << ", " << m_csvLoggingConnected << ", " << m_csvLoggingDataUpdated;
+    m_csvLoggingDataUpdated=0;
+
+    foreach(PlotData* plotData2, m_curvesData.values())
+    {
+        ss  << ", ";
+        if (plotData2->xData->isEmpty ())
+        {
+        }
+        else
+        {
+            ss  << QString().sprintf("%3.6g",plotData2->yDataHistory->last());
+            m_csvLoggingDataValid=1;
+        }
+    }
+    ss << endl;
+    if (m_csvLoggingDataValid)
+    {
+        QTextStream ts( &m_csvLoggingBuffer );
+        ts << tempString;
+    }
+
+    return 0;
+}
+
 int ScopeGadgetWidget::csvLoggingInsertData()
 {
     if (!m_csvLoggingStarted) return -1;
     m_csvLoggingDataSaved=1;
-    m_csvLoggingDataValid=0;
-    QDateTime NOW = QDateTime::currentDateTime();
-    QString tempString;
 
     if(m_csvLoggingFile.open(QIODevice::WriteOnly | QIODevice::Append)== FALSE)
     {
@@ -690,38 +730,11 @@ int ScopeGadgetWidget::csvLoggingInsertData()
     }
     else
     {
-        QTextStream ss( &tempString );
-        ss << NOW.toString("yyyy-MM-dd") << ", " << NOW.toString("hh:mm:ss.z") << ", " ;
-
-#if QT_VERSION >= 0x040700
-        ss <<(NOW.toMSecsSinceEpoch() - m_csvLoggingStartTime.toMSecsSinceEpoch())/1000.00;
-#else
-        ss <<(NOW.toTime_t() - m_csvLoggingStartTime.toTime_t());
-#endif
-        ss << ", " << m_csvLoggingConnected << ", " << m_csvLoggingDataUpdated;
-        m_csvLoggingDataUpdated=0;
-
-        foreach(PlotData* plotData2, m_curvesData.values())
-        {
-            ss  << ", ";
-            if (plotData2->xData->isEmpty ())
-            {
-            }
-            else
-            {
-                ss  << QString().sprintf("%3.6g",plotData2->yData->last());
-                m_csvLoggingDataValid=1;
-            }
-        }
-        ss << endl;
-        if (m_csvLoggingDataValid)
-        {
-            QTextStream ts( &m_csvLoggingFile );
-            ts << tempString;
-        }
+        QTextStream ts( &m_csvLoggingFile );
+        ts << m_csvLoggingBuffer;
         m_csvLoggingFile.close();
     }
-
+    m_csvLoggingBuffer.clear();
 
     return 0;
 }

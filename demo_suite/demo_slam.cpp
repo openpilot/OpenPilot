@@ -306,8 +306,8 @@ class ConfigSetup: public kernel::KeyValueFileSaveLoad
 	double UNCERT_GRAVITY;   /// initial gravity uncertainty (% of 9.81)
 	double UNCERT_ABIAS;     /// initial accelerometer bias uncertainty (% of ACCELERO_FULLSCALE)
 	double UNCERT_WBIAS;     /// initial gyrometer bias uncertainty (% of GYRO_FULLSCALE)
-	double PERT_AERR;        /// noise stdev of accelerometers (% of ACCELERO_NOISE)
-	double PERT_WERR;        /// noise stdev of gyrometers (% of GYRO_NOISE)
+	double PERT_AERR;        /// noise stdev coeff of accelerometers, for testing purpose (% of ACCELERO_NOISE)
+	double PERT_WERR;        /// noise stdev coeff of gyrometers, for testing purpose (% of GYRO_NOISE)
 	double PERT_RANWALKACC;  /// IMU a_bias random walk (m/s2 per sqrt(s))
 	double PERT_RANWALKGYRO; /// IMU w_bias random walk (rad/s per sqrt(s))
 

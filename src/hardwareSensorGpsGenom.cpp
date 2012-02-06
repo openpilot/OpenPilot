@@ -77,11 +77,11 @@ namespace hardware {
 				pos = (double*)(data+16);
 				var = (float*)(data+48);
 				reading.data(0) = *date;
-				reading.data(1) = pos[0];
-				reading.data(2) = pos[1];
+				reading.data(1) = pos[1]; // swap
+				reading.data(2) = pos[0];
 				reading.data(3) = pos[2];
-				reading.data(4) = var[0];
-				reading.data(5) = var[1];
+				reading.data(4) = var[1]; // swap
+				reading.data(5) = var[0];
 				reading.data(6) = var[2];
 				//std::cout << "GPS poster : " << std::setprecision(15) << reading.data << std::endl;
 			}

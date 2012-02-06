@@ -239,9 +239,9 @@ namespace jafar {
 				 * Compute robot process noise \a Q in state space.
 				 * This function is called by move() at each iteration if constantPerturbation is \b false.
 				 * It performs the operation:
-				 * - Q = XNEW_pert * control.P() * XNEW_pert',
+				 * - Q = XNEW_pert * perturbation.P() * XNEW_pert',
 				 *
-				 * where XNEW_pert and control.P() must have been already computed.
+				 * where XNEW_pert and perturbation.P() must have been already computed.
 				 */
 				void computeStatePerturbation();
 

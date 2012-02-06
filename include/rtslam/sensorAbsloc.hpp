@@ -43,7 +43,6 @@ namespace jafar {
 				jblas::mat EXP_rs;
 				jblas::mat INN_rs;
 				jblas::mat EXP_q;
-				bool hasVar;
 				int inns;
 				bool absolute;
 				bool first;
@@ -51,7 +50,7 @@ namespace jafar {
 				SensorAbsloc(const robot_ptr_t & robPtr, const filtered_obj_t inFilter = UNFILTERED, bool absolute = false):
 				  SensorProprioAbstract(robPtr, inFilter),
 					ia_rs(ia_globalPose), innovation(NULL), measurement(NULL), expectation(NULL),
-				  hasVar(false), inns(0), absolute(absolute), first(true)
+					inns(0), absolute(absolute), first(true)
 				{}
 				~SensorAbsloc() { delete innovation; delete measurement; }
 				virtual void setHardwareSensor(hardware::hardware_sensorprop_ptr_t hardwareSensorPtr_)
@@ -65,8 +64,6 @@ namespace jafar {
 					EXP_rs.resize(inns, ia_rs.size(), false);
 					INN_rs.resize(inns, ia_rs.size(), false);
 					EXP_q.resize(inns, 4, false);
-					if (hardwareSensorPtr->varianceSize() == hardwareSensorPtr->dataSize())
-						hasVar = true;
 				}
 				
 				
@@ -117,42 +114,54 @@ namespace jafar {
 					// pos(x/y/z)(gps,baro,mocap), ori (mocap,mag), vel(gps), gyr(y/p/r), acc(x/y/z)
 
 					jblas::vec T = ublas::subrange(pose.x(), 0, 3);
+					jblas::vec r = ublas::subrange(pose.x(), 3, 7);
 					jblas::vec p = ublas::subrange(robotPtr()->pose.x(), 0, 3);
 					jblas::vec q = ublas::subrange(robotPtr()->pose.x(), 3, 7);
 					jblas::vec Tr = quaternion::rotate(q,T);
 
 					switch (innovation->size())
 					{
-						case 3: // POS only
+						case 6: // ORI (using euler x/y/z because the sensors work with euler and the uncertainty is provided with euler)
+						{
+							// compute expectation->x and EXP_rs
+							jblas::mat QR_q(4,4), E_qr(3,4);
+							jblas::vec e;
+							jblas::vec qr = quaternion::qProd(q, r);
+							quaternion::qProd_by_dq1(r, QR_q);
+							quaternion::q2e(qr, e, E_qr);
+							ublas::subrange(expectation->x(), 3,6) = e;
+							ublas::subrange(EXP_rs, 3,6, 3,7) = ublas::prod(E_qr, QR_q);
+
+							// fill measurement
+							ublas::subrange(measurement->x(), 3,6) = ublas::subrange(reading.data, 4,7);
+							measurement->P()(3,3) = jmath::sqr(reading.data(4+inns));
+							measurement->P()(4,4) = jmath::sqr(reading.data(5+inns));
+							measurement->P()(5,5) = jmath::sqr(reading.data(6+inns));
+
+							// no break, continue with POS
+						}
+						case 3: // POS
+							// compute expectation->x and EXP_rs
 							quaternion::rotate_by_dq(q, T, EXP_q);
 							ublas::subrange(EXP_rs, 0,3, 0,3) = jblas::identity_mat(3);
 							ublas::subrange(EXP_rs, 0,3, 3,7) = EXP_q;
-						
-							expectation->x() = p + Tr;
-							expectation->P() = ublasExtra::prod_JPJt(ublas::project(robotPtr()->mapPtr()->filterPtr->P(), ia_rs, ia_rs), EXP_rs);
+							ublas::subrange(expectation->x(), 0,3) = p + Tr;
 							
-							measurement->x()(0) = reading.data(2) - robotPtr()->origin_sensors(0);
-							measurement->x()(1) = reading.data(1) - robotPtr()->origin_sensors(1);
-							measurement->x()(2) = reading.data(3) - robotPtr()->origin_sensors(2);
-							if (hasVar)
-							{
-								measurement->P()(0,0) = jmath::sqr(reading.data(2+inns));
-								measurement->P()(1,1) = jmath::sqr(reading.data(1+inns));
-								measurement->P()(2,2) = jmath::sqr(reading.data(3+inns));
-							} else
-							{
-								// TODO
-								JFR_ERROR(RtslamException, RtslamException::GENERIC_ERROR,
-								          "SensorAbsloc with constant uncertainty not implemented yet");
-							}
+							// fill measurement
+							ublas::subrange(measurement->x(), 0,3) = ublas::subrange(reading.data, 0,3) - robotPtr()->origin_sensors;
+							measurement->P()(0,0) = jmath::sqr(reading.data(1+inns));
+							measurement->P()(1,1) = jmath::sqr(reading.data(2+inns));
+							measurement->P()(2,2) = jmath::sqr(reading.data(3+inns));
 							
 							// TODO gating ?
-							
+
+							// compute expectation->P and innovation
+							ublas::subrange(expectation->P(), 0,inns, 0,inns) = ublasExtra::prod_JPJt(ublas::project(robotPtr()->mapPtr()->filterPtr->P(), ia_rs, ia_rs), EXP_rs);
 							innovation->x() = measurement->x() - expectation->x();
 							innovation->P() = measurement->P() + expectation->P();
 							INN_rs = -EXP_rs;
 							break;
-						default: // TODO 7=pos+ori
+						default:
 							JFR_ERROR(RtslamException, RtslamException::GENERIC_ERROR,
 							          "SensorAbsloc reading size " << reading.data.size() << " not supported.");
 					}

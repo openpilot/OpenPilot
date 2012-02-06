@@ -49,7 +49,6 @@ class HardwareSensorGpsGenom: public HardwareSensorProprioAbstract
 		virtual void start();
 		virtual double getLastTimestamp() { boost::unique_lock<boost::mutex> l(mutex_data); return last_timestamp; }
 		virtual int dataSize() { return 3; }
-		virtual int varianceSize() { return 3; }
 		
 };
 

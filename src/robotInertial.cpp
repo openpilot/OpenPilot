@@ -114,7 +114,7 @@ namespace jafar {
 			// a = R(q)(asens - ab) + g     true acceleration
 			// w = wsens - wb               true angular rate
 			vec3 atrue, wtrue;
-			atrue = prod(Rold, (am - ab)) + g; // could have done rotate(q, instead of prod(Rold, ; jac/q is Rold...
+			atrue = prod(Rold, (am - ab)) + g; // could have done rotate(q, instead of prod(Rold, 
 			wtrue = wm - wb;
 
 			// Get new state vector

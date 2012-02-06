@@ -1165,6 +1165,7 @@ void demo_slam_main(world_ptr_t *world)
 	}
 	else if (intOpts[iReplay] & 1) {
 		std::fstream f((strOpts[sDataPath] + std::string("/sdate.log")).c_str(), std::ios_base::in);
+		if (!f.is_open()) std::cout << "Missing sdate.log file" << std::endl;
 		f >> start_date;
 		f.close();
 	}

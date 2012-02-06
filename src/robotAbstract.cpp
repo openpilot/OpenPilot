@@ -137,14 +137,23 @@ namespace jafar {
 					jblas::mat_indirect readings = hardwareEstimatorPtr->acquireReadings(0, time);
 					self_time = 0.;
 					dt_or_dx = 0.;
-					jblas::vec avg_u(readings.size2()-1); avg_u.clear();
 					unsigned nreadings = readings.size1();
 					if (readings(nreadings-1, 0) >= time) nreadings--; // because it could be available offline but not online
+
+					jblas::vec avg_u(readings.size2()-1); avg_u.clear();
 					for(size_t i = 0; i < nreadings; i++)
 						avg_u += ublas::subrange(ublas::matrix_row<mat_indirect>(readings, i),1,readings.size2());
-					
 					if (nreadings) avg_u /= nreadings;
-					init(avg_u);
+
+					jblas::vec var_u(readings.size2()-1); var_u.clear();
+					jblas::vec diff_u(readings.size2()-1);
+					for(size_t i = 0; i < nreadings; i++) {
+						diff_u = ublas::subrange(ublas::matrix_row<mat_indirect>(readings, i),1,readings.size2()) - avg_u;
+						var_u += ublas::element_prod(diff_u, diff_u);
+					}
+					if (nreadings) var_u /= nreadings;
+
+					init(avg_u, var_u);
 				}
 				else // else just move with the available control
 				{

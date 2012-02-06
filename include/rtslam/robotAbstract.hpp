@@ -14,11 +14,11 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-#include <jmath/jblas.hpp>
 #include "kernel/jafarDebug.hpp"
 #include "kernel/IdFactory.hpp"
 #include "kernel/dataLog.hpp"
 #include "kernel/timingTools.hpp"
+#include "jmath/jblas.hpp"
 
 #include "rtslam/rtSlam.hpp"
 #include "rtslam/gaussian.hpp"
@@ -164,16 +164,6 @@ namespace jafar {
 
 
 				/**
-				 * Initialize the state, affect SLAM filter.
-				 */
-				void init() {
-					vec x = state.x();
-					vec xnew(x.size());
-
-					init_func(x, control, xnew);
-					state.x() = xnew;
-				}
-				/**
 				 * Move one step ahead, affect SLAM filter.
 				 * This function updates the full state and covariances matrix of the robot plus the cross-variances with all other map objects.
 				 */
@@ -198,10 +188,14 @@ namespace jafar {
 				/**
 				 * Initialize the state, affect SLAM filter.
 				 */
-				inline void init(const vec & _u) {
+				inline void init(const vec & _u, const vec & _U) {
 					JFR_ASSERT(_u.size() >= control.size(), "robotAbstract.hpp: init: wrong control size.");
 					control = ublas::subrange(_u, 0, control.size());
-					init();
+					vec x = state.x();
+					vec xnew(x.size());
+
+					init_func(x, control, _U, xnew);
+					state.x() = xnew;
 				}
 				/**
 				 * Move one step ahead, affect SLAM filter.
@@ -216,24 +210,6 @@ namespace jafar {
 				
 				void move(double time);
 				void move_fake(double time);
-
-				void move(const vec & u, double time){
-					bool firstmove = false;
-					if (self_time < 0.) { firstmove = true; self_time = time; }
-					if (firstmove)
-					{
-						self_time = 0.;
-						dt_or_dx = 0.;
-						init(u);
-					} else
-					{
-						dt_or_dx = time - self_time;
-						perturbation.set_from_continuous(dt_or_dx);
-						move(u);
-					}
-					self_time = time;
-				}
-
 
 				/**
 				 * Compute robot process noise \a Q in state space.
@@ -283,7 +259,7 @@ namespace jafar {
 				 * This function can initialize differently the robot state, given the
 				 * average control input on a past period of time, if possible.
 				*/
-				virtual void init_func(const vec & _x, const vec & _u, vec & _xnew) {}
+				virtual void init_func(const vec & _x, const vec & _u, const vec & _U, vec & _xnew) {}
 
 
 		};

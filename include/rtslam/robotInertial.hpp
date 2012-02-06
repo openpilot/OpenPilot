@@ -17,8 +17,21 @@
 #include "boost/shared_ptr.hpp"
 #include "rtslam/robotAbstract.hpp"
 
+/**
+Consider that the speed between two updates is the average between
+initial and final speed.
+*/
 #define AVGSPEED 1
+/**
+Initialize the orientation so that g is vertical.
+*/
 #define INIT_Q_FROM_G 1
+/**
+Estimate g as a 3D vector. If not, only estimage its magnitude and estimate
+absolute orientation to force g vertical. Less linear, but easier to integrate
+with absolute sensors.
+*/
+#define ESTIMATE_G_VEC 1
 
 namespace jafar {
 	namespace rtslam {
@@ -62,6 +75,8 @@ namespace jafar {
 		 * \sa See the extense comments on move_func() in file robotInertial.cpp for algebraic details.
 		 */
 		class RobotInertial: public RobotAbstract {
+			static int g_size;
+			jblas::vec3 z_axis;
 
 			public:
 				//				RobotInertial(MapAbstract & _map);
@@ -106,7 +121,7 @@ namespace jafar {
 				 * Initialize the value of g with the average value of acceleration
 				 * in the past.
 				*/
-				void init_func(const vec & _x, const vec & _u, vec & _xnew);
+				void init_func(const vec & _x, const vec & _u, const vec & _U, vec & _xnew);
 
 				virtual void move_func() {
 					vec x = state.x();
@@ -117,7 +132,7 @@ namespace jafar {
 				}
 
 				static size_t size() {
-					return 19;
+					return 16+g_size;
 				}
 
 				static size_t size_control() {
@@ -143,7 +158,7 @@ namespace jafar {
 					for (size_t i = pose.size() + 6; i < pose.size() + 9; i++){
 						state.P(i,i) = wBiasStd*wBiasStd;
 					}
-					for (size_t i = pose.size() + 9; i < pose.size() + 12; i++){
+					for (size_t i = pose.size() + 9; i < pose.size() + 9 + g_size; i++){
 						state.P(i,i) = gravStd*gravStd;
 					}
 				}
@@ -170,7 +185,7 @@ namespace jafar {
 					v = ublas::subrange(x, 7, 10);
 					ab = ublas::subrange(x, 10, 13);
 					wb = ublas::subrange(x, 13, 16);
-					g = ublas::subrange(x, 16, 19);
+					g = ublas::subrange(x, 16, 16+g_size);
 				}
 
 
@@ -192,7 +207,7 @@ namespace jafar {
 					ublas::subrange(x, 7, 10) = v;
 					ublas::subrange(x, 10, 13) = ab;
 					ublas::subrange(x, 13, 16) = wb;
-					ublas::subrange(x, 16, 19) = g;
+					ublas::subrange(x, 16, 16+g_size) = g;
 				}
 
 
@@ -227,6 +242,8 @@ namespace jafar {
 					ar = project(n, ublas::range(6, 9));
 					wr = project(n, ublas::range(9, 12));
 				}
+
+				vec e_from_g(const vec3 & _g);
 
 			private:
 				// Temporary members to accelerate Jacobian computation

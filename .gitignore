@@ -14,3 +14,10 @@ tmp/
 *.tmp
 stats/
 Makefile
+data/scripts/*.pdf
+data/scripts/*.png
+data/scripts/*.eps
+data/*.log
+data/*.dat
+data/*.trc
+data/*.txt

@@ -20,14 +20,23 @@ namespace jafar {
 		using namespace quaternion;
 
 
+#if ESTIMATE_G_VEC
+			int RobotInertial::g_size = 3;
+#else
+			int RobotInertial::g_size = 1;
+#endif
+
+
 		/**
 		 * Remote constructor from remote map.
 		 * \param _map the remote map
 		 */
 		RobotInertial::RobotInertial(const map_ptr_t & _mapPtr) :
-			RobotAbstract(_mapPtr, RobotInertial::size(), RobotInertial::size_control(), RobotInertial::size_perturbation()) {
+			RobotAbstract(_mapPtr, RobotInertial::size(), RobotInertial::size_control(), RobotInertial::size_perturbation())
+		{
 			constantPerturbation = false;
 			type = INERTIAL;
+			z_axis.clear(); z_axis(2) = 1;
 		}
 		RobotInertial::RobotInertial(const simulation_t dummy, const map_ptr_t & _mapPtr) :
 			RobotAbstract(FOR_SIMULATION, _mapPtr, RobotInertial::size(), RobotInertial::size_control(), RobotInertial::size_perturbation()) {
@@ -95,9 +104,11 @@ namespace jafar {
 		    mat & _XNEW_pert) {
 
 			// Separate things out to make it clearer
-			vec3 p, v, ab, wb, g;
+			vec3 p, v, ab, wb, gv;
+			vec g;
 			vec4 q;
 			splitState(_x, p, q, v, ab, wb, g); // split state vector
+			if (g_size == 1) { gv = z_axis * g(0); } else { gv = g; }
 
 			// Split control and perturbation vectors into
 			// sensed acceleration and sensed angular rate
@@ -114,11 +125,12 @@ namespace jafar {
 			// a = R(q)(asens - ab) + g     true acceleration
 			// w = wsens - wb               true angular rate
 			vec3 atrue, wtrue;
-			atrue = prod(Rold, (am - ab)) + g; // could have done rotate(q, instead of prod(Rold, 
+			atrue = prod(Rold, (am - ab)) + gv; // could have done rotate(q, instead of prod(Rold,
 			wtrue = wm - wb;
 
 			// Get new state vector
-			vec3 pnew, vnew, abnew, wbnew, gnew;
+			vec3 pnew, vnew, abnew, wbnew;
+			vec gnew;
 			vec4 qnew;
 
 			// qnew = q x q(w * dt)
@@ -164,11 +176,13 @@ namespace jafar {
 			// Fill in XNEW_v: VNEW_g and PNEW_v = I * dt
 			identity_mat I(3);
 			Idt = I * _dt;
+			mat Iz; if (g_size == 1) { Iz.resize(3,1); Iz.clear(); Iz(2,0)=1; } else { Iz = I; }
+			mat Izdt = Iz * _dt;
 			subrange(_XNEW_x, 0, 3, 7, 10) = Idt;
 			#if AVGSPEED
-			subrange(_XNEW_x, 0, 3, 16, 19) = Idt*_dt/2;
+			subrange(_XNEW_x, 0, 3, 16, 16+g_size) = Izdt*_dt/2;
 			#endif
-			subrange(_XNEW_x, 7, 10, 16, 19) = Idt;
+			subrange(_XNEW_x, 7, 10, 16, 16+g_size) = Izdt;
 
 			// Fill in QNEW_q
 			// qnew = qold ** qwdt  ( qnew = q1 ** q2 = qProd(q1, q2) in rtslam/quatTools.hpp )
@@ -245,31 +259,11 @@ namespace jafar {
 			subrange(_XNEW_pert, 3, 7, 3, 6) = prod (QNORM_qnew, QNEW_w) * (1 / _dt);
 		}
 
-		void RobotInertial::init_func(const vec & _x, const vec & _u, vec & _xnew) {
-			
-			// Separate things out to make it clearer
-			vec3 p, v, ab, wb, g;
-			vec4 q;
-			splitState(_x, p, q, v, ab, wb, g); // split state vector
-
-			// Split control vector into
-			// sensed acceleration and sensed angular rate
-			vec3 am, wm;
-			splitControl(_u, am, wm);
-			
-			// init direction and uncertainty of g from acceleration
-			const double th_g = 9.81;
-			g = th_g*(-am)/ublas::norm_2(am);
-			double G = (ublas::norm_2(am) - th_g); G = 2*G*G;
-			for (size_t i = pose.size() + 9; i < pose.size() + 12; i++){
-				state.P(i,i) = std::max(state.P(i,i), G);
-			}
-			
-			// init orientation from g
-			#if INIT_Q_FROM_G
+		vec RobotInertial::e_from_g(const vec3 & _g)
+		{
 			vec3 xr, yr, zr, xw, yw, zw; // robot and world frame axis
 			xw.clear(); xw(0)=1.; yw.clear(); yw(1)=1.; zw.clear(); zw(2)=1.;
-			zr = -g/ublas::norm_2(g);
+			zr = -_g/ublas::norm_2(_g);
 			yr = ublasExtra::crossProd(zr,xw); if (yr(0) < 0.0) yr = -yr;
 			xr = -ublasExtra::crossProd(yw,zr); if (xr(0) < 0.0) xr = -xr;
 			if (ublas::norm_2(xr) > ublas::norm_2(yr)) // just in case one of them is too close to 0
@@ -285,17 +279,68 @@ namespace jafar {
 			rot(0,0)=xr(0); rot(1,0)=xr(1), rot(2,0)=xr(2);
 			rot(0,1)=yr(0); rot(1,1)=yr(1), rot(2,1)=yr(2);
 			rot(0,2)=zr(0); rot(1,2)=zr(1), rot(2,2)=zr(2);
-			double initial_yaw = q2e(q)(2);
-			q = q2qc(R2q(rot));
-			vec3 e = q2e(q);
-			e(2) = initial_yaw;
+			vec4 q = q2qc(R2q(rot));
+			return q2e(q);
+		}
+
+		void RobotInertial::init_func(const vec & _x, const vec & _u, const vec & _U, vec & _xnew) {
+			
+			// Separate things out to make it clearer
+			vec3 p, v, ab, wb, gv;
+			vec g;
+			vec4 q;
+			splitState(_x, p, q, v, ab, wb, g); // split state vector
+
+			// Split control vector into
+			// sensed acceleration and sensed angular rate
+			vec3 am, wm;
+			splitControl(_u, am, wm);
+			
+			// init direction and uncertainty of g from acceleration
+			const double th_g = 9.81;
+			gv = th_g*(-am)/ublas::norm_2(am);
+			double G = (ublas::norm_2(am) - th_g); G = 2*G*G;
+			for (size_t i = pose.size() + 9; i < pose.size() + 9 + g_size; i++){
+				state.P(i,i) = std::max(state.P(i,i), G);
+			}
+			if (g_size == 1) { g(0) = -th_g; } else { g = gv; }
+
+			// init orientation from g
+			#if INIT_Q_FROM_G
+			vec3 e = e_from_g(gv);
+			e(2) = q2e(q)(2); // restore initial yaw
 			q = e2q(e);
 			
-			
-			g(0)=0; g(1)=0; g(2) = -th_g; // update g
+			if (g_size == 1) { g(0) = -th_g; } else { g = - z_axis * th_g; } // update g
+
+			vec3 estd; estd.clear();
+			if (g_size == 1) // compute attitude initial uncertainty
+			{
+				vec3 av, wv;
+				splitControl(_U, av, wv);
+
+				// numerically approximate the euler uncertainty because we can't compute the jacobian
+				vec3 gext;
+				for(int i = 0; i < 3; ++i)
+				{
+					gext = gv;
+					gext(i) += sqrt(av(i));
+					vec3 eext = e_from_g(gext);
+					for(int j = 0; j < 2; ++j) estd(j) = std::max(estd(j), std::abs(eext(j)-e(j)));
+				}
+				mat33 E; E.clear(); for(int j = 0; j < 2; ++j) E(j,j) = estd(j)*estd(j);
+
+				// now convert to quaternion uncertainty
+				mat Q_e(4,3);
+				quaternion::e2q_by_de(e, Q_e);
+				ublas::subrange(state.P(), 3,7, 3,7) = jmath::ublasExtra::prod_JPJt(E, Q_e);
+			}
 			#endif
 			
 			std::cout << "Initialize robot state with g = " << g << " (std " << sqrt(state.P(pose.size()+9,pose.size()+9)) << ") and q = " << q << std::endl;
+#if INIT_Q_FROM_G
+			if (g_size == 1) std::cout << "Euler attitude is " << e << "(std " << estd << ")" << std::endl;
+#endif
 			unsplitState(p, q, v, ab, wb, g, _xnew);
 		}
 		
@@ -337,14 +382,14 @@ namespace jafar {
 			for(int i = 7 ; i < 10; ++i) log.writeData(state.x()(i));
 			for(int i = 10; i < 13; ++i) log.writeData(state.x()(i));
 			for(int i = 13; i < 16; ++i) log.writeData(state.x()(2-(i-13)+13));
-			for(int i = 16; i < 19; ++i) log.writeData(state.x()(i));
+			for(int i = 16; i < 16+g_size; ++i) log.writeData(state.x()(i));
 			
 			for(int i = 0 ; i < 7 ; ++i) log.writeData(sqrt(state.P()(i,i)));
 			for(int i = 0 ; i < 3 ; ++i) log.writeData(sqrt(euler_P(2-i,2-i)));
 			for(int i = 7 ; i < 10; ++i) log.writeData(sqrt(state.P()(i,i)));
 			for(int i = 10; i < 13; ++i) log.writeData(sqrt(state.P()(i,i)));
 			for(int i = 13; i < 16; ++i) log.writeData(sqrt(state.P()(2-(i-13)+13,2-(i-13)+13)));
-			for(int i = 16; i < 19; ++i) log.writeData(sqrt(state.P()(i,i)));
+			for(int i = 16; i < 16+g_size; ++i) log.writeData(sqrt(state.P()(i,i)));
 		}
 
 	}

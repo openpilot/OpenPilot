@@ -56,7 +56,7 @@ void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString fiel
     Q_ASSERT(_field);
     addUAVObjectToWidgetRelation(object,field,widget,_field->getElementNames().indexOf(index));
 }
-void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString field, QWidget *widget, QString element, float scale, bool isLimited, QList<int> *defaultReloadGroups)
+void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString field, QWidget *widget, QString element, double scale, bool isLimited, QList<int> *defaultReloadGroups)
 {
     UAVObject *obj=objManager->getObject(QString(object));
     Q_ASSERT(obj);
@@ -66,7 +66,7 @@ void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString fiel
     int index=_field->getElementNames().indexOf(QString(element));
     addUAVObjectToWidgetRelation(object, field, widget,index,scale,isLimited,defaultReloadGroups);
 }
-void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString field, QWidget * widget, int index,float scale,bool isLimited,QList<int>* defaultReloadGroups)
+void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString field, QWidget * widget, int index,double scale,bool isLimited,QList<int>* defaultReloadGroups)
 {
     if(addShadowWidget(object,field,widget,index,scale,isLimited,defaultReloadGroups))
         return;
@@ -221,6 +221,13 @@ void ConfigTaskWidget::updateObjectsFromWidgets()
     }
 }
 
+void ConfigTaskWidget::helpButtonPressed()
+{
+    QString url=helpButtonList.value((QPushButton*)sender(),QString::QString());
+    if(!url.isEmpty())
+        QDesktopServices::openUrl( QUrl(url, QUrl::StrictMode) );
+}
+
 void ConfigTaskWidget::addApplySaveButtons(QPushButton *update, QPushButton *save)
 {
     smartsave=new smartSaveButton(update,save);
@@ -247,7 +254,7 @@ void ConfigTaskWidget::enableControls(bool enable)
 
 void ConfigTaskWidget::widgetsContentsChanged()
 {
-    float scale;
+    double scale;
     objectToWidget * oTw= shadowsList.value((QWidget*)sender(),NULL);
 
     /*
@@ -372,6 +379,13 @@ bool ConfigTaskWidget::allObjectsUpdated()
     return ret;
 }
 
+void ConfigTaskWidget::addHelpButton(QPushButton *button, QString url)
+{
+    helpButtonList.insert(button,url);
+    connect(button,SIGNAL(clicked()),this,SLOT(helpButtonPressed()));
+
+}
+
 void ConfigTaskWidget::invalidateObjects()
 {
     foreach(UAVObject *obj, objectUpdates.keys())
@@ -380,7 +394,7 @@ void ConfigTaskWidget::invalidateObjects()
     }
 }
 
-bool ConfigTaskWidget::addShadowWidget(QString object, QString field, QWidget *widget, int index, float scale, bool isLimited,QList<int>* defaultReloadGroups)
+bool ConfigTaskWidget::addShadowWidget(QString object, QString field, QWidget *widget, int index, double scale, bool isLimited,QList<int>* defaultReloadGroups)
 {
     foreach(objectToWidget * oTw,objOfInterest)
     {
@@ -408,13 +422,15 @@ void ConfigTaskWidget::autoLoadWidgets()
 {
     QPushButton * saveButtonWidget=NULL;
     QPushButton * applyButtonWidget=NULL;
-    foreach(QObject * widget,this->children())
+    foreach(QWidget * widget,this->findChildren<QWidget*>())
     {
         QVariant info=widget->property("objrelation");
         if(info.isValid())
         {
+            qDebug()<<"processing autoloadwidget";
             uiRelationAutomation uiRelation;
             uiRelation.buttonType=none;
+            uiRelation.scale=1;
             foreach(QString str, info.toStringList())
             {
                 QString prop=str.split(":").at(0);
@@ -430,14 +446,7 @@ void ConfigTaskWidget::autoLoadWidgets()
                     if(value=="null")
                         uiRelation.scale=1;
                     else
-                        uiRelation.scale=value.toFloat();
-                }
-                else if(prop== "ismaster")
-                {
-                    if(value=="yes")
-                        uiRelation.ismaster=true;
-                    else
-                        uiRelation.ismaster=false;
+                        uiRelation.scale=value.toDouble();
                 }
                 else if(prop== "haslimits")
                 {
@@ -456,6 +465,9 @@ void ConfigTaskWidget::autoLoadWidgets()
                         uiRelation.buttonType=reload_button;
                     else if(value=="default")
                         uiRelation.buttonType=default_button;
+                    else if(value=="help")
+                        uiRelation.buttonType=help_button;
+
                 }
                 else if(prop== "buttongroup")
                 {
@@ -465,6 +477,8 @@ void ConfigTaskWidget::autoLoadWidgets()
                     }
 
                 }
+                else if(prop=="url")
+                    uiRelation.url=value;
             }
             if(!uiRelation.buttonType==none)
             {
@@ -491,11 +505,12 @@ void ConfigTaskWidget::autoLoadWidgets()
                     break;
                 }
             }
-            else if(uiRelation.ismaster)
+            else
             {
                 QWidget * wid=qobject_cast<QWidget *>(widget);
+                qDebug()<<"adding widget"<<(quint32)wid;
                 if(wid)
-                    addUAVObjectToWidgetRelation(uiRelation.objname,uiRelation.fieldname,wid,uiRelation.element,uiRelation.haslimits,&uiRelation.buttonGroup);
+                    addUAVObjectToWidgetRelation(uiRelation.objname,uiRelation.fieldname,wid,uiRelation.element,uiRelation.scale,uiRelation.haslimits,&uiRelation.buttonGroup);
             }
         }
     }
@@ -632,7 +647,7 @@ void ConfigTaskWidget::connectWidgetUpdatesToSlot(QWidget * widget,const char* f
 
 }
 
-bool ConfigTaskWidget::setFieldFromWidget(QWidget * widget,UAVObjectField * field,int index,float scale)
+bool ConfigTaskWidget::setFieldFromWidget(QWidget * widget,UAVObjectField * field,int index,double scale)
 {
     if(!widget || !field)
         return false;
@@ -647,7 +662,7 @@ bool ConfigTaskWidget::setFieldFromWidget(QWidget * widget,UAVObjectField * fiel
         return false;
     }
 }
-QVariant ConfigTaskWidget::getVariantFromWidget(QWidget * widget,float scale)
+QVariant ConfigTaskWidget::getVariantFromWidget(QWidget * widget,double scale)
 {
     if(QComboBox * cb=qobject_cast<QComboBox *>(widget))
     {
@@ -663,11 +678,11 @@ QVariant ConfigTaskWidget::getVariantFromWidget(QWidget * widget,float scale)
     }
     else if(QSpinBox * cb=qobject_cast<QSpinBox *>(widget))
     {
-        return (int)(cb->value()* (int)scale);
+        return (double)(cb->value()* scale);
     }
     else if(QSlider * cb=qobject_cast<QSlider *>(widget))
     {
-        return(int)(cb->value()* (int)scale);
+        return(double)(cb->value()* scale);
     }
     else if(QCheckBox * cb=qobject_cast<QCheckBox *>(widget))
     {
@@ -677,7 +692,7 @@ QVariant ConfigTaskWidget::getVariantFromWidget(QWidget * widget,float scale)
         return QVariant();
 }
 
-bool ConfigTaskWidget::setWidgetFromVariant(QWidget *widget, QVariant value, float scale)
+bool ConfigTaskWidget::setWidgetFromVariant(QWidget *widget, QVariant value, double scale)
 {
     if(QComboBox * cb=qobject_cast<QComboBox *>(widget))
     {
@@ -691,17 +706,18 @@ bool ConfigTaskWidget::setWidgetFromVariant(QWidget *widget, QVariant value, flo
     }
     else if(QDoubleSpinBox * cb=qobject_cast<QDoubleSpinBox *>(widget))
     {
-        cb->setValue(value.toDouble()/scale);
+        cb->setValue((double)(value.toDouble()/scale));
         return true;
     }
     else if(QSpinBox * cb=qobject_cast<QSpinBox *>(widget))
     {
-        cb->setValue(value.toInt()/(int)scale);
+        cb->setValue((int)(value.toDouble()/scale));
         return true;
     }
     else if(QSlider * cb=qobject_cast<QSlider *>(widget))
     {
-        cb->setValue(value.toInt()/(int)scale);
+        cb->setValue((int)(value.toDouble()/scale));
+        qDebug()<<"SETVALUE widgetfromvariant"<<value.toDouble()<<"/"<<scale<<"="<<(int)(value.toDouble()/scale)<<"object"<<(quint32)cb;
         return true;
     }
     else if(QCheckBox * cb=qobject_cast<QCheckBox *>(widget))
@@ -713,7 +729,7 @@ bool ConfigTaskWidget::setWidgetFromVariant(QWidget *widget, QVariant value, flo
         return false;
 }
 
-bool ConfigTaskWidget::setWidgetFromField(QWidget * widget,UAVObjectField * field,int index,float scale,bool hasLimits)
+bool ConfigTaskWidget::setWidgetFromField(QWidget * widget,UAVObjectField * field,int index,double scale,bool hasLimits)
 {
     if(!widget || !field)
         return false;
@@ -733,7 +749,7 @@ bool ConfigTaskWidget::setWidgetFromField(QWidget * widget,UAVObjectField * fiel
         return false;
     }
 }
-void ConfigTaskWidget::checkWidgetsLimits(QWidget * widget,UAVObjectField * field,int index,bool hasLimits, QVariant value, float scale)
+void ConfigTaskWidget::checkWidgetsLimits(QWidget * widget,UAVObjectField * field,int index,bool hasLimits, QVariant value, double scale)
 {
     if(!hasLimits)
         return;
@@ -751,36 +767,36 @@ void ConfigTaskWidget::checkWidgetsLimits(QWidget * widget,UAVObjectField * fiel
         }
         else if(QDoubleSpinBox * cb=qobject_cast<QDoubleSpinBox *>(widget))
         {
-            if(value.toDouble()/scale>cb->maximum())
+            if((double)(value.toDouble()/scale)>cb->maximum())
             {
-                cb->setMaximum(value.toDouble()/scale);
+                cb->setMaximum((double)(value.toDouble()/scale));
             }
-            else if(value.toDouble()/scale<cb->minimum())
+            else if((double)(value.toDouble()/scale)<cb->minimum())
             {
-                cb->setMinimum(value.toDouble()/scale);
+                cb->setMinimum((double)(value.toDouble()/scale));
             }
 
         }
         else if(QSpinBox * cb=qobject_cast<QSpinBox *>(widget))
         {
-            if(value.toInt()/scale>cb->maximum())
+            if((int)(value.toDouble()/scale)>cb->maximum())
             {
-                cb->setMaximum(value.toInt()/scale);
+                cb->setMaximum((int)(value.toDouble()/scale));
             }
-            else if(value.toInt()/scale<cb->minimum())
+            else if((int)(value.toDouble()/scale)<cb->minimum())
             {
-                cb->setMinimum(value.toInt()/scale);
+                cb->setMinimum((int)(value.toDouble()/scale));
             }
         }
         else if(QSlider * cb=qobject_cast<QSlider *>(widget))
         {
-            if(value.toInt()/scale>cb->maximum())
+            if((int)(value.toDouble()/scale)>cb->maximum())
             {
-                cb->setMaximum(value.toInt()/scale);
+                cb->setMaximum((int)(value.toDouble()/scale));
             }
-            else if(value.toInt()/scale<cb->minimum())
+            else if((int)(value.toDouble()/scale)<cb->minimum())
             {
-                cb->setMinimum(value.toInt()/scale);
+                cb->setMinimum((int)(value.toDouble()/scale));
             }
         }
 
@@ -803,7 +819,7 @@ void ConfigTaskWidget::checkWidgetsLimits(QWidget * widget,UAVObjectField * fiel
         }
     }
 }
-void ConfigTaskWidget::loadWidgetLimits(QWidget * widget,UAVObjectField * field,int index,bool hasLimits,float scale)
+void ConfigTaskWidget::loadWidgetLimits(QWidget * widget,UAVObjectField * field,int index,bool hasLimits,double scale)
 {   
     if(!widget || !field)
         return;
@@ -828,33 +844,35 @@ void ConfigTaskWidget::loadWidgetLimits(QWidget * widget,UAVObjectField * field,
     {
         if(field->getMaxLimit(index).isValid())
         {
-            cb->setMaximum(field->getMaxLimit(index).toDouble()/scale);
+            cb->setMaximum((double)(field->getMaxLimit(index).toDouble()/scale));
         }
         if(field->getMinLimit(index).isValid())
         {
-            cb->setMinimum(field->getMinLimit(index).toDouble()/scale);
+            cb->setMinimum((double)(field->getMinLimit(index).toDouble()/scale));
         }
     }
     else if(QSpinBox * cb=qobject_cast<QSpinBox *>(widget))
     {
         if(field->getMaxLimit(index).isValid())
         {
-            cb->setMaximum((int)(field->getMaxLimit(index).toInt()/scale));
+            cb->setMaximum((int)(field->getMaxLimit(index).toDouble()/scale));
         }
         if(field->getMinLimit(index).isValid())
         {
-            cb->setMinimum((int)(field->getMinLimit(index).toInt()/scale));
+            cb->setMinimum((int)(field->getMinLimit(index).toDouble()/scale));
         }
     }
     else if(QSlider * cb=qobject_cast<QSlider *>(widget))
     {
         if(field->getMaxLimit(index).isValid())
         {
-            cb->setMaximum((int)(field->getMaxLimit(index).toInt()/scale));
+            cb->setMaximum((int)(field->getMaxLimit(index).toDouble()/scale));
+            qDebug()<<"MAX="<<field->getMaxLimit(index).toDouble()<<"/"<<scale<<"="<<cb->maximum();
         }
         if(field->getMinLimit(index).isValid())
         {
-            cb->setMinimum((int)(field->getMinLimit(index).toInt()/scale));
+            cb->setMinimum((int)(field->getMinLimit(index).toDouble()/scale));
+            qDebug()<<"MIN="<<field->getMinLimit(index).toDouble()<<"/"<<scale<<"="<<cb->minimum();
         }
     }
 }

@@ -107,10 +107,13 @@ void UAVObjectField::limitsInitialize(const QString &limits)
         return;
     QStringList stringPerElement=limits.split(",");
     foreach (QString str, stringPerElement) {
-        QStringList valuesPerElement=str.split(":");
+        QString _str=str.trimmed();
+        QStringList valuesPerElement=_str.split(":");
         LimitStruct lstruc;
-        quint32 index=valuesPerElement.at(0).mid(1,valuesPerElement.at(0).length()-3).toULong();
-        if(valuesPerElement.at(0).startsWith("%") && index<numElements)
+        quint32 index=stringPerElement.indexOf(str);
+        bool b1=valuesPerElement.at(0).startsWith("%");
+        bool b2=(int)(index)<(int)numElements;
+        if(b1 && b2)
         {
             if(valuesPerElement.at(0).right(2)=="EQ")
                 lstruc.type=EQUAL;
@@ -123,10 +126,11 @@ void UAVObjectField::limitsInitialize(const QString &limits)
             else if(valuesPerElement.at(0).right(2)=="SM")
                 lstruc.type=SMALLER;
             else
-                qDebug()<<"limits parsing failed on UAVObjectField"<<name;
+                qDebug()<<"limits parsing failed (invalid property) on UAVObjectField"<<name;
             valuesPerElement.removeAt(0);
-            foreach(QString value,valuesPerElement)
+            foreach(QString _value,valuesPerElement)
             {
+                QString value=_value.trimmed();
                 switch (type)
                 {
                 case INT8:
@@ -155,7 +159,12 @@ void UAVObjectField::limitsInitialize(const QString &limits)
             elementLimits.insert(index,lstruc);
         }
         else
-            qDebug()<<"limits parsing failed on UAVObjectField"<<name;
+        {
+            if(!valuesPerElement.at(0).startsWith("%"))
+                qDebug()<<"limits parsing failed (property doesn't start with %) on UAVObjectField"<<name;
+            else if(index>=numElements)
+                qDebug()<<"limits parsing failed (index>numelements) on UAVObjectField"<<name<<"index"<<index<<"numElements"<<numElements;
+        }
     }
 }
 bool UAVObjectField::isWithinLimits(QVariant var,quint32 index)

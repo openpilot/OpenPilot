@@ -195,6 +195,7 @@ static void overoSyncTask(void *parameters)
 				// Update stats.  This will trigger a local send event too
 				OveroSyncStatsData syncStats;
 				syncStats.Send = overosync->sent_bytes;
+				syncStats.Received = 0;
 				syncStats.Connected = syncStats.Send > 500 ? OVEROSYNCSTATS_CONNECTED_TRUE : OVEROSYNCSTATS_CONNECTED_FALSE;
 				OveroSyncStatsSet(&syncStats);
 				overosync->sent_bytes = 0;

@@ -360,7 +360,7 @@ static void USBD_GetDescriptor(USB_OTG_CORE_HANDLE  *pdev,
                                USB_SETUP_REQ *req)
 {
   uint16_t len;
-  uint8_t *pbuf;
+  const uint8_t * pbuf;
   
   switch (req->wValue >> 8)
   {
@@ -381,7 +381,6 @@ static void USBD_GetDescriptor(USB_OTG_CORE_HANDLE  *pdev,
       pbuf   = (uint8_t *)pdev->dev.class_cb->GetOtherConfigDescriptor(pdev->cfg.speed, &len);
     }
 #endif  
-    pbuf[1] = USB_DESC_TYPE_CONFIGURATION;
     pdev->dev.pConfig_descriptor = pbuf;    
     break;
     

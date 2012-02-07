@@ -256,7 +256,7 @@ typedef struct _DCD
   USBD_Class_cb_TypeDef         *class_cb;
   USBD_Usr_cb_TypeDef           *usr_cb;
   USBD_DEVICE                   *usr_device;  
-  uint8_t        *pConfig_descriptor;
+  const uint8_t        *pConfig_descriptor;
  }
 DCD_DEV , *DCD_PDEV;
 

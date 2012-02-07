@@ -229,6 +229,12 @@ extern uint32_t pios_com_telem_usb_id;
 // None.
 //-------------------------
 
+//-------------------------
+// USB
+//-------------------------
+#define PIOS_USB_MAX_DEVS                       1
+#define PIOS_USB_ENABLED                        1 /* Should remove all references to this */
+#define PIOS_USB_HID_MAX_DEVS                   1
 
 #endif /* STM3210E_INS_H_ */
 /**

@@ -2,12 +2,13 @@
  ******************************************************************************
  * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
- * @addtogroup   PIOS_USB_HID USB HID Functions
+ * @addtogroup PIOS_USB_BOARD Board specific USB definitions
+ * @brief Board specific USB definitions
  * @{
  *
- * @file       pios_usb_hid.h
+ * @file       pios_usb_board_data.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      USB HID layer functions header
+ * @brief      Board specific USB definitions
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -27,20 +28,24 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_USB_HID_H
-#define PIOS_USB_HID_H
+#ifndef PIOS_USB_BOARD_DATA_H
+#define PIOS_USB_BOARD_DATA_H
 
-/* Global functions */
-extern int32_t PIOS_USB_HID_Reenumerate(void);
-extern int32_t PIOS_USB_HID_ChangeConnectionState(uint32_t Connected);
-extern bool PIOS_USB_HID_CheckAvailable(uint8_t id);
+#define PIOS_USB_BOARD_HID_DATA_LENGTH 64
 
-extern void PIOS_USB_HID_RegisterHidInterface(const uint8_t * desc, uint16_t length);
-extern void PIOS_USB_HID_RegisterHidReport(const uint8_t * desc, uint16_t length);
+#define PIOS_USB_BOARD_EP_NUM 2
 
-#endif /* PIOS_USB_HID_H */
+#include "pios_usb_defs.h" 	/* struct usb_* */
 
-/**
-  * @}
-  * @}
-  */
+#define PIOS_USB_BOARD_PRODUCT_ID USB_PRODUCT_ID_REVOLUTION
+#define PIOS_USB_BOARD_DEVICE_VER USB_OP_DEVICE_VER(USB_OP_BOARD_ID_REVOLUTION, USB_OP_BOARD_MODE_BL)
+
+/*
+ * The bootloader uses a simplified report structure
+ *   BL: <REPORT_ID><DATA>...<DATA>
+ *   FW: <REPORT_ID><LENGTH><DATA>...<DATA>
+ * This define changes the behaviour in pios_usb_hid.c
+ */
+#define PIOS_USB_BOARD_BL_HID_HAS_NO_LENGTH_BYTE
+
+#endif	/* PIOS_USB_BOARD_DATA_H */

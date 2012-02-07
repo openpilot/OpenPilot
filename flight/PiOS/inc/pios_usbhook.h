@@ -31,21 +31,14 @@
 #ifndef PIOS_USBHOOK_H
 #define PIOS_USBHOOK_H
 
-typedef enum _HID_REQUESTS {
-	GET_REPORT = 1,
-	GET_IDLE,
-	GET_PROTOCOL,
+#include <stdbool.h>
+#include <stdint.h>
+#include "pios_usb_defs.h"	/* usb_setup_request */
 
-	SET_REPORT = 9,
-	SET_IDLE,
-	SET_PROTOCOL
-} HID_REQUESTS;
-
-typedef enum CDC_REQUESTS {
-	SET_LINE_CODING = 0x20,
-	GET_LINE_CODING = 0x21,
-	SET_CONTROL_LINE_STATE = 0x23,
-} CDC_REQUESTS;
+struct pios_usbhook_descriptor {
+	const uint8_t * descriptor;
+	uint16_t length;
+};
 
 enum usb_string_desc {
 	USB_STRING_DESC_LANG    = 0,
@@ -57,8 +50,28 @@ enum usb_string_desc {
 extern void PIOS_USBHOOK_RegisterDevice(const uint8_t * desc, uint16_t desc_size);
 extern void PIOS_USBHOOK_RegisterConfig(uint8_t config_id, const uint8_t * desc, uint16_t desc_size);
 extern void PIOS_USBHOOK_RegisterString(enum usb_string_desc string_id, const uint8_t * desc, uint16_t desc_size);
-extern void PIOS_USBHOOK_RegisterHidInterface(const uint8_t * desc, uint16_t desc_size);
-extern void PIOS_USBHOOK_RegisterHidReport(const uint8_t * desc, uint16_t desc_size);
+
+struct pios_usb_ifops {
+  void (*init)(uint32_t context);
+  void (*deinit)(uint32_t context);
+  bool (*setup)(uint32_t context, struct usb_setup_request * req);
+  void (*ctrl_data_out)(uint32_t context, struct usb_setup_request * req);
+};
+
+extern void PIOS_USBHOOK_RegisterIfOps(uint8_t ifnum, struct pios_usb_ifops * ifops, uint32_t context);
+
+typedef bool (*pios_usbhook_epcb)(uint32_t context, uint8_t epnum, uint16_t len);
+
+extern void PIOS_USBHOOK_RegisterEpInCallback(uint8_t epnum, uint16_t max_len, pios_usbhook_epcb cb, uint32_t context);
+extern void PIOS_USBHOOK_RegisterEpOutCallback(uint8_t epnum, uint16_t max_len, pios_usbhook_epcb cb, uint32_t context);
+extern void PIOS_USBHOOK_DeRegisterEpInCallback(uint8_t epnum);
+extern void PIOS_USBHOOK_DeRegisterEpOutCallback(uint8_t epnum);
+
+extern void PIOS_USBHOOK_CtrlTx(const uint8_t *buf, uint16_t len);
+extern void PIOS_USBHOOK_CtrlRx(uint8_t *buf, uint16_t len);
+extern void PIOS_USBHOOK_EndpointTx(uint8_t epnum, const uint8_t *buf, uint16_t len);
+extern void PIOS_USBHOOK_EndpointRx(uint8_t epnum, uint8_t *buf, uint16_t len);
+extern void PIOS_USBHOOK_Activate(void);
 
 #endif /* PIOS_USBHOOK_H */
 

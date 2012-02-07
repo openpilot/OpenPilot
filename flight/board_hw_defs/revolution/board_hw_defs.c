@@ -1416,5 +1416,61 @@ static const struct pios_ppm_cfg pios_ppm_cfg = {
 
 #endif
 
+#if defined(PIOS_INCLUDE_USB)
+#include "pios_usb_priv.h"
 
+static const struct pios_usb_cfg pios_usb_main_cfg = {
+	.irq = {
+		.init    = {
+			.NVIC_IRQChannel                   = OTG_FS_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
+			.NVIC_IRQChannelSubPriority        = 3,
+			.NVIC_IRQChannelCmd                = ENABLE,
+		},
+	},
+	.vsense = {
+		.gpio = GPIOD,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_11,
+			.GPIO_Speed = GPIO_Speed_25MHz,
+			.GPIO_Mode  = GPIO_Mode_IN,
+			.GPIO_OType = GPIO_OType_OD,
+		},
+	}
+};
 
+#include "pios_usb_board_data_priv.h"
+#include "pios_usb_desc_hid_cdc_priv.h"
+#include "pios_usb_desc_hid_only_priv.h"
+#include "pios_usbhook.h"
+
+#endif	/* PIOS_INCLUDE_USB */
+
+#if defined(PIOS_INCLUDE_COM_MSG)
+
+#include <pios_com_msg_priv.h>
+
+#endif /* PIOS_INCLUDE_COM_MSG */
+
+#if defined(PIOS_INCLUDE_USB_HID)
+#include <pios_usb_hid_priv.h>
+
+const struct pios_usb_hid_cfg pios_usb_hid_cfg = {
+	.data_if = 0,
+	.data_rx_ep = 1,
+	.data_tx_ep = 1,
+};
+#endif /* PIOS_INCLUDE_USB_HID */
+
+#if defined(PIOS_INCLUDE_USB_CDC)
+#include <pios_usb_cdc_priv.h>
+
+const struct pios_usb_cdc_cfg pios_usb_cdc_cfg = {
+	.ctrl_if = 1,
+	.ctrl_tx_ep = 2,
+
+	.data_if = 2,
+	.data_rx_ep = 3,
+	.data_tx_ep = 3,
+};
+#endif	/* PIOS_INCLUDE_USB_CDC */

@@ -94,7 +94,7 @@ void PIOS_SYS_Init(void)
 			       //RCC_AHB2Periph_CRYP |				No crypto
 			       //RCC_AHB2Periph_HASH |				No hash generator
 			       //RCC_AHB2Periph_RNG |				No random numbers @todo might be good to have later if entropy is desired
-			       RCC_AHB2Periph_OTG_FS |
+			       //RCC_AHB2Periph_OTG_FS |
 			0, ENABLE);
 	RCC_AHB3PeriphClockCmd(
 			       //RCC_AHB3Periph_FSMC |				No external static memory

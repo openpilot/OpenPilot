@@ -30,14 +30,12 @@
 
 /* Project Includes */
 #include "pios.h"
-#include "usb_lib.h"
+#include "usb_core.h"
 #include "pios_usb_board_data.h"
-#include "stm32f10x.h"
-
 #include "pios_usb.h"
 #include "pios_usb_priv.h"
 
-#if defined(PIOS_INCLUDE_USB_HID)
+#if defined(PIOS_INCLUDE_USB)
 
 /* Rx/Tx status */
 static uint8_t transfer_possible = 0;
@@ -53,17 +51,11 @@ struct pios_usb_dev {
 
 /**
  * @brief Validate the usb device structure
- * @returns 0 if valid device or -1 otherwise
+ * @returns true if valid device or false otherwise
  */
-static int32_t PIOS_USB_validate(struct pios_usb_dev * usb_dev)
+static bool PIOS_USB_validate(struct pios_usb_dev * usb_dev)
 {
-	if(usb_dev == NULL)
-		return -1;
-
-	if (usb_dev->magic != PIOS_USB_DEV_MAGIC)
-		return -1;
-
-	return 0;
+	return (usb_dev && (usb_dev->magic == PIOS_USB_DEV_MAGIC));
 }
 
 #if defined(PIOS_INCLUDE_FREERTOS)
@@ -97,11 +89,10 @@ static struct pios_usb_dev * PIOS_USB_alloc(void)
 
 
 /**
- * Initialises USB COM layer
+ * Bind configuration to USB BSP layer
  * \return < 0 if initialisation failed
- * \note Applications shouldn't call this function directly, instead please use \ref PIOS_COM layer functions
  */
-static uint32_t pios_usb_com_id;
+static uint32_t pios_usb_id;
 int32_t PIOS_USB_Init(uint32_t * usb_id, const struct pios_usb_cfg * cfg)
 {
 	PIOS_Assert(usb_id);
@@ -115,24 +106,11 @@ int32_t PIOS_USB_Init(uint32_t * usb_id, const struct pios_usb_cfg * cfg)
 	/* Bind the configuration to the device instance */
 	usb_dev->cfg = cfg;
 
-	PIOS_USB_Reenumerate();
-
 	/*
 	 * This is a horrible hack to make this available to
 	 * the interrupt callbacks.  This should go away ASAP.
 	 */
-	pios_usb_com_id = (uint32_t) usb_dev;
-
-	/* Enable the USB Interrupts */
-	NVIC_Init(&usb_dev->cfg->irq.init);
-
-	/* Select USBCLK source */
-	RCC_USBCLKConfig(RCC_USBCLKSource_PLLCLK_1Div5);
-	/* Enable the USB clock */
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USB, ENABLE);
-
-	USB_Init();
-	USB_SIL_Init();
+	pios_usb_id = (uint32_t) usb_dev;
 
 	*usb_id = (uint32_t) usb_dev;
 
@@ -148,10 +126,10 @@ out_fail:
  * \return < 0 on errors
  * \note Applications shouldn't call this function directly, instead please use \ref PIOS_COM layer functions
  */
-int32_t PIOS_USB_ChangeConnectionState(bool Connected)
+int32_t PIOS_USB_ChangeConnectionState(bool connected)
 {
 	// In all cases: re-initialise USB HID driver
-	if (Connected) {
+	if (connected) {
 		transfer_possible = 1;
 
 		//TODO: Check SetEPRxValid(ENDP1);
@@ -171,62 +149,140 @@ int32_t PIOS_USB_ChangeConnectionState(bool Connected)
 	return 0;
 }
 
-int32_t PIOS_USB_Reenumerate()
-{
-	/* Force USB reset and power-down (this will also release the USB pins for direct GPIO control) */
-	_SetCNTR(CNTR_FRES | CNTR_PDWN);
-
-	/* Using a "dirty" method to force a re-enumeration: */
-	/* Force DPM (Pin PA12) low for ca. 10 mS before USB Tranceiver will be enabled */
-	/* This overrules the external Pull-Up at PA12, and at least Windows & MacOS will enumerate again */
-	GPIO_InitTypeDef GPIO_InitStructure;
-	GPIO_StructInit(&GPIO_InitStructure);
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_Init(GPIOA, &GPIO_InitStructure);
-
-	PIOS_DELAY_WaitmS(50);
-
-	/* Release power-down, still hold reset */
-	_SetCNTR(CNTR_PDWN);
-	PIOS_DELAY_WaituS(5);
-
-	/* CNTR_FRES = 0 */
-	_SetCNTR(0);
-
-	/* Clear pending interrupts */
-	_SetISTR(0);
-
-	/* Configure USB clock */
-	/* USBCLK = PLLCLK / 1.5 */
-	RCC_USBCLKConfig(RCC_USBCLKSource_PLLCLK_1Div5);
-	/* Enable USB clock */
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USB, ENABLE);
-
-	return 0;
-}
-
 /**
- * This function returns the connection status of the USB HID interface
+ * This function returns the connection status of the USB interface
  * \return 1: interface available
  * \return 0: interface not available
- * \note Applications shouldn't call this function directly, instead please use \ref PIOS_COM layer functions
  */
 uint32_t usb_found;
 bool PIOS_USB_CheckAvailable(uint8_t id)
 {
-	struct pios_usb_dev * usb_dev = (struct pios_usb_dev *) pios_usb_com_id;
+	struct pios_usb_dev * usb_dev = (struct pios_usb_dev *) pios_usb_id;
 
-	if(PIOS_USB_validate(usb_dev) != 0)
-		return 0;
+	if(!PIOS_USB_validate(usb_dev))
+		return false;
 
 	usb_found = (usb_dev->cfg->vsense.gpio->IDR & usb_dev->cfg->vsense.init.GPIO_Pin);
 	return usb_found;
 	return usb_found != 0 && transfer_possible ? 1 : 0;
 }
 
+/*
+ *
+ * Provide STM32 USB OTG BSP layer API
+ *
+ */
+
+#include "usb_bsp.h"
+
+void USB_OTG_BSP_Init(USB_OTG_CORE_HANDLE *pdev)
+{
+	struct pios_usb_dev * usb_dev = (struct pios_usb_dev *) pios_usb_id;
+
+	bool valid = PIOS_USB_validate(usb_dev);
+	PIOS_Assert(valid);
+
+#define FORCE_DISABLE_USB_IRQ 1
+#if FORCE_DISABLE_USB_IRQ
+	/* Make sure we disable the USB interrupt since it may be left on by bootloader */
+	NVIC_InitTypeDef NVIC_InitStructure;
+	NVIC_InitStructure = usb_dev->cfg->irq.init;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
+	NVIC_Init(&NVIC_InitStructure);
 #endif
+
+	/* Configure USB D-/D+ (DM/DP) pins */
+	GPIO_InitTypeDef GPIO_InitStructure;
+
+#define FORCE_USB_DP_DM_LOW 1
+#if FORCE_USB_DP_DM_LOW
+	/* Force D-/D+ low for 50ms to trigger a disconnect */
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11 | GPIO_Pin_12;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+	GPIO_PinAFConfig(GPIOA, GPIO_PinSource11, 0);
+	GPIO_PinAFConfig(GPIOA, GPIO_PinSource12, 0);
+
+	GPIO_ResetBits(GPIOA, GPIO_Pin_12);
+	GPIO_ResetBits(GPIOA, GPIO_Pin_11);
+
+	PIOS_DELAY_WaitmS(50);
+#endif
+
+	/* Set up D-/D+ as USB function again */
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11 | GPIO_Pin_12;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+	GPIO_PinAFConfig(GPIOA, GPIO_PinSource11, GPIO_AF_OTG1_FS);
+	GPIO_PinAFConfig(GPIOA, GPIO_PinSource12, GPIO_AF_OTG1_FS);
+
+	/* Configure VBUS sense pin */
+	GPIO_Init(usb_dev->cfg->vsense.gpio, &usb_dev->cfg->vsense.init);
+
+	/* Enable USB OTG Clock */
+	RCC_AHB2PeriphClockCmd(RCC_AHB2Periph_OTG_FS, ENABLE);
+}
+
+void USB_OTG_BSP_EnableInterrupt(USB_OTG_CORE_HANDLE *pdev)
+{
+	struct pios_usb_dev * usb_dev = (struct pios_usb_dev *) pios_usb_id;
+
+	bool valid = PIOS_USB_validate(usb_dev);
+	PIOS_Assert(valid);
+
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
+
+	NVIC_Init(&usb_dev->cfg->irq.init);
+}
+
+#ifdef USE_HOST_MODE
+void USB_OTG_BSP_DriveVBUS(USB_OTG_CORE_HANDLE *pdev, uint8_t state)
+{
+
+}
+
+void USB_OTG_BSP_ConfigVBUS(USB_OTG_CORE_HANDLE *pdev)
+{
+
+}
+#endif	/* USE_HOST_MODE */
+
+void USB_OTG_BSP_TimeInit ( void )
+{
+
+}
+
+void USB_OTG_BSP_uDelay (const uint32_t usec)
+{
+	uint32_t count = 0;
+	const uint32_t utime = (120 * usec / 7);
+	do {
+		if (++count > utime) {
+			return ;
+		}
+	}
+	while (1); 
+}
+
+void USB_OTG_BSP_mDelay (const uint32_t msec)
+{
+	USB_OTG_BSP_uDelay(msec * 1000);
+}
+
+void USB_OTG_BSP_TimerIRQ (void)
+{
+
+}
+
+#endif	/* PIOS_INCLUDE_USB */
 
 /**
  * @}

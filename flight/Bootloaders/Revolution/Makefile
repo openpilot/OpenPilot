@@ -80,6 +80,7 @@ OPUAVSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
 ## BOOTLOADER:
 SRC += main.c
 SRC += pios_board.c
+SRC += pios_usb_board_data.c
 SRC += bl_fsm.c
 
 ## PIOS Hardware (STM32F4xx)
@@ -91,7 +92,9 @@ SRC += $(FLIGHTLIB)/fifo_buffer.c
 # PIOS Hardware (Common)
 #SRC += $(PIOSCOMMON)/pios_com.c
 SRC += $(PIOSCOMMON)/pios_board_info.c
+SRC += $(PIOSCOMMON)/pios_com_msg.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c
+SRC += $(PIOSCOMMON)/pios_usb_desc_hid_only.c
 
 # List C source files here which must be compiled in ARM-Mode (no -mthumb).
 # use file-extension c for "c-only"-files
@@ -224,7 +227,7 @@ CFLAGS += -fpromote-loop-indices
 endif
 
 CFLAGS += -Wall
-CFLAGS += -Werror
+#CFLAGS += -Werror
 CFLAGS += -Wa,-adhlns=$(addprefix $(OUTDIR)/, $(notdir $(addsuffix .lst, $(basename $<))))
 # Compiler flags to generate dependency files:
 CFLAGS += -MD -MP -MF $(OUTDIR)/dep/$(@F).d

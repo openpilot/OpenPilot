@@ -33,6 +33,7 @@
 #include "openpilot.h"
 #include "overosync.h"
 #include "overosyncstats.h"
+#include "systemstats.h"
 
 // Private constants
 #define OVEROSYNC_PACKET_SIZE 256
@@ -197,7 +198,9 @@ static void overoSyncTask(void *parameters)
 				syncStats.Send = overosync->sent_bytes;
 				syncStats.Received = 0;
 				syncStats.Connected = syncStats.Send > 500 ? OVEROSYNCSTATS_CONNECTED_TRUE : OVEROSYNCSTATS_CONNECTED_FALSE;
+				syncStats.DroppedUpdates = overosync->failed_objects;
 				OveroSyncStatsSet(&syncStats);
+				overosync->failed_objects = 0;
 				overosync->sent_bytes = 0;
 				lastUpdateTime = updateTime;
 			}

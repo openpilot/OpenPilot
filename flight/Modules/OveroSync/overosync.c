@@ -36,9 +36,9 @@
 #include "systemstats.h"
 
 // Private constants
-#define OVEROSYNC_PACKET_SIZE 256
+#define OVEROSYNC_PACKET_SIZE 512
 #define MAX_QUEUE_SIZE   10
-#define STACK_SIZE_BYTES 512
+#define STACK_SIZE_BYTES 4096
 #define TASK_PRIORITY (tskIDLE_PRIORITY + 0)
 
 // Private types
@@ -264,7 +264,7 @@ static int32_t packData(uint8_t * data, int32_t length)
 		overosync->write_pointer;
 	memcpy(tx_buffer, &tickTime, sizeof(tickTime));
 	memcpy(tx_buffer + sizeof(tickTime),data,length);
-	overosync->write_pointer += length;
+	overosync->write_pointer += length + sizeof(tickTime);
 	overosync->sent_bytes += length;
 	overosync->sent_objects++;
 

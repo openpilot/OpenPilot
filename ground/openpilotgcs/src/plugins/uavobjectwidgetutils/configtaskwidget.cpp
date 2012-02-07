@@ -61,9 +61,12 @@ void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString fiel
     UAVObject *obj=objManager->getObject(QString(object));
     Q_ASSERT(obj);
     UAVObjectField *_field;
+    int index=0;
     if(!field.isEmpty() && obj)
+    {
         _field = obj->getField(QString(field));
-    int index=_field->getElementNames().indexOf(QString(element));
+        index=_field->getElementNames().indexOf(QString(element));
+    }
     addUAVObjectToWidgetRelation(object, field, widget,index,scale,isLimited,defaultReloadGroups);
 }
 void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString field, QWidget * widget, int index,double scale,bool isLimited,QList<int>* defaultReloadGroups)
@@ -287,14 +290,16 @@ void ConfigTaskWidget::widgetsContentsChanged()
         if(oTw->widget!=(QWidget *)sender())
         {
              checkWidgetsLimits(oTw->widget,oTw->field,oTw->index,oTw->isLimited,getVariantFromWidget((QWidget*)sender(),scale),oTw->scale);
-            setWidgetFromVariant(oTw->widget,getVariantFromWidget((QWidget*)sender(),scale),oTw->scale);
+             setWidgetFromVariant(oTw->widget,getVariantFromWidget((QWidget*)sender(),scale),oTw->scale);
         }
         foreach (shadow * sh, oTw->shadowsList)
         {
             if(sh->widget!=(QWidget*)sender())
             {
                 checkWidgetsLimits(sh->widget,oTw->field,oTw->index,sh->isLimited,getVariantFromWidget((QWidget*)sender(),scale),oTw->scale);
+                disconnectWidgetUpdatesToSlot((QWidget*)sender(),SLOT(widgetsContentsChanged()));
                 setWidgetFromVariant(sh->widget,getVariantFromWidget((QWidget*)sender(),scale),sh->scale);
+                connectWidgetUpdatesToSlot((QWidget*)sender(),SLOT(widgetsContentsChanged()));
             }
         }
     }
@@ -402,12 +407,26 @@ bool ConfigTaskWidget::addShadowWidget(QString object, QString field, QWidget *w
             continue;
         if(oTw->object->getName()==object && oTw->field->getName()==field && oTw->index==index)
         {
-            shadow * sh=new shadow;
-            sh->isLimited=isLimited;
-            sh->scale=scale;
-            sh->widget=widget;
+            shadow * sh=NULL;
+            if(qobject_cast<QLabel *>(oTw->widget) && !qobject_cast<QLabel *>(widget))
+            {
+                sh=new shadow;
+                sh->isLimited=oTw->isLimited;
+                sh->scale=oTw->scale;
+                sh->widget=oTw->widget;
+                oTw->isLimited=isLimited;
+                oTw->scale=scale;
+                oTw->widget=widget;
+            }
+            else
+            {
+                sh=new shadow;
+                sh->isLimited=isLimited;
+                sh->scale=scale;
+                sh->widget=widget;
+            }
             oTw->shadowsList.append(sh);
-            shadowsList.insert(widget,oTw);
+            shadowsList.insert(sh->widget,oTw);
             connectWidgetUpdatesToSlot(widget,SLOT(widgetsContentsChanged()));
             if(defaultReloadGroups)
                 addWidgetToDefaultReloadGroups(widget,defaultReloadGroups);
@@ -516,6 +535,7 @@ void ConfigTaskWidget::autoLoadWidgets()
     }
     if(saveButtonWidget && applyButtonWidget)
         addApplySaveButtons(applyButtonWidget,saveButtonWidget);
+    refreshWidgetsValues();
 }
 
 void ConfigTaskWidget::addWidgetToDefaultReloadGroups(QWidget *widget, QList<int> * groups)
@@ -616,7 +636,7 @@ void ConfigTaskWidget::connectWidgetUpdatesToSlot(QWidget * widget,const char* f
     }
     else if(QSlider * cb=qobject_cast<QSlider *>(widget))
     {
-        connect(cb,SIGNAL(sliderMoved(int)),this,function);
+        connect(cb,SIGNAL(valueChanged(int)),this,function);
     }
     else if(MixerCurveWidget * cb=qobject_cast<MixerCurveWidget *>(widget))
     {
@@ -646,7 +666,46 @@ void ConfigTaskWidget::connectWidgetUpdatesToSlot(QWidget * widget,const char* f
         qDebug()<<__FUNCTION__<<"widget to uavobject relation not implemented"<<widget->metaObject()->className();
 
 }
+void ConfigTaskWidget::disconnectWidgetUpdatesToSlot(QWidget * widget,const char* function)
+{
+    if(!widget)
+        return;
+    if(QComboBox * cb=qobject_cast<QComboBox *>(widget))
+    {
+        disconnect(cb,SIGNAL(currentIndexChanged(int)),this,function);
+    }
+    else if(QSlider * cb=qobject_cast<QSlider *>(widget))
+    {
+        disconnect(cb,SIGNAL(valueChanged(int)),this,function);
+    }
+    else if(MixerCurveWidget * cb=qobject_cast<MixerCurveWidget *>(widget))
+    {
+        disconnect(cb,SIGNAL(curveUpdated(QList<double>,double)),this,function);
+    }
+    else if(QTableWidget * cb=qobject_cast<QTableWidget *>(widget))
+    {
+        disconnect(cb,SIGNAL(cellChanged(int,int)),this,function);
+    }
+    else if(QSpinBox * cb=qobject_cast<QSpinBox *>(widget))
+    {
+        disconnect(cb,SIGNAL(valueChanged(int)),this,function);
+    }
+    else if(QDoubleSpinBox * cb=qobject_cast<QDoubleSpinBox *>(widget))
+    {
+        disconnect(cb,SIGNAL(valueChanged(double)),this,function);
+    }
+    else if(QCheckBox * cb=qobject_cast<QCheckBox *>(widget))
+    {
+        disconnect(cb,SIGNAL(clicked()),this,function);
+    }
+    else if(QPushButton * cb=qobject_cast<QPushButton *>(widget))
+    {
+        disconnect(cb,SIGNAL(clicked()),this,function);
+    }
+    else
+        qDebug()<<__FUNCTION__<<"widget to uavobject relation not implemented"<<widget->metaObject()->className();
 
+}
 bool ConfigTaskWidget::setFieldFromWidget(QWidget * widget,UAVObjectField * field,int index,double scale)
 {
     if(!widget || !field)
@@ -667,10 +726,6 @@ QVariant ConfigTaskWidget::getVariantFromWidget(QWidget * widget,double scale)
     if(QComboBox * cb=qobject_cast<QComboBox *>(widget))
     {
         return (QString)cb->currentText();
-    }
-    else if(QLabel * cb=qobject_cast<QLabel *>(widget))
-    {
-        return (QString)cb->text();
     }
     else if(QDoubleSpinBox * cb=qobject_cast<QDoubleSpinBox *>(widget))
     {
@@ -701,7 +756,11 @@ bool ConfigTaskWidget::setWidgetFromVariant(QWidget *widget, QVariant value, dou
     }
     else if(QLabel * cb=qobject_cast<QLabel *>(widget))
     {
-        cb->setText(value.toString());
+        qDebug()<<"SETLABEL "<<value.toDouble()<<scale;
+        if(scale==0)
+            cb->setText(value.toString());
+        else
+            cb->setText(QString::number((value.toDouble()/scale)));
         return true;
     }
     else if(QDoubleSpinBox * cb=qobject_cast<QDoubleSpinBox *>(widget))
@@ -711,13 +770,13 @@ bool ConfigTaskWidget::setWidgetFromVariant(QWidget *widget, QVariant value, dou
     }
     else if(QSpinBox * cb=qobject_cast<QSpinBox *>(widget))
     {
-        cb->setValue((int)(value.toDouble()/scale));
+        cb->setValue((int)qRound(value.toDouble()/scale));
         return true;
     }
     else if(QSlider * cb=qobject_cast<QSlider *>(widget))
     {
-        cb->setValue((int)(value.toDouble()/scale));
-        qDebug()<<"SETVALUE widgetfromvariant"<<value.toDouble()<<"/"<<scale<<"="<<(int)(value.toDouble()/scale)<<"object"<<(quint32)cb;
+        cb->setValue((int)qRound(value.toDouble()/scale));
+        qDebug()<<"SETVALUE widgetfromvariant"<<value.toDouble()<<"/"<<scale<<"="<<(int)qRound(value.toDouble()/scale)<<"object"<<(quint32)cb;
         return true;
     }
     else if(QCheckBox * cb=qobject_cast<QCheckBox *>(widget))
@@ -779,46 +838,43 @@ void ConfigTaskWidget::checkWidgetsLimits(QWidget * widget,UAVObjectField * fiel
         }
         else if(QSpinBox * cb=qobject_cast<QSpinBox *>(widget))
         {
-            if((int)(value.toDouble()/scale)>cb->maximum())
+            if((int)qRound(value.toDouble()/scale)>cb->maximum())
             {
-                cb->setMaximum((int)(value.toDouble()/scale));
+                cb->setMaximum((int)qRound(value.toDouble()/scale));
             }
-            else if((int)(value.toDouble()/scale)<cb->minimum())
+            else if((int)qRound(value.toDouble()/scale)<cb->minimum())
             {
-                cb->setMinimum((int)(value.toDouble()/scale));
+                cb->setMinimum((int)qRound(value.toDouble()/scale));
             }
         }
         else if(QSlider * cb=qobject_cast<QSlider *>(widget))
         {
-            if((int)(value.toDouble()/scale)>cb->maximum())
+            if((int)qRound(value.toDouble()/scale)>cb->maximum())
             {
-                cb->setMaximum((int)(value.toDouble()/scale));
+                cb->setMaximum((int)qRound(value.toDouble()/scale));
             }
-            else if((int)(value.toDouble()/scale)<cb->minimum())
+            else if((int)qRound(value.toDouble()/scale)<cb->minimum())
             {
-                cb->setMinimum((int)(value.toDouble()/scale));
+                cb->setMinimum((int)qRound(value.toDouble()/scale));
             }
         }
 
     }
     else if(widget->property("wasOverLimits").isValid())
     {
-        qDebug()<<"1wasOverLimits";
         if(widget->property("wasOverLimits").toBool())
         {
-            qDebug()<<"2";
             widget->setProperty("wasOverLimits",(bool)false);
             if(widget->property("styleBackup").isValid())
             {
-                qDebug()<<"3";
                 QString style=widget->property("styleBackup").toString();
-                qDebug()<<"STYLE"<<style;
                 widget->setStyleSheet(style);
             }
             loadWidgetLimits(widget,field,index,hasLimits,scale);
         }
     }
 }
+
 void ConfigTaskWidget::loadWidgetLimits(QWidget * widget,UAVObjectField * field,int index,bool hasLimits,double scale)
 {   
     if(!widget || !field)
@@ -855,24 +911,24 @@ void ConfigTaskWidget::loadWidgetLimits(QWidget * widget,UAVObjectField * field,
     {
         if(field->getMaxLimit(index).isValid())
         {
-            cb->setMaximum((int)(field->getMaxLimit(index).toDouble()/scale));
+            cb->setMaximum((int)qRound(field->getMaxLimit(index).toDouble()/scale));
         }
         if(field->getMinLimit(index).isValid())
         {
-            cb->setMinimum((int)(field->getMinLimit(index).toDouble()/scale));
+            cb->setMinimum((int)qRound(field->getMinLimit(index).toDouble()/scale));
         }
     }
     else if(QSlider * cb=qobject_cast<QSlider *>(widget))
     {
         if(field->getMaxLimit(index).isValid())
         {
-            cb->setMaximum((int)(field->getMaxLimit(index).toDouble()/scale));
-            qDebug()<<"MAX="<<field->getMaxLimit(index).toDouble()<<"/"<<scale<<"="<<cb->maximum();
+            cb->setMaximum((int)qRound(field->getMaxLimit(index).toDouble()/scale));
+            qDebug()<<"set MAX="<<field->getMaxLimit(index).toDouble()<<"/"<<scale<<"="<<cb->maximum();
         }
         if(field->getMinLimit(index).isValid())
         {
             cb->setMinimum((int)(field->getMinLimit(index).toDouble()/scale));
-            qDebug()<<"MIN="<<field->getMinLimit(index).toDouble()<<"/"<<scale<<"="<<cb->minimum();
+            qDebug()<< "set MIN="<<field->getMinLimit(index).toDouble()<<"/"<<scale<<"="<<cb->minimum();
         }
     }
 }

@@ -3367,8 +3367,11 @@ border-radius: 5;</string>
                      <property name="maximum">
                       <number>100</number>
                      </property>
+                     <property name="value">
+                      <number>51</number>
+                     </property>
                      <property name="sliderPosition">
-                      <number>50</number>
+                      <number>51</number>
                      </property>
                      <property name="orientation">
                       <enum>Qt::Horizontal</enum>
@@ -3410,6 +3413,15 @@ border-radius: 5;</string>
                      <property name="text">
                       <string>50</string>
                      </property>
+                     <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:RollRatePID</string>
+                       <string>element:Kp</string>
+                       <string>haslimits:yes</string>
+                       <string>scale:0.0001</string>
+                      </stringlist>
+                     </property>
                     </widget>
                    </item>
                    <item row="1" column="3">
@@ -3444,6 +3456,15 @@ border-radius: 5;</string>
                      <property name="tickInterval">
                       <number>25</number>
                      </property>
+                     <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:PitchRatePID</string>
+                       <string>element:Kp</string>
+                       <string>haslimits:yes</string>
+                       <string>scale:0.0001</string>
+                      </stringlist>
+                     </property>
                     </widget>
                    </item>
                    <item row="1" column="4">
@@ -3465,6 +3486,15 @@ border-radius: 5;</string>
                      </property>
                      <property name="text">
                       <string>50</string>
+                     </property>
+                     <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:PitchRatePID</string>
+                       <string>element:Kp</string>
+                       <string>haslimits:yes</string>
+                       <string>scale:0.0001</string>
+                      </stringlist>
                      </property>
                     </widget>
                    </item>
@@ -3500,6 +3530,15 @@ border-radius: 5;</string>
                      <property name="tickInterval">
                       <number>25</number>
                      </property>
+                     <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:YawRatePID</string>
+                       <string>element:Kp</string>
+                       <string>haslimits:yes</string>
+                       <string>scale:0.0001</string>
+                      </stringlist>
+                     </property>
                     </widget>
                    </item>
                    <item row="1" column="6">
@@ -3521,6 +3560,15 @@ border-radius: 5;</string>
                      </property>
                      <property name="text">
                       <string>50</string>
+                     </property>
+                     <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:YawRatePID</string>
+                       <string>element:Kp</string>
+                       <string>haslimits:yes</string>
+                       <string>scale:0.0001</string>
+                      </stringlist>
                      </property>
                     </widget>
                    </item>
@@ -3575,6 +3623,15 @@ border-radius: 5;</string>
                      <property name="tickInterval">
                       <number>25</number>
                      </property>
+                     <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:RollRatePID</string>
+                       <string>element:Ki</string>
+                       <string>haslimits:yes</string>
+                       <string>scale:0.0001</string>
+                      </stringlist>
+                     </property>
                     </widget>
                    </item>
                    <item row="2" column="2">
@@ -3596,6 +3653,15 @@ border-radius: 5;</string>
                      </property>
                      <property name="text">
                       <string>50</string>
+                     </property>
+                     <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:RollRatePID</string>
+                       <string>element:Ki</string>
+                       <string>haslimits:yes</string>
+                       <string>scale:0.0001</string>
+                      </stringlist>
                      </property>
                     </widget>
                    </item>
@@ -3631,6 +3697,15 @@ border-radius: 5;</string>
                      <property name="tickInterval">
                       <number>25</number>
                      </property>
+                     <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:PitchRatePID</string>
+                       <string>element:Ki</string>
+                       <string>haslimits:yes</string>
+                       <string>scale:0.0001</string>
+                      </stringlist>
+                     </property>
                     </widget>
                    </item>
                    <item row="2" column="4">
@@ -3652,6 +3727,15 @@ border-radius: 5;</string>
                      </property>
                      <property name="text">
                       <string>50</string>
+                     </property>
+                     <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:PitchRatePID</string>
+                       <string>element:Ki</string>
+                       <string>haslimits:yes</string>
+                       <string>scale:0.0001</string>
+                      </stringlist>
                      </property>
                     </widget>
                    </item>
@@ -3687,6 +3771,15 @@ border-radius: 5;</string>
                      <property name="tickInterval">
                       <number>25</number>
                      </property>
+                     <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:YawRatePID</string>
+                       <string>element:Ki</string>
+                       <string>haslimits:yes</string>
+                       <string>scale:0.0001</string>
+                      </stringlist>
+                     </property>
                     </widget>
                    </item>
                    <item row="2" column="6">
@@ -3708,6 +3801,15 @@ border-radius: 5;</string>
                      </property>
                      <property name="text">
                       <string>50</string>
+                     </property>
+                     <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:YawRatePID</string>
+                       <string>element:Ki</string>
+                       <string>haslimits:yes</string>
+                       <string>scale:0.0001</string>
+                      </stringlist>
                      </property>
                     </widget>
                    </item>
@@ -6575,6 +6677,16 @@ border-radius: 5;</string>
                      <property name="text">
                       <string>50</string>
                      </property>
+                     <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:RollPI</string>
+                       <string>element:Kp</string>
+                       <string>scale:0.1</string>
+                       <string>haslimits:yes</string>
+                       <string>buttongroup:2</string>
+                      </stringlist>
+                     </property>
                     </widget>
                    </item>
                    <item row="1" column="3">
@@ -6609,6 +6721,16 @@ border-radius: 5;</string>
                      <property name="tickInterval">
                       <number>25</number>
                      </property>
+                     <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:PitchPI</string>
+                       <string>element:Kp</string>
+                       <string>scale:0.1</string>
+                       <string>haslimits:yes</string>
+                       <string>buttongroup:2</string>
+                      </stringlist>
+                     </property>
                     </widget>
                    </item>
                    <item row="1" column="4">
@@ -6630,6 +6752,16 @@ border-radius: 5;</string>
                      </property>
                      <property name="text">
                       <string>50</string>
+                     </property>
+                     <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:PitchPI</string>
+                       <string>element:Kp</string>
+                       <string>scale:0.1</string>
+                       <string>haslimits:yes</string>
+                       <string>buttongroup:2</string>
+                      </stringlist>
                      </property>
                     </widget>
                    </item>
@@ -6665,6 +6797,16 @@ border-radius: 5;</string>
                      <property name="tickInterval">
                       <number>25</number>
                      </property>
+                     <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:YawPI</string>
+                       <string>element:Kp</string>
+                       <string>scale:0.1</string>
+                       <string>haslimits:yes</string>
+                       <string>buttongroup:2</string>
+                      </stringlist>
+                     </property>
                     </widget>
                    </item>
                    <item row="1" column="6">
@@ -6686,6 +6828,16 @@ border-radius: 5;</string>
                      </property>
                      <property name="text">
                       <string>50</string>
+                     </property>
+                     <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:YawPI</string>
+                       <string>element:Kp</string>
+                       <string>scale:0.1</string>
+                       <string>haslimits:yes</string>
+                       <string>buttongroup:2</string>
+                      </stringlist>
                      </property>
                     </widget>
                    </item>
@@ -6740,6 +6892,16 @@ border-radius: 5;</string>
                      <property name="tickInterval">
                       <number>25</number>
                      </property>
+                     <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:RollPI</string>
+                       <string>element:Ki</string>
+                       <string>scale:0.1</string>
+                       <string>haslimits:yes</string>
+                       <string>buttongroup:2</string>
+                      </stringlist>
+                     </property>
                     </widget>
                    </item>
                    <item row="2" column="2">
@@ -6761,6 +6923,16 @@ border-radius: 5;</string>
                      </property>
                      <property name="text">
                       <string>50</string>
+                     </property>
+                     <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:RollPI</string>
+                       <string>element:Ki</string>
+                       <string>scale:0.1</string>
+                       <string>haslimits:yes</string>
+                       <string>buttongroup:2</string>
+                      </stringlist>
                      </property>
                     </widget>
                    </item>
@@ -6796,6 +6968,16 @@ border-radius: 5;</string>
                      <property name="tickInterval">
                       <number>25</number>
                      </property>
+                     <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:PitchPI</string>
+                       <string>element:Ki</string>
+                       <string>scale:0.1</string>
+                       <string>haslimits:yes</string>
+                       <string>buttongroup:2</string>
+                      </stringlist>
+                     </property>
                     </widget>
                    </item>
                    <item row="2" column="4">
@@ -6817,6 +6999,16 @@ border-radius: 5;</string>
                      </property>
                      <property name="text">
                       <string>50</string>
+                     </property>
+                     <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:PitchPI</string>
+                       <string>element:Ki</string>
+                       <string>scale:0.1</string>
+                       <string>haslimits:yes</string>
+                       <string>buttongroup:2</string>
+                      </stringlist>
                      </property>
                     </widget>
                    </item>
@@ -6852,6 +7044,16 @@ border-radius: 5;</string>
                      <property name="tickInterval">
                       <number>25</number>
                      </property>
+                     <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:YawPI</string>
+                       <string>element:Ki</string>
+                       <string>scale:0.1</string>
+                       <string>haslimits:yes</string>
+                       <string>buttongroup:2</string>
+                      </stringlist>
+                     </property>
                     </widget>
                    </item>
                    <item row="2" column="6">
@@ -6873,6 +7075,16 @@ border-radius: 5;</string>
                      </property>
                      <property name="text">
                       <string>50</string>
+                     </property>
+                     <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:YawPI</string>
+                       <string>element:Ki</string>
+                       <string>scale:0.1</string>
+                       <string>haslimits:yes</string>
+                       <string>buttongroup:2</string>
+                      </stringlist>
                      </property>
                     </widget>
                    </item>
@@ -11222,7 +11434,7 @@ border-radius: 4;
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>626</width>
+              <width>431</width>
               <height>828</height>
              </rect>
             </property>

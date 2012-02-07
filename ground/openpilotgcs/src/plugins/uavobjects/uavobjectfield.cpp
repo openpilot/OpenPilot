@@ -102,7 +102,7 @@ void UAVObjectField::limitsInitialize(const QString &limits)
     /// (VALX)->value
     /// %TY:VAL1:VAL2:VAL3,%TY,VAL1,VAL2,VAL3
     /// example: first element bigger than 3 and second element inside [2.3,5]
-    /// "%0BI:3,%1BE:2.3:5"
+    /// "0BI:3,%1BE:2.3:5"
     if(limits.isEmpty())
         return;
     QStringList stringPerElement=limits.split(",");
@@ -160,9 +160,9 @@ void UAVObjectField::limitsInitialize(const QString &limits)
         }
         else
         {
-            if(!valuesPerElement.at(0).startsWith("%"))
+            if(!valuesPerElement.at(0).isEmpty() && !b1)
                 qDebug()<<"limits parsing failed (property doesn't start with %) on UAVObjectField"<<name;
-            else if(index>=numElements)
+            else if(!b2)
                 qDebug()<<"limits parsing failed (index>numelements) on UAVObjectField"<<name<<"index"<<index<<"numElements"<<numElements;
         }
     }

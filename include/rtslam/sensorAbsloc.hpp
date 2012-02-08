@@ -47,6 +47,11 @@ namespace jafar {
 				bool absolute;
 				bool first;
 			public:
+				/**
+					@param absolute do we estimate the absolute position as returned by the sensor,
+					or do we estimate a relative position wrt the initial absolute position, and just
+					convert to absolute position before exporting.
+				*/
 				SensorAbsloc(const robot_ptr_t & robPtr, const filtered_obj_t inFilter = UNFILTERED, bool absolute = false):
 				  SensorProprioAbstract(robPtr, inFilter),
 					ia_rs(ia_globalPose), innovation(NULL), measurement(NULL), expectation(NULL),
@@ -71,7 +76,7 @@ namespace jafar {
 				{
 					RawInfos infos;
 					queryAvailableRaws(infos);
-					
+
 					// find minimum variance
 					jblas::vec3 min_var; min_var(0) = min_var(1) = min_var(2) = 1e3;
 					for(std::vector<RawInfo>::iterator it = infos.available.begin(); it != infos.available.end(); ++it)
@@ -80,7 +85,7 @@ namespace jafar {
 						for(int i = 0; i < 3; ++i) if (reading.data(i+1+inns) < min_var(i)) min_var(i) = reading.data(i+1+inns);
 						if ((*it).id == id) break;
 					}
-					
+
 					// do the average using only readings with variance between min and 2*min
 					jblas::vec3 average; average.clear();
 					jblas::vec3 sum_coeffs; sum_coeffs.clear();
@@ -93,7 +98,7 @@ namespace jafar {
 						if ((*it).id == id) break;
 					}
 					for(int i = 0; i < 3; ++i) average(i) /= sum_coeffs(i);
-					
+
 					// now initialize the robot state with this variance
 					for(int i = 0; i < 3; ++i) { reading.data(i+1) = average(i); reading.data(i+1+inns) = min_var(i); }
 				}
@@ -102,99 +107,99 @@ namespace jafar {
 				virtual void process(unsigned id)
 				{
 					if (use_for_init)
-					{
 						init(id);
-					} else
-					{
+					else
 						hardwareSensorPtr->getRaw(id, reading);
-					}
-						
-					// TODO a vec hardware sensor should return some information about what it is returning
-					// just like robots should be able to do with, including whether the info is measure or variance.
-					// pos(x/y/z)(gps,baro,mocap), ori (mocap,mag), vel(gps), gyr(y/p/r), acc(x/y/z)
 
+					EXP_rs.clear();
 					jblas::vec T = ublas::subrange(pose.x(), 0, 3);
 					jblas::vec r = ublas::subrange(pose.x(), 3, 7);
 					jblas::vec p = ublas::subrange(robotPtr()->pose.x(), 0, 3);
 					jblas::vec q = ublas::subrange(robotPtr()->pose.x(), 3, 7);
 					jblas::vec Tr = quaternion::rotate(q,T);
 
-					switch (innovation->size())
+					size_t indexE = 0;
+					size_t indexE_OriEuler = 0, indexE_Pos = 0;
+					size_t indexD_OriEuler = hardwareSensorPtr->getQuantity(hardware::HardwareSensorProprioAbstract::qOriEuler);
+					size_t indexD_Pos = hardwareSensorPtr->getQuantity(hardware::HardwareSensorProprioAbstract::qPos);
+
+					// POSITION
+					if (indexD_Pos)
 					{
-						case 6: // ORI (using euler x/y/z because the sensors work with euler and the uncertainty is provided with euler)
-						{
-							// compute expectation->x and EXP_rs
-							jblas::mat QR_q(4,4), E_qr(3,4);
-							jblas::vec e;
-							jblas::vec qr = quaternion::qProd(q, r);
-							quaternion::qProd_by_dq1(r, QR_q);
-							quaternion::q2e(qr, e, E_qr);
-							ublas::subrange(expectation->x(), 3,6) = e;
-							ublas::subrange(EXP_rs, 3,6, 3,7) = ublas::prod(E_qr, QR_q);
+						// compute expectation->x and EXP_rs
+						quaternion::rotate_by_dq(q, T, EXP_q);
+						ublas::subrange(EXP_rs, indexE,indexE+3, 0,3) = jblas::identity_mat(3);
+						ublas::subrange(EXP_rs, indexE,indexE+3, 3,7) = EXP_q;
+						ublas::subrange(expectation->x(), indexE,indexE+3) = p + Tr;
 
-							// fill measurement
-							ublas::subrange(measurement->x(), 3,6) = ublas::subrange(reading.data, 4,7);
-							measurement->P()(3,3) = jmath::sqr(reading.data(4+inns));
-							measurement->P()(4,4) = jmath::sqr(reading.data(5+inns));
-							measurement->P()(5,5) = jmath::sqr(reading.data(6+inns));
+						// fill measurement
+						ublas::subrange(measurement->x(), indexE,indexE+3) = ublas::subrange(reading.data, indexD_Pos,indexD_Pos+3) - robotPtr()->origin_sensors;
+						measurement->P()(0,0) = jmath::sqr(reading.data(indexD_Pos+0+inns));
+						measurement->P()(1,1) = jmath::sqr(reading.data(indexD_Pos+1+inns));
+						measurement->P()(2,2) = jmath::sqr(reading.data(indexD_Pos+2+inns));
 
-							// no break, continue with POS
-						}
-						case 3: // POS
-							// compute expectation->x and EXP_rs
-							quaternion::rotate_by_dq(q, T, EXP_q);
-							ublas::subrange(EXP_rs, 0,3, 0,3) = jblas::identity_mat(3);
-							ublas::subrange(EXP_rs, 0,3, 3,7) = EXP_q;
-							ublas::subrange(expectation->x(), 0,3) = p + Tr;
-							
-							// fill measurement
-							ublas::subrange(measurement->x(), 0,3) = ublas::subrange(reading.data, 0,3) - robotPtr()->origin_sensors;
-							measurement->P()(0,0) = jmath::sqr(reading.data(1+inns));
-							measurement->P()(1,1) = jmath::sqr(reading.data(2+inns));
-							measurement->P()(2,2) = jmath::sqr(reading.data(3+inns));
-							
-							// TODO gating ?
+						// TODO gating ?
 
-							// compute expectation->P and innovation
-							ublas::subrange(expectation->P(), 0,inns, 0,inns) = ublasExtra::prod_JPJt(ublas::project(robotPtr()->mapPtr()->filterPtr->P(), ia_rs, ia_rs), EXP_rs);
-							innovation->x() = measurement->x() - expectation->x();
-							innovation->P() = measurement->P() + expectation->P();
-							INN_rs = -EXP_rs;
-							break;
-						default:
-							JFR_ERROR(RtslamException, RtslamException::GENERIC_ERROR,
-							          "SensorAbsloc reading size " << reading.data.size() << " not supported.");
+						indexE_Pos = indexE;
+						indexE += 3;
 					}
+
+					// ORIENTATION EULER
+					if (indexD_OriEuler)
+					{
+						// compute expectation->x and EXP_rs
+						jblas::mat QR_q(4,4), E_qr(3,4);
+						jblas::vec e;
+						jblas::vec qr = quaternion::qProd(q, r);
+						quaternion::qProd_by_dq1(r, QR_q);
+						quaternion::q2e(qr, e, E_qr);
+						ublas::subrange(expectation->x(), indexE,indexE+3) = e;
+						ublas::subrange(EXP_rs, indexE,indexE+3, 3,7) = ublas::prod(E_qr, QR_q);
+
+						// fill measurement
+						ublas::subrange(measurement->x(), indexE,indexE+3) = ublas::subrange(reading.data, indexD_OriEuler,indexD_OriEuler+3);
+						measurement->P()(3,3) = jmath::sqr(reading.data(indexD_OriEuler+0+inns));
+						measurement->P()(4,4) = jmath::sqr(reading.data(indexD_OriEuler+1+inns));
+						measurement->P()(5,5) = jmath::sqr(reading.data(indexD_OriEuler+2+inns));
+
+						indexE_OriEuler = indexE;
+						indexE += 3;
+					}
+
 
 					if (first)
 					{
 						first = false;
 						// for first reading we force initialization
-						if (absolute)
+
+						if (indexD_OriEuler) // need to set ori uncertainty before pos uncertainty because of sensor lever arm
 						{
-							switch (innovation->size())
-							{
-								case 3: // POS
-									robotPtr()->origin_sensors = jblas::zero_vec(3);
-									ublas::subrange(robotPtr()->pose.x(), 0,3) = measurement->x() - Tr;
-									ublas::subrange(robotPtr()->pose.P(), 0,3, 0,3) = measurement->P() + 
-										ublasExtra::prod_JPJt(ublas::subrange(robotPtr()->pose.P(), 3,7, 3,7), EXP_q);
-									break;
-								default:
-									break;
-							}
-						} else
+							jblas::mat Q_qr(4,4), QR_e(4,3), Q_exp(4,3);
+							jblas::vec qr, ri = quaternion::q2qc(r);
+							quaternion::e2q(ublas::subrange(measurement->x(), indexE_OriEuler,indexE_OriEuler+3), qr, QR_e);
+							q = quaternion::qProd(q, ri);
+							quaternion::qProd_by_dq1(ri, Q_qr);
+							Q_exp = ublas::prod(Q_qr, QR_e);
+
+							ublas::subrange(robotPtr()->pose.x(), 3, 7) = q;
+							ublas::subrange(robotPtr()->pose.P(), 3,7, 3,7) = ublasExtra::prod_JPJt(
+								ublas::subrange(measurement->P(), indexE_OriEuler,indexE_OriEuler+3, indexE_OriEuler,indexE_OriEuler+3), Q_exp);
+						}
+
+						if (indexD_Pos)
 						{
-							switch (innovation->size())
+							if (absolute)
 							{
-								case 3: // POS
-									robotPtr()->origin_sensors = measurement->x() - Tr;
-									ublas::subrange(robotPtr()->pose.x(), 0, 3) = jblas::zero_vec(3);
-									ublas::subrange(robotPtr()->pose.P(), 0,3, 0,3) = measurement->P() + 
-										ublasExtra::prod_JPJt(ublas::subrange(robotPtr()->pose.P(), 3,7, 3,7), EXP_q);
-									break;
-								default:
-									break;
+								robotPtr()->origin_sensors = jblas::zero_vec(3);
+								ublas::subrange(robotPtr()->pose.x(), 0,3) = ublas::subrange(measurement->x(), indexE_Pos,indexE_Pos+3) - Tr;
+								ublas::subrange(robotPtr()->pose.P(), 0,3, 0,3) = ublas::subrange(measurement->P(), indexE_Pos,indexE_Pos+3, indexE_Pos,indexE_Pos+3) +
+									ublasExtra::prod_JPJt(ublas::subrange(robotPtr()->pose.P(), 3,7, 3,7), EXP_q);
+							} else
+							{
+								robotPtr()->origin_sensors = ublas::subrange(measurement->x(), indexE_Pos,indexE_Pos+3) - Tr;
+								ublas::subrange(robotPtr()->pose.x(), 0, 3) = jblas::zero_vec(3);
+								ublas::subrange(robotPtr()->pose.P(), 0,3, 0,3) = ublas::subrange(measurement->P(), indexE_Pos,indexE_Pos+3, indexE_Pos,indexE_Pos+3) +
+									ublasExtra::prod_JPJt(ublas::subrange(robotPtr()->pose.P(), 3,7, 3,7), EXP_q);
 							}
 						}
 						
@@ -204,6 +209,12 @@ namespace jafar {
 						
 					} else
 					{
+						// compute expectation->P and innovation
+						ublas::subrange(expectation->P(), 0,inns, 0,inns) = ublasExtra::prod_JPJt(ublas::project(robotPtr()->mapPtr()->filterPtr->P(), ia_rs, ia_rs), EXP_rs);
+						innovation->x() = measurement->x() - expectation->x();
+						innovation->P() = measurement->P() + expectation->P();
+						INN_rs = -EXP_rs;
+
 						map_ptr_t mapPtr = robotPtr()->mapPtr();
 						ind_array ia_x = mapPtr->ia_used_states();
 						mapPtr->filterPtr->correct(ia_x,*innovation,INN_rs,ia_rs);

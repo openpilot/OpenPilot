@@ -48,11 +48,10 @@ class HardwareSensorGpsGenom: public HardwareSensorProprioAbstract
 		
 		virtual void start();
 		virtual double getLastTimestamp() { boost::unique_lock<boost::mutex> l(mutex_data); return last_timestamp; }
-		virtual int dataSize() { return 3; }
 		
 };
 
 
 }}}
 
-#endif // HARDWARESENSORABSLOCGPSGENOM_HPP
+#endif // HARDWARE_SENSOR_GPSGENOM_HPP_

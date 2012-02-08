@@ -195,29 +195,18 @@ class HardwareSensorAbstract
 class HardwareSensorProprioAbstract: public HardwareSensorAbstract<RawVec>
 {
 	public:
-	/*
-		TODO return some automatic information about what is provided
-		
-	enum locpart {
-		x=1,y=2,z=4,pos=7, 
-		qw=8,qx=16,qy=32,qz=64,q=120,
-		vx=128,vy=256,vz=512,vel=903,
-		vyaw=1024,vpitch=2048,vroll=4096,vela=7288
-	};
-	locpart bor(locpart a, locpart b) { return (locpart)((unsigned)a | (unsigned)b); }
-	locpart bor(locpart a, locpart b, locpart c) { return (locpart)((unsigned)bor(a,b) | (unsigned)c); }
-	locpart bor(locpart a, locpart b, locpart c, locpart d) { return (locpart)((unsigned)bor(a,b,c) | (unsigned)d); }
-	locpart bor(locpart a, locpart b, locpart c, locpart d, locpart e) { return (locpart)((unsigned)bor(a,b,c,d) | (unsigned)e); }
-	locpart bor(locpart a, locpart b, locpart c, locpart d, locpart e, locpart f) { return (locpart)((unsigned)bor(a,b,c,d,e) | (unsigned)f); }
-	
-	virtual ind_array get(locpart x);
-	*/
-	
+		enum Quantity { qPos, qOriQuat, qOriEuler, qVel, qAbsVel, qAngVel, qAbsAngVel, qAcc, qAbsAcc, qNQuantity };
+	private:
+		size_t quantities[qNQuantity];
+		size_t data_size;
+	protected:
+		void addQuantity(Quantity quantity, size_t index, size_t size) { quantities[quantity] = index; data_size += size; }
+		void clearQuantities() { for(int i = 0; i < qNQuantity; ++i) quantities[i] = 0; data_size = 0; }
+	public:
 		HardwareSensorProprioAbstract(kernel::VariableCondition<int> &condition, unsigned bufferSize):
-			HardwareSensorAbstract<RawVec>(condition, bufferSize) {}
-		virtual int dataSize() = 0; /// number of measure variables provided (without timestamp and variance)
-	
-	
+			HardwareSensorAbstract<RawVec>(condition, bufferSize) { clearQuantities(); }
+		int dataSize() { return data_size; } /// number of measure variables provided (without timestamp and variance)
+		inline size_t getQuantity(Quantity quantity) { return quantities[quantity]; } /// get index of quantity, 0 if not measured
 };
 
 class HardwareSensorExteroAbstract: public HardwareSensorAbstract<raw_ptr_t>

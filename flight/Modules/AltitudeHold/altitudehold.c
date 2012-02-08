@@ -105,6 +105,7 @@ float tau;
 float velocity, lastAltitude;
 float throttleIntegral;
 float decay;
+float velocity_decay;
 bool running = false;
 float error;
 
@@ -122,6 +123,8 @@ static void altitudeHoldTask(void *parameters)
 
 	// Force update of the settings
 	SettingsUpdatedCb(&ev);
+
+	running = false;
 
 	// Main task loop
 	lastSysTime = xTaskGetTickCount();
@@ -153,11 +156,12 @@ static void altitudeHoldTask(void *parameters)
 			lastSysTime = thisTime;
 
 			// Flipping sign on error since altitude is "down"
-			error =  (altitudeHoldDesired.Altitude - baroAltitude.Altitude);
+			decay = expf(-dT / altitudeHoldSettings.Tau);
+			error = error * decay + (altitudeHoldDesired.Altitude - baroAltitude.Altitude) * (1.0f - decay);
 			
 			// Estimate velocity by smoothing derivative
-			decay = expf(-dT / altitudeHoldSettings.Tau);
-			velocity = velocity * decay + (baroAltitude.Altitude - lastAltitude) / dT * (1.0f-decay); // m/s
+			velocity_decay = expf(-dT / altitudeHoldSettings.DerivativeTau);
+			velocity = velocity * velocity_decay + (baroAltitude.Altitude - lastAltitude) / dT * (1.0f-velocity_decay); // m/s
 			lastAltitude = baroAltitude.Altitude;
 
 			// Compute integral off altitude error
@@ -190,6 +194,8 @@ static void altitudeHoldTask(void *parameters)
 				BaroAltitudeConnectQueue(queue);
 				// Copy the current throttle as a starting point for integral
 				StabilizationDesiredThrottleGet(&throttleIntegral);
+				BaroAltitudeAltitudeGet(&lastAltitude);
+				error = 0;
 				running = true;
 			}
 

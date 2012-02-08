@@ -152,6 +152,7 @@
 #include "rtslam/hardwareSensorCameraFirewire.hpp"
 #include "rtslam/hardwareEstimatorMti.hpp"
 #include "rtslam/hardwareSensorGpsGenom.hpp"
+#include "rtslam/hardwareSensorMocap.hpp"
 
 #include "rtslam/display_qt.hpp"
 #include "rtslam/display_gdhe.hpp"
@@ -1055,17 +1056,28 @@ void demo_slam_init()
 		
 		if (intOpts[iGps])
 		{
-			absloc_ptr_t senPtr13(new SensorAbsloc(robPtr1, MapObject::UNFILTERED, intOpts[iGps] == 2));
+			absloc_ptr_t senPtr13(new SensorAbsloc(robPtr1, MapObject::UNFILTERED, false));
 			senPtr13->setId();
 			senPtr13->linkToParentRobot(robPtr1);
-			hardware::hardware_sensorprop_ptr_t hardGps(
-				new hardware::HardwareSensorGpsGenom(rawdata_condition, 200, "mana-base", mode, strOpts[sDataPath]));
+			hardware::hardware_sensorprop_ptr_t hardGps;
+			bool inits = true;
+			switch (intOpts[iGps])
+			{
+				case 1:
+					hardGps.reset(new hardware::HardwareSensorGpsGenom(rawdata_condition, 200, "mana-base", mode, strOpts[sDataPath]));
+				case 2:
+					hardGps.reset(new hardware::HardwareSensorGpsGenom(rawdata_condition, 200, "mana-base", mode, strOpts[sDataPath])); // TODO ask to ignore vel
+				case 3:
+					hardGps.reset(new hardware::HardwareSensorMocap(rawdata_condition, 200, mode, strOpts[sDataPath]));
+					inits = false;
+			}
+
 			hardGps->setSyncConfig(configSetup.GPS_TIMESTAMP_CORRECTION);
 			hardGps->setTimingInfos(1.0/20.0, 1.5/20.0);
 			senPtr13->setHardwareSensor(hardGps);
 			senPtr13->setIntegrationPolicy(true);
-			senPtr13->setUseForInit(true);
-			senPtr13->setNeedInit(true);
+			senPtr13->setUseForInit(inits);
+			senPtr13->setNeedInit(inits);
 			senPtr13->setPose(configSetup.GPS_POSE[0], configSetup.GPS_POSE[1], configSetup.GPS_POSE[2],
 												configSetup.GPS_POSE[3], configSetup.GPS_POSE[4], configSetup.GPS_POSE[5]); // x,y,z,roll,pitch,yaw
 			//hardGps->start();
@@ -1153,7 +1165,7 @@ void demo_slam_main(world_ptr_t *world)
 
 	// wait for their init
 	std::cout << "Sensors are calibrating..." << std::flush;
-	if ((intOpts[iRobot] == 1 || intOpts[iGps] != 0) && !(intOpts[iReplay] & 1)) sleep(3);
+	if ((intOpts[iRobot] == 1 || intOpts[iGps] == 1 || intOpts[iGps] == 2) && !(intOpts[iReplay] & 1)) sleep(2);
 	std::cout << " done." << std::endl;
 					
 	// set the start date
@@ -1570,7 +1582,7 @@ void demo_slam_run() {
 	* --simu 0 or <environment id>*10+<trajectory id> (
 	* --freq camera frequency in double Hz (with trigger==0/1)
 	* --shutter shutter time in double seconds (0=auto); for trigger modes 0,2,3 the value is relative between 0 and 1
-	* --gps=0/1/2 -> Off/Relative/Absolute
+	* --gps=0/1/2/3 -> Off / Pos / Pos+Vel / Pos+Ori(mocap)
 	*
 	* You can use the following examples and only change values:
 	* online test (old mode=0):

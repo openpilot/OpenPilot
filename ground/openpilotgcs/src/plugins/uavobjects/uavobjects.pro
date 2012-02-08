@@ -28,7 +28,6 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/attitudeactual.h \
     $$UAVOBJECT_SYNTHETICS/altitudeholddesired.h \
     $$UAVOBJECT_SYNTHETICS/altitudeholdsettings.h \
-    $$UAVOBJECT_SYNTHETICS/inssettings.h \
     $$UAVOBJECT_SYNTHETICS/revocalibration.h \
     $$UAVOBJECT_SYNTHETICS/gcstelemetrystats.h \
     $$UAVOBJECT_SYNTHETICS/gyros.h \
@@ -85,7 +84,6 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/attitudeactual.cpp \
     $$UAVOBJECT_SYNTHETICS/altitudeholddesired.cpp \
     $$UAVOBJECT_SYNTHETICS/altitudeholdsettings.cpp \
-    $$UAVOBJECT_SYNTHETICS/inssettings.cpp \
     $$UAVOBJECT_SYNTHETICS/revocalibration.cpp \
     $$UAVOBJECT_SYNTHETICS/gcstelemetrystats.cpp \
     $$UAVOBJECT_SYNTHETICS/accels.cpp \

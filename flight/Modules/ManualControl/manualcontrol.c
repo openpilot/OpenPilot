@@ -44,6 +44,8 @@
 #include "flightstatus.h"
 #include "accessorydesired.h"
 #include "receiveractivity.h"
+#include "altitudeholddesired.h"
+#include "positionactual.h"
 
 // Private constants
 #if defined(PIOS_MANUAL_STACK_SIZE)
@@ -79,6 +81,7 @@ static portTickType lastSysTime;
 // Private functions
 static void updateActuatorDesired(ManualControlCommandData * cmd);
 static void updateStabilizationDesired(ManualControlCommandData * cmd, ManualControlSettingsData * settings);
+static void altitudeHoldDesired(ManualControlCommandData * cmd);
 static void processFlightMode(ManualControlSettingsData * settings, float flightMode);
 static void processArm(ManualControlCommandData * cmd, ManualControlSettingsData * settings);
 static void setArmedIfChanged(uint8_t val);
@@ -375,7 +378,13 @@ static void manualControlTask(void *parameters)
 				updateStabilizationDesired(&cmd, &settings);
 				break;
 			case FLIGHTMODE_GUIDANCE:
-				// TODO: Implement
+				switch(flightStatus.FlightMode) {
+					case FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD:
+						altitudeHoldDesired(&cmd);
+						break;
+					default:
+						AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_CRITICAL);
+				}
 				break;
 		}
 	}
@@ -586,6 +595,47 @@ static void updateStabilizationDesired(ManualControlCommandData * cmd, ManualCon
 
 	stabilization.Throttle = (cmd->Throttle < 0) ? -1 : cmd->Throttle;
 	StabilizationDesiredSet(&stabilization);
+}
+
+// TODO: Need compile flag to exclude this from copter control
+static void altitudeHoldDesired(ManualControlCommandData * cmd)
+{
+	const float DEADBAND_HIGH = 0.55;
+	const float DEADBAND_LOW = 0.45;
+	
+	static portTickType lastSysTime;
+	static bool zeroed = false;
+	portTickType thisSysTime;
+	float dT;
+	AltitudeHoldDesiredData altitudeHoldDesired;
+	AltitudeHoldDesiredGet(&altitudeHoldDesired);
+
+	StabilizationSettingsData stabSettings;
+	StabilizationSettingsGet(&stabSettings);
+
+	thisSysTime = xTaskGetTickCount();
+	if(thisSysTime > lastSysTime) // reuse dt in case of wraparound
+		dT = (thisSysTime - lastSysTime) / portTICK_RATE_MS / 1000.0f;
+	lastSysTime = thisSysTime;
+
+	altitudeHoldDesired.Roll = cmd->Roll * stabSettings.RollMax;
+	altitudeHoldDesired.Pitch = cmd->Pitch * stabSettings.PitchMax;
+	altitudeHoldDesired.Yaw = cmd->Yaw * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_YAW];
+	
+	float currentDown;
+	PositionActualDownGet(&currentDown);
+	if(dT > 1) {
+		// After not being in this mode for a while init at current height
+		altitudeHoldDesired.Down = currentDown;
+		zeroed = false;
+	} else if (cmd->Throttle > DEADBAND_HIGH && zeroed)
+		altitudeHoldDesired.Down += (DEADBAND_HIGH - cmd->Throttle) * dT;
+	else if (cmd->Throttle < DEADBAND_LOW && zeroed)
+		altitudeHoldDesired.Down += (DEADBAND_LOW - cmd->Throttle) * dT;
+	else if (cmd->Throttle >= DEADBAND_LOW && cmd->Throttle <= DEADBAND_HIGH)  // Require the stick to enter the dead band before they can move height
+		zeroed = true;
+	
+	AltitudeHoldDesiredSet(&altitudeHoldDesired);
 }
 
 /**

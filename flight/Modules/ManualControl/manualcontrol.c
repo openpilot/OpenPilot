@@ -46,6 +46,7 @@
 #include "receiveractivity.h"
 #include "altitudeholddesired.h"
 #include "positionactual.h"
+#include "baroaltitude.h"
 
 // Private constants
 #if defined(PIOS_MANUAL_STACK_SIZE)
@@ -626,12 +627,14 @@ static void altitudeHoldDesired(ManualControlCommandData * cmd)
 	PositionActualDownGet(&currentDown);
 	if(dT > 1) {
 		// After not being in this mode for a while init at current height
-		altitudeHoldDesired.Down = currentDown;
+		BaroAltitudeData baroAltitude;
+		BaroAltitudeGet(&baroAltitude);
+		altitudeHoldDesired.Altitude = baroAltitude.Altitude;
 		zeroed = false;
 	} else if (cmd->Throttle > DEADBAND_HIGH && zeroed)
-		altitudeHoldDesired.Down += (DEADBAND_HIGH - cmd->Throttle) * dT;
+		altitudeHoldDesired.Altitude += (cmd->Throttle - DEADBAND_HIGH) * dT;
 	else if (cmd->Throttle < DEADBAND_LOW && zeroed)
-		altitudeHoldDesired.Down += (DEADBAND_LOW - cmd->Throttle) * dT;
+		altitudeHoldDesired.Altitude += (cmd->Throttle - DEADBAND_LOW) * dT;
 	else if (cmd->Throttle >= DEADBAND_LOW && cmd->Throttle <= DEADBAND_HIGH)  // Require the stick to enter the dead band before they can move height
 		zeroed = true;
 	

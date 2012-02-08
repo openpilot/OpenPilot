@@ -46,7 +46,9 @@
 #include "openpilot.h"
 #include "altitudeholdsettings.h"
 #include "altitudeholddesired.h"	// object that will be updated by the module
+#include "baroaltitude.h"
 #include "positionactual.h"
+#include "flightstatus.h"
 #include "stabilizationdesired.h"
 
 // Private constants
@@ -58,6 +60,7 @@
 // Private variables
 static xTaskHandle altitudeHoldTaskHandle;
 static xQueueHandle queue;
+static AltitudeHoldSettingsData altitudeHoldSettings;
 
 // Private functions
 static void altitudeHoldTask(void *parameters);
@@ -87,17 +90,22 @@ int32_t AltitudeHoldInitialize()
 
 	// Create object queue
 	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
-	
+
 	// Listen for updates.
 	AltitudeHoldDesiredConnectQueue(queue);
-	
+	FlightStatusConnectQueue(queue);
+
 	AltitudeHoldSettingsConnectCallback(&SettingsUpdatedCb);
-	
+
 	return 0;
 }
 MODULE_INITCALL(AltitudeHoldInitialize, AltitudeHoldStart)
 
-static float throttleIntegral = 0;
+float tau;
+float velocity, lastAltitude;
+float throttleIntegral;
+float decay;
+bool running = false;
 
 /**
  * Module thread, should not return.
@@ -106,16 +114,15 @@ static void altitudeHoldTask(void *parameters)
 {
 	AltitudeHoldSettingsData altitudeHoldSettings;
 	AltitudeHoldDesiredData altitudeHoldDesired;
-	PositionActualData positionActual;
+	BaroAltitudeData baroAltitude;
 	StabilizationDesiredData stabilizationDesired;
-			
-	portTickType thisTime;
-	portTickType lastSysTime;
+
+	portTickType thisTime, lastSysTime;
 	UAVObjEvent ev;
-	
+
 	// Force update of the settings
 	SettingsUpdatedCb(&ev);
-	
+
 	// Main task loop
 	lastSysTime = xTaskGetTickCount();
 	while (1) {
@@ -124,36 +131,47 @@ static void altitudeHoldTask(void *parameters)
 		if ( xQueueReceive(queue, &ev, 100 / portTICK_RATE_MS) != pdTRUE )
 		{
 			// Todo: Add alarm if it should be running
-			throttleIntegral = 0;
 			continue;
-		} else {
-			PositionActualGet(&positionActual);
+		} else if (ev.obj == BaroAltitudeHandle()) {
+			BaroAltitudeGet(&baroAltitude);
 			StabilizationDesiredGet(&stabilizationDesired);
 			float dT;
-			
+
+			// Verify that we are still in altitude hold mode
+			FlightStatusData flightStatus;
+			FlightStatusGet(&flightStatus);
+			if(flightStatus.FlightMode != FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD) {
+				UAVObjDisconnectQueue(BaroAltitudeHandle(), queue);
+				running = false;
+			}
+
 			thisTime = xTaskGetTickCount();
-			if(thisTime > lastSysTime) // reuse dt in case of wraparound
-				dT = (thisTime - lastSysTime) / portTICK_RATE_MS / 1000.0f;
+			dT = ((portTickType)(thisTime - lastSysTime)) / portTICK_RATE_MS / 1000.0f;
 			lastSysTime = thisTime;
 
-			static float altitude;
-			const float altitudeTau = 0.1;
-			
-			
 			// Flipping sign on error since altitude is "down"
-			float error = - (altitudeHoldDesired.Down - positionActual.Down);
-			static float 
-			throttleIntegral += error * altitudeHoldSettings.Ki * dT * 1000;
-			if(throttleIntegral > altitudeHoldSettings.ILimit)
-				throttleIntegral = altitudeHoldSettings.ILimit;
-			else if (throttleIntegral < 0)
-				throttleIntegral = 0;
-			stabilizationDesired.Throttle = error * altitudeHoldSettings.Kp + throttleIntegral;
-			if(stabilizationDesired.Throttle > 1)
+			float error = (altitudeHoldDesired.Altitude - baroAltitude.Altitude);
+			
+			// Estimate velocity by smoothing derivative
+			decay = expf(-dT / tau);
+			velocity = velocity * decay + (baroAltitude.Altitude - lastAltitude) / dT * (1-decay); // m/s
+			lastAltitude = baroAltitude.Altitude;
+
+			// Compute integral off altitude error
+			throttleIntegral += error * altitudeHoldSettings.Ki * dT;
+
+			// Instead of explicit limit on integral you output limit feedback
+			stabilizationDesired.Throttle = error * altitudeHoldSettings.Kp + throttleIntegral -
+				velocity * altitudeHoldSettings.Kd;
+			if(stabilizationDesired.Throttle > 1) {
+				throttleIntegral -= (stabilizationDesired.Throttle - 1);
 				stabilizationDesired.Throttle = 1;
-			else if (stabilizationDesired.Throttle < 0)
+			}
+			else if (stabilizationDesired.Throttle < 0) {
+				throttleIntegral -= stabilizationDesired.Throttle;
 				stabilizationDesired.Throttle = 0;
-				
+			}
+
 			stabilizationDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_ROLL] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
 			stabilizationDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_PITCH] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
 			stabilizationDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW] = STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK;		
@@ -161,6 +179,20 @@ static void altitudeHoldTask(void *parameters)
 			stabilizationDesired.Pitch = altitudeHoldDesired.Pitch;
 			stabilizationDesired.Yaw = altitudeHoldDesired.Yaw;
 			StabilizationDesiredSet(&stabilizationDesired);
+		} else if (ev.obj == FlightStatusHandle()) {
+			FlightStatusData flightStatus;
+			FlightStatusGet(&flightStatus);
+
+			if(flightStatus.FlightMode == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD && !running) {
+				BaroAltitudeConnectQueue(queue);
+				// Copy the current throttle as a starting point for integral
+				StabilizationDesiredThrottleGet(&throttleIntegral);
+				throttleIntegral /= altitudeHoldSettings.Ki;
+				running = true;
+			}
+
+		} else if (ev.obj == AltitudeHoldDesiredHandle()) {
+			AltitudeHoldDesiredGet(&altitudeHoldDesired);
 		}
 	
 	}
@@ -168,13 +200,7 @@ static void altitudeHoldTask(void *parameters)
 
 static void SettingsUpdatedCb(UAVObjEvent * ev)
 {
-	AltitudeHoldDesiredGet(&altitudeHoldDesired);
 	AltitudeHoldSettingsGet(&altitudeHoldSettings);
 
-	const float fakeDt = 0.0025;
-	if(settings.GyroTau < 0.0001)
-		gyro_alpha = 0;   // not trusting this to resolve to 0
-	else
-		gyro_alpha = expf(-fakeDt  / settings.GyroTau);
-
+	tau = altitudeHoldSettings.Tau / 1000.0f;
 }

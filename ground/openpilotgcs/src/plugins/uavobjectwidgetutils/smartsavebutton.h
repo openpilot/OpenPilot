@@ -39,10 +39,12 @@
 #include <QDebug>
 class smartSaveButton:public QObject
 {
+    enum buttonTypeEnum {save_button,apply_button};
 public:
     Q_OBJECT
 public:
-    smartSaveButton(QPushButton * update,QPushButton * save);
+    smartSaveButton();
+    void addButtons(QPushButton * save,QPushButton * apply);
     void setObjects(QList<UAVDataObject *>);
     void addObject(UAVDataObject *);
     void clearObjects();
@@ -59,14 +61,13 @@ private slots:
     void saving_finished(int,bool);
 
 private:
-    QPushButton *bupdate;
-    QPushButton *bsave;
     quint32 current_objectID;
     UAVDataObject * current_object;
     bool up_result;
     bool sv_result;
     QEventLoop loop;
     QList<UAVDataObject *> objects;
+    QMap<QPushButton *,buttonTypeEnum> buttonList;
 protected:
 public slots:
     void enableControls(bool value);

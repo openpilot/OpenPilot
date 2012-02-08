@@ -1140,6 +1140,12 @@
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
+				   <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>button:default</string>
+                       <string>buttongroup:1</string>
+                      </stringlist>
+                     </property>
                   <property name="minimumSize">
                    <size>
                     <width>81</width>
@@ -1188,7 +1194,13 @@ border-radius: 4;
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
-                  </property>
+				   </property>
+				   <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>button:help</string>
+                       <string>url:http://wiki.openpilot.org/display/Doc/Stabilization+panel</string>
+                      </stringlist>
+                     </property>
                   <property name="minimumSize">
                    <size>
                     <width>51</width>
@@ -3389,6 +3401,7 @@ border-radius: 5;</string>
                        <string>element:Kp</string>
                        <string>haslimits:yes</string>
                        <string>scale:0.0001</string>
+					   <string>buttongroup:1,10</string>
                       </stringlist>
                      </property>
                     </widget>
@@ -3420,6 +3433,7 @@ border-radius: 5;</string>
                        <string>element:Kp</string>
                        <string>haslimits:yes</string>
                        <string>scale:0.0001</string>
+					   <string>buttongroup:1,10</string>
                       </stringlist>
                      </property>
                     </widget>
@@ -3463,6 +3477,7 @@ border-radius: 5;</string>
                        <string>element:Kp</string>
                        <string>haslimits:yes</string>
                        <string>scale:0.0001</string>
+					   <string>buttongroup:1,10</string>
                       </stringlist>
                      </property>
                     </widget>
@@ -3494,6 +3509,7 @@ border-radius: 5;</string>
                        <string>element:Kp</string>
                        <string>haslimits:yes</string>
                        <string>scale:0.0001</string>
+					   <string>buttongroup:1,10</string>
                       </stringlist>
                      </property>
                     </widget>
@@ -3537,6 +3553,7 @@ border-radius: 5;</string>
                        <string>element:Kp</string>
                        <string>haslimits:yes</string>
                        <string>scale:0.0001</string>
+					   <string>buttongroup:1,10</string>
                       </stringlist>
                      </property>
                     </widget>
@@ -3568,6 +3585,7 @@ border-radius: 5;</string>
                        <string>element:Kp</string>
                        <string>haslimits:yes</string>
                        <string>scale:0.0001</string>
+					   <string>buttongroup:1,10</string>
                       </stringlist>
                      </property>
                     </widget>
@@ -3630,6 +3648,7 @@ border-radius: 5;</string>
                        <string>element:Ki</string>
                        <string>haslimits:yes</string>
                        <string>scale:0.0001</string>
+					   <string>buttongroup:1,10</string>
                       </stringlist>
                      </property>
                     </widget>
@@ -3661,6 +3680,7 @@ border-radius: 5;</string>
                        <string>element:Ki</string>
                        <string>haslimits:yes</string>
                        <string>scale:0.0001</string>
+					   <string>buttongroup:1,10</string>
                       </stringlist>
                      </property>
                     </widget>
@@ -3704,6 +3724,7 @@ border-radius: 5;</string>
                        <string>element:Ki</string>
                        <string>haslimits:yes</string>
                        <string>scale:0.0001</string>
+					   <string>buttongroup:1,10</string>
                       </stringlist>
                      </property>
                     </widget>
@@ -3735,6 +3756,7 @@ border-radius: 5;</string>
                        <string>element:Ki</string>
                        <string>haslimits:yes</string>
                        <string>scale:0.0001</string>
+					   <string>buttongroup:1,10</string>
                       </stringlist>
                      </property>
                     </widget>
@@ -3778,6 +3800,7 @@ border-radius: 5;</string>
                        <string>element:Ki</string>
                        <string>haslimits:yes</string>
                        <string>scale:0.0001</string>
+					   <string>buttongroup:1,10</string>
                       </stringlist>
                      </property>
                     </widget>
@@ -3809,6 +3832,7 @@ border-radius: 5;</string>
                        <string>element:Ki</string>
                        <string>haslimits:yes</string>
                        <string>scale:0.0001</string>
+					   <string>buttongroup:1,10</string>
                       </stringlist>
                      </property>
                     </widget>
@@ -4458,6 +4482,12 @@ border-radius: 5;</string>
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
+				  <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>button:default</string>
+                       <string>buttongroup:2</string>
+                      </stringlist>
+                     </property>
                   <property name="minimumSize">
                    <size>
                     <width>81</width>
@@ -6652,7 +6682,7 @@ border-radius: 5;</string>
                        <string>element:Kp</string>
                        <string>scale:0.1</string>
                        <string>haslimits:yes</string>
-                       <string>buttongroup:2</string>
+                       <string>buttongroup:2,10</string>
                       </stringlist>
                      </property>
                     </widget>
@@ -6684,7 +6714,7 @@ border-radius: 5;</string>
                        <string>element:Kp</string>
                        <string>scale:0.1</string>
                        <string>haslimits:yes</string>
-                       <string>buttongroup:2</string>
+                       <string>buttongroup:2,10</string>
                       </stringlist>
                      </property>
                     </widget>
@@ -6728,7 +6758,7 @@ border-radius: 5;</string>
                        <string>element:Kp</string>
                        <string>scale:0.1</string>
                        <string>haslimits:yes</string>
-                       <string>buttongroup:2</string>
+                       <string>buttongroup:2,10</string>
                       </stringlist>
                      </property>
                     </widget>
@@ -6760,7 +6790,7 @@ border-radius: 5;</string>
                        <string>element:Kp</string>
                        <string>scale:0.1</string>
                        <string>haslimits:yes</string>
-                       <string>buttongroup:2</string>
+                       <string>buttongroup:2,10</string>
                       </stringlist>
                      </property>
                     </widget>
@@ -6804,7 +6834,7 @@ border-radius: 5;</string>
                        <string>element:Kp</string>
                        <string>scale:0.1</string>
                        <string>haslimits:yes</string>
-                       <string>buttongroup:2</string>
+                       <string>buttongroup:2,10</string>
                       </stringlist>
                      </property>
                     </widget>
@@ -6836,7 +6866,7 @@ border-radius: 5;</string>
                        <string>element:Kp</string>
                        <string>scale:0.1</string>
                        <string>haslimits:yes</string>
-                       <string>buttongroup:2</string>
+                       <string>buttongroup:2,10</string>
                       </stringlist>
                      </property>
                     </widget>
@@ -6899,7 +6929,7 @@ border-radius: 5;</string>
                        <string>element:Ki</string>
                        <string>scale:0.1</string>
                        <string>haslimits:yes</string>
-                       <string>buttongroup:2</string>
+                       <string>buttongroup:2,10</string>
                       </stringlist>
                      </property>
                     </widget>
@@ -6931,7 +6961,7 @@ border-radius: 5;</string>
                        <string>element:Ki</string>
                        <string>scale:0.1</string>
                        <string>haslimits:yes</string>
-                       <string>buttongroup:2</string>
+                       <string>buttongroup:2,10</string>
                       </stringlist>
                      </property>
                     </widget>
@@ -6975,7 +7005,7 @@ border-radius: 5;</string>
                        <string>element:Ki</string>
                        <string>scale:0.1</string>
                        <string>haslimits:yes</string>
-                       <string>buttongroup:2</string>
+                       <string>buttongroup:2,10</string>
                       </stringlist>
                      </property>
                     </widget>
@@ -7007,7 +7037,7 @@ border-radius: 5;</string>
                        <string>element:Ki</string>
                        <string>scale:0.1</string>
                        <string>haslimits:yes</string>
-                       <string>buttongroup:2</string>
+                       <string>buttongroup:2,10</string>
                       </stringlist>
                      </property>
                     </widget>
@@ -7051,7 +7081,7 @@ border-radius: 5;</string>
                        <string>element:Ki</string>
                        <string>scale:0.1</string>
                        <string>haslimits:yes</string>
-                       <string>buttongroup:2</string>
+                       <string>buttongroup:2,10</string>
                       </stringlist>
                      </property>
                     </widget>
@@ -7083,7 +7113,7 @@ border-radius: 5;</string>
                        <string>element:Ki</string>
                        <string>scale:0.1</string>
                        <string>haslimits:yes</string>
-                       <string>buttongroup:2</string>
+                       <string>buttongroup:2,10</string>
                       </stringlist>
                      </property>
                     </widget>
@@ -7099,6 +7129,12 @@ border-radius: 5;</string>
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
+				  <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>button:help</string>
+                       <string>url:http://wiki.openpilot.org/display/Doc/Stabilization+panel</string>
+                      </stringlist>
+                     </property>
                   <property name="minimumSize">
                    <size>
                     <width>51</width>
@@ -7779,6 +7815,12 @@ border-radius: 4;
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
+				  <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>button:help</string>
+                       <string>url:http://wiki.openpilot.org/display/Doc/Stabilization+panel</string>
+                      </stringlist>
+                     </property>
                   <property name="minimumSize">
                    <size>
                     <width>51</width>
@@ -7825,6 +7867,12 @@ border-radius: 4;
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
+				  <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>button:default</string>
+                       <string>buttongroup:3</string>
+                      </stringlist>
+                     </property>
                   <property name="minimumSize">
                    <size>
                     <width>81</width>
@@ -10022,6 +10070,15 @@ Angle</string>
                      <property name="tickInterval">
                       <number>25</number>
                      </property>
+					 <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:RollMax</string>
+                       <string>haslimits:yes</string>
+                       <string>scale:1.8</string>
+					   <string>buttongroup:3,10</string>
+                      </stringlist>
+                     </property>
                     </widget>
                    </item>
                    <item row="1" column="2">
@@ -10043,6 +10100,15 @@ Angle</string>
                      </property>
                      <property name="text">
                       <string>50</string>
+                     </property>
+					 <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:RollMax</string>
+                       <string>haslimits:yes</string>
+                       <string>scale:1.8</string>
+					   <string>buttongroup:3,10</string>
+                      </stringlist>
                      </property>
                     </widget>
                    </item>
@@ -10078,6 +10144,15 @@ Angle</string>
                      <property name="tickInterval">
                       <number>25</number>
                      </property>
+					 <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:PitchMax</string>
+                       <string>haslimits:yes</string>
+                       <string>scale:1.8</string>
+					   <string>buttongroup:3,10</string>
+                      </stringlist>
+                     </property>
                     </widget>
                    </item>
                    <item row="1" column="4">
@@ -10099,6 +10174,15 @@ Angle</string>
                      </property>
                      <property name="text">
                       <string>50</string>
+                     </property>
+					 <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:PitchMax</string>
+                       <string>haslimits:yes</string>
+                       <string>scale:1.8</string>
+					   <string>buttongroup:3,10</string>
+                      </stringlist>
                      </property>
                     </widget>
                    </item>
@@ -10134,6 +10218,15 @@ Angle</string>
                      <property name="tickInterval">
                       <number>25</number>
                      </property>
+					 <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:YawMax</string>
+                       <string>haslimits:yes</string>
+                       <string>scale:1.8</string>
+					   <string>buttongroup:3,10</string>
+                      </stringlist>
+                     </property>
                     </widget>
                    </item>
                    <item row="1" column="6">
@@ -10155,6 +10248,15 @@ Angle</string>
                      </property>
                      <property name="text">
                       <string>50</string>
+                     </property>
+					 <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:YawMax</string>
+                       <string>haslimits:yes</string>
+                       <string>scale:1.8</string>
+					   <string>buttongroup:3,10</string>
+                      </stringlist>
                      </property>
                     </widget>
                    </item>
@@ -10210,6 +10312,16 @@ Rate</string>
                      <property name="tickInterval">
                       <number>25</number>
                      </property>
+					 <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:ManualRate</string>
+					   <string>element:Roll</string>
+                       <string>haslimits:yes</string>
+                       <string>scale:5</string>
+					   <string>buttongroup:3,10</string>
+                      </stringlist>
+                     </property>
                     </widget>
                    </item>
                    <item row="2" column="2">
@@ -10231,6 +10343,16 @@ Rate</string>
                      </property>
                      <property name="text">
                       <string>50</string>
+                     </property>
+					  <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:ManualRate</string>
+					   <string>element:Roll</string>
+                       <string>haslimits:yes</string>
+                       <string>scale:5</string>
+					   <string>buttongroup:3,10</string>
+                      </stringlist>
                      </property>
                     </widget>
                    </item>
@@ -10266,6 +10388,16 @@ Rate</string>
                      <property name="tickInterval">
                       <number>25</number>
                      </property>
+					  <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:ManualRate</string>
+					   <string>element:Pitch</string>
+                       <string>haslimits:yes</string>
+                       <string>scale:5</string>
+					   <string>buttongroup:3,10</string>
+                      </stringlist>
+                     </property>
                     </widget>
                    </item>
                    <item row="2" column="4">
@@ -10287,6 +10419,16 @@ Rate</string>
                      </property>
                      <property name="text">
                       <string>50</string>
+                     </property>
+					  <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:ManualRate</string>
+					   <string>element:Pitch</string>
+                       <string>haslimits:yes</string>
+                       <string>scale:5</string>
+					   <string>buttongroup:3,10</string>
+                      </stringlist>
                      </property>
                     </widget>
                    </item>
@@ -10322,6 +10464,16 @@ Rate</string>
                      <property name="tickInterval">
                       <number>25</number>
                      </property>
+					  <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:ManualRate</string>
+					   <string>element:Yaw</string>
+                       <string>haslimits:yes</string>
+                       <string>scale:5</string>
+					   <string>buttongroup:3,10</string>
+                      </stringlist>
+                     </property>
                     </widget>
                    </item>
                    <item row="2" column="6">
@@ -10343,6 +10495,16 @@ Rate</string>
                      </property>
                      <property name="text">
                       <string>50</string>
+                     </property>
+					  <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:ManualRate</string>
+					   <string>element:Yaw</string>
+                       <string>haslimits:yes</string>
+                       <string>scale:5</string>
+					   <string>buttongroup:3,10</string>
+                      </stringlist>
                      </property>
                     </widget>
                    </item>
@@ -10398,6 +10560,16 @@ Attitude</string>
                      <property name="tickInterval">
                       <number>25</number>
                      </property>
+					  <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:MaximumRate</string>
+					   <string>element:Roll</string>
+                       <string>haslimits:yes</string>
+                       <string>scale:5</string>
+					   <string>buttongroup:3,10</string>
+                      </stringlist>
+                     </property>
                     </widget>
                    </item>
                    <item row="3" column="2">
@@ -10419,6 +10591,16 @@ Attitude</string>
                      </property>
                      <property name="text">
                       <string>50</string>
+                     </property>
+					 <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:MaximumRate</string>
+					   <string>element:Roll</string>
+                       <string>haslimits:yes</string>
+                       <string>scale:5</string>
+					   <string>buttongroup:3,10</string>
+                      </stringlist>
                      </property>
                     </widget>
                    </item>
@@ -10454,6 +10636,16 @@ Attitude</string>
                      <property name="tickInterval">
                       <number>25</number>
                      </property>
+					 <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:MaximumRate</string>
+					   <string>element:Pitch</string>
+                       <string>haslimits:yes</string>
+                       <string>scale:5</string>
+					   <string>buttongroup:3,10</string>
+                      </stringlist>
+                     </property>
                     </widget>
                    </item>
                    <item row="3" column="4">
@@ -10475,6 +10667,16 @@ Attitude</string>
                      </property>
                      <property name="text">
                       <string>50</string>
+                     </property>
+					 <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:MaximumRate</string>
+					   <string>element:Pitch</string>
+                       <string>haslimits:yes</string>
+                       <string>scale:5</string>
+					   <string>buttongroup:3,10</string>
+                      </stringlist>
                      </property>
                     </widget>
                    </item>
@@ -10510,6 +10712,16 @@ Attitude</string>
                      <property name="tickInterval">
                       <number>25</number>
                      </property>
+					 <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:MaximumRate</string>
+					   <string>element:Yaw</string>
+                       <string>haslimits:yes</string>
+                       <string>scale:5</string>
+					   <string>buttongroup:3,10</string>
+                      </stringlist>
+                     </property>
                     </widget>
                    </item>
                    <item row="3" column="6">
@@ -10531,6 +10743,16 @@ Attitude</string>
                      </property>
                      <property name="text">
                       <string>50</string>
+                     </property>
+					 <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:MaximumRate</string>
+					   <string>element:Yaw</string>
+                       <string>haslimits:yes</string>
+                       <string>scale:5</string>
+					   <string>buttongroup:3,10</string>
+                      </stringlist>
                      </property>
                     </widget>
                    </item>
@@ -11155,6 +11377,12 @@ Attitude</string>
                   <property name="text">
                    <string>Zero the integral when throttle is low</string>
                   </property>
+				  <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:LowThrottleZeroIntegral</string>
+                      </stringlist>
+                     </property>
                  </widget>
                 </item>
                 <item row="1" column="0">
@@ -11211,6 +11439,12 @@ automatically every 300ms, which will help for fast tuning.</string>
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
+				   <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>button:help</string>
+                       <string>url:http://wiki.openpilot.org/display/Doc/Stabilization+panel</string>
+                      </stringlist>
+                     </property>
                   <property name="maximumSize">
                    <size>
                     <width>32</width>
@@ -11243,6 +11477,12 @@ automatically every 300ms, which will help for fast tuning.</string>
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
+				  <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>button:reload</string>
+                       <string>buttongroup:10</string>
+                      </stringlist>
+                     </property>
                   <property name="minimumSize">
                    <size>
                     <width>120</width>
@@ -12075,6 +12315,13 @@ border-radius: 4;
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
+				   <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>button:default</string>
+					   <string>buttongroup:4</string>
+                      </stringlist>
+                     </property>
                   <property name="minimumSize">
                    <size>
                     <width>81</width>
@@ -14254,6 +14501,16 @@ border-radius: 5;</string>
                        <verstretch>0</verstretch>
                       </sizepolicy>
                      </property>
+					 <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:RollRatePID</string>
+                       <string>element:Kp</string>
+                       <string>haslimits:no</string>
+                       <string>scale:1</string>
+					   <string>buttongroup:4,20</string>
+                      </stringlist>
+                     </property>
                      <property name="minimumSize">
                       <size>
                        <width>0</width>
@@ -14288,6 +14545,16 @@ border-radius: 5;</string>
                        <verstretch>0</verstretch>
                       </sizepolicy>
                      </property>
+					 <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:PitchRatePID</string>
+                       <string>element:Kp</string>
+                       <string>haslimits:no</string>
+                       <string>scale:1</string>
+					   <string>buttongroup:4,20</string>
+                      </stringlist>
+                     </property>
                      <property name="minimumSize">
                       <size>
                        <width>0</width>
@@ -14318,6 +14585,16 @@ border-radius: 5;</string>
                        <horstretch>0</horstretch>
                        <verstretch>0</verstretch>
                       </sizepolicy>
+                     </property>
+					 <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:YawRatePID</string>
+                       <string>element:Kp</string>
+                       <string>haslimits:no</string>
+                       <string>scale:1</string>
+					   <string>buttongroup:4,20</string>
+                      </stringlist>
                      </property>
                      <property name="minimumSize">
                       <size>
@@ -14391,6 +14668,16 @@ You can usually go for higher values for Yaw factors.</string>
                        <verstretch>0</verstretch>
                       </sizepolicy>
                      </property>
+					 <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:RollRatePID</string>
+                       <string>element:Ki</string>
+                       <string>haslimits:no</string>
+                       <string>scale:1</string>
+					   <string>buttongroup:4,20</string>
+                      </stringlist>
+                     </property>
                      <property name="minimumSize">
                       <size>
                        <width>0</width>
@@ -14442,6 +14729,16 @@ value as YawRate Kp.</string>
                        <verstretch>0</verstretch>
                       </sizepolicy>
                      </property>
+					 <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:PitchRatePID</string>
+                       <string>element:Ki</string>
+                       <string>haslimits:no</string>
+                       <string>scale:1</string>
+					   <string>buttongroup:4,20</string>
+                      </stringlist>
+                     </property>
                      <property name="minimumSize">
                       <size>
                        <width>0</width>
@@ -14488,6 +14785,16 @@ value as YawRate Kp.</string>
                        <horstretch>0</horstretch>
                        <verstretch>0</verstretch>
                       </sizepolicy>
+                     </property>
+					 <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:YawRatePID</string>
+                       <string>element:Ki</string>
+                       <string>haslimits:no</string>
+                       <string>scale:1</string>
+					   <string>buttongroup:4,20</string>
+                      </stringlist>
                      </property>
                      <property name="minimumSize">
                       <size>
@@ -14557,6 +14864,16 @@ You can usually go for higher values for Yaw factors.</string>
                        <verstretch>0</verstretch>
                       </sizepolicy>
                      </property>
+					 <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:RollRatePID</string>
+                       <string>element:ILimit</string>
+                       <string>haslimits:no</string>
+                       <string>scale:1</string>
+					   <string>buttongroup:4,20</string>
+                      </stringlist>
+                     </property>
                      <property name="minimumSize">
                       <size>
                        <width>0</width>
@@ -14591,6 +14908,16 @@ You can usually go for higher values for Yaw factors.</string>
                        <verstretch>0</verstretch>
                       </sizepolicy>
                      </property>
+					  <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:PitchRatePID</string>
+                       <string>element:ILimit</string>
+                       <string>haslimits:no</string>
+                       <string>scale:1</string>
+					   <string>buttongroup:4,20</string>
+                      </stringlist>
+                     </property>
                      <property name="minimumSize">
                       <size>
                        <width>0</width>
@@ -14621,6 +14948,16 @@ You can usually go for higher values for Yaw factors.</string>
                        <horstretch>0</horstretch>
                        <verstretch>0</verstretch>
                       </sizepolicy>
+                     </property>
+					  <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:YawRatePID</string>
+                       <string>element:ILimit</string>
+                       <string>haslimits:no</string>
+                       <string>scale:1</string>
+					   <string>buttongroup:4,20</string>
+                      </stringlist>
                      </property>
                      <property name="minimumSize">
                       <size>
@@ -15325,6 +15662,13 @@ You can usually go for higher values for Yaw factors.</string>
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
+				   <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>button:default</string>
+					   <string>buttongroup:5</string>
+                      </stringlist>
+                     </property>
                   <property name="minimumSize">
                    <size>
                     <width>81</width>
@@ -17504,6 +17848,16 @@ border-radius: 5;</string>
                        <verstretch>0</verstretch>
                       </sizepolicy>
                      </property>
+					 <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:RollPI</string>
+                       <string>element:Kp</string>
+                       <string>haslimits:no</string>
+                       <string>scale:1</string>
+					   <string>buttongroup:5,20</string>
+                      </stringlist>
+                     </property>
                      <property name="minimumSize">
                       <size>
                        <width>0</width>
@@ -17538,6 +17892,16 @@ border-radius: 5;</string>
                        <verstretch>0</verstretch>
                       </sizepolicy>
                      </property>
+					 <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:PitchPI</string>
+                       <string>element:Kp</string>
+                       <string>haslimits:no</string>
+                       <string>scale:1</string>
+					   <string>buttongroup:5,20</string>
+                      </stringlist>
+                     </property>
                      <property name="minimumSize">
                       <size>
                        <width>0</width>
@@ -17568,6 +17932,16 @@ border-radius: 5;</string>
                        <horstretch>0</horstretch>
                        <verstretch>0</verstretch>
                       </sizepolicy>
+                     </property>
+					 <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:YawPI</string>
+                       <string>element:Kp</string>
+                       <string>haslimits:no</string>
+                       <string>scale:1</string>
+					   <string>buttongroup:5,20</string>
+                      </stringlist>
                      </property>
                      <property name="minimumSize">
                       <size>
@@ -17641,6 +18015,16 @@ You can usually go for higher values for Yaw factors.</string>
                        <verstretch>0</verstretch>
                       </sizepolicy>
                      </property>
+					 <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:RollPI</string>
+                       <string>element:Ki</string>
+                       <string>haslimits:no</string>
+                       <string>scale:1</string>
+					   <string>buttongroup:5,20</string>
+                      </stringlist>
+                     </property>
                      <property name="minimumSize">
                       <size>
                        <width>0</width>
@@ -17692,6 +18076,16 @@ value as YawRate Kp.</string>
                        <verstretch>0</verstretch>
                       </sizepolicy>
                      </property>
+					  <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:PitchPI</string>
+                       <string>element:Ki</string>
+                       <string>haslimits:no</string>
+                       <string>scale:1</string>
+					   <string>buttongroup:5,20</string>
+                      </stringlist>
+                     </property>
                      <property name="minimumSize">
                       <size>
                        <width>0</width>
@@ -17738,6 +18132,16 @@ value as YawRate Kp.</string>
                        <horstretch>0</horstretch>
                        <verstretch>0</verstretch>
                       </sizepolicy>
+                     </property>
+					  <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:YawPI</string>
+                       <string>element:Ki</string>
+                       <string>haslimits:no</string>
+                       <string>scale:1</string>
+					   <string>buttongroup:5,20</string>
+                      </stringlist>
                      </property>
                      <property name="minimumSize">
                       <size>
@@ -17807,6 +18211,16 @@ You can usually go for higher values for Yaw factors.</string>
                        <verstretch>0</verstretch>
                       </sizepolicy>
                      </property>
+					  <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:RollPI</string>
+                       <string>element:ILimit</string>
+                       <string>haslimits:no</string>
+                       <string>scale:1</string>
+					   <string>buttongroup:5,20</string>
+                      </stringlist>
+                     </property>
                      <property name="minimumSize">
                       <size>
                        <width>0</width>
@@ -17841,6 +18255,16 @@ You can usually go for higher values for Yaw factors.</string>
                        <verstretch>0</verstretch>
                       </sizepolicy>
                      </property>
+					  <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:PitchPI</string>
+                       <string>element:ILimit</string>
+                       <string>haslimits:no</string>
+                       <string>scale:1</string>
+					   <string>buttongroup:5,20</string>
+                      </stringlist>
+                     </property>
                      <property name="minimumSize">
                       <size>
                        <width>0</width>
@@ -17871,6 +18295,16 @@ You can usually go for higher values for Yaw factors.</string>
                        <horstretch>0</horstretch>
                        <verstretch>0</verstretch>
                       </sizepolicy>
+                     </property>
+					  <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>fieldname:YawPI</string>
+                       <string>element:ILimit</string>
+                       <string>haslimits:no</string>
+                       <string>scale:1</string>
+					   <string>buttongroup:5,20</string>
+                      </stringlist>
                      </property>
                      <property name="minimumSize">
                       <size>
@@ -18530,6 +18964,13 @@ You can usually go for higher values for Yaw factors.</string>
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
+				   <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>button:default</string>
+					   <string>buttongroup:6</string>
+                      </stringlist>
+                     </property>
                   <property name="minimumSize">
                    <size>
                     <width>81</width>

@@ -119,11 +119,13 @@ public slots:
     void onAutopilotDisconnect();
     void onAutopilotConnect();
     void invalidateObjects();
-    void removeObject(UAVObject*);
-    void removeAllObjects();
 signals:
-    void objectAdded(UAVObject*);
-    void objectRemoved(UAVObject*);
+    void widgetContentsChanged(QWidget * widget);
+    void populateWidgetsRequested();
+    void refreshWidgetsValuesRequested();
+    void updateObjectsFromWidgetsRequested();
+    void autoPilotConnected();
+    void autoPilotDisconnected();
 private slots:
     void objectUpdated(UAVObject*);
     void defaultButtonClicked();
@@ -139,6 +141,7 @@ private:
     QMap<int,QList<objectToWidget*> *> defaultReloadGroups;
     QMap<QWidget *,objectToWidget*> shadowsList;
     QMap<QPushButton *,QString> helpButtonList;
+    QList<QPushButton *> reloadButtonList;
     bool dirty;
     bool setFieldFromWidget(QWidget *widget, UAVObjectField *field, int index, double scale);
     bool setWidgetFromField(QWidget *widget, UAVObjectField *field, int index, double scale, bool hasLimits);

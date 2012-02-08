@@ -26,22 +26,27 @@
  */
 #include "smartsavebutton.h"
 
-smartSaveButton::smartSaveButton(QPushButton * update, QPushButton * save):bupdate(update),bsave(save)
+smartSaveButton::smartSaveButton()
 {
-    connect(bsave,SIGNAL(clicked()),this,SLOT(processClick()));
-    connect(bupdate,SIGNAL(clicked()),this,SLOT(processClick()));
 
+}
+
+void smartSaveButton::addButtons(QPushButton *save, QPushButton *apply)
+{
+    buttonList.insert(save,save_button);
+    buttonList.insert(apply,apply_button);
+    connect(save,SIGNAL(clicked()),this,SLOT(processClick()));
+    connect(apply,SIGNAL(clicked()),this,SLOT(processClick()));
 }
 void smartSaveButton::processClick()
 {
     emit beginOp();
     bool save=false;
-    QPushButton *button=bupdate;
-    if(sender()==bsave)
-    {
+    QPushButton *button=qobject_cast<QPushButton *>(sender());
+    if(!button)
+        return;
+    if(buttonList.value(button)==save_button)
         save=true;
-        button=bsave;
-    }
     emit preProcessOperations();
     button->setEnabled(false);
     button->setIcon(QIcon(":/uploader/images/system-run.svg"));
@@ -161,6 +166,6 @@ void smartSaveButton::saving_finished(int id, bool result)
 
 void smartSaveButton::enableControls(bool value)
 {
-    bupdate->setEnabled(value);
-    bsave->setEnabled(value);
+    foreach(QPushButton * button,buttonList.keys())
+        button->setEnabled(value);
 }

@@ -106,13 +106,13 @@ float velocity, lastAltitude;
 float throttleIntegral;
 float decay;
 bool running = false;
+float error;
 
 /**
  * Module thread, should not return.
  */
 static void altitudeHoldTask(void *parameters)
 {
-	AltitudeHoldSettingsData altitudeHoldSettings;
 	AltitudeHoldDesiredData altitudeHoldDesired;
 	BaroAltitudeData baroAltitude;
 	StabilizationDesiredData stabilizationDesired;
@@ -130,6 +130,9 @@ static void altitudeHoldTask(void *parameters)
 		// Wait until the AttitudeRaw object is updated, if a timeout then go to failsafe
 		if ( xQueueReceive(queue, &ev, 100 / portTICK_RATE_MS) != pdTRUE )
 		{
+			if(!running)
+				throttleIntegral = 0;
+
 			// Todo: Add alarm if it should be running
 			continue;
 		} else if (ev.obj == BaroAltitudeHandle()) {
@@ -150,11 +153,11 @@ static void altitudeHoldTask(void *parameters)
 			lastSysTime = thisTime;
 
 			// Flipping sign on error since altitude is "down"
-			float error = (altitudeHoldDesired.Altitude - baroAltitude.Altitude);
+			error =  (altitudeHoldDesired.Altitude - baroAltitude.Altitude);
 			
 			// Estimate velocity by smoothing derivative
-			decay = expf(-dT / tau);
-			velocity = velocity * decay + (baroAltitude.Altitude - lastAltitude) / dT * (1-decay); // m/s
+			decay = expf(-dT / altitudeHoldSettings.Tau);
+			velocity = velocity * decay + (baroAltitude.Altitude - lastAltitude) / dT * (1.0f-decay); // m/s
 			lastAltitude = baroAltitude.Altitude;
 
 			// Compute integral off altitude error
@@ -187,7 +190,6 @@ static void altitudeHoldTask(void *parameters)
 				BaroAltitudeConnectQueue(queue);
 				// Copy the current throttle as a starting point for integral
 				StabilizationDesiredThrottleGet(&throttleIntegral);
-				throttleIntegral /= altitudeHoldSettings.Ki;
 				running = true;
 			}
 
@@ -201,6 +203,4 @@ static void altitudeHoldTask(void *parameters)
 static void SettingsUpdatedCb(UAVObjEvent * ev)
 {
 	AltitudeHoldSettingsGet(&altitudeHoldSettings);
-
-	tau = altitudeHoldSettings.Tau / 1000.0f;
 }

@@ -55,8 +55,8 @@ namespace jafar {
 		}
 
 		void ExtendedKalmanFilterIndirect::computeKalmanGain(const ind_array & ia_x, Innovation & inn, const mat & INN_rsl, const ind_array & ia_rsl){
-			PJt_tmp.resize(ia_x.size(),inn.size());
-			K.resize(ia_x.size(),inn.size());
+			PJt_tmp.resize(ia_x.size(),inn.size(), false);
+			K.resize(ia_x.size(),inn.size(), false);
 			ublas::noalias(PJt_tmp) = prod(project(P_, ia_x, ia_rsl), trans(INN_rsl));
 			inn.invertCov();
 			ublas::noalias(K) = - prod(PJt_tmp, inn.iP_);
@@ -83,11 +83,11 @@ namespace jafar {
 		
 		void ExtendedKalmanFilterIndirect::correctAllStacked(const ind_array & ia_x)
 		{
-			PJt_tmp.resize(ia_x.size(), corrStack.inn_size);
-			stackedInnovation_x.resize(corrStack.inn_size);
-			stackedInnovation_P.resize(corrStack.inn_size);
-			stackedInnovation_iP.resize(corrStack.inn_size);
-			K.resize(ia_x.size(), corrStack.inn_size);
+			PJt_tmp.resize(ia_x.size(), corrStack.inn_size, false);
+			stackedInnovation_x.resize(corrStack.inn_size, false);
+			stackedInnovation_P.resize(corrStack.inn_size, false);
+			stackedInnovation_iP.resize(corrStack.inn_size, false);
+			K.resize(ia_x.size(), corrStack.inn_size, false);
 			
 			// 1 build PJt_tmp and stackedInnovation
 			int col1 = 0;
@@ -96,13 +96,13 @@ namespace jafar {
 				int nextcol1 = col1 + corrIter1->inn.size();
 				
 				// 1a update PJt_tmp
-				ublas::subrange(PJt_tmp, 0, ia_x.size(), col1, nextcol1) =
+				ublas::noalias(ublas::subrange(PJt_tmp, 0, ia_x.size(), col1, nextcol1)) =
 					ublas::prod(ublas::project(P_, ia_x, corrIter1->ia_rsl), trans(corrIter1->INN_rsl));
 // JFR_DEBUG("correctAllStacked: corrIter1->INN_rsl " << corrIter1->INN_rsl);
 				
 				// 1b update diagonal of stackedInnovation
-				ublas::subrange(stackedInnovation_x, col1, nextcol1) = corrIter1->inn.x();
-				ublas::subrange(stackedInnovation_P, col1, nextcol1, col1, nextcol1) = corrIter1->inn.P();
+				ublas::noalias(ublas::subrange(stackedInnovation_x, col1, nextcol1)) = corrIter1->inn.x();
+				ublas::noalias(ublas::subrange(stackedInnovation_P, col1, nextcol1, col1, nextcol1)) = corrIter1->inn.P();
 				
 				int col2 = 0;
 				for(CorrectionList::iterator corrIter2 = corrStack.stack.begin(); corrIter2 != corrIter1; ++corrIter2)
@@ -129,8 +129,8 @@ namespace jafar {
 // JFR_DEBUG("correctAllStacked: K " << K);
 // JFR_DEBUG("correctAllStacked: dx " << prod(K, stackedInnovation_x));
 			// 3 correct
-			ublas::project(x_, ia_x) += prod(K, stackedInnovation_x);
-			ublas::project(P_, ia_x, ia_x) += prod<sym_mat>(K, trans(PJt_tmp));
+			ublas::noalias(ublas::project(x_, ia_x)) += prod(K, stackedInnovation_x);
+			ublas::project(P_, ia_x, ia_x) += prod<sym_mat>(K, trans(PJt_tmp)); // noalias crashes
 			
 			corrStack.clear();
 		}

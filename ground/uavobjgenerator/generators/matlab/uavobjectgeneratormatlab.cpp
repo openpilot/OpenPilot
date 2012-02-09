@@ -79,7 +79,7 @@ bool UAVObjectGeneratorMatlab::process_object(ObjectInfo* info)
     QString objectTableName(objectName);
     QString tableIdxName(objectName.toLower() + "Idx");
     QString functionName("Read" + info->name + "Object");
-    QString functionCall(functionName + "(fid, timestamp, ");
+    QString functionCall(functionName + "(fid, timestamp, checkCRC, ");
     QString objectID(QString().setNum(info->id));
     QString isSingleInst = boolTo01String( info->isSingleInst );
 
@@ -166,6 +166,8 @@ bool UAVObjectGeneratorMatlab::process_object(ObjectInfo* info)
     matlabFunctionsCode.append("%%\n% " + objectName + " read function\n");
 	
     matlabFunctionsCode.append("function [" + objectName + "] = " + functionCall + objectTableName + ", " + tableIdxName + ")" + "\n");
+
+    
     matlabFunctionsCode.append("\t" + objectName + ".timestamp(" + tableIdxName + ")= timestamp;\n");
     matlabFunctionsCode.append("\tif " + isSingleInst + "\n");
     matlabFunctionsCode.append("\t\theaderSize = 8;\n");
@@ -176,6 +178,8 @@ bool UAVObjectGeneratorMatlab::process_object(ObjectInfo* info)
 
     // Generate functions code, actual fields of the object
     QString funcfields;
+
+    matlabFunctionsCode.append("\tstartPos = ftell(fid) - headerSize;\n");    
 
     for (int n = 0; n < info->fields.length(); ++n) {
         // Determine type
@@ -188,8 +192,20 @@ bool UAVObjectGeneratorMatlab::process_object(ObjectInfo* info)
     }
     matlabFunctionsCode.append(funcfields);
 
+    matlabFunctionsCode.append("\tobjLen = ftell(fid) - startPos;\n");
+
     matlabFunctionsCode.append("\t% read CRC\n");
-    matlabFunctionsCode.append("\tfread(fid, 1, '*uint8');\n");
+    matlabFunctionsCode.append("\tcrc_read = fread(fid, 1, '*uint8');\n");
+
+    matlabFunctionsCode.append("\tif checkCRC\n");
+    matlabFunctionsCode.append("\t\tfseek(fid, startPos, 'bof');\n");
+    matlabFunctionsCode.append("\t\tcrc_calc = compute_crc(uint8(fread(fid,objLen,'uint8')));\n");
+    matlabFunctionsCode.append("\t\tfread(fid,1,'uint8');\n");
+    matlabFunctionsCode.append("\t\tif (crc_calc ~= crc_read)\n");    
+    matlabFunctionsCode.append("\t\t\tdisp('CRC Error')\n");
+    matlabFunctionsCode.append("\t\t\t" + tableIdxName + " = " + tableIdxName + " - 1;\n");
+    matlabFunctionsCode.append("\t\tend\n");
+    matlabFunctionsCode.append("\tend\n");
 
     matlabFunctionsCode.append("\n\n");
 

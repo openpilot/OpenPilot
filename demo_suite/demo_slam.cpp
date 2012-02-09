@@ -207,7 +207,7 @@ time_t rseed;
  * program parameters
  * ###########################################################################*/
 
-enum { iDispQt = 0, iDispGdhe, iRenderAll, iReplay, iDump, iRandSeed, iPause, iVerbose, iMap, iRobot, iTrigger, iGps, iSimu, iExport, nIntOpts };
+enum { iDispQt = 0, iDispGdhe, iRenderAll, iReplay, iDump, iRandSeed, iPause, iVerbose, iMap, iRobot, iCamera, iTrigger, iGps, iSimu, iExport, nIntOpts };
 int intOpts[nIntOpts] = {0};
 const int nFirstIntOpt = 0, nLastIntOpt = nIntOpts-1;
 
@@ -238,6 +238,7 @@ struct option long_options[] = {
 	{"verbose", 2, 0, 0},
 	{"map", 2, 0, 0},
 	{"robot", 2, 0, 0}, // should be in config file
+	{"camera", 2, 0, 0},
 	{"trigger", 2, 0, 0}, // should be in config file
 	{"gps", 2, 0, 0},
 	{"simu", 2, 0, 0},
@@ -921,167 +922,170 @@ void demo_slam_init()
 	
 	
 	// 3. Create sensors.
-	pinhole_ptr_t senPtr11(new SensorPinhole(robPtr1, MapObject::UNFILTERED));
-	senPtr11->setId();
-	senPtr11->linkToParentRobot(robPtr1);
-	if (intOpts[iRobot] == 1)
+	if (intOpts[iCamera])
 	{
-		senPtr11->setPose(configSetup.SENSOR_POSE_INERTIAL[0], configSetup.SENSOR_POSE_INERTIAL[1], configSetup.SENSOR_POSE_INERTIAL[2],
-											configSetup.SENSOR_POSE_INERTIAL[3], configSetup.SENSOR_POSE_INERTIAL[4], configSetup.SENSOR_POSE_INERTIAL[5]); // x,y,z,roll,pitch,yaw
-	} else
-	{
-		senPtr11->setPose(configSetup.SENSOR_POSE_CONSTVEL[0], configSetup.SENSOR_POSE_CONSTVEL[1], configSetup.SENSOR_POSE_CONSTVEL[2],
-											configSetup.SENSOR_POSE_CONSTVEL[3], configSetup.SENSOR_POSE_CONSTVEL[4], configSetup.SENSOR_POSE_CONSTVEL[5]); // x,y,z,roll,pitch,yaw
-	}
-	//senPtr11->pose.x(quaternion::originFrame());
-	senPtr11->params.setImgSize(img_width, img_height);
-	senPtr11->params.setIntrinsicCalibration(intrinsic, distortion, configEstimation.CORRECTION_SIZE);
-	//JFR_DEBUG("Correction params: " << senPtr11->params.correction);
-	senPtr11->params.setMiscellaneous(configEstimation.PIX_NOISE, configEstimation.D_MIN);
-
-	if (intOpts[iSimu] != 0)
-	{
-		jblas::vec6 pose;
-		subrange(pose, 0, 3) = subrange(senPtr11->pose.x(), 0, 3);
-		subrange(pose, 3, 6) = quaternion::q2e(subrange(senPtr11->pose.x(), 3, 7));
-		std::swap(pose(3), pose(5)); // FIXME-EULER-CONVENTION
-		simu::Sensor *sen = new simu::Sensor(senPtr11->id(), pose, senPtr11);
-		simulator->addSensor(robPtr1->id(), sen);
-		simulator->addObservationModel(robPtr1->id(), senPtr11->id(), LandmarkAbstract::POINT, new ObservationModelPinHoleEuclideanPoint(senPtr11));
-		#if SEGMENT_BASED
-			simulator->addObservationModel(robPtr1->id(), senPtr11->id(), LandmarkAbstract::LINE, new ObservationModelPinHoleAnchoredHomogeneousPointsLine(senPtr11));
-		#endif
-	}
-	
-	// 3b. Create data manager.
-	boost::shared_ptr<ActiveSearchGrid> asGrid(new ActiveSearchGrid(img_width, img_height, configEstimation.GRID_HCELLS, configEstimation.GRID_VCELLS, configEstimation.GRID_MARGIN, configEstimation.GRID_SEPAR));
-   boost::shared_ptr<ActiveSegmentSearchGrid> assGrid(new ActiveSegmentSearchGrid(img_width, img_height, configEstimation.GRID_HCELLS, configEstimation.GRID_VCELLS, configEstimation.GRID_MARGIN, configEstimation.GRID_SEPAR));
-
-	#if RANSAC_FIRST
-   int ransac_ntries = configEstimation.RANSAC_NTRIES;
-	#else
-	int ransac_ntries = 0;
-   #endif
-
-	if (intOpts[iSimu] != 0)
-	{
-		#if SEGMENT_BASED
-			boost::shared_ptr<simu::DetectorSimu<image::ConvexRoi> > detector(new simu::DetectorSimu<image::ConvexRoi>(LandmarkAbstract::LINE, 4, configEstimation.PATCH_SIZE, configEstimation.PIX_NOISE, configEstimation.PIX_NOISE*configEstimation.PIX_NOISE_SIMUFACTOR));
-			boost::shared_ptr<simu::MatcherSimu<image::ConvexRoi> > matcher(new simu::MatcherSimu<image::ConvexRoi>(LandmarkAbstract::LINE, 4, configEstimation.PATCH_SIZE, configEstimation.MAX_SEARCH_SIZE, configEstimation.RANSAC_LOW_INNOV, configEstimation.MATCH_TH, configEstimation.MAHALANOBIS_TH, configEstimation.RELEVANCE_TH, configEstimation.PIX_NOISE, configEstimation.PIX_NOISE*configEstimation.PIX_NOISE_SIMUFACTOR));
-
-			boost::shared_ptr<DataManager_Segment_Ransac_Simu> dmPt11(new DataManager_Segment_Ransac_Simu(detector, matcher, assGrid, configEstimation.N_UPDATES_TOTAL, configEstimation.N_UPDATES_RANSAC, ransac_ntries, configEstimation.N_INIT, configEstimation.N_RECOMP_GAINS));
-
-			dmPt11->linkToParentSensorSpec(senPtr11);
-			dmPt11->linkToParentMapManager(mmPoint);
-			dmPt11->setObservationFactory(obsFact);
-
-			hardware::hardware_sensorext_ptr_t hardSen11(new hardware::HardwareSensorAdhocSimulator(rawdata_condition, floatOpts[fFreq], simulator, robPtr1->id(), senPtr11->id()));
-			senPtr11->setHardwareSensor(hardSen11);
-		#else
-			boost::shared_ptr<simu::DetectorSimu<image::ConvexRoi> > detector(new simu::DetectorSimu<image::ConvexRoi>(LandmarkAbstract::POINT, 2, configEstimation.PATCH_SIZE, configEstimation.PIX_NOISE, configEstimation.PIX_NOISE*configEstimation.PIX_NOISE_SIMUFACTOR));
-			boost::shared_ptr<simu::MatcherSimu<image::ConvexRoi> > matcher(new simu::MatcherSimu<image::ConvexRoi>(LandmarkAbstract::POINT, 2, configEstimation.PATCH_SIZE, configEstimation.MAX_SEARCH_SIZE, configEstimation.RANSAC_LOW_INNOV, configEstimation.MATCH_TH, configEstimation.MAHALANOBIS_TH, configEstimation.RELEVANCE_TH, configEstimation.PIX_NOISE, configEstimation.PIX_NOISE*configEstimation.PIX_NOISE_SIMUFACTOR));
-
-			boost::shared_ptr<DataManager_ImagePoint_Ransac_Simu> dmPt11(new DataManager_ImagePoint_Ransac_Simu(detector, matcher, asGrid, configEstimation.N_UPDATES_TOTAL, configEstimation.N_UPDATES_RANSAC, ransac_ntries, configEstimation.N_INIT, configEstimation.N_RECOMP_GAINS));
-
-			dmPt11->linkToParentSensorSpec(senPtr11);
-			dmPt11->linkToParentMapManager(mmPoint);
-			dmPt11->setObservationFactory(obsFact);
-
-			hardware::hardware_sensorext_ptr_t hardSen11(new hardware::HardwareSensorAdhocSimulator(rawdata_condition, floatOpts[fFreq], simulator, robPtr1->id(), senPtr11->id()));
-			senPtr11->setHardwareSensor(hardSen11);
-		#endif
-	} else
-   {
-      boost::shared_ptr<DescriptorFactoryAbstract> pointDescFactory;
-      boost::shared_ptr<DescriptorFactoryAbstract> segDescFactory;
-      #if SEGMENT_BASED
-
-         if (configEstimation.MULTIVIEW_DESCRIPTOR)
-				segDescFactory.reset(new DescriptorImageSegMultiViewFactory(configEstimation.DESC_SIZE, configEstimation.DESC_SCALE_STEP, jmath::degToRad(configEstimation.DESC_ANGLE_STEP), (DescriptorImageSegMultiView::PredictionType)configEstimation.DESC_PREDICTION_TYPE));
-         else
-				segDescFactory.reset(new DescriptorImageSegFirstViewFactory(configEstimation.DESC_SIZE));
-
-			boost::shared_ptr<HDsegDetector> hdsegDetector(new HDsegDetector(configEstimation.PATCH_SIZE, 3,configEstimation.PIX_NOISE*SEGMENT_NOISE_FACTOR,segDescFactory));
-         boost::shared_ptr<DsegMatcher> dsegMatcher(new DsegMatcher(configEstimation.RANSAC_LOW_INNOV, configEstimation.MATCH_TH, configEstimation.MAHALANOBIS_TH, configEstimation.RELEVANCE_TH, configEstimation.PIX_NOISE*SEGMENT_NOISE_FACTOR));
-         boost::shared_ptr<DataManager_ImageSeg_Test> dmSeg(new DataManager_ImageSeg_Test(hdsegDetector, dsegMatcher, assGrid, configEstimation.N_UPDATES_TOTAL, configEstimation.N_UPDATES_RANSAC, ransac_ntries, configEstimation.N_INIT, configEstimation.N_RECOMP_GAINS));
-
-         dmSeg->linkToParentSensorSpec(senPtr11);
-         dmSeg->linkToParentMapManager(mmSeg);
-         dmSeg->setObservationFactory(obsFact);
-		#endif
-		#if SEGMENT_BASED != 1
-         if (configEstimation.MULTIVIEW_DESCRIPTOR)
-            pointDescFactory.reset(new DescriptorImagePointMultiViewFactory(configEstimation.DESC_SIZE, configEstimation.DESC_SCALE_STEP, jmath::degToRad(configEstimation.DESC_ANGLE_STEP), (DescriptorImagePointMultiView::PredictionType)configEstimation.DESC_PREDICTION_TYPE));
-         else
-            pointDescFactory.reset(new DescriptorImagePointFirstViewFactory(configEstimation.DESC_SIZE));
-
-         boost::shared_ptr<ImagePointHarrisDetector> harrisDetector(new ImagePointHarrisDetector(configEstimation.HARRIS_CONV_SIZE, configEstimation.HARRIS_TH, configEstimation.HARRIS_EDDGE, configEstimation.PATCH_SIZE, configEstimation.PIX_NOISE, pointDescFactory));
-         boost::shared_ptr<ImagePointZnccMatcher> znccMatcher(new ImagePointZnccMatcher(configEstimation.MIN_SCORE, configEstimation.PARTIAL_POSITION, configEstimation.PATCH_SIZE, configEstimation.MAX_SEARCH_SIZE, configEstimation.RANSAC_LOW_INNOV, configEstimation.MATCH_TH, configEstimation.MAHALANOBIS_TH, configEstimation.RELEVANCE_TH, configEstimation.PIX_NOISE));
-
-         boost::shared_ptr<DataManager_ImagePoint_Ransac> dmPt11(new DataManager_ImagePoint_Ransac(harrisDetector, znccMatcher, asGrid, configEstimation.N_UPDATES_TOTAL, configEstimation.N_UPDATES_RANSAC, ransac_ntries, configEstimation.N_INIT, configEstimation.N_RECOMP_GAINS));
-
-         dmPt11->linkToParentSensorSpec(senPtr11);
-         dmPt11->linkToParentMapManager(mmPoint);
-         dmPt11->setObservationFactory(obsFact);
-      #endif
-		
-		#ifdef HAVE_VIAM
-		viam_hwcrop_t crop;
-		switch (configSetup.CAMERA_TYPE)
+		pinhole_ptr_t senPtr11(new SensorPinhole(robPtr1, MapObject::UNFILTERED));
+		senPtr11->setId();
+		senPtr11->linkToParentRobot(robPtr1);
+		if (intOpts[iRobot] == 1)
 		{
-			case 0: crop = VIAM_HW_FIXED; break;
-			case 1: crop = VIAM_HW_CROP; break;
-			default: crop = VIAM_HW_FIXED; break;
+			senPtr11->setPose(configSetup.SENSOR_POSE_INERTIAL[0], configSetup.SENSOR_POSE_INERTIAL[1], configSetup.SENSOR_POSE_INERTIAL[2],
+												configSetup.SENSOR_POSE_INERTIAL[3], configSetup.SENSOR_POSE_INERTIAL[4], configSetup.SENSOR_POSE_INERTIAL[5]); // x,y,z,roll,pitch,yaw
+		} else
+		{
+			senPtr11->setPose(configSetup.SENSOR_POSE_CONSTVEL[0], configSetup.SENSOR_POSE_CONSTVEL[1], configSetup.SENSOR_POSE_CONSTVEL[2],
+												configSetup.SENSOR_POSE_CONSTVEL[3], configSetup.SENSOR_POSE_CONSTVEL[4], configSetup.SENSOR_POSE_CONSTVEL[5]); // x,y,z,roll,pitch,yaw
 		}
-		hardware::hardware_sensor_firewire_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(rawdata_condition, 5+50,
-			configSetup.CAMERA_DEVICE, cv::Size(img_width,img_height), 0, 8, crop, floatOpts[fFreq], intOpts[iTrigger], 
-			floatOpts[fShutter], mode, strOpts[sDataPath]));
-		hardSen11->setTimingInfos(1.0/hardSen11->getFreq(), 1.0/hardSen11->getFreq());
-		senPtr11->setHardwareSensor(hardSen11);
-		senPtr11->setIntegrationPolicy(false);
-		senPtr11->setUseForInit(false);
-		senPtr11->setNeedInit(false);
-		//hardSen11->start();
-		#else
-		if (intOpts[iReplay] & 1)
+		//senPtr11->pose.x(quaternion::originFrame());
+		senPtr11->params.setImgSize(img_width, img_height);
+		senPtr11->params.setIntrinsicCalibration(intrinsic, distortion, configEstimation.CORRECTION_SIZE);
+		//JFR_DEBUG("Correction params: " << senPtr11->params.correction);
+		senPtr11->params.setMiscellaneous(configEstimation.PIX_NOISE, configEstimation.D_MIN);
+
+		if (intOpts[iSimu] != 0)
 		{
-			hardware::hardware_sensorext_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(rawdata_condition, cv::Size(img_width,img_height),strOpts[sDataPath]));
+			jblas::vec6 pose;
+			subrange(pose, 0, 3) = subrange(senPtr11->pose.x(), 0, 3);
+			subrange(pose, 3, 6) = quaternion::q2e(subrange(senPtr11->pose.x(), 3, 7));
+			std::swap(pose(3), pose(5)); // FIXME-EULER-CONVENTION
+			simu::Sensor *sen = new simu::Sensor(senPtr11->id(), pose, senPtr11);
+			simulator->addSensor(robPtr1->id(), sen);
+			simulator->addObservationModel(robPtr1->id(), senPtr11->id(), LandmarkAbstract::POINT, new ObservationModelPinHoleEuclideanPoint(senPtr11));
+			#if SEGMENT_BASED
+				simulator->addObservationModel(robPtr1->id(), senPtr11->id(), LandmarkAbstract::LINE, new ObservationModelPinHoleAnchoredHomogeneousPointsLine(senPtr11));
+			#endif
+		}
+
+		// 3b. Create data manager.
+		boost::shared_ptr<ActiveSearchGrid> asGrid(new ActiveSearchGrid(img_width, img_height, configEstimation.GRID_HCELLS, configEstimation.GRID_VCELLS, configEstimation.GRID_MARGIN, configEstimation.GRID_SEPAR));
+		 boost::shared_ptr<ActiveSegmentSearchGrid> assGrid(new ActiveSegmentSearchGrid(img_width, img_height, configEstimation.GRID_HCELLS, configEstimation.GRID_VCELLS, configEstimation.GRID_MARGIN, configEstimation.GRID_SEPAR));
+
+		#if RANSAC_FIRST
+		 int ransac_ntries = configEstimation.RANSAC_NTRIES;
+		#else
+		int ransac_ntries = 0;
+		 #endif
+
+		if (intOpts[iSimu] != 0)
+		{
+			#if SEGMENT_BASED
+				boost::shared_ptr<simu::DetectorSimu<image::ConvexRoi> > detector(new simu::DetectorSimu<image::ConvexRoi>(LandmarkAbstract::LINE, 4, configEstimation.PATCH_SIZE, configEstimation.PIX_NOISE, configEstimation.PIX_NOISE*configEstimation.PIX_NOISE_SIMUFACTOR));
+				boost::shared_ptr<simu::MatcherSimu<image::ConvexRoi> > matcher(new simu::MatcherSimu<image::ConvexRoi>(LandmarkAbstract::LINE, 4, configEstimation.PATCH_SIZE, configEstimation.MAX_SEARCH_SIZE, configEstimation.RANSAC_LOW_INNOV, configEstimation.MATCH_TH, configEstimation.MAHALANOBIS_TH, configEstimation.RELEVANCE_TH, configEstimation.PIX_NOISE, configEstimation.PIX_NOISE*configEstimation.PIX_NOISE_SIMUFACTOR));
+
+				boost::shared_ptr<DataManager_Segment_Ransac_Simu> dmPt11(new DataManager_Segment_Ransac_Simu(detector, matcher, assGrid, configEstimation.N_UPDATES_TOTAL, configEstimation.N_UPDATES_RANSAC, ransac_ntries, configEstimation.N_INIT, configEstimation.N_RECOMP_GAINS));
+
+				dmPt11->linkToParentSensorSpec(senPtr11);
+				dmPt11->linkToParentMapManager(mmPoint);
+				dmPt11->setObservationFactory(obsFact);
+
+				hardware::hardware_sensorext_ptr_t hardSen11(new hardware::HardwareSensorAdhocSimulator(rawdata_condition, floatOpts[fFreq], simulator, robPtr1->id(), senPtr11->id()));
+				senPtr11->setHardwareSensor(hardSen11);
+			#else
+				boost::shared_ptr<simu::DetectorSimu<image::ConvexRoi> > detector(new simu::DetectorSimu<image::ConvexRoi>(LandmarkAbstract::POINT, 2, configEstimation.PATCH_SIZE, configEstimation.PIX_NOISE, configEstimation.PIX_NOISE*configEstimation.PIX_NOISE_SIMUFACTOR));
+				boost::shared_ptr<simu::MatcherSimu<image::ConvexRoi> > matcher(new simu::MatcherSimu<image::ConvexRoi>(LandmarkAbstract::POINT, 2, configEstimation.PATCH_SIZE, configEstimation.MAX_SEARCH_SIZE, configEstimation.RANSAC_LOW_INNOV, configEstimation.MATCH_TH, configEstimation.MAHALANOBIS_TH, configEstimation.RELEVANCE_TH, configEstimation.PIX_NOISE, configEstimation.PIX_NOISE*configEstimation.PIX_NOISE_SIMUFACTOR));
+
+				boost::shared_ptr<DataManager_ImagePoint_Ransac_Simu> dmPt11(new DataManager_ImagePoint_Ransac_Simu(detector, matcher, asGrid, configEstimation.N_UPDATES_TOTAL, configEstimation.N_UPDATES_RANSAC, ransac_ntries, configEstimation.N_INIT, configEstimation.N_RECOMP_GAINS));
+
+				dmPt11->linkToParentSensorSpec(senPtr11);
+				dmPt11->linkToParentMapManager(mmPoint);
+				dmPt11->setObservationFactory(obsFact);
+
+				hardware::hardware_sensorext_ptr_t hardSen11(new hardware::HardwareSensorAdhocSimulator(rawdata_condition, floatOpts[fFreq], simulator, robPtr1->id(), senPtr11->id()));
+				senPtr11->setHardwareSensor(hardSen11);
+			#endif
+		} else
+		 {
+				boost::shared_ptr<DescriptorFactoryAbstract> pointDescFactory;
+				boost::shared_ptr<DescriptorFactoryAbstract> segDescFactory;
+				#if SEGMENT_BASED
+
+					 if (configEstimation.MULTIVIEW_DESCRIPTOR)
+					segDescFactory.reset(new DescriptorImageSegMultiViewFactory(configEstimation.DESC_SIZE, configEstimation.DESC_SCALE_STEP, jmath::degToRad(configEstimation.DESC_ANGLE_STEP), (DescriptorImageSegMultiView::PredictionType)configEstimation.DESC_PREDICTION_TYPE));
+					 else
+					segDescFactory.reset(new DescriptorImageSegFirstViewFactory(configEstimation.DESC_SIZE));
+
+				boost::shared_ptr<HDsegDetector> hdsegDetector(new HDsegDetector(configEstimation.PATCH_SIZE, 3,configEstimation.PIX_NOISE*SEGMENT_NOISE_FACTOR,segDescFactory));
+					 boost::shared_ptr<DsegMatcher> dsegMatcher(new DsegMatcher(configEstimation.RANSAC_LOW_INNOV, configEstimation.MATCH_TH, configEstimation.MAHALANOBIS_TH, configEstimation.RELEVANCE_TH, configEstimation.PIX_NOISE*SEGMENT_NOISE_FACTOR));
+					 boost::shared_ptr<DataManager_ImageSeg_Test> dmSeg(new DataManager_ImageSeg_Test(hdsegDetector, dsegMatcher, assGrid, configEstimation.N_UPDATES_TOTAL, configEstimation.N_UPDATES_RANSAC, ransac_ntries, configEstimation.N_INIT, configEstimation.N_RECOMP_GAINS));
+
+					 dmSeg->linkToParentSensorSpec(senPtr11);
+					 dmSeg->linkToParentMapManager(mmSeg);
+					 dmSeg->setObservationFactory(obsFact);
+			#endif
+			#if SEGMENT_BASED != 1
+					 if (configEstimation.MULTIVIEW_DESCRIPTOR)
+							pointDescFactory.reset(new DescriptorImagePointMultiViewFactory(configEstimation.DESC_SIZE, configEstimation.DESC_SCALE_STEP, jmath::degToRad(configEstimation.DESC_ANGLE_STEP), (DescriptorImagePointMultiView::PredictionType)configEstimation.DESC_PREDICTION_TYPE));
+					 else
+							pointDescFactory.reset(new DescriptorImagePointFirstViewFactory(configEstimation.DESC_SIZE));
+
+					 boost::shared_ptr<ImagePointHarrisDetector> harrisDetector(new ImagePointHarrisDetector(configEstimation.HARRIS_CONV_SIZE, configEstimation.HARRIS_TH, configEstimation.HARRIS_EDDGE, configEstimation.PATCH_SIZE, configEstimation.PIX_NOISE, pointDescFactory));
+					 boost::shared_ptr<ImagePointZnccMatcher> znccMatcher(new ImagePointZnccMatcher(configEstimation.MIN_SCORE, configEstimation.PARTIAL_POSITION, configEstimation.PATCH_SIZE, configEstimation.MAX_SEARCH_SIZE, configEstimation.RANSAC_LOW_INNOV, configEstimation.MATCH_TH, configEstimation.MAHALANOBIS_TH, configEstimation.RELEVANCE_TH, configEstimation.PIX_NOISE));
+
+					 boost::shared_ptr<DataManager_ImagePoint_Ransac> dmPt11(new DataManager_ImagePoint_Ransac(harrisDetector, znccMatcher, asGrid, configEstimation.N_UPDATES_TOTAL, configEstimation.N_UPDATES_RANSAC, ransac_ntries, configEstimation.N_INIT, configEstimation.N_RECOMP_GAINS));
+
+					 dmPt11->linkToParentSensorSpec(senPtr11);
+					 dmPt11->linkToParentMapManager(mmPoint);
+					 dmPt11->setObservationFactory(obsFact);
+				#endif
+
+			#ifdef HAVE_VIAM
+			viam_hwcrop_t crop;
+			switch (configSetup.CAMERA_TYPE)
+			{
+				case 0: crop = VIAM_HW_FIXED; break;
+				case 1: crop = VIAM_HW_CROP; break;
+				default: crop = VIAM_HW_FIXED; break;
+			}
+			hardware::hardware_sensor_firewire_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(rawdata_condition, 5+50,
+				configSetup.CAMERA_DEVICE, cv::Size(img_width,img_height), 0, 8, crop, floatOpts[fFreq], intOpts[iTrigger],
+				floatOpts[fShutter], mode, strOpts[sDataPath]));
+			hardSen11->setTimingInfos(1.0/hardSen11->getFreq(), 1.0/hardSen11->getFreq());
 			senPtr11->setHardwareSensor(hardSen11);
 			senPtr11->setIntegrationPolicy(false);
 			senPtr11->setUseForInit(false);
 			senPtr11->setNeedInit(false);
 			//hardSen11->start();
-		}
-		#endif
-		
-		if (intOpts[iGps])
-		{
-			absloc_ptr_t senPtr13(new SensorAbsloc(robPtr1, MapObject::UNFILTERED, false));
-			senPtr13->setId();
-			senPtr13->linkToParentRobot(robPtr1);
-			hardware::hardware_sensorprop_ptr_t hardGps;
-			bool inits = true;
-			switch (intOpts[iGps])
+			#else
+			if (intOpts[iReplay] & 1)
 			{
-				case 1:
-					hardGps.reset(new hardware::HardwareSensorGpsGenom(rawdata_condition, 200, "mana-base", mode, strOpts[sDataPath]));
-				case 2:
-					hardGps.reset(new hardware::HardwareSensorGpsGenom(rawdata_condition, 200, "mana-base", mode, strOpts[sDataPath])); // TODO ask to ignore vel
-				case 3:
-					hardGps.reset(new hardware::HardwareSensorMocap(rawdata_condition, 200, mode, strOpts[sDataPath]));
-					inits = false;
+				hardware::hardware_sensorext_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(rawdata_condition, cv::Size(img_width,img_height),strOpts[sDataPath]));
+				senPtr11->setHardwareSensor(hardSen11);
+				senPtr11->setIntegrationPolicy(false);
+				senPtr11->setUseForInit(false);
+				senPtr11->setNeedInit(false);
+				//hardSen11->start();
 			}
-
-			hardGps->setSyncConfig(configSetup.GPS_TIMESTAMP_CORRECTION);
-			hardGps->setTimingInfos(1.0/20.0, 1.5/20.0);
-			senPtr13->setHardwareSensor(hardGps);
-			senPtr13->setIntegrationPolicy(true);
-			senPtr13->setUseForInit(inits);
-			senPtr13->setNeedInit(inits);
-			senPtr13->setPose(configSetup.GPS_POSE[0], configSetup.GPS_POSE[1], configSetup.GPS_POSE[2],
-												configSetup.GPS_POSE[3], configSetup.GPS_POSE[4], configSetup.GPS_POSE[5]); // x,y,z,roll,pitch,yaw
-			//hardGps->start();
+			#endif
 		}
+	} // if (intOpts[iCamera])
+
+	if (intOpts[iGps])
+	{
+		absloc_ptr_t senPtr13(new SensorAbsloc(robPtr1, MapObject::UNFILTERED, false));
+		senPtr13->setId();
+		senPtr13->linkToParentRobot(robPtr1);
+		hardware::hardware_sensorprop_ptr_t hardGps;
+		bool inits = true;
+		switch (intOpts[iGps])
+		{
+			case 1:
+				hardGps.reset(new hardware::HardwareSensorGpsGenom(rawdata_condition, 200, "mana-base", mode, strOpts[sDataPath]));
+			case 2:
+				hardGps.reset(new hardware::HardwareSensorGpsGenom(rawdata_condition, 200, "mana-base", mode, strOpts[sDataPath])); // TODO ask to ignore vel
+			case 3:
+				hardGps.reset(new hardware::HardwareSensorMocap(rawdata_condition, 200, mode, strOpts[sDataPath]));
+				inits = false;
+		}
+
+		hardGps->setSyncConfig(configSetup.GPS_TIMESTAMP_CORRECTION);
+		hardGps->setTimingInfos(1.0/20.0, 1.5/20.0);
+		senPtr13->setHardwareSensor(hardGps);
+		senPtr13->setIntegrationPolicy(true);
+		senPtr13->setUseForInit(inits);
+		senPtr13->setNeedInit(inits);
+		senPtr13->setPose(configSetup.GPS_POSE[0], configSetup.GPS_POSE[1], configSetup.GPS_POSE[2],
+											configSetup.GPS_POSE[3], configSetup.GPS_POSE[4], configSetup.GPS_POSE[5]); // x,y,z,roll,pitch,yaw
+		//hardGps->start();
 	}
 	
 	if (intOpts[iReplay] == 1)
@@ -1580,6 +1584,7 @@ void demo_slam_run() {
 	* --map 0=odometry, 1=global, 2=local/multimap
 	* --trigger 0=internal, 1=external mode 1, 2=external mode 0, 3=external mode 14 (PointGrey (Flea) only)
 	* --simu 0 or <environment id>*10+<trajectory id> (
+	* --camera=0/1/2/3 -> Disable / Mono / Stereo / Bicam
 	* --freq camera frequency in double Hz (with trigger==0/1)
 	* --shutter shutter time in double seconds (0=auto); for trigger modes 0,2,3 the value is relative between 0 and 1
 	* --gps=0/1/2/3 -> Off / Pos / Pos+Vel / Pos+Ori(mocap)
@@ -1600,6 +1605,7 @@ int main(int argc, char* const* argv)
 { try {
 	intOpts[iVerbose] = 5;
 	intOpts[iMap] = 1;
+	intOpts[iCamera] = 1;
 	floatOpts[fFreq] = 60.0;
 	floatOpts[fShutter] = 0.0;
 	strOpts[sDataPath] = ".";

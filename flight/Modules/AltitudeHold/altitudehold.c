@@ -108,6 +108,8 @@ float decay;
 float velocity_decay;
 bool running = false;
 float error;
+float switchThrottle;
+float smoothed_altitude;
 
 /**
  * Module thread, should not return.
@@ -191,12 +193,14 @@ static void altitudeHoldTask(void *parameters)
 			FlightStatusGet(&flightStatus);
 
 			if(flightStatus.FlightMode == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD && !running) {
-				BaroAltitudeConnectQueue(queue);
 				// Copy the current throttle as a starting point for integral
 				StabilizationDesiredThrottleGet(&throttleIntegral);
-				BaroAltitudeAltitudeGet(&lastAltitude);
+				switchThrottle = throttleIntegral;
 				error = 0;
+				velocity = 0;
 				running = true;
+				BaroAltitudeAltitudeGet(&lastAltitude);
+				BaroAltitudeConnectQueue(queue);
 			}
 
 		} else if (ev.obj == AltitudeHoldDesiredHandle()) {

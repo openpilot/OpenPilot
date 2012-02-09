@@ -44,6 +44,7 @@
  */
 
 #include "openpilot.h"
+#include <math.h>
 #include "altitudeholdsettings.h"
 #include "altitudeholddesired.h"	// object that will be updated by the module
 #include "baroaltitude.h"
@@ -52,9 +53,9 @@
 #include "stabilizationdesired.h"
 
 // Private constants
-#define MAX_QUEUE_SIZE 1
+#define MAX_QUEUE_SIZE 2
 #define STACK_SIZE_BYTES 1024
-#define TASK_PRIORITY (tskIDLE_PRIORITY+2)
+#define TASK_PRIORITY (tskIDLE_PRIORITY+1)
 // Private types
 
 // Private variables
@@ -93,6 +94,7 @@ int32_t AltitudeHoldInitialize()
 
 	// Listen for updates.
 	AltitudeHoldDesiredConnectQueue(queue);
+	BaroAltitudeConnectQueue(queue);
 	FlightStatusConnectQueue(queue);
 
 	AltitudeHoldSettingsConnectCallback(&SettingsUpdatedCb);
@@ -110,7 +112,7 @@ bool running = false;
 float error;
 float switchThrottle;
 float smoothed_altitude;
-
+float starting_altitude;
 /**
  * Module thread, should not return.
  */
@@ -120,12 +122,13 @@ static void altitudeHoldTask(void *parameters)
 	BaroAltitudeData baroAltitude;
 	StabilizationDesiredData stabilizationDesired;
 
-	portTickType thisTime, lastSysTime;
+	portTickType thisTime, lastSysTime, lastUpdateTime;
 	UAVObjEvent ev;
 
 	// Force update of the settings
 	SettingsUpdatedCb(&ev);
 
+	BaroAltitudeAltitudeGet(&smoothed_altitude);
 	running = false;
 
 	// Main task loop
@@ -145,29 +148,44 @@ static void altitudeHoldTask(void *parameters)
 			StabilizationDesiredGet(&stabilizationDesired);
 			float dT;
 
-			// Verify that we are still in altitude hold mode
-			FlightStatusData flightStatus;
-			FlightStatusGet(&flightStatus);
-			if(flightStatus.FlightMode != FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD) {
-				UAVObjDisconnectQueue(BaroAltitudeHandle(), queue);
-				running = false;
-			}
-
+			// Update dT
 			thisTime = xTaskGetTickCount();
 			dT = ((portTickType)(thisTime - lastSysTime)) / portTICK_RATE_MS / 1000.0f;
 			lastSysTime = thisTime;
 
-			// Flipping sign on error since altitude is "down"
+			// Initialize when it was NAN
+			if((smoothed_altitude == smoothed_altitude) == false)
+				smoothed_altitude = baroAltitude.Altitude;
+
+			// Verify that we are still in altitude hold mode		
+			FlightStatusData flightStatus;
+			FlightStatusGet(&flightStatus);
+			if(flightStatus.FlightMode != FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD) {
+				running = false;
+			}
+
+			// Smooth the altitude
 			decay = expf(-dT / altitudeHoldSettings.Tau);
-			error = error * decay + (altitudeHoldDesired.Altitude - baroAltitude.Altitude) * (1.0f - decay);
-			
+			smoothed_altitude = smoothed_altitude * decay + baroAltitude.Altitude * (1.0f - decay);
+			if (!running)
+				continue;
+
+			// Compute the altitude error
+			error = (starting_altitude + altitudeHoldDesired.Altitude) - smoothed_altitude;
+
 			// Estimate velocity by smoothing derivative
 			velocity_decay = expf(-dT / altitudeHoldSettings.DerivativeTau);
 			velocity = velocity * velocity_decay + (baroAltitude.Altitude - lastAltitude) / dT * (1.0f-velocity_decay); // m/s
 			lastAltitude = baroAltitude.Altitude;
 
 			// Compute integral off altitude error
-			throttleIntegral += error * altitudeHoldSettings.Ki * dT;
+			throttleIntegral += ((starting_altitude + altitudeHoldDesired.Altitude) - baroAltitude.Altitude) * altitudeHoldSettings.Ki * dT;
+
+			// Only update stabilizationDesired less frequently
+			if((thisTime - lastUpdateTime) < 20)
+				continue;
+
+			lastUpdateTime = thisTime;
 
 			// Instead of explicit limit on integral you output limit feedback
 			stabilizationDesired.Throttle = error * altitudeHoldSettings.Kp + throttleIntegral -
@@ -199,14 +217,15 @@ static void altitudeHoldTask(void *parameters)
 				error = 0;
 				velocity = 0;
 				running = true;
+				starting_altitude = smoothed_altitude;
 				BaroAltitudeAltitudeGet(&lastAltitude);
-				BaroAltitudeConnectQueue(queue);
-			}
+			} else if (flightStatus.FlightMode != FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD)
+				running = false;
 
 		} else if (ev.obj == AltitudeHoldDesiredHandle()) {
 			AltitudeHoldDesiredGet(&altitudeHoldDesired);
 		}
-	
+
 	}
 }
 

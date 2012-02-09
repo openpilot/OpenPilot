@@ -627,9 +627,7 @@ static void altitudeHoldDesired(ManualControlCommandData * cmd)
 	PositionActualDownGet(&currentDown);
 	if(dT > 1) {
 		// After not being in this mode for a while init at current height
-		BaroAltitudeData baroAltitude;
-		BaroAltitudeGet(&baroAltitude);
-		altitudeHoldDesired.Altitude = baroAltitude.Altitude;
+		altitudeHoldDesired.Altitude = 0;
 		zeroed = false;
 	} else if (cmd->Throttle > DEADBAND_HIGH && zeroed)
 		altitudeHoldDesired.Altitude += (cmd->Throttle - DEADBAND_HIGH) * dT;

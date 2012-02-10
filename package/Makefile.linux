@@ -49,7 +49,7 @@ linux_deb_package: deb_build gcs
 
 deb_build: | $(DEB_BUILD_DIR) $(ALL_DEB_FILES) $(BUILD_DIR)/build 
 	@echo $@ starting
-	$(V1)$(shell echo $(PACKAGE_DIR) > $(BUILD_DIR)/package_dir)
+	$(V1)$(shell echo $(FW_DIR) > $(BUILD_DIR)/package_dir)
 	$(V1)sed -i -e "$(SED_SCRIPT)" $(DEB_BUILD_DIR)/changelog
 
 $(BUILD_DIR)/build: package_flight

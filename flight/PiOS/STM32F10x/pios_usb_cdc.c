@@ -346,7 +346,7 @@ RESULT PIOS_USB_CDC_SetLineCoding(void)
 	return USB_SUCCESS;
 }
 
-uint8_t *PIOS_USB_CDC_GetLineCoding(uint16_t Length)
+const uint8_t *PIOS_USB_CDC_GetLineCoding(uint16_t Length)
 {
 	struct pios_usb_cdc_dev * usb_cdc_dev = (struct pios_usb_cdc_dev *)pios_usb_cdc_id;
 

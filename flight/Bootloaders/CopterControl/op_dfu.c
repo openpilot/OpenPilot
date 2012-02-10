@@ -30,6 +30,7 @@
 #include "pios.h"
 #include "op_dfu.h"
 #include "pios_bl_helper.h"
+#include "pios_com_msg.h"
 #include <pios_board_info.h>
 //programmable devices
 Device devicesTable[10];
@@ -446,9 +447,7 @@ uint32_t CalcFirmCRC() {
 
 }
 void sendData(uint8_t * buf, uint16_t size) {
-	PIOS_COM_SendBuffer(PIOS_COM_TELEM_USB, buf, size);
-	if (DeviceState == downloading)
-		PIOS_DELAY_WaitmS(20);//this is an hack, we should check wtf is wrong with hid
+	PIOS_COM_MSG_Send(PIOS_COM_TELEM_USB, buf, size);
 }
 
 bool flash_read(uint8_t * buffer, uint32_t adr, DFUProgType type) {

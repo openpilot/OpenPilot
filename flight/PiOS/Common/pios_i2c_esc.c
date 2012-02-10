@@ -93,7 +93,7 @@ bool PIOS_I2C_ESC_SetSpeed(uint8_t speed[4])
 		} 
 	};
 	
-	return PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list));	
+	return PIOS_I2C_Transfer(PIOS_I2C_ESC_ADAPTER, txn_list, NELEMENTS(txn_list));	
 }
 
 bool PIOS_SetMKSpeed(uint8_t motornum, uint8_t speed) {
@@ -115,7 +115,7 @@ bool PIOS_SetMKSpeed(uint8_t motornum, uint8_t speed) {
 		} 
 	};
 	
-	return PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list));
+	return PIOS_I2C_Transfer(PIOS_I2C_ESC_ADAPTER, txn_list, NELEMENTS(txn_list));
 }
 
 bool PIOS_SetAstec4Address(uint8_t new_address) {
@@ -134,7 +134,7 @@ bool PIOS_SetAstec4Address(uint8_t new_address) {
 		} 
 	};
 	
-	return PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list));		
+	return PIOS_I2C_Transfer(PIOS_I2C_ESC_ADAPTER, txn_list, NELEMENTS(txn_list));		
 }
 
 bool PIOS_SetAstec4Speed(uint8_t motornum, uint8_t speed) {
@@ -161,7 +161,7 @@ bool PIOS_SetAstec4Speed(uint8_t motornum, uint8_t speed) {
 		} 
 	};
 	
-	return PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list));	
+	return PIOS_I2C_Transfer(PIOS_I2C_ESC_ADAPTER, txn_list, NELEMENTS(txn_list));	
 }
 
 #endif

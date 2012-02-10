@@ -64,6 +64,7 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
 
     connect(m_config->refreshPorts, SIGNAL(clicked()), this, SLOT(getSerialPorts()));
 
+    connect(m_config->pbHelp,SIGNAL(clicked()),this,SLOT(openHelp()));
     // And check whether by any chance we are not already connected
     if (telMngr->isConnected())
     {
@@ -650,3 +651,8 @@ void UploaderGadgetWidget::versionMatchCheck()
                                  QString(tr("FW Versions: ")) + boardDescription.gitTag+":"+boardDescription.buildDate);
     }
   }
+void UploaderGadgetWidget::openHelp()
+{
+
+    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/Uploader+Plugin", QUrl::StrictMode) );
+}

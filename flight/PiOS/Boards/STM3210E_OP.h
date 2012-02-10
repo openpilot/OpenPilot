@@ -91,16 +91,8 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
 //------------------------
 // PIOS_LED
 //------------------------
-#define PIOS_LED_LED1_GPIO_PORT                 GPIOC
-#define PIOS_LED_LED1_GPIO_PIN                  GPIO_Pin_12
-#define PIOS_LED_LED1_GPIO_CLK                  RCC_APB2Periph_GPIOC
-#define PIOS_LED_LED2_GPIO_PORT                 GPIOC
-#define PIOS_LED_LED2_GPIO_PIN                  GPIO_Pin_13
-#define PIOS_LED_LED2_GPIO_CLK                  RCC_APB2Periph_GPIOC
-#define PIOS_LED_NUM                            2
-#define PIOS_LED_PORTS                          { PIOS_LED_LED1_GPIO_PORT, PIOS_LED_LED2_GPIO_PORT }
-#define PIOS_LED_PINS                           { PIOS_LED_LED1_GPIO_PIN, PIOS_LED_LED2_GPIO_PIN }
-#define PIOS_LED_CLKS                           { PIOS_LED_LED1_GPIO_CLK, PIOS_LED_LED2_GPIO_CLK }
+#define PIOS_LED_HEARTBEAT	0
+#define PIOS_LED_ALARM		1
 
 //------------------------
 // PIOS_SPI
@@ -115,10 +107,13 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
 #define PIOS_I2C_MAX_DEVS			1
 extern uint32_t pios_i2c_main_adapter_id;
 #define PIOS_I2C_MAIN_ADAPTER			(pios_i2c_main_adapter_id)
+#define PIOS_I2C_ESC_ADAPTER			(pios_i2c_main_adapter_id)
+#define PIOS_I2C_BMP085_ADAPTER			(pios_i2c_main_adapter_id)
 
 //------------------------
 // PIOS_BMP085
 //------------------------
+#define PIOS_BMP085_HAS_GPIOS
 #define PIOS_BMP085_EOC_GPIO_PORT               GPIOC
 #define PIOS_BMP085_EOC_GPIO_PIN                GPIO_Pin_15
 #define PIOS_BMP085_EOC_PORT_SOURCE             GPIO_PortSourceGPIOC
@@ -313,8 +308,6 @@ extern uint32_t pios_com_aux_id;
 #define PIOS_USB_MAX_DEVS                       1
 #define PIOS_USB_HID_MAX_DEVS                   1
 #define PIOS_USB_DETECT_GPIO_PIN                GPIO_Pin_4
-#define PIOS_USB_DETECT_EXTI_LINE               EXTI_Line4
-#define PIOS_IRQ_USB_PRIORITY                   PIOS_IRQ_PRIO_MID
 
 /**
  * glue macros for file IO

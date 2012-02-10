@@ -37,6 +37,7 @@ struct pios_i2c_adapter_cfg {
 	uint32_t transfer_timeout_ms;
 	struct stm32_gpio scl;
 	struct stm32_gpio sda;
+	uint32_t remap;
 	struct stm32_irq event;
 	struct stm32_irq error;
 };

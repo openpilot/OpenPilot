@@ -119,6 +119,8 @@ public slots:
     void onAutopilotDisconnect();
     void onAutopilotConnect();
     void invalidateObjects();
+    void apply();
+    void save();
 signals:
     void widgetContentsChanged(QWidget * widget);
     void populateWidgetsRequested();

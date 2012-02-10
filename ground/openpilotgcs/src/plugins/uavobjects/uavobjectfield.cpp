@@ -106,11 +106,11 @@ void UAVObjectField::limitsInitialize(const QString &limits)
     if(limits.isEmpty())
         return;
     QStringList stringPerElement=limits.split(",");
+    quint32 index=0;
     foreach (QString str, stringPerElement) {
         QString _str=str.trimmed();
         QStringList valuesPerElement=_str.split(":");
         LimitStruct lstruc;
-        quint32 index=stringPerElement.indexOf(str);
         bool b1=valuesPerElement.at(0).startsWith("%");
         bool b2=(int)(index)<(int)numElements;
         if(b1 && b2)
@@ -157,6 +157,7 @@ void UAVObjectField::limitsInitialize(const QString &limits)
                 }
             }
             elementLimits.insert(index,lstruc);
+            ++index;
         }
         else
         {

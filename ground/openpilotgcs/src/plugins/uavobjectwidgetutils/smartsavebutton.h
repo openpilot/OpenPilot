@@ -50,13 +50,19 @@ public:
     void clearObjects();
     void removeObject(UAVDataObject *obj);
     void removeAllObjects();
+    void addApplyButton(QPushButton *apply);
+    void addSaveButton(QPushButton *save);
 signals:
     void preProcessOperations();
     void saveSuccessfull();
     void beginOp();
     void endOp();
+public slots:
+    void apply();
+    void save();
 private slots:
     void processClick();
+    void processOperation(QPushButton *button, bool save);
     void transaction_finished(UAVObject* obj, bool result);
     void saving_finished(int,bool);
 

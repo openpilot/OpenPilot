@@ -47,8 +47,11 @@ public:
 
 private:
     Ui_StabilizationWidget *m_stabilization;
-
+    QTimer * realtimeUpdates;
 private slots:
+    void realtimeUpdatesSlot(int);
+    void linkCheckBoxes(int value);
+    void processLinkedWidgets(QWidget*);
 };
 
 #endif // ConfigStabilizationWidget_H

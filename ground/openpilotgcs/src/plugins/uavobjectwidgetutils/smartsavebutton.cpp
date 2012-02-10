@@ -38,6 +38,16 @@ void smartSaveButton::addButtons(QPushButton *save, QPushButton *apply)
     connect(save,SIGNAL(clicked()),this,SLOT(processClick()));
     connect(apply,SIGNAL(clicked()),this,SLOT(processClick()));
 }
+void smartSaveButton::addApplyButton(QPushButton *apply)
+{
+    buttonList.insert(apply,apply_button);
+    connect(apply,SIGNAL(clicked()),this,SLOT(processClick()));
+}
+void smartSaveButton::addSaveButton(QPushButton *save)
+{
+    buttonList.insert(save,save_button);
+    connect(save,SIGNAL(clicked()),this,SLOT(processClick()));
+}
 void smartSaveButton::processClick()
 {
     emit beginOp();
@@ -47,9 +57,18 @@ void smartSaveButton::processClick()
         return;
     if(buttonList.value(button)==save_button)
         save=true;
+    processOperation(button,save);
+
+}
+
+void smartSaveButton::processOperation(QPushButton * button,bool save)
+{
     emit preProcessOperations();
-    button->setEnabled(false);
-    button->setIcon(QIcon(":/uploader/images/system-run.svg"));
+    if(button)
+    {
+        button->setEnabled(false);
+        button->setIcon(QIcon(":/uploader/images/system-run.svg"));
+    }
     QTimer timer;
     timer.setSingleShot(true);
     bool error=false;
@@ -109,15 +128,18 @@ void smartSaveButton::processClick()
             }
         }
     }
-    button->setEnabled(true);
+    if(button)
+        button->setEnabled(true);
     if(!error)
     {
-        button->setIcon(QIcon(":/uploader/images/dialog-apply.svg"));
+        if(button)
+            button->setIcon(QIcon(":/uploader/images/dialog-apply.svg"));
         emit saveSuccessfull();
     }
     else
     {
-        button->setIcon(QIcon(":/uploader/images/process-stop.svg"));
+        if(button)
+            button->setIcon(QIcon(":/uploader/images/process-stop.svg"));
     }
     emit endOp();
 }
@@ -169,3 +191,15 @@ void smartSaveButton::enableControls(bool value)
     foreach(QPushButton * button,buttonList.keys())
         button->setEnabled(value);
 }
+
+void smartSaveButton::apply()
+{
+    processOperation(NULL,false);
+}
+
+void smartSaveButton::save()
+{
+    processOperation(NULL,true);
+}
+
+

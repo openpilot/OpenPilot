@@ -209,7 +209,7 @@ bool NotifyTableModel::dropMimeData( const QMimeData * data, Qt::DropAction acti
     int rows = beginRow;
     // read next item from input MIME and drop into the table line by line
     while(!stream.atEnd()) {
-        qint32 ptr;
+        quintptr ptr;
         stream >> ptr;
         NotificationItem* item = reinterpret_cast<NotificationItem*>(ptr);
         int dragged = _list.indexOf(item);
@@ -247,7 +247,7 @@ QMimeData* NotifyTableModel::mimeData(const QModelIndexList& indexes) const
     int rows = 0;
     foreach (const QModelIndex& index, indexes) {
         if (!index.column()) {
-            qint32 item = reinterpret_cast<qint32>(_list.at(index.row()));
+            quintptr item = reinterpret_cast<quintptr>(_list.at(index.row()));
             stream << item;
             ++rows;
         }

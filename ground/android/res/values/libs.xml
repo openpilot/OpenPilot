@@ -10,6 +10,8 @@
         <item>QtScript</item>
         <item>QtSql</item>
         <item>QtTest</item>
+        <item>QtDeclarative</item>
+        <item>QtXmlPatterns</item>
     </array>
     <array name="bundled_libs">
         <item>Utils</item>
@@ -23,7 +25,7 @@
         <item>QtConcurrent</item>
         <item>Qwt</item>
         <item>Core</item>
-        <item>UAVObjects</item>
+        <!-- item>UAVObjects</item>
         <item>UAVTalk</item>
         <item>UAVObjectUtil</item>
         <item>UAVSettingsImportExport</item>
@@ -44,7 +46,7 @@
         <item>PFDGadget</item>
         <item>Serial</item>
         <item>SystemHealthGadget</item>
-        <item>UAVObjectBrowser</item>
+        <item>UAVObjectBrowser</item -->
         <item>Welcome</item>
     </array>
 </resources>

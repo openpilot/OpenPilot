@@ -5,7 +5,8 @@ QT += xml \
     network \
     script \
     svg \
-    sql
+    sql \
+    declarative
 include(../../openpilotgcsplugin.pri)
 include(../../libs/utils/utils.pri)
 include(../../shared/scriptwrapper/scriptwrapper.pri)
@@ -136,6 +137,17 @@ unix:!macx {
     images.path = /share/pixmaps
     INSTALLS += images
 }
-OTHER_FILES += Core.pluginspec
+
+android-g++{
+    pluginSpec.files = Core.pluginspec
+    pluginSpec.path = /assets/plugins
+    qmlFiles.files = mainwindow.qml
+    qmlFiles.path = /assets/qml
+    INSTALLS += pluginSpec
+    INSTALLS += qmlFiles
+}
+OTHER_FILES += Core.pluginspec \
+    mainwindow.qml
 
 include(gcsversioninfo.pri)
+

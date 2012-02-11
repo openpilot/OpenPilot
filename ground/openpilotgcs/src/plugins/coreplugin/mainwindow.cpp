@@ -83,6 +83,8 @@
 #include <QtGui/QWizard>
 #include <QtGui/QToolButton>
 #include <QtGui/QMessageBox>
+#include <QDeclarativeView>
+#include <QDeclarativeEngine>
 
 /*
 #ifdef Q_OS_UNIX
@@ -167,48 +169,62 @@ MainWindow::MainWindow() :
 #endif
     qApp->setStyle(new ManhattanStyle(baseName));
 
-    setDockNestingEnabled(true);
+//    setDockNestingEnabled(true);
 
-    setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
-    setCorner(Qt::BottomRightCorner, Qt::BottomDockWidgetArea);
+//    setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
+//    setCorner(Qt::BottomRightCorner, Qt::BottomDockWidgetArea);
 
-    registerDefaultContainers();
-    registerDefaultActions();
+//    registerDefaultContainers();
+//    registerDefaultActions();
 
-    m_modeStack = new MyTabWidget(this);
-    m_modeStack->setIconSize(QSize(24,24));
-    m_modeStack->setTabPosition(QTabWidget::South);
-    m_modeStack->setMovable(false);
-    m_modeStack->setMinimumWidth(512);
-    m_modeStack->setElideMode(Qt::ElideRight);
+//    m_modeStack = new MyTabWidget(this);
+//    m_modeStack->setIconSize(QSize(24,24));
+//    m_modeStack->setTabPosition(QTabWidget::South);
+//    m_modeStack->setMovable(false);
+//    m_modeStack->setMinimumWidth(512);
+//    m_modeStack->setElideMode(Qt::ElideRight);
 #ifndef Q_WS_MAC
-    m_modeStack->setDocumentMode(true);
+//    m_modeStack->setDocumentMode(true);
 #endif
-    m_modeManager = new ModeManager(this, m_modeStack);
+//    m_modeManager = new ModeManager(this, m_modeStack);
 
-    m_connectionManager = new ConnectionManager(this, m_modeStack);
+//    m_connectionManager = new ConnectionManager(this, m_modeStack);
 
     m_messageManager = new MessageManager;
-    setCentralWidget(m_modeStack);
 
-    connect(QApplication::instance(), SIGNAL(focusChanged(QWidget*,QWidget*)),
-            this, SLOT(updateFocusWidget(QWidget*,QWidget*)));
-    connect(m_workspaceSettings, SIGNAL(tabBarSettingsApplied(QTabWidget::TabPosition,bool)),
-            this, SLOT(applyTabBarSettings(QTabWidget::TabPosition,bool)));
-    connect(m_modeManager, SIGNAL(newModeOrder(QVector<IMode*>)), m_workspaceSettings, SLOT(newModeOrder(QVector<IMode*>)));
+    qDebug() << "DSW: Loading QML";
+    QDeclarativeView *view = new QDeclarativeView();
+    view->engine()->setBaseUrl(QUrl::fromLocalFile("/"));
+    view->setSource(QUrl::fromLocalFile("qml/mainwindow.qml"));
+
+    if(view->status() == QDeclarativeView::Error){
+        foreach(QDeclarativeError curError, view->errors()){
+            qDebug() << "DSW: QML error - " << curError.description();
+        }
+    }
+
+    setCentralWidget(view);
+    qDebug() << "DSW: Set central widget";
+
+//    connect(QApplication::instance(), SIGNAL(focusChanged(QWidget*,QWidget*)),
+//            this, SLOT(updateFocusWidget(QWidget*,QWidget*)));
+//    connect(m_workspaceSettings, SIGNAL(tabBarSettingsApplied(QTabWidget::TabPosition,bool)),
+//            this, SLOT(applyTabBarSettings(QTabWidget::TabPosition,bool)));
+//    connect(m_modeManager, SIGNAL(newModeOrder(QVector<IMode*>)), m_workspaceSettings, SLOT(newModeOrder(QVector<IMode*>)));
 
 //    setUnifiedTitleAndToolBarOnMac(true);
 #ifdef Q_OS_UNIX
      //signal(SIGINT, handleSigInt);
 #endif
 
-    statusBar()->setProperty("p_styled", true);
-    setAcceptDrops(true);
-    foreach (QString engine, qxtLog->allLoggerEngines())
-        qxtLog->removeLoggerEngine(engine);
-    qxtLog->addLoggerEngine("std", new QxtBasicSTDLoggerEngine());
-    qxtLog->installAsMessageHandler();
-    qxtLog->enableAllLogLevels();
+//    statusBar()->setProperty("p_styled", true);
+//    setAcceptDrops(true);
+//    foreach (QString engine, qxtLog->allLoggerEngines())
+//        qxtLog->removeLoggerEngine(engine);
+//    qxtLog->addLoggerEngine("std", new QxtBasicSTDLoggerEngine());
+//    qxtLog->installAsMessageHandler();
+//    qxtLog->enableAllLogLevels();
+    qDebug() << "DSW: Constructor complete";
 }
 
 MainWindow::~MainWindow()
@@ -274,6 +290,7 @@ bool MainWindow::init(QString *errorMessage)
     pm->addObject(m_generalSettings);
     pm->addObject(m_shortcutSettings);
     pm->addObject(m_workspaceSettings);
+    qDebug() << "DSW: Init complete";
 
     return true;
 }
@@ -291,11 +308,11 @@ void MainWindow::extensionsInitialized()
 //    QSettings defaultSettings(":/core/OpenPilotGCS.ini", QSettings::IniFormat);
 
     if ( ! qs->allKeys().count() ){
-        QMessageBox msgBox;
-        msgBox.setText(tr("No configuration file could be found."));
-        msgBox.setInformativeText(tr("The default configuration will be loaded."));
-        msgBox.setStandardButtons(QMessageBox::Ok);
-        msgBox.exec();
+//        QMessageBox msgBox;
+//        msgBox.setText(tr("No configuration file could be found."));
+//        msgBox.setInformativeText(tr("The default configuration will be loaded."));
+//        msgBox.setStandardButtons(QMessageBox::Ok);
+//        msgBox.exec();
         qDebug() << "Load default config from resource /core/OpenPilotGCS.xml";
         qs = &defaultSettings;
     }
@@ -311,6 +328,7 @@ void MainWindow::extensionsInitialized()
     emit m_coreImpl->coreAboutToOpen();
     show();
     emit m_coreImpl->coreOpened();
+    qDebug() << "DSW: Extensions initialized";
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -981,8 +999,8 @@ void MainWindow::changeEvent(QEvent *e)
         m_minimizeAction->setEnabled(!minimized);
         m_zoomAction->setEnabled(!minimized);
 #else
-        bool isFullScreen = (windowState() & Qt::WindowFullScreen) != 0;
-        m_toggleFullScreenAction->setChecked(isFullScreen);
+//        bool isFullScreen = (windowState() & Qt::WindowFullScreen) != 0;
+//        m_toggleFullScreenAction->setChecked(isFullScreen);
 #endif
     }
 }
@@ -1034,8 +1052,8 @@ void MainWindow::resetContext()
 
 void MainWindow::shutdown()
 {
-    disconnect(QApplication::instance(), SIGNAL(focusChanged(QWidget*,QWidget*)),
-               this, SLOT(updateFocusWidget(QWidget*,QWidget*)));
+//    disconnect(QApplication::instance(), SIGNAL(focusChanged(QWidget*,QWidget*)),
+//               this, SLOT(updateFocusWidget(QWidget*,QWidget*)));
     m_activeContext = 0;
 
     // We have to remove all the existing gagdets at his point, not
@@ -1142,7 +1160,7 @@ void MainWindow::readSettings(QSettings* qs, bool workspaceDiffOnly)
     }
 
     m_generalSettings->readSettings(qs);
-    m_actionManager->readSettings(qs);
+//    m_actionManager->readSettings(qs);
 
     qs->beginGroup(QLatin1String(settingsGroup));
 
@@ -1162,7 +1180,7 @@ void MainWindow::readSettings(QSettings* qs, bool workspaceDiffOnly)
 
     m_workspaceSettings->readSettings(qs);
 
-    createWorkspaces(qs);
+//    createWorkspaces(qs);
 
     // Read tab ordering
     qs->beginGroup(QLatin1String(modePriorities));
@@ -1171,7 +1189,7 @@ void MainWindow::readSettings(QSettings* qs, bool workspaceDiffOnly)
     foreach (QString modeName, modeNames) {
         map.insert(modeName, qs->value(modeName).toInt());
     }
-    m_modeManager->reorderModes(map);
+//    m_modeManager->reorderModes(map);
 
     qs->endGroup();
 
@@ -1215,7 +1233,7 @@ void MainWindow::saveSettings(QSettings* qs)
         manager->saveSettings(qs);
     }
 
-    m_actionManager->saveSettings(qs);
+//    m_actionManager->saveSettings(qs);
     m_generalSettings->saveSettings(qs);
 
 }
@@ -1292,7 +1310,7 @@ void MainWindow::removeAdditionalContext(int context)
 
 bool MainWindow::hasContext(int context) const
 {
-    return m_actionManager->hasContext(context);
+    return /*m_actionManager->hasContext(context)*/false;
 }
 
 void MainWindow::updateContext()
@@ -1311,7 +1329,7 @@ void MainWindow::updateContext()
             uniquecontexts << c;
     }
 
-    m_actionManager->setContext(uniquecontexts);
+//    m_actionManager->setContext(uniquecontexts);
 }
 
 void MainWindow::aboutToShowRecentFiles()

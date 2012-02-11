@@ -28,6 +28,7 @@
 
 #include "optionsparser.h"
 
+#include <QtCore/QDebug>
 #include <QtCore/QCoreApplication>
 
 using namespace ExtensionSystem;
@@ -134,13 +135,23 @@ bool OptionsParser::checkForNoLoadOption()
 
 bool OptionsParser::checkForAppOption()
 {
+    qDebug() << "Check for app option: " << m_currentArg;
+#ifndef ANDROID
     if (!m_appOptions.contains(m_currentArg))
+#else
+    // Horrible dirty hack to work with necessitas and its '-platfrom android' parameter
+    if (!m_appOptions.contains(m_currentArg) && !m_currentArg.contains("platform"))
+#endif
+    {
+        qDebug() << "Failed to find " << m_currentArg;
         return false;
+    }
     QString option = m_currentArg;
     QString argument;
     if (m_appOptions.value(m_currentArg) && nextToken(RequiredToken)) {
         //argument required
         argument = m_currentArg;
+        qDebug() << "Found arg. value: " << argument;
     }
     if (m_foundAppOptions)
         m_foundAppOptions->insert(option, argument);

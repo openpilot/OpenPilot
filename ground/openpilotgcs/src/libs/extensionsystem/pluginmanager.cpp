@@ -32,6 +32,7 @@
 #include "pluginspec_p.h"
 #include "optionsparser.h"
 #include "iplugin.h"
+#include "/home/violator/necessitas/Android/Qt/480/qt-src/src/plugins/platforms/android/src/androidjnimain.h"
 
 #include <QtCore/QMetaProperty>
 #include <QtCore/QDir>
@@ -708,6 +709,33 @@ void PluginManagerPrivate::readPluginPaths()
         foreach (const QFileInfo &subdir, dirs)
             searchPaths << subdir.absoluteFilePath();
     }
+#ifdef Q_OS_ANDROID
+    QFile coreSpec(QString("plugins/Core.pluginspec"));
+    if(coreSpec.exists()){
+        qDebug() << "DSW Found " << QFileInfo(coreSpec).absoluteFilePath();
+        specFiles << coreSpec.fileName();
+    }
+    else{
+        qDebug() << "DSW: Core.pluginspec not found";
+    }
+//    QFile welcomeSpec(QString("plugins/Welcome.pluginspec"));
+//    if(welcomeSpec.exists()){
+//        qDebug() << "DSW Found " << QFileInfo(welcomeSpec).absoluteFilePath();
+//        specFiles << welcomeSpec.fileName();
+//    }
+//    else{
+//        qDebug() << "DSW: Welcome.pluginspec not found";
+//    }
+    const QDir pluginDir("plugins/");
+    const QFileInfoList files = pluginDir.entryInfoList(QStringList() << QString("*.%1").arg(extension), QDir::Files);
+    foreach (const QFileInfo &file, files){
+        qDebug() << "DSW: found plugin - " << file.absoluteFilePath();
+        specFiles << file.absoluteFilePath();
+    }
+    foreach(const QString& curSpecFile, QDir("plugins/").entryList(QStringList() << QString("*.%1").arg(extension), QDir::Files)){
+        qDebug() << "DSW: "<< curSpecFile;
+    }
+#endif
     foreach (const QString &specFile, specFiles) {
         PluginSpec *spec = new PluginSpec;
         spec->d->read(specFile);

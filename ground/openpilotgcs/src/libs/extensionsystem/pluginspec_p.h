@@ -69,6 +69,9 @@ public:
     QList<PluginDependency> dependencies;
 
     QString location;
+#ifdef Q_OS_ANDROID
+    QString altLocation;
+#endif
     QString filePath;
     QStringList arguments;
 

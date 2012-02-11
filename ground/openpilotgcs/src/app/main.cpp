@@ -70,6 +70,7 @@ static const char *CLIENT_OPTION = "-client";
 static const char *CONFIG_OPTION = "-D";
 static const char *CLEAN_CONFIG_OPTION = "-clean-config";
 static const char *EXIT_AFTER_CONFIG_OPTION = "-exit-after-config";
+static const char *PLATFORM = "-platform\tandroid";
 
 typedef QList<ExtensionSystem::PluginSpec *> PluginSpecSet;
 
@@ -196,6 +197,12 @@ static inline QStringList getPluginPaths()
     pluginPath += QLatin1Char('/');
     pluginPath += QLatin1String("Plugins");
     rc.push_back(pluginPath);
+#ifdef DSW_ANDROID
+//    pluginPath = rootDirPath;
+//    pluginPath += QLatin1Char('/');
+    pluginPath /*+*/= QLatin1String("plugins");
+    rc.push_back(pluginPath);
+#endif
     return rc;
 }
 
@@ -240,6 +247,10 @@ int main(int argc, char **argv)
 #endif
 
     SharedTools::QtSingleApplication app((QLatin1String(appNameC)), argc, argv);
+
+#ifdef Q_OS_ANDROID
+    app.addLibraryPath("/data/data/org.kde.necessitas.ministro/files/qt/plugins");
+#endif
 
     QString locale = QLocale::system().name();
 
@@ -291,6 +302,7 @@ int main(int argc, char **argv)
         appOptions.insert(QLatin1String(CONFIG_OPTION), true);
         appOptions.insert(QLatin1String(CLEAN_CONFIG_OPTION), false);
         appOptions.insert(QLatin1String(EXIT_AFTER_CONFIG_OPTION), false);
+        appOptions.insert(QLatin1String(PLATFORM), true);
         QString errorMessage;
         if (!pluginManager.parseOptions(arguments,
                                         appOptions,
@@ -333,11 +345,26 @@ int main(int argc, char **argv)
             || foundAppOptions.contains(QLatin1String(HELP_OPTION4))) {
         printHelp(QFileInfo(app.applicationFilePath()).baseName(), pluginManager);
         return 0;
+    }    
+    if(foundAppOptions.contains(QLatin1String(PLATFORM)))
+    {
+        qDebug() << "Platform: " << foundAppOptions.value(PLATFORM);
     }
 
     const bool isFirstInstance = !app.isRunning();
     if (!isFirstInstance && foundAppOptions.contains(QLatin1String(CLIENT_OPTION)))
         return sendArguments(app, pluginManager.arguments()) ? 0 : -1;
+
+    const QDir pluginDir("assets/plugins/");
+    if(pluginDir.exists()){
+        qDebug() << "DSW " << pluginDir.count() << " files";
+    }else{
+        qDebug() << "DSW : plugin dir not found";
+    }
+    const QFileInfoList files = pluginDir.entryInfoList(QStringList() << QString("*.%1").arg("pluginspec"), QDir::Files);
+    foreach (const QFileInfo &file, files){
+        qDebug() << "DSW: found plugin - " << file.absoluteFilePath();
+    }
 
     pluginManager.loadPlugins();
     if (coreplugin->hasError()) {

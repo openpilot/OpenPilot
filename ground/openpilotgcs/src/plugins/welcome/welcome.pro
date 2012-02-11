@@ -20,3 +20,9 @@ FORMS += welcomemode.ui \
 RESOURCES += welcome.qrc
 DEFINES += WELCOME_LIBRARY
 OTHER_FILES += Welcome.pluginspec
+
+android-g++{
+    pluginSpec.files = Welcome.pluginspec
+    pluginSpec.path = /assets/plugins
+    INSTALLS += pluginSpec
+}

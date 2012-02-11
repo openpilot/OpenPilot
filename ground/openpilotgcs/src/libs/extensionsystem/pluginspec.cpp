@@ -33,12 +33,14 @@
 #include "iplugin_p.h"
 #include "pluginmanager.h"
 
+#include <QtCore/QDir>
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 #include <QtCore/QXmlStreamReader>
 #include <QtCore/QRegExp>
 #include <QtCore/QCoreApplication>
 #include <QtDebug>
+#include <QtGui/QApplication>
 
 #ifdef Q_OS_LINUX
 // Using the patched version breaks on Fedora 10, KDE4.2.2/Qt4.5.
@@ -416,6 +418,15 @@ bool PluginSpecPrivate::read(const QString &fileName)
         return reportError(tr("Could not open file for read: %1").arg(file.fileName()));
     QFileInfo fileInfo(file);
     location = fileInfo.absolutePath();
+#ifdef Q_OS_ANDROID
+    // Figure out root:  Up one from 'bin'
+    QDir rootDir = QApplication::applicationDirPath();
+    rootDir.cdUp();
+    const QString rootDirPath = rootDir.canonicalPath();
+    altLocation = rootDirPath;
+    altLocation += QLatin1Char('/');
+    altLocation += QLatin1String(GCS_LIBRARY_BASENAME);
+#endif
     filePath = fileInfo.absoluteFilePath();
     QXmlStreamReader reader(&file);
     while (!reader.atEnd()) {
@@ -785,9 +796,18 @@ bool PluginSpecPrivate::loadLibrary()
 
     PluginLoader loader(libName);
     if (!loader.load()) {
+#ifdef Q_OS_ANDROID
+        loader.setFileName(QString("%1/lib%2.so").arg(altLocation).arg(name));
+        location = altLocation;
+        filePath = QString("%1/%2.pluginspec").arg(location).arg(name);
+        if(!loader.load()){
+#endif
         hasError = true;
         errorString = libName + QString::fromLatin1(": ") + loader.errorString();
         return false;
+#ifdef Q_OS_ANDROID
+        }
+#endif
     }
     IPlugin *pluginObject = qobject_cast<IPlugin*>(loader.instance());
     if (!pluginObject) {

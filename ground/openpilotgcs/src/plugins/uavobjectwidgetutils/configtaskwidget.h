@@ -92,9 +92,9 @@ public:
     void addUAVObject(QString objectName);
     void addWidget(QWidget * widget);
 
-    void addUAVObjectToWidgetRelation(QString object,QString field,QWidget * widget,int index=0,double scale=1,bool isLimited=false,QList<int>* defaultReloadGroups=0);
-    void addUAVObjectToWidgetRelation(QString object,QString field,QWidget * widget,QString element,double scale,bool isLimited=false,QList<int>* defaultReloadGroups=0);
-void addUAVObjectToWidgetRelation(QString object, QString field, QWidget *widget, QString index);
+    void addUAVObjectToWidgetRelation(QString object,QString field,QWidget * widget,int index=0,double scale=1,bool isLimited=false,QList<int>* defaultReloadGroups=0,quint32 instID=0);
+    void addUAVObjectToWidgetRelation(QString object,QString field,QWidget * widget,QString element,double scale,bool isLimited=false,QList<int>* defaultReloadGroups=0,quint32 instID=0);
+    void addUAVObjectToWidgetRelation(QString object, QString field, QWidget *widget, QString index);
 
     //BUTTONS//
     void addApplySaveButtons(QPushButton * update,QPushButton * save);
@@ -105,7 +105,7 @@ void addUAVObjectToWidgetRelation(QString object, QString field, QWidget *widget
     void addWidgetToDefaultReloadGroups(QWidget * widget, QList<int> *groups);
 
     bool addShadowWidget(QWidget * masterWidget, QWidget * shadowWidget,double shadowScale=1,bool shadowIsLimited=false);
-    bool addShadowWidget(QString object,QString field,QWidget * widget,int index=0,double scale=1,bool isLimited=false, QList<int> *defaultReloadGroups=NULL);
+    bool addShadowWidget(QString object,QString field,QWidget * widget,int index=0,double scale=1,bool isLimited=false, QList<int> *defaultReloadGroups=NULL, quint32 instID=0);
 
     void autoLoadWidgets();
 

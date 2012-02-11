@@ -102,7 +102,7 @@ void UAVObjectField::limitsInitialize(const QString &limits)
     /// (VALX)->value
     /// %TY:VAL1:VAL2:VAL3,%TY,VAL1,VAL2,VAL3
     /// example: first element bigger than 3 and second element inside [2.3,5]
-    /// "0BI:3,%1BE:2.3:5"
+    /// "%BI:3,%BE:2.3:5"
     if(limits.isEmpty())
         return;
     QStringList stringPerElement=limits.split(",");

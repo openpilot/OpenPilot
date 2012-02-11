@@ -353,10 +353,10 @@ void ScopeGadgetOptionsPage::on_loggingEnable_clicked()
 
 void ScopeGadgetOptionsPage::on_spnRefreshInterval_valueChanged(int )
 {
-    validateRefresh();
+    validateRefreshInterval();
 }
 
-void ScopeGadgetOptionsPage::validateRefresh()
+void ScopeGadgetOptionsPage::validateRefreshInterval()
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();

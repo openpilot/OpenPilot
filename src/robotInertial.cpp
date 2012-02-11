@@ -337,7 +337,8 @@ namespace jafar {
 			}
 			#endif
 			
-			std::cout << "Initialize robot state with g = " << g << " (std " << sqrt(state.P(pose.size()+9,pose.size()+9)) << ") and q = " << q << std::endl;
+			std::cout << "IMU initializes robot state with g = " << g << " (std " << sqrt(state.P(pose.size()+9,pose.size()+9)) <<
+				") and orientation q = " << q << " e = " << quaternion::q2e(q) << std::endl;
 #if INIT_Q_FROM_G
 			if (g_size == 1) std::cout << "Euler attitude is " << e << "(std " << estd << ")" << std::endl;
 #endif

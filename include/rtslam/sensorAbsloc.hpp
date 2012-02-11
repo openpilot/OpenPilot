@@ -68,7 +68,7 @@ namespace jafar {
 					expectation = new Expectation(inns);
 					EXP_rs.resize(inns, ia_rs.size(), false);
 					INN_rs.resize(inns, ia_rs.size(), false);
-					EXP_q.resize(inns, 4, false);
+					EXP_q.resize(3, 4, false);
 				}
 				
 				
@@ -149,8 +149,8 @@ namespace jafar {
 					{
 						// compute expectation->x and EXP_rs
 						jblas::mat QR_q(4,4), E_qr(3,4);
-						jblas::vec e;
-						jblas::vec qr = quaternion::qProd(q, r);
+						jblas::vec3 e;
+						jblas::vec4 qr = quaternion::qProd(q, r);
 						quaternion::qProd_by_dq1(r, QR_q);
 						quaternion::q2e(qr, e, E_qr);
 						ublas::subrange(expectation->x(), indexE,indexE+3) = e;
@@ -177,13 +177,17 @@ namespace jafar {
 							jblas::mat Q_qr(4,4), QR_e(4,3), Q_exp(4,3);
 							jblas::vec qr, ri = quaternion::q2qc(r);
 							quaternion::e2q(ublas::subrange(measurement->x(), indexE_OriEuler,indexE_OriEuler+3), qr, QR_e);
-							q = quaternion::qProd(q, ri);
+							q = quaternion::qProd(qr, ri);
 							quaternion::qProd_by_dq1(ri, Q_qr);
 							Q_exp = ublas::prod(Q_qr, QR_e);
 
 							ublas::subrange(robotPtr()->pose.x(), 3, 7) = q;
 							ublas::subrange(robotPtr()->pose.P(), 3,7, 3,7) = ublasExtra::prod_JPJt(
 								ublas::subrange(measurement->P(), indexE_OriEuler,indexE_OriEuler+3, indexE_OriEuler,indexE_OriEuler+3), Q_exp);
+
+							std::cout << "AbsLoc sets initial orientation q = " << ublas::subrange(robotPtr()->pose.x(), 3, 7) <<
+								" e = " <<  quaternion::q2e(ublas::subrange(robotPtr()->pose.x(), 3, 7)) << std::endl;
+
 						}
 
 						if (indexD_Pos)
@@ -201,12 +205,11 @@ namespace jafar {
 								ublas::subrange(robotPtr()->pose.P(), 0,3, 0,3) = ublas::subrange(measurement->P(), indexE_Pos,indexE_Pos+3, indexE_Pos,indexE_Pos+3) +
 									ublasExtra::prod_JPJt(ublas::subrange(robotPtr()->pose.P(), 3,7, 3,7), EXP_q);
 							}
+
+							std::cout << "AbsLoc sets robot origin " << robotPtr()->origin_sensors <<
+								" ; initial position " << ublas::subrange(robotPtr()->pose.x(), 0,3) <<
+								" ; initial position var " << ublas::subrange(robotPtr()->pose.P(), 0,3, 0,3) << std::endl;
 						}
-						
-						std::cout << std::setprecision(16) << "robot origin: " << robotPtr()->origin_sensors << 
-							" ; initial position: " << ublas::subrange(robotPtr()->pose.x(), 0,3) << 
-							" ; initial pose var: " << ublas::subrange(robotPtr()->pose.P(), 0,3, 0,3) << std::endl;
-						
 					} else
 					{
 						// compute expectation->P and innovation

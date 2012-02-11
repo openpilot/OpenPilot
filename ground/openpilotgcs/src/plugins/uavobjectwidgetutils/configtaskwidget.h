@@ -122,11 +122,17 @@ public slots:
     void apply();
     void save();
 signals:
+    //fired when a widgets contents changes
     void widgetContentsChanged(QWidget * widget);
+    //fired when the framework requests that the widgets values be populated, use for custom behaviour
     void populateWidgetsRequested();
+    //fired when the framework requests that the widgets values be refreshed, use for custom behaviour
     void refreshWidgetsValuesRequested();
+    //fired when the framework requests that the UAVObject values be updated from the widgets value, use for custom behaviour
     void updateObjectsFromWidgetsRequested();
+    //fired when the autopilot connects
     void autoPilotConnected();
+    //fired when the autopilot disconnects
     void autoPilotDisconnected();
 private slots:
     void objectUpdated(UAVObject*);

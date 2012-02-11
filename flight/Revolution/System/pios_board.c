@@ -305,7 +305,17 @@ void PIOS_Board_Init(void) {
 	PIOS_TIM_InitClock(&tim_11_cfg);
 
 	/* IAP System Setup */
-	//PIOS_IAP_Init();
+	PIOS_IAP_Init();
+	uint16_t boot_count = PIOS_IAP_ReadBootCount();
+	if (boot_count < 3) {
+		PIOS_IAP_WriteBootCount(++boot_count);
+		AlarmsClear(SYSTEMALARMS_ALARM_BOOTFAULT);
+	} else {
+		/* Too many failed boot attempts, force hwsettings to defaults */
+		HwSettingsSetDefaults(HwSettingsHandle(), 0);
+		AlarmsSet(SYSTEMALARMS_ALARM_BOOTFAULT, SYSTEMALARMS_ALARM_CRITICAL);
+	}
+	
 	
 #if defined(PIOS_INCLUDE_COM)
 #if defined(PIOS_INCLUDE_GPS)

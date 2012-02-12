@@ -33,57 +33,107 @@
 
 #if defined(PIOS_INCLUDE_LED)
 
-/* Private Function Prototypes */
+#include <pios_led_priv.h>
 
-/* Local Variables */
-static GPIO_TypeDef *LED_GPIO_PORT[PIOS_LED_NUM] = PIOS_LED_PORTS;
-static const uint32_t LED_GPIO_PIN[PIOS_LED_NUM] = PIOS_LED_PINS;
-static const uint32_t LED_GPIO_CLK[PIOS_LED_NUM] = PIOS_LED_CLKS;
+const static struct pios_led_cfg * led_cfg;
 
 /**
 * Initialises all the LED's
 */
-void PIOS_LED_Init(void)
+int32_t PIOS_LED_Init(const struct pios_led_cfg * cfg)
 {
-	GPIO_InitTypeDef GPIO_InitStructure;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	PIOS_Assert(cfg);
 
-	for (int LEDNum = 0; LEDNum < PIOS_LED_NUM; LEDNum++) {
-		RCC_APB2PeriphClockCmd(LED_GPIO_CLK[LEDNum], ENABLE);
-		GPIO_InitStructure.GPIO_Pin = LED_GPIO_PIN[LEDNum];
-		GPIO_Init(LED_GPIO_PORT[LEDNum], &GPIO_InitStructure);
+	/* Store away the config in a global used by API functions */
+	led_cfg = cfg;
 
-		/* LED's Off */
-		LED_GPIO_PORT[LEDNum]->BSRR = LED_GPIO_PIN[LEDNum];
+	for (uint8_t i = 0; i < cfg->num_leds; i++) {
+		const struct pios_led * led = &(cfg->leds[i]);
+
+		/* Enable the peripheral clock for the GPIO */
+		switch ((uint32_t)led->pin.gpio) {
+		case (uint32_t) GPIOA:
+			RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+			break;
+		case (uint32_t) GPIOB:
+			RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+			break;
+		case (uint32_t) GPIOC:
+			RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+			break;
+		default:
+			PIOS_Assert(0);
+			break;
+		}
+
+		if (led->remap) {
+			GPIO_PinRemapConfig(led->remap, ENABLE);
+		}
+
+		GPIO_Init(led->pin.gpio, &led->pin.init);
+
+		PIOS_LED_Off(i);
 	}
+
+	return 0;
 }
 
 /**
 * Turn on LED
-* \param[in] LED LED Name (LED1, LED2)
+* \param[in] LED LED id
 */
-void PIOS_LED_On(LedTypeDef LED)
+void PIOS_LED_On(uint32_t led_id)
 {
-	LED_GPIO_PORT[LED]->BRR = LED_GPIO_PIN[LED];
+	PIOS_Assert(led_cfg);
+
+	if (led_id >= led_cfg->num_leds) {
+		/* LED index out of range */
+		return;
+	}
+
+	const struct pios_led * led = &(led_cfg->leds[led_id]);
+
+	GPIO_ResetBits(led->pin.gpio, led->pin.init.GPIO_Pin);
 }
 
 /**
 * Turn off LED
-* \param[in] LED LED Name (LED1, LED2)
+* \param[in] LED LED id
 */
-void PIOS_LED_Off(LedTypeDef LED)
+void PIOS_LED_Off(uint32_t led_id)
 {
-	LED_GPIO_PORT[LED]->BSRR = LED_GPIO_PIN[LED];
+	PIOS_Assert(led_cfg);
+
+	if (led_id >= led_cfg->num_leds) {
+		/* LED index out of range */
+		return;
+	}
+
+	const struct pios_led * led = &(led_cfg->leds[led_id]);
+
+	GPIO_SetBits(led->pin.gpio, led->pin.init.GPIO_Pin);
 }
 
 /**
 * Toggle LED on/off
-* \param[in] LED LED Name (LED1, LED2)
+* \param[in] LED LED id
 */
-void PIOS_LED_Toggle(LedTypeDef LED)
+void PIOS_LED_Toggle(uint32_t led_id)
 {
-	LED_GPIO_PORT[LED]->ODR ^= LED_GPIO_PIN[LED];
+	PIOS_Assert(led_cfg);
+
+	if (led_id >= led_cfg->num_leds) {
+		/* LED index out of range */
+		return;
+	}
+
+	const struct pios_led * led = &(led_cfg->leds[led_id]);
+
+	if (GPIO_ReadOutputDataBit(led->pin.gpio, led->pin.init.GPIO_Pin) == Bit_SET) {
+		PIOS_LED_On(led_id);
+	} else {
+		PIOS_LED_Off(led_id);
+	}
 }
 
 #endif

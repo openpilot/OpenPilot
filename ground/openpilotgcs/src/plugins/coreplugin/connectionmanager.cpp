@@ -38,6 +38,7 @@
 #include <QLabel>
 #include <QHBoxLayout>
 #include <QComboBox>
+#include <QEventLoop>
 
 namespace Core {
 
@@ -333,6 +334,12 @@ void ConnectionManager::registerDevice(IConnection *conn, const QString &devN, c
 */
 void ConnectionManager::devChanged(IConnection *connection)
 {
+    if(!ExtensionSystem::PluginManager::instance()->allPluginsLoaded())
+    {
+        connectionBackup.append(connection);
+        connect(ExtensionSystem::PluginManager::instance(),SIGNAL(pluginsLoadEnded()),this,SLOT(connectionsCallBack()),Qt::UniqueConnection);
+        return;
+    }
     //clear device list combobox
     m_availableDevList->clear();
 
@@ -358,7 +365,10 @@ void ConnectionManager::devChanged(IConnection *connection)
             if(m_mainWindow->generalSettings()->autoConnect() || m_mainWindow->generalSettings()->autoSelect())
                 m_availableDevList->setCurrentIndex(m_availableDevList->count()-1);
             if(m_mainWindow->generalSettings()->autoConnect())
+            {
                 connectDevice();
+                qDebug()<<"ConnectionManager::devChanged autoconnected USB device";
+            }
         }
     }
     if(m_ioDev)//if a device is connected make it the one selected on the dropbox
@@ -378,4 +388,14 @@ void ConnectionManager::devChanged(IConnection *connection)
         m_connectBtn->setEnabled(false);
 }
 
+}
+
+void Core::ConnectionManager::connectionsCallBack()
+{
+    foreach(IConnection * con,connectionBackup)
+    {
+        devChanged(con);
+    }
+    connectionBackup.clear();
+    disconnect(ExtensionSystem::PluginManager::instance(),SIGNAL(pluginsLoadEnded()),this,SLOT(connectionsCallBack()));
 } //namespace Core

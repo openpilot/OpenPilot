@@ -61,10 +61,15 @@
 // Private types
 
 // Private variables
+static struct CameraStab_data {
+	portTickType lastSysTime;
+	float inputs[CAMERASTABSETTINGS_INPUT_NUMELEM];
+	float inputs_filtered[CAMERASTABSETTINGS_INPUT_NUMELEM];
+} *csd;
 
 // Private functions
 static void attitudeUpdated(UAVObjEvent* ev);
-static float bound(float val);
+static float bound(float val, float limit);
 
 /**
  * Initialise the module, called on startup
@@ -72,9 +77,11 @@ static float bound(float val);
  */
 int32_t CameraStabInitialize(void)
 {
-	static UAVObjEvent ev;
-
 	bool cameraStabEnabled;
+
+#ifdef MODULE_CameraStab_BUILTIN
+	cameraStabEnabled = true;
+#else
 	uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
 
 	HwSettingsInitialize();
@@ -84,18 +91,28 @@ int32_t CameraStabInitialize(void)
 		cameraStabEnabled = true;
 	else
 		cameraStabEnabled = false;
+#endif
 
 	if (cameraStabEnabled) {
 
+		// allocate and initialize the static data storage only if module is enabled
+		csd = (struct CameraStab_data *) pvPortMalloc(sizeof(struct CameraStab_data));
+		if (!csd)
+			return -1;
+
+		// make sure that all inputs[] and inputs_filtered[] are zeroed
+		memset(csd, 0, sizeof(struct CameraStab_data));
+		csd->lastSysTime = xTaskGetTickCount();
+
 		AttitudeActualInitialize();
-
-		ev.obj = AttitudeActualHandle();
-		ev.instId = 0;
-		ev.event = 0;
-
 		CameraStabSettingsInitialize();
 		CameraDesiredInitialize();
 
+		UAVObjEvent ev = {
+			.obj = AttitudeActualHandle(),
+			.instId = 0,
+			.event = 0,
+		};
 		EventPeriodicCallbackCreate(&ev, attitudeUpdated, SAMPLE_PERIOD_MS / portTICK_RATE_MS);
 
 		return 0;
@@ -117,47 +134,68 @@ static void attitudeUpdated(UAVObjEvent* ev)
 	if (ev->obj != AttitudeActualHandle())
 		return;
 
-	float attitude;
-	float output;
 	AccessoryDesiredData accessory;
 
 	CameraStabSettingsData cameraStab;
 	CameraStabSettingsGet(&cameraStab);
 
-	// Read any input channels
-	float inputs[3] = {0,0,0};
-	if(cameraStab.Inputs[CAMERASTABSETTINGS_INPUTS_ROLL] != CAMERASTABSETTINGS_INPUTS_NONE) {
-		if(AccessoryDesiredInstGet(cameraStab.Inputs[CAMERASTABSETTINGS_INPUTS_ROLL] - CAMERASTABSETTINGS_INPUTS_ACCESSORY0, &accessory) == 0)
-			inputs[0] = accessory.AccessoryVal * cameraStab.InputRange[CAMERASTABSETTINGS_INPUTRANGE_ROLL];
-	}
-	if(cameraStab.Inputs[CAMERASTABSETTINGS_INPUTS_PITCH] != CAMERASTABSETTINGS_INPUTS_NONE) {
-		if(AccessoryDesiredInstGet(cameraStab.Inputs[CAMERASTABSETTINGS_INPUTS_PITCH] - CAMERASTABSETTINGS_INPUTS_ACCESSORY0, &accessory) == 0)
-			inputs[1] = accessory.AccessoryVal * cameraStab.InputRange[CAMERASTABSETTINGS_INPUTRANGE_PITCH];
-	}
-	if(cameraStab.Inputs[CAMERASTABSETTINGS_INPUTS_YAW] != CAMERASTABSETTINGS_INPUTS_NONE) {
-		if(AccessoryDesiredInstGet(cameraStab.Inputs[CAMERASTABSETTINGS_INPUTS_YAW] - CAMERASTABSETTINGS_INPUTS_ACCESSORY0, &accessory) == 0)
-			inputs[2] = accessory.AccessoryVal * cameraStab.InputRange[CAMERASTABSETTINGS_INPUTRANGE_YAW];
+	// Check how long since last update, time delta between calls in ms
+	portTickType thisSysTime = xTaskGetTickCount();
+	float dT = (thisSysTime > csd->lastSysTime) ?
+			(thisSysTime - csd->lastSysTime) / portTICK_RATE_MS :
+			(float)SAMPLE_PERIOD_MS / 1000.0f;
+	csd->lastSysTime = thisSysTime;
+
+	// Read any input channels and apply LPF
+	for (uint8_t i = 0; i < CAMERASTABSETTINGS_INPUT_NUMELEM; i++) {
+		if (cameraStab.Input[i] != CAMERASTABSETTINGS_INPUT_NONE) {
+			if (AccessoryDesiredInstGet(cameraStab.Input[i] - CAMERASTABSETTINGS_INPUT_ACCESSORY0, &accessory) == 0) {
+				float input_rate;
+				switch (cameraStab.StabilizationMode[i]) {
+				case CAMERASTABSETTINGS_STABILIZATIONMODE_ATTITUDE:
+					csd->inputs[i] = accessory.AccessoryVal * cameraStab.InputRange[i];
+					break;
+				case CAMERASTABSETTINGS_STABILIZATIONMODE_AXISLOCK:
+					input_rate = accessory.AccessoryVal * cameraStab.InputRate[i];
+					if (fabs(input_rate) > cameraStab.MaxAxisLockRate)
+						csd->inputs[i] = bound(csd->inputs[i] + input_rate * dT / 1000.0f, cameraStab.InputRange[i]);
+					break;
+				default:
+					PIOS_Assert(0);
+				}
+
+				// bypass LPF calculation if ResponseTime is zero
+				float rt = (float)cameraStab.ResponseTime[i];
+				if (rt)
+					csd->inputs_filtered[i] = (rt / (rt + dT)) * csd->inputs_filtered[i]
+								+ (dT / (rt + dT)) * csd->inputs[i];
+				else
+					csd->inputs_filtered[i] = csd->inputs[i];
+			}
+		}
 	}
 
 	// Set output channels
+	float attitude;
+	float output;
+
 	AttitudeActualRollGet(&attitude);
-	output = bound((attitude + inputs[0]) / cameraStab.OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_ROLL]);
+	output = bound((attitude + csd->inputs_filtered[CAMERASTABSETTINGS_INPUT_ROLL]) / cameraStab.OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_ROLL], 1.0f);
 	CameraDesiredRollSet(&output);
 
 	AttitudeActualPitchGet(&attitude);
-	output = bound((attitude + inputs[1])  / cameraStab.OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_PITCH]);
+	output = bound((attitude + csd->inputs_filtered[CAMERASTABSETTINGS_INPUT_PITCH]) / cameraStab.OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_PITCH], 1.0f);
 	CameraDesiredPitchSet(&output);
 
 	AttitudeActualYawGet(&attitude);
-	output = bound((attitude + inputs[2])  / cameraStab.OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_YAW]);
+	output = bound((attitude + csd->inputs_filtered[CAMERASTABSETTINGS_INPUT_YAW]) / cameraStab.OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_YAW], 1.0f);
 	CameraDesiredYawSet(&output);
-
 }
 
-float bound(float val)
+float bound(float val, float limit)
 {
-	return (val > 1) ? 1 : 
-		(val < -1) ? -1 :
+	return (val > limit) ? limit :
+		(val < -limit) ? -limit :
 		val;
 }
 /**

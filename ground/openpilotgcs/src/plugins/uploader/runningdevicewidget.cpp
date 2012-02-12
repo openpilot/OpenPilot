@@ -73,7 +73,7 @@ void runningDeviceWidget::populate()
 
     myDevice->lblDeviceID->setText(QString("Device ID: ") + QString::number(id, 16));
     myDevice->lblBoardName->setText(deviceDescriptorStruct::idToBoardName(id));
-    myDevice->lblHWRev->setText(QString(tr("HW Revision: "))+QString::number(id & 0x0011, 16));
+    myDevice->lblHWRev->setText(QString(tr("HW Revision: "))+QString::number(id & 0x00FF, 16));
     qDebug()<<"CRC"<<utilMngr->getFirmwareCRC();
     myDevice->lblCRC->setText(QString(tr("Firmware CRC: "))+QVariant(utilMngr->getFirmwareCRC()).toString());
     // DeviceID tells us what sort of HW we have detected:
@@ -128,7 +128,7 @@ void runningDeviceWidget::populate()
             myDevice->lblCertified->setToolTip(tr("Untagged or custom firmware build"));
         }
         myDevice->lblGitCommitTag->setText("Git commit tag: "+devDesc.gitTag);
-        myDevice->lblFWDate->setText(QString("Firmware date: ") + devDesc.buildDate);
+        myDevice->lblFWDate->setText(QString("Firmware date: ") + devDesc.buildDate.insert(4,"-").insert(7,"-"));
     }
     else
     {

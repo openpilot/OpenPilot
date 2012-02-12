@@ -60,7 +60,7 @@ class NotifyPluginOptionsPage : public IOptionsPage
     Q_OBJECT
 
 public:
-
+    enum {equal,bigger,smaller,inrange};
     explicit NotifyPluginOptionsPage(QObject *parent = 0);
     ~NotifyPluginOptionsPage();
     QString id() const { return QLatin1String("settings"); }
@@ -72,6 +72,7 @@ public:
     void apply();
     void finish();
     void restoreFromSettings();
+    static QStringList conditionValues;
 
 signals:
     void updateNotifications(QList<NotificationItem*> list);
@@ -152,7 +153,7 @@ private:
     QScopedPointer<Ui::NotifyPluginOptionsPage> _optionsPage;
 
     //! Widget to convinient selection of condition for field value (equal, lower, greater)
-    QComboBox* _dynamicFieldLimit;
+    QComboBox* _dynamicFieldCondition;
 
     //! Represents edit widget for dynamic UAVObjectfield,
     //! can be spinbox - for numerics, combobox - enums, or

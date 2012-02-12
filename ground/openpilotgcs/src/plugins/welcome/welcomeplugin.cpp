@@ -30,8 +30,6 @@
 
 #include "welcomemode.h"
 
-#include "communitywelcomepage.h"
-
 #include <coreplugin/actionmanager/actionmanager.h>
 #include <coreplugin/basemode.h>
 #include <coreplugin/coreconstants.h>
@@ -49,7 +47,7 @@
 using namespace Welcome::Internal;
 
 WelcomePlugin::WelcomePlugin()
-  : m_welcomeMode(0), m_communityWelcomePage(0)
+  : m_welcomeMode(0)
 {
 }
 
@@ -58,10 +56,6 @@ WelcomePlugin::~WelcomePlugin()
     if (m_welcomeMode) {
         removeObject(m_welcomeMode);
         delete m_welcomeMode;
-    }
-    if (m_communityWelcomePage) {
-        removeObject(m_communityWelcomePage);
-        delete m_communityWelcomePage;
     }
 }
 
@@ -75,9 +69,6 @@ bool WelcomePlugin::initialize(const QStringList &arguments, QString *error_mess
 {
     Q_UNUSED(arguments)
     Q_UNUSED(error_message)
-
-    m_communityWelcomePage = new Internal::CommunityWelcomePage;
-    addObject(m_communityWelcomePage);
 
     m_welcomeMode = new WelcomeMode;
     addObject(m_welcomeMode);
@@ -98,7 +89,6 @@ bool WelcomePlugin::initialize(const QStringList &arguments, QString *error_mess
 */
 void WelcomePlugin::extensionsInitialized()
 {
-    m_welcomeMode->initPlugins();
     Core::ModeManager::instance()->activateMode(m_welcomeMode->uniqueModeName());
 }
 

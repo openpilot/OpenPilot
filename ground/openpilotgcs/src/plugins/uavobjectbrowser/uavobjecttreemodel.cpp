@@ -95,7 +95,7 @@ void UAVObjectTreeModel::addDataObject(UAVDataObject *obj)
         int index = root->objIds().indexOf(obj->getObjID());
         addInstance(obj, root->child(index));
     } else {
-        DataObjectTreeItem *data = new DataObjectTreeItem(obj->getName());
+        DataObjectTreeItem *data = new DataObjectTreeItem(obj->getName() + " (" + QString::number(obj->getNumBytes()) + " bytes)");
         connect(data, SIGNAL(updateHighlight(TreeItem*)), this, SLOT(updateHighlight(TreeItem*)));
         int index = root->nameIndex(obj->getName());
         root->insert(index, data);

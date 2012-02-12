@@ -178,7 +178,7 @@ PluginManager *PluginManager::instance()
     Create a plugin manager. Should be done only once per application.
 */
 PluginManager::PluginManager()
-    : d(new PluginManagerPrivate(this))
+    : d(new PluginManagerPrivate(this)),m_allPluginsLoaded(false)
 {
     m_instance = this;
 }
@@ -587,6 +587,8 @@ void PluginManagerPrivate::loadPlugins()
         loadPlugin(it.previous(), PluginSpec::Running);
     }
     emit q->pluginsChanged();
+    q->m_allPluginsLoaded=true;
+    emit q->pluginsLoadEnded();
 }
 
 /*!

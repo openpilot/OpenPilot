@@ -111,7 +111,7 @@ void deviceWidget::populate()
     // display a nice icon:
     myDevice->gVDevice->scene()->clear();
     myDevice->lblDevName->setText(deviceDescriptorStruct::idToBoardName(id));
-    myDevice->lblHWRev->setText(QString(tr("HW Revision: "))+QString::number(id & 0x0011, 16));
+    myDevice->lblHWRev->setText(QString(tr("HW Revision: "))+QString::number(id & 0x00FF, 16));
 
     devicePic = new QGraphicsSvgItem();
     devicePic->setSharedRenderer(new QSvgRenderer());
@@ -183,7 +183,7 @@ bool deviceWidget::populateBoardStructuredDescription(QByteArray desc)
     if(UAVObjectUtilManager::descriptionToStructure(desc,&onBoardDescrition))
     {
         myDevice->lblGitTag->setText(onBoardDescrition.gitTag);
-        myDevice->lblBuildDate->setText(onBoardDescrition.buildDate);
+        myDevice->lblBuildDate->setText(onBoardDescrition.buildDate.insert(4,"-").insert(7,"-"));
         if(onBoardDescrition.description.startsWith("release",Qt::CaseInsensitive))
         {
             myDevice->lblDescription->setText(QString("Firmware tag: ")+onBoardDescrition.description);
@@ -213,7 +213,7 @@ bool deviceWidget::populateLoadedStructuredDescription(QByteArray desc)
     if(UAVObjectUtilManager::descriptionToStructure(desc,&LoadedDescrition))
     {
         myDevice->lblGitTagL->setText(LoadedDescrition.gitTag);
-        myDevice->lblBuildDateL->setText( LoadedDescrition.buildDate);
+        myDevice->lblBuildDateL->setText( LoadedDescrition.buildDate.insert(4,"-").insert(7,"-"));
         if(LoadedDescrition.description.startsWith("release",Qt::CaseInsensitive))
         {
             myDevice->lblDescritpionL->setText(LoadedDescrition.description);
@@ -358,8 +358,10 @@ void deviceWidget::loadFirmware()
   */
 void deviceWidget::uploadFirmware()
 {
+    myDevice->updateButton->setEnabled(false);
     if (!m_dfu->devices[deviceID].Writable) {
         status("Device not writable!", STATUSICON_FAIL);
+        myDevice->updateButton->setEnabled(true);
         return;
     }
 
@@ -378,6 +380,7 @@ void deviceWidget::uploadFirmware()
         int firmwareBoard = ((desc.at(12)&0xff)<<8) + (desc.at(13)&0xff);
         if (firmwareBoard != board) {
             status("Error: firmware does not match board", STATUSICON_FAIL);
+            myDevice->updateButton->setEnabled(true);
             return;
         }
         // Check the firmware embedded in the file:
@@ -385,6 +388,7 @@ void deviceWidget::uploadFirmware()
         QByteArray fileHash = QCryptographicHash::hash(loadedFW.left(loadedFW.length()-100), QCryptographicHash::Sha1);
         if (firmwareHash != fileHash) {
             status("Error: firmware file corrupt", STATUSICON_FAIL);
+            myDevice->updateButton->setEnabled(true);
             return;
         }
     } else {
@@ -400,6 +404,7 @@ void deviceWidget::uploadFirmware()
     if(!m_dfu->enterDFU(deviceID))
     {
         status("Error:Could not enter DFU mode", STATUSICON_FAIL);
+        myDevice->updateButton->setEnabled(true);
         return;
     }
     OP_DFU::Status ret=m_dfu->StatusRequest();
@@ -412,6 +417,7 @@ void deviceWidget::uploadFirmware()
     bool retstatus = m_dfu->UploadFirmware(filename,verify, deviceID);
     if(!retstatus ) {
         status("Could not start upload", STATUSICON_FAIL);
+        myDevice->updateButton->setEnabled(true);
         return;
     }
     status("Uploading, please wait...", STATUSICON_RUNNING);
@@ -465,6 +471,7 @@ void deviceWidget::downloadFinished()
   */
 void deviceWidget::uploadFinished(OP_DFU::Status retstatus)
 {
+    myDevice->updateButton->setEnabled(true);
     disconnect(m_dfu, SIGNAL(uploadFinished(OP_DFU::Status)), this, SLOT(uploadFinished(OP_DFU::Status)));
     disconnect(m_dfu, SIGNAL(progressUpdated(int)), this, SLOT(setProgress(int)));
     disconnect(m_dfu, SIGNAL(operationProgress(QString)), this, SLOT(dfuStatus(QString)));

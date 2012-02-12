@@ -1,0 +1,85 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+# Sample debian/rules that uses debhelper.
+#
+# This file was originally written by Joey Hess and Craig Small.
+# As a special exception, when this file is copied by dh-make into a
+# dh-make output file, you may use that output file without restriction.
+# This special exception was added by Craig Small in version 0.37 of dh-make.
+#
+# Modified to make a template file for a multi-binary package with separated
+# build-arch and build-indep targets  by Bill Allombert 2001
+
+# Uncomment this to turn on verbose mode.
+# export DH_VERBOSE=1
+
+# This has to be exported to make some magic below work.
+export DH_OPTIONS=-v
+
+#%:
+#	dh $@ 
+
+PACKAGE_DIR	= $(shell cat build/package_dir)
+
+clean:
+	dh_testdir
+	dh_testroot
+	dh_clean
+ 
+install:
+	dh_testdir
+	dh_testroot
+	dh_prep
+	dh_installdirs
+	dh_installudev --priority=45
+	# Add here commands to install the package into debian/<packagename>
+	cp -arp build/ground/openpilotgcs/bin   debian/openpilot/usr/local/OpenPilot
+	cp -arp build/ground/openpilotgcs/lib   debian/openpilot/usr/local/OpenPilot
+	cp -arp build/ground/openpilotgcs/share debian/openpilot/usr/local/OpenPilot
+	cp -arp build/ground/openpilotgcs/.obj  debian/openpilot/usr/local/OpenPilot
+	cp -arp build/ground/openpilotgcs/gcsversioninfo.h debian/openpilot/usr/local/OpenPilot
+	cp -arp package/linux/openpilot.desktop debian/openpilot/usr/share/applications
+	cp -arp package/linux/openpilot.png     debian/openpilot/usr/share/pixmaps
+	cp -arp package/linux/openpilot_menu.png  debian/openpilot/usr/share/pixmaps
+	cp -arp package/linux/openpilot_menu.menu debian/openpilot/etc/xdg/menus/applications-merged
+	cp -arp package/linux/openpilot_menu.directory debian/openpilot/usr/share/desktop-directories
+ifdef PACKAGE_DIR
+	cp -a $(PACKAGE_DIR)/*.opfw debian/openpilot/usr/local/OpenPilot/firmware/
+else
+	$(error PACKAGE_DIR not defined! $(PACKAGE_DIR))
+endif
+	ln -s /usr/local/OpenPilot/bin/openpilotgcs.bin `pwd`/debian/openpilot/usr/bin/openpilot-gcs
+	rm -rf debian/openpilot/usr/local/OpenPilot/share/openpilotgcs/sounds/sounds
+	rm -rf debian/openpilot/usr/local/OpenPilot/share/openpilotgcs/pfd/pfd
+	rm -rf debian/openpilot/usr/local/OpenPilot/share/openpilotgcs/models/models
+	rm -rf debian/openpilot/usr/local/OpenPilot/share/openpilotgcs/mapicons/mapicons
+	rm -rf debian/openpilot/usr/local/OpenPilot/share/openpilotgcs/dials/dials
+	rm -rf debian/openpilot/usr/local/OpenPilot/share/openpilotgcs/diagrams/diagrams
+
+
+# Build architecture-independent files here.
+binary-indep: install
+
+# We have nothing to build by default. Got taken care of by OPs build system
+# Build architecture-dependent files here.
+binary-arch: install
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs
+	dh_installdocs
+	dh_installexamples
+	dh_installman
+	dh_link
+	dh_strip
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_shlibdeps -l/usr/local/OpenPilot/lib/openpilotgcs --dpkg-shlibdeps-params="--ignore-missing-info -v"
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep binary-arch
+
+.PHONY: clean binary-indep binary-arch binary install
+

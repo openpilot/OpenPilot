@@ -31,6 +31,7 @@
 #include "packet_handler.h"
 #include "saved_settings.h"
 #include "main.h"
+#include "pios_usb.h"		/* PIOS_USB_* */
 
 #if defined(PIOS_COM_DEBUG)
   #define TRANS_DEBUG
@@ -70,8 +71,8 @@ void trans_process(void)
     bool usb_comms = false;						// TRUE if we are using the usb port for comms.
     uint32_t comm_port = PIOS_COM_SERIAL;		// default to using the usart comm-port
 
-    #if defined(PIOS_INCLUDE_USB_HID)
-        if (PIOS_USB_HID_CheckAvailable(0))
+    #if defined(PIOS_INCLUDE_USB)
+        if (PIOS_USB_CheckAvailable(0))
         {	// USB comms is up, use the USB comm-port instead of the USART comm-port
             usb_comms = true;
             comm_port = PIOS_COM_TELEM_USB;
@@ -88,13 +89,8 @@ void trans_process(void)
     else
 	if (usb_comms)
 	{	// we're using the USB for comms - keep the USART rx buffer empty
-		int32_t bytes = PIOS_COM_ReceiveBufferUsed(PIOS_COM_SERIAL);
-		while (bytes > 0)
-		{
-			uint8_t c;
-			PIOS_COM_ReceiveBuffer(PIOS_COM_SERIAL, &c, 1, 0);
-			bytes--;
-		}
+		uint8_t c;
+		while (PIOS_COM_ReceiveBuffer(PIOS_COM_SERIAL, &c, 1, 0) > 0);
 	}
 
 	trans_previous_com_port = comm_port;			// remember the current comm-port we are using
@@ -111,9 +107,6 @@ void trans_process(void)
 		// free space size in the RF packet handler tx buffer
 		uint16_t ph_num = ph_putData_free(connection_index);
 
-		// get the number of data bytes received down the comm-port
-		int32_t com_num = PIOS_COM_ReceiveBufferUsed(comm_port);
-
 		// set the USART RTS handshaking line
 		if (!usb_comms)
 		{
@@ -126,16 +119,12 @@ void trans_process(void)
 			SERIAL_RTS_SET;								// release the USART RTS line
 
 		// limit number of bytes we will get to the size of the temp buffer
-		if (com_num > sizeof(trans_temp_buffer1))
-			com_num = sizeof(trans_temp_buffer1);
-
-		// limit number of bytes we will get to the size of the free space in the RF packet handler TX buffer
-		if (com_num > ph_num)
-			com_num = ph_num;
+		if (ph_num > sizeof(trans_temp_buffer1))
+			ph_num = sizeof(trans_temp_buffer1);
 
 		// copy data received down the comm-port into our temp buffer
 		register uint16_t bytes_saved = 0;
-		bytes_saved = PIOS_COM_ReceiveBuffer(comm_port, trans_temp_buffer1, com_num, 0);
+		bytes_saved = PIOS_COM_ReceiveBuffer(comm_port, trans_temp_buffer1, ph_num, 0);
 
 		// put the received comm-port data bytes into the RF packet handler TX buffer
 		if (bytes_saved > 0)
@@ -146,12 +135,8 @@ void trans_process(void)
 	}
 	else
 	{	// empty the comm-ports rx buffer
-		int32_t com_num = PIOS_COM_ReceiveBufferUsed(comm_port);
-		while (com_num > 0) {
-			uint8_t c;
-			PIOS_COM_ReceiveBuffer(comm_port, &c, 1, 0);
-			com_num--;
-		}
+		uint8_t c;
+		while (PIOS_COM_ReceiveBuffer(comm_port, &c, 1, 0) > 0);
 	}
 
 	// ********************

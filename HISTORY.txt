@@ -1,5 +1,17 @@
 Short summary of changes.  For a complete list see the git log.
 
+2012-01-02
+CC FW now supports USB Virtual Com Port (VCP/CDC) in addition to the original HID interface
+New ComUsbBridge module can bridge any serial port to the USB CDC port
+CC FW now detects repeated faults during init and boots with default hwsettings
+
+2012-01-02
+Added new camera stabilization features: AxisLock mode and LPF.
+
+2011-12-10
+Merged a change that sorts the UAVO fields based on size.  Because this changes
+all of the objects, erase all existing flash files based on this.
+
 2011-11-04
 New Spektrum/JR satellite receiver driver implementation.
 It now provides explicit selection of DSM2 (and DSMJ), DSMX (10bit) and

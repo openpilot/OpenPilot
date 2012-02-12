@@ -76,6 +76,11 @@ SerialConnection::SerialConnection()
     : enablePolling(true), m_enumerateThread(this)
 {
     serialHandle = NULL;
+    m_config = new SerialPluginConfiguration("Serial Telemetry", NULL, this);
+    m_config->restoresettings();
+
+    m_optionspage = new SerialPluginOptionsPage(m_config,this);
+
 
     // Experimental: enable polling on all OS'es since there
     // were reports that autodetect does not work on XP amongst
@@ -142,7 +147,8 @@ QIODevice *SerialConnection::openDevice(const QString &deviceName)
             {
             //we need to handle port settings here...
             PortSettings set;
-            set.BaudRate = BAUD57600;
+            set.BaudRate = stringToBaud(m_config->speed());
+            qDebug()<<"Serial telemetry running at "<<m_config->speed();
             set.DataBits = DATA_8;
             set.Parity = PAR_NONE;
             set.StopBits = STOP_1;
@@ -198,6 +204,33 @@ void SerialConnection::resumePolling()
     enablePolling = true;
 }
 
+BaudRateType SerialConnection::stringToBaud(QString str)
+{
+    if(str=="1200")
+        return BAUD1200;
+    else if(str=="2400")
+        return BAUD2400;
+    else if(str== "4800")
+        return BAUD4800;
+    else if(str== "9600")
+        return BAUD9600;
+    else if(str== "19200")
+        return BAUD19200;
+    else if(str== "38400")
+        return BAUD38400;
+    else if(str== "57600")
+        return BAUD57600;
+    else if(str== "115200")
+        return BAUD115200;
+    else if(str== "230400")
+        return BAUD230400;
+    else if(str== "460800")
+        return BAUD460800;
+    else if(str== "921600")
+        return BAUD921600;
+    else
+        return BAUD57600;
+}
 
 SerialPlugin::SerialPlugin()
 {
@@ -205,19 +238,23 @@ SerialPlugin::SerialPlugin()
 
 SerialPlugin::~SerialPlugin()
 {
-
+    removeObject(m_connection->Optionspage());
 }
 
 void SerialPlugin::extensionsInitialized()
 {
-    addAutoReleasedObject(new SerialConnection);
+    addAutoReleasedObject(m_connection);
 }
 
 bool SerialPlugin::initialize(const QStringList &arguments, QString *errorString)
 {
     Q_UNUSED(arguments);
     Q_UNUSED(errorString);
-
+    m_connection = new SerialConnection();
+    //must manage this registration of child object ourselves
+    //if we use an autorelease here it causes the GCS to crash
+    //as it is deleting objects as the app closes...
+    addObject(m_connection->Optionspage());
     return true;
 }
 

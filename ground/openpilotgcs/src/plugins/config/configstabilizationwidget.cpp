@@ -42,8 +42,7 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     m_stabilization = new Ui_StabilizationWidget();
     m_stabilization->setupUi(this);
 
-
-    setupButtons(m_stabilization->saveStabilizationToRAM,m_stabilization->saveStabilizationToSD);
+    setupButtons(m_stabilization->saveStabilizationToRAM, m_stabilization->saveStabilizationToSD);
 
     addUAVObject("StabilizationSettings");
 
@@ -71,8 +70,6 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     connect(m_stabilization->pitchKi, SIGNAL(valueChanged(double)), this, SLOT(updatePitchKI(double)));
     connect(m_stabilization->pitchILimit, SIGNAL(valueChanged(double)), this, SLOT(updatePitchILimit(double)));
 
-    // Connect the help button
-    connect(m_stabilization->stabilizationHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
     addWidget(m_stabilization->rateRollKp);
     addWidget(m_stabilization->rateRollKi);
     addWidget(m_stabilization->rateRollILimit);
@@ -102,6 +99,9 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     addWidget(m_stabilization->maximumYaw);
     addWidget(m_stabilization->lowThrottleZeroIntegral);
 
+    // Connect buttons
+    connect(m_stabilization->stabilizationResetToDefaults, SIGNAL(clicked()), this, SLOT(resetToDefaults()));
+    connect(m_stabilization->stabilizationHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
 }
 
 ConfigStabilizationWidget::~ConfigStabilizationWidget()
@@ -195,21 +195,17 @@ void ConfigStabilizationWidget::updatePitchILimit(double val)
     }
 }
 
-
 /*******************************
  * Stabilization Settings
  *****************************/
 
 /**
-  Request stabilization settings from the board
+  * Refresh UI with new settings of StabilizationSettings object
+  * (either from active configuration or just loaded defaults
+  * to be applied or saved)
   */
-void ConfigStabilizationWidget::refreshWidgetsValues()
+void ConfigStabilizationWidget::refreshUIValues(StabilizationSettings::DataFields &stabData)
 {
-    bool dirty=isDirty();
-    // Not needed anymore as this slot is only called whenever we get
-    // a signal that the object was just updated
-    // stabSettings->requestUpdate();
-    StabilizationSettings::DataFields stabData = stabSettings->getData();
     // Now fill in all the fields, this is fairly tedious:
     m_stabilization->rateRollKp->setValue(stabData.RollRatePID[StabilizationSettings::ROLLRATEPID_KP]);
     m_stabilization->rateRollKi->setValue(stabData.RollRatePID[StabilizationSettings::ROLLRATEPID_KI]);
@@ -247,15 +243,25 @@ void ConfigStabilizationWidget::refreshWidgetsValues()
     m_stabilization->maximumPitch->setValue(stabData.MaximumRate[StabilizationSettings::MAXIMUMRATE_PITCH]);
     m_stabilization->maximumYaw->setValue(stabData.MaximumRate[StabilizationSettings::MAXIMUMRATE_YAW]);
     m_stabilization->lowThrottleZeroIntegral->setChecked(stabData.LowThrottleZeroIntegral==StabilizationSettings::LOWTHROTTLEZEROINTEGRAL_TRUE ? true : false);
-
-    setDirty(dirty);
 }
 
+/**
+  Request stabilization settings from the board
+  */
+void ConfigStabilizationWidget::refreshWidgetsValues()
+{
+    bool dirty=isDirty();
+    // Not needed anymore as this slot is only called whenever we get
+    // a signal that the object was just updated
+    // stabSettings->requestUpdate();
+    StabilizationSettings::DataFields stabData = stabSettings->getData();
+    refreshUIValues(stabData);
+    setDirty(dirty);
+}
 
 /**
   Send telemetry settings to the board
   */
-
 void ConfigStabilizationWidget::updateObjectsFromWidgets()
 {
     StabilizationSettings::DataFields stabData = stabSettings->getData();
@@ -298,7 +304,6 @@ void ConfigStabilizationWidget::updateObjectsFromWidgets()
 
     stabData.LowThrottleZeroIntegral = (m_stabilization->lowThrottleZeroIntegral->isChecked() ? StabilizationSettings::LOWTHROTTLEZEROINTEGRAL_TRUE :StabilizationSettings::LOWTHROTTLEZEROINTEGRAL_FALSE);
 
-
     stabSettings->setData(stabData); // this is atomic
 }
 
@@ -311,9 +316,16 @@ void ConfigStabilizationWidget::realtimeUpdateToggle(bool state)
     }
 }
 
-void ConfigStabilizationWidget::openHelp()
+void ConfigStabilizationWidget::resetToDefaults()
 {
-
-    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/Stabilization+panel", QUrl::StrictMode) );
+    StabilizationSettings stabDefaults;
+    StabilizationSettings::DataFields defaults = stabDefaults.getData();
+    bool dirty=isDirty();
+    refreshUIValues(defaults);
+    setDirty(dirty);
 }
 
+void ConfigStabilizationWidget::openHelp()
+{
+    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/Stabilization+panel", QUrl::StrictMode) );
+}

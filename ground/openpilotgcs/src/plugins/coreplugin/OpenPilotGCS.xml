@@ -995,7 +995,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <dFile>%%DATAPATH%%dials/default/lineardial-vertical.svg</dFile>
+          <dFile>%%DATAPATH%%dials/deluxe/lineardial-vertical.svg</dFile>
           <decimalPlaces>0</decimalPlaces>
           <factor>1</factor>
           <font>Andale Mono,12,-1,5,75,0,0,0,0,0</font>
@@ -1018,7 +1018,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <dFile>%%DATAPATH%%dials/default/lineardial-horizontal.svg</dFile>
+          <dFile>%%DATAPATH%%dials/deluxe/lineardial-horizontal.svg</dFile>
           <decimalPlaces>2</decimalPlaces>
           <factor>1</factor>
           <font>Andale Mono,8,-1,5,50,0,0,0,0,0</font>
@@ -1041,7 +1041,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <dFile>%%DATAPATH%%dials/default/lineardial-horizontal.svg</dFile>
+          <dFile>%%DATAPATH%%dials/deluxe/lineardial-horizontal.svg</dFile>
           <decimalPlaces>2</decimalPlaces>
           <factor>1</factor>
           <font>Andale Mono,6,-1,5,50,0,0,0,0,0</font>
@@ -1064,7 +1064,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <dFile>%%DATAPATH%%dials/default/lineardial-horizontal.svg</dFile>
+          <dFile>%%DATAPATH%%dials/deluxe/lineardial-horizontal.svg</dFile>
           <decimalPlaces>2</decimalPlaces>
           <factor>1</factor>
           <font>Andale Mono,8,-1,5,50,0,0,0,0,0</font>
@@ -1202,7 +1202,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <dFile>%%DATAPATH%%dials/default/lineardial-vertical.svg</dFile>
+          <dFile>%%DATAPATH%%dials/deluxe/lineardial-vertical.svg</dFile>
           <decimalPlaces>0</decimalPlaces>
           <factor>1</factor>
           <font>Andale Mono,12,-1,5,75,0,0,0,0,0</font>
@@ -1225,7 +1225,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <dFile>%%DATAPATH%%dials/default/lineardial-vertical.svg</dFile>
+          <dFile>%%DATAPATH%%dials/deluxe/lineardial-vertical.svg</dFile>
           <decimalPlaces>2</decimalPlaces>
           <factor>1</factor>
           <font>Andale Mono,12,-1,5,75,0,0,0,0,0</font>
@@ -1248,7 +1248,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <dFile>%%DATAPATH%%dials/default/lineardial-vertical.svg</dFile>
+          <dFile>%%DATAPATH%%dials/deluxe/lineardial-vertical.svg</dFile>
           <decimalPlaces>2</decimalPlaces>
           <factor>1</factor>
           <font>Andale Mono,12,-1,5,75,0,0,0,0,0</font>
@@ -1271,7 +1271,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <dFile>%%DATAPATH%%dials/default/lineardial-vertical.svg</dFile>
+          <dFile>%%DATAPATH%%dials/deluxe/lineardial-vertical.svg</dFile>
           <decimalPlaces>2</decimalPlaces>
           <factor>1</factor>
           <font>Andale Mono,12,-1,5,75,0,0,0,0,0</font>
@@ -1294,7 +1294,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <dFile>%%DATAPATH%%dials/default/lineardial-vertical.svg</dFile>
+          <dFile>%%DATAPATH%%dials/deluxe/lineardial-vertical.svg</dFile>
           <decimalPlaces>2</decimalPlaces>
           <factor>1</factor>
           <font>Andale Mono,12,-1,5,75,0,0,0,0,0</font>
@@ -1317,7 +1317,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <dFile>%%DATAPATH%%dials/default/lineardial-vertical.svg</dFile>
+          <dFile>%%DATAPATH%%dials/deluxe/lineardial-vertical.svg</dFile>
           <decimalPlaces>2</decimalPlaces>
           <factor>1</factor>
           <font>Andale Mono,12,-1,5,75,0,0,0,0,0</font>
@@ -1340,7 +1340,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <dFile>%%DATAPATH%%dials/default/lineardial-horizontal.svg</dFile>
+          <dFile>%%DATAPATH%%dials/deluxe/lineardial-horizontal.svg</dFile>
           <decimalPlaces>0</decimalPlaces>
           <factor>1</factor>
           <font>Andale Mono,12,-1,5,75,0,0,0,0,0</font>
@@ -1363,7 +1363,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <dFile>%%DATAPATH%%dials/default/lineardial-horizontal.svg</dFile>
+          <dFile>%%DATAPATH%%dials/deluxe/lineardial-horizontal.svg</dFile>
           <decimalPlaces>0</decimalPlaces>
           <factor>1</factor>
           <font>Andale Mono,12,-1,5,75,0,0,0,0,0</font>
@@ -1386,7 +1386,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <dFile>%%DATAPATH%%dials/default/lineardial-vertical.svg</dFile>
+          <dFile>%%DATAPATH%%dials/deluxe/lineardial-vertical.svg</dFile>
           <decimalPlaces>2</decimalPlaces>
           <factor>1</factor>
           <font>Andale Mono,12,-1,5,75,0,0,0,0,0</font>
@@ -1409,7 +1409,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <dFile>%%DATAPATH%%dials/default/lineardial-vertical.svg</dFile>
+          <dFile>%%DATAPATH%%dials/deluxe/lineardial-vertical.svg</dFile>
           <decimalPlaces>2</decimalPlaces>
           <factor>1</factor>
           <font>Andale Mono,12,-1,5,75,0,0,0,0,0</font>
@@ -1432,7 +1432,7 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <dFile>%%DATAPATH%%dials/default/lineardial-vertical.svg</dFile>
+          <dFile>%%DATAPATH%%dials/deluxe/lineardial-vertical.svg</dFile>
           <decimalPlaces>2</decimalPlaces>
           <factor>1</factor>
           <font>Andale Mono,12,-1,5,75,0,0,0,0,0</font>
@@ -1627,6 +1627,17 @@
           <enableVbo>false</enableVbo>
         </data>
       </Test__PCT__20Quad__PCT__20X>
+      <Ricoo>
+        <configInfo>
+          <locked>false</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <acFilename>%%DATAPATH%%models/multi/ricoo/ricoo.3DS</acFilename>
+          <bgFilename>%%DATAPATH%%models/backgrounds/default_background.png</bgFilename>
+          <enableVbo>false</enableVbo>
+        </data>
+      </Ricoo>
       <CopterControl>
         <configInfo>
           <locked>false</locked>

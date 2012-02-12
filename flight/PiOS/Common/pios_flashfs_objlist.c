@@ -56,8 +56,8 @@ struct fileHeader {
 } __attribute__((packed));
 
 
-#define OBJECT_TABLE_MAGIC 0x85FB3C35
-#define OBJ_MAGIC          0x3015AE71
+#define OBJECT_TABLE_MAGIC 0x85FB3D35
+#define OBJ_MAGIC          0x3015A371
 #define OBJECT_TABLE_START 0x00000010
 #define OBJECT_TABLE_END   0x00001000
 #define SECTOR_SIZE        0x00001000
@@ -81,7 +81,9 @@ int32_t PIOS_FLASHFS_Init()
 		if(object_table_magic != OBJECT_TABLE_MAGIC) {
 			if(magic_fail_count++ > MAX_BADMAGIC) {
 				PIOS_FLASHFS_ClearObjectTableHeader();
-				PIOS_LED_Toggle(LED1);
+#if defined(PIOS_LED_HEARTBEAT)
+				PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
+#endif	/* PIOS_LED_HEARTBEAT */
 				magic_fail_count = 0;
 				magic_good = true;
 			} else {

@@ -1,0 +1,18 @@
+    # OpenPilot Flight Control board
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="4117", MODE="0664", GROUP="plugdev"
+    # OpenPilot OP board
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="415a", MODE="0664", GROUP="plugdev"
+    # OpenPilot CopterControl flight control board
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="415b", MODE="0664", GROUP="plugdev"
+    # OpenPilot Pipx radio modem board
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="415c", MODE="0664", GROUP="plugdev"
+    # OpenPilot CopterControl3D flight control board
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="415d", MODE="0664", GROUP="plugdev"
+    # OpenPilot Revolution flight control board
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="415e", MODE="0664", GROUP="plugdev"
+    # unprogrammed openpilot flight control board
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="5750", MODE="0664", GROUP="plugdev"
+    # FTDI FT2232C Dual USB-UART/FIFO IC
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6010", MODE="0664", GROUP="plugdev"
+    # Olimex Ltd. OpenOCD JTAG TINY
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="15ba", ATTRS{idProduct}=="0004", MODE="0664", GROUP="plugdev"

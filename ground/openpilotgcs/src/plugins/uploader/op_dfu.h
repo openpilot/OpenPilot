@@ -4,6 +4,7 @@
 #include <QByteArray>
 #include <rawhid/pjrc_rawhid.h>
 #include <rawhid/usbmonitor.h>
+#include <rawhid/usbsignalfilter.h>
 #include <QDebug>
 #include <QFile>
 #include <QThread>
@@ -128,7 +129,7 @@ namespace OP_DFU {
         // Service commands:
         bool enterDFU(int const &devNumber);
         bool findDevices();
-        int JumpToApp();
+        int JumpToApp(bool);
         int ResetDevice(void);
         OP_DFU::Status StatusRequest();
         bool EndOperation();

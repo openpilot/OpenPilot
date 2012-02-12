@@ -32,10 +32,10 @@ __IO uint8_t bIntPackSOF = 0;	/* SOFs received between 2 consecutive packets */
 /* Private functions ---------------------------------------------------------*/
 /* function pointers to non-control endpoints service routines */
 void (*pEpInt_IN[7]) (void) = {
-PIOS_USB_HID_EP1_IN_Callback, EP2_IN_Callback, EP3_IN_Callback, EP4_IN_Callback, EP5_IN_Callback, EP6_IN_Callback, EP7_IN_Callback,};
+EP1_IN_Callback, EP2_IN_Callback, EP3_IN_Callback, EP4_IN_Callback, EP5_IN_Callback, EP6_IN_Callback, EP7_IN_Callback,};
 
 void (*pEpInt_OUT[7]) (void) = {
-PIOS_USB_HID_EP1_OUT_Callback, EP2_OUT_Callback, EP3_OUT_Callback, EP4_OUT_Callback, EP5_OUT_Callback, EP6_OUT_Callback, EP7_OUT_Callback,};
+EP1_OUT_Callback, EP2_OUT_Callback, EP3_OUT_Callback, EP4_OUT_Callback, EP5_OUT_Callback, EP6_OUT_Callback, EP7_OUT_Callback,};
 
 #ifndef STM32F10X_CL
 

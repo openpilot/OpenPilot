@@ -65,7 +65,8 @@ magic
 manual flight
 maxium
 meters
-minimum 
+minimum
+minus 
 mode
 moved
 MPH

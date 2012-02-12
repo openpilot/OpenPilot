@@ -299,7 +299,7 @@ void assert_failed(uint8_t * file, uint32_t line)
 #if defined(PIOS_LED_ALARM)
 	PIOS_LED_On(PIOS_LED_ALARM);
 #endif
-#if defiend(PIOS_LED_HEARTBEAT)
+#if defined(PIOS_LED_HEARTBEAT)
 	PIOS_LED_Off(PIOS_LED_HEARTBEAT);
 #endif
 

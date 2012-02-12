@@ -203,10 +203,9 @@ arm_sdk_clean:
 OPENOCD_DIR := $(TOOLS_DIR)/openocd
 
 .PHONY: openocd_install
+openocd_install: | $(DL_DIR) $(TOOLS_DIR)
 openocd_install: OPENOCD_URL  := http://sourceforge.net/projects/openocd/files/openocd/0.5.0/openocd-0.5.0.tar.bz2/download
 openocd_install: OPENOCD_FILE := openocd-0.5.0.tar.bz2
-# order-only prereq on directory existance:
-openocd_install: | $(DL_DIR) $(TOOLS_DIR)
 openocd_install: openocd_clean
         # download the source only if it's newer than what we already have
 	$(V1) wget -N -P "$(DL_DIR)" --trust-server-name "$(OPENOCD_URL)"
@@ -221,6 +220,44 @@ openocd_install: openocd_clean
 	$(V1) ( \
 	  cd $(DL_DIR)/openocd-build/openocd-0.5.0 ; \
 	  ./configure --prefix="$(OPENOCD_DIR)" --enable-ft2232_libftdi --enable-buspirate; \
+	  $(MAKE) --silent ; \
+	  $(MAKE) --silent install ; \
+	)
+
+        # delete the extracted source when we're done
+	$(V1) [ ! -d "$(DL_DIR)/openocd-build" ] || $(RM) -rf "$(DL_DIR)/openocd-build"
+
+.PHONY: openocd_git_install
+
+openocd_git_install: | $(DL_DIR) $(TOOLS_DIR)
+openocd_git_install: OPENOCD_URL  := git://openocd.git.sourceforge.net/gitroot/openocd/openocd
+openocd_git_install: OPENOCD_REV  := bce7009e31b23250d4325637c7b7cdbae0efed9a
+openocd_git_install: openocd_clean
+        # download the source
+	$(V0) @echo " DOWNLOAD     $(OPENOCD_URL) @ $(OPENOCD_REV)"
+	$(V1) [ ! -d "$(DL_DIR)/openocd-build" ] || $(RM) -rf "$(DL_DIR)/openocd-build"
+	$(V1) mkdir -p "$(DL_DIR)/openocd-build"
+	$(V1) git clone --depth 1 --no-checkout $(OPENOCD_URL) "$(DL_DIR)/openocd-build"
+	$(V1) ( \
+	  cd $(DL_DIR)/openocd-build ; \
+	  git checkout -q $(OPENOCD_REV) ; \
+	)
+
+        # apply patches
+	$(V0) @echo " PATCH        $(OPENOCD_DIR)"
+	$(V1) ( \
+	  cd $(DL_DIR)/openocd-build ; \
+	  git apply < $(ROOT_DIR)/flight/Project/OpenOCD/0001-armv7m-remove-dummy-FP-regs-for-new-gdb.patch ; \
+	  git apply < $(ROOT_DIR)/flight/Project/OpenOCD/0002-rtos-add-stm32_stlink-to-FreeRTOS-targets.patch ; \
+	)
+
+        # build and install
+	$(V0) @echo " BUILD        $(OPENOCD_DIR)"
+	$(V1) mkdir -p "$(OPENOCD_DIR)"
+	$(V1) ( \
+	  cd $(DL_DIR)/openocd-build ; \
+	  ./bootstrap ; \
+	  ./configure --enable-maintainer-mode --prefix="$(OPENOCD_DIR)" --enable-ft2232_libftdi --enable-buspirate --enable-stlink ; \
 	  $(MAKE) ; \
 	  $(MAKE) install ; \
 	)
@@ -230,6 +267,7 @@ openocd_install: openocd_clean
 
 .PHONY: openocd_clean
 openocd_clean:
+	$(V0) @echo " CLEAN        $(OPENOCD_DIR)"
 	$(V1) [ ! -d "$(OPENOCD_DIR)" ] || $(RM) -r "$(OPENOCD_DIR)"
 
 STM32FLASH_DIR := $(TOOLS_DIR)/stm32flash
@@ -453,16 +491,38 @@ bu_$(1)_clean:
 endef
 
 # $(1) = Canonical board name all in lower case (e.g. coptercontrol)
+define EF_TEMPLATE
+.PHONY: ef_$(1)
+ef_$(1): ef_$(1)_bin
+
+ef_$(1)_%: bl_$(1)_bin fw_$(1)_bin
+	$(V1) mkdir -p $(BUILD_DIR)/ef_$(1)/dep
+	$(V1) cd $(ROOT_DIR)/flight/EntireFlash && \
+		$$(MAKE) -r --no-print-directory \
+		BOARD_NAME=$(1) \
+		TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
+		DFU_CMD="$(DFUUTIL_DIR)/bin/dfu-util" \
+		$$*
+
+.PHONY: ef_$(1)_clean
+ef_$(1)_clean:
+	$(V0) @echo " CLEAN      $$@"
+	$(V1) $(RM) -fr $(BUILD_DIR)/ef_$(1)
+endef
+
+# $(1) = Canonical board name all in lower case (e.g. coptercontrol)
 define BOARD_PHONY_TEMPLATE
 .PHONY: all_$(1)
 all_$(1): $$(filter fw_$(1), $$(FW_TARGETS))
 all_$(1): $$(filter bl_$(1), $$(BL_TARGETS))
 all_$(1): $$(filter bu_$(1), $$(BU_TARGETS))
+all_$(1): $$(filter ef_$(1), $$(EF_TARGETS))
 
 .PHONY: all_$(1)_clean
 all_$(1)_clean: $$(addsuffix _clean, $$(filter fw_$(1), $$(FW_TARGETS)))
 all_$(1)_clean: $$(addsuffix _clean, $$(filter bl_$(1), $$(BL_TARGETS)))
 all_$(1)_clean: $$(addsuffix _clean, $$(filter bu_$(1), $$(BU_TARGETS)))
+all_$(1)_clean: $$(addsuffix _clean, $$(filter ef_$(1), $$(EF_TARGETS)))
 endef
 
 ALL_BOARDS := coptercontrol pipxtreme revolution
@@ -476,6 +536,7 @@ revolution_friendly    := Revolution
 FW_BOARDS  := $(ALL_BOARDS)
 BL_BOARDS  := $(ALL_BOARDS)
 BU_BOARDS  := $(ALL_BOARDS)
+EF_BOARDS  := $(ALL_BOARDS)
 
 # FIXME: The INS build doesn't have a bootloader or bootloader
 #        updater yet so we need to filter them out to prevent errors.
@@ -486,6 +547,7 @@ BU_BOARDS  := $(filter-out ins, $(ALL_BOARDS))
 FW_TARGETS := $(addprefix fw_, $(FW_BOARDS))
 BL_TARGETS := $(addprefix bl_, $(BL_BOARDS))
 BU_TARGETS := $(addprefix bu_, $(BU_BOARDS))
+EF_TARGETS := $(addprefix ef_, $(EF_BOARDS))
 
 .PHONY: all_fw all_fw_clean
 all_fw:        $(addsuffix _opfw,  $(FW_TARGETS))
@@ -499,9 +561,13 @@ all_bl_clean:  $(addsuffix _clean, $(BL_TARGETS))
 all_bu:        $(addsuffix _opfw,  $(BU_TARGETS))
 all_bu_clean:  $(addsuffix _clean, $(BU_TARGETS))
 
+.PHONY: all_ef all_ef_clean
+all_ef:        $(EF_TARGETS))
+all_ef_clean:  $(addsuffix _clean, $(EF_TARGETS))
+
 .PHONY: all_flight all_flight_clean
-all_flight:       all_fw all_bl all_bu
-all_flight_clean: all_fw_clean all_bl_clean all_bu_clean
+all_flight:       all_fw all_bl all_bu all_ef
+all_flight_clean: all_fw_clean all_bl_clean all_bu_clean all_ef_clean
 
 # Expand the groups of targets for each board
 $(foreach board, $(ALL_BOARDS), $(eval $(call BOARD_PHONY_TEMPLATE,$(board))))
@@ -514,6 +580,9 @@ $(foreach board, $(ALL_BOARDS), $(eval $(call FW_TEMPLATE,$(board),$($(board)_fr
 
 # Expand the bootloader rules
 $(foreach board, $(ALL_BOARDS), $(eval $(call BL_TEMPLATE,$(board),$($(board)_friendly))))
+
+# Expand the entire-flash rules
+$(foreach board, $(ALL_BOARDS), $(eval $(call EF_TEMPLATE,$(board),$($(board)_friendly))))
 
 .PHONY: sim_posix
 sim_posix: sim_posix_elf

@@ -68,6 +68,7 @@ SECTIONS
     {
 		. = ALIGN(4);
 		KEEP(*(.boardinfo))
+		. = ALIGN(ORIGIN(BD_INFO)+LENGTH(BD_INFO));
 	} > BD_INFO
 
     /*

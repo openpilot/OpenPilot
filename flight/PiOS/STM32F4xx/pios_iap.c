@@ -68,19 +68,17 @@
  */
 void PIOS_IAP_Init( void )
 {
-#if 0
 	/* Enable CRC clock */
-	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_CRC, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_CRC, ENABLE);
 
 	/* Enable PWR and BKP clock */
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR | RCC_APB1Periph_BKP, ENABLE);
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR | RCC_AHB1Periph_BKPSRAM, ENABLE);
 
 	/* Enable write access to Backup domain */
 	PWR_BackupAccessCmd(ENABLE);
 
 	/* Clear Tamper pin Event(TE) pending flag */
-	RTC_ClearFlag();
-#endif
+	RTC_ClearFlag(RTC_FLAG_TAMP1F);
 }
 
 /*!
@@ -93,8 +91,7 @@ void PIOS_IAP_Init( void )
  */
 uint32_t	PIOS_IAP_CheckRequest( void )
 {
-#if 0	
-	uint32_t	retval = FALSE;
+	uint32_t	retval = false;
 	uint16_t	reg1;
 	uint16_t	reg2;
 
@@ -103,13 +100,11 @@ uint32_t	PIOS_IAP_CheckRequest( void )
 
 	if( reg1 == IAP_MAGIC_WORD_1 && reg2 == IAP_MAGIC_WORD_2 ) {
 		// We have a match.
-		retval = TRUE;
+		retval = true;
 	} else {
-		retval = FALSE;
+		retval = false;
 	}
 	return retval;
-#endif
-	return 0;
 }
 
 
@@ -122,24 +117,18 @@ uint32_t	PIOS_IAP_CheckRequest( void )
  */
 void	PIOS_IAP_SetRequest1(void)
 {
-#if 0
 	RTC_WriteBackupRegister( MAGIC_REG_1, IAP_MAGIC_WORD_1);
-#endif
 }
 
 void	PIOS_IAP_SetRequest2(void)
 {
-#if 0
 	RTC_WriteBackupRegister( MAGIC_REG_2, IAP_MAGIC_WORD_2);
-#endif
 }
 
 void	PIOS_IAP_ClearRequest(void)
 {
-#if 0
 	RTC_WriteBackupRegister( MAGIC_REG_1, 0);
 	RTC_WriteBackupRegister( MAGIC_REG_2, 0);
-#endif
 }
 
 uint16_t PIOS_IAP_ReadBootCount(void)

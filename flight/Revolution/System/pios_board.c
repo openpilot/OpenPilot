@@ -328,7 +328,7 @@ void PIOS_Board_Init(void) {
 #if defined(PIOS_INCLUDE_GPS)
 
 	uint32_t pios_usart_gps_id;
-	if (PIOS_USART_Init(&pios_usart_gps_id, &pios_usart_telem_main_cfg)) {
+	if (PIOS_USART_Init(&pios_usart_gps_id, &pios_usart_gps_cfg)) {
 		PIOS_Assert(0);
 	}
 	
@@ -339,7 +339,6 @@ void PIOS_Board_Init(void) {
 					  NULL, 0)) {
 		PIOS_Assert(0);
 	}
-
 #endif	/* PIOS_INCLUDE_GPS */
 	
 #if defined(PIOS_INCLUDE_COM_AUX)
@@ -369,7 +368,7 @@ void PIOS_Board_Init(void) {
 #if defined(PIOS_INCLUDE_COM_TELEM)
 	{ /* Eventually add switch for this port function */
 		uint32_t pios_usart_telem_rf_id;
-		if (PIOS_USART_Init(&pios_usart_telem_rf_id, &pios_usart_gps_cfg)) {
+		if (PIOS_USART_Init(&pios_usart_telem_rf_id, &pios_usart_telem_main_cfg)) {
 			PIOS_Assert(0);
 		}
 		

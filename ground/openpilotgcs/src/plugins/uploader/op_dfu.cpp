@@ -37,6 +37,7 @@ DFUObject::DFUObject(bool _debug,bool _use_serial,QString portname):
     debug(_debug),use_serial(_use_serial),mready(true)
 {
     info = NULL;
+    numberOfDevices = 0;
 
     qRegisterMetaType<OP_DFU::Status>("Status");
 

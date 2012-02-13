@@ -30,9 +30,6 @@
           <property name="text">
            <string/>
           </property>
-          <property name="pixmap">
-           <pixmap resource="configgadget.qrc">:/configgadget/images/coptercontrol.svg</pixmap>
-          </property>
           <property name="scaledContents">
            <bool>true</bool>
           </property>
@@ -300,7 +297,6 @@ Beware of not locking yourself out!</string>
   </layout>
  </widget>
  <resources>
-  <include location="configgadget.qrc"/>
   <include location="../coreplugin/core.qrc"/>
  </resources>
  <connections/>

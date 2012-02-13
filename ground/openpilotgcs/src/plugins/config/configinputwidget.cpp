@@ -41,8 +41,8 @@
 #include <utils/stylehelper.h>
 #include <QMessageBox>
 
-#define ACCESS_MIN_MOVE -6
-#define ACCESS_MAX_MOVE 6
+#define ACCESS_MIN_MOVE -3
+#define ACCESS_MAX_MOVE 3
 #define STICK_MIN_MOVE -8
 #define STICK_MAX_MOVE 8
 
@@ -108,7 +108,7 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
     m_renderer = new QSvgRenderer();
     QGraphicsScene *l_scene = m_config->graphicsView->scene();
     m_config->graphicsView->setBackgroundBrush(QBrush(Utils::StyleHelper::baseColor()));
-    if (QFile::exists(":/configgadget/images/TX.svg") && m_renderer->load(QString(":/configgadget/images/TX.svg")) && m_renderer->isValid())
+    if (QFile::exists(":/configgadget/images/TX2.svg") && m_renderer->load(QString(":/configgadget/images/TX2.svg")) && m_renderer->isValid())
     {
         l_scene->clear(); // Deletes all items contained in the scene as well.
 
@@ -401,6 +401,7 @@ void ConfigInputWidget::wizardSetUpStep(enum wizardSteps step)
     case wizardChooseMode:
     {
         m_config->graphicsView->setVisible(true);
+        m_config->graphicsView->fitInView(m_txBackground, Qt::KeepAspectRatio );
         setTxMovement(nothing);
         m_config->wzText->setText(tr("Please choose your transmiter type.\n"
                                      "Mode 1 means your throttle stick is on the right\n"
@@ -718,7 +719,7 @@ void ConfigInputWidget::identifyControls()
     m_config->wzText->clear();
     setTxMovement(nothing);
 
-    QTimer::singleShot(500, this, SLOT(wzNext()));
+    QTimer::singleShot(2500, this, SLOT(wzNext()));
 }
 
 void ConfigInputWidget::identifyLimits()

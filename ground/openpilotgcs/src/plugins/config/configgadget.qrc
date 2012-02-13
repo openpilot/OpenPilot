@@ -16,6 +16,7 @@
         <file>images/hw_config.png</file>
         <file>images/gyroscope.png</file>
         <file>images/TX.svg</file>
+        <file>images/TX2.svg</file>
         <file>images/camera.png</file>
         <file>images/txpid.png</file>
     </qresource>

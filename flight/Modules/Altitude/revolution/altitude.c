@@ -133,12 +133,12 @@ static void altitudeTask(void *parameters)
 		
 		// Update the temperature data
 		PIOS_MS5611_StartADC(TemperatureConv);
-		vTaskDelay(5);
+		vTaskDelay(PIOS_MS5611_GetDelay());
 		PIOS_MS5611_ReadADC();
 		
 		// Update the pressure data
 		PIOS_MS5611_StartADC(PressureConv);
-		vTaskDelay(5);
+		vTaskDelay(PIOS_MS5611_GetDelay());
 		PIOS_MS5611_ReadADC();
 
 		

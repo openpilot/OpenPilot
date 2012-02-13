@@ -58,6 +58,14 @@ struct pios_ms5611_cfg {
 	uint32_t oversampling;
 };
 
+enum pios_ms5611_osr {
+	MS5611_OSR_256   = 0,
+	MS5611_OSR_512   = 2,
+	MS5611_OSR_1024  = 4,
+	MS5611_OSR_2048  = 6,
+	MS5611_OSR_4096  = 8,
+};
+
 /* Public Functions */
 extern void PIOS_MS5611_Init(const struct pios_ms5611_cfg * cfg, int32_t i2c_device);
 extern int32_t PIOS_MS5611_StartADC(ConversionTypeTypeDef Type);
@@ -65,6 +73,7 @@ extern int32_t PIOS_MS5611_ReadADC(void);
 extern float PIOS_MS5611_GetTemperature(void);
 extern float PIOS_MS5611_GetPressure(void);
 extern int32_t PIOS_MS5611_Test();
+extern int32_t PIOS_MS5611_GetDelay();
 
 #endif /* PIOS_MS5611_H */
 

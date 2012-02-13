@@ -45,10 +45,10 @@ MS5611CalibDataTypeDef CalibData;
 /* Straight from the datasheet */
 static int32_t X1, X2, X3, B3, B5, B6, P;
 static uint32_t B4, B7;
-static volatile uint32_t RawTemperature;
-static volatile uint32_t RawPressure;
-static volatile int64_t Pressure;
-static volatile int64_t Temperature;
+static uint32_t RawTemperature;
+static uint32_t RawPressure;
+static int64_t Pressure;
+static int64_t Temperature;
 
 static int32_t PIOS_MS5611_Read(uint8_t address, uint8_t * buffer, uint8_t len);
 static int32_t PIOS_MS5611_WriteCommand(uint8_t command);
@@ -58,9 +58,11 @@ static uint32_t oversampling;
 static const struct pios_ms5611_cfg * dev_cfg;
 static int32_t i2c_id;
 
+static enum pios_ms5611_osr osr = MS5611_OSR_256;
+
 /**
-* Initialise the BMP085 sensor
-*/
+ * Initialise the MS5611 sensor
+ */
 int32_t ms5611_read_flag;
 void PIOS_MS5611_Init(const struct pios_ms5611_cfg * cfg, int32_t i2c_device)
 {
@@ -90,10 +92,10 @@ int32_t PIOS_MS5611_StartADC(ConversionTypeTypeDef Type)
 {
 	/* Start the conversion */
 	if (Type == TemperatureConv) {
-		while (PIOS_MS5611_WriteCommand(MS5611_TEMP_ADDR) != 0)
+		while (PIOS_MS5611_WriteCommand(MS5611_TEMP_ADDR + osr) != 0)
 			continue;
 	} else if (Type == PressureConv) {
-		while (PIOS_MS5611_WriteCommand(MS5611_PRES_ADDR) != 0)
+		while (PIOS_MS5611_WriteCommand(MS5611_PRES_ADDR + osr) != 0)
 			continue;
 	}
 
@@ -103,20 +105,38 @@ int32_t PIOS_MS5611_StartADC(ConversionTypeTypeDef Type)
 }
 
 /**
+ * @brief Return the delay for the current osr
+ */
+int32_t PIOS_MS5611_GetDelay() {
+	switch(osr) {
+		case MS5611_OSR_256:
+			return 2;
+		case MS5611_OSR_512:
+			return 2;
+		case MS5611_OSR_1024:
+			return 3;
+		case MS5611_OSR_2048:
+			return 5;
+		case MS5611_OSR_4096:
+			return 10;
+		default:
+			break;
+	}
+	return 10;
+}
+/**
 * Read the ADC conversion value (once ADC conversion has completed)
 * \param[in] PresOrTemp BMP085_PRES_ADDR or BMP085_TEMP_ADDR
 * \return 0 if successfully read the ADC, -1 if failed
 */
-volatile int64_t Offset;
-volatile int64_t Sens;
-volatile int64_t deltaTemp;
-
 int32_t PIOS_MS5611_ReadADC(void)
 {
 	uint8_t Data[3];
 	Data[0] = 0;
 	Data[1] = 0;
 	Data[2] = 0;
+	
+	static int64_t deltaTemp;
 
 	/* Read and store the 16bit result */
 	if (CurrentRead == TemperatureConv) {
@@ -128,9 +148,10 @@ int32_t PIOS_MS5611_ReadADC(void)
 		
 		deltaTemp = RawTemperature - (CalibData.C[4] << 8);
 		Temperature = ((2000l + deltaTemp * CalibData.C[5]) >> 23);
-//		Temperature /= 100.0f;
 
 	} else {	
+		int64_t Offset;
+		int64_t Sens;
 
 		/* Read the pressure conversion */
 		if (PIOS_MS5611_Read(MS5611_ADC_READ, Data, 3) != 0)
@@ -142,7 +163,6 @@ int32_t PIOS_MS5611_ReadADC(void)
 		Sens = Sens + ((((int64_t) CalibData.C[2]) * deltaTemp) >> 8);
 		
 		Pressure = (((((int64_t) RawPressure) * Sens) >> 21) - Offset) >> 15; 
-//		Pressure /= 1000.0f;
 	}
 	return 0;
 }

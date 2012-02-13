@@ -134,6 +134,7 @@ namespace rtslam {
 				RawInfo info;
 				double oldest_timestamp = -1;
 				result.no_more_data = true;
+				bool wait_data = false;
 				
 				if (!all_init)
 				{
@@ -153,13 +154,15 @@ namespace rtslam {
 					for (RobotAbstract::SensorList::iterator senIter = (*robIter)->sensorList().begin();
 						senIter != (*robIter)->sensorList().end(); ++senIter)
 					{
-						int missed = (*senIter)->queryNextAvailableRaw(info);
-						if (missed != -2) result.no_more_data = false;
-						if (missed == 0 && (oldest_timestamp < 0 || info.timestamp < oldest_timestamp))
+						int status = (*senIter)->queryNextAvailableRaw(info);
+						if (status == -1) wait_data = true;
+						if (status != -2) result.no_more_data = false;
+						if (status == 0 && (oldest_timestamp < 0 || info.timestamp < oldest_timestamp))
 							{ result.id = info.id; result.sen = (*senIter); oldest_timestamp = info.timestamp; }
 					}
 				}
 				
+				if (wait_data == true) result.sen.reset();
 				return result;
 			}
 		

@@ -46,7 +46,7 @@ namespace hardware {
 				f >> reading.data;
 				boost::unique_lock<boost::mutex> l(mutex_data);
 				if (isFull(true)) cond_offline_full.notify_all();
-				if (f.eof()) { cond_offline_full.notify_all(); f.close(); return; }
+				if (f.eof()) { no_more_data = true; cond_offline_full.notify_all(); f.close(); return; }
 				while (isFull(true)) cond_offline_freed.wait(l);
 				
 			} else

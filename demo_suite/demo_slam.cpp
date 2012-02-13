@@ -1065,7 +1065,7 @@ void demo_slam_init()
 		senPtr13->setId();
 		senPtr13->linkToParentRobot(robPtr1);
 		hardware::hardware_sensorprop_ptr_t hardGps;
-		bool inits = true;
+		bool init = true;
 		switch (intOpts[iGps])
 		{
 			case 1:
@@ -1074,15 +1074,15 @@ void demo_slam_init()
 				hardGps.reset(new hardware::HardwareSensorGpsGenom(rawdata_condition, 200, "mana-base", mode, strOpts[sDataPath])); // TODO ask to ignore vel
 			case 3:
 				hardGps.reset(new hardware::HardwareSensorMocap(rawdata_condition, 200, mode, strOpts[sDataPath]));
-				inits = false;
+				init = false;
 		}
 
 		hardGps->setSyncConfig(configSetup.GPS_TIMESTAMP_CORRECTION);
 		hardGps->setTimingInfos(1.0/20.0, 1.5/20.0);
 		senPtr13->setHardwareSensor(hardGps);
 		senPtr13->setIntegrationPolicy(true);
-		senPtr13->setUseForInit(inits);
-		senPtr13->setNeedInit(inits);
+		senPtr13->setUseForInit(true);
+		senPtr13->setNeedInit(init);
 		senPtr13->setPose(configSetup.GPS_POSE[0], configSetup.GPS_POSE[1], configSetup.GPS_POSE[2],
 											configSetup.GPS_POSE[3], configSetup.GPS_POSE[4], configSetup.GPS_POSE[5]); // x,y,z,roll,pitch,yaw
 		//hardGps->start();

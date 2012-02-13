@@ -137,14 +137,14 @@ bool UAVObjectGeneratorMatlab::process_object(ObjectInfo* info)
     matlabSwitchCode.append("\t\t\t\tFieldNames= fieldnames(" + objectTableName +");\n");
     matlabSwitchCode.append("\t\t\t\tfor i=1:length(FieldNames) %Grow structure\n");
     matlabSwitchCode.append("\t\t\t\t\t" + objectTableName + ".(FieldNames{i})(:," + tableIdxName + "*2+1) = 0;\n");
-    matlabSwitchCode.append("\t\t\t\tend;\n");
+    matlabSwitchCode.append("\t\t\t\tend\n");
     matlabSwitchCode.append("\t\t\tend\n");
 	
 	
     //============================================================//
     // Generate 'Cleanup:' code (will replace the $(CLEANUP) tag) //
     //============================================================//
-    matlabCleanupCode.append(objectTableName + "=PruneStructOfArrays(" + objectTableName + "," + tableIdxName +");  %#ok<NASGU>\n" );
+    matlabCleanupCode.append(objectTableName + "=PruneStructOfArrays(" + objectTableName + "," + tableIdxName +");\n" );
 
 	
     //========================================================================//

@@ -46,19 +46,11 @@
 // Private constants
 #define STACK_SIZE_BYTES 500
 #define TASK_PRIORITY (tskIDLE_PRIORITY+1)
-//#define UPDATE_PERIOD 100
-#define UPDATE_PERIOD 25
 
 // Private types
 
 // Private variables
 static xTaskHandle taskHandle;
-
-// down sampling variables
-#define alt_ds_size    4
-static int32_t alt_ds_temp = 0;
-static int32_t alt_ds_pres = 0;
-static int alt_ds_count = 0;
 
 // Private functions
 static void altitudeTask(void *parameters);
@@ -88,11 +80,6 @@ int32_t AltitudeInitialize()
 {
 	BaroAltitudeInitialize();
 
-	// init down-sampling data
-	alt_ds_temp = 0;
-	alt_ds_pres = 0;
-	alt_ds_count = 0;
-	
 	return 0;
 }
 MODULE_INITCALL(AltitudeInitialize, AltitudeStart)

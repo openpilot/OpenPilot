@@ -47,6 +47,38 @@ QWidget *SerialPluginOptionsPage::createPage(QWidget *parent)
     QWidget *optionsPageWidget = new QWidget;
     //main layout
     options_page->setupUi(optionsPageWidget);
+    QStringList allowedSpeeds;
+    allowedSpeeds<<"1200"
+#ifdef Q_OS_UNIX
+                 <<"1800"              //POSIX ONLY
+#endif
+                 <<"2400"
+                 <<"4800"
+                 <<"9600"
+#ifdef Q_OS_WIN
+                 <<"14400"             //WINDOWS ONLY
+#endif
+                 <<"19200"
+                 <<"38400"
+#ifdef Q_OS_WIN
+                 <<"56000"             //WINDOWS ONLY
+#endif
+                 <<"57600"
+#ifdef Q_OS_UNIX
+                 <<"76800"             //POSIX ONLY
+#endif
+                 <<"115200"
+#ifdef Q_OS_WIN
+                 <<"128000"            //WINDOWS ONLY
+                 <<"230400"            //WINDOWS ONLY
+                 <<"256000"            //WINDOWS ONLY
+                 <<"460800"            //WINDOWS ONLY
+                 <<"921600"            //WINDOWS ONLY
+#endif
+                   ;
+
+
+    options_page->cb_speed->addItems(allowedSpeeds);
     options_page->cb_speed->setCurrentIndex(options_page->cb_speed->findText(m_config->speed()));
     return optionsPageWidget;
 }

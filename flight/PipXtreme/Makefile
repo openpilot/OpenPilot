@@ -75,7 +75,7 @@ endif
 CMSISDIR  = $(STMLIBDIR)/CMSIS/Core/CM3
 BOOT = ../Bootloaders/AHRS
 BOOTINC = $(BOOT)/inc
-
+HWDEFSINC = ../board_hw_defs/$(BOARD_NAME)
 
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files
@@ -200,6 +200,7 @@ ifeq ($(USE_USB), YES)
 endif
 EXTRAINCDIRS  += $(CMSISDIR)
 EXTRAINCDIRS  += $(BOOTINC)
+EXTRAINCDIRS  += $(HWDEFSINC)
 
 # List any extra directories to look for library files here.
 # Also add directories where the linker should search for

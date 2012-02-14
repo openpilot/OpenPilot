@@ -98,8 +98,6 @@ uint8_t processRX();
 void jump_to_app();
 uint32_t sspTimeSource();
 
-#define BLUE LED1
-#define RED	LED2
 #define LED_PWM_TIMER	TIM6
 int main() {
 	PIOS_SYS_Init();
@@ -159,7 +157,7 @@ int main() {
 		case DFUidle:
 			period1 = 50;
 			sweep_steps1 = 100;
-			PIOS_LED_Off(RED);
+			PIOS_LED_Off(PIOS_LED_ALARM);
 			period2 = 0;
 			break;
 		case uploading:
@@ -171,12 +169,12 @@ int main() {
 		case downloading:
 			period1 = 25;
 			sweep_steps1 = 50;
-			PIOS_LED_Off(RED);
+			PIOS_LED_Off(PIOS_LED_ALARM);
 			period2 = 0;
 			break;
 		case BLidle:
 			period1 = 0;
-			PIOS_LED_On(BLUE);
+			PIOS_LED_On(PIOS_LED_HEARTBEAT);
 			period2 = 0;
 			break;
 		default://error
@@ -188,19 +186,19 @@ int main() {
 
 		if (period1 != 0) {
 			if (LedPWM(period1, sweep_steps1, STOPWATCH_ValueGet(LED_PWM_TIMER)))
-				PIOS_LED_On(BLUE);
+				PIOS_LED_On(PIOS_LED_HEARTBEAT);
 			else
-				PIOS_LED_Off(BLUE);
+				PIOS_LED_Off(PIOS_LED_HEARTBEAT);
 		} else
-			PIOS_LED_On(BLUE);
+			PIOS_LED_On(PIOS_LED_HEARTBEAT);
 
 		if (period2 != 0) {
 			if (LedPWM(period2, sweep_steps2, STOPWATCH_ValueGet(LED_PWM_TIMER)))
-				PIOS_LED_On(RED);
+				PIOS_LED_On(PIOS_LED_ALARM);
 			else
-				PIOS_LED_Off(RED);
+				PIOS_LED_Off(PIOS_LED_ALARM);
 		} else
-			PIOS_LED_Off(RED);
+			PIOS_LED_Off(PIOS_LED_ALARM);
 
 		if (STOPWATCH_ValueGet(LED_PWM_TIMER) > 100 * 50 * 100)
 			STOPWATCH_Reset(LED_PWM_TIMER);

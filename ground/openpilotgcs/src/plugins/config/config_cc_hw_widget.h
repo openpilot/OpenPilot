@@ -50,6 +50,7 @@ private slots:
 
 private:
     Ui_CC_HW_Widget *m_telemetry;
+    QSvgRenderer *m_renderer;
 };
 
 #endif // CONFIGCCHWWIDGET_H

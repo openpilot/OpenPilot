@@ -79,6 +79,54 @@ struct overosync {
 
 struct overosync *overosync;
 
+static void PIOS_OVERO_IRQHandler();
+
+static const struct pios_exti_cfg pios_exti_overo_cfg __exti_config = {
+	.vector = PIOS_OVERO_IRQHandler,
+	.line = EXTI_Line15,
+	.pin = {
+		.gpio = GPIOA,
+		.init = {
+			.GPIO_Pin = GPIO_Pin_15,
+			.GPIO_Speed = GPIO_Speed_100MHz,
+			.GPIO_Mode = GPIO_Mode_IN,
+			.GPIO_OType = GPIO_OType_OD,
+			.GPIO_PuPd = GPIO_PuPd_NOPULL,
+		},
+	},
+	.irq = {
+		.init = {
+			.NVIC_IRQChannel = EXTI15_10_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
+			.NVIC_IRQChannelSubPriority = 0,
+			.NVIC_IRQChannelCmd = ENABLE,
+		},
+	},
+	.exti = {
+		.init = {
+			.EXTI_Line = EXTI_Line15, // matches above GPIO pin
+			.EXTI_Mode = EXTI_Mode_Interrupt,
+			.EXTI_Trigger = EXTI_Trigger_Rising,
+			.EXTI_LineCmd = ENABLE,
+		},
+	},
+};
+
+/**
+ * On the rising edge of NSS schedule a new transaction.  This cannot be
+ * done by the DMA complete because there is 150 us between that and the
+ * Overo deasserting the CS line.  We don't want to spin that long in an
+ * isr
+ */
+int32_t failed_overo_start;
+void PIOS_OVERO_IRQHandler()
+{
+	// transmitData must not block to get semaphore for when we get out of
+	// frame and transaction is still running here
+	if(transmitData() == -1)
+		failed_overo_start++;
+}
+
 /**
  * Initialise the telemetry module
  * \return -1 if initialisation failed
@@ -91,6 +139,7 @@ int32_t OveroSyncInitialize(void)
 	
 	OveroSyncStatsInitialize();
 
+	PIOS_EXTI_Init(&pios_exti_overo_cfg);
 	// Create object queues
 	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
 
@@ -155,7 +204,6 @@ static void registerObject(UAVObjHandle obj)
 	UAVObjConnectQueue(obj, queue, eventMask);
 }
 
-
 int32_t overosync_transfers = 0;
 /**
  * Telemetry transmit task, regular priority
@@ -176,8 +224,6 @@ static void overoSyncTask(void *parameters)
 	overosync->failed_objects = 0;
 	overosync->received_objects = 0;
 	
-	transmitData();
-	
 	portTickType lastUpdateTime = xTaskGetTickCount();
 	portTickType updateTime;
 	
@@ -187,9 +233,6 @@ static void overoSyncTask(void *parameters)
 		if (xQueueReceive(queue, &ev, portMAX_DELAY) == pdTRUE) {
 			// Process event.  This calls transmitData
 			UAVTalkSendObject(uavTalkCon, ev.obj, ev.instId, false, 0);
-			
-			//if(overosync->transaction_done)
-			//	transmitData();
 
 			updateTime = xTaskGetTickCount();
 			if(((portTickType) (updateTime - lastUpdateTime)) > 1000) {
@@ -211,6 +254,7 @@ static void overoSyncTask(void *parameters)
 }
 
 int32_t transactionsDone = 0;
+int32_t reschedule_failed = 0;
 static void transmitDataDone(bool crc_ok, uint8_t crc_val)
 {
 	uint8_t *rx_buffer;
@@ -226,8 +270,6 @@ static void transmitDataDone(bool crc_ok, uint8_t crc_val)
 	portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 
 	overosync->transaction_done = true;
-
-	transmitData();
 	
 	// Parse the data from overo
 	for (uint32_t i = 0; rx_buffer[0] != 0 && i < sizeof(rx_buffer) ; i++)
@@ -273,13 +315,26 @@ static int32_t packData(uint8_t * data, int32_t length)
 	return length;
 }
 
+int32_t failed_buffer_lock;
 static int32_t transmitData()
 {
 	uint8_t *tx_buffer, *rx_buffer;
+	static signed portBASE_TYPE xHigherPriorityTaskWoken;
+
+	// Get this lock first so we don't swap buffers and then fail
+	// to start
+	if (xSemaphoreTake(overosync->transaction_lock, 0) == pdFALSE)
+		return -1;
+	
+	transactionsStarted++;
 
 	// Get lock to manipulate buffers
-	/*if(xSemaphoreTake(overosync->buffer_lock, 1) == pdFALSE)
-		return -1;*/
+	if(xSemaphoreTake(overosync->buffer_lock, 0) == pdFALSE) {
+		xSemaphoreGiveFromISR(overosync->transaction_lock, &xHigherPriorityTaskWoken);
+		portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
+		failed_buffer_lock++;
+		return -1;
+	}
 
 	overosync->transaction_done = false;
 
@@ -296,10 +351,8 @@ static int32_t transmitData()
 		   sizeof(overosync->transactions[overosync->loading_transaction_id].tx_buffer));
 	overosync->write_pointer = 0;
 
-	//xSemaphoreGive(overosync->buffer_lock);
-
-	xSemaphoreTake(overosync->transaction_lock, portMAX_DELAY);
-	transactionsStarted++;
+	xSemaphoreGiveFromISR(overosync->buffer_lock, &xHigherPriorityTaskWoken);
+	portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 
 	return PIOS_SPI_TransferBlock(pios_spi_overo_id, (uint8_t *) tx_buffer, (uint8_t *) rx_buffer, sizeof(overosync->transactions[overosync->active_transaction_id].tx_buffer), &transmitDataDone);
 }

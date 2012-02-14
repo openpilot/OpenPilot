@@ -47,6 +47,7 @@
 static xQueueHandle queue;
 static UAVTalkConnection uavTalkCon;
 static xTaskHandle overoSyncTaskHandle;
+volatile bool buffer_swap_failed;
 
 // Private functions
 static void overoSyncTask(void *parameters);
@@ -75,6 +76,7 @@ struct overosync {
 	uint32_t sent_objects;
 	uint32_t failed_objects;
 	uint32_t received_objects;
+	uint32_t framesync_error;
 };
 
 struct overosync *overosync;
@@ -118,13 +120,14 @@ static const struct pios_exti_cfg pios_exti_overo_cfg __exti_config = {
  * Overo deasserting the CS line.  We don't want to spin that long in an
  * isr
  */
-int32_t failed_overo_start;
 void PIOS_OVERO_IRQHandler()
 {
 	// transmitData must not block to get semaphore for when we get out of
-	// frame and transaction is still running here
+	// frame and transaction is still running here.  -1 indicates the transaction
+	// semaphore is blocked and we are still in a transaction, thus a framesync
+	// error occurred.  This shouldn't happen.  Race condition?
 	if(transmitData() == -1)
-		failed_overo_start++;
+		overosync->framesync_error++;
 }
 
 /**
@@ -175,6 +178,7 @@ int32_t OveroSyncStart(void)
 	overosync->loading_transaction_id = 0;
 	overosync->write_pointer = 0;
 	overosync->sent_bytes = 0;
+	overosync->framesync_error = 0;
 
 	// Process all registered objects and connect queue for updates
 	UAVObjIterate(&registerObject);
@@ -204,7 +208,6 @@ static void registerObject(UAVObjHandle obj)
 	UAVObjConnectQueue(obj, queue, eventMask);
 }
 
-int32_t overosync_transfers = 0;
 /**
  * Telemetry transmit task, regular priority
  *
@@ -247,20 +250,15 @@ static void overoSyncTask(void *parameters)
 				overosync->sent_bytes = 0;
 				lastUpdateTime = updateTime;
 			}
-
-			overosync_transfers++;
 		}
 	}
 }
 
-int32_t transactionsDone = 0;
-int32_t reschedule_failed = 0;
 static void transmitDataDone(bool crc_ok, uint8_t crc_val)
 {
 	uint8_t *rx_buffer;
 	static signed portBASE_TYPE xHigherPriorityTaskWoken;
 
-	transactionsDone ++;
 	rx_buffer = overosync->transactions[overosync->active_transaction_id].rx_buffer;
 
 	// Release the semaphore and start another transaction (which grabs semaphore again but then
@@ -276,7 +274,6 @@ static void transmitDataDone(bool crc_ok, uint8_t crc_val)
 		UAVTalkProcessInputStream(uavTalkCon, rx_buffer[i]);
 }
 
-int32_t transactionsStarted = 0;
 /**
  * Transmit data buffer to the modem or USB port.
  * \param[in] data Data buffer to send
@@ -311,11 +308,18 @@ static int32_t packData(uint8_t * data, int32_t length)
 	overosync->sent_objects++;
 
 	xSemaphoreGive(overosync->buffer_lock);
+	
+	// When the NSS line rises while we are packing data then a transaction doesn't start
+	// because that means we will be here very shortly afterwards (priority of task making that
+	// not always perfectly true) schedule the transaction here.
+	if (buffer_swap_failed) {
+		buffer_swap_failed = false;
+		transmitData();
+	}
 
 	return length;
 }
 
-int32_t failed_buffer_lock;
 static int32_t transmitData()
 {
 	uint8_t *tx_buffer, *rx_buffer;
@@ -325,15 +329,13 @@ static int32_t transmitData()
 	// to start
 	if (xSemaphoreTake(overosync->transaction_lock, 0) == pdFALSE)
 		return -1;
-	
-	transactionsStarted++;
 
 	// Get lock to manipulate buffers
 	if(xSemaphoreTake(overosync->buffer_lock, 0) == pdFALSE) {
 		xSemaphoreGiveFromISR(overosync->transaction_lock, &xHigherPriorityTaskWoken);
 		portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
-		failed_buffer_lock++;
-		return -1;
+		buffer_swap_failed = true;
+		return -2;
 	}
 
 	overosync->transaction_done = false;
@@ -354,7 +356,7 @@ static int32_t transmitData()
 	xSemaphoreGiveFromISR(overosync->buffer_lock, &xHigherPriorityTaskWoken);
 	portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 
-	return PIOS_SPI_TransferBlock(pios_spi_overo_id, (uint8_t *) tx_buffer, (uint8_t *) rx_buffer, sizeof(overosync->transactions[overosync->active_transaction_id].tx_buffer), &transmitDataDone);
+	return PIOS_SPI_TransferBlock(pios_spi_overo_id, (uint8_t *) tx_buffer, (uint8_t *) rx_buffer, sizeof(overosync->transactions[overosync->active_transaction_id].tx_buffer), &transmitDataDone) == 0 ? 0 : -3;
 }
 
 /**

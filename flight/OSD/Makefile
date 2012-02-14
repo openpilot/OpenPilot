@@ -105,13 +105,20 @@ SRC += $(OPSYSTEM)/pios_usb_board_data.c
 SRC += $(OPSYSTEM)/fonts.c
 SRC += $(OPSYSTEM)/font_outlined8x14.c
 SRC += $(OPSYSTEM)/font_outlined8x8.c
-SRC += $(FLIGHTLIB)/fifo_buffer.c
 SRC += $(OPSYSTEM)/alarms.c
-SRC += $(OPSYSTEM)/taskmonitor.c
+#SRC += $(OPSYSTEM)/taskmonitor.c
 SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
 SRC += $(OPUAVOBJ)/eventdispatcher.c
 #SRC += $(OPSYSTEM)/pios_usb_hid_desc.c
+
+#ifeq ($(DEBUG),YES)
+SRC += $(OPSYSTEM)/dcc_stdio.c
+SRC += $(OPSYSTEM)/cm3_fault_handlers.c
+#endif
+
+SRC += $(FLIGHTLIB)/fifo_buffer.c
+SRC += $(FLIGHTLIB)/taskmonitor.c
 
 ## UAVOBJECTS
 #SRC += $(OPUAVSYNTHDIR)/accessorydesired.c

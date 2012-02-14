@@ -288,7 +288,7 @@ static const struct pios_exti_cfg pios_exti_hsync_cfg __exti_config = {
 	.irq = {
 		.init = {
 			.NVIC_IRQChannel = EXTI0_IRQn,
-			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGHEST,
 			.NVIC_IRQChannelSubPriority = 0,
 			.NVIC_IRQChannelCmd = ENABLE,
 		},
@@ -582,7 +582,7 @@ void PIOS_VIDEO_DMA_Handler(void)
 
 #endif
 
-
+#if defined(PIOS_INCLUDE_ADC)
 /*
 * ADC system
 */
@@ -627,6 +627,7 @@ struct pios_adc_dev pios_adc_devs[] = {
 
 uint8_t pios_adc_num_devices = NELEMENTS(pios_adc_devs);
 
+#endif
 
 /* Private define ------------------------------------------------------------*/
 #define DAC_DHR12R2_ADDRESS    0x40007414
@@ -926,7 +927,7 @@ const struct pios_usb_cdc_cfg pios_usb_cdc_cfg = {
 #define PIOS_COM_TELEM_RF_RX_BUF_LEN 512
 #define PIOS_COM_TELEM_RF_TX_BUF_LEN 512
 
-#define PIOS_COM_GPS_RX_BUF_LEN 32
+#define PIOS_COM_GPS_RX_BUF_LEN 127
 
 #define PIOS_COM_TELEM_USB_RX_BUF_LEN 65
 #define PIOS_COM_TELEM_USB_TX_BUF_LEN 65
@@ -1147,7 +1148,7 @@ void PIOS_Board_Init(void) {
 #if defined(PIOS_INCLUDE_COM_TELEM)
 	{ /* Eventually add switch for this port function */
 		uint32_t pios_usart_telem_rf_id;
-		if (PIOS_USART_Init(&pios_usart_telem_rf_id, &pios_usart_gps_cfg)) {
+		if (PIOS_USART_Init(&pios_usart_telem_rf_id, &pios_usart_telem_main_cfg)) {
 			PIOS_Assert(0);
 		}
 

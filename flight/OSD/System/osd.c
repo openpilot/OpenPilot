@@ -186,21 +186,6 @@ void processReset(void)
     RCC_ClearFlag();
 }
 
-/*static void updateOnceEveryFrame() {
-#ifdef TEXT_ENABLED
-	clearText();
-	for (uint8_t i = 0; i < TEXT_LINES; ++i) {
-	  updateText(i);
-	}
-#endif //TEXT_ENABLED
-
-#ifdef GRAPICSENABLED
-	clearGraphics();
-	updateGrapics();
-#endif //GRAPICSENABLED
-}
-*/
-
 int main()
 {
 	int	result;
@@ -221,35 +206,10 @@ int main()
 						 &initTaskHandle);
 	PIOS_Assert(result == pdPASS);
 
-    // turn all the leds off
-    //USB_LED_OFF;
-
-
-	#if defined(PIOS_COM_DEBUG)
-    	DEBUG_PRINTF("\r\n");
-	#endif
-
-    // *************
-    // Main executive loop
-	clearGraphics();
-	introGraphics();
-	PIOS_DELAY_WaitmS(1000);
-	//clearText();
-	introText();
-	PIOS_DELAY_WaitmS(1000);
-	/*for(int i=0;i<10000;i++){
-		updateTextPixmap(activeTextId);
-		PIOS_DELAY_WaituS(10);
-	}*/
-
-	/* swap the stack to use the IRQ stack */
-	//Stack_Change();
-
 	/* Start the FreeRTOS scheduler which should never returns.*/
 	vTaskStartScheduler();
 
 	/* If all is well we will never reach here as the scheduler will now be running. */
-
 	/* Do some indication to user that something bad just happened */
 	PIOS_LED_Off(PIOS_LED_HEARTBEAT); \
 	for(;;) { \
@@ -258,45 +218,6 @@ int main()
 	};
 
 	return 0;
-/*
-    for (;;)
-    {
-#ifdef TEXT_ENABLED
-    if (update == 2) {
-		  update = 0;
-#ifdef TEXT_INVERTED_ENABLED
-	    clearTextInverted();
-#endif //TEXT_INVERTED_ENABLED
-	    updateTextPixmap(activeTextId);
-	  }
-		else if (update == 1) {
-#else
-			if (update == 1) {
-#endif //TEXTENABLED
-				update = 0;
-				updateOnceEveryFrame();
-			}
-
-		#if defined(USE_WATCHDOG)
-			  processWatchdog();		// process the watchdog
-		#endif
-		}
-
-    // *************
-    // we should never arrive here
-
-    // disable all interrupts
-    PIOS_IRQ_Disable();
-
-    // turn off all leds
-    USB_LED_OFF;
-
-
-    PIOS_SYS_Reset();
-
-    while (1);
-*/
-    return 0;
 }
 
 /**

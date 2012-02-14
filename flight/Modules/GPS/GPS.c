@@ -129,10 +129,10 @@ int32_t GPSInitialize(void)
 
 	HwSettingsOptionalModulesGet(optionalModules);
 
-	if (optionalModules[HWSETTINGS_OPTIONALMODULES_GPS] == HWSETTINGS_OPTIONALMODULES_ENABLED)
+	//if (optionalModules[HWSETTINGS_OPTIONALMODULES_GPS] == HWSETTINGS_OPTIONALMODULES_ENABLED)
 		gpsEnabled = true;
-	else
-		gpsEnabled = false;
+	//else
+	//	gpsEnabled = false;
 #endif
 
 	if (gpsPort && gpsEnabled) {
@@ -144,7 +144,7 @@ int32_t GPSInitialize(void)
 #ifdef PIOS_GPS_SETS_HOMELOCATION
 		HomeLocationInitialize();
 #endif
-		updateSettings();
+		//updateSettings();
 
 		gps_rx_buffer = pvPortMalloc(NMEA_MAX_PACKET_LENGTH);
 		PIOS_Assert(gps_rx_buffer);

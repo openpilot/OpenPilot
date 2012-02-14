@@ -101,7 +101,7 @@ void PIOS_Hsync_ISR() {
 			//PIOS_LED_On(LED2);
 			if(gLineType == LINE_TYPE_GRAPHICS)
 			{
-				for(int g=0;g<130;g++)
+				for(int g=0;g<110;g++)
 				{
 					asm("nop");
 				}
@@ -149,6 +149,7 @@ void PIOS_Vsync_ISR() {
 	//PIOS_LED_Toggle(LED3);
 
 	//if(gActiveLine > 200)
+    xHigherPriorityTaskWoken = pdFALSE;
 	m_osdLines = gActiveLine;
 	{
 		gActiveLine = 0;
@@ -157,9 +158,10 @@ void PIOS_Vsync_ISR() {
 		{
 			swap_buffers();
 			Vsync_update=0;
-			xSemaphoreGiveFromISR(osdSemaphore, &xHigherPriorityTaskWoken);
+			xHigherPriorityTaskWoken = xSemaphoreGiveFromISR(osdSemaphore, &xHigherPriorityTaskWoken);
 		}
 	}
+	portEND_SWITCHING_ISR(xHigherPriorityTaskWoken); 	//portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 }
 
 uint16_t PIOS_Video_GetOSDLines(void) {
@@ -228,29 +230,14 @@ void PIOS_Video_Init(const struct pios_video_cfg * cfg){
 	NVIC_Init(&cfg->level.dma.irq.init);
 	NVIC_Init(&cfg->mask.dma.irq.init);
 
-
-
 	/* Enable SPI interrupts to DMA */
 	SPI_I2S_DMACmd(cfg->level.regs, SPI_I2S_DMAReq_Tx, ENABLE);
 	SPI_I2S_DMACmd(cfg->mask.regs, SPI_I2S_DMAReq_Tx, ENABLE);
 
-	/* Initialize the GPIO pins */
-	//SYSCFG_EXTILineConfig(cfg->vsync.port_source, cfg->vsync.pin_source);
-	//SYSCFG_EXTILineConfig(cfg->hsync.port_source, cfg->hsync.pin_source);
-
-	/* Configure Video Sync pin input floating */
-	//GPIO_Init(cfg->vsync_io.gpio, (GPIO_InitTypeDef*)&(cfg->vsync_io.init));
-	//GPIO_Init(cfg->hsync_io.gpio, (GPIO_InitTypeDef*)&(cfg->hsync_io.init));
-
 	/* Configure the Video Line interrupt */
 	PIOS_EXTI_Init(cfg->hsync);
 	PIOS_EXTI_Init(cfg->vsync);
-	//EXTI_Init(&cfg->vsync.init);
-	//EXTI_Init(&cfg->hsync.init);
 
-	/* Enable and set EXTI Interrupt to the lowest priority */
-	//NVIC_Init(&cfg->vsync_irq.init);
-	//NVIC_Init(&cfg->hsync_irq.init);
 
     draw_buffer_level = buffer0_level;
     draw_buffer_mask = buffer0_mask;

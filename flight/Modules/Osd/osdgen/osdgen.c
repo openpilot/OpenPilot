@@ -73,9 +73,10 @@ static void osdgenTask(void *parameters);
 
 // ****************
 // Private constants
-xSemaphoreHandle osdSemaphore;
+#define LONG_TIME 0xffff
+xSemaphoreHandle osdSemaphore = NULL;
 
-#define STACK_SIZE_BYTES            1024
+#define STACK_SIZE_BYTES            1096
 
 #define TASK_PRIORITY               (tskIDLE_PRIORITY + 4)
 #define UPDATE_PERIOD 100
@@ -2288,26 +2289,33 @@ static void osdgenTask(void *parameters)
 	// intro
 	for(int i=0; i<125; i++)
 	{
-		clearGraphics();
-		introGraphics();
-		xSemaphoreTake(osdSemaphore, portMAX_DELAY);
+        if( xSemaphoreTake( osdSemaphore, LONG_TIME ) == pdTRUE )
+        {
+			clearGraphics();
+			introGraphics();
+        }
 	}
 	for(int i=0; i<125; i++)
 	{
-		clearGraphics();
-		introGraphics();
-		introText();
-		xSemaphoreTake(osdSemaphore, portMAX_DELAY);
+        if( xSemaphoreTake( osdSemaphore, LONG_TIME ) == pdTRUE )
+        {
+			clearGraphics();
+			introGraphics();
+			introText();
+        }
 	}
 
 	while (1)
 	{
-		GPSPositionGet(&gpsData);
-		AttitudeActualGet(&attitude);
-		setAttitudeOsd((int16_t)attitude.Pitch,(int16_t)attitude.Roll,(int16_t)attitude.Yaw);
-		setGpsOsd(gpsData.Status,gpsData.Latitude,gpsData.Longitude,gpsData.Altitude,gpsData.Groundspeed);
-		updateOnceEveryFrame();
-		xSemaphoreTake(osdSemaphore, portMAX_DELAY);
+        if( xSemaphoreTake( osdSemaphore, LONG_TIME ) == pdTRUE )
+        {
+			GPSPositionGet(&gpsData);
+			AttitudeActualGet(&attitude);
+			setAttitudeOsd((int16_t)attitude.Pitch,(int16_t)attitude.Roll,(int16_t)attitude.Yaw);
+			setGpsOsd(gpsData.Status,gpsData.Latitude,gpsData.Longitude,gpsData.Altitude,gpsData.Groundspeed);
+			updateOnceEveryFrame();
+        }
+		//xSemaphoreTake(osdSemaphore, portMAX_DELAY);
 		//vTaskDelayUntil(&lastSysTime, 10 / portTICK_RATE_MS);
 	}
 }

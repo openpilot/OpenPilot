@@ -128,6 +128,15 @@ UAVDataObject* $(NAME)::clone(quint32 instID)
 }
 
 /**
+ * Create a clone of this object only to be used to retrieve defaults
+ */
+UAVDataObject* $(NAME)::dirtyClone()
+{
+    $(NAME)* obj = new $(NAME)();
+    return obj;
+}
+
+/**
  * Static function to retrieve an instance of the object.
  */
 $(NAME)* $(NAME)::GetInstance(UAVObjectManager* objMngr, quint32 instID)

@@ -51,7 +51,7 @@ public:
     QString contextHelpId() const { return QString(); }
 
 private:
-        QWidget *m_widget;
+    QWidget *m_widget;
 	QList<int> m_context;
 };
 

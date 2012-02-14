@@ -3,7 +3,6 @@ TARGET = DebugGadget
 
 include(../../openpilotgcsplugin.pri)
 include(../../plugins/coreplugin/coreplugin.pri)
-include(../../libs/libqxt/core/logengines.pri)
 HEADERS += debugplugin.h \
     debugengine.h
 HEADERS += debuggadget.h

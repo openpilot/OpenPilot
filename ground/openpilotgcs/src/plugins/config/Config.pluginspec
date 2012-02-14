@@ -10,5 +10,6 @@
         <dependency name="UAVTalk" version="1.0.0"/>
         <dependency name="UAVObjectUtil" version="1.0.0"/>
         <dependency name="UAVSettingsImportExport" version="1.0.0"/>
+		<dependency name="UAVObjectWidgetUtils" version="1.0.0"/>
     </dependencyList>
 </plugin>   

@@ -1,24 +1,74 @@
+/**
+ ******************************************************************************
+ *
+ * @file       smartsavebutton.cpp
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @addtogroup GCSPlugins GCS Plugins
+ * @{
+ * @addtogroup UAVObjectWidgetUtils Plugin
+ * @{
+ * @brief Utility plugin for UAVObject to Widget relation management
+ *****************************************************************************/
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
 #include "smartsavebutton.h"
 
-smartSaveButton::smartSaveButton(QPushButton * update, QPushButton * save):bupdate(update),bsave(save)
+smartSaveButton::smartSaveButton()
 {
-    connect(bsave,SIGNAL(clicked()),this,SLOT(processClick()));
-    connect(bupdate,SIGNAL(clicked()),this,SLOT(processClick()));
 
+}
+
+void smartSaveButton::addButtons(QPushButton *save, QPushButton *apply)
+{
+    buttonList.insert(save,save_button);
+    buttonList.insert(apply,apply_button);
+    connect(save,SIGNAL(clicked()),this,SLOT(processClick()));
+    connect(apply,SIGNAL(clicked()),this,SLOT(processClick()));
+}
+void smartSaveButton::addApplyButton(QPushButton *apply)
+{
+    buttonList.insert(apply,apply_button);
+    connect(apply,SIGNAL(clicked()),this,SLOT(processClick()));
+}
+void smartSaveButton::addSaveButton(QPushButton *save)
+{
+    buttonList.insert(save,save_button);
+    connect(save,SIGNAL(clicked()),this,SLOT(processClick()));
 }
 void smartSaveButton::processClick()
 {
     emit beginOp();
     bool save=false;
-    QPushButton *button=bupdate;
-    if(sender()==bsave)
-    {
+    QPushButton *button=qobject_cast<QPushButton *>(sender());
+    if(!button)
+        return;
+    if(buttonList.value(button)==save_button)
         save=true;
-        button=bsave;
-    }
+    processOperation(button,save);
+
+}
+
+void smartSaveButton::processOperation(QPushButton * button,bool save)
+{
     emit preProcessOperations();
-    button->setEnabled(false);
-    button->setIcon(QIcon(":/uploader/images/system-run.svg"));
+    if(button)
+    {
+        button->setEnabled(false);
+        button->setIcon(QIcon(":/uploader/images/system-run.svg"));
+    }
     QTimer timer;
     timer.setSingleShot(true);
     bool error=false;
@@ -78,15 +128,18 @@ void smartSaveButton::processClick()
             }
         }
     }
-    button->setEnabled(true);
+    if(button)
+        button->setEnabled(true);
     if(!error)
     {
-        button->setIcon(QIcon(":/uploader/images/dialog-apply.svg"));
+        if(button)
+            button->setIcon(QIcon(":/uploader/images/dialog-apply.svg"));
         emit saveSuccessfull();
     }
     else
     {
-        button->setIcon(QIcon(":/uploader/images/process-stop.svg"));
+        if(button)
+            button->setIcon(QIcon(":/uploader/images/process-stop.svg"));
     }
     emit endOp();
 }
@@ -101,7 +154,15 @@ void smartSaveButton::addObject(UAVDataObject * obj)
     if(!objects.contains(obj))
         objects.append(obj);
 }
-
+void smartSaveButton::removeObject(UAVDataObject * obj)
+{
+    if(objects.contains(obj))
+        objects.removeAll(obj);
+}
+void smartSaveButton::removeAllObjects()
+{
+    objects.clear();
+}
 void smartSaveButton::clearObjects()
 {
     objects.clear();
@@ -127,6 +188,18 @@ void smartSaveButton::saving_finished(int id, bool result)
 
 void smartSaveButton::enableControls(bool value)
 {
-    bupdate->setEnabled(value);
-    bsave->setEnabled(value);
+    foreach(QPushButton * button,buttonList.keys())
+        button->setEnabled(value);
 }
+
+void smartSaveButton::apply()
+{
+    processOperation(NULL,false);
+}
+
+void smartSaveButton::save()
+{
+    processOperation(NULL,true);
+}
+
+

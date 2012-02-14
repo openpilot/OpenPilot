@@ -28,7 +28,7 @@
 #define CONFIGAIRFRAMEWIDGET_H
 
 #include "ui_airframe.h"
-#include "configtaskwidget.h"
+#include "../uavobjectwidgetutils/configtaskwidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"

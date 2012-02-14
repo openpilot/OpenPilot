@@ -65,7 +65,8 @@ $(DATAFIELDINFO)
     void setData(const DataFields& data);
     Metadata getDefaultMetadata();
     UAVDataObject* clone(quint32 instID);
-
+	UAVDataObject* dirtyClone();
+	
     static $(NAME)* GetInstance(UAVObjectManager* objMngr, quint32 instID = 0);
 
 $(PROPERTY_GETTERS)

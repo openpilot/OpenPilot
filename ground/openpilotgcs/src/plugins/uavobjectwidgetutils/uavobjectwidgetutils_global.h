@@ -1,13 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       configtelemetrytwidget.h
+ * @file       uavobjectwidgetutils_global.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
- * @addtogroup ConfigPlugin Config Plugin
+ * @addtogroup UAVObjectWidgetUtils Plugin
  * @{
- * @brief Telemetry configuration panel
+ * @brief Utility plugin for UAVObject to Widget relation management
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -24,32 +24,16 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef CONFIGPROHWWIDGET_H
-#define CONFIGPROHWWIDGET_H
 
-#include "ui_pro_hw_settings.h"
-#include "../uavobjectwidgetutils/configtaskwidget.h"
-#include "extensionsystem/pluginmanager.h"
-#include "uavobjectmanager.h"
-#include "uavobject.h"
-#include <QtGui/QWidget>
-#include <QList>
+#ifndef UAVOBJECTWIDGETUTILS_GLOBAL_H
+#define UAVOBJECTWIDGETUTILS_GLOBAL_H
 
+#include <QtCore/qglobal.h>
 
-class ConfigProHWWidget: public ConfigTaskWidget
-{
-    Q_OBJECT
+#if defined(UAVOBJECTWIDGETUTILS_LIBRARY)
+#  define UAVOBJECTWIDGETUTILS_EXPORT Q_DECL_EXPORT
+#else
+#  define UAVOBJECTWIDGETUTILS_EXPORT Q_DECL_IMPORT
+#endif
 
-public:
-    ConfigProHWWidget(QWidget *parent = 0);
-    ~ConfigProHWWidget();
-
-private:
-    Ui_PRO_HW_Widget *m_telemetry;
-
-private slots:
-    virtual void refreshValues();
-
-};
-
-#endif // CONFIGPROHWWIDGET_H
+#endif

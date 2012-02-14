@@ -48,6 +48,7 @@ static xQueueHandle queue;
 static UAVTalkConnection uavTalkCon;
 static xTaskHandle overoSyncTaskHandle;
 volatile bool buffer_swap_failed;
+volatile uint32_t buffer_swap_timeval;
 
 // Private functions
 static void overoSyncTask(void *parameters);
@@ -281,6 +282,7 @@ static void transmitDataDone(bool crc_ok, uint8_t crc_val)
  * \return -1 on failure
  * \return number of bytes transmitted on success
  */
+uint32_t too_long = 0;
 static int32_t packData(uint8_t * data, int32_t length)
 {
 	uint8_t *tx_buffer;
@@ -312,9 +314,12 @@ static int32_t packData(uint8_t * data, int32_t length)
 	// When the NSS line rises while we are packing data then a transaction doesn't start
 	// because that means we will be here very shortly afterwards (priority of task making that
 	// not always perfectly true) schedule the transaction here.
-	if (buffer_swap_failed) {
+	if (buffer_swap_failed && (PIOS_DELAY_DiffuS(buffer_swap_timeval) < 50)) {
 		buffer_swap_failed = false;
 		transmitData();
+	} else if (buffer_swap_failed) {
+		buffer_swap_failed = false;
+		too_long++;
 	}
 
 	return length;
@@ -335,6 +340,7 @@ static int32_t transmitData()
 		xSemaphoreGiveFromISR(overosync->transaction_lock, &xHigherPriorityTaskWoken);
 		portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 		buffer_swap_failed = true;
+		buffer_swap_timeval = PIOS_DELAY_GetRaw();
 		return -2;
 	}
 

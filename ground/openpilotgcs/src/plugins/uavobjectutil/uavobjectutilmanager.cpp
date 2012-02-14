@@ -669,42 +669,45 @@ deviceDescriptorStruct UAVObjectUtilManager::getBoardDescriptionStruct()
 
 bool UAVObjectUtilManager::descriptionToStructure(QByteArray desc, deviceDescriptorStruct *struc)
 {
-       if (desc.startsWith("OpFw")) {
-           // This looks like a binary with a description at the end
-           /*
-            #  4 bytes: header: "OpFw"
-            #  4 bytes: GIT commit tag (short version of SHA1)
-            #  4 bytes: Unix timestamp of compile time
-            #  2 bytes: target platform. Should follow same rule as BOARD_TYPE and BOARD_REVISION in board define files.
-            #  26 bytes: commit tag if it is there, otherwise "Unreleased". Zero-padded
-            #   ---- 40 bytes limit ---
-            #  20 bytes: SHA1 sum of the firmware.
-            #  40 bytes: free for now.
-            */
+   if (desc.startsWith("OpFw")) {
+       /*
+        * This looks like a binary with a description at the end
+        *  4 bytes: header: "OpFw"
+        *  4 bytes: git commit hash (short version of SHA1)
+        *  4 bytes: Unix timestamp of last git commit
+        *  2 bytes: target platform. Should follow same rule as BOARD_TYPE and BOARD_REVISION in board define files.
+        *  26 bytes: commit tag if it is there, otherwise "Unreleased". Zero-padded
+        *   ---- 40 bytes limit ---
+        *  20 bytes: SHA1 sum of the firmware.
+        *  40 bytes: free for now.
+        */
 
-           // Note: the ARM binary is big-endian:
-           quint32 gitCommitTag = desc.at(7)&0xFF;
-           for (int i=1;i<4;i++) {
-               gitCommitTag = gitCommitTag<<8;
-               gitCommitTag += desc.at(7-i) & 0xFF;
-           }
-           struc->gitTag=QString::number(gitCommitTag,16);
-           quint32 buildDate = desc.at(11)&0xFF;
-           for (int i=1;i<4;i++) {
-               buildDate = buildDate<<8;
-               buildDate += desc.at(11-i) & 0xFF;
-           }
-           struc->buildDate= QDateTime::fromTime_t(buildDate).toUTC().toString("yyyyMMdd HH:mm");
-           QByteArray targetPlatform = desc.mid(12,2);
-           // TODO: check platform compatibility
-           QString dscText = QString(desc.mid(14,26));
-           struc->boardType=(int)targetPlatform.at(0);
-           struc->boardRevision=(int)targetPlatform.at(1);
-           struc->description=dscText;
-           return true;
+       // Note: the ARM binary is big-endian:
+       quint32 gitCommitHash = desc.at(7) & 0xFF;
+       for (int i = 1; i < 4; i++) {
+           gitCommitHash = gitCommitHash << 8;
+           gitCommitHash += desc.at(7-i) & 0xFF;
        }
-       return false;
+       struc->gitHash = QString::number(gitCommitHash, 16);
 
+       quint32 gitDate = desc.at(11) & 0xFF;
+       for (int i = 1; i < 4; i++) {
+           gitDate = gitDate << 8;
+           gitDate += desc.at(11-i) & 0xFF;
+       }
+       struc->gitDate = QDateTime::fromTime_t(gitDate).toUTC().toString("yyyyMMdd HH:mm");
+
+       QString gitTag = QString(desc.mid(14,26));
+       struc->gitTag = gitTag;
+
+       // TODO: check platform compatibility
+       QByteArray targetPlatform = desc.mid(12,2);
+       struc->boardType = (int)targetPlatform.at(0);
+       struc->boardRevision = (int)targetPlatform.at(1);
+
+       return true;
+   }
+   return false;
 }
 
 // ******************************

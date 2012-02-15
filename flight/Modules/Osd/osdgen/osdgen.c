@@ -1416,10 +1416,10 @@ void write_char(char ch, unsigned int x, unsigned int y, int flags, int font)
     int wbit = CALC_BIT_IN_WORD(x);
     // If font only supports lowercase or uppercase, make the letter
     // lowercase or uppercase.
-    if(font_info.flags & FONT_LOWERCASE_ONLY)
+    /*if(font_info.flags & FONT_LOWERCASE_ONLY)
             ch = tolower(ch);
     if(font_info.flags & FONT_UPPERCASE_ONLY)
-            ch = toupper(ch);
+            ch = toupper(ch);*/
     fetch_font_info(ch, font, &font_info, &lookup);
     // How big is the character? We handle characters up to 8 pixels
     // wide for now. Support for large characters may be added in future.
@@ -2122,9 +2122,6 @@ void hud_draw_linear_compass(int v, int range, int width, int x, int y, int mint
         write_string(headingstr, x + 1, majtick_start + textoffset+2, 1, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 1, 0);
 }
 
-static int count=0;
-static int mark=0;
-
 //main draw function
 void updateGraphics() {
 
@@ -2150,46 +2147,40 @@ void updateGraphics() {
 	}
 	angleB+=sum;
 	angleC+=2;
-	//drawArrow(32,GRAPHICS_HEIGHT_REAL-40,angleA,32);
-	//drawAttitude(96,GRAPHICS_HEIGHT_REAL/2,90,0,48);
+
+	/* Draw Attitude Indicator */
 	drawAttitude(GRAPHICS_WIDTH_REAL/2,GRAPHICS_HEIGHT_REAL/2,m_pitch,m_roll,96);
-	//printTextFB(2,12,"Hello OP-OSD");
-	//printTextFB(1,21,"Hello OP-OSD");
-	//printTextFB(0,2,"Hello OP-OSD");
-	/*write_hline_outlined(GRAPHICS_WIDTH_REAL/2-30, GRAPHICS_WIDTH_REAL/2+30, GRAPHICS_HEIGHT_REAL/2, 2, 2, 0, 1);
-	write_vline_outlined(GRAPHICS_WIDTH_REAL/2, GRAPHICS_HEIGHT_REAL/2-30, GRAPHICS_HEIGHT_REAL/2+30, 2, 2, 0, 1);
-	write_circle_outlined(GRAPHICS_WIDTH_REAL/2,GRAPHICS_HEIGHT_REAL/2,30,0,0,0,1);*/
+
 	//write_string("Hello OP-OSD", 60, 12, 1, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 0);
 	//printText16( 60, 12,"Hello OP-OSD");
-	char temp[20]={0};
 
-	sprintf(temp,"S%d, Lat:%02d, Lon:%02d",(int)m_gpsStatus,(int)m_gpsLat,(int)m_gpsLon);
-	write_string(temp, 10, 10, 1, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 0);
+	char temp[50]={0};
+	memset(temp, ' ', 40);
+	sprintf(temp,"Lat:%d",(int)m_gpsLat);
+	write_string(temp, 5, 10, 1, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 0);
+	sprintf(temp,"Lon:%d",(int)m_gpsLon);
+	write_string(temp, 5, 10+14, 1, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 0);
+	sprintf(temp,"Fix:%d",(int)m_gpsStatus);
+	write_string(temp, 5, 10+14+14, 1, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 0);
 
-	/*count++;
-	for(int x=1;x<20;x++)
-	{
-		//printCharFB((mark+x-1)%255,x,40);
-		write_char16((mark+x-1)%255,x*12+40,60);
-	}
-	if(count==12)
-	{
-		mark++;
-		count=0;
-	}*/
 
+	/* Print RTC time */
 	printTime((GRAPHICS_WIDTH_REAL - 80)/16,GRAPHICS_HEIGHT_REAL-20);
 
-	char tempx[20]={0};
-	sprintf(tempx,"Lines:%4d",PIOS_Video_GetOSDLines());
-	write_string(tempx, (GRAPHICS_WIDTH_REAL - 2),10, 1, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 0);
+	/* Print Number of detected video Lines */
+	sprintf(temp,"Lines:%4d",PIOS_Video_GetOSDLines());
+	write_string(temp, (GRAPHICS_WIDTH_REAL - 2),10, 1, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 0);
 
-	sprintf(tempx,"Rssi:%4dV",(int)(PIOS_ADC_PinGet(4)*3000/4096));
-	write_string(tempx, (GRAPHICS_WIDTH_REAL - 2),24, 1, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 0);
+	/* Print ADC voltage */
+	sprintf(temp,"Rssi:%4dV",(int)(PIOS_ADC_PinGet(4)*3000/4096));
+	write_string(temp, (GRAPHICS_WIDTH_REAL - 2),24, 1, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 0);
 
-	sprintf(tempx,"Temp:%4dC",(int)(PIOS_ADC_PinGet(5)*0.29296875f-279));
-	write_string(tempx, (GRAPHICS_WIDTH_REAL - 2),38, 1, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 0);
+	/* Print CPU temperature */
+	sprintf(temp,"Temp:%4dC",(int)(PIOS_ADC_PinGet(5)*0.29296875f-279));
+	write_string(temp, (GRAPHICS_WIDTH_REAL - 2),38, 1, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 0);
 
+
+	/* Draw Battery Gauge */
 	m_batt++;
 	uint8_t dir=3;
 	if(m_batt==101)
@@ -2204,12 +2195,12 @@ void updateGraphics() {
 		dir=1;
 		m_alt+=m_pitch/2;
 	}
-
 	drawBattery(GRAPHICS_WIDTH_REAL-20,GRAPHICS_HEIGHT_REAL-(20*3),m_batt,16);
 
 	//drawAltitude(200,50,m_alt,dir);
+
+
 	//drawArrow(96,GRAPHICS_HEIGHT_REAL/2,angleB,32);
-	//ellipse(50,50,50,30);
 
     // Draw airspeed (left side.)
     hud_draw_vertical_scale((int)m_gpsSpd, 100, -1, 2, (DISP_HEIGHT / 2) + 10, 100, 10, 20, 7, 12, 15, 1000, HUD_VSCALE_FLAG_NO_NEGATIVE);
@@ -2223,8 +2214,11 @@ void updateGraphics() {
 
 	//write_filled_rectangle(draw_buffer_level,20,20,30,30,1);
 	//write_filled_rectangle(draw_buffer_mask,30,30,30,30,1);
+
+    /* Make sure every line last bit is 0 */
 	write_vline( draw_buffer_level,GRAPHICS_WIDTH_REAL-1,0,GRAPHICS_HEIGHT_REAL-1,0);
 	write_vline( draw_buffer_mask,GRAPHICS_WIDTH_REAL-1,0,GRAPHICS_HEIGHT_REAL-1,0);
+
 }
 
 

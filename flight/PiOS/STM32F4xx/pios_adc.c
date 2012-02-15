@@ -149,7 +149,7 @@ init_timer(void)
 	TIM_TimeBaseStructInit(&TIMInit);
 	TIMInit.TIM_Prescaler							= clocks.PCLK1_Frequency / 1000000;	/* 1MHz base clock*/
 	TIMInit.TIM_CounterMode							= TIM_CounterMode_Down;
-	TIMInit.TIM_Period								= 1000;							/* 1kHz conversion rate */
+	TIMInit.TIM_Period								= 100;							/* 1kHz conversion rate */
 	TIMInit.TIM_ClockDivision						= TIM_CKD_DIV1;					/* no additional divisor */
 	TIM_TimeBaseInit(PIOS_ADC_TIMER, &TIMInit);
 

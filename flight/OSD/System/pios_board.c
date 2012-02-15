@@ -124,6 +124,7 @@ static const struct pios_led_cfg pios_led_cfg = {
 #if defined(PIOS_INCLUDE_GPS)
 
 #include <pios_usart_priv.h>
+#include <pios_com_priv.h>
 
 /*
  * GPS USART
@@ -927,7 +928,7 @@ const struct pios_usb_cdc_cfg pios_usb_cdc_cfg = {
 #define PIOS_COM_TELEM_RF_RX_BUF_LEN 512
 #define PIOS_COM_TELEM_RF_TX_BUF_LEN 512
 
-#define PIOS_COM_GPS_RX_BUF_LEN 127
+#define PIOS_COM_GPS_RX_BUF_LEN 32
 
 #define PIOS_COM_TELEM_USB_RX_BUF_LEN 65
 #define PIOS_COM_TELEM_USB_TX_BUF_LEN 65

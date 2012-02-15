@@ -31,7 +31,7 @@ Estimate g as a 3D vector. If not, only estimage its magnitude and estimate
 absolute orientation to force g vertical. Less linear, but easier to integrate
 with absolute sensors.
 */
-#define ESTIMATE_G_VEC 1
+#define ESTIMATE_G_VEC 0
 
 namespace jafar {
 	namespace rtslam {

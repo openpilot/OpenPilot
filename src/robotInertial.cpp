@@ -298,11 +298,11 @@ namespace jafar {
 			
 			// init direction and uncertainty of g from acceleration
 			const double th_g = 9.81;
-			gv = th_g*(-am)/ublas::norm_2(am);
-			double G = (ublas::norm_2(am) - th_g); G = 2*G*G;
-			for (size_t i = pose.size() + 9; i < pose.size() + 9 + g_size; i++){
-				state.P(i,i) = std::max(state.P(i,i), G);
-			}
+			gv = th_g*(-am+ab)/ublas::norm_2(am-ab);
+//			double G = (ublas::norm_2(am) - th_g); G = 2*G*G;
+//			for (size_t i = pose.size() + 9; i < pose.size() + 9 + g_size; i++){
+//				state.P(i,i) = std::max(state.P(i,i), G);
+//			}
 			if (g_size == 1) { g(0) = -th_g; } else { g = gv; }
 
 			// init orientation from g
@@ -324,7 +324,7 @@ namespace jafar {
 				for(int i = 0; i < 3; ++i)
 				{
 					gext = gv;
-					gext(i) += sqrt(av(i));
+					gext(i) += sqrt(av(i)) + sqrt(state.P(10+i,10+i)); // uncertainty of measure + bias
 					vec3 eext = e_from_g(gext);
 					for(int j = 0; j < 2; ++j) estd(j) = std::max(estd(j), std::abs(eext(j)-e(j)));
 				}
@@ -383,14 +383,17 @@ namespace jafar {
 			for(int i = 7 ; i < 10; ++i) log.writeData(state.x()(i));
 			for(int i = 10; i < 13; ++i) log.writeData(state.x()(i));
 			for(int i = 13; i < 16; ++i) log.writeData(state.x()(2-(i-13)+13));
-			for(int i = 16; i < 16+g_size; ++i) log.writeData(state.x()(i));
+			if (g_size == 1) { for(int i = 16; i < 16+2; ++i) log.writeData(0.); log.writeData(state.x()(16)); }
+									else { for(int i = 16; i < 16+g_size; ++i) log.writeData(state.x()(i)); }
+
 			
 			for(int i = 0 ; i < 7 ; ++i) log.writeData(sqrt(state.P()(i,i)));
 			for(int i = 0 ; i < 3 ; ++i) log.writeData(sqrt(euler_P(2-i,2-i)));
 			for(int i = 7 ; i < 10; ++i) log.writeData(sqrt(state.P()(i,i)));
 			for(int i = 10; i < 13; ++i) log.writeData(sqrt(state.P()(i,i)));
 			for(int i = 13; i < 16; ++i) log.writeData(sqrt(state.P()(2-(i-13)+13,2-(i-13)+13)));
-			for(int i = 16; i < 16+g_size; ++i) log.writeData(sqrt(state.P()(i,i)));
+			if (g_size == 1) { for(int i = 16; i < 16+2; ++i) log.writeData(0.); log.writeData(sqrt(state.P()(16,16))); }
+									else { for(int i = 16; i < 16+g_size; ++i) log.writeData(sqrt(state.P()(i,i))); }
 		}
 
 	}

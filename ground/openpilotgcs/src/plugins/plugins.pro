@@ -193,12 +193,6 @@ plugin_uavobjectutil.depends = plugin_coreplugin
 plugin_uavobjectutil.depends += plugin_uavobjects
 SUBDIRS += plugin_uavobjectutil
 
-# UAV Object Widget Utility plugin
-plugin_uavobjectwidgetutils.subdir = uavobjectwidgetutils
-plugin_uavobjectwidgetutils.depends = plugin_coreplugin
-plugin_uavobjectwidgetutils.depends += plugin_uavobjects
-SUBDIRS += plugin_uavobjectwidgetutils
-
 # Magic Waypoint gadget
 plugin_magicwaypoint.subdir = magicwaypoint
 plugin_magicwaypoint.depends = plugin_coreplugin
@@ -210,6 +204,13 @@ plugin_uavsettingsimportexport.subdir = uavsettingsimportexport
 plugin_uavsettingsimportexport.depends = plugin_coreplugin
 plugin_uavsettingsimportexport.depends += plugin_uavobjects
 SUBDIRS += plugin_uavsettingsimportexport
+
+# UAV Object Widget Utility plugin
+plugin_uavobjectwidgetutils.subdir = uavobjectwidgetutils
+plugin_uavobjectwidgetutils.depends = plugin_coreplugin
+plugin_uavobjectwidgetutils.depends += plugin_uavobjects
+plugin_uavobjectwidgetutils.depends += plugin_uavsettingsimportexport
+SUBDIRS += plugin_uavobjectwidgetutils
 
 # Junsi Powerlog plugin
 #plugin_powerlog.subdir = powerlog

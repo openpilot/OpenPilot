@@ -120,14 +120,6 @@ float switchThrottle;
 float smoothed_altitude;
 float starting_altitude;
 
-float dT;
-float z[3] = {0, 0, 0};
-float z_new[3];			
-float P[3][3], K[3][2], x[2];
-float G[3] = {1.0e-5f, 1.0e-5f, 1.0e-3f};
-float S[2] = {1.0f,10.0f};
-float V[3] = {10.0f, 10.0f, 10.0f};
-
 int32_t loop_count;
 /**
  * Module thread, should not return.
@@ -165,58 +157,7 @@ static void altitudeHoldTask(void *parameters)
 		} else if (ev.obj == BaroAltitudeHandle()) {
 			baro_updated = true;
 			
-			AltHoldSmoothedData altHold;
-			AltHoldSmoothedGet(&altHold);
-			float dT;
-			
 			init = (init == WAITING_BARO) ? WAITIING_INIT : init;
-
-			// Update dT
-			thisTime = xTaskGetTickCount();
-			dT = ((portTickType)(thisTime - lastSysTime)) / portTICK_RATE_MS / 1000.0f;
-			lastSysTime = thisTime;
-
-			// Verify that we are still in altitude hold mode		
-			FlightStatusData flightStatus;
-			FlightStatusGet(&flightStatus);
-			if(flightStatus.FlightMode != FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD) {
-				running = false;
-			}
-
-			if (!running)
-				continue;
-
-			// Compute the altitude error
-			error = (starting_altitude + altitudeHoldDesired.Altitude) - altHold.Altitude;
-
-			// Compute integral off altitude error
-			throttleIntegral += ((starting_altitude + altitudeHoldDesired.Altitude) - altHold.Velocity) * altitudeHoldSettings.Ki * dT;
-
-			// Only update stabilizationDesired less frequently
-			if((thisTime - lastUpdateTime) < 20)
-				continue;
-
-			lastUpdateTime = thisTime;
-
-			// Instead of explicit limit on integral you output limit feedback
-			stabilizationDesired.Throttle = error * altitudeHoldSettings.Kp + throttleIntegral -
-				altHold.Velocity * altitudeHoldSettings.Kd - altHold.Accel * altitudeHoldSettings.Ka;
-			if(stabilizationDesired.Throttle > 1) {
-				throttleIntegral -= (stabilizationDesired.Throttle - 1);
-				stabilizationDesired.Throttle = 1;
-			}
-			else if (stabilizationDesired.Throttle < 0) {
-				throttleIntegral -= stabilizationDesired.Throttle;
-				stabilizationDesired.Throttle = 0;
-			}
-
-			stabilizationDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_ROLL] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
-			stabilizationDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_PITCH] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
-			stabilizationDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW] = STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK;		
-			stabilizationDesired.Roll = altitudeHoldDesired.Roll;
-			stabilizationDesired.Pitch = altitudeHoldDesired.Pitch;
-			stabilizationDesired.Yaw = altitudeHoldDesired.Yaw;
-			StabilizationDesiredSet(&stabilizationDesired);
 		} else if (ev.obj == FlightStatusHandle()) {
 			FlightStatusData flightStatus;
 			FlightStatusGet(&flightStatus);
@@ -237,10 +178,20 @@ static void altitudeHoldTask(void *parameters)
 		} else if (ev.obj == AccelsHandle()) {
 			static uint32_t timeval;
 
+			float dT;
+			static float z[3] = {0, 0, 0};
+			float z_new[3];
+			float P[3][3], K[3][2], x[2];
+			static float G[3] = {1.0e-5f, 1.0e-5f, 1.0e-3f};
+			static float S[2] = {1.0f,10.0f};
+			static float V[3] = {10.0f, 10.0f, 10.0f};
+
+			thisTime = xTaskGetTickCount();
+
 			/* Somehow this always assigns to zero.  Compiler bug? Race condition? */
-			//S[0] = altitudeHoldSettings.PressureNoise;
-			//S[1] = altitudeHoldSettings.AccelNoise;
-			//G[2] = altitudeHoldSettings.AccelDrift; 
+			S[0] = altitudeHoldSettings.PressureNoise;
+			S[1] = altitudeHoldSettings.AccelNoise;
+			G[2] = altitudeHoldSettings.AccelDrift; 
 
 			AccelsData accels;
 			AccelsGet(&accels);
@@ -322,6 +273,51 @@ static void altitudeHoldTask(void *parameters)
 			altHold.Velocity = z[1];
 			altHold.Accel = z[2];
 			AltHoldSmoothedSet(&altHold);
+
+			AltHoldSmoothedGet(&altHold);
+
+			// Verify that we are  in altitude hold mode
+			FlightStatusData flightStatus;
+			FlightStatusGet(&flightStatus);
+			if(flightStatus.FlightMode != FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD) {
+				running = false;
+			}
+
+			if (!running)
+				continue;
+
+			// Compute the altitude error
+			error = (starting_altitude + altitudeHoldDesired.Altitude) - altHold.Altitude;
+
+			// Compute integral off altitude error
+			throttleIntegral += ((starting_altitude + altitudeHoldDesired.Altitude) - altHold.Velocity) * altitudeHoldSettings.Ki * dT;
+
+			// Only update stabilizationDesired less frequently
+			if((thisTime - lastUpdateTime) < 20)
+				continue;
+
+			lastUpdateTime = thisTime;
+
+			// Instead of explicit limit on integral you output limit feedback
+			StabilizationDesiredGet(&stabilizationDesired);
+			stabilizationDesired.Throttle = error * altitudeHoldSettings.Kp + throttleIntegral -
+			altHold.Velocity * altitudeHoldSettings.Kd - altHold.Accel * altitudeHoldSettings.Ka;
+			if(stabilizationDesired.Throttle > 1) {
+				throttleIntegral -= (stabilizationDesired.Throttle - 1);
+				stabilizationDesired.Throttle = 1;
+			}
+			else if (stabilizationDesired.Throttle < 0) {
+				throttleIntegral -= stabilizationDesired.Throttle;
+				stabilizationDesired.Throttle = 0;
+			}
+
+			stabilizationDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_ROLL] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+			stabilizationDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_PITCH] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+			stabilizationDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW] = STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK;		
+			stabilizationDesired.Roll = altitudeHoldDesired.Roll;
+			stabilizationDesired.Pitch = altitudeHoldDesired.Pitch;
+			stabilizationDesired.Yaw = altitudeHoldDesired.Yaw;
+			StabilizationDesiredSet(&stabilizationDesired);
 
 		} else if (ev.obj == AltitudeHoldDesiredHandle()) {
 			AltitudeHoldDesiredGet(&altitudeHoldDesired);

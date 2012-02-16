@@ -4,6 +4,17 @@ function [] = OPLogConvert(varargin)
 
 outputType='mat'; %Default output is a .mat file
 checkCRC = false;
+wrongSyncByte=0;
+wrongMessageByte=0;
+lastWrongSyncByte=0;
+lastWrongMessageByte=0;
+str1=[];
+str2=[];
+str3=[];
+str4=[];
+str5=[];
+
+fprintf('\n\n***OpenPilot log parser***\n\n');
 global crc_table;
 crc_table = [ ...
     hex2dec('00'),hex2dec('07'),hex2dec('0e'),hex2dec('09'),hex2dec('1c'),hex2dec('1b'),hex2dec('12'),hex2dec('15'),hex2dec('38'),hex2dec('3f'),hex2dec('36'),hex2dec('31'),hex2dec('24'),hex2dec('23'),hex2dec('2a'),hex2dec('2d'), ...
@@ -26,7 +37,7 @@ crc_table = [ ...
 
 if nargin==0
 	%%
-	if (exist('uigetfile'))
+	if (exist('uigetfile')) %#ok<EXIST>
 		[FileName, PathName]=uigetfile('*.opl');
 		logfile=fullfile(PathName, FileName);
 		
@@ -58,20 +69,17 @@ log_size = dir(logfile);
 log_size = log_size.bytes;
 last_print = 0;
 
+startTime=clock;
+
 while (1)
 	if (feof(fid)); break; end
-
-	if (ftell(fid) / log_size - last_print) > 0.01
-		disp([num2str(ftell(fid) / log_size * 100) '%']);
-		last_print = ftell(fid) / log_size;
-	end
 
 	%% Read message header
 	% get sync field (0x3C, 1 byte)
 	sync = fread(fid, 1, 'uint8');
 	if sync ~= correctSyncByte
         	prebuf = [prebuf(2:end); sync];
-		disp ('Wrong sync byte');
+		wrongSyncByte = wrongSyncByte + 1;	
        		continue
     	end
     
@@ -82,7 +90,7 @@ while (1)
 	% get msg type (quint8 1 byte ) should be 0x20, ignore the rest?
 	msgType = fread(fid, 1, 'uint8');
 	if msgType ~= correctMsgByte
-		disp ('Wrong msgType');
+		wrongMessageByte = wrongMessageByte + 1;	
 		continue
 	end
 
@@ -117,8 +125,39 @@ $(SWITCHCODE)
 		break;
 	end
 
+	if (wrongSyncByte ~= lastWrongSyncByte || wrongMessageByte~=lastWrongMessageByte ) ||...
+			(ftell(fid) / log_size - last_print) > 0.01
+
+		lastWrongSyncByte=wrongSyncByte;
+		lastWrongMessageByte=wrongMessageByte;
+
+		str1=[];
+		for i=1:length([str2 str3 str4 str5]);
+			str1=[str1 sprintf('\b')];
+		end
+		str2=sprintf('wrongSyncByte instances:    % 10d\n', wrongSyncByte );
+		str3=sprintf('wrongMessageByte instances: % 10d\n\n', wrongMessageByte );
+		
+		str4=sprintf('Completed bytes: % 9d of % 9d\n', ftell(fid), log_size);
+		
+	        % Arbitrary times two so that it is at least as long	
+		estTimeRemaining=(log_size-ftell(fid))/(ftell(fid)/etime(clock,startTime)) * 2;
+		h=floor(estTimeRemaining/3600);
+		m=floor((estTimeRemaining-h*3600)/60);
+		s=ceil(estTimeRemaining-h*3600-m*60);
+		
+		str5=sprintf('Est. time remaining, %02dh:%02dm:%02ds \n', h,m,s);
+
+		last_print = ftell(fid) / log_size;
+		
+		fprintf([str1 str2 str3 str4 str5]);
+	end
+
+
 	prebuf = fread(fid, 12, 'uint8');
 end
+
+fprintf('%d records in %0.2f seconds.\n', ftell(fid), etime(clock,startTime));
 
 for i=2:size(unknownObjIDList,1) %Don't show the first one, as it was simply a dummy placeholder
    disp(['Unknown object ID: 0x' dec2hex(unknownObjIDList(i,1),8) ' appeared ' int2str(unknownObjIDList(i,2)) ' times.']);
@@ -147,7 +186,7 @@ function [structOut]=PruneStructOfArrays(structIn, lastIndex)
 
 	fieldNames = fieldnames(structIn);
 	for i=1:length(fieldNames)
-		structOut.(fieldNames{i})=structIn.(fieldNames{i})(1:lastIndex);
+		structOut.(fieldNames{i})=structIn.(fieldNames{i})(:,1:lastIndex);
 	end
 
 	

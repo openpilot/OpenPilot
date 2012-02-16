@@ -133,7 +133,7 @@ bool UAVObjectGeneratorMatlab::process_object(ObjectInfo* info)
 //	matlabSwitchCode.append("\t\t\t" + objectTableName + "(" + tableIdxName +") = " + functionCall + ";\n");
 	matlabSwitchCode.append("\t\t\t" + tableIdxName + " = " + tableIdxName +" + 1;\n");
 	matlabSwitchCode.append("\t\t\t" + objectTableName + "= " + functionCall + objectTableName + ", " + tableIdxName + ");\n");
-    matlabSwitchCode.append("\t\t\tif " + tableIdxName + " >= length(" + objectTableName +") %Check to see if pre-allocated memory is exhausted\n");
+    matlabSwitchCode.append("\t\t\tif " + tableIdxName + " >= length(" + objectTableName +".timestamp) %Check to see if pre-allocated memory is exhausted\n");
     matlabSwitchCode.append("\t\t\t\tFieldNames= fieldnames(" + objectTableName +");\n");
     matlabSwitchCode.append("\t\t\t\tfor i=1:length(FieldNames) %Grow structure\n");
     matlabSwitchCode.append("\t\t\t\t\t" + objectTableName + ".(FieldNames{i})(:," + tableIdxName + "*2+1) = 0;\n");

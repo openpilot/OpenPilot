@@ -120,6 +120,15 @@ float switchThrottle;
 float smoothed_altitude;
 float starting_altitude;
 
+float dT;
+float z[3] = {0, 0, 0};
+float z_new[3];			
+float P[3][3], K[3][2], x[2];
+float G[3] = {1.0e-5f, 1.0e-5f, 1.0e-3f};
+float S[2] = {1.0f,10.0f};
+float V[3] = {10.0f, 10.0f, 10.0f};
+
+int32_t loop_count;
 /**
  * Module thread, should not return.
  */
@@ -142,7 +151,9 @@ static void altitudeHoldTask(void *parameters)
 	// Main task loop
 	lastSysTime = xTaskGetTickCount();
 	while (1) {
-
+		loop_count++;
+		
+		bool baro_updated;
 		// Wait until the AttitudeRaw object is updated, if a timeout then go to failsafe
 		if ( xQueueReceive(queue, &ev, 100 / portTICK_RATE_MS) != pdTRUE )
 		{
@@ -152,6 +163,8 @@ static void altitudeHoldTask(void *parameters)
 			// Todo: Add alarm if it should be running
 			continue;
 		} else if (ev.obj == BaroAltitudeHandle()) {
+			baro_updated = true;
+			
 			AltHoldSmoothedData altHold;
 			AltHoldSmoothedGet(&altHold);
 			float dT;
@@ -222,18 +235,12 @@ static void altitudeHoldTask(void *parameters)
 			} else if (flightStatus.FlightMode != FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD)
 				running = false;
 		} else if (ev.obj == AccelsHandle()) {
-			float dT;
-			float z[3] = {0, 0, 0};			
-			float P[3][3], K[3][2], x[2];
-			float G[3] = {1.0e-3f, 1.0e-3f, 1.0e-3f};
-			float S[2] = {0.0001f,1.0f}; //{1.0f,100.0f}; //{2.0f, 10.0f};
-			float V[3] = {10.0f, 10.0f, 10.0f};
 			static uint32_t timeval;
 
 			/* Somehow this always assigns to zero.  Compiler bug? Race condition? */
-			S[0] = altitudeHoldSettings.PressureNoise;
-			S[1] = altitudeHoldSettings.AccelNoise;
-			G[2] = altitudeHoldSettings.AccelDrift; 
+			//S[0] = altitudeHoldSettings.PressureNoise;
+			//S[1] = altitudeHoldSettings.AccelNoise;
+			//G[2] = altitudeHoldSettings.AccelDrift; 
 
 			AccelsData accels;
 			AccelsGet(&accels);
@@ -250,41 +257,64 @@ static void altitudeHoldTask(void *parameters)
 			} else if (init == WAITING_BARO)
 				continue;
 
-			//rotate avg accels into earth frame and store it
-			float q[4], Rbe[3][3];
-			q[0]=attitudeActual.q1;
-			q[1]=attitudeActual.q2;
-			q[2]=attitudeActual.q3;
-			q[3]=attitudeActual.q4;
-			Quaternion2R(q, Rbe);
-
 			x[0] = baro.Altitude;
-			x[1] = -(Rbe[0][2]*accels.x+ Rbe[1][2]*accels.y + Rbe[2][2]*accels.z + 9.81f);
+			//rotate avg accels into earth frame and store it
+			if(1) {
+				float q[4], Rbe[3][3];
+				q[0]=attitudeActual.q1;
+				q[1]=attitudeActual.q2;
+				q[2]=attitudeActual.q3;
+				q[3]=attitudeActual.q4;
+				Quaternion2R(q, Rbe);
+				x[1] = -(Rbe[0][2]*accels.x+ Rbe[1][2]*accels.y + Rbe[2][2]*accels.z + 9.81f);
+			} else {
+				x[1] = -accels.z + 9.81f;
+			}
 
 			dT = PIOS_DELAY_DiffuS(timeval) / 1.0e6f;
 			timeval = PIOS_DELAY_GetRaw();
 
+			V[0] = 0.014f;
+			V[1] = 9.6f;
+			V[2] = 3.2e-3f;
+
 			P[0][0] = G[0]+V[0]+(dT*dT)*V[1];
-			P[0][1] = dT*V[1];
-			P[1][0] = dT*V[1];
 			P[1][1] = G[1]+V[1]+(dT*dT)*V[2];
-			P[1][2] = dT*V[2];
-			P[2][1] = dT*V[2];
 			P[2][2] = G[2]+V[2];
+			P[1][0] = P[0][1] = dT*V[1];
+			P[2][1] = P[1][2] = dT*V[2];
 
-			//temp = (dT*V[1]); ///(G[0]+S[0]+V[0]+(dT*dT)*V[1]);
-			K[0][0] = -S[0]/(G[0]+S[0]+V[0]+(dT*dT)*V[1])+1.0f;
-			K[1][0] = (dT*V[1])/(G[0]+S[0]+V[0]+(dT*dT)*V[1]);
-			K[1][1] = (dT*V[2])/(G[2]+S[1]+V[2]);
-			K[2][1] = -S[1]/(G[2]+S[1]+V[2])+1.0f;
+			if (baro_updated) {
+				K[0][0] = -S[0]/(G[0]+S[0]+V[0]+(dT*dT)*V[1])+1.0f;
+				K[1][0] = (dT*V[1])/(G[0]+S[0]+V[0]+(dT*dT)*V[1]);
+				K[1][1] = (dT*V[2])/(G[2]+S[1]+V[2]);
+				K[2][1] = -S[1]/(G[2]+S[1]+V[2])+1.0f;
 
-			z[0] = -K[0][0]*(dT*z[1]-x[0]+z[0])+dT*z[1]+K[0][1]*(x[1]-z[2])+z[0];
-			z[1] = -K[1][0]*(dT*z[1]-x[0]+z[0])+dT*z[2]+K[1][1]*(x[1]-z[2])+z[1];
-			z[2] = -K[2][0]*(dT*z[1]-x[0]+z[0])+K[2][1]*(x[1]-z[2])+z[2];
+				z_new[0] = -K[0][0]*(dT*z[1]-x[0]+z[0])+dT*z[1]+z[0];
+				z_new[1] = -K[1][0]*(dT*z[1]-x[0]+z[0])+dT*z[2]+K[1][1]*(x[1]-z[2])+z[1];
+				z_new[2] =  K[2][1]*(x[1]-z[2])+z[2];
 
-			V[0] = -K[0][1]*P[2][0]-P[0][0]*(K[0][0]-1.0f);
-			V[1] = P[1][1]-K[1][0]*P[0][1]-K[1][1]*P[2][1];
-			V[2] = -K[2][0]*P[0][2]-P[2][2]*(K[2][1]-1.0f);
+				memcpy(z, z_new, sizeof(z_new));
+
+				V[0] = -P[0][0]*(K[0][0]-1.0f);
+				V[1] = P[1][1]-K[1][0]*P[0][1]-K[1][1]*P[2][1];
+				V[2] = -P[2][2]*(K[2][1]-1.0f);
+
+				baro_updated = false;
+			} else {
+				K[1][0] = (dT*V[2])/(G[2]+S[1]+V[2]);
+				K[2][0] = -S[1]/(G[2]+S[1]+V[2])+1.0f;
+
+				z_new[0] = dT*z[1]+z[0];
+				z_new[1] = dT*z[2]+K[1][0]*(x[1]-z[2])+z[1];
+				z_new[2] = K[2][0]*(x[1]-z[2])+z[2];
+
+				memcpy(z, z_new, sizeof(z_new));
+
+				V[0] = P[0][0];
+				V[1] = P[1][1]-K[1][0]*P[2][1];
+				V[2] = -P[2][2]*(K[2][0]-1.0f);
+			}
 
 			AltHoldSmoothedData altHold;
 			AltHoldSmoothedGet(&altHold);

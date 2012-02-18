@@ -37,9 +37,11 @@
 #include "homelocation.h"
 #include "gpstime.h"
 #include "gpssatellites.h"
+#include "osdsettings.h"
 
 #include "fonts.h"
 #include "font12x18.h"
+#include "WMMInternal.h"
 
 static uint16_t angleA=0;
 static int16_t angleB=90;
@@ -1817,14 +1819,17 @@ void drawBattery(uint16_t x, uint16_t y, uint8_t battery, uint16_t size)
 	//right
 	drawLine((x)-1+size, (y)-1+2, (x)-1+size, (y)-1+size*3);*/
 
+	write_rectangle_outlined((x)-1, (y)-1+2,size,size*3,0,1);
+	write_vline_lm((x)-1+(size/2+size/4)+1,(y)-2,(y)-1+1,0,1);
+	write_vline_lm((x)-1+(size/2-size/4)-1,(y)-2,(y)-1+1,0,1);
+	write_hline_lm((x)-1+(size/2-size/4),(x)-1 + (size/2+size/4),(y)-2,0,1);
 	write_hline_lm((x)-1+(size/2-size/4),(x)-1 + (size/2+size/4),(y)-1,1,1);
 	write_hline_lm((x)-1+(size/2-size/4),(x)-1 + (size/2+size/4),(y)-1+1,1,1);
-	write_rectangle_outlined((x)-1, (y)-1+2,size,size*3,0,1);
 
 	batteryLines = battery*(size*3-2)/100;
 	for(i=0;i<batteryLines;i++)
 	{
-		drawLine((x)-1, (y)-1+size*3-i, (x)-1 + size, (y)-1+size*3-i);
+		write_hline_lm((x)-1,(x)-1 + size,(y)-1+size*3-i,1,1);
 	}
 }
 
@@ -2122,9 +2127,90 @@ void hud_draw_linear_compass(int v, int range, int width, int x, int y, int mint
         write_string(headingstr, x + 1, majtick_start + textoffset+2, 1, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 1, 0);
 }
 
+
+void calcHomeArrow(void)
+{
+	HomeLocationData home;
+	HomeLocationGet (&home);
+	GPSPositionData gpsData;
+	GPSPositionGet (&gpsData);
+
+	/** http://www.movable-type.co.uk/scripts/latlong.html **/
+    float lat1, lat2, lon1, lon2, a, c, d, x, y, brng, u2g;
+    float elevation;
+    float gcsAlt=home.Altitude; // Home MSL altitude
+    float uavAlt=gpsData.Altitude; // UAV MSL altitude
+    float dAlt=uavAlt-gcsAlt; // Altitude difference
+
+    // Convert to radians
+    lat1 = DEG2RAD(home.Latitude)/10000000.0f; // Home lat
+    lon1 = DEG2RAD(home.Longitude)/10000000.0f; // Home lon
+    lat2 = DEG2RAD(gpsData.Latitude)/10000000.0f; // UAV lat
+    lon2 = DEG2RAD(gpsData.Longitude)/10000000.0f; // UAV lon
+
+    // Bearing
+    /**
+    var y = Math.sin(dLon) * Math.cos(lat2);
+    var x = Math.cos(lat1)*Math.sin(lat2) -
+            Math.sin(lat1)*Math.cos(lat2)*Math.cos(dLon);
+    var brng = Math.atan2(y, x).toDeg();
+    **/
+    y = sinf(lon2-lon1) * cosf(lat2);
+    x = cosf(lat1) * sinf(lat2) - sinf(lat1) * cosf(lat2) * cosf(lon2-lon1);
+    brng = RAD2DEG(atan2f((sinf(lon2-lon1)*cosf(lat2)),(cosf(lat1)*sinf(lat2)-sinf(lat1)*cosf(lat2)*cosf(lon2-lon1))));
+    if(brng<0)
+        brng+=360;
+
+    // yaw corrected bearing, needs compass
+    u2g=brng-180-m_yaw;
+    if(u2g<0)
+    	u2g+=360;
+
+    // Haversine formula for distance
+    /**
+    var R = 6371; // km
+    var dLat = (lat2-lat1).toRad();
+    var dLon = (lon2-lon1).toRad();
+    var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(lat1.toRad()) * Math.cos(lat2.toRad()) *
+            Math.sin(dLon/2) * Math.sin(dLon/2);
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    var d = R * c;
+    **/
+    a = sinf((lat2-lat1)/2) * sinf((lat2-lat1)/2) +
+            cosf(lat1) * cosf(lat2) *
+            sinf((lon2-lon1)/2) * sinf((lon2-lon1)/2);
+    c = 2 * atan2f(sqrtf(a), sqrtf(1-a));
+    d = 6371 * 1000 * c;
+
+    // Elevation  v depends servo direction
+    if(d!=0)
+        elevation = 90-RAD2DEG(atanf(dAlt/d));
+    else
+        elevation = 0;
+    //! TODO: sanity check
+
+	char temp[50]={0};
+	memset(temp, ' ', 40);
+	sprintf(temp,"hea:%d",(int)brng);
+	write_string(temp, 130, 10, 1, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 0);
+	sprintf(temp,"ele:%d",(int)elevation);
+	write_string(temp, 130, 10+14, 1, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 0);
+	sprintf(temp,"dis:%d",(int)d);
+	write_string(temp, 130, 10+14+14, 1, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 0);
+	sprintf(temp,"u2g:%d",(int)u2g);
+	write_string(temp, 130, 10+14+14+14, 1, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 0);
+
+	sprintf(temp,"%c%c",(int)(u2g/22.5f)*2+0x90,(int)(u2g/22.5f)*2+0x91);
+	printText16(200, 10+14+14,temp);
+
+}
+
 //main draw function
 void updateGraphics() {
 
+	OsdSettingsData OsdSettings;
+	OsdSettingsGet (&OsdSettings);
 	/*drawBox(2,2,GRAPHICS_WIDTH_REAL-4,GRAPHICS_HEIGHT_REAL-4);
 	write_filled_rectangle(draw_buffer_mask,0,0,GRAPHICS_WIDTH_REAL-2,GRAPHICS_HEIGHT_REAL-2,0);
 	write_filled_rectangle(draw_buffer_mask,2,2,GRAPHICS_WIDTH_REAL-4-2,GRAPHICS_HEIGHT_REAL-4-2,2);
@@ -2148,9 +2234,13 @@ void updateGraphics() {
 	angleB+=sum;
 	angleC+=2;
 
-	/* Draw Attitude Indicator */
-	drawAttitude(GRAPHICS_WIDTH_REAL/2,GRAPHICS_HEIGHT_REAL/2,m_pitch,m_roll,96);
+	calcHomeArrow();
 
+	/* Draw Attitude Indicator */
+	if(OsdSettings.Attitude == OSDSETTINGS_ATTITUDE_ENABLED)
+	{
+		drawAttitude(OsdSettings.AttitudeSetup[OSDSETTINGS_ATTITUDESETUP_X],OsdSettings.AttitudeSetup[OSDSETTINGS_ATTITUDESETUP_Y],m_pitch,m_roll,96);
+	}
 	//write_string("Hello OP-OSD", 60, 12, 1, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 0);
 	//printText16( 60, 12,"Hello OP-OSD");
 
@@ -2165,7 +2255,10 @@ void updateGraphics() {
 
 
 	/* Print RTC time */
-	printTime((GRAPHICS_WIDTH_REAL - 80)/16,GRAPHICS_HEIGHT_REAL-20);
+	if(OsdSettings.Time == OSDSETTINGS_TIME_ENABLED)
+	{
+		printTime(OsdSettings.TimeSetup[OSDSETTINGS_TIMESETUP_X],OsdSettings.TimeSetup[OSDSETTINGS_TIMESETUP_Y]);
+	}
 
 	/* Print Number of detected video Lines */
 	sprintf(temp,"Lines:%4d",PIOS_Video_GetOSDLines());
@@ -2195,7 +2288,10 @@ void updateGraphics() {
 		dir=1;
 		m_alt+=m_pitch/2;
 	}
-	drawBattery(GRAPHICS_WIDTH_REAL-20,GRAPHICS_HEIGHT_REAL-(20*3),m_batt,16);
+	if(OsdSettings.Battery == OSDSETTINGS_BATTERY_ENABLED)
+	{
+		drawBattery(OsdSettings.BatterySetup[OSDSETTINGS_BATTERYSETUP_X],OsdSettings.BatterySetup[OSDSETTINGS_BATTERYSETUP_Y],m_batt,16);
+	}
 
 	//drawAltitude(200,50,m_alt,dir);
 
@@ -2203,15 +2299,28 @@ void updateGraphics() {
 	//drawArrow(96,GRAPHICS_HEIGHT_REAL/2,angleB,32);
 
     // Draw airspeed (left side.)
-    hud_draw_vertical_scale((int)m_gpsSpd, 100, -1, 2, (DISP_HEIGHT / 2) + 10, 100, 10, 20, 7, 12, 15, 1000, HUD_VSCALE_FLAG_NO_NEGATIVE);
+	if(OsdSettings.Speed == OSDSETTINGS_SPEED_ENABLED)
+	{
+	    hud_draw_vertical_scale((int)m_gpsSpd, 100, -1, OsdSettings.SpeedSetup[OSDSETTINGS_SPEEDSETUP_X],
+	    		OsdSettings.SpeedSetup[OSDSETTINGS_SPEEDSETUP_Y], 100, 10, 20, 7, 12, 15, 1000, HUD_VSCALE_FLAG_NO_NEGATIVE);
+	}
     // Draw altimeter (right side.)
-    hud_draw_vertical_scale((int)m_gpsAlt, 200, +1, 2, (DISP_HEIGHT / 2) + 10, 100, 20, 100, 7, 12, 15, 500, 0);
+	if(OsdSettings.Altitude == OSDSETTINGS_ALTITUDE_ENABLED)
+	{
+		hud_draw_vertical_scale((int)m_gpsAlt, 200, +1, OsdSettings.AltitudeSetup[OSDSETTINGS_ALTITUDESETUP_X],
+				OsdSettings.AltitudeSetup[OSDSETTINGS_ALTITUDESETUP_Y], 100, 20, 100, 7, 12, 15, 500, 0);
+	}
     // Draw compass.
-    if(m_yaw<0)
-    	hud_draw_linear_compass(360+m_yaw, 150, 120, DISP_WIDTH / 2, DISP_HEIGHT - 20, 15, 30, 7, 12, 0);
-    else
-    	hud_draw_linear_compass(m_yaw, 150, 120, DISP_WIDTH / 2, DISP_HEIGHT - 20, 15, 30, 7, 12, 0);
-
+	if(OsdSettings.Heading == OSDSETTINGS_HEADING_ENABLED)
+	{
+		if(m_yaw<0) {
+			hud_draw_linear_compass(360+m_yaw, 150, 120, OsdSettings.HeadingSetup[OSDSETTINGS_HEADINGSETUP_X],
+					OsdSettings.HeadingSetup[OSDSETTINGS_HEADINGSETUP_Y], 15, 30, 7, 12, 0);
+		} else {
+			hud_draw_linear_compass(m_yaw, 150, 120, OsdSettings.HeadingSetup[OSDSETTINGS_HEADINGSETUP_X],
+					OsdSettings.HeadingSetup[OSDSETTINGS_HEADINGSETUP_Y], 15, 30, 7, 12, 0);
+		}
+	}
 	//write_filled_rectangle(draw_buffer_level,20,20,30,30,1);
 	//write_filled_rectangle(draw_buffer_mask,30,30,30,30,1);
 
@@ -2263,6 +2372,8 @@ int32_t osdgenInitialize(void)
 	HomeLocationInitialize();
 #endif
 #endif
+	OsdSettingsInitialize();
+
 	return 0;
 }
 MODULE_INITCALL(osdgenInitialize, osdgenStart)

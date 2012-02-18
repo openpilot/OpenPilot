@@ -337,6 +337,7 @@ static void setHomeLocation(GPSPositionData * gpsData)
 		home.Altitude = gpsData->Altitude + gpsData->GeoidSeparation;
 
 		// Compute home ECEF coordinates and the rotation matrix into NED
+#if defined(WORLD_MODEL)
 		double LLA[3] = { ((double)home.Latitude) / 10e6, ((double)home.Longitude) / 10e6, ((double)home.Altitude) };
 		double ECEF[3];
 		RneFromLLA(LLA, (float (*)[3])home.RNE);
@@ -358,6 +359,10 @@ static void setHomeLocation(GPSPositionData * gpsData)
 			home.Set = HOMELOCATION_SET_TRUE;
 			HomeLocationSet(&home);
 		}
+#else
+		home.Set = HOMELOCATION_SET_TRUE;
+		HomeLocationSet(&home);
+#endif
 	}
 }
 #endif

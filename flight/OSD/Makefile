@@ -119,6 +119,8 @@ SRC += $(OPSYSTEM)/cm3_fault_handlers.c
 
 SRC += $(FLIGHTLIB)/fifo_buffer.c
 SRC += $(FLIGHTLIB)/taskmonitor.c
+SRC += $(FLIGHTLIB)/CoordinateConversions.c
+SRC += $(FLIGHTLIB)/WorldMagModel.c
 
 ## UAVOBJECTS
 #SRC += $(OPUAVSYNTHDIR)/accessorydesired.c
@@ -152,9 +154,11 @@ SRC += $(OPUAVSYNTHDIR)/hwsettings.c
 SRC += $(OPUAVSYNTHDIR)/taskinfo.c
 SRC += $(OPUAVSYNTHDIR)/mixerstatus.c
 #SRC += $(OPUAVSYNTHDIR)/ratedesired.c
+SRC += $(OPUAVSYNTHDIR)/homelocation.c
 SRC += $(OPUAVSYNTHDIR)/gpsposition.c
 SRC += $(OPUAVSYNTHDIR)/gpssatellites.c
 SRC += $(OPUAVSYNTHDIR)/gpstime.c
+SRC += $(OPUAVSYNTHDIR)/osdsettings.c
 
 ## PIOS Hardware (STM32F10x)
 #SRC += $(PIOSSTM32F4XX)/pios_adc.c

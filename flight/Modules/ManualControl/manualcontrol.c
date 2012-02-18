@@ -88,7 +88,7 @@ static float scaleChannel(int16_t value, int16_t max, int16_t min, int16_t neutr
 static uint32_t timeDifferenceMs(portTickType start_time, portTickType end_time);
 static bool okToArm(void);
 static bool validInputRange(int16_t min, int16_t max, uint16_t value);
-static void applyDeadband (float *value, float deadband);
+static void applyDeadband(float *value, float deadband);
 
 #define RCVR_ACTIVITY_MONITOR_CHANNELS_PER_GROUP 12
 #define RCVR_ACTIVITY_MONITOR_MIN_RANGE 10
@@ -832,10 +832,15 @@ bool validInputRange(int16_t min, int16_t max, uint16_t value)
 /**
  * @brief Apply deadband to Roll/Pitch/Yaw channels
  */
-static void applyDeadband (float *value, float deadband)
+static void applyDeadband(float *value, float deadband)
 {
 	if (fabs(*value) < deadband)
 		*value = 0.0f;
+	else
+		if (*value > 0.0f)
+			*value -= deadband;
+		else
+			*value += deadband;
 }
 
 /**

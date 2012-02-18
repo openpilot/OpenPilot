@@ -264,6 +264,7 @@ void ConfigTaskWidget::refreshWidgetsValues()
         else
         {
             setWidgetFromField(ow->widget,ow->field,ow->index,ow->scale,ow->isLimited);
+
         }
 
     }
@@ -345,6 +346,25 @@ void ConfigTaskWidget::enableControls(bool enable)
     foreach (QPushButton * button, reloadButtonList) {
         button->setEnabled(enable);
     }
+}
+/**
+ * SLOT function called when on of the widgets contents added to the framework changes
+ */
+void ConfigTaskWidget::forceShadowUpdates()
+{
+    foreach(objectToWidget * oTw,objOfInterest)
+    {
+        foreach (shadow * sh, oTw->shadowsList)
+        {
+            disconnectWidgetUpdatesToSlot((QWidget*)sh->widget,SLOT(widgetsContentsChanged()));
+            checkWidgetsLimits(sh->widget,oTw->field,oTw->index,sh->isLimited,getVariantFromWidget(oTw->widget,oTw->scale),sh->scale);
+            setWidgetFromVariant(sh->widget,getVariantFromWidget(oTw->widget,oTw->scale),sh->scale);
+            emit widgetContentsChanged((QWidget*)sh->widget);
+            connectWidgetUpdatesToSlot((QWidget*)sh->widget,SLOT(widgetsContentsChanged()));
+
+        }
+    }
+    setDirty(true);
 }
 /**
  * SLOT function called when on of the widgets contents added to the framework changes
@@ -664,6 +684,15 @@ void ConfigTaskWidget::autoLoadWidgets()
         }
     }
     refreshWidgetsValues();
+    forceShadowUpdates();
+    foreach(objectToWidget * ow,objOfInterest)
+    {
+        qDebug()<<"Master:"<<ow->widget->objectName();
+        foreach(shadow * sh,ow->shadowsList)
+        {
+            qDebug()<<"Child"<<sh->widget->objectName();
+        }
+    }
 }
 /**
  * Adds a widget to a list of default/reload groups

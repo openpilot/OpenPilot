@@ -470,7 +470,7 @@
         <enum>QTabWidget::North</enum>
        </property>
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <property name="documentMode">
         <bool>true</bool>
@@ -11673,7 +11673,7 @@ border-radius: 4;
             <property name="geometry">
              <rect>
               <x>0</x>
-              <y>-38</y>
+              <y>0</y>
               <width>626</width>
               <height>828</height>
              </rect>

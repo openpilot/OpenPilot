@@ -115,6 +115,7 @@ public:
     bool allObjectsUpdated();
     void setOutOfLimitsStyle(QString style){outOfLimitsStyle=style;}
     void addHelpButton(QPushButton * button,QString url);
+    void forceShadowUpdates();
 public slots:
     void onAutopilotDisconnect();
     void onAutopilotConnect();

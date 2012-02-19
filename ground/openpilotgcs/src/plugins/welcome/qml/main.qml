@@ -35,37 +35,37 @@ Rectangle {
                 spacing: 4
 
                 WelcomePageButton {
-                    baseIconName: "welcome-flightdata"
+                    baseIconName: "flightdata"
                     label: "Flight Data"
                     onClicked: welcomePlugin.openPage("Mode1")
                 }
 
                 WelcomePageButton {
-                    baseIconName: "welcome-flightdata"
+                    baseIconName: "config"
                     label: "Configuration"
                     onClicked: welcomePlugin.openPage("Mode2")
                 }
 
                 WelcomePageButton {
-                    baseIconName: "welcome-flightdata"
+                    baseIconName: "planner"
                     label: "Flight Planner"
                     onClicked: welcomePlugin.openPage("Mode3")
                 }
 
                 WelcomePageButton {
-                    baseIconName: "welcome-flightdata"
+                    baseIconName: "scopes"
                     label: "Scopes"
                     onClicked: welcomePlugin.openPage("Mode4")
                 }
 
                 WelcomePageButton {
-                    baseIconName: "welcome-flightdata"
+                    baseIconName: "hitl"
                     label: "HIL"
                     onClicked: welcomePlugin.openPage("Mode5")
                 }
 
                 WelcomePageButton {
-                    baseIconName: "welcome-flightdata"
+                    baseIconName: "firmware"
                     label: "Firmware"
                     onClicked: welcomePlugin.openPage("Mode6")
                 }

@@ -295,7 +295,7 @@ void ConfigTaskWidget::updateObjectsFromWidgets()
  */
 void ConfigTaskWidget::helpButtonPressed()
 {
-    QString url=helpButtonList.value((QPushButton*)sender(),QString::QString());
+    QString url=helpButtonList.value((QPushButton*)sender(),QString());
     if(!url.isEmpty())
         QDesktopServices::openUrl( QUrl(url, QUrl::StrictMode) );
 }

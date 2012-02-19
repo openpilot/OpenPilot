@@ -13,13 +13,13 @@ Item {
 
     Image {
         id: icon
-        source: "images/"+baseIconName+".png"
+        source: "images/"+baseIconName+"-off.png"
         anchors.centerIn: parent
     }
 
     Image {
         id: hoveredIcon
-        source: "images/"+baseIconName+"-hover.png"
+        source: "images/"+baseIconName+"-on.png"
         anchors.centerIn: parent
         opacity: 0
     }

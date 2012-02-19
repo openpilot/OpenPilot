@@ -496,8 +496,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>626</width>
-              <height>842</height>
+              <width>648</width>
+              <height>802</height>
              </rect>
             </property>
             <layout class="QGridLayout" name="gridLayout_23">
@@ -1091,7 +1091,11 @@
                 <bool>false</bool>
                </property>
                <property name="styleSheet">
-                <string notr="true">#RateStabilizationGroup_15{background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0 rgba(243, 243, 243, 255), stop:1 rgba(250, 250, 250, 255));}</string>
+                <string notr="true">#RateStabilizationGroup_15{background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0 rgba(243, 243, 243, 255), stop:1 rgba(250, 250, 250, 255));
+
+border: 1px outset #999;
+border-radius: 3;
+}</string>
                </property>
                <property name="title">
                 <string/>
@@ -1683,7 +1687,7 @@ border-radius: 4;
                   <property name="flat">
                    <bool>true</bool>
                   </property>
-                  <layout class="QGridLayout" name="gridLayout_25">
+                  <layout class="QGridLayout" name="gridLayout_11">
                    <item row="0" column="1">
                     <widget class="QLabel" name="label_138">
                      <property name="sizePolicy">
@@ -2234,7 +2238,7 @@ border-radius: 5;</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="0" column="3">
+                   <item row="0" column="4">
                     <widget class="QLabel" name="label_139">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -2784,7 +2788,7 @@ border-radius: 5;</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="0" column="5">
+                   <item row="0" column="7">
                     <widget class="QLabel" name="label_140">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -3407,24 +3411,24 @@ border-radius: 5;</string>
                     </widget>
                    </item>
                    <item row="1" column="2">
-                    <widget class="QLabel" name="label_142">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
+                    <widget class="QSpinBox" name="spinBox_7">
                      <property name="minimumSize">
                       <size>
-                       <width>21</width>
-                       <height>16</height>
+                       <width>43</width>
+                       <height>22</height>
                       </size>
                      </property>
-                     <property name="styleSheet">
-                      <string notr="true"/>
+                     <property name="maximumSize">
+                      <size>
+                       <width>43</width>
+                       <height>22</height>
+                      </size>
                      </property>
-                     <property name="text">
-                      <string>50</string>
+                     <property name="maximum">
+                      <number>200</number>
+                     </property>
+                     <property name="value">
+                      <number>200</number>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -3439,6 +3443,22 @@ border-radius: 5;</string>
                     </widget>
                    </item>
                    <item row="1" column="3">
+                    <spacer name="horizontalSpacer_6">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeType">
+                      <enum>QSizePolicy::Fixed</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>3</width>
+                       <height>22</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                   <item row="1" column="4">
                     <widget class="QSlider" name="horizontalSlider_77">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -3482,30 +3502,30 @@ border-radius: 5;</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="1" column="4">
-                    <widget class="QLabel" name="label_143">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
+                   <item row="1" column="5">
+                    <widget class="QSpinBox" name="spinBox_11">
                      <property name="minimumSize">
                       <size>
-                       <width>21</width>
-                       <height>16</height>
+                       <width>43</width>
+                       <height>22</height>
                       </size>
                      </property>
-                     <property name="styleSheet">
-                      <string notr="true"/>
+                     <property name="maximumSize">
+                      <size>
+                       <width>43</width>
+                       <height>22</height>
+                      </size>
                      </property>
-                     <property name="text">
-                      <string>50</string>
+                     <property name="maximum">
+                      <number>200</number>
+                     </property>
+                     <property name="value">
+                      <number>200</number>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
                        <string>objname:StabilizationSettings</string>
-                       <string>fieldname:PitchRatePID</string>
+                       <string>fieldname:RollRatePID</string>
                        <string>element:Kp</string>
                        <string>haslimits:yes</string>
                        <string>scale:0.0001</string>
@@ -3514,7 +3534,23 @@ border-radius: 5;</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="1" column="5">
+                   <item row="1" column="6">
+                    <spacer name="horizontalSpacer_34">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeType">
+                      <enum>QSizePolicy::Fixed</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>3</width>
+                       <height>22</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                   <item row="1" column="7">
                     <widget class="QSlider" name="horizontalSlider_78">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -3558,25 +3594,25 @@ border-radius: 5;</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="1" column="6">
-                    <widget class="QLabel" name="label_144">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
+                   <item row="1" column="8">
+                    <widget class="QSpinBox" name="spinBox_12">
                      <property name="minimumSize">
                       <size>
-                       <width>21</width>
-                       <height>16</height>
+                       <width>43</width>
+                       <height>22</height>
                       </size>
                      </property>
-                     <property name="styleSheet">
-                      <string notr="true"/>
+                     <property name="maximumSize">
+                      <size>
+                       <width>43</width>
+                       <height>22</height>
+                      </size>
                      </property>
-                     <property name="text">
-                      <string>50</string>
+                     <property name="maximum">
+                      <number>200</number>
+                     </property>
+                     <property name="value">
+                      <number>200</number>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -3654,24 +3690,24 @@ border-radius: 5;</string>
                     </widget>
                    </item>
                    <item row="2" column="2">
-                    <widget class="QLabel" name="label_146">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
+                    <widget class="QSpinBox" name="spinBox_8">
                      <property name="minimumSize">
                       <size>
-                       <width>21</width>
-                       <height>16</height>
+                       <width>43</width>
+                       <height>22</height>
                       </size>
                      </property>
-                     <property name="styleSheet">
-                      <string notr="true"/>
+                     <property name="maximumSize">
+                      <size>
+                       <width>43</width>
+                       <height>22</height>
+                      </size>
                      </property>
-                     <property name="text">
-                      <string>50</string>
+                     <property name="maximum">
+                      <number>200</number>
+                     </property>
+                     <property name="value">
+                      <number>200</number>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -3685,7 +3721,7 @@ border-radius: 5;</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="2" column="3">
+                   <item row="2" column="4">
                     <widget class="QSlider" name="horizontalSlider_80">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -3729,25 +3765,25 @@ border-radius: 5;</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="2" column="4">
-                    <widget class="QLabel" name="label_147">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
+                   <item row="2" column="5">
+                    <widget class="QSpinBox" name="spinBox_9">
                      <property name="minimumSize">
                       <size>
-                       <width>21</width>
-                       <height>16</height>
+                       <width>43</width>
+                       <height>22</height>
                       </size>
                      </property>
-                     <property name="styleSheet">
-                      <string notr="true"/>
+                     <property name="maximumSize">
+                      <size>
+                       <width>43</width>
+                       <height>22</height>
+                      </size>
                      </property>
-                     <property name="text">
-                      <string>50</string>
+                     <property name="maximum">
+                      <number>200</number>
+                     </property>
+                     <property name="value">
+                      <number>200</number>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -3761,7 +3797,7 @@ border-radius: 5;</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="2" column="5">
+                   <item row="2" column="7">
                     <widget class="QSlider" name="horizontalSlider_81">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -3805,25 +3841,25 @@ border-radius: 5;</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="2" column="6">
-                    <widget class="QLabel" name="label_148">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
+                   <item row="2" column="8">
+                    <widget class="QSpinBox" name="spinBox_10">
                      <property name="minimumSize">
                       <size>
-                       <width>21</width>
-                       <height>16</height>
+                       <width>43</width>
+                       <height>22</height>
                       </size>
                      </property>
-                     <property name="styleSheet">
-                      <string notr="true"/>
+                     <property name="maximumSize">
+                      <size>
+                       <width>43</width>
+                       <height>22</height>
+                      </size>
                      </property>
-                     <property name="text">
-                      <string>50</string>
+                     <property name="maximum">
+                      <number>200</number>
+                     </property>
+                     <property name="value">
+                      <number>200</number>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -4433,7 +4469,11 @@ border-radius: 5;</string>
                 <bool>false</bool>
                </property>
                <property name="styleSheet">
-                <string notr="true">#RateStabilizationGroup_17{background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0 rgba(243, 243, 243, 255), stop:1 rgba(250, 250, 250, 255));}</string>
+                <string notr="true">#RateStabilizationGroup_17{background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0 rgba(243, 243, 243, 255), stop:1 rgba(250, 250, 250, 255));
+
+border: 1px outset #999;
+border-radius: 3;
+}</string>
                </property>
                <property name="title">
                 <string/>
@@ -4967,7 +5007,7 @@ border-radius: 4;
                   <property name="flat">
                    <bool>true</bool>
                   </property>
-                  <layout class="QGridLayout" name="gridLayout_27">
+                  <layout class="QGridLayout" name="gridLayout_12">
                    <item row="0" column="1">
                     <widget class="QLabel" name="label_150">
                      <property name="sizePolicy">
@@ -5518,7 +5558,7 @@ border-radius: 5;</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="0" column="3">
+                   <item row="0" column="4">
                     <widget class="QLabel" name="label_151">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -6068,7 +6108,7 @@ border-radius: 5;</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="0" column="5">
+                   <item row="0" column="7">
                     <widget class="QLabel" name="label_152">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -6688,24 +6728,24 @@ border-radius: 5;</string>
                     </widget>
                    </item>
                    <item row="1" column="2">
-                    <widget class="QLabel" name="label_154">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
+                    <widget class="QSpinBox" name="spinBox_13">
                      <property name="minimumSize">
                       <size>
-                       <width>21</width>
-                       <height>16</height>
+                       <width>43</width>
+                       <height>22</height>
                       </size>
                      </property>
-                     <property name="styleSheet">
-                      <string notr="true"/>
+                     <property name="maximumSize">
+                      <size>
+                       <width>43</width>
+                       <height>22</height>
+                      </size>
                      </property>
-                     <property name="text">
-                      <string>50</string>
+                     <property name="maximum">
+                      <number>200</number>
+                     </property>
+                     <property name="value">
+                      <number>200</number>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -6720,6 +6760,22 @@ border-radius: 5;</string>
                     </widget>
                    </item>
                    <item row="1" column="3">
+                    <spacer name="horizontalSpacer_35">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeType">
+                      <enum>QSizePolicy::Fixed</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>3</width>
+                       <height>22</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                   <item row="1" column="4">
                     <widget class="QSlider" name="horizontalSlider_83">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -6763,25 +6819,25 @@ border-radius: 5;</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="1" column="4">
-                    <widget class="QLabel" name="label_155">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
+                   <item row="1" column="5">
+                    <widget class="QSpinBox" name="spinBox_14">
                      <property name="minimumSize">
                       <size>
-                       <width>21</width>
-                       <height>16</height>
+                       <width>43</width>
+                       <height>22</height>
                       </size>
                      </property>
-                     <property name="styleSheet">
-                      <string notr="true"/>
+                     <property name="maximumSize">
+                      <size>
+                       <width>43</width>
+                       <height>22</height>
+                      </size>
                      </property>
-                     <property name="text">
-                      <string>50</string>
+                     <property name="maximum">
+                      <number>200</number>
+                     </property>
+                     <property name="value">
+                      <number>200</number>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -6795,7 +6851,23 @@ border-radius: 5;</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="1" column="5">
+                   <item row="1" column="6">
+                    <spacer name="horizontalSpacer_36">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeType">
+                      <enum>QSizePolicy::Fixed</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>3</width>
+                       <height>22</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                   <item row="1" column="7">
                     <widget class="QSlider" name="horizontalSlider_84">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -6839,25 +6911,25 @@ border-radius: 5;</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="1" column="6">
-                    <widget class="QLabel" name="label_156">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
+                   <item row="1" column="8">
+                    <widget class="QSpinBox" name="spinBox_15">
                      <property name="minimumSize">
                       <size>
-                       <width>21</width>
-                       <height>16</height>
+                       <width>43</width>
+                       <height>22</height>
                       </size>
                      </property>
-                     <property name="styleSheet">
-                      <string notr="true"/>
+                     <property name="maximumSize">
+                      <size>
+                       <width>43</width>
+                       <height>22</height>
+                      </size>
                      </property>
-                     <property name="text">
-                      <string>50</string>
+                     <property name="maximum">
+                      <number>200</number>
+                     </property>
+                     <property name="value">
+                      <number>200</number>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -6870,6 +6942,22 @@ border-radius: 5;</string>
                       </stringlist>
                      </property>
                     </widget>
+                   </item>
+                   <item row="1" column="9">
+                    <spacer name="horizontalSpacer_37">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeType">
+                      <enum>QSizePolicy::Fixed</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>3</width>
+                       <height>22</height>
+                      </size>
+                     </property>
+                    </spacer>
                    </item>
                    <item row="2" column="0">
                     <widget class="QLabel" name="label_157">
@@ -6935,24 +7023,24 @@ border-radius: 5;</string>
                     </widget>
                    </item>
                    <item row="2" column="2">
-                    <widget class="QLabel" name="label_158">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
+                    <widget class="QSpinBox" name="spinBox_18">
                      <property name="minimumSize">
                       <size>
-                       <width>21</width>
-                       <height>16</height>
+                       <width>43</width>
+                       <height>22</height>
                       </size>
                      </property>
-                     <property name="styleSheet">
-                      <string notr="true"/>
+                     <property name="maximumSize">
+                      <size>
+                       <width>43</width>
+                       <height>22</height>
+                      </size>
                      </property>
-                     <property name="text">
-                      <string>50</string>
+                     <property name="maximum">
+                      <number>200</number>
+                     </property>
+                     <property name="value">
+                      <number>200</number>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -6966,7 +7054,7 @@ border-radius: 5;</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="2" column="3">
+                   <item row="2" column="4">
                     <widget class="QSlider" name="horizontalSlider_86">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -7010,25 +7098,25 @@ border-radius: 5;</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="2" column="4">
-                    <widget class="QLabel" name="label_159">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
+                   <item row="2" column="5">
+                    <widget class="QSpinBox" name="spinBox_19">
                      <property name="minimumSize">
                       <size>
-                       <width>21</width>
-                       <height>16</height>
+                       <width>43</width>
+                       <height>22</height>
                       </size>
                      </property>
-                     <property name="styleSheet">
-                      <string notr="true"/>
+                     <property name="maximumSize">
+                      <size>
+                       <width>43</width>
+                       <height>22</height>
+                      </size>
                      </property>
-                     <property name="text">
-                      <string>50</string>
+                     <property name="maximum">
+                      <number>200</number>
+                     </property>
+                     <property name="value">
+                      <number>200</number>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -7042,7 +7130,7 @@ border-radius: 5;</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="2" column="5">
+                   <item row="2" column="7">
                     <widget class="QSlider" name="horizontalSlider_87">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -7086,25 +7174,25 @@ border-radius: 5;</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="2" column="6">
-                    <widget class="QLabel" name="label_160">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
+                   <item row="2" column="8">
+                    <widget class="QSpinBox" name="spinBox_20">
                      <property name="minimumSize">
                       <size>
-                       <width>21</width>
-                       <height>16</height>
+                       <width>43</width>
+                       <height>22</height>
                       </size>
                      </property>
-                     <property name="styleSheet">
-                      <string notr="true"/>
+                     <property name="maximumSize">
+                      <size>
+                       <width>43</width>
+                       <height>22</height>
+                      </size>
                      </property>
-                     <property name="text">
-                      <string>50</string>
+                     <property name="maximum">
+                      <number>200</number>
+                     </property>
+                     <property name="value">
+                      <number>200</number>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -7208,7 +7296,7 @@ border-radius: 4;
                </property>
               </spacer>
              </item>
-             <item row="8" column="1">
+             <item row="7" column="1">
               <spacer name="horizontalSpacer_21">
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
@@ -7224,7 +7312,7 @@ border-radius: 4;
                </property>
               </spacer>
              </item>
-             <item row="8" column="2">
+             <item row="7" column="2">
               <widget class="QLabel" name="label_161">
                <property name="minimumSize">
                 <size>
@@ -7244,7 +7332,7 @@ border-radius: 4;
                </property>
               </widget>
              </item>
-             <item row="9" column="1" colspan="4">
+             <item row="8" column="1" colspan="4">
               <widget class="QGroupBox" name="RateStabilizationGroup_19">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -7782,7 +7870,11 @@ border-radius: 4;
                 <bool>false</bool>
                </property>
                <property name="styleSheet">
-                <string notr="true">#RateStabilizationGroup_19{background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0 rgba(243, 243, 243, 255), stop:1 rgba(250, 250, 250, 255));}</string>
+                <string notr="true">#RateStabilizationGroup_19{background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0 rgba(243, 243, 243, 255), stop:1 rgba(250, 250, 250, 255));
+
+border: 1px outset #999;
+border-radius: 3;
+}</string>
                </property>
                <property name="title">
                 <string/>
@@ -8358,10 +8450,7 @@ border-radius: 4;
                   <property name="flat">
                    <bool>true</bool>
                   </property>
-                  <layout class="QGridLayout" name="gridLayout_29">
-                   <property name="topMargin">
-                    <number>11</number>
-                   </property>
+                  <layout class="QGridLayout" name="gridLayout_13">
                    <item row="0" column="1">
                     <widget class="QLabel" name="label_162">
                      <property name="sizePolicy">
@@ -8912,7 +9001,7 @@ border-radius: 5;</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="0" column="3">
+                   <item row="0" column="4">
                     <widget class="QLabel" name="label_163">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -9462,7 +9551,7 @@ border-radius: 5;</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="0" column="5">
+                   <item row="0" column="7">
                     <widget class="QLabel" name="label_164">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -10082,24 +10171,24 @@ Angle</string>
                     </widget>
                    </item>
                    <item row="1" column="2">
-                    <widget class="QLabel" name="label_166">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
+                    <widget class="QSpinBox" name="spinBox_16">
                      <property name="minimumSize">
                       <size>
-                       <width>21</width>
-                       <height>16</height>
+                       <width>43</width>
+                       <height>22</height>
                       </size>
                      </property>
-                     <property name="styleSheet">
-                      <string notr="true"/>
+                     <property name="maximumSize">
+                      <size>
+                       <width>43</width>
+                       <height>22</height>
+                      </size>
                      </property>
-                     <property name="text">
-                      <string>50</string>
+                     <property name="maximum">
+                      <number>200</number>
+                     </property>
+                     <property name="value">
+                      <number>200</number>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -10113,6 +10202,22 @@ Angle</string>
                     </widget>
                    </item>
                    <item row="1" column="3">
+                    <spacer name="horizontalSpacer_38">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeType">
+                      <enum>QSizePolicy::Fixed</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>3</width>
+                       <height>22</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                   <item row="1" column="4">
                     <widget class="QSlider" name="horizontalSlider_89">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -10155,25 +10260,25 @@ Angle</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="1" column="4">
-                    <widget class="QLabel" name="label_167">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
+                   <item row="1" column="5">
+                    <widget class="QSpinBox" name="spinBox_17">
                      <property name="minimumSize">
                       <size>
-                       <width>21</width>
-                       <height>16</height>
+                       <width>43</width>
+                       <height>22</height>
                       </size>
                      </property>
-                     <property name="styleSheet">
-                      <string notr="true"/>
+                     <property name="maximumSize">
+                      <size>
+                       <width>43</width>
+                       <height>22</height>
+                      </size>
                      </property>
-                     <property name="text">
-                      <string>50</string>
+                     <property name="maximum">
+                      <number>200</number>
+                     </property>
+                     <property name="value">
+                      <number>200</number>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -10186,7 +10291,23 @@ Angle</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="1" column="5">
+                   <item row="1" column="6">
+                    <spacer name="horizontalSpacer_39">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeType">
+                      <enum>QSizePolicy::Fixed</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>3</width>
+                       <height>22</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                   <item row="1" column="7">
                     <widget class="QSlider" name="horizontalSlider_90">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -10229,25 +10350,25 @@ Angle</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="1" column="6">
-                    <widget class="QLabel" name="label_168">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
+                   <item row="1" column="8">
+                    <widget class="QSpinBox" name="spinBox_21">
                      <property name="minimumSize">
                       <size>
-                       <width>21</width>
-                       <height>16</height>
+                       <width>43</width>
+                       <height>22</height>
                       </size>
                      </property>
-                     <property name="styleSheet">
-                      <string notr="true"/>
+                     <property name="maximumSize">
+                      <size>
+                       <width>43</width>
+                       <height>22</height>
+                      </size>
                      </property>
-                     <property name="text">
-                      <string>50</string>
+                     <property name="maximum">
+                      <number>200</number>
+                     </property>
+                     <property name="value">
+                      <number>200</number>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -10325,24 +10446,24 @@ Rate</string>
                     </widget>
                    </item>
                    <item row="2" column="2">
-                    <widget class="QLabel" name="label_170">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
+                    <widget class="QSpinBox" name="spinBox_22">
                      <property name="minimumSize">
                       <size>
-                       <width>21</width>
-                       <height>16</height>
+                       <width>43</width>
+                       <height>22</height>
                       </size>
                      </property>
-                     <property name="styleSheet">
-                      <string notr="true"/>
+                     <property name="maximumSize">
+                      <size>
+                       <width>43</width>
+                       <height>22</height>
+                      </size>
                      </property>
-                     <property name="text">
-                      <string>50</string>
+                     <property name="maximum">
+                      <number>200</number>
+                     </property>
+                     <property name="value">
+                      <number>200</number>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -10356,7 +10477,7 @@ Rate</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="2" column="3">
+                   <item row="2" column="4">
                     <widget class="QSlider" name="horizontalSlider_92">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -10400,25 +10521,25 @@ Rate</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="2" column="4">
-                    <widget class="QLabel" name="label_171">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
+                   <item row="2" column="5" colspan="2">
+                    <widget class="QSpinBox" name="spinBox_23">
                      <property name="minimumSize">
                       <size>
-                       <width>21</width>
-                       <height>16</height>
+                       <width>43</width>
+                       <height>22</height>
                       </size>
                      </property>
-                     <property name="styleSheet">
-                      <string notr="true"/>
+                     <property name="maximumSize">
+                      <size>
+                       <width>43</width>
+                       <height>22</height>
+                      </size>
                      </property>
-                     <property name="text">
-                      <string>50</string>
+                     <property name="maximum">
+                      <number>200</number>
+                     </property>
+                     <property name="value">
+                      <number>200</number>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -10432,7 +10553,7 @@ Rate</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="2" column="5">
+                   <item row="2" column="7">
                     <widget class="QSlider" name="horizontalSlider_93">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -10476,25 +10597,25 @@ Rate</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="2" column="6">
-                    <widget class="QLabel" name="label_172">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
+                   <item row="2" column="8">
+                    <widget class="QSpinBox" name="spinBox_24">
                      <property name="minimumSize">
                       <size>
-                       <width>21</width>
-                       <height>16</height>
+                       <width>43</width>
+                       <height>22</height>
                       </size>
                      </property>
-                     <property name="styleSheet">
-                      <string notr="true"/>
+                     <property name="maximumSize">
+                      <size>
+                       <width>43</width>
+                       <height>22</height>
+                      </size>
                      </property>
-                     <property name="text">
-                      <string>50</string>
+                     <property name="maximum">
+                      <number>200</number>
+                     </property>
+                     <property name="value">
+                      <number>200</number>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -10573,24 +10694,24 @@ Attitude</string>
                     </widget>
                    </item>
                    <item row="3" column="2">
-                    <widget class="QLabel" name="label_174">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
+                    <widget class="QSpinBox" name="spinBox_25">
                      <property name="minimumSize">
                       <size>
-                       <width>21</width>
-                       <height>16</height>
+                       <width>43</width>
+                       <height>22</height>
                       </size>
                      </property>
-                     <property name="styleSheet">
-                      <string notr="true"/>
+                     <property name="maximumSize">
+                      <size>
+                       <width>43</width>
+                       <height>22</height>
+                      </size>
                      </property>
-                     <property name="text">
-                      <string>50</string>
+                     <property name="maximum">
+                      <number>200</number>
+                     </property>
+                     <property name="value">
+                      <number>200</number>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -10604,7 +10725,7 @@ Attitude</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="3" column="3">
+                   <item row="3" column="4">
                     <widget class="QSlider" name="horizontalSlider_95">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -10648,25 +10769,25 @@ Attitude</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="3" column="4">
-                    <widget class="QLabel" name="label_175">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
+                   <item row="3" column="5">
+                    <widget class="QSpinBox" name="spinBox_26">
                      <property name="minimumSize">
                       <size>
-                       <width>21</width>
-                       <height>16</height>
+                       <width>43</width>
+                       <height>22</height>
                       </size>
                      </property>
-                     <property name="styleSheet">
-                      <string notr="true"/>
+                     <property name="maximumSize">
+                      <size>
+                       <width>43</width>
+                       <height>22</height>
+                      </size>
                      </property>
-                     <property name="text">
-                      <string>50</string>
+                     <property name="maximum">
+                      <number>200</number>
+                     </property>
+                     <property name="value">
+                      <number>200</number>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -10680,7 +10801,7 @@ Attitude</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="3" column="5">
+                   <item row="3" column="7">
                     <widget class="QSlider" name="horizontalSlider_96">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -10724,25 +10845,25 @@ Attitude</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="3" column="6">
-                    <widget class="QLabel" name="label_176">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
+                   <item row="3" column="8">
+                    <widget class="QSpinBox" name="spinBox_27">
                      <property name="minimumSize">
                       <size>
-                       <width>21</width>
-                       <height>16</height>
+                       <width>43</width>
+                       <height>22</height>
                       </size>
                      </property>
-                     <property name="styleSheet">
-                      <string notr="true"/>
+                     <property name="maximumSize">
+                      <size>
+                       <width>43</width>
+                       <height>22</height>
+                      </size>
                      </property>
-                     <property name="text">
-                      <string>50</string>
+                     <property name="maximum">
+                      <number>200</number>
+                     </property>
+                     <property name="value">
+                      <number>200</number>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -10762,7 +10883,7 @@ Attitude</string>
                </layout>
               </widget>
              </item>
-             <item row="10" column="3">
+             <item row="9" column="3">
               <spacer name="verticalSpacer_9">
                <property name="orientation">
                 <enum>Qt::Vertical</enum>
@@ -10778,7 +10899,7 @@ Attitude</string>
                </property>
               </spacer>
              </item>
-             <item row="12" column="4">
+             <item row="11" column="4">
               <spacer name="verticalSpacer_10">
                <property name="orientation">
                 <enum>Qt::Vertical</enum>
@@ -10810,7 +10931,7 @@ Attitude</string>
                </property>
               </spacer>
              </item>
-             <item row="11" column="1" colspan="4">
+             <item row="10" column="1" colspan="4">
               <widget class="QGroupBox" name="RateStabilizationGroup_21">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -11348,7 +11469,11 @@ Attitude</string>
                 <bool>false</bool>
                </property>
                <property name="styleSheet">
-                <string notr="true">#RateStabilizationGroup_21{background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0 rgba(243, 243, 243, 255), stop:1 rgba(250, 250, 250, 255));}</string>
+                <string notr="true">#RateStabilizationGroup_21{background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0 rgba(243, 243, 243, 255), stop:1 rgba(250, 250, 250, 255));
+
+border: 1px outset #999;
+border-radius: 3;
+}</string>
                </property>
                <property name="title">
                 <string/>
@@ -11399,13 +11524,6 @@ Attitude</string>
                     <height>20</height>
                    </size>
                   </property>
-                  <property name="font">
-                   <font>
-                    <pointsize>8</pointsize>
-                    <weight>50</weight>
-                    <bold>false</bold>
-                   </font>
-                  </property>
                   <property name="toolTip">
                    <string>If you check this, the GCS will udpate the stabilization factors
 automatically every 300ms, which will help for fast tuning.</string>
@@ -11432,44 +11550,6 @@ automatically every 300ms, which will help for fast tuning.</string>
                  </spacer>
                 </item>
                 <item row="1" column="2">
-                 <widget class="QPushButton" name="stabilizationHelp_5">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>32</width>
-                    <height>32</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string/>
-                  </property>
-                  <property name="icon">
-                   <iconset resource="../coreplugin/core.qrc">
-                    <normaloff>:/core/images/helpicon.svg</normaloff>:/core/images/helpicon.svg</iconset>
-                  </property>
-                  <property name="iconSize">
-                   <size>
-                    <width>32</width>
-                    <height>32</height>
-                   </size>
-                  </property>
-                  <property name="flat">
-                   <bool>true</bool>
-                  </property>
-                  <property name="objrelation" stdset="0">
-                   <stringlist>
-                    <string>button:help</string>
-                    <string>url:http://wiki.openpilot.org/display/Doc/Stabilization+panel</string>
-                   </stringlist>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="3">
                  <widget class="QPushButton" name="stabilizationReloadBoardData_6">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -11526,7 +11606,7 @@ border-radius: 4;
                   </property>
                  </widget>
                 </item>
-                <item row="1" column="4">
+                <item row="1" column="3">
                  <widget class="QPushButton" name="saveStabilizationToRAM_6">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -11585,7 +11665,7 @@ border-radius: 4;
                   </property>
                  </widget>
                 </item>
-                <item row="1" column="5">
+                <item row="1" column="4">
                  <widget class="QPushButton" name="saveStabilizationToSD_6">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -11647,9 +11727,6 @@ border-radius: 4;
                </layout>
               </widget>
              </item>
-             <item row="7" column="2">
-              <layout class="QHBoxLayout" name="horizontalLayout"/>
-             </item>
             </layout>
            </widget>
           </widget>
@@ -11674,8 +11751,8 @@ border-radius: 4;
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>626</width>
-              <height>828</height>
+              <width>648</width>
+              <height>798</height>
              </rect>
             </property>
             <layout class="QGridLayout" name="gridLayout">
@@ -12269,7 +12346,11 @@ border-radius: 4;
                 <bool>false</bool>
                </property>
                <property name="styleSheet">
-                <string notr="true">#RateStabilizationGroup_8{background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0 rgba(243, 243, 243, 255), stop:1 rgba(250, 250, 250, 255));}</string>
+                <string notr="true">#RateStabilizationGroup_8{background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0 rgba(243, 243, 243, 255), stop:1 rgba(250, 250, 250, 255));
+
+border: 1px outset #999;
+border-radius: 3;
+}</string>
                </property>
                <property name="title">
                 <string/>
@@ -15616,7 +15697,11 @@ You can usually go for higher values for Yaw factors.</string>
                 <bool>false</bool>
                </property>
                <property name="styleSheet">
-                <string notr="true">#RateStabilizationGroup_4{background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0 rgba(243, 243, 243, 255), stop:1 rgba(250, 250, 250, 255));}</string>
+                <string notr="true">#RateStabilizationGroup_4{background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0 rgba(243, 243, 243, 255), stop:1 rgba(250, 250, 250, 255));
+
+border: 1px outset #999;
+border-radius: 3;
+}</string>
                </property>
                <property name="title">
                 <string/>
@@ -18931,7 +19016,11 @@ You can usually go for higher values for Yaw factors.</string>
                 <bool>false</bool>
                </property>
                <property name="styleSheet">
-                <string notr="true">#RateStabilizationGroup_6{background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0 rgba(243, 243, 243, 255), stop:1 rgba(250, 250, 250, 255));}</string>
+                <string notr="true">#RateStabilizationGroup_6{background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0 rgba(243, 243, 243, 255), stop:1 rgba(250, 250, 250, 255));
+
+border: 1px outset #999;
+border-radius: 3;
+}</string>
                </property>
                <property name="title">
                 <string/>
@@ -22224,7 +22313,11 @@ You can usually go for higher values for Yaw factors.</string>
                 <bool>false</bool>
                </property>
                <property name="styleSheet">
-                <string notr="true">#RateStabilizationGroup_22{background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0 rgba(243, 243, 243, 255), stop:1 rgba(250, 250, 250, 255));}</string>
+                <string notr="true">#RateStabilizationGroup_22{background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0 rgba(243, 243, 243, 255), stop:1 rgba(250, 250, 250, 255));
+
+border: 1px outset #999;
+border-radius: 3;
+}</string>
                </property>
                <property name="title">
                 <string/>
@@ -22271,7 +22364,7 @@ You can usually go for higher values for Yaw factors.</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>8</pointsize>
+                    <pointsize>9</pointsize>
                     <weight>50</weight>
                     <bold>false</bold>
                    </font>
@@ -22288,45 +22381,7 @@ automatically every 300ms, which will help for fast tuning.</string>
                   </property>
                  </widget>
                 </item>
-                <item row="1" column="1" rowspan="2">
-                 <widget class="QPushButton" name="stabilizationHelp_6">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>32</width>
-                    <height>32</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string/>
-                  </property>
-                  <property name="icon">
-                   <iconset resource="../coreplugin/core.qrc">
-                    <normaloff>:/core/images/helpicon.svg</normaloff>:/core/images/helpicon.svg</iconset>
-                  </property>
-                  <property name="iconSize">
-                   <size>
-                    <width>32</width>
-                    <height>32</height>
-                   </size>
-                  </property>
-                  <property name="flat">
-                   <bool>true</bool>
-                  </property>
-                  <property name="objrelation" stdset="0">
-                   <stringlist>
-                    <string>button:help</string>
-                    <string>url:http://wiki.openpilot.org/display/Doc/Stabilization+panel</string>
-                   </stringlist>
-                  </property>
-                 </widget>
-                </item>
-                <item row="2" column="2">
+                <item row="2" column="1" colspan="2">
                  <spacer name="horizontalSpacer_33">
                   <property name="orientation">
                    <enum>Qt::Horizontal</enum>

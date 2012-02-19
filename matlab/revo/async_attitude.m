@@ -2,11 +2,13 @@ baro = fixTime(BaroAltitude);
 accel = fixTime(Accels);
 attitude = fixTime(AttitudeActual);
 
+%accel.z(end/2:end) = accel.z(end/2:end) + 1;
+accel.z = accel.z+2;
 
-Gamma = diag([1e-5 1e-5 0.00001 1e-20]); % state noise
-accel_sigma = 1;
-baro_sigma = 1;
-Nu = diag([10 10 10 10]);
+Gamma = diag([1e-15 1e-15 1e-3 1e-5]); % state noise
+accel_sigma = 10;
+baro_sigma = 0.1;
+Nu = diag([10 10 10 1000]);
 z = zeros(length(accel.z),4);
 Nu_n = zeros([4 4 length(accel.z)]);
 Nu_n(:,:,1) = Nu;
@@ -19,7 +21,7 @@ i = 1;
 timestamp = [];
 
 z(1) = baro.Altitude(1);
-z(1:5,4) = 0.4;
+z(1:5,4) = 0;
 timestamp(1) = t;
 log_accel = 0;
 while (last_accel_idx + 1) <= length(accel.z) && (last_baro_idx + 1) <= length(baro.Altitude)
@@ -44,12 +46,12 @@ while (last_accel_idx + 1) <= length(accel.z) && (last_baro_idx + 1) <= length(b
         x = [baro.Altitude(last_baro_idx + 1); -accel_ned-9.81];
         last_baro_idx = last_baro_idx + 1;
         last_accel_idx = last_accel_idx + 1;
-        C = [1 0 0 0; 0 0 1 -1];
+        C = [1 0 0 0; 0 0 1 1];
         Sigma = diag([baro_sigma; accel_sigma]);
     elseif update_accel
         x =  -accel_ned - 9.81;
         last_accel_idx = last_accel_idx + 1;
-        C = [0 0 1 -1];
+        C = [0 0 1 1];
         Sigma = [accel_sigma];
     elseif update_baro
         x = [baro.Altitude(last_baro_idx + 1)];
@@ -71,10 +73,7 @@ while (last_accel_idx + 1) <= length(accel.z) && (last_baro_idx + 1) <= length(b
     last_t = t;
     
     i = i + 1;
-    
-    % Zero out non-diag covariance
-    Nu = diag(diag(Nu));
-   
+       
     A = [1 dT 0 0; 0 1 dT 0; 0 0 1 0; 0 0 0 1];
  
     P = A * Nu * A' + Gamma;
@@ -85,7 +84,6 @@ while (last_accel_idx + 1) <= length(accel.z) && (last_baro_idx + 1) <= length(b
     Nu = (eye(4) - K * C) * P;
     Nu_n(:,:,i) = Nu;
     
-    z(i,4) = 0;
     if mod(i,10000) == 0
         subplot(311)
         plot(baro.timestamp, baro.Altitude, '.', timestamp(1:i),z(1:i,1),'r','LineWidth',5)

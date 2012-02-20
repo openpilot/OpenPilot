@@ -74,7 +74,6 @@ typedef struct {
 static xTaskHandle taskHandle;
 static StabilizationSettingsData settings;
 static xQueueHandle queue;
-float dT = 1;
 float gyro_alpha = 0;
 float gyro_filtered[3] = {0,0,0};
 float axis_lock_accum[3] = {0,0,0};
@@ -83,12 +82,13 @@ uint8_t max_axislock_rate = 0;
 float weak_leveling_kp = 0;
 uint8_t weak_leveling_max = 0;
 bool lowThrottleZeroIntegral;
-
+float vbar_integral[3] = {0, 0, 0};
+float vbar_decay = 0.1f;
 pid_type pids[PID_MAX];
 
 // Private functions
 static void stabilizationTask(void* parameters);
-static float ApplyPid(pid_type * pid, const float err);
+static float ApplyPid(pid_type * pid, const float err, float dT);
 static float bound(float val);
 static void ZeroPids(void);
 static void SettingsUpdatedCb(UAVObjEvent * ev);
@@ -154,6 +154,8 @@ static void stabilizationTask(void* parameters)
 	// Main task loop
 	ZeroPids();
 	while(1) {
+		float dT;
+
 		PIOS_WDG_UpdateFlag(PIOS_WDG_STABILIZATION);
 
 		// Wait until the AttitudeRaw object is updated, if a timeout then go to failsafe
@@ -227,6 +229,7 @@ static void stabilizationTask(void* parameters)
 			switch(stabDesired.StabilizationMode[i])
 			{
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_RATE:
+				case STABILIZATIONDESIRED_STABILIZATIONMODE_VBAR:
 					rateDesiredAxis[i] = attitudeDesiredAxis[i];
 
 					// Zero attitude and axis lock accumulators
@@ -251,7 +254,7 @@ static void stabilizationTask(void* parameters)
 					break;
 				}
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE:
-					rateDesiredAxis[i] = ApplyPid(&pids[PID_ROLL + i], local_error[i]);
+					rateDesiredAxis[i] = ApplyPid(&pids[PID_ROLL + i], local_error[i], dT);
 					
 					if(rateDesiredAxis[i] > settings.MaximumRate[i])
 						rateDesiredAxis[i] = settings.MaximumRate[i];
@@ -275,7 +278,7 @@ static void stabilizationTask(void* parameters)
 						else if(axis_lock_accum[i] < -max_axis_lock)
 							axis_lock_accum[i] = -max_axis_lock;
 
-						rateDesiredAxis[i] = ApplyPid(&pids[PID_ROLL + i], axis_lock_accum[i]);
+						rateDesiredAxis[i] = ApplyPid(&pids[PID_ROLL + i], axis_lock_accum[i], dT);
 					}
 					
 					if(rateDesiredAxis[i] > settings.MaximumRate[i])
@@ -293,36 +296,51 @@ static void stabilizationTask(void* parameters)
 #endif
 		ActuatorDesiredGet(&actuatorDesired);
 		//Calculate desired command
-		for(int8_t ct=0; ct< MAX_AXES; ct++)
+		for(uint32_t i = 0; i < MAX_AXES; i++)
 		{
-			switch(stabDesired.StabilizationMode[ct])
+			switch(stabDesired.StabilizationMode[i])
 			{
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_RATE:
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE:
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK:
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_WEAKLEVELING:
 				{
-					float command = ApplyPid(&pids[PID_RATE_ROLL + ct],  rateDesiredAxis[ct] - gyro_filtered[ct]);
-					actuatorDesiredAxis[ct] = bound(command);
+					float command = ApplyPid(&pids[PID_RATE_ROLL + i],  rateDesiredAxis[i] - gyro_filtered[i], dT);
+					actuatorDesiredAxis[i] = bound(command);
+					break;
+				}
+				case STABILIZATIONDESIRED_STABILIZATIONMODE_VBAR:
+				{
+					// Track the angle of the virtual flybar which includes a slow decay
+					vbar_decay = 0.991f; // expf(logf(0.01) / (1 / dT)) // Set the decay so that after 1 second at 1%
+					vbar_integral[i] = vbar_integral[i] * vbar_decay + gyro_filtered[i] * dT;
+
+					float k1 = 0.2f;
+					float k2 = pids[PID_RATE_ROLL + i].i;
+					float k3 = pids[PID_RATE_ROLL + i].p;
+					// Command signal is composed of stick input added to the gyro and virtual flybar
+					float command = rateDesiredAxis[i] * k1 - vbar_integral[i] * k2 - gyro_filtered[i] * k3;
+
+					actuatorDesiredAxis[i] = bound(command);
 					break;
 				}
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_NONE:
-					switch (ct)
+					switch (i)
 				{
 					case ROLL:
-						actuatorDesiredAxis[ct] = bound(attitudeDesiredAxis[ct]);
+						actuatorDesiredAxis[i] = bound(attitudeDesiredAxis[i]);
 						shouldUpdate = 1;
 						pids[PID_RATE_ROLL].iAccumulator = 0;
 						pids[PID_ROLL].iAccumulator = 0;
 						break;
 					case PITCH:
-						actuatorDesiredAxis[ct] = bound(attitudeDesiredAxis[ct]);
+						actuatorDesiredAxis[i] = bound(attitudeDesiredAxis[i]);
 						shouldUpdate = 1;
 						pids[PID_RATE_PITCH].iAccumulator = 0;
 						pids[PID_PITCH].iAccumulator = 0;
 						break;
 					case YAW:
-						actuatorDesiredAxis[ct] = bound(attitudeDesiredAxis[ct]);
+						actuatorDesiredAxis[i] = bound(attitudeDesiredAxis[i]);
 						shouldUpdate = 1;
 						pids[PID_RATE_YAW].iAccumulator = 0;
 						pids[PID_YAW].iAccumulator = 0;
@@ -360,7 +378,7 @@ static void stabilizationTask(void* parameters)
 	}
 }
 
-float ApplyPid(pid_type * pid, const float err)
+float ApplyPid(pid_type * pid, const float err, float dT)
 {
 	float diff = (err - pid->lastErr);
 	pid->lastErr = err;

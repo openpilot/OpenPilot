@@ -193,11 +193,17 @@ static void updatePIDs(UAVObjEvent* ev)
 			case TXPIDSETTINGS_PIDS_ROLLRATEKD:
 				needsUpdate |= update(&stab.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KD], value);
 				break;
+			case TXPIDSETTINGS_PIDS_ROLLRATEILIMIT:
+				needsUpdate |= update(&stab.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_ILIMIT], value);
+				break;
 			case TXPIDSETTINGS_PIDS_ROLLATTITUDEKP:
 				needsUpdate |= update(&stab.RollPI[STABILIZATIONSETTINGS_ROLLPI_KP], value);
 				break;
 			case TXPIDSETTINGS_PIDS_ROLLATTITUDEKI:
 				needsUpdate |= update(&stab.RollPI[STABILIZATIONSETTINGS_ROLLPI_KI], value);
+				break;
+			case TXPIDSETTINGS_PIDS_ROLLATTITUDEILIMIT:
+				needsUpdate |= update(&stab.RollPI[STABILIZATIONSETTINGS_ROLLPI_ILIMIT], value);
 				break;
 			case TXPIDSETTINGS_PIDS_PITCHRATEKP:
 				needsUpdate |= update(&stab.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KP], value);
@@ -208,11 +214,17 @@ static void updatePIDs(UAVObjEvent* ev)
 			case TXPIDSETTINGS_PIDS_PITCHRATEKD:
 				needsUpdate |= update(&stab.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KD], value);
 				break;
+			case TXPIDSETTINGS_PIDS_PITCHRATEILIMIT:
+				needsUpdate |= update(&stab.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_ILIMIT], value);
+				break;
 			case TXPIDSETTINGS_PIDS_PITCHATTITUDEKP:
 				needsUpdate |= update(&stab.PitchPI[STABILIZATIONSETTINGS_PITCHPI_KP], value);
 				break;
 			case TXPIDSETTINGS_PIDS_PITCHATTITUDEKI:
 				needsUpdate |= update(&stab.PitchPI[STABILIZATIONSETTINGS_PITCHPI_KI], value);
+				break;
+			case TXPIDSETTINGS_PIDS_PITCHATTITUDEILIMIT:
+				needsUpdate |= update(&stab.PitchPI[STABILIZATIONSETTINGS_PITCHPI_ILIMIT], value);
 				break;
 			case TXPIDSETTINGS_PIDS_ROLLPITCHRATEKP:
 				needsUpdate |= update(&stab.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KP], value);
@@ -226,6 +238,10 @@ static void updatePIDs(UAVObjEvent* ev)
 				needsUpdate |= update(&stab.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KD], value);
 				needsUpdate |= update(&stab.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KD], value);
 				break;
+			case TXPIDSETTINGS_PIDS_ROLLPITCHRATEILIMIT:
+				needsUpdate |= update(&stab.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_ILIMIT], value);
+				needsUpdate |= update(&stab.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_ILIMIT], value);
+				break;
 			case TXPIDSETTINGS_PIDS_ROLLPITCHATTITUDEKP:
 				needsUpdate |= update(&stab.RollPI[STABILIZATIONSETTINGS_ROLLPI_KP], value);
 				needsUpdate |= update(&stab.PitchPI[STABILIZATIONSETTINGS_PITCHPI_KP], value);
@@ -233,6 +249,10 @@ static void updatePIDs(UAVObjEvent* ev)
 			case TXPIDSETTINGS_PIDS_ROLLPITCHATTITUDEKI:
 				needsUpdate |= update(&stab.RollPI[STABILIZATIONSETTINGS_ROLLPI_KI], value);
 				needsUpdate |= update(&stab.PitchPI[STABILIZATIONSETTINGS_PITCHPI_KI], value);
+				break;
+			case TXPIDSETTINGS_PIDS_ROLLPITCHATTITUDEILIMIT:
+				needsUpdate |= update(&stab.RollPI[STABILIZATIONSETTINGS_ROLLPI_ILIMIT], value);
+				needsUpdate |= update(&stab.PitchPI[STABILIZATIONSETTINGS_PITCHPI_ILIMIT], value);
 				break;
 			case TXPIDSETTINGS_PIDS_YAWRATEKP:
 				needsUpdate |= update(&stab.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_KP], value);
@@ -243,11 +263,17 @@ static void updatePIDs(UAVObjEvent* ev)
 			case TXPIDSETTINGS_PIDS_YAWRATEKD:
 				needsUpdate |= update(&stab.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_KD], value);
 				break;
+			case TXPIDSETTINGS_PIDS_YAWRATEILIMIT:
+				needsUpdate |= update(&stab.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_ILIMIT], value);
+				break;
 			case TXPIDSETTINGS_PIDS_YAWATTITUDEKP:
 				needsUpdate |= update(&stab.YawPI[STABILIZATIONSETTINGS_YAWPI_KP], value);
 				break;
 			case TXPIDSETTINGS_PIDS_YAWATTITUDEKI:
 				needsUpdate |= update(&stab.YawPI[STABILIZATIONSETTINGS_YAWPI_KI], value);
+				break;
+			case TXPIDSETTINGS_PIDS_YAWATTITUDEILIMIT:
+				needsUpdate |= update(&stab.YawPI[STABILIZATIONSETTINGS_YAWPI_ILIMIT], value);
 				break;
 			default:
 				PIOS_Assert(0);

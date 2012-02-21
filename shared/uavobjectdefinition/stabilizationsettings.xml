@@ -15,9 +15,9 @@
 	<field name="YawPI" units="" type="float" elementnames="Kp,Ki,ILimit" defaultvalue="2,0,50" limits="%BE:0:10,%BE:0:10,"/>
 
 	<field name="VbarSensitivity" units="frac" type="float" elementnames="Roll,Pitch,Yaw" defaultvalue="0.5,0.5,0.5"/>
-	<field name="VbarRollPI" units="frac" type="float" elementnames="Kp,Ki" defaultvalue="0.005,0.002"/>
-	<field name="VbarPitchPI" units="frac" type="float" elementnames="Kp,Ki" defaultvalue="0.005,0.002"/>
-	<field name="VbarYawPI" units="frac" type="float" elementnames="Kp,Ki" defaultvalue="0.005,0.002"/>
+	<field name="VbarRollPI" units="1/(deg/s)" type="float" elementnames="Kp,Ki" defaultvalue="0.005,0.002"/>
+	<field name="VbarPitchPI" units="1/(deg/s)" type="float" elementnames="Kp,Ki" defaultvalue="0.005,0.002"/>
+	<field name="VbarYawPI" units="1/(deg/s)" type="float" elementnames="Kp,Ki" defaultvalue="0.005,0.002"/>
 	<field name="VbarTau" units="sec" type="float" elements="1" defaultvalue="0.5"/>
 
 	<field name="GyroTau" units="" type="float" elements="1" defaultvalue="0.005"/>

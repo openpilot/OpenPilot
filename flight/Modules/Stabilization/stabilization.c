@@ -55,7 +55,7 @@
 #define TASK_PRIORITY (tskIDLE_PRIORITY+4)
 #define FAILSAFE_TIMEOUT_MS 30
 
-enum {PID_RATE_ROLL, PID_RATE_PITCH, PID_RATE_YAW, PID_ROLL, PID_PITCH, PID_YAW, PID_MAX};
+enum {PID_RATE_ROLL, PID_RATE_PITCH, PID_RATE_YAW, PID_ROLL, PID_PITCH, PID_YAW, PID_VBAR_ROLL, PID_VBAR_PITCH, PID_VBAR_YAW, PID_MAX};
 
 enum {ROLL,PITCH,YAW,MAX_AXES};
 
@@ -83,7 +83,7 @@ float weak_leveling_kp = 0;
 uint8_t weak_leveling_max = 0;
 bool lowThrottleZeroIntegral;
 float vbar_integral[3] = {0, 0, 0};
-float vbar_decay = 0.1f;
+float vbar_decay = 0.991f;
 pid_type pids[PID_MAX];
 
 // Private functions
@@ -312,14 +312,10 @@ static void stabilizationTask(void* parameters)
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_VBAR:
 				{
 					// Track the angle of the virtual flybar which includes a slow decay
-					vbar_decay = 0.991f; // expf(logf(0.01) / (1 / dT)) // Set the decay so that after 1 second at 1%
 					vbar_integral[i] = vbar_integral[i] * vbar_decay + gyro_filtered[i] * dT;
 
-					float k1 = 0.2f;
-					float k2 = pids[PID_RATE_ROLL + i].i;
-					float k3 = pids[PID_RATE_ROLL + i].p;
 					// Command signal is composed of stick input added to the gyro and virtual flybar
-					float command = rateDesiredAxis[i] * k1 - vbar_integral[i] * k2 - gyro_filtered[i] * k3;
+					float command = rateDesiredAxis[i] - vbar_integral[i] * pids[PID_VBAR_ROLL + i].i - gyro_filtered[i] * pids[PID_VBAR_ROLL + i].p;
 
 					actuatorDesiredAxis[i] = bound(command);
 					break;
@@ -418,44 +414,55 @@ static float bound(float val)
 	return val;
 }
 
-
 static void SettingsUpdatedCb(UAVObjEvent * ev)
 {
 	memset(pids,0,sizeof (pid_type) * PID_MAX);
 	StabilizationSettingsGet(&settings);
 
 	// Set the roll rate PID constants
-	pids[0].p = settings.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KP];
-	pids[0].i = settings.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KI];
-	pids[0].d = settings.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KD];
-	pids[0].iLim = settings.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_ILIMIT];
+	pids[PID_RATE_ROLL].p = settings.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KP];
+	pids[PID_RATE_ROLL].i = settings.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KI];
+	pids[PID_RATE_ROLL].d = settings.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KD];
+	pids[PID_RATE_ROLL].iLim = settings.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_ILIMIT];
 
 	// Set the pitch rate PID constants
-	pids[1].p = settings.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KP];
-	pids[1].i = settings.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KI];
-	pids[1].d = settings.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KD];
-	pids[1].iLim = settings.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_ILIMIT];
+	pids[PID_RATE_PITCH].p = settings.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KP];
+	pids[PID_RATE_PITCH].i = settings.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KI];
+	pids[PID_RATE_PITCH].d = settings.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KD];
+	pids[PID_RATE_PITCH].iLim = settings.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_ILIMIT];
 
 	// Set the yaw rate PID constants
-	pids[2].p = settings.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_KP];
-	pids[2].i = settings.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_KI];
-	pids[2].d = settings.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_KD];
-	pids[2].iLim = settings.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_ILIMIT];
+	pids[PID_RATE_YAW].p = settings.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_KP];
+	pids[PID_RATE_YAW].i = settings.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_KI];
+	pids[PID_RATE_YAW].d = settings.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_KD];
+	pids[PID_RATE_YAW].iLim = settings.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_ILIMIT];
 
 	// Set the roll attitude PI constants
-	pids[3].p = settings.RollPI[STABILIZATIONSETTINGS_ROLLPI_KP];
-	pids[3].i = settings.RollPI[STABILIZATIONSETTINGS_ROLLPI_KI];
-	pids[3].iLim = settings.RollPI[STABILIZATIONSETTINGS_ROLLPI_ILIMIT];
+	pids[PID_ROLL].p = settings.RollPI[STABILIZATIONSETTINGS_ROLLPI_KP];
+	pids[PID_ROLL].i = settings.RollPI[STABILIZATIONSETTINGS_ROLLPI_KI];
+	pids[PID_ROLL].iLim = settings.RollPI[STABILIZATIONSETTINGS_ROLLPI_ILIMIT];
 
 	// Set the pitch attitude PI constants
-	pids[4].p = settings.PitchPI[STABILIZATIONSETTINGS_PITCHPI_KP];
-	pids[4].i = settings.PitchPI[STABILIZATIONSETTINGS_PITCHPI_KI];
-	pids[4].iLim = settings.PitchPI[STABILIZATIONSETTINGS_PITCHPI_ILIMIT];
+	pids[PID_PITCH].p = settings.PitchPI[STABILIZATIONSETTINGS_PITCHPI_KP];
+	pids[PID_PITCH].i = settings.PitchPI[STABILIZATIONSETTINGS_PITCHPI_KI];
+	pids[PID_PITCH].iLim = settings.PitchPI[STABILIZATIONSETTINGS_PITCHPI_ILIMIT];
 
 	// Set the yaw attitude PI constants
-	pids[5].p = settings.YawPI[STABILIZATIONSETTINGS_YAWPI_KP];
-	pids[5].i = settings.YawPI[STABILIZATIONSETTINGS_YAWPI_KI];
-	pids[5].iLim = settings.YawPI[STABILIZATIONSETTINGS_YAWPI_ILIMIT];
+	pids[PID_YAW].p = settings.YawPI[STABILIZATIONSETTINGS_YAWPI_KP];
+	pids[PID_YAW].i = settings.YawPI[STABILIZATIONSETTINGS_YAWPI_KI];
+	pids[PID_YAW].iLim = settings.YawPI[STABILIZATIONSETTINGS_YAWPI_ILIMIT];
+
+	// Set the roll attitude PI constants
+	pids[PID_VBAR_ROLL].p = settings.VbarRollPI[STABILIZATIONSETTINGS_VBARROLLPI_KP];
+	pids[PID_VBAR_ROLL].i = settings.VbarRollPI[STABILIZATIONSETTINGS_VBARROLLPI_KI];
+	
+	// Set the pitch attitude PI constants
+	pids[PID_VBAR_PITCH].p = settings.VbarPitchPI[STABILIZATIONSETTINGS_VBARPITCHPI_KP];
+	pids[PID_VBAR_PITCH].i = settings.VbarPitchPI[STABILIZATIONSETTINGS_VBARPITCHPI_KI];
+	
+	// Set the yaw attitude PI constants
+	pids[PID_VBAR_YAW].p = settings.VbarYawPI[STABILIZATIONSETTINGS_VBARYAWPI_KP];
+	pids[PID_VBAR_YAW].i = settings.VbarYawPI[STABILIZATIONSETTINGS_VBARYAWPI_KI];
 
 	// Maximum deviation to accumulate for axis lock
 	max_axis_lock = settings.MaxAxisLock;
@@ -478,6 +485,9 @@ static void SettingsUpdatedCb(UAVObjEvent * ev)
 		gyro_alpha = 0;   // not trusting this to resolve to 0
 	else
 		gyro_alpha = expf(-fakeDt  / settings.GyroTau);
+
+	// Compute time constant for vbar decay term based on a tau
+	vbar_decay = expf(-fakeDt / settings.VbarTau);
 }
 
 

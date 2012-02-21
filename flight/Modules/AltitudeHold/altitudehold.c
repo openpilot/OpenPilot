@@ -332,7 +332,7 @@ static void altitudeHoldTask(void *parameters)
 			error = (starting_altitude + altitudeHoldDesired.Altitude) - altHold.Altitude;
 
 			// Compute integral off altitude error
-			throttleIntegral += ((starting_altitude + altitudeHoldDesired.Altitude) - altHold.Velocity) * altitudeHoldSettings.Ki * dT;
+			throttleIntegral += error * altitudeHoldSettings.Ki * dT;
 
 			// Only update stabilizationDesired less frequently
 			if((thisTime - lastUpdateTime) < 20)

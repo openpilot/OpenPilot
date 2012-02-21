@@ -19,6 +19,7 @@
 	<field name="VbarPitchPI" units="1/(deg/s)" type="float" elementnames="Kp,Ki" defaultvalue="0.005,0.002"/>
 	<field name="VbarYawPI" units="1/(deg/s)" type="float" elementnames="Kp,Ki" defaultvalue="0.005,0.002"/>
 	<field name="VbarTau" units="sec" type="float" elements="1" defaultvalue="0.5"/>
+	<field name="VbarGyroSuppress" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>
 
 	<field name="GyroTau" units="" type="float" elements="1" defaultvalue="0.005"/>
 

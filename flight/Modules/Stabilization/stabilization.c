@@ -85,6 +85,7 @@ bool lowThrottleZeroIntegral;
 float vbar_integral[3] = {0, 0, 0};
 float vbar_decay = 0.991f;
 pid_type pids[PID_MAX];
+bool vbar_gyros_suppress;
 
 // Private functions
 static void stabilizationTask(void* parameters);
@@ -315,7 +316,14 @@ static void stabilizationTask(void* parameters)
 					vbar_integral[i] = vbar_integral[i] * vbar_decay + gyro_filtered[i] * dT;
 
 					// Command signal is composed of stick input added to the gyro and virtual flybar
-					float command = rateDesiredAxis[i] - vbar_integral[i] * pids[PID_VBAR_ROLL + i].i - gyro_filtered[i] * pids[PID_VBAR_ROLL + i].p;
+					float gyro_gain = 1.0f;
+					if (vbar_gyros_suppress) {
+						float gyro_gain = (1.0f - fabs(rateDesiredAxis[i]));
+						gyro_gain = (gyro_gain < 0) ? 0 : gyro_gain;
+					}
+					float command = rateDesiredAxis[i] - gyro_gain * (
+							vbar_integral[i] * pids[PID_VBAR_ROLL + i].i - 
+							gyro_filtered[i] * pids[PID_VBAR_ROLL + i].p);
 
 					actuatorDesiredAxis[i] = bound(command);
 					break;
@@ -488,6 +496,7 @@ static void SettingsUpdatedCb(UAVObjEvent * ev)
 
 	// Compute time constant for vbar decay term based on a tau
 	vbar_decay = expf(-fakeDt / settings.VbarTau);
+	vbar_gyros_suppress = settings.VbarGyroSuppress == STABILIZATIONSETTINGS_VBARGYROSUPPRESS_TRUE;
 }
 
 

@@ -601,7 +601,7 @@ void ConfigInputWidget::fastMdata()
 {
     manualControlMdata = manualCommandObj->getMetadata();
     UAVObject::Metadata mdata = manualControlMdata;
-    mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
+		UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
     mdata.flightTelemetryUpdatePeriod = 150;
     manualCommandObj->setMetadata(mdata);
 }

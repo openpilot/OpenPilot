@@ -35,6 +35,17 @@
 #define UAVOBJ_ALL_INSTANCES 0xFFFF
 #define UAVOBJ_MAX_INSTANCES 1000
 
+/*
+ * Shifts and masks used to read/write metadata flags.
+ */
+#define UAVOBJ_ACCESS_SHIFT 0
+#define UAVOBJ_GCS_ACCESS_SHIFT 1
+#define UAVOBJ_TELEMETRY_ACKED_SHIFT 2
+#define UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT 3
+#define UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT 4
+#define UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT 6
+#define UAVOBJ_UPDATE_MODE_MASK 0x3
+
 
 // FIXME: All this typedef for SDCARD needs to be abstracted away
 #if !defined(PIOS_INCLUDE_SDCARD)
@@ -57,18 +68,24 @@ typedef enum {
 /**
  * Object metadata, each object has a meta object that holds its metadata. The metadata define
  * properties for each object and can be used by multiple modules (e.g. telemetry and logger)
+ *
+ * The object metadata flags are packed into a single 16 bit integer.
+ * The bits in the flag field are defined as:
+ *
+ *   Bit(s)			Name										Meaning
+ *   ------			----										-------
+ *      0				access									Defines the access level for the local transactions (readonly=0 and readwrite=1)
+ *      1				gcsAccess								Defines the access level for the local GCS transactions (readonly=0 and readwrite=1), not used in the flight s/w
+ *      2				telemetryAcked					Defines if an ack is required for the transactions of this object (1:acked, 0:not acked)
+ *      3				gcsTelemetryAcked				Defines if an ack is required for the transactions of this object (1:acked, 0:not acked)
+ *    4-5				telemetryUpdateMode			Update mode used by the telemetry module (UAVObjUpdateMode)
+ *    6-7				gcsTelemetryUpdateMode	Update mode used by the GCS (UAVObjUpdateMode)
  */
 typedef struct {
-	uint8_t access; /** Defines the access level for the local transactions (readonly and readwrite) */
-	uint8_t gcsAccess; /** Defines the access level for the local GCS transactions (readonly and readwrite), not used in the flight s/w */
-	uint8_t telemetryAcked; /** Defines if an ack is required for the transactions of this object (1:acked, 0:not acked) */
-	uint8_t telemetryUpdateMode; /** Update mode used by the telemetry module (UAVObjUpdateMode) */
-	uint32_t telemetryUpdatePeriod; /** Update period used by the telemetry module (only if telemetry mode is PERIODIC) */
-	uint8_t gcsTelemetryAcked; /** Defines if an ack is required for the transactions of this object (1:acked, 0:not acked) */
-	uint8_t gcsTelemetryUpdateMode; /** Update mode used by the GCS (UAVObjUpdateMode) */
-	uint32_t gcsTelemetryUpdatePeriod; /** Update period used by the GCS (only if telemetry mode is PERIODIC) */
-	uint8_t loggingUpdateMode; /** Update mode used by the logging module (UAVObjUpdateMode) */
-	uint32_t loggingUpdatePeriod; /** Update period used by the logging module (only if logging mode is PERIODIC) */
+	uint8_t flags; /** Defines flags for update and logging modes and whether an update should be ACK'd (bits defined above) */
+	uint16_t telemetryUpdatePeriod; /** Update period used by the telemetry module (only if telemetry mode is PERIODIC) */
+	uint16_t gcsTelemetryUpdatePeriod; /** Update period used by the GCS (only if telemetry mode is PERIODIC) */
+	uint16_t loggingUpdatePeriod; /** Update period used by the logging module (only if logging mode is PERIODIC) */
 } __attribute__((packed)) UAVObjMetadata;
 
 /**
@@ -76,9 +93,9 @@ typedef struct {
  */
 typedef enum {
 	EV_UNPACKED = 0x01, /** Object data updated by unpacking */
-    EV_UPDATED = 0x02, /** Object data updated by changing the data structure */
-    EV_UPDATED_MANUAL = 0x04, /** Object update event manually generated */
-    EV_UPDATE_REQ = 0x08 /** Request to update object data */
+	EV_UPDATED = 0x02, /** Object data updated by changing the data structure */
+	EV_UPDATED_MANUAL = 0x04, /** Object update event manually generated */
+	EV_UPDATE_REQ = 0x08 /** Request to update object data */
 } UAVObjEventType;
 
 /**
@@ -162,6 +179,20 @@ int32_t UAVObjGetInstanceData(UAVObjHandle obj, uint16_t instId, void* dataOut);
 int32_t UAVObjGetInstanceDataField(UAVObjHandle obj, uint16_t instId, void* dataOut, uint32_t offset, uint32_t size);
 int32_t UAVObjSetMetadata(UAVObjHandle obj, const UAVObjMetadata* dataIn);
 int32_t UAVObjGetMetadata(UAVObjHandle obj, UAVObjMetadata* dataOut);
+uint8_t UAVObjGetMetadataAccess(const UAVObjMetadata* dataOut);
+void UAVObjMetadataInitialize(UAVObjMetadata* dataOut);
+UAVObjAccessType UAVObjGetAccess(const UAVObjMetadata* dataOut);
+void UAVObjSetAccess(UAVObjMetadata* dataOut, UAVObjAccessType mode);
+UAVObjAccessType UAVObjGetGcsAccess(const UAVObjMetadata* dataOut);
+void UAVObjSetGcsAccess(UAVObjMetadata* dataOut, UAVObjAccessType mode);
+uint8_t UAVObjGetTelemetryAcked(const UAVObjMetadata* dataOut);
+void UAVObjSetTelemetryAcked( UAVObjMetadata* dataOut, uint8_t val);
+uint8_t UAVObjGetGcsTelemetryAcked(const UAVObjMetadata* dataOut);
+void UAVObjSetGcsTelemetryAcked(UAVObjMetadata* dataOut, uint8_t val);
+UAVObjUpdateMode UAVObjGetTelemetryUpdateMode(const UAVObjMetadata* dataOut);
+void UAVObjSetTelemetryUpdateMode(UAVObjMetadata* dataOut, UAVObjUpdateMode val);
+UAVObjUpdateMode UAVObjGetGcsTelemetryUpdateMode(const UAVObjMetadata* dataOut);
+void UAVObjSetTelemetryGcsUpdateMode(UAVObjMetadata* dataOut, UAVObjUpdateMode val);
 int8_t UAVObjReadOnly(UAVObjHandle obj);
 int32_t UAVObjConnectQueue(UAVObjHandle obj, xQueueHandle queue, int32_t eventMask);
 int32_t UAVObjDisconnectQueue(UAVObjHandle obj, xQueueHandle queue);

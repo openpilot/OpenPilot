@@ -196,7 +196,7 @@ static void manualControlTask(void *parameters)
 				/* trying to fly via GCS and lost connection.  fall back to transmitter */
 				UAVObjMetadata metadata;
 				ManualControlCommandGetMetadata(&metadata);
-				metadata.access = ACCESS_READWRITE;
+				UAVObjSetAccess(&metadata, ACCESS_READWRITE);
 				ManualControlCommandSetMetadata(&metadata);
 			}
 		}

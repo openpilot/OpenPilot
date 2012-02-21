@@ -38,6 +38,14 @@
 #include <QFile>
 #include "uavobjectfield.h"
 
+#define UAVOBJ_ACCESS_SHIFT 0
+#define UAVOBJ_GCS_ACCESS_SHIFT 1
+#define UAVOBJ_TELEMETRY_ACKED_SHIFT 2
+#define UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT 3
+#define UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT 4
+#define UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT 6
+#define UAVOBJ_UPDATE_MODE_MASK 0x3
+
 class UAVObjectField;
 
 class UAVOBJECTS_EXPORT UAVObject: public QObject
@@ -64,22 +72,28 @@ public:
             ACCESS_READONLY = 1
     } AccessMode;
 
-    /**
-     * Object metadata, each object has a meta object that holds its metadata. The metadata define
-     * properties for each object and can be used by multiple modules (e.g. telemetry and logger)
-     */
-    typedef struct {
-            quint8 flightAccess; /** Defines the access level for the local flight transactions (readonly and readwrite) */
-            quint8 gcsAccess; /** Defines the access level for the local GCS transactions (readonly and readwrite) */
-            quint8 flightTelemetryAcked; /** Defines if an ack is required for the transactions of this object (1:acked, 0:not acked) */
-            quint8 flightTelemetryUpdateMode; /** Update mode used by the autopilot (UpdateMode) */
-            qint32 flightTelemetryUpdatePeriod; /** Update period used by the autopilot (only if telemetry mode is PERIODIC) */
-            quint8 gcsTelemetryAcked; /** Defines if an ack is required for the transactions of this object (1:acked, 0:not acked) */
-            quint8 gcsTelemetryUpdateMode; /** Update mode used by the GCS (UpdateMode) */
-            qint32 gcsTelemetryUpdatePeriod; /** Update period used by the GCS (only if telemetry mode is PERIODIC) */
-            quint8 loggingUpdateMode; /** Update mode used by the logging module (UpdateMode) */
-            qint32 loggingUpdatePeriod; /** Update period used by the logging module (only if logging mode is PERIODIC) */
-    } __attribute__((packed)) Metadata;
+		/**
+		 * Object metadata, each object has a meta object that holds its metadata. The metadata define
+		 * properties for each object and can be used by multiple modules (e.g. telemetry and logger)
+		 *
+		 * The object metadata flags are packed into a single 16 bit integer.
+		 * The bits in the flag field are defined as:
+		 *
+		 *   Bit(s)			Name										Meaning
+		 *   ------			----										-------
+		 *      0				access									Defines the access level for the local transactions (readonly=0 and readwrite=1)
+		 *      1				gcsAccess								Defines the access level for the local GCS transactions (readonly=0 and readwrite=1), not used in the flight s/w
+		 *      2				telemetryAcked					Defines if an ack is required for the transactions of this object (1:acked, 0:not acked)
+		 *      3				gcsTelemetryAcked				Defines if an ack is required for the transactions of this object (1:acked, 0:not acked)
+		 *    4-5				telemetryUpdateMode			Update mode used by the telemetry module (UAVObjUpdateMode)
+		 *    6-7				gcsTelemetryUpdateMode	Update mode used by the GCS (UAVObjUpdateMode)
+		 */
+		typedef struct {
+			uint8_t flags; /** Defines flags for update and logging modes and whether an update should be ACK'd (bits defined above) */
+			uint16_t flightTelemetryUpdatePeriod; /** Update period used by the telemetry module (only if telemetry mode is PERIODIC) */
+			uint16_t gcsTelemetryUpdatePeriod; /** Update period used by the GCS (only if telemetry mode is PERIODIC) */
+			uint16_t loggingUpdatePeriod; /** Update period used by the logging module (only if logging mode is PERIODIC) */
+		} __attribute__((packed)) Metadata;
 
 
     UAVObject(quint32 objID, bool isSingleInst, const QString& name);
@@ -111,6 +125,21 @@ public:
     QString toStringData();
     void emitTransactionCompleted(bool success);
 
+		// Metadata accessors
+		static void MetadataInitialize(Metadata& meta);
+		static AccessMode GetFlightAccess(const Metadata& meta);
+		static void SetFlightAccess(Metadata& meta, AccessMode mode);
+		static AccessMode GetGcsAccess(const Metadata& meta);
+		static void SetGcsAccess(Metadata& meta, AccessMode mode);
+		static uint8_t GetFlightTelemetryAcked(const Metadata& meta);
+		static void SetFlightTelemetryAcked(Metadata& meta, uint8_t val);
+		static uint8_t GetGcsTelemetryAcked(const Metadata& meta);
+		static void SetGcsTelemetryAcked(Metadata& meta, uint8_t val);
+		static UpdateMode GetFlightTelemetryUpdateMode(const Metadata& meta);
+		static void SetFlightTelemetryUpdateMode(Metadata& meta, UpdateMode val);
+		static UpdateMode GetGcsTelemetryUpdateMode(const Metadata& meta);
+		static void SetGcsTelemetryUpdateMode(Metadata& meta, UpdateMode val);
+		
 public slots:
     void requestUpdate();
     void updated();

@@ -29,6 +29,18 @@
 #include <QtEndian>
 #include <QDebug>
 
+// Constants
+#define UAVOBJ_ACCESS_SHIFT 0
+#define UAVOBJ_GCS_ACCESS_SHIFT 1
+#define UAVOBJ_TELEMETRY_ACKED_SHIFT 2
+#define UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT 3
+#define UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT 4
+#define UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT 6
+#define UAVOBJ_UPDATE_MODE_MASK 0x3
+
+// Macros
+#define SET_BITS(var, shift, value, mask) var = (var & !(mask << shift)) |	(value << shift);
+
 /**
  * Constructor
  * @param objID The object ID
@@ -455,4 +467,133 @@ QString UAVObject::toStringData()
 void UAVObject::emitTransactionCompleted(bool success)
 {
     emit transactionCompleted(this, success);
+}
+
+/**
+ * Initialize a UAVObjMetadata object.
+ * \param[in] metadata The metadata object
+ */
+void UAVObject::MetadataInitialize(UAVObject::Metadata& metadata)
+{
+	metadata.flags =
+		ACCESS_READWRITE << UAVOBJ_ACCESS_SHIFT |
+		ACCESS_READWRITE << UAVOBJ_GCS_ACCESS_SHIFT |
+		1 << UAVOBJ_TELEMETRY_ACKED_SHIFT |
+		1 << UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT |
+		UPDATEMODE_ONCHANGE << UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT |
+		UPDATEMODE_ONCHANGE << UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT;
+	metadata.flightTelemetryUpdatePeriod = 0;
+	metadata.gcsTelemetryUpdatePeriod = 0;
+	metadata.loggingUpdatePeriod = 0;
+}
+
+/**
+ * Get the UAVObject metadata access member
+ * \param[in] metadata The metadata object
+ * \return the access type
+ */
+UAVObject::AccessMode UAVObject::GetFlightAccess(const UAVObject::Metadata& metadata)
+{
+	return UAVObject::AccessMode((metadata.flags >> UAVOBJ_ACCESS_SHIFT) & 1);
+}
+
+/**
+ * Set the UAVObject metadata access member
+ * \param[in] metadata The metadata object
+ * \param[in] mode The access mode
+ */
+void UAVObject::SetFlightAccess(UAVObject::Metadata& metadata, UAVObject::AccessMode mode)
+{
+	SET_BITS(metadata.flags, UAVOBJ_ACCESS_SHIFT, mode, 1);
+}
+
+/**
+ * Get the UAVObject metadata GCS access member
+ * \param[in] metadata The metadata object
+ * \return the GCS access type
+ */
+UAVObject::AccessMode UAVObject::GetGcsAccess(const UAVObject::Metadata& metadata)
+{
+	return UAVObject::AccessMode((metadata.flags >> UAVOBJ_GCS_ACCESS_SHIFT) & 1);
+}
+
+/**
+ * Set the UAVObject metadata GCS access member
+ * \param[in] metadata The metadata object
+ * \param[in] mode The access mode
+ */
+void UAVObject::SetGcsAccess(UAVObject::Metadata& metadata, UAVObject::AccessMode mode) {
+	SET_BITS(metadata.flags, UAVOBJ_GCS_ACCESS_SHIFT, mode, 1);
+}
+
+/**
+ * Get the UAVObject metadata telemetry acked member
+ * \param[in] metadata The metadata object
+ * \return the telemetry acked boolean
+ */
+uint8_t UAVObject::GetFlightTelemetryAcked(const UAVObject::Metadata& metadata) {
+	return (metadata.flags >> UAVOBJ_TELEMETRY_ACKED_SHIFT) & 1;
+}
+
+/**
+ * Set the UAVObject metadata telemetry acked member
+ * \param[in] metadata The metadata object
+ * \param[in] val The telemetry acked boolean
+ */
+void UAVObject::SetFlightTelemetryAcked(UAVObject::Metadata& metadata, uint8_t val) {
+	SET_BITS(metadata.flags, UAVOBJ_TELEMETRY_ACKED_SHIFT, val, 1);
+}
+
+/**
+ * Get the UAVObject metadata GCS telemetry acked member
+ * \param[in] metadata The metadata object
+ * \return the telemetry acked boolean
+ */
+uint8_t UAVObject::GetGcsTelemetryAcked(const UAVObject::Metadata& metadata) {
+	return (metadata.flags >> UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT) & 1;
+}
+
+/**
+ * Set the UAVObject metadata GCS telemetry acked member
+ * \param[in] metadata The metadata object
+ * \param[in] val The GCS telemetry acked boolean
+ */
+void UAVObject::SetGcsTelemetryAcked(UAVObject::Metadata& metadata, uint8_t val) {
+	SET_BITS(metadata.flags, UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT, val, 1);
+}
+
+/**
+ * Get the UAVObject metadata telemetry update mode
+ * \param[in] metadata The metadata object
+ * \return the telemetry update mode
+ */
+UAVObject::UpdateMode UAVObject::GetFlightTelemetryUpdateMode(const UAVObject::Metadata& metadata) {
+	return UAVObject::UpdateMode((metadata.flags >> UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT) & UAVOBJ_UPDATE_MODE_MASK);
+}
+
+/**
+ * Set the UAVObject metadata telemetry update mode member
+ * \param[in] metadata The metadata object
+ * \param[in] val The telemetry update mode
+ */
+void UAVObject::SetFlightTelemetryUpdateMode(UAVObject::Metadata& metadata, UAVObject::UpdateMode val) {
+	SET_BITS(metadata.flags, UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT, val, UAVOBJ_UPDATE_MODE_MASK);
+}
+
+/**
+ * Get the UAVObject metadata GCS telemetry update mode
+ * \param[in] metadata The metadata object
+ * \return the GCS telemetry update mode
+ */
+UAVObject::UpdateMode UAVObject::GetGcsTelemetryUpdateMode(const UAVObject::Metadata& metadata) {
+	return UAVObject::UpdateMode((metadata.flags >> UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT) & UAVOBJ_UPDATE_MODE_MASK);
+}
+
+/**
+ * Set the UAVObject metadata GCS telemetry update mode member
+ * \param[in] metadata The metadata object
+ * \param[in] val The GCS telemetry update mode
+ */
+void UAVObject::SetGcsTelemetryUpdateMode(UAVObject::Metadata& metadata, UAVObject::UpdateMode val) {
+	SET_BITS(metadata.flags, UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT, val, UAVOBJ_UPDATE_MODE_MASK);
 }

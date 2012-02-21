@@ -49,7 +49,7 @@ GCSControlGadgetWidget::GCSControlGadgetWidget(QWidget *parent) : QLabel(parent)
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>( objManager->getObject(QString("ManualControlCommand")) );
     UAVObject::Metadata mdata = obj->getMetadata();
-    m_gcscontrol->checkBoxGcsControl->setChecked(mdata.flightAccess == UAVObject::ACCESS_READONLY);
+    m_gcscontrol->checkBoxGcsControl->setChecked(UAVObject::GetFlightAccess(mdata) == UAVObject::ACCESS_READONLY);
 
     // Set up the drop down box for the flightmode
     UAVDataObject* flightStatus = dynamic_cast<UAVDataObject*>( objManager->getObject(QString("FlightStatus")) );
@@ -117,10 +117,10 @@ void GCSControlGadgetWidget::toggleControl(int state)
     if (state)
     {
         mccInitialData = mdata;
-        mdata.flightAccess = UAVObject::ACCESS_READONLY;
-        mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
-        mdata.gcsTelemetryAcked = false;
-        mdata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
+				UAVObject::SetFlightAccess(mdata, UAVObject::ACCESS_READONLY);
+				UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_ONCHANGE);
+				UAVObject::SetGcsTelemetryAcked(mdata, false);
+				UAVObject::SetGcsTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_ONCHANGE);
         mdata.gcsTelemetryUpdatePeriod = 100;
 
     }

@@ -168,13 +168,15 @@ static void registerObject(UAVObjHandle obj)
 static void updateObject(UAVObjHandle obj)
 {
 	UAVObjMetadata metadata;
+	UAVObjUpdateMode updateMode;
 	int32_t eventMask;
 
 	// Get metadata
 	UAVObjGetMetadata(obj, &metadata);
+	updateMode = UAVObjGetTelemetryUpdateMode(&metadata);
 
 	// Setup object depending on update mode
-	if (metadata.telemetryUpdateMode == UPDATEMODE_PERIODIC) {
+	if (updateMode == UPDATEMODE_PERIODIC) {
 		// Set update period
 		setUpdatePeriod(obj, metadata.telemetryUpdatePeriod);
 		// Connect queue
@@ -183,7 +185,7 @@ static void updateObject(UAVObjHandle obj)
 			eventMask |= EV_UNPACKED;	// we also need to act on remote updates (unpack events)
 		}
 		UAVObjConnectQueue(obj, priorityQueue, eventMask);
-	} else if (metadata.telemetryUpdateMode == UPDATEMODE_ONCHANGE) {
+	} else if (updateMode == UPDATEMODE_ONCHANGE) {
 		// Set update period
 		setUpdatePeriod(obj, 0);
 		// Connect queue
@@ -192,7 +194,7 @@ static void updateObject(UAVObjHandle obj)
 			eventMask |= EV_UNPACKED;	// we also need to act on remote updates (unpack events)
 		}
 		UAVObjConnectQueue(obj, priorityQueue, eventMask);
-	} else if (metadata.telemetryUpdateMode == UPDATEMODE_MANUAL) {
+	} else if (updateMode == UPDATEMODE_MANUAL) {
 		// Set update period
 		setUpdatePeriod(obj, 0);
 		// Connect queue
@@ -201,7 +203,7 @@ static void updateObject(UAVObjHandle obj)
 			eventMask |= EV_UNPACKED;	// we also need to act on remote updates (unpack events)
 		}
 		UAVObjConnectQueue(obj, priorityQueue, eventMask);
-	} else if (metadata.telemetryUpdateMode == UPDATEMODE_NEVER) {
+	} else if (updateMode == UPDATEMODE_NEVER) {
 		// Set update period
 		setUpdatePeriod(obj, 0);
 		// Disconnect queue
@@ -235,7 +237,7 @@ static void processObjEvent(UAVObjEvent * ev)
 			if (ev->event == EV_UPDATED || ev->event == EV_UPDATED_MANUAL) {
 				// Send update to GCS (with retries)
 				while (retries < MAX_RETRIES && success == -1) {
-					success = UAVTalkSendObject(uavTalkCon, ev->obj, ev->instId, metadata.telemetryAcked, REQ_TIMEOUT_MS);	// call blocks until ack is received or timeout
+					success = UAVTalkSendObject(uavTalkCon, ev->obj, ev->instId, UAVObjGetTelemetryAcked(&metadata), REQ_TIMEOUT_MS);	// call blocks until ack is received or timeout
 					++retries;
 				}
 				// Update stats

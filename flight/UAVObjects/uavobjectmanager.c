@@ -37,6 +37,9 @@
 
 // Private types
 
+// Macros
+#define SET_BITS(var, shift, value, mask) var = (var & !(mask << shift)) |	(value << shift);
+
 /**
  * List of event queues and the eventmask associated with the queue.
  */
@@ -125,16 +128,7 @@ int32_t UAVObjInitialize()
 		    return -1;
 
 	  // Initialize default metadata structure (metadata of metaobjects)
-	  defMetadata.access = ACCESS_READWRITE;
-	  defMetadata.gcsAccess = ACCESS_READWRITE;
-	  defMetadata.telemetryAcked = 1;
-	  defMetadata.telemetryUpdateMode = UPDATEMODE_ONCHANGE;
-	  defMetadata.telemetryUpdatePeriod = 0;
-	  defMetadata.gcsTelemetryAcked = 1;
-	  defMetadata.gcsTelemetryUpdateMode = UPDATEMODE_ONCHANGE;
-	  defMetadata.gcsTelemetryUpdatePeriod = 0;
-	  defMetadata.loggingUpdateMode = UPDATEMODE_ONCHANGE;
-	  defMetadata.loggingUpdatePeriod = 0;
+		UAVObjMetadataInitialize(&defMetadata);
 
 	  // Done
 	  return 0;
@@ -1051,7 +1045,7 @@ int32_t UAVObjSetInstanceData(UAVObjHandle obj, uint16_t instId,
 		    mdata =
 			(UAVObjMetadata *) (objEntry->linkedObj->instances.
 					    data);
-		    if (mdata->access == ACCESS_READONLY) {
+		    if (UAVObjGetAccess(mdata) == ACCESS_READONLY) {
 			      xSemaphoreGiveRecursive(mutex);
 			      return -1;
 		    }
@@ -1097,7 +1091,7 @@ int32_t UAVObjSetInstanceDataField(UAVObjHandle obj, uint16_t instId, const void
 	if ( !objEntry->isMetaobject )
 	{
 		mdata = (UAVObjMetadata*)(objEntry->linkedObj->instances.data);
-		if ( mdata->access == ACCESS_READONLY )
+		if ( UAVObjGetAccess(mdata) == ACCESS_READONLY )
 		{
 			xSemaphoreGiveRecursive(mutex);
 			return -1;
@@ -1263,6 +1257,136 @@ int32_t UAVObjGetMetadata(UAVObjHandle obj, UAVObjMetadata * dataOut)
 }
 
 /**
+ * Initialize a UAVObjMetadata object.
+ * \param[in] metadata The metadata object
+ */
+void UAVObjMetadataInitialize(UAVObjMetadata* metadata)
+{
+	metadata->flags =
+		ACCESS_READWRITE << UAVOBJ_ACCESS_SHIFT |
+		ACCESS_READWRITE << UAVOBJ_GCS_ACCESS_SHIFT |
+		1 << UAVOBJ_TELEMETRY_ACKED_SHIFT |
+		1 << UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT |
+		UPDATEMODE_ONCHANGE << UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT |
+		UPDATEMODE_ONCHANGE << UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT;
+	metadata->telemetryUpdatePeriod = 0;
+	metadata->gcsTelemetryUpdatePeriod = 0;
+	metadata->loggingUpdatePeriod = 0;
+}
+
+/**
+ * Get the UAVObject metadata access member
+ * \param[in] metadata The metadata object
+ * \return the access type
+ */
+UAVObjAccessType UAVObjGetAccess(const UAVObjMetadata* metadata)
+{
+	return (metadata->flags >> UAVOBJ_ACCESS_SHIFT) & 1;
+}
+
+/**
+ * Set the UAVObject metadata access member
+ * \param[in] metadata The metadata object
+ * \param[in] mode The access mode
+ */
+void UAVObjSetAccess(UAVObjMetadata* metadata, UAVObjAccessType mode)
+{
+	SET_BITS(metadata->flags, UAVOBJ_ACCESS_SHIFT, mode, 1);
+}
+
+/**
+ * Get the UAVObject metadata GCS access member
+ * \param[in] metadata The metadata object
+ * \return the GCS access type
+ */
+UAVObjAccessType UAVObjGetGcsAccess(const UAVObjMetadata* metadata)
+{
+	return (metadata->flags >> UAVOBJ_GCS_ACCESS_SHIFT) & 1;
+}
+
+/**
+ * Set the UAVObject metadata GCS access member
+ * \param[in] metadata The metadata object
+ * \param[in] mode The access mode
+ */
+void UAVObjSetGcsAccess(UAVObjMetadata* metadata, UAVObjAccessType mode) {
+	SET_BITS(metadata->flags, UAVOBJ_GCS_ACCESS_SHIFT, mode, 1);
+}
+
+/**
+ * Get the UAVObject metadata telemetry acked member
+ * \param[in] metadata The metadata object
+ * \return the telemetry acked boolean
+ */
+uint8_t UAVObjGetTelemetryAcked(const UAVObjMetadata* metadata) {
+	return (metadata->flags >> UAVOBJ_TELEMETRY_ACKED_SHIFT) & 1;
+}
+
+/**
+ * Set the UAVObject metadata telemetry acked member
+ * \param[in] metadata The metadata object
+ * \param[in] val The telemetry acked boolean
+ */
+void UAVObjSetTelemetryAcked(UAVObjMetadata* metadata, uint8_t val) {
+	SET_BITS(metadata->flags, UAVOBJ_TELEMETRY_ACKED_SHIFT, val, 1);
+}
+
+/**
+ * Get the UAVObject metadata GCS telemetry acked member
+ * \param[in] metadata The metadata object
+ * \return the telemetry acked boolean
+ */
+uint8_t UAVObjGetGcsTelemetryAcked(const UAVObjMetadata* metadata) {
+	return (metadata->flags >> UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT) & 1;
+}
+
+/**
+ * Set the UAVObject metadata GCS telemetry acked member
+ * \param[in] metadata The metadata object
+ * \param[in] val The GCS telemetry acked boolean
+ */
+void UAVObjSetGcsTelemetryAcked(UAVObjMetadata* metadata, uint8_t val) {
+	SET_BITS(metadata->flags, UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT, val, 1);
+}
+
+/**
+ * Get the UAVObject metadata telemetry update mode
+ * \param[in] metadata The metadata object
+ * \return the telemetry update mode
+ */
+UAVObjUpdateMode UAVObjGetTelemetryUpdateMode(const UAVObjMetadata* metadata) {
+	return (metadata->flags >> UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT) & UAVOBJ_UPDATE_MODE_MASK;
+}
+
+/**
+ * Set the UAVObject metadata telemetry update mode member
+ * \param[in] metadata The metadata object
+ * \param[in] val The telemetry update mode
+ */
+void UAVObjSetTelemetryUpdateMode(UAVObjMetadata* metadata, UAVObjUpdateMode val) {
+	SET_BITS(metadata->flags, UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT, val, UAVOBJ_UPDATE_MODE_MASK);
+}
+
+/**
+ * Get the UAVObject metadata GCS telemetry update mode
+ * \param[in] metadata The metadata object
+ * \return the GCS telemetry update mode
+ */
+UAVObjUpdateMode UAVObjGetGcsTelemetryUpdateMode(const UAVObjMetadata* metadata) {
+	return (metadata->flags >> UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT) & UAVOBJ_UPDATE_MODE_MASK;
+}
+
+/**
+ * Set the UAVObject metadata GCS telemetry update mode member
+ * \param[in] metadata The metadata object
+ * \param[in] val The GCS telemetry update mode
+ */
+void UAVObjSetGcsTelemetryUpdateMode(UAVObjMetadata* metadata, UAVObjUpdateMode val) {
+	SET_BITS(metadata->flags, UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT, val, UAVOBJ_UPDATE_MODE_MASK);
+}
+
+
+/**
  * Check if an object is read only
  * \param[in] obj The object handle
  * \return 
@@ -1283,7 +1407,7 @@ int8_t UAVObjReadOnly(UAVObjHandle obj)
 		    mdata =
 			(UAVObjMetadata *) (objEntry->linkedObj->instances.
 					    data);
-		    return mdata->access == ACCESS_READONLY;
+		    return UAVObjGetAccess(mdata) == ACCESS_READONLY;
 	  }
 	  return -1;
 }

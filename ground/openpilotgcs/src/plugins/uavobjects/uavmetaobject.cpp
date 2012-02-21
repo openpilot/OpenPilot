@@ -36,16 +36,7 @@ UAVMetaObject::UAVMetaObject(quint32 objID, const QString& name, UAVObject* pare
 {
     this->parent = parent;
     // Setup default metadata of metaobject (can not be changed)
-    ownMetadata.flightAccess = ACCESS_READWRITE;
-    ownMetadata.gcsAccess = ACCESS_READWRITE;
-    ownMetadata.flightTelemetryAcked = 1;
-    ownMetadata.flightTelemetryUpdateMode = UPDATEMODE_ONCHANGE;
-    ownMetadata.flightTelemetryUpdatePeriod = 0;
-    ownMetadata.gcsTelemetryAcked = 1;
-    ownMetadata.gcsTelemetryUpdateMode = UPDATEMODE_ONCHANGE;
-    ownMetadata.gcsTelemetryUpdatePeriod = 0;
-    ownMetadata.loggingUpdateMode = UPDATEMODE_ONCHANGE;
-    ownMetadata.loggingUpdatePeriod = 0;
+		UAVObject::MetadataInitialize(ownMetadata);
     // Setup fields
     QStringList boolEnum;
     boolEnum << tr("False") << tr("True");

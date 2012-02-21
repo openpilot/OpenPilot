@@ -148,7 +148,7 @@ void ConfigCCAttitudeWidget::startAccelCalibration() {
     // Speed up updates
     initialMdata = obj->getMetadata();
     UAVObject::Metadata mdata = initialMdata;
-    mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
+		UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
     mdata.flightTelemetryUpdatePeriod = 100;
     obj->setMetadata(mdata);
 

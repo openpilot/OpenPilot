@@ -156,10 +156,11 @@ void Telemetry::updateObject(UAVObject* obj)
 {
     // Get metadata
     UAVObject::Metadata metadata = obj->getMetadata();
+		UAVObject::UpdateMode updateMode = UAVObject::GetGcsTelemetryUpdateMode(metadata);
 
     // Setup object depending on update mode
     qint32 eventMask;
-    if ( metadata.gcsTelemetryUpdateMode == UAVObject::UPDATEMODE_PERIODIC )
+    if ( updateMode == UAVObject::UPDATEMODE_PERIODIC )
     {
         // Set update period
         setUpdatePeriod(obj, metadata.gcsTelemetryUpdatePeriod);
@@ -171,7 +172,7 @@ void Telemetry::updateObject(UAVObject* obj)
         }
         connectToObjectInstances(obj, eventMask);
     }
-    else if ( metadata.gcsTelemetryUpdateMode == UAVObject::UPDATEMODE_ONCHANGE )
+    else if ( updateMode == UAVObject::UPDATEMODE_ONCHANGE )
     {
         // Set update period
         setUpdatePeriod(obj, 0);
@@ -183,7 +184,7 @@ void Telemetry::updateObject(UAVObject* obj)
         }
         connectToObjectInstances(obj, eventMask);
     }
-    else if ( metadata.gcsTelemetryUpdateMode == UAVObject::UPDATEMODE_MANUAL )
+    else if ( updateMode == UAVObject::UPDATEMODE_MANUAL )
     {
         // Set update period
         setUpdatePeriod(obj, 0);
@@ -195,7 +196,7 @@ void Telemetry::updateObject(UAVObject* obj)
         }
         connectToObjectInstances(obj, eventMask);
     }
-    else if ( metadata.gcsTelemetryUpdateMode == UAVObject::UPDATEMODE_NEVER )
+    else if ( updateMode == UAVObject::UPDATEMODE_NEVER )
     {
         // Set update period
         setUpdatePeriod(obj, 0);
@@ -387,7 +388,7 @@ void Telemetry::processObjectQueue()
         transInfo.obj = objInfo.obj;
         transInfo.allInstances = objInfo.allInstances;
         transInfo.retriesRemaining = MAX_RETRIES;
-        transInfo.acked = metadata.gcsTelemetryAcked;
+        transInfo.acked = UAVObject::GetGcsTelemetryAcked(metadata);
         if ( objInfo.event == EV_UPDATED || objInfo.event == EV_UPDATED_MANUAL )
         {
             transInfo.objRequest = false;

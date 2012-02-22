@@ -720,14 +720,14 @@ void PluginManagerPrivate::readPluginPaths()
     else{
         qDebug() << "DSW: Core.pluginspec not found";
     }
-//    QFile welcomeSpec(QString("plugins/Welcome.pluginspec"));
-//    if(welcomeSpec.exists()){
-//        qDebug() << "DSW Found " << QFileInfo(welcomeSpec).absoluteFilePath();
-//        specFiles << welcomeSpec.fileName();
-//    }
-//    else{
-//        qDebug() << "DSW: Welcome.pluginspec not found";
-//    }
+    QFile welcomeSpec(QString("plugins/Welcome.pluginspec"));
+    if(welcomeSpec.exists()){
+        qDebug() << "DSW Found " << QFileInfo(welcomeSpec).absoluteFilePath();
+        specFiles << welcomeSpec.fileName();
+    }
+    else{
+        qDebug() << "DSW: Welcome.pluginspec not found";
+    }
     const QDir pluginDir("plugins/");
     const QFileInfoList files = pluginDir.entryInfoList(QStringList() << QString("*.%1").arg(extension), QDir::Files);
     foreach (const QFileInfo &file, files){

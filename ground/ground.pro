@@ -82,3 +82,7 @@ OTHER_FILES += \
     android/src/org/kde/necessitas/origo/QtApplication.java \
     android/AndroidManifest.xml
 }
+
+OTHER_FILES += \
+    android/version.xml
+

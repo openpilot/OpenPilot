@@ -141,13 +141,13 @@ unix:!macx {
 android-g++{
     pluginSpec.files = Core.pluginspec
     pluginSpec.path = /assets/plugins
-    qmlFiles.files = mainwindow.qml
-    qmlFiles.path = /assets/qml
+#    qmlFiles.files = mainwindow.qml
+#    qmlFiles.path = /assets/qml
     INSTALLS += pluginSpec
-    INSTALLS += qmlFiles
+#    INSTALLS += qmlFiles
 }
-OTHER_FILES += Core.pluginspec \
-    mainwindow.qml
+OTHER_FILES += Core.pluginspec# \
+#    mainwindow.qml
 
 include(gcsversioninfo.pri)
 

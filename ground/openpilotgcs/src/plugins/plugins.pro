@@ -13,7 +13,7 @@ SUBDIRS   = plugin_coreplugin
 
 # Core plugin
 plugin_coreplugin.subdir = coreplugin
-
+!android-g++{
 # Empty UAVGadget - Default for new splits
 plugin_emptygadget.subdir = emptygadget
 plugin_emptygadget.depends = plugin_coreplugin
@@ -23,7 +23,7 @@ SUBDIRS += plugin_emptygadget
 plugin_debuggadget.subdir = debuggadget
 plugin_debuggadget.depends = plugin_coreplugin
 SUBDIRS += plugin_debuggadget
-
+}
 # Welcome plugin
 plugin_welcome.subdir = welcome
 plugin_welcome.depends = plugin_coreplugin
@@ -35,7 +35,7 @@ SUBDIRS += plugin_welcome
     plugin_rawhid.subdir = rawhid
     plugin_rawhid.depends = plugin_coreplugin
 }
-
+!android-g++{
 # Serial port connection plugin
 SUBDIRS += plugin_serial
 plugin_serial.subdir = serialconnection
@@ -84,7 +84,7 @@ plugin_notify.depends = plugin_coreplugin
 plugin_notify.depends += plugin_uavobjects
 SUBDIRS += plugin_notify
 }
-
+}
 #Uploader gadget
 !android-g++{
     plugin_uploader.subdir = uploader
@@ -93,7 +93,7 @@ SUBDIRS += plugin_notify
     plugin_uploader.depends += plugin_rawhid
     SUBDIRS += plugin_uploader
 }
-
+!android-g++{
 #Dial gadget
 plugin_dial.subdir = dial
 plugin_dial.depends = plugin_coreplugin
@@ -154,7 +154,7 @@ plugin_logging.depends = plugin_coreplugin
 plugin_logging.depends += plugin_uavobjects
 plugin_logging.depends += plugin_uavtalk
 SUBDIRS += plugin_logging
-
+}
 #GCS Control of UAV gadget
 !android-g++{
     plugin_gcscontrol.subdir = gcscontrol
@@ -184,7 +184,7 @@ SUBDIRS += plugin_logging
 #plugin_scopeogl.depends = plugin_coreplugin
 #plugin_scopeogl.depends += plugin_uavobjects
 #SUBDIRS += plugin_scopeogl
-
+!android-g++{
 # UAV Object Utility plugin
 plugin_uavobjectutil.subdir = uavobjectutil
 plugin_uavobjectutil.depends = plugin_coreplugin
@@ -202,7 +202,7 @@ plugin_uavsettingsimportexport.subdir = uavsettingsimportexport
 plugin_uavsettingsimportexport.depends = plugin_coreplugin
 plugin_uavsettingsimportexport.depends += plugin_uavobjects
 SUBDIRS += plugin_uavsettingsimportexport
-
+}
 # Junsi Powerlog plugin
 #plugin_powerlog.subdir = powerlog
 #plugin_powerlog.depends = plugin_coreplugin

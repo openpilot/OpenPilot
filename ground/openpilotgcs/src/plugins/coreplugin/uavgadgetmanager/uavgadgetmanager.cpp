@@ -349,9 +349,11 @@ void UAVGadgetManager::readSettings(QSettings *qs)
     }
     qs->beginGroup(uniqueModeName());
 
+#ifndef Q_OS_ANDROID
     restoreState(qs);
-
     showToolbars(m_showToolbars);
+#endif
+    qDebug() << "DSW: you are here <--";
 
     qs->endGroup();
     qs->endGroup();

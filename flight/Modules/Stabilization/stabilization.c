@@ -86,6 +86,7 @@ float vbar_integral[3] = {0, 0, 0};
 float vbar_decay = 0.991f;
 pid_type pids[PID_MAX];
 bool vbar_gyros_suppress;
+bool vbar_piro_comp = false;
 
 // Private functions
 static void stabilizationTask(void* parameters);
@@ -289,6 +290,20 @@ static void stabilizationTask(void* parameters)
 
 					break;
 			}
+		}
+
+		// Piro compensation rotates the virtual flybar by yaw step to keep it
+		// rotated to external world
+		if (vbar_piro_comp) {
+			const float F_PI = 3.14159f;
+			float cy = cosf(gyro_filtered[2] / 180.0f * F_PI * dT);
+			float sy = sinf(gyro_filtered[2] / 180.0f * F_PI * dT);
+			
+			float vbar_pitch = cy * vbar_integral[1] - sy * vbar_integral[0];
+			float vbar_roll = sy * vbar_integral[1] + cy * vbar_integral[0];
+			
+			vbar_integral[1] = vbar_pitch;
+			vbar_integral[0] = vbar_roll;
 		}
 
 		uint8_t shouldUpdate = 1;
@@ -497,6 +512,7 @@ static void SettingsUpdatedCb(UAVObjEvent * ev)
 	// Compute time constant for vbar decay term based on a tau
 	vbar_decay = expf(-fakeDt / settings.VbarTau);
 	vbar_gyros_suppress = settings.VbarGyroSuppress == STABILIZATIONSETTINGS_VBARGYROSUPPRESS_TRUE;
+	vbar_piro_comp = settings.VbarPiroComp == STABILIZATIONSETTINGS_VBARPIROCOMP_TRUE;
 }
 
 

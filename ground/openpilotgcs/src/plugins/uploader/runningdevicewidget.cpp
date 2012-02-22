@@ -73,7 +73,7 @@ void runningDeviceWidget::populate()
 
     myDevice->lblDeviceID->setText(QString("Device ID: ") + QString::number(id, 16));
     myDevice->lblBoardName->setText(deviceDescriptorStruct::idToBoardName(id));
-    myDevice->lblHWRev->setText(QString(tr("HW Revision: "))+QString::number(id & 0x0011, 16));
+    myDevice->lblHWRev->setText(QString(tr("HW Revision: "))+QString::number(id & 0x00FF, 16));
     qDebug()<<"CRC"<<utilMngr->getFirmwareCRC();
     myDevice->lblCRC->setText(QString(tr("Firmware CRC: "))+QVariant(utilMngr->getFirmwareCRC()).toString());
     // DeviceID tells us what sort of HW we have detected:
@@ -112,9 +112,9 @@ void runningDeviceWidget::populate()
     deviceDescriptorStruct devDesc;
     if(UAVObjectUtilManager::descriptionToStructure(description,&devDesc))
     {
-        if(devDesc.description.startsWith("release",Qt::CaseInsensitive))
+        if(devDesc.gitTag.startsWith("release",Qt::CaseInsensitive))
         {
-            myDevice->lblFWTag->setText(QString("Firmware tag: ")+devDesc.description);
+            myDevice->lblFWTag->setText(QString("Firmware tag: ")+devDesc.gitTag);
             QPixmap pix = QPixmap(QString(":uploader/images/application-certificate.svg"));
             myDevice->lblCertified->setPixmap(pix);
             myDevice->lblCertified->setToolTip(tr("Tagged officially released firmware build"));
@@ -122,13 +122,13 @@ void runningDeviceWidget::populate()
         }
         else
         {
-            myDevice->lblFWTag->setText(QString("Firmware tag: ")+devDesc.description);
+            myDevice->lblFWTag->setText(QString("Firmware tag: ")+devDesc.gitTag);
             QPixmap pix = QPixmap(QString(":uploader/images/warning.svg"));
             myDevice->lblCertified->setPixmap(pix);
             myDevice->lblCertified->setToolTip(tr("Untagged or custom firmware build"));
         }
-        myDevice->lblGitCommitTag->setText("Git commit tag: "+devDesc.gitTag);
-        myDevice->lblFWDate->setText(QString("Firmware date: ") + devDesc.buildDate.insert(4,"-").insert(7,"-"));
+        myDevice->lblGitCommitTag->setText("Git commit hash: "+devDesc.gitHash);
+        myDevice->lblFWDate->setText(QString("Firmware date: ") + devDesc.gitDate.insert(4,"-").insert(7,"-"));
     }
     else
     {

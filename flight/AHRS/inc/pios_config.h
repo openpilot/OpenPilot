@@ -41,5 +41,6 @@
 #define PIOS_INCLUDE_GPIO
 #define PIOS_INCLUDE_EXTI
 #define PIOS_INCLUDE_BL_HELPER
+#define PIOS_INCLUDE_IAP
 
 #endif /* PIOS_CONFIG_H */

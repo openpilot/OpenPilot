@@ -54,15 +54,15 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
     m_config = new Ui_InputWidget();
     m_config->setupUi(this);
 
-    setupButtons(m_config->saveRCInputToRAM,m_config->saveRCInputToSD);
+    addApplySaveButtons(m_config->saveRCInputToRAM,m_config->saveRCInputToSD);
 
     unsigned int index=0;
-    foreach(QString name,manualSettingsObj->getFields().at(0)->getElementNames())
+    foreach(QString name,manualSettingsObj->getField("ChannelNumber")->getElementNames())
     {
         Q_ASSERT(index < ManualControlSettings::CHANNELGROUPS_NUMELEM);
         inputChannelForm * inp=new inputChannelForm(this,index==0);
         m_config->channelSettings->layout()->addWidget(inp);
-        inp->ui->channelName->setText(name);
+        inp->setName(name);
         addUAVObjectToWidgetRelation("ManualControlSettings","ChannelGroups",inp->ui->channelGroup,index);
         addUAVObjectToWidgetRelation("ManualControlSettings","ChannelNumber",inp->ui->channelNumber,index);
         addUAVObjectToWidgetRelation("ManualControlSettings","ChannelMin",inp->ui->channelMin,index);
@@ -1097,7 +1097,7 @@ void ConfigInputWidget::invertControls()
         QCheckBox * cb=qobject_cast<QCheckBox *>(wd);
         if(cb)
         {
-            int index=manualSettingsObj->getFields().at(0)->getElementNames().indexOf(cb->text());
+            int index=manualSettingsObj->getField("ChannelNumber")->getElementNames().indexOf(cb->text());
             if((cb->isChecked() && (manualSettingsData.ChannelMax[index]>manualSettingsData.ChannelMin[index])) ||
                     (!cb->isChecked() && (manualSettingsData.ChannelMax[index]<manualSettingsData.ChannelMin[index])))
             {

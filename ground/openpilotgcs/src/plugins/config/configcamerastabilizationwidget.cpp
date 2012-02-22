@@ -2,7 +2,7 @@
  ******************************************************************************
  *
  * @file       configcamerastabilizationwidget.cpp
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2011.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup ConfigPlugin Config Plugin
@@ -25,47 +25,69 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "configcamerastabilizationwidget.h"
-
-#include <QDebug>
-#include <QTimer>
-#include <QStringList>
-#include <QtGui/QWidget>
-#include <QtGui/QTextEdit>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QPushButton>
-#include <QThread>
-#include <iostream>
-#include <QUrl>
-#include <QDesktopServices>
-
 #include "camerastabsettings.h"
 #include "hwsettings.h"
 #include "mixersettings.h"
 #include "actuatorcommand.h"
 
+#include <QDebug>
+#include <QDesktopServices>
+#include <QUrl>
+
 ConfigCameraStabilizationWidget::ConfigCameraStabilizationWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
+    // TODO: this widget should use the addUAVObjectToWidgetRelation()
     m_camerastabilization = new Ui_CameraStabilizationWidget();
     m_camerastabilization->setupUi(this);
 
-    QComboBox * selectors[3] = {
+    QComboBox *outputs[3] = {
         m_camerastabilization->rollChannel,
         m_camerastabilization->pitchChannel,
-        m_camerastabilization->yawChannel
+        m_camerastabilization->yawChannel,
     };
 
+    QComboBox *inputs[3] = {
+        m_camerastabilization->rollInputChannel,
+        m_camerastabilization->pitchInputChannel,
+        m_camerastabilization->yawInputChannel,
+    };
+
+    QComboBox *stabilizationMode[3] = {
+        m_camerastabilization->rollStabilizationMode,
+        m_camerastabilization->pitchStabilizationMode,
+        m_camerastabilization->yawStabilizationMode,
+    };
+
+    CameraStabSettings *cameraStab = CameraStabSettings::GetInstance(getObjectManager());
+    CameraStabSettings::DataFields cameraStabData = cameraStab->getData();
+
     for (int i = 0; i < 3; i++) {
-        selectors[i]->clear();
-        selectors[i]->addItem("None");
-        for (int j = 0; j < ActuatorCommand::CHANNEL_NUMELEM; j++)
-            selectors[i]->addItem(QString("Channel %1").arg(j+1));
+        outputs[i]->clear();
+        outputs[i]->addItem("None");
+        for (quint32 j = 0; j < ActuatorCommand::CHANNEL_NUMELEM; j++)
+            outputs[i]->addItem(QString("Channel %1").arg(j+1));
+
+        UAVObjectField *field;
+
+        field = cameraStab->getField("Input");
+        Q_ASSERT(field);
+        inputs[i]->clear();
+        inputs[i]->addItems(field->getOptions());
+        inputs[i]->setCurrentIndex(cameraStabData.Input[i]);
+
+        field = cameraStab->getField("StabilizationMode");
+        Q_ASSERT(field);
+        stabilizationMode[i]->clear();
+        stabilizationMode[i]->addItems(field->getOptions());
+        stabilizationMode[i]->setCurrentIndex(cameraStabData.StabilizationMode[i]);
     }
 
     connectUpdates();
 
     // Connect buttons
-    connect(m_camerastabilization->camerastabilizationSaveRAM,SIGNAL(clicked()),this,SLOT(applySettings()));
-    connect(m_camerastabilization->camerastabilizationSaveSD,SIGNAL(clicked()),this,SLOT(saveSettings()));
+    connect(m_camerastabilization->camerastabilizationResetToDefaults, SIGNAL(clicked()), this, SLOT(resetToDefaults()));
+    connect(m_camerastabilization->camerastabilizationSaveRAM, SIGNAL(clicked()), this, SLOT(applySettings()));
+    connect(m_camerastabilization->camerastabilizationSaveSD, SIGNAL(clicked()), this, SLOT(saveSettings()));
     connect(m_camerastabilization->camerastabilizationHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
 }
 
@@ -77,19 +99,19 @@ ConfigCameraStabilizationWidget::~ConfigCameraStabilizationWidget()
 void ConfigCameraStabilizationWidget::connectUpdates()
 {
     // Now connect the widget to the StabilizationSettings object
-    connect(MixerSettings::GetInstance(getObjectManager()),SIGNAL(objectUpdated(UAVObject*)),this,SLOT(refreshValues()));
-    connect(CameraStabSettings::GetInstance(getObjectManager()),SIGNAL(objectUpdated(UAVObject*)),this,SLOT(refreshValues()));
+    connect(MixerSettings::GetInstance(getObjectManager()), SIGNAL(objectUpdated(UAVObject *)), this, SLOT(refreshValues()));
+    connect(CameraStabSettings::GetInstance(getObjectManager()), SIGNAL(objectUpdated(UAVObject *)), this, SLOT(refreshValues()));
     // TODO: This will need to support both CC and OP later
-    connect(HwSettings::GetInstance(getObjectManager()),SIGNAL(objectUpdated(UAVObject*)),this,SLOT(refreshValues()));
+    connect(HwSettings::GetInstance(getObjectManager()), SIGNAL(objectUpdated(UAVObject *)), this, SLOT(refreshValues()));
 }
 
 void ConfigCameraStabilizationWidget::disconnectUpdates()
 {
     // Now connect the widget to the StabilizationSettings object
-    disconnect(MixerSettings::GetInstance(getObjectManager()),SIGNAL(objectUpdated(UAVObject*)),this,SLOT(refreshValues()));
-    disconnect(CameraStabSettings::GetInstance(getObjectManager()),SIGNAL(objectUpdated(UAVObject*)),this,SLOT(refreshValues()));
+    disconnect(MixerSettings::GetInstance(getObjectManager()), SIGNAL(objectUpdated(UAVObject *)), this, SLOT(refreshValues()));
+    disconnect(CameraStabSettings::GetInstance(getObjectManager()), SIGNAL(objectUpdated(UAVObject *)), this, SLOT(refreshValues()));
     // TODO: This will need to support both CC and OP later
-    disconnect(HwSettings::GetInstance(getObjectManager()),SIGNAL(objectUpdated(UAVObject*)),this,SLOT(refreshValues()));
+    disconnect(HwSettings::GetInstance(getObjectManager()), SIGNAL(objectUpdated(UAVObject *)), this, SLOT(refreshValues()));
 }
 
 /**
@@ -99,7 +121,7 @@ void ConfigCameraStabilizationWidget::disconnectUpdates()
 void ConfigCameraStabilizationWidget::applySettings()
 {
     // Enable or disable the settings
-    HwSettings * hwSettings = HwSettings::GetInstance(getObjectManager());
+    HwSettings *hwSettings = HwSettings::GetInstance(getObjectManager());
     HwSettings::DataFields hwSettingsData = hwSettings->getData();
     hwSettingsData.OptionalModules[HwSettings::OPTIONALMODULES_CAMERASTAB] =
             m_camerastabilization->enableCameraStabilization->isChecked() ?
@@ -107,14 +129,14 @@ void ConfigCameraStabilizationWidget::applySettings()
                 HwSettings::OPTIONALMODULES_DISABLED;
 
     // Update the mixer settings
-    MixerSettings * mixerSettings = MixerSettings::GetInstance(getObjectManager());
+    MixerSettings *mixerSettings = MixerSettings::GetInstance(getObjectManager());
     MixerSettings::DataFields mixerSettingsData = mixerSettings->getData();
     const int NUM_MIXERS = 10;
 
-    QComboBox * selectors[3] = {
+    QComboBox *outputs[3] = {
         m_camerastabilization->rollChannel,
         m_camerastabilization->pitchChannel,
-        m_camerastabilization->yawChannel
+        m_camerastabilization->yawChannel,
     };
 
     // TODO: Need to reformat object so types are an
@@ -136,14 +158,14 @@ void ConfigCameraStabilizationWidget::applySettings()
     for (int i = 0; i < 3; i++)
     {
         // Channel 1 is second entry, so becomes zero
-        int mixerNum = selectors[i]->currentIndex() - 1;
+        int mixerNum = outputs[i]->currentIndex() - 1;
 
         if ( mixerNum >= 0 && // Short circuit in case of none
              *mixerTypes[mixerNum] != MixerSettings::MIXER1TYPE_DISABLED &&
              (*mixerTypes[mixerNum] != MixerSettings::MIXER1TYPE_CAMERAROLL + i) ) {
             // If the mixer channel already to something that isn't what we are
             // about to set it to reset to none
-            selectors[i]->setCurrentIndex(0);
+            outputs[i]->setCurrentIndex(0);
             m_camerastabilization->message->setText("One of the channels is already assigned, reverted to none");
         } else {
             // Make sure no other channels have this output set
@@ -158,12 +180,35 @@ void ConfigCameraStabilizationWidget::applySettings()
         }
     }
 
-    // Update the ranges
-    CameraStabSettings * cameraStab = CameraStabSettings::GetInstance(getObjectManager());
+    // Update the settings
+    CameraStabSettings *cameraStab = CameraStabSettings::GetInstance(getObjectManager());
     CameraStabSettings::DataFields cameraStabData = cameraStab->getData();
+
     cameraStabData.OutputRange[CameraStabSettings::OUTPUTRANGE_ROLL] = m_camerastabilization->rollOutputRange->value();
     cameraStabData.OutputRange[CameraStabSettings::OUTPUTRANGE_PITCH] = m_camerastabilization->pitchOutputRange->value();
     cameraStabData.OutputRange[CameraStabSettings::OUTPUTRANGE_YAW] = m_camerastabilization->yawOutputRange->value();
+
+    cameraStabData.Input[CameraStabSettings::INPUT_ROLL] = m_camerastabilization->rollInputChannel->currentIndex();
+    cameraStabData.Input[CameraStabSettings::INPUT_PITCH] = m_camerastabilization->pitchInputChannel->currentIndex();
+    cameraStabData.Input[CameraStabSettings::INPUT_YAW] = m_camerastabilization->yawInputChannel->currentIndex();
+
+    cameraStabData.StabilizationMode[CameraStabSettings::STABILIZATIONMODE_ROLL] = m_camerastabilization->rollStabilizationMode->currentIndex();
+    cameraStabData.StabilizationMode[CameraStabSettings::STABILIZATIONMODE_PITCH] = m_camerastabilization->pitchStabilizationMode->currentIndex();
+    cameraStabData.StabilizationMode[CameraStabSettings::STABILIZATIONMODE_YAW] = m_camerastabilization->yawStabilizationMode->currentIndex();
+
+    cameraStabData.InputRange[CameraStabSettings::INPUTRANGE_ROLL] = m_camerastabilization->rollInputRange->value();
+    cameraStabData.InputRange[CameraStabSettings::INPUTRANGE_PITCH] = m_camerastabilization->pitchInputRange->value();
+    cameraStabData.InputRange[CameraStabSettings::INPUTRANGE_YAW] = m_camerastabilization->yawInputRange->value();
+
+    cameraStabData.InputRate[CameraStabSettings::INPUTRATE_ROLL] = m_camerastabilization->rollInputRate->value();
+    cameraStabData.InputRate[CameraStabSettings::INPUTRATE_PITCH] = m_camerastabilization->pitchInputRate->value();
+    cameraStabData.InputRate[CameraStabSettings::INPUTRATE_YAW] = m_camerastabilization->yawInputRate->value();
+
+    cameraStabData.ResponseTime[CameraStabSettings::RESPONSETIME_ROLL] = m_camerastabilization->rollResponseTime->value();
+    cameraStabData.ResponseTime[CameraStabSettings::RESPONSETIME_PITCH] = m_camerastabilization->pitchResponseTime->value();
+    cameraStabData.ResponseTime[CameraStabSettings::RESPONSETIME_YAW] = m_camerastabilization->yawResponseTime->value();
+
+    cameraStabData.MaxAxisLockRate = m_camerastabilization->MaxAxisLockRate->value();
 
     // Because multiple objects are updated, and all of them trigger the callback
     // they must be done together (if update one then load settings from second
@@ -182,7 +227,7 @@ void ConfigCameraStabilizationWidget::applySettings()
 void ConfigCameraStabilizationWidget::saveSettings()
 {
     applySettings();
-    UAVObject * obj = HwSettings::GetInstance(getObjectManager());
+    UAVObject *obj = HwSettings::GetInstance(getObjectManager());
     saveObjectToSD(obj);
     obj = MixerSettings::GetInstance(getObjectManager());
     saveObjectToSD(obj);
@@ -190,24 +235,56 @@ void ConfigCameraStabilizationWidget::saveSettings()
     saveObjectToSD(obj);
 }
 
+/**
+  * Refresh UI with new settings of CameraStabSettings object
+  * (either from active configuration or just loaded defaults
+  * to be applied or saved)
+  */
+void ConfigCameraStabilizationWidget::refreshUIValues(CameraStabSettings::DataFields &cameraStabData)
+{
+    m_camerastabilization->rollOutputRange->setValue(cameraStabData.OutputRange[CameraStabSettings::OUTPUTRANGE_ROLL]);
+    m_camerastabilization->pitchOutputRange->setValue(cameraStabData.OutputRange[CameraStabSettings::OUTPUTRANGE_PITCH]);
+    m_camerastabilization->yawOutputRange->setValue(cameraStabData.OutputRange[CameraStabSettings::OUTPUTRANGE_YAW]);
+
+    m_camerastabilization->rollInputChannel->setCurrentIndex(cameraStabData.Input[CameraStabSettings::INPUT_ROLL]);
+    m_camerastabilization->pitchInputChannel->setCurrentIndex(cameraStabData.Input[CameraStabSettings::INPUT_PITCH]);
+    m_camerastabilization->yawInputChannel->setCurrentIndex(cameraStabData.Input[CameraStabSettings::INPUT_YAW]);
+
+    m_camerastabilization->rollStabilizationMode->setCurrentIndex(cameraStabData.StabilizationMode[CameraStabSettings::STABILIZATIONMODE_ROLL]);
+    m_camerastabilization->pitchStabilizationMode->setCurrentIndex(cameraStabData.StabilizationMode[CameraStabSettings::STABILIZATIONMODE_PITCH]);
+    m_camerastabilization->yawStabilizationMode->setCurrentIndex(cameraStabData.StabilizationMode[CameraStabSettings::STABILIZATIONMODE_YAW]);
+
+    m_camerastabilization->rollInputRange->setValue(cameraStabData.InputRange[CameraStabSettings::INPUTRANGE_ROLL]);
+    m_camerastabilization->pitchInputRange->setValue(cameraStabData.InputRange[CameraStabSettings::INPUTRANGE_PITCH]);
+    m_camerastabilization->yawInputRange->setValue(cameraStabData.InputRange[CameraStabSettings::INPUTRANGE_YAW]);
+
+    m_camerastabilization->rollInputRate->setValue(cameraStabData.InputRate[CameraStabSettings::INPUTRATE_ROLL]);
+    m_camerastabilization->pitchInputRate->setValue(cameraStabData.InputRate[CameraStabSettings::INPUTRATE_PITCH]);
+    m_camerastabilization->yawInputRate->setValue(cameraStabData.InputRate[CameraStabSettings::INPUTRATE_YAW]);
+
+    m_camerastabilization->rollResponseTime->setValue(cameraStabData.ResponseTime[CameraStabSettings::RESPONSETIME_ROLL]);
+    m_camerastabilization->pitchResponseTime->setValue(cameraStabData.ResponseTime[CameraStabSettings::RESPONSETIME_PITCH]);
+    m_camerastabilization->yawResponseTime->setValue(cameraStabData.ResponseTime[CameraStabSettings::RESPONSETIME_YAW]);
+
+    m_camerastabilization->MaxAxisLockRate->setValue(cameraStabData.MaxAxisLockRate);
+}
+
 void ConfigCameraStabilizationWidget::refreshValues()
 {
-    HwSettings * hwSettings = HwSettings::GetInstance(getObjectManager());
+    HwSettings *hwSettings = HwSettings::GetInstance(getObjectManager());
     HwSettings::DataFields hwSettingsData = hwSettings->getData();
     m_camerastabilization->enableCameraStabilization->setChecked(
                 hwSettingsData.OptionalModules[HwSettings::OPTIONALMODULES_CAMERASTAB] ==
                 HwSettings::OPTIONALMODULES_ENABLED);
 
-    CameraStabSettings * cameraStabSettings = CameraStabSettings::GetInstance(getObjectManager());
-    CameraStabSettings::DataFields cameraStab = cameraStabSettings->getData();
-    m_camerastabilization->rollOutputRange->setValue(cameraStab.OutputRange[CameraStabSettings::OUTPUTRANGE_ROLL]);
-    m_camerastabilization->pitchOutputRange->setValue(cameraStab.OutputRange[CameraStabSettings::OUTPUTRANGE_PITCH]);
-    m_camerastabilization->yawOutputRange->setValue(cameraStab.OutputRange[CameraStabSettings::OUTPUTRANGE_YAW]);
+    CameraStabSettings *cameraStabSettings = CameraStabSettings::GetInstance(getObjectManager());
+    CameraStabSettings::DataFields cameraStabData = cameraStabSettings->getData();
+    refreshUIValues(cameraStabData);
 
-    MixerSettings * mixerSettings = MixerSettings::GetInstance(getObjectManager());
+    MixerSettings *mixerSettings = MixerSettings::GetInstance(getObjectManager());
     MixerSettings::DataFields mixerSettingsData = mixerSettings->getData();
     const int NUM_MIXERS = 10;
-    QComboBox * selectors[3] = {
+    QComboBox *outputs[3] = {
         m_camerastabilization->rollChannel,
         m_camerastabilization->pitchChannel,
         m_camerastabilization->yawChannel
@@ -232,21 +309,29 @@ void ConfigCameraStabilizationWidget::refreshValues()
     {
         // Default to none if not found.  Then search for any mixer channels set to
         // this
-        selectors[i]->setCurrentIndex(0);
+        outputs[i]->setCurrentIndex(0);
         for (int j = 0; j < NUM_MIXERS; j++)
             if (*mixerTypes[j] == (MixerSettings::MIXER1TYPE_CAMERAROLL + i) &&
-                    selectors[i]->currentIndex() != (j + 1))
-                selectors[i]->setCurrentIndex(j + 1);
+                    outputs[i]->currentIndex() != (j + 1))
+                outputs[i]->setCurrentIndex(j + 1);
     }
+}
+
+void ConfigCameraStabilizationWidget::resetToDefaults()
+{
+    CameraStabSettings cameraStabDefaults;
+    CameraStabSettings::DataFields defaults = cameraStabDefaults.getData();
+    refreshUIValues(defaults);
 }
 
 void ConfigCameraStabilizationWidget::openHelp()
 {
-    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/Camera+Stabilization", QUrl::StrictMode) );
+    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/Camera+Stabilization+Configuration", QUrl::StrictMode) );
 }
 
 void ConfigCameraStabilizationWidget::enableControls(bool enable)
 {
+    m_camerastabilization->camerastabilizationResetToDefaults->setEnabled(enable);
     m_camerastabilization->camerastabilizationSaveSD->setEnabled(enable);
     m_camerastabilization->camerastabilizationSaveRAM->setEnabled(enable);
 }

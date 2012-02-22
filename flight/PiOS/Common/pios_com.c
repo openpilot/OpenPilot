@@ -8,7 +8,6 @@
  *
  * @file       pios_com.c  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * 	       Parts by Thorsten Klose (tk@midibox.org)
  * @brief      COM layer functions
  * @see        The GNU Public License (GPL) Version 3
  * 
@@ -161,7 +160,7 @@ out_fail:
 static void PIOS_COM_UnblockRx(struct pios_com_dev * com_dev, bool * need_yield)
 {
 #if defined(PIOS_INCLUDE_FREERTOS)
-	static signed portBASE_TYPE xHigherPriorityTaskWoken;
+	static signed portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
 	xSemaphoreGiveFromISR(com_dev->rx_sem, &xHigherPriorityTaskWoken);
 
 	if (xHigherPriorityTaskWoken != pdFALSE) {
@@ -177,7 +176,7 @@ static void PIOS_COM_UnblockRx(struct pios_com_dev * com_dev, bool * need_yield)
 static void PIOS_COM_UnblockTx(struct pios_com_dev * com_dev, bool * need_yield)
 {
 #if defined(PIOS_INCLUDE_FREERTOS)
-	static signed portBASE_TYPE xHigherPriorityTaskWoken;
+	static signed portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
 	xSemaphoreGiveFromISR(com_dev->tx_sem, &xHigherPriorityTaskWoken);
 
 	if (xHigherPriorityTaskWoken != pdFALSE) {
@@ -272,7 +271,7 @@ int32_t PIOS_COM_ChangeBaud(uint32_t com_id, uint32_t baud)
 * \return -1 if port not available
 * \return -2 if non-blocking mode activated: buffer is full
 *            caller should retry until buffer is free again
-* \return 0 on success
+* \return number of bytes transmitted on success
 */
 int32_t PIOS_COM_SendBufferNonBlocking(uint32_t com_id, const uint8_t *buffer, uint16_t len)
 {
@@ -285,7 +284,7 @@ int32_t PIOS_COM_SendBufferNonBlocking(uint32_t com_id, const uint8_t *buffer, u
 
 	PIOS_Assert(com_dev->has_tx);
 
-	if (len >= fifoBuf_getFree(&com_dev->tx)) {
+	if (len > fifoBuf_getFree(&com_dev->tx)) {
 		/* Buffer cannot accept all requested bytes (retry) */
 		return -2;
 	}
@@ -302,7 +301,7 @@ int32_t PIOS_COM_SendBufferNonBlocking(uint32_t com_id, const uint8_t *buffer, u
 		}
 	}
 
-	return (0);
+	return (bytes_into_fifo);
 }
 
 /**
@@ -312,7 +311,7 @@ int32_t PIOS_COM_SendBufferNonBlocking(uint32_t com_id, const uint8_t *buffer, u
 * \param[in] buffer character buffer
 * \param[in] len buffer length
 * \return -1 if port not available
-* \return 0 on success
+* \return number of bytes transmitted on success
 */
 int32_t PIOS_COM_SendBuffer(uint32_t com_id, const uint8_t *buffer, uint16_t len)
 {
@@ -325,25 +324,46 @@ int32_t PIOS_COM_SendBuffer(uint32_t com_id, const uint8_t *buffer, uint16_t len
 
 	PIOS_Assert(com_dev->has_tx);
 
-	int32_t rc;
-	do {
-	  rc = PIOS_COM_SendBufferNonBlocking(com_id, buffer, len);
+	uint32_t max_frag_len = fifoBuf_getSize(&com_dev->tx);
+	uint32_t bytes_to_send = len;
+	while (bytes_to_send) {
+		uint32_t frag_size;
 
+		if (bytes_to_send > max_frag_len) {
+			frag_size = max_frag_len;
+		} else {
+			frag_size = bytes_to_send;
+		}
+		int32_t rc = PIOS_COM_SendBufferNonBlocking(com_id, buffer, frag_size);
+		if (rc >= 0) {
+			bytes_to_send -= rc;
+			buffer += rc;
+		} else {
+			switch (rc) {
+			case -1:
+				/* Device is invalid, this will never work */
+				return -1;
+			case -2:
+				/* Device is busy, wait for the underlying device to free some space and retry */
+				/* Make sure the transmitter is running while we wait */
+				if (com_dev->driver->tx_start) {
+					(com_dev->driver->tx_start)(com_dev->lower_id,
+								fifoBuf_getUsed(&com_dev->tx));
+				}
 #if defined(PIOS_INCLUDE_FREERTOS)
-	  if (rc == -2) {
-	    /* Make sure the transmitter is running while we wait */
-	    if (com_dev->driver->tx_start) {
-	      (com_dev->driver->tx_start)(com_dev->lower_id,
-					  fifoBuf_getUsed(&com_dev->tx));
-	    }
-	    if (xSemaphoreTake(com_dev->tx_sem, portMAX_DELAY) != pdTRUE) {
-	      return -3;
-	    }
-	  }
+				if (xSemaphoreTake(com_dev->tx_sem, 5000) != pdTRUE) {
+					return -3;
+				}
 #endif
-	} while (rc == -2);
+				continue;
+			default:
+				/* Unhandled return code */
+				return rc;
+			}
+		}
+	}
 
-	return rc;
+	return len;
 }
 
 /**
@@ -463,7 +483,7 @@ uint16_t PIOS_COM_ReceiveBuffer(uint32_t com_id, uint8_t * buf, uint16_t buf_len
 	uint16_t bytes_from_fifo = fifoBuf_getData(&com_dev->rx, buf, buf_len);
 	PIOS_IRQ_Enable();
 
-	if (bytes_from_fifo == 0 && timeout_ms > 0) {
+	if (bytes_from_fifo == 0) {
 		/* No more bytes in receive buffer */
 		/* Make sure the receiver is running while we wait */
 		if (com_dev->driver->rx_start) {
@@ -471,39 +491,23 @@ uint16_t PIOS_COM_ReceiveBuffer(uint32_t com_id, uint8_t * buf, uint16_t buf_len
 			(com_dev->driver->rx_start)(com_dev->lower_id,
 						    fifoBuf_getFree(&com_dev->rx));
 		}
+		if (timeout_ms > 0) {
 #if defined(PIOS_INCLUDE_FREERTOS)
-		if (xSemaphoreTake(com_dev->rx_sem, timeout_ms / portTICK_RATE_MS) == pdTRUE) {
-			/* Make sure we don't come back here again */
-			timeout_ms = 0;
-			goto check_again;
-		}
+			if (xSemaphoreTake(com_dev->rx_sem, timeout_ms / portTICK_RATE_MS) == pdTRUE) {
+				/* Make sure we don't come back here again */
+				timeout_ms = 0;
+				goto check_again;
+			}
 #else
-		PIOS_DELAY_WaitmS(1);
-		timeout_ms--;
-		goto check_again;
+			PIOS_DELAY_WaitmS(1);
+			timeout_ms--;
+			goto check_again;
 #endif
+		}
 	}
 
 	/* Return received byte */
 	return (bytes_from_fifo);
-}
-
-/**
-* Get the number of bytes waiting in the buffer
-* \param[in] port COM port
-* \return Number of bytes used in buffer
-*/
-int32_t PIOS_COM_ReceiveBufferUsed(uint32_t com_id)
-{
-	struct pios_com_dev * com_dev = (struct pios_com_dev *)com_id;
-
-	if (!PIOS_COM_validate(com_dev)) {
-		/* Undefined COM port for this board (see pios_board.c) */
-		PIOS_Assert(0);
-	}
-
-	PIOS_Assert(com_dev->has_rx);
-	return (fifoBuf_getUsed(&com_dev->rx));
 }
 
 #endif

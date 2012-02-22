@@ -49,6 +49,8 @@ MSG_OPFIRMWARE       := ${quote} OPFW      ${quote}
 MSG_FWINFO           := ${quote} FWINFO    ${quote}
 MSG_JTAG_PROGRAM     := ${quote} JTAG-PGM  ${quote}
 MSG_JTAG_WIPE        := ${quote} JTAG-WIPE ${quote}
+MSG_JTAG_RESET       := ${quote} JTAG-RST  ${quote}
+MSG_JTAG_SAFEBOOT    := ${quote} JTAG-SAFE ${quote}
 
 toprel = $(subst $(realpath $(TOP))/,,$(abspath $(1)))
 
@@ -241,6 +243,35 @@ wipe:
 		$$(OOCD_JTAG_SETUP) \
 		$$(OOCD_BOARD_RESET) \
 		-c "flash erase_address pad $(2) $(3)" \
+		-c "reset run" \
+		-c "shutdown"
+
+reset:
+	@echo $(MSG_JTAG_RESET) resetting device
+	$(V1) $(OOCD_EXE) \
+		$$(OOCD_JTAG_SETUP) \
+		$$(OOCD_BOARD_RESET) \
+		-c "reset run" \
+		-c "shutdown"
+
+# Enable PWR and BKP clocks (set RCC_APB1ENR[PWREN|BKPEN])
+OOCD_WRITE_BKPDR3 =  -c "mww 0x4002101C 0x18000000"
+# Enable writes to BKP registers (set PWR_CR[DBP] via bit op alias address)
+#
+# Direct register access would be:
+#    mww 0x40007000 0x00000100
+#
+# Direct _bit_ access is:
+#    Bit 8 in 0x40007000 = 0x42000000 + 0x7000 * 32 + 8 * 4 = 420E0020
+OOCD_WRITE_BKPDR3 += -c "mww 0x420E0020 0x00000001"
+# Set BR3 to max value to force a safe boot
+OOCD_WRITE_BKPDR3 += -c "mwh 0x40006C0C 0xFFFF"
+safeboot:
+	@echo $(MSG_JTAG_SAFEBOOT) forcing boot into safe mode
+	$(V1) $(OOCD_EXE) \
+		$$(OOCD_JTAG_SETUP) \
+		$$(OOCD_BOARD_RESET) \
+		$$(OOCD_WRITE_BKPDR3) \
 		-c "reset run" \
 		-c "shutdown"
 endef

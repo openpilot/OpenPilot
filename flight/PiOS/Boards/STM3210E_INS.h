@@ -76,16 +76,8 @@ TIM8  |           |           |           |
 //------------------------
 // PIOS_LED
 //------------------------
-#define PIOS_LED_LED1_GPIO_PORT                 GPIOA
-#define PIOS_LED_LED1_GPIO_PIN                  GPIO_Pin_3
-#define PIOS_LED_LED1_GPIO_CLK                  RCC_APB2Periph_GPIOA
-#define PIOS_LED_LED2_GPIO_PORT                 GPIOA
-#define PIOS_LED_LED2_GPIO_PIN                  GPIO_Pin_2
-#define PIOS_LED_LED2_GPIO_CLK                  RCC_APB2Periph_GPIOA
-#define PIOS_LED_NUM                            2
-#define PIOS_LED_PORTS                          { PIOS_LED_LED1_GPIO_PORT, PIOS_LED_LED2_GPIO_PORT }
-#define PIOS_LED_PINS                           { PIOS_LED_LED1_GPIO_PIN, PIOS_LED_LED2_GPIO_PIN }
-#define PIOS_LED_CLKS                           { PIOS_LED_LED1_GPIO_CLK, PIOS_LED_LED2_GPIO_CLK }
+#define PIOS_LED_HEARTBEAT	0
+#define PIOS_LED_ALARM		1
 
 //------------------------
 // PIOS_SPI
@@ -100,12 +92,14 @@ TIM8  |           |           |           |
 #define PIOS_I2C_MAX_DEVS			3
 extern uint32_t pios_i2c_pres_mag_adapter_id;
 #define PIOS_I2C_MAIN_ADAPTER			(pios_i2c_pres_mag_adapter_id)
+#define PIOS_I2C_BMP085_ADAPTER			(pios_i2c_pres_mag_adapter_id)
 extern uint32_t pios_i2c_gyro_adapter_id;
 #define PIOS_I2C_GYRO_ADAPTER			(pios_i2c_gyro_adapter_id)
 
 //------------------------
 // PIOS_BMP085
 //------------------------
+#define PIOS_BMP085_HAS_GPIOS
 #define PIOS_BMP085_EOC_GPIO_PORT               GPIOC
 #define PIOS_BMP085_EOC_GPIO_PIN                GPIO_Pin_2
 #define PIOS_BMP085_EOC_PORT_SOURCE             GPIO_PortSourceGPIOC

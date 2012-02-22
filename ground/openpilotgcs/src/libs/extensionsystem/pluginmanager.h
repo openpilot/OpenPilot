@@ -56,7 +56,7 @@ class EXTENSIONSYSTEM_EXPORT PluginManager : public QObject
 
 public:
     static PluginManager *instance();
-
+    bool allPluginsLoaded(){return m_allPluginsLoaded;}
     PluginManager();
     virtual ~PluginManager();
 
@@ -115,6 +115,7 @@ signals:
     void aboutToRemoveObject(QObject *obj);
 
     void pluginsChanged();
+    void pluginsLoadEnded();
 private slots:
     void startTests();
 
@@ -122,6 +123,7 @@ private:
     Internal::PluginManagerPrivate *d;
     static PluginManager *m_instance;
     mutable QReadWriteLock m_lock;
+    bool m_allPluginsLoaded;
 
     friend class Internal::PluginManagerPrivate;
 };

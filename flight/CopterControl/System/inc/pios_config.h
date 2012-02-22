@@ -42,6 +42,8 @@
 #endif
 #define PIOS_INCLUDE_IRQ
 #define PIOS_INCLUDE_LED
+#define PIOS_INCLUDE_IAP
+#define PIOS_INCLUDE_TIM
 
 #define PIOS_INCLUDE_RCVR
 
@@ -61,7 +63,9 @@
 #define PIOS_INCLUDE_SPI
 #define PIOS_INCLUDE_SYS
 #define PIOS_INCLUDE_USART
+#define PIOS_INCLUDE_USB
 #define PIOS_INCLUDE_USB_HID
+#define PIOS_INCLUDE_USB_CDC
 #define PIOS_INCLUDE_COM
 #define PIOS_INCLUDE_SETTINGS
 #define PIOS_INCLUDE_FREERTOS
@@ -74,12 +78,10 @@
 #define PIOS_INCLUDE_ADXL345
 #define PIOS_INCLUDE_FLASH
 
+#define PIOS_INCLUDE_BMP085
+
 /* A really shitty setting saving implementation */
 #define PIOS_INCLUDE_FLASH_SECTOR_SETTINGS
-
-/* Defaults for Logging */
-#define LOG_FILENAME 			"PIOS.LOG"
-#define STARTUP_LOG_ENABLED		1
 
 /* Alarm Thresholds */
 #define HEAP_LIMIT_WARNING             220

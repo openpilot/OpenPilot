@@ -1,13 +1,8 @@
 TEMPLATE = lib
 TARGET = Config
+DEFINES += CONFIG_LIBRARY
 QT += svg
-include(../../openpilotgcsplugin.pri)
-include(../../libs/utils/utils.pri)
-include(../../plugins/uavtalk/uavtalk.pri)
-include(../../plugins/coreplugin/coreplugin.pri)
-include(../../plugins/uavobjects/uavobjects.pri)
-include(../../plugins/uavobjectutil/uavobjectutil.pri)
-include(../../plugins/uavsettingsimportexport/uavsettingsimportexport.pri)
+include(config_dependencies.pri)
 INCLUDEPATH += ../../libs/eigen
 OTHER_FILES += Config.pluginspec
 HEADERS += configplugin.h \
@@ -19,26 +14,22 @@ HEADERS += configplugin.h \
     fancytabwidget.h \
     configinputwidget.h \
     configoutputwidget.h \
-    configtaskwidget.h \
     configairframewidget.h \
     config_pro_hw_widget.h \
     config_cc_hw_widget.h \
     configahrswidget.h \
     configccattitudewidget.h \
-    mixercurvewidget.h \
-    mixercurvepoint.h \
-    mixercurveline.h \
     configccpmwidget.h \
     configstabilizationwidget.h \
     assertions.h \
     calibration.h \
     defaultattitudewidget.h \
-    smartsavebutton.h \
     defaulthwsettingswidget.h \
     inputchannelform.h \
     configcamerastabilizationwidget.h \
     configtxpidwidget.h \
-    outputchannelform.h
+    outputchannelform.h \
+    config_global.h
 SOURCES += configplugin.cpp \
     configgadgetconfiguration.cpp \
     configgadgetwidget.cpp \
@@ -46,7 +37,6 @@ SOURCES += configplugin.cpp \
     configgadgetoptionspage.cpp \
     configgadget.cpp \
     fancytabwidget.cpp \
-    configtaskwidget.cpp \
     configinputwidget.cpp \
     configoutputwidget.cpp \
     configairframewidget.cpp \
@@ -54,9 +44,6 @@ SOURCES += configplugin.cpp \
     config_cc_hw_widget.cpp \
     configahrswidget.cpp \
     configccattitudewidget.cpp \
-    mixercurvewidget.cpp \
-    mixercurvepoint.cpp \
-    mixercurveline.cpp \
     configccpmwidget.cpp \
     configstabilizationwidget.cpp \
     twostep.cpp \
@@ -64,7 +51,6 @@ SOURCES += configplugin.cpp \
     gyro-calibration.cpp \
     alignment-calibration.cpp \
     defaultattitudewidget.cpp \
-    smartsavebutton.cpp \
     defaulthwsettingswidget.cpp \
     inputchannelform.cpp \
     configcamerastabilizationwidget.cpp \

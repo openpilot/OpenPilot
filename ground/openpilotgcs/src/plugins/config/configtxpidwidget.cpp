@@ -34,7 +34,7 @@ ConfigTxPIDWidget::ConfigTxPIDWidget(QWidget *parent) : ConfigTaskWidget(parent)
     m_txpid = new Ui_TxPIDWidget();
     m_txpid->setupUi(this);
 
-    setupButtons(m_txpid->Apply, m_txpid->Save);
+    addApplySaveButtons(m_txpid->Apply, m_txpid->Save);
 
     // Cannot use addUAVObjectToWidgetRelation() for OptionaModules enum because
     // QCheckBox returns bool (0 or -1) and this value is then set to enum instead

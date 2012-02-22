@@ -19,27 +19,18 @@
  ****************************************************************************************/
 #define MAGIC_REG_1		BKP_DR1
 #define MAGIC_REG_2		BKP_DR2
-#define IAP_COMM		BKP_DR3
-
-#define IAP_COMM_INVALID	0
-#define IAP_COMM_USB		1
-#define IAP_COMM_TELEMETRY	2
-#define IAP_COMM_SPI_AHRS	3
-#define IAP_COMM_I2C		4
-// Additional types can be added along with the proper support code.
+#define IAP_BOOTCOUNT		BKP_DR3
 
 /****************************************************************************************
  *  Public Functions
  ****************************************************************************************/
 void		PIOS_IAP_Init(void);
-uint32_t 	PIOS_IAP_CRCVerify( void );
 uint32_t	PIOS_IAP_CheckRequest( void );
-void 		PIOS_IAP_SetCommInput( uint16_t comm );
-uint16_t 	PIOS_IAP_GetCommInput( void );
 void		PIOS_IAP_SetRequest1(void);
 void		PIOS_IAP_SetRequest2(void);
 void		PIOS_IAP_ClearRequest(void);
-void 		PIOS_IAP_SetCRC( uint32_t crcval );
+uint16_t	PIOS_IAP_ReadBootCount(void);
+void		PIOS_IAP_WriteBootCount(uint16_t);
 
 /****************************************************************************************
  *  Public Data

@@ -13,314 +13,726 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
+  <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
-    <widget class="QCheckBox" name="enableCameraStabilization">
-     <property name="text">
-      <string>Enable CameraStabilization module</string>
+    <widget class="QScrollArea" name="scrollArea">
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
      </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="label_7">
-     <property name="text">
-      <string>After enabling the module, you must power cycle before using and configuring.</string>
+     <property name="widgetResizable">
+      <bool>true</bool>
      </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="Line" name="line">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="groupBox">
-     <property name="title">
-      <string>Channel Ranges (number of degrees full range)</string>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <layout class="QFormLayout" name="formLayout_2">
-        <item row="2" column="0">
-         <widget class="QLabel" name="label_2">
-          <property name="text">
-           <string>Pitch</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="label_3">
-          <property name="text">
-           <string>Yaw</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label">
-          <property name="text">
-           <string>Roll</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QSpinBox" name="rollOutputRange">
-          <property name="maximum">
-           <number>180</number>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QSpinBox" name="pitchOutputRange">
-          <property name="maximum">
-           <number>180</number>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1">
-         <widget class="QSpinBox" name="yawOutputRange">
-          <property name="maximum">
-           <number>180</number>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer_4">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>212</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="groupBox_2">
-     <property name="title">
-      <string>Channel Mapping (select output channel or none to disable)</string>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <item>
-       <layout class="QFormLayout" name="formLayout">
-        <item row="2" column="0">
-         <widget class="QLabel" name="label_4">
-          <property name="text">
-           <string>Roll</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QComboBox" name="rollChannel">
-          <item>
-           <property name="text">
-            <string>None</string>
-           </property>
+     <widget class="QWidget" name="scrollAreaWidgetContents_2">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>702</width>
+        <height>488</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QCheckBox" name="enableCameraStabilization">
+         <property name="text">
+          <string>Enable CameraStabilization module</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>After enabling the module, you must power cycle before using and configuring.</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="Line" name="line">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Preferred</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>10</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_5">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>100</height>
+          </size>
+         </property>
+         <property name="title">
+          <string>Basic Settings (Stabilization)</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_9">
+          <item row="2" column="3">
+           <widget class="QSpinBox" name="yawOutputRange">
+            <property name="toolTip">
+             <string>Camera yaw angle for 100% output value, deg.
+
+This value should be tuned for particular gimbal and servo. You also
+have to define channel output range using Output configuration tab.</string>
+            </property>
+            <property name="maximum">
+             <number>180</number>
+            </property>
+            <property name="value">
+             <number>20</number>
+            </property>
+           </widget>
           </item>
-         </widget>
-        </item>
-        <item row="4" column="1">
-         <widget class="QComboBox" name="yawChannel">
-          <item>
-           <property name="text">
-            <string>None</string>
-           </property>
+          <item row="2" column="2">
+           <widget class="QSpinBox" name="pitchOutputRange">
+            <property name="toolTip">
+             <string>Camera pitch angle for 100% output value, deg.
+
+This value should be tuned for particular gimbal and servo. You also
+have to define channel output range using Output configuration tab.</string>
+            </property>
+            <property name="maximum">
+             <number>180</number>
+            </property>
+            <property name="value">
+             <number>20</number>
+            </property>
+           </widget>
           </item>
-         </widget>
-        </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="label_5">
-          <property name="text">
-           <string>Pitch</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1">
-         <widget class="QComboBox" name="pitchChannel">
-          <item>
-           <property name="text">
-            <string>None</string>
-           </property>
+          <item row="2" column="1">
+           <widget class="QSpinBox" name="rollOutputRange">
+            <property name="toolTip">
+             <string>Camera roll angle for 100% output value, deg.
+
+This value should be tuned for particular gimbal and servo. You also
+have to define channel output range using Output configuration tab.</string>
+            </property>
+            <property name="maximum">
+             <number>180</number>
+            </property>
+            <property name="value">
+             <number>20</number>
+            </property>
+           </widget>
           </item>
-         </widget>
-        </item>
-        <item row="4" column="0">
-         <widget class="QLabel" name="label_6">
-          <property name="text">
-           <string>Yaw</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer_5">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer_3">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>212</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-     </layout>
+          <item row="1" column="3">
+           <widget class="QComboBox" name="yawChannel">
+            <property name="toolTip">
+             <string>Yaw output channel for camera gimbal</string>
+            </property>
+            <item>
+             <property name="text">
+              <string>None</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QComboBox" name="pitchChannel">
+            <property name="toolTip">
+             <string>Pitch output channel for camera gimbal</string>
+            </property>
+            <item>
+             <property name="text">
+              <string>None</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QComboBox" name="rollChannel">
+            <property name="toolTip">
+             <string>Roll output channel for camera gimbal</string>
+            </property>
+            <item>
+             <property name="text">
+              <string>None</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_42">
+            <property name="text">
+             <string>Output Channel</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_43">
+            <property name="text">
+             <string>Output Range</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QLabel" name="label_44">
+            <property name="text">
+             <string>Yaw</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QLabel" name="label_45">
+            <property name="text">
+             <string>Pitch</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="label_46">
+            <property name="text">
+             <string>Roll</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Preferred</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>10</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>204</height>
+          </size>
+         </property>
+         <property name="title">
+          <string>Advanced Settings (Control)</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_8">
+          <item row="0" column="3">
+           <widget class="QLabel" name="label_32">
+            <property name="text">
+             <string>Yaw</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QLabel" name="label_33">
+            <property name="text">
+             <string>Pitch</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="label_34">
+            <property name="text">
+             <string>Roll</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3">
+           <widget class="QComboBox" name="yawInputChannel">
+            <property name="toolTip">
+             <string>Input channel to control camera yaw
+
+Don't forget to map this channel using Input configuration tab.</string>
+            </property>
+            <item>
+             <property name="text">
+              <string>None</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QComboBox" name="pitchInputChannel">
+            <property name="toolTip">
+             <string>Input channel to control camera pitch
+
+Don't forget to map this channel using Input configuration tab.</string>
+            </property>
+            <item>
+             <property name="text">
+              <string>None</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QComboBox" name="rollInputChannel">
+            <property name="toolTip">
+             <string>Input channel to control camera roll
+
+Don't forget to map this channel using Input configuration tab.</string>
+            </property>
+            <item>
+             <property name="text">
+              <string>None</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_35">
+            <property name="text">
+             <string>Input Channel</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="3">
+           <widget class="QComboBox" name="yawStabilizationMode">
+            <property name="toolTip">
+             <string>Axis stabilization mode
+
+Attitude: camera tracks level for the axis. Input controls the deflection.
+AxisLock: camera remembers tracking attitude. Input controls the rate of deflection.</string>
+            </property>
+            <item>
+             <property name="text">
+              <string>Attitude</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="3" column="3">
+           <widget class="QSpinBox" name="yawInputRange">
+            <property name="toolTip">
+             <string>Maximum camera yaw deflection for 100% input in Attitude mode, deg.</string>
+            </property>
+            <property name="maximum">
+             <number>180</number>
+            </property>
+            <property name="value">
+             <number>20</number>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="3">
+           <widget class="QSpinBox" name="yawInputRate">
+            <property name="toolTip">
+             <string>Maximum camera yaw rate for 100% input in AxisLock mode, deg/s.</string>
+            </property>
+            <property name="maximum">
+             <number>180</number>
+            </property>
+            <property name="value">
+             <number>50</number>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="3">
+           <widget class="QSpinBox" name="yawResponseTime">
+            <property name="toolTip">
+             <string>Input low-pass filter response time for yaw axis, ms.
+
+This option smoothes the stick input. Zero value disables LPF.</string>
+            </property>
+            <property name="maximum">
+             <number>1000</number>
+            </property>
+            <property name="value">
+             <number>150</number>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QComboBox" name="pitchStabilizationMode">
+            <property name="toolTip">
+             <string>Axis stabilization mode
+
+Attitude: camera tracks level for the axis. Input controls the deflection.
+AxisLock: camera remembers tracking attitude. Input controls the rate of deflection.</string>
+            </property>
+            <item>
+             <property name="text">
+              <string>Attitude</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="3" column="2">
+           <widget class="QSpinBox" name="pitchInputRange">
+            <property name="toolTip">
+             <string>Maximum camera pitch deflection for 100% input in Attitude mode, deg.</string>
+            </property>
+            <property name="maximum">
+             <number>180</number>
+            </property>
+            <property name="value">
+             <number>20</number>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="2">
+           <widget class="QSpinBox" name="pitchInputRate">
+            <property name="toolTip">
+             <string>Maximum camera pitch rate for 100% input in AxisLock mode, deg/s.</string>
+            </property>
+            <property name="maximum">
+             <number>180</number>
+            </property>
+            <property name="value">
+             <number>50</number>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="2">
+           <widget class="QSpinBox" name="pitchResponseTime">
+            <property name="toolTip">
+             <string>Input low-pass filter response time for pitch axis, ms.
+
+This option smoothes the stick input. Zero value disables LPF.</string>
+            </property>
+            <property name="maximum">
+             <number>1000</number>
+            </property>
+            <property name="value">
+             <number>150</number>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QComboBox" name="rollStabilizationMode">
+            <property name="toolTip">
+             <string>Axis stabilization mode
+
+Attitude: camera tracks level for the axis. Input controls the deflection.
+AxisLock: camera remembers tracking attitude. Input controls the rate of deflection.</string>
+            </property>
+            <item>
+             <property name="text">
+              <string>Attitude</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QSpinBox" name="rollInputRange">
+            <property name="toolTip">
+             <string>Maximum camera roll deflection for 100% input in Attitude mode, deg.</string>
+            </property>
+            <property name="maximum">
+             <number>180</number>
+            </property>
+            <property name="value">
+             <number>20</number>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QSpinBox" name="rollInputRate">
+            <property name="toolTip">
+             <string>Maximum camera roll rate for 100% input in AxisLock mode, deg/s.</string>
+            </property>
+            <property name="maximum">
+             <number>180</number>
+            </property>
+            <property name="value">
+             <number>50</number>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QSpinBox" name="rollResponseTime">
+            <property name="toolTip">
+             <string>Input low-pass filter response time for roll axis, ms.
+
+This option smoothes the stick input. Zero value disables LPF.</string>
+            </property>
+            <property name="maximum">
+             <number>1000</number>
+            </property>
+            <property name="value">
+             <number>150</number>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0">
+           <widget class="QLabel" name="label_36">
+            <property name="text">
+             <string>MaxAxisLockRate</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="label_37">
+            <property name="text">
+             <string>Response Time</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="label_38">
+            <property name="text">
+             <string>Input Rate</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_39">
+            <property name="text">
+             <string>Input Range</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_40">
+            <property name="text">
+             <string>Stabilization Mode</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="2" colspan="2">
+           <widget class="QLabel" name="label_41">
+            <property name="text">
+             <string>(the same value for Roll, Pitch, Yaw)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="1">
+           <widget class="QDoubleSpinBox" name="MaxAxisLockRate">
+            <property name="toolTip">
+             <string>Stick input deadband for all axes in AxisLock mode, deg/s.
+
+When stick input is within the MaxAxisLockRate range, camera tracks
+current attitude. Otherwise it starts moving according to input with
+rate depending on input value.
+
+If you have drift in your Tx controls, you may want to increase this
+value.</string>
+            </property>
+            <property name="decimals">
+             <number>1</number>
+            </property>
+            <property name="singleStep">
+             <double>0.100000000000000</double>
+            </property>
+            <property name="value">
+             <double>1.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="message">
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="submitButtons">
+    <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QFrame" name="frame">
-       <property name="frameShape">
-        <enum>QFrame::StyledPanel</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="camerastabilizationHelp">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>32</width>
-         <height>32</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <kerning>true</kerning>
-        </font>
-       </property>
+      <widget class="QLabel" name="message">
        <property name="text">
         <string/>
        </property>
-       <property name="icon">
-        <iconset resource="../coreplugin/core.qrc">
-         <normaloff>:/core/images/helpicon.svg</normaloff>:/core/images/helpicon.svg</iconset>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>32</width>
-         <height>32</height>
-        </size>
-       </property>
-       <property name="shortcut">
-        <string>Ctrl+S</string>
-       </property>
-       <property name="default">
-        <bool>false</bool>
-       </property>
-       <property name="flat">
-        <bool>true</bool>
-       </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="camerastabilizationSaveRAM">
-       <property name="toolTip">
-        <string>Save settings to the board (RAM only).
+      <layout class="QHBoxLayout" name="submitButtons">
+       <item>
+        <widget class="QFrame" name="frame">
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="camerastabilizationHelp">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>32</width>
+           <height>32</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <kerning>true</kerning>
+          </font>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="../coreplugin/core.qrc">
+           <normaloff>:/core/images/helpicon.svg</normaloff>:/core/images/helpicon.svg</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>32</width>
+           <height>32</height>
+          </size>
+         </property>
+         <property name="shortcut">
+          <string>Ctrl+S</string>
+         </property>
+         <property name="default">
+          <bool>false</bool>
+         </property>
+         <property name="flat">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="camerastabilizationResetToDefaults">
+         <property name="toolTip">
+          <string>Load default CameraStabilization settings except output channels
 
-This does not save the calibration settings, this is done using the
-specific calibration button on top of the screen.</string>
-       </property>
-       <property name="text">
-        <string>Apply</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="camerastabilizationSaveSD">
-       <property name="toolTip">
-        <string>Send settings to the board, and save to the non-volatile memory.</string>
-       </property>
-       <property name="text">
-        <string>Save</string>
-       </property>
-       <property name="checked">
-        <bool>false</bool>
-       </property>
-      </widget>
+Loaded settings are not applied automatically. You have to click the
+Apply or Save button afterwards.</string>
+         </property>
+         <property name="text">
+          <string>Reset To Defaults</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="camerastabilizationSaveRAM">
+         <property name="toolTip">
+          <string>Send settings to the board but do not save to the non-volatile memory</string>
+         </property>
+         <property name="text">
+          <string>Apply</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="camerastabilizationSaveSD">
+         <property name="toolTip">
+          <string>Send settings to the board and save to the non-volatile memory</string>
+         </property>
+         <property name="text">
+          <string>Save</string>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>enableCameraStabilization</tabstop>
+  <tabstop>rollChannel</tabstop>
+  <tabstop>pitchChannel</tabstop>
+  <tabstop>yawChannel</tabstop>
+  <tabstop>rollOutputRange</tabstop>
+  <tabstop>pitchOutputRange</tabstop>
+  <tabstop>yawOutputRange</tabstop>
+  <tabstop>rollInputChannel</tabstop>
+  <tabstop>pitchInputChannel</tabstop>
+  <tabstop>yawInputChannel</tabstop>
+  <tabstop>rollStabilizationMode</tabstop>
+  <tabstop>pitchStabilizationMode</tabstop>
+  <tabstop>yawStabilizationMode</tabstop>
+  <tabstop>rollInputRange</tabstop>
+  <tabstop>pitchInputRange</tabstop>
+  <tabstop>yawInputRange</tabstop>
+  <tabstop>rollInputRate</tabstop>
+  <tabstop>pitchInputRate</tabstop>
+  <tabstop>yawInputRate</tabstop>
+  <tabstop>rollResponseTime</tabstop>
+  <tabstop>pitchResponseTime</tabstop>
+  <tabstop>yawResponseTime</tabstop>
+  <tabstop>MaxAxisLockRate</tabstop>
+  <tabstop>camerastabilizationHelp</tabstop>
+  <tabstop>camerastabilizationResetToDefaults</tabstop>
+  <tabstop>camerastabilizationSaveRAM</tabstop>
+  <tabstop>camerastabilizationSaveSD</tabstop>
+  <tabstop>scrollArea</tabstop>
+ </tabstops>
  <resources>
   <include location="../coreplugin/core.qrc"/>
  </resources>

@@ -1056,11 +1056,19 @@ void demo_slam_init()
 				std::cerr << "Generic USB cameras not supported yet ; use firewire of ueye camera" << std::endl;
 			} else if (configSetup.CAMERA_TYPE == 3)
 			{ // UEYE
+				#ifdef HAVE_UEYE
 				hardware::hardware_sensor_ueye_ptr_t hardSen11(new hardware::HardwareSensorCameraUeye(rawdata_condition, 200,
 					configSetup.CAMERA_DEVICE, cv::Size(img_width,img_height), floatOpts[fFreq], intOpts[iTrigger],
 					floatOpts[fShutter], mode, strOpts[sDataPath]));
 				hardSen11->setTimingInfos(1.0/hardSen11->getFreq(), 1.0/hardSen11->getFreq());
 				senPtr11->setHardwareSensor(hardSen11);
+				#else
+				if (intOpts[iReplay] & 1)
+				{
+					hardware::hardware_sensorext_ptr_t hardSen11(new hardware::HardwareSensorCameraUeye(rawdata_condition, cv::Size(img_width,img_height),strOpts[sDataPath]));
+					senPtr11->setHardwareSensor(hardSen11);
+				}
+				#endif
 			}
 
 			senPtr11->setIntegrationPolicy(false);

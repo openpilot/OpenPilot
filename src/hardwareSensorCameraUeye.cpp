@@ -44,9 +44,11 @@ namespace hardware {
 
 	void HardwareSensorCameraUeye::preloadTask(void)
 	{ try {
+#ifdef HAVE_UEYE
 		char *image;
 		int imageID;
 		UEYEIMAGEINFO imageInfo;
+#endif
 
 		while(true)
 		{
@@ -188,9 +190,9 @@ namespace hardware {
 
 	HardwareSensorCameraUeye::~HardwareSensorCameraUeye()
 	{
+#ifdef HAVE_UEYE
 		int r;
 		char *msg;
-#ifdef HAVE_UEYE
 		if (mode == 0 || mode == 1)
 		{
 			if (is_StopLiveVideo(camera, IS_WAIT) != IS_SUCCESS)

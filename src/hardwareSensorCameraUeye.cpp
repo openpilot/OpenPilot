@@ -63,8 +63,8 @@ namespace hardware {
 				if (is_GetImageInfo(camera, imageID, &imageInfo, sizeof(imageInfo)) != IS_SUCCESS) continue;
 				bufferSpecPtr[buff_write]->timestamp = convertUeyeTime(imageInfo.TimestampSystem);
 				// TODO use camera timestamp to filter pc timestamp
-				//double cameraTimeStamp = ImageInfo.u64TimestampDevice * 1e-7;
-
+				//double cameraTimeStamp = imageInfo.u64TimestampDevice * 1e-7;
+				//printf("%.16g\t%.19g\t%.12g\n", bufferSpecPtr[buff_write]->timestamp, bufferSpecPtr[buff_write]->arrival, imageInfo.u64TimestampDevice * 1e-7);
 				last_timestamp = bufferSpecPtr[buff_write]->timestamp;
 #endif
 			incWritePos();

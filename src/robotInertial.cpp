@@ -259,6 +259,20 @@ namespace jafar {
 			subrange(_XNEW_pert, 3, 7, 3, 6) = prod (QNORM_qnew, QNEW_w) * (1 / _dt);
 		}
 
+#if 1
+		vec RobotInertial::e_from_g(const vec3 & _g)
+		{
+			double norm_g = ublas::norm_2(_g);
+			vec3 gf; gf.clear(); gf(2) = -norm_g;
+			vec3 rotv = ublasExtra::crossProd(_g,gf);
+			double norm_rotv = ublas::norm_2(rotv);
+			double sin_a = norm_rotv / (norm_g*norm_g);
+			double cos_a = ublas::inner_prod(gf,_g) / (norm_g*norm_g);
+			double a = atan2(sin_a, cos_a);
+			rotv = a/norm_rotv * rotv;
+			return quaternion::q2e(quaternion::v2q(rotv));
+		}
+#else
 		vec RobotInertial::e_from_g(const vec3 & _g)
 		{
 			vec3 xr, yr, zr, xw, yw, zw; // robot and world frame axis
@@ -282,6 +296,7 @@ namespace jafar {
 			vec4 q = q2qc(R2q(rot));
 			return q2e(q);
 		}
+#endif
 
 		void RobotInertial::init_func(const vec & _x, const vec & _u, const vec & _U, vec & _xnew) {
 			
@@ -319,18 +334,30 @@ namespace jafar {
 				vec3 av, wv;
 				splitControl(_U, av, wv);
 
-				// numerically approximate the euler uncertainty because we can't compute the jacobian
+#if 1
+				// roughly approximate the euler uncertainty because the exact jacobian is too complicated
+				double uncert = 0.;
+				for(int i = 0; i < 3; ++i) uncert += av(i)+state.P(10+i,10+i);
+				uncert = sqrt(uncert/3);
+				estd(0) = estd(1) = asin(uncert / 9.81);
+#else
+				// not working correctly, messes up with yaw and dometimes results in uncertainties too large
+				// numerically approximate the euler uncertainty because the exact jacobian is too complicated
+				std::cout << "gv " << gv << std::endl;
 				vec3 gext;
 				for(int i = 0; i < 3; ++i)
 				{
 					gext = gv;
-					gext(i) += sqrt(av(i)) + sqrt(state.P(10+i,10+i)); // uncertainty of measure + bias
+					std::cout << "uncert " << i << " noise " << sqrt(av(i)) << " bias " << sqrt(state.P(10+i,10+i)) << std::endl;
+					gext(i) += sqrt(av(i) + state.P(10+i,10+i)); // uncertainty of measure + bias
+					std::cout << "gext " << gext << std::endl;
 					vec3 eext = e_from_g(gext);
+					std::cout << "eext " << eext << std::endl;
 					for(int j = 0; j < 2; ++j) estd(j) = std::max(estd(j), std::abs(eext(j)-e(j)));
 				}
-				mat33 E; E.clear(); for(int j = 0; j < 2; ++j) E(j,j) = estd(j)*estd(j);
-
+#endif
 				// now convert to quaternion uncertainty
+				mat33 E; E.clear(); for(int j = 0; j < 2; ++j) E(j,j) = estd(j)*estd(j);
 				mat Q_e(4,3);
 				quaternion::e2q_by_de(e, Q_e);
 				ublas::subrange(state.P(), 3,7, 3,7) = jmath::ublasExtra::prod_JPJt(E, Q_e);
@@ -340,7 +367,7 @@ namespace jafar {
 			std::cout << "IMU initializes robot state with g = " << g << " (std " << sqrt(state.P(pose.size()+9,pose.size()+9)) <<
 				") and orientation q = " << q << " e = " << quaternion::q2e(q) << std::endl;
 #if INIT_Q_FROM_G
-			if (g_size == 1) std::cout << "Euler attitude is " << e << "(std " << estd << ")" << std::endl;
+			if (g_size == 1) std::cout << "Euler attitude is " << e << " (std " << estd << ")" << std::endl;
 #endif
 			unsplitState(p, q, v, ab, wb, g, _xnew);
 		}

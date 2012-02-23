@@ -27,6 +27,12 @@
 
 /*
  * STATUS: working fine, use it
+ * This allows to use Dala "atrv" robot model instead of camera (default) model in the Gdhe view display
+ */
+#define ATRV 1
+
+/*
+ * STATUS: working fine, use it
  * This allows to have 0% cpu used for waiting/idle
  */
 //#define EVENT_BASED_RAW 1 // always enabled now
@@ -491,7 +497,11 @@ void demo_slam_init()
 	#ifdef HAVE_MODULE_GDHE
 	if (intOpts[iDispGdhe])
 	{
+		#if ATRV
+		display::ViewerGdhe *viewerGdhe = new display::ViewerGdhe("atrv", configEstimation.MAHALANOBIS_TH, "localhost");
+		#else	
 		display::ViewerGdhe *viewerGdhe = new display::ViewerGdhe("camera", configEstimation.MAHALANOBIS_TH, "localhost");
+		#endif
 		boost::filesystem::path ram_path("/mnt/ram");
 		if (boost::filesystem::exists(ram_path) && boost::filesystem::is_directory(ram_path))
 			viewerGdhe->setConvertTempPath("/mnt/ram");

@@ -25,136 +25,132 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "notifyitemdelegate.h"
 #include <QtGui>
+#include "notifyitemdelegate.h"
+#include "notifytablemodel.h"
+#include "notifylogging.h"
+#include "notificationitem.h"
 
-
- NotifyItemDelegate::NotifyItemDelegate(QStringList items,QObject *parent)
-		 : QItemDelegate(parent),
-		 m_parent(parent),
-		 m_items(items) {
-
-		 }
-
- QWidget *NotifyItemDelegate::createEditor(QWidget *parent,
-										   const QStyleOptionViewItem &,
-										   const QModelIndex &index) const
- {
-	 if (index.column() == 1) {
-		 QComboBox* editor = new QComboBox(parent);
-		 editor->clear();
-		 editor->addItems(m_items);
-		 //repeatEditor->setCurrentIndex(0);
-		 //repeatEditor->setItemDelegate(new RepeatCounterDelegate());
-
-		 //connect(repeatEditor,SIGNAL(activated (const QString& )),this,SLOT(selectRow(const QString& )));
-		 //QTableWidgetItem* item = qobject_cast<QTableWidgetItem *>(parent);
-		 //((QTableWidgetItem*)parent)->setSelected(true);
-//		 connect(editor, SIGNAL(editingFinished()),
-//				 this, SLOT(commitAndCloseEditor()));
-		  return editor;
-	 } else
-	 {
-		 if(index.column() == 2)
-		 {
-			 QSpinBox* editor = new QSpinBox(parent);
-			 connect(editor, SIGNAL(editingFinished()),
-					  this, SLOT(commitAndCloseEditor()));
-			 return editor;
-		 }
-
-	 }
-	 QLineEdit *editor = new QLineEdit(parent);
-//	 connect(editor, SIGNAL(editingFinished()),
-//		 this, SLOT(commitAndCloseEditor()));
-	 return editor;
- }
-
- void NotifyItemDelegate::commitAndCloseEditor()
- {
-	 QLineEdit *editor = qobject_cast<QLineEdit *>(sender());
-	 if (editor)
-	 {
-		 emit commitData(editor);
-		 emit closeEditor(editor);
-
-	 } else {
-		 QComboBox* editor = qobject_cast<QComboBox*>(sender());
-		 if (editor)
-		 {
-			 emit commitData(editor);
-			 emit closeEditor(editor);
-		 } else {
-			 QSpinBox* editor = qobject_cast<QSpinBox*>(sender());
-			 if (editor)
-			 {
-				 emit commitData(editor);
-				 emit closeEditor(editor);
-			 }
-		 }
-	 }
- }
-
- void NotifyItemDelegate::setEditorData(QWidget *editor,
-	 const QModelIndex &index) const
- {
-	 QLineEdit *edit = qobject_cast<QLineEdit*>(editor);
-	 if (edit) {
-		 edit->setText(index.model()->data(index, Qt::EditRole).toString());
-	 } else {
-		 QComboBox * repeatEditor = qobject_cast<QComboBox *>(editor);
-		 if (repeatEditor)
-			 repeatEditor->setCurrentIndex(repeatEditor->findText(index.model()->data(index, Qt::EditRole).toString()));
-		 else {
-			 QSpinBox * expireEditor = qobject_cast<QSpinBox *>(editor);
-			 if (expireEditor)
-				 expireEditor->setValue(index.model()->data(index, Qt::EditRole).toInt());
-		 }
-	 }
- }
-
- void NotifyItemDelegate::setModelData(QWidget *editor,
-	 QAbstractItemModel *model, const QModelIndex &index) const
- {
-	 QLineEdit *edit = qobject_cast<QLineEdit *>(editor);
-	 if (edit) {
-		 model->setData(index, edit->text());
-	 } else {
-		 QComboBox * repeatEditor = qobject_cast<QComboBox *>(editor);
-		 if (repeatEditor) {
-			 model->setData(index, repeatEditor->currentText());
-
-		 } else {
-			QSpinBox * expireEditor = qobject_cast<QSpinBox *>(editor);
-			if (expireEditor) {
-				//expireEditor->interpretText();
-				model->setData(index, expireEditor->value(), Qt::EditRole);
-			}
-		 }
-	 }
- }
-
-
-void NotifyItemDelegate::selectRow(const QString & text)
+NotifyItemDelegate::NotifyItemDelegate(QObject* parent)
+    : QItemDelegate(parent)
+    , _parent(parent)
 {
-	//QList<QTableWidgetItem *> list = ((QTableWidget*)(sender()->parent()))->findItems(text,Qt::MatchExactly);
-	QComboBox* combo = qobject_cast<QComboBox*>(sender());
-	QTableWidget* table = new QTableWidget;
-	table = (QTableWidget*)(combo->parent());
-	qDebug()<<table->columnCount();
-	qDebug()<<table->rowCount();
-	qDebug()<<table->currentRow();
-	//table->setCurrentIndex(1);
-	//table->findItems(text,Qt::MatchExactly);
-	//item->model()->index()
-	//item->setSelected(true);
 }
 
-QSize  NotifyItemDelegate::sizeHint ( const QStyleOptionViewItem  & option,
-									  const QModelIndex & index ) const
+QWidget *NotifyItemDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& /*none*/,
+                                            const QModelIndex& index) const
 {
-	QSize s = QItemDelegate::sizeHint(option, index);
-	s.setHeight(10);
+    if (eRepeatValue == index.column()) {
+        QComboBox* editor = new QComboBox(parent);
+        editor->clear();
+        editor->addItems(NotificationItem::retryValues);
+        return editor;
+    } else {
+        if (eExpireTimer == index.column()) {
+            QSpinBox* editor = new QSpinBox(parent);
+            connect(editor, SIGNAL(editingFinished()), this, SLOT(commitAndCloseEditor()));
+            return editor;
+        } else {
+            if (eTurnOn == index.column()) {
+                QCheckBox* editor = new QCheckBox(parent);
+                connect(editor, SIGNAL(editingFinished()), this, SLOT(commitAndCloseEditor()));
+                return editor;
+            }
+        }
+    }
+    QLineEdit *editor = new QLineEdit(parent);
+    return editor;
+}
 
-	return s;
+void NotifyItemDelegate::commitAndCloseEditor()
+{
+    QLineEdit* editor = qobject_cast<QLineEdit*>(sender());
+    if (editor) {
+        emit commitData(editor);
+        emit closeEditor(editor);
+    } else {
+        QComboBox* editor = qobject_cast<QComboBox*>(sender());
+        if (editor)
+        {
+            emit commitData(editor);
+            emit closeEditor(editor);
+        } else {
+            QSpinBox* editor = qobject_cast<QSpinBox*>(sender());
+            if (editor)
+            {
+                emit commitData(editor);
+                emit closeEditor(editor);
+            } else {
+                QCheckBox* editor = qobject_cast<QCheckBox*>(sender());
+                if (editor)
+                {
+                    emit commitData(editor);
+                    emit closeEditor(editor);
+                }
+            }
+        }
+    }
+}
+
+void NotifyItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
+{
+    QLineEdit* edit = qobject_cast<QLineEdit*>(editor);
+    if (edit) {
+        edit->setText(index.model()->data(index, Qt::EditRole).toString());
+    } else {
+        QComboBox* repeatEditor = qobject_cast<QComboBox *>(editor);
+        if (repeatEditor)
+            repeatEditor->setCurrentIndex(repeatEditor->findText(index.model()->data(index, Qt::EditRole).toString()));
+        else {
+            QSpinBox* expireEditor = qobject_cast<QSpinBox *>(editor);
+            if (expireEditor)
+                expireEditor->setValue(index.model()->data(index, Qt::EditRole).toInt());
+            else {
+                QCheckBox* enablePlayEditor = qobject_cast<QCheckBox *>(editor);
+                if (enablePlayEditor)
+                    enablePlayEditor->setChecked(index.model()->data(index, Qt::EditRole).toBool());
+            }
+        }
+    }
+}
+
+void NotifyItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
+{
+    QLineEdit *edit = qobject_cast<QLineEdit *>(editor);
+    if (edit) {
+        model->setData(index, edit->text());
+    } else {
+        QComboBox * repeatEditor = qobject_cast<QComboBox *>(editor);
+        if (repeatEditor) {
+            model->setData(index, repeatEditor->currentText());
+        } else {
+            QSpinBox * expireEditor = qobject_cast<QSpinBox *>(editor);
+            if (expireEditor) {
+                model->setData(index, expireEditor->value(), Qt::EditRole);
+            } else {
+                QCheckBox* enablePlayEditor = qobject_cast<QCheckBox*>(editor);
+                if (enablePlayEditor) {
+                    model->setData(index, enablePlayEditor->isChecked(), Qt::EditRole);
+                }
+            }
+        }
+    }
+}
+
+void NotifyItemDelegate::selectRow(const QString& text)
+{
+    QComboBox* combo = qobject_cast<QComboBox*>(sender());
+    QTableWidget* table = new QTableWidget;
+    table = (QTableWidget*)(combo->parent());
+
+    qNotifyDebug() << table->columnCount();
+    qNotifyDebug() << table->rowCount();
+    qNotifyDebug() << table->currentRow();
+}
+
+QSize  NotifyItemDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const
+{
+    QSize s = QItemDelegate::sizeHint(option, index);
+    s.setHeight(10);
+    return s;
 }

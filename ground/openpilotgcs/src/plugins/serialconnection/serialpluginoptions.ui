@@ -22,63 +22,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QComboBox" name="cb_speed">
-     <item>
-           <property name="text">
-            <string>1200</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>2400</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>4800</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>9600</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>19200</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>38400</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>57600</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>115200</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>230400</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>460800</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>921600</string>
-           </property>
-          </item>
-    </widget>
+    <widget class="QComboBox" name="cb_speed"/>
    </item>
    <item>
     <spacer name="horizontalSpacer">

@@ -52,7 +52,7 @@
 #include <QtGui/QPushButton>
 #include <QMutexLocker>
 
-using namespace Core;
+//using namespace Core;
 
 TestDataGen* ScopeGadgetWidget::testDataGen;
 
@@ -195,7 +195,8 @@ void ScopeGadgetWidget::addLegend()
 	QPalette pal = legend->palette();
 	pal.setColor(legend->backgroundRole(), QColor(100, 100, 100));	// background colour
 //	pal.setColor(legend->backgroundRole(), Qt::transparent);		// background colour
-	pal.setColor(QPalette::Text, QColor(255, 255, 255));			// text colour
+//	pal.setColor(QPalette::Text, QColor(255, 255, 255));			// text colour
+	pal.setColor(QPalette::Text, QColor(0, 0, 0));			// text colour
 	legend->setPalette(pal);
 
 	insertLegend(legend, QwtPlot::TopLegend);
@@ -229,7 +230,7 @@ void ScopeGadgetWidget::preparePlot(PlotType plotType)
     setMinimumSize(64, 64);
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 
-	setMargin(1);
+//	setMargin(1);
 
 //	QPalette pal = palette();
 //	QPalette::ColorRole cr = backgroundRole();
@@ -356,7 +357,7 @@ void ScopeGadgetWidget::setupChronoPlot()
 //	scaleWidget->setMinBorderDist(0, fmw);
 }
 
-void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavFieldSubField, int scaleOrderFactor, QPen pen)
+void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavFieldSubField, int scaleOrderFactor, int interpolationSamples, QPen pen)
 {
     PlotData* plotData;
 
@@ -369,6 +370,7 @@ void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavFieldSubField
 
     plotData->m_xWindowSize = m_xWindowSize;
     plotData->scalePower = scaleOrderFactor;
+    plotData->interpolationSamples = interpolationSamples;
 
     //If the y-bounds are supplied, set them
     if (plotData->yMinimum != plotData->yMaximum)
@@ -407,7 +409,7 @@ void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavFieldSubField
 
     QwtPlotCurve* plotCurve = new QwtPlotCurve(curveNameScaled);
     plotCurve->setPen(pen);
-    plotCurve->setData(*plotData->xData, *plotData->yData);
+    plotCurve->setSamples(*plotData->xData, *plotData->yData);
     plotCurve->attach(this);
     plotData->curve = plotCurve;
 
@@ -446,6 +448,7 @@ void ScopeGadgetWidget::uavObjectReceived(UAVObject* obj)
     foreach(PlotData* plotData, m_curvesData.values()) {
         if (plotData->append(obj)) m_csvLoggingDataUpdated=1;
     }
+    csvLoggingAddData();
 }
 
 void ScopeGadgetWidget::replotNewData()
@@ -455,7 +458,7 @@ void ScopeGadgetWidget::replotNewData()
 	foreach(PlotData* plotData, m_curvesData.values())
 	{
         plotData->removeStaleData();
-        plotData->curve->setData(*plotData->xData, *plotData->yData);
+        plotData->curve->setSamples(*plotData->xData, *plotData->yData);
     }
 
     QDateTime NOW = QDateTime::currentDateTime();
@@ -503,10 +506,9 @@ void ScopeGadgetWidget::setupExamplePlot()
     curve3->setPen(QPen(Qt::green));
 
     // copy the data into the curves
-    curve1->setData(x, sn, points);
-    curve2->setData(x, cs, points);
-    curve3->setData(x, sg, points);
-
+    curve1->setSamples(x, sn, points);
+    curve2->setSamples(x, cs, points);
+    curve3->setSamples(x, sg, points);
     curve1->attach(this);
     curve2->attach(this);
     curve3->attach(this);
@@ -609,6 +611,7 @@ int ScopeGadgetWidget::csvLoggingStart()
         m_csvLoggingStartTime = NOW;
         m_csvLoggingHeaderSaved=0;
         m_csvLoggingDataSaved=0;
+        m_csvLoggingBuffer.clear();
         QDir PathCheck(m_csvLoggingPath);
         if (!PathCheck.exists())
         {
@@ -676,13 +679,50 @@ int ScopeGadgetWidget::csvLoggingInsertHeader()
     return 0;
 }
 
+int ScopeGadgetWidget::csvLoggingAddData()
+{
+    if (!m_csvLoggingStarted) return -1;
+    m_csvLoggingDataValid=0;
+    QDateTime NOW = QDateTime::currentDateTime();
+    QString tempString;
+
+    QTextStream ss( &tempString );
+    ss << NOW.toString("yyyy-MM-dd") << ", " << NOW.toString("hh:mm:ss.z") << ", " ;
+
+#if QT_VERSION >= 0x040700
+    ss <<(NOW.toMSecsSinceEpoch() - m_csvLoggingStartTime.toMSecsSinceEpoch())/1000.00;
+#else
+    ss <<(NOW.toTime_t() - m_csvLoggingStartTime.toTime_t());
+#endif
+    ss << ", " << m_csvLoggingConnected << ", " << m_csvLoggingDataUpdated;
+    m_csvLoggingDataUpdated=0;
+
+    foreach(PlotData* plotData2, m_curvesData.values())
+    {
+        ss  << ", ";
+        if (plotData2->xData->isEmpty ())
+        {
+        }
+        else
+        {
+            ss  << QString().sprintf("%3.6g",plotData2->yDataHistory->last());
+            m_csvLoggingDataValid=1;
+        }
+    }
+    ss << endl;
+    if (m_csvLoggingDataValid)
+    {
+        QTextStream ts( &m_csvLoggingBuffer );
+        ts << tempString;
+    }
+
+    return 0;
+}
+
 int ScopeGadgetWidget::csvLoggingInsertData()
 {
     if (!m_csvLoggingStarted) return -1;
     m_csvLoggingDataSaved=1;
-    m_csvLoggingDataValid=0;
-    QDateTime NOW = QDateTime::currentDateTime();
-    QString tempString;
 
     if(m_csvLoggingFile.open(QIODevice::WriteOnly | QIODevice::Append)== FALSE)
     {
@@ -690,38 +730,11 @@ int ScopeGadgetWidget::csvLoggingInsertData()
     }
     else
     {
-        QTextStream ss( &tempString );
-        ss << NOW.toString("yyyy-MM-dd") << ", " << NOW.toString("hh:mm:ss.z") << ", " ;
-
-#if QT_VERSION >= 0x040700
-        ss <<(NOW.toMSecsSinceEpoch() - m_csvLoggingStartTime.toMSecsSinceEpoch())/1000.00;
-#else
-        ss <<(NOW.toTime_t() - m_csvLoggingStartTime.toTime_t());
-#endif
-        ss << ", " << m_csvLoggingConnected << ", " << m_csvLoggingDataUpdated;
-        m_csvLoggingDataUpdated=0;
-
-        foreach(PlotData* plotData2, m_curvesData.values())
-        {
-            ss  << ", ";
-            if (plotData2->xData->isEmpty ())
-            {
-            }
-            else
-            {
-                ss  << QString().sprintf("%3.6g",plotData2->yData->last());
-                m_csvLoggingDataValid=1;
-            }
-        }
-        ss << endl;
-        if (m_csvLoggingDataValid)
-        {
-            QTextStream ts( &m_csvLoggingFile );
-            ts << tempString;
-        }
+        QTextStream ts( &m_csvLoggingFile );
+        ts << m_csvLoggingBuffer;
         m_csvLoggingFile.close();
     }
-
+    m_csvLoggingBuffer.clear();
 
     return 0;
 }
@@ -745,4 +758,3 @@ void ScopeGadgetWidget::csvLoggingDisconnect()
     if (m_csvLoggingNewFileOnConnect)csvLoggingStop();
     return;
 }
-

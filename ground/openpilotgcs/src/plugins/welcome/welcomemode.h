@@ -60,13 +60,11 @@ public:
     QList<int> context() const;
     void activated();
     QString contextHelpId() const { return QLatin1String("OpenPilot GCS"); }
-    void initPlugins();
     void setPriority(int priority) { m_priority = priority; }
 
-private slots:
-    void slotFeedback();
-    void welcomePluginAdded(QObject*);
-    void showClickedPage();
+public slots:
+    void openUrl(const QString &url);
+    void openPage(const QString &page);
 
 private:
     WelcomeModePrivate *m_d;

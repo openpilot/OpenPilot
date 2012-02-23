@@ -8,7 +8,6 @@
  *
  * @file       pios_i2c.c  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * 	        Parts by Thorsten Klose (tk@midibox.org) (tk@midibox.org)
  * @brief      I2C Enable/Disable routines
  * @see        The GNU Public License (GPL) Version 3
  * 
@@ -890,6 +889,10 @@ int32_t PIOS_I2C_Init(uint32_t * i2c_id, const struct pios_i2c_adapter_cfg * cfg
 		/* Enable I2C peripheral clock (APB1 == slow speed) */
 		RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C2, ENABLE);
 		break;
+	}
+
+	if (i2c_adapter->cfg->remap) {
+		GPIO_PinRemapConfig(i2c_adapter->cfg->remap, ENABLE);
 	}
 
 	/* Initialize the state machine */

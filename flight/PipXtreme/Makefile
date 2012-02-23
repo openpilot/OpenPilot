@@ -75,7 +75,7 @@ endif
 CMSISDIR  = $(STMLIBDIR)/CMSIS/Core/CM3
 BOOT = ../Bootloaders/AHRS
 BOOTINC = $(BOOT)/inc
-
+HWDEFSINC = ../board_hw_defs/$(BOARD_NAME)
 
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files
@@ -97,10 +97,6 @@ SRC += $(HOME_DIR)/gpio_in.c
 SRC += $(HOME_DIR)/stopwatch.c
 SRC += $(HOME_DIR)/watchdog.c
 SRC += $(FLIGHTLIB)/fifo_buffer.c
-ifeq ($(USE_USB), YES)
-	SRC += $(HOME_DIR)/pios_usb_hid_desc.c
-endif
-
 
 ## PIOS Hardware (STM32F10x)
 SRC += $(PIOSSTM32F10X)/pios_sys.c
@@ -115,12 +111,13 @@ SRC += $(PIOSSTM32F10X)/pios_ppm.c
 
 # PIOS USB related files (seperated to make code maintenance more easy)
 ifeq ($(USE_USB), YES)
+	SRC += $(PIOSSTM32F10X)/pios_usb.c
+	SRC += $(PIOSSTM32F10X)/pios_usbhook.c
 	SRC += $(PIOSSTM32F10X)/pios_usb_hid.c
-	#SRC += $(PIOSSTM32F10X)/pios_usb_hid_desc.c
-	#SRC += $(PIOSSTM32F10X)/pios_usb_hid_endp.c
 	SRC += $(PIOSSTM32F10X)/pios_usb_hid_istr.c
-	SRC += $(PIOSSTM32F10X)/pios_usb_hid_prop.c
 	SRC += $(PIOSSTM32F10X)/pios_usb_hid_pwr.c
+	SRC += $(HOME_DIR)/pios_usb_board_data.c
+	SRC += $(PIOSCOMMON)/pios_usb_desc_hid_only.c
 endif
 
 ## PIOS Hardware (Common)
@@ -203,6 +200,7 @@ ifeq ($(USE_USB), YES)
 endif
 EXTRAINCDIRS  += $(CMSISDIR)
 EXTRAINCDIRS  += $(BOOTINC)
+EXTRAINCDIRS  += $(HWDEFSINC)
 
 # List any extra directories to look for library files here.
 # Also add directories where the linker should search for

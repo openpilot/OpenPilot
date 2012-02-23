@@ -54,8 +54,8 @@ public:
     QString setOpenFileName();
     QString setSaveFileName();
 private:
-    deviceDescriptorStruct onBoardDescrition;
-    deviceDescriptorStruct LoadedDescrition;
+    deviceDescriptorStruct onBoardDescription;
+    deviceDescriptorStruct LoadedDescription;
     QByteArray loadedFW;
     QString idToBoardName(int id);
     Ui_deviceWidget *myDevice;

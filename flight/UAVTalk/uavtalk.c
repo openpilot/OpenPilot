@@ -48,9 +48,8 @@ static void updateAck(UAVTalkConnectionData *connection, UAVObjHandle obj, uint1
  * \return 0 Success
  * \return -1 Failure
  */
-UAVTalkConnection UAVTalkInitialize(UAVTalkOutputStream outputStream, uint32_t maxPacketSize)
+UAVTalkConnection UAVTalkInitialize(UAVTalkOutputStream outputStream)
 {
-	if (maxPacketSize<1) return 0;
 	// allocate object
 	UAVTalkConnectionData * connection = pvPortMalloc(sizeof(UAVTalkConnectionData));
 	if (!connection) return 0;
@@ -60,7 +59,6 @@ UAVTalkConnection UAVTalkInitialize(UAVTalkOutputStream outputStream, uint32_t m
 	connection->outStream = outputStream;
 	connection->lock = xSemaphoreCreateRecursiveMutex();
 	connection->transLock = xSemaphoreCreateRecursiveMutex();
-	connection->txSize = maxPacketSize;
 	// allocate buffers
 	connection->rxBuffer = pvPortMalloc(UAVTALK_MAX_PACKET_LENGTH);
 	if (!connection->rxBuffer) return 0;
@@ -646,7 +644,9 @@ static int32_t sendSingleObject(UAVTalkConnectionData *connection, UAVObjHandle 
 	int32_t length;
 	int32_t dataOffset;
 	uint32_t objId;
-	
+
+	if (!connection->outStream) return -1;
+
 	// Setup type and object id fields
 	objId = UAVObjGetID(obj);
 	connection->txBuffer[0] = UAVTALK_SYNC_VAL;  // sync byte
@@ -701,21 +701,15 @@ static int32_t sendSingleObject(UAVTalkConnectionData *connection, UAVObjHandle 
 	// Calculate checksum
 	connection->txBuffer[dataOffset+length] = PIOS_CRC_updateCRC(0, connection->txBuffer, dataOffset+length);
 
-	// Send buffer (partially if needed)
-	uint32_t sent=0;
-	while (sent < dataOffset+length+UAVTALK_CHECKSUM_LENGTH) {
-		uint32_t sending = dataOffset+length+UAVTALK_CHECKSUM_LENGTH - sent;
-		if ( sending > connection->txSize ) sending = connection->txSize;
-		if ( connection->outStream != NULL ) {
-			(*connection->outStream)(connection->txBuffer+sent, sending);
-		}
-		sent += sending;
+	uint16_t tx_msg_len = dataOffset+length+UAVTALK_CHECKSUM_LENGTH;
+	int32_t rc = (*connection->outStream)(connection->txBuffer, tx_msg_len);
+
+	if (rc == tx_msg_len) {
+		// Update stats
+		++connection->stats.txObjects;
+		connection->stats.txBytes += tx_msg_len;
+		connection->stats.txObjectBytes += length;
 	}
-	
-	// Update stats
-	++connection->stats.txObjects;
-	connection->stats.txBytes += dataOffset+length+UAVTALK_CHECKSUM_LENGTH;
-	connection->stats.txObjectBytes += length;
 	
 	// Done
 	return 0;
@@ -731,6 +725,8 @@ static int32_t sendSingleObject(UAVTalkConnectionData *connection, UAVObjHandle 
 static int32_t sendNack(UAVTalkConnectionData *connection, uint32_t objId)
 {
 	int32_t dataOffset;
+
+	if (!connection->outStream) return -1;
 
 	connection->txBuffer[0] = UAVTALK_SYNC_VAL;  // sync byte
 	connection->txBuffer[1] = UAVTALK_TYPE_NACK;
@@ -749,11 +745,13 @@ static int32_t sendNack(UAVTalkConnectionData *connection, uint32_t objId)
 	// Calculate checksum
 	connection->txBuffer[dataOffset] = PIOS_CRC_updateCRC(0, connection->txBuffer, dataOffset);
 
-	// Send buffer
-	if (connection->outStream!=NULL) (*connection->outStream)(connection->txBuffer, dataOffset+UAVTALK_CHECKSUM_LENGTH);
+	uint16_t tx_msg_len = dataOffset+UAVTALK_CHECKSUM_LENGTH;
+	int32_t rc = (*connection->outStream)(connection->txBuffer, tx_msg_len);
 
-	// Update stats
-	connection->stats.txBytes += dataOffset+UAVTALK_CHECKSUM_LENGTH;
+	if (rc == tx_msg_len) {
+		// Update stats
+		connection->stats.txBytes += tx_msg_len;
+	}
 
 	// Done
 	return 0;

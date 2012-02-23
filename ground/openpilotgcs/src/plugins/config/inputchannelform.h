@@ -15,7 +15,7 @@ public:
     explicit inputChannelForm(QWidget *parent = 0,bool showlegend=false);
     ~inputChannelForm();
     friend class ConfigInputWidget;
-
+    void setName(QString &name);
 private slots:
     void minMaxUpdated();
     void neutralUpdated(int);

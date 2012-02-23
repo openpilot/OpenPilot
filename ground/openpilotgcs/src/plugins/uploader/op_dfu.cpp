@@ -37,6 +37,7 @@ DFUObject::DFUObject(bool _debug,bool _use_serial,QString portname):
     debug(_debug),use_serial(_use_serial),mready(true)
 {
     info = NULL;
+    numberOfDevices = 0;
 
     qRegisterMetaType<OP_DFU::Status>("Status");
 
@@ -509,7 +510,7 @@ int DFUObject::AbortOperation(void)
 /**
   Starts the firmware (leaves bootloader and boots the main software)
   */
-int DFUObject::JumpToApp()
+int DFUObject::JumpToApp(bool safeboot)
 {
     char buf[BUF_LEN];
     buf[0] =0x02;//reportID
@@ -520,8 +521,17 @@ int DFUObject::JumpToApp()
     buf[5] = 0;
     buf[6] = 0;
     buf[7] = 0;
-    buf[8] = 0;
-    buf[9] = 0;
+    if (safeboot)
+    {
+        /* force system to safe boot mode (hwsettings == defaults) */
+        buf[8] = 0x5A;
+        buf[9] = 0xFE;
+    }
+    else
+    {
+        buf[8] = 0;
+        buf[9] = 0;
+    }
 
     return sendData(buf, BUF_LEN);
     //return hidHandle.send(0,buf, BUF_LEN, 500);

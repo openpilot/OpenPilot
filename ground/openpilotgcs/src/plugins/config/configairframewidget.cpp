@@ -95,7 +95,7 @@ ConfigAirframeWidget::ConfigAirframeWidget(QWidget *parent) : ConfigTaskWidget(p
     m_aircraft = new Ui_AircraftWidget();
     m_aircraft->setupUi(this);
 
-    setupButtons(m_aircraft->saveAircraftToRAM,m_aircraft->saveAircraftToSD);
+    addApplySaveButtons(m_aircraft->saveAircraftToRAM,m_aircraft->saveAircraftToSD);
 
     addUAVObject("SystemSettings");
     addUAVObject("MixerSettings");
@@ -2179,7 +2179,6 @@ void ConfigAirframeWidget::addToDirtyMonitor()
     addWidget(m_aircraft->elevonSlider1);
     addWidget(m_aircraft->elevonSlider2);
     addWidget(m_aircraft->widget_3->m_ccpm->ccpmType);
-    addWidget(m_aircraft->widget_3->m_ccpm->TabObject);
     addWidget(m_aircraft->widget_3->m_ccpm->ccpmTailChannel);
     addWidget(m_aircraft->widget_3->m_ccpm->ccpmEngineChannel);
     addWidget(m_aircraft->widget_3->m_ccpm->ccpmServoWChannel);

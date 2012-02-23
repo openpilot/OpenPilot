@@ -30,6 +30,7 @@ $(ALLOCATIONCODE)
 fid = fopen(logfile);
 correctMsgByte=hex2dec('20');
 correctSyncByte=hex2dec('3C');
+unknownObjIDList=zeros(1,2);
 
 % Parse log file, entry by entry
 while (1)
@@ -65,11 +66,20 @@ while (1)
 	switch objID
 $(SWITCHCODE)
 		otherwise
-  			disp(['Unknown object ID: 0x' dec2hex(objID)]);
+			unknownObjIDListIdx=find(unknownObjIDList(:,1)==objID, 1, 'first');
+			if isempty(unknownObjIDListIdx)
+				unknownObjIDList=[unknownObjIDList; objID 1]; 
+			else
+				unknownObjIDList(unknownObjIDListIdx,2)=unknownObjIDList(unknownObjIDListIdx,2)+1;
+			end
 			msgBytesLeft = datasize - 1 - 1 - 2 - 4;
 			fread(fid, msgBytesLeft, 'uint8');
 	end
 	
+end
+
+for i=2:size(unknownObjIDList,1) %Don't show the first one, as it was simply a dummy placeholder
+   disp(['Unknown object ID: 0x' dec2hex(unknownObjIDList(i,1),8) ' appeared ' int2str(unknownObjIDList(i,2)) ' times.']);
 end
 
 %% Clean Up and Save mat file

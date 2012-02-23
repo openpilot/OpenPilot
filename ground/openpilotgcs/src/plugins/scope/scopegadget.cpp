@@ -61,12 +61,14 @@ void ScopeGadget::loadConfiguration(IUAVGadgetConfiguration* config)
         QString uavObject = plotCurveConfig->uavObject;
         QString uavField = plotCurveConfig->uavField;
         int scale = plotCurveConfig->yScalePower;
+        int interpolation = plotCurveConfig->yInterpolationSamples;
         QRgb color = plotCurveConfig->color;
 
         widget->addCurvePlot(
                 uavObject,
                 uavField,
                 scale,
+		interpolation,
                 QPen(  QBrush(QColor(color),Qt::SolidPattern),
 //					   (qreal)2,
 					   (qreal)1,

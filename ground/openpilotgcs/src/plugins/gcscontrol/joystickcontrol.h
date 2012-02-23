@@ -7,7 +7,7 @@
  * @{
  * @addtogroup GCSControlGadgetPlugin GCSControl Gadget Plugin
  * @{
- * @brief A that mimics a transmitter joystick and updates the MCC
+ * @brief The plugin that mimics a transmitter joystick and updates the MCC
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -24,7 +24,6 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 
 #ifndef JOYSTICKCONTROL_H
 #define JOYSTICKCONTROL_H
@@ -46,26 +45,27 @@ class JoystickControl : public QGraphicsView
 public:
     explicit JoystickControl(QWidget *parent = 0);
     ~JoystickControl();
-	void enableOpenGL(bool flag);
-   void paint();
+    void enableOpenGL(bool flag);
+    void paint();
 
 protected:
-     void mouseMoveEvent(QMouseEvent *event);
-     void mousePressEvent(QMouseEvent *event);
-     void paintEvent(QPaintEvent *event);
-     void resizeEvent(QResizeEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
+    void mousePressEvent(QMouseEvent *event);
+    void paintEvent(QPaintEvent *event);
+    void resizeEvent(QResizeEvent *event);
 
 public slots:
-     void changePosition (double X, double Y);
+    void changePosition(double x, double y);
 
 signals:
-    void positionClicked(double X, double Y);
+    void positionClicked(double x, double y);
 
 private:
      QSvgRenderer *m_renderer;
      QGraphicsSvgItem *m_background;
+     QGraphicsSvgItem *m_joystickArea;
      QGraphicsSvgItem *m_joystickEnd;
- };
+};
 
 #endif // JOYSTICKCONTROL_H
 

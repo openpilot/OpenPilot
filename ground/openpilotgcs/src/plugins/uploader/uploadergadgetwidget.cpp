@@ -52,6 +52,7 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
     connect(m_config->haltButton, SIGNAL(clicked()), this, SLOT(goToBootloader()));
     connect(m_config->resetButton, SIGNAL(clicked()), this, SLOT(systemReset()));
     connect(m_config->bootButton, SIGNAL(clicked()), this, SLOT(systemBoot()));
+    connect(m_config->safeBootButton, SIGNAL(clicked()), this, SLOT(systemSafeBoot()));
     connect(m_config->rescueButton, SIGNAL(clicked()), this, SLOT(systemRescue()));
     Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
     connect(cm,SIGNAL(deviceConnected(QIODevice*)),this,SLOT(onPhisicalHWConnect()));
@@ -63,6 +64,7 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
 
     connect(m_config->refreshPorts, SIGNAL(clicked()), this, SLOT(getSerialPorts()));
 
+    connect(m_config->pbHelp,SIGNAL(clicked()),this,SLOT(openHelp()));
     // And check whether by any chance we are not already connected
     if (telMngr->isConnected())
     {
@@ -117,6 +119,7 @@ QString UploaderGadgetWidget::getPortDevice(const QString &friendName)
 void UploaderGadgetWidget::onPhisicalHWConnect()
 {
     m_config->bootButton->setEnabled(false);
+    m_config->safeBootButton->setEnabled(false);
     m_config->rescueButton->setEnabled(false);
     m_config->telemetryLink->setEnabled(false);
 }
@@ -132,6 +135,7 @@ void UploaderGadgetWidget::populate()
 {
     m_config->haltButton->setEnabled(true);
     m_config->resetButton->setEnabled(true);
+    m_config->safeBootButton->setEnabled(false);
     m_config->bootButton->setEnabled(false);
     m_config->rescueButton->setEnabled(false);
     m_config->telemetryLink->setEnabled(false);
@@ -155,6 +159,7 @@ void UploaderGadgetWidget::onAutopilotDisconnect(){
     m_config->haltButton->setEnabled(false);
     m_config->resetButton->setEnabled(false);
     m_config->bootButton->setEnabled(true);
+    m_config->safeBootButton->setEnabled(true);
     if (currentStep == IAP_STATE_BOOTLOADER) {
         m_config->rescueButton->setEnabled(false);
         m_config->telemetryLink->setEnabled(false);
@@ -311,6 +316,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
         */
         // Need to re-enable in case we were not connected
         m_config->bootButton->setEnabled(true);
+        m_config->safeBootButton->setEnabled(true);
         /*
         m_config->telemetryLink->setEnabled(false);
         m_config->rescueButton->setEnabled(false);
@@ -348,14 +354,25 @@ void UploaderGadgetWidget::systemReset()
     goToBootloader();
 }
 
+void UploaderGadgetWidget::systemBoot()
+{
+  commonSystemBoot(false);
+}
+
+void UploaderGadgetWidget::systemSafeBoot()
+{
+  commonSystemBoot(true);
+}
+
 /**
   Tells the system to boot (from Bootloader state)
   */
-void UploaderGadgetWidget::systemBoot()
+void UploaderGadgetWidget::commonSystemBoot(bool safeboot)
 {
 
     clearLog();
     m_config->bootButton->setEnabled(false);
+    m_config->safeBootButton->setEnabled(false);
 
     // Suspend telemety & polling in case it is not done yet
     Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
@@ -379,11 +396,12 @@ void UploaderGadgetWidget::systemBoot()
         delete dfu;
         dfu = NULL;
         m_config->bootButton->setEnabled(true);
+        m_config->safeBootButton->setEnabled(true);
         m_config->rescueButton->setEnabled(true); // Boot not possible, maybe Rescue OK?
         return;
     }
     log("Booting system...");
-    dfu->JumpToApp();
+    dfu->JumpToApp(safeboot);
     // Restart the polling thread
     cm->resumePolling();
     m_config->rescueButton->setEnabled(true);
@@ -530,6 +548,7 @@ void UploaderGadgetWidget::systemRescue()
     m_config->haltButton->setEnabled(false);
     m_config->resetButton->setEnabled(false);
     m_config->bootButton->setEnabled(true);
+    m_config->safeBootButton->setEnabled(true);
     m_config->rescueButton->setEnabled(false);
     currentStep = IAP_STATE_BOOTLOADER; // So that we can boot from the GUI afterwards.
 }
@@ -619,16 +638,25 @@ void UploaderGadgetWidget::info(QString infoString, int infoNumber)
 void UploaderGadgetWidget::versionMatchCheck()
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectUtilManager* utilMngr = pm->getObject<UAVObjectUtilManager>();
-    deviceDescriptorStruct boardDescription=utilMngr->getBoardDescriptionStruct();
-    QString gcsDescription=QString::fromLatin1(Core::Constants::GCS_REVISION_STR);
-    if(boardDescription.gitTag!=gcsDescription.mid(gcsDescription.indexOf(":")+1,8))
-    {
-        qDebug()<<QDate::fromString(boardDescription.buildDate.mid(0,8),"yyyyMMdd");
-        qDebug()<<QDate::fromString(gcsDescription.mid(gcsDescription.indexOf(" ")+1,8),"yyyyMMdd");
-        qDebug()<<QDate::fromString(boardDescription.buildDate.mid(0,8),"yyyyMMdd").daysTo(QDate::fromString(gcsDescription.mid(gcsDescription.indexOf(" ")+1,8),"yyyyMMdd"));
-        msg->showMessage(QString(tr("GCS and FW versions do not match which can cause configuration problems.")) + "  \n" +
-                                 QString(tr("GCS Versions: ")) + gcsDescription + "  \n" +
-                                 QString(tr("FW Versions: ")) + boardDescription.gitTag+":"+boardDescription.buildDate);
+    UAVObjectUtilManager *utilMngr = pm->getObject<UAVObjectUtilManager>();
+    deviceDescriptorStruct boardDescription = utilMngr->getBoardDescriptionStruct();
+
+    QString gcsDescription = QString::fromLatin1(Core::Constants::GCS_REVISION_STR);
+    QString gcsGitHash = gcsDescription.mid(gcsDescription.indexOf(":")+1, 8);
+    QString gcsGitDate = gcsDescription.mid(gcsDescription.indexOf(" ")+1, 14);
+
+    QString gcsVersion = gcsGitDate + " (" + gcsGitHash + ")";
+    QString fwVersion = boardDescription.gitDate + " (" + boardDescription.gitHash + ")";
+
+    if (boardDescription.gitHash != gcsGitHash) {
+        QString warning = QString(tr(
+            "GCS and firmware versions do not match which can cause configuration problems. "
+            "GCS version: %1. Firmware version: %2.")).arg(gcsVersion).arg(fwVersion);
+        msg->showMessage(warning);
     }
   }
+void UploaderGadgetWidget::openHelp()
+{
+
+    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/Uploader+Plugin", QUrl::StrictMode) );
+}

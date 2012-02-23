@@ -94,18 +94,18 @@ void blink(int led, int times)
 void test_accel()
 {
 	if(PIOS_BMA180_Test())
-		blink(LED1, 1);
+		blink(PIOS_LED_HEARTBEAT, 1);
 	else
-		blink(LED2, 1);
+		blink(PIOS_LED_ALARM, 1);
 }
 
 #if defined (PIOS_INCLUDE_HMC5883)
 void test_mag()
 {
 	if(PIOS_HMC5883_Test())
-		blink(LED1, 2);
+		blink(PIOS_LED_HEARTBEAT, 2);
 	else
-		blink(LED2, 2);
+		blink(PIOS_LED_ALARM, 2);
 }
 #endif
 
@@ -113,9 +113,9 @@ void test_mag()
 void test_pressure()
 {
 	if(PIOS_BMP085_Test())
-		blink(LED1, 3);
+		blink(PIOS_LED_HEARTBEAT, 3);
 	else
-		blink(LED2, 3);
+		blink(PIOS_LED_ALARM, 3);
 }
 #endif
 
@@ -123,9 +123,9 @@ void test_pressure()
 void test_imu()
 {
 	if(PIOS_IMU3000_Test())
-		blink(LED1, 4);
+		blink(PIOS_LED_HEARTBEAT, 4);
 	else
-		blink(LED2, 4);
+		blink(PIOS_LED_ALARM, 4);
 }
 #endif
 

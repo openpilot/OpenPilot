@@ -155,7 +155,7 @@ typedef struct
   */
 
 void EXTI_DeInit(void);
-void EXTI_Init(EXTI_InitTypeDef* EXTI_InitStruct);
+void EXTI_Init(const EXTI_InitTypeDef* EXTI_InitStruct);
 void EXTI_StructInit(EXTI_InitTypeDef* EXTI_InitStruct);
 void EXTI_GenerateSWInterrupt(uint32_t EXTI_Line);
 FlagStatus EXTI_GetFlagStatus(uint32_t EXTI_Line);

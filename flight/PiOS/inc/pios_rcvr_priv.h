@@ -8,7 +8,6 @@
  *
  * @file       pios_rcvr_priv.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * 	       Parts by Thorsten Klose (tk@midibox.org)
  * @brief      USART private definitions.
  * @see        The GNU Public License (GPL) Version 3
  *

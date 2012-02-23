@@ -83,13 +83,7 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 //------------------------
 // PIOS_LED
 //------------------------
-#define PIOS_LED_LED1_GPIO_PORT			GPIOA
-#define PIOS_LED_LED1_GPIO_PIN			GPIO_Pin_6
-#define PIOS_LED_LED1_GPIO_CLK			RCC_APB2Periph_GPIOA
-#define PIOS_LED_NUM				1
-#define PIOS_LED_PORTS				{ PIOS_LED_LED1_GPIO_PORT }
-#define PIOS_LED_PINS				{ PIOS_LED_LED1_GPIO_PIN }
-#define PIOS_LED_CLKS				{ PIOS_LED_LED1_GPIO_CLK }
+#define PIOS_LED_HEARTBEAT	0
 
 //-------------------------
 // System Settings
@@ -110,8 +104,15 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 // See also pios_board.c
 //------------------------
 #define PIOS_I2C_MAX_DEVS			1
-extern uint32_t pios_i2c_main_adapter_id;
-#define PIOS_I2C_MAIN_ADAPTER			(pios_i2c_main_adapter_id)
+extern uint32_t pios_i2c_flexi_adapter_id;
+#define PIOS_I2C_MAIN_ADAPTER			(pios_i2c_flexi_adapter_id)
+#define PIOS_I2C_ESC_ADAPTER			(pios_i2c_flexi_adapter_id)
+#define PIOS_I2C_BMP085_ADAPTER			(pios_i2c_flexi_adapter_id)
+
+//------------------------
+// PIOS_BMP085
+//------------------------
+#define PIOS_BMP085_OVERSAMPLING                3
 
 //-------------------------
 // SPI
@@ -140,6 +141,12 @@ extern uint32_t pios_com_telem_rf_id;
 extern uint32_t pios_com_gps_id;
 #define PIOS_COM_GPS                    (pios_com_gps_id)
 #endif	/* PIOS_INCLUDE_GPS */
+
+extern uint32_t pios_com_bridge_id;
+#define PIOS_COM_BRIDGE			(pios_com_bridge_id)
+
+extern uint32_t pios_com_vcp_id;
+#define PIOS_COM_VCP			(pios_com_vcp_id)
 
 extern uint32_t pios_com_telem_usb_id;
 #define PIOS_COM_TELEM_USB              (pios_com_telem_usb_id)
@@ -265,10 +272,10 @@ extern uint32_t pios_com_telem_usb_id;
 //-------------------------
 // USB
 //-------------------------
-#define PIOS_USB_ENABLED                        1
 #define PIOS_USB_HID_MAX_DEVS                   1
+
+#define PIOS_USB_ENABLED                        1
 #define PIOS_USB_DETECT_GPIO_PORT               GPIOC
+#define PIOS_USB_MAX_DEVS                       1
 #define PIOS_USB_DETECT_GPIO_PIN                GPIO_Pin_15
-#define PIOS_USB_DETECT_EXTI_LINE               EXTI_Line15
-#define PIOS_IRQ_USB_PRIORITY                   PIOS_IRQ_PRIO_MID
 #endif /* STM32103CB_AHRS_H_ */

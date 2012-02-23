@@ -110,13 +110,12 @@ int main()
 	/* If all is well we will never reach here as the scheduler will now be running. */
 
 	/* Do some indication to user that something bad just happened */
-	PIOS_LED_Off(LED1); \
-	for(;;) { \
-		PIOS_LED_Toggle(LED1); \
-		PIOS_DELAY_WaitmS(100); \
-	};
-
-	return 0;
+	while (1) {
+#if defined(PIOS_LED_HEARTBEAT)
+		PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
+#endif	/* PIOS_LED_HEARTBEAT */
+		PIOS_DELAY_WaitmS(100);
+	}
 }
 
 

@@ -35,6 +35,7 @@
 #include "pios_iap.h"
 #include "ssp.h"
 #include "fifo_buffer.h"
+#include "pios_com_msg.h"
 /* Prototype of PIOS_Board_Init() function */
 extern void PIOS_Board_Init(void);
 extern void FLASH_Download();
@@ -90,21 +91,15 @@ uint8_t JumpToApp = FALSE;
 uint8_t GO_dfu = FALSE;
 uint8_t USB_connected = FALSE;
 uint8_t User_DFU_request = FALSE;
-static uint8_t mReceive_Buffer[64];
+static uint8_t mReceive_Buffer[63];
 /* Private function prototypes -----------------------------------------------*/
 uint32_t LedPWM(uint32_t pwm_period, uint32_t pwm_sweep_steps, uint32_t count);
 uint8_t processRX();
 void jump_to_app();
 uint32_t sspTimeSource();
 
-#define BLUE LED1
-#define RED	LED2
 #define LED_PWM_TIMER	TIM6
 int main() {
-	/* NOTE: Do NOT modify the following start-up sequence */
-	/* Any new initialization functions should be added in OpenPilotInit() */
-
-	/* Brings up System using CMSIS functions, enables the LEDs. */
 	PIOS_SYS_Init();
 	if (BSL_HOLD_STATE == 0)
 		USB_connected = TRUE;
@@ -162,7 +157,7 @@ int main() {
 		case DFUidle:
 			period1 = 50;
 			sweep_steps1 = 100;
-			PIOS_LED_Off(RED);
+			PIOS_LED_Off(PIOS_LED_ALARM);
 			period2 = 0;
 			break;
 		case uploading:
@@ -174,12 +169,12 @@ int main() {
 		case downloading:
 			period1 = 25;
 			sweep_steps1 = 50;
-			PIOS_LED_Off(RED);
+			PIOS_LED_Off(PIOS_LED_ALARM);
 			period2 = 0;
 			break;
 		case BLidle:
 			period1 = 0;
-			PIOS_LED_On(BLUE);
+			PIOS_LED_On(PIOS_LED_HEARTBEAT);
 			period2 = 0;
 			break;
 		default://error
@@ -191,19 +186,19 @@ int main() {
 
 		if (period1 != 0) {
 			if (LedPWM(period1, sweep_steps1, STOPWATCH_ValueGet(LED_PWM_TIMER)))
-				PIOS_LED_On(BLUE);
+				PIOS_LED_On(PIOS_LED_HEARTBEAT);
 			else
-				PIOS_LED_Off(BLUE);
+				PIOS_LED_Off(PIOS_LED_HEARTBEAT);
 		} else
-			PIOS_LED_On(BLUE);
+			PIOS_LED_On(PIOS_LED_HEARTBEAT);
 
 		if (period2 != 0) {
 			if (LedPWM(period2, sweep_steps2, STOPWATCH_ValueGet(LED_PWM_TIMER)))
-				PIOS_LED_On(RED);
+				PIOS_LED_On(PIOS_LED_ALARM);
 			else
-				PIOS_LED_Off(RED);
+				PIOS_LED_Off(PIOS_LED_ALARM);
 		} else
-			PIOS_LED_Off(RED);
+			PIOS_LED_Off(PIOS_LED_ALARM);
 
 		if (STOPWATCH_ValueGet(LED_PWM_TIMER) > 100 * 50 * 100)
 			STOPWATCH_Reset(LED_PWM_TIMER);
@@ -227,7 +222,6 @@ void jump_to_app() {
 		RCC_APB1PeriphResetCmd(0xffffffff, DISABLE);
 		_SetCNTR(0); // clear interrupt mask
 		_SetISTR(0); // clear all requests
-
 		JumpAddress = *(__IO uint32_t*) (bdinfo->fw_base + 4);
 		Jump_To_Application = (pFunction) JumpAddress;
 		/* Initialize user application's Stack Pointer */
@@ -249,10 +243,8 @@ uint32_t LedPWM(uint32_t pwm_period, uint32_t pwm_sweep_steps, uint32_t count) {
 
 uint8_t processRX() {
 	if (ProgPort == Usb) {
-		while (PIOS_COM_ReceiveBufferUsed(PIOS_COM_TELEM_USB) >= 63) {
-			if (PIOS_COM_ReceiveBuffer(PIOS_COM_TELEM_USB, mReceive_Buffer, 63, 0) == 63) {
-				processComand(mReceive_Buffer);
-			}
+		if (PIOS_COM_MSG_Receive(PIOS_COM_TELEM_USB, mReceive_Buffer, sizeof(mReceive_Buffer))) {
+			processComand(mReceive_Buffer);
 		}
 	} else if (ProgPort == Serial) {
 
@@ -277,15 +269,12 @@ void SSP_CallBack(uint8_t *buf, uint16_t len) {
 	fifoBuf_putData(&ssp_buffer, buf, len);
 }
 int16_t SSP_SerialRead(void) {
-	if (PIOS_COM_ReceiveBufferUsed(PIOS_COM_TELEM_RF) > 0) {
-		uint8_t byte;
-		if (PIOS_COM_ReceiveBuffer(PIOS_COM_TELEM_RF, &byte, 1, 0) == 1) {
-			return byte;
-		} else {
-			return -1;
-		}	    
-	} else
+	uint8_t byte;
+	if (PIOS_COM_ReceiveBuffer(PIOS_COM_TELEM_RF, &byte, 1, 0) == 1) {
+		return byte;
+	} else {
 		return -1;
+	}
 }
 void SSP_SerialWrite(uint8_t value) {
 	PIOS_COM_SendChar(PIOS_COM_TELEM_RF, value);

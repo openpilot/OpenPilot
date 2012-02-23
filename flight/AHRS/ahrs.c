@@ -447,9 +447,9 @@ void print_ahrs_raw()
 	valid_data_buffer = PIOS_ADC_GetRawBuffer();
 
 	if (total_conversion_blocks != previous_conversion + 1)
-		PIOS_LED_On(LED1);	// not keeping up
+		PIOS_LED_On(PIOS_LED_HEARTBEAT);	// not keeping up
 	else
-		PIOS_LED_Off(LED1);
+		PIOS_LED_Off(PIOS_LED_HEARTBEAT);
 	previous_conversion = total_conversion_blocks;
 	
 	
@@ -463,9 +463,9 @@ void print_ahrs_raw()
 			    PIOS_ADC_NUM_PINS *
 			    sizeof(valid_data_buffer[0]));
 	if (result == 0)
-		PIOS_LED_Off(LED1);
+		PIOS_LED_Off(PIOS_LED_HEARTBEAT);
 	else {
-		PIOS_LED_On(LED1);
+		PIOS_LED_On(PIOS_LED_HEARTBEAT);
 	}	
 }
 #endif
@@ -490,7 +490,7 @@ void print_ahrs_raw()
 		// wait for new raw samples
 		while (previous_conversion == total_conversion_blocks);
 		if ((previous_conversion + 1) != total_conversion_blocks)
-			PIOS_LED_On(LED1);                              // we are not keeping up
+			PIOS_LED_On(PIOS_LED_HEARTBEAT);                              // we are not keeping up
 		previous_conversion = total_conversion_blocks;
 
 		// fetch the buffer address for the new samples
@@ -534,9 +534,9 @@ void print_ahrs_raw()
 		result += PIOS_COM_SendBufferNonBlocking(PIOS_COM_AUX, (uint8_t *)gyro_z, over_sampling * sizeof(gyro_z[0]));
 
 		if (result != 0)
-			PIOS_LED_On(LED1);          // all data not sent
+			PIOS_LED_On(PIOS_LED_HEARTBEAT);          // all data not sent
 		else
-			PIOS_LED_Off(LED1);
+			PIOS_LED_Off(PIOS_LED_HEARTBEAT);
 	}
 #endif
 
@@ -616,7 +616,7 @@ for all data to be up to date before doing anything*/
 
 		// Alive signal
 		if (((total_conversion_blocks % 100) & 0xFFFE) == 0)
-			PIOS_LED_Toggle(LED1);
+			PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
 
 		// Delay for valid data
 

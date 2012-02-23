@@ -29,7 +29,7 @@
  * STATUS: working fine, use it
  * This allows to use Dala "atrv" robot model instead of camera (default) model in the Gdhe view display
  */
-#define ATRV 1
+#define ATRV 0
 
 /*
  * STATUS: working fine, use it

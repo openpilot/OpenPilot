@@ -1193,6 +1193,7 @@ void demo_slam_main(world_ptr_t *world)
 					
 	// set the start date
 	double start_date = kernel::Clock::getTime();
+	if (intOpts[iSimu]) start_date = 0.0;
 	if (!(intOpts[iReplay] & 1) && intOpts[iDump]) {
 		std::fstream f((strOpts[sDataPath] + std::string("/sdate.log")).c_str(), std::ios_base::out);
 		f << std::setprecision(19) << start_date << std::endl;
@@ -1200,7 +1201,7 @@ void demo_slam_main(world_ptr_t *world)
 	}
 	else if (intOpts[iReplay] & 1) {
 		std::fstream f((strOpts[sDataPath] + std::string("/sdate.log")).c_str(), std::ios_base::in);
-		if (!f.is_open()) std::cout << "Missing sdate.log file" << std::endl;
+		if (!f.is_open()) { std::cout << "Missing sdate.log file. Please copy the .time file of the first image to sdate.log" << std::endl; return; }
 		f >> start_date;
 		f.close();
 	}

@@ -333,11 +333,11 @@ static void stabilizationTask(void* parameters)
 					// Command signal is composed of stick input added to the gyro and virtual flybar
 					float gyro_gain = 1.0f;
 					if (vbar_gyros_suppress) {
-						float gyro_gain = (1.0f - fabs(rateDesiredAxis[i]));
+						gyro_gain = (1.0f - fabs(rateDesiredAxis[i]));
 						gyro_gain = (gyro_gain < 0) ? 0 : gyro_gain;
 					}
 					float command = rateDesiredAxis[i] - gyro_gain * (
-							vbar_integral[i] * pids[PID_VBAR_ROLL + i].i - 
+							vbar_integral[i] * pids[PID_VBAR_ROLL + i].i +
 							gyro_filtered[i] * pids[PID_VBAR_ROLL + i].p);
 
 					actuatorDesiredAxis[i] = bound(command);

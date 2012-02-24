@@ -1,7 +1,9 @@
 /**
  * \file robotOdometry.cpp
- * \date 07/03/2010
+ * \date 01/01/2012
+ * \author dmarquez
  * \author agonzale
+ * 
  * \ingroup rtslam
  */
 
@@ -11,7 +13,6 @@
 #include "boost/numeric/ublas/matrix_proxy.hpp"
 #include "boost/numeric/ublas/vector_proxy.hpp"
 #include "rtslam/quatTools.hpp"
-
 #include "rtslam/robotAbstract.hpp"
 #include "rtslam/robotOdometry.hpp"
 
@@ -43,7 +44,7 @@ namespace jafar {
 
 		void RobotOdometry::move_func(const vec & _x, const vec & _u,
 		    const vec & _n, const double _dt, vec & _xnew, mat & _XNEW_x,
-		    mat & _XNEW_n) {
+		    mat & _XNEW_u) {
 
 			using namespace jblas;
 			using namespace ublas;
@@ -74,7 +75,7 @@ namespace jafar {
 			 *   q   3  |  0     QNEW_dv
 			 * ----------------------------
 			 */
-
+			
 			//variables
 			mat PNEW_x(3, 7);
 
@@ -92,31 +93,37 @@ namespace jafar {
 			// position update
 			vec3 pnew;
 			vec4 qnew;
-
-			quaternion::vecFromFrame(_x, dx, pnew, PNEW_x, PNEW_dx);
-
+			quaternion::eucFromFrame(_x, dx, pnew, PNEW_x, PNEW_dx);
+			
 			//quaternion update
 			vec4 qdv;
-
-			quaternion::v2q(dv, qdv, QDV_dv); //vector orientation increment to quaternion with jacobians
+			quaternion::v2q(dv, qdv, QDV_dv); //orientation increment to quaternion with jacobians
 			quaternion::qProd(q, qdv, qnew, QNEW_q, QNEW_qdv);
 			
-			// normalize quaternion
-			ublasExtra::normalizeJac(qnew, QNORM_qnew);
-			ublasExtra::normalize(qnew);
-
-
 			QNEW_dv = prod(QNEW_qdv, QDV_dv);
-
+			
 			unsplitState(pnew, qnew, _xnew);
-
+			
 			_XNEW_x.clear();
-			subrange(_XNEW_x, 3, 7, 3, 7) = prod(QNORM_qnew,QNEW_q);
 			subrange(_XNEW_x, 0, 3, 0, 7) = PNEW_x;
+			subrange(_XNEW_x, 3, 7, 3, 7) = QNEW_q;
 
-			_XNEW_n.clear();
-			subrange(_XNEW_n, 0, 3, 0, 3) = PNEW_dx;
-			subrange(_XNEW_n, 3, 7, 3, 6) = QNEW_dv;
+			_XNEW_u.clear();
+			subrange(_XNEW_u, 0, 3, 0, 3) = PNEW_dx;
+			subrange(_XNEW_u, 3, 7, 3, 6) = QNEW_dv;			
+		}
+			
+		void RobotOdometry::init_func(const vec & _x, const vec & _u, vec & _xnew) {
+			
+			using namespace jblas;
+			using namespace ublas;
+			
+			// split robot state vector
+			vec3 p;
+			vec4 q;
+			splitState(_x, p, q);
+			
+			unsplitState(p, q, _xnew); //FIXME temporary solution to copy the initial state
 		}
 	}
 }

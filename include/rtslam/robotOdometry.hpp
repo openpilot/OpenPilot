@@ -1,9 +1,10 @@
 /**
  * \file robotOdometry.hpp
  *
- * Header file for the robot with constant velocity motion model.
+ * Header file for robot with odometry motion model.
  *
- * \date 14/02/2010
+ * \date 01/01/2012
+ * \author dmarquez
  * \author agonzale
  *
  * \ingroup rtslam
@@ -22,8 +23,6 @@ namespace jafar {
 
 		/**
 		 * Odometry motion model robot class.
-		 *
-		 * \author agonzale
 		 *
 		 * This class implements a rigid frame in 3D moving with an odometry motion model.
 		 * This model performs one step on the pose F of a vehicle, given odometry increments U=[dx,dv] given by the robot frame.
@@ -87,8 +86,8 @@ namespace jafar {
 				 */
 				void move_func(const vec & _x, const vec & _u, const vec & _n,
 				    const double _dt, vec & _xnew, mat & _XNEW_x, mat & _XNEW_u);
-
-				void computePertJacobian();
+				
+				void init_func(const vec & _x, const vec & _u, vec & _xnew);
 
 				static size_t size() {
 					return 7;
@@ -110,6 +109,7 @@ namespace jafar {
 				virtual size_t mySize_perturbation() {
 					return size_perturbation();
 				}
+				
 
 			protected:
 				/**
@@ -155,14 +155,11 @@ namespace jafar {
 
 			private:
 				// temporary matrices to speed up Jacobian computation
-								mat33 PNEW_dx; ///<		Temporary Jacobian matrix
-								mat34 PNEW_q;
-								mat43 QDV_dv; ///< 		Temporary Jacobian matrix
-								mat44 QNEW_qdv; ///<	Temporary Jacobian matrix
-								mat43 QNEW_dv; ///<		Temporary Jacobian matrix
-								mat44 QNEW_q; ///<		Temporary Jacobian matrix
-								mat44 QNORM_qnew; ///<	Temporary Jacobian matrix
-
+				mat33 PNEW_dx;	///<	Temporary Jacobian matrix
+				mat43 QDV_dv;	///<	Temporary Jacobian matrix
+				mat44 QNEW_qdv; ///<	Temporary Jacobian matrix
+				mat43 QNEW_dv;	///<	Temporary Jacobian matrix
+				mat44 QNEW_q;	///<	Temporary Jacobian matrix
 		};
 	}
 }

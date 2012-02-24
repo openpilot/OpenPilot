@@ -23,9 +23,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-#ifndef STM32103C8_TRANSMITTER_H_
-#define STM32103C8_TRANSMITTER_H_
+#ifndef STM32103CB_PIPXTREME_H_
+#define STM32103CB_PIPXTREME_H_
 
 #define ADD_ONE_ADC
 
@@ -85,26 +84,6 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 //------------------------
 // PIOS_LED
 //------------------------
-#define PIOS_LED_HEARTBEAT	0
-#ifdef MOVE_CONTROLLER
-#define PIOS_LED_LED1_GPIO_PORT			GPIOC
-//#define PIOS_LED_LED1_GPIO_PIN			GPIO_Pin_9
-#define PIOS_LED_LED1_GPIO_PIN			GPIO_Pin_8
-#define PIOS_LED_LED1_GPIO_CLK			RCC_APB2Periph_GPIOC
-#define PIOS_LED_NUM				1
-#define PIOS_LED_PORTS				{ PIOS_LED_LED1_GPIO_PORT }
-#define PIOS_LED_PINS				{ PIOS_LED_LED1_GPIO_PIN }
-#define PIOS_LED_CLKS				{ PIOS_LED_LED1_GPIO_CLK }
-
-#define PIOS_FLASH_CS_PIN                       0
-#define PIOS_FLASH_ENABLE                       PIOS_GPIO_On(0)
-#define PIOS_FLASH_DISABLE                      PIOS_GPIO_Off(0)
-#define PIOS_ADXL_ENABLE                        PIOS_SPI_RC_PinSet(PIOS_SPI_ACCEL,0)
-#define PIOS_ADXL_DISABLE                       PIOS_SPI_RC_PinSet(PIOS_SPI_ACCEL,1)
-
-// *****************************************************************
-// PIOS_LED
-
 #define PIOS_LED_USB	0
 #define PIOS_LED_LINK	1
 #define PIOS_LED_RX	2
@@ -128,37 +107,6 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 #define TX_LED_ON					PIOS_LED_On(PIOS_LED_TX)
 #define TX_LED_OFF					PIOS_LED_Off(PIOS_LED_TX)
 #define TX_LED_TOGGLE					PIOS_LED_Toggle(PIOS_LED_TX)
-
-//------------------------
-// PIOS_AK8794
-//------------------------
-#define PIOS_AK8974_DRDY_GPIO_PORT		GPIOE
-#define PIOS_AK8974_DRDY_GPIO_PIN		GPIO_Pin_12
-#define PIOS_AK8974_DRDY_PORT_SOURCE		GPIO_PortSourceGPIOE
-#define PIOS_AK8974_DRDY_PIN_SOURCE		GPIO_PinSource12
-#define PIOS_AK8974_DRDY_CLK			RCC_APB2Periph_GPIOE
-#define PIOS_AK8974_DRDY_EXTI_LINE		EXTI_Line12
-#define PIOS_AK8974_DRDY_IRQn			EXTI15_10_IRQn
-
-#define PIOS_AK8974_DRDY_PRIO			PIOS_IRQ_PRIO_HIGH
-
-#else
-
-#define PIOS_LED_LED1_GPIO_PORT			GPIOB
-#ifdef MAPLE_MINI
-#define PIOS_LED_LED1_GPIO_PIN			GPIO_Pin_1
-#else
-#define PIOS_LED_LED1_GPIO_PIN			GPIO_Pin_8
-#endif
-#define PIOS_LED_LED1_GPIO_CLK			RCC_APB2Periph_GPIOB
-#define PIOS_LED_LED2_GPIO_PORT                 GPIOB
-#define PIOS_LED_LED2_GPIO_PIN                  GPIO_Pin_9
-#define PIOS_LED_LED2_GPIO_CLK                  RCC_APB2Periph_GPIOB
-#define PIOS_LED_NUM                            2
-#define PIOS_LED_PORTS                          { PIOS_LED_LED1_GPIO_PORT, PIOS_LED_LED2_GPIO_PORT }
-#define PIOS_LED_PINS                           { PIOS_LED_LED1_GPIO_PIN, PIOS_LED_LED2_GPIO_PIN }
-#define PIOS_LED_CLKS                           { PIOS_LED_LED1_GPIO_CLK, PIOS_LED_LED2_GPIO_CLK }
-#endif
 
 //-------------------------
 // System Settings

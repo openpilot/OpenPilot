@@ -299,7 +299,7 @@ static RESULT PIOS_USBHOOK_Data_Setup(uint8_t RequestNo)
 	switch (Type_Recipient) {
 	case (STANDARD_REQUEST | INTERFACE_RECIPIENT):
 		switch (pInformation->USBwIndex0) {
-		case 0:		/* HID Interface */
+		case 2:		/* HID Interface */
 			switch (RequestNo) {
 			case GET_DESCRIPTOR:
 				switch (pInformation->USBwValue1) {
@@ -316,7 +316,7 @@ static RESULT PIOS_USBHOOK_Data_Setup(uint8_t RequestNo)
 
 	case (CLASS_REQUEST | INTERFACE_RECIPIENT):
 		switch (pInformation->USBwIndex0) {
-		case 0:		/* HID Interface */
+		case 2:		/* HID Interface */
 			switch (RequestNo) {
 			case GET_PROTOCOL:
 				CopyRoutine = PIOS_USBHOOK_GetProtocolValue;
@@ -325,16 +325,16 @@ static RESULT PIOS_USBHOOK_Data_Setup(uint8_t RequestNo)
 
 			break;
 #if defined(PIOS_INCLUDE_USB_CDC)
-		case 1:		/* CDC Call Control Interface */
+		case 0:		/* CDC Call Control Interface */
 			switch (RequestNo) {
 			case GET_LINE_CODING:
-				CopyRoutine = PIOS_USB_CDC_GetLineCoding;
+				//CopyRoutine = PIOS_USB_CDC_GetLineCoding;
 				break;
 			}
 
 			break;
 
-		case 2:		/* CDC Data Interface */
+		case 1:		/* CDC Data Interface */
 			switch (RequestNo) {
 			case 0:
 				break;

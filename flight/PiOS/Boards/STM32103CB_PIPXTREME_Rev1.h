@@ -102,6 +102,32 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 #define PIOS_ADXL_ENABLE                        PIOS_SPI_RC_PinSet(PIOS_SPI_ACCEL,0)
 #define PIOS_ADXL_DISABLE                       PIOS_SPI_RC_PinSet(PIOS_SPI_ACCEL,1)
 
+// *****************************************************************
+// PIOS_LED
+
+#define PIOS_LED_USB	0
+#define PIOS_LED_LINK	1
+#define PIOS_LED_RX	2
+#define PIOS_LED_TX	3
+
+#define PIOS_LED_HEARTBEAT PIOS_LED_USB
+#define PIOS_LED_ALARM PIOS_LED_TX
+
+#define USB_LED_ON					PIOS_LED_On(PIOS_LED_USB)
+#define USB_LED_OFF					PIOS_LED_Off(PIOS_LED_USB)
+#define USB_LED_TOGGLE					PIOS_LED_Toggle(PIOS_LED_USB)
+
+#define LINK_LED_ON					PIOS_LED_On(PIOS_LED_LINK)
+#define LINK_LED_OFF					PIOS_LED_Off(PIOS_LED_LINK)
+#define LINK_LED_TOGGLE					PIOS_LED_Toggle(PIOS_LED_LINK)
+
+#define RX_LED_ON					PIOS_LED_On(PIOS_LED_RX)
+#define RX_LED_OFF					PIOS_LED_Off(PIOS_LED_RX)
+#define RX_LED_TOGGLE					PIOS_LED_Toggle(PIOS_LED_RX)
+
+#define TX_LED_ON					PIOS_LED_On(PIOS_LED_TX)
+#define TX_LED_OFF					PIOS_LED_Off(PIOS_LED_TX)
+#define TX_LED_TOGGLE					PIOS_LED_Toggle(PIOS_LED_TX)
 
 //------------------------
 // PIOS_AK8794

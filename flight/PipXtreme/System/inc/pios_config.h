@@ -34,7 +34,7 @@
 #define PIOS_CONFIG_H
 
 /* Enable/Disable PiOS Modules */
-#define PIOS_INCLUDE_ADC
+//#define PIOS_INCLUDE_ADC
 #define PIOS_INCLUDE_DELAY
 #ifdef MOVE_CONTROLLER
 #define PIOS_INCLUDE_I2C

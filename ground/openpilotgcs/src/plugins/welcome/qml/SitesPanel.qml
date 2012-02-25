@@ -12,7 +12,7 @@ Item {
         id: header
         text: "OpenPilot Websites"
         width: parent.width
-        color: "#303060"
+        color: "#44515c"
         font {
             pointSize: 14
             weight: Font.Bold
@@ -47,7 +47,7 @@ Item {
                 weight: Font.Bold
             }
 
-            color: mouseArea.containsMouse ? "darkblue" : "black"
+            color: mouseArea.containsMouse ? "#224d81" : "black"
 
             MouseArea {
                 id: mouseArea

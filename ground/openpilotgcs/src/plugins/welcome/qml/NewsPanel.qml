@@ -12,7 +12,7 @@ Item {
         id: header
         text: "Project News"
         width: parent.width
-        color: "#303060"
+        color: "#44515c"
         font {
             pointSize: 14
             weight: Font.Bold
@@ -50,16 +50,18 @@ Item {
                 Text {
                     text: title
                     width: view.width
+                    textFormat: text.indexOf("&") > 0 ? Text.StyledText : Text.PlainText
                     elide: Text.ElideRight
                     font.bold: true
-                    color: mouseArea.containsMouse ? "darkblue" : "black"
+                    color: mouseArea.containsMouse ? "#224d81" : "black"
                 }
 
                 Text {
                     text: description
                     width: view.width
+                    textFormat: text.indexOf("&") > 0 ? Text.StyledText : Text.PlainText
                     elide: Text.ElideRight
-                    color: mouseArea.containsMouse ? "darkblue" : "black"
+                    color: mouseArea.containsMouse ? "#224d81" : "black"
                 }
             }
 

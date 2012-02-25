@@ -9,6 +9,9 @@ BOARD               := STM32103CB_PIPXTREME
 MODEL               := MD
 MODEL_SUFFIX        := 
 
+OPENOCD_JTAG_CONFIG := foss-jtag.revb.cfg
+OPENOCD_CONFIG      := stm32f1x.cfg
+
 # Note: These must match the values in link_$(BOARD)_memory.ld
 BL_BANK_BASE        := 0x08000000  # Start of bootloader flash
 BL_BANK_SIZE        := 0x00003000  # Should include BD_INFO region

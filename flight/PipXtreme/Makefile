@@ -72,7 +72,7 @@ FLASH_TOOL = OPENOCD
 
 # List of modules to include
 OPTMODULES = 
-MODULES = TransmitterControls FirmwareIAP
+MODULES = TransmitterControls FirmwareIAP RadioComBridge
 ifeq ($(ENABLE_MOVE_CONTROLLER), YES)
 MODULES += AttitudeMARG
 endif

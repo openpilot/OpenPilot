@@ -397,10 +397,11 @@ static const struct pios_usart_cfg pios_usart_telem_flexi_cfg = {
 #define PIOS_COM_TELEM_RF_RX_BUF_LEN 192
 #define PIOS_COM_TELEM_RF_TX_BUF_LEN 192
 
-#define PIOS_COM_GPS_RX_BUF_LEN 96
-
 #define PIOS_COM_TELEM_USB_RX_BUF_LEN 192
 #define PIOS_COM_TELEM_USB_TX_BUF_LEN 192
+
+#define PIOS_COM_VCP_USB_RX_BUF_LEN 192
+#define PIOS_COM_VCP_USB_TX_BUF_LEN 192
 
 #if defined(PIOS_INCLUDE_RTC)
 /*
@@ -607,6 +608,7 @@ const struct pios_ppm_cfg pios_ppm_cfg = {
 uint32_t pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE];
 
 uint32_t pios_com_telem_usb_id;
+uint32_t pios_com_vcp_usb_id;
 uint32_t pios_com_usart1_id;
 uint32_t pios_com_usart2_id;
 uint32_t pios_com_usart3_id;
@@ -735,37 +737,17 @@ void PIOS_Board_Init(void) {
 		if (PIOS_USB_CDC_Init(&pios_usb_cdc_id, &pios_usb_cdc_cfg, pios_usb_id)) {
 			PIOS_Assert(0);
 		}
-		uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_USB_RX_BUF_LEN);
-		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_USB_TX_BUF_LEN);
+		uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_VCP_USB_RX_BUF_LEN);
+		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_VCP_USB_TX_BUF_LEN);
 		PIOS_Assert(rx_buffer);
 		PIOS_Assert(tx_buffer);
-		if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_cdc_com_driver, pios_usb_cdc_id,
-											rx_buffer, PIOS_COM_TELEM_USB_RX_BUF_LEN,
-											tx_buffer, PIOS_COM_TELEM_USB_TX_BUF_LEN)) {
+		if (PIOS_COM_Init(&pios_com_vcp_usb_id, &pios_usb_cdc_com_driver, pios_usb_cdc_id,
+											rx_buffer, PIOS_COM_VCP_USB_RX_BUF_LEN,
+											tx_buffer, PIOS_COM_VCP_USB_TX_BUF_LEN)) {
 			PIOS_Assert(0);
 		}
 	}
 #endif	/* PIOS_INCLUDE_COM */
-
-#ifdef COMBRIDGE
-#if defined(PIOS_INCLUDE_COM)
-	{
-		uint32_t pios_usb_cdc_id;
-		if (PIOS_USB_CDC_Init(&pios_usb_cdc_id, &pios_usb_cdc_cfg, pios_usb_id)) {
-			PIOS_Assert(0);
-		}
-		uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_BRIDGE_RX_BUF_LEN);
-		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_BRIDGE_TX_BUF_LEN);
-		PIOS_Assert(rx_buffer);
-		PIOS_Assert(tx_buffer);
-		if (PIOS_COM_Init(&pios_com_vcp_id, &pios_usb_cdc_com_driver, pios_usb_cdc_id,
-											rx_buffer, PIOS_COM_BRIDGE_RX_BUF_LEN,
-											tx_buffer, PIOS_COM_BRIDGE_TX_BUF_LEN)) {
-			PIOS_Assert(0);
-		}
-	}
-#endif	/* PIOS_INCLUDE_COM */
-#endif
 
 #endif	/* PIOS_INCLUDE_USB_CDC */
 

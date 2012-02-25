@@ -231,7 +231,7 @@ openocd_install: openocd_clean
 
 openocd_git_install: | $(DL_DIR) $(TOOLS_DIR)
 openocd_git_install: OPENOCD_URL  := git://openocd.git.sourceforge.net/gitroot/openocd/openocd
-openocd_git_install: OPENOCD_REV  := bce7009e31b23250d4325637c7b7cdbae0efed9a
+openocd_git_install: OPENOCD_REV  := dec6b913809bd3f857af31be178ffde65e42dbab
 openocd_git_install: openocd_clean
         # download the source
 	$(V0) @echo " DOWNLOAD     $(OPENOCD_URL) @ $(OPENOCD_REV)"
@@ -263,7 +263,7 @@ openocd_git_install: openocd_clean
 	)
 
         # delete the extracted source when we're done
-	$(V1) [ ! -d "$(DL_DIR)/openocd-build" ] || $(RM) -r "$(DL_DIR)/openocd-build"
+	$(V1) [ ! -d "$(DL_DIR)/openocd-build" ] || $(RM) -rf "$(DL_DIR)/openocd-build"
 
 .PHONY: openocd_clean
 openocd_clean:

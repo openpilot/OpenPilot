@@ -495,7 +495,7 @@
             <property name="geometry">
              <rect>
               <x>0</x>
-              <y>-162</y>
+              <y>0</y>
               <width>648</width>
               <height>802</height>
              </rect>
@@ -3459,7 +3459,7 @@ border-radius: 5;</string>
                     </spacer>
                    </item>
                    <item row="1" column="4">
-                    <widget class="QSlider" name="horizontalSlider_77">
+                    <widget class="QSlider" name="PitchPSlider">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                        <horstretch>0</horstretch>
@@ -3503,7 +3503,7 @@ border-radius: 5;</string>
                     </widget>
                    </item>
                    <item row="1" column="5">
-                    <widget class="QSpinBox" name="spinBox_11">
+                    <widget class="QSpinBox" name="spinBox_PitchRateP">
                      <property name="minimumSize">
                       <size>
                        <width>43</width>
@@ -3525,7 +3525,7 @@ border-radius: 5;</string>
                      <property name="objrelation" stdset="0">
                       <stringlist>
                        <string>objname:StabilizationSettings</string>
-                       <string>fieldname:RollRatePID</string>
+                       <string>fieldname:PitchRatePID</string>
                        <string>element:Kp</string>
                        <string>haslimits:yes</string>
                        <string>scale:0.0001</string>
@@ -11753,8 +11753,8 @@ border-radius: 4;
             <property name="geometry">
              <rect>
               <x>0</x>
-              <y>-350</y>
-              <width>648</width>
+              <y>0</y>
+              <width>401</width>
               <height>990</height>
              </rect>
             </property>

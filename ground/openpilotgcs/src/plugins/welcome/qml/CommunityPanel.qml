@@ -2,7 +2,7 @@
 import QtQuick 1.1
 
 Item {
-    width: 600
+    width: background.sourceSize.width
     height: 300
 
     BorderImage {
@@ -32,7 +32,7 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         anchors.left: newsPanel.right
         anchors.margins: 16
-        color: "#A0A0B0"
+        color: "#A0A0A0"
     }
 
     SitesPanel {

@@ -197,6 +197,16 @@ namespace jafar {
 					init_func(x, control, _U, xnew);
 					state.x() = xnew;
 				}
+				
+				inline void init(const vec & _u) {
+					JFR_ASSERT(_u.size() >= control.size(), "robotAbstract.hpp: init: wrong control size.");
+					control = ublas::subrange(_u, 0, control.size());
+					vec x = state.x();
+					vec xnew(x.size());
+
+					init_func(x, control, xnew);
+					state.x() = xnew;
+				}
 				/**
 				 * Move one step ahead, affect SLAM filter.
 				 * This function updates the full state and covariances matrix of the robot plus the cross-variances with all other map objects.
@@ -210,6 +220,7 @@ namespace jafar {
 				
 				void move(double time);
 				void move_fake(double time);
+				void move(const vec & u_, double time);
 
 				/**
 				 * Compute robot process noise \a Q in state space.
@@ -260,6 +271,7 @@ namespace jafar {
 				 * average control input on a past period of time, if possible.
 				*/
 				virtual void init_func(const vec & _x, const vec & _u, const vec & _U, vec & _xnew) {}
+				virtual void init_func(const vec & _x, const vec & _u, vec & _xnew) {}
 
 
 		};

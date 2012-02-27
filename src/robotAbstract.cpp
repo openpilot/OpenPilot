@@ -207,7 +207,68 @@ namespace jafar {
 			if (hardwareEstimatorPtr) hardwareEstimatorPtr->acquireReadings(self_time, time);
 			self_time = time;
 		}
-
+		
+		void RobotAbstract::move(const vec & u_, double time){
+			bool firstmove = false;
+			if (self_time < 0.) { firstmove = true; self_time = time; }
+			if (hardwareEstimatorPtr)
+			{
+				if (firstmove) // compute average past control and allow the robot to init its state with it
+				{
+					jblas::mat_indirect readings = hardwareEstimatorPtr->acquireReadings(0, time);  
+					self_time = 0.;
+					dt_or_dx = 0.;
+					jblas::vec avg_u(readings.size2()-1); avg_u.clear();
+					unsigned nreadings = readings.size1();
+					if (readings(nreadings-1, 0) >= time) nreadings--; // because it could be available offline but not online
+					for(size_t i = 0; i < nreadings; i++)
+						avg_u += ublas::subrange(ublas::matrix_row<mat_indirect>(readings, i),1,readings.size2());
+					
+					if (nreadings) avg_u /= nreadings;
+					init(avg_u);
+				}
+				else // else just move with the available control
+				{
+					jblas::mat_indirect readings = hardwareEstimatorPtr->acquireReadings(self_time, time);
+					jblas::vec u(readings.size2()-1), prev_u(readings.size2()-1), next_u(readings.size2()-1);
+					jblas::vec7 prev_uq, next_uq, prev_uqi, uq;
+					
+					jblas::ind_array instantArray = hardwareEstimatorPtr->instantValues()-1;
+					jblas::ind_array incrementArray = hardwareEstimatorPtr->incrementValues()-1;
+					double cur_time = self_time, after_time, prev_time = readings(0, 0), next_time;
+				
+					for(size_t i = 0; i < readings.size1(); i++)
+					{
+						next_time = after_time = readings(i, 0);
+						if (after_time > time || i == readings.size1()-1) after_time = time;
+						if (after_time < time || prev_time > time) continue;
+						
+						prev_u = ublas::subrange(ublas::matrix_row<mat_indirect>(readings, i-2),1,readings.size2());
+						next_u = ublas::subrange(ublas::matrix_row<mat_indirect>(readings, i-1),1,readings.size2());
+						
+						ublas::subrange(prev_uq, 0, 3) = ublas::subrange(prev_u, 0, 3);
+						ublas::subrange(prev_uq, 3, 7) = quaternion::e2q(ublas::subrange(prev_u, 3, 6));
+						ublas::subrange(next_uq, 0, 3) = ublas::subrange(next_u, 0, 3);
+						ublas::subrange(next_uq, 3, 7) = quaternion::e2q(ublas::subrange(next_u, 3, 6));
+						
+						prev_uqi = quaternion::invertFrame(prev_uq);
+						uq = quaternion::composeFrames(prev_uqi, next_uq);
+						
+						ublas::subrange(u, 0, 3) = ublas::subrange(uq, 0, 3);
+						ublas::subrange(u, 3, 6) = quaternion::q2e(ublas::subrange(uq, 3, 7));
+						double un = norm_2(ublas::subrange(u,0,3));
+						perturbation.set_P_from_continuous(un);
+// 						perturbation.set_from_continuous(un);
+						move(u);
+						
+						prev_time = cur_time = next_time;
+						prev_u = next_u;
+					}
+					dt_or_dx = time - self_time;
+				}
+			} 
+			self_time = time;
+		}
 
 		void RobotAbstract::writeLogHeader(kernel::DataLogger& log) const
 		{

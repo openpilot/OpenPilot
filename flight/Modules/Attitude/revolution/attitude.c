@@ -455,7 +455,7 @@ static int32_t updateAttitudeINSGPS(bool first_run)
 	HomeLocationGet(&home);
 
 	// Have a minimum requirement for gps usage
-	gps_updated &= (gpsData.Satellites >= 7) && (gpsData.PDOP >= 3.0f);
+	gps_updated &= (gpsData.Satellites >= 7) && (gpsData.PDOP <= 4.0f);
 
 	if (!inited)
 		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE,SYSTEMALARMS_ALARM_ERROR);
@@ -603,8 +603,8 @@ static int32_t updateAttitudeINSGPS(bool first_run)
 
 	if(gps_updated && outdoor_mode)
 	{
-		INSSetPosVelVar(1.0f, 1.0f);
-		sensors = POS_SENSORS; //HORIZ_SENSORS | VERT_SENSORS;
+		INSSetPosVelVar(1e-2f, 1e-2f);
+		sensors = POS_SENSORS | HORIZ_SENSORS;
 		GPSPositionData gpsPosition;
 		GPSPositionGet(&gpsPosition);
 

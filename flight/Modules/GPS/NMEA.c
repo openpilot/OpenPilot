@@ -455,7 +455,7 @@ static bool nmeaProcessGPRMC(GPSPositionData * GpsData, bool* gpsDataUpdated, ch
 	}
 
 	// get speed in knots
-	GpsData->Groundspeed = NMEA_real_to_float(param[7]) * 0.51444; // to m/s
+	GpsData->Groundspeed = NMEA_real_to_float(param[7]) * 0.51444f; // to m/s
 
 	// get True course
 	GpsData->Heading = NMEA_real_to_float(param[8]);
@@ -492,7 +492,7 @@ static bool nmeaProcessGPVTG(GPSPositionData * GpsData, bool* gpsDataUpdated, ch
 	*gpsDataUpdated = true;
 
 	GpsData->Heading = NMEA_real_to_float(param[1]);
-	GpsData->Groundspeed = NMEA_real_to_float(param[5]) * 0.51444; // to m/s
+	GpsData->Groundspeed = NMEA_real_to_float(param[5]) * 0.51444f; // to m/s
 
 	return true;
 }

@@ -39,6 +39,8 @@
   * @{
   */
 #define POS_SENSORS 0x007
+#define HORIZ_POS_SENSORS 0x003
+#define VER_POS_SENSORS 0x004
 #define HORIZ_SENSORS 0x018
 #define VERT_SENSORS  0x020
 #define MAG_SENSORS 0x1C0

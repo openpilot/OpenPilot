@@ -62,6 +62,8 @@ void INSSetMagVar(float scaled_mag_var[3]);
 void INSPosVelReset(float pos[3], float vel[3]);
 
 void MagCorrection(float mag_data[3]);
+void BaroCorrection(float baro);
+void GpsCorrection(float Pos[3], float Vel[3]);
 void MagVelBaroCorrection(float mag_data[3], float Vel[3], float BaroAlt);
 void FullCorrection(float mag_data[3], float Pos[3], float Vel[3],
 		    float BaroAlt);

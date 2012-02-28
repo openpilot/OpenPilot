@@ -74,12 +74,24 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			return;
 		}
 
-		if(!mlGetFloatArray(prhs[1], mag_data, 1)) {
+		if(!mlGetFloatArray(prhs[1], mag_data, 3)) {
 			mexErrMsgTxt("Error with the input parameters\n");
 			return;
 		}
 
 		MagCorrection(mag_data);
+    } else 	if(mlStringCompare(prhs[0], "INSBaroCorrection")) {
+		if(nrhs != 2) {
+			mexErrMsgTxt("Incorrect number of inputs for correction\n");
+			return;
+		}
+
+		if(!mlGetFloatArray(prhs[1], &baro_data, 1)) {
+			mexErrMsgTxt("Error with the input parameters\n");
+			return;
+		}
+
+		BaroCorrection(baro_data);
 	} else 	if(mlStringCompare(prhs[0], "INSMagVelBaroCorrection")) {
 
 		if(nrhs != 4) {
@@ -95,6 +107,20 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		}
 
 		MagVelBaroCorrection(mag_data, vel_data, baro_data);
+	} else 	if(mlStringCompare(prhs[0], "INSGpsCorrection")) {
+
+		if(nrhs != 3) {
+			mexErrMsgTxt("Incorrect number of inputs for correction\n");
+			return;
+		}
+
+		if(!mlGetFloatArray(prhs[1], pos_data, 3) ||
+				!mlGetFloatArray(prhs[2], vel_data ,3)) {
+			mexErrMsgTxt("Error with the input parameters\n");
+			return;
+		}
+
+		GpsCorrection(pos_data, vel_data);
 	} else 	if(mlStringCompare(prhs[0], "INSVelBaroCorrection")) {
 
 		if(nrhs != 3) {

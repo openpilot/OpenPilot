@@ -31,6 +31,9 @@
 #include <manualcontrolsettings.h>
 #include <gcsreceiver.h>
 
+#include "board_hw_defs.c"
+
+
 #define TxBufferSize3   33
 
 
@@ -46,228 +49,6 @@ uint8_t RxBuffer3[TxBufferSize3];
 
 
 
-/**
- * PIOS_Board_Init()
- * initializes all the core subsystems on this specific hardware
- * called from System/openpilot.c
- */
-
-#if defined(PIOS_INCLUDE_RTC)
-/*
- * Realtime Clock (RTC)
- */
-#include <pios_rtc_priv.h>
-
-void PIOS_RTC_IRQ_Handler (void);
-void RTC_WKUP_IRQHandler() __attribute__ ((alias ("PIOS_RTC_IRQ_Handler")));
-static const struct pios_rtc_cfg pios_rtc_main_cfg = {
-	.clksrc = RCC_RTCCLKSource_HSE_Div8, // Divide 8 Mhz crystal down to 1
-	// For some reason it's acting like crystal is 16 Mhz.  This clock is then divided
-	// by another 16 to give a nominal 62.5 khz clock
-	.prescaler = 100, // Every 100 cycles gives 625 Hz
-	.irq = {
-		.init = {
-			.NVIC_IRQChannel                   = RTC_WKUP_IRQn,
-			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
-			.NVIC_IRQChannelSubPriority        = 0,
-			.NVIC_IRQChannelCmd                = ENABLE,
-		},
-	},
-};
-
-void PIOS_RTC_IRQ_Handler (void)
-{
-	PIOS_RTC_irq_handler ();
-}
-
-#endif
-
-#if defined(PIOS_INCLUDE_LED)
-
-#include <pios_led_priv.h>
-static const struct pios_led pios_leds[] = {
-	[PIOS_LED_HEARTBEAT] = {
-		.pin = {
-			.gpio = GPIOD,
-			.init = {
-				.GPIO_Pin   = GPIO_Pin_13,
-				.GPIO_Speed = GPIO_Speed_50MHz,
-				.GPIO_Mode  = GPIO_Mode_OUT,
-				.GPIO_OType = GPIO_OType_PP,
-				.GPIO_PuPd = GPIO_PuPd_UP
-			},
-		},
-	},
-	[PIOS_LED_ALARM] = {
-		.pin = {
-			.gpio = GPIOD,
-			.init = {
-				.GPIO_Pin   = GPIO_Pin_12,
-				.GPIO_Speed = GPIO_Speed_50MHz,
-				.GPIO_Mode  = GPIO_Mode_OUT,
-				.GPIO_OType = GPIO_OType_PP,
-				.GPIO_PuPd = GPIO_PuPd_UP
-			},
-		},
-	},
-};
-
-static const struct pios_led_cfg pios_led_cfg = {
-	.leds     = pios_leds,
-	.num_leds = NELEMENTS(pios_leds),
-};
-
-#endif	/* PIOS_INCLUDE_LED */
-
-
-
-#if defined(PIOS_INCLUDE_GPS)
-
-#include <pios_usart_priv.h>
-#include <pios_com_priv.h>
-
-/*
- * GPS USART
- */
-static const struct pios_usart_cfg pios_usart_gps_cfg = {
-	.regs = USART1,
-	.remap = GPIO_AF_USART1,
-	.init = {
-		.USART_BaudRate = 38400,
-		.USART_WordLength = USART_WordLength_8b,
-		.USART_Parity = USART_Parity_No,
-		.USART_StopBits = USART_StopBits_1,
-		.USART_HardwareFlowControl =
-		USART_HardwareFlowControl_None,
-		.USART_Mode = USART_Mode_Rx | USART_Mode_Tx,
-	},
-	.irq = {
-		.init = {
-			.NVIC_IRQChannel = USART1_IRQn,
-			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
-			.NVIC_IRQChannelSubPriority = 0,
-			.NVIC_IRQChannelCmd = ENABLE,
-		},
-	},
-	.rx = {
-		.gpio = GPIOA,
-		.init = {
-			.GPIO_Pin   = GPIO_Pin_10,
-			.GPIO_Speed = GPIO_Speed_2MHz,
-			.GPIO_Mode  = GPIO_Mode_AF,
-			.GPIO_OType = GPIO_OType_PP,
-			.GPIO_PuPd  = GPIO_PuPd_UP
-		},
-	},
-	.tx = {
-		.gpio = GPIOA,
-		.init = {
-			.GPIO_Pin   = GPIO_Pin_9,
-			.GPIO_Speed = GPIO_Speed_2MHz,
-			.GPIO_Mode  = GPIO_Mode_AF,
-			.GPIO_OType = GPIO_OType_PP,
-			.GPIO_PuPd  = GPIO_PuPd_UP
-		},
-	},
-};
-
-#endif /* PIOS_INCLUDE_GPS */
-
-#ifdef PIOS_INCLUDE_COM_AUX
-/*
- * AUX USART
- */
-static const struct pios_usart_cfg pios_usart_aux_cfg = {
-	.regs = USART1,
-	.remap = GPIO_AF_USART1,
-	.init = {
-		.USART_BaudRate = 230400,
-		.USART_WordLength = USART_WordLength_8b,
-		.USART_Parity = USART_Parity_No,
-		.USART_StopBits = USART_StopBits_1,
-		.USART_HardwareFlowControl =
-		USART_HardwareFlowControl_None,
-		.USART_Mode = USART_Mode_Rx | USART_Mode_Tx,
-	},
-	.irq = {
-		.init = {
-			.NVIC_IRQChannel = USART1_IRQn,
-			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
-			.NVIC_IRQChannelSubPriority = 0,
-			.NVIC_IRQChannelCmd = ENABLE,
-		},
-	},
-	.rx = {
-		.gpio = GPIOA,
-		.init = {
-			.GPIO_Pin   = GPIO_Pin_10,
-			.GPIO_Speed = GPIO_Speed_2MHz,
-			.GPIO_Mode  = GPIO_Mode_AF,
-			.GPIO_OType = GPIO_OType_PP,
-			.GPIO_PuPd  = GPIO_PuPd_UP
-		},
-	},
-	.tx = {
-		.gpio = GPIOA,
-		.init = {
-			.GPIO_Pin   = GPIO_Pin_9,
-			.GPIO_Speed = GPIO_Speed_2MHz,
-			.GPIO_Mode  = GPIO_Mode_AF,
-			.GPIO_OType = GPIO_OType_PP,
-			.GPIO_PuPd  = GPIO_PuPd_UP
-		},
-	},
-};
-
-#endif /* PIOS_COM_AUX */
-
-#ifdef PIOS_INCLUDE_COM_TELEM
-/*
- * Telemetry on main USART
- */
-static const struct pios_usart_cfg pios_usart_telem_main_cfg = {
-	.regs = USART6,
-	.remap = GPIO_AF_USART6,
-	.init = {
-		.USART_BaudRate = 57600,
-		.USART_WordLength = USART_WordLength_8b,
-		.USART_Parity = USART_Parity_No,
-		.USART_StopBits = USART_StopBits_1,
-		.USART_HardwareFlowControl =
-		USART_HardwareFlowControl_None,
-		.USART_Mode = USART_Mode_Rx | USART_Mode_Tx,
-	},
-	.irq = {
-		.init = {
-			.NVIC_IRQChannel = USART6_IRQn,
-			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
-			.NVIC_IRQChannelSubPriority = 0,
-			.NVIC_IRQChannelCmd = ENABLE,
-		},
-	},
-	.rx = {
-		.gpio = GPIOC,
-		.init = {
-			.GPIO_Pin   = GPIO_Pin_7,
-			.GPIO_Speed = GPIO_Speed_2MHz,
-			.GPIO_Mode  = GPIO_Mode_AF,
-			.GPIO_OType = GPIO_OType_PP,
-			.GPIO_PuPd  = GPIO_PuPd_UP
-		},
-	},
-	.tx = {
-		.gpio = GPIOC,
-		.init = {
-			.GPIO_Pin   = GPIO_Pin_6,
-			.GPIO_Speed = GPIO_Speed_2MHz,
-			.GPIO_Mode  = GPIO_Mode_AF,
-			.GPIO_OType = GPIO_OType_PP,
-			.GPIO_PuPd  = GPIO_PuPd_UP
-		},
-	},
-};
-
-#endif /* PIOS_COM_TELEM */
 
 
 #if defined(PIOS_INCLUDE_VIDEO)
@@ -275,11 +56,11 @@ static const struct pios_usart_cfg pios_usart_telem_main_cfg = {
 #include <pios_video.h>
 static const struct pios_exti_cfg pios_exti_hsync_cfg __exti_config = {
 	.vector = PIOS_Hsync_ISR,
-	.line = EXTI_Line0,
+	.line = EXTI_Line2,
 	.pin = {
 		.gpio = GPIOD,
 		.init = {
-			.GPIO_Pin = GPIO_Pin_0,
+			.GPIO_Pin = GPIO_Pin_2,
 			.GPIO_Speed = GPIO_Speed_100MHz,
 			.GPIO_Mode = GPIO_Mode_IN,
 			.GPIO_OType = GPIO_OType_OD,
@@ -288,7 +69,7 @@ static const struct pios_exti_cfg pios_exti_hsync_cfg __exti_config = {
 	},
 	.irq = {
 		.init = {
-			.NVIC_IRQChannel = EXTI0_IRQn,
+			.NVIC_IRQChannel = EXTI2_IRQn,
 			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGHEST,
 			.NVIC_IRQChannelSubPriority = 0,
 			.NVIC_IRQChannelCmd = ENABLE,
@@ -296,7 +77,7 @@ static const struct pios_exti_cfg pios_exti_hsync_cfg __exti_config = {
 	},
 	.exti = {
 		.init = {
-			.EXTI_Line = EXTI_Line0, // matches above GPIO pin
+			.EXTI_Line = EXTI_Line2, // matches above GPIO pin
 			.EXTI_Mode = EXTI_Mode_Interrupt,
 			.EXTI_Trigger = EXTI_Trigger_Rising_Falling,
 			.EXTI_LineCmd = ENABLE,
@@ -865,65 +646,6 @@ void init_USART_dma()
    DMA_Init(DMA1_Stream2, &DMA_InitStructure);
 
 }
-
-#if defined(PIOS_INCLUDE_USB)
-#include "pios_usb_priv.h"
-
-static const struct pios_usb_cfg pios_usb_main_cfg = {
-	.irq = {
-		.init    = {
-			.NVIC_IRQChannel                   = OTG_FS_IRQn,
-			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
-			.NVIC_IRQChannelSubPriority        = 3,
-			.NVIC_IRQChannelCmd                = ENABLE,
-		},
-	},
-	.vsense = {
-		.gpio = GPIOD,
-		.init = {
-			.GPIO_Pin   = GPIO_Pin_11,
-			.GPIO_Speed = GPIO_Speed_25MHz,
-			.GPIO_Mode  = GPIO_Mode_IN,
-			.GPIO_OType = GPIO_OType_OD,
-		},
-	}
-};
-
-#include "pios_usb_board_data_priv.h"
-#include "pios_usb_desc_hid_cdc_priv.h"
-#include "pios_usb_desc_hid_only_priv.h"
-#include "pios_usbhook.h"
-
-#endif	/* PIOS_INCLUDE_USB */
-
-#if defined(PIOS_INCLUDE_COM_MSG)
-
-#include <pios_com_msg_priv.h>
-
-#endif /* PIOS_INCLUDE_COM_MSG */
-
-#if defined(PIOS_INCLUDE_USB_HID)
-#include <pios_usb_hid_priv.h>
-
-const struct pios_usb_hid_cfg pios_usb_hid_cfg = {
-	.data_if = 0,
-	.data_rx_ep = 1,
-	.data_tx_ep = 1,
-};
-#endif /* PIOS_INCLUDE_USB_HID */
-
-#if defined(PIOS_INCLUDE_USB_CDC)
-#include <pios_usb_cdc_priv.h>
-
-const struct pios_usb_cdc_cfg pios_usb_cdc_cfg = {
-	.ctrl_if = 1,
-	.ctrl_tx_ep = 2,
-
-	.data_if = 2,
-	.data_rx_ep = 3,
-	.data_tx_ep = 3,
-};
-#endif	/* PIOS_INCLUDE_USB_CDC */
 
 #define PIOS_COM_TELEM_RF_RX_BUF_LEN 512
 #define PIOS_COM_TELEM_RF_TX_BUF_LEN 512

@@ -34,9 +34,9 @@
 static const struct pios_led pios_leds[] = {
 	[PIOS_LED_HEARTBEAT] = {
 		.pin = {
-			.gpio = GPIOD,
+			.gpio = GPIOC,
 			.init = {
-				.GPIO_Pin   = GPIO_Pin_13,
+				.GPIO_Pin   = GPIO_Pin_5,
 				.GPIO_Speed = GPIO_Speed_50MHz,
 				.GPIO_Mode  = GPIO_Mode_OUT,
 				.GPIO_OType = GPIO_OType_PP,
@@ -46,9 +46,9 @@ static const struct pios_led pios_leds[] = {
 	},
 	[PIOS_LED_ALARM] = {
 		.pin = {
-			.gpio = GPIOD,
+			.gpio = GPIOC,
 			.init = {
-				.GPIO_Pin   = GPIO_Pin_12,
+				.GPIO_Pin   = GPIO_Pin_4,
 				.GPIO_Speed = GPIO_Speed_50MHz,
 				.GPIO_Mode  = GPIO_Mode_OUT,
 				.GPIO_OType = GPIO_OType_PP,

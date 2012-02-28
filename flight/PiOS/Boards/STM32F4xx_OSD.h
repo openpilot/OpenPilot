@@ -134,6 +134,7 @@ TIM4  |                     STOPWATCH                    |
 #define PIOS_LED_HEARTBEAT	0
 #define PIOS_LED_ALARM		1
 
+#if 0
 #define PIOS_LED_LED1_GPIO_PORT					GPIOD
 #define PIOS_LED_LED1_GPIO_PIN					GPIO_Pin_13 //LD3
 #define PIOS_LED_LED1_GPIO_CLK					RCC_APB2Periph_GPIOD
@@ -150,7 +151,7 @@ TIM4  |                     STOPWATCH                    |
 #define PIOS_LED_PORTS                          { PIOS_LED_LED1_GPIO_PORT, PIOS_LED_LED2_GPIO_PORT, PIOS_LED_LED3_GPIO_PORT, PIOS_LED_LED4_GPIO_PORT }
 #define PIOS_LED_PINS                           { PIOS_LED_LED1_GPIO_PIN, PIOS_LED_LED2_GPIO_PIN, PIOS_LED_LED3_GPIO_PIN, PIOS_LED_LED4_GPIO_PIN }
 #define PIOS_LED_CLKS                           { PIOS_LED_LED1_GPIO_CLK, PIOS_LED_LED2_GPIO_CLK, PIOS_LED_LED3_GPIO_CLK, PIOS_LED_LED4_GPIO_CLK }
-
+#endif
 
 /*#define USB_LED_ON						PIOS_LED_On(LED1)
 #define USB_LED_OFF						PIOS_LED_Off(LED1)
@@ -251,6 +252,7 @@ extern uint32_t pios_com_telem_usb_id;
 {GPIOC, GPIO_Pin_1, ADC_Channel_11}, \
 {GPIOC, GPIO_Pin_2, ADC_Channel_12}, \
 {GPIOC, GPIO_Pin_3, ADC_Channel_13}, \
+{GPIOA, GPIO_Pin_7, ADC_Channel_7}, \
 {NULL, 0, ADC_Channel_Vrefint}, /* Voltage reference */\
 {NULL, 0, ADC_Channel_TempSensor} /* Temperature sensor */\
 }
@@ -258,9 +260,11 @@ extern uint32_t pios_com_telem_usb_id;
 /* we have to do all this to satisfy the PIOS_ADC_MAX_SAMPLES define in pios_adc.h */
 /* which is annoying because this then determines the rate at which we generate buffer turnover events */
 /* the objective here is to get enough buffer space to support 100Hz averaging rate */
-#define PIOS_ADC_NUM_CHANNELS 6
+#define PIOS_ADC_NUM_CHANNELS 7
 #define PIOS_ADC_MAX_OVERSAMPLING 10
 #define PIOS_ADC_USE_ADC2 0
+
+#if 0
 
 // *****************************************************************
 // GPIO output pins
@@ -410,6 +414,8 @@ extern uint32_t pios_com_telem_usb_id;
 #define RF_INT_PIN				5
 #define RF_MISC_PIN				6
 
+#endif
+
 // *****************************************************************
 // USB
 
@@ -424,6 +430,7 @@ extern uint32_t pios_com_telem_usb_id;
 #endif
 
 
+#if 0
 // *****************************************************************
 // VIDEO
 #define PIOS_VIDEO_HSYNC_GPIO_PORT		GPIOD
@@ -448,7 +455,7 @@ extern uint32_t pios_com_telem_usb_id;
 #define PIOS_VIDEO_VSYNC_EXTI_PIN_SOURCE		EXTI_PinSource11
 #define PIOS_VIDEO_VSYNC_IRQn			EXTI15_10_IRQn
 #define PIOS_VIDEO_VSYNC_PRIO			PIOS_IRQ_PRIO_HIGHEST
-
+#endif
 
 // *****************************************************************
 //--------------------------

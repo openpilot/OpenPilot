@@ -84,6 +84,7 @@ OPUAVOBJINC = $(OPUAVOBJ)/inc
 OPSYSINC = $(OPDIR)/System/inc
 BOOT = ../Bootloaders/AHRS
 BOOTINC = $(BOOT)/inc
+HWDEFSINC = ../board_hw_defs/$(BOARD_NAME)
 
 OPUAVSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
 
@@ -243,6 +244,7 @@ EXTRAINCDIRS  += $(RTOSSRCDIR)/portable/GCC/ARM_CM3
 EXTRAINCDIRS  += $(AHRSINC)
 EXTRAINCDIRS  += $(OPUAVSYNTHDIR)
 EXTRAINCDIRS  += $(BOOTINC)
+EXTRAINCDIRS  += $(HWDEFSINC)
 
 EXTRAINCDIRS += ${foreach MOD, ${MODULES}, ${OPMODULEDIR}/${MOD}/inc} ${OPMODULEDIR}/System/inc
 

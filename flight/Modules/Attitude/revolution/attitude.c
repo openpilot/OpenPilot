@@ -409,6 +409,7 @@ static int32_t updateAttitudeINSGPS(bool first_run)
 	BaroAltitudeData baroData;
 	GPSPositionData gpsData;
 	GyrosBiasData gyrosBias;
+	HomeLocationData home;
 
 	static bool mag_updated;
 	static bool baro_updated;
@@ -451,6 +452,7 @@ static int32_t updateAttitudeINSGPS(bool first_run)
 	MagnetometerGet(&magData);
 	BaroAltitudeGet(&baroData);
 	GPSPositionGet(&gpsData);
+	HomeLocationGet(&home);
 
 	// Have a minimum requirement for gps usage
 	gps_updated &= (gpsData.Satellites >= 7) && (gpsData.PDOP >= 3.0f);
@@ -473,7 +475,8 @@ static int32_t updateAttitudeINSGPS(bool first_run)
 
 			// Reset the INS algorithm
 			INSGPSInit();
-			var[0] = var[1] = var[2] = 5e-3f;
+			var[0] = var[1] = 1e-4f;
+			var[2] = 1e-1f;
 			INSSetMagVar(var);
 			var[0] = var[1] = var[2] = 1.5e-5f;
 			INSSetAccelVar(var);
@@ -486,6 +489,10 @@ static int32_t updateAttitudeINSGPS(bool first_run)
 			rpy[1] = atan2f(accelsData.y, accelsData.z) * 180.0f / F_PI;
 			rpy[2] = atan2f(magData.x, -magData.y) * 180.0f / F_PI;
 			RPY2Quaternion(rpy,q);
+			/*float Rbe[3][3];
+			float ge[3] = {0,0,-9.81f};
+			RotFrom2Vectors(&accelsData.x, ge, &magData.x, home.Be, Rbe);
+			R2Quaternion(Rbe,q);*/
 
 			INSSetState(pos, zeros, q, zeros, zeros);
 			INSResetP(Pdiag);
@@ -504,8 +511,6 @@ static int32_t updateAttitudeINSGPS(bool first_run)
 			var[0] = var[1] = var[2] = 2.0e-4f;
 			INSSetGyroVar(var);
 
-			HomeLocationData home;
-			HomeLocationGet(&home);
 			INSSetMagNorth(home.Be);
 
 			GPSPositionData gpsPosition;
@@ -539,7 +544,7 @@ static int32_t updateAttitudeINSGPS(bool first_run)
 		}
 
 		init_stage++;
-		if(init_stage > 500)
+		if(init_stage > 10)
 			inited = true;
 
 		ins_last_time = PIOS_DELAY_GetRaw();	
@@ -588,15 +593,12 @@ static int32_t updateAttitudeINSGPS(bool first_run)
 	// Advance the covariance estimate
 	INSCovariancePrediction(dT);
 
-	//if(mag_updated)
-	//	sensors |= MAG_SENSORS;
+	if(mag_updated)
+		sensors |= MAG_SENSORS;
 
 	if(baro_updated)
 		sensors |= BARO_SENSOR;
 
-	HomeLocationData home;
-	HomeLocationGet(&home);
-	
 	INSSetMagNorth(home.Be);
 
 	if(gps_updated && outdoor_mode)
@@ -620,12 +622,11 @@ static int32_t updateAttitudeINSGPS(bool first_run)
 			(float) (home.ECEF[2] / 100.0f)};
 		LLA2Base(LLA, ECEF, (float (*)[3]) home.RNE, NED);
 	} else if (!outdoor_mode) {
-		//INSSetPosVelVar(0.1f, 0.1f);
+		INSSetPosVelVar(1e-2f, 1e-2f);
 		vel[0] = vel[1] = vel[2] = 0;
 		NED[0] = NED[1] = 0;
 		NED[2] = baroData.Altitude;
-		sensors |= HORIZ_POS_SENSORS;
-		//sensors |= HORIZ_SENSORS | VERT_SENSORS | POS_SENSORS;
+		sensors |= HORIZ_SENSORS | HORIZ_POS_SENSORS;
 	}
 
 	/*

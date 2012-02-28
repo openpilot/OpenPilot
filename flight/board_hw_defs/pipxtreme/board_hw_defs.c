@@ -1,5 +1,58 @@
 #include <pios_config.h>
 
+#if defined(PIOS_INCLUDE_LED)
+
+#include <pios_led_priv.h>
+static const struct pios_led pios_leds[] = {
+	[PIOS_LED_USB] = {
+		.pin = {
+			.gpio = GPIOA,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_3,
+				.GPIO_Mode  = GPIO_Mode_Out_PP,
+				.GPIO_Speed = GPIO_Speed_50MHz,
+			},
+		},
+	},
+	[PIOS_LED_LINK] = {
+		.pin = {
+			.gpio = GPIOB,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_5,
+				.GPIO_Mode  = GPIO_Mode_Out_PP,
+				.GPIO_Speed = GPIO_Speed_50MHz,
+			},
+		},
+	},
+	[PIOS_LED_RX] = {
+		.pin = {
+			.gpio = GPIOB,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_6,
+				.GPIO_Mode  = GPIO_Mode_Out_PP,
+				.GPIO_Speed = GPIO_Speed_50MHz,
+			},
+		},
+	},
+	[PIOS_LED_TX] = {
+		.pin = {
+			.gpio = GPIOB,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_7,
+				.GPIO_Mode  = GPIO_Mode_Out_PP,
+				.GPIO_Speed = GPIO_Speed_50MHz,
+			},
+		},
+	},
+};
+
+static const struct pios_led_cfg pios_led_cfg = {
+	.leds     = pios_leds,
+	.num_leds = NELEMENTS(pios_leds),
+};
+
+#endif	/* PIOS_INCLUDE_LED */
+
 #if defined(PIOS_INCLUDE_SPI)
 
 #include <pios_spi_priv.h>

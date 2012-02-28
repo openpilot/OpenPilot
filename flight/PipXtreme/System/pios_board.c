@@ -35,6 +35,250 @@
 #include <manualcontrolsettings.h>
 #include <gcsreceiver.h>
 
+#if defined(PIOS_INCLUDE_LED)
+
+#include <pios_led_priv.h>
+static const struct pios_led pios_leds[] = {
+	[PIOS_LED_USB] = {
+		.pin = {
+			//.gpio = GPIOA,
+			.gpio = GPIOC,
+			.init = {
+				//.GPIO_Pin   = GPIO_Pin_3,
+				.GPIO_Pin   = GPIO_Pin_13,
+				.GPIO_Mode  = GPIO_Mode_Out_PP,
+				.GPIO_Speed = GPIO_Speed_50MHz,
+			},
+		},
+	},
+	[PIOS_LED_LINK] = {
+		.pin = {
+			.gpio = GPIOB,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_5,
+				.GPIO_Mode  = GPIO_Mode_Out_PP,
+				.GPIO_Speed = GPIO_Speed_50MHz,
+			},
+		},
+	},
+	[PIOS_LED_RX] = {
+		.pin = {
+			.gpio = GPIOB,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_6,
+				.GPIO_Mode  = GPIO_Mode_Out_PP,
+				.GPIO_Speed = GPIO_Speed_50MHz,
+			},
+		},
+	},
+	[PIOS_LED_TX] = {
+		.pin = {
+			.gpio = GPIOB,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_7,
+				.GPIO_Mode  = GPIO_Mode_Out_PP,
+				.GPIO_Speed = GPIO_Speed_50MHz,
+			},
+		},
+	},
+};
+
+static const struct pios_led_cfg pios_led_cfg = {
+	.leds     = pios_leds,
+	.num_leds = NELEMENTS(pios_leds),
+};
+
+#endif	/* PIOS_INCLUDE_LED */
+
+#if defined(PIOS_INCLUDE_SPI)
+
+#include <pios_spi_priv.h>
+
+/* OP Interface
+ *
+ * NOTE: Leave this declared as const data so that it ends up in the
+ * .rodata section (ie. Flash) rather than in the .bss section (RAM).
+ */
+void PIOS_SPI_port_irq_handler(void);
+void DMA1_Channel5_IRQHandler() __attribute__ ((alias ("PIOS_SPI_port_irq_handler")));
+void DMA1_Channel4_IRQHandler() __attribute__ ((alias ("PIOS_SPI_port_irq_handler")));
+
+static const struct pios_spi_cfg pios_spi_port_cfg =
+{
+	.regs = SPI1,
+
+	.init =
+	{
+		.SPI_Mode = SPI_Mode_Master,
+		.SPI_Direction = SPI_Direction_2Lines_FullDuplex,
+		.SPI_DataSize = SPI_DataSize_8b,
+		.SPI_NSS = SPI_NSS_Soft,
+		.SPI_FirstBit = SPI_FirstBit_MSB,
+		.SPI_CRCPolynomial = 0,
+		.SPI_CPOL = SPI_CPOL_Low,
+		.SPI_CPHA = SPI_CPHA_1Edge,
+		.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_256,		// slowest SCLK
+	},
+	.use_crc = FALSE,
+
+	.dma =
+	{
+		.ahb_clk = RCC_AHBPeriph_DMA1,
+		.irq =
+		{
+		      .flags   = (DMA1_FLAG_TC2 | DMA1_FLAG_TE2 | DMA1_FLAG_HT2 | DMA1_FLAG_GL2),
+		      .init    = {
+			.NVIC_IRQChannel                   = DMA1_Channel2_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+			.NVIC_IRQChannelSubPriority        = 0,
+			.NVIC_IRQChannelCmd                = ENABLE,
+		      },
+		    },
+
+		    .rx = {
+		      .channel = DMA1_Channel2,
+		      .init    = {
+			.DMA_PeripheralBaseAddr = (uint32_t)&(SPI1->DR),
+			.DMA_DIR                = DMA_DIR_PeripheralSRC,
+			.DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
+			.DMA_MemoryInc          = DMA_MemoryInc_Enable,
+			.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte,
+			.DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte,
+			.DMA_Mode               = DMA_Mode_Normal,
+			.DMA_Priority           = DMA_Priority_Medium,
+			.DMA_M2M                = DMA_M2M_Disable,
+		      },
+		    },
+		    .tx = {
+		      .channel = DMA1_Channel3,
+		      .init    = {
+			.DMA_PeripheralBaseAddr = (uint32_t)&(SPI1->DR),
+			.DMA_DIR                = DMA_DIR_PeripheralDST,
+			.DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
+			.DMA_MemoryInc          = DMA_MemoryInc_Enable,
+			.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte,
+			.DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte,
+			.DMA_Mode               = DMA_Mode_Normal,
+			.DMA_Priority           = DMA_Priority_Medium,
+			.DMA_M2M                = DMA_M2M_Disable,
+		      },
+		    },
+	},
+
+	.ssel =
+	{
+		.gpio = GPIOA,
+		.init =
+		{
+			.GPIO_Pin = GPIO_Pin_4,
+			.GPIO_Speed = GPIO_Speed_10MHz,
+			.GPIO_Mode = GPIO_Mode_Out_PP,
+		},
+	},
+	.sclk =
+	{
+		.gpio = GPIOA,
+		.init =
+		{
+			.GPIO_Pin = GPIO_Pin_5,
+			.GPIO_Speed = GPIO_Speed_10MHz,
+			.GPIO_Mode = GPIO_Mode_AF_PP,
+		},
+	},
+	.miso =
+	{
+		.gpio = GPIOA,
+		.init =
+		{
+			.GPIO_Pin = GPIO_Pin_6,
+			.GPIO_Speed = GPIO_Speed_10MHz,
+			.GPIO_Mode  = GPIO_Mode_IN_FLOATING,
+		},
+	},
+	.mosi =
+	{
+		.gpio = GPIOA,
+		.init =
+		{
+			.GPIO_Pin = GPIO_Pin_7,
+			.GPIO_Speed = GPIO_Speed_10MHz,
+			.GPIO_Mode = GPIO_Mode_AF_PP,
+		},
+	},
+};
+
+uint32_t pios_spi_port_id;
+void PIOS_SPI_port_irq_handler(void)
+{
+	/* Call into the generic code to handle the IRQ for this specific device */
+	PIOS_SPI_IRQ_Handler(pios_spi_port_id);
+}
+
+#endif /* PIOS_INCLUDE_SPI */
+
+#if defined(PIOS_INCLUDE_ADC)
+
+/*
+ * ADC system
+ */
+#include "pios_adc_priv.h"
+extern void PIOS_ADC_handler(void);
+void DMA1_Channel1_IRQHandler() __attribute__ ((alias("PIOS_ADC_handler")));
+// Remap the ADC DMA handler to this one
+static const struct pios_adc_cfg pios_adc_cfg = {
+	.dma = {
+		.ahb_clk  = RCC_AHBPeriph_DMA1,
+		.irq = {
+			.flags   = (DMA1_FLAG_TC1 | DMA1_FLAG_TE1 | DMA1_FLAG_HT1 | DMA1_FLAG_GL1),
+			.init    = {
+				.NVIC_IRQChannel                   = DMA1_Channel1_IRQn,
+				.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+				.NVIC_IRQChannelSubPriority        = 0,
+				.NVIC_IRQChannelCmd                = ENABLE,
+			},
+		},
+		.rx = {
+			.channel = DMA1_Channel1,
+			.init    = {
+				.DMA_PeripheralBaseAddr = (uint32_t) & ADC1->DR,
+				.DMA_DIR                = DMA_DIR_PeripheralSRC,
+				.DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
+				.DMA_MemoryInc          = DMA_MemoryInc_Enable,
+				.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Word,
+				.DMA_MemoryDataSize     = DMA_MemoryDataSize_Word,
+				.DMA_Mode               = DMA_Mode_Circular,
+				.DMA_Priority           = DMA_Priority_High,
+				.DMA_M2M                = DMA_M2M_Disable,
+			},
+		}
+	}, 
+	.half_flag = DMA1_IT_HT1,
+	.full_flag = DMA1_IT_TC1,
+};
+
+struct pios_adc_dev pios_adc_devs[] = {
+	{
+		.cfg = &pios_adc_cfg,
+		.callback_function = NULL,
+	},
+};
+
+uint8_t pios_adc_num_devices = NELEMENTS(pios_adc_devs);
+
+void PIOS_ADC_handler() {
+	PIOS_ADC_DMA_Handler();
+}
+
+#endif	/* PIOS_INCLUDE_ADC */
+
+#if defined(PIOS_INCLUDE_COM)
+
+#include "pios_com_priv.h"
+
+#endif	/* PIOS_INCLUDE_COM */
+
+#if defined(PIOS_INCLUDE_USART)
+
 #include "pios_usart_priv.h"
 
 /*
@@ -148,15 +392,16 @@ static const struct pios_usart_cfg pios_usart_telem_flexi_cfg = {
   },
 };
 
-#include "pios_com_priv.h"
+#endif  /* PIOS_INCLUDE_USART */
 
 #define PIOS_COM_TELEM_RF_RX_BUF_LEN 192
 #define PIOS_COM_TELEM_RF_TX_BUF_LEN 192
 
-#define PIOS_COM_GPS_RX_BUF_LEN 96
-
 #define PIOS_COM_TELEM_USB_RX_BUF_LEN 192
 #define PIOS_COM_TELEM_USB_TX_BUF_LEN 192
+
+#define PIOS_COM_VCP_USB_RX_BUF_LEN 192
+#define PIOS_COM_VCP_USB_TX_BUF_LEN 192
 
 #if defined(PIOS_INCLUDE_RTC)
 /*
@@ -362,9 +607,60 @@ const struct pios_ppm_cfg pios_ppm_cfg = {
  */
 uint32_t pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE];
 
+uint32_t pios_com_telem_usb_id;
+uint32_t pios_com_vcp_usb_id;
 uint32_t pios_com_usart1_id;
 uint32_t pios_com_usart2_id;
 uint32_t pios_com_usart3_id;
+
+#if defined(PIOS_INCLUDE_USB)
+#include "pios_usb_priv.h"
+
+static const struct pios_usb_cfg pios_usb_main_cfg = {
+  .irq = {
+    .init    = {
+      .NVIC_IRQChannel                   = USB_LP_CAN1_RX0_IRQn,
+      .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
+      .NVIC_IRQChannelSubPriority        = 0,
+      .NVIC_IRQChannelCmd                = ENABLE,
+    },
+  },
+};
+
+#include "pios_usb_board_data_priv.h"
+#include "pios_usb_desc_hid_cdc_priv.h"
+#include "pios_usb_desc_hid_only_priv.h"
+
+#endif	/* PIOS_INCLUDE_USB */
+
+#if defined(PIOS_INCLUDE_COM_MSG)
+
+#include <pios_com_msg_priv.h>
+
+#endif /* PIOS_INCLUDE_COM_MSG */
+
+#if defined(PIOS_INCLUDE_USB_HID)
+#include <pios_usb_hid_priv.h>
+
+const struct pios_usb_hid_cfg pios_usb_hid_cfg = {
+	.data_if = 0,
+	.data_rx_ep = 1,
+	.data_tx_ep = 1,
+};
+#endif /* PIOS_INCLUDE_USB_HID */
+
+#if defined(PIOS_INCLUDE_USB_CDC)
+#include <pios_usb_cdc_priv.h>
+
+const struct pios_usb_cdc_cfg pios_usb_cdc_cfg = {
+	.ctrl_if = 1,
+	.ctrl_tx_ep = 2,
+
+	.data_if = 2,
+	.data_rx_ep = 3,
+	.data_tx_ep = 3,
+};
+#endif	/* PIOS_INCLUDE_USB_CDC */
 
 /**
  * PIOS_Board_Init()
@@ -375,6 +671,11 @@ void PIOS_Board_Init(void) {
 
 	/* Delay system */
 	PIOS_DELAY_Init();
+
+	/* Set up the SPI interface to the serial flash */
+	if (PIOS_SPI_Init(&pios_spi_port_id, &pios_spi_port_cfg)) {
+		PIOS_Assert(0);
+	}
 
 	/* Initialize UAVObject libraries */
 	EventDispatcherInitialize();
@@ -398,6 +699,10 @@ void PIOS_Board_Init(void) {
 	PIOS_RTC_Init(&pios_rtc_main_cfg);
 #endif
 
+#if defined(PIOS_INCLUDE_LED)
+	PIOS_LED_Init(&pios_led_cfg);
+#endif	/* PIOS_INCLUDE_LED */
+
 	/* Initialize the task monitor library */
 	TaskMonitorInitialize();
 
@@ -406,6 +711,70 @@ void PIOS_Board_Init(void) {
 	PIOS_TIM_InitClock(&tim_2_cfg);
 	PIOS_TIM_InitClock(&tim_3_cfg);
 	PIOS_TIM_InitClock(&tim_4_cfg);
+
+#if defined(PIOS_INCLUDE_USB)
+	/* Initialize board specific USB data */
+	PIOS_USB_BOARD_DATA_Init();
+
+#if defined(PIOS_INCLUDE_USB_CDC)
+	if (PIOS_USB_DESC_HID_CDC_Init()) {
+		PIOS_Assert(0);
+	}
+#else
+	if (PIOS_USB_DESC_HID_ONLY_Init()) {
+		PIOS_Assert(0);
+	}
+#endif
+
+	uint32_t pios_usb_id;
+	PIOS_USB_Init(&pios_usb_id, &pios_usb_main_cfg);
+
+#if defined(PIOS_INCLUDE_USB_CDC)
+
+#if defined(PIOS_INCLUDE_COM)
+	{
+		uint32_t pios_usb_cdc_id;
+		if (PIOS_USB_CDC_Init(&pios_usb_cdc_id, &pios_usb_cdc_cfg, pios_usb_id)) {
+			PIOS_Assert(0);
+		}
+		uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_VCP_USB_RX_BUF_LEN);
+		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_VCP_USB_TX_BUF_LEN);
+		PIOS_Assert(rx_buffer);
+		PIOS_Assert(tx_buffer);
+		if (PIOS_COM_Init(&pios_com_vcp_usb_id, &pios_usb_cdc_com_driver, pios_usb_cdc_id,
+											rx_buffer, PIOS_COM_VCP_USB_RX_BUF_LEN,
+											tx_buffer, PIOS_COM_VCP_USB_TX_BUF_LEN)) {
+			PIOS_Assert(0);
+		}
+	}
+#endif	/* PIOS_INCLUDE_COM */
+
+#endif	/* PIOS_INCLUDE_USB_CDC */
+
+#if defined(PIOS_INCLUDE_USB_HID)
+
+	/* Configure the usb HID port */
+#if defined(PIOS_INCLUDE_COM)
+	{
+		uint32_t pios_usb_hid_id;
+		if (PIOS_USB_HID_Init(&pios_usb_hid_id, &pios_usb_hid_cfg, pios_usb_id)) {
+			PIOS_Assert(0);
+		}
+		uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_USB_RX_BUF_LEN);
+		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_USB_TX_BUF_LEN);
+		PIOS_Assert(rx_buffer);
+		PIOS_Assert(tx_buffer);
+		if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_hid_com_driver, pios_usb_hid_id,
+											rx_buffer, PIOS_COM_TELEM_USB_RX_BUF_LEN,
+											tx_buffer, PIOS_COM_TELEM_USB_TX_BUF_LEN)) {
+			PIOS_Assert(0);
+		}
+	}
+#endif	/* PIOS_INCLUDE_COM */
+
+#endif	/* PIOS_INCLUDE_USB_HID */
+
+#endif	/* PIOS_INCLUDE_USB */
 
 #ifdef TRANSMITTER_BOX
 	/* Configure the rcvr port */
@@ -473,9 +842,9 @@ void PIOS_Board_Init(void) {
 			PIOS_Assert(0);
 		}
 	}
+	PIOS_COM_SendString(PIOS_COM_TELEM_SERIAL, "Hello Telem\n\r");
 	PIOS_COM_SendString(PIOS_COM_DEBUG, "Hello Debug\n\r");
-	PIOS_COM_SendString(PIOS_COM_TELEM_GCS, "Hello GCS\n\r");
-	PIOS_COM_SendString(PIOS_COM_TELEM_OUT, "Hello CC\n\r");
+	PIOS_COM_SendString(PIOS_COM_FLEXI, "Hello Flexi\n\r");
 
 	/* Remap AFIO pin */
 	GPIO_PinRemapConfig( GPIO_Remap_SWJ_NoJTRST, ENABLE);

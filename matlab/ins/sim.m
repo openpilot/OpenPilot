@@ -74,7 +74,7 @@ for i = 1:length(Gyros.timestamp)-1000
     accel_idx = accel_idx - 1 + find(Accels.timestamp(accel_idx:end) >= t,1,'first');
     accel = [Accels.x(accel_idx) Accels.y(accel_idx) Accels.z(accel_idx)-0.4];
 
-    dT = 0.0015;
+    dT = 0.0013;
     [a(:,i) b K] = insgps_ml('INSStatePrediction',gyro,accel,dT);
 
     if Magnetometer.timestamp(mag_idx) <= t
@@ -140,7 +140,7 @@ for i = 1:length(Gyros.timestamp)-1000
                 insgps_ml('INSVelBaroCorrection',vel,baro);
                 update_baro = false;
             elseif update_pos
-                %insgps_ml('
+                insgps_ml('INSGpsCorrection',[0 0 baro],[0 0 0]);
                 update_pos = false;
             end
         else % outdoor

@@ -403,6 +403,9 @@ static const struct pios_usart_cfg pios_usart_telem_flexi_cfg = {
 #define PIOS_COM_VCP_USB_RX_BUF_LEN 192
 #define PIOS_COM_VCP_USB_TX_BUF_LEN 192
 
+#define PIOS_COM_RFM22B_RF_RX_BUF_LEN 192
+#define PIOS_COM_RFM22B_RF_TX_BUF_LEN 192
+
 #if defined(PIOS_INCLUDE_RTC)
 /*
  * Realtime Clock (RTC)
@@ -612,6 +615,7 @@ uint32_t pios_com_vcp_usb_id;
 uint32_t pios_com_usart1_id;
 uint32_t pios_com_usart2_id;
 uint32_t pios_com_usart3_id;
+uint32_t pios_com_rfm22b_id;
 
 #if defined(PIOS_INCLUDE_USB)
 #include "pios_usb_priv.h"
@@ -661,6 +665,14 @@ const struct pios_usb_cdc_cfg pios_usb_cdc_cfg = {
 	.data_tx_ep = 3,
 };
 #endif	/* PIOS_INCLUDE_USB_CDC */
+
+#if defined(PIOS_INCLUDE_RFM22B)
+#include <pios_rfm22b_priv.h>
+
+const struct pios_rfm22b_cfg pios_rfm22b_cfg = {
+	.send_timeout = 15, /* ms */
+};
+#endif /* PIOS_INCLUDE_RFM22B */
 
 /**
  * PIOS_Board_Init()
@@ -842,9 +854,28 @@ void PIOS_Board_Init(void) {
 			PIOS_Assert(0);
 		}
 	}
+#if defined(PIOS_INCLUDE_RFM22B)
+	/* Initalize the RFM22B radio COM device. */
+	{
+		uint32_t pios_rfm22b_id;
+		if (PIOS_RFM22B_Init(&pios_rfm22b_id, &pios_rfm22b_cfg)) {
+			PIOS_Assert(0);
+		}
+		uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_RFM22B_RF_RX_BUF_LEN);
+		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_RFM22B_RF_TX_BUF_LEN);
+		PIOS_Assert(rx_buffer);
+		PIOS_Assert(tx_buffer);
+		if (PIOS_COM_Init(&pios_com_rfm22b_id, &pios_rfm22b_com_driver, pios_rfm22b_id,
+											rx_buffer, PIOS_COM_RFM22B_RF_RX_BUF_LEN,
+											tx_buffer, PIOS_COM_RFM22B_RF_TX_BUF_LEN)) {
+			PIOS_Assert(0);
+		}
+	}
+#endif /* PIOS_INCLUDE_RFM22B */
 	PIOS_COM_SendString(PIOS_COM_TELEM_SERIAL, "Hello Telem\n\r");
 	PIOS_COM_SendString(PIOS_COM_DEBUG, "Hello Debug\n\r");
 	PIOS_COM_SendString(PIOS_COM_FLEXI, "Hello Flexi\n\r");
+	PIOS_COM_SendString(PIOS_COM_RFM22B_RF, "Hello RMF22B\n\r");
 
 	/* Remap AFIO pin */
 	GPIO_PinRemapConfig( GPIO_Remap_SWJ_NoJTRST, ENABLE);

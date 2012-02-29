@@ -34,13 +34,12 @@
 #define PIOS_CONFIG_H
 
 /* Enable/Disable PiOS Modules */
-//#define PIOS_INCLUDE_ADC
 #define PIOS_INCLUDE_DELAY
-//#define PIOS_INCLUDE_I2C
+#define PIOS_INCLUDE_I2C
 #define PIOS_INCLUDE_IRQ
 #define PIOS_INCLUDE_LED
 #define PIOS_INCLUDE_IAP
-
+#define PIOS_INCLUDE_RFM22B
 #define PIOS_INCLUDE_RCVR
 
 /* Supported receiver interfaces */
@@ -68,10 +67,6 @@
 #define PIOS_INCLUDE_RTC
 //#define PIOS_INCLUDE_WDG
 #define PIOS_INCLUDE_BL_HELPER
-
-#define PIOS_INCLUDE_FLASH
-
-#define PIOS_UAVTALK_DEBUG
 
 /* A really shitty setting saving implementation */
 //#define PIOS_INCLUDE_FLASH_SECTOR_SETTINGS

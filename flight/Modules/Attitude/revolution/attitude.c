@@ -86,6 +86,7 @@ static xQueueHandle gpsQueue;
 
 static AttitudeSettingsData attitudeSettings;
 static RevoSettingsData revoSettings;
+static HomeLocationData homeLocation;
 const uint32_t SENSOR_QUEUE_SIZE = 10;
 
 // Private functions
@@ -94,6 +95,8 @@ static void AttitudeTask(void *parameters);
 static int32_t updateAttitudeComplimentary(bool first_run);
 static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode);
 static void settingsUpdatedCb(UAVObjEvent * objEv);
+
+static int32_t getNED(GPSPositionData * gpsPosition, float * NED);
 
 /**
  * API for sensor fusion algorithms:
@@ -138,7 +141,8 @@ int32_t AttitudeInitialize(void)
 	
 	AttitudeSettingsConnectCallback(&settingsUpdatedCb);
 	RevoSettingsConnectCallback(&settingsUpdatedCb);
-	
+	HomeLocationConnectCallback(&settingsUpdatedCb);
+
 	return 0;
 }
 
@@ -627,15 +631,8 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 		vel[1] = gpsPosition.Groundspeed * sinf(gpsPosition.Heading * F_PI / 180.0f);
 		vel[2] = 0;
 
-		// convert from cm back to meters
-		float LLA[3] = {(float) gpsPosition.Latitude / 1e7f,
-			(float) gpsPosition.Longitude / 1e7f,
-			(float) (gpsPosition.GeoidSeparation + gpsPosition.Altitude)};
-		// put in local NED frame
-		float ECEF[3] = {(float) (home.ECEF[0] / 100.0f),
-			(float) (home.ECEF[1] / 100.0f),
-			(float) (home.ECEF[2] / 100.0f)};
-		LLA2Base(LLA, ECEF, (float (*)[3]) home.RNE, NED);
+		// Transform the GPS position into NED coordinates
+		getNED(&gpsPosition, NED);
 
 		// Store this for inspecting offline
 		NEDPositionData nedPos;
@@ -683,10 +680,35 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	return 0;
 }
 
+/**
+ * @brief Convert the GPS LLA position into NED coordinates
+ * @note this method uses a taylor expansion around the home coordinates
+ * to convert to NED which allows it to be done with all floating
+ * calculations
+ * @param[in] Current GPS coordinates
+ * @param[out] NED frame coordinates
+ * @returns 0 for success, -1 for failure
+ */
+float T[3];
+const float DEG2RAD = 3.141592653589793f / 180.0f;
+static int32_t getNED(GPSPositionData * gpsPosition, float * NED)
+{
+	float dL[3] = {(gpsPosition->Latitude - homeLocation.Latitude) / 10.0e6 * DEG2RAD,
+		(gpsPosition->Longitude - homeLocation.Longitude) / 10.0e6 * DEG2RAD,
+		(gpsPosition->Altitude - homeLocation.Altitude)};
+
+	NED[0] = T[0] * dL[0];
+	NED[1] = T[1] * dL[1];
+	NED[2] = T[2] * dL[2];
+}
+
 static void settingsUpdatedCb(UAVObjEvent * objEv) 
 {
+	float lat, lon, alt;
+
 	AttitudeSettingsGet(&attitudeSettings);
 	RevoSettingsGet(&revoSettings);
+	HomeLocationGet(&homeLocation);
 
 	GyrosBiasData gyrosBias;
 	GyrosBiasGet(&gyrosBias);
@@ -694,6 +716,15 @@ static void settingsUpdatedCb(UAVObjEvent * objEv)
 	gyrosBias.y = attitudeSettings.GyroBias[ATTITUDESETTINGS_GYROBIAS_Y] / 100.0f;
 	gyrosBias.z = attitudeSettings.GyroBias[ATTITUDESETTINGS_GYROBIAS_Z] / 100.0f;
 	GyrosBiasSet(&gyrosBias);
+
+	// Compute matrix to convert deltaLLA to NED
+	lat = homeLocation.Latitude / 10.0e6f * DEG2RAD;
+	lon = homeLocation.Longitude / 10.0e6 * DEG2RAD;
+	alt = homeLocation.Altitude;
+
+	T[0] = alt+6.378137E6f;
+	T[1] = cosf(lat)*(alt+6.378137E6f);
+	T[2] = -1.0f;
 }
 /**
  * @}

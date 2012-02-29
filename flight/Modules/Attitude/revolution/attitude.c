@@ -118,6 +118,7 @@ int32_t AttitudeInitialize(void)
 	NEDPositionInitialize();
 	PositionActualInitialize();
 	VelocityActualInitialize();
+	RevoSettingsInitialize();
 	
 	// Initialize this here while we aren't setting the homelocation in GPS
 	HomeLocationInitialize();

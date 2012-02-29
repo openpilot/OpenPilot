@@ -45,13 +45,13 @@
 
 #include "openpilot.h"
 #include "guidance.h"
-#include "guidancesettings.h"
-#include "attituderaw.h"
+#include "accels.h"
 #include "attitudeactual.h"
 #include "positiondesired.h"	// object that will be updated by the module
 #include "positionactual.h"
 #include "manualcontrol.h"
 #include "flightstatus.h"
+#include "guidancesettings.h"
 #include "nedaccel.h"
 #include "stabilizationdesired.h"
 #include "stabilizationsettings.h"
@@ -61,7 +61,7 @@
 #include "CoordinateConversions.h"
 
 // Private constants
-#define MAX_QUEUE_SIZE 1
+#define MAX_QUEUE_SIZE 4
 #define STACK_SIZE_BYTES 1024
 #define TASK_PRIORITY (tskIDLE_PRIORITY+2)
 // Private types
@@ -97,7 +97,6 @@ int32_t GuidanceStart()
  */
 int32_t GuidanceInitialize()
 {
-
 	GuidanceSettingsInitialize();
 	PositionDesiredInitialize();
 	NedAccelInitialize();
@@ -107,7 +106,7 @@ int32_t GuidanceInitialize()
 	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
 	
 	// Listen for updates.
-	AttitudeRawConnectQueue(queue);
+	AccelsConnectQueue(queue);
 	
 	return 0;
 }
@@ -155,15 +154,15 @@ static void guidanceTask(void *parameters)
 		} else {
 			AlarmsClear(SYSTEMALARMS_ALARM_GUIDANCE);
 		}
-				
+
 		// Collect downsampled attitude data
-		AttitudeRawData attitudeRaw;
-		AttitudeRawGet(&attitudeRaw);		
-		accel[0] += attitudeRaw.accels[0];
-		accel[1] += attitudeRaw.accels[1];
-		accel[2] += attitudeRaw.accels[2];
+		AccelsData accels;
+		AccelsGet(&accels);		
+		accel[0] += accels.x;
+		accel[1] += accels.y;
+		accel[2] += accels.z;
 		accel_accum++;
-		
+
 		// Continue collecting data if not enough time
 		thisTime = xTaskGetTickCount();
 		if( (thisTime - lastUpdateTime) < (guidanceSettings.UpdatePeriod / portTICK_RATE_MS) )
@@ -173,6 +172,8 @@ static void guidanceTask(void *parameters)
 		accel[0] /= accel_accum;
 		accel[1] /= accel_accum;
 		accel[2] /= accel_accum;
+		accel[0] = accel[1] = accel[2] = 0;
+		accel_accum = 0;
 		
 		//rotate avg accels into earth frame and store it
 		AttitudeActualData attitudeActual;
@@ -187,45 +188,30 @@ static void guidanceTask(void *parameters)
 			for (uint8_t j=0; j<3; j++)
 				accel_ned[i] += Rbe[j][i]*accel[j];
 		}
-		accel_ned[2] += 9.81;
+		accel_ned[2] += 9.81f;
 		
 		NedAccelData accelData;
 		NedAccelGet(&accelData);
-		// Convert from m/s to cm/s
 		accelData.North = accel_ned[0];
 		accelData.East = accel_ned[1];
 		accelData.Down = accel_ned[2];
 		NedAccelSet(&accelData);
 		
-		
 		FlightStatusGet(&flightStatus);
 		SystemSettingsGet(&systemSettings);
 		GuidanceSettingsGet(&guidanceSettings);
 		
-		if ((PARSE_FLIGHT_MODE(flightStatus.FlightMode) == FLIGHTMODE_GUIDANCE) &&
+		if ((flightStatus.FlightMode == FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD) &&
 		    ((systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_VTOL) ||
 		     (systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_QUADP) ||
 		     (systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_QUADX) ||
 		     (systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_HEXA) ))
 		{
-			if(positionHoldLast == 0) {
-				/* When enter position hold mode save current position */
-				PositionDesiredData positionDesired;
-				PositionActualData positionActual;
-				PositionDesiredGet(&positionDesired);
-				PositionActualGet(&positionActual);
-				positionDesired.North = positionActual.North;
-				positionDesired.East = positionActual.East;
-				PositionDesiredSet(&positionDesired);
-				positionHoldLast = 1;
-			}
-			
 			if( flightStatus.FlightMode == FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD ) 
 				updateVtolDesiredVelocity();
-			else
+			else 
 				manualSetDesiredVelocity();			
 			updateVtolDesiredAttitude();
-			
 		} else {
 			// Be cleaner and get rid of global variables
 			northVelIntegral = 0;
@@ -236,9 +222,6 @@ static void guidanceTask(void *parameters)
 			downPosIntegral = 0;
 			positionHoldLast = 0;
 		}
-		
-		accel[0] = accel[1] = accel[2] = 0;
-		accel_accum = 0;
 	}
 }
 

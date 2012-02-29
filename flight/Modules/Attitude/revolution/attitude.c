@@ -60,6 +60,7 @@
 #include "velocityactual.h"
 #include "gpsposition.h"
 #include "baroaltitude.h"
+#include "nedposition.h"
 #include "flightstatus.h"
 #include "homelocation.h"
 #include "gpsposition.h"
@@ -116,6 +117,7 @@ int32_t AttitudeInitialize(void)
 {
 	AttitudeActualInitialize();
 	AttitudeSettingsInitialize();
+	NEDPositionInitialize();
 	PositionActualInitialize();
 	VelocityActualInitialize();
 	
@@ -621,6 +623,15 @@ static int32_t updateAttitudeINSGPS(bool first_run)
 			(float) (home.ECEF[1] / 100.0f),
 			(float) (home.ECEF[2] / 100.0f)};
 		LLA2Base(LLA, ECEF, (float (*)[3]) home.RNE, NED);
+
+		// Store this for inspecting offline
+		NEDPositionData nedPos;
+		NEDPositionGet(&nedPos);
+		nedPos.North = NED[0];
+		nedPos.East = NED[1];
+		nedPos.Down = NED[2];
+		NEDPositionSet(&nedPos);
+
 	} else if (!outdoor_mode) {
 		INSSetPosVelVar(1e-2f, 1e-2f);
 		vel[0] = vel[1] = vel[2] = 0;

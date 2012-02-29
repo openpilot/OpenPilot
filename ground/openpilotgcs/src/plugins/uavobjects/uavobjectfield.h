@@ -50,8 +50,8 @@ public:
         QList<QVariant> values;
     } LimitStruct;
 
-    UAVObjectField(const QString& name, const QString& units, FieldType type, quint32 numElements, const QStringList& options,const QString& limits=QString::QString());
-    UAVObjectField(const QString& name, const QString& units, FieldType type, const QStringList& elementNames, const QStringList& options,const QString& limits=QString::QString());
+    UAVObjectField(const QString& name, const QString& units, FieldType type, quint32 numElements, const QStringList& options,const QString& limits=QString());
+    UAVObjectField(const QString& name, const QString& units, FieldType type, const QStringList& elementNames, const QStringList& options,const QString& limits=QString());
     void initialize(quint8* data, quint32 dataOffset, UAVObject* obj);
     UAVObject* getObject();
     FieldType getType();

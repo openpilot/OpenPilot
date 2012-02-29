@@ -1,6 +1,7 @@
 import QtQuick 1.1
 
 Rectangle {
+    id: container
     width: 1024
     height: 768
 
@@ -9,63 +10,76 @@ Rectangle {
     Image {
         id: bg
         source: "images/welcome-op-bg.png"
-        anchors.fill: parent
-        fillMode: Image.PreserveAspectFit
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
+
+        // The background OP logo is downscalled to fit the page
+        // but not upscalled if page is larger
+        property real scale: Math.min(parent.width/sourceSize.width,
+                                      parent.height/sourceSize.height,
+                                      1.0)
+
+        width: scale*sourceSize.width
+        height: scale*sourceSize.height
         smooth: true
     }
 
     Column {
-        anchors.centerIn: parent
+        anchors.horizontalCenter: parent.horizontalCenter
+        // distribute a vertical space between the icons blocks an community widget as:
+        // top - 48% - Icons - 27% - CommunityWidget - 25% - bottom
+        y: (parent.height - buttons.height - communityPanel.height) * 0.48
         width: parent.width
-        spacing: 32
+        spacing: (parent.height - buttons.height - communityPanel.height) * 0.27
 
         Row {
-            //anchors.bottom: parent.verticalCenter
             anchors.horizontalCenter: parent.horizontalCenter
             spacing: 16
 
             Image {
                 source: "images/welcome-op-logo.png"
                 anchors.verticalCenter: parent.verticalCenter
+                anchors.verticalCenterOffset: -2 //it looks better aligned to icons grid
             }
 
             Grid {
                 id: buttons
                 columns: 3
                 spacing: 4
+                anchors.verticalCenter: parent.verticalCenter
 
                 WelcomePageButton {
-                    baseIconName: "welcome-flightdata"
+                    baseIconName: "flightdata"
                     label: "Flight Data"
                     onClicked: welcomePlugin.openPage("Mode1")
                 }
 
                 WelcomePageButton {
-                    baseIconName: "welcome-flightdata"
+                    baseIconName: "config"
                     label: "Configuration"
                     onClicked: welcomePlugin.openPage("Mode2")
                 }
 
                 WelcomePageButton {
-                    baseIconName: "welcome-flightdata"
+                    baseIconName: "planner"
                     label: "Flight Planner"
                     onClicked: welcomePlugin.openPage("Mode3")
                 }
 
                 WelcomePageButton {
-                    baseIconName: "welcome-flightdata"
+                    baseIconName: "scopes"
                     label: "Scopes"
                     onClicked: welcomePlugin.openPage("Mode4")
                 }
 
                 WelcomePageButton {
-                    baseIconName: "welcome-flightdata"
+                    baseIconName: "hitl"
                     label: "HIL"
                     onClicked: welcomePlugin.openPage("Mode5")
                 }
 
                 WelcomePageButton {
-                    baseIconName: "welcome-flightdata"
+                    baseIconName: "firmware"
                     label: "Firmware"
                     onClicked: welcomePlugin.openPage("Mode6")
                 }
@@ -73,8 +87,8 @@ Rectangle {
         } // images row
 
         CommunityPanel {
+            id: communityPanel
             anchors.horizontalCenter: parent.horizontalCenter
-            width: parent.width*0.8
         }
     }
 }

@@ -8,9 +8,19 @@
         <file>qml/images/welcome-news-bg.png</file>
         <file>qml/images/welcome-op-logo.png</file>
         <file>qml/images/button-label.png</file>
-        <file>qml/images/welcome-flightdata-hover.png</file>
-        <file>qml/images/welcome-flightdata.png</file>
         <file>qml/images/welcome-op-bg.png</file>
         <file>qml/images/welcome-bg.png</file>
+        <file>qml/images/flightdata-on.png</file>
+        <file>qml/images/flightdata-off.png</file>
+        <file>qml/images/config-on.png</file>
+        <file>qml/images/config-off.png</file>
+        <file>qml/images/firmware-on.png</file>
+        <file>qml/images/firmware-off.png</file>
+        <file>qml/images/hitl-on.png</file>
+        <file>qml/images/hitl-off.png</file>
+        <file>qml/images/planner-on.png</file>
+        <file>qml/images/planner-off.png</file>
+        <file>qml/images/scopes-on.png</file>
+        <file>qml/images/scopes-off.png</file>
     </qresource>
 </RCC>

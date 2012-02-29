@@ -185,6 +185,18 @@ void OutputChannelForm::neutral(int value)
 void OutputChannelForm::setAssignment(const QString &assignment)
 {
     ui.actuatorName->setText(assignment);
+    QFontMetrics metrics(ui.actuatorName->font());
+    int width=metrics.width(assignment)+1;
+    foreach(OutputChannelForm * form,parent()->findChildren<OutputChannelForm*>())
+    {
+        if(form==this)
+            continue;
+        if(form->ui.actuatorName->minimumSize().width()<width)
+            form->ui.actuatorName->setMinimumSize(width,0);
+        else
+            width=form->ui.actuatorName->minimumSize().width();
+    }
+    ui.actuatorName->setMinimumSize(width,0);
 }
 
 /**

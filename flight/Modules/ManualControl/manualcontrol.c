@@ -34,19 +34,20 @@
  */
 
 #include "openpilot.h"
-#include "manualcontrol.h"
-#include "manualcontrolsettings.h"
-#include "stabilizationsettings.h"
-#include "manualcontrolcommand.h"
+#include "accessorydesired.h"
 #include "actuatordesired.h"
-#include "stabilizationdesired.h"
+#include "altitudeholddesired.h"
+#include "baroaltitude.h"
 #include "flighttelemetrystats.h"
 #include "flightstatus.h"
-#include "accessorydesired.h"
-#include "receiveractivity.h"
-#include "altitudeholddesired.h"
+#include "manualcontrol.h"
+#include "manualcontrolsettings.h"
+#include "manualcontrolcommand.h"
 #include "positionactual.h"
-#include "baroaltitude.h"
+#include "positiondesired.h"
+#include "stabilizationsettings.h"
+#include "stabilizationdesired.h"
+#include "receiveractivity.h"
 
 // Private constants
 #if defined(PIOS_MANUAL_STACK_SIZE)
@@ -83,6 +84,7 @@ static portTickType lastSysTime;
 static void updateActuatorDesired(ManualControlCommandData * cmd);
 static void updateStabilizationDesired(ManualControlCommandData * cmd, ManualControlSettingsData * settings);
 static void altitudeHoldDesired(ManualControlCommandData * cmd);
+static void positionDesired(ManualControlCommandData * cmd);
 static void processFlightMode(ManualControlSettingsData * settings, float flightMode);
 static void processArm(ManualControlCommandData * cmd, ManualControlSettingsData * settings);
 static void setArmedIfChanged(uint8_t val);
@@ -391,6 +393,9 @@ static void manualControlTask(void *parameters)
 					case FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD:
 						altitudeHoldDesired(&cmd);
 						break;
+					case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
+						positionDesired(&cmd);
+						break;
 					default:
 						AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_CRITICAL);
 				}
@@ -608,6 +613,41 @@ static void updateStabilizationDesired(ManualControlCommandData * cmd, ManualCon
 
 #if defined(REVOLUTION)
 // TODO: Need compile flag to exclude this from copter control
+/**
+ * @brief Update the position desired to current location when
+ * enabled and allow the waypoint to be moved by transmitter
+ */
+static void positionDesired(ManualControlCommandData * cmd)
+{
+	static portTickType lastSysTime;
+	portTickType thisSysTime;
+	float dT;
+
+	thisSysTime = xTaskGetTickCount();
+	dT = (thisSysTime - lastSysTime) / portTICK_RATE_MS / 1000.0f;
+	lastSysTime = thisSysTime;
+
+	if(dT > 1) {
+		// After not being in this mode for a while init at current height
+		PositionActualData positionActual;
+		PositionActualGet(&positionActual);
+		
+		PositionDesiredData positionDesired;
+		PositionDesiredGet(&positionDesired);
+		positionDesired.North = positionActual.North;
+		positionDesired.East = positionActual.East;
+		positionDesired.Down = positionActual.Down;
+		PositionDesiredSet(&positionDesired);
+	} else {
+		// TODO: Implement moving magic waypoint with remote
+	}
+}
+
+/**
+ * @brief Update the altitude desired to current altitude when
+ * enabled and enable altitude mode for stabilization
+ * @todo: Need compile flag to exclude this from copter control
+ */
 static void altitudeHoldDesired(ManualControlCommandData * cmd)
 {
 	const float DEADBAND_HIGH = 0.55;

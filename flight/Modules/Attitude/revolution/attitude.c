@@ -49,21 +49,21 @@
  */
 
 #include "pios.h"
-#include "attitude.h"
-#include "magnetometer.h"
 #include "accels.h"
-#include "gyros.h"
-#include "gyrosbias.h"
+#include "attitude.h"
 #include "attitudeactual.h"
 #include "attitudesettings.h"
-#include "positionactual.h"
-#include "velocityactual.h"
-#include "gpsposition.h"
 #include "baroaltitude.h"
-#include "nedposition.h"
 #include "flightstatus.h"
-#include "homelocation.h"
 #include "gpsposition.h"
+#include "gyros.h"
+#include "gyrosbias.h"
+#include "homelocation.h"
+#include "magnetometer.h"
+#include "nedposition.h"
+#include "positionactual.h"
+#include "revosettings.h"
+#include "velocityactual.h"
 #include "CoordinateConversions.h"
 
 // Private constants
@@ -83,13 +83,15 @@ static xQueueHandle accelQueue;
 static xQueueHandle magQueue;
 static xQueueHandle baroQueue;
 static xQueueHandle gpsQueue;
+
+static RevoSettingsData revoSettings;
 const uint32_t SENSOR_QUEUE_SIZE = 10;
 
 // Private functions
 static void AttitudeTask(void *parameters);
 
 static int32_t updateAttitudeComplimentary(bool first_run);
-static int32_t updateAttitudeINSGPS(bool first_run);
+static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode);
 static void settingsUpdatedCb(UAVObjEvent * objEv);
 
 static float accelKi = 0;
@@ -99,6 +101,8 @@ static float gyroGain = 0.42;
 static int16_t accelbias[3];
 static bool zero_during_arming = false;
 
+// Variables for tracking algorithm mode
+static uint32_t last_algorithm;
 
 /**
  * API for sensor fusion algorithms:
@@ -141,11 +145,8 @@ int32_t AttitudeInitialize(void)
 	gyrosBias.z = 0;
 	GyrosBiasSet(&gyrosBias);
 	
-	//for(uint8_t i = 0; i < 3; i++)
-	//	for(uint8_t j = 0; j < 3; j++)
-	//		R[i][j] = 0;
-	
 	AttitudeSettingsConnectCallback(&settingsUpdatedCb);
+	RevoSettingsConnectCallback(&settingsUpdatedCb);
 	
 	return 0;
 }
@@ -188,23 +189,41 @@ static void AttitudeTask(void *parameters)
 
 	// Force settings update to make sure rotation loaded
 	settingsUpdatedCb(AttitudeSettingsHandle());
-	
+	settingsUpdatedCb(RevoSettingsHandle());
+
 	bool first_run = true;
-	
+
 	// Wait for all the sensors be to read
 	vTaskDelay(100);
-	
+
+	// Invalidate previous algorithm to trigger a first run
+	last_algorithm = 0xfffffff;
+
 	// Main task loop
 	while (1) {
 
-		// This  function blocks on data queue
-		if(0) 
-			updateAttitudeComplimentary(first_run);
-		else
-			updateAttitudeINSGPS(first_run);
+		if (last_algorithm != revoSettings.FusionAlgorithm) {
+			last_algorithm = revoSettings.FusionAlgorithm;
+			first_run = true;
+		}
 
-		if (first_run)
-			first_run = false;
+		// This  function blocks on data queue
+		switch (revoSettings.FusionAlgorithm ) {
+			case REVOSETTINGS_FUSIONALGORITHM_COMPLIMENTARY:
+				updateAttitudeComplimentary(first_run);
+				break;
+			case REVOSETTINGS_FUSIONALGORITHM_INSOUTDOOR:
+				updateAttitudeINSGPS(first_run, true);
+				break;
+			case REVOSETTINGS_FUSIONALGORITHM_INSINDOOR:
+				updateAttitudeINSGPS(first_run, false);
+				break;
+			default:
+				AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE,SYSTEMALARMS_ALARM_ERROR);
+				break;
+		}
+
+		first_run = false;
 
 		PIOS_WDG_UpdateFlag(PIOS_WDG_ATTITUDE);
 	}
@@ -399,10 +418,15 @@ static int32_t updateAttitudeComplimentary(bool first_run)
 #include "insgps.h"
 int32_t ins_failed = 0;
 extern struct NavStruct Nav;
-bool outdoor_mode = false;
 int32_t init_stage = 0;
 
-static int32_t updateAttitudeINSGPS(bool first_run)
+/**
+ * @brief Use the INSGPS fusion algorithm in either indoor or outdoor mode (use GPS)
+ * @params[in] first_run This is the first run so trigger reinitialization
+ * @params[in] outdoor_mode If true use the GPS for position, if false weakly pull to (0,0)
+ * @return 0 for success, -1 for failure
+ */
+static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 {
 	UAVObjEvent ev;
 	GyrosData gyrosData;
@@ -646,7 +670,7 @@ static int32_t updateAttitudeINSGPS(bool first_run)
 	 */
 	if (sensors)
 		INSCorrection(&magData.x, NED, vel, baroData.Altitude, sensors);
-	
+
 	// Copy the position and velocity into the UAVO
 	PositionActualData positionActual;
 	PositionActualGet(&positionActual);

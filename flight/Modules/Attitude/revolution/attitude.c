@@ -84,6 +84,7 @@ static xQueueHandle magQueue;
 static xQueueHandle baroQueue;
 static xQueueHandle gpsQueue;
 
+static AttitudeSettingsData attitudeSettings;
 static RevoSettingsData revoSettings;
 const uint32_t SENSOR_QUEUE_SIZE = 10;
 
@@ -93,16 +94,6 @@ static void AttitudeTask(void *parameters);
 static int32_t updateAttitudeComplimentary(bool first_run);
 static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode);
 static void settingsUpdatedCb(UAVObjEvent * objEv);
-
-static float accelKi = 0;
-static float accelKp = 0;
-static float yawBiasRate = 0;
-static float gyroGain = 0.42;
-static int16_t accelbias[3];
-static bool zero_during_arming = false;
-
-// Variables for tracking algorithm mode
-static uint32_t last_algorithm;
 
 /**
  * API for sensor fusion algorithms:
@@ -185,13 +176,13 @@ MODULE_INITCALL(AttitudeInitialize, AttitudeStart)
  */
 static void AttitudeTask(void *parameters)
 {
+	bool first_run;
+	uint32_t last_algorithm;
 	AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
 
 	// Force settings update to make sure rotation loaded
 	settingsUpdatedCb(AttitudeSettingsHandle());
 	settingsUpdatedCb(RevoSettingsHandle());
-
-	bool first_run = true;
 
 	// Wait for all the sensors be to read
 	vTaskDelay(100);
@@ -266,19 +257,17 @@ static int32_t updateAttitudeComplimentary(bool first_run)
 
 	if((init == 0 && xTaskGetTickCount() < 7000) && (xTaskGetTickCount() > 1000)) {
 		// For first 7 seconds use accels to get gyro bias
-		accelKp = 1;
-		accelKi = 0.9;
-		yawBiasRate = 0.23;
-	} else if (zero_during_arming && (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMING)) {
-		accelKp = 1;
-		accelKi = 0.9;
-		yawBiasRate = 0.23;
+		attitudeSettings.AccelKp = 1;
+		attitudeSettings.AccelKi = 0.9;
+		attitudeSettings.YawBiasRate = 0.23;
+	} else if ((attitudeSettings.ZeroDuringArming == ATTITUDESETTINGS_ZERODURINGARMING_TRUE) && (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMING)) {
+		attitudeSettings.AccelKp = 1;
+		attitudeSettings.AccelKi = 0.9;
+		attitudeSettings.YawBiasRate = 0.23;
 		init = 0;
 	} else if (init == 0) {
 		// Reload settings (all the rates)
-		AttitudeSettingsAccelKiGet(&accelKi);
-		AttitudeSettingsAccelKpGet(&accelKp);
-		AttitudeSettingsYawBiasRateGet(&yawBiasRate);
+		AttitudeSettingsGet(&attitudeSettings);
 		init = 1;
 	}	
 
@@ -348,15 +337,15 @@ static int32_t updateAttitudeComplimentary(bool first_run)
 	// Accumulate integral of error.  Scale here so that units are (deg/s) but Ki has units of s
 	GyrosBiasData gyrosBias;
 	GyrosBiasGet(&gyrosBias);
-	gyrosBias.x += accel_err[0] * accelKi;
-	gyrosBias.y += accel_err[1] * accelKi;
+	gyrosBias.x += accel_err[0] * attitudeSettings.AccelKi;
+	gyrosBias.y += accel_err[1] * attitudeSettings.AccelKi;
 	gyrosBias.z += mag_err[2] * magKi;
 	GyrosBiasSet(&gyrosBias);
 
 	// Correct rates based on error, integral component dealt with in updateSensors
-	gyrosData.x += accel_err[0] * accelKp / dT;
-	gyrosData.y += accel_err[1] * accelKp / dT;
-	gyrosData.z += accel_err[2] * accelKp / dT + mag_err[2] * magKp / dT;
+	gyrosData.x += accel_err[0] * attitudeSettings.AccelKp / dT;
+	gyrosData.y += accel_err[1] * attitudeSettings.AccelKp / dT;
+	gyrosData.z += accel_err[2] * attitudeSettings.AccelKp / dT + mag_err[2] * magKp / dT;
 
 	// Work out time derivative from INSAlgo writeup
 	// Also accounts for the fact that gyros are in deg/s
@@ -696,19 +685,8 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 
 static void settingsUpdatedCb(UAVObjEvent * objEv) 
 {
-	AttitudeSettingsData attitudeSettings;
 	AttitudeSettingsGet(&attitudeSettings);
-
-	accelKp = attitudeSettings.AccelKp;
-	accelKi = attitudeSettings.AccelKi;
-	yawBiasRate = attitudeSettings.YawBiasRate;
-	gyroGain = attitudeSettings.GyroGain;
-
-	zero_during_arming = attitudeSettings.ZeroDuringArming == ATTITUDESETTINGS_ZERODURINGARMING_TRUE;
-
-	accelbias[0] = attitudeSettings.AccelBias[ATTITUDESETTINGS_ACCELBIAS_X];
-	accelbias[1] = attitudeSettings.AccelBias[ATTITUDESETTINGS_ACCELBIAS_Y];
-	accelbias[2] = attitudeSettings.AccelBias[ATTITUDESETTINGS_ACCELBIAS_Z];
+	RevoSettingsGet(&revoSettings);
 
 	GyrosBiasData gyrosBias;
 	GyrosBiasGet(&gyrosBias);

@@ -239,6 +239,8 @@ int main(int argc, char **argv)
     setrlimit(RLIMIT_NOFILE, &rl);
 #endif
 
+    QApplication::setGraphicsSystem("raster");
+
     SharedTools::QtSingleApplication app((QLatin1String(appNameC)), argc, argv);
 
     QString locale = QLocale::system().name();

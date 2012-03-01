@@ -305,7 +305,6 @@ void PIOS_Board_Init(void) {
 	PIOS_TIM_InitClock(&tim_1_cfg);
 	PIOS_TIM_InitClock(&tim_3_cfg);
 	PIOS_TIM_InitClock(&tim_4_cfg);
-	PIOS_TIM_InitClock(&tim_4_cfg);
 	PIOS_TIM_InitClock(&tim_5_cfg);
 	PIOS_TIM_InitClock(&tim_9_cfg);
 	PIOS_TIM_InitClock(&tim_10_cfg);

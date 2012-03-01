@@ -62,6 +62,7 @@
 #include "magnetometer.h"
 #include "nedposition.h"
 #include "positionactual.h"
+#include "revocalibration.h"
 #include "revosettings.h"
 #include "velocityactual.h"
 #include "CoordinateConversions.h"
@@ -85,8 +86,9 @@ static xQueueHandle baroQueue;
 static xQueueHandle gpsQueue;
 
 static AttitudeSettingsData attitudeSettings;
-static RevoSettingsData revoSettings;
 static HomeLocationData homeLocation;
+static RevoCalibrationData revoCalibration;
+static RevoSettingsData revoSettings;
 const uint32_t SENSOR_QUEUE_SIZE = 10;
 
 // Private functions
@@ -483,25 +485,20 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE,SYSTEMALARMS_ALARM_ERROR);
 	else
 		AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
-
+			
 	if (!inited && mag_updated && baro_updated && (gps_updated || !outdoor_mode)) {
 		// Don't initialize until all sensors are read
 		if (init_stage == 0 && !outdoor_mode) {
 			float Pdiag[16]={25.0f,25.0f,25.0f,5.0f,5.0f,5.0f,1e-5f,1e-5f,1e-5f,1e-5f,1e-5f,1e-5f,1e-5f,1e-4f,1e-4f,1e-4f};
 			float q[4];
-			float var[3] = {500.0f, 500.0f, 500.0f};
 			float pos[3] = {0.0f, 0.0f, 0.0f};
 			pos[2] = baroData.Altitude * -1.0f;
 
 			// Reset the INS algorithm
 			INSGPSInit();
-			var[0] = var[1] = 1e-4f;
-			var[2] = 1e-1f;
-			INSSetMagVar(var);
-			var[0] = var[1] = var[2] = 1.5e-6f;
-			INSSetAccelVar(var);
-			var[0] = var[1] = var[2] = 2.0e-4f;
-			INSSetGyroVar(var);
+			INSSetMagVar(revoCalibration.mag_var);
+			INSSetAccelVar(revoCalibration.accel_var);
+			INSSetGyroVar(revoCalibration.gyro_var);
 
 			// Set initial attitude
 			float rpy[3];
@@ -520,17 +517,12 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 			float q[4], rpy[3];
 			float Pdiag[16]={25.0f,25.0f,25.0f,5.0f,5.0f,5.0f,1e-5f,1e-5f,1e-5f,1e-5f,1e-5f,1e-5f,1e-5f,1e-4f,1e-4f,1e-4f};
 			float NED[3];
-			float var[3];
 
 			// Reset the INS algorithm
 			INSGPSInit();
-			var[0] = var[1] = 1e-4f;
-			var[2] = 1e-1f;
-			INSSetMagVar(var);
-			var[0] = var[1] = var[2] = 1.5e-5f;
-			INSSetAccelVar(var);
-			var[0] = var[1] = var[2] = 2.0e-4f;
-			INSSetGyroVar(var);
+			INSSetMagVar(revoCalibration.mag_var);
+			INSSetAccelVar(revoCalibration.accel_var);
+			INSSetGyroVar(revoCalibration.gyro_var);
 
 			INSSetMagNorth(home.Be);
 
@@ -709,6 +701,7 @@ static void settingsUpdatedCb(UAVObjEvent * objEv)
 	float lat, lon, alt;
 
 	AttitudeSettingsGet(&attitudeSettings);
+	RevoCalibrationGet(&revoCalibration);
 	RevoSettingsGet(&revoSettings);
 	HomeLocationGet(&homeLocation);
 
@@ -723,6 +716,11 @@ static void settingsUpdatedCb(UAVObjEvent * objEv)
 	lat = homeLocation.Latitude / 10.0e6f * DEG2RAD;
 	lon = homeLocation.Longitude / 10.0e6 * DEG2RAD;
 	alt = homeLocation.Altitude;
+
+	// In case INS currently running
+	INSSetMagVar(revoCalibration.mag_var);
+	INSSetAccelVar(revoCalibration.accel_var);
+	INSSetGyroVar(revoCalibration.gyro_var);
 
 	T[0] = alt+6.378137E6f;
 	T[1] = cosf(lat)*(alt+6.378137E6f);

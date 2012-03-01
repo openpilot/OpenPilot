@@ -498,7 +498,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 			var[0] = var[1] = 1e-4f;
 			var[2] = 1e-1f;
 			INSSetMagVar(var);
-			var[0] = var[1] = var[2] = 1.5e-5f;
+			var[0] = var[1] = var[2] = 1.5e-6f;
 			INSSetAccelVar(var);
 			var[0] = var[1] = var[2] = 2.0e-4f;
 			INSSetGyroVar(var);
@@ -524,7 +524,8 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 
 			// Reset the INS algorithm
 			INSGPSInit();
-			var[0] = var[1] = var[2] = 5e-3f;
+			var[0] = var[1] = 1e-4f;
+			var[2] = 1e-1f;
 			INSSetMagVar(var);
 			var[0] = var[1] = var[2] = 1.5e-5f;
 			INSSetAccelVar(var);

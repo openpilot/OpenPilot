@@ -67,7 +67,7 @@
 #include "CoordinateConversions.h"
 
 // Private constants
-#define STACK_SIZE_BYTES 3540
+#define STACK_SIZE_BYTES 2540
 #define TASK_PRIORITY (tskIDLE_PRIORITY+3)
 #define FAILSAFE_TIMEOUT_MS 10
 
@@ -694,8 +694,8 @@ float T[3];
 const float DEG2RAD = 3.141592653589793f / 180.0f;
 static int32_t getNED(GPSPositionData * gpsPosition, float * NED)
 {
-	float dL[3] = {(gpsPosition->Latitude - homeLocation.Latitude) / 10.0e6 * DEG2RAD,
-		(gpsPosition->Longitude - homeLocation.Longitude) / 10.0e6 * DEG2RAD,
+	float dL[3] = {(gpsPosition->Latitude - homeLocation.Latitude) / 10.0e6f * DEG2RAD,
+		(gpsPosition->Longitude - homeLocation.Longitude) / 10.0e6f * DEG2RAD,
 		(gpsPosition->Altitude - homeLocation.Altitude)};
 
 	NED[0] = T[0] * dL[0];

@@ -148,7 +148,7 @@ out_fail:
  * \return < 0 on errors
  * \note Applications shouldn't call this function directly, instead please use \ref PIOS_COM layer functions
  */
-int32_t PIOS_USB_ChangeConnectionState(uint32_t Connected)
+int32_t PIOS_USB_ChangeConnectionState(bool Connected)
 {
 	// In all cases: re-initialise USB HID driver
 	if (Connected) {

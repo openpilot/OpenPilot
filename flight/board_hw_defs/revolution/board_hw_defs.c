@@ -618,8 +618,6 @@ static const struct pios_usart_cfg pios_usart_gps_cfg = {
 	},
 };
 
-#define PIOS_COM_GPS_RX_BUF_LEN 192
-
 #endif /* PIOS_INCLUDE_GPS */
 
 #ifdef PIOS_INCLUDE_COM_AUX
@@ -715,9 +713,6 @@ static const struct pios_usart_cfg pios_usart_telem_main_cfg = {
 		},
 	},
 };
-
-#define PIOS_COM_TELEM_RF_RX_BUF_LEN 512
-#define PIOS_COM_TELEM_RF_TX_BUF_LEN 512
 
 #endif /* PIOS_COM_TELEM */
 
@@ -1545,17 +1540,63 @@ static const struct pios_ppm_cfg pios_ppm_cfg = {
 #if defined(PIOS_INCLUDE_RCVR)
 #include "pios_rcvr_priv.h"
 
-/* One slot per selectable receiver group.
- *  eg. PWM, PPM, GCS, SPEKTRUM1, SPEKTRUM2, SBUS
- * NOTE: No slot in this map for NONE.
- */
-uint32_t pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE];
 #endif
 
-extern const struct pios_com_driver pios_usart_com_driver;
+#if defined(PIOS_INCLUDE_USB)
+#include "pios_usb_priv.h"
 
-uint32_t pios_com_aux_id;
-uint32_t pios_com_gps_id;
-uint32_t pios_com_telem_usb_id;
-uint32_t pios_com_telem_rf_id;
+static const struct pios_usb_cfg pios_usb_main_cfg = {
+	.irq = {
+		.init    = {
+			.NVIC_IRQChannel                   = OTG_FS_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
+			.NVIC_IRQChannelSubPriority        = 3,
+			.NVIC_IRQChannelCmd                = ENABLE,
+		},
+	},
+	.vsense = {
+		.gpio = GPIOD,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_11,
+			.GPIO_Speed = GPIO_Speed_25MHz,
+			.GPIO_Mode  = GPIO_Mode_IN,
+			.GPIO_OType = GPIO_OType_OD,
+		},
+	}
+};
 
+#include "pios_usb_board_data_priv.h"
+#include "pios_usb_desc_hid_cdc_priv.h"
+#include "pios_usb_desc_hid_only_priv.h"
+#include "pios_usbhook.h"
+
+#endif	/* PIOS_INCLUDE_USB */
+
+#if defined(PIOS_INCLUDE_COM_MSG)
+
+#include <pios_com_msg_priv.h>
+
+#endif /* PIOS_INCLUDE_COM_MSG */
+
+#if defined(PIOS_INCLUDE_USB_HID)
+#include <pios_usb_hid_priv.h>
+
+const struct pios_usb_hid_cfg pios_usb_hid_cfg = {
+	.data_if = 0,
+	.data_rx_ep = 1,
+	.data_tx_ep = 1,
+};
+#endif /* PIOS_INCLUDE_USB_HID */
+
+#if defined(PIOS_INCLUDE_USB_CDC)
+#include <pios_usb_cdc_priv.h>
+
+const struct pios_usb_cdc_cfg pios_usb_cdc_cfg = {
+	.ctrl_if = 1,
+	.ctrl_tx_ep = 2,
+
+	.data_if = 2,
+	.data_rx_ep = 3,
+	.data_tx_ep = 3,
+};
+#endif	/* PIOS_INCLUDE_USB_CDC */

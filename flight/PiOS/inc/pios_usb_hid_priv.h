@@ -31,8 +31,6 @@
 #ifndef PIOS_USB_HID_PRIV_H
 #define PIOS_USB_HID_PRIV_H
 
-#include "usb_core.h"		/* RESULT */
-
 struct pios_usb_hid_cfg {
 	uint8_t data_if;
 	uint8_t data_rx_ep;

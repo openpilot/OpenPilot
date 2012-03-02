@@ -170,7 +170,6 @@ int32_t gyro_test;
 static void AttitudeTask(void *parameters)
 {
 	uint8_t init = 0;
-	portTickType lastSysTime;
 	AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
 	
 	// Set critical error and wait until the accel is producing data
@@ -204,8 +203,6 @@ static void AttitudeTask(void *parameters)
 	}
 	// Force settings update to make sure rotation loaded
 	settingsUpdatedCb(AttitudeSettingsHandle());
-	
-	lastSysTime = xTaskGetTickCount();
 	
 	// Main task loop
 	while (1) {

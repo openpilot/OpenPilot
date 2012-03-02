@@ -335,6 +335,7 @@ int32_t PIOS_SPI_RC_PinSet(uint32_t spi_id, uint32_t slave_id, uint8_t pin_value
 * \param[in] spi SPI number (0 or 1)
 * \param[in] b the byte which should be transfered
 */
+static uint8_t dummy;
 int32_t PIOS_SPI_TransferByte(uint32_t spi_id, uint8_t b)
 {
 	struct pios_spi_dev * spi_dev = (struct pios_spi_dev *)spi_id;
@@ -342,7 +343,6 @@ int32_t PIOS_SPI_TransferByte(uint32_t spi_id, uint8_t b)
 	bool valid = PIOS_SPI_validate(spi_dev);
 	PIOS_Assert(valid)
 
-	uint8_t dummy;
 	uint8_t rx_byte;
 
 	/* 

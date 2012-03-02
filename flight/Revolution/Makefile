@@ -119,13 +119,14 @@ SRC += ${foreach MOD, ${MODULES}, ${wildcard ${OPMODULEDIR}/${MOD}/*.c}}
 SRC += ${OPMODULEDIR}/System/systemmod.c
 SRC += $(OPSYSTEM)/revolution.c
 SRC += $(OPSYSTEM)/pios_board.c
+SRC += $(OPSYSTEM)/pios_usb_board_data.c
 SRC += $(OPSYSTEM)/alarms.c
 SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
 SRC += $(OPUAVOBJ)/eventdispatcher.c
 
 #ifeq ($(DEBUG),YES)
-SRC += $(OPSYSTEM)/dcc_stdio.c                                                                                                                                                                                                
+SRC += $(OPSYSTEM)/dcc_stdio.c
 SRC += $(OPSYSTEM)/cm3_fault_handlers.c
 #endif
 
@@ -150,6 +151,8 @@ SRC += $(PIOSCOMMON)/pios_rcvr.c
 SRC += $(PIOSCOMMON)/pios_flash_jedec.c
 SRC += $(PIOSCOMMON)/pios_flashfs_objlist.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c
+SRC += $(PIOSCOMMON)/pios_usb_desc_hid_cdc.c
+SRC += $(PIOSCOMMON)/pios_usb_desc_hid_only.c
 
 include ./UAVObjects.inc
 SRC += $(UAVOBJSRC)
@@ -314,7 +317,7 @@ ifeq ($(CODE_SOURCERY), YES)
 CFLAGS += -fpromote-loop-indices
 endif
 
-#CFLAGS += -Wall
+CFLAGS += -Wall
 #CFLAGS += -Werror
 CFLAGS += -Wa,-adhlns=$(addprefix $(OUTDIR)/, $(notdir $(addsuffix .lst, $(basename $<))))
 # Compiler flags to generate dependency files:

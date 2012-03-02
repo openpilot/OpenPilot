@@ -89,7 +89,6 @@ MODULE_INITCALL(AltitudeInitialize, AltitudeStart)
 static void altitudeTask(void *parameters)
 {
 	BaroAltitudeData data;
-	portTickType lastSysTime;
 	
 #if defined(PIOS_INCLUDE_HCSR04)
 	SonarAltitudeData sonardata;
@@ -102,7 +101,6 @@ static void altitudeTask(void *parameters)
 	// TODO: Check the pressure sensor and set a warning if it fails test
 	
 	// Main task loop
-	lastSysTime = xTaskGetTickCount();
 	while (1)
 	{
 #if defined(PIOS_INCLUDE_HCSR04)

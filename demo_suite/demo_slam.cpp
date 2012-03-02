@@ -623,7 +623,7 @@ void demo_slam_init()
 		}
 		case 1: { // global
 			if(pointLmkFactory != NULL)
-				mmPoint.reset(new MapManagerGlobal(pointLmkFactory, configEstimation.REPARAM_TH, configEstimation.KILL_SEARCH_SIZE, 10, 0.5, 0.5));
+				mmPoint.reset(new MapManagerGlobal(pointLmkFactory, configEstimation.REPARAM_TH, configEstimation.KILL_SEARCH_SIZE, 30, 0.5, 0.5));
 			if(segLmkFactory != NULL)
 				mmSeg.reset(new MapManagerGlobal(segLmkFactory, configEstimation.REPARAM_TH, configEstimation.KILL_SEARCH_SIZE, 30, 0.5, 0.5));
 			break;

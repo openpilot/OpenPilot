@@ -52,6 +52,7 @@ public:
     void removeAllObjects();
     void addApplyButton(QPushButton *apply);
     void addSaveButton(QPushButton *save);
+    void resetIcons();
 signals:
     void preProcessOperations();
     void saveSuccessfull();

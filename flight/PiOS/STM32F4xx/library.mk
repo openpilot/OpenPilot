@@ -46,6 +46,21 @@ SRC					+=	$(wildcard $(PERIPHLIB)/src/*.c)
 EXTRAINCDIRS		+=	$(PERIPHLIB)/inc
 
 #
+# ST USB OTG library
+#
+USBOTGLIB			=	$(PIOS_DEVLIB)/Libraries/STM32_USB_OTG_Driver
+USBOTGLIB_SRC			=	usb_core.c usb_dcd.c usb_dcd_int.c
+SRC				+=	$(addprefix $(USBOTGLIB)/src/,$(USBOTGLIB_SRC))
+EXTRAINCDIRS			+=	$(USBOTGLIB)/inc
+
+#
+# ST USB Device library
+#
+USBDEVLIB			=	$(PIOS_DEVLIB)/Libraries/STM32_USB_Device_Library
+SRC				+=	$(wildcard $(USBDEVLIB)/Core/src/*.c)
+EXTRAINCDIRS			+=	$(USBDEVLIB)/Core/inc
+
+#
 # FreeRTOS
 #
 # If the application has included the generic FreeRTOS support, then add in

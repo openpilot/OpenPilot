@@ -38,6 +38,9 @@
 #include "pios_usb_cdc_priv.h"
 #include "pios_usb_board_data.h" /* PIOS_BOARD_*_DATA_LENGTH */
 
+/* STM32 USB Library Definitions */
+#include "usb_lib.h"
+
 static void PIOS_USB_CDC_RegisterTxCallback(uint32_t usbcdc_id, pios_com_callback tx_out_cb, uint32_t context);
 static void PIOS_USB_CDC_RegisterRxCallback(uint32_t usbcdc_id, pios_com_callback rx_in_cb, uint32_t context);
 static void PIOS_USB_CDC_TxStart(uint32_t usbcdc_id, uint16_t tx_bytes_avail);
@@ -312,14 +315,13 @@ static void PIOS_USB_CDC_DATA_EP_OUT_Callback(void)
 #endif	/* PIOS_INCLUDE_FREERTOS */
 }
 
+static uint16_t control_line_state;
 RESULT PIOS_USB_CDC_SetControlLineState(void)
 {
 	struct pios_usb_cdc_dev * usb_cdc_dev = (struct pios_usb_cdc_dev *)pios_usb_cdc_id;
 
 	bool valid = PIOS_USB_CDC_validate(usb_cdc_dev);
 	PIOS_Assert(valid);
-
-	static uint16_t control_line_state;
 
 	uint8_t wValue0 = pInformation->USBwValue0;
 	uint8_t wValue1 = pInformation->USBwValue1;

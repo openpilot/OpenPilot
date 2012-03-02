@@ -33,8 +33,8 @@ OUTDIR := $(TOP)/build/$(TARGET)
 .PHONY: bin
 bin: $(OUTDIR)/$(TARGET).bin
 
-$(OUTDIR)/$(TARGET).bin: BL_BIN := $(TOP)/build/bl_$(BOARD_NAME)/bl_$(BOARD_NAME).bin
-$(OUTDIR)/$(TARGET).bin: FW_BIN := $(TOP)/build/fw_$(BOARD_NAME)/fw_$(BOARD_NAME).bin
+BL_BIN = $(TOP)/build/bl_$(BOARD_NAME)/bl_$(BOARD_NAME).bin
+FW_BIN = $(TOP)/build/fw_$(BOARD_NAME)/fw_$(BOARD_NAME).bin
 $(OUTDIR)/$(TARGET).bin: $(BL_BIN) $(FW_BIN)
 	$(V0) @echo " FLASH IMG  $@"
 	$(V1) cat $(BL_BIN) $(FW_BIN) > $@

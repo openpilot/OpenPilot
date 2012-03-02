@@ -1,6 +1,6 @@
 /**
  * \file demo_slam.cpp
- *
+		*
  * ## Add brief description here ##
  *
  * \author jsola@laas.fr
@@ -136,7 +136,7 @@
 #include "rtslam/rtSlam.hpp"
 #include "rtslam/rawProcessors.hpp"
 #include "rtslam/rawSegProcessors.hpp"
-//#include "rtslam/robotOdometry.hpp"
+#include "rtslam/robotOdometry.hpp"
 #include "rtslam/robotConstantVelocity.hpp"
 #include "rtslam/robotInertial.hpp"
 #include "rtslam/sensorPinhole.hpp"
@@ -160,6 +160,7 @@
 #include "rtslam/hardwareEstimatorMti.hpp"
 #include "rtslam/hardwareSensorGpsGenom.hpp"
 #include "rtslam/hardwareSensorMocap.hpp"
+#include "rtslam/hardwareEstimatorOdo.hpp" 
 
 #include "rtslam/display_qt.hpp"
 #include "rtslam/display_gdhe.hpp"
@@ -325,6 +326,12 @@ class ConfigSetup: public kernel::KeyValueFileSaveLoad
 	
 	double IMU_TIMESTAMP_CORRECTION; /// correction to add to the IMU timestamp for synchronization (s)
 	double GPS_TIMESTAMP_CORRECTION; /// correction to add to the GPS timestamp for synchronization (s)
+	
+	/// Odometry noise variance to distance ratios
+	double dxNDR;   /// Odometry noise in position increment (m per sqrt(m))
+	double dvNDR;    /// Odometry noise in orientation increment (rad per sqrt(m))
+	
+	double POS_TIMESTAMP_CORRECTION; /// correction to add to the POS timestamp for synchronization (s)
 	
 	/// SIMU INERTIAL
 	double SIMU_IMU_TIMESTAMP_CORRECTION;
@@ -616,7 +623,7 @@ void demo_slam_init()
 		}
 		case 1: { // global
 			if(pointLmkFactory != NULL)
-				mmPoint.reset(new MapManagerGlobal(pointLmkFactory, configEstimation.REPARAM_TH, configEstimation.KILL_SEARCH_SIZE, 30, 0.5, 0.5));
+				mmPoint.reset(new MapManagerGlobal(pointLmkFactory, configEstimation.REPARAM_TH, configEstimation.KILL_SEARCH_SIZE, 10, 0.5, 0.5));
 			if(segLmkFactory != NULL)
 				mmSeg.reset(new MapManagerGlobal(segLmkFactory, configEstimation.REPARAM_TH, configEstimation.KILL_SEARCH_SIZE, 30, 0.5, 0.5));
 			break;
@@ -818,6 +825,27 @@ void demo_slam_init()
 		}
 		robPtr1_->setHardwareEstimator(hardEst1);
 
+		robPtr1 = robPtr1_;
+	} else
+	if (intOpts[iRobot] == 2) // odometry
+	{
+		robodo_ptr_t robPtr1_(new RobotOdometry(mapPtr));
+		robPtr1_->setId();	
+		std::cout<<"configSetup.dxNDR "<<configSetup.dxNDR<<std::endl;
+		std::cout<<"configSetup.dvNDR "<<configSetup.dvNDR<<std::endl;
+		double _v[6] = {configSetup.dxNDR, configSetup.dxNDR, configSetup.dxNDR, 
+						configSetup.dvNDR, configSetup.dvNDR, configSetup.dvNDR};
+		vec pertStd = createVector<6>(_v);
+		robPtr1_->perturbation.set_std_continuous(pertStd);
+		robPtr1_->constantPerturbation = false;
+		
+		hardware::hardware_estimator_ptr_t hardEst2;
+		boost::shared_ptr<hardware::HardwareEstimatorOdo> hardEst2_(new hardware::HardwareEstimatorOdo(
+				intOpts[iTrigger], floatOpts[fFreq], floatOpts[fShutter], 1024, mode, strOpts[sDataPath]));
+		if (intOpts[iTrigger] != 0) floatOpts[fFreq] = hardEst2_->getFreq();
+		hardEst2_->setSyncConfig(configSetup.POS_TIMESTAMP_CORRECTION);
+		hardEst2 = hardEst2_;
+		robPtr1_->setHardwareEstimator(hardEst2);	
 		robPtr1 = robPtr1_;
 	}
 
@@ -1269,7 +1297,8 @@ int n_innovation = 0;
 				
 				robot_ptr_t robPtr = pinfo.sen->robotPtr();
 //std::cout << "Frame " << (*world)->t << " using sen " << pinfo.sen->id() << " at time " << std::setprecision(16) << newt << std::endl;
-				robPtr->move(newt);
+				if (intOpts[iRobot] == 2) robPtr->move(robPtr->control, newt);
+				else robPtr->move(newt);
 				
 				JFR_DEBUG("Robot " << robPtr->id() << " state after move " << robPtr->state.x() << " ; euler " << quaternion::q2e(ublas::subrange(robPtr->state.x(), 3, 7)));
 				JFR_DEBUG("Robot state stdev after move " << stdevFromCov(robPtr->state.P()));
@@ -1608,7 +1637,7 @@ void demo_slam_run() {
 	* --config-estimation=data/estimation.cfg
 	* --help
 	* --usage
-	* --robot 0=constant vel, 1=inertial
+	* --robot 0=constant vel, 1=inertial, 2=odometry
 	* --map 0=odometry, 1=global, 2=local/multimap
 	* --trigger 0=internal, 1=external mode 1, 2=external mode 0, 3=external mode 14 (PointGrey (Flea) only)
 	* --simu 0 or <environment id>*10+<trajectory id> (
@@ -1701,7 +1730,6 @@ int main(int argc, char* const* argv)
 #define KeyValueFile_getItem(k) keyValueFile.getItem(#k, k);
 #define KeyValueFile_setItem(k) keyValueFile.setItem(#k, k);
 
-
 void ConfigSetup::loadKeyValueFile(jafar::kernel::KeyValueFile const& keyValueFile)
 {
 	KeyValueFile_getItem(SENSOR_POSE_CONSTVEL);
@@ -1745,6 +1773,10 @@ void ConfigSetup::loadKeyValueFile(jafar::kernel::KeyValueFile const& keyValueFi
 	
 	KeyValueFile_getItem(IMU_TIMESTAMP_CORRECTION);
 	KeyValueFile_getItem(GPS_TIMESTAMP_CORRECTION);
+	
+	KeyValueFile_getItem(dxNDR);
+	KeyValueFile_getItem(dvNDR);
+	KeyValueFile_getItem(POS_TIMESTAMP_CORRECTION);
 	
 	KeyValueFile_getItem(SIMU_IMU_TIMESTAMP_CORRECTION);
 	KeyValueFile_getItem(SIMU_IMU_FREQ);
@@ -1804,6 +1836,10 @@ void ConfigSetup::saveKeyValueFile(jafar::kernel::KeyValueFile& keyValueFile)
 	
 	KeyValueFile_setItem(IMU_TIMESTAMP_CORRECTION);
 	KeyValueFile_setItem(GPS_TIMESTAMP_CORRECTION);
+	
+	KeyValueFile_setItem(dxNDR);
+	KeyValueFile_setItem(dvNDR);
+	KeyValueFile_setItem(POS_TIMESTAMP_CORRECTION);
 	
 	KeyValueFile_setItem(SIMU_IMU_TIMESTAMP_CORRECTION);
 	KeyValueFile_setItem(SIMU_IMU_FREQ);

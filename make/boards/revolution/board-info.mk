@@ -9,7 +9,8 @@ BOARD               := STM32F4xx_OP
 MODEL               := HD
 MODEL_SUFFIX        := 
 
-OPENOCD_CONFIG      := stm32f4xx.cfg
+OPENOCD_JTAG_CONFIG := stlink-v2.cfg
+OPENOCD_CONFIG      := stm32f4xx.stlink.cfg
 
 # Note: These must match the values in link_$(BOARD)_memory.ld
 BL_BANK_BASE        := 0x08000000  # Start of bootloader flash

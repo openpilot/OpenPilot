@@ -43,8 +43,6 @@ ConversionTypeTypeDef CurrentRead;
 MS5611CalibDataTypeDef CalibData;
 
 /* Straight from the datasheet */
-static int32_t X1, X2, X3, B3, B5, B6, P;
-static uint32_t B4, B7;
 static uint32_t RawTemperature;
 static uint32_t RawPressure;
 static int64_t Pressure;

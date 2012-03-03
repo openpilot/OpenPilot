@@ -514,8 +514,9 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 			INSSetState(pos, zeros, q, zeros, zeros);
 			INSResetP(Pdiag);
 		} else if (init_stage == 0 && outdoor_mode) {
-			float q[4], rpy[3];
 			float Pdiag[16]={25.0f,25.0f,25.0f,5.0f,5.0f,5.0f,1e-5f,1e-5f,1e-5f,1e-5f,1e-5f,1e-5f,1e-5f,1e-4f,1e-4f,1e-4f};
+			float rpy[3];
+			float q[4];
 			float NED[3];
 
 			// Reset the INS algorithm
@@ -682,16 +683,18 @@ static int32_t getNED(GPSPositionData * gpsPosition, float * NED)
 {
 	float dL[3] = {(gpsPosition->Latitude - homeLocation.Latitude) / 10.0e6f * DEG2RAD,
 		(gpsPosition->Longitude - homeLocation.Longitude) / 10.0e6f * DEG2RAD,
-		(gpsPosition->Altitude - homeLocation.Altitude)};
+		(gpsPosition->Altitude + gpsPosition->GeoidSeparation - homeLocation.Altitude)};
 
 	NED[0] = T[0] * dL[0];
 	NED[1] = T[1] * dL[1];
 	NED[2] = T[2] * dL[2];
+
+	return 0;
 }
 
 static void settingsUpdatedCb(UAVObjEvent * objEv) 
 {
-	float lat, lon, alt;
+	float lat, alt;
 
 	AttitudeSettingsGet(&attitudeSettings);
 	RevoCalibrationGet(&revoCalibration);
@@ -707,7 +710,6 @@ static void settingsUpdatedCb(UAVObjEvent * objEv)
 
 	// Compute matrix to convert deltaLLA to NED
 	lat = homeLocation.Latitude / 10.0e6f * DEG2RAD;
-	lon = homeLocation.Longitude / 10.0e6 * DEG2RAD;
 	alt = homeLocation.Altitude;
 
 	// In case INS currently running

@@ -529,15 +529,8 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 			GPSPositionData gpsPosition;
 			GPSPositionGet(&gpsPosition);
 
-			// convert from cm back to meters
-			float LLA[3] = {(float) gpsPosition.Latitude / 1e7f, 
-				(float) gpsPosition.Longitude / 1e7f, 
-				(float) (gpsPosition.GeoidSeparation + gpsPosition.Altitude)};
-			// put in local NED frame
-			float ECEF[3] = {(float) (home.ECEF[0] / 100.0f),
-				(float) (home.ECEF[1] / 100.0f),
-				(float) (home.ECEF[2] / 100.0f)};
-			LLA2Base(LLA, ECEF, (float (*)[3]) home.RNE, NED);
+			// Transform the GPS position into NED coordinates
+			getNED(&gpsPosition, NED);
 
 			// Set initial attitude
 			rpy[0] = atan2f(accelsData.x, accelsData.z) * 180.0f / F_PI;

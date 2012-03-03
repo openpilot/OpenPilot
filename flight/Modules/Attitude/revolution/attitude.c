@@ -477,7 +477,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	HomeLocationGet(&home);
 
 	// Have a minimum requirement for gps usage
-	gps_updated &= (gpsData.Satellites >= 7) && (gpsData.PDOP <= 4.0f);
+	gps_updated &= (gpsData.Satellites >= 7) && (gpsData.PDOP <= 4.0f) && (homeLocation.Set == HOMELOCATION_SET_TRUE);
 
 	if (!inited)
 		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE,SYSTEMALARMS_ALARM_ERROR);

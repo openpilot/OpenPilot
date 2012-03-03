@@ -147,7 +147,6 @@ int32_t mag_test;
 uint32_t sensor_dt_us;
 static void SensorsTask(void *parameters)
 {
-	uint8_t init = 0;
 	portTickType lastSysTime;
 	uint32_t accel_samples;
 	uint32_t gyro_samples;

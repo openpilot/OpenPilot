@@ -145,7 +145,7 @@ int32_t PIOS_MS5611_ReadADC(void)
 		RawTemperature = (Data[0] << 16) | (Data[1] << 8) | Data[2];
 		
 		deltaTemp = RawTemperature - (CalibData.C[4] << 8);
-		Temperature = ((2000l + deltaTemp * CalibData.C[5]) >> 23);
+		Temperature = 2000l + ((deltaTemp * CalibData.C[5]) >> 23);
 
 	} else {	
 		int64_t Offset;

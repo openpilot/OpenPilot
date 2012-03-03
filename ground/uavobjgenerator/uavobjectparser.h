@@ -57,6 +57,7 @@ typedef struct {
     QStringList options; // for enums only
     bool defaultElementNames;
     QStringList defaultValues;
+    QString limitValues;
 } FieldInfo;
 
 /**

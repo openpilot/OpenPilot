@@ -50,13 +50,13 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
     m_config->setupUi(this);
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    setupButtons(m_config->saveRCOutputToRAM,m_config->saveRCOutputToSD);
+    addApplySaveButtons(m_config->saveRCOutputToRAM,m_config->saveRCOutputToSD);
     addUAVObject("ActuatorSettings");
 
     UAVSettingsImportExportFactory * importexportplugin =  pm->getObject<UAVSettingsImportExportFactory>();
     connect(importexportplugin,SIGNAL(importAboutToBegin()),this,SLOT(stopTests()));
 
-    setupButtons(m_config->saveRCOutputToRAM,m_config->saveRCOutputToSD);
+    addApplySaveButtons(m_config->saveRCOutputToRAM,m_config->saveRCOutputToSD);
         addUAVObject("ActuatorSettings");
 
     // NOTE: we have channel indices from 0 to 9, but the convention for OP is Channel 1 to Channel 10.

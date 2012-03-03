@@ -163,6 +163,10 @@ for i=2:size(unknownObjIDList,1) %Don't show the first one, as it was simply a d
    disp(['Unknown object ID: 0x' dec2hex(unknownObjIDList(i,1),8) ' appeared ' int2str(unknownObjIDList(i,2)) ' times.']);
 end
 
+for i=2:size(unknownObjIDList,1) %Don't show the first one, as it was simply a dummy placeholder
+   disp(['Unknown object ID: 0x' dec2hex(unknownObjIDList(i,1),8) ' appeared ' int2str(unknownObjIDList(i,2)) ' times.']);
+end
+
 %% Clean Up and Save mat file
 fclose(fid);
 

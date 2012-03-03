@@ -399,11 +399,27 @@ static int32_t updateAttitudeComplimentary(bool first_run)
 	AttitudeActualSet(&attitudeActual);
 
 	// Flush these queues for avoid errors
-	if ( xQueueReceive(baroQueue, &ev, 0) != pdTRUE )
-	{
-	}
-	if ( xQueueReceive(gpsQueue, &ev, 0) != pdTRUE )
-	{
+	xQueueReceive(baroQueue, &ev, 0);
+	if ( xQueueReceive(gpsQueue, &ev, 0) == pdTRUE && homeLocation.Set == HOMELOCATION_SET_TRUE ) {
+		float NED[3];
+		// Transform the GPS position into NED coordinates
+		GPSPositionData gpsPosition;
+		GPSPositionGet(&gpsPosition);
+		getNED(&gpsPosition, NED);
+
+		PositionActualData positionActual;
+		PositionActualGet(&positionActual);
+		positionActual.North = NED[0];
+		positionActual.East = NED[1];
+		positionActual.Down = NED[2];
+		PositionActualSet(&positionActual);
+
+		VelocityActualData velocityActual;
+		VelocityActualGet(&velocityActual);
+		velocityActual.North = gpsPosition.Groundspeed * cosf(gpsPosition.Heading * F_PI / 180.0f);
+		velocityActual.East = gpsPosition.Groundspeed * sinf(gpsPosition.Heading * F_PI / 180.0f);
+		velocityActual.Down = 0;
+		VelocityActualSet(&velocityActual);
 	}
 
 	AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);

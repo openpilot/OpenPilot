@@ -496,8 +496,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>648</width>
-              <height>802</height>
+              <width>626</width>
+              <height>834</height>
              </rect>
             </property>
             <layout class="QGridLayout" name="gridLayout_23">
@@ -11753,9 +11753,9 @@ border-radius: 4;
             <property name="geometry">
              <rect>
               <x>0</x>
-              <y>0</y>
-              <width>401</width>
-              <height>990</height>
+              <y>-402</y>
+              <width>626</width>
+              <height>1026</height>
              </rect>
             </property>
             <layout class="QGridLayout" name="gridLayout_15">
@@ -24709,7 +24709,7 @@ border-radius: 5;</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>0</number>
+                      <number>3</number>
                      </property>
                      <property name="maximum">
                       <double>1000000.000000000000000</double>
@@ -24755,7 +24755,7 @@ border-radius: 5;</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>0</number>
+                      <number>3</number>
                      </property>
                      <property name="maximum">
                       <double>1000000.000000000000000</double>
@@ -24801,7 +24801,7 @@ border-radius: 5;</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>0</number>
+                      <number>5</number>
                      </property>
                      <property name="maximum">
                       <double>1000000.000000000000000</double>
@@ -25598,8 +25598,6 @@ border-radius: 4;
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources>
-  <include location="../../coreplugin/core.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

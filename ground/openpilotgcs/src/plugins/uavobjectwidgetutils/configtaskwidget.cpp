@@ -412,6 +412,7 @@ void ConfigTaskWidget::widgetsContentsChanged()
             }
         }
     }
+    smartsave->resetIcons();
     setDirty(true);
 }
 /**

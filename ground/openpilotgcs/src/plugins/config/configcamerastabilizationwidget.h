@@ -28,7 +28,7 @@
 #define CONFIGCAMERASTABILIZATIONWIDGET_H
 
 #include "ui_camerastabilization.h"
-#include "configtaskwidget.h"
+#include "../uavobjectwidgetutils/configtaskwidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"

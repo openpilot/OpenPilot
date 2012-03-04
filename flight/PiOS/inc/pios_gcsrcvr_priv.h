@@ -37,7 +37,7 @@
 
 extern const struct pios_rcvr_driver pios_gcsrcvr_rcvr_driver;
 
-extern void PIOS_GCSRCVR_Init(void);
+extern int32_t PIOS_GCSRCVR_Init(uint32_t *gcsrcvr_id);
 
 #endif /* PIOS_GCSRCVR_PRIV_H */
 

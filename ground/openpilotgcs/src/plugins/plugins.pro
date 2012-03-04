@@ -70,12 +70,14 @@ plugin_uavobjectbrowser.depends += plugin_uavobjects
 SUBDIRS += plugin_uavobjectbrowser
 
 !contains(QT_VERSION, ^4\\.8\\..*) {
+# Disable ModelView on 64-bit linux too
+!linux-g++-64 {
 # ModelView UAVGadget
 plugin_modelview.subdir = modelview
 plugin_modelview.depends = plugin_coreplugin
 plugin_modelview.depends += plugin_uavobjects
 SUBDIRS += plugin_modelview
-
+}
 #Notify gadget
 plugin_notify.subdir = notify
 plugin_notify.depends = plugin_coreplugin
@@ -112,6 +114,7 @@ SUBDIRS += plugin_systemhealth
 plugin_config.subdir = config
 plugin_config.depends = plugin_coreplugin
 plugin_config.depends += plugin_uavobjects
+plugin_config.depends += plugin_uavobjectwidgetutils
 plugin_config.depends += plugin_uavsettingsimportexport
 SUBDIRS += plugin_config
 
@@ -126,6 +129,13 @@ plugin_pfd.subdir = pfd
 plugin_pfd.depends = plugin_coreplugin
 plugin_pfd.depends += plugin_uavobjects
 SUBDIRS += plugin_pfd
+
+# Primary Flight Display (PFD) gadget
+plugin_qmlview.subdir = qmlview
+plugin_qmlview.depends = plugin_coreplugin
+plugin_qmlview.depends += plugin_uavobjects
+SUBDIRS += plugin_qmlview
+
 
 #IP connection plugin
 plugin_ipconnection.subdir = ipconnection
@@ -195,6 +205,13 @@ plugin_uavsettingsimportexport.subdir = uavsettingsimportexport
 plugin_uavsettingsimportexport.depends = plugin_coreplugin
 plugin_uavsettingsimportexport.depends += plugin_uavobjects
 SUBDIRS += plugin_uavsettingsimportexport
+
+# UAV Object Widget Utility plugin
+plugin_uavobjectwidgetutils.subdir = uavobjectwidgetutils
+plugin_uavobjectwidgetutils.depends = plugin_coreplugin
+plugin_uavobjectwidgetutils.depends += plugin_uavobjects
+plugin_uavobjectwidgetutils.depends += plugin_uavsettingsimportexport
+SUBDIRS += plugin_uavobjectwidgetutils
 
 # Junsi Powerlog plugin
 #plugin_powerlog.subdir = powerlog

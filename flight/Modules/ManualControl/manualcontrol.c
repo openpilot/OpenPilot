@@ -615,8 +615,7 @@ static void altitudeHoldDesired(ManualControlCommandData * cmd)
 	StabilizationSettingsGet(&stabSettings);
 
 	thisSysTime = xTaskGetTickCount();
-	if(thisSysTime > lastSysTime) // reuse dt in case of wraparound
-		dT = (thisSysTime - lastSysTime) / portTICK_RATE_MS / 1000.0f;
+	dT = (thisSysTime - lastSysTime) / portTICK_RATE_MS / 1000.0f;
 	lastSysTime = thisSysTime;
 
 	altitudeHoldDesired.Roll = cmd->Roll * stabSettings.RollMax;

@@ -28,7 +28,7 @@
 #define DEFAULTATTITUDEWIDGET_H
 
 #include "ui_defaultattitude.h"
-#include "configtaskwidget.h"
+#include "../uavobjectwidgetutils/configtaskwidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"

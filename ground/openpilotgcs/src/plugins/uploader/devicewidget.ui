@@ -208,7 +208,7 @@
         <item>
          <widget class="QLabel" name="label_5">
           <property name="text">
-           <string>Description:</string>
+           <string>Firmware tag:</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -218,7 +218,7 @@
         <item>
          <widget class="QLabel" name="label_4">
           <property name="text">
-           <string>Build date:</string>
+           <string>Firmware date:</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -228,7 +228,7 @@
         <item>
          <widget class="QLabel" name="label_3">
           <property name="text">
-           <string>Git tag:</string>
+           <string>Git commit hash:</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

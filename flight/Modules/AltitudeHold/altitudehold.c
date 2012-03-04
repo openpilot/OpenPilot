@@ -126,10 +126,9 @@ float starting_altitude;
 static void altitudeHoldTask(void *parameters)
 {
 	AltitudeHoldDesiredData altitudeHoldDesired;
-	BaroAltitudeData baroAltitude;
 	StabilizationDesiredData stabilizationDesired;
 
-	portTickType thisTime, lastSysTime, lastUpdateTime;
+	portTickType thisTime, lastUpdateTime;
 	UAVObjEvent ev;
 
 	// Force update of the settings
@@ -140,9 +139,8 @@ static void altitudeHoldTask(void *parameters)
 	enum init_state {WAITING_BARO, WAITIING_INIT, INITED} init = WAITING_BARO;
 
 	// Main task loop
-	lastSysTime = xTaskGetTickCount();
 	while (1) {		
-		bool baro_updated;
+		bool baro_updated = false;
 		// Wait until the AttitudeRaw object is updated, if a timeout then go to failsafe
 		if ( xQueueReceive(queue, &ev, 100 / portTICK_RATE_MS) != pdTRUE )
 		{

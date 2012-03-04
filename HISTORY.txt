@@ -1,5 +1,9 @@
 Short summary of changes.  For a complete list see the git log.
 
+2012-02-14
+New QML based system to allow more flexible UI.  Upgraded stabilization
+configuration.
+
 2012-01-02
 CC FW now supports USB Virtual Com Port (VCP/CDC) in addition to the original HID interface
 New ComUsbBridge module can bridge any serial port to the USB CDC port

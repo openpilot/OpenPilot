@@ -65,12 +65,12 @@ void PIOS_USBHOOK_RegisterString(enum usb_string_desc string_id, const uint8_t *
 	}
 }
 
-static ONE_DESCRIPTOR Hid_Interface_Descriptor;
+static ONE_DESCRIPTOR Hid_Descriptor;
 
-void PIOS_USB_HID_RegisterHidInterface(const uint8_t * desc, uint16_t desc_size)
+void PIOS_USB_HID_RegisterHidDescriptor(const uint8_t * desc, uint16_t desc_size)
 {
-	Hid_Interface_Descriptor.Descriptor      = desc;
-	Hid_Interface_Descriptor.Descriptor_Size = desc_size;
+	Hid_Descriptor.Descriptor      = desc;
+	Hid_Descriptor.Descriptor_Size = desc_size;
 }
 
 static ONE_DESCRIPTOR Hid_Report_Descriptor;
@@ -468,7 +468,7 @@ static const uint8_t *PIOS_USBHOOK_GetReportDescriptor(uint16_t Length)
 *******************************************************************************/
 static const uint8_t *PIOS_USBHOOK_GetHIDDescriptor(uint16_t Length)
 {
-	return Standard_GetDescriptorData(Length, &Hid_Interface_Descriptor);
+	return Standard_GetDescriptorData(Length, &Hid_Descriptor);
 }
 
 /*******************************************************************************

@@ -150,12 +150,12 @@ out_fail:
 }
 
 
-static struct pios_usbhook_descriptor hid_if_desc;
+static struct pios_usbhook_descriptor hid_desc;
 
-void PIOS_USB_HID_RegisterHidInterface(const uint8_t * desc, uint16_t length)
+void PIOS_USB_HID_RegisterHidDescriptor(const uint8_t * desc, uint16_t length)
 {
-	hid_if_desc.descriptor = desc;
-	hid_if_desc.length     = length;
+	hid_desc.descriptor = desc;
+	hid_desc.length     = length;
 }
 
 static struct pios_usbhook_descriptor hid_report_desc;
@@ -358,8 +358,8 @@ static bool PIOS_USB_HID_IF_Setup(uint32_t usb_hid_id, struct usb_setup_request 
 						MIN(hid_report_desc.length, req->wLength));
 				break;
 			case USB_DESC_TYPE_HID:
-				PIOS_USBHOOK_CtrlTx(hid_if_desc.descriptor,
-						MIN(hid_if_desc.length, req->wLength));
+				PIOS_USBHOOK_CtrlTx(hid_desc.descriptor,
+						MIN(hid_desc.length, req->wLength));
 				break;
 			default:
 				/* Unhandled descriptor request */

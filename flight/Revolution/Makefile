@@ -273,7 +273,7 @@ DEBUGF = dwarf-2
 
 # Place project-specific -D (define) and/or
 # -U options for C here.
-CDEFS += -DSTM32F10X_$(MODEL)
+CDEFS += -DHSE_VALUE=$(OSCILLATOR_FREQ)
 CDEFS += -DSYSCLK_FREQ=$(SYSCLK_FREQ)
 CDEFS += -DUSE_STDPERIPH_DRIVER
 CDEFS += -DUSE_$(BOARD)

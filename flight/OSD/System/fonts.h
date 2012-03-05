@@ -26,7 +26,7 @@
 #include "font_outlined8x8.h"
 
 // This number must also be incremented for each new font.
-#define NUM_FONTS 3
+#define NUM_FONTS 4
 
 // Flags for fonts.
 #define FONT_LOWERCASE_ONLY	1

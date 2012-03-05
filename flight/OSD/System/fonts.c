@@ -29,6 +29,7 @@ struct FontEntry fonts[NUM_FONTS + 1] = {
 			&font_lookup_outlined8x8,
 			&font_data_outlined8x8,
 			FONT_UPPERCASE_ONLY },
-	{ 2, 8, 8, "Tiny5x5", 0, 0, 0 }, // not yet implemented
+	{ 2, 8, 10, "font8x10", 0, 0, 0 },
+	{ 3, 12, 18, "font12x18", 0, 0, 0 },
 	{ -1 } // ends font table
 };

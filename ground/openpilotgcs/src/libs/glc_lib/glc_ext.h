@@ -35,6 +35,15 @@
 #include "glu.h"
 #endif
 
+#if defined(Q_OS_WIN32)
+#include "GL/gl.h"
+#include "GL/glu.h"
+#endif
+
+#if defined(Q_OS_LINUX)
+#include "GL/glu.h"
+#endif
+
 #if !defined(Q_OS_MAC)
 // ARB_vertex_buffer_object
 extern PFNGLBINDBUFFERARBPROC			glBindBuffer;

@@ -94,14 +94,14 @@ void PIOS_Hsync_ISR() {
 		asm("nop");
 	}*/
 	//PIOS_DELAY_WaituS(5); // wait 5us to see if H or V sync
-	//if(dev_cfg->hsync_io.gpio->IDR & dev_cfg->hsync_io.init.GPIO_Pin) {
-	if(PIOS_VIDEO_HSYNC_GPIO_PORT->IDR & PIOS_VIDEO_HSYNC_GPIO_PIN) {
+	if(dev_cfg->hsync->pin.gpio->IDR & dev_cfg->hsync->pin.init.GPIO_Pin) {
+	//if(PIOS_VIDEO_HSYNC_GPIO_PORT->IDR & PIOS_VIDEO_HSYNC_GPIO_PIN) {
 		//rising
 		//if (gActiveLine != 0) {
 			//PIOS_LED_On(LED2);
 			if(gLineType == LINE_TYPE_GRAPHICS)
 			{
-				for(int g=0;g<110;g++)
+				for(int g=0;g<90;g++)
 				{
 					asm("nop");
 				}

@@ -41,6 +41,7 @@
 
 #include "fonts.h"
 #include "font12x18.h"
+#include "font8x10.h"
 #include "WMMInternal.h"
 
 static uint16_t angleA=0;
@@ -124,7 +125,7 @@ uint8_t getCharData(uint16_t charPos) {
 		}
 	}
 	return length;
-}*/
+}
 
 uint8_t printText16(uint16_t x, uint16_t y, const char* str) {
 
@@ -139,12 +140,6 @@ uint8_t printText16(uint16_t x, uint16_t y, const char* str) {
 }
 
 
-void printTime(uint16_t x, uint16_t y) {
-	char temp[9]={0};
-	sprintf(temp,"%02d:%02d:%02d",time.hour,time.min,time.sec);
-	//printTextFB(x,y,temp);
-	write_string(temp, x, y, 1, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 0);
-}
 
 uint8_t printCharFB(uint16_t ch, uint16_t x, uint16_t y) {
 	for(uint8_t i = 0; i < 18; i++)
@@ -155,57 +150,7 @@ uint8_t printCharFB(uint16_t ch, uint16_t x, uint16_t y) {
 	}
 	return 1;
 }
-
-void write_char16(char ch, unsigned int x, unsigned int y)
-{
-    int yy, addr_temp, row, row_temp, xshift;
-    uint16_t and_mask, or_mask, level_bits;
-    char lookup = 0;
-    // Compute starting address (for x,y) of character.
-    int addr = CALC_BUFF_ADDR(x, y);
-    int wbit = CALC_BIT_IN_WORD(x);
-    // If font only supports lowercase or uppercase, make the letter
-    // lowercase or uppercase.
-    // How big is the character? We handle characters up to 8 pixels
-    // wide for now. Support for large characters may be added in future.
-    {
-            // Ensure we don't overflow.
-            if(x + wbit > DISP_WIDTH)
-                    return;
-            // Load data pointer.
-            row = ch * 18;
-            row_temp = row;
-            addr_temp = addr;
-            xshift = 16 - 16;
-            // We can write mask words easily.
-            for(yy = y; yy < y + 18; yy++)
-            {
-                    write_word_misaligned_OR(draw_buffer_mask, font_mask16x18[row] << xshift, addr, wbit);
-                    addr += DISP_WIDTH / 16;
-                    row++;
-            }
-            // Level bits are more complicated. We need to set or clear
-            // level bits, but only where the mask bit is set; otherwise,
-            // we need to leave them alone. To do this, for each word, we
-            // construct an AND mask and an OR mask, and apply each individually.
-            row = row_temp;
-            addr = addr_temp;
-            for(yy = y; yy < y + 18; yy++)
-            {
-                    level_bits = font_frame16x18[row];
-                    //if(!(flags & FONT_INVERT)) // data is normally inverted
-                            level_bits = ~level_bits;
-                    or_mask = font_mask16x18[row] << xshift;
-                    and_mask = (font_mask16x18[row] & level_bits) << xshift;
-                    write_word_misaligned_OR(draw_buffer_level, or_mask, addr, wbit);
-                    // If we're not bold write the AND mask.
-                    //if(!(flags & FONT_BOLD))
-                            write_word_misaligned_NAND(draw_buffer_level, and_mask, addr, wbit);
-                    addr += DISP_WIDTH / 16;
-                    row++;
-            }
-    }
-}
+*/
 
 
 
@@ -1395,6 +1340,86 @@ int fetch_font_info(char ch, int font, struct FontEntry *font_info, char *lookup
         return 1;
 }
 
+
+/**
+ * write_char16: Draw a character on the current draw buffer.
+ * Currently supports outlined characters and characters with
+ * a width of up to 8 pixels.
+ *
+ * @param       ch              character to write
+ * @param       x               x coordinate (left)
+ * @param       y               y coordinate (top)
+ * @param       flags   flags to write with (see gfx.h)
+ * @param       font    font to use
+ */
+void write_char16(char ch, unsigned int x, unsigned int y, int font)
+{
+    int yy, addr_temp, row, row_temp, xshift;
+    uint16_t and_mask, or_mask, level_bits;
+    struct FontEntry font_info;
+    char lookup = 0;
+    fetch_font_info(0, font, &font_info, NULL);
+
+    // Compute starting address (for x,y) of character.
+    int addr = CALC_BUFF_ADDR(x, y);
+    int wbit = CALC_BIT_IN_WORD(x);
+    // If font only supports lowercase or uppercase, make the letter
+    // lowercase or uppercase.
+    // How big is the character? We handle characters up to 8 pixels
+    // wide for now. Support for large characters may be added in future.
+    {
+            // Ensure we don't overflow.
+            if(x + wbit > DISP_WIDTH)
+                    return;
+            // Load data pointer.
+            row = ch * font_info.height;
+            row_temp = row;
+            addr_temp = addr;
+            xshift = 16 - font_info.width;
+            // We can write mask words easily.
+            for(yy = y; yy < y + font_info.height; yy++)
+            {
+            		if(font==3)
+            			write_word_misaligned_OR(draw_buffer_mask, font_mask12x18[row] << xshift, addr, wbit);
+            		else
+            			write_word_misaligned_OR(draw_buffer_mask, font_mask8x10[row] << xshift, addr, wbit);
+                    addr += DISP_WIDTH / 16;
+                    row++;
+            }
+            // Level bits are more complicated. We need to set or clear
+            // level bits, but only where the mask bit is set; otherwise,
+            // we need to leave them alone. To do this, for each word, we
+            // construct an AND mask and an OR mask, and apply each individually.
+            row = row_temp;
+            addr = addr_temp;
+            for(yy = y; yy < y + font_info.height; yy++)
+            {
+        			if(font==3)
+        			{
+						level_bits = font_frame12x18[row];
+						//if(!(flags & FONT_INVERT)) // data is normally inverted
+								level_bits = ~level_bits;
+						or_mask = font_mask12x18[row] << xshift;
+						and_mask = (font_mask12x18[row] & level_bits) << xshift;
+        			} else {
+						level_bits = font_frame8x10[row];
+						//if(!(flags & FONT_INVERT)) // data is normally inverted
+								level_bits = ~level_bits;
+						or_mask = font_mask8x10[row] << xshift;
+						and_mask = (font_mask8x10[row] & level_bits) << xshift;
+        			}
+                    write_word_misaligned_OR(draw_buffer_level, or_mask, addr, wbit);
+                    // If we're not bold write the AND mask.
+                    //if(!(flags & FONT_BOLD))
+                            write_word_misaligned_NAND(draw_buffer_level, and_mask, addr, wbit);
+                    addr += DISP_WIDTH / 16;
+                    row++;
+            }
+    }
+}
+
+
+
 /**
  * write_char: Draw a character on the current draw buffer.
  * Currently supports outlined characters and characters with
@@ -1418,10 +1443,10 @@ void write_char(char ch, unsigned int x, unsigned int y, int flags, int font)
     int wbit = CALC_BIT_IN_WORD(x);
     // If font only supports lowercase or uppercase, make the letter
     // lowercase or uppercase.
-    /*if(font_info.flags & FONT_LOWERCASE_ONLY)
+    if(font_info.flags & FONT_LOWERCASE_ONLY)
             ch = tolower(ch);
     if(font_info.flags & FONT_UPPERCASE_ONLY)
-            ch = toupper(ch);*/
+            ch = toupper(ch);
     fetch_font_info(ch, font, &font_info, &lookup);
     // How big is the character? We handle characters up to 8 pixels
     // wide for now. Support for large characters may be added in future.
@@ -1543,7 +1568,12 @@ void write_string(char *str, unsigned int x, unsigned int y, unsigned int xs, un
             else
             {
                     if(xx >= 0 && xx < DISP_WIDTH)
+                    {
+                    	if(font_info.id<2)
                             write_char(*str, xx, yy, flags, font);
+                    	else
+                    		write_char16(*str, xx, yy, font);
+                    }
                     xx += font_info.width + xs;
             }
             str++;
@@ -1833,6 +1863,14 @@ void drawBattery(uint16_t x, uint16_t y, uint8_t battery, uint16_t size)
 	}
 }
 
+
+void printTime(uint16_t x, uint16_t y) {
+	char temp[9]={0};
+	sprintf(temp,"%02d:%02d:%02d",time.hour,time.min,time.sec);
+	//printTextFB(x,y,temp);
+	write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 3);
+}
+
 void setAttitudeOsd(int16_t pitch, int16_t roll, int16_t yaw)
 {
 	m_pitch=pitch;
@@ -1851,7 +1889,7 @@ void setGpsOsd(uint8_t status, int32_t lat, int32_t lon, float alt, float spd)
 
 void introText(){
 	//printTextFB((GRAPHICS_WIDTH_REAL/2 - 40)/16,GRAPHICS_HEIGHT_REAL-10,"ver 0.1");
-	write_string("ver 0.2", (GRAPHICS_WIDTH_REAL/2),GRAPHICS_HEIGHT_REAL-18, 1, 0, TEXT_VA_TOP, TEXT_HA_CENTER, 0, 0);
+	write_string("ver 0.2", (GRAPHICS_WIDTH_REAL/2),GRAPHICS_HEIGHT_REAL-20, 0, 0, TEXT_VA_TOP, TEXT_HA_CENTER, 0, 3);
 }
 
 void introGraphics() {
@@ -2115,7 +2153,7 @@ void hud_draw_linear_compass(int v, int range, int width, int x, int y, int mint
         // Then, draw a rectangle with the present heading in it.
         // We want to cover up any other markers on the bottom.
         // First compute font size.
-        fetch_font_info(0, 0, &font_info, NULL);
+        fetch_font_info(0, 3, &font_info, NULL);
         int text_width = (font_info.width + 1) * 3;
         int rect_width = text_width + 2;
         write_filled_rectangle_lm(x - (rect_width / 2), majtick_start + 2, rect_width, font_info.height + 2, 0, 1);
@@ -2124,7 +2162,7 @@ void hud_draw_linear_compass(int v, int range, int width, int x, int y, int mint
         headingstr[1] = '0' + ((v / 10) % 10);
         headingstr[2] = '0' + (v % 10);
         headingstr[3] = 0;
-        write_string(headingstr, x + 1, majtick_start + textoffset+2, 1, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 1, 0);
+        write_string(headingstr, x + 1, majtick_start + textoffset+2, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 1, 3);
 }
 
 
@@ -2191,19 +2229,40 @@ void calcHomeArrow(void)
     //! TODO: sanity check
 
 	char temp[50]={0};
-	memset(temp, ' ', 40);
 	sprintf(temp,"hea:%d",(int)brng);
-	write_string(temp, 130, 10, 1, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 0);
+	write_string(temp, 130, 10, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
 	sprintf(temp,"ele:%d",(int)elevation);
-	write_string(temp, 130, 10+14, 1, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 0);
+	write_string(temp, 130, 10+10, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
 	sprintf(temp,"dis:%d",(int)d);
-	write_string(temp, 130, 10+14+14, 1, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 0);
+	write_string(temp, 130, 10+10+10, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
 	sprintf(temp,"u2g:%d",(int)u2g);
-	write_string(temp, 130, 10+14+14+14, 1, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 0);
+	write_string(temp, 130, 10+10+10+10, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
 
 	sprintf(temp,"%c%c",(int)(u2g/22.5f)*2+0x90,(int)(u2g/22.5f)*2+0x91);
-	printText16(200, 10+14+14,temp);
+	write_string(temp,200,10+10+10, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 3);
+}
 
+int lama=10;
+int lama_loc[2][30];
+
+void lamas(void)
+{
+	char temp[10]={0};
+	lama++;
+	if(lama%10==0)
+	{
+		for(int z=0; z<30;z++)
+		{
+
+			lama_loc[0][z]=rand()%(GRAPHICS_WIDTH_REAL-10);
+			lama_loc[1][z]=rand()%(GRAPHICS_HEIGHT_REAL-10);
+		}
+	}
+	for(int z=0; z<30;z++)
+	{
+		sprintf(temp,"%c",0xe8+(lama_loc[0][z]%2));
+		write_string(temp,lama_loc[0][z],lama_loc[1][z], 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+	}
 }
 
 //main draw function
@@ -2247,11 +2306,11 @@ void updateGraphics() {
 	char temp[50]={0};
 	memset(temp, ' ', 40);
 	sprintf(temp,"Lat:%d",(int)m_gpsLat);
-	write_string(temp, 5, 10, 1, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 0);
+	write_string(temp, 5, 10, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
 	sprintf(temp,"Lon:%d",(int)m_gpsLon);
-	write_string(temp, 5, 10+14, 1, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 0);
+	write_string(temp, 5, 10+14, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
 	sprintf(temp,"Fix:%d",(int)m_gpsStatus);
-	write_string(temp, 5, 10+14+14, 1, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 0);
+	write_string(temp, 5, 10+14+14, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
 
 
 	/* Print RTC time */
@@ -2262,16 +2321,27 @@ void updateGraphics() {
 
 	/* Print Number of detected video Lines */
 	sprintf(temp,"Lines:%4d",PIOS_Video_GetOSDLines());
-	write_string(temp, (GRAPHICS_WIDTH_REAL - 2),10, 1, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 0);
+	write_string(temp, (GRAPHICS_WIDTH_REAL - 2),10, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 
 	/* Print ADC voltage */
-	sprintf(temp,"Rssi:%4dV",(int)(PIOS_ADC_PinGet(4)*3000/4096));
-	write_string(temp, (GRAPHICS_WIDTH_REAL - 2),24, 1, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 0);
+	sprintf(temp,"Rssi:%4dV",(int)(PIOS_ADC_PinGet(5)*300*61/4096));
+	write_string(temp, (GRAPHICS_WIDTH_REAL - 2),20, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 
 	/* Print CPU temperature */
-	sprintf(temp,"Temp:%4dC",(int)(PIOS_ADC_PinGet(5)*0.29296875f-279));
-	write_string(temp, (GRAPHICS_WIDTH_REAL - 2),38, 1, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 0);
+	sprintf(temp,"Temp:%4dC",(int)(PIOS_ADC_PinGet(6)*0.29296875f-279));
+	write_string(temp, (GRAPHICS_WIDTH_REAL - 2),30, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 
+	/* Print ADC voltage FLIGHT*/
+	sprintf(temp,"FltV:%4dV",(int)(PIOS_ADC_PinGet(2)*300*61/4096));
+	write_string(temp, (GRAPHICS_WIDTH_REAL - 2),40, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+
+	/* Print ADC voltage VIDEO*/
+	sprintf(temp,"VidV:%4dV",(int)(PIOS_ADC_PinGet(3)*300*61/4096));
+	write_string(temp, (GRAPHICS_WIDTH_REAL - 2),50, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+
+	/* Print ADC voltage RSSI */
+	sprintf(temp,"Rssi:%4dV",(int)(PIOS_ADC_PinGet(4)*300*61/4096));
+	write_string(temp, (GRAPHICS_WIDTH_REAL - 2),60, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 
 	/* Draw Battery Gauge */
 	m_batt++;
@@ -2323,7 +2393,7 @@ void updateGraphics() {
 	}
 	//write_filled_rectangle(draw_buffer_level,20,20,30,30,1);
 	//write_filled_rectangle(draw_buffer_mask,30,30,30,30,1);
-
+	lamas();
     /* Make sure every line last bit is 0 */
 	write_vline( draw_buffer_level,GRAPHICS_WIDTH_REAL-1,0,GRAPHICS_HEIGHT_REAL-1,0);
 	write_vline( draw_buffer_mask,GRAPHICS_WIDTH_REAL-1,0,GRAPHICS_HEIGHT_REAL-1,0);

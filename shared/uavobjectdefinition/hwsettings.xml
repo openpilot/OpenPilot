@@ -16,7 +16,7 @@
 		<field name="USB_HIDPort" units="function" type="enum" elements="1" options="USBTelemetry,Disabled" defaultvalue="USBTelemetry"/>
 		<field name="USB_VCPPort" units="function" type="enum" elements="1" options="USBTelemetry,ComBridge,Disabled" defaultvalue="Disabled"/>
 
-		<field name="OptionalModules" units="" type="enum" elementnames="CameraStab,GPS,ComUsbBridge,Fault,Altitude" options="Disabled,Enabled" defaultvalue="Disabled"/>
+		<field name="OptionalModules" units="" type="enum" elementnames="CameraStab,GPS,ComUsbBridge,Fault,Altitude,TxPID" options="Disabled,Enabled" defaultvalue="Disabled"/>
 		<field name="DSMxBind" units=""  type="uint8"  elements="1" defaultvalue="0"/>
 
 		<access gcs="readwrite" flight="readwrite"/>

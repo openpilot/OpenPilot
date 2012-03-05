@@ -105,6 +105,8 @@
 // This actually needs calibrating
 #define IDLE_COUNTS_PER_SEC_AT_NO_LOAD (8379692)
 
+#define REVOLUTION
+
 #endif /* PIOS_CONFIG_H */
 /**
  * @}

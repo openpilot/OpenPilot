@@ -598,6 +598,7 @@ static void updateStabilizationDesired(ManualControlCommandData * cmd, ManualCon
 	StabilizationDesiredSet(&stabilization);
 }
 
+#if defined(REVOLUTION)
 // TODO: Need compile flag to exclude this from copter control
 static void altitudeHoldDesired(ManualControlCommandData * cmd)
 {
@@ -637,7 +638,12 @@ static void altitudeHoldDesired(ManualControlCommandData * cmd)
 	
 	AltitudeHoldDesiredSet(&altitudeHoldDesired);
 }
-
+#else
+static void altitudeHoldDesired(ManualControlCommandData * cmd)
+{
+	AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_ERROR);
+}
+#endif
 /**
  * Convert channel from servo pulse duration (microseconds) to scaled -1/+1 range.
  */

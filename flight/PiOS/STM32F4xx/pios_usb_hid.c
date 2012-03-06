@@ -40,6 +40,7 @@
 #include "pios_usbhook.h"	 /* PIOS_USBHOOK_* */
 
 #define MIN(x,y) (((x) < (y)) ? (x) : (y))
+#define MAX(x,y) (((x) > (y)) ? (x) : (y))
 
 static void PIOS_USB_HID_RegisterTxCallback(uint32_t usbhid_id, pios_com_callback tx_out_cb, uint32_t context);
 static void PIOS_USB_HID_RegisterRxCallback(uint32_t usbhid_id, pios_com_callback rx_in_cb, uint32_t context);
@@ -71,7 +72,10 @@ struct pios_usb_hid_dev {
 	bool usb_if_enabled;
 
 	uint8_t rx_packet_buffer[PIOS_USB_BOARD_HID_DATA_LENGTH];
+	bool rx_active;
+
 	uint8_t tx_packet_buffer[PIOS_USB_BOARD_HID_DATA_LENGTH];
+	bool tx_active;
 
 	uint32_t rx_dropped;
 	uint32_t rx_oversize;
@@ -140,6 +144,10 @@ int32_t PIOS_USB_HID_Init(uint32_t * usbhid_id, const struct pios_usb_hid_cfg * 
 	usb_hid_dev->cfg = cfg;
 	usb_hid_dev->lower_id = lower_id;
 
+	/* Rx and Tx are not active yet */
+	usb_hid_dev->rx_active = false;
+	usb_hid_dev->tx_active = false;
+
 	/* Register class specific interface callbacks with the USBHOOK layer */
 	usb_hid_dev->usb_if_enabled = false;
 	PIOS_USBHOOK_RegisterIfOps(cfg->data_if, &usb_hid_ifops, (uint32_t) usb_hid_dev);
@@ -195,6 +203,12 @@ static bool PIOS_USB_HID_SendReport(struct pios_usb_hid_dev * usb_hid_dev)
 		return false;
 	}
 
+	/* 
+	 * Mark this endpoint as being tx active _before_ actually transmitting
+	 * to make sure we don't race with the Tx completion interrupt
+	 */
+	usb_hid_dev->tx_active = true;
+
 	/* Always set type as report ID */
 	usb_hid_dev->tx_packet_buffer[0] = 1;
 
@@ -240,16 +254,12 @@ static void PIOS_USB_HID_RxStart(uint32_t usbhid_id, uint16_t rx_bytes_avail) {
 	uint16_t max_payload_length = PIOS_USB_BOARD_HID_DATA_LENGTH - 2;
 #endif
 
-	PIOS_IRQ_Disable();
-	if (rx_bytes_avail >= max_payload_length) {
-		/*
-		 * FIXME should make sure we do not already have a buffer queued
-		 */
+	if (!usb_hid_dev->rx_active && (rx_bytes_avail >= max_payload_length)) {
 		PIOS_USBHOOK_EndpointRx(usb_hid_dev->cfg->data_rx_ep,
 					usb_hid_dev->rx_packet_buffer,
 					sizeof(usb_hid_dev->rx_packet_buffer));
+		usb_hid_dev->rx_active = true;
 	}
-	PIOS_IRQ_Enable();
 }
 
 static void PIOS_USB_HID_TxStart(uint32_t usbhid_id, uint16_t tx_bytes_avail)
@@ -268,7 +278,10 @@ static void PIOS_USB_HID_TxStart(uint32_t usbhid_id, uint16_t tx_bytes_avail)
 		return;
 	}
 
-	PIOS_USB_HID_SendReport(usb_hid_dev);
+	if (!usb_hid_dev->tx_active) {
+		/* Transmitter is not currently active, send a report */
+		PIOS_USB_HID_SendReport(usb_hid_dev);
+	}
 }
 
 static void PIOS_USB_HID_RegisterRxCallback(uint32_t usbhid_id, pios_com_callback rx_in_cb, uint32_t context)
@@ -434,11 +447,15 @@ static bool PIOS_USB_HID_EP_IN_Callback(uint32_t usb_hid_id, uint8_t epnum, uint
 		return false;
 	}
 
-	if (!PIOS_USB_CheckAvailable(usb_hid_dev->lower_id)) {
+	if (PIOS_USB_CheckAvailable(usb_hid_dev->lower_id) &&
+		PIOS_USB_HID_SendReport(usb_hid_dev)) {
+		/* More data has been queued, leave tx_active set to true */
+		return true;
+	} else {
+		/* Nothing new sent, transmitter is now inactive */
+		usb_hid_dev->tx_active = false;
 		return false;
 	}
-
-	return (PIOS_USB_HID_SendReport(usb_hid_dev));
 }
 
 /**
@@ -458,6 +475,7 @@ static bool PIOS_USB_HID_EP_OUT_Callback(uint32_t usb_hid_id, uint8_t epnum, uin
 
 	if (!usb_hid_dev->rx_in_cb) {
 		/* No Rx call back registered, disable the receiver */
+		usb_hid_dev->rx_active = false;
 		return false;
 	}
 
@@ -489,6 +507,7 @@ static bool PIOS_USB_HID_EP_OUT_Callback(uint32_t usb_hid_id, uint8_t epnum, uin
 		return true;
 	} else {
 		/* Not enough room left for a message, apply backpressure */
+		usb_hid_dev->rx_active = false;
 		return false;
 	}
 

@@ -68,6 +68,8 @@ struct pios_usb_hid_dev {
 	pios_com_callback tx_out_cb;
 	uint32_t tx_out_context;
 
+	bool usb_if_enabled;
+
 	uint8_t rx_packet_buffer[PIOS_USB_BOARD_HID_DATA_LENGTH];
 	uint8_t tx_packet_buffer[PIOS_USB_BOARD_HID_DATA_LENGTH];
 
@@ -139,6 +141,7 @@ int32_t PIOS_USB_HID_Init(uint32_t * usbhid_id, const struct pios_usb_hid_cfg * 
 	usb_hid_dev->lower_id = lower_id;
 
 	/* Register class specific interface callbacks with the USBHOOK layer */
+	usb_hid_dev->usb_if_enabled = false;
 	PIOS_USBHOOK_RegisterIfOps(cfg->data_if, &usb_hid_ifops, (uint32_t) usb_hid_dev);
 
 	*usbhid_id = (uint32_t) usb_hid_dev;
@@ -221,6 +224,11 @@ static void PIOS_USB_HID_RxStart(uint32_t usbhid_id, uint16_t rx_bytes_avail) {
 	bool valid = PIOS_USB_HID_validate(usb_hid_dev);
 	PIOS_Assert(valid);
 
+	/* Make sure this USB interface has been initialized */
+	if (!usb_hid_dev->usb_if_enabled) {
+		return;
+	}
+
 	if (!PIOS_USB_CheckAvailable(usb_hid_dev->lower_id)) {
 		return;
 	}
@@ -251,20 +259,14 @@ static void PIOS_USB_HID_TxStart(uint32_t usbhid_id, uint16_t tx_bytes_avail)
 	bool valid = PIOS_USB_HID_validate(usb_hid_dev);
 	PIOS_Assert(valid);
 
-	if (!PIOS_USB_CheckAvailable(usb_hid_dev->lower_id)) {
+	/* Make sure this USB interface has been initialized */
+	if (!usb_hid_dev->usb_if_enabled) {
 		return;
 	}
 
-#if 0
-	if (GetEPTxStatus(usb_hid_dev->cfg->data_tx_ep) == EP_TX_VALID) {
-		/* Endpoint is already transmitting */
+	if (!PIOS_USB_CheckAvailable(usb_hid_dev->lower_id)) {
 		return;
 	}
-#else
-	/*
-	 * FIXME start transmitter
-	 */
-#endif
 
 	PIOS_USB_HID_SendReport(usb_hid_dev);
 }
@@ -316,6 +318,8 @@ static void PIOS_USB_HID_IF_Init(uint32_t usb_hid_id)
 					   sizeof(usb_hid_dev->rx_packet_buffer),
 					   PIOS_USB_HID_EP_OUT_Callback,
 					   (uint32_t) usb_hid_dev);
+	usb_hid_dev->usb_if_enabled = true;
+
 }
 
 static void PIOS_USB_HID_IF_DeInit(uint32_t usb_hid_id)
@@ -327,6 +331,7 @@ static void PIOS_USB_HID_IF_DeInit(uint32_t usb_hid_id)
 	}
 
 	/* DeRegister endpoint specific callbacks with the USBHOOK layer */
+	usb_hid_dev->usb_if_enabled = false;
 	PIOS_USBHOOK_DeRegisterEpInCallback(usb_hid_dev->cfg->data_tx_ep);
 	PIOS_USBHOOK_DeRegisterEpOutCallback(usb_hid_dev->cfg->data_rx_ep);
 }

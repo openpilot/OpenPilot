@@ -340,7 +340,7 @@ static uint8_t PIOS_USBHOOK_CLASS_Setup(void *pdev, USB_SETUP_REQ *req)
 			usb_if_table[ifnum].ifops->setup(usb_if_table[ifnum].context, 
 							 (struct usb_setup_request *)req);
 			if (req->bmRequest & 0x80 && req->wLength > 0) {
-				/* Request is a host-to-device data setup packet, keep track of the request details for the EP0_RxRead call */
+				/* Request is a host-to-device data setup packet, keep track of the request details for the EP0_RxReady call */
 				usb_ep0_active_req.bmRequestType = req->bmRequest;
 				usb_ep0_active_req.bRequest      = req->bRequest;
 				usb_ep0_active_req.wValue        = req->wValue;
@@ -386,11 +386,14 @@ static uint8_t PIOS_USBHOOK_CLASS_DataIn(void *pdev, uint8_t epnum)
 	DCD_EP_Flush(pdev, epnum);	/* NOT SURE IF THIS IS REQUIRED */
 
 	/* Remove the direction bit so we can use this as an index */
-	epnum = epnum & 0xF;
+	uint8_t epnum_idx = epnum & 0x7F;
 
-	if ((epnum < NELEMENTS(usb_epin_table)) && usb_epin_table[epnum].cb) {
-		struct usb_ep_entry *ep = &(usb_epin_table[epnum]);
-		ep->cb(ep->context, epnum, ep->max_len);
+	if ((epnum_idx < NELEMENTS(usb_epin_table)) && usb_epin_table[epnum_idx].cb) {
+		struct usb_ep_entry *ep = &(usb_epin_table[epnum_idx]);
+		if (!ep->cb(ep->context, epnum_idx, ep->max_len)) {
+			/* NOTE: use real endpoint number including direction bit */
+			DCD_SetEPStatus(pdev, epnum, USB_OTG_EP_TX_NAK);
+		}
 	}
 
 	return USBD_OK;
@@ -399,11 +402,14 @@ static uint8_t PIOS_USBHOOK_CLASS_DataIn(void *pdev, uint8_t epnum)
 static uint8_t PIOS_USBHOOK_CLASS_DataOut(void *pdev, uint8_t epnum)
 {
 	/* Remove the direction bit so we can use this as an index */
-	epnum = epnum & 0xF;
+	uint8_t epnum_idx = epnum & 0x7F;
 
-	if ((epnum < NELEMENTS(usb_epout_table)) && usb_epout_table[epnum].cb) {
-		struct usb_ep_entry *ep = &(usb_epout_table[epnum]);
-		ep->cb(ep->context, epnum, ep->max_len);
+	if ((epnum_idx < NELEMENTS(usb_epout_table)) && usb_epout_table[epnum_idx].cb) {
+		struct usb_ep_entry *ep = &(usb_epout_table[epnum_idx]);
+		if (!ep->cb(ep->context, epnum_idx, ep->max_len)) {
+			/* NOTE: use real endpoint number including direction bit */
+			DCD_SetEPStatus(pdev, epnum, USB_OTG_EP_RX_NAK);
+		}
 	}
 
 	return USBD_OK;

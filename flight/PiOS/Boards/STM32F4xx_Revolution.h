@@ -30,7 +30,7 @@
 #ifndef STM3210E_INS_H_
 #define STM3210E_INS_H_
 
-
+#include <stdbool.h>
 
 //------------------------
 // Timers and Channels Used
@@ -68,8 +68,8 @@ TIM8  |           |           |           |
 //------------------------
 // BOOTLOADER_SETTINGS
 //------------------------
-#define BOARD_READABLE	TRUE
-#define BOARD_WRITABLE	TRUE
+#define BOARD_READABLE	true
+#define BOARD_WRITABLE	true
 #define MAX_DEL_RETRYS	3
 
 

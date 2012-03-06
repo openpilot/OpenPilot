@@ -86,6 +86,13 @@ void PIOS_USBHOOK_Activate(void)
 		&user_callbacks);
 }
 
+void PIOS_USBHOOK_Deactivate(void)
+{
+	DCD_DevDisconnect(&pios_usb_otg_core_handle);
+	USBD_DeInit(&pios_usb_otg_core_handle);
+	USB_OTG_StopDevice(&pios_usb_otg_core_handle);
+}
+
 void OTG_FS_IRQHandler(void)
 {
 	if(!USBD_OTG_ISR_Handler(&pios_usb_otg_core_handle)) {

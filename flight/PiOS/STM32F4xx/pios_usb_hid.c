@@ -309,7 +309,7 @@ static void PIOS_USB_HID_IF_Init(uint32_t usb_hid_id)
 
 	/* Register endpoint specific callbacks with the USBHOOK layer */
 	PIOS_USBHOOK_RegisterEpInCallback(usb_hid_dev->cfg->data_tx_ep,
-					  sizeof(usb_hid_dev->rx_packet_buffer),
+					  sizeof(usb_hid_dev->tx_packet_buffer),
 					  PIOS_USB_HID_EP_IN_Callback,
 					  (uint32_t) usb_hid_dev);
 	PIOS_USBHOOK_RegisterEpOutCallback(usb_hid_dev->cfg->data_rx_ep,

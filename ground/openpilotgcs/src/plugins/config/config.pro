@@ -27,6 +27,7 @@ HEADERS += configplugin.h \
     defaulthwsettingswidget.h \
     inputchannelform.h \
     configcamerastabilizationwidget.h \
+    configtxpidwidget.h \
     outputchannelform.h \
     config_global.h
 SOURCES += configplugin.cpp \
@@ -53,6 +54,7 @@ SOURCES += configplugin.cpp \
     defaulthwsettingswidget.cpp \
     inputchannelform.cpp \
     configcamerastabilizationwidget.cpp \
+    configtxpidwidget.cpp \
     outputchannelform.cpp
 FORMS += airframe.ui \
     cc_hw_settings.ui \
@@ -67,5 +69,6 @@ FORMS += airframe.ui \
     defaulthwsettings.ui \
     inputchannelform.ui \
     camerastabilization.ui \
-    outputchannelform.ui
+    outputchannelform.ui \
+    txpid.ui 
 RESOURCES += configgadget.qrc

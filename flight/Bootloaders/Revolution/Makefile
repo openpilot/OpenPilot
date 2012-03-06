@@ -46,10 +46,8 @@ else
 REMOVE_CMD = rm
 endif
 
-FLASH_TOOL = OPENOCD
-
 # Paths
-REVO_BL = ./
+REVO_BL = $(WHEREAMI)
 REVO_BLINC = $(REVO_BL)/inc
 PIOS = ../../PiOS
 PIOSINC = $(PIOS)/inc
@@ -64,15 +62,7 @@ STMLIBDIR = $(APPLIBDIR)
 STMSPDDIR = $(STMLIBDIR)/STM32F4xx_StdPeriph_Driver
 STMSPDSRCDIR = $(STMSPDDIR)/src
 STMSPDINCDIR = $(STMSPDDIR)/inc
-OPDIR = ../OpenPilot
-OPUAVOBJ = ../UAVObjects
-OPUAVOBJINC = $(OPUAVOBJ)/inc
-OPSYSINC = $(OPDIR)/System/inc
-BOOT = ../Bootloaders/Revolution
-BOOTINC = $(BOOT)/inc
 HWDEFSINC = ../../board_hw_defs/$(BOARD_NAME)
-
-OPUAVSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
 
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files
@@ -81,16 +71,11 @@ OPUAVSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
 SRC += main.c
 SRC += pios_board.c
 SRC += pios_usb_board_data.c
-SRC += bl_fsm.c
 
 ## PIOS Hardware (STM32F4xx)
 include $(PIOS)/STM32F4xx/library.mk
 
-## Library files
-SRC += $(FLIGHTLIB)/fifo_buffer.c
-
 # PIOS Hardware (Common)
-#SRC += $(PIOSCOMMON)/pios_com.c
 SRC += $(PIOSCOMMON)/pios_board_info.c
 SRC += $(PIOSCOMMON)/pios_com_msg.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c
@@ -121,7 +106,6 @@ EXTRAINCDIRS  += $(PIOSBOARDS)
 EXTRAINCDIRS  += $(STMSPDINCDIR)
 EXTRAINCDIRS  += $(CMSISDIR)
 EXTRAINCDIRS  += $(REVO_BLINC)
-EXTRAINCDIRS  += $(BOOTINC)
 EXTRAINCDIRS  += $(HWDEFSINC)
 
 # List any extra directories to look for library files here.

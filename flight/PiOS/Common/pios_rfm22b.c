@@ -35,6 +35,8 @@
 
 #include <pios_rfm22b_priv.h>
 
+#define OUTPUT_COM PIOS_COM_FLEXI
+
 /* Provide a COM driver */
 static void PIOS_RFM22B_ChangeBaud(uint32_t rfm22b_id, uint32_t baud);
 static void PIOS_RFM22B_RegisterRxCallback(uint32_t rfm22b_id, pios_com_callback rx_in_cb, uint32_t context);
@@ -139,10 +141,8 @@ static void PIOS_RFM22B_RxStart(uint32_t rfm22b_id, uint16_t rx_bytes_avail)
 	bool valid = PIOS_RFM22B_validate(rfm22b_dev);
 	PIOS_Assert(valid);
 
-#ifdef NEVER
-	RFM22B_ITConfig(rfm22b_dev->cfg->regs, RFM22B_IT_RXNE, ENABLE);
-#endif
 }
+
 static void PIOS_RFM22B_TxStart(uint32_t rfm22b_id, uint16_t tx_bytes_avail)
 {
 	struct pios_rfm22b_dev * rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
@@ -150,9 +150,18 @@ static void PIOS_RFM22B_TxStart(uint32_t rfm22b_id, uint16_t tx_bytes_avail)
 	bool valid = PIOS_RFM22B_validate(rfm22b_dev);
 	PIOS_Assert(valid);
 
-#ifdef NEVER
-	RFM22B_ITConfig(rfm22b_dev->cfg->regs, RFM22B_IT_TXE, ENABLE);
-#endif
+	bool need_yield = false;
+	if (rfm22b_dev->tx_out_cb) {
+		uint8_t buf[16];
+		uint16_t bytes_to_send = (rfm22b_dev->tx_out_cb)(rfm22b_dev->tx_out_context, buf, 16, NULL, &need_yield);
+		if(bytes_to_send > 0)
+			PIOS_COM_SendBuffer(OUTPUT_COM, buf, bytes_to_send);
+	}
+
+#if defined(PIOS_INCLUDE_FREERTOS)
+	if (need_yield)
+		vPortYieldFromISR();
+#endif	/* PIOS_INCLUDE_FREERTOS */
 }
 
 /**
@@ -167,23 +176,10 @@ static void PIOS_RFM22B_ChangeBaud(uint32_t rfm22b_id, uint32_t baud)
 	bool valid = PIOS_RFM22B_validate(rfm22b_dev);
 	PIOS_Assert(valid);
 
-#ifdef NEVER
-	RFM22B_InitTypeDef RFM22B_InitStructure;
-
-	/* Start with a copy of the default configuration for the peripheral */
-	RFM22B_InitStructure = rfm22b_dev->cfg->init;
-
-	/* Adjust the baud rate */
-	RFM22B_InitStructure.RFM22B_BaudRate = baud;
-
-	/* Write back the new configuration */
-	RFM22B_Init(rfm22b_dev->cfg->regs, &RFM22B_InitStructure);
-#endif
 }
 
 static void PIOS_RFM22B_RegisterRxCallback(uint32_t rfm22b_id, pios_com_callback rx_in_cb, uint32_t context)
 {
-#ifdef NEVER
 	struct pios_rfm22b_dev * rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
 
 	bool valid = PIOS_RFM22B_validate(rfm22b_dev);
@@ -195,12 +191,10 @@ static void PIOS_RFM22B_RegisterRxCallback(uint32_t rfm22b_id, pios_com_callback
 	 */
 	rfm22b_dev->rx_in_context = context;
 	rfm22b_dev->rx_in_cb = rx_in_cb;
-#endif
 }
 
 static void PIOS_RFM22B_RegisterTxCallback(uint32_t rfm22b_id, pios_com_callback tx_out_cb, uint32_t context)
 {
-#ifdef NEVER
 	struct pios_rfm22b_dev * rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
 
 	bool valid = PIOS_RFM22B_validate(rfm22b_dev);
@@ -212,7 +206,6 @@ static void PIOS_RFM22B_RegisterTxCallback(uint32_t rfm22b_id, pios_com_callback
 	 */
 	rfm22b_dev->tx_out_context = context;
 	rfm22b_dev->tx_out_cb = tx_out_cb;
-#endif
 }
 
 static void PIOS_RFM22B_Timer_Callback(uint32_t dev_id) {
@@ -224,13 +217,21 @@ static void PIOS_RFM22B_Timer_Callback(uint32_t dev_id) {
 		return;
 	}
 
+	bool need_yield = false;
+	if (rfm22b_dev->rx_in_cb) {
+		uint8_t buf[16];
+		uint32_t rx_bytes = PIOS_COM_ReceiveBuffer(OUTPUT_COM, buf, 16, 0);
+
+		if (rx_bytes > 0)
+			(rfm22b_dev->rx_in_cb)(rfm22b_dev->rx_in_context, buf, rx_bytes, NULL, &need_yield);
+	}
+
 	/* 
 	 * RTC runs at 625Hz.
 	 */
 	if(--rfm22b_dev->countdown_timer > 0)
 		return;
 	rfm22b_dev->countdown_timer = (uint32_t)((float)(rfm22b_dev->cfg->send_timeout) / 0.625);
-	PIOS_COM_SendString(PIOS_COM_TELEM_SERIAL, "Hello Telem\n\r");
 }
 
 #endif

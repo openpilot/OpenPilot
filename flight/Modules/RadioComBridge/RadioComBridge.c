@@ -104,9 +104,8 @@ static int32_t RadioComBridgeInitialize(void)
 		return -1;
 
 	// TODO: Get from settings object
-	//data->com_port = PIOS_COM_VCP;
 	data->com_port = PIOS_COM_TELEM_USB;
-	data->radio_port = PIOS_COM_TELEM_SERIAL;
+	data->radio_port = PIOS_COM_RFM22B_RF;
 
 	data->radio2com_buf = pvPortMalloc(BRIDGE_BUF_LEN);
 	PIOS_Assert(data->radio2com_buf);
@@ -150,7 +149,6 @@ static void com2RadioBridgeTask(void * parameters)
 
 		rx_bytes = PIOS_COM_ReceiveBuffer(data->com_port, data->com2radio_buf, BRIDGE_BUF_LEN, 500);
 		if (rx_bytes > 0) {
-			PIOS_COM_SendString(PIOS_COM_TELEM_SERIAL, "Rec com\n\r");
 			/* Bytes available to transfer */
 			if (PIOS_COM_SendBuffer(data->radio_port, data->com2radio_buf, rx_bytes) != rx_bytes) {
 				/* Error on transmit */

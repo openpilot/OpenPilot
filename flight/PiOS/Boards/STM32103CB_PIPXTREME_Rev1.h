@@ -147,20 +147,19 @@ extern uint32_t pios_i2c_flexi_adapter_id;
 //
 // See also pios_board.c
 //-------------------------
-#define PIOS_COM_MAX_DEVS			4
+#define PIOS_COM_MAX_DEVS			5
 
 extern uint32_t pios_com_telem_usb_id;
 extern uint32_t pios_com_vcp_usb_id;
 extern uint32_t pios_com_usart1_id;
-extern uint32_t pios_com_usart2_id;
 extern uint32_t pios_com_usart3_id;
 extern uint32_t pios_com_rfm22b_id;
 #define PIOS_COM_TELEM_SERIAL           (pios_com_usart1_id)
-#define PIOS_COM_DEBUG                  (pios_com_usart2_id)
 #define PIOS_COM_FLEXI                  (pios_com_usart3_id)
 #define PIOS_COM_TELEM_USB              (pios_com_telem_usb_id)
 #define PIOS_COM_VCP_USB                (pios_com_vcp_usb_id)
 #define PIOS_COM_RFM22B_RF              (pios_com_rfm22b_id)
+#define PIOS_COM_DEBUG									PIOS_COM_TELEM_SERIAL
 
 //------------------------
 // PIOS_RCVR

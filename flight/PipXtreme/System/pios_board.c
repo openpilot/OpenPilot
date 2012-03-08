@@ -613,7 +613,6 @@ uint32_t pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE];
 uint32_t pios_com_telem_usb_id;
 uint32_t pios_com_vcp_usb_id;
 uint32_t pios_com_usart1_id;
-uint32_t pios_com_usart2_id;
 uint32_t pios_com_usart3_id;
 uint32_t pios_com_rfm22b_id;
 
@@ -820,24 +819,6 @@ void PIOS_Board_Init(void) {
 		}
 	}
 
-	/* Configure USART2 */
-	{
-		uint32_t pios_usart2_id;
-		if (PIOS_USART_Init(&pios_usart2_id, &pios_usart_usart2_cfg)) {
-			PIOS_Assert(0);
-		}
-
-		uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_RX_BUF_LEN);
-		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_TX_BUF_LEN);
-		PIOS_Assert(rx_buffer);
-		PIOS_Assert(tx_buffer);
-		if (PIOS_COM_Init(&pios_com_usart2_id, &pios_usart_com_driver, pios_usart2_id,
-											rx_buffer, PIOS_COM_TELEM_RF_RX_BUF_LEN,
-											tx_buffer, PIOS_COM_TELEM_RF_TX_BUF_LEN)) {
-			PIOS_Assert(0);
-		}
-	}
-
 	/* Configure USART3 */
 	{
 		uint32_t pios_usart3_id;
@@ -872,10 +853,7 @@ void PIOS_Board_Init(void) {
 		}
 	}
 #endif /* PIOS_INCLUDE_RFM22B */
-	PIOS_COM_SendString(PIOS_COM_TELEM_SERIAL, "Hello Telem\n\r");
-	PIOS_COM_SendString(PIOS_COM_DEBUG, "Hello Debug\n\r");
-	PIOS_COM_SendString(PIOS_COM_FLEXI, "Hello Flexi\n\r");
-	PIOS_COM_SendString(PIOS_COM_RFM22B_RF, "Hello RMF22B\n\r");
+	PIOS_COM_SendString(PIOS_COM_DEBUG, "Hello DEBUG\n\r");
 
 	/* Remap AFIO pin */
 	GPIO_PinRemapConfig( GPIO_Remap_SWJ_NoJTRST, ENABLE);

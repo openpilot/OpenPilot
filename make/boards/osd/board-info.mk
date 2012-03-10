@@ -13,8 +13,8 @@ MODEL_SUFFIX        :=
 OPENOCD_CONFIG      := stm32f4xx.cfg
 
 # Note: These must match the values in link_$(BOARD)_memory.ld
-#BL_BANK_BASE        := 0x08000000  # Start of bootloader flash
-#BL_BANK_SIZE        := 0x00008000  # Should include BD_INFO region
+BL_BANK_BASE        := 0x08000000  # Start of bootloader flash
+BL_BANK_SIZE        := 0x00008000  # Should include BD_INFO region
 FW_BANK_BASE        := 0x08000000  # Start of firmware flash
 FW_BANK_SIZE        := 0x000F8000  # Should include FW_DESC_SIZE
 

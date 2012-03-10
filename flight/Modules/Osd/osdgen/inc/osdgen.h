@@ -161,7 +161,7 @@ void introGraphics();
 void updateGraphics();
 void drawGraphicsLine();
 
-void write_char16(char ch, unsigned int x, unsigned int y);
+void write_char16(char ch, unsigned int x, unsigned int y, int font);
 void write_pixel(uint16_t *buff, unsigned int x, unsigned int y, int mode);
 void write_pixel_lm(unsigned int x, unsigned int y, int mmode, int lmode);
 void write_hline(uint16_t *buff, unsigned int x0, unsigned int x1, unsigned int y, int mode);

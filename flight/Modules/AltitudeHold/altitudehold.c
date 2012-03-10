@@ -139,8 +139,8 @@ static void altitudeHoldTask(void *parameters)
 	enum init_state {WAITING_BARO, WAITIING_INIT, INITED} init = WAITING_BARO;
 
 	// Main task loop
+	bool baro_updated = false;
 	while (1) {		
-		bool baro_updated = false;
 		// Wait until the AttitudeRaw object is updated, if a timeout then go to failsafe
 		if ( xQueueReceive(queue, &ev, 100 / portTICK_RATE_MS) != pdTRUE )
 		{

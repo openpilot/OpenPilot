@@ -464,7 +464,10 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	uint16_t sensors = 0;
 	float dT;
 
-	inited = first_run ? false : inited;
+	if (first_run) {
+		inited = false;
+		init_stage = 0;
+	}
 
 	// Wait until the gyro and accel object is updated, if a timeout then go to failsafe
 	if ( (xQueueReceive(gyroQueue, &ev, 10 / portTICK_RATE_MS) != pdTRUE) ||

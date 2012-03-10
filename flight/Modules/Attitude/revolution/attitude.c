@@ -259,8 +259,26 @@ static int32_t updateAttitudeComplimentary(bool first_run)
 	// During initialization and 
 	FlightStatusData flightStatus;
 	FlightStatusGet(&flightStatus);
-	if(first_run)
+	if(first_run) {
+		AttitudeActualData attitudeActual;
+		AttitudeActualGet(&attitudeActual);
+		MagnetometerData magData;
+		MagnetometerGet(&magData);
 		init = 0;
+		float rpy[3];
+		float q[4];
+		rpy[0] = atan2f(-accelsData.y, -accelsData.z) * 180.0f / F_PI;
+		rpy[1] = atan2f(accelsData.x, -accelsData.z) * 180.0f / F_PI;
+		rpy[2] = atan2f(magData.x, -magData.y) * 180.0f / F_PI;
+
+		RPY2Quaternion(rpy,q);
+		quat_copy(q, &attitudeActual.q1);
+		
+		// Convert into eueler degrees (makes assumptions about RPY order)
+		Quaternion2RPY(&attitudeActual.q1,&attitudeActual.Roll);
+		AttitudeActualSet(&attitudeActual);
+
+	}
 
 	if((init == 0 && xTaskGetTickCount() < 7000) && (xTaskGetTickCount() > 1000)) {
 		// For first 7 seconds use accels to get gyro bias
@@ -521,8 +539,8 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 
 			// Set initial attitude
 			float rpy[3];
-			rpy[0] = atan2f(accelsData.x, accelsData.z) * 180.0f / F_PI;
-			rpy[1] = atan2f(accelsData.y, accelsData.z) * 180.0f / F_PI;
+			rpy[0] = atan2f(-accelsData.y, -accelsData.z) * 180.0f / F_PI;
+			rpy[1] = atan2f(accelsData.x, -accelsData.z) * 180.0f / F_PI;
 			rpy[2] = atan2f(magData.x, -magData.y) * 180.0f / F_PI;
 			RPY2Quaternion(rpy,q);
 			/*float Rbe[3][3];
@@ -553,8 +571,8 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 			getNED(&gpsPosition, NED);
 
 			// Set initial attitude
-			rpy[0] = atan2f(accelsData.x, accelsData.z) * 180.0f / F_PI;
-			rpy[1] = atan2f(accelsData.y, accelsData.z) * 180.0f / F_PI;
+			rpy[0] = atan2f(-accelsData.y, -accelsData.z) * 180.0f / F_PI;
+			rpy[1] = atan2f(accelsData.x, -accelsData.z) * 180.0f / F_PI;
 			rpy[2] = atan2f(magData.x, -magData.y) * 180.0f / F_PI;
 			RPY2Quaternion(rpy,q);
 

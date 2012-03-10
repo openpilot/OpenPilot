@@ -2,6 +2,7 @@
 #include "ui_inputchannelform.h"
 
 #include "manualcontrolsettings.h"
+#include "gcsreceiver.h"
 
 inputChannelForm::inputChannelForm(QWidget *parent,bool showlegend) :
     QWidget(parent),
@@ -108,7 +109,7 @@ void inputChannelForm::groupUpdated()
         count = 18;
         break;
     case ManualControlSettings::CHANNELGROUPS_GCS:
-        count = 5;
+        count = GCSReceiver::CHANNEL_NUMELEM;
         break;
     case ManualControlSettings::CHANNELGROUPS_NONE:
         count = 0;

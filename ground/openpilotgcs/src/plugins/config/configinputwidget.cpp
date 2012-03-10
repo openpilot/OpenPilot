@@ -70,7 +70,6 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
         addUAVObjectToWidgetRelation("ManualControlSettings","ChannelMax",inp->ui->channelMax,index);
         ++index;
     }
-
     connect(m_config->configurationWizard,SIGNAL(clicked()),this,SLOT(goToWizard()));
     connect(m_config->runCalibration,SIGNAL(toggled(bool)),this, SLOT(simpleCalibration(bool)));
 
@@ -242,6 +241,10 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
                         ManualControlSettings::CHANNELGROUPS_ACCESSORY0 <<
                         ManualControlSettings::CHANNELGROUPS_ACCESSORY1 <<
                         ManualControlSettings::CHANNELGROUPS_ACCESSORY2;
+
+    ((QGridLayout*)m_config->groupBox->layout())->setAlignment(m_config->label_8,Qt::AlignHCenter);
+    ((QGridLayout*)m_config->groupBox->layout())->setAlignment(m_config->label_9,Qt::AlignHCenter);
+    ((QGridLayout*)m_config->groupBox->layout())->setAlignment(m_config->label_10,Qt::AlignHCenter);
 }
 void ConfigInputWidget::resetTxControls()
 {

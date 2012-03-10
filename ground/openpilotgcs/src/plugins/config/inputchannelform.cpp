@@ -23,6 +23,14 @@ inputChannelForm::inputChannelForm(QWidget *parent,bool showlegend) :
         delete ui->legend4;
         delete ui->legend5;
     }
+
+    ((QGridLayout*)layout())->setAlignment(ui->legend0,Qt::AlignHCenter);
+    ((QGridLayout*)layout())->setAlignment(ui->legend1,Qt::AlignHCenter);
+    ((QGridLayout*)layout())->setAlignment(ui->legend2,Qt::AlignHCenter);
+    ((QGridLayout*)layout())->setAlignment(ui->legend3,Qt::AlignHCenter);
+    ((QGridLayout*)layout())->setAlignment(ui->legend4,Qt::AlignHCenter);
+    ((QGridLayout*)layout())->setAlignment(ui->legend5,Qt::AlignHCenter);
+
     connect(ui->channelMin,SIGNAL(valueChanged(int)),this,SLOT(minMaxUpdated()));
     connect(ui->channelMax,SIGNAL(valueChanged(int)),this,SLOT(minMaxUpdated()));
     connect(ui->channelGroup,SIGNAL(currentIndexChanged(int)),this,SLOT(groupUpdated()));

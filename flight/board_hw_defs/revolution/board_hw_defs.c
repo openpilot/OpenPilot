@@ -1256,22 +1256,6 @@ static const struct pios_tim_channel pios_tim_servoport_all_pins[] = {
 		.remap = GPIO_AF_TIM9,		
 	},
 	{
-		.timer = TIM10,
-		.timer_chan = TIM_Channel_1,
-		.pin = {
-			.gpio = GPIOB,
-			.init = {
-				.GPIO_Pin = GPIO_Pin_8,
-				.GPIO_Speed = GPIO_Speed_2MHz,
-				.GPIO_Mode  = GPIO_Mode_AF,
-				.GPIO_OType = GPIO_OType_PP,
-				.GPIO_PuPd  = GPIO_PuPd_UP
-			},
-			.pin_source = GPIO_PinSource8,
-		},
-		.remap = GPIO_AF_TIM10,
-	},
-	{
 		.timer = TIM11,
 		.timer_chan = TIM_Channel_1,
 		.pin = {
@@ -1286,6 +1270,22 @@ static const struct pios_tim_channel pios_tim_servoport_all_pins[] = {
 			.pin_source = GPIO_PinSource9,
 		},
 		.remap = GPIO_AF_TIM11,
+	},
+	{
+		.timer = TIM10,
+		.timer_chan = TIM_Channel_1,
+		.pin = {
+			.gpio = GPIOB,
+			.init = {
+				.GPIO_Pin = GPIO_Pin_8,
+				.GPIO_Speed = GPIO_Speed_2MHz,
+				.GPIO_Mode  = GPIO_Mode_AF,
+				.GPIO_OType = GPIO_OType_PP,
+				.GPIO_PuPd  = GPIO_PuPd_UP
+			},
+			.pin_source = GPIO_PinSource8,
+		},
+		.remap = GPIO_AF_TIM10,
 	},
 	{
 		.timer = TIM5,

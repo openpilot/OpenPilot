@@ -246,7 +246,11 @@ static int8_t updateSensors(AttitudeRawData * attitudeRaw)
 		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
 		return -1;
 	}
-	
+
+	// for simulation
+	if (AttitudeRawReadOnly() == ACCESS_READONLY)
+		return 0;
+
 	// No accel data available
 	if(PIOS_ADXL345_FifoElements() == 0)
 		return -1;
@@ -329,6 +333,10 @@ static int8_t updateSensors(AttitudeRawData * attitudeRaw)
 
 static void updateAttitude(AttitudeRawData * attitudeRaw)
 {
+	// for simulation
+	if (AttitudeActualReadOnly() == ACCESS_READONLY)
+		return;
+
 	float dT;
 	portTickType thisSysTime = xTaskGetTickCount();
 	static portTickType lastSysTime = 0;

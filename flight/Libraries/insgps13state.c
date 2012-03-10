@@ -121,7 +121,7 @@ void INSGPSInit()		//pretty much just a place holder for now
 	R[3] = R[4] = 0.004f;   // High freq GPS horizontal velocity noise variance (m/s)^2
 	R[5] = 100.0f;          // High freq GPS vertical velocity noise variance (m/s)^2
 	R[6] = R[7] = R[8] = 0.005f;    // magnetometer unit vector noise variance
-	R[9] = .005f;                    // High freq altimeter noise variance (m^2)
+	R[9] = .25f;                    // High freq altimeter noise variance (m^2)
 }
 
 void INSResetP(float PDiag[NUMX])

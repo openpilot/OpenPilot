@@ -650,11 +650,12 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 		NEDPositionSet(&nedPos);
 
 	} else if (!outdoor_mode) {
-		INSSetPosVelVar(1e-2f, 1e-2f);
+		INSSetPosVelVar(1e2f, 1e2f);
 		vel[0] = vel[1] = vel[2] = 0;
 		NED[0] = NED[1] = 0;
 		NED[2] = baroData.Altitude;
 		sensors |= HORIZ_SENSORS | HORIZ_POS_SENSORS;
+		sensors |= POS_SENSORS |VERT_SENSORS;
 	}
 
 	/*

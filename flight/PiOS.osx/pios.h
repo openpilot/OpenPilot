@@ -29,7 +29,7 @@
 #define PIOS_H
 
 /* PIOS Feature Selection */
-#include "pios_config_posix.h"
+#include "pios_config_sim.h"
 #include <pios_posix.h>
 
 #if defined(PIOS_INCLUDE_FREERTOS)

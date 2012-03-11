@@ -200,7 +200,9 @@ arm_sdk_clean:
 	$(V1) [ ! -d "$(ARM_SDK_DIR)" ] || $(RM) -r $(ARM_SDK_DIR)
 
 # Set up openocd tools
-OPENOCD_DIR := $(TOOLS_DIR)/openocd
+OPENOCD_DIR       := $(TOOLS_DIR)/openocd
+OPENOCD_WIN_DIR   := $(TOOLS_DIR)/openocd_win
+OPENOCD_BUILD_DIR := $(DL_DIR)/openocd-build
 
 .PHONY: openocd_install
 openocd_install: | $(DL_DIR) $(TOOLS_DIR)
@@ -211,42 +213,139 @@ openocd_install: openocd_clean
 	$(V1) wget -N -P "$(DL_DIR)" --trust-server-name "$(OPENOCD_URL)"
 
         # extract the source
-	$(V1) [ ! -d "$(DL_DIR)/openocd-build" ] || $(RM) -r "$(DL_DIR)/openocd-build"
-	$(V1) mkdir -p "$(DL_DIR)/openocd-build"
-	$(V1) tar -C $(DL_DIR)/openocd-build -xjf "$(DL_DIR)/$(OPENOCD_FILE)"
+	$(V1) [ ! -d "$(OPENOCD_BUILD_DIR)" ] || $(RM) -r "$(OPENOCD_BUILD_DIR)"
+	$(V1) mkdir -p "$(OPENOCD_BUILD_DIR)"
+	$(V1) tar -C $(OPENOCD_BUILD_DIR) -xjf "$(DL_DIR)/$(OPENOCD_FILE)"
 
         # build and install
 	$(V1) mkdir -p "$(OPENOCD_DIR)"
 	$(V1) ( \
-	  cd $(DL_DIR)/openocd-build/openocd-0.5.0 ; \
+	  cd $(OPENOCD_BUILD_DIR)/openocd-0.5.0 ; \
 	  ./configure --prefix="$(OPENOCD_DIR)" --enable-ft2232_libftdi --enable-buspirate; \
 	  $(MAKE) --silent ; \
 	  $(MAKE) --silent install ; \
 	)
 
         # delete the extracted source when we're done
-	$(V1) [ ! -d "$(DL_DIR)/openocd-build" ] || $(RM) -rf "$(DL_DIR)/openocd-build"
+	$(V1) [ ! -d "$(OPENOCD_BUILD_DIR)" ] || $(RM) -rf "$(OPENOCD_BUILD_DIR)"
+
+.PHONY: ftd2xx_install
+
+FTD2XX_DIR := $(DL_DIR)/ftd2xx
+
+ftd2xx_install: | $(DL_DIR)
+ftd2xx_install: FTD2XX_URL  := http://www.ftdichip.com/Drivers/CDM/Beta/CDM20817.zip
+ftd2xx_install: FTD2XX_FILE := CDM20817.zip
+ftd2xx_install: ftd2xx_clean
+        # download the file only if it's newer than what we already have
+	$(V0) @echo " DOWNLOAD     $(FTD2XX_URL)"
+	$(V1) wget -q -N -P "$(DL_DIR)" "$(FTD2XX_URL)"
+
+        # extract the source
+	$(V0) @echo " EXTRACT      $(FTD2XX_FILE) -> $(FTD2XX_DIR)"
+	$(V1) mkdir -p "$(FTD2XX_DIR)"
+	$(V1) unzip -q -d "$(FTD2XX_DIR)" "$(DL_DIR)/$(FTD2XX_FILE)"
+
+.PHONY: ftd2xx_clean
+ftd2xx_clean:
+	$(V0) @echo " CLEAN        $(FTD2XX_DIR)"
+	$(V1) [ ! -d "$(FTD2XX_DIR)" ] || $(RM) -r "$(FTD2XX_DIR)"
+
+.PHONY: ftd2xx_install
+
+LIBUSB_WIN_DIR := $(DL_DIR)/libusb-win32-bin-1.2.6.0
+
+libusb_win_install: | $(DL_DIR)
+libusb_win_install: LIBUSB_WIN_URL  := http://sourceforge.net/projects/libusb-win32/files/libusb-win32-releases/1.2.6.0/libusb-win32-bin-1.2.6.0.zip/download
+libusb_win_install: LIBUSB_WIN_FILE := libusb-win32-bin-1.2.6.0.zip
+libusb_win_install: libusb_win_clean
+        # download the file only if it's newer than what we already have
+	$(V0) @echo " DOWNLOAD     $(LIBUSB_WIN_URL)"
+	$(V1) wget -q -N -P "$(DL_DIR)" --trust-server-name "$(LIBUSB_WIN_URL)"
+
+        # extract the source
+	$(V0) @echo " EXTRACT      $(LIBUSB_WIN_FILE) -> $(LIBUSB_WIN_DIR)"
+	$(V1) mkdir -p "$(LIBUSB_WIN_DIR)"
+	$(V1) unzip -q -d "$(DL_DIR)" "$(DL_DIR)/$(LIBUSB_WIN_FILE)"
+
+        # fixup .h file needed by openocd build
+	$(V0) @echo " FIXUP        $(LIBUSB_WIN_DIR)"
+	$(V1) ln -s "$(LIBUSB_WIN_DIR)/include/lusb0_usb.h" "$(LIBUSB_WIN_DIR)/include/usb.h"
+
+.PHONY: libusb_win_clean
+libusb_win_clean:
+	$(V0) @echo " CLEAN        $(LIBUSB_WIN_DIR)"
+	$(V1) [ ! -d "$(LIBUSB_WIN_DIR)" ] || $(RM) -r "$(LIBUSB_WIN_DIR)"
+
+.PHONY: openocd_git_win_install
+
+openocd_git_win_install: | $(DL_DIR) $(TOOLS_DIR)
+openocd_git_win_install: OPENOCD_URL  := git://openocd.git.sourceforge.net/gitroot/openocd/openocd
+openocd_git_win_install: OPENOCD_REV  := c59a4419fcc5568d59fbaee775132f91cb7fd26b
+openocd_git_win_install: openocd_win_clean libusb_win_install ftd2xx_install
+        # download the source
+	$(V0) @echo " DOWNLOAD     $(OPENOCD_URL) @ $(OPENOCD_REV)"
+	$(V1) [ ! -d "$(OPENOCD_BUILD_DIR)" ] || $(RM) -rf "$(OPENOCD_BUILD_DIR)"
+	$(V1) mkdir -p "$(OPENOCD_BUILD_DIR)"
+	$(V1) git clone --depth 1 --no-checkout $(OPENOCD_URL) "$(DL_DIR)/openocd-build"
+	$(V1) ( \
+	  cd $(OPENOCD_BUILD_DIR) ; \
+	  git checkout -q $(OPENOCD_REV) ; \
+	)
+
+        # apply patches
+	$(V0) @echo " PATCH        $(OPENOCD_BUILD_DIR)"
+	$(V1) ( \
+	  cd $(OPENOCD_BUILD_DIR) ; \
+	  git apply < $(ROOT_DIR)/flight/Project/OpenOCD/0001-armv7m-remove-dummy-FP-regs-for-new-gdb.patch ; \
+	  git apply < $(ROOT_DIR)/flight/Project/OpenOCD/0002-rtos-add-stm32_stlink-to-FreeRTOS-targets.patch ; \
+	)
+
+        # build and install
+	$(V0) @echo " BUILD        $(OPENOCD_WIN_DIR)"
+	$(V1) mkdir -p "$(OPENOCD_WIN_DIR)"
+	$(V1) ( \
+	  cd $(OPENOCD_BUILD_DIR) ; \
+	  ./bootstrap ; \
+	  ./configure --enable-maintainer-mode --prefix="$(OPENOCD_WIN_DIR)" \
+		--build=i686-pc-linux-gnu --host=i586-mingw32msvc \
+		CPPFLAGS=-I$(LIBUSB_WIN_DIR)/include \
+		LDFLAGS=-L$(LIBUSB_WIN_DIR)/lib/gcc \
+		--enable-ft2232_ftd2xx --with-ftd2xx-win32-zipdir=$(FTD2XX_DIR) \
+		--disable-werror \
+		--enable-stlink ; \
+	  $(MAKE) ; \
+	  $(MAKE) install ; \
+	)
+
+        # delete the extracted source when we're done
+	$(V1) [ ! -d "$(OPENOCD_BUILD_DIR)" ] || $(RM) -rf "$(OPENOCD_BUILD_DIR)"
+
+.PHONY: openocd_win_clean
+openocd_win_clean:
+	$(V0) @echo " CLEAN        $(OPENOCD_WIN_DIR)"
+	$(V1) [ ! -d "$(OPENOCD_WIN_DIR)" ] || $(RM) -r "$(OPENOCD_WIN_DIR)"
 
 .PHONY: openocd_git_install
 
 openocd_git_install: | $(DL_DIR) $(TOOLS_DIR)
 openocd_git_install: OPENOCD_URL  := git://openocd.git.sourceforge.net/gitroot/openocd/openocd
-openocd_git_install: OPENOCD_REV  := bce7009e31b23250d4325637c7b7cdbae0efed9a
+openocd_git_install: OPENOCD_REV  := c59a4419fcc5568d59fbaee775132f91cb7fd26b
 openocd_git_install: openocd_clean
         # download the source
 	$(V0) @echo " DOWNLOAD     $(OPENOCD_URL) @ $(OPENOCD_REV)"
-	$(V1) [ ! -d "$(DL_DIR)/openocd-build" ] || $(RM) -rf "$(DL_DIR)/openocd-build"
-	$(V1) mkdir -p "$(DL_DIR)/openocd-build"
-	$(V1) git clone --depth 1 --no-checkout $(OPENOCD_URL) "$(DL_DIR)/openocd-build"
+	$(V1) [ ! -d "$(OPENOCD_BUILD_DIR)" ] || $(RM) -rf "$(OPENOCD_BUILD_DIR)"
+	$(V1) mkdir -p "$(OPENOCD_BUILD_DIR)"
+	$(V1) git clone --depth 1 --no-checkout $(OPENOCD_URL) "$(OPENOCD_BUILD_DIR)"
 	$(V1) ( \
-	  cd $(DL_DIR)/openocd-build ; \
+	  cd $(OPENOCD_BUILD_DIR) ; \
 	  git checkout -q $(OPENOCD_REV) ; \
 	)
 
         # apply patches
 	$(V0) @echo " PATCH        $(OPENOCD_DIR)"
 	$(V1) ( \
-	  cd $(DL_DIR)/openocd-build ; \
+	  cd $(OPENOCD_BUILD_DIR) ; \
 	  git apply < $(ROOT_DIR)/flight/Project/OpenOCD/0001-armv7m-remove-dummy-FP-regs-for-new-gdb.patch ; \
 	  git apply < $(ROOT_DIR)/flight/Project/OpenOCD/0002-rtos-add-stm32_stlink-to-FreeRTOS-targets.patch ; \
 	)
@@ -255,7 +354,7 @@ openocd_git_install: openocd_clean
 	$(V0) @echo " BUILD        $(OPENOCD_DIR)"
 	$(V1) mkdir -p "$(OPENOCD_DIR)"
 	$(V1) ( \
-	  cd $(DL_DIR)/openocd-build ; \
+	  cd $(OPENOCD_BUILD_DIR) ; \
 	  ./bootstrap ; \
 	  ./configure --enable-maintainer-mode --prefix="$(OPENOCD_DIR)" --enable-ft2232_libftdi --enable-buspirate --enable-stlink ; \
 	  $(MAKE) ; \
@@ -263,7 +362,7 @@ openocd_git_install: openocd_clean
 	)
 
         # delete the extracted source when we're done
-	$(V1) [ ! -d "$(DL_DIR)/openocd-build" ] || $(RM) -r "$(DL_DIR)/openocd-build"
+	$(V1) [ ! -d "$(OPENOCD_BUILD_DIR)" ] || $(RM) -rf "$(OPENOCD_BUILD_DIR)"
 
 .PHONY: openocd_clean
 openocd_clean:

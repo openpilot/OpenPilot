@@ -299,6 +299,13 @@ void PIOS_Board_Init(void) {
 #endif
 	PIOS_FLASHFS_Init(&flashfs_m25p_cfg);
 	
+#if defined(PIOS_OVERO_SPI)
+	/* Set up the SPI interface to the gyro */
+	if (PIOS_SPI_Init(&pios_spi_overo_id, &pios_spi_overo_cfg)) {
+		PIOS_DEBUG_Assert(0);
+	}
+#endif
+
 	/* Initialize UAVObject libraries */
 	EventDispatcherInitialize();
 	UAVObjInitialize();
@@ -326,6 +333,18 @@ void PIOS_Board_Init(void) {
 	PIOS_TIM_InitClock(&tim_11_cfg);
 
 	/* IAP System Setup */
+	PIOS_IAP_Init();
+	uint16_t boot_count = PIOS_IAP_ReadBootCount();
+	if (boot_count < 3) {
+		PIOS_IAP_WriteBootCount(++boot_count);
+		AlarmsClear(SYSTEMALARMS_ALARM_BOOTFAULT);
+	} else {
+		/* Too many failed boot attempts, force hwsettings to defaults */
+		HwSettingsSetDefaults(HwSettingsHandle(), 0);
+		AlarmsSet(SYSTEMALARMS_ALARM_BOOTFAULT, SYSTEMALARMS_ALARM_CRITICAL);
+	}
+	
+	
 	//PIOS_IAP_Init();
 
 #if defined(PIOS_INCLUDE_USB)
@@ -462,7 +481,7 @@ void PIOS_Board_Init(void) {
 #if defined(PIOS_INCLUDE_GPS)
 
 	uint32_t pios_usart_gps_id;
-	if (PIOS_USART_Init(&pios_usart_gps_id, &pios_usart_telem_main_cfg)) {
+	if (PIOS_USART_Init(&pios_usart_gps_id, &pios_usart_gps_cfg)) {
 		PIOS_Assert(0);
 	}
 	
@@ -473,7 +492,6 @@ void PIOS_Board_Init(void) {
 					  NULL, 0)) {
 		PIOS_Assert(0);
 	}
-
 #endif	/* PIOS_INCLUDE_GPS */
 	
 #if defined(PIOS_INCLUDE_COM_AUX)
@@ -503,7 +521,7 @@ void PIOS_Board_Init(void) {
 #if defined(PIOS_INCLUDE_COM_TELEM)
 	{ /* Eventually add switch for this port function */
 		uint32_t pios_usart_telem_rf_id;
-		if (PIOS_USART_Init(&pios_usart_telem_rf_id, &pios_usart_gps_cfg)) {
+		if (PIOS_USART_Init(&pios_usart_telem_rf_id, &pios_usart_telem_main_cfg)) {
 			PIOS_Assert(0);
 		}
 		

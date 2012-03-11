@@ -40,7 +40,7 @@
 #include <QMessageBox>
 //#include "fancytabwidget.h"
 #include "utils/mytabbedstackwidget.h"
-#include "configtaskwidget.h"
+#include "../uavobjectwidgetutils/configtaskwidget.h"
 
 class ConfigGadgetWidget: public QWidget
 {

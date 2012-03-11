@@ -14,8 +14,8 @@
    height="322.58304"
    id="svg10068"
    version="1.1"
-   inkscape:version="0.48.1 "
-   sodipodi:docname="lineardial-vertical.svg"
+   inkscape:version="0.48.2 r9819"
+   sodipodi:docname="lineardial-vertical-old2.svg"
    inkscape:export-filename="H:\Documents\Hobbies\W433\My Gauges\vbat-001.png"
    inkscape:export-xdpi="103.61"
    inkscape:export-ydpi="103.61"
@@ -23,11 +23,22 @@
   <defs
      id="defs10070">
     <linearGradient
+       id="linearGradient3894">
+      <stop
+         style="stop-color:#171717;stop-opacity:1;"
+         offset="0"
+         id="stop3896" />
+      <stop
+         style="stop-color:#b0b0b0;stop-opacity:1;"
+         offset="1"
+         id="stop3898" />
+    </linearGradient>
+    <linearGradient
        id="linearGradient3903">
       <stop
          id="stop3905"
          offset="0"
-         style="stop-color:#000000;stop-opacity:1" />
+         style="stop-color:#656565;stop-opacity:1;" />
       <stop
          style="stop-color:#ffffff;stop-opacity:1"
          offset="0.39386007"
@@ -35,7 +46,7 @@
       <stop
          id="stop3909"
          offset="1"
-         style="stop-color:#000000;stop-opacity:1" />
+         style="stop-color:#757575;stop-opacity:1;" />
     </linearGradient>
     <linearGradient
        id="linearGradient5375">
@@ -83,15 +94,19 @@
       <stop
          id="stop5348"
          offset="0"
-         style="stop-color:#1a1a1a;stop-opacity:1" />
+         style="stop-color:#9c9c9c;stop-opacity:0;" />
       <stop
-         style="stop-color:#666666;stop-opacity:1"
-         offset="0.35277387"
-         id="stop5350" />
+         id="stop3921"
+         offset="0.359375"
+         style="stop-color:#6c6c6c;stop-opacity:0.88793105;" />
+      <stop
+         style="stop-color:#5f5f5f;stop-opacity:0.62931037;"
+         offset="0.62630206"
+         id="stop3923" />
       <stop
          id="stop5352"
          offset="1"
-         style="stop-color:#1a1a1a;stop-opacity:1" />
+         style="stop-color:#9c9c9c;stop-opacity:0;" />
     </linearGradient>
     <linearGradient
        id="linearGradient5326">
@@ -216,45 +231,33 @@
     <linearGradient
        id="linearGradient5116">
       <stop
-         style="stop-color:#000000;stop-opacity:1"
-         offset="0"
-         id="stop5118" />
-      <stop
          id="stop5124"
-         offset="0.37640449"
-         style="stop-color:#dcaf28;stop-opacity:1" />
+         offset="0"
+         style="stop-color:#ffc001;stop-opacity:1;" />
       <stop
-         style="stop-color:#000000;stop-opacity:1"
+         style="stop-color:#844700;stop-opacity:1;"
          offset="1"
          id="stop5120" />
     </linearGradient>
     <linearGradient
        id="linearGradient5106">
       <stop
-         style="stop-color:#000000;stop-opacity:1"
-         offset="0"
-         id="stop5108" />
-      <stop
          id="stop5114"
-         offset="0.38184431"
+         offset="0"
          style="stop-color:#00a000;stop-opacity:1" />
       <stop
-         style="stop-color:#000000;stop-opacity:1"
+         style="stop-color:#003d00;stop-opacity:1;"
          offset="1"
          id="stop5110" />
     </linearGradient>
     <linearGradient
        id="linearGradient5096">
       <stop
-         style="stop-color:#100000;stop-opacity:1"
-         offset="0"
-         id="stop5098" />
-      <stop
          id="stop5104"
-         offset="0.39717463"
-         style="stop-color:#aa0000;stop-opacity:1" />
+         offset="0"
+         style="stop-color:#e60000;stop-opacity:1;" />
       <stop
-         style="stop-color:#0c0000;stop-opacity:1"
+         style="stop-color:#710000;stop-opacity:1;"
          offset="1"
          id="stop5100" />
     </linearGradient>
@@ -475,7 +478,8 @@
        y1="132.84332"
        x2="-58.661255"
        y2="169.46072"
-       gradientUnits="userSpaceOnUse" />
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.0045664,0,0,0.98072534,3.8285685,3.8328979)" />
     <linearGradient
        inkscape:collect="always"
        xlink:href="#linearGradient5106"
@@ -484,7 +488,8 @@
        y1="133.15433"
        x2="-38.946774"
        y2="168.58655"
-       gradientUnits="userSpaceOnUse" />
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.0048708,0,0,1.0000284,3.816285,2.2385824)" />
     <linearGradient
        inkscape:collect="always"
        xlink:href="#linearGradient5116"
@@ -493,7 +498,8 @@
        y1="133.16322"
        x2="-17.108463"
        y2="168.82289"
-       gradientUnits="userSpaceOnUse" />
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.0057658,0,0,0.99502095,3.8176724,2.8357789)" />
     <linearGradient
        inkscape:collect="always"
        xlink:href="#linearGradient5129"
@@ -711,7 +717,8 @@
        x1="-246.82069"
        y1="353.9455"
        x2="-247.44464"
-       y2="412.00528" />
+       y2="412.00528"
+       gradientTransform="matrix(1,0,0,0.98663274,0,3.8538758)" />
     <linearGradient
        inkscape:collect="always"
        xlink:href="#linearGradient5375"
@@ -727,11 +734,21 @@
        xlink:href="#linearGradient3903"
        id="linearGradient3899"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.99999998,0,0,1.7142857,306.20028,-235.50286)"
+       gradientTransform="matrix(1.0304804,0,0,1.7130087,311.94981,-242.17845)"
        x1="-172.33069"
        y1="74.562233"
-       x2="-135.50557"
-       y2="74.562233" />
+       x2="-136.75557"
+       y2="74.015358" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3894"
+       id="linearGradient3900"
+       x1="-353.51318"
+       y1="324.74451"
+       x2="-355.30441"
+       y2="355.70587"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.0187536,0,0,1.2873355,10.177224,-58.104213)" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -740,16 +757,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.9843492"
-     inkscape:cx="13.888309"
-     inkscape:cy="302.67927"
+     inkscape:zoom="7.87"
+     inkscape:cx="0.68217946"
+     inkscape:cy="151.28502"
      inkscape:document-units="px"
-     inkscape:current-layer="layer6"
+     inkscape:current-layer="layer4"
      showgrid="false"
-     inkscape:window-width="1366"
-     inkscape:window-height="706"
-     inkscape:window-x="-8"
-     inkscape:window-y="-8"
+     inkscape:window-width="1680"
+     inkscape:window-height="957"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
      inkscape:window-maximized="1"
      inkscape:object-paths="true"
      showguides="true"
@@ -765,7 +782,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
         <dc:creator>
           <cc:Agent>
             <dc:title>Edouard Lafargue</dc:title>
@@ -779,8 +796,7 @@
      inkscape:label="Dark background"
      id="g2932"
      inkscape:groupmode="layer"
-     transform="translate(-357.06525,-236.21351)"
-     sodipodi:insensitive="true">
+     transform="translate(-357.06525,-236.21351)">
     <g
        id="background"
        inkscape:label="#g5354">
@@ -789,39 +805,39 @@
          style="fill:url(#linearGradient5344);fill-opacity:1;stroke:none"
          id="rect2936"
          width="318.58304"
-         height="46.756046"
+         height="46.131046"
          x="-556.79657"
-         y="358.44128"
-         ry="3.4504199"
+         y="357.50378"
+         ry="3.4042974"
          inkscape:export-filename="H:\Documents\Hobbies\W433\g9905.png"
          inkscape:export-xdpi="88.809998"
          inkscape:export-ydpi="88.809998" />
-      <rect
-         transform="matrix(0,-1,1,0,0,0)"
-         style="fill:#332d2d;fill-opacity:1;stroke:none"
-         id="bargraph"
-         width="260.53882"
-         height="34.835861"
-         x="-519.56018"
-         y="362.7359"
-         ry="2.5707548"
-         inkscape:export-filename="H:\Documents\Hobbies\W433\g9905.png"
-         inkscape:export-xdpi="88.809998"
-         inkscape:export-ydpi="88.809998"
-         inkscape:label="#rect4388" />
       <rect
          transform="matrix(0,-1,1,0,0,0)"
          inkscape:label="#rect4388"
          inkscape:export-ydpi="88.809998"
          inkscape:export-xdpi="88.809998"
          inkscape:export-filename="H:\Documents\Hobbies\W433\g9905.png"
-         ry="2.2944832"
-         y="365.23175"
-         x="-519.56018"
-         height="31.09215"
-         width="260.53882"
+         ry="2.9537699"
+         y="360.57819"
+         x="-519.12665"
+         height="40.026031"
+         width="265.4249"
          id="bargraph-outer"
-         style="fill:#332d2d;fill-opacity:1;stroke:none" />
+         style="fill:url(#linearGradient3900);fill-opacity:1;stroke:none" />
+      <rect
+         transform="matrix(0,-1,1,0,0,0)"
+         style="fill:#332d2d;fill-opacity:1;stroke:none"
+         id="bargraph"
+         width="262.19809"
+         height="33.195633"
+         x="-516.71185"
+         y="363.7984"
+         ry="16.597816"
+         inkscape:export-filename="H:\Documents\Hobbies\W433\g9905.png"
+         inkscape:export-xdpi="88.809998"
+         inkscape:export-ydpi="88.809998"
+         inkscape:label="#rect4388" />
     </g>
   </g>
   <g
@@ -829,17 +845,16 @@
      id="layer5"
      inkscape:label="Green Zone"
      style="display:inline"
-     transform="translate(-129.62194,129.52019)"
-     sodipodi:insensitive="true">
+     transform="translate(-129.62194,129.52019)">
     <rect
        inkscape:label="#rect5741"
        style="fill:url(#linearGradient5112);fill-opacity:1;stroke:none;display:inline"
        id="green"
-       width="260.53882"
-       height="34.0919"
-       x="-153.97397"
-       y="134.02345"
-       ry="2.5158536"
+       width="261.80789"
+       height="34.092869"
+       x="-150.90765"
+       y="136.26584"
+       ry="2.5159254"
        inkscape:export-filename="H:\Documents\Hobbies\W433\g9905.png"
        inkscape:export-xdpi="88.809998"
        inkscape:export-ydpi="88.809998"
@@ -849,18 +864,17 @@
      inkscape:groupmode="layer"
      id="layer4"
      inkscape:label="Yellow Zone"
-     style="display:none"
-     transform="translate(-129.62194,129.52019)"
-     sodipodi:insensitive="true">
+     style="display:inline"
+     transform="translate(-129.62194,129.52019)">
     <rect
        inkscape:export-ydpi="88.809998"
        inkscape:export-xdpi="88.809998"
        inkscape:export-filename="H:\Documents\Hobbies\W433\g9905.png"
-       ry="2.5158532"
-       y="134.02345"
-       x="-153.97397"
-       height="34.091896"
-       width="260.53882"
+       ry="2.5033269"
+       y="136.19191"
+       x="-151.04408"
+       height="33.92215"
+       width="262.04108"
        id="yellow"
        style="fill:url(#linearGradient5122);fill-opacity:1;stroke:none;display:inline"
        inkscape:label="#rect5741"
@@ -871,17 +885,16 @@
      id="layer3"
      inkscape:label="Red zone"
      style="display:none"
-     transform="translate(-129.62194,129.52019)"
-     sodipodi:insensitive="true">
+     transform="translate(-129.62194,129.52019)">
     <rect
        inkscape:label="#rect5741"
        style="fill:url(#linearGradient5102);fill-opacity:1;stroke:none;display:inline"
        id="red"
-       width="260.53882"
-       height="34.589863"
-       x="-154.0755"
-       y="134.00487"
-       ry="2.5526016"
+       width="261.72849"
+       height="33.923153"
+       x="-150.95049"
+       y="135.25487"
+       ry="2.503401"
        inkscape:export-filename="H:\Documents\Hobbies\W433\g9905.png"
        inkscape:export-xdpi="88.809998"
        inkscape:export-ydpi="88.809998"
@@ -894,35 +907,35 @@
      style="display:inline"
      transform="translate(-129.62194,129.52019)">
     <rect
-       style="fill:url(#linearGradient3899);fill-opacity:1;stroke:#000000;stroke-width:0.30000000999999998;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       style="fill:url(#linearGradient3899);fill-opacity:1;stroke:#000000;stroke-width:0.30442432;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="needle"
-       width="33.162418"
-       height="5.9393759"
-       x="135.64999"
-       y="-107.91632"
-       inkscape:label="#rect5246" />
+       width="34.173222"
+       height="5.9349518"
+       x="136.20108"
+       y="-114.68695"
+       inkscape:label="#rect5246"
+       ry="2.4981377" />
   </g>
   <g
      inkscape:groupmode="layer"
      id="layer1"
      inkscape:label="Text"
      style="display:inline"
-     transform="translate(-129.62194,129.52019)"
-     sodipodi:insensitive="true">
+     transform="translate(-129.62194,129.52019)">
     <rect
        style="fill:#ffffff;fill-opacity:1;stroke:none"
        id="field"
-       width="33.853165"
+       width="46.305515"
        height="12.626906"
-       x="128.30692"
+       x="129.09726"
        y="157.31393"
        inkscape:label="#rect2878" />
     <rect
        inkscape:label="#rect2878"
        y="170.91206"
-       x="128.88902"
+       x="129.9335"
        height="12.626906"
-       width="32.851257"
+       width="45.176544"
        id="value"
        style="fill:#ffffff;fill-opacity:1;stroke:none" />
   </g>

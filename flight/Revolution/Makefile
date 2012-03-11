@@ -49,7 +49,10 @@ endif
 FLASH_TOOL = OPENOCD
 
 # List of modules to include
-MODULES = Sensors Attitude/revolution ManualControl Stabilization Altitude/revolution Actuator GPS Telemetry FirmwareIAP
+MODULES = Sensors Attitude/revolution ManualControl Stabilization Altitude/revolution Actuator GPS FirmwareIAP AltitudeHold
+MODULES += CameraStab
+MODULES += Telemetry
+MODULES += OveroSync
 PYMODULES = 
 #FlightPlan
 
@@ -251,8 +254,8 @@ endif
 # common architecture-specific flags from the device-specific library makefile
 CFLAGS += $(ARCHFLAGS)
 
-
 CFLAGS += -DDIAGNOSTICS
+CFLAGS += -DDIAG_TASKS
 
 # This is not the best place for these.  Really should abstract out
 # to the board file or something
@@ -271,7 +274,7 @@ DEBUGF = dwarf-2
 
 # Place project-specific -D (define) and/or
 # -U options for C here.
-CDEFS += -DSTM32F10X_$(MODEL)
+CDEFS += -DHSE_VALUE=$(OSCILLATOR_FREQ)
 CDEFS += -DSYSCLK_FREQ=$(SYSCLK_FREQ)
 CDEFS += -DUSE_STDPERIPH_DRIVER
 CDEFS += -DUSE_$(BOARD)
@@ -417,7 +420,7 @@ $(OUTDIR)/$(TARGET).bin.o: $(OUTDIR)/$(TARGET).bin
 $(eval $(call OPFW_TEMPLATE,$(OUTDIR)/$(TARGET).bin,$(BOARD_TYPE),$(BOARD_REVISION)))
 
 # Add jtag targets (program and wipe)
-$(eval $(call JTAG_TEMPLATE,$(OUTDIR)/$(TARGET).bin,$(FW_BANK_BASE),$(FW_BANK_SIZE),$(OPENOCD_CONFIG)))
+$(eval $(call JTAG_TEMPLATE,$(OUTDIR)/$(TARGET).bin,$(FW_BANK_BASE),$(FW_BANK_SIZE),$(OPENOCD_JTAG_CONFIG),$(OPENOCD_CONFIG)))
 
 .PHONY: elf lss sym hex bin bino opfw
 elf: $(OUTDIR)/$(TARGET).elf

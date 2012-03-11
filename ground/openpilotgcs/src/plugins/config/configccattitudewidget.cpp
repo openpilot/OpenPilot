@@ -44,7 +44,7 @@ ConfigCCAttitudeWidget::ConfigCCAttitudeWidget(QWidget *parent) :
     connect(ui->zeroBias,SIGNAL(clicked()),this,SLOT(startAccelCalibration()));
 
 
-    setupButtons(ui->applyButton,ui->saveButton);
+    addApplySaveButtons(ui->applyButton,ui->saveButton);
     addUAVObject("AttitudeSettings");
 
     // Connect the help button

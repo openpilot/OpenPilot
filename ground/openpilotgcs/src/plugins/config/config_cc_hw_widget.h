@@ -28,7 +28,7 @@
 #define CONFIGCCHWWIDGET_H
 
 #include "ui_cc_hw_settings.h"
-#include "configtaskwidget.h"
+#include "../uavobjectwidgetutils/configtaskwidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
@@ -50,6 +50,7 @@ private slots:
 
 private:
     Ui_CC_HW_Widget *m_telemetry;
+    QSvgRenderer *m_renderer;
 };
 
 #endif // CONFIGCCHWWIDGET_H

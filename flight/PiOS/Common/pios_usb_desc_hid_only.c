@@ -158,7 +158,7 @@ int32_t PIOS_USB_DESC_HID_ONLY_Init(void)
 
 	PIOS_USBHOOK_RegisterDevice((uint8_t *)&device_desc, sizeof(device_desc));
 
-	PIOS_USB_HID_RegisterHidInterface((uint8_t *)&(config_hid_only.hid_if), sizeof(config_hid_only.hid_if));
+	PIOS_USB_HID_RegisterHidDescriptor((uint8_t *)&(config_hid_only.hid), sizeof(config_hid_only.hid));
 	PIOS_USB_HID_RegisterHidReport((uint8_t *)hid_report_desc, sizeof(hid_report_desc));
 
 	return 0;

@@ -257,10 +257,68 @@ uint32_t pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE];
 #define PIOS_COM_BRIDGE_RX_BUF_LEN 65
 #define PIOS_COM_BRIDGE_TX_BUF_LEN 12
 
-uint32_t pios_com_aux_id;
-uint32_t pios_com_gps_id;
-uint32_t pios_com_telem_usb_id;
-uint32_t pios_com_telem_rf_id;
+#define PIOS_COM_AUX_RX_BUF_LEN 512
+#define PIOS_COM_AUX_TX_BUF_LEN 512
+
+uint32_t pios_com_aux_id = 0;
+uint32_t pios_com_gps_id = 0;
+uint32_t pios_com_telem_usb_id = 0;
+uint32_t pios_com_telem_rf_id = 0;
+uint32_t pios_com_bridge_id = 0;
+
+/* 
+ * Setup a com port based on the passed cfg, driver and buffer sizes. tx size of -1 make the port rx only
+ */
+inline void PIOS_Board_configure_com(const struct pios_usart_cfg *usart_port_cfg, size_t rx_buf_len, size_t tx_buf_len, const struct pios_com_driver *com_driver, uint32_t *pios_com_id) { 
+	uint32_t pios_usart_id;
+	if (PIOS_USART_Init(&pios_usart_id, usart_port_cfg)) {
+		PIOS_Assert(0);
+	}
+	
+	uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(rx_buf_len);
+	PIOS_Assert(rx_buffer);
+	if(tx_buf_len!= -1){ // this is the case for rx/tx ports
+		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(tx_buf_len);
+		PIOS_Assert(tx_buffer);
+		
+		if (PIOS_COM_Init(pios_com_id, com_driver, pios_usart_id,
+								rx_buffer, rx_buf_len,
+								tx_buffer, tx_buf_len)) {
+			PIOS_Assert(0);
+		}
+	}
+	else{ //rx only port
+		if (PIOS_COM_Init(pios_com_id, com_driver, pios_usart_id,
+								rx_buffer, rx_buf_len,
+								NULL, 0)) {
+			PIOS_Assert(0);
+		}
+	}
+}
+
+inline void PIOS_Board_configure_dsm(const struct pios_usart_cfg *pios_usart_dsm_cfg, const struct pios_dsm_cfg *pios_dsm_cfg, 
+												 const struct pios_com_driver *pios_usart_com_driver,enum pios_dsm_proto *proto, ManualControlSettingsChannelGroupsOptions channelgroup,uint8_t *bind){
+	uint32_t pios_usart_dsm_id;
+	if (PIOS_USART_Init(&pios_usart_dsm_id, pios_usart_dsm_cfg)) {
+		PIOS_Assert(0);
+	}
+	
+	uint32_t pios_dsm_id;
+	if (PIOS_DSM_Init(&pios_dsm_id,
+							pios_dsm_cfg,
+							pios_usart_com_driver,
+							pios_usart_dsm_id,
+							*proto, *bind)) {
+		PIOS_Assert(0);
+	}
+	
+	uint32_t pios_dsm_rcvr_id;
+	if (PIOS_RCVR_Init(&pios_dsm_rcvr_id, &pios_dsm_rcvr_driver, pios_dsm_id)) {
+		PIOS_Assert(0);
+	}
+	pios_rcvr_group_map[channelgroup] = pios_dsm_rcvr_id;
+	
+}
 
 /**
  * PIOS_Board_Init()
@@ -274,11 +332,6 @@ void PIOS_Board_Init(void) {
 
 	PIOS_LED_Init(&pios_led_cfg);
 
-#ifdef PIOS_DEBUG_ENABLE_DEBUG_PINS
-	PIOS_DEBUG_Init(&pios_tim_servo_all_channels, NELEMENTS(pios_tim_servo_all_channels));
-#endif	/* PIOS_DEBUG_ENABLE_DEBUG_PINS */
-	
-	
 	/* Set up the SPI interface to the accelerometer*/
 	if (PIOS_SPI_Init(&pios_spi_accel_id, &pios_spi_accel_cfg)) {
 		PIOS_DEBUG_Assert(0);
@@ -325,7 +378,6 @@ void PIOS_Board_Init(void) {
 	/* Set up pulse timers */
 	PIOS_TIM_InitClock(&tim_1_cfg);
 	PIOS_TIM_InitClock(&tim_3_cfg);
-	PIOS_TIM_InitClock(&tim_4_cfg);
 	PIOS_TIM_InitClock(&tim_4_cfg);
 	PIOS_TIM_InitClock(&tim_5_cfg);
 	PIOS_TIM_InitClock(&tim_9_cfg);
@@ -397,40 +449,12 @@ void PIOS_Board_Init(void) {
 		break;
 	case HWSETTINGS_USB_VCPPORT_USBTELEMETRY:
 #if defined(PIOS_INCLUDE_COM)
-		{
-			uint32_t pios_usb_cdc_id;
-			if (PIOS_USB_CDC_Init(&pios_usb_cdc_id, &pios_usb_cdc_cfg, pios_usb_id)) {
-				PIOS_Assert(0);
-			}
-			uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_USB_RX_BUF_LEN);
-			uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_USB_TX_BUF_LEN);
-			PIOS_Assert(rx_buffer);
-			PIOS_Assert(tx_buffer);
-			if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_cdc_com_driver, pios_usb_cdc_id,
-						rx_buffer, PIOS_COM_TELEM_USB_RX_BUF_LEN,
-						tx_buffer, PIOS_COM_TELEM_USB_TX_BUF_LEN)) {
-				PIOS_Assert(0);
-			}
-		}
+			PIOS_Board_configure_com(&pios_usb_cdc_cfg, PIOS_COM_TELEM_USB_RX_BUF_LEN, PIOS_COM_TELEM_USB_TX_BUF_LEN, &pios_usb_cdc_com_driver, &pios_com_telem_usb_id);
 #endif	/* PIOS_INCLUDE_COM */
 		break;
 	case HWSETTINGS_USB_VCPPORT_COMBRIDGE:
 #if defined(PIOS_INCLUDE_COM)
-		{
-			uint32_t pios_usb_cdc_id;
-			if (PIOS_USB_CDC_Init(&pios_usb_cdc_id, &pios_usb_cdc_cfg, pios_usb_id)) {
-				PIOS_Assert(0);
-			}
-			uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_BRIDGE_RX_BUF_LEN);
-			uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_BRIDGE_TX_BUF_LEN);
-			PIOS_Assert(rx_buffer);
-			PIOS_Assert(tx_buffer);
-			if (PIOS_COM_Init(&pios_com_vcp_id, &pios_usb_cdc_com_driver, pios_usb_cdc_id,
-						rx_buffer, PIOS_COM_BRIDGE_RX_BUF_LEN,
-						tx_buffer, PIOS_COM_BRIDGE_TX_BUF_LEN)) {
-				PIOS_Assert(0);
-			}
-		}
+		PIOS_Board_configure_com(&pios_usb_cdc_cfg, PIOS_COM_BRIDGE_RX_BUF_LEN, PIOS_COM_BRIDGE_TX_BUF_LEN, &pios_usb_cdc_com_driver, &pios_com_vcp_id);
 #endif	/* PIOS_INCLUDE_COM */
 		break;
 	}
@@ -477,109 +501,284 @@ void PIOS_Board_Init(void) {
 	}
 #endif	/* PIOS_INCLUDE_USB */
 
-#if defined(PIOS_INCLUDE_COM)
-#if defined(PIOS_INCLUDE_GPS)
+	/* Configure IO ports */
+	uint8_t hwsettings_DSMxBind;
+	HwSettingsDSMxBindGet(&hwsettings_DSMxBind);
+	
+	/* Configure Telemetry port */
+	uint8_t hwsettings_rv_telemetryport;
+	HwSettingsRV_TelemetryPortGet(&hwsettings_rv_telemetryport);
 
-	uint32_t pios_usart_gps_id;
-	if (PIOS_USART_Init(&pios_usart_gps_id, &pios_usart_gps_cfg)) {
+	switch (hwsettings_rv_telemetryport){
+		case HWSETTINGS_RV_TELEMETRYPORT_DISABLED:
+			break;
+		case HWSETTINGS_RV_TELEMETRYPORT_TELEMETRY:
+			PIOS_Board_configure_com(&pios_usart_telem_cfg, PIOS_COM_TELEM_RF_RX_BUF_LEN, PIOS_COM_TELEM_RF_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_telem_rf_id);
+			break;
+		case HWSETTINGS_RV_TELEMETRYPORT_COMAUX:
+			PIOS_Board_configure_com(&pios_usart_telem_cfg, PIOS_COM_AUX_RX_BUF_LEN, PIOS_COM_AUX_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_aux_id);
+			break;
+		case HWSETTINGS_RV_TELEMETRYPORT_COMBRIDGE:
+			PIOS_Board_configure_com(&pios_usart_telem_cfg, PIOS_COM_BRIDGE_RX_BUF_LEN, PIOS_COM_BRIDGE_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_bridge_id);
+			break;
+			
+	} /* 	hwsettings_rv_telemetryport */
+
+	/* Configure GPS port */
+	uint8_t hwsettings_rv_gpsport;
+	HwSettingsRV_GPSPortGet(&hwsettings_rv_gpsport);
+	switch (hwsettings_rv_gpsport){
+		case HWSETTINGS_RV_GPSPORT_DISABLED:
+			break;
+			
+		case HWSETTINGS_RV_GPSPORT_TELEMETRY:
+			PIOS_Board_configure_com(&pios_usart_gps_cfg, PIOS_COM_TELEM_RF_RX_BUF_LEN, PIOS_COM_TELEM_RF_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_telem_rf_id);
+			break;
+			
+		case HWSETTINGS_RV_GPSPORT_GPS:
+			PIOS_Board_configure_com(&pios_usart_gps_cfg, PIOS_COM_GPS_RX_BUF_LEN, -1,  &pios_usart_com_driver, &pios_com_gps_id);
+			break;
+		
+		case HWSETTINGS_RV_GPSPORT_COMAUX:
+			PIOS_Board_configure_com(&pios_usart_gps_cfg, PIOS_COM_AUX_RX_BUF_LEN, PIOS_COM_AUX_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_aux_id);
+			break;
+			
+		case HWSETTINGS_RV_GPSPORT_COMBRIDGE:
+			PIOS_Board_configure_com(&pios_usart_gps_cfg, PIOS_COM_BRIDGE_RX_BUF_LEN, PIOS_COM_BRIDGE_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_bridge_id);
+			break;
+	}/* hwsettings_rv_gpsport */
+
+	/* Configure AUXPort */
+	uint8_t hwsettings_rv_auxport;
+	HwSettingsRV_AuxPortGet(&hwsettings_rv_auxport);
+
+	switch (hwsettings_rv_auxport) {
+		case HWSETTINGS_RV_AUXPORT_DISABLED:
+			break;
+			
+		case HWSETTINGS_RV_AUXPORT_TELEMETRY:
+			PIOS_Board_configure_com(&pios_usart_aux_cfg, PIOS_COM_TELEM_RF_RX_BUF_LEN, PIOS_COM_TELEM_RF_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_telem_rf_id);
+			break;
+			
+		case HWSETTINGS_RV_AUXPORT_DSM2:
+		case HWSETTINGS_RV_AUXPORT_DSMX10BIT:
+		case HWSETTINGS_RV_AUXPORT_DSMX11BIT:
+		{
+			enum pios_dsm_proto proto;
+			switch (hwsettings_rv_auxport) {
+				case HWSETTINGS_RV_AUXPORT_DSM2:
+					proto = PIOS_DSM_PROTO_DSM2;
+					break;
+				case HWSETTINGS_RV_AUXPORT_DSMX10BIT:
+					proto = PIOS_DSM_PROTO_DSMX10BIT;
+					break;
+				case HWSETTINGS_RV_AUXPORT_DSMX11BIT:
+					proto = PIOS_DSM_PROTO_DSMX11BIT;
+					break;
+				default:
+					PIOS_Assert(0);
+					break;
+			}
+			//TODO: Define the various Channelgroup for Revo dsm inputs and handle here
+			PIOS_Board_configure_dsm(&pios_usart_dsm_aux_cfg, &pios_dsm_aux_cfg, 
+											 &pios_usart_com_driver, &proto, MANUALCONTROLSETTINGS_CHANNELGROUPS_DSMMAINPORT,&hwsettings_DSMxBind);
+		}
+			break;
+		case HWSETTINGS_RV_AUXPORT_COMAUX:
+			PIOS_Board_configure_com(&pios_usart_aux_cfg, PIOS_COM_AUX_RX_BUF_LEN, PIOS_COM_AUX_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_aux_id);
+			break;
+		case HWSETTINGS_RV_AUXPORT_COMBRIDGE:
+			PIOS_Board_configure_com(&pios_usart_aux_cfg, PIOS_COM_BRIDGE_RX_BUF_LEN, PIOS_COM_BRIDGE_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_bridge_id);
+			break;
+	} /* hwsettings_rv_auxport */
+	/* Configure AUXSbusPort */
+	//TODO: ensure that the serial invertion pin is setted correctly
+	uint8_t hwsettings_rv_auxsbusport;
+	HwSettingsRV_AuxSBusPortGet(&hwsettings_rv_auxsbusport);
+	
+	switch (hwsettings_rv_auxsbusport) {
+		case HWSETTINGS_RV_AUXSBUSPORT_DISABLED:
+			break;
+		case HWSETTINGS_RV_AUXSBUSPORT_SBUS:
+#ifdef PIOS_INCLUDE_SBUS
+		{
+			uint32_t pios_usart_sbus_id;
+			if (PIOS_USART_Init(&pios_usart_sbus_id, &pios_usart_sbus_auxsbus_cfg)) {
+				PIOS_Assert(0);
+			}
+			
+			uint32_t pios_sbus_id;
+			if (PIOS_SBus_Init(&pios_sbus_id, &pios_sbus_cfg, &pios_usart_com_driver, pios_usart_sbus_id)) {
+				PIOS_Assert(0);
+			}
+			
+			uint32_t pios_sbus_rcvr_id;
+			if (PIOS_RCVR_Init(&pios_sbus_rcvr_id, &pios_sbus_rcvr_driver, pios_sbus_id)) {
+				PIOS_Assert(0);
+			}
+			pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_SBUS] = pios_sbus_rcvr_id;
+			
+		}
+#endif /* PIOS_INCLUDE_SBUS */
+			break;
+
+		case HWSETTINGS_RV_AUXSBUSPORT_DSM2:
+		case HWSETTINGS_RV_AUXSBUSPORT_DSMX10BIT:
+		case HWSETTINGS_RV_AUXSBUSPORT_DSMX11BIT:
+		{
+			enum pios_dsm_proto proto;
+			switch (hwsettings_rv_auxsbusport) {
+				case HWSETTINGS_RV_AUXSBUSPORT_DSM2:
+					proto = PIOS_DSM_PROTO_DSM2;
+					break;
+				case HWSETTINGS_RV_AUXSBUSPORT_DSMX10BIT:
+					proto = PIOS_DSM_PROTO_DSMX10BIT;
+					break;
+				case HWSETTINGS_RV_AUXSBUSPORT_DSMX11BIT:
+					proto = PIOS_DSM_PROTO_DSMX11BIT;
+					break;
+				default:
+					PIOS_Assert(0);
+					break;
+			}
+			//TODO: Define the various Channelgroup for Revo dsm inputs and handle here
+			PIOS_Board_configure_dsm(&pios_usart_dsm_auxsbus_cfg, &pios_dsm_auxsbus_cfg, 
+											 &pios_usart_com_driver, &proto, MANUALCONTROLSETTINGS_CHANNELGROUPS_DSMMAINPORT,&hwsettings_DSMxBind);
+		}
+			break;
+		case HWSETTINGS_RV_AUXSBUSPORT_COMAUX:
+			PIOS_Board_configure_com(&pios_usart_auxsbus_cfg, PIOS_COM_AUX_RX_BUF_LEN, PIOS_COM_AUX_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_aux_id);
+			break;
+		case HWSETTINGS_RV_AUXSBUSPORT_COMBRIDGE:
+			PIOS_Board_configure_com(&pios_usart_auxsbus_cfg, PIOS_COM_BRIDGE_RX_BUF_LEN, PIOS_COM_BRIDGE_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_bridge_id);
+			break;
+	} /* hwsettings_rv_auxport */
+	
+	/* Configure FlexiPort */
+
+	uint8_t hwsettings_rv_flexiport;
+	HwSettingsRV_FlexiPortGet(&hwsettings_rv_flexiport);
+	
+	switch (hwsettings_rv_flexiport) {
+		case HWSETTINGS_RV_FLEXIPORT_DISABLED:
+			break;
+		case HWSETTINGS_RV_FLEXIPORT_I2C:
+//TODO: Enable I2C
+#if defined(PIOS_INCLUDE_I2C)
+/*		
+		{
+			if (PIOS_I2C_Init(&pios_i2c_flexi_adapter_id, &pios_i2c_flexi_adapter_cfg)) {
+				PIOS_Assert(0);
+			}
+		}
+*/
+#endif	/* PIOS_INCLUDE_I2C */
+			break;
+			
+		case HWSETTINGS_RV_FLEXIPORT_DSM2:
+		case HWSETTINGS_RV_FLEXIPORT_DSMX10BIT:
+		case HWSETTINGS_RV_FLEXIPORT_DSMX11BIT:
+		{
+			enum pios_dsm_proto proto;
+			switch (hwsettings_rv_flexiport) {
+				case HWSETTINGS_RV_FLEXIPORT_DSM2:
+					proto = PIOS_DSM_PROTO_DSM2;
+					break;
+				case HWSETTINGS_RV_FLEXIPORT_DSMX10BIT:
+					proto = PIOS_DSM_PROTO_DSMX10BIT;
+					break;
+				case HWSETTINGS_RV_FLEXIPORT_DSMX11BIT:
+					proto = PIOS_DSM_PROTO_DSMX11BIT;
+					break;
+				default:
+					PIOS_Assert(0);
+					break;
+			}
+			//TODO: Define the various Channelgroup for Revo dsm inputs and handle here
+			PIOS_Board_configure_dsm(&pios_usart_dsm_flexi_cfg, &pios_dsm_flexi_cfg, 
+											 &pios_usart_com_driver, &proto, MANUALCONTROLSETTINGS_CHANNELGROUPS_DSMMAINPORT,&hwsettings_DSMxBind);
+		}
+			break;
+		case HWSETTINGS_RV_FLEXIPORT_COMAUX:
+			PIOS_Board_configure_com(&pios_usart_flexi_cfg, PIOS_COM_AUX_RX_BUF_LEN, PIOS_COM_AUX_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_aux_id);
+			break;
+		case HWSETTINGS_RV_FLEXIPORT_COMBRIDGE:
+			PIOS_Board_configure_com(&pios_usart_flexi_cfg, PIOS_COM_BRIDGE_RX_BUF_LEN, PIOS_COM_BRIDGE_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_bridge_id);
+			break;
+	} /* hwsettings_rv_flexiport */
+	
+	
+	/* Configure the receiver port*/
+	uint8_t hwsettings_rcvrport;
+	HwSettingsRV_RcvrPortGet(&hwsettings_rcvrport);
+	//   
+	switch (hwsettings_rcvrport){
+		case HWSETTINGS_RV_RCVRPORT_DISABLED:
+			break;
+		case HWSETTINGS_RV_RCVRPORT_PWM:
+#if defined(PIOS_INCLUDE_PWM)
+		{
+			/* Set up the receiver port.  Later this should be optional */
+			uint32_t pios_pwm_id;
+			PIOS_PWM_Init(&pios_pwm_id, &pios_pwm_cfg);
+			
+			uint32_t pios_pwm_rcvr_id;
+			if (PIOS_RCVR_Init(&pios_pwm_rcvr_id, &pios_pwm_rcvr_driver, pios_pwm_id)) {
+				PIOS_Assert(0);
+			}
+			pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_PWM] = pios_pwm_rcvr_id;
+		}
+#endif	/* PIOS_INCLUDE_PWM */
+			break;
+		case HWSETTINGS_RV_RCVRPORT_PPM:
+		case HWSETTINGS_RV_RCVRPORT_PPMOUTPUTS:
+#if defined(PIOS_INCLUDE_PPM)
+		{
+			uint32_t pios_ppm_id;
+			PIOS_PPM_Init(&pios_ppm_id, &pios_ppm_cfg);
+			
+			uint32_t pios_ppm_rcvr_id;
+			if (PIOS_RCVR_Init(&pios_ppm_rcvr_id, &pios_ppm_rcvr_driver, pios_ppm_id)) {
+				PIOS_Assert(0);
+			}
+			pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_PPM] = pios_ppm_rcvr_id;
+		}
+#endif	/* PIOS_INCLUDE_PPM */
+		case HWSETTINGS_RV_RCVRPORT_OUTPUTS:
+		
+			break;
+	}
+
+#if defined(PIOS_INCLUDE_GCSRCVR)
+	GCSReceiverInitialize();
+	uint32_t pios_gcsrcvr_id;
+	PIOS_GCSRCVR_Init(&pios_gcsrcvr_id);
+	uint32_t pios_gcsrcvr_rcvr_id;
+	if (PIOS_RCVR_Init(&pios_gcsrcvr_rcvr_id, &pios_gcsrcvr_rcvr_driver, pios_gcsrcvr_id)) {
 		PIOS_Assert(0);
 	}
+	pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_GCS] = pios_gcsrcvr_rcvr_id;
+#endif	/* PIOS_INCLUDE_GCSRCVR */
 	
-	uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_GPS_RX_BUF_LEN);
-	PIOS_Assert(rx_buffer);
-	if (PIOS_COM_Init(&pios_com_gps_id, &pios_usart_com_driver, pios_usart_gps_id,
-					  rx_buffer, PIOS_COM_GPS_RX_BUF_LEN,
-					  NULL, 0)) {
-		PIOS_Assert(0);
-	}
-#endif	/* PIOS_INCLUDE_GPS */
-	
-#if defined(PIOS_INCLUDE_COM_AUX)
-	{
-		uint32_t pios_usart_aux_id;
-		
-		if (PIOS_USART_Init(&pios_usart_aux_id, &pios_usart_aux_cfg)) {
-			PIOS_DEBUG_Assert(0);
-		}
-		
-		const uint32_t BUF_SIZE = 512;
-		uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(BUF_SIZE);
-		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(BUF_SIZE);
-		PIOS_Assert(rx_buffer);
-		PIOS_Assert(tx_buffer);
-		
-		if (PIOS_COM_Init(&pios_com_aux_id, &pios_usart_com_driver, pios_usart_aux_id,
-						  rx_buffer, BUF_SIZE,
-						  tx_buffer, BUF_SIZE)) {
-			PIOS_DEBUG_Assert(0);
-		}
+#ifndef PIOS_DEBUG_ENABLE_DEBUG_PINS
+	switch (hwsettings_rcvrport) {
+		case HWSETTINGS_RV_RCVRPORT_DISABLED:
+		case HWSETTINGS_RV_RCVRPORT_PWM:
+		case HWSETTINGS_RV_RCVRPORT_PPM:
+			/* Set up the servo outputs */
+			PIOS_Servo_Init(&pios_servo_cfg);
+			break;
+		case HWSETTINGS_RV_RCVRPORT_PPMOUTPUTS:
+		case HWSETTINGS_RV_RCVRPORT_OUTPUTS:
+			//PIOS_Servo_Init(&pios_servo_rcvr_cfg);
+			//TODO: Prepare the configurations on board_hw_defs and handle here:
+			PIOS_Servo_Init(&pios_servo_cfg);
+			break;
 	}
 #else
-	pios_com_aux_id = 0;
-#endif  /* PIOS_INCLUDE_COM_AUX */
-
-#if defined(PIOS_INCLUDE_COM_TELEM)
-	{ /* Eventually add switch for this port function */
-		uint32_t pios_usart_telem_rf_id;
-		if (PIOS_USART_Init(&pios_usart_telem_rf_id, &pios_usart_telem_main_cfg)) {
-			PIOS_Assert(0);
-		}
-		
-		uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_RX_BUF_LEN);
-		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_TX_BUF_LEN);
-		PIOS_Assert(rx_buffer);
-		PIOS_Assert(tx_buffer);
-		if (PIOS_COM_Init(&pios_com_telem_rf_id, &pios_usart_com_driver, pios_usart_telem_rf_id,
-						  rx_buffer, PIOS_COM_TELEM_RF_RX_BUF_LEN,
-						  tx_buffer, PIOS_COM_TELEM_RF_TX_BUF_LEN)) {
-			PIOS_Assert(0);
-		}
-	}
-#else
-	pios_com_telem_rf_id = 0;
-#endif	/* PIOS_INCLUDE_COM_TELEM */
-
-#endif	/* PIOS_INCLUDE_COM */
-	
-	// Set up spektrum receiver
-	enum pios_dsm_proto proto;
-	proto = PIOS_DSM_PROTO_DSM2;
-	
-	uint32_t pios_usart_dsm_id;
-	if (PIOS_USART_Init(&pios_usart_dsm_id, &pios_usart_dsm_main_cfg)) {
-		PIOS_Assert(0);
-	}
-
-	uint32_t pios_dsm_id;
-	if (PIOS_DSM_Init(&pios_dsm_id,
-					  &pios_dsm_main_cfg,
-					  &pios_usart_com_driver,
-					  pios_usart_dsm_id,
-					  proto, 0)) {
-		PIOS_Assert(0);
-	}
-	
-	uint32_t pios_dsm_rcvr_id;
-	if (PIOS_RCVR_Init(&pios_dsm_rcvr_id, &pios_dsm_rcvr_driver, pios_dsm_id)) {
-		PIOS_Assert(0);
-	}
-	pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_DSMMAINPORT] = pios_dsm_rcvr_id;
-
-#if defined(PIOS_INCLUDE_PWM) && defined(PIOS_INCLUDE_RCVR)
-	/* Set up the receiver port.  Later this should be optional */
-	uint32_t pios_pwm_id;
-	PIOS_PWM_Init(&pios_pwm_id, &pios_pwm_cfg);
-	
-	uint32_t pios_pwm_rcvr_id;
-	if (PIOS_RCVR_Init(&pios_pwm_rcvr_id, &pios_pwm_rcvr_driver, pios_pwm_id)) {
-		PIOS_Assert(0);
-	}
-	pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_PWM] = pios_pwm_rcvr_id;
+	PIOS_DEBUG_Init(&pios_tim_servo_all_channels, NELEMENTS(pios_tim_servo_all_channels));
 #endif
-
-	/* Set up the servo outputs */
-	PIOS_Servo_Init(&pios_servo_cfg);
-
+	
 	if (PIOS_I2C_Init(&pios_i2c_mag_adapter_id, &pios_i2c_mag_adapter_cfg)) {
 		PIOS_DEBUG_Assert(0);
 	}

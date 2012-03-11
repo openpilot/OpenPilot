@@ -49,8 +49,10 @@
  */
 
 #include "pios.h"
-#include "accels.h"
+
 #include "attitude.h"
+
+#include "accels.h"
 #include "attitudeactual.h"
 #include "attitudesettings.h"
 #include "baroaltitude.h"

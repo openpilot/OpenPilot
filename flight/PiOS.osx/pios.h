@@ -54,7 +54,7 @@
 #include "pios_initcall.h"
 
 /* PIOS Board Specific Device Configuration */
-#include "pios_board_posix.h"
+#include "pios_board_sim.h"
 
 /* PIOS Hardware Includes (posix) */
 #include <pios_sys.h>

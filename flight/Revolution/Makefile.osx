@@ -59,6 +59,10 @@ MODULES += Attitude/Revolution
 
 MOD_GEN = Telemetry Actuator ManualControl Stabilization Attitude
 
+# To run simulation instead of connect to SITL
+MODULES += Sensors/Simulated
+MOD_GEN += Sensors
+
 # MCU name, submodel and board
 # - MCU used for compiler-option (-mtune)
 # - MODEL used for linker-script name (-T) and passed as define
@@ -134,7 +138,7 @@ SRC += ${OUTDIR}/InitMods.c
 ## OPENPILOT CORE:
 SRC += ${OPMODULEDIR}/System/systemmod.c
 SRC += $(OPSYSTEM)/revolution.c
-SRC += $(OPSYSTEM)/pios_board_posix.c
+SRC += $(OPSYSTEM)/pios_board_sim.c
 SRC += $(OPSYSTEM)/alarms.c
 SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c

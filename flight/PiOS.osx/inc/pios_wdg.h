@@ -42,5 +42,6 @@ void PIOS_WDG_Clear(void);
 #define PIOS_WDG_STABILIZATION   0x0002
 #define PIOS_WDG_ATTITUDE        0x0004
 #define PIOS_WDG_MANUAL          0x0008
+#define PIOS_WDG_SENSORS         0x0010
 
 #endif

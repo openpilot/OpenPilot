@@ -29,10 +29,12 @@
 #include <openpilot.h>
 #include <uavobjectsinit.h>
 
-#include "attituderaw.h"
-#include "attitudeactual.h"
-#include "positionactual.h"
-#include "velocityactual.h"
+#include "accels.h"
+#include "baroaltitude.h"
+#include "gpsposition.h"
+#include "gyros.h"
+#include "gyrosbias.h"
+#include "magnetometer.h"
 #include "manualcontrolsettings.h"
 
 #include "pios_rcvr_priv.h"
@@ -132,6 +134,13 @@ void PIOS_Board_Init(void) {
 	EventDispatcherInitialize();
 	UAVObjInitialize();
 	UAVObjectsInitializeAll();
+
+	AccelsInitialize();
+	BaroAltitudeInitialize();
+	MagnetometerInitialize();
+	GPSPositionInitialize();
+	GyrosInitialize();
+	GyrosBiasInitialize();
 
 	/* Initialize the alarms library */
 	AlarmsInitialize();

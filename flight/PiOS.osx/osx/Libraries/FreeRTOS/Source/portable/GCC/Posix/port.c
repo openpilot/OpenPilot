@@ -77,9 +77,9 @@
 /*-----------------------------------------------------------*/
 
 #ifndef __CYGWIN__ 
-	#define COND_SIGNALING 
+//	#define COND_SIGNALING 
 //	#define CHECK_TASK_RESUMES
-//	#define RUNNING_THREAD_MUTEX
+	#define RUNNING_THREAD_MUTEX
 #endif
 
 /* Parameters to pass to the newly created pthread. */
@@ -358,9 +358,20 @@ portLONG lIndex;
 	/* Start the first task. Will not return unless all threads are killed. */
 	vPortStartFirstTask();
 
+	int i = 0;
+	struct timespec x;
 	usleep(1000000);
 	while( pdTRUE != xSchedulerEnd ) {
-		usleep(portTICK_RATE_MICROSECONDS);
+		x.tv_sec=0;
+		x.tv_nsec=portTICK_RATE_MICROSECONDS * 1000;
+		nanosleep(&x,NULL);
+		i++;
+//		if(i % 1000 == 0) {
+//			printf("."); fflush(stdout);
+//		}
+		while(xInterruptsEnabled == pdFALSE){ // Don't call while in interrupt
+			printf("."); fflush(stdout);
+		}
 		vPortSystemTickHandler(SIG_TICK);		
 	}
 	

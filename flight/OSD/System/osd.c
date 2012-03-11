@@ -34,8 +34,7 @@
 
 #include <string.h>
 
-#include "oposd.h"
-#include "watchdog.h"
+#include "openpilot.h"
 #include "systemmod.h"
 
 /* Task Priorities */

@@ -32,19 +32,12 @@
 #include "pios_sys.h"		 /* PIOS_SYS_SerialNumberGet */
 #include "pios_usbhook.h"	 /* PIOS_USBHOOK_* */
 
-static const uint8_t usb_product_id[22] = {
+static const uint8_t usb_product_id[8] = {
 	sizeof(usb_product_id),
 	USB_DESC_TYPE_STRING,
-	'R', 0,
-	'e', 0,
-	'v', 0,
-	'o', 0,
-	'l', 0,
-	'u', 0,
-	't', 0,
-	'i', 0,
-	'o', 0,
-	'n', 0,
+	'O', 0,
+	'S', 0,
+	'D', 0,
 };
 
 static uint8_t usb_serial_number[52] = {

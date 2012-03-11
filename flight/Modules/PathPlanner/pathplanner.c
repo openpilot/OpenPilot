@@ -128,6 +128,14 @@ static void pathPlannerTask(void *parameters)
 				positionDesired.East = waypoint.Position[WAYPOINT_POSITION_EAST];
 				positionDesired.Down = waypoint.Position[WAYPOINT_POSITION_DOWN];
 				PositionDesiredSet(&positionDesired);
+			} else if (waypointAction == WAYPOINT_ACTION_RTH) {
+				// Fly back to the home location but 20 m above it
+				PositionDesiredData positionDesired;
+				PositionDesiredGet(&positionDesired);
+				positionDesired.North = 0;
+				positionDesired.East = 0;
+				positionDesired.Down = -20;
+				PositionDesiredSet(&positionDesired);
 			}
 		}
 		vTaskDelay(10);

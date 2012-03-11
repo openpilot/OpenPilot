@@ -49,9 +49,9 @@ endif
 FLASH_TOOL = OPENOCD
 
 # List of modules to include
-MODULES = Osd/osdgen Osd/osdinput GPS COTelemetry Telemetry FirmwareIAP
+MODULES = Osd/osdgen  GPS COTelemetry Telemetry #FirmwareIAP
 
-
+#Osd/osdinput
 # Paths
 OPSYSTEM = ./System
 OPSYSTEMINC = $(OPSYSTEM)/inc

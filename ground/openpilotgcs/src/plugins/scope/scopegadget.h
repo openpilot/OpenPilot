@@ -30,6 +30,7 @@
 #define SCOPEGADGET_H_
 
 #include <coreplugin/iuavgadget.h>
+#include "scopegadgetwidget.h"
 
 class IUAVGadget;
 //class QList<int>;
@@ -59,7 +60,7 @@ public:
     }
 
 private:
-    QWidget *m_widget;
+    ScopeGadgetWidget *m_widget;
     QList<int> m_context;
 
     bool configLoaded;

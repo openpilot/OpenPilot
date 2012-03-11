@@ -496,11 +496,11 @@ static void updateTelemetryStats()
 	}
 
 	// Update object
-	FlightTelemetryStatsSet(&flightStats);
+	//FlightTelemetryStatsSet(&flightStats);
 
 	// Force telemetry update if not connected
 	if (forceUpdate) {
-		FlightTelemetryStatsUpdated();
+		//FlightTelemetryStatsUpdated();
 	}
 }
 

@@ -269,7 +269,9 @@ uint32_t pios_com_bridge_id = 0;
 /* 
  * Setup a com port based on the passed cfg, driver and buffer sizes. tx size of -1 make the port rx only
  */
-inline void PIOS_Board_configure_com(const struct pios_usart_cfg *usart_port_cfg, size_t rx_buf_len, size_t tx_buf_len, const struct pios_com_driver *com_driver, uint32_t *pios_com_id) { 
+static void PIOS_Board_configure_com(const struct pios_usart_cfg *usart_port_cfg, size_t rx_buf_len, size_t tx_buf_len,
+		const struct pios_com_driver *com_driver, uint32_t *pios_com_id) 
+{
 	uint32_t pios_usart_id;
 	if (PIOS_USART_Init(&pios_usart_id, usart_port_cfg)) {
 		PIOS_Assert(0);
@@ -282,33 +284,32 @@ inline void PIOS_Board_configure_com(const struct pios_usart_cfg *usart_port_cfg
 		PIOS_Assert(tx_buffer);
 		
 		if (PIOS_COM_Init(pios_com_id, com_driver, pios_usart_id,
-								rx_buffer, rx_buf_len,
-								tx_buffer, tx_buf_len)) {
+				rx_buffer, rx_buf_len,
+				tx_buffer, tx_buf_len)) {
 			PIOS_Assert(0);
 		}
 	}
 	else{ //rx only port
 		if (PIOS_COM_Init(pios_com_id, com_driver, pios_usart_id,
-								rx_buffer, rx_buf_len,
-								NULL, 0)) {
+				rx_buffer, rx_buf_len,
+				NULL, 0)) {
 			PIOS_Assert(0);
 		}
 	}
 }
 
-inline void PIOS_Board_configure_dsm(const struct pios_usart_cfg *pios_usart_dsm_cfg, const struct pios_dsm_cfg *pios_dsm_cfg, 
-												 const struct pios_com_driver *pios_usart_com_driver,enum pios_dsm_proto *proto, ManualControlSettingsChannelGroupsOptions channelgroup,uint8_t *bind){
+static void PIOS_Board_configure_dsm(const struct pios_usart_cfg *pios_usart_dsm_cfg, const struct pios_dsm_cfg *pios_dsm_cfg, 
+		const struct pios_com_driver *pios_usart_com_driver,enum pios_dsm_proto *proto, 
+		ManualControlSettingsChannelGroupsOptions channelgroup,uint8_t *bind)
+{
 	uint32_t pios_usart_dsm_id;
 	if (PIOS_USART_Init(&pios_usart_dsm_id, pios_usart_dsm_cfg)) {
 		PIOS_Assert(0);
 	}
 	
 	uint32_t pios_dsm_id;
-	if (PIOS_DSM_Init(&pios_dsm_id,
-							pios_dsm_cfg,
-							pios_usart_com_driver,
-							pios_usart_dsm_id,
-							*proto, *bind)) {
+	if (PIOS_DSM_Init(&pios_dsm_id, pios_dsm_cfg, pios_usart_com_driver,
+			pios_usart_dsm_id, *proto, *bind)) {
 		PIOS_Assert(0);
 	}
 	
@@ -317,7 +318,6 @@ inline void PIOS_Board_configure_dsm(const struct pios_usart_cfg *pios_usart_dsm
 		PIOS_Assert(0);
 	}
 	pios_rcvr_group_map[channelgroup] = pios_dsm_rcvr_id;
-	
 }
 
 /**

@@ -9,7 +9,6 @@
 #define FONT8X10_H_
 
 static const uint8_t font_frame8x10[] = {
-
 0x00,
 0x00,
 0x00,

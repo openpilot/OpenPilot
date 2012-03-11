@@ -10,9 +10,6 @@
 
 #include "openpilot.h"
 
-#include "xconvert.h"
-#include "oem6x8.h"
-
 int32_t osdgenInitialize(void);
 
 

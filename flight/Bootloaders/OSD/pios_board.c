@@ -23,6 +23,13 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+/* Pull in the board-specific static HW definitions.
+ * Including .c files is a bit ugly but this allows all of
+ * the HW definitions to be const and static to limit their
+ * scope.
+ *
+ * NOTE: THIS IS THE ONLY PLACE THAT SHOULD EVER INCLUDE THIS FILE
+ */
 #include "board_hw_defs.c"
 
 #include <pios_board_info.h>
@@ -39,10 +46,11 @@ void PIOS_Board_Init() {
 	/* Delay system */
 	PIOS_DELAY_Init();
 	
+#if defined(PIOS_INCLUDE_LED)
 	PIOS_LED_Init(&pios_led_cfg);
+#endif	/* PIOS_INCLUDE_LED */
 
-
-#if 0 && defined(PIOS_INCLUDE_USB)
+#if defined(PIOS_INCLUDE_USB)
 	/* Initialize board specific USB data */
 	PIOS_USB_BOARD_DATA_Init();
 

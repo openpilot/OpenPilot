@@ -53,7 +53,8 @@ FLASH_TOOL = OPENOCD
 USE_THUMB_MODE = YES
 
 # List of modules to include
-MODULES =  Telemetry Actuator Stabilization ManualControl FlightPlan SimulatedAttitude
+MODULES =  Telemetry Actuator Stabilization ManualControl FlightPlan 
+#MODULES += SimulatedAttitude
 
 # MCU name, submodel and board
 # - MCU used for compiler-option (-mtune)
@@ -166,7 +167,7 @@ SRC += $(PIOSPOSIX)/pios_wdg.c
 SRC += $(PIOSPOSIX)/pios_debug.c
 
 SRC += $(PIOSPOSIX)/pios_rcvr.c
-SRC += $(PIOSPOSIX)/pios_sim.c
+#SRC += $(PIOSPOSIX)/pios_sim.c
 
 ## Libraries for flight calculations
 SRC += $(FLIGHTLIB)/fifo_buffer.c
@@ -339,7 +340,7 @@ LDFLAGS += -lc -lgcc
 
 # To include simulation model
 LDFLAGS += -L$(OUTDIR) 
-LDFLAGS += -lsimmodel
+#LDFLAGS += -lsimmodel
 
 
 # Define programs and commands.

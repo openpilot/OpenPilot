@@ -662,6 +662,7 @@ uint32_t pios_com_aux_id;
 uint32_t pios_com_gps_id;
 uint32_t pios_com_telem_usb_id;
 uint32_t pios_com_telem_rf_id;
+uint32_t pios_com_cotelem_id;
 
 
 void PIOS_Board_Init(void) {
@@ -888,6 +889,27 @@ void PIOS_Board_Init(void) {
 #else
 	pios_com_telem_rf_id = 0;
 #endif	/* PIOS_INCLUDE_COM_TELEM */
+
+#if defined(PIOS_INCLUDE_COM_TELEM)
+	{ /* Eventually add switch for this port function */
+		uint32_t pios_usart_cotelem_id;
+		if (PIOS_USART_Init(&pios_usart_cotelem_id, &pios_usart_cotelem_main_cfg)) {
+			PIOS_Assert(0);
+		}
+
+		uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_RX_BUF_LEN);
+		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_TX_BUF_LEN);
+		PIOS_Assert(rx_buffer);
+		PIOS_Assert(tx_buffer);
+		if (PIOS_COM_Init(&pios_com_cotelem_id, &pios_usart_com_driver, pios_usart_cotelem_id,
+						  rx_buffer, PIOS_COM_TELEM_RF_RX_BUF_LEN,
+						  tx_buffer, PIOS_COM_TELEM_RF_TX_BUF_LEN)) {
+			PIOS_Assert(0);
+		}
+	}
+#else
+	pios_com_cotelem_id = 0;
+#endif	/* PIOS_INCLUDE_COM_TELEM */
 #endif	/* PIOS_INCLUDE_COM */
 
 /*
@@ -950,12 +972,12 @@ GPIO_InitTypeDef GPIO_InitStructure;
 		PIOS_DEBUG_Assert(0);
 	}*/
 
-	init_USART_dma();
+	/*init_USART_dma();
 	initUSARTs();
 	extern t_fifo_buffer rx;
 	fifoBuf_init(&rx,RxBuffer3,sizeof(RxBuffer3));
 
-	PIOS_Video_Init(&pios_video_cfg);
+	PIOS_Video_Init(&pios_video_cfg);*/
 
 	//uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_HKOSD_RX_BUF_LEN);
 

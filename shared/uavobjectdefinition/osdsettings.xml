@@ -12,7 +12,7 @@
         <field name="Altitude" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
         <field name="AltitudeSetup" units="" type="int16" elements="2" elementnames="X,Y" defaultvalue="2,145"/>
         <field name="Heading" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
-        <field name="HeadingSetup" units="" type="int16" elements="2" elementnames="X,Y" defaultvalue="168,250"/>
+        <field name="HeadingSetup" units="" type="int16" elements="2" elementnames="X,Y" defaultvalue="168,240"/>
 
 	<access gcs="readwrite" flight="readwrite"/>
 	<telemetrygcs acked="true" updatemode="onchange" period="0"/>

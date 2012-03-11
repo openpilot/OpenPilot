@@ -198,15 +198,17 @@ extern uint32_t pios_spi_port_id;
 //
 // See also pios_board.c
 //-------------------------
-#define PIOS_COM_MAX_DEVS               4
+#define PIOS_COM_MAX_DEVS               5
 extern uint32_t pios_com_telem_rf_id;
 extern uint32_t pios_com_gps_id;
 extern uint32_t pios_com_aux_id;
 extern uint32_t pios_com_telem_usb_id;
+extern uint32_t pios_com_cotelem_id;
 #define PIOS_COM_AUX                    (pios_com_aux_id)
 #define PIOS_COM_GPS                    (pios_com_gps_id)
 #define PIOS_COM_TELEM_USB              (pios_com_telem_usb_id)
 #define PIOS_COM_TELEM_RF               (pios_com_telem_rf_id)
+#define PIOS_COM_COTELEM               (pios_com_cotelem_id)
 #define PIOS_COM_DEBUG                  PIOS_COM_AUX
 
 

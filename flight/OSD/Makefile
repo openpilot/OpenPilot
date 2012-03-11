@@ -49,7 +49,11 @@ endif
 FLASH_TOOL = OPENOCD
 
 # List of modules to include
+<<<<<<< HEAD
 MODULES = Osd/osdgen Osd/osdinput GPS Telemetry #FirmwareIAP
+=======
+MODULES = Osd/osdgen Osd/osdinput GPS COTelemetry Telemetry FirmwareIAP
+>>>>>>> remotes/origin/sambas/osd_test
 
 
 # Paths

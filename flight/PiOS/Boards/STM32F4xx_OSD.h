@@ -26,6 +26,9 @@
 #ifndef PIOS_BOARD_H
 #define PIOS_BOARD_H
 
+
+#include <stdbool.h>
+
 // *****************************************************************
 // Timers and Channels Used
 
@@ -54,6 +57,13 @@ TIM4  |                     STOPWATCH                    |
 /* Channel 10 - 				*/
 /* Channel 11 - 				*/
 /* Channel 12 - 				*/
+
+//------------------------
+// BOOTLOADER_SETTINGS
+//------------------------
+#define BOARD_READABLE	true
+#define BOARD_WRITABLE	true
+#define MAX_DEL_RETRYS	3
 
 //-------------------------
 // System Settings
@@ -89,13 +99,6 @@ TIM4  |                     STOPWATCH                    |
 //
 #define PIOS_PERIPHERAL_APB2_CLOCK					PIOS_SYSCLK
 
-
-//------------------------
-// BOOTLOADER_SETTINGS
-//------------------------
-#define BOARD_READABLE	TRUE
-#define BOARD_WRITABLE	TRUE
-#define MAX_DEL_RETRYS	3
 
 //------------------------
 // TELEMETRY

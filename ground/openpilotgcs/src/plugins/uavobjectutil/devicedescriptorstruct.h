@@ -5,9 +5,9 @@
 struct deviceDescriptorStruct
 {
 public:
+       QString gitHash;
+       QString gitDate;
        QString gitTag;
-       QString buildDate;
-       QString description;
        int boardType;
        int boardRevision;
        static QString idToBoardName(int id)

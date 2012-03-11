@@ -99,8 +99,6 @@ public:
     virtual void setMetadata(const Metadata& mdata) = 0;
     virtual Metadata getMetadata() = 0;
     virtual Metadata getDefaultMetadata() = 0;
-    void requestUpdate();
-    void updated();
     void lock();
     void lock(int timeoutMs);
     void unlock();
@@ -112,6 +110,10 @@ public:
     QString toStringBrief();
     QString toStringData();
     void emitTransactionCompleted(bool success);
+
+public slots:
+    void requestUpdate();
+    void updated();
 
 signals:
     void objectUpdated(UAVObject* obj);

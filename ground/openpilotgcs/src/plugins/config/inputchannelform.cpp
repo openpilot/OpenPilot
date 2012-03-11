@@ -23,7 +23,6 @@ inputChannelForm::inputChannelForm(QWidget *parent,bool showlegend) :
         delete ui->legend4;
         delete ui->legend5;
     }
-
     connect(ui->channelMin,SIGNAL(valueChanged(int)),this,SLOT(minMaxUpdated()));
     connect(ui->channelMax,SIGNAL(valueChanged(int)),this,SLOT(minMaxUpdated()));
     connect(ui->channelGroup,SIGNAL(currentIndexChanged(int)),this,SLOT(groupUpdated()));
@@ -39,6 +38,22 @@ inputChannelForm::inputChannelForm(QWidget *parent,bool showlegend) :
 inputChannelForm::~inputChannelForm()
 {
     delete ui;
+}
+void inputChannelForm::setName(QString &name)
+{
+    ui->channelName->setText(name);
+    QFontMetrics metrics(ui->channelName->font());
+    int width=metrics.width(name)+5;
+    foreach(inputChannelForm * form,parent()->findChildren<inputChannelForm*>())
+    {
+        if(form==this)
+            continue;
+        if(form->ui->channelName->minimumSize().width()<width)
+            form->ui->channelName->setMinimumSize(width,0);
+        else
+            width=form->ui->channelName->minimumSize().width();
+    }
+    ui->channelName->setMinimumSize(width,0);
 }
 
 /**

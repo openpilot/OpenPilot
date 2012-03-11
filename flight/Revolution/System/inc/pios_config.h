@@ -71,7 +71,7 @@
 #define PIOS_INCLUDE_COM_TELEM
 //#define PIOS_INCLUDE_COM_AUX
 #define PIOS_INCLUDE_GPS
-
+#define PIOS_OVERO_SPI
 /* Supported receiver interfaces */
 #define PIOS_INCLUDE_RCVR
 #define PIOS_INCLUDE_DSM
@@ -104,6 +104,8 @@
 
 // This actually needs calibrating
 #define IDLE_COUNTS_PER_SEC_AT_NO_LOAD (8379692)
+
+#define REVOLUTION
 
 #endif /* PIOS_CONFIG_H */
 /**

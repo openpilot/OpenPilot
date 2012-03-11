@@ -472,6 +472,13 @@ QString UAVObjectParser::processObjectFields(QDomNode& childNode, ObjectInfo* in
 		}
 		field->defaultValues = defaults;
     }
+    elemAttr = elemAttributes.namedItem("limits");
+    if ( elemAttr.isNull() ) {
+        field->limitValues=QString();
+    }
+    else{
+        field->limitValues=elemAttr.nodeValue();
+    }
     // Add field to object
     info->fields.append(field);
     // Done

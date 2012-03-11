@@ -147,7 +147,6 @@ int32_t mag_test;
 uint32_t sensor_dt_us;
 static void SensorsTask(void *parameters)
 {
-	uint8_t init = 0;
 	portTickType lastSysTime;
 	uint32_t accel_samples;
 	uint32_t gyro_samples;
@@ -192,6 +191,7 @@ static void SensorsTask(void *parameters)
 	// Main task loop
 	lastSysTime = xTaskGetTickCount();
 	bool error = false;
+	uint32_t mag_update_time = PIOS_DELAY_GetRaw();
 	while (1) {
 		// TODO: add timeouts to the sensor reads and set an error if the fail
 		sensor_dt_us = PIOS_DELAY_DiffuS(timeval);
@@ -347,7 +347,8 @@ static void SensorsTask(void *parameters)
 		// and make it average zero (weakly)
 		MagnetometerData mag;
 		bool mag_updated = false;
-		if (PIOS_HMC5883_NewDataAvailable()) {
+
+		if (PIOS_HMC5883_NewDataAvailable() || PIOS_DELAY_DiffuS(mag_update_time) > 150000) {
 			mag_updated = true;
 			int16_t values[3];
 			PIOS_HMC5883_ReadMag(values);
@@ -355,6 +356,7 @@ static void SensorsTask(void *parameters)
 			mag.y = values[0] * mag_scale[1] - mag_bias[1];
 			mag.z = -values[2] * mag_scale[2] - mag_bias[2];
 			MagnetometerSet(&mag);
+			mag_update_time = PIOS_DELAY_GetRaw();
 		}
 
 		// For debugging purposes here we can output all of the sensors.  Do it as a single transaction

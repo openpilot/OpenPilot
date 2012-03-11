@@ -193,27 +193,6 @@ void USB_OTG_BSP_Init(USB_OTG_CORE_HANDLE *pdev)
 
 	/* Configure USB D-/D+ (DM/DP) pins */
 	GPIO_InitTypeDef GPIO_InitStructure;
-
-#define FORCE_USB_DP_DM_LOW 1
-#if FORCE_USB_DP_DM_LOW
-	/* Force D-/D+ low for 50ms to trigger a disconnect */
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11 | GPIO_Pin_12;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-	GPIO_Init(GPIOA, &GPIO_InitStructure);
-
-	GPIO_PinAFConfig(GPIOA, GPIO_PinSource11, 0);
-	GPIO_PinAFConfig(GPIOA, GPIO_PinSource12, 0);
-
-	GPIO_ResetBits(GPIOA, GPIO_Pin_12);
-	GPIO_ResetBits(GPIOA, GPIO_Pin_11);
-
-	PIOS_DELAY_WaitmS(50);
-#endif
-
-	/* Set up D-/D+ as USB function again */
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11 | GPIO_Pin_12;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;

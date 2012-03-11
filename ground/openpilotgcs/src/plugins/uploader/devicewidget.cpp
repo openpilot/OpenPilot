@@ -111,7 +111,7 @@ void deviceWidget::populate()
     // display a nice icon:
     myDevice->gVDevice->scene()->clear();
     myDevice->lblDevName->setText(deviceDescriptorStruct::idToBoardName(id));
-    myDevice->lblHWRev->setText(QString(tr("HW Revision: "))+QString::number(id & 0x0011, 16));
+    myDevice->lblHWRev->setText(QString(tr("HW Revision: "))+QString::number(id & 0x00FF, 16));
 
     devicePic = new QGraphicsSvgItem();
     devicePic->setSharedRenderer(new QSvgRenderer());
@@ -180,13 +180,13 @@ void deviceWidget::freeze()
   */
 bool deviceWidget::populateBoardStructuredDescription(QByteArray desc)
 {
-    if(UAVObjectUtilManager::descriptionToStructure(desc,&onBoardDescrition))
+    if(UAVObjectUtilManager::descriptionToStructure(desc,&onBoardDescription))
     {
-        myDevice->lblGitTag->setText(onBoardDescrition.gitTag);
-        myDevice->lblBuildDate->setText(onBoardDescrition.buildDate.insert(4,"-").insert(7,"-"));
-        if(onBoardDescrition.description.startsWith("release",Qt::CaseInsensitive))
+        myDevice->lblGitTag->setText(onBoardDescription.gitHash);
+        myDevice->lblBuildDate->setText(onBoardDescription.gitDate.insert(4,"-").insert(7,"-"));
+        if(onBoardDescription.gitTag.startsWith("release",Qt::CaseInsensitive))
         {
-            myDevice->lblDescription->setText(QString("Firmware tag: ")+onBoardDescrition.description);
+            myDevice->lblDescription->setText(QString("Firmware tag: ")+onBoardDescription.gitTag);
             QPixmap pix = QPixmap(QString(":uploader/images/application-certificate.svg"));
             myDevice->lblCertified->setPixmap(pix);
             myDevice->lblCertified->setToolTip(tr("Tagged officially released firmware build"));
@@ -194,13 +194,13 @@ bool deviceWidget::populateBoardStructuredDescription(QByteArray desc)
         }
         else
         {
-            myDevice->lblDescription->setText(onBoardDescrition.description);
+            myDevice->lblDescription->setText(onBoardDescription.gitTag);
             QPixmap pix = QPixmap(QString(":uploader/images/warning.svg"));
             myDevice->lblCertified->setPixmap(pix);
             myDevice->lblCertified->setToolTip(tr("Untagged or custom firmware build"));
         }
 
-        myDevice->lblBrdName->setText(idToBoardName(onBoardDescrition.boardType<<8));
+        myDevice->lblBrdName->setText(idToBoardName(onBoardDescription.boardType<<8));
 
         return true;
     }
@@ -210,27 +210,27 @@ bool deviceWidget::populateBoardStructuredDescription(QByteArray desc)
 }
 bool deviceWidget::populateLoadedStructuredDescription(QByteArray desc)
 {
-    if(UAVObjectUtilManager::descriptionToStructure(desc,&LoadedDescrition))
+    if(UAVObjectUtilManager::descriptionToStructure(desc,&LoadedDescription))
     {
-        myDevice->lblGitTagL->setText(LoadedDescrition.gitTag);
-        myDevice->lblBuildDateL->setText( LoadedDescrition.buildDate.insert(4,"-").insert(7,"-"));
-        if(LoadedDescrition.description.startsWith("release",Qt::CaseInsensitive))
+        myDevice->lblGitTagL->setText(LoadedDescription.gitHash);
+        myDevice->lblBuildDateL->setText( LoadedDescription.gitDate.insert(4,"-").insert(7,"-"));
+        if(LoadedDescription.gitTag.startsWith("release",Qt::CaseInsensitive))
         {
-            myDevice->lblDescritpionL->setText(LoadedDescrition.description);
-            myDevice->description->setText(LoadedDescrition.description);
+            myDevice->lblDescritpionL->setText(LoadedDescription.gitTag);
+            myDevice->description->setText(LoadedDescription.gitTag);
             QPixmap pix = QPixmap(QString(":uploader/images/application-certificate.svg"));
             myDevice->lblCertifiedL->setPixmap(pix);
             myDevice->lblCertifiedL->setToolTip(tr("Tagged officially released firmware build"));
         }
         else
         {
-            myDevice->lblDescritpionL->setText(LoadedDescrition.description);
-            myDevice->description->setText(LoadedDescrition.description);
+            myDevice->lblDescritpionL->setText(LoadedDescription.gitTag);
+            myDevice->description->setText(LoadedDescription.gitTag);
             QPixmap pix = QPixmap(QString(":uploader/images/warning.svg"));
             myDevice->lblCertifiedL->setPixmap(pix);
             myDevice->lblCertifiedL->setToolTip(tr("Untagged or custom firmware build"));
         }
-        myDevice->lblBrdNameL->setText(deviceDescriptorStruct::idToBoardName(LoadedDescrition.boardType<<8));
+        myDevice->lblBrdNameL->setText(deviceDescriptorStruct::idToBoardName(LoadedDescription.boardType<<8));
 
         return true;
     }
@@ -323,12 +323,12 @@ void deviceWidget::loadFirmware()
             myDevice->statusLabel->setText(tr("WARNING: the loaded firmware is for different hardware. Do not update!"));
             px.load(QString(":/uploader/images/error.svg"));
         }
-        else if(QDateTime::fromString(onBoardDescrition.buildDate)>QDateTime::fromString(LoadedDescrition.buildDate))
+        else if(QDateTime::fromString(onBoardDescription.gitDate)>QDateTime::fromString(LoadedDescription.gitDate))
         {
             myDevice->statusLabel->setText(tr("The board has newer firmware than loaded. Are you sure you want to update?"));
             px.load(QString(":/uploader/images/warning.svg"));
         }
-        else if(!LoadedDescrition.description.startsWith("release",Qt::CaseInsensitive))
+        else if(!LoadedDescription.gitTag.startsWith("release",Qt::CaseInsensitive))
         {
             myDevice->statusLabel->setText(tr("The loaded firmware is untagged or custom build. Update only if it was received from a trusted source (official website or your own build)"));
             px.load(QString(":/uploader/images/warning.svg"));

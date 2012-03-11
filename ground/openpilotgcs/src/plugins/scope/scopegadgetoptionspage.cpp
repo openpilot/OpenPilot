@@ -114,6 +114,7 @@ QWidget* ScopeGadgetOptionsPage::createPage(QWidget *parent)
     connect(options_page->btnRemoveCurve, SIGNAL(clicked()), this, SLOT(on_btnRemoveCurve_clicked()));
     connect(options_page->lstCurves, SIGNAL(currentRowChanged(int)), this, SLOT(on_lstCurves_currentRowChanged(int)));
     connect(options_page->btnColor, SIGNAL(clicked()), this, SLOT(on_btnColor_clicked()));
+    connect(options_page->spnRefreshInterval, SIGNAL(valueChanged(int )), this, SLOT(on_spnRefreshInterval_valueChanged(int)));
 
     setYAxisWidgetFromPlotCurve();
 
@@ -349,3 +350,34 @@ void ScopeGadgetOptionsPage::on_loggingEnable_clicked()
     options_page->LoggingLabel->setEnabled(en);
 
  }
+
+void ScopeGadgetOptionsPage::on_spnRefreshInterval_valueChanged(int )
+{
+    validateRefreshInterval();
+}
+
+void ScopeGadgetOptionsPage::validateRefreshInterval()
+{
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    for(int iIndex = 0; iIndex < options_page->lstCurves->count();iIndex++) {
+        QListWidgetItem* listItem = options_page->lstCurves->item(iIndex);
+
+        QString uavObject = listItem->data(Qt::UserRole + 0).toString();
+
+        UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject((uavObject)));
+        if(!obj) {
+            qDebug() << "Object  " << uavObject << " is missing";
+            continue;
+        }
+
+        if(options_page->spnRefreshInterval->value() < obj->getMetadata().flightTelemetryUpdatePeriod)
+        {
+            options_page->lblWarnings->setText("The refresh interval is faster than some or all telemetry objects.");
+            return;
+        }
+    }
+
+    options_page->lblWarnings->setText("");
+}
+

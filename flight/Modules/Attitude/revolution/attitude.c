@@ -234,6 +234,12 @@ static int32_t updateAttitudeComplimentary(bool first_run)
 		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE,SYSTEMALARMS_ALARM_WARNING);
 		return -1;
 	}
+	if ( xQueueReceive(accelQueue, &ev, 0) != pdTRUE )
+	{
+		// When one of these is updated so should the other
+		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE,SYSTEMALARMS_ALARM_WARNING);
+		return -1;
+	}
 	
 	// During initialization and 
 	FlightStatusData flightStatus;
@@ -290,7 +296,8 @@ static int32_t updateAttitudeComplimentary(bool first_run)
 	accel_err[1] /= accel_mag;
 	accel_err[2] /= accel_mag;	
 	
-	if (1) {
+	if ( xQueueReceive(magQueue, &ev, 0) != pdTRUE )
+	{
 		// Rotate gravity to body frame and cross with accels
 		float brot[3];
 		float Rbe[3][3];
@@ -378,6 +385,14 @@ static int32_t updateAttitudeComplimentary(bool first_run)
 
 	AttitudeActualSet(&attitudeActual);
 	
+	// Flush these queues for avoid errors
+	if ( xQueueReceive(baroQueue, &ev, 0) != pdTRUE )
+	{
+	}
+	if ( xQueueReceive(gpsQueue, &ev, 0) != pdTRUE )
+	{
+	}
+
 	AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
 
 	return 0;

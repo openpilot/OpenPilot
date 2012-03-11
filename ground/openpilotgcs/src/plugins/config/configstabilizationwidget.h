@@ -28,7 +28,7 @@
 #define CONFIGSTABILIZATIONWIDGET_H
 
 #include "ui_stabilization.h"
-#include "configtaskwidget.h"
+#include "../uavobjectwidgetutils/configtaskwidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
@@ -47,30 +47,11 @@ public:
 
 private:
     Ui_StabilizationWidget *m_stabilization;
-    StabilizationSettings* stabSettings;
-    QTimer updateTimer;
-
+    QTimer * realtimeUpdates;
 private slots:
-    virtual void refreshWidgetsValues();
-    void updateObjectsFromWidgets();
-    void realtimeUpdateToggle(bool);
-    void openHelp();
-
-    void updateRateRollKP(double);
-    void updateRateRollKI(double);
-    void updateRateRollILimit(double);
-
-    void updateRatePitchKP(double);
-    void updateRatePitchKI(double);
-    void updateRatePitchILimit(double);
-
-    void updateRollKP(double);
-    void updateRollKI(double);
-    void updateRollILimit(double);
-
-    void updatePitchKP(double);
-    void updatePitchKI(double);
-    void updatePitchILimit(double);
+    void realtimeUpdatesSlot(int);
+    void linkCheckBoxes(int value);
+    void processLinkedWidgets(QWidget*);
 };
 
 #endif // ConfigStabilizationWidget_H

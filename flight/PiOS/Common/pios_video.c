@@ -101,7 +101,7 @@ void PIOS_Hsync_ISR() {
 			//PIOS_LED_On(LED2);
 			if(gLineType == LINE_TYPE_GRAPHICS)
 			{
-				for(int g=0;g<90;g++)
+				for(int g=0;g<95;g++)
 				{
 					asm("nop");
 				}

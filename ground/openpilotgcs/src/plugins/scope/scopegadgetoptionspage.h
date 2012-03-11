@@ -70,8 +70,10 @@ private:
     void setCurvePlotProperties(QListWidgetItem *listWidgetItem, QString uavObject, QString uavField, int scale, int interpolation, QVariant varColor);
     void setYAxisWidgetFromPlotCurve();
     void setButtonColor(const QColor &color);
+    void validateRefreshInterval();
 
 private slots:
+    void on_spnRefreshInterval_valueChanged(int );
     void on_lstCurves_currentRowChanged(int currentRow);
     void on_btnRemoveCurve_clicked();
     void on_btnAddCurve_clicked();

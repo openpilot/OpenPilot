@@ -39,7 +39,7 @@ ConfigProHWWidget::ConfigProHWWidget(QWidget *parent) : ConfigTaskWidget(parent)
     m_telemetry = new Ui_PRO_HW_Widget();
     m_telemetry->setupUi(this);
 
-    setupButtons(m_telemetry->saveTelemetryToRAM,m_telemetry->saveTelemetryToSD);
+    addApplySaveButtons(m_telemetry->saveTelemetryToRAM,m_telemetry->saveTelemetryToSD);
     addUAVObjectToWidgetRelation("HwSettings","TelemetrySpeed",m_telemetry->telemetrySpeed);
     enableControls(false);
     populateWidgets();

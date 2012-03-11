@@ -66,6 +66,7 @@ ScopeGadgetConfiguration::ScopeGadgetConfiguration(QString classId, QSettings* q
             plotCurveConf->color = color;
             plotCurveConf->yScalePower = qSettings->value("yScalePower").toInt();
             plotCurveConf->yInterpolationSamples = qSettings->value("yInterpolationSamples").toInt();
+            if (!plotCurveConf->yInterpolationSamples) plotCurveConf->yInterpolationSamples = 1; // fallback for backward compatibility with earlier versions
             plotCurveConf->yMinimum = qSettings->value("yMinimum").toDouble();
             plotCurveConf->yMaximum = qSettings->value("yMaximum").toDouble();
 

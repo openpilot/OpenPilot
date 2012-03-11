@@ -99,16 +99,14 @@ int32_t PIOS_DELAY_WaitmS(uint32_t mS)
 
 uint32_t PIOS_DELAY_GetRaw()
 {
-//	struct timespec time;
-//	uint32_t raw_us;
-
-	
-
-	return 0;
+	uint32_t raw_us = clock();
+	return raw_us;
 }
 
-uint32_t PIOS_DELAY_DiffuS(uint32_t rapec)
+uint32_t PIOS_DELAY_DiffuS(uint32_t ref)
 {
-	return 0;
+	uint32_t diff_clock = clock() - ref;
+	uint32_t diff_us = diff_clock; // (CLOCKS_PER_SEC / 1000);
+	return diff_us;
 }
 #endif

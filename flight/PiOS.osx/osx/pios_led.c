@@ -39,7 +39,7 @@ static uint8_t LED_GPIO[PIOS_LED_NUM];
 
 
 static inline void PIOS_SetLED(uint32_t LED,uint8_t stat) {
-	printf("PIOS: LED %i status %i\n",LED,stat);
+//	printf("PIOS: LED %i status %i\n",LED,stat);
 	LED_GPIO[LED]=stat;
 }
 

@@ -34,7 +34,7 @@ QGroupBox::title {
  }</string>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="RCInput">
       <attribute name="title">
@@ -149,25 +149,6 @@ QGroupBox::title {
       <attribute name="title">
        <string>Flight Mode Switch Settings</string>
       </attribute>
-      <widget class="QLabel" name="label_15">
-       <property name="geometry">
-        <rect>
-         <x>310</x>
-         <y>10</y>
-         <width>201</width>
-         <height>17</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Warning: avoid &quot;Manual&quot;</string>
-       </property>
-      </widget>
       <widget class="QLabel" name="label_16">
        <property name="geometry">
         <rect>
@@ -192,7 +173,7 @@ QGroupBox::title {
         <rect>
          <x>30</x>
          <y>160</y>
-         <width>445</width>
+         <width>451</width>
          <height>155</height>
         </rect>
        </property>
@@ -206,58 +187,62 @@ QGroupBox::title {
         <item row="1" column="2">
          <widget class="QLabel" name="label_9">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="minimumSize">
-           <size>
-            <width>40</width>
-            <height>0</height>
-           </size>
+          <property name="font">
+           <font>
+            <pointsize>-1</pointsize>
+            <weight>75</weight>
+            <italic>false</italic>
+            <bold>true</bold>
+           </font>
           </property>
           <property name="styleSheet">
            <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
 border-radius: 5;
-font: bold 9px;
+font: bold 12px;
 margin:1px;</string>
           </property>
           <property name="text">
            <string>Pitch</string>
           </property>
           <property name="alignment">
-           <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+           <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
         <item row="1" column="3">
          <widget class="QLabel" name="label_10">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="minimumSize">
-           <size>
-            <width>40</width>
-            <height>0</height>
-           </size>
+          <property name="font">
+           <font>
+            <pointsize>-1</pointsize>
+            <weight>75</weight>
+            <italic>false</italic>
+            <bold>true</bold>
+           </font>
           </property>
           <property name="styleSheet">
            <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
 border-radius: 5;
-font: bold 9px;
+font: bold 12px;
 margin:1px;</string>
           </property>
           <property name="text">
            <string>Yaw</string>
           </property>
           <property name="alignment">
-           <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+           <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
@@ -339,6 +324,37 @@ margin:1px;</string>
         <item row="4" column="3">
          <widget class="QComboBox" name="fmsSsPos3Yaw"/>
         </item>
+        <item row="1" column="1">
+         <widget class="QLabel" name="label_8">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>-1</pointsize>
+            <weight>75</weight>
+            <italic>false</italic>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;
+font: bold 12px;
+margin:1px;</string>
+          </property>
+          <property name="text">
+           <string>Roll</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
         <item row="0" column="1">
          <spacer name="verticalSpacer_3">
           <property name="orientation">
@@ -352,35 +368,6 @@ margin:1px;</string>
           </property>
          </spacer>
         </item>
-        <item row="1" column="1">
-         <widget class="QLabel" name="label_8">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>40</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
-color: rgb(255, 255, 255);
-border-radius: 5;
-font: bold 9px;
-margin:1px;</string>
-          </property>
-          <property name="text">
-           <string>Roll</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignBottom|Qt::AlignHCenter</set>
-          </property>
-         </widget>
-        </item>
        </layout>
       </widget>
       <widget class="QGroupBox" name="groupBox_2">
@@ -388,7 +375,7 @@ margin:1px;</string>
         <rect>
          <x>30</x>
          <y>30</y>
-         <width>261</width>
+         <width>451</width>
          <height>121</height>
         </rect>
        </property>
@@ -507,6 +494,28 @@ if you have not done so already.</string>
         </property>
         <property name="tickInterval">
          <number>100</number>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_15">
+        <property name="geometry">
+         <rect>
+          <x>270</x>
+          <y>30</y>
+          <width>141</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>Warning: avoid &quot;Manual&quot;</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
         </property>
        </widget>
       </widget>

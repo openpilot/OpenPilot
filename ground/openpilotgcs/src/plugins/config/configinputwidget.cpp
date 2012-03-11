@@ -241,10 +241,6 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
                         ManualControlSettings::CHANNELGROUPS_ACCESSORY0 <<
                         ManualControlSettings::CHANNELGROUPS_ACCESSORY1 <<
                         ManualControlSettings::CHANNELGROUPS_ACCESSORY2;
-
-    ((QGridLayout*)m_config->groupBox->layout())->setAlignment(m_config->label_8,Qt::AlignHCenter);
-    ((QGridLayout*)m_config->groupBox->layout())->setAlignment(m_config->label_9,Qt::AlignHCenter);
-    ((QGridLayout*)m_config->groupBox->layout())->setAlignment(m_config->label_10,Qt::AlignHCenter);
 }
 void ConfigInputWidget::resetTxControls()
 {

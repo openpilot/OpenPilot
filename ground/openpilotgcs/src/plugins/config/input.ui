@@ -174,7 +174,7 @@ QGroupBox::title {
          <x>30</x>
          <y>160</y>
          <width>451</width>
-         <height>155</height>
+         <height>141</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -184,53 +184,8 @@ QGroupBox::title {
         <string>Configure each stabilization mode for each axis</string>
        </property>
        <layout class="QGridLayout" name="gridLayout_2">
-        <item row="1" column="2">
-         <widget class="QLabel" name="label_9">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="font">
-           <font>
-            <pointsize>-1</pointsize>
-            <weight>75</weight>
-            <italic>false</italic>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
-color: rgb(255, 255, 255);
-border-radius: 5;
-font: bold 12px;
-margin:1px;</string>
-          </property>
-          <property name="text">
-           <string>Pitch</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
         <item row="1" column="3">
          <widget class="QLabel" name="label_10">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="font">
-           <font>
-            <pointsize>-1</pointsize>
-            <weight>75</weight>
-            <italic>false</italic>
-            <bold>true</bold>
-           </font>
-          </property>
           <property name="styleSheet">
            <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
@@ -326,20 +281,6 @@ margin:1px;</string>
         </item>
         <item row="1" column="1">
          <widget class="QLabel" name="label_8">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="font">
-           <font>
-            <pointsize>-1</pointsize>
-            <weight>75</weight>
-            <italic>false</italic>
-            <bold>true</bold>
-           </font>
-          </property>
           <property name="styleSheet">
            <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
@@ -363,10 +304,27 @@ margin:1px;</string>
           <property name="sizeHint" stdset="0">
            <size>
             <width>20</width>
-            <height>40</height>
+            <height>20</height>
            </size>
           </property>
          </spacer>
+        </item>
+        <item row="1" column="2">
+         <widget class="QLabel" name="label_9">
+          <property name="styleSheet">
+           <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;
+font: bold 12px;
+margin:1px;</string>
+          </property>
+          <property name="text">
+           <string>Pitch</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>

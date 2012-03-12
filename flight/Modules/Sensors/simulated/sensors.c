@@ -50,6 +50,7 @@
 #include "attitude.h"
 
 #include "accels.h"
+#include "actuatordesired.h"
 #include "attitudeactual.h"
 #include "attitudesettings.h"
 #include "baroaltitude.h"
@@ -80,8 +81,11 @@ static xTaskHandle sensorsTaskHandle;
 static void SensorsTask(void *parameters);
 static void simulateConstant();
 static void simulateModelAgnostic();
+static void simulateModelQuadcopter();
 
-enum sensor_sim_type {CONSTANT, MODEL_AGNOSTIC} sensor_sim_type;
+static float rand_gauss();
+
+enum sensor_sim_type {CONSTANT, MODEL_AGNOSTIC, MODEL_QUADCOPTER} sensor_sim_type;
 
 /**
  * Initialise the module.  Called before the start function
@@ -135,12 +139,19 @@ static void SensorsTask(void *parameters)
 	homeLocation.Set = HOMELOCATION_SET_TRUE;
 	HomeLocationSet(&homeLocation);
 
-	sensor_sim_type = MODEL_AGNOSTIC;
+	sensor_sim_type = MODEL_QUADCOPTER;
 
 	// Main task loop
 	lastSysTime = xTaskGetTickCount();
+	uint32_t last_time = PIOS_DELAY_GetRaw();
 	while (1) {
 		PIOS_WDG_UpdateFlag(PIOS_WDG_SENSORS);
+
+		float dT = PIOS_DELAY_DiffuS(last_time) / 1.0e6;
+		if(dT > 0.010) {
+			fprintf(stderr,"Long sensor update\n");
+		}
+		last_time = PIOS_DELAY_GetRaw();
 
 		switch(sensor_sim_type) {
 			case CONSTANT:
@@ -148,6 +159,9 @@ static void SensorsTask(void *parameters)
 				break;
 			case MODEL_AGNOSTIC:
 				simulateModelAgnostic();
+				break;
+			case MODEL_QUADCOPTER:
+				simulateModelQuadcopter();
 				break;
 		}
 
@@ -225,9 +239,9 @@ static void simulateModelAgnostic()
 	RateDesiredGet(&rateDesired);
 
 	GyrosData gyrosData; // Skip get as we set all the fields
-	gyrosData.x = rateDesired.Roll;
-	gyrosData.y = rateDesired.Pitch;
-	gyrosData.z = rateDesired.Yaw;
+	gyrosData.x = rateDesired.Roll + rand_gauss();
+	gyrosData.y = rateDesired.Pitch + rand_gauss();
+	gyrosData.z = rateDesired.Yaw + rand_gauss();
 
 	// Apply bias correction to the gyros
 	GyrosBiasData gyrosBias;
@@ -259,6 +273,129 @@ static void simulateModelAgnostic()
 	MagnetometerSet(&mag);
 }
 
+static void simulateModelQuadcopter()
+{
+	static float pos[3] = {0,0,0};
+	static float vel[3] = {0,0,0};
+	static float ned_accel[3] = {0,0,0};
+	static float q[4] = {1,0,0,0};
+	static float rpy[3] = {0,0,0}; // Low pass filtered actuator
+	float T[3];
+	float Rbe[3][3];
+	
+	const float ACTUATOR_ALPHA = 0.99;
+	const float MAX_THRUST = 9.81 * 2;
+
+	static uint32_t last_time;
+	
+	float dT = (PIOS_DELAY_DiffuS(last_time) / 1e6);
+	if(dT < 1e-3)
+		dT = 2e-3;
+	last_time = PIOS_DELAY_GetRaw();
+	
+	ActuatorDesiredData actuatorDesired;
+	ActuatorDesiredGet(&actuatorDesired);
+	rpy[0] = actuatorDesired.Roll * (1 - ACTUATOR_ALPHA) + rpy[0] * ACTUATOR_ALPHA;
+	rpy[1] = actuatorDesired.Pitch * (1 - ACTUATOR_ALPHA) + rpy[1] * ACTUATOR_ALPHA;
+	rpy[2] = actuatorDesired.Yaw * (1 - ACTUATOR_ALPHA) + rpy[2] * ACTUATOR_ALPHA;
+	
+	GyrosData gyrosData; // Skip get as we set all the fields
+	gyrosData.x = rpy[0] + rand_gauss();
+	gyrosData.y = rpy[1] + rand_gauss();
+	gyrosData.z = rpy[2] + rand_gauss();
+	
+	// Apply bias correction to the gyros
+	GyrosBiasData gyrosBias;
+	GyrosBiasGet(&gyrosBias);
+	gyrosData.x += gyrosBias.x;
+	gyrosData.y += gyrosBias.y;
+	gyrosData.z += gyrosBias.z;
+	GyrosSet(&gyrosData);
+	
+	// Predict the attitude forward in time
+	float qdot[4];
+	qdot[0] = (-q[1] * rpy[0] - q[2] * rpy[1] - q[3] * rpy[2]) * dT * M_PI / 180 / 2;
+	qdot[1] = (q[0] * rpy[0] - q[3] * rpy[1] + q[2] * rpy[2]) * dT * M_PI / 180 / 2;
+	qdot[2] = (q[3] * rpy[0] + q[0] * rpy[1] - q[1] * rpy[2]) * dT * M_PI / 180 / 2;
+	qdot[3] = (-q[2] * rpy[0] + q[1] * rpy[1] + q[0] * rpy[2]) * dT * M_PI / 180 / 2;
+	
+	// Take a time step
+	q[0] = q[0] + qdot[0];
+	q[1] = q[1] + qdot[1];
+	q[2] = q[2] + qdot[2];
+	q[3] = q[3] + qdot[3];
+	
+	float thrust = actuatorDesired.Throttle * MAX_THRUST;
+	if (thrust != thrust)
+		thrust = 0;
+
+	Quaternion2R(q,Rbe);
+	ned_accel[0] = thrust * Rbe[0][2];
+	ned_accel[1] = thrust * Rbe[1][2];
+	ned_accel[2] = thrust * Rbe[2][2];
+	ned_accel[2] -= 9.81;
+
+	// Predict the velocity forward in time
+	vel[0] = vel[0] + ned_accel[0] * dT;
+	vel[1] = vel[1] + ned_accel[1] * dT;
+	vel[2] = vel[2] + ned_accel[2] * dT;
+
+	// Predict the position forward in time
+	pos[0] = pos[0] + vel[0] * dT;
+	pos[1] = pos[1] + vel[1] * dT;
+	pos[2] = pos[2] + vel[2] * dT;
+
+	// Transform the accels back in to body frame
+	AccelsData accelsData; // Skip get as we set all the fields
+	accelsData.x = ned_accel[0] * Rbe[0][0] + ned_accel[1] * Rbe[0][1] + ned_accel[2] * Rbe[0][2];
+	accelsData.y = ned_accel[0] * Rbe[1][0] + ned_accel[1] * Rbe[1][1] + ned_accel[2] * Rbe[1][2];
+	accelsData.z = ned_accel[0] * Rbe[2][0] + ned_accel[1] * Rbe[2][1] + ned_accel[2] * Rbe[2][2];
+	accelsData.temperature = 30;
+	AccelsSet(&accelsData);
+	
+	BaroAltitudeData baroAltitude;
+	BaroAltitudeGet(&baroAltitude);
+	baroAltitude.Altitude = pos[2];
+	BaroAltitudeSet(&baroAltitude);
+	
+	HomeLocationData homeLocation;
+	HomeLocationGet(&homeLocation);
+	T[0] = homeLocation.Altitude+6.378137E6f;
+	T[1] = cosf(homeLocation.Latitude / 10e6)*(homeLocation.Altitude+6.378137E6f);
+	T[2] = -1.0f;
+
+	GPSPositionData gpsPosition;
+	GPSPositionGet(&gpsPosition);
+	gpsPosition.Latitude = homeLocation.Latitude + pos[0] / T[0];
+	gpsPosition.Longitude = homeLocation.Longitude + pos[1] / T[1];
+	gpsPosition.Altitude = homeLocation.Altitude + pos[2] / T[2];
+	GPSPositionSet(&gpsPosition);
+	
+	// Because most crafts wont get enough information from gravity to zero yaw gyro, we try
+	// and make it average zero (weakly)
+	MagnetometerData mag;
+	mag.x = 400;
+	mag.y = 0;
+	mag.z = 800;
+	MagnetometerSet(&mag);
+}
+
+
+static float rand_gauss (void) {
+	float v1,v2,s;
+	
+	do {
+		v1 = 2.0 * ((float) rand()/RAND_MAX) - 1;
+		v2 = 2.0 * ((float) rand()/RAND_MAX) - 1;
+		
+		s = v1*v1 + v2*v2;
+	} while ( s >= 1.0 );
+	
+	if (s == 0.0)
+		return 0.0;
+	else
+		return (v1*sqrt(-2.0 * log(s) / s));
+}
 
 /**
   * @}

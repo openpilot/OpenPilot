@@ -34,6 +34,12 @@
 
 #include "pios.h"
 
+unsigned int wdg_registered_flags;
+unsigned int wdg_updated_flags;
+unsigned int wdg_cleared_time;
+unsigned int wdg_last_update_time;
+bool wdg_expired;
+
 /** 
  * @brief Initialize the watchdog timer for a specified timeout
  *
@@ -53,6 +59,8 @@
  */
 void PIOS_WDG_Init()
 {
+	wdg_registered_flags = 0;
+	wdg_updated_flags = 0;
 }
 
 /**
@@ -70,6 +78,7 @@ void PIOS_WDG_Init()
  */
 bool PIOS_WDG_RegisterFlag(uint16_t flag_requested) 
 {
+	wdg_registered_flags |= flag_requested;
 	return true;
 }
 
@@ -85,6 +94,13 @@ bool PIOS_WDG_RegisterFlag(uint16_t flag_requested)
  */
 bool PIOS_WDG_UpdateFlag(uint16_t flag) 
 {	
+	PIOS_WDG_Check();
+	wdg_updated_flags |= flag;
+	if( wdg_updated_flags == wdg_registered_flags) {
+		wdg_last_update_time = PIOS_DELAY_DiffuS(wdg_cleared_time);
+		wdg_updated_flags = 0;
+		wdg_cleared_time = PIOS_DELAY_GetRaw();
+	}
 	return true;		
 }
 
@@ -120,4 +136,17 @@ uint16_t PIOS_WDG_GetActiveFlags()
  */
 void PIOS_WDG_Clear(void)
 {
+}
+
+/**
+ * @brief This function returns true if the watchdog would 
+ * have expired
+ */
+bool PIOS_WDG_Check()
+{
+	if(PIOS_DELAY_DiffuS(wdg_cleared_time) > 250000) {
+		fprintf(stderr, "Watchdog fired!\r\n");
+		wdg_expired = true;
+	}
+	return wdg_expired;
 }

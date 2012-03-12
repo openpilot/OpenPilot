@@ -37,6 +37,7 @@ bool PIOS_WDG_UpdateFlag(uint16_t flag);
 uint16_t PIOS_WDG_GetBootupFlags();
 uint16_t PIOS_WDG_GetActiveFlags();
 void PIOS_WDG_Clear(void);
+bool PIOS_WDG_Check();
 
 #define PIOS_WDG_ACTUATOR        0x0001
 #define PIOS_WDG_STABILIZATION   0x0002

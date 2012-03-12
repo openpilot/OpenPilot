@@ -463,7 +463,7 @@ tskTCB * oldTask, * newTask;
 		/* service the signal */
 
 		assert( 0 == pthread_mutex_unlock( &xSwappingThreadMutex ) );
-		debug_printf( "The current task isn't even us, letting interrupt happen.  Watch for swap.\r\n" );
+//		debug_printf( "The current task isn't even us, letting interrupt happen.  Watch for swap.\r\n" );
 		/* Now we are resuming, want to be able to catch this interrupt again */
 		sigemptyset( &xSignals );
 		pthread_sigmask( SIG_SETMASK, &xSignals, NULL);

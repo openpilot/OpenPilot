@@ -1831,7 +1831,7 @@ static portTASK_FUNCTION( prvIdleTask, pvParameters )
 		}
 		#endif
 #ifndef __CYGWIN__
-		usleep(10);
+		//usleep(10);
 #endif
 	}
 } /*lint !e715 pvParameters is not accessed but all task functions require the same prototype. */

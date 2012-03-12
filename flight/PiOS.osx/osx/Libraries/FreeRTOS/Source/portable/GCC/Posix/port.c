@@ -463,7 +463,7 @@ tskTCB * oldTask, * newTask;
 		/* service the signal */
 
 		assert( 0 == pthread_mutex_unlock( &xSwappingThreadMutex ) );
-//		debug_printf( "The current task isn't even us, letting interrupt happen.  Watch for swap.\r\n" );
+		debug_printf( "The current task isn't even us, letting interrupt happen.  Watch for swap.\r\n" );
 		/* Now we are resuming, want to be able to catch this interrupt again */
 		sigemptyset( &xSignals );
 		pthread_sigmask( SIG_SETMASK, &xSignals, NULL);
@@ -483,7 +483,7 @@ tskTCB * oldTask, * newTask;
 		prvSetTaskCriticalNesting( xTaskToSuspend, uxCriticalNesting );
 		uxCriticalNesting = prvGetTaskCriticalNesting( xTaskToResume );
 
-		debug_error( "Swapping From %li(%s) to %li(%s)\r\n", (long int) xTaskToSuspend, oldTask->pcTaskName, (long int) xTaskToResume, newTask->pcTaskName);				
+		debug_printf( "Swapping From %li(%s) to %li(%s)\r\n", (long int) xTaskToSuspend, oldTask->pcTaskName, (long int) xTaskToResume, newTask->pcTaskName);				
 		
 #ifdef COND_SIGNALING		
 		/* Set resume condition for specific thread */
@@ -769,7 +769,7 @@ void pauseThread( portBASE_TYPE pauseMode )
 #ifdef RUNNING_THREAD_MUTEX
 			assert( 0 == pthread_mutex_lock( &xRunningThread ) );
 #endif
-			debug_error("Resuming\r\n");
+			debug_printf("Resuming\r\n");
 			return;
 		}
 		else {
@@ -802,7 +802,7 @@ sigset_t xBlockSignals;
 	/* This signal is set here instead of pauseThread because it is checked by the tick handler */
 	/* which means if there were a swap it should result in a suspend interrupt */
 	
-	debug_error( "Caught signal %i\r\n", sig );
+	debug_printf( "Caught signal %i\r\n", sig );
 	/* Check that we aren't suspending when we should be running.  This bug would need tracking down */
 	//assert( pthread_self() != prvGetThreadHandle(xTaskGetCurrentTaskHandle() ) ); 
 	if( pthread_self() == prvGetThreadHandle( xTaskGetCurrentTaskHandle() ) ) 

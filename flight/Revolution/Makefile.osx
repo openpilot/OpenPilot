@@ -275,8 +275,6 @@ ifeq ($(USE_BOOTLOADER), YES)
 CDEFS += -DUSE_BOOTLOADER
 endif
 
-
-
 # Compiler flag to set the C Standard level.
 # c89   - "ANSI" C
 # gnu89 - c89 plus GCC extensions
@@ -300,6 +298,9 @@ CSTANDARD = -std=gnu99
 ifeq ($(DEBUG),YES)
 CFLAGS = -g$(DEBUGF) -DDEBUG
 endif
+
+CFLAGS += -DDIAGNOSTICS
+CFLAGS += -DDIAG_TASKS
 
 CFLAGS += $(CFLAGS_UAVOBJECTS)
 CFLAGS += -DARCH_POSIX
@@ -436,8 +437,9 @@ endif
 # Generate intermediate code
 gencode: ${OUTDIR}/InitMods.c ${OUTDIR}/pmlib_img.c ${OUTDIR}/pmlib_nat.c ${OUTDIR}/pmlibusr_img.c ${OUTDIR}/pmlibusr_nat.c ${OUTDIR}/pmfeatures.h 
 
-# Remove any words after a slash (for module variants)
-MOD_GEN = ${foreach MOD, ${MODULES}, $(shell echo $(MOD) | sed 's/\([a-z,A-Z]*\).*/\1/')}
+getmodname = $(firstword $(subst /, ,$1))
+
+MOD_GEN := $(foreach MOD,$(MODULES),$(call getmodname,$(MOD)))
 
 # Generate code for module initialization
 ${OUTDIR}/InitMods.c: Makefile.osx

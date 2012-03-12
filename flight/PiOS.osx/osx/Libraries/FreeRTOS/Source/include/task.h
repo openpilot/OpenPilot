@@ -1044,6 +1044,19 @@ void vTaskList( signed char *pcWriteBuffer ) PRIVILEGED_FUNCTION;
  */
 void vTaskGetRunTimeStats( signed char *pcWriteBuffer ) PRIVILEGED_FUNCTION;
 
+	/**
+	 * task.h
+	 * <PRE>unsigned portBASE_TYPE uxTaskGetRunTime( xTaskHandle xTask );</PRE>
+	 *
+	 * Returns the run time of selected task
+	 *
+	 * @param xTask Handle of the task associated with the stack to be checked.
+	 * Set xTask to NULL to check the stack of the calling task.
+	 *
+	 * @return The run time of selected task
+	 */
+unsigned portBASE_TYPE uxTaskGetRunTime( xTaskHandle xTask );
+
 /**
  * task. h
  * <PRE>void vTaskStartTrace( char * pcBuffer, unsigned portBASE_TYPE uxBufferSize );</PRE>

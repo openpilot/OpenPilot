@@ -88,9 +88,14 @@ to exclude the API function. */
 #define INCLUDE_xTaskGetCurrentTaskHandle	1
 #define INCLUDE_uxTaskGetStackHighWaterMark	0
 
+/* Enable run time stats collection */
+#define configGENERATE_RUN_TIME_STATS 			1
+#define INCLUDE_uxTaskGetRunTime 				1
 
+#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS()
+#define portGET_RUN_TIME_COUNTER_VALUE() clock()
 
-
+#error Here
 /* This is the raw value as per the Cortex-M3 NVIC.  Values can be 255
 (lowest) to 1 (highest maskable) to 0 (highest non-maskable). */
 #define configKERNEL_INTERRUPT_PRIORITY 	15 << 4 /* equivalent to NVIC priority 15 */

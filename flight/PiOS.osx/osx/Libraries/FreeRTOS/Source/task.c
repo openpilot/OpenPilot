@@ -1312,6 +1312,24 @@ unsigned portBASE_TYPE uxTaskGetNumberOfTasks( void )
 		xTaskResumeAll();
 	}
 
+/*-----------------------------------------------------------*/
+
+#if ( INCLUDE_uxTaskGetRunTime == 1 )
+
+unsigned portBASE_TYPE uxTaskGetRunTime( xTaskHandle xTask )
+{
+	unsigned long runTime;
+	
+	tskTCB *pxTCB;
+	pxTCB = prvGetTCBFromHandle( xTask );
+	runTime = pxTCB->ulRunTimeCounter;
+	pxTCB->ulRunTimeCounter = 0;
+	return runTime;
+}
+
+#endif
+/*-----------------------------------------------------------*/
+
 #endif
 /*----------------------------------------------------------*/
 
@@ -1568,7 +1586,7 @@ void vTaskSwitchContext( void )
 	#if ( configGENERATE_RUN_TIME_STATS == 1 )
 	{
 		unsigned long ulTempCounter = portGET_RUN_TIME_COUNTER_VALUE();
-
+		
 			/* Add the amount of time the task has been running to the accumulated
 			time so far.  The time the task started running was stored in
 			ulTaskSwitchedInTime.  Note that there is no overflow protection here
@@ -2112,6 +2130,7 @@ tskTCB *pxNewTCB;
 	}
 
 #endif
+
 /*-----------------------------------------------------------*/
 
 #if ( ( configUSE_TRACE_FACILITY == 1 ) || ( INCLUDE_uxTaskGetStackHighWaterMark == 1 ) )

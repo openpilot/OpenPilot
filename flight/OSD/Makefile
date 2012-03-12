@@ -1,8 +1,8 @@
  #####
- # Project: OpenPilot AHRS
+ # Project: OpenPilot OSD
  #
  #
- # Makefile for OpenPilot AHRS project
+ # Makefile for OpenPilot OSD project
  #
  # The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2009.
  #
@@ -61,7 +61,6 @@ OPSYSTEM = ./System
 OPSYSTEMINC = $(OPSYSTEM)/inc
 OPUAVTALK = ../UAVTalk
 OPUAVTALKINC = $(OPUAVTALK)/inc
-OPTESTS  = ./Tests
 OPMODULEDIR = ../Modules
 PIOS = ../PiOS
 PIOSINC = $(PIOS)/inc
@@ -74,7 +73,7 @@ PIOSCOMMONLIB = $(PIOSCOMMON)/Libraries
 PIOS_DEVLIB = $(PIOS)/STM32F4xx
 APPLIBDIR = $(PIOSSTM32F4XX)/Libraries
 STMLIBDIR = $(APPLIBDIR)
-STMSPDDIR = $(STMLIBDIR)/STM32F10x_StdPeriph_Driver
+STMSPDDIR = $(STMLIBDIR)/STM32F4xx_StdPeriph_Driver
 STMUSBDIR = $(STMLIBDIR)/STM32_USB-FS-Device_Driver
 STMSPDSRCDIR = $(STMSPDDIR)/src
 STMSPDINCDIR = $(STMSPDDIR)/inc
@@ -82,11 +81,11 @@ CMSISDIR  = $(STMLIBDIR)/CMSIS/Core/CM3
 RTOSDIR = $(PIOSCOMMONLIB)/FreeRTOS
 RTOSSRCDIR = $(RTOSDIR)/Source
 RTOSINCDIR = $(RTOSSRCDIR)/include
-OPDIR = ../OpenPilot
+OPDIR = ../OSD
 OPUAVOBJ = ../UAVObjects
 OPUAVOBJINC = $(OPUAVOBJ)/inc
 OPSYSINC = $(OPDIR)/System/inc
-BOOT = ../Bootloaders/AHRS
+BOOT = ../Bootloaders/OSD
 BOOTINC = $(BOOT)/inc
 HWDEFSINC = ../board_hw_defs/$(BOARD_NAME)
 
@@ -95,7 +94,6 @@ OPUAVSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files
 
-## AHRS:
 ## MODULES
 SRC += ${foreach MOD, ${MODULES}, ${wildcard ${OPMODULEDIR}/${MOD}/*.c}}
 ## OPENPILOT CORE:
@@ -103,19 +101,13 @@ SRC += ${OPMODULEDIR}/System/systemmod.c
 SRC += $(OPSYSTEM)/osd.c
 SRC += $(OPSYSTEM)/pios_board.c
 SRC += $(OPSYSTEM)/pios_usb_board_data.c
-#SRC += linedriver.c
-#SRC += textdriver.c
-#SRC += graphicdriver.c
-#SRC += watchdog.c
 SRC += $(OPSYSTEM)/fonts.c
 SRC += $(OPSYSTEM)/font_outlined8x14.c
 SRC += $(OPSYSTEM)/font_outlined8x8.c
 SRC += $(OPSYSTEM)/alarms.c
-#SRC += $(OPSYSTEM)/taskmonitor.c
 SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
 SRC += $(OPUAVOBJ)/eventdispatcher.c
-#SRC += $(OPSYSTEM)/pios_usb_hid_desc.c
 
 #ifeq ($(DEBUG),YES)
 SRC += $(OPSYSTEM)/dcc_stdio.c
@@ -165,26 +157,11 @@ SRC += $(OPUAVSYNTHDIR)/gpssatellites.c
 SRC += $(OPUAVSYNTHDIR)/gpstime.c
 SRC += $(OPUAVSYNTHDIR)/osdsettings.c
 
-## PIOS Hardware (STM32F10x)
-#SRC += $(PIOSSTM32F4XX)/pios_adc.c
-#SRC += $(PIOSSTM32F4XX)/pios_sys.c
-#SRC += $(PIOSSTM32F4XX)/pios_led.c
-#SRC += $(PIOSSTM32F4XX)/pios_delay.c
-#SRC += $(PIOSSTM32F4XX)/pios_usart.c
-#SRC += $(PIOSSTM32F4XX)/pios_irq.c
-#SRC += $(PIOSSTM32F4XX)/pios_i2c.c
-#SRC += $(PIOSSTM32F4XX)/pios_gpio.c
-#SRC += $(PIOSSTM32F4XX)/pios_spi.c
-#SRC += $(PIOSSTM32F4XX)/pios_exti.c
-#SRC += $(PIOSSTM32F4XX)/pios_rtc.c
-#SRC += $(PIOSSTM32F4XX)/pios_wdg.c
-
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_com.c
 #SRC += $(PIOSCOMMON)/pios_hmc5843.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c
 SRC += $(PIOSCOMMON)/pios_crc.c
-#SRC += $(PIOSCOMMON)/pios_iap.c
 SRC += $(PIOSCOMMON)/pios_video.c
 SRC += $(PIOSCOMMON)/pios_usb_desc_hid_cdc.c
 SRC += $(PIOSCOMMON)/pios_usb_desc_hid_only.c
@@ -227,7 +204,6 @@ ASRCARM =
 # List any extra directories to look for include files here.
 #    Each directory must be seperated by a space.
 EXTRAINCDIRS  +=  $(OPSYSTEM)
-EXTRAINCDIRS  += $(AHRSINC)
 EXTRAINCDIRS  += $(OPSYSTEMINC)
 EXTRAINCDIRS  += $(OPUAVTALK)
 EXTRAINCDIRS  += $(OPUAVTALKINC)
@@ -245,7 +221,6 @@ EXTRAINCDIRS  += $(CMSISDIR)
 EXTRAINCDIRS  += $(RTOSINCDIR)
 EXTRAINCDIRS  += $(APPLIBDIR)
 EXTRAINCDIRS  += $(RTOSSRCDIR)/portable/GCC/ARM_CM3
-EXTRAINCDIRS  += $(AHRSINC)
 EXTRAINCDIRS  += $(OPUAVSYNTHDIR)
 EXTRAINCDIRS  += $(BOOTINC)
 EXTRAINCDIRS  += $(HWDEFSINC)
@@ -288,7 +263,8 @@ endif
 CFLAGS += $(ARCHFLAGS)
 
 
-#CFLAGS += -DDIAGNOSTICS
+CFLAGS += -DDIAGNOSTICS
+CFLAGS += -DDIAG_TASKS
 
 # This is not the best place for these.  Really should abstract out
 # to the board file or something
@@ -308,7 +284,7 @@ DEBUGF = dwarf-2
 
 # Place project-specific -D (define) and/or
 # -U options for C here.
-CDEFS += -DSTM32F10X_$(MODEL)
+CDEFS += -DHSE_VALUE=$(OSCILLATOR_FREQ)
 CDEFS += -DSYSCLK_FREQ=$(SYSCLK_FREQ)
 CDEFS += -DUSE_STDPERIPH_DRIVER
 CDEFS += -DUSE_$(BOARD)

@@ -24,8 +24,9 @@
  */
 
 #include <pios.h>
-#include <pios_udp_priv.h>
 #include <pios_com_priv.h>
+#include <pios_tcp_priv.h>
+#include <pios_udp_priv.h>
 #include <openpilot.h>
 #include <uavobjectsinit.h>
 
@@ -49,15 +50,15 @@ void Stack_Change_Weak() {
 }
 
 
-const struct pios_udp_cfg pios_udp_telem_cfg = {
+const struct pios_tcp_cfg pios_tcp_telem_cfg = {
   .ip = "0.0.0.0",
   .port = 9000,
 };
-const struct pios_udp_cfg pios_udp_gps_cfg = {
+const struct pios_tcp_cfg pios_tcp_gps_cfg = {
   .ip = "0.0.0.0",
   .port = 9001,
 };
-const struct pios_udp_cfg pios_udp_debug_cfg = {
+const struct pios_tcp_cfg pios_tcp_debug_cfg = {
   .ip = "0.0.0.0",
   .port = 9002,
 };
@@ -66,7 +67,7 @@ const struct pios_udp_cfg pios_udp_debug_cfg = {
 /*
  * AUX USART
  */
-const struct pios_udp_cfg pios_udp_aux_cfg = {
+const struct pios_tcp_cfg pios_tcp_aux_cfg = {
   .ip = "0.0.0.0",
   .port = 9003,
 };
@@ -112,6 +113,7 @@ uint8_t pios_udp_num_devices = NELEMENTS(pios_udp_devs);
  */
 extern const struct pios_com_driver pios_serial_com_driver;
 extern const struct pios_com_driver pios_udp_com_driver;
+extern const struct pios_com_driver pios_tcp_com_driver;
 
 uint32_t pios_com_telem_rf_id;
 uint32_t pios_com_telem_usb_id;
@@ -151,8 +153,8 @@ void PIOS_Board_Init(void) {
 #if defined(PIOS_INCLUDE_COM)
 #if defined(PIOS_INCLUDE_TELEMETRY_RF)
 	{
-		uint32_t pios_udp_telem_rf_id;
-		if (PIOS_UDP_Init(&pios_udp_telem_rf_id, &pios_udp_telem_cfg)) {
+		uint32_t pios_tcp_telem_rf_id;
+		if (PIOS_TCP_Init(&pios_tcp_telem_rf_id, &pios_tcp_telem_cfg)) {
 			PIOS_Assert(0);
 		}
 
@@ -160,7 +162,7 @@ void PIOS_Board_Init(void) {
 		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_TX_BUF_LEN);
 		PIOS_Assert(rx_buffer);
 		PIOS_Assert(tx_buffer);
-		if (PIOS_COM_Init(&pios_com_telem_rf_id, &pios_udp_com_driver, pios_udp_telem_rf_id,
+		if (PIOS_COM_Init(&pios_com_telem_rf_id, &pios_tcp_com_driver, pios_tcp_telem_rf_id,
 						  rx_buffer, PIOS_COM_TELEM_RF_RX_BUF_LEN,
 						  tx_buffer, PIOS_COM_TELEM_RF_TX_BUF_LEN)) {
 			PIOS_Assert(0);
@@ -170,13 +172,13 @@ void PIOS_Board_Init(void) {
 
 #if defined(PIOS_INCLUDE_GPS)
 	{
-		uint32_t pios_udp_gps_id;
-		if (PIOS_UDP_Init(&pios_udp_gps_id, &pios_udp_gps_cfg)) {
+		uint32_t pios_tcp_gps_id;
+		if (PIOS_TCP_Init(&pios_tcp_gps_id, &pios_tcp_gps_cfg)) {
 			PIOS_Assert(0);
 		}
 		uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_GPS_RX_BUF_LEN);
 		PIOS_Assert(rx_buffer);
-		if (PIOS_COM_Init(&pios_com_gps_id, &pios_udp_com_driver, pios_udp_gps_id,
+		if (PIOS_COM_Init(&pios_com_gps_id, &pios_tcp_com_driver, pios_tcp_gps_id,
 				  rx_buffer, PIOS_COM_GPS_RX_BUF_LEN,
 				  NULL, 0)) {
 			PIOS_Assert(0);

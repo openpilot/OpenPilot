@@ -46,6 +46,7 @@
 #define PIOS_COM_BUFFER_SIZE 1024
 #define PIOS_COM_MAX_DEVS 255
 #define PIOS_UDP_RX_BUFFER_SIZE		PIOS_COM_BUFFER_SIZE
+#define PIOS_TCP_RX_BUFFER_SIZE		PIOS_COM_BUFFER_SIZE
 
 extern uint32_t pios_com_telem_rf_id;
 extern uint32_t pios_com_telem_usb_id;

@@ -165,6 +165,7 @@ SRC += $(PIOSPOSIX)/pios_irq.c
 SRC += $(PIOSPOSIX)/pios_delay.c
 SRC += $(PIOSPOSIX)/pios_sdcard.c
 SRC += $(PIOSPOSIX)/pios_udp.c
+SRC += $(PIOSPOSIX)/pios_tcp.c
 SRC += $(PIOSPOSIX)/pios_com.c
 SRC += $(PIOSPOSIX)/pios_servo.c
 SRC += $(PIOSPOSIX)/pios_wdg.c

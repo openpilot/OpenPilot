@@ -62,6 +62,7 @@
 #include <pios_led.h>
 #include <pios_sdcard.h>
 #include <pios_udp.h>
+#include <pios_tcp.h>
 #include <pios_com.h>
 #include <pios_servo.h>
 #include <pios_wdg.h>

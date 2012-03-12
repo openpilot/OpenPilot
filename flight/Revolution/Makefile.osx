@@ -54,11 +54,11 @@ USE_THUMB_MODE = YES
 
 # List of modules to include
 MODULES =  Telemetry Actuator ManualControl Stabilization 
-MODULES += Attitude/Revolution
+MODULES += Attitude/revolution
 #MODULES += SimulatedAttitude
 
 # To run simulation instead of connect to SITL
-MODULES += Sensors/Simulated
+MODULES += Sensors/simulated
 
 # MCU name, submodel and board
 # - MCU used for compiler-option (-mtune)

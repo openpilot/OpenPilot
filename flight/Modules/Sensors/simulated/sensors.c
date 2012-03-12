@@ -59,6 +59,7 @@
 #include "gpsposition.h"
 #include "homelocation.h"
 #include "magnetometer.h"
+#include "ratedesired.h"
 #include "revocalibration.h"
 
 #include "CoordinateConversions.h"
@@ -77,6 +78,10 @@ static xTaskHandle sensorsTaskHandle;
 
 // Private functions
 static void SensorsTask(void *parameters);
+static void simulateConstant();
+static void simulateModelAgnostic();
+
+enum sensor_sim_type {CONSTANT, MODEL_AGNOSTIC} sensor_sim_type;
 
 /**
  * Initialise the module.  Called before the start function
@@ -130,58 +135,130 @@ static void SensorsTask(void *parameters)
 	homeLocation.Set = HOMELOCATION_SET_TRUE;
 	HomeLocationSet(&homeLocation);
 
+	sensor_sim_type = MODEL_AGNOSTIC;
+
 	// Main task loop
 	lastSysTime = xTaskGetTickCount();
 	while (1) {
-
-
-		AccelsData accelsData; // Skip get as we set all the fields
-		accelsData.x = 0;
-		accelsData.y = -1;
-		accelsData.z = -8;
-		accelsData.temperature = 0;
-		AccelsSet(&accelsData);
-
-
-		GyrosData gyrosData; // Skip get as we set all the fields
-		gyrosData.x = 2;
-		gyrosData.y = 0;
-		gyrosData.z = 1;
-
-		// Apply bias correction to the gyros
-		GyrosBiasData gyrosBias;
-		GyrosBiasGet(&gyrosBias);
-		gyrosData.x += gyrosBias.x;
-		gyrosData.y += gyrosBias.y;
-		gyrosData.z += gyrosBias.z;
-
-		GyrosSet(&gyrosData);
-		
-		BaroAltitudeData baroAltitude;
-		BaroAltitudeGet(&baroAltitude);
-		baroAltitude.Altitude = 1;
-		BaroAltitudeSet(&baroAltitude);
-
-		GPSPositionData gpsPosition;
-		GPSPositionGet(&gpsPosition);
-		gpsPosition.Latitude = 0;
-		gpsPosition.Longitude = 0;
-		gpsPosition.Altitude = 0;		
-		GPSPositionSet(&gpsPosition);
-		
-		// Because most crafts wont get enough information from gravity to zero yaw gyro, we try
-		// and make it average zero (weakly)
-		MagnetometerData mag;
-		mag.x = 400;
-		mag.y = 0;
-		mag.z = 800;
-		MagnetometerSet(&mag);
-		
 		PIOS_WDG_UpdateFlag(PIOS_WDG_SENSORS);
 
-		vTaskDelay(20 / portTICK_RATE_MS);
+		switch(sensor_sim_type) {
+			case CONSTANT:
+				simulateConstant();
+				break;
+			case MODEL_AGNOSTIC:
+				simulateModelAgnostic();
+				break;
+		}
+
+		vTaskDelay(2 / portTICK_RATE_MS);
+
 	}
 }
+
+static void simulateConstant()
+{
+	AccelsData accelsData; // Skip get as we set all the fields
+	accelsData.x = 0;
+	accelsData.y = 0;
+	accelsData.z = -9.81;
+	accelsData.temperature = 0;
+	AccelsSet(&accelsData);
+
+	GyrosData gyrosData; // Skip get as we set all the fields
+	gyrosData.x = 0;
+	gyrosData.y = 0;
+	gyrosData.z = 0;
+
+	// Apply bias correction to the gyros
+	GyrosBiasData gyrosBias;
+	GyrosBiasGet(&gyrosBias);
+	gyrosData.x += gyrosBias.x;
+	gyrosData.y += gyrosBias.y;
+	gyrosData.z += gyrosBias.z;
+
+	GyrosSet(&gyrosData);
+
+	BaroAltitudeData baroAltitude;
+	BaroAltitudeGet(&baroAltitude);
+	baroAltitude.Altitude = 1;
+	BaroAltitudeSet(&baroAltitude);
+
+	GPSPositionData gpsPosition;
+	GPSPositionGet(&gpsPosition);
+	gpsPosition.Latitude = 0;
+	gpsPosition.Longitude = 0;
+	gpsPosition.Altitude = 0;
+	GPSPositionSet(&gpsPosition);
+
+	// Because most crafts wont get enough information from gravity to zero yaw gyro, we try
+	// and make it average zero (weakly)
+	MagnetometerData mag;
+	mag.x = 400;
+	mag.y = 0;
+	mag.z = 800;
+	MagnetometerSet(&mag);
+}
+
+static void simulateModelAgnostic()
+{
+	float Rbe[3][3];
+	float q[4];
+
+	// Simulate accels based on current attitude
+	AttitudeActualData attitudeActual;
+	AttitudeActualGet(&attitudeActual);
+	q[0] = attitudeActual.q1;
+	q[1] = attitudeActual.q2;
+	q[2] = attitudeActual.q3;
+	q[3] = attitudeActual.q4;
+	Quaternion2R(q,Rbe);
+
+	AccelsData accelsData; // Skip get as we set all the fields
+	accelsData.x = -9.81 * Rbe[0][2];
+	accelsData.y = -9.81 * Rbe[1][2];
+	accelsData.z = -9.81 * Rbe[2][2];
+	accelsData.temperature = 30;
+	AccelsSet(&accelsData);
+
+	RateDesiredData rateDesired;
+	RateDesiredGet(&rateDesired);
+
+	GyrosData gyrosData; // Skip get as we set all the fields
+	gyrosData.x = rateDesired.Roll;
+	gyrosData.y = rateDesired.Pitch;
+	gyrosData.z = rateDesired.Yaw;
+
+	// Apply bias correction to the gyros
+	GyrosBiasData gyrosBias;
+	GyrosBiasGet(&gyrosBias);
+	gyrosData.x += gyrosBias.x;
+	gyrosData.y += gyrosBias.y;
+	gyrosData.z += gyrosBias.z;
+
+	GyrosSet(&gyrosData);
+
+	BaroAltitudeData baroAltitude;
+	BaroAltitudeGet(&baroAltitude);
+	baroAltitude.Altitude = 1;
+	BaroAltitudeSet(&baroAltitude);
+
+	GPSPositionData gpsPosition;
+	GPSPositionGet(&gpsPosition);
+	gpsPosition.Latitude = 0;
+	gpsPosition.Longitude = 0;
+	gpsPosition.Altitude = 0;
+	GPSPositionSet(&gpsPosition);
+
+	// Because most crafts wont get enough information from gravity to zero yaw gyro, we try
+	// and make it average zero (weakly)
+	MagnetometerData mag;
+	mag.x = 400;
+	mag.y = 0;
+	mag.z = 800;
+	MagnetometerSet(&mag);
+}
+
 
 /**
   * @}

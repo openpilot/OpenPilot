@@ -109,7 +109,7 @@ static pthread_mutex_t xRunningThread = PTHREAD_MUTEX_INITIALIZER;
 #endif
 static pthread_mutex_t xSuspendResumeThreadMutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t xSwappingThreadMutex = PTHREAD_MUTEX_INITIALIZER;
-static pthread_mutex_t xIrqMutex = PTHREAD_MUTEX_INITIALIZER;
+//static pthread_mutex_t xIrqMutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_t hMainThread = ( pthread_t )NULL;
 /*-----------------------------------------------------------*/
 
@@ -514,18 +514,18 @@ tskTCB * oldTask, * newTask;
 void vPortDisableInterrupts( void )
 {
 	//debug_printf("\r\n");
-	assert( pthread_mutex_lock( &xIrqMutex ) == 0);
+	//assert( pthread_mutex_lock( &xIrqMutex ) == 0);
 	xInterruptsEnabled = pdFALSE;
-	assert( pthread_mutex_unlock( &xIrqMutex) == 0);
+	//assert( pthread_mutex_unlock( &xIrqMutex) == 0);
 }
 /*-----------------------------------------------------------*/
 
 void vPortEnableInterrupts( void )
 {
 	//debug_printf("\r\n");
-	assert( pthread_mutex_lock( &xIrqMutex ) == 0);
+	//assert( pthread_mutex_lock( &xIrqMutex ) == 0);
 	xInterruptsEnabled = pdTRUE;
-	assert( pthread_mutex_unlock( &xIrqMutex) == 0);
+	//assert( pthread_mutex_unlock( &xIrqMutex) == 0);
 }
 /*-----------------------------------------------------------*/
 

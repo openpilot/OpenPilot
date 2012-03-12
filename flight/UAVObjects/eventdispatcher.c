@@ -350,7 +350,8 @@ static int32_t processPeriodicUpdates()
     			{
     				if ( xQueueSend(objEntry->evInfo.queue, &objEntry->evInfo.ev, 0) != pdTRUE ) // do not block if queue is full
     				{
-						stats.lastErrorID = UAVObjGetID(objEntry->evInfo.ev.obj);
+						if (objEntry->evInfo.ev.obj != NULL)
+							stats.lastErrorID = UAVObjGetID(objEntry->evInfo.ev.obj);
     					++stats.eventErrors;
     				}
     			}

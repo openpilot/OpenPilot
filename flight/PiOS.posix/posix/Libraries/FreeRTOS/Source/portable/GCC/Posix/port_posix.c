@@ -635,6 +635,7 @@ void vPortEnableInterrupts( void )
 
 portBASE_TYPE xPortSetInterruptMask( void )
 {
+	fprintf(stderr, "This is called!\r\n");
 portBASE_TYPE xReturn = xInterruptsEnabled;
 	debug_printf("\r\n");
 	xInterruptsEnabled = pdFALSE;

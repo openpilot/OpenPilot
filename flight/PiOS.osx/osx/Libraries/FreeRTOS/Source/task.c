@@ -59,6 +59,7 @@
 #include <signal.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <assert.h>
 
 /* Defining MPU_WRAPPERS_INCLUDED_FROM_API_FILE prevents task.h from redefining
 all the API functions to use the MPU wrappers.  That should only be done when
@@ -160,7 +161,7 @@ PRIVILEGED_DATA static volatile portTickType xTickCount 						= ( portTickType )
 PRIVILEGED_DATA static unsigned portBASE_TYPE uxTopUsedPriority	 				= tskIDLE_PRIORITY;
 PRIVILEGED_DATA static volatile unsigned portBASE_TYPE uxTopReadyPriority 		= tskIDLE_PRIORITY;
 PRIVILEGED_DATA static volatile signed portBASE_TYPE xSchedulerRunning 			= pdFALSE;
-PRIVILEGED_DATA static volatile unsigned portBASE_TYPE uxSchedulerSuspended	 	= ( unsigned portBASE_TYPE ) pdFALSE;
+PRIVILEGED_DATA volatile unsigned portBASE_TYPE uxSchedulerSuspended	 	= ( unsigned portBASE_TYPE ) pdFALSE;
 PRIVILEGED_DATA static volatile unsigned portBASE_TYPE uxMissedTicks 			= ( unsigned portBASE_TYPE ) 0;
 PRIVILEGED_DATA static volatile portBASE_TYPE xMissedYield 						= ( portBASE_TYPE ) pdFALSE;
 PRIVILEGED_DATA static volatile portBASE_TYPE xNumOfOverflows 					= ( portBASE_TYPE ) 0;
@@ -377,7 +378,6 @@ static tskTCB *prvAllocateTCBAndStack( unsigned short usStackDepth, portSTACK_TY
 	static unsigned short usTaskCheckFreeStackSpace( const unsigned char * pucStackByte ) PRIVILEGED_FUNCTION;
 
 #endif
-
 
 /*lint +e956 */
 
@@ -1078,7 +1078,9 @@ void vTaskSuspendAll( void )
 {
 	/* A critical section is not required as the variable is of type
 	portBASE_TYPE. */
+	portENTER_CRITICAL();
 	++uxSchedulerSuspended;
+	portEXIT_CRITICAL();
 }
 /*----------------------------------------------------------*/
 
@@ -1571,12 +1573,20 @@ void vTaskIncrementTick( void )
 #endif
 /*-----------------------------------------------------------*/
 
+int missed_threshold = 100;
 void vTaskSwitchContext( void )
 {
 	if( uxSchedulerSuspended != ( unsigned portBASE_TYPE ) pdFALSE )
 	{
+		static int missed_count = 0;
+		missed_count++;
+		if (missed_count > missed_threshold) {
+			fprintf(stderr, "Missed switch\n");
+
+		}
 		/* The scheduler is currently suspended - do not allow a context
 		switch. */
+		//fprintf(stderr, "Missed switch\n");
 		xMissedYield = pdTRUE;
 		return;
 	}
@@ -1614,6 +1624,7 @@ void vTaskSwitchContext( void )
 	vWriteTraceToBuffer();
 }
 /*-----------------------------------------------------------*/
+extern volatile portBASE_TYPE xInterruptsEnabled;
 
 void vTaskPlaceOnEventList( const xList * const pxEventList, portTickType xTicksToWait )
 {
@@ -1622,6 +1633,10 @@ portTickType xTimeToWake;
 	/* THIS FUNCTION MUST BE CALLED WITH INTERRUPTS DISABLED OR THE
 	SCHEDULER SUSPENDED. */
 
+	if(!(uxSchedulerSuspended == pdTRUE || xInterruptsEnabled == pdFALSE)) {
+//		assert(0);
+		fprintf(stderr,"vTaskPlaceOnEventList while scheduler enabled: %d and interrupts enabled %ld\r\n", uxSchedulerSuspended == pdFALSE, xInterruptsEnabled);
+	}
 	/* Place the event list item of the TCB in the appropriate event list.
 	This is placed in the list in priority order so the highest priority task
 	is the first to be woken by the event. */
@@ -1802,9 +1817,10 @@ static portTASK_FUNCTION( prvIdleTask, pvParameters )
 {
 	/* Stop warnings. */
 	( void ) pvParameters;
-
+	int i =0;
 	for( ;; )
 	{
+		i++;
 		/* See if any tasks have been deleted. */
 		prvCheckTasksWaitingTermination();
 
@@ -2081,6 +2097,95 @@ tskTCB *pxNewTCB;
 
 #endif
 /*-----------------------------------------------------------*/
+
+static void printNamesInList( const signed char *pcWriteBuffer, xList *pxList)
+{
+	volatile tskTCB *pxNextTCB, *pxFirstTCB;
+	char pcStatsString[100];
+	/* Write the run time stats of all the TCB's in pxList into the buffer. */
+	listGET_OWNER_OF_NEXT_ENTRY( pxFirstTCB, pxList );
+	do
+	{
+		/* Get next TCB in from the list. */
+		listGET_OWNER_OF_NEXT_ENTRY( pxNextTCB, pxList );
+		if(pxNextTCB) {
+			sprintf( pcStatsString, ( char * ) "%s, ", pxNextTCB->pcTaskName);
+		
+			strcat( ( char * ) pcWriteBuffer, ( char * ) pcStatsString );
+		}
+		
+	} while( pxNextTCB != pxFirstTCB );
+}
+
+void printTasks()
+{
+	signed char pcWriteBuffer[500];
+	int uxQueue;
+	vTaskSuspendAll();
+	{
+		/* Run through all the lists that could potentially contain a TCB,
+		 generating a table of run timer percentages in the provided
+		 buffer. */
+		
+		pcWriteBuffer[ 0 ] = ( signed char ) 0x00;
+		
+		uxQueue = uxTopUsedPriority + 1;
+		
+		do
+		{
+			uxQueue--;
+			
+			if( !listLIST_IS_EMPTY( &( pxReadyTasksLists[ uxQueue ] ) ) )
+			{
+				char readyMessage[30];
+				sprintf(readyMessage, "\r\nReady priority %d: ", uxQueue);
+				strcat( ( char * ) pcWriteBuffer,readyMessage);
+				printNamesInList( pcWriteBuffer, ( xList * ) &( pxReadyTasksLists[ uxQueue ] ));
+			}
+		}while( uxQueue > ( unsigned short ) tskIDLE_PRIORITY );
+		
+		if( !listLIST_IS_EMPTY( pxDelayedTaskList ) )
+		{
+			strcat( ( char * ) pcWriteBuffer, "\r\nDelay: ");
+			printNamesInList( pcWriteBuffer, ( xList * ) &( pxDelayedTaskList));
+		}
+		
+		if( !listLIST_IS_EMPTY( pxOverflowDelayedTaskList ) )
+		{
+			strcat( ( char * ) pcWriteBuffer, "\r\nDelay Overflow: ");
+			printNamesInList( pcWriteBuffer, ( xList * ) pxOverflowDelayedTaskList);
+		}
+
+		if( !listLIST_IS_EMPTY( &xPendingReadyList ) )
+		{
+			strcat( ( char * ) pcWriteBuffer, "\r\nPending ready: ");
+			printNamesInList( pcWriteBuffer, ( xList * ) &xPendingReadyList);
+		}
+		
+#if ( INCLUDE_vTaskDelete == 1 )
+		{
+			if( !listLIST_IS_EMPTY( &xTasksWaitingTermination ) )
+			{
+				strcat( ( char * ) pcWriteBuffer, "\r\nWaiting termination: ");
+				printNamesInList( pcWriteBuffer, ( xList * ) &xTasksWaitingTermination);
+			}
+		}
+#endif
+		
+#if ( INCLUDE_vTaskSuspend == 1 )
+		{
+			if( !listLIST_IS_EMPTY( &xSuspendedTaskList ) )
+			{
+				strcat( ( char * ) pcWriteBuffer, "\r\nSuspended: ");
+				printNamesInList( pcWriteBuffer, ( xList * ) &xSuspendedTaskList);
+			}
+		}
+#endif
+	}
+	strcat( (char *) pcWriteBuffer, "\r\n\r\n");
+	fprintf(stderr, "%s", ( char * ) pcWriteBuffer);
+	xTaskResumeAll();
+}
 
 #if ( configGENERATE_RUN_TIME_STATS == 1 )
 

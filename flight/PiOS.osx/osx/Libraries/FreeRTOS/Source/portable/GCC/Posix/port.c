@@ -89,6 +89,8 @@ typedef struct XPARAMS
 	void *pvParams;
 } xParams;
 
+enum thread_status {RUNNING, INTERRUPTED, STOPPED};
+
 /* Each task maintains its own interrupt status in the critical nesting variable. */
 typedef struct THREAD_SUSPENSIONS
 {
@@ -97,11 +99,12 @@ typedef struct THREAD_SUSPENSIONS
 	pthread_mutex_t * hMutex;
 	xTaskHandle hTask;
 	portBASE_TYPE xThreadState;
+	enum thread_status status;
 	unsigned portBASE_TYPE uxCriticalNesting;
 } xThreadState;
 /*-----------------------------------------------------------*/
 
-static xThreadState *pxThreads;
+static xThreadState pxThreads[MAX_NUMBER_OF_TASKS];
 static pthread_once_t hSigSetupThread = PTHREAD_ONCE_INIT;
 static pthread_attr_t xThreadAttributes;
 #ifdef RUNNING_THREAD_MUTEX
@@ -109,7 +112,7 @@ static pthread_mutex_t xRunningThread = PTHREAD_MUTEX_INITIALIZER;
 #endif
 static pthread_mutex_t xSuspendResumeThreadMutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t xSwappingThreadMutex = PTHREAD_MUTEX_INITIALIZER;
-//static pthread_mutex_t xIrqMutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t xIrqMutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_t hMainThread = ( pthread_t )NULL;
 /*-----------------------------------------------------------*/
 
@@ -119,7 +122,7 @@ static volatile portBASE_TYPE xSuspended = pdFALSE;
 static volatile portBASE_TYPE xStarted = pdFALSE;
 static volatile portBASE_TYPE xHandover = 0;
 static volatile portBASE_TYPE xSchedulerEnd = pdFALSE;
-static volatile portBASE_TYPE xInterruptsEnabled = pdTRUE;
+volatile portBASE_TYPE xInterruptsEnabled = pdTRUE;
 static volatile portBASE_TYPE xServicingTick = pdFALSE;
 static volatile portBASE_TYPE xPendYield = pdFALSE;
 static volatile portLONG lIndexOfLastAddedTask = 0;
@@ -139,6 +142,7 @@ static pthread_cond_t * prvGetConditionHandle( xTaskHandle hTask );
 static pthread_mutex_t * prvGetMutexHandle( xTaskHandle hTask );
 #endif
 static xTaskHandle prvGetTaskHandle( pthread_t hThread );
+static void prvSetThreadStatus( pthread_t hThread, enum thread_status status );
 static portLONG prvGetFreeThreadState( void );
 static void prvSetTaskCriticalNesting( pthread_t xThreadId, unsigned portBASE_TYPE uxNesting );
 static unsigned portBASE_TYPE prvGetTaskCriticalNesting( pthread_t xThreadId );
@@ -339,6 +343,9 @@ portBASE_TYPE xResult;
 sigset_t xSignalToBlock;
 portLONG lIndex;
 
+	fid = fopen("log.txt", "w");
+	
+
 	debug_printf( "xPortStartScheduler\r\n" );
 
 	/* Establish the signals to block before they are needed. */
@@ -353,15 +360,17 @@ portLONG lIndex;
 		pxThreads[ lIndex ].uxCriticalNesting = 0;
 	}
 
-	fid = fopen("log.txt", "w");
-
 	/* Start the first task. Will not return unless all threads are killed. */
 	vPortStartFirstTask();
 
 	usleep(1000000);
+	int i = 0;
 	while( pdTRUE != xSchedulerEnd ) {
 		usleep(portTICK_RATE_MICROSECONDS);
-		vPortSystemTickHandler(SIG_TICK);		
+		vPortSystemTickHandler(SIG_TICK);	
+		i++;
+		//if (i % 2000 == 0)
+		//	printTasks();
 	}
 	
 	debug_printf( "Cleaning Up, Exiting.\n" );
@@ -429,13 +438,14 @@ void vPortExitCritical( void )
 		if ( pdTRUE == xPendYield )
 		{
 			xPendYield = pdFALSE;
-			vPortYield();
+		//	vPortYield();
 		}
 		vPortEnableInterrupts();
 	}
 }
 /*-----------------------------------------------------------*/
 
+tskTCB *lastYield;
 void vPortYield( void )
 {
 pthread_t xTaskToSuspend;
@@ -470,6 +480,7 @@ tskTCB * oldTask, * newTask;
 		return;
 	}
 
+	lastYield = oldTask;
 	xStarted = pdFALSE;
 	
 	/* Get new task then release the task switching mutex */
@@ -511,21 +522,50 @@ tskTCB * oldTask, * newTask;
 }
 /*-----------------------------------------------------------*/
 
+void maskSuspend()
+{
+	sigset_t xSignals;
+	sigemptyset( &xSignals );
+	sigaddset( &xSignals, SIG_SUSPEND );
+	pthread_sigmask( SIG_SETMASK, &xSignals, NULL );
+}
+void unmaskSuspend()
+{
+	sigset_t xSignals;
+	sigemptyset( &xSignals );
+	pthread_sigmask( SIG_SETMASK, &xSignals, NULL );
+}
+
+int irq_lock;
+
 void vPortDisableInterrupts( void )
 {
 	//debug_printf("\r\n");
-	//assert( pthread_mutex_lock( &xIrqMutex ) == 0);
+	maskSuspend();
+	irq_lock = 1;
+	assert( pthread_mutex_lock( &xIrqMutex ) == 0);
 	xInterruptsEnabled = pdFALSE;
-	//assert( pthread_mutex_unlock( &xIrqMutex) == 0);
+	assert( pthread_mutex_unlock( &xIrqMutex) == 0);
+	irq_lock = 0;
+	unmaskSuspend();
 }
 /*-----------------------------------------------------------*/
 
+/**
+ * Obvious the simulated interrupts status must be thread safe.
+ * This means we also must mask these threads ever being suspended
+ * while they have the irqMutex.
+ */
 void vPortEnableInterrupts( void )
 {
 	//debug_printf("\r\n");
-	//assert( pthread_mutex_lock( &xIrqMutex ) == 0);
+	maskSuspend();
+	irq_lock = 1;
+	assert( pthread_mutex_lock( &xIrqMutex ) == 0);
 	xInterruptsEnabled = pdTRUE;
-	//assert( pthread_mutex_unlock( &xIrqMutex) == 0);
+	assert( pthread_mutex_unlock( &xIrqMutex) == 0);
+	irq_lock = 0;
+	unmaskSuspend();	
 }
 /*-----------------------------------------------------------*/
 
@@ -546,32 +586,38 @@ void vPortClearInterruptMask( portBASE_TYPE xMask )
 /*-----------------------------------------------------------*/
 
 
+tskTCB * oldTask, * newTask;
 void vPortSystemTickHandler( int sig )
 {
 pthread_t xTaskToSuspend;
 pthread_t xTaskToResume;
-tskTCB * oldTask, * newTask;
 	
 	debug_printf( "\r\n\r\n" );
 	debug_printf( "(xInterruptsEnabled = %i, xServicingTick = %i)\r\n", (int) xInterruptsEnabled != 0, (int) xServicingTick != 0);
+
+	/* Tick Increment. */
+	vTaskIncrementTick();
+
+	if (pthread_mutex_trylock( &xIrqMutex ) == EBUSY) {
+		fprintf(stderr, "Systick could not block interrupts\r\n");
+		return;
+	}
+
 	if ( ( pdTRUE == xInterruptsEnabled ) && ( pdTRUE != xServicingTick ) )
 	{
 //		debug_printf( "Checking for lock ...\r\n" );
 		if ( 0 ==  pthread_mutex_trylock( &xSwappingThreadMutex ) )
 		{
+
+			/* Select Next Task. */
+#if ( configUSE_PREEMPTION == 1 )
 			debug_printf( "Handling\r\n");
 			xServicingTick = pdTRUE;
 			
 			oldTask = xTaskGetCurrentTaskHandle();
 			xTaskToSuspend = prvGetThreadHandle( xTaskGetCurrentTaskHandle() );
 			
-			/* Tick Increment. */
-			vTaskIncrementTick();
-
-			/* Select Next Task. */
-#if ( configUSE_PREEMPTION == 1 )
 			vTaskSwitchContext();
-#endif
 
 			newTask = xTaskGetCurrentTaskHandle();			
 			xTaskToResume = prvGetThreadHandle( xTaskGetCurrentTaskHandle() );
@@ -580,6 +626,7 @@ tskTCB * oldTask, * newTask;
 			/* The only thread that can process this tick is the running thread. */
 			if ( xTaskToSuspend != xTaskToResume )
 			{
+				//fprintf(stderr,"Suspending: %s\r\n", oldTask->pcTaskName);
 				xSuspended = pdFALSE;
 				xStarted = pdFALSE;
 				
@@ -609,7 +656,7 @@ tskTCB * oldTask, * newTask;
 					pthread_cond_t * hCond = prvGetConditionHandle( xTaskGetCurrentTaskHandle() );
 					assert( pthread_cond_signal( hCond ) == 0 ); 
 #endif
-					assert( pthread_kill( xTaskToSuspend, SIG_SUSPEND ) == 0);
+					//assert( pthread_kill( xTaskToSuspend, SIG_SUSPEND ) == 0);
 
 					sched_yield();
 				}
@@ -619,21 +666,22 @@ tskTCB * oldTask, * newTask;
 			{
 			//	debug_error ("Want %s running \r\n", newTask->pcTaskName );
 			}
+#endif configUSE_PREEMPTION
+
 			xServicingTick = pdFALSE;
 			(void)pthread_mutex_unlock( &xSwappingThreadMutex );
 		}
 		else
 		{
+			fprintf(stderr, "Cannot get swap thread mutex\r\n");
 			debug_error( "Pending yield here (portYield has lock - hopefully)\r\n" );
 			xPendYield = pdTRUE;
 		}
 
 	}
-	else
-	{
-		debug_printf( "Pending yield or here\r\n");
-		xPendYield = pdTRUE;
-	}
+
+	assert( pthread_mutex_unlock( &xIrqMutex) == 0);
+
 }
 /*-----------------------------------------------------------*/
 
@@ -733,6 +781,8 @@ void * pParams = pxParams->pvParams;
 }
 /*-----------------------------------------------------------*/
 
+extern volatile unsigned portBASE_TYPE uxSchedulerSuspended;
+
 void pauseThread( portBASE_TYPE pauseMode ) 
 {
 	debug_printf( "Pausing thread %li.  Set xSuspended false\r\n", (long int) pthread_self() );
@@ -770,15 +820,52 @@ void pauseThread( portBASE_TYPE pauseMode )
 			assert( 0 == pthread_mutex_lock( &xRunningThread ) );
 #endif
 			debug_printf("Resuming\r\n");
+			prvSetThreadStatus( pthread_self(), RUNNING );
 			return;
 		}
 		else {
+			if(pauseMode == THREAD_PAUSE_INTERRUPT)
+				prvSetThreadStatus( pthread_self(), INTERRUPTED );
+			else
+				prvSetThreadStatus( pthread_self(), STOPPED );
+
+			if( uxSchedulerSuspended != 0) {
+//				fprintf(stderr, "This is probably a fuckup\r\n");
+			}
 #ifdef COND_SIGNALING
 			gettimeofday( &tv, NULL );
-			ts.tv_sec = ts.tv_sec + 1;
-			ts.tv_nsec = 0; 
+			ts.tv_sec = tv.tv_sec + 1;
+			ts.tv_nsec = tv.tv_usec * 1000; 
 			xResult = pthread_cond_timedwait( hCond, hMutex, &ts );
 			assert( xResult != EINVAL );
+			if (xResult == ETIMEDOUT) {
+				debug_task_handle = prvGetTaskHandle(pthread_self());
+				signed char * str;
+				if(debug_task_handle)
+					str = debug_task_handle->pcTaskName;
+				else
+					str = (signed char *) "Unknown";
+				
+				if(pthread_self() == prvGetThreadHandle(xTaskGetCurrentTaskHandle()))
+				   fprintf(stderr,"Timed out %s and should be running\n", str);
+				else {
+				   fprintf(stderr,"Timed out %s.  Sould be running %s\n", str, ((tskTCB *)xTaskGetCurrentTaskHandle())->pcTaskName);
+#if 0 && defined(COND_SIGNALING)
+					fprintf(stderr,"Resending resume signal\r\n");
+					/* Set resume condition for specific thread */
+					pthread_cond_t * hCond = prvGetConditionHandle( xTaskGetCurrentTaskHandle() );
+					assert( pthread_cond_signal( hCond ) == 0 ); 
+#endif
+				}
+
+				printTasks();
+			} else {
+				static int i;
+				i ++;
+				//if(i % 1000 == 0)
+				//printTasks();
+			}
+			
 #else
 			/* For windows where conditional signaling is buggy */
 			/* It would be wonderful to put a nanosleep here, but since its not reentrant safe */
@@ -793,6 +880,7 @@ void pauseThread( portBASE_TYPE pauseMode )
 		}
 
 	}
+	assert(0);
 }
 
 void prvSuspendSignalHandler(int sig)
@@ -802,12 +890,12 @@ sigset_t xBlockSignals;
 	/* This signal is set here instead of pauseThread because it is checked by the tick handler */
 	/* which means if there were a swap it should result in a suspend interrupt */
 	
-	debug_printf( "Caught signal %i\r\n", sig );
+	debug_error( "Caught signal %i\r\n", sig );
 	/* Check that we aren't suspending when we should be running.  This bug would need tracking down */
 	//assert( pthread_self() != prvGetThreadHandle(xTaskGetCurrentTaskHandle() ) ); 
 	if( pthread_self() == prvGetThreadHandle( xTaskGetCurrentTaskHandle() ) ) 
 	{
-		debug_printf( "Suspend ISR called while this thread still marked active.  Reflects buggy behavior in scheduler\r\n" );
+		debug_error( "Suspend ISR called while this thread still marked active.  Reflects buggy behavior in scheduler.  Signals %d\r\n" , sig);
 		return;
 	}
 
@@ -821,7 +909,7 @@ sigset_t xBlockSignals;
 //	assert( pthread_self() == prvGetThreadHandle( xTaskGetCurrentTaskHandle() ) );
 	while( pthread_self() != prvGetThreadHandle( xTaskGetCurrentTaskHandle() ) )
 	{
-		debug_printf( "Incorrectly woke up.  Repausing\r\n" );
+		debug_error( "Incorrectly woke up.  Repausing\r\n" );
 		pauseThread( THREAD_PAUSE_INTERRUPT );
 	}
 
@@ -870,7 +958,7 @@ portLONG lIndex;
 	
 	debug_printf("prvSetupSignalAndSchedulerPolicy\r\n");
 	
-	pxThreads = ( xThreadState *)pvPortMalloc( sizeof( xThreadState ) * MAX_NUMBER_OF_TASKS );
+	//pxThreads = ( xThreadState *)pvPortMalloc( sizeof( xThreadState ) * MAX_NUMBER_OF_TASKS );
 	for ( lIndex = 0; lIndex < MAX_NUMBER_OF_TASKS; lIndex++ )
 	{
 		pxThreads[ lIndex ].hThread = ( pthread_t )NULL;
@@ -920,7 +1008,25 @@ portLONG lIndex;
 		}
 	}
 	return hTask;
-} 
+}
+
+/*-----------------------------------------------------------*/
+static void prvSetThreadStatus( pthread_t hThread, enum thread_status status ) 
+{
+	portLONG lIndex;
+	
+	/* If not initialized yet */
+	if( pxThreads  == NULL ) return;
+	
+	for ( lIndex = 0; lIndex < MAX_NUMBER_OF_TASKS; lIndex++ )
+	{
+		if ( pxThreads[ lIndex ].hThread == hThread )
+		{
+			pxThreads[ lIndex ].status = status;
+			break;
+		}
+	}
+}
 
 /*-----------------------------------------------------------*/
 pthread_cond_t * prvGetConditionHandle( xTaskHandle hTask )

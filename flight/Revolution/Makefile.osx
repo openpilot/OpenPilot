@@ -53,7 +53,8 @@ FLASH_TOOL = OPENOCD
 USE_THUMB_MODE = YES
 
 # List of modules to include
-MODULES =  Telemetry Actuator ManualControl Stabilization 
+MODULES = Telemetry
+MODULES +=  Actuator ManualControl Stabilization 
 MODULES += Attitude/revolution
 #MODULES += SimulatedAttitude
 

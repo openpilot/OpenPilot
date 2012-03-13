@@ -155,6 +155,7 @@ typedef portBASE_TYPE (*pdTASK_HOOK_CODE)( void * );
 #endif
 
 #ifndef configUSE_TIMERS
+#error HERE
 	#define configUSE_TIMERS 0
 #endif
 

@@ -430,22 +430,12 @@ void vPortEnterCritical( void )
 
 void vPortExitCritical( void )
 {
-	/* Check for unmatched exits. */
-	if ( uxCriticalNesting > 0 )
-	{
-		uxCriticalNesting--;
-	}
+	uxCriticalNesting--;
+	assert(uxCriticalNesting >= 0);
 
-	/* If we have reached 0 then re-enable the interrupts. */
-	if( uxCriticalNesting == 0 )
+	if( uxCriticalNesting == 0)
 	{
-		/* Have we missed ticks? This is the equivalent of pending an interrupt. */
-		if ( pdTRUE == xPendYield )
-		{
-			xPendYield = pdFALSE;
-		//	vPortYield();
-		}
-		vPortEnableInterrupts();
+		portENABLE_INTERRUPTS();
 	}
 }
 /*-----------------------------------------------------------*/
@@ -870,8 +860,8 @@ void pauseThread( portBASE_TYPE pauseMode )
 			} else {
 				static int i;
 				i ++;
-				//if(i % 1000 == 0)
-				//printTasks();
+				if(i % 1000 == 0)
+				printTasks();
 			}
 			
 #else

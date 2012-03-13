@@ -1984,6 +1984,11 @@ static portTASK_FUNCTION( prvIdleTask, pvParameters )
 			vApplicationIdleHook();
 		}
 		#endif
+		
+		static int i = 0;
+		i++;
+		if (i % 100000 == 0)
+			printTasks();
 	}
 } /*lint !e715 pvParameters is not accessed but all task functions require the same prototype. */
 
@@ -2532,6 +2537,94 @@ void vTaskExitCritical( void )
 #endif
 /*-----------------------------------------------------------*/
 
+static void printNamesInList( const signed char *pcWriteBuffer, xList *pxList)
+{
+	volatile tskTCB *pxNextTCB, *pxFirstTCB;
+	char pcStatsString[100];
+	/* Write the run time stats of all the TCB's in pxList into the buffer. */
+	listGET_OWNER_OF_NEXT_ENTRY( pxFirstTCB, pxList );
+	do
+	{
+		/* Get next TCB in from the list. */
+		listGET_OWNER_OF_NEXT_ENTRY( pxNextTCB, pxList );
+		if(pxNextTCB) {
+			sprintf( pcStatsString, ( char * ) "%s, ", pxNextTCB->pcTaskName);
+			
+			strcat( ( char * ) pcWriteBuffer, ( char * ) pcStatsString );
+		}
+		
+	} while( pxNextTCB != pxFirstTCB );
+}
 
+void printTasks()
+{
+	signed char pcWriteBuffer[500];
+	int uxQueue;
+	taskENTER_CRITICAL();
+	{
+		/* Run through all the lists that could potentially contain a TCB,
+		 generating a table of run timer percentages in the provided
+		 buffer. */
+		
+		pcWriteBuffer[ 0 ] = ( signed char ) 0x00;
+		
+		uxQueue = uxTopUsedPriority + 1;
+		
+		do
+		{
+			uxQueue--;
+			
+			if( !listLIST_IS_EMPTY( &( pxReadyTasksLists[ uxQueue ] ) ) )
+			{
+				char readyMessage[30];
+				sprintf(readyMessage, "\r\nReady priority %d: ", uxQueue);
+				strcat( ( char * ) pcWriteBuffer,readyMessage);
+				printNamesInList( pcWriteBuffer, ( xList * ) &( pxReadyTasksLists[ uxQueue ] ));
+			}
+		}while( uxQueue > ( unsigned short ) tskIDLE_PRIORITY );
+		
+		if( !listLIST_IS_EMPTY( pxDelayedTaskList ) )
+		{
+			strcat( ( char * ) pcWriteBuffer, "\r\nDelay: ");
+			printNamesInList( pcWriteBuffer, ( xList * ) &( pxDelayedTaskList));
+		}
+		
+		if( !listLIST_IS_EMPTY( pxOverflowDelayedTaskList ) )
+		{
+			strcat( ( char * ) pcWriteBuffer, "\r\nDelay Overflow: ");
+			printNamesInList( pcWriteBuffer, ( xList * ) pxOverflowDelayedTaskList);
+		}
+		
+		if( !listLIST_IS_EMPTY( &xPendingReadyList ) )
+		{
+			strcat( ( char * ) pcWriteBuffer, "\r\nPending ready: ");
+			printNamesInList( pcWriteBuffer, ( xList * ) &xPendingReadyList);
+		}
+		
+#if ( INCLUDE_vTaskDelete == 1 )
+		{
+			if( !listLIST_IS_EMPTY( &xTasksWaitingTermination ) )
+			{
+				strcat( ( char * ) pcWriteBuffer, "\r\nWaiting termination: ");
+				printNamesInList( pcWriteBuffer, ( xList * ) &xTasksWaitingTermination);
+			}
+		}
+#endif
+		
+#if ( INCLUDE_vTaskSuspend == 1 )
+		{
+			if( !listLIST_IS_EMPTY( &xSuspendedTaskList ) )
+			{
+				strcat( ( char * ) pcWriteBuffer, "\r\nSuspended: ");
+				printNamesInList( pcWriteBuffer, ( xList * ) &xSuspendedTaskList);
+			}
+		}
+#endif
+	}
+	strcat( (char *) pcWriteBuffer, "\r\n\r\n");
+	fprintf(stderr, "%s", ( char * ) pcWriteBuffer);
+	taskEXIT_CRITICAL();
+	
+}
 
 

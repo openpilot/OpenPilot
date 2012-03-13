@@ -580,7 +580,7 @@ void PIOS_Board_Init(void) {
 	pios_com_telem_rf_id = 0;
 #endif	/* PIOS_INCLUDE_COM_TELEM */
 
-#if defined(PIOS_INCLUDE_COM_TELEM)
+#if defined(PIOS_INCLUDE_COM_COTELEM)
 	{ /* Eventually add switch for this port function */
 		uint32_t pios_usart_cotelem_id;
 		if (PIOS_USART_Init(&pios_usart_cotelem_id, &pios_usart_cotelem_main_cfg)) {

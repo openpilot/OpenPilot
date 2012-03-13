@@ -120,8 +120,8 @@ static const struct pios_usart_cfg pios_usart_gps_cfg = {
  * AUX USART
  */
 static const struct pios_usart_cfg pios_usart_aux_cfg = {
-	.regs = USART1,
-	.remap = GPIO_AF_USART1,
+	.regs = USART2,
+	.remap = GPIO_AF_USART2,
 	.init = {
 		.USART_BaudRate = 230400,
 		.USART_WordLength = USART_WordLength_8b,
@@ -133,7 +133,7 @@ static const struct pios_usart_cfg pios_usart_aux_cfg = {
 	},
 	.irq = {
 		.init = {
-			.NVIC_IRQChannel = USART1_IRQn,
+			.NVIC_IRQChannel = USART2_IRQn,
 			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
 			.NVIC_IRQChannelSubPriority = 0,
 			.NVIC_IRQChannelCmd = ENABLE,
@@ -142,7 +142,7 @@ static const struct pios_usart_cfg pios_usart_aux_cfg = {
 	.rx = {
 		.gpio = GPIOA,
 		.init = {
-			.GPIO_Pin   = GPIO_Pin_10,
+			.GPIO_Pin   = GPIO_Pin_3,
 			.GPIO_Speed = GPIO_Speed_2MHz,
 			.GPIO_Mode  = GPIO_Mode_AF,
 			.GPIO_OType = GPIO_OType_PP,
@@ -152,7 +152,7 @@ static const struct pios_usart_cfg pios_usart_aux_cfg = {
 	.tx = {
 		.gpio = GPIOA,
 		.init = {
-			.GPIO_Pin   = GPIO_Pin_9,
+			.GPIO_Pin   = GPIO_Pin_2,
 			.GPIO_Speed = GPIO_Speed_2MHz,
 			.GPIO_Mode  = GPIO_Mode_AF,
 			.GPIO_OType = GPIO_OType_PP,
@@ -168,8 +168,8 @@ static const struct pios_usart_cfg pios_usart_aux_cfg = {
  * Telemetry on main USART
  */
 static const struct pios_usart_cfg pios_usart_telem_main_cfg = {
-	.regs = USART6,
-	.remap = GPIO_AF_USART6,
+	.regs = UART4,
+	.remap = GPIO_AF_UART4,
 	.init = {
 		.USART_BaudRate = 57600,
 		.USART_WordLength = USART_WordLength_8b,
@@ -181,16 +181,16 @@ static const struct pios_usart_cfg pios_usart_telem_main_cfg = {
 	},
 	.irq = {
 		.init = {
-			.NVIC_IRQChannel = USART6_IRQn,
+			.NVIC_IRQChannel = UART4_IRQn,
 			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
 			.NVIC_IRQChannelSubPriority = 0,
 			.NVIC_IRQChannelCmd = ENABLE,
 		},
 	},
 	.rx = {
-		.gpio = GPIOC,
+		.gpio = GPIOA,
 		.init = {
-			.GPIO_Pin   = GPIO_Pin_7,
+			.GPIO_Pin   = GPIO_Pin_1,
 			.GPIO_Speed = GPIO_Speed_2MHz,
 			.GPIO_Mode  = GPIO_Mode_AF,
 			.GPIO_OType = GPIO_OType_PP,
@@ -198,9 +198,9 @@ static const struct pios_usart_cfg pios_usart_telem_main_cfg = {
 		},
 	},
 	.tx = {
-		.gpio = GPIOC,
+		.gpio = GPIOA,
 		.init = {
-			.GPIO_Pin   = GPIO_Pin_6,
+			.GPIO_Pin   = GPIO_Pin_0,
 			.GPIO_Speed = GPIO_Speed_2MHz,
 			.GPIO_Mode  = GPIO_Mode_AF,
 			.GPIO_OType = GPIO_OType_PP,
@@ -212,7 +212,7 @@ static const struct pios_usart_cfg pios_usart_telem_main_cfg = {
 #endif /* PIOS_COM_TELEM */
 
 
-#if 1
+#if 0
 /*
  * COTelemetry on main USART
  */
@@ -307,7 +307,7 @@ static const struct pios_usb_cfg pios_usb_main_cfg = {
 		.init    = {
 			.NVIC_IRQChannel                   = OTG_FS_IRQn,
 			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
-			.NVIC_IRQChannelSubPriority        = 3,
+			.NVIC_IRQChannelSubPriority        = 0,
 			.NVIC_IRQChannelCmd                = ENABLE,
 		},
 	},
@@ -646,11 +646,11 @@ void DMA2_Stream5_IRQHandler(void) __attribute__ ((alias("PIOS_VIDEO_DMA_Handler
 void PIOS_VIDEO_DMA_Handler(void)
 {
 	if (DMA_GetFlagStatus(DMA1_Stream7,DMA_FLAG_TCIF7)) {	// whole double buffer filled
-		DMA_ClearFlag(DMA1_Stream5,DMA_FLAG_TCIF7);
+		DMA_ClearFlag(DMA1_Stream7,DMA_FLAG_TCIF7);
 		//PIOS_LED_Toggle(LED2);
 	}
 	else if (DMA_GetFlagStatus(DMA1_Stream7,DMA_FLAG_HTIF7)) {
-		DMA_ClearFlag(DMA1_Stream5,DMA_FLAG_HTIF7);
+		DMA_ClearFlag(DMA1_Stream7,DMA_FLAG_HTIF7);
 	}
 	else {
 

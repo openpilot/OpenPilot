@@ -2633,13 +2633,13 @@ void calcHomeArrow(void)
 
 	char temp[50]={0};
 	sprintf(temp,"hea:%d",(int)brng);
-	write_string(temp, 130, 10, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+	write_string(temp, 130, 5, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
 	sprintf(temp,"ele:%d",(int)elevation);
-	write_string(temp, 130, 10+10, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+	write_string(temp, 130, 5+10, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
 	sprintf(temp,"dis:%d",(int)d);
-	write_string(temp, 130, 10+10+10, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+	write_string(temp, 130, 5+10+10, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
 	sprintf(temp,"u2g:%d",(int)u2g);
-	write_string(temp, 130, 10+10+10+10, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+	write_string(temp, 130, 5+10+10+10, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
 
 	sprintf(temp,"%c%c",(int)(u2g/22.5f)*2+0x90,(int)(u2g/22.5f)*2+0x91);
 	write_string(temp,200,10+10+10, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 3);
@@ -2712,11 +2712,11 @@ void updateGraphics() {
 	char temp[50]={0};
 	memset(temp, ' ', 40);
 	sprintf(temp,"Lat:%d",(int)m_gpsLat);
-	write_string(temp, 5, 10, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+	write_string(temp, 5, 5, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
 	sprintf(temp,"Lon:%d",(int)m_gpsLon);
-	write_string(temp, 5, 10+14, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+	write_string(temp, 5, 15, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
 	sprintf(temp,"Fix:%d",(int)m_gpsStatus);
-	write_string(temp, 5, 10+14+14, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+	write_string(temp, 5, 25, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
 
 
 	/* Print RTC time */
@@ -2727,27 +2727,27 @@ void updateGraphics() {
 
 	/* Print Number of detected video Lines */
 	sprintf(temp,"Lines:%4d",PIOS_Video_GetOSDLines());
-	write_string(temp, (GRAPHICS_WIDTH_REAL - 2),10, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+	write_string(temp, (GRAPHICS_WIDTH_REAL - 2),5, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 
 	/* Print ADC voltage */
-	sprintf(temp,"Rssi:%4dV",(int)(PIOS_ADC_PinGet(5)*300*61/4096));
-	write_string(temp, (GRAPHICS_WIDTH_REAL - 2),20, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+	sprintf(temp,"Rssi:%4dV",(int)(PIOS_ADC_PinGet(4)*3000/4096));
+	write_string(temp, (GRAPHICS_WIDTH_REAL - 2),15, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 
 	/* Print CPU temperature */
 	sprintf(temp,"Temp:%4dC",(int)(PIOS_ADC_PinGet(6)*0.29296875f-279));
-	write_string(temp, (GRAPHICS_WIDTH_REAL - 2),30, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+	write_string(temp, (GRAPHICS_WIDTH_REAL - 2),25, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 
 	/* Print ADC voltage FLIGHT*/
 	sprintf(temp,"FltV:%4dV",(int)(PIOS_ADC_PinGet(2)*300*61/4096));
-	write_string(temp, (GRAPHICS_WIDTH_REAL - 2),40, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+	write_string(temp, (GRAPHICS_WIDTH_REAL - 2),35, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 
 	/* Print ADC voltage VIDEO*/
 	sprintf(temp,"VidV:%4dV",(int)(PIOS_ADC_PinGet(3)*300*61/4096));
-	write_string(temp, (GRAPHICS_WIDTH_REAL - 2),50, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+	write_string(temp, (GRAPHICS_WIDTH_REAL - 2),45, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 
 	/* Print ADC voltage RSSI */
-	sprintf(temp,"Rssi:%4dV",(int)(PIOS_ADC_PinGet(4)*300*61/4096));
-	write_string(temp, (GRAPHICS_WIDTH_REAL - 2),60, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+	//sprintf(temp,"Curr:%4dA",(int)(PIOS_ADC_PinGet(0)*300*61/4096));
+	//write_string(temp, (GRAPHICS_WIDTH_REAL - 2),60, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 
 	/* Draw Battery Gauge */
 	m_batt++;
@@ -2799,7 +2799,7 @@ void updateGraphics() {
 	}
 	//write_filled_rectangle(draw_buffer_level,20,20,30,30,1);
 	//write_filled_rectangle(draw_buffer_mask,30,30,30,30,1);
-	lamas();
+	//lamas();
     /* Make sure every line last bit is 0 */
 	write_vline( draw_buffer_level,GRAPHICS_WIDTH_REAL-1,0,GRAPHICS_HEIGHT_REAL-1,0);
 	write_vline( draw_buffer_mask,GRAPHICS_WIDTH_REAL-1,0,GRAPHICS_HEIGHT_REAL-1,0);

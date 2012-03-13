@@ -119,9 +119,9 @@ void * PIOS_TCP_RxThread(void *tcp_dev_n)
 		
 		if (-1 == shutdown(tcp_dev->socket_connection, SHUT_RDWR))
 		{
-			perror("can not shutdown socket");
-			close(tcp_dev->socket_connection);
-			exit(EXIT_FAILURE);
+			//perror("can not shutdown socket");
+			//close(tcp_dev->socket_connection);
+			//exit(EXIT_FAILURE);
 		}
 		close(tcp_dev->socket_connection);
 		tcp_dev->socket_connection = 0;
@@ -218,6 +218,13 @@ static void PIOS_TCP_TxStart(uint32_t tcp_id, uint16_t tx_bytes_avail)
 				}
 			}
 			tx_bytes_avail -= length;
+#if defined(PIOS_INCLUDE_FREERTOS)
+			// Not sure about this
+			if (tx_need_yield) {
+				vPortYieldFromISR();
+			}
+#endif	/* PIOS_INCLUDE_FREERTOS */
+			
 		}
 	}
 	

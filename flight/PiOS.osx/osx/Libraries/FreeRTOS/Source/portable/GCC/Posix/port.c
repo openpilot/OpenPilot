@@ -54,6 +54,11 @@
  * Implementation of functions defined in portable.h for the Posix port.
  *----------------------------------------------------------*/
 
+// vPortYield
+// vPortSystemTickHandler -- preempts when necessary (in our case just idle task)
+// xPortStartScheduler
+// interrupts
+
 #include <pthread.h>
 #include <sched.h>
 #include <signal.h>
@@ -78,8 +83,8 @@
 
 #ifndef __CYGWIN__ 
 	#define COND_SIGNALING 
-//	#define CHECK_TASK_RESUMES
-//	#define RUNNING_THREAD_MUTEX
+	//#define CHECK_TASK_RESUMES
+	//#define RUNNING_THREAD_MUTEX
 #endif
 
 /* Parameters to pass to the newly created pthread. */
@@ -162,7 +167,7 @@ void vPortSystemTickHandler( int sig );
 FILE * fid;
  
 //#define DEBUG_OUTPUT
-#define ERROR_OUTPUT
+//#define ERROR_OUTPUT
 #ifdef DEBUG_OUTPUT
 
 	static pthread_mutex_t xPrintfMutex = PTHREAD_MUTEX_INITIALIZER;
@@ -445,6 +450,7 @@ void vPortExitCritical( void )
 }
 /*-----------------------------------------------------------*/
 
+int yield_locking = 0;
 tskTCB *lastYield;
 void vPortYield( void )
 {
@@ -463,8 +469,10 @@ tskTCB * oldTask, * newTask;
 	sigaddset( &xSignals, SIG_SUSPEND );
 	pthread_sigmask( SIG_SETMASK, &xSignals, NULL );
 
+	yield_locking = 1;
 	assert( pthread_mutex_lock( &xSwappingThreadMutex ) == 0);	
-
+	yield_locking = 0;
+	
 	oldTask = xTaskGetCurrentTaskHandle();
 	xTaskToSuspend = prvGetThreadHandle( xTaskGetCurrentTaskHandle() );
 	if(xTaskToSuspend != pthread_self() ) {
@@ -669,7 +677,7 @@ pthread_t xTaskToResume;
 #endif configUSE_PREEMPTION
 
 			xServicingTick = pdFALSE;
-			(void)pthread_mutex_unlock( &xSwappingThreadMutex );
+			assert( pthread_mutex_unlock( &xSwappingThreadMutex ) == 0 );
 		}
 		else
 		{
@@ -858,7 +866,7 @@ void pauseThread( portBASE_TYPE pauseMode )
 #endif
 				}
 
-				printTasks();
+				//printTasks();
 			} else {
 				static int i;
 				i ++;
@@ -914,7 +922,7 @@ sigset_t xBlockSignals;
 	}
 
 	/* Make sure the right thread is resuming */
-	assert( pthread_self() == prvGetThreadHandle(xTaskGetCurrentTaskHandle() ) ); 
+	//assert( pthread_self() == prvGetThreadHandle(xTaskGetCurrentTaskHandle() ) ); 
 	
 	/* Old synchronization code, may still be required 
 	while( !xHandover );

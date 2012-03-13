@@ -108,16 +108,13 @@ void * PIOS_TCP_RxThread(void *tcp_dev_n)
 				(void) (tcp_dev->rx_in_cb)(tcp_dev->rx_in_context, &tcp_dev->rx_buffer[0], received, NULL, &rx_need_yield);
 			}
 			
-#if 0
-			if (rx_need_yield) {
-				fprintf(stderr, "Not sure about this ... \n");
-			}
+			//fprintf(stderr, "Received %d\n", received);
 #if defined(PIOS_INCLUDE_FREERTOS)
+			// Not sure about this
 			if (rx_need_yield) {
 				vPortYieldFromISR();
 			}
 #endif	/* PIOS_INCLUDE_FREERTOS */
-#endif
 		} while(received > 0);
 		
 		if (-1 == shutdown(tcp_dev->socket_connection, SHUT_RDWR))

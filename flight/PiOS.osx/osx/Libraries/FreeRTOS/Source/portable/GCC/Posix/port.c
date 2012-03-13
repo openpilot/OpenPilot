@@ -135,6 +135,7 @@ typedef struct THREAD_SUSPENSIONS
 	portBASE_TYPE xThreadState;
 	volatile enum thread_status status;
 	unsigned portBASE_TYPE uxCriticalNesting;
+	char * name;
 } xThreadState;
 /*-----------------------------------------------------------*/
 
@@ -171,7 +172,7 @@ static volatile unsigned portBASE_TYPE uxCriticalNesting;
  * when then goes into it's signal handler.  It will changes it's running
  * status to stopped which this thread will wait for.
  */
-static void pauseOtherThread(xTaskHandle hTask);
+static int pauseOtherThread(xTaskHandle hTask);
 
 /**
  * Prepares a task to pause (stores critical nesting, releases running semaphore)
@@ -215,6 +216,7 @@ static pthread_cond_t * prvGetConditionHandle( xTaskHandle hTask );
 static pthread_mutex_t * prvGetMutexHandle( xTaskHandle hTask );
 static xTaskHandle prvGetTaskHandle( pthread_t hThread );
 static void prvSetThreadStatus( pthread_t hThread, enum thread_status status );
+static enum thread_status prvGetThreadStatus( pthread_t hThread );
 static portLONG prvGetFreeThreadState( void );
 static void prvSetTaskCriticalNesting( pthread_t xThreadId, unsigned portBASE_TYPE uxNesting );
 static unsigned portBASE_TYPE prvGetTaskCriticalNesting( pthread_t xThreadId );
@@ -444,10 +446,10 @@ portLONG lIndex;
 	while( pdTRUE != xSchedulerEnd ) {
 		usleep(portTICK_RATE_MICROSECONDS);
 		vPortSystemTickHandler(SIG_TICK);	
+		i++;
 		if (i % 1000 == 0)
 			fprintf(stderr,".");
-		i++;
-		//if (i % 2000 == 0)
+		//if (i % 200 == 0)
 		//	printTasks();
 	}
 	
@@ -520,6 +522,7 @@ void vPortYield( void )
 
 	if(pthread_mutex_trylock( &xSwappingThreadMutex )== EBUSY) {
 		// The tick handler will just pause this thread
+		fprintf(stdout, "Could not get the swapping thread to yield\r\n");
 		usleep(10);
 		storeSelf();
 		pauseSelf();
@@ -530,8 +533,8 @@ void vPortYield( void )
 			// Time to sleep
 			//fprintf(stdout, "Yielding from %s\r\n", threadToName(pthread_self()));
 			storeSelf();
-			pthread_mutex_unlock( &xSwappingThreadMutex );
 			resumeThread(xTaskGetCurrentTaskHandle());
+			pthread_mutex_unlock( &xSwappingThreadMutex );
 			pauseSelf();
 			claimRunningSemaphore(3);
 		} else
@@ -621,7 +624,7 @@ void vPortSystemTickHandler( int sig )
 	}
 */	
 	if(pthread_mutex_trylock( &xSwappingThreadMutex )== EBUSY) {
-		fprintf(stdout,"Can't get swapping lock for tick handler\r\n");
+		//fprintf(stdout,"Can't get swapping lock for tick handler\r\n");
 		return;
 	}
 
@@ -632,11 +635,13 @@ void vPortSystemTickHandler( int sig )
 		
 		//printTasks();
 		
-		pauseOtherThread(xTaskGetCurrentTaskHandle());
+		// If that thread won't pause something is going on
+		if (pauseOtherThread(xTaskGetCurrentTaskHandle()) != -1) {
 		claimRunningSemaphore(2);
 		vTaskSwitchContext();
 		releaseRunningSemaphore();
 		resumeThread(xTaskGetCurrentTaskHandle());
+		}
 //		fprintf(stdout, "System tick done\r\n");
 	}
 #endif
@@ -738,6 +743,13 @@ void * pParams = pxParams->pvParams;
 
 	usleep(1000);
 	
+	xTaskHandle hTask = prvGetTaskHandle( pthread_self() );
+	portLONG lIndex;	
+	for ( lIndex = 0; lIndex < MAX_NUMBER_OF_TASKS && pxThreads[ lIndex ].hTask != hTask; lIndex++ );
+	assert(pxThreads[ lIndex ].hTask == hTask);
+	
+	pxThreads[lIndex].name = (char *) ((tskTCB *) hTask)->pcTaskName;
+
 	pauseSelf();
 	
 	sigemptyset( &xSignals );
@@ -757,10 +769,16 @@ extern volatile unsigned portBASE_TYPE uxSchedulerSuspended;
 
 void prvSuspendSignalHandler(int sig)
 {
-	//fprintf(stderr, "Caught suspend signal (%d): %s\r\n", sig, threadToName(pthread_self()));
-	storeSelf();
-	pauseSelf();
-	claimRunningSemaphore(1);
+	if (prvGetThreadStatus(pthread_self()) != RUNNING) {
+		//fprintf(stderr, "Caught erroneous suspend signal (%d): %s\r\n", sig, threadToName(pthread_self()));
+		return;
+	}
+	else {
+		//fprintf(stderr, "Caught suspend signal (%d): %s\r\n", sig, threadToName(pthread_self()));
+		storeSelf();
+		pauseSelf();
+		claimRunningSemaphore(1);
+	}
 }
 
 /*-----------------------------------------------------------*/
@@ -850,6 +868,23 @@ static void prvSetThreadStatus( pthread_t hThread, enum thread_status status )
 			break;
 		}
 	}
+}
+
+/*-----------------------------------------------------------*/
+static enum thread_status prvGetThreadStatus( pthread_t hThread )
+{
+	portLONG lIndex;
+	
+	/* If not initialized yet */
+	if( pxThreads  == NULL ) return DESTROYED;
+	
+	for ( lIndex = 0; lIndex < MAX_NUMBER_OF_TASKS; lIndex++ )
+	{
+		if ( pxThreads[ lIndex ].hThread == hThread )
+		{
+			return pxThreads[ lIndex ].status;				}
+	}
+	return DESTROYED;
 }
 
 /*-----------------------------------------------------------*/
@@ -1073,7 +1108,7 @@ void pauseSelf()
 		assert( xResult != EINVAL );
 	
 		if (xResult == ETIMEDOUT && pthread_self() == prvGetThreadHandle(xTaskGetCurrentTaskHandle())) {
-			fprintf(stdout,"Timed out should be running\r\n");
+			fprintf(stdout,"Timed out should be running %s\r\n", threadToName( pthread_self() ));
 			break;
 		}
 	}
@@ -1100,7 +1135,7 @@ void pauseSelf()
  * when then goes into it's signal handler.  It will changes it's running
  * status to stopped which this thread will wait for.
  */
-static void pauseOtherThread(xTaskHandle hTask)
+static int pauseOtherThread(xTaskHandle hTask)
 {
 	const int MAX_TIME = 10000; // us
 	const int MAX_ATTEMPTS = 5;
@@ -1109,10 +1144,16 @@ static void pauseOtherThread(xTaskHandle hTask)
 	for ( lIndex = 0; lIndex < MAX_NUMBER_OF_TASKS && pxThreads[ lIndex ].hTask != hTask; lIndex++ );
 	assert(pxThreads[ lIndex ].hTask == hTask);
 
+	if(pxThreads[ lIndex ].status != RUNNING) {
+		//fprintf(stdout, "Attempted to stop thread that is not running %s by %s\r\n", threadToName(pxThreads[lIndex].hThread), threadToName(pthread_self()));
+		return -1;
+	}
+	
+
 	for (int i = 0; i < MAX_ATTEMPTS; i++) {
 		// Trigger signal handler which will call pauseSelf
 		pthread_t thread_to_supend = prvGetThreadHandle( hTask );
-		//fprintf(stdout,  "Requesting pause of thread %s from %s.\r\n", threadToName(thread_to_supend), threadToName( pthread_self() ) );
+		fprintf(stdout,  "Requesting pause of thread %s from %s.\r\n", threadToName(thread_to_supend), threadToName( pthread_self() ) );
 		
 		assert( pthread_kill( thread_to_supend, SIG_SUSPEND ) == 0);		
 		
@@ -1120,13 +1161,15 @@ static void pauseOtherThread(xTaskHandle hTask)
 		while( (clock() - start_time) < MAX_TIME ) {
 			if(pxThreads[ lIndex ].status == STOPPED || pxThreads[ lIndex ].status == STORED) {
 				//fprintf(stdout, "Pause detected of %s by %s\r\n", threadToName(pxThreads[lIndex].hThread), threadToName(pthread_self()));
-				return;
+				return 0;
 			}
 		}
 
 		//fprintf(stdout, "Sending pause signal from %s to %s: Try %d\r\n", threadToName(pthread_self()), threadToName(prvGetThreadHandle( hTask )), i);
 	}
 	assert(0);
+	
+	return -2;
 }
 
 /**
@@ -1137,7 +1180,7 @@ static void pauseOtherThread(xTaskHandle hTask)
 static void resumeThread(xTaskHandle hTask)
 {
 	const unsigned int MAX_TIME = 10000; // us
-	const int MAX_ATTEMPTS = 25;
+	const int MAX_ATTEMPTS = 250;
 
 	portLONG lIndex;	
 	for ( lIndex = 0; lIndex < MAX_NUMBER_OF_TASKS && pxThreads[ lIndex ].hTask != hTask; lIndex++ );
@@ -1161,6 +1204,7 @@ static void resumeThread(xTaskHandle hTask)
 		//fprintf(stdout, "Sending resume signal from %s to %s (%d): Try %d\r\n", threadToName(pthread_self()), threadToName(hTask), lIndex, i);
 
 	}
+	fprintf(stdout, "Railed to resume from %s to %s (%d)\r\n", threadToName(pthread_self()), threadToName(hTask), lIndex);
 	// Thread resumption timed out
 	assert(0);
 }
@@ -1186,8 +1230,8 @@ static void claimRunningSemaphore(int source)
  */
 static void releaseRunningSemaphore()
 {
-	//fprintf(stderr,"Released the semaphore %s\r\n", threadToName(pthread_self()));
 	assert( 0 == pthread_mutex_unlock( &xRunningThread ) ); 
+	//fprintf(stderr,"Released the semaphore %s\r\n", threadToName(pthread_self()));
 }
 
 

@@ -24,40 +24,40 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+#include "QtDebug"
+
 #include "modelviewgadgetwidget.h"
 #include "extensionsystem/pluginmanager.h"
+#include "glc_context.h"
+#include "glc_exception.h"
+#include "glc_openglexception.h"
+#include "viewport/glc_userinput.h"
+
 #include <iostream>
 
 ModelViewGadgetWidget::ModelViewGadgetWidget(QWidget *parent) 
-    : QGLWidget(QGLFormat(QGL::SampleBuffers),parent)
-//    : QGLWidget(parent)
-, m_pFactory(GLC_Factory::instance(this->context()))
+: QGLWidget(new GLC_Context(QGLFormat(QGL::SampleBuffers)),parent)
 , m_Light()
 , m_World()
 , m_GlView(this)
 , m_MoverController()
 , m_ModelBoundingBox()
 , m_MotionTimer()
+, acFilename()
+, bgFilename()
 , vboEnable(false)
+, loadError(true)
+, mvInitGLSuccess(false)
 {
-    // Prevent crash on non-VBO enabled systems during GLC geometry creation
-    GLC_State::setVboUsage(vboEnable);
 
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     mvInitGLSuccess = false;
 
     CreateScene();
 
-    m_Light.setPosition(4000.0, -40000.0, 80000.0);
-    m_Light.setAmbientColor(Qt::lightGray);
-
-    m_GlView.cameraHandle()->setDefaultUpVector(glc::Z_AXIS);
-    m_GlView.cameraHandle()->setFrontView();
-    m_GlView.setToOrtho(true); // orthogonal view
-
     QColor repColor;
     repColor.setRgbF(1.0, 0.11372, 0.11372, 0.0);
-    m_MoverController= m_pFactory->createDefaultMoverController(repColor, &m_GlView);
+    m_MoverController= GLC_Factory::instance()->createDefaultMoverController(repColor, &m_GlView);
 
     // Get required UAVObjects
     ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
@@ -70,7 +70,31 @@ ModelViewGadgetWidget::ModelViewGadgetWidget(QWidget *parent)
 
 ModelViewGadgetWidget::~ModelViewGadgetWidget()
 {
-    //delete m_pFactory;
+
+}
+
+
+void ModelViewGadgetWidget::setAcFilename(QString acf)
+{
+    if(QFile::exists(acf))
+        acFilename = acf;
+    else
+    {
+        acFilename= acf= ":/modelview/models/warning_sign.obj";
+        m_GlView.cameraHandle()->setFrontView(); // set to front camera to see/read the warning sign
+    }
+}
+
+void ModelViewGadgetWidget::setBgFilename(QString bgf)
+{
+    if (QFile::exists(bgFilename))
+        bgFilename = bgf;
+    else
+    {
+    	qDebug() << "file " << bgf << " doesn't exists";
+    	bgFilename= ":/modelview/models/black.jpg"; // will put a black background if there's no background
+    }
+
 }
 
 //// Public funcitons ////
@@ -87,16 +111,21 @@ void ModelViewGadgetWidget::initializeGL()
     // OpenGL initialization
     m_GlView.initGl();
 
+    m_Light.setPosition(4000.0, -40000.0, 80000.0);
+    m_Light.setAmbientColor(Qt::lightGray);
+
+    m_GlView.cameraHandle()->setDefaultUpVector(glc::Z_AXIS);
+    m_GlView.cameraHandle()->setFrontView();
+    m_GlView.setToOrtho(true); // orthogonal view
+
+    /*
     // Enable VBO usage if configured (default is to disable)
     GLC_State::setVboUsage(vboEnable);
     if (!vboEnable)
     {
 	qDebug("VBOs disabled.  Enable for better performance if GPU supports it. (Most do)");
     }
-
-    m_GlView.reframe(m_ModelBoundingBox);
-    // Calculate camera depth of view
-    m_GlView.setDistMinAndMax(m_World.boundingBox());
+    */
     glEnable(GL_NORMALIZE);
     // Enable antialiasing
     glEnable(GL_MULTISAMPLE);
@@ -107,36 +136,63 @@ void ModelViewGadgetWidget::initializeGL()
 
 void ModelViewGadgetWidget::paintGL()
 {
-    if (loadError)
-        return;
-    // Clear screen
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    // Load identity matrix
-    glLoadIdentity();
+    try
+	{
+		// Clear screen
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Enable antialiasing
-    glEnable(GL_MULTISAMPLE);
+		// OpenGL error handler
+		{
+			GLenum error= glGetError();
+			if (error != GL_NO_ERROR)
+			{
+				GLC_OpenGlException OpenGlException("ModelViewGadgetWidget::paintGL() ", error);
+				throw(OpenGlException);
+			}
+		}
 
-    // define the light
-    m_Light.enable();
+		// Load identity matrix
+		glLoadIdentity();
 
-    // define view matrix
-    m_GlView.glExecuteCam();
-    m_Light.glExecute();
+		// Enable antialiasing
+		glEnable(GL_MULTISAMPLE);
 
-    // Display the collection of GLC_Object
-    m_World.render(0, glc::TransparentRenderFlag);
-    m_World.render(0, glc::ShadingFlag);
+        // Calculate camera depth of view
+        m_GlView.setDistMinAndMax(m_World.boundingBox());
 
-    // Display UI Info (orbit circle)
-    m_MoverController.drawActiveMoverRep();
-    mvInitGLSuccess = true;
+        // define view matrix
+    	m_Light.glExecute();
+        m_GlView.glExecuteCam();
+
+        // Display the collection of GLC_Object
+        m_World.render(0, glc::ShadingFlag);
+        m_World.render(0, glc::TransparentRenderFlag);
+
+        // Display UI Info (orbit circle)
+        m_MoverController.drawActiveMoverRep();
+        mvInitGLSuccess = true;
+    }
+    catch (GLC_Exception &e)
+	{
+		qDebug() << e.what();
+	}
+
 
 }
 
 void ModelViewGadgetWidget::resizeGL(int width, int height)
 {
     m_GlView.setWinGLSize(width, height);   // Compute window aspect ratio
+	// OpenGL error handler
+	{
+		GLenum error= glGetError();
+		if (error != GL_NO_ERROR)
+		{
+			GLC_OpenGlException OpenGlException("ModelViewGadgetWidget::resizeGL() ", error);
+			throw(OpenGlException);
+		}
+	}
+
 }
 
 // Create GLC_Object to display
@@ -145,6 +201,7 @@ void ModelViewGadgetWidget::CreateScene()
     // put a black background if the 3D model is invalid or if the background image is also invalid
     if (acFilename == ":/modelview/models/warning_sign.obj" or !QFile::exists(bgFilename))
         bgFilename= ":/modelview/models/black.jpg";
+
 
     try 
     {
@@ -163,10 +220,11 @@ void ModelViewGadgetWidget::CreateScene()
             m_World= GLC_Factory::instance()->createWorldFromFile(aircraft);
             m_ModelBoundingBox= m_World.boundingBox();
             m_GlView.reframe(m_ModelBoundingBox); // center 3D model in the scene
-            m_GlView.setDistMinAndMax(m_World.boundingBox());
             loadError = false;
+            /*
             if (!mvInitGLSuccess)
                 initializeGL();
+                */
         } else {
             loadError = true;
         }
@@ -187,13 +245,14 @@ void ModelViewGadgetWidget::wheelEvent(QWheelEvent * e)
 
 void ModelViewGadgetWidget::mousePressEvent(QMouseEvent *e)
 {
-        if (m_MoverController.hasActiveMover()) return;
+	GLC_UserInput userInput(e->x(), e->y());
+	if (m_MoverController.hasActiveMover()) return;
 
         switch (e->button())
         {
         case (Qt::LeftButton):
                 m_MotionTimer.stop();
-                m_MoverController.setActiveMover(GLC_MoverController::TurnTable, e);
+                m_MoverController.setActiveMover(GLC_MoverController::TurnTable, userInput);
                 updateGL();
                 break;
         case (Qt::RightButton):
@@ -211,8 +270,9 @@ void ModelViewGadgetWidget::mousePressEvent(QMouseEvent *e)
 
 void ModelViewGadgetWidget::mouseMoveEvent(QMouseEvent * e)
 {
-        if (not m_MoverController.hasActiveMover()) return;
-        m_MoverController.move(e);
+	GLC_UserInput userInput(e->x(), e->y());
+	if (not m_MoverController.hasActiveMover()) return;
+        m_MoverController.move(userInput);
         m_GlView.setDistMinAndMax(m_World.boundingBox());
         updateGL();
 }

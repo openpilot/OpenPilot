@@ -50,23 +50,9 @@ class ModelViewGadgetWidget : public QGLWidget
 public:
     ModelViewGadgetWidget(QWidget *parent = 0);
    ~ModelViewGadgetWidget();
-   void setAcFilename(QString acf)
-   {
-       if(QFile::exists(acf))
-           acFilename = acf;
-       else
-       {
-           acFilename= acf= ":/modelview/models/warning_sign.obj";
-           m_GlView.cameraHandle()->setFrontView(); // set to front camera to see/read the warning sign
-       }
-   }
-   void setBgFilename(QString bgf)
-   {
-       if (QFile::exists(bgFilename))
-           bgFilename = bgf;
-       else
-           bgFilename= ":/modelview/models/black.jpg"; // will put a black background if there's no background
-   }
+   void setAcFilename(QString acf);
+
+   void setBgFilename(QString bgf);
    void setVboEnable(bool eVbo) { vboEnable = eVbo; }
    void reloadScene();
    void updateAttitude(int value);
@@ -100,7 +86,6 @@ private:
     GLC_BoundingBox m_ModelBoundingBox;
     //! The timer used for motion
     QTimer m_MotionTimer;
-    int yMouseStart;
 
     QString acFilename;
     QString bgFilename;

@@ -166,11 +166,14 @@ public:
 	{m_Name= name;}
 
 	//! Set the instance attributes
-	void setAttributes(const GLC_Attributes& attr)
+	inline void setAttributes(const GLC_Attributes& attr)
 	{
 		delete m_pAttributes;
 		m_pAttributes= new GLC_Attributes(attr);
 	}
+
+	//! Update absolute matrix off children and all occurences of this instance
+	void updateOccurencesAbsoluteMatrix();
 
 
 //@}

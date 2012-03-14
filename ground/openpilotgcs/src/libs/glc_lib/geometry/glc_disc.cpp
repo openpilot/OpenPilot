@@ -30,7 +30,7 @@ GLC_Disc::GLC_Disc(double radius, double angle)
 , m_Angle(angle)
 , m_Step(0)
 {
-
+	createMeshAndWire();
 }
 
 GLC_Disc::GLC_Disc(const GLC_Disc& disc)
@@ -40,7 +40,7 @@ GLC_Disc::GLC_Disc(const GLC_Disc& disc)
 , m_Angle(disc.m_Angle)
 , m_Step(disc.m_Step)
 {
-
+	createMeshAndWire();
 }
 
 GLC_Disc::~GLC_Disc()

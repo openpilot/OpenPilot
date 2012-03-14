@@ -76,6 +76,9 @@ public:
 	//! Construct a 3d vector from another 3d float vector
 	inline GLC_Vector3d(const GLC_Vector3df &vector);
 
+	//! Construct a 3d vector from a 2d float vector
+	inline GLC_Vector3d(const GLC_Vector2d &vector);
+
 //@}
 
 //////////////////////////////////////////////////////////////////////
@@ -111,8 +114,11 @@ public:
 	/*! retrieve component corresponding to mask vector NULL component*/
 	inline GLC_Vector2d toVector2d(const GLC_Vector3d& mask) const;
 
-	//! Return the Angle from this vector to the given vector
+	//! Return the Angle from this vector to the given vector (from 0 to PI)
 	inline double angleWithVect(GLC_Vector3d Vect) const;
+
+	//! Return the signed angle from this vector to th given vector with the given direction (from 0 to -PI and 0 to PI)
+	inline double signedAngleWithVect(GLC_Vector3d Vect, const GLC_Vector3d& dir) const;
 
 	//! Return the float 3D vector from this vector
 	inline GLC_Vector3df toVector3df() const
@@ -289,6 +295,18 @@ inline QDataStream &operator>>(QDataStream &stream, GLC_Vector3d &vector)
 	return stream;
 }
 
+//! Return the determinant of the given Matrix 3X3
+inline double getDeterminant3x3(const double *Mat3x3)
+{
+	double Determinant;
+
+	Determinant= Mat3x3[0] * ( Mat3x3[4] * Mat3x3[8] - Mat3x3[7] * Mat3x3[5]);
+	Determinant+= - Mat3x3[3] * ( Mat3x3[1] * Mat3x3[8] - Mat3x3[7] * Mat3x3[2]);
+	Determinant+= Mat3x3[6] * ( Mat3x3[1] * Mat3x3[5] - Mat3x3[4] * Mat3x3[2]);
+
+	return Determinant;
+}
+
 //////////////////////////////////////////////////////////////////////
 // inline method implementation
 //////////////////////////////////////////////////////////////////////
@@ -312,6 +330,13 @@ GLC_Vector3d::GLC_Vector3d(const GLC_Vector3df &vector)
 	m_Vector[0]= static_cast<double>(vector.m_Vector[0]);
 	m_Vector[1]= static_cast<double>(vector.m_Vector[1]);
 	m_Vector[2]= static_cast<double>(vector.m_Vector[2]);
+}
+
+GLC_Vector3d::GLC_Vector3d(const GLC_Vector2d &vector)
+{
+	m_Vector[0]= vector.getX();
+	m_Vector[1]= vector.getY();
+	m_Vector[2]= 0.0;
 }
 
 GLC_Vector3d& GLC_Vector3d::operator = (const GLC_Vector3df &Vect)
@@ -417,6 +442,48 @@ double GLC_Vector3d::angleWithVect(GLC_Vector3d Vect) const
 		return acos(ThisVect * Vect);
 	}
 	else return 0.0;
+}
+
+double GLC_Vector3d::signedAngleWithVect(GLC_Vector3d Vect, const GLC_Vector3d& dir) const
+{
+	double angle= 0.0;
+
+	GLC_Vector3d ThisVect(*this);
+	ThisVect.normalize();
+	Vect.normalize();
+	if (Vect == ThisVect.inverted())
+	{
+		angle= glc::PI;
+	}
+	else if (Vect != ThisVect)
+	{
+		// Rotation axis
+		const GLC_Vector3d VectAxeRot(ThisVect ^ Vect);
+		// Check if the rotation axis vector is null
+		if (!VectAxeRot.isNull())
+		{
+			double mat3x3[9];
+			mat3x3[0]= ThisVect.m_Vector[0];
+			mat3x3[1]= ThisVect.m_Vector[1];
+			mat3x3[2]= ThisVect.m_Vector[2];
+
+			mat3x3[3]= Vect.m_Vector[0];
+			mat3x3[4]= Vect.m_Vector[1];
+			mat3x3[5]= Vect.m_Vector[2];
+
+			mat3x3[6]= dir.m_Vector[0];
+			mat3x3[7]= dir.m_Vector[1];
+			mat3x3[8]= dir.m_Vector[2];
+
+			double det= getDeterminant3x3(mat3x3);
+
+			double sign= 1.0;
+			if (det != 0) sign= fabs(det) / det;
+			angle= acos(ThisVect * Vect) * sign;
+		}
+	}
+
+	return angle;
 }
 
 QString GLC_Vector3d::toString() const

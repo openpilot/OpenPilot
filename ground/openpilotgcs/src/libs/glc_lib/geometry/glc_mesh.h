@@ -183,9 +183,11 @@ public:
 	//! Create a mesh from the given LOD index
 	GLC_Mesh* createMeshFromGivenLod(int lodIndex);
 
-
 	//! Transform mesh vertice by the given matrix
 	GLC_Mesh& transformVertice(const GLC_Matrix4x4& matrix);
+
+	//! Return the volume of this mesh
+	virtual double volume();
 
 //@}
 //////////////////////////////////////////////////////////////////////
@@ -264,6 +266,9 @@ public:
 	//! Release client VBO
 	virtual void releaseVboClientSide(bool update);
 
+	//! Set VBO usage
+	virtual void setVboUsage(bool usage);
+
 //@}
 
 //////////////////////////////////////////////////////////////////////
@@ -309,10 +314,10 @@ private:
 	void finishSerialized();
 
 	//! Move Indexs from the primitive groups to the mesh Data LOD and Set IBOs offsets
-	void finishVbo();
+	//void finishVbo();
 
 	//! Move Indexs from the primitive groups to the mesh Data LOD and Set Index offsets
-	void finishNonVbo();
+	void moveIndexToMeshDataLod();
 
 	//! Use VBO to Draw primitives from the specified GLC_PrimitiveGroup
 	inline void vboDrawPrimitivesOf(GLC_PrimitiveGroup*);
@@ -353,6 +358,9 @@ private:
 	//! The overwrite transparency render loop
 	void OverwriteTransparencyRenderLoop(const GLC_RenderProperties&, bool);
 
+	//! The overwrite transparency and material render loop
+	void OverwriteTransparencyAndMaterialRenderLoop(const GLC_RenderProperties&, bool);
+
 	//! The body selection render loop
 	void bodySelectionRenderLoop(bool);
 
@@ -370,6 +378,13 @@ private:
 
 	//! Copy Bulk data
 	void copyBulkData(GLC_Mesh* pLodMesh, const QHash<GLuint, GLuint>& tagetToSourceIndexMap, int maxIndex);
+
+	//! Return the equivalent triangles index of the strips index of given LOD and material ID
+	IndexList equivalentTrianglesIndexOfstripsIndex(int lodIndex, GLC_uint materialId);
+
+	//! Return the equivalent triangles index of the fan index of given LOD and material ID
+	IndexList equivalentTrianglesIndexOfFansIndex(int lodIndex, GLC_uint materialId);
+
 
 //@}
 

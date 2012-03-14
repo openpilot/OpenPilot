@@ -32,7 +32,7 @@ const QString GLC_BSRep::m_Suffix("BSRep");
 const QUuid GLC_BSRep::m_Uuid("{d6f97789-36a9-4c2e-b667-0e66c27f839f}");
 
 // The binary rep version
-const quint32 GLC_BSRep::m_Version= 102;
+const quint32 GLC_BSRep::m_Version= 103;
 
 // Mutex used by compression
 QMutex GLC_BSRep::m_CompressionMutex;
@@ -181,6 +181,11 @@ QString GLC_BSRep::suffix()
 	return m_Suffix;
 }
 
+quint32 GLC_BSRep::version()
+{
+	return m_Version;
+}
+
 //////////////////////////////////////////////////////////////////////
 //name Set Functions
 //////////////////////////////////////////////////////////////////////
@@ -322,7 +327,7 @@ bool GLC_BSRep::headerIsOk()
 	// Set the version of the data stream
 	m_DataStream.setVersion(QDataStream::Qt_4_6);
 
-	bool headerOk= (uuid == m_Uuid) && (version == m_Version) && writeFinished;
+	bool headerOk= (uuid == m_Uuid) && (version <= m_Version) && (version > 101) && writeFinished;
 
 	return headerOk;
 }

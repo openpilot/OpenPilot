@@ -110,8 +110,8 @@ public:
 	//! Copy from an GLC_Vector3d
 	inline GLC_Vector4d(const GLC_Vector2d &Vect)
 	{
-		vector[0]= Vect.dVecteur[0];
-		vector[1]= Vect.dVecteur[1];
+		vector[0]= Vect.m_Vector[0];
+		vector[1]= Vect.m_Vector[1];
 		vector[2]= 0.0;
 		vector[3]= 1.0;
 	}
@@ -168,8 +168,8 @@ public:
 	//! Overload "=" operator
 	inline GLC_Vector4d& operator = (const GLC_Vector2d &Vect)
 	{
-		vector[0]= Vect.dVecteur[0];
-		vector[1]= Vect.dVecteur[1];
+		vector[0]= Vect.m_Vector[0];
+		vector[1]= Vect.m_Vector[1];
 		vector[2]= 0.0;
 		vector[3]= 1.0;
 

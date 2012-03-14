@@ -22,7 +22,9 @@
 
 //! \file glc_viewport.cpp implementation of the GLC_Viewport class.
 
+#include <QtOpenGL>
 
+#include "../glu/glc_glu.h"
 #include "glc_viewport.h"
 #include "../glc_openglexception.h"
 #include "../glc_ext.h"
@@ -85,6 +87,38 @@ GLC_Viewport::~GLC_Viewport()
 //////////////////////////////////////////////////////////////////////
 // Get Functions
 //////////////////////////////////////////////////////////////////////
+GLC_Point2d  GLC_Viewport::normalyseMousePosition(int x, int y)
+{
+	double nX= 0.0;
+	double nY= 0.0;
+	if (m_WindowHSize != 0)
+	{
+		nX= static_cast<double>(x) / static_cast<double>(m_WindowHSize);
+	}
+
+	if (m_WindowVSize != 0)
+	{
+		nY= static_cast<double>(y) / static_cast<double>(m_WindowVSize);
+	}
+
+	return GLC_Point2d(nX, nY);
+}
+
+GLC_Point2d GLC_Viewport::mapToOpenGLScreen(int x, int y)
+{
+	GLC_Point2d nPos= normalyseMousePosition(x, y);
+
+	return mapNormalyzeToOpenGLScreen(nPos.getX(), nPos.getY());
+}
+
+GLC_Point2d GLC_Viewport::mapNormalyzeToOpenGLScreen(double x, double y)
+{
+	GLC_Point2d pos(x, y);
+	pos= pos * 2.0;
+	pos.setY(pos.getY() * -1.0);
+	pos= pos + GLC_Point2d(-1.0, 1.0);
+	return pos;
+}
 
 GLC_Vector3d GLC_Viewport::mapPosMouse( GLdouble Posx, GLdouble Posy) const
 {
@@ -106,13 +140,19 @@ GLC_Vector3d GLC_Viewport::mapPosMouse( GLdouble Posx, GLdouble Posy) const
 	return VectMouse;
 }
 
+GLC_Vector3d GLC_Viewport::mapNormalyzePosMouse(double Posx, double Posy) const
+{
+	double screenX= Posx * static_cast<double>(m_WindowHSize);
+	double screenY= Posy * static_cast<double>(m_WindowVSize);
+	return mapPosMouse(screenX, screenY);
+}
+
 //////////////////////////////////////////////////////////////////////
 // Public OpenGL Functions
 //////////////////////////////////////////////////////////////////////
 
 void GLC_Viewport::initGl()
 {
-	// OpenGL initialisation from NEHE production
 	m_pQGLWidget->qglClearColor(m_BackgroundColor);       // Background
 	glClearDepth(1.0f);                                   // Depth Buffer Setup
 	glShadeModel(GL_SMOOTH);                              // Enable Smooth Shading
@@ -120,24 +160,20 @@ void GLC_Viewport::initGl()
 	glDepthFunc(GL_LEQUAL);                               // The Type Of Depth Testing To Do
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);    // Really Nice Perspective Calculation
 	glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-	// Init GLC_State
-	GLC_State::init();
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glPolygonOffset (1.0f, 1.0f);
 }
 
 void GLC_Viewport::glExecuteCam(void)
 {
-	m_pViewCam->glExecute();
 	renderImagePlane();
+	m_pViewCam->glExecute();
 }
 
 void GLC_Viewport::updateProjectionMat(void)
 {
-	// Make opengl context attached the current One
-	m_pQGLWidget->makeCurrent();
-
-	glMatrixMode(GL_PROJECTION);						// select The Projection Matrix
-	glLoadIdentity();									// Reset The Projection Matrix
+	GLC_Context::current()->glcMatrixMode(GL_PROJECTION);						// select The Projection Matrix
+	GLC_Context::current()->glcLoadIdentity();									// Reset The Projection Matrix
 
 	if (m_UseParallelProjection)
 	{
@@ -148,18 +184,21 @@ void GLC_Viewport::updateProjectionMat(void)
 		const double right=  -left;
 		const double bottom= - height * 0.5;
 		const double top= -bottom;
-		glOrtho(left, right, bottom, top, m_dDistanceMini, m_DistanceMax);
+		GLC_Context::current()->glcOrtho(left, right, bottom, top, m_dDistanceMini, m_DistanceMax);
 	}
 	else
 	{
-		gluPerspective(m_ViewAngle, m_AspectRatio, m_dDistanceMini, m_DistanceMax);
+	    const double yMax= m_dDistanceMini * tan(m_ViewAngle * glc::PI / 360.0);
+	    const double yMin= -yMax;
+	    const double xMax= yMax * m_AspectRatio;
+	    const double xMin= -xMax;
+	    GLC_Context::current()->glcFrustum(xMin, xMax, yMin, yMax, m_dDistanceMini, m_DistanceMax);
 	}
 
 	// Save the projection matrix
-	glGetDoublev(GL_PROJECTION_MATRIX, m_ProjectionMatrix.setData());
+	m_ProjectionMatrix= GLC_Context::current()->projectionMatrix();
 
-	glMatrixMode(GL_MODELVIEW);							// select The Modelview Matrix
-	glLoadIdentity();									// Reset The Modelview Matrix
+	GLC_Context::current()->glcMatrixMode(GL_MODELVIEW);							// select The Modelview Matrix
 }
 
 void GLC_Viewport::forceAspectRatio(double ratio)
@@ -223,7 +262,7 @@ GLC_Point3d GLC_Viewport::unProject(int x, int y) const
 
 	// OpenGL ccordinate of selected point
 	GLdouble pX, pY, pZ;
-	gluUnProject((GLdouble) x, (GLdouble) (m_WindowVSize - y) , Depth
+	glc::gluUnProject((GLdouble) x, (GLdouble) (m_WindowVSize - y) , Depth
 		, m_pViewCam->modelViewMatrix().getData(), m_ProjectionMatrix.getData(), Viewport, &pX, &pY, &pZ);
 
 	return GLC_Point3d(pX, pY, pZ);
@@ -250,7 +289,7 @@ QList<GLC_Point3d> GLC_Viewport::unproject(const QList<int>& list)const
 		const int y= m_WindowVSize - list.at(i + 1);
 		glReadPixels(x, y , 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &Depth);
 
-		gluUnProject(static_cast<GLdouble>(x), static_cast<GLdouble>(y) , Depth , m_pViewCam->modelViewMatrix().getData()
+		glc::gluUnProject(static_cast<GLdouble>(x), static_cast<GLdouble>(y) , Depth , m_pViewCam->modelViewMatrix().getData()
 				, m_ProjectionMatrix.getData(), Viewport, &pX, &pY, &pZ);
 		unprojectedPoints.append(GLC_Point3d(pX, pY, pZ));
 	}
@@ -331,13 +370,13 @@ GLC_uint GLC_Viewport::selectBody(GLC_3DViewInstance* pInstance, int x, int y)
 	m_pQGLWidget->qglClearColor(Qt::black);
 	GLC_State::setSelectionMode(true);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glLoadIdentity();
+	GLC_Context::current()->glcLoadIdentity();
 
 	glExecuteCam();
 
 	// Draw the scene
 	glDisable(GL_BLEND);
-	glDisable(GL_LIGHTING);
+	GLC_Context::current()->glcEnableLighting(false);
 	glDisable(GL_TEXTURE_2D);
 
 	pInstance->renderForBodySelection();
@@ -360,13 +399,13 @@ QPair<int, GLC_uint> GLC_Viewport::selectPrimitive(GLC_3DViewInstance* pInstance
 	m_pQGLWidget->qglClearColor(Qt::black);
 	GLC_State::setSelectionMode(true);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glLoadIdentity();
+	GLC_Context::current()->glcLoadIdentity();
 
 	glExecuteCam();
 
 	// Draw the scene
 	glDisable(GL_BLEND);
-	glDisable(GL_LIGHTING);
+	GLC_Context::current()->glcEnableLighting(false);
 	glDisable(GL_TEXTURE_2D);
 
 	pInstance->renderForBodySelection();
@@ -508,13 +547,13 @@ void GLC_Viewport::updateMinimumRatioSize()
 void GLC_Viewport::loadBackGroundImage(const QString& ImageFile)
 {
 	delete m_pImagePlane;
-	m_pImagePlane= new GLC_ImagePlane(m_pQGLWidget->context(), ImageFile);
+	m_pImagePlane= new GLC_ImagePlane(ImageFile);
 }
 
 void GLC_Viewport::loadBackGroundImage(const QImage& image)
 {
 	delete m_pImagePlane;
-	m_pImagePlane= new GLC_ImagePlane(m_pQGLWidget->context(), image);
+	m_pImagePlane= new GLC_ImagePlane(image);
 }
 
 void GLC_Viewport::deleteBackGroundImage()

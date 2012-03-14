@@ -22,7 +22,7 @@
  *****************************************************************************/
 //! \file glc_pointsprite.h interface for the GLC_PointSprite class.
 
-#include "glc_geometry.h"
+#include "glc_pointcloud.h"
 #include <QVector>
 
 #include "../glc_config.h"
@@ -37,7 +37,7 @@
 /*! An GLC_PointSprite is just a simple 3D Sprite Point*/
 //////////////////////////////////////////////////////////////////////
 
-class GLC_LIB_EXPORT GLC_PointSprite : public GLC_Geometry
+class GLC_LIB_EXPORT GLC_PointSprite : public GLC_PointCloud
 {
 public:
 //////////////////////////////////////////////////////////////////////
@@ -47,6 +47,9 @@ public:
 	//! Default constructor
 	/*! The material must exist and had texture*/
 	GLC_PointSprite(float, GLC_Material*);
+
+	//! Copy constructor
+	GLC_PointSprite(const GLC_PointSprite& point);
 
 	//! Default destructor
 	virtual ~GLC_PointSprite();
@@ -60,9 +63,6 @@ public:
 	//! Return the point size
 	inline float size() const
 	{return m_Size;}
-
-	//! Return the point bounding box
-	virtual const GLC_BoundingBox& boundingBox(void);
 
 	//! Return a copy of the geometry
 	virtual GLC_Geometry* clone() const;

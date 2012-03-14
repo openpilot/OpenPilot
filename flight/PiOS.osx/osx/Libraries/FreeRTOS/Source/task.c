@@ -61,6 +61,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 /* Defining MPU_WRAPPERS_INCLUDED_FROM_API_FILE prevents task.h from redefining
 all the API functions to use the MPU wrappers.  That should only be done when
@@ -1813,6 +1814,8 @@ portTickType xTimeToWake;
 #endif /* configUSE_TIMERS */
 /*-----------------------------------------------------------*/
 
+#include "assert.h"
+extern volatile portBASE_TYPE xInterruptsEnabled;
 signed portBASE_TYPE xTaskRemoveFromEventList( const xList * const pxEventList )
 {
 tskTCB *pxUnblockedTCB;
@@ -1820,6 +1823,8 @@ portBASE_TYPE xReturn;
 
 	/* THIS FUNCTION MUST BE CALLED WITH INTERRUPTS DISABLED OR THE
 	SCHEDULER SUSPENDED.  It can also be called from within an ISR. */
+
+	assert( uxSchedulerSuspended || xInterruptsEnabled == pdFALSE);
 
 	/* The event list is sorted in priority order, so we can remove the
 	first in the list, remove the TCB from the delayed list, and add
@@ -1985,10 +1990,8 @@ static portTASK_FUNCTION( prvIdleTask, pvParameters )
 		}
 		#endif
 		
-		static int i = 0;
-		i++;
-		if (i % 100000 == 0)
-			printTasks();
+		
+		//usleep(5);
 	}
 } /*lint !e715 pvParameters is not accessed but all task functions require the same prototype. */
 

@@ -187,6 +187,7 @@ SRC += $(RTOSSRCDIR)/list.c
 SRC += $(RTOSSRCDIR)/queue.c
 UNAME := $(shell uname)
 SRC += $(RTOSSRCDIR)/task.c
+SRC += $(RTOSSRCDIR)/timers.c
 SRC += $(RTOSSRCDIR)/portable/GCC/Posix/port.c
 SRC += $(RTOSSRCDIR)/portable/MemMang/heap_3.c
 

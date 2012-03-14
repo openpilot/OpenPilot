@@ -36,6 +36,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <netinet/in.h>
+#include "fifo_buffer.h"
 
 struct pios_tcp_cfg {
 	const char *ip;
@@ -60,6 +61,7 @@ typedef struct {
 	pios_com_callback rx_in_cb;
 	uint32_t rx_in_context;
 	
+	t_fifo_buffer rx_fifo;
 	uint8_t rx_buffer[PIOS_TCP_RX_BUFFER_SIZE];
 	uint8_t tx_buffer[PIOS_TCP_RX_BUFFER_SIZE];
 } pios_tcp_dev;

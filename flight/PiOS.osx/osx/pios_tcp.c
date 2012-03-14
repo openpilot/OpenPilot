@@ -81,13 +81,12 @@ static void PIOS_TCP_RxTask(void *tcp_dev_n)
 
 	pios_tcp_dev *tcp_dev = (pios_tcp_dev *) tcp_dev_n;
 	while(1) {
-		if (tcp_dev->received) {
+		
+		if (tcp_dev->rx_in_cb) {
+			char buffer[PIOS_TCP_RX_BUFFER_SIZE];
+			int received = fifoBuf_getData(&tcp_dev->rx_fifo, buffer, PIOS_TCP_RX_BUFFER_SIZE);
+			(void) (tcp_dev->rx_in_cb)(tcp_dev->rx_in_context, (uint8_t *) buffer, received, NULL, &rx_need_yield);
 
-			if (tcp_dev->rx_in_cb) {
-				(void) (tcp_dev->rx_in_cb)(tcp_dev->rx_in_context, &tcp_dev->rx_buffer[0], tcp_dev->received, NULL, &rx_need_yield);
-				tcp_dev->received = 0;
-			}
-			
 			//fprintf(stderr, "Received %d\n", received);
 #if defined(PIOS_INCLUDE_FREERTOS)
 			// Not sure about this
@@ -95,9 +94,11 @@ static void PIOS_TCP_RxTask(void *tcp_dev_n)
 				vPortYieldFromISR();
 			}
 #endif	/* PIOS_INCLUDE_FREERTOS */
-
-			vTaskDelay(1);
-		}
+			
+		} else
+			fifoBuf_clearData(&tcp_dev->rx_fifo);	
+		
+		vTaskDelay(1);
 	}
 }
 
@@ -111,6 +112,8 @@ static void *PIOS_TCP_RxThread(void *tcp_dev_n)
 	
 	pios_tcp_dev *tcp_dev = (pios_tcp_dev*) tcp_dev_n;
 	
+	const int INCOMING_BUFFER_SIZE = 16;
+	char incoming_buffer[INCOMING_BUFFER_SIZE];
 	/**
 	 * com devices never get closed except by application "reboot"
 	 * we also never give up our mutex except for waiting
@@ -128,13 +131,13 @@ static void *PIOS_TCP_RxThread(void *tcp_dev_n)
 		
 		int received;
 		do {
-			if (tcp_dev->received == 0) {
-				// Received is used to track the scoket whereas the dev variable is only updated when it can be
-				received = read(tcp_dev->socket_connection, &tcp_dev->rx_buffer[0], PIOS_UDP_RX_BUFFER_SIZE);
-				tcp_dev->received = received;
-			} else
-				usleep(1);
+			// Received is used to track the scoket whereas the dev variable is only updated when it can be
+			received = read(tcp_dev->socket_connection, incoming_buffer, INCOMING_BUFFER_SIZE);
 			
+			while(fifoBuf_getFree(&tcp_dev->rx_fifo) < received)
+				usleep(10);
+			
+			fifoBuf_putData(&tcp_dev->rx_fifo, incoming_buffer, received);
 		} while(received > 0);
 		
 		if (-1 == shutdown(tcp_dev->socket_connection, SHUT_RDWR))
@@ -184,6 +187,8 @@ int32_t PIOS_TCP_Init(uint32_t *tcp_id, const struct pios_tcp_cfg * cfg)
 		perror("Socket listen failed\n");
 		exit(EXIT_FAILURE);
 	}
+	
+	fifoBuf_init(&tcp_dev->rx_fifo, tcp_dev->rx_buffer, PIOS_TCP_RX_BUFFER_SIZE);
 	
 	pthread_create(&tcp_dev->rxThread, NULL, PIOS_TCP_RxThread, (void*)tcp_dev);
 

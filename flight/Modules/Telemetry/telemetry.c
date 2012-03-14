@@ -274,6 +274,7 @@ static void telemetryTxTask(void *parameters)
 	while (1) {
 		// Wait for queue message
 		if (xQueueReceive(queue, &ev, portMAX_DELAY) == pdTRUE) {
+			//fprintf(stderr,".");
 			// Process event
 			processObjEvent(&ev);
 		}
@@ -292,6 +293,8 @@ static void telemetryTxPriTask(void *parameters)
 	while (1) {
 		// Wait for queue message
 		if (xQueueReceive(priorityQueue, &ev, portMAX_DELAY) == pdTRUE) {
+			//fprintf(stderr,"*");
+
 			// Process event
 			processObjEvent(&ev);
 		}
@@ -308,6 +311,7 @@ static void telemetryRxTask(void *parameters)
 
 	// Task loop
 	while (1) {
+		//fprintf(stderr,"-");
 #if defined(PIOS_INCLUDE_USB)
 		// Determine input port (USB takes priority over telemetry port)
 		if (PIOS_USB_CheckAvailable(0) && PIOS_COM_TELEM_USB) {

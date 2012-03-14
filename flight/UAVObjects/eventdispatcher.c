@@ -288,6 +288,7 @@ static void eventTask()
 	{
 		// Calculate delay time
 		delayMs = timeToNextUpdateMs-(xTaskGetTickCount()*portTICK_RATE_MS);
+		//fprintf(stderr,"eventDispatcher %d\n", delayMs);
 		if (delayMs < 0)
 		{
 			delayMs = 0;

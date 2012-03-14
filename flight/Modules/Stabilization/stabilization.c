@@ -138,6 +138,8 @@ MODULE_INITCALL(StabilizationInitialize, StabilizationStart)
 /**
  * Module task
  */
+int stabilization_step;
+int stabilization_count;
 static void stabilizationTask(void* parameters)
 {
 	UAVObjEvent ev;
@@ -158,12 +160,27 @@ static void stabilizationTask(void* parameters)
 	while(1) {
 		PIOS_WDG_UpdateFlag(PIOS_WDG_STABILIZATION);
 
+		stabilization_step = 0;
+		stabilization_count ++;
+		static int i;
+		static uint32_t last_time;
+		i++;
+		if (i % 5000 == 0) {
+			float dT = PIOS_DELAY_DiffuS(last_time) / 10.0e6;
+			fprintf(stderr, "Stabilization relative timing: %f\n", dT);
+			last_time = PIOS_DELAY_GetRaw();
+		}
+
+		stabilization_step = 1;
+
 		// Wait until the AttitudeRaw object is updated, if a timeout then go to failsafe
 		if ( xQueueReceive(queue, &ev, FAILSAFE_TIMEOUT_MS / portTICK_RATE_MS) != pdTRUE )
 		{
 			AlarmsSet(SYSTEMALARMS_ALARM_STABILIZATION,SYSTEMALARMS_ALARM_WARNING);
 			continue;
 		}
+
+		stabilization_step = 2;
 
 		dT = PIOS_DELAY_DiffuS(timeval) * 1.0e-6f;
 		timeval = PIOS_DELAY_GetRaw();
@@ -172,6 +189,8 @@ static void stabilizationTask(void* parameters)
 		StabilizationDesiredGet(&stabDesired);
 		AttitudeActualGet(&attitudeActual);
 		GyrosGet(&gyrosData);
+		
+		stabilization_step = 3;
 
 #if defined(DIAGNOSTICS)
 		RateDesiredGet(&rateDesired);
@@ -183,6 +202,8 @@ static void stabilizationTask(void* parameters)
 		float q_desired[4];
 		float q_error[4];
 		float local_error[3];
+
+		stabilization_step = 4;
 
 		// Essentially zero errors for anything in rate or none
 		if(stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_ROLL] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE)
@@ -206,6 +227,8 @@ static void stabilizationTask(void* parameters)
 		quat_inverse(q_error);
 		Quaternion2RPY(q_error, local_error);
 
+		stabilization_step = 5;
+
 #else
 		// Simpler algorithm for CC, less memory
 		float local_error[3] = {stabDesired.Roll - attitudeActual.Roll,
@@ -222,6 +245,8 @@ static void stabilizationTask(void* parameters)
 		float *attitudeDesiredAxis = &stabDesired.Roll;
 		float *actuatorDesiredAxis = &actuatorDesired.Roll;
 		float *rateDesiredAxis = &rateDesired.Roll;
+		
+		stabilization_step = 6;
 
 		//Calculate desired rate
 		for(uint8_t i=0; i< MAX_AXES; i++)
@@ -289,6 +314,8 @@ static void stabilizationTask(void* parameters)
 			}
 		}
 
+		stabilization_step = 7;
+
 		uint8_t shouldUpdate = 1;
 #if defined(DIAGNOSTICS)
 		RateDesiredSet(&rateDesired);
@@ -335,6 +362,8 @@ static void stabilizationTask(void* parameters)
 			}
 		}
 
+		stabilization_step = 8;
+
 		// Save dT
 		actuatorDesired.UpdateTime = dT * 1000;
 
@@ -349,6 +378,8 @@ static void stabilizationTask(void* parameters)
 			ActuatorDesiredSet(&actuatorDesired);
 		}
 
+		stabilization_step = 9;
+
 		if(flightStatus.Armed != FLIGHTSTATUS_ARMED_ARMED ||
 		   (lowThrottleZeroIntegral && stabDesired.Throttle < 0) ||
 		   !shouldUpdate)
@@ -356,6 +387,7 @@ static void stabilizationTask(void* parameters)
 			ZeroPids();
 		}
 
+		stabilization_step = 10;
 
 		// Clear alarms
 		AlarmsClear(SYSTEMALARMS_ALARM_STABILIZATION);

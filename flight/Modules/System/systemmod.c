@@ -50,7 +50,7 @@
 #include "taskmonitor.h"
 
 // Private constants
-#define SYSTEM_UPDATE_PERIOD_MS 1000
+#define SYSTEM_UPDATE_PERIOD_MS 5000
 #define LED_BLINK_RATE_HZ 5
 
 #ifndef IDLE_COUNTS_PER_SEC_AT_NO_LOAD
@@ -197,7 +197,7 @@ static void systemTask(void *parameters)
 		if(flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED) {
 			vTaskDelayUntil(&lastSysTime, SYSTEM_UPDATE_PERIOD_MS / portTICK_RATE_MS / (LED_BLINK_RATE_HZ * 2) );
 		} else {
-			vTaskDelayUntil(&lastSysTime, SYSTEM_UPDATE_PERIOD_MS / portTICK_RATE_MS);
+			vTaskDelayUntil(&lastSysTime, 50); //SYSTEM_UPDATE_PERIOD_MS / portTICK_RATE_MS);
 		}
 	}
 }

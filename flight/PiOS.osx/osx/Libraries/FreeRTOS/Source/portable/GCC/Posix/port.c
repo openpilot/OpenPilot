@@ -452,8 +452,8 @@ sigset_t xSignalToBlock;
 		i++;
 		if (i % 1000 == 0)
 			fprintf(stderr,".");
-		if (i % 5000 == 0)
-			printTasks();
+		//if (i % 5000 == 0)
+		//	printTasks();
 	}
 	
 	debug_printf( "Cleaning Up, Exiting.\n" );
@@ -1197,7 +1197,7 @@ void pauseSelf()
 static int pauseOtherThread(xTaskHandle hTask)
 {
 	const int MAX_TIME = 10000; // us
-	const int MAX_ATTEMPTS = 5;
+	const int MAX_ATTEMPTS = 100;
 	
 	assert(xInterruptsEnabled == pdTRUE);
 
@@ -1280,6 +1280,7 @@ static void resumeThread(xTaskHandle hTask)
  */
 tskTCB *lastClaim;
 int lastClaimType;
+int claim_count = 0;
 static void claimRunningSemaphore(int source)
 {
 	//fprintf(stderr,"Claimed the semaphore(%d) %s\r\n", source, threadToName(pthread_self()));
@@ -1293,20 +1294,24 @@ static void claimRunningSemaphore(int source)
 	
 	lastClaim = (tskTCB *) hTask;
 	lastClaimType = source;
+	claim_count ++;
 }
 
 /**
  * Claims the running semaphore or fails
  */
 tskTCB *lastRelease;
+int release_count = 0;
 static void releaseRunningSemaphore()
 {
 	assert( 0 == pthread_mutex_unlock( &xRunningThread ) ); 
 	//fprintf(stderr,"Released the semaphore %s\r\n", threadToName(pthread_self()));
 	
 	xTaskHandle hTask = prvGetTaskHandle( pthread_self() );
-	lastRelease = (tskTCB *) hTask; 
+	assert( lastClaim == hTask );
+	lastRelease = (tskTCB *) hTask;
 
+	release_count++;
 }
 
 

@@ -209,6 +209,15 @@ static void AttitudeTask(void *parameters)
 			first_run = true;
 		}
 
+		static int i;
+		static uint32_t last_time;
+		i++;
+		if (i % 5000 == 0) {
+			float dT = PIOS_DELAY_DiffuS(last_time) / 10.0e6;
+			fprintf(stderr, "Attitude relative timing: %f\n", dT);
+			last_time = PIOS_DELAY_GetRaw();
+		}
+
 		// This  function blocks on data queue
 		switch (revoSettings.FusionAlgorithm ) {
 			case REVOSETTINGS_FUSIONALGORITHM_COMPLIMENTARY:

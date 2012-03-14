@@ -122,6 +122,7 @@ MODULE_INITCALL(SensorsInitialize, SensorsStart)
 /**
  * Simulated sensor task.  Run a model of the airframe and produce sensor values
  */
+int sensors_count;
 static void SensorsTask(void *parameters)
 {
 	portTickType lastSysTime;
@@ -139,19 +140,23 @@ static void SensorsTask(void *parameters)
 	homeLocation.Set = HOMELOCATION_SET_TRUE;
 	HomeLocationSet(&homeLocation);
 
-	sensor_sim_type = MODEL_QUADCOPTER;
+	sensor_sim_type = MODEL_AGNOSTIC;
 
 	// Main task loop
 	lastSysTime = xTaskGetTickCount();
 	uint32_t last_time = PIOS_DELAY_GetRaw();
 	while (1) {
 		PIOS_WDG_UpdateFlag(PIOS_WDG_SENSORS);
-
-		float dT = PIOS_DELAY_DiffuS(last_time) / 1.0e6;
-		if(dT > 0.010) {
-			fprintf(stderr,"Long sensor update\n");
+		
+		static int i;
+		i++;
+		if (i % 5000 == 0) {
+			float dT = PIOS_DELAY_DiffuS(last_time) / 10.0e6;
+			fprintf(stderr, "Sensor relative timing: %f\n", dT);
+			last_time = PIOS_DELAY_GetRaw();
 		}
-		last_time = PIOS_DELAY_GetRaw();
+		
+		sensors_count++;
 
 		switch(sensor_sim_type) {
 			case CONSTANT:

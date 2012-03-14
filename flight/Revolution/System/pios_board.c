@@ -805,7 +805,6 @@ void PIOS_Board_Init(void) {
 	PIOS_Assert(PIOS_BMA180_Test() == 0);
 #endif
 
-
 #if defined(PIOS_INCLUDE_HMC5883)
 	PIOS_HMC5883_Init(&pios_hmc5883_cfg);
 #endif

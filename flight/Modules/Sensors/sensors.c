@@ -172,8 +172,10 @@ static void SensorsTask(void *parameters)
 #if defined(PIOS_INCLUDE_BMA180)
 	accel_test = PIOS_BMA180_Test();
 #endif
+#if defined(PIOS_INCLUDE_HMC5883)
 	mag_test = PIOS_HMC5883_Test();
-	
+#endif
+
 	if(accel_test < 0 || gyro_test < 0 || mag_test < 0) {
 		AlarmsSet(SYSTEMALARMS_ALARM_SENSORS, SYSTEMALARMS_ALARM_CRITICAL);
 		while(1) {
@@ -345,9 +347,10 @@ static void SensorsTask(void *parameters)
 		
 		// Because most crafts wont get enough information from gravity to zero yaw gyro, we try
 		// and make it average zero (weakly)
-		MagnetometerData mag;
-		bool mag_updated = false;
 
+		bool mag_updated = false;
+		MagnetometerData mag;
+#if defined(PIOS_INCLUDE_HMC5883)
 		if (PIOS_HMC5883_NewDataAvailable() || PIOS_DELAY_DiffuS(mag_update_time) > 150000) {
 			mag_updated = true;
 			int16_t values[3];
@@ -358,6 +361,7 @@ static void SensorsTask(void *parameters)
 			MagnetometerSet(&mag);
 			mag_update_time = PIOS_DELAY_GetRaw();
 		}
+#endif
 
 		// For debugging purposes here we can output all of the sensors.  Do it as a single transaction
 		// so the message isn't split if anything else is writing to it

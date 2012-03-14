@@ -879,6 +879,7 @@ void prvSuspendSignalHandler(int sig)
 		//fprintf(stderr, "Caught suspend signal (%d): %s\r\n", sig, threadToName(pthread_self()));
 		storeSelf();
 		pauseSelf();
+		assert(prvGetTaskHandle(pthread_self()) == xTaskGetCurrentTaskHandle());
 		claimRunningSemaphore(1);
 		unmaskSuspend();
 	}

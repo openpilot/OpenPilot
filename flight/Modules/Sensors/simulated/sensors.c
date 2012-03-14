@@ -52,6 +52,7 @@
 #include "accels.h"
 #include "actuatordesired.h"
 #include "attitudeactual.h"
+#include "attitudesimulated.h"
 #include "attitudesettings.h"
 #include "baroaltitude.h"
 #include "gyros.h"
@@ -94,6 +95,7 @@ enum sensor_sim_type {CONSTANT, MODEL_AGNOSTIC, MODEL_QUADCOPTER} sensor_sim_typ
 int32_t SensorsInitialize(void)
 {
 	AccelsInitialize();
+	AttitudeSimulatedInitialize();
 	BaroAltitudeInitialize();
 	GyrosInitialize();
 	GyrosBiasInitialize();
@@ -328,9 +330,9 @@ static void simulateModelQuadcopter()
 	RateDesiredData rateDesired;
 	RateDesiredGet(&rateDesired);
 	
-	rpy[0] = thrust / MAX_THRUST * rateDesired.Roll * (1 - ACTUATOR_ALPHA) + rpy[0] * ACTUATOR_ALPHA;
-	rpy[1] = thrust / MAX_THRUST * rateDesired.Pitch * (1 - ACTUATOR_ALPHA) + rpy[1] * ACTUATOR_ALPHA;
-	rpy[2] = thrust / MAX_THRUST * rateDesired.Yaw * (1 - ACTUATOR_ALPHA) + rpy[2] * ACTUATOR_ALPHA;
+	rpy[0] = rateDesired.Roll * (1 - ACTUATOR_ALPHA) + rpy[0] * ACTUATOR_ALPHA;
+	rpy[1] = rateDesired.Pitch * (1 - ACTUATOR_ALPHA) + rpy[1] * ACTUATOR_ALPHA;
+	rpy[2] = rateDesired.Yaw * (1 - ACTUATOR_ALPHA) + rpy[2] * ACTUATOR_ALPHA;
 	
 	GyrosData gyrosData; // Skip get as we set all the fields
 	gyrosData.x = rpy[0] + rand_gauss();
@@ -434,6 +436,21 @@ static void simulateModelQuadcopter()
 	mag.y = homeLocation.Be[0] * Rbe[1][0] + homeLocation.Be[1] * Rbe[1][1] + homeLocation.Be[2] * Rbe[1][2];
 	mag.z = homeLocation.Be[0] * Rbe[2][0] + homeLocation.Be[1] * Rbe[2][1] + homeLocation.Be[2] * Rbe[2][2];
 	MagnetometerSet(&mag);
+	
+	AttitudeSimulatedData attitudeSimulated;
+	AttitudeSimulatedGet(&attitudeSimulated);
+	attitudeSimulated.q1 = q[0];
+	attitudeSimulated.q2 = q[1];
+	attitudeSimulated.q3 = q[2];
+	attitudeSimulated.q4 = q[3];
+	Quaternion2RPY(q,&attitudeSimulated.Roll);
+	attitudeSimulated.Position[0] = pos[0];
+	attitudeSimulated.Position[1] = pos[1];
+	attitudeSimulated.Position[2] = pos[2];
+	attitudeSimulated.Velocity[0] = vel[0];
+	attitudeSimulated.Velocity[1] = vel[1];
+	attitudeSimulated.Velocity[2] = vel[2];
+	AttitudeSimulatedSet(&attitudeSimulated);
 }
 
 

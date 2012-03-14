@@ -97,6 +97,7 @@ int32_t SensorsInitialize(void)
 	BaroAltitudeInitialize();
 	GyrosInitialize();
 	GyrosBiasInitialize();
+	GPSPositionInitialize();
 	MagnetometerInitialize();
 	RevoCalibrationInitialize();
 
@@ -105,7 +106,7 @@ int32_t SensorsInitialize(void)
 
 /**
  * Start the task.  Expects all objects to be initialized by this point.
- * \returns 0 on success or -1 if initialisation failed
+ *pick \returns 0 on success or -1 if initialisation failed
  */
 int32_t SensorsStart(void)
 {
@@ -140,7 +141,7 @@ static void SensorsTask(void *parameters)
 	homeLocation.Set = HOMELOCATION_SET_TRUE;
 	HomeLocationSet(&homeLocation);
 
-	sensor_sim_type = MODEL_AGNOSTIC;
+	sensor_sim_type = MODEL_QUADCOPTER;
 
 	// Main task loop
 	lastSysTime = xTaskGetTickCount();
@@ -151,8 +152,8 @@ static void SensorsTask(void *parameters)
 		static int i;
 		i++;
 		if (i % 5000 == 0) {
-			float dT = PIOS_DELAY_DiffuS(last_time) / 10.0e6;
-			fprintf(stderr, "Sensor relative timing: %f\n", dT);
+			//float dT = PIOS_DELAY_DiffuS(last_time) / 10.0e6;
+			//fprintf(stderr, "Sensor relative timing: %f\n", dT);
 			last_time = PIOS_DELAY_GetRaw();
 		}
 		
@@ -278,18 +279,21 @@ static void simulateModelAgnostic()
 	MagnetometerSet(&mag);
 }
 
+float thrustToDegs = 50;
+bool overideAttitude = false;
 static void simulateModelQuadcopter()
 {
-	static float pos[3] = {0,0,0};
-	static float vel[3] = {0,0,0};
-	static float ned_accel[3] = {0,0,0};
+	static double pos[3] = {0,0,0};
+	static double vel[3] = {0,0,0};
+	static double ned_accel[3] = {0,0,0};
 	static float q[4] = {1,0,0,0};
 	static float rpy[3] = {0,0,0}; // Low pass filtered actuator
-	float T[3];
+	double T[3];
 	float Rbe[3][3];
 	
 	const float ACTUATOR_ALPHA = 0.99;
 	const float MAX_THRUST = 9.81 * 2;
+	const float K_FRICTION = 1;
 
 	static uint32_t last_time;
 	
@@ -298,23 +302,47 @@ static void simulateModelQuadcopter()
 		dT = 2e-3;
 	last_time = PIOS_DELAY_GetRaw();
 	
+	FlightStatusData flightStatus;
+	FlightStatusGet(&flightStatus);
 	ActuatorDesiredData actuatorDesired;
 	ActuatorDesiredGet(&actuatorDesired);
-	rpy[0] = actuatorDesired.Roll * (1 - ACTUATOR_ALPHA) + rpy[0] * ACTUATOR_ALPHA;
-	rpy[1] = actuatorDesired.Pitch * (1 - ACTUATOR_ALPHA) + rpy[1] * ACTUATOR_ALPHA;
-	rpy[2] = actuatorDesired.Yaw * (1 - ACTUATOR_ALPHA) + rpy[2] * ACTUATOR_ALPHA;
+
+	float thrust = (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED) ? actuatorDesired.Throttle * MAX_THRUST : 0;
+	if (thrust < 0)
+		thrust = 0;
+	
+	if (thrust != thrust)
+		thrust = 0;
+	
+//	float control_scaling = thrust * thrustToDegs;
+//	// In rad/s
+//	rpy[0] = control_scaling * actuatorDesired.Roll * (1 - ACTUATOR_ALPHA) + rpy[0] * ACTUATOR_ALPHA;
+//	rpy[1] = control_scaling * actuatorDesired.Pitch * (1 - ACTUATOR_ALPHA) + rpy[1] * ACTUATOR_ALPHA;
+//	rpy[2] = control_scaling * actuatorDesired.Yaw * (1 - ACTUATOR_ALPHA) + rpy[2] * ACTUATOR_ALPHA;
+//	
+//	GyrosData gyrosData; // Skip get as we set all the fields
+//	gyrosData.x = rpy[0] * 180 / M_PI + rand_gauss();
+//	gyrosData.y = rpy[1] * 180 / M_PI + rand_gauss();
+//	gyrosData.z = rpy[2] * 180 / M_PI + rand_gauss();
+	
+	RateDesiredData rateDesired;
+	RateDesiredGet(&rateDesired);
+	
+	rpy[0] = thrust / MAX_THRUST * rateDesired.Roll * (1 - ACTUATOR_ALPHA) + rpy[0] * ACTUATOR_ALPHA;
+	rpy[1] = thrust / MAX_THRUST * rateDesired.Pitch * (1 - ACTUATOR_ALPHA) + rpy[1] * ACTUATOR_ALPHA;
+	rpy[2] = thrust / MAX_THRUST * rateDesired.Yaw * (1 - ACTUATOR_ALPHA) + rpy[2] * ACTUATOR_ALPHA;
 	
 	GyrosData gyrosData; // Skip get as we set all the fields
 	gyrosData.x = rpy[0] + rand_gauss();
 	gyrosData.y = rpy[1] + rand_gauss();
 	gyrosData.z = rpy[2] + rand_gauss();
-	
+
 	// Apply bias correction to the gyros
-	GyrosBiasData gyrosBias;
-	GyrosBiasGet(&gyrosBias);
-	gyrosData.x += gyrosBias.x;
-	gyrosData.y += gyrosBias.y;
-	gyrosData.z += gyrosBias.z;
+//	GyrosBiasData gyrosBias;
+//	GyrosBiasGet(&gyrosBias);
+//	gyrosData.x += gyrosBias.x;
+//	gyrosData.y += gyrosBias.y;
+//	gyrosData.z += gyrosBias.z;
 	GyrosSet(&gyrosData);
 	
 	// Predict the attitude forward in time
@@ -330,25 +358,43 @@ static void simulateModelQuadcopter()
 	q[2] = q[2] + qdot[2];
 	q[3] = q[3] + qdot[3];
 	
-	float thrust = actuatorDesired.Throttle * MAX_THRUST;
-	if (thrust != thrust)
-		thrust = 0;
-
+	if(overideAttitude){
+		AttitudeActualData attitudeActual;
+		AttitudeActualGet(&attitudeActual);
+		attitudeActual.q1 = q[0];
+		attitudeActual.q2 = q[1];
+		attitudeActual.q3 = q[2];
+		attitudeActual.q4 = q[3];
+		AttitudeActualSet(&attitudeActual);
+	}
+	
 	Quaternion2R(q,Rbe);
 	ned_accel[0] = thrust * Rbe[0][2];
 	ned_accel[1] = thrust * Rbe[1][2];
 	ned_accel[2] = thrust * Rbe[2][2];
 	ned_accel[2] -= 9.81;
+	
+	// Apply acceleration based on velocity
+	ned_accel[0] -= K_FRICTION * vel[0];
+	ned_accel[1] -= K_FRICTION * vel[1];
+	ned_accel[2] += K_FRICTION * vel[2];
 
 	// Predict the velocity forward in time
 	vel[0] = vel[0] + ned_accel[0] * dT;
 	vel[1] = vel[1] + ned_accel[1] * dT;
-	vel[2] = vel[2] + ned_accel[2] * dT;
+	vel[2] = vel[2] - ned_accel[2] * dT;
 
 	// Predict the position forward in time
 	pos[0] = pos[0] + vel[0] * dT;
 	pos[1] = pos[1] + vel[1] * dT;
 	pos[2] = pos[2] + vel[2] * dT;
+	
+	// Simulate hitting ground
+	if(pos[2] > 0) {
+		pos[2] = 0;
+		vel[2] = 0;
+		ned_accel[2] = -9.81;
+	}
 
 	// Transform the accels back in to body frame
 	AccelsData accelsData; // Skip get as we set all the fields
@@ -360,28 +406,33 @@ static void simulateModelQuadcopter()
 	
 	BaroAltitudeData baroAltitude;
 	BaroAltitudeGet(&baroAltitude);
-	baroAltitude.Altitude = pos[2];
+	baroAltitude.Altitude = -pos[2];
 	BaroAltitudeSet(&baroAltitude);
 	
 	HomeLocationData homeLocation;
 	HomeLocationGet(&homeLocation);
-	T[0] = homeLocation.Altitude+6.378137E6f;
-	T[1] = cosf(homeLocation.Latitude / 10e6)*(homeLocation.Altitude+6.378137E6f);
+	T[0] = homeLocation.Altitude+6.378137E6f * M_PI / 180;
+	T[1] = cosf(homeLocation.Latitude / 10e6)*(homeLocation.Altitude+6.378137E6f) * M_PI / 180;
 	T[2] = -1.0f;
 
 	GPSPositionData gpsPosition;
 	GPSPositionGet(&gpsPosition);
-	gpsPosition.Latitude = homeLocation.Latitude + pos[0] / T[0];
-	gpsPosition.Longitude = homeLocation.Longitude + pos[1] / T[1];
-	gpsPosition.Altitude = homeLocation.Altitude + pos[2] / T[2];
+	gpsPosition.Latitude = homeLocation.Latitude + (pos[0] / T[0] * 10.0e6);
+	gpsPosition.Longitude = homeLocation.Longitude + (pos[1] / T[1] * 10.0e6);
+	gpsPosition.Altitude = homeLocation.Altitude + (pos[2] / T[2] * 10.0e6);
+	gpsPosition.Groundspeed = sqrt(vel[0] * vel[0] + vel[1] * vel[1]);
+	gpsPosition.Heading = 180 / M_PI * atan2(vel[0], vel[1]);
+	gpsPosition.Satellites = 7;
+	gpsPosition.PDOP = 1;
 	GPSPositionSet(&gpsPosition);
 	
 	// Because most crafts wont get enough information from gravity to zero yaw gyro, we try
 	// and make it average zero (weakly)
+	
 	MagnetometerData mag;
-	mag.x = 400;
-	mag.y = 0;
-	mag.z = 800;
+	mag.x = homeLocation.Be[0] * Rbe[0][0] + homeLocation.Be[1] * Rbe[0][1] + homeLocation.Be[2] * Rbe[0][2];
+	mag.y = homeLocation.Be[0] * Rbe[1][0] + homeLocation.Be[1] * Rbe[1][1] + homeLocation.Be[2] * Rbe[1][2];
+	mag.z = homeLocation.Be[0] * Rbe[2][0] + homeLocation.Be[1] * Rbe[2][1] + homeLocation.Be[2] * Rbe[2][2];
 	MagnetometerSet(&mag);
 }
 

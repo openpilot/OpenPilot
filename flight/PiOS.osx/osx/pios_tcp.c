@@ -74,7 +74,34 @@ static pios_tcp_dev * find_tcp_dev_by_id (uint8_t tcp)
 /**
  * RxThread
  */
-void * PIOS_TCP_RxThread(void *tcp_dev_n)
+ 
+static void PIOS_TCP_RxTask(void *tcp_dev_n)
+{
+	bool rx_need_yield;
+
+	pios_tcp_dev *tcp_dev = (pios_tcp_dev *) tcp_dev_n;
+	while(1) {
+		if (tcp_dev->received) {
+
+			if (tcp_dev->rx_in_cb) {
+				(void) (tcp_dev->rx_in_cb)(tcp_dev->rx_in_context, &tcp_dev->rx_buffer[0], tcp_dev->received, NULL, &rx_need_yield);
+				tcp_dev->received = 0;
+			}
+			
+			//fprintf(stderr, "Received %d\n", received);
+#if defined(PIOS_INCLUDE_FREERTOS)
+			// Not sure about this
+			if (rx_need_yield) {
+				vPortYieldFromISR();
+			}
+#endif	/* PIOS_INCLUDE_FREERTOS */
+
+			vTaskDelay(1);
+		}
+	}
+}
+
+static void *PIOS_TCP_RxThread(void *tcp_dev_n)
 {
 	
 	/* needed because of FreeRTOS.posix scheduling */
@@ -99,22 +126,15 @@ void * PIOS_TCP_RxThread(void *tcp_dev_n)
 		
 		fprintf(stderr, "Connection accepted\n");
 		
-		bool rx_need_yield;
 		int received;
 		do {
-			received = read(tcp_dev->socket_connection, &tcp_dev->rx_buffer[0], PIOS_UDP_RX_BUFFER_SIZE);
+			if (tcp_dev->received == 0) {
+				// Received is used to track the scoket whereas the dev variable is only updated when it can be
+				received = read(tcp_dev->socket_connection, &tcp_dev->rx_buffer[0], PIOS_UDP_RX_BUFFER_SIZE);
+				tcp_dev->received = received;
+			} else
+				usleep(1);
 			
-			if (tcp_dev->rx_in_cb) {
-				(void) (tcp_dev->rx_in_cb)(tcp_dev->rx_in_context, &tcp_dev->rx_buffer[0], received, NULL, &rx_need_yield);
-			}
-			
-			//fprintf(stderr, "Received %d\n", received);
-#if defined(PIOS_INCLUDE_FREERTOS)
-			// Not sure about this
-			if (rx_need_yield) {
-				vPortYieldFromISR();
-			}
-#endif	/* PIOS_INCLUDE_FREERTOS */
 		} while(received > 0);
 		
 		if (-1 == shutdown(tcp_dev->socket_connection, SHUT_RDWR))
@@ -132,6 +152,7 @@ void * PIOS_TCP_RxThread(void *tcp_dev_n)
 /**
  * Open UDP socket
  */
+xTaskHandle tcpRxTaskHandle;
 int32_t PIOS_TCP_Init(uint32_t *tcp_id, const struct pios_tcp_cfg * cfg)
 {
 	
@@ -164,8 +185,9 @@ int32_t PIOS_TCP_Init(uint32_t *tcp_id, const struct pios_tcp_cfg * cfg)
 		exit(EXIT_FAILURE);
 	}
 	
-	/* Create transmit thread for this connection */
 	pthread_create(&tcp_dev->rxThread, NULL, PIOS_TCP_RxThread, (void*)tcp_dev);
+
+	xTaskCreate(PIOS_TCP_RxTask, (signed char *)"TcpRx", 1024, (void*)tcp_dev, 2, &tcpRxTaskHandle);
 	
 	printf("udp dev %i - socket %i opened - result %i\n",pios_tcp_num_devices-1,tcp_dev->socket,res);
 	
@@ -224,7 +246,6 @@ static void PIOS_TCP_TxStart(uint32_t tcp_id, uint16_t tx_bytes_avail)
 				vPortYieldFromISR();
 			}
 #endif	/* PIOS_INCLUDE_FREERTOS */
-			
 		}
 	}
 	

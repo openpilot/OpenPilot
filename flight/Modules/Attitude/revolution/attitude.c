@@ -121,6 +121,7 @@ int32_t AttitudeInitialize(void)
 	PositionActualInitialize();
 	VelocityActualInitialize();
 	RevoSettingsInitialize();
+	RevoCalibrationInitialize();
 	
 	// Initialize this here while we aren't setting the homelocation in GPS
 	HomeLocationInitialize();
@@ -144,6 +145,7 @@ int32_t AttitudeInitialize(void)
 	
 	AttitudeSettingsConnectCallback(&settingsUpdatedCb);
 	RevoSettingsConnectCallback(&settingsUpdatedCb);
+	RevoCalibrationConnectCallback(&settingsUpdatedCb);
 	HomeLocationConnectCallback(&settingsUpdatedCb);
 
 	return 0;
@@ -255,7 +257,9 @@ static int32_t updateAttitudeComplimentary(bool first_run)
 		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE,SYSTEMALARMS_ALARM_WARNING);
 		return -1;
 	}
-	
+
+	AccelsGet(&accelsData);
+
 	// During initialization and 
 	FlightStatusData flightStatus;
 	FlightStatusGet(&flightStatus);
@@ -269,7 +273,7 @@ static int32_t updateAttitudeComplimentary(bool first_run)
 		float q[4];
 		rpy[0] = atan2f(-accelsData.y, -accelsData.z) * 180.0f / F_PI;
 		rpy[1] = atan2f(accelsData.x, -accelsData.z) * 180.0f / F_PI;
-		rpy[2] = atan2f(magData.x, -magData.y) * 180.0f / F_PI;
+		rpy[2] = atan2f(-magData.y, magData.x) * 180.0f / F_PI;
 
 		RPY2Quaternion(rpy,q);
 		quat_copy(q, &attitudeActual.q1);
@@ -297,7 +301,6 @@ static int32_t updateAttitudeComplimentary(bool first_run)
 	}	
 
 	GyrosGet(&gyrosData);
-	AccelsGet(&accelsData);
 
 	// Compute the dT using the cpu clock
 	dT = PIOS_DELAY_DiffuS(timeval) / 1000000.0f;
@@ -541,7 +544,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 			float rpy[3];
 			rpy[0] = atan2f(-accelsData.y, -accelsData.z) * 180.0f / F_PI;
 			rpy[1] = atan2f(accelsData.x, -accelsData.z) * 180.0f / F_PI;
-			rpy[2] = atan2f(magData.x, -magData.y) * 180.0f / F_PI;
+			rpy[2] = atan2f(-magData.y, magData.x) * 180.0f / F_PI;
 			RPY2Quaternion(rpy,q);
 			/*float Rbe[3][3];
 			float ge[3] = {0,0,-9.81f};
@@ -573,7 +576,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 			// Set initial attitude
 			rpy[0] = atan2f(-accelsData.y, -accelsData.z) * 180.0f / F_PI;
 			rpy[1] = atan2f(accelsData.x, -accelsData.z) * 180.0f / F_PI;
-			rpy[2] = atan2f(magData.x, -magData.y) * 180.0f / F_PI;
+			rpy[2] = atan2f(-magData.y, magData.x) * 180.0f / F_PI;
 			RPY2Quaternion(rpy,q);
 
 			INSSetState(NED, zeros, q, zeros, zeros);
@@ -648,7 +651,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	if(gps_updated && outdoor_mode)
 	{
 		INSSetPosVelVar(1e-2f, 1e-2f);
-		sensors = POS_SENSORS | HORIZ_SENSORS;
+		sensors |= POS_SENSORS | HORIZ_SENSORS;
 		GPSPositionData gpsPosition;
 		GPSPositionGet(&gpsPosition);
 

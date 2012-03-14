@@ -399,6 +399,9 @@ xParams *pxThisThreadParams = pvPortMalloc( sizeof( xParams ) );
 
 	/* Wait until the task suspends. */
 	while ( xSentinel == 0 );
+
+	//printf( "Task suspended detected for %i\r\n", lIndexOfLastAddedTask);
+
 	vPortExitCritical();
 
 	return pxTopOfStack;
@@ -415,6 +418,7 @@ void vPortStartFirstTask( void )
 	/* Start the first task. */
 	xInterruptsEnabled = pdTRUE;
 	xRunning = 1;
+	unmaskSuspend();
 	
 	resumeThread( xTaskGetCurrentTaskHandle() );
 }
@@ -820,13 +824,30 @@ void * pParams = pxParams->pvParams;
 	pxThreads[lIndex].name = (char *) ((tskTCB *) hTask)->pcTaskName;
 
 	xInterruptsEnabled = pdTRUE;
-	if(prvGetTaskHandle(pthread_self()) != xTaskGetCurrentTaskHandle()) {
+	if(1 || prvGetTaskHandle(pthread_self()) != xTaskGetCurrentTaskHandle()) {
 		pauseSelf();
 		claimRunningSemaphore(7);
 		unmaskSuspend();
 	}
 	else {
-		//fprintf(stdout, "New thread wants to run right away %s\r\n", threadToName(pthread_self()));
+		fprintf(stdout, "New thread wants to run right away %s\r\n", threadToName(pthread_self()));
+
+		assert(pthread_mutex_trylock( &xSwappingThreadMutex )!= EBUSY);
+		
+		// Find the previously running thread.  xTaskGetCurrentHandle no longer reflects current state
+		
+		portLONG lIndex;	
+		for ( lIndex = 0; lIndex < MAX_NUMBER_OF_TASKS && pxThreads[ lIndex ].hTask != hTask; lIndex++ )
+			if(pxThreads[ lIndex ].status == RUNNING)
+				break;
+				
+		pthread_mutex_unlock( &xSwappingThreadMutex );
+		
+		assert(pxThreads[ lIndex ].hTask != NULL); // Should find a thread that is running
+		
+		if( pxThreads[lIndex].hThread != pthread_self())
+			assert(pauseOtherThread(pxThreads[ lIndex ].hTask) == 0);
+		
 		prvSetThreadStatus(pthread_self(), RUNNING);
 		claimRunningSemaphore(6);
 	}
@@ -1232,10 +1253,10 @@ void pauseSelf()
 		xInterruptsEnabled = pdTRUE;
 	
 	prvSetThreadStatus( pthread_self(), RUNNING );
-	//if (xResult == 0)
-	//	fprintf(stdout, "Thread resumed from signal %s\r\n", threadToName( pthread_self() ));
-	//else 
-	//	fprintf(stdout, "Thread resumed from timeout %s\r\n", threadToName( pthread_self() ));
+//	if (xResult == 0)
+//		fprintf(stdout, "Thread resumed from signal %s\r\n", threadToName( pthread_self() ));
+//	else 
+//		fprintf(stdout, "Thread resumed from timeout %s\r\n", threadToName( pthread_self() ));
 
 }
 

@@ -531,12 +531,7 @@ void vPortYield( void )
 {
 	if(pthread_mutex_trylock( &xSwappingThreadMutex )== EBUSY) {
 		// The tick handler will just pause this thread
-		fprintf(stdout, "Could not get the swapping thread to yield\r\n");
-		//usleep(10);
-		storeSelf();
-		pauseSelf();
-		claimRunningSemaphore(5);
-		unmaskSuspend();
+		return;
 	} else {
 		lastYield =  xTaskGetCurrentTaskHandle();
 		vTaskSwitchContext();
@@ -662,6 +657,22 @@ int preemptive_count = 0;
 int noirq_count = 0;
 void vPortSystemTickHandler( int sig )
 {
+	/* In this real hardware this is what happens
+	 * 0. if preemption set pending sys call flag (happens when all isr's finished)
+	 * 1. set interrupt mask
+	 * 2. increment tick count
+	 * 3. restore interrupt mask
+	 * 4. exits which triggers the pending sys call (?)
+	 *
+	 * Pending sys call:
+	 * 1. store the current tcb
+	 * 2. something with "msr basepri, r0" which changes the interrupt priority mask
+	 * 3. switches context
+	 * 4. restores the interrupt priority
+	 * 5. loads the new tcb
+	 * 
+	 */
+	 
 	debug_printf( "\r\n\r\n" );
 	debug_printf( "(xInterruptsEnabled = %i, xServicingTick = %i)\r\n", (int) xInterruptsEnabled != 0, (int) xServicingTick != 0);
 
@@ -689,8 +700,6 @@ void vPortSystemTickHandler( int sig )
 		}
 		
 		vTaskIncrementTick();
-
-		//assert(uxCriticalNesting == 0);
 		
 		oldTask = xTaskGetCurrentTaskHandle();
 		claimRunningSemaphore(2);
@@ -700,7 +709,6 @@ void vPortSystemTickHandler( int sig )
 		resumeThread(xTaskGetCurrentTaskHandle());
 		newTask = xTaskGetCurrentTaskHandle();
 
-//		fprintf(stdout, "System tick done\r\n");
 	}
 	else
 		noirq_count++;
@@ -1327,14 +1335,21 @@ int claim_count = 0;
 static void claimRunningSemaphore(int source)
 {
 	//fprintf(stderr,"Claimed the semaphore(%d) %s\r\n", source, threadToName(pthread_self()));
+		
+	// And they succeed
+	int succeed = 0;
+	for (int i = 0; i < 10 && !succeed; i++) {
+		
+		succeed = (pthread_mutex_trylock( &xRunningThread ) == 0);
+		if (!succeed)
+			usleep(1);
+	}
+	assert( succeed );
 	
 	// Make sure the right task is trying for this (SystemTick doesn't have a handle)
 	xTaskHandle hTask = prvGetTaskHandle( pthread_self() );
 	assert( hTask == NULL || hTask ==  xTaskGetCurrentTaskHandle() );
-	
-	// And they succeed
-	assert( 0 == pthread_mutex_trylock( &xRunningThread ) );
-	
+
 	lastClaim = (tskTCB *) hTask;
 	lastClaimType = source;
 	claim_count ++;
@@ -1347,11 +1362,11 @@ tskTCB *lastRelease;
 int release_count = 0;
 static void releaseRunningSemaphore()
 {
+	xTaskHandle hTask = prvGetTaskHandle( pthread_self() );
+	assert( lastClaim == hTask );
 	assert( 0 == pthread_mutex_unlock( &xRunningThread ) ); 
 	//fprintf(stderr,"Released the semaphore %s\r\n", threadToName(pthread_self()));
 	
-	xTaskHandle hTask = prvGetTaskHandle( pthread_self() );
-	assert( lastClaim == hTask );
 	lastRelease = (tskTCB *) hTask;
 
 	release_count++;

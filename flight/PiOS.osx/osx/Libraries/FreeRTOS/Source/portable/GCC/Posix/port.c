@@ -89,6 +89,9 @@
  * pause
  */
 
+// Critical sections: Disable interrupts but can yield
+// Suspend scheduler: Makes sure that we don't actually swap tasks
+// Interrupts - I don't think they do block the tick handler?  Uses two irqs - the PEND and SVC
 
 #include <pthread.h>
 #include <sched.h>
@@ -135,6 +138,7 @@ typedef struct THREAD_SUSPENSIONS
 	portBASE_TYPE xThreadState;
 	volatile enum thread_status status;
 	unsigned portBASE_TYPE uxCriticalNesting;
+	unsigned portBASE_TYPE xInterruptsEnabled;
 	char * name;
 } xThreadState;
 /*-----------------------------------------------------------*/
@@ -224,6 +228,8 @@ static portLONG prvGetFreeThreadState( void );
 static void prvSetTaskCriticalNesting( pthread_t xThreadId, unsigned portBASE_TYPE uxNesting );
 static unsigned portBASE_TYPE prvGetTaskCriticalNesting( pthread_t xThreadId );
 static void prvDeleteThread( void *xThreadId );
+void prvSetTaskInterrupt( pthread_t xThreadId, unsigned portBASE_TYPE xInterruptsEnabled );
+unsigned portBASE_TYPE prvGetTaskInterrupt( pthread_t xThreadId );
 /*-----------------------------------------------------------*/
 
 /*
@@ -633,7 +639,8 @@ portBASE_TYPE xPortSetInterruptMask( void )
 {
 portBASE_TYPE xReturn = xInterruptsEnabled;
 	debug_printf("\r\n");
-	xInterruptsEnabled = pdFALSE;
+//	xInterruptsEnabled = pdFALSE;
+	vPortDisableInterrupts();
 	return xReturn;
 }
 /*-----------------------------------------------------------*/
@@ -641,7 +648,11 @@ portBASE_TYPE xReturn = xInterruptsEnabled;
 void vPortClearInterruptMask( portBASE_TYPE xMask )
 {
 	debug_printf("\r\n");
-	xInterruptsEnabled = xMask;
+	if(xMask == pdTRUE)
+		vPortEnableInterrupts();
+	else
+		vPortDisableInterrupts();
+//	xInterruptsEnabled = xMask;
 }
 /*-----------------------------------------------------------*/
 
@@ -653,10 +664,6 @@ void vPortSystemTickHandler( int sig )
 {
 	debug_printf( "\r\n\r\n" );
 	debug_printf( "(xInterruptsEnabled = %i, xServicingTick = %i)\r\n", (int) xInterruptsEnabled != 0, (int) xServicingTick != 0);
-
-	/* Tick Increment. */
-	vTaskIncrementTick();
-
 
 /*	if (pthread_mutex_trylock( &xIrqMutex ) == EBUSY) {
 		fprintf(stdout, "Systick could not block interrupts\r\n");
@@ -677,8 +684,13 @@ void vPortSystemTickHandler( int sig )
 		
 		// If that thread won't pause something is going on
 		if (pauseOtherThread(xTaskGetCurrentTaskHandle()) == -1) {
-		fprintf(stdout, "Can't pause thread\r\n");
+			tskTCB *non_stopping = (tskTCB *) xTaskGetCurrentTaskHandle();
+			fprintf(stdout, "Can't pause thread %s\r\n", non_stopping->pcTaskName);
 		}
+		
+		vTaskIncrementTick();
+
+		//assert(uxCriticalNesting == 0);
 		
 		oldTask = xTaskGetCurrentTaskHandle();
 		claimRunningSemaphore(2);
@@ -810,6 +822,8 @@ void * pParams = pxParams->pvParams;
 		prvSetThreadStatus(pthread_self(), RUNNING);
 		claimRunningSemaphore(6);
 	}
+	
+	vPortEnableInterrupts();
 	
 	sigemptyset( &xSignals );
 	assert( pthread_sigmask( SIG_SETMASK, &xSignals, NULL ) == 0);
@@ -1037,6 +1051,39 @@ portLONG lIndex;
 	}
 	return uxNesting;
 }
+
+/*-----------------------------------------------------------*/
+
+void prvSetTaskInterrupt( pthread_t xThreadId, unsigned portBASE_TYPE xInterruptsEnabled )
+{
+	portLONG lIndex;
+	
+	for ( lIndex = 0; lIndex < MAX_NUMBER_OF_TASKS; lIndex++ )
+	{
+		if ( pxThreads[ lIndex ].hThread == xThreadId )
+		{
+			pxThreads[ lIndex ].xInterruptsEnabled = xInterruptsEnabled;
+			break;
+		}
+	}
+}
+/*-----------------------------------------------------------*/
+
+unsigned portBASE_TYPE prvGetTaskInterrupt( pthread_t xThreadId )
+{
+	unsigned portBASE_TYPE xInterruptsEnabled = 0;
+	portLONG lIndex;
+	
+	for ( lIndex = 0; lIndex < MAX_NUMBER_OF_TASKS; lIndex++ )
+	{
+		if ( pxThreads[ lIndex ].hThread == xThreadId )
+		{
+			xInterruptsEnabled = pxThreads[ lIndex ].uxCriticalNesting;
+			break;
+		}
+	}
+	return xInterruptsEnabled;
+}
 /*-----------------------------------------------------------*/
 
 void prvDeleteThread( void *xThreadId )
@@ -1125,6 +1172,7 @@ void storeSelf()
 	maskSuspend();
 	
 	prvSetTaskCriticalNesting( hTask, uxCriticalNesting );
+	prvSetTaskInterrupt( hTask, xInterruptsEnabled );
 
 	releaseRunningSemaphore();
 	
@@ -1171,14 +1219,9 @@ void pauseSelf()
 	
 	/* Restore the critical nesting */
 	uxCriticalNesting = prvGetTaskCriticalNesting( hTask );
-	if ( uxCriticalNesting == 0 )
-	{
+	//xInterruptsEnabled = prvGetTaskInterrupt( hTask );
+	if(uxCriticalNesting == 0)
 		xInterruptsEnabled = pdTRUE;
-	}
-	else
-	{
-		xInterruptsEnabled = pdFALSE;
-	}
 	
 	prvSetThreadStatus( pthread_self(), RUNNING );
 	//if (xResult == 0)

@@ -348,6 +348,8 @@ class ConfigSetup: public kernel::KeyValueFileSaveLoad
 	double SIMU_IMU_ACC_GAIN_NOISESTD;
 	double SIMU_IMU_RANDWALKACC_FACTOR;
 	
+ private:
+  void processKeyValueFile(jafar::kernel::KeyValueFile& keyValueFile, bool read);
  public:
 	virtual void loadKeyValueFile(jafar::kernel::KeyValueFile const& keyValueFile);
 	virtual void saveKeyValueFile(jafar::kernel::KeyValueFile& keyValueFile);
@@ -403,6 +405,8 @@ class ConfigEstimation: public kernel::KeyValueFileSaveLoad
 	double MIN_SCORE;          /// min ZNCC score under which we don't finish to compute the value of the score
 	double PARTIAL_POSITION;   /// position in the patch where we test if we finish the correlation computation
 	
+ private:
+  void processKeyValueFile(jafar::kernel::KeyValueFile& keyValueFile, bool read);
  public:
 	virtual void loadKeyValueFile(jafar::kernel::KeyValueFile const& keyValueFile);
 	virtual void saveKeyValueFile(jafar::kernel::KeyValueFile& keyValueFile);
@@ -1727,219 +1731,152 @@ int main(int argc, char* const* argv)
  * Config file loading
  * ###########################################################################*/
 
-#define KeyValueFile_getItem(k) keyValueFile.getItem(#k, k);
-#define KeyValueFile_setItem(k) keyValueFile.setItem(#k, k);
+#define KeyValueFile_processItem(k) { read ? keyValueFile.getItem(#k, k) : keyValueFile.setItem(#k, k); }
+
 
 void ConfigSetup::loadKeyValueFile(jafar::kernel::KeyValueFile const& keyValueFile)
 {
-	KeyValueFile_getItem(SENSOR_POSE_CONSTVEL);
-	KeyValueFile_getItem(SENSOR_POSE_INERTIAL);
-	KeyValueFile_getItem(GPS_POSE);
-	KeyValueFile_getItem(ROBOT_POSE);
-	
-	KeyValueFile_getItem(CAMERA_TYPE);
-	KeyValueFile_getItem(CAMERA_DEVICE);
-	KeyValueFile_getItem(IMG_WIDTH);
-	KeyValueFile_getItem(IMG_HEIGHT);
-	KeyValueFile_getItem(INTRINSIC);
-	KeyValueFile_getItem(DISTORTION);
-	
-	KeyValueFile_getItem(IMG_WIDTH_SIMU);
-	KeyValueFile_getItem(IMG_HEIGHT_SIMU);
-	KeyValueFile_getItem(INTRINSIC_SIMU);
-	KeyValueFile_getItem(DISTORTION_SIMU);
-	
-	KeyValueFile_getItem(UNCERT_VLIN);
-	KeyValueFile_getItem(UNCERT_VANG);
-	KeyValueFile_getItem(PERT_VLIN);
-	KeyValueFile_getItem(PERT_VANG);
-	
-	KeyValueFile_getItem(MTI_DEVICE);
-	KeyValueFile_getItem(ACCELERO_FULLSCALE);
-	KeyValueFile_getItem(ACCELERO_NOISE);
-	KeyValueFile_getItem(GYRO_FULLSCALE);
-	KeyValueFile_getItem(GYRO_NOISE);
-	
-	KeyValueFile_getItem(UNCERT_GRAVITY);
-	KeyValueFile_getItem(UNCERT_ABIAS);
-	KeyValueFile_getItem(UNCERT_WBIAS);
-	KeyValueFile_getItem(PERT_AERR);
-	KeyValueFile_getItem(PERT_WERR);
-	KeyValueFile_getItem(PERT_RANWALKACC);
-	KeyValueFile_getItem(PERT_RANWALKGYRO);
-	
-	KeyValueFile_getItem(UNCERT_HEADING);
-	KeyValueFile_getItem(UNCERT_ATTITUDE);
-	
-	KeyValueFile_getItem(IMU_TIMESTAMP_CORRECTION);
-	KeyValueFile_getItem(GPS_TIMESTAMP_CORRECTION);
-	
-	KeyValueFile_getItem(dxNDR);
-	KeyValueFile_getItem(dvNDR);
-	KeyValueFile_getItem(POS_TIMESTAMP_CORRECTION);
-	
-	KeyValueFile_getItem(SIMU_IMU_TIMESTAMP_CORRECTION);
-	KeyValueFile_getItem(SIMU_IMU_FREQ);
-	KeyValueFile_getItem(SIMU_IMU_GRAVITY);
-	KeyValueFile_getItem(SIMU_IMU_GYR_BIAS);
-	KeyValueFile_getItem(SIMU_IMU_GYR_BIAS_NOISESTD);
-	KeyValueFile_getItem(SIMU_IMU_GYR_GAIN);
-	KeyValueFile_getItem(SIMU_IMU_GYR_GAIN_NOISESTD);
-	KeyValueFile_getItem(SIMU_IMU_RANDWALKGYR_FACTOR);
-	KeyValueFile_getItem(SIMU_IMU_ACC_BIAS);
-	KeyValueFile_getItem(SIMU_IMU_ACC_BIAS_NOISESTD);
-	KeyValueFile_getItem(SIMU_IMU_ACC_GAIN);
-	KeyValueFile_getItem(SIMU_IMU_ACC_GAIN_NOISESTD);
-	KeyValueFile_getItem(SIMU_IMU_RANDWALKACC_FACTOR);
+  jafar::kernel::KeyValueFile &keyValueFile2 = const_cast<jafar::kernel::KeyValueFile&>(keyValueFile);
+  processKeyValueFile(keyValueFile2, true);
 }
-
 void ConfigSetup::saveKeyValueFile(jafar::kernel::KeyValueFile& keyValueFile)
 {
-	KeyValueFile_setItem(SENSOR_POSE_CONSTVEL);
-	KeyValueFile_setItem(SENSOR_POSE_INERTIAL);
-	KeyValueFile_setItem(GPS_POSE);
-	KeyValueFile_setItem(ROBOT_POSE);
-	
-	KeyValueFile_setItem(CAMERA_TYPE);
-	KeyValueFile_setItem(CAMERA_DEVICE);
-	KeyValueFile_setItem(IMG_WIDTH);
-	KeyValueFile_setItem(IMG_HEIGHT);
-	KeyValueFile_setItem(INTRINSIC);
-	KeyValueFile_setItem(DISTORTION);
-	
-	KeyValueFile_setItem(IMG_WIDTH_SIMU);
-	KeyValueFile_setItem(IMG_HEIGHT_SIMU);
-	KeyValueFile_setItem(INTRINSIC_SIMU);
-	KeyValueFile_setItem(DISTORTION_SIMU);
-	
-	KeyValueFile_setItem(UNCERT_VLIN);
-	KeyValueFile_setItem(UNCERT_VANG);
-	KeyValueFile_setItem(PERT_VLIN);
-	KeyValueFile_setItem(PERT_VANG);
-	
-	KeyValueFile_setItem(MTI_DEVICE);
-	KeyValueFile_setItem(ACCELERO_FULLSCALE);
-	KeyValueFile_setItem(ACCELERO_NOISE);
-	KeyValueFile_setItem(GYRO_FULLSCALE);
-	KeyValueFile_setItem(GYRO_NOISE);
-	
-	KeyValueFile_setItem(UNCERT_GRAVITY);
-	KeyValueFile_setItem(UNCERT_ABIAS);
-	KeyValueFile_setItem(UNCERT_WBIAS);
-	KeyValueFile_setItem(PERT_AERR);
-	KeyValueFile_setItem(PERT_WERR);
-	KeyValueFile_setItem(PERT_RANWALKACC);
-	KeyValueFile_setItem(PERT_RANWALKGYRO);
-	
-	KeyValueFile_setItem(UNCERT_HEADING);
-	KeyValueFile_setItem(UNCERT_ATTITUDE);
-	
-	KeyValueFile_setItem(IMU_TIMESTAMP_CORRECTION);
-	KeyValueFile_setItem(GPS_TIMESTAMP_CORRECTION);
-	
-	KeyValueFile_setItem(dxNDR);
-	KeyValueFile_setItem(dvNDR);
-	KeyValueFile_setItem(POS_TIMESTAMP_CORRECTION);
-	
-	KeyValueFile_setItem(SIMU_IMU_TIMESTAMP_CORRECTION);
-	KeyValueFile_setItem(SIMU_IMU_FREQ);
-	KeyValueFile_setItem(SIMU_IMU_GRAVITY);
-	KeyValueFile_setItem(SIMU_IMU_GYR_BIAS);
-	KeyValueFile_setItem(SIMU_IMU_GYR_BIAS_NOISESTD);
-	KeyValueFile_setItem(SIMU_IMU_GYR_GAIN);
-	KeyValueFile_setItem(SIMU_IMU_GYR_GAIN_NOISESTD);
-	KeyValueFile_setItem(SIMU_IMU_RANDWALKGYR_FACTOR);
-	KeyValueFile_setItem(SIMU_IMU_ACC_BIAS);
-	KeyValueFile_setItem(SIMU_IMU_ACC_BIAS_NOISESTD);
-	KeyValueFile_setItem(SIMU_IMU_ACC_GAIN);
-	KeyValueFile_setItem(SIMU_IMU_ACC_GAIN_NOISESTD);
-	KeyValueFile_setItem(SIMU_IMU_RANDWALKACC_FACTOR);
+  processKeyValueFile(keyValueFile, false);
 }
+
+void ConfigSetup::processKeyValueFile(jafar::kernel::KeyValueFile& keyValueFile, bool read)
+{
+	if (intOpts[iRobot] == 1)
+		KeyValueFile_processItem(SENSOR_POSE_INERTIAL)
+	else
+		KeyValueFile_processItem(SENSOR_POSE_CONSTVEL)
+	if (intOpts[iGps])
+		KeyValueFile_processItem(GPS_POSE);
+	KeyValueFile_processItem(ROBOT_POSE);
+	
+	if (intOpts[iSimu])
+	{
+		KeyValueFile_processItem(IMG_WIDTH_SIMU);
+		KeyValueFile_processItem(IMG_HEIGHT_SIMU);
+		KeyValueFile_processItem(INTRINSIC_SIMU);
+		KeyValueFile_processItem(DISTORTION_SIMU);
+	} else
+	{
+		KeyValueFile_processItem(CAMERA_TYPE);
+		KeyValueFile_processItem(CAMERA_DEVICE);
+		KeyValueFile_processItem(IMG_WIDTH);
+		KeyValueFile_processItem(IMG_HEIGHT);
+		KeyValueFile_processItem(INTRINSIC);
+		KeyValueFile_processItem(DISTORTION);
+	}
+	
+	KeyValueFile_processItem(UNCERT_VLIN);
+	KeyValueFile_processItem(UNCERT_VANG);
+	KeyValueFile_processItem(PERT_VLIN);
+	KeyValueFile_processItem(PERT_VANG);
+	
+	if (intOpts[iRobot] == 1)
+	{
+		KeyValueFile_processItem(MTI_DEVICE);
+		KeyValueFile_processItem(ACCELERO_FULLSCALE);
+		KeyValueFile_processItem(ACCELERO_NOISE);
+		KeyValueFile_processItem(GYRO_FULLSCALE);
+		KeyValueFile_processItem(GYRO_NOISE);
+	
+		KeyValueFile_processItem(UNCERT_GRAVITY);
+		KeyValueFile_processItem(UNCERT_ABIAS);
+		KeyValueFile_processItem(UNCERT_WBIAS);
+		KeyValueFile_processItem(PERT_AERR);
+		KeyValueFile_processItem(PERT_WERR);
+		KeyValueFile_processItem(PERT_RANWALKACC);
+		KeyValueFile_processItem(PERT_RANWALKGYRO);
+	}
+
+	KeyValueFile_processItem(UNCERT_HEADING);
+	KeyValueFile_processItem(UNCERT_ATTITUDE);
+	
+	if (intOpts[iRobot] == 1)
+		KeyValueFile_processItem(IMU_TIMESTAMP_CORRECTION);
+	if (intOpts[iGps])
+		KeyValueFile_processItem(GPS_TIMESTAMP_CORRECTION);
+	
+	if (intOpts[iRobot] == 2)
+	{
+		KeyValueFile_processItem(dxNDR);
+		KeyValueFile_processItem(dvNDR);
+		KeyValueFile_processItem(POS_TIMESTAMP_CORRECTION);
+	}
+
+	if (intOpts[iRobot] == 1 && intOpts[iSimu])
+	{
+		KeyValueFile_processItem(SIMU_IMU_TIMESTAMP_CORRECTION);
+		KeyValueFile_processItem(SIMU_IMU_FREQ);
+		KeyValueFile_processItem(SIMU_IMU_GRAVITY);
+		KeyValueFile_processItem(SIMU_IMU_GYR_BIAS);
+		KeyValueFile_processItem(SIMU_IMU_GYR_BIAS_NOISESTD);
+		KeyValueFile_processItem(SIMU_IMU_GYR_GAIN);
+		KeyValueFile_processItem(SIMU_IMU_GYR_GAIN_NOISESTD);
+		KeyValueFile_processItem(SIMU_IMU_RANDWALKGYR_FACTOR);
+		KeyValueFile_processItem(SIMU_IMU_ACC_BIAS);
+		KeyValueFile_processItem(SIMU_IMU_ACC_BIAS_NOISESTD);
+		KeyValueFile_processItem(SIMU_IMU_ACC_GAIN);
+		KeyValueFile_processItem(SIMU_IMU_ACC_GAIN_NOISESTD);
+		KeyValueFile_processItem(SIMU_IMU_RANDWALKACC_FACTOR);
+	}
+}
+
 
 void ConfigEstimation::loadKeyValueFile(jafar::kernel::KeyValueFile const& keyValueFile)
 {
-	KeyValueFile_getItem(CORRECTION_SIZE);
-	
-	KeyValueFile_getItem(MAP_SIZE);
-	KeyValueFile_getItem(PIX_NOISE);
-	KeyValueFile_getItem(PIX_NOISE_SIMUFACTOR);
-	
-	KeyValueFile_getItem(D_MIN);
-	KeyValueFile_getItem(REPARAM_TH);
-	
-	KeyValueFile_getItem(GRID_HCELLS);
-	KeyValueFile_getItem(GRID_VCELLS);
-	KeyValueFile_getItem(GRID_MARGIN);
-	KeyValueFile_getItem(GRID_SEPAR);
-	
-	KeyValueFile_getItem(RELEVANCE_TH);
-	KeyValueFile_getItem(MAHALANOBIS_TH);
-	KeyValueFile_getItem(N_UPDATES_TOTAL);
-	KeyValueFile_getItem(N_UPDATES_RANSAC);
-	KeyValueFile_getItem(N_INIT);
-	KeyValueFile_getItem(N_RECOMP_GAINS);
-	KeyValueFile_getItem(RANSAC_LOW_INNOV);
-	
-	KeyValueFile_getItem(RANSAC_NTRIES);
-	
-	KeyValueFile_getItem(HARRIS_CONV_SIZE);
-	KeyValueFile_getItem(HARRIS_TH);
-	KeyValueFile_getItem(HARRIS_EDDGE);
-	
-	KeyValueFile_getItem(DESC_SIZE);
-	KeyValueFile_getItem(MULTIVIEW_DESCRIPTOR);
-	KeyValueFile_getItem(DESC_SCALE_STEP);
-	KeyValueFile_getItem(DESC_ANGLE_STEP);
-	KeyValueFile_getItem(DESC_PREDICTION_TYPE);
-	
-	KeyValueFile_getItem(PATCH_SIZE);
-	KeyValueFile_getItem(MAX_SEARCH_SIZE);
-	KeyValueFile_getItem(KILL_SEARCH_SIZE);
-	KeyValueFile_getItem(MATCH_TH);
-	KeyValueFile_getItem(MIN_SCORE);
-	KeyValueFile_getItem(PARTIAL_POSITION);
+  jafar::kernel::KeyValueFile &keyValueFile2 = const_cast<jafar::kernel::KeyValueFile&>(keyValueFile);
+  processKeyValueFile(keyValueFile2, true);
 }
-
 void ConfigEstimation::saveKeyValueFile(jafar::kernel::KeyValueFile& keyValueFile)
 {
-	KeyValueFile_setItem(CORRECTION_SIZE);
-	
-	KeyValueFile_setItem(MAP_SIZE);
-	KeyValueFile_setItem(PIX_NOISE);
-	KeyValueFile_setItem(PIX_NOISE_SIMUFACTOR);
-	
-	KeyValueFile_setItem(D_MIN);
-	KeyValueFile_setItem(REPARAM_TH);
-	
-	KeyValueFile_setItem(GRID_HCELLS);
-	KeyValueFile_setItem(GRID_VCELLS);
-	KeyValueFile_setItem(GRID_MARGIN);
-	KeyValueFile_setItem(GRID_SEPAR);
-	
-	KeyValueFile_setItem(RELEVANCE_TH);
-	KeyValueFile_setItem(MAHALANOBIS_TH);
-	KeyValueFile_setItem(N_UPDATES_TOTAL);
-	KeyValueFile_setItem(N_UPDATES_RANSAC);
-	KeyValueFile_setItem(N_INIT);
-	KeyValueFile_setItem(N_RECOMP_GAINS);
-	KeyValueFile_setItem(RANSAC_LOW_INNOV);
-	
-	KeyValueFile_setItem(RANSAC_NTRIES);
-	
-	KeyValueFile_setItem(HARRIS_CONV_SIZE);
-	KeyValueFile_setItem(HARRIS_TH);
-	KeyValueFile_setItem(HARRIS_EDDGE);
-	
-	KeyValueFile_setItem(DESC_SIZE);
-	KeyValueFile_setItem(MULTIVIEW_DESCRIPTOR);
-	KeyValueFile_setItem(DESC_SCALE_STEP);
-	KeyValueFile_setItem(DESC_ANGLE_STEP);
-	KeyValueFile_setItem(DESC_PREDICTION_TYPE);
-	
-	KeyValueFile_setItem(PATCH_SIZE);
-	KeyValueFile_setItem(MAX_SEARCH_SIZE);
-	KeyValueFile_setItem(KILL_SEARCH_SIZE);
-	KeyValueFile_setItem(MATCH_TH);
-	KeyValueFile_setItem(MIN_SCORE);
-	KeyValueFile_setItem(PARTIAL_POSITION);
+  processKeyValueFile(keyValueFile, false);
 }
+
+void ConfigEstimation::processKeyValueFile(jafar::kernel::KeyValueFile& keyValueFile, bool read)
+{
+	KeyValueFile_processItem(CORRECTION_SIZE);
+	
+	KeyValueFile_processItem(MAP_SIZE);
+	KeyValueFile_processItem(PIX_NOISE);
+	KeyValueFile_processItem(PIX_NOISE_SIMUFACTOR);
+	
+	KeyValueFile_processItem(D_MIN);
+	KeyValueFile_processItem(REPARAM_TH);
+	
+	KeyValueFile_processItem(GRID_HCELLS);
+	KeyValueFile_processItem(GRID_VCELLS);
+	KeyValueFile_processItem(GRID_MARGIN);
+	KeyValueFile_processItem(GRID_SEPAR);
+	
+	KeyValueFile_processItem(RELEVANCE_TH);
+	KeyValueFile_processItem(MAHALANOBIS_TH);
+	KeyValueFile_processItem(N_UPDATES_TOTAL);
+	KeyValueFile_processItem(N_UPDATES_RANSAC);
+	KeyValueFile_processItem(N_INIT);
+	KeyValueFile_processItem(N_RECOMP_GAINS);
+	KeyValueFile_processItem(RANSAC_LOW_INNOV);
+	
+	KeyValueFile_processItem(RANSAC_NTRIES);
+	
+	KeyValueFile_processItem(HARRIS_CONV_SIZE);
+	KeyValueFile_processItem(HARRIS_TH);
+	KeyValueFile_processItem(HARRIS_EDDGE);
+	
+	KeyValueFile_processItem(DESC_SIZE);
+	KeyValueFile_processItem(MULTIVIEW_DESCRIPTOR);
+	KeyValueFile_processItem(DESC_SCALE_STEP);
+	KeyValueFile_processItem(DESC_ANGLE_STEP);
+	KeyValueFile_processItem(DESC_PREDICTION_TYPE);
+	
+	KeyValueFile_processItem(PATCH_SIZE);
+	KeyValueFile_processItem(MAX_SEARCH_SIZE);
+	KeyValueFile_processItem(KILL_SEARCH_SIZE);
+	KeyValueFile_processItem(MATCH_TH);
+	KeyValueFile_processItem(MIN_SCORE);
+	KeyValueFile_processItem(PARTIAL_POSITION);
+}
+

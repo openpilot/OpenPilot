@@ -380,6 +380,11 @@ static void simulateModelQuadcopter()
 		AttitudeActualSet(&attitudeActual);
 	}
 	
+	static float wind[3] = {0,0,0};
+	wind[0] = wind[0] * 0.95 + rand_gauss();
+	wind[1] = wind[1] * 0.95 + rand_gauss();
+	wind[2] = wind[2] * 0.95 + rand_gauss();
+	
 	Quaternion2R(q,Rbe);
 	// Make thrust negative as down is positive
 	ned_accel[0] = -thrust * Rbe[2][0];
@@ -388,9 +393,9 @@ static void simulateModelQuadcopter()
 	ned_accel[2] = -thrust * Rbe[2][2] + 9.81;
 	
 	// Apply acceleration based on velocity
-	ned_accel[0] -= K_FRICTION * vel[0];
-	ned_accel[1] -= K_FRICTION * vel[1];
-	ned_accel[2] -= K_FRICTION * vel[2];
+	ned_accel[0] -= K_FRICTION * (vel[0] - wind[0]);
+	ned_accel[1] -= K_FRICTION * (vel[1] - wind[0]);
+	ned_accel[2] -= K_FRICTION * (vel[2] - wind[0]);
 
 	// Predict the velocity forward in time
 	vel[0] = vel[0] + ned_accel[0] * dT;

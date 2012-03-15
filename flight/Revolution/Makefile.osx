@@ -55,6 +55,7 @@ USE_THUMB_MODE = YES
 # List of modules to include
 MODULES = Telemetry
 MODULES +=  Actuator ManualControl Stabilization 
+MODULES += AltitudeHold Guidance
 MODULES += Attitude/revolution
 #MODULES += SimulatedAttitude
 

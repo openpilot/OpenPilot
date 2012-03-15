@@ -49,6 +49,7 @@ static xQueueHandle queue;
 
 // Private functions
 static void pathPlannerTask(void *parameters);
+static void updatePositionDesired();
 
 /**
  * Module initialization
@@ -126,6 +127,7 @@ static void pathPlannerTask(void *parameters)
 
 	// Main thread loop
 	bool pathplanner_active = false;
+	uint32_t last_index=0;
 	while (1)
 	{
 		FlightStatusGet(&flightStatus);
@@ -142,15 +144,10 @@ static void pathPlannerTask(void *parameters)
 			waypointActive.Index = 0;
 			WaypointActiveSet(&waypointActive);
 
-			WaypointInstGet(waypointActive.Index, &waypoint);
-
-			PositionDesiredGet(&positionDesired);
-			positionDesired.North = waypoint.Position[WAYPOINT_POSITION_NORTH];
-			positionDesired.East = waypoint.Position[WAYPOINT_POSITION_EAST];
-			positionDesired.Down = waypoint.Position[WAYPOINT_POSITION_DOWN];
-			PositionDesiredSet(&positionDesired);
+			updatePositionDesired();
 
 			pathplanner_active = true;
+			last_index = waypointActive.Index;
 
 			continue;
 		}
@@ -158,6 +155,9 @@ static void pathPlannerTask(void *parameters)
 		PositionActualGet(&positionActual);
 		WaypointActiveGet(&waypointActive);
 		WaypointInstGet(waypointActive.Index, &waypoint);
+
+		if(last_index != waypointActive.Index)
+			updatePositionDesired();
 
 		float r2 = powf(positionActual.North - waypoint.Position[WAYPOINT_POSITION_NORTH], 2) +
 		     powf(positionActual.East - waypoint.Position[WAYPOINT_POSITION_EAST], 2) +
@@ -170,16 +170,9 @@ static void pathPlannerTask(void *parameters)
 					waypointActive.Index++;
 					WaypointActiveSet(&waypointActive);
 					
-					if(WaypointInstGet(waypointActive.Index, &waypoint) != 0) {
-						// Oh shit, tried to go to non-existant waypoint
-						continue;
-					}
+					updatePositionDesired();
+					last_index = waypointActive.Index;
 
-					PositionDesiredGet(&positionDesired);
-					positionDesired.North = waypoint.Position[WAYPOINT_POSITION_NORTH];
-					positionDesired.East = waypoint.Position[WAYPOINT_POSITION_EAST];
-					positionDesired.Down = waypoint.Position[WAYPOINT_POSITION_DOWN];
-					PositionDesiredSet(&positionDesired);
 					break;
 				case WAYPOINT_ACTION_RTH:
 					// Fly back to the home location but 20 m above it
@@ -194,6 +187,21 @@ static void pathPlannerTask(void *parameters)
 			}
 		}
 	}
+}
+
+static void updatePositionDesired()
+{
+	PositionDesiredData positionDesired;
+	WaypointActiveData waypointActive;
+	WaypointData waypoint;
+
+	WaypointInstGet(waypointActive.Index, &waypoint);
+	
+	PositionDesiredGet(&positionDesired);
+	positionDesired.North = waypoint.Position[WAYPOINT_POSITION_NORTH];
+	positionDesired.East = waypoint.Position[WAYPOINT_POSITION_EAST];
+	positionDesired.Down = waypoint.Position[WAYPOINT_POSITION_DOWN];
+	PositionDesiredSet(&positionDesired);
 }
 
 /**

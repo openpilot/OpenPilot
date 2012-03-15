@@ -446,13 +446,23 @@ static void simulateModelQuadcopter()
 		T[1] = cos(homeLocation.Latitude / 10e6 * M_PI / 180.0f)*(homeLocation.Altitude+6.378137E6) * M_PI / 180.0;
 		T[2] = -1.0;
 		
+		static float gps_drift[3] = {0,0,0};
+		gps_drift[0] = gps_drift[0] * 0.95 + rand_gauss() / 10.0;
+		gps_drift[1] = gps_drift[1] * 0.95 + rand_gauss() / 10.0;
+		gps_drift[2] = gps_drift[2] * 0.95 + rand_gauss() / 10.0;
+
+		static float gps_vel_drift[3] = {0,0,0};
+		gps_vel_drift[0] = gps_vel_drift[0] * 0.65 + rand_gauss() / 5.0;
+		gps_vel_drift[1] = gps_vel_drift[1] * 0.65 + rand_gauss() / 5.0;
+		gps_vel_drift[2] = gps_vel_drift[2] * 0.65 + rand_gauss() / 5.0;
+
 		GPSPositionData gpsPosition;
 		GPSPositionGet(&gpsPosition);
-		gpsPosition.Latitude = homeLocation.Latitude + (pos[0] / T[0] * 10.0e6);
-		gpsPosition.Longitude = homeLocation.Longitude + (pos[1] / T[1] * 10.0e6);
-		gpsPosition.Altitude = homeLocation.Altitude + (pos[2] / T[2]);
-		gpsPosition.Groundspeed = sqrt(vel[0] * vel[0] + vel[1] * vel[1]);
-		gpsPosition.Heading = 180 / M_PI * atan2(vel[1],vel[0]);
+		gpsPosition.Latitude = homeLocation.Latitude + ((pos[0] + gps_drift[0]) / T[0] * 10.0e6);
+		gpsPosition.Longitude = homeLocation.Longitude + ((pos[1] + gps_drift[1])/ T[1] * 10.0e6);
+		gpsPosition.Altitude = homeLocation.Altitude + ((pos[2] + gps_drift[2]) / T[2]);
+		gpsPosition.Groundspeed = sqrt(pow(vel[0] + gps_vel_drift[0],2) + pow(vel[1] + gps_vel_drift[1],2));
+		gpsPosition.Heading = 180 / M_PI * atan2(vel[1] + gps_vel_drift[1],vel[0] + gps_vel_drift[0]);
 		gpsPosition.Satellites = 7;
 		gpsPosition.PDOP = 1;
 		GPSPositionSet(&gpsPosition);

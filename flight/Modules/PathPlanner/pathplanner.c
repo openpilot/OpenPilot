@@ -125,18 +125,39 @@ static void pathPlannerTask(void *parameters)
 	const float MIN_RADIUS = 2.0f; // Radius to consider at waypoint (m)
 
 	// Main thread loop
+	bool pathplanner_active = false;
 	while (1)
 	{
 		FlightStatusGet(&flightStatus);
 
 		vTaskDelay(100);
 
-		if (flightStatus.FlightMode != FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER)
+		if (flightStatus.FlightMode != FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER) {
+			pathplanner_active = false;
 			continue;
+		}
+
+		if(pathplanner_active == false) {
+			WaypointActiveSet(&waypointActive);
+			waypointActive.Index = 0;
+			WaypointActiveSet(&waypointActive);
+
+			WaypointInstGet(waypointActive.Index, &waypoint);
+
+			PositionDesiredGet(&positionDesired);
+			positionDesired.North = waypoint.Position[WAYPOINT_POSITION_NORTH];
+			positionDesired.East = waypoint.Position[WAYPOINT_POSITION_EAST];
+			positionDesired.Down = waypoint.Position[WAYPOINT_POSITION_DOWN];
+			PositionDesiredSet(&positionDesired);
+
+			pathplanner_active = true;
+
+			continue;
+		}
 
 		PositionActualGet(&positionActual);
 		WaypointActiveGet(&waypointActive);
-		bad_reads += (WaypointInstGet(waypointActive.Index, &waypoint) != 0);
+		WaypointInstGet(waypointActive.Index, &waypoint);
 
 		float r2 = powf(positionActual.North - waypoint.Position[WAYPOINT_POSITION_NORTH], 2) +
 		     powf(positionActual.East - waypoint.Position[WAYPOINT_POSITION_EAST], 2) +
@@ -153,6 +174,12 @@ static void pathPlannerTask(void *parameters)
 						// Oh shit, tried to go to non-existant waypoint
 						continue;
 					}
+
+					PositionDesiredGet(&positionDesired);
+					positionDesired.North = waypoint.Position[WAYPOINT_POSITION_NORTH];
+					positionDesired.East = waypoint.Position[WAYPOINT_POSITION_EAST];
+					positionDesired.Down = waypoint.Position[WAYPOINT_POSITION_DOWN];
+					PositionDesiredSet(&positionDesired);
 					break;
 				case WAYPOINT_ACTION_RTH:
 					// Fly back to the home location but 20 m above it
@@ -166,12 +193,6 @@ static void pathPlannerTask(void *parameters)
 					PIOS_DEBUG_Assert(0);
 			}
 		}
-
-		PositionDesiredGet(&positionDesired);
-		positionDesired.North = waypoint.Position[WAYPOINT_POSITION_NORTH];
-		positionDesired.East = waypoint.Position[WAYPOINT_POSITION_EAST];
-		positionDesired.Down = waypoint.Position[WAYPOINT_POSITION_DOWN];
-		PositionDesiredSet(&positionDesired);
 	}
 }
 

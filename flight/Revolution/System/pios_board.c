@@ -805,9 +805,13 @@ void PIOS_Board_Init(void) {
 #endif
 
 
+#if defined(PIOS_INCLUDE_HMC5883)
 	PIOS_HMC5883_Init(&pios_hmc5883_cfg);
+#endif
 	
+#if defined(PIOS_INCLUDE_MS5611)
 	PIOS_MS5611_Init(&pios_ms5611_cfg, pios_i2c_pressure_adapter_id);
+#endif
 }
 
 /**

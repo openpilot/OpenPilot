@@ -37,7 +37,7 @@
 #include "waypointactive.h"
 
 // Private constants
-#define STACK_SIZE_BYTES 1500
+#define STACK_SIZE_BYTES 2500
 #define TASK_PRIORITY (tskIDLE_PRIORITY+1)
 #define MAX_QUEUE_SIZE 2
 
@@ -85,13 +85,42 @@ MODULE_INITCALL(PathPlannerInitialize, PathPlannerStart)
 /**
  * Module task
  */
+int32_t bad_inits;
+int32_t bad_reads;
 static void pathPlannerTask(void *parameters)
 {
 	FlightStatusData flightStatus;
 	PositionActualData positionActual;
+	PositionDesiredData positionDesired;
 
 	WaypointActiveData waypointActive;
 	WaypointData waypoint;
+	for(uint32_t i = 0; i < 20; i++) {
+		waypoint.Position[1] = 30 * cos(i / 10.0 * M_PI);
+		waypoint.Position[0] = 50 * sin(i / 10.0 * M_PI);
+		waypoint.Position[2] = -50;
+		waypoint.Action = WAYPOINT_ACTION_NEXT;
+		WaypointCreateInstance();
+		bad_inits += (WaypointInstSet(i, &waypoint) != 0);
+	}
+	
+	for(uint32_t i = 20; i < 35; i++) {
+		waypoint.Position[1] = 55 + 20 * cos(i / 10.0 * M_PI - M_PI / 2);
+		waypoint.Position[0] = 25 + 25 * sin(i / 10.0 * M_PI - M_PI / 2);
+		waypoint.Position[2] = -50;
+		waypoint.Action = WAYPOINT_ACTION_NEXT;
+		WaypointCreateInstance();
+		bad_inits += (WaypointInstSet(i, &waypoint) != 0);
+	}
+	
+	waypoint.Position[1] = 35;
+	waypoint.Position[0] = -50;
+	waypoint.Position[2] = -50;
+	waypoint.Action = WAYPOINT_ACTION_RTH;
+	WaypointCreateInstance();
+	WaypointInstSet(35, &waypoint);
+
+	
 
 	const float MIN_RADIUS = 2.0f; // Radius to consider at waypoint (m)
 
@@ -100,12 +129,14 @@ static void pathPlannerTask(void *parameters)
 	{
 		FlightStatusGet(&flightStatus);
 
+		vTaskDelay(100);
+
 		if (flightStatus.FlightMode != FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER)
 			continue;
 
 		PositionActualGet(&positionActual);
 		WaypointActiveGet(&waypointActive);
-		WaypointInstGet(waypointActive.Index, &waypoint);
+		bad_reads += (WaypointInstGet(waypointActive.Index, &waypoint) != 0);
 
 		float r2 = powf(positionActual.North - waypoint.Position[WAYPOINT_POSITION_NORTH], 2) +
 		     powf(positionActual.East - waypoint.Position[WAYPOINT_POSITION_EAST], 2) +
@@ -113,32 +144,34 @@ static void pathPlannerTask(void *parameters)
 
 		// We hit this waypoint
 		if (r2 < (MIN_RADIUS * MIN_RADIUS)) {
-			if (waypoint.Action == WAYPOINT_ACTION_NEXT) {
-				waypointActive.Index++;
-				WaypointActiveSet(&waypointActive);
-
-				if(WaypointInstGet(waypointActive.Index, &waypoint) != 0) {
-					// Oh shit, tried to go to non-existant waypoint
-					continue;
-				}
-
-				PositionDesiredData positionDesired;
-				PositionDesiredGet(&positionDesired);
-				positionDesired.North = waypoint.Position[WAYPOINT_POSITION_NORTH];
-				positionDesired.East = waypoint.Position[WAYPOINT_POSITION_EAST];
-				positionDesired.Down = waypoint.Position[WAYPOINT_POSITION_DOWN];
-				PositionDesiredSet(&positionDesired);
-			} else if (waypointAction == WAYPOINT_ACTION_RTH) {
-				// Fly back to the home location but 20 m above it
-				PositionDesiredData positionDesired;
-				PositionDesiredGet(&positionDesired);
-				positionDesired.North = 0;
-				positionDesired.East = 0;
-				positionDesired.Down = -20;
-				PositionDesiredSet(&positionDesired);
+			switch(waypoint.Action) {
+				case WAYPOINT_ACTION_NEXT:
+					waypointActive.Index++;
+					WaypointActiveSet(&waypointActive);
+					
+					if(WaypointInstGet(waypointActive.Index, &waypoint) != 0) {
+						// Oh shit, tried to go to non-existant waypoint
+						continue;
+					}
+					break;
+				case WAYPOINT_ACTION_RTH:
+					// Fly back to the home location but 20 m above it
+					PositionDesiredGet(&positionDesired);
+					positionDesired.North = 0;
+					positionDesired.East = 0;
+					positionDesired.Down = -20;
+					PositionDesiredSet(&positionDesired);
+					break;
+				default:
+					PIOS_DEBUG_Assert(0);
 			}
 		}
-		vTaskDelay(10);
+
+		PositionDesiredGet(&positionDesired);
+		positionDesired.North = waypoint.Position[WAYPOINT_POSITION_NORTH];
+		positionDesired.East = waypoint.Position[WAYPOINT_POSITION_EAST];
+		positionDesired.Down = waypoint.Position[WAYPOINT_POSITION_DOWN];
+		PositionDesiredSet(&positionDesired);
 	}
 }
 

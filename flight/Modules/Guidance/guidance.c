@@ -201,13 +201,15 @@ static void guidanceTask(void *parameters)
 		SystemSettingsGet(&systemSettings);
 		GuidanceSettingsGet(&guidanceSettings);
 		
-		if ((flightStatus.FlightMode == FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD) &&
+		if ((flightStatus.FlightMode == FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD ||
+			 flightStatus.FlightMode == FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER) &&
 		    ((systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_VTOL) ||
 		     (systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_QUADP) ||
 		     (systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_QUADX) ||
 		     (systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_HEXA) ))
 		{
-			if( flightStatus.FlightMode == FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD ) 
+			if( flightStatus.FlightMode == FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD ||
+			   flightStatus.FlightMode == FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER) 
 				updateVtolDesiredVelocity();
 			else 
 				manualSetDesiredVelocity();			

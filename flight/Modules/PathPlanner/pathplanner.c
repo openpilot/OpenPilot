@@ -46,11 +46,12 @@
 // Private variables
 static xTaskHandle taskHandle;
 static xQueueHandle queue;
+static WaypointActiveData waypointActive;
+static WaypointData waypoint;
 
 // Private functions
 static void pathPlannerTask(void *parameters);
-static void updatePositionDesired();
-
+static void waypointsUpdated(UAVObjEvent * ev);
 /**
  * Module initialization
  */
@@ -90,6 +91,9 @@ int32_t bad_inits;
 int32_t bad_reads;
 static void pathPlannerTask(void *parameters)
 {
+	WaypointConnectCallback(waypointsUpdated);
+	WaypointActiveConnectCallback(waypointsUpdated);
+
 	FlightStatusData flightStatus;
 	PositionActualData positionActual;
 	PositionDesiredData positionDesired;
@@ -127,37 +131,28 @@ static void pathPlannerTask(void *parameters)
 
 	// Main thread loop
 	bool pathplanner_active = false;
-	uint32_t last_index=0;
 	while (1)
 	{
+
+		vTaskDelay(20);
+
 		FlightStatusGet(&flightStatus);
-
-		vTaskDelay(100);
-
 		if (flightStatus.FlightMode != FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER) {
 			pathplanner_active = false;
 			continue;
 		}
 
 		if(pathplanner_active == false) {
-			WaypointActiveSet(&waypointActive);
+			// This triggers callback to update variable
+			WaypointActiveGet(&waypointActive);
 			waypointActive.Index = 0;
 			WaypointActiveSet(&waypointActive);
 
-			updatePositionDesired();
-
 			pathplanner_active = true;
-			last_index = waypointActive.Index;
-
 			continue;
 		}
 
 		PositionActualGet(&positionActual);
-		WaypointActiveGet(&waypointActive);
-		WaypointInstGet(waypointActive.Index, &waypoint);
-
-		if(last_index != waypointActive.Index)
-			updatePositionDesired();
 
 		float r2 = powf(positionActual.North - waypoint.Position[WAYPOINT_POSITION_NORTH], 2) +
 		     powf(positionActual.East - waypoint.Position[WAYPOINT_POSITION_EAST], 2) +
@@ -170,9 +165,6 @@ static void pathPlannerTask(void *parameters)
 					waypointActive.Index++;
 					WaypointActiveSet(&waypointActive);
 					
-					updatePositionDesired();
-					last_index = waypointActive.Index;
-
 					break;
 				case WAYPOINT_ACTION_RTH:
 					// Fly back to the home location but 20 m above it
@@ -189,14 +181,21 @@ static void pathPlannerTask(void *parameters)
 	}
 }
 
-static void updatePositionDesired()
+/**
+ * On changed waypoints or active waypoint update position desired
+ * if we are in charge
+ */
+static void waypointsUpdated(UAVObjEvent * ev)
 {
-	PositionDesiredData positionDesired;
-	WaypointActiveData waypointActive;
-	WaypointData waypoint;
-
-	WaypointInstGet(waypointActive.Index, &waypoint);
+	FlightStatusData flightStatus;
+	FlightStatusGet(&flightStatus);
+	if (flightStatus.FlightMode != FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER)
+		return;
 	
+	WaypointActiveGet(&waypointActive);
+	WaypointInstGet(waypointActive.Index, &waypoint);
+
+	PositionDesiredData positionDesired;
 	PositionDesiredGet(&positionDesired);
 	positionDesired.North = waypoint.Position[WAYPOINT_POSITION_NORTH];
 	positionDesired.East = waypoint.Position[WAYPOINT_POSITION_EAST];

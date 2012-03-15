@@ -1315,14 +1315,19 @@ static int pauseOtherThread(xTaskHandle hTask)
  * or another thread) and returns when that thread has done so.  Sends resume
  * condition to that thread and waits for the status flag to change to running.
  */
+tskTCB *lastResumeAttempt;
+tskTCB *lastResume;
 static void resumeThread(xTaskHandle hTask)
 {
 	const unsigned int MAX_TIME = 100; // us
 	const int MAX_ATTEMPTS = 2000;
 
+	lastResumeAttempt = (tskTCB *) hTask;
+
 	portLONG lIndex;	
 	for ( lIndex = 0; lIndex < MAX_NUMBER_OF_TASKS && pxThreads[ lIndex ].hTask != hTask; lIndex++ );
 	assert(pxThreads[ lIndex ].hTask == hTask);
+
 
 	for(int i = 0; i < MAX_ATTEMPTS; i++) {
 		//pthread_t thread_to_resume = prvGetThreadHandle( hTask );
@@ -1335,6 +1340,7 @@ static void resumeThread(xTaskHandle hTask)
 		while( (clock() - start_time) < MAX_TIME ) {
 			if(pxThreads[ lIndex ].status == RUNNING) {
 				//fprintf(stdout, "Resume detected of %s by %s\r\n", threadToName(pxThreads[lIndex].hThread), threadToName(pthread_self()));
+				lastResume = (tskTCB *) hTask;
 				return;
 			}
 		}
@@ -1357,24 +1363,50 @@ int claim_count = 0;
 static void claimRunningSemaphore(int source)
 {
 	//fprintf(stderr,"Claimed the semaphore(%d) %s\r\n", source, threadToName(pthread_self()));
-		
+	xTaskHandle hTask = prvGetTaskHandle( pthread_self() );
+
 	// And they succeed
 	int succeed = 0;
-	for (int i = 0; i < 10 && !succeed; i++) {
+	for (int i = 0; i < 100 && !succeed; i++) {
 		
 		succeed = (pthread_mutex_trylock( &xRunningThread ) == 0);
 		if (!succeed)
-			usleep(1);
+			usleep(10);
 	}
-	assert( succeed );
 	
-	// Make sure the right task is trying for this (SystemTick doesn't have a handle)
-	xTaskHandle hTask = prvGetTaskHandle( pthread_self() );
-	assert( hTask == NULL || hTask ==  xTaskGetCurrentTaskHandle() );
+	if(succeed) {
+		lastClaim = (tskTCB *) hTask;
+		lastClaimType = source;
+		claim_count ++;
+		
+		if(hTask != NULL && hTask !=  xTaskGetCurrentTaskHandle()) {
+			fprintf(stdout,"This shouldn't have happened\r\b");
+			storeSelf();
+			pauseSelf();
+			claimRunningSemaphore(10);
+			unmaskSuspend();
+		}
+	} else {
+		
+		/* Block further suspend signals.  They need to go to their thread */
+		maskSuspend();
 
-	lastClaim = (tskTCB *) hTask;
-	lastClaimType = source;
-	claim_count ++;
+		/* Store self without releasing semaphore */
+		prvSetTaskCriticalNesting( hTask, uxCriticalNesting );
+		prvSetTaskInterrupt( hTask, xInterruptsEnabled );
+		
+		releaseRunningSemaphore();
+		
+		prvSetThreadStatus( pthread_self(), STORED );
+	
+		pauseSelf();
+		claimRunningSemaphore(11);
+		unmaskSuspend();
+	}
+	
+
+	// Make sure the right task is trying for this (SystemTick doesn't have a handle)
+	assert( hTask == NULL || hTask ==  xTaskGetCurrentTaskHandle() );
 }
 
 /**

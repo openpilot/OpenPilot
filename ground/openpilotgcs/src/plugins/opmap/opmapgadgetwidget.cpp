@@ -2339,9 +2339,9 @@ bool OPMapGadgetWidget::getUAVPosition(double &latitude, double &longitude, doub
     Q_ASSERT(positionActual != NULL);
     PositionActual::DataFields positionActualData = positionActual->getData();
 
-    NED[0] = positionActualData.North / 100;
-    NED[1] = positionActualData.East / 100;
-    NED[2] = positionActualData.Down / 100;
+    NED[0] = positionActualData.North;
+    NED[1] = positionActualData.East;
+    NED[2] = positionActualData.Down;
 
     Utils::CoordinateConversions().GetLLA(homeLLA, NED, LLA);
 
@@ -2350,23 +2350,12 @@ bool OPMapGadgetWidget::getUAVPosition(double &latitude, double &longitude, doub
     altitude = LLA[2];
 
     if (latitude != latitude) latitude = 0; // nan detection
-    //    if (isNan(latitude)) latitude = 0; // nan detection
-    else
-        //    if (!isFinite(latitude)) latitude = 0;
-        //    else
-        if (latitude >  90) latitude =  90;
-        else
-            if (latitude < -90) latitude = -90;
+    else if (latitude >  90) latitude =  90;
+    else if (latitude < -90) latitude = -90;
 
     if (longitude != longitude) longitude = 0; // nan detection
-    else
-        //    if (longitude > std::numeric_limits<double>::max()) longitude = 0;  // +infinite
-        //    else
-        //    if (longitude < -std::numeric_limits<double>::max()) longitude = 0;  // -infinite
-        //    else
-        if (longitude >  180) longitude =  180;
-        else
-            if (longitude < -180) longitude = -180;
+    else if (longitude >  180) longitude =  180;
+    else if (longitude < -180) longitude = -180;
 
     if (altitude != altitude) altitude = 0; // nan detection
 

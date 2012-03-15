@@ -131,9 +131,9 @@ int CoordinateConversions::ECEF2LLA(double ECEF[3], double LLA[3])
   */
 int CoordinateConversions::GetLLA(double homeLLA[3], double NED[3], double position[3])
 {
-    float T[3];
-    T[0] = homeLLA[2]+6.378137E6f;
-    T[1] = cosf(homeLLA[0])*(homeLLA[2]+6.378137E6f);
+    double T[3];
+    T[0] = homeLLA[2]+6.378137E6f * M_PI / 180.0;
+    T[1] = cosf(homeLLA[0] * M_PI / 180.0)*(homeLLA[2]+6.378137E6f) * M_PI / 180.0;
     T[2] = -1.0f;
 
     position[0] = homeLLA[0] + NED[0] / T[0];

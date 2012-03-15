@@ -29,7 +29,7 @@
 #include "uavobjectutilmanager.h"
 
 #include "utils/homelocationutil.h"
-
+#include "homelocation.h"
 #include <QMutexLocker>
 #include <QDebug>
 #include <QEventLoop>
@@ -339,17 +339,13 @@ QByteArray UAVObjectUtilManager::getBoardDescription()
 
 int UAVObjectUtilManager::setHomeLocation(double LLA[3], bool save_to_sdcard)
 {
-	double ECEF[3];
-	double RNE[9];
 	double Be[3];
-	UAVObjectField *field;
 
 	QMutexLocker locker(mutex);
 
-	if (Utils::HomeLocationUtil().getDetails(LLA, ECEF, RNE, Be) < 0)
-		return -1;	// error
+        Q_ASSERT (Utils::HomeLocationUtil().getDetails(LLA, Be) >= 0);
 
-	// ******************
+        // ******************
 	// save the new settings
 
 	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
@@ -358,68 +354,27 @@ int UAVObjectUtilManager::setHomeLocation(double LLA[3], bool save_to_sdcard)
 	UAVObjectManager *om = pm->getObject<UAVObjectManager>();
 	if (!om) return -3;
 
-	UAVDataObject *obj = dynamic_cast<UAVDataObject *>(om->getObject(QString("HomeLocation")));
-	if (!obj) return -4;
+        HomeLocation *homeLocation = HomeLocation::GetInstance(om);
+        Q_ASSERT(homeLocation != NULL);
 
-	UAVObjectField *ECEF_field = obj->getField(QString("ECEF"));
-	if (!ECEF_field) return -5;
+        HomeLocation::DataFields homeLocationData = homeLocation->getData();
+        homeLocationData.Latitude = LLA[0] * 10e6;
+        homeLocationData.Longitude = LLA[1] * 10e6;
+        homeLocationData.Altitude = LLA[2] * 10e6;
 
-	UAVObjectField *RNE_field = obj->getField(QString("RNE"));
-	if (!RNE_field) return -6;
+        homeLocationData.Be[0] = Be[0];
+        homeLocationData.Be[1] = Be[1];
+        homeLocationData.Be[2] = Be[2];
 
-	UAVObjectField *Be_field = obj->getField(QString("Be"));
-	if (!Be_field) return -7;
+        homeLocationData.Set = HomeLocation::SET_TRUE;
 
-	field = obj->getField("Latitude");
-	if (!field) return -8;
-	field->setDouble(LLA[0] * 10e6);
-
-	field = obj->getField("Longitude");
-	if (!field) return -9;
-	field->setDouble(LLA[1] * 10e6);
-
-	field = obj->getField("Altitude");
-	if (!field) return -10;
-	field->setDouble(LLA[2]);
-
-	for (int i = 0; i < 3; i++)
-		ECEF_field->setDouble(ECEF[i] * 100, i);
-
-	for (int i = 0; i < 9; i++)
-		RNE_field->setDouble(RNE[i], i);
-
-	for (int i = 0; i < 3; i++)
-		Be_field->setDouble(Be[i], i);
-
-	field = obj->getField("Set");
-	if (!field) return -11;
-	field->setValue("TRUE");
-
-	obj->updated();
-
-	// ******************
-	// save the new setting to SD card
+        homeLocation->setData(homeLocationData);
+        homeLocation->updated();
 
 	if (save_to_sdcard)
-		saveObjectToSD(obj);
+                saveObjectToSD(homeLocation);
 
-	// ******************
-	// debug
-/*
-	qDebug() << "setting HomeLocation UAV Object .. " << endl;
-	QString s;
-	s = "        LAT:" + QString::number(LLA[0], 'f', 7) + " LON:" + QString::number(LLA[1], 'f', 7) + " ALT:" + QString::number(LLA[2], 'f', 1);
-	qDebug() << s << endl;
-	s = "        ECEF "; for (int i = 0; i < 3; i++) s += " " + QString::number((int)(ECEF[i] * 100));
-	qDebug() << s << endl;
-	s = "        RNE  ";  for (int i = 0; i < 9; i++) s += " " + QString::number(RNE[i], 'f', 7);
-	qDebug() << s << endl;
-	s = "        Be   ";  for (int i = 0; i < 3; i++) s += " " + QString::number(Be[i], 'f', 2);
-	qDebug() << s << endl;
-*/
-	// ******************
-
-	return 0;	// OK
+        return 0;
 }
 
 int UAVObjectUtilManager::getHomeLocation(bool &set, double LLA[3])

@@ -132,16 +132,16 @@ static void SensorsTask(void *parameters)
 
 	AlarmsClear(SYSTEMALARMS_ALARM_SENSORS);
 	
-	HomeLocationData homeLocation;
-	HomeLocationGet(&homeLocation);
-	homeLocation.Latitude = 0;
-	homeLocation.Longitude = 0;
-	homeLocation.Altitude = 0;
-	homeLocation.Be[0] = 26000;
-	homeLocation.Be[1] = 400;
-	homeLocation.Be[2] = 40000;
-	homeLocation.Set = HOMELOCATION_SET_TRUE;
-	HomeLocationSet(&homeLocation);
+//	HomeLocationData homeLocation;
+//	HomeLocationGet(&homeLocation);
+//	homeLocation.Latitude = 0;
+//	homeLocation.Longitude = 0;
+//	homeLocation.Altitude = 0;
+//	homeLocation.Be[0] = 26000;
+//	homeLocation.Be[1] = 400;
+//	homeLocation.Be[2] = 40000;
+//	homeLocation.Set = HOMELOCATION_SET_TRUE;
+//	HomeLocationSet(&homeLocation);
 
 	sensor_sim_type = MODEL_QUADCOPTER;
 
@@ -290,7 +290,6 @@ static void simulateModelQuadcopter()
 	static double ned_accel[3] = {0,0,0};
 	static float q[4] = {1,0,0,0};
 	static float rpy[3] = {0,0,0}; // Low pass filtered actuator
-	double T[3];
 	float Rbe[3][3];
 	
 	const float ACTUATOR_ALPHA = 0.8;
@@ -381,9 +380,9 @@ static void simulateModelQuadcopter()
 	}
 	
 	static float wind[3] = {0,0,0};
-	wind[0] = wind[0] * 0.95 + rand_gauss();
-	wind[1] = wind[1] * 0.95 + rand_gauss();
-	wind[2] = wind[2] * 0.95 + rand_gauss();
+	wind[0] = wind[0] * 0.95 + rand_gauss() / 10.0;
+	wind[1] = wind[1] * 0.95 + rand_gauss() / 10.0;
+	wind[2] = wind[2] * 0.95 + rand_gauss() / 10.0;
 	
 	Quaternion2R(q,Rbe);
 	// Make thrust negative as down is positive
@@ -441,9 +440,11 @@ static void simulateModelQuadcopter()
 	// Update GPS periodically	
 	static uint32_t last_gps_time = 0;
 	if(PIOS_DELAY_DiffuS(last_gps_time) / 1.0e6 > GPS_PERIOD) {
-		T[0] = homeLocation.Altitude+6.378137E6f * M_PI / 180;
-		T[1] = cosf(homeLocation.Latitude / 10e6)*(homeLocation.Altitude+6.378137E6f) * M_PI / 180;
-		T[2] = -1.0f;
+		// Use double precision here as simulating what GPS produces
+		double T[3];
+		T[0] = homeLocation.Altitude+6.378137E6f * M_PI / 180.0;
+		T[1] = cos(homeLocation.Latitude / 10e6 * M_PI / 180.0f)*(homeLocation.Altitude+6.378137E6) * M_PI / 180.0;
+		T[2] = -1.0;
 		
 		GPSPositionData gpsPosition;
 		GPSPositionGet(&gpsPosition);

@@ -53,14 +53,15 @@ FLASH_TOOL = OPENOCD
 USE_THUMB_MODE = YES
 
 # List of modules to include
-MODULES = Telemetry
 MODULES +=  Actuator ManualControl Stabilization 
-MODULES += AltitudeHold Guidance
+MODULES += AltitudeHold Guidance PathPlanner
 MODULES += Attitude/revolution
 #MODULES += SimulatedAttitude
 
 # To run simulation instead of connect to SITL
 MODULES += Sensors/simulated
+
+MODULES += Telemetry
 
 # MCU name, submodel and board
 # - MCU used for compiler-option (-mtune)

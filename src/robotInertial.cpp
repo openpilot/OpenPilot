@@ -117,26 +117,26 @@ namespace jafar {
 			splitControl(_u, am, wm);
 			splitPert(_n, vi, ti, abi, wbi);
 
-			// It is useful to start obtaining a nice rotation matrix and the product R*dt
-			Rold = q2R(q);
-			Rdt = Rold * _dt;
-
-			// Invert sensor functions. Get true acc. and ang. rates
-			// a = R(q)(asens - ab) + g     true acceleration
-			// w = wsens - wb               true angular rate
-			vec3 atrue, wtrue;
-			atrue = prod(Rold, (am - ab)) + gv; // could have done rotate(q, instead of prod(Rold,
-			wtrue = wm - wb;
-
 			// Get new state vector
 			vec3 pnew, vnew, abnew, wbnew;
 			vec gnew;
 			vec4 qnew;
 
-			// qnew = q x q(w * dt)
-			// Keep qwt ( = q(w * dt)) for later use
+			// It is useful to start obtaining a nice rotation matrix and the product R*dt
+			Rdt = q2R(q) * _dt;
+
+			// Invert sensor functions. Get true angular rates:
+			// w = wsens - wb
+			vec3 wtrue = wm - wb;
+
+			// qnew = q x q(w * dt) (keep qwdt for later use)
 			vec4 qwdt = v2q(wtrue * _dt + ti);
 			qnew = qProd(q, qwdt); //    orientation
+
+			// Invert sensor functions. Get true acceleration:
+			// a = R(q)(asens - ab) + g
+			vec3 atrue = rotate(qnew, (am - ab)) + gv;
+
 			vnew = v + atrue * _dt + vi; //    velocity
 			#if AVGSPEED
 			pnew = p + (v+vnew)/2 * _dt; //     position

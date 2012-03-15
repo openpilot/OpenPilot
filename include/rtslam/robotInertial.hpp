@@ -20,6 +20,9 @@
 /**
 Consider that the speed between two updates is the average between
 initial and final speed.
+Of course this should be done for acceleration->speed and
+angular_velocity->angle as well, but this is compensated by the optimal
+timestamp correction
 */
 #define AVGSPEED 1
 /**

@@ -45,7 +45,7 @@ struct pios_udp_cfg {
 
 typedef struct {
   const struct pios_udp_cfg * cfg;
-  pthread_t rxThread;
+  xTaskHandle rxThread;
 
   int socket;
   struct sockaddr_in server;

@@ -54,6 +54,12 @@ const struct pios_tcp_cfg pios_tcp_telem_cfg = {
   .ip = "0.0.0.0",
   .port = 9001,
 };
+
+const struct pios_udp_cfg pios_udp_telem_cfg = {
+	.ip = "0.0.0.0",
+	.port = 9001,
+};
+
 const struct pios_tcp_cfg pios_tcp_gps_cfg = {
   .ip = "0.0.0.0",
   .port = 9001,
@@ -151,7 +157,7 @@ void PIOS_Board_Init(void) {
 	TaskMonitorInitialize();
 
 #if defined(PIOS_INCLUDE_COM)
-#if defined(PIOS_INCLUDE_TELEMETRY_RF)
+#if defined(PIOS_INCLUDE_TELEMETRY_RF) && 1
 	{
 		uint32_t pios_tcp_telem_rf_id;
 		if (PIOS_TCP_Init(&pios_tcp_telem_rf_id, &pios_tcp_telem_cfg)) {
@@ -169,6 +175,26 @@ void PIOS_Board_Init(void) {
 		}
 	}
 #endif /* PIOS_INCLUDE_TELEMETRY_RF */
+
+#if defined(PIOS_INCLUDE_TELEMETRY_RF) && 0
+	{
+		uint32_t pios_udp_telem_rf_id;
+		if (PIOS_UDP_Init(&pios_udp_telem_rf_id, &pios_udp_telem_cfg)) {
+			PIOS_Assert(0);
+		}
+		
+		uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_RX_BUF_LEN);
+		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_TX_BUF_LEN);
+		PIOS_Assert(rx_buffer);
+		PIOS_Assert(tx_buffer);
+		if (PIOS_COM_Init(&pios_com_telem_rf_id, &pios_udp_com_driver, pios_udp_telem_rf_id,
+						  rx_buffer, PIOS_COM_TELEM_RF_RX_BUF_LEN,
+						  tx_buffer, PIOS_COM_TELEM_RF_TX_BUF_LEN)) {
+			PIOS_Assert(0);
+		}
+	}
+#endif /* PIOS_INCLUDE_TELEMETRY_RF */
+
 
 #if defined(PIOS_INCLUDE_GPS)
 	{

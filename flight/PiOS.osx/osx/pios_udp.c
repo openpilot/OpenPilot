@@ -75,7 +75,7 @@ static pios_udp_dev * find_udp_dev_by_id (uint8_t udp)
 /**
  * RxThread
  */
-void * PIOS_UDP_RxThread(void * udp_dev_n)
+void PIOS_UDP_RxThread(void * udp_dev_n)
 {
 
 	/* needed because of FreeRTOS.posix scheduling */
@@ -151,7 +151,7 @@ int32_t PIOS_UDP_Init(uint32_t * udp_id, const struct pios_udp_cfg * cfg)
   int res= bind(udp_dev->socket, (struct sockaddr *)&udp_dev->server,sizeof(udp_dev->server));
 
   /* Create transmit thread for this connection */
-  pthread_create(&udp_dev->rxThread, NULL, PIOS_UDP_RxThread, (void*)udp_dev);
+  xTaskCreate(PIOS_UDP_RxThread, (signed char *)"UdpRx", 1024, (void*)udp_dev, 2, &udp_dev->rxThread);
 
   printf("udp dev %i - socket %i opened - result %i\n",pios_udp_num_devices-1,udp_dev->socket,res);
 

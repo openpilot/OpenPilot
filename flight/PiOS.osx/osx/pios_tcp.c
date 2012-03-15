@@ -134,8 +134,7 @@ static void *PIOS_TCP_RxThread(void *tcp_dev_n)
 			// Received is used to track the scoket whereas the dev variable is only updated when it can be
 			received = read(tcp_dev->socket_connection, incoming_buffer, INCOMING_BUFFER_SIZE);
 			
-			while(fifoBuf_getFree(&tcp_dev->rx_fifo) < received)
-				usleep(10);
+			//while(fifoBuf_getFree(&tcp_dev->rx_fifo) < received);
 			
 			fifoBuf_putData(&tcp_dev->rx_fifo, incoming_buffer, received);
 		} while(received > 0);

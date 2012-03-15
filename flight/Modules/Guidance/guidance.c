@@ -279,8 +279,13 @@ void updateVtolDesiredVelocity()
 		       eastPosIntegral);
 	
 	
-	velocityDesired.North = bound(northCommand,-guidanceSettings.HorizontalVelMax,guidanceSettings.HorizontalVelMax);
-	velocityDesired.East = bound(eastCommand,-guidanceSettings.HorizontalVelMax,guidanceSettings.HorizontalVelMax);
+	float total_vel = sqrtf(powf(velocityDesired.North,2) + powf(velocityDesired.East,2));
+	float scale = 1;
+	if(total_vel > guidanceSettings.HorizontalVelMax)
+		scale = guidanceSettings.HorizontalVelMax / total_vel;
+
+	velocityDesired.North = northCommand * scale;
+	velocityDesired.East = eastCommand * scale;
 
 	downError = positionDesired.Down - positionActual.Down;
 	downPosIntegral = bound(downPosIntegral + downError * dT * guidanceSettings.VerticalPosPI[GUIDANCESETTINGS_VERTICALPOSPI_KI], 

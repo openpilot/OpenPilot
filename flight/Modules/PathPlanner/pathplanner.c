@@ -52,6 +52,7 @@ static WaypointData waypoint;
 // Private functions
 static void pathPlannerTask(void *parameters);
 static void waypointsUpdated(UAVObjEvent * ev);
+static void createPath();
 /**
  * Module initialization
  */
@@ -97,37 +98,10 @@ static void pathPlannerTask(void *parameters)
 	FlightStatusData flightStatus;
 	PositionActualData positionActual;
 	PositionDesiredData positionDesired;
-
-	WaypointActiveData waypointActive;
-	WaypointData waypoint;
-	for(uint32_t i = 0; i < 20; i++) {
-		waypoint.Position[1] = 30 * cos(i / 10.0 * M_PI);
-		waypoint.Position[0] = 50 * sin(i / 10.0 * M_PI);
-		waypoint.Position[2] = -50;
-		waypoint.Action = WAYPOINT_ACTION_NEXT;
-		WaypointCreateInstance();
-		bad_inits += (WaypointInstSet(i, &waypoint) != 0);
-	}
 	
-	for(uint32_t i = 20; i < 35; i++) {
-		waypoint.Position[1] = 55 + 20 * cos(i / 10.0 * M_PI - M_PI / 2);
-		waypoint.Position[0] = 25 + 25 * sin(i / 10.0 * M_PI - M_PI / 2);
-		waypoint.Position[2] = -50;
-		waypoint.Action = WAYPOINT_ACTION_NEXT;
-		WaypointCreateInstance();
-		bad_inits += (WaypointInstSet(i, &waypoint) != 0);
-	}
+	createPath();
 	
-	waypoint.Position[1] = 35;
-	waypoint.Position[0] = -50;
-	waypoint.Position[2] = -50;
-	waypoint.Action = WAYPOINT_ACTION_RTH;
-	WaypointCreateInstance();
-	WaypointInstSet(35, &waypoint);
-
-	
-
-	const float MIN_RADIUS = 2.0f; // Radius to consider at waypoint (m)
+	const float MIN_RADIUS = 4.0f; // Radius to consider at waypoint (m)
 
 	// Main thread loop
 	bool pathplanner_active = false;
@@ -203,7 +177,82 @@ static void waypointsUpdated(UAVObjEvent * ev)
 	PositionDesiredSet(&positionDesired);
 }
 
+static void createPath()
+{
+	// Draw O
+	WaypointData waypoint;
+	for(uint32_t i = 0; i < 20; i++) {
+		waypoint.Position[1] = 30 * cos(i / 19.0 * 2 * M_PI);
+		waypoint.Position[0] = 50 * sin(i / 19.0 * 2 * M_PI);
+		waypoint.Position[2] = -50;
+		waypoint.Action = WAYPOINT_ACTION_NEXT;
+		WaypointCreateInstance();
+		bad_inits += (WaypointInstSet(i, &waypoint) != 0);
+	}
+	
+	// Draw P
+	for(uint32_t i = 20; i < 35; i++) {
+		waypoint.Position[1] = 55 + 20 * cos(i / 10.0 * M_PI - M_PI / 2);
+		waypoint.Position[0] = 25 + 25 * sin(i / 10.0 * M_PI - M_PI / 2);
+		waypoint.Position[2] = -50;
+		waypoint.Action = WAYPOINT_ACTION_NEXT;
+		WaypointCreateInstance();
+		bad_inits += (WaypointInstSet(i, &waypoint) != 0);
+	}
+		
+	waypoint.Position[1] = 35;
+	waypoint.Position[0] = -50;
+	waypoint.Position[2] = -50;
+	waypoint.Action = WAYPOINT_ACTION_NEXT;
+	WaypointCreateInstance();
+	WaypointInstSet(35, &waypoint);
+	
+	// Draw Box
+	waypoint.Position[1] = 35;
+	waypoint.Position[0] = -60;
+	waypoint.Position[2] = -30;
+	waypoint.Action = WAYPOINT_ACTION_NEXT;
+	WaypointCreateInstance();
+	WaypointInstSet(36, &waypoint);
+
+	waypoint.Position[1] = 85;
+	waypoint.Position[0] = -60;
+	waypoint.Position[2] = -30;
+	waypoint.Action = WAYPOINT_ACTION_NEXT;
+	WaypointCreateInstance();
+	WaypointInstSet(37, &waypoint);
+
+	waypoint.Position[1] = 85;
+	waypoint.Position[0] = 60;
+	waypoint.Position[2] = -30;
+	waypoint.Action = WAYPOINT_ACTION_NEXT;
+	WaypointCreateInstance();
+	WaypointInstSet(38, &waypoint);
+	
+	waypoint.Position[1] = -40;
+	waypoint.Position[0] = 60;
+	waypoint.Position[2] = -30;
+	waypoint.Action = WAYPOINT_ACTION_NEXT;
+	WaypointCreateInstance();
+	WaypointInstSet(39, &waypoint);
+
+	waypoint.Position[1] = -40;
+	waypoint.Position[0] = -60;
+	waypoint.Position[2] = -30;
+	waypoint.Action = WAYPOINT_ACTION_NEXT;
+	WaypointCreateInstance();
+	WaypointInstSet(40, &waypoint);
+
+	waypoint.Position[1] = 35;
+	waypoint.Position[0] = -60;
+	waypoint.Position[2] = -30;
+	waypoint.Action = WAYPOINT_ACTION_NEXT;
+	WaypointCreateInstance();
+	WaypointInstSet(41, &waypoint);
+
+}
+
 /**
-  * @}
-  * @}
-  */
+ * @}
+ * @}
+ */

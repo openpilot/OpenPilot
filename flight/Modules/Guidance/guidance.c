@@ -364,6 +364,8 @@ static void updateVtolDesiredAttitude()
 	
 	// Compute desired down command
 	downError = velocityDesired.Down - velocityActual.Down;
+	// Must flip this sign 
+	downError = -downError;
 	downVelIntegral = bound(downVelIntegral + downError * dT * guidanceSettings.VerticalVelPID[GUIDANCESETTINGS_VERTICALVELPID_KI], 
 			      -guidanceSettings.VerticalVelPID[GUIDANCESETTINGS_VERTICALVELPID_ILIMIT],
 			      guidanceSettings.VerticalVelPID[GUIDANCESETTINGS_VERTICALVELPID_ILIMIT]);	

@@ -650,7 +650,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 
 	if(gps_updated && outdoor_mode)
 	{
-		INSSetPosVelVar(1e-2f, 1e-2f);
+		INSSetPosVelVar(1.0e0f, 1.0e0f);
 		sensors |= POS_SENSORS | HORIZ_SENSORS;
 		GPSPositionData gpsPosition;
 		GPSPositionGet(&gpsPosition);

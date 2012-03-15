@@ -293,9 +293,13 @@ static void simulateModelQuadcopter()
 	double T[3];
 	float Rbe[3][3];
 	
-	const float ACTUATOR_ALPHA = 0.99;
+	const float ACTUATOR_ALPHA = 0.8;
 	const float MAX_THRUST = 9.81 * 2;
 	const float K_FRICTION = 1;
+	const float GPS_PERIOD = 0.1;
+	const float MAG_PERIOD = 1.0 / 75.0;
+	const float BARO_PERIOD = 1.0 / 20.0;
+	
 
 	static uint32_t last_time;
 	
@@ -330,9 +334,9 @@ static void simulateModelQuadcopter()
 	RateDesiredData rateDesired;
 	RateDesiredGet(&rateDesired);
 	
-	rpy[0] = rateDesired.Roll * (1 - ACTUATOR_ALPHA) + rpy[0] * ACTUATOR_ALPHA;
-	rpy[1] = rateDesired.Pitch * (1 - ACTUATOR_ALPHA) + rpy[1] * ACTUATOR_ALPHA;
-	rpy[2] = rateDesired.Yaw * (1 - ACTUATOR_ALPHA) + rpy[2] * ACTUATOR_ALPHA;
+	rpy[0] = (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED) * rateDesired.Roll * (1 - ACTUATOR_ALPHA) + rpy[0] * ACTUATOR_ALPHA;
+	rpy[1] = (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED) * rateDesired.Pitch * (1 - ACTUATOR_ALPHA) + rpy[1] * ACTUATOR_ALPHA;
+	rpy[2] = (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED) * rateDesired.Yaw * (1 - ACTUATOR_ALPHA) + rpy[2] * ACTUATOR_ALPHA;
 	
 	GyrosData gyrosData; // Skip get as we set all the fields
 	gyrosData.x = rpy[0] + rand_gauss();
@@ -360,6 +364,12 @@ static void simulateModelQuadcopter()
 	q[2] = q[2] + qdot[2];
 	q[3] = q[3] + qdot[3];
 	
+	float qmag = sqrtf(q[0]*q[0] + q[1]*q[1] + q[2]*q[2] + q[3]*q[3]);
+	q[0] = q[0] / qmag;
+	q[1] = q[1] / qmag;
+	q[2] = q[2] / qmag;
+	q[3] = q[3] / qmag;
+	
 	if(overideAttitude){
 		AttitudeActualData attitudeActual;
 		AttitudeActualGet(&attitudeActual);
@@ -371,33 +381,37 @@ static void simulateModelQuadcopter()
 	}
 	
 	Quaternion2R(q,Rbe);
-	ned_accel[0] = thrust * Rbe[0][2];
-	ned_accel[1] = thrust * Rbe[1][2];
-	ned_accel[2] = thrust * Rbe[2][2];
-	ned_accel[2] -= 9.81;
+	// Make thrust negative as down is positive
+	ned_accel[0] = -thrust * Rbe[2][0];
+	ned_accel[1] = -thrust * Rbe[2][1];
+	// Gravity causes acceleration of 9.81 in the down direction
+	ned_accel[2] = -thrust * Rbe[2][2] + 9.81;
 	
 	// Apply acceleration based on velocity
 	ned_accel[0] -= K_FRICTION * vel[0];
 	ned_accel[1] -= K_FRICTION * vel[1];
-	ned_accel[2] += K_FRICTION * vel[2];
+	ned_accel[2] -= K_FRICTION * vel[2];
 
 	// Predict the velocity forward in time
 	vel[0] = vel[0] + ned_accel[0] * dT;
 	vel[1] = vel[1] + ned_accel[1] * dT;
-	vel[2] = vel[2] - ned_accel[2] * dT;
+	vel[2] = vel[2] + ned_accel[2] * dT;
 
 	// Predict the position forward in time
 	pos[0] = pos[0] + vel[0] * dT;
 	pos[1] = pos[1] + vel[1] * dT;
 	pos[2] = pos[2] + vel[2] * dT;
-	
+
 	// Simulate hitting ground
 	if(pos[2] > 0) {
 		pos[2] = 0;
 		vel[2] = 0;
-		ned_accel[2] = -9.81;
+		ned_accel[2] = 0;
 	}
-
+		
+	// Sensor feels gravity (when not acceleration in ned frame e.g. ned_accel[2] = 0)
+	ned_accel[2] -= 9.81;
+	
 	// Transform the accels back in to body frame
 	AccelsData accelsData; // Skip get as we set all the fields
 	accelsData.x = ned_accel[0] * Rbe[0][0] + ned_accel[1] * Rbe[0][1] + ned_accel[2] * Rbe[0][2];
@@ -406,36 +420,49 @@ static void simulateModelQuadcopter()
 	accelsData.temperature = 30;
 	AccelsSet(&accelsData);
 	
-	BaroAltitudeData baroAltitude;
-	BaroAltitudeGet(&baroAltitude);
-	baroAltitude.Altitude = -pos[2];
-	BaroAltitudeSet(&baroAltitude);
+	// Update baro periodically	
+	static uint32_t last_baro_time = 0;
+	if(PIOS_DELAY_DiffuS(last_baro_time) / 1.0e6 > BARO_PERIOD) {
+		BaroAltitudeData baroAltitude;
+		BaroAltitudeGet(&baroAltitude);
+		baroAltitude.Altitude = -pos[2];
+		BaroAltitudeSet(&baroAltitude);
+		last_baro_time = PIOS_DELAY_GetRaw();
+	}
 	
 	HomeLocationData homeLocation;
 	HomeLocationGet(&homeLocation);
-	T[0] = homeLocation.Altitude+6.378137E6f * M_PI / 180;
-	T[1] = cosf(homeLocation.Latitude / 10e6)*(homeLocation.Altitude+6.378137E6f) * M_PI / 180;
-	T[2] = -1.0f;
 
-	GPSPositionData gpsPosition;
-	GPSPositionGet(&gpsPosition);
-	gpsPosition.Latitude = homeLocation.Latitude + (pos[0] / T[0] * 10.0e6);
-	gpsPosition.Longitude = homeLocation.Longitude + (pos[1] / T[1] * 10.0e6);
-	gpsPosition.Altitude = homeLocation.Altitude + (pos[2] / T[2] * 10.0e6);
-	gpsPosition.Groundspeed = sqrt(vel[0] * vel[0] + vel[1] * vel[1]);
-	gpsPosition.Heading = 180 / M_PI * atan2(vel[0], vel[1]);
-	gpsPosition.Satellites = 7;
-	gpsPosition.PDOP = 1;
-	GPSPositionSet(&gpsPosition);
-	
-	// Because most crafts wont get enough information from gravity to zero yaw gyro, we try
-	// and make it average zero (weakly)
-	
-	MagnetometerData mag;
-	mag.x = homeLocation.Be[0] * Rbe[0][0] + homeLocation.Be[1] * Rbe[0][1] + homeLocation.Be[2] * Rbe[0][2];
-	mag.y = homeLocation.Be[0] * Rbe[1][0] + homeLocation.Be[1] * Rbe[1][1] + homeLocation.Be[2] * Rbe[1][2];
-	mag.z = homeLocation.Be[0] * Rbe[2][0] + homeLocation.Be[1] * Rbe[2][1] + homeLocation.Be[2] * Rbe[2][2];
-	MagnetometerSet(&mag);
+	// Update GPS periodically	
+	static uint32_t last_gps_time = 0;
+	if(PIOS_DELAY_DiffuS(last_gps_time) / 1.0e6 > GPS_PERIOD) {
+		T[0] = homeLocation.Altitude+6.378137E6f * M_PI / 180;
+		T[1] = cosf(homeLocation.Latitude / 10e6)*(homeLocation.Altitude+6.378137E6f) * M_PI / 180;
+		T[2] = -1.0f;
+		
+		GPSPositionData gpsPosition;
+		GPSPositionGet(&gpsPosition);
+		gpsPosition.Latitude = homeLocation.Latitude + (pos[0] / T[0] * 10.0e6);
+		gpsPosition.Longitude = homeLocation.Longitude + (pos[1] / T[1] * 10.0e6);
+		gpsPosition.Altitude = homeLocation.Altitude + (pos[2] / T[2]);
+		gpsPosition.Groundspeed = sqrt(vel[0] * vel[0] + vel[1] * vel[1]);
+		gpsPosition.Heading = 180 / M_PI * atan2(vel[1],vel[0]);
+		gpsPosition.Satellites = 7;
+		gpsPosition.PDOP = 1;
+		GPSPositionSet(&gpsPosition);
+		last_gps_time = PIOS_DELAY_GetRaw();
+	}
+
+	// Update mag periodically
+	static uint32_t last_mag_time = 0;
+	if(PIOS_DELAY_DiffuS(last_mag_time) / 1.0e6 > MAG_PERIOD) {
+		MagnetometerData mag;
+		mag.x = homeLocation.Be[0] * Rbe[0][0] + homeLocation.Be[1] * Rbe[0][1] + homeLocation.Be[2] * Rbe[0][2];
+		mag.y = homeLocation.Be[0] * Rbe[1][0] + homeLocation.Be[1] * Rbe[1][1] + homeLocation.Be[2] * Rbe[1][2];
+		mag.z = homeLocation.Be[0] * Rbe[2][0] + homeLocation.Be[1] * Rbe[2][1] + homeLocation.Be[2] * Rbe[2][2];
+		MagnetometerSet(&mag);
+		last_mag_time = PIOS_DELAY_GetRaw();
+	}
 	
 	AttitudeSimulatedData attitudeSimulated;
 	AttitudeSimulatedGet(&attitudeSimulated);

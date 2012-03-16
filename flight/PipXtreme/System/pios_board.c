@@ -669,7 +669,11 @@ const struct pios_usb_cdc_cfg pios_usb_cdc_cfg = {
 #include <pios_rfm22b_priv.h>
 
 const struct pios_rfm22b_cfg pios_rfm22b_cfg = {
-	.send_timeout = 15, /* ms */
+	.sendTimeout = 15, /* ms */
+	.minPacketSize = 0,
+	.txWinSize = 4,
+	.maxConnections = 1,
+	.id = 0x36249acb
 };
 #endif /* PIOS_INCLUDE_RFM22B */
 
@@ -694,10 +698,8 @@ void PIOS_Board_Init(void) {
 
 	HwSettingsInitialize();
 
-#ifndef ERASE_FLASH
 	/* Initialize watchdog as early as possible to catch faults during init */
 	PIOS_WDG_Init();
-#endif
 
 	/* Initialize the alarms library */
 	AlarmsInitialize();
@@ -854,6 +856,9 @@ void PIOS_Board_Init(void) {
 	}
 #endif /* PIOS_INCLUDE_RFM22B */
 	PIOS_COM_SendString(PIOS_COM_DEBUG, "Hello DEBUG\n\r");
+	PIOS_COM_SendString(PIOS_COM_FLEXI, "Hello Flexi\n\r");
+	PIOS_COM_SendString(PIOS_COM_TELEM_SERIAL, "Hello Telem Serial\n\r");
+	PIOS_COM_SendString(PIOS_COM_VCP_USB, "Hello VCP\n\r");
 
 	/* Remap AFIO pin */
 	GPIO_PinRemapConfig( GPIO_Remap_SWJ_NoJTRST, ENABLE);

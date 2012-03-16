@@ -41,12 +41,14 @@
 
 static void radio2ComBridgeTask(void *parameters);
 static void com2RadioBridgeTask(void *parameters);
+static int32_t transmitData(uint8_t * data, int32_t length);
 static void updateSettings();
 
 // ****************
 // Private constants
 
-#define STACK_SIZE_BYTES 280
+//#define STACK_SIZE_BYTES 280
+#define STACK_SIZE_BYTES 350
 #define TASK_PRIORITY (tskIDLE_PRIORITY + 1)
 
 #define BRIDGE_BUF_LEN 10
@@ -66,6 +68,14 @@ typedef struct {
 	// The com ports
 	uint32_t com_port;
 	uint32_t radio_port;
+
+	// The UAVTalk connection on the com side.
+	UAVTalkConnection uavTalkCon;
+
+	// Error statistics.
+	uint32_t com_tx_errors;
+	uint32_t radio_tx_errors;
+
 } RadioComBridgeData;
 
 // ****************
@@ -74,11 +84,10 @@ typedef struct {
 static RadioComBridgeData *data;
 
 /**
- * Initialise the module
+ * Start the module
  * \return -1 if initialisation failed
  * \return 0 on success
  */
-
 static int32_t RadioComBridgeStart(void)
 {
 	if(data) {
@@ -90,6 +99,7 @@ static int32_t RadioComBridgeStart(void)
 
 	return -1;
 }
+
 /**
  * Initialise the module
  * \return -1 if initialisation failed
@@ -104,13 +114,21 @@ static int32_t RadioComBridgeInitialize(void)
 		return -1;
 
 	// TODO: Get from settings object
-	data->com_port = PIOS_COM_TELEM_USB;
-	data->radio_port = PIOS_COM_RFM22B_RF;
+	data->com_port = PIOS_COM_BRIDGE_COM;
+	data->radio_port = PIOS_COM_BRIDGE_RADIO;
 
+	// Allocate the com buffers.
 	data->radio2com_buf = pvPortMalloc(BRIDGE_BUF_LEN);
 	PIOS_Assert(data->radio2com_buf);
 	data->com2radio_buf = pvPortMalloc(BRIDGE_BUF_LEN);
 	PIOS_Assert(data->com2radio_buf);
+    
+	// Initialise UAVTalk
+	data->uavTalkCon = UAVTalkInitialize(&transmitData);
+
+	// Initialize the statistics.
+	data->com_tx_errors = 0;
+	data->radio_tx_errors = 0;
 
 	updateSettings();
 
@@ -119,45 +137,64 @@ static int32_t RadioComBridgeInitialize(void)
 MODULE_INITCALL(RadioComBridgeInitialize, RadioComBridgeStart)
 
 /**
- * Main task. It does not return.
+ * The radio to com bridge task.
  */
-
 static void radio2ComBridgeTask(void *parameters)
 {
 	/* Handle radio -> usart/usb direction */
-	volatile uint32_t tx_errors = 0;
 	while (1) {
 		uint32_t rx_bytes;
 
+		// Receive data from the radio port
 		rx_bytes = PIOS_COM_ReceiveBuffer(data->radio_port, data->radio2com_buf, BRIDGE_BUF_LEN, 500);
 		if (rx_bytes > 0) {
-			/* Bytes available to transfer */
+			/* Send the received data to the com port */
 			if (PIOS_COM_SendBuffer(data->com_port, data->radio2com_buf, rx_bytes) != rx_bytes) {
 				/* Error on transmit */
-				tx_errors++;
+				data->com_tx_errors++;
 			}
 		}
 	}
 }
 
+/**
+ * The com to radio bridge task.
+ */
 static void com2RadioBridgeTask(void * parameters)
 {
 	/* Handle usart/usb -> radio direction */
-	volatile uint32_t tx_errors = 0;
 	while (1) {
 		uint32_t rx_bytes;
 
+		// Receive data from the com port
 		rx_bytes = PIOS_COM_ReceiveBuffer(data->com_port, data->com2radio_buf, BRIDGE_BUF_LEN, 500);
 		if (rx_bytes > 0) {
-			/* Bytes available to transfer */
+
+			/* Send the received data to the radio port */
 			if (PIOS_COM_SendBuffer(data->radio_port, data->com2radio_buf, rx_bytes) != rx_bytes) {
 				/* Error on transmit */
-				tx_errors++;
+				data->radio_tx_errors++;
 			}
+
+			// Pass the data through UAVTalk
+			for (uint8_t i = 0; i < rx_bytes; i++)
+				UAVTalkProcessInputStream(data->uavTalkCon, data->com2radio_buf[i]);
 		}
 	}
 }
 
+
+/**
+ * Transmit data buffer to the com port.
+ * \param[in] buf Data buffer to send
+ * \param[in] length Length of buffer
+ * \return -1 on failure
+ * \return number of bytes transmitted on success
+ */
+static int32_t transmitData(uint8_t *buf, int32_t length)
+{
+	return PIOS_COM_SendBuffer(data->com_port, buf, length);
+}
 
 static void updateSettings()
 {

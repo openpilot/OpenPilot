@@ -159,7 +159,15 @@ extern uint32_t pios_com_rfm22b_id;
 #define PIOS_COM_TELEM_USB              (pios_com_telem_usb_id)
 #define PIOS_COM_VCP_USB                (pios_com_vcp_usb_id)
 #define PIOS_COM_RFM22B_RF              (pios_com_rfm22b_id)
+/*
 #define PIOS_COM_DEBUG									PIOS_COM_TELEM_SERIAL
+#define PIOS_COM_RADIO_TEMP							PIOS_COM_FLEXI
+#define PIOS_COM_BRIDGE_COM							PIOS_COM_TELEM_USB
+*/
+#define PIOS_COM_DEBUG									PIOS_COM_TELEM_SERIAL
+#define PIOS_COM_RADIO_TEMP							PIOS_COM_FLEXI
+#define PIOS_COM_BRIDGE_COM							PIOS_COM_TELEM_SERIAL
+#define PIOS_COM_BRIDGE_RADIO						PIOS_COM_RFM22B_RF
 
 //------------------------
 // PIOS_RCVR

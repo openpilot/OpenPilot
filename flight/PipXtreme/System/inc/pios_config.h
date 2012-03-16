@@ -41,6 +41,7 @@
 #define PIOS_INCLUDE_IAP
 #define PIOS_INCLUDE_RFM22B
 #define PIOS_INCLUDE_RCVR
+#define PIOS_INCLUDE_TIM
 
 /* Supported receiver interfaces */
 //#define PIOS_INCLUDE_SPEKTRUM

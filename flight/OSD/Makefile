@@ -263,8 +263,8 @@ endif
 CFLAGS += $(ARCHFLAGS)
 
 
-CFLAGS += -DDIAGNOSTICS
-CFLAGS += -DDIAG_TASKS
+#CFLAGS += -DDIAGNOSTICS
+#CFLAGS += -DDIAG_TASKS
 
 # This is not the best place for these.  Really should abstract out
 # to the board file or something

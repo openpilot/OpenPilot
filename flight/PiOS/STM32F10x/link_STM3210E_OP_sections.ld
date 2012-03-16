@@ -275,7 +275,7 @@ SECTIONS
         _init_stack_top = . - 4 ;
     } > RAM
 
-    _eram = ORIGIN(SRAM) + LENGTH(SRAM) ;
+    _eram = ORIGIN(RAM) + LENGTH(RAM) ;
     _ebss = _eram ;
 
     /* keep the heap section at the end of the SRAM

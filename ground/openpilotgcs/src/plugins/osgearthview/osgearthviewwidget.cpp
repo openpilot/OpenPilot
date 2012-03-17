@@ -87,9 +87,23 @@ using namespace osgEarth::Annotation;
 
 #include <iostream>
 
+#include "utils/stylehelper.h"
+#include "utils/homelocationutil.h"
+#include "utils/worldmagmodel.h"
+#include "utils/coordinateconversions.h"
+#include "attitudeactual.h"
+#include "homelocation.h"
+#include "positionactual.h"
+
+using namespace Utils;
+
 OsgEarthviewWidget::OsgEarthviewWidget(QWidget *parent) : QWidget(parent)
 {
+    setThreadingModel(osgViewer::ViewerBase::CullThreadPerCameraDrawThreadPerContext);
+
+    //setThreadingModel(osgViewer::ViewerBase::SingleThreaded);
     setAttribute(Qt::WA_PaintOnScreen, true);
+    setAttribute(Qt::WA_NoSystemBackground, true);
 
     osg::Group* root = new osg::Group;
     osg::Node* earth = osgDB::readNodeFile("/Users/jcotton81/Documents/Programming/osgearth/tests/boston.earth");
@@ -102,7 +116,7 @@ OsgEarthviewWidget::OsgEarthviewWidget(QWidget *parent) : QWidget(parent)
     root->addChild(earth);
 
     osg::Node* airplane = createAirplane();
-    osgEarth::Util::ObjectLocatorNode* uavPos = new osgEarth::Util::ObjectLocatorNode(mapNode->getMap());
+    uavPos = new osgEarth::Util::ObjectLocatorNode(mapNode->getMap());
     uavPos->getLocator()->setPosition( osg::Vec3d(-71.0763, 42.34425, 150) );
     uavPos->addChild(airplane);
 
@@ -143,7 +157,7 @@ QWidget* OsgEarthviewWidget::createViewWidget( osg::Camera* camera, osg::Node* s
     ControlCanvas::get(view, true)->addControl(grid);
 
     // zoom to a good startup position
-    manip->setViewpoint( Viewpoint(-71.0763, 42.34425, 0, 24.261, -21.6, 1450.0), 5.0 );
+    manip->setViewpoint( Viewpoint(-71.0763, 42.34425, 0, 24.261, -21.6, 650.0), 5.0 );
     //manip->setHomeViewpoint(Viewpoint("Boston", osg::Vec3d(-71.0763, 42.34425, 0), 24.261, -21.6, 3450.0));
 
     osgQt::GraphicsWindowQt* gw = dynamic_cast<osgQt::GraphicsWindowQt*>( camera->getGraphicsContext() );
@@ -181,19 +195,41 @@ osg::Node* OsgEarthviewWidget::createAirplane()
     osg::Group* model = new osg::Group;
     osg::Node *cessna = osgDB::readNodeFile("/Users/jcotton81/Documents/Programming/OpenPilot/artwork/3D Model/multi/joes_cnc/J14-QT_+.3DS");
     if(cessna) {
-        osg::MatrixTransform* mt = new osg::MatrixTransform();
-        mt->setMatrix(osg::Matrixd::scale(0.2e0,0.2e0,0.2e0));
-        mt->addChild( cessna );
+        uavAttitudeAndScale = new osg::MatrixTransform();
+        uavAttitudeAndScale->setMatrix(osg::Matrixd::scale(0.2e0,0.2e0,0.2e0));
+        uavAttitudeAndScale->addChild( cessna );
 
-        model->addChild(mt);
+        model->addChild(uavAttitudeAndScale);
     } else
         qDebug() << "Bad model file";
     return model;
 }
 
 void OsgEarthviewWidget::paintEvent( QPaintEvent* event )
-{ frame(); }
+{
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager * objMngr = pm->getObject<UAVObjectManager>();
+
+    PositionActual *positionActualObj = PositionActual::GetInstance(objMngr);
+    PositionActual::DataFields positionActual = positionActualObj->getData();
+
+    double LLA[3];
+    double NED[3] = {positionActual.North, positionActual.East, positionActual.Down};
+    double homeLLA[3] = {-71.0763, 42.34425, 50};
+
+    CoordinateConversions().GetLLA(homeLLA, NED, LLA);
+    uavPos->getLocator()->setPosition( osg::Vec3d(LLA[0], LLA[1], LLA[2]) );
+
+    AttitudeActual *attitudeActualObj = AttitudeActual::GetInstance(objMngr);
+    AttitudeActual::DataFields attitudeActual = attitudeActualObj->getData();
+
+    osg::Quat quat(-attitudeActual.q2, -attitudeActual.q3, -attitudeActual.q4,attitudeActual.q1);
+    uavAttitudeAndScale->setMatrix(osg::Matrixd::scale(0.05e0,0.05e0,0.05e0) * osg::Matrixd::rotate(quat));
+
+    frame();
+}
 
 void OsgEarthviewWidget::resizeEvent(QResizeEvent *event)
 {
 }
+

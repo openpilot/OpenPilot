@@ -109,5 +109,7 @@ private: /* Private methods */
 private: /* Private variables */
     QTimer _timer;
     EarthManipulator* manip;
+    osgEarth::Util::ObjectLocatorNode* uavPos;
+    osg::MatrixTransform* uavAttitudeAndScale;
 };
 #endif /* OSGEARTHVIEWWIDGET_H_ */

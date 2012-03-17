@@ -30,6 +30,8 @@
 #include <QStringList>
 #include <extensionsystem/pluginmanager.h>
 
+#include <osgQt/GraphicsWindowQt>
+
 
 OsgEarthviewPlugin::OsgEarthviewPlugin()
 {
@@ -47,6 +49,8 @@ bool OsgEarthviewPlugin::initialize(const QStringList& args, QString *errMsg)
    Q_UNUSED(errMsg);
    mf = new OsgEarthviewGadgetFactory(this);
    addAutoReleasedObject(mf);
+
+   osgQt::initQtWindowingSystem();
 
    return true;
 }

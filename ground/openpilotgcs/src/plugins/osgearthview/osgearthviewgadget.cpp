@@ -25,9 +25,9 @@
 
 #include "osgearthviewgadget.h"
 #include "osgearthviewwidget.h"
-#include "osgearthviewconfiguration.h"
+#include "osgearthviewgadgetconfiguration.h"
 
-OsgEarthviewGadget::OsgEarthviewGadget(QString classId, OsgEarthviewGadgetWidget *widget, QWidget *parent) :
+OsgEarthviewGadget::OsgEarthviewGadget(QString classId, OsgEarthviewWidget *widget, QWidget *parent) :
         IUAVGadget(classId, parent),
         m_widget(widget)
 {

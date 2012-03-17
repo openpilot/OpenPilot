@@ -25,14 +25,69 @@
 
 #include "osgearthviewwidget.h"
 #include <utils/stylehelper.h>
-#include <utils/cachedsvgitem.h>
 #include <iostream>
 #include <QDebug>
 #include <QPainter>
 #include <QtOpenGL/QGLWidget>
 #include <cmath>
+#include <QtGui/QApplication>
+#include <QLabel>
+#include <QDebug>
 
-OsgEarthviewWidget::OsgEarthviewWidget(QWidget *parent) : QGraphicsView(parent)
+#include <QtCore/QTimer>
+#include <QtGui/QApplication>
+#include <QtGui/QGridLayout>
+
+
+#include <osg/Notify>
+#include <osg/PositionAttitudeTransform>
+
+#include <osgUtil/Optimizer>
+#include <osgGA/StateSetManipulator>
+#include <osgGA/GUIEventHandler>
+#include <osgViewer/Viewer>
+#include <osgViewer/ViewerEventHandlers>
+
+#include <osgEarth/MapNode>
+#include <osgEarth/XmlUtils>
+#include <osgEarth/Viewpoint>
+
+#include <osgEarthSymbology/Color>
+
+#include <osgEarthAnnotation/AnnotationRegistry>
+#include <osgEarthAnnotation/AnnotationData>
+#include <osgEarthAnnotation/Decluttering>
+
+#include <osgEarthDrivers/kml/KML>
+#include <osgEarthDrivers/ocean_surface/OceanSurface>
+#include <osgEarthDrivers/cache_filesystem/FileSystemCache>
+
+#include <osgEarthUtil/EarthManipulator>
+#include <osgEarthUtil/AutoClipPlaneHandler>
+#include <osgEarthUtil/Controls>
+#include <osgEarthUtil/SkyNode>
+#include <osgEarthUtil/LatLongFormatter>
+#include <osgEarthUtil/MouseCoordsTool>
+#include <osgEarthUtil/ObjectLocator>
+
+using namespace osgEarth::Util;
+using namespace osgEarth::Util::Controls;
+using namespace osgEarth::Symbology;
+using namespace osgEarth::Drivers;
+using namespace osgEarth::Annotation;
+
+#include <osgViewer/CompositeViewer>
+#include <osgViewer/ViewerEventHandlers>
+
+#include <osgGA/TrackballManipulator>
+
+#include <osgDB/ReadFile>
+
+#include <osgQt/GraphicsWindowQt>
+
+#include <iostream>
+
+OsgEarthviewWidget::OsgEarthviewWidget(QWidget *parent) : QWidget(parent)
 {
 }
 

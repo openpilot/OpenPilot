@@ -1,4 +1,4 @@
-<plugin name="OsgEarthview" version="1.0.0" compatVersion="1.0.0">
+<plugin name="OsgEarthviewGadget" version="1.0.0" compatVersion="1.0.0">
     <vendor>The OpenPilot Project</vendor>
     <copyright>(C) 2012 The OpenPilot Project</copyright>
     <license>The GNU Public License (GPL) Version 3</license>

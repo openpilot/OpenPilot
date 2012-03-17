@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>PFDGadgetOptionsPage</class>
- <widget class="QWidget" name="PFDGadgetOptionsPage">
+ <class>OsgEarthviewGadgetOptionsPage</class>
+ <widget class="QWidget" name="OsgEarthviewGadgetOptionsPage">
   <property name="geometry">
    <rect>
     <x>0</x>

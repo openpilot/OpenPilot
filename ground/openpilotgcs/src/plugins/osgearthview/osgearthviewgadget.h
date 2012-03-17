@@ -33,7 +33,7 @@
 class IUAVGadget;
 class QWidget;
 class QString;
-class OsgEarthviewGadgetWidget;
+class OsgEarthviewWidget;
 
 using namespace Core;
 
@@ -48,7 +48,7 @@ public:
     void loadConfiguration(IUAVGadgetConfiguration* config);
 
 private:
-    OsgEarthviewGadgetWidget *m_widget;
+    OsgEarthviewWidget *m_widget;
 };
 
 

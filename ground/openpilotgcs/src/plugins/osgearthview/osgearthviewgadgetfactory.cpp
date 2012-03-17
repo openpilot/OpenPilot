@@ -42,7 +42,7 @@ OsgEarthviewGadgetFactory::~OsgEarthviewGadgetFactory()
 
 Core::IUAVGadget* OsgEarthviewGadgetFactory::createGadget(QWidget *parent)
 {
-    OsgEarthviewGadgetWidget* gadgetWidget = new OsgEarthviewGadgetWidget(parent);
+    OsgEarthviewWidget* gadgetWidget = new OsgEarthviewWidget(parent);
     return new OsgEarthviewGadget(QString("OsgEarthviewGadget"), gadgetWidget, parent);
 }
 

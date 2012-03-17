@@ -54,5 +54,4 @@ IUAVGadgetConfiguration *OsgEarthviewGadgetConfiguration::clone()
  *
  */
 void OsgEarthviewGadgetConfiguration::saveConfig(QSettings* qSettings) const {
-    QString dialFile = Utils::PathUtils().RemoveDataPath(m_defaultDial);
 }

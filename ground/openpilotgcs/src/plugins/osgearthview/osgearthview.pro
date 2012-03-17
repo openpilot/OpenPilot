@@ -1,10 +1,10 @@
 TEMPLATE = lib
-TARGET = PFDGadget
+TARGET = OsgEarthviewGadget
 
 QT += opengl
 include(../../openpilotgcsplugin.pri)
 include(../../plugins/coreplugin/coreplugin.pri)
-include(pfd_dependencies.pri)
+include(osgearthview_dependencies.pri)
 include(osg.pri)
 include(osgearth.pri)
 
@@ -22,5 +22,7 @@ SOURCES += osgearthviewgadgetfactory.cpp
 SOURCES += osgearthviewgadgetconfiguration.cpp
 SOURCES += osgearthviewgadgetoptionspage.cpp
 
-OTHER_FILES += OsgEarthview.pluginspec
+FORMS += osgearthviewgadgetoptionspage.ui
+
+OTHER_FILES += OsgEarthviewGadget.pluginspec
 RESOURCES += osgearthview.qrc

@@ -30,14 +30,55 @@
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
-#include <QGraphicsView>
-#include <QtSvg/QSvgRenderer>
-#include <QtSvg/QGraphicsSvgItem>
 
-#include <QFile>
-#include <QTimer>
+#include <osg/Notify>
+#include <osg/PositionAttitudeTransform>
 
-class OsgEarthviewWidget : public QGraphicsView
+#include <osgDB/ReadFile>
+
+#include <osgGA/StateSetManipulator>
+#include <osgGA/TrackballManipulator>
+#include <osgGA/GUIEventHandler>
+
+#include <osgUtil/Optimizer>
+
+#include <osgViewer/CompositeViewer>
+#include <osgViewer/Viewer>
+#include <osgViewer/ViewerEventHandlers>
+
+#include <osgEarth/MapNode>
+#include <osgEarth/XmlUtils>
+#include <osgEarth/Viewpoint>
+
+#include <osgEarthSymbology/Color>
+
+#include <osgEarthAnnotation/AnnotationRegistry>
+#include <osgEarthAnnotation/AnnotationData>
+#include <osgEarthAnnotation/Decluttering>
+
+#include <osgEarthDrivers/kml/KML>
+#include <osgEarthDrivers/ocean_surface/OceanSurface>
+#include <osgEarthDrivers/cache_filesystem/FileSystemCache>
+
+#include <osgEarthUtil/EarthManipulator>
+#include <osgEarthUtil/AutoClipPlaneHandler>
+#include <osgEarthUtil/Controls>
+#include <osgEarthUtil/SkyNode>
+#include <osgEarthUtil/LatLongFormatter>
+#include <osgEarthUtil/MouseCoordsTool>
+#include <osgEarthUtil/ObjectLocator>
+
+using namespace osgEarth::Util;
+using namespace osgEarth::Util::Controls;
+using namespace osgEarth::Symbology;
+using namespace osgEarth::Drivers;
+using namespace osgEarth::Annotation;
+
+#include <osgQt/GraphicsWindowQt>
+
+#include <iostream>
+
+class OsgEarthviewWidget : public QWidget, public osgViewer::CompositeViewer
 {
     Q_OBJECT
 

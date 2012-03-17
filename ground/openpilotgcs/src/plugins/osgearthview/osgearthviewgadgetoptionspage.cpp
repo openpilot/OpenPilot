@@ -23,9 +23,9 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "pfdgadgetoptionspage.h"
-#include "pfdgadgetconfiguration.h"
-#include "ui_pfdgadgetoptionspage.h"
+#include "osgearthviewgadgetoptionspage.h"
+#include "osgearthviewgadgetconfiguration.h"
+#include "ui_osgearthviewgadgetoptionspage.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavdataobject.h"
@@ -35,32 +35,21 @@
 #include <QtAlgorithms>
 #include <QStringList>
 
-PFDGadgetOptionsPage::PFDGadgetOptionsPage(PFDGadgetConfiguration *config, QObject *parent) :
+OsgEarthviewGadgetOptionsPage::OsgEarthviewGadgetOptionsPage(OsgEarthviewGadgetConfiguration *config, QObject *parent) :
         IOptionsPage(parent),
         m_config(config)
 {
 }
 
 //creates options page widget (uses the UI file)
-QWidget *PFDGadgetOptionsPage::createPage(QWidget *parent)
+QWidget *OsgEarthviewGadgetOptionsPage::createPage(QWidget *parent)
 {
 
-    options_page = new Ui::PFDGadgetOptionsPage();
+    options_page = new Ui::OsgEarthviewGadgetOptionsPage();
     //main widget
     QWidget *optionsPageWidget = new QWidget;
     //main layout
     options_page->setupUi(optionsPageWidget);
-
-
-
-    // Restore the contents from the settings:
-    options_page->svgSourceFile->setExpectedKind(Utils::PathChooser::File);
-    options_page->svgSourceFile->setPromptDialogFilter(tr("SVG image (*.svg)"));
-    options_page->svgSourceFile->setPromptDialogTitle(tr("Choose SVG image"));
-    options_page->svgSourceFile->setPath(m_config->dialFile());
-    options_page->useOpenGL->setChecked(m_config->useOpenGL());
-    options_page->hqText->setChecked(m_config->getHqFonts());
-    options_page->smoothUpdates->setChecked(m_config->getBeSmooth());
 
     return optionsPageWidget;
 }
@@ -71,16 +60,12 @@ QWidget *PFDGadgetOptionsPage::createPage(QWidget *parent)
  * Saves the current values
  *
  */
-void PFDGadgetOptionsPage::apply()
+void OsgEarthviewGadgetOptionsPage::apply()
 {
-    m_config->setDialFile(options_page->svgSourceFile->path());
-    m_config->setUseOpenGL(options_page->useOpenGL->checkState());
-    m_config->setHqFonts(options_page->hqText->checkState());
-    m_config->setBeSmooth(options_page->smoothUpdates->checkState());
 }
 
 
 
-void PFDGadgetOptionsPage::finish()
+void OsgEarthviewGadgetOptionsPage::finish()
 {
 }

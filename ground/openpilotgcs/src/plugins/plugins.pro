@@ -192,6 +192,12 @@ plugin_uavobjectutil.depends = plugin_coreplugin
 plugin_uavobjectutil.depends += plugin_uavobjects
 SUBDIRS += plugin_uavobjectutil
 
+# OSG Earth View plugin
+plugin_osgearthview.subdir = osgearthview
+plugin_osgearthview.depends = plugin_coreplugin
+plugin_osgearthview.depends += plugin_uavobjects
+SUBDIRS += plugin_osgearthview
+
 # Magic Waypoint gadget
 plugin_magicwaypoint.subdir = magicwaypoint
 plugin_magicwaypoint.depends = plugin_coreplugin

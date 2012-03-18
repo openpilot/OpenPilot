@@ -130,12 +130,13 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 extern uint32_t pios_i2c_flexi_adapter_id;
 #define PIOS_I2C_MAIN_ADAPTER			(pios_i2c_flexi_adapter_id)
 
-//-------------------------
-// SPI
-//
+//------------------------
+// PIOS_SPI
 // See also pios_board.c
-//-------------------------
-#define PIOS_SPI_MAX_DEVS			2
+//------------------------
+#define PIOS_SPI_MAX_DEVS               1
+extern uint32_t pios_spi_port_id;
+#define PIOS_SPI_PORT                   (pios_spi_port_id)
 
 //-------------------------
 // PIOS_USART
@@ -161,13 +162,19 @@ extern uint32_t pios_com_rfm22b_id;
 #define PIOS_COM_RFM22B_RF              (pios_com_rfm22b_id)
 /*
 #define PIOS_COM_DEBUG									PIOS_COM_TELEM_SERIAL
-#define PIOS_COM_RADIO_TEMP							PIOS_COM_FLEXI
 #define PIOS_COM_BRIDGE_COM							PIOS_COM_TELEM_USB
 */
-#define PIOS_COM_DEBUG									PIOS_COM_TELEM_SERIAL
-#define PIOS_COM_RADIO_TEMP							PIOS_COM_FLEXI
+#define PIOS_COM_DEBUG									PIOS_COM_FLEXI
 #define PIOS_COM_BRIDGE_COM							PIOS_COM_TELEM_SERIAL
 #define PIOS_COM_BRIDGE_RADIO						PIOS_COM_RFM22B_RF
+
+#define DEBUG_LEVEL 1
+#if DEBUG_LEVEL > 0
+#define DEBUG_PRINTF(level, ...) if(level <= DEBUG_LEVEL) { PIOS_COM_SendFormattedStringNonBlocking(PIOS_COM_DEBUG, __VA_ARGS__); }
+#else
+#define DEBUG_PRINTF(...)
+#endif
+#define RFM22_DEBUG 1
 
 //------------------------
 // PIOS_RCVR
@@ -217,5 +224,24 @@ extern uint32_t pios_com_rfm22b_id;
 #define PIOS_USB_DETECT_GPIO_PORT               GPIOC
 #define PIOS_USB_DETECT_GPIO_PIN                GPIO_Pin_15
 #define PIOS_USB_DETECT_EXTI_LINE               EXTI_Line15
+
+//-------------------------
+// RFM22
+//-------------------------
+
+//#define RFM22_EXT_INT_USE
+
+#define RFM22_PIOS_SPI						PIOS_SPI_PORT	// SPIx
+
+#if defined(RFM22_EXT_INT_USE)
+#define RFM22_EXT_INT_PORT_SOURCE		GPIO_PortSourceGPIOA
+#define RFM22_EXT_INT_PIN_SOURCE		GPIO_PinSource2
+
+#define RFM22_EXT_INT_LINE				EXTI_Line2
+#define RFM22_EXT_INT_IRQn				EXTI2_IRQn
+#define	RFM22_EXT_INT_FUNC				EXTI2_IRQHandler
+
+#define RFM22_EXT_INT_PRIORITY			1
+#endif
 
 #endif /* STM32103CB_PIPXTREME_H_ */

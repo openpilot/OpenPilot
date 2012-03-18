@@ -478,8 +478,14 @@ const struct pios_usb_cdc_cfg pios_usb_cdc_cfg = {
 #include <pios_rfm22b_priv.h>
 
 const struct pios_rfm22b_cfg pios_rfm22b_cfg = {
+	.frequencyHz = 434000000,
+	.minFrequencyHz = 434000000 - 2000000,
+	.maxFrequencyHz = 434000000 + 2000000,
+	.RFXtalCap = 0x7f,
+	.maxRFBandwidth = 128000,
+	.maxTxPower = RFM22_tx_pwr_txpow_0, // +1dBm ... 1.25mW
 	.sendTimeout = 15, /* ms */
-	.minPacketSize = 0,
+	.minPacketSize = 50,
 	.txWinSize = 4,
 	.maxConnections = 1,
 	.id = 0x36249acb

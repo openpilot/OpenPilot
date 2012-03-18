@@ -199,6 +199,10 @@ void PIOS_Board_Init(void) {
 			PIOS_Assert(0);
 		}
 	}
+	PIOS_COM_SendString(PIOS_COM_DEBUG, "Hello DEBUG\n\r");
+	PIOS_COM_SendString(PIOS_COM_FLEXI, "Hello Flexi\n\r");
+	PIOS_COM_SendString(PIOS_COM_TELEM_SERIAL, "Hello Telem Serial\n\r");
+	PIOS_COM_SendString(PIOS_COM_VCP_USB, "Hello VCP\n\r");
 
 #if defined(PIOS_INCLUDE_RFM22B)
 	/* Initalize the RFM22B radio COM device. */
@@ -218,10 +222,6 @@ void PIOS_Board_Init(void) {
 		}
 	}
 #endif /* PIOS_INCLUDE_RFM22B */
-	PIOS_COM_SendString(PIOS_COM_DEBUG, "Hello DEBUG\n\r");
-	PIOS_COM_SendString(PIOS_COM_FLEXI, "Hello Flexi\n\r");
-	PIOS_COM_SendString(PIOS_COM_TELEM_SERIAL, "Hello Telem Serial\n\r");
-	PIOS_COM_SendString(PIOS_COM_VCP_USB, "Hello VCP\n\r");
 
 	/* Remap AFIO pin */
 	GPIO_PinRemapConfig( GPIO_Remap_SWJ_NoJTRST, ENABLE);

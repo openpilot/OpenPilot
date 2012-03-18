@@ -65,10 +65,11 @@ typedef struct {
 	uint8_t txWinSize;
 	uint16_t maxConnections;
 	uint32_t id;
-	uint8_t (*output_stream)(PHPacketHandle packet);
+	void *dev;
+	uint8_t (*output_stream)(void *dev, PHPacketHandle packet);
 	void (*set_baud)(uint32_t baud);
-	void (*data_handler)(uint8_t *data, uint8_t len);
-	void (*receiver_handler)(uint8_t *data, uint8_t len);
+	void (*data_handler)(void *dev, uint8_t *data, uint8_t len);
+	void (*receiver_handler)(void *dev, uint8_t *data, uint8_t len);
 } PacketHandlerConfig;
 
 typedef int32_t (*PHOutputStream)(PHPacketHandle packet);
@@ -78,6 +79,7 @@ typedef void* PHInstHandle;
 // Public functions
 PHInstHandle PHInitialize(PacketHandlerConfig *cfg);
 uint32_t PHConnect(PHInstHandle h, uint32_t dest_id);
+PHPacketHandle PHGetRXPacket(PHInstHandle h);
 PHPacketHandle PHGetTXPacket(PHInstHandle h);
 PHPacketHandle PHReserveTXPacket(PHInstHandle h);
 void PHReleaseLock(PHInstHandle h, bool keep_packet);

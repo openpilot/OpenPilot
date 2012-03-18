@@ -1,13 +1,9 @@
 /**
  ******************************************************************************
- * @addtogroup OpenPilotSystem OpenPilot System
- * @{
- * @addtogroup OpenPilotLibraries OpenPilot System Libraries
- * @{
  *
  * @file       packet_handler.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
- * @brief      A packet handler for handeling radio packet transmission.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @brief      Modem packet handling routines
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -30,64 +26,51 @@
 #ifndef __PACKET_HANDLER_H__
 #define __PACKET_HANDLER_H__
 
-// Public types
-typedef enum {
-	PACKET_TYPE_NONE = 0,
-	PACKET_TYPE_CONNECT,        // for requesting a connection
-	PACKET_TYPE_DISCONNECT,     // to tell the other modem they cannot connect to us
-	PACKET_TYPE_READY,          // tells the other modem we are ready to accept more data
-	PACKET_TYPE_NOTREADY,       // tells the other modem we're not ready to accept more data - we can also send user data in this packet type
-	PACKET_TYPE_DATARATE,       // for changing the RF data rate
-	PACKET_TYPE_PING,           // used to check link is still up
-	PACKET_TYPE_ADJUST_TX_PWR,  // used to ask the other modem to adjust it's tx power
-	PACKET_TYPE_DATA,           // data packet (packet contains user data)
-	PACKET_TYPE_ACKED_DATA,     // data packet that requies an ACK
-	PACKET_TYPE_RECEIVER,       // Receiver relay values
-	PACKET_TYPE_ACK
-} PHPacketType;
+#include "stdint.h"
 
-typedef struct {
-	uint32_t source_id;
-	uint32_t destination_id;
-	uint8_t type;
-	uint8_t tx_seq;
-	uint8_t rx_seq;
-	uint8_t data_size;
-} PHPacketHeader;
+// *****************************************************************************
 
-#define PH_MAX_DATA (255 - sizeof(PHPacketHeader))
-typedef struct {
-	PHPacketHeader header;
-	uint8_t data[PH_MAX_DATA];
-} PHPacket, *PHPacketHandle;
+#define PH_MAX_CONNECTIONS      1	// maximum number of remote connections
 
-typedef struct {
-	uint8_t txWinSize;
-	uint16_t maxConnections;
-	uint32_t id;
-	uint8_t (*output_stream)(PHPacketHandle packet);
-	void (*set_baud)(uint32_t baud);
-	void (*data_handler)(uint8_t *data, uint8_t len);
-	void (*receiver_handler)(uint8_t *data, uint8_t len);
-} PacketHandlerConfig;
+// *****************************************************************************
 
-typedef int32_t (*PHOutputStream)(PHPacketHandle packet);
+void ph_1ms_tick(void);
+void ph_process(void);
 
-typedef void* PHInstHandle;
+bool ph_connected(const int connection_index);
 
-// Public functions
-PHInstHandle PHInitialize(PacketHandlerConfig *cfg);
-uint32_t PHConnect(PHInstHandle h, uint32_t dest_id);
-PHPacketHandle PHGetTXPacket(PHInstHandle h);
-PHPacketHandle PHReserveTXPacket(PHInstHandle h);
-void PHReleaseLock(PHInstHandle h, bool keep_packet);
-void PHReleaseTXPacket(PHInstHandle h, PHPacketHandle p);
-uint8_t PHTransmitPacket(PHInstHandle h, PHPacketHandle p);
-uint8_t PHReceivePacket(PHInstHandle h, PHPacketHandle p);
+uint16_t ph_putData_free(const int connection_index);
+uint16_t ph_putData(const int connection_index, const void *data, uint16_t len);
 
-#endif // __PACKET_HANDLER_H__
+uint16_t ph_getData_used(const int connection_index);
+uint16_t ph_getData(const int connection_index, void *data, uint16_t len);
 
-/**
- * @}
- * @}
- */
+void ph_setFastPing(bool fast);
+
+uint16_t ph_getRetries(const int connection_index);
+
+uint8_t ph_getCurrentLinkState(const int connection_index);
+
+int16_t ph_getLastRSSI(const int connection_index);
+int32_t ph_getLastAFC(const int connection_index);
+
+void ph_setNominalCarrierFrequency(uint32_t frequency_hz);
+uint32_t ph_getNominalCarrierFrequency(void);
+
+void ph_setDatarate(uint32_t datarate_bps);
+uint32_t ph_getDatarate(void);
+
+void ph_setTxPower(uint8_t tx_power);
+uint8_t ph_getTxPower(void);
+
+void ph_set_AES128_key(const void *key);
+
+int ph_set_remote_serial_number(int connection_index, uint32_t sn);
+void ph_set_remote_encryption(int connection_index, bool enabled, const void *key);
+
+void ph_deinit(void);
+void ph_init(uint32_t our_sn);
+
+// *****************************************************************************
+
+#endif

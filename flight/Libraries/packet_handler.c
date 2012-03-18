@@ -158,6 +158,17 @@ PHPacketHandle PHGetTXPacket(PHInstHandle h)
 }
 
 /**
+ * Get a pointer to the the receive buffer.
+ * \param[in] h The packet handler instance data pointer.
+ * \return PHPacketHandle A pointer to the packet buffer.
+ */
+PHPacketHandle PHGetRXPacket(PHInstHandle h)
+{
+	PHPacketDataHandle data = (PHPacketDataHandle)h;
+	return &(data->rx_packet);
+}
+
+/**
  * Release a packet from the transmit packet buffer window.
  * \param[in] h The packet handler instance data pointer.
  * \param[in] p A pointer to the packet buffer.
@@ -229,15 +240,19 @@ uint8_t PHReceivePacket(PHInstHandle h, PHPacketHandle p)
 
 		// Pass on the data.
 		if(data->cfg.data_handler)
-			data->cfg.data_handler(p->data, p->header.data_size);
+			data->cfg.data_handler(data->cfg.dev, p->data, p->header.data_size);
 
 		break;
 
 	case PACKET_TYPE_RECEIVER:
 
+		break;
+
+	default:
+
 		// Pass on the data to the receiver handler.
-		if(data->cfg.receiver_handler)
-			data->cfg.receiver_handler(p->data, p->header.data_size);
+		if(data->cfg.data_handler)
+			data->cfg.data_handler(data->cfg.dev, p->data, p->header.data_size);
 
 		break;
 	}
@@ -259,7 +274,7 @@ static uint8_t PHLTransmitPacket(PHPacketDataHandle data, PHPacketHandle p)
 	p->header.tx_seq = data->tx_seq_id++;
 
 	// Transmit the packet using the output stream.
-	if(!data->cfg.output_stream(p))
+	if(!data->cfg.output_stream(data->cfg.dev, p))
 		return 0;
 
 	return 1;

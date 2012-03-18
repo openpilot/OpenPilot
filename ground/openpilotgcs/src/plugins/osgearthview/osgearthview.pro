@@ -8,14 +8,16 @@ include(osgearthview_dependencies.pri)
 include(osg.pri)
 include(osgearth.pri)
 
-HEADERS += osgearthviewplugin.h
+HEADERS += osgearthviewplugin.h \
+    osgviewerwidget.h
 HEADERS += osgearthviewgadget.h
 HEADERS += osgearthviewwidget.h
 HEADERS += osgearthviewgadgetfactory.h
 HEADERS += osgearthviewgadgetconfiguration.h
 HEADERS += osgearthviewgadgetoptionspage.h
 
-SOURCES += osgearthviewplugin.cpp
+SOURCES += osgearthviewplugin.cpp \
+    osgviewerwidget.cpp
 SOURCES += osgearthviewgadget.cpp
 SOURCES += osgearthviewwidget.cpp
 SOURCES += osgearthviewgadgetfactory.cpp
@@ -26,3 +28,5 @@ FORMS += osgearthviewgadgetoptionspage.ui
 
 OTHER_FILES += OsgEarthviewGadget.pluginspec
 RESOURCES += osgearthview.qrc
+
+

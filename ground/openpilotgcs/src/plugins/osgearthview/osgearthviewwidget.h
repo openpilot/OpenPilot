@@ -26,6 +26,7 @@
 #ifndef OSGEARTHVIEWWIDGET_H_
 #define OSGEARTHVIEWWIDGET_H_
 
+#include "osgviewerwidget.h"
 #include "osgearthviewgadgetconfiguration.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
@@ -80,7 +81,7 @@ using namespace osgEarth::Annotation;
 
 #include <iostream>
 
-class OsgEarthviewWidget : public QWidget, public osgViewer::CompositeViewer
+class OsgEarthviewWidget : public QWidget
 {
     Q_OBJECT
 
@@ -94,22 +95,6 @@ protected: /* Protected methods */
    void paintEvent(QPaintEvent *event);
    void resizeEvent(QResizeEvent *event);
 
-   /* Create a osgQt::GraphicsWindowQt to add to the widget */
-   QWidget* createViewWidget( osg::Camera* camera, osg::Node* scene );
-
-   /* Create an osg::Camera which sets up the OSG view */
-   osg::Camera* createCamera( int x, int y, int w, int h, const std::string& name, bool windowDecoration );
-
-   /* Get the model to render */
-   osg::Node* createAirplane();
-private slots:
-
-private: /* Private methods */
-
-private: /* Private variables */
-    QTimer _timer;
-    EarthManipulator* manip;
-    osgEarth::Util::ObjectLocatorNode* uavPos;
-    osg::MatrixTransform* uavAttitudeAndScale;
+    OsgViewerWidget *viewWidget;
 };
 #endif /* OSGEARTHVIEWWIDGET_H_ */

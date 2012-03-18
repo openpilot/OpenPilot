@@ -101,14 +101,8 @@ using namespace Utils;
 
 OsgViewerWidget::OsgViewerWidget(QWidget *parent) : QWidget(parent)
 {
-    osgQt::initQtWindowingSystem();
-    osgQt::setViewer(this);
-
     setThreadingModel(osgViewer::ViewerBase::CullThreadPerCameraDrawThreadPerContext);
-
-    setThreadingModel(osgViewer::ViewerBase::SingleThreaded);
     setAttribute(Qt::WA_PaintOnScreen, true);
-    setAttribute(Qt::WA_NoSystemBackground, true);
 
     osg::Group* root = new osg::Group;
     osg::Node* earth = osgDB::readNodeFile("/Users/jcotton81/Documents/Programming/osgearth/tests/boston.earth");
@@ -131,7 +125,7 @@ OsgViewerWidget::OsgViewerWidget(QWidget *parent) : QWidget(parent)
     optimizer.optimize(root);
 
     QWidget* viewWidget = createViewWidget( createCamera(0,0,200,200,"Earth",false), root);
-    //viewWidget->show();
+    viewWidget->show();
     setLayout(new QVBoxLayout(this));
 
     viewWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -215,6 +209,7 @@ osg::Node* OsgViewerWidget::createAirplane()
 
 void OsgViewerWidget::paintEvent( QPaintEvent* event )
 {
+    Q_UNUSED(event);
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager * objMngr = pm->getObject<UAVObjectManager>();
 

@@ -87,6 +87,8 @@ using namespace osgEarth::Annotation;
 
 #include <iostream>
 
+#include "ui_osgearthview.h"
+
 #include "utils/stylehelper.h"
 #include "utils/homelocationutil.h"
 #include "utils/worldmagmodel.h"
@@ -99,11 +101,15 @@ using namespace Utils;
 
 OsgEarthviewWidget::OsgEarthviewWidget(QWidget *parent) : QWidget(parent)
 {
-    viewWidget = new OsgViewerWidget(this);
+
+    m_widget = new Ui_OsgEarthview();
+    m_widget->setupUi(this);
+
+    /*viewWidget = new OsgViewerWidget(this);
     viewWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     setLayout(new QVBoxLayout());
-    layout()->addWidget(viewWidget);
+    layout()->addWidget(viewWidget);*/
 }
 
 OsgEarthviewWidget::~OsgEarthviewWidget()

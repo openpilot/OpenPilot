@@ -81,6 +81,8 @@ using namespace osgEarth::Annotation;
 
 #include <iostream>
 
+class Ui_OsgEarthview;
+
 class OsgEarthviewWidget : public QWidget
 {
     Q_OBJECT
@@ -96,5 +98,6 @@ protected: /* Protected methods */
    void resizeEvent(QResizeEvent *event);
 
     OsgViewerWidget *viewWidget;
+    Ui_OsgEarthview *m_widget;
 };
 #endif /* OSGEARTHVIEWWIDGET_H_ */

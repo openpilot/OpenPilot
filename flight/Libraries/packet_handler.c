@@ -30,7 +30,6 @@
 #include "openpilot.h"
 #include "packet_handler.h"
 #include "aes.h"
-#include "crc.h"
 
 // Private types and constants
 typedef struct {

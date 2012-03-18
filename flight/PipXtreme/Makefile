@@ -222,7 +222,6 @@ SRC += $(FLIGHTLIB)/fifo_buffer.c
 SRC += $(FLIGHTLIB)/CoordinateConversions.c
 SRC += $(FLIGHTLIB)/taskmonitor.c
 SRC += $(FLIGHTLIB)/aes.c
-SRC += $(FLIGHTLIB)/crc.c
 SRC += $(FLIGHTLIB)/packet_handler.c
 
 ## CMSIS for STM32

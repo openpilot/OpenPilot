@@ -2653,53 +2653,6 @@
       <showToolbars>false</showToolbars>
       <splitter>
         <side0>
-          <classId>OPMapGadget</classId>
-          <gadget>
-            <activeConfiguration>default</activeConfiguration>
-          </gadget>
-          <type>uavGadget</type>
-        </side0>
-        <side1>
-          <side0>
-            <classId>ModelViewGadget</classId>
-            <gadget>
-              <activeConfiguration>Test Quad X</activeConfiguration>
-            </gadget>
-            <type>uavGadget</type>
-          </side0>
-          <side1>
-            <side0>
-              <classId>DialGadget</classId>
-              <gadget>
-                <activeConfiguration>Attitude</activeConfiguration>
-              </gadget>
-              <type>uavGadget</type>
-            </side0>
-            <side1>
-              <classId>DialGadget</classId>
-              <gadget>
-                <activeConfiguration>Compass</activeConfiguration>
-              </gadget>
-              <type>uavGadget</type>
-            </side1>
-            <splitterOrientation>1</splitterOrientation>
-            <splitterSizes>@Variant(AAAACQAAAAA=)</splitterSizes>
-            <type>splitter</type>
-          </side1>
-          <splitterOrientation>2</splitterOrientation>
-          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAABiwAAAAIAAADs)</splitterSizes>
-          <type>splitter</type>
-        </side1>
-        <splitterOrientation>1</splitterOrientation>
-        <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAD1AAAAAIAAAGB)</splitterSizes>
-        <type>splitter</type>
-      </splitter>
-      <version>UAVGadgetManagerV1</version>
-    </Mode3>
-    <Mode4>
-      <showToolbars>false</showToolbars>
-      <splitter>
-        <side0>
           <side0>
             <classId>ScopeGadget</classId>
             <gadget>
@@ -2751,8 +2704,8 @@
         <type>splitter</type>
       </splitter>
       <version>UAVGadgetManagerV1</version>
-    </Mode4>
-    <Mode5>
+    </Mode3>
+    <Mode4>
       <showToolbars>false</showToolbars>
       <splitter>
         <side0>
@@ -2822,8 +2775,8 @@
         <type>splitter</type>
       </splitter>
       <version>UAVGadgetManagerV1</version>
-    </Mode5>
-    <Mode6>
+    </Mode4>
+    <Mode5>
       <showToolbars>false</showToolbars>
       <splitter>
         <side0>
@@ -2869,30 +2822,30 @@
         <type>splitter</type>
       </splitter>
       <version>UAVGadgetManagerV1</version>
-    </Mode6>
+    </Mode5>
   </UAVGadgetManager>
   <ViewGroup_Default>@ByteArray(AAAA/wAAAAD9AAAAAAAABQAAAALCAAAABAAAAAQAAAABAAAACPwAAAAA)</ViewGroup_Default>
   <Workspace>
     <Icon1>:/core/images/ah.png</Icon1>
-    <Icon10>:/core/images/openpilot_logo_64.png</Icon10>
     <Icon2>:/core/images/config.png</Icon2>
-    <Icon3>:/core/images/world.png</Icon3>
-    <Icon4>:/core/images/scopes.png</Icon4>
-    <Icon5>:/core/images/joystick.png</Icon5>
-    <Icon6>:/core/images/cog.png</Icon6>
+    <Icon3>:/core/images/scopes.png</Icon3>
+    <Icon4>:/core/images/joystick.png</Icon4>
+    <Icon5>:/core/images/cog.png</Icon5>
+    <Icon6>:/core/images/openpilot_logo_64.png</Icon6>
     <Icon7>:/core/images/openpilot_logo_64.png</Icon7>
     <Icon8>:/core/images/openpilot_logo_64.png</Icon8>
     <Icon9>:/core/images/openpilot_logo_64.png</Icon9>
-    <NumberOfWorkspaces>6</NumberOfWorkspaces>
+    <Icon10>:/core/images/openpilot_logo_64.png</Icon10>
+    <NumberOfWorkspaces>5</NumberOfWorkspaces>
     <Workspace1>Flight data</Workspace1>
-    <Workspace10>Workspace10</Workspace10>
     <Workspace2>Configuration</Workspace2>
-    <Workspace3>Flight Planner</Workspace3>
-    <Workspace4>Scopes</Workspace4>
-    <Workspace5>HITL</Workspace5>
-    <Workspace6>Firmware</Workspace6>
+    <Workspace3>Scopes</Workspace3>
+    <Workspace4>HITL</Workspace4>
+    <Workspace5>Firmware</Workspace5>
+    <Workspace6>Workspace6</Workspace6>
     <Workspace7>Workspace7</Workspace7>
     <Workspace8>Workspace8</Workspace8>
     <Workspace9>Workspace9</Workspace9>
+    <Workspace10>Workspace10</Workspace10>
   </Workspace>
 </gcs>

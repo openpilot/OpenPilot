@@ -192,6 +192,12 @@ void smartSaveButton::enableControls(bool value)
         button->setEnabled(value);
 }
 
+void smartSaveButton::resetIcons()
+{
+    foreach(QPushButton * button,buttonList.keys())
+        button->setIcon(QIcon());
+}
+
 void smartSaveButton::apply()
 {
     processOperation(NULL,false);

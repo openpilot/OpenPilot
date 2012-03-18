@@ -48,10 +48,6 @@ ENABLE_DEBUG_PINS ?= NO
 # Set to Yes to enable the AUX UART which is mapped on the S1 (Tx) and S2 (Rx) servo outputs
 ENABLE_AUX_UART ?= NO
 
-USE_GPS ?= YES
-
-USE_I2C ?= YES
-
 # Set to YES when using Code Sourcery toolchain
 CODE_SOURCERY ?= YES
 
@@ -64,16 +60,41 @@ endif
 
 FLASH_TOOL = OPENOCD
 
-# List of modules to include
-OPTMODULES = CameraStab ComUsbBridge Altitude
+# Optional module and driver defaults
+USE_CAMERASTAB ?= YES
+USE_COMUSBBRIDGE ?= YES
+USE_GPS ?= YES
+USE_TXPID ?= YES
+USE_I2C ?= NO
+USE_ALTITUDE ?= NO
+TEST_FAULTS ?= NO
+
+# List of optional modules to include
+OPTMODULES =
+ifeq ($(USE_CAMERASTAB), YES)
+OPTMODULES += CameraStab
+endif
+ifeq ($(USE_COMUSBBRIDGE), YES)
+OPTMODULES += ComUsbBridge
+endif
 ifeq ($(USE_GPS), YES)
 OPTMODULES += GPS
 endif
-
+ifeq ($(USE_TXPID), YES)
+OPTMODULES += TxPID
+endif
+ifeq ($(USE_ALTITUDE), YES)
+ifeq ($(USE_I2C), YES)
+OPTMODULES += Altitude
+else
+$(error "Altitude module (USE_ALTITUDE=YES) requires i2c (USE_I2C=YES)")
+endif
+endif
 ifeq ($(TEST_FAULTS), YES)
 OPTMODULES += Fault
 endif
 
+# List of mandatory modules to include
 MODULES = Attitude Stabilization Actuator ManualControl FirmwareIAP
 # Telemetry must be last to grab the optional modules (why?)
 MODULES += Telemetry
@@ -183,6 +204,7 @@ SRC += $(OPUAVSYNTHDIR)/taskinfo.c
 SRC += $(OPUAVSYNTHDIR)/mixerstatus.c
 SRC += $(OPUAVSYNTHDIR)/ratedesired.c
 SRC += $(OPUAVSYNTHDIR)/baroaltitude.c
+SRC += $(OPUAVSYNTHDIR)/txpidsettings.c
 
 endif
 

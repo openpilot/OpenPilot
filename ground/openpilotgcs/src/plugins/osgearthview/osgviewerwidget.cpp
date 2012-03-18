@@ -44,8 +44,11 @@
 #include <osg/PositionAttitudeTransform>
 
 #include <osgUtil/Optimizer>
+
 #include <osgGA/StateSetManipulator>
 #include <osgGA/GUIEventHandler>
+#include <osgGA/NodeTrackerManipulator>
+
 #include <osgViewer/Viewer>
 #include <osgViewer/ViewerEventHandlers>
 
@@ -154,14 +157,23 @@ QWidget* OsgViewerWidget::createViewWidget( osg::Camera* camera, osg::Node* scen
     manip = new EarthManipulator();
     view->setCameraManipulator( manip );
 
+//    osgGA::NodeTrackerManipulator *camTracker = new osgGA::NodeTrackerManipulator();
+//    camTracker->setTrackNode(uavPos);
+//    camTracker->setMinimumDistance(0.0001f);
+//    camTracker->setDistance(0.001f);
+//    camTracker->setTrackerMode(osgGA::NodeTrackerManipulator::NODE_CENTER);
+//    view->setCameraManipulator(camTracker);
+
     Grid* grid = new Grid();
     grid->setControl(0,0,new LabelControl("OpenPilot"));
     ControlCanvas::get(view, true)->addControl(grid);
 
     // zoom to a good startup position
-    manip->setViewpoint( Viewpoint(-71.100549, 42.349273, 0, 24.261, -21.6, 650.0), 5.0 );
+    manip->setViewpoint( Viewpoint(-71.100549, 42.349273, 0, 24.261, -21.6, 350.0), 5.0 );
+    //manip->setViewpoint( Viewpoint(-71.100549, 42.349273, 0, 24.261, -81.6, 650.0), 5.0 );
     //manip->setHomeViewpoint(Viewpoint("Boston", osg::Vec3d(-71.0763, 42.34425, 0), 24.261, -21.6, 3450.0));
 
+    manip->setTetherNode(uavPos);
     osgQt::GraphicsWindowQt* gw = dynamic_cast<osgQt::GraphicsWindowQt*>( camera->getGraphicsContext() );
     return gw ? gw->getGLWidget() : NULL;
 }
@@ -195,11 +207,17 @@ osg::Camera* OsgViewerWidget::createCamera( int x, int y, int w, int h, const st
 osg::Node* OsgViewerWidget::createAirplane()
 {
     osg::Group* model = new osg::Group;
-    osg::Node *cessna = osgDB::readNodeFile("/Users/jcotton81/Documents/Programming/OpenPilot/artwork/3D Model/multi/joes_cnc/J14-QT_+.3DS");
-    if(cessna) {
+    osg::Node *uav = osgDB::readNodeFile("/Users/jcotton81/Documents/Programming/OpenPilot/artwork/3D Model/multi/joes_cnc/J14-QT_+.3DS");
+    if(uav) {
         uavAttitudeAndScale = new osg::MatrixTransform();
         uavAttitudeAndScale->setMatrix(osg::Matrixd::scale(0.2e0,0.2e0,0.2e0));
-        uavAttitudeAndScale->addChild( cessna );
+
+        // Apply a rotation so model is NED before any other rotations
+        osg::MatrixTransform *rotateModelNED = new osg::MatrixTransform();
+        rotateModelNED->setMatrix(osg::Matrixd::scale(0.05e0,0.05e0,0.05e0) * osg::Matrixd::rotate(M_PI, osg::Vec3d(0,0,1)));
+        rotateModelNED->addChild( uav );
+
+        uavAttitudeAndScale->addChild( rotateModelNED );
 
         model->addChild(uavAttitudeAndScale);
     } else
@@ -235,8 +253,16 @@ void OsgViewerWidget::paintEvent( QPaintEvent* event )
     // Set the attitude (reverse the attitude)
     AttitudeActual *attitudeActualObj = AttitudeActual::GetInstance(objMngr);
     AttitudeActual::DataFields attitudeActual = attitudeActualObj->getData();
-    osg::Quat quat(-attitudeActual.q2, -attitudeActual.q3, -attitudeActual.q4,attitudeActual.q1);
-    uavAttitudeAndScale->setMatrix(osg::Matrixd::scale(0.05e0,0.05e0,0.05e0) * osg::Matrixd::rotate(quat));
+    osg::Quat quat(attitudeActual.q2, attitudeActual.q3, attitudeActual.q4, attitudeActual.q1);
+
+    // Have to rotate the axes from OP NED frame to OSG frame (X east, Y north, Z down)
+    double angle;
+    osg::Vec3d axis;
+    quat.getRotate(angle,axis);
+    quat.makeRotate(angle, osg::Vec3d(axis[1],axis[0],-axis[2]));
+    osg::Matrixd rot = osg::Matrixd::rotate(quat);
+
+    uavAttitudeAndScale->setMatrix(rot);
 
     frame();
 }

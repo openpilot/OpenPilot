@@ -275,23 +275,33 @@ void IL2Simulator::processUpdate(const QByteArray& inp)
         velData.Down = current.dZ*-100;
 
         // Update AttitudeRaw object (filtered gyros and accels only for now)
-        AttitudeRaw::DataFields rawData;
-        memset(&rawData, 0, sizeof(AttitudeRaw::DataFields));
-        rawData = attRaw->getData();
+        //AttitudeRaw::DataFields rawData;
+        //memset(&rawData, 0, sizeof(AttitudeRaw::DataFields));
+        //rawData = attRaw->getData();
+	Gyros::DataFields gyroData;
+	Accels::DataFields accelData;
+        memset(&gyroData, 0, sizeof(Gyros::DataFields));
+        memset(&accelData, 0, sizeof(Accels::DataFields));
+	gyroData = gyros->getData();
+	accelData = accels->getData();
+
 	// rotate turn rates and accelerations into body frame
 	// (note: rotation deltas are NOT in NED frame but in RPY - manual conversion!)
-	rawData.gyros[0] = current.dRoll;
-	rawData.gyros[1] = cos(DEG2RAD * current.roll) * current.dPitch + sin(DEG2RAD * current.roll) * current.dAzimuth;
-	rawData.gyros[2] = cos(DEG2RAD * current.roll) * current.dAzimuth - sin(DEG2RAD * current.roll) * current.dPitch;
+	gyroData.x = current.dRoll;
+	gyroData.y = cos(DEG2RAD * current.roll) * current.dPitch + sin(DEG2RAD * current.roll) * current.dAzimuth;
+	gyroData.z = cos(DEG2RAD * current.roll) * current.dAzimuth - sin(DEG2RAD * current.roll) * current.dPitch;
 	// accels are in NED and can be converted using standard ned->local rotation matrix
 	float Rbe[3][3];
 	Utils::CoordinateConversions().Quaternion2R(quat,Rbe);
-	for (int t=0;t<3;t++) {
-		rawData.accels[t]=current.ddX*Rbe[t][0]
-				+current.ddY*Rbe[t][1]
-				+(current.ddZ+GEE)*Rbe[t][2];
-	}
-	rawData.accels[2]=-rawData.accels[2];
+		accelData.x = current.ddX*Rbe[0][0]
+				+current.ddY*Rbe[0][1]
+				+(current.ddZ+GEE)*Rbe[0][2];
+		accelData.y = current.ddX*Rbe[1][0]
+				+current.ddY*Rbe[1][1]
+				+(current.ddZ+GEE)*Rbe[1][2];
+		accelData.z = - (current.ddX*Rbe[2][0]
+				+current.ddY*Rbe[2][1]
+				+(current.ddZ+GEE)*Rbe[2][2]);
 
         // Update homelocation
         HomeLocation::DataFields homeData;
@@ -339,7 +349,9 @@ void IL2Simulator::processUpdate(const QByteArray& inp)
         // update every time (50ms)
         attActual->setData(attActualData);
         //attActual->updated();
-        attRaw->setData(rawData);
+        //attRaw->setData(rawData);
+	gyros->setData(gyroData);
+	accels->setData(accelData);
         //attRaw->updated();
 	velActual->setData(velData);
 	//velActual->updated();

@@ -382,15 +382,24 @@ void FGSimulator::processUpdate(const QByteArray& inp)
         posActual->setData(positionActualData);
 
         // Update AttitudeRaw object (filtered gyros only for now)
-        AttitudeRaw::DataFields rawData;
-        memset(&rawData, 0, sizeof(AttitudeRaw::DataFields));
-        rawData = attRaw->getData();
-        rawData.gyros[0] = rollRate;
+        //AttitudeRaw::DataFields rawData;
+        //AttitudeRaw::DataFields rawData;
+        Gyros::DataFields gyroData;
+        Accels::DataFields accelData;
+        memset(&gyroData, 0, sizeof(Gyros::DataFields));
+        memset(&accelData, 0, sizeof(Accels::DataFields));
+        gyroData = gyros->getData();
+        accelData = accels->getData();
+        //rawData.gyros[0] = rollRate;
         //rawData.gyros[1] = cos(DEG2RAD * roll) * pitchRate + sin(DEG2RAD * roll) * yawRate;
         //rawData.gyros[2] = cos(DEG2RAD * roll) * yawRate - sin(DEG2RAD * roll) * pitchRate;
-        rawData.gyros[1] = pitchRate;
-        rawData.gyros[2] = yawRate;
-        attRaw->setData(rawData);
+        //rawData.gyros[1] = pitchRate;
+        //rawData.gyros[2] = yawRate;
+	gyroData.x = rollRate;
+	gyroData.y = pitchRate;
+	gyroData.z = yawRate;
+	// TODO: Accels are still missing!!!!
+        gyros->setData(gyroData);
         // attRaw->updated();
 }
 

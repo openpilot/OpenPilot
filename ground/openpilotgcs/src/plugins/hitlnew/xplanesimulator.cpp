@@ -382,19 +382,31 @@ void XplaneSimulator::processUpdate(const QByteArray& dataBuf)
                 posActual->setData(positionActualData);
 
                 // Update AttitudeRaw object (filtered gyros only for now)
-                AttitudeRaw::DataFields rawData;
-                memset(&rawData, 0, sizeof(AttitudeRaw::DataFields));
-                rawData = attRaw->getData();
-                rawData.gyros[0] = rollRate;
+                //AttitudeRaw::DataFields rawData;
+                //memset(&rawData, 0, sizeof(AttitudeRaw::DataFields));
+                //rawData = attRaw->getData();
+                //rawData.gyros[0] = rollRate;
                 //rawData.gyros_filtered[1] = cos(DEG2RAD * roll) * pitchRate + sin(DEG2RAD * roll) * yawRate;
                 //rawData.gyros_filtered[2] = cos(DEG2RAD * roll) * yawRate - sin(DEG2RAD * roll) * pitchRate;
-                rawData.gyros[1] = pitchRate;
-                rawData.gyros[2] = yawRate;
-                rawData.accels[0] = accX;
-                rawData.accels[1] = accY;
-                rawData.accels[2] = -accZ;
-                attRaw->setData(rawData);
+                //rawData.gyros[1] = pitchRate;
+                //rawData.gyros[2] = yawRate;
+                //rawData.accels[0] = accX;
+                //rawData.accels[1] = accY;
+                //rawData.accels[2] = -accZ;
+                //attRaw->setData(rawData);
+		Gyros::DataFields gyroData;
+                memset(&gyroData, 0, sizeof(Gyros::DataFields));
+		gyroData.x = rollRate;
+		gyroData.y = pitchRate;
+		gyroData.z = yawRate;
+		gyros->setData(gyroData);
 
+		Accels::DataFields accelData;
+                memset(&accelData, 0, sizeof(Accels::DataFields));
+		accelData.x = accX;
+		accelData.y = accY;
+		accelData.z = -accZ;
+		accels->setData(accelData);
 
 	}
 	// issue manual update

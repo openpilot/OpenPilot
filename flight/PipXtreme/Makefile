@@ -52,12 +52,6 @@ USE_GPS ?= NO
 
 USE_I2C ?= YES
 
-# Select the type of hardware you're using
-ENABLE_TRANSMITTER_BOX ?= NO
-ENABLE_ANALOG_TRANSMITTER ?= NO
-ENABLE_MOVE_CONTROLLER ?= NO
-ENABLE_MAPLE_MINI_TRANSMITTER ?= YES
-
 # Set to YES when using Code Sourcery toolchain
 CODE_SOURCERY ?= YES
 
@@ -72,10 +66,7 @@ FLASH_TOOL = OPENOCD
 
 # List of modules to include
 OPTMODULES = 
-MODULES = TransmitterControls FirmwareIAP RadioComBridge
-ifeq ($(ENABLE_MOVE_CONTROLLER), YES)
-MODULES += AttitudeMARG
-endif
+MODULES = FirmwareIAP RadioComBridge
 
 # Paths
 OPSYSTEM = ./System
@@ -144,8 +135,6 @@ else
 SRC += $(OPTESTS)/test_common.c
 SRC += $(OPTESTS)/$(TESTAPP).c
 endif
-
-
 
 ## UAVOBJECTS
 ifndef TESTAPP
@@ -252,26 +241,6 @@ SRC += $(RTOSSRCDIR)/tasks.c
 ## RTOS Portable
 SRC += $(RTOSSRCDIR)/portable/GCC/ARM_CM3/port.c
 SRC += $(RTOSSRCDIR)/portable/MemMang/heap_1.c
-
-## Dosfs file system
-#SRC += $(DOSFSDIR)/dosfs.c
-#SRC += $(DOSFSDIR)/dfs_sdcard.c
-
-## PyMite files
-#SRC += $(wildcard ${PYMITEVM}/*.c)
-#SRC += $(wildcard ${PYMITEPLAT}/*.c)
-#SRC += $(OUTDIR)/pmlib_img.c
-#SRC += $(OUTDIR)/pmlib_nat.c
-#SRC += $(OUTDIR)/pmlibusr_img.c
-#SRC += $(OUTDIR)/pmlibusr_nat.c
-
-## Mass Storage Device
-#SRC += $(MSDDIR)/msd.c
-#SRC += $(MSDDIR)/msd_bot.c
-#SRC += $(MSDDIR)/msd_desc.c
-#SRC += $(MSDDIR)/msd_memory.c
-#SRC += $(MSDDIR)/msd_scsi.c
-#SRC += $(MSDDIR)/msd_scsi_data.c
 
 # List C source files here which must be compiled in ARM-Mode (no -mthumb).
 # use file-extension c for "c-only"-files
@@ -388,19 +357,6 @@ endif
 
 ifeq ($(USE_I2C), YES)
 CDEFS += -DUSE_I2C
-endif
-
-ifeq ($(ENABLE_TRANSMITTER_BOX), YES)
-CDEFS += -DTRANSMITTER_BOX
-endif
-ifeq ($(ENABLE_ANALOG_TRANSMITTER), YES)
-CDEFS += -DANALOG_TRANSMITTER
-endif
-ifeq ($(ENABLE_MOVE_CONTROLLER), YES)
-CDEFS += -DMOVE_CONTROLLER
-endif
-ifeq ($(ENABLE_MAPLE_MINI_TRANSMITTER), YES)
-CDEFS += -DMAPLE_MINI
 endif
 
 # Place project-specific -D and/or -U options for
@@ -523,13 +479,6 @@ $(error "$(MSG_FORMATERROR) $(FORMAT)")
 endif
 endif
 endif
-
-# Generate code for PyMite
-#$(OUTDIR)/pmlib_img.c $(OUTDIR)/pmlib_nat.c $(OUTDIR)/pmlibusr_img.c $(OUTDIR)/pmlibusr_nat.c $(OUTDIR)/pmfeatures.h: $(wildcard $(PYMITELIB)/*.py) $(wildcard $(PYMITEPLAT)/*.py) $(wildcard $(FLIGHTPLANLIB)/*.py) $(wildcard $(FLIGHTPLANS)/*.py)
-#	@echo $(MSG_PYMITEINIT) $(call toprel, $@)
-#	@$(PYTHON) $(PYMITETOOLS)/pmImgCreator.py -f $(PYMITEPLAT)/pmfeatures.py -c -s --memspace=flash -o $(OUTDIR)/pmlib_img.c --native-file=$(OUTDIR)/pmlib_nat.c $(PYMITELIB)/list.py $(PYMITELIB)/dict.py $(PYMITELIB)/__bi.py $(PYMITELIB)/sys.py $(PYMITELIB)/string.py $(wildcard $(FLIGHTPLANLIB)/*.py)
-#	@$(PYTHON) $(PYMITETOOLS)/pmGenPmFeatures.py $(PYMITEPLAT)/pmfeatures.py > $(OUTDIR)/pmfeatures.h
-#	@$(PYTHON) $(PYMITETOOLS)/pmImgCreator.py -f $(PYMITEPLAT)/pmfeatures.py -c -u -o $(OUTDIR)/pmlibusr_img.c --native-file=$(OUTDIR)/pmlibusr_nat.c $(FLIGHTPLANS)/test.py
 
 # Link: create ELF output file from object files.
 $(eval $(call LINK_TEMPLATE, $(OUTDIR)/$(TARGET).elf, $(ALLOBJ)))

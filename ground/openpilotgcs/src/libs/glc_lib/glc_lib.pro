@@ -12,7 +12,7 @@ QT += opengl \
 CONFIG += exceptions \
     warn_on
 #TARGET = GLC_lib
-VERSION = 2.2.0
+#VERSION = 2.2.0
 
 DEFINES += CREATE_GLC_LIB_DLL
 DEFINES += LIB3DS_EXPORTS

@@ -53,7 +53,7 @@ public:
    void setAcFilename(QString acf);
 
    void setBgFilename(QString bgf);
-   void setVboEnable(bool eVbo) { vboEnable = eVbo; }
+   void setVboEnable(bool eVbo);
    void reloadScene();
    void updateAttitude(int value);
 
@@ -90,8 +90,6 @@ private:
     QString acFilename;
     QString bgFilename;
     bool vboEnable;
-    bool loadError;
-    bool mvInitGLSuccess;
 
     AttitudeActual* attActual;
 };

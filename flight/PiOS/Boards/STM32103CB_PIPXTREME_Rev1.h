@@ -244,4 +244,16 @@ extern uint32_t pios_com_rfm22b_id;
 #define RFM22_EXT_INT_PRIORITY			1
 #endif
 
+//-------------------------
+// Packet Handler
+//-------------------------
+
+#define PH_MAX_PACKET 255
+
+//-------------------------
+// Reed-Solomon ECC
+//-------------------------
+
+#define RS_ECC_NPARITY 4
+
 #endif /* STM32103CB_PIPXTREME_H_ */

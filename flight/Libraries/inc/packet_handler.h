@@ -30,6 +30,10 @@
 #ifndef __PACKET_HANDLER_H__
 #define __PACKET_HANDLER_H__
 
+// Public defines / macros
+#define PHPacketSize(p) ((uint8_t*)(p->data) + p->header.data_size - (uint8_t*)p)
+#define PHPacketSizeECC(p) ((uint8_t*)(p->data) + p->header.data_size  + RS_ECC_NPARITY - (uint8_t*)p)
+
 // Public types
 typedef enum {
 	PACKET_TYPE_NONE = 0,
@@ -43,7 +47,8 @@ typedef enum {
 	PACKET_TYPE_DATA,           // data packet (packet contains user data)
 	PACKET_TYPE_ACKED_DATA,     // data packet that requies an ACK
 	PACKET_TYPE_RECEIVER,       // Receiver relay values
-	PACKET_TYPE_ACK
+	PACKET_TYPE_ACK,
+	PACKET_TYPE_NACK
 } PHPacketType;
 
 typedef struct {
@@ -55,10 +60,10 @@ typedef struct {
 	uint8_t data_size;
 } PHPacketHeader;
 
-#define PH_MAX_DATA (255 - sizeof(PHPacketHeader))
+#define PH_MAX_DATA (PH_MAX_PACKET - sizeof(PHPacketHeader) - RS_ECC_NPARITY)
 typedef struct {
 	PHPacketHeader header;
-	uint8_t data[PH_MAX_DATA];
+	uint8_t data[PH_MAX_DATA + RS_ECC_NPARITY];
 } PHPacket, *PHPacketHandle;
 
 typedef struct {

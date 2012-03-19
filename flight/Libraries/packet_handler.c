@@ -30,6 +30,7 @@
 #include "openpilot.h"
 #include "packet_handler.h"
 #include "aes.h"
+#include "ecc.h"
 
 // Private types and constants
 typedef struct {
@@ -45,7 +46,16 @@ typedef struct {
 
 // Private functions
 static uint8_t PHLSendAck(PHPacketDataHandle data, PHPacketHandle p);
+static uint8_t PHLSendNAck(PHPacketDataHandle data, PHPacketHandle p);
 static uint8_t PHLTransmitPacket(PHPacketDataHandle data, PHPacketHandle p);
+
+/*
+static void
+byte_err (int err, int loc, unsigned char *dst)
+{
+  dst[loc-1] ^= err;
+}
+*/
 
 /**
  * Initialize the Packet Handler library
@@ -74,6 +84,9 @@ PHInstHandle PHInitialize(PacketHandlerConfig *cfg)
 
 	// Create the lock
 	data->lock = xSemaphoreCreateRecursiveMutex();
+
+	// Initialize the ECC library.
+  initialize_ecc();
 
 	// Return the structure.
 	return (PHInstHandle)data;
@@ -231,17 +244,64 @@ uint8_t PHReceivePacket(PHInstHandle h, PHPacketHandle p)
 {
 	PHPacketDataHandle data = (PHPacketDataHandle)h;
 
+	// Attempt to correct any errors in the packet.
+	uint16_t len = PHPacketSizeECC(p);
+	decode_data((unsigned char*)p, len);
+
+	// Check that there were no unfixed errors.
+	uint8_t rx_error = check_syndrome() != 0;
+	if(rx_error)
+		DEBUG_PRINTF(1, "Error in message\n\r");
+
 	switch (p->header.type) {
 	case PACKET_TYPE_ACKED_DATA:
 
-		// Send the ACK
-		PHLSendAck(data, p);
+		// Send the ACK / NACK
+		if (rx_error)
+		{
+			DEBUG_PRINTF(1, "Sending NACK\n\r");
+			PHLSendNAck(data, p);
+		}
+		else
+		{
 
-		// Pass on the data.
-		if(data->cfg.data_handler)
-			data->cfg.data_handler(data->cfg.dev, p->data, p->header.data_size);
+			PHLSendAck(data, p);
+
+			// Pass on the data.
+			if(data->cfg.data_handler)
+				data->cfg.data_handler(data->cfg.dev, p->data, p->header.data_size);
+		}
 
 		break;
+
+	case PACKET_TYPE_ACK:
+	{
+		// Find the packet ID in the TX buffer, and free it.
+		unsigned int i = 0;
+		for (unsigned int i = 0; i < data->cfg.txWinSize; ++i)
+			if (data->tx_packets[i].header.tx_seq == p->header.rx_seq)
+				PHReleaseTXPacket(h, data->tx_packets + i);
+#ifdef DEBUG_LEVEL
+		if (i == data->cfg.txWinSize)
+			DEBUG_PRINTF(1, "Error finding acked packet to release\n\r");
+#endif
+	}
+	break;
+
+	case PACKET_TYPE_NACK:
+	{
+		// Resend the packet.
+		unsigned int i = 0;
+		for ( ; i < data->cfg.txWinSize; ++i)
+			if (data->tx_packets[i].header.tx_seq == p->header.rx_seq)
+				PHLTransmitPacket(data, data->tx_packets + i);
+#ifdef DEBUG_LEVEL
+		if (i == data->cfg.txWinSize)
+			DEBUG_PRINTF(1, "Error finding acked packet to NACK\n\r");
+		DEBUG_PRINTF(1, "Resending after NACK\n\r");
+#endif
+	}
+	break;
 
 	case PACKET_TYPE_RECEIVER:
 
@@ -249,9 +309,11 @@ uint8_t PHReceivePacket(PHInstHandle h, PHPacketHandle p)
 
 	default:
 
-		// Pass on the data to the receiver handler.
-		if(data->cfg.data_handler)
-			data->cfg.data_handler(data->cfg.dev, p->data, p->header.data_size);
+		if (!rx_error)
+
+			// Pass on the data to the receiver handler.
+			if(data->cfg.data_handler)
+				data->cfg.data_handler(data->cfg.dev, p->data, p->header.data_size);
 
 		break;
 	}
@@ -272,6 +334,9 @@ static uint8_t PHLTransmitPacket(PHPacketDataHandle data, PHPacketHandle p)
 	// Set the sequence ID to the current ID.
 	p->header.tx_seq = data->tx_seq_id++;
 
+	// Add the error correcting code.
+	encode_data((unsigned char*)p, PHPacketSize(p), (unsigned char*)p);
+	
 	// Transmit the packet using the output stream.
 	if(!data->cfg.output_stream(data->cfg.dev, p))
 		return 0;
@@ -294,6 +359,30 @@ static uint8_t PHLSendAck(PHPacketDataHandle data, PHPacketHandle p)
 	ack.source_id = data->cfg.id;
 	ack.destination_id = p->header.source_id;
 	ack.type = PACKET_TYPE_ACK;
+	ack.rx_seq = p->header.tx_seq;
+	ack.data_size = 0;
+
+	// Set the packet.
+	PHLTransmitPacket(data, (PHPacketHandle)&ack);
+
+	return 1;
+}
+
+/**
+ * Send an NAck packet.
+ * \param[in] data The packet handler instance data pointer.
+ * \param[in] p A pointer to the packet buffer of the packet to be ACKed.
+ * \return 1 Success
+ * \return 0 Failure
+ */
+static uint8_t PHLSendNAck(PHPacketDataHandle data, PHPacketHandle p)
+{
+
+	// Create the NAck message
+	PHPacketHeader ack;
+	ack.source_id = data->cfg.id;
+	ack.destination_id = p->header.source_id;
+	ack.type = PACKET_TYPE_NACK;
 	ack.rx_seq = p->header.tx_seq;
 	ack.data_size = 0;
 

@@ -529,8 +529,8 @@ static void PIOS_RFM22B_RegisterTxCallback(uint32_t rfm22b_id, pios_com_callback
 static uint8_t PIOS_RFM22B_send_packet(void *rfm22b, PHPacketHandle packet)
 {
 	//struct pios_rfm22b_dev * rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b;
-	uint16_t len = packet->header.data_size + sizeof(PHPacketHeader);
-	DEBUG_PRINTF(1, "Sending: %d %d %x\n\r", len, packet->header.data_size, (int)(packet->data[0]));
+	uint16_t len = PHPacketSizeECC(packet);
+	DEBUG_PRINTF(2, "Sending: %d %d %x\n\r", len, packet->header.data_size, (int)(packet->data[0]));
 	return rfm22_sendData(packet, len, 1);
 }
 
@@ -538,7 +538,7 @@ static void PIOS_RFM22B_receive_data(void *rfm22b, uint8_t *data, uint8_t len)
 {
 	struct pios_rfm22b_dev * rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b;
 
-	DEBUG_PRINTF(1, "Data: %d %x\n\r", len, (int)(data[0]));
+	DEBUG_PRINTF(2, "Data: %d %x\n\r", len, (int)(data[0]));
 	// Pass the received data the the receive callback.
 	bool need_yield = false;
 	if (rfm22b_dev->rx_in_cb)
@@ -577,7 +577,7 @@ static void PIOS_RFM22B_Task(void *parameters)
 
 			// Try to get some data.
 			bool need_yield = false;
-			uint16_t bytes_to_send = (rfm22b_dev->tx_out_cb)(rfm22b_dev->tx_out_context, p->data + p->header.data_size, PH_MAX_DATA - p->header.data_size, NULL, &need_yield);
+			uint16_t bytes_to_send = (rfm22b_dev->tx_out_cb)(rfm22b_dev->tx_out_context, p->data + p->header.data_size, PH_MAX_DATA + RS_ECC_NPARITY - p->header.data_size, NULL, &need_yield);
 			p->header.data_size += bytes_to_send;
 
 			// Did we just reserve this packet?
@@ -602,7 +602,7 @@ static void PIOS_RFM22B_Task(void *parameters)
 					rfm22b_dev->countdownTimer = rfm22b_dev->cfg->sendTimeout;
 
 					// Initialize the packet.
-					p->header.type = PACKET_TYPE_DATA;
+					p->header.type = PACKET_TYPE_ACKED_DATA;
 					rfm22b_dev->cur_tx_packet = p;
 				}
 			}
@@ -641,7 +641,7 @@ static void PIOS_RFM22B_Task(void *parameters)
 			// Get the receive packet buffer.
 			PHPacketHandle p = PHGetRXPacket(rfm22b_dev->packet_handler);
 			memmove(p, rfm22_receivedPointer(), packet_size);
-			DEBUG_PRINTF(1, "Received: %d %d\n\r", packet_size, p->header.data_size);
+			DEBUG_PRINTF(2, "Received: %d %d\n\r", packet_size, p->header.data_size);
 
 			// Process the received packet with the packet handler.
 			PHReceivePacket(rfm22b_dev->packet_handler, p);

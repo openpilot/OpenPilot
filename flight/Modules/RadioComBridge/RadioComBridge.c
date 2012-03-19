@@ -177,8 +177,8 @@ static void com2RadioBridgeTask(void * parameters)
 			}
 
 			// Pass the data through UAVTalk
-			for (uint8_t i = 0; i < rx_bytes; i++)
-				UAVTalkProcessInputStream(data->uavTalkCon, data->com2radio_buf[i]);
+			//for (uint8_t i = 0; i < rx_bytes; i++)
+			//UAVTalkProcessInputStream(data->uavTalkCon, data->com2radio_buf[i]);
 		}
 	}
 }

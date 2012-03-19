@@ -46,13 +46,9 @@ ModelViewGadgetWidget::ModelViewGadgetWidget(QWidget *parent)
 , acFilename()
 , bgFilename()
 , vboEnable(false)
-, loadError(true)
-, mvInitGLSuccess(false)
 {
 
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-    mvInitGLSuccess = false;
-
     CreateScene();
 
     QColor repColor;
@@ -64,7 +60,6 @@ ModelViewGadgetWidget::ModelViewGadgetWidget(QWidget *parent)
     UAVObjectManager* objManager = pm->getObject<UAVObjectManager>();
     attActual = AttitudeActual::GetInstance(objManager);
 
-    // Create objects to display
     connect(&m_MotionTimer, SIGNAL(timeout()), this, SLOT(updateAttitude()));
 }
 
@@ -97,6 +92,12 @@ void ModelViewGadgetWidget::setBgFilename(QString bgf)
 
 }
 
+void ModelViewGadgetWidget::setVboEnable(bool eVbo)
+{
+	vboEnable = eVbo;
+	m_World.collection()->setVboUsage(vboEnable);
+}
+
 //// Public funcitons ////
 void ModelViewGadgetWidget::reloadScene()
 {
@@ -106,8 +107,6 @@ void ModelViewGadgetWidget::reloadScene()
 //// Private functions ////
 void ModelViewGadgetWidget::initializeGL()
 {
-    if (loadError)
-        return;
     // OpenGL initialization
     m_GlView.initGl();
 
@@ -118,14 +117,6 @@ void ModelViewGadgetWidget::initializeGL()
     m_GlView.cameraHandle()->setFrontView();
     m_GlView.setToOrtho(true); // orthogonal view
 
-    /*
-    // Enable VBO usage if configured (default is to disable)
-    GLC_State::setVboUsage(vboEnable);
-    if (!vboEnable)
-    {
-	qDebug("VBOs disabled.  Enable for better performance if GPU supports it. (Most do)");
-    }
-    */
     glEnable(GL_NORMALIZE);
     // Enable antialiasing
     glEnable(GL_MULTISAMPLE);
@@ -170,7 +161,6 @@ void ModelViewGadgetWidget::paintGL()
 
         // Display UI Info (orbit circle)
         m_MoverController.drawActiveMoverRep();
-        mvInitGLSuccess = true;
     }
     catch (GLC_Exception &e)
 	{
@@ -215,30 +205,24 @@ void ModelViewGadgetWidget::CreateScene()
     try
     {
         if(QFile::exists(acFilename))
-	{
+        {
             QFile aircraft(acFilename);
             m_World= GLC_Factory::instance()->createWorldFromFile(aircraft);
             m_ModelBoundingBox= m_World.boundingBox();
             m_GlView.reframe(m_ModelBoundingBox); // center 3D model in the scene
-            loadError = false;
-            /*
-            if (!mvInitGLSuccess)
-                initializeGL();
-                */
         } else {
-            loadError = true;
+        	qDebug("ModelView: aircraft file not found.");
         }
     }
     catch(GLC_Exception e)
     {
         qDebug("ModelView: aircraft file loading failed.");
-        loadError = true;
     }
 }
 
 void ModelViewGadgetWidget::wheelEvent(QWheelEvent * e)
 {
-        double delta = m_GlView.cameraHandle()->distEyeTarget() - (e->delta()/120) ;
+        double delta = m_GlView.cameraHandle()->distEyeTarget() - (e->delta()/4) ;
         m_GlView.cameraHandle()->setDistEyeTarget(delta);
         m_GlView.setDistMinAndMax(m_World.boundingBox());
 }

@@ -21,7 +21,7 @@
         <field name="Stabilization3Settings" units="" type="enum" elementnames="Roll,Pitch,Yaw" options="None,Rate,Attitude,AxisLock,WeakLeveling" defaultvalue="Attitude,Attitude,Rate"/>
 
 	<!-- Note these options values should be identical to those defined in FlightMode -->
-        <field name="FlightModePosition" units="" type="enum" elements="3" options="Manual,Stabilized1,Stabilized2,Stabilized3,AltitudeHold,VelocityControl,PositionHold" defaultvalue="Manual,Stabilized1,Stabilized2"/>
+        <field name="FlightModePosition" units="" type="enum" elements="3" options="Manual,Stabilized1,Stabilized2,Stabilized3,AltitudeHold,VelocityControl,PositionHold,ReturnToBase" defaultvalue="Manual,Stabilized1,Stabilized2"/>
 
         <field name="ArmedTimeout" units="ms" type="uint16" elements="1" defaultvalue="30000"/>
         <access gcs="readwrite" flight="readwrite"/>

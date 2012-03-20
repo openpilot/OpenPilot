@@ -2,15 +2,24 @@
     <object name="GuidanceSettings" singleinstance="true" settings="true">
         <description>Settings for the @ref GuidanceModule</description>
         <field name="GuidanceMode" units="" type="enum" elements="1" options="DUAL_LOOP,VELOCITY_CONTROL" defaultvalue="DUAL_LOOP"/>
-        <field name="HorizontalVelMax" units="m/s" type="uint16" elements="1" defaultvalue="300"/>
-        <field name="VerticalVelMax" units="m/s" type="uint16" elements="1" defaultvalue="150"/>
-        <field name="HorizontalPosPI" units="(m/s)/m" type="float" elementnames="Kp,Ki,ILimit" defaultvalue="0.1,0.001,300"/>
+	<field name="ReturnTobaseAltitudeOffset" units="m" type="float" elements="1" defaultvalue="75.0"/>
+        <field name="HorizontalVelMax" units="m/s" type="float" elements="1" defaultvalue="0.3"/>
+        <field name="VerticalVelMax" units="m/s" type="float" elements="1" defaultvalue="0.15"/>
+        <field name="HorizontalPosPI" units="(m/s)/m" type="float" elementnames="Kp,Ki,ILimit" defaultvalue="0.1,0,300"/>
         <field name="HorizontalVelPID" units="deg/(m/s)" type="float" elementnames="Kp,Ki,Kd,ILimit" defaultvalue="0.05,0.002,0,1000"/>
-        <field name="VerticalPosPI" units="" type="float" elementnames="Kp,Ki,ILimit" defaultvalue="0.1,0.001,200"/>
-        <field name="VerticalVelPID" units="" type="float" elementnames="Kp,Ki,Kd,ILimit" defaultvalue="0.1,0,0,0"/>
+        <field name="VerticalPosPI" units="m/s" type="float" elementnames="Kp,Ki,ILimit" defaultvalue="0.1,0,200"/>
+        <field name="VerticalVelPID" units="1/(m/s)" type="float" elementnames="Kp,Ki,Kd,ILimit" defaultvalue="0.1,0,0,0"/>
+        <field name="CoursePI" units="deg/deg" type="float" elements="3" elementnames="Kp,Ki,ILimit" defaultvalue="0.2,0.02,10"/>
+        <field name="SpeedP" units="(m/s^2)/(m/s)" type="float" elementnames="Kp,Max" defaultvalue="0.1,20"/>
+        <field name="AccelPI" units="deg/(m/s^2)" type="float" elements="3" elementnames="Kp,Ki,ILimit" defaultvalue="0.1,0.1,10"/>
+        <field name="ClimbRateBoostFactor" units="" type="float" elements="1" defaultvalue="3.14"/>
+        <field name="PowerPI" units="1/(m/s)" type="float" elements="3" elementnames="Kp,Ki,ILimit" defaultvalue="0.00005,0.00005,0.4"/>
         <field name="ThrottleControl" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>
-        <field name="MaxRollPitch" units="deg" type="float" elements="1" defaultvalue="10"/>
-        <field name="UpdatePeriod" units="" type="int32" elements="1" defaultvalue="100"/>
+        <field name="CruiseSpeed" units="m/s" type="float" elements="1" defaultvalue="13"/>
+        <field name="RollLimit" units="deg" type="float" elements="3" elementnames="Min,Neutral,Max" defaultvalue="-35,0,35" />
+        <field name="PitchLimit" units="deg" type="float" elements="3" elementnames="Min,Neutral,Max" defaultvalue="-10,5,20" />
+        <field name="ThrottleLimit" units="" type="float" elements="3" elementnames="Min,Neutral,Max" defaultvalue="0.1,0.5,0.9" />
+        <field name="UpdatePeriod" units="ms" type="int32" elements="1" defaultvalue="100"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

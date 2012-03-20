@@ -70,7 +70,6 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
         addUAVObjectToWidgetRelation("ManualControlSettings","ChannelMax",inp->ui->channelMax,index);
         ++index;
     }
-
     connect(m_config->configurationWizard,SIGNAL(clicked()),this,SLOT(goToWizard()));
     connect(m_config->runCalibration,SIGNAL(toggled(bool)),this, SLOT(simpleCalibration(bool)));
 

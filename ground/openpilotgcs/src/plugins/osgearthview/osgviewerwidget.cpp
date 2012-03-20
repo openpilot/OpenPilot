@@ -109,7 +109,7 @@ OsgViewerWidget::OsgViewerWidget(QWidget *parent) : QWidget(parent)
 
     osg::Group* root = new osg::Group;
     osg::Node* earth = osgDB::readNodeFile("/Users/jcotton81/Documents/Programming/osgearth/tests/boston.earth");
-    osgEarth::MapNode * mapNode = osgEarth::MapNode::findMapNode( earth );
+    mapNode = osgEarth::MapNode::findMapNode( earth );
     if (!mapNode)
     {
         qDebug() <<"Uhoh";
@@ -174,6 +174,7 @@ QWidget* OsgViewerWidget::createViewWidget( osg::Camera* camera, osg::Node* scen
     //manip->setHomeViewpoint(Viewpoint("Boston", osg::Vec3d(-71.0763, 42.34425, 0), 24.261, -21.6, 3450.0));
 
     manip->setTetherNode(uavPos);
+
     osgQt::GraphicsWindowQt* gw = dynamic_cast<osgQt::GraphicsWindowQt*>( camera->getGraphicsContext() );
     return gw ? gw->getGLWidget() : NULL;
 }

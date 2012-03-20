@@ -109,6 +109,7 @@ private: /* Private variables */
     EarthManipulator* manip;
     osgEarth::Util::ObjectLocatorNode* uavPos;
     osg::MatrixTransform* uavAttitudeAndScale;
+    osgEarth::MapNode* mapNode;
 };
 
 

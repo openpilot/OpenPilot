@@ -19,16 +19,19 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
  *****************************************************************************/
-//! \file glc_openglstate.cpp implementation of the GLC_OpenGLState class.
+//! \file glc_contextshareddata.cpp implementation of the GLC_ContextSharedData class.
 
-#include "glc_openglstate.h"
+#include <QtDebug>
 
-GLC_OpenGLState::GLC_OpenGLState()
+#include "glc_contextshareddata.h"
+
+GLC_ContextSharedData::GLC_ContextSharedData()
 {
+	qDebug() << "GLC_ContextSharedData::GLC_ContextSharedData()";
 
 }
 
-GLC_OpenGLState::~GLC_OpenGLState()
+GLC_ContextSharedData::~GLC_ContextSharedData()
 {
-
+	qDebug() << "GLC_ContextSharedData::~GLC_ContextSharedData()";
 }

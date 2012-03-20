@@ -150,7 +150,7 @@ public:
 //////////////////////////////////////////////////////////////////////
 
 public:
-	GLC_ObjToWorld(const QGLContext*);
+	GLC_ObjToWorld();
 	virtual ~GLC_ObjToWorld();
 //@}
 
@@ -226,9 +226,6 @@ private:
 
 	//! The Obj File name
 	QString m_FileName;
-
-	//! OpenGL Context
-	const QGLContext* m_pQGLContext;
 
 	//! the Obj Mtl loader
 	GLC_ObjMtlLoader* m_pMtlLoader;

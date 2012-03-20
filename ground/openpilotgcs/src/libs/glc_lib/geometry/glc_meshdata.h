@@ -26,6 +26,7 @@
 #define GLC_MESHDATA_H_
 
 #include <QVector>
+#include <QGLBuffer>
 
 #include "glc_lod.h"
 #include "../glc_global.h"
@@ -140,7 +141,7 @@ public:
 
 	//! Return true if the mesh data doesn't contains vertice
 	inline bool isEmpty() const
-	{return (0 == m_PositionSize) && (0 == m_Positions.size());}
+	{return (1 > m_PositionSize) && (0 == m_Positions.size());}
 
 	//! Return the number of triangle from the given lod index
 	inline unsigned int trianglesCount(int lod) const
@@ -148,6 +149,10 @@ public:
 		Q_ASSERT(lod < m_LodList.size());
 		return m_LodList.at(lod)->trianglesCount();
 	}
+
+	//! Return true if the position size is set
+	inline bool positionSizeIsSet() const
+	{return m_PositionSize != -1;}
 
 //@}
 
@@ -159,9 +164,6 @@ public:
 	//! Add a empty Lod to the engine
 	inline void appendLod(double accuracy= 0.0)
 	{m_LodList.append(new GLC_Lod(accuracy));}
-
-	//! The mesh wich use the data is finished and VBO is used
-	void finishVbo();
 
 	//! If the there is more than 2 LOD Swap the first and last
 	void finishLod();
@@ -183,6 +185,13 @@ public:
 		m_LodList.at(lod)->trianglesAdded(number);
 	}
 
+	//! Set VBO usage
+	void setVboUsage(bool usage);
+
+	//! Init the position size
+	inline void initPositionSize()
+	{m_PositionSize= m_Positions.size();}
+
 //@}
 
 //////////////////////////////////////////////////////////////////////
@@ -194,14 +203,17 @@ public:
 	void createVBOs();
 
 	//! Ibo Usage
-	bool useVBO(bool, GLC_MeshData::VboType) const;
+	bool useVBO(bool, GLC_MeshData::VboType);
 
 	//! Ibo Usage
 	inline void useIBO(bool use, const int currentLod= 0)
 	{
 		if (use) m_LodList.at(currentLod)->useIBO();
-		else glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		else QGLBuffer::release(QGLBuffer::IndexBuffer);
 	}
+
+	//! Fill all LOD IBO
+	void fillLodIbo();
 
 	//! Fill the VBO of the given type
 	void fillVbo(GLC_MeshData::VboType vboType);
@@ -213,8 +225,8 @@ public:
 //////////////////////////////////////////////////////////////////////
 private:
 
-	//! Main VBO ID
-	GLuint m_VboId;
+	//! The vertex Buffer
+	QGLBuffer m_VertexBuffer;
 
 	//! Vertex Position Vector
 	GLfloatVector m_Positions;
@@ -228,14 +240,14 @@ private:
 	//! Color index
 	GLfloatVector m_Colors;
 
-	//! Normals VBO ID
-	GLuint m_NormalVboId;
+	//! Normals Buffer
+	QGLBuffer m_NormalBuffer;
 
-	//! Texture VBO ID
-	GLuint m_TexelVboId;
+	//! Texture Buffer
+	QGLBuffer m_TexelBuffer;
 
-	//! Color VBO ID
-	GLuint m_ColorVboId;
+	//! Color Buffer
+	QGLBuffer m_ColorBuffer;
 
 	//! The list of LOD
 	QList<GLC_Lod*> m_LodList;
@@ -248,6 +260,9 @@ private:
 
 	//! The size of Color VBO
 	int m_ColorSize;
+
+	//! Use VBO
+	bool m_UseVbo;
 
 	//! Class chunk id
 	static quint32 m_ChunkId;

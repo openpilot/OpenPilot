@@ -75,6 +75,9 @@ public:
 
 	//! Return bsrep suffix
 	static QString suffix();
+
+	//! Return bsrep version
+	static quint32 version();
 //@}
 
 //////////////////////////////////////////////////////////////////////

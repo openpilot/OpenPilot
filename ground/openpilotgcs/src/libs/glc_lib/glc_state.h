@@ -103,6 +103,9 @@ public:
 
 	//! Return true if frustum culling is activated
 	static bool isFrustumCullingActivated();
+
+	//! Return true valid
+	static bool isValid();
 //@}
 
 //////////////////////////////////////////////////////////////////////
@@ -208,6 +211,9 @@ private:
 
 	//! Frame buffer supported
 	static bool m_IsFrameBufferSupported;
+
+	//! State valid flag
+	static bool m_IsValid;
 
 };
 

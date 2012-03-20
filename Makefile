@@ -114,9 +114,6 @@ help:
 	@echo "                            supported boards are ($(BL_BOARDS))"
 	@echo
 	@echo "   [Simulation]"
-	@echo "     sim_posix            - Build OpenPilot simulation firmware for"
-	@echo "                            a POSIX compatible system (Linux, Mac OS X, ...)"
-	@echo "     sim_posix_clean      - Delete all build output for the POSIX simulation"
 	@echo "     sim_win32            - Build OpenPilot simulation firmware for"
 	@echo "                            Windows using mingw and msys"
 	@echo "     sim_win32_clean      - Delete all build output for the win32 simulation"
@@ -624,12 +621,13 @@ all_$(1)_clean: $$(addsuffix _clean, $$(filter bu_$(1), $$(BU_TARGETS)))
 all_$(1)_clean: $$(addsuffix _clean, $$(filter ef_$(1), $$(EF_TARGETS)))
 endef
 
-ALL_BOARDS := coptercontrol pipxtreme revolution
+ALL_BOARDS := coptercontrol pipxtreme revolution simposix
 
 # Friendly names of each board (used to find source tree)
 coptercontrol_friendly := CopterControl
 pipxtreme_friendly     := PipXtreme
 revolution_friendly    := Revolution
+simposix_friendly      := SimPosix
 
 # Start out assuming that we'll build fw, bl and bu for all boards
 FW_BOARDS  := $(ALL_BOARDS)
@@ -682,14 +680,6 @@ $(foreach board, $(ALL_BOARDS), $(eval $(call BL_TEMPLATE,$(board),$($(board)_fr
 
 # Expand the entire-flash rules
 $(foreach board, $(ALL_BOARDS), $(eval $(call EF_TEMPLATE,$(board),$($(board)_friendly))))
-
-.PHONY: sim_posix
-sim_posix: sim_posix_elf
-
-sim_posix_%: uavobjects_flight
-	$(V1) mkdir -p $(BUILD_DIR)/sitl_posix
-	$(V1) $(MAKE) --no-print-directory \
-		-C $(ROOT_DIR)/flight/OpenPilot --file=$(ROOT_DIR)/flight/OpenPilot/Makefile.posix $*
 
 .PHONY: sim_win32
 sim_win32: sim_win32_exe

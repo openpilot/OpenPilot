@@ -42,8 +42,7 @@
 //////////////////////////////////////////////////////////////////////
 // Constructor
 //////////////////////////////////////////////////////////////////////
-GLC_FileLoader::GLC_FileLoader(const QGLContext *pContext)
-: m_pQGLContext(pContext)
+GLC_FileLoader::GLC_FileLoader()
 {
 }
 
@@ -89,7 +88,7 @@ GLC_World GLC_FileLoader::createWorldFromFile(QFile &file, QStringList* pAttache
 	GLC_World* pWorld= NULL;
 	if (QFileInfo(file).suffix().toLower() == "obj")
 	{
-		GLC_ObjToWorld objToWorld(m_pQGLContext);
+		GLC_ObjToWorld objToWorld;
 		connect(&objToWorld, SIGNAL(currentQuantum(int)), this, SIGNAL(currentQuantum(int)));
 		pWorld= objToWorld.CreateWorldFromObj(file);
 		if (NULL != pAttachedFileName)
@@ -111,7 +110,7 @@ GLC_World GLC_FileLoader::createWorldFromFile(QFile &file, QStringList* pAttache
 	}
 	else if (QFileInfo(file).suffix().toLower() == "3ds")
 	{
-		GLC_3dsToWorld studioToWorld(m_pQGLContext);
+		GLC_3dsToWorld studioToWorld;
 		connect(&studioToWorld, SIGNAL(currentQuantum(int)), this, SIGNAL(currentQuantum(int)));
 		pWorld= studioToWorld.CreateWorldFrom3ds(file);
 		if (NULL != pAttachedFileName)
@@ -121,7 +120,7 @@ GLC_World GLC_FileLoader::createWorldFromFile(QFile &file, QStringList* pAttache
 	}
 	else if (QFileInfo(file).suffix().toLower() == "3dxml")
 	{
-		GLC_3dxmlToWorld d3dxmlToWorld(m_pQGLContext);
+		GLC_3dxmlToWorld d3dxmlToWorld;
 		connect(&d3dxmlToWorld, SIGNAL(currentQuantum(int)), this, SIGNAL(currentQuantum(int)));
 		pWorld= d3dxmlToWorld.createWorldFrom3dxml(file, false);
 		if (NULL != pAttachedFileName)
@@ -131,7 +130,7 @@ GLC_World GLC_FileLoader::createWorldFromFile(QFile &file, QStringList* pAttache
 	}
 	else if (QFileInfo(file).suffix().toLower() == "dae")
 	{
-		GLC_ColladaToWorld colladaToWorld(m_pQGLContext);
+		GLC_ColladaToWorld colladaToWorld;
 		connect(&colladaToWorld, SIGNAL(currentQuantum(int)), this, SIGNAL(currentQuantum(int)));
 		pWorld= colladaToWorld.CreateWorldFromCollada(file);
 		if (NULL != pAttachedFileName)

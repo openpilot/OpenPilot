@@ -25,6 +25,7 @@
 #include "glc_material.h"
 #include "../geometry/glc_geometry.h"
 #include "../glc_factory.h"
+#include "../glc_openglexception.h"
 
 #include <QtDebug>
 
@@ -100,8 +101,8 @@ GLC_Material::GLC_Material(const QString& name ,const GLfloat *pDiffuseColor)
 	// Others
 	initOtherColor();
 }
-GLC_Material::GLC_Material(GLC_Texture* pTexture, const char *pName)
-:GLC_Object(pName)
+GLC_Material::GLC_Material(GLC_Texture* pTexture, const QString& name)
+:GLC_Object(name)
 , m_AmbientColor()
 , m_DiffuseColor()
 , m_SpecularColor()
@@ -460,11 +461,15 @@ void GLC_Material::setOpacity(const qreal alpha)
 //////////////////////////////////////////////////////////////////////
 
 // Load the texture
-void GLC_Material::glLoadTexture(void)
+void GLC_Material::glLoadTexture(QGLContext* pContext)
 {
 	if (m_pTexture != NULL)
 	{
-		m_pTexture->glLoadTexture();
+		m_pTexture->glLoadTexture(pContext);
+	}
+	else
+	{
+		qDebug() << "GLC_Material::glLoadTexture : Material without texture !";
 	}
 }
 
@@ -492,9 +497,10 @@ void GLC_Material::glExecute()
 								emissiveColor().blueF(),
 								emissiveColor().alphaF()};
 
+	const bool textureIsEnable= glIsEnabled(GL_TEXTURE_2D);
 	if (m_pTexture != NULL)
 	{
-		glEnable(GL_TEXTURE_2D);
+		if (!textureIsEnable) glEnable(GL_TEXTURE_2D);
 		m_pTexture->glcBindTexture();
 		if (GLC_State::glslUsed())
 		{
@@ -511,13 +517,13 @@ void GLC_Material::glExecute()
 
 		if (GLC_State::glslUsed() && GLC_Shader::hasActiveShader())
 		{
-				glEnable(GL_TEXTURE_2D);
+				if (!textureIsEnable) glEnable(GL_TEXTURE_2D);
 				GLC_Shader::currentShaderHandle()->programShaderHandle()->setUniformValue("tex", GLint(0));
 				GLC_Shader::currentShaderHandle()->programShaderHandle()->setUniformValue("useTexture", false);
 		}
 		else
 		{
-			glDisable(GL_TEXTURE_2D);
+			if (textureIsEnable) glDisable(GL_TEXTURE_2D);
 		}
 
 	}
@@ -530,14 +536,15 @@ void GLC_Material::glExecute()
 
 	glColor4fv(pDiffuseColor);
 
+
 	// OpenGL Error handler
-	GLenum errCode;
-	if ((errCode= glGetError()) != GL_NO_ERROR)
+	GLenum error= glGetError();
+	if (error != GL_NO_ERROR)
 	{
-		const GLubyte* errString;
-		errString = gluErrorString(errCode);
-		qDebug("GLC_Material::GlExecute OpenGL Error %s", errString);
+		GLC_OpenGlException OpenGlException("GLC_Material::glExecute() ", error);
+		throw(OpenGlException);
 	}
+
 }
 
 // Execute OpenGL Material
@@ -563,9 +570,11 @@ void GLC_Material::glExecute(float overwriteTransparency)
 								emissiveColor().blueF(),
 								overwriteTransparency};
 
+	const bool textureIsEnable= glIsEnabled(GL_TEXTURE_2D);
+
 	if (m_pTexture != NULL)
 	{
-		glEnable(GL_TEXTURE_2D);
+		if (!textureIsEnable) glEnable(GL_TEXTURE_2D);
 		m_pTexture->glcBindTexture();
 		if (GLC_State::glslUsed())
 		{
@@ -578,7 +587,7 @@ void GLC_Material::glExecute(float overwriteTransparency)
 	}
 	else
 	{
-		glDisable(GL_TEXTURE_2D);
+		if (textureIsEnable) glDisable(GL_TEXTURE_2D);
 		if (GLC_State::glslUsed())
 		{
 			if (GLC_Shader::hasActiveShader())
@@ -598,12 +607,11 @@ void GLC_Material::glExecute(float overwriteTransparency)
 	glColor4fv(pDiffuseColor);
 
 	// OpenGL Error handler
-	GLenum errCode;
-	if ((errCode= glGetError()) != GL_NO_ERROR)
+	GLenum error= glGetError();
+	if (error != GL_NO_ERROR)
 	{
-		const GLubyte* errString;
-		errString = gluErrorString(errCode);
-		qDebug("GLC_Material::glExecute(float) OpenGL Error %s", errString);
+		GLC_OpenGlException OpenGlException("GLC_Material::glExecute(float overwriteTransparency) ", error);
+		throw(OpenGlException);
 	}
 }
 
@@ -687,7 +695,7 @@ QDataStream &operator>>(QDataStream &stream, GLC_Material &material)
 	stream >> hasTexture;
 	if (hasTexture)
 	{
-		GLC_Texture texture(GLC_Factory::instance()->context());
+		GLC_Texture texture;
 		stream >> texture;
 		material.setTexture(new GLC_Texture(texture));
 	}

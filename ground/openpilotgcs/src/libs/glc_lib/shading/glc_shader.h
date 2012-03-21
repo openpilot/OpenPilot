@@ -32,6 +32,7 @@
 #include <QFile>
 #include <QMutex>
 #include <QString>
+#include <QMap>
 
 #include "../glc_config.h"
 
@@ -89,6 +90,22 @@ public:
 	inline QGLShaderProgram* programShaderHandle()
 	{return &m_ProgramShader;}
 
+	//! Return the position attribute id
+	inline int positionAttributeId() const
+	{return m_PositionAttributeId;}
+
+	//! Return the texture coordinate attribute id
+	inline int textureAttributeId() const
+	{return m_TextcoordAttributeId;}
+
+	//! Return the color attribute id
+	inline int colorAttributeId() const
+	{return m_ColorAttributeId;}
+
+	//! Return the normal attribute id
+	inline int normalAttributeId() const
+	{return m_NormalAttributeId;}
+
 	//! Return the number of shader
 	static int shaderCount();
 
@@ -130,6 +147,62 @@ public:
 	inline void setName(const QString& name)
 	{m_Name= name;}
 
+	//! Return the modelView location id
+	inline int modelViewLocationId() const
+	{return m_ModelViewLocationId;}
+
+	//! Return the modelView Projection matrix id
+	inline int mvpLocationId() const
+	{return m_MvpLocationId;}
+
+	//! Return the inverse modelView location id
+	inline int invModelViewLocationId() const
+	{return m_InvModelViewLocationId;}
+
+	//! Return the enable lighting location id
+	inline int enableLightingId() const
+	{return m_EnableLightingId;}
+
+	//! Return the lights enable state id
+	inline int lightsEnableStateId() const
+	{return m_LightsEnableStateId;}
+
+	//! Return the light position id of the given light id
+	inline int lightPositionId(GLenum lightId) const
+	{return m_LightsPositionId.value(lightId);}
+
+	//! Return the light ambient color id of the given light id
+	inline int lightAmbientColorId(GLenum lightId) const
+	{return m_LightsAmbientColorId.value(lightId);}
+
+	//! Return the light diffuse color id of the given light id
+	inline int lightDiffuseColorId(GLenum lightId) const
+	{return m_LightsDiffuseColorId.value(lightId);}
+
+	//! Return the light specular color id of the given light id
+	inline int lightSpecularColorId(GLenum lightId) const
+	{return m_LightsSpecularColorId.value(lightId);}
+
+	//! Return the light spot direction id of the given light id
+	inline int lightSpotDirectionId(GLenum lightId) const
+	{return m_LightsSpotDirectionId.value(lightId);}
+
+	//! Return the light attenuation factors id of the given light id
+	inline int lightAttebuationFactorsId(GLenum lightId) const
+	{return m_LightsAttenuationFactorsId.value(lightId);}
+
+	//! Return the light spot exponent id of the given light id
+	inline int lightSpotExponentId(GLenum lightId) const
+	{return m_LightsSpotExponentId.value(lightId);}
+
+	//! Return the light spot cutoff id of the given light id
+	inline int lightSpotCutoffId(GLenum lightId) const
+	{return m_LightsSpotCutoffAngleId.value(lightId);}
+
+	//! Return the light compute distance attenuation id of the given light id
+	inline int lightComputeDistanceAttenuationId(GLenum lightId) const
+	{return m_LightsComputeDistanceAttenuationId.value(lightId);}
+
 //@}
 
 //////////////////////////////////////////////////////////////////////
@@ -143,7 +216,7 @@ public:
 
 	//! Use specified program shader
 	/*! Return true if the given shading group id is usable*/
-	static bool use(GLuint ShadingGroupId);
+	static bool use(GLC_uint ShadingGroupId);
 
 	//! unuse programm shader
 	static void unuse();
@@ -156,6 +229,12 @@ public:
 	void deleteShader();
 //@}
 
+//////////////////////////////////////////////////////////////////////
+// private services function
+//////////////////////////////////////////////////////////////////////
+private:
+	//! Init light uniform id
+	void initLightsUniformId();
 //////////////////////////////////////////////////////////////////////
 // private members
 //////////////////////////////////////////////////////////////////////
@@ -183,6 +262,60 @@ private:
 
 	//! The Shader's name
 	QString m_Name;
+
+	//! The position attribute id
+	int m_PositionAttributeId;
+
+	//! The Texture coordinate attribute id
+	int m_TextcoordAttributeId;
+
+	//! The color attribute id
+	int m_ColorAttributeId;
+
+	//! The Normal attribute id
+	int m_NormalAttributeId;
+
+	//! The modelView location matrix id
+	int m_ModelViewLocationId;
+
+	//! The modelView Projection matrix id
+	int m_MvpLocationId;
+
+	//! The inverse modelView location id
+	int m_InvModelViewLocationId;
+
+	//! The enable lighting id
+	int m_EnableLightingId;
+
+	//! Lights enable states id
+	int m_LightsEnableStateId;
+
+	//! Lights positions id
+	QMap<GLenum, int> m_LightsPositionId;
+
+	//! Lights ambient color id
+	QMap<GLenum, int> m_LightsAmbientColorId;
+
+	//! Lights diffuse color id
+	QMap<GLenum, int> m_LightsDiffuseColorId;
+
+	//! Lights specular color id
+	QMap<GLenum, int> m_LightsSpecularColorId;
+
+	//! Lights spot direction id
+	QMap<GLenum, int> m_LightsSpotDirectionId;
+
+	//! Lights attenuation factors id
+	QMap<GLenum, int> m_LightsAttenuationFactorsId;
+
+	//! Lights spot exponent id
+	QMap<GLenum, int> m_LightsSpotExponentId;
+
+	//! Lights spot cutoff angle id
+	QMap<GLenum, int> m_LightsSpotCutoffAngleId;
+
+	//! Lights compute distance attenuation
+	QMap<GLenum, int> m_LightsComputeDistanceAttenuationId;
 
 };
 

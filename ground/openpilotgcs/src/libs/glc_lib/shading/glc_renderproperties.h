@@ -43,6 +43,7 @@ namespace glc
 		NormalRenderMode,
 		OverwriteMaterial,
 		OverwriteTransparency,
+		OverwriteTransparencyAndMaterial,
 		PrimitiveSelected,
 		OverwritePrimitiveMaterial,
 		BodySelection,

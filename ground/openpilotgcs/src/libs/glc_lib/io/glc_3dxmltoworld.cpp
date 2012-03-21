@@ -45,9 +45,8 @@ QMutex GLC_3dxmlToWorld::m_ZipMutex;
 
 static qint64 chunckSize= 10000000;
 
-GLC_3dxmlToWorld::GLC_3dxmlToWorld(const QGLContext* pContext)
+GLC_3dxmlToWorld::GLC_3dxmlToWorld()
 : QObject()
-, m_pQGLContext(pContext)
 , m_pStreamReader(NULL)
 , m_FileName()
 , m_p3dxmlArchive(NULL)
@@ -72,9 +71,11 @@ GLC_3dxmlToWorld::GLC_3dxmlToWorld(const QGLContext* pContext)
 , m_SetOfAttachedFileName()
 , m_CurrentFileName()
 , m_CurrentDateTime()
-, m_OccurenceAttrib()
+, m_V3OccurenceAttribHash()
+, m_V4OccurenceAttribList()
 , m_GetExternalRef3DName(false)
 , m_ByteArrayList()
+, m_IsVersion3(false)
 {
 
 }
@@ -90,13 +91,18 @@ GLC_3dxmlToWorld::~GLC_3dxmlToWorld()
 	clearMaterialHash();
 
 	// Clear specific attributes hash table
-	QHash<unsigned int, OccurenceAttrib*>::iterator iAttrib= m_OccurenceAttrib.begin();
-	while (m_OccurenceAttrib.constEnd() != iAttrib)
+	QHash<unsigned int, V3OccurenceAttrib*>::iterator iAttrib= m_V3OccurenceAttribHash.begin();
+	while (m_V3OccurenceAttribHash.constEnd() != iAttrib)
 	{
 		delete iAttrib.value();
 		++iAttrib;
 	}
-	m_OccurenceAttrib.clear();
+
+	const int v4OccurenceAttribCount= m_V4OccurenceAttribList.count();
+	for (int i= 0; i < v4OccurenceAttribCount; ++i)
+	{
+		delete m_V4OccurenceAttribList.at(i);
+	}
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -144,6 +150,9 @@ GLC_World* GLC_3dxmlToWorld::createWorldFrom3dxml(QFile &file, bool structureOnl
 		loadCatMaterialRef();
 	}
 
+	// Read the header
+	readHeader();
+
 	// Load the product structure
 	loadProductStructure();
 
@@ -179,7 +188,7 @@ GLC_3DRep GLC_3dxmlToWorld::create3DrepFrom3dxmlRep(const QString& fileName)
 		m_CurrentFileName= glc::archiveEntryFileName(fileName);
 
 		// Get the 3DXML time stamp
-		m_CurrentDateTime= QFileInfo(QFileInfo(m_FileName).absolutePath() + QDir::separator() + QFileInfo(fileName).fileName()).lastModified();
+		m_CurrentDateTime= QFileInfo(QFileInfo(m_FileName)).lastModified();
 	}
 	else if (glc::isFileString(fileName))
 	{
@@ -231,7 +240,7 @@ GLC_3DRep GLC_3dxmlToWorld::create3DrepFrom3dxmlRep(const QString& fileName)
 			}
 		}
 	}
-	else if (QFileInfo(m_CurrentFileName).suffix().toLower() == "3drep")
+	else if ((QFileInfo(m_CurrentFileName).suffix().toLower() == "3drep") || (QFileInfo(m_CurrentFileName).suffix().toLower() == "xml"))
 	{
         if (GLC_State::cacheIsUsed() && GLC_State::currentCacheManager().isUsable(m_CurrentDateTime, QFileInfo(m_FileName).baseName(), QFileInfo(m_CurrentFileName).fileName()))
 		{
@@ -310,7 +319,7 @@ void GLC_3dxmlToWorld::goToRepId(const QString& id)
 	while(!m_pStreamReader->atEnd() && !((QXmlStreamReader::StartElement == m_pStreamReader->tokenType()) && (m_pStreamReader->name() == "Representation")
 			&& (m_pStreamReader->attributes().value("id").toString() == id)))
 	{
-		readNext();;
+		readNext();
 	}
 
 }
@@ -324,7 +333,7 @@ void GLC_3dxmlToWorld::gotToPolygonalRepType()
 	{
 		//qDebug() << m_pStreamReader->name();
 		//qDebug() << m_pStreamReader->attributes().value("xsi:type").toString();
-		readNext();;
+		readNext();
 	}
 
 }
@@ -347,10 +356,34 @@ QString GLC_3dxmlToWorld::readAttribute(const QString& name, bool required)
 	return attributeValue;
 }
 
+void GLC_3dxmlToWorld::readHeader()
+{
+	setStreamReaderToFile(m_RootName);
+
+	goToElement(m_pStreamReader, "Header");
+	if (m_pStreamReader->atEnd() || m_pStreamReader->hasError())
+	{
+		QString message(QString("GLC_3dxmlToWorld::readHeader Element Header Not found in ") + m_FileName);
+		GLC_FileFormatException fileFormatException(message, m_FileName, GLC_FileFormatException::WrongFileFormat);
+		clear();
+		throw(fileFormatException);
+	}
+
+	while(endElementNotReached(m_pStreamReader, "Header"))
+	{
+		if ((QXmlStreamReader::StartElement == m_pStreamReader->tokenType()) && (m_pStreamReader->name() == "SchemaVersion"))
+		{
+			QString version= getContent(m_pStreamReader, "SchemaVersion");
+			m_IsVersion3= version.startsWith('3');
+		}
+		readNext();
+	}
+}
+
 // Load the product structure
 void GLC_3dxmlToWorld::loadProductStructure()
 {
-	setStreamReaderToFile(m_RootName);
+
 	goToElement(m_pStreamReader, "ProductStructure");
 	if (m_pStreamReader->atEnd() || m_pStreamReader->hasError())
 	{
@@ -373,7 +406,7 @@ void GLC_3dxmlToWorld::loadProductStructure()
 			else loadInstanceRep();
 		}
 
-		readNext();;
+		readNext();
 	}
 
 	// Load Default view properties
@@ -382,11 +415,11 @@ void GLC_3dxmlToWorld::loadProductStructure()
 		if ((QXmlStreamReader::StartElement == m_pStreamReader->tokenType())
 				&& ((m_pStreamReader->name() == "DefaultView") || (m_pStreamReader->name() == "GeometricRepresentationSet")))
 		{
-			if (m_pStreamReader->name() == "DefaultView") loadGraphicsProperties();
+			if (m_pStreamReader->name() == "DefaultView") loadDefaultView();
 			else if (m_pStreamReader->name() == "GeometricRepresentationSet") loadLocalRepresentations();
 
 		}
-		readNext();;
+		readNext();
 	}
 
 	// Check if an error Occur
@@ -478,17 +511,17 @@ void GLC_3dxmlToWorld::loadProductStructure()
 	// Update occurence number
 	m_pWorld->rootOccurence()->updateOccurenceNumber(1);
 
-	// Change occurence attributes
-	if (! m_OccurenceAttrib.isEmpty())
+	// Change occurence attributes for 3DXML V3
+	if (! m_V3OccurenceAttribHash.isEmpty())
 	{
-		//qDebug() << "Not visible occurence= " << m_OccurenceAttrib.size();
+		//qDebug() << "Not visible occurence= " << m_V3OccurenceAttribHash.size();
 		QList<GLC_StructOccurence*> occurenceList= m_pWorld->listOfOccurence();
 		const int size= occurenceList.size();
 		for (int i= 0; i < size; ++i)
 		{
-			if (m_OccurenceAttrib.contains(occurenceList.at(i)->occurenceNumber()))
+			if (m_V3OccurenceAttribHash.contains(occurenceList.at(i)->occurenceNumber()))
 			{
-				OccurenceAttrib* pOccurenceAttrib= m_OccurenceAttrib.value(occurenceList.at(i)->occurenceNumber());
+				V3OccurenceAttrib* pOccurenceAttrib= m_V3OccurenceAttribHash.value(occurenceList.at(i)->occurenceNumber());
 				occurenceList.at(i)->setVisibility(pOccurenceAttrib->m_IsVisible);
 				if (NULL != pOccurenceAttrib->m_pRenderProperties)
 				{
@@ -497,6 +530,27 @@ void GLC_3dxmlToWorld::loadProductStructure()
 			}
 		}
 	}
+
+	// Change occurence attributes for 3DXML V4
+	if (!m_V4OccurenceAttribList.isEmpty())
+	{
+		QHash<GLC_StructInstance*, unsigned int> instanceToIdHash;
+		const int assyCount= m_AssyLinkList.count();
+		for (int i= 0; i < assyCount; ++i)
+		{
+			AssyLink assyLink= m_AssyLinkList.at(i);
+			instanceToIdHash.insert(assyLink.m_pChildInstance, assyLink.m_InstanceId);
+		}
+
+		const int attribCount= m_V4OccurenceAttribList.count();
+		for (int i= 0; i < attribCount; ++i)
+		{
+			V4OccurenceAttrib* pCurrentV4OccurenceAttrib= m_V4OccurenceAttribList.at(i);
+			//qDebug() << pCurrentV4OccurenceAttrib->m_Path;
+			applyV4Attribute(m_pWorld->rootOccurence(), pCurrentV4OccurenceAttrib, instanceToIdHash);
+		}
+	}
+
 	// Check usage of Instance
 	InstanceOfExtRefHash::const_iterator iInstance= m_InstanceOfExtRefHash.constBegin();
 	while (m_InstanceOfExtRefHash.constEnd() != iInstance)
@@ -570,10 +624,10 @@ void GLC_3dxmlToWorld::loadReference3D()
 					}
 					userAttributes.insert(name, value);
 				}
-				readNext();;
+				readNext();
 			}
 		}
-		readNext();;
+		readNext();
 	}
 	if (!userAttributes.isEmpty())
 	{
@@ -591,6 +645,7 @@ void GLC_3dxmlToWorld::loadInstance3D()
 
 	const unsigned int instanceId= readAttribute("id", true).toUInt();
 	const QString instName(readAttribute("name", false));
+	goToElement(m_pStreamReader, "IsAggregatedBy");
 	const unsigned int aggregatedById= getContent(m_pStreamReader, "IsAggregatedBy").toUInt();
 	QString instanceOf= getContent(m_pStreamReader, "IsInstanceOf");
 	const QString matrixString= getContent(m_pStreamReader, "RelativeMatrix");
@@ -614,10 +669,10 @@ void GLC_3dxmlToWorld::loadInstance3D()
 					QString value= readAttribute("value", true);
 					userAttributes.insert(name, value);
 				}
-				readNext();;
+				readNext();
 			}
 		}
-		readNext();;
+		readNext();
 	}
 	if (!userAttributes.isEmpty())
 	{
@@ -687,7 +742,7 @@ void GLC_3dxmlToWorld::loadInstanceRep()
 {
 	const QString local= "urn:3DXML:Reference:loc:";
 
-	//const QString instName(readAttribute("name", true));
+	goToElement(m_pStreamReader, "IsAggregatedBy");
 	const unsigned int aggregatedById= getContent(m_pStreamReader, "IsAggregatedBy").toUInt();
 	QString instanceOf= getContent(m_pStreamReader, "IsInstanceOf");
 
@@ -745,7 +800,6 @@ void GLC_3dxmlToWorld::loadExternalRef3D()
 			GLC_3DRep* pRep= new GLC_3DRep(binaryRep.loadRep());
 
 			setRepresentationFileName(pRep);
-			factorizeMaterial(pRep);
 
 			GLC_StructReference* pCurrentRef= new GLC_StructReference(pRep);
 			pCurrentRef->setName(QFileInfo(m_CurrentFileName).baseName());
@@ -952,103 +1006,7 @@ GLC_StructReference* GLC_3dxmlToWorld::createReferenceRep(QString repId, GLC_3DR
 			currentMesh3DRep.addGeom(pMesh);
 		}
 
-		// Get the master lod accuracy
-		double masterLodAccuracy= readAttribute("accuracy", false).toDouble();
-
-		loadLOD(pMesh);
-		if (m_pStreamReader->atEnd() || m_pStreamReader->hasError())
-		{
-			QStringList stringList(m_FileName);
-			stringList.append(m_CurrentFileName);
-			stringList.append("Master LOD not found");
-			GLC_ErrorLog::addError(stringList);
-			return new GLC_StructReference("Empty Rep");
-		}
-
-		// Load Faces index data
-		while (endElementNotReached(m_pStreamReader, "Faces"))
-		{
-			readNext();;
-			if ( m_pStreamReader->name() == "Face")
-			{
-				loadFace(pMesh, 0, masterLodAccuracy);
-			}
-		}
-		checkForXmlError("End of Faces not found");
-
-		while (startElementNotReached(m_pStreamReader, "Edges") && startElementNotReached(m_pStreamReader, "VertexBuffer"))
-		{
-			readNext();;
-		}
-
-		checkForXmlError("Element VertexBuffer not found");
-		if (m_pStreamReader->name() == "Edges")
-		{
-			while (endElementNotReached(m_pStreamReader, "Edges"))
-			{
-				readNext();;
-				if ( m_pStreamReader->name() == "Polyline")
-				{
-					loadPolyline(pMesh);
-					readNext();;
-				}
-			}
-		}
-
-
-		{
-			QString verticePosition= getContent(m_pStreamReader, "Positions").replace(',', ' ');
-			//qDebug() << "Position " << verticePosition;
-			checkForXmlError("Error while retrieving Position ContentVertexBuffer");
-			// Load Vertice position
-			QTextStream verticeStream(&verticePosition);
-			QList<GLfloat> verticeValues;
-			QString buff;
-			while ((!verticeStream.atEnd()))
-			{
-				verticeStream >> buff;
-				verticeValues.append(buff.toFloat());
-			}
-			pMesh->addVertice(verticeValues.toVector());
-
-		}
-
-		{
-			QString normals= getContent(m_pStreamReader, "Normals").replace(',', ' ');
-			//qDebug() << "Normals " << normals;
-			checkForXmlError("Error while retrieving Normals values");
-			// Load Vertice Normals
-			QTextStream normalsStream(&normals);
-			QList<GLfloat> normalValues;
-			QString buff;
-			while ((!normalsStream.atEnd()))
-			{
-				normalsStream >> buff;
-				normalValues.append(buff.toFloat());
-			}
-			pMesh->addNormals(normalValues.toVector());
-		}
-
-		// Try to find texture coordinate
-		while (endElementNotReached(m_pStreamReader, "VertexBuffer"))
-		{
-			//qDebug() << "Try to find texture coordinate " << m_pStreamReader->name() << " " << m_pStreamReader->lineNumber();
-			if ((QXmlStreamReader::StartElement == m_pStreamReader->tokenType()) && (m_pStreamReader->name() == "TextureCoordinates"))
-			{
-				QString texels= getContent(m_pStreamReader, "TextureCoordinates").replace(',', ' ');
-				checkForXmlError("Error while retrieving Texture coordinates");
-				QTextStream texelStream(&texels);
-				QList<GLfloat> texelValues;
-				QString buff;
-				while ((!texelStream.atEnd()))
-				{
-					texelStream >> buff;
-					texelValues.append(buff.toFloat());
-				}
-				pMesh->addTexels(texelValues.toVector());
-			}
-			readNext();;
-		}
+		loadRep(pMesh);
 
 		++numberOfMesh;
 	}
@@ -1166,8 +1124,6 @@ void GLC_3dxmlToWorld::createUnfoldedTree()
 		++iLink;
 	}
 
-	m_AssyLinkList.clear();
-
 	// Check the assembly structure occurence
 	ReferenceHash::const_iterator iRef= m_ReferenceHash.constBegin();
 	while (m_ReferenceHash.constEnd() != iRef)
@@ -1239,34 +1195,7 @@ void GLC_3dxmlToWorld::checkForXmlError(const QString& info)
 		throw(fileFormatException);
 	}
 }
-// Go to the master LOD
-void GLC_3dxmlToWorld::loadLOD(GLC_Mesh* pMesh)
-{
-	int lodIndex= 1;
-	while(!m_pStreamReader->atEnd() && !((QXmlStreamReader::StartElement == m_pStreamReader->tokenType()) && (m_pStreamReader->name() == "Faces")))
-	{
-		readNext();;
-		if ((QXmlStreamReader::StartElement == m_pStreamReader->tokenType()) && (m_pStreamReader->name() == "SurfaceAttributes"))
-		{
-			m_pCurrentMaterial= loadSurfaceAttributes();
-		}
-		else if ((QXmlStreamReader::StartElement == m_pStreamReader->tokenType()) && (m_pStreamReader->name() == "PolygonalLOD"))
-		{
-			double accuracy= readAttribute("accuracy", true).toDouble();
-			// Load Faces index data
-			while (endElementNotReached(m_pStreamReader, "Faces"))
-			{
-				readNext();;
-				if ( m_pStreamReader->name() == "Face")
-				{
-					loadFace(pMesh, lodIndex, accuracy);
-				}
-			}
-			checkForXmlError("End of Faces not found");
-			++lodIndex;
-		}
-	}
-}
+
 // Load a face
 void GLC_3dxmlToWorld::loadFace(GLC_Mesh* pMesh, const int lod, double accuracy)
 {
@@ -1292,7 +1221,7 @@ void GLC_3dxmlToWorld::loadFace(GLC_Mesh* pMesh, const int lod, double accuracy)
 		{
 			pCurrentMaterial= loadSurfaceAttributes();
 		}
-		readNext();;
+		readNext();
 	}
 	if (NULL == pCurrentMaterial)
 	{
@@ -1365,14 +1294,30 @@ void GLC_3dxmlToWorld::loadPolyline(GLC_Mesh* pMesh)
 
 	data.replace(',', ' ');
 	QTextStream dataStream(&data);
-	GLfloatVector dataVector;
+	QList<GLfloat> values;
 	QString buff;
 	while ((!dataStream.atEnd()))
 	{
 		dataStream >> buff;
-		dataVector.append(buff.toFloat());
+		values.append(buff.toFloat());
 	}
-	pMesh->addVerticeGroup(dataVector);
+	if ((values.size() % 3) == 0)
+	{
+		pMesh->addVerticeGroup(values.toVector());
+	}
+	else
+	{
+		QString message(QString("polyline buffer is not a multiple of 3 ") + m_CurrentFileName);
+
+		QStringList stringList(message);
+		GLC_ErrorLog::addError(stringList);
+
+		GLC_FileFormatException fileFormatException(message, m_FileName, GLC_FileFormatException::WrongFileFormat);
+		clear();
+		throw(fileFormatException);
+	}
+
+
 }
 
 // Clear material hash
@@ -1404,7 +1349,7 @@ GLC_Material* GLC_3dxmlToWorld::loadSurfaceAttributes()
 		{
 			while (endElementNotReached(m_pStreamReader, "MaterialApplication"))
 			{
-				readNext();;
+				readNext();
 				if ((QXmlStreamReader::StartElement == m_pStreamReader->tokenType()) && (m_pStreamReader->name() == "MaterialId"))
 				{
 					checkForXmlError("Material ID not found");
@@ -1414,7 +1359,7 @@ GLC_Material* GLC_3dxmlToWorld::loadSurfaceAttributes()
 			}
 
 		}
-		readNext();;
+		readNext();
 	}
 
 	return pMaterial;
@@ -1566,7 +1511,7 @@ void GLC_3dxmlToWorld::loadLocalRepresentations()
 			}
 			delete pRef;
 		}
-		readNext();;
+		readNext();
 	}
 	//qDebug() << "Local rep loaded";
 
@@ -1586,7 +1531,7 @@ void GLC_3dxmlToWorld::loadLocalRepresentations()
 	}
 }
 
-void GLC_3dxmlToWorld::loadGraphicsProperties()
+void GLC_3dxmlToWorld::loadDefaultView()
 {
 	if (m_pStreamReader->atEnd() || m_pStreamReader->hasError())
 	{
@@ -1601,10 +1546,11 @@ void GLC_3dxmlToWorld::loadGraphicsProperties()
 	{
 		if ((QXmlStreamReader::StartElement == m_pStreamReader->tokenType()) && (m_pStreamReader->name() == "DefaultViewProperty"))
 		{
-			loadDefaultViewProperty();
+			if (m_IsVersion3) loadV3DefaultViewProperty();
+			else loadV4DefaultViewProperty();
 		}
 
-		readNext();;
+		readNext();
 	}
 
 	// Check if an error Occur
@@ -1618,7 +1564,7 @@ void GLC_3dxmlToWorld::loadGraphicsProperties()
 
 }
 
-void GLC_3dxmlToWorld::loadDefaultViewProperty()
+void GLC_3dxmlToWorld::loadV3DefaultViewProperty()
 {
 	goToElement(m_pStreamReader, "OccurenceId");
 	unsigned int occurenceId= getContent(m_pStreamReader, "OccurenceId").toUInt();
@@ -1635,13 +1581,13 @@ void GLC_3dxmlToWorld::loadDefaultViewProperty()
 					QString visibleString= readAttribute("visible", true);
 					if (visibleString != "true")
 					{
-						if (!m_OccurenceAttrib.contains(occurenceId))
+						if (!m_V3OccurenceAttribHash.contains(occurenceId))
 						{
-							OccurenceAttrib* pOccurenceAttrib= new OccurenceAttrib();
+							V3OccurenceAttrib* pOccurenceAttrib= new V3OccurenceAttrib();
 							pOccurenceAttrib->m_IsVisible= false;
-							m_OccurenceAttrib.insert(occurenceId, pOccurenceAttrib);
+							m_V3OccurenceAttribHash.insert(occurenceId, pOccurenceAttrib);
 						}
-						else m_OccurenceAttrib.value(occurenceId)->m_IsVisible= false;
+						else m_V3OccurenceAttribHash.value(occurenceId)->m_IsVisible= false;
 					}
 				}
 				else if ((QXmlStreamReader::StartElement == m_pStreamReader->tokenType()) && (m_pStreamReader->name() == "SurfaceAttributes"))
@@ -1669,21 +1615,21 @@ void GLC_3dxmlToWorld::loadDefaultViewProperty()
 						pRenderProperties->setOverwriteTransparency(static_cast<float>(alpha));
 						pRenderProperties->setRenderingMode(glc::OverwriteTransparency);
 					}
-					if (!m_OccurenceAttrib.contains(occurenceId))
+					if (!m_V3OccurenceAttribHash.contains(occurenceId))
 					{
-						OccurenceAttrib* pOccurenceAttrib= new OccurenceAttrib();
+						V3OccurenceAttrib* pOccurenceAttrib= new V3OccurenceAttrib();
 						pOccurenceAttrib->m_pRenderProperties= pRenderProperties;
-						m_OccurenceAttrib.insert(occurenceId, pOccurenceAttrib);
+						m_V3OccurenceAttribHash.insert(occurenceId, pOccurenceAttrib);
 					}
-					else m_OccurenceAttrib.value(occurenceId)->m_pRenderProperties= pRenderProperties;
+					else m_V3OccurenceAttribHash.value(occurenceId)->m_pRenderProperties= pRenderProperties;
 				}
 
-				readNext();;
+				readNext();
 			}
 
 		}
 
-		readNext();;
+		readNext();
 	}
 
 	// Check if an error Occur
@@ -1696,6 +1642,120 @@ void GLC_3dxmlToWorld::loadDefaultViewProperty()
 	}
 
 }
+
+void GLC_3dxmlToWorld::loadV4DefaultViewProperty()
+{
+	V4OccurenceAttrib* pV4OccurenceAttrib= new V4OccurenceAttrib();
+
+	while(endElementNotReached(m_pStreamReader, "DefaultViewProperty"))
+	{
+		if ((QXmlStreamReader::StartElement == m_pStreamReader->tokenType()) && (m_pStreamReader->name() == "OccurenceId"))
+		{
+			pV4OccurenceAttrib->m_Path= loadOccurencePath();
+		}
+		else if ((QXmlStreamReader::StartElement == m_pStreamReader->tokenType()) && (m_pStreamReader->name() == "RelativePosition"))
+		{
+			const QString matrix= getContent(m_pStreamReader, "RelativePosition");
+			pV4OccurenceAttrib->m_pMatrix= new GLC_Matrix4x4(loadMatrix(matrix));
+		}
+		else if ((QXmlStreamReader::StartElement == m_pStreamReader->tokenType()) && (m_pStreamReader->name() == "GraphicProperties"))
+		{
+			loadGraphicProperties(pV4OccurenceAttrib);
+		}
+		readNext();
+	}
+
+	if(!pV4OccurenceAttrib->m_Path.isEmpty())
+	{
+		m_V4OccurenceAttribList.append(pV4OccurenceAttrib);
+	}
+	else
+	{
+		delete pV4OccurenceAttrib;
+	}
+
+	// Check if an error Occur
+	if (m_pStreamReader->hasError())
+	{
+		QString message(QString("GLC_3dxmlToWorld::loadV4DefaultViewProperty An error occur in ") + m_FileName);
+		GLC_FileFormatException fileFormatException(message, m_FileName, GLC_FileFormatException::WrongFileFormat);
+		clear();
+		throw(fileFormatException);
+	}
+
+}
+
+QList<unsigned int> GLC_3dxmlToWorld::loadOccurencePath()
+{
+	QList<unsigned int> path;
+	while(endElementNotReached(m_pStreamReader, "OccurenceId"))
+	{
+		if ((QXmlStreamReader::StartElement == m_pStreamReader->tokenType()) && (m_pStreamReader->name() == "id"))
+		{
+			QString instanceId= getContent(m_pStreamReader, "id");
+			instanceId= instanceId.right(instanceId.length() - 1 - instanceId.indexOf('#'));
+			path.append(instanceId.toUInt());
+		}
+		readNext();
+	}
+
+	// Check if an error Occur
+	if (m_pStreamReader->hasError() || path.contains(0))
+	{
+		QString message(QString("GLC_3dxmlToWorld::loadOccurencePath An error occur in ") + m_FileName);
+		GLC_FileFormatException fileFormatException(message, m_FileName, GLC_FileFormatException::WrongFileFormat);
+		clear();
+		throw(fileFormatException);
+	}
+
+	return path;
+}
+
+void GLC_3dxmlToWorld::loadGraphicProperties(V4OccurenceAttrib* pAttrib)
+{
+	while(endElementNotReached(m_pStreamReader, "GraphicProperties"))
+	{
+		if ((QXmlStreamReader::StartElement == m_pStreamReader->tokenType()) && (m_pStreamReader->name() == "GeneralAttributes"))
+		{
+			QString visibleString= readAttribute("visible", true);
+			if (visibleString != "true")
+			{
+				pAttrib->m_IsVisible= false;
+			}
+		}
+		else if ((QXmlStreamReader::StartElement == m_pStreamReader->tokenType()) && (m_pStreamReader->name() == "SurfaceAttributes"))
+		{
+			goToElement(m_pStreamReader, "Color");
+			const double red= readAttribute("red", true).toDouble();
+			const double green= readAttribute("green", true).toDouble();
+			const double blue= readAttribute("blue", true).toDouble();
+			double alpha= 1.0;
+			QString alphaString= readAttribute("alpha", false);
+			if (!alphaString.isEmpty()) alpha= alphaString.toDouble();
+
+			GLC_RenderProperties* pRenderProperties= new GLC_RenderProperties();
+			if (red != -1.0f)
+			{
+				QColor diffuseColor;
+				diffuseColor.setRgbF(red, green, blue, alpha);
+				GLC_Material* pMaterial= new GLC_Material();
+				pMaterial->setDiffuseColor(diffuseColor);
+				pRenderProperties->setOverwriteMaterial(pMaterial);
+				pRenderProperties->setRenderingMode(glc::OverwriteMaterial);
+			}
+			else if (alpha < 1.0f)
+			{
+				pRenderProperties->setOverwriteTransparency(static_cast<float>(alpha));
+				pRenderProperties->setRenderingMode(glc::OverwriteTransparency);
+			}
+
+			pAttrib->m_pRenderProperties= pRenderProperties;
+		}
+
+		readNext();
+	}
+}
+
 // Load the extern representation
 void GLC_3dxmlToWorld::loadExternRepresentations()
 {
@@ -1734,7 +1794,6 @@ void GLC_3dxmlToWorld::loadExternRepresentations()
 				GLC_BSRep binaryRep= cacheManager.binary3DRep(QFileInfo(m_FileName).baseName(), m_CurrentFileName);
 				representation= binaryRep.loadRep();
 				setRepresentationFileName(&representation);
-				factorizeMaterial(&representation);
 			}
 			else
 			{
@@ -1853,110 +1912,8 @@ GLC_3DRep GLC_3dxmlToWorld::loadCurrentExtRep()
 			currentMeshRep.addGeom(pMesh);
 		}
 
-		// Get the master lod accuracy
-		double masteLodAccuracy= readAttribute("accuracy", false).toDouble();
+		loadRep(pMesh);
 
-		loadLOD(pMesh);
-		if (m_pStreamReader->atEnd() || m_pStreamReader->hasError())
-		{
-			QStringList stringList(m_FileName);
-			stringList.append(m_CurrentFileName);
-			stringList.append("Master LOD not found");
-			GLC_ErrorLog::addError(stringList);
-
-			pMesh->finish();
-			currentMeshRep.clean();
-
-			if (GLC_State::cacheIsUsed())
-			{
-				GLC_CacheManager currentManager= GLC_State::currentCacheManager();
-				currentManager.addToCache(QFileInfo(m_FileName).baseName(), currentMeshRep);
-			}
-
-			return currentMeshRep;
-		}
-
-		// Load Faces index data
-		while (endElementNotReached(m_pStreamReader, "Faces"))
-		{
-			readNext();;
-			if ( m_pStreamReader->name() == "Face")
-			{
-				loadFace(pMesh, 0, masteLodAccuracy);
-			}
-		}
-		checkForXmlError("End of Faces not found");
-
-		while (startElementNotReached(m_pStreamReader, "Edges") && startElementNotReached(m_pStreamReader, "VertexBuffer"))
-		{
-			readNext();;
-		}
-
-		checkForXmlError("Element VertexBuffer not found");
-		if (m_pStreamReader->name() == "Edges")
-		{
-			while (endElementNotReached(m_pStreamReader, "Edges"))
-			{
-				readNext();;
-				if ( m_pStreamReader->name() == "Polyline")
-				{
-					loadPolyline(pMesh);
-					readNext();;
-				}
-			}
-		}
-
-		{
-			QString verticePosition= getContent(m_pStreamReader, "Positions").replace(',', ' ');
-			//qDebug() << "Position " << verticePosition;
-			checkForXmlError("Error while retrieving Position ContentVertexBuffer");
-			// Load Vertice position
-			QTextStream verticeStream(&verticePosition);
-			QList<GLfloat> verticeValues;
-			QString buff;
-			while ((!verticeStream.atEnd()))
-			{
-				verticeStream >> buff;
-				verticeValues.append(buff.toFloat());
-			}
-			pMesh->addVertice(verticeValues.toVector());
-
-		}
-
-		{
-			QString normals= getContent(m_pStreamReader, "Normals").replace(',', ' ');
-			//qDebug() << "Normals " << normals;
-			checkForXmlError("Error while retrieving Normals values");
-			// Load Vertice Normals
-			QTextStream normalsStream(&normals);
-			QList<GLfloat> normalValues;
-			QString buff;
-			while ((!normalsStream.atEnd()))
-			{
-				normalsStream >> buff;
-				normalValues.append(buff.toFloat());
-			}
-			pMesh->addNormals(normalValues.toVector());
-		}
-		// Try to find texture coordinate
-		while (endElementNotReached(m_pStreamReader, "VertexBuffer"))
-		{
-			if ((QXmlStreamReader::StartElement == m_pStreamReader->tokenType()) && (m_pStreamReader->name() == "TextureCoordinates"))
-			{
-				QString texels= getContent(m_pStreamReader, "TextureCoordinates").replace(',', ' ');
-				checkForXmlError("Error while retrieving Texture coordinates");
-				QTextStream texelStream(&texels);
-				QList<GLfloat> texelValues;
-				QString buff;
-				while ((!texelStream.atEnd()))
-				{
-					texelStream >> buff;
-					texelValues.append(buff.toFloat());
-				}
-				pMesh->addTexels(texelValues.toVector());
-			}
-			readNext();;
-		}
 		++numberOfMesh;
 	}
 
@@ -2001,7 +1958,7 @@ void GLC_3dxmlToWorld::loadCatMaterialRef()
 					//qDebug() << "Material " << currentMaterial.m_Name << " Added";
 				}
 			}
-			readNext();;
+			readNext();
 		}
 	}
 	// Load material files
@@ -2024,7 +1981,7 @@ void GLC_3dxmlToWorld::loadMaterialDef(const MaterialRef& materialRef)
 	checkForXmlError(QString("Element Osm not found in file : ") + materialRef.m_AssociatedFile);
 	while (endElementNotReached(m_pStreamReader, "Osm"))
 	{
-		readNext();;
+		readNext();
 		if ((QXmlStreamReader::StartElement == m_pStreamReader->tokenType()) && m_pStreamReader->name() == "Attr")
 		{
 			const QString currentName= readAttribute("Name", true);
@@ -2121,7 +2078,7 @@ void GLC_3dxmlToWorld::loadCatRepImage()
 					m_TextureImagesHash.insert(id,associatedFile);
 				}
 			}
-			readNext();;
+			readNext();
 		}
 		//qDebug() << "CATRepImage.3dxml Load";
 	}
@@ -2187,7 +2144,7 @@ GLC_Texture* GLC_3dxmlToWorld::loadTexture(QString fileName)
 	GLC_Texture* pTexture= NULL;
 	if (!resultImage.isNull())
 	{
-		pTexture= new GLC_Texture(m_pQGLContext, resultImage, resultImageFileName);
+		pTexture= new GLC_Texture(resultImage, resultImageFileName);
 	}
 	else
 	{
@@ -2197,47 +2154,6 @@ GLC_Texture* GLC_3dxmlToWorld::loadTexture(QString fileName)
 	}
 
 	return pTexture;
-}
-
-// Factorize material use
-void GLC_3dxmlToWorld::factorizeMaterial(GLC_3DRep* pRep)
-{
-	//qDebug() << "GLC_3dxmlToWorld::factorizeMaterial";
-	// Get the Set of materials of the rep
-	QSet<GLC_Material*> repMaterialSet= pRep->materialSet();
-	//! The hash table of rep material
-	QHash<GLC_uint, GLC_Material*> repMaterialHash;
-	// Construct the map of material String Hash and Id
-	QHash<QString, GLC_uint> materialMap;
-
-	{ // Fill the map of material
-		QSet<GLC_Material*>::const_iterator iMat= repMaterialSet.constBegin();
-		while(repMaterialSet.constEnd() != iMat)
-		{
-			GLC_Material* pCurrentMat= *iMat;
-			materialMap.insert(QString::number(pCurrentMat->hashCode()), pCurrentMat->id());
-			repMaterialHash.insert(pCurrentMat->id(), pCurrentMat);
-			++iMat;
-		}
-	}
-
-	// Make the factorization
-	QHash<QString, GLC_uint>::iterator iMat= materialMap.begin();
-	while (materialMap.constEnd() != iMat)
-	{
-		if (m_MaterialHash.contains(iMat.key()))
-		{
-			//qDebug() << "Replace Mat :" << iMat.key() << " " << iMat.value();
-			pRep->replaceMaterial(iMat.value(), m_MaterialHash.value(iMat.key()));
-		}
-		else
-		{
-			//qDebug() << "Indert mat " << iMat.key() << " " << iMat.value();
-			m_MaterialHash.insert(iMat.key(), repMaterialHash.value(iMat.value()));
-		}
-		++iMat;
-	}
-
 }
 
 void GLC_3dxmlToWorld::setRepresentationFileName(GLC_3DRep* pRep)
@@ -2266,4 +2182,236 @@ void GLC_3dxmlToWorld::checkFileValidity(QIODevice* pIODevice)
 	{
 		pIODevice->seek(0);
 	}
+}
+
+void GLC_3dxmlToWorld::applyV4Attribute(GLC_StructOccurence* pOccurence, V4OccurenceAttrib* pV4OccurenceAttrib, QHash<GLC_StructInstance*, unsigned int>& instanceToIdHash)
+{
+	Q_ASSERT(pOccurence->hasChild() && !pV4OccurenceAttrib->m_Path.isEmpty());
+	unsigned int id= pV4OccurenceAttrib->m_Path.takeFirst();
+
+	const int childCount= pOccurence->childCount();
+	bool occurenceFound= false;
+	int i= 0;
+	while (!occurenceFound && (i < childCount))
+	{
+		GLC_StructOccurence* pChildOccurence= pOccurence->child(i);
+		if (instanceToIdHash.contains(pChildOccurence->structInstance()) && (instanceToIdHash.value(pChildOccurence->structInstance()) == id))
+		{
+			Q_ASSERT(id == instanceToIdHash.value(pChildOccurence->structInstance()));
+			occurenceFound= true;
+
+			if (pV4OccurenceAttrib->m_Path.isEmpty())
+			{
+				pChildOccurence->setVisibility(pV4OccurenceAttrib->m_IsVisible);
+				if (NULL != pV4OccurenceAttrib->m_pRenderProperties)
+				{
+					pChildOccurence->setRenderProperties(*(pV4OccurenceAttrib->m_pRenderProperties));
+				}
+				if (pV4OccurenceAttrib->m_pMatrix != NULL)
+				{
+					pChildOccurence->makeFlexible(*(pV4OccurenceAttrib->m_pMatrix));
+				}
+			}
+			else
+			{
+				applyV4Attribute(pChildOccurence, pV4OccurenceAttrib, instanceToIdHash);
+			}
+		}
+		else
+		{
+			++i;
+		}
+	}
+	if (!occurenceFound)
+	{
+		qDebug() << "GLC_3dxmlToWorld::applyV4Attribute Occurrence not found" << id;
+	}
+
+}
+
+void GLC_3dxmlToWorld::loadRep(GLC_Mesh* pMesh)
+{
+	double masteLodAccuracy= readAttribute("accuracy", false).toDouble();
+	int lodIndex= 1;
+
+	bool masterLodFound= false;
+	bool vertexBufferFound= false;
+
+	while (endElementNotReached(m_pStreamReader, "Rep") && endElementNotReached(m_pStreamReader, "Root"))
+	{
+		if ((QXmlStreamReader::StartElement == m_pStreamReader->tokenType()))
+		{
+			if (m_pStreamReader->name() == "SurfaceAttributes")
+			{
+				m_pCurrentMaterial= loadSurfaceAttributes();
+			}
+			else if (m_pStreamReader->name() == "PolygonalLOD")
+			{
+				double accuracy= readAttribute("accuracy", true).toDouble();
+				while (endElementNotReached(m_pStreamReader, "Faces"))
+				{
+					readNext();
+					if ( m_pStreamReader->name() == "Face")
+					{
+						loadFace(pMesh, lodIndex, accuracy);
+					}
+				}
+				checkForXmlError("End of Faces not found");
+				++lodIndex;
+			}
+			else if (m_pStreamReader->name() == "Faces")
+			{
+				masterLodFound= true;
+				while (endElementNotReached(m_pStreamReader, "Faces"))
+				{
+					readNext();
+					if ( m_pStreamReader->name() == "Face")
+					{
+						loadFace(pMesh, 0, masteLodAccuracy);
+					}
+				}
+				checkForXmlError("End of Faces not found");
+			}
+			else if (m_pStreamReader->name() == "Edges")
+			{
+				while (endElementNotReached(m_pStreamReader, "Edges"))
+				{
+					readNext();
+					if ( m_pStreamReader->name() == "Polyline")
+					{
+						loadPolyline(pMesh);
+						readNext();
+					}
+				}
+			}
+			else if (m_pStreamReader->name() == "VertexBuffer")
+			{
+				vertexBufferFound= true;
+				loadVertexBuffer(pMesh);
+			}
+			else readNext();
+		}
+		else
+		{
+			readNext();
+		}
+	}
+	checkForXmlError("End of Rep or Root not found");
+
+	if (!masterLodFound || !vertexBufferFound)
+	{
+		QString message;
+		if (!masterLodFound)
+		{
+			message= QString("Master LOD not found in file ") + m_FileName;
+		}
+		else
+		{
+			message= QString("Vertex Buffer not found in file ") + m_FileName;
+		}
+		GLC_FileFormatException fileFormatException(message, m_FileName, GLC_FileFormatException::WrongFileFormat);
+		clear();
+		throw(fileFormatException);
+	}
+
+
+}
+
+void GLC_3dxmlToWorld::loadVertexBuffer(GLC_Mesh* pMesh)
+{
+	{
+		QString verticePosition= getContent(m_pStreamReader, "Positions").replace(',', ' ');
+		//qDebug() << "Position " << verticePosition;
+		checkForXmlError("Error while retrieving Position ContentVertexBuffer");
+		// Load Vertice position
+		QTextStream verticeStream(&verticePosition);
+		QList<GLfloat> verticeValues;
+		QString buff;
+		while ((!verticeStream.atEnd()))
+		{
+			verticeStream >> buff;
+			verticeValues.append(buff.toFloat());
+		}
+		if ((verticeValues.size() % 3) == 0)
+		{
+			pMesh->addVertice(verticeValues.toVector());
+		}
+		else
+		{
+			QString message(QString("Vertice buffer is not a multiple of 3 ") + m_CurrentFileName);
+
+			QStringList stringList(message);
+			GLC_ErrorLog::addError(stringList);
+
+			GLC_FileFormatException fileFormatException(message, m_FileName, GLC_FileFormatException::WrongFileFormat);
+			clear();
+			throw(fileFormatException);
+		}
+	}
+
+	{
+		QString normals= getContent(m_pStreamReader, "Normals").replace(',', ' ');
+		//qDebug() << "Normals " << normals;
+		checkForXmlError("Error while retrieving Normals values");
+		// Load Vertice Normals
+		QTextStream normalsStream(&normals);
+		QList<GLfloat> normalValues;
+		QString buff;
+		while ((!normalsStream.atEnd()))
+		{
+			normalsStream >> buff;
+			normalValues.append(buff.toFloat());
+		}
+		if ((normalValues.size() % 3) == 0)
+		{
+			pMesh->addNormals(normalValues.toVector());
+		}
+		else
+		{
+			QString message(QString("Normal buffer is not a multiple of 3 ") + m_CurrentFileName);
+
+			QStringList stringList(message);
+			GLC_ErrorLog::addError(stringList);
+
+			GLC_FileFormatException fileFormatException(message, m_FileName, GLC_FileFormatException::WrongFileFormat);
+			clear();
+			throw(fileFormatException);
+		}
+
+	}
+	// Try to find texture coordinate
+	while (endElementNotReached(m_pStreamReader, "VertexBuffer"))
+	{
+		if ((QXmlStreamReader::StartElement == m_pStreamReader->tokenType()) && (m_pStreamReader->name() == "TextureCoordinates"))
+		{
+			QString texels= getContent(m_pStreamReader, "TextureCoordinates").replace(',', ' ');
+			checkForXmlError("Error while retrieving Texture coordinates");
+			QTextStream texelStream(&texels);
+			QList<GLfloat> texelValues;
+			QString buff;
+			while ((!texelStream.atEnd()))
+			{
+				texelStream >> buff;
+				texelValues.append(buff.toFloat());
+			}
+
+			if ((texelValues.size() % 2) == 0)
+			{
+				pMesh->addTexels(texelValues.toVector());
+			}
+			else
+			{
+				QString message(QString("Texel buffer is not a multiple of 2 ") + m_CurrentFileName);
+
+				QStringList stringList(message);
+				GLC_ErrorLog::addError(stringList);
+
+				GLC_FileFormatException fileFormatException(message, m_FileName, GLC_FileFormatException::WrongFileFormat);
+				clear();
+				throw(fileFormatException);
+			}
+		}
+		readNext();
+	}
+	checkForXmlError("VertexBuffer not found");
 }

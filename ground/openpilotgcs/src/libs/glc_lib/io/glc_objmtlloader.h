@@ -50,7 +50,7 @@ class GLC_LIB_EXPORT GLC_ObjMtlLoader
 //@{
 //////////////////////////////////////////////////////////////////////
 public:
-	GLC_ObjMtlLoader(const QGLContext*, const QString&);
+	GLC_ObjMtlLoader(const QString&);
 
 	virtual ~GLC_ObjMtlLoader();
 //@}
@@ -122,9 +122,6 @@ private:
 
 	//! the Load status
 	QString m_LoadStatus;
-
-	//! OpenGL Context
-	const QGLContext *m_pQGLContext;
 
 	//! The list of attached file name
 	QSet<QString> m_ListOfAttachedFileName;

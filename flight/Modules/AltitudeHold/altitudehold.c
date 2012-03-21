@@ -97,12 +97,6 @@ int32_t AltitudeHoldInitialize()
 	// Create object queue
 	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
 
-	// Listen for updates.
-	AltitudeHoldDesiredConnectQueue(queue);
-	BaroAltitudeConnectQueue(queue);
-	FlightStatusConnectQueue(queue);
-	AccelsConnectQueue(queue);
-
 	AltitudeHoldSettingsConnectCallback(&SettingsUpdatedCb);
 
 	return 0;
@@ -130,10 +124,16 @@ static void altitudeHoldTask(void *parameters)
 
 	portTickType thisTime, lastUpdateTime;
 	UAVObjEvent ev;
-
+	
 	// Force update of the settings
 	SettingsUpdatedCb(&ev);
 
+	// Listen for updates.
+	AltitudeHoldDesiredConnectQueue(queue);
+	BaroAltitudeConnectQueue(queue);
+	FlightStatusConnectQueue(queue);
+	AccelsConnectQueue(queue);
+	
 	BaroAltitudeAltitudeGet(&smoothed_altitude);
 	running = false;
 	enum init_state {WAITING_BARO, WAITIING_INIT, INITED} init = WAITING_BARO;

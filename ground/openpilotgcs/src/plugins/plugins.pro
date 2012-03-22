@@ -69,15 +69,13 @@ plugin_uavobjectbrowser.depends = plugin_coreplugin
 plugin_uavobjectbrowser.depends += plugin_uavobjects
 SUBDIRS += plugin_uavobjectbrowser
 
-!contains(QT_VERSION, ^4\\.8\\..*) {
-# Disable ModelView on 64-bit linux too
-!linux-g++-64 {
 # ModelView UAVGadget
 plugin_modelview.subdir = modelview
 plugin_modelview.depends = plugin_coreplugin
 plugin_modelview.depends += plugin_uavobjects
 SUBDIRS += plugin_modelview
-}
+
+!contains(QT_VERSION, ^4\\.8\\..*) {
 #Notify gadget
 plugin_notify.subdir = notify
 plugin_notify.depends = plugin_coreplugin

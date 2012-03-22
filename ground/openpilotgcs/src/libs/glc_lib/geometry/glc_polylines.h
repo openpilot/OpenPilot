@@ -74,9 +74,15 @@ public:
 //@{
 //////////////////////////////////////////////////////////////////////
 public:
-	//! Add a Polyline to this wire and returns its id if id are managed
+	//! Add a Polyline to this polylines and returns its id if id are managed
 	inline GLC_uint addPolyline(const GLfloatVector& data)
 	{return GLC_Geometry::m_WireData.addVerticeGroup(data);}
+
+	//! Add polyline with the given list of points to this polylines and returns its id if id are managed
+	GLC_uint addPolyline(const QList<GLC_Point3d>& pointsList);
+
+	//! Add polyline with the given list of points to this polylines and returns its id if id are managed
+	GLC_uint addPolyline(const QList<GLC_Point3df>& pointsList);
 
 	//! Set this polylines from the given polylines and return a reference of this polylines
 	GLC_Polylines& operator=(const GLC_Polylines& polyline);
@@ -91,7 +97,7 @@ public:
 /*! \name OpenGL Functions*/
 //@{
 //////////////////////////////////////////////////////////////////////
-private:
+protected:
 
 	//! Virtual interface for OpenGL Geometry set up.
 	/*! This Virtual function is implemented here.\n

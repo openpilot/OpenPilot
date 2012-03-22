@@ -189,13 +189,12 @@ void GLC_PrimitiveGroup::addTrianglesStrip(const IndexList& input, GLC_uint id)
 // Set the triangle index offset
 void GLC_PrimitiveGroup::setTrianglesOffset(GLvoid* pOffset)
 {
-	m_TrianglesGroupOffseti.pop_back();
+	//m_TrianglesGroupOffseti.pop_back();
 	const int size= m_TrianglesGroupOffseti.size();
 	for (int i= 0; i < size; ++i)
 	{
 		m_TrianglesGroupOffset.append(BUFFER_OFFSET(static_cast<GLsizei>(m_TrianglesGroupOffseti[i]) * sizeof(GLuint) + reinterpret_cast<GLsizeiptr>(pOffset)));
 	}
-	m_TrianglesGroupOffseti.clear();
 }
 
 // Set the triangle index offset
@@ -212,13 +211,12 @@ void GLC_PrimitiveGroup::setTrianglesOffseti(int offset)
 // Set base triangle strip offset
 void GLC_PrimitiveGroup::setBaseTrianglesStripOffset(GLvoid* pOffset)
 {
-	m_StripIndexOffseti.pop_back();
+	//m_StripIndexOffseti.pop_back();
 	const int size= m_StripIndexOffseti.size();
 	for (int i= 0; i < size; ++i)
 	{
 		m_StripIndexOffset.append(BUFFER_OFFSET(static_cast<GLsizei>(m_StripIndexOffseti[i]) * sizeof(GLuint) + reinterpret_cast<GLsizeiptr>(pOffset)));
 	}
-	m_StripIndexOffseti.clear();
 }
 
 // Set base triangle strip offset
@@ -257,13 +255,12 @@ void GLC_PrimitiveGroup::addTrianglesFan(const IndexList& input, GLC_uint id)
 // Set base triangle fan offset
 void GLC_PrimitiveGroup::setBaseTrianglesFanOffset(GLvoid* pOffset)
 {
-	m_FanIndexOffseti.pop_back();
+	//m_FanIndexOffseti.pop_back();
 	const int size= m_FanIndexOffseti.size();
 	for (int i= 0; i < size; ++i)
 	{
 		m_FanIndexOffset.append(BUFFER_OFFSET(static_cast<GLsizei>(m_FanIndexOffseti[i]) * sizeof(GLuint) + reinterpret_cast<GLsizeiptr>(pOffset)));
 	}
-	m_FanIndexOffseti.clear();
 }
 
 // Set base triangle fan offset
@@ -278,16 +275,14 @@ void GLC_PrimitiveGroup::setBaseTrianglesFanOffseti(int offset)
 }
 
 // Change index to VBO mode
-void GLC_PrimitiveGroup::changeToVboMode()
+void GLC_PrimitiveGroup::computeVboOffset()
 {
-
 	m_TrianglesGroupOffset.clear();
 	const int triangleOffsetSize= m_TrianglesGroupOffseti.size();
 	for (int i= 0; i < triangleOffsetSize; ++i)
 	{
 		m_TrianglesGroupOffset.append(BUFFER_OFFSET(static_cast<GLsizei>(m_TrianglesGroupOffseti.at(i)) * sizeof(GLuint)));
 	}
-	m_TrianglesGroupOffseti.clear();
 
 	m_StripIndexOffset.clear();
 	const int stripOffsetSize= m_StripIndexOffseti.size();
@@ -295,7 +290,6 @@ void GLC_PrimitiveGroup::changeToVboMode()
 	{
 		m_StripIndexOffset.append(BUFFER_OFFSET(static_cast<GLsizei>(m_StripIndexOffseti.at(i)) * sizeof(GLuint)));
 	}
-	m_StripIndexOffseti.clear();
 
 	m_FanIndexOffset.clear();
 	const int fanOffsetSize= m_FanIndexOffseti.size();
@@ -303,7 +297,6 @@ void GLC_PrimitiveGroup::changeToVboMode()
 	{
 		m_FanIndexOffset.append(BUFFER_OFFSET(static_cast<GLsizei>(m_FanIndexOffseti.at(i)) * sizeof(GLuint)));
 	}
-	m_FanIndexOffseti.clear();
 }
 
 // Clear the group
@@ -345,35 +338,10 @@ QDataStream &operator<<(QDataStream &stream, const GLC_PrimitiveGroup &primitive
 	OffsetVectori fanIndexOffseti;
 
 	// Get triangles, strips and fans offset
-	if (GLC_State::vboUsed())
-	{
-		// Convert offset to index
-		// Triangles offset
-		const int triangleIndexOffsetSize= primitiveGroup.m_TrianglesGroupOffset.size();
-		for (int i= 0; i < triangleIndexOffsetSize; ++i)
-		{
-			trianglesGroupOffseti.append(static_cast<GLuint>(reinterpret_cast<GLsizeiptr>(primitiveGroup.m_TrianglesGroupOffset.at(i)) / sizeof(GLuint)));
-		}
+	trianglesGroupOffseti= primitiveGroup.m_TrianglesGroupOffseti;
+	stripIndexOffseti= primitiveGroup.m_StripIndexOffseti;
+	fanIndexOffseti= primitiveGroup.m_FanIndexOffseti;
 
-		// Trips offsets
-		const int stripIndexOffsetSize= primitiveGroup.m_StripIndexOffset.size();
-		for (int i= 0; i < stripIndexOffsetSize; ++i)
-		{
-			stripIndexOffseti.append(static_cast<GLuint>(reinterpret_cast<GLsizeiptr>(primitiveGroup.m_StripIndexOffset.at(i)) / sizeof(GLuint)));
-		}
-		// Fans offsets
-		const int fanIndexOffsetSize= primitiveGroup.m_FanIndexOffset.size();
-		for (int i= 0; i < fanIndexOffsetSize; ++i)
-		{
-			fanIndexOffseti.append(static_cast<GLuint>(reinterpret_cast<GLsizeiptr>(primitiveGroup.m_FanIndexOffset.at(i)) / sizeof(GLuint)));
-		}
-	}
-	else
-	{
-		trianglesGroupOffseti= primitiveGroup.m_TrianglesGroupOffseti;
-		stripIndexOffseti= primitiveGroup.m_StripIndexOffseti;
-		fanIndexOffseti= primitiveGroup.m_FanIndexOffseti;
-	}
 	// Triangles index
 	stream << primitiveGroup.m_TrianglesIndexSize;
 	stream << trianglesGroupOffseti;

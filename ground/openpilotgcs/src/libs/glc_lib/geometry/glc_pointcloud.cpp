@@ -96,6 +96,23 @@ GLC_uint GLC_PointCloud::addPoint(const QList<GLC_Point3df>& pointsList)
 	return GLC_Geometry::m_WireData.addVerticeGroup(data);
 }
 
+void GLC_PointCloud::addColors(const QList<QColor>& colors)
+{
+	const int colorCount= colors.count();
+	const int size= colorCount * 4;
+	GLfloatVector data(size);
+	for (int i= 0; i < colorCount; ++i)
+	{
+		QColor color= colors.at(i);
+		data[i * 4]= static_cast<GLfloat>(color.redF());
+		data[i * 4 + 1]= static_cast<GLfloat>(color.greenF());
+		data[i * 4 + 2]= static_cast<GLfloat>(color.blueF());
+		data[i * 4 + 3]= static_cast<GLfloat>(color.alphaF());
+	}
+
+	GLC_Geometry::m_WireData.addColors(data);
+}
+
 GLC_PointCloud& GLC_PointCloud::operator=(const GLC_PointCloud& pointCloud)
 {
 	if (this != &pointCloud)

@@ -23,7 +23,7 @@
 #ifndef GLC_LINE_H_
 #define GLC_LINE_H_
 
-#include "glc_geometry.h"
+#include "glc_polylines.h"
 
 #include "../glc_config.h"
 
@@ -34,7 +34,7 @@
 /*! An GLC_Line is just a simple renderable 3D Line*/
 //////////////////////////////////////////////////////////////////////
 
-class GLC_LIB_EXPORT GLC_Line : public GLC_Geometry
+class GLC_LIB_EXPORT GLC_Line : public GLC_Polylines
 {
 //////////////////////////////////////////////////////////////////////
 /*! @name Constructor / Destructor */
@@ -79,12 +79,15 @@ public:
 //@{
 //////////////////////////////////////////////////////////////////////
 public:
-	//! Set Line coordinate by 4D point
-	void setCoordinate(const GLC_Point3d &, const GLC_Point3d &);
+	//! Set Line coordinate by 3D point
+	void setCoordinate(const GLC_Point3d &point1, const GLC_Point3d &point2);
 
-	//! Set this line color
-	inline void setColor(const QColor& color);
+	//! Clear the content of this line Data and makes it empty
+	inline void clear()
+	{GLC_Polylines::clear();}
 
+	//! Set this line from the given line and return a reference of this line
+	GLC_Line& operator=(const GLC_Line& line);
 
 //@}
 
@@ -97,6 +100,16 @@ private:
 	//! Virtual interface for OpenGL Geometry set up.
 	/*! This Virtual function is implemented here.\n*/
 	virtual void glDraw(const GLC_RenderProperties&);
+
+//@}
+
+//////////////////////////////////////////////////////////////////////
+/*! \name Private services Functions*/
+//@{
+//////////////////////////////////////////////////////////////////////
+private:
+	//! Create the wire
+	void createWire();
 
 //@}
 

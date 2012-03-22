@@ -143,7 +143,7 @@ public:
 
 	//! Select the given occurence id
 	/*! The given occurence id must belong to this worldhandle*/
-	void select(GLC_uint occurenceId, bool propagate= true);
+	void select(GLC_uint occurenceId);
 
 	//! Unselect the given occurence id
 	/*! The given occurence id must belong to this worldhandle*/

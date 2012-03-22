@@ -92,6 +92,8 @@ private:
     Q_SLOT void actionTriggered(bool);
     Q_SLOT void spinBoxValueChanged(int);
     Q_SLOT void spinBoxValueChanged(QString);
+    Q_SLOT void doubleSpinBoxValueChanged(double);
+    Q_SLOT void doubleSpinBoxValueChanged(QString);
 
     QVariant m_value;
     QVariant m_defaultValue;

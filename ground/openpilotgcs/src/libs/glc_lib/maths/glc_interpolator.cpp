@@ -25,121 +25,99 @@
 #include "glc_interpolator.h"
 
 using namespace glc;
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
-// Contructeur par défaut Interpolation Linéaire
 GLC_Interpolator::GLC_Interpolator()
 : m_InterpolType(INTERPOL_LINEAIRE)
-, m_nNbrPas(1)
+, m_StepCount(1)
 {
 
 }
 
 //////////////////////////////////////////////////////////////////////
-// Fonction Set
+// Set Function
 //////////////////////////////////////////////////////////////////////
-// Défini la matrice d'interpolation
 void GLC_Interpolator::SetInterpolMat(int NbrPas, const GLC_Vector3d &VectDepart, const GLC_Vector3d &VectArrive
 								   , INTERPOL_TYPE Interpolation)
 {
-	// Mise à jour des données membre
 	m_InterpolType= Interpolation;
-	if (!NbrPas)
-	{
-		//TRACE("GLC_Interpolator::SetInterpolMat -> NbrPas == 0 \n");
-	}
-	else m_nNbrPas= NbrPas;
+	if (NbrPas != 0)
+	m_StepCount= NbrPas;
 
-	m_VectDepart= VectDepart;
-	m_VectArrive= VectArrive;
-	// Calcul de la matrice d'interpolation
+	m_StartPoint= VectDepart;
+	m_EndPoint= VectArrive;
+
 	CalcInterpolMat();
 }
-// Type d'interpolation
+
 void GLC_Interpolator::SetType(INTERPOL_TYPE Interpolation)
 {
 	if (m_InterpolType != Interpolation)
 	{
 		m_InterpolType= Interpolation;
-		// Calcul de la matrice d'interpolation
+
 		CalcInterpolMat();
 	}
 }
-// Nombre de pas
+
 void GLC_Interpolator::SetNbrPas(int NbrPas)
 {
-	if (!NbrPas)
-	{
-		//TRACE("GLC_Interpolator::SetNbrPas -> NbrPas == 0 \n");
-		return;
-	}
 
-	if (m_nNbrPas != NbrPas)
+	if ((NbrPas != 0) && (m_StepCount != NbrPas))
 	{
-		m_nNbrPas= NbrPas;
-		// Calcul de la matrice d'interpolation
+		m_StepCount= NbrPas;
+
 		CalcInterpolMat();
 	}
 }
-// Vecteur d'arrivée et de depart
+
 void GLC_Interpolator::SetVecteurs(const GLC_Vector3d &VectDepart, const GLC_Vector3d &VectArrive)
 {
-	m_VectDepart= VectDepart;
-	m_VectArrive= VectArrive;
+	m_StartPoint= VectDepart;
+	m_EndPoint= VectArrive;
 
-	// Calcul de la matrice d'interpolation
+
 	CalcInterpolMat();
 
 }
 
 //////////////////////////////////////////////////////////////////////
-// Fonction Get
+// Private sevices functions
 //////////////////////////////////////////////////////////////////////
 
-//////////////////////////////////////////////////////////////////////
-// Fonctions de Service privée
-//////////////////////////////////////////////////////////////////////
-// Calcul La matrice d'interpolation
 bool GLC_Interpolator::CalcInterpolMat(void)
 {
-	// Verifie que les vecteur d'arrivé et de départ sont différent
-	if (m_VectDepart == m_VectArrive)
+
+	if (m_StartPoint != m_EndPoint)
 	{
-		//TRACE("GLC_Interpolator::CalcInterpolMat : Depart == Arrive\n");
-		return false;
+		switch (m_InterpolType)
+		{
+		case INTERPOL_LINEAIRE:
+			return CalcInterpolLineaireMat();
+			break;
+
+		case INTERPOL_ANGULAIRE:
+			return CalcInterpolAngulaireMat();
+			break;
+
+		case INTERPOL_HOMOTETIE:
+			return false;
+			break;
+
+		default:
+			return false;
+		}
 	}
+	else return false;
 
-	switch (m_InterpolType)
-	{
-	case INTERPOL_LINEAIRE:
-		return CalcInterpolLineaireMat();
-		break;
-
-	case INTERPOL_ANGULAIRE:
-		return CalcInterpolAngulaireMat();
-		break;
-
-	case INTERPOL_HOMOTETIE:
-		return false;
-		break;
-
-	default:
-		//TRACE("GLC_Interpolator::CalcInterpolMat : Type d'interpolation non valide\n");
-		return false;
-	}
 }
 
-// Calcul la matrice d'interpolation linéaire
+
 bool GLC_Interpolator::CalcInterpolLineaireMat(void)
 {
 
-	// Calcul la matrice de translation
-	const GLC_Vector3d VectTrans= (m_VectArrive - m_VectDepart) * (1.0 / m_nNbrPas);
+	const GLC_Vector3d VectTrans= (m_EndPoint - m_StartPoint) * (1.0 / m_StepCount);
 	if(VectTrans.isNull())
 	{
-		//TRACE("GLC_Interpolator::CalcInterpolLineaireMat -> Translation NULL\n");
 		m_InterpolMat.setToIdentity();
 		return false;
 	}
@@ -150,17 +128,15 @@ bool GLC_Interpolator::CalcInterpolLineaireMat(void)
 	}
 }
 
-// Calcul la matrice d'interpolation angulaire
 bool GLC_Interpolator::CalcInterpolAngulaireMat(void)
 {
-	// Calcul de l'axe de rotation
-	const GLC_Vector3d AxeRot(m_VectDepart ^ m_VectArrive);
-	// Calcul de l'angle entre les vecteurs
-	const double Angle= m_VectArrive.angleWithVect(m_VectDepart) / m_nNbrPas;
-	// Calcul de la matrice de rotation
+
+	const GLC_Vector3d AxeRot(m_StartPoint ^ m_EndPoint);
+
+	const double Angle= m_EndPoint.angleWithVect(m_StartPoint) / m_StepCount;
+
 	if (qFuzzyCompare(Angle, 0.0))
 	{
-		//TRACE("GLC_Interpolator::CalcInterpolAngulaireMat -> Rotation NULL\n");
 		m_InterpolMat.setToIdentity();
 		return false;
 	}

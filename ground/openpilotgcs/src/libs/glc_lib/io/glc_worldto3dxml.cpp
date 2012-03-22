@@ -23,8 +23,8 @@
 
 #include "glc_worldto3dxml.h"
 // Quazip library
-#include "../quazip/quazip.h"
-#include "../quazip/quazipfile.h"
+#include "../3rdparty/quazip/quazip.h"
+#include "../3rdparty/quazip/quazipfile.h"
 #include "../glc_exception.h"
 #include "../geometry/glc_mesh.h"
 
@@ -405,7 +405,7 @@ void GLC_WorldTo3dxml::exportAssemblyFromOccurence(const GLC_StructOccurence* pO
 		GLC_3DViewInstance* pInstance= m_World.collection()->instanceHandle(pOccurence->id());
 		Q_ASSERT(NULL != pInstance);
 		const bool isVisible= pInstance->isVisible();
-		const bool isOverload= !isVisible || !pInstance->renderPropertiesHandle()->isDefault();
+		const bool isOverload= !isVisible || !pInstance->renderPropertiesHandle()->isDefault() || pOccurence->isFlexible();
 		if (isOverload)
 		{
 			m_ListOfOverLoadedOccurence.append(pOccurence);
@@ -419,22 +419,22 @@ QString GLC_WorldTo3dxml::matrixString(const GLC_Matrix4x4& matrix)
 	QString resultMatrix;
 	const QChar spaceChar(' ');
 	// Rotation
-	resultMatrix+= QString::number(matrix.getData()[0]) + spaceChar;
-	resultMatrix+= QString::number(matrix.getData()[1]) + spaceChar;
-	resultMatrix+= QString::number(matrix.getData()[2]) + spaceChar;
+	resultMatrix+= QString::number(matrix.getData()[0], 'g', 16) + spaceChar;
+	resultMatrix+= QString::number(matrix.getData()[1], 'g', 16) + spaceChar;
+	resultMatrix+= QString::number(matrix.getData()[2], 'g', 16) + spaceChar;
 
-	resultMatrix+= QString::number(matrix.getData()[4]) + spaceChar;
-	resultMatrix+= QString::number(matrix.getData()[5]) + spaceChar;
-	resultMatrix+= QString::number(matrix.getData()[6]) + spaceChar;
+	resultMatrix+= QString::number(matrix.getData()[4], 'g', 16) + spaceChar;
+	resultMatrix+= QString::number(matrix.getData()[5], 'g', 16) + spaceChar;
+	resultMatrix+= QString::number(matrix.getData()[6], 'g', 16) + spaceChar;
 
-	resultMatrix+= QString::number(matrix.getData()[8]) + spaceChar;
-	resultMatrix+= QString::number(matrix.getData()[9]) + spaceChar;
-	resultMatrix+= QString::number(matrix.getData()[10]) + spaceChar;
+	resultMatrix+= QString::number(matrix.getData()[8], 'g', 16) + spaceChar;
+	resultMatrix+= QString::number(matrix.getData()[9], 'g', 16) + spaceChar;
+	resultMatrix+= QString::number(matrix.getData()[10], 'g', 16) + spaceChar;
 
 	// Translation
-	resultMatrix+= QString::number(matrix.getData()[12]) + spaceChar;
-	resultMatrix+= QString::number(matrix.getData()[13]) + spaceChar;
-	resultMatrix+= QString::number(matrix.getData()[14]);
+	resultMatrix+= QString::number(matrix.getData()[12], 'g', 16) + spaceChar;
+	resultMatrix+= QString::number(matrix.getData()[13], 'g', 16) + spaceChar;
+	resultMatrix+= QString::number(matrix.getData()[14], 'g', 16);
 
 	return resultMatrix;
 }
@@ -772,7 +772,7 @@ void GLC_WorldTo3dxml::writeMaterial(const GLC_Material* pMaterial)
 	}
 	else
 	{
-		materialName= pMaterial->name();
+		materialName= symplifyName(pMaterial->name());
 	}
 
 
@@ -1105,17 +1105,30 @@ void GLC_WorldTo3dxml::addImageTextureTo3dxml(const QImage& image, const QString
 	}
 }
 
-QString GLC_WorldTo3dxml::xmlFileName(const QString& fileName)
+QString GLC_WorldTo3dxml::xmlFileName(QString fileName)
 {
-	QString newName;
-	if (!m_3dxmlFileSet.contains(fileName))
+	QString prefix;
+	if (fileName.contains("urn:3DXML:"))
 	{
+		prefix= "urn:3DXML:";
+		fileName.remove(prefix);
+	}
+
+	fileName= symplifyName(fileName);
+
+
+
+	QString newName;
+	if (!m_3dxmlFileSet.contains(prefix + fileName))
+	{
+		fileName.prepend(prefix);
 		m_3dxmlFileSet << fileName;
 		newName= fileName;
 	}
 	else
 	{
 		newName= QFileInfo(fileName).completeBaseName() + QString::number(++m_FileNameIncrement) + '.' + QFileInfo(fileName).suffix();
+		newName.prepend(prefix);
 	}
 	return newName;
 }
@@ -1142,40 +1155,87 @@ void GLC_WorldTo3dxml::writeExtensionAttributes(GLC_Attributes* pAttributes)
 
 void GLC_WorldTo3dxml::writeOccurenceDefaultViewProperty(const GLC_StructOccurence* pOccurence)
 {
+	QList<unsigned int> path= instancePath(pOccurence);
+
 	GLC_3DViewInstance* pInstance= m_World.collection()->instanceHandle(pOccurence->id());
 	Q_ASSERT(NULL != pInstance);
 	const bool isVisible= pOccurence->isVisible();
-	const unsigned int occurrenceId= pOccurence->occurenceNumber();
 	m_pOutStream->writeStartElement("DefaultViewProperty");
-	m_pOutStream->writeTextElement("OccurenceId", QString::number(occurrenceId));
-	m_pOutStream->writeStartElement("GraphicProperties");
-	m_pOutStream->writeAttribute("xsi:type", "GraphicPropertiesType");
-	if (! isVisible)
+	m_pOutStream->writeStartElement("OccurenceId");
+	const QString prefix= "urn:3DXML:" + QFileInfo(m_FileName).fileName() + "#";
+	const int pathSize= path.size();
+	for (int i= 0; i < pathSize; ++i)
 	{
-		m_pOutStream->writeStartElement("GeneralAttributes");
-			m_pOutStream->writeAttribute("xsi:type", "GeneralAttributesType");
-			m_pOutStream->writeAttribute("visible", "false");
-			m_pOutStream->writeAttribute("selectable", "true");
-		m_pOutStream->writeEndElement(); // GeneralAttributes
+		m_pOutStream->writeTextElement("id", prefix + QString::number(path.at(i)));
 	}
-	if (!pInstance->renderPropertiesHandle()->isDefault())
+	m_pOutStream->writeEndElement(); // OccurenceId
+
+	if (pOccurence->isFlexible())
 	{
-		const GLC_RenderProperties* pProperties= pInstance->renderPropertiesHandle();
-		if (pProperties->overwriteTransparency() != -1.0f)
+		m_pOutStream->writeTextElement("RelativePosition", matrixString(pOccurence->occurrenceRelativeMatrix()));
+	}
+
+	if (!isVisible || !pInstance->renderPropertiesHandle()->isDefault())
+	{
+		qDebug() << "(!isVisible || !pInstance->renderPropertiesHandle()->isDefault())";
+		m_pOutStream->writeStartElement("GraphicProperties");
+		m_pOutStream->writeAttribute("xsi:type", "GraphicPropertiesType");
+		if (! isVisible)
 		{
-			m_pOutStream->writeStartElement("SurfaceAttributes");
-			m_pOutStream->writeAttribute("xsi:type", "SurfaceAttributesType");
-				m_pOutStream->writeStartElement("Color");
-					m_pOutStream->writeAttribute("xsi:type", "RGBAColorType");
-					m_pOutStream->writeAttribute("red", "-1");
-					m_pOutStream->writeAttribute("green", "-1");
-					m_pOutStream->writeAttribute("blue", "-1");
-					m_pOutStream->writeAttribute("alpha", QString::number(pProperties->overwriteTransparency()));
-				m_pOutStream->writeEndElement(); // Color
-			m_pOutStream->writeEndElement(); // SurfaceAttributes
+			m_pOutStream->writeStartElement("GeneralAttributes");
+				m_pOutStream->writeAttribute("xsi:type", "GeneralAttributesType");
+				m_pOutStream->writeAttribute("visible", "false");
+				m_pOutStream->writeAttribute("selectable", "true");
+			m_pOutStream->writeEndElement(); // GeneralAttributes
 		}
+		if (!pInstance->renderPropertiesHandle()->isDefault())
+		{
+			const GLC_RenderProperties* pProperties= pInstance->renderPropertiesHandle();
+			if ((pProperties->renderingMode() == glc::OverwriteTransparency))
+			{
+				m_pOutStream->writeStartElement("SurfaceAttributes");
+				m_pOutStream->writeAttribute("xsi:type", "SurfaceAttributesType");
+					m_pOutStream->writeStartElement("Color");
+						m_pOutStream->writeAttribute("xsi:type", "RGBAColorType");
+						m_pOutStream->writeAttribute("red", "-1");
+						m_pOutStream->writeAttribute("green", "-1");
+						m_pOutStream->writeAttribute("blue", "-1");
+						m_pOutStream->writeAttribute("alpha", QString::number(pProperties->overwriteTransparency()));
+					m_pOutStream->writeEndElement(); // Color
+				m_pOutStream->writeEndElement(); // SurfaceAttributes
+			}
+			else if ((pProperties->renderingMode() == glc::OverwriteTransparencyAndMaterial))
+			{
+				GLC_Material* pMaterial= pProperties->overwriteMaterial();
+				m_pOutStream->writeStartElement("SurfaceAttributes");
+				m_pOutStream->writeAttribute("xsi:type", "SurfaceAttributesType");
+					m_pOutStream->writeStartElement("Color");
+						m_pOutStream->writeAttribute("xsi:type", "RGBAColorType");
+						m_pOutStream->writeAttribute("red", QString::number(pMaterial->diffuseColor().redF()));
+						m_pOutStream->writeAttribute("green", QString::number(pMaterial->diffuseColor().greenF()));
+						m_pOutStream->writeAttribute("blue", QString::number(pMaterial->diffuseColor().blueF()));
+						m_pOutStream->writeAttribute("alpha", QString::number(pProperties->overwriteTransparency()));
+					m_pOutStream->writeEndElement(); // Color
+				m_pOutStream->writeEndElement(); // SurfaceAttributes
+			}
+			else if ((pProperties->renderingMode() == glc::OverwriteMaterial))
+			{
+				GLC_Material* pMaterial= pProperties->overwriteMaterial();
+				m_pOutStream->writeStartElement("SurfaceAttributes");
+				m_pOutStream->writeAttribute("xsi:type", "SurfaceAttributesType");
+					m_pOutStream->writeStartElement("Color");
+						m_pOutStream->writeAttribute("xsi:type", "RGBAColorType");
+						m_pOutStream->writeAttribute("red", QString::number(pMaterial->diffuseColor().redF()));
+						m_pOutStream->writeAttribute("green", QString::number(pMaterial->diffuseColor().greenF()));
+						m_pOutStream->writeAttribute("blue", QString::number(pMaterial->diffuseColor().blueF()));
+						m_pOutStream->writeAttribute("alpha", QString::number(pMaterial->opacity()));
+					m_pOutStream->writeEndElement(); // Color
+				m_pOutStream->writeEndElement(); // SurfaceAttributes
+			}
+
+		}
+		m_pOutStream->writeEndElement(); // GraphicProperties
 	}
-	m_pOutStream->writeEndElement(); // GraphicProperties
 	m_pOutStream->writeEndElement(); // DefaultViewProperty
 }
 
@@ -1190,4 +1250,33 @@ bool GLC_WorldTo3dxml::continu()
 		m_pReadWriteLock->unlock();
 	}
 	return continuValue;
+}
+
+QString GLC_WorldTo3dxml::symplifyName(QString name)
+{
+	const int nameSize= name.size();
+	for (int i= 0; i < nameSize; ++i)
+	{
+		if (!name.at(i).isLetterOrNumber() && (name.at(i) != '.'))
+		{
+			name.replace(i, 1, '_');
+		}
+	}
+
+	return name;
+}
+
+QList<unsigned int> GLC_WorldTo3dxml::instancePath(const GLC_StructOccurence* pOccurence)
+{
+	QList<unsigned int> path;
+	if (!pOccurence->isOrphan())
+	{
+		GLC_StructInstance* pInstance= pOccurence->structInstance();
+		Q_ASSERT(m_InstanceToIdHash.contains(pInstance));
+		path.prepend(m_InstanceToIdHash.value(pInstance));
+		QList<unsigned int> subPath(instancePath(pOccurence->parent()));
+		subPath.append(path);
+		path= subPath;
+	}
+	return path;
 }

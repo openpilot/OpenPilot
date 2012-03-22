@@ -41,28 +41,29 @@
 /* Enable/Disable PiOS Modules */
 //#define PIOS_INCLUDE_ADC
 #define PIOS_INCLUDE_DELAY
-#define PIOS_INCLUDE_I2C
+//#define PIOS_INCLUDE_I2C
 #define PIOS_INCLUDE_IRQ
 #define PIOS_INCLUDE_LED
-#define PIOS_INCLUDE_IAP
+//#define PIOS_INCLUDE_IAP
 #define PIOS_INCLUDE_SERVO
 #define PIOS_INCLUDE_SPI
 #define PIOS_INCLUDE_SYS
 #define PIOS_INCLUDE_USART
-#define PIOS_INCLUDE_USB
+//#define PIOS_INCLUDE_USB
 #define PIOS_INCLUDE_USB_HID
 //#define PIOS_INCLUDE_GPIO
 #define PIOS_INCLUDE_EXTI
 #define PIOS_INCLUDE_RTC
 #define PIOS_INCLUDE_WDG
+#define PIOS_INCLUDE_UDP
 
 /* Select the sensors to include */
-#define PIOS_INCLUDE_BMA180
-#define PIOS_INCLUDE_HMC5883
+//#define PIOS_INCLUDE_BMA180
+//#define PIOS_INCLUDE_HMC5883
 //#define PIOS_INCLUDE_MPU6000
 //#define PIOS_MPU6000_ACCEL
-#define PIOS_INCLUDE_L3GD20
-#define PIOS_INCLUDE_MS5611
+//#define PIOS_INCLUDE_L3GD20
+//#define PIOS_INCLUDE_MS5611
 //#define PIOS_INCLUDE_HCSR04
 #define PIOS_FLASH_ON_ACCEL /* true for second revo */
 #define FLASH_FREERTOS
@@ -86,7 +87,7 @@
 #define PIOS_INCLUDE_SETTINGS
 #define PIOS_INCLUDE_FLASH
 /* A really shitty setting saving implementation */
-#define PIOS_INCLUDE_FLASH_SECTOR_SETTINGS
+//#define PIOS_INCLUDE_FLASH_SECTOR_SETTINGS
 
 /* Other Interfaces */
 //#define PIOS_INCLUDE_I2C_ESC
@@ -109,6 +110,7 @@
 #define IDLE_COUNTS_PER_SEC_AT_NO_LOAD (8379692)
 
 #define REVOLUTION
+#define SIMPOSIX
 
 #endif /* PIOS_CONFIG_H */
 /**

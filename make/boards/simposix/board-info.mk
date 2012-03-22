@@ -5,7 +5,7 @@ HW_TYPE             := 0x00
 
 MCU                 :=
 CHIP                := 
-BOARD               := simposix
+BOARD               := SIM_POSIX
 MODEL               := 
 MODEL_SUFFIX        := 
 

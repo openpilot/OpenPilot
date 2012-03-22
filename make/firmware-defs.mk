@@ -137,7 +137,7 @@ endef
 define ASSEMBLE_TEMPLATE
 $(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
 	@echo $(MSG_ASSEMBLING) $$(call toprel, $$<)
-	$(V1) $(CC) -c -mthumb $$(ASFLAGS) $$< -o $$@
+	$(V1) $(CC) -c $(THUMB) $$(ASFLAGS) $$< -o $$@
 endef
 
 # Assemble: create object files from assembler source files. ARM-only
@@ -151,7 +151,7 @@ endef
 define COMPILE_C_TEMPLATE
 $(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
 	@echo $(MSG_COMPILING) $$(call toprel, $$<)
-	$(V1) $(CC) -c -mthumb $$(CFLAGS) $$(CONLYFLAGS) $$< -o $$@
+	$(V1) $(CC) -c $(THUMB) $$(CFLAGS) $$(CONLYFLAGS) $$< -o $$@
 endef
 
 # Compile: create object files from C source files. ARM-only
@@ -165,7 +165,7 @@ endef
 define COMPILE_CPP_TEMPLATE
 $(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
 	@echo $(MSG_COMPILINGCPP) $$(call toprel, $$<)
-	$(V1) $(CC) -c -mthumb $$(CFLAGS) $$(CPPFLAGS) $$< -o $$@
+	$(V1) $(CC) -c $(THUMB) $$(CFLAGS) $$(CPPFLAGS) $$< -o $$@
 endef
 
 # Compile: create object files from C++ source files. ARM-only
@@ -183,14 +183,14 @@ define LINK_TEMPLATE
 .PRECIOUS : $(2)
 $(1):  $(2)
 	@echo $(MSG_LINKING) $$(call toprel, $$@)
-	$(V1) $(CC) -mthumb $$(CFLAGS) $(2) --output $$@ $$(LDFLAGS)
+	$(V1) $(CC) $(THUMB) $$(CFLAGS) $(2) --output $$@ $$(LDFLAGS)
 endef
 
 # Compile: create assembler files from C source files. ARM/Thumb
 define PARTIAL_COMPILE_TEMPLATE
 $($(1):.c=.s) : %.s : %.c
 	@echo $(MSG_ASMFROMC) $$(call toprel, $$<)
-	$(V1) $(CC) -mthumb -S $$(CFLAGS) $$(CONLYFLAGS) $$< -o $$@
+	$(V1) $(CC) $(THUMB) -S $$(CFLAGS) $$(CONLYFLAGS) $$< -o $$@
 endef
 
 # Compile: create assembler files from C source files. ARM only

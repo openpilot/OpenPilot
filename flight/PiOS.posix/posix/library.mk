@@ -22,7 +22,7 @@ PIOS_DEVLIB			:=	$(dir $(lastword $(MAKEFILE_LIST)))
 #CDEFS				+= -DSTM32F4XX
 #CDEFS				+= -DHSE_VALUE=$(OSCILLATOR_FREQ)
 #CDEFS 				+= -DUSE_STDPERIPH_DRIVER
-#ARCHFLAGS			+= -mcpu=cortex-m4 -march=armv7e-m -mfpu=fpv4-sp-d16 -mfloat-abi=hard
+ARCHFLAGS			+= -DARCH_POSIX
 
 #
 # PIOS device library source and includes
@@ -68,7 +68,9 @@ EXTRAINCDIRS		+=	$(PIOS_DEVLIB)/inc
 #
 ifneq ($(FREERTOS_DIR),)
 FREERTOS_PORTDIR	:=	$(PIOS_DEVLIB)/Libraries/FreeRTOS/Source
-SRC					+=	$(wildcard $(FREERTOS_PORTDIR)/portable/GCC/ARM_CM4/*.c)
+SRC					+=	$(wildcard $(FREERTOS_PORTDIR)/portable/GCC/Posix/*.c)
+SRC					+=	$(wildcard $(FREERTOS_PORTDIR)/portable/MemMang/*.c)
+
 EXTRAINCDIRS		+=	$(FREERTOS_PORTDIR)/portable/GCC/Posix
 endif
 

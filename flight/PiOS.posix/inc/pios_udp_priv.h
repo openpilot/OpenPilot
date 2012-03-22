@@ -66,6 +66,7 @@ typedef struct {
 
 extern int32_t PIOS_UDP_Init(uint32_t * udp_id, const struct pios_udp_cfg * cfg);
 
+extern const struct pios_com_driver pios_udp_com_driver;
 
 
 #endif /* PIOS_UDP_PRIV_H */

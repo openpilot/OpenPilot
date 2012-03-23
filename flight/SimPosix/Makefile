@@ -479,6 +479,8 @@ else
 endif
 
 #create compile-time module auto-initialisation
+MODNAMES = ${notdir $(subst /revolution,,$(MODULES))}
+
 # Test if quotes are needed for the echo-command
 result = ${shell echo "test"}
 ifeq (${result}, test)

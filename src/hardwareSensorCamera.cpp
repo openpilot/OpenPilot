@@ -46,8 +46,8 @@ namespace hardware {
 				{
 					if (!found_first) ndigit = i;
 					oss.str(""); oss << dump_path << "/image_" << std::setw(ndigit) << std::setfill('0') << index_load+first_index;
-					if (found_first != 2 && bufferSpecPtr[buff_write]->img->load(oss.str() + std::string(".pgm")) && found_first == 0) { found_first = 1; std::cout << "First image " << oss.str() << ".pgm" << std::endl; }
-					if (found_first != 1 && bufferSpecPtr[buff_write]->img->load(oss.str() + std::string(".png")) && found_first == 0) { found_first = 2; std::cout << "First image " << oss.str() << ".png" << std::endl; }
+					if (found_first != 2 && bufferSpecPtr[buff_write]->img->load(oss.str() + std::string(".pgm"), 0) && found_first == 0) { found_first = 1; std::cout << "First image " << oss.str() << ".pgm" << std::endl; }
+					if (found_first != 1 && bufferSpecPtr[buff_write]->img->load(oss.str() + std::string(".png"), 0) && found_first == 0) { found_first = 2; std::cout << "First image " << oss.str() << ".png" << std::endl; }
 					if (found_first) break;
 				}
 				if (!found_first) { first_index++; continue; }

@@ -167,172 +167,24 @@ namespace hardware {
 		int r;
 		//bool emptied_buffers = false;
 		//double date = 0.;
-		int ndigit = 0;
 
 		while(true)
 		{
 			// acquire the image
-			if (mode == 2)
-			{
-				boost::unique_lock<boost::mutex> l(mutex_data);
-				while (isFull(true)) cond_offline_freed.wait(l);
-				l.unlock();
-				int buff_write = getWritePos();
-				while (true)
-				{
-					// FIXME manage multisensors : put sensor id in filename
-					std::ostringstream oss;
-					for (int i = 3; i <= 7; ++i)
-					{
-						if (!found_first) ndigit = i;
-						oss.str(""); oss << dump_path << "/image_" << std::setw(ndigit) << std::setfill('0') << index_load+first_index;
-						if (found_first != 2 && bufferSpecPtr[buff_write]->img->load(oss.str() + std::string(".pgm")) && found_first == 0) { found_first = 1; std::cout << "First image " << oss.str() << ".pgm" << std::endl; }
-						if (found_first != 1 && bufferSpecPtr[buff_write]->img->load(oss.str() + std::string(".png")) && found_first == 0) { found_first = 2; std::cout << "First image " << oss.str() << ".png" << std::endl; }
-						if (found_first) break;
-					}
-					if (!found_first) { first_index++; continue; }
-					
-					if (bufferSpecPtr[buff_write]->img->data() == NULL)
-					{
-						boost::unique_lock<boost::mutex> l(mutex_data);
-						no_more_data = true;
-						//std::cout << "No more images to read." << std::endl;
-						break;
-					}
-					std::fstream f((oss.str() + std::string(".time")).c_str(), std::ios_base::in);
-					f >> bufferSpecPtr[buff_write]->timestamp; f.close();
-					index_load++;
-					break;
-				} //else  { boost::this_thread::yield(); continue; }
-				if (no_more_data) break;
-			} else
-			{
 #ifdef HAVE_VIAM
-				int buff_write = getWritePos();
-				//if (!emptied_buffers) date = kernel::Clock::getTime();
-				r = viam_oneshot(handle, bank, &(bufferImage[buff_write]), &pts, 1);
-				//if (!emptied_buffers) { date = kernel::Clock::getTime()-date; if (date < 0.004) continue; else emptied_buffers = true; }
-				bufferSpecPtr[buff_write]->arrival = kernel::Clock::getTime();
-				bufferSpecPtr[buff_write]->timestamp = ts.tv_sec + ts.tv_usec*1e-6;
-				last_timestamp = bufferSpecPtr[buff_write]->timestamp;
+			int buff_write = getWritePos();
+			//if (!emptied_buffers) date = kernel::Clock::getTime();
+			r = viam_oneshot(handle, bank, &(bufferImage[buff_write]), &pts, 1);
+			//if (!emptied_buffers) { date = kernel::Clock::getTime()-date; if (date < 0.004) continue; else emptied_buffers = true; }
+			bufferSpecPtr[buff_write]->arrival = kernel::Clock::getTime();
+			bufferSpecPtr[buff_write]->timestamp = ts.tv_sec + ts.tv_usec*1e-6;
+			last_timestamp = bufferSpecPtr[buff_write]->timestamp;
 #endif
-			}
 			incWritePos();
 			condition.setAndNotify(1);
 		}
 	} catch (kernel::Exception &e) { std::cout << e.what(); throw e; } }
 
-#if 0
-	void HardwareSensorCameraFirewire::saveTask(void)
-	{ try {
-		int last_processed_index = index();
-		//if (mode == 1)
-		{
-			#if 0
-			// TODO test
-			boost::filesystem::path bdump_path(dump_path);
-			if (!exists(bdump_path) || !is_directory(bdump_path)) create_directory(bdump_path);
-			
-			boost::regex pattern1("*.pgm");
-			boost::regex pattern2("*.time");
-			for (boost::filesystem::recursive_directory_iterator it(bdump_path), end; it != end; ++it)
-			{
-				std::string name = it->path().leaf();
-				if (boost::regex_match(name, pattern1) || boost::regex_match(name, pattern2))
-					remove(it->path());
-			}
-			//remove(bdump_path / "*.pgm"); // FIXME possible ?
-			#else
-			std::ostringstream oss; oss << "mkdir -p " << dump_path << " ; rm -f " << dump_path << "/*.pgm ; rm -f " << dump_path << "/*.time" << std::endl;
-			int r = system(oss.str().c_str());
-			if (!r) {} // don't care
-			#endif
-		}
-		
-		while (true)
-		{
-			index.wait(boost::lambda::_1 != last_processed_index);
-			// dump the images
-			//if (mode == 1)
-			{
-				std::ostringstream oss; oss << dump_path << "/image_" << std::setw(4) << std::setfill('0') << index();
-				bufferSpecPtr[last_sent_pos]->img->save(oss.str() + std::string(".pgm"));
-				std::fstream f; f.open((oss.str() + std::string(".time")).c_str(), std::ios_base::out); 
-				f << std::setprecision(20) << bufferSpecPtr[last_sent_pos]->timestamp << std::endl; f.close();
-				last_processed_index = index();
-			}
-		}
-	} catch (kernel::Exception &e) { std::cout << e.what(); throw e; } }
-#endif
-	
-	void HardwareSensorCameraFirewire::savePushTask(void)
-	{ try {
-		int last_processed_index = index();
-		
-		// clean previously existing files
-		#if 0
-		// TODO test
-		boost::filesystem::path bdump_path(dump_path);
-		if (!exists(bdump_path) || !is_directory(bdump_path)) create_directory(bdump_path);
-		
-		boost::regex pattern1("*.pgm");
-		boost::regex pattern2("*.time");
-		for (boost::filesystem::recursive_directory_iterator it(bdump_path), end; it != end; ++it)
-		{
-			std::string name = it->path().leaf();
-			if (boost::regex_match(name, pattern1) || boost::regex_match(name, pattern2))
-				remove(it->path());
-		}
-		//remove(bdump_path / "*.pgm"); // FIXME possible ?
-		#else
-		std::ostringstream oss; oss << "mkdir -p " << dump_path << " ; rm -f " << dump_path << "/*.pgm ; rm -f " << dump_path << "/*.time" << std::endl;
-		int r = system(oss.str().c_str());
-		if (!r) {} // don't care
-		#endif
-		
-		while (true)
-		{
-			index.wait(boost::lambda::_1 != last_processed_index);
-			// push image to file for saving
-			saveTask_cond.lock();
-			bufferSave.push_front(rawimage_ptr_t(static_cast<RawImage*>(bufferSpecPtr[last_sent_pos]->clone())));
-			saveTask_cond.var++;
-			saveTask_cond.unlock();
-			saveTask_cond.notify();
-			last_processed_index = index();
-		}
-	} catch (kernel::Exception &e) { std::cout << e.what(); throw e; } }
-	
-	
-	void HardwareSensorCameraFirewire::saveTask(void)
-	{ try {
-		
-		int save_index = index();
-		int remain = 0, prev_remain = 0;
-		
-		while (true)
-		{
-			// wait for and get next data to save
-			saveTask_cond.wait(boost::lambda::_1 != 0, false);
-			rawimage_ptr_t image = bufferSave.back();
-			bufferSave.pop_back();
-			saveTask_cond.var--;
-			remain = saveTask_cond.var;
-			saveTask_cond.unlock();
-			
-			std::ostringstream oss; oss << dump_path << "/image_" << std::setw(7) << std::setfill('0') << save_index;
-			image->img->save(oss.str() + std::string(".pgm"));
-			std::fstream f; f.open((oss.str() + std::string(".time")).c_str(), std::ios_base::out); 
-			f << std::setprecision(20) << image->timestamp << std::endl; f.close();
-			
-			if (remain > prev_remain || (remain == 0 && prev_remain != 0))
-				std::cout << save_index << ": " << remain << " in queue." << std::endl;
-			prev_remain = remain;
-			
-			++save_index;
-		}
-	} catch (kernel::Exception &e) { std::cout << e.what(); throw e; } }
-	
 	
 	void HardwareSensorCameraFirewire::init(int mode, std::string dump_path, cv::Size imgSize)
 	{
@@ -369,15 +221,16 @@ namespace hardware {
 		if (started) { std::cout << "Warning: This HardwareSensorCameraFirewire has already been started" << std::endl; return; }
 		started = true;
 		last_timestamp = kernel::Clock::getTime();
-		preloadTask_thread = new boost::thread(boost::bind(&HardwareSensorCameraFirewire::preloadTask,this));
+		if (mode == 2)
+			preloadTask_thread = new boost::thread(boost::bind(&HardwareSensorCameraFirewire::preloadTaskOffline,this));
+		else
+			preloadTask_thread = new boost::thread(boost::bind(&HardwareSensorCameraFirewire::preloadTask,this));
 	}
 		
 	
 	HardwareSensorCameraFirewire::HardwareSensorCameraFirewire(kernel::VariableCondition<int> &condition, cv::Size imgSize, std::string dump_path):
-		HardwareSensorExteroAbstract(condition, 3), saveTask_cond(0)
-	{
-		init(2, dump_path, imgSize);
-	}
+		HardwareSensorCamera(condition, imgSize, dump_path)
+	{}
 	
 
 #ifdef HAVE_VIAM
@@ -415,7 +268,7 @@ namespace hardware {
 	}
 
 	HardwareSensorCameraFirewire::HardwareSensorCameraFirewire(kernel::VariableCondition<int> &condition, int bufferSize, const std::string &camera_id, cv::Size size, int format, int depth, viam_hwcrop_t crop, double freq, int trigger, double shutter, int mode, std::string dump_path):
-		HardwareSensorExteroAbstract(condition, bufferSize), saveTask_cond(0)
+		HardwareSensorCamera(condition, bufferSize)
 	{
 		viam_hwmode_t hwmode = { size_to_viamSize(size), format_to_viamFormat(format, depth), crop, freq_to_viamFreq(freq), trigger_to_viamTrigger(trigger) };
 		realFreq = viamFreq_to_freq(hwmode.fps);
@@ -433,24 +286,8 @@ namespace hardware {
 		saveTask_cond.wait(boost::lambda::_1 == 0);
 #endif
 	}
-	
-#if 0
-	
-	int HardwareSensorCameraFirewire::acquireRaw(raw_ptr_t &rawPtr)
-	{
-		boost::unique_lock<boost::mutex> l(mutex_data);
-		int missed_count = image_count-1;
-		if (image_count > 0)
-		{
-			std::swap(buff_in_use, buff_ready);
-			rawPtr = buffer[buff_in_use];
-			image_count = 0;
-			index.applyAndNotify(boost::lambda::_1++);
-			//index++;
-		}
-		if (no_more_data && missed_count == -1) return -2; else return missed_count;
-	}
-#endif
+
+
 
 }}}
 

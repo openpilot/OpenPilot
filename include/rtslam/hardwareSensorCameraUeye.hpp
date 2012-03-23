@@ -13,16 +13,10 @@
 #define HARDWARE_SENSOR_CAMERA_UEYE_HPP_
 
 #include <jafarConfig.h>
-#include <image/Image.hpp>
-#include <kernel/threads.hpp>
 
 #ifdef HAVE_UEYE
 #include <ueye.h>
 #endif
-
-#include <boost/thread.hpp>
-#include <boost/thread/thread.hpp>
-#include <boost/thread/mutex.hpp>
 
 #include "rtslam/hardwareSensorCamera.hpp"
 #include "rtslam/rawImage.hpp"

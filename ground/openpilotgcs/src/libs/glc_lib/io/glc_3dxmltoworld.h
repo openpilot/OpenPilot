@@ -34,7 +34,7 @@
 #include "../maths/glc_matrix4x4.h"
 #include "../sceneGraph/glc_3dviewinstance.h"
 
-#include "glc_config.h"
+#include "../glc_config.h"
 
 class GLC_World;
 class QGLContext;
@@ -42,6 +42,7 @@ class QuaZip;
 class QuaZipFile;
 class GLC_StructReference;
 class GLC_StructInstance;
+class GLC_StructOccurence;
 class GLC_Mesh;
 
 //////////////////////////////////////////////////////////////////////
@@ -78,21 +79,47 @@ class GLC_LIB_EXPORT GLC_3dxmlToWorld : public QObject
 		QString m_AssociatedFile;
 	};
 
-	//! \class OccurenceAttrib
-	/*! \brief OccurenceAttrib : Specifique occurence attribute */
-	struct OccurenceAttrib
+	//! \class V3OccurenceAttrib
+	/*! \brief V3OccurenceAttrib : Specifique occurence attribute */
+	struct V3OccurenceAttrib
 	{
-		inline OccurenceAttrib()
+		inline V3OccurenceAttrib()
 		: m_IsVisible(true)
 		, m_pRenderProperties(NULL)
 		{}
-		inline ~OccurenceAttrib()
+		inline ~V3OccurenceAttrib()
 		{delete m_pRenderProperties;}
 
 		//! Visibility attribute
 		bool m_IsVisible;
 		//! Render properties attribute
 		GLC_RenderProperties* m_pRenderProperties;
+	};
+
+	//! \class V3OccurenceAttrib
+	/*! \brief V3OccurenceAttrib : Specifique occurence attribute */
+	struct V4OccurenceAttrib
+	{
+		inline V4OccurenceAttrib()
+		: m_IsVisible(true)
+		, m_pRenderProperties(NULL)
+		, m_pMatrix(NULL)
+		, m_Path()
+		{}
+		inline ~V4OccurenceAttrib()
+		{
+			delete m_pRenderProperties;
+			delete m_pMatrix;
+		}
+
+		//! Visibility attribute
+		bool m_IsVisible;
+		//! Render properties attribute
+		GLC_RenderProperties* m_pRenderProperties;
+		//! Relative matrix
+		GLC_Matrix4x4* m_pMatrix;
+		//! The path of this attrib
+		QList<unsigned int> m_Path;
 	};
 
 	typedef QHash<unsigned int, GLC_StructReference*> ReferenceHash;
@@ -111,7 +138,7 @@ class GLC_LIB_EXPORT GLC_3dxmlToWorld : public QObject
 //////////////////////////////////////////////////////////////////////
 public:
 	//! Default constructor
-	GLC_3dxmlToWorld(const QGLContext*);
+	GLC_3dxmlToWorld();
 
 	virtual ~GLC_3dxmlToWorld();
 //@}
@@ -159,6 +186,9 @@ private:
 	//! Read the specified attribute
 	QString readAttribute(const QString&, bool required= false);
 
+	//! Read the Header
+	void readHeader();
+
 	//! Load the product structure
 	void loadProductStructure();
 
@@ -190,9 +220,6 @@ private:
 	//! Throw ecxeption if error occur
 	void checkForXmlError(const QString&);
 
-	//! Load Level of detail
-	void loadLOD(GLC_Mesh*);
-
 	//! Load a face
 	void loadFace(GLC_Mesh*, const int lod, double accuracy);
 
@@ -211,11 +238,20 @@ private:
 	//! Set the stream reader to the specified file
 	bool setStreamReaderToFile(QString, bool test= false);
 
-	//! Load graphics properties
-	void loadGraphicsProperties();
+	//! Load default view element
+	void loadDefaultView();
 
-	//! Load default view property
-	void loadDefaultViewProperty();
+	//! Load 3DXML V3 default view property
+	void loadV3DefaultViewProperty();
+
+	//! Load 3DXML V4 default view property
+	void loadV4DefaultViewProperty();
+
+	//! Return the occurence path of the current DefaultViewProperty
+	QList<unsigned int> loadOccurencePath();
+
+	//! Load Graphics properties element
+	void loadGraphicProperties(V4OccurenceAttrib* pAttrib);
 
 	//! Load the local representation
 	void loadLocalRepresentations();
@@ -237,9 +273,6 @@ private:
 
 	//! Try to construct a texture with the specified fileName
 	GLC_Texture* loadTexture(QString);
-
-	//! Factorize material use
-	void factorizeMaterial(GLC_3DRep*);
 
 	//! Set fileName of the given 3DRep
 	void setRepresentationFileName(GLC_3DRep* pRep);
@@ -268,15 +301,21 @@ private:
 	//! Check if the given file is binary
 	void checkFileValidity(QIODevice* pIODevice);
 
+	//! Apply the given attribute to the right occurence from the given occurence
+	void applyV4Attribute(GLC_StructOccurence* pOccurence, V4OccurenceAttrib* pV4OccurenceAttrib, QHash<GLC_StructInstance*, unsigned int>& InstanceToIdHash);
+
+	//! Load representation from 3DRep file
+	void loadRep(GLC_Mesh* pMesh);
+
+	//! Load The 3DXML vertex buffer
+	void loadVertexBuffer(GLC_Mesh* pMesh);
+
 //@}
 
 //////////////////////////////////////////////////////////////////////
 // Private members
 //////////////////////////////////////////////////////////////////////
 private:
-	//! OpenGL Context
-	const QGLContext* m_pQGLContext;
-
 	//! Xml Reader
 	QXmlStreamReader* m_pStreamReader;
 
@@ -349,8 +388,11 @@ private:
 	//! The current file time and date
 	QDateTime m_CurrentDateTime;
 
-	//! Hash table of occurence specific attributes
-	QHash<unsigned int, OccurenceAttrib*> m_OccurenceAttrib;
+	//! Hash table of occurence specific attributes for 3DXML V3
+	QHash<unsigned int, V3OccurenceAttrib*> m_V3OccurenceAttribHash;
+
+	//! List of occurence specific attributes for 3DXML V4
+	QList<V4OccurenceAttrib*> m_V4OccurenceAttribList;
 
 	//! bool get external ref 3D name
 	bool m_GetExternalRef3DName;
@@ -358,6 +400,9 @@ private:
 	static QMutex m_ZipMutex;
 
 	QList<QByteArray> m_ByteArrayList;
+
+	//! Flag to know if the 3DXML is in version 3.x
+	bool m_IsVersion3;
 
 };
 

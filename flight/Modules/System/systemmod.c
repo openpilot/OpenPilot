@@ -457,11 +457,21 @@ static void updateSystemAlarms()
 	EventGetStats(&evStats);
 	UAVObjClearStats();
 	EventClearStats();
-	if (objStats.eventErrors > 0 || evStats.eventErrors > 0) {
+	if (objStats.eventCallbackErrors > 0 || objStats.eventQueueErrors > 0  || evStats.eventErrors > 0) {
 		AlarmsSet(SYSTEMALARMS_ALARM_EVENTSYSTEM, SYSTEMALARMS_ALARM_WARNING);
 	} else {
 		AlarmsClear(SYSTEMALARMS_ALARM_EVENTSYSTEM);
 	}
+	
+	if (objStats.lastCallbackErrorID || objStats.lastQueueErrorID || evStats.lastErrorID) {
+		SystemStatsData sysStats;
+		SystemStatsGet(&sysStats);
+		sysStats.EventSystemWarningID = evStats.lastErrorID;
+		sysStats.ObjectManagerCallbackID = objStats.lastCallbackErrorID;
+		sysStats.ObjectManagerQueueID = objStats.lastQueueErrorID;
+		SystemStatsSet(&sysStats);
+	}
+		
 }
 
 /**

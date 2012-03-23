@@ -27,13 +27,13 @@
 
 #include "glc_repmover.h"
 #include "../maths/glc_vector3d.h"
+#include "glc_userinput.h"
 
 #include <QObject>
 #include <QList>
 
 #include "../glc_config.h"
 
-class QMouseEvent;
 class GLC_Viewport;
 
 //////////////////////////////////////////////////////////////////////
@@ -70,10 +70,10 @@ public:
 //////////////////////////////////////////////////////////////////////
 public:
 	//! Initialized the mover
-	virtual void init(QMouseEvent * e)= 0;
+	virtual void init(const GLC_UserInput& userInput)= 0;
 
 	//! Move the camera
-	virtual bool move(QMouseEvent * e)= 0;
+	virtual bool move(const GLC_UserInput& userInput)= 0;
 
 	//! Ends this mover
 	virtual void ends(){}
@@ -112,16 +112,11 @@ private:
 	void clearMoverRepresentation();
 
 //////////////////////////////////////////////////////////////////////
-// Private Members
-//////////////////////////////////////////////////////////////////////
-private:
-	//! The mover representations list
-	QList<GLC_RepMover*> m_RepMoverList;
-
-//////////////////////////////////////////////////////////////////////
 // Protected Members
 //////////////////////////////////////////////////////////////////////
 protected:
+	//! The mover representations list
+	QList<GLC_RepMover*> m_RepMoverList;
 
 	//! The previous mover value
 	GLC_Vector3d m_PreviousVector;

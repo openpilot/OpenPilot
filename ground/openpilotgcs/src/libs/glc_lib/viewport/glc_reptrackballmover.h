@@ -70,6 +70,10 @@ public:
 	//! Set representation main color
 	virtual void setMainColor(const QColor& color);
 
+	//! Set representation screen ration
+	inline void setRatio(double ratio)
+	{m_Ratio= ratio;}
+
 //@}
 
 //////////////////////////////////////////////////////////////////////

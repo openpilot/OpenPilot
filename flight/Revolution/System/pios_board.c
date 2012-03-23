@@ -325,7 +325,12 @@ static void PIOS_Board_configure_dsm(const struct pios_usart_cfg *pios_usart_dsm
  * initializes all the core subsystems on this specific hardware
  * called from System/openpilot.c
  */
+
+#include <pios_board_info.h>
+
 void PIOS_Board_Init(void) {
+
+	const struct pios_board_info * bdinfo = &pios_board_info_blob;	
 	
 	/* Delay system */
 	PIOS_DELAY_Init();
@@ -787,27 +792,37 @@ void PIOS_Board_Init(void) {
 		PIOS_DEBUG_Assert(0);
 	}
 	
-	PIOS_DELAY_WaitmS(500);
+	PIOS_DELAY_WaitmS(50);
 
-#if defined(PIOS_INCLUDE_BMA180)
-	PIOS_BMA180_Init(pios_spi_accel_id, 0, &pios_bma180_cfg);
-	PIOS_Assert(PIOS_BMA180_Test() == 0);
-#endif
-#if defined(PIOS_INCLUDE_MPU6000)
-	PIOS_MPU6000_Attach(pios_spi_gyro_id);
-	PIOS_MPU6000_Init(&pios_mpu6000_cfg);
-//	PIOS_Assert(PIOS_MPU6000_Test() == 0);
-#elif defined(PIOS_INCLUDE_L3GD20)
-	PIOS_L3GD20_Init(pios_spi_gyro_id, 0, &pios_l3gd20_cfg);
-	PIOS_Assert(PIOS_L3GD20_Test() == 0);
-#else
-	PIOS_Assert(0);
-#endif
-
-
+#if defined(PIOS_INCLUDE_HMC5883)
 	PIOS_HMC5883_Init(&pios_hmc5883_cfg);
+#endif
 	
+#if defined(PIOS_INCLUDE_MS5611)
 	PIOS_MS5611_Init(&pios_ms5611_cfg, pios_i2c_pressure_adapter_id);
+#endif
+
+	switch(bdinfo->board_rev) {
+		case 0x01:
+#if defined(PIOS_INCLUDE_L3GD20)
+			PIOS_L3GD20_Init(pios_spi_gyro_id, 0, &pios_l3gd20_cfg);
+			PIOS_Assert(PIOS_L3GD20_Test() == 0);
+#endif
+#if defined(PIOS_INCLUDE_BMA180)
+			PIOS_BMA180_Init(pios_spi_accel_id, 0, &pios_bma180_cfg);
+			PIOS_Assert(PIOS_BMA180_Test() == 0);
+#endif
+			break;
+		case 0x02:
+#if defined(PIOS_INCLUDE_MPU6000)
+			PIOS_MPU6000_Attach(pios_spi_gyro_id);
+			PIOS_MPU6000_Init(&pios_mpu6000_cfg);
+#endif
+			break;
+		default:
+			PIOS_DEBUG_Assert(0);
+	}
+
 }
 
 /**

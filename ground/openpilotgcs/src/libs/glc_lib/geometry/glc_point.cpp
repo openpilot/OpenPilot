@@ -32,18 +32,27 @@ using namespace glc;
 
 
 GLC_Point::GLC_Point(const GLC_Point3d &setCoord)
-:GLC_Geometry("Point", true)
+:GLC_PointCloud()
 , m_Coordinate(setCoord)
 , m_Size(1.0f)
 {
-
+	setCoordinate(m_Coordinate);
 }
-//! Construct an GLC_Point
+
 GLC_Point::GLC_Point(double x, double y, double z)
-:GLC_Geometry("Point", true)
+:GLC_PointCloud()
 , m_Coordinate(x, y, z)
 , m_Size(1.0f)
 {
+	setCoordinate(m_Coordinate);
+}
+
+GLC_Point::GLC_Point(const GLC_Point& point)
+:GLC_PointCloud(point)
+, m_Coordinate(point.m_Coordinate)
+, m_Size(point.m_Size)
+{
+
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -54,26 +63,6 @@ GLC_Point::GLC_Point(double x, double y, double z)
 GLC_Point3d GLC_Point::coordinate(void) const
 {
 	return m_Coordinate;
-}
-
-// return the point bounding box
-const GLC_BoundingBox& GLC_Point::boundingBox(void)
-{
-
-	if (NULL == m_pBoundingBox)
-	{
-		m_pBoundingBox= new GLC_BoundingBox();
-		const double delta= 1e-2;
-		GLC_Point3d lower(m_Coordinate.x() - delta,
-				m_Coordinate.y() - delta,
-				m_Coordinate.z() - delta);
-		GLC_Point3d upper(m_Coordinate.x() + delta,
-				m_Coordinate.y() + delta,
-				m_Coordinate.z() + delta);
-		m_pBoundingBox->combine(lower);
-		m_pBoundingBox->combine(upper);
-	}
-	return *m_pBoundingBox;
 }
 
 // Return a copy of the current geometry
@@ -90,32 +79,26 @@ GLC_Geometry* GLC_Point::clone() const
 void GLC_Point::setCoordinate(const GLC_Point3d &point)
 {
 	m_Coordinate= point;
+	GLC_PointCloud::clear();
+	QList<GLC_Point3d> points;
+	points.append(m_Coordinate);
+	GLC_PointCloud::addPoint(points);
+
 }
 // Set Point coordinate by 3 double
 void GLC_Point::setCoordinate(double x, double y, double z)
 {
-	m_Coordinate.setVect(x, y, z);
+	setCoordinate(GLC_Point3d(x, y, z));
 }
 
 //////////////////////////////////////////////////////////////////////
 // OpenGL Functions
 //////////////////////////////////////////////////////////////////////
 
-void GLC_Point::glDraw(const GLC_RenderProperties&)
+void GLC_Point::glDraw(const GLC_RenderProperties& renderProperties)
 {
 	glPointSize(m_Size);
 	// Point Display
-	glBegin(GL_POINTS);
-		glVertex3dv(m_Coordinate.data());
-	glEnd();
-	glPointSize(1.0f);
-
-	// OpenGL error handler
-	GLenum error= glGetError();
-	if (error != GL_NO_ERROR)
-	{
-		GLC_OpenGlException OpenGlException("GLC_Point::GlDraw ", error);
-		throw(OpenGlException);
-	}
+	GLC_PointCloud::glDraw(renderProperties);
 }
 

@@ -180,3 +180,12 @@ GLC_StructInstance::~GLC_StructInstance()
 	else qDebug() << "GLC_StructInstance::~GLC_StructInstance() of empty instance";
 
 }
+
+void GLC_StructInstance::updateOccurencesAbsoluteMatrix()
+{
+	const int occurenceCount= m_ListOfOccurences.count();
+	for (int i= 0; i < occurenceCount; ++i)
+	{
+		m_ListOfOccurences.at(i)->updateChildrenAbsoluteMatrix();
+	}
+}

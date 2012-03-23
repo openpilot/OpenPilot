@@ -74,7 +74,6 @@
 // Private types
 
 // Private variables
-static xTaskHandle sensorTaskHandle;
 static xTaskHandle attitudeTaskHandle;
 
 static xQueueHandle gyroQueue;
@@ -85,10 +84,8 @@ static xQueueHandle gpsQueue;
 const uint32_t SENSOR_QUEUE_SIZE = 10;
 
 // Private functions
-static void SensorTask(void *parameters);
 static void AttitudeTask(void *parameters);
 
-static int32_t updateSensors();
 static int32_t updateAttitudeComplimentary(bool first_run);
 static int32_t updateAttitudeINSGPS(bool first_run);
 static void settingsUpdatedCb(UAVObjEvent * objEv);
@@ -131,7 +128,7 @@ int32_t AttitudeInitialize(void)
 	
 	// Initialize this here while we aren't setting the homelocation in GPS
 	HomeLocationInitialize();
-	
+
 	// Initialize quaternion
 	AttitudeActualData attitude;
 	AttitudeActualGet(&attitude);
@@ -455,12 +452,11 @@ static int32_t updateAttitudeINSGPS(bool first_run)
 	} else if (!inited ) {
 		inited = true;
 
-		float Rbe[3][3], q[4], accels[3], rpy[3], mag;
+		float Rbe[3][3], q[4];
 		float ge[3]={0.0f,0.0f,-9.81f};
 		float zeros[3]={0.0f,0.0f,0.0f};
 		float Pdiag[16]={25.0f,25.0f,25.0f,5.0f,5.0f,5.0f,1e-5f,1e-5f,1e-5f,1e-5f,1e-5f,1e-5f,1e-5f,1e-4f,1e-4f,1e-4f};
 		float vel[3], NED[3];
-		bool using_mags, using_gps;
 		
 		INSGPSInit();
 		
@@ -490,10 +486,7 @@ static int32_t updateAttitudeINSGPS(bool first_run)
 		return 0;
 	}
 	
-	// Perform the update
-	static uint32_t updated_without_gps = 0;
-	
-	float zeros[3] = {0, 0, 0};
+	// Perform the update	
 	uint16_t sensors = 0;
 	float dT;
 	
@@ -591,6 +584,7 @@ static int32_t updateAttitudeINSGPS(bool first_run)
 		INSSetGyroBias(zeros);
 	}
 
+	return 0;
 }
 
 static void settingsUpdatedCb(UAVObjEvent * objEv) 

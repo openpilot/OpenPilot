@@ -46,7 +46,7 @@
 #include "openpilot.h"
 #include "guidance.h"
 #include "guidancesettings.h"
-#include "attituderaw.h"
+#include "accels.h"
 #include "attitudeactual.h"
 #include "positiondesired.h"	// object that will be updated by the module
 #include "positionactual.h"
@@ -111,7 +111,7 @@ int32_t GuidanceInitialize()
 	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
 	
 	// Listen for updates.
-	AttitudeRawConnectQueue(queue);
+	AccelsConnectQueue(queue);
 	
 	return 0;
 }
@@ -156,7 +156,7 @@ static void guidanceTask(void *parameters)
 	while (1) {
 		GuidanceSettingsGet(&guidanceSettings);
 
-		// Wait until the AttitudeRaw object is updated, if a timeout then go to failsafe
+		// Wait until the Accels object is updated, if a timeout then go to failsafe
 		if ( xQueueReceive(queue, &ev, guidanceSettings.UpdatePeriod / portTICK_RATE_MS) != pdTRUE )
 		{
 			AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_WARNING);
@@ -165,11 +165,11 @@ static void guidanceTask(void *parameters)
 		}
 				
 		// Collect downsampled attitude data
-		AttitudeRawData attitudeRaw;
-		AttitudeRawGet(&attitudeRaw);		
-		accel[0] += attitudeRaw.accels[0];
-		accel[1] += attitudeRaw.accels[1];
-		accel[2] += attitudeRaw.accels[2];
+		AccelsData accels;
+		AccelsGet(&accels);		
+		accel[0] += accels.x;
+		accel[1] += accels.y;
+		accel[2] += accels.z;
 		accel_accum++;
 		
 		// Continue collecting data if not enough time
@@ -366,7 +366,7 @@ static void updateFixedDesiredAttitude()
 	StabilizationDesiredData stabDesired;
 	AttitudeActualData attitudeActual;
 	NedAccelData nedAccel;
-	AttitudeRawData attitudeRaw;
+	AccelsData accels;
 	GuidanceSettingsData guidanceSettings;
 	StabilizationSettingsData stabSettings;
 	SystemSettingsData systemSettings;
@@ -399,7 +399,7 @@ static void updateFixedDesiredAttitude()
 	StabilizationDesiredGet(&stabDesired);
 	VelocityDesiredGet(&velocityDesired);
 	AttitudeActualGet(&attitudeActual);
-	AttitudeRawGet(&attitudeRaw);
+	AccelsGet(&accels);
 	StabilizationSettingsGet(&stabSettings);
 	NedAccelGet(&nedAccel);
 
@@ -443,7 +443,7 @@ static void updateFixedDesiredAttitude()
 		-guidanceSettings.SpeedP[GUIDANCESETTINGS_SPEEDP_MAX],
 		guidanceSettings.SpeedP[GUIDANCESETTINGS_SPEEDP_MAX]);
 	
-	accelError = accelDesired - attitudeRaw.accels[0];
+	accelError = accelDesired - accels.x;
 	accelIntegral = bound(accelIntegral + accelError * dT * guidanceSettings.AccelPI[GUIDANCESETTINGS_ACCELPI_KI], 
 		-guidanceSettings.AccelPI[GUIDANCESETTINGS_ACCELPI_ILIMIT],
 		guidanceSettings.AccelPI[GUIDANCESETTINGS_ACCELPI_ILIMIT]);

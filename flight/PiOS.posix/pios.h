@@ -29,7 +29,7 @@
 #define PIOS_H
 
 /* PIOS Feature Selection */
-#include "pios_config_posix.h"
+#include "pios_config.h"
 #include <pios_posix.h>
 
 #if defined(PIOS_INCLUDE_FREERTOS)
@@ -52,7 +52,7 @@
 #include "pios_initcall.h"
 
 /* PIOS Board Specific Device Configuration */
-#include "pios_board_posix.h"
+#include "pios_board.h"
 
 /* PIOS Hardware Includes (posix) */
 #include <pios_sys.h>

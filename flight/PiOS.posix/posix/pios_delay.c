@@ -59,7 +59,7 @@ int32_t PIOS_DELAY_Init(void)
 * \param[in] uS delay (1..65535 microseconds)
 * \return < 0 on errors
 */
-int32_t PIOS_DELAY_WaituS(uint16_t uS)
+int32_t PIOS_DELAY_WaituS(uint32_t uS)
 {
 	static struct timespec wait,rest;
 	wait.tv_sec=0;
@@ -83,7 +83,7 @@ int32_t PIOS_DELAY_WaituS(uint16_t uS)
 * \param[in] mS delay (1..65535 milliseconds)
 * \return < 0 on errors
 */
-int32_t PIOS_DELAY_WaitmS(uint16_t mS)
+int32_t PIOS_DELAY_WaitmS(uint32_t mS)
 {
 	//for(int i = 0; i < mS; i++) {
 	//	PIOS_DELAY_WaituS(1000);
@@ -98,5 +98,45 @@ int32_t PIOS_DELAY_WaitmS(uint16_t mS)
 	/* No error */
 	return 0;
 }
+
+/**
+ * @brief Query the Delay timer for the current uS 
+ * @return A microsecond value
+ */
+uint32_t PIOS_DELAY_GetuS()
+{
+	static struct timespec current;
+	clock_gettime(CLOCK_REALTIME, &current);
+	return ((current.tv_sec * 1000000) + (current.tv_nsec / 1000));
+}
+
+/**
+ * @brief Calculate time in microseconds since a previous time
+ * @param[in] t previous time
+ * @return time in us since previous time t.
+ */
+uint32_t PIOS_DELAY_GetuSSince(uint32_t t)
+{
+	return (PIOS_DELAY_GetuS() - t);
+}
+
+/**
+ * @brief Get the raw delay timer, useful for timing
+ * @return Unitless value (uint32 wrap around)
+ */
+uint32_t PIOS_DELAY_GetRaw()
+{
+	return (PIOS_DELAY_GetuS());
+}
+
+/**
+ * @brief Compare to raw times to and convert to us 
+ * @return A microsecond value
+ */
+uint32_t PIOS_DELAY_DiffuS(uint32_t raw)
+{
+	return ( PIOS_DELAY_GetuS() - raw );
+}
+
 
 #endif

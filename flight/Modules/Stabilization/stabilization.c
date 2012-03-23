@@ -115,6 +115,7 @@ int32_t StabilizationInitialize()
 	// Initialize variables
 	StabilizationSettingsInitialize();
 	ActuatorDesiredInitialize();
+	GyrosInitialize();
 #if defined(DIAGNOSTICS)
 	RateDesiredInitialize();
 #endif

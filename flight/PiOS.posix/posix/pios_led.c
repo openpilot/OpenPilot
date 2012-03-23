@@ -41,7 +41,7 @@
 static uint8_t LED_GPIO[PIOS_LED_NUM];
 
 
-static inline void PIOS_SetLED(LedTypeDef LED,uint8_t stat) {
+static inline void PIOS_SetLED(uint32_t LED,uint8_t stat) {
 	printf("PIOS: LED %i status %i\n",LED,stat);
 	LED_GPIO[LED]=stat;
 }
@@ -71,7 +71,7 @@ void PIOS_LED_Init(void)
 * Turn on LED
 * \param[in] LED LED Name (LED1, LED2)
 */
-void PIOS_LED_On(LedTypeDef LED)
+void PIOS_LED_On(uint32_t LED)
 {
 	//LED_GPIO_PORT[LED]->BRR = LED_GPIO_PIN[LED];
 	PIOS_SetLED(LED,1);
@@ -82,7 +82,7 @@ void PIOS_LED_On(LedTypeDef LED)
 * Turn off LED
 * \param[in] LED LED Name (LED1, LED2)
 */
-void PIOS_LED_Off(LedTypeDef LED)
+void PIOS_LED_Off(uint32_t LED)
 {
 	//LED_GPIO_PORT[LED]->BSRR = LED_GPIO_PIN[LED];
 	PIOS_SetLED(LED,0);
@@ -93,7 +93,7 @@ void PIOS_LED_Off(LedTypeDef LED)
 * Toggle LED on/off
 * \param[in] LED LED Name (LED1, LED2)
 */
-void PIOS_LED_Toggle(LedTypeDef LED)
+void PIOS_LED_Toggle(uint32_t LED)
 {
 	//LED_GPIO_PORT[LED]->ODR ^= LED_GPIO_PIN[LED];
 	PIOS_SetLED(LED,LED_GPIO[LED]?0:1);

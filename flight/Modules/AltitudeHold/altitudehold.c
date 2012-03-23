@@ -93,6 +93,8 @@ int32_t AltitudeHoldInitialize()
 	AltitudeHoldSettingsInitialize();
 	AltitudeHoldDesiredInitialize();
 	AltHoldSmoothedInitialize();
+	BaroAltitudeInitialize();
+	AccelsInitialize();
 
 	// Create object queue
 	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));

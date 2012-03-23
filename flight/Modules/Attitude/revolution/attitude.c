@@ -122,6 +122,12 @@ int32_t AttitudeInitialize(void)
 	AttitudeSettingsInitialize();
 	PositionActualInitialize();
 	VelocityActualInitialize();
+	GyrosBiasInitialize();
+	MagnetometerInitialize();
+	GyrosInitialize();
+	AccelsInitialize();
+	BaroAltitudeInitialize();
+	GPSPositionInitialize();
 	
 	// Initialize this here while we aren't setting the homelocation in GPS
 	HomeLocationInitialize();

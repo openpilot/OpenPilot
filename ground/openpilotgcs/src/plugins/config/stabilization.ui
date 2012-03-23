@@ -470,7 +470,7 @@
         <enum>QTabWidget::North</enum>
        </property>
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <property name="documentMode">
         <bool>true</bool>
@@ -11753,7 +11753,7 @@ border-radius: 4;
             <property name="geometry">
              <rect>
               <x>0</x>
-              <y>-274</y>
+              <y>0</y>
               <width>667</width>
               <height>1079</height>
              </rect>
@@ -21550,7 +21550,7 @@ rate(deg/s)</string>
                       <double>1000000.000000000000000</double>
                      </property>
                      <property name="singleStep">
-                      <double>0.100000000000000</double>
+                      <double>1.000000000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -21610,7 +21610,7 @@ rate(deg/s)</string>
                       <double>1000000.000000000000000</double>
                      </property>
                      <property name="singleStep">
-                      <double>0.100000000000000</double>
+                      <double>1.000000000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -21673,7 +21673,7 @@ rate(deg/s)</string>
                       <double>1000000.000000000000000</double>
                      </property>
                      <property name="singleStep">
-                      <double>0.100000000000000</double>
+                      <double>1.000000000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -21752,7 +21752,7 @@ rate(deg/s)</string>
                       <double>1000000.000000000000000</double>
                      </property>
                      <property name="singleStep">
-                      <double>0.100000000000000</double>
+                      <double>1.000000000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -21796,7 +21796,7 @@ rate(deg/s)</string>
                       <double>1000000.000000000000000</double>
                      </property>
                      <property name="singleStep">
-                      <double>0.100000000000000</double>
+                      <double>1.000000000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -21843,7 +21843,7 @@ rate(deg/s)</string>
                       <double>1000000.000000000000000</double>
                      </property>
                      <property name="singleStep">
-                      <double>0.100000000000000</double>
+                      <double>1.000000000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>

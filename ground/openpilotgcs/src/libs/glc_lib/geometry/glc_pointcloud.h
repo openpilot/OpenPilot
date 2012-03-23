@@ -86,6 +86,13 @@ public:
 	//! Add the given list of points to this cloud and returns its id if id are managed
 	GLC_uint addPoint(const QList<GLC_Point3df>& pointsList);
 
+	//! Add Colors
+	inline void addColors(const GLfloatVector& colors)
+	{GLC_Geometry::m_WireData.addColors(colors);}
+
+	//! Add Colors
+	void addColors(const QList<QColor>& colors);
+
 	//! Set this point cloud from the given point cloud and return a reference of this point cloud
 	GLC_PointCloud& operator=(const GLC_PointCloud& pointcloud);
 
@@ -99,7 +106,7 @@ public:
 /*! \name OpenGL Functions*/
 //@{
 //////////////////////////////////////////////////////////////////////
-private:
+protected:
 
 	//! Virtual interface for OpenGL Geometry set up.
 	/*! This Virtual function is implemented here.\n

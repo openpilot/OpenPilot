@@ -27,10 +27,14 @@
 
 #include <QColor>
 #include <QSet>
+#include <QHash>
+
 #include "../glc_object.h"
 #include "../maths/glc_vector3d.h"
 
 #include "../glc_config.h"
+
+class QGLContext;
 
 //////////////////////////////////////////////////////////////////////
 //! \class GLC_Light
@@ -57,11 +61,11 @@ public:
 public:
 	//! Construct a default GLC_Light
 	/*! By default, ambient color is black, diffuse Color is white and specular color is white*/
-	GLC_Light(const QColor& color= Qt::white);
+	GLC_Light(const QGLContext* pContext= NULL, const QColor& color= Qt::white);
 
 	//! Construct a default GLC_Light
 	/*! By default, ambient color is black, diffuse Color is white and specular color is white*/
-	GLC_Light(LightType lightType, const QColor& color= Qt::white);
+	GLC_Light(LightType lightType, const QGLContext* pContext= NULL, const QColor& color= Qt::white);
 
 	//! Copy constructor
 	GLC_Light(const GLC_Light& light);
@@ -79,7 +83,7 @@ public:
 	static int maxLightCount();
 
 	//! Return the number of builtable light
-	static int builtAbleLightCount();
+	static int builtAbleLightCount(QGLContext* pContext);
 
 	//! Return a GLC_Point3d representing light position
 	inline GLC_Point3d position(void) const
@@ -139,8 +143,8 @@ public:
 //@{
 //////////////////////////////////////////////////////////////////////
 public:
-	//! Init Max number of light
-	static void init();
+	//! Init Max number of light for this light context
+	void initForThisContext();
 
 	//! Set lihgt's position by a point
 	void setPosition(const GLC_Point3d &pos);
@@ -185,16 +189,12 @@ public:
 //@{
 //////////////////////////////////////////////////////////////////////
 public:
-	//! Enable the light
-	inline void enable() const
-	{glEnable(m_LightID);}
 
 	// Disable the light
-	inline void disable() const
-	{glDisable(m_LightID);}
+	void disable();
 
 	//! Execute OpenGL light
-	virtual void glExecute(GLenum Mode= GL_COMPILE_AND_EXECUTE);
+	virtual void glExecute();
 //@}
 
 //////////////////////////////////////////////////////////////////////
@@ -203,33 +203,29 @@ public:
 //////////////////////////////////////////////////////////////////////
 
 private:
-	//! OpenGL light set up
-	void glDraw();
 
-	//! Display List creation
-	void creationList(GLenum Mode);
-
-	//! Delete OpenGL Display list
-	void deleteList();
 
 //@}
 
 //////////////////////////////////////////////////////////////////////
+// Private services fonction
+//////////////////////////////////////////////////////////////////////
+private:
+	//! Add context new light
+	void addNewLight();
+
+	//! Remove contetx light
+	void removeThisLight();
+
+//////////////////////////////////////////////////////////////////////
 // Private Members
 //////////////////////////////////////////////////////////////////////
-
 private:
 	//! OpenGL light ID
 	GLenum m_LightID;
 
 	//! The Light type
 	LightType m_LightType;
-
-	//! OpenGL Display list ID
-	GLuint m_ListID;
-
-	//! OpenGL list validity
-	bool m_ListIsValid;
 
 	//! Light ambiant color
 	QColor m_AmbientColor;
@@ -266,7 +262,13 @@ private:
 	//! Maximum number of light
 	static GLint m_MaxLight;
 
-	//! Free light set
-	static QSet<GLenum> m_FreeLightSet;
+	//! The context of this light
+	QGLContext* m_pContext;
+
+	//! Flag to know if this light is valid
+	bool m_IsValid;
+
+	//! Mapping between context and light set
+	static QHash<const QGLContext*, QSet<GLenum> > m_ContextToFreeLightSet;
 };
 #endif //GLC_LIGHT_H_

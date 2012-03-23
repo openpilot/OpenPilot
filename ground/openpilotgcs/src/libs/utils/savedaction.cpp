@@ -302,6 +302,13 @@ void SavedAction::connectWidget(QWidget *widget, ApplyMode applyMode)
             this, SLOT(spinBoxValueChanged(int)));
         connect(spinBox, SIGNAL(valueChanged(QString)),
             this, SLOT(spinBoxValueChanged(QString)));
+    } else if (QDoubleSpinBox *doubleSpinBox = qobject_cast<QDoubleSpinBox *>(widget)) {
+        doubleSpinBox->setValue(m_value.toDouble());
+        //qDebug() << "SETTING VALUE" << doubleSpinBox->value(); 
+        connect(doubleSpinBox, SIGNAL(valueChanged(double)),
+            this, SLOT(doubleSpinBoxValueChanged(double)));
+        connect(doubleSpinBox, SIGNAL(valueChanged(QString)),
+            this, SLOT(doubleSpinBoxValueChanged(QString)));
     } else if (QLineEdit *lineEdit = qobject_cast<QLineEdit *>(widget)) {
         lineEdit->setText(m_value.toString());
         //qDebug() << "SETTING TEXT" << lineEdit->text(); 
@@ -336,6 +343,8 @@ void SavedAction::apply(QSettings *s)
         setValue(lineEdit->text());
     else if (QSpinBox *spinBox = qobject_cast<QSpinBox *>(m_widget))
         setValue(spinBox->value());
+    else if (QDoubleSpinBox *doubleSpinBox = qobject_cast<QDoubleSpinBox *>(m_widget))
+        setValue(doubleSpinBox->value());
     else if (PathChooser *pathChooser = qobject_cast<PathChooser *>(m_widget))
         setValue(pathChooser->path());
     if (s)
@@ -379,6 +388,22 @@ void SavedAction::spinBoxValueChanged(QString value)
 {
     QSpinBox *spinBox = qobject_cast<QSpinBox *>(sender());
     QTC_ASSERT(spinBox, return);
+    if (m_applyMode == ImmediateApply)
+        setValue(value);
+}
+
+void SavedAction::doubleSpinBoxValueChanged(double value)
+{
+    QDoubleSpinBox *doubleSpinBox = qobject_cast<QDoubleSpinBox *>(sender());
+    QTC_ASSERT(doubleSpinBox, return);
+    if (m_applyMode == ImmediateApply)
+        setValue(value);
+}
+
+void SavedAction::doubleSpinBoxValueChanged(QString value)
+{
+    QDoubleSpinBox *doubleSpinBox = qobject_cast<QDoubleSpinBox *>(sender());
+    QTC_ASSERT(doubleSpinBox, return);
     if (m_applyMode == ImmediateApply)
         setValue(value);
 }

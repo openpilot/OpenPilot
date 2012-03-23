@@ -32,7 +32,6 @@ GLC_World::GLC_World()
 , m_pRoot(new GLC_StructOccurence())
 {
 	m_pRoot->setWorldHandle(m_pWorldHandle);
-	//qDebug() << "GLC_World::GLC_World() : " << (*m_pNumberOfWorld) << " " << this;
 }
 
 // Copy constructor
@@ -43,14 +42,13 @@ GLC_World::GLC_World(const GLC_World& world)
 	//qDebug() << "GLC_World::GLC_World() : " << (*m_pNumberOfWorld) << " " << this;
 	// Increment the number of world
 	m_pWorldHandle->increment();
+
 }
 
 GLC_World::~GLC_World()
 {
-
 	// Decrement the number of world
 	m_pWorldHandle->decrement();
-	//qDebug() << "GLC_World::GLC_World() : " << (*m_pNumberOfWorld) << " " << this;
 	if (m_pWorldHandle->isOrphan())
 	{
 		// this is the last World, delete the root product and collection
@@ -63,7 +61,6 @@ GLC_World::~GLC_World()
 // Merge this world with another world
 void GLC_World::mergeWithAnotherWorld(GLC_World& anotherWorld)
 {
-	qDebug() << "GLC_World::mergeWithAnotherWorld";
 	GLC_StructOccurence* pAnotherRoot= anotherWorld.rootOccurence();
 	if (pAnotherRoot->childCount() > 0)
 	{

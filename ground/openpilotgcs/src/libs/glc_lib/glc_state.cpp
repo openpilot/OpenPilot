@@ -48,6 +48,7 @@ GLC_CacheManager GLC_State::m_CacheManager;
 
 bool GLC_State::m_IsSpacePartitionningActivated= false;
 bool GLC_State::m_IsFrustumCullingActivated= false;
+bool GLC_State::m_IsValid= false;
 
 GLC_State::~GLC_State()
 {
@@ -145,13 +146,24 @@ bool GLC_State::isFrustumCullingActivated()
 
 void GLC_State::init()
 {
-	setVboSupport();
-	setGlslSupport();
-	setPointSpriteSupport();
-	setFrameBufferSupport();
-	m_Version= (char *) glGetString(GL_VERSION);
-	m_Vendor= (char *) glGetString(GL_VENDOR);
-	m_Renderer= (char *) glGetString(GL_RENDERER);
+	if (!m_IsValid)
+	{
+		Q_ASSERT((NULL != QGLContext::currentContext()) &&  QGLContext::currentContext()->isValid());
+		setVboSupport();
+		setGlslSupport();
+		setPointSpriteSupport();
+		setFrameBufferSupport();
+		m_Version= (char *) glGetString(GL_VERSION);
+		m_Vendor= (char *) glGetString(GL_VENDOR);
+		m_Renderer= (char *) glGetString(GL_RENDERER);
+
+		m_IsValid= true;
+	}
+}
+
+bool GLC_State::isValid()
+{
+	return m_IsValid;
 }
 
 void GLC_State::setVboSupport()

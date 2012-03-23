@@ -36,7 +36,7 @@ GLC_Box::GLC_Box(double dLx, double dLy, double dlz)
 , m_dLgY(dLy)
 , m_dLgZ(dlz)
 {
-
+	createMeshAndWire();
 }
 // Copy constructor
 GLC_Box::GLC_Box(const GLC_Box& box)
@@ -45,7 +45,7 @@ GLC_Box::GLC_Box(const GLC_Box& box)
 , m_dLgY(box.m_dLgY)
 , m_dLgZ(box.m_dLgZ)
 {
-
+	createMeshAndWire();
 }
 GLC_Box::~GLC_Box()
 {

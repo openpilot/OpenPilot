@@ -111,12 +111,12 @@ void GLC_MoverController::removeMover(const int id)
 	}
 }
 
-void GLC_MoverController::setActiveMover(const int id, QMouseEvent * e)
+void GLC_MoverController::setActiveMover(const int id, const GLC_UserInput& userInput)
 {
 	Q_ASSERT(m_MoverHash.contains(id));
 	m_ActiveMoverId= id;
 	connect(m_MoverHash.value(m_ActiveMoverId), SIGNAL(updated()), this, SIGNAL(repaintNeeded()));
-	m_MoverHash.value(m_ActiveMoverId)->init(e);
+	m_MoverHash.value(m_ActiveMoverId)->init(userInput);
 }
 
 void GLC_MoverController::setNoMover()

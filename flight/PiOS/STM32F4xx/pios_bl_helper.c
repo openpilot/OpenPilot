@@ -152,7 +152,7 @@ uint8_t PIOS_BL_HELPER_FLASH_Start()
 			PIOS_Assert(0);
 		}
 		for (int retry = 0; retry < MAX_DEL_RETRYS; ++retry) {
-			if (FLASH_EraseSector(sector_number, VoltageRange_2) == FLASH_COMPLETE) {
+			if (FLASH_EraseSector(sector_number, VoltageRange_3) == FLASH_COMPLETE) {
 				fail = false;
 				break;
 			} else {

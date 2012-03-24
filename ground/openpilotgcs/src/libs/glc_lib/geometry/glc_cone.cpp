@@ -33,6 +33,7 @@ GLC_Cone::GLC_Cone(double dRadius, double dLength)
 , m_Discret(glc::GLC_POLYDISCRET)	// Default discretion
 {
 	Q_ASSERT((m_Radius > 0.0) && (m_Length > 0.0));
+	createMeshAndWire();
 }
 
 GLC_Cone::GLC_Cone(const GLC_Cone& sourceCone)
@@ -41,7 +42,7 @@ GLC_Cone::GLC_Cone(const GLC_Cone& sourceCone)
 , m_Length(sourceCone.m_Length)
 , m_Discret(sourceCone.m_Discret)
 {
-
+	createMeshAndWire();
 }
 
 GLC_Cone::~GLC_Cone()

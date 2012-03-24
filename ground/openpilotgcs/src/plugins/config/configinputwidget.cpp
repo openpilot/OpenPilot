@@ -57,7 +57,7 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
     addApplySaveButtons(m_config->saveRCInputToRAM,m_config->saveRCInputToSD);
 
     unsigned int index=0;
-    foreach(QString name,manualSettingsObj->getField("ChannelNumber")->getElementNames())
+    foreach (QString name, manualSettingsObj->getField("ChannelNumber")->getElementNames())
     {
         Q_ASSERT(index < ManualControlSettings::CHANNELGROUPS_NUMELEM);
         inputChannelForm * inp=new inputChannelForm(this,index==0);
@@ -70,6 +70,8 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
         addUAVObjectToWidgetRelation("ManualControlSettings","ChannelMax",inp->ui->channelMax,index);
         ++index;
     }
+
+    addUAVObjectToWidgetRelation("ManualControlSettings", "Deadband", m_config->deadband, 0, 0.01f);
 
     connect(m_config->configurationWizard,SIGNAL(clicked()),this,SLOT(goToWizard()));
     connect(m_config->runCalibration,SIGNAL(toggled(bool)),this, SLOT(simpleCalibration(bool)));
@@ -1097,7 +1099,7 @@ void ConfigInputWidget::invertControls()
         QCheckBox * cb=qobject_cast<QCheckBox *>(wd);
         if(cb)
         {
-            int index=manualSettingsObj->getField("ChannelNumber")->getElementNames().indexOf(cb->text());
+            int index = manualSettingsObj->getField("ChannelNumber")->getElementNames().indexOf(cb->text());
             if((cb->isChecked() && (manualSettingsData.ChannelMax[index]>manualSettingsData.ChannelMin[index])) ||
                     (!cb->isChecked() && (manualSettingsData.ChannelMax[index]<manualSettingsData.ChannelMin[index])))
             {

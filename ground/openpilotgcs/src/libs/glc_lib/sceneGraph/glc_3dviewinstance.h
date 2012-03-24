@@ -32,10 +32,11 @@
 #include "../glc_state.h"
 #include "../geometry/glc_3drep.h"
 #include "../shading/glc_renderproperties.h"
+#include "../glc_context.h"
 
 #include <QMutex>
 
-#include "glc_config.h"
+#include "../glc_config.h"
 
 class GLC_Viewport;
 
@@ -197,10 +198,7 @@ public:
 public:
 
 	//! Set the instance Geometry
-	/*!
-	 *  instance must be null
-	 */
-	bool setGeometry(GLC_Geometry* pGeom);
+	bool addGeometry(GLC_Geometry* pGeom);
 
 	//! Remove empty geometries
 	inline void removeEmptyGeometry()
@@ -274,6 +272,9 @@ public:
 	inline void setRenderProperties(const GLC_RenderProperties& renderProperties)
 	{m_RenderProperties= renderProperties;}
 
+	//! Set VBO usage
+	void setVboUsage(bool usage);
+
 //@}
 
 //////////////////////////////////////////////////////////////////////
@@ -298,7 +299,7 @@ private:
 		// Polygons display mode
 		glPolygonMode(m_RenderProperties.polyFaceMode(), m_RenderProperties.polygonMode());
 		// Change the current matrix
-		glMultMatrixd(m_AbsoluteMatrix.getData());
+		GLC_Context::current()->glcMultMatrix(m_AbsoluteMatrix);
 	}
 
 

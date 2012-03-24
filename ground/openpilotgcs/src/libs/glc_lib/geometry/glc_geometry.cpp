@@ -25,6 +25,7 @@
 #include "../shading/glc_selectionmaterial.h"
 #include "../glc_openglexception.h"
 #include "../glc_state.h"
+#include "../glc_context.h"
 #include "glc_geometry.h"
 
 //////////////////////////////////////////////////////////////////////
@@ -44,6 +45,7 @@ GLC_Geometry::GLC_Geometry(const QString& name, const bool typeIsWire)
 , m_TransparentMaterialNumber(0)
 , m_Id(glc::GLC_GenGeomID())
 , m_Name(name)
+, m_UseVbo(false)
 {
 
 }
@@ -61,6 +63,7 @@ GLC_Geometry::GLC_Geometry(const GLC_Geometry& sourceGeom)
 , m_TransparentMaterialNumber(sourceGeom.m_TransparentMaterialNumber)
 , m_Id(glc::GLC_GenGeomID())
 , m_Name(sourceGeom.m_Name)
+, m_UseVbo(sourceGeom.m_UseVbo)
 {
 	// Add this mesh to inner material
 	MaterialHash::const_iterator i= sourceGeom.m_MaterialHash.constBegin();
@@ -95,6 +98,7 @@ GLC_Geometry& GLC_Geometry::operator=(const GLC_Geometry& sourceGeom)
 		m_TransparentMaterialNumber= sourceGeom.m_TransparentMaterialNumber;
 		m_Id= glc::GLC_GenGeomID();
 		m_Name= sourceGeom.m_Name;
+		m_UseVbo= sourceGeom.m_UseVbo;
 	}
 	return *this;
 }
@@ -132,6 +136,11 @@ unsigned int GLC_Geometry::faceCount(int) const
 unsigned int GLC_Geometry::VertexCount() const
 {
 	return 0;
+}
+
+double GLC_Geometry::volume()
+{
+	return 0.0;
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -179,7 +188,6 @@ void GLC_Geometry::updateTransparentMaterialNumber()
 	}
 	if (m_WireColor.alpha() != 255)
 	{
-		qDebug() << "GLC_Geometry::updateTransparentMaterialNumber()";
 		++m_TransparentMaterialNumber;
 	}
 }
@@ -187,8 +195,6 @@ void GLC_Geometry::updateTransparentMaterialNumber()
 // Add material to mesh
 void GLC_Geometry::addMaterial(GLC_Material* pMaterial)
 {
-	Q_ASSERT(!m_IsWire);
-
 	if (pMaterial != NULL)
 	{
 		const GLC_uint materialID= pMaterial->id();
@@ -232,6 +238,15 @@ void GLC_Geometry::copyVboToClientSide()
 void GLC_Geometry::releaseVboClientSide(bool update)
 {
 	m_WireData.releaseVboClientSide(update);
+}
+
+void GLC_Geometry::setVboUsage(bool usage)
+{
+	m_UseVbo= usage;
+	if (!usage || (usage && GLC_State::vboSupported()))
+	{
+		m_WireData.setVboUsage(m_UseVbo);
+	}
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -283,7 +298,7 @@ void GLC_Geometry::render(const GLC_RenderProperties& renderProperties)
 		GLenum error= glGetError();
 		if (error != GL_NO_ERROR)
 		{
-			GLC_OpenGlException OpenGlException("GLC_Geometry::glExecute " + name(), error);
+			GLC_OpenGlException OpenGlException("GLC_Geometry::render " + name(), error);
 			throw(OpenGlException);
 		}
 	}
@@ -297,7 +312,7 @@ void GLC_Geometry::glPropGeom(const GLC_RenderProperties& renderProperties)
 	if(m_IsWire)
 	{
 		glLineWidth(m_LineWidth);
-		glDisable(GL_LIGHTING);
+		GLC_Context::current()->glcEnableLighting(false);;
 		if (!renderProperties.isSelected())
 		{
 			// Set polyline colors
@@ -318,13 +333,13 @@ void GLC_Geometry::glPropGeom(const GLC_RenderProperties& renderProperties)
 		GLC_Material* pCurrentMaterial= m_MaterialHash.begin().value();
 		if (pCurrentMaterial->hasTexture())
 		{
-			glEnable(GL_LIGHTING);
+			GLC_Context::current()->glcEnableLighting(true);
 			pCurrentMaterial->glExecute();
 			if (renderProperties.isSelected()) GLC_SelectionMaterial::glExecute();
 		}
 		else
 		{
-			glEnable(GL_LIGHTING);
+			GLC_Context::current()->glcEnableLighting(true);
 			if (renderProperties.isSelected()) GLC_SelectionMaterial::glExecute();
 			else pCurrentMaterial->glExecute();
 		}

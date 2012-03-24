@@ -24,6 +24,7 @@
 
 #include "glc_mesh.h"
 #include "../glc_renderstatistics.h"
+#include "../glc_context.h"
 
 // Class chunk id
 quint32 GLC_Mesh::m_ChunkId= 0xA701;
@@ -167,7 +168,7 @@ const GLC_BoundingBox& GLC_Mesh::boundingBox()
 
 		if (m_MeshData.positionVectorHandle()->isEmpty())
 		{
-			qDebug() << "GLC_ExtendedMesh::getBoundingBox empty m_Positions";
+			qDebug() << "GLC_Mesh::boundingBox empty m_Positions";
 		}
 		else
 		{
@@ -210,7 +211,7 @@ QVector<GLuint> GLC_Mesh::getTrianglesIndex(int lod, GLC_uint materialId) const
 	GLC_PrimitiveGroup* pPrimitiveGroup= m_PrimitiveGroups.value(lod)->value(materialId);
 
 	int offset= 0;
-	if (GLC_State::vboUsed())
+	if (vboIsUsed())
 	{
 		offset= static_cast<int>(reinterpret_cast<GLsizeiptr>(pPrimitiveGroup->trianglesIndexOffset()) / sizeof(GLuint));
 	}
@@ -258,7 +259,7 @@ QList<QVector<GLuint> > GLC_Mesh::getStripsIndex(int lod, GLC_uint materialId) c
 	QList<int> sizes;
 	int stripsCount;
 
-	if (GLC_State::vboUsed())
+	if (vboIsUsed())
 	{
 		stripsCount= pPrimitiveGroup->stripsOffset().size();
 		for (int i= 0; i < stripsCount; ++i)
@@ -331,7 +332,7 @@ QList<QVector<GLuint> > GLC_Mesh::getFansIndex(int lod, GLC_uint materialId) con
 	QList<int> sizes;
 	int fansCount;
 
-	if (GLC_State::vboUsed())
+	if (vboIsUsed())
 	{
 		fansCount= pPrimitiveGroup->fansOffset().size();
 		for (int i= 0; i < fansCount; ++i)
@@ -453,6 +454,59 @@ GLC_Mesh& GLC_Mesh::transformVertice(const GLC_Matrix4x4& matrix)
 	}
 
 	return *this;
+}
+
+double GLC_Mesh::volume()
+{
+	double resultVolume= 0.0;
+
+	if (!m_MeshData.isEmpty())
+	{
+		IndexList triangleIndex;
+		QList<GLC_Material*> materials= materialSet().toList();
+		const int materialsCount= materials.count();
+		for (int i= 0; i < materialsCount; ++i)
+		{
+			GLC_uint materialId= materials.at(i)->id();
+			if (containsTriangles(0, materialId))
+			{
+				triangleIndex.append(getTrianglesIndex(0, materialId).toList());
+			}
+			if (containsStrips(0, materialId))
+			{
+				triangleIndex.append(equivalentTrianglesIndexOfstripsIndex(0, materialId));
+			}
+			if (containsFans(0, materialId))
+			{
+				triangleIndex.append(equivalentTrianglesIndexOfFansIndex(0, materialId));
+			}
+		}
+
+		GLfloatVector vertices= m_MeshData.positionVector();
+		Q_ASSERT((triangleIndex.count() % 3) == 0);
+		const int triangleCount= triangleIndex.count() / 3;
+		for (int i= 0; i < triangleCount; ++i)
+		{
+			const int index= i * 3;
+			const double v1x= vertices.at(triangleIndex.at(index) * 3);
+			const double v1y= vertices.at(triangleIndex.at(index) * 3 + 1);
+			const double v1z= vertices.at(triangleIndex.at(index) * 3 + 2);
+
+			const double v2x= vertices.at(triangleIndex.at(index + 1) * 3);
+			const double v2y= vertices.at(triangleIndex.at(index + 1) * 3 + 1);
+			const double v2z= vertices.at(triangleIndex.at(index + 1) * 3 + 2);
+
+			const double v3x= vertices.at(triangleIndex.at(index + 2) * 3);
+			const double v3y= vertices.at(triangleIndex.at(index + 2) * 3 + 1);
+			const double v3z= vertices.at(triangleIndex.at(index + 2) * 3 + 2);
+
+			resultVolume+= ((v2y - v1y) * (v3z - v1z) - (v2z - v1z) * (v3y - v1y)) * (v1x + v2x + v3x);
+		}
+
+		resultVolume= resultVolume / 6.0;
+	}
+
+	return resultVolume;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -581,8 +635,11 @@ void GLC_Mesh::reverseNormals()
 	{
 		(*pNormalVector)[i]= - pNormalVector->at(i);
 	}
-	// Invalid the geometry
-	m_GeometryIsValid = false;
+	if (vboIsUsed())
+	{
+		m_MeshData.fillVbo(GLC_MeshData::GLC_Normal);
+		m_MeshData.useVBO(false, GLC_MeshData::GLC_Normal);
+	}
 }
 
 // Copy index list in a vector for Vertex Array Use
@@ -592,14 +649,7 @@ void GLC_Mesh::finish()
 
 	m_MeshData.finishLod();
 
-	if (GLC_State::vboUsed())
-	{
-		finishVbo();
-	}
-	else
-	{
-		finishNonVbo();
-	}
+	moveIndexToMeshDataLod();
 
 	//qDebug() << "Mesh mem size= " << memmorySize();
 }
@@ -692,6 +742,15 @@ void GLC_Mesh::releaseVboClientSide(bool update)
 	GLC_Geometry::releaseVboClientSide(update);
 }
 
+void GLC_Mesh::setVboUsage(bool usage)
+{
+	if (!isEmpty())
+	{
+		GLC_Geometry::setVboUsage(usage);
+		m_MeshData.setVboUsage(usage);
+	}
+}
+
 // Load the mesh from binary data stream
 void GLC_Mesh::loadFromDataStream(QDataStream& stream, const MaterialHash& materialHash, const QHash<GLC_uint, GLC_uint>& materialIdMap)
 {
@@ -749,7 +808,6 @@ void GLC_Mesh::loadFromDataStream(QDataStream& stream, const MaterialHash& mater
 	stream >> m_NumberOfNormals;
 
 	finishSerialized();
-	//qDebug() << "Mesh mem size= " << memmorySize();
 }
 
 // Save the mesh to binary data stream
@@ -802,9 +860,10 @@ void GLC_Mesh::saveToDataStream(QDataStream& stream) const
 // Virtual interface for OpenGL Geometry set up.
 void GLC_Mesh::glDraw(const GLC_RenderProperties& renderProperties)
 {
-	Q_ASSERT(m_GeometryIsValid || !m_MeshData.normalVectorHandle()->isEmpty());
 
-	const bool vboIsUsed= GLC_State::vboUsed();
+	Q_ASSERT(m_GeometryIsValid || !m_MeshData.positionSizeIsSet());
+
+	const bool vboIsUsed= GLC_Geometry::vboIsUsed()  && GLC_State::vboSupported();
 
 	if (m_IsSelected && (renderProperties.renderingMode() == glc::PrimitiveSelected) && !GLC_State::isInSelectionMode()
 	&& !renderProperties.setOfSelectedPrimitiveIdIsEmpty())
@@ -817,20 +876,9 @@ void GLC_Mesh::glDraw(const GLC_RenderProperties& renderProperties)
 		m_MeshData.createVBOs();
 
 		// Create VBO and IBO
-		if (!m_GeometryIsValid && !m_MeshData.positionVectorHandle()->isEmpty())
+		if (!m_GeometryIsValid && !m_MeshData.positionSizeIsSet())
 		{
 			fillVbosAndIbos();
-		}
-		else if (!m_GeometryIsValid && !m_MeshData.normalVectorHandle()->isEmpty())
-		{
-			// Normals has been inversed update normal vbo
-			m_MeshData.useVBO(true, GLC_MeshData::GLC_Normal);
-
-			GLfloatVector* pNormalVector= m_MeshData.normalVectorHandle();
-			const GLsizei dataNbr= static_cast<GLsizei>(pNormalVector->size());
-			const GLsizeiptr dataSize= dataNbr * sizeof(GLfloat);
-			glBufferData(GL_ARRAY_BUFFER, dataSize, pNormalVector->data(), GL_STATIC_DRAW);
-			m_MeshData.normalVectorHandle()->clear();
 		}
 
 		// Activate mesh VBOs and IBO of the current LOD
@@ -838,6 +886,10 @@ void GLC_Mesh::glDraw(const GLC_RenderProperties& renderProperties)
 	}
 	else
 	{
+		if (!m_GeometryIsValid)
+		{
+			m_MeshData.initPositionSize();
+		}
 		activateVertexArray();
 	}
 
@@ -893,6 +945,9 @@ void GLC_Mesh::glDraw(const GLC_RenderProperties& renderProperties)
 		case glc::OverwriteTransparency:
 			OverwriteTransparencyRenderLoop(renderProperties, vboIsUsed);
 			break;
+		case glc::OverwriteTransparencyAndMaterial:
+			OverwriteTransparencyAndMaterialRenderLoop(renderProperties, vboIsUsed);
+			break;
 		case glc::OverwritePrimitiveMaterial:
 			if ((m_CurrentLod == 0) && !renderProperties.hashOfOverwritePrimitiveMaterialsIsEmpty())
 				primitiveRenderLoop(renderProperties, vboIsUsed);
@@ -907,11 +962,6 @@ void GLC_Mesh::glDraw(const GLC_RenderProperties& renderProperties)
 
 
 	// Restore client state
-	if (vboIsUsed)
-	{
-		m_MeshData.useIBO(false);
-		m_MeshData.useVBO(false, GLC_MeshData::GLC_Normal);
-	}
 
 	if (m_ColorPearVertex && !m_IsSelected && !GLC_State::isInSelectionMode())
 	{
@@ -923,12 +973,18 @@ void GLC_Mesh::glDraw(const GLC_RenderProperties& renderProperties)
 	glDisableClientState(GL_NORMAL_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
+	if (vboIsUsed)
+	{
+		QGLBuffer::release(QGLBuffer::IndexBuffer);
+		QGLBuffer::release(QGLBuffer::VertexBuffer);
+	}
+
 	// Draw mesh's wire if necessary
 	if ((renderProperties.renderingFlag() == glc::WireRenderFlag) && !m_WireData.isEmpty() && !GLC_Geometry::typeIsWire())
 	{
 		if (!GLC_State::isInSelectionMode())
 		{
-			glDisable(GL_LIGHTING);
+			GLC_Context::current()->glcEnableLighting(false);
 			// Set polyline colors
 			GLfloat color[4]= {static_cast<float>(m_WireColor.redF()),
 									static_cast<float>(m_WireColor.greenF()),
@@ -937,7 +993,7 @@ void GLC_Mesh::glDraw(const GLC_RenderProperties& renderProperties)
 
 			glColor4fv(color);
 			m_WireData.glDraw(renderProperties, GL_LINE_STRIP);
-			glEnable(GL_LIGHTING);
+			GLC_Context::current()->glcEnableLighting(true);
 		}
 		else
 		{
@@ -1011,54 +1067,38 @@ GLC_uint GLC_Mesh::setCurrentMaterial(GLC_Material* pMaterial, int lod, double a
 // Fill VBOs and IBOs
 void GLC_Mesh::fillVbosAndIbos()
 {
-	// Create VBO of vertices
+	// Fill VBO of vertices
 	m_MeshData.fillVbo(GLC_MeshData::GLC_Vertex);
 
-	// Create VBO of normals
+	// Fill VBO of normals
 	m_MeshData.fillVbo(GLC_MeshData::GLC_Normal);
 
-	// Create VBO of texel if needed
+	// Fill VBO of texel if needed
 	m_MeshData.fillVbo(GLC_MeshData::GLC_Texel);
 
-	// Create VBO of color if needed
+	// Fill VBO of color if needed
 	m_MeshData.fillVbo(GLC_MeshData::GLC_Color);
 
-	const int lodNumber= m_MeshData.lodCount();
-	for (int i= 0; i < lodNumber; ++i)
-	{
-		//Create LOD IBO
-		if (!m_MeshData.indexVectorHandle(i)->isEmpty())
-		{
-			QVector<GLuint>* pIndexVector= m_MeshData.indexVectorHandle(i);
-			m_MeshData.useIBO(true, i);
-			const GLsizei indexNbr= static_cast<GLsizei>(pIndexVector->size());
-			const GLsizeiptr indexSize = indexNbr * sizeof(GLuint);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexSize, pIndexVector->data(), GL_STATIC_DRAW);
-		}
-	}
-	// Remove client side data
-	m_MeshData.finishVbo();
+	// Fill a lod IBO
+	m_MeshData.fillLodIbo();
 
 }
 // set primitive group offset
 void GLC_Mesh::finishSerialized()
 {
-	if (GLC_State::vboUsed())
+	PrimitiveGroupsHash::iterator iGroups= m_PrimitiveGroups.begin();
+	while (iGroups != m_PrimitiveGroups.constEnd())
 	{
-		PrimitiveGroupsHash::iterator iGroups= m_PrimitiveGroups.begin();
-		while (iGroups != m_PrimitiveGroups.constEnd())
+		LodPrimitiveGroups::iterator iGroup= iGroups.value()->begin();
+		while (iGroup != iGroups.value()->constEnd())
 		{
-			LodPrimitiveGroups::iterator iGroup= iGroups.value()->begin();
-			while (iGroup != iGroups.value()->constEnd())
-			{
-				iGroup.value()->changeToVboMode();
-				++iGroup;
-			}
-			++iGroups;
+			iGroup.value()->computeVboOffset();
+			++iGroup;
 		}
+		++iGroups;
 	}
 }
-
+/*
 // Move Indexs from the primitive groups to the mesh Data LOD and Set IBOs offsets
 void GLC_Mesh::finishVbo()
 {
@@ -1097,11 +1137,12 @@ void GLC_Mesh::finishVbo()
 
 	}
 }
+*/
 
 // Move Indexs from the primitive groups to the mesh Data LOD and Set Index offsets
-void GLC_Mesh::finishNonVbo()
+void GLC_Mesh::moveIndexToMeshDataLod()
 {
-	//qDebug() << "GLC_Mesh::finishNonVbo()";
+	//qDebug() << "GLC_Mesh::moveIndexToMeshDataLod()";
 	PrimitiveGroupsHash::iterator iGroups= m_PrimitiveGroups.begin();
 	while (iGroups != m_PrimitiveGroups.constEnd())
 	{
@@ -1130,6 +1171,7 @@ void GLC_Mesh::finishNonVbo()
 				(*m_MeshData.indexVectorHandle(currentLod))+= iGroup.value()->fansIndex().toVector();
 			}
 
+			iGroup.value()->computeVboOffset();
 			iGroup.value()->finish();
 			++iGroup;
 		}
@@ -1166,9 +1208,13 @@ void GLC_Mesh::normalRenderLoop(const GLC_RenderProperties& renderProperties, bo
 			{
 
 				if (vboIsUsed)
+				{
 					vboDrawPrimitivesOf(pCurrentGroup);
+				}
 				else
+				{
 					vertexArrayDrawPrimitivesOf(pCurrentGroup);
+				}
 			}
 
 			++iGroup;
@@ -1240,6 +1286,40 @@ void GLC_Mesh::OverwriteTransparencyRenderLoop(const GLC_RenderProperties& rende
 			}
 			++iGroup;
 		}
+	}
+}
+
+void GLC_Mesh::OverwriteTransparencyAndMaterialRenderLoop(const GLC_RenderProperties& renderProperties, bool vboIsUsed)
+{
+	// Get transparency value
+	const float alpha= renderProperties.overwriteTransparency();
+	Q_ASSERT(-1.0f != alpha);
+
+	// Get the overwrite material
+	GLC_Material* pOverwriteMaterial= renderProperties.overwriteMaterial();
+	Q_ASSERT(NULL != pOverwriteMaterial);
+	pOverwriteMaterial->glExecute(alpha);
+	if (m_IsSelected) GLC_SelectionMaterial::glExecute();
+
+	LodPrimitiveGroups::iterator iGroup= m_PrimitiveGroups.value(m_CurrentLod)->begin();
+	while (iGroup != m_PrimitiveGroups.value(m_CurrentLod)->constEnd())
+	{
+		GLC_PrimitiveGroup* pCurrentGroup= iGroup.value();
+
+		// Test if the current material is renderable
+		bool materialIsrenderable = (renderProperties.renderingFlag() == glc::TransparentRenderFlag);
+
+   		// Choose the primitives to render
+		if (m_IsSelected || materialIsrenderable)
+		{
+
+			if (vboIsUsed)
+				vboDrawPrimitivesOf(pCurrentGroup);
+			else
+				vertexArrayDrawPrimitivesOf(pCurrentGroup);
+		}
+
+		++iGroup;
 	}
 }
 
@@ -1475,3 +1555,61 @@ void GLC_Mesh::copyBulkData(GLC_Mesh* pLodMesh, const QHash<GLuint, GLuint>& tag
 		tempFloatVector.clear();
 	}
 }
+
+IndexList GLC_Mesh::equivalentTrianglesIndexOfstripsIndex(int lodIndex, GLC_uint materialId)
+{
+	IndexList trianglesIndex;
+	if (containsStrips(lodIndex, materialId))
+	{
+		const QList<QVector<GLuint> > stripsIndex= getStripsIndex(lodIndex, materialId);
+		const int stripCount= stripsIndex.count();
+		for (int i= 0; i < stripCount; ++i)
+		{
+			const QVector<GLuint> currentStripIndex= stripsIndex.at(i);
+
+			trianglesIndex.append(currentStripIndex.at(0));
+			trianglesIndex.append(currentStripIndex.at(1));
+			trianglesIndex.append(currentStripIndex.at(2));
+			const int stripSize= currentStripIndex.size();
+			for (int j= 3; j < stripSize; ++j)
+			{
+				if ((j % 2) != 0)
+				{
+					trianglesIndex.append(currentStripIndex.at(j));
+					trianglesIndex.append(currentStripIndex.at(j - 1));
+					trianglesIndex.append(currentStripIndex.at(j - 2));
+				}
+				else
+				{
+					trianglesIndex.append(currentStripIndex.at(j));
+					trianglesIndex.append(currentStripIndex.at(j - 2));
+					trianglesIndex.append(currentStripIndex.at(j - 1));
+				}
+			}
+		}
+	}
+	return trianglesIndex;
+}
+
+IndexList GLC_Mesh::equivalentTrianglesIndexOfFansIndex(int lodIndex, GLC_uint materialId)
+{
+	IndexList trianglesIndex;
+	if (containsFans(lodIndex, materialId))
+	{
+		const QList<QVector<GLuint> > fanIndex= getFansIndex(lodIndex, materialId);
+		const int fanCount= fanIndex.count();
+		for (int i= 0; i < fanCount; ++i)
+		{
+			const QVector<GLuint> currentFanIndex= fanIndex.at(i);
+			const int size= currentFanIndex.size();
+			for (int j= 1; j < size - 1; ++j)
+			{
+				trianglesIndex.append(currentFanIndex.first());
+				trianglesIndex.append(currentFanIndex.at(j));
+				trianglesIndex.append(currentFanIndex.at(j + 1));
+			}
+		}
+	}
+	return trianglesIndex;
+}
+

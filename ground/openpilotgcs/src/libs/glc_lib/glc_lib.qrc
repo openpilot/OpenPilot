@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/GLC_lib_Shaders" >
+ 		<file alias="default_frag">shading/shaders/default.frag</file>
+ 		<file alias="default_vert">shading/shaders/default.vert</file>
+     </qresource>
+</RCC>

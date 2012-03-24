@@ -25,26 +25,27 @@
 #include "glc_viewport.h"
 #include "../glc_openglexception.h"
 #include "../glc_factory.h"
+#include "../glc_context.h"
 #include <QtDebug>
 
 //////////////////////////////////////////////////////////////////////
 // Constructor Destructor
 //////////////////////////////////////////////////////////////////////
 
-GLC_ImagePlane::GLC_ImagePlane(const QGLContext *pContext, const QString& ImageName)
-: m_Material()
+GLC_ImagePlane::GLC_ImagePlane(const QString& ImageName)
+: m_Representation(GLC_Factory::instance()->createRectangle(2.0, 2.0))
 {
-	GLC_Texture* pImgTexture= GLC_Factory::instance(pContext)->createTexture(ImageName);
+	GLC_Texture* pImgTexture= GLC_Factory::instance()->createTexture(ImageName);
 	pImgTexture->setMaxTextureSize(pImgTexture->imageOfTexture().size());
-	m_Material.setTexture(pImgTexture);
+	m_Representation.geomAt(0)->addMaterial(new GLC_Material(pImgTexture));
 }
 
-GLC_ImagePlane::GLC_ImagePlane(const QGLContext *pContext, const QImage& image)
-: m_Material()
+GLC_ImagePlane::GLC_ImagePlane(const QImage& image)
+: m_Representation(GLC_Factory::instance()->createRectangle(2.0, 2.0))
 {
-	GLC_Texture* pImgTexture= GLC_Factory::instance(pContext)->createTexture(image);
+	GLC_Texture* pImgTexture= GLC_Factory::instance()->createTexture(image);
 	pImgTexture->setMaxTextureSize(image.size());
-	m_Material.setTexture(pImgTexture);
+	m_Representation.geomAt(0)->addMaterial(new GLC_Material(pImgTexture));
 }
 
 GLC_ImagePlane::~GLC_ImagePlane()
@@ -58,34 +59,22 @@ GLC_ImagePlane::~GLC_ImagePlane()
 
 void GLC_ImagePlane::render()
 {
-	m_Material.glExecute();
-	// Display info area
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	glOrtho(-1,1,-1,1,-1,1);
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
+	GLC_Context::current()->glcMatrixMode(GL_PROJECTION);
+	GLC_Context::current()->glcPushMatrix();
+	GLC_Context::current()->glcLoadIdentity();
+	GLC_Context::current()->glcOrtho(-1,1,-1,1,-1,1);
+	GLC_Context::current()->glcMatrixMode(GL_MODELVIEW);
 
 	glDisable(GL_BLEND);
 	glDisable(GL_DEPTH_TEST);
 	glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	glBegin(GL_QUADS);
 
-		glNormal3d(0.0, 0.0, 1.0);	// Z
-		glTexCoord2f(0.0f, 0.0f); glVertex3d(-1.0, -1.0, 0.0);
-		glTexCoord2f(1.0f, 0.0f); glVertex3d(1.0, -1.0, 0.0);
-		glTexCoord2f(1.0f, 1.0f); glVertex3d(1.0, 1.0, 0.0);
-		glTexCoord2f(0.0f, 1.0f); glVertex3d(-1.0, 1.0, 0.0);
+	m_Representation.render();
 
-	glEnd();
 	glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glEnable(GL_DEPTH_TEST);
 
-	glPopMatrix();
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
-	glMatrixMode(GL_MODELVIEW);
+	GLC_Context::current()->glcMatrixMode(GL_PROJECTION);
+	GLC_Context::current()->glcPopMatrix();
+	GLC_Context::current()->glcMatrixMode(GL_MODELVIEW);
 }

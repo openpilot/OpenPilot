@@ -36,7 +36,7 @@ GLC_Sphere::GLC_Sphere(double radius)
 , m_PhiMin(-glc::PI / 2.0)
 , m_PhiMax(glc::PI / 2.0)
 {
-
+	createMesh();
 }
 
 
@@ -49,7 +49,7 @@ GLC_Sphere::GLC_Sphere(const GLC_Sphere & sphere)
 , m_PhiMin(sphere.m_PhiMin)
 , m_PhiMax(sphere.m_PhiMax)
 {
-
+	createMesh();
 }
 
 GLC_Sphere::~GLC_Sphere()
@@ -92,8 +92,19 @@ void GLC_Sphere::setDiscretion(int TargetDiscret)
 	}
 }
 
+void GLC_Sphere::glDraw(const GLC_RenderProperties& renderProperties)
+{
+	if (GLC_Mesh::isEmpty())
+	{
+		createMesh();
+	}
+
+	GLC_Mesh::glDraw(renderProperties);
+}
+
 void GLC_Sphere::createMesh()
 {
+
 	Q_ASSERT(GLC_Mesh::isEmpty());
 
 	GLfloatVector verticeFloat;
@@ -153,8 +164,8 @@ void GLC_Sphere::createMesh()
 			xf= m_Radius * cost * cospp;
 			yf= m_Radius * sint * cospp;
 
-			verticeFloat << xi << yi << zi << xf << yf << zf;
- 			normalsFloat << cost * cosp << sint * cosp << sinp << cost * cospp << sint * cospp << sinpp ;
+			verticeFloat << xf << yf << zf << xi << yi << zi;
+			normalsFloat << cost * cospp << sint * cospp << sinpp << cost * cosp << sint * cosp << sinp;
  			texelVector << static_cast<double>(t) * 1.0 / static_cast<double>(nbThetaSteps)
 						<< static_cast<double>(p) * 1.0 / static_cast<double>(nbPhiSteps)
 						<< static_cast<double>(t) * 1.0 / static_cast<double>(nbThetaSteps)

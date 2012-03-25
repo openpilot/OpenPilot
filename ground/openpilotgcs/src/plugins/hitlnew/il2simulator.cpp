@@ -263,16 +263,16 @@ void IL2Simulator::processUpdate(const QByteArray& inp)
         // Update positionActual objects
         PositionActual::DataFields posData;
         memset(&posData, 0, sizeof(PositionActual::DataFields));
-        posData.North =  current.Y*100;
-        posData.East = current.X*100;
-        posData.Down = current.Z*-100;
+        posData.North =  current.Y;
+        posData.East = current.X;
+        posData.Down = current.Z*-1.;
 
         // Update velocityActual objects
         VelocityActual::DataFields velData;
         memset(&velData, 0, sizeof(VelocityActual::DataFields));
-        velData.North = current.dY*100;
-        velData.East = current.dX*100;
-        velData.Down = current.dZ*-100;
+        velData.North = current.dY;
+        velData.East = current.dX;
+        velData.Down = current.dZ*-1.;
 
         // Update AttitudeRaw object (filtered gyros and accels only for now)
         //AttitudeRaw::DataFields rawData;
@@ -321,9 +321,9 @@ void IL2Simulator::processUpdate(const QByteArray& inp)
 		homeData.RNE[t]=RNE[t];
 	}
         Utils::CoordinateConversions().LLA2ECEF(LLA,ECEF);
-        homeData.ECEF[0]=ECEF[0]*100;
-        homeData.ECEF[1]=ECEF[1]*100;
-        homeData.ECEF[2]=ECEF[2]*100;
+        homeData.ECEF[0]=ECEF[0];
+        homeData.ECEF[1]=ECEF[1];
+        homeData.ECEF[2]=ECEF[2];
         homeData.Be[0]=0;
         homeData.Be[1]=0;
         homeData.Be[2]=0;

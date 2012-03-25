@@ -312,9 +312,9 @@ void FGSimulator::processUpdate(const QByteArray& inp)
                     homeData.RNE[t]=RNE[t];
             }
             Utils::CoordinateConversions().LLA2ECEF(LLA,ECEF);
-            homeData.ECEF[0]=ECEF[0]*100;
-            homeData.ECEF[1]=ECEF[1]*100;
-            homeData.ECEF[2]=ECEF[2]*100;
+            homeData.ECEF[0]=ECEF[0];
+            homeData.ECEF[1]=ECEF[1];
+            homeData.ECEF[2]=ECEF[2];
             homeData.Be[0]=0;
             homeData.Be[1]=0;
             homeData.Be[2]=0;
@@ -335,7 +335,7 @@ void FGSimulator::processUpdate(const QByteArray& inp)
 	memset(&positionActualData, 0, sizeof(PositionActual::DataFields));
         positionActualData.North = 0; //Currently hardcoded as there is no way of setting up a reference point to calculate distance
 	positionActualData.East = 0; //Currently hardcoded as there is no way of setting up a reference point to calculate distance
-	positionActualData.Down = (altitude * 100); //Multiply by 100 because positionActual expects input in Centimeters.
+	positionActualData.Down = altitude ; //Multiply by 1 because positionActual expects input in meters.
         posActual->setData(positionActualData);
 
 	// Update AltitudeActual object
@@ -373,12 +373,12 @@ void FGSimulator::processUpdate(const QByteArray& inp)
         float NED[3];
         double LLA[3] = {(double) gpsData.Latitude / 1e7, (double) gpsData.Longitude / 1e7, (double) (gpsData.GeoidSeparation + gpsData.Altitude)};
         // convert from cm back to meters
-        double ECEF[3] = {(double) (homeData.ECEF[0] / 100), (double) (homeData.ECEF[1] / 100), (double) (homeData.ECEF[2] / 100)};
+        double ECEF[3] = {(double) (homeData.ECEF[0] ), (double) (homeData.ECEF[1] ), (double) (homeData.ECEF[2] )};
                 Utils::CoordinateConversions().LLA2Base(LLA, ECEF, (float (*)[3]) homeData.RNE, NED);
 
-        positionActualData.North = NED[0]*100; //Currently hardcoded as there is no way of setting up a reference point to calculate distance
-        positionActualData.East = NED[1]*100; //Currently hardcoded as there is no way of setting up a reference point to calculate distance
-        positionActualData.Down = NED[2]*100; //Multiply by 100 because positionActual expects input in Centimeters.
+        positionActualData.North = NED[0]; //Currently hardcoded as there is no way of setting up a reference point to calculate distance
+        positionActualData.East = NED[1]; //Currently hardcoded as there is no way of setting up a reference point to calculate distance
+        positionActualData.Down = NED[2]; //Multiply by 1 because positionActual expects input in meters.
         posActual->setData(positionActualData);
 
         // Update AttitudeRaw object (filtered gyros only for now)

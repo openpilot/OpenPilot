@@ -310,9 +310,9 @@ void XplaneSimulator::processUpdate(const QByteArray& dataBuf)
                             homeData.RNE[t]=RNE[t];
                     }
                     Utils::CoordinateConversions().LLA2ECEF(LLA,ECEF);
-                    homeData.ECEF[0]=ECEF[0]*100;
-                    homeData.ECEF[1]=ECEF[1]*100;
-                    homeData.ECEF[2]=ECEF[2]*100;
+                    homeData.ECEF[0]=ECEF[0];
+                    homeData.ECEF[1]=ECEF[1];
+                    homeData.ECEF[2]=ECEF[2];
                     homeData.Be[0]=0;
                     homeData.Be[1]=0;
                     homeData.Be[2]=0;
@@ -368,17 +368,17 @@ void XplaneSimulator::processUpdate(const QByteArray& dataBuf)
                 // Update VelocityActual.{Nort,East,Down}
                 VelocityActual::DataFields velocityActualData;
                 memset(&velocityActualData, 0, sizeof(VelocityActual::DataFields));
-                velocityActualData.North = velY*100;
-                velocityActualData.East = velX*100;
-                velocityActualData.Down = -velZ*100;
+                velocityActualData.North = velY;
+                velocityActualData.East = velX;
+                velocityActualData.Down = -velZ;
                 velActual->setData(velocityActualData);
 
                 // Update PositionActual.{Nort,East,Down}
                 PositionActual::DataFields positionActualData;
                 memset(&positionActualData, 0, sizeof(PositionActual::DataFields));
-                positionActualData.North = (dstY-initY)*100;
-                positionActualData.East = (dstX-initX)*100;
-                positionActualData.Down = -(dstZ-initZ)*100;
+                positionActualData.North = (dstY-initY);
+                positionActualData.East = (dstX-initX);
+                positionActualData.Down = -(dstZ-initZ);
                 posActual->setData(positionActualData);
 
                 // Update AttitudeRaw object (filtered gyros only for now)

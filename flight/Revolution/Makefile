@@ -49,7 +49,7 @@ endif
 FLASH_TOOL = OPENOCD
 
 # List of modules to include
-MODULES = Sensors Attitude/revolution ManualControl Stabilization Altitude/revolution Actuator GPS FirmwareIAP 
+MODULES = Sensors Attitude/revolution ManualControl Stabilization Altitude/revolution Actuator GPS Guidance FirmwareIAP 
 MODULES += AltitudeHold
 MODULES += CameraStab
 MODULES += Telemetry

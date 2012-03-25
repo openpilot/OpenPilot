@@ -60,6 +60,8 @@
 #include "baroaltitude.h"
 #include "CoordinateConversions.h"
 
+#include <pios_board_info.h>
+
 // Private constants
 #define STACK_SIZE_BYTES 1540
 #define TASK_PRIORITY (tskIDLE_PRIORITY+3)
@@ -152,8 +154,8 @@ static void SensorsTask(void *parameters)
 	uint32_t gyro_samples;
 	int32_t accel_accum[3] = {0, 0, 0};
 	int32_t gyro_accum[3] = {0,0,0};
-	float gyro_scaling;
-	float accel_scaling;
+	float gyro_scaling = 0;
+	float accel_scaling = 0;
 	static int32_t timeval;
 
 	AlarmsClear(SYSTEMALARMS_ALARM_SENSORS);
@@ -161,19 +163,31 @@ static void SensorsTask(void *parameters)
 	UAVObjEvent ev;
 	settingsUpdatedCb(&ev);
 
-#if defined(PIOS_INCLUDE_MPU6000)
-	gyro_test = PIOS_MPU6000_Test();
-#if !defined(PIOS_INCLUDE_BMA180)
-	accel_test = gyro_test;
-#endif
-#elif defined(PIOS_INCLUDE_L3GD20)
-	gyro_test = PIOS_L3GD20_Test();
+	const struct pios_board_info * bdinfo = &pios_board_info_blob;	
+
+	switch(bdinfo->board_rev) {
+		case 0x01:
+#if defined(PIOS_INCLUDE_L3GD20)
+			gyro_test = PIOS_L3GD20_Test();
 #endif
 #if defined(PIOS_INCLUDE_BMA180)
-	accel_test = PIOS_BMA180_Test();
+			accel_test = PIOS_BMA180_Test();
 #endif
+			break;
+		case 0x02:
+#if defined(PIOS_INCLUDE_MPU6000)
+			gyro_test = PIOS_MPU6000_Test();
+			accel_test = gyro_test;
+#endif
+			break;
+		default:
+			PIOS_DEBUG_Assert(0);
+	}
+
+#if defined(PIOS_INCLUDE_HMC5883)
 	mag_test = PIOS_HMC5883_Test();
-	
+#endif
+
 	if(accel_test < 0 || gyro_test < 0 || mag_test < 0) {
 		AlarmsSet(SYSTEMALARMS_ALARM_SENSORS, SYSTEMALARMS_ALARM_CRITICAL);
 		while(1) {
@@ -217,121 +231,121 @@ static void SensorsTask(void *parameters)
 		accel_samples = 0;
 		gyro_samples = 0;
 
-		// Make sure we get one sample
-#if !defined(PIOS_MPU6000_ACCEL)
-		struct pios_bma180_data accel;
+		AccelsData accelsData;
+		GyrosData gyrosData;
 
-		count = 0;
-		while((read_good = PIOS_BMA180_ReadFifo(&accel)) != 0 && !error)
-			error = ((xTaskGetTickCount() - lastSysTime) > SENSOR_PERIOD) ? true : error;
-		if (error) {
-			// Unfortunately if the BMA180 ever misses getting read, then it will not
-			// trigger more interrupts.  In this case we must force a read to kickstarts
-			// it.
-			struct pios_bma180_data data;
-			PIOS_BMA180_ReadAccels(&data);
-			continue;
-		}
-		while(read_good == 0) {	
-			count++;
-			
-			accel_accum[0] += accel.x;
-			accel_accum[1] += accel.y;
-			accel_accum[2] += accel.z;
-			
-			read_good = PIOS_BMA180_ReadFifo(&accel);
-		}
-		accel_samples = count;
-		accel_scaling = PIOS_BMA180_GetScale();
+		switch(bdinfo->board_rev) {
+			case 0x01:  // L3GD20 + BMA180 board
+#if defined(PIOS_INCLUDE_BMA180)
+			{
+				struct pios_bma180_data accel;
+				
+				count = 0;
+				while((read_good = PIOS_BMA180_ReadFifo(&accel)) != 0 && !error)
+					error = ((xTaskGetTickCount() - lastSysTime) > SENSOR_PERIOD) ? true : error;
+				if (error) {
+					// Unfortunately if the BMA180 ever misses getting read, then it will not
+					// trigger more interrupts.  In this case we must force a read to kickstarts
+					// it.
+					struct pios_bma180_data data;
+					PIOS_BMA180_ReadAccels(&data);
+					continue;
+				}
+				while(read_good == 0) {	
+					count++;
+					
+					accel_accum[0] += accel.x;
+					accel_accum[1] += accel.y;
+					accel_accum[2] += accel.z;
+					
+					read_good = PIOS_BMA180_ReadFifo(&accel);
+				}
+				accel_samples = count;
+				accel_scaling = PIOS_BMA180_GetScale();
+				
+				// Get temp from last reading
+				accelsData.temperature = 25.0f + ((float) accel.temperature - 2.0f) / 2.0f;
+			}
 #endif
+#if defined(PIOS_INCLUDE_L3GD20)
+			{
+				struct pios_l3gd20_data gyro;
+				gyro_samples = 0;
+				xQueueHandle gyro_queue = PIOS_L3GD20_GetQueue();
+				
+				if(xQueueReceive(gyro_queue, (void *) &gyro, 4) == errQUEUE_EMPTY) {
+					error = true;
+					continue;
+				}
+				
+				gyro_samples = 1;
+				gyro_accum[0] += gyro.gyro_x;
+				gyro_accum[1] += gyro.gyro_y;
+				gyro_accum[2] += gyro.gyro_z;
+				
+				gyro_scaling = PIOS_L3GD20_GetScale();
 
-// Using MPU6000 gyro and possibly accel
+				// Get temp from last reading
+				gyrosData.temperature = gyro.temperature;
+			}
+#endif
+				break;
+			case 0x02:  // MPU6000 board
 #if defined(PIOS_INCLUDE_MPU6000)
-		struct pios_mpu6000_data gyro;
+			{
+				struct pios_mpu6000_data gyro;
+				
+				count = 0;
+				while((read_good = PIOS_MPU6000_ReadFifo(&gyro)) != 0 && !error)
+					error = ((xTaskGetTickCount() - lastSysTime) > SENSOR_PERIOD) ? true : error;
+				if (error)
+					continue;
+				while(read_good == 0) {
+					count++;
+					
+					gyro_accum[0] += gyro.gyro_x;
+					gyro_accum[1] += gyro.gyro_y;
+					gyro_accum[2] += gyro.gyro_z;
+					
+					accel_accum[0] += gyro.accel_x;
+					accel_accum[1] += gyro.accel_y;
+					accel_accum[2] += gyro.accel_z;
+					
+					read_good = PIOS_MPU6000_ReadFifo(&gyro);
+				}
+				gyro_samples = count;
+				gyro_scaling = PIOS_MPU6000_GetScale();
+				
+				accel_samples = count;
+				accel_scaling = PIOS_MPU6000_GetAccelScale();
 
-		count = 0;
-		while((read_good = PIOS_MPU6000_ReadFifo(&gyro)) != 0 && !error)
-			error = ((xTaskGetTickCount() - lastSysTime) > SENSOR_PERIOD) ? true : error;
-		if (error)
-			continue;
-		while(read_good == 0) {
-			count++;
-			
-			gyro_accum[0] += gyro.gyro_x;
-			gyro_accum[1] += gyro.gyro_y;
-			gyro_accum[2] += gyro.gyro_z;
-			
-#if defined(PIOS_MPU6000_ACCEL)
-			accel_accum[0] += gyro.accel_x;
-			accel_accum[1] += gyro.accel_y;
-			accel_accum[2] += gyro.accel_z;
-#endif
-
-			read_good = PIOS_MPU6000_ReadFifo(&gyro);
-		}
-		gyro_samples = count;
-		gyro_scaling = PIOS_MPU6000_GetScale();
-
-#if defined(PIOS_MPU6000_ACCEL)
-		accel_samples = count;
-		accel_scaling = PIOS_MPU6000_GetAccelScale();
-#endif
-
-// Using L3DG20 gyro
-#elif defined(PIOS_INCLUDE_L3GD20)
-		struct pios_l3gd20_data gyro;
-		gyro_samples = 0;
-		xQueueHandle gyro_queue = PIOS_L3GD20_GetQueue();
-		
-		if(xQueueReceive(gyro_queue, (void *) &gyro, 4) == errQUEUE_EMPTY) {
-			error = true;
-			continue;
+				// Get temp from last reading
+				gyrosData.temperature = 35.0f + ((float) gyro.temperature + 512.0f) / 340.0f;
+				accelsData.temperature = 35.0f + ((float) gyro.temperature + 512.0f) / 340.0f;
+			}
+#endif /* PIOS_INCLUDE_MPU6000 */
+				break;
+			default:
+				PIOS_DEBUG_Assert(0);
 		}
 
-		gyro_samples = 1;
-		gyro_accum[0] += gyro.gyro_x;
-		gyro_accum[1] += gyro.gyro_y;
-		gyro_accum[2] += gyro.gyro_z;
-
-		gyro_scaling = PIOS_L3GD20_GetScale();
-
-#else
-//#error No gyro defined
-		struct gyro_data {float x; float y; float z; float temperature;} gyro;
-		gyro_scaling = 0;
-		gyro_samples = 1;
-#endif
-		float accels[3] = {(float) accel_accum[1] / accel_samples, (float) accel_accum[0] / accel_samples, -(float) accel_accum[2] / accel_samples};
-
-		// Not the swaping of channel orders
-#if defined(PIOS_MPU6000_ACCEL)
-		accel_scaling = PIOS_MPU6000_GetAccelScale();
-#else
-		accel_scaling = PIOS_BMA180_GetScale();
-#endif
-		AccelsData accelsData; // Skip get as we set all the fields
+		// Scale the accels
+		float accels[3] = {(float) accel_accum[1] / accel_samples, 
+		                   (float) accel_accum[0] / accel_samples,
+		                  -(float) accel_accum[2] / accel_samples};
 		accelsData.x = accels[0] * accel_scaling * accel_scale[0] - accel_bias[0];
 		accelsData.y = accels[1] * accel_scaling * accel_scale[1] - accel_bias[1];
 		accelsData.z = accels[2] * accel_scaling * accel_scale[2] - accel_bias[2];
-#if defined(BMA180)
-		accelsData.temperature = 25.0f + ((float) accel.temperature - 2.0f) / 2.0f;
-#elif defined(PIOS_MPU6000_ACCEL)
-		accelsData.temperature = 35.0f + ((float) gyro.temperature + 512.0f) / 340.0f;
-#endif
-		accelsData.temperature = 
 		AccelsSet(&accelsData);
 
-		float gyros[3] = {(float) gyro_accum[1] / gyro_samples, (float) gyro_accum[0] / gyro_samples, -(float) gyro_accum[2] / gyro_samples};
-
-		GyrosData gyrosData; // Skip get as we set all the fields
+		// Scale the gyros
+		float gyros[3] = {(float) gyro_accum[1] / gyro_samples,
+		                  (float) gyro_accum[0] / gyro_samples,
+		                 -(float) gyro_accum[2] / gyro_samples};
 		gyrosData.x = gyros[0] * gyro_scaling;
 		gyrosData.y = gyros[1] * gyro_scaling;
 		gyrosData.z = gyros[2] * gyro_scaling;
-#if defined(PIOS_INCLUDE_MPU6000)
-		gyrosData.temperature = 35.0f + ((float) gyro.temperature + 512.0f) / 340.0f;
-#else
-		gyrosData.temperature = gyro.temperature;
-#endif
+		
 		if (bias_correct_gyro) {
 			// Apply bias correction to the gyros
 			GyrosBiasData gyrosBias;
@@ -340,16 +354,14 @@ static void SensorsTask(void *parameters)
 			gyrosData.y += gyrosBias.y;
 			gyrosData.z += gyrosBias.z;
 		}
-		
 		GyrosSet(&gyrosData);
 		
 		// Because most crafts wont get enough information from gravity to zero yaw gyro, we try
 		// and make it average zero (weakly)
-		MagnetometerData mag;
-		bool mag_updated = false;
 
+#if defined(PIOS_INCLUDE_HMC5883)
+		MagnetometerData mag;
 		if (PIOS_HMC5883_NewDataAvailable() || PIOS_DELAY_DiffuS(mag_update_time) > 150000) {
-			mag_updated = true;
 			int16_t values[3];
 			PIOS_HMC5883_ReadMag(values);
 			mag.x = values[1] * mag_scale[0] - mag_bias[0];
@@ -358,60 +370,20 @@ static void SensorsTask(void *parameters)
 			MagnetometerSet(&mag);
 			mag_update_time = PIOS_DELAY_GetRaw();
 		}
+#endif
 
-		// For debugging purposes here we can output all of the sensors.  Do it as a single transaction
-		// so the message isn't split if anything else is writing to it
-		if(pios_com_aux_id != 0) {
-			uint32_t message_size = 3;
-			uint8_t message[200] = {0xff, (lastSysTime & 0xff00) >> 8, lastSysTime & 0x00ff};
-			
-			// Add accel data
-			memcpy(&message[message_size], &accelsData.x, sizeof(accelsData.x) * 3);
-			message_size += sizeof(accelsData.x) * 3;
-			
-			// Add gyro data with temp
-			memcpy(&message[message_size], &gyrosData, sizeof(gyrosData));
-			message_size += sizeof(gyrosData);
-			
-			if(mag_updated) { // Add mag data
-				message[message_size] = 0x01; // Indicate mag data here
-				message_size++;
-				memcpy(&message[message_size], &mag, sizeof(mag));
-				message_size += sizeof(mag);
-			}
-			
-			if(gps_updated) { // Add GPS data
-				gps_updated = false;
-				GPSPositionData gps;
-				GPSPositionGet(&gps);
-				message[message_size] = 0x02; // Indicate gps data here
-				message_size++;
-				memcpy(&message[message_size], &gps, sizeof(gps));
-				message_size += sizeof(gps);
-			}
-			
-			if(baro_updated) { // Add baro data
-				baro_updated = false;
-				BaroAltitudeData baro;
-				BaroAltitudeGet(&baro);
-				message[message_size] = 0x03; // Indicate mag data here
-				message_size++;
-				memcpy(&message[message_size], &baro, sizeof(baro));
-				message_size += sizeof(baro);
-			}
-			
-			PIOS_COM_SendBufferNonBlocking(pios_com_aux_id, message, message_size);
-
-		}
-		
 		PIOS_WDG_UpdateFlag(PIOS_WDG_SENSORS);
 
-		// For L3GD20 which runs at 760 then one cycle per sample
-#if defined(PIOS_INCLUDE_MPU6000) && !defined(PIOS_INCLUDE_L3GD20)
-		vTaskDelayUntil(&lastSysTime, SENSOR_PERIOD / portTICK_RATE_MS);
-#else
-		lastSysTime = xTaskGetTickCount();
-#endif
+		switch(bdinfo->board_rev) {
+			case 0x01:  // L3GD20 + BMA180 board
+				lastSysTime = xTaskGetTickCount();
+				break;
+			case 0x02:
+				vTaskDelayUntil(&lastSysTime, SENSOR_PERIOD / portTICK_RATE_MS);
+				break;
+			default:
+				PIOS_DEBUG_Assert(0);
+		}
 	}
 }
 

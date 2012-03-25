@@ -59,8 +59,8 @@
 /* Select the sensors to include */
 #define PIOS_INCLUDE_BMA180
 #define PIOS_INCLUDE_HMC5883
-//#define PIOS_INCLUDE_MPU6000
-//#define PIOS_MPU6000_ACCEL
+#define PIOS_INCLUDE_MPU6000
+#define PIOS_MPU6000_ACCEL
 #define PIOS_INCLUDE_L3GD20
 #define PIOS_INCLUDE_MS5611
 //#define PIOS_INCLUDE_HCSR04
@@ -69,14 +69,17 @@
 /* Com systems to include */
 #define PIOS_INCLUDE_COM
 #define PIOS_INCLUDE_COM_TELEM
-//#define PIOS_INCLUDE_COM_AUX
+#define PIOS_INCLUDE_COM_AUX
+#define PIOS_INCLUDE_COM_AUXSBUS
+#define PIOS_INCLUDE_COM_FLEXI
+
 #define PIOS_INCLUDE_GPS
 #define PIOS_OVERO_SPI
 /* Supported receiver interfaces */
 #define PIOS_INCLUDE_RCVR
 #define PIOS_INCLUDE_DSM
 //#define PIOS_INCLUDE_SBUS
-//#define PIOS_INCLUDE_PPM
+#define PIOS_INCLUDE_PPM
 #define PIOS_INCLUDE_PWM
 //#define PIOS_INCLUDE_GCSRCVR
 

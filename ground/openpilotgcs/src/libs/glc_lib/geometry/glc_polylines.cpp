@@ -64,6 +64,38 @@ GLC_Geometry* GLC_Polylines::clone() const
 //////////////////////////////////////////////////////////////////////
 // Set Functions
 //////////////////////////////////////////////////////////////////////
+
+
+GLC_uint GLC_Polylines::addPolyline(const QList<GLC_Point3d>& pointsList)
+{
+	const int pointCount= pointsList.size();
+	const int size= pointCount * 3;
+	GLfloatVector data(size);
+	for (int i= 0; i < pointCount; ++i)
+	{
+		const GLC_Point3d currentPoint(pointsList.at(i));
+		data[i * 3]= static_cast<float>(currentPoint.x());
+		data[i * 3 + 1]= static_cast<float>(currentPoint.y());
+		data[i * 3 + 2]= static_cast<float>(currentPoint.z());
+	}
+	return GLC_Geometry::m_WireData.addVerticeGroup(data);
+}
+
+GLC_uint GLC_Polylines::addPolyline(const QList<GLC_Point3df>& pointsList)
+{
+	const int pointCount= pointsList.size();
+	const int size= pointCount * 3;
+	GLfloatVector data(size);
+	for (int i= 0; i < pointCount; ++i)
+	{
+		const GLC_Point3df currentPoint(pointsList.at(i));
+		data[i * 3]= currentPoint.x();
+		data[i * 3 + 1]= currentPoint.y();
+		data[i * 3 + 2]= currentPoint.z();
+	}
+	return GLC_Geometry::m_WireData.addVerticeGroup(data);
+}
+
 GLC_Polylines& GLC_Polylines::operator=(const GLC_Polylines& polyline)
 {
 	if (this != &polyline)

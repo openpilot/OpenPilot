@@ -31,6 +31,7 @@
  * Event dispatcher statistics
  */
 typedef struct {
+	uint32_t lastErrorID;
 	uint32_t eventErrors;
 } EventStats;
 

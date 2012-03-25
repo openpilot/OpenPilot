@@ -1441,14 +1441,16 @@ static int32_t sendEvent(ObjectList * obj, uint16_t instId,
 			      if (eventEntry->queue != 0) {
 					if (xQueueSend(eventEntry->queue, &msg, 0) != pdTRUE)	// will not block
 					{
-						  ++stats.eventErrors;
+						stats.lastQueueErrorID = UAVObjGetID(obj);
+						  ++stats.eventQueueErrors;
 					}
 			      }
 			      // Invoke callback (from event task) if a valid one is registered
 			      if (eventEntry->cb != 0) {
 					if (EventCallbackDispatch(&msg, eventEntry->cb) != pdTRUE)	// invoke callback from the event task, will not block
 					{
-						  ++stats.eventErrors;
+						  ++stats.eventCallbackErrors;
+						  stats.lastCallbackErrorID = UAVObjGetID(obj);
 					}
 			      }
 		    }

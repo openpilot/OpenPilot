@@ -26,10 +26,12 @@
 #define GLC_VECTOR2D_H_
 
 #include <QString>
+#include <QPointF>
+
 #include "glc_utils_maths.h"
 #include "glc_vector2df.h"
 
-#include "glc_config.h"
+#include "../glc_config.h"
 
 //////////////////////////////////////////////////////////////////////
 // definition global
@@ -51,7 +53,7 @@ class GLC_LIB_EXPORT GLC_Vector2d
 	/*! Overload unary "-" operator*/
 	inline friend GLC_Vector2d operator - (const GLC_Vector2d &Vect)
 	{
-		return GLC_Vector2d(-Vect.dVecteur[0], -Vect.dVecteur[1]);
+		return GLC_Vector2d(-Vect.m_Vector[0], -Vect.m_Vector[1]);
 	}
 
 
@@ -67,15 +69,15 @@ public:
 	*/
 	inline GLC_Vector2d()
 	{
-		dVecteur[0]= 0.0;
-		dVecteur[1]= 0.0;
+		m_Vector[0]= 0.0;
+		m_Vector[1]= 0.0;
 	}
 
 	/*! Standard constructor With x, y = 0.0*/
 	inline GLC_Vector2d(const double &dX, const double &dY)
 	{
-		dVecteur[0]= dX;
-		dVecteur[1]= dY;
+		m_Vector[0]= dX;
+		m_Vector[1]= dY;
 	}
 
 	/*! Recopy constructor
@@ -86,9 +88,14 @@ public:
 	 */
 	inline GLC_Vector2d(const GLC_Vector2d &Vect)
 	{
-		dVecteur[0]= Vect.dVecteur[0];
-		dVecteur[1]= Vect.dVecteur[1];
+		m_Vector[0]= Vect.m_Vector[0];
+		m_Vector[1]= Vect.m_Vector[1];
 	}
+
+	//! Return the QPointF of this GLC_Vector
+	inline QPointF toQPointF() const
+	{return QPointF(m_Vector[0], m_Vector[1]);}
+
 //@}
 //////////////////////////////////////////////////////////////////////
 /*! @name Operator Overload */
@@ -99,7 +106,7 @@ public:
 	/*! Overload binary "+" operator*/
 	inline GLC_Vector2d operator + (const GLC_Vector2d &Vect) const
 	{
-		GLC_Vector2d VectResult(dVecteur[0] + Vect.dVecteur[0], dVecteur[1] + Vect.dVecteur[1]);
+		GLC_Vector2d VectResult(m_Vector[0] + Vect.m_Vector[0], m_Vector[1] + Vect.m_Vector[1]);
 
 		return VectResult;
 	}
@@ -107,8 +114,8 @@ public:
 	/*! Overload "=" operator*/
 	inline GLC_Vector2d& operator = (const GLC_Vector2d &Vect)
 	{
-		dVecteur[0]= Vect.dVecteur[0];
-		dVecteur[1]= Vect.dVecteur[1];
+		m_Vector[0]= Vect.m_Vector[0];
+		m_Vector[1]= Vect.m_Vector[1];
 
 		return *this;
 	}
@@ -116,8 +123,8 @@ public:
 	/*! Overload "=" operator*/
 	inline GLC_Vector2d& operator = (const GLC_Vector2df &Vect)
 	{
-		dVecteur[0]= static_cast<double>(Vect.vector[0]);
-		dVecteur[1]= static_cast<double>(Vect.vector[1]);
+		m_Vector[0]= static_cast<double>(Vect.vector[0]);
+		m_Vector[1]= static_cast<double>(Vect.vector[1]);
 
 		return *this;
 	}
@@ -134,7 +141,7 @@ public:
 	/*! Overload binary "-" operator*/
 	inline GLC_Vector2d operator - (const GLC_Vector2d &Vect) const
 	{
-		GLC_Vector2d VectResult(dVecteur[0] - Vect.dVecteur[0], dVecteur[1] - Vect.dVecteur[1]);
+		GLC_Vector2d VectResult(m_Vector[0] - Vect.m_Vector[0], m_Vector[1] - Vect.m_Vector[1]);
 
 		return VectResult;
 	}
@@ -149,27 +156,27 @@ public:
 	/*! Overload dot product "^" operator*/
 	inline double operator ^ (const GLC_Vector2d &Vect) const
 	{
-		return dVecteur[0] * Vect.dVecteur[1] - dVecteur[1] * Vect.dVecteur[0];
+		return m_Vector[0] * Vect.m_Vector[1] - m_Vector[1] * Vect.m_Vector[0];
 	}
 
 	/*! Overload scalar product "*" operator between 2 vector*/
 	inline double operator * (const GLC_Vector2d &Vect) const
 	{
-		return dVecteur[0] * Vect.dVecteur[0] + dVecteur[1] * Vect.dVecteur[1];
+		return m_Vector[0] * Vect.m_Vector[0] + m_Vector[1] * Vect.m_Vector[1];
 	}
 
 	/*! Overload scalar product "*" operator between 1 vector and one scalar*/
 	inline GLC_Vector2d operator * (double Scalaire) const
 	{
-		return GLC_Vector2d(dVecteur[0] * Scalaire, dVecteur[1] * Scalaire);;
+		return GLC_Vector2d(m_Vector[0] * Scalaire, m_Vector[1] * Scalaire);;
 	}
 
 
 	/*! Overload equality "==" operator*/
 	inline bool operator == (const GLC_Vector2d &Vect) const
 	{
-		bool bResult= qFuzzyCompare(dVecteur[0], Vect.dVecteur[0]);
-		bResult= bResult && qFuzzyCompare(dVecteur[1], Vect.dVecteur[1]);
+		bool bResult= qFuzzyCompare(m_Vector[0], Vect.m_Vector[0]);
+		bResult= bResult && qFuzzyCompare(m_Vector[1], Vect.m_Vector[1]);
 
 		return bResult;
 	}
@@ -190,32 +197,39 @@ public:
 	/*! X Composante*/
 	inline GLC_Vector2d& setX(const double &dX)
 	{
-		dVecteur[0]= dX;
+		m_Vector[0]= dX;
 		return *this;
 	}
 
 	/*! Y Composante*/
 	inline GLC_Vector2d& setY(const double &dY)
 	{
-		dVecteur[1]= dY;
+		m_Vector[1]= dY;
 		return *this;
 	}
 
 	/*! All Composante*/
 	inline GLC_Vector2d& setVect(const double &dX, const double &dY)
 	{
-		dVecteur[0]= dX;
-		dVecteur[1]= dY;
+		m_Vector[0]= dX;
+		m_Vector[1]= dY;
 		return *this;
 	}
 
 	/*! From another Vector*/
 	inline GLC_Vector2d& setVect(const GLC_Vector2d &Vect)
 	{
-		dVecteur[0]= Vect.dVecteur[0];
-		dVecteur[1]= Vect.dVecteur[1];
+		m_Vector[0]= Vect.m_Vector[0];
+		m_Vector[1]= Vect.m_Vector[1];
 		return *this;
 	}
+
+	//! Set vector lenght from the given scalar and return a reference of this vector
+	inline GLC_Vector2d& setLength(double);
+
+	//! Normalize this vector and return a reference to it
+	inline GLC_Vector2d& normalize()
+	{return setLength(1.0);}
 
 //@}
 
@@ -227,32 +241,32 @@ public:
 	/*! X Composante*/
 	inline double getX(void) const
 	{
-		return dVecteur[0];
+		return m_Vector[0];
 	}
 	/*! Y Composante*/
 	inline double getY(void) const
 	{
-		return dVecteur[1];
+		return m_Vector[1];
 	}
 	/*! retourne un pointeur constant vers le tableau du vecteur.*/
 	inline const double *return_dVect(void) const
 	{
-		return dVecteur;
+		return m_Vector;
 	}
 	/*! Return true if the vector is null*/
 	inline bool isNull(void) const
 	{
-		return qFuzzyCompare(dVecteur[0], 0.0) && qFuzzyCompare(dVecteur[1], 0.0);
+		return qFuzzyCompare(m_Vector[0], 0.0) && qFuzzyCompare(m_Vector[1], 0.0);
 	}
 	//! return the string representation of vector
 	inline QString toString() const
 	{
-		return QString("[") + QString::number(dVecteur[0]) + QString(" , ") + QString::number(dVecteur[1]) + QString("]");
+		return QString("[") + QString::number(m_Vector[0]) + QString(" , ") + QString::number(m_Vector[1]) + QString("]");
 	}
 	//! return a vector perpendicular to this
 	inline GLC_Vector2d perp() const
 	{
-		return GLC_Vector2d(-dVecteur[1], dVecteur[0]);
+		return GLC_Vector2d(-m_Vector[1], m_Vector[0]);
 	}
 //@}
 
@@ -264,11 +278,25 @@ private:
 	*	vector[0]	X \n
 	*	vector[1]	Y \n
 	*/
-	double dVecteur[2];
+	double m_Vector[2];
 
 }; //class GLC_Vector2d
 
 //! Define GLC_Point2D
 typedef GLC_Vector2d GLC_Point2d;
+
+inline GLC_Vector2d& GLC_Vector2d::setLength(double norme)
+{
+	const double normCur= sqrt( m_Vector[0] * m_Vector[0] + m_Vector[1] * m_Vector[1]);
+
+	if (normCur != 0.0f)
+	{
+		const double Coef = norme / normCur;
+
+		m_Vector[0] = m_Vector[0] * Coef;
+		m_Vector[1] = m_Vector[1] * Coef;
+	}
+	return *this;
+}
 
 #endif /*GLC_VECTOR2D_H_*/

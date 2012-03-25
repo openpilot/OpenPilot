@@ -6,6 +6,9 @@
         <field name="IRQStackRemaining" units="bytes" type="uint16" elements="1"/>
         <field name="CPULoad" units="%" type="uint8" elements="1"/>
         <field name="CPUTemp" units="C" type="int8" elements="1"/>
+        <field name="EventSystemWarningID" units="uavoid" type="uint32" elements="1"/>
+        <field name="ObjectManagerCallbackID" units="uavoid" type="uint32" elements="1"/>
+        <field name="ObjectManagerQueueID" units="uavoid" type="uint32" elements="1"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>
         <telemetryflight acked="false" updatemode="periodic" period="1000"/>

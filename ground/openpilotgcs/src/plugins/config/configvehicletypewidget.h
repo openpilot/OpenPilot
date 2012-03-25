@@ -24,8 +24,8 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef CONFIGAIRFRAMEWIDGET_H
-#define CONFIGAIRFRAMEWIDGET_H
+#ifndef CONFIGVEHICLETYPEWIDGET_H
+#define CONFIGVEHICLETYPEWIDGET_H
 
 #include "ui_airframe.h"
 #include "../uavobjectwidgetutils/configtaskwidget.h"
@@ -39,24 +39,27 @@
 
 class Ui_Widget;
 
-class ConfigAirframeWidget: public ConfigTaskWidget
+class ConfigVehicleTypeWidget: public ConfigTaskWidget
 {
     Q_OBJECT
 
 public:
-    ConfigAirframeWidget(QWidget *parent = 0);
-    ~ConfigAirframeWidget();
+    ConfigVehicleTypeWidget(QWidget *parent = 0);
+    ~ConfigVehicleTypeWidget();
 
 private:
     Ui_AircraftWidget *m_aircraft;
-    bool setupFrameFixedWing();
-    bool setupFrameElevon();
-    bool setupFrameVtail();
+    bool setupFrameFixedWing(QString airframeType);
+    bool setupFrameElevon(QString airframeType);
+    bool setupFrameVtail(QString airframeType);
     bool setupQuad(bool pLayout);
     bool setupHexa(bool pLayout);
     bool setupOcto();
+    bool setupGroundVehicleCar(QString airframeType);
+    bool setupGroundVehicleDifferential(QString airframeType);
+    bool setupGroundVehicleMotorcycle(QString airframeType);
     void updateCustomAirframeUI();
-    bool setupMixer(double mixerFactors[8][3]);
+    bool setupMultiRotorMixer(double mixerFactors[8][3]);
     void setupMotors(QList<QString> motorList);
     void addToDirtyMonitor();
     void resetField(UAVObjectField * field);
@@ -74,19 +77,39 @@ private:
 
 private slots:
     virtual void refreshWidgetsValues();
+	void refreshFixedWingWidgetsValues(QString frameType);
+	void refreshMultiRotorWidgetsValues(QString frameType);
+	void refreshGroundVehicleWidgetsValues(QString frameType);
+	
     void updateObjectsFromWidgets();
+	QString updateFixedWingObjectsFromWidgets();
+	QString updateMultiRotorObjectsFromWidgets();
+	QString updateGroundVehicleObjectsFromWidgets();
    // void saveAircraftUpdate();
+
     void setupAirframeUI(QString type);
+	void setupFixedWingUI(QString frameType);
+	void setupMultiRotorUI(QString frameType);
+	void setupGroundVehicleUI(QString frameType);
+	
+	void throwMultiRotorChannelConfigError(int numMotors);
+	void throwFixedWingChannelConfigError(QString airframeType);
+	void throwGroundVehicleChannelConfigError(QString airframeType);
+	
     void toggleAileron2(int index);
     void toggleElevator2(int index);
     void toggleRudder2(int index);
     void switchAirframeType(int index);
     void resetFwMixer();
     void resetMrMixer();
+    void resetGvFrontMixer();
+    void resetGvRearMixer();
     void resetCt1Mixer();
     void resetCt2Mixer();
     void updateFwThrottleCurveValue(QList<double> list, double value);
     void updateMrThrottleCurveValue(QList<double> list, double value);
+    void updateGvThrottle1CurveValue(QList<double> list, double value);
+    void updateGvThrottle2CurveValue(QList<double> list, double value);
     void updateCustomThrottle1CurveValue(QList<double> list, double value);
     void updateCustomThrottle2CurveValue(QList<double> list, double value);
     void enableFFTest();
@@ -117,4 +140,4 @@ public:
         const QStyleOptionViewItem &option, const QModelIndex &index) const;
 };
 
-#endif // CONFIGAIRFRAMEWIDGET_H
+#endif // CONFIGVEHICLETYPEWIDGET_H

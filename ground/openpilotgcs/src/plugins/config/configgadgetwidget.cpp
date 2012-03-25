@@ -28,7 +28,7 @@
 #include "configahrswidget.h"
 #include "configgadgetwidget.h"
 
-#include "configairframewidget.h"
+#include "ConfigVehicleTypeWidget.h"
 #include "configccattitudewidget.h"
 #include "configinputwidget.h"
 #include "configoutputwidget.h"
@@ -68,7 +68,7 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     qwd = new DefaultHwSettingsWidget(this);
     ftw->insertTab(ConfigGadgetWidget::hardware, qwd, QIcon(":/configgadget/images/hw_config.png"), QString("HW Settings"));
 
-    qwd = new ConfigAirframeWidget(this);
+    qwd = new ConfigVehicleTypeWidget(this);
     ftw->insertTab(ConfigGadgetWidget::aircraft, qwd, QIcon(":/configgadget/images/Airframe.png"), QString("Aircraft"));
 
     qwd = new ConfigInputWidget(this);

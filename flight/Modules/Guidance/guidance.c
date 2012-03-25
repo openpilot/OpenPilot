@@ -328,7 +328,7 @@ void updateVtolDesiredVelocity()
 	/**
 	 * make sure we do not introduce direction errors through overflow
 	 */
-	float speed = sqrt( northCommand*northCommand + eastCommand*eastCommand );
+	float speed = sqrtf( northCommand*northCommand + eastCommand*eastCommand );
 	if (speed>=guidanceSettings.HorizontalVelMax) {
 		northCommand *= (float)guidanceSettings.HorizontalVelMax / speed;
 		eastCommand *= (float)guidanceSettings.HorizontalVelMax / speed;
@@ -404,7 +404,7 @@ static void updateFixedDesiredAttitude()
 	NedAccelGet(&nedAccel);
 
 	// current speed - lacking forward airspeed we use groundspeed :( TODO get airspeed sensor!
-	speedActual = sqrt(pow(velocityActual.East, 2) + pow(velocityActual.North, 2) + pow(velocityActual.Down, 2));
+	speedActual = sqrtf(velocityActual.East*velocityActual.East + velocityActual.North*velocityActual.North + velocityActual.Down*velocityActual.Down );
 
 	// Compute desired roll command
 	courseError = RAD2DEG * (atan2f(velocityDesired.East,velocityDesired.North) - atan2f(velocityActual.East,velocityActual.North));
@@ -462,11 +462,29 @@ static void updateFixedDesiredAttitude()
 		guidanceSettings.PowerPI[GUIDANCESETTINGS_POWERPI_ILIMIT]);
 	powerCommand = (powerError * guidanceSettings.PowerPI[GUIDANCESETTINGS_POWERPI_KP] +
 		powerIntegral);
-	
-	stabDesired.Throttle = bound( guidanceSettings.ThrottleLimit[GUIDANCESETTINGS_THROTTLELIMIT_NEUTRAL] +
-		powerCommand,
-		guidanceSettings.ThrottleLimit[GUIDANCESETTINGS_THROTTLELIMIT_MIN],
-		guidanceSettings.ThrottleLimit[GUIDANCESETTINGS_THROTTLELIMIT_MAX]);
+
+	// prevent integral running out of bounds 
+	if ( ( powerCommand + guidanceSettings.ThrottleLimit[GUIDANCESETTINGS_THROTTLELIMIT_NEUTRAL] ) > guidanceSettings.ThrottleLimit[GUIDANCESETTINGS_THROTTLELIMIT_MAX]) {
+		powerIntegral = bound(
+			powerIntegral -
+				( (powerCommand + guidanceSettings.ThrottleLimit[GUIDANCESETTINGS_THROTTLELIMIT_NEUTRAL] )
+				- guidanceSettings.ThrottleLimit[GUIDANCESETTINGS_THROTTLELIMIT_MAX]),
+			-guidanceSettings.PowerPI[GUIDANCESETTINGS_POWERPI_ILIMIT],
+			guidanceSettings.PowerPI[GUIDANCESETTINGS_POWERPI_ILIMIT]);
+		powerCommand = guidanceSettings.ThrottleLimit[GUIDANCESETTINGS_THROTTLELIMIT_MAX];
+	}
+	if ( ( powerCommand + guidanceSettings.ThrottleLimit[GUIDANCESETTINGS_THROTTLELIMIT_NEUTRAL] ) < guidanceSettings.ThrottleLimit[GUIDANCESETTINGS_THROTTLELIMIT_MIN]) {
+		powerIntegral = bound(
+			powerIntegral -
+				( (powerCommand + guidanceSettings.ThrottleLimit[GUIDANCESETTINGS_THROTTLELIMIT_NEUTRAL] )
+				- guidanceSettings.ThrottleLimit[GUIDANCESETTINGS_THROTTLELIMIT_MIN]),
+			-guidanceSettings.PowerPI[GUIDANCESETTINGS_POWERPI_ILIMIT],
+			guidanceSettings.PowerPI[GUIDANCESETTINGS_POWERPI_ILIMIT]);
+		powerCommand = guidanceSettings.ThrottleLimit[GUIDANCESETTINGS_THROTTLELIMIT_MIN];
+	}
+
+	// set throttle
+	stabDesired.Throttle = powerCommand;
 
 	if(guidanceSettings.ThrottleControl == GUIDANCESETTINGS_THROTTLECONTROL_FALSE) {
 		// For now override throttle with manual control.  Disable at your risk, quad goes to China.
@@ -474,6 +492,7 @@ static void updateFixedDesiredAttitude()
 		ManualControlCommandGet(&manualControl);
 		stabDesired.Throttle = manualControl.Throttle;
 	}
+//printf("Cycle:	speed Error: %f\n	powerError: %f\n	accelCommand: %f\n	powerCommand: %f\n\n",speedError,powerError,accelCommand,powerCommand);
 
 	stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_ROLL] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
 	stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_PITCH] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;

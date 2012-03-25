@@ -461,22 +461,22 @@ static void updateFixedDesiredAttitude()
 		-guidanceSettings.PowerPI[GUIDANCESETTINGS_POWERPI_ILIMIT],
 		guidanceSettings.PowerPI[GUIDANCESETTINGS_POWERPI_ILIMIT]);
 	powerCommand = (powerError * guidanceSettings.PowerPI[GUIDANCESETTINGS_POWERPI_KP] +
-		powerIntegral);
+		powerIntegral) + guidanceSettings.ThrottleLimit[GUIDANCESETTINGS_THROTTLELIMIT_NEUTRAL];
 
 	// prevent integral running out of bounds 
-	if ( ( powerCommand + guidanceSettings.ThrottleLimit[GUIDANCESETTINGS_THROTTLELIMIT_NEUTRAL] ) > guidanceSettings.ThrottleLimit[GUIDANCESETTINGS_THROTTLELIMIT_MAX]) {
+	if ( powerCommand > guidanceSettings.ThrottleLimit[GUIDANCESETTINGS_THROTTLELIMIT_MAX]) {
 		powerIntegral = bound(
 			powerIntegral -
-				( (powerCommand + guidanceSettings.ThrottleLimit[GUIDANCESETTINGS_THROTTLELIMIT_NEUTRAL] )
+				( powerCommand 
 				- guidanceSettings.ThrottleLimit[GUIDANCESETTINGS_THROTTLELIMIT_MAX]),
 			-guidanceSettings.PowerPI[GUIDANCESETTINGS_POWERPI_ILIMIT],
 			guidanceSettings.PowerPI[GUIDANCESETTINGS_POWERPI_ILIMIT]);
 		powerCommand = guidanceSettings.ThrottleLimit[GUIDANCESETTINGS_THROTTLELIMIT_MAX];
 	}
-	if ( ( powerCommand + guidanceSettings.ThrottleLimit[GUIDANCESETTINGS_THROTTLELIMIT_NEUTRAL] ) < guidanceSettings.ThrottleLimit[GUIDANCESETTINGS_THROTTLELIMIT_MIN]) {
+	if ( powerCommand < guidanceSettings.ThrottleLimit[GUIDANCESETTINGS_THROTTLELIMIT_MIN]) {
 		powerIntegral = bound(
 			powerIntegral -
-				( (powerCommand + guidanceSettings.ThrottleLimit[GUIDANCESETTINGS_THROTTLELIMIT_NEUTRAL] )
+				( powerCommand
 				- guidanceSettings.ThrottleLimit[GUIDANCESETTINGS_THROTTLELIMIT_MIN]),
 			-guidanceSettings.PowerPI[GUIDANCESETTINGS_POWERPI_ILIMIT],
 			guidanceSettings.PowerPI[GUIDANCESETTINGS_POWERPI_ILIMIT]);

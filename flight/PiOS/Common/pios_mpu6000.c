@@ -45,7 +45,7 @@ static void PIOS_MPU6000_Config(struct pios_mpu6000_cfg const * cfg);
 static int32_t PIOS_MPU6000_SetReg(uint8_t address, uint8_t buffer);
 static int32_t PIOS_MPU6000_GetReg(uint8_t address);
 
-#define PIOS_MPU6000_MAX_DOWNSAMPLE 100
+#define PIOS_MPU6000_MAX_DOWNSAMPLE 10
 static int16_t pios_mpu6000_buffer[PIOS_MPU6000_MAX_DOWNSAMPLE * sizeof(struct pios_mpu6000_data)];
 static t_fifo_buffer pios_mpu6000_fifo;
 
@@ -66,9 +66,9 @@ void PIOS_MPU6000_Init(const struct pios_mpu6000_cfg * new_cfg)
 	fifoBuf_init(&pios_mpu6000_fifo, (uint8_t *) pios_mpu6000_buffer, sizeof(pios_mpu6000_buffer));
 
 	/* Configure the MPU6000 Sensor */
-	PIOS_SPI_SetPrescalar(pios_spi_gyro, SPI_BaudRatePrescaler_256);
+	PIOS_SPI_SetClockSpeed(pios_spi_gyro, PIOS_SPI_PRESCALER_256);
 	PIOS_MPU6000_Config(cfg);
-	PIOS_SPI_SetPrescalar(pios_spi_gyro, SPI_BaudRatePrescaler_8);
+	PIOS_SPI_SetClockSpeed(pios_spi_gyro, PIOS_SPI_PRESCALER_16);
 
 	/* Set up EXTI line */
 	PIOS_EXTI_Init(cfg->exti_cfg);
@@ -295,10 +295,11 @@ float PIOS_MPU6000_GetAccelScale()
  * \return 0 if test succeeded
  * \return non-zero value if test succeeded
  */
+int32_t mpu6000_id;
 uint8_t PIOS_MPU6000_Test(void)
 {
 	/* Verify that ID matches (MPU6000 ID is 0x69) */
-	int32_t mpu6000_id = PIOS_MPU6000_ReadID();
+	mpu6000_id = PIOS_MPU6000_ReadID();
 	if(mpu6000_id < 0)
 		return -1;
 	
@@ -371,9 +372,9 @@ void PIOS_MPU6000_IRQHandler(void)
 	}
 
 	PIOS_MPU6000_ReleaseBus();
-	
+
 	struct pios_mpu6000_data data;
-	
+
 	if(fifoBuf_getFree(&pios_mpu6000_fifo) < sizeof(data)) {
 		mpu6000_fifo_full++;
 		return;			
@@ -394,8 +395,6 @@ void PIOS_MPU6000_IRQHandler(void)
 		}
 		
 		PIOS_MPU6000_ReleaseBus();
-		
-		struct pios_mpu6000_data data;
 		
 		if(fifoBuf_getFree(&pios_mpu6000_fifo) < sizeof(data)) {
 			mpu6000_fifo_full++;

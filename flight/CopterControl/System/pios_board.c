@@ -68,52 +68,12 @@ uint32_t pios_com_gps_id;
 uint32_t pios_com_bridge_id;
 
 /**
- * Configuration for the BMA180 chip
+ * Configuration for MPU6000 chip
  */
-#if defined(PIOS_INCLUDE_BMA180)
-#include "pios_bma180.h"
-static const struct pios_exti_cfg pios_exti_bma180_cfg __exti_config = {
-	.vector = PIOS_BMA180_IRQHandler,
-	.line = EXTI_Line13,
-	.pin = {
-		.gpio = GPIOC,
-		.init = {
-			.GPIO_Pin = GPIO_Pin_13,
-			.GPIO_Speed = GPIO_Speed_10MHz,
-			.GPIO_Mode = GPIO_Mode_IN_FLOATING,
-		},
-	},
-	.irq = {
-		.init = {
-			.NVIC_IRQChannel = EXTI15_10_IRQn,
-			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
-			.NVIC_IRQChannelSubPriority = 0,
-			.NVIC_IRQChannelCmd = ENABLE,
-		},
-	},
-	.exti = {
-		.init = {
-			.EXTI_Line = EXTI_Line13, // matches above GPIO pin
-			.EXTI_Mode = EXTI_Mode_Interrupt,
-			.EXTI_Trigger = EXTI_Trigger_Rising,
-			.EXTI_LineCmd = ENABLE,
-		},
-	},
-};
-static const struct pios_bma180_cfg pios_bma180_cfg = {
-	.exti_cfg = &pios_exti_bma180_cfg,
-	.bandwidth = BMA_BW_300HZ,
-	.range = BMA_RANGE_8G,
-};
-#endif /* PIOS_INCLUDE_BMA180 */
-
-/**
- * Configuration for L3GD20 chip
- */
-#if defined(PIOS_INCLUDE_L3GD20)
-#include "pios_l3gd20.h"
-static const struct pios_exti_cfg pios_exti_l3gd20_cfg __exti_config = {
-	.vector = PIOS_L3GD20_IRQHandler,
+#if defined(PIOS_INCLUDE_MPU6000)
+#include "pios_mpu6000.h"
+static const struct pios_exti_cfg pios_exti_mpu6000_cfg __exti_config = {
+	.vector = PIOS_MPU6000_IRQHandler,
 	.line = EXTI_Line3,
 	.pin = {
 		.gpio = GPIOA,
@@ -141,11 +101,19 @@ static const struct pios_exti_cfg pios_exti_l3gd20_cfg __exti_config = {
 	},
 };
 
-static const struct pios_l3gd20_cfg pios_l3gd20_cfg = {
-	.exti_cfg = &pios_exti_l3gd20_cfg,
-	.range = PIOS_L3GD20_SCALE_500_DEG,
+static const struct pios_mpu6000_cfg pios_mpu6000_cfg = {
+	.exti_cfg = &pios_exti_mpu6000_cfg,
+	.Fifo_store = PIOS_MPU6000_FIFO_TEMP_OUT | PIOS_MPU6000_FIFO_GYRO_X_OUT | PIOS_MPU6000_FIFO_GYRO_Y_OUT | PIOS_MPU6000_FIFO_GYRO_Z_OUT,
+	// Clock at 8 khz, downsampled by 8 for 1khz
+	.Smpl_rate_div = 7, 
+	.interrupt_cfg = PIOS_MPU6000_INT_CLR_ANYRD,
+	.interrupt_en = PIOS_MPU6000_INTEN_DATA_RDY,
+	.User_ctl = PIOS_MPU6000_USERCTL_FIFO_EN,
+	.Pwr_mgmt_clk = PIOS_MPU6000_PWRMGMT_PLL_X_CLK,
+	.gyro_range = PIOS_MPU6000_SCALE_500_DEG,
+	.filter = PIOS_MPU6000_LOWPASS_256_HZ
 };
-#endif /* PIOS_INCLUDE_L3GD20 */
+#endif /* PIOS_INCLUDE_MPU6000 */
 
 static const struct flashfs_cfg flashfs_w25x_cfg = {
 	.table_magic = 0x85FB3C35,
@@ -160,12 +128,25 @@ static const struct pios_flash_jedec_cfg flash_w25x_cfg = {
 	.chip_erase = 0x60
 };
 
+static const struct flashfs_cfg flashfs_m25p_cfg = {
+	.table_magic = 0x85FB3D35,
+	.obj_magic = 0x3015A371,
+	.obj_table_start = 0x00000010,
+	.obj_table_end = 0x00010000,
+	.sector_size = 0x00010000,
+};
+
+static const struct pios_flash_jedec_cfg flash_m25p_cfg = {
+	.sector_erase = 0xD8,
+	.chip_erase = 0xC7
+};
 #include <pios_board_info.h>
 /**
  * PIOS_Board_Init()
  * initializes all the core subsystems on this specific hardware
  * called from System/openpilot.c
  */
+int32_t init_test;
 void PIOS_Board_Init(void) {
 
 	/* Delay system */
@@ -206,9 +187,19 @@ void PIOS_Board_Init(void) {
 	}
 
 #endif
-	PIOS_Flash_Jedec_Init(pios_spi_flash_accel_id, 1, &flash_w25x_cfg);	
 
-	PIOS_FLASHFS_Init(&flashfs_w25x_cfg);
+	switch(bdinfo->board_rev) {
+		case 0x01: // Revision 1
+			PIOS_Flash_Jedec_Init(pios_spi_flash_accel_id, 1, &flash_w25x_cfg);	
+			PIOS_FLASHFS_Init(&flashfs_w25x_cfg);
+			break;
+		case 0x02: // Revision 2
+			PIOS_Flash_Jedec_Init(pios_spi_flash_accel_id, 0, &flash_m25p_cfg);	
+			PIOS_FLASHFS_Init(&flashfs_m25p_cfg);
+			break;
+		default:
+			PIOS_DEBUG_Assert(0);
+	}
 
 	/* Initialize UAVObject libraries */
 	EventDispatcherInitialize();
@@ -709,7 +700,9 @@ void PIOS_Board_Init(void) {
 	switch(bdinfo->board_rev) {
 		case 0x01:
 			// Revision 1 with invensense gyros, start the ADC
+#if defined(PIOS_INCLUDE_ADC)
 			PIOS_ADC_Init();
+#endif
 #if defined(PIOS_INCLUDE_ADXL345)
 			PIOS_ADXL345_Init(pios_spi_flash_accel_id, 0);
 #endif
@@ -718,19 +711,16 @@ void PIOS_Board_Init(void) {
 			// Revision 2 with L3GD20 gyros, start a SPI interface and connect to it
 			GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
 
-#if defined(PIOS_INCLUDE_L3GD20)
+#if defined(PIOS_INCLUDE_MPU6000)
 			// Set up the SPI interface to the serial flash 
 			if (PIOS_SPI_Init(&pios_spi_gyro_id, &pios_spi_gyro_cfg)) {
 				PIOS_Assert(0);
 			}
-			PIOS_L3GD20_Init(pios_spi_gyro_id, 0, &pios_l3gd20_cfg);
-			PIOS_Assert(PIOS_L3GD20_Test() == 0);
-#endif /* PIOS_INCLUDE_L3GD20 */
+			PIOS_MPU6000_Attach(pios_spi_gyro_id);
+			PIOS_MPU6000_Init(&pios_mpu6000_cfg);
+			init_test = PIOS_MPU6000_Test();
+#endif /* PIOS_INCLUDE_MPU6000 */
 
-#if defined(PIOS_INCLUDE_BMA180)
-			PIOS_BMA180_Init(pios_spi_flash_accel_id, 0, &pios_bma180_cfg);
-			PIOS_Assert(PIOS_BMA180_Test() == 0);
-#endif /* PIOS_INCLUDE_BMA180 */
 			break;
 		default:
 			PIOS_Assert(0);

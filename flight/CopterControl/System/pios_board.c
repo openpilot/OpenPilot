@@ -716,8 +716,7 @@ void PIOS_Board_Init(void) {
 			if (PIOS_SPI_Init(&pios_spi_gyro_id, &pios_spi_gyro_cfg)) {
 				PIOS_Assert(0);
 			}
-			PIOS_MPU6000_Attach(pios_spi_gyro_id);
-			PIOS_MPU6000_Init(&pios_mpu6000_cfg);
+			PIOS_MPU6000_Init(pios_spi_gyro_id,0,&pios_mpu6000_cfg);
 			init_test = PIOS_MPU6000_Test();
 #endif /* PIOS_INCLUDE_MPU6000 */
 

@@ -355,61 +355,29 @@ static int32_t updateSensors(AccelsData * accels, GyrosData * gyros)
  * @param[in] attitudeRaw Populate the UAVO instead of saving right here
  * @return 0 if successfull, -1 if not
  */
-struct pios_mpu6000_data gyro;
+struct pios_mpu6000_data mpu6000_data;
 static int32_t updateSensorsCC3D(AccelsData * accelsData, GyrosData * gyrosData)
 {
-	static portTickType lastSysTime;
-	uint32_t accel_samples = 0;
-	int32_t accel_accum[3] = {0, 0, 0};
-	float gyro_scaling = 1;
-	float gyro_accum[3] = {0, 0, 0};
-	float accel_scaling = 1;
-	uint32_t gyro_samples;
-
-	vTaskDelayUntil(&lastSysTime, SENSOR_PERIOD / portTICK_RATE_MS);
-
+	float accels[3], gyros[3];
+	
 #if defined(PIOS_INCLUDE_MPU6000)
 	
-	uint32_t count = 0;
-	int32_t read_good = 0;
-	int32_t error = false;
-
-	while((read_good = PIOS_MPU6000_ReadFifo(&gyro)) != 0 && !error)
-		error = ((xTaskGetTickCount() - lastSysTime) > SENSOR_PERIOD) ? true : error;
-	if (error)
-		return -1;
-	while(read_good == 0) {
-		count++;
-		
-		gyro_accum[0] += gyro.gyro_x;
-		gyro_accum[1] += gyro.gyro_y;
-		gyro_accum[2] += gyro.gyro_z;
-		
-		accel_accum[0] += gyro.accel_x;
-		accel_accum[1] += gyro.accel_y;
-		accel_accum[2] += gyro.accel_z;
-		
-		read_good = PIOS_MPU6000_ReadFifo(&gyro);
-	}
-	gyro_samples = count;
-	gyro_scaling = PIOS_MPU6000_GetScale();
+	xQueueHandle queue = PIOS_MPU6000_GetQueue();
 	
-	accel_samples = count;
-	accel_scaling = PIOS_MPU6000_GetAccelScale();
+	if(xQueueReceive(queue, (void *) &mpu6000_data, SENSOR_PERIOD) == errQUEUE_EMPTY)
+		return -1;	// Error, no data
+
+	gyros[0] = -mpu6000_data.gyro_y * PIOS_MPU6000_GetScale();
+	gyros[1] = -mpu6000_data.gyro_x * PIOS_MPU6000_GetScale();
+	gyros[2] = -mpu6000_data.gyro_z * PIOS_MPU6000_GetScale();
+	
+	accels[0] = -mpu6000_data.accel_y * PIOS_MPU6000_GetAccelScale();
+	accels[1] = -mpu6000_data.accel_x * PIOS_MPU6000_GetAccelScale();
+	accels[2] = -mpu6000_data.accel_z * PIOS_MPU6000_GetAccelScale();
+
+	gyrosData->temperature = 35.0f + ((float) mpu6000_data.temperature + 512.0f) / 340.0f;
+	accelsData->temperature = 35.0f + ((float) mpu6000_data.temperature + 512.0f) / 340.0f;
 #endif
-	// Get temp from last reading
-	gyrosData->temperature = 35.0f + ((float) gyro.temperature + 512.0f) / 340.0f;
-	accelsData->temperature = 35.0f + ((float) gyro.temperature + 512.0f) / 340.0f;
-
-	// Scale the accels
-	float accels[3] = {-(float) accel_accum[1] / accel_samples, 
-		-(float) accel_accum[0] / accel_samples,
-		-(float) accel_accum[2] / accel_samples};
-
-	// Scale the gyros
-	float gyros[3] = {-(float) gyro_accum[1] / gyro_samples,
-		-(float) gyro_accum[0] / gyro_samples,
-		-(float) gyro_accum[2] / gyro_samples};
 
 	if(rotate) {
 		// TODO: rotate sensors too so stabilization is well behaved
@@ -424,14 +392,14 @@ static int32_t updateSensorsCC3D(AccelsData * accelsData, GyrosData * gyrosData)
 		gyros[2] = vec_out[2];
 	}
 
-	accelsData->x = (accels[0] - accelbias[0]) * accel_scaling;
-	accelsData->y = (accels[1] - accelbias[1]) * accel_scaling;
-	accelsData->z = (accels[2] - accelbias[2]) * accel_scaling;
+	accelsData->x = accels[0] - accelbias[0] * ACCEL_SCALE; // Applying arbitrary scale here to match CC v1
+	accelsData->y = accels[1] - accelbias[1] * ACCEL_SCALE;
+	accelsData->z = accels[2] - accelbias[2] * ACCEL_SCALE;
 	AccelsSet(&accelsData);
 
-	gyrosData->x = gyros[0] * gyro_scaling;
-	gyrosData->y = gyros[1] * gyro_scaling;
-	gyrosData->z = gyros[2] * gyro_scaling;
+	gyrosData->x = gyros[0];
+	gyrosData->y = gyros[1];
+	gyrosData->z = gyros[2];
 
 	if(bias_correct_gyro) {
 		// Applying integral component here so it can be seen on the gyros and correct bias

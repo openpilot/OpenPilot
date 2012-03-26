@@ -141,9 +141,8 @@ struct pios_mpu6000_cfg {
 };
 
 /* Public Functions */
-extern void PIOS_MPU6000_Init(const struct pios_mpu6000_cfg * cfg);
-extern void PIOS_MPU6000_Attach(uint32_t spi_id);
-extern int32_t PIOS_MPU6000_ReadFifo(struct pios_mpu6000_data * buffer);
+extern int32_t PIOS_MPU6000_Init(uint32_t spi_id, uint32_t slave_num, const struct pios_mpu6000_cfg * new_cfg);
+extern xQueueHandle PIOS_MPU6000_GetQueue();
 extern int32_t PIOS_MPU6000_ReadGyros(struct pios_mpu6000_data * buffer);
 extern int32_t PIOS_MPU6000_ReadID();
 extern uint8_t PIOS_MPU6000_Test();

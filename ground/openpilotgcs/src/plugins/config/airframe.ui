@@ -38,7 +38,7 @@
             </font>
            </property>
            <property name="text">
-            <string>Aircraft type:</string>
+            <string>Vehicle type:</string>
            </property>
           </widget>
          </item>
@@ -1409,7 +1409,7 @@ margin:1px;</string>
                   </font>
                  </property>
                  <property name="text">
-                  <string>Airplane type:</string>
+                  <string>Vehicle type:</string>
                  </property>
                 </widget>
                </item>

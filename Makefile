@@ -68,7 +68,7 @@ help:
 	@echo "   Here is a summary of the available targets:"
 	@echo
 	@echo "   [Tool Installers]"
-	@echo "     qt_sdk_install       - Install the QT v4.6.2 tools"
+	@echo "     qt_sdk_install       - Install the QT v4.7.3 tools"
 	@echo "     arm_sdk_install      - Install the Code Sourcery ARM gcc toolchain"
 	@echo "     openocd_install      - Install the OpenOCD JTAG daemon"
 	@echo "     stm32flash_install   - Install the stm32flash tool for unbricking boards"
@@ -158,20 +158,22 @@ $(BUILD_DIR):
 ###############################################################
 
 # Set up QT toolchain
-QT_SDK_DIR := $(TOOLS_DIR)/qtsdk-2010.02
+QT_SDK_DIR := $(TOOLS_DIR)/qtsdk-v1.2
 
 .PHONY: qt_sdk_install
-qt_sdk_install: QT_SDK_URL  := http://get.qt.nokia.com/qtsdk/qt-sdk-linux-x86-opensource-2010.02.bin
-qt_sdk_install: QT_SDK_FILE := $(notdir $(QT_SDK_URL))
+qt_sdk_install: QT_SDK_URL  := http://www.developer.nokia.com/dp?uri=http://sw.nokia.com/id/8ea74da4-fec1-4277-8b26-c58cc82e204b/Qt_SDK_Lin32_offline
+qt_sdk_install: QT_SDK_FILE := Qt_SDK_Lin32_offline_v1_2_en.run
+#qt_sdk_install: QT_SDK_URL  := http://www.developer.nokia.com/dp?uri=http://sw.nokia.com/id/c365bbf5-c2b9-4dda-9c1f-34b2c8d07785/Qt_SDK_Lin32_offline_v1_1_2
+#qt_sdk_install: QT_SDK_FILE := Qt_SDK_Lin32_offline_v1_1_2_en.run
 # order-only prereq on directory existance:
 qt_sdk_install : | $(DL_DIR) $(TOOLS_DIR)
 qt_sdk_install: qt_sdk_clean
         # download the source only if it's newer than what we already have
-	$(V1) wget -N -P "$(DL_DIR)" "$(QT_SDK_URL)"
+	$(V1) wget -N --content-disposition -P "$(DL_DIR)" "$(QT_SDK_URL)"
 
         #installer is an executable, make it executable and run it
 	$(V1) chmod u+x "$(DL_DIR)/$(QT_SDK_FILE)"
-	"$(DL_DIR)/$(QT_SDK_FILE)" --installdir "$(QT_SDK_DIR)"
+	"$(DL_DIR)/$(QT_SDK_FILE)" -style cleanlooks
 
 .PHONY: qt_sdk_clean
 qt_sdk_clean:
@@ -278,13 +280,13 @@ libusb_win_clean:
 
 openocd_git_win_install: | $(DL_DIR) $(TOOLS_DIR)
 openocd_git_win_install: OPENOCD_URL  := git://openocd.git.sourceforge.net/gitroot/openocd/openocd
-openocd_git_win_install: OPENOCD_REV  := c59a4419fcc5568d59fbaee775132f91cb7fd26b
+openocd_git_win_install: OPENOCD_REV  := f1c0133321c8fcadadd10bba5537c0a634eb183b
 openocd_git_win_install: openocd_win_clean libusb_win_install ftd2xx_install
         # download the source
 	$(V0) @echo " DOWNLOAD     $(OPENOCD_URL) @ $(OPENOCD_REV)"
 	$(V1) [ ! -d "$(OPENOCD_BUILD_DIR)" ] || $(RM) -rf "$(OPENOCD_BUILD_DIR)"
 	$(V1) mkdir -p "$(OPENOCD_BUILD_DIR)"
-	$(V1) git clone --depth 1 --no-checkout $(OPENOCD_URL) "$(DL_DIR)/openocd-build"
+	$(V1) git clone --no-checkout $(OPENOCD_URL) "$(DL_DIR)/openocd-build"
 	$(V1) ( \
 	  cd $(OPENOCD_BUILD_DIR) ; \
 	  git checkout -q $(OPENOCD_REV) ; \
@@ -327,13 +329,13 @@ openocd_win_clean:
 
 openocd_git_install: | $(DL_DIR) $(TOOLS_DIR)
 openocd_git_install: OPENOCD_URL  := git://openocd.git.sourceforge.net/gitroot/openocd/openocd
-openocd_git_install: OPENOCD_REV  := c59a4419fcc5568d59fbaee775132f91cb7fd26b
+openocd_git_install: OPENOCD_REV  := f1c0133321c8fcadadd10bba5537c0a634eb183b
 openocd_git_install: openocd_clean
         # download the source
 	$(V0) @echo " DOWNLOAD     $(OPENOCD_URL) @ $(OPENOCD_REV)"
 	$(V1) [ ! -d "$(OPENOCD_BUILD_DIR)" ] || $(RM) -rf "$(OPENOCD_BUILD_DIR)"
 	$(V1) mkdir -p "$(OPENOCD_BUILD_DIR)"
-	$(V1) git clone --depth 1 --no-checkout $(OPENOCD_URL) "$(OPENOCD_BUILD_DIR)"
+	$(V1) git clone --no-checkout $(OPENOCD_URL) "$(OPENOCD_BUILD_DIR)"
 	$(V1) ( \
 	  cd $(OPENOCD_BUILD_DIR) ; \
 	  git checkout -q $(OPENOCD_REV) ; \
@@ -424,7 +426,7 @@ dfuutil_clean:
 ##############################
 
 ifeq ($(shell [ -d "$(QT_SDK_DIR)" ] && echo "exists"), exists)
-  QMAKE=$(QT_SDK_DIR)/qt/bin/qmake
+  QMAKE=$(QT_SDK_DIR)/Desktop/Qt/4.8.0/gcc/bin/qmake
 else
   # not installed, hope it's in the path...
   QMAKE=qmake

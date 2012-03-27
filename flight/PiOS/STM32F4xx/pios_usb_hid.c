@@ -502,13 +502,17 @@ static bool PIOS_USB_HID_EP_OUT_Callback(uint32_t usb_hid_id, uint8_t epnum, uin
 	uint16_t max_payload_length = PIOS_USB_BOARD_HID_DATA_LENGTH - 2;
 #endif
 
+	bool rc;
 	if (headroom >= max_payload_length) {
 		/* We have room for a maximum length message */
-		return true;
+		PIOS_USBHOOK_EndpointRx(usb_hid_dev->cfg->data_rx_ep,
+					usb_hid_dev->rx_packet_buffer,
+					sizeof(usb_hid_dev->rx_packet_buffer));
+		rc = true;
 	} else {
 		/* Not enough room left for a message, apply backpressure */
 		usb_hid_dev->rx_active = false;
-		return false;
+		rc = false;
 	}
 
 #if defined(PIOS_INCLUDE_FREERTOS)
@@ -516,6 +520,8 @@ static bool PIOS_USB_HID_EP_OUT_Callback(uint32_t usb_hid_id, uint8_t epnum, uin
 		vPortYieldFromISR();
 	}
 #endif	/* PIOS_INCLUDE_FREERTOS */
+
+	return rc;
 }
 
 #endif	/* PIOS_INCLUDE_USB_HID */

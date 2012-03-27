@@ -68,7 +68,7 @@
 #define SENSOR_PERIOD 2
 
 #define F_PI 3.14159265358979323846f
-#define PI_MOD(x) (fmod(x + F_PI, F_PI * 2) - F_PI)
+#define PI_MOD(x) (fmodf(x + F_PI, F_PI * 2) - F_PI)
 // Private types
 
 // Private variables
@@ -88,6 +88,9 @@ static float mag_bias[3] = {0,0,0};
 static float mag_scale[3] = {0,0,0};
 static float accel_bias[3] = {0,0,0};
 static float accel_scale[3] = {0,0,0};
+
+static float R[3][3] = {{0}};
+static int8_t rotate = 0;
 
 /**
  * API for sensor fusion algorithms:
@@ -109,8 +112,13 @@ int32_t SensorsInitialize(void)
 	AccelsInitialize();
 	MagnetometerInitialize();
 	RevoCalibrationInitialize();
+	AttitudeSettingsInitialize();
+
+	rotate = 0;
 
 	RevoCalibrationConnectCallback(&settingsUpdatedCb);
+	AttitudeSettingsConnectCallback(&settingsUpdatedCb);
+
 	return 0;
 }
 
@@ -333,18 +341,38 @@ static void SensorsTask(void *parameters)
 		float accels[3] = {(float) accel_accum[1] / accel_samples, 
 		                   (float) accel_accum[0] / accel_samples,
 		                  -(float) accel_accum[2] / accel_samples};
-		accelsData.x = accels[0] * accel_scaling * accel_scale[0] - accel_bias[0];
-		accelsData.y = accels[1] * accel_scaling * accel_scale[1] - accel_bias[1];
-		accelsData.z = accels[2] * accel_scaling * accel_scale[2] - accel_bias[2];
+		float accels_out[3] = {accels[0] * accel_scaling * accel_scale[0] - accel_bias[0],
+		                       accels[1] * accel_scaling * accel_scale[1] - accel_bias[1],
+		                       accels[2] * accel_scaling * accel_scale[2] - accel_bias[2]};
+		if (rotate) {
+			rot_mult(R, accels_out, accels);
+			accelsData.x = accels[0];
+			accelsData.y = accels[1];
+			accelsData.z = accels[2];
+		} else {
+			accelsData.x = accels_out[0];
+			accelsData.y = accels_out[1];
+			accelsData.z = accels_out[2];
+		}
 		AccelsSet(&accelsData);
 
 		// Scale the gyros
 		float gyros[3] = {(float) gyro_accum[1] / gyro_samples,
 		                  (float) gyro_accum[0] / gyro_samples,
 		                 -(float) gyro_accum[2] / gyro_samples};
-		gyrosData.x = gyros[0] * gyro_scaling;
-		gyrosData.y = gyros[1] * gyro_scaling;
-		gyrosData.z = gyros[2] * gyro_scaling;
+		float gyros_out[3] = {gyros[0] * gyro_scaling,
+		                      gyros[1] * gyro_scaling,
+		                      gyros[2] * gyro_scaling};
+		if (rotate) {
+			rot_mult(R, gyros_out, gyros);
+			gyrosData.x = gyros[0];
+			gyrosData.y = gyros[1];
+			gyrosData.z = gyros[2];
+		} else {
+			gyrosData.x = gyros_out[0];
+			gyrosData.y = gyros_out[1];
+			gyrosData.z = gyros_out[2];
+		}
 		
 		if (bias_correct_gyro) {
 			// Apply bias correction to the gyros
@@ -364,9 +392,20 @@ static void SensorsTask(void *parameters)
 		if (PIOS_HMC5883_NewDataAvailable() || PIOS_DELAY_DiffuS(mag_update_time) > 150000) {
 			int16_t values[3];
 			PIOS_HMC5883_ReadMag(values);
-			mag.x = values[1] * mag_scale[0] - mag_bias[0];
-			mag.y = values[0] * mag_scale[1] - mag_bias[1];
-			mag.z = -values[2] * mag_scale[2] - mag_bias[2];
+			float mags[3] = {(float) values[1] * mag_scale[0] - mag_bias[0],
+			                (float) values[0] * mag_scale[1] - mag_bias[1],
+			                -(float) values[2] * mag_scale[2] - mag_bias[2]};
+			if (rotate) {
+				float mag_out[3];
+				rot_mult(R, mags, mag_out);
+				mag.x = mag_out[0];
+				mag.y = mag_out[1];
+				mag.z = mag_out[2];
+			} else {
+				mag.x = mags[0];
+				mag.y = mags[1];
+				mag.z = mags[2];
+			}
 			MagnetometerSet(&mag);
 			mag_update_time = PIOS_DELAY_GetRaw();
 		}
@@ -417,6 +456,24 @@ static void settingsUpdatedCb(UAVObjEvent * objEv) {
 	accel_scale[0] = cal.accel_scale[REVOCALIBRATION_ACCEL_SCALE_X];
 	accel_scale[1] = cal.accel_scale[REVOCALIBRATION_ACCEL_SCALE_Y];
 	accel_scale[2] = cal.accel_scale[REVOCALIBRATION_ACCEL_SCALE_Z];
+
+	AttitudeSettingsData attitudeSettings;
+	AttitudeSettingsGet(&attitudeSettings);
+
+	// Indicates not to expend cycles on rotation
+	if(attitudeSettings.BoardRotation[0] == 0 && attitudeSettings.BoardRotation[1] == 0 &&
+	   attitudeSettings.BoardRotation[2] == 0) {
+		rotate = 0;
+	} else {
+		float rotationQuat[4];
+		const float rpy[3] = {attitudeSettings.BoardRotation[ATTITUDESETTINGS_BOARDROTATION_ROLL],
+			attitudeSettings.BoardRotation[ATTITUDESETTINGS_BOARDROTATION_PITCH],
+			attitudeSettings.BoardRotation[ATTITUDESETTINGS_BOARDROTATION_YAW]};
+		RPY2Quaternion(rpy, rotationQuat);
+		Quaternion2R(rotationQuat, R);
+		rotate = 1;
+	}
+
 }
 /**
   * @}

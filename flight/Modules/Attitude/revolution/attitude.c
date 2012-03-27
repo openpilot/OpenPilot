@@ -70,7 +70,7 @@
 #define FAILSAFE_TIMEOUT_MS 10
 
 #define F_PI 3.14159265358979323846f
-#define PI_MOD(x) (fmod(x + F_PI, F_PI * 2) - F_PI)
+#define PI_MOD(x) (fmodf(x + F_PI, F_PI * 2) - F_PI)
 // Private types
 
 // Private variables

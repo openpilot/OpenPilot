@@ -283,7 +283,7 @@ libusb_win_clean:
 
 openocd_git_win_install: | $(DL_DIR) $(TOOLS_DIR)
 openocd_git_win_install: OPENOCD_URL  := git://openocd.git.sourceforge.net/gitroot/openocd/openocd
-openocd_git_win_install: OPENOCD_REV  := c59a4419fcc5568d59fbaee775132f91cb7fd26b
+openocd_git_win_install: OPENOCD_REV  := f1c0133321c8fcadadd10bba5537c0a634eb183b
 openocd_git_win_install: openocd_win_clean libusb_win_install ftd2xx_install
         # download the source
 	$(V0) @echo " DOWNLOAD     $(OPENOCD_URL) @ $(OPENOCD_REV)"
@@ -332,7 +332,7 @@ openocd_win_clean:
 
 openocd_git_install: | $(DL_DIR) $(TOOLS_DIR)
 openocd_git_install: OPENOCD_URL  := git://openocd.git.sourceforge.net/gitroot/openocd/openocd
-openocd_git_install: OPENOCD_REV  := c59a4419fcc5568d59fbaee775132f91cb7fd26b
+openocd_git_install: OPENOCD_REV  := f1c0133321c8fcadadd10bba5537c0a634eb183b
 openocd_git_install: openocd_clean
         # download the source
 	$(V0) @echo " DOWNLOAD     $(OPENOCD_URL) @ $(OPENOCD_REV)"

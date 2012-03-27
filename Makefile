@@ -289,7 +289,7 @@ openocd_git_win_install: openocd_win_clean libusb_win_install ftd2xx_install
 	$(V0) @echo " DOWNLOAD     $(OPENOCD_URL) @ $(OPENOCD_REV)"
 	$(V1) [ ! -d "$(OPENOCD_BUILD_DIR)" ] || $(RM) -rf "$(OPENOCD_BUILD_DIR)"
 	$(V1) mkdir -p "$(OPENOCD_BUILD_DIR)"
-	$(V1) git clone --depth 1 --no-checkout $(OPENOCD_URL) "$(DL_DIR)/openocd-build"
+	$(V1) git clone --no-checkout $(OPENOCD_URL) "$(DL_DIR)/openocd-build"
 	$(V1) ( \
 	  cd $(OPENOCD_BUILD_DIR) ; \
 	  git checkout -q $(OPENOCD_REV) ; \
@@ -338,7 +338,7 @@ openocd_git_install: openocd_clean
 	$(V0) @echo " DOWNLOAD     $(OPENOCD_URL) @ $(OPENOCD_REV)"
 	$(V1) [ ! -d "$(OPENOCD_BUILD_DIR)" ] || $(RM) -rf "$(OPENOCD_BUILD_DIR)"
 	$(V1) mkdir -p "$(OPENOCD_BUILD_DIR)"
-	$(V1) git clone --depth 1 --no-checkout $(OPENOCD_URL) "$(OPENOCD_BUILD_DIR)"
+	$(V1) git clone --no-checkout $(OPENOCD_URL) "$(OPENOCD_BUILD_DIR)"
 	$(V1) ( \
 	  cd $(OPENOCD_BUILD_DIR) ; \
 	  git checkout -q $(OPENOCD_REV) ; \

@@ -65,8 +65,9 @@
 #define MAX_QUEUE_SIZE 1
 #define STACK_SIZE_BYTES 1500
 #define TASK_PRIORITY (tskIDLE_PRIORITY+2)
-#define RAD2DEG (180.0/M_PI)
-#define GEE 9.81
+#define f_PI 3.1415926535897932f
+#define RAD2DEG (180.0f/f_PI)
+#define GEE 9.81f
 // Private types
 
 // Private variables
@@ -330,13 +331,13 @@ void updateVtolDesiredVelocity()
 	 */
 	float speed = sqrtf( northCommand*northCommand + eastCommand*eastCommand );
 	if (speed>=guidanceSettings.HorizontalVelMax) {
-		northCommand *= (float)guidanceSettings.HorizontalVelMax / speed;
-		eastCommand *= (float)guidanceSettings.HorizontalVelMax / speed;
+		northCommand *= guidanceSettings.HorizontalVelMax / speed;
+		eastCommand *= guidanceSettings.HorizontalVelMax / speed;
 	}
 	velocityDesired.North = northCommand;
 	velocityDesired.East = eastCommand;
 
-	downError = (float)positionDesired.Down - (float)positionActual.Down;
+	downError = positionDesired.Down - positionActual.Down;
 	downPosIntegral = bound(downPosIntegral + downError * dT * guidanceSettings.VerticalPosPI[GUIDANCESETTINGS_VERTICALPOSPI_KI], 
 		-guidanceSettings.VerticalPosPI[GUIDANCESETTINGS_VERTICALPOSPI_ILIMIT],
 		guidanceSettings.VerticalPosPI[GUIDANCESETTINGS_VERTICALPOSPI_ILIMIT]);
@@ -359,7 +360,7 @@ static void updateFixedDesiredAttitude()
 {
 	static portTickType lastSysTime;
 	portTickType thisSysTime = xTaskGetTickCount();;
-	float dT;
+	float dT = 0;
 
 	VelocityDesiredData velocityDesired;
 	VelocityActualData velocityActual;
@@ -408,8 +409,8 @@ static void updateFixedDesiredAttitude()
 
 	// Compute desired roll command
 	courseError = RAD2DEG * (atan2f(velocityDesired.East,velocityDesired.North) - atan2f(velocityActual.East,velocityActual.North));
-	if (courseError<-180.) courseError+=360.;
-	if (courseError>180.) courseError-=360.;
+	if (courseError<-180.0f) courseError+=360.0f;
+	if (courseError>180.0f) courseError-=360.0f;
 
 	courseIntegral = bound(courseIntegral + courseError * dT * guidanceSettings.CoursePI[GUIDANCESETTINGS_COURSEPI_KI], 
 		-guidanceSettings.CoursePI[GUIDANCESETTINGS_COURSEPI_ILIMIT],
@@ -588,13 +589,13 @@ static void updateVtolDesiredAttitude()
 	// Project the north and east command signals into the pitch and roll based on yaw.  For this to behave well the
 	// craft should move similarly for 5 deg roll versus 5 deg pitch
 	stabDesired.Pitch = bound(guidanceSettings.PitchLimit[GUIDANCESETTINGS_PITCHLIMIT_NEUTRAL] +
-		(-northCommand * cosf(attitudeActual.Yaw * M_PI / 180)) +
-		(-eastCommand * sinf(attitudeActual.Yaw * M_PI / 180)),
+		(-northCommand * cosf(attitudeActual.Yaw * f_PI / 180.0f)) +
+		(-eastCommand * sinf(attitudeActual.Yaw * f_PI / 180.0f)),
 		guidanceSettings.PitchLimit[GUIDANCESETTINGS_PITCHLIMIT_MIN],
 		guidanceSettings.PitchLimit[GUIDANCESETTINGS_PITCHLIMIT_MAX]);
 	stabDesired.Roll = bound(guidanceSettings.RollLimit[GUIDANCESETTINGS_ROLLLIMIT_NEUTRAL] +
-		(-northCommand * sinf(attitudeActual.Yaw * M_PI / 180)) +
-		(eastCommand * cosf(attitudeActual.Yaw * M_PI / 180)),
+		(-northCommand * sinf(attitudeActual.Yaw * f_PI / 180.0f)) +
+		(eastCommand * cosf(attitudeActual.Yaw * f_PI / 180.0f)),
 		guidanceSettings.RollLimit[GUIDANCESETTINGS_ROLLLIMIT_MIN],
 		guidanceSettings.RollLimit[GUIDANCESETTINGS_ROLLLIMIT_MAX] );
 	

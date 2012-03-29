@@ -69,7 +69,7 @@ class CORE_EXPORT ConnectionManager : public QWidget
     Q_OBJECT
 
 public:
-    ConnectionManager(Internal::MainWindow *mainWindow, QTabWidget *modeStack);
+    ConnectionManager(Internal::MainWindow *mainWindow, ModeStack *modeStack);
     virtual ~ConnectionManager();
 
     void init();

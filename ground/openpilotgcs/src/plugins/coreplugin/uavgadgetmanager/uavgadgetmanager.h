@@ -68,7 +68,11 @@ public:
 
     // IMode
     QString name() const { return m_name; }
+    void setName(QString name){m_name = name;}
     QIcon icon() const { return m_icon; }
+    void setIcon(QIcon icon){m_icon = icon;}
+    QString qmlPath() const{return m_qmlPath;}
+    void setQmlPath(QString path){m_qmlPath = path;}
     int priority() const { return m_priority; }
     void setPriority(int priority) { m_priority = priority; }
     const char *uniqueModeName() const { return m_uniqueModeName; }
@@ -123,6 +127,7 @@ private:
 
     QString m_name;
     QIcon m_icon;
+    QString m_qmlPath;
     int m_priority;
     QString m_uniqueName;
     QByteArray m_uniqueNameBA;

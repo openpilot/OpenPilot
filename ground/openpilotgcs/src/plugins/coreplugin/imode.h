@@ -47,7 +47,11 @@ public:
     virtual ~IMode() {}
 
     virtual QString name() const = 0;
+    virtual void setName(QString name) = 0;
     virtual QIcon icon() const = 0;
+    virtual void setIcon(QIcon icon) = 0;
+    virtual QString qmlPath() const = 0;
+    virtual void setQmlPath(QString path) = 0;
     virtual int priority() const = 0;
     virtual void setPriority(int priority) = 0;
     virtual const char *uniqueModeName() const = 0;

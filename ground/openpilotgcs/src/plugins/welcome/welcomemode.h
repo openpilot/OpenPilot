@@ -31,6 +31,7 @@
 
 #include "welcome_global.h"
 
+#include <QIcon>
 #include <coreplugin/imode.h>
 
 
@@ -53,7 +54,11 @@ public:
 
     // IMode
     QString name() const;
+    void setName(QString name);
     QIcon icon() const;
+    void setIcon(QIcon icon);
+    QString qmlPath() const;
+    void setQmlPath(QString path);
     int priority() const;
     QWidget *widget();
     const char *uniqueModeName() const;
@@ -69,6 +74,9 @@ public slots:
 private:
     WelcomeModePrivate *m_d;
     int m_priority;
+    QString m_name;
+    QString m_qmlPath;
+    QIcon m_icon;
 };
 
 } // namespace Welcome

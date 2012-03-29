@@ -35,18 +35,19 @@
 #include <QtCore/QVector>
 
 #include <coreplugin/core_global.h>
+#include "modestack.h"
 
 QT_BEGIN_NAMESPACE
 class QSignalMapper;
 class QMenu;
 class QIcon;
-class MyTabWidget;
 QT_END_NAMESPACE
 
 namespace Core {
 
 class Command;
 class IMode;
+class ModeStack;
 
 namespace Internal {
 class FancyTabWidget;
@@ -59,7 +60,7 @@ class CORE_EXPORT ModeManager : public QObject
     Q_OBJECT
 
 public:
-    ModeManager(Internal::MainWindow *mainWindow, MyTabWidget *modeStack);
+    ModeManager(Internal::MainWindow *mainWindow, ModeStack *modeStack);
 
     void init();
     static ModeManager *instance() { return m_instance; }
@@ -96,7 +97,7 @@ private:
 
     static ModeManager *m_instance;
     Internal::MainWindow *m_mainWindow;
-    MyTabWidget *m_modeStack;
+    ModeStack *m_modeStack;
     QMap<Command*, int> m_actions;
     QVector<IMode*> m_modes;
     QVector<Command*> m_modeShortcuts;

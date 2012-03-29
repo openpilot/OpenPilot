@@ -62,4 +62,8 @@
         <file>OpenPilotGCS.xml</file>
         <file>images/helpicon.svg</file>
     </qresource>
+    <qresource prefix="/core/qml">
+        <file>UAVGadgetManager.qml</file>
+        <file>ModeStack.qml</file>
+    </qresource>
 </RCC>

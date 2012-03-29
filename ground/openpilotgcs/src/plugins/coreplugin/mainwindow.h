@@ -56,6 +56,7 @@ class ConnectionManager;
 class MessageManager;
 class MimeDatabase;
 class ModeManager;
+class ModeStack;
 class RightPaneWidget;
 class SettingsDatabase;
 class UniqueIDManager;
@@ -187,7 +188,7 @@ private:
     UAVGadgetInstanceManager *m_uavGadgetInstanceManager;
     ConnectionManager *m_connectionManager;
     MimeDatabase *m_mimeDatabase;
-    MyTabWidget *m_modeStack;
+    ModeStack *m_modeStack;
     Core::BaseView *m_outputView;
     VersionDialog *m_versionDialog;
     AuthorsDialog *m_authorsDialog;

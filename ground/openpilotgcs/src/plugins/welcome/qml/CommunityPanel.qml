@@ -15,10 +15,15 @@ Item {
 
     NewsPanel {
         id: newsPanel
+        x: 33
+        y: 32
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         width: parent.width*0.6
+        anchors.bottomMargin: 32
+        anchors.leftMargin: 33
+        anchors.topMargin: 32
         anchors.margins: 32
 
         onClicked: welcomePlugin.openUrl(url)

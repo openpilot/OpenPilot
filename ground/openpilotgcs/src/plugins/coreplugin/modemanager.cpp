@@ -26,6 +26,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#include "modestack.h"
 #include "modemanager.h"
 
 #include "fancytabwidget.h"
@@ -60,7 +61,7 @@ using namespace Core::Internal;
 
 ModeManager *ModeManager::m_instance = 0;
 
-ModeManager::ModeManager(Internal::MainWindow *mainWindow, MyTabWidget *modeStack) :
+ModeManager::ModeManager(Internal::MainWindow *mainWindow, ModeStack *modeStack) :
     m_mainWindow(mainWindow),
     m_modeStack(modeStack),
     m_signalMapper(new QSignalMapper(this)),
@@ -68,9 +69,8 @@ ModeManager::ModeManager(Internal::MainWindow *mainWindow, MyTabWidget *modeStac
 {
     m_instance = this;
 
-//    connect((m_modeStack), SIGNAL(currentAboutToShow(int)), SLOT(currentTabAboutToChange(int)));
     connect(m_modeStack, SIGNAL(currentChanged(int)), this, SLOT(currentTabChanged(int)));
-    connect(m_modeStack, SIGNAL(tabMoved(int,int)), this, SLOT(tabMoved(int,int)));
+//    connect(m_modeStack, SIGNAL(tabMoved(int,int)), this, SLOT(tabMoved(int,int)));
     connect(m_signalMapper, SIGNAL(mapped(QString)), this, SLOT(activateMode(QString)));
 }
 
@@ -139,7 +139,7 @@ void ModeManager::objectAdded(QObject *obj)
             ++index;
 
     m_modes.insert(index, mode);
-    m_modeStack->insertTab(index, mode->widget(), mode->icon(), mode->name());
+    m_modeStack->insertItem(index, mode);
 
     // Register mode shortcut
     ActionManager *am = m_mainWindow->actionManager();
@@ -178,7 +178,7 @@ void ModeManager::updateModeToolTip()
     if (cmd) {
         int index = m_modeShortcuts.indexOf(cmd);
         if (index != -1)
-            m_modeStack->setTabToolTip(index, cmd->stringWithAppendedShortcut(cmd->shortcut()->whatsThis()));
+            m_modeStack->setItemToolTip(index, cmd->stringWithAppendedShortcut(cmd->shortcut()->whatsThis()));
     }
 }
 
@@ -187,8 +187,8 @@ void ModeManager::updateModeNameIcon(IMode *mode, const QIcon &icon, const QStri
     int index = indexOf(mode->uniqueModeName());
     if (index < 0)
         return;
-    m_modeStack->setTabIcon(index, icon);
-    m_modeStack->setTabText(index, label);
+    m_modeStack->setItemIcon(index, icon);
+    m_modeStack->setItemText(index, label);
 }
 
 void ModeManager::aboutToRemoveObject(QObject *obj)
@@ -201,7 +201,7 @@ void ModeManager::aboutToRemoveObject(QObject *obj)
     m_modes.remove(index);
     m_modeShortcuts.remove(index);
     disconnect(m_modeStack, SIGNAL(currentChanged(int)), this, SLOT(currentTabChanged(int)));
-    m_modeStack->removeTab(index);
+    m_modeStack->removeItem(index);
     connect(m_modeStack, SIGNAL(currentChanged(int)), this, SLOT(currentTabChanged(int)));
 
     m_mainWindow->removeContextObject(mode);
@@ -285,7 +285,7 @@ void ModeManager::reorderModes(QMap<QString, int> priorities)
             IMode *mode2 = m_modes.at(i+1);
 //            qDebug() << "Comparing " << i << " to " << i+1 << " p1 " << mode1->priority() << " p2 " << mode2->priority();
             if (mode2->priority() > mode1->priority()) {
-                m_modeStack->moveTab(i, i+1);
+                m_modeStack->moveItem(i, i+1);
 //                qDebug() << "Tab moved from " << i << " to " << i+1;
                 swapped = true;
             }

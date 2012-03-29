@@ -26,6 +26,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#include "modestack.h"
 #include "connectionmanager.h"
 
 #include <aggregation/aggregate.h>
@@ -43,7 +44,7 @@
 namespace Core {
 
 
-ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow, QTabWidget *modeStack) :
+ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow, ModeStack *modeStack) :
 	QWidget(mainWindow),	// Pip
 	m_availableDevList(0),
     m_connectBtn(0),
@@ -79,7 +80,7 @@ ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow, QTabWidge
     setLayout(layout);
 
     //    modeStack->insertCornerWidget(modeStack->cornerWidgetCount()-1, this);
-    modeStack->setCornerWidget(this, Qt::TopRightCorner);
+//    modeStack->setCornerWidget(this, Qt::TopRightCorner);
 
 	QObject::connect(m_connectBtn, SIGNAL(pressed()), this, SLOT(onConnectPressed()));
 }

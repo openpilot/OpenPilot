@@ -73,10 +73,13 @@ WelcomeMode::WelcomeMode() :
     m_d(new WelcomeModePrivate),
     m_priority(Core::Constants::P_MODE_WELCOME)
 {
+    m_name = tr("Welcome");
+    m_qmlPath = QLatin1String("qrc:/welcome/qml/main.qml");
+    m_icon = QIcon(QLatin1String(":/core/images/openpilot_logo_64.png"));
     m_d->declarativeView = new QDeclarativeView;
     m_d->declarativeView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     m_d->declarativeView->engine()->rootContext()->setContextProperty("welcomePlugin", this);
-    m_d->declarativeView->setSource(QUrl("qrc:/welcome/qml/main.qml"));
+    m_d->declarativeView->setSource(QUrl(m_qmlPath));
 }
 
 WelcomeMode::~WelcomeMode()
@@ -87,12 +90,33 @@ WelcomeMode::~WelcomeMode()
 
 QString WelcomeMode::name() const
 {
-    return tr("Welcome");
+    return m_name;
+}
+
+void WelcomeMode::setName(QString name)
+{
+    m_name = name;
 }
 
 QIcon WelcomeMode::icon() const
 {
-    return QIcon(QLatin1String(":/core/images/openpilot_logo_64.png"));
+    return m_icon;
+}
+
+void WelcomeMode::setIcon(QIcon icon)
+{
+    m_icon = icon;
+}
+
+QString WelcomeMode::qmlPath() const
+{
+    return m_qmlPath;
+}
+
+void WelcomeMode::setQmlPath(QString path)
+{
+    m_qmlPath = path;
+    m_d->declarativeView->setSource(QUrl(m_qmlPath));
 }
 
 int WelcomeMode::priority() const

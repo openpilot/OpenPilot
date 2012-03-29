@@ -32,7 +32,9 @@
 #include "pluginspec_p.h"
 #include "optionsparser.h"
 #include "iplugin.h"
+#ifdef Q_OS_ANDROID
 #include "/home/violator/necessitas/Android/Qt/480/qt-src/src/plugins/platforms/android/src/androidjnimain.h"
+#endif
 
 #include <QtCore/QMetaProperty>
 #include <QtCore/QDir>

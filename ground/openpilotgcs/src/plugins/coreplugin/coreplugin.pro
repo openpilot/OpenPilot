@@ -63,7 +63,9 @@ SOURCES += mainwindow.cpp \
     uavgadgetdecorator.cpp \
     workspacesettings.cpp \
     uavconfiginfo.cpp \
-    authorsdialog.cpp
+    authorsdialog.cpp \
+    modestack.cpp \
+    modestackmodel.cpp
 HEADERS += mainwindow.h \
     tabpositionindicator.h \
     fancyactionbar.h \
@@ -123,7 +125,9 @@ HEADERS += mainwindow.h \
     workspacesettings.h \
     uavconfiginfo.h \
     authorsdialog.h \
-    iconfigurableplugin.h
+    iconfigurableplugin.h \
+    modestack.h \
+    modestackmodel.h
 FORMS += dialogs/settingsdialog.ui \
     dialogs/shortcutsettings.ui \
     generalsettings.ui \
@@ -146,8 +150,16 @@ android-g++{
     INSTALLS += pluginSpec
 #    INSTALLS += qmlFiles
 }
-OTHER_FILES += Core.pluginspec# \
+OTHER_FILES += Core.pluginspec # \
+#    UAVGadgetManager.qml
 #    mainwindow.qml
 
 include(gcsversioninfo.pri)
+
+
+
+
+
+
+
 

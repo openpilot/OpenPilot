@@ -14,7 +14,7 @@ Item {
         width: parent.width
         color: "#303060"
         font {
-            pointSize: 14
+            pointSize: 10
             weight: Font.Bold
         }
     }
@@ -43,7 +43,7 @@ Item {
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
 
             font {
-                pointSize: 12
+                pointSize: 8
                 weight: Font.Bold
             }
 

@@ -26,6 +26,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#include "modestack.h"
 #include "mainwindow.h"
 #include "actioncontainer.h"
 #include "actionmanager_p.h"
@@ -33,7 +34,6 @@
 #include "connectionmanager.h"
 #include "coreimpl.h"
 #include "coreconstants.h"
-#include "utils/mytabwidget.h"
 #include "generalsettings.h"
 #include "messagemanager.h"
 #include "modemanager.h"
@@ -169,50 +169,47 @@ MainWindow::MainWindow() :
 #endif
     qApp->setStyle(new ManhattanStyle(baseName));
 
+#ifndef Q_OS_ANDROID
     setDockNestingEnabled(true);
 
     setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
     setCorner(Qt::BottomRightCorner, Qt::BottomDockWidgetArea);
+#endif
 
     registerDefaultContainers();
     registerDefaultActions();
 
-    m_modeStack = new MyTabWidget(this);
+    m_modeStack = new ModeStack(this);
     m_modeStack->setIconSize(QSize(24,24));
-    m_modeStack->setTabPosition(QTabWidget::South);
-    m_modeStack->setMovable(false);
-    m_modeStack->setMinimumWidth(512);
-    m_modeStack->setElideMode(Qt::ElideRight);
+//    m_modeStack->setTabPosition(QTabWidget::South);
+//    m_modeStack->setMovable(false);
+//    m_modeStack->setMinimumWidth(512);
+//    m_modeStack->setElideMode(Qt::ElideRight);
 #ifndef Q_WS_MAC
-    m_modeStack->setDocumentMode(true);
+//    m_modeStack->setDocumentMode(true);
 #endif
     m_modeManager = new ModeManager(this, m_modeStack);
 
     m_connectionManager = new ConnectionManager(this, m_modeStack);
 
+#ifndef Q_OS_ANDROID
     m_messageManager = new MessageManager;
+#endif
 
-//    qDebug() << "DSW: Loading QML";
-//    QDeclarativeView *view = new QDeclarativeView();
-//    view->engine()->setBaseUrl(QUrl::fromLocalFile("/"));
-//    view->setSource(QUrl::fromLocalFile("qml/mainwindow.qml"));
-
-//    if(view->status() == QDeclarativeView::Error){
-//        foreach(QDeclarativeError curError, view->errors()){
-//            qDebug() << "DSW: QML error - " << curError.description();
-//        }
-//    }
-
-    setCentralWidget(m_modeStack);
+    setCentralWidget(m_modeStack->getWidget());
     qDebug() << "DSW: Set central widget";
 
     connect(QApplication::instance(), SIGNAL(focusChanged(QWidget*,QWidget*)),
             this, SLOT(updateFocusWidget(QWidget*,QWidget*)));
+#ifndef Q_OS_ANDROID
     connect(m_workspaceSettings, SIGNAL(tabBarSettingsApplied(QTabWidget::TabPosition,bool)),
             this, SLOT(applyTabBarSettings(QTabWidget::TabPosition,bool)));
     connect(m_modeManager, SIGNAL(newModeOrder(QVector<IMode*>)), m_workspaceSettings, SLOT(newModeOrder(QVector<IMode*>)));
+#endif
 
+#ifndef Q_OS_ANDROID
     setUnifiedTitleAndToolBarOnMac(true);
+#endif
 #ifdef Q_OS_UNIX
 //     signal(SIGINT, handleSigInt);
 #endif
@@ -233,17 +230,19 @@ MainWindow::MainWindow() :
 
 MainWindow::~MainWindow()
 {
-	if (m_connectionManager)	// Pip
-	{
-		m_connectionManager->disconnectDevice();
-		m_connectionManager->suspendPolling();
-	}
+    if (m_connectionManager)	// Pip
+    {
+            m_connectionManager->disconnectDevice();
+            m_connectionManager->suspendPolling();
+    }
 
-	hide();
+    hide();
 
-	qxtLog->removeAsMessageHandler();
+#ifndef Q_OS_ANDROID
+    qxtLog->removeAsMessageHandler();
     foreach (QString engine, qxtLog->allLoggerEngines())
         qxtLog->removeLoggerEngine(engine);
+#endif
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     if (m_uavGadgetManagers.count() > 0) {
         foreach (UAVGadgetManager *mode, m_uavGadgetManagers)
@@ -256,8 +255,10 @@ MainWindow::~MainWindow()
     pm->removeObject(m_shortcutSettings);
     pm->removeObject(m_generalSettings);
     pm->removeObject(m_workspaceSettings);
+#ifndef Q_OS_ANDROID
     delete m_messageManager;
     m_messageManager = 0;
+#endif
     delete m_shortcutSettings;
     m_shortcutSettings = 0;
     delete m_generalSettings;
@@ -326,12 +327,18 @@ void MainWindow::extensionsInitialized()
     m_uavGadgetInstanceManager = new UAVGadgetInstanceManager(this);
     m_uavGadgetInstanceManager->readSettings(qs);
 
+#ifndef Q_OS_ANDROID
     m_messageManager->init();
+#endif
     readSettings(qs);
+    qDebug() << "DSW: read main window settings";
 
+#ifndef Q_OS_ANDROID
     updateContext();
+#endif
 
     emit m_coreImpl->coreAboutToOpen();
+    qDebug() << "DSW: Showing MainWindow";
     show();
     emit m_coreImpl->coreOpened();
     qDebug() << "DSW: Extensions initialized";
@@ -889,9 +896,9 @@ void MainWindow::openFileWith()
 }
 
 void MainWindow::applyTabBarSettings(QTabWidget::TabPosition pos, bool movable) {
-    if (m_modeStack->tabPosition() != pos)
-        m_modeStack->setTabPosition(pos);
-    m_modeStack->setMovable(movable);
+//    if (m_modeStack->tabPosition() != pos)
+//        m_modeStack->setTabPosition(pos);
+//    m_modeStack->setMovable(movable);
 }
 
 ActionManager *MainWindow::actionManager() const
@@ -1170,9 +1177,11 @@ void MainWindow::readSettings(QSettings* qs, bool workspaceDiffOnly)
     m_actionManager->readSettings(qs);
 
     qs->beginGroup(QLatin1String(settingsGroup));
+    qDebug() << "DSW: Begin settings for MainWindow";
 
     Utils::StyleHelper::setBaseColor(qs->value(QLatin1String(colorKey)).value<QColor>());
 
+#ifndef Q_OS_ANDROID
     const QVariant geom = qs->value(QLatin1String(geometryKey));
     if (geom.isValid()) {
         setGeometry(geom.toRect());
@@ -1181,11 +1190,11 @@ void MainWindow::readSettings(QSettings* qs, bool workspaceDiffOnly)
     }
     if (qs->value(QLatin1String(maxKey), false).toBool())
         setWindowState(Qt::WindowMaximized);
-#ifndef Q_OS_ANDROID
     setFullScreen(qs->value(QLatin1String(fullScreenKey), false).toBool());
 #endif
 
     qs->endGroup();
+    qDebug() << "DSW: End settings for MainWindow";
 
     m_workspaceSettings->readSettings(qs);
 
@@ -1338,7 +1347,10 @@ void MainWindow::updateContext()
             uniquecontexts << c;
     }
 
+//#ifndef Q_OS_ANDROID
     m_actionManager->setContext(uniquecontexts);
+//#endif
+    qDebug() << "DSW: Updated context";
 }
 
 void MainWindow::aboutToShowRecentFiles()

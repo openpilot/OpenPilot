@@ -3,8 +3,8 @@ import QtQuick 1.1
 
 Item {
     id: welcomeButton
-    width: 116
-    height: 116
+//    width: 116
+//    height: 116
 
     property string baseIconName
     property alias label : labelText.text

@@ -85,6 +85,7 @@ UAVGadgetManager::UAVGadgetManager(ICore *core, QString name, QIcon icon, int pr
     m_core(core),
     m_name(name),
     m_icon(icon),
+//    m_qmlPath("qrc:/core/qml/ModeStack.qml"),
     m_priority(priority),
     m_widget(new QWidget(parent))
 {

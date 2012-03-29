@@ -28,7 +28,7 @@
 #include "configahrswidget.h"
 #include "configgadgetwidget.h"
 
-#include "ConfigVehicleTypeWidget.h"
+#include "configvehicletypewidget.h"
 #include "configccattitudewidget.h"
 #include "configinputwidget.h"
 #include "configoutputwidget.h"

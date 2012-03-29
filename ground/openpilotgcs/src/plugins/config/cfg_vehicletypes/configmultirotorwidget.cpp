@@ -1,8 +1,8 @@
 /**
  ******************************************************************************
  *
- * @file       configccpmwidget.cpp
- * @author     E. Lafargue & The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @file       configmultirotorwidget.cpp
+ * @author     E. Lafargue & The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup ConfigPlugin Config Plugin
@@ -66,11 +66,6 @@ void ConfigVehicleTypeWidget::setupMultiRotorUI(QString frameType)
 			combobox->setEnabled(false);
 		}
 		
-//		m_aircraft->multiMotorChannelBox4->setEnabled(false);
-//		m_aircraft->multiMotorChannelBox5->setEnabled(false);
-//		m_aircraft->multiMotorChannelBox6->setEnabled(false);
-//		m_aircraft->multiMotorChannelBox7->setEnabled(false);
-//		m_aircraft->multiMotorChannelBox8->setEnabled(false);
 		m_aircraft->triYawChannelBox->setEnabled(true);
 	} else if (frameType == "QuadX" || frameType == "Quad X") {
 		m_aircraft->aircraftType->setCurrentIndex(m_aircraft->aircraftType->findText("Multirotor"));
@@ -88,11 +83,6 @@ void ConfigVehicleTypeWidget::setupMultiRotorUI(QString frameType)
 			combobox->setEnabled(false);
 		}
 		
-//		m_aircraft->multiMotorChannelBox4->setEnabled(true);
-//		m_aircraft->multiMotorChannelBox5->setEnabled(false);
-//		m_aircraft->multiMotorChannelBox6->setEnabled(false);
-//		m_aircraft->multiMotorChannelBox7->setEnabled(false);
-//		m_aircraft->multiMotorChannelBox8->setEnabled(false);
 		m_aircraft->triYawChannelBox->setEnabled(false);
 		m_aircraft->mrRollMixLevel->setValue(50);
 		m_aircraft->mrPitchMixLevel->setValue(50);
@@ -112,11 +102,7 @@ void ConfigVehicleTypeWidget::setupMultiRotorUI(QString frameType)
 			QComboBox *combobox = qFindChild<QComboBox*>(this, "multiMotorChannelBox" + QString::number(i));
 			combobox->setEnabled(false);
 		}
-		//		m_aircraft->multiMotorChannelBox4->setEnabled(true);
-//		m_aircraft->multiMotorChannelBox5->setEnabled(false);
-//		m_aircraft->multiMotorChannelBox6->setEnabled(false);
-//		m_aircraft->multiMotorChannelBox7->setEnabled(false);
-//		m_aircraft->multiMotorChannelBox8->setEnabled(false);
+
 		m_aircraft->triYawChannelBox->setEnabled(false);
 		m_aircraft->mrRollMixLevel->setValue(100);
 		m_aircraft->mrPitchMixLevel->setValue(100);
@@ -137,11 +123,6 @@ void ConfigVehicleTypeWidget::setupMultiRotorUI(QString frameType)
 			combobox->setEnabled(false);
 		}
 		
-//		m_aircraft->multiMotorChannelBox4->setEnabled(true);
-//		m_aircraft->multiMotorChannelBox5->setEnabled(true);
-//		m_aircraft->multiMotorChannelBox6->setEnabled(true);
-//		m_aircraft->multiMotorChannelBox7->setEnabled(false);
-//		m_aircraft->multiMotorChannelBox8->setEnabled(false);
 		m_aircraft->triYawChannelBox->setEnabled(false);
 		m_aircraft->mrRollMixLevel->setValue(50);
 		m_aircraft->mrPitchMixLevel->setValue(33);
@@ -162,11 +143,6 @@ void ConfigVehicleTypeWidget::setupMultiRotorUI(QString frameType)
 			combobox->setEnabled(false);
 		}
 		
-//		m_aircraft->multiMotorChannelBox4->setEnabled(true);
-//		m_aircraft->multiMotorChannelBox5->setEnabled(true);
-//		m_aircraft->multiMotorChannelBox6->setEnabled(true);
-//		m_aircraft->multiMotorChannelBox7->setEnabled(false);
-//		m_aircraft->multiMotorChannelBox8->setEnabled(false);
 		m_aircraft->triYawChannelBox->setEnabled(false);
 		m_aircraft->mrRollMixLevel->setValue(33);
 		m_aircraft->mrPitchMixLevel->setValue(50);
@@ -188,11 +164,6 @@ void ConfigVehicleTypeWidget::setupMultiRotorUI(QString frameType)
 			combobox->setEnabled(false);
 		}
 		
-		//		m_aircraft->multiMotorChannelBox4->setEnabled(true);
-		//		m_aircraft->multiMotorChannelBox5->setEnabled(true);
-		//		m_aircraft->multiMotorChannelBox6->setEnabled(true);
-		//		m_aircraft->multiMotorChannelBox7->setEnabled(false);
-		//		m_aircraft->multiMotorChannelBox8->setEnabled(false);
 		m_aircraft->triYawChannelBox->setEnabled(false);
 		m_aircraft->mrRollMixLevel->setValue(100);
 		m_aircraft->mrPitchMixLevel->setValue(50);
@@ -209,11 +180,6 @@ void ConfigVehicleTypeWidget::setupMultiRotorUI(QString frameType)
 			combobox->setEnabled(true);
 		}		
 		
-//		m_aircraft->multiMotorChannelBox4->setEnabled(true);
-//		m_aircraft->multiMotorChannelBox5->setEnabled(true);
-//		m_aircraft->multiMotorChannelBox6->setEnabled(true);
-//		m_aircraft->multiMotorChannelBox7->setEnabled(true);
-//		m_aircraft->multiMotorChannelBox8->setEnabled(true);
 		m_aircraft->triYawChannelBox->setEnabled(false);
 		m_aircraft->mrRollMixLevel->setValue(33);
 		m_aircraft->mrPitchMixLevel->setValue(33);
@@ -229,11 +195,6 @@ void ConfigVehicleTypeWidget::setupMultiRotorUI(QString frameType)
 			combobox->setEnabled(true);
 		}		
 
-//		m_aircraft->multiMotorChannelBox4->setEnabled(true);
-//		m_aircraft->multiMotorChannelBox5->setEnabled(true);
-//		m_aircraft->multiMotorChannelBox6->setEnabled(true);
-//		m_aircraft->multiMotorChannelBox7->setEnabled(true);
-//		m_aircraft->multiMotorChannelBox8->setEnabled(true);
 		m_aircraft->triYawChannelBox->setEnabled(false);
 		m_aircraft->mrRollMixLevel->setValue(25);
 		m_aircraft->mrPitchMixLevel->setValue(25);
@@ -250,11 +211,6 @@ void ConfigVehicleTypeWidget::setupMultiRotorUI(QString frameType)
 			combobox->setEnabled(true);
 		}		
 
-//		m_aircraft->multiMotorChannelBox4->setEnabled(true);
-//		m_aircraft->multiMotorChannelBox5->setEnabled(true);
-//		m_aircraft->multiMotorChannelBox6->setEnabled(true);
-//		m_aircraft->multiMotorChannelBox7->setEnabled(true);
-//		m_aircraft->multiMotorChannelBox8->setEnabled(true);
 		m_aircraft->triYawChannelBox->setEnabled(false);
 		m_aircraft->mrRollMixLevel->setValue(100);
 		m_aircraft->mrPitchMixLevel->setValue(100);
@@ -271,11 +227,6 @@ void ConfigVehicleTypeWidget::setupMultiRotorUI(QString frameType)
 			combobox->setEnabled(true);
 		}		
 
-//		m_aircraft->multiMotorChannelBox4->setEnabled(true);
-//		m_aircraft->multiMotorChannelBox5->setEnabled(true);
-//		m_aircraft->multiMotorChannelBox6->setEnabled(true);
-//		m_aircraft->multiMotorChannelBox7->setEnabled(true);
-//		m_aircraft->multiMotorChannelBox8->setEnabled(true);
 		m_aircraft->triYawChannelBox->setEnabled(false);
 		m_aircraft->mrRollMixLevel->setValue(50);
 		m_aircraft->mrPitchMixLevel->setValue(50);

@@ -298,7 +298,7 @@ void ConfigAHRSWidget::launchAccelBiasCalibration()
     obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AttitudeRaw")));
     initialMdata = obj->getMetadata();
     UAVObject::Metadata mdata = initialMdata;
-		UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
+    UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
     mdata.flightTelemetryUpdatePeriod = 100;
     obj->setMetadata(mdata);
 
@@ -380,7 +380,7 @@ void ConfigAHRSWidget::launchGyroDriftCalibration()
         obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AttitudeRaw")));
         initialMdata = obj->getMetadata();
         UAVObject::Metadata mdata = initialMdata;
-				UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
+        UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
         mdata.flightTelemetryUpdatePeriod = 100;
         obj->setMetadata(mdata);
 
@@ -998,7 +998,7 @@ void ConfigAHRSWidget::multiPointCalibrationMode()
     obj = getObjectManager()->getObject(QString("AttitudeRaw"));
     initialMdata = obj->getMetadata();
     UAVObject::Metadata mdata = initialMdata;
-		UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
+    UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
     mdata.flightTelemetryUpdatePeriod = 100;
     obj->setMetadata(mdata);
 

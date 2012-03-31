@@ -309,7 +309,7 @@ void ConfigAirframeWidget::enableFFTest()
             UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ManualControlCommand")));
             UAVObject::Metadata mdata = obj->getMetadata();
             accInitialData = mdata;
-						UAVObject::SetFlightAccess(mdata, UAVObject::ACCESS_READONLY);
+            UAVObject::SetFlightAccess(mdata, UAVObject::ACCESS_READONLY);
             obj->setMetadata(mdata);
         }
         // Depending on phase, either move actuator or send FF settings:

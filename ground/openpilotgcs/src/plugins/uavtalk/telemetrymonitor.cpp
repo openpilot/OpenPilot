@@ -91,7 +91,7 @@ void TelemetryMonitor::startRetrievingObjects()
                 }
                 else
                 {
-									if ( UAVObject::GetFlightTelemetryUpdateMode(mdata) == UAVObject::UPDATEMODE_ONCHANGE )
+                    if ( UAVObject::GetFlightTelemetryUpdateMode(mdata) == UAVObject::UPDATEMODE_ONCHANGE )
                     {
                         queue.enqueue(obj);
                     }

@@ -156,7 +156,7 @@ void Telemetry::updateObject(UAVObject* obj)
 {
     // Get metadata
     UAVObject::Metadata metadata = obj->getMetadata();
-		UAVObject::UpdateMode updateMode = UAVObject::GetGcsTelemetryUpdateMode(metadata);
+    UAVObject::UpdateMode updateMode = UAVObject::GetGcsTelemetryUpdateMode(metadata);
 
     // Setup object depending on update mode
     qint32 eventMask;

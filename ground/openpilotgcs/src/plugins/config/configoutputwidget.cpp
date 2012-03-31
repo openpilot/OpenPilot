@@ -152,10 +152,10 @@ void ConfigOutputWidget::runChannelTests(bool state)
     {
         wasItMe=true;
         accInitialData = mdata;
-				UAVObject::SetFlightAccess(mdata, UAVObject::ACCESS_READONLY);
-				UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_ONCHANGE);
-				UAVObject::SetGcsTelemetryAcked(mdata, false);
-				UAVObject::SetGcsTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_ONCHANGE);
+        UAVObject::SetFlightAccess(mdata, UAVObject::ACCESS_READONLY);
+        UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_ONCHANGE);
+        UAVObject::SetGcsTelemetryAcked(mdata, false);
+        UAVObject::SetGcsTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_ONCHANGE);
         mdata.gcsTelemetryUpdatePeriod = 100;
     }
     else

@@ -36,7 +36,7 @@ UAVMetaObject::UAVMetaObject(quint32 objID, const QString& name, UAVObject* pare
 {
     this->parent = parent;
     // Setup default metadata of metaobject (can not be changed)
-		UAVObject::MetadataInitialize(ownMetadata);
+    UAVObject::MetadataInitialize(ownMetadata);
     // Setup fields
     QStringList boolEnum;
     boolEnum << tr("False") << tr("True");

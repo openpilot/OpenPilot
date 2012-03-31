@@ -128,7 +128,7 @@ int32_t UAVObjInitialize()
 		    return -1;
 
 	  // Initialize default metadata structure (metadata of metaobjects)
-		UAVObjMetadataInitialize(&defMetadata);
+	  UAVObjMetadataInitialize(&defMetadata);
 
 	  // Done
 	  return 0;

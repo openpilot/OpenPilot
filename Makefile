@@ -183,7 +183,7 @@ qt_sdk_install: qt_sdk_clean
 
         #installer is an executable, make it executable and run it
 	$(V1) chmod u+x "$(DL_DIR)/$(QT_SDK_FILE)"
-	"$(DL_DIR)/$(QT_SDK_FILE)" -style cleanlooks
+	$(V1) "$(DL_DIR)/$(QT_SDK_FILE)" -style cleanlooks
 
 .PHONY: qt_sdk_clean
 qt_sdk_clean:

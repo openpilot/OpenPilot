@@ -332,7 +332,7 @@ float PIOS_MPU6000_GetScale()
 
 float PIOS_MPU6000_GetAccelScale()
 {
-	return GRAV / 2048.0f;
+	return GRAV / 2048.0f / 2.0f;
 }
 
 /**

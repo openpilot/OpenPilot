@@ -81,7 +81,7 @@ public:
     ConfigccpmWidget(QWidget *parent = 0);
     ~ConfigccpmWidget();
 
-    friend class ConfigAirframeWidget;
+    friend class ConfigVehicleTypeWidget;
 
 private:
         Ui_ccpmWidget *m_ccpm;

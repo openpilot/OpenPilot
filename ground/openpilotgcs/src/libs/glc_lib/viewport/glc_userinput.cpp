@@ -19,50 +19,49 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
  *****************************************************************************/
-//! \file glc_openglstate.h interface for the GLC_OpenGLState class.
 
-#ifndef GLC_OPENGLSTATE_H_
-#define GLC_OPENGLSTATE_H_
+//! \file glc_mover.cpp Implementation of the GLC_Mover class.
 
-//////////////////////////////////////////////////////////////////////
-//! \class GLC_OpenGLState
-/*! \brief GLC_OpenGLState is use to store and retrieve differential opengl state*/
-//////////////////////////////////////////////////////////////////////
-class GLC_OpenGLState
+#include "glc_userinput.h"
+
+GLC_UserInput::GLC_UserInput(int x, int y)
+: m_X(x)
+, m_Y(y)
+, m_NormalyzeX(0.0)
+, m_NormalyzeY(0.0)
+, m_Translation()
+, m_Rotation(0.0)
+, m_ScaleFactor(1.0)
+, m_TransformationIsSet(false)
 {
-public:
-//////////////////////////////////////////////////////////////////////
-/*! @name Constructor / Destructor */
-//@{
-//////////////////////////////////////////////////////////////////////
 
-	GLC_OpenGLState();
-	virtual ~GLC_OpenGLState();
+}
 
-//@}
+GLC_UserInput::~GLC_UserInput()
+{
+
+}
 
 //////////////////////////////////////////////////////////////////////
-/*! \name Get Functions*/
-//@{
+// Set Functions
 //////////////////////////////////////////////////////////////////////
-public:
+void GLC_UserInput::setPosition(int x, int y)
+{
+	m_X= x;
+	m_Y= y;
+}
 
-//@}
+void GLC_UserInput::setNormalyzeTouchCenterPosition(double x, double y)
+{
+	m_NormalyzeX= x;
+	m_NormalyzeY= y;
+}
 
-//////////////////////////////////////////////////////////////////////
-/*! \name Set Functions*/
-//@{
-//////////////////////////////////////////////////////////////////////
-public:
-	//!
+void GLC_UserInput::setTransformation(const GLC_Vector2d& translation, double rotation, double scaleFactor)
+{
+	m_Translation= translation;
+	m_Rotation= rotation;
+	m_ScaleFactor= scaleFactor;
 
-//@}
-
-//////////////////////////////////////////////////////////////////////
-// Private members
-//////////////////////////////////////////////////////////////////////
-private:
-
-};
-
-#endif /* GLC_OPENGLSTATE_H_ */
+	m_TransformationIsSet= true;
+}

@@ -66,3 +66,5 @@ GPATH
 GRTAGS
 GSYMS
 GTAGS
+/.cproject
+/.project

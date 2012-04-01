@@ -47,66 +47,65 @@ enum INTERPOL_TYPE
 class GLC_LIB_EXPORT GLC_Interpolator
 {
 
-//////////////////////////////////////////////////////////////////////
-// Construction
-//////////////////////////////////////////////////////////////////////
 public:
-	// Contructeur par défaut Interpolation Linéaire
+	//! Default linear interpolation constructor
 	GLC_Interpolator();
 
 //////////////////////////////////////////////////////////////////////
-// Fonctions Set
+// Set Function
 //////////////////////////////////////////////////////////////////////
 public:
-	// Défini la matrice d'interpolation
+	//! Set interpolation matrix
 	void SetInterpolMat(int NbrPas, const GLC_Vector3d &VectDepart, const GLC_Vector3d &VectArrive
 		, INTERPOL_TYPE Interpolation = INTERPOL_LINEAIRE);
-	// Type d'interpolation
+
+	//! Set interpolation type
 	void SetType(INTERPOL_TYPE Interpolation);
-	// Nombre de pas
+
+	// Number of step
 	void SetNbrPas(int NbrPas);
-	// Vecteur d'arrivée et de depart
+
+	//! Set start and end vector
 	void SetVecteurs(const GLC_Vector3d &VectDepart, const GLC_Vector3d &VectArrive);
 
 //////////////////////////////////////////////////////////////////////
-// Fonctions Get
+// Get Function
 //////////////////////////////////////////////////////////////////////
 public:
-	// Retourne la matrice d'interpolation
-	GLC_Matrix4x4 GetInterpolMat(void) const
-	{
-		return m_InterpolMat;
-	}
+	//! Return th interpolation matrix
+	inline GLC_Matrix4x4 GetInterpolMat(void) const
+	{return m_InterpolMat;}
 
 //////////////////////////////////////////////////////////////////////
-// Fonctions de Service privée
+// Private services functions
 //////////////////////////////////////////////////////////////////////
 private:
-	// Calcul La matrice d'interpolation
+	//! Compute interpolation matrix
 	bool CalcInterpolMat(void);
 
-	// Calcul la matrice d'interpolation linéaire
+	//! Compute linear interolation matrix
 	bool CalcInterpolLineaireMat(void);
 
-	// Calcul la matrice d'interpolation angulaire
+	//! Compute angular interpolation matrix
 	bool CalcInterpolAngulaireMat(void);
 
 //////////////////////////////////////////////////////////////////////
 // Membres privés
 //////////////////////////////////////////////////////////////////////
 private:
-	// Vecteur de départ
-	GLC_Vector3d m_VectDepart;
-	// Vecteur d'arriver
-	GLC_Vector3d m_VectArrive;
+	//! Start Point
+	GLC_Point3d m_StartPoint;
 
-	// Type d'interpolation courante
+	//! End Point
+	GLC_Point3d m_EndPoint;
+
+	//! Interpolation type
 	INTERPOL_TYPE m_InterpolType;
 
-	// Nombre de pas d'interpolation
-	int m_nNbrPas;
+	//! Interpolation step count
+	int m_StepCount;
 
-	// Matrice d'interpolation
+	//! Interpolation matrix
 	GLC_Matrix4x4 m_InterpolMat;
 };
 

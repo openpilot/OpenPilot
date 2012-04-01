@@ -25,6 +25,7 @@
 #include "glc_reptrackballmover.h"
 #include "glc_viewport.h"
 #include "../glc_factory.h"
+#include "../glc_context.h"
 #include <QGLContext>
 
 using namespace glc;
@@ -155,23 +156,18 @@ void GLC_RepTrackBallMover::glDraw()
 	computeRadius();
 	const double aspectRatio= static_cast<double>(m_pViewport->viewHSize())/static_cast<double>(m_pViewport->viewVSize());
 
-	// Save current state
-	GLboolean depthTest, blend;
-	glGetBooleanv(GL_DEPTH_TEST, &depthTest);
-	glGetBooleanv(GL_BLEND, &blend);
-
 	// orbit circle must be shown
-	if (depthTest) glDisable(GL_DEPTH_TEST);
+	glDisable(GL_DEPTH_TEST);
 
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	glOrtho(aspectRatio * -1.0 ,aspectRatio * 1.0 ,-1.0 ,1.0 ,-1.0 ,1.0);
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
+	GLC_Context::current()->glcMatrixMode(GL_PROJECTION);
+	GLC_Context::current()->glcPushMatrix();
+	GLC_Context::current()->glcLoadIdentity();
+	GLC_Context::current()->glcOrtho(aspectRatio * -1.0 ,aspectRatio * 1.0 ,-1.0 ,1.0 ,-1.0 ,1.0);
+	GLC_Context::current()->glcMatrixMode(GL_MODELVIEW);
+	GLC_Context::current()->glcPushMatrix();
+	GLC_Context::current()->glcLoadIdentity();
 
-	if (blend) glDisable(GL_BLEND);
+	glDisable(GL_BLEND);
 	m_RenderProperties.setRenderingFlag(glc::WireRenderFlag);
 	// Display arcs
 	m_Arc1.render(glc::WireRenderFlag);
@@ -188,13 +184,10 @@ void GLC_RepTrackBallMover::glDraw()
 	// Display base class (Main circle)
 	m_MainCircle.render(m_RenderProperties);
 
-	glPopMatrix();
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
-	glMatrixMode(GL_MODELVIEW);
-
-	if (depthTest) glEnable(GL_DEPTH_TEST);
-	if (!blend)  glEnable(GL_BLEND);
+	GLC_Context::current()->glcPopMatrix();
+	GLC_Context::current()->glcMatrixMode(GL_PROJECTION);
+	GLC_Context::current()->glcPopMatrix();
+	GLC_Context::current()->glcMatrixMode(GL_MODELVIEW);
 
 }
 

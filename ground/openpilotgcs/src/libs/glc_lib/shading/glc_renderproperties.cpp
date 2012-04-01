@@ -178,7 +178,7 @@ bool GLC_RenderProperties::needToRenderWithTransparency() const
 		Q_ASSERT(NULL != m_pOverwriteMaterial);
 		renderWithTransparency= m_pOverwriteMaterial->isTransparent();
 	}
-	else if (m_RenderMode == glc::OverwriteTransparency)
+	else if ((m_RenderMode == glc::OverwriteTransparency) || (m_RenderMode == glc::OverwriteTransparencyAndMaterial))
 	{
 		Q_ASSERT(-1.0f != m_OverwriteOpacity);
 		renderWithTransparency= (m_OverwriteOpacity < 1.0f);

@@ -29,7 +29,7 @@
 #include "glc_wiredata.h"
 #include "../glc_boundingbox.h"
 
-#include "glc_config.h"
+#include "../glc_config.h"
 
 typedef QHash<GLC_uint, GLC_Material*> MaterialHash;
 typedef QHash<GLC_uint, GLC_uint> MaterialHashMap;
@@ -68,19 +68,13 @@ class GLC_LIB_EXPORT GLC_Geometry
 //////////////////////////////////////////////////////////////////////
 public:
 	//! Default constructor
-	/*!
-	 * QString Name
-	 * const bool typeIsWire
-	 */
-	GLC_Geometry(const QString &, const bool);
+	GLC_Geometry(const QString &name, const bool type);
+
 	//! Copy constructor
-	/*!
-	 * const GLC_VboGeom geometry to copy
-	 */
-	GLC_Geometry(const GLC_Geometry&);
+	GLC_Geometry(const GLC_Geometry& sourceGeom);
 
 	//! Overload "=" operator
-	GLC_Geometry& operator=(const GLC_Geometry&);
+	GLC_Geometry& operator=(const GLC_Geometry& sourceGeom);
 
 	//! Destructor
 	virtual ~GLC_Geometry();
@@ -197,6 +191,13 @@ public:
 	inline GLsizei wirePolylineSize(int index) const
 	{return m_WireData.verticeGroupSize(index);}
 
+	//! Return the volume of this geometry
+	virtual double volume();
+
+	//! Return true if this geometry will try to use VBO
+	inline bool vboIsUsed() const
+	{return m_UseVbo;}
+
 //@}
 
 //////////////////////////////////////////////////////////////////////
@@ -258,6 +259,9 @@ public:
 
 	//! Release client VBO
 	virtual void releaseVboClientSide(bool update= false);
+
+	//! Set VBO usage
+	virtual void setVboUsage(bool usage);
 
 //@}
 //////////////////////////////////////////////////////////////////////
@@ -357,6 +361,9 @@ private:
 
 	//! Name of geometry
 	QString m_Name;
+
+	//! VBO usage flag
+	bool m_UseVbo;
 };
 
 #endif /*GLC_GEOMETRY_H_*/

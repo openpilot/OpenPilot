@@ -22,6 +22,7 @@
 
 #include "glc_repcrossmover.h"
 #include "glc_viewport.h"
+#include "../geometry/glc_polylines.h"
 
 // Default constructor
 GLC_RepCrossMover::GLC_RepCrossMover(GLC_Viewport* pViewport)
@@ -59,6 +60,26 @@ GLC_RepMover* GLC_RepCrossMover::clone() const
 // Virtual interface for OpenGL Geometry set up.
 void GLC_RepCrossMover::glDraw()
 {
+	GLC_3DViewInstance crossInstance(createCrossInstance());
+
+	glDisable(GL_BLEND);
+	m_RenderProperties.setRenderingFlag(glc::WireRenderFlag);
+	crossInstance.render(glc::WireRenderFlag);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	m_RenderProperties.setRenderingFlag(glc::TransparentRenderFlag);
+	// Display arcs
+	crossInstance.render(glc::TransparentRenderFlag);
+}
+
+//////////////////////////////////////////////////////////////////////
+// Private services Functions
+//////////////////////////////////////////////////////////////////////
+GLC_3DViewInstance GLC_RepCrossMover::createCrossInstance()
+{
+	GLC_Polylines* pCross= new GLC_Polylines();
+
 	int nLgAxe;
 	const int winHSize= m_pViewport->viewHSize();
 	const int winVSize= m_pViewport->viewVSize();
@@ -78,41 +99,48 @@ void GLC_RepCrossMover::glDraw()
 	// Axis length in OpenGL unit = length(Pixel) * (dimend GL / dimens Pixel)
 	const double dLgAxe= ((double)nLgAxe * ChampsVision / (double)winVSize) / 7;
 	const double dDecAxe= dLgAxe / 3;
-	glPushMatrix();
 
-	glTranslated(m_pViewport->cameraHandle()->target().x(), m_pViewport->cameraHandle()->target().y(),
-			m_pViewport->cameraHandle()->target().z() );
+	//X axis
+	{
+		GLC_Point3d p1(-dLgAxe, 0, 0);
+		GLC_Point3d p2(-dDecAxe, 0, 0);
+		GLC_Point3d p3(dDecAxe, 0, 0);
+		GLC_Point3d p4(dLgAxe, 0, 0);
+		QList<GLC_Point3d> points;
+		points << p1 << p2 << p3 << p4;
+		pCross->addPolyline(points);
+	}
 
-	// Graphic properties
-	glDisable(GL_TEXTURE_2D);
-	glDisable(GL_LIGHTING);
-	glColor4d(m_MainColor.redF(), m_MainColor.greenF(), m_MainColor.blueF(), m_MainColor.alphaF());
-	glLineWidth(1.0);
+	//Y axis
+	{
+		GLC_Point3d p1(0, -dLgAxe, 0);
+		GLC_Point3d p2(0, -dDecAxe, 0);
+		GLC_Point3d p3(0, dDecAxe, 0);
+		GLC_Point3d p4(0, dLgAxe, 0);
+		QList<GLC_Point3d> points;
+		points << p1 << p2 << p3 << p4;
+		pCross->addPolyline(points);
+	}
 
-	// Display camera's target lines
-	glBegin(GL_LINES);
-		//X axis
-		glVertex3d(-dLgAxe, 0, 0);
-		glVertex3d(-dDecAxe, 0, 0);
-		glVertex3d(dDecAxe, 0, 0);
-		glVertex3d(dLgAxe, 0, 0);
+	//Z axis
+	{
+		GLC_Point3d p1(0, 0, -dLgAxe);
+		GLC_Point3d p2(0, 0, -dDecAxe);
+		GLC_Point3d p3(0, 0, dDecAxe);
+		GLC_Point3d p4(0, 0, dLgAxe);
+		QList<GLC_Point3d> points;
+		points << p1 << p2 << p3 << p4;
+		pCross->addPolyline(points);
+	}
 
-		//Y axis
-		glVertex3d(0, -dLgAxe, 0);
-		glVertex3d(0, -dDecAxe, 0);
-		glVertex3d(0, dDecAxe, 0);
-		glVertex3d(0, dLgAxe, 0);
+	pCross->setWireColor(m_MainColor);
+	GLC_3DViewInstance crossInstance(pCross);
 
-		//Z axis
-		glVertex3d(0, 0, -dLgAxe);
-		glVertex3d(0, 0, -dDecAxe);
-		glVertex3d(0, 0, dDecAxe);
-		glVertex3d(0, 0, dLgAxe);
+	GLC_Matrix4x4 translation;
+	translation.setMatTranslate(m_pViewport->cameraHandle()->target());
 
-	glEnd();
+	crossInstance.setMatrix(translation);
 
-	glPopMatrix();
-
+	return crossInstance;
 }
-
 

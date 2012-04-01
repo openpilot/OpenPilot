@@ -192,11 +192,17 @@ void GLC_3DViewInstance::setGlobalDefaultLod(int lod)
 	m_GlobalDefaultLOD= lod;
 }
 
+void GLC_3DViewInstance::setVboUsage(bool usage)
+{
+	m_3DRep.setVboUsage(usage);
+}
+
 // Clone the instance
 GLC_3DViewInstance GLC_3DViewInstance::deepCopy() const
 {
 
 	GLC_3DRep* pRep= dynamic_cast<GLC_3DRep*>(m_3DRep.deepCopy());
+	Q_ASSERT(NULL != pRep);
 	GLC_3DRep newRep(*pRep);
 	delete pRep;
 	GLC_3DViewInstance cloneInstance(newRep);
@@ -231,7 +237,7 @@ GLC_3DViewInstance GLC_3DViewInstance::instanciate()
 
 
 // Set the instance Geometry
-bool GLC_3DViewInstance::setGeometry(GLC_Geometry* pGeom)
+bool GLC_3DViewInstance::addGeometry(GLC_Geometry* pGeom)
 {
 	if (m_3DRep.contains(pGeom))
 	{
@@ -299,7 +305,7 @@ void GLC_3DViewInstance::render(glc::RenderFlag renderFlag, bool useLod, GLC_Vie
 	m_RenderProperties.setRenderingFlag(renderFlag);
 
 	// Save current OpenGL Matrix
-	glPushMatrix();
+	GLC_Context::current()->glcPushMatrix();
 	OpenglVisProperties();
 
 	// Change front face orientation if this instance absolute matrix is indirect
@@ -350,7 +356,7 @@ void GLC_3DViewInstance::render(glc::RenderFlag renderFlag, bool useLod, GLC_Vie
 		}
 	}
 	// Restore OpenGL Matrix
-	glPopMatrix();
+	GLC_Context::current()->glcPopMatrix();
 
 	// Restore front face orientation if this instance absolute matrix is indirect
 	if (m_AbsoluteMatrix.type() == GLC_Matrix4x4::Indirect)
@@ -371,7 +377,7 @@ void GLC_3DViewInstance::renderForBodySelection()
 	m_RenderProperties.setRenderingMode(glc::BodySelection);
 
 	// Save current OpenGL Matrix
-	glPushMatrix();
+	GLC_Context::current()->glcPushMatrix();
 	OpenglVisProperties();
 
 	GLubyte colorId[4];
@@ -389,7 +395,7 @@ void GLC_3DViewInstance::renderForBodySelection()
 	// Restore rendering mode
 	m_RenderProperties.setRenderingMode(previousRenderMode);
 	// Restore OpenGL Matrix
-	glPopMatrix();
+	GLC_Context::current()->glcPopMatrix();
 }
 
 // Display the instance in Primitive selection mode and return the body index
@@ -402,7 +408,7 @@ int GLC_3DViewInstance::renderForPrimitiveSelection(GLC_uint bodyId)
 	m_RenderProperties.setRenderingMode(glc::PrimitiveSelection);
 
 	// Save current OpenGL Matrix
-	glPushMatrix();
+	GLC_Context::current()->glcPushMatrix();
 	OpenglVisProperties();
 
 	const int size= m_3DRep.numberOfBody();
@@ -423,7 +429,7 @@ int GLC_3DViewInstance::renderForPrimitiveSelection(GLC_uint bodyId)
 	m_RenderProperties.setRenderingMode(previousRenderMode);
 
 	// Restore OpenGL Matrix
-	glPopMatrix();
+	GLC_Context::current()->glcPopMatrix();
 
 	return i;
 }

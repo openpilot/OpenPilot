@@ -26,6 +26,8 @@
 #define GLC_LOD_H_
 
 #include <QVector>
+#include <QGLBuffer>
+
 #include "../glc_ext.h"
 
 #include "../glc_config.h"
@@ -88,7 +90,7 @@ public:
 	 * - Triangles Fans index
 	 */
 	inline QVector<GLuint>* indexVectorHandle()
-	{ return &m_IndexVector;}
+	{return &m_IndexVector;}
 
 	//! Return the size of the index Vector
 	inline int indexVectorSize() const
@@ -111,12 +113,6 @@ public:
 	//! Release client IBO
 	void releaseIboClientSide(bool update= false);
 
-	//! The mesh wich use this lod is finished
-	inline void finishVbo()
-	{
-		m_IndexSize= m_IndexVector.size();
-		m_IndexVector.clear();
-	}
 	//! Set accuracy of the LOD
 	inline void setAccuracy(const double& accuracy)
 	{m_Accuracy= accuracy;}
@@ -126,6 +122,9 @@ public:
 	{
 		m_TrianglesCount+= count;
 	}
+
+	//! Set IBO usage
+	void setIboUsage(bool usage);
 
 
 //@}
@@ -138,15 +137,18 @@ public:
 	//! IBO creation
 	inline void createIBO()
 	{
-		if (0 == m_IboId && !m_IndexVector.isEmpty())
+		if (!m_IndexBuffer.isCreated() && !m_IndexVector.isEmpty())
 		{
-			glGenBuffers(1, &m_IboId);
+			m_IndexBuffer.create();
 		}
 	}
 
 	//! Ibo Usage
-	inline void useIBO() const
-	{glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IboId);}
+	void useIBO() const;
+
+	//! Fill IBO
+	inline void fillIbo()
+	{releaseIboClientSide(true);}
 
 //@}
 
@@ -158,8 +160,8 @@ private:
 	//! The accuracy of the LOD
 	double m_Accuracy;
 
-	//! The IBO ID
-	GLuint m_IboId;
+	//! The Index Buffer
+	QGLBuffer m_IndexBuffer;
 
 	//! The Index Vector
 	QVector<GLuint> m_IndexVector;

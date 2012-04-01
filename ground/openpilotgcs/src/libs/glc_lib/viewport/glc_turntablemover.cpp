@@ -62,9 +62,9 @@ GLC_Mover* GLC_TurnTableMover::clone() const
 //////////////////////////////////////////////////////////////////////
 
 // Initialized the mover
-void GLC_TurnTableMover::init(QMouseEvent * e)
+void GLC_TurnTableMover::init(const GLC_UserInput& userInput)
 {
-	GLC_Mover::m_PreviousVector.setVect(static_cast<double>(e->x()), static_cast<double>(e->y()),0.0);
+	GLC_Mover::m_PreviousVector.setVect(static_cast<double>(userInput.x()), static_cast<double>(userInput.y()),0.0);
 	GLC_Camera* pCamera= GLC_Mover::m_pViewport->cameraHandle();
 	// Calculate angle sign
 	m_Sign= pCamera->defaultUpVector() * pCamera->upVector();
@@ -81,7 +81,7 @@ void GLC_TurnTableMover::init(QMouseEvent * e)
 }
 
 
-bool GLC_TurnTableMover::move(QMouseEvent * e)
+bool GLC_TurnTableMover::move(const GLC_UserInput& userInput)
 {
 	GLC_Camera* pCamera= GLC_Mover::m_pViewport->cameraHandle();
 	// Turn table rotation
@@ -89,8 +89,8 @@ bool GLC_TurnTableMover::move(QMouseEvent * e)
 	const double width= static_cast<double> ( GLC_Mover::m_pViewport->viewVSize() );
 	const double height= static_cast<double> ( GLC_Mover::m_pViewport->viewHSize() );
 
-	const double alpha = -((static_cast<double>(e->x()) - GLC_Mover::m_PreviousVector.x()) / width) * rotSpeed;
-	const double beta = ((static_cast<double>(e->y()) - GLC_Mover::m_PreviousVector.y()) / height) * rotSpeed;
+	const double alpha = -((static_cast<double>(userInput.x()) - GLC_Mover::m_PreviousVector.x()) / width) * rotSpeed;
+	const double beta = ((static_cast<double>(userInput.y()) - GLC_Mover::m_PreviousVector.y()) / height) * rotSpeed;
 
 	// Rotation around the screen vertical axis
 	pCamera->rotateAroundTarget(pCamera->defaultUpVector(), alpha * m_Sign);
@@ -103,7 +103,7 @@ bool GLC_TurnTableMover::move(QMouseEvent * e)
 		pCamera->rotateAroundTarget(rightVector, beta);
 	}
 
-	m_PreviousVector.setVect(static_cast<double>(e->x()), static_cast<double>(e->y()), 0.0);
+	m_PreviousVector.setVect(static_cast<double>(userInput.x()), static_cast<double>(userInput.y()), 0.0);
 
 	return true;
 }

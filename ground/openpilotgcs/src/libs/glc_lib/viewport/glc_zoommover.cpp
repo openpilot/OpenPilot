@@ -60,19 +60,19 @@ GLC_Mover* GLC_ZoomMover::clone() const
 //////////////////////////////////////////////////////////////////////
 
 // Initialized the mover
-void GLC_ZoomMover::init(QMouseEvent * e)
+void GLC_ZoomMover::init(const GLC_UserInput& userInput)
 {
 	// Change origine (view center) and cover between -1 and 1
 	const double vSize= static_cast<double>(m_pViewport->viewVSize());
-	m_PreviousVector.setY((vSize / 2.0 - e->y()) / ( vSize / 2.0));
+	m_PreviousVector.setY((vSize / 2.0 - userInput.y()) / ( vSize / 2.0));
 }
 
 // Move the camera
-bool GLC_ZoomMover::move(QMouseEvent * e)
+bool GLC_ZoomMover::move(const GLC_UserInput& userInput)
 {
 	// Change origine (View Center) and cover (from -1 to 1)
 	const double vSize= static_cast<double>(m_pViewport->viewVSize());
-	const double Posy= (vSize / 2.0 - e->y()) / ( vSize / 2.0);
+	const double Posy= (vSize / 2.0 - userInput.y()) / ( vSize / 2.0);
 
 	// Compute zoom factor between (1 / MAXZOOMFACTOR) and (MAXZOOMFACTOR)
 	double ZoomFactor= Posy - m_PreviousVector.y();

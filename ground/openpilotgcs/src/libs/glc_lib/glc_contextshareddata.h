@@ -19,16 +19,18 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
  *****************************************************************************/
-//! \file glc_openglstatemanager.h interface for the GLC_OpenGLStateManager class.
+//! \file glc_contextshareddata.h interface for the GLC_ContextSharedData class.
 
-#ifndef GLC_OPENGLSTATEMANAGER_H_
-#define GLC_OPENGLSTATEMANAGER_H_
+#ifndef GLC_CONTEXTSHAREDDATA_H_
+#define GLC_CONTEXTSHAREDDATA_H_
 
-class GLC_OpenGLStateManager
+#include "glc_config.h"
+
+class GLC_LIB_EXPORT GLC_ContextSharedData
 {
 public:
-	GLC_OpenGLStateManager();
-	virtual ~GLC_OpenGLStateManager();
+	GLC_ContextSharedData();
+	virtual ~GLC_ContextSharedData();
 };
 
-#endif /* GLC_OPENGLSTATEMANAGER_H_ */
+#endif /* GLC_CONTEXTSHAREDDATA_H_ */

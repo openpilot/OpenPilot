@@ -25,6 +25,8 @@
 
 #include "glc_repmover.h"
 
+#include "../sceneGraph/glc_3dviewinstance.h"
+
 #include "../glc_config.h"
 
 //////////////////////////////////////////////////////////////////////
@@ -60,6 +62,13 @@ public:
 	virtual void glDraw();
 
 //@}
+
+//////////////////////////////////////////////////////////////////////
+// Private services Functions
+//////////////////////////////////////////////////////////////////////
+private:
+	//! Create and return the cross instance
+	GLC_3DViewInstance createCrossInstance();
 
 };
 

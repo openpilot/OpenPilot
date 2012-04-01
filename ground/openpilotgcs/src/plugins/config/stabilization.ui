@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>683</width>
+    <width>732</width>
     <height>685</height>
    </rect>
   </property>
@@ -496,8 +496,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>626</width>
-              <height>834</height>
+              <width>667</width>
+              <height>880</height>
              </rect>
             </property>
             <layout class="QGridLayout" name="gridLayout_23">
@@ -11753,9 +11753,9 @@ border-radius: 4;
             <property name="geometry">
              <rect>
               <x>0</x>
-              <y>-402</y>
-              <width>626</width>
-              <height>1026</height>
+              <y>0</y>
+              <width>667</width>
+              <height>1079</height>
              </rect>
             </property>
             <layout class="QGridLayout" name="gridLayout_15">
@@ -21544,13 +21544,13 @@ rate(deg/s)</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>0</number>
                      </property>
                      <property name="maximum">
                       <double>1000000.000000000000000</double>
                      </property>
                      <property name="singleStep">
-                      <double>0.100000000000000</double>
+                      <double>1.000000000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -21604,13 +21604,13 @@ rate(deg/s)</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>0</number>
                      </property>
                      <property name="maximum">
                       <double>1000000.000000000000000</double>
                      </property>
                      <property name="singleStep">
-                      <double>0.100000000000000</double>
+                      <double>1.000000000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -21667,13 +21667,13 @@ rate(deg/s)</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>0</number>
                      </property>
                      <property name="maximum">
                       <double>1000000.000000000000000</double>
                      </property>
                      <property name="singleStep">
-                      <double>0.100000000000000</double>
+                      <double>1.000000000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -21746,13 +21746,13 @@ rate(deg/s)</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>0</number>
                      </property>
                      <property name="maximum">
                       <double>1000000.000000000000000</double>
                      </property>
                      <property name="singleStep">
-                      <double>0.100000000000000</double>
+                      <double>1.000000000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -21790,13 +21790,13 @@ rate(deg/s)</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>0</number>
                      </property>
                      <property name="maximum">
                       <double>1000000.000000000000000</double>
                      </property>
                      <property name="singleStep">
-                      <double>0.100000000000000</double>
+                      <double>1.000000000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -21837,13 +21837,13 @@ rate(deg/s)</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>0</number>
                      </property>
                      <property name="maximum">
                       <double>1000000.000000000000000</double>
                      </property>
                      <property name="singleStep">
-                      <double>0.100000000000000</double>
+                      <double>1.000000000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>

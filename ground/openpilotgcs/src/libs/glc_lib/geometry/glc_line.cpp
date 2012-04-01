@@ -28,19 +28,19 @@
 //////////////////////////////////////////////////////////////////////
 
 GLC_Line::GLC_Line(const GLC_Point3d & point1, const GLC_Point3d & point2)
-: GLC_Geometry("Line", true)
+: GLC_Polylines()
 , m_Point1(point1)
 , m_Point2(point2)
 {
-
+	createWire();
 }
 
 GLC_Line::GLC_Line(const GLC_Line& line)
-: GLC_Geometry(line)
+: GLC_Polylines(line)
 , m_Point1(line.m_Point1)
 , m_Point2(line.m_Point2)
 {
-
+	createWire();
 }
 
 GLC_Line::~GLC_Line()
@@ -54,15 +54,7 @@ GLC_Line::~GLC_Line()
 
 const GLC_BoundingBox& GLC_Line::boundingBox(void)
 {
-
-	if (NULL == m_pBoundingBox)
-	{
-		m_pBoundingBox= new GLC_BoundingBox();
-
-		m_pBoundingBox->combine(m_Point1);
-		m_pBoundingBox->combine(m_Point2);
-	}
-	return *m_pBoundingBox;
+	return GLC_Polylines::boundingBox();
 }
 
 GLC_Geometry* GLC_Line::clone() const
@@ -74,32 +66,44 @@ GLC_Geometry* GLC_Line::clone() const
 //////////////////////////////////////////////////////////////////////
 // Set Functions
 //////////////////////////////////////////////////////////////////////
-void GLC_Line::setColor(const QColor& color)
+void GLC_Line::setCoordinate(const GLC_Point3d &point1, const GLC_Point3d &point2)
 {
-	m_WireColor= color;
-	if (GLC_Geometry::hasMaterial())
-	{
-		GLC_Geometry::firstMaterial()->setDiffuseColor(color);
-	}
+	m_Point1= point1;
+	m_Point2= point2;
+	clear();
+	createWire();
 }
+
+GLC_Line& GLC_Line::operator=(const GLC_Line& line)
+{
+	if (this != &line)
+	{
+		m_Point1= line.m_Point1;
+		m_Point2= line.m_Point2;
+		GLC_Polylines::operator=(line);
+	}
+	return *this;
+}
+
 //////////////////////////////////////////////////////////////////////
 // OpenGL Functions
 //////////////////////////////////////////////////////////////////////
 
-void GLC_Line::glDraw(const GLC_RenderProperties&)
+void GLC_Line::glDraw(const GLC_RenderProperties& renderProperties)
 {
-	// Point Display
-	glBegin(GL_LINES);
-		glVertex3dv(m_Point1.data());
-		glVertex3dv(m_Point2.data());
-	glEnd();
-
-	// OpenGL error handler
-	GLenum error= glGetError();
-	if (error != GL_NO_ERROR)
-	{
-		GLC_OpenGlException OpenGlException("GLC_Line::GlDraw ", error);
-		throw(OpenGlException);
-	}
+	GLC_Polylines::glDraw(renderProperties);
 }
+
+
+//////////////////////////////////////////////////////////////////////
+// Private services Functions
+//////////////////////////////////////////////////////////////////////
+void  GLC_Line::createWire()
+{
+	QList<GLC_Point3d> points;
+	points.append(m_Point1);
+	points.append(m_Point2);
+	GLC_Polylines::addPolyline(points);
+}
+
 

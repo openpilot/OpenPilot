@@ -27,13 +27,14 @@
 #include "../glc_state.h"
 #include "../glc_ext.h"
 #include "../shading/glc_selectionmaterial.h"
+#include "../glc_context.h"
 
 // The maximum point size
 float GLC_PointSprite::m_MaxSize= -1.0f;
 
 // Default constructor
 GLC_PointSprite::GLC_PointSprite(float size, GLC_Material* pMaterial)
-:GLC_Geometry("PointSprite", false)
+:GLC_PointCloud()
 , m_Size(size)
 , m_DistanceAttenuation(3)
 , m_FadeThresoldSize(60.0f)
@@ -46,31 +47,24 @@ GLC_PointSprite::GLC_PointSprite(float size, GLC_Material* pMaterial)
 	m_DistanceAttenuation[0]= 1.0f;
 	m_DistanceAttenuation[1]= 0.0f;
 	m_DistanceAttenuation[2]= 0.0f;
+
+	QList<GLC_Point3d> points;
+	points.append(GLC_Point3d(0.0, 0.0, 0.0));
+	GLC_PointCloud::addPoint(points);
+}
+
+GLC_PointSprite::GLC_PointSprite(const GLC_PointSprite& point)
+: GLC_PointCloud(point)
+, m_Size(point.m_Size)
+, m_DistanceAttenuation(point.m_DistanceAttenuation)
+, m_FadeThresoldSize(point.m_FadeThresoldSize)
+{
+
 }
 
 GLC_PointSprite::~GLC_PointSprite()
 {
 
-}
-
-// return the point bounding box
-const GLC_BoundingBox& GLC_PointSprite::boundingBox(void)
-{
-
-	if (NULL == m_pBoundingBox)
-	{
-		m_pBoundingBox= new GLC_BoundingBox();
-		const double epsilon= 1e-2;
-		GLC_Point3d lower( 	- epsilon,
-							- epsilon,
-							- epsilon);
-		GLC_Point3d upper(  epsilon,
-							epsilon,
-							epsilon);
-		m_pBoundingBox->combine(lower);
-		m_pBoundingBox->combine(upper);
-	}
-	return *m_pBoundingBox;
 }
 
 // Return a copy of the current geometry
@@ -116,6 +110,7 @@ void GLC_PointSprite::render(const GLC_RenderProperties& renderProperties)
 		glEnable(GL_TEXTURE_2D);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glDisable(GL_LIGHTING);
+		//GLC_Context::current()->glcEnableLighting(false);
 
 	    if(m_MaterialHash.size() == 1)
 	    {
@@ -143,6 +138,7 @@ void GLC_PointSprite::render(const GLC_RenderProperties& renderProperties)
 		glDisable(GL_BLEND);
 		glDisable(GL_TEXTURE_2D);
 		glDisable(GL_LIGHTING);
+		//GLC_Context::current()->glcEnableLighting(false);
 	}
 
 
@@ -182,19 +178,8 @@ void GLC_PointSprite::render(const GLC_RenderProperties& renderProperties)
 
 }
 // Point sprite set up
-void GLC_PointSprite::glDraw(const GLC_RenderProperties&)
+void GLC_PointSprite::glDraw(const GLC_RenderProperties& renderProperties)
 {
-	// Point Display
-	glBegin(GL_POINTS);
-		glVertex3f(0.0f,0.0f,0.0f);
-	glEnd();
-
-	// OpenGL error handler
-	GLenum error= glGetError();
-	if (error != GL_NO_ERROR)
-	{
-		GLC_OpenGlException OpenGlException("GLC_PointSprite::GlDraw ", error);
-		throw(OpenGlException);
-	}
+	GLC_PointCloud::glDraw(renderProperties);
 }
 

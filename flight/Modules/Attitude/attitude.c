@@ -438,6 +438,9 @@ static void updateAttitude(AccelsData * accelsData, GyrosData * gyrosData)
 	
 	// Account for accel magnitude
 	float accel_mag = sqrtf(accels[0]*accels[0] + accels[1]*accels[1] + accels[2]*accels[2]);
+	if(accel_mag < 1.0e-3f)
+		return;
+
 	accel_err[0] /= accel_mag;
 	accel_err[1] /= accel_mag;
 	accel_err[2] /= accel_mag;

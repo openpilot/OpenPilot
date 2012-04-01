@@ -173,6 +173,14 @@ qt_sdk_install: qt_sdk_clean
         # download the source only if it's newer than what we already have
 	$(V1) wget -N --content-disposition -P "$(DL_DIR)" "$(QT_SDK_URL)"
 
+        # tell the user exactly which path they should select in the GUI
+	$(V1) echo "*** NOTE NOTE NOTE ***"
+	$(V1) echo "*"
+	$(V1) echo "*  In the GUI, please use exactly this path as the installation path:"
+	$(V1) echo "*        $(QT_SDK_DIR)"
+	$(V1) echo "*"
+	$(V1) echo "*** NOTE NOTE NOTE ***"
+
         #installer is an executable, make it executable and run it
 	$(V1) chmod u+x "$(DL_DIR)/$(QT_SDK_FILE)"
 	"$(DL_DIR)/$(QT_SDK_FILE)" -style cleanlooks

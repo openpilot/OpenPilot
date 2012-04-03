@@ -39,6 +39,7 @@ DEBUG ?= NO
 
 # Include objects that are just nice information to show
 DIAGNOSTICS ?= NO
+DIAG_TASKS ?= NO
 
 # Set to YES to build a FW version that will erase all flash memory
 ERASE_FLASH ?= NO

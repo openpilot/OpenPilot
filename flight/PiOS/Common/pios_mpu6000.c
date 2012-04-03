@@ -155,7 +155,7 @@ static void PIOS_MPU6000_Config(struct pios_mpu6000_cfg const * cfg)
 	// FIFO storage
 #if defined(PIOS_MPU6000_ACCEL)
 	// Set the accel to 8g mode
-	while(PIOS_MPU6000_SetReg(PIOS_MPU6000_ACCEL_CFG_REG, 0x10) != 0);
+	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_ACCEL_CFG_REG, cfg->accel_range) != 0);
 	
 	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_FIFO_EN_REG, cfg->Fifo_store | PIOS_MPU6000_ACCEL_OUT) != 0);
 #else
@@ -332,7 +332,17 @@ float PIOS_MPU6000_GetScale()
 
 float PIOS_MPU6000_GetAccelScale()
 {
-	return GRAV / 2048.0f / 2.0f;
+	switch (dev->cfg->accel_range) {
+		case PIOS_MPU6000_ACCEL_2G:
+			return GRAV / 16384.0f;
+		case PIOS_MPU6000_ACCEL_4G:
+			return GRAV / 8192.0f;
+		case PIOS_MPU6000_ACCEL_8G:
+			return GRAV / 4096.0f;
+		case PIOS_MPU6000_ACCEL_16G:
+			return GRAV / 2048.0f;
+	}
+	return 0;
 }
 
 /**
@@ -340,11 +350,10 @@ float PIOS_MPU6000_GetAccelScale()
  * \return 0 if test succeeded
  * \return non-zero value if test succeeded
  */
-int32_t mpu6000_id;
 uint8_t PIOS_MPU6000_Test(void)
 {
 	/* Verify that ID matches (MPU6000 ID is 0x69) */
-	mpu6000_id = PIOS_MPU6000_ReadID();
+	int32_t mpu6000_id = PIOS_MPU6000_ReadID();
 	if(mpu6000_id < 0)
 		return -1;
 	

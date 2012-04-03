@@ -115,6 +115,13 @@ enum pios_mpu6000_filter {
 	PIOS_MPU6000_LOWPASS_5_HZ   = 0x06
 };
 
+enum pios_mpu6000_accel_range {
+	PIOS_MPU6000_ACCEL_2G = 0x00,
+	PIOS_MPU6000_ACCEL_4G = 0x08,
+	PIOS_MPU6000_ACCEL_8G = 0x10,
+	PIOS_MPU6000_ACCEL_16G = 0x18
+};
+
 struct pios_mpu6000_data {
 	int16_t gyro_x;
 	int16_t gyro_y;
@@ -136,6 +143,7 @@ struct pios_mpu6000_cfg {
 	uint8_t interrupt_en;	/* Interrupt configuration (See datasheet page 35 for more details) */
 	uint8_t User_ctl;		/* User control settings (See datasheet page 41 for more details)  */
 	uint8_t Pwr_mgmt_clk;	/* Power management and clock selection (See datasheet page 32 for more details) */
+	enum pios_mpu6000_accel_range accel_range;
 	enum pios_mpu6000_range gyro_range;
 	enum pios_mpu6000_filter filter;
 };

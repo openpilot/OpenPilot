@@ -116,6 +116,7 @@ void Simulator::onStart()
     gcsReceiver = GCSReceiver::GetInstance(objManager);
     actCommand = ActuatorCommand::GetInstance(objManager);
     attSettings = AttitudeSettings::GetInstance(objManager);
+    sonarAlt = SonarAltitude::GetInstance(objManager);
 
     telStats = GCSTelemetryStats::GetInstance(objManager);
 
@@ -204,6 +205,9 @@ void Simulator::setupObjects()
     if (settings.homeLocation)
         setupOutputObject(posHome);
 
+    if (settings.sonarAltitude)
+        setupOutputObject(sonarAlt);
+
     if (settings.gpsPosition)
         setupOutputObject(gpsPosition);
 
@@ -224,6 +228,7 @@ void Simulator::resetAllObjects()
     setupDefaultObject(gpsPosition);
     setupDefaultObject(gcsReceiver);
     setupDefaultObject(actCommand);
+    setupDefaultObject(sonarAlt);
 //    setupDefaultObject(manCtrlCommand);
 //    setupDefaultObject(actDesired);
 //    setupDefaultObject(camDesired);

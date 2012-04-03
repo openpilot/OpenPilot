@@ -369,6 +369,27 @@ void AeroSimRCSimulator::processUpdate(const QByteArray &data)
         }
     }
     /**********************************************************************************************/
+    if (settings.sonarAltitude) {
+        static QTime sonarAltTime = currentTime;
+        if (sonarAltTime.msecsTo(currentTime) >= settings.sonarAltRate) {
+            SonarAltitude::DataFields sonarAltData;
+            sonarAltData = sonarAlt->getData();
+
+            float sAlt = settings.sonarMaxAlt;
+            // 0.35 rad ~= 20 degree
+            if ((agl < (sAlt * 2.0)) && (roll < 0.35) && (pitch < 0.35)) {
+                float x = agl * qTan(roll);
+                float y = agl * qTan(pitch);
+                float h = qSqrt(x*x + y*y + agl*agl);
+                sAlt = qMin(h, sAlt);
+            }
+
+            sonarAltData.Altitude = sAlt;
+            sonarAlt->setData(sonarAltData);
+            sonarAltTime = currentTime;
+        }
+    }
+    /**********************************************************************************************/
 /*
     BaroAltitude::DataFields altActData;
     altActData = altActual->getData();

@@ -45,6 +45,7 @@
 #include "actuatorcommand.h"
 #include "gcstelemetrystats.h"
 #include "attitudesettings.h"
+#include "sonaraltitude.h"
 
 //#define DBG_TIMERS
 #undef DBG_TIMERS
@@ -73,6 +74,10 @@ typedef struct _CONNECTION
     bool attActHW;
     bool attActSim;
     bool attActCalc;
+
+    bool sonarAltitude;
+    float sonarMaxAlt;
+    quint16 sonarAltRate;
 
     bool gpsPosition;
     quint16 gpsPosRate;
@@ -158,14 +163,15 @@ protected:
 //    BaroAltitude* altActual;
 //    CameraDesired *camDesired;
 //    AccessoryDesired *acsDesired;
-    AttitudeRaw* attRaw;
-    AttitudeActual* attActual;
-    HomeLocation* posHome;
-    FlightStatus* flightStatus;
-    GPSPosition* gpsPosition;
+    AttitudeRaw *attRaw;
+    AttitudeActual *attActual;
+    HomeLocation *posHome;
+    FlightStatus *flightStatus;
+    GPSPosition *gpsPosition;
     GCSReceiver *gcsReceiver;
     ActuatorCommand *actCommand;
     AttitudeSettings *attSettings;
+    SonarAltitude *sonarAlt;
 
     GCSTelemetryStats* telStats;
     SimulatorSettings settings;

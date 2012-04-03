@@ -53,6 +53,10 @@ HITLConfiguration::HITLConfiguration(QString classId,
     bool attActSim          = true;
     bool attActCalc         = false;
 
+    bool sonarAltitude      = false;
+    float sonarMaxAlt       = 5.0;
+    quint16 sonarAltRate    = 50;
+
     bool gpsPosition        = true;
     quint16 gpsPosRate      = 200;
 
@@ -84,6 +88,10 @@ HITLConfiguration::HITLConfiguration(QString classId,
         settings.attActSim          = qSettings->value("attActSim", attActSim).toBool();
         settings.attActCalc         = qSettings->value("attActCalc", attActCalc).toBool();
 
+        settings.sonarAltitude      = qSettings->value("sonarAltitude", sonarAltitude).toBool();
+        settings.sonarMaxAlt        = qSettings->value("sonarMaxAlt", sonarMaxAlt).toFloat();
+        settings.sonarAltRate       = qSettings->value("sonarAltRate", sonarAltRate).toInt();
+
         settings.gpsPosition        = qSettings->value("gpsPosition", gpsPosition).toBool();
         settings.gpsPosRate         = qSettings->value("gpsPosRate", gpsPosRate).toInt();
 
@@ -111,6 +119,10 @@ HITLConfiguration::HITLConfiguration(QString classId,
         settings.attActHW           = attActHW;
         settings.attActSim          = attActSim;
         settings.attActCalc         = attActCalc;
+
+        settings.sonarAltitude      = sonarAltitude;
+        settings.sonarMaxAlt        = sonarMaxAlt;
+        settings.sonarAltRate       = sonarAltRate;
 
         settings.gpsPosition        = gpsPosition;
         settings.gpsPosRate         = gpsPosRate;
@@ -150,6 +162,10 @@ void HITLConfiguration::saveConfig(QSettings* qSettings) const
     qSettings->setValue("attActHW", settings.attActHW);
     qSettings->setValue("attActSim", settings.attActSim);
     qSettings->setValue("attActCalc", settings.attActCalc);
+
+    qSettings->setValue("sonarAltitude", settings.sonarAltitude);
+    qSettings->setValue("sonarMaxAlt", settings.sonarMaxAlt);
+    qSettings->setValue("sonarAltRate", settings.sonarAltRate);
 
     qSettings->setValue("gpsPosition", settings.gpsPosition);
     qSettings->setValue("gpsPosRate", settings.gpsPosRate);

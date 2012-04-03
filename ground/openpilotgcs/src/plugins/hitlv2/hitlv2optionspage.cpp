@@ -82,6 +82,10 @@ QWidget *HITLOptionsPage::createPage(QWidget *parent)
     m_optionsPage->attActSim->setChecked(config->Settings().attActSim);
     m_optionsPage->attActCalc->setChecked(config->Settings().attActCalc);
 
+    m_optionsPage->sonarAltitude->setChecked(config->Settings().sonarAltitude);
+    m_optionsPage->sonarMaxAlt->setValue(config->Settings().sonarMaxAlt);
+    m_optionsPage->sonarAltRate->setValue(config->Settings().sonarAltRate);
+
     m_optionsPage->gpsPosition->setChecked(config->Settings().gpsPosition);
     m_optionsPage->gpsPosRate->setValue(config->Settings().gpsPosRate);
 
@@ -118,6 +122,10 @@ void HITLOptionsPage::apply()
     settings.attActHW       = m_optionsPage->attActHW->isChecked();
     settings.attActSim      = m_optionsPage->attActSim->isChecked();
     settings.attActCalc     = m_optionsPage->attActCalc->isChecked();
+
+    settings.sonarAltitude  = m_optionsPage->sonarAltitude->isChecked();
+    settings.sonarMaxAlt    = m_optionsPage->sonarMaxAlt->value();
+    settings.sonarAltRate   = m_optionsPage->sonarAltRate->value();
 
     settings.gpsPosition    = m_optionsPage->gpsPosition->isChecked();
     settings.gpsPosRate     = m_optionsPage->gpsPosRate->value();

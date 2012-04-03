@@ -154,7 +154,7 @@ static void PIOS_MPU6000_Config(struct pios_mpu6000_cfg const * cfg)
 
 	// FIFO storage
 #if defined(PIOS_MPU6000_ACCEL)
-	// Set the accel to 8g mode
+	// Set the accel scale
 	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_ACCEL_CFG_REG, cfg->accel_range) != 0);
 	
 	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_FIFO_EN_REG, cfg->Fifo_store | PIOS_MPU6000_ACCEL_OUT) != 0);

@@ -290,6 +290,7 @@ static void simulateModelQuadcopter()
 	static double ned_accel[3] = {0,0,0};
 	static float q[4] = {1,0,0,0};
 	static float rpy[3] = {0,0,0}; // Low pass filtered actuator
+	static float baro_offset = 0.0f;
 	float Rbe[3][3];
 	
 	const float ACTUATOR_ALPHA = 0.8;
@@ -299,7 +300,6 @@ static void simulateModelQuadcopter()
 	const float MAG_PERIOD = 1.0 / 75.0;
 	const float BARO_PERIOD = 1.0 / 20.0;
 	
-
 	static uint32_t last_time;
 	
 	float dT = (PIOS_DELAY_DiffuS(last_time) / 1e6);
@@ -341,13 +341,6 @@ static void simulateModelQuadcopter()
 	gyrosData.x = rpy[0] + rand_gauss();
 	gyrosData.y = rpy[1] + rand_gauss();
 	gyrosData.z = rpy[2] + rand_gauss();
-
-	// Apply bias correction to the gyros
-//	GyrosBiasData gyrosBias;
-//	GyrosBiasGet(&gyrosBias);
-//	gyrosData.x += gyrosBias.x;
-//	gyrosData.y += gyrosBias.y;
-//	gyrosData.z += gyrosBias.z;
 	GyrosSet(&gyrosData);
 	
 	// Predict the attitude forward in time
@@ -423,13 +416,20 @@ static void simulateModelQuadcopter()
 	accelsData.z = ned_accel[0] * Rbe[2][0] + ned_accel[1] * Rbe[2][1] + ned_accel[2] * Rbe[2][2];
 	accelsData.temperature = 30;
 	AccelsSet(&accelsData);
-	
+
+	if(baro_offset == 0) {
+		// Hacky initialization
+		baro_offset = 50;// * rand_gauss();
+	} else {
+		// Very small drift process
+		baro_offset += rand_gauss() / 100;
+	}
 	// Update baro periodically	
 	static uint32_t last_baro_time = 0;
 	if(PIOS_DELAY_DiffuS(last_baro_time) / 1.0e6 > BARO_PERIOD) {
 		BaroAltitudeData baroAltitude;
 		BaroAltitudeGet(&baroAltitude);
-		baroAltitude.Altitude = -pos[2];
+		baroAltitude.Altitude = -pos[2] + baro_offset;
 		BaroAltitudeSet(&baroAltitude);
 		last_baro_time = PIOS_DELAY_GetRaw();
 	}

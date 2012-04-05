@@ -117,8 +117,8 @@ namespace rtslam {
 					
 					for(int i = 0; i < 7; ++i) message[i+1+17] = sqrt(stateCov(i,i));
 					for(int i = 7; i < 10; ++i); //TODO euler cov
-					for(int i = 10; i < 13; ++i) message[i+1] = sqrt(stateCov(i-3,i-3));
-					for(int i = 13; i < 16; ++i) message[i+1] = 0.; // TODO get value from MTI, with some "non filtered state" feature
+					for(int i = 10; i < 13; ++i) message[i+1+17] = sqrt(stateCov(i-3,i-3));
+					for(int i = 13; i < 16; ++i) message[i+1+17] = 0.; // TODO get value from MTI, with some "non filtered state" feature
 					
 					mutex_data.unlock();
 					condition_send.setAndNotify(1);

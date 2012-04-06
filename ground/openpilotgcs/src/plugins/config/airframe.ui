@@ -38,7 +38,7 @@
             </font>
            </property>
            <property name="text">
-            <string>Aircraft type:</string>
+            <string>Vehicle type:</string>
            </property>
           </widget>
          </item>
@@ -173,7 +173,7 @@ QGroupBox::title {
                    </widget>
                   </item>
                   <item row="1" column="1">
-                   <widget class="QComboBox" name="fwEngineChannel">
+                   <widget class="QComboBox" name="fwEngineChannelBox">
                     <property name="toolTip">
                      <string>Select output channel for the engine</string>
                     </property>
@@ -193,7 +193,7 @@ QGroupBox::title {
                    </widget>
                   </item>
                   <item row="2" column="1">
-                   <widget class="QComboBox" name="fwAileron1Channel">
+                   <widget class="QComboBox" name="fwAileron1ChannelBox">
                     <property name="toolTip">
                      <string>Select output channel for the first aileron (or elevon)</string>
                     </property>
@@ -216,7 +216,7 @@ QGroupBox::title {
                    </widget>
                   </item>
                   <item row="3" column="1">
-                   <widget class="QComboBox" name="fwAileron2Channel">
+                   <widget class="QComboBox" name="fwAileron2ChannelBox">
                     <property name="enabled">
                      <bool>false</bool>
                     </property>
@@ -239,7 +239,7 @@ QGroupBox::title {
                    </widget>
                   </item>
                   <item row="4" column="1">
-                   <widget class="QComboBox" name="fwElevator1Channel">
+                   <widget class="QComboBox" name="fwElevator1ChannelBox">
                     <property name="toolTip">
                      <string>Select output channel for the first elevator</string>
                     </property>
@@ -262,12 +262,12 @@ QGroupBox::title {
                    </widget>
                   </item>
                   <item row="5" column="1">
-                   <widget class="QComboBox" name="fwElevator2Channel">
+                   <widget class="QComboBox" name="fwElevator2ChannelBox">
                     <property name="enabled">
                      <bool>false</bool>
                     </property>
                     <property name="toolTip">
-                     <string>Select output channel for a secondry elevator</string>
+                     <string>Select output channel for a secondary elevator</string>
                     </property>
                    </widget>
                   </item>
@@ -279,7 +279,7 @@ QGroupBox::title {
                    </widget>
                   </item>
                   <item row="6" column="1">
-                   <widget class="QComboBox" name="fwRudder1Channel">
+                   <widget class="QComboBox" name="fwRudder1ChannelBox">
                     <property name="toolTip">
                      <string>Select output channel for the first rudder</string>
                     </property>
@@ -293,7 +293,7 @@ QGroupBox::title {
                    </widget>
                   </item>
                   <item row="7" column="1">
-                   <widget class="QComboBox" name="fwRudder2Channel">
+                   <widget class="QComboBox" name="fwRudder2ChannelBox">
                     <property name="toolTip">
                      <string>Select output channel for a secondary rudder</string>
                     </property>
@@ -390,7 +390,7 @@ margin:1px;</string>
                        </widget>
                       </item>
                       <item>
-                       <widget class="QLabel" name="label_18">
+                       <widget class="QLabel" name="elevonSliderLabel1">
                         <property name="text">
                          <string>50</string>
                         </property>
@@ -446,7 +446,7 @@ margin:1px;</string>
                        </widget>
                       </item>
                       <item>
-                       <widget class="QLabel" name="label_25">
+                       <widget class="QLabel" name="elevonSliderLabel2">
                         <property name="text">
                          <string>50</string>
                         </property>
@@ -533,6 +533,12 @@ margin:1px;</string>
                   </item>
                   <item>
                    <widget class="QPushButton" name="fwThrottleReset">
+                    <property name="maximumSize">
+                     <size>
+                      <width>200</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
                     <property name="text">
                      <string>Reset</string>
                     </property>
@@ -681,7 +687,13 @@ margin:1px;</string>
                        <item>
                         <layout class="QVBoxLayout" name="verticalLayout_22">
                          <item>
-                          <widget class="QLabel" name="label_43">
+                          <widget class="QLabel" name="mrRollMixValue">
+                           <property name="minimumSize">
+                            <size>
+                             <width>30</width>
+                             <height>0</height>
+                            </size>
+                           </property>
                            <property name="text">
                             <string>100</string>
                            </property>
@@ -692,6 +704,12 @@ margin:1px;</string>
                          </item>
                          <item>
                           <widget class="QSlider" name="mrRollMixLevel">
+                           <property name="minimumSize">
+                            <size>
+                             <width>35</width>
+                             <height>0</height>
+                            </size>
+                           </property>
                            <property name="toolTip">
                             <string>Weight of Roll mixing in percent.
 Typical values are 100% for + configuration and 50% for X configuration on quads.</string>
@@ -729,7 +747,13 @@ margin:1px;</string>
                        <item>
                         <layout class="QVBoxLayout" name="verticalLayout_23">
                          <item>
-                          <widget class="QLabel" name="label_44">
+                          <widget class="QLabel" name="mrYawPitchValue">
+                           <property name="minimumSize">
+                            <size>
+                             <width>0</width>
+                             <height>0</height>
+                            </size>
+                           </property>
                            <property name="text">
                             <string>100</string>
                            </property>
@@ -740,6 +764,12 @@ margin:1px;</string>
                          </item>
                          <item>
                           <widget class="QSlider" name="mrPitchMixLevel">
+                           <property name="minimumSize">
+                            <size>
+                             <width>35</width>
+                             <height>0</height>
+                            </size>
+                           </property>
                            <property name="toolTip">
                             <string>Weight of Pitch mixing in percent.
 Typical values are 100% for + configuration and 50% for X configuration on quads.</string>
@@ -777,7 +807,13 @@ margin:1px;</string>
                        <item>
                         <layout class="QVBoxLayout" name="verticalLayout_21">
                          <item>
-                          <widget class="QLabel" name="label_45">
+                          <widget class="QLabel" name="mrYawMixValue">
+                           <property name="minimumSize">
+                            <size>
+                             <width>0</width>
+                             <height>0</height>
+                            </size>
+                           </property>
                            <property name="text">
                             <string>50</string>
                            </property>
@@ -788,6 +824,12 @@ margin:1px;</string>
                          </item>
                          <item>
                           <widget class="QSlider" name="mrYawMixLevel">
+                           <property name="minimumSize">
+                            <size>
+                             <width>40</width>
+                             <height>0</height>
+                            </size>
+                           </property>
                            <property name="toolTip">
                             <string>Weight of Yaw mixing in percent.
 Typical value is 50% for + or X configuration on quads.</string>
@@ -923,6 +965,12 @@ margin:1px;</string>
                       <verstretch>0</verstretch>
                      </sizepolicy>
                     </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>200</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
                     <property name="text">
                      <string>Reset</string>
                     </property>
@@ -992,7 +1040,7 @@ margin:1px;</string>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QComboBox" name="triYawChannel">
+                  <widget class="QComboBox" name="triYawChannelBox">
                    <property name="enabled">
                     <bool>false</bool>
                    </property>
@@ -1046,7 +1094,7 @@ margin:1px;</string>
                      <number>3</number>
                     </property>
                     <item row="1" column="0">
-                     <widget class="QLabel" name="label_3">
+                     <widget class="QLabel" name="MotorOutputLabel1">
                       <property name="styleSheet">
                        <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
@@ -1060,7 +1108,7 @@ margin:1px;</string>
                      </widget>
                     </item>
                     <item row="1" column="1">
-                     <widget class="QComboBox" name="multiMotor1">
+                     <widget class="QComboBox" name="multiMotorChannelBox1">
                       <property name="toolTip">
                        <string>Assign your motor output channels using the drawing above as a reference. Respect propeller rotation.</string>
                       </property>
@@ -1081,7 +1129,7 @@ margin:1px;</string>
                      </widget>
                     </item>
                     <item row="2" column="1">
-                     <widget class="QComboBox" name="multiMotor2">
+                     <widget class="QComboBox" name="multiMotorChannelBox2">
                       <property name="toolTip">
                        <string>Assign your motor output channels using the drawing above as a reference. Respect propeller rotation.</string>
                       </property>
@@ -1102,7 +1150,7 @@ margin:1px;</string>
                      </widget>
                     </item>
                     <item row="3" column="1">
-                     <widget class="QComboBox" name="multiMotor3">
+                     <widget class="QComboBox" name="multiMotorChannelBox3">
                       <property name="toolTip">
                        <string>Assign your motor output channels using the drawing above as a reference. Respect propeller rotation.</string>
                       </property>
@@ -1123,7 +1171,7 @@ margin:1px;</string>
                      </widget>
                     </item>
                     <item row="4" column="1">
-                     <widget class="QComboBox" name="multiMotor4">
+                     <widget class="QComboBox" name="multiMotorChannelBox4">
                       <property name="toolTip">
                        <string>Assign your motor output channels using the drawing above as a reference. Respect propeller rotation.</string>
                       </property>
@@ -1170,7 +1218,7 @@ margin:1px;</string>
                      </widget>
                     </item>
                     <item row="1" column="1">
-                     <widget class="QComboBox" name="multiMotor5">
+                     <widget class="QComboBox" name="multiMotorChannelBox5">
                       <property name="enabled">
                        <bool>false</bool>
                       </property>
@@ -1200,7 +1248,7 @@ margin:1px;</string>
                      </widget>
                     </item>
                     <item row="2" column="1">
-                     <widget class="QComboBox" name="multiMotor6">
+                     <widget class="QComboBox" name="multiMotorChannelBox6">
                       <property name="enabled">
                        <bool>false</bool>
                       </property>
@@ -1224,7 +1272,7 @@ margin:1px;</string>
                      </widget>
                     </item>
                     <item row="3" column="1">
-                     <widget class="QComboBox" name="multiMotor7">
+                     <widget class="QComboBox" name="multiMotorChannelBox7">
                       <property name="enabled">
                        <bool>false</bool>
                       </property>
@@ -1248,7 +1296,7 @@ margin:1px;</string>
                      </widget>
                     </item>
                     <item row="4" column="1">
-                     <widget class="QComboBox" name="multiMotor8">
+                     <widget class="QComboBox" name="multiMotorChannelBox8">
                       <property name="enabled">
                        <bool>false</bool>
                       </property>
@@ -1329,6 +1377,520 @@ margin:1px;</string>
              </property>
              <item>
               <widget class="ConfigccpmWidget" name="widget_3" native="true"/>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="groundVehicle">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="autoFillBackground">
+           <bool>false</bool>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0">
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_6">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_3">
+               <item>
+                <widget class="QLabel" name="label_5">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="font">
+                  <font>
+                   <weight>75</weight>
+                   <bold>true</bold>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>Vehicle type:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QComboBox" name="groundVehicleType"/>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_3">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_23">
+               <item>
+                <widget class="QLabel" name="label_7">
+                 <property name="font">
+                  <font>
+                   <weight>75</weight>
+                   <bold>true</bold>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>Channel Assignment</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_15">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_4">
+               <item>
+                <widget class="QGroupBox" name="groupBox_2">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>100</height>
+                  </size>
+                 </property>
+                 <property name="title">
+                  <string>Output channel asignmets</string>
+                 </property>
+                 <layout class="QFormLayout" name="formLayout_3">
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="gvEngineLabel">
+                    <property name="minimumSize">
+                     <size>
+                      <width>77</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>Engine</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QComboBox" name="gvEngineChannelBox">
+                    <property name="toolTip">
+                     <string>Select output channel for the engine</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QLabel" name="gvAileron1Label">
+                    <property name="minimumSize">
+                     <size>
+                      <width>60</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>Aileron 1</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QComboBox" name="gvAileron1ChannelBox">
+                    <property name="toolTip">
+                     <string>Select output channel for the first aileron (or elevon)</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="0">
+                   <widget class="QLabel" name="gvAileron2Label">
+                    <property name="enabled">
+                     <bool>false</bool>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>60</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>Aileron 2</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QComboBox" name="gvAileron2ChannelBox">
+                    <property name="enabled">
+                     <bool>false</bool>
+                    </property>
+                    <property name="toolTip">
+                     <string>Select output channel for the second aileron (or elevon)</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="0">
+                   <widget class="QLabel" name="gvMotor1Label">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>Motor</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="1">
+                   <widget class="QComboBox" name="gvMotor1ChannelBox">
+                    <property name="toolTip">
+                     <string>Select output channel for the first motor</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="0">
+                   <widget class="QLabel" name="gvMotor2Label">
+                    <property name="enabled">
+                     <bool>false</bool>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>47</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>Motor 2</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="1">
+                   <widget class="QComboBox" name="gvMotor2ChannelBox">
+                    <property name="enabled">
+                     <bool>false</bool>
+                    </property>
+                    <property name="toolTip">
+                     <string>Select output channel for a second motor</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="5" column="0">
+                   <widget class="QLabel" name="gvSteering1Label">
+                    <property name="text">
+                     <string>Front Steering</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="5" column="1">
+                   <widget class="QComboBox" name="gvSteering1ChannelBox">
+                    <property name="toolTip">
+                     <string>Select output channel for the first steering actuator</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="6" column="0">
+                   <widget class="QLabel" name="gvSteering2Label">
+                    <property name="text">
+                     <string>Rear Steering</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="6" column="1">
+                   <widget class="QComboBox" name="gvSteering2ChannelBox">
+                    <property name="toolTip">
+                     <string>Select output channel for a second steering actuator</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QGroupBox" name="differentialSteeringMixBox">
+                 <property name="enabled">
+                  <bool>true</bool>
+                 </property>
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="title">
+                  <string>Differential Steering Mix</string>
+                 </property>
+                 <layout class="QVBoxLayout" name="verticalLayout_13">
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_8">
+                    <item>
+                     <layout class="QVBoxLayout" name="verticalLayout_14">
+                      <item>
+                       <widget class="QLabel" name="differentialSteeringLabel1">
+                        <property name="minimumSize">
+                         <size>
+                          <width>65</width>
+                          <height>0</height>
+                         </size>
+                        </property>
+                        <property name="text">
+                         <string>Left %</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QSlider" name="differentialSteeringSlider1">
+                        <property name="maximum">
+                         <number>100</number>
+                        </property>
+                        <property name="value">
+                         <number>50</number>
+                        </property>
+                        <property name="orientation">
+                         <enum>Qt::Vertical</enum>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLabel" name="gvDiffSteering1Label">
+                        <property name="text">
+                         <string>50</string>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QVBoxLayout" name="verticalLayout_15">
+                      <item>
+                       <widget class="QLabel" name="differentialSteeringLabel2">
+                        <property name="minimumSize">
+                         <size>
+                          <width>50</width>
+                          <height>0</height>
+                         </size>
+                        </property>
+                        <property name="text">
+                         <string>Right %</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QSlider" name="differentialSteeringSlider2">
+                        <property name="maximum">
+                         <number>100</number>
+                        </property>
+                        <property name="value">
+                         <number>50</number>
+                        </property>
+                        <property name="orientation">
+                         <enum>Qt::Vertical</enum>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLabel" name="gvDiffSteering2Label">
+                        <property name="text">
+                         <string>50</string>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </item>
+                   </layout>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_4">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QGroupBox" name="gvThrottleCurve1GroupBox">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>100</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="title">
+                  <string>Front throttle curve</string>
+                 </property>
+                 <layout class="QVBoxLayout" name="verticalLayout_16">
+                  <item>
+                   <widget class="MixerCurveWidget" name="groundVehicleThrottle1" native="true">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>100</width>
+                      <height>100</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>200</width>
+                      <height>200</height>
+                     </size>
+                    </property>
+                    <property name="sizeIncrement">
+                     <size>
+                      <width>10</width>
+                      <height>10</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="gvThrottleCurve1Reset">
+                    <property name="maximumSize">
+                     <size>
+                      <width>200</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>Reset</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="gvThrottleCurve1ItemValue">
+                    <property name="text">
+                     <string>Val: 0.00</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QGroupBox" name="gvThrottleCurve2GroupBox">
+                 <property name="title">
+                  <string>Rear throttle curve</string>
+                 </property>
+                 <layout class="QVBoxLayout" name="verticalLayout_17">
+                  <item>
+                   <widget class="MixerCurveWidget" name="groundVehicleThrottle2" native="true">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>100</width>
+                      <height>100</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>200</width>
+                      <height>200</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="gvThrottleCurve2Reset">
+                    <property name="text">
+                     <string>Reset</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="gvThrottleCurve2ItemValue">
+                    <property name="text">
+                     <string>Val: 0.00</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <spacer name="verticalSpacer">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_13">
+               <item>
+                <spacer name="horizontalSpacer_11">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QLabel" name="gvStatusLabel">
+                 <property name="font">
+                  <font>
+                   <weight>75</weight>
+                   <bold>true</bold>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>Mixer OK</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </item>
             </layout>
            </item>
@@ -1990,7 +2552,7 @@ margin:1px;</string>
               </widget>
              </item>
              <item>
-              <widget class="QLabel" name="feedForwardValue">
+              <widget class="QLabel" name="feedForwardSliderValue">
                <property name="minimumSize">
                 <size>
                  <width>30</width>
@@ -2095,7 +2657,7 @@ Do it after accel time is setup.</string>
               </widget>
              </item>
              <item>
-              <widget class="QLabel" name="label_33">
+              <widget class="QLabel" name="maxAccelSliderValue">
                <property name="text">
                 <string>1000</string>
                </property>
@@ -2329,7 +2891,7 @@ p, li { white-space: pre-wrap; }
   <customwidget>
    <class>ConfigccpmWidget</class>
    <extends>QWidget</extends>
-   <header>configccpmwidget.h</header>
+   <header>cfg_vehicletypes/configccpmwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
@@ -2340,7 +2902,7 @@ p, li { white-space: pre-wrap; }
   <connection>
    <sender>feedForwardSlider</sender>
    <signal>valueChanged(int)</signal>
-   <receiver>feedForwardValue</receiver>
+   <receiver>feedForwardSliderValue</receiver>
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -2356,7 +2918,7 @@ p, li { white-space: pre-wrap; }
   <connection>
    <sender>maxAccelSlider</sender>
    <signal>valueChanged(int)</signal>
-   <receiver>label_33</receiver>
+   <receiver>maxAccelSliderValue</receiver>
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -2372,7 +2934,7 @@ p, li { white-space: pre-wrap; }
   <connection>
    <sender>elevonSlider1</sender>
    <signal>valueChanged(int)</signal>
-   <receiver>label_18</receiver>
+   <receiver>elevonSliderLabel1</receiver>
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -2388,12 +2950,12 @@ p, li { white-space: pre-wrap; }
   <connection>
    <sender>elevonSlider2</sender>
    <signal>valueChanged(int)</signal>
-   <receiver>label_25</receiver>
+   <receiver>elevonSliderLabel2</receiver>
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>124</x>
-     <y>126</y>
+     <x>362</x>
+     <y>299</y>
     </hint>
     <hint type="destinationlabel">
      <x>124</x>
@@ -2402,9 +2964,41 @@ p, li { white-space: pre-wrap; }
    </hints>
   </connection>
   <connection>
+   <sender>differentialSteeringSlider1</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>gvDiffSteering1Label</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>124</x>
+     <y>126</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>315</x>
+     <y>391</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>differentialSteeringSlider2</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>gvDiffSteering2Label</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>124</x>
+     <y>126</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>390</x>
+     <y>391</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
    <sender>mrPitchMixLevel</sender>
    <signal>valueChanged(int)</signal>
-   <receiver>label_44</receiver>
+   <receiver>mrPitchMixValue</receiver>
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -2420,7 +3014,7 @@ p, li { white-space: pre-wrap; }
   <connection>
    <sender>mrRollMixLevel</sender>
    <signal>valueChanged(int)</signal>
-   <receiver>label_43</receiver>
+   <receiver>mrRollMixValue</receiver>
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -2436,7 +3030,7 @@ p, li { white-space: pre-wrap; }
   <connection>
    <sender>mrYawMixLevel</sender>
    <signal>valueChanged(int)</signal>
-   <receiver>label_45</receiver>
+   <receiver>mrYawMixValue</receiver>
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">

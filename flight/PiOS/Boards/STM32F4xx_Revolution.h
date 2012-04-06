@@ -134,7 +134,7 @@ extern uint32_t pios_com_vcp_id;
 //------------------------
 // TELEMETRY 
 //------------------------
-#define TELEM_QUEUE_SIZE         40
+#define TELEM_QUEUE_SIZE         80
 #define PIOS_TELEM_STACK_SIZE    624
 
 //-------------------------

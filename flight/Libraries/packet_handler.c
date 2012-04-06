@@ -32,6 +32,8 @@
 #include "aes.h"
 #include "ecc.h"
 
+extern char *debug_msg;
+
 // Private types and constants
 typedef struct {
 	PacketHandlerConfig cfg;
@@ -42,20 +44,14 @@ typedef struct {
 	PHPacket rx_packet;
 	PHOutputStream stream;
 	xSemaphoreHandle lock;
+	PHOutputStream output_stream;
+	PHDataHandler data_handler;
 } PHPacketData, *PHPacketDataHandle;
 
 // Private functions
 static uint8_t PHLSendAck(PHPacketDataHandle data, PHPacketHandle p);
 static uint8_t PHLSendNAck(PHPacketDataHandle data, PHPacketHandle p);
 static uint8_t PHLTransmitPacket(PHPacketDataHandle data, PHPacketHandle p);
-
-/*
-static void
-byte_err (int err, int loc, unsigned char *dst)
-{
-  dst[loc-1] ^= err;
-}
-*/
 
 /**
  * Initialize the Packet Handler library
@@ -93,6 +89,30 @@ PHInstHandle PHInitialize(PacketHandlerConfig *cfg)
 }
 
 /**
+ * Register an output stream handler
+ * \param[in] h The packet handler instance data pointer.
+ * \param[in] f The output stream handler function
+ */
+void PHRegisterOutputStream(PHInstHandle h, PHOutputStream f)
+{
+	PHPacketDataHandle data = (PHPacketDataHandle)h;
+
+	data->output_stream = f;
+}
+
+/**
+ * Register a data handler
+ * \param[in] h The packet handler instance data pointer.
+ * \param[in] f The data handler function
+ */
+void PHRegisterDataHandler(PHInstHandle h, PHDataHandler f)
+{
+	PHPacketDataHandle data = (PHPacketDataHandle)h;
+
+	data->data_handler = f;
+}
+
+/**
  * Get a packet out of the transmit buffer.
  * \param[in] h The packet handler instance data pointer.
  * \param[in] dest_id The destination ID of this connection
@@ -105,58 +125,6 @@ uint32_t PHConnect(PHInstHandle h, uint32_t dest_id)
 }
 
 /**
- * Temporarily reserve the next packet in the TX packet window.
- * This function places a tempoary hold on the next TX packet and
- * retains the packet handler lock.
- *
- * NOTE: PHReleaseLock must be called to release the lock and  retain
- * or release the reserved packet.
- *
- * \param[in] h The packet handler instance data pointer.
- * \return PHPacketHandle A pointer to the packet buffer.
- * \return 0 No packets buffers avaiable in the transmit window.
- */
-PHPacketHandle PHReserveTXPacket(PHInstHandle h)
-{
-	PHPacketDataHandle data = (PHPacketDataHandle)h;
-
-	// Lock
-	xSemaphoreTakeRecursive(data->lock, portMAX_DELAY);
-
-	// Is the window full?
-	uint8_t next_end = (data->tx_win_end + 1) % data->cfg.txWinSize;
-	if(next_end == data->tx_win_start) {
-
-		// Release the lock
-		xSemaphoreGiveRecursive(data->lock);
-
-		return NULL;
-	}
-
-	// Return a pointer to the packet at the end of the TX window.
-	return data->tx_packets + data->tx_win_end;
-}
-
-/**
- * Get a packet out of the transmit buffer and keep the lock.
- * NOTE: PHReleaseLock must be called to release the lock.
- * \param[in] h The packet handler instance data pointer.
- * \param[in] keep_packet Maintain a permanent (until released) lock on the packet.
- */
-void PHReleaseLock(PHInstHandle h, bool keep_packet)
-{
-	PHPacketDataHandle data = (PHPacketDataHandle)h;
-	uint8_t next_end = (data->tx_win_end + 1) % data->cfg.txWinSize;
-
-	// Increment the end index if packet is being kept.
-	if (keep_packet)
-		data->tx_win_end = next_end;
-
-	// Release lock
-	xSemaphoreGiveRecursive(data->lock);
-}
-
-/**
  * Get a packet out of the transmit buffer.
  * \param[in] h The packet handler instance data pointer.
  * \return PHPacketHandle A pointer to the packet buffer.
@@ -164,8 +132,22 @@ void PHReleaseLock(PHInstHandle h, bool keep_packet)
  */
 PHPacketHandle PHGetTXPacket(PHInstHandle h)
 {
-	PHPacketHandle p = PHReserveTXPacket(h);
-	PHReleaseLock(p, 1);
+	PHPacketDataHandle data = (PHPacketDataHandle)h;
+
+	// Lock
+	xSemaphoreTakeRecursive(data->lock, portMAX_DELAY);
+	PHPacketHandle p = data->tx_packets + data->tx_win_end;
+
+	// Is the window full?
+	uint8_t next_end = (data->tx_win_end + 1) % data->cfg.txWinSize;
+	if(next_end == data->tx_win_start)
+		return NULL;
+	data->tx_win_end = next_end;
+
+	// Release lock
+	xSemaphoreGiveRecursive(data->lock);
+
+	// Return a pointer to the packet at the end of the TX window.
 	return p;
 }
 
@@ -268,8 +250,8 @@ uint8_t PHReceivePacket(PHInstHandle h, PHPacketHandle p)
 			PHLSendAck(data, p);
 
 			// Pass on the data.
-			if(data->cfg.data_handler)
-				data->cfg.data_handler(data->cfg.dev, p->data, p->header.data_size);
+			if(data->data_handler)
+				data->data_handler(p->data, p->header.data_size);
 		}
 
 		break;
@@ -307,14 +289,17 @@ uint8_t PHReceivePacket(PHInstHandle h, PHPacketHandle p)
 
 		break;
 
-	default:
+	case PACKET_TYPE_DATA:
 
 		if (!rx_error)
 
 			// Pass on the data to the receiver handler.
-			if(data->cfg.data_handler)
-				data->cfg.data_handler(data->cfg.dev, p->data, p->header.data_size);
+			if(data->data_handler)
+				data->data_handler(p->data, p->header.data_size);
 
+		break;
+
+	default:
 		break;
 	}
 
@@ -331,14 +316,17 @@ uint8_t PHReceivePacket(PHInstHandle h, PHPacketHandle p)
 static uint8_t PHLTransmitPacket(PHPacketDataHandle data, PHPacketHandle p)
 {
 
+	if(!data->output_stream)
+		return 0;
+
 	// Set the sequence ID to the current ID.
 	p->header.tx_seq = data->tx_seq_id++;
 
 	// Add the error correcting code.
 	encode_data((unsigned char*)p, PHPacketSize(p), (unsigned char*)p);
-	
+
 	// Transmit the packet using the output stream.
-	if(!data->cfg.output_stream(data->cfg.dev, p))
+	if(data->output_stream(p) == -1)
 		return 0;
 
 	return 1;
@@ -362,10 +350,8 @@ static uint8_t PHLSendAck(PHPacketDataHandle data, PHPacketHandle p)
 	ack.rx_seq = p->header.tx_seq;
 	ack.data_size = 0;
 
-	// Set the packet.
-	PHLTransmitPacket(data, (PHPacketHandle)&ack);
-
-	return 1;
+	// Send the packet.
+	return PHLTransmitPacket(data, (PHPacketHandle)&ack);
 }
 
 /**
@@ -387,7 +373,5 @@ static uint8_t PHLSendNAck(PHPacketDataHandle data, PHPacketHandle p)
 	ack.data_size = 0;
 
 	// Set the packet.
-	PHLTransmitPacket(data, (PHPacketHandle)&ack);
-
-	return 1;
+	return PHLTransmitPacket(data, (PHPacketHandle)&ack);
 }

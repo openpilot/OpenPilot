@@ -490,4 +490,5 @@ const struct pios_rfm22b_cfg pios_rfm22b_cfg = {
 	.maxConnections = 1,
 	.id = 0x36249acb
 };
+
 #endif /* PIOS_INCLUDE_RFM22B */

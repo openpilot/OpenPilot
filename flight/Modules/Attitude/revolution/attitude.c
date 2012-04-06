@@ -652,7 +652,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 
 	if(gps_updated && outdoor_mode)
 	{
-		INSSetPosVelVar(1.0e0f, 1.0e0f);
+		INSSetPosVelVar(revoCalibration.gps_var[REVOCALIBRATION_GPS_VAR_POS], revoCalibration.gps_var[REVOCALIBRATION_GPS_VAR_VEL]);
 		sensors |= POS_SENSORS | HORIZ_SENSORS;
 		GPSPositionData gpsPosition;
 		GPSPositionGet(&gpsPosition);

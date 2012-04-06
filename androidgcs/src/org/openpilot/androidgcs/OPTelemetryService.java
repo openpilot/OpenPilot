@@ -71,21 +71,25 @@ public class OPTelemetryService extends Service {
 				stopSelf(msg.arg2);
 				break;
 			case MSG_CONNECT:	
-				Toast.makeText(getApplicationContext(), "Attempting connection", Toast.LENGTH_SHORT).show();
 				terminate = false;
 				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(OPTelemetryService.this);
-				//int connection_type = Integer.decode(prefs.getString("connection_type", ""));
-				int connection_type = 1;
+				int connection_type = Integer.decode(prefs.getString("connection_type", ""));
 				switch(connection_type) {
 				case 0: // No connection
 					return;
 				case 1:
+					Toast.makeText(getApplicationContext(), "Attempting fake connection", Toast.LENGTH_SHORT).show();
 					activeTelem = new FakeTelemetryThread();
 					break;
 				case 2:
+					Toast.makeText(getApplicationContext(), "Attempting BT connection", Toast.LENGTH_SHORT).show();
 					activeTelem = new BTTelemetryThread();
 					break;
 				case 3:
+					Toast.makeText(getApplicationContext(), "Attempting TCP connection", Toast.LENGTH_SHORT).show();
+					activeTelem = new TcpTelemetryThread();
+					break;
+				default:
 					throw new Error("Unsupported");
 				}
 				activeTelem.start();
@@ -305,6 +309,75 @@ public class OPTelemetryService extends Service {
 			if (DEBUG) Log.d(TAG, "Connected via bluetooth");
 
 			uavTalk = bt.getUavtalk();
+			tel = new Telemetry(uavTalk, objMngr);
+			mon = new TelemetryMonitor(objMngr,tel);
+			mon.addObserver(new Observer() {
+				public void update(Observable arg0, Object arg1) {
+					System.out.println("Mon updated. Connected: " + mon.getConnected() + " objects updated: " + mon.getObjectsUpdated());
+					if(mon.getConnected() /*&& mon.getObjectsUpdated()*/) {
+						Intent intent = new Intent();
+						intent.setAction(INTENT_ACTION_CONNECTED);
+						sendBroadcast(intent,null);					
+					}
+				}				
+			});
+
+
+			if (DEBUG) Log.d(TAG, "Entering UAVTalk processing loop");
+			while( !terminate ) {
+				if( !uavTalk.processInputStream() )
+					break;
+			}
+			if (DEBUG) Log.d(TAG, "UAVTalk stream disconnected");
+		}
+
+	};
+
+	private class TcpTelemetryThread extends Thread implements TelemTask { 
+
+		private UAVObjectManager objMngr;
+		private UAVTalk uavTalk;
+		private Telemetry tel;
+		private TelemetryMonitor mon;
+
+		public UAVObjectManager getObjectManager() { return objMngr; };
+
+		TcpTelemetryThread() {
+			objMngr = new UAVObjectManager();
+			UAVObjectsInitialize.register(objMngr);
+		}
+
+		public void run() {			
+			if (DEBUG) Log.d(TAG, "Telemetry Thread started");
+
+			Looper.prepare();						
+
+			TcpUAVTalk tcp = new TcpUAVTalk(OPTelemetryService.this);
+			for( int i = 0; i < 10; i++ ) {
+				if (DEBUG) Log.d(TAG, "Attempting network Connection");
+
+				tcp.connect(objMngr);
+
+				if (DEBUG) Log.d(TAG, "Done attempting connection");
+				if( tcp.getConnected() )
+					break;
+
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					Log.e(TAG, "Thread interrupted while trying to connect");
+					e.printStackTrace();
+					return;
+				}
+			}
+			if( ! tcp.getConnected() ) {
+				return;
+			}
+
+
+			if (DEBUG) Log.d(TAG, "Connected via network");
+
+			uavTalk = tcp.getUavtalk();
 			tel = new Telemetry(uavTalk, objMngr);
 			mon = new TelemetryMonitor(objMngr,tel);
 			mon.addObserver(new Observer() {

@@ -248,12 +248,8 @@ static int32_t updateAttitudeComplimentary(bool first_run)
 	static uint8_t init = 0;
 
 	// Wait until the AttitudeRaw object is updated, if a timeout then go to failsafe
-	if ( xQueueReceive(gyroQueue, &ev, FAILSAFE_TIMEOUT_MS / portTICK_RATE_MS) != pdTRUE )
-	{
-		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE,SYSTEMALARMS_ALARM_WARNING);
-		return -1;
-	}
-	if ( xQueueReceive(accelQueue, &ev, 0) != pdTRUE )
+	if ( xQueueReceive(gyroQueue, &ev, FAILSAFE_TIMEOUT_MS / portTICK_RATE_MS) != pdTRUE ||
+	     xQueueReceive(accelQueue, &ev, 1 / portTICK_RATE_MS) != pdTRUE )
 	{
 		// When one of these is updated so should the other
 		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE,SYSTEMALARMS_ALARM_WARNING);
@@ -493,8 +489,8 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	}
 
 	// Wait until the gyro and accel object is updated, if a timeout then go to failsafe
-	if ( (xQueueReceive(gyroQueue, &ev, 10 / portTICK_RATE_MS) != pdTRUE) ||
-		(xQueueReceive(accelQueue, &ev, 10 / portTICK_RATE_MS) != pdTRUE) )
+	if ( (xQueueReceive(gyroQueue, &ev, FAILSAFE_TIMEOUT_MS / portTICK_RATE_MS) != pdTRUE) ||
+		(xQueueReceive(accelQueue, &ev, 1 / portTICK_RATE_MS) != pdTRUE) )
 	{
 		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE,SYSTEMALARMS_ALARM_WARNING);
 		return -1;

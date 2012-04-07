@@ -226,7 +226,10 @@ void PIOS_Board_Init(void) {
 	/* Remap AFIO pin */
 	GPIO_PinRemapConfig( GPIO_Remap_SWJ_NoJTRST, ENABLE);
 
-	PIOS_GPIO_Init();
+#ifdef PIOS_INCLUDE_ADC
+	PIOS_ADC_Init();
+#endif
+ 	PIOS_GPIO_Init();
 }
 
 /**

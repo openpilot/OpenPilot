@@ -30,11 +30,16 @@
 
 // ****************
 
-#include "openpilot.h"
-#include "hwsettings.h"
-#include "radiocombridge.h"
+#include <openpilot.h>
+#include <hwsettings.h>
+#include <radiocombridge.h>
+#include <packet_handler.h>
 
 #include <stdbool.h>
+
+#include "ecc.h"
+
+extern char *debug_msg;
 
 // ****************
 // Private functions
@@ -42,16 +47,17 @@
 static void radio2ComBridgeTask(void *parameters);
 static void com2RadioBridgeTask(void *parameters);
 static int32_t transmitData(uint8_t * data, int32_t length);
+static int32_t transmitPacket(PHPacketHandle packet);
+static void receiveData(uint8_t *buf, uint8_t len);
 static void updateSettings();
 
 // ****************
 // Private constants
 
-//#define STACK_SIZE_BYTES 280
-#define STACK_SIZE_BYTES 350
+#define STACK_SIZE_BYTES 300
 #define TASK_PRIORITY (tskIDLE_PRIORITY + 1)
 
-#define BRIDGE_BUF_LEN 10
+#define BRIDGE_BUF_LEN 128
 
 // ****************
 // Private types
@@ -76,6 +82,13 @@ typedef struct {
 	uint32_t com_tx_errors;
 	uint32_t radio_tx_errors;
 
+	// The packet handler.
+	PHInstHandle packet_handler;
+	portTickType send_timeout;
+	uint16_t min_packet_size;
+
+	PHPacket packet;
+
 } RadioComBridgeData;
 
 // ****************
@@ -92,8 +105,8 @@ static int32_t RadioComBridgeStart(void)
 {
 	if(data) {
 		// Start the tasks
-		xTaskCreate(radio2ComBridgeTask, (signed char *)"Radio2ComBridge", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &(data->radio2ComBridgeTaskHandle));
-		xTaskCreate(com2RadioBridgeTask, (signed char *)"Com2RadioBridge", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &(data->com2RadioBridgeTaskHandle));
+		xTaskCreate(radio2ComBridgeTask, (signed char *)"Radio2ComBridge", STACK_SIZE_BYTES/2, NULL, TASK_PRIORITY, &(data->radio2ComBridgeTaskHandle));
+		xTaskCreate(com2RadioBridgeTask, (signed char *)"Com2RadioBridge", STACK_SIZE_BYTES/2, NULL, TASK_PRIORITY, &(data->com2RadioBridgeTaskHandle));
 		return 0;
 	}
 
@@ -122,13 +135,29 @@ static int32_t RadioComBridgeInitialize(void)
 	PIOS_Assert(data->radio2com_buf);
 	data->com2radio_buf = pvPortMalloc(BRIDGE_BUF_LEN);
 	PIOS_Assert(data->com2radio_buf);
-    
+
 	// Initialise UAVTalk
 	data->uavTalkCon = UAVTalkInitialize(&transmitData);
 
 	// Initialize the statistics.
 	data->com_tx_errors = 0;
 	data->radio_tx_errors = 0;
+
+	// Initialize the packet handler
+	PacketHandlerConfig phcfg = {
+		.txWinSize = PIOS_PH_TX_WIN_SIZE,
+		.maxConnections = PIOS_PH_MAX_CONNECTIONS,
+		.id = 0x36249acb,
+	};
+	data->packet_handler = PHInitialize(&phcfg);
+
+	// Register the callbacks with the packet handler
+	PHRegisterOutputStream(data->packet_handler, transmitPacket);
+	PHRegisterDataHandler(data->packet_handler, receiveData);
+
+	// Initialize the packet send timeout
+	data->send_timeout = 25; // ms
+	data->min_packet_size = 50;
 
 	updateSettings();
 
@@ -148,11 +177,7 @@ static void radio2ComBridgeTask(void *parameters)
 		// Receive data from the radio port
 		rx_bytes = PIOS_COM_ReceiveBuffer(data->radio_port, data->radio2com_buf, BRIDGE_BUF_LEN, 500);
 		if (rx_bytes > 0) {
-			/* Send the received data to the com port */
-			if (PIOS_COM_SendBuffer(data->com_port, data->radio2com_buf, rx_bytes) != rx_bytes) {
-				/* Error on transmit */
-				data->com_tx_errors++;
-			}
+			PHReceivePacket(data->packet_handler, (PHPacketHandle)data->radio2com_buf);
 		}
 	}
 }
@@ -162,22 +187,69 @@ static void radio2ComBridgeTask(void *parameters)
  */
 static void com2RadioBridgeTask(void * parameters)
 {
+	uint32_t rx_bytes = 0;
+	portTickType packet_start_time = 0;
+	uint32_t timeout = 500;
+
 	/* Handle usart/usb -> radio direction */
 	while (1) {
-		uint32_t rx_bytes;
 
 		// Receive data from the com port
-		rx_bytes = PIOS_COM_ReceiveBuffer(data->com_port, data->com2radio_buf, BRIDGE_BUF_LEN, 500);
+		//debug_msg = "COM receive";
+		uint32_t cur_rx_bytes = PIOS_COM_ReceiveBuffer(data->com_port, data->com2radio_buf +
+																									 rx_bytes, BRIDGE_BUF_LEN - rx_bytes, timeout);
+		//debug_msg = "COM receive done";
+		rx_bytes += cur_rx_bytes;
+
+		// Do we have an data to send?
 		if (rx_bytes > 0) {
 
-			/* Send the received data to the radio port */
-			if (PIOS_COM_SendBuffer(data->radio_port, data->com2radio_buf, rx_bytes) != rx_bytes) {
-				/* Error on transmit */
-				data->radio_tx_errors++;
+			// Check how long since last update
+			portTickType cur_sys_time = xTaskGetTickCount();
+
+			// Is this the start of a packet?
+			if(packet_start_time == 0)
+				packet_start_time = cur_sys_time;
+
+			// Just send the packet on wraparound
+			bool send_packet = (cur_sys_time < packet_start_time);
+			if (!send_packet)
+			{
+				portTickType dT = (cur_sys_time - packet_start_time) / portTICK_RATE_MS;
+				if (dT > data->send_timeout)
+					send_packet = true;
+				else
+					timeout = data->send_timeout - dT;
+			}
+
+			// Also send the packet if the size is over the minimum.
+			send_packet |= (rx_bytes > data->min_packet_size);
+
+			// Should we send this packet?
+			if (send_packet)
+			{
+				// Get a TX packet from the packet handler
+				PHPacketHandle p = PHGetTXPacket(data->packet_handler);
+
+				// Initialize the packet.
+				//p->header.type = PACKET_TYPE_ACKED_DATA;
+				p->header.type = PACKET_TYPE_DATA;
+				p->header.data_size = rx_bytes;
+
+				// Copy the data into the packet.
+				memcpy(p->data, data->com2radio_buf, rx_bytes);
+
+				// Transmit the packet
+				PHTransmitPacket(data->packet_handler, p);
+
+				// Reset the timeout
+				timeout = 500;
+				rx_bytes = 0;
+				packet_start_time = 0;
 			}
 
 			// Pass the data through UAVTalk
-			//for (uint8_t i = 0; i < rx_bytes; i++)
+			//for (uint8_t i = 0; i < cur_rx_bytes; i++)
 			//UAVTalkProcessInputStream(data->uavTalkCon, data->com2radio_buf[i]);
 		}
 	}
@@ -194,6 +266,35 @@ static void com2RadioBridgeTask(void * parameters)
 static int32_t transmitData(uint8_t *buf, int32_t length)
 {
 	return PIOS_COM_SendBuffer(data->com_port, buf, length);
+}
+
+/**
+ * Transmit a packet to the radio port.
+ * \param[in] buf Data buffer to send
+ * \param[in] length Length of buffer
+ * \return -1 on failure
+ * \return number of bytes transmitted on success
+ */
+static int32_t transmitPacket(PHPacketHandle p)
+{
+	static uint32_t cntr = 0;
+	DEBUG_PRINTF(2, "Sending: %d %d\n\r", p->header.data_size, cntr++);
+	int32_t ret = PIOS_COM_SendBuffer(data->radio_port, (uint8_t*)p, PH_PACKET_SIZE(p));
+	return ret;
+}
+
+/**
+ * Receive a packet
+ * \param[in] buf The received data buffer
+ * \param[in] length Length of buffer
+ */
+static void receiveData(uint8_t *buf, uint8_t len)
+{
+	DEBUG_PRINTF(2, "Received: %d\n\r", len);
+	/* Send the received data to the com port */
+	if (PIOS_COM_SendBuffer(data->com_port, buf, len) != len)
+		/* Error on transmit */
+		data->com_tx_errors++;
 }
 
 static void updateSettings()

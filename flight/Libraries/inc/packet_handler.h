@@ -60,7 +60,8 @@ typedef struct {
 	uint8_t data_size;
 } PHPacketHeader;
 
-#define PH_MAX_DATA (PH_MAX_PACKET - sizeof(PHPacketHeader) - RS_ECC_NPARITY)
+#define PH_MAX_DATA (PIOS_PH_MAX_PACKET - sizeof(PHPacketHeader) - RS_ECC_NPARITY)
+#define PH_PACKET_SIZE(p) (p->data + p->header.data_size - (uint8_t*)p + RS_ECC_NPARITY)
 typedef struct {
 	PHPacketHeader header;
 	uint8_t data[PH_MAX_DATA + RS_ECC_NPARITY];
@@ -70,24 +71,20 @@ typedef struct {
 	uint8_t txWinSize;
 	uint16_t maxConnections;
 	uint32_t id;
-	void *dev;
-	uint8_t (*output_stream)(void *dev, PHPacketHandle packet);
-	void (*set_baud)(uint32_t baud);
-	void (*data_handler)(void *dev, uint8_t *data, uint8_t len);
-	void (*receiver_handler)(void *dev, uint8_t *data, uint8_t len);
 } PacketHandlerConfig;
 
 typedef int32_t (*PHOutputStream)(PHPacketHandle packet);
+typedef void (*PHDataHandler)(uint8_t *data, uint8_t len);
 
 typedef void* PHInstHandle;
 
 // Public functions
 PHInstHandle PHInitialize(PacketHandlerConfig *cfg);
+void PHRegisterOutputStream(PHInstHandle h, PHOutputStream f);
+void PHRegisterDataHandler(PHInstHandle h, PHDataHandler f);
 uint32_t PHConnect(PHInstHandle h, uint32_t dest_id);
 PHPacketHandle PHGetRXPacket(PHInstHandle h);
 PHPacketHandle PHGetTXPacket(PHInstHandle h);
-PHPacketHandle PHReserveTXPacket(PHInstHandle h);
-void PHReleaseLock(PHInstHandle h, bool keep_packet);
 void PHReleaseTXPacket(PHInstHandle h, PHPacketHandle p);
 uint8_t PHTransmitPacket(PHInstHandle h, PHPacketHandle p);
 uint8_t PHReceivePacket(PHInstHandle h, PHPacketHandle p);

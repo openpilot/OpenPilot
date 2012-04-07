@@ -8,6 +8,8 @@ inputChannelForm::inputChannelForm(QWidget *parent,bool showlegend) :
     ui(new Ui::inputChannelForm)
 {
     ui->setupUi(this);
+    
+    //The first time through the loop, keep the legend. All other times, delete it.
     if(!showlegend)
     {
         layout()->removeWidget(ui->legend0);

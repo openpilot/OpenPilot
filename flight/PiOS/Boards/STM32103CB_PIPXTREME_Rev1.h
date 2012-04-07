@@ -166,9 +166,10 @@ extern uint32_t pios_com_rfm22b_id;
 */
 #define PIOS_COM_DEBUG									PIOS_COM_FLEXI
 #define PIOS_COM_BRIDGE_COM							PIOS_COM_TELEM_SERIAL
+//#define PIOS_COM_BRIDGE_COM							PIOS_COM_FLEXI
 #define PIOS_COM_BRIDGE_RADIO						PIOS_COM_RFM22B_RF
 
-#define DEBUG_LEVEL 1
+#define DEBUG_LEVEL 2
 #if DEBUG_LEVEL > 0
 #define DEBUG_PRINTF(level, ...) if(level <= DEBUG_LEVEL) { PIOS_COM_SendFormattedStringNonBlocking(PIOS_COM_DEBUG, __VA_ARGS__); }
 #else
@@ -229,26 +230,28 @@ extern uint32_t pios_com_rfm22b_id;
 // RFM22
 //-------------------------
 
-//#define RFM22_EXT_INT_USE
+#define RFM22_EXT_INT_USE
 
 #define RFM22_PIOS_SPI						PIOS_SPI_PORT	// SPIx
 
 #if defined(RFM22_EXT_INT_USE)
-#define RFM22_EXT_INT_PORT_SOURCE		GPIO_PortSourceGPIOA
-#define RFM22_EXT_INT_PIN_SOURCE		GPIO_PinSource2
-
-#define RFM22_EXT_INT_LINE				EXTI_Line2
-#define RFM22_EXT_INT_IRQn				EXTI2_IRQn
-#define	RFM22_EXT_INT_FUNC				EXTI2_IRQHandler
-
-#define RFM22_EXT_INT_PRIORITY			1
+#define PIOS_RFM22_EXTI_GPIO_PORT               GPIOA
+#define PIOS_RFM22_EXTI_GPIO_PIN                GPIO_Pin_2
+#define PIOS_RFM22_EXTI_PORT_SOURCE             GPIO_PortSourceGPIOA
+#define PIOS_RFM22_EXTI_PIN_SOURCE              GPIO_PinSource2
+#define PIOS_RFM22_EXTI_CLK                     RCC_APB2Periph_GPIOA
+#define PIOS_RFM22_EXTI_LINE                    EXTI_Line2
+#define PIOS_RFM22_EXTI_IRQn                    EXTI2_IRQn
+#define PIOS_RFM22_EXTI_PRIO                    PIOS_IRQ_PRIO_LOW
 #endif
 
 //-------------------------
 // Packet Handler
 //-------------------------
 
-#define PH_MAX_PACKET 255
+#define PIOS_PH_MAX_PACKET 255
+#define PIOS_PH_TX_WIN_SIZE 3
+#define PIOS_PH_MAX_CONNECTIONS 1
 
 //-------------------------
 // Reed-Solomon ECC

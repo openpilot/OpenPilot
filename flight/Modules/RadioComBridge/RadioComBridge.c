@@ -190,14 +190,24 @@ static void com2RadioBridgeTask(void * parameters)
 	uint32_t rx_bytes = 0;
 	portTickType packet_start_time = 0;
 	uint32_t timeout = 500;
+	uint32_t inputPort;
 
 	/* Handle usart/usb -> radio direction */
 	while (1) {
+#if defined(PIOS_INCLUDE_USB)
+		// Determine input port (USB takes priority over telemetry port)
+		if (PIOS_USB_CheckAvailable(0) && PIOS_COM_TELEM_USB) {
+			inputPort = PIOS_COM_TELEM_USB;
+		} else
+#endif /* PIOS_INCLUDE_USB */
+		{
+			inputPort = data->com_port;
+		}
 
 		// Receive data from the com port
 		//debug_msg = "COM receive";
-		uint32_t cur_rx_bytes = PIOS_COM_ReceiveBuffer(data->com_port, data->com2radio_buf +
-																									 rx_bytes, BRIDGE_BUF_LEN - rx_bytes, timeout);
+		uint32_t cur_rx_bytes = PIOS_COM_ReceiveBuffer(inputPort, data->com2radio_buf +
+							       rx_bytes, BRIDGE_BUF_LEN - rx_bytes, timeout);
 		//debug_msg = "COM receive done";
 		rx_bytes += cur_rx_bytes;
 
@@ -265,7 +275,13 @@ static void com2RadioBridgeTask(void * parameters)
  */
 static int32_t transmitData(uint8_t *buf, int32_t length)
 {
-	return PIOS_COM_SendBuffer(data->com_port, buf, length);
+	uint32_t inputPort = data->com_port;
+#if defined(PIOS_INCLUDE_USB)
+	// Determine input port (USB takes priority over telemetry port)
+	if (PIOS_USB_CheckAvailable(0) && PIOS_COM_TELEM_USB)
+		inputPort = PIOS_COM_TELEM_USB;
+#endif /* PIOS_INCLUDE_USB */
+	return PIOS_COM_SendBuffer(inputPort, buf, length);
 }
 
 /**

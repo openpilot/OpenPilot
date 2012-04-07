@@ -673,13 +673,18 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 		nedPos.Down = NED[2];
 		NEDPositionSet(&nedPos);
 
+		// Mask out baro sensor for outdoor mode.  Causing issues right now.
+		sensors &= ~BARO_SENSOR;
 	} else if (!outdoor_mode) {
 		INSSetPosVelVar(1e2f, 1e2f);
 		vel[0] = vel[1] = vel[2] = 0;
 		NED[0] = NED[1] = 0;
-		NED[2] = baroData.Altitude;
 		sensors |= HORIZ_SENSORS | HORIZ_POS_SENSORS;
-		sensors |= POS_SENSORS |VERT_SENSORS;
+		
+		// Mask out baro sensor for indoor mode.  Causing issues right now.
+		sensors &= ~BARO_SENSOR;
+		NED[2] = -baroData.Altitude;
+		sensors |= VER_POS_SENSORS;
 	}
 
 	/*

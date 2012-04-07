@@ -848,41 +848,60 @@ void rfm22_setDatarate(uint32_t datarate_bps, bool data_whitening)
 	uint32_t modulation_bandwidth = datarate_bps + (2 * frequency_deviation);
 #endif
 
-	rfm22_write(0x1C, reg_1C[lookup_index]);	// rfm22_if_filter_bandwidth
+	// rfm22_if_filter_bandwidth
+	rfm22_write(0x1C, reg_1C[lookup_index]);
 
-	rfm22_write(0x1D, reg_1D[lookup_index]);	// rfm22_afc_loop_gearshift_override
-	rfm22_write(0x1E, reg_1E[lookup_index]);	// RFM22_afc_timing_control
+	// rfm22_afc_loop_gearshift_override
+	rfm22_write(0x1D, reg_1D[lookup_index]);
+	// RFM22_afc_timing_control
+	rfm22_write(0x1E, reg_1E[lookup_index]);
 
-	rfm22_write(0x1F, reg_1F[lookup_index]);	// RFM22_clk_recovery_gearshift_override
-	rfm22_write(0x20, reg_20[lookup_index]);	// rfm22_clk_recovery_oversampling_ratio
-	rfm22_write(0x21, reg_21[lookup_index]);	// rfm22_clk_recovery_offset2
-	rfm22_write(0x22, reg_22[lookup_index]);	// rfm22_clk_recovery_offset1
-	rfm22_write(0x23, reg_23[lookup_index]);	// rfm22_clk_recovery_offset0
-	rfm22_write(0x24, reg_24[lookup_index]);	// rfm22_clk_recovery_timing_loop_gain1
-	rfm22_write(0x25, reg_25[lookup_index]);	// rfm22_clk_recovery_timing_loop_gain0
+	// RFM22_clk_recovery_gearshift_override
+	rfm22_write(0x1F, reg_1F[lookup_index]);
+	// rfm22_clk_recovery_oversampling_ratio
+	rfm22_write(0x20, reg_20[lookup_index]);
+	// rfm22_clk_recovery_offset2
+	rfm22_write(0x21, reg_21[lookup_index]);
+	// rfm22_clk_recovery_offset1
+	rfm22_write(0x22, reg_22[lookup_index]);
+	// rfm22_clk_recovery_offset0
+	rfm22_write(0x23, reg_23[lookup_index]);
+	// rfm22_clk_recovery_timing_loop_gain1
+	rfm22_write(0x24, reg_24[lookup_index]);
+	// rfm22_clk_recovery_timing_loop_gain0
+	rfm22_write(0x25, reg_25[lookup_index]);
 
-	rfm22_write(0x2A, reg_2A[lookup_index]);	// rfm22_afc_limiter
+	// rfm22_afc_limiter
+	rfm22_write(0x2A, reg_2A[lookup_index]);
 
 	if (carrier_datarate_bps < 100000)
-		rfm22_write(0x58, 0x80);				// rfm22_chargepump_current_trimming_override
+		// rfm22_chargepump_current_trimming_override
+		rfm22_write(0x58, 0x80);
 	else
-		rfm22_write(0x58, 0xC0);				// rfm22_chargepump_current_trimming_override
+		// rfm22_chargepump_current_trimming_override
+		rfm22_write(0x58, 0xC0);
 
-	rfm22_write(0x6E, reg_6E[lookup_index]);	// rfm22_tx_data_rate1
-	rfm22_write(0x6F, reg_6F[lookup_index]);	// rfm22_tx_data_rate0
+	// rfm22_tx_data_rate1
+	rfm22_write(0x6E, reg_6E[lookup_index]);
+	// rfm22_tx_data_rate0
+	rfm22_write(0x6F, reg_6F[lookup_index]);
 
 	// Enable data whitening
 	//	uint8_t txdtrtscale_bit = rfm22_read(RFM22_modulation_mode_control1) & RFM22_mmc1_txdtrtscale;
 	//	rfm22_write(RFM22_modulation_mode_control1, txdtrtscale_bit | RFM22_mmc1_enwhite);
 
 	if (!data_whitening)
-		rfm22_write(0x70, reg_70[lookup_index] & ~RFM22_mmc1_enwhite);	// rfm22_modulation_mode_control1
+		// rfm22_modulation_mode_control1
+		rfm22_write(0x70, reg_70[lookup_index] & ~RFM22_mmc1_enwhite);
 	else
-		rfm22_write(0x70, reg_70[lookup_index] |  RFM22_mmc1_enwhite);	// rfm22_modulation_mode_control1
+		// rfm22_modulation_mode_control1
+		rfm22_write(0x70, reg_70[lookup_index] |  RFM22_mmc1_enwhite);
 
-	rfm22_write(0x71, reg_71[lookup_index]);	// rfm22_modulation_mode_control2
+	// rfm22_modulation_mode_control2
+	rfm22_write(0x71, reg_71[lookup_index]);
 
-	rfm22_write(0x72, reg_72[lookup_index]);	// rfm22_frequency_deviation
+	// rfm22_frequency_deviation
+	rfm22_write(0x72, reg_72[lookup_index]);
 
 	rfm22_write(RFM22_ook_counter_value1, 0x00);
 	rfm22_write(RFM22_ook_counter_value2, 0x00);
@@ -923,13 +942,17 @@ void rfm22_setDatarate(uint32_t datarate_bps, bool data_whitening)
 	// ********************************
 	// determine suitable time-out periods
 
-	timeout_sync_ms = (8000ul * 16) / carrier_datarate_bps;				// milliseconds
+	// milliseconds
+	timeout_sync_ms = (8000ul * 16) / carrier_datarate_bps;
 	if (timeout_sync_ms < 3)
-		timeout_sync_ms = 3;											// because out timer resolution is only 1ms
+		// because out timer resolution is only 1ms
+		timeout_sync_ms = 3;
 
-	timeout_data_ms = (8000ul * 100) / carrier_datarate_bps;			// milliseconds
+	// milliseconds
+	timeout_data_ms = (8000ul * 100) / carrier_datarate_bps;
 	if (timeout_data_ms < 3)
-		timeout_data_ms = 3;											// because out timer resolution is only 1ms
+		// because out timer resolution is only 1ms
+		timeout_data_ms = 3;
 
 	// ********************************
 
@@ -1332,7 +1355,6 @@ void rfm22_processRxInt(void)
 			RX_LED_ON;
 			rfm22_setDebug("sync_det");
 
-#ifdef NEVER
 			// read the 10-bit signed afc correction value
 			// bits 9 to 2
 			afc_correction = (uint16_t)rfm22_read(RFM22_afc_correction_read) << 8;
@@ -1346,7 +1368,6 @@ void rfm22_processRxInt(void)
 			rx_packet_start_rssi_dBm = rssi_dBm;
 			// remember the afc value for this packet
 			rx_packet_start_afc_Hz = afc_correction_Hz;
-#endif
 		}
 	}
 
@@ -1554,7 +1575,6 @@ void rfm22_processInt(void)
 	// read device status register
 	device_status = rfm22_read(RFM22_device_status);
 
-#ifdef NEVER
 	// read ezmac status register
 	ezmac_status = rfm22_read(RFM22_ezmac_status);
 
@@ -1576,7 +1596,6 @@ void rfm22_processInt(void)
 		// read the tx power register
 		tx_pwr = rfm22_read(RFM22_tx_power);
 	}
-#endif
 
 	// the RF module has gone and done a reset - we need to re-initialize the rf module
 	if (int_status2 & RFM22_is2_ipor)

@@ -277,10 +277,7 @@ static int32_t transmitData(uint8_t *buf, int32_t length)
  */
 static int32_t transmitPacket(PHPacketHandle p)
 {
-	static uint32_t cntr = 0;
-	DEBUG_PRINTF(2, "Sending: %d %d\n\r", p->header.data_size, cntr++);
-	int32_t ret = PIOS_COM_SendBuffer(data->radio_port, (uint8_t*)p, PH_PACKET_SIZE(p));
-	return ret;
+	return PIOS_COM_SendBuffer(data->radio_port, (uint8_t*)p, PH_PACKET_SIZE(p));
 }
 
 /**
@@ -290,7 +287,6 @@ static int32_t transmitPacket(PHPacketHandle p)
  */
 static void receiveData(uint8_t *buf, uint8_t len)
 {
-	DEBUG_PRINTF(2, "Received: %d\n\r", len);
 	/* Send the received data to the com port */
 	if (PIOS_COM_SendBuffer(data->com_port, buf, len) != len)
 		/* Error on transmit */

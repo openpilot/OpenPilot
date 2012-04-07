@@ -46,6 +46,7 @@ typedef struct {
 	xSemaphoreHandle lock;
 	PHOutputStream output_stream;
 	PHDataHandler data_handler;
+	PHPPMHandler ppm_handler;
 } PHPacketData, *PHPacketDataHandle;
 
 // Private functions
@@ -110,6 +111,18 @@ void PHRegisterDataHandler(PHInstHandle h, PHDataHandler f)
 	PHPacketDataHandle data = (PHPacketDataHandle)h;
 
 	data->data_handler = f;
+}
+
+/**
+ * Register a PPM packet handler
+ * \param[in] h The packet handler instance data pointer.
+ * \param[in] f The PPM handler function
+ */
+void PHRegisterPPMHandler(PHInstHandle h, PHPPMHandler f)
+{
+	PHPacketDataHandle data = (PHPacketDataHandle)h;
+
+	data->ppm_handler = f;
 }
 
 /**
@@ -207,7 +220,7 @@ uint8_t PHTransmitPacket(PHInstHandle h, PHPacketHandle p)
 	case PACKET_TYPE_READY:
 	case PACKET_TYPE_NOTREADY:
 	case PACKET_TYPE_DATA:
-	case PACKET_TYPE_RECEIVER:
+	case PACKET_TYPE_PPM:
 		PHReleaseTXPacket(h, p);
 		break;
 	}
@@ -285,7 +298,13 @@ uint8_t PHReceivePacket(PHInstHandle h, PHPacketHandle p)
 	}
 	break;
 
-	case PACKET_TYPE_RECEIVER:
+	case PACKET_TYPE_PPM:
+
+		if (!rx_error)
+
+			// Pass on the channels to the PPM handler.
+			if(data->ppm_handler)
+				data->ppm_handler(((PHPpmPacketHandle)p)->channels);
 
 		break;
 
@@ -293,7 +312,7 @@ uint8_t PHReceivePacket(PHInstHandle h, PHPacketHandle p)
 
 		if (!rx_error)
 
-			// Pass on the data to the receiver handler.
+			// Pass on the data to the data handler.
 			if(data->data_handler)
 				data->data_handler(p->data, p->header.data_size);
 

@@ -75,9 +75,6 @@ void PIOS_Board_Init(void) {
 	/* Initialize watchdog as early as possible to catch faults during init */
 	PIOS_WDG_Init();
 
-	/* Initialize the alarms library */
-	AlarmsInitialize();
-
 	/* Initialize IAP */
 	PIOS_IAP_Init();
 
@@ -100,6 +97,10 @@ void PIOS_Board_Init(void) {
 	PIOS_TIM_InitClock(&tim_3_cfg);
 	PIOS_TIM_InitClock(&tim_4_cfg);
 #endif	/* PIOS_INCLUDE_TIM */
+
+#if defined(PIOS_INCLUDE_PACKET_HANDLER)
+	pios_packet_handler = PHInitialize(&pios_ph_cfg);
+#endif /* PIOS_INCLUDE_PACKET_HANDLER */
 
 #if defined(PIOS_INCLUDE_USB)
 	/* Initialize board specific USB data */

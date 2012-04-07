@@ -31,13 +31,14 @@
 // ****************
 
 #include <openpilot.h>
-#include <hwsettings.h>
 #include <radiocombridge.h>
 #include <packet_handler.h>
 
 #include <stdbool.h>
 
 #include "ecc.h"
+
+#undef PIOS_INCLUDE_USB
 
 extern char *debug_msg;
 
@@ -82,8 +83,7 @@ typedef struct {
 	uint32_t com_tx_errors;
 	uint32_t radio_tx_errors;
 
-	// The packet handler.
-	PHInstHandle packet_handler;
+	// The packet timeout.
 	portTickType send_timeout;
 	uint16_t min_packet_size;
 
@@ -143,17 +143,9 @@ static int32_t RadioComBridgeInitialize(void)
 	data->com_tx_errors = 0;
 	data->radio_tx_errors = 0;
 
-	// Initialize the packet handler
-	PacketHandlerConfig phcfg = {
-		.txWinSize = PIOS_PH_TX_WIN_SIZE,
-		.maxConnections = PIOS_PH_MAX_CONNECTIONS,
-		.id = 0x36249acb,
-	};
-	data->packet_handler = PHInitialize(&phcfg);
-
 	// Register the callbacks with the packet handler
-	PHRegisterOutputStream(data->packet_handler, transmitPacket);
-	PHRegisterDataHandler(data->packet_handler, receiveData);
+	PHRegisterOutputStream(pios_packet_handler, transmitPacket);
+	PHRegisterDataHandler(pios_packet_handler, receiveData);
 
 	// Initialize the packet send timeout
 	data->send_timeout = 25; // ms
@@ -176,9 +168,8 @@ static void radio2ComBridgeTask(void *parameters)
 
 		// Receive data from the radio port
 		rx_bytes = PIOS_COM_ReceiveBuffer(data->radio_port, data->radio2com_buf, BRIDGE_BUF_LEN, 500);
-		if (rx_bytes > 0) {
-			PHReceivePacket(data->packet_handler, (PHPacketHandle)data->radio2com_buf);
-		}
+		if (rx_bytes > 0)
+			PHReceivePacket(pios_packet_handler, (PHPacketHandle)data->radio2com_buf);
 	}
 }
 
@@ -196,22 +187,27 @@ static void com2RadioBridgeTask(void * parameters)
 	while (1) {
 #if defined(PIOS_INCLUDE_USB)
 		// Determine input port (USB takes priority over telemetry port)
-		if (PIOS_USB_CheckAvailable(0) && PIOS_COM_TELEM_USB) {
+		if (PIOS_USB_CheckAvailable(0) && PIOS_COM_TELEM_USB)
 			inputPort = PIOS_COM_TELEM_USB;
-		} else
+		else
 #endif /* PIOS_INCLUDE_USB */
-		{
 			inputPort = data->com_port;
-		}
 
 		// Receive data from the com port
-		//debug_msg = "COM receive";
 		uint32_t cur_rx_bytes = PIOS_COM_ReceiveBuffer(inputPort, data->com2radio_buf +
 							       rx_bytes, BRIDGE_BUF_LEN - rx_bytes, timeout);
-		//debug_msg = "COM receive done";
-		rx_bytes += cur_rx_bytes;
+
+		// Pass the new data through UAVTalk
+		for (uint8_t i = 0; i < cur_rx_bytes; i++) {
+			UAVTalkProcessInputStream(data->uavTalkCon, *(data->com2radio_buf + i + rx_bytes));
+			/*
+			if(UAVTalkIdle(data->uavTalkCon))
+				DEBUG_PRINTF(1, "Idle\n\r");
+			*/
+		}
 
 		// Do we have an data to send?
+		rx_bytes += cur_rx_bytes;
 		if (rx_bytes > 0) {
 
 			// Check how long since last update
@@ -239,7 +235,7 @@ static void com2RadioBridgeTask(void * parameters)
 			if (send_packet)
 			{
 				// Get a TX packet from the packet handler
-				PHPacketHandle p = PHGetTXPacket(data->packet_handler);
+				PHPacketHandle p = PHGetTXPacket(pios_packet_handler);
 
 				// Initialize the packet.
 				//p->header.type = PACKET_TYPE_ACKED_DATA;
@@ -250,17 +246,13 @@ static void com2RadioBridgeTask(void * parameters)
 				memcpy(p->data, data->com2radio_buf, rx_bytes);
 
 				// Transmit the packet
-				PHTransmitPacket(data->packet_handler, p);
+				PHTransmitPacket(pios_packet_handler, p);
 
 				// Reset the timeout
 				timeout = 500;
 				rx_bytes = 0;
 				packet_start_time = 0;
 			}
-
-			// Pass the data through UAVTalk
-			//for (uint8_t i = 0; i < cur_rx_bytes; i++)
-			//UAVTalkProcessInputStream(data->uavTalkCon, data->com2radio_buf[i]);
 		}
 	}
 }
@@ -275,13 +267,14 @@ static void com2RadioBridgeTask(void * parameters)
  */
 static int32_t transmitData(uint8_t *buf, int32_t length)
 {
-	uint32_t inputPort = data->com_port;
+	uint32_t outputPort = data->com_port;
 #if defined(PIOS_INCLUDE_USB)
-	// Determine input port (USB takes priority over telemetry port)
+	// Determine output port (USB takes priority over telemetry port)
 	if (PIOS_USB_CheckAvailable(0) && PIOS_COM_TELEM_USB)
-		inputPort = PIOS_COM_TELEM_USB;
+		outputPort = PIOS_COM_TELEM_USB;
 #endif /* PIOS_INCLUDE_USB */
-	return PIOS_COM_SendBuffer(inputPort, buf, length);
+	DEBUG_PRINTF(1, "Transmitting UAVTalk data\n\r");
+	return PIOS_COM_SendBuffer(outputPort, buf, length);
 }
 
 /**
@@ -303,8 +296,14 @@ static int32_t transmitPacket(PHPacketHandle p)
  */
 static void receiveData(uint8_t *buf, uint8_t len)
 {
+	uint32_t outputPort = data->com_port;
+#if defined(PIOS_INCLUDE_USB)
+	// Determine output port (USB takes priority over telemetry port)
+	if (PIOS_USB_CheckAvailable(0) && PIOS_COM_TELEM_USB)
+		outputPort = PIOS_COM_TELEM_USB;
+#endif /* PIOS_INCLUDE_USB */
 	/* Send the received data to the com port */
-	if (PIOS_COM_SendBuffer(data->com_port, buf, len) != len)
+	if (PIOS_COM_SendBuffer(outputPort, buf, len) != len)
 		/* Error on transmit */
 		data->com_tx_errors++;
 }

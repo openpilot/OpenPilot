@@ -492,3 +492,15 @@ const struct pios_rfm22b_cfg pios_rfm22b_cfg = {
 };
 
 #endif /* PIOS_INCLUDE_RFM22B */
+
+#if defined(PIOS_INCLUDE_PACKET_HANDLER)
+#include <packet_handler.h>
+
+// Initialize the packet handler
+PacketHandlerConfig pios_ph_cfg = {
+	.txWinSize = PIOS_PH_TX_WIN_SIZE,
+	.maxConnections = PIOS_PH_MAX_CONNECTIONS,
+	.id = 0x36249acb,
+};
+
+#endif /* PIOS_INCLUDE_PACKET_HANDLER */

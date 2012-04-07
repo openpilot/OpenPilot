@@ -214,20 +214,20 @@ extern uint32_t pios_com_rfm22b_id;
 // PIOS_RCVR
 // See also pios_board.c
 //------------------------
-#define PIOS_RCVR_MAX_DEVS                      3
-#define PIOS_RCVR_MAX_CHANNELS			12
+#define PIOS_RCVR_MAX_DEVS          3
+#define PIOS_RCVR_MAX_CHANNELS      12
 
 //-------------------------
 // Receiver PPM input
 //-------------------------
-#define PIOS_PPM_MAX_DEVS			1
-#define PIOS_PPM_NUM_INPUTS                     12
+#define PIOS_PPM_MAX_DEVS     1
+#define PIOS_PPM_NUM_INPUTS   12
 
 //-------------------------
 // Receiver PWM input
 //-------------------------
-#define PIOS_PWM_MAX_DEVS			1
-#define PIOS_PWM_NUM_INPUTS                     1
+#define PIOS_PWM_MAX_DEVS    1
+#define PIOS_PWM_NUM_INPUTS   1
 
 //-------------------------
 // Servo outputs
@@ -282,6 +282,8 @@ extern uint32_t pios_com_rfm22b_id;
 // Packet Handler
 //-------------------------
 
+uint32_t pios_packet_handler;
+#define PIOS_INCLUDE_PACKET_HANDLER
 #define PIOS_PH_MAX_PACKET 255
 #define PIOS_PH_TX_WIN_SIZE 3
 #define PIOS_PH_MAX_CONNECTIONS 1

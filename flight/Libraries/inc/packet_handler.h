@@ -46,7 +46,7 @@ typedef enum {
 	PACKET_TYPE_ADJUST_TX_PWR,  // used to ask the other modem to adjust it's tx power
 	PACKET_TYPE_DATA,           // data packet (packet contains user data)
 	PACKET_TYPE_ACKED_DATA,     // data packet that requies an ACK
-	PACKET_TYPE_RECEIVER,       // Receiver relay values
+	PACKET_TYPE_PPM,            // PPM relay values
 	PACKET_TYPE_ACK,
 	PACKET_TYPE_NACK
 } PHPacketType;
@@ -67,6 +67,13 @@ typedef struct {
 	uint8_t data[PH_MAX_DATA + RS_ECC_NPARITY];
 } PHPacket, *PHPacketHandle;
 
+#define PH_PPM_DATA_SIZE(p) ((uint8_t*)(p->ecc) - (uint8_t*)(((PHPacketHandle)p)->data))
+typedef struct {
+	PHPacketHeader header;
+	uint16_t channels[PIOS_RCVR_MAX_CHANNELS];
+	uint8_t ecc[RS_ECC_NPARITY];
+} PHPpmPacket, *PHPpmPacketHandle;
+
 typedef struct {
 	uint8_t txWinSize;
 	uint16_t maxConnections;
@@ -75,13 +82,15 @@ typedef struct {
 
 typedef int32_t (*PHOutputStream)(PHPacketHandle packet);
 typedef void (*PHDataHandler)(uint8_t *data, uint8_t len);
+typedef void (*PHPPMHandler)(uint16_t *channels);
 
-typedef void* PHInstHandle;
+typedef uint32_t PHInstHandle;
 
 // Public functions
 PHInstHandle PHInitialize(PacketHandlerConfig *cfg);
 void PHRegisterOutputStream(PHInstHandle h, PHOutputStream f);
 void PHRegisterDataHandler(PHInstHandle h, PHDataHandler f);
+void PHRegisterPPMHandler(PHInstHandle h, PHPPMHandler f);
 uint32_t PHConnect(PHInstHandle h, uint32_t dest_id);
 PHPacketHandle PHGetRXPacket(PHInstHandle h);
 PHPacketHandle PHGetTXPacket(PHInstHandle h);

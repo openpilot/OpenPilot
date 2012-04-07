@@ -214,6 +214,11 @@ void INSSetMagVar(float scaled_mag_var[3])
 	R[8] = scaled_mag_var[2];
 }
 
+void INSSetBaroVar(float baro_var)
+{
+	R[9] = baro_var;
+}
+
 void INSSetMagNorth(float B[3])
 {
 	float mag = sqrtf(B[0] * B[0] + B[1] * B[1] + B[2] * B[2]);

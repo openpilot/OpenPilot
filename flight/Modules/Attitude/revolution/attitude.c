@@ -204,6 +204,8 @@ static void AttitudeTask(void *parameters)
 	// Main task loop
 	while (1) {
 
+		int32_t ret_val = -1;
+
 		if (last_algorithm != revoSettings.FusionAlgorithm) {
 			last_algorithm = revoSettings.FusionAlgorithm;
 			first_run = true;
@@ -212,20 +214,21 @@ static void AttitudeTask(void *parameters)
 		// This  function blocks on data queue
 		switch (revoSettings.FusionAlgorithm ) {
 			case REVOSETTINGS_FUSIONALGORITHM_COMPLIMENTARY:
-				updateAttitudeComplimentary(first_run);
+				ret_val = updateAttitudeComplimentary(first_run);
 				break;
 			case REVOSETTINGS_FUSIONALGORITHM_INSOUTDOOR:
-				updateAttitudeINSGPS(first_run, true);
+				ret_val = updateAttitudeINSGPS(first_run, true);
 				break;
 			case REVOSETTINGS_FUSIONALGORITHM_INSINDOOR:
-				updateAttitudeINSGPS(first_run, false);
+				ret_val = updateAttitudeINSGPS(first_run, false);
 				break;
 			default:
 				AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE,SYSTEMALARMS_ALARM_ERROR);
 				break;
 		}
 
-		first_run = false;
+		if(ret_val == 0)
+			first_run = false;
 
 		PIOS_WDG_UpdateFlag(PIOS_WDG_ATTITUDE);
 	}
@@ -537,6 +540,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 			INSSetMagVar(revoCalibration.mag_var);
 			INSSetAccelVar(revoCalibration.accel_var);
 			INSSetGyroVar(revoCalibration.gyro_var);
+			INSSetBaroVar(revoCalibration.baro_var);
 
 			// Set initial attitude
 			float rpy[3];
@@ -562,6 +566,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 			INSSetMagVar(revoCalibration.mag_var);
 			INSSetAccelVar(revoCalibration.accel_var);
 			INSSetGyroVar(revoCalibration.gyro_var);
+			INSSetBaroVar(revoCalibration.baro_var);
 
 			INSSetMagNorth(home.Be);
 
@@ -594,7 +599,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 
 		ins_last_time = PIOS_DELAY_GetRaw();	
 
-		return -1;
+		return 0;
 	}
 
 	if (!inited)
@@ -755,6 +760,7 @@ static void settingsUpdatedCb(UAVObjEvent * objEv)
 	INSSetMagVar(revoCalibration.mag_var);
 	INSSetAccelVar(revoCalibration.accel_var);
 	INSSetGyroVar(revoCalibration.gyro_var);
+	INSSetBaroVar(revoCalibration.baro_var);
 
 	T[0] = alt+6.378137E6f;
 	T[1] = cosf(lat)*(alt+6.378137E6f);

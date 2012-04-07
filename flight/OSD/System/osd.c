@@ -182,7 +182,7 @@ void processReset(void)
     }
 
     // Clear reset flags
-    RCC_ClearFlag();
+    //RCC_ClearFlag();
 }
 
 int main()

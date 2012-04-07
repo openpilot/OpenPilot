@@ -81,7 +81,7 @@ static void osdgenTask(void *parameters);
 #define LONG_TIME 0xffff
 xSemaphoreHandle osdSemaphore = NULL;
 
-#define STACK_SIZE_BYTES            1096
+#define STACK_SIZE_BYTES            4096
 
 #define TASK_PRIORITY               (tskIDLE_PRIORITY + 4)
 #define UPDATE_PERIOD 100
@@ -2183,6 +2183,8 @@ void updateGraphics() {
 	OsdSettingsGet (&OsdSettings);
 	AttitudeActualData attitude;
 	AttitudeActualGet(&attitude);
+	GPSPositionData gpsData;
+	GPSPositionGet(&gpsData);
 
 	/*drawBox(2,2,GRAPHICS_WIDTH_REAL-4,GRAPHICS_HEIGHT_REAL-4);
 	write_filled_rectangle(draw_buffer_mask,0,0,GRAPHICS_WIDTH_REAL-2,GRAPHICS_HEIGHT_REAL-2,0);
@@ -2219,12 +2221,14 @@ void updateGraphics() {
 
 	char temp[50]={0};
 	memset(temp, ' ', 40);
-	sprintf(temp,"Lat:%d",(int)m_gpsLat);
+	sprintf(temp,"Lat:%11.7f",gpsData.Latitude/10000000.0f);
 	write_string(temp, 5, 5, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
-	sprintf(temp,"Lon:%d",(int)m_gpsLon);
+	sprintf(temp,"Lon:%11.7f",gpsData.Longitude/10000000.0f);
 	write_string(temp, 5, 15, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
-	sprintf(temp,"Fix:%d",(int)m_gpsStatus);
+	sprintf(temp,"Fix:%d",(int)gpsData.Status);
 	write_string(temp, 5, 25, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+	sprintf(temp,"Sat:%d",(int)gpsData.Satellites);
+	write_string(temp, 5, 35, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
 
 
 	/* Print RTC time */
@@ -2238,19 +2242,21 @@ void updateGraphics() {
 	write_string(temp, (GRAPHICS_WIDTH_REAL - 2),5, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 
 	/* Print ADC voltage */
-	sprintf(temp,"Rssi:%4dV",(int)(PIOS_ADC_PinGet(4)*3000/4096));
+	//sprintf(temp,"Rssi:%4dV",(int)(PIOS_ADC_PinGet(4)*3000/4096));
+	//write_string(temp, (GRAPHICS_WIDTH_REAL - 2),15, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+	sprintf(temp,"Rssi:%4.2fV",(PIOS_ADC_PinGet(4)*3.0f/4096));
 	write_string(temp, (GRAPHICS_WIDTH_REAL - 2),15, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 
 	/* Print CPU temperature */
-	sprintf(temp,"Temp:%4dC",(int)(PIOS_ADC_PinGet(6)*0.29296875f-279));
+	sprintf(temp,"Temp:%4.2fC",(PIOS_ADC_PinGet(6)*0.29296875f-279));
 	write_string(temp, (GRAPHICS_WIDTH_REAL - 2),25, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 
 	/* Print ADC voltage FLIGHT*/
-	sprintf(temp,"FltV:%4dV",(int)(PIOS_ADC_PinGet(2)*300*61/4096));
+	sprintf(temp,"FltV:%4.2fV",(PIOS_ADC_PinGet(2)*3.0f*6.1f/4096));
 	write_string(temp, (GRAPHICS_WIDTH_REAL - 2),35, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 
 	/* Print ADC voltage VIDEO*/
-	sprintf(temp,"VidV:%4dV",(int)(PIOS_ADC_PinGet(3)*300*61/4096));
+	sprintf(temp,"VidV:%4.2fV",(PIOS_ADC_PinGet(3)*3.0f*6.1f/4096));
 	write_string(temp, (GRAPHICS_WIDTH_REAL - 2),45, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 
 	/* Print ADC voltage RSSI */

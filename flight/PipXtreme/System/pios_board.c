@@ -99,6 +99,18 @@ void PIOS_Board_Init(void) {
 #endif	/* PIOS_INCLUDE_TIM */
 
 #if defined(PIOS_INCLUDE_PACKET_HANDLER)
+	// Create our (hopefully) unique 32 bit id from the processor serial number.
+	uint32_t crc32 = 0;
+	{
+		char serial_no_str[33];
+		PIOS_SYS_SerialNumberGet(serial_no_str);
+		// Create a 32 bit value using 4 8 bit CRC values.
+		crc32 = PIOS_CRC_updateCRC(0, (uint8_t*)serial_no_str, 8) << 24;
+		crc32 |= PIOS_CRC_updateCRC(0, (uint8_t*)serial_no_str + 8, 8) << 16;
+		crc32 |= PIOS_CRC_updateCRC(0, (uint8_t*)serial_no_str + 16, 8) << 8;
+		crc32 |= PIOS_CRC_updateCRC(0, (uint8_t*)serial_no_str + 24, 8);
+	}
+	pios_ph_cfg.id = crc32;
 	pios_packet_handler = PHInitialize(&pios_ph_cfg);
 #endif /* PIOS_INCLUDE_PACKET_HANDLER */
 

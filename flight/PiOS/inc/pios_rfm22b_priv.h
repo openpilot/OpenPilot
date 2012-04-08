@@ -48,7 +48,6 @@ struct pios_rfm22b_cfg {
 	uint8_t minPacketSize;
 	uint8_t txWinSize;
 	uint8_t maxConnections;
-	uint32_t id;
 };
 
 extern int32_t PIOS_RFM22B_Init(uint32_t *rfb22b_id, const struct pios_rfm22b_cfg *cfg);

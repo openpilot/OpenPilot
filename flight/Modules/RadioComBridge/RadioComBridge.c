@@ -39,7 +39,7 @@
 
 #include <stdbool.h>
 
-#undef PIOS_INCLUDE_USB
+//#undef PIOS_INCLUDE_USB
 
 // ****************
 // Private functions
@@ -117,6 +117,10 @@ static int32_t RadioComBridgeStart(void)
 		// Start the tasks
 		xTaskCreate(radio2ComBridgeTask, (signed char *)"Radio2ComBridge", STACK_SIZE_BYTES/2, NULL, TASK_PRIORITY, &(data->radio2ComBridgeTaskHandle));
 		xTaskCreate(com2RadioBridgeTask, (signed char *)"Com2RadioBridge", STACK_SIZE_BYTES/2, NULL, TASK_PRIORITY, &(data->com2RadioBridgeTaskHandle));
+#ifdef PIOS_INCLUDE_WDG
+		PIOS_WDG_RegisterFlag(PIOS_WDG_RADIOCOM);
+		PIOS_WDG_RegisterFlag(PIOS_WDG_COMRADIO);
+#endif
 		return 0;
 	}
 
@@ -186,10 +190,16 @@ static void radio2ComBridgeTask(void *parameters)
 	while (1) {
 		uint32_t rx_bytes;
 
+#ifdef PIOS_INCLUDE_WDG
+		// Update the watchdog timer.
+		PIOS_WDG_UpdateFlag(PIOS_WDG_RADIOCOM);
+#endif /* PIOS_INCLUDE_WDG */
+
 		// Receive data from the radio port
-		rx_bytes = PIOS_COM_ReceiveBuffer(data->radio_port, data->radio2com_buf, BRIDGE_BUF_LEN, 500);
+		rx_bytes = PIOS_COM_ReceiveBuffer(data->radio_port, data->radio2com_buf, BRIDGE_BUF_LEN, 200);
 		if (rx_bytes > 0)
 			PHReceivePacket(pios_packet_handler, (PHPacketHandle)data->radio2com_buf);
+
 	}
 }
 
@@ -205,6 +215,7 @@ static void com2RadioBridgeTask(void * parameters)
 
 	/* Handle usart/usb -> radio direction */
 	while (1) {
+
 #if defined(PIOS_INCLUDE_USB)
 		// Determine input port (USB takes priority over telemetry port)
 		if (PIOS_USB_CheckAvailable(0) && PIOS_COM_TELEM_USB)
@@ -212,6 +223,11 @@ static void com2RadioBridgeTask(void * parameters)
 		else
 #endif /* PIOS_INCLUDE_USB */
 			inputPort = data->com_port;
+
+#ifdef PIOS_INCLUDE_WDG
+		// Update the watchdog timer.
+		PIOS_WDG_UpdateFlag(PIOS_WDG_COMRADIO);
+#endif /* PIOS_INCLUDE_WDG */
 
 		// Receive data from the com port
 		uint32_t cur_rx_bytes = PIOS_COM_ReceiveBuffer(inputPort, data->com2radio_buf +

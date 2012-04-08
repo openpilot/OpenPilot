@@ -474,10 +474,6 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, const struct pios_rfm22b_cfg *cfg)
 			TX_LED_ON;
 
 			PIOS_DELAY_WaitmS(200);
-
-#if defined(PIOS_INCLUDE_WDG)
-			processWatchdog();
-#endif
 		}
 
 		PIOS_DELAY_WaitmS(1000);

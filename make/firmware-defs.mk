@@ -49,6 +49,8 @@ MSG_OPFIRMWARE       := ${quote} OPFW      ${quote}
 MSG_FWINFO           := ${quote} FWINFO    ${quote}
 MSG_JTAG_PROGRAM     := ${quote} JTAG-PGM  ${quote}
 MSG_JTAG_WIPE        := ${quote} JTAG-WIPE ${quote}
+MSG_JTAG_RESET       := ${quote} JTAG-RST  ${quote}
+MSG_JTAG_SAFEBOOT    := ${quote} JTAG-SAFE ${quote}
 
 toprel = $(subst $(realpath $(TOP))/,,$(abspath $(1)))
 
@@ -116,7 +118,7 @@ FORCE:
 
 $(1).firmwareinfo.c: $(1) $(TOP)/make/templates/firmwareinfotemplate.c FORCE
 	@echo $(MSG_FWINFO) $$(call toprel, $$@)
-	python $(TOP)/make/scripts/version-info.py \
+	$(V1) python $(TOP)/make/scripts/version-info.py \
 		--path=$(TOP) \
 		--template=$(TOP)/make/templates/firmwareinfotemplate.c \
 		--outfile=$$@ \
@@ -201,6 +203,7 @@ endef
 # $(1) = Name of binary image to write
 # $(2) = Base of flash region to write/wipe
 # $(3) = Size of flash region to write/wipe
+# $(4) = OpenOCD configuration file to use
 define JTAG_TEMPLATE
 # ---------------------------------------------------------------------------
 # Options for OpenOCD flash-programming
@@ -213,7 +216,7 @@ OOCD_EXE ?= openocd
 OOCD_JTAG_SETUP  = -d0
 # interface and board/target settings (using the OOCD target-library here)
 OOCD_JTAG_SETUP += -s $(TOP)/flight/Project/OpenOCD
-OOCD_JTAG_SETUP += -f flyswatter.cfg -f stm32f1x.cfg
+OOCD_JTAG_SETUP += -f foss-jtag.revb.cfg -f $(4)
 
 # initialize
 OOCD_BOARD_RESET = -c init
@@ -228,8 +231,8 @@ program: $(1)
 	$(V1) $(OOCD_EXE) \
 		$$(OOCD_JTAG_SETUP) \
 		$$(OOCD_BOARD_RESET) \
-		-c "flash write_image erase $(subst c:,,$(1)) $(2) bin" \
-		-c "verify_image $(subst c:,,$(1)) $(2) bin" \
+		-c "flash write_image erase $$< $(2) bin" \
+		-c "verify_image $$< $(2) bin" \
 		-c "reset run" \
 		-c "shutdown"
 
@@ -242,4 +245,34 @@ wipe:
 		-c "flash erase_address pad $(2) $(3)" \
 		-c "reset run" \
 		-c "shutdown"
+
+reset:
+	@echo $(MSG_JTAG_RESET) resetting device
+	$(V1) $(OOCD_EXE) \
+		$$(OOCD_JTAG_SETUP) \
+		$$(OOCD_BOARD_RESET) \
+		-c "reset run" \
+		-c "shutdown"
+
+# Enable PWR and BKP clocks (set RCC_APB1ENR[PWREN|BKPEN])
+OOCD_WRITE_BKPDR3 =  -c "mww 0x4002101C 0x18000000"
+# Enable writes to BKP registers (set PWR_CR[DBP] via bit op alias address)
+#
+# Direct register access would be:
+#    mww 0x40007000 0x00000100
+#
+# Direct _bit_ access is:
+#    Bit 8 in 0x40007000 = 0x42000000 + 0x7000 * 32 + 8 * 4 = 420E0020
+OOCD_WRITE_BKPDR3 += -c "mww 0x420E0020 0x00000001"
+# Set BR3 to max value to force a safe boot
+OOCD_WRITE_BKPDR3 += -c "mwh 0x40006C0C 0xFFFF"
+safeboot:
+	@echo $(MSG_JTAG_SAFEBOOT) forcing boot into safe mode
+	$(V1) $(OOCD_EXE) \
+		$$(OOCD_JTAG_SETUP) \
+		$$(OOCD_BOARD_RESET) \
+		$$(OOCD_WRITE_BKPDR3) \
+		-c "reset run" \
+		-c "shutdown"
 endef
+

@@ -33,14 +33,13 @@
 #include <openpilot.h>
 #include <radiocombridge.h>
 #include <packet_handler.h>
+#include <gcsreceiver.h>
+#include <uavtalk_priv.h>
+#include <ecc.h>
 
 #include <stdbool.h>
 
-#include "ecc.h"
-
 #undef PIOS_INCLUDE_USB
-
-extern char *debug_msg;
 
 // ****************
 // Private functions
@@ -50,6 +49,8 @@ static void com2RadioBridgeTask(void *parameters);
 static int32_t transmitData(uint8_t * data, int32_t length);
 static int32_t transmitPacket(PHPacketHandle packet);
 static void receiveData(uint8_t *buf, uint8_t len);
+static void SendGCSReceiver(void);
+static void PPMHandler(uint16_t *channels);
 static void updateSettings();
 
 // ****************
@@ -59,6 +60,9 @@ static void updateSettings();
 #define TASK_PRIORITY (tskIDLE_PRIORITY + 1)
 
 #define BRIDGE_BUF_LEN 128
+
+#define MAX_RETRIES 2
+#define REQ_TIMEOUT_MS 10
 
 // ****************
 // Private types
@@ -87,7 +91,13 @@ typedef struct {
 	portTickType send_timeout;
 	uint16_t min_packet_size;
 
-	PHPacket packet;
+	// Flag used to indicate an update of the GCSReceiver object.
+	bool send_gcsreceiver;
+
+	// Tracks the UAVTalk messages transmitted from radio to com.
+	bool uavtalk_idle;
+	int16_t uavtalk_packet_len;
+	int16_t uavtalk_packet_index;
 
 } RadioComBridgeData;
 
@@ -126,6 +136,10 @@ static int32_t RadioComBridgeInitialize(void)
 	if (!data)
 		return -1;
 
+	// Initialize the GCSReceiver object.
+	GCSReceiverInitialize();
+	data->send_gcsreceiver = false;
+
 	// TODO: Get from settings object
 	data->com_port = PIOS_COM_BRIDGE_COM;
 	data->radio_port = PIOS_COM_BRIDGE_RADIO;
@@ -146,10 +160,16 @@ static int32_t RadioComBridgeInitialize(void)
 	// Register the callbacks with the packet handler
 	PHRegisterOutputStream(pios_packet_handler, transmitPacket);
 	PHRegisterDataHandler(pios_packet_handler, receiveData);
+	PHRegisterPPMHandler(pios_packet_handler, PPMHandler);
 
 	// Initialize the packet send timeout
 	data->send_timeout = 25; // ms
 	data->min_packet_size = 50;
+
+	// Initialize the rado->com UAVTalk message tracker.
+	data->uavtalk_idle = true;
+	data->uavtalk_packet_len = -1;
+	data->uavtalk_packet_index = -1;
 
 	updateSettings();
 
@@ -198,13 +218,8 @@ static void com2RadioBridgeTask(void * parameters)
 							       rx_bytes, BRIDGE_BUF_LEN - rx_bytes, timeout);
 
 		// Pass the new data through UAVTalk
-		for (uint8_t i = 0; i < cur_rx_bytes; i++) {
+		for (uint8_t i = 0; i < cur_rx_bytes; i++)
 			UAVTalkProcessInputStream(data->uavTalkCon, *(data->com2radio_buf + i + rx_bytes));
-			/*
-			if(UAVTalkIdle(data->uavTalkCon))
-				DEBUG_PRINTF(1, "Idle\n\r");
-			*/
-		}
 
 		// Do we have an data to send?
 		rx_bytes += cur_rx_bytes;
@@ -273,7 +288,6 @@ static int32_t transmitData(uint8_t *buf, int32_t length)
 	if (PIOS_USB_CheckAvailable(0) && PIOS_COM_TELEM_USB)
 		outputPort = PIOS_COM_TELEM_USB;
 #endif /* PIOS_INCLUDE_USB */
-	DEBUG_PRINTF(1, "Transmitting UAVTalk data\n\r");
 	return PIOS_COM_SendBuffer(outputPort, buf, length);
 }
 
@@ -302,10 +316,102 @@ static void receiveData(uint8_t *buf, uint8_t len)
 	if (PIOS_USB_CheckAvailable(0) && PIOS_COM_TELEM_USB)
 		outputPort = PIOS_COM_TELEM_USB;
 #endif /* PIOS_INCLUDE_USB */
-	/* Send the received data to the com port */
-	if (PIOS_COM_SendBuffer(outputPort, buf, len) != len)
-		/* Error on transmit */
+
+	// Send a local UAVTalk message if one is waiting to be sent.
+	if (data->send_gcsreceiver && data->uavtalk_idle)
+		SendGCSReceiver();
+
+	// Parse the data for UAVTalk packets.
+	uint8_t sent_bytes = 0;
+	for (uint8_t i = 0; i < len; ++i)
+	{
+		uint8_t val = buf[i];
+
+		// Looking for sync value
+		if (data->uavtalk_packet_index == -1)
+		{
+			if (val == UAVTALK_SYNC_VAL)
+				data->uavtalk_packet_index = 1;
+		}
+		else
+		{
+			if (data->uavtalk_packet_index == 2)
+				// Length LSB
+				data->uavtalk_packet_len = val;
+			else if (data->uavtalk_packet_index == 3)
+			{
+				// Length MSB
+				data->uavtalk_packet_len |= val << 8;
+				// Is the length valid.
+				if ((data->uavtalk_packet_len < UAVTALK_MIN_HEADER_LENGTH) ||
+						(data->uavtalk_packet_len > UAVTALK_MAX_HEADER_LENGTH + UAVTALK_MAX_PAYLOAD_LENGTH))
+					data->uavtalk_packet_index = -2;
+			}
+			else if (data->uavtalk_packet_index == data->uavtalk_packet_len)
+			{
+				// Packet received.
+				data->uavtalk_packet_index = -2;
+
+				// Send the buffer up to this point
+				uint8_t send_bytes = len - sent_bytes;
+				if (PIOS_COM_SendBuffer(outputPort, buf + sent_bytes, send_bytes) != send_bytes)
+					// Error on transmit
+					data->com_tx_errors++;
+				sent_bytes = i;
+
+				// Send any UAVTalk messages that need to be sent.
+				if (data->send_gcsreceiver)
+					SendGCSReceiver();
+			}
+			++(data->uavtalk_packet_index);
+		}
+	}
+
+	// Send the received data to the com port
+	uint8_t send_bytes = len - sent_bytes;
+	if (PIOS_COM_SendBuffer(outputPort, buf + sent_bytes, send_bytes) != send_bytes)
+		// Error on transmit
 		data->com_tx_errors++;
+}
+
+/**
+ * Transmit the GCSReceiver object using UAVTalk
+ * \param[in] channels The ppm channels
+ */
+static void SendGCSReceiver(void)
+{
+	// Send update (with retries)
+	uint32_t retries = 0;
+	int32_t success = -1;
+	while (retries < MAX_RETRIES && success == -1) {
+		success = UAVTalkSendObject(data->uavTalkCon, GCSReceiverHandle(), 0, 0, REQ_TIMEOUT_MS);
+		++retries;
+	}
+	if(success >= 0)
+		data->send_gcsreceiver = false;
+}
+
+/**
+ * Receive a ppm packet
+ * \param[in] channels The ppm channels
+ */
+static void PPMHandler(uint16_t *channels)
+{
+	GCSReceiverData rcvr;
+
+	// Copy the receiver channels into the GCSReceiver object.
+	for (uint8_t i = 0; i < GCSRECEIVER_CHANNEL_NUMELEM; ++i)
+		rcvr.Channel[i] = channels[i];
+
+	// Set the GCSReceiverData object.
+	{
+		UAVObjMetadata metadata;
+		UAVObjGetMetadata(GCSReceiverHandle(), &metadata);
+		metadata.access = ACCESS_READWRITE;
+		UAVObjSetMetadata(GCSReceiverHandle(), &metadata);
+	}
+	GCSReceiverSet(&rcvr);
+	data->send_gcsreceiver = true;
 }
 
 static void updateSettings()

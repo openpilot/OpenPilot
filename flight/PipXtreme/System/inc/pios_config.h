@@ -66,7 +66,7 @@
 #define PIOS_INCLUDE_GPIO
 #define PIOS_INCLUDE_EXTI
 #define PIOS_INCLUDE_RTC
-#define PIOS_INCLUDE_WDG
+//#define PIOS_INCLUDE_WDG
 #define PIOS_INCLUDE_BL_HELPER
 
 /* A really shitty setting saving implementation */

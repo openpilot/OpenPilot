@@ -52,6 +52,14 @@ void path_progress(float * start_point, float * end_point, float * cur_point, st
 	dot = path_north * diff_north + path_east * diff_east;
 	dist_path2 = path_north * path_north + path_east * path_east;
 
+	if(dist_path2 < 1e-3) {
+		status->fractional_progress = 1;
+		status->error = 0;
+		status->correction_direction[0] = status->correction_direction[1] = 0;
+		status->path_direction[0] = status->path_direction[1] = 0;
+		return;
+	}
+
 	// Compute the normal to the path
 	normal[0] = -path_east / sqrtf(dist_path2);
 	normal[1] = path_north / sqrtf(dist_path2);

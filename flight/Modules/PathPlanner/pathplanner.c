@@ -231,12 +231,12 @@ static void waypointsUpdated(UAVObjEvent * ev)
 		case GUIDANCESETTINGS_PATHMODE_PATH:
 		{
 			PathDesiredData pathDesired;
-			pathDesired.StartingVelocity = 2;
-			pathDesired.EndingVelocity = 2;
 
 			pathDesired.End[PATHDESIRED_END_NORTH] = waypoint.Position[WAYPOINT_POSITION_NORTH];
 			pathDesired.End[PATHDESIRED_END_EAST] = waypoint.Position[WAYPOINT_POSITION_EAST];
 			pathDesired.End[PATHDESIRED_END_DOWN] = waypoint.Position[WAYPOINT_POSITION_DOWN];
+			pathDesired.EndingVelocity = sqrtf(powf(waypoint.Velocity[WAYPOINT_VELOCITY_NORTH],2) + 
+											   powf(waypoint.Velocity[WAYPOINT_VELOCITY_EAST],2));
 
 			if(waypointActive.Index == 0) {
 				// Get current position as start point
@@ -245,7 +245,8 @@ static void waypointsUpdated(UAVObjEvent * ev)
 
 				pathDesired.Start[PATHDESIRED_START_NORTH] = positionActual.North;
 				pathDesired.Start[PATHDESIRED_START_EAST] = positionActual.East;
-				pathDesired.Start[PATHDESIRED_START_DOWN] = positionActual.Down;
+				pathDesired.Start[PATHDESIRED_START_DOWN] = positionActual.Down - 1;
+				pathDesired.StartingVelocity = pathDesired.EndingVelocity;
 			} else {
 				// Get previous waypoint as start point
 				WaypointData waypointPrev;
@@ -254,6 +255,9 @@ static void waypointsUpdated(UAVObjEvent * ev)
 				pathDesired.Start[PATHDESIRED_END_NORTH] = waypointPrev.Position[WAYPOINT_POSITION_NORTH];
 				pathDesired.Start[PATHDESIRED_END_EAST] = waypointPrev.Position[WAYPOINT_POSITION_EAST];
 				pathDesired.Start[PATHDESIRED_END_DOWN] = waypointPrev.Position[WAYPOINT_POSITION_DOWN];
+				pathDesired.StartingVelocity = sqrtf(powf(waypointPrev.Velocity[WAYPOINT_VELOCITY_NORTH],2) +
+												   powf(waypointPrev.Velocity[WAYPOINT_VELOCITY_EAST],2));
+
 			}
 
 			PathDesiredSet(&pathDesired);
@@ -266,6 +270,7 @@ static void createPath()
 {
 	// Draw O
 	WaypointData waypoint;
+	waypoint.Velocity[0] = 2; // Since for now this isn't directional just set a mag
 	for(uint32_t i = 0; i < 20; i++) {
 		waypoint.Position[1] = 30 * cos(i / 19.0 * 2 * M_PI);
 		waypoint.Position[0] = 50 * sin(i / 19.0 * 2 * M_PI);

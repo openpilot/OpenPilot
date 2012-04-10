@@ -212,6 +212,16 @@ static void guidanceTask(void *parameters)
  */
 static void updatePathVelocity()
 {
+	static portTickType lastSysTime;
+	portTickType thisSysTime = xTaskGetTickCount();;
+	float dT = 0;
+	float downCommand;
+
+	// Check how long since last update
+	if(thisSysTime > lastSysTime) // reuse dt in case of wraparound
+		dT = (thisSysTime - lastSysTime) / portTICK_RATE_MS / 1000.0f;
+	lastSysTime = thisSysTime;
+
 	PathDesiredData pathDesired;
 	PathDesiredGet(&pathDesired);
 
@@ -231,7 +241,6 @@ static void updatePathVelocity()
 	VelocityDesiredData velocityDesired;
 	velocityDesired.North = progress.path_direction[0] * groundspeed;
 	velocityDesired.East = progress.path_direction[1] * groundspeed;
-	velocityDesired.Down = 0;
 	
 	float error_speed = progress.error * guidanceSettings.HorizontalPosPI[GUIDANCESETTINGS_HORIZONTALPOSPI_KP];
 	float correction_velocity[2] = {progress.correction_direction[0] * error_speed, 
@@ -245,6 +254,18 @@ static void updatePathVelocity()
 	velocityDesired.North += progress.correction_direction[0] * error_speed * scale;
 	velocityDesired.East += progress.correction_direction[1] * error_speed * scale;
 	
+	float altitudeSetpoint = pathDesired.Start[2] + (pathDesired.End[2] - pathDesired.Start[2]) *
+	    bound(progress.fractional_progress,0,1);
+
+	float downError = altitudeSetpoint - positionActual.Down;
+	downPosIntegral = bound(downPosIntegral + downError * dT * guidanceSettings.VerticalPosPI[GUIDANCESETTINGS_VERTICALPOSPI_KI],
+							-guidanceSettings.VerticalPosPI[GUIDANCESETTINGS_VERTICALPOSPI_ILIMIT],
+							guidanceSettings.VerticalPosPI[GUIDANCESETTINGS_VERTICALPOSPI_ILIMIT]);
+	downCommand = (downError * guidanceSettings.VerticalPosPI[GUIDANCESETTINGS_VERTICALPOSPI_KP] + downPosIntegral);
+	velocityDesired.Down = bound(downCommand,
+								 -guidanceSettings.VerticalVelMax,
+								 guidanceSettings.VerticalVelMax);
+
 	VelocityDesiredSet(&velocityDesired);
 }
 

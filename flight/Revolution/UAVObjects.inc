@@ -58,6 +58,7 @@ UAVOBJSRCFILENAMES += nedaccel
 UAVOBJSRCFILENAMES += nedposition
 UAVOBJSRCFILENAMES += objectpersistence
 UAVOBJSRCFILENAMES += overosyncstats
+UAVOBJSRCFILENAMES += pathdesired
 UAVOBJSRCFILENAMES += positionactual
 UAVOBJSRCFILENAMES += positiondesired
 UAVOBJSRCFILENAMES += ratedesired

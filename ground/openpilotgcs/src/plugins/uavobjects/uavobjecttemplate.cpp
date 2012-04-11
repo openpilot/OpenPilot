@@ -50,6 +50,9 @@ $(FIELDSINIT)
     setDefaultFieldValues();
     // Set the object description
     setDescription(DESCRIPTION);
+
+    connect(this, SIGNAL(objectUpdated(UAVObject*)),
+            SLOT(emitNotifications()));
 }
 
 /**
@@ -107,6 +110,11 @@ void $(NAME)::setData(const DataFields& data)
     }
 }
 
+void $(NAME)::emitNotifications()
+{
+    $(NOTIFY_PROPERTIES_CHANGED)
+}
+
 /**
  * Create a clone of this object, a new instance ID must be specified.
  * Do not use this function directly to create new instances, the
@@ -126,3 +134,5 @@ $(NAME)* $(NAME)::GetInstance(UAVObjectManager* objMngr, quint32 instID)
 {
     return dynamic_cast<$(NAME)*>(objMngr->getObject($(NAME)::OBJID, instID));
 }
+
+$(PROPERTIES_IMPL)

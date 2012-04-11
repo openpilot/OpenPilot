@@ -131,6 +131,13 @@ plugin_pfd.depends = plugin_coreplugin
 plugin_pfd.depends += plugin_uavobjects
 SUBDIRS += plugin_pfd
 
+# Primary Flight Display (PFD) gadget
+plugin_qmlview.subdir = qmlview
+plugin_qmlview.depends = plugin_coreplugin
+plugin_qmlview.depends += plugin_uavobjects
+SUBDIRS += plugin_qmlview
+
+
 #IP connection plugin
 plugin_ipconnection.subdir = ipconnection
 plugin_ipconnection.depends = plugin_coreplugin

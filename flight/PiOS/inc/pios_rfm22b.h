@@ -32,7 +32,23 @@
 #define PIOS_RFM22B_H
 
 /* Global Types */
+struct pios_rfm22b_cfg {
+	uint32_t frequencyHz;
+	uint32_t minFrequencyHz;
+	uint32_t maxFrequencyHz;
+	uint8_t RFXtalCap;
+	uint32_t maxRFBandwidth;
+	uint8_t maxTxPower;
+	uint32_t sendTimeout;
+	uint8_t minPacketSize;
+	uint8_t txWinSize;
+	uint8_t maxConnections;
+};
+
 /* Public Functions */
+extern int32_t PIOS_RFM22B_Init(uint32_t *rfb22b_id, const struct pios_rfm22b_cfg *cfg);
+extern uint32_t PIOS_RFM22B_DeviceID(uint32_t rfb22b_id);
+extern int16_t PIOS_RFM22B_RSSI(uint32_t rfb22b_id);
 
 #endif /* PIOS_RFM22B_H */
 

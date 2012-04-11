@@ -34,7 +34,10 @@
 #include <radiocombridge.h>
 #include <packet_handler.h>
 #include <gcsreceiver.h>
+#include <pipxstatus.h>
+#include <pipxsettings.h>
 #include <uavtalk_priv.h>
+#include <pios_rfm22b.h>
 #include <ecc.h>
 
 #include <stdbool.h>
@@ -46,10 +49,13 @@
 
 static void radio2ComBridgeTask(void *parameters);
 static void com2RadioBridgeTask(void *parameters);
+static void radioStatusTask(void *parameters);
+static void updatePipXStatus(void);
 static int32_t transmitData(uint8_t * data, int32_t length);
 static int32_t transmitPacket(PHPacketHandle packet);
 static void receiveData(uint8_t *buf, uint8_t len);
 static void SendGCSReceiver(void);
+static void SendPipXStatus(void);
 static void PPMHandler(uint16_t *channels);
 static void updateSettings();
 
@@ -64,6 +70,8 @@ static void updateSettings();
 #define MAX_RETRIES 2
 #define REQ_TIMEOUT_MS 10
 
+#define STATS_UPDATE_PERIOD_MS 250
+
 // ****************
 // Private types
 
@@ -71,6 +79,7 @@ typedef struct {
 	// The task handles.
 	xTaskHandle radio2ComBridgeTaskHandle;
 	xTaskHandle com2RadioBridgeTaskHandle;
+	xTaskHandle radioStatusTaskHandle;
 
 	// The com buffers.
 	uint8_t *radio2com_buf;
@@ -84,15 +93,20 @@ typedef struct {
 	UAVTalkConnection uavTalkCon;
 
 	// Error statistics.
-	uint32_t com_tx_errors;
-	uint32_t radio_tx_errors;
+	uint32_t comTxErrors;
+	uint32_t comTxRetries;
+	uint32_t comRxErrors;
+	uint32_t radioTxErrors;
+	uint32_t radioTxRetries;
+	uint32_t radioRxErrors;
 
 	// The packet timeout.
 	portTickType send_timeout;
 	uint16_t min_packet_size;
 
-	// Flag used to indicate an update of the GCSReceiver object.
+	// Flag used to indicate an update of the UAVObjects.
 	bool send_gcsreceiver;
+	bool send_pipxstatus;
 
 	// Tracks the UAVTalk messages transmitted from radio to com.
 	bool uavtalk_idle;
@@ -117,6 +131,7 @@ static int32_t RadioComBridgeStart(void)
 		// Start the tasks
 		xTaskCreate(radio2ComBridgeTask, (signed char *)"Radio2ComBridge", STACK_SIZE_BYTES/2, NULL, TASK_PRIORITY, &(data->radio2ComBridgeTaskHandle));
 		xTaskCreate(com2RadioBridgeTask, (signed char *)"Com2RadioBridge", STACK_SIZE_BYTES/2, NULL, TASK_PRIORITY, &(data->com2RadioBridgeTaskHandle));
+		xTaskCreate(radioStatusTask, (signed char *)"RadioStatus", STACK_SIZE_BYTES/2, NULL, TASK_PRIORITY, &(data->radioStatusTaskHandle));
 #ifdef PIOS_INCLUDE_WDG
 		PIOS_WDG_RegisterFlag(PIOS_WDG_RADIOCOM);
 		PIOS_WDG_RegisterFlag(PIOS_WDG_COMRADIO);
@@ -140,9 +155,12 @@ static int32_t RadioComBridgeInitialize(void)
 	if (!data)
 		return -1;
 
-	// Initialize the GCSReceiver object.
+	// Initialize the UAVObjects that we use
 	GCSReceiverInitialize();
+	PipXStatusInitialize();
+	PipXSettingsInitialize();
 	data->send_gcsreceiver = false;
+	data->send_pipxstatus = false;
 
 	// TODO: Get from settings object
 	data->com_port = PIOS_COM_BRIDGE_COM;
@@ -158,8 +176,12 @@ static int32_t RadioComBridgeInitialize(void)
 	data->uavTalkCon = UAVTalkInitialize(&transmitData);
 
 	// Initialize the statistics.
-	data->com_tx_errors = 0;
-	data->radio_tx_errors = 0;
+	data->radioTxErrors = 0;
+	data->radioTxRetries = 0;
+	data->radioRxErrors = 0;
+	data->comTxErrors = 0;
+	data->comTxRetries = 0;
+	data->comRxErrors = 0;
 
 	// Register the callbacks with the packet handler
 	PHRegisterOutputStream(pios_packet_handler, transmitPacket);
@@ -288,6 +310,44 @@ static void com2RadioBridgeTask(void * parameters)
 	}
 }
 
+/**
+ * The stats update task.
+ */
+static void radioStatusTask(void *parameters)
+{
+	while (1) {
+
+#ifdef PIOS_INCLUDE_WDG
+		// Update the watchdog timer.
+		PIOS_WDG_UpdateFlag(PIOS_WDG_RADIOCOM);
+#endif /* PIOS_INCLUDE_WDG */
+
+		// Update the status
+		updatePipXStatus();
+		data->send_pipxstatus = true;
+
+		// Delay until the next update period.
+		vTaskDelay(STATS_UPDATE_PERIOD_MS / portTICK_RATE_MS);
+	}
+}
+
+/**
+ * Update the PipX status
+ */
+static void updatePipXStatus(void)
+{
+	PipXStatusData pipxStatus;
+
+	// Get object data
+	PipXStatusGet(&pipxStatus);
+
+	// Update the status
+	pipxStatus.DeviceID = PIOS_RFM22B_DeviceID(pios_rfm22b_id);
+	pipxStatus.RSSI = PIOS_RFM22B_RSSI(pios_rfm22b_id);
+
+	// Update the object
+	PipXStatusSet(&pipxStatus);
+}
 
 /**
  * Transmit data buffer to the com port.
@@ -336,6 +396,8 @@ static void receiveData(uint8_t *buf, uint8_t len)
 	// Send a local UAVTalk message if one is waiting to be sent.
 	if (data->send_gcsreceiver && data->uavtalk_idle)
 		SendGCSReceiver();
+	if (data->send_pipxstatus && data->uavtalk_idle)
+		SendPipXStatus();
 
 	// Parse the data for UAVTalk packets.
 	uint8_t sent_bytes = 0;
@@ -372,12 +434,14 @@ static void receiveData(uint8_t *buf, uint8_t len)
 				uint8_t send_bytes = len - sent_bytes;
 				if (PIOS_COM_SendBuffer(outputPort, buf + sent_bytes, send_bytes) != send_bytes)
 					// Error on transmit
-					data->com_tx_errors++;
+					data->comTxErrors++;
 				sent_bytes = i;
 
 				// Send any UAVTalk messages that need to be sent.
 				if (data->send_gcsreceiver)
 					SendGCSReceiver();
+				if (data->send_pipxstatus)
+					SendPipXStatus();
 			}
 			++(data->uavtalk_packet_index);
 		}
@@ -387,7 +451,7 @@ static void receiveData(uint8_t *buf, uint8_t len)
 	uint8_t send_bytes = len - sent_bytes;
 	if (PIOS_COM_SendBuffer(outputPort, buf + sent_bytes, send_bytes) != send_bytes)
 		// Error on transmit
-		data->com_tx_errors++;
+		data->comTxErrors++;
 }
 
 /**
@@ -405,6 +469,17 @@ static void SendGCSReceiver(void)
 	}
 	if(success >= 0)
 		data->send_gcsreceiver = false;
+}
+
+/**
+ * Transmit the GCSReceiver object using UAVTalk
+ * \param[in] channels The ppm channels
+ */
+static void SendPipXStatus(void)
+{
+	// Transmit the PipXStatus
+	UAVTalkSendObject(data->uavTalkCon, PipXStatusHandle(), 0, 0, REQ_TIMEOUT_MS);
+	data->send_pipxstatus = false;
 }
 
 /**

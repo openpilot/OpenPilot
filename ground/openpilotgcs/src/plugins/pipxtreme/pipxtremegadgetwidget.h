@@ -1,12 +1,12 @@
 /**
- ******************************************************************************
- *
- * @file       pipxtremegadgetwidget.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @addtogroup GCSPlugins GCS Plugins
- * @{
- * @{
- *****************************************************************************/
+******************************************************************************
+*
+* @file       pipxtremegadgetwidget.h
+* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+* @addtogroup GCSPlugins GCS Plugins
+* @{
+* @{
+*****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -130,22 +130,25 @@ typedef struct
 
 class PipXtremeGadgetWidget : public QWidget
 {
-    Q_OBJECT
+	Q_OBJECT
 
-public:
-    PipXtremeGadgetWidget(QWidget *parent = 0);
-   ~PipXtremeGadgetWidget();
+		public:
+	PipXtremeGadgetWidget(QWidget *parent = 0);
+	~PipXtremeGadgetWidget();
 
-public slots:
-    void onTelemetryStart();
-    void onTelemetryStop();
-    void onTelemetryConnect();
-    void onTelemetryDisconnect();
+	public slots:
+	void onTelemetryStart();
+	void onTelemetryStop();
+	void onTelemetryConnect();
+	void onTelemetryDisconnect();
 
 	void onComboBoxPorts_currentIndexChanged(int index);
 
+public slots:
+	void updateStatus(UAVObject *object1);
+
 protected:
-    void resizeEvent(QResizeEvent *event);
+	void resizeEvent(QResizeEvent *event);
 
 private:
 	typedef enum { PIPX_IDLE, PIPX_REQ_DETAILS, PIPX_REQ_SETTINGS, PIPX_REQ_STATE} PipXStage;
@@ -159,6 +162,9 @@ private:
 
 	PipXStage			m_stage;
 	int					m_stage_retries;
+
+	// The PipXtreme status UAVObject
+	UAVDataObject* pipxStatusObj;
 
 //	QVector<quint8>	buffer;
 
@@ -187,12 +193,12 @@ private:
 	void disconnectPort(bool enable_telemetry, bool lock_stuff = true);
 	void connectPort();
 
-private slots:
+	private slots:
 	void importSettings();
 	void exportSettings();
 	void connectDisconnect();
 	void error(QString errorString, int errorNumber);
-    void getPorts();
+	void getPorts();
 	void randomiseAESKey();
 	void scanSpectrum();
 	void saveToFlash();

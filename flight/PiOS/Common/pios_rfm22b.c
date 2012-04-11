@@ -149,14 +149,13 @@ struct pios_rfm22b_dev {
 	enum pios_rfm22b_dev_magic magic;
 	const struct pios_rfm22b_cfg *cfg;
 
-	uint32_t countdownTimer;
+	uint32_t deviceID;
 
+	// The COM callback functions.
 	pios_com_callback rx_in_cb;
 	uint32_t rx_in_context;
 	pios_com_callback tx_out_cb;
 	uint32_t tx_out_context;
-
-	PHPacketHandle cur_tx_packet;
 };
 
 uint32_t random32 = 0x459ab8d8;
@@ -441,14 +440,25 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, const struct pios_rfm22b_cfg *cfg)
 
 	// Bind the configuration to the device instance
 	rfm22b_dev->cfg = cfg;
-	rfm22b_dev->cur_tx_packet = 0;
   
 	*rfm22b_id = (uint32_t)rfm22b_dev;
 
+	// Initialize the TX pre-buffer pointer.
 	tx_pre_buffer_size = 0;
 
+	// Create our (hopefully) unique 32 bit id from the processor serial number.
+	uint8_t crcs[] = { 0, 0, 0, 0 };
+	{
+		char serial_no_str[33];
+		PIOS_SYS_SerialNumberGet(serial_no_str);
+		// Create a 32 bit value using 4 8 bit CRC values.
+		for (uint8_t i = 0; serial_no_str[i] != 0; ++i)
+			crcs[i % 4] = PIOS_CRC_updateByte(crcs[i % 4], serial_no_str[i]);
+	}
+	rfm22b_dev->deviceID = crcs[0] | crcs[1] << 8 | crcs[2] << 16 | crcs[3] << 24;
+	DEBUG_PRINTF(2, "RF device ID: %x\n\r", rfm22b_dev->deviceID);
+
 	// Initialize the radio device.
-	DEBUG_PRINTF(2, "Init Radio\n\r");
 	int initval = rfm22_init_normal(cfg->minFrequencyHz, cfg->maxFrequencyHz, 50000);
 
 	if (initval < 0)
@@ -487,11 +497,24 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, const struct pios_rfm22b_cfg *cfg)
 	rfm22_setTxPower(cfg->maxTxPower);
 
 	DEBUG_PRINTF(2, "\n\r");
+	DEBUG_PRINTF(2, "RF device ID: %x\n\r", rfm22b_dev->deviceID);
 	DEBUG_PRINTF(2, "RF datarate: %dbps\n\r", rfm22_getDatarate());
 	DEBUG_PRINTF(2, "RF frequency: %dHz\n\r", rfm22_getNominalCarrierFrequency());
 	DEBUG_PRINTF(2, "RF TX power: %d\n\r", rfm22_getTxPower());
 
 	return(0);
+}
+
+uint32_t PIOS_RFM22B_DeviceID(uint32_t rfm22b_id)
+{
+	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
+
+	return rfm22b_dev->deviceID;
+}
+
+int16_t PIOS_RFM22B_RSSI(uint32_t rfb22b_id)
+{
+	return rssi_dBm;
 }
 
 static void PIOS_RFM22B_RxStart(uint32_t rfm22b_id, uint16_t rx_bytes_avail)
@@ -2384,12 +2407,45 @@ int rfm22_init_normal(uint32_t min_frequency_hz, uint32_t max_frequency_hz, uint
 	// x-nibbles rx preamble detection
 	rfm22_write(RFM22_preamble_detection_ctrl1, RX_PREAMBLE_NIBBLES << 3);
 
+#ifdef PIOS_RFM22_NO_HEADER
 	// header control - we are not using the header
 	rfm22_write(RFM22_header_control1, RFM22_header_cntl1_bcen_none | RFM22_header_cntl1_hdch_none);
 
 	// no header bytes, synchronization word length 3, 2, 1 & 0 used, packet length included in header.
 	rfm22_write(RFM22_header_control2, RFM22_header_cntl2_hdlen_none |
 							RFM22_header_cntl2_synclen_3210 | ((TX_PREAMBLE_NIBBLES >> 8) & 0x01));
+#else
+	// header control - using a 4 by header with broadcast of 0xffffffff
+	rfm22_write(RFM22_header_control1,
+							RFM22_header_cntl1_bcen_0 |
+							RFM22_header_cntl1_bcen_1 |
+							RFM22_header_cntl1_bcen_2 |
+							RFM22_header_cntl1_bcen_3 |
+							RFM22_header_cntl1_hdch_0 |
+							RFM22_header_cntl1_hdch_1 |
+							RFM22_header_cntl1_hdch_2 |
+							RFM22_header_cntl1_hdch_3);
+	// Check all bit of all bytes of the header
+	rfm22_write(RFM22_header_enable0, 0xff);
+	rfm22_write(RFM22_header_enable1, 0xff);
+	rfm22_write(RFM22_header_enable2, 0xff);
+	rfm22_write(RFM22_header_enable3, 0xff);
+	// Set the ID to be checked
+	rfm22_write(RFM22_check_header0, 0x11);
+	rfm22_write(RFM22_check_header1, 0x22);
+	rfm22_write(RFM22_check_header2, 0x33);
+	rfm22_write(RFM22_check_header3, 0x44);
+	// Set our address in the transmit header.
+	rfm22_write(RFM22_transmit_header0, 0x11);
+	rfm22_write(RFM22_transmit_header1, 0x22);
+	rfm22_write(RFM22_transmit_header2, 0x33);
+	rfm22_write(RFM22_transmit_header3, 0x44);
+	// 4 header bytes, synchronization word length 3, 2, 1 & 0 used, packet length included in header.
+	rfm22_write(RFM22_header_control2,
+							RFM22_header_cntl2_hdlen_3210 |
+							RFM22_header_cntl2_synclen_3210 |
+							((TX_PREAMBLE_NIBBLES >> 8) & 0x01));
+#endif
 
   // sync word
 	rfm22_write(RFM22_sync_word3, SYNC_BYTE_1);

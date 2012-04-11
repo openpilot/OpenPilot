@@ -138,6 +138,8 @@ endif
 ## UAVOBJECTS
 ifndef TESTAPP
 SRC += $(OPUAVSYNTHDIR)/gcsreceiver.c
+SRC += $(OPUAVSYNTHDIR)/pipxstatus.c
+SRC += $(OPUAVSYNTHDIR)/pipxsettings.c
 
 endif
 

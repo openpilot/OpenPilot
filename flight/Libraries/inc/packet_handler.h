@@ -77,7 +77,6 @@ typedef struct {
 typedef struct {
 	uint8_t txWinSize;
 	uint16_t maxConnections;
-	uint32_t id;
 } PacketHandlerConfig;
 
 typedef int32_t (*PHOutputStream)(PHPacketHandle packet);

@@ -363,7 +363,6 @@ static uint8_t PHLSendAck(PHPacketDataHandle data, PHPacketHandle p)
 
 	// Create the ACK message
 	PHPacketHeader ack;
-	ack.source_id = data->cfg.id;
 	ack.destination_id = p->header.source_id;
 	ack.type = PACKET_TYPE_ACK;
 	ack.rx_seq = p->header.tx_seq;
@@ -385,7 +384,6 @@ static uint8_t PHLSendNAck(PHPacketDataHandle data, PHPacketHandle p)
 
 	// Create the NAck message
 	PHPacketHeader ack;
-	ack.source_id = data->cfg.id;
 	ack.destination_id = p->header.source_id;
 	ack.type = PACKET_TYPE_NACK;
 	ack.rx_seq = p->header.tx_seq;

@@ -261,9 +261,9 @@ extern uint32_t pios_com_rfm22b_id;
 // RFM22
 //-------------------------
 
+extern uint32_t pios_rfm22b_id;
 #define RFM22_EXT_INT_USE
-
-#define RFM22_PIOS_SPI						PIOS_SPI_PORT	// SPIx
+#define RFM22_PIOS_SPI	PIOS_SPI_PORT	// SPIx
 
 #if defined(RFM22_EXT_INT_USE)
 #define PIOS_RFM22_EXTI_GPIO_PORT               GPIOA

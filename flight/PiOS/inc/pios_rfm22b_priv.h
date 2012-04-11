@@ -37,21 +37,6 @@
 
 extern const struct pios_com_driver pios_rfm22b_com_driver;
 
-struct pios_rfm22b_cfg {
-	uint32_t frequencyHz;
-	uint32_t minFrequencyHz;
-	uint32_t maxFrequencyHz;
-	uint8_t RFXtalCap;
-	uint32_t maxRFBandwidth;
-	uint8_t maxTxPower;
-	uint32_t sendTimeout;
-	uint8_t minPacketSize;
-	uint8_t txWinSize;
-	uint8_t maxConnections;
-};
-
-extern int32_t PIOS_RFM22B_Init(uint32_t *rfb22b_id, const struct pios_rfm22b_cfg *cfg);
-
 // ************************************
 
 #define RFM22_DEVICE_VERSION_V2		0x02
@@ -410,11 +395,13 @@ enum {	RX_SCAN_SPECTRUM = 0,
 #define RFM22_header_cntl1_bcen_none			0x00		// No broadcast address enable.
 #define RFM22_header_cntl1_bcen_0				0x10		// Broadcast address enable for header byte 0.
 #define RFM22_header_cntl1_bcen_1				0x20		// Broadcast address enable for header byte 1.
-#define RFM22_header_cntl1_bcen_01				0x30		// Broadcast address enable for header bytes 0 & 1.
+#define RFM22_header_cntl1_bcen_2				0x40		// Broadcast address enable for header byte 2.
+#define RFM22_header_cntl1_bcen_3				0x80		// Broadcast address enable for header byte 3.
 #define RFM22_header_cntl1_hdch_none			0x00		// No Received Header check
 #define RFM22_header_cntl1_hdch_0				0x01		// Received Header check for byte 0.
 #define RFM22_header_cntl1_hdch_1				0x02		// Received Header check for byte 1.
-#define RFM22_header_cntl1_hdch_01				0x03		// Received Header check for bytes 0 & 1.
+#define RFM22_header_cntl1_hdch_2				0x04		// Received Header check for byte 2.
+#define RFM22_header_cntl1_hdch_3				0x08		// Received Header check for byte 3.
 
 #define RFM22_header_control2						0x33	// R/W
 #define RFM22_header_cntl2_prealen				0x01		// MSB of Preamble Length. See register Preamble Length.

@@ -1,7 +1,7 @@
 import QtQuick 1.1
 
 Rectangle {
-    id: rectangle1
+    id: welcome
     width: 1024
     height: 768
 
@@ -19,8 +19,8 @@ Rectangle {
         id: column1
         x: 66
         y: 66
-        width: parent.width
-        height: parent.height
+        width: parent.width * 0.8
+        height: parent.height * 0.8
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
         spacing: 32
@@ -55,7 +55,7 @@ Rectangle {
                     height: parent.height / 2
                     baseIconName: "welcome-flightdata"
                     label: "Flight Data"
-                    onClicked: welcomePlugin.openPage("Mode1")
+                    onClicked: welcome.changePage(1)
                 }
 
                 WelcomePageButton {
@@ -63,7 +63,7 @@ Rectangle {
                     height: parent.height / 2
                     baseIconName: "welcome-flightdata"
                     label: "Configuration"
-                    onClicked: welcomePlugin.openPage("Mode2")
+                    onClicked: welcome.changePage(2)
                 }
 
                 WelcomePageButton {
@@ -71,7 +71,7 @@ Rectangle {
                     height: parent.height / 2
                     baseIconName: "welcome-flightdata"
                     label: "Flight Planner"
-                    onClicked: welcomePlugin.openPage("Mode3")
+                    onClicked: welcome.changePage(3)
                 }
 
                 WelcomePageButton {
@@ -79,7 +79,7 @@ Rectangle {
                     height: parent.height / 2
                     baseIconName: "welcome-flightdata"
                     label: "Scopes"
-                    onClicked: welcomePlugin.openPage("Mode4")
+                    onClicked: welcome.changePage(4)
                 }
 
                 WelcomePageButton {
@@ -87,7 +87,7 @@ Rectangle {
                     height: parent.height / 2
                     baseIconName: "welcome-flightdata"
                     label: "HIL"
-                    onClicked: welcomePlugin.openPage("Mode5")
+                    onClicked: welcome.changePage(5)
                 }
 
                 WelcomePageButton {
@@ -95,7 +95,7 @@ Rectangle {
                     height: parent.height / 2
                     baseIconName: "welcome-flightdata"
                     label: "Firmware"
-                    onClicked: welcomePlugin.openPage("Mode6")
+                    onClicked: welcome.changePage(6)
                 }
             } //icons grid
         } // images row
@@ -107,4 +107,6 @@ Rectangle {
             anchors.bottom: parent.bottom
         }
     }
+
+    signal changePage(int index)
 }

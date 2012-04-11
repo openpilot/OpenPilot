@@ -8,12 +8,12 @@ Rectangle {
         height: parent.height
         spacing: 10
         Rectangle {
-            width: 40
+            width: 20
             height: parent.height
             color: "green"
         }
         Text {
-            text: "itemName"
+            text: itemName
         }
     }
 }

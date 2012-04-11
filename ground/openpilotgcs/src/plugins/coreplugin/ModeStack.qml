@@ -45,7 +45,7 @@ Rectangle {
                     height: parent.height
                     spacing: 10
                     Rectangle {
-                        width: 40
+                        width: 20
                         height: parent.height
                         color: "green"
                     }
@@ -54,32 +54,62 @@ Rectangle {
                         width: parent.width
                         height: parent.height
                         source: itemQml
+
+                        onLoaded: {
+                            if(hasModeSwitch){
+                                item.changePage.connect(hostRect.setPageByIndex)
+                            }
+                        }
                     }
-//                    Text {
-//                        anchors.verticalCenter: parent.verticalCenter
-//                        text: qsTr(itemName)
-//                    }
                 }
             }
-//            model: testModel
-            model: items
+            model: testModel
+//            model: items
 
             onCurrentIndexChanged: hostRect.indexChanged(currentIndex)
         }
     }
+
+    function setPageByIndex(index){
+        modeList.positionViewAtIndex(index, ListView.Visible)
+    }
+
     ListModel{
         id: testModel
         ListElement{
-            itemName: "Dave"
-            itemQml: ""
+            itemName: "Welcome"
+            itemQml: "../welcome/qml/main.qml"
+            hasModeSwitch: true
         }
         ListElement{
-            itemName: "Bob"
-            itemQml: ""
+            itemName: "Mode One"
+            itemQml: "UAVGadgetManager.qml"
+            hasModeSwitch: false
         }
         ListElement{
-            itemName: "Mo"
-            itemQml: ""
+            itemName: "Mode Two"
+            itemQml: "UAVGadgetManager.qml"
+            hasModeSwitch: false
+        }
+        ListElement{
+            itemName: "Mode Three"
+            itemQml: "UAVGadgetManager.qml"
+            hasModeSwitch: false
+        }
+        ListElement{
+            itemName: "Mode Four"
+            itemQml: "UAVGadgetManager.qml"
+            hasModeSwitch: false
+        }
+        ListElement{
+            itemName: "Mode Five"
+            itemQml: "UAVGadgetManager.qml"
+            hasModeSwitch: false
+        }
+        ListElement{
+            itemName: "Mode Six"
+            itemQml: "UAVGadgetManager.qml"
+            hasModeSwitch: false
         }
     }
 }

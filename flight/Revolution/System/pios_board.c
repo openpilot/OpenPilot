@@ -174,11 +174,12 @@ static const struct pios_mpu6000_cfg pios_mpu6000_cfg = {
 	.exti_cfg = &pios_exti_mpu6000_cfg,
 	.Fifo_store = PIOS_MPU6000_FIFO_TEMP_OUT | PIOS_MPU6000_FIFO_GYRO_X_OUT | PIOS_MPU6000_FIFO_GYRO_Y_OUT | PIOS_MPU6000_FIFO_GYRO_Z_OUT,
 	// Clock at 8 khz, downsampled by 8 for 1khz
-	.Smpl_rate_div = 7, 
+	.Smpl_rate_div = 7,
 	.interrupt_cfg = PIOS_MPU6000_INT_CLR_ANYRD,
 	.interrupt_en = PIOS_MPU6000_INTEN_DATA_RDY,
 	.User_ctl = PIOS_MPU6000_USERCTL_FIFO_EN,
 	.Pwr_mgmt_clk = PIOS_MPU6000_PWRMGMT_PLL_X_CLK,
+	.accel_range = PIOS_MPU6000_ACCEL_8G,
 	.gyro_range = PIOS_MPU6000_SCALE_500_DEG,
 	.filter = PIOS_MPU6000_LOWPASS_256_HZ
 };
@@ -815,8 +816,7 @@ void PIOS_Board_Init(void) {
 			break;
 		case 0x02:
 #if defined(PIOS_INCLUDE_MPU6000)
-			PIOS_MPU6000_Attach(pios_spi_gyro_id);
-			PIOS_MPU6000_Init(&pios_mpu6000_cfg);
+			PIOS_MPU6000_Init(pios_spi_gyro_id,0, &pios_mpu6000_cfg);
 #endif
 			break;
 		default:

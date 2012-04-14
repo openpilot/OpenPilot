@@ -196,39 +196,47 @@ out_fail:
 }
 
 /**
-* (Re-)initialises SPI peripheral clock rate
-*
-* \param[in] spi SPI number (0 or 1)
-* \param[in] spi_prescaler configures the SPI speed
-* \return 0 if no error
-* \return -1 if disabled SPI port selected
-* \return -3 if invalid spi_prescaler selected
-*/
+ * (Re-)initialises SPI peripheral clock rate
+ *
+ * \param[in] spi SPI number (0 or 1)
+ * \param[in] spi_prescaler configures the SPI speed:
+ * <UL>
+ *   <LI>PIOS_SPI_PRESCALER_2: sets clock rate 27.7~ nS @ 72 MHz (36 MBit/s) (only supported for spi==0, spi1 uses 4 instead)
+ *   <LI>PIOS_SPI_PRESCALER_4: sets clock rate 55.5~ nS @ 72 MHz (18 MBit/s)
+ *   <LI>PIOS_SPI_PRESCALER_8: sets clock rate 111.1~ nS @ 72 MHz (9 MBit/s)
+ *   <LI>PIOS_SPI_PRESCALER_16: sets clock rate 222.2~ nS @ 72 MHz (4.5 MBit/s)
+ *   <LI>PIOS_SPI_PRESCALER_32: sets clock rate 444.4~ nS @ 72 MHz (2.25 MBit/s)
+ *   <LI>PIOS_SPI_PRESCALER_64: sets clock rate 888.8~ nS @ 72 MHz (1.125 MBit/s)
+ *   <LI>PIOS_SPI_PRESCALER_128: sets clock rate 1.7~ nS @ 72 MHz (0.562 MBit/s)
+ *   <LI>PIOS_SPI_PRESCALER_256: sets clock rate 3.5~ nS @ 72 MHz (0.281 MBit/s)
+ * </UL>
+ * \return 0 if no error
+ * \return -1 if disabled SPI port selected
+ * \return -3 if invalid spi_prescaler selected
+ */
 int32_t PIOS_SPI_SetClockSpeed(uint32_t spi_id, SPIPrescalerTypeDef spi_prescaler)
 {
 	struct pios_spi_dev * spi_dev = (struct pios_spi_dev *)spi_id;
-
+	
 	bool valid = PIOS_SPI_validate(spi_dev);
 	PIOS_Assert(valid)
-
+	
 	SPI_InitTypeDef       SPI_InitStructure;
-
+	
 	if (spi_prescaler >= 8) {
 		/* Invalid prescaler selected */
 		return -3;
 	}
-
+	
 	/* Start with a copy of the default configuration for the peripheral */
 	SPI_InitStructure = spi_dev->cfg->init;
-
+	
 	/* Adjust the prescaler for the peripheral's clock */
-	/* XXX is this correct? */
 	SPI_InitStructure.SPI_BaudRatePrescaler = ((uint16_t) spi_prescaler & 7) << 3;
-
+	
 	/* Write back the new configuration */
 	SPI_Init(spi_dev->cfg->regs, &SPI_InitStructure);
-
-	/* XXX what gets selected by this? */
+	
 	PIOS_SPI_TransferByte(spi_id, 0xFF);
 	return 0;
 }
@@ -618,17 +626,6 @@ int32_t PIOS_SPI_Busy(uint32_t spi_id)
 	}
 
 	return(0);
-}
-
-void PIOS_SPI_SetPrescalar(uint32_t spi_id, uint32_t prescaler)
-{
-	struct pios_spi_dev * spi_dev = (struct pios_spi_dev *)spi_id;
-	
-	bool valid = PIOS_SPI_validate(spi_dev);
-	PIOS_Assert(valid);
-	PIOS_Assert(IS_SPI_BAUDRATE_PRESCALER(prescaler));
-	
-	spi_dev->cfg->regs->CR1 = (spi_dev->cfg->regs->CR1 & ~0x0038) | prescaler;
 }
 
 void PIOS_SPI_IRQ_Handler(uint32_t spi_id)

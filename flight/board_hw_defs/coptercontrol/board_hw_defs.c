@@ -88,7 +88,7 @@ static const struct pios_spi_cfg pios_spi_gyro_cfg = {
 		.SPI_CRCPolynomial     = 7,
 		.SPI_CPOL              = SPI_CPOL_High,
 		.SPI_CPHA              = SPI_CPHA_2Edge,
-		.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_8, /* 10 Mhz */
+		.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_16, /* 10 Mhz */
 	},
 	.use_crc = false,
 	.dma = {
@@ -390,6 +390,7 @@ void PIOS_SPI_flash_accel_irq_handler(void)
 /*
  * ADC system
  */
+#if defined(PIOS_INCLUDE_ADC)
 #include "pios_adc_priv.h"
 extern void PIOS_ADC_handler(void);
 void DMA1_Channel1_IRQHandler() __attribute__ ((alias("PIOS_ADC_handler")));
@@ -437,6 +438,7 @@ uint8_t pios_adc_num_devices = NELEMENTS(pios_adc_devs);
 void PIOS_ADC_handler() {
 	PIOS_ADC_DMA_Handler();
 }
+#endif
 
 #include "pios_tim_priv.h"
 

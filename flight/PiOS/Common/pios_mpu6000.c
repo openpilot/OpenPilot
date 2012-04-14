@@ -37,41 +37,93 @@
 #include "fifo_buffer.h"
 
 /* Global Variables */
-uint32_t pios_spi_gyro;
 
-/* Local Variables */
-#define DEG_TO_RAD (M_PI / 180.0)
+enum pios_mpu6000_dev_magic {
+	PIOS_MPU6000_DEV_MAGIC = 0x9da9b3ed,
+};
+
+#define PIOS_MPU6000_MAX_DOWNSAMPLE 2
+struct mpu6000_dev {
+	uint32_t spi_id;
+	uint32_t slave_num;
+	xQueueHandle queue;
+	const struct pios_mpu6000_cfg * cfg;
+	enum pios_mpu6000_dev_magic magic;
+};
+
+//! Global structure for this device device
+static struct mpu6000_dev * dev;
+volatile bool mpu6000_configured = false;
+
+//! Private functions
+static struct mpu6000_dev * PIOS_MPU6000_alloc(void);
+static int32_t PIOS_MPU6000_Validate(struct mpu6000_dev * dev);
 static void PIOS_MPU6000_Config(struct pios_mpu6000_cfg const * cfg);
 static int32_t PIOS_MPU6000_SetReg(uint8_t address, uint8_t buffer);
 static int32_t PIOS_MPU6000_GetReg(uint8_t address);
 
-#define PIOS_MPU6000_MAX_DOWNSAMPLE 100
-static int16_t pios_mpu6000_buffer[PIOS_MPU6000_MAX_DOWNSAMPLE * sizeof(struct pios_mpu6000_data)];
-static t_fifo_buffer pios_mpu6000_fifo;
-
-volatile bool mpu6000_configured = false;
-
-static struct pios_mpu6000_cfg const * cfg;
+#define DEG_TO_RAD (M_PI / 180.0)
 
 #define GRAV 9.81f
 
 /**
- * @brief Initialize the MPU6000 3-axis gyro sensor.
- * @return none
+ * @brief Allocate a new device
  */
-void PIOS_MPU6000_Init(const struct pios_mpu6000_cfg * new_cfg)
+static struct mpu6000_dev * PIOS_MPU6000_alloc(void)
 {
-	cfg = new_cfg;
+	struct mpu6000_dev * mpu6000_dev;
 	
-	fifoBuf_init(&pios_mpu6000_fifo, (uint8_t *) pios_mpu6000_buffer, sizeof(pios_mpu6000_buffer));
+	mpu6000_dev = (struct mpu6000_dev *)pvPortMalloc(sizeof(*mpu6000_dev));
+	if (!mpu6000_dev) return (NULL);
+	
+	mpu6000_dev->magic = PIOS_MPU6000_DEV_MAGIC;
+	
+	mpu6000_dev->queue = xQueueCreate(PIOS_MPU6000_MAX_DOWNSAMPLE, sizeof(struct pios_mpu6000_data));
+	if(mpu6000_dev->queue == NULL) {
+		vPortFree(mpu6000_dev);
+		return NULL;
+	}
+	
+	return(mpu6000_dev);
+}
+
+/**
+ * @brief Validate the handle to the spi device
+ * @returns 0 for valid device or -1 otherwise
+ */
+static int32_t PIOS_MPU6000_Validate(struct mpu6000_dev * dev)
+{
+	if (dev == NULL) 
+		return -1;
+	if (dev->magic != PIOS_MPU6000_DEV_MAGIC)
+		return -2;
+	if (dev->spi_id == 0)
+		return -3;
+	return 0;
+}
+
+/**
+ * @brief Initialize the MPU6000 3-axis gyro sensor.
+ * @return 0 for success, -1 for failure
+ */
+int32_t PIOS_MPU6000_Init(uint32_t spi_id, uint32_t slave_num, const struct pios_mpu6000_cfg * cfg)
+{
+	dev = PIOS_MPU6000_alloc();
+	if(dev == NULL)
+		return -1;
+	
+	dev->spi_id = spi_id;
+	dev->slave_num = slave_num;
+	dev->cfg = cfg;
 
 	/* Configure the MPU6000 Sensor */
-	PIOS_SPI_SetPrescalar(pios_spi_gyro, SPI_BaudRatePrescaler_256);
+	PIOS_SPI_SetClockSpeed(dev->spi_id, PIOS_SPI_PRESCALER_256);
 	PIOS_MPU6000_Config(cfg);
-	PIOS_SPI_SetPrescalar(pios_spi_gyro, SPI_BaudRatePrescaler_8);
+	PIOS_SPI_SetClockSpeed(dev->spi_id, PIOS_SPI_PRESCALER_16);
 
 	/* Set up EXTI line */
 	PIOS_EXTI_Init(cfg->exti_cfg);
+	return 0;
 }
 
 /**
@@ -102,8 +154,8 @@ static void PIOS_MPU6000_Config(struct pios_mpu6000_cfg const * cfg)
 
 	// FIFO storage
 #if defined(PIOS_MPU6000_ACCEL)
-	// Set the accel to 8g mode
-	while(PIOS_MPU6000_SetReg(PIOS_MPU6000_ACCEL_CFG_REG, 0x10) != 0);
+	// Set the accel scale
+	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_ACCEL_CFG_REG, cfg->accel_range) != 0);
 	
 	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_FIFO_EN_REG, cfg->Fifo_store | PIOS_MPU6000_ACCEL_OUT) != 0);
 #else
@@ -138,13 +190,17 @@ static void PIOS_MPU6000_Config(struct pios_mpu6000_cfg const * cfg)
 
 /**
  * @brief Claim the SPI bus for the accel communications and select this chip
- * @return 0 if successful, -1 if unable to claim bus
+ * @return 0 if successful, -1 for invalid device, -2 if unable to claim bus
  */
 int32_t PIOS_MPU6000_ClaimBus()
 {
-	if(PIOS_SPI_ClaimBus(pios_spi_gyro) != 0)
+	if(PIOS_MPU6000_Validate(dev) != 0)
 		return -1;
-	PIOS_SPI_RC_PinSet(pios_spi_gyro,0,0);
+	
+	if(PIOS_SPI_ClaimBus(dev->spi_id) != 0)
+		return -2;
+	
+	PIOS_SPI_RC_PinSet(dev->spi_id,dev->slave_num,0);
 	return 0;
 }
 
@@ -154,16 +210,12 @@ int32_t PIOS_MPU6000_ClaimBus()
  */
 int32_t PIOS_MPU6000_ReleaseBus()
 {
-	PIOS_SPI_RC_PinSet(pios_spi_gyro,0,1);
-	return PIOS_SPI_ReleaseBus(pios_spi_gyro);
-}
-
-/**
- * @brief Connect to the correct SPI bus
- */
-void PIOS_MPU6000_Attach(uint32_t spi_id)
-{
-	pios_spi_gyro = spi_id;
+	if(PIOS_MPU6000_Validate(dev) != 0)
+		return -1;
+	
+	PIOS_SPI_RC_PinSet(dev->spi_id,dev->slave_num,1);
+	
+	return PIOS_SPI_ReleaseBus(dev->spi_id);
 }
 
 /**
@@ -178,8 +230,8 @@ static int32_t PIOS_MPU6000_GetReg(uint8_t reg)
 	if(PIOS_MPU6000_ClaimBus() != 0)
 		return -1;	
 	
-	PIOS_SPI_TransferByte(pios_spi_gyro,(0x80 | reg) ); // request byte
-	data = PIOS_SPI_TransferByte(pios_spi_gyro,0 );     // receive response
+	PIOS_SPI_TransferByte(dev->spi_id,(0x80 | reg) ); // request byte
+	data = PIOS_SPI_TransferByte(dev->spi_id,0 );     // receive response
 	
 	PIOS_MPU6000_ReleaseBus();
 	return data;
@@ -198,12 +250,12 @@ static int32_t PIOS_MPU6000_SetReg(uint8_t reg, uint8_t data)
 	if(PIOS_MPU6000_ClaimBus() != 0)
 		return -1;
 	
-	if(PIOS_SPI_TransferByte(pios_spi_gyro, 0x7f & reg) != 0) {
+	if(PIOS_SPI_TransferByte(dev->spi_id, 0x7f & reg) != 0) {
 		PIOS_MPU6000_ReleaseBus();
 		return -2;
 	}
 	
-	if(PIOS_SPI_TransferByte(pios_spi_gyro, data) != 0) {
+	if(PIOS_SPI_TransferByte(dev->spi_id, data) != 0) {
 		PIOS_MPU6000_ReleaseBus();
 		return -3;
 	}
@@ -226,7 +278,7 @@ int32_t PIOS_MPU6000_ReadGyros(struct pios_mpu6000_data * data)
 	if(PIOS_MPU6000_ClaimBus() != 0)
 		return -1;
 
-	if(PIOS_SPI_TransferBlock(pios_spi_gyro, &buf[0], &rec[0], sizeof(buf), NULL) < 0)
+	if(PIOS_SPI_TransferBlock(dev->spi_id, &buf[0], &rec[0], sizeof(buf), NULL) < 0)
 		return -2;
 		
 	PIOS_MPU6000_ReleaseBus();
@@ -251,28 +303,21 @@ int32_t PIOS_MPU6000_ReadID()
 }
 
 /**
- * \brief Reads the data from the MPU6000 FIFO
- * \param[out] buffer destination buffer
- * \param[in] len maximum number of bytes which should be read
- * \note This returns the data as X, Y, Z the temperature
- * \return number of bytes transferred if operation was successful
- * \return -1 if error during I2C transfer
+ * \brief Reads the queue handle
+ * \return Handle to the queue or null if invalid device
  */
-int32_t PIOS_MPU6000_ReadFifo(struct pios_mpu6000_data * buffer)
+xQueueHandle PIOS_MPU6000_GetQueue()
 {
-	if(fifoBuf_getUsed(&pios_mpu6000_fifo) < sizeof(*buffer))
-		return -1;
-		
-	fifoBuf_getData(&pios_mpu6000_fifo, (uint8_t *) buffer, sizeof(*buffer));
+	if(PIOS_MPU6000_Validate(dev) != 0)
+		return (xQueueHandle) NULL;
 	
-	return 0;
+	return dev->queue;
 }
-
 
 
 float PIOS_MPU6000_GetScale() 
 {
-	switch (cfg->gyro_range) {
+	switch (dev->cfg->gyro_range) {
 		case PIOS_MPU6000_SCALE_250_DEG:
 			return 1.0f / 131.0f;
 		case PIOS_MPU6000_SCALE_500_DEG:
@@ -287,7 +332,17 @@ float PIOS_MPU6000_GetScale()
 
 float PIOS_MPU6000_GetAccelScale()
 {
-	return GRAV / 2048.0f;
+	switch (dev->cfg->accel_range) {
+		case PIOS_MPU6000_ACCEL_2G:
+			return GRAV / 16384.0f;
+		case PIOS_MPU6000_ACCEL_4G:
+			return GRAV / 8192.0f;
+		case PIOS_MPU6000_ACCEL_8G:
+			return GRAV / 4096.0f;
+		case PIOS_MPU6000_ACCEL_16G:
+			return GRAV / 2048.0f;
+	}
+	return 0;
 }
 
 /**
@@ -321,7 +376,7 @@ static int32_t PIOS_MPU6000_FifoDepth(void)
 	if(PIOS_MPU6000_ClaimBus() != 0)
 		return -1;
 
-	if(PIOS_SPI_TransferBlock(pios_spi_gyro, &mpu6000_send_buf[0], &mpu6000_rec_buf[0], sizeof(mpu6000_send_buf), NULL) < 0) {
+	if(PIOS_SPI_TransferBlock(dev->spi_id, &mpu6000_send_buf[0], &mpu6000_rec_buf[0], sizeof(mpu6000_send_buf), NULL) < 0) {
 		PIOS_MPU6000_ReleaseBus();
 		return -1;
 	}
@@ -336,7 +391,7 @@ static int32_t PIOS_MPU6000_FifoDepth(void)
 */
 uint32_t mpu6000_irq = 0;
 int32_t mpu6000_count;
-uint32_t mpu6000_fifo_full = 0;
+uint32_t mpu6000_fifo_backup = 0;
 
 uint8_t mpu6000_last_read_count = 0;
 uint32_t mpu6000_fails = 0;
@@ -364,44 +419,32 @@ void PIOS_MPU6000_IRQHandler(void)
 	uint8_t mpu6000_send_buf[1+sizeof(struct pios_mpu6000_data)] = {PIOS_MPU6000_FIFO_REG | 0x80, 0, 0, 0, 0, 0, 0, 0, 0};
 	uint8_t mpu6000_rec_buf[1+sizeof(struct pios_mpu6000_data)];
 	
-	if(PIOS_SPI_TransferBlock(pios_spi_gyro, &mpu6000_send_buf[0], &mpu6000_rec_buf[0], sizeof(mpu6000_send_buf), NULL) < 0) {
+	if(PIOS_SPI_TransferBlock(dev->spi_id, &mpu6000_send_buf[0], &mpu6000_rec_buf[0], sizeof(mpu6000_send_buf), NULL) < 0) {
 		PIOS_MPU6000_ReleaseBus();
 		mpu6000_fails++;
 		return;
 	}
 
 	PIOS_MPU6000_ReleaseBus();
-	
+
 	struct pios_mpu6000_data data;
-	
-	if(fifoBuf_getFree(&pios_mpu6000_fifo) < sizeof(data)) {
-		mpu6000_fifo_full++;
-		return;			
-	}
-	
+
 	// In the case where extras samples backed up grabbed an extra
 	if (mpu6000_count >= (sizeof(data) * 2)) {
+		mpu6000_fifo_backup++;
 		if(PIOS_MPU6000_ClaimBus() != 0)
 			return;		
 		
 		uint8_t mpu6000_send_buf[1+sizeof(struct pios_mpu6000_data)] = {PIOS_MPU6000_FIFO_REG | 0x80, 0, 0, 0, 0, 0, 0, 0, 0};
 		uint8_t mpu6000_rec_buf[1+sizeof(struct pios_mpu6000_data)];
 		
-		if(PIOS_SPI_TransferBlock(pios_spi_gyro, &mpu6000_send_buf[0], &mpu6000_rec_buf[0], sizeof(mpu6000_send_buf), NULL) < 0) {
+		if(PIOS_SPI_TransferBlock(dev->spi_id, &mpu6000_send_buf[0], &mpu6000_rec_buf[0], sizeof(mpu6000_send_buf), NULL) < 0) {
 			PIOS_MPU6000_ReleaseBus();
 			mpu6000_fails++;
 			return;
 		}
 		
 		PIOS_MPU6000_ReleaseBus();
-		
-		struct pios_mpu6000_data data;
-		
-		if(fifoBuf_getFree(&pios_mpu6000_fifo) < sizeof(data)) {
-			mpu6000_fifo_full++;
-			return;			
-		}
-
 	}
 	
 #if defined(PIOS_MPU6000_ACCEL)
@@ -419,7 +462,8 @@ void PIOS_MPU6000_IRQHandler(void)
 	data.gyro_z = mpu6000_rec_buf[7] << 8 | mpu6000_rec_buf[8];
 #endif
 
-	fifoBuf_putData(&pios_mpu6000_fifo, (uint8_t *) &data, sizeof(data));	
+	xQueueSend(dev->queue, (void *) &data, 0);
+	
 	mpu6000_irq++;
 	
 	mpu6000_time_us = PIOS_DELAY_DiffuS(timeval);

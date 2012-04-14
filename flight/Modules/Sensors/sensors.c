@@ -158,8 +158,8 @@ uint32_t sensor_dt_us;
 static void SensorsTask(void *parameters)
 {
 	portTickType lastSysTime;
-	uint32_t accel_samples;
-	uint32_t gyro_samples;
+	uint32_t accel_samples = 0;
+	uint32_t gyro_samples = 0;
 	int32_t accel_accum[3] = {0, 0, 0};
 	int32_t gyro_accum[3] = {0,0,0};
 	float gyro_scaling = 0;
@@ -301,35 +301,34 @@ static void SensorsTask(void *parameters)
 			case 0x02:  // MPU6000 board
 #if defined(PIOS_INCLUDE_MPU6000)
 			{
-				struct pios_mpu6000_data gyro;
+				struct pios_mpu6000_data mpu6000_data;
+				xQueueHandle queue = PIOS_MPU6000_GetQueue();
 				
-				count = 0;
-				while((read_good = PIOS_MPU6000_ReadFifo(&gyro)) != 0 && !error)
-					error = ((xTaskGetTickCount() - lastSysTime) > SENSOR_PERIOD) ? true : error;
-				if (error)
-					continue;
-				while(read_good == 0) {
-					count++;
-					
-					gyro_accum[0] += gyro.gyro_x;
-					gyro_accum[1] += gyro.gyro_y;
-					gyro_accum[2] += gyro.gyro_z;
-					
-					accel_accum[0] += gyro.accel_x;
-					accel_accum[1] += gyro.accel_y;
-					accel_accum[2] += gyro.accel_z;
-					
-					read_good = PIOS_MPU6000_ReadFifo(&gyro);
+				while(xQueueReceive(queue, (void *) &mpu6000_data, gyro_samples == 0 ? 10 : 0) != errQUEUE_EMPTY)
+				{
+					gyro_accum[0] += mpu6000_data.gyro_x;
+					gyro_accum[1] += mpu6000_data.gyro_y;
+					gyro_accum[2] += mpu6000_data.gyro_z;
+
+					accel_accum[0] += mpu6000_data.accel_x;
+					accel_accum[1] += mpu6000_data.accel_y;
+					accel_accum[2] += mpu6000_data.accel_z;
+
+					gyro_samples ++;
+					accel_samples ++;
 				}
-				gyro_samples = count;
-				gyro_scaling = PIOS_MPU6000_GetScale();
 				
-				accel_samples = count;
+				if (gyro_samples == 0) {
+					PIOS_MPU6000_ReadGyros(&mpu6000_data);
+					error = true;
+					continue;
+				}
+
+				gyro_scaling = PIOS_MPU6000_GetScale();
 				accel_scaling = PIOS_MPU6000_GetAccelScale();
 
-				// Get temp from last reading
-				gyrosData.temperature = 35.0f + ((float) gyro.temperature + 512.0f) / 340.0f;
-				accelsData.temperature = 35.0f + ((float) gyro.temperature + 512.0f) / 340.0f;
+				gyrosData.temperature = 35.0f + ((float) mpu6000_data.temperature + 512.0f) / 340.0f;
+				accelsData.temperature = 35.0f + ((float) mpu6000_data.temperature + 512.0f) / 340.0f;
 			}
 #endif /* PIOS_INCLUDE_MPU6000 */
 				break;

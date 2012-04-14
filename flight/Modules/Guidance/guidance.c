@@ -387,7 +387,8 @@ static void updateVtolDesiredAttitude()
 			      guidanceSettings.HorizontalVelPID[GUIDANCESETTINGS_HORIZONTALVELPID_ILIMIT]);
 	northCommand = (northError * guidanceSettings.HorizontalVelPID[GUIDANCESETTINGS_HORIZONTALVELPID_KP] +
 			northVelIntegral -
-			nedAccel.North * guidanceSettings.HorizontalVelPID[GUIDANCESETTINGS_HORIZONTALVELPID_KD]);
+			nedAccel.North * guidanceSettings.HorizontalVelPID[GUIDANCESETTINGS_HORIZONTALVELPID_KD] +
+			velocityDesired.North * guidanceSettings.VelocityFeedforward);
 	
 	// Compute desired east command
 	eastError = velocityDesired.East - eastVel;
@@ -396,7 +397,8 @@ static void updateVtolDesiredAttitude()
 			     guidanceSettings.HorizontalVelPID[GUIDANCESETTINGS_HORIZONTALVELPID_ILIMIT]);
 	eastCommand = (eastError * guidanceSettings.HorizontalVelPID[GUIDANCESETTINGS_HORIZONTALVELPID_KP] + 
 		       eastVelIntegral - 
-		       nedAccel.East * guidanceSettings.HorizontalVelPID[GUIDANCESETTINGS_HORIZONTALVELPID_KD]);
+		       nedAccel.East * guidanceSettings.HorizontalVelPID[GUIDANCESETTINGS_HORIZONTALVELPID_KD] +
+			   velocityDesired.East * guidanceSettings.VelocityFeedforward);
 	
 	// Compute desired down command
 	downError = velocityDesired.Down - downVel;

@@ -8,7 +8,8 @@
         <field name="HorizontalVelPID" units="deg/(m/s)" type="float" elementnames="Kp,Ki,Kd,ILimit" defaultvalue="5,0,1,0"/>
         <field name="VerticalPosPI" units="" type="float" elementnames="Kp,Ki,ILimit" defaultvalue="0.1,0.001,200"/>
         <field name="VerticalVelPID" units="" type="float" elementnames="Kp,Ki,Kd,ILimit" defaultvalue="0.1,0,0,0"/>
-        <field name="ThrottleControl" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>
+	<field name="VelocityFeedforward" units="deg/(m/s)" type="float" elements="1" defaultvalue="0"/>
+	<field name="ThrottleControl" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>
         <field name="VelocitySource" units="" type="enum" elements="1" options="EKF,NEDVEL,GPSPOS" defaultvalue="EKF"/>
         <field name="PositionSource" units="" type="enum" elements="1" options="EKF,GPSPOS" defaultvalue="EKF"/>
         <field name="MaxRollPitch" units="deg" type="float" elements="1" defaultvalue="20"/>

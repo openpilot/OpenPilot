@@ -134,6 +134,17 @@ static void SensorsTask(void *parameters)
 
 	AlarmsClear(SYSTEMALARMS_ALARM_SENSORS);
 	
+//	HomeLocationData homeLocation;
+//	HomeLocationGet(&homeLocation);
+//	homeLocation.Latitude = 0;
+//	homeLocation.Longitude = 0;
+//	homeLocation.Altitude = 0;
+//	homeLocation.Be[0] = 26000;
+//	homeLocation.Be[1] = 400;
+//	homeLocation.Be[2] = 40000;
+//	homeLocation.Set = HOMELOCATION_SET_TRUE;
+//	HomeLocationSet(&homeLocation);
+
 	sensor_sim_type = MODEL_QUADCOPTER;
 
 	// Main task loop
@@ -329,17 +340,9 @@ static void simulateModelQuadcopter()
 	rpy[2] = (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED) * rateDesired.Yaw * (1 - ACTUATOR_ALPHA) + rpy[2] * ACTUATOR_ALPHA;
 	
 	GyrosData gyrosData; // Skip get as we set all the fields
-	gyrosData.x = rpy[1] + rand_gauss() + 3;
-	gyrosData.y = rpy[1] + rand_gauss() - 5;
-	gyrosData.z = rpy[2] + rand_gauss() + 1;
-
-	// Add in estimate of bias from sensors
-	GyrosBiasData gyrosBias;
-	GyrosBiasGet(&gyrosBias);
-	gyrosData.x += gyrosBias.x;
-	gyrosData.y += gyrosBias.y;
-	gyrosData.z += gyrosBias.z;
-
+	gyrosData.x = rpy[0] + rand_gauss();
+	gyrosData.y = rpy[1] + rand_gauss();
+	gyrosData.z = rpy[2] + rand_gauss();
 	GyrosSet(&gyrosData);
 	
 	// Predict the attitude forward in time

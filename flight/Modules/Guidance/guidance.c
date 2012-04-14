@@ -279,7 +279,7 @@ void updateVtolDesiredVelocity()
 		       eastPosIntegral);
 	
 	
-	float total_vel = sqrtf(powf(velocityDesired.North,2) + powf(velocityDesired.East,2));
+	float total_vel = sqrtf(powf(northCommand,2) + powf(eastCommand,2));
 	float scale = 1;
 	if(total_vel > guidanceSettings.HorizontalVelMax)
 		scale = guidanceSettings.HorizontalVelMax / total_vel;

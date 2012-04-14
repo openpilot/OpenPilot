@@ -73,9 +73,9 @@ void parse_ubx_nav_velned (UBXPayload payload)
 	GPSVelocityData GpsVelocity;
 	GPSVelocityGet(&GpsVelocity);
 
-	GpsVelocity.North	= (float)payload.nav_velned.velN/100.0;
-	GpsVelocity.East	= (float)payload.nav_velned.velE/100.0;
-	GpsVelocity.Down	= (float)payload.nav_velned.velD/100.0;
+	GpsVelocity.North	= (float)payload.nav_velned.velN/100.0f;
+	GpsVelocity.East	= (float)payload.nav_velned.velE/100.0f;
+	GpsVelocity.Down	= (float)payload.nav_velned.velD/100.0f;
 
 	GPSVelocitySet(&GpsVelocity);
 }

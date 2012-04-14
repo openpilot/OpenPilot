@@ -319,6 +319,7 @@ static void SensorsTask(void *parameters)
 				}
 				
 				if (gyro_samples == 0) {
+					PIOS_MPU6000_ReadGyros(&mpu6000_data);
 					error = true;
 					continue;
 				}

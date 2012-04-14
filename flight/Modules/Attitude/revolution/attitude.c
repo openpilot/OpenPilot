@@ -617,9 +617,9 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	// Because the sensor module remove the bias we need to add it
 	// back in here so that the INS algorithm can track it correctly 
 	GyrosBiasGet(&gyrosBias);
-	float gyros[3] = {(gyrosData.x + gyrosBias.x) * F_PI / 180.0f, 
-		(gyrosData.y + gyrosBias.y) * F_PI / 180.0f, 
-		(gyrosData.z + gyrosBias.z) * F_PI / 180.0f};
+	float gyros[3] = {(gyrosData.x - gyrosBias.x) * F_PI / 180.0f, 
+		(gyrosData.y - gyrosBias.y) * F_PI / 180.0f, 
+		(gyrosData.z - gyrosBias.z) * F_PI / 180.0f};
 
 	// Advance the state estimate
 	INSStatePrediction(gyros, &accelsData.x, dT);
@@ -635,9 +635,9 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	AttitudeActualSet(&attitude);
 
 	// Copy the gyro bias into the UAVO
-	gyrosBias.x = Nav.gyro_bias[0];
-	gyrosBias.y = Nav.gyro_bias[1];
-	gyrosBias.z = Nav.gyro_bias[2];
+	gyrosBias.x = -Nav.gyro_bias[0] * 180.0f / F_PI;
+	gyrosBias.y = -Nav.gyro_bias[1] * 180.0f / F_PI;
+	gyrosBias.z = -Nav.gyro_bias[2] * 180.0f / F_PI;
 	GyrosBiasSet(&gyrosBias);
 
 	// Advance the covariance estimate

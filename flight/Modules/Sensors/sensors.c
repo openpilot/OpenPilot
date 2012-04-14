@@ -317,6 +317,11 @@ static void SensorsTask(void *parameters)
 					gyro_samples ++;
 					accel_samples ++;
 				}
+				
+				if (gyro_samples == 0) {
+					error = true;
+					continue;
+				}
 
 				gyro_scaling = PIOS_MPU6000_GetScale();
 				accel_scaling = PIOS_MPU6000_GetAccelScale();

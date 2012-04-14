@@ -54,6 +54,8 @@
 #include "positionactual.h"
 #include "manualcontrol.h"
 #include "flightstatus.h"
+#include "gpsvelocity.h"
+#include "gpsposition.h"
 #include "guidancesettings.h"
 #include "nedaccel.h"
 #include "stabilizationdesired.h"
@@ -67,6 +69,7 @@
 #define MAX_QUEUE_SIZE 4
 #define STACK_SIZE_BYTES 1548
 #define TASK_PRIORITY (tskIDLE_PRIORITY+2)
+#define F_PI 3.14159265358979323846f
 // Private types
 
 // Private variables
@@ -297,7 +300,6 @@ void updateVtolDesiredVelocity()
 	float northCommand;
 	float eastCommand;
 	float downCommand;
-	
 
 	// Check how long since last update
 	if(thisSysTime > lastSysTime) // reuse dt in case of wraparound
@@ -321,7 +323,7 @@ void updateVtolDesiredVelocity()
 		       eastPosIntegral);
 	
 	
-	float total_vel = sqrtf(powf(velocityDesired.North,2) + powf(velocityDesired.East,2));
+	float total_vel = sqrtf(powf(northCommand,2) + powf(eastCommand,2));
 	float scale = 1;
 	if(total_vel > guidanceSettings.HorizontalVelMax)
 		scale = guidanceSettings.HorizontalVelMax / total_vel;
@@ -388,31 +390,60 @@ static void updateVtolDesiredAttitude()
 	StabilizationSettingsGet(&stabSettings);
 	NedAccelGet(&nedAccel);
 	
+	float northVel, eastVel, downVel;
+	switch (guidanceSettings.VelocitySource) {
+		case GUIDANCESETTINGS_VELOCITYSOURCE_EKF:
+			northVel = velocityActual.North;
+			eastVel = velocityActual.East;
+			downVel = velocityActual.Down;
+			break;
+		case GUIDANCESETTINGS_VELOCITYSOURCE_NEDVEL:
+		{
+			GPSVelocityData gpsVelocity;
+			GPSVelocityGet(&gpsVelocity);
+			northVel = gpsVelocity.North;
+			eastVel = gpsVelocity.East;
+			downVel = gpsVelocity.Down;
+		}
+		case GUIDANCESETTINGS_VELOCITYSOURCE_GPSPOS:
+		{
+			GPSPositionData gpsPosition;
+			GPSPositionGet(&gpsPosition);
+			northVel = gpsPosition.Groundspeed * cosf(gpsPosition.Heading * F_PI / 180.0f);
+			eastVel = gpsPosition.Groundspeed * sinf(gpsPosition.Heading * F_PI / 180.0f);
+			downVel = velocityActual.Down;
+		}
+		default:
+			break;
+	}
+	
 	// Testing code - refactor into manual control command
 	ManualControlCommandData manualControlData;
 	ManualControlCommandGet(&manualControlData);
 	stabDesired.Yaw = stabSettings.MaximumRate[STABILIZATIONSETTINGS_MAXIMUMRATE_YAW] * manualControlData.Yaw;	
 	
 	// Compute desired north command
-	northError = velocityDesired.North - velocityActual.North;
+	northError = velocityDesired.North - northVel;
 	northVelIntegral = bound(northVelIntegral + northError * dT * guidanceSettings.HorizontalVelPID[GUIDANCESETTINGS_HORIZONTALVELPID_KI], 
 			      -guidanceSettings.HorizontalVelPID[GUIDANCESETTINGS_HORIZONTALVELPID_ILIMIT],
 			      guidanceSettings.HorizontalVelPID[GUIDANCESETTINGS_HORIZONTALVELPID_ILIMIT]);
 	northCommand = (northError * guidanceSettings.HorizontalVelPID[GUIDANCESETTINGS_HORIZONTALVELPID_KP] +
 			northVelIntegral -
-			nedAccel.North * guidanceSettings.HorizontalVelPID[GUIDANCESETTINGS_HORIZONTALVELPID_KD]);
+			nedAccel.North * guidanceSettings.HorizontalVelPID[GUIDANCESETTINGS_HORIZONTALVELPID_KD] +
+			velocityDesired.North * guidanceSettings.VelocityFeedforward);
 	
 	// Compute desired east command
-	eastError = velocityDesired.East - velocityActual.East;
+	eastError = velocityDesired.East - eastVel;
 	eastVelIntegral = bound(eastVelIntegral + eastError * dT * guidanceSettings.HorizontalVelPID[GUIDANCESETTINGS_HORIZONTALVELPID_KI], 
 			     -guidanceSettings.HorizontalVelPID[GUIDANCESETTINGS_HORIZONTALVELPID_ILIMIT],
 			     guidanceSettings.HorizontalVelPID[GUIDANCESETTINGS_HORIZONTALVELPID_ILIMIT]);
 	eastCommand = (eastError * guidanceSettings.HorizontalVelPID[GUIDANCESETTINGS_HORIZONTALVELPID_KP] + 
 		       eastVelIntegral - 
-		       nedAccel.East * guidanceSettings.HorizontalVelPID[GUIDANCESETTINGS_HORIZONTALVELPID_KD]);
+		       nedAccel.East * guidanceSettings.HorizontalVelPID[GUIDANCESETTINGS_HORIZONTALVELPID_KD] +
+			   velocityDesired.East * guidanceSettings.VelocityFeedforward);
 	
 	// Compute desired down command
-	downError = velocityDesired.Down - velocityActual.Down;
+	downError = velocityDesired.Down - downVel;
 	// Must flip this sign 
 	downError = -downError;
 	downVelIntegral = bound(downVelIntegral + downError * dT * guidanceSettings.VerticalVelPID[GUIDANCESETTINGS_VERTICALVELPID_KI], 

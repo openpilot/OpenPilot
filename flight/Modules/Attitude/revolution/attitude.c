@@ -58,6 +58,7 @@
 #include "baroaltitude.h"
 #include "flightstatus.h"
 #include "gpsposition.h"
+#include "gpsvelocity.h"
 #include "gyros.h"
 #include "gyrosbias.h"
 #include "homelocation.h"
@@ -86,6 +87,7 @@ static xQueueHandle accelQueue;
 static xQueueHandle magQueue;
 static xQueueHandle baroQueue;
 static xQueueHandle gpsQueue;
+static xQueueHandle gpsVelQueue;
 
 static AttitudeSettingsData attitudeSettings;
 static HomeLocationData homeLocation;
@@ -165,6 +167,7 @@ int32_t AttitudeStart(void)
 	magQueue = xQueueCreate(1, sizeof(UAVObjEvent));
 	baroQueue = xQueueCreate(1, sizeof(UAVObjEvent));
 	gpsQueue = xQueueCreate(1, sizeof(UAVObjEvent));
+	gpsVelQueue = xQueueCreate(1, sizeof(UAVObjEvent));
 
 	// Start main task
 	xTaskCreate(AttitudeTask, (signed char *)"Attitude", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &attitudeTaskHandle);
@@ -176,7 +179,8 @@ int32_t AttitudeStart(void)
 	MagnetometerConnectQueue(magQueue);
 	BaroAltitudeConnectQueue(baroQueue);
 	GPSPositionConnectQueue(gpsQueue);
-	
+	GPSVelocityConnectQueue(gpsVelQueue);
+
 	return 0;
 }
 
@@ -468,12 +472,14 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	MagnetometerData magData;
 	BaroAltitudeData baroData;
 	GPSPositionData gpsData;
+	GPSVelocityData gpsVelData;
 	GyrosBiasData gyrosBias;
 	HomeLocationData home;
 
 	static bool mag_updated;
 	static bool baro_updated;
 	static bool gps_updated;
+	static bool gps_vel_updated;
 
 	static uint32_t ins_last_time = 0;
 	static bool inited;
@@ -508,6 +514,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	mag_updated |= (xQueueReceive(magQueue, &ev, 0 / portTICK_RATE_MS) == pdTRUE) && homeLocation.Set == HOMELOCATION_SET_TRUE;
 	baro_updated |= xQueueReceive(baroQueue, &ev, 0 / portTICK_RATE_MS) == pdTRUE;
 	gps_updated |= (xQueueReceive(gpsQueue, &ev, 0 / portTICK_RATE_MS) == pdTRUE) && outdoor_mode;
+	gps_vel_updated |= (xQueueReceive(gpsVelQueue, &ev, 0 / portTICK_RATE_MS) == pdTRUE) && outdoor_mode;
 
 	// Get most recent data
 	GyrosGet(&gyrosData);
@@ -515,6 +522,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	MagnetometerGet(&magData);
 	BaroAltitudeGet(&baroData);
 	GPSPositionGet(&gpsData);
+	GPSVelocityGet(&gpsVelData);
 	HomeLocationGet(&home);
 
 	// Have a minimum requirement for gps usage
@@ -617,9 +625,9 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	// Because the sensor module remove the bias we need to add it
 	// back in here so that the INS algorithm can track it correctly 
 	GyrosBiasGet(&gyrosBias);
-	float gyros[3] = {(gyrosData.x + gyrosBias.x) * F_PI / 180.0f, 
-		(gyrosData.y + gyrosBias.y) * F_PI / 180.0f, 
-		(gyrosData.z + gyrosBias.z) * F_PI / 180.0f};
+	float gyros[3] = {(gyrosData.x - gyrosBias.x) * F_PI / 180.0f, 
+		(gyrosData.y - gyrosBias.y) * F_PI / 180.0f, 
+		(gyrosData.z - gyrosBias.z) * F_PI / 180.0f};
 
 	// Advance the state estimate
 	INSStatePrediction(gyros, &accelsData.x, dT);
@@ -635,9 +643,9 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	AttitudeActualSet(&attitude);
 
 	// Copy the gyro bias into the UAVO
-	gyrosBias.x = Nav.gyro_bias[0];
-	gyrosBias.y = Nav.gyro_bias[1];
-	gyrosBias.z = Nav.gyro_bias[2];
+	gyrosBias.x = -Nav.gyro_bias[0] * 180.0f / F_PI;
+	gyrosBias.y = -Nav.gyro_bias[1] * 180.0f / F_PI;
+	gyrosBias.z = -Nav.gyro_bias[2] * 180.0f / F_PI;
 	GyrosBiasSet(&gyrosBias);
 
 	// Advance the covariance estimate
@@ -658,10 +666,15 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 		GPSPositionData gpsPosition;
 		GPSPositionGet(&gpsPosition);
 
-		vel[0] = gpsPosition.Groundspeed * cosf(gpsPosition.Heading * F_PI / 180.0f);
-		vel[1] = gpsPosition.Groundspeed * sinf(gpsPosition.Heading * F_PI / 180.0f);
-		vel[2] = 0;
-
+		if (0) {
+			vel[0] = gpsPosition.Groundspeed * cosf(gpsPosition.Heading * F_PI / 180.0f);
+			vel[1] = gpsPosition.Groundspeed * sinf(gpsPosition.Heading * F_PI / 180.0f);
+			vel[2] = 0;
+		} else {
+			vel[0] = gpsVelData.North;
+			vel[1] = gpsVelData.East;
+			vel[2] = gpsVelData.Down;
+		}
 		// Transform the GPS position into NED coordinates
 		getNED(&gpsPosition, NED);
 

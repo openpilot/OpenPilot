@@ -59,6 +59,7 @@
 #include "gyrosbias.h"
 #include "flightstatus.h"
 #include "gpsposition.h"
+#include "gpsvelocity.h"
 #include "homelocation.h"
 #include "magnetometer.h"
 #include "ratedesired.h"
@@ -100,6 +101,7 @@ int32_t SensorsInitialize(void)
 	GyrosInitialize();
 	GyrosBiasInitialize();
 	GPSPositionInitialize();
+	GPSVelocityInitialize();
 	MagnetometerInitialize();
 	RevoCalibrationInitialize();
 
@@ -467,6 +469,13 @@ static void simulateModelQuadcopter()
 		gpsPosition.PDOP = 1;
 		GPSPositionSet(&gpsPosition);
 		last_gps_time = PIOS_DELAY_GetRaw();
+
+		GPSVelocityData gpsVelocity;
+		GPSVelocityGet(&gpsVelocity);
+		gpsVelocity.North = vel[0] + gps_vel_drift[0];
+		gpsVelocity.East = vel[1] + gps_vel_drift[1];
+		gpsVelocity.Down = vel[2] + gps_vel_drift[2];
+		GPSVelocitySet(&gpsVelocity);
 	}
 
 	// Update mag periodically

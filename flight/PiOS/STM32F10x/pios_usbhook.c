@@ -376,7 +376,7 @@ static RESULT PIOS_USBHOOK_NoData_Setup(uint8_t RequestNo)
 	switch (Type_Recipient) {
 	case (CLASS_REQUEST | INTERFACE_RECIPIENT):
 		switch (pInformation->USBwIndex0) {
-		case 0:		/* HID */
+		case 2:		/* HID */
 			switch (RequestNo) {
 			case USB_HID_REQ_SET_PROTOCOL:
 				return PIOS_USBHOOK_SetProtocol();
@@ -386,7 +386,7 @@ static RESULT PIOS_USBHOOK_NoData_Setup(uint8_t RequestNo)
 			break;
 
 #if defined(PIOS_INCLUDE_USB_CDC)
-		case 1:		/* CDC Call Control Interface */
+		case 0:		/* CDC Call Control Interface */
 			switch (RequestNo) {
 			case USB_CDC_REQ_SET_LINE_CODING:
 				return PIOS_USB_CDC_SetLineCoding();

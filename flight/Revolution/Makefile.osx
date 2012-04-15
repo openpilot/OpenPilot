@@ -56,7 +56,7 @@ USE_THUMB_MODE = YES
 MODULES +=  Actuator ManualControl Stabilization 
 MODULES += AltitudeHold Guidance PathPlanner
 MODULES += Attitude/revolution
-#MODULES += SimulatedAttitude
+MODULES += OveroSync/simulated
 
 # To run simulation instead of connect to SITL
 MODULES += Sensors/simulated

@@ -191,7 +191,7 @@ MODULE_INITCALL(AttitudeInitialize, AttitudeStart)
  */
 static void AttitudeTask(void *parameters)
 {
-	bool first_run;
+	bool first_run = true;
 	uint32_t last_algorithm;
 	AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
 
@@ -509,6 +509,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 		mag_updated = 0;
 		baro_updated = 0;
 		gps_updated = 0;
+		gps_vel_updated = 0;
 	}
 
 	mag_updated |= (xQueueReceive(magQueue, &ev, 0 / portTICK_RATE_MS) == pdTRUE) && homeLocation.Set == HOMELOCATION_SET_TRUE;
@@ -659,24 +660,19 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 
 	INSSetMagNorth(home.Be);
 
-	if(gps_updated && outdoor_mode)
+	if (gps_updated && outdoor_mode)
 	{
 		INSSetPosVelVar(revoCalibration.gps_var[REVOCALIBRATION_GPS_VAR_POS], revoCalibration.gps_var[REVOCALIBRATION_GPS_VAR_VEL]);
-		sensors |= POS_SENSORS | HORIZ_SENSORS;
-		GPSPositionData gpsPosition;
-		GPSPositionGet(&gpsPosition);
+		sensors |= POS_SENSORS;
 
-		if (0) {
-			vel[0] = gpsPosition.Groundspeed * cosf(gpsPosition.Heading * F_PI / 180.0f);
-			vel[1] = gpsPosition.Groundspeed * sinf(gpsPosition.Heading * F_PI / 180.0f);
+		if (0) { // Old code to take horizontal velocity from GPS Position update
+			sensors |= HORIZ_SENSORS;
+			vel[0] = gpsData.Groundspeed * cosf(gpsData.Heading * F_PI / 180.0f);
+			vel[1] = gpsData.Groundspeed * sinf(gpsData.Heading * F_PI / 180.0f);
 			vel[2] = 0;
-		} else {
-			vel[0] = gpsVelData.North;
-			vel[1] = gpsVelData.East;
-			vel[2] = gpsVelData.Down;
 		}
 		// Transform the GPS position into NED coordinates
-		getNED(&gpsPosition, NED);
+		getNED(&gpsData, NED);
 
 		// Store this for inspecting offline
 		NEDPositionData nedPos;
@@ -695,6 +691,13 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 		sensors |= POS_SENSORS |VERT_SENSORS;
 	}
 
+	if (gps_vel_updated && outdoor_mode) {
+		sensors |= HORIZ_SENSORS | VERT_SENSORS;
+		vel[0] = gpsVelData.North;
+		vel[1] = gpsVelData.East;
+		vel[2] = gpsVelData.Down;
+	}
+	
 	/*
 	 * TODO: Need to add a general sanity check for all the inputs to make sure their kosher
 	 * although probably should occur within INS itself

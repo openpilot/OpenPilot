@@ -85,6 +85,8 @@ static void simulateConstant();
 static void simulateModelAgnostic();
 static void simulateModelQuadcopter();
 
+static float accel_bias[3];
+
 static float rand_gauss();
 
 enum sensor_sim_type {CONSTANT, MODEL_AGNOSTIC, MODEL_QUADCOPTER} sensor_sim_type;
@@ -95,6 +97,11 @@ enum sensor_sim_type {CONSTANT, MODEL_AGNOSTIC, MODEL_QUADCOPTER} sensor_sim_typ
  */
 int32_t SensorsInitialize(void)
 {
+
+	accel_bias[0] = rand_gauss() / 10;
+	accel_bias[1] = rand_gauss() / 10;
+	accel_bias[2] = rand_gauss() / 10;
+
 	AccelsInitialize();
 	AttitudeSimulatedInitialize();
 	BaroAltitudeInitialize();
@@ -413,9 +420,9 @@ static void simulateModelQuadcopter()
 	
 	// Transform the accels back in to body frame
 	AccelsData accelsData; // Skip get as we set all the fields
-	accelsData.x = ned_accel[0] * Rbe[0][0] + ned_accel[1] * Rbe[0][1] + ned_accel[2] * Rbe[0][2];
-	accelsData.y = ned_accel[0] * Rbe[1][0] + ned_accel[1] * Rbe[1][1] + ned_accel[2] * Rbe[1][2];
-	accelsData.z = ned_accel[0] * Rbe[2][0] + ned_accel[1] * Rbe[2][1] + ned_accel[2] * Rbe[2][2];
+	accelsData.x = ned_accel[0] * Rbe[0][0] + ned_accel[1] * Rbe[0][1] + ned_accel[2] * Rbe[0][2] + accel_bias[0];
+	accelsData.y = ned_accel[0] * Rbe[1][0] + ned_accel[1] * Rbe[1][1] + ned_accel[2] * Rbe[1][2] + accel_bias[1];
+	accelsData.z = ned_accel[0] * Rbe[2][0] + ned_accel[1] * Rbe[2][1] + ned_accel[2] * Rbe[2][2] + accel_bias[2];
 	accelsData.temperature = 30;
 	AccelsSet(&accelsData);
 
@@ -439,6 +446,11 @@ static void simulateModelQuadcopter()
 	HomeLocationData homeLocation;
 	HomeLocationGet(&homeLocation);
 
+	static float gps_vel_drift[3] = {0,0,0};
+	gps_vel_drift[0] = gps_vel_drift[0] * 0.65 + rand_gauss() / 5.0;
+	gps_vel_drift[1] = gps_vel_drift[1] * 0.65 + rand_gauss() / 5.0;
+	gps_vel_drift[2] = gps_vel_drift[2] * 0.65 + rand_gauss() / 5.0;
+
 	// Update GPS periodically	
 	static uint32_t last_gps_time = 0;
 	if(PIOS_DELAY_DiffuS(last_gps_time) / 1.0e6 > GPS_PERIOD) {
@@ -453,11 +465,6 @@ static void simulateModelQuadcopter()
 		gps_drift[1] = gps_drift[1] * 0.95 + rand_gauss() / 10.0;
 		gps_drift[2] = gps_drift[2] * 0.95 + rand_gauss() / 10.0;
 
-		static float gps_vel_drift[3] = {0,0,0};
-		gps_vel_drift[0] = gps_vel_drift[0] * 0.65 + rand_gauss() / 5.0;
-		gps_vel_drift[1] = gps_vel_drift[1] * 0.65 + rand_gauss() / 5.0;
-		gps_vel_drift[2] = gps_vel_drift[2] * 0.65 + rand_gauss() / 5.0;
-
 		GPSPositionData gpsPosition;
 		GPSPositionGet(&gpsPosition);
 		gpsPosition.Latitude = homeLocation.Latitude + ((pos[0] + gps_drift[0]) / T[0] * 10.0e6);
@@ -469,13 +476,18 @@ static void simulateModelQuadcopter()
 		gpsPosition.PDOP = 1;
 		GPSPositionSet(&gpsPosition);
 		last_gps_time = PIOS_DELAY_GetRaw();
-
+	}
+	
+	// Update GPS Velocity measurements
+	static uint32_t last_gps_vel_time = 1000; // Delay by a millisecond
+	if(PIOS_DELAY_DiffuS(last_gps_vel_time) / 1.0e6 > GPS_PERIOD) {
 		GPSVelocityData gpsVelocity;
 		GPSVelocityGet(&gpsVelocity);
 		gpsVelocity.North = vel[0] + gps_vel_drift[0];
 		gpsVelocity.East = vel[1] + gps_vel_drift[1];
 		gpsVelocity.Down = vel[2] + gps_vel_drift[2];
 		GPSVelocitySet(&gpsVelocity);
+		last_gps_vel_time = PIOS_DELAY_GetRaw();
 	}
 
 	// Update mag periodically

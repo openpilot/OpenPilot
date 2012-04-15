@@ -30,8 +30,8 @@
 
 #include "openpilot.h"
 #include "pios.h"
-#include "NMEA.h"
 #include "gpsposition.h"
+#include "NMEA.h"
 #include "gpstime.h"
 #include "gpssatellites.h"
 
@@ -285,7 +285,7 @@ static bool NMEA_latlon_to_fixed_point(int32_t * latlon, char *nmea_latlon, bool
  * \return true if the sentence was successfully parsed
  * \return false if any errors were encountered with the parsing
  */
-bool NMEA_update_position(char *nmea_sentence)
+bool NMEA_update_position(char *nmea_sentence, GPSPositionData *GpsData)
 {
 	char* p = nmea_sentence;
 	char* params[MAX_NB_PARAMS];
@@ -340,11 +340,9 @@ bool NMEA_update_position(char *nmea_sentence)
 		DEBUG_MSG("%s %d ", params[0], parser->cnt);
 	#endif
 	// Send the message to then parser and get it update the GpsData
-	GPSPositionData GpsData;
-	GPSPositionGet(&GpsData);
-	bool gpsDataUpdated;
+	bool gpsDataUpdated = false;
 
-	if (!parser->handler(&GpsData, &gpsDataUpdated, params, nbParams)) {
+	if (!parser->handler(GpsData, &gpsDataUpdated, params, nbParams)) {
 		// Parse failed
 		DEBUG_MSG("PARSE FAILED (\"%s\")\n", params[0]);
 		return false;
@@ -356,7 +354,7 @@ bool NMEA_update_position(char *nmea_sentence)
 		#ifdef DEBUG_MGSID_IN
 			DEBUG_MSG("U");
 		#endif
-		GPSPositionSet(&GpsData);
+		GPSPositionSet(GpsData);
 	}
 
 	#ifdef DEBUG_MGSID_IN
@@ -431,7 +429,7 @@ static bool nmeaProcessGPRMC(GPSPositionData * GpsData, bool* gpsDataUpdated, ch
 	DEBUG_MSG(" DateOfFix=%s\n\n", param[9]);
 #endif
 
-	*gpsDataUpdated = true;
+	*gpsDataUpdated = false;
 
 #if !defined(PIOS_GPS_MINIMAL)
 	GPSTimeData gpst;
@@ -489,7 +487,7 @@ static bool nmeaProcessGPVTG(GPSPositionData * GpsData, bool* gpsDataUpdated, ch
 	DEBUG_MSG(" GroundSpeed=%s %s\n", param[5], param[6]);
 #endif
 
-	*gpsDataUpdated = true;
+	*gpsDataUpdated = false;
 
 	GpsData->Heading = NMEA_real_to_float(param[1]);
 	GpsData->Groundspeed = NMEA_real_to_float(param[5]) * 0.51444f; // to m/s
@@ -555,7 +553,7 @@ static bool nmeaProcessGPGSV(GPSPositionData * GpsData, bool* gpsDataUpdated, ch
 	uint8_t nbSentences = atoi(param[1]);
 	uint8_t currSentence = atoi(param[2]);
 
-	*gpsDataUpdated = true;
+	*gpsDataUpdated = false;
 
 	if (nbSentences < 1 || nbSentences > 8 || currSentence < 1 || currSentence > nbSentences)
 		return false;
@@ -639,7 +637,7 @@ static bool nmeaProcessGPGSA(GPSPositionData * GpsData, bool* gpsDataUpdated, ch
 	DEBUG_MSG(" VDOP=%s\n", param[17]);
 #endif
 
-	*gpsDataUpdated = true;
+	*gpsDataUpdated = false;
 
 	switch (atoi(param[2])) {
 	case 1:

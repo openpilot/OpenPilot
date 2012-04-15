@@ -390,7 +390,7 @@ static void updateVtolDesiredAttitude()
 	StabilizationSettingsGet(&stabSettings);
 	NedAccelGet(&nedAccel);
 	
-	float northVel, eastVel, downVel;
+	float northVel = 0, eastVel = 0, downVel = 0;
 	switch (guidanceSettings.VelocitySource) {
 		case GUIDANCESETTINGS_VELOCITYSOURCE_EKF:
 			northVel = velocityActual.North;
@@ -414,6 +414,7 @@ static void updateVtolDesiredAttitude()
 			downVel = velocityActual.Down;
 		}
 		default:
+			PIOS_Assert(0);
 			break;
 	}
 	

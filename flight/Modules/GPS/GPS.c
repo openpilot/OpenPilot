@@ -35,10 +35,6 @@
 
 #include <stdbool.h>
 
-#include "NMEA.h"
-#include "UBX.h"
-
-
 #include "gpsposition.h"
 #include "homelocation.h"
 #include "gpstime.h"
@@ -47,6 +43,9 @@
 #include "WorldMagModel.h"
 #include "CoordinateConversions.h"
 #include "hwsettings.h"
+
+#include "NMEA.h"
+#include "UBX.h"
 
 
 // ****************
@@ -202,6 +201,8 @@ static void gpsTask(void *parameters)
 	timeOfLastUpdateMs = timeNowMs;
 	timeOfLastCommandMs = timeNowMs;
 
+
+	GPSPositionGet(&GpsData);
 	// Loop forever
 	while (1)
 	{
@@ -345,7 +346,7 @@ static void gpsTask(void *parameters)
 				}
 				else
 				{	// Valid checksum, use this packet to update the GPS position
-					if (!NMEA_update_position(&gps_rx_buffer[1])) {
+					if (!NMEA_update_position(&gps_rx_buffer[1],&GpsData)) {
 						//PIOS_DEBUG_PinHigh(2);
 						++numParsingErrors;
 						//PIOS_DEBUG_PinLow(2);
@@ -366,7 +367,6 @@ static void gpsTask(void *parameters)
 		{	// we have not received any valid GPS sentences for a while.
 			// either the GPS is not plugged in or a hardware problem or the GPS has locked up.
 
-			GPSPositionGet(&GpsData);
 			GpsData.Status = GPSPOSITION_STATUS_NOGPS;
 			GPSPositionSet(&GpsData);
 			AlarmsSet(SYSTEMALARMS_ALARM_GPS, SYSTEMALARMS_ALARM_ERROR);
@@ -374,8 +374,6 @@ static void gpsTask(void *parameters)
 		}
 		else
 		{	// we appear to be receiving GPS sentences OK, we've had an update
-
-			GPSPositionGet(&GpsData);
 
 #ifdef PIOS_GPS_SETS_HOMELOCATION
 			HomeLocationData home;

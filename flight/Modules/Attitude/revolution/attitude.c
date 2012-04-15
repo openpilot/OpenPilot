@@ -432,6 +432,13 @@ static int32_t updateAttitudeComplimentary(bool first_run)
 		GPSPositionData gpsPosition;
 		GPSPositionGet(&gpsPosition);
 		getNED(&gpsPosition, NED);
+		
+		NEDPositionData nedPosition;
+		NEDPositionGet(&nedPosition);
+		nedPosition.North = NED[0];
+		nedPosition.East = NED[1];
+		nedPosition.Down = NED[2];
+		NEDPositionSet(&nedPosition);
 
 		PositionActualData positionActual;
 		PositionActualGet(&positionActual);

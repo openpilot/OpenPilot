@@ -58,6 +58,7 @@
 #include "gpsposition.h"
 #include "guidancesettings.h"
 #include "nedaccel.h"
+#include "nedposition.h"
 #include "stabilizationdesired.h"
 #include "stabilizationsettings.h"
 #include "systemsettings.h"
@@ -306,16 +307,36 @@ void updateVtolDesiredVelocity()
 		dT = (thisSysTime - lastSysTime) / portTICK_RATE_MS / 1000.0f;		
 	lastSysTime = thisSysTime;
 	
+	float northPos = 0, eastPos = 0, downPos = 0;
+	switch (guidanceSettings.PositionSource) {
+		case GUIDANCESETTINGS_POSITIONSOURCE_EKF:
+			northPos = positionActual.North;
+			eastPos = positionActual.East;
+			downPos = positionActual.Down;
+			break;
+		case GUIDANCESETTINGS_POSITIONSOURCE_GPSPOS:
+		{
+			NEDPositionData nedPosition;
+			NEDPositionGet(&nedPosition);
+			northPos = nedPosition.North;
+			eastPos = nedPosition.East;
+			downPos = nedPosition.Down;
+		}
+		default:
+			PIOS_Assert(0);
+			break;
+	}
+
 	// Note all distances in cm
 	// Compute desired north command
-	northError = positionDesired.North - positionActual.North;
+	northError = positionDesired.North - northPos;
 	northPosIntegral = bound(northPosIntegral + northError * dT * guidanceSettings.HorizontalPosPI[GUIDANCESETTINGS_HORIZONTALPOSPI_KI], 
 			      -guidanceSettings.HorizontalPosPI[GUIDANCESETTINGS_HORIZONTALPOSPI_ILIMIT],
 			      guidanceSettings.HorizontalPosPI[GUIDANCESETTINGS_HORIZONTALPOSPI_ILIMIT]);
 	northCommand = (northError * guidanceSettings.HorizontalPosPI[GUIDANCESETTINGS_HORIZONTALPOSPI_KP] +
 			northPosIntegral);
 	
-	eastError = positionDesired.East - positionActual.East;
+	eastError = positionDesired.East - eastPos;
 	eastPosIntegral = bound(eastPosIntegral + eastError * dT * guidanceSettings.HorizontalPosPI[GUIDANCESETTINGS_HORIZONTALPOSPI_KI], 
 				 -guidanceSettings.HorizontalPosPI[GUIDANCESETTINGS_HORIZONTALPOSPI_ILIMIT],
 				 guidanceSettings.HorizontalPosPI[GUIDANCESETTINGS_HORIZONTALPOSPI_ILIMIT]);
@@ -331,7 +352,7 @@ void updateVtolDesiredVelocity()
 	velocityDesired.North = northCommand * scale;
 	velocityDesired.East = eastCommand * scale;
 
-	downError = positionDesired.Down - positionActual.Down;
+	downError = positionDesired.Down - downPos;
 	downPosIntegral = bound(downPosIntegral + downError * dT * guidanceSettings.VerticalPosPI[GUIDANCESETTINGS_VERTICALPOSPI_KI], 
 				-guidanceSettings.VerticalPosPI[GUIDANCESETTINGS_VERTICALPOSPI_ILIMIT],
 				guidanceSettings.VerticalPosPI[GUIDANCESETTINGS_VERTICALPOSPI_ILIMIT]);

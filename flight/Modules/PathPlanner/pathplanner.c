@@ -41,7 +41,7 @@
 #include "waypointactive.h"
 
 // Private constants
-#define STACK_SIZE_BYTES 512
+#define STACK_SIZE_BYTES 1024
 #define TASK_PRIORITY (tskIDLE_PRIORITY+1)
 #define MAX_QUEUE_SIZE 2
 

@@ -76,7 +76,7 @@ void PIOS_Board_Init(void) {
 	}
 #if defined(PIOS_INCLUDE_USB_HID) && defined(PIOS_INCLUDE_COM_MSG)
 	uint32_t pios_usb_hid_id;
-	if (PIOS_USB_HID_Init(&pios_usb_hid_id, &pios_usb_hid_cfg, pios_usb_id)) {
+	if (PIOS_USB_HID_Init(&pios_usb_hid_id, &pios_usb_hid_without_vcp_cfg, pios_usb_id)) {
 		PIOS_Assert(0);
 	}
 	if (PIOS_COM_MSG_Init(&pios_com_telem_usb_id, &pios_usb_hid_com_driver, pios_usb_hid_id)) {

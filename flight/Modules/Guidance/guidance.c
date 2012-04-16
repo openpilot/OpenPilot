@@ -322,6 +322,7 @@ void updateVtolDesiredVelocity()
 			eastPos = nedPosition.East;
 			downPos = nedPosition.Down;
 		}
+			break;
 		default:
 			PIOS_Assert(0);
 			break;
@@ -426,6 +427,7 @@ static void updateVtolDesiredAttitude()
 			eastVel = gpsVelocity.East;
 			downVel = gpsVelocity.Down;
 		}
+			break;
 		case GUIDANCESETTINGS_VELOCITYSOURCE_GPSPOS:
 		{
 			GPSPositionData gpsPosition;
@@ -434,6 +436,7 @@ static void updateVtolDesiredAttitude()
 			eastVel = gpsPosition.Groundspeed * sinf(gpsPosition.Heading * F_PI / 180.0f);
 			downVel = velocityActual.Down;
 		}
+			break;
 		default:
 			PIOS_Assert(0);
 			break;

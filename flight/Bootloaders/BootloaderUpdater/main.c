@@ -33,7 +33,7 @@
 /* Prototype of PIOS_Board_Init() function */
 extern void PIOS_Board_Init(void);
 extern void FLASH_Download();
-void error(int);
+void error(void);
 
 /* The ADDRESSES of the _binary_* symbols are the important
  * data.  This is non-intuitive for _binary_size where you
@@ -50,14 +50,11 @@ int main() {
 
 	PIOS_SYS_Init();
 	PIOS_Board_Init();
-	PIOS_LED_On(PIOS_LED_HEARTBEAT);
-	PIOS_DELAY_WaitmS(3000);
-	PIOS_LED_Off(PIOS_LED_HEARTBEAT);
 
 	/// Self overwrite check
 	uint32_t base_address = SCB->VTOR;
 	if ((0x08000000 + embedded_image_size) > base_address)
-		error(PIOS_LED_HEARTBEAT);
+		error();
 	///
 	FLASH_Unlock();
 
@@ -82,7 +79,7 @@ int main() {
 	}
 
 	if (fail == true)
-		error(PIOS_LED_HEARTBEAT);
+		error();
 
 
 	///
@@ -90,7 +87,6 @@ int main() {
 	/// Bootloader programing
 	for (uint32_t offset = 0; offset < embedded_image_size/sizeof(uint32_t); ++offset) {
 		bool result = false;
-		PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
 		for (uint8_t retry = 0; retry < MAX_WRI_RETRYS; ++retry) {
 			if (result == false) {
 				result = (FLASH_ProgramWord(0x08000000 + (offset * 4), embedded_image_start[offset])
@@ -98,15 +94,9 @@ int main() {
 			}
 		}
 		if (result == false)
-			error(PIOS_LED_HEARTBEAT);
+			error();
 	}
 	///
-	for (uint8_t x = 0; x < 3; ++x) {
-			PIOS_LED_On(PIOS_LED_HEARTBEAT);
-			PIOS_DELAY_WaitmS(1000);
-			PIOS_LED_Off(PIOS_LED_HEARTBEAT);
-			PIOS_DELAY_WaitmS(1000);
-	}
 
 	/// Invalidate the bootloader updater so we won't run
 	/// the update again on the next power cycle.
@@ -119,11 +109,7 @@ int main() {
 
 }
 
-void error(int led) {
+void error(void) {
 	for (;;) {
-		PIOS_LED_On(led);
-		PIOS_DELAY_WaitmS(500);
-		PIOS_LED_Off(led);
-		PIOS_DELAY_WaitmS(500);
 	}
 }

@@ -646,14 +646,6 @@ EF_BOARDS  := $(ALL_BOARDS)
 BL_BOARDS  := $(filter-out ins, $(BL_BOARDS))
 BU_BOARDS  := $(filter-out ins, $(BU_BOARDS))
 
-# FIXME: The CC bootloader updaters don't work anymore due to
-#        differences between CC and CC3D
-BU_BOARDS  := $(filter-out coptercontrol, $(BU_BOARDS))
-
-# FIXME: PipXtreme bootloader updater doesn't work due to missing
-#        definitions for LEDs
-BU_BOARDS  := $(filter-out pipxtreme, $(BU_BOARDS))
-
 # Generate the targets for whatever boards are left in each list
 FW_TARGETS := $(addprefix fw_, $(FW_BOARDS))
 BL_TARGETS := $(addprefix bl_, $(BL_BOARDS))

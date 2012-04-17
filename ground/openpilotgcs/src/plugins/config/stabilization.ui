@@ -495,7 +495,7 @@
             <property name="geometry">
              <rect>
               <x>0</x>
-              <y>0</y>
+              <y>-267</y>
               <width>667</width>
               <height>880</height>
              </rect>
@@ -1127,6 +1127,9 @@ border-radius: 3;
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
+                  </property>
+                  <property name="focusPolicy">
+                   <enum>Qt::StrongFocus</enum>
                   </property>
                   <property name="styleSheet">
                    <string notr="true"/>
@@ -3377,6 +3380,9 @@ border-radius: 5;</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
@@ -3423,6 +3429,9 @@ border-radius: 5;</string>
                        <width>43</width>
                        <height>22</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="maximum">
                       <number>200</number>
@@ -3472,6 +3481,9 @@ border-radius: 5;</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
@@ -3515,6 +3527,9 @@ border-radius: 5;</string>
                        <width>43</width>
                        <height>22</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="maximum">
                       <number>200</number>
@@ -3564,6 +3579,9 @@ border-radius: 5;</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
@@ -3607,6 +3625,9 @@ border-radius: 5;</string>
                        <width>43</width>
                        <height>22</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="maximum">
                       <number>200</number>
@@ -3659,6 +3680,9 @@ border-radius: 5;</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
@@ -3703,6 +3727,9 @@ border-radius: 5;</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="maximum">
                       <number>200</number>
                      </property>
@@ -3734,6 +3761,9 @@ border-radius: 5;</string>
                        <width>0</width>
                        <height>25</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="styleSheet">
                       <string notr="true"/>
@@ -3779,6 +3809,9 @@ border-radius: 5;</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="maximum">
                       <number>200</number>
                      </property>
@@ -3810,6 +3843,9 @@ border-radius: 5;</string>
                        <width>0</width>
                        <height>25</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="styleSheet">
                       <string notr="true"/>
@@ -3854,6 +3890,9 @@ border-radius: 5;</string>
                        <width>43</width>
                        <height>22</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="maximum">
                       <number>200</number>
@@ -4505,6 +4544,9 @@ border-radius: 3;
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
+                  </property>
+                  <property name="focusPolicy">
+                   <enum>Qt::StrongFocus</enum>
                   </property>
                   <property name="styleSheet">
                    <string notr="true"/>
@@ -6697,6 +6739,9 @@ border-radius: 5;</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
@@ -6740,6 +6785,9 @@ border-radius: 5;</string>
                        <width>43</width>
                        <height>22</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="maximum">
                       <number>200</number>
@@ -6789,6 +6837,9 @@ border-radius: 5;</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
@@ -6832,6 +6883,9 @@ border-radius: 5;</string>
                        <width>43</width>
                        <height>22</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="maximum">
                       <number>200</number>
@@ -6881,6 +6935,9 @@ border-radius: 5;</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
@@ -6924,6 +6981,9 @@ border-radius: 5;</string>
                        <width>43</width>
                        <height>22</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="maximum">
                       <number>200</number>
@@ -6992,6 +7052,9 @@ border-radius: 5;</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
@@ -7036,6 +7099,9 @@ border-radius: 5;</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="maximum">
                       <number>200</number>
                      </property>
@@ -7067,6 +7133,9 @@ border-radius: 5;</string>
                        <width>0</width>
                        <height>25</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="styleSheet">
                       <string notr="true"/>
@@ -7112,6 +7181,9 @@ border-radius: 5;</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="maximum">
                       <number>200</number>
                      </property>
@@ -7143,6 +7215,9 @@ border-radius: 5;</string>
                        <width>0</width>
                        <height>25</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="styleSheet">
                       <string notr="true"/>
@@ -7187,6 +7262,9 @@ border-radius: 5;</string>
                        <width>43</width>
                        <height>22</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="maximum">
                       <number>200</number>
@@ -10141,6 +10219,9 @@ Angle</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
@@ -10183,6 +10264,9 @@ Angle</string>
                        <width>43</width>
                        <height>22</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="maximum">
                       <number>200</number>
@@ -10231,6 +10315,9 @@ Angle</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
@@ -10273,6 +10360,9 @@ Angle</string>
                        <width>43</width>
                        <height>22</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="maximum">
                       <number>200</number>
@@ -10321,6 +10411,9 @@ Angle</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
@@ -10363,6 +10456,9 @@ Angle</string>
                        <width>43</width>
                        <height>22</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="maximum">
                       <number>200</number>
@@ -10415,6 +10511,9 @@ Rate</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
@@ -10459,6 +10558,9 @@ Rate</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="maximum">
                       <number>200</number>
                      </property>
@@ -10490,6 +10592,9 @@ Rate</string>
                        <width>0</width>
                        <height>25</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="styleSheet">
                       <string notr="true"/>
@@ -10535,6 +10640,9 @@ Rate</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="maximum">
                       <number>200</number>
                      </property>
@@ -10566,6 +10674,9 @@ Rate</string>
                        <width>0</width>
                        <height>25</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="styleSheet">
                       <string notr="true"/>
@@ -10610,6 +10721,9 @@ Rate</string>
                        <width>43</width>
                        <height>22</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="maximum">
                       <number>200</number>
@@ -10663,6 +10777,9 @@ Attitude</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
@@ -10707,6 +10824,9 @@ Attitude</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="maximum">
                       <number>200</number>
                      </property>
@@ -10738,6 +10858,9 @@ Attitude</string>
                        <width>0</width>
                        <height>25</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="styleSheet">
                       <string notr="true"/>
@@ -10783,6 +10906,9 @@ Attitude</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="maximum">
                       <number>200</number>
                      </property>
@@ -10814,6 +10940,9 @@ Attitude</string>
                        <width>0</width>
                        <height>25</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="styleSheet">
                       <string notr="true"/>
@@ -10858,6 +10987,9 @@ Attitude</string>
                        <width>43</width>
                        <height>22</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="maximum">
                       <number>200</number>
@@ -11753,7 +11885,7 @@ border-radius: 4;
             <property name="geometry">
              <rect>
               <x>0</x>
-              <y>0</y>
+              <y>-466</y>
               <width>667</width>
               <height>1079</height>
              </rect>
@@ -25598,6 +25730,109 @@ border-radius: 4;
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>scrollArea</tabstop>
+  <tabstop>checkBox_7</tabstop>
+  <tabstop>pushButton_19</tabstop>
+  <tabstop>pushButton_20</tabstop>
+  <tabstop>horizontalSlider_76</tabstop>
+  <tabstop>spinBox_7</tabstop>
+  <tabstop>PitchPSlider</tabstop>
+  <tabstop>spinBox_PitchRateP</tabstop>
+  <tabstop>horizontalSlider_78</tabstop>
+  <tabstop>spinBox_12</tabstop>
+  <tabstop>horizontalSlider_79</tabstop>
+  <tabstop>spinBox_8</tabstop>
+  <tabstop>horizontalSlider_80</tabstop>
+  <tabstop>spinBox_9</tabstop>
+  <tabstop>horizontalSlider_81</tabstop>
+  <tabstop>spinBox_10</tabstop>
+  <tabstop>checkBox_8</tabstop>
+  <tabstop>pushButton_21</tabstop>
+  <tabstop>pushButton_22</tabstop>
+  <tabstop>horizontalSlider_82</tabstop>
+  <tabstop>spinBox_13</tabstop>
+  <tabstop>horizontalSlider_83</tabstop>
+  <tabstop>spinBox_14</tabstop>
+  <tabstop>horizontalSlider_84</tabstop>
+  <tabstop>spinBox_15</tabstop>
+  <tabstop>horizontalSlider_85</tabstop>
+  <tabstop>spinBox_18</tabstop>
+  <tabstop>horizontalSlider_86</tabstop>
+  <tabstop>spinBox_19</tabstop>
+  <tabstop>horizontalSlider_87</tabstop>
+  <tabstop>spinBox_20</tabstop>
+  <tabstop>pushButton_23</tabstop>
+  <tabstop>pushButton_24</tabstop>
+  <tabstop>horizontalSlider_88</tabstop>
+  <tabstop>spinBox_16</tabstop>
+  <tabstop>horizontalSlider_89</tabstop>
+  <tabstop>spinBox_17</tabstop>
+  <tabstop>horizontalSlider_90</tabstop>
+  <tabstop>spinBox_21</tabstop>
+  <tabstop>horizontalSlider_91</tabstop>
+  <tabstop>spinBox_22</tabstop>
+  <tabstop>horizontalSlider_92</tabstop>
+  <tabstop>spinBox_23</tabstop>
+  <tabstop>horizontalSlider_93</tabstop>
+  <tabstop>spinBox_24</tabstop>
+  <tabstop>horizontalSlider_94</tabstop>
+  <tabstop>spinBox_25</tabstop>
+  <tabstop>horizontalSlider_95</tabstop>
+  <tabstop>spinBox_26</tabstop>
+  <tabstop>horizontalSlider_96</tabstop>
+  <tabstop>spinBox_27</tabstop>
+  <tabstop>lowThrottleZeroIntegral_8</tabstop>
+  <tabstop>realTimeUpdates_6</tabstop>
+  <tabstop>stabilizationReloadBoardData_6</tabstop>
+  <tabstop>saveStabilizationToRAM_6</tabstop>
+  <tabstop>saveStabilizationToSD_6</tabstop>
+  <tabstop>scrollArea_2</tabstop>
+  <tabstop>checkBox_3</tabstop>
+  <tabstop>pushButton_4</tabstop>
+  <tabstop>RateRollKp_2</tabstop>
+  <tabstop>RatePitchKp</tabstop>
+  <tabstop>RateYawKp</tabstop>
+  <tabstop>RateRollKi_2</tabstop>
+  <tabstop>RatePitchKi</tabstop>
+  <tabstop>RateYawKi</tabstop>
+  <tabstop>RollRateKd</tabstop>
+  <tabstop>PitchRateKd</tabstop>
+  <tabstop>YawRateKd</tabstop>
+  <tabstop>RateRollILimit_2</tabstop>
+  <tabstop>RatePitchILimit</tabstop>
+  <tabstop>RateYawILimit</tabstop>
+  <tabstop>checkBox_2</tabstop>
+  <tabstop>pushButton_2</tabstop>
+  <tabstop>AttitudeRollKp</tabstop>
+  <tabstop>AttitudePitchKp_2</tabstop>
+  <tabstop>AttitudeYawKp</tabstop>
+  <tabstop>AttitudeRollKi</tabstop>
+  <tabstop>AttitudePitchKi_2</tabstop>
+  <tabstop>AttitudeYawKi</tabstop>
+  <tabstop>AttitudeRollILimit</tabstop>
+  <tabstop>AttitudePitchILimit_2</tabstop>
+  <tabstop>AttitudeYawILimit</tabstop>
+  <tabstop>pushButton_3</tabstop>
+  <tabstop>rateRollKp_3</tabstop>
+  <tabstop>ratePitchKp_4</tabstop>
+  <tabstop>rateRollKi_3</tabstop>
+  <tabstop>ratePitchKi_4</tabstop>
+  <tabstop>rateYawKi_3</tabstop>
+  <tabstop>rateRollILimit_3</tabstop>
+  <tabstop>ratePitchILimit_4</tabstop>
+  <tabstop>rateYawILimit_3</tabstop>
+  <tabstop>rateYawKp_3</tabstop>
+  <tabstop>pushButton_5</tabstop>
+  <tabstop>GyroTau</tabstop>
+  <tabstop>AccelKp</tabstop>
+  <tabstop>AccelKi</tabstop>
+  <tabstop>lowThrottleZeroIntegral_9</tabstop>
+  <tabstop>realTimeUpdates_7</tabstop>
+  <tabstop>saveStabilizationToRAM_7</tabstop>
+  <tabstop>saveStabilizationToSD_7</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

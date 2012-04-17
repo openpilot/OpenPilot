@@ -37,6 +37,7 @@
  */
 
 #include "openpilot.h"
+#include "hwsettings.h"
 #include "airspeed.h"
 #include "baroairspeed.h"	// object that will be updated by the module
 #if defined(PIOS_INCLUDE_HCSR04)
@@ -46,6 +47,7 @@
 // Private constants
 #define STACK_SIZE_BYTES 500
 #define TASK_PRIORITY (tskIDLE_PRIORITY+1)
+#define SENSITIVE_DELAY_MS 500
 
 // Private types
 
@@ -114,25 +116,13 @@ static void airspeedTask(void *parameters)
 	// Main task loop
 	while (1)
 	{
-		float temp, press;
+		float airspeed;
 		
-		// Update the temperature data
-		PIOS_MS5611_StartADC(TemperatureConv);
-		vTaskDelay(PIOS_MS5611_GetDelay());
-		PIOS_MS5611_ReadADC();
+		// Update the airspeed
+		vTaskDelay(SENSITIVE_DELAY_MS);
+		airspeed = PIOS_ETASV3_ReadAirspeed();
 		
-		// Update the pressure data
-		PIOS_MS5611_StartADC(PressureConv);
-		vTaskDelay(PIOS_MS5611_GetDelay());
-		PIOS_MS5611_ReadADC();
-
-		
-		temp = PIOS_MS5611_GetTemperature();
-		press = PIOS_MS5611_GetPressure();
-		
-		data.Temperature = temp;
-		data.Pressure = press;
-		data.Airspeed = 44330.0f * (1.0f - powf(data.Pressure / MS5611_P0, (1.0f / 5.255f)));
+		data.Airspeed = airspeed;
 	
 		// Update the AirspeedActual UAVObject
 		BaroAirspeedSet(&data);

@@ -89,8 +89,8 @@ fclose(fid);
 $(CLEANUPCODE)
 
 if strcmpi(outputType,'mat')
-	matfile = strrep(logfile,'opl','mat');
-	save(matfile $(SAVEOBJECTSCODE));
+	[pathstr, name, ext] = fileparts(logfile); 
+	save([fullfile(pathstr, name) '.mat'] $(SAVEOBJECTSCODE));
 else
 $(EXPORTCSVCODE);
 end

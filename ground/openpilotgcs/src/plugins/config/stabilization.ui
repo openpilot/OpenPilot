@@ -15112,7 +15112,7 @@ value as the Kp.</string>
                       <number>6</number>
                      </property>
                      <property name="singleStep">
-                      <double>1.000000000000000</double>
+                      <double>0.000001000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -15153,7 +15153,7 @@ value as the Kp.</string>
                       <number>6</number>
                      </property>
                      <property name="singleStep">
-                      <double>1.000000000000000</double>
+                      <double>0.000001000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -15197,7 +15197,7 @@ value as the Kp.</string>
                       <number>6</number>
                      </property>
                      <property name="singleStep">
-                      <double>1.000000000000000</double>
+                      <double>0.000001000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -15235,7 +15235,7 @@ value as the Kp.</string>
                       <string notr="true"/>
                      </property>
                      <property name="text">
-                      <string>ILimit</string>
+                      <string>K_i*ILimit</string>
                      </property>
                      <property name="alignment">
                       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -15272,7 +15272,7 @@ value as the Kp.</string>
                       <number>6</number>
                      </property>
                      <property name="singleStep">
-                      <double>1.000000000000000</double>
+                      <double>0.0010000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -15313,7 +15313,7 @@ value as the Kp.</string>
                       <number>6</number>
                      </property>
                      <property name="singleStep">
-                      <double>1.000000000000000</double>
+                      <double>0.00100000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -15357,7 +15357,7 @@ value as the Kp.</string>
                       <number>6</number>
                      </property>
                      <property name="singleStep">
-                      <double>1.000000000000000</double>
+                      <double>0.00100000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -18576,7 +18576,7 @@ border-radius: 5;</string>
                       <string notr="true"/>
                      </property>
                      <property name="text">
-                      <string>ILimit</string>
+                      <string>K_i*ILimit</string>
                      </property>
                      <property name="alignment">
                       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -24847,7 +24847,7 @@ border-radius: 5;</string>
                       <double>1000000.000000000000000</double>
                      </property>
                      <property name="singleStep">
-                      <double>1.000000000000000</double>
+                      <double>0.001000000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -24893,7 +24893,7 @@ border-radius: 5;</string>
                       <double>1000000.000000000000000</double>
                      </property>
                      <property name="singleStep">
-                      <double>1.000000000000000</double>
+                      <double>0.010000000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -24939,7 +24939,7 @@ border-radius: 5;</string>
                       <double>1000000.000000000000000</double>
                      </property>
                      <property name="singleStep">
-                      <double>1.000000000000000</double>
+                      <double>0.000100000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>

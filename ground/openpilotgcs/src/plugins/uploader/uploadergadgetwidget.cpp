@@ -643,8 +643,8 @@ void UploaderGadgetWidget::versionMatchCheck()
 
     QString gcsDescription = QString::fromLatin1(Core::Constants::GCS_REVISION_STR);
     QString gcsGitHash = gcsDescription.mid(gcsDescription.indexOf(":")+1, 8);
+    gcsGitHash.remove( QRegExp("^[0]*") );
     QString gcsGitDate = gcsDescription.mid(gcsDescription.indexOf(" ")+1, 14);
-
     QString gcsVersion = gcsGitDate + " (" + gcsGitHash + ")";
     QString fwVersion = boardDescription.gitDate + " (" + boardDescription.gitHash + ")";
 

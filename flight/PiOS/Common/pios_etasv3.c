@@ -42,14 +42,14 @@ static bool PIOS_ETASV3_Read(uint8_t command, uint8_t * buffer, uint8_t len)
 	};
 
 	const struct pios_i2c_txn txn_list[] = {
-		{
+		/*{
 		 .info = __func__,
 		 .addr = ETASV3_I2C_ADDR,
 		 .rw = PIOS_I2C_TXN_WRITE,
 		 .len = sizeof(cmd_buffer),
 		 .buf = cmd_buffer,
 		 }
-		,
+		,*/
 		{
 		 .info = __func__,
 		 .addr = ETASV3_I2C_ADDR,
@@ -66,12 +66,12 @@ int16_t PIOS_ETASV3_ReadAirspeed (void)
 {
 	uint8_t airspeed_raw[2];
 
-	if (!PIOS_ETASV3_Read(ETASV3_I2C_READ_CMD, airspeed_raw, sizeof(airspeed_raw))) {
+	if (PIOS_ETASV3_Read(ETASV3_I2C_READ_CMD, airspeed_raw, sizeof(airspeed_raw)) != 0) {
 		/* Failed to read airspeed */
 		return -1;
 	}
 
-	return (airspeed_raw[0] << 8 || airspeed_raw[1]);
+	return (airspeed_raw[0] | (airspeed_raw[1]<<8));
 }
 
 #endif /* PIOS_INCLUDE_ETASV3 */

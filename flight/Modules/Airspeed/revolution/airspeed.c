@@ -47,7 +47,7 @@
 // Private constants
 #define STACK_SIZE_BYTES 500
 #define TASK_PRIORITY (tskIDLE_PRIORITY+1)
-#define SENSITIVE_DELAY_MS 500
+#define SAMPLING_DELAY_MS 50
 
 // Private types
 
@@ -113,17 +113,16 @@ static void airspeedTask(void *parameters)
 	
 	// TODO: Check the pressure sensor and set a warning if it fails test
 	
-	float test=0;
 	// Main task loop
 	while (1)
 	{
 		float airspeed;
 		
 		// Update the airspeed
-		vTaskDelay(SENSITIVE_DELAY_MS);
+		vTaskDelay(SAMPLING_DELAY_MS);
 		airspeed = PIOS_ETASV3_ReadAirspeed();
 		
-		data.Airspeed = (test++)*1000.0f + airspeed;
+		data.Airspeed = airspeed;
 	
 		// Update the AirspeedActual UAVObject
 		BaroAirspeedSet(&data);

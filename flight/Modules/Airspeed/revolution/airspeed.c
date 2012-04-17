@@ -72,7 +72,7 @@ int32_t AirspeedStart()
 	}
 	// Start main task
 	xTaskCreate(airspeedTask, (signed char *)"Airspeed", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
-	TaskMonitorAdd(TASKINFO_RUNNING_ALTITUDE, taskHandle);
+	TaskMonitorAdd(TASKINFO_RUNNING_AIRSPEED, taskHandle);
 
 	return 0;
 }
@@ -113,6 +113,7 @@ static void airspeedTask(void *parameters)
 	
 	// TODO: Check the pressure sensor and set a warning if it fails test
 	
+	float test=0;
 	// Main task loop
 	while (1)
 	{
@@ -122,7 +123,7 @@ static void airspeedTask(void *parameters)
 		vTaskDelay(SENSITIVE_DELAY_MS);
 		airspeed = PIOS_ETASV3_ReadAirspeed();
 		
-		data.Airspeed = airspeed;
+		data.Airspeed = (test++)*1000.0f + airspeed;
 	
 		// Update the AirspeedActual UAVObject
 		BaroAirspeedSet(&data);

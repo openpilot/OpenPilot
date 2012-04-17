@@ -63,7 +63,7 @@
 #define ARMED_TIME_MS      1000
 #define ARMED_THRESHOLD    0.50f
 //safe band to allow a bit of calibration error or trim offset (in microseconds)
-#define CONNECTION_OFFSET 150
+#define CONNECTION_OFFSET 250
 
 // Private types
 typedef enum
@@ -314,7 +314,7 @@ static void manualControlTask(void *parameters)
 						AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
 				}
 
-			} else {
+			} else if (valid_input_detected) {
 				AlarmsClear(SYSTEMALARMS_ALARM_MANUALCONTROL);
 
 				// Scale channels to -1 -> +1 range

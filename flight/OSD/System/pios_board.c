@@ -331,8 +331,8 @@ void init_USART_dma()
 
 }
 
-#define PIOS_COM_TELEM_RF_RX_BUF_LEN 512
-#define PIOS_COM_TELEM_RF_TX_BUF_LEN 512
+#define PIOS_COM_TELEM_RF_RX_BUF_LEN 128
+#define PIOS_COM_TELEM_RF_TX_BUF_LEN 128
 
 #define PIOS_COM_GPS_RX_BUF_LEN 32
 
@@ -667,7 +667,7 @@ GPIO_InitTypeDef GPIO_InitStructure;
 	extern t_fifo_buffer rx;
 	fifoBuf_init(&rx,RxBuffer3,sizeof(RxBuffer3));*/
 
-	//PIOS_Video_Init(&pios_video_cfg);
+	PIOS_Video_Init(&pios_video_cfg);
 
 	//uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_HKOSD_RX_BUF_LEN);
 

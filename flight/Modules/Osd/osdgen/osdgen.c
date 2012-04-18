@@ -2090,7 +2090,6 @@ void calcHomeArrow(void)
 	HomeLocationGet (&home);
 	GPSPositionData gpsData;
 	GPSPositionGet (&gpsData);
-	int plus_offset=16;
 
 	/** http://www.movable-type.co.uk/scripts/latlong.html **/
     float lat1, lat2, lon1, lon2, a, c, d, x, y, brng, u2g;
@@ -2149,16 +2148,16 @@ void calcHomeArrow(void)
 
 	char temp[50]={0};
 	sprintf(temp,"hea:%d",(int)brng);
-	write_string(temp, plus_offset+130, 5, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+	write_string(temp, 180, 30, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
 	sprintf(temp,"ele:%d",(int)elevation);
-	write_string(temp, plus_offset+130, 5+10, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+	write_string(temp, 180, 30+10, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
 	sprintf(temp,"dis:%d",(int)d);
-	write_string(temp, plus_offset+130, 5+10+10, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+	write_string(temp, 180, 30+10+10, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
 	sprintf(temp,"u2g:%d",(int)u2g);
-	write_string(temp, plus_offset+130, 5+10+10+10, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+	write_string(temp, 180, 30+10+10+10, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
 
 	sprintf(temp,"%c%c",(int)(u2g/22.5f)*2+0x90,(int)(u2g/22.5f)*2+0x91);
-	write_string(temp,plus_offset+200,10+10+10, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 3);
+	write_string(temp,250,40+10+10, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 3);
 }
 
 int lama=10;
@@ -2194,7 +2193,14 @@ void updateGraphics() {
 	GPSPositionGet(&gpsData);
 	HomeLocationData home;
 	HomeLocationGet(&home);
-	int plus_offset=16;
+	int plus_offset=40;
+/*
+ * for(int i=0; i<10;i++)
+{
+	write_vline( draw_buffer_level,75+i*16,0,GRAPHICS_HEIGHT_REAL-1,1);
+	write_vline( draw_buffer_mask,75+i*16,0,GRAPHICS_HEIGHT_REAL-1,1);
+}
+*/
 
 
 	if(home.Set == HOMELOCATION_SET_FALSE)
@@ -2202,7 +2208,7 @@ void updateGraphics() {
 		char temps[20]={0};
 		sprintf(temps,"HOME NOT SET");
 		//printTextFB(x,y,temp);
-		write_string(temps, plus_offset+GRAPHICS_WIDTH_REAL/2-((12*12)/2), GRAPHICS_HEIGHT_REAL/2-18/2, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 3);
+		write_string(temps, GRAPHICS_WIDTH_REAL/2-((12*12)/2), GRAPHICS_HEIGHT_REAL/2-18/2, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 3);
 	}
 	// Dave Simple
 	if(1)
@@ -2215,19 +2221,17 @@ void updateGraphics() {
 		char temp[50]={0};
 		memset(temp, ' ', 40);
 		sprintf(temp,"Lat:%11.7f",gpsData.Latitude/10000000.0f);
-		write_string(temp, plus_offset+5, GRAPHICS_HEIGHT_REAL-20, 0, 0, TEXT_VA_BOTTOM, TEXT_HA_LEFT, 0, 3);
+		write_string(temp, 70, GRAPHICS_HEIGHT_REAL-30, 0, 0, TEXT_VA_BOTTOM, TEXT_HA_LEFT, 0, 3);
 		sprintf(temp,"Lon:%11.7f",gpsData.Longitude/10000000.0f);
-		write_string(temp, plus_offset+5, GRAPHICS_HEIGHT_REAL-1, 0, 0, TEXT_VA_BOTTOM, TEXT_HA_LEFT, 0, 3);
+		write_string(temp, 70, GRAPHICS_HEIGHT_REAL-10, 0, 0, TEXT_VA_BOTTOM, TEXT_HA_LEFT, 0, 3);
 		sprintf(temp,"Sat:%d",(int)gpsData.Satellites);
-		write_string(temp, plus_offset+GRAPHICS_WIDTH_REAL-5, 5, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+		write_string(temp, GRAPHICS_WIDTH_REAL-40, 30, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 
 		/* Print ADC voltage FLIGHT*/
 		sprintf(temp,"V:%4.2fV",(PIOS_ADC_PinGet(2)*3.0f*6.1f/4096.0f));
-		write_string(temp, plus_offset+10, 5, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 3);
+		write_string(temp, 70, 20, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 3);
 
 		calcHomeArrow();
-		write_vline( draw_buffer_level,plus_offset,0,GRAPHICS_HEIGHT_REAL-1,1);
-		write_vline( draw_buffer_mask,plus_offset,0,GRAPHICS_HEIGHT_REAL-1,1);
 
 		// Last pixel
 		write_vline( draw_buffer_level,GRAPHICS_WIDTH_REAL-1,0,GRAPHICS_HEIGHT_REAL-1,0);
@@ -2386,7 +2390,6 @@ void updateGraphics() {
 			write_vline( draw_buffer_mask,16,0,GRAPHICS_HEIGHT_REAL-1,1);
 		}
 	}
-
 }
 
 
@@ -2449,6 +2452,13 @@ static void osdgenTask(void *parameters)
 	GPSPositionData gpsData;
 	// Loop forever
 	lastSysTime = xTaskGetTickCount();
+	/*while(1)
+		{
+			if( xSemaphoreTake( osdSemaphore, LONG_TIME ) == pdTRUE )
+			{
+
+			}
+		}*/
 
 	// intro
 	for(int i=0; i<125; i++)
@@ -2473,10 +2483,10 @@ static void osdgenTask(void *parameters)
 	{
         if( xSemaphoreTake( osdSemaphore, LONG_TIME ) == pdTRUE )
         {
-			GPSPositionGet(&gpsData);
-			AttitudeActualGet(&attitude);
-			setAttitudeOsd((int16_t)attitude.Pitch,(int16_t)attitude.Roll,(int16_t)attitude.Yaw);
-			setGpsOsd(gpsData.Status,gpsData.Latitude,gpsData.Longitude,gpsData.Altitude,gpsData.Groundspeed);
+			//GPSPositionGet(&gpsData);
+			//AttitudeActualGet(&attitude);
+			//setAttitudeOsd((int16_t)attitude.Pitch,(int16_t)attitude.Roll,(int16_t)attitude.Yaw);
+			//setGpsOsd(gpsData.Status,gpsData.Latitude,gpsData.Longitude,gpsData.Altitude,gpsData.Groundspeed);
 			updateOnceEveryFrame();
         }
 		//xSemaphoreTake(osdSemaphore, portMAX_DELAY);

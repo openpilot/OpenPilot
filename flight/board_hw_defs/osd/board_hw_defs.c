@@ -386,7 +386,8 @@ static const struct pios_exti_cfg pios_exti_hsync_cfg __exti_config = {
 		.init = {
 			.EXTI_Line = EXTI_Line2, // matches above GPIO pin
 			.EXTI_Mode = EXTI_Mode_Interrupt,
-			.EXTI_Trigger = EXTI_Trigger_Rising_Falling,
+			//.EXTI_Trigger = EXTI_Trigger_Rising_Falling,
+			.EXTI_Trigger = EXTI_Trigger_Falling,
 			.EXTI_LineCmd = ENABLE,
 		},
 	},
@@ -462,7 +463,7 @@ static const struct pios_video_cfg pios_video_cfg = {
 					.DMA_MemoryInc          = DMA_MemoryInc_Enable,
 					.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord,
 					.DMA_MemoryDataSize     = DMA_MemoryDataSize_HalfWord,
-					.DMA_Mode               = DMA_Mode_Circular,
+					.DMA_Mode               = DMA_Mode_Normal,
 					.DMA_Priority           = DMA_Priority_Medium,
 					//TODO: Enable FIFO
 					.DMA_FIFOMode           = DMA_FIFOMode_Disable,
@@ -484,7 +485,7 @@ static const struct pios_video_cfg pios_video_cfg = {
 					.DMA_MemoryDataSize     = DMA_MemoryDataSize_HalfWord,
 					.DMA_Mode               = DMA_Mode_Circular,
 					.DMA_Priority           = DMA_Priority_High,
-					.DMA_FIFOMode           = DMA_FIFOMode_Disable,
+					.DMA_FIFOMode           = DMA_FIFOMode_Enable,
 					.DMA_FIFOThreshold      = DMA_FIFOThreshold_Full,
 					.DMA_MemoryBurst        = DMA_MemoryBurst_Single,
 					.DMA_PeripheralBurst    = DMA_PeripheralBurst_Single,
@@ -581,7 +582,7 @@ static const struct pios_video_cfg pios_video_cfg = {
 						.DMA_MemoryDataSize     = DMA_MemoryDataSize_HalfWord,
 						.DMA_Mode               = DMA_Mode_Circular,
 						.DMA_Priority           = DMA_Priority_High,
-						.DMA_FIFOMode           = DMA_FIFOMode_Disable,
+						.DMA_FIFOMode           = DMA_FIFOMode_Enable,
 						.DMA_FIFOThreshold      = DMA_FIFOThreshold_Full,
 		                .DMA_MemoryBurst        = DMA_MemoryBurst_Single,
 		                .DMA_PeripheralBurst    = DMA_PeripheralBurst_Single,
@@ -630,44 +631,6 @@ static const struct pios_video_cfg pios_video_cfg = {
 
 
 
-void PIOS_VIDEO_DMA_Handler(void);
-void DMA1_Stream7_IRQHandler(void) __attribute__ ((alias("PIOS_VIDEO_DMA_Handler")));
-void DMA2_Stream5_IRQHandler(void) __attribute__ ((alias("PIOS_VIDEO_DMA_Handler")));
-
-/**
- * @brief Interrupt for half and full buffer transfer
- *
- * This interrupt handler swaps between the two halfs of the double buffer to make
- * sure the ahrs uses the most recent data.  Only swaps data when AHRS is idle, but
- * really this is a pretense of a sanity check since the DMA engine is consantly
- * running in the background.  Keep an eye on the ekf_too_slow variable to make sure
- * it's keeping up.
- */
-void PIOS_VIDEO_DMA_Handler(void)
-{
-	if (DMA_GetFlagStatus(DMA1_Stream7,DMA_FLAG_TCIF7)) {	// whole double buffer filled
-		DMA_ClearFlag(DMA1_Stream7,DMA_FLAG_TCIF7);
-		//PIOS_LED_Toggle(LED2);
-	}
-	else if (DMA_GetFlagStatus(DMA1_Stream7,DMA_FLAG_HTIF7)) {
-		DMA_ClearFlag(DMA1_Stream7,DMA_FLAG_HTIF7);
-	}
-	else {
-
-	}
-
-	if (DMA_GetFlagStatus(DMA2_Stream5,DMA_FLAG_TCIF5)) {	// whole double buffer filled
-		DMA_ClearFlag(DMA2_Stream5,DMA_FLAG_TCIF5);
-		//PIOS_LED_Toggle(LED3);
-	}
-	else if (DMA_GetFlagStatus(DMA2_Stream5,DMA_FLAG_HTIF5)) {
-		DMA_ClearFlag(DMA2_Stream5,DMA_FLAG_HTIF5);
-	}
-	else {
-
-	}
-
-}
 
 #endif
 

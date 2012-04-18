@@ -86,7 +86,23 @@ void swap_buffers()
 }
 
 void PIOS_Hsync_ISR() {
+	if(Vsync_update==11 && (DMA_GetCmdStatus(dev_cfg->level.dma.tx.channel)!=ENABLE))
+	{
+		// load first line of data
+		DMA_MemoryTargetConfig(dev_cfg->level.dma.tx.channel,(uint32_t)&disp_buffer_level[0],DMA_Memory_0);
+		DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[0],DMA_Memory_0);
+		// load second line of data
+		DMA_MemoryTargetConfig(dev_cfg->level.dma.tx.channel,(uint32_t)&disp_buffer_level[GRAPHICS_WIDTH],DMA_Memory_1);
+		DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[GRAPHICS_WIDTH],DMA_Memory_1);
 
+		// Enable DMA, Slave first
+		DMA_SetCurrDataCounter(dev_cfg->level.dma.tx.channel,BUFFER_LINE_LENGTH);
+		DMA_SetCurrDataCounter(dev_cfg->mask.dma.tx.channel,BUFFER_LINE_LENGTH);
+		DMA_Cmd(dev_cfg->level.dma.tx.channel, ENABLE);
+		DMA_Cmd(dev_cfg->mask.dma.tx.channel, ENABLE);
+	}
+	Vsync_update++;
+#if 0
 	//if(dev_cfg->hsync->pin.gpio->IDR & dev_cfg->hsync->pin.init.GPIO_Pin) {
 			/*if(gLineType == LINE_TYPE_GRAPHICS)
 			{
@@ -108,18 +124,19 @@ void PIOS_Hsync_ISR() {
 			gActivePixmapLine = (gActiveLine - GRAPHICS_LINE);
 			line = gActivePixmapLine*GRAPHICS_WIDTH;
 		}*/
+		line = gActiveLine*GRAPHICS_WIDTH;
 		if(gActiveLine < GRAPHICS_HEIGHT-2)
 		{
 			// Load new line
 			switch(DMA_GetCurrentMemoryTarget(dev_cfg->mask.dma.tx.channel))
 			{
 			case 0:
-				DMA_MemoryTargetConfig(dev_cfg->level.dma.tx.channel,(uint32_t)&disp_buffer_level[gActiveLine],DMA_Memory_1);
-				DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[gActiveLine],DMA_Memory_1);
+				DMA_MemoryTargetConfig(dev_cfg->level.dma.tx.channel,(uint32_t)&disp_buffer_level[line],DMA_Memory_1);
+				DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[line],DMA_Memory_1);
 				break;
 			case 1:
-				DMA_MemoryTargetConfig(dev_cfg->level.dma.tx.channel,(uint32_t)&disp_buffer_level[gActiveLine],DMA_Memory_0);
-				DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[gActiveLine],DMA_Memory_0);
+				DMA_MemoryTargetConfig(dev_cfg->level.dma.tx.channel,(uint32_t)&disp_buffer_level[line],DMA_Memory_0);
+				DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[line],DMA_Memory_0);
 				break;
 			}
 		}
@@ -127,14 +144,16 @@ void PIOS_Hsync_ISR() {
 		{
 			// Do nothing
 		}
-		else if(gActiveLine == GRAPHICS_HEIGHT-1)
+		else if(gActiveLine >= GRAPHICS_HEIGHT-1)
 		{
 			// STOP DMA, master first
 			DMA_Cmd(dev_cfg->mask.dma.tx.channel, DISABLE);
 			DMA_Cmd(dev_cfg->level.dma.tx.channel, DISABLE);
+			gActiveLine = 0;
 		}
 		gActiveLine++;
 	}
+#endif
 }
 
 void PIOS_Vsync_ISR() {
@@ -142,20 +161,10 @@ void PIOS_Vsync_ISR() {
 
     xHigherPriorityTaskWoken = pdFALSE;
 	m_osdLines = gActiveLine;
-	gActiveLine = 2;   // FIXME this should get incremented to 2
 
 	// load second image buffer
 	swap_buffers();
-	// load first line of data
-	DMA_MemoryTargetConfig(dev_cfg->level.dma.tx.channel,(uint32_t)&disp_buffer_level[0],DMA_Memory_0);
-	DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[0],DMA_Memory_0);
-	// load second line of data
-	DMA_MemoryTargetConfig(dev_cfg->level.dma.tx.channel,(uint32_t)&disp_buffer_level[1],DMA_Memory_1);
-	DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[1],DMA_Memory_1);
 
-	// Enable DMA, Slave first
-	DMA_Cmd(dev_cfg->level.dma.tx.channel, ENABLE);
-	DMA_Cmd(dev_cfg->mask.dma.tx.channel, ENABLE);
 
 	Vsync_update=0;
 	// trigger redraw
@@ -218,21 +227,38 @@ void PIOS_Video_Init(const struct pios_video_cfg * cfg){
 
 
 	/* Trigger interrupt when for half conversions too to indicate double buffer */
-	DMA_ITConfig(cfg->mask.dma.tx.channel, DMA_IT_TC, ENABLE);
+	//DMA_ITConfig(cfg->mask.dma.tx.channel, DMA_IT_TC, ENABLE);
+	DMA_ITConfig(cfg->level.dma.tx.channel, DMA_IT_TC, ENABLE);
 	/*DMA_ClearFlag(cfg->mask.dma.tx.channel,DMA_FLAG_TCIF5);
 	DMA_ClearITPendingBit(cfg->mask.dma.tx.channel, DMA_IT_TCIF5);
 
 	DMA_ClearFlag(cfg->level.dma.tx.channel,DMA_FLAG_TCIF5);
 	DMA_ClearITPendingBit(cfg->level.dma.tx.channel, DMA_IT_TCIF5);
 */
+    draw_buffer_level = buffer0_level;
+    draw_buffer_mask = buffer0_mask;
+    disp_buffer_level = buffer1_level;
+    disp_buffer_mask = buffer1_mask;
 
 	/* Configure DMA interrupt */
 	NVIC_Init(&cfg->level.dma.irq.init);
 	NVIC_Init(&cfg->mask.dma.irq.init);
 
 	/* double buffer config */
-	DMA_DoubleBufferModeConfig(cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[1],DMA_Memory_0);
-	DMA_DoubleBufferModeConfig(cfg->level.dma.tx.channel,(uint32_t)&disp_buffer_level[1],DMA_Memory_0);
+	for (uint16_t x = 0; x < GRAPHICS_WIDTH*GRAPHICS_HEIGHT; x++) {
+		  disp_buffer_level[x] = 0;
+		  disp_buffer_mask[x] = 0;
+	}
+	for (uint16_t x = 0; x < GRAPHICS_WIDTH*GRAPHICS_HEIGHT; x++) {
+		  draw_buffer_level[x] = 0;
+		  draw_buffer_mask[x] = 0;
+	}
+
+	DMA_DoubleBufferModeConfig(cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[GRAPHICS_WIDTH],DMA_Memory_0);
+	DMA_DoubleBufferModeConfig(cfg->level.dma.tx.channel,(uint32_t)&disp_buffer_level[GRAPHICS_WIDTH],DMA_Memory_0);
+
+	DMA_MemoryTargetConfig(dev_cfg->level.dma.tx.channel,(uint32_t)&disp_buffer_level[0],DMA_Memory_0);
+	DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[0],DMA_Memory_0);
 
 	/* Enable double buffering */
 	DMA_DoubleBufferModeCmd(cfg->mask.dma.tx.channel,ENABLE);
@@ -242,15 +268,84 @@ void PIOS_Video_Init(const struct pios_video_cfg * cfg){
 	SPI_I2S_DMACmd(cfg->level.regs, SPI_I2S_DMAReq_Tx, ENABLE);
 	SPI_I2S_DMACmd(cfg->mask.regs, SPI_I2S_DMAReq_Tx, ENABLE);
 
+	//DMA_Cmd(dev_cfg->level.dma.tx.channel, ENABLE);
+	//DMA_Cmd(dev_cfg->mask.dma.tx.channel, ENABLE);
+
 	/* Configure the Video Line interrupt */
 	PIOS_EXTI_Init(cfg->hsync);
 	PIOS_EXTI_Init(cfg->vsync);
+}
 
 
-    draw_buffer_level = buffer0_level;
-    draw_buffer_mask = buffer0_mask;
-    disp_buffer_level = buffer1_level;
-    disp_buffer_mask = buffer1_mask;
+void PIOS_VIDEO_DMA_Handler(void);
+void DMA1_Stream7_IRQHandler(void) __attribute__ ((alias("PIOS_VIDEO_DMA_Handler")));
+void DMA2_Stream5_IRQHandler(void) __attribute__ ((alias("PIOS_VIDEO_DMA_Handler")));
+
+/**
+ * @brief Interrupt for half and full buffer transfer
+ *
+ * This interrupt handler swaps between the two halfs of the double buffer to make
+ * sure the ahrs uses the most recent data.  Only swaps data when AHRS is idle, but
+ * really this is a pretense of a sanity check since the DMA engine is consantly
+ * running in the background.  Keep an eye on the ekf_too_slow variable to make sure
+ * it's keeping up.
+ */
+void PIOS_VIDEO_DMA_Handler(void)
+{
+	if (DMA_GetFlagStatus(DMA1_Stream7,DMA_FLAG_TCIF7)) {	// whole double buffer filled
+
+		DMA_ClearFlag(DMA1_Stream7,DMA_FLAG_TCIF7);
+		//PIOS_LED_Toggle(LED2);
+	}
+	else if (DMA_GetFlagStatus(DMA1_Stream7,DMA_FLAG_HTIF7)) {
+		DMA_ClearFlag(DMA1_Stream7,DMA_FLAG_HTIF7);
+	}
+	else {
+
+	}
+
+	if (DMA_GetFlagStatus(dev_cfg->level.dma.tx.channel,DMA_FLAG_TCIF5)) {	// whole double buffer filled
+
+		line = gActiveLine*GRAPHICS_WIDTH;
+		if(gActiveLine < GRAPHICS_HEIGHT-2)
+		{
+			// Load new line
+			switch(DMA_GetCurrentMemoryTarget(dev_cfg->mask.dma.tx.channel))
+			{
+			case 0:
+				DMA_MemoryTargetConfig(dev_cfg->level.dma.tx.channel,(uint32_t)&disp_buffer_level[line],DMA_Memory_1);
+				DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[line],DMA_Memory_1);
+				break;
+			case 1:
+				DMA_MemoryTargetConfig(dev_cfg->level.dma.tx.channel,(uint32_t)&disp_buffer_level[line],DMA_Memory_0);
+				DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[line],DMA_Memory_0);
+				break;
+			}
+		}
+		else if(gActiveLine == GRAPHICS_HEIGHT-2)
+		{
+			// Do nothing
+		}
+		else if(gActiveLine >= GRAPHICS_HEIGHT-1)
+		{
+			// STOP DMA, master first
+			DMA_Cmd(dev_cfg->mask.dma.tx.channel, DISABLE);
+			DMA_Cmd(dev_cfg->level.dma.tx.channel, DISABLE);
+			gActiveLine = 0;
+		}
+		gActiveLine++;
+
+
+		DMA_ClearFlag(dev_cfg->level.dma.tx.channel,DMA_FLAG_TCIF5);
+		//PIOS_LED_Toggle(LED3);
+	}
+	else if (DMA_GetFlagStatus(dev_cfg->level.dma.tx.channel,DMA_FLAG_HTIF5)) {
+		DMA_ClearFlag(dev_cfg->level.dma.tx.channel,DMA_FLAG_HTIF5);
+	}
+	else {
+
+	}
+
 }
 
 

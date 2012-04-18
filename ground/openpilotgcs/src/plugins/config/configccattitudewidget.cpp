@@ -53,6 +53,7 @@ ConfigCCAttitudeWidget::ConfigCCAttitudeWidget(QWidget *parent) :
     addUAVObjectToWidgetRelation("AttitudeSettings","BoardRotation",ui->pitchBias,AttitudeSettings::BOARDROTATION_PITCH);
     addUAVObjectToWidgetRelation("AttitudeSettings","BoardRotation",ui->yawBias,AttitudeSettings::BOARDROTATION_YAW);
     addWidget(ui->zeroBias);
+    refreshWidgetsValues();
 }
 
 ConfigCCAttitudeWidget::~ConfigCCAttitudeWidget()

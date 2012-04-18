@@ -108,6 +108,9 @@ struct FontDimensions
 #define MAX3(a, b, c)   MAX(a, MAX(b, c))
 #define MIN3(a, b, c)   MIN(a, MIN(b, c))
 
+// Apply DeadBand
+#define APPLY_DEADBAND(x, y) { x=x+GRAPHICS_HDEADBAND; y=y+GRAPHICS_VDEADBAND; }
+
 // Check if coordinates are valid. If not, return.
 #define CHECK_COORDS(x, y) if(x < 0 || x >= DISP_WIDTH || y < 0 || y >= DISP_HEIGHT) return;
 #define CHECK_COORD_X(x) if(x < 0 || x >= DISP_WIDTH) return;

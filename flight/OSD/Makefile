@@ -51,7 +51,7 @@ FLASH_TOOL = OPENOCD
 # List of modules to include
 MODULES = Osd/osdgen GPS
 
-MODULES += Osd/osdinput
+#MODULES += Osd/osdinput
 #MODULES += COTelemetry
 MODULES += Telemetry
 MODULES += FirmwareIAP

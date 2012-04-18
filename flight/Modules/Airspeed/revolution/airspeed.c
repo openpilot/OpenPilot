@@ -50,7 +50,7 @@
 #define SAMPLING_DELAY_MS 50
 #define CALIBRATION_IDLE 40
 #define CALIBRATION_COUNT 40
-#define ETS_AIRSPEED_SCALE 1.8f
+#define ETS_AIRSPEED_SCALE 1.0f
 
 // Private types
 
@@ -116,8 +116,6 @@ static void airspeedTask(void *parameters)
 	
 	uint8_t calibrationCount = 0;
 	uint32_t calibrationSum = 0;
-	uint16_t calibrationMin = 0;
-	uint16_t calibrationMax = 0;
 	
 	// Main task loop
 	while (1)
@@ -135,19 +133,12 @@ static void airspeedTask(void *parameters)
 		}
 
 		if (calibrationCount<CALIBRATION_IDLE) {
-			calibrationMin=data.SensorValue;
-			calibrationMax=data.SensorValue;
 			calibrationCount++;
 		} else if (calibrationCount<CALIBRATION_IDLE + CALIBRATION_COUNT) {
-			if (data.SensorValue<calibrationMin)
-				calibrationMin = data.SensorValue;
-			if (data.SensorValue>calibrationMax)
-				calibrationMax = data.SensorValue;
 			calibrationCount++;
 			calibrationSum +=  data.SensorValue;
 			if (calibrationCount==CALIBRATION_IDLE+CALIBRATION_COUNT) {
 				data.ZeroPoint = calibrationSum / CALIBRATION_COUNT;
-				data.ZeroZone = (calibrationMax - calibrationMin) / 2;
 			} else {
 				continue;
 			}
@@ -155,13 +146,7 @@ static void airspeedTask(void *parameters)
 
 		data.Connected = BAROAIRSPEED_CONNECTED_TRUE;
 
-		int16_t tmp = abs(data.SensorValue - data.ZeroPoint) - data.ZeroZone;
-
-		if (tmp>0) {
-			data.Airspeed = ETS_AIRSPEED_SCALE * sqrtf((float)tmp);
-		} else {
-			data.Airspeed = 0;
-		}
+		data.Airspeed = ETS_AIRSPEED_SCALE * sqrtf((float)abs(data.SensorValue - data.ZeroPoint));
 	
 		// Update the AirspeedActual UAVObject
 		BaroAirspeedSet(&data);

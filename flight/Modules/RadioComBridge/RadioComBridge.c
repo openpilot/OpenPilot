@@ -42,7 +42,7 @@
 
 #include <stdbool.h>
 
-//#undef PIOS_INCLUDE_USB
+#undef PIOS_INCLUDE_USB
 
 // ****************
 // Private functions
@@ -50,12 +50,12 @@
 static void radio2ComBridgeTask(void *parameters);
 static void com2RadioBridgeTask(void *parameters);
 static void radioStatusTask(void *parameters);
-static void updatePipXStatus(void);
 static int32_t transmitData(uint8_t * data, int32_t length);
 static int32_t transmitPacket(PHPacketHandle packet);
 static void receiveData(uint8_t *buf, uint8_t len);
 static void SendGCSReceiver(void);
 static void SendPipXStatus(void);
+static void StatusHandler(PHPacketHandle p);
 static void PPMHandler(uint16_t *channels);
 static void updateSettings();
 
@@ -65,15 +65,24 @@ static void updateSettings();
 #define STACK_SIZE_BYTES 300
 #define TASK_PRIORITY (tskIDLE_PRIORITY + 1)
 
-#define BRIDGE_BUF_LEN 128
+#define BRIDGE_BUF_LEN 512
 
 #define MAX_RETRIES 2
 #define REQ_TIMEOUT_MS 10
 
-#define STATS_UPDATE_PERIOD_MS 250
+#define STATS_UPDATE_PERIOD_MS 500
+#define RADIOSTATS_UPDATE_PERIOD_MS 500
+
+#define MAX_LOST_CONTACT_TIME 10
 
 // ****************
 // Private types
+
+typedef struct {
+	uint32_t pairID;
+	int8_t rssi;
+	uint8_t lastContact;
+} PairStats;
 
 typedef struct {
 	// The task handles.
@@ -90,7 +99,8 @@ typedef struct {
 	uint32_t radio_port;
 
 	// The UAVTalk connection on the com side.
-	UAVTalkConnection uavTalkCon;
+	UAVTalkConnection inUAVTalkCon;
+	UAVTalkConnection outUAVTalkCon;
 
 	// Error statistics.
 	uint32_t comTxErrors;
@@ -99,6 +109,9 @@ typedef struct {
 	uint32_t radioTxErrors;
 	uint32_t radioTxRetries;
 	uint32_t radioRxErrors;
+
+	// The destination ID
+	uint32_t destination_id;
 
 	// The packet timeout.
 	portTickType send_timeout;
@@ -112,6 +125,9 @@ typedef struct {
 	bool uavtalk_idle;
 	int16_t uavtalk_packet_len;
 	int16_t uavtalk_packet_index;
+
+	// Track other radios that are in range.
+	PairStats pairStats[PIPXSTATUS_PAIRIDS_NUMELEM];
 
 } RadioComBridgeData;
 
@@ -167,13 +183,17 @@ static int32_t RadioComBridgeInitialize(void)
 	data->radio_port = PIOS_COM_BRIDGE_RADIO;
 
 	// Allocate the com buffers.
-	data->radio2com_buf = pvPortMalloc(BRIDGE_BUF_LEN);
+	data->radio2com_buf = pvPortMalloc(PIOS_PH_MAX_PACKET);
 	PIOS_Assert(data->radio2com_buf);
 	data->com2radio_buf = pvPortMalloc(BRIDGE_BUF_LEN);
 	PIOS_Assert(data->com2radio_buf);
 
 	// Initialise UAVTalk
-	data->uavTalkCon = UAVTalkInitialize(&transmitData);
+	data->inUAVTalkCon = UAVTalkInitialize(0);
+	data->outUAVTalkCon = UAVTalkInitialize(&transmitData);
+
+	// Initialize the destination ID
+	data->destination_id = 0xffffffff;
 
 	// Initialize the statistics.
 	data->radioTxErrors = 0;
@@ -186,6 +206,7 @@ static int32_t RadioComBridgeInitialize(void)
 	// Register the callbacks with the packet handler
 	PHRegisterOutputStream(pios_packet_handler, transmitPacket);
 	PHRegisterDataHandler(pios_packet_handler, receiveData);
+	PHRegisterStatusHandler(pios_packet_handler, StatusHandler);
 	PHRegisterPPMHandler(pios_packet_handler, PPMHandler);
 
 	// Initialize the packet send timeout
@@ -194,8 +215,16 @@ static int32_t RadioComBridgeInitialize(void)
 
 	// Initialize the rado->com UAVTalk message tracker.
 	data->uavtalk_idle = true;
-	data->uavtalk_packet_len = -1;
-	data->uavtalk_packet_index = -1;
+	data->uavtalk_packet_len = 0;
+	data->uavtalk_packet_index = -1; // Looking for SYNC
+
+	// Initialize the detected device statistics.
+	for (uint8_t i = 0; i < PIPXSTATUS_PAIRIDS_NUMELEM; ++i)
+	{
+		data->pairStats[i].pairID = 0;
+		data->pairStats[i].rssi = -127;
+		data->pairStats[i].lastContact = 0;
+	}
 
 	updateSettings();
 
@@ -218,9 +247,9 @@ static void radio2ComBridgeTask(void *parameters)
 #endif /* PIOS_INCLUDE_WDG */
 
 		// Receive data from the radio port
-		rx_bytes = PIOS_COM_ReceiveBuffer(data->radio_port, data->radio2com_buf, BRIDGE_BUF_LEN, 200);
+		rx_bytes = PIOS_COM_ReceiveBuffer(data->radio_port, data->radio2com_buf, PIOS_PH_MAX_PACKET, 200);
 		if (rx_bytes > 0)
-			PHReceivePacket(pios_packet_handler, (PHPacketHandle)data->radio2com_buf);
+			PHReceivePacket(pios_packet_handler, (PHPacketHandle)data->radio2com_buf, rx_bytes);
 
 	}
 }
@@ -253,11 +282,11 @@ static void com2RadioBridgeTask(void * parameters)
 
 		// Receive data from the com port
 		uint32_t cur_rx_bytes = PIOS_COM_ReceiveBuffer(inputPort, data->com2radio_buf +
-							       rx_bytes, BRIDGE_BUF_LEN - rx_bytes, timeout);
+																									 rx_bytes, BRIDGE_BUF_LEN - rx_bytes, timeout);
 
 		// Pass the new data through UAVTalk
 		for (uint8_t i = 0; i < cur_rx_bytes; i++)
-			UAVTalkProcessInputStream(data->uavTalkCon, *(data->com2radio_buf + i + rx_bytes));
+			UAVTalkProcessInputStream(data->inUAVTalkCon, *(data->com2radio_buf + i + rx_bytes));
 
 		// Do we have an data to send?
 		rx_bytes += cur_rx_bytes;
@@ -292,6 +321,8 @@ static void com2RadioBridgeTask(void * parameters)
 
 				// Initialize the packet.
 				//p->header.type = PACKET_TYPE_ACKED_DATA;
+				p->header.destination_id = data->destination_id;
+				p->header.source_id = PIOS_RFM22B_DeviceID(pios_rfm22b_id);
 				p->header.type = PACKET_TYPE_DATA;
 				p->header.data_size = rx_bytes;
 
@@ -316,37 +347,41 @@ static void com2RadioBridgeTask(void * parameters)
 static void radioStatusTask(void *parameters)
 {
 	while (1) {
+		PipXStatusData pipxStatus;
 
-#ifdef PIOS_INCLUDE_WDG
-		// Update the watchdog timer.
-		PIOS_WDG_UpdateFlag(PIOS_WDG_RADIOCOM);
-#endif /* PIOS_INCLUDE_WDG */
+		// Get object data
+		PipXStatusGet(&pipxStatus);
 
 		// Update the status
-		updatePipXStatus();
+		pipxStatus.DeviceID = PIOS_RFM22B_DeviceID(pios_rfm22b_id);
+		pipxStatus.RSSI = PIOS_RFM22B_RSSI(pios_rfm22b_id);
+
+		// Update the potential pairing contacts
+		for (uint8_t i = 0; i < PIPXSTATUS_PAIRIDS_NUMELEM; ++i)
+		{
+			pipxStatus.PairIDs[i] = data->pairStats[i].pairID;
+			pipxStatus.PairSignalStrengths[i] = data->pairStats[i].rssi;
+		}
+
+		// Update the object
+		PipXStatusSet(&pipxStatus);
+
+		// Schedule the status for transmssion
 		data->send_pipxstatus = true;
+
+		// Broadcast the status.
+		{
+			static uint16_t cntr = 0;
+			if(cntr++ == RADIOSTATS_UPDATE_PERIOD_MS / STATS_UPDATE_PERIOD_MS)
+			{
+				PHBroadcastStatus(pios_packet_handler, pipxStatus.DeviceID, pipxStatus.RSSI);
+				cntr = 0;
+			}
+		}
 
 		// Delay until the next update period.
 		vTaskDelay(STATS_UPDATE_PERIOD_MS / portTICK_RATE_MS);
 	}
-}
-
-/**
- * Update the PipX status
- */
-static void updatePipXStatus(void)
-{
-	PipXStatusData pipxStatus;
-
-	// Get object data
-	PipXStatusGet(&pipxStatus);
-
-	// Update the status
-	pipxStatus.DeviceID = PIOS_RFM22B_DeviceID(pios_rfm22b_id);
-	pipxStatus.RSSI = PIOS_RFM22B_RSSI(pios_rfm22b_id);
-
-	// Update the object
-	PipXStatusSet(&pipxStatus);
 }
 
 /**
@@ -364,7 +399,7 @@ static int32_t transmitData(uint8_t *buf, int32_t length)
 	if (PIOS_USB_CheckAvailable(0) && PIOS_COM_TELEM_USB)
 		outputPort = PIOS_COM_TELEM_USB;
 #endif /* PIOS_INCLUDE_USB */
-	return PIOS_COM_SendBuffer(outputPort, buf, length);
+	return PIOS_COM_SendBufferNonBlocking(outputPort, buf, length);
 }
 
 /**
@@ -376,7 +411,7 @@ static int32_t transmitData(uint8_t *buf, int32_t length)
  */
 static int32_t transmitPacket(PHPacketHandle p)
 {
-	return PIOS_COM_SendBuffer(data->radio_port, (uint8_t*)p, PH_PACKET_SIZE(p));
+	return PIOS_COM_SendBufferNonBlocking(data->radio_port, (uint8_t*)p, PH_PACKET_SIZE(p));
 }
 
 /**
@@ -399,59 +434,43 @@ static void receiveData(uint8_t *buf, uint8_t len)
 	if (data->send_pipxstatus && data->uavtalk_idle)
 		SendPipXStatus();
 
-	// Parse the data for UAVTalk packets.
 	uint8_t sent_bytes = 0;
 	for (uint8_t i = 0; i < len; ++i)
 	{
-		uint8_t val = buf[i];
-
-		// Looking for sync value
-		if (data->uavtalk_packet_index == -1)
+		UAVTalkRxState state = UAVTalkProcessInputStream(data->outUAVTalkCon, buf[i]);
+		/* if(state == UAVTALK_STATE_ERROR) */
+		/* 	DEBUG_PRINTF(2, "OUT Error\n\r"); */
+		if((state == UAVTALK_STATE_COMPLETE) || (state == UAVTALK_STATE_SYNC))
 		{
-			if (val == UAVTALK_SYNC_VAL)
-				data->uavtalk_packet_index = 1;
-		}
-		else
-		{
-			if (data->uavtalk_packet_index == 2)
-				// Length LSB
-				data->uavtalk_packet_len = val;
-			else if (data->uavtalk_packet_index == 3)
-			{
-				// Length MSB
-				data->uavtalk_packet_len |= val << 8;
-				// Is the length valid.
-				if ((data->uavtalk_packet_len < UAVTALK_MIN_HEADER_LENGTH) ||
-						(data->uavtalk_packet_len > UAVTALK_MAX_HEADER_LENGTH + UAVTALK_MAX_PAYLOAD_LENGTH))
-					data->uavtalk_packet_index = -2;
-			}
-			else if (data->uavtalk_packet_index == data->uavtalk_packet_len)
-			{
-				// Packet received.
-				data->uavtalk_packet_index = -2;
+			// Send the buffer up to this point
+			uint8_t send_bytes = i - sent_bytes;
+			if (PIOS_COM_SendBufferNonBlocking(outputPort, buf + sent_bytes, send_bytes) != send_bytes)
+				// Error on transmit
+				data->comTxErrors++;
+			sent_bytes = i;
 
-				// Send the buffer up to this point
-				uint8_t send_bytes = len - sent_bytes;
-				if (PIOS_COM_SendBuffer(outputPort, buf + sent_bytes, send_bytes) != send_bytes)
-					// Error on transmit
-					data->comTxErrors++;
-				sent_bytes = i;
+			// The connection is now idle.
+			data->uavtalk_idle = true;
 
-				// Send any UAVTalk messages that need to be sent.
-				if (data->send_gcsreceiver)
-					SendGCSReceiver();
-				if (data->send_pipxstatus)
-					SendPipXStatus();
-			}
-			++(data->uavtalk_packet_index);
+			// Send a local UAVTalk message if one is waiting to be sent.
+			if (data->send_gcsreceiver && data->uavtalk_idle)
+				SendGCSReceiver();
+			if (data->send_pipxstatus && data->uavtalk_idle)
+				SendPipXStatus();
 		}
 	}
 
 	// Send the received data to the com port
 	uint8_t send_bytes = len - sent_bytes;
-	if (PIOS_COM_SendBuffer(outputPort, buf + sent_bytes, send_bytes) != send_bytes)
-		// Error on transmit
-		data->comTxErrors++;
+	if (send_bytes > 0)
+	{
+		if (PIOS_COM_SendBufferNonBlocking(outputPort, buf + sent_bytes, send_bytes) != send_bytes)
+			// Error on transmit
+			data->comTxErrors++;
+
+		// The connection is not idle.
+		data->uavtalk_idle = false;
+	}
 }
 
 /**
@@ -464,7 +483,7 @@ static void SendGCSReceiver(void)
 	uint32_t retries = 0;
 	int32_t success = -1;
 	while (retries < MAX_RETRIES && success == -1) {
-		success = UAVTalkSendObject(data->uavTalkCon, GCSReceiverHandle(), 0, 0, REQ_TIMEOUT_MS);
+		success = UAVTalkSendObject(data->outUAVTalkCon, GCSReceiverHandle(), 0, 0, REQ_TIMEOUT_MS);
 		++retries;
 	}
 	if(success >= 0)
@@ -478,8 +497,61 @@ static void SendGCSReceiver(void)
 static void SendPipXStatus(void)
 {
 	// Transmit the PipXStatus
-	UAVTalkSendObject(data->uavTalkCon, PipXStatusHandle(), 0, 0, REQ_TIMEOUT_MS);
+	UAVTalkSendObject(data->outUAVTalkCon, PipXStatusHandle(), 0, 0, REQ_TIMEOUT_MS);
 	data->send_pipxstatus = false;
+
+	// Increment the last contact for each device
+	for (uint8_t i = 0; i < PIPXSTATUS_PAIRIDS_NUMELEM; ++i)
+		++data->pairStats[i].lastContact;
+}
+
+/**
+ * Receive a status packet
+ * \param[in] status The status structure
+ */
+static void StatusHandler(PHPacketHandle status)
+{
+	uint32_t id = status->header.source_id;
+
+	// Have we seen this device recently?
+	uint8_t id_idx = 0;
+	for ( ; id_idx < PIPXSTATUS_PAIRIDS_NUMELEM; ++id_idx)
+		if(data->pairStats[id_idx].pairID == id)
+			break;
+
+	// If we have seen it, update the RSSI and reset the last contact couter
+	if(id_idx < PIPXSTATUS_PAIRIDS_NUMELEM)
+	{
+		data->pairStats[id_idx].rssi = status->header.rssi;
+		data->pairStats[id_idx].lastContact = 0;
+		return;
+	}
+
+	// Remove any contacts that we haven't seen for a while.
+	for (id_idx = 0; id_idx < PIPXSTATUS_PAIRIDS_NUMELEM; ++id_idx)
+	{
+		if(data->pairStats[id_idx].lastContact > MAX_LOST_CONTACT_TIME)
+		{
+			data->pairStats[id_idx].pairID = 0;
+			data->pairStats[id_idx].rssi = -127;
+			data->pairStats[id_idx].lastContact = 0;
+		}
+	}
+
+	// If we haven't seen it, find a slot to put it in.
+	uint8_t min_idx = 0;
+	int8_t min_rssi = data->pairStats[0].rssi;
+	for (id_idx = 1; id_idx < PIPXSTATUS_PAIRIDS_NUMELEM; ++id_idx)
+	{
+		if(data->pairStats[id_idx].rssi < min_rssi)
+		{
+			min_rssi = data->pairStats[id_idx].rssi;
+			min_idx = id_idx;
+		}
+	}
+	data->pairStats[min_idx].pairID = id;
+	data->pairStats[min_idx].rssi = status->header.rssi;
+	data->pairStats[min_idx].lastContact = 0;
 }
 
 /**

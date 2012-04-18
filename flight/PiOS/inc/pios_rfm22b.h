@@ -48,7 +48,7 @@ struct pios_rfm22b_cfg {
 /* Public Functions */
 extern int32_t PIOS_RFM22B_Init(uint32_t *rfb22b_id, const struct pios_rfm22b_cfg *cfg);
 extern uint32_t PIOS_RFM22B_DeviceID(uint32_t rfb22b_id);
-extern int16_t PIOS_RFM22B_RSSI(uint32_t rfb22b_id);
+extern int8_t PIOS_RFM22B_RSSI(uint32_t rfb22b_id);
 
 #endif /* PIOS_RFM22B_H */
 

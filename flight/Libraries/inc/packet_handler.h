@@ -41,6 +41,7 @@ typedef enum {
 	PACKET_TYPE_DISCONNECT,     // to tell the other modem they cannot connect to us
 	PACKET_TYPE_READY,          // tells the other modem we are ready to accept more data
 	PACKET_TYPE_NOTREADY,       // tells the other modem we're not ready to accept more data - we can also send user data in this packet type
+	PACKET_TYPE_STATUS,         // broadcasts status of this modem
 	PACKET_TYPE_DATARATE,       // for changing the RF data rate
 	PACKET_TYPE_PING,           // used to check link is still up
 	PACKET_TYPE_ADJUST_TX_PWR,  // used to ask the other modem to adjust it's tx power
@@ -52,12 +53,14 @@ typedef enum {
 } PHPacketType;
 
 typedef struct {
-	uint32_t source_id;
 	uint32_t destination_id;
+	uint32_t source_id;
 	uint8_t type;
+	uint8_t data_size;
 	uint8_t tx_seq;
 	uint8_t rx_seq;
-	uint8_t data_size;
+	int8_t rssi;
+	int8_t afc;
 } PHPacketHeader;
 
 #define PH_MAX_DATA (PIOS_PH_MAX_PACKET - sizeof(PHPacketHeader) - RS_ECC_NPARITY)
@@ -81,6 +84,7 @@ typedef struct {
 
 typedef int32_t (*PHOutputStream)(PHPacketHandle packet);
 typedef void (*PHDataHandler)(uint8_t *data, uint8_t len);
+typedef void (*PHStatusHandler)(PHPacketHandle s);
 typedef void (*PHPPMHandler)(uint16_t *channels);
 
 typedef uint32_t PHInstHandle;
@@ -89,13 +93,15 @@ typedef uint32_t PHInstHandle;
 PHInstHandle PHInitialize(PacketHandlerConfig *cfg);
 void PHRegisterOutputStream(PHInstHandle h, PHOutputStream f);
 void PHRegisterDataHandler(PHInstHandle h, PHDataHandler f);
+void PHRegisterStatusHandler(PHInstHandle h, PHStatusHandler f);
 void PHRegisterPPMHandler(PHInstHandle h, PHPPMHandler f);
 uint32_t PHConnect(PHInstHandle h, uint32_t dest_id);
 PHPacketHandle PHGetRXPacket(PHInstHandle h);
 PHPacketHandle PHGetTXPacket(PHInstHandle h);
 void PHReleaseTXPacket(PHInstHandle h, PHPacketHandle p);
 uint8_t PHTransmitPacket(PHInstHandle h, PHPacketHandle p);
-uint8_t PHReceivePacket(PHInstHandle h, PHPacketHandle p);
+uint8_t PHBroadcastStatus(PHInstHandle h, uint32_t id, int8_t rssi);
+uint8_t PHReceivePacket(PHInstHandle h, PHPacketHandle p, uint16_t len);
 
 #endif // __PACKET_HANDLER_H__
 

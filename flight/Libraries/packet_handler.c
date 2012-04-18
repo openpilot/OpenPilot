@@ -46,6 +46,7 @@ typedef struct {
 	xSemaphoreHandle lock;
 	PHOutputStream output_stream;
 	PHDataHandler data_handler;
+	PHStatusHandler status_handler;
 	PHPPMHandler ppm_handler;
 } PHPacketData, *PHPacketDataHandle;
 
@@ -111,6 +112,18 @@ void PHRegisterDataHandler(PHInstHandle h, PHDataHandler f)
 	PHPacketDataHandle data = (PHPacketDataHandle)h;
 
 	data->data_handler = f;
+}
+
+/**
+ * Register a PPM packet handler
+ * \param[in] h The packet handler instance data pointer.
+ * \param[in] f The PPM handler function
+ */
+void PHRegisterStatusHandler(PHInstHandle h, PHStatusHandler f)
+{
+	PHPacketDataHandle data = (PHPacketDataHandle)h;
+
+	data->status_handler = f;
 }
 
 /**
@@ -232,23 +245,47 @@ uint8_t PHTransmitPacket(PHInstHandle h, PHPacketHandle p)
  * Process a packet that has been received.
  * \param[in] h The packet handler instance data pointer.
  * \param[in] p A pointer to the packet buffer.
+ * \param[in] received_len The length of data received.
  * \return 1 Success
  * \return 0 Failure
  */
-uint8_t PHReceivePacket(PHInstHandle h, PHPacketHandle p)
+uint8_t PHReceivePacket(PHInstHandle h, PHPacketHandle p, uint16_t received_len)
 {
 	PHPacketDataHandle data = (PHPacketDataHandle)h;
 
-	// Attempt to correct any errors in the packet.
+	// Verify the packet length.
+	// Note: The last two bytes should be the RSSI and AFC.
 	uint16_t len = PHPacketSizeECC(p);
+	if (received_len != (len + 2))
+	{
+		DEBUG_PRINTF(1, "Packet length error\n\r");
+		return 0;
+	}
+
+	// Attempt to correct any errors in the packet.
 	decode_data((unsigned char*)p, len);
 
 	// Check that there were no unfixed errors.
-	uint8_t rx_error = check_syndrome() != 0;
+	bool rx_error = check_syndrome() != 0;
 	if(rx_error)
-		DEBUG_PRINTF(1, "Error in message\n\r");
+		DEBUG_PRINTF(1, "Error in packet\n\r");
+
+	// Add the RSSI and AFC to the packet.
+	p->header.rssi = *(((int8_t*)p) + len);
+	p->header.afc = *(((int8_t*)p) + len + 1);
 
 	switch (p->header.type) {
+
+	case PACKET_TYPE_STATUS:
+
+		if (!rx_error)
+
+			// Pass on the channels to the PPM handler.
+			if(data->status_handler)
+				data->status_handler(p);
+
+		break;
+
 	case PACKET_TYPE_ACKED_DATA:
 
 		// Send the ACK / NACK
@@ -323,6 +360,29 @@ uint8_t PHReceivePacket(PHInstHandle h, PHPacketHandle p)
 	}
 
 	return 1;
+}
+
+/**
+ * Broadcast a status packet.
+ * \param[in] data The packet handler instance data pointer.
+ * \param[in] p A pointer to the packet buffer.
+ * \return 1 Success
+ * \return 0 Failure
+ */
+uint8_t PHBroadcastStatus(PHInstHandle h, uint32_t id, int8_t rssi)
+{
+	PHPacketDataHandle data = (PHPacketDataHandle)h;
+
+	// Create the status message
+	PHPacketHeader header;
+	header.destination_id = 0xffffffff;
+	header.source_id = id;
+	header.rssi = rssi;
+	header.type = PACKET_TYPE_STATUS;
+	header.data_size = 0;
+
+	// Send the packet.
+	return PHLTransmitPacket(data, (PHPacketHandle)&header);
 }
 
 /**

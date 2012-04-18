@@ -29,7 +29,6 @@
  */
 
 #define ETASV3_I2C_ADDR			0x75
-#define ETASV3_I2C_READ_CMD		0x07
 
 
 int16_t PIOS_ETASV3_ReadAirspeed (void);

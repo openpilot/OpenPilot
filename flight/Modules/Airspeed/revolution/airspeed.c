@@ -48,6 +48,9 @@
 #define STACK_SIZE_BYTES 500
 #define TASK_PRIORITY (tskIDLE_PRIORITY+1)
 #define SAMPLING_DELAY_MS 50
+#define CALIBRATION_IDLE 40
+#define CALIBRATION_COUNT 40
+#define ETS_AIRSPEED_SCALE 1.8f
 
 // Private types
 
@@ -111,18 +114,54 @@ static void airspeedTask(void *parameters)
 {
 	BaroAirspeedData data;
 	
-	// TODO: Check the pressure sensor and set a warning if it fails test
+	uint8_t calibrationCount = 0;
+	uint32_t calibrationSum = 0;
+	uint16_t calibrationMin = 0;
+	uint16_t calibrationMax = 0;
 	
 	// Main task loop
 	while (1)
 	{
-		float airspeed;
-		
 		// Update the airspeed
 		vTaskDelay(SAMPLING_DELAY_MS);
-		airspeed = PIOS_ETASV3_ReadAirspeed();
-		
-		data.Airspeed = airspeed;
+
+		BaroAirspeedGet(&data);
+		data.SensorValue = PIOS_ETASV3_ReadAirspeed();
+		if (data.SensorValue==-1) {
+			data.Connected = BAROAIRSPEED_CONNECTED_FALSE;
+			data.Airspeed = 0;
+			BaroAirspeedSet(&data);
+			continue;
+		}
+
+		if (calibrationCount<CALIBRATION_IDLE) {
+			calibrationMin=data.SensorValue;
+			calibrationMax=data.SensorValue;
+			calibrationCount++;
+		} else if (calibrationCount<CALIBRATION_IDLE + CALIBRATION_COUNT) {
+			if (data.SensorValue<calibrationMin)
+				calibrationMin = data.SensorValue;
+			if (data.SensorValue>calibrationMax)
+				calibrationMax = data.SensorValue;
+			calibrationCount++;
+			calibrationSum +=  data.SensorValue;
+			if (calibrationCount==CALIBRATION_IDLE+CALIBRATION_COUNT) {
+				data.ZeroPoint = calibrationSum / CALIBRATION_COUNT;
+				data.ZeroZone = (calibrationMax - calibrationMin) / 2;
+			} else {
+				continue;
+			}
+		}
+
+		data.Connected = BAROAIRSPEED_CONNECTED_TRUE;
+
+		int16_t tmp = abs(data.SensorValue - data.ZeroPoint) - data.ZeroZone;
+
+		if (tmp>0) {
+			data.Airspeed = ETS_AIRSPEED_SCALE * sqrtf((float)tmp);
+		} else {
+			data.Airspeed = 0;
+		}
 	
 		// Update the AirspeedActual UAVObject
 		BaroAirspeedSet(&data);

@@ -35,21 +35,9 @@
 
 #include "pios_etasv3.h"
 
-static bool PIOS_ETASV3_Read(uint8_t command, uint8_t * buffer, uint8_t len)
+static bool PIOS_ETASV3_Read(uint8_t * buffer, uint8_t len)
 {
-	uint8_t cmd_buffer[] = {
-		command,
-	};
-
 	const struct pios_i2c_txn txn_list[] = {
-		/*{
-		 .info = __func__,
-		 .addr = ETASV3_I2C_ADDR,
-		 .rw = PIOS_I2C_TXN_WRITE,
-		 .len = sizeof(cmd_buffer),
-		 .buf = cmd_buffer,
-		 }
-		,*/
 		{
 		 .info = __func__,
 		 .addr = ETASV3_I2C_ADDR,
@@ -66,7 +54,7 @@ int16_t PIOS_ETASV3_ReadAirspeed (void)
 {
 	uint8_t airspeed_raw[2];
 
-	if (PIOS_ETASV3_Read(ETASV3_I2C_READ_CMD, airspeed_raw, sizeof(airspeed_raw)) != 0) {
+	if (PIOS_ETASV3_Read(airspeed_raw, sizeof(airspeed_raw)) != 0) {
 		/* Failed to read airspeed */
 		return -1;
 	}

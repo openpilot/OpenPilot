@@ -183,7 +183,7 @@ void INSSetPosVelVar(float PosVar, float VelVar)
 	R[2] = PosVar;
 	R[3] = VelVar;
 	R[4] = VelVar;
-    R[5] = PosVar;  // Don't change vertical velocity, not measured
+	R[5] = VelVar;
 }
 
 void INSSetGyroBias(float gyro_bias[3])

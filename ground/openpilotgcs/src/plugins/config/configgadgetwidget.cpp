@@ -37,6 +37,7 @@
 #include "configtxpidwidget.h"
 #include "config_pro_hw_widget.h"
 #include "config_cc_hw_widget.h"
+#include "configpipxtremewidget.h"
 #include "defaultattitudewidget.h"
 #include "defaulthwsettingswidget.h"
 #include "uavobjectutilmanager.h"
@@ -89,8 +90,8 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     qwd = new ConfigTxPIDWidget(this);
     ftw->insertTab(ConfigGadgetWidget::txpid, qwd, QIcon(":/configgadget/images/txpid.png"), QString("TxPID"));
 
-//    qwd = new ConfigPipXtremeWidget(this);
-//    ftw->insertTab(5, qwd, QIcon(":/configgadget/images/PipXtreme.png"), QString("PipXtreme"));
+    qwd = new ConfigPipXtremeWidget(this);
+    ftw->insertTab(ConfigGadgetWidget::pipxtreme, qwd, QIcon(":/configgadget/images/PipXtreme.png"), QString("PipXtreme"));
 
     // *********************
     // Listen to autopilot connection events

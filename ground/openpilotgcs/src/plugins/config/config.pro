@@ -31,7 +31,8 @@ HEADERS += configplugin.h \
     configcamerastabilizationwidget.h \
     configtxpidwidget.h \
     outputchannelform.h \
-    config_global.h
+    config_global.h \
+    configpipxtremewidget.h
 SOURCES += configplugin.cpp \
     configgadgetconfiguration.cpp \
     configgadgetwidget.cpp \
@@ -60,7 +61,8 @@ SOURCES += configplugin.cpp \
     cfg_vehicletypes/configgroundvehiclewidget.cpp \
     cfg_vehicletypes/configfixedwingwidget.cpp \
     cfg_vehicletypes/configccpmwidget.cpp \
-    outputchannelform.cpp
+    outputchannelform.cpp \
+    configpipxtremewidget.cpp
 FORMS += airframe.ui \
     cc_hw_settings.ui \
     pro_hw_settings.ui \
@@ -74,6 +76,10 @@ FORMS += airframe.ui \
     defaulthwsettings.ui \
     inputchannelform.ui \
     camerastabilization.ui \
+    pipxtreme.ui \
     outputchannelform.ui \
     txpid.ui 
 RESOURCES += configgadget.qrc
+
+
+

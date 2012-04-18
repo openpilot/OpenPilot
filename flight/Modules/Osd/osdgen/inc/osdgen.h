@@ -9,6 +9,7 @@
 #define OSDGEN_H_
 
 #include "openpilot.h"
+#include "pios.h"
 
 int32_t osdgenInitialize(void);
 
@@ -109,7 +110,7 @@ struct FontDimensions
 #define MIN3(a, b, c)   MIN(a, MIN(b, c))
 
 // Apply DeadBand
-#define APPLY_DEADBAND(x, y) { x=x+GRAPHICS_HDEADBAND; y=y+GRAPHICS_VDEADBAND; }
+#define APPLY_DEADBAND(x, y) { x += GRAPHICS_HDEADBAND; y+=GRAPHICS_VDEADBAND; }
 
 // Check if coordinates are valid. If not, return.
 #define CHECK_COORDS(x, y) if(x < 0 || x >= DISP_WIDTH || y < 0 || y >= DISP_HEIGHT) return;

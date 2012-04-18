@@ -160,8 +160,8 @@ SRC += $(OPUAVSYNTHDIR)/osdsettings.c
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_com.c
 #SRC += $(PIOSCOMMON)/pios_hmc5843.c
-#SRC += $(PIOSCOMMON)/printf-stdarg.c
-SRC += $(PIOSCOMMON)/printf2.c
+SRC += $(PIOSCOMMON)/printf-stdarg.c
+#SRC += $(PIOSCOMMON)/printf2.c
 SRC += $(PIOSCOMMON)/pios_crc.c
 SRC += $(PIOSCOMMON)/pios_video.c
 SRC += $(PIOSCOMMON)/pios_usb_desc_hid_cdc.c

@@ -531,7 +531,7 @@ void write_pixel_lm(unsigned int x, unsigned int y, int mmode, int lmode)
  */
 void write_hline(uint16_t *buff, unsigned int x0, unsigned int x1, unsigned int y, int mode)
 {
-	APPLY_DEADBAND(x0, y0);
+	APPLY_DEADBAND(x0, y);
         CLIP_COORDS(x0, y);
         CLIP_COORDS(x1, y);
         if(x0 > x1)

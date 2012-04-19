@@ -367,7 +367,7 @@ void ConfigTaskWidget::forceShadowUpdates()
     setDirty(true);
 }
 /**
- * SLOT function called when on of the widgets contents added to the framework changes
+ * SLOT function called when one of the widgets contents added to the framework changes
  */
 void ConfigTaskWidget::widgetsContentsChanged()
 {
@@ -412,7 +412,8 @@ void ConfigTaskWidget::widgetsContentsChanged()
             }
         }
     }
-    smartsave->resetIcons();
+    if(smartsave)
+        smartsave->resetIcons();
     setDirty(true);
 }
 /**

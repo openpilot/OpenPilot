@@ -46,6 +46,7 @@ class ConfigVehicleTypeWidget: public ConfigTaskWidget
 public:
     ConfigVehicleTypeWidget(QWidget *parent = 0);
     ~ConfigVehicleTypeWidget();
+    bool eventFilter( QObject * obj, QEvent * evt );
 
 private:
     Ui_AircraftWidget *m_aircraft;

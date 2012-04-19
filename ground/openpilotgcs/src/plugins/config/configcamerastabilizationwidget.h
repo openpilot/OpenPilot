@@ -41,7 +41,7 @@ class ConfigCameraStabilizationWidget: public ConfigTaskWidget
 public:
     ConfigCameraStabilizationWidget(QWidget *parent = 0);
     ~ConfigCameraStabilizationWidget();
-    
+    bool eventFilter( QObject * obj, QEvent * evt );
 private:
     Ui_CameraStabilizationWidget *m_camerastabilization;
     virtual void enableControls(bool enable);

@@ -39,6 +39,7 @@ class OutputChannelForm : public QWidget
 public:
     explicit OutputChannelForm(const int index, QWidget *parent = NULL, const bool showLegend = false);
     ~OutputChannelForm();
+    bool eventFilter( QObject * obj, QEvent * evt );
     friend class ConfigOnputWidget;
 
     void setAssignment(const QString &assignment);

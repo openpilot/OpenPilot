@@ -233,6 +233,16 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
     setupGroundVehicleUI( m_aircraft->groundVehicleType->currentText() );
     setupFixedWingUI( m_aircraft->fixedWingType->currentText() );
 	
+    //Disable mouse wheel events
+    foreach( QSpinBox * sp, findChildren<QSpinBox*>() ) {
+            sp->installEventFilter( this );
+    }
+    foreach( QDoubleSpinBox * sp, findChildren<QDoubleSpinBox*>() ) {
+            sp->installEventFilter( this );
+    }
+    foreach( QSlider * sp, findChildren<QSlider*>() ) {
+            sp->installEventFilter( this );
+    }
 }
 
 
@@ -242,6 +252,18 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
 ConfigVehicleTypeWidget::~ConfigVehicleTypeWidget()
 {
    // Do nothing
+}
+
+
+bool ConfigVehicleTypeWidget::eventFilter( QObject * obj, QEvent * evt ) {
+    //Filter all wheel events, and ignore them
+    if ( evt->type() == QEvent::Wheel &&
+         (qobject_cast<QAbstractSpinBox*>( obj ) || qobject_cast<QAbstractSlider*>( obj ) ))
+    {
+        evt->ignore();
+        return true;
+    }
+    return QWidget::eventFilter( obj, evt );
 }
 
 

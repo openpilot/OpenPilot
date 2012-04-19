@@ -731,9 +731,6 @@ void MainWindow::registerDefaultActions()
     cmd = am->registerAction(tmpaction, Constants::G_HELP_HELP, m_globalContext);
     mhelp->addAction(cmd, Constants::G_HELP_HELP);
     tmpaction->setEnabled(true);
-#ifdef Q_WS_MAC
-    cmd->action()->setMenuRole(QAction::ApplicationSpecificRole);
-#endif
     connect(tmpaction, SIGNAL(triggered()), this,  SLOT(aboutPlugins()));
 
     // About sep

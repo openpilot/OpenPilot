@@ -77,7 +77,7 @@ void Telemetry::registerObject(UAVObject* obj)
     addObject(obj);
 
     // Setup object for telemetry updates
-    updateObject(obj);
+    updateObject(obj, EV_NONE);
 }
 
 /**
@@ -152,7 +152,7 @@ void Telemetry::connectToObjectInstances(UAVObject* obj, quint32 eventMask)
 /**
  * Update an object based on its metadata properties
  */
-void Telemetry::updateObject(UAVObject* obj)
+void Telemetry::updateObject(UAVObject* obj, quint32 eventType)
 {
     // Get metadata
     UAVObject::Metadata metadata = obj->getMetadata();
@@ -184,6 +184,34 @@ void Telemetry::updateObject(UAVObject* obj)
         }
         connectToObjectInstances(obj, eventMask);
     }
+    else if ( updateMode == UAVObject::UPDATEMODE_THROTTLED )
+    {
+        // If we received a periodic update, we can change back to update on change
+        if (eventType == EV_UPDATED_PERIODIC) {
+            // Set update period
+            setUpdatePeriod(obj, 0);
+            // Connect signals for all instances
+	    eventMask = EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ;
+            if( dynamic_cast<UAVMetaObject*>(obj) != NULL )
+            {
+                eventMask |= EV_UNPACKED; // we also need to act on remote updates (unpack events)
+            }
+            connectToObjectInstances(obj, eventMask);
+	}
+	else
+	{
+            // Otherwise, we just received an object update, so switch to periodic for the timeout period to prevent more updates
+            // Set update period
+            setUpdatePeriod(obj, metadata.gcsTelemetryUpdatePeriod);
+            // Connect signals for all instances
+            eventMask = EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ;
+            if( dynamic_cast<UAVMetaObject*>(obj) != NULL )
+            {
+               eventMask |= EV_UNPACKED; // we also need to act on remote updates (unpack events)
+            }
+            connectToObjectInstances(obj, eventMask);
+	}
+    }
     else if ( updateMode == UAVObject::UPDATEMODE_MANUAL )
     {
         // Set update period
@@ -195,13 +223,6 @@ void Telemetry::updateObject(UAVObject* obj)
             eventMask |= EV_UNPACKED; // we also need to act on remote updates (unpack events)
         }
         connectToObjectInstances(obj, eventMask);
-    }
-    else if ( updateMode == UAVObject::UPDATEMODE_NEVER )
-    {
-        // Set update period
-        setUpdatePeriod(obj, 0);
-        // Disconnect from object
-        connectToObjectInstances(obj, 0);
     }
 }
 
@@ -409,7 +430,7 @@ void Telemetry::processObjectQueue()
     UAVMetaObject* metaobj = dynamic_cast<UAVMetaObject*>(objInfo.obj);
     if ( metaobj != NULL )
     {
-        updateObject( metaobj->getParentObject() );
+        updateObject( metaobj->getParentObject(), objInfo.event );
     }
 
     // The fact we received an unpacked event does not mean that

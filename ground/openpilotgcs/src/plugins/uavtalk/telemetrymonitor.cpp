@@ -77,24 +77,21 @@ void TelemetryMonitor::startRetrievingObjects()
         UAVMetaObject* mobj = dynamic_cast<UAVMetaObject*>(obj);
         UAVDataObject* dobj = dynamic_cast<UAVDataObject*>(obj);
         UAVObject::Metadata mdata = obj->getMetadata();
-        if ( UAVObject::GetGcsTelemetryUpdateMode(mdata) != UAVObject::UPDATEMODE_NEVER )
+        if ( mobj != NULL )
         {
-            if ( mobj != NULL )
+            queue.enqueue(obj);
+        }
+        else if ( dobj != NULL )
+        {
+            if ( dobj->isSettings() )
             {
                 queue.enqueue(obj);
             }
-            else if ( dobj != NULL )
+            else
             {
-                if ( dobj->isSettings() )
+                if ( UAVObject::GetFlightTelemetryUpdateMode(mdata) == UAVObject::UPDATEMODE_ONCHANGE )
                 {
                     queue.enqueue(obj);
-                }
-                else
-                {
-                    if ( UAVObject::GetFlightTelemetryUpdateMode(mdata) == UAVObject::UPDATEMODE_ONCHANGE )
-                    {
-                        queue.enqueue(obj);
-                    }
                 }
             }
         }

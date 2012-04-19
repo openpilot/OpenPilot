@@ -60,8 +60,8 @@ public:
     typedef enum {
             UPDATEMODE_PERIODIC = 0, /** Automatically update object at periodic intervals */
             UPDATEMODE_ONCHANGE = 1, /** Only update object when its data changes */
-            UPDATEMODE_MANUAL = 2,  /** Manually update object, by calling the updated() function */
-            UPDATEMODE_NEVER = 3 /** Object is never updated */
+            UPDATEMODE_THROTTLED = 2, /** Object is updated on change, but not more often than the interval time */
+            UPDATEMODE_MANUAL = 3  /** Manually update object, by calling the updated() function */
     } UpdateMode;
 
     /**

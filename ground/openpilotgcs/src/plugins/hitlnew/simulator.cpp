@@ -251,7 +251,7 @@ void Simulator::setupOutputObject(UAVObject* obj, int updatePeriod)
 	mdata = obj->getDefaultMetadata();
 	UAVObject::SetFlightAccess(mdata, UAVObject::ACCESS_READONLY);
 	UAVObject::SetGcsAccess(mdata, UAVObject::ACCESS_READWRITE);
-	UAVObject::SetFlightTelemetryUpdateMode(mdata,UAVObject::UPDATEMODE_NEVER);
+	UAVObject::SetFlightTelemetryUpdateMode(mdata,UAVObject::UPDATEMODE_MANUAL);
 	UAVObject::SetGcsTelemetryAcked(mdata, false);
 	UAVObject::SetGcsTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
 	mdata.gcsTelemetryUpdatePeriod = updatePeriod;

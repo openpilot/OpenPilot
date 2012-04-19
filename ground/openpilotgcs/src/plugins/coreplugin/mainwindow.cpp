@@ -83,6 +83,7 @@
 #include <QtGui/QWizard>
 #include <QtGui/QToolButton>
 #include <QtGui/QMessageBox>
+#include <QDesktopServices>
 
 /*
 #ifdef Q_OS_UNIX
@@ -731,7 +732,7 @@ void MainWindow::registerDefaultActions()
     cmd = am->registerAction(tmpaction, Constants::G_HELP_HELP, m_globalContext);
     mhelp->addAction(cmd, Constants::G_HELP_HELP);
     tmpaction->setEnabled(true);
-    connect(tmpaction, SIGNAL(triggered()), this,  SLOT(aboutPlugins()));
+    connect(tmpaction, SIGNAL(triggered()), this,  SLOT(showHelp()));
 
     // About sep
 #ifndef Q_WS_MAC // doesn't have the "About" actions in the Help menu
@@ -865,6 +866,11 @@ void MainWindow::applyTabBarSettings(QTabWidget::TabPosition pos, bool movable) 
     if (m_modeStack->tabPosition() != pos)
         m_modeStack->setTabPosition(pos);
     m_modeStack->setMovable(movable);
+}
+
+void MainWindow::showHelp()
+{
+    QDesktopServices::openUrl( QUrl(Constants::GCS_HELP, QUrl::StrictMode) );
 }
 
 ActionManager *MainWindow::actionManager() const

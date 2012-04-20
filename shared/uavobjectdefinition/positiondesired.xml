@@ -1,9 +1,9 @@
 <xml>
     <object name="PositionDesired" singleinstance="true" settings="false">
         <description>The position the craft is trying t achieve.  Can come from GCS or @ref PathPlanner </description>
-        <field name="North" units="cm" type="int32" elements="1"/>
-        <field name="East" units="cm" type="int32" elements="1"/>
-        <field name="Down" units="cm" type="int32" elements="1"/>
+        <field name="North" units="m" type="int32" elements="1"/>
+        <field name="East" units="m" type="int32" elements="1"/>
+        <field name="Down" units="m" type="int32" elements="1"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>
         <telemetryflight acked="false" updatemode="onchange" period="0"/>

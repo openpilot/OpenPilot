@@ -45,16 +45,10 @@ UAVMetaObject::UAVMetaObject(quint32 objID, const QString& name, UAVObject* pare
     QStringList accessModeEnum;
     accessModeEnum << tr("Read/Write") << tr("Read Only");
     QList<UAVObjectField*> fields;    
-    fields.append( new UAVObjectField(tr("Flight Access Mode"), tr(""), UAVObjectField::ENUM, 1, accessModeEnum) );
-    fields.append( new UAVObjectField(tr("GCS Access Mode"), tr(""), UAVObjectField::ENUM, 1, accessModeEnum) );
-    fields.append( new UAVObjectField(tr("Flight Telemetry Acked"), tr(""), UAVObjectField::ENUM, 1, boolEnum) );
-    fields.append( new UAVObjectField(tr("Flight Telemetry Update Mode"), tr(""), UAVObjectField::ENUM, 1, updateModeEnum) );
-    fields.append( new UAVObjectField(tr("Flight Telemetry Update Period"), tr(""), UAVObjectField::UINT32, 1, QStringList()) );
-    fields.append( new UAVObjectField(tr("GCS Telemetry Acked"), tr(""), UAVObjectField::ENUM, 1, boolEnum) );
-    fields.append( new UAVObjectField(tr("GCS Telemetry Update Mode"), tr(""), UAVObjectField::ENUM, 1, updateModeEnum) );
-    fields.append( new UAVObjectField(tr("GCS Telemetry Update Period"), tr(""), UAVObjectField::UINT32, 1, QStringList()) );
-    fields.append( new UAVObjectField(tr("Logging Update Mode"), tr(""), UAVObjectField::ENUM, 1, updateModeEnum) );
-    fields.append( new UAVObjectField(tr("Logging Update Period"), tr(""), UAVObjectField::UINT32, 1, QStringList()) );
+    fields.append( new UAVObjectField(tr("Modes"), tr(""), UAVObjectField::UINT8, 1, accessModeEnum) );
+    fields.append( new UAVObjectField(tr("Flight Telemetry Update Period"), tr(""), UAVObjectField::UINT16, 1, QStringList()) );
+    fields.append( new UAVObjectField(tr("GCS Telemetry Update Period"), tr(""), UAVObjectField::UINT16, 1, QStringList()) );
+    fields.append( new UAVObjectField(tr("Logging Update Period"), tr(""), UAVObjectField::UINT16, 1, QStringList()) );
     // Initialize parent
     UAVObject::initialize(0);
     UAVObject::initializeFields(fields, (quint8*)&parentMetadata, sizeof(Metadata));

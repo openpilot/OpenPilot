@@ -148,6 +148,7 @@ signals:
     void objectUpdated(UAVObject* obj);
     void objectUpdatedAuto(UAVObject* obj);
     void objectUpdatedManual(UAVObject* obj);
+    void objectUpdatedPeriodic(UAVObject* obj);
     void objectUnpacked(UAVObject* obj);
     void updateRequested(UAVObject* obj);
     void transactionCompleted(UAVObject* obj, bool success);

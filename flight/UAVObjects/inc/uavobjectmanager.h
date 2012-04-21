@@ -104,7 +104,7 @@ typedef enum {
  * Helper macros for event masks
  */
 #define EV_MASK_ALL 0
-#define EV_MASK_ALL_UPDATES (EV_UNPACKED | EV_UPDATED | EV_UPDATED_MANUAL)
+#define EV_MASK_ALL_UPDATES (EV_UNPACKED | EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATED_PERIODIC)
 
 /**
  * Access types

@@ -142,6 +142,10 @@ void Telemetry::connectToObjectInstances(UAVObject* obj, quint32 eventMask)
         {
             connect(objs[n], SIGNAL(objectUpdatedManual(UAVObject*)), this, SLOT(objectUpdatedManual(UAVObject*)));
         }
+        if ( (eventMask&EV_UPDATED_PERIODIC) != 0)
+        {
+            connect(objs[n], SIGNAL(objectUpdatedPeriodic(UAVObject*)), this, SLOT(objectUpdatedPeriodic(UAVObject*)));
+        }
         if ( (eventMask&EV_UPDATE_REQ) != 0)
         {
             connect(objs[n], SIGNAL(updateRequested(UAVObject*)), this, SLOT(updateRequested(UAVObject*)));
@@ -165,7 +169,7 @@ void Telemetry::updateObject(UAVObject* obj, quint32 eventType)
         // Set update period
         setUpdatePeriod(obj, metadata.gcsTelemetryUpdatePeriod);
         // Connect signals for all instances
-        eventMask = EV_UPDATED_MANUAL | EV_UPDATE_REQ;
+        eventMask = EV_UPDATED_MANUAL | EV_UPDATE_REQ | EV_UPDATED_PERIODIC;
         if( dynamic_cast<UAVMetaObject*>(obj) != NULL )
         {
             eventMask |= EV_UNPACKED; // we also need to act on remote updates (unpack events)
@@ -187,11 +191,11 @@ void Telemetry::updateObject(UAVObject* obj, quint32 eventType)
     else if ( updateMode == UAVObject::UPDATEMODE_THROTTLED )
     {
         // If we received a periodic update, we can change back to update on change
-        if (eventType == EV_UPDATED_PERIODIC) {
+	if ((eventType == EV_UPDATED_PERIODIC) || (eventType == EV_NONE)) {
             // Set update period
             setUpdatePeriod(obj, 0);
             // Connect signals for all instances
-	    eventMask = EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ;
+	    eventMask = EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ | EV_UPDATED_PERIODIC;
             if( dynamic_cast<UAVMetaObject*>(obj) != NULL )
             {
                 eventMask |= EV_UNPACKED; // we also need to act on remote updates (unpack events)
@@ -403,7 +407,9 @@ void Telemetry::processObjectQueue()
     }
 
     // Setup transaction (skip if unpack event)
-    if ( objInfo.event != EV_UNPACKED )
+    UAVObject::Metadata metadata = objInfo.obj->getMetadata();
+    UAVObject::UpdateMode updateMode = UAVObject::GetGcsTelemetryUpdateMode(metadata);
+    if ( ( objInfo.event != EV_UNPACKED ) && ( ( objInfo.event != EV_UPDATED_PERIODIC ) || ( updateMode != UAVObject::UPDATEMODE_THROTTLED ) ) )
     {
         UAVObject::Metadata metadata = objInfo.obj->getMetadata();
         transInfo.obj = objInfo.obj;
@@ -431,6 +437,10 @@ void Telemetry::processObjectQueue()
     if ( metaobj != NULL )
     {
         updateObject( metaobj->getParentObject(), objInfo.event );
+    }
+    else if ( updateMode != UAVObject::UPDATEMODE_THROTTLED )
+    {
+        updateObject( objInfo.obj, objInfo.event );
     }
 
     // The fact we received an unpacked event does not mean that
@@ -475,7 +485,7 @@ void Telemetry::processPeriodicUpdates()
                 objinfo->timeToNextUpdateMs = objinfo->updatePeriodMs - offset;
                 // Send object
                 time.start();
-                processObjectUpdates(objinfo->obj, EV_UPDATED_MANUAL, true, false);
+                processObjectUpdates(objinfo->obj, EV_UPDATED_PERIODIC, true, false);
                 elapsedMs = time.elapsed();
                 // Update timeToNextUpdateMs with the elapsed delay of sending the object;
                 timeToNextUpdateMs += elapsedMs;
@@ -542,6 +552,12 @@ void Telemetry::objectUpdatedManual(UAVObject* obj)
 {
     QMutexLocker locker(mutex);
     processObjectUpdates(obj, EV_UPDATED_MANUAL, false, true);
+}
+
+void Telemetry::objectUpdatedPeriodic(UAVObject* obj)
+{
+    QMutexLocker locker(mutex);
+    processObjectUpdates(obj, EV_UPDATED_PERIODIC, false, true);
 }
 
 void Telemetry::objectUnpacked(UAVObject* obj)

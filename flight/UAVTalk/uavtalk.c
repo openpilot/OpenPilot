@@ -261,12 +261,12 @@ UAVTalkRxState UAVTalkProcessInputStream(UAVTalkConnection connectionHandle, uin
 
 	UAVTalkInputProcessor *iproc = &connection->iproc;
 	++connection->stats.rxBytes;
-	
-	if (iproc->rxPacketLength < 0xffff)
-		iproc->rxPacketLength++;   // update packet byte count
 
 	if (iproc->state == UAVTALK_STATE_ERROR || iproc->state == UAVTALK_STATE_COMPLETE)
 		iproc->state = UAVTALK_STATE_SYNC;
+	
+	if (iproc->rxPacketLength < 0xffff)
+		iproc->rxPacketLength++;   // update packet byte count
 	
 	// Receive state machine
 	switch (iproc->state)
@@ -336,7 +336,8 @@ UAVTalkRxState UAVTalkProcessInputStream(UAVTalkConnection connectionHandle, uin
 
 			if (iproc->rxCount < 4)
 				break;
-
+			
+			// Search for object.
 			iproc->obj = UAVObjGetByID(iproc->objId);
 			
 			// Determine data length
@@ -381,24 +382,21 @@ UAVTalkRxState UAVTalkProcessInputStream(UAVTalkConnection connectionHandle, uin
 			{
 				// If this is a NACK, we skip to Checksum
 				iproc->state = UAVTALK_STATE_CS;
-				iproc->rxCount = 0;
 			}
 			// Check if this is a single instance object (i.e. if the instance ID field is coming next)
-			else if ((iproc->obj == 0) || !UAVObjIsSingleInstance(iproc->obj))
+			else if ((iproc->obj != 0) && !UAVObjIsSingleInstance(iproc->obj))
+			{
+				iproc->state = UAVTALK_STATE_INSTID;
+			}
+			else
 			{
 				// If there is a payload get it, otherwise receive checksum
 				if (iproc->length > 0)
 					iproc->state = UAVTALK_STATE_DATA;
 				else
 					iproc->state = UAVTALK_STATE_CS;
-
-				iproc->rxCount = 0;
 			}
-			else
-			{
-				iproc->state = UAVTALK_STATE_INSTID;
-				iproc->rxCount = 0;
-			}
+			iproc->rxCount = 0;
 			
 			break;
 			
@@ -451,7 +449,7 @@ UAVTalkRxState UAVTalkProcessInputStream(UAVTalkConnection connectionHandle, uin
 				iproc->state = UAVTALK_STATE_ERROR;
 				break;
 			}
-
+			
 			if (iproc->obj)
 			{
 				xSemaphoreTakeRecursive(connection->lock, portMAX_DELAY);
@@ -467,7 +465,6 @@ UAVTalkRxState UAVTalkProcessInputStream(UAVTalkConnection connectionHandle, uin
 		default:
 			connection->stats.rxErrors++;
 			iproc->state = UAVTALK_STATE_ERROR;
-			break;
 	}
 	
 	// Done

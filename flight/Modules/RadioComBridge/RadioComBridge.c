@@ -285,7 +285,7 @@ static void com2RadioBridgeTask(void * parameters)
 
 		// Pass the new data through UAVTalk
 		for (uint8_t i = 0; i < cur_rx_bytes; i++)
-			UAVTalkProcessInputStream(data->inUAVTalkCon, *(data->com2radio_buf + i + rx_bytes));
+			UAVTalkProcessInputStreamQuiet(data->inUAVTalkCon, *(data->com2radio_buf + i + rx_bytes));
 
 		// Do we have an data to send?
 		rx_bytes += cur_rx_bytes;
@@ -437,7 +437,7 @@ static void receiveData(uint8_t *buf, uint8_t len)
 	uint8_t sent_bytes = 0;
 	for (uint8_t i = 0; i < len; ++i)
 	{
-		UAVTalkRxState state = UAVTalkProcessInputStream(data->outUAVTalkCon, buf[i]);
+		UAVTalkRxState state = UAVTalkProcessInputStreamQuiet(data->outUAVTalkCon, buf[i]);
 		/* if(state == UAVTALK_STATE_ERROR) */
 		/* 	DEBUG_PRINTF(2, "OUT Error\n\r"); */
 		if((state == UAVTALK_STATE_COMPLETE) || (state == UAVTALK_STATE_SYNC))

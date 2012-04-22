@@ -446,14 +446,21 @@ static int32_t updateAttitudeComplimentary(bool first_run)
 		positionActual.East = NED[1];
 		positionActual.Down = NED[2];
 		PositionActualSet(&positionActual);
+	}
+
+	if ( xQueueReceive(gpsVelQueue, &ev, 0) == pdTRUE ) {
+		// Transform the GPS position into NED coordinates
+		GPSVelocityData gpsVelocity;
+		GPSVelocityGet(&gpsVelocity);
 
 		VelocityActualData velocityActual;
 		VelocityActualGet(&velocityActual);
-		velocityActual.North = gpsPosition.Groundspeed * cosf(gpsPosition.Heading * F_PI / 180.0f);
-		velocityActual.East = gpsPosition.Groundspeed * sinf(gpsPosition.Heading * F_PI / 180.0f);
-		velocityActual.Down = 0;
+		velocityActual.North = gpsVelocity.North;
+		velocityActual.East = gpsVelocity.East;
+		velocityActual.Down = gpsVelocity.Down;
 		VelocityActualSet(&velocityActual);
 	}
+
 
 	AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
 

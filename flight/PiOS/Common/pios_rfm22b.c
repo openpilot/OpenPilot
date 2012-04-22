@@ -63,6 +63,11 @@
 /* Local Defines */
 #define STACK_SIZE_BYTES  200
 
+// RTC timer is running at 625Hz (1.6ms or 5 ticks == 8ms).
+// A 256 byte message at 56kbps should take less than 40ms
+// Note: This timeout should be rate dependent.
+#define PIOS_RFM22B_SUPERVISOR_TIMEOUT 65  // ~100ms
+
 // this is too adjust the RF module so that it is on frequency
 #define OSC_LOAD_CAP					0x7F	// cap = 12.5pf .. default
 #define OSC_LOAD_CAP_1				0x7D	// board 1
@@ -156,14 +161,19 @@ struct pios_rfm22b_dev {
 	uint32_t rx_in_context;
 	pios_com_callback tx_out_cb;
 	uint32_t tx_out_context;
+
+	// The supervisor countdown timer.
+	uint16_t supv_timer;
+	uint16_t resets;
 };
 
 uint32_t random32 = 0x459ab8d8;
 
 /* Local function forwared declarations */
-void rfm22_processInt(void);
-void PIOS_RFM22_EXT_Int(void);
-void rfm22_setTxMode(uint8_t mode);
+static void PIOS_RFM22B_Supervisor(uint32_t ppm_id);
+static void rfm22_processInt(void);
+static void PIOS_RFM22_EXT_Int(void);
+static void rfm22_setTxMode(uint8_t mode);
 
 // SPI read/write functions
 void rfm22_startBurstWrite(uint8_t addr);
@@ -289,6 +299,8 @@ const uint8_t ss_reg_71[] = {  0x2B, 0x23}; // rfm22_modulation_mode_control2
 // ************************************
 
 volatile bool		initialized = false;
+
+struct pios_rfm22b_dev * rfm22b_dev;
 
 #if defined(RFM22_EXT_INT_USE)
 volatile bool		exec_using_spi;					// set this if you want to access the SPI bus outside of the interrupt
@@ -430,8 +442,6 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, const struct pios_rfm22b_cfg *cfg)
 	PIOS_DEBUG_Assert(rfm22b_id);
 	PIOS_DEBUG_Assert(cfg);
 
-	struct pios_rfm22b_dev * rfm22b_dev;
-
 	// Allocate the device structure.
 	rfm22b_dev = (struct pios_rfm22b_dev *) PIOS_RFM22B_alloc();
 	if (!rfm22b_dev)
@@ -456,6 +466,10 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, const struct pios_rfm22b_cfg *cfg)
 	}
 	rfm22b_dev->deviceID = crcs[0] | crcs[1] << 8 | crcs[2] << 16 | crcs[3] << 24;
 	DEBUG_PRINTF(2, "RF device ID: %x\n\r", rfm22b_dev->deviceID);
+
+	// Initialize the supervisor timer.
+	rfm22b_dev->supv_timer = PIOS_RFM22B_SUPERVISOR_TIMEOUT;
+	rfm22b_dev->resets = 0;
 
 	// Initialize the radio device.
 	int initval = rfm22_init_normal(rfm22b_dev->deviceID, cfg->minFrequencyHz, cfg->maxFrequencyHz, 50000);
@@ -501,6 +515,11 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, const struct pios_rfm22b_cfg *cfg)
 	DEBUG_PRINTF(2, "RF frequency: %dHz\n\r", rfm22_getNominalCarrierFrequency());
 	DEBUG_PRINTF(2, "RF TX power: %d\n\r", rfm22_getTxPower());
 
+	// Setup a real-time clock callback to kickstart the radio if a transfer lock sup.
+	if (!PIOS_RTC_RegisterTickCallback(PIOS_RFM22B_Supervisor, *rfm22b_id)) {
+		PIOS_DEBUG_Assert(0);
+	}
+
 	return(0);
 }
 
@@ -511,9 +530,16 @@ uint32_t PIOS_RFM22B_DeviceID(uint32_t rfm22b_id)
 	return rfm22b_dev->deviceID;
 }
 
-int8_t PIOS_RFM22B_RSSI(uint32_t rfb22b_id)
+int8_t PIOS_RFM22B_RSSI(uint32_t rfm22b_id)
 {
 	return rfm22_receivedRSSI();
+}
+
+int16_t PIOS_RFM22B_Resets(uint32_t rfm22b_id)
+{
+	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
+
+	return rfm22b_dev->resets;
 }
 
 static void PIOS_RFM22B_RxStart(uint32_t rfm22b_id, uint16_t rx_bytes_avail)
@@ -602,12 +628,39 @@ static void PIOS_RFM22B_RegisterTxCallback(uint32_t rfm22b_id, pios_com_callback
 	rfm22b_dev->tx_out_cb = tx_out_cb;
 }
 
-void rfm22_setDebug(const char* msg)
+static void PIOS_RFM22B_Supervisor(uint32_t rfm22b_id)
+{
+	/* Recover our device context */
+	struct pios_rfm22b_dev * rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
+
+	if (!PIOS_RFM22B_validate(rfm22b_dev)) {
+		/* Invalid device specified */
+		return;
+	}
+
+	/* Not a problem if we're waiting for a packet. */
+	if(rf_mode == RX_WAIT_SYNC_MODE)
+		return;
+
+	/* The radio must be locked up if the timer reaches 0 */
+	if(--(rfm22b_dev->supv_timer) != 0)
+		return;
+	++(rfm22b_dev->resets);
+
+	/* Start a packet transfer if one is available. */
+	if(!rfm22_txStart())
+	{
+		/* Otherwise, switch to RX mode */
+		rfm22_setRxMode(RX_WAIT_PREAMBLE_MODE, false);
+	}
+}
+
+static void rfm22_setDebug(const char* msg)
 {
 	debug_msg = msg;
 }
 
-void rfm22_setError(const char* msg)
+static void rfm22_setError(const char* msg)
 {
 	error_msg = msg;
 }
@@ -687,7 +740,7 @@ uint8_t rfm22_read(uint8_t addr)
 // external interrupt
 
 
-void PIOS_RFM22_EXT_Int(void)
+static void PIOS_RFM22_EXT_Int(void)
 {
 	rfm22_setDebug("Ext Int");
 	if (!exec_using_spi)
@@ -1126,6 +1179,9 @@ uint8_t rfm22_txStart()
 	// Disable interrrupts.
 	PIOS_IRQ_Disable();
 
+	// Initialize the supervisor timer.
+	rfm22b_dev->supv_timer = PIOS_RFM22B_SUPERVISOR_TIMEOUT;
+
 	// disable interrupts
 	rfm22_write(RFM22_interrupt_enable1, 0x00);
 	rfm22_write(RFM22_interrupt_enable2, 0x00);
@@ -1202,7 +1258,7 @@ uint8_t rfm22_txStart()
 }
 
 
-void rfm22_setTxMode(uint8_t mode)
+static void rfm22_setTxMode(uint8_t mode)
 {
 	rfm22_setDebug("setTxMode");
 	if (mode != TX_DATA_MODE && mode != TX_STREAM_MODE && mode != TX_CARRIER_MODE && mode != TX_PN_MODE)
@@ -1582,7 +1638,7 @@ void rfm22_processTxInt(void)
 	rfm22_setDebug("ProcessTxInt done");
 }
 
-void rfm22_processInt(void)
+static void rfm22_processInt(void)
 {
 	rfm22_setDebug("ProcessInt");
 	// this is called from the external interrupt handler
@@ -1592,6 +1648,9 @@ void rfm22_processInt(void)
 		return;
 
 	exec_using_spi = TRUE;
+
+	// Reset the supervisor timer.
+	rfm22b_dev->supv_timer = PIOS_RFM22B_SUPERVISOR_TIMEOUT;
 
 	// ********************************
 	// read the RF modules current status registers

@@ -42,7 +42,7 @@
 
 #include <stdbool.h>
 
-#undef PIOS_INCLUDE_USB
+//#undef PIOS_INCLUDE_USB
 
 // ****************
 // Private functions
@@ -173,7 +173,6 @@ static int32_t RadioComBridgeInitialize(void)
 
 	// Initialize the UAVObjects that we use
 	GCSReceiverInitialize();
-	PipXStatusInitialize();
 	PipXSettingsInitialize();
 	data->send_gcsreceiver = false;
 	data->send_pipxstatus = false;
@@ -355,6 +354,7 @@ static void radioStatusTask(void *parameters)
 		// Update the status
 		pipxStatus.DeviceID = PIOS_RFM22B_DeviceID(pios_rfm22b_id);
 		pipxStatus.RSSI = PIOS_RFM22B_RSSI(pios_rfm22b_id);
+		pipxStatus.Resets = PIOS_RFM22B_Resets(pios_rfm22b_id);
 
 		// Update the potential pairing contacts
 		for (uint8_t i = 0; i < PIPXSTATUS_PAIRIDS_NUMELEM; ++i)

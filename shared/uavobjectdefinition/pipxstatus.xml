@@ -13,6 +13,7 @@
 		<field name="AFC" units="" type="int32" elements="1" defaultvalue="0"/>
 		<field name="Retries" units="" type="uint16" elements="1" defaultvalue="0"/>
 		<field name="Errors" units="" type="uint16" elements="1" defaultvalue="0"/>
+		<field name="Resets" units="" type="uint16" elements="1" defaultvalue="0"/>
 		<field name="RSSI" units="dBm" type="int8" elements="1" defaultvalue="0"/>
 		<field name="LinkState" units="function" type="enum" elements="1" options="Disconnected,Connecting,Connected" defaultvalue="Disconnected"/>
 		<field name="PairIDs" units="" type="uint32" elements="4" defaultvalue="0"/>

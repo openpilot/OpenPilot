@@ -39,6 +39,8 @@
  */
 
 #include <openpilot.h>
+#include <pipxstatus.h>
+#include <pios_board_info.h>
 #include "systemmod.h"
 
 // Private constants
@@ -96,6 +98,22 @@ int32_t PipXtremeModInitialize(void)
 {
 
 	// Must registers objects here for system thread because ObjectManager started in OpenPilotInit
+
+	// Initialize out status object.
+	PipXStatusInitialize();
+	PipXStatusData pipxStatus;
+	PipXStatusGet(&pipxStatus);
+
+	// Get our hardware information.
+	const struct pios_board_info * bdinfo = &pios_board_info_blob;
+
+	pipxStatus.BoardType= bdinfo->board_type;
+	PIOS_BL_HELPER_FLASH_Read_Description(pipxStatus.Description, PIPXSTATUS_DESCRIPTION_NUMELEM);
+	PIOS_SYS_SerialNumberGetBinary(pipxStatus.CPUSerial);
+	pipxStatus.BoardRevision= bdinfo->board_rev;
+
+	// Update the object
+	PipXStatusSet(&pipxStatus);
 
 	// Call the module start function.
 	PipXtremeModStart();

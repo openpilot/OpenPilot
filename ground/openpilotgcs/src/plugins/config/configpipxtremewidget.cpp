@@ -76,14 +76,6 @@ void ConfigPipXtremeWidget::saveSettings()
   */
 void ConfigPipXtremeWidget::updateStatus(UAVObject *object) {
 
-	// Update the DeviceID field
-	UAVObjectField* idField = object->getField("DeviceID");
-	if (idField) {
-		m_pipx->DeviceID->setText(QString::number(idField->getValue().toUInt(), 16).toUpper());
- 	} else {
- 		qDebug() << "PipXtremeGadgetWidget: Count not read DeviceID field.";
- 	}
-
 	// Update the detected devices.
 	UAVObjectField* pairIdField = object->getField("PairIDs");
 	if (pairIdField) {
@@ -102,6 +94,42 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object) {
 		m_pipx->PairSignalStrength4->setValue(pairRssiField->getValue(3).toInt());
 	} else {
 		qDebug() << "PipXtremeGadgetWidget: Count not read PairID field.";
+	}
+
+	// Update the Description field
+	UAVObjectField* descField = object->getField("Description");
+	if (descField) {
+		char buf[PipXStatus::DESCRIPTION_NUMELEM];
+		for (unsigned int i = 0; i < PipXStatus::DESCRIPTION_NUMELEM; ++i)
+			buf[i] = descField->getValue(i).toChar().toAscii();
+		m_pipx->FirmwareVersion->setText(buf);
+ 	} else {
+ 		qDebug() << "PipXtremeGadgetWidget: Count not read Description field.";
+ 	}
+
+	// Update the serial number field
+	UAVObjectField* serialField = object->getField("CPUSerial");
+	if (serialField) {
+		char buf[PipXStatus::CPUSERIAL_NUMELEM * 2 + 1];
+		for (unsigned int i = 0; i < PipXStatus::CPUSERIAL_NUMELEM; ++i)
+		{
+			unsigned char val = serialField->getValue(i).toUInt() >> 4;
+			buf[i * 2] = ((val < 10) ? '0' : '7') + val;
+			val = serialField->getValue(i).toUInt() & 0xf;
+			buf[i * 2 + 1] = ((val < 10) ? '0' : '7') + val;
+		}
+		buf[PipXStatus::CPUSERIAL_NUMELEM * 2] = '\0';
+		m_pipx->SerialNumber->setText(buf);
+ 	} else {
+ 		qDebug() << "PipXtremeGadgetWidget: Count not read Description field.";
+ 	}
+
+	// Update the DeviceID field
+	UAVObjectField* idField = object->getField("DeviceID");
+	if (idField) {
+		m_pipx->DeviceID->setText(QString::number(idField->getValue().toUInt(), 16).toUpper());
+	} else {
+		qDebug() << "PipXtremeGadgetWidget: Count not read DeviceID field.";
 	}
 
  	// Update the link state
@@ -123,6 +151,30 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object) {
 		m_pipx->LinkState->setText(msg);
 	} else {
 		qDebug() << "PipXtremeGadgetWidget: Count not read link state field.";
+	}
+
+	// Update the Retries field
+	UAVObjectField* retriesField = object->getField("Retries");
+	if (retriesField) {
+		m_pipx->Retries->setText(QString::number(retriesField->getValue().toUInt()));
+	} else {
+		qDebug() << "PipXtremeGadgetWidget: Count not read Retries field.";
+	}
+
+	// Update the Errors field
+	UAVObjectField* errorsField = object->getField("Errors");
+	if (errorsField) {
+		m_pipx->Errors->setText(QString::number(errorsField->getValue().toUInt()));
+	} else {
+		qDebug() << "PipXtremeGadgetWidget: Count not read Errors field.";
+	}
+
+	// Update the Resets field
+	UAVObjectField* resetsField = object->getField("Resets");
+	if (resetsField) {
+		m_pipx->Retries->setText(QString::number(resetsField->getValue().toUInt()));
+	} else {
+		qDebug() << "PipXtremeGadgetWidget: Count not read Resets field.";
 	}
 }
 

@@ -196,9 +196,9 @@ void UAVObjSetTelemetryUpdateMode(UAVObjMetadata* dataOut, UAVObjUpdateMode val)
 UAVObjUpdateMode UAVObjGetGcsTelemetryUpdateMode(const UAVObjMetadata* dataOut);
 void UAVObjSetTelemetryGcsUpdateMode(UAVObjMetadata* dataOut, UAVObjUpdateMode val);
 int8_t UAVObjReadOnly(UAVObjHandle obj);
-int32_t UAVObjConnectQueue(UAVObjHandle obj, xQueueHandle queue, int32_t eventMask);
+int32_t UAVObjConnectQueue(UAVObjHandle obj, xQueueHandle queue, uint8_t eventMask);
 int32_t UAVObjDisconnectQueue(UAVObjHandle obj, xQueueHandle queue);
-int32_t UAVObjConnectCallback(UAVObjHandle obj, UAVObjEventCallback cb, int32_t eventMask);
+int32_t UAVObjConnectCallback(UAVObjHandle obj, UAVObjEventCallback cb, uint8_t eventMask);
 int32_t UAVObjDisconnectCallback(UAVObjHandle obj, UAVObjEventCallback cb);
 void UAVObjRequestUpdate(UAVObjHandle obj);
 void UAVObjRequestInstanceUpdate(UAVObjHandle obj, uint16_t instId);

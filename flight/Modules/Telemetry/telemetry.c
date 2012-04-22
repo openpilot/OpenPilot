@@ -195,21 +195,15 @@ static void updateObject(UAVObjHandle obj, int32_t eventType)
 		}
 		UAVObjConnectQueue(obj, priorityQueue, eventMask);
 	} else if (updateMode == UPDATEMODE_THROTTLED) {
-		// If we received a periodic update, we can change back to update on change
 		if ((eventType == EV_UPDATED_PERIODIC) || (eventType == EV_NONE)) {
-			// Set update period
-			setUpdatePeriod(obj, 0);
-			// Connect queue
+			// If we received a periodic update, we can change back to update on change
 			eventMask = EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ;
+			// Set update period on initialization and metadata change
+			if (eventType == EV_NONE)
+				setUpdatePeriod(obj, metadata.telemetryUpdatePeriod);
 		} else {
 			// Otherwise, we just received an object update, so switch to periodic for the timeout period to prevent more updates
-			// Set update period
-			setUpdatePeriod(obj, metadata.telemetryUpdatePeriod);
-			// Connect queue
 			eventMask = EV_UPDATED_PERIODIC | EV_UPDATED_MANUAL | EV_UPDATE_REQ;
-			if (UAVObjIsMetaobject(obj)) {
-				eventMask |= EV_UNPACKED;	// we also need to act on remote updates (unpack events)
-			}
 		}
 		if (UAVObjIsMetaobject(obj)) {
 			eventMask |= EV_UNPACKED;	// we also need to act on remote updates (unpack events)
@@ -277,7 +271,7 @@ static void processObjEvent(UAVObjEvent * ev)
 			}
 			// If this is a metaobject then make necessary telemetry updates
 			if (UAVObjIsMetaobject(ev->obj)) {
-				updateObject(UAVObjGetLinkedObj(ev->obj), ev->event);	// linked object will be the actual object the metadata are for
+				updateObject(UAVObjGetLinkedObj(ev->obj), EV_NONE);	// linked object will be the actual object the metadata are for
 			}
 		}
 		if((updateMode == UPDATEMODE_THROTTLED) && !UAVObjIsMetaobject(ev->obj)) {

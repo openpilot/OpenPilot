@@ -39,7 +39,7 @@
 #define UAVOBJ_UPDATE_MODE_MASK 0x3
 
 // Macros
-#define SET_BITS(var, shift, value, mask) var = (var & !(mask << shift)) |	(value << shift);
+#define SET_BITS(var, shift, value, mask) var = (var & ~(mask << shift)) |	(value << shift);
 
 /**
  * Constructor

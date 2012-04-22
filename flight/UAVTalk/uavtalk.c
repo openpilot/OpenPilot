@@ -254,7 +254,7 @@ static int32_t objectTransaction(UAVTalkConnectionData *connection, UAVObjHandle
  * \param[in] rxbyte Received byte
  * \return UAVTalkRxState
  */
-UAVTalkRxState UAVTalkProcessInputStream(UAVTalkConnection connectionHandle, uint8_t rxbyte)
+UAVTalkRxState UAVTalkProcessInputStreamQuiet(UAVTalkConnection connectionHandle, uint8_t rxbyte)
 {
 	UAVTalkConnectionData *connection;
     CHECKCONHANDLE(connectionHandle,connection,return -1);
@@ -449,15 +449,9 @@ UAVTalkRxState UAVTalkProcessInputStream(UAVTalkConnection connectionHandle, uin
 				iproc->state = UAVTALK_STATE_ERROR;
 				break;
 			}
-			
-			if (iproc->obj)
-			{
-				xSemaphoreTakeRecursive(connection->lock, portMAX_DELAY);
-				receiveObject(connection, iproc->type, iproc->objId, iproc->instId, connection->rxBuffer, iproc->length);
-				connection->stats.rxObjectBytes += iproc->length;
-				connection->stats.rxObjects++;
-				xSemaphoreGiveRecursive(connection->lock);
-			}
+
+			connection->stats.rxObjectBytes += iproc->length;
+			connection->stats.rxObjects++;
 
 			iproc->state = UAVTALK_STATE_COMPLETE;
 			break;
@@ -469,6 +463,30 @@ UAVTalkRxState UAVTalkProcessInputStream(UAVTalkConnection connectionHandle, uin
 	
 	// Done
 	return iproc->state;
+}
+			
+/**
+ * Process an byte from the telemetry stream.
+ * \param[in] connection UAVTalkConnection to be used
+ * \param[in] rxbyte Received byte
+ * \return UAVTalkRxState
+ */
+UAVTalkRxState UAVTalkProcessInputStream(UAVTalkConnection connectionHandle, uint8_t rxbyte)
+{
+	UAVTalkRxState state = UAVTalkProcessInputStreamQuiet(connectionHandle, rxbyte);
+
+	if (state == UAVTALK_STATE_COMPLETE)
+	{
+		UAVTalkConnectionData *connection;
+		CHECKCONHANDLE(connectionHandle,connection,return -1);
+		UAVTalkInputProcessor *iproc = &connection->iproc;
+
+		xSemaphoreTakeRecursive(connection->lock, portMAX_DELAY);
+		receiveObject(connection, iproc->type, iproc->objId, iproc->instId, connection->rxBuffer, iproc->length);
+		xSemaphoreGiveRecursive(connection->lock);
+	}
+
+	return state;
 }
 
 /**
@@ -495,7 +513,7 @@ static int32_t receiveObject(UAVTalkConnectionData *connection, uint8_t type, ui
 	switch (type) {
 		case UAVTALK_TYPE_OBJ:
 			// All instances, not allowed for OBJ messages
-			if (instId != UAVOBJ_ALL_INSTANCES)
+			if (obj && (instId != UAVOBJ_ALL_INSTANCES))
 			{
 				// Unpack object, if the instance does not exist it will be created!
 				UAVObjUnpack(obj, instId, data);
@@ -509,7 +527,7 @@ static int32_t receiveObject(UAVTalkConnectionData *connection, uint8_t type, ui
 			break;
 		case UAVTALK_TYPE_OBJ_ACK:
 			// All instances, not allowed for OBJ_ACK messages
-			if (instId != UAVOBJ_ALL_INSTANCES)
+			if (obj && (instId != UAVOBJ_ALL_INSTANCES))
 			{
 				// Unpack object, if the instance does not exist it will be created!
 				if ( UAVObjUnpack(obj, instId, data) == 0 )
@@ -539,7 +557,7 @@ static int32_t receiveObject(UAVTalkConnectionData *connection, uint8_t type, ui
 			break;
 		case UAVTALK_TYPE_ACK:
 			// All instances, not allowed for ACK messages
-			if (instId != UAVOBJ_ALL_INSTANCES)
+			if (obj && (instId != UAVOBJ_ALL_INSTANCES))
 			{
 				// Check if an ack is pending
 				updateAck(connection, obj, instId);

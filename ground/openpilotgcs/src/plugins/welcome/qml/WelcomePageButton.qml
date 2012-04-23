@@ -10,28 +10,34 @@ Item {
     property alias label : labelText.text
 
     signal clicked
+    width: 64
+    height: 64
 
     Image {
         id: icon
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.fill: parent
         source: "images/"+baseIconName+".png"
-        anchors.centerIn: parent
     }
 
     Image {
         id: hoveredIcon
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.fill: parent
         source: "images/"+baseIconName+"-hover.png"
-        anchors.centerIn: parent
         opacity: 0
     }
 
     Image {
         id: labelImage
+        y: -parent.height / 3
+        width: parent.width * 1.5
+        height: parent.height * 0.75
+        z: 1
         source: "images/button-label.png"
         opacity: 0
 
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottom: hoveredIcon.top
-        anchors.bottomMargin: -8
 
         Text {
             id: labelText
@@ -41,9 +47,11 @@ Item {
 
             font {
                 weight: Font.DemiBold
-                pointSize: 14
             }
             color: "#272727"
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignHCenter
+            font.pixelSize: parent.height * 0.25
         }
     }
 

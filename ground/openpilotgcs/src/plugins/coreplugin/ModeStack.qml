@@ -44,11 +44,11 @@ Rectangle {
                     width: parent.width
                     height: parent.height
                     spacing: 10
-                    Rectangle {
-                        width: 20
-                        height: parent.height
-                        color: "green"
-                    }
+//                    Rectangle {
+//                        width: 20
+//                        height: parent.height
+//                        color: "green"
+//                    }
                     Loader{
                         id: pageLoader
                         width: parent.width

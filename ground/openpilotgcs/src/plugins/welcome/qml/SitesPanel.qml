@@ -13,8 +13,9 @@ Item {
         text: "OpenPilot Websites"
         width: parent.width
         color: "#303060"
+        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
         font {
-            pointSize: 10
+            pointSize: { if(parent.height < 150) 7; else 13 }
             weight: Font.Bold
         }
     }
@@ -34,7 +35,7 @@ Item {
         width: parent.width
         anchors { top: header.bottom; topMargin: 14; bottom: parent.bottom }
         model: sitesModel
-        spacing: 8
+        spacing: { if(parent.height < 150) 4; else 8 }
         clip: true
 
         delegate: Text {
@@ -43,7 +44,7 @@ Item {
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
 
             font {
-                pointSize: 8
+                pointSize: header.font.pointSize
                 weight: Font.Bold
             }
 

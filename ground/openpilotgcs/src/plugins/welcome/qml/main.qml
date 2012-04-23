@@ -19,36 +19,36 @@ Rectangle {
         id: column1
         x: 66
         y: 66
-        width: parent.width * 0.8
-        height: parent.height * 0.8
-        anchors.horizontalCenter: parent.horizontalCenter
+        width: parent.width * 0.7
+        height: parent.height * 0.7
+        spacing: height * 0.1
         anchors.verticalCenter: parent.verticalCenter
-        spacing: 32
+        anchors.horizontalCenter: parent.horizontalCenter
 
         Row {
             id: pager
-            width: parent.width * 0.7
+            y: 0
+            width: parent.width
             height: parent.height * 0.4
-            //anchors.bottom: parent.verticalCenter
             anchors.horizontalCenter: parent.horizontalCenter
+            //anchors.bottom: parent.verticalCenter
             spacing: 16
 
             Image {
                 height: parent.height
+                anchors.verticalCenter: parent.verticalCenter
                 fillMode: Image.PreserveAspectFit
-                anchors.left: parent.left
-                anchors.leftMargin: 0
-                anchors.top: parent.top
-                anchors.topMargin: 0
                 source: "images/welcome-op-logo.png"
             }
 
             Flow {
                 id: buttons
                 x: 173
-                y: 52
                 width: 453
                 height: parent.height
+                anchors.top: parent.top
+                anchors.topMargin: 0
+                flow: Flow.LeftToRight
 
                 WelcomePageButton {
                     width: parent.height / 2
@@ -101,10 +101,8 @@ Rectangle {
         } // images row
 
         CommunityPanel {
-            anchors.horizontalCenter: parent.horizontalCenter
-            width: parent.width*0.8
-            height: parent.height * 0.4
-            anchors.bottom: parent.bottom
+            width: parent.width
+            height: parent.height - pager.height
         }
     }
 

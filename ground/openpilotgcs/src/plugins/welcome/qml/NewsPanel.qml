@@ -11,10 +11,12 @@ Item {
     Text {
         id: header
         text: "Project News"
+        font.pointSize: { if(parent.height < 150) 7; else 13 }
+
         width: parent.width
+        height: font.pixelSize * 1.1
         color: "#303060"
         font {
-            pointSize: 10
             weight: Font.Bold
         }
     }
@@ -42,13 +44,14 @@ Item {
         id: listDelegate
         Item {
             width: view.width
-            height: column.height + 16
+            height: header.font.pixelSize * 2.5
 
             Column {
                 id: column
-                spacing: 4
+                spacing: header.font.pixelSize * 0.1
                 Text {
                     text: title
+                    font.pixelSize: header.font.pixelSize
                     width: view.width
                     elide: Text.ElideRight
                     font.bold: true
@@ -57,6 +60,7 @@ Item {
 
                 Text {
                     text: description
+                    font.pointSize: header.font.pixelSize * 0.7
                     width: view.width
                     elide: Text.ElideRight
                     color: mouseArea.containsMouse ? "darkblue" : "black"

@@ -243,7 +243,7 @@ float qmag;
 float attitudeDt;
 float mag_err[3];
 float magKi = 0.000001f;
-float magKp = 0.0001f;
+float magKp = 0.01f;
 
 static int32_t updateAttitudeComplimentary(bool first_run)
 {
@@ -294,14 +294,17 @@ static int32_t updateAttitudeComplimentary(bool first_run)
 		attitudeSettings.AccelKp = 1;
 		attitudeSettings.AccelKi = 0.9;
 		attitudeSettings.YawBiasRate = 0.23;
+		magKp = 1;
 	} else if ((attitudeSettings.ZeroDuringArming == ATTITUDESETTINGS_ZERODURINGARMING_TRUE) && (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMING)) {
 		attitudeSettings.AccelKp = 1;
 		attitudeSettings.AccelKi = 0.9;
 		attitudeSettings.YawBiasRate = 0.23;
+		magKp = 1;
 		init = 0;
 	} else if (init == 0) {
 		// Reload settings (all the rates)
 		AttitudeSettingsGet(&attitudeSettings);
+		magKp = 0.01f;
 		init = 1;
 	}	
 

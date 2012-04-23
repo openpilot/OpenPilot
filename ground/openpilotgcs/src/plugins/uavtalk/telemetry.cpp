@@ -193,28 +193,22 @@ void Telemetry::updateObject(UAVObject* obj, quint32 eventType)
         // If we received a periodic update, we can change back to update on change
 	if ((eventType == EV_UPDATED_PERIODIC) || (eventType == EV_NONE)) {
             // Set update period
-            setUpdatePeriod(obj, 0);
+            if (eventType == EV_NONE)
+                 setUpdatePeriod(obj, metadata.gcsTelemetryUpdatePeriod);
             // Connect signals for all instances
 	    eventMask = EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ | EV_UPDATED_PERIODIC;
-            if( dynamic_cast<UAVMetaObject*>(obj) != NULL )
-            {
-                eventMask |= EV_UNPACKED; // we also need to act on remote updates (unpack events)
-            }
-            connectToObjectInstances(obj, eventMask);
 	}
 	else
 	{
             // Otherwise, we just received an object update, so switch to periodic for the timeout period to prevent more updates
-            // Set update period
-            setUpdatePeriod(obj, metadata.gcsTelemetryUpdatePeriod);
             // Connect signals for all instances
             eventMask = EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ;
-            if( dynamic_cast<UAVMetaObject*>(obj) != NULL )
-            {
-               eventMask |= EV_UNPACKED; // we also need to act on remote updates (unpack events)
-            }
-            connectToObjectInstances(obj, eventMask);
 	}
+        if( dynamic_cast<UAVMetaObject*>(obj) != NULL )
+        {
+           eventMask |= EV_UNPACKED; // we also need to act on remote updates (unpack events)
+        }
+        connectToObjectInstances(obj, eventMask);
     }
     else if ( updateMode == UAVObject::UPDATEMODE_MANUAL )
     {
@@ -416,7 +410,7 @@ void Telemetry::processObjectQueue()
         transInfo.allInstances = objInfo.allInstances;
         transInfo.retriesRemaining = MAX_RETRIES;
         transInfo.acked = UAVObject::GetGcsTelemetryAcked(metadata);
-        if ( objInfo.event == EV_UPDATED || objInfo.event == EV_UPDATED_MANUAL )
+        if ( objInfo.event == EV_UPDATED || objInfo.event == EV_UPDATED_MANUAL || objInfo.event == EV_UPDATED_PERIODIC )
         {
             transInfo.objRequest = false;
         }
@@ -436,7 +430,7 @@ void Telemetry::processObjectQueue()
     UAVMetaObject* metaobj = dynamic_cast<UAVMetaObject*>(objInfo.obj);
     if ( metaobj != NULL )
     {
-        updateObject( metaobj->getParentObject(), objInfo.event );
+        updateObject( metaobj->getParentObject(), EV_NONE );
     }
     else if ( updateMode != UAVObject::UPDATEMODE_THROTTLED )
     {
@@ -449,7 +443,6 @@ void Telemetry::processObjectQueue()
     // stuck:
     if ( objInfo.event == EV_UNPACKED )
         processObjectQueue();
-
 }
 
 /**

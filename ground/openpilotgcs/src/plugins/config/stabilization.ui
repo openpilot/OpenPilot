@@ -11885,7 +11885,7 @@ border-radius: 4;
             <property name="geometry">
              <rect>
               <x>0</x>
-              <y>-403</y>
+              <y>0</y>
               <width>673</width>
               <height>1079</height>
              </rect>
@@ -14743,7 +14743,7 @@ Then lower the value by 20% or so.</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>5</number>
                      </property>
                      <property name="singleStep">
                       <double>0.000100000000000</double>
@@ -14791,7 +14791,7 @@ Then lower the value by 20% or so.</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>5</number>
                      </property>
                      <property name="singleStep">
                       <double>0.000100000000000</double>
@@ -14841,7 +14841,7 @@ You can usually go for higher values for Yaw factors.</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>5</number>
                      </property>
                      <property name="singleStep">
                       <double>0.000100000000000</double>
@@ -14924,7 +14924,7 @@ value as the Kp.</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>5</number>
                      </property>
                      <property name="singleStep">
                       <double>0.000100000000000</double>
@@ -14988,7 +14988,7 @@ value as the Kp.</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>5</number>
                      </property>
                      <property name="singleStep">
                       <double>0.000100000000000</double>
@@ -15052,7 +15052,7 @@ value as the Kp.</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>5</number>
                      </property>
                      <property name="singleStep">
                       <double>0.000100000000000</double>
@@ -15299,7 +15299,7 @@ value as the Kp.</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>4</number>
                      </property>
                      <property name="maximum">
                       <double>1.000000000000000</double>
@@ -15346,7 +15346,7 @@ value as the Kp.</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>4</number>
                      </property>
                      <property name="maximum">
                       <double>1.000000000000000</double>
@@ -15396,7 +15396,7 @@ value as the Kp.</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>4</number>
                      </property>
                      <property name="maximum">
                       <double>1.000000000000000</double>
@@ -18302,7 +18302,7 @@ border-radius: 5;</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>3</number>
                      </property>
                      <property name="singleStep">
                       <double>0.100000000000000</double>
@@ -18346,7 +18346,7 @@ border-radius: 5;</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>3</number>
                      </property>
                      <property name="singleStep">
                       <double>0.100000000000000</double>
@@ -18393,7 +18393,7 @@ border-radius: 5;</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>3</number>
                      </property>
                      <property name="singleStep">
                       <double>0.100000000000000</double>
@@ -18475,7 +18475,7 @@ border-radius: 5;</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>3</number>
                      </property>
                      <property name="singleStep">
                       <double>0.100000000000000</double>
@@ -18535,7 +18535,7 @@ border-radius: 5;</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>3</number>
                      </property>
                      <property name="singleStep">
                       <double>0.100000000000000</double>
@@ -18598,7 +18598,7 @@ border-radius: 5;</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>3</number>
                      </property>
                      <property name="singleStep">
                       <double>0.100000000000000</double>
@@ -18676,7 +18676,7 @@ border-radius: 5;</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>2</number>
                      </property>
                      <property name="singleStep">
                       <double>0.100000000000000</double>
@@ -18720,7 +18720,7 @@ border-radius: 5;</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>2</number>
                      </property>
                      <property name="singleStep">
                       <double>0.100000000000000</double>
@@ -18767,7 +18767,7 @@ border-radius: 5;</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>2</number>
                      </property>
                      <property name="singleStep">
                       <double>0.100000000000000</double>

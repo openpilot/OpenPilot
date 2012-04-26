@@ -90,35 +90,13 @@ ConfigCameraStabilizationWidget::ConfigCameraStabilizationWidget(QWidget *parent
     connect(m_camerastabilization->camerastabilizationSaveSD, SIGNAL(clicked()), this, SLOT(saveSettings()));
     connect(m_camerastabilization->camerastabilizationHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
 
-    //Disable mouse wheel events
-    foreach( QSpinBox * sp, findChildren<QSpinBox*>() ) {
-            sp->installEventFilter( this );
-    }
-    foreach( QDoubleSpinBox * sp, findChildren<QDoubleSpinBox*>() ) {
-            sp->installEventFilter( this );
-    }
-    foreach( QSlider * sp, findChildren<QSlider*>() ) {
-            sp->installEventFilter( this );
-    }
+    disbleMouseWheelEvents();
 }
 
 ConfigCameraStabilizationWidget::~ConfigCameraStabilizationWidget()
 {
    // Do nothing
 }
-
-
-bool ConfigCameraStabilizationWidget::eventFilter( QObject * obj, QEvent * evt ) {
-    //Filter all wheel events, and ignore them
-    if ( evt->type() == QEvent::Wheel &&
-         (qobject_cast<QAbstractSpinBox*>( obj ) || qobject_cast<QAbstractSlider*>( obj ) ))
-    {
-        evt->ignore();
-        return true;
-    }
-    return QWidget::eventFilter( obj, evt );
-}
-
 
 void ConfigCameraStabilizationWidget::connectUpdates()
 {

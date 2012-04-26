@@ -29,7 +29,7 @@
 #include "configoutputwidget.h"
 
 OutputChannelForm::OutputChannelForm(const int index, QWidget *parent, const bool showLegend) :
-        QWidget(parent),
+        ConfigTaskWidget(parent),
         ui(),
         m_index(index),
         m_inChannelTest(false)
@@ -71,35 +71,13 @@ OutputChannelForm::OutputChannelForm(const int index, QWidget *parent, const boo
     connect(ui.actuatorLink, SIGNAL(toggled(bool)),
             this, SLOT(linkToggled(bool)));
 
-    //Disable mouse wheel events
-    foreach( QSpinBox * sp, findChildren<QSpinBox*>() ) {
-            sp->installEventFilter( this );
-    }
-    foreach( QDoubleSpinBox * sp, findChildren<QDoubleSpinBox*>() ) {
-            sp->installEventFilter( this );
-    }
-    foreach( QSlider * sp, findChildren<QSlider*>() ) {
-            sp->installEventFilter( this );
-    }
+    disbleMouseWheelEvents();
 }
 
 OutputChannelForm::~OutputChannelForm()
 {
     // Do nothing
 }
-
-
-bool OutputChannelForm::eventFilter( QObject * obj, QEvent * evt ) {
-    //Filter all wheel events, and ignore them
-    if ( evt->type() == QEvent::Wheel &&
-         (qobject_cast<QAbstractSpinBox*>( obj ) || qobject_cast<QAbstractSlider*>( obj ) ))
-    {
-        evt->ignore();
-        return true;
-    }
-    return QWidget::eventFilter( obj, evt );
-}
-
 
 /**
  * Restrict UI to protect users from accidental misuse.

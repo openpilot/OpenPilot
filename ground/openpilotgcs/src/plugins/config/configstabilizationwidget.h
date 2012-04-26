@@ -44,7 +44,6 @@ class ConfigStabilizationWidget: public ConfigTaskWidget
 public:
     ConfigStabilizationWidget(QWidget *parent = 0);
     ~ConfigStabilizationWidget();
-    bool eventFilter( QObject * o, QEvent * e );
 
 private:
     Ui_StabilizationWidget *m_stabilization;

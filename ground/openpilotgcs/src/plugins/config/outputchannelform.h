@@ -29,17 +29,15 @@
 
 #include <QWidget>
 #include "ui_outputchannelform.h"
+#include "configtaskwidget.h"
 
-class ConfigOnputWidget;
-
-class OutputChannelForm : public QWidget
+class OutputChannelForm : public ConfigTaskWidget
 {
     Q_OBJECT
 
 public:
     explicit OutputChannelForm(const int index, QWidget *parent = NULL, const bool showLegend = false);
     ~OutputChannelForm();
-    bool eventFilter( QObject * obj, QEvent * evt );
     friend class ConfigOnputWidget;
 
     void setAssignment(const QString &assignment);

@@ -50,6 +50,7 @@ namespace mapcontrol
         MapRipForm * progressForm;
         int maxzoom;
         internals::Core * core;
+        bool yesToAll;
 
     signals:
         void percentageChanged(int const& perc);

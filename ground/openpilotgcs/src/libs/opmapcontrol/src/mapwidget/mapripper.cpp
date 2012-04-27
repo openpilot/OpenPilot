@@ -28,7 +28,7 @@
 namespace mapcontrol
 {
 
-    MapRipper::MapRipper(internals::Core * core, const internals::RectLatLng & rect):sleep(100),cancel(false),progressForm(0),core(core)
+MapRipper::MapRipper(internals::Core * core, const internals::RectLatLng & rect):sleep(100),cancel(false),progressForm(0),core(core),yesToAll(false)
     {
         if(!rect.IsEmpty())
         {
@@ -46,32 +46,49 @@ namespace mapcontrol
             connect(this,SIGNAL(finished()),this,SLOT(finish()));
             emit numberOfTilesChanged(0,0);
         }
+        else
+            QMessageBox::information(new QWidget(),"No valid selection","Please select the area of the map to rip with Mouse+Control key");
     }
-    void MapRipper::finish()
+void MapRipper::finish()
+{
+    if(zoom<maxzoom)
     {
-         if(zoom<maxzoom)
+        ++zoom;
+        int ret;
+        if(!yesToAll)
         {
-         ++zoom;
-         QMessageBox msgBox;
-         msgBox.setText(QString("Continue Ripping at zoom level %1?").arg(zoom));
-        // msgBox.setInformativeText("Do you want to save your changes?");
-         msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-         msgBox.setDefaultButton(QMessageBox::Yes);
-         int ret = msgBox.exec();
-         if(ret==QMessageBox::Yes)
-         {
-             points.clear();
-             points=core->Projection()->GetAreaTileList(area,zoom,0);
-             this->start();
-         }
-         else
-         {
-             progressForm->close();
-             delete progressForm;
-             this->deleteLater();
-         }
-     }
+            QMessageBox msgBox;
+            msgBox.setText(QString("Continue Ripping at zoom level %1?").arg(zoom));
+            // msgBox.setInformativeText("Do you want to save your changes?");
+            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::YesAll);
+            msgBox.setDefaultButton(QMessageBox::Yes);
+            ret = msgBox.exec();
+        }
+        else
+            ret=QMessageBox::Yes;
+        if(ret==QMessageBox::Yes)
+        {
+            points.clear();
+            points=core->Projection()->GetAreaTileList(area,zoom,0);
+            this->start();
+        }
+        else if(ret==QMessageBox::YesAll)
+        {
+            yesToAll=true;
+            points.clear();
+            points=core->Projection()->GetAreaTileList(area,zoom,0);
+            this->start();
+        }
+        else
+        {
+            progressForm->close();
+            delete progressForm;
+            this->deleteLater();
+        }
     }
+    else
+        yesToAll=false;
+}
 
 
     void MapRipper::run()

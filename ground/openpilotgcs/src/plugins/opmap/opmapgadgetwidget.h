@@ -187,6 +187,7 @@ private slots:
     * @brief mouse right click context menu signals
     */
     void onReloadAct_triggered();
+    void onRipAct_triggered();
     void onCopyMouseLatLonToClipAct_triggered();
     void onCopyMouseLatToClipAct_triggered();
     void onCopyMouseLonToClipAct_triggered();
@@ -282,6 +283,7 @@ private:
     QAction *closeAct1;
     QAction *closeAct2;
     QAction *reloadAct;
+    QAction *ripAct;
 	QAction *copyMouseLatLonToClipAct;
     QAction *copyMouseLatToClipAct;
     QAction *copyMouseLonToClipAct;

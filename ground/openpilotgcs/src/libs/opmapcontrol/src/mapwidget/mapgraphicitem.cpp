@@ -196,7 +196,7 @@ namespace mapcontrol
             }
 
         }
-        else if(isSelected && !selectionStart.IsEmpty() && (event->modifiers() == Qt::AltModifier || event->modifiers() == Qt::ShiftModifier))
+        else if(isSelected && !selectionStart.IsEmpty() && (event->modifiers() == Qt::ControlModifier || event->modifiers() == Qt::ShiftModifier))
         {
             selectionEnd = FromLocalToLatLng(event->pos().x(), event->pos().y());
             {
@@ -217,10 +217,10 @@ namespace mapcontrol
     {
 
 
-
+        qDebug()<<event->modifiers();
         if(!IsMouseOverMarker())
         {
-            if(event->button() == config->DragButton && CanDragMap()&& !((event->modifiers()==Qt::AltModifier)||(event->modifiers()==Qt::ShiftModifier)))
+            if(event->button() == config->DragButton && CanDragMap()&& !((event->modifiers()==Qt::ShiftModifier)||(event->modifiers()==Qt::ControlModifier)))
             {
                 core->mouseDown.SetX(event->pos().x());
                 core->mouseDown.SetY(event->pos().y());
@@ -232,7 +232,7 @@ namespace mapcontrol
                 this->update();
 
             }
-            else if(!isSelected && ((event->modifiers()==Qt::AltModifier)||(event->modifiers()==Qt::ShiftModifier)))
+            else if(!isSelected && ((event->modifiers()==Qt::ControlModifier)||(event->modifiers()==Qt::ShiftModifier)))
             {
                 isSelected = true;
                     SetSelectedArea (internals::RectLatLng::Empty);

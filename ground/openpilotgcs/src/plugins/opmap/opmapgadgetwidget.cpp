@@ -430,6 +430,10 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
 
     menu.addSeparator();
 
+    menu.addAction(ripAct);
+
+    menu.addSeparator();
+
 	QMenu maxUpdateRateSubMenu(tr("&Max Update Rate ") + "(" + QString::number(m_maxUpdateRate) + " ms)", this);
 	for (int i = 0; i < maxUpdateRateAct.count(); i++)
 		maxUpdateRateSubMenu.addAction(maxUpdateRateAct.at(i));
@@ -1410,6 +1414,10 @@ void OPMapGadgetWidget::createActions()
     reloadAct->setStatusTip(tr("Reload the map tiles"));
     connect(reloadAct, SIGNAL(triggered()), this, SLOT(onReloadAct_triggered()));
 
+    ripAct = new QAction(tr("&Rip map"), this);
+    ripAct->setStatusTip(tr("Rip the map tiles"));
+    connect(ripAct, SIGNAL(triggered()), this, SLOT(onRipAct_triggered()));
+
     copyMouseLatLonToClipAct = new QAction(tr("Mouse latitude and longitude"), this);
     copyMouseLatLonToClipAct->setStatusTip(tr("Copy the mouse latitude and longitude to the clipboard"));
     connect(copyMouseLatLonToClipAct, SIGNAL(triggered()), this, SLOT(onCopyMouseLatLonToClipAct_triggered()));
@@ -1680,6 +1688,11 @@ void OPMapGadgetWidget::onReloadAct_triggered()
 		return;
 
     m_map->ReloadMap();
+}
+
+void OPMapGadgetWidget::onRipAct_triggered()
+{
+    m_map->RipMap();
 }
 
 void OPMapGadgetWidget::onCopyMouseLatLonToClipAct_triggered()

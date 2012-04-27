@@ -4,7 +4,7 @@
 #include "manualcontrolsettings.h"
 
 inputChannelForm::inputChannelForm(QWidget *parent,bool showlegend) :
-    QWidget(parent),
+    ConfigTaskWidget(parent),
     ui(new Ui::inputChannelForm)
 {
     ui->setupUi(this);
@@ -37,16 +37,7 @@ inputChannelForm::inputChannelForm(QWidget *parent,bool showlegend) :
     connect(ui->channelNumberDropdown,SIGNAL(currentIndexChanged(int)),this,SLOT(channelDropdownUpdated(int)));
     connect(ui->channelNumber,SIGNAL(valueChanged(int)),this,SLOT(channelNumberUpdated(int)));
 
-    //Disable mouse wheel events
-    foreach( QSpinBox * sp, findChildren<QSpinBox*>() ) {
-            sp->installEventFilter( this );
-    }
-    foreach( QDoubleSpinBox * sp, findChildren<QDoubleSpinBox*>() ) {
-            sp->installEventFilter( this );
-    }
-    foreach( QSlider * sp, findChildren<QSlider*>() ) {
-            sp->installEventFilter( this );
-    }
+    disbleMouseWheelEvents();
 }
 
 
@@ -54,19 +45,6 @@ inputChannelForm::~inputChannelForm()
 {
     delete ui;
 }
-
-
-bool inputChannelForm::eventFilter( QObject * obj, QEvent * evt ) {
-    //Filter all wheel events, and ignore them
-    if ( evt->type() == QEvent::Wheel &&
-         (qobject_cast<QAbstractSpinBox*>( obj ) || qobject_cast<QAbstractSlider*>( obj ) ))
-    {
-        evt->ignore();
-        return true;
-    }
-    return QWidget::eventFilter( obj, evt );
-}
-
 
 void inputChannelForm::setName(QString &name)
 {

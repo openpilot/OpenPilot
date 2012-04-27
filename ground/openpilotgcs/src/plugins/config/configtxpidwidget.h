@@ -37,7 +37,6 @@ class ConfigTxPIDWidget : public ConfigTaskWidget
 public:
     ConfigTxPIDWidget(QWidget *parent = 0);
     ~ConfigTxPIDWidget();
-    bool eventFilter( QObject * obj, QEvent * evt );
 private:
     Ui_TxPIDWidget *m_txpid;
 

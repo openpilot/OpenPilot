@@ -159,6 +159,7 @@ SRC += $(PIOSSTM32F10X)/pios_wdg.c
 SRC += $(PIOSSTM32F10X)/pios_tim.c
 SRC += $(PIOSSTM32F10X)/pios_pwm.c
 SRC += $(PIOSSTM32F10X)/pios_adc.c
+SRC += $(PIOSSTM32F10X)/pios_eeprom.c
 
 # PIOS USB related files (separated to make code maintenance more easy)
 SRC += $(PIOSSTM32F10X)/pios_usb.c

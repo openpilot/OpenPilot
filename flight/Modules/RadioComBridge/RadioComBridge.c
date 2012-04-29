@@ -173,7 +173,7 @@ static int32_t RadioComBridgeInitialize(void)
 
 	// Initialize the UAVObjects that we use
 	GCSReceiverInitialize();
-	PipXSettingsInitialize();
+	PipXStatusInitialize();
 	data->send_gcsreceiver = false;
 	data->send_pipxstatus = false;
 
@@ -247,9 +247,10 @@ static void radio2ComBridgeTask(void *parameters)
 
 		// Receive data from the radio port
 		rx_bytes = PIOS_COM_ReceiveBuffer(data->radio_port, data->radio2com_buf, PIOS_PH_MAX_PACKET, 200);
+
+		// Receive the packet.
 		if (rx_bytes > 0)
 			PHReceivePacket(pios_packet_handler, (PHPacketHandle)data->radio2com_buf, rx_bytes);
-
 	}
 }
 
@@ -260,7 +261,7 @@ static void com2RadioBridgeTask(void * parameters)
 {
 	uint32_t rx_bytes = 0;
 	portTickType packet_start_time = 0;
-	uint32_t timeout = 500;
+	uint32_t timeout = 250;
 	uint32_t inputPort;
 
 	/* Handle usart/usb -> radio direction */
@@ -439,7 +440,7 @@ static void receiveData(uint8_t *buf, uint8_t len)
 	{
 		UAVTalkRxState state = UAVTalkProcessInputStreamQuiet(data->outUAVTalkCon, buf[i]);
 		/* if(state == UAVTALK_STATE_ERROR) */
-		/* 	DEBUG_PRINTF(2, "OUT Error\n\r"); */
+		/* 	DEBUG_PRINTF(2, "OUT Error\n\r\r"); */
 		if((state == UAVTALK_STATE_COMPLETE) || (state == UAVTALK_STATE_SYNC))
 		{
 			// Send the buffer up to this point

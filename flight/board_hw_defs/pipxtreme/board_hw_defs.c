@@ -474,6 +474,15 @@ const struct pios_usb_cdc_cfg pios_usb_cdc_cfg = {
 };
 #endif	/* PIOS_INCLUDE_USB_CDC */
 
+#if defined(PIOS_INCLUDE_FLASH_EEPROM)
+#include <pios_eeprom.h>
+
+const struct pios_eeprom_cfg pios_eeprom_cfg = {
+	.base_address = PIOS_FLASH_EEPROM_ADDR,
+	.max_size = PIOS_FLASH_EEPROM_LEN,
+};
+#endif /* PIOS_INCLUDE_FLASH_EEPROM */
+
 #if defined(PIOS_INCLUDE_RFM22B)
 #include <pios_rfm22b_priv.h>
 

@@ -30,6 +30,7 @@
 
 #include <pios.h>
 #include <openpilot.h>
+#include <pipxsettings.h>
 #include <board_hw_defs.c>
 
 #define PIOS_COM_SERIAL_RX_BUF_LEN 192
@@ -73,8 +74,10 @@ void PIOS_Board_Init(void) {
 	EventDispatcherInitialize();
 	UAVObjInitialize();
 
+#ifdef PIOS_INCLUDE_WDG
 	/* Initialize watchdog as early as possible to catch faults during init */
 	PIOS_WDG_Init();
+#endif /* PIOS_INCLUDE_WDG */
 
 	/* Initialize IAP */
 	PIOS_IAP_Init();
@@ -82,11 +85,24 @@ void PIOS_Board_Init(void) {
 #if defined(PIOS_INCLUDE_RTC)
 	/* Initialize the real-time clock and its associated tick */
 	PIOS_RTC_Init(&pios_rtc_main_cfg);
-#endif
+#endif /* PIOS_INCLUDE_RTC */
+
+	PipXSettingsInitialize();
 
 #if defined(PIOS_INCLUDE_LED)
 	PIOS_LED_Init(&pios_led_cfg);
 #endif	/* PIOS_INCLUDE_LED */
+
+#if defined(PIOS_INCLUDE_FLASH_EEPROM)
+	PIOS_EEPROM_Init(&pios_eeprom_cfg);
+
+	/* Read the settings from flash. */
+	PipXSettingsData pipxSettings;
+	if (PIOS_EEPROM_Load((uint8_t*)&pipxSettings, sizeof(PipXSettingsData)) == 0)
+		PipXSettingsSet(&pipxSettings);
+	else
+		PipXSettingsGet(&pipxSettings);
+#endif /* PIOS_INCLUDE_FLASH_EEPROM */
 
 	/* Initialize the task monitor library */
 	TaskMonitorInitialize();

@@ -69,7 +69,7 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 //------------------------
 // WATCHDOG_SETTINGS
 //------------------------
-#define PIOS_WATCHDOG_TIMEOUT    250
+#define PIOS_WATCHDOG_TIMEOUT    500
 #define PIOS_WDG_REGISTER        BKP_DR4
 #define PIOS_WDG_RADIOCOM        0x0001
 #define PIOS_WDG_COMRADIO        0x0002
@@ -158,7 +158,7 @@ extern uint32_t pios_com_rfm22b_id;
 #define PIOS_COM_TELEM_USB              (pios_com_telem_usb_id)
 #define PIOS_COM_VCP_USB                (pios_com_vcp_usb_id)
 #define PIOS_COM_RFM22B_RF              (pios_com_rfm22b_id)
-#define PIOS_COM_BRIDGE_RADIO	PIOS_COM_RFM22B_RF
+#define PIOS_COM_BRIDGE_RADIO	 PIOS_COM_RFM22B_RF
 #define PIOS_COM_DEBUG          PIOS_COM_FLEXI
 #define PIOS_COM_BRIDGE_COM     PIOS_COM_TELEM_SERIAL
 
@@ -291,5 +291,15 @@ uint32_t pios_packet_handler;
 //-------------------------
 
 #define RS_ECC_NPARITY 4
+
+//-------------------------
+// Flash EEPROM Emulation
+//-------------------------
+
+#define PIOS_FLASH_SIZE 0x20000
+#define PIOS_FLASH_EEPROM_START_ADDR 0x08000000
+#define PIOS_FLASH_PAGE_SIZE 1024
+#define PIOS_FLASH_EEPROM_ADDR (PIOS_FLASH_EEPROM_START_ADDR + PIOS_FLASH_SIZE - PIOS_FLASH_PAGE_SIZE)
+#define PIOS_FLASH_EEPROM_LEN PIOS_FLASH_PAGE_SIZE
 
 #endif /* STM32103CB_PIPXTREME_H_ */

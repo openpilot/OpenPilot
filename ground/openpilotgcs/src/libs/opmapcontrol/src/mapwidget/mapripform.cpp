@@ -33,6 +33,7 @@ MapRipForm::MapRipForm(QWidget *parent) :
     ui(new Ui::MapRipForm)
 {
     ui->setupUi(this);
+    connect(ui->cancelButton,SIGNAL(clicked()),this,SIGNAL(cancelRequest()));
 }
 
 MapRipForm::~MapRipForm()

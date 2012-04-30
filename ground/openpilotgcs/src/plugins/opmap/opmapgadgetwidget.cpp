@@ -474,12 +474,14 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
 
     menu.addSeparator();
     */
-
-    menu.addAction(showSafeAreaAct);
+    QMenu safeArea("Safety Area definitions");
+   // menu.addAction(showSafeAreaAct);
     QMenu safeAreaSubMenu(tr("Safe Area Radius") + " (" + QString::number(m_map->Home->SafeArea()) + "m)", this);
     for (int i = 0; i < safeAreaAct.count(); i++)
         safeAreaSubMenu.addAction(safeAreaAct.at(i));
-    menu.addMenu(&safeAreaSubMenu);
+    safeArea.addMenu(&safeAreaSubMenu);
+    safeArea.addAction(showSafeAreaAct);
+    menu.addMenu(&safeArea);
 
     menu.addSeparator();
 

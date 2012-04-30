@@ -216,8 +216,6 @@ namespace mapcontrol
     void MapGraphicItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     {
 
-
-        qDebug()<<event->modifiers();
         if(!IsMouseOverMarker())
         {
             if(event->button() == config->DragButton && CanDragMap()&& !((event->modifiers()==Qt::ShiftModifier)||(event->modifiers()==Qt::ControlModifier)))
@@ -431,11 +429,6 @@ namespace mapcontrol
                 }
             }
         }
-        // painter->drawRect(core->GetrenderOffset().X()-lastimagepoint.X()-3,core->GetrenderOffset().Y()-lastimagepoint.Y()-3,lastimage.width(),lastimage.height());
-//        painter->setPen(Qt::red);
-//        painter->drawLine(-10,-10,10,10);
-//        painter->drawLine(10,10,-10,-10);
-//        painter->drawRect(boundingRect().adjusted(100,100,-100,-100));
     }
 
 

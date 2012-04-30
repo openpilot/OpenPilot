@@ -51,6 +51,7 @@ namespace mapcontrol
         int maxzoom;
         internals::Core * core;
         bool yesToAll;
+        QMutex mutex;
 
     signals:
         void percentageChanged(int const& perc);
@@ -59,6 +60,7 @@ namespace mapcontrol
 
 
     public slots:
+        void stopFetching();
         void finish();
     };
 }

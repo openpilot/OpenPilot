@@ -34,11 +34,13 @@ MapRipper::MapRipper(internals::Core * core, const internals::RectLatLng & rect)
         {
             type=core->GetMapType();
             progressForm=new MapRipForm;
+            connect(progressForm,SIGNAL(cancelRequest()),this,SLOT(stopFetching()));
             area=rect;
             zoom=core->Zoom();
             maxzoom=core->MaxZoom();
             points=core->Projection()->GetAreaTileList(area,zoom,0);
             this->start();
+            cancel=false;
             progressForm->show();
             connect(this,SIGNAL(percentageChanged(int)),progressForm,SLOT(SetPercentage(int)));
             connect(this,SIGNAL(numberOfTilesChanged(int,int)),progressForm,SLOT(SetNumberOfTiles(int,int)));
@@ -51,7 +53,7 @@ MapRipper::MapRipper(internals::Core * core, const internals::RectLatLng & rect)
     }
 void MapRipper::finish()
 {
-    if(zoom<maxzoom)
+    if(zoom<maxzoom && !cancel)
     {
         ++zoom;
         int ret;
@@ -87,7 +89,12 @@ void MapRipper::finish()
         }
     }
     else
+    {
         yesToAll=false;
+        progressForm->close();
+        delete progressForm;
+        this->deleteLater();
+    }
 }
 
 
@@ -135,5 +142,11 @@ void MapRipper::finish()
 
             QThread::msleep(sleep);
         }
+    }
+
+    void MapRipper::stopFetching()
+    {
+        QMutexLocker locker(&mutex);
+        cancel=true;
     }
 }

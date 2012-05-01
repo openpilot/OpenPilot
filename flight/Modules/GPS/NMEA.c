@@ -451,6 +451,11 @@ static bool nmeaProcessGPRMC(GPSPositionData * GpsData, bool* gpsDataUpdated, ch
 	gpst.Hour = (int)hms / 10000;
 #endif //PIOS_GPS_MINIMAL
 
+	// don't process void sentences
+	if (param[2][0] == 'V') {
+		return false;
+	}
+
 	// get latitude [DDMM.mmmmm] [N|S]
 	if (!NMEA_latlon_to_fixed_point(&GpsData->Latitude, param[3], param[4][0] == 'S')) {
 		return false;

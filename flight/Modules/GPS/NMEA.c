@@ -234,6 +234,10 @@ static bool NMEA_latlon_to_fixed_point(int32_t * latlon, char *nmea_latlon, bool
 	PIOS_DEBUG_Assert(nmea_latlon);
 	PIOS_DEBUG_Assert(latlon);
 
+	if (*nmea_latlon == '\0') { /* empty lat/lon field */
+		return false;
+	}
+
 	if (!NMEA_parse_real(&num_DDDMM, &num_m, &units, nmea_latlon)) {
 		return false;
 	}

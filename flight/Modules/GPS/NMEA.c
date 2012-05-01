@@ -402,6 +402,11 @@ static bool nmeaProcessGPGGA(GPSPositionData * GpsData, bool* gpsDataUpdated, ch
 		return false;
 	}
 
+
+	// check for invalid GPS fix
+	if (param[6][0] == '0') {
+		return false;
+	}
 	// get number of satellites used in GPS solution
 	GpsData->Satellites = atoi(param[7]);
 

@@ -702,7 +702,7 @@ void PIOS_Board_Init(void) {
 		case 0x01:
 			// Revision 1 with invensense gyros, start the ADC
 #if defined(PIOS_INCLUDE_ADC)
-			PIOS_ADC_Init();
+			PIOS_ADC_Init(&pios_adc_cfg);
 #endif
 #if defined(PIOS_INCLUDE_ADXL345)
 			PIOS_ADXL345_Init(pios_spi_flash_accel_id, 0);

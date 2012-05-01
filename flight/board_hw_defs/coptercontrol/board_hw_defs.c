@@ -426,15 +426,6 @@ static const struct pios_adc_cfg pios_adc_cfg = {
 	.full_flag = DMA1_IT_TC1,
 };
 
-struct pios_adc_dev pios_adc_devs[] = {
-	{
-		.cfg = &pios_adc_cfg,
-		.callback_function = NULL,
-	},
-};
-
-uint8_t pios_adc_num_devices = NELEMENTS(pios_adc_devs);
-
 void PIOS_ADC_handler() {
 	PIOS_ADC_DMA_Handler();
 }

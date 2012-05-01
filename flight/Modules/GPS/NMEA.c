@@ -343,7 +343,7 @@ bool NMEA_update_position(char *nmea_sentence, GPSPositionData *GpsData)
 	#ifdef DEBUG_MGSID_IN
 		DEBUG_MSG("%s %d ", params[0], parser->cnt);
 	#endif
-	// Send the message to then parser and get it update the GpsData
+	// Send the message to the parser and get it update the GpsData
 	bool gpsDataUpdated = false;
 
 	if (!parser->handler(GpsData, &gpsDataUpdated, params, nbParams)) {

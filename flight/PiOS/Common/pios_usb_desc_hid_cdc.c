@@ -37,9 +37,9 @@ static const struct usb_device_desc device_desc = {
 	.bLength            = sizeof(struct usb_device_desc),
 	.bDescriptorType    = USB_DESC_TYPE_DEVICE,
 	.bcdUSB             = htousbs(0x0200),
-	.bDeviceClass       = 0x02,
-	.bDeviceSubClass    = 0x00,
-	.bDeviceProtocol    = 0x00,
+	.bDeviceClass       = 0xef,
+	.bDeviceSubClass    = 0x02,
+	.bDeviceProtocol    = 0x01,
 	.bMaxPacketSize0    = 64, /* Must be 64 for high-speed devices */
 	.idVendor           = htousbs(USB_VENDOR_ID_OPENPILOT),
 	.idProduct          = htousbs(PIOS_USB_BOARD_PRODUCT_ID),
@@ -97,10 +97,6 @@ static const uint8_t hid_report_desc[36] = {
 struct usb_config_hid_cdc {
 	struct usb_configuration_desc         config;
 	struct usb_interface_association_desc iad;
-	struct usb_interface_desc             hid_if;
-	struct usb_hid_desc                   hid;
-	struct usb_endpoint_desc              hid_in;
-	struct usb_endpoint_desc              hid_out;
 	struct usb_interface_desc             cdc_control_if;
 	struct usb_cdc_header_func_desc       cdc_header;
 	struct usb_cdc_callmgmt_func_desc     cdc_callmgmt;
@@ -110,6 +106,10 @@ struct usb_config_hid_cdc {
 	struct usb_interface_desc             cdc_data_if;
 	struct usb_endpoint_desc              cdc_in;
 	struct usb_endpoint_desc              cdc_out;
+	struct usb_interface_desc             hid_if;
+	struct usb_hid_desc                   hid;
+	struct usb_endpoint_desc              hid_in;
+	struct usb_endpoint_desc              hid_out;
 } __attribute__((packed));
 
 static const struct usb_config_hid_cdc config_hid_cdc = {
@@ -128,15 +128,87 @@ static const struct usb_config_hid_cdc config_hid_cdc = {
 		.bDescriptorType      = USB_DESC_TYPE_IAD,
 		.bFirstInterface      = 0,
 		.bInterfaceCount      = 2,
-		.bFunctionClass       = 2, /* Communication */
-		.bFunctionSubClass    = 2, /* Abstract Control Model */
-		.bFunctionProtocol    = 0, /* V.25ter, Common AT commands */
+		.bFunctionClass       = USB_INTERFACE_CLASS_CDC, /* Communication */
+		.bFunctionSubClass    = USB_CDC_DESC_SUBTYPE_ABSTRACT_CTRL, /* Abstract Control Model */
+		.bFunctionProtocol    = 1, /* V.25ter, Common AT commands */
 		.iInterface           = 0,
+	},
+	.cdc_control_if = {
+		.bLength              = sizeof(struct usb_interface_desc),
+		.bDescriptorType      = USB_DESC_TYPE_INTERFACE,
+		.bInterfaceNumber     = 0,
+		.bAlternateSetting    = 0,
+		.bNumEndpoints        = 1,
+		.bInterfaceClass      = USB_INTERFACE_CLASS_CDC,
+		.bInterfaceSubClass   = USB_CDC_DESC_SUBTYPE_ABSTRACT_CTRL, /* Abstract Control Model */
+		.nInterfaceProtocol   = 1,	 /* V.25ter, Common AT commands */
+		.iInterface           = 0,
+	},
+	.cdc_header = {
+		.bLength              = sizeof(struct usb_cdc_header_func_desc),
+		.bDescriptorType      = USB_DESC_TYPE_CLASS_SPECIFIC,
+		.bDescriptorSubType   = USB_CDC_DESC_SUBTYPE_HEADER,
+		.bcdCDC               = htousbs(0x0110),
+	},
+	.cdc_callmgmt = {
+		.bLength              = sizeof(struct usb_cdc_callmgmt_func_desc),
+		.bDescriptorType      = USB_DESC_TYPE_CLASS_SPECIFIC,
+		.bDescriptorSubType   = USB_CDC_DESC_SUBTYPE_CALLMGMT,
+		.bmCapabilities       = 0x00, /* No call handling */
+		.bDataInterface       = 1,
+	},
+	.cdc_acm = {
+		.bLength              = sizeof(struct usb_cdc_acm_func_desc),
+		.bDescriptorType      = USB_DESC_TYPE_CLASS_SPECIFIC,
+		.bDescriptorSubType   = USB_CDC_DESC_SUBTYPE_ABSTRACT_CTRL,
+		.bmCapabilities       = 0x00,
+	},
+	.cdc_union = {
+		.bLength              = sizeof(struct usb_cdc_union_func_desc),
+		.bDescriptorType      = USB_DESC_TYPE_CLASS_SPECIFIC,
+		.bDescriptorSubType   = USB_CDC_DESC_SUBTYPE_UNION,
+		.bMasterInterface     = 0,
+		.bSlaveInterface      = 1,
+	},
+	.cdc_mgmt_in = {
+		.bLength              = sizeof(struct usb_endpoint_desc),
+		.bDescriptorType      = USB_DESC_TYPE_ENDPOINT,
+		.bEndpointAddress     = USB_EP_IN(2),
+		.bmAttributes         = USB_EP_ATTR_TT_INTERRUPT,
+		.wMaxPacketSize       = htousbs(PIOS_USB_BOARD_CDC_MGMT_LENGTH),
+		.bInterval            = 4, /* ms */
+	},
+	.cdc_data_if = {
+		.bLength              = sizeof(struct usb_interface_desc),
+		.bDescriptorType      = USB_DESC_TYPE_INTERFACE,
+		.bInterfaceNumber     = 1,
+		.bAlternateSetting    = 0,
+		.bNumEndpoints        = 2,
+		.bInterfaceClass      = USB_INTERFACE_CLASS_DATA,
+		.bInterfaceSubClass   = 0,
+		.nInterfaceProtocol   = 0, /* No class specific protocol */
+		.iInterface           = 0,
+	},
+	.cdc_in = {
+		.bLength              = sizeof(struct usb_endpoint_desc),
+		.bDescriptorType      = USB_DESC_TYPE_ENDPOINT,
+		.bEndpointAddress     = USB_EP_IN(3),
+		.bmAttributes         = USB_EP_ATTR_TT_BULK,
+		.wMaxPacketSize       = htousbs(PIOS_USB_BOARD_CDC_DATA_LENGTH),
+		.bInterval            = 0, /* ms */
+	},
+	.cdc_out = {
+		.bLength              = sizeof(struct usb_endpoint_desc),
+		.bDescriptorType      = USB_DESC_TYPE_ENDPOINT,
+		.bEndpointAddress     = USB_EP_OUT(3),
+		.bmAttributes         = USB_EP_ATTR_TT_BULK,	  /* Bulk */
+		.wMaxPacketSize       = htousbs(PIOS_USB_BOARD_CDC_DATA_LENGTH),
+		.bInterval            = 0, /* ms */
 	},
 	.hid_if = {
 		.bLength              = sizeof(struct usb_interface_desc),
 		.bDescriptorType      = USB_DESC_TYPE_INTERFACE,
-		.bInterfaceNumber     = 0,
+		.bInterfaceNumber     = 2,
 		.bAlternateSetting    = 0,
 		.bNumEndpoints        = 2,
 		.bInterfaceClass      = USB_INTERFACE_CLASS_HID,
@@ -168,78 +240,6 @@ static const struct usb_config_hid_cdc config_hid_cdc = {
 		.bmAttributes         = USB_EP_ATTR_TT_INTERRUPT,
 		.wMaxPacketSize       = htousbs(PIOS_USB_BOARD_HID_DATA_LENGTH),
 		.bInterval            = 4, /* ms */
-	},
-	.cdc_control_if = {
-		.bLength              = sizeof(struct usb_interface_desc),
-		.bDescriptorType      = USB_DESC_TYPE_INTERFACE,
-		.bInterfaceNumber     = 1,
-		.bAlternateSetting    = 0,
-		.bNumEndpoints        = 1,
-		.bInterfaceClass      = USB_INTERFACE_CLASS_CDC,
-		.bInterfaceSubClass   = 2, /* Abstract Control Model */
-		.nInterfaceProtocol   = 1,	 /* V.25ter, Common AT commands */
-		.iInterface           = 0,
-	},
-	.cdc_header = {
-		.bLength              = sizeof(struct usb_cdc_header_func_desc),
-		.bDescriptorType      = USB_DESC_TYPE_CLASS_SPECIFIC,
-		.bDescriptorSubType   = USB_CDC_DESC_SUBTYPE_HEADER,
-		.bcdCDC               = htousbs(0x0110),
-	},
-	.cdc_callmgmt = {
-		.bLength              = sizeof(struct usb_cdc_callmgmt_func_desc),
-		.bDescriptorType      = USB_DESC_TYPE_CLASS_SPECIFIC,
-		.bDescriptorSubType   = USB_CDC_DESC_SUBTYPE_CALLMGMT,
-		.bmCapabilities       = 0x00, /* No call handling */
-		.bDataInterface       = 2,
-	},
-	.cdc_acm = {
-		.bLength              = sizeof(struct usb_cdc_acm_func_desc),
-		.bDescriptorType      = USB_DESC_TYPE_CLASS_SPECIFIC,
-		.bDescriptorSubType   = USB_CDC_DESC_SUBTYPE_ABSTRACT_CTRL,
-		.bmCapabilities       = 0,
-	},
-	.cdc_union = {
-		.bLength              = sizeof(struct usb_cdc_union_func_desc),
-		.bDescriptorType      = USB_DESC_TYPE_CLASS_SPECIFIC,
-		.bDescriptorSubType   = USB_CDC_DESC_SUBTYPE_UNION,
-		.bMasterInterface     = 1,
-		.bSlaveInterface      = 2,
-	},
-	.cdc_mgmt_in = {
-		.bLength              = sizeof(struct usb_endpoint_desc),
-		.bDescriptorType      = USB_DESC_TYPE_ENDPOINT,
-		.bEndpointAddress     = USB_EP_IN(2),
-		.bmAttributes         = USB_EP_ATTR_TT_INTERRUPT,
-		.wMaxPacketSize       = htousbs(PIOS_USB_BOARD_CDC_MGMT_LENGTH),
-		.bInterval            = 4, /* ms */
-	},
-	.cdc_data_if = {
-		.bLength              = sizeof(struct usb_interface_desc),
-		.bDescriptorType      = USB_DESC_TYPE_INTERFACE,
-		.bInterfaceNumber     = 2,
-		.bAlternateSetting    = 0,
-		.bNumEndpoints        = 2,
-		.bInterfaceClass      = USB_INTERFACE_CLASS_DATA,
-		.bInterfaceSubClass   = 0,
-		.nInterfaceProtocol   = 0, /* No class specific protocol */
-		.iInterface           = 0,
-	},
-	.cdc_in = {
-		.bLength              = sizeof(struct usb_endpoint_desc),
-		.bDescriptorType      = USB_DESC_TYPE_ENDPOINT,
-		.bEndpointAddress     = USB_EP_IN(3),
-		.bmAttributes         = USB_EP_ATTR_TT_BULK,
-		.wMaxPacketSize       = htousbs(PIOS_USB_BOARD_CDC_DATA_LENGTH),
-		.bInterval            = 0, /* ms */
-	},
-	.cdc_out = {
-		.bLength              = sizeof(struct usb_endpoint_desc),
-		.bDescriptorType      = USB_DESC_TYPE_ENDPOINT,
-		.bEndpointAddress     = USB_EP_OUT(3),
-		.bmAttributes         = USB_EP_ATTR_TT_BULK,	  /* Bulk */
-		.wMaxPacketSize       = htousbs(PIOS_USB_BOARD_CDC_DATA_LENGTH),
-		.bInterval            = 0, /* ms */
 	},
 };
 

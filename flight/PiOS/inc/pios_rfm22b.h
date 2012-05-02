@@ -41,7 +41,6 @@ struct pios_rfm22b_cfg {
 	uint8_t maxTxPower;
 	uint32_t sendTimeout;
 	uint8_t minPacketSize;
-	uint8_t txWinSize;
 	uint8_t maxConnections;
 };
 

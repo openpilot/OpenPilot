@@ -40,8 +40,10 @@ typedef struct {
 	PHPacket *tx_packets;
 	uint8_t tx_win_start;
 	uint8_t tx_win_end;
+	PHPacket *rx_packets;
+	uint8_t rx_win_start;
+	uint8_t rx_win_end;
 	uint16_t tx_seq_id;
-	PHPacket rx_packet;
 	PHOutputStream stream;
 	xSemaphoreHandle lock;
 	PHOutputStream output_stream;
@@ -72,13 +74,18 @@ PHInstHandle PHInitialize(PacketHandlerConfig *cfg)
 	data->cfg = *cfg;
 	data->tx_seq_id = 0;
 
-	// Allocate the tx packet window
-	data->tx_packets = pvPortMalloc(sizeof(PHPacket) * data->cfg.txWinSize);
+	// Allocate the packet windows
+	data->tx_packets = pvPortMalloc(sizeof(PHPacket) * data->cfg.winSize);
+	data->rx_packets = pvPortMalloc(sizeof(PHPacket) * data->cfg.winSize);
 
-	// Initialize the window
+	// Initialize the windows
 	data->tx_win_start = data->tx_win_end = 0;
-	for (uint8_t i = 0; i < data->cfg.txWinSize; ++i)
+	data->rx_win_start = data->rx_win_end = 0;
+	for (uint8_t i = 0; i < data->cfg.winSize; ++i)
+	{
 		data->tx_packets[i].header.type = PACKET_TYPE_NONE;
+		data->rx_packets[i].header.type = PACKET_TYPE_NONE;
+	}
 
 	// Create the lock
 	data->lock = xSemaphoreCreateRecursiveMutex();
@@ -165,7 +172,7 @@ PHPacketHandle PHGetTXPacket(PHInstHandle h)
 	PHPacketHandle p = data->tx_packets + data->tx_win_end;
 
 	// Is the window full?
-	uint8_t next_end = (data->tx_win_end + 1) % data->cfg.txWinSize;
+	uint8_t next_end = (data->tx_win_end + 1) % data->cfg.winSize;
 	if(next_end == data->tx_win_start)
 		return NULL;
 	data->tx_win_end = next_end;
@@ -175,17 +182,6 @@ PHPacketHandle PHGetTXPacket(PHInstHandle h)
 
 	// Return a pointer to the packet at the end of the TX window.
 	return p;
-}
-
-/**
- * Get a pointer to the the receive buffer.
- * \param[in] h The packet handler instance data pointer.
- * \return PHPacketHandle A pointer to the packet buffer.
- */
-PHPacketHandle PHGetRXPacket(PHInstHandle h)
-{
-	PHPacketDataHandle data = (PHPacketDataHandle)h;
-	return &(data->rx_packet);
 }
 
 /**
@@ -207,7 +203,59 @@ void PHReleaseTXPacket(PHInstHandle h, PHPacketHandle p)
 	// If this packet is at the start of the window, increment the start index.
 	while ((data->tx_win_start != data->tx_win_end) &&
 				 (data->tx_packets[data->tx_win_start].header.type == PACKET_TYPE_NONE))
-		data->tx_win_start = (data->tx_win_start + 1) % data->cfg.txWinSize;
+		data->tx_win_start = (data->tx_win_start + 1) % data->cfg.winSize;
+
+	// Release lock
+	xSemaphoreGiveRecursive(data->lock);
+}
+
+/**
+ * Get a packet out of the receive buffer.
+ * \param[in] h The packet handler instance data pointer.
+ * \return PHPacketHandle A pointer to the packet buffer.
+ * \return 0 No packets buffers avaiable in the transmit window.
+ */
+PHPacketHandle PHGetRXPacket(PHInstHandle h)
+{
+	PHPacketDataHandle data = (PHPacketDataHandle)h;
+
+	// Lock
+	xSemaphoreTakeRecursive(data->lock, portMAX_DELAY);
+	PHPacketHandle p = data->rx_packets + data->rx_win_end;
+
+	// Is the window full?
+	uint8_t next_end = (data->rx_win_end + 1) % data->cfg.winSize;
+	if(next_end == data->rx_win_start)
+		return NULL;
+	data->rx_win_end = next_end;
+
+	// Release lock
+	xSemaphoreGiveRecursive(data->lock);
+
+	// Return a pointer to the packet at the end of the TX window.
+	return p;
+}
+
+/**
+ * Release a packet from the receive packet buffer window.
+ * \param[in] h The packet handler instance data pointer.
+ * \param[in] p A pointer to the packet buffer.
+ * \return Nothing
+ */
+void PHReleaseRXPacket(PHInstHandle h, PHPacketHandle p)
+{
+	PHPacketDataHandle data = (PHPacketDataHandle)h;
+
+	// Lock
+	xSemaphoreTakeRecursive(data->lock, portMAX_DELAY);
+
+	// Change the packet type so we know this packet is unused.
+	p->header.type = PACKET_TYPE_NONE;
+
+	// If this packet is at the start of the window, increment the start index.
+	while ((data->rx_win_start != data->rx_win_end) &&
+				 (data->rx_packets[data->rx_win_start].header.type == PACKET_TYPE_NONE))
+		data->rx_win_start = (data->rx_win_start + 1) % data->cfg.winSize;
 
 	// Release lock
 	xSemaphoreGiveRecursive(data->lock);
@@ -242,24 +290,23 @@ uint8_t PHTransmitPacket(PHInstHandle h, PHPacketHandle p)
 }
 
 /**
- * Process a packet that has been received.
+ * Verify that a buffer contains a valid packet.
  * \param[in] h The packet handler instance data pointer.
  * \param[in] p A pointer to the packet buffer.
  * \param[in] received_len The length of data received.
- * \return 1 Success
- * \return 0 Failure
+ * \return < 0 Failure
+ * \return > 0 Number of bytes consumed.
  */
-uint8_t PHReceivePacket(PHInstHandle h, PHPacketHandle p, uint16_t received_len)
+int32_t PHVerifyPacket(PHInstHandle h, PHPacketHandle p, uint16_t received_len)
 {
-	PHPacketDataHandle data = (PHPacketDataHandle)h;
 
 	// Verify the packet length.
 	// Note: The last two bytes should be the RSSI and AFC.
 	uint16_t len = PHPacketSizeECC(p);
-	if (received_len != (len + 2))
+	if (received_len < (len + 2))
 	{
-		DEBUG_PRINTF(1, "Packet length error\n\r");
-		return 0;
+		DEBUG_PRINTF(1, "Packet length error %d %d\n\r", received_len, len + 2);
+		return -1;
 	}
 
 	// Attempt to correct any errors in the packet.
@@ -268,7 +315,26 @@ uint8_t PHReceivePacket(PHInstHandle h, PHPacketHandle p, uint16_t received_len)
 	// Check that there were no unfixed errors.
 	bool rx_error = check_syndrome() != 0;
 	if(rx_error)
+	{
 		DEBUG_PRINTF(1, "Error in packet\n\r");
+		return -2;
+	}
+
+	return len + 2;
+}
+
+/**
+ * Process a packet that has been received.
+ * \param[in] h The packet handler instance data pointer.
+ * \param[in] p A pointer to the packet buffer.
+ * \param[in] received_len The length of data received.
+ * \return 0 Failure
+ * \return 1 Success
+ */
+uint8_t PHReceivePacket(PHInstHandle h, PHPacketHandle p, bool rx_error)
+{
+	PHPacketDataHandle data = (PHPacketDataHandle)h;
+	uint16_t len = PHPacketSizeECC(p);
 
 	// Add the RSSI and AFC to the packet.
 	p->header.rssi = *(((int8_t*)p) + len);
@@ -310,11 +376,11 @@ uint8_t PHReceivePacket(PHInstHandle h, PHPacketHandle p, uint16_t received_len)
 	{
 		// Find the packet ID in the TX buffer, and free it.
 		unsigned int i = 0;
-		for (unsigned int i = 0; i < data->cfg.txWinSize; ++i)
+		for (unsigned int i = 0; i < data->cfg.winSize; ++i)
 			if (data->tx_packets[i].header.tx_seq == p->header.rx_seq)
 				PHReleaseTXPacket(h, data->tx_packets + i);
 #ifdef DEBUG_LEVEL
-		if (i == data->cfg.txWinSize)
+		if (i == data->cfg.winSize)
 			DEBUG_PRINTF(1, "Error finding acked packet to release\n\r");
 #endif
 	}
@@ -324,11 +390,11 @@ uint8_t PHReceivePacket(PHInstHandle h, PHPacketHandle p, uint16_t received_len)
 	{
 		// Resend the packet.
 		unsigned int i = 0;
-		for ( ; i < data->cfg.txWinSize; ++i)
+		for ( ; i < data->cfg.winSize; ++i)
 			if (data->tx_packets[i].header.tx_seq == p->header.rx_seq)
 				PHLTransmitPacket(data, data->tx_packets + i);
 #ifdef DEBUG_LEVEL
-		if (i == data->cfg.txWinSize)
+		if (i == data->cfg.winSize)
 			DEBUG_PRINTF(1, "Error finding acked packet to NACK\n\r");
 		DEBUG_PRINTF(1, "Resending after NACK\n\r");
 #endif
@@ -353,12 +419,16 @@ uint8_t PHReceivePacket(PHInstHandle h, PHPacketHandle p, uint16_t received_len)
 			if(data->data_handler)
 				data->data_handler(p->data, p->header.data_size);
 
+		// Release the packet.
+		PHReleaseTXPacket(h, p);
+
 		break;
 
 	default:
 		break;
 	}
 
+	
 	return 1;
 }
 
@@ -373,16 +443,8 @@ uint8_t PHBroadcastStatus(PHInstHandle h, uint32_t id, int8_t rssi)
 {
 	PHPacketDataHandle data = (PHPacketDataHandle)h;
 
-	// Create the status message
-	PHPacketHeader header;
-	header.destination_id = 0xffffffff;
-	header.source_id = id;
-	header.rssi = rssi;
-	header.type = PACKET_TYPE_STATUS;
-	header.data_size = 0;
-
 	// Send the packet.
-	return PHLTransmitPacket(data, (PHPacketHandle)&header);
+	return PHLTransmitPacket(data, (PHPacketHandle)&h);
 }
 
 /**

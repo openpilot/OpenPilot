@@ -78,7 +78,7 @@ typedef struct {
 } PHPpmPacket, *PHPpmPacketHandle;
 
 typedef struct {
-	uint8_t txWinSize;
+	uint8_t winSize;
 	uint16_t maxConnections;
 } PacketHandlerConfig;
 
@@ -97,11 +97,13 @@ void PHRegisterStatusHandler(PHInstHandle h, PHStatusHandler f);
 void PHRegisterPPMHandler(PHInstHandle h, PHPPMHandler f);
 uint32_t PHConnect(PHInstHandle h, uint32_t dest_id);
 PHPacketHandle PHGetRXPacket(PHInstHandle h);
+void PHReleaseTXPacket(PHInstHandle h, PHPacketHandle p);
 PHPacketHandle PHGetTXPacket(PHInstHandle h);
 void PHReleaseTXPacket(PHInstHandle h, PHPacketHandle p);
 uint8_t PHTransmitPacket(PHInstHandle h, PHPacketHandle p);
-uint8_t PHBroadcastStatus(PHInstHandle h, uint32_t id, int8_t rssi);
-uint8_t PHReceivePacket(PHInstHandle h, PHPacketHandle p, uint16_t len);
+uint8_t PHFillStatusPacket(PHInstHandle h, uint32_t id, int8_t rssi);
+int32_t PHVerifyPacket(PHInstHandle h, PHPacketHandle p, uint16_t received_len);
+uint8_t PHReceivePacket(PHInstHandle h, PHPacketHandle p, bool rx_error);
 
 #endif // __PACKET_HANDLER_H__
 

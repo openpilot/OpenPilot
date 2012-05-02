@@ -494,9 +494,6 @@ const struct pios_rfm22b_cfg pios_rfm22b_cfg = {
 	.maxRFBandwidth = 128000,
 	//.maxTxPower = RFM22_tx_pwr_txpow_0, // +1dBm ... 1.25mW
 	.maxTxPower = RFM22_tx_pwr_txpow_7, // +20dBm .. 100mW
-	.sendTimeout = 25, /* ms */
-	.minPacketSize = 100,
-	.maxConnections = 1,
 };
 
 #endif /* PIOS_INCLUDE_RFM22B */
@@ -506,7 +503,7 @@ const struct pios_rfm22b_cfg pios_rfm22b_cfg = {
 
 // Initialize the packet handler
 PacketHandlerConfig pios_ph_cfg = {
-	.winSize = PIOS_PH_TX_WIN_SIZE,
+	.winSize = PIOS_PH_WIN_SIZE,
 	.maxConnections = PIOS_PH_MAX_CONNECTIONS,
 };
 

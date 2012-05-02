@@ -455,7 +455,7 @@ static const struct pios_usb_cfg pios_usb_main_cfg = {
 #include <pios_usb_hid_priv.h>
 
 const struct pios_usb_hid_cfg pios_usb_hid_cfg = {
-	.data_if = 0,
+	.data_if = 2,
 	.data_rx_ep = 1,
 	.data_tx_ep = 1,
 };
@@ -465,10 +465,10 @@ const struct pios_usb_hid_cfg pios_usb_hid_cfg = {
 #include <pios_usb_cdc_priv.h>
 
 const struct pios_usb_cdc_cfg pios_usb_cdc_cfg = {
-	.ctrl_if = 1,
+	.ctrl_if = 0,
 	.ctrl_tx_ep = 2,
 
-	.data_if = 2,
+	.data_if = 1,
 	.data_rx_ep = 3,
 	.data_tx_ep = 3,
 };
@@ -494,9 +494,6 @@ const struct pios_rfm22b_cfg pios_rfm22b_cfg = {
 	.maxRFBandwidth = 128000,
 	//.maxTxPower = RFM22_tx_pwr_txpow_0, // +1dBm ... 1.25mW
 	.maxTxPower = RFM22_tx_pwr_txpow_7, // +20dBm .. 100mW
-	.sendTimeout = 25, /* ms */
-	.minPacketSize = 100,
-	.maxConnections = 1,
 };
 
 #endif /* PIOS_INCLUDE_RFM22B */
@@ -506,7 +503,7 @@ const struct pios_rfm22b_cfg pios_rfm22b_cfg = {
 
 // Initialize the packet handler
 PacketHandlerConfig pios_ph_cfg = {
-	.winSize = PIOS_PH_TX_WIN_SIZE,
+	.winSize = PIOS_PH_WIN_SIZE,
 	.maxConnections = PIOS_PH_MAX_CONNECTIONS,
 };
 

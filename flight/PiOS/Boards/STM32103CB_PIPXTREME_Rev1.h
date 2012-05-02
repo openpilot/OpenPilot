@@ -285,7 +285,7 @@ extern uint32_t pios_rfm22b_id;
 uint32_t pios_packet_handler;
 #define PIOS_INCLUDE_PACKET_HANDLER
 #define PIOS_PH_MAX_PACKET 255
-#define PIOS_PH_TX_WIN_SIZE 3
+#define PIOS_PH_WIN_SIZE 3
 #define PIOS_PH_MAX_CONNECTIONS 1
 
 //-------------------------

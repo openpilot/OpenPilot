@@ -48,23 +48,17 @@
 // Private constants
 
 #define TEMP_BUFFER_SIZE 25
-
 #define STACK_SIZE_BYTES 300
 #define TASK_PRIORITY (tskIDLE_PRIORITY + 1)
-
 #define BRIDGE_BUF_LEN 512
-
 #define MAX_RETRIES 2
 #define REQ_TIMEOUT_MS 10
-
 #define STATS_UPDATE_PERIOD_MS 500
 #define RADIOSTATS_UPDATE_PERIOD_MS 500
-
 #define MAX_LOST_CONTACT_TIME 10
-
 #define PACKET_QUEUE_SIZE 5
-
 #define EV_PACKET_RECEIVED 0x10
+#define MAX_PORT_DELAY 200
 
 // ****************
 // Private types
@@ -278,7 +272,7 @@ static void comUAVTalkTask(void *parameters)
 
 		// Read the next byte
 		uint8_t rx_byte;
-		if(!BufferedRead(f, &rx_byte, 100))
+		if(!BufferedRead(f, &rx_byte, MAX_PORT_DELAY))
 			continue;
 
 		// Get a TX packet from the packet handler if required.
@@ -352,7 +346,7 @@ static void radioReceiveTask(void *parameters)
 			p = PHGetRXPacket(pios_packet_handler);
 
 		// Receive data from the radio port
-		rx_bytes = PIOS_COM_ReceiveBuffer(data->radio_port, (uint8_t*)p, PIOS_PH_MAX_PACKET, 200);
+		rx_bytes = PIOS_COM_ReceiveBuffer(data->radio_port, (uint8_t*)p, PIOS_PH_MAX_PACKET, MAX_PORT_DELAY);
 
 		// Verify that the packet is valid and pass it on.
 		if(PHVerifyPacket(pios_packet_handler, p, rx_bytes) > 0) {
@@ -379,7 +373,7 @@ static void sendPacketTask(void *parameters)
 		PIOS_WDG_UpdateFlag(PIOS_WDG_SENDPACKET);
 #endif /* PIOS_INCLUDE_WDG */
 		// Wait for a packet on the queue.
-		if (xQueueReceive(data->sendPacketQueue, &p, portMAX_DELAY) == pdTRUE) {
+		if (xQueueReceive(data->sendPacketQueue, &p, MAX_PORT_DELAY) == pdTRUE) {
 			// Send the packet.
 			PHTransmitPacket(pios_packet_handler, p);
 		}
@@ -400,7 +394,7 @@ static void sendDataTask(void *parameters)
 		PIOS_WDG_UpdateFlag(PIOS_WDG_SENDDATA);
 #endif /* PIOS_INCLUDE_WDG */
 		// Wait for a packet on the queue.
-		if (xQueueReceive(data->objEventQueue, &ev, portMAX_DELAY) == pdTRUE) {
+		if (xQueueReceive(data->objEventQueue, &ev, MAX_PORT_DELAY) == pdTRUE) {
 			if (ev.event == EV_UPDATED)
 			{
 				// Send update (with retries)

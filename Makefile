@@ -173,10 +173,17 @@ qt_sdk_install : | $(DL_DIR) $(TOOLS_DIR)
 qt_sdk_install: qt_sdk_clean
         # download the source only if it's newer than what we already have
 	$(V1) wget -N --content-disposition -P "$(DL_DIR)" "$(QT_SDK_URL)"
+        # tell the user exactly which path they should select in the GUI
+	$(V1) echo "*** NOTE NOTE NOTE ***"
+	$(V1) echo "*"
+	$(V1) echo "*  In the GUI, please use exactly this path as the installation path:"
+	$(V1) echo "*        $(QT_SDK_DIR)"
+	$(V1) echo "*"
+	$(V1) echo "*** NOTE NOTE NOTE ***"
 
         #installer is an executable, make it executable and run it
 	$(V1) chmod u+x "$(DL_DIR)/$(QT_SDK_FILE)"
-	"$(DL_DIR)/$(QT_SDK_FILE)" -style cleanlooks
+	$(V1) "$(DL_DIR)/$(QT_SDK_FILE)" -style cleanlooks
 
 .PHONY: qt_sdk_clean
 qt_sdk_clean:
@@ -643,14 +650,6 @@ EF_BOARDS  := $(ALL_BOARDS)
 #        updater yet so we need to filter them out to prevent errors.
 BL_BOARDS  := $(filter-out ins, $(BL_BOARDS))
 BU_BOARDS  := $(filter-out ins, $(BU_BOARDS))
-
-# FIXME: The CC bootloader updaters don't work anymore due to
-#        differences between CC and CC3D
-BU_BOARDS  := $(filter-out coptercontrol, $(BU_BOARDS))
-
-# FIXME: PipXtreme bootloader updater doesn't work due to missing
-#        definitions for LEDs
-BU_BOARDS  := $(filter-out pipxtreme, $(BU_BOARDS))
 
 # Generate the targets for whatever boards are left in each list
 FW_TARGETS := $(addprefix fw_, $(FW_BOARDS))

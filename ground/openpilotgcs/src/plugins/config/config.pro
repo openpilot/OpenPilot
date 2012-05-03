@@ -4,7 +4,9 @@ DEFINES += CONFIG_LIBRARY
 QT += svg
 include(config_dependencies.pri)
 INCLUDEPATH += ../../libs/eigen
+
 OTHER_FILES += Config.pluginspec
+
 HEADERS += configplugin.h \
     configgadgetconfiguration.h \
     configgadgetwidget.h \
@@ -14,11 +16,11 @@ HEADERS += configplugin.h \
     fancytabwidget.h \
     configinputwidget.h \
     configoutputwidget.h \
-    configairframewidget.h \
+    configvehicletypewidget.h \
     config_pro_hw_widget.h \
     config_cc_hw_widget.h \
     configccattitudewidget.h \
-    configccpmwidget.h \
+    cfg_vehicletypes/configccpmwidget.h \
     configstabilizationwidget.h \
     assertions.h \
     calibration.h \
@@ -39,11 +41,10 @@ SOURCES += configplugin.cpp \
     fancytabwidget.cpp \
     configinputwidget.cpp \
     configoutputwidget.cpp \
-    configairframewidget.cpp \
+    configvehicletypewidget.cpp \
     config_pro_hw_widget.cpp \
     config_cc_hw_widget.cpp \
     configccattitudewidget.cpp \
-    configccpmwidget.cpp \
     configstabilizationwidget.cpp \
     twostep.cpp \
     legacy-calibration.cpp \
@@ -55,6 +56,10 @@ SOURCES += configplugin.cpp \
     configcamerastabilizationwidget.cpp \
     configrevowidget.cpp \
     configtxpidwidget.cpp \
+    cfg_vehicletypes/configmultirotorwidget.cpp \
+    cfg_vehicletypes/configgroundvehiclewidget.cpp \
+    cfg_vehicletypes/configfixedwingwidget.cpp \
+    cfg_vehicletypes/configccpmwidget.cpp \
     outputchannelform.cpp
 FORMS += airframe.ui \
     cc_hw_settings.ui \

@@ -1703,10 +1703,10 @@ void ConfigccpmWidget::enableSwashplateLevellingControl(bool state)
     if (state)
     {
         SwashLvlaccInitialData = mdata;
-        mdata.flightAccess = UAVObject::ACCESS_READONLY;
-        mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
-        mdata.gcsTelemetryAcked = false;
-        mdata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
+        UAVObject::SetFlightAccess(mdata, UAVObject::ACCESS_READONLY);
+        UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_ONCHANGE);
+        UAVObject::SetGcsTelemetryAcked(mdata, false);
+        UAVObject::SetGcsTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_ONCHANGE);
         mdata.gcsTelemetryUpdatePeriod = 100;
         SwashLvlConfigurationInProgress=1;
         m_ccpm->TabObject->setTabEnabled(0,0);

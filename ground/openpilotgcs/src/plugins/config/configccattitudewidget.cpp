@@ -55,6 +55,7 @@ ConfigCCAttitudeWidget::ConfigCCAttitudeWidget(QWidget *parent) :
     addUAVObjectToWidgetRelation("AttitudeSettings","BoardRotation",ui->pitchBias,AttitudeSettings::BOARDROTATION_PITCH);
     addUAVObjectToWidgetRelation("AttitudeSettings","BoardRotation",ui->yawBias,AttitudeSettings::BOARDROTATION_YAW);
     addWidget(ui->zeroBias);
+    refreshWidgetsValues();
 }
 
 ConfigCCAttitudeWidget::~ConfigCCAttitudeWidget()
@@ -154,7 +155,7 @@ void ConfigCCAttitudeWidget::startAccelCalibration() {
     // Speed up updates
     initialMdata = obj->getMetadata();
     UAVObject::Metadata mdata = initialMdata;
-    mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
+    UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
     mdata.flightTelemetryUpdatePeriod = 100;
     obj->setMetadata(mdata);
 

@@ -35,6 +35,7 @@
 #include <packet_handler.h>
 #include <gcsreceiver.h>
 #include <pipxstatus.h>
+#include <objectpersistence.h>
 #include <pipxsettings.h>
 #include <uavtalk_priv.h>
 #include <pios_rfm22b.h>
@@ -42,7 +43,7 @@
 
 #include <stdbool.h>
 
-//#undef PIOS_INCLUDE_USB
+#undef PIOS_INCLUDE_USB
 
 // ****************
 // Private constants
@@ -57,8 +58,10 @@
 #define RADIOSTATS_UPDATE_PERIOD_MS 500
 #define MAX_LOST_CONTACT_TIME 10
 #define PACKET_QUEUE_SIZE 5
-#define EV_PACKET_RECEIVED 0x10
 #define MAX_PORT_DELAY 200
+#define EV_PACKET_RECEIVED 0x10
+#define EV_SEND_ACK 0x20
+#define EV_SEND_NACK 0x40
 
 // ****************
 // Private types
@@ -104,15 +107,6 @@ typedef struct {
 	portTickType send_timeout;
 	uint16_t min_packet_size;
 
-	// Flag used to indicate an update of the UAVObjects.
-	bool send_gcsreceiver;
-	bool send_pipxstatus;
-
-	// Tracks the UAVTalk messages transmitted from radio to com.
-	bool uavtalk_idle;
-	int16_t uavtalk_packet_len;
-	int16_t uavtalk_packet_index;
-
 	// Track other radios that are in range.
 	PairStats pairStats[PIPXSTATUS_PAIRIDS_NUMELEM];
 
@@ -146,6 +140,7 @@ static void PPMHandler(uint16_t *channels);
 static void updateSettings();
 static BufferedReadHandle BufferedReadInit(uint32_t com_port, uint16_t buffer_length);
 static bool BufferedRead(BufferedReadHandle h, uint8_t *value, uint32_t timeout_ms);
+static void BufferedReadSetCom(BufferedReadHandle h, uint32_t com_port);
 
 // ****************
 // Private variables
@@ -194,8 +189,6 @@ static int32_t RadioComBridgeInitialize(void)
 	// Initialize the UAVObjects that we use
 	GCSReceiverInitialize();
 	PipXStatusInitialize();
-	data->send_gcsreceiver = false;
-	data->send_pipxstatus = false;
 
 	// TODO: Get from settings object
 	data->com_port = PIOS_COM_BRIDGE_COM;
@@ -229,11 +222,6 @@ static int32_t RadioComBridgeInitialize(void)
 	// Initialize the packet send timeout
 	data->send_timeout = 25; // ms
 	data->min_packet_size = 50;
-
-	// Initialize the rado->com UAVTalk message tracker.
-	data->uavtalk_idle = true;
-	data->uavtalk_packet_len = 0;
-	data->uavtalk_packet_index = -1; // Looking for SYNC
 
 	// Initialize the detected device statistics.
 	for (uint8_t i = 0; i < PIPXSTATUS_PAIRIDS_NUMELEM; ++i)
@@ -269,6 +257,14 @@ static void comUAVTalkTask(void *parameters)
 		// Update the watchdog timer.
 		PIOS_WDG_UpdateFlag(PIOS_WDG_COMUAVTALK);
 #endif /* PIOS_INCLUDE_WDG */
+
+#if defined(PIOS_INCLUDE_USB)
+		// Determine input port (USB takes priority over telemetry port)
+		if (PIOS_USB_CheckAvailable(0) && PIOS_COM_TELEM_USB)
+			BufferedReadSetCom(f, PIOS_COM_TELEM_USB);
+		else
+#endif /* PIOS_INCLUDE_USB */
+			BufferedReadSetCom(f, data->com_port);
 
 		// Read the next byte
 		uint8_t rx_byte;
@@ -309,11 +305,48 @@ static void comUAVTalkTask(void *parameters)
 
 		// Keep reading until we receive a completed packet.
 		UAVTalkRxState state = UAVTalkProcessInputStreamQuiet(data->inUAVTalkCon, rx_byte);
+		UAVTalkInputProcessor *iproc = &(((UAVTalkConnectionData*)(data->inUAVTalkCon))->iproc);
 		if (state == UAVTALK_STATE_COMPLETE) {
 
-			// Queue the packet for transmission.
-			xQueueSend(data->sendPacketQueue, &p, portMAX_DELAY);
-			p = NULL;
+			// Is this a local UAVObject?
+			if (iproc->obj != NULL)
+			{
+				// We treat the ObjectPersistance object differently
+				if(iproc->objId == OBJECTPERSISTENCE_OBJID)
+				{
+					// Queue the packet for transmission.
+					xQueueSend(data->sendPacketQueue, &p, MAX_PORT_DELAY);
+					p = NULL;
+				}
+				else
+				{
+					UAVObjEvent ev;
+					ev.obj = iproc->obj;
+					switch (iproc->type)
+					{
+					case UAVTALK_TYPE_OBJ:
+						// Unpack object, if the instance does not exist it will be created!
+						UAVObjUnpack(iproc->obj, iproc->instId, p->data);
+						break;
+					case UAVTALK_TYPE_OBJ_REQ:
+						// Queue up an object send request.
+						ev.event = EV_UPDATE_REQ;
+						xQueueSend(data->objEventQueue, &ev, MAX_PORT_DELAY);
+						break;
+					case UAVTALK_TYPE_OBJ_ACK:
+						// Queue up an ACK
+						ev.event = EV_SEND_ACK;
+						xQueueSend(data->objEventQueue, &ev, MAX_PORT_DELAY);
+						break;
+					}
+				}
+			}
+			else
+			{
+				// Queue the packet for transmission.
+				xQueueSend(data->sendPacketQueue, &p, MAX_PORT_DELAY);
+				p = NULL;
+			}
 
 		} else if(state == UAVTALK_STATE_ERROR) {
 			DEBUG_PRINTF(1, "UAVTalk FAILED!\n\r");
@@ -321,6 +354,16 @@ static void comUAVTalkTask(void *parameters)
 			// Release the packet and start over again.
 			PHReleaseTXPacket(pios_packet_handler, p);
 			p = NULL;
+
+			// Send a NACK if required.
+			if((iproc->obj) && (iproc->type == UAVTALK_TYPE_ACK))
+			{
+				UAVObjEvent ev;
+				ev.obj = iproc->obj;
+				// Queue up a NACK
+				ev.event = EV_SEND_NACK;
+				xQueueSend(data->objEventQueue, &ev, MAX_PORT_DELAY);
+			}
 		}
 	}
 }
@@ -347,6 +390,8 @@ static void radioReceiveTask(void *parameters)
 
 		// Receive data from the radio port
 		rx_bytes = PIOS_COM_ReceiveBuffer(data->radio_port, (uint8_t*)p, PIOS_PH_MAX_PACKET, MAX_PORT_DELAY);
+		if(rx_bytes == 0)
+			continue;
 
 		// Verify that the packet is valid and pass it on.
 		if(PHVerifyPacket(pios_packet_handler, p, rx_bytes) > 0) {
@@ -395,7 +440,7 @@ static void sendDataTask(void *parameters)
 #endif /* PIOS_INCLUDE_WDG */
 		// Wait for a packet on the queue.
 		if (xQueueReceive(data->objEventQueue, &ev, MAX_PORT_DELAY) == pdTRUE) {
-			if (ev.event == EV_UPDATED)
+			if ((ev.event == EV_UPDATED) || (ev.event == EV_UPDATE_REQ))
 			{
 				// Send update (with retries)
 				uint32_t retries = 0;
@@ -404,6 +449,16 @@ static void sendDataTask(void *parameters)
 					success = UAVTalkSendObject(data->outUAVTalkCon, ev.obj, 0, 0, REQ_TIMEOUT_MS);
 					++retries;
 				}
+			}
+			else if(ev.event == EV_SEND_ACK)
+			{
+				// Send the ACK
+				UAVTalkSendAck(data->outUAVTalkCon, ev.obj, ev.instId);
+			}
+			else if(ev.event == EV_SEND_NACK)
+			{
+				// Send the ACK
+				UAVTalkSendNack(data->outUAVTalkCon, UAVObjGetID(ev.obj));
 			}
 			else if(ev.event == EV_PACKET_RECEIVED)
 			{
@@ -543,7 +598,7 @@ static void radioStatusTask(void *parameters)
 				status_packet.source_id = pipxStatus.DeviceID;
 				status_packet.rssi = pipxStatus.RSSI;
 				PHPacketHandle sph = (PHPacketHandle)&status_packet;
-				xQueueSend(data->sendPacketQueue, &sph, portMAX_DELAY);
+				xQueueSend(data->sendPacketQueue, &sph, MAX_PORT_DELAY);
 				cntr = 0;
 			}
 		}
@@ -672,7 +727,6 @@ static void PPMHandler(uint16_t *channels)
 		UAVObjSetMetadata(GCSReceiverHandle(), &metadata);
 	}
 	GCSReceiverSet(&rcvr);
-	data->send_gcsreceiver = true;
 }
 
 static BufferedReadHandle BufferedReadInit(uint32_t com_port, uint16_t buffer_length)
@@ -708,6 +762,11 @@ static bool BufferedRead(BufferedReadHandle h, uint8_t *value, uint32_t timeout_
 	// Return the next byte.
 	*value = h->buffer[h->index++];
 	return true;
+}
+
+static void BufferedReadSetCom(BufferedReadHandle h, uint32_t com_port)
+{
+	h->com_port = com_port;
 }
 
 static void updateSettings()

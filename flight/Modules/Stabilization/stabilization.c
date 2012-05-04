@@ -329,6 +329,10 @@ static void stabilizationTask(void* parameters)
 				{
 					// Track the angle of the virtual flybar which includes a slow decay
 					vbar_integral[i] = vbar_integral[i] * vbar_decay + gyro_filtered[i] * dT;
+					if (vbar_integral[i] > settings.VbarMaxAngle)
+						vbar_integral[i] = settings.VbarMaxAngle;
+					if (-vbar_integral[i] < -settings.VbarMaxAngle)
+						vbar_integral[i] = -settings.VbarMaxAngle;
 
 					// Command signal is composed of stick input added to the gyro and virtual flybar
 					float gyro_gain = 1.0f;

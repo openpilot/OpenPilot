@@ -21,6 +21,7 @@
 	<field name="VbarTau" units="sec" type="float" elements="1" defaultvalue="0.5"/>
 	<field name="VbarGyroSuppress" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>
 	<field name="VbarPiroComp" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>
+	<field name="VbarMaxAngle" units="deg" type="uint8" elements="1" defaultvalue="10"/>
 
 	<field name="GyroTau" units="" type="float" elements="1" defaultvalue="0.005"/>
 

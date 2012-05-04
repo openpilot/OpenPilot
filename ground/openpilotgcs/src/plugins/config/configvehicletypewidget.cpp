@@ -110,7 +110,7 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
 	//Generate list of channels
     QStringList channels;
     channels << "None";
-    for (int i = 0; i < ActuatorSettings::CHANNELADDR_NUMELEM; i++) {
+    for (unsigned int i = 0; i < ActuatorSettings::CHANNELADDR_NUMELEM; i++) {
         mixerTypes << QString("Mixer%1Type").arg(i+1);
         mixerVectors << QString("Mixer%1Vector").arg(i+1);
         channels << QString("Channel%1").arg(i+1);
@@ -353,7 +353,7 @@ void ConfigVehicleTypeWidget::enableFFTest()
             UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ManualControlCommand")));
             UAVObject::Metadata mdata = obj->getMetadata();
             accInitialData = mdata;
-            mdata.flightAccess = UAVObject::ACCESS_READONLY;
+            UAVObject::SetFlightAccess(mdata, UAVObject::ACCESS_READONLY);
             obj->setMetadata(mdata);
         }
         // Depending on phase, either move actuator or send FF settings:

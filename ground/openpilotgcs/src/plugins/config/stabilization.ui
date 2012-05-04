@@ -15262,7 +15262,7 @@ value as the Kp.</string>
                       <string notr="true"/>
                      </property>
                      <property name="text">
-                      <string>K_i*ILimit</string>
+                      <string>ILimit</string>
                      </property>
                      <property name="alignment">
                       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -18639,7 +18639,7 @@ border-radius: 5;</string>
                       <string notr="true"/>
                      </property>
                      <property name="text">
-                      <string>K_i*ILimit</string>
+                      <string>ILimit</string>
                      </property>
                      <property name="alignment">
                       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

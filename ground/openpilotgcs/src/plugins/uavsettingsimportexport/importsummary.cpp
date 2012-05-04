@@ -71,18 +71,23 @@ void ImportSummaryDialog::addLine(QString uavObjectName, QString text, bool stat
 {
     ui->importSummaryList->setRowCount(ui->importSummaryList->rowCount()+1);
     int row = ui->importSummaryList->rowCount()-1;
-    ui->progressBar->setMaximum(row);
     ui->importSummaryList->setCellWidget(row,0,new QCheckBox(ui->importSummaryList));
     QTableWidgetItem *objName = new QTableWidgetItem(uavObjectName);
     ui->importSummaryList->setItem(row, 1, objName);
     QCheckBox *box = dynamic_cast<QCheckBox*>(ui->importSummaryList->cellWidget(row,0));
     ui->importSummaryList->setItem(row,2,new QTableWidgetItem(text));
+
+    //Disable editability and selectability in table elements
+    ui->importSummaryList->item(row,1)->setFlags(!Qt::ItemIsEditable);
+    ui->importSummaryList->item(row,2)->setFlags(!Qt::ItemIsEditable);
+
     if (status) {
         box->setChecked(true);
     } else {
         box->setChecked(false);
         box->setEnabled(false);
     }
+
    this->repaint();
    this->showEvent(NULL);
 }
@@ -92,11 +97,22 @@ void ImportSummaryDialog::addLine(QString uavObjectName, QString text, bool stat
   */
 void ImportSummaryDialog::doTheSaving()
 {
+    int itemCount=0;
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
     UAVObjectUtilManager *utilManager = pm->getObject<UAVObjectUtilManager>();
     connect(utilManager, SIGNAL(saveCompleted(int,bool)), this, SLOT(updateSaveCompletion()));
 
+    for(int i=0; i < ui->importSummaryList->rowCount(); i++) {
+        QCheckBox *box = dynamic_cast<QCheckBox*>(ui->importSummaryList->cellWidget(i,0));
+        if (box->isChecked()) {
+        ++itemCount;
+        }
+    }
+    if(itemCount==0)
+        return;
+    ui->progressBar->setMaximum(itemCount+1);
+    ui->progressBar->setValue(1);
     for(int i=0; i < ui->importSummaryList->rowCount(); i++) {
         QString uavObjectName = ui->importSummaryList->item(i,1)->text();
         QCheckBox *box = dynamic_cast<QCheckBox*>(ui->importSummaryList->cellWidget(i,0));
@@ -106,12 +122,21 @@ void ImportSummaryDialog::doTheSaving()
             this->repaint();
         }
     }
+
+    ui->saveToFlash->setEnabled(false);
+    ui->closeButton->setEnabled(false);
+
 }
 
 
 void ImportSummaryDialog::updateSaveCompletion()
 {
     ui->progressBar->setValue(ui->progressBar->value()+1);
+    if(ui->progressBar->value()==ui->progressBar->maximum())
+    {
+        ui->saveToFlash->setEnabled(true);
+        ui->closeButton->setEnabled(true);
+    }
 }
 
 void ImportSummaryDialog::changeEvent(QEvent *e)

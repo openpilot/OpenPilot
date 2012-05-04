@@ -233,6 +233,7 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
     setupGroundVehicleUI( m_aircraft->groundVehicleType->currentText() );
     setupFixedWingUI( m_aircraft->fixedWingType->currentText() );
 	
+    disbleMouseWheelEvents();
 }
 
 
@@ -243,7 +244,6 @@ ConfigVehicleTypeWidget::~ConfigVehicleTypeWidget()
 {
    // Do nothing
 }
-
 
 /**
   Slot for switching the airframe type. We do it explicitely

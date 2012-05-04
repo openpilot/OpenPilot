@@ -10198,7 +10198,7 @@ border-radius: 5;</string>
                      </property>
                      <property name="text">
                       <string>Full Stick
-Angle</string>
+Angle (deg)</string>
                      </property>
                      <property name="alignment">
                       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -10226,7 +10226,7 @@ Angle</string>
                       <string notr="true"/>
                      </property>
                      <property name="maximum">
-                      <number>100</number>
+                      <number>180</number>
                      </property>
                      <property name="sliderPosition">
                       <number>50</number>
@@ -10245,7 +10245,7 @@ Angle</string>
                        <string>objname:StabilizationSettings</string>
                        <string>fieldname:RollMax</string>
                        <string>haslimits:yes</string>
-                       <string>scale:1.8</string>
+                       <string>scale:1.0</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10269,17 +10269,17 @@ Angle</string>
                       <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="maximum">
-                      <number>200</number>
+                      <number>180</number>
                      </property>
                      <property name="value">
-                      <number>200</number>
+                      <number>180</number>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
                        <string>objname:StabilizationSettings</string>
                        <string>fieldname:RollMax</string>
                        <string>haslimits:yes</string>
-                       <string>scale:1.8</string>
+                       <string>scale:1.0</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10322,7 +10322,7 @@ Angle</string>
                       <string notr="true"/>
                      </property>
                      <property name="maximum">
-                      <number>100</number>
+                      <number>180</number>
                      </property>
                      <property name="sliderPosition">
                       <number>50</number>
@@ -10341,7 +10341,7 @@ Angle</string>
                        <string>objname:StabilizationSettings</string>
                        <string>fieldname:PitchMax</string>
                        <string>haslimits:yes</string>
-                       <string>scale:1.8</string>
+                       <string>scale:1.0</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10365,17 +10365,17 @@ Angle</string>
                       <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="maximum">
-                      <number>200</number>
+                      <number>180</number>
                      </property>
                      <property name="value">
-                      <number>200</number>
+                      <number>180</number>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
                        <string>objname:StabilizationSettings</string>
                        <string>fieldname:PitchMax</string>
                        <string>haslimits:yes</string>
-                       <string>scale:1.8</string>
+                       <string>scale:1.0</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10418,7 +10418,7 @@ Angle</string>
                       <string notr="true"/>
                      </property>
                      <property name="maximum">
-                      <number>100</number>
+                      <number>180</number>
                      </property>
                      <property name="sliderPosition">
                       <number>50</number>
@@ -10437,7 +10437,7 @@ Angle</string>
                        <string>objname:StabilizationSettings</string>
                        <string>fieldname:YawMax</string>
                        <string>haslimits:yes</string>
-                       <string>scale:1.8</string>
+                       <string>scale:1.0</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10461,17 +10461,17 @@ Angle</string>
                       <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="maximum">
-                      <number>200</number>
+                      <number>180</number>
                      </property>
                      <property name="value">
-                      <number>200</number>
+                      <number>180</number>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
                        <string>objname:StabilizationSettings</string>
                        <string>fieldname:YawMax</string>
                        <string>haslimits:yes</string>
-                       <string>scale:1.8</string>
+                       <string>scale:1.0</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10490,7 +10490,7 @@ Angle</string>
                      </property>
                      <property name="text">
                       <string>Full Stick
-Rate</string>
+Rate (deg/s)</string>
                      </property>
                      <property name="alignment">
                       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -10518,7 +10518,7 @@ Rate</string>
                       <string notr="true"/>
                      </property>
                      <property name="maximum">
-                      <number>100</number>
+                      <number>500</number>
                      </property>
                      <property name="sliderPosition">
                       <number>50</number>
@@ -10538,7 +10538,7 @@ Rate</string>
                        <string>fieldname:ManualRate</string>
                        <string>element:Roll</string>
                        <string>haslimits:yes</string>
-                       <string>scale:5</string>
+                       <string>scale:1</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10562,10 +10562,10 @@ Rate</string>
                       <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="maximum">
-                      <number>200</number>
+                      <number>500</number>
                      </property>
                      <property name="value">
-                      <number>200</number>
+                      <number>180</number>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -10573,7 +10573,7 @@ Rate</string>
                        <string>fieldname:ManualRate</string>
                        <string>element:Roll</string>
                        <string>haslimits:yes</string>
-                       <string>scale:5</string>
+                       <string>scale:1</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10600,7 +10600,7 @@ Rate</string>
                       <string notr="true"/>
                      </property>
                      <property name="maximum">
-                      <number>100</number>
+                      <number>500</number>
                      </property>
                      <property name="sliderPosition">
                       <number>50</number>
@@ -10620,7 +10620,7 @@ Rate</string>
                        <string>fieldname:ManualRate</string>
                        <string>element:Pitch</string>
                        <string>haslimits:yes</string>
-                       <string>scale:5</string>
+                       <string>scale:1</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10644,10 +10644,10 @@ Rate</string>
                       <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="maximum">
-                      <number>200</number>
+                      <number>500</number>
                      </property>
                      <property name="value">
-                      <number>200</number>
+                      <number>180</number>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -10655,7 +10655,7 @@ Rate</string>
                        <string>fieldname:ManualRate</string>
                        <string>element:Pitch</string>
                        <string>haslimits:yes</string>
-                       <string>scale:5</string>
+                       <string>scale:1</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10682,7 +10682,7 @@ Rate</string>
                       <string notr="true"/>
                      </property>
                      <property name="maximum">
-                      <number>100</number>
+                      <number>500</number>
                      </property>
                      <property name="sliderPosition">
                       <number>50</number>
@@ -10702,7 +10702,7 @@ Rate</string>
                        <string>fieldname:ManualRate</string>
                        <string>element:Yaw</string>
                        <string>haslimits:yes</string>
-                       <string>scale:5</string>
+                       <string>scale:1</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10726,10 +10726,10 @@ Rate</string>
                       <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="maximum">
-                      <number>200</number>
+                      <number>500</number>
                      </property>
                      <property name="value">
-                      <number>200</number>
+                      <number>180</number>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -10737,7 +10737,7 @@ Rate</string>
                        <string>fieldname:ManualRate</string>
                        <string>element:Yaw</string>
                        <string>haslimits:yes</string>
-                       <string>scale:5</string>
+                       <string>scale:1</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10784,7 +10784,7 @@ Attitude</string>
                       <string notr="true"/>
                      </property>
                      <property name="maximum">
-                      <number>100</number>
+                      <number>500</number>
                      </property>
                      <property name="sliderPosition">
                       <number>50</number>
@@ -10804,7 +10804,7 @@ Attitude</string>
                        <string>fieldname:MaximumRate</string>
                        <string>element:Roll</string>
                        <string>haslimits:yes</string>
-                       <string>scale:5</string>
+                       <string>scale:1</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10828,7 +10828,7 @@ Attitude</string>
                       <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="maximum">
-                      <number>200</number>
+                      <number>500</number>
                      </property>
                      <property name="value">
                       <number>200</number>
@@ -10839,7 +10839,7 @@ Attitude</string>
                        <string>fieldname:MaximumRate</string>
                        <string>element:Roll</string>
                        <string>haslimits:yes</string>
-                       <string>scale:5</string>
+                       <string>scale:1</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10866,7 +10866,7 @@ Attitude</string>
                       <string notr="true"/>
                      </property>
                      <property name="maximum">
-                      <number>100</number>
+                      <number>500</number>
                      </property>
                      <property name="sliderPosition">
                       <number>50</number>
@@ -10886,7 +10886,7 @@ Attitude</string>
                        <string>fieldname:MaximumRate</string>
                        <string>element:Pitch</string>
                        <string>haslimits:yes</string>
-                       <string>scale:5</string>
+                       <string>scale:1</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10910,7 +10910,7 @@ Attitude</string>
                       <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="maximum">
-                      <number>200</number>
+                      <number>500</number>
                      </property>
                      <property name="value">
                       <number>200</number>
@@ -10921,7 +10921,7 @@ Attitude</string>
                        <string>fieldname:MaximumRate</string>
                        <string>element:Pitch</string>
                        <string>haslimits:yes</string>
-                       <string>scale:5</string>
+                       <string>scale:1</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10948,7 +10948,7 @@ Attitude</string>
                       <string notr="true"/>
                      </property>
                      <property name="maximum">
-                      <number>100</number>
+                      <number>500</number>
                      </property>
                      <property name="sliderPosition">
                       <number>50</number>
@@ -10968,7 +10968,7 @@ Attitude</string>
                        <string>fieldname:MaximumRate</string>
                        <string>element:Yaw</string>
                        <string>haslimits:yes</string>
-                       <string>scale:5</string>
+                       <string>scale:1</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10992,7 +10992,7 @@ Attitude</string>
                       <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="maximum">
-                      <number>200</number>
+                      <number>500</number>
                      </property>
                      <property name="value">
                       <number>200</number>
@@ -11003,7 +11003,7 @@ Attitude</string>
                        <string>fieldname:MaximumRate</string>
                        <string>element:Yaw</string>
                        <string>haslimits:yes</string>
-                       <string>scale:5</string>
+                       <string>scale:1</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -11885,7 +11885,7 @@ border-radius: 4;
             <property name="geometry">
              <rect>
               <x>0</x>
-              <y>-403</y>
+              <y>0</y>
               <width>673</width>
               <height>1079</height>
              </rect>
@@ -14743,7 +14743,7 @@ Then lower the value by 20% or so.</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>5</number>
                      </property>
                      <property name="singleStep">
                       <double>0.000100000000000</double>
@@ -14791,7 +14791,7 @@ Then lower the value by 20% or so.</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>5</number>
                      </property>
                      <property name="singleStep">
                       <double>0.000100000000000</double>
@@ -14841,7 +14841,7 @@ You can usually go for higher values for Yaw factors.</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>5</number>
                      </property>
                      <property name="singleStep">
                       <double>0.000100000000000</double>
@@ -14924,7 +14924,7 @@ value as the Kp.</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>5</number>
                      </property>
                      <property name="singleStep">
                       <double>0.000100000000000</double>
@@ -14988,7 +14988,7 @@ value as the Kp.</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>5</number>
                      </property>
                      <property name="singleStep">
                       <double>0.000100000000000</double>
@@ -15052,7 +15052,7 @@ value as the Kp.</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>5</number>
                      </property>
                      <property name="singleStep">
                       <double>0.000100000000000</double>
@@ -15299,7 +15299,7 @@ value as the Kp.</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>4</number>
                      </property>
                      <property name="maximum">
                       <double>1.000000000000000</double>
@@ -15346,7 +15346,7 @@ value as the Kp.</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>4</number>
                      </property>
                      <property name="maximum">
                       <double>1.000000000000000</double>
@@ -15396,7 +15396,7 @@ value as the Kp.</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>4</number>
                      </property>
                      <property name="maximum">
                       <double>1.000000000000000</double>
@@ -18302,7 +18302,7 @@ border-radius: 5;</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>3</number>
                      </property>
                      <property name="singleStep">
                       <double>0.100000000000000</double>
@@ -18346,7 +18346,7 @@ border-radius: 5;</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>3</number>
                      </property>
                      <property name="singleStep">
                       <double>0.100000000000000</double>
@@ -18393,7 +18393,7 @@ border-radius: 5;</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>3</number>
                      </property>
                      <property name="singleStep">
                       <double>0.100000000000000</double>
@@ -18475,7 +18475,7 @@ border-radius: 5;</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>3</number>
                      </property>
                      <property name="singleStep">
                       <double>0.100000000000000</double>
@@ -18535,7 +18535,7 @@ border-radius: 5;</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>3</number>
                      </property>
                      <property name="singleStep">
                       <double>0.100000000000000</double>
@@ -18598,7 +18598,7 @@ border-radius: 5;</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>3</number>
                      </property>
                      <property name="singleStep">
                       <double>0.100000000000000</double>
@@ -18676,7 +18676,7 @@ border-radius: 5;</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>2</number>
                      </property>
                      <property name="singleStep">
                       <double>0.100000000000000</double>
@@ -18720,7 +18720,7 @@ border-radius: 5;</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>2</number>
                      </property>
                      <property name="singleStep">
                       <double>0.100000000000000</double>
@@ -18767,7 +18767,7 @@ border-radius: 5;</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>2</number>
                      </property>
                      <property name="singleStep">
                       <double>0.100000000000000</double>

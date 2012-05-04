@@ -4,7 +4,7 @@
 #include "manualcontrolsettings.h"
 
 inputChannelForm::inputChannelForm(QWidget *parent,bool showlegend) :
-    QWidget(parent),
+    ConfigTaskWidget(parent),
     ui(new Ui::inputChannelForm)
 {
     ui->setupUi(this);
@@ -36,12 +36,16 @@ inputChannelForm::inputChannelForm(QWidget *parent,bool showlegend) :
     // a spin box fixes this
     connect(ui->channelNumberDropdown,SIGNAL(currentIndexChanged(int)),this,SLOT(channelDropdownUpdated(int)));
     connect(ui->channelNumber,SIGNAL(valueChanged(int)),this,SLOT(channelNumberUpdated(int)));
+
+    disbleMouseWheelEvents();
 }
+
 
 inputChannelForm::~inputChannelForm()
 {
     delete ui;
 }
+
 void inputChannelForm::setName(QString &name)
 {
     ui->channelName->setText(name);

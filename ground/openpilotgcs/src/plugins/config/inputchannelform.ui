@@ -65,6 +65,9 @@
        <height>16777215</height>
       </size>
      </property>
+     <property name="focusPolicy">
+      <enum>Qt::StrongFocus</enum>
+     </property>
     </widget>
    </item>
    <item row="2" column="4">
@@ -74,6 +77,9 @@
        <width>0</width>
        <height>25</height>
       </size>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::StrongFocus</enum>
      </property>
      <property name="buttonSymbols">
       <enum>QAbstractSpinBox::NoButtons</enum>
@@ -93,6 +99,9 @@
        <width>0</width>
        <height>25</height>
       </size>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::StrongFocus</enum>
      </property>
      <property name="buttonSymbols">
       <enum>QAbstractSpinBox::NoButtons</enum>
@@ -275,6 +284,9 @@ font:bold;</string>
        <height>22</height>
       </size>
      </property>
+     <property name="focusPolicy">
+      <enum>Qt::StrongFocus</enum>
+     </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
@@ -299,6 +311,9 @@ font:bold;</string>
        <width>80</width>
        <height>16777215</height>
       </size>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::StrongFocus</enum>
      </property>
      <property name="maxVisibleItems">
       <number>7</number>
@@ -471,6 +486,15 @@ font:bold;</string>
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>channelNumber</tabstop>
+  <tabstop>channelGroup</tabstop>
+  <tabstop>channelNumberDropdown</tabstop>
+  <tabstop>channelMin</tabstop>
+  <tabstop>channelNeutral</tabstop>
+  <tabstop>channelMax</tabstop>
+  <tabstop>channelRev</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

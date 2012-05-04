@@ -59,7 +59,7 @@ typedef struct {
  */
 struct PeriodicObjectListStruct {
 	EventCallbackInfo evInfo; /** Event callback information */
-    int32_t updatePeriodMs; /** Update period in ms or 0 if no periodic updates are needed */
+    uint16_t updatePeriodMs; /** Update period in ms or 0 if no periodic updates are needed */
     int32_t timeToNextUpdateMs; /** Time delay to the next update */
     struct PeriodicObjectListStruct* next; /** Needed by linked list library (utlist.h) */
 };
@@ -75,9 +75,9 @@ static EventStats stats;
 // Private functions
 static int32_t processPeriodicUpdates();
 static void eventTask();
-static int32_t eventPeriodicCreate(UAVObjEvent* ev, UAVObjEventCallback cb, xQueueHandle queue, int32_t periodMs);
-static int32_t eventPeriodicUpdate(UAVObjEvent* ev, UAVObjEventCallback cb, xQueueHandle queue, int32_t periodMs);
-static uint32_t randomizePeriod(uint32_t periodMs);
+static int32_t eventPeriodicCreate(UAVObjEvent* ev, UAVObjEventCallback cb, xQueueHandle queue, uint16_t periodMs);
+static int32_t eventPeriodicUpdate(UAVObjEvent* ev, UAVObjEventCallback cb, xQueueHandle queue, uint16_t periodMs);
+static uint16_t randomizePeriod(uint16_t periodMs);
 
 
 /**
@@ -151,7 +151,7 @@ int32_t EventCallbackDispatch(UAVObjEvent* ev, UAVObjEventCallback cb)
  * \param[in] periodMs The period the event is generated
  * \return Success (0), failure (-1)
  */
-int32_t EventPeriodicCallbackCreate(UAVObjEvent* ev, UAVObjEventCallback cb, int32_t periodMs)
+int32_t EventPeriodicCallbackCreate(UAVObjEvent* ev, UAVObjEventCallback cb, uint16_t periodMs)
 {
 	return eventPeriodicCreate(ev, cb, 0, periodMs);
 }
@@ -163,7 +163,7 @@ int32_t EventPeriodicCallbackCreate(UAVObjEvent* ev, UAVObjEventCallback cb, int
  * \param[in] periodMs The period the event is generated
  * \return Success (0), failure (-1)
  */
-int32_t EventPeriodicCallbackUpdate(UAVObjEvent* ev, UAVObjEventCallback cb, int32_t periodMs)
+int32_t EventPeriodicCallbackUpdate(UAVObjEvent* ev, UAVObjEventCallback cb, uint16_t periodMs)
 {
 	return eventPeriodicUpdate(ev, cb, 0, periodMs);
 }
@@ -175,7 +175,7 @@ int32_t EventPeriodicCallbackUpdate(UAVObjEvent* ev, UAVObjEventCallback cb, int
  * \param[in] periodMs The period the event is generated
  * \return Success (0), failure (-1)
  */
-int32_t EventPeriodicQueueCreate(UAVObjEvent* ev, xQueueHandle queue, int32_t periodMs)
+int32_t EventPeriodicQueueCreate(UAVObjEvent* ev, xQueueHandle queue, uint16_t periodMs)
 {
 	return eventPeriodicCreate(ev, 0, queue, periodMs);
 }
@@ -187,7 +187,7 @@ int32_t EventPeriodicQueueCreate(UAVObjEvent* ev, xQueueHandle queue, int32_t pe
  * \param[in] periodMs The period the event is generated
  * \return Success (0), failure (-1)
  */
-int32_t EventPeriodicQueueUpdate(UAVObjEvent* ev, xQueueHandle queue, int32_t periodMs)
+int32_t EventPeriodicQueueUpdate(UAVObjEvent* ev, xQueueHandle queue, uint16_t periodMs)
 {
 	return eventPeriodicUpdate(ev, 0, queue, periodMs);
 }
@@ -200,7 +200,7 @@ int32_t EventPeriodicQueueUpdate(UAVObjEvent* ev, xQueueHandle queue, int32_t pe
  * \param[in] periodMs The period the event is generated
  * \return Success (0), failure (-1)
  */
-static int32_t eventPeriodicCreate(UAVObjEvent* ev, UAVObjEventCallback cb, xQueueHandle queue, int32_t periodMs)
+static int32_t eventPeriodicCreate(UAVObjEvent* ev, UAVObjEventCallback cb, xQueueHandle queue, uint16_t periodMs)
 {
 	PeriodicObjectList* objEntry;
 	// Get lock
@@ -244,7 +244,7 @@ static int32_t eventPeriodicCreate(UAVObjEvent* ev, UAVObjEventCallback cb, xQue
  * \param[in] periodMs The period the event is generated
  * \return Success (0), failure (-1)
  */
-static int32_t eventPeriodicUpdate(UAVObjEvent* ev, UAVObjEventCallback cb, xQueueHandle queue, int32_t periodMs)
+static int32_t eventPeriodicUpdate(UAVObjEvent* ev, UAVObjEventCallback cb, xQueueHandle queue, uint16_t periodMs)
 {
 	PeriodicObjectList* objEntry;
 	// Get lock
@@ -372,7 +372,7 @@ static int32_t processPeriodicUpdates()
  * Based on the Park-Miller-Carta Pseudo-Random Number Generator
  * http://www.firstpr.com.au/dsp/rand31/
  */
-static uint32_t randomizePeriod(uint32_t periodMs)
+static uint16_t randomizePeriod(uint16_t periodMs)
 {
 	static uint32_t seed = 1;
 	uint32_t hi, lo;
@@ -382,6 +382,6 @@ static uint32_t randomizePeriod(uint32_t periodMs)
 	lo += hi >> 15;
 	if (lo > 0x7FFFFFFF) lo -= 0x7FFFFFFF;
 	seed = lo;
-	return (uint32_t)( ((float)periodMs * (float)lo) / (float)0x7FFFFFFF );
+	return (uint16_t)( ((float)periodMs * (float)lo) / (float)0x7FFFFFFF );
 }
 

@@ -85,15 +85,15 @@ $(INITFIELDS)
 	UAVObjSetInstanceData(obj, instId, &data);
 
 	// Initialize object metadata to their default values
-	metadata.access = $(FLIGHTACCESS);
-	metadata.gcsAccess = $(GCSACCESS);
-	metadata.telemetryAcked = $(FLIGHTTELEM_ACKED);
-	metadata.telemetryUpdateMode = $(FLIGHTTELEM_UPDATEMODE);
+	metadata.flags =
+		$(FLIGHTACCESS) << UAVOBJ_ACCESS_SHIFT |
+		$(GCSACCESS) << UAVOBJ_GCS_ACCESS_SHIFT |
+		$(FLIGHTTELEM_ACKED) << UAVOBJ_TELEMETRY_ACKED_SHIFT |
+		$(GCSTELEM_ACKED) << UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT |
+		$(FLIGHTTELEM_UPDATEMODE) << UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT |
+		$(GCSTELEM_UPDATEMODE) << UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT;
 	metadata.telemetryUpdatePeriod = $(FLIGHTTELEM_UPDATEPERIOD);
-	metadata.gcsTelemetryAcked = $(GCSTELEM_ACKED);
-	metadata.gcsTelemetryUpdateMode = $(GCSTELEM_UPDATEMODE);
 	metadata.gcsTelemetryUpdatePeriod = $(GCSTELEM_UPDATEPERIOD);
-	metadata.loggingUpdateMode = $(LOGGING_UPDATEMODE);
 	metadata.loggingUpdatePeriod = $(LOGGING_UPDATEPERIOD);
 	UAVObjSetMetadata(obj, &metadata);
 }

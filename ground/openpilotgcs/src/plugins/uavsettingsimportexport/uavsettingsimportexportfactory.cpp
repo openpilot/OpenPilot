@@ -79,14 +79,14 @@ UAVSettingsImportExportFactory::UAVSettingsImportExportFactory(QObject *parent):
     ac->addAction(cmd, Core::Constants::G_FILE_SAVE);
     connect(cmd->action(), SIGNAL(triggered(bool)), this, SLOT(importUAVSettings()));
 
+    ac = am->actionContainer(Core::Constants::M_HELP);
     cmd = am->registerAction(new QAction(this),
                              "UAVSettingsImportExportPlugin.UAVDataExport",
                              QList<int>() <<
                              Core::Constants::C_GLOBAL_ID);
     cmd->action()->setText(tr("Export UAV Data..."));
-    ac->addAction(cmd, Core::Constants::G_FILE_SAVE);
+    ac->addAction(cmd, Core::Constants::G_HELP_HELP);
     connect(cmd->action(), SIGNAL(triggered(bool)), this, SLOT(exportUAVData()));
-
 }
 
 // Slot called by the menu manager on user action

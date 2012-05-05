@@ -77,6 +77,10 @@ FORMS += airframe.ui \
     camerastabilization.ui \
     outputchannelform.ui \
     revosensors.ui \
+<<<<<<< HEAD
     txpid.ui \
     pipxtreme.ui
+=======
+    txpid.ui 
+>>>>>>> origin/next
 RESOURCES += configgadget.qrc

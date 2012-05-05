@@ -747,7 +747,7 @@ margin:1px;</string>
                        <item>
                         <layout class="QVBoxLayout" name="verticalLayout_23">
                          <item>
-                          <widget class="QLabel" name="mrYawPitchValue">
+                          <widget class="QLabel" name="mrPitchMixValue">
                            <property name="minimumSize">
                             <size>
                              <width>0</width>
@@ -2571,6 +2571,9 @@ margin:1px;</string>
              <property name="enabled">
               <bool>true</bool>
              </property>
+             <property name="focusPolicy">
+              <enum>Qt::StrongFocus</enum>
+             </property>
              <property name="toolTip">
               <string>Overall level of feed forward (in percentage).</string>
              </property>
@@ -2600,6 +2603,9 @@ margin:1px;</string>
              <property name="enabled">
               <bool>true</bool>
              </property>
+             <property name="focusPolicy">
+              <enum>Qt::StrongFocus</enum>
+             </property>
              <property name="toolTip">
               <string>In miliseconds.
 When tuning: Slowly raise accel time from zero to just
@@ -2628,6 +2634,9 @@ its target speed.</string>
             <widget class="QDoubleSpinBox" name="decelTime">
              <property name="enabled">
               <bool>true</bool>
+             </property>
+             <property name="focusPolicy">
+              <enum>Qt::StrongFocus</enum>
              </property>
              <property name="toolTip">
               <string>When tuning: Slowly raise decel time from zero to just
@@ -2667,6 +2676,9 @@ Do it after accel time is setup.</string>
            </item>
            <item row="5" column="1">
             <widget class="QSlider" name="maxAccelSlider">
+             <property name="focusPolicy">
+              <enum>Qt::StrongFocus</enum>
+             </property>
              <property name="toolTip">
               <string>Limits how much the engines can accelerate or decelerate.
 In 'units per second', a sound default is 1000.</string>
@@ -2704,6 +2716,9 @@ In 'units per second', a sound default is 1000.</string>
            </item>
            <item>
             <widget class="QCheckBox" name="ffTestBox1">
+             <property name="focusPolicy">
+              <enum>Qt::StrongFocus</enum>
+             </property>
              <property name="toolTip">
               <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
@@ -2719,6 +2734,9 @@ p, li { white-space: pre-wrap; }
            </item>
            <item>
             <widget class="QCheckBox" name="ffTestBox2">
+             <property name="focusPolicy">
+              <enum>Qt::StrongFocus</enum>
+             </property>
              <property name="toolTip">
               <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
@@ -2734,6 +2752,9 @@ p, li { white-space: pre-wrap; }
            </item>
            <item>
             <widget class="QCheckBox" name="ffTestBox3">
+             <property name="focusPolicy">
+              <enum>Qt::StrongFocus</enum>
+             </property>
              <property name="toolTip">
               <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;

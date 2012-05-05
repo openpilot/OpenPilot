@@ -747,7 +747,7 @@ margin:1px;</string>
                        <item>
                         <layout class="QVBoxLayout" name="verticalLayout_23">
                          <item>
-                          <widget class="QLabel" name="mrYawPitchValue">
+                          <widget class="QLabel" name="mrPitchMixValue">
                            <property name="minimumSize">
                             <size>
                              <width>0</width>

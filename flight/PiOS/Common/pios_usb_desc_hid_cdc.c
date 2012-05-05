@@ -32,6 +32,7 @@
 #include "pios_usb_defs.h"		/* struct usb_*, USB_* */
 #include "pios_usb_board_data.h"	/* PIOS_USB_BOARD_* */
 #include "pios_usbhook.h"		/* PIOS_USBHOOK_Register* */
+#include "pios_usb_hid.h"		/* PIOS_USB_HID_Register* */
 
 static const struct usb_device_desc device_desc = {
 	.bLength            = sizeof(struct usb_device_desc),
@@ -249,8 +250,8 @@ int32_t PIOS_USB_DESC_HID_CDC_Init(void)
 
 	PIOS_USBHOOK_RegisterDevice((uint8_t *)&device_desc, sizeof(device_desc));
 
-	PIOS_USBHOOK_RegisterHidInterface((uint8_t *)&(config_hid_cdc.hid_if), sizeof(config_hid_cdc.hid_if));
-	PIOS_USBHOOK_RegisterHidReport((uint8_t *)hid_report_desc, sizeof(hid_report_desc));
+	PIOS_USB_HID_RegisterHidDescriptor((uint8_t *)&(config_hid_cdc.hid), sizeof(config_hid_cdc.hid));
+	PIOS_USB_HID_RegisterHidReport((uint8_t *)hid_report_desc, sizeof(hid_report_desc));
 
 	return 0;
 }

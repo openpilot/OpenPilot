@@ -29,36 +29,38 @@
 
 #include "attitudeactual.h"
 #include "attituderaw.h"
-#include "ahrsstatus.h"
 #include "baroaltitude.h"
 #include "gpsposition.h"
+#include "homelocation.h"
+#include "insstatus.h"
+#include "inssettings.h"
 #include "positionactual.h"
 #include "velocityactual.h"
-#include "homelocation.h"
-#include "ahrscalibration.h"
-#include "ahrssettings.h"
 #include "firmwareiapobj.h"
-
+#include "gpsposition.h"
+#include "gpssatellites.h"
+#include "gpstime.h"
 /** union that will fit any UAVObject.
 */
 
 typedef union {
 	AttitudeRawData AttitudeRaw;
 	AttitudeActualData AttitudeActual;
-	AHRSCalibrationData AHRSCalibration;
-	AhrsStatusData AhrsStatus;
+	InsStatusData AhrsStatus;
 	BaroAltitudeData BaroAltitude;
 	GPSPositionData GPSPosition;
 	PositionActualData PositionActual;
 	VelocityActualData VelocityActual;
 	HomeLocationData HomeLocation;
-	AHRSSettingsData AHRSSettings;
+	InsSettingsData InsSettings;
 	FirmwareIAPObjData FirmwareIAPObj;
+	GPSSatellitesData GPSSatellites;
+	GPSTimeData GPSTime;
 } __attribute__ ((packed)) AhrsSharedData;
 
 /** The number of UAVObjects we will be dealing with.
 */
-#define MAX_AHRS_OBJECTS 11
+#define MAX_AHRS_OBJECTS 12
 
 /** Our own version of a UAVObject.
 */

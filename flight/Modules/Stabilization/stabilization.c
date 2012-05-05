@@ -38,7 +38,7 @@
 #include "ratedesired.h"
 #include "stabilizationdesired.h"
 #include "attitudeactual.h"
-#include "attituderaw.h"
+#include "gyros.h"
 #include "flightstatus.h"
 #include "manualcontrol.h" // Just to get a macro
 #include "CoordinateConversions.h"
@@ -124,7 +124,7 @@ int32_t StabilizationInitialize()
 
 	// Listen for updates.
 	//	AttitudeActualConnectQueue(queue);
-	AttitudeRawConnectQueue(queue);
+	GyrosConnectQueue(queue);
 
 	StabilizationSettingsConnectCallback(SettingsUpdatedCb);
 	SettingsUpdatedCb(StabilizationSettingsHandle());
@@ -140,22 +140,20 @@ MODULE_INITCALL(StabilizationInitialize, StabilizationStart)
  */
 static void stabilizationTask(void* parameters)
 {
-	portTickType lastSysTime;
-	portTickType thisSysTime;
 	UAVObjEvent ev;
 
+	uint32_t timeval = PIOS_DELAY_GetRaw();
 
 	ActuatorDesiredData actuatorDesired;
 	StabilizationDesiredData stabDesired;
 	RateDesiredData rateDesired;
 	AttitudeActualData attitudeActual;
-	AttitudeRawData attitudeRaw;
+	GyrosData gyrosData;
 	FlightStatusData flightStatus;
 
 	SettingsUpdatedCb((UAVObjEvent *) NULL);
 
 	// Main task loop
-	lastSysTime = xTaskGetTickCount();
 	ZeroPids();
 	while(1) {
 		PIOS_WDG_UpdateFlag(PIOS_WDG_STABILIZATION);
@@ -167,16 +165,13 @@ static void stabilizationTask(void* parameters)
 			continue;
 		}
 
-		// Check how long since last update
-		thisSysTime = xTaskGetTickCount();
-		if(thisSysTime > lastSysTime) // reuse dt in case of wraparound
-			dT = (thisSysTime - lastSysTime) / portTICK_RATE_MS / 1000.0f;
-		lastSysTime = thisSysTime;
+		dT = PIOS_DELAY_DiffuS(timeval) * 1.0e-6f;
+		timeval = PIOS_DELAY_GetRaw();
 
 		FlightStatusGet(&flightStatus);
 		StabilizationDesiredGet(&stabDesired);
 		AttitudeActualGet(&attitudeActual);
-		AttitudeRawGet(&attitudeRaw);
+		GyrosGet(&gyrosData);
 
 #if defined(DIAGNOSTICS)
 		RateDesiredGet(&rateDesired);
@@ -216,13 +211,13 @@ static void stabilizationTask(void* parameters)
 		float local_error[3] = {stabDesired.Roll - attitudeActual.Roll,
 			stabDesired.Pitch - attitudeActual.Pitch,
 			stabDesired.Yaw - attitudeActual.Yaw};
-		local_error[2] = fmod(local_error[2] + 180, 360) - 180;
+		local_error[2] = fmodf(local_error[2] + 180, 360) - 180;
 #endif
 
 
-		for(uint8_t i = 0; i < MAX_AXES; i++) {
-			gyro_filtered[i] = gyro_filtered[i] * gyro_alpha + attitudeRaw.gyros[i] * (1 - gyro_alpha);
-		}
+		gyro_filtered[0] = gyro_filtered[0] * gyro_alpha + gyrosData.x * (1 - gyro_alpha);
+		gyro_filtered[1] = gyro_filtered[1] * gyro_alpha + gyrosData.y * (1 - gyro_alpha);
+		gyro_filtered[2] = gyro_filtered[2] * gyro_alpha + gyrosData.z * (1 - gyro_alpha);
 
 		float *attitudeDesiredAxis = &stabDesired.Roll;
 		float *actuatorDesiredAxis = &actuatorDesired.Roll;
@@ -373,24 +368,24 @@ float ApplyPid(pid_type * pid, const float err)
 	pid->lastErr = err;
 
 	// Scale up accumulator by 1000 while computing to avoid losing precision
-	pid->iAccumulator += err * (pid->i * dT * 1000);
-	if(pid->iAccumulator > (pid->iLim * 1000)) {
-		pid->iAccumulator = pid->iLim * 1000;
-	} else if (pid->iAccumulator < -(pid->iLim * 1000)) {
-		pid->iAccumulator = -pid->iLim * 1000;
+	pid->iAccumulator += err * (pid->i * dT * 1000.0f);
+	if(pid->iAccumulator > (pid->iLim * 1000.0f)) {
+		pid->iAccumulator = pid->iLim * 1000.0f;
+	} else if (pid->iAccumulator < -(pid->iLim * 1000.0f)) {
+		pid->iAccumulator = -pid->iLim * 1000.0f;
 	}
-	return ((err * pid->p) + pid->iAccumulator / 1000 + (diff * pid->d / dT));
+	return ((err * pid->p) + pid->iAccumulator / 1000.0f + (diff * pid->d / dT));
 }
 
 
 static void ZeroPids(void)
 {
 	for(int8_t ct = 0; ct < PID_MAX; ct++) {
-		pids[ct].iAccumulator = 0;
-		pids[ct].lastErr = 0;
+		pids[ct].iAccumulator = 0.0f;
+		pids[ct].lastErr = 0.0f;
 	}
 	for(uint8_t i = 0; i < 3; i++)
-		axis_lock_accum[i] = 0;
+		axis_lock_accum[i] = 0.0f;
 }
 
 
@@ -399,10 +394,10 @@ static void ZeroPids(void)
  */
 static float bound(float val)
 {
-	if(val < -1) {
-		val = -1;
-	} else if(val > 1) {
-		val = 1;
+	if(val < -1.0f) {
+		val = -1.0f;
+	} else if(val > 1.0f) {
+		val = 1.0f;
 	}
 	return val;
 }
@@ -466,7 +461,7 @@ static void SettingsUpdatedCb(UAVObjEvent * ev)
 	if(settings.GyroTau < 0.0001)
 		gyro_alpha = 0;   // not trusting this to resolve to 0
 	else
-		gyro_alpha = exp(-fakeDt  / settings.GyroTau);
+		gyro_alpha = expf(-fakeDt  / settings.GyroTau);
 }
 
 

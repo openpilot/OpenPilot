@@ -38,6 +38,9 @@
 #include "pios_usb_hid_priv.h"
 #include "pios_usb_board_data.h" /* PIOS_BOARD_*_DATA_LENGTH */
 
+/* STM32 USB Library Definitions */
+#include "usb_lib.h"
+
 static void PIOS_USB_HID_RegisterTxCallback(uint32_t usbhid_id, pios_com_callback tx_out_cb, uint32_t context);
 static void PIOS_USB_HID_RegisterRxCallback(uint32_t usbhid_id, pios_com_callback rx_in_cb, uint32_t context);
 static void PIOS_USB_HID_TxStart(uint32_t usbhid_id, uint16_t tx_bytes_avail);

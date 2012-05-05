@@ -140,12 +140,13 @@ plugin_ipconnection.subdir = ipconnection
 plugin_ipconnection.depends = plugin_coreplugin
 SUBDIRS += plugin_ipconnection
 
+# Disable until updated to the new sensor objects
 #HITLNEW Simulation gadget
-plugin_hitlnew.subdir = hitlnew
-plugin_hitlnew.depends = plugin_coreplugin
-plugin_hitlnew.depends += plugin_uavobjects
-plugin_hitlnew.depends += plugin_uavtalk
-SUBDIRS += plugin_hitlnew
+#plugin_hitlnew.subdir = hitlnew
+#plugin_hitlnew.depends = plugin_coreplugin
+#plugin_hitlnew.depends += plugin_uavobjects
+#plugin_hitlnew.depends += plugin_uavtalk
+#SUBDIRS += plugin_hitlnew
 
 # Export and Import GCS Configuration
 plugin_importexport.subdir = importexport

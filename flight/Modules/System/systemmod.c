@@ -384,7 +384,7 @@ static void updateStats()
 	if (now > lastTickCount) {
 		uint32_t dT = (xTaskGetTickCount() - lastTickCount) * portTICK_RATE_MS;	// in ms
 		stats.CPULoad =
-			100 - (uint8_t) round(100.0 * ((float)idleCounter / ((float)dT / 1000.0)) / (float)IDLE_COUNTS_PER_SEC_AT_NO_LOAD);
+			100 - (uint8_t) roundf(100.0f * ((float)idleCounter / ((float)dT / 1000.0f)) / (float)IDLE_COUNTS_PER_SEC_AT_NO_LOAD);
 	} //else: TickCount has wrapped, do not calc now
 	lastTickCount = now;
 	idleCounterClear = 1;
@@ -457,11 +457,21 @@ static void updateSystemAlarms()
 	EventGetStats(&evStats);
 	UAVObjClearStats();
 	EventClearStats();
-	if (objStats.eventErrors > 0 || evStats.eventErrors > 0) {
+	if (objStats.eventCallbackErrors > 0 || objStats.eventQueueErrors > 0  || evStats.eventErrors > 0) {
 		AlarmsSet(SYSTEMALARMS_ALARM_EVENTSYSTEM, SYSTEMALARMS_ALARM_WARNING);
 	} else {
 		AlarmsClear(SYSTEMALARMS_ALARM_EVENTSYSTEM);
 	}
+	
+	if (objStats.lastCallbackErrorID || objStats.lastQueueErrorID || evStats.lastErrorID) {
+		SystemStatsData sysStats;
+		SystemStatsGet(&sysStats);
+		sysStats.EventSystemWarningID = evStats.lastErrorID;
+		sysStats.ObjectManagerCallbackID = objStats.lastCallbackErrorID;
+		sysStats.ObjectManagerQueueID = objStats.lastQueueErrorID;
+		SystemStatsSet(&sysStats);
+	}
+		
 }
 
 /**

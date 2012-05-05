@@ -79,9 +79,6 @@ void PIOS_Board_Init(void) {
 	PIOS_WDG_Init();
 #endif /* PIOS_INCLUDE_WDG */
 
-	/* Initialize IAP */
-	PIOS_IAP_Init();
-
 #if defined(PIOS_INCLUDE_RTC)
 	/* Initialize the real-time clock and its associated tick */
 	PIOS_RTC_Init(&pios_rtc_main_cfg);

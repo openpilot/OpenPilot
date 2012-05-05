@@ -57,11 +57,11 @@
 #define STATS_UPDATE_PERIOD_MS 500
 #define RADIOSTATS_UPDATE_PERIOD_MS 500
 #define MAX_LOST_CONTACT_TIME 10
-#define PACKET_QUEUE_SIZE 5
+#define PACKET_QUEUE_SIZE 10
 #define MAX_PORT_DELAY 200
-#define EV_PACKET_RECEIVED 0x10
-#define EV_SEND_ACK 0x20
-#define EV_SEND_NACK 0x40
+#define EV_PACKET_RECEIVED 0x20
+#define EV_SEND_ACK 0x40
+#define EV_SEND_NACK 0x80
 
 // ****************
 // Private types
@@ -137,7 +137,6 @@ static void SendPipXStatus(void);
 */
 static void StatusHandler(PHPacketHandle p);
 static void PPMHandler(uint16_t *channels);
-static void updateSettings();
 static BufferedReadHandle BufferedReadInit(uint32_t com_port, uint16_t buffer_length);
 static bool BufferedRead(BufferedReadHandle h, uint8_t *value, uint32_t timeout_ms);
 static void BufferedReadSetCom(BufferedReadHandle h, uint32_t com_port);
@@ -234,8 +233,6 @@ static int32_t RadioComBridgeInitialize(void)
 	// Configure our UAVObjects for updates.
 	UAVObjConnectQueue(UAVObjGetByName("PipXStatus"), data->objEventQueue, EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ);
 	UAVObjConnectQueue(UAVObjGetByName("GCSReceiver"), data->objEventQueue, EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ);
-
-	updateSettings();
 
 	return 0;
 }
@@ -387,6 +384,10 @@ static void radioReceiveTask(void *parameters)
 		// Get a RX packet from the packet handler if required.
 		if (p == NULL)
 			p = PHGetRXPacket(pios_packet_handler);
+		if(p == NULL) {
+			vTaskDelay(MAX_PORT_DELAY / portTICK_RATE_MS);
+			continue;
+		}
 
 		// Receive data from the radio port
 		rx_bytes = PIOS_COM_ReceiveBuffer(data->radio_port, (uint8_t*)p, PIOS_PH_MAX_PACKET, MAX_PORT_DELAY);
@@ -401,6 +402,7 @@ static void radioReceiveTask(void *parameters)
 			xQueueSend(data->objEventQueue, &ev, portMAX_DELAY);
 		} else
 			PHReceivePacket(pios_packet_handler, p, false);
+		p = NULL;
 	}
 }
 
@@ -720,12 +722,6 @@ static void PPMHandler(uint16_t *channels)
 		rcvr.Channel[i] = channels[i];
 
 	// Set the GCSReceiverData object.
-	{
-		UAVObjMetadata metadata;
-		UAVObjGetMetadata(GCSReceiverHandle(), &metadata);
-		metadata.access = ACCESS_READWRITE;
-		UAVObjSetMetadata(GCSReceiverHandle(), &metadata);
-	}
 	GCSReceiverSet(&rcvr);
 }
 
@@ -767,41 +763,4 @@ static bool BufferedRead(BufferedReadHandle h, uint8_t *value, uint32_t timeout_
 static void BufferedReadSetCom(BufferedReadHandle h, uint32_t com_port)
 {
 	h->com_port = com_port;
-}
-
-static void updateSettings()
-{
-	if (data->com_port) {
-
-#ifdef NEVER
-		// Retrieve settings
-		uint8_t speed;
-		HwSettingsRadioComBridgeSpeedGet(&speed);
-
-		// Set port speed
-		switch (speed) {
-		case HWSETTINGS_RADIOCOMBRIDGESPEED_2400:
-			PIOS_COM_ChangeBaud(data->com_port, 2400);
-			break;
-		case HWSETTINGS_RADIOCOMBRIDGESPEED_4800:
-			PIOS_COM_ChangeBaud(data->com_port, 4800);
-			break;
-		case HWSETTINGS_RADIOCOMBRIDGESPEED_9600:
-			PIOS_COM_ChangeBaud(data->com_port, 9600);
-			break;
-		case HWSETTINGS_RADIOCOMBRIDGESPEED_19200:
-			PIOS_COM_ChangeBaud(data->com_port, 19200);
-			break;
-		case HWSETTINGS_RADIOCOMBRIDGESPEED_38400:
-			PIOS_COM_ChangeBaud(data->com_port, 38400);
-			break;
-		case HWSETTINGS_RADIOCOMBRIDGESPEED_57600:
-			PIOS_COM_ChangeBaud(data->com_port, 57600);
-			break;
-		case HWSETTINGS_RADIOCOMBRIDGESPEED_115200:
-			PIOS_COM_ChangeBaud(data->com_port, 115200);
-			break;
-		}
-#endif
-	}
 }

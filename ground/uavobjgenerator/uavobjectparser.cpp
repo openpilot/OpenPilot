@@ -209,6 +209,9 @@ QString UAVObjectParser::parseXML(QString& xml, QString& filename)
 		// Sort all fields according to size
         qStableSort(info->fields.begin(), info->fields.end(), fieldTypeLessThan);
 
+        // Sort all fields according to size
+        qStableSort(info->fields.begin(), info->fields.end(), fieldTypeLessThan);
+
         // Make sure that required elements were found
         if ( !accessFound )
             return QString("Object::access element is missing");

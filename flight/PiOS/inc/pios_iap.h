@@ -17,9 +17,15 @@
 /*****************************************************************************************
  *	Public Definitions/Macros
  ****************************************************************************************/
-#define MAGIC_REG_1		BKP_DR1
-#define MAGIC_REG_2		BKP_DR2
-#define IAP_BOOTCOUNT		BKP_DR3
+#if defined(STM32F4XX)
+#define MAGIC_REG_1     RTC_BKP_DR1
+#define MAGIC_REG_2     RTC_BKP_DR2
+#define IAP_BOOTCOUNT   RTC_BKP_DR3
+#else
+#define MAGIC_REG_1     BKP_DR1
+#define MAGIC_REG_2     BKP_DR2
+#define IAP_BOOTCOUNT   BKP_DR3
+#endif
 
 /****************************************************************************************
  *  Public Functions

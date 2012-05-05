@@ -108,7 +108,7 @@ int32_t PipXtremeModInitialize(void)
 	const struct pios_board_info * bdinfo = &pios_board_info_blob;
 
 	pipxStatus.BoardType= bdinfo->board_type;
-	PIOS_BL_HELPER_FLASH_Read_Description(pipxStatus.Description, PIPXSTATUS_DESCRIPTION_NUMELEM);
+	//PIOS_BL_HELPER_FLASH_Read_Description(pipxStatus.Description, PIPXSTATUS_DESCRIPTION_NUMELEM);
 	PIOS_SYS_SerialNumberGetBinary(pipxStatus.CPUSerial);
 	pipxStatus.BoardRevision= bdinfo->board_rev;
 
@@ -140,11 +140,6 @@ static void systemTask(void *parameters)
 		 */
 		PIOS_SYS_Reset();
 	}
-
-#if defined(PIOS_INCLUDE_IAP)
-	/* Record a successful boot */
-	PIOS_IAP_WriteBootCount(0);
-#endif
 
 	// Initialize vars
 	idleCounter = 0;

@@ -31,8 +31,6 @@
 #ifndef PIOS_USB_CDC_PRIV_H
 #define PIOS_USB_CDC_PRIV_H
 
-#include "usb_core.h"		/* RESULT */
-
 struct pios_usb_cdc_cfg {
 	uint8_t ctrl_if;
 	uint8_t ctrl_tx_ep;
@@ -45,10 +43,6 @@ struct pios_usb_cdc_cfg {
 extern const struct pios_com_driver pios_usb_cdc_com_driver;
 
 extern int32_t PIOS_USB_CDC_Init(uint32_t * usbcdc_id, const struct pios_usb_cdc_cfg * cfg, uint32_t lower_id);
-
-extern const uint8_t *PIOS_USB_CDC_GetLineCoding(uint16_t Length);
-extern RESULT PIOS_USB_CDC_SetControlLineState(void);
-extern RESULT PIOS_USB_CDC_SetLineCoding(void);
 
 #endif /* PIOS_USB_CDC_PRIV_H */
 

@@ -36,13 +36,15 @@
 
 struct pios_spi_cfg {
 	SPI_TypeDef *regs;
+	uint32_t remap;				/* GPIO_Remap_* or GPIO_AF_* */
 	SPI_InitTypeDef init;
 	bool use_crc;
 	struct stm32_dma dma;
-	struct stm32_gpio ssel;
 	struct stm32_gpio sclk;
 	struct stm32_gpio miso;
 	struct stm32_gpio mosi;
+	uint32_t slave_count;
+	struct stm32_gpio ssel[];
 };
 
 struct pios_spi_dev {
@@ -52,6 +54,8 @@ struct pios_spi_dev {
 	uint8_t rx_dummy_byte;
 #if defined(PIOS_INCLUDE_FREERTOS)
 	xSemaphoreHandle busy;
+#else
+	uint8_t busy;
 #endif
 };
 

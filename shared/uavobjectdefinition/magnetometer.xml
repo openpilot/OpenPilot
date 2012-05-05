@@ -1,0 +1,12 @@
+<xml>
+    <object name="Magnetometer" singleinstance="true" settings="false">
+        <description>The mag data.</description>
+	<field name="x" units="mGa" type="float" elements="1"/>
+	<field name="y" units="mGa" type="float" elements="1"/>
+	<field name="z" units="mGa" type="float" elements="1"/>
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetryflight acked="false" updatemode="periodic" period="1000"/>
+        <logging updatemode="manual" period="0"/>
+    </object>
+</xml>

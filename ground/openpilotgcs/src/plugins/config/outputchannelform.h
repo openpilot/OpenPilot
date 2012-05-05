@@ -29,10 +29,9 @@
 
 #include <QWidget>
 #include "ui_outputchannelform.h"
+#include "configtaskwidget.h"
 
-class ConfigOnputWidget;
-
-class OutputChannelForm : public QWidget
+class OutputChannelForm : public ConfigTaskWidget
 {
     Q_OBJECT
 

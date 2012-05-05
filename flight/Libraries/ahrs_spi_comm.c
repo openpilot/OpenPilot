@@ -33,7 +33,7 @@
 #include "pios_spi.h"
 #include "pios_irq.h"
 #include "ahrs_spi_program_slave.h"
-#include "STM32103CB_AHRS.h"
+//#include "STM32103CB_AHRS.h"
 #endif
 
 /*transmit and receive packet magic numbers.
@@ -53,7 +53,7 @@ typedef enum { COMMS_NULL, COMMS_OBJECT } COMMSCOMMAND;
 
 //The maximum number of objects that can be updated in one cycle.
 //Currently the link is capable of sending 3 packets per cycle but 2 is enough
-#define MAX_UPDATE_OBJECTS 1
+#define MAX_UPDATE_OBJECTS 2
 
 //Number of transmissions + 1 before we expect to see the data acknowledge
 //This is controlled by the SPI hardware.
@@ -298,13 +298,11 @@ int32_t AhrsConnectCallBack(AhrsObjHandle obj, AhrsEventCallback cb)
 	return (0);
 }
 
-AhrsCommStatus AhrsGetStatus()
+void AhrsGetStatus(AhrsCommStatus * status)
 {
-	AhrsCommStatus status;
-	status.remote = rxPacket.status;
-	status.local = txPacket.status;
-	status.linkOk = linkOk;
-	return (status);
+	status->remote = rxPacket.status;
+	status->local = txPacket.status;
+	status->linkOk = linkOk;
 }
 
 
@@ -439,7 +437,9 @@ void AhrsSendObjects(void)
 
 void SendPacket(void)
 {
+#ifndef IN_AHRS
 	PIOS_SPI_RC_PinSet(opahrs_spi_id, 0);
+#endif
 	//no point checking if this failed. There isn't much we could do about it if it did fail
 	PIOS_SPI_TransferBlock(opahrs_spi_id, (uint8_t *) & txPacket, (uint8_t *) & rxPacket, sizeof(CommsDataPacket), &CommsCallback);
 }

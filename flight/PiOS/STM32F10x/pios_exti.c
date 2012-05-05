@@ -224,7 +224,7 @@ static void PIOS_EXTI_15_10_irq_handler (void)
 }
 void EXTI15_10_IRQHandler(void) __attribute__ ((alias ("PIOS_EXTI_15_10_irq_handler")));
 
-#endif
+#endif /* PIOS_INCLUDE_EXTI */
 
 /**
   * @}

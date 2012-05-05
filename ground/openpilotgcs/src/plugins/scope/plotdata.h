@@ -29,11 +29,6 @@
 #define PLOTDATA_H
 
 #include "uavobject.h"
-#include "baroaltitude.h"
-#include "positionactual.h"
-#include "attituderaw.h"
-#include "manualcontrolcommand.h"
-
 
 #include "qwt/src/qwt.h"
 #include "qwt/src/qwt_plot.h"

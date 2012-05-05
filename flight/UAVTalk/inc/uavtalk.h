@@ -53,6 +53,8 @@ int32_t UAVTalkSetOutputStream(UAVTalkConnection connection, UAVTalkOutputStream
 UAVTalkOutputStream UAVTalkGetOutputStream(UAVTalkConnection connection);
 int32_t UAVTalkSendObject(UAVTalkConnection connection, UAVObjHandle obj, uint16_t instId, uint8_t acked, int32_t timeoutMs);
 int32_t UAVTalkSendObjectRequest(UAVTalkConnection connection, UAVObjHandle obj, uint16_t instId, int32_t timeoutMs);
+int32_t UAVTalkSendAck(UAVTalkConnection connectionHandle, UAVObjHandle obj, uint16_t instId);
+int32_t UAVTalkSendNack(UAVTalkConnection connectionHandle, uint32_t objId);
 UAVTalkRxState UAVTalkProcessInputStream(UAVTalkConnection connection, uint8_t rxbyte);
 UAVTalkRxState UAVTalkProcessInputStreamQuiet(UAVTalkConnection connection, uint8_t rxbyte);
 void UAVTalkGetStats(UAVTalkConnection connection, UAVTalkStats *stats);

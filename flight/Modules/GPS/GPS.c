@@ -144,7 +144,6 @@ int32_t GPSInitialize(void)
 #ifdef PIOS_GPS_SETS_HOMELOCATION
 		HomeLocationInitialize();
 #endif
-		HwSettingsInitialize();
 		updateSettings();
 
 		gps_rx_buffer = pvPortMalloc(NMEA_MAX_PACKET_LENGTH);

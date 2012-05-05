@@ -34,6 +34,9 @@
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
         <widget class="QCheckBox" name="TxPIDEnable">
+         <property name="focusPolicy">
+          <enum>Qt::StrongFocus</enum>
+         </property>
          <property name="toolTip">
           <string>This module will periodically update values of stabilization PID settings
 depending on configured input control channels. New values of stabilization
@@ -191,6 +194,9 @@ margin:1px;</string>
           </item>
           <item row="2" column="1">
            <widget class="QComboBox" name="PID1">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="toolTip">
              <string>Select PID option or option pair to update.
 Set to Disabled if not used.</string>
@@ -199,6 +205,9 @@ Set to Disabled if not used.</string>
           </item>
           <item row="2" column="2">
            <widget class="QComboBox" name="Input1">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="toolTip">
              <string>Select input used as a control source for this instance.
 It can be one of Accessory channels or Throttle channel.
@@ -219,6 +228,9 @@ used, for instance, to decrease PID value when increasing Throttle.</string>
           </item>
           <item row="2" column="3">
            <widget class="QDoubleSpinBox" name="MinPID1">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="toolTip">
              <string>Minimum PID value mapped to Accessory channel = 0 or
 Throttle channel lesser or equal to Throttle Min value.</string>
@@ -233,6 +245,9 @@ Throttle channel lesser or equal to Throttle Min value.</string>
           </item>
           <item row="2" column="4">
            <widget class="QDoubleSpinBox" name="MaxPID1">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="toolTip">
              <string>Maximum PID value mapped to Accessory channel = 1 or
 Throttle channel greater or equal to Throttle Max value.</string>
@@ -254,6 +269,9 @@ Throttle channel greater or equal to Throttle Max value.</string>
           </item>
           <item row="3" column="1">
            <widget class="QComboBox" name="PID2">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="toolTip">
              <string>Select PID option or option pair to update.
 Set to Disabled if not used.</string>
@@ -262,6 +280,9 @@ Set to Disabled if not used.</string>
           </item>
           <item row="3" column="2">
            <widget class="QComboBox" name="Input2">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="toolTip">
              <string>Select input used as a control source for this instance.
 It can be one of Accessory channels or Throttle channel.
@@ -282,6 +303,9 @@ used, for instance, to decrease PID value when increasing Throttle.</string>
           </item>
           <item row="3" column="3">
            <widget class="QDoubleSpinBox" name="MinPID2">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="toolTip">
              <string>Minimum PID value mapped to Accessory channel = 0 or
 Throttle channel lesser or equal to Throttle Min value.</string>
@@ -296,6 +320,9 @@ Throttle channel lesser or equal to Throttle Min value.</string>
           </item>
           <item row="3" column="4">
            <widget class="QDoubleSpinBox" name="MaxPID2">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="toolTip">
              <string>Maximum PID value mapped to Accessory channel = 1 or
 Throttle channel greater or equal to Throttle Max value.</string>
@@ -317,6 +344,9 @@ Throttle channel greater or equal to Throttle Max value.</string>
           </item>
           <item row="4" column="1">
            <widget class="QComboBox" name="PID3">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="toolTip">
              <string>Select PID option or option pair to update.
 Set to Disabled if not used.</string>
@@ -325,6 +355,9 @@ Set to Disabled if not used.</string>
           </item>
           <item row="4" column="2">
            <widget class="QComboBox" name="Input3">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="toolTip">
              <string>Select input used as a control source for this instance.
 It can be one of Accessory channels or Throttle channel.
@@ -345,6 +378,9 @@ used, for instance, to decrease PID value when increasing Throttle.</string>
           </item>
           <item row="4" column="3">
            <widget class="QDoubleSpinBox" name="MinPID3">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="toolTip">
              <string>Minimum PID value mapped to Accessory channel = 0 or
 Throttle channel lesser or equal to Throttle Min value.</string>
@@ -359,6 +395,9 @@ Throttle channel lesser or equal to Throttle Min value.</string>
           </item>
           <item row="4" column="4">
            <widget class="QDoubleSpinBox" name="MaxPID3">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="toolTip">
              <string>Maximum PID value mapped to Accessory channel = 1 or
 Throttle channel greater or equal to Throttle Max value.</string>
@@ -380,6 +419,9 @@ Throttle channel greater or equal to Throttle Max value.</string>
           </item>
           <item row="8" column="1">
            <widget class="QComboBox" name="UpdateMode">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="toolTip">
              <string>PID values update mode which can be set to:
 - Never: this disables PID updates (but module still will be run if enabled),
@@ -403,6 +445,9 @@ only when system is armed without disabling the module.</string>
           </item>
           <item row="7" column="1">
            <widget class="QDoubleSpinBox" name="ThrottleMin">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="toolTip">
              <string>Throttle channel lower bound mapped to PID Min value</string>
             </property>
@@ -416,6 +461,9 @@ only when system is armed without disabling the module.</string>
           </item>
           <item row="7" column="2">
            <widget class="QDoubleSpinBox" name="ThrottleMax">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="toolTip">
              <string>Throttle channel upper bound mapped to PID Max value</string>
             </property>
@@ -578,6 +626,21 @@ margin:1px;</string>
   <tabstop>Apply</tabstop>
   <tabstop>Save</tabstop>
   <tabstop>scrollArea</tabstop>
+  <tabstop>PID1</tabstop>
+  <tabstop>Input1</tabstop>
+  <tabstop>MinPID1</tabstop>
+  <tabstop>MaxPID1</tabstop>
+  <tabstop>PID2</tabstop>
+  <tabstop>Input2</tabstop>
+  <tabstop>MinPID2</tabstop>
+  <tabstop>MaxPID2</tabstop>
+  <tabstop>PID3</tabstop>
+  <tabstop>Input3</tabstop>
+  <tabstop>MinPID3</tabstop>
+  <tabstop>MaxPID3</tabstop>
+  <tabstop>ThrottleMin</tabstop>
+  <tabstop>ThrottleMax</tabstop>
+  <tabstop>UpdateMode</tabstop>
  </tabstops>
  <resources/>
  <connections/>

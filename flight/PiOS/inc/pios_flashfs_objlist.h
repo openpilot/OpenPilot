@@ -31,7 +31,15 @@
 #include "openpilot.h"
 #include "uavobjectmanager.h"
 
-int32_t PIOS_FLASHFS_Init();
+struct flashfs_cfg {
+	uint32_t table_magic;
+	uint32_t obj_magic;
+	uint32_t obj_table_start;
+	uint32_t obj_table_end;
+	uint32_t sector_size;
+};
+
+int32_t PIOS_FLASHFS_Init(const struct flashfs_cfg * cfg);
 int32_t PIOS_FLASHFS_Format();
 int32_t PIOS_FLASHFS_ObjSave(UAVObjHandle obj, uint16_t instId, uint8_t * data);
 int32_t PIOS_FLASHFS_ObjLoad(UAVObjHandle obj, uint16_t instId, uint8_t * data);

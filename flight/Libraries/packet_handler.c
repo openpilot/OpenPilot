@@ -419,15 +419,14 @@ uint8_t PHReceivePacket(PHInstHandle h, PHPacketHandle p, bool rx_error)
 			if(data->data_handler)
 				data->data_handler(p->data, p->header.data_size);
 
-		// Release the packet.
-		PHReleaseTXPacket(h, p);
-
 		break;
 
 	default:
 		break;
 	}
 
+	// Release the packet.
+	PHReleaseRXPacket(h, p);
 	
 	return 1;
 }

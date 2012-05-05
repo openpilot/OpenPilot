@@ -139,7 +139,10 @@ typedef void (*UAVObjInitializeCallback)(UAVObjHandle obj, uint16_t instId);
  * Event manager statistics
  */
 typedef struct {
-	uint32_t eventErrors;
+	uint32_t eventQueueErrors;
+	uint32_t eventCallbackErrors;
+	uint32_t lastCallbackErrorID;
+	uint32_t lastQueueErrorID;
 } UAVObjStats;
 
 int32_t UAVObjInitialize();

@@ -19,8 +19,8 @@ HEADERS += configplugin.h \
     configvehicletypewidget.h \
     config_pro_hw_widget.h \
     config_cc_hw_widget.h \
-    configahrswidget.h \
     configccattitudewidget.h \
+    configpipxtremewidget.h \
     cfg_vehicletypes/configccpmwidget.h \
     configstabilizationwidget.h \
     assertions.h \
@@ -31,8 +31,8 @@ HEADERS += configplugin.h \
     configcamerastabilizationwidget.h \
     configtxpidwidget.h \
     outputchannelform.h \
-    config_global.h \
-    configpipxtremewidget.h
+    configrevowidget.h \
+    config_global.h
 SOURCES += configplugin.cpp \
     configgadgetconfiguration.cpp \
     configgadgetwidget.cpp \
@@ -45,9 +45,9 @@ SOURCES += configplugin.cpp \
     configvehicletypewidget.cpp \
     config_pro_hw_widget.cpp \
     config_cc_hw_widget.cpp \
-    configahrswidget.cpp \
     configccattitudewidget.cpp \
     configstabilizationwidget.cpp \
+    configpipxtremewidget.cpp \
     twostep.cpp \
     legacy-calibration.cpp \
     gyro-calibration.cpp \
@@ -56,17 +56,16 @@ SOURCES += configplugin.cpp \
     defaulthwsettingswidget.cpp \
     inputchannelform.cpp \
     configcamerastabilizationwidget.cpp \
+    configrevowidget.cpp \
     configtxpidwidget.cpp \
     cfg_vehicletypes/configmultirotorwidget.cpp \
     cfg_vehicletypes/configgroundvehiclewidget.cpp \
     cfg_vehicletypes/configfixedwingwidget.cpp \
     cfg_vehicletypes/configccpmwidget.cpp \
-    outputchannelform.cpp \
-    configpipxtremewidget.cpp
+    outputchannelform.cpp
 FORMS += airframe.ui \
     cc_hw_settings.ui \
     pro_hw_settings.ui \
-    ahrs.ui \
     ccpm.ui \
     stabilization.ui \
     input.ui \
@@ -76,10 +75,12 @@ FORMS += airframe.ui \
     defaulthwsettings.ui \
     inputchannelform.ui \
     camerastabilization.ui \
-    pipxtreme.ui \
     outputchannelform.ui \
+    revosensors.ui \
+<<<<<<< HEAD
+    txpid.ui \
+    pipxtreme.ui
+=======
     txpid.ui 
+>>>>>>> origin/next
 RESOURCES += configgadget.qrc
-
-
-

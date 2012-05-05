@@ -21,7 +21,9 @@ device=$(hdiutil attach  "${TEMP_FILE}" | \
 # packaging goes here
 cp -r "${APP_PATH}" "/Volumes/${VOL_NAME}"
 #cp -r "${FW_DIR}" "/Volumes/${VOL_NAME}/firmware"
-cp "${FW_DIR}/fw_coptercontrol-${PACKAGE_LBL}.opfw" "/Volumes/${VOL_NAME}/firmware"
+cp "${FW_DIR}/fw_coptercontrol-${PACKAGE_LBL}.opfw" "/Volumes/${VOL_NAME}/Firmware"
+
+cp "${BUILD_DIR}/uavobject-synthetics/matlab/OPLogConvert.m" "/Volumes/${VOL_NAME}/Utilities"
 
 cp "${ROOT_DIR}/HISTORY.txt" "/Volumes/${VOL_NAME}"
 

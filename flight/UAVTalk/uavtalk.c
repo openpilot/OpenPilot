@@ -490,6 +490,36 @@ UAVTalkRxState UAVTalkProcessInputStream(UAVTalkConnection connectionHandle, uin
 }
 
 /**
+ * Send a ACK through the telemetry link.
+ * \param[in] connectionHandle UAVTalkConnection to be used
+ * \param[in] objId Object ID to send a NACK for
+ * \return 0 Success
+ * \return -1 Failure
+ */
+int32_t UAVTalkSendAck(UAVTalkConnection connectionHandle, UAVObjHandle obj, uint16_t instId)
+{
+	UAVTalkConnectionData *connection;
+	CHECKCONHANDLE(connectionHandle,connection,return -1);
+
+	return sendObject(connection, obj, instId, UAVTALK_TYPE_ACK);
+}
+
+/**
+ * Send a NACK through the telemetry link.
+ * \param[in] connectionHandle UAVTalkConnection to be used
+ * \param[in] objId Object ID to send a NACK for
+ * \return 0 Success
+ * \return -1 Failure
+ */
+int32_t UAVTalkSendNack(UAVTalkConnection connectionHandle, uint32_t objId)
+{
+	UAVTalkConnectionData *connection;
+	CHECKCONHANDLE(connectionHandle,connection,return -1);
+
+	return sendNack(connection, objId);
+}
+
+/**
  * Receive an object. This function process objects received through the telemetry stream.
  * \param[in] connection UAVTalkConnection to be used
  * \param[in] type Type of received message (UAVTALK_TYPE_OBJ, UAVTALK_TYPE_OBJ_REQ, UAVTALK_TYPE_OBJ_ACK, UAVTALK_TYPE_ACK, UAVTALK_TYPE_NACK)

@@ -531,8 +531,8 @@ static void updateTelemetryStats()
  */
 static void updateSettings()
 {
+	
 	if (telemetryPort) {
-
 		// Retrieve settings
 		uint8_t speed;
 		HwSettingsTelemetrySpeedGet(&speed);

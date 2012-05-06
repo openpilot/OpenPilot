@@ -429,14 +429,22 @@ static const struct pios_tim_clock_cfg tim_4_cfg = {
 #include "pios_usb_priv.h"
 
 static const struct pios_usb_cfg pios_usb_main_cfg = {
-  .irq = {
-    .init    = {
-      .NVIC_IRQChannel                   = USB_LP_CAN1_RX0_IRQn,
-      .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
-      .NVIC_IRQChannelSubPriority        = 0,
-      .NVIC_IRQChannelCmd                = ENABLE,
-    },
-  },
+	.irq = {
+		.init    = {
+			.NVIC_IRQChannel                   = USB_LP_CAN1_RX0_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
+			.NVIC_IRQChannelSubPriority        = 0,
+			.NVIC_IRQChannelCmd                = ENABLE,
+		},
+	},
+	.vsense = {
+		.gpio = GPIOA,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_8,
+			.GPIO_Speed = GPIO_Speed_10MHz,
+			.GPIO_Mode  = GPIO_Mode_AF_OD,
+		},
+	}
 };
 
 #include "pios_usb_board_data_priv.h"

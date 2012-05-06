@@ -36,10 +36,7 @@
 #include "configtxpidwidget.h"
 #include "config_pro_hw_widget.h"
 #include "config_cc_hw_widget.h"
-<<<<<<< HEAD
 #include "configpipxtremewidget.h"
-=======
->>>>>>> origin/next
 #include "configrevowidget.h"
 #include "defaultattitudewidget.h"
 #include "defaulthwsettingswidget.h"

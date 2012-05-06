@@ -43,7 +43,7 @@
 
 #include <stdbool.h>
 
-#undef PIOS_INCLUDE_USB
+//#undef PIOS_INCLUDE_USB
 
 // ****************
 // Private constants
@@ -54,8 +54,8 @@
 #define BRIDGE_BUF_LEN 512
 #define MAX_RETRIES 2
 #define REQ_TIMEOUT_MS 10
-#define STATS_UPDATE_PERIOD_MS 500
-#define RADIOSTATS_UPDATE_PERIOD_MS 500
+#define STATS_UPDATE_PERIOD_MS 2000
+#define RADIOSTATS_UPDATE_PERIOD_MS 1000
 #define MAX_LOST_CONTACT_TIME 10
 #define PACKET_QUEUE_SIZE 10
 #define MAX_PORT_DELAY 200
@@ -131,10 +131,6 @@ static void radioStatusTask(void *parameters);
 static int32_t transmitData(uint8_t * data, int32_t length);
 static int32_t transmitPacket(PHPacketHandle packet);
 static void receiveData(uint8_t *buf, uint8_t len);
-/*
-static void SendGCSReceiver(void);
-static void SendPipXStatus(void);
-*/
 static void StatusHandler(PHPacketHandle p);
 static void PPMHandler(uint16_t *channels);
 static BufferedReadHandle BufferedReadInit(uint32_t com_port, uint16_t buffer_length);
@@ -385,7 +381,9 @@ static void radioReceiveTask(void *parameters)
 		if (p == NULL)
 			p = PHGetRXPacket(pios_packet_handler);
 		if(p == NULL) {
-			vTaskDelay(MAX_PORT_DELAY / portTICK_RATE_MS);
+			DEBUG_PRINTF(2, "RX Packet Unavailable.!\n\r");
+			// Wait a bit for a packet to come available.
+			vTaskDelay(5);
 			continue;
 		}
 

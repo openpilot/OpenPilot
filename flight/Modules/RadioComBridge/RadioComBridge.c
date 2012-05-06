@@ -43,8 +43,6 @@
 
 #include <stdbool.h>
 
-//#undef PIOS_INCLUDE_USB
-
 // ****************
 // Private constants
 
@@ -635,7 +633,7 @@ static int32_t transmitData(uint8_t *buf, int32_t length)
  */
 static int32_t transmitPacket(PHPacketHandle p)
 {
-	return PIOS_COM_SendBufferNonBlocking(data->radio_port, (uint8_t*)p, PH_PACKET_SIZE(p));
+	return PIOS_COM_SendBuffer(data->radio_port, (uint8_t*)p, PH_PACKET_SIZE(p));
 }
 
 /**
@@ -653,7 +651,7 @@ static void receiveData(uint8_t *buf, uint8_t len)
 #endif /* PIOS_INCLUDE_USB */
 
 	// Send the received data to the com port
-	if (PIOS_COM_SendBufferNonBlocking(outputPort, buf, len) != len)
+	if (PIOS_COM_SendBuffer(outputPort, buf, len) != len)
 		// Error on transmit
 		data->comTxErrors++;
 }

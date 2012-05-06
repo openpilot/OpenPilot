@@ -119,7 +119,7 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
     QStringList airframeTypes;
     airframeTypes << "Fixed Wing" << "Multirotor" << "Helicopter" << "Ground" << "Custom";
     m_aircraft->aircraftType->addItems(airframeTypes);
-    m_aircraft->aircraftType->setCurrentIndex(1);
+    m_aircraft->aircraftType->setCurrentIndex(0); //Set default vehicle to Fixed Wing
 
     QStringList fixedWingTypes;
     fixedWingTypes << "Elevator aileron rudder" << "Elevon" << "Vtail";
@@ -655,7 +655,8 @@ void ConfigVehicleTypeWidget::setupAirframeUI(QString frameType)
 				frameType == "HexaCoax" || frameType == "Hexacopter Y6" ||
 				frameType == "Octo" || frameType == "Octocopter" ||
 				frameType == "OctoV" || frameType == "Octocopter V" ||
-				frameType == "OctoCoaxP" || frameType == "Octo Coax +" ) {
+				frameType == "OctoCoaxP" || frameType == "Octo Coax +" || 
+				frameType == "OctoCoaxX" || frameType == "Octo Coax X" ) {
 		 
 		 //Call multi-rotor setup UI
 		 setupMultiRotorUI(frameType);

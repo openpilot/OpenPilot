@@ -40,6 +40,9 @@
 #include <uavtalk_priv.h>
 #include <pios_rfm22b.h>
 #include <ecc.h>
+#if defined(PIOS_INCLUDE_FLASH_EEPROM)
+#include <pios_eeprom.h>
+#endif
 
 #include <stdbool.h>
 
@@ -54,7 +57,7 @@
 #define REQ_TIMEOUT_MS 10
 #define STATS_UPDATE_PERIOD_MS 2000
 #define RADIOSTATS_UPDATE_PERIOD_MS 1000
-#define MAX_LOST_CONTACT_TIME 10
+#define MAX_LOST_CONTACT_TIME 4
 #define PACKET_QUEUE_SIZE 10
 #define MAX_PORT_DELAY 200
 #define EV_PACKET_RECEIVED 0x20
@@ -182,6 +185,11 @@ static int32_t RadioComBridgeInitialize(void)
 	// Initialize the UAVObjects that we use
 	GCSReceiverInitialize();
 	PipXStatusInitialize();
+	ObjectPersistenceInitialize();
+
+	// Get the settings.
+	PipXSettingsData pipxSettings;
+	PipXSettingsGet(&pipxSettings);
 
 	// TODO: Get from settings object
 	data->com_port = PIOS_COM_BRIDGE_COM;
@@ -196,7 +204,8 @@ static int32_t RadioComBridgeInitialize(void)
 	data->objEventQueue = xQueueCreate(PACKET_QUEUE_SIZE, sizeof(UAVObjEvent));
 
 	// Initialize the destination ID
-	data->destination_id = 0xffffffff;
+	data->destination_id = pipxSettings.PairID ? pipxSettings.PairID : 0xffffffff;
+	DEBUG_PRINTF(2, "PairID: %x\n\r", data->destination_id);
 
 	// Initialize the statistics.
 	data->radioTxErrors = 0;
@@ -296,7 +305,8 @@ static void comUAVTalkTask(void *parameters)
 
 		// Keep reading until we receive a completed packet.
 		UAVTalkRxState state = UAVTalkProcessInputStreamQuiet(data->inUAVTalkCon, rx_byte);
-		UAVTalkInputProcessor *iproc = &(((UAVTalkConnectionData*)(data->inUAVTalkCon))->iproc);
+		UAVTalkConnectionData *connection = (UAVTalkConnectionData*)(data->inUAVTalkCon);
+		UAVTalkInputProcessor *iproc = &(connection->iproc);
 		if (state == UAVTALK_STATE_COMPLETE) {
 
 			// Is this a local UAVObject?
@@ -305,19 +315,65 @@ static void comUAVTalkTask(void *parameters)
 				// We treat the ObjectPersistance object differently
 				if(iproc->objId == OBJECTPERSISTENCE_OBJID)
 				{
-					// Queue the packet for transmission.
-					xQueueSend(data->sendPacketQueue, &p, MAX_PORT_DELAY);
-					p = NULL;
+					// Unpack object, if the instance does not exist it will be created!
+					UAVObjUnpack(iproc->obj, iproc->instId, connection->rxBuffer);
+
+					// Get the ObjectPersistance object.
+					ObjectPersistenceData obj_per;
+					ObjectPersistenceGet(&obj_per);
+
+					// Is this concerning or setting object?
+					if (obj_per.ObjectID == PIPXSETTINGS_OBJID)
+					{
+						UAVObjEvent ev;
+						ev.obj = iproc->obj;
+						ev.instId = 0;
+						ev.event = EV_SEND_ACK;
+
+						// Is this a save, load, or delete?
+						switch (obj_per.Operation)
+						{
+						case OBJECTPERSISTENCE_OPERATION_LOAD:
+							DEBUG_PRINTF(2, "Load\n\r");
+							break;
+						case OBJECTPERSISTENCE_OPERATION_SAVE:
+#if defined(PIOS_INCLUDE_FLASH_EEPROM)
+						{
+							// Save the settings.
+							PipXSettingsData pipxSettings;
+							PipXSettingsGet(&pipxSettings);
+							if (PIOS_EEPROM_Save((uint8_t*)&pipxSettings, sizeof(PipXSettingsData)) != 0)
+								ev.event = EV_SEND_NACK;
+							break;
+						}
+#endif
+						case OBJECTPERSISTENCE_OPERATION_DELETE:
+							DEBUG_PRINTF(2, "Delete\n\r");
+							break;
+						default:
+							DEBUG_PRINTF(2, "Other\n\r");
+							break;
+						}
+
+						// Queue up the ACK/NACK
+						xQueueSend(data->objEventQueue, &ev, MAX_PORT_DELAY);
+					}
+					else {
+						// Otherwise, queue the packet for transmission.
+						xQueueSend(data->sendPacketQueue, &p, MAX_PORT_DELAY);
+						p = NULL;
+					}
 				}
 				else
 				{
 					UAVObjEvent ev;
 					ev.obj = iproc->obj;
+					ev.instId = 0;
 					switch (iproc->type)
 					{
 					case UAVTALK_TYPE_OBJ:
 						// Unpack object, if the instance does not exist it will be created!
-						UAVObjUnpack(iproc->obj, iproc->instId, p->data);
+						UAVObjUnpack(iproc->obj, iproc->instId, connection->rxBuffer);
 						break;
 					case UAVTALK_TYPE_OBJ_REQ:
 						// Queue up an object send request.
@@ -327,7 +383,7 @@ static void comUAVTalkTask(void *parameters)
 					case UAVTALK_TYPE_OBJ_ACK:
 						// Queue up an ACK
 						ev.event = EV_SEND_ACK;
-						xQueueSend(data->objEventQueue, &ev, MAX_PORT_DELAY);
+						UAVObjUnpack(iproc->obj, iproc->instId, connection->rxBuffer);
 						break;
 					}
 				}
@@ -582,6 +638,7 @@ static void radioStatusTask(void *parameters)
 		{
 			pipxStatus.PairIDs[i] = data->pairStats[i].pairID;
 			pipxStatus.PairSignalStrengths[i] = data->pairStats[i].rssi;
+			data->pairStats[i].lastContact++;
 		}
 
 		// Update the object
@@ -663,19 +720,21 @@ static void receiveData(uint8_t *buf, uint8_t len)
 static void StatusHandler(PHPacketHandle status)
 {
 	uint32_t id = status->header.source_id;
-
+	bool found = false;
 	// Have we seen this device recently?
 	uint8_t id_idx = 0;
 	for ( ; id_idx < PIPXSTATUS_PAIRIDS_NUMELEM; ++id_idx)
 		if(data->pairStats[id_idx].pairID == id)
+		{
+			found = true;
 			break;
+		}
 
 	// If we have seen it, update the RSSI and reset the last contact couter
-	if(id_idx < PIPXSTATUS_PAIRIDS_NUMELEM)
+	if(found)
 	{
 		data->pairStats[id_idx].rssi = status->header.rssi;
 		data->pairStats[id_idx].lastContact = 0;
-		return;
 	}
 
 	// Remove any contacts that we haven't seen for a while.
@@ -690,19 +749,22 @@ static void StatusHandler(PHPacketHandle status)
 	}
 
 	// If we haven't seen it, find a slot to put it in.
-	uint8_t min_idx = 0;
-	int8_t min_rssi = data->pairStats[0].rssi;
-	for (id_idx = 1; id_idx < PIPXSTATUS_PAIRIDS_NUMELEM; ++id_idx)
+	if (!found)
 	{
-		if(data->pairStats[id_idx].rssi < min_rssi)
+		uint8_t min_idx = 0;
+		int8_t min_rssi = data->pairStats[0].rssi;
+		for (id_idx = 1; id_idx < PIPXSTATUS_PAIRIDS_NUMELEM; ++id_idx)
 		{
-			min_rssi = data->pairStats[id_idx].rssi;
-			min_idx = id_idx;
+			if(data->pairStats[id_idx].rssi < min_rssi)
+			{
+				min_rssi = data->pairStats[id_idx].rssi;
+				min_idx = id_idx;
+			}
 		}
+		data->pairStats[min_idx].pairID = id;
+		data->pairStats[min_idx].rssi = status->header.rssi;
+		data->pairStats[min_idx].lastContact = 0;
 	}
-	data->pairStats[min_idx].pairID = id;
-	data->pairStats[min_idx].rssi = status->header.rssi;
-	data->pairStats[min_idx].lastContact = 0;
 }
 
 /**

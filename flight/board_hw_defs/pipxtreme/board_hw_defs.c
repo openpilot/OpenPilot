@@ -494,16 +494,6 @@ const struct pios_eeprom_cfg pios_eeprom_cfg = {
 #if defined(PIOS_INCLUDE_RFM22B)
 #include <pios_rfm22b_priv.h>
 
-const struct pios_rfm22b_cfg pios_rfm22b_cfg = {
-	.frequencyHz = 434000000,
-	.minFrequencyHz = 434000000 - 2000000,
-	.maxFrequencyHz = 434000000 + 2000000,
-	.RFXtalCap = 0x7f,
-	.maxRFBandwidth = 128000,
-	//.maxTxPower = RFM22_tx_pwr_txpow_0, // +1dBm ... 1.25mW
-	.maxTxPower = RFM22_tx_pwr_txpow_7, // +20dBm .. 100mW
-};
-
 #endif /* PIOS_INCLUDE_RFM22B */
 
 #if defined(PIOS_INCLUDE_PACKET_HANDLER)

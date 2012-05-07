@@ -152,7 +152,7 @@ enum pios_rfm22b_dev_magic {
 
 struct pios_rfm22b_dev {
 	enum pios_rfm22b_dev_magic magic;
-	const struct pios_rfm22b_cfg *cfg;
+	struct pios_rfm22b_cfg cfg;
 
 	uint32_t deviceID;
 
@@ -448,7 +448,7 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, const struct pios_rfm22b_cfg *cfg)
 		return(-1);
 
 	// Bind the configuration to the device instance
-	rfm22b_dev->cfg = cfg;
+	rfm22b_dev->cfg = *cfg;
   
 	*rfm22b_id = (uint32_t)rfm22b_dev;
 
@@ -853,7 +853,7 @@ void rfm22_setNominalCarrierFrequency(uint32_t frequency_hz)
 	// *******
 
 #if defined(RFM22_DEBUG)
-	DEBUG_PRINTF(2, "rf setFreq: %u\n\r", carrier_frequency_hz);
+	//DEBUG_PRINTF(2, "rf setFreq: %u\n\r", carrier_frequency_hz);
 	//	DEBUG_PRINTF(2, "rf setFreq frequency_step_size: %0.2f\n\r", frequency_step_size);
 #endif
 
@@ -911,13 +911,6 @@ void rfm22_setDatarate(uint32_t datarate_bps, bool data_whitening)
 	carrier_datarate_bps = datarate_bps = data_rate[lookup_index];
 
 	rf_bandwidth_used = rx_bandwidth[lookup_index];
-
-	// ********************************
-
-#if defined(RFM22_DEBUG)
-	uint32_t frequency_deviation = freq_deviation[lookup_index];	// Hz
-	uint32_t modulation_bandwidth = datarate_bps + (2 * frequency_deviation);
-#endif
 
 	// rfm22_if_filter_bandwidth
 	rfm22_write(0x1C, reg_1C[lookup_index]);
@@ -1028,11 +1021,15 @@ void rfm22_setDatarate(uint32_t datarate_bps, bool data_whitening)
 	// ********************************
 
 #if defined(RFM22_DEBUG)
+/*
 	DEBUG_PRINTF(2, "rf datarate_bps: %d\n\r", datarate_bps);
 	DEBUG_PRINTF(2, "rf frequency_deviation: %d\n\r", frequency_deviation);
+	uint32_t frequency_deviation = freq_deviation[lookup_index];	// Hz
+	uint32_t modulation_bandwidth = datarate_bps + (2 * frequency_deviation);
 	DEBUG_PRINTF(2, "rf modulation_bandwidth: %u\n\r", modulation_bandwidth);
 	DEBUG_PRINTF(2, "rf_rx_bandwidth[%u]: %u\n\r", lookup_index, rx_bandwidth[lookup_index]);
 	DEBUG_PRINTF(2, "rf est rx sensitivity[%u]: %ddBm\n\r", lookup_index, est_rx_sens_dBm[lookup_index]);
+*/
 #endif
 
 	// *******

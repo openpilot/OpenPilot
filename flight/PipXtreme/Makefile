@@ -140,6 +140,7 @@ ifndef TESTAPP
 SRC += $(OPUAVSYNTHDIR)/gcsreceiver.c
 SRC += $(OPUAVSYNTHDIR)/pipxstatus.c
 SRC += $(OPUAVSYNTHDIR)/pipxsettings.c
+SRC += $(OPUAVSYNTHDIR)/objectpersistence.c
 
 endif
 

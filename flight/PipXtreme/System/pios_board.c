@@ -214,12 +214,72 @@ void PIOS_Board_Init(void) {
 			PIOS_Assert(0);
 		}
 	}
-	PIOS_COM_SendString(PIOS_COM_DEBUG, "Hello DEBUG\n\r");
-	PIOS_COM_SendString(PIOS_COM_FLEXI, "Hello Flexi\n\r");
-	PIOS_COM_SendString(PIOS_COM_TELEM_SERIAL, "Hello Telem Serial\n\r");
-	PIOS_COM_SendString(PIOS_COM_VCP_USB, "Hello VCP\n\r");
 
 #if defined(PIOS_INCLUDE_RFM22B)
+	struct pios_rfm22b_cfg pios_rfm22b_cfg = {
+		.frequencyHz = 434000000,
+		.minFrequencyHz = 434000000 - 2000000,
+		.maxFrequencyHz = 434000000 + 2000000,
+		.RFXtalCap = 0x7f,
+		.maxRFBandwidth = 128000,
+		.maxTxPower = RFM22_tx_pwr_txpow_7, // +20dBm .. 100mW
+	};
+
+	/* Retrieve hardware settings. */
+	pios_rfm22b_cfg.frequencyHz = pipxSettings.Frequency;
+	pios_rfm22b_cfg.RFXtalCap = pipxSettings.FrequencyCalibration;
+	switch (pipxSettings.RFSpeed)
+	{
+	case PIPXSETTINGS_RFSPEED_2400:
+		pios_rfm22b_cfg.maxRFBandwidth = 2000;
+		break;
+	case PIPXSETTINGS_RFSPEED_4800:
+		pios_rfm22b_cfg.maxRFBandwidth = 4000;
+		break;
+	case PIPXSETTINGS_RFSPEED_9600:
+		pios_rfm22b_cfg.maxRFBandwidth = 9600;
+		break;
+	case PIPXSETTINGS_RFSPEED_19200:
+		pios_rfm22b_cfg.maxRFBandwidth = 19200;
+		break;
+	case PIPXSETTINGS_RFSPEED_38400:
+		pios_rfm22b_cfg.maxRFBandwidth = 32000;
+		break;
+	case PIPXSETTINGS_RFSPEED_57600:
+		pios_rfm22b_cfg.maxRFBandwidth = 64000;
+		break;
+	case PIPXSETTINGS_RFSPEED_115200:
+		pios_rfm22b_cfg.maxRFBandwidth = 128000;
+		break;
+	}
+	switch (pipxSettings.RFSpeed)
+	{
+	case PIPXSETTINGS_MAXRFPOWER_125:
+		pios_rfm22b_cfg.maxTxPower = RFM22_tx_pwr_txpow_0;
+		break;
+	case PIPXSETTINGS_MAXRFPOWER_16:
+		pios_rfm22b_cfg.maxTxPower = RFM22_tx_pwr_txpow_1;
+		break;
+	case PIPXSETTINGS_MAXRFPOWER_316:
+		pios_rfm22b_cfg.maxTxPower = RFM22_tx_pwr_txpow_2;
+		break;
+	case PIPXSETTINGS_MAXRFPOWER_63:
+		pios_rfm22b_cfg.maxTxPower = RFM22_tx_pwr_txpow_3;
+		break;
+	case PIPXSETTINGS_MAXRFPOWER_126:
+		pios_rfm22b_cfg.maxTxPower = RFM22_tx_pwr_txpow_4;
+		break;
+	case PIPXSETTINGS_MAXRFPOWER_25:
+		pios_rfm22b_cfg.maxTxPower = RFM22_tx_pwr_txpow_5;
+		break;
+	case PIPXSETTINGS_MAXRFPOWER_50:
+		pios_rfm22b_cfg.maxTxPower = RFM22_tx_pwr_txpow_6;
+		break;
+	case PIPXSETTINGS_MAXRFPOWER_100:
+		pios_rfm22b_cfg.maxTxPower = RFM22_tx_pwr_txpow_7;
+		break;
+	}
+
 	/* Initalize the RFM22B radio COM device. */
 	{
 		if (PIOS_RFM22B_Init(&pios_rfm22b_id, &pios_rfm22b_cfg)) {

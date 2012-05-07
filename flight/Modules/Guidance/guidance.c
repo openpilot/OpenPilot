@@ -149,6 +149,19 @@ static void guidanceTask(void *parameters)
 	// Main task loop
 	lastUpdateTime = xTaskGetTickCount();
 	while (1) {
+
+		SystemSettingsGet(&systemSettings);
+		if ( (systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_VTOL) &&
+			(systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_QUADP) &&
+			(systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_QUADX) &&
+			(systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_HEXA) &&
+			(systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_HEXACOAX) )
+		{
+			AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_WARNING);
+			vTaskDelay(1000);
+			continue;
+		}
+
 		GuidanceSettingsGet(&guidanceSettings);
 
 		// Wait until the AttitudeRaw object is updated, if a timeout then go to failsafe
@@ -168,19 +181,8 @@ static void guidanceTask(void *parameters)
 		updateNedAccel();
 		
 		FlightStatusGet(&flightStatus);
-		SystemSettingsGet(&systemSettings);
 		GuidanceSettingsGet(&guidanceSettings);
 
-		if ( (systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_VTOL) &&
-		     (systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_QUADP) &&
-		     (systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_QUADX) &&
-		     (systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_HEXA) &&
-		     (systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_HEXACOAX) )
-		{
-			AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_WARNING);
-			continue;
-		}
-		
 		switch(flightStatus.FlightMode) {
 			case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
 				updateVtolDesiredVelocity();

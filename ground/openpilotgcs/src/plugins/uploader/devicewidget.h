@@ -72,7 +72,8 @@ private:
     bool populateLoadedStructuredDescription(QByteArray arr);
 
 signals:
-
+    void uploadStarted();
+    void uploadEnded(bool success);
 public slots:
     void uploadFirmware();
     void loadFirmware();

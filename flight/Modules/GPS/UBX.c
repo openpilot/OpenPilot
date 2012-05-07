@@ -70,6 +70,7 @@ bool checksum_ubx_message (UBXPacket *ubx)
 
 void parse_ubx_nav_velned (UBXPayload payload)
 {
+#if defined(REVOLUTION)
 	GPSVelocityData GpsVelocity;
 	GPSVelocityGet(&GpsVelocity);
 
@@ -78,6 +79,7 @@ void parse_ubx_nav_velned (UBXPayload payload)
 	GpsVelocity.Down	= (float)payload.nav_velned.velD/100.0f;
 
 	GPSVelocitySet(&GpsVelocity);
+#endif
 }
 
 void parse_ubx_message (UBXPacket *ubx)

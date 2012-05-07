@@ -679,6 +679,11 @@ static void altitudeHoldDesired(ManualControlCommandData * cmd)
 	AltitudeHoldDesiredSet(&altitudeHoldDesired);
 }
 #else
+static void positionDesired(ManualControlCommandData * cmd)
+{
+	AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_ERROR);
+}
+
 static void altitudeHoldDesired(ManualControlCommandData * cmd)
 {
 	AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_ERROR);

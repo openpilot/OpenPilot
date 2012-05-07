@@ -150,7 +150,6 @@ int32_t GPSInitialize(void)
 #else
 	if (gpsPort && gpsEnabled) {
 		GPSPositionInitialize();
-		GPSVelocityInitialize();
 #if !defined(PIOS_GPS_MINIMAL)
 		GPSTimeInitialize();
 		GPSSatellitesInitialize();

@@ -30,7 +30,7 @@ CLEAN_FLIGHT := YES
 endif
 
 # Set up targets
-FW_TARGETS        := $(addprefix fw_, coptercontrol)
+FW_TARGETS        := $(addprefix fw_, coptercontrol) $(addprefix fw_, revolution)
 FW_TARGETS_TOOLS  := $(addprefix fw_, coptercontrol)
 BL_TARGETS        := $(addprefix bl_, coptercontrol)
 BU_TARGETS        := $(addprefix bu_, coptercontrol)

@@ -23,9 +23,9 @@ void AeroSimRCSimulator::setupUdpPorts(const QString &host, int inPort, int outP
 {
     Q_UNUSED(outPort)
     if (inSocket->bind(QHostAddress(host), inPort))
-        emit processOutput("Successfully bound to address " + host + " on port " + QString::number(inPort) + "\n");
+        emit processOutput("Successfully bound to address " + host + ", port " + QString::number(inPort) + "\n");
     else
-        emit processOutput("Cannot bind to address " + host + " on port " + QString::number(inPort) + "\n");
+        emit processOutput("Cannot bind to address " + host + ", port " + QString::number(inPort) + "\n");
 }
 
 void AeroSimRCSimulator::transmitUpdate()
@@ -172,17 +172,20 @@ void AeroSimRCSimulator::processUpdate(const QByteArray &data)
 
         /*************************************************************************************/
         if (settings.attRaw) {
-            AttitudeRaw::DataFields attRawData;
-            attRawData = attRaw->getData();
+            Accels::DataFields accelsData;
+            accelsData = accels->getData();
+            Gyros::DataFields gyrosData;
+            gyrosData = gyros->getData();
 
-            attRawData.gyros[0] = angY * RAD2DEG;       // gyros (X,Y,Z) -> (+Y,+X,-Z)
-            attRawData.gyros[1] = angX * RAD2DEG;
-            attRawData.gyros[2] = angZ * -RAD2DEG;
-            attRawData.accels[0] = acc.x();
-            attRawData.accels[1] = acc.y();
-            attRawData.accels[2] = acc.z();
+            gyrosData.x = angY * RAD2DEG;       // gyros (X,Y,Z) -> (+Y,+X,-Z)
+            gyrosData.y = angX * RAD2DEG;
+            gyrosData.z = angZ * -RAD2DEG;
+            accelsData.x = acc.x();
+            accelsData.y = acc.y();
+            accelsData.z = acc.z();
 
-            attRaw->setData(attRawData);
+            accels->setData(accelsData);
+            gyros->setData(gyrosData);
         }
         /*************************************************************************************/
         if (settings.attActHW) {

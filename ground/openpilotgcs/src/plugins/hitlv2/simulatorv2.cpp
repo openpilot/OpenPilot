@@ -109,7 +109,8 @@ void Simulator::onStart()
 //    camDesired = CameraDesired::GetInstance(objManager);
 //    acsDesired = AccessoryDesired::GetInstance(objManager);
     posHome = HomeLocation::GetInstance(objManager);
-    attRaw = AttitudeRaw::GetInstance(objManager);
+    accels = Accels::GetInstance(objManager);
+    gyros = Gyros::GetInstance(objManager);
     attActual = AttitudeActual::GetInstance(objManager);
     gpsPosition = GPSPosition::GetInstance(objManager);
     flightStatus = FlightStatus::GetInstance(objManager);
@@ -211,8 +212,10 @@ void Simulator::setupObjects()
     if (settings.gpsPosition)
         setupOutputObject(gpsPosition);
 
-    if (settings.attRaw || settings.attActual)
-        setupOutputObject(attRaw);
+    if (settings.attRaw || settings.attActual) {
+        setupOutputObject(accels);
+        setupOutputObject(gyros);
+    }
 
     if (settings.attActual && !settings.attActHW)
         setupOutputObject(attActual);
@@ -223,7 +226,8 @@ void Simulator::setupObjects()
 void Simulator::resetAllObjects()
 {
     setupDefaultObject(posHome);
-    setupDefaultObject(attRaw);
+    setupDefaultObject(accels);
+    setupDefaultObject(gyros);
     setupDefaultObject(attActual);
     setupDefaultObject(gpsPosition);
     setupDefaultObject(gcsReceiver);

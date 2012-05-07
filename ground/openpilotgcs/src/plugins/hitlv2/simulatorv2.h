@@ -37,7 +37,8 @@
 #include "uavtalk/telemetrymanager.h"
 #include "uavobjectmanager.h"
 #include "homelocation.h"
-#include "attituderaw.h"
+#include "accels.h"
+#include "gyros.h"
 #include "attitudeactual.h"
 #include "gpsposition.h"
 #include "flightstatus.h"
@@ -163,7 +164,8 @@ protected:
 //    BaroAltitude* altActual;
 //    CameraDesired *camDesired;
 //    AccessoryDesired *acsDesired;
-    AttitudeRaw *attRaw;
+    Accels *accels;
+    Gyros *gyros;
     AttitudeActual *attActual;
     HomeLocation *posHome;
     FlightStatus *flightStatus;

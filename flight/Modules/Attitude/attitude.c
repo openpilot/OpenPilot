@@ -267,7 +267,11 @@ static int32_t updateSensors(AccelsData * accels, GyrosData * gyros)
 		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
 		return -1;
 	}
-	
+
+	// for simulation
+	if (AttitudeRawReadOnly() == ACCESS_READONLY)
+		return 0;
+
 	// No accel data available
 	if(PIOS_ADXL345_FifoElements() == 0)
 		return -1;
@@ -416,6 +420,10 @@ static int32_t updateSensorsCC3D(AccelsData * accelsData, GyrosData * gyrosData)
 
 static void updateAttitude(AccelsData * accelsData, GyrosData * gyrosData)
 {
+	// for simulation
+	if (AttitudeActualReadOnly() == ACCESS_READONLY)
+		return;
+
 	float dT;
 	portTickType thisSysTime = xTaskGetTickCount();
 	static portTickType lastSysTime = 0;

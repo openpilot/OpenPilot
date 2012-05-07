@@ -46,6 +46,8 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
 	}
 
 	addApplySaveButtons(m_pipx->Apply, m_pipx->Save);
+	connect(m_pipx->Apply, SIGNAL(clicked()), this, SLOT(applySettings()));
+	connect(m_pipx->Save, SIGNAL(clicked()), this, SLOT(saveSettings()));
 }
 
 ConfigPipXtremeWidget::~ConfigPipXtremeWidget()
@@ -61,6 +63,19 @@ void ConfigPipXtremeWidget::applySettings()
 {
 	PipXSettings *pipxSettings = PipXSettings::GetInstance(getObjectManager());
 	PipXSettings::DataFields pipxSettingsData = pipxSettings->getData();
+
+	// Get the pair ID.
+	quint32 pairID = 0;
+	bool okay;
+	if (m_pipx->PairSelect1->isChecked())
+		pairID = m_pipx->PairID1->text().toUInt(&okay, 16);
+	else if (m_pipx->PairSelect2->isChecked())
+		pairID = m_pipx->PairID2->text().toUInt(&okay, 16);
+	else if (m_pipx->PairSelect3->isChecked())
+		pairID = m_pipx->PairID3->text().toUInt(&okay, 16);
+	else if (m_pipx->PairSelect4->isChecked())
+		pairID = m_pipx->PairID4->text().toUInt(&okay, 16);
+	pipxSettingsData.PairID = pairID;
 	pipxSettings->setData(pipxSettingsData);
 }
 
@@ -76,13 +91,33 @@ void ConfigPipXtremeWidget::saveSettings()
   */
 void ConfigPipXtremeWidget::updateStatus(UAVObject *object) {
 
+	// Get the settings object.
+	PipXSettings *pipxSettings = PipXSettings::GetInstance(getObjectManager());
+	PipXSettings::DataFields pipxSettingsData = pipxSettings->getData();
+
 	// Update the detected devices.
 	UAVObjectField* pairIdField = object->getField("PairIDs");
 	if (pairIdField) {
-		m_pipx->PairID1->setText(QString::number(pairIdField->getValue(0).toUInt(), 16).toUpper());
+		quint32 pairid1 = pairIdField->getValue(0).toUInt();
+		m_pipx->PairID1->setText(QString::number(pairid1, 16).toUpper());
+		m_pipx->PairID1->setEnabled(false);
+		m_pipx->PairSelect1->setChecked(pipxSettingsData.PairID == pairid1);
+		m_pipx->PairSelect1->setEnabled(pairid1);
+		quint32 pairid2 = pairIdField->getValue(1).toUInt();
 		m_pipx->PairID2->setText(QString::number(pairIdField->getValue(1).toUInt(), 16).toUpper());
+		m_pipx->PairID2->setEnabled(false);
+		m_pipx->PairSelect2->setChecked(pipxSettingsData.PairID == pairid2);
+		m_pipx->PairSelect2->setEnabled(pairid2);
+		quint32 pairid3 = pairIdField->getValue(2).toUInt();
 		m_pipx->PairID3->setText(QString::number(pairIdField->getValue(2).toUInt(), 16).toUpper());
+		m_pipx->PairID3->setEnabled(false);
+		m_pipx->PairSelect3->setChecked(pipxSettingsData.PairID == pairid3);
+		m_pipx->PairSelect3->setEnabled(pairid3);
+		quint32 pairid4 = pairIdField->getValue(3).toUInt();
 		m_pipx->PairID4->setText(QString::number(pairIdField->getValue(3).toUInt(), 16).toUpper());
+		m_pipx->PairID4->setEnabled(false);
+		m_pipx->PairSelect4->setChecked(pipxSettingsData.PairID == pairid4);
+		m_pipx->PairSelect4->setEnabled(pairid4);
 	} else {
 		qDebug() << "PipXtremeGadgetWidget: Count not read PairID field.";
 	}

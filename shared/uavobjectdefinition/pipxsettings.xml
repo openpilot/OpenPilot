@@ -16,9 +16,9 @@
 		<field name="Frequency" units="" type="uint32" elements="1" defaultvalue="434000000"/>
 		<field name="AESKey" units="" type="uint8" elements="32" defaultvalue="0123456789abcdef0123456789abcdef"/>
 
-		<access gcs="readwrite" flight="readonly"/>
+		<access gcs="readwrite" flight="readwrite"/>
 		<telemetrygcs acked="true" updatemode="onchange" period="0"/>
-		<telemetryflight acked="false" updatemode="manual" period="0"/>
+		<telemetryflight acked="true" updatemode="onchange" period="0"/>
 		<logging updatemode="manual" period="0"/>
 	</object>
 </xml>

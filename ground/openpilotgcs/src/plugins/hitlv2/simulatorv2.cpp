@@ -247,17 +247,19 @@ void Simulator::setupInputObject(UAVObject* obj, quint32 updateRate)
     UAVObject::Metadata mdata;
     mdata = obj->getDefaultMetadata();
 
-    mdata.gcsAccess = UAVObject::ACCESS_READONLY;
-    mdata.gcsTelemetryAcked = false;
-    mdata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_NEVER;
+    UAVObject::SetGcsAccess(mdata, UAVObject::ACCESS_READONLY);
+    UAVObject::SetGcsTelemetryAcked(mdata, false);
+    UAVObject::SetGcsTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_MANUAL);
     mdata.gcsTelemetryUpdatePeriod = 0;
-    mdata.flightAccess = UAVObject::ACCESS_READWRITE;
-    mdata.flightTelemetryAcked = false;
+
+    UAVObject::SetFlightAccess(mdata, UAVObject::ACCESS_READWRITE);
+    UAVObject::SetFlightTelemetryAcked(mdata, false);
+
     if (settings.manualOutput) {
-        mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
+        UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
         mdata.flightTelemetryUpdatePeriod = updateRate;
     } else {
-        mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
+        UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_ONCHANGE);
         mdata.flightTelemetryUpdatePeriod = 0;
     }
 
@@ -269,13 +271,14 @@ void Simulator::setupWatchedObject(UAVObject *obj)
     UAVObject::Metadata mdata;
     mdata = obj->getDefaultMetadata();
 
-    mdata.gcsAccess = UAVObject::ACCESS_READONLY;
-    mdata.gcsTelemetryAcked = false;
-    mdata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_MANUAL;
+    UAVObject::SetGcsAccess(mdata, UAVObject::ACCESS_READONLY);
+    UAVObject::SetGcsTelemetryAcked(mdata, false);
+    UAVObject::SetGcsTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_MANUAL);
     mdata.gcsTelemetryUpdatePeriod = 0;
-    mdata.flightAccess = UAVObject::ACCESS_READWRITE;
-    mdata.flightTelemetryAcked = false;
-    mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
+
+    UAVObject::SetFlightAccess(mdata, UAVObject::ACCESS_READWRITE);
+    UAVObject::SetFlightTelemetryAcked(mdata, false);
+    UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
     mdata.flightTelemetryUpdatePeriod = 100;
 
     obj->setMetadata(mdata);
@@ -286,14 +289,15 @@ void Simulator::setupOutputObject(UAVObject* obj)
     UAVObject::Metadata mdata;
     mdata = obj->getDefaultMetadata();
 
-    mdata.flightAccess = UAVObject::ACCESS_READONLY;
-    mdata.flightTelemetryAcked = false;
-    mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_NEVER;
-    mdata.flightTelemetryUpdatePeriod = 0;
-    mdata.gcsAccess = UAVObject::ACCESS_READWRITE;
-    mdata.gcsTelemetryAcked = false;
-    mdata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
+    UAVObject::SetGcsAccess(mdata, UAVObject::ACCESS_READWRITE);
+    UAVObject::SetGcsTelemetryAcked(mdata, false);
+    UAVObject::SetGcsTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_ONCHANGE);
     mdata.gcsTelemetryUpdatePeriod = 0;
+
+    UAVObject::SetFlightAccess(mdata, UAVObject::ACCESS_READONLY);
+    UAVObject::SetFlightTelemetryAcked(mdata, false);
+    UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_MANUAL);
+    mdata.flightTelemetryUpdatePeriod = 0;
 
     obj->setMetadata(mdata);
 }

@@ -1,8 +1,8 @@
 /**
  ******************************************************************************
  *
- * @file       guidance.c
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @file       vtolpathfollower.c
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @brief      This module compared @ref PositionActuatl to @ref ActiveWaypoint 
  * and sets @ref AttitudeDesired.  It only does this when the FlightMode field
  * of @ref ManualControlCommand is Auto.
@@ -46,7 +46,7 @@
 #include "openpilot.h"
 #include "paths.h"
 
-#include "guidance.h"
+#include "vtolpathfollower.h"
 #include "accels.h"
 #include "attitudeactual.h"
 #include "pathdesired.h"	// object that will be updated by the module
@@ -74,11 +74,11 @@
 // Private types
 
 // Private variables
-static xTaskHandle guidanceTaskHandle;
+static xTaskHandle pathfollowerTaskHandle;
 static xQueueHandle queue;
 
 // Private functions
-static void guidanceTask(void *parameters);
+static void vtolPathFollowerTask(void *parameters);
 static float bound(float val, float min, float max);
 
 static void updateNedAccel();
@@ -93,11 +93,11 @@ static GuidanceSettingsData guidanceSettings;
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
  */
-int32_t GuidanceStart()
+int32_t VtolPathFollowerStart()
 {
 	// Start main task
-	xTaskCreate(guidanceTask, (signed char *)"Guidance", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &guidanceTaskHandle);
-	TaskMonitorAdd(TASKINFO_RUNNING_GUIDANCE, guidanceTaskHandle);
+	xTaskCreate(vtolPathFollowerTask, (signed char *)"VtolPathFollower", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &pathfollowerTaskHandle);
+	TaskMonitorAdd(TASKINFO_RUNNING_PATHFOLLOWER, pathfollowerTaskHandle);
 
 	return 0;
 }
@@ -106,7 +106,7 @@ int32_t GuidanceStart()
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
  */
-int32_t GuidanceInitialize()
+int32_t VtolPathFollowerInitialize()
 {
 	GuidanceSettingsInitialize();
 	NedAccelInitialize();
@@ -122,7 +122,7 @@ int32_t GuidanceInitialize()
 	
 	return 0;
 }
-MODULE_INITCALL(GuidanceInitialize, GuidanceStart)
+MODULE_INITCALL(VtolPathFollowerInitialize, VtolPathFollowerStart)
 
 static float northVelIntegral = 0;
 static float eastVelIntegral = 0;
@@ -137,7 +137,7 @@ static uint8_t positionHoldLast = 0;
 /**
  * Module thread, should not return.
  */
-static void guidanceTask(void *parameters)
+static void vtolPathFollowerTask(void *parameters)
 {
 	SystemSettingsData systemSettings;
 	FlightStatusData flightStatus;

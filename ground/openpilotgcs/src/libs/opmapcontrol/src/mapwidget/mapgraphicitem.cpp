@@ -40,6 +40,7 @@ namespace mapcontrol
         core->SetCurrentRegion(internals::Rectangle(0, 0, maprect.width(), maprect.height()));
         core->SetMapType(MapType::GoogleHybrid);
         this->SetZoom(2);
+        this->setFlag(ItemIsFocusable);
         connect(core,SIGNAL(OnNeedInvalidation()),this,SLOT(Core_OnNeedInvalidation()));
         connect(core,SIGNAL(OnMapDrag()),this,SLOT(ChildPosRefresh()));
         connect(core,SIGNAL(OnMapZoomChanged()),this,SLOT(ChildPosRefresh()));
@@ -238,7 +239,6 @@ namespace mapcontrol
                     selectionStart = FromLocalToLatLng(event->pos().x(), event->pos().y());
                 }
             }
-
     }
     void MapGraphicItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     {
@@ -271,6 +271,16 @@ namespace mapcontrol
             }
 
         }
+    }
+    void MapGraphicItem::keyPressEvent(QKeyEvent *event)
+    {
+        if(event->modifiers()&(Qt::ShiftModifier|Qt::ControlModifier))
+            this->setCursor(Qt::CrossCursor);
+    }
+    void MapGraphicItem::keyReleaseEvent(QKeyEvent *event)
+    {
+        if((event->modifiers()&(Qt::ShiftModifier|Qt::ControlModifier))==0)
+            this->setCursor(Qt::ArrowCursor);
     }
     bool MapGraphicItem::SetZoomToFitRect(internals::RectLatLng const& rect)
           {

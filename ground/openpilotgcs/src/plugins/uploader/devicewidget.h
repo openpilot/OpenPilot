@@ -40,6 +40,8 @@
 #include <QCryptographicHash>
 #include "uavobjectutilmanager.h"
 #include "devicedescriptorstruct.h"
+#include <QDir>
+#include <QCoreApplication>
 using namespace OP_DFU;
 class deviceWidget : public QWidget
 {

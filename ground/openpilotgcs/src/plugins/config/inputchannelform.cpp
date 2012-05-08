@@ -4,10 +4,12 @@
 #include "manualcontrolsettings.h"
 
 inputChannelForm::inputChannelForm(QWidget *parent,bool showlegend) :
-    QWidget(parent),
+    ConfigTaskWidget(parent),
     ui(new Ui::inputChannelForm)
 {
     ui->setupUi(this);
+    
+    //The first time through the loop, keep the legend. All other times, delete it.
     if(!showlegend)
     {
         layout()->removeWidget(ui->legend0);
@@ -23,6 +25,7 @@ inputChannelForm::inputChannelForm(QWidget *parent,bool showlegend) :
         delete ui->legend4;
         delete ui->legend5;
     }
+
     connect(ui->channelMin,SIGNAL(valueChanged(int)),this,SLOT(minMaxUpdated()));
     connect(ui->channelMax,SIGNAL(valueChanged(int)),this,SLOT(minMaxUpdated()));
     connect(ui->channelGroup,SIGNAL(currentIndexChanged(int)),this,SLOT(groupUpdated()));
@@ -33,12 +36,16 @@ inputChannelForm::inputChannelForm(QWidget *parent,bool showlegend) :
     // a spin box fixes this
     connect(ui->channelNumberDropdown,SIGNAL(currentIndexChanged(int)),this,SLOT(channelDropdownUpdated(int)));
     connect(ui->channelNumber,SIGNAL(valueChanged(int)),this,SLOT(channelNumberUpdated(int)));
+
+    disbleMouseWheelEvents();
 }
+
 
 inputChannelForm::~inputChannelForm()
 {
     delete ui;
 }
+
 void inputChannelForm::setName(QString &name)
 {
     ui->channelName->setText(name);

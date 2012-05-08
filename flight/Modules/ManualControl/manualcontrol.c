@@ -94,6 +94,7 @@ static float scaleChannel(int16_t value, int16_t max, int16_t min, int16_t neutr
 static uint32_t timeDifferenceMs(portTickType start_time, portTickType end_time);
 static bool okToArm(void);
 static bool validInputRange(int16_t min, int16_t max, uint16_t value);
+static void applyDeadband(float *value, float deadband);
 
 #define RCVR_ACTIVITY_MONITOR_CHANNELS_PER_GROUP 12
 #define RCVR_ACTIVITY_MONITOR_MIN_RANGE 10
@@ -202,7 +203,7 @@ static void manualControlTask(void *parameters)
 				/* trying to fly via GCS and lost connection.  fall back to transmitter */
 				UAVObjMetadata metadata;
 				ManualControlCommandGetMetadata(&metadata);
-				metadata.access = ACCESS_READWRITE;
+				UAVObjSetAccess(&metadata, ACCESS_READWRITE);
 				ManualControlCommandSetMetadata(&metadata);
 			}
 		}
@@ -322,6 +323,13 @@ static void manualControlTask(void *parameters)
 				cmd.Yaw            = scaledChannel[MANUALCONTROLSETTINGS_CHANNELGROUPS_YAW];
 				cmd.Throttle       = scaledChannel[MANUALCONTROLSETTINGS_CHANNELGROUPS_THROTTLE];
 				flightMode         = scaledChannel[MANUALCONTROLSETTINGS_CHANNELGROUPS_FLIGHTMODE];
+
+				// Apply deadband for Roll/Pitch/Yaw stick inputs
+				if (settings.Deadband) {
+					applyDeadband(&cmd.Roll, settings.Deadband);
+					applyDeadband(&cmd.Pitch, settings.Deadband);
+					applyDeadband(&cmd.Yaw, settings.Deadband);
+				}
 
 				if(cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_COLLECTIVE] != (uint16_t) PIOS_RCVR_INVALID &&
 				   cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_COLLECTIVE] != (uint16_t) PIOS_RCVR_NODRIVER &&
@@ -920,6 +928,20 @@ bool validInputRange(int16_t min, int16_t max, uint16_t value)
 		max = tmp;
 	}
 	return (value >= min - CONNECTION_OFFSET && value <= max + CONNECTION_OFFSET);
+}
+
+/**
+ * @brief Apply deadband to Roll/Pitch/Yaw channels
+ */
+static void applyDeadband(float *value, float deadband)
+{
+	if (fabs(*value) < deadband)
+		*value = 0.0f;
+	else
+		if (*value > 0.0f)
+			*value -= deadband;
+		else
+			*value += deadband;
 }
 
 /**

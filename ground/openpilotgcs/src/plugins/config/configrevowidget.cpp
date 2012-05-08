@@ -285,7 +285,7 @@ void ConfigRevoWidget::launchAccelBiasCalibration()
     Q_ASSERT(accels);
     initialMdata = accels->getMetadata();
     UAVObject::Metadata mdata = initialMdata;
-    mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
+    UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
     mdata.flightTelemetryUpdatePeriod = 100;
     accels->setMetadata(mdata);
 
@@ -607,7 +607,6 @@ void ConfigRevoWidget::computeScaleBias()
   */
 void ConfigRevoWidget::sixPointCalibrationMode()
 {
-    double S[3], b[3];
     RevoCalibration * revoCalibration = RevoCalibration::GetInstance(getObjectManager());
     Q_ASSERT(revoCalibration);
     RevoCalibration::DataFields revoCalibrationData = revoCalibration->getData();
@@ -650,12 +649,12 @@ void ConfigRevoWidget::sixPointCalibrationMode()
 
    initialMdata = accels->getMetadata();
    UAVObject::Metadata mdata = initialMdata;
-   mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
+   UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
    mdata.flightTelemetryUpdatePeriod = 100;
    accels->setMetadata(mdata);
 
    mdata = mag->getMetadata();
-   mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
+   UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
    mdata.flightTelemetryUpdatePeriod = 100;
    mag->setMetadata(mdata);
 

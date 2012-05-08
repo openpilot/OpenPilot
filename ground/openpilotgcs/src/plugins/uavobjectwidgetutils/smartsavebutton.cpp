@@ -77,7 +77,7 @@ void smartSaveButton::processOperation(QPushButton * button,bool save)
     foreach(UAVDataObject * obj,objects)
     {
         UAVObject::Metadata mdata= obj->getMetadata();
-        if(mdata.gcsAccess==UAVObject::ACCESS_READONLY)
+        if(UAVObject::GetGcsAccess(mdata)==UAVObject::ACCESS_READONLY)
             continue;
         up_result=false;
         current_object=obj;

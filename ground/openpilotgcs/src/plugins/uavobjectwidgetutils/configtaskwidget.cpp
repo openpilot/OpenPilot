@@ -367,7 +367,7 @@ void ConfigTaskWidget::forceShadowUpdates()
     setDirty(true);
 }
 /**
- * SLOT function called when on of the widgets contents added to the framework changes
+ * SLOT function called when one of the widgets contents added to the framework changes
  */
 void ConfigTaskWidget::widgetsContentsChanged()
 {
@@ -412,7 +412,8 @@ void ConfigTaskWidget::widgetsContentsChanged()
             }
         }
     }
-    smartsave->resetIcons();
+    if(smartsave)
+        smartsave->resetIcons();
     setDirty(true);
 }
 /**
@@ -1144,6 +1145,30 @@ void ConfigTaskWidget::loadWidgetLimits(QWidget * widget,UAVObjectField * field,
     }
 }
 
+void ConfigTaskWidget::disbleMouseWheelEvents()
+{
+    //Disable mouse wheel events
+    foreach( QSpinBox * sp, findChildren<QSpinBox*>() ) {
+        sp->installEventFilter( this );
+    }
+    foreach( QDoubleSpinBox * sp, findChildren<QDoubleSpinBox*>() ) {
+        sp->installEventFilter( this );
+    }
+    foreach( QSlider * sp, findChildren<QSlider*>() ) {
+        sp->installEventFilter( this );
+    }
+}
+
+bool ConfigTaskWidget::eventFilter( QObject * obj, QEvent * evt ) {
+    //Filter all wheel events, and ignore them
+    if ( evt->type() == QEvent::Wheel &&
+         (qobject_cast<QAbstractSpinBox*>( obj ) || qobject_cast<QAbstractSlider*>( obj ) ))
+    {
+        evt->ignore();
+        return true;
+    }
+    return QWidget::eventFilter( obj, evt );
+}
 /**
   @}
   @}

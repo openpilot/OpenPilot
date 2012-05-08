@@ -16,6 +16,23 @@
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
     <widget class="QScrollArea" name="scrollArea">
+     <property name="styleSheet">
+      <string notr="true">#groupBox_5,#groupBox{
+background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0 rgba(243, 243, 243, 255), stop:1 rgba(250, 250, 250, 255));
+border: 1px outset #999;
+border-radius: 3;
+font:bold;
+}
+
+QGroupBox::title {
+     subcontrol-origin: margin;
+     subcontrol-position: top center; /* position at the top center */
+     padding: 0 3px;
+     background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                       stop: 0 #FFOECE, stop: 1 #FFFFFF);
+	top: 5px;
+ }</string>
+     </property>
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
@@ -28,12 +45,15 @@
         <x>0</x>
         <y>0</y>
         <width>702</width>
-        <height>488</height>
+        <height>484</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
         <widget class="QCheckBox" name="enableCameraStabilization">
+         <property name="focusPolicy">
+          <enum>Qt::StrongFocus</enum>
+         </property>
          <property name="text">
           <string>Enable CameraStabilization module</string>
          </property>
@@ -87,8 +107,11 @@
           <string>Basic Settings (Stabilization)</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_9">
-          <item row="2" column="3">
+          <item row="3" column="3">
            <widget class="QSpinBox" name="yawOutputRange">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="toolTip">
              <string>Camera yaw angle for 100% output value, deg.
 
@@ -103,8 +126,11 @@ have to define channel output range using Output configuration tab.</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="2">
+          <item row="3" column="2">
            <widget class="QSpinBox" name="pitchOutputRange">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="toolTip">
              <string>Camera pitch angle for 100% output value, deg.
 
@@ -119,8 +145,11 @@ have to define channel output range using Output configuration tab.</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
+          <item row="3" column="1">
            <widget class="QSpinBox" name="rollOutputRange">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="toolTip">
              <string>Camera roll angle for 100% output value, deg.
 
@@ -135,8 +164,11 @@ have to define channel output range using Output configuration tab.</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="3">
+          <item row="2" column="3">
            <widget class="QComboBox" name="yawChannel">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="toolTip">
              <string>Yaw output channel for camera gimbal</string>
             </property>
@@ -147,8 +179,11 @@ have to define channel output range using Output configuration tab.</string>
             </item>
            </widget>
           </item>
-          <item row="1" column="2">
+          <item row="2" column="2">
            <widget class="QComboBox" name="pitchChannel">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="toolTip">
              <string>Pitch output channel for camera gimbal</string>
             </property>
@@ -159,8 +194,11 @@ have to define channel output range using Output configuration tab.</string>
             </item>
            </widget>
           </item>
-          <item row="1" column="1">
+          <item row="2" column="1">
            <widget class="QComboBox" name="rollChannel">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="toolTip">
              <string>Roll output channel for camera gimbal</string>
             </property>
@@ -171,22 +209,29 @@ have to define channel output range using Output configuration tab.</string>
             </item>
            </widget>
           </item>
-          <item row="1" column="0">
+          <item row="2" column="0">
            <widget class="QLabel" name="label_42">
             <property name="text">
              <string>Output Channel</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
+          <item row="3" column="0">
            <widget class="QLabel" name="label_43">
             <property name="text">
              <string>Output Range</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="3">
+          <item row="1" column="3">
            <widget class="QLabel" name="label_44">
+            <property name="styleSheet">
+             <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;
+font: bold 12px;
+margin:1px;</string>
+            </property>
             <property name="text">
              <string>Yaw</string>
             </property>
@@ -195,8 +240,15 @@ have to define channel output range using Output configuration tab.</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="2">
+          <item row="1" column="2">
            <widget class="QLabel" name="label_45">
+            <property name="styleSheet">
+             <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;
+font: bold 12px;
+margin:1px;</string>
+            </property>
             <property name="text">
              <string>Pitch</string>
             </property>
@@ -205,8 +257,15 @@ have to define channel output range using Output configuration tab.</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
+          <item row="1" column="1">
            <widget class="QLabel" name="label_46">
+            <property name="styleSheet">
+             <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;
+font: bold 12px;
+margin:1px;</string>
+            </property>
             <property name="text">
              <string>Roll</string>
             </property>
@@ -214,6 +273,19 @@ have to define channel output range using Output configuration tab.</string>
              <set>Qt::AlignCenter</set>
             </property>
            </widget>
+          </item>
+          <item row="0" column="2">
+           <spacer name="verticalSpacer_4">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
           </item>
          </layout>
         </widget>
@@ -252,8 +324,15 @@ have to define channel output range using Output configuration tab.</string>
           <string>Advanced Settings (Control)</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_8">
-          <item row="0" column="3">
+          <item row="1" column="3">
            <widget class="QLabel" name="label_32">
+            <property name="styleSheet">
+             <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;
+font: bold 12px;
+margin:1px;</string>
+            </property>
             <property name="text">
              <string>Yaw</string>
             </property>
@@ -262,8 +341,15 @@ have to define channel output range using Output configuration tab.</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="2">
+          <item row="1" column="2">
            <widget class="QLabel" name="label_33">
+            <property name="styleSheet">
+             <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;
+font: bold 12px;
+margin:1px;</string>
+            </property>
             <property name="text">
              <string>Pitch</string>
             </property>
@@ -272,8 +358,15 @@ have to define channel output range using Output configuration tab.</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
+          <item row="1" column="1">
            <widget class="QLabel" name="label_34">
+            <property name="styleSheet">
+             <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;
+font: bold 12px;
+margin:1px;</string>
+            </property>
             <property name="text">
              <string>Roll</string>
             </property>
@@ -282,8 +375,11 @@ have to define channel output range using Output configuration tab.</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="3">
+          <item row="2" column="3">
            <widget class="QComboBox" name="yawInputChannel">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="toolTip">
              <string>Input channel to control camera yaw
 
@@ -296,8 +392,11 @@ Don't forget to map this channel using Input configuration tab.</string>
             </item>
            </widget>
           </item>
-          <item row="1" column="2">
+          <item row="2" column="2">
            <widget class="QComboBox" name="pitchInputChannel">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="toolTip">
              <string>Input channel to control camera pitch
 
@@ -310,8 +409,11 @@ Don't forget to map this channel using Input configuration tab.</string>
             </item>
            </widget>
           </item>
-          <item row="1" column="1">
+          <item row="2" column="1">
            <widget class="QComboBox" name="rollInputChannel">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="toolTip">
              <string>Input channel to control camera roll
 
@@ -324,15 +426,18 @@ Don't forget to map this channel using Input configuration tab.</string>
             </item>
            </widget>
           </item>
-          <item row="1" column="0">
+          <item row="2" column="0">
            <widget class="QLabel" name="label_35">
             <property name="text">
              <string>Input Channel</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="3">
+          <item row="3" column="3">
            <widget class="QComboBox" name="yawStabilizationMode">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="toolTip">
              <string>Axis stabilization mode
 
@@ -346,8 +451,11 @@ AxisLock: camera remembers tracking attitude. Input controls the rate of deflect
             </item>
            </widget>
           </item>
-          <item row="3" column="3">
+          <item row="4" column="3">
            <widget class="QSpinBox" name="yawInputRange">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="toolTip">
              <string>Maximum camera yaw deflection for 100% input in Attitude mode, deg.</string>
             </property>
@@ -359,8 +467,11 @@ AxisLock: camera remembers tracking attitude. Input controls the rate of deflect
             </property>
            </widget>
           </item>
-          <item row="4" column="3">
+          <item row="5" column="3">
            <widget class="QSpinBox" name="yawInputRate">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="toolTip">
              <string>Maximum camera yaw rate for 100% input in AxisLock mode, deg/s.</string>
             </property>
@@ -372,8 +483,11 @@ AxisLock: camera remembers tracking attitude. Input controls the rate of deflect
             </property>
            </widget>
           </item>
-          <item row="5" column="3">
+          <item row="6" column="3">
            <widget class="QSpinBox" name="yawResponseTime">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="toolTip">
              <string>Input low-pass filter response time for yaw axis, ms.
 
@@ -387,8 +501,11 @@ This option smoothes the stick input. Zero value disables LPF.</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="2">
+          <item row="3" column="2">
            <widget class="QComboBox" name="pitchStabilizationMode">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="toolTip">
              <string>Axis stabilization mode
 
@@ -402,8 +519,11 @@ AxisLock: camera remembers tracking attitude. Input controls the rate of deflect
             </item>
            </widget>
           </item>
-          <item row="3" column="2">
+          <item row="4" column="2">
            <widget class="QSpinBox" name="pitchInputRange">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="toolTip">
              <string>Maximum camera pitch deflection for 100% input in Attitude mode, deg.</string>
             </property>
@@ -415,8 +535,11 @@ AxisLock: camera remembers tracking attitude. Input controls the rate of deflect
             </property>
            </widget>
           </item>
-          <item row="4" column="2">
+          <item row="5" column="2">
            <widget class="QSpinBox" name="pitchInputRate">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="toolTip">
              <string>Maximum camera pitch rate for 100% input in AxisLock mode, deg/s.</string>
             </property>
@@ -428,8 +551,11 @@ AxisLock: camera remembers tracking attitude. Input controls the rate of deflect
             </property>
            </widget>
           </item>
-          <item row="5" column="2">
+          <item row="6" column="2">
            <widget class="QSpinBox" name="pitchResponseTime">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="toolTip">
              <string>Input low-pass filter response time for pitch axis, ms.
 
@@ -443,8 +569,11 @@ This option smoothes the stick input. Zero value disables LPF.</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
+          <item row="3" column="1">
            <widget class="QComboBox" name="rollStabilizationMode">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="toolTip">
              <string>Axis stabilization mode
 
@@ -458,8 +587,11 @@ AxisLock: camera remembers tracking attitude. Input controls the rate of deflect
             </item>
            </widget>
           </item>
-          <item row="3" column="1">
+          <item row="4" column="1">
            <widget class="QSpinBox" name="rollInputRange">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="toolTip">
              <string>Maximum camera roll deflection for 100% input in Attitude mode, deg.</string>
             </property>
@@ -471,8 +603,11 @@ AxisLock: camera remembers tracking attitude. Input controls the rate of deflect
             </property>
            </widget>
           </item>
-          <item row="4" column="1">
+          <item row="5" column="1">
            <widget class="QSpinBox" name="rollInputRate">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="toolTip">
              <string>Maximum camera roll rate for 100% input in AxisLock mode, deg/s.</string>
             </property>
@@ -484,8 +619,11 @@ AxisLock: camera remembers tracking attitude. Input controls the rate of deflect
             </property>
            </widget>
           </item>
-          <item row="5" column="1">
+          <item row="6" column="1">
            <widget class="QSpinBox" name="rollResponseTime">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="toolTip">
              <string>Input low-pass filter response time for roll axis, ms.
 
@@ -499,50 +637,53 @@ This option smoothes the stick input. Zero value disables LPF.</string>
             </property>
            </widget>
           </item>
-          <item row="6" column="0">
+          <item row="7" column="0">
            <widget class="QLabel" name="label_36">
             <property name="text">
              <string>MaxAxisLockRate</string>
             </property>
            </widget>
           </item>
-          <item row="5" column="0">
+          <item row="6" column="0">
            <widget class="QLabel" name="label_37">
             <property name="text">
              <string>Response Time</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="0">
+          <item row="5" column="0">
            <widget class="QLabel" name="label_38">
             <property name="text">
              <string>Input Rate</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="0">
+          <item row="4" column="0">
            <widget class="QLabel" name="label_39">
             <property name="text">
              <string>Input Range</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
+          <item row="3" column="0">
            <widget class="QLabel" name="label_40">
             <property name="text">
              <string>Stabilization Mode</string>
             </property>
            </widget>
           </item>
-          <item row="6" column="2" colspan="2">
+          <item row="7" column="2" colspan="2">
            <widget class="QLabel" name="label_41">
             <property name="text">
              <string>(the same value for Roll, Pitch, Yaw)</string>
             </property>
            </widget>
           </item>
-          <item row="6" column="1">
+          <item row="7" column="1">
            <widget class="QDoubleSpinBox" name="MaxAxisLockRate">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="toolTip">
              <string>Stick input deadband for all axes in AxisLock mode, deg/s.
 
@@ -563,6 +704,19 @@ value.</string>
              <double>1.000000000000000</double>
             </property>
            </widget>
+          </item>
+          <item row="0" column="2">
+           <spacer name="verticalSpacer_5">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
           </item>
          </layout>
         </widget>

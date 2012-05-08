@@ -36,16 +36,7 @@ UAVMetaObject::UAVMetaObject(quint32 objID, const QString& name, UAVObject* pare
 {
     this->parent = parent;
     // Setup default metadata of metaobject (can not be changed)
-    ownMetadata.flightAccess = ACCESS_READWRITE;
-    ownMetadata.gcsAccess = ACCESS_READWRITE;
-    ownMetadata.flightTelemetryAcked = 1;
-    ownMetadata.flightTelemetryUpdateMode = UPDATEMODE_ONCHANGE;
-    ownMetadata.flightTelemetryUpdatePeriod = 0;
-    ownMetadata.gcsTelemetryAcked = 1;
-    ownMetadata.gcsTelemetryUpdateMode = UPDATEMODE_ONCHANGE;
-    ownMetadata.gcsTelemetryUpdatePeriod = 0;
-    ownMetadata.loggingUpdateMode = UPDATEMODE_ONCHANGE;
-    ownMetadata.loggingUpdatePeriod = 0;
+    UAVObject::MetadataInitialize(ownMetadata);
     // Setup fields
     QStringList boolEnum;
     boolEnum << tr("False") << tr("True");
@@ -54,16 +45,10 @@ UAVMetaObject::UAVMetaObject(quint32 objID, const QString& name, UAVObject* pare
     QStringList accessModeEnum;
     accessModeEnum << tr("Read/Write") << tr("Read Only");
     QList<UAVObjectField*> fields;    
-    fields.append( new UAVObjectField(tr("Flight Access Mode"), tr(""), UAVObjectField::ENUM, 1, accessModeEnum) );
-    fields.append( new UAVObjectField(tr("GCS Access Mode"), tr(""), UAVObjectField::ENUM, 1, accessModeEnum) );
-    fields.append( new UAVObjectField(tr("Flight Telemetry Acked"), tr(""), UAVObjectField::ENUM, 1, boolEnum) );
-    fields.append( new UAVObjectField(tr("Flight Telemetry Update Mode"), tr(""), UAVObjectField::ENUM, 1, updateModeEnum) );
-    fields.append( new UAVObjectField(tr("Flight Telemetry Update Period"), tr(""), UAVObjectField::UINT32, 1, QStringList()) );
-    fields.append( new UAVObjectField(tr("GCS Telemetry Acked"), tr(""), UAVObjectField::ENUM, 1, boolEnum) );
-    fields.append( new UAVObjectField(tr("GCS Telemetry Update Mode"), tr(""), UAVObjectField::ENUM, 1, updateModeEnum) );
-    fields.append( new UAVObjectField(tr("GCS Telemetry Update Period"), tr(""), UAVObjectField::UINT32, 1, QStringList()) );
-    fields.append( new UAVObjectField(tr("Logging Update Mode"), tr(""), UAVObjectField::ENUM, 1, updateModeEnum) );
-    fields.append( new UAVObjectField(tr("Logging Update Period"), tr(""), UAVObjectField::UINT32, 1, QStringList()) );
+    fields.append( new UAVObjectField(tr("Modes"), tr(""), UAVObjectField::UINT8, 1, accessModeEnum) );
+    fields.append( new UAVObjectField(tr("Flight Telemetry Update Period"), tr(""), UAVObjectField::UINT16, 1, QStringList()) );
+    fields.append( new UAVObjectField(tr("GCS Telemetry Update Period"), tr(""), UAVObjectField::UINT16, 1, QStringList()) );
+    fields.append( new UAVObjectField(tr("Logging Update Period"), tr(""), UAVObjectField::UINT16, 1, QStringList()) );
     // Initialize parent
     UAVObject::initialize(0);
     UAVObject::initializeFields(fields, (quint8*)&parentMetadata, sizeof(Metadata));

@@ -163,6 +163,7 @@ private slots:
     void modeChanged(Core::IMode *mode);
     void showUavGadgetMenus(bool show, bool hasSplitter);
     void applyTabBarSettings(QTabWidget::TabPosition pos, bool movable);
+    void showHelp();
 
 private:
     void updateContextObject(IContext *context);

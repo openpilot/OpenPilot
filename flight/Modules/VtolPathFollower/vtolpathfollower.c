@@ -132,7 +132,6 @@ static void vtolPathFollowerTask(void *parameters)
 {
 	SystemSettingsData systemSettings;
 	FlightStatusData flightStatus;
-	PathDesiredData pathDesired;
 
 	portTickType lastUpdateTime;
 	

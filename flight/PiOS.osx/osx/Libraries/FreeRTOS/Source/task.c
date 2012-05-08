@@ -62,6 +62,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <time.h>
+#include <sys/times.h>
 
 /* Defining MPU_WRAPPERS_INCLUDED_FROM_API_FILE prevents task.h from redefining
 all the API functions to use the MPU wrappers.  That should only be done when
@@ -1943,7 +1945,7 @@ static portTASK_FUNCTION( prvIdleTask, pvParameters )
 {
 	/* Stop warnings. */
 	( void ) pvParameters;
-
+	int last_idle_time = clock();
 	for( ;; )
 	{
 		/* See if any tasks have been deleted. */
@@ -1986,6 +1988,8 @@ static portTASK_FUNCTION( prvIdleTask, pvParameters )
 			without the overhead of a separate task.
 			NOTE: vApplicationIdleHook() MUST NOT, UNDER ANY CIRCUMSTANCES,
 			CALL A FUNCTION THAT MIGHT BLOCK. */
+			while(clock() < (last_idle_time + 1));
+			last_idle_time = clock();
 			vApplicationIdleHook();
 		}
 		#endif

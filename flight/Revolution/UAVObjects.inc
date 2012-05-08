@@ -61,7 +61,6 @@ UAVOBJSRCFILENAMES += objectpersistence
 UAVOBJSRCFILENAMES += overosyncstats
 UAVOBJSRCFILENAMES += pathdesired
 UAVOBJSRCFILENAMES += positionactual
-UAVOBJSRCFILENAMES += positiondesired
 UAVOBJSRCFILENAMES += ratedesired
 UAVOBJSRCFILENAMES += revocalibration
 UAVOBJSRCFILENAMES += revosettings

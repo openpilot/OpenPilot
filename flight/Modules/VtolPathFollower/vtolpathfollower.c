@@ -125,6 +125,7 @@ static float northPosIntegral = 0;
 static float eastPosIntegral = 0;
 static float downPosIntegral = 0;
 
+static float throttleOffset = 0;
 /**
  * Module thread, should not return.
  */
@@ -206,7 +207,12 @@ static void vtolPathFollowerTask(void *parameters)
 				northPosIntegral = 0;
 				eastPosIntegral = 0;
 				downPosIntegral = 0;
-				
+
+				// Track throttle before engaging this mode.  Cheap system ident
+				StabilizationDesiredData stabDesired;
+				StabilizationDesiredGet(&stabDesired);
+				throttleOffset = stabDesired.Throttle;
+
 				break;
 		}
 	}
@@ -453,7 +459,7 @@ static void updateVtolDesiredAttitude()
 		       downVelIntegral -
 		       nedAccel.Down * guidanceSettings.VerticalVelPID[GUIDANCESETTINGS_VERTICALVELPID_KD]);
 	
-	stabDesired.Throttle = bound(downCommand, 0, 1);
+	stabDesired.Throttle = bound(downCommand + throttleOffset, 0, 1);
 	
 	// Project the north and east command signals into the pitch and roll based on yaw.  For this to behave well the
 	// craft should move similarly for 5 deg roll versus 5 deg pitch

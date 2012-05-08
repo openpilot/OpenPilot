@@ -1,10 +1,16 @@
 <xml>
     <object name="PathDesired" singleinstance="true" settings="false">
-        <description>The position the craft is trying t achieve.  Can come from GCS or @ref PathPlanner </description>
+        <description>The endpoint or path the craft is trying to achieve.  Can come from @ref ManualControl or @ref PathPlanner </description>
+
 	<field name="Start" units="m" type="float" elementnames="North,East,Down" default="0"/>
         <field name="End" units="m" type="float" elementnames="North,East,Down" default="0"/>
 	<field name="StartingVelocity" units="m/s" type="float" elements="1" default="0"/>
 	<field name="EndingVelocity" units="m/s" type="float" elements="1" default="0"/>
+
+	<field name="Mode" units="" type="enum" elements="1" options="Endpoint,Path" default="0"/>
+	<!-- Endpoint Mode - Fly to end location and attempt to stay there -->
+	<!-- Path Mode - Attempt to fly a line from Start to End using specifed velocity -->
+
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>
         <telemetryflight acked="false" updatemode="onchange" period="0"/>

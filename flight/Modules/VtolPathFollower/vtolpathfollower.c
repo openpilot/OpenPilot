@@ -49,8 +49,8 @@
 #include "vtolpathfollower.h"
 #include "accels.h"
 #include "attitudeactual.h"
-#include "pathdesired.h"	// object that will be updated by the module
-#include "positiondesired.h"	// object that will be updated by the module
+#include "pathdesired.h"        // object that will be updated by the module
+#include "positiondesired.h"    // object that will be updated by the module
 #include "positionactual.h"
 #include "manualcontrol.h"
 #include "flightstatus.h"
@@ -71,23 +71,22 @@
 #define STACK_SIZE_BYTES 1548
 #define TASK_PRIORITY (tskIDLE_PRIORITY+2)
 #define F_PI 3.14159265358979323846f
+
 // Private types
 
 // Private variables
 static xTaskHandle pathfollowerTaskHandle;
-static xQueueHandle queue;
+static PathDesiredData pathDesired;
+static GuidanceSettingsData guidanceSettings;
 
 // Private functions
 static void vtolPathFollowerTask(void *parameters);
-static float bound(float val, float min, float max);
-
+static void SettingsUpdatedCb(UAVObjEvent * ev);
 static void updateNedAccel();
 static void updatePathVelocity();
-static void updateVtolDesiredVelocity();
-static void manualSetDesiredVelocity();
+static void updateEndpointVelocity();
 static void updateVtolDesiredAttitude();
-
-static GuidanceSettingsData guidanceSettings;
+static float bound(float val, float min, float max);
 
 /**
  * Initialise the module, called on startup
@@ -111,17 +110,11 @@ int32_t VtolPathFollowerInitialize()
 	GuidanceSettingsInitialize();
 	NedAccelInitialize();
 	PathDesiredInitialize();
-	PositionDesiredInitialize();
 	VelocityDesiredInitialize();
-
-	// Create object queue
-	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
-	
-	// Listen for updates.
-	AccelsConnectQueue(queue);
 	
 	return 0;
 }
+
 MODULE_INITCALL(VtolPathFollowerInitialize, VtolPathFollowerStart)
 
 static float northVelIntegral = 0;
@@ -132,8 +125,6 @@ static float northPosIntegral = 0;
 static float eastPosIntegral = 0;
 static float downPosIntegral = 0;
 
-static uint8_t positionHoldLast = 0;
-
 /**
  * Module thread, should not return.
  */
@@ -141,14 +132,24 @@ static void vtolPathFollowerTask(void *parameters)
 {
 	SystemSettingsData systemSettings;
 	FlightStatusData flightStatus;
+	PathDesiredData pathDesired;
 
-	portTickType thisTime;
 	portTickType lastUpdateTime;
-	UAVObjEvent ev;
+	
+	GuidanceSettingsConnectCallback(SettingsUpdatedCb);
+	PathDesiredConnectCallback(SettingsUpdatedCb);
+	
+	GuidanceSettingsGet(&guidanceSettings);
+	PathDesiredGet(&pathDesired);
 	
 	// Main task loop
 	lastUpdateTime = xTaskGetTickCount();
 	while (1) {
+
+		// Conditions when this runs:
+		// 1. Must have VTOL type airframe
+		// 2. Flight mode is PositionHold and PathDesired.Mode is Endpoint  OR
+		//    FlightMode is PathPlanner and PathDesired.Mode is Endpoint or Path
 
 		SystemSettingsGet(&systemSettings);
 		if ( (systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_VTOL) &&
@@ -168,38 +169,35 @@ static void vtolPathFollowerTask(void *parameters)
 			continue;
 		}
 
-		GuidanceSettingsGet(&guidanceSettings);
-
-		// Wait until the AttitudeRaw object is updated, if a timeout then go to failsafe
-		if ( xQueueReceive(queue, &ev, guidanceSettings.UpdatePeriod / portTICK_RATE_MS) != pdTRUE )
-		{
-			AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_WARNING);
-		} else {
-			AlarmsClear(SYSTEMALARMS_ALARM_GUIDANCE);
-		}
-
 		// Continue collecting data if not enough time
-		thisTime = xTaskGetTickCount();
-		if( (thisTime - lastUpdateTime) < (guidanceSettings.UpdatePeriod / portTICK_RATE_MS) )
-			continue;
+		vTaskDelayUntil(&lastUpdateTime, guidanceSettings.UpdatePeriod / portTICK_RATE_MS);
 
 		// Convert the accels into the NED frame
 		updateNedAccel();
 		
 		FlightStatusGet(&flightStatus);
-		GuidanceSettingsGet(&guidanceSettings);
 
+		// Check the combinations of flightmode and pathdesired mode
 		switch(flightStatus.FlightMode) {
 			case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
-				updateVtolDesiredVelocity();
-				updateVtolDesiredAttitude();
+				if (pathDesired.Mode == PATHDESIRED_MODE_ENDPOINT) {
+					updateEndpointVelocity();
+					updateVtolDesiredAttitude();
+				} else {
+					AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_ERROR);
+				}
 				break;
 			case FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER:
-				if (guidanceSettings.PathMode == GUIDANCESETTINGS_PATHMODE_ENDPOINT)
-					updateVtolDesiredVelocity();
-				else
+				if (pathDesired.Mode == PATHDESIRED_MODE_ENDPOINT) {
+					updateEndpointVelocity();
+					updateVtolDesiredAttitude();
+				} else if (pathDesired.Mode == PATHDESIRED_MODE_PATH) {
 					updatePathVelocity();
-				updateVtolDesiredAttitude();
+					updateVtolDesiredAttitude();
+				} else {
+					AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_ERROR);
+					break;
+				}
 				break;
 			default:
 				// Be cleaner and get rid of global variables
@@ -209,9 +207,7 @@ static void vtolPathFollowerTask(void *parameters)
 				northPosIntegral = 0;
 				eastPosIntegral = 0;
 				downPosIntegral = 0;
-				positionHoldLast = 0;
 				
-				manualSetDesiredVelocity();
 				break;
 		}
 	}
@@ -225,18 +221,8 @@ static void vtolPathFollowerTask(void *parameters)
  */
 static void updatePathVelocity()
 {
-	static portTickType lastSysTime;
-	portTickType thisSysTime = xTaskGetTickCount();;
-	float dT = 0;
+	float dT = guidanceSettings.UpdatePeriod / 1000.0f;
 	float downCommand;
-
-	// Check how long since last update
-	if(thisSysTime > lastSysTime) // reuse dt in case of wraparound
-		dT = (thisSysTime - lastSysTime) / portTICK_RATE_MS / 1000.0f;
-	lastSysTime = thisSysTime;
-
-	PathDesiredData pathDesired;
-	PathDesiredGet(&pathDesired);
 
 	PositionActualData positionActual;
 	PositionActualGet(&positionActual);
@@ -288,20 +274,14 @@ static void updatePathVelocity()
  * Takes in @ref PositionActual and compares it to @ref PositionDesired 
  * and computes @ref VelocityDesired
  */
-void updateVtolDesiredVelocity()
+void updateEndpointVelocity()
 {
-	static portTickType lastSysTime;
-	portTickType thisSysTime = xTaskGetTickCount();;
-	float dT = 0;
+	float dT = guidanceSettings.UpdatePeriod / 1000.0f;
 
-	GuidanceSettingsData guidanceSettings;
 	PositionActualData positionActual;
-	PositionDesiredData positionDesired;
 	VelocityDesiredData velocityDesired;
 	
-	GuidanceSettingsGet(&guidanceSettings);
 	PositionActualGet(&positionActual);
-	PositionDesiredGet(&positionDesired);
 	VelocityDesiredGet(&velocityDesired);
 	
 	float northError;
@@ -310,11 +290,6 @@ void updateVtolDesiredVelocity()
 	float northCommand;
 	float eastCommand;
 	float downCommand;
-
-	// Check how long since last update
-	if(thisSysTime > lastSysTime) // reuse dt in case of wraparound
-		dT = (thisSysTime - lastSysTime) / portTICK_RATE_MS / 1000.0f;		
-	lastSysTime = thisSysTime;
 	
 	float northPos = 0, eastPos = 0, downPos = 0;
 	switch (guidanceSettings.PositionSource) {
@@ -337,23 +312,22 @@ void updateVtolDesiredVelocity()
 			break;
 	}
 
-	// Note all distances in cm
 	// Compute desired north command
-	northError = positionDesired.North - northPos;
+	northError = pathDesired.End[PATHDESIRED_END_NORTH] - northPos;
 	northPosIntegral = bound(northPosIntegral + northError * dT * guidanceSettings.HorizontalPosPI[GUIDANCESETTINGS_HORIZONTALPOSPI_KI], 
 			      -guidanceSettings.HorizontalPosPI[GUIDANCESETTINGS_HORIZONTALPOSPI_ILIMIT],
 			      guidanceSettings.HorizontalPosPI[GUIDANCESETTINGS_HORIZONTALPOSPI_ILIMIT]);
 	northCommand = (northError * guidanceSettings.HorizontalPosPI[GUIDANCESETTINGS_HORIZONTALPOSPI_KP] +
 			northPosIntegral);
 	
-	eastError = positionDesired.East - eastPos;
+	eastError = pathDesired.End[PATHDESIRED_END_EAST] - eastPos;
 	eastPosIntegral = bound(eastPosIntegral + eastError * dT * guidanceSettings.HorizontalPosPI[GUIDANCESETTINGS_HORIZONTALPOSPI_KI], 
 				 -guidanceSettings.HorizontalPosPI[GUIDANCESETTINGS_HORIZONTALPOSPI_ILIMIT],
 				 guidanceSettings.HorizontalPosPI[GUIDANCESETTINGS_HORIZONTALPOSPI_ILIMIT]);
 	eastCommand = (eastError * guidanceSettings.HorizontalPosPI[GUIDANCESETTINGS_HORIZONTALPOSPI_KP] +
 		       eastPosIntegral);
 	
-	
+	// Limit the maximum velocity
 	float total_vel = sqrtf(powf(northCommand,2) + powf(eastCommand,2));
 	float scale = 1;
 	if(total_vel > guidanceSettings.HorizontalVelMax)
@@ -362,7 +336,7 @@ void updateVtolDesiredVelocity()
 	velocityDesired.North = northCommand * scale;
 	velocityDesired.East = eastCommand * scale;
 
-	downError = positionDesired.Down - downPos;
+	downError = pathDesired.End[PATHDESIRED_END_DOWN] - downPos;
 	downPosIntegral = bound(downPosIntegral + downError * dT * guidanceSettings.VerticalPosPI[GUIDANCESETTINGS_VERTICALPOSPI_KI], 
 				-guidanceSettings.VerticalPosPI[GUIDANCESETTINGS_VERTICALPOSPI_ILIMIT],
 				guidanceSettings.VerticalPosPI[GUIDANCESETTINGS_VERTICALPOSPI_ILIMIT]);
@@ -383,9 +357,7 @@ void updateVtolDesiredVelocity()
  */
 static void updateVtolDesiredAttitude()
 {
-	static portTickType lastSysTime;
-	portTickType thisSysTime = xTaskGetTickCount();;
-	float dT = 0;
+	float dT = guidanceSettings.UpdatePeriod / 1000.0f;
 
 	VelocityDesiredData velocityDesired;
 	VelocityActualData velocityActual;
@@ -404,12 +376,7 @@ static void updateVtolDesiredAttitude()
 
 	float downError;
 	float downCommand;
-	
-	// Check how long since last update
-	if(thisSysTime > lastSysTime) // reuse dt in case of wraparound
-		dT = (thisSysTime - lastSysTime) / portTICK_RATE_MS / 1000.0f;		
-	lastSysTime = thisSysTime;
-	
+		
 	SystemSettingsGet(&systemSettings);
 	GuidanceSettingsGet(&guidanceSettings);
 	
@@ -553,27 +520,6 @@ static void updateNedAccel()
 }
 
 /**
- * Set the desired velocity from the input sticks
- */
-static void manualSetDesiredVelocity() 
-{
-	ManualControlCommandData cmd;
-	VelocityDesiredData velocityDesired;
-	
-	ManualControlCommandGet(&cmd);
-	VelocityDesiredGet(&velocityDesired);
-
-	GuidanceSettingsData guidanceSettings;
-	GuidanceSettingsGet(&guidanceSettings);
-	
-	velocityDesired.North = -guidanceSettings.HorizontalVelMax * cmd.Pitch;
-	velocityDesired.East = guidanceSettings.HorizontalVelMax * cmd.Roll;
-	velocityDesired.Down = 0;
-	
-	VelocityDesiredSet(&velocityDesired);	
-}
-
-/**
  * Bound input value between limits
  */
 static float bound(float val, float min, float max)
@@ -585,3 +531,10 @@ static float bound(float val, float min, float max)
 	}
 	return val;
 }
+
+static void SettingsUpdatedCb(UAVObjEvent * ev)
+{
+	GuidanceSettingsGet(&guidanceSettings);
+	PathDesiredGet(&pathDesired);
+}
+

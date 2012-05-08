@@ -107,6 +107,8 @@ namespace mapcontrol
         void wheelEvent ( QGraphicsSceneWheelEvent * event );
         void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
         bool IsMouseOverMarker()const{return isMouseOverMarker;}
+        void keyPressEvent ( QKeyEvent * event );
+        void keyReleaseEvent ( QKeyEvent * event );
 
         /**
         * @brief Returns current map zoom

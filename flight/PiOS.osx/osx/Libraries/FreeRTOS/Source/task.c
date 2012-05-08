@@ -57,7 +57,8 @@
     licensing and training services.
 */
 
-
+#include <pthread.h>
+#include <sched.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1988,7 +1989,8 @@ static portTASK_FUNCTION( prvIdleTask, pvParameters )
 			without the overhead of a separate task.
 			NOTE: vApplicationIdleHook() MUST NOT, UNDER ANY CIRCUMSTANCES,
 			CALL A FUNCTION THAT MIGHT BLOCK. */
-			while(clock() < (last_idle_time + 1));
+			while(clock() < (last_idle_time + 1))
+				sched_yield();
 			last_idle_time = clock();
 			vApplicationIdleHook();
 		}

@@ -44,7 +44,7 @@
 #include "manualcontrolsettings.h"
 #include "manualcontrolcommand.h"
 #include "positionactual.h"
-#include "positiondesired.h"
+#include "pathdesired.h"
 #include "stabilizationsettings.h"
 #include "stabilizationdesired.h"
 #include "receiveractivity.h"
@@ -83,8 +83,8 @@ static portTickType lastSysTime;
 // Private functions
 static void updateActuatorDesired(ManualControlCommandData * cmd);
 static void updateStabilizationDesired(ManualControlCommandData * cmd, ManualControlSettingsData * settings);
-static void altitudeHoldDesired(ManualControlCommandData * cmd);
-static void positionDesired(ManualControlCommandData * cmd);
+static void altitudeHoldDesired(ManualControlCommandData * cmd, bool changed);
+static void updatePathDesired(ManualControlCommandData * cmd, bool changed);
 static void processFlightMode(ManualControlSettingsData * settings, float flightMode);
 static void processArm(ManualControlCommandData * cmd, ManualControlSettingsData * settings);
 static void setArmedIfChanged(uint8_t val);
@@ -377,6 +377,7 @@ static void manualControlTask(void *parameters)
 		FlightStatusGet(&flightStatus);
 
 		// Depending on the mode update the Stabilization or Actuator objects
+		static uint8_t lastFlightMode = FLIGHTSTATUS_FLIGHTMODE_MANUAL;
 		switch(PARSE_FLIGHT_MODE(flightStatus.FlightMode)) {
 			case FLIGHTMODE_UNDEFINED:
 				// This reflects a bug in the code architecture!
@@ -391,16 +392,17 @@ static void manualControlTask(void *parameters)
 			case FLIGHTMODE_GUIDANCE:
 				switch(flightStatus.FlightMode) {
 					case FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD:
-						altitudeHoldDesired(&cmd);
+						altitudeHoldDesired(&cmd, lastFlightMode != flightStatus.FlightMode);
 						break;
 					case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
-						positionDesired(&cmd);
+						updatePathDesired(&cmd, lastFlightMode != flightStatus.FlightMode);
 						break;
 					default:
 						AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_CRITICAL);
 				}
 				break;
 		}
+		lastFlightMode = flightStatus.FlightMode;
 	}
 }
 
@@ -617,7 +619,7 @@ static void updateStabilizationDesired(ManualControlCommandData * cmd, ManualCon
  * @brief Update the position desired to current location when
  * enabled and allow the waypoint to be moved by transmitter
  */
-static void positionDesired(ManualControlCommandData * cmd)
+static void updatePathDesired(ManualControlCommandData * cmd, bool changed)
 {
 	static portTickType lastSysTime;
 	portTickType thisSysTime;
@@ -627,19 +629,25 @@ static void positionDesired(ManualControlCommandData * cmd)
 	dT = (thisSysTime - lastSysTime) / portTICK_RATE_MS / 1000.0f;
 	lastSysTime = thisSysTime;
 
-	if(dT > 1) {
+	if(changed) {
 		// After not being in this mode for a while init at current height
 		PositionActualData positionActual;
 		PositionActualGet(&positionActual);
 		
-		PositionDesiredData positionDesired;
-		PositionDesiredGet(&positionDesired);
-		positionDesired.North = positionActual.North;
-		positionDesired.East = positionActual.East;
-		positionDesired.Down = positionActual.Down;
-		PositionDesiredSet(&positionDesired);
+		PathDesiredData pathDesired;
+		PathDesiredGet(&pathDesired);
+		pathDesired.End[PATHDESIRED_END_NORTH] = positionActual.North;
+		pathDesired.End[PATHDESIRED_END_EAST] = positionActual.East;
+		pathDesired.End[PATHDESIRED_END_DOWN] = positionActual.Down;
+		pathDesired.Mode = PATHDESIRED_MODE_ENDPOINT;
+		PathDesiredSet(&pathDesired);
 	} else {
-		// TODO: Implement moving magic waypoint with remote
+		PathDesiredData pathDesired;
+		PathDesiredGet(&pathDesired);
+		pathDesired.End[PATHDESIRED_END_NORTH] += dT * -cmd->Pitch;
+		pathDesired.End[PATHDESIRED_END_EAST] += dT * cmd->Roll;
+		pathDesired.Mode = PATHDESIRED_MODE_ENDPOINT;
+		PathDesiredSet(&pathDesired);
 	}
 }
 
@@ -648,7 +656,7 @@ static void positionDesired(ManualControlCommandData * cmd)
  * enabled and enable altitude mode for stabilization
  * @todo: Need compile flag to exclude this from copter control
  */
-static void altitudeHoldDesired(ManualControlCommandData * cmd)
+static void altitudeHoldDesired(ManualControlCommandData * cmd, bool changed)
 {
 	const float DEADBAND_HIGH = 0.55;
 	const float DEADBAND_LOW = 0.45;
@@ -673,7 +681,7 @@ static void altitudeHoldDesired(ManualControlCommandData * cmd)
 	
 	float currentDown;
 	PositionActualDownGet(&currentDown);
-	if(dT > 1) {
+	if(changed) {
 		// After not being in this mode for a while init at current height
 		altitudeHoldDesired.Altitude = 0;
 		zeroed = false;

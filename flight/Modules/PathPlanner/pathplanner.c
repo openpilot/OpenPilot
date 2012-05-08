@@ -36,7 +36,6 @@
 #include "guidancesettings.h"
 #include "pathdesired.h"
 #include "positionactual.h"
-#include "positiondesired.h"
 #include "waypoint.h"
 #include "waypointactive.h"
 
@@ -103,7 +102,6 @@ static void pathPlannerTask(void *parameters)
 	FlightStatusData flightStatus;
 	PathDesiredData pathDesired;
 	PositionActualData positionActual;
-	PositionDesiredData positionDesired;
 	
 	createPath();
 	
@@ -152,11 +150,12 @@ static void pathPlannerTask(void *parameters)
 							break;
 						case WAYPOINT_ACTION_RTH:
 							// Fly back to the home location but 20 m above it
-							PositionDesiredGet(&positionDesired);
-							positionDesired.North = 0;
-							positionDesired.East = 0;
-							positionDesired.Down = -20;
-							PositionDesiredSet(&positionDesired);
+							PathDesiredGet(&pathDesired);
+							pathDesired.End[PATHDESIRED_END_NORTH] = 0;
+							pathDesired.End[PATHDESIRED_END_EAST] = 0;
+							pathDesired.End[PATHDESIRED_END_DOWN] = -20;
+							pathDesired.Mode = PATHDESIRED_MODE_ENDPOINT;
+							PathDesiredSet(&pathDesired);
 							break;
 						default:
 							PIOS_DEBUG_Assert(0);
@@ -184,11 +183,12 @@ static void pathPlannerTask(void *parameters)
 							break;
 						case WAYPOINT_ACTION_RTH:
 							// Fly back to the home location but 20 m above it
-							PositionDesiredGet(&positionDesired);
-							positionDesired.North = 0;
-							positionDesired.East = 0;
-							positionDesired.Down = -20;
-							PositionDesiredSet(&positionDesired);
+							PathDesiredGet(&pathDesired);
+							pathDesired.End[PATHDESIRED_END_NORTH] = 0;
+							pathDesired.End[PATHDESIRED_END_EAST] = 0;
+							pathDesired.End[PATHDESIRED_END_DOWN] = -20;
+							pathDesired.Mode = PATHDESIRED_MODE_ENDPOINT;
+							PathDesiredSet(&pathDesired);
 							break;
 						default:
 							PIOS_DEBUG_Assert(0);
@@ -216,15 +216,18 @@ static void waypointsUpdated(UAVObjEvent * ev)
 	
 	GuidanceSettingsGet(&guidanceSettings);
 
+	PathDesiredData pathDesired;
+
 	switch(guidanceSettings.PathMode) {
 		case GUIDANCESETTINGS_PATHMODE_ENDPOINT:
 		{
-			PositionDesiredData positionDesired;
-			PositionDesiredGet(&positionDesired);
-			positionDesired.North = waypoint.Position[WAYPOINT_POSITION_NORTH];
-			positionDesired.East = waypoint.Position[WAYPOINT_POSITION_EAST];
-			positionDesired.Down = waypoint.Position[WAYPOINT_POSITION_DOWN];
-			PositionDesiredSet(&positionDesired);
+			PathDesiredGet(&pathDesired);
+			pathDesired.End[PATHDESIRED_END_NORTH] = waypoint.Position[WAYPOINT_POSITION_NORTH];
+			pathDesired.End[PATHDESIRED_END_EAST] = waypoint.Position[WAYPOINT_POSITION_EAST];
+			pathDesired.End[PATHDESIRED_END_DOWN] = -waypoint.Position[WAYPOINT_POSITION_DOWN];
+			pathDesired.Mode = PATHDESIRED_MODE_ENDPOINT;
+			PathDesiredSet(&pathDesired);
+
 		}
 			break;
 
@@ -235,6 +238,7 @@ static void waypointsUpdated(UAVObjEvent * ev)
 			pathDesired.End[PATHDESIRED_END_NORTH] = waypoint.Position[WAYPOINT_POSITION_NORTH];
 			pathDesired.End[PATHDESIRED_END_EAST] = waypoint.Position[WAYPOINT_POSITION_EAST];
 			pathDesired.End[PATHDESIRED_END_DOWN] = waypoint.Position[WAYPOINT_POSITION_DOWN];
+			pathDesired.Mode = PATHDESIRED_MODE_PATH;
 			pathDesired.EndingVelocity = sqrtf(powf(waypoint.Velocity[WAYPOINT_VELOCITY_NORTH],2) + 
 											   powf(waypoint.Velocity[WAYPOINT_VELOCITY_EAST],2));
 

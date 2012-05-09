@@ -57,8 +57,8 @@ private:
 
 	void assignChannel(UAVDataObject *obj, QString str);
 	void assignOutputChannel(UAVDataObject *obj, QString str);
-        OutputChannelForm* getOutputChannelForm(const int index) const;
-
+    OutputChannelForm* getOutputChannelForm(const int index) const;
+    QStringList getChannelDescriptions();
 	int mccDataRate;
 
 	UAVObject::Metadata accInitialData;

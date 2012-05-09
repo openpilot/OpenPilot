@@ -21,16 +21,30 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
-    <widget class="QTableView" name="tableView">
+    <widget class="QTableView" name="waypoints">
      <attribute name="horizontalHeaderCascadingSectionResizes">
       <bool>false</bool>
      </attribute>
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="pushButton">
+    <widget class="QPushButton" name="buttonNewWaypoint">
      <property name="text">
       <string>New Waypoint</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="buttonSaveFile">
+     <property name="text">
+      <string>Save to File</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="buttonLoadFile">
+     <property name="text">
+      <string>Load from File</string>
      </property>
     </widget>
    </item>

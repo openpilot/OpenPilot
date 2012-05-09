@@ -34,16 +34,29 @@
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QPushButton>
 
-#include "uavobject.h"
-#include "uavobjectmanager.h"
-#include "manualcontrolcommand.h"
-#include "extensionsystem/pluginmanager.h"
 #include "extensionsystem/pluginmanager.h"
 
 WaypointEditorGadgetWidget::WaypointEditorGadgetWidget(QWidget *parent) : QLabel(parent)
 {
     m_waypointeditor = new Ui_WaypointEditor();
     m_waypointeditor->setupUi(this);
+
+    waypointTable = new WaypointTable(this);
+    m_waypointeditor->waypoints->setModel(waypointTable);
+
+    // Get the objects used here
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    Q_ASSERT(pm != NULL);
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    Q_ASSERT(objManager != NULL);
+    waypointActiveObj = WaypointActive::GetInstance(objManager);
+    Q_ASSERT(waypointActiveObj != NULL);
+
+    // Connect the signals
+    connect(waypointActiveObj, SIGNAL(objectUpdated(UAVObject*)),
+            this, SLOT(waypointActiveChanged(UAVObject*)));
+    connect(m_waypointeditor->buttonNewWaypoint, SIGNAL(clicked()),
+            this, SLOT(addInstance()));
 }
 
 WaypointEditorGadgetWidget::~WaypointEditorGadgetWidget()

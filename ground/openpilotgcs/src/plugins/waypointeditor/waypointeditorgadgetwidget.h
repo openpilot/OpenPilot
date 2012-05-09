@@ -28,7 +28,7 @@
 #define WaypointEditorGADGETWIDGET_H_
 
 #include <QtGui/QLabel>
-#include <waypoint.h>
+#include <waypointtable.h>
 #include <waypointactive.h>
 
 class Ui_WaypointEditor;
@@ -50,6 +50,8 @@ protected slots:
 
 private:
     Ui_WaypointEditor * m_waypointeditor;
+    WaypointTable *waypointTable;
+    WaypointActive *waypointActiveObj;
 };
 
 #endif /* WaypointEditorGADGETWIDGET_H_ */

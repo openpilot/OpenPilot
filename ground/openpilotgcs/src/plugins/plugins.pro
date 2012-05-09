@@ -134,6 +134,11 @@ plugin_qmlview.depends = plugin_coreplugin
 plugin_qmlview.depends += plugin_uavobjects
 SUBDIRS += plugin_qmlview
 
+# Waypoint Editor gadget
+plugin_waypointeditor.subdir = waypointeditor
+plugin_waypointeditor.depends = plugin_coreplugin
+plugin_waypointeditor.depends += plugin_uavobjects
+SUBDIRS += plugin_waypointeditor
 
 #IP connection plugin
 plugin_ipconnection.subdir = ipconnection

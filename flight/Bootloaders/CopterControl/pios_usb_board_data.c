@@ -31,6 +31,7 @@
 #include "pios_usb_board_data.h" /* struct usb_*, USB_* */
 #include "pios_sys.h"		 /* PIOS_SYS_SerialNumberGet */
 #include "pios_usbhook.h"	 /* PIOS_USBHOOK_* */
+#include <string.h>		 /* strcat */
 
 static const uint8_t usb_product_id[28] = {
 	sizeof(usb_product_id),
@@ -50,34 +51,9 @@ static const uint8_t usb_product_id[28] = {
 	'l', 0,
 };
 
-static uint8_t usb_serial_number[52] = {
+static uint8_t usb_serial_number[2 + 25*2 + 3*2] = {
 	sizeof(usb_serial_number),
 	USB_DESC_TYPE_STRING,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0
 };
 
 static const struct usb_string_langid usb_lang_id = {
@@ -107,8 +83,13 @@ static const uint8_t usb_vendor_id[28] = {
 int32_t PIOS_USB_BOARD_DATA_Init(void)
 {
 	/* Load device serial number into serial number string */
-	uint8_t sn[25];
+	uint8_t sn[25+3];
 	PIOS_SYS_SerialNumberGet((char *)sn);
+
+	/* Add the appropriate suffix ("+BL" or "+FW") depending on what we're running */
+	strcat((char *)sn, PIOS_USB_BOARD_SN_SUFFIX);
+
+	/* Map the serial number string into the unicode serial number for USB */
 	for (uint8_t i = 0; sn[i] != '\0' && (2 * i) < usb_serial_number[0]; i++) {
 		usb_serial_number[2 + 2 * i] = sn[i];
 	}

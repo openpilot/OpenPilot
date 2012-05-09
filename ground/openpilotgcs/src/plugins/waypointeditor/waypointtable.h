@@ -39,11 +39,17 @@ class WaypointTable : public QAbstractTableModel
 public:
     explicit WaypointTable(QObject *parent = 0);
 
+    // Get dimensionality of the data
     int rowCount(const QModelIndex &parent) const;
     int columnCount(const QModelIndex &parent) const;
 
+    // Access data
     QVariant data(const QModelIndex &index, int role) const;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const;
+
+    // Functions to make the data editable
+    Qt::ItemFlags flags(const QModelIndex &index) const;
+    bool setData ( const QModelIndex & index, const QVariant & value, int role);
 signals:
 
 protected slots:
@@ -52,6 +58,7 @@ protected slots:
 public slots:
 
 private:
+    UAVObjectManager *objManager;
     Waypoint *waypointObj;
     WaypointActive *waypointActiveObj;
     QList <QString> headers;

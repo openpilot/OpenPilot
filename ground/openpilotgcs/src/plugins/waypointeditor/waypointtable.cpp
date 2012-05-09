@@ -34,15 +34,18 @@ WaypointTable::WaypointTable(QObject *parent) :
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     Q_ASSERT(pm != NULL);
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    objManager = pm->getObject<UAVObjectManager>();
     Q_ASSERT(objManager != NULL);
     waypointObj = Waypoint::GetInstance(objManager);
     Q_ASSERT(waypointObj != NULL);
     waypointActiveObj = WaypointActive::GetInstance(objManager);
-    Q_ASSERT(waypointObj != NULL);
+    Q_ASSERT(waypointActiveObj != NULL);
 
     elements = 0;
 
+    // Unfortunately there is no per object new instance signal yet
+    connect(objManager, SIGNAL(newInstance(UAVObject*)),
+            this, SLOT(waypointsUpdated(UAVObject*)));
     connect(waypointActiveObj, SIGNAL(objectUpdated(UAVObject*)),
             this, SLOT(waypointsUpdated(UAVObject*)));
     connect(waypointObj, SIGNAL(),
@@ -54,7 +57,7 @@ WaypointTable::WaypointTable(QObject *parent) :
     headers.append(QString("Down"));
 }
 
-int WaypointTable::rowCount(const QModelIndex &parent) const
+int WaypointTable::rowCount(const QModelIndex & /*parent*/) const
 {
     return elements;
 }
@@ -70,11 +73,6 @@ int WaypointTable::columnCount(const QModelIndex &parent) const
 QVariant WaypointTable::data(const QModelIndex &index, int role) const
 {
     if(role == Qt::DisplayRole) {
-        ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-        Q_ASSERT(pm != NULL);
-        UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-        Q_ASSERT(objManager != NULL);
-
         Waypoint *obj = Waypoint::GetInstance(objManager, index.row());
         Q_ASSERT(obj);
         Waypoint::DataFields waypoint = obj->getData();
@@ -120,22 +118,56 @@ QVariant WaypointTable::headerData(int section, Qt::Orientation orientation, int
   */
 void WaypointTable::waypointsUpdated(UAVObject *)
 {
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    Q_ASSERT(pm != NULL);
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    Q_ASSERT(objManager != NULL);
-    int elementsNow = objManager->getNumInstances(waypointObj->getObjID());
+     int elementsNow = objManager->getNumInstances(waypointObj->getObjID());
 
     // Currently only support adding instances which is all the UAVO manager
     // supports
+    qDebug() << "Elements before " << elementsNow << " and cached " << elements;
     if (elementsNow > elements) {
-        beginInsertRows(QModelIndex(), elements, elementsNow);
+        beginInsertRows(QModelIndex(), elements, elementsNow-1);
         elements = elementsNow;
         endInsertRows();
     }
 
     QModelIndex i1 = index(0,0);
-    QModelIndex i2 = index(elements, columnCount(QModelIndex()));
-    qDebug() << "Waypoints updated.  Found " << rowCount(QModelIndex());
+    QModelIndex i2 = index(elements-1, columnCount(QModelIndex()));
     emit dataChanged(i1, i2);
+}
+
+Qt::ItemFlags WaypointTable::flags(const QModelIndex &index) const
+{
+    return QAbstractTableModel::flags(index) | Qt::ItemIsEditable;
+}
+
+bool WaypointTable::setData ( const QModelIndex & index, const QVariant & value, int role = Qt::EditRole )
+{
+//    if(role != Qt::EditRole)
+//        return false;
+
+    double val = value.toDouble();
+    qDebug() << "New value " << val << " for column " << index.column();
+
+    Waypoint *obj = Waypoint::GetInstance(objManager, index.row());
+    Q_ASSERT(obj);
+    Waypoint::DataFields waypoint = obj->getData();
+
+    switch(index.column()) {
+    case 0:
+        waypoint.Position[Waypoint::POSITION_NORTH] = val;
+        break;
+    case 1:
+        waypoint.Position[Waypoint::POSITION_EAST] = val;
+        break;
+    case 2:
+        waypoint.Position[Waypoint::POSITION_DOWN] = val;
+        break;
+    default:
+        return false;
+    }
+
+    obj->setData(waypoint);
+    obj->updated();
+    qDebug() << "Set data for instance " << obj->getInstID();
+
+    return true;
 }

@@ -51,7 +51,7 @@ protected slots:
 private:
     Ui_WaypointEditor * m_waypointeditor;
     WaypointTable *waypointTable;
-    WaypointActive *waypointActiveObj;
+    Waypoint *waypointObj;
 };
 
 #endif /* WaypointEditorGADGETWIDGET_H_ */

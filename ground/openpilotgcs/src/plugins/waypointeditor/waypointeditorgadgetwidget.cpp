@@ -44,17 +44,14 @@ WaypointEditorGadgetWidget::WaypointEditorGadgetWidget(QWidget *parent) : QLabel
     waypointTable = new WaypointTable(this);
     m_waypointeditor->waypoints->setModel(waypointTable);
 
-    // Get the objects used here
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     Q_ASSERT(pm != NULL);
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
     Q_ASSERT(objManager != NULL);
-    waypointActiveObj = WaypointActive::GetInstance(objManager);
-    Q_ASSERT(waypointActiveObj != NULL);
+    waypointObj = Waypoint::GetInstance(objManager);
+    Q_ASSERT(waypointObj != NULL);
 
     // Connect the signals
-    connect(waypointActiveObj, SIGNAL(objectUpdated(UAVObject*)),
-            this, SLOT(waypointActiveChanged(UAVObject*)));
     connect(m_waypointeditor->buttonNewWaypoint, SIGNAL(clicked()),
             this, SLOT(addInstance()));
 }
@@ -74,6 +71,17 @@ void WaypointEditorGadgetWidget::waypointActiveChanged(UAVObject *)
 
 void WaypointEditorGadgetWidget::addInstance()
 {
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    Q_ASSERT(pm != NULL);
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    Q_ASSERT(objManager != NULL);
+
+    qDebug() << "Instances before: " << objManager->getNumInstances(waypointObj->getObjID());
+    Waypoint *obj = new Waypoint();
+    quint32 newInstId = objManager->getNumInstances(waypointObj->getObjID());
+    obj->initialize(newInstId,obj->getMetaObject());
+    objManager->registerObject(obj);
+    qDebug() << "Instances after: " << objManager->getNumInstances(waypointObj->getObjID());
 }
 
 /**

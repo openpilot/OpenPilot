@@ -53,15 +53,15 @@ public class NedAccel extends UAVDataObject {
 
 		List<String> NorthElemNames = new ArrayList<String>();
 		NorthElemNames.add("0");
-		fields.add( new UAVObjectField("North", "cm/s^2", UAVObjectField.FieldType.FLOAT32, NorthElemNames, null) );
+		fields.add( new UAVObjectField("North", "m/s^2", UAVObjectField.FieldType.FLOAT32, NorthElemNames, null) );
 
 		List<String> EastElemNames = new ArrayList<String>();
 		EastElemNames.add("0");
-		fields.add( new UAVObjectField("East", "cm/s^2", UAVObjectField.FieldType.FLOAT32, EastElemNames, null) );
+		fields.add( new UAVObjectField("East", "m/s^2", UAVObjectField.FieldType.FLOAT32, EastElemNames, null) );
 
 		List<String> DownElemNames = new ArrayList<String>();
 		DownElemNames.add("0");
-		fields.add( new UAVObjectField("Down", "cm/s^2", UAVObjectField.FieldType.FLOAT32, DownElemNames, null) );
+		fields.add( new UAVObjectField("Down", "m/s^2", UAVObjectField.FieldType.FLOAT32, DownElemNames, null) );
 
 
 		// Compute the number of bytes for this object

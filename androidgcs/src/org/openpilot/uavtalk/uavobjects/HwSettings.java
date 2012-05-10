@@ -89,31 +89,70 @@ public class HwSettings extends UAVDataObject {
 		CC_FlexiPortEnumOptions.add("ComBridge");
 		fields.add( new UAVObjectField("CC_FlexiPort", "function", UAVObjectField.FieldType.ENUM, CC_FlexiPortElemNames, CC_FlexiPortEnumOptions) );
 
-		List<String> OP_RcvrPortElemNames = new ArrayList<String>();
-		OP_RcvrPortElemNames.add("0");
-		List<String> OP_RcvrPortEnumOptions = new ArrayList<String>();
-		OP_RcvrPortEnumOptions.add("Disabled");
-		OP_RcvrPortEnumOptions.add("PWM");
-		OP_RcvrPortEnumOptions.add("PPM");
-		OP_RcvrPortEnumOptions.add("DSM2");
-		OP_RcvrPortEnumOptions.add("DSMX (10bit)");
-		OP_RcvrPortEnumOptions.add("DSMX (11bit)");
-		OP_RcvrPortEnumOptions.add("Debug");
-		fields.add( new UAVObjectField("OP_RcvrPort", "function", UAVObjectField.FieldType.ENUM, OP_RcvrPortElemNames, OP_RcvrPortEnumOptions) );
+		List<String> RV_RcvrPortElemNames = new ArrayList<String>();
+		RV_RcvrPortElemNames.add("0");
+		List<String> RV_RcvrPortEnumOptions = new ArrayList<String>();
+		RV_RcvrPortEnumOptions.add("Disabled");
+		RV_RcvrPortEnumOptions.add("PWM");
+		RV_RcvrPortEnumOptions.add("PPM");
+		RV_RcvrPortEnumOptions.add("PPM+Outputs");
+		RV_RcvrPortEnumOptions.add("Outputs");
+		fields.add( new UAVObjectField("RV_RcvrPort", "function", UAVObjectField.FieldType.ENUM, RV_RcvrPortElemNames, RV_RcvrPortEnumOptions) );
 
-		List<String> OP_MainPortElemNames = new ArrayList<String>();
-		OP_MainPortElemNames.add("0");
-		List<String> OP_MainPortEnumOptions = new ArrayList<String>();
-		OP_MainPortEnumOptions.add("Disabled");
-		OP_MainPortEnumOptions.add("Telemetry");
-		fields.add( new UAVObjectField("OP_MainPort", "function", UAVObjectField.FieldType.ENUM, OP_MainPortElemNames, OP_MainPortEnumOptions) );
+		List<String> RV_AuxPortElemNames = new ArrayList<String>();
+		RV_AuxPortElemNames.add("0");
+		List<String> RV_AuxPortEnumOptions = new ArrayList<String>();
+		RV_AuxPortEnumOptions.add("Disabled");
+		RV_AuxPortEnumOptions.add("Telemetry");
+		RV_AuxPortEnumOptions.add("DSM2");
+		RV_AuxPortEnumOptions.add("DSMX (10bit)");
+		RV_AuxPortEnumOptions.add("DSMX (11bit)");
+		RV_AuxPortEnumOptions.add("ComAux");
+		RV_AuxPortEnumOptions.add("ComBridge");
+		fields.add( new UAVObjectField("RV_AuxPort", "function", UAVObjectField.FieldType.ENUM, RV_AuxPortElemNames, RV_AuxPortEnumOptions) );
 
-		List<String> OP_FlexiPortElemNames = new ArrayList<String>();
-		OP_FlexiPortElemNames.add("0");
-		List<String> OP_FlexiPortEnumOptions = new ArrayList<String>();
-		OP_FlexiPortEnumOptions.add("Disabled");
-		OP_FlexiPortEnumOptions.add("GPS");
-		fields.add( new UAVObjectField("OP_FlexiPort", "function", UAVObjectField.FieldType.ENUM, OP_FlexiPortElemNames, OP_FlexiPortEnumOptions) );
+		List<String> RV_AuxSBusPortElemNames = new ArrayList<String>();
+		RV_AuxSBusPortElemNames.add("0");
+		List<String> RV_AuxSBusPortEnumOptions = new ArrayList<String>();
+		RV_AuxSBusPortEnumOptions.add("Disabled");
+		RV_AuxSBusPortEnumOptions.add("S.Bus");
+		RV_AuxSBusPortEnumOptions.add("DSM2");
+		RV_AuxSBusPortEnumOptions.add("DSMX (10bit)");
+		RV_AuxSBusPortEnumOptions.add("DSMX (11bit)");
+		RV_AuxSBusPortEnumOptions.add("ComAux");
+		RV_AuxSBusPortEnumOptions.add("ComBridge");
+		fields.add( new UAVObjectField("RV_AuxSBusPort", "function", UAVObjectField.FieldType.ENUM, RV_AuxSBusPortElemNames, RV_AuxSBusPortEnumOptions) );
+
+		List<String> RV_FlexiPortElemNames = new ArrayList<String>();
+		RV_FlexiPortElemNames.add("0");
+		List<String> RV_FlexiPortEnumOptions = new ArrayList<String>();
+		RV_FlexiPortEnumOptions.add("Disabled");
+		RV_FlexiPortEnumOptions.add("I2C");
+		RV_FlexiPortEnumOptions.add("DSM2");
+		RV_FlexiPortEnumOptions.add("DSMX (10bit)");
+		RV_FlexiPortEnumOptions.add("DSMX (11bit)");
+		RV_FlexiPortEnumOptions.add("ComAux");
+		RV_FlexiPortEnumOptions.add("ComBridge");
+		fields.add( new UAVObjectField("RV_FlexiPort", "function", UAVObjectField.FieldType.ENUM, RV_FlexiPortElemNames, RV_FlexiPortEnumOptions) );
+
+		List<String> RV_TelemetryPortElemNames = new ArrayList<String>();
+		RV_TelemetryPortElemNames.add("0");
+		List<String> RV_TelemetryPortEnumOptions = new ArrayList<String>();
+		RV_TelemetryPortEnumOptions.add("Disabled");
+		RV_TelemetryPortEnumOptions.add("Telemetry");
+		RV_TelemetryPortEnumOptions.add("ComAux");
+		RV_TelemetryPortEnumOptions.add("ComBridge");
+		fields.add( new UAVObjectField("RV_TelemetryPort", "function", UAVObjectField.FieldType.ENUM, RV_TelemetryPortElemNames, RV_TelemetryPortEnumOptions) );
+
+		List<String> RV_GPSPortElemNames = new ArrayList<String>();
+		RV_GPSPortElemNames.add("0");
+		List<String> RV_GPSPortEnumOptions = new ArrayList<String>();
+		RV_GPSPortEnumOptions.add("Disabled");
+		RV_GPSPortEnumOptions.add("Telemetry");
+		RV_GPSPortEnumOptions.add("GPS");
+		RV_GPSPortEnumOptions.add("ComAux");
+		RV_GPSPortEnumOptions.add("ComBridge");
+		fields.add( new UAVObjectField("RV_GPSPort", "function", UAVObjectField.FieldType.ENUM, RV_GPSPortElemNames, RV_GPSPortEnumOptions) );
 
 		List<String> TelemetrySpeedElemNames = new ArrayList<String>();
 		TelemetrySpeedElemNames.add("0");
@@ -180,6 +219,7 @@ public class HwSettings extends UAVDataObject {
 		OptionalModulesElemNames.add("ComUsbBridge");
 		OptionalModulesElemNames.add("Fault");
 		OptionalModulesElemNames.add("Altitude");
+		OptionalModulesElemNames.add("TxPID");
 		List<String> OptionalModulesEnumOptions = new ArrayList<String>();
 		OptionalModulesEnumOptions.add("Disabled");
 		OptionalModulesEnumOptions.add("Enabled");
@@ -237,9 +277,12 @@ public class HwSettings extends UAVDataObject {
 		getField("CC_RcvrPort").setValue("PWM");
 		getField("CC_MainPort").setValue("Disabled");
 		getField("CC_FlexiPort").setValue("Disabled");
-		getField("OP_RcvrPort").setValue("PWM");
-		getField("OP_MainPort").setValue("Telemetry");
-		getField("OP_FlexiPort").setValue("GPS");
+		getField("RV_RcvrPort").setValue("PWM");
+		getField("RV_AuxPort").setValue("Disabled");
+		getField("RV_AuxSBusPort").setValue("Disabled");
+		getField("RV_FlexiPort").setValue("Disabled");
+		getField("RV_TelemetryPort").setValue("Telemetry");
+		getField("RV_GPSPort").setValue("GPS");
 		getField("TelemetrySpeed").setValue("57600");
 		getField("GPSSpeed").setValue("57600");
 		getField("ComUsbBridgeSpeed").setValue("57600");
@@ -251,6 +294,7 @@ public class HwSettings extends UAVDataObject {
 		getField("OptionalModules").setValue("Disabled",2);
 		getField("OptionalModules").setValue("Disabled",3);
 		getField("OptionalModules").setValue("Disabled",4);
+		getField("OptionalModules").setValue("Disabled",5);
 		getField("DSMxBind").setValue(0);
 
 	}
@@ -280,7 +324,7 @@ public class HwSettings extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0x2EE6575A;
+	protected static final int OBJID = 0x4730375C;
 	protected static final String NAME = "HwSettings";
 	protected static String DESCRIPTION = "Selection of optional hardware configurations.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

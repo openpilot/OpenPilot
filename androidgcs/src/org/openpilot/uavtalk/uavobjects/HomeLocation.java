@@ -63,24 +63,6 @@ public class HomeLocation extends UAVDataObject {
 		AltitudeElemNames.add("0");
 		fields.add( new UAVObjectField("Altitude", "m over geoid", UAVObjectField.FieldType.FLOAT32, AltitudeElemNames, null) );
 
-		List<String> ECEFElemNames = new ArrayList<String>();
-		ECEFElemNames.add("0");
-		ECEFElemNames.add("1");
-		ECEFElemNames.add("2");
-		fields.add( new UAVObjectField("ECEF", "cm", UAVObjectField.FieldType.INT32, ECEFElemNames, null) );
-
-		List<String> RNEElemNames = new ArrayList<String>();
-		RNEElemNames.add("0");
-		RNEElemNames.add("1");
-		RNEElemNames.add("2");
-		RNEElemNames.add("3");
-		RNEElemNames.add("4");
-		RNEElemNames.add("5");
-		RNEElemNames.add("6");
-		RNEElemNames.add("7");
-		RNEElemNames.add("8");
-		fields.add( new UAVObjectField("RNE", "", UAVObjectField.FieldType.FLOAT32, RNEElemNames, null) );
-
 		List<String> BeElemNames = new ArrayList<String>();
 		BeElemNames.add("0");
 		BeElemNames.add("1");
@@ -146,18 +128,6 @@ public class HomeLocation extends UAVDataObject {
 		getField("Latitude").setValue(0);
 		getField("Longitude").setValue(0);
 		getField("Altitude").setValue(0);
-		getField("ECEF").setValue(0,0);
-		getField("ECEF").setValue(0,1);
-		getField("ECEF").setValue(0,2);
-		getField("RNE").setValue(0,0);
-		getField("RNE").setValue(0,1);
-		getField("RNE").setValue(0,2);
-		getField("RNE").setValue(0,3);
-		getField("RNE").setValue(0,4);
-		getField("RNE").setValue(0,5);
-		getField("RNE").setValue(0,6);
-		getField("RNE").setValue(0,7);
-		getField("RNE").setValue(0,8);
 		getField("Be").setValue(0,0);
 		getField("Be").setValue(0,1);
 		getField("Be").setValue(0,2);
@@ -191,7 +161,7 @@ public class HomeLocation extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0x5BB3AEFC;
+	protected static final int OBJID = 0x6185DC6E;
 	protected static final String NAME = "HomeLocation";
 	protected static String DESCRIPTION = "HomeLocation setting which contains the constants to tranlate from longitutde and latitude to NED reference frame.  Automatically set by @ref GPSModule after acquiring a 3D lock.  Used by @ref AHRSCommsModule.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

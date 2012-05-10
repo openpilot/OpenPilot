@@ -55,36 +55,42 @@ public class TaskInfo extends UAVDataObject {
 		StackRemainingElemNames.add("System");
 		StackRemainingElemNames.add("Actuator");
 		StackRemainingElemNames.add("Attitude");
+		StackRemainingElemNames.add("Sensors");
 		StackRemainingElemNames.add("TelemetryTx");
 		StackRemainingElemNames.add("TelemetryTxPri");
 		StackRemainingElemNames.add("TelemetryRx");
 		StackRemainingElemNames.add("GPS");
 		StackRemainingElemNames.add("ManualControl");
 		StackRemainingElemNames.add("Altitude");
-		StackRemainingElemNames.add("AHRSComms");
 		StackRemainingElemNames.add("Stabilization");
+		StackRemainingElemNames.add("AltitudeHold");
 		StackRemainingElemNames.add("Guidance");
 		StackRemainingElemNames.add("FlightPlan");
+		StackRemainingElemNames.add("PathPlanner");
 		StackRemainingElemNames.add("Com2UsbBridge");
 		StackRemainingElemNames.add("Usb2ComBridge");
+		StackRemainingElemNames.add("OveroSync");
 		fields.add( new UAVObjectField("StackRemaining", "bytes", UAVObjectField.FieldType.UINT16, StackRemainingElemNames, null) );
 
 		List<String> RunningElemNames = new ArrayList<String>();
 		RunningElemNames.add("System");
 		RunningElemNames.add("Actuator");
 		RunningElemNames.add("Attitude");
+		RunningElemNames.add("Sensors");
 		RunningElemNames.add("TelemetryTx");
 		RunningElemNames.add("TelemetryTxPri");
 		RunningElemNames.add("TelemetryRx");
 		RunningElemNames.add("GPS");
 		RunningElemNames.add("ManualControl");
 		RunningElemNames.add("Altitude");
-		RunningElemNames.add("AHRSComms");
 		RunningElemNames.add("Stabilization");
+		RunningElemNames.add("AltitudeHold");
 		RunningElemNames.add("Guidance");
 		RunningElemNames.add("FlightPlan");
+		RunningElemNames.add("PathPlanner");
 		RunningElemNames.add("Com2UsbBridge");
 		RunningElemNames.add("Usb2ComBridge");
+		RunningElemNames.add("OveroSync");
 		List<String> RunningEnumOptions = new ArrayList<String>();
 		RunningEnumOptions.add("False");
 		RunningEnumOptions.add("True");
@@ -94,18 +100,21 @@ public class TaskInfo extends UAVDataObject {
 		RunningTimeElemNames.add("System");
 		RunningTimeElemNames.add("Actuator");
 		RunningTimeElemNames.add("Attitude");
+		RunningTimeElemNames.add("Sensors");
 		RunningTimeElemNames.add("TelemetryTx");
 		RunningTimeElemNames.add("TelemetryTxPri");
 		RunningTimeElemNames.add("TelemetryRx");
 		RunningTimeElemNames.add("GPS");
 		RunningTimeElemNames.add("ManualControl");
 		RunningTimeElemNames.add("Altitude");
-		RunningTimeElemNames.add("AHRSComms");
 		RunningTimeElemNames.add("Stabilization");
+		RunningTimeElemNames.add("AltitudeHold");
 		RunningTimeElemNames.add("Guidance");
 		RunningTimeElemNames.add("FlightPlan");
+		RunningTimeElemNames.add("PathPlanner");
 		RunningTimeElemNames.add("Com2UsbBridge");
 		RunningTimeElemNames.add("Usb2ComBridge");
+		RunningTimeElemNames.add("OveroSync");
 		fields.add( new UAVObjectField("RunningTime", "%", UAVObjectField.FieldType.UINT8, RunningTimeElemNames, null) );
 
 
@@ -181,7 +190,7 @@ public class TaskInfo extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0xE34A7C32;
+	protected static final int OBJID = 0x498F54BA;
 	protected static final String NAME = "TaskInfo";
 	protected static String DESCRIPTION = "Task information";
 	protected static final boolean ISSINGLEINST = 1 == 1;

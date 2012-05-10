@@ -181,8 +181,10 @@ public class ManualControlSettings extends UAVDataObject {
 		FlightModePositionEnumOptions.add("Stabilized1");
 		FlightModePositionEnumOptions.add("Stabilized2");
 		FlightModePositionEnumOptions.add("Stabilized3");
+		FlightModePositionEnumOptions.add("AltitudeHold");
 		FlightModePositionEnumOptions.add("VelocityControl");
 		FlightModePositionEnumOptions.add("PositionHold");
+		FlightModePositionEnumOptions.add("PathPlanner");
 		fields.add( new UAVObjectField("FlightModePosition", "", UAVObjectField.FieldType.ENUM, FlightModePositionElemNames, FlightModePositionEnumOptions) );
 
 
@@ -317,7 +319,7 @@ public class ManualControlSettings extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0x24959BB0;
+	protected static final int OBJID = 0x59C4551C;
 	protected static final String NAME = "ManualControlSettings";
 	protected static String DESCRIPTION = "Settings to indicate how to decode receiver input by @ref ManualControlModule.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

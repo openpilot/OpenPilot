@@ -53,15 +53,15 @@ public class PositionActual extends UAVDataObject {
 
 		List<String> NorthElemNames = new ArrayList<String>();
 		NorthElemNames.add("0");
-		fields.add( new UAVObjectField("North", "cm", UAVObjectField.FieldType.INT32, NorthElemNames, null) );
+		fields.add( new UAVObjectField("North", "m", UAVObjectField.FieldType.FLOAT32, NorthElemNames, null) );
 
 		List<String> EastElemNames = new ArrayList<String>();
 		EastElemNames.add("0");
-		fields.add( new UAVObjectField("East", "cm", UAVObjectField.FieldType.INT32, EastElemNames, null) );
+		fields.add( new UAVObjectField("East", "m", UAVObjectField.FieldType.FLOAT32, EastElemNames, null) );
 
 		List<String> DownElemNames = new ArrayList<String>();
 		DownElemNames.add("0");
-		fields.add( new UAVObjectField("Down", "cm", UAVObjectField.FieldType.INT32, DownElemNames, null) );
+		fields.add( new UAVObjectField("Down", "m", UAVObjectField.FieldType.FLOAT32, DownElemNames, null) );
 
 
 		// Compute the number of bytes for this object
@@ -136,7 +136,7 @@ public class PositionActual extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0xF9691DA4;
+	protected static final int OBJID = 0xFA9E2D42;
 	protected static final String NAME = "PositionActual";
 	protected static String DESCRIPTION = "Contains the current position relative to @ref HomeLocation";
 	protected static final boolean ISSINGLEINST = 1 == 1;

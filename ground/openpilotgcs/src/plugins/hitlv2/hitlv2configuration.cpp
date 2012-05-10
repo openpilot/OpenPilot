@@ -36,9 +36,9 @@ HITLConfiguration::HITLConfiguration(QString classId,
     // default values
     QString simulatorId     = "";
     QString hostAddress     = "127.0.0.1";
-    int inPort              = 0;
+    int inPort              = 40100;
     QString remoteAddress   = "127.0.0.1";
-    int outPort             = 0;
+    int outPort             = 40200;
     QString binPath         = "";
     QString dataPath        = "";
 

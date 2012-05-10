@@ -495,7 +495,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	GyrosBiasData gyrosBias;
 	HomeLocationData home;
 
-	static bool mag_updated;
+	static bool mag_updated = false;
 	static bool baro_updated;
 	static bool gps_updated;
 	static bool gps_vel_updated;
@@ -510,11 +510,6 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	// Perform the update
 	uint16_t sensors = 0;
 	float dT;
-
-	if (first_run) {
-		inited = false;
-		init_stage = 0;
-	}
 
 	// Wait until the gyro and accel object is updated, if a timeout then go to failsafe
 	if ( (xQueueReceive(gyroQueue, &ev, FAILSAFE_TIMEOUT_MS / portTICK_RATE_MS) != pdTRUE) ||
@@ -536,6 +531,20 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	gps_updated |= (xQueueReceive(gpsQueue, &ev, 0 / portTICK_RATE_MS) == pdTRUE) && outdoor_mode;
 	gps_vel_updated |= (xQueueReceive(gpsVelQueue, &ev, 0 / portTICK_RATE_MS) == pdTRUE) && outdoor_mode;
 
+	if (first_run) {
+		inited = false;
+		init_stage = 0;
+
+		mag_updated = 0;
+		baro_updated = 0;
+		gps_updated = 0;
+		gps_vel_updated = 0;
+
+		ins_last_time = PIOS_DELAY_GetRaw();
+
+		return 0;
+	}
+	
 	// Get most recent data
 	GyrosGet(&gyrosData);
 	AccelsGet(&accelsData);
@@ -570,22 +579,25 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 			INSSetGyroVar(revoCalibration.gyro_var);
 			INSSetBaroVar(revoCalibration.baro_var);
 
-			// Set initial attitude
-			float rpy[3];
-			rpy[0] = atan2f(-accelsData.y, -accelsData.z) * 180.0f / F_PI;
-			rpy[1] = atan2f(accelsData.x, -accelsData.z) * 180.0f / F_PI;
-			rpy[2] = atan2f(-magData.y, magData.x) * 180.0f / F_PI;
-			RPY2Quaternion(rpy,q);
-			/*float Rbe[3][3];
-			float ge[3] = {0,0,-9.81f};
-			RotFrom2Vectors(&accelsData.x, ge, &magData.x, home.Be, Rbe);
-			R2Quaternion(Rbe,q);*/
+			xQueueReceive(magQueue, &ev, 100 / portTICK_RATE_MS);
+			MagnetometerGet(&magData);
 
+			// Set initial attitude
+			AttitudeActualData attitudeActual;
+			attitudeActual.Roll = atan2f(-accelsData.y, -accelsData.z) * 180.0f / F_PI;
+			attitudeActual.Pitch = atan2f(accelsData.x, -accelsData.z) * 180.0f / F_PI;
+			attitudeActual.Yaw = atan2f(-magData.y, magData.x) * 180.0f / F_PI;
+			RPY2Quaternion(&attitudeActual.Roll,&attitudeActual.q1);
+			AttitudeActualSet(&attitudeActual);
+
+			q[0] = attitudeActual.q1;
+			q[1] = attitudeActual.q2;
+			q[2] = attitudeActual.q3;
+			q[3] = attitudeActual.q4;
 			INSSetState(pos, zeros, q, zeros, zeros);
 			INSResetP(Pdiag);
 		} else if (init_stage == 0 && outdoor_mode) {
 			float Pdiag[16]={25.0f,25.0f,25.0f,5.0f,5.0f,5.0f,1e-5f,1e-5f,1e-5f,1e-5f,1e-5f,1e-5f,1e-5f,1e-4f,1e-4f,1e-4f};
-			float rpy[3];
 			float q[4];
 			float NED[3];
 
@@ -604,21 +616,42 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 			// Transform the GPS position into NED coordinates
 			getNED(&gpsPosition, NED);
 
+			xQueueReceive(magQueue, &ev, 100 / portTICK_RATE_MS);
+			MagnetometerGet(&magData);
+
 			// Set initial attitude
-			rpy[0] = atan2f(-accelsData.y, -accelsData.z) * 180.0f / F_PI;
-			rpy[1] = atan2f(accelsData.x, -accelsData.z) * 180.0f / F_PI;
-			rpy[2] = atan2f(-magData.y, magData.x) * 180.0f / F_PI;
-			RPY2Quaternion(rpy,q);
+			AttitudeActualData attitudeActual;
+			attitudeActual.Roll = atan2f(-accelsData.y, -accelsData.z) * 180.0f / F_PI;
+			attitudeActual.Pitch = atan2f(accelsData.x, -accelsData.z) * 180.0f / F_PI;
+			attitudeActual.Yaw = atan2f(-magData.y, magData.x) * 180.0f / F_PI;
+			RPY2Quaternion(&attitudeActual.Roll,&attitudeActual.q1);
+			AttitudeActualSet(&attitudeActual);
+
+			q[0] = attitudeActual.q1;
+			q[1] = attitudeActual.q2;
+			q[2] = attitudeActual.q3;
+			q[3] = attitudeActual.q4;
 
 			INSSetState(NED, zeros, q, zeros, zeros);
 			INSResetP(Pdiag);
 		} else if (init_stage > 0) {
 			// Run prediction a bit before any corrections
+			dT = PIOS_DELAY_DiffuS(ins_last_time) / 1.0e6f;
+
 			GyrosBiasGet(&gyrosBias);
 			float gyros[3] = {(gyrosData.x + gyrosBias.x) * F_PI / 180.0f, 
 				(gyrosData.y + gyrosBias.y) * F_PI / 180.0f, 
 				(gyrosData.z + gyrosBias.z) * F_PI / 180.0f};
-			INSStatePrediction(gyros, &accelsData.x, 0.002f);
+			INSStatePrediction(gyros, &accelsData.x, dT);
+			
+			AttitudeActualData attitude;
+			AttitudeActualGet(&attitude);
+			attitude.q1 = Nav.q[0];
+			attitude.q2 = Nav.q[1];
+			attitude.q3 = Nav.q[2];
+			attitude.q4 = Nav.q[3];
+			Quaternion2RPY(&attitude.q1,&attitude.Roll);
+			AttitudeActualSet(&attitude);
 		}
 
 		init_stage++;
@@ -631,7 +664,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	}
 
 	if (!inited)
-		return -1;
+		return 0;
 
 	dT = PIOS_DELAY_DiffuS(ins_last_time) / 1.0e6f;
 	ins_last_time = PIOS_DELAY_GetRaw();

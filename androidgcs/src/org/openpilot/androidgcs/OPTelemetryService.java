@@ -33,7 +33,7 @@ public class OPTelemetryService extends Service {
 
 	// Logging settings
 	private final String TAG = "OPTelemetryService";
-	public static int LOGLEVEL = 2;
+	public static int LOGLEVEL = 0;
 	public static boolean WARN = LOGLEVEL > 1;
 	public static boolean DEBUG = LOGLEVEL > 0;
 

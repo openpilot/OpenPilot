@@ -12,7 +12,7 @@ import android.util.Log;
 public class UAVTalk extends Observable {
 
 	static final String TAG = "UAVTalk";
-	public static int LOGLEVEL = 2;
+	public static int LOGLEVEL = 0;
 	public static boolean WARN = LOGLEVEL > 1;
 	public static boolean DEBUG = LOGLEVEL > 0;
 
@@ -504,8 +504,7 @@ public class UAVTalk extends Observable {
 		case TYPE_OBJ_ACK:
 			// All instances, not allowed for OBJ_ACK messages
 			if (!allInstances) {
-				 System.out.println("Received object ack: " + objId + " " +
-				 objMngr.getObject(objId).getName());
+				 if (DEBUG) Log.d(TAG,"Received object ack: " + objId + " " + objMngr.getObject(objId).getName());
 				// Get object and update its data
 				obj = updateObject(objId, instId, data);
 				// Transmit ACK
@@ -521,7 +520,7 @@ public class UAVTalk extends Observable {
 		case TYPE_OBJ_REQ:
 			// Get object, if all instances are requested get instance 0 of the
 			// object
-			 System.out.println("Received object request: " + objId + " " +
+			if (DEBUG) Log.d(TAG,"Received object request: " + objId + " " +
 			 objMngr.getObject(objId).getName());
 			if (allInstances) {
 				obj = objMngr.getObject(objId);
@@ -538,8 +537,7 @@ public class UAVTalk extends Observable {
 		case TYPE_ACK:
 			// All instances, not allowed for ACK messages
 			if (!allInstances) {
-				System.out.println("Received ack: " + objId + " " +
-				 objMngr.getObject(objId).getName());
+				if (DEBUG) Log.d(TAG,"Received ack: " + objId + " " + objMngr.getObject(objId).getName());
 				// Get object
 				obj = objMngr.getObject(objId, instId);
 				// Check if an ack is pending

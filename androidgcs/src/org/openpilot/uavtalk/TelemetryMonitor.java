@@ -13,7 +13,7 @@ import android.util.Log;
 public class TelemetryMonitor extends Observable{
 
 	private static final String TAG = "TelemetryMonitor";
-	public static int LOGLEVEL = 2;
+	public static int LOGLEVEL = 0;
 	public static boolean WARN = LOGLEVEL > 1;
 	public static boolean DEBUG = LOGLEVEL > 0;
 
@@ -204,6 +204,8 @@ public class TelemetryMonitor extends Observable{
 	    Telemetry.TelemetryStats telStats = tel.getStats();
 	    tel.resetStats();
 
+	    if (DEBUG) Log.d(TAG, "processStatsUpdates() - stats reset");
+	    
 	    // Update stats object 
 	    gcsStatsObj.getField("RxDataRate").setDouble( (float)telStats.rxBytes / ((float)currentPeriod/1000.0) );
 	    gcsStatsObj.getField("TxDataRate").setDouble( (float)telStats.txBytes / ((float)currentPeriod/1000.0) );
@@ -214,6 +216,8 @@ public class TelemetryMonitor extends Observable{
 	    field = gcsStatsObj.getField("TxRetries");
 	    field.setDouble(field.getDouble() + telStats.txRetries);
 
+	    if (DEBUG) Log.d(TAG, "processStatsUpdates() - stats updated");
+	    
 	    // Check for a connection timeout
 	    boolean connectionTimeout;
 	    if ( telStats.rxObjects > 0 )
@@ -296,8 +300,10 @@ public class TelemetryMonitor extends Observable{
 	    	objects_updated = false;
 	        setChanged();
 	    }
+	    
+	    if (DEBUG) Log.d(TAG, "processStatsUpdates() - before notify");
         notifyObservers();
-
+        if (DEBUG) Log.d(TAG, "processStatsUpdates() - after notify");
 	}
 
 	private void setPeriod(int ms) {

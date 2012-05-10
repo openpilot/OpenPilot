@@ -87,6 +87,7 @@
 
 /* User control functionality */
 #define PIOS_MPU6000_USERCTL_FIFO_EN      0X40
+#define PIOS_MPU6000_USERCTL_DIS_I2C      0X10
 #define PIOS_MPU6000_USERCTL_FIFO_RST     0X02
 #define PIOS_MPU6000_USERCTL_GYRO_RST     0X01
 

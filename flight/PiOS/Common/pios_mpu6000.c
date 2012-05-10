@@ -134,12 +134,16 @@ int32_t PIOS_MPU6000_Init(uint32_t spi_id, uint32_t slave_num, const struct pios
 */
 static void PIOS_MPU6000_Config(struct pios_mpu6000_cfg const * cfg)
 {
+
+	PIOS_MPU6000_Test();
+	
 	// Reset chip
 	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_PWR_MGMT_REG, 0x80) != 0);
-	PIOS_DELAY_WaitmS(100);
+	PIOS_DELAY_WaitmS(300);
 	
 	// Reset chip and fifo
-	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_USER_CTRL_REG, 0x01 | 0x02 | 0x04) != 0);
+	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_USER_CTRL_REG, 0x80 | 0x01 | 0x02 | 0x04) != 0);
+	
 	// Wait for reset to finish
 	while (PIOS_MPU6000_GetReg(PIOS_MPU6000_USER_CTRL_REG) & 0x07);
 	
@@ -179,7 +183,7 @@ static void PIOS_MPU6000_Config(struct pios_mpu6000_cfg const * cfg)
 	
 	// Interrupt configuration
 	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_INT_CFG_REG, cfg->interrupt_cfg) != 0) ;
-	
+
 	// Interrupt configuration
 	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_INT_EN_REG, cfg->interrupt_en) != 0) ;
 	if((PIOS_MPU6000_GetReg(PIOS_MPU6000_INT_EN_REG)) != cfg->interrupt_en)

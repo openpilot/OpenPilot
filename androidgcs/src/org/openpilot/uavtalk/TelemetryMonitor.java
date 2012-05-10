@@ -185,7 +185,8 @@ public class TelemetryMonitor extends Observable{
 	    // Force update if not yet connected
 	    gcsStatsObj = objMngr.getObject("GCSTelemetryStats");
 	    flightStatsObj = objMngr.getObject("FlightTelemetryStats");
-	    
+	    if (DEBUG) Log.d(TAG,"GCS Status: " + gcsStatsObj.getField("Status").getValue());
+	    if (DEBUG) Log.d(TAG,"Flight Status: " + flightStatsObj.getField("Status").getValue());
 	    if ( ((String) gcsStatsObj.getField("Status").getValue()).compareTo("Connected") != 0 ||
 	    		((String) flightStatsObj.getField("Status").getValue()).compareTo("Connected") == 0 )
 	    {

@@ -17,7 +17,7 @@ public class TcpUAVTalk {
 	public static boolean DEBUG = LOGLEVEL > 0;
 	
 	// Temporarily define fixed device name
-	public final static String IP_ADDRESS = "127.0.0.1";
+	public final static String IP_ADDRESS = "10.21.18.120";
 	public final static int PORT = 9001;
 	
 	private UAVTalk uavTalk;
@@ -47,7 +47,7 @@ public class TcpUAVTalk {
 	
  
 	private boolean openTelemetryTcp(UAVObjectManager objMngr) {
-		Log.d(TAG, "Opening conncetion to " + IP_ADDRESS);
+		Log.d(TAG, "Opening conncetion to " + IP_ADDRESS + " at address " + PORT);
 		
 		InetAddress serverAddr = null;
 		try {

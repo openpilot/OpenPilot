@@ -12,7 +12,7 @@ import android.util.Log;
 public class UAVTalk extends Observable {
 
 	static final String TAG = "UAVTalk";
-	public static int LOGLEVEL = 0;
+	public static int LOGLEVEL = 2;
 	public static boolean WARN = LOGLEVEL > 1;
 	public static boolean DEBUG = LOGLEVEL > 0;
 
@@ -433,6 +433,7 @@ public class UAVTalk extends Observable {
 			rxCSPacket = rxbyte;
 
 			if (rxCS != rxCSPacket) { // packet error - faulty CRC
+				if (DEBUG) Log.d(TAG,"Bad crc");
 				stats.rxErrors++;
 				rxState = RxStateType.STATE_SYNC;
 				break;
@@ -441,10 +442,13 @@ public class UAVTalk extends Observable {
 			if (rxPacketLength != (packetSize + 1)) { // packet error -
 														// mismatched packet
 														// size
+				if (DEBUG) Log.d(TAG,"Bad size");
 				stats.rxErrors++;
 				rxState = RxStateType.STATE_SYNC;
 				break;
 			}
+
+			if (DEBUG) Log.d(TAG,"Received");
 
 			rxBuffer.position(0);
 			receiveObject(rxType, rxObjId, rxInstId, rxBuffer);
@@ -500,8 +504,8 @@ public class UAVTalk extends Observable {
 		case TYPE_OBJ_ACK:
 			// All instances, not allowed for OBJ_ACK messages
 			if (!allInstances) {
-				// System.out.println("Received object ack: " + objId + " " +
-				// objMngr.getObject(objId).getName());
+				 System.out.println("Received object ack: " + objId + " " +
+				 objMngr.getObject(objId).getName());
 				// Get object and update its data
 				obj = updateObject(objId, instId, data);
 				// Transmit ACK
@@ -517,8 +521,8 @@ public class UAVTalk extends Observable {
 		case TYPE_OBJ_REQ:
 			// Get object, if all instances are requested get instance 0 of the
 			// object
-			// System.out.println("Received object request: " + objId + " " +
-			// objMngr.getObject(objId).getName());
+			 System.out.println("Received object request: " + objId + " " +
+			 objMngr.getObject(objId).getName());
 			if (allInstances) {
 				obj = objMngr.getObject(objId);
 			} else {
@@ -534,8 +538,8 @@ public class UAVTalk extends Observable {
 		case TYPE_ACK:
 			// All instances, not allowed for ACK messages
 			if (!allInstances) {
-				// System.out.println("Received ack: " + objId + " " +
-				// objMngr.getObject(objId).getName());
+				System.out.println("Received ack: " + objId + " " +
+				 objMngr.getObject(objId).getName());
 				// Get object
 				obj = objMngr.getObject(objId, instId);
 				// Check if an ack is pending

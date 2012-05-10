@@ -55,14 +55,14 @@ public class GuidanceSettings extends UAVDataObject {
 		HorizontalPosPIElemNames.add("Kp");
 		HorizontalPosPIElemNames.add("Ki");
 		HorizontalPosPIElemNames.add("ILimit");
-		fields.add( new UAVObjectField("HorizontalPosPI", "(cm/s)/cm", UAVObjectField.FieldType.FLOAT32, HorizontalPosPIElemNames, null) );
+		fields.add( new UAVObjectField("HorizontalPosPI", "(m/s)/m", UAVObjectField.FieldType.FLOAT32, HorizontalPosPIElemNames, null) );
 
 		List<String> HorizontalVelPIDElemNames = new ArrayList<String>();
 		HorizontalVelPIDElemNames.add("Kp");
 		HorizontalVelPIDElemNames.add("Ki");
 		HorizontalVelPIDElemNames.add("Kd");
 		HorizontalVelPIDElemNames.add("ILimit");
-		fields.add( new UAVObjectField("HorizontalVelPID", "deg/(cm/s)", UAVObjectField.FieldType.FLOAT32, HorizontalVelPIDElemNames, null) );
+		fields.add( new UAVObjectField("HorizontalVelPID", "deg/(m/s)", UAVObjectField.FieldType.FLOAT32, HorizontalVelPIDElemNames, null) );
 
 		List<String> VerticalPosPIElemNames = new ArrayList<String>();
 		VerticalPosPIElemNames.add("Kp");
@@ -87,11 +87,11 @@ public class GuidanceSettings extends UAVDataObject {
 
 		List<String> HorizontalVelMaxElemNames = new ArrayList<String>();
 		HorizontalVelMaxElemNames.add("0");
-		fields.add( new UAVObjectField("HorizontalVelMax", "cm/s", UAVObjectField.FieldType.UINT16, HorizontalVelMaxElemNames, null) );
+		fields.add( new UAVObjectField("HorizontalVelMax", "m/s", UAVObjectField.FieldType.UINT16, HorizontalVelMaxElemNames, null) );
 
 		List<String> VerticalVelMaxElemNames = new ArrayList<String>();
 		VerticalVelMaxElemNames.add("0");
-		fields.add( new UAVObjectField("VerticalVelMax", "cm/s", UAVObjectField.FieldType.UINT16, VerticalVelMaxElemNames, null) );
+		fields.add( new UAVObjectField("VerticalVelMax", "m/s", UAVObjectField.FieldType.UINT16, VerticalVelMaxElemNames, null) );
 
 		List<String> GuidanceModeElemNames = new ArrayList<String>();
 		GuidanceModeElemNames.add("0");

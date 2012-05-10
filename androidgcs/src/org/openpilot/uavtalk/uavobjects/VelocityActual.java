@@ -53,15 +53,15 @@ public class VelocityActual extends UAVDataObject {
 
 		List<String> NorthElemNames = new ArrayList<String>();
 		NorthElemNames.add("0");
-		fields.add( new UAVObjectField("North", "cm/s", UAVObjectField.FieldType.INT32, NorthElemNames, null) );
+		fields.add( new UAVObjectField("North", "m/s", UAVObjectField.FieldType.FLOAT32, NorthElemNames, null) );
 
 		List<String> EastElemNames = new ArrayList<String>();
 		EastElemNames.add("0");
-		fields.add( new UAVObjectField("East", "cm/s", UAVObjectField.FieldType.INT32, EastElemNames, null) );
+		fields.add( new UAVObjectField("East", "m/s", UAVObjectField.FieldType.FLOAT32, EastElemNames, null) );
 
 		List<String> DownElemNames = new ArrayList<String>();
 		DownElemNames.add("0");
-		fields.add( new UAVObjectField("Down", "cm/s", UAVObjectField.FieldType.INT32, DownElemNames, null) );
+		fields.add( new UAVObjectField("Down", "m/s", UAVObjectField.FieldType.FLOAT32, DownElemNames, null) );
 
 
 		// Compute the number of bytes for this object
@@ -136,7 +136,7 @@ public class VelocityActual extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0x43007EB0;
+	protected static final int OBJID = 0x5A08F61A;
 	protected static final String NAME = "VelocityActual";
 	protected static String DESCRIPTION = "Updated by @ref AHRSCommsModule and used within @ref GuidanceModule for velocity control";
 	protected static final boolean ISSINGLEINST = 1 == 1;

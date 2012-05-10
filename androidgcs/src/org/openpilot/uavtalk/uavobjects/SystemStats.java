@@ -55,6 +55,18 @@ public class SystemStats extends UAVDataObject {
 		FlightTimeElemNames.add("0");
 		fields.add( new UAVObjectField("FlightTime", "ms", UAVObjectField.FieldType.UINT32, FlightTimeElemNames, null) );
 
+		List<String> EventSystemWarningIDElemNames = new ArrayList<String>();
+		EventSystemWarningIDElemNames.add("0");
+		fields.add( new UAVObjectField("EventSystemWarningID", "uavoid", UAVObjectField.FieldType.UINT32, EventSystemWarningIDElemNames, null) );
+
+		List<String> ObjectManagerCallbackIDElemNames = new ArrayList<String>();
+		ObjectManagerCallbackIDElemNames.add("0");
+		fields.add( new UAVObjectField("ObjectManagerCallbackID", "uavoid", UAVObjectField.FieldType.UINT32, ObjectManagerCallbackIDElemNames, null) );
+
+		List<String> ObjectManagerQueueIDElemNames = new ArrayList<String>();
+		ObjectManagerQueueIDElemNames.add("0");
+		fields.add( new UAVObjectField("ObjectManagerQueueID", "uavoid", UAVObjectField.FieldType.UINT32, ObjectManagerQueueIDElemNames, null) );
+
 		List<String> HeapRemainingElemNames = new ArrayList<String>();
 		HeapRemainingElemNames.add("0");
 		fields.add( new UAVObjectField("HeapRemaining", "bytes", UAVObjectField.FieldType.UINT16, HeapRemainingElemNames, null) );
@@ -144,7 +156,7 @@ public class SystemStats extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0xD610A0F0;
+	protected static final int OBJID = 0x364D1406;
 	protected static final String NAME = "SystemStats";
 	protected static String DESCRIPTION = "CPU and memory usage from OpenPilot computer. ";
 	protected static final boolean ISSINGLEINST = 1 == 1;

@@ -66,8 +66,10 @@ public class FlightStatus extends UAVDataObject {
 		FlightModeEnumOptions.add("Stabilized1");
 		FlightModeEnumOptions.add("Stabilized2");
 		FlightModeEnumOptions.add("Stabilized3");
+		FlightModeEnumOptions.add("AltitudeHold");
 		FlightModeEnumOptions.add("VelocityControl");
 		FlightModeEnumOptions.add("PositionHold");
+		FlightModeEnumOptions.add("PathPlanner");
 		fields.add( new UAVObjectField("FlightMode", "", UAVObjectField.FieldType.ENUM, FlightModeElemNames, FlightModeEnumOptions) );
 
 
@@ -144,7 +146,7 @@ public class FlightStatus extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0x743DB13C;
+	protected static final int OBJID = 0x19B92D8;
 	protected static final String NAME = "FlightStatus";
 	protected static String DESCRIPTION = "Contains major flight status information for other modules.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

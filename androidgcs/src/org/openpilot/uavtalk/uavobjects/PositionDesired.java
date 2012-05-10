@@ -53,15 +53,15 @@ public class PositionDesired extends UAVDataObject {
 
 		List<String> NorthElemNames = new ArrayList<String>();
 		NorthElemNames.add("0");
-		fields.add( new UAVObjectField("North", "cm", UAVObjectField.FieldType.INT32, NorthElemNames, null) );
+		fields.add( new UAVObjectField("North", "m", UAVObjectField.FieldType.FLOAT32, NorthElemNames, null) );
 
 		List<String> EastElemNames = new ArrayList<String>();
 		EastElemNames.add("0");
-		fields.add( new UAVObjectField("East", "cm", UAVObjectField.FieldType.INT32, EastElemNames, null) );
+		fields.add( new UAVObjectField("East", "m", UAVObjectField.FieldType.FLOAT32, EastElemNames, null) );
 
 		List<String> DownElemNames = new ArrayList<String>();
 		DownElemNames.add("0");
-		fields.add( new UAVObjectField("Down", "cm", UAVObjectField.FieldType.INT32, DownElemNames, null) );
+		fields.add( new UAVObjectField("Down", "m", UAVObjectField.FieldType.FLOAT32, DownElemNames, null) );
 
 
 		// Compute the number of bytes for this object
@@ -136,7 +136,7 @@ public class PositionDesired extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0x33C9EAB4;
+	protected static final int OBJID = 0x778DBE24;
 	protected static final String NAME = "PositionDesired";
 	protected static String DESCRIPTION = "The position the craft is trying t achieve.  Can come from GCS or @ref PathPlanner ";
 	protected static final boolean ISSINGLEINST = 1 == 1;

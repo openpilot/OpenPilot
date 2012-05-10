@@ -83,6 +83,14 @@ public class MixerStatus extends UAVDataObject {
 		Mixer8ElemNames.add("0");
 		fields.add( new UAVObjectField("Mixer8", "", UAVObjectField.FieldType.FLOAT32, Mixer8ElemNames, null) );
 
+		List<String> Mixer9ElemNames = new ArrayList<String>();
+		Mixer9ElemNames.add("0");
+		fields.add( new UAVObjectField("Mixer9", "", UAVObjectField.FieldType.FLOAT32, Mixer9ElemNames, null) );
+
+		List<String> Mixer10ElemNames = new ArrayList<String>();
+		Mixer10ElemNames.add("0");
+		fields.add( new UAVObjectField("Mixer10", "", UAVObjectField.FieldType.FLOAT32, Mixer10ElemNames, null) );
+
 
 		// Compute the number of bytes for this object
 		int numBytes = 0;
@@ -156,7 +164,7 @@ public class MixerStatus extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0x11CFB4E6;
+	protected static final int OBJID = 0x124E28A;
 	protected static final String NAME = "MixerStatus";
 	protected static String DESCRIPTION = "Status for the matrix mixer showing the output of each mixer after all scaling";
 	protected static final boolean ISSINGLEINST = 1 == 1;

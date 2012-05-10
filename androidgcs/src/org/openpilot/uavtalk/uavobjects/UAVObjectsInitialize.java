@@ -35,15 +35,15 @@ public class UAVObjectsInitialize {
 	
 	public static void register(UAVObjectManager objMngr) {
 		try {
+			objMngr.registerObject( new Accels() );
 			objMngr.registerObject( new AccessoryDesired() );
 			objMngr.registerObject( new ActuatorCommand() );
 			objMngr.registerObject( new ActuatorDesired() );
 			objMngr.registerObject( new ActuatorSettings() );
-			objMngr.registerObject( new AHRSCalibration() );
-			objMngr.registerObject( new AHRSSettings() );
-			objMngr.registerObject( new AhrsStatus() );
+			objMngr.registerObject( new AltHoldSmoothed() );
+			objMngr.registerObject( new AltitudeHoldDesired() );
+			objMngr.registerObject( new AltitudeHoldSettings() );
 			objMngr.registerObject( new AttitudeActual() );
-			objMngr.registerObject( new AttitudeRaw() );
 			objMngr.registerObject( new AttitudeSettings() );
 			objMngr.registerObject( new BaroAltitude() );
 			objMngr.registerObject( new CameraDesired() );
@@ -62,16 +62,23 @@ public class UAVObjectsInitialize {
 			objMngr.registerObject( new GPSPosition() );
 			objMngr.registerObject( new GPSSatellites() );
 			objMngr.registerObject( new GPSTime() );
+			objMngr.registerObject( new GPSVelocity() );
+			objMngr.registerObject( new Gyros() );
+			objMngr.registerObject( new GyrosBias() );
 			objMngr.registerObject( new GuidanceSettings() );
 			objMngr.registerObject( new HomeLocation() );
 			objMngr.registerObject( new HwSettings() );
 			objMngr.registerObject( new I2CStats() );
+			objMngr.registerObject( new GPSPosition() );
+			objMngr.registerObject( new Magnetometer() );
 			objMngr.registerObject( new ManualControlCommand() );
 			objMngr.registerObject( new ManualControlSettings() );
 			objMngr.registerObject( new MixerSettings() );
 			objMngr.registerObject( new MixerStatus() );
+			objMngr.registerObject( new NEDPosition() );
 			objMngr.registerObject( new NedAccel() );
 			objMngr.registerObject( new ObjectPersistence() );
+			objMngr.registerObject( new PathDesired() );
 			objMngr.registerObject( new PositionActual() );
 			objMngr.registerObject( new PositionDesired() );
 			objMngr.registerObject( new RateDesired() );
@@ -82,10 +89,13 @@ public class UAVObjectsInitialize {
 			objMngr.registerObject( new SystemAlarms() );
 			objMngr.registerObject( new SystemSettings() );
 			objMngr.registerObject( new SystemStats() );
+			objMngr.registerObject( new TxPIDSettings() );
 			objMngr.registerObject( new TaskInfo() );
 			objMngr.registerObject( new VelocityActual() );
 			objMngr.registerObject( new VelocityDesired() );
 			objMngr.registerObject( new WatchdogStatus() );
+			objMngr.registerObject( new Waypoint() );
+			objMngr.registerObject( new WaypointActive() );
 	
 		} catch (Exception e) {
 			e.printStackTrace();

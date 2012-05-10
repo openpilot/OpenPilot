@@ -61,6 +61,7 @@ public class SystemAlarms extends UAVDataObject {
 		AlarmElemNames.add("ManualControl");
 		AlarmElemNames.add("Actuator");
 		AlarmElemNames.add("Attitude");
+		AlarmElemNames.add("Sensors");
 		AlarmElemNames.add("Stabilization");
 		AlarmElemNames.add("Guidance");
 		AlarmElemNames.add("AHRSComms");
@@ -139,6 +140,7 @@ public class SystemAlarms extends UAVDataObject {
 		getField("Alarm").setValue("Uninitialised",14);
 		getField("Alarm").setValue("Uninitialised",15);
 		getField("Alarm").setValue("Uninitialised",16);
+		getField("Alarm").setValue("Uninitialised",17);
 
 	}
 
@@ -167,7 +169,7 @@ public class SystemAlarms extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0x737ADCF2;
+	protected static final int OBJID = 0x9C7CBFE;
 	protected static final String NAME = "SystemAlarms";
 	protected static String DESCRIPTION = "Alarms from OpenPilot to indicate failure conditions or warnings.  Set by various modules.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

@@ -226,9 +226,9 @@ public class UAVObjectField {
             }
             case ENUM:
             {
-        		List<Byte> l = (List<Byte>) data;
+        		List<Byte> l = (List<Byte>) this.data;
             	for (int index = 0 ; index < numElements; ++index) {
-            		l.set(index, dataIn.get(index));
+            		l.set(index, dataIn.get());
             	}
                 break;
             }

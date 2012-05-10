@@ -269,23 +269,25 @@ static int32_t updateAttitudeComplimentary(bool first_run)
 	FlightStatusData flightStatus;
 	FlightStatusGet(&flightStatus);
 	if(first_run) {
+		// To initialize we need a valid mag reading
+		if ( xQueueReceive(magQueue, &ev, 0 / portTICK_RATE_MS) != pdTRUE )
+			return -1;
+
 		AttitudeActualData attitudeActual;
 		AttitudeActualGet(&attitudeActual);
 		MagnetometerData magData;
 		MagnetometerGet(&magData);
 		init = 0;
-		float rpy[3];
-		float q[4];
-		rpy[0] = atan2f(-accelsData.y, -accelsData.z) * 180.0f / F_PI;
-		rpy[1] = atan2f(accelsData.x, -accelsData.z) * 180.0f / F_PI;
-		rpy[2] = atan2f(-magData.y, magData.x) * 180.0f / F_PI;
+		attitudeActual.Roll = atan2f(-accelsData.y, -accelsData.z) * 180.0f / F_PI;
+		attitudeActual.Pitch = atan2f(accelsData.x, -accelsData.z) * 180.0f / F_PI;
+		attitudeActual.Yaw = atan2f(-magData.y, magData.x) * 180.0f / F_PI;
 
-		RPY2Quaternion(rpy,q);
-		quat_copy(q, &attitudeActual.q1);
-		
-		// Convert into eueler degrees (makes assumptions about RPY order)
-		Quaternion2RPY(&attitudeActual.q1,&attitudeActual.Roll);
+		RPY2Quaternion(&attitudeActual.Roll,&attitudeActual.q1);
 		AttitudeActualSet(&attitudeActual);
+
+		timeval = PIOS_DELAY_GetRaw();
+
+		return 0;
 
 	}
 
@@ -306,7 +308,7 @@ static int32_t updateAttitudeComplimentary(bool first_run)
 		AttitudeSettingsGet(&attitudeSettings);
 		magKp = 0.01f;
 		init = 1;
-	}	
+	}
 
 	GyrosGet(&gyrosData);
 

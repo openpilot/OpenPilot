@@ -33,8 +33,8 @@
 #include "paths.h"
 
 #include "flightstatus.h"
-#include "guidancesettings.h"
 #include "pathdesired.h"
+#include "pathplannersettings.h"
 #include "positionactual.h"
 #include "waypoint.h"
 #include "waypointactive.h"
@@ -49,14 +49,17 @@
 // Private variables
 static xTaskHandle taskHandle;
 static xQueueHandle queue;
+static PathPlannerSettingsData pathPlannerSettings;
 static WaypointActiveData waypointActive;
 static WaypointData waypoint;
-static GuidanceSettingsData guidanceSettings;
 
 // Private functions
 static void pathPlannerTask(void *parameters);
+static void settingsUpdated(UAVObjEvent * ev);
 static void waypointsUpdated(UAVObjEvent * ev);
-static void createPath();
+static void createPathBox();
+static void createPathLogo();
+
 /**
  * Module initialization
  */
@@ -77,7 +80,8 @@ int32_t PathPlannerStart()
 int32_t PathPlannerInitialize()
 {
 	taskHandle = NULL;
-	
+
+	PathPlannerSettingsInitialize();
 	WaypointInitialize();
 	WaypointActiveInitialize();
 	
@@ -96,14 +100,15 @@ int32_t bad_inits;
 int32_t bad_reads;
 static void pathPlannerTask(void *parameters)
 {
+	PathPlannerSettingsConnectCallback(settingsUpdated);
+	settingsUpdated(PathPlannerSettingsHandle());
+
 	WaypointConnectCallback(waypointsUpdated);
 	WaypointActiveConnectCallback(waypointsUpdated);
 
 	FlightStatusData flightStatus;
 	PathDesiredData pathDesired;
 	PositionActualData positionActual;
-	
-	createPath();
 	
 	const float MIN_RADIUS = 4.0f; // Radius to consider at waypoint (m)
 
@@ -129,11 +134,9 @@ static void pathPlannerTask(void *parameters)
 			pathplanner_active = true;
 			continue;
 		}
-
-		GuidanceSettingsGet(&guidanceSettings);
 		
-		switch(guidanceSettings.PathMode) {
-			case GUIDANCESETTINGS_PATHMODE_ENDPOINT:
+		switch(pathPlannerSettings.PathMode) {
+			case PATHPLANNERSETTINGS_PATHMODE_ENDPOINT:
 				PositionActualGet(&positionActual);
 				
 				float r2 = powf(positionActual.North - waypoint.Position[WAYPOINT_POSITION_NORTH], 2) +
@@ -164,7 +167,7 @@ static void pathPlannerTask(void *parameters)
 
 				break;
 
-			case GUIDANCESETTINGS_PATHMODE_PATH:
+			case PATHPLANNERSETTINGS_PATHMODE_PATH:
 
 				PathDesiredGet(&pathDesired);
 				PositionActualGet(&positionActual);
@@ -213,13 +216,11 @@ static void waypointsUpdated(UAVObjEvent * ev)
 	
 	WaypointActiveGet(&waypointActive);
 	WaypointInstGet(waypointActive.Index, &waypoint);
-	
-	GuidanceSettingsGet(&guidanceSettings);
 
 	PathDesiredData pathDesired;
 
-	switch(guidanceSettings.PathMode) {
-		case GUIDANCESETTINGS_PATHMODE_ENDPOINT:
+	switch(pathPlannerSettings.PathMode) {
+		case PATHPLANNERSETTINGS_PATHMODE_ENDPOINT:
 		{
 			PathDesiredGet(&pathDesired);
 			pathDesired.End[PATHDESIRED_END_NORTH] = waypoint.Position[WAYPOINT_POSITION_NORTH];
@@ -231,7 +232,7 @@ static void waypointsUpdated(UAVObjEvent * ev)
 		}
 			break;
 
-		case GUIDANCESETTINGS_PATHMODE_PATH:
+		case PATHPLANNERSETTINGS_PATHMODE_PATH:
 		{
 			PathDesiredData pathDesired;
 
@@ -270,7 +271,64 @@ static void waypointsUpdated(UAVObjEvent * ev)
 	}
 }
 
-static void createPath()
+void settingsUpdated(UAVObjEvent * ev) {
+	uint8_t preprogrammedPath = pathPlannerSettings.PreprogrammedPath;
+	PathPlannerSettingsGet(&pathPlannerSettings);
+	if (pathPlannerSettings.PreprogrammedPath != preprogrammedPath) {
+		switch(pathPlannerSettings.PreprogrammedPath) {
+			case PATHPLANNERSETTINGS_PREPROGRAMMEDPATH_NONE:
+				break;
+			case PATHPLANNERSETTINGS_PREPROGRAMMEDPATH_10M_BOX:
+				createPathBox();
+				break;
+			case PATHPLANNERSETTINGS_PREPROGRAMMEDPATH_LOGO:
+				createPathLogo();
+				break;
+				
+		}
+	}
+}
+
+static void createPathBox()
+{
+	WaypointCreateInstance();
+	WaypointCreateInstance();
+	WaypointCreateInstance();
+	WaypointCreateInstance();
+	WaypointCreateInstance();
+	
+	// Draw O
+	WaypointData waypoint;
+	waypoint.Velocity[0] = 2; // Since for now this isn't directional just set a mag
+	waypoint.Action = WAYPOINT_ACTION_NEXT;
+
+	waypoint.Position[0] = 5;
+	waypoint.Position[1] = 5;
+	waypoint.Position[2] = -10;
+	WaypointInstSet(0, &waypoint);
+
+	waypoint.Position[0] = -5;
+	waypoint.Position[1] = 5;
+	WaypointInstSet(1, &waypoint);
+
+	waypoint.Position[0] = -5;
+	waypoint.Position[1] = -5;
+	WaypointInstSet(2, &waypoint);
+
+	waypoint.Position[0] = 5;
+	waypoint.Position[1] = -5;
+	WaypointInstSet(3, &waypoint);
+
+	waypoint.Position[0] = 5;
+	waypoint.Position[1] = 5;
+	WaypointInstSet(4, &waypoint);
+
+	waypoint.Position[0] = 0;
+	waypoint.Position[1] = 0;
+	WaypointInstSet(5, &waypoint);
+}
+
+static void createPathLogo()
 {
 	// Draw O
 	WaypointData waypoint;

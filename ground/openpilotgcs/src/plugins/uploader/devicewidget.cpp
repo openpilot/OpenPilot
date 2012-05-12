@@ -93,6 +93,9 @@ QString deviceWidget::idToBoardName(int id)
     case 0x0211://INS
         return QString("OpenPilot INS");
         break;
+    case 0x0911://Revolution
+        return QString("Revolution");
+        break;
     default:
         return QString("");
         break;

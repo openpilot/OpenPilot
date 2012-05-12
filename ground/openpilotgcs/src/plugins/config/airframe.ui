@@ -1389,13 +1389,13 @@ margin:1px;</string>
           <property name="autoFillBackground">
            <bool>false</bool>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0">
+          <layout class="QVBoxLayout" name="verticalLayout_31" stretch="0">
            <item>
-            <layout class="QVBoxLayout" name="verticalLayout_6">
+            <layout class="QVBoxLayout" name="verticalLayout_61">
              <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_3">
+              <layout class="QHBoxLayout" name="horizontalLayout_31">
                <item>
-                <widget class="QLabel" name="label_5">
+                <widget class="QLabel" name="label_51">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
                    <horstretch>0</horstretch>
@@ -1417,7 +1417,7 @@ margin:1px;</string>
                 <widget class="QComboBox" name="groundVehicleType"/>
                </item>
                <item>
-                <spacer name="horizontalSpacer_3">
+                <spacer name="horizontalSpacer_31">
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>
@@ -1432,7 +1432,7 @@ margin:1px;</string>
               </layout>
              </item>
              <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_23">
+              <layout class="QHBoxLayout" name="horizontalLayout_33">
                <item>
                 <widget class="QLabel" name="label_7">
                  <property name="font">
@@ -1462,9 +1462,9 @@ margin:1px;</string>
               </layout>
              </item>
              <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_4">
+              <layout class="QHBoxLayout" name="horizontalLayout_41">
                <item>
-                <widget class="QGroupBox" name="groupBox_2">
+                <widget class="QGroupBox" name="groupBox_7">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
                    <horstretch>0</horstretch>
@@ -1480,7 +1480,7 @@ margin:1px;</string>
                  <property name="title">
                   <string>Output channel asignmets</string>
                  </property>
-                 <layout class="QFormLayout" name="formLayout_3">
+                 <layout class="QFormLayout" name="formLayout_5">
                   <item row="0" column="0">
                    <widget class="QLabel" name="gvEngineLabel">
                     <property name="minimumSize">
@@ -1644,11 +1644,11 @@ margin:1px;</string>
                  <property name="title">
                   <string>Differential Steering Mix</string>
                  </property>
-                 <layout class="QVBoxLayout" name="verticalLayout_13">
+                 <layout class="QVBoxLayout" name="verticalLayout_33">
                   <item>
-                   <layout class="QHBoxLayout" name="horizontalLayout_8">
+                   <layout class="QHBoxLayout" name="horizontalLayout_30">
                     <item>
-                     <layout class="QVBoxLayout" name="verticalLayout_14">
+                     <layout class="QVBoxLayout" name="verticalLayout_34">
                       <item>
                        <widget class="QLabel" name="differentialSteeringLabel1">
                         <property name="minimumSize">
@@ -1685,7 +1685,7 @@ margin:1px;</string>
                      </layout>
                     </item>
                     <item>
-                     <layout class="QVBoxLayout" name="verticalLayout_15">
+                     <layout class="QVBoxLayout" name="verticalLayout_35">
                       <item>
                        <widget class="QLabel" name="differentialSteeringLabel2">
                         <property name="minimumSize">
@@ -1727,7 +1727,7 @@ margin:1px;</string>
                 </widget>
                </item>
                <item>
-                <spacer name="horizontalSpacer_4">
+                <spacer name="horizontalSpacer_24">
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>
@@ -1750,7 +1750,7 @@ margin:1px;</string>
                  <property name="title">
                   <string>Front throttle curve</string>
                  </property>
-                 <layout class="QVBoxLayout" name="verticalLayout_16">
+                 <layout class="QVBoxLayout" name="verticalLayout_36">
                   <item>
                    <widget class="MixerCurveWidget" name="groundVehicleThrottle1" native="true">
                     <property name="sizePolicy">
@@ -1807,7 +1807,7 @@ margin:1px;</string>
                  <property name="title">
                   <string>Rear throttle curve</string>
                  </property>
-                 <layout class="QVBoxLayout" name="verticalLayout_17">
+                 <layout class="QVBoxLayout" name="verticalLayout_37">
                   <item>
                    <widget class="MixerCurveWidget" name="groundVehicleThrottle2" native="true">
                     <property name="sizePolicy">
@@ -1850,7 +1850,7 @@ margin:1px;</string>
               </layout>
              </item>
              <item>
-              <spacer name="verticalSpacer">
+              <spacer name="verticalSpacer_1">
                <property name="orientation">
                 <enum>Qt::Vertical</enum>
                </property>
@@ -1863,9 +1863,9 @@ margin:1px;</string>
               </spacer>
              </item>
              <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_13">
+              <layout class="QHBoxLayout" name="horizontalLayout_28">
                <item>
-                <spacer name="horizontalSpacer_11">
+                <spacer name="horizontalSpacer_21">
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>

@@ -88,6 +88,7 @@ private:
      QLineEdit* openFileNameLE;
      QEventLoop m_eventloop;
      QErrorMessage * msg;
+     void connectSignalSlot(QWidget * widget);
 private slots:
     void onPhisicalHWConnect();
     void versionMatchCheck();
@@ -102,6 +103,8 @@ private slots:
     void getSerialPorts();
     void perform();
     void cancel();
+    void uploadStarted();
+    void uploadEnded(bool succeed);
 
 };
 

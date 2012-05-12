@@ -245,28 +245,19 @@ void ConfigOutputWidget::refreshWidgetsValues()
 {
     bool dirty=isDirty();
 
-    // Get System Settings
-    SystemSettings * systemSettings = SystemSettings::GetInstance(getObjectManager());
-    Q_ASSERT(systemSettings);
-    SystemSettings::DataFields systemSettingsData = systemSettings->getData();
-
     // Get Actuator Settings
     ActuatorSettings *actuatorSettings = ActuatorSettings::GetInstance(getObjectManager());
     Q_ASSERT(actuatorSettings);
     ActuatorSettings::DataFields actuatorSettingsData = actuatorSettings->getData();
 
     // get helicp channel descriptions based on mixer settings
-    QStringList heliChannelDesc = getChannelDescriptions();
+    QStringList ChannelDesc = GUIManager.getChannelDescriptions();
 
     // Initialize output forms
     QList<OutputChannelForm*> outputChannelForms = findChildren<OutputChannelForm*>();
     foreach(OutputChannelForm *outputChannelForm, outputChannelForms)
     {
-        // init channel description
-        if (systemSettingsData.AirframeType == SystemSettings::AIRFRAMETYPE_HELICP)
-            outputChannelForm->setAssignment(heliChannelDesc[outputChannelForm->index()]);
-        else
-            outputChannelForm->setAssignment("-");
+        outputChannelForm->setAssignment(ChannelDesc[outputChannelForm->index()]);
 
         // init min,max,neutral
         int minValue = actuatorSettingsData.ChannelMin[outputChannelForm->index()];
@@ -275,18 +266,6 @@ void ConfigOutputWidget::refreshWidgetsValues()
 
         int neutral = actuatorSettingsData.ChannelNeutral[outputChannelForm->index()];
         outputChannelForm->neutral(neutral);
-    }
-
-    // non-helicp channel descriptions
-    if (systemSettingsData.AirframeType != SystemSettings::AIRFRAMETYPE_HELICP)
-    {
-        // get channel descriptions based on units=channel and fieldname
-        QList<UAVObjectField*> fieldList = actuatorSettings->getFields();
-        foreach (UAVObjectField* field, fieldList) {
-            if (field->getUnits().contains("channel")) {
-                assignOutputChannel(actuatorSettings,field->getName());
-            }
-        }
     }
 
     // Get the SpinWhileArmed setting
@@ -374,92 +353,6 @@ void ConfigOutputWidget::updateObjectsFromWidgets()
     actuatorSettingsData.ChannelUpdateFreq[3] = m_config->cb_outputRate4->currentText().toUInt();
     // Apply settings
     actuatorSettings->setData(actuatorSettingsData);
-}
-QStringList ConfigOutputWidget::getChannelDescriptions()
-{
-    QStringList channelDesc;
-    int MixerDataFromHeli[8][5];
-    quint8 MixerOutputType[8];
-    int i;
-
-    // Get existing mixer settings
-    MixerSettings * mixerSettings = MixerSettings::GetInstance(getObjectManager());
-    Q_ASSERT(mixerSettings);
-    MixerSettings::DataFields mixerSettingsData = mixerSettings->getData();
-
-    //go through the user data and update the mixer matrix
-    for (i=0;i<5;i++)
-    {
-        MixerDataFromHeli[0][i] = mixerSettingsData.Mixer1Vector[i];
-        MixerDataFromHeli[1][i] = mixerSettingsData.Mixer2Vector[i];
-        MixerDataFromHeli[2][i] = mixerSettingsData.Mixer3Vector[i];
-        MixerDataFromHeli[3][i] = mixerSettingsData.Mixer4Vector[i];
-        MixerDataFromHeli[4][i] = mixerSettingsData.Mixer5Vector[i];
-        MixerDataFromHeli[5][i] = mixerSettingsData.Mixer6Vector[i];
-        MixerDataFromHeli[6][i] = mixerSettingsData.Mixer7Vector[i];
-        MixerDataFromHeli[7][i] = mixerSettingsData.Mixer8Vector[i];
-    }
-
-    MixerOutputType[0] = mixerSettingsData.Mixer1Type;
-    MixerOutputType[1] = mixerSettingsData.Mixer2Type;
-    MixerOutputType[2] = mixerSettingsData.Mixer3Type;
-    MixerOutputType[3] = mixerSettingsData.Mixer4Type;
-    MixerOutputType[4] = mixerSettingsData.Mixer5Type;
-    MixerOutputType[5] = mixerSettingsData.Mixer6Type;
-    MixerOutputType[6] = mixerSettingsData.Mixer7Type;
-    MixerOutputType[7] = mixerSettingsData.Mixer8Type;
-
-    for (i=1; i <= (int)(ActuatorCommand::CHANNEL_NUMELEM); i++)
-    {
-        channelDesc.append(QString("-"));
-    }
-
-    //process the data from the mixer and try to figure out the settings...
-    for (i=0;i<8;i++)
-    {
-        //check if this is the engine... Throttle only
-        if ((MixerOutputType[i] == MixerSettings::MIXER1TYPE_MOTOR)&&
-            (MixerDataFromHeli[i][0]>0)&&//ThrottleCurve1
-            (MixerDataFromHeli[i][1]==0)&&//ThrottleCurve2
-            (MixerDataFromHeli[i][2]==0)&&//Roll
-            (MixerDataFromHeli[i][3]==0)&&//Pitch
-            (MixerDataFromHeli[i][4]==0))//Yaw
-        {
-            channelDesc[i] = "Throttle";
-        }
-        else if ((MixerDataFromHeli[i][0]>0)&& //ThrottleCurve1
-                 (MixerDataFromHeli[i][2]!=0)&&//Roll
-                 (MixerDataFromHeli[i][3]!=0)) //Pitch
-        {
-            channelDesc[i] = "Collective";
-        }
-        //check if this is the tail servo...
-        else if ((MixerOutputType[i] == MixerSettings::MIXER1TYPE_SERVO)&&
-                (MixerDataFromHeli[i][0]==0)&&//ThrottleCurve1
-                (MixerDataFromHeli[i][1]==0)&&//ThrottleCurve2
-                (MixerDataFromHeli[i][2]==0)&&//Roll
-                (MixerDataFromHeli[i][3]==0)&&//Pitch
-                (MixerDataFromHeli[i][4]>0))//Yaw
-        {
-            channelDesc[i] = "Tail";
-        }
-        //check if this is the elevator servo...
-        else if ((MixerOutputType[i] == MixerSettings::MIXER1TYPE_SERVO)&&
-                (MixerDataFromHeli[i][2]==0)&&//Roll
-                (MixerDataFromHeli[i][3]!=0))//Pitch
-        {
-            channelDesc[i] = "Elevator";
-        }
-        //check if this is a swashplate servo...
-        else if ((MixerOutputType[i] == MixerSettings::MIXER1TYPE_SERVO)&&
-            (MixerDataFromHeli[i][2]!=0))//Roll
-        {
-            channelDesc[i] = QString("%1%2").arg("Roll").arg(i);
-        }
-
-    }
-
-    return channelDesc;
 }
 
 void ConfigOutputWidget::openHelp()

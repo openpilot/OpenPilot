@@ -33,6 +33,7 @@
 #include "uavobjectmanager.h"
 #include "uavobject.h"
 #include "uavobjectutilmanager.h"
+#include "cfg_vehicletypes/guiconfigdata.h"
 #include <QtGui/QWidget>
 #include <QList>
 
@@ -58,10 +59,11 @@ private:
 	void assignChannel(UAVDataObject *obj, QString str);
 	void assignOutputChannel(UAVDataObject *obj, QString str);
     OutputChannelForm* getOutputChannelForm(const int index) const;
-    QStringList getChannelDescriptions();
 	int mccDataRate;
 
 	UAVObject::Metadata accInitialData;
+
+    GUIConfigDataManager GUIManager;
 
 	bool firstUpdate;
 

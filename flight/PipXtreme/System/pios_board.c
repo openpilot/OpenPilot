@@ -180,7 +180,13 @@ void PIOS_Board_Init(void) {
 
 #endif	/* PIOS_INCLUDE_USB */
 
-	/* Configure USART1 */
+	/* Configure USART1 (telemetry port) */
+	switch (pipxSettings.TelemetryConfig)
+	{
+	case PIPXSETTINGS_TELEMETRYCONFIG_SERIAL:
+	case PIPXSETTINGS_TELEMETRYCONFIG_UAVTALK:
+	case PIPXSETTINGS_TELEMETRYCONFIG_DEBUG:
+	case PIPXSETTINGS_TELEMETRYCONFIG_DISABLED:
 	{
 		uint32_t pios_usart1_id;
 		if (PIOS_USART_Init(&pios_usart1_id, &pios_usart_serial_cfg)) {
@@ -196,9 +202,20 @@ void PIOS_Board_Init(void) {
 											tx_buffer, PIOS_COM_SERIAL_TX_BUF_LEN)) {
 			PIOS_Assert(0);
 		}
+		break;
+	}
+	case PIPXSETTINGS_TELEMETRYCONFIG_PPM_IN:
+	case PIPXSETTINGS_TELEMETRYCONFIG_PPM_OUT:
+	case PIPXSETTINGS_TELEMETRYCONFIG_RSSI:
+		break;
 	}
 
 	/* Configure USART3 */
+	switch (pipxSettings.FlexiConfig)
+	{
+	case PIPXSETTINGS_FLEXICONFIG_SERIAL:
+	case PIPXSETTINGS_FLEXICONFIG_UAVTALK:
+	case PIPXSETTINGS_FLEXICONFIG_DEBUG:
 	{
 		uint32_t pios_usart3_id;
 		if (PIOS_USART_Init(&pios_usart3_id, &pios_usart_telem_flexi_cfg)) {
@@ -213,6 +230,13 @@ void PIOS_Board_Init(void) {
 											tx_buffer, PIOS_COM_FLEXI_TX_BUF_LEN)) {
 			PIOS_Assert(0);
 		}
+		break;
+	}
+	case PIPXSETTINGS_FLEXICONFIG_PPM_IN:
+	case PIPXSETTINGS_FLEXICONFIG_PPM_OUT:
+	case PIPXSETTINGS_FLEXICONFIG_RSSI:
+	case PIPXSETTINGS_FLEXICONFIG_DISABLED:
+		break;
 	}
 
 #if defined(PIOS_INCLUDE_RFM22B)

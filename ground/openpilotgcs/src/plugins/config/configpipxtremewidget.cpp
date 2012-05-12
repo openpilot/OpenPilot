@@ -45,9 +45,45 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
 		qDebug() << "Error: Object is unknown (PipXStatus).";
 	}
 
+	// Connect to the PipXSettings object updates
+	pipxSettingsObj = dynamic_cast<UAVDataObject*>(objManager->getObject("PipXSettings"));
+	if (pipxSettingsObj != NULL ) {
+		connect(pipxSettingsObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateSettings(UAVObject*)));
+	} else {
+		qDebug() << "Error: Object is unknown (PipXSettings).";
+	}
+
 	addApplySaveButtons(m_pipx->Apply, m_pipx->Save);
-	connect(m_pipx->Apply, SIGNAL(clicked()), this, SLOT(applySettings()));
-	connect(m_pipx->Save, SIGNAL(clicked()), this, SLOT(saveSettings()));
+	//connect(m_pipx->Apply, SIGNAL(clicked()), this, SLOT(applySettings()));
+	//connect(m_pipx->Save, SIGNAL(clicked()), this, SLOT(saveSettings()));
+
+	addUAVObjectToWidgetRelation("PipXSettings", "TelemetryConfig", m_pipx->TelemPortConfig);
+	addUAVObjectToWidgetRelation("PipXSettings", "TelemetrySpeed", m_pipx->TelemPortSpeed);
+	addUAVObjectToWidgetRelation("PipXSettings", "FlexiConfig", m_pipx->FlexiPortConfig);
+	addUAVObjectToWidgetRelation("PipXSettings", "FlexiSpeed", m_pipx->FlexiPortSpeed);
+	addUAVObjectToWidgetRelation("PipXSettings", "VCPConfig", m_pipx->VCPConfig);
+	addUAVObjectToWidgetRelation("PipXSettings", "VCPSpeed", m_pipx->VCPSpeed);
+	addUAVObjectToWidgetRelation("PipXSettings", "RFSpeed", m_pipx->MaxRFDatarate);
+	addUAVObjectToWidgetRelation("PipXSettings", "MaxRFPower", m_pipx->MaxRFTxPower);
+	addUAVObjectToWidgetRelation("PipXSettings", "SendTimeout", m_pipx->SendTimeout);
+	addUAVObjectToWidgetRelation("PipXSettings", "MinPacketSize", m_pipx->MinPacketSize);
+	addUAVObjectToWidgetRelation("PipXSettings", "FrequencyCalibration", m_pipx->FrequencyCalibration);
+	addUAVObjectToWidgetRelation("PipXSettings", "Frequency", m_pipx->Frequency);
+
+	addUAVObjectToWidgetRelation("PipXStatus", "MinFrequency", m_pipx->MinFrequency);
+	addUAVObjectToWidgetRelation("PipXStatus", "MaxFrequency", m_pipx->MaxFrequency);
+	addUAVObjectToWidgetRelation("PipXStatus", "FrequencyStepSize", m_pipx->FrequencyStepSize);
+	addUAVObjectToWidgetRelation("PipXStatus", "AFC", m_pipx->RxAFC);
+	addUAVObjectToWidgetRelation("PipXStatus", "Retries", m_pipx->Retries);
+	addUAVObjectToWidgetRelation("PipXStatus", "Errors", m_pipx->Errors);
+	addUAVObjectToWidgetRelation("PipXStatus", "UAVTalkErrors", m_pipx->UAVTalkErrors);
+	addUAVObjectToWidgetRelation("PipXStatus", "Resets", m_pipx->Resets);
+	addUAVObjectToWidgetRelation("PipXStatus", "RXRate", m_pipx->RXRate);
+	addUAVObjectToWidgetRelation("PipXStatus", "TXRate", m_pipx->TXRate);
+
+	// Request and update of the setting object.
+	settingsUpdated = false;
+	pipxSettingsObj->requestUpdate();
 }
 
 ConfigPipXtremeWidget::~ConfigPipXtremeWidget()
@@ -81,7 +117,7 @@ void ConfigPipXtremeWidget::applySettings()
 
 void ConfigPipXtremeWidget::saveSettings()
 {
-	applySettings();
+	//applySettings();
 	UAVObject *obj = PipXSettings::GetInstance(getObjectManager());
 	saveObjectToSD(obj);
 }
@@ -91,9 +127,9 @@ void ConfigPipXtremeWidget::saveSettings()
   */
 void ConfigPipXtremeWidget::updateStatus(UAVObject *object) {
 
-	// Get the settings object.
-	PipXSettings *pipxSettings = PipXSettings::GetInstance(getObjectManager());
-	PipXSettings::DataFields pipxSettingsData = pipxSettings->getData();
+	// Request and update of the setting object if we haven't received it yet.
+	if (!settingsUpdated)
+		pipxSettingsObj->requestUpdate();
 
 	// Update the detected devices.
 	UAVObjectField* pairIdField = object->getField("PairIDs");
@@ -101,22 +137,22 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object) {
 		quint32 pairid1 = pairIdField->getValue(0).toUInt();
 		m_pipx->PairID1->setText(QString::number(pairid1, 16).toUpper());
 		m_pipx->PairID1->setEnabled(false);
-		m_pipx->PairSelect1->setChecked(pipxSettingsData.PairID == pairid1);
+		m_pipx->PairSelect1->setChecked(pairID == pairid1);
 		m_pipx->PairSelect1->setEnabled(pairid1);
 		quint32 pairid2 = pairIdField->getValue(1).toUInt();
 		m_pipx->PairID2->setText(QString::number(pairIdField->getValue(1).toUInt(), 16).toUpper());
 		m_pipx->PairID2->setEnabled(false);
-		m_pipx->PairSelect2->setChecked(pipxSettingsData.PairID == pairid2);
+		m_pipx->PairSelect2->setChecked(pairID == pairid2);
 		m_pipx->PairSelect2->setEnabled(pairid2);
 		quint32 pairid3 = pairIdField->getValue(2).toUInt();
 		m_pipx->PairID3->setText(QString::number(pairIdField->getValue(2).toUInt(), 16).toUpper());
 		m_pipx->PairID3->setEnabled(false);
-		m_pipx->PairSelect3->setChecked(pipxSettingsData.PairID == pairid3);
+		m_pipx->PairSelect3->setChecked(pairID == pairid3);
 		m_pipx->PairSelect3->setEnabled(pairid3);
 		quint32 pairid4 = pairIdField->getValue(3).toUInt();
 		m_pipx->PairID4->setText(QString::number(pairIdField->getValue(3).toUInt(), 16).toUpper());
 		m_pipx->PairID4->setEnabled(false);
-		m_pipx->PairSelect4->setChecked(pipxSettingsData.PairID == pairid4);
+		m_pipx->PairSelect4->setChecked(pairID == pairid4);
 		m_pipx->PairSelect4->setEnabled(pairid4);
 	} else {
 		qDebug() << "PipXtremeGadgetWidget: Count not read PairID field.";
@@ -187,32 +223,20 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object) {
 	} else {
 		qDebug() << "PipXtremeGadgetWidget: Count not read link state field.";
 	}
-
-	// Update the Retries field
-	UAVObjectField* retriesField = object->getField("Retries");
-	if (retriesField) {
-		m_pipx->Retries->setText(QString::number(retriesField->getValue().toUInt()));
-	} else {
-		qDebug() << "PipXtremeGadgetWidget: Count not read Retries field.";
-	}
-
-	// Update the Errors field
-	UAVObjectField* errorsField = object->getField("Errors");
-	if (errorsField) {
-		m_pipx->Errors->setText(QString::number(errorsField->getValue().toUInt()));
-	} else {
-		qDebug() << "PipXtremeGadgetWidget: Count not read Errors field.";
-	}
-
-	// Update the Resets field
-	UAVObjectField* resetsField = object->getField("Resets");
-	if (resetsField) {
-		m_pipx->Retries->setText(QString::number(resetsField->getValue().toUInt()));
-	} else {
-		qDebug() << "PipXtremeGadgetWidget: Count not read Resets field.";
-	}
 }
 
+/*!
+  \brief Called by updates to @PipXSettings
+  */
+void ConfigPipXtremeWidget::updateSettings(UAVObject *object) {
+	settingsUpdated = true;
+        enableControls(true);
+
+	// Get the settings object.
+	PipXSettings *pipxSettings = PipXSettings::GetInstance(getObjectManager());
+	PipXSettings::DataFields pipxSettingsData = pipxSettings->getData();
+	pairID = pipxSettingsData.PairID;
+}
 
 /**
    @}

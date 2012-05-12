@@ -40,12 +40,19 @@ public:
     
 public slots:
 	void updateStatus(UAVObject *object1);
+	void updateSettings(UAVObject *object1);
 
 private:
 	Ui_PipXtremeWidget *m_pipx;
 
 	// The PipXtreme status UAVObject
 	UAVDataObject* pipxStatusObj;
+
+	// The PipXtreme ssettins UAVObject
+	UAVDataObject* pipxSettingsObj;
+
+	bool settingsUpdated;
+	quint32 pairID;
 
 private slots:
 	void refreshValues();

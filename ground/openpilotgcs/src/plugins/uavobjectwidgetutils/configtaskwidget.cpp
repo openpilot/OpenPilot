@@ -26,12 +26,13 @@
  */
 #include "configtaskwidget.h"
 #include <QtGui/QWidget>
+#include <QtGui/QLineEdit>
 #include "uavsettingsimportexport/uavsettingsimportexportfactory.h"
 
 /**
  * Constructor
  */
-ConfigTaskWidget::ConfigTaskWidget(QWidget *parent) : QWidget(parent),isConnected(false),smartsave(NULL),dirty(false),outOfLimitsStyle("background-color: rgb(255, 0, 0);"),timeOut(NULL)
+ConfigTaskWidget::ConfigTaskWidget(QWidget *parent) : QWidget(parent),isConnected(false),smartsave(NULL),dirty(false),outOfLimitsStyle("background-color: rgb(255, 0, 0);")
 {
     pm = ExtensionSystem::PluginManager::instance();
     objManager = pm->getObject<UAVObjectManager>();
@@ -126,7 +127,7 @@ void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString fiel
         Q_ASSERT(obj);
         objectUpdates.insert(obj,true);
         connect(obj, SIGNAL(objectUpdated(UAVObject*)),this, SLOT(objectUpdated(UAVObject*)));
-        connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshWidgetsValues()));
+        connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshWidgetsValues(UAVObject*)));
     }
     if(!field.isEmpty() && obj)
         _field = obj->getField(QString(field));
@@ -174,10 +175,6 @@ ConfigTaskWidget::~ConfigTaskWidget()
     {
         if(oTw)
             delete oTw;
-    }
-    if(timeOut)
-    {
-        delete timeOut;
     }
 }
 
@@ -255,7 +252,7 @@ void ConfigTaskWidget::populateWidgets()
  * object field added to the framework pool
  * Overwrite this if you need to change the default behavior
  */
-void ConfigTaskWidget::refreshWidgetsValues()
+void ConfigTaskWidget::refreshWidgetsValues(UAVObject * obj)
 {
     bool dirtyBack=dirty;
     emit refreshWidgetsValuesRequested();
@@ -267,8 +264,8 @@ void ConfigTaskWidget::refreshWidgetsValues()
         }
         else
         {
-            setWidgetFromField(ow->widget,ow->field,ow->index,ow->scale,ow->isLimited);
-
+            if(ow->object==obj || obj==NULL)
+                setWidgetFromField(ow->widget,ow->field,ow->index,ow->scale,ow->isLimited);
         }
 
     }
@@ -465,7 +462,7 @@ void ConfigTaskWidget::enableObjUpdates()
     foreach(objectToWidget * obj,objOfInterest)
     {
         if(obj->object)
-            connect(obj->object, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshWidgetsValues()));
+            connect(obj->object, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshWidgetsValues(UAVObject*)));
     }
 }
 /**
@@ -784,7 +781,7 @@ void ConfigTaskWidget::reloadButtonClicked()
     if(!list)
         return;
     ObjectPersistence* objper = dynamic_cast<ObjectPersistence*>( getObjectManager()->getObject(ObjectPersistence::NAME) );
-    timeOut=new QTimer(this);
+    QTimer * timeOut=new QTimer(this);
     QEventLoop * eventLoop=new QEventLoop(this);
     connect(timeOut, SIGNAL(timeout()),eventLoop,SLOT(quit()));
     connect(objper, SIGNAL(objectUpdated(UAVObject*)), eventLoop, SLOT(quit()));
@@ -803,22 +800,13 @@ void ConfigTaskWidget::reloadButtonClicked()
             eventLoop->exec();
             if(timeOut->isActive())
             {
-                oTw->object->requestUpdate();
                 setWidgetFromField(oTw->widget,oTw->field,oTw->index,oTw->scale,oTw->isLimited);
             }
             timeOut->stop();
         }
     }
-    if(eventLoop)
-    {
-        delete eventLoop;
-        eventLoop=NULL;
-    }
-    if(timeOut)
-    {
-        delete timeOut;
-        timeOut=NULL;
-    }
+    delete eventLoop;
+    delete timeOut;
 }
 
 /**
@@ -1002,6 +990,14 @@ bool ConfigTaskWidget::setWidgetFromVariant(QWidget *widget, QVariant value, dou
     {
         bool bvalue=value.toString()=="TRUE";
         cb->setChecked(bvalue);
+        return true;
+    }
+    else if(QLineEdit * cb=qobject_cast<QLineEdit *>(widget))
+    {
+        if(scale==0)
+            cb->setText(value.toString());
+        else
+            cb->setText(QString::number((value.toDouble()/scale)));
         return true;
     }
     else

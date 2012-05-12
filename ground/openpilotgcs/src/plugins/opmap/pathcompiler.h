@@ -29,6 +29,10 @@
 
 #include <QObject>
 #include <uavobject.h>
+#include <uavobjectmanager.h>
+
+// TODO: Make this a singleton class and separate from map library.  Not sure of the proper design pattern in Qt.
+// factory? static variables?
 
 /**
   * This class is a two way adapter between a visualization of a path and the
@@ -53,6 +57,13 @@ public:
         float latitude;
         float longitude;
     };
+
+private:
+    //! Helper method to get uavobject manager
+    UAVObjectManager * getObjectManager();
+
+    //! The internal list of waypoints
+    QList <struct waypoint> waypoints;
 
 signals:
     /**

@@ -269,14 +269,20 @@ static int32_t updateAttitudeComplimentary(bool first_run)
 	FlightStatusData flightStatus;
 	FlightStatusGet(&flightStatus);
 	if(first_run) {
+#if defined(PIOS_INCLUDE_HMC5883)
 		// To initialize we need a valid mag reading
 		if ( xQueueReceive(magQueue, &ev, 0 / portTICK_RATE_MS) != pdTRUE )
 			return -1;
-
-		AttitudeActualData attitudeActual;
-		AttitudeActualGet(&attitudeActual);
 		MagnetometerData magData;
 		MagnetometerGet(&magData);
+#else
+		MagnetometerData magData;
+		magData.x = 100;
+		magData.y = 0;
+		magData.z = 0;
+#endif
+		AttitudeActualData attitudeActual;
+		AttitudeActualGet(&attitudeActual);
 		init = 0;
 		attitudeActual.Roll = atan2f(-accelsData.y, -accelsData.z) * 180.0f / F_PI;
 		attitudeActual.Pitch = atan2f(accelsData.x, -accelsData.z) * 180.0f / F_PI;

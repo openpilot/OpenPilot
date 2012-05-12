@@ -194,6 +194,8 @@ static void SensorsTask(void *parameters)
 
 #if defined(PIOS_INCLUDE_HMC5883)
 	mag_test = PIOS_HMC5883_Test();
+#else
+	mag_test = 0;
 #endif
 
 	if(accel_test < 0 || gyro_test < 0 || mag_test < 0) {
@@ -412,16 +414,7 @@ static void SensorsTask(void *parameters)
 
 		PIOS_WDG_UpdateFlag(PIOS_WDG_SENSORS);
 
-		switch(bdinfo->board_rev) {
-			case 0x01:  // L3GD20 + BMA180 board
-				lastSysTime = xTaskGetTickCount();
-				break;
-			case 0x02:
-				vTaskDelayUntil(&lastSysTime, SENSOR_PERIOD / portTICK_RATE_MS);
-				break;
-			default:
-				PIOS_DEBUG_Assert(0);
-		}
+		lastSysTime = xTaskGetTickCount();
 	}
 }
 

@@ -282,26 +282,19 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     // **************
     // connect to the UAVObject updates we require to become a bit aware of our environment:
 
-    if (pm)
-    {
-        // Register for Home Location state changes
-        if (obm)
-        {
-            UAVDataObject *obj = dynamic_cast<UAVDataObject *>(obm->getObject(QString("HomeLocation")));
-            if (obj)
-            {
-                connect(obj, SIGNAL(objectUpdated(UAVObject *)), this , SLOT(homePositionUpdated(UAVObject *)));
-            }
-        }
+    Q_ASSERT(pm);
+    Q_ASSERT(obm);
 
-        // Listen to telemetry connection events
-        TelemetryManager *telMngr = pm->getObject<TelemetryManager>();
-        if (telMngr)
-        {
-            connect(telMngr, SIGNAL(connected()), this, SLOT(onTelemetryConnect()));
-            connect(telMngr, SIGNAL(disconnected()), this, SLOT(onTelemetryDisconnect()));
-        }
-    }
+    // Register for Home Location state changes
+    HomeLocation *obj = HomeLocation::GetInstance(obm);
+    Q_ASSERT(obj != NULL);
+    connect(obj, SIGNAL(objectUpdated(UAVObject *)), this , SLOT(homePositionUpdated(UAVObject *)));
+
+    // Listen to telemetry connection events
+    TelemetryManager *telMngr = pm->getObject<TelemetryManager>();
+    Q_ASSERT(telMngr);
+    connect(telMngr, SIGNAL(connected()), this, SLOT(onTelemetryConnect()));
+    connect(telMngr, SIGNAL(disconnected()), this, SLOT(onTelemetryDisconnect()));
 
     // **************
     // create the desired timers
@@ -331,29 +324,6 @@ OPMapGadgetWidget::~OPMapGadgetWidget()
         m_map->SetShowHome(false);	// doing this appears to stop the map lib crashing on exit
         m_map->SetShowUAV(false);	//   "          "
     }
-
-
-    // this destructor doesn't appear to be called at shutdown???
-
-    //    #if defined(Q_OS_MAC)
-    //    #elif defined(Q_OS_WIN)
-    //	saveComboBoxLines(m_widget->comboBoxFindPlace, QCoreApplication::applicationDirPath() + "/opmap_find_place_history.txt");
-    //    #else
-    //    #endif
-
-    m_waypoint_list_mutex.lock();
-    foreach (t_waypoint *wp, m_waypoint_list)
-    {
-        if (!wp) continue;
-
-
-        // todo:
-
-
-        delete wp->map_wp_item;
-    }
-    m_waypoint_list_mutex.unlock();
-    m_waypoint_list.clear();
 
     if (m_map)
     {
@@ -472,11 +442,6 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
 
     menu.addSeparator();
 
-    /*
-    menu.addAction(findPlaceAct);
-
-    menu.addSeparator();
-    */
     QMenu safeArea("Safety Area definitions");
     // menu.addAction(showSafeAreaAct);
     QMenu safeAreaSubMenu(tr("Safe Area Radius") + " (" + QString::number(m_map->Home->SafeArea()) + "m)", this);

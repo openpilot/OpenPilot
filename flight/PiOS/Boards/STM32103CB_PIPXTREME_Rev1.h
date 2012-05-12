@@ -75,6 +75,7 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 #define PIOS_WDG_RADIORECEIVE    0x0002
 #define PIOS_WDG_SENDPACKET      0x0004
 #define PIOS_WDG_SENDDATA        0x0008
+#define PIOS_WDG_TRANSCOMM       0x0010
 
 //------------------------
 // TELEMETRY
@@ -150,23 +151,26 @@ extern uint32_t pios_spi_port_id;
 //-------------------------
 #define PIOS_COM_MAX_DEVS			5
 
-extern uint32_t pios_com_telem_usb_id;
-extern uint32_t pios_com_vcp_usb_id;
-extern uint32_t pios_com_usart1_id;
-extern uint32_t pios_com_usart3_id;
+extern uint32_t pios_com_usb_hid_id;
+extern uint32_t pios_com_telemetry_id;
+extern uint32_t pios_com_flexi_id;
+extern uint32_t pios_com_vcp_id;
+extern uint32_t pios_com_uavtalk_com_id;
+extern uint32_t pios_com_trans_com_id;
+extern uint32_t pios_com_debug_id;
 extern uint32_t pios_com_rfm22b_id;
-#define PIOS_COM_TELEM_SERIAL           (pios_com_usart1_id)
-#define PIOS_COM_FLEXI                  (pios_com_usart3_id)
-#define PIOS_COM_TELEM_USB              (pios_com_telem_usb_id)
-#define PIOS_COM_VCP_USB                (pios_com_vcp_usb_id)
-#define PIOS_COM_RFM22B_RF              (pios_com_rfm22b_id)
-#define PIOS_COM_BRIDGE_RADIO	 PIOS_COM_RFM22B_RF
-#define PIOS_COM_DEBUG          PIOS_COM_FLEXI
-#define PIOS_COM_BRIDGE_COM     PIOS_COM_TELEM_SERIAL
+#define PIOS_COM_USB_HID           (pios_com_usb_hid_id)
+#define PIOS_COM_TELEMETRY         (pios_com_telemetry_id)
+#define PIOS_COM_FLEXI             (pios_com_flexi_id)
+#define PIOS_COM_VCP               (pios_com_vcp_id)
+#define PIOS_COM_UAVTALK           (pios_com_uavtalk_com_id)
+#define PIOS_COM_TRANS_COM         (pios_com_trans_com_id)
+#define PIOS_COM_DEBUG             (pios_com_debug_id)
+#define PIOS_COM_RADIO             (pios_com_rfm22b_id)
 
 #define DEBUG_LEVEL 2
 #if DEBUG_LEVEL > 0
-#define DEBUG_PRINTF(level, ...) if(level <= DEBUG_LEVEL) { PIOS_COM_SendFormattedStringNonBlocking(PIOS_COM_DEBUG, __VA_ARGS__); }
+#define DEBUG_PRINTF(level, ...) {if(level <= DEBUG_LEVEL && PIOS_COM_DEBUG > 0) { PIOS_COM_SendFormattedStringNonBlocking(PIOS_COM_DEBUG, __VA_ARGS__); }}
 #else
 #define DEBUG_PRINTF(...)
 #endif

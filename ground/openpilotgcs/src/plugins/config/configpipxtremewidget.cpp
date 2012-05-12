@@ -81,6 +81,10 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
 	addUAVObjectToWidgetRelation("PipXStatus", "RXRate", m_pipx->RXRate);
 	addUAVObjectToWidgetRelation("PipXStatus", "TXRate", m_pipx->TXRate);
 
+	// Create the timer that is used to timeout the connection to the PipX.
+	timeOut = new QTimer(this);
+	connect(timeOut, SIGNAL(timeout()),this,SLOT(disconnected()));
+
 	// Request and update of the setting object.
 	settingsUpdated = false;
 	pipxSettingsObj->requestUpdate();
@@ -125,7 +129,11 @@ void ConfigPipXtremeWidget::saveSettings()
 /*!
   \brief Called by updates to @PipXStatus
   */
-void ConfigPipXtremeWidget::updateStatus(UAVObject *object) {
+void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
+{
+
+	// Restart the disconnection timer.
+	timeOut->start(5000);
 
 	// Request and update of the setting object if we haven't received it yet.
 	if (!settingsUpdated)
@@ -228,7 +236,8 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object) {
 /*!
   \brief Called by updates to @PipXSettings
   */
-void ConfigPipXtremeWidget::updateSettings(UAVObject *object) {
+void ConfigPipXtremeWidget::updateSettings(UAVObject *object)
+{
 	settingsUpdated = true;
         enableControls(true);
 
@@ -236,6 +245,12 @@ void ConfigPipXtremeWidget::updateSettings(UAVObject *object) {
 	PipXSettings *pipxSettings = PipXSettings::GetInstance(getObjectManager());
 	PipXSettings::DataFields pipxSettingsData = pipxSettings->getData();
 	pairID = pipxSettingsData.PairID;
+}
+
+void ConfigPipXtremeWidget::disconnected()
+{
+	settingsUpdated = false;
+	enableControls(false);
 }
 
 /**

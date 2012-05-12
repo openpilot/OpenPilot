@@ -54,10 +54,14 @@ private:
 	bool settingsUpdated;
 	quint32 pairID;
 
+	// A timer that timesout the connction to the PipX.
+	QTimer *timeOut;
+
 private slots:
 	void refreshValues();
 	void applySettings();
 	void saveSettings();
+	void disconnected();
 };
 
 #endif // CONFIGTXPIDWIDGET_H

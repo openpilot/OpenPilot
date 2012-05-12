@@ -48,12 +48,15 @@
 #define PIOS_COM_RFM22B_RF_RX_BUF_LEN 192
 #define PIOS_COM_RFM22B_RF_TX_BUF_LEN 192
 
-uint32_t pios_com_telem_usb_id;
-uint32_t pios_com_vcp_usb_id;
-uint32_t pios_com_usart1_id;
-uint32_t pios_com_usart3_id;
-uint32_t pios_com_rfm22b_id;
-uint32_t pios_rfm22b_id;
+uint32_t pios_com_usb_hid_id = 0;
+uint32_t pios_com_telemetry_id;
+uint32_t pios_com_flexi_id;
+uint32_t pios_com_vcp_id;
+uint32_t pios_com_uavtalk_com_id = 0;
+uint32_t pios_com_trans_com_id = 0;
+uint32_t pios_com_debug_id = 0;
+uint32_t pios_com_rfm22b_id = 0;
+uint32_t pios_rfm22b_id = 0;
 
 /**
  * PIOS_Board_Init()
@@ -136,6 +139,10 @@ void PIOS_Board_Init(void) {
 #if defined(PIOS_INCLUDE_USB_CDC)
 
 #if defined(PIOS_INCLUDE_COM)
+	switch (pipxSettings.VCPConfig)
+	{
+	case PIPXSETTINGS_VCPCONFIG_SERIAL:
+	case PIPXSETTINGS_VCPCONFIG_DEBUG:
 	{
 		uint32_t pios_usb_cdc_id;
 		if (PIOS_USB_CDC_Init(&pios_usb_cdc_id, &pios_usb_cdc_cfg, pios_usb_id)) {
@@ -145,11 +152,27 @@ void PIOS_Board_Init(void) {
 		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_VCP_USB_TX_BUF_LEN);
 		PIOS_Assert(rx_buffer);
 		PIOS_Assert(tx_buffer);
-		if (PIOS_COM_Init(&pios_com_vcp_usb_id, &pios_usb_cdc_com_driver, pios_usb_cdc_id,
+		if (PIOS_COM_Init(&pios_com_vcp_id, &pios_usb_cdc_com_driver, pios_usb_cdc_id,
 											rx_buffer, PIOS_COM_VCP_USB_RX_BUF_LEN,
 											tx_buffer, PIOS_COM_VCP_USB_TX_BUF_LEN)) {
 			PIOS_Assert(0);
 		}
+		switch (pipxSettings.TelemetryConfig)
+		{
+		case PIPXSETTINGS_VCPCONFIG_SERIAL:
+			pios_com_trans_com_id = pios_com_vcp_id;
+			break;
+		case PIPXSETTINGS_VCPCONFIG_UAVTALK:
+			pios_com_uavtalk_com_id = pios_com_vcp_id;
+			break;
+		case PIPXSETTINGS_VCPCONFIG_DEBUG:
+			pios_com_debug_id = pios_com_vcp_id;
+			break;
+		}
+		break;
+	}
+	case PIPXSETTINGS_VCPCONFIG_DISABLED:
+		break;
 	}
 #endif	/* PIOS_INCLUDE_COM */
 
@@ -168,7 +191,7 @@ void PIOS_Board_Init(void) {
 		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_USB_TX_BUF_LEN);
 		PIOS_Assert(rx_buffer);
 		PIOS_Assert(tx_buffer);
-		if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_hid_com_driver, pios_usb_hid_id,
+		if (PIOS_COM_Init(&pios_com_usb_hid_id, &pios_usb_hid_com_driver, pios_usb_hid_id,
 											rx_buffer, PIOS_COM_TELEM_USB_RX_BUF_LEN,
 											tx_buffer, PIOS_COM_TELEM_USB_TX_BUF_LEN)) {
 			PIOS_Assert(0);
@@ -186,27 +209,38 @@ void PIOS_Board_Init(void) {
 	case PIPXSETTINGS_TELEMETRYCONFIG_SERIAL:
 	case PIPXSETTINGS_TELEMETRYCONFIG_UAVTALK:
 	case PIPXSETTINGS_TELEMETRYCONFIG_DEBUG:
-	case PIPXSETTINGS_TELEMETRYCONFIG_DISABLED:
 	{
 		uint32_t pios_usart1_id;
 		if (PIOS_USART_Init(&pios_usart1_id, &pios_usart_serial_cfg)) {
 			PIOS_Assert(0);
 		}
-
 		uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_SERIAL_RX_BUF_LEN);
 		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_SERIAL_TX_BUF_LEN);
 		PIOS_Assert(rx_buffer);
 		PIOS_Assert(tx_buffer);
-		if (PIOS_COM_Init(&pios_com_usart1_id, &pios_usart_com_driver, pios_usart1_id,
+		if (PIOS_COM_Init(&pios_com_telemetry_id, &pios_usart_com_driver, pios_usart1_id,
 											rx_buffer, PIOS_COM_SERIAL_RX_BUF_LEN,
 											tx_buffer, PIOS_COM_SERIAL_TX_BUF_LEN)) {
 			PIOS_Assert(0);
+		}
+		switch (pipxSettings.TelemetryConfig)
+		{
+		case PIPXSETTINGS_TELEMETRYCONFIG_SERIAL:
+			pios_com_trans_com_id = pios_com_telemetry_id;
+			break;
+		case PIPXSETTINGS_TELEMETRYCONFIG_UAVTALK:
+			pios_com_uavtalk_com_id = pios_com_telemetry_id;
+			break;
+		case PIPXSETTINGS_TELEMETRYCONFIG_DEBUG:
+			pios_com_debug_id = pios_com_telemetry_id;
+			break;
 		}
 		break;
 	}
 	case PIPXSETTINGS_TELEMETRYCONFIG_PPM_IN:
 	case PIPXSETTINGS_TELEMETRYCONFIG_PPM_OUT:
 	case PIPXSETTINGS_TELEMETRYCONFIG_RSSI:
+	case PIPXSETTINGS_TELEMETRYCONFIG_DISABLED:
 		break;
 	}
 
@@ -225,10 +259,22 @@ void PIOS_Board_Init(void) {
 		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_FLEXI_TX_BUF_LEN);
 		PIOS_Assert(rx_buffer);
 		PIOS_Assert(tx_buffer);
-		if (PIOS_COM_Init(&pios_com_usart3_id, &pios_usart_com_driver, pios_usart3_id,
+		if (PIOS_COM_Init(&pios_com_flexi_id, &pios_usart_com_driver, pios_usart3_id,
 											rx_buffer, PIOS_COM_FLEXI_RX_BUF_LEN,
 											tx_buffer, PIOS_COM_FLEXI_TX_BUF_LEN)) {
 			PIOS_Assert(0);
+		}
+		switch (pipxSettings.FlexiConfig)
+		{
+		case PIPXSETTINGS_FLEXICONFIG_SERIAL:
+			pios_com_trans_com_id = pios_com_flexi_id;
+			break;
+		case PIPXSETTINGS_FLEXICONFIG_UAVTALK:
+			pios_com_uavtalk_com_id = pios_com_flexi_id;
+			break;
+		case PIPXSETTINGS_FLEXICONFIG_DEBUG:
+			pios_com_debug_id = pios_com_flexi_id;
+			break;
 		}
 		break;
 	}

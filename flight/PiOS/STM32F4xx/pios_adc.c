@@ -82,9 +82,7 @@ struct pios_adc_dev {
 	enum pios_adc_dev_magic magic;
 };
 
-#if defined(PIOS_INCLUDE_FREERTOS)
 struct pios_adc_dev * pios_adc_dev;
-#endif
 
 // Private functions
 void PIOS_ADC_downsample_data();
@@ -271,7 +269,13 @@ static struct pios_adc_dev * PIOS_ADC_Allocate()
 	return(adc_dev);
 }
 #else
+#if defined(PIOS_INCLUDE_ADC)
 #error Not implemented
+#endif
+static struct pios_adc_dev * PIOS_ADC_Allocate()
+{
+	return (struct pios_adc_dev *) NULL;
+}
 #endif
 
 /**

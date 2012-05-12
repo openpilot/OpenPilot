@@ -325,6 +325,21 @@ OPMapGadgetWidget::~OPMapGadgetWidget()
         m_map->SetShowUAV(false);	//   "          "
     }
 
+
+    m_waypoint_list_mutex.lock();
+    foreach (t_waypoint *wp, m_waypoint_list)
+    {
+        if (!wp) continue;
+
+
+        // todo:
+
+
+        delete wp->map_wp_item;
+    }
+    m_waypoint_list_mutex.unlock();
+    m_waypoint_list.clear();
+
     if (m_map)
     {
         delete m_map;
@@ -442,6 +457,11 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
 
     menu.addSeparator();
 
+    /*
+    menu.addAction(findPlaceAct);
+
+    menu.addSeparator();
+    */
     QMenu safeArea("Safety Area definitions");
     // menu.addAction(showSafeAreaAct);
     QMenu safeAreaSubMenu(tr("Safe Area Radius") + " (" + QString::number(m_map->Home->SafeArea()) + "m)", this);
@@ -514,32 +534,32 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
 
     // *********
 
+    qDebug() << "Testing mode";
     switch (m_map_mode)
     {
     case Normal_MapMode:
+        qDebug() << "Normal mode";
         // only show the waypoint stuff if not in 'magic waypoint' mode
-        /*
-            menu.addSeparator()->setText(tr("Waypoints"));
+        menu.addSeparator()->setText(tr("Waypoints"));
 
-            menu.addAction(wayPointEditorAct);
-            menu.addAction(addWayPointAct);
+        menu.addAction(wayPointEditorAct);
+        menu.addAction(addWayPointAct);
 
-            if (m_mouse_waypoint)
-            {	// we have a waypoint under the mouse
-                menu.addAction(editWayPointAct);
+        if (m_mouse_waypoint)
+        {	// we have a waypoint under the mouse
+            menu.addAction(editWayPointAct);
 
-                lockWayPointAct->setChecked(waypoint_locked);
-                menu.addAction(lockWayPointAct);
+            lockWayPointAct->setChecked(waypoint_locked);
+            menu.addAction(lockWayPointAct);
 
-                if (!waypoint_locked)
-                    menu.addAction(deleteWayPointAct);
-            }
+            if (!waypoint_locked)
+                menu.addAction(deleteWayPointAct);
+        }
 
-            m_waypoint_list_mutex.lock();
-            if (m_waypoint_list.count() > 0)
-                menu.addAction(clearWayPointsAct);	// we have waypoints
-            m_waypoint_list_mutex.unlock();
-            */
+        m_waypoint_list_mutex.lock();
+        if (m_waypoint_list.count() > 0)
+            menu.addAction(clearWayPointsAct);	// we have waypoints
+        m_waypoint_list_mutex.unlock();
 
         break;
 
@@ -1476,16 +1496,12 @@ void OPMapGadgetWidget::createActions()
     followUAVheadingAct->setChecked(false);
     connect(followUAVheadingAct, SIGNAL(toggled(bool)), this, SLOT(onFollowUAVheadingAct_toggled(bool)));
 
-    /*
-      TODO: Waypoint support is disabled for v1.0
-      */
-
-    /*
+    /* Waypoint stuff */
     wayPointEditorAct = new QAction(tr("&Waypoint editor"), this);
     wayPointEditorAct->setShortcut(tr("Ctrl+W"));
     wayPointEditorAct->setStatusTip(tr("Open the waypoint editor"));
     wayPointEditorAct->setEnabled(false);   // temporary
-    connect(wayPointEditorAct, SIGNAL(triggered()), this, SLOT(onOpenWayPointEditorAct_triggered()));
+    //connect(wayPointEditorAct, SIGNAL(triggered()), this, SLOT(onOpenWayPointEditorAct_triggered()));
 
     addWayPointAct = new QAction(tr("&Add waypoint"), this);
     addWayPointAct->setShortcut(tr("Ctrl+A"));
@@ -1512,7 +1528,6 @@ void OPMapGadgetWidget::createActions()
     clearWayPointsAct->setShortcut(tr("Ctrl+C"));
     clearWayPointsAct->setStatusTip(tr("Clear waypoints"));
     connect(clearWayPointsAct, SIGNAL(triggered()), this, SLOT(onClearWayPointsAct_triggered()));
-    */
 
     homeMagicWaypointAct = new QAction(tr("Home magic waypoint"), this);
     homeMagicWaypointAct->setStatusTip(tr("Move the magic waypoint to the home position"));
@@ -1877,24 +1892,20 @@ void OPMapGadgetWidget::onUAVTrailDistanceActGroup_triggered(QAction *action)
     m_map->UAV->SetTrailDistance(trail_distance);
 }
 
-/**
-  * TODO: unused for v1.0
-  **/
-/*
 void OPMapGadgetWidget::onAddWayPointAct_triggered()
 {
- if (!m_widget || !m_map)
-  return;
+    if (!m_widget || !m_map)
+        return;
 
     if (m_map_mode != Normal_MapMode)
         return;
 
     m_waypoint_list_mutex.lock();
 
- // create a waypoint on the map at the last known mouse position
+    // create a waypoint on the map at the last known mouse position
     t_waypoint *wp = new t_waypoint;
     wp->map_wp_item = NULL;
-    wp->coord = context_menu_lat_lon;
+    wp->coord = m_context_menu_lat_lon;
     wp->altitude = 0;
     wp->description = "";
     wp->locked = false;
@@ -1920,7 +1931,6 @@ void OPMapGadgetWidget::onAddWayPointAct_triggered()
 
     m_waypoint_list_mutex.unlock();
 }
-*/
 
 /**
   * Called when the user asks to edit a waypoint from the map
@@ -1928,11 +1938,10 @@ void OPMapGadgetWidget::onAddWayPointAct_triggered()
   * TODO: should open an interface to edit waypoint properties, or
   *       propagate the signal to a specific WP plugin (tbd).
   **/
-/*
 void OPMapGadgetWidget::onEditWayPointAct_triggered()
 {
- if (!m_widget || !m_map)
-  return;
+    if (!m_widget || !m_map)
+        return;
 
     if (m_map_mode != Normal_MapMode)
         return;
@@ -1944,12 +1953,7 @@ void OPMapGadgetWidget::onEditWayPointAct_triggered()
 
     m_mouse_waypoint = NULL;
 }
-*/
 
-/**
-  * TODO: unused for v1.0
-  */
-/*
 void OPMapGadgetWidget::onLockWayPointAct_triggered()
 {
     if (!m_widget || !m_map || !m_mouse_waypoint)
@@ -1969,12 +1973,7 @@ void OPMapGadgetWidget::onLockWayPointAct_triggered()
 
     m_mouse_waypoint = NULL;
 }
-*/
 
-/**
-  * TODO: unused for v1.0
-  */
-/*
 void OPMapGadgetWidget::onDeleteWayPointAct_triggered()
 {
     if (!m_widget || !m_map)
@@ -2008,31 +2007,29 @@ void OPMapGadgetWidget::onDeleteWayPointAct_triggered()
 
         break;
     }
-//
-//    foreach (t_waypoint *wp, m_waypoint_list)
-//    {
-//        if (!wp) continue;
-//        if (!wp->map_wp_item || wp->map_wp_item != m_mouse_waypoint) continue;
-//
-//	    // delete the waypoint from the map
-//      m_map->WPDelete(wp->map_wp_item);
-//
-//	    // delete the waypoint from our local waypoint list
-//        m_waypoint_list.removeOne(wp);
-//
-//        delete wp;
-//
-//	    break;
-//	}
+
+    foreach (t_waypoint *wp, m_waypoint_list)
+    {
+        if (!wp) continue;
+        if (!wp->map_wp_item || wp->map_wp_item != m_mouse_waypoint) continue;
+
+        // delete the waypoint from the map
+        m_map->WPDelete(wp->map_wp_item);
+
+        // delete the waypoint from our local waypoint list
+        m_waypoint_list.removeOne(wp);
+
+        delete wp;
+
+        break;
+    }
 
     m_mouse_waypoint = NULL;
 }
-*/
 
 /**
   * TODO: No Waypoint support in v1.0
   */
-/*
 void OPMapGadgetWidget::onClearWayPointsAct_triggered()
 {
     if (!m_widget || !m_map)
@@ -2043,7 +2040,7 @@ void OPMapGadgetWidget::onClearWayPointsAct_triggered()
 
     QMutexLocker locker(&m_waypoint_list_mutex);
 
- m_map->WPDeleteAll();
+    m_map->WPDeleteAll();
 
     foreach (t_waypoint *wp, m_waypoint_list)
     {
@@ -2056,7 +2053,6 @@ void OPMapGadgetWidget::onClearWayPointsAct_triggered()
 
     m_waypoint_list.clear();
 }
-*/
 
 void OPMapGadgetWidget::onHomeMagicWaypointAct_triggered()
 {

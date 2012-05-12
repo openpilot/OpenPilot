@@ -7,7 +7,7 @@
  * @{
  * @addtogroup OPMapPlugin OpenPilot Map Plugin
  * @{
- * @brief The OpenPilot Map plugin 
+ * @brief The OpenPilot Map plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -57,7 +57,7 @@
 
 namespace Ui
 {
-    class OPMap_Widget;
+class OPMap_Widget;
 }
 
 using namespace mapcontrol;
@@ -96,7 +96,7 @@ class OPMapGadgetWidget : public QWidget
 
 public:
     OPMapGadgetWidget(QWidget *parent = 0);
-   ~OPMapGadgetWidget();
+    ~OPMapGadgetWidget();
 
     /**
     * @brief public functions
@@ -115,8 +115,8 @@ public:
     void setUseMemoryCache(bool useMemoryCache);
     void setCacheLocation(QString cacheLocation);
     void setMapMode(opMapModeType mode);
-	void SetUavPic(QString UAVPic);
-	void setMaxUpdateRate(int update_rate);
+    void SetUavPic(QString UAVPic);
+    void setMaxUpdateRate(int update_rate);
 
 public slots:
     void homePositionUpdated(UAVObject *);
@@ -142,21 +142,21 @@ private slots:
     *
     * Some are currently disabled for the v1.0 plugin version.
     */
-//    void comboBoxFindPlace_returnPressed();
-//    void on_toolButtonFindPlace_clicked();
+    //    void comboBoxFindPlace_returnPressed();
+    //    void on_toolButtonFindPlace_clicked();
     void on_toolButtonZoomM_clicked();
     void on_toolButtonZoomP_clicked();
     void on_toolButtonMapHome_clicked();
     void on_toolButtonMapUAV_clicked();
     void on_toolButtonMapUAVheading_clicked();
     void on_horizontalSliderZoom_sliderMoved(int position);
-//    void on_toolButtonAddWaypoint_clicked();
-//    void on_treeViewWaypoints_clicked(QModelIndex index);
-//    void on_toolButtonHome_clicked();
-//    void on_toolButtonNextWaypoint_clicked();
-//    void on_toolButtonPrevWaypoint_clicked();
-//    void on_toolButtonHoldPosition_clicked();
-//    void on_toolButtonGo_clicked();
+    //    void on_toolButtonAddWaypoint_clicked();
+    //    void on_treeViewWaypoints_clicked(QModelIndex index);
+    //    void on_toolButtonHome_clicked();
+    //    void on_toolButtonNextWaypoint_clicked();
+    //    void on_toolButtonPrevWaypoint_clicked();
+    //    void on_toolButtonHoldPosition_clicked();
+    //    void on_toolButtonGo_clicked();
     void on_toolButtonMagicWaypointMapMode_clicked();
     void on_toolButtonNormalMapMode_clicked();
     void on_toolButtonHomeWaypoint_clicked();
@@ -191,7 +191,7 @@ private slots:
     void onCopyMouseLatLonToClipAct_triggered();
     void onCopyMouseLatToClipAct_triggered();
     void onCopyMouseLonToClipAct_triggered();
-//    void onFindPlaceAct_triggered();
+    //    void onFindPlaceAct_triggered();
     void onShowCompassAct_toggled(bool show);
     void onShowDiagnostics_toggled(bool show);
     void onShowUAVAct_toggled(bool show);
@@ -206,14 +206,12 @@ private slots:
     void onGoUAVAct_triggered();
     void onFollowUAVpositionAct_toggled(bool checked);
     void onFollowUAVheadingAct_toggled(bool checked);
-/*
-    void onOpenWayPointEditorAct_triggered();
+    //void onOpenWayPointEditorAct_triggered();
     void onAddWayPointAct_triggered();
     void onEditWayPointAct_triggered();
     void onLockWayPointAct_triggered();
     void onDeleteWayPointAct_triggered();
     void onClearWayPointsAct_triggered();
-*/
     void onMapModeActGroup_triggered(QAction *action);
     void onZoomActGroup_triggered(QAction *action);
     void onHomeMagicWaypointAct_triggered();
@@ -223,31 +221,31 @@ private slots:
     void onClearUAVtrailAct_triggered();
     void onUAVTrailTimeActGroup_triggered(QAction *action);
     void onUAVTrailDistanceActGroup_triggered(QAction *action);
-	void onMaxUpdateRateActGroup_triggered(QAction *action);
+    void onMaxUpdateRateActGroup_triggered(QAction *action);
 
 private:
 
-	// *****
+    // *****
 
-	int m_min_zoom;
-	int m_max_zoom;
+    int m_min_zoom;
+    int m_max_zoom;
 
     double m_heading;	// uav heading
 
-	internals::PointLatLng m_mouse_lat_lon;
-	internals::PointLatLng m_context_menu_lat_lon;
+    internals::PointLatLng m_mouse_lat_lon;
+    internals::PointLatLng m_context_menu_lat_lon;
 
-	int m_prev_tile_number;
+    int m_prev_tile_number;
 
     opMapModeType m_map_mode;
 
-	int m_maxUpdateRate;
+    int m_maxUpdateRate;
 
-	t_home m_home_position;
+    t_home m_home_position;
 
-	t_waypoint m_magic_waypoint;
+    t_waypoint m_magic_waypoint;
 
-	QStringList findPlaceWordList;
+    QStringList findPlaceWordList;
     QCompleter *findPlaceCompleter;
 
     QTimer *m_updateTimer;
@@ -257,11 +255,11 @@ private:
 
     mapcontrol::OPMapWidget *m_map;
 
-	ExtensionSystem::PluginManager *pm;
-	UAVObjectManager *obm;
-	UAVObjectUtilManager *obum;
+    ExtensionSystem::PluginManager *pm;
+    UAVObjectManager *obm;
+    UAVObjectUtilManager *obum;
 
-	//opmap_waypointeditor_dialog waypoint_editor_dialog;
+    //opmap_waypointeditor_dialog waypoint_editor_dialog;
 
     //opmap_edit_waypoint_dialog waypoint_edit_dialog;
 
@@ -274,9 +272,9 @@ private:
 
     QMutex m_map_mutex;
 
-	bool m_telemetry_connected;
+    bool m_telemetry_connected;
 
-	// *****
+    // *****
 
     void createActions();
 
@@ -284,7 +282,7 @@ private:
     QAction *closeAct2;
     QAction *reloadAct;
     QAction *ripAct;
-	QAction *copyMouseLatLonToClipAct;
+    QAction *copyMouseLatLonToClipAct;
     QAction *copyMouseLatToClipAct;
     QAction *copyMouseLonToClipAct;
     QAction *findPlaceAct;
@@ -300,14 +298,12 @@ private:
     QAction *goUAVAct;
     QAction *followUAVpositionAct;
     QAction *followUAVheadingAct;
-    /*
     QAction *wayPointEditorAct;
     QAction *addWayPointAct;
     QAction *editWayPointAct;
     QAction *lockWayPointAct;
     QAction *deleteWayPointAct;
     QAction *clearWayPointsAct;
-    */
     QAction *homeMagicWaypointAct;
 
     QAction *showSafeAreaAct;
@@ -330,12 +326,12 @@ private:
     QActionGroup *zoomActGroup;
     QList<QAction *> zoomAct;
 
-	QActionGroup *maxUpdateRateActGroup;
-	QList<QAction *> maxUpdateRateAct;
+    QActionGroup *maxUpdateRateActGroup;
+    QList<QAction *> maxUpdateRateAct;
 
-	// *****
+    // *****
 
-	void homeMagicWaypoint();
+    void homeMagicWaypoint();
 
     void moveToMagicWaypointPosition();
 
@@ -351,13 +347,13 @@ private:
     double bearing(internals::PointLatLng from, internals::PointLatLng to);
     internals::PointLatLng destPoint(internals::PointLatLng source, double bear, double dist);
 
-	bool getUAVPosition(double &latitude, double &longitude, double &altitude);
-	bool getGPSPosition(double &latitude, double &longitude, double &altitude);
+    bool getUAVPosition(double &latitude, double &longitude, double &altitude);
+    bool getGPSPosition(double &latitude, double &longitude, double &altitude);
     double getUAV_Yaw();
 
     void setMapFollowingMode();
 
-	bool setHomeLocationObject();
+    bool setHomeLocationObject();
 };
 
 #endif /* OPMAP_GADGETWIDGET_H_ */

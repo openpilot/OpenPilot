@@ -172,7 +172,7 @@ static int32_t RadioComBridgeStart(void)
 			PIOS_WDG_RegisterFlag(PIOS_WDG_TRANSCOMM);
 		PIOS_WDG_RegisterFlag(PIOS_WDG_RADIORECEIVE);
 		PIOS_WDG_RegisterFlag(PIOS_WDG_SENDPACKET);
-		PIOS_WDG_RegisterFlag(PIOS_WDG_SENDDATA);
+		//PIOS_WDG_RegisterFlag(PIOS_WDG_SENDDATA);
 #endif
 		return 0;
 	}
@@ -535,7 +535,9 @@ static void sendDataTask(void *parameters)
 	while (1) {
 #ifdef PIOS_INCLUDE_WDG
 		// Update the watchdog timer.
-		PIOS_WDG_UpdateFlag(PIOS_WDG_SENDDATA);
+		// NOTE: this is temporarily turned off becase PIOS_Com_SendBuffer appears to block for an uncontrollable time,
+		// and SendBufferNonBlocking doesn't seem to be working in this case.
+		//PIOS_WDG_UpdateFlag(PIOS_WDG_SENDDATA);
 #endif /* PIOS_INCLUDE_WDG */
 		// Wait for a packet on the queue.
 		if (xQueueReceive(data->objEventQueue, &ev, MAX_PORT_DELAY) == pdTRUE) {
@@ -587,7 +589,7 @@ static void sendDataTask(void *parameters)
 static void transparentCommTask(void * parameters)
 {
 	portTickType packet_start_time = 0;
-	uint32_t timeout = 250;
+	uint32_t timeout = MAX_PORT_DELAY;
 	PHPacketHandle p = NULL;
 
 	/* Handle usart/usb -> radio direction */
@@ -621,7 +623,7 @@ static void transparentCommTask(void * parameters)
 
 		// Receive data from the com port
 		uint32_t cur_rx_bytes = PIOS_COM_ReceiveBuffer(PIOS_COM_TRANS_COM, p->data + p->header.data_size,
-																									 PH_MAX_DATA - p->header.data_size, timeout);
+							       PH_MAX_DATA - p->header.data_size, timeout);
 
 		// Do we have an data to send?
 		p->header.data_size += cur_rx_bytes;
@@ -655,7 +657,7 @@ static void transparentCommTask(void * parameters)
 				PHTransmitPacket(pios_packet_handler, p);
 
 				// Reset the timeout
-				timeout = 500;
+				timeout = MAX_PORT_DELAY;
 				p = NULL;
 				packet_start_time = 0;
 			}
@@ -752,7 +754,10 @@ static int32_t transmitData(uint8_t *buf, int32_t length)
 	if (PIOS_USB_CheckAvailable(0) && PIOS_COM_USB_HID)
 		outputPort = PIOS_COM_USB_HID;
 #endif /* PIOS_INCLUDE_USB */
-	return PIOS_COM_SendBuffer(outputPort, buf, length);
+	if(outputPort)
+		return PIOS_COM_SendBuffer(outputPort, buf, length);
+	else
+		return -1;
 }
 
 /**
@@ -774,16 +779,16 @@ static int32_t transmitPacket(PHPacketHandle p)
  */
 static void receiveData(uint8_t *buf, uint8_t len)
 {
-	// Packet data should to to transparent com if it's configured,
+	// Packet data should go to transparent com if it's configured,
 	// USB HID if it's connected, otherwise, UAVTalk com if it's configured.
 	uint32_t outputPort = PIOS_COM_TRANS_COM;
 	if (!outputPort)
 	{
 		outputPort = PIOS_COM_UAVTALK;
 #if defined(PIOS_INCLUDE_USB)
-	// Determine output port (USB takes priority over telemetry port)
-	if (PIOS_USB_CheckAvailable(0) && PIOS_COM_USB_HID)
-		outputPort = PIOS_COM_USB_HID;
+		// Determine output port (USB takes priority over telemetry port)
+		if (PIOS_USB_CheckAvailable(0) && PIOS_COM_USB_HID)
+			outputPort = PIOS_COM_USB_HID;
 #endif /* PIOS_INCLUDE_USB */
 	}
 	if (!outputPort)

@@ -54,8 +54,6 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
 	}
 
 	addApplySaveButtons(m_pipx->Apply, m_pipx->Save);
-	//connect(m_pipx->Apply, SIGNAL(clicked()), this, SLOT(applySettings()));
-	//connect(m_pipx->Save, SIGNAL(clicked()), this, SLOT(saveSettings()));
 
 	addUAVObjectToWidgetRelation("PipXSettings", "TelemetryConfig", m_pipx->TelemPortConfig);
 	addUAVObjectToWidgetRelation("PipXSettings", "TelemetrySpeed", m_pipx->TelemPortSpeed);
@@ -80,6 +78,12 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
 	addUAVObjectToWidgetRelation("PipXStatus", "Resets", m_pipx->Resets);
 	addUAVObjectToWidgetRelation("PipXStatus", "RXRate", m_pipx->RXRate);
 	addUAVObjectToWidgetRelation("PipXStatus", "TXRate", m_pipx->TXRate);
+
+	// Connect to the pair ID radio buttons.
+	connect(m_pipx->PairSelect1, SIGNAL(toggled(bool)), this, SLOT(pair1Toggled(bool)));
+	connect(m_pipx->PairSelect2, SIGNAL(toggled(bool)), this, SLOT(pair2Toggled(bool)));
+	connect(m_pipx->PairSelect3, SIGNAL(toggled(bool)), this, SLOT(pair3Toggled(bool)));
+	connect(m_pipx->PairSelect4, SIGNAL(toggled(bool)), this, SLOT(pair4Toggled(bool)));
 
 	// Create the timer that is used to timeout the connection to the PipX.
 	timeOut = new QTimer(this);
@@ -139,28 +143,34 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
 	if (!settingsUpdated)
 		pipxSettingsObj->requestUpdate();
 
+	// Get the current pairID
+	PipXSettings *pipxSettings = PipXSettings::GetInstance(getObjectManager());
+	quint32 pairID = 0;
+	if (pipxSettings)
+		pipxSettings->getPairID();
+
 	// Update the detected devices.
 	UAVObjectField* pairIdField = object->getField("PairIDs");
 	if (pairIdField) {
 		quint32 pairid1 = pairIdField->getValue(0).toUInt();
 		m_pipx->PairID1->setText(QString::number(pairid1, 16).toUpper());
 		m_pipx->PairID1->setEnabled(false);
-		m_pipx->PairSelect1->setChecked(pairID == pairid1);
+		m_pipx->PairSelect1->setChecked(pairID && (pairID == pairid1));
 		m_pipx->PairSelect1->setEnabled(pairid1);
 		quint32 pairid2 = pairIdField->getValue(1).toUInt();
 		m_pipx->PairID2->setText(QString::number(pairIdField->getValue(1).toUInt(), 16).toUpper());
 		m_pipx->PairID2->setEnabled(false);
-		m_pipx->PairSelect2->setChecked(pairID == pairid2);
+		m_pipx->PairSelect2->setChecked(pairID && (pairID == pairid2));
 		m_pipx->PairSelect2->setEnabled(pairid2);
 		quint32 pairid3 = pairIdField->getValue(2).toUInt();
 		m_pipx->PairID3->setText(QString::number(pairIdField->getValue(2).toUInt(), 16).toUpper());
 		m_pipx->PairID3->setEnabled(false);
-		m_pipx->PairSelect3->setChecked(pairID == pairid3);
+		m_pipx->PairSelect3->setChecked(pairID && (pairID == pairid3));
 		m_pipx->PairSelect3->setEnabled(pairid3);
 		quint32 pairid4 = pairIdField->getValue(3).toUInt();
 		m_pipx->PairID4->setText(QString::number(pairIdField->getValue(3).toUInt(), 16).toUpper());
 		m_pipx->PairID4->setEnabled(false);
-		m_pipx->PairSelect4->setChecked(pairID == pairid4);
+		m_pipx->PairSelect4->setChecked(pairID && (pairID == pairid4));
 		m_pipx->PairSelect4->setEnabled(pairid4);
 	} else {
 		qDebug() << "PipXtremeGadgetWidget: Count not read PairID field.";
@@ -240,17 +250,49 @@ void ConfigPipXtremeWidget::updateSettings(UAVObject *object)
 {
 	settingsUpdated = true;
         enableControls(true);
-
-	// Get the settings object.
-	PipXSettings *pipxSettings = PipXSettings::GetInstance(getObjectManager());
-	PipXSettings::DataFields pipxSettingsData = pipxSettings->getData();
-	pairID = pipxSettingsData.PairID;
 }
 
 void ConfigPipXtremeWidget::disconnected()
 {
 	settingsUpdated = false;
 	enableControls(false);
+}
+
+void ConfigPipXtremeWidget::pairIDToggled(bool checked, quint8 idx)
+{
+	qDebug() << "Toggled";
+	if(checked)
+	{
+		PipXStatus *pipxStatus = PipXStatus::GetInstance(getObjectManager());
+		PipXSettings *pipxSettings = PipXSettings::GetInstance(getObjectManager());
+
+		if (pipxStatus && pipxSettings)
+		{
+			quint32 pairID = pipxStatus->getPairIDs(idx);
+			if (pairID)
+				pipxSettings->setPairID(pairID);
+		}
+	}
+}
+
+void ConfigPipXtremeWidget::pair1Toggled(bool checked)
+{
+	pairIDToggled(checked, 0);
+}
+
+void ConfigPipXtremeWidget::pair2Toggled(bool checked)
+{
+	pairIDToggled(checked, 1);
+}
+
+void ConfigPipXtremeWidget::pair3Toggled(bool checked)
+{
+	pairIDToggled(checked, 2);
+}
+
+void ConfigPipXtremeWidget::pair4Toggled(bool checked)
+{
+	pairIDToggled(checked, 3);
 }
 
 /**

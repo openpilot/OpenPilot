@@ -52,7 +52,6 @@ private:
 	UAVDataObject* pipxSettingsObj;
 
 	bool settingsUpdated;
-	quint32 pairID;
 
 	// A timer that timesout the connction to the PipX.
 	QTimer *timeOut;
@@ -62,6 +61,11 @@ private slots:
 	void applySettings();
 	void saveSettings();
 	void disconnected();
+	void pairIDToggled(bool checked, quint8 idx);
+	void pair1Toggled(bool checked);
+	void pair2Toggled(bool checked);
+	void pair3Toggled(bool checked);
+	void pair4Toggled(bool checked);
 };
 
 #endif // CONFIGTXPIDWIDGET_H

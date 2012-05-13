@@ -58,6 +58,8 @@
 #endif
 
 #define MAX_NB_PARAMS 20
+
+#define NMEA_DOP_NOFIX 99.99
 /* NMEA sentence parsers */
 
 struct nmea_parser {
@@ -393,19 +395,14 @@ static bool nmeaProcessGPGGA(GPSPositionData * GpsData, bool* gpsDataUpdated, ch
 	*gpsDataUpdated = true;
 
 	// get latitude [DDMM.mmmmm] [N|S]
-	if (!NMEA_latlon_to_fixed_point(&GpsData->Latitude, param[2], param[3][0] == 'S')) {
-		return false;
-	}
+	if (!NMEA_latlon_to_fixed_point(&GpsData->Latitude, param[2], param[3][0] == 'S') ||
+			// get longitude [dddmm.mmmmm] [E|W]
+			!NMEA_latlon_to_fixed_point(&GpsData->Longitude, param[4], param[5][0] == 'W') ||
+			// check for invalid GPS fix
+			param[6][0] == '0') {
 
-	// get longitude [dddmm.mmmmm] [E|W]
-	if (!NMEA_latlon_to_fixed_point(&GpsData->Longitude, param[4], param[5][0] == 'W')) {
-		return false;
-	}
-
-
-	// check for invalid GPS fix
-	if (param[6][0] == '0') {
-		return false;
+		GpsData->Status = GPSPOSITION_STATUS_NOFIX;
+		GpsData->PDOP = GpsData->HDOP = GpsData->VDOP = NMEA_DOP_NOFIX;
 	}
 	// get number of satellites used in GPS solution
 	GpsData->Satellites = atoi(param[7]);
@@ -449,30 +446,7 @@ static bool nmeaProcessGPRMC(GPSPositionData * GpsData, bool* gpsDataUpdated, ch
 	gpst.Second = (int)hms % 100;
 	gpst.Minute = (((int)hms - gpst.Second) / 100) % 100;
 	gpst.Hour = (int)hms / 10000;
-#endif //PIOS_GPS_MINIMAL
 
-	// don't process void sentences
-	if (param[2][0] == 'V') {
-		return false;
-	}
-
-	// get latitude [DDMM.mmmmm] [N|S]
-	if (!NMEA_latlon_to_fixed_point(&GpsData->Latitude, param[3], param[4][0] == 'S')) {
-		return false;
-	}
-
-	// get longitude [dddmm.mmmmm] [E|W]
-	if (!NMEA_latlon_to_fixed_point(&GpsData->Longitude, param[5], param[6][0] == 'W')) {
-		return false;
-	}
-
-	// get speed in knots
-	GpsData->Groundspeed = NMEA_real_to_float(param[7]) * 0.51444f; // to m/s
-
-	// get True course
-	GpsData->Heading = NMEA_real_to_float(param[8]);
-
-#if !defined(PIOS_GPS_MINIMAL)
 	// get Date of fix
 	// TODO: Should really not use a float here to be safe
 	float date = NMEA_real_to_float(param[9]);
@@ -482,6 +456,26 @@ static bool nmeaProcessGPRMC(GPSPositionData * GpsData, bool* gpsDataUpdated, ch
 	gpst.Year += 2000;
 	GPSTimeSet(&gpst);
 #endif //PIOS_GPS_MINIMAL
+
+	// don't process void sentences
+	if (param[2][0] == 'V') {
+		return false;
+	}
+
+	// get latitude [DDMM.mmmmm] [N|S]
+	if (!NMEA_latlon_to_fixed_point(&GpsData->Latitude, param[3], param[4][0] == 'S') ||
+			// get longitude [dddmm.mmmmm] [E|W]
+			!NMEA_latlon_to_fixed_point(&GpsData->Longitude, param[5], param[6][0] == 'W')) {
+
+		GpsData->Status = GPSPOSITION_STATUS_NOFIX;
+		GpsData->PDOP = GpsData->HDOP = GpsData->VDOP = NMEA_DOP_NOFIX;
+	}
+
+	// get speed in knots
+	GpsData->Groundspeed = NMEA_real_to_float(param[7]) * 0.51444f; // to m/s
+
+	// get True course
+	GpsData->Heading = NMEA_real_to_float(param[8]);
 
 	return true;
 }

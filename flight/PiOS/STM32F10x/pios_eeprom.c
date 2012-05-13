@@ -73,7 +73,7 @@ int32_t PIOS_EEPROM_Save(uint8_t *data, uint32_t len)
 
 	// See if we have to write the data.
 	if ((memcmp(data, (uint8_t*)config.base_address, len) == 0) &&
-			(memcmp((uint8_t*)crc, (uint8_t*)config.base_address + size - 4, 4) == 0))
+			(memcmp((uint8_t*)&crc, (uint8_t*)config.base_address + size - 4, 4) == 0))
 		return 0;
 
 	// TODO: Check that the area isn't already erased

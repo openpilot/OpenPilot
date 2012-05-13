@@ -69,6 +69,10 @@
 
 typedef struct {
 	uint32_t pairID;
+	uint16_t retries;
+	uint16_t errors;
+	uint16_t uavtalk_errors;
+	uint16_t resets;
 	int8_t rssi;
 	uint8_t lastContact;
 } PairStats;
@@ -134,7 +138,7 @@ static void radioStatusTask(void *parameters);
 static int32_t transmitData(uint8_t * data, int32_t length);
 static int32_t transmitPacket(PHPacketHandle packet);
 static void receiveData(uint8_t *buf, uint8_t len);
-static void StatusHandler(PHPacketHandle p);
+static void StatusHandler(PHStatusPacketHandle p);
 static void PPMHandler(uint16_t *channels);
 static BufferedReadHandle BufferedReadInit(uint32_t com_port, uint16_t buffer_length);
 static bool BufferedRead(BufferedReadHandle h, uint8_t *value, uint32_t timeout_ms);
@@ -228,6 +232,10 @@ static int32_t RadioComBridgeInitialize(void)
 	{
 		data->pairStats[i].pairID = 0;
 		data->pairStats[i].rssi = -127;
+		data->pairStats[i].retries = 0;
+		data->pairStats[i].errors = 0;
+		data->pairStats[i].uavtalk_errors = 0;
+		data->pairStats[i].resets = 0;
 		data->pairStats[i].lastContact = 0;
 	}
 
@@ -540,16 +548,29 @@ static void sendDataTask(void *parameters)
 					success = UAVTalkSendObject(data->outUAVTalkCon, ev.obj, 0, 0, REQ_TIMEOUT_MS);
 					++retries;
 				}
+				data->comTxRetries += retries;
 			}
 			else if(ev.event == EV_SEND_ACK)
 			{
 				// Send the ACK
-				UAVTalkSendAck(data->outUAVTalkCon, ev.obj, ev.instId);
+				uint32_t retries = 0;
+				int32_t success = -1;
+				while (retries < MAX_RETRIES && success == -1) {
+					success = UAVTalkSendAck(data->outUAVTalkCon, ev.obj, ev.instId);
+					++retries;
+				}
+				data->comTxRetries += retries;
 			}
 			else if(ev.event == EV_SEND_NACK)
 			{
-				// Send the ACK
-				UAVTalkSendNack(data->outUAVTalkCon, UAVObjGetID(ev.obj));
+				// Send the NACK
+				uint32_t retries = 0;
+				int32_t success = -1;
+				while (retries < MAX_RETRIES && success == -1) {
+					success = UAVTalkSendNack(data->outUAVTalkCon, UAVObjGetID(ev.obj));
+					++retries;
+				}
+				data->comTxRetries += retries;
 			}
 			else if(ev.event == EV_PACKET_RECEIVED)
 			{
@@ -647,27 +668,31 @@ static void transparentCommTask(void * parameters)
  */
 static void radioStatusTask(void *parameters)
 {
-	PHPacketHeader status_packet;
-	status_packet.destination_id = 0xffffffff;
-	status_packet.type = PACKET_TYPE_STATUS;
-	status_packet.data_size = 0;
+	PHStatusPacket status_packet;
+	status_packet.header.destination_id = 0xffffffff;
+	status_packet.header.type = PACKET_TYPE_STATUS;
+	status_packet.header.data_size = PH_STATUS_DATA_SIZE(&status_packet);
 
 	while (1) {
 		PipXStatusData pipxStatus;
+		uint32_t pairID;
 
 		// Get object data
 		PipXStatusGet(&pipxStatus);
+		PipXStatusPairIDsGet(&pairID);
 
 		// Update the status
 		pipxStatus.DeviceID = PIOS_RFM22B_DeviceID(pios_rfm22b_id);
 		pipxStatus.RSSI = PIOS_RFM22B_RSSI(pios_rfm22b_id);
-		pipxStatus.Resets = PIOS_RFM22B_Resets(pios_rfm22b_id);
+		pipxStatus.Retries = data->comTxRetries;
 		pipxStatus.Errors = data->packetErrors;
 		pipxStatus.UAVTalkErrors = data->UAVTalkErrors;
+		pipxStatus.Resets = PIOS_RFM22B_Resets(pios_rfm22b_id);
 		pipxStatus.TXRate = (uint16_t)((float)(data->txBytes * 1000) / STATS_UPDATE_PERIOD_MS);
 		data->txBytes = 0;
 		pipxStatus.RXRate = (uint16_t)((float)(data->rxBytes * 1000) / STATS_UPDATE_PERIOD_MS);
 		data->rxBytes = 0;
+		pipxStatus.LinkState = PIPXSTATUS_LINKSTATE_DISCONNECTED;
 
 		// Update the potential pairing contacts
 		for (uint8_t i = 0; i < PIPXSTATUS_PAIRIDS_NUMELEM; ++i)
@@ -675,6 +700,15 @@ static void radioStatusTask(void *parameters)
 			pipxStatus.PairIDs[i] = data->pairStats[i].pairID;
 			pipxStatus.PairSignalStrengths[i] = data->pairStats[i].rssi;
 			data->pairStats[i].lastContact++;
+			// Add the paired devices stats to ours.
+			if(data->pairStats[i].pairID == pairID)
+			{
+				pipxStatus.Retries += data->pairStats[i].retries;
+				pipxStatus.Errors += data->pairStats[i].errors;
+				pipxStatus.UAVTalkErrors += data->pairStats[i].uavtalk_errors;
+				pipxStatus.Resets += data->pairStats[i].resets;
+				pipxStatus.LinkState = PIPXSTATUS_LINKSTATE_CONNECTED;
+			}
 		}
 
 		// Update the object
@@ -686,8 +720,12 @@ static void radioStatusTask(void *parameters)
 			if(cntr++ == RADIOSTATS_UPDATE_PERIOD_MS / STATS_UPDATE_PERIOD_MS)
 			{
 				// Queue the status message
-				status_packet.source_id = pipxStatus.DeviceID;
-				status_packet.rssi = pipxStatus.RSSI;
+				status_packet.header.source_id = pipxStatus.DeviceID;
+				status_packet.header.rssi = pipxStatus.RSSI;
+				status_packet.retries = data->comTxRetries;
+				status_packet.errors = data->packetErrors;
+				status_packet.uavtalk_errors = data->UAVTalkErrors;
+				status_packet.resets = PIOS_RFM22B_Resets(pios_rfm22b_id);
 				PHPacketHandle sph = (PHPacketHandle)&status_packet;
 				xQueueSend(data->sendPacketQueue, &sph, MAX_PORT_DELAY);
 				cntr = 0;
@@ -761,7 +799,7 @@ static void receiveData(uint8_t *buf, uint8_t len)
  * Receive a status packet
  * \param[in] status The status structure
  */
-static void StatusHandler(PHPacketHandle status)
+static void StatusHandler(PHStatusPacketHandle status)
 {
 	uint32_t id = status->header.source_id;
 	bool found = false;
@@ -778,6 +816,10 @@ static void StatusHandler(PHPacketHandle status)
 	if(found)
 	{
 		data->pairStats[id_idx].rssi = status->header.rssi;
+		data->pairStats[id_idx].retries = status->retries;
+		data->pairStats[id_idx].errors = status->errors;
+		data->pairStats[id_idx].uavtalk_errors = status->uavtalk_errors;
+		data->pairStats[id_idx].resets = status->resets;
 		data->pairStats[id_idx].lastContact = 0;
 	}
 
@@ -788,6 +830,10 @@ static void StatusHandler(PHPacketHandle status)
 		{
 			data->pairStats[id_idx].pairID = 0;
 			data->pairStats[id_idx].rssi = -127;
+			data->pairStats[id_idx].retries = 0;
+			data->pairStats[id_idx].errors = 0;
+			data->pairStats[id_idx].uavtalk_errors = 0;
+			data->pairStats[id_idx].resets = 0;
 			data->pairStats[id_idx].lastContact = 0;
 		}
 	}
@@ -807,6 +853,10 @@ static void StatusHandler(PHPacketHandle status)
 		}
 		data->pairStats[min_idx].pairID = id;
 		data->pairStats[min_idx].rssi = status->header.rssi;
+		data->pairStats[min_idx].retries = status->retries;
+		data->pairStats[min_idx].errors = status->errors;
+		data->pairStats[min_idx].uavtalk_errors = status->uavtalk_errors;
+		data->pairStats[min_idx].resets = status->resets;
 		data->pairStats[min_idx].lastContact = 0;
 	}
 }

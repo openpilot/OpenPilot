@@ -348,7 +348,7 @@ uint8_t PHReceivePacket(PHInstHandle h, PHPacketHandle p, bool rx_error)
 
 			// Pass on the channels to the PPM handler.
 			if(data->status_handler)
-				data->status_handler(p);
+				data->status_handler((PHStatusPacketHandle)p);
 
 		break;
 
@@ -429,21 +429,6 @@ uint8_t PHReceivePacket(PHInstHandle h, PHPacketHandle p, bool rx_error)
 	PHReleaseRXPacket(h, p);
 	
 	return 1;
-}
-
-/**
- * Broadcast a status packet.
- * \param[in] data The packet handler instance data pointer.
- * \param[in] p A pointer to the packet buffer.
- * \return 1 Success
- * \return 0 Failure
- */
-uint8_t PHBroadcastStatus(PHInstHandle h, uint32_t id, int8_t rssi)
-{
-	PHPacketDataHandle data = (PHPacketDataHandle)h;
-
-	// Send the packet.
-	return PHLTransmitPacket(data, (PHPacketHandle)&h);
 }
 
 /**

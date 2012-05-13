@@ -77,6 +77,16 @@ typedef struct {
 	uint8_t ecc[RS_ECC_NPARITY];
 } PHPpmPacket, *PHPpmPacketHandle;
 
+#define PH_STATUS_DATA_SIZE(p) ((uint8_t*)((p)->ecc) - (uint8_t*)(((PHPacketHandle)(p))->data))
+typedef struct {
+	PHPacketHeader header;
+	uint16_t retries;
+	uint16_t errors;
+	uint16_t uavtalk_errors;
+	uint16_t resets;
+	uint8_t ecc[RS_ECC_NPARITY];
+} PHStatusPacket, *PHStatusPacketHandle;
+
 typedef struct {
 	uint8_t winSize;
 	uint16_t maxConnections;
@@ -84,7 +94,7 @@ typedef struct {
 
 typedef int32_t (*PHOutputStream)(PHPacketHandle packet);
 typedef void (*PHDataHandler)(uint8_t *data, uint8_t len);
-typedef void (*PHStatusHandler)(PHPacketHandle s);
+typedef void (*PHStatusHandler)(PHStatusPacketHandle s);
 typedef void (*PHPPMHandler)(uint16_t *channels);
 
 typedef uint32_t PHInstHandle;
@@ -101,7 +111,6 @@ void PHReleaseTXPacket(PHInstHandle h, PHPacketHandle p);
 PHPacketHandle PHGetTXPacket(PHInstHandle h);
 void PHReleaseTXPacket(PHInstHandle h, PHPacketHandle p);
 uint8_t PHTransmitPacket(PHInstHandle h, PHPacketHandle p);
-uint8_t PHFillStatusPacket(PHInstHandle h, uint32_t id, int8_t rssi);
 int32_t PHVerifyPacket(PHInstHandle h, PHPacketHandle p, uint16_t received_len);
 uint8_t PHReceivePacket(PHInstHandle h, PHPacketHandle p, bool rx_error);
 

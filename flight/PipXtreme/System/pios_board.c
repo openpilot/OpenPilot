@@ -33,20 +33,20 @@
 #include <pipxsettings.h>
 #include <board_hw_defs.c>
 
-#define PIOS_COM_SERIAL_RX_BUF_LEN 192
-#define PIOS_COM_SERIAL_TX_BUF_LEN 192
+#define PIOS_COM_SERIAL_RX_BUF_LEN 256
+#define PIOS_COM_SERIAL_TX_BUF_LEN 256
 
-#define PIOS_COM_FLEXI_RX_BUF_LEN 192
-#define PIOS_COM_FLEXI_TX_BUF_LEN 192
+#define PIOS_COM_FLEXI_RX_BUF_LEN 256
+#define PIOS_COM_FLEXI_TX_BUF_LEN 256
 
-#define PIOS_COM_TELEM_USB_RX_BUF_LEN 512
-#define PIOS_COM_TELEM_USB_TX_BUF_LEN 192
+#define PIOS_COM_TELEM_USB_RX_BUF_LEN 256
+#define PIOS_COM_TELEM_USB_TX_BUF_LEN 256
 
-#define PIOS_COM_VCP_USB_RX_BUF_LEN 192
-#define PIOS_COM_VCP_USB_TX_BUF_LEN 192
+#define PIOS_COM_VCP_USB_RX_BUF_LEN 256
+#define PIOS_COM_VCP_USB_TX_BUF_LEN 256
 
-#define PIOS_COM_RFM22B_RF_RX_BUF_LEN 192
-#define PIOS_COM_RFM22B_RF_TX_BUF_LEN 192
+#define PIOS_COM_RFM22B_RF_RX_BUF_LEN 256
+#define PIOS_COM_RFM22B_RF_TX_BUF_LEN 256
 
 uint32_t pios_com_usb_hid_id = 0;
 uint32_t pios_com_telemetry_id;
@@ -97,6 +97,7 @@ void PIOS_Board_Init(void) {
 	PIOS_EEPROM_Init(&pios_eeprom_cfg);
 
 	/* Read the settings from flash. */
+	/* NOTE: We probably need to save/restore the objID here incase the object changed but the size doesn't */
 	PipXSettingsData pipxSettings;
 	if (PIOS_EEPROM_Load((uint8_t*)&pipxSettings, sizeof(PipXSettingsData)) == 0)
 		PipXSettingsSet(&pipxSettings);

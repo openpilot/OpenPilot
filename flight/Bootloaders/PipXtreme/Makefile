@@ -86,6 +86,7 @@ RTOSDIR = $(APPLIBDIR)/FreeRTOS
 RTOSSRCDIR = $(RTOSDIR)/Source
 RTOSINCDIR = $(RTOSSRCDIR)/include
 DOXYGENDIR = ../Doc/Doxygen
+HWDEFSINC = ../../board_hw_defs/$(BOARD_NAME)
 
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files
@@ -118,8 +119,6 @@ SRC += $(PIOSCOMMON)/pios_usb_desc_hid_only.c
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_board_info.c
 SRC += $(PIOSCOMMON)/pios_com_msg.c
-SRC += $(PIOSCOMMON)/pios_bl_helper.c
-SRC += $(PIOSCOMMON)/pios_iap.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c
 
 ## Libraries for flight calculations
@@ -200,8 +199,7 @@ EXTRAINCDIRS  += $(MSDDIR)
 EXTRAINCDIRS  += $(RTOSINCDIR)
 EXTRAINCDIRS  += $(APPLIBDIR)
 EXTRAINCDIRS  += $(RTOSSRCDIR)/portable/GCC/ARM_CM3
-
-
+EXTRAINCDIRS  += $(HWDEFSINC)
 
 # List any extra directories to look for library files here.
 # Also add directories where the linker should search for

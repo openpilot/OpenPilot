@@ -48,7 +48,7 @@
 #define PIOS_COM_RFM22B_RF_RX_BUF_LEN 256
 #define PIOS_COM_RFM22B_RF_TX_BUF_LEN 256
 
-uint32_t pios_com_usb_hid_id = 0;
+uint32_t pios_com_telem_usb_id = 0;
 uint32_t pios_com_telemetry_id;
 uint32_t pios_com_flexi_id;
 uint32_t pios_com_vcp_id;
@@ -93,15 +93,17 @@ void PIOS_Board_Init(void) {
 	PIOS_LED_Init(&pios_led_cfg);
 #endif	/* PIOS_INCLUDE_LED */
 
+	PipXSettingsData pipxSettings;
 #if defined(PIOS_INCLUDE_FLASH_EEPROM)
+#ifdef NEVER
 	PIOS_EEPROM_Init(&pios_eeprom_cfg);
 
 	/* Read the settings from flash. */
 	/* NOTE: We probably need to save/restore the objID here incase the object changed but the size doesn't */
-	PipXSettingsData pipxSettings;
 	if (PIOS_EEPROM_Load((uint8_t*)&pipxSettings, sizeof(PipXSettingsData)) == 0)
 		PipXSettingsSet(&pipxSettings);
 	else
+#endif
 		PipXSettingsGet(&pipxSettings);
 #endif /* PIOS_INCLUDE_FLASH_EEPROM */
 
@@ -192,7 +194,7 @@ void PIOS_Board_Init(void) {
 		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_USB_TX_BUF_LEN);
 		PIOS_Assert(rx_buffer);
 		PIOS_Assert(tx_buffer);
-		if (PIOS_COM_Init(&pios_com_usb_hid_id, &pios_usb_hid_com_driver, pios_usb_hid_id,
+		if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_hid_com_driver, pios_usb_hid_id,
 											rx_buffer, PIOS_COM_TELEM_USB_RX_BUF_LEN,
 											tx_buffer, PIOS_COM_TELEM_USB_TX_BUF_LEN)) {
 			PIOS_Assert(0);

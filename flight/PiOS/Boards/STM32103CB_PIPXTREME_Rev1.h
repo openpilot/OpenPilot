@@ -151,7 +151,7 @@ extern uint32_t pios_spi_port_id;
 //-------------------------
 #define PIOS_COM_MAX_DEVS			5
 
-extern uint32_t pios_com_usb_hid_id;
+extern uint32_t pios_com_telem_usb_id;
 extern uint32_t pios_com_telemetry_id;
 extern uint32_t pios_com_flexi_id;
 extern uint32_t pios_com_vcp_id;
@@ -159,7 +159,7 @@ extern uint32_t pios_com_uavtalk_com_id;
 extern uint32_t pios_com_trans_com_id;
 extern uint32_t pios_com_debug_id;
 extern uint32_t pios_com_rfm22b_id;
-#define PIOS_COM_USB_HID           (pios_com_usb_hid_id)
+#define PIOS_COM_USB_HID           (pios_com_telem_usb_id)
 #define PIOS_COM_TELEMETRY         (pios_com_telemetry_id)
 #define PIOS_COM_FLEXI             (pios_com_flexi_id)
 #define PIOS_COM_VCP               (pios_com_vcp_id)
@@ -167,6 +167,7 @@ extern uint32_t pios_com_rfm22b_id;
 #define PIOS_COM_TRANS_COM         (pios_com_trans_com_id)
 #define PIOS_COM_DEBUG             (pios_com_debug_id)
 #define PIOS_COM_RADIO             (pios_com_rfm22b_id)
+#define PIOS_COM_TELEM_USB         PIOS_COM_USB_HID
 
 #define DEBUG_LEVEL 2
 #if DEBUG_LEVEL > 0

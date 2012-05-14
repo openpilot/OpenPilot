@@ -48,7 +48,7 @@ typedef struct {
 } __attribute__((packed))  multiGUISettingsStruct;
 
 typedef struct {
-    uint SwasplateType:3;
+    uint SwashplateType:3;
     uint FirstServoIndex:2;
     uint CorrectionAngle:9;
     uint ccpmCollectivePassthroughState:1;
@@ -109,20 +109,23 @@ class GUIConfigDataManager: public QObject
         GUIConfigDataManager();
         ~GUIConfigDataManager();
 
+        GUIConfigDataUnion GetConfigData();
+        void SetConfigData(GUIConfigDataUnion configData);
+        QStringList getChannelDescriptions();
+        void ResetActuators();
+        void ResetActuators(GUIConfigDataUnion* configData);
+
         static const quint32 CHANNEL_NUMELEM = 10;
 
         friend class ConfigTaskWidget;
 
     private:
-
-
-    private slots:
         UAVObjectManager* getObjectManager();
 
+    private slots:
+
     public slots:
-        GUIConfigDataUnion GetConfigData();
-        void SetConfigData(GUIConfigDataUnion configData);
-        QStringList getChannelDescriptions();
+
 
 protected:
 

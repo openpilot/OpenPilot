@@ -194,38 +194,15 @@ void ConfigVehicleTypeWidget::refreshGroundVehicleWidgetsValues(QString frameTyp
 	UAVDataObject*	obj;
 	UAVObjectField *field;
 	
+    GUIConfigData = GUIManager.GetConfigData();
+
 	//THIS SECTION STILL NEEDS WORK. FOR THE MOMENT, USE THE FIXED-WING ONBOARD SETTING IN ORDER TO MINIMIZE CHANCES OF BOLLOXING REAL CODE
 	// Retrieve channel setup values
-	obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorSettings")));
-	Q_ASSERT(obj);
-	field = obj->getField(QString("FixedWingThrottle"));
-	Q_ASSERT(field);
-	m_aircraft->gvEngineChannelBox->setCurrentIndex(m_aircraft->gvEngineChannelBox->findText(field->getValue().toString()));
-	
-	field = obj->getField(QString("FixedWingRoll1"));
-	Q_ASSERT(field);
-	m_aircraft->gvAileron1ChannelBox->setCurrentIndex(m_aircraft->gvAileron1ChannelBox->findText(field->getValue().toString()));
-	
-	field = obj->getField(QString("FixedWingRoll2"));
-	Q_ASSERT(field);
-	m_aircraft->gvAileron2ChannelBox->setCurrentIndex(m_aircraft->gvAileron2ChannelBox->findText(field->getValue().toString()));
-	
-	field = obj->getField(QString("GroundVehicleThrottle1"));
-	Q_ASSERT(field);
-	m_aircraft->gvMotor1ChannelBox->setCurrentIndex(m_aircraft->gvMotor1ChannelBox->findText(field->getValue().toString()));
-	
-	field = obj->getField(QString("GroundVehicleThrottle2"));
-	Q_ASSERT(field);
-	m_aircraft->gvMotor2ChannelBox->setCurrentIndex(m_aircraft->gvMotor2ChannelBox->findText(field->getValue().toString()));
-	
-	field = obj->getField(QString("GroundVehicleSteering1"));
-	Q_ASSERT(field);
-	m_aircraft->gvSteering1ChannelBox->setCurrentIndex(m_aircraft->gvSteering1ChannelBox->findText(field->getValue().toString()));
-	
-	field = obj->getField(QString("GroundVehicleSteering2"));
-	Q_ASSERT(field);
-	m_aircraft->gvSteering2ChannelBox->setCurrentIndex(m_aircraft->gvSteering2ChannelBox->findText(field->getValue().toString()));
-	
+    setComboCurrentIndex(m_aircraft->gvMotor1ChannelBox, GUIConfigData.ground.GroundVehicleThrottle1);
+    setComboCurrentIndex(m_aircraft->gvMotor2ChannelBox, GUIConfigData.ground.GroundVehicleThrottle2);
+    setComboCurrentIndex(m_aircraft->gvSteering1ChannelBox, GUIConfigData.ground.GroundVehicleSteering1);
+    setComboCurrentIndex(m_aircraft->gvSteering2ChannelBox, GUIConfigData.ground.GroundVehicleSteering2);
+
 	if (frameType == "GroundVehicleDifferential") {
 		//CURRENTLY BROKEN UNTIL WE DECIDE HOW DIFFERENTIAL SHOULD BEHAVE
 		// If the vehicle type is "differential", restore the slider setting
@@ -280,25 +257,19 @@ bool ConfigVehicleTypeWidget::setupGroundVehicleMotorcycle(QString airframeType)
 		return false;
 	}
 	
-	
+
 	// Now setup the channels:
-    resetActuators();
+    GUIConfigData = GUIManager.GetConfigData();
+
+    GUIManager.ResetActuators(&GUIConfigData);
+    GUIConfigData.ground.GroundVehicleThrottle1 = m_aircraft->gvMotor1ChannelBox->currentIndex();
+    GUIConfigData.ground.GroundVehicleThrottle2 = m_aircraft->gvMotor2ChannelBox->currentIndex();
+
+    GUIManager.SetConfigData(GUIConfigData);
 	
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorSettings")));
-    Q_ASSERT(obj);
-	
-    // Left motor
-    UAVObjectField *field = obj->getField("GroundVehicleThrottle1");
-    Q_ASSERT(field);
-    field->setValue(m_aircraft->gvMotor1ChannelBox->currentText());
-    
-    // Right motor
-	field = obj->getField("GroundVehicleThrottle2");
-    Q_ASSERT(field);
-    field->setValue(m_aircraft->gvMotor2ChannelBox->currentText());
-	
-	obj->updated();
-	
+    UAVObject* obj;
+    UAVObjectField* field;
+
     obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(obj);
     // ... and compute the matrix:
@@ -397,25 +368,19 @@ bool ConfigVehicleTypeWidget::setupGroundVehicleDifferential(QString airframeTyp
 		return false;
 	}
 
+
+    // Now setup the channels:
+    GUIConfigData = GUIManager.GetConfigData();
+    GUIManager.ResetActuators(&GUIConfigData);
 	
-	// Now setup the channels:
-    resetActuators();
+    GUIConfigData.ground.GroundVehicleThrottle1 = m_aircraft->gvMotor1ChannelBox->currentIndex();
+    GUIConfigData.ground.GroundVehicleThrottle2 = m_aircraft->gvMotor2ChannelBox->currentIndex();
+
+    GUIManager.SetConfigData((GUIConfigData));
 	
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorSettings")));
-    Q_ASSERT(obj);
-	
-    // Left motor
-    UAVObjectField *field = obj->getField("GroundVehicleThrottle1");
-    Q_ASSERT(field);
-    field->setValue(m_aircraft->gvMotor1ChannelBox->currentText());
-    
-    // Right motor
-	field = obj->getField("GroundVehicleThrottle2");
-    Q_ASSERT(field);
-    field->setValue(m_aircraft->gvMotor2ChannelBox->currentText());
-	
-	obj->updated();
-	
+    UAVObject* obj;
+    UAVObjectField* field;
+
     obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(obj);
     // ... and compute the matrix:
@@ -524,43 +489,20 @@ bool ConfigVehicleTypeWidget::setupGroundVehicleCar(QString airframeType)
 //		m_aircraft->gvMotor2Label->setText(htmlText->toPlainText());
 //	}
 	
-	// Now setup the channels:
-    resetActuators();
+    // Now setup the channels:
+    GUIConfigData = GUIManager.GetConfigData();
+    GUIManager.ResetActuators(&GUIConfigData);
 	
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorSettings")));
-    Q_ASSERT(obj);
-	
-    // Front motor
-    UAVObjectField *field = obj->getField("GroundVehicleThrottle1");
-    Q_ASSERT(field);
-    field->setValue(m_aircraft->gvMotor1ChannelBox->currentText());
-    
-    // Rear motor
-	field = obj->getField("GroundVehicleThrottle2");
-    Q_ASSERT(field);
-    field->setValue(m_aircraft->gvMotor2ChannelBox->currentText());
+    GUIConfigData.ground.GroundVehicleThrottle1 = m_aircraft->gvMotor1ChannelBox->currentIndex();
+    GUIConfigData.ground.GroundVehicleThrottle2 = m_aircraft->gvMotor2ChannelBox->currentIndex();
+    GUIConfigData.ground.GroundVehicleSteering1 = m_aircraft->gvSteering1ChannelBox->currentIndex();
+    GUIConfigData.ground.GroundVehicleSteering2 = m_aircraft->gvSteering2ChannelBox->currentIndex();
 
-//    // Aileron
-//	field = obj->getField("FixedWingRoll1");
-//    Q_ASSERT(field);
-//    field->setValue(m_aircraft->fwAileron1ChannelBox->currentText());
-//
-//    field = obj->getField("FixedWingRoll2");
-//    Q_ASSERT(field);
-//    field->setValue(m_aircraft->fwAileron2ChannelBox->currentText());
-
-    // Front steering
-	field = obj->getField("GroundVehicleSteering1");
-    Q_ASSERT(field);
-    field->setValue(m_aircraft->gvSteering1ChannelBox->currentText());
-
-    // Rear steering
-	field = obj->getField("GroundVehicleSteering2");
-    Q_ASSERT(field);
-    field->setValue(m_aircraft->gvSteering2ChannelBox->currentText());
+    GUIManager.SetConfigData(GUIConfigData);
 	
-    obj->updated();
-	
+    UAVDataObject* obj;
+    UAVObjectField* field;
+
     obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(obj);
     // ... and compute the matrix:

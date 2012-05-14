@@ -250,7 +250,7 @@ ConfigVehicleTypeWidget::~ConfigVehicleTypeWidget()
   rather than a signal in the UI, because we want to force a fitInView of the quad shapes.
   This is because this method (fitinview) only works when the widget is shown.
   */
-void ConfigVehicleTypeWidget::switchAirframeType(int index){
+void ConfigVehicleTypeWidget::switchAirframeType(int index){    
     m_aircraft->airframesWidget->setCurrentIndex(index);
     m_aircraft->quadShape->setSceneRect(quad->boundingRect());
     m_aircraft->quadShape->fitInView(quad, Qt::KeepAspectRatio);
@@ -844,6 +844,16 @@ void ConfigVehicleTypeWidget::openHelp()
     QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/Airframe+configuration", QUrl::StrictMode) );
 }
 
+/**
+  Helper function:
+  Sets the current index on supplied combobox to index
+  if it is within bounds 0 <= index < combobox.count()
+ */
+void ConfigVehicleTypeWidget::setComboCurrentIndex(QComboBox* box, int index)
+{
+    if (index >= 0 && index < box->count())
+        box->setCurrentIndex(index);
+}
 
 /**
  WHAT DOES THIS DO???

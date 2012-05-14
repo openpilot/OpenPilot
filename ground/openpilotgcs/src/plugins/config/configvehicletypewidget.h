@@ -33,6 +33,7 @@
 #include "uavobjectmanager.h"
 #include "uavobject.h"
 #include "uavtalk/telemetrymanager.h"
+#include "cfg_vehicletypes/guiconfigdata.h"
 #include <QtGui/QWidget>
 #include <QList>
 #include <QItemDelegate>
@@ -67,13 +68,16 @@ private:
     void resetActuators();
     //void setMixerChannel(int channelNumber, bool channelIsMotor, QList<double> vector);
     void setupQuadMotor(int channel, double roll, double pitch, double yaw);
-
+    void setComboCurrentIndex(QComboBox* box, int index);
     QStringList mixerTypes;
     QStringList mixerVectors;
     QGraphicsSvgItem *quad;
     bool ffTuningInProgress;
     bool ffTuningPhase;
     UAVObject::Metadata accInitialData;
+
+    GUIConfigDataManager GUIManager;
+    GUIConfigDataUnion GUIConfigData;
 
 private slots:
     virtual void refreshWidgetsValues();

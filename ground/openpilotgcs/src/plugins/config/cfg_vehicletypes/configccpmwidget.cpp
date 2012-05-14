@@ -25,7 +25,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "configccpmwidget.h"
-#include "mixersettings.h"
+//#include "mixersettings.h"
 
 #include <QDebug>
 #include <QStringList>
@@ -892,7 +892,7 @@ void ConfigccpmWidget::UpdateMixer()
         }               
     }
 
-    if (GUIConfigData.heli.SwasplateType>0)
+    if (GUIConfigData.heli.SwashplateType>0)
     {//not advanced settings
         //get the channel data from the ui
         MixerChannelData[0] = m_ccpm->ccpmEngineChannel->currentIndex();
@@ -999,7 +999,7 @@ void ConfigccpmWidget::UpdateCCPMOptionsFromUI()
     if (updatingFromHardware) return;
     //get the user options
     //swashplate config
-    GUIConfigData.heli.SwasplateType = m_ccpm->ccpmType->count() - m_ccpm->ccpmType->currentIndex()-1;
+    GUIConfigData.heli.SwashplateType = m_ccpm->ccpmType->count() - m_ccpm->ccpmType->currentIndex()-1;
     GUIConfigData.heli.FirstServoIndex = m_ccpm->ccpmSingleServo->currentIndex();
     
     //ccpm mixing options
@@ -1036,12 +1036,17 @@ void ConfigccpmWidget::UpdateCCPMOptionsFromUI()
     GUIConfigData.heli.ServoIndexX = m_ccpm->ccpmServoXChannel->currentIndex();
     GUIConfigData.heli.ServoIndexY = m_ccpm->ccpmServoYChannel->currentIndex();
     GUIConfigData.heli.ServoIndexZ = m_ccpm->ccpmServoZChannel->currentIndex();
+
+    //throttle
+    GUIConfigData.heli.Throttle = m_ccpm->ccpmEngineChannel->currentIndex();
+    //tail
+    GUIConfigData.heli.Tail = m_ccpm->ccpmTailChannel->currentIndex();
     
 }
 void ConfigccpmWidget::UpdateCCPMUIFromOptions()
 {
     //swashplate config
-    m_ccpm->ccpmType->setCurrentIndex(m_ccpm->ccpmType->count() - (GUIConfigData.heli.SwasplateType +1));
+    m_ccpm->ccpmType->setCurrentIndex(m_ccpm->ccpmType->count() - (GUIConfigData.heli.SwashplateType +1));
     m_ccpm->ccpmSingleServo->setCurrentIndex(GUIConfigData.heli.FirstServoIndex);
     
     //ccpm mixing options
@@ -1070,6 +1075,10 @@ void ConfigccpmWidget::UpdateCCPMUIFromOptions()
     m_ccpm->ccpmServoYChannel->setCurrentIndex(GUIConfigData.heli.ServoIndexY);
     m_ccpm->ccpmServoZChannel->setCurrentIndex(GUIConfigData.heli.ServoIndexZ);
 
+    //throttle
+    m_ccpm->ccpmEngineChannel->setCurrentIndex(GUIConfigData.heli.Throttle);
+    //tail
+    m_ccpm->ccpmTailChannel->setCurrentIndex((GUIConfigData.heli.Tail));
 }
 
 
@@ -1117,15 +1126,17 @@ void ConfigccpmWidget::requestccpmUpdate()
     
     unsigned int i,j;
     
-    SystemSettings * systemSettings = SystemSettings::GetInstance(getObjectManager());
-    Q_ASSERT(systemSettings);
-    SystemSettings::DataFields systemSettingsData = systemSettings->getData();
+//    SystemSettings * systemSettings = SystemSettings::GetInstance(getObjectManager());
+//    Q_ASSERT(systemSettings);
+//    SystemSettings::DataFields systemSettingsData = systemSettings->getData();
 
-    Q_ASSERT(SystemSettings::GUICONFIGDATA_NUMELEM ==
-             (sizeof(GUIConfigData.UAVObject) / sizeof(GUIConfigData.UAVObject[0])));
+//    Q_ASSERT(SystemSettings::GUICONFIGDATA_NUMELEM ==
+//             (sizeof(GUIConfigData.UAVObject) / sizeof(GUIConfigData.UAVObject[0])));
 
-    for(i = 0; i < SystemSettings::GUICONFIGDATA_NUMELEM; i++)
-        GUIConfigData.UAVObject[i]=systemSettingsData.GUIConfigData[i];
+//    for(i = 0; i < SystemSettings::GUICONFIGDATA_NUMELEM; i++)
+//        GUIConfigData.UAVObject[i]=systemSettingsData.GUIConfigData[i];
+
+    GUIConfigData = GUIManager.GetConfigData();
 
     UpdateCCPMUIFromOptions();
 
@@ -1178,7 +1189,7 @@ void ConfigccpmWidget::requestccpmUpdate()
             (MixerDataFromHeli[i][4]==0))//Yaw
         {
             EngineChannel = i;
-            m_ccpm->ccpmEngineChannel->setCurrentIndex(i);
+            //m_ccpm->ccpmEngineChannel->setCurrentIndex(i);
 
         }
         //check if this is the tail rotor... REVO and YAW
@@ -1190,7 +1201,7 @@ void ConfigccpmWidget::requestccpmUpdate()
             (MixerDataFromHeli[i][4]!=0))//Yaw
         {
             TailRotorChannel = i;
-            m_ccpm->ccpmTailChannel->setCurrentIndex(i);
+            //m_ccpm->ccpmTailChannel->setCurrentIndex(i);
             m_ccpm->ccpmRevoSlider->setValue((MixerDataFromHeli[i][0]*100)/127);
             m_ccpm->ccpmREVOspinBox->setValue((MixerDataFromHeli[i][0]*100)/127);
         }
@@ -1239,14 +1250,17 @@ void ConfigccpmWidget::sendccpmUpdate()
     
     UpdateCCPMOptionsFromUI();
 
+    GUIManager.SetConfigData(GUIConfigData);
+
     // Store the data required to reconstruct
-    SystemSettings * systemSettings = SystemSettings::GetInstance(getObjectManager());
-    Q_ASSERT(systemSettings);
-    SystemSettings::DataFields systemSettingsData = systemSettings->getData();
-    systemSettingsData.GUIConfigData[0] = GUIConfigData.UAVObject[0];
-    systemSettingsData.GUIConfigData[1] = GUIConfigData.UAVObject[1];
-    systemSettings->setData(systemSettingsData);
-    systemSettings->updated();
+//    SystemSettings * systemSettings = SystemSettings::GetInstance(getObjectManager());
+//    Q_ASSERT(systemSettings);
+//    SystemSettings::DataFields systemSettingsData = systemSettings->getData();
+//    for (i=0; i<SystemSettings::GUICONFIGDATA_NUMELEM; i++)
+//        systemSettingsData.GUIConfigData[i] = GUIConfigData.UAVObject[i];
+
+//    systemSettings->setData(systemSettingsData);
+//    systemSettings->updated();
     
     MixerSettings * mixerSettings = MixerSettings::GetInstance(getObjectManager());
     Q_ASSERT(mixerSettings);

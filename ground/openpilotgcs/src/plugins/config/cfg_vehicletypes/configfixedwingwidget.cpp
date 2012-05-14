@@ -136,7 +136,7 @@ QString ConfigVehicleTypeWidget::updateFixedWingObjectsFromWidgets()
 	//All airframe types must start with "FixedWing"
 	if (m_aircraft->fixedWingType->currentText() == "Elevator aileron rudder" ) {
 		airframeType = "FixedWing";
-		setupFrameFixedWing( airframeType );
+        setupFrameFixedWing( airframeType );
 	} else if (m_aircraft->fixedWingType->currentText() == "Elevon") {
 		airframeType = "FixedWingElevon";
 		setupFrameElevon( airframeType );
@@ -156,42 +156,22 @@ QString ConfigVehicleTypeWidget::updateFixedWingObjectsFromWidgets()
  Helper function to refresh the UI widget values
  */
 void ConfigVehicleTypeWidget::refreshFixedWingWidgetsValues(QString frameType)
-{
-	
-	UAVDataObject* obj;
-	UAVObjectField *field;
-	
-	// Then retrieve how channels are setup
-	obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorSettings")));
-	Q_ASSERT(obj);
-	field = obj->getField(QString("FixedWingThrottle"));
-	Q_ASSERT(field);
-	m_aircraft->fwEngineChannelBox->setCurrentIndex(m_aircraft->fwEngineChannelBox->findText(field->getValue().toString()));
+{	
+    GUIConfigData = GUIManager.GetConfigData();
+    fixedGUISettingsStruct fixed = GUIConfigData.fixed;
 
-	field = obj->getField(QString("FixedWingRoll1"));
-	Q_ASSERT(field);
-	m_aircraft->fwAileron1ChannelBox->setCurrentIndex(m_aircraft->fwAileron1ChannelBox->findText(field->getValue().toString()));
-	
-	field = obj->getField(QString("FixedWingRoll2"));
-	Q_ASSERT(field);
-	m_aircraft->fwAileron2ChannelBox->setCurrentIndex(m_aircraft->fwAileron2ChannelBox->findText(field->getValue().toString()));
-	
-	field = obj->getField(QString("FixedWingPitch1"));
-	Q_ASSERT(field);
-	m_aircraft->fwElevator1ChannelBox->setCurrentIndex(m_aircraft->fwElevator1ChannelBox->findText(field->getValue().toString()));
-	
-	field = obj->getField(QString("FixedWingPitch2"));
-	Q_ASSERT(field);
-	m_aircraft->fwElevator2ChannelBox->setCurrentIndex(m_aircraft->fwElevator2ChannelBox->findText(field->getValue().toString()));
-	
-	field = obj->getField(QString("FixedWingYaw1"));
-	Q_ASSERT(field);
-	m_aircraft->fwRudder1ChannelBox->setCurrentIndex(m_aircraft->fwRudder1ChannelBox->findText(field->getValue().toString()));
-	
-	field = obj->getField(QString("FixedWingYaw2"));
-	Q_ASSERT(field);
-	m_aircraft->fwRudder2ChannelBox->setCurrentIndex(m_aircraft->fwRudder2ChannelBox->findText(field->getValue().toString()));
-	
+    // Then retrieve how channels are setup
+    setComboCurrentIndex(m_aircraft->fwEngineChannelBox, fixed.FixedWingThrottle);
+    setComboCurrentIndex(m_aircraft->fwAileron1ChannelBox, fixed.FixedWingRoll1);
+    setComboCurrentIndex(m_aircraft->fwAileron2ChannelBox, fixed.FixedWingRoll2);
+    setComboCurrentIndex(m_aircraft->fwElevator1ChannelBox, fixed.FixedWingPitch1);
+    setComboCurrentIndex(m_aircraft->fwElevator2ChannelBox, fixed.FixedWingPitch2);
+    setComboCurrentIndex(m_aircraft->fwRudder1ChannelBox, fixed.FixedWingYaw1);
+    setComboCurrentIndex(m_aircraft->fwRudder2ChannelBox, fixed.FixedWingYaw2);
+
+    UAVDataObject* obj;
+    UAVObjectField *field;
+
 	if (frameType == "FixedWingElevon") {
         // If the airframe is elevon, restore the slider setting
 		// Find the channel number for Elevon1 (FixedWingRoll1)
@@ -245,40 +225,24 @@ bool ConfigVehicleTypeWidget::setupFrameFixedWing(QString airframeType)
 //			m_aircraft->fwStatusLabel->setText("ERROR: check channel assignment");
 			return false;
 		}
-    // Now setup the channels:
-    resetActuators();
-	
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorSettings")));
-    Q_ASSERT(obj);
-	
-    // Elevator
-    UAVObjectField *field = obj->getField("FixedWingPitch1");
-    Q_ASSERT(field);
-    field->setValue(m_aircraft->fwElevator1ChannelBox->currentText());
-    field = obj->getField("FixedWingPitch2");
-    Q_ASSERT(field);
-    field->setValue(m_aircraft->fwElevator2ChannelBox->currentText());
 
-    // Aileron
-    field = obj->getField("FixedWingRoll1");
-    Q_ASSERT(field);
-    field->setValue(m_aircraft->fwAileron1ChannelBox->currentText());
-    field = obj->getField("FixedWingRoll2");
-    Q_ASSERT(field);
-    field->setValue(m_aircraft->fwAileron2ChannelBox->currentText());
-    
-	// Rudder
-    field = obj->getField("FixedWingYaw1");
-    Q_ASSERT(field);
-    field->setValue(m_aircraft->fwRudder1ChannelBox->currentText());
-    
-	// Throttle
-    field = obj->getField("FixedWingThrottle");
-    Q_ASSERT(field);
-    field->setValue(m_aircraft->fwEngineChannelBox->currentText());
+    // Now setup the channels:
 	
-    obj->updated();
+    GUIConfigData = GUIManager.GetConfigData();
+    GUIManager.ResetActuators(&GUIConfigData);
+
+    GUIConfigData.fixed.FixedWingPitch1 = m_aircraft->fwElevator1ChannelBox->currentIndex();
+    GUIConfigData.fixed.FixedWingPitch2 = m_aircraft->fwElevator2ChannelBox->currentIndex();
+    GUIConfigData.fixed.FixedWingRoll1 = m_aircraft->fwAileron1ChannelBox->currentIndex();
+    GUIConfigData.fixed.FixedWingRoll2 = m_aircraft->fwAileron2ChannelBox->currentIndex();
+    GUIConfigData.fixed.FixedWingYaw1 = m_aircraft->fwRudder1ChannelBox->currentIndex();
+    GUIConfigData.fixed.FixedWingThrottle = m_aircraft->fwEngineChannelBox->currentIndex();
+
+    GUIManager.SetConfigData(GUIConfigData);
 	
+    UAVDataObject* obj;
+    UAVObjectField* field;
+
     obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(obj);
     // ... and compute the matrix:
@@ -382,32 +346,20 @@ bool ConfigVehicleTypeWidget::setupFrameElevon(QString airframeType)
         return false;
     }
 	
-    resetActuators();
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorSettings")));
-    Q_ASSERT(obj);
-	
-    // Elevons
-    UAVObjectField *field = obj->getField("FixedWingRoll1");
-    Q_ASSERT(field);
-    field->setValue(m_aircraft->fwAileron1ChannelBox->currentText());
-    field = obj->getField("FixedWingRoll2");
-    Q_ASSERT(field);
-    field->setValue(m_aircraft->fwAileron2ChannelBox->currentText());
-    // Rudder 1 (can be None)
-    field = obj->getField("FixedWingYaw1");
-    Q_ASSERT(field);
-    field->setValue(m_aircraft->fwRudder1ChannelBox->currentText());
-    // Rudder 2 (can be None)
-    field = obj->getField("FixedWingYaw2");
-    Q_ASSERT(field);
-    field->setValue(m_aircraft->fwRudder2ChannelBox->currentText());
-    // Throttle
-    field = obj->getField("FixedWingThrottle");
-    Q_ASSERT(field);
-    field->setValue(m_aircraft->fwEngineChannelBox->currentText());
-	
-    obj->updated();
-	
+    GUIConfigData = GUIManager.GetConfigData();
+    GUIManager.ResetActuators(&GUIConfigData);
+
+    GUIConfigData.fixed.FixedWingRoll1 = m_aircraft->fwAileron1ChannelBox->currentIndex();
+    GUIConfigData.fixed.FixedWingRoll2 = m_aircraft->fwAileron2ChannelBox->currentIndex();
+    GUIConfigData.fixed.FixedWingYaw1 = m_aircraft->fwRudder1ChannelBox->currentIndex();
+    GUIConfigData.fixed.FixedWingYaw2 = m_aircraft->fwRudder2ChannelBox->currentIndex();
+    GUIConfigData.fixed.FixedWingThrottle = m_aircraft->fwEngineChannelBox->currentIndex();
+
+    GUIManager.SetConfigData(GUIConfigData);
+	    
+    UAVDataObject* obj;
+    UAVObjectField* field;
+
     // Save the curve:
     obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(obj);
@@ -506,31 +458,20 @@ bool ConfigVehicleTypeWidget::setupFrameVtail(QString airframeType)
         return false;
     }
 	
-    resetActuators();
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorSettings")));
-    Q_ASSERT(obj);
-	
-    // Elevons
-    UAVObjectField *field = obj->getField("FixedWingPitch1");
-    Q_ASSERT(field);
-    field->setValue(m_aircraft->fwElevator1ChannelBox->currentText());
-    field = obj->getField("FixedWingPitch2");
-    Q_ASSERT(field);
-    field->setValue(m_aircraft->fwElevator2ChannelBox->currentText());
-    field = obj->getField("FixedWingRoll1");
-    Q_ASSERT(field);
-    field->setValue(m_aircraft->fwAileron1ChannelBox->currentText());
-    field = obj->getField("FixedWingRoll2");
-    Q_ASSERT(field);
-    field->setValue(m_aircraft->fwAileron2ChannelBox->currentText());
-	
-    // Throttle
-    field = obj->getField("FixedWingThrottle");
-    Q_ASSERT(field);
-    field->setValue(m_aircraft->fwEngineChannelBox->currentText());
-	
-    obj->updated();
-	
+    GUIConfigData = GUIManager.GetConfigData();
+    GUIManager.ResetActuators(&GUIConfigData);
+
+    GUIConfigData.fixed.FixedWingPitch1 = m_aircraft->fwElevator1ChannelBox->currentIndex();
+    GUIConfigData.fixed.FixedWingPitch2 = m_aircraft->fwElevator2ChannelBox->currentIndex();
+    GUIConfigData.fixed.FixedWingRoll1 = m_aircraft->fwAileron1ChannelBox->currentIndex();
+    GUIConfigData.fixed.FixedWingRoll2 = m_aircraft->fwAileron2ChannelBox->currentIndex();
+    GUIConfigData.fixed.FixedWingThrottle = m_aircraft->fwEngineChannelBox->currentIndex();
+
+    GUIManager.SetConfigData(GUIConfigData);
+	    
+    UAVDataObject* obj;
+    UAVObjectField* field;
+
     obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(obj);
     // ... and compute the matrix:

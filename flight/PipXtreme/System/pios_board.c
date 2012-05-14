@@ -95,7 +95,6 @@ void PIOS_Board_Init(void) {
 
 	PipXSettingsData pipxSettings;
 #if defined(PIOS_INCLUDE_FLASH_EEPROM)
-#ifdef NEVER
 	PIOS_EEPROM_Init(&pios_eeprom_cfg);
 
 	/* Read the settings from flash. */
@@ -103,8 +102,9 @@ void PIOS_Board_Init(void) {
 	if (PIOS_EEPROM_Load((uint8_t*)&pipxSettings, sizeof(PipXSettingsData)) == 0)
 		PipXSettingsSet(&pipxSettings);
 	else
-#endif
 		PipXSettingsGet(&pipxSettings);
+#else
+	PipXSettingsGet(&pipxSettings);
 #endif /* PIOS_INCLUDE_FLASH_EEPROM */
 
 	/* Initialize the task monitor library */

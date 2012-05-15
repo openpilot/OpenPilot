@@ -86,6 +86,9 @@ void UAVObjectField::constructorInitialize(const QString& name, const QString& u
     case ENUM:
         numBytesPerElement = sizeof(quint8);
         break;
+    case BITFIELD:
+        numBytesPerElement = sizeof(quint8);
+        break;
     case STRING:
         numBytesPerElement = sizeof(quint8);
         break;
@@ -477,7 +480,15 @@ UAVObject* UAVObjectField::getObject()
 void UAVObjectField::clear()
 {
     QMutexLocker locker(obj->getMutex());
-    memset(&data[offset], 0, numBytesPerElement*numElements);
+    switch (type)
+    {
+    case BITFIELD:
+        memset(&data[offset], 0, numBytesPerElement*((quint32)(numElements/8)));
+        break;
+    default:
+        memset(&data[offset], 0, numBytesPerElement*numElements);
+        break;
+    }
 }
 
 QString UAVObjectField::getName()
@@ -507,7 +518,15 @@ quint32 UAVObjectField::getDataOffset()
 
 quint32 UAVObjectField::getNumBytes()
 {
-    return numBytesPerElement * numElements;
+    switch (type)
+    {
+    case BITFIELD:
+        return numBytesPerElement * ((quint32) (numElements/8));
+        break;
+    default:
+        return numBytesPerElement * numElements;
+        break;
+    }
 }
 
 QString UAVObjectField::toString()
@@ -584,6 +603,12 @@ qint32 UAVObjectField::pack(quint8* dataOut)
             dataOut[numBytesPerElement*index] = data[offset + numBytesPerElement*index];
         }
         break;
+    case BITFIELD:
+        for (quint32 index = 0; index < (quint32)(numElements/8); ++index)
+        {
+            dataOut[numBytesPerElement*index] = data[offset + numBytesPerElement*index];
+        }
+        break;
     case STRING:
         memcpy(dataOut, &data[offset], numElements);
         break;
@@ -653,17 +678,18 @@ qint32 UAVObjectField::unpack(const quint8* dataIn)
             data[offset + numBytesPerElement*index] = dataIn[numBytesPerElement*index];
         }
         break;
+    case BITFIELD:
+        for (quint32 index = 0; index < (quint32)(numElements/8); ++index)
+        {
+            data[offset + numBytesPerElement*index] = dataIn[numBytesPerElement*index];
+        }
+        break;
     case STRING:
         memcpy(&data[offset], dataIn, numElements);
         break;
     }
     // Done
     return getNumBytes();
-}
-
-quint32 UAVObjectField::getNumBytesElement()
-{
-    return numBytesPerElement;
 }
 
 bool UAVObjectField::isNumeric()
@@ -692,6 +718,9 @@ bool UAVObjectField::isNumeric()
         return true;
         break;
     case ENUM:
+        return false;
+        break;
+    case BITFIELD:
         return false;
         break;
     case STRING:
@@ -728,6 +757,9 @@ bool UAVObjectField::isText()
         return false;
         break;
     case ENUM:
+        return true;
+        break;
+    case BITFIELD:
         return true;
         break;
     case STRING:
@@ -810,6 +842,14 @@ QVariant UAVObjectField::getValue(quint32 index)
         return QVariant( options[tmpenum] );
         break;
     }
+    case BITFIELD:
+    {
+        quint8 tmpbitfield;
+        memcpy(&tmpbitfield, &data[offset + numBytesPerElement*((quint32)(index/8))], numBytesPerElement);
+        tmpbitfield = (tmpbitfield >> (index % 8)) & 1;
+        return QVariant( tmpbitfield );
+        break;
+    }
     case STRING:
     {
         data[offset + numElements - 1] = '\0';
@@ -845,6 +885,7 @@ bool UAVObjectField::checkValue(const QVariant& value, quint32 index)
         case UINT32:
         case FLOAT32:
         case STRING:
+        case BITFIELD:
             return true;
             break;
         case ENUM:
@@ -924,6 +965,14 @@ void UAVObjectField::setValue(const QVariant& value, quint32 index)
             qint8 tmpenum = options.indexOf( value.toString() );
             Q_ASSERT(tmpenum >= 0); // To catch any programming errors where we set invalid values
             memcpy(&data[offset + numBytesPerElement*index], &tmpenum, numBytesPerElement);
+            break;
+        }
+        case BITFIELD:
+        {
+            quint8 tmpbitfield;
+            memcpy(&tmpbitfield, &data[offset + numBytesPerElement*((quint32)(index/8))], numBytesPerElement);
+            tmpbitfield = tmpbitfield | ( (value.toUInt()!=0?1:0) << (index % 8) );
+            memcpy(&data[offset + numBytesPerElement*((quint32)(index/8))], &tmpbitfield, numBytesPerElement);
             break;
         }
         case STRING:

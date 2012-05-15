@@ -27,8 +27,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>702</width>
-        <height>489</height>
+        <width>696</width>
+        <height>475</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -67,22 +67,6 @@ Up to 3 separate PID options (or option pairs) can be selected and updated.</str
         </widget>
        </item>
        <item>
-        <spacer name="verticalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Preferred</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>10</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
         <widget class="QGroupBox" name="groupBox_6">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
@@ -96,28 +80,11 @@ Up to 3 separate PID options (or option pairs) can be selected and updated.</str
            <height>100</height>
           </size>
          </property>
-         <property name="styleSheet">
-          <string notr="true">#groupBox_6{
-background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0 rgba(243, 243, 243, 255), stop:1 rgba(250, 250, 250, 255));
-border: 1px outset #999;
-border-radius: 3;
-font:bold;
-}
-
-QGroupBox::title {
-     subcontrol-origin: margin;
-     subcontrol-position: top center; /* position at the top center */
-     padding: 0 3px;
-     background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                       stop: 0 #FFOECE, stop: 1 #FFFFFF);
-	top: 5px;
- }</string>
-         </property>
          <property name="title">
           <string>Module Settings</string>
          </property>
          <layout class="QGridLayout" name="gridLayout">
-          <item row="1" column="1">
+          <item row="0" column="1">
            <widget class="QLabel" name="label_51">
             <property name="styleSheet">
              <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
@@ -134,7 +101,7 @@ margin:1px;</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="2">
+          <item row="0" column="2">
            <widget class="QLabel" name="label_50">
             <property name="styleSheet">
              <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
@@ -151,7 +118,7 @@ margin:1px;</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="3">
+          <item row="0" column="3">
            <widget class="QLabel" name="label_49">
             <property name="styleSheet">
              <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
@@ -168,7 +135,7 @@ margin:1px;</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="4">
+          <item row="0" column="4">
            <widget class="QLabel" name="label">
             <property name="styleSheet">
              <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
@@ -185,14 +152,14 @@ margin:1px;</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
+          <item row="1" column="0">
            <widget class="QLabel" name="label_47">
             <property name="text">
              <string>Instance 1</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
+          <item row="1" column="1">
            <widget class="QComboBox" name="PID1">
             <property name="focusPolicy">
              <enum>Qt::StrongFocus</enum>
@@ -203,7 +170,7 @@ Set to Disabled if not used.</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="2">
+          <item row="1" column="2">
            <widget class="QComboBox" name="Input1">
             <property name="focusPolicy">
              <enum>Qt::StrongFocus</enum>
@@ -226,7 +193,7 @@ used, for instance, to decrease PID value when increasing Throttle.</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="3">
+          <item row="1" column="3">
            <widget class="QDoubleSpinBox" name="MinPID1">
             <property name="focusPolicy">
              <enum>Qt::StrongFocus</enum>
@@ -243,7 +210,7 @@ Throttle channel lesser or equal to Throttle Min value.</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="4">
+          <item row="1" column="4">
            <widget class="QDoubleSpinBox" name="MaxPID1">
             <property name="focusPolicy">
              <enum>Qt::StrongFocus</enum>
@@ -260,14 +227,14 @@ Throttle channel greater or equal to Throttle Max value.</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="0">
+          <item row="2" column="0">
            <widget class="QLabel" name="label_48">
             <property name="text">
              <string>Instance 2</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
+          <item row="2" column="1">
            <widget class="QComboBox" name="PID2">
             <property name="focusPolicy">
              <enum>Qt::StrongFocus</enum>
@@ -278,7 +245,7 @@ Set to Disabled if not used.</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="2">
+          <item row="2" column="2">
            <widget class="QComboBox" name="Input2">
             <property name="focusPolicy">
              <enum>Qt::StrongFocus</enum>
@@ -301,7 +268,7 @@ used, for instance, to decrease PID value when increasing Throttle.</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="3">
+          <item row="2" column="3">
            <widget class="QDoubleSpinBox" name="MinPID2">
             <property name="focusPolicy">
              <enum>Qt::StrongFocus</enum>
@@ -318,7 +285,7 @@ Throttle channel lesser or equal to Throttle Min value.</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="4">
+          <item row="2" column="4">
            <widget class="QDoubleSpinBox" name="MaxPID2">
             <property name="focusPolicy">
              <enum>Qt::StrongFocus</enum>
@@ -335,14 +302,14 @@ Throttle channel greater or equal to Throttle Max value.</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="0">
+          <item row="3" column="0">
            <widget class="QLabel" name="label_52">
             <property name="text">
              <string>Instance 3</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="1">
+          <item row="3" column="1">
            <widget class="QComboBox" name="PID3">
             <property name="focusPolicy">
              <enum>Qt::StrongFocus</enum>
@@ -353,7 +320,7 @@ Set to Disabled if not used.</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="2">
+          <item row="3" column="2">
            <widget class="QComboBox" name="Input3">
             <property name="focusPolicy">
              <enum>Qt::StrongFocus</enum>
@@ -376,7 +343,7 @@ used, for instance, to decrease PID value when increasing Throttle.</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="3">
+          <item row="3" column="3">
            <widget class="QDoubleSpinBox" name="MinPID3">
             <property name="focusPolicy">
              <enum>Qt::StrongFocus</enum>
@@ -393,7 +360,7 @@ Throttle channel lesser or equal to Throttle Min value.</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="4">
+          <item row="3" column="4">
            <widget class="QDoubleSpinBox" name="MaxPID3">
             <property name="focusPolicy">
              <enum>Qt::StrongFocus</enum>
@@ -410,14 +377,14 @@ Throttle channel greater or equal to Throttle Max value.</string>
             </property>
            </widget>
           </item>
-          <item row="8" column="0">
+          <item row="7" column="0">
            <widget class="QLabel" name="label_2">
             <property name="text">
              <string>Update Mode</string>
             </property>
            </widget>
           </item>
-          <item row="8" column="1">
+          <item row="7" column="1">
            <widget class="QComboBox" name="UpdateMode">
             <property name="focusPolicy">
              <enum>Qt::StrongFocus</enum>
@@ -436,14 +403,14 @@ only when system is armed without disabling the module.</string>
             </property>
            </widget>
           </item>
-          <item row="7" column="0">
+          <item row="6" column="0">
            <widget class="QLabel" name="label_3">
             <property name="text">
              <string>Throttle Range</string>
             </property>
            </widget>
           </item>
-          <item row="7" column="1">
+          <item row="6" column="1">
            <widget class="QDoubleSpinBox" name="ThrottleMin">
             <property name="focusPolicy">
              <enum>Qt::StrongFocus</enum>
@@ -459,7 +426,7 @@ only when system is armed without disabling the module.</string>
             </property>
            </widget>
           </item>
-          <item row="7" column="2">
+          <item row="6" column="2">
            <widget class="QDoubleSpinBox" name="ThrottleMax">
             <property name="focusPolicy">
              <enum>Qt::StrongFocus</enum>
@@ -475,7 +442,7 @@ only when system is armed without disabling the module.</string>
             </property>
            </widget>
           </item>
-          <item row="6" column="1">
+          <item row="5" column="1">
            <widget class="QLabel" name="label_4">
             <property name="styleSheet">
              <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
@@ -492,7 +459,7 @@ margin:1px;</string>
             </property>
            </widget>
           </item>
-          <item row="6" column="2">
+          <item row="5" column="2">
            <widget class="QLabel" name="label_5">
             <property name="styleSheet">
              <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
@@ -509,20 +476,7 @@ margin:1px;</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="2">
-           <spacer name="verticalSpacer_4">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item row="5" column="1">
+          <item row="4" column="1">
            <spacer name="verticalSpacer_3">
             <property name="orientation">
              <enum>Qt::Vertical</enum>

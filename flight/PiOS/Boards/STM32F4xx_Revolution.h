@@ -247,7 +247,7 @@ extern uint32_t pios_com_vcp_id;
 /* which is annoying because this then determines the rate at which we generate buffer turnover events */
 /* the objective here is to get enough buffer space to support 100Hz averaging rate */
 #define PIOS_ADC_NUM_CHANNELS           4
-#define PIOS_ADC_MAX_OVERSAMPLING       10
+#define PIOS_ADC_MAX_OVERSAMPLING       2
 #define PIOS_ADC_USE_ADC2               0
 
 //-------------------------

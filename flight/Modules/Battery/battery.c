@@ -55,15 +55,6 @@
 //
 #define SAMPLE_PERIOD_MS		500
 
-//#define ENABLE_DEBUG_MSG
-
-#ifdef ENABLE_DEBUG_MSG
-#define DEBUG_PORT			PIOS_COM_GPS
-#define DEBUG_MSG(format, ...) PIOS_COM_SendFormattedString(DEBUG_PORT, format, ## __VA_ARGS__)
-#else
-#define DEBUG_MSG(format, ...)
-#endif
-
 // Private types
 
 // Private variables
@@ -101,8 +92,8 @@ static void onTimer(UAVObjEvent* ev)
 	FlightBatterySettingsGet(&batterySettings);
 
 	//calculate the battery parameters
-	flightBatteryData.Voltage = ((float)PIOS_ADC_PinGet(1)) * batterySettings.SensorCalibrations[FLIGHTBATTERYSETTINGS_SENSORCALIBRATIONS_VOLTAGEFACTOR]; //in Volts
-	flightBatteryData.Current = ((float)PIOS_ADC_PinGet(0)) * batterySettings.SensorCalibrations[FLIGHTBATTERYSETTINGS_SENSORCALIBRATIONS_CURRENTFACTOR]; //in Amps
+	flightBatteryData.Voltage = ((float)PIOS_ADC_PinGet(0)) * batterySettings.SensorCalibrations[FLIGHTBATTERYSETTINGS_SENSORCALIBRATIONS_VOLTAGEFACTOR]; //in Volts
+	flightBatteryData.Current = ((float)PIOS_ADC_PinGet(1)) * batterySettings.SensorCalibrations[FLIGHTBATTERYSETTINGS_SENSORCALIBRATIONS_CURRENTFACTOR]; //in Amps
 
 	flightBatteryData.ConsumedEnergy += (flightBatteryData.Current * 1000.0 * dT / 3600.0) ;//in mAh
 

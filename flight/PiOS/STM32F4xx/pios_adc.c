@@ -76,9 +76,9 @@ struct pios_adc_dev {
 	volatile uint8_t adc_oversample;
 	uint8_t dma_block_size;
 	uint16_t dma_half_buffer_size;
-	int16_t fir_coeffs[PIOS_ADC_MAX_SAMPLES+1]  __attribute__ ((aligned(4)));
-	volatile int16_t raw_data_buffer[PIOS_ADC_MAX_SAMPLES]  __attribute__ ((aligned(4)));
-	float downsampled_buffer[PIOS_ADC_NUM_CHANNELS]  __attribute__ ((aligned(4)));
+//	int16_t fir_coeffs[PIOS_ADC_MAX_SAMPLES+1]  __attribute__ ((aligned(4)));
+//	volatile int16_t raw_data_buffer[PIOS_ADC_MAX_SAMPLES]  __attribute__ ((aligned(4)));
+//	float downsampled_buffer[PIOS_ADC_NUM_CHANNELS]  __attribute__ ((aligned(4)));
 	enum pios_adc_dev_magic magic;
 };
 
@@ -108,7 +108,7 @@ struct adc_accumulator {
 };
 
 #if defined(PIOS_INCLUDE_ADC)
-static struct dma_config config[] = PIOS_DMA_PIN_CONFIG;
+static const struct dma_config config[] = PIOS_DMA_PIN_CONFIG;
 #define PIOS_ADC_NUM_PINS	(sizeof(config) / sizeof(config[0]))
 
 static struct adc_accumulator accumulator[PIOS_ADC_NUM_PINS];
@@ -116,8 +116,6 @@ static struct adc_accumulator accumulator[PIOS_ADC_NUM_PINS];
 // Two buffers here for double buffering
 static uint16_t adc_raw_buffer[2][PIOS_ADC_MAX_SAMPLES][PIOS_ADC_NUM_PINS];
 #endif
-
-#define PIOS_ADC_TIMER		TIM3		/* might want this to come from the config */
 
 #if defined(PIOS_INCLUDE_ADC)
 static void
@@ -176,6 +174,7 @@ init_dma(void)
 	NVIC_Init(&NVICInit);
 }
 
+#if 0
 static void
 init_timer(void)
 {
@@ -200,6 +199,7 @@ init_timer(void)
 	TIM_SelectOutputTrigger(PIOS_ADC_TIMER, TIM_TRGOSource_Update);
 	TIM_Cmd(PIOS_ADC_TIMER, ENABLE);
 }
+#endif
 
 static void
 init_adc(void)
@@ -432,15 +432,15 @@ void accumulate(uint16_t *buffer, uint32_t count)
 	// XXX should do something with this
 	if (pios_adc_dev->data_queue) {
 		static portBASE_TYPE xHigherPriorityTaskWoken;
-		xQueueSendFromISR(pios_adc_dev->data_queue, pios_adc_dev->downsampled_buffer, &xHigherPriorityTaskWoken);
+//		xQueueSendFromISR(pios_adc_dev->data_queue, pios_adc_dev->downsampled_buffer, &xHigherPriorityTaskWoken);
 		portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);		
 	}
 
 #endif
 #endif
 
-	if(pios_adc_dev->callback_function)
-		pios_adc_dev->callback_function(pios_adc_dev->downsampled_buffer);
+//	if(pios_adc_dev->callback_function)
+//		pios_adc_dev->callback_function(pios_adc_dev->downsampled_buffer);
 
 }
 

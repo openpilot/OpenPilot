@@ -105,7 +105,14 @@ int UAVObjectParser::getNumBytes(int objIndex)
         int numBytes = 0;
         for (int n = 0; n < info->fields.length(); ++n)
         {
-            numBytes += info->fields[n]->numBytes * info->fields[n]->numElements;
+            if (info->fields[n]->type==FIELDTYPE_BITFIELD)
+            {
+                numBytes += info->fields[n]->numBytes * (1 + (info->fields[n]->numElements-1)/8 );
+            }
+            else
+            {
+                numBytes += info->fields[n]->numBytes * info->fields[n]->numElements;
+            }
         }
         return numBytes;
     }

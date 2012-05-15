@@ -25,15 +25,18 @@
  */
 
 #include "uavobjectgeneratorgcs.h"
+
+#define BITELEMENTS(type,elements) (((type)==FIELDTYPE_BITFIELD)?( 1 + ((elements)-1)/8):elements)
+
 using namespace std;
 
 bool UAVObjectGeneratorGCS::generate(UAVObjectParser* parser,QString templatepath,QString outputpath) {
 
     fieldTypeStrCPP << "qint8" << "qint16" << "qint32" <<
-        "quint8" << "quint16" << "quint32" << "float" << "quint8";
+        "quint8" << "quint16" << "quint32" << "float" << "quint8" << "quint8" << "quint8";
 
     fieldTypeStrCPPClass << "INT8" << "INT16" << "INT32"
-        << "UINT8" << "UINT16" << "UINT32" << "FLOAT32" << "ENUM";
+        << "UINT8" << "UINT16" << "UINT32" << "FLOAT32" << "ENUM" << "BITFIELD" << "STRING";
 
     gcsCodePath = QDir( templatepath + QString(GCS_CODE_DIR));
     gcsOutputPath = QDir( outputpath + QString("gcs") );
@@ -98,7 +101,7 @@ bool UAVObjectGeneratorGCS::process_object(ObjectInfo* info)
         if ( info->fields[n]->numElements > 1 )
         {
             fields.append( QString("        %1 %2[%3];\n").arg(type).arg(info->fields[n]->name)
-                           .arg(info->fields[n]->numElements) );
+                           .arg( BITELEMENTS(info->fields[n]->type,info->fields[n]->numElements)) );
         }
         else
         {
@@ -133,26 +136,56 @@ bool UAVObjectGeneratorGCS::process_object(ObjectInfo* info)
             propertyGetters +=
                     QString("    Q_INVOKABLE %1 get%2(quint32 index) const;\n")
                     .arg(type).arg(field->name);
-            propertiesImpl +=
-                    QString("%1 %2::get%3(quint32 index) const\n"
-                            "{\n"
-                            "   QMutexLocker locker(mutex);\n"
-                            "   return data.%3[index];\n"
-                            "}\n")
-                    .arg(type).arg(info->name).arg(field->name);
+            if (field->type==FIELDTYPE_BITFIELD)
+            {
+                propertiesImpl +=
+                        QString("%1 %2::get%3(quint32 index) const\n"
+                                "{\n"
+                                "   QMutexLocker locker(mutex);\n"
+                                "   return (data.%3[index/8] & (1 << (index%8)))!=0;\n"
+                                "}\n")
+                        .arg(type).arg(info->name).arg(field->name);
+            }
+            else
+            {
+                propertiesImpl +=
+                        QString("%1 %2::get%3(quint32 index) const\n"
+                                "{\n"
+                                "   QMutexLocker locker(mutex);\n"
+                                "   return data.%3[index];\n"
+                                "}\n")
+                        .arg(type).arg(info->name).arg(field->name);
+            }
             propertySetters +=
                     QString("    void set%1(quint32 index, %2 value);\n")
                     .arg(field->name).arg(type);
-            propertiesImpl +=
+            if (field->type==FIELDTYPE_BITFIELD)
+            {
+                propertiesImpl +=
                     QString("void %1::set%2(quint32 index, %3 value)\n"
-                            "{\n"
-                            "   mutex->lock();\n"
-                            "   bool changed = data.%2[index] != value;\n"
-                            "   data.%2[index] = value;\n"
-                            "   mutex->unlock();\n"
-                            "   if (changed) emit %2Changed(index,value);\n"
-                            "}\n\n")
+                        "{\n"
+                        "   mutex->lock();\n"
+                        "   value = data.%2[index/8] & ~( 1 << (index\%8)) | ( (value!=0?1:0) << (index\%8) );\n"
+                        "   bool changed = data.%2[index/8] != value;\n"
+                        "   data.%2[index] = value;\n"
+                        "   mutex->unlock();\n"
+                        "   if (changed) emit %2Changed(index,value);\n"
+                        "}\n\n")
                     .arg(info->name).arg(field->name).arg(type);
+            }
+            else
+            {
+                propertiesImpl +=
+                    QString("void %1::set%2(quint32 index, %3 value)\n"
+                        "{\n"
+                        "   mutex->lock();\n"
+                        "   bool changed = data.%2[index] != value;\n"
+                        "   data.%2[index] = value;\n"
+                        "   mutex->unlock();\n"
+                        "   if (changed) emit %2Changed(index,value);\n"
+                        "}\n\n")
+                    .arg(info->name).arg(field->name).arg(type);
+            }
             propertyNotifications +=
                     QString("    void %1Changed(quint32 index, %2 value);\n")
                     .arg(field->name).arg(type);
@@ -287,7 +320,7 @@ bool UAVObjectGeneratorGCS::process_object(ObjectInfo* info)
             enums.append(QString("    /* Number of elements for field %1 */\n").arg(info->fields[n]->name));
             enums.append( QString("    static const quint32 %1_NUMELEM = %2;\n")
                           .arg( info->fields[n]->name.toUpper() )
-                          .arg( info->fields[n]->numElements ) );
+                          .arg( BITELEMENTS(info->fields[n]->type,info->fields[n]->numElements) ) );
         }
     }
     outInclude.replace(QString("$(DATAFIELDINFO)"), enums);
@@ -333,6 +366,12 @@ bool UAVObjectGeneratorGCS::process_object(ObjectInfo* info)
                     }
                     else if ( info->fields[n]->type == FIELDTYPE_FLOAT32 ) {
                         initfields.append( QString("    data.%1[%2] = %3;\n")
+                                    .arg( info->fields[n]->name )
+                                    .arg( idx )
+                                    .arg( info->fields[n]->defaultValues[idx].toFloat() ) );
+                    }
+                    else if ( info->fields[n]->type == FIELDTYPE_BITFIELD ) {
+                        initfields.append( QString("    data.%1[%2/8] = (data.%1[%2/8] & ~(1 << (%2\%8))) | (%3 << (%2\%8));\n")
                                     .arg( info->fields[n]->name )
                                     .arg( idx )
                                     .arg( info->fields[n]->defaultValues[idx].toFloat() ) );

@@ -2,7 +2,7 @@
     <object name="TaskInfo" singleinstance="true" settings="false">
         <description>Task information</description>
         <field name="StackRemaining" units="bytes" type="uint16" elementnames="System,Actuator,Attitude,Sensors,TelemetryTx,TelemetryTxPri,TelemetryRx,GPS,ManualControl,Altitude,Stabilization,AltitudeHold,Guidance,FlightPlan,Com2UsbBridge,Usb2ComBridge,OveroSync"/>
-	<field name="Running" units="bool" type="enum" options="False,True" elementnames="System,Actuator,Attitude,Sensors,TelemetryTx,TelemetryTxPri,TelemetryRx,GPS,ManualControl,Altitude,Stabilization,AltitudeHold,Guidance,FlightPlan,Com2UsbBridge,Usb2ComBridge,OveroSync"/>
+	<field name="Running" units="bool" type="bitfield" elementnames="System,Actuator,Attitude,Sensors,TelemetryTx,TelemetryTxPri,TelemetryRx,GPS,ManualControl,Altitude,Stabilization,AltitudeHold,Guidance,FlightPlan,Com2UsbBridge,Usb2ComBridge,OveroSync" defaultvalue="1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1"/>
 	<field name="RunningTime" units="%" type="uint8" elementnames="System,Actuator,Attitude,Sensors,TelemetryTx,TelemetryTxPri,TelemetryRx,GPS,ManualControl,Altitude,Stabilization,AltitudeHold,Guidance,FlightPlan,Com2UsbBridge,Usb2ComBridge,OveroSync"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>

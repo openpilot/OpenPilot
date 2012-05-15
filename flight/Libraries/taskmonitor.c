@@ -120,7 +120,7 @@ void TaskMonitorUpdateAll(void)
 	{
 		if (handles[n] != 0)
 		{
-			data.Running[n] = TASKINFO_RUNNING_TRUE;
+			UAVOBJ_BITFIELD_SET(data.Running,n,1);
 #if defined(ARCH_POSIX) || defined(ARCH_WIN32)
 			data.StackRemaining[n] = 10000;
 #else
@@ -134,7 +134,7 @@ void TaskMonitorUpdateAll(void)
 		}
 		else
 		{
-			data.Running[n] = TASKINFO_RUNNING_FALSE;
+			UAVOBJ_BITFIELD_SET(data.Running,n,0);
 			data.StackRemaining[n] = 0;
 			data.RunningTime[n] = 0;
 		}

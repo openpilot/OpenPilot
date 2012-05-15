@@ -75,12 +75,10 @@ static void onTimer(UAVObjEvent* ev);
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
  */
-MODULE_INITCALL(BatteryInitialize, 0)
-
 int32_t BatteryInitialize(void)
 {
-	BatteryStateInitialze();
-	BatterySettingsInitialize();
+	FlightBatteryStateInitialize();
+	FlightBatterySettingsInitialize();
 	
 	static UAVObjEvent ev;
 
@@ -89,6 +87,8 @@ int32_t BatteryInitialize(void)
 
 	return 0;
 }
+
+MODULE_INITCALL(BatteryInitialize, 0)
 
 static void onTimer(UAVObjEvent* ev)
 {
@@ -114,7 +114,6 @@ static void onTimer(UAVObjEvent* ev)
 	portTickType thisSysTime;
 	FlightBatterySettingsData batterySettings;
 	static float dT = SAMPLE_PERIOD_MS / 1000;
-	float Bob;
 	float energyRemaining;
 
 
@@ -129,7 +128,7 @@ static void onTimer(UAVObjEvent* ev)
 	//calculate the battery parameters
 	flightBatteryData.Voltage = ((float)PIOS_ADC_PinGet(2)) * batterySettings.SensorCalibrations[FLIGHTBATTERYSETTINGS_SENSORCALIBRATIONS_VOLTAGEFACTOR]; //in Volts
 	flightBatteryData.Current = ((float)PIOS_ADC_PinGet(1)) * batterySettings.SensorCalibrations[FLIGHTBATTERYSETTINGS_SENSORCALIBRATIONS_CURRENTFACTOR]; //in Amps
-Bob =dT; // FIXME: something funky happens if I don't do this... Andrew
+
 	flightBatteryData.ConsumedEnergy += (flightBatteryData.Current * 1000.0 * dT / 3600.0) ;//in mAh
 
 	if (flightBatteryData.Current > flightBatteryData.PeakCurrent)flightBatteryData.PeakCurrent = flightBatteryData.Current; //in Amps

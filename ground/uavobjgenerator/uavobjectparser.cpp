@@ -32,15 +32,15 @@
 UAVObjectParser::UAVObjectParser()
 {
     fieldTypeStrXML << "int8" << "int16" << "int32" << "uint8"
-        << "uint16" << "uint32" <<"float" << "enum";
+        << "uint16" << "uint32" << "float" << "enum" << "bitfield" << "string";
 
-    updateModeStrXML << "periodic" << "onchange" << "throttled" << "manual";
+    updateModeStrXML << "manual" << "periodic" << "onchange" << "throttled";
 
     accessModeStr << "ACCESS_READWRITE" << "ACCESS_READONLY";
 
     fieldTypeNumBytes << int(1) << int(2) << int(4) <<
                         int(1) << int(2) << int(4) <<
-                        int(4) << int(1);
+                        int(4) << int(1) << int(1) << int(1);
 
     accessModeStrXML << "readwrite" << "readonly";
 

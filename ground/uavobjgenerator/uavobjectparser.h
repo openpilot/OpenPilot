@@ -44,7 +44,9 @@ typedef enum {
     FIELDTYPE_UINT16,
     FIELDTYPE_UINT32,
     FIELDTYPE_FLOAT32,
-    FIELDTYPE_ENUM
+    FIELDTYPE_ENUM,
+    FIELDTYPE_BITFIELD,
+    FIELDTYPE_STRING
 } FieldType;
 
 typedef struct {
@@ -64,10 +66,10 @@ typedef struct {
  * Object update mode
  */
 typedef enum {
-    UPDATEMODE_PERIODIC = 0, /** Automatically update object at periodic intervals */
-    UPDATEMODE_ONCHANGE, /** Only update object when its data changes */
-    UPDATEMODE_THROTTLED, /** Object is updated on change, but not more often than the interval time */
-    UPDATEMODE_MANUAL  /** Manually update object, by calling the updated() function */
+    UPDATEMODE_MANUAL = 0,  /** Manually update object, by calling the updated() function */
+    UPDATEMODE_PERIODIC = 1, /** Automatically update object at periodic intervals */
+    UPDATEMODE_ONCHANGE = 2, /** Only update object when its data changes */
+    UPDATEMODE_THROTTLED = 3 /** Object is updated on change, but not more often than the interval time */
 } UpdateMode;
 
 

@@ -38,12 +38,10 @@ UAVMetaObject::UAVMetaObject(quint32 objID, const QString& name, UAVObject* pare
     // Setup default metadata of metaobject (can not be changed)
     UAVObject::MetadataInitialize(ownMetadata);
     // Setup fields
-    QStringList boolEnum;
-    boolEnum << tr("0") << tr("1");
     QStringList modesBitField;
     modesBitField << tr("FlightReadOnly") << tr("GCSReadOnly") << tr("FlightTelemetryAcked") << tr("GCSTelemetryAcked") << tr("FlightUpdatePeriodic") << tr("FlightUpdateOnChange") << tr("GCSUpdatePeriodic") << tr("GCSUpdateOnChange");
     QList<UAVObjectField*> fields;    
-    fields.append( new UAVObjectField(tr("Modes"), tr("boolean"), UAVObjectField::BITFIELD, modesBitField, boolEnum) );
+    fields.append( new UAVObjectField(tr("Modes"), tr("boolean"), UAVObjectField::BITFIELD, modesBitField, QStringList()) );
     fields.append( new UAVObjectField(tr("Flight Telemetry Update Period"), tr("ms"), UAVObjectField::UINT16, 1, QStringList()) );
     fields.append( new UAVObjectField(tr("GCS Telemetry Update Period"), tr("ms"), UAVObjectField::UINT16, 1, QStringList()) );
     fields.append( new UAVObjectField(tr("Logging Update Period"), tr("ms"), UAVObjectField::UINT16, 1, QStringList()) );

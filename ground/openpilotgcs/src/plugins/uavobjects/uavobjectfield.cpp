@@ -88,6 +88,7 @@ void UAVObjectField::constructorInitialize(const QString& name, const QString& u
         break;
     case BITFIELD:
         numBytesPerElement = sizeof(quint8);
+        this->options = QStringList()<<tr("0")<<tr("1");
         break;
     case STRING:
         numBytesPerElement = sizeof(quint8);

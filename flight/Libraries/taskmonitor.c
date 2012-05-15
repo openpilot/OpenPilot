@@ -116,7 +116,7 @@ void TaskMonitorUpdateAll(void)
 #endif
 	
 	// Update all task information
-	for (n = 0; n < TASKINFO_RUNNING_NUMELEM; ++n)
+	for (n = 0; n < TASKINFO_RUNNINGTIME_NUMELEM; ++n)
 	{
 		if (handles[n] != 0)
 		{

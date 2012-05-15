@@ -136,14 +136,15 @@ void UAVObjectField::limitsInitialize(const QString &limits)
                 QString value=_value.trimmed();
                 switch (type)
                 {
+                case UINT8:
+                case UINT16:
+                case UINT32:
+		case BITFIELD:
+                    lstruc.values.append((quint32)value.toULong());
+                    break;
                 case INT8:
                 case INT16:
                 case INT32:
-                case UINT8:
-                    lstruc.values.append((quint32)value.toULong());
-                    break;
-                case UINT16:
-                case UINT32:
                     lstruc.values.append((qint32)value.toLong());
                     break;
                 case FLOAT32:
@@ -193,6 +194,7 @@ bool UAVObjectField::isWithinLimits(QVariant var,quint32 index)
         case UINT8:
         case UINT16:
         case UINT32:
+        case BITFIELD:
             foreach (QVariant vars, struc.values) {
                 if(var.toUInt()==vars.toUInt())
                     return true;
@@ -233,6 +235,7 @@ bool UAVObjectField::isWithinLimits(QVariant var,quint32 index)
         case UINT8:
         case UINT16:
         case UINT32:
+        case BITFIELD:
             foreach (QVariant vars, struc.values) {
                 if(var.toUInt()==vars.toUInt())
                     return false;
@@ -278,6 +281,7 @@ bool UAVObjectField::isWithinLimits(QVariant var,quint32 index)
         case UINT8:
         case UINT16:
         case UINT32:
+        case BITFIELD:
                 if(!(var.toUInt()>=struc.values.at(0).toUInt() && var.toUInt()<=struc.values.at(1).toUInt()))
                     return false;
             return true;
@@ -319,6 +323,7 @@ bool UAVObjectField::isWithinLimits(QVariant var,quint32 index)
         case UINT8:
         case UINT16:
         case UINT32:
+        case BITFIELD:
                 if(!(var.toUInt()>=struc.values.at(0).toUInt()))
                     return false;
             return true;
@@ -353,6 +358,7 @@ bool UAVObjectField::isWithinLimits(QVariant var,quint32 index)
         case UINT8:
         case UINT16:
         case UINT32:
+        case BITFIELD:
                 if(!(var.toUInt()<=struc.values.at(0).toUInt()))
                     return false;
             return true;
@@ -460,6 +466,8 @@ QString UAVObjectField::getTypeAsString()
         return "float32";
     case UAVObjectField::ENUM:
         return "enum";
+    case UAVObjectField::BITFIELD:
+        return "bitfield";
     case UAVObjectField::STRING:
         return "string";
     default:
@@ -721,7 +729,7 @@ bool UAVObjectField::isNumeric()
         return false;
         break;
     case BITFIELD:
-        return false;
+        return true;
         break;
     case STRING:
         return false;
@@ -760,7 +768,7 @@ bool UAVObjectField::isText()
         return true;
         break;
     case BITFIELD:
-        return true;
+        return false;
         break;
     case STRING:
         return true;
@@ -971,7 +979,7 @@ void UAVObjectField::setValue(const QVariant& value, quint32 index)
         {
             quint8 tmpbitfield;
             memcpy(&tmpbitfield, &data[offset + numBytesPerElement*((quint32)(index/8))], numBytesPerElement);
-            tmpbitfield = tmpbitfield | ( (value.toUInt()!=0?1:0) << (index % 8) );
+            tmpbitfield = (tmpbitfield & ~(1 << (index % 8))) | ( (value.toUInt()!=0?1:0) << (index % 8) );
             memcpy(&data[offset + numBytesPerElement*((quint32)(index/8))], &tmpbitfield, numBytesPerElement);
             break;
         }

@@ -163,9 +163,9 @@ bool UAVObjectGeneratorGCS::process_object(ObjectInfo* info)
                     QString("void %1::set%2(quint32 index, %3 value)\n"
                         "{\n"
                         "   mutex->lock();\n"
-                        "   value = data.%2[index/8] & ~( 1 << (index\%8)) | ( (value!=0?1:0) << (index\%8) );\n"
-                        "   bool changed = data.%2[index/8] != value;\n"
-                        "   data.%2[index] = value;\n"
+                        "   quint8 value2 = data.%2[index/8] & ~( 1 << (index\%8)) | ( (value!=0?1:0) << (index\%8) );\n"
+                        "   bool changed = data.%2[index/8] != value2;\n"
+                        "   data.%2[index/8] = value2;\n"
                         "   mutex->unlock();\n"
                         "   if (changed) emit %2Changed(index,value);\n"
                         "}\n\n")

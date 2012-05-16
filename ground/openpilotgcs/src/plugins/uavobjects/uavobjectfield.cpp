@@ -492,7 +492,7 @@ void UAVObjectField::clear()
     switch (type)
     {
     case BITFIELD:
-        memset(&data[offset], 0, numBytesPerElement*((quint32)(numElements/8)));
+        memset(&data[offset], 0, numBytesPerElement*((quint32)(1+(numElements-1)/8)));
         break;
     default:
         memset(&data[offset], 0, numBytesPerElement*numElements);

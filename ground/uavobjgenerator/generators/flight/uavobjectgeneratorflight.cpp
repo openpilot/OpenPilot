@@ -191,6 +191,48 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo* info)
         }
     }
     outInclude.replace(QString("$(DATAFIELDINFO)"), enums);
+    
+    // Replace the $(DATAFIELDWRAPPERS) tag
+    QString wrappers;
+    for (int n = 0; n < info->fields.length(); ++n)
+    {
+        if ( info->fields[n]->isArray ){
+            if (info->fields[n]->type==FIELDTYPE_BITFIELD) {
+                wrappers.append( QString("// wrappers for %5%1\r\n"
+                                    "static inline %2 %5%1GetElement( %2 *%1, uint32_t e) {\r\n"
+                                    "\tPIOS_Assert(e<%3_%4_NUMELEM);\r\n"
+                                    "\treturn (%1[e/8] >> (e%8)) & 1;\r\n"
+                                    "}\r\n"
+                                    "static inline void %5%1SetElement( %2 *%1, uint32_t e, %2 v) {\r\n"
+                                    "\tPIOS_Assert(e<%3_%4_NUMELEM);\r\n"
+                                    "\t%1[e/8] = (%1[e/8] & ~( 1 << (e%8))) | ((v!=0?1:0) << (e%8));\r\n"
+                                    "}\r\n")
+                                    .arg( info->fields[n]->name )
+                                    .arg( fieldTypeStrC[info->fields[n]->type] )
+                                    .arg( info->name.toUpper() )
+                                    .arg( info->fields[n]->name.toUpper() )
+                                    .arg( info->name ));
+            }
+            else
+            {
+                wrappers.append( QString("// wrappers for %5%1\r\n"
+                                    "static inline %2 %5%1GetElement( %2 *%1, uint32_t e) {\r\n"
+                                    "\tPIOS_Assert(e<%3_%4_NUMELEM);\r\n"
+                                    "\treturn %1[e];\r\n"
+                                    "}\r\n"
+                                    "static inline void %5%1SetElement( %2 *%1, uint32_t e, %2 v) {\r\n"
+                                    "\tPIOS_Assert(e<%3_%4_NUMELEM);\r\n"
+                                    "\t%1[e] = v;\r\n"
+                                    "}\r\n")
+                                    .arg( info->fields[n]->name )
+                                    .arg( fieldTypeStrC[info->fields[n]->type] )
+                                    .arg( info->name.toUpper() )
+                                    .arg( info->fields[n]->name.toUpper() )
+                                    .arg( info->name ));
+            }
+        }
+    }
+    outInclude.replace(QString("$(DATAFIELDWRAPPERS)"), wrappers);
 
     // Replace the $(INITFIELDS) tag
     QString initfields;

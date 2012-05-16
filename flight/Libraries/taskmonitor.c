@@ -116,27 +116,29 @@ void TaskMonitorUpdateAll(void)
 #endif
 	
 	// Update all task information
-	for (n = 0; n < TASKINFO_RUNNINGTIME_NUMELEM; ++n)
+	for (n = 0; n < TASKINFO_RUNNING_NUMELEM; ++n)
 	{
 		if (handles[n] != 0)
 		{
-			UAVOBJ_BITFIELD_SET(data.Running,n,1);
+			TaskInfoRunningSetElement(data.Running, n, 1);
 #if defined(ARCH_POSIX) || defined(ARCH_WIN32)
-			data.StackRemaining[n] = 10000;
+			TaskInfoStackRemainingSetElement(data.StackRemaining, n, 10000);
 #else
-			data.StackRemaining[n] = uxTaskGetStackHighWaterMark(handles[n]) * 4;
+			TaskInfoStackRemainingSetElement(data.StackRemaining, n,
+			        uxTaskGetStackHighWaterMark(handles[n]) * 4);
 #if ( configGENERATE_RUN_TIME_STATS == 1 )
 			/* Generate run time stats */
-			data.RunningTime[n] = uxTaskGetRunTime(handles[n]) / deltaTime;
+			TaskInfoRunningTimeSetElement(data.RunningTime, n, 
+			        uxTaskGetRunTime(handles[n]) / deltaTie);
 #endif
 #endif
 			
 		}
 		else
 		{
-			UAVOBJ_BITFIELD_SET(data.Running,n,0);
-			data.StackRemaining[n] = 0;
-			data.RunningTime[n] = 0;
+			TaskInfoRunningSetElement(data.Running, n, 0);
+			TaskInfoStackRemainingSetElement(data.StackRemaining, n, 0);
+			TaskInfoRunningTimeSetElement(data.RunningTime, n, 0);
 		}
 	}
 

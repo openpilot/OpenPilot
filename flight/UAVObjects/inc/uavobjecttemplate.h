@@ -77,6 +77,9 @@ $(DATAFIELDS)
 // Field information
 $(DATAFIELDINFO)
 
+// Field modification wrappers
+$(DATAFIELDWRAPPERS)
+
 // Generic interface functions
 int32_t $(NAME)Initialize();
 UAVObjHandle $(NAME)Handle();

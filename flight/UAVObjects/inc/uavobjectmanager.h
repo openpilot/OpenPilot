@@ -46,12 +46,6 @@
 #define UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT 6
 #define UAVOBJ_UPDATE_MODE_MASK 0x3
 
-/**
- * BITFIELD support macros
- */
-#define UAVOBJ_BITFIELD_GET(array,element) ((array[((element)/8)] & (1 << ((element)%8)))!=0?1:0)
-#define UAVOBJ_BITFIELD_SET(array,element,value) array[(element)/8] = (array[(element)/8] & ~( 1 << ((element)%8) )) | ( (value) << ((element)%8))
-
 // FIXME: All this typedef for SDCARD needs to be abstracted away
 #if !defined(PIOS_INCLUDE_SDCARD)
 typedef struct {} FILEINFO;

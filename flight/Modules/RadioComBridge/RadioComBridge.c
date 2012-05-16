@@ -50,11 +50,11 @@
 // Private constants
 
 #define TEMP_BUFFER_SIZE 25
-#define STACK_SIZE_BYTES 300
+#define STACK_SIZE_BYTES 150
 #define TASK_PRIORITY (tskIDLE_PRIORITY + 1)
 #define BRIDGE_BUF_LEN 512
 #define MAX_RETRIES 2
-#define REQ_TIMEOUT_MS 10
+#define RETRY_TIMEOUT_MS 20
 #define STATS_UPDATE_PERIOD_MS 2000
 #define RADIOSTATS_UPDATE_PERIOD_MS 1000
 #define MAX_LOST_CONTACT_TIME 4
@@ -159,13 +159,13 @@ static int32_t RadioComBridgeStart(void)
 {
 	if(data) {
 		// Start the tasks
-		xTaskCreate(comUAVTalkTask, (signed char *)"ComUAVTalk", STACK_SIZE_BYTES/2, NULL, TASK_PRIORITY + 2, &(data->comUAVTalkTaskHandle));
+		xTaskCreate(comUAVTalkTask, (signed char *)"ComUAVTalk", STACK_SIZE_BYTES, NULL, TASK_PRIORITY + 2, &(data->comUAVTalkTaskHandle));
 		if(PIOS_COM_TRANS_COM)
-			xTaskCreate(transparentCommTask, (signed char *)"transparentComm", STACK_SIZE_BYTES/2, NULL, TASK_PRIORITY + 2, &(data->transparentCommTaskHandle));
-		xTaskCreate(radioReceiveTask, (signed char *)"RadioReceive", STACK_SIZE_BYTES/2, NULL, TASK_PRIORITY, &(data->radioReceiveTaskHandle));
-		xTaskCreate(sendPacketTask, (signed char *)"SendPacketTask", STACK_SIZE_BYTES/2, NULL, TASK_PRIORITY, &(data->sendPacketTaskHandle));
-		xTaskCreate(sendDataTask, (signed char *)"SendDataTask", STACK_SIZE_BYTES/2, NULL, TASK_PRIORITY, &(data->sendDataTaskHandle));
-		xTaskCreate(radioStatusTask, (signed char *)"RadioStatus", STACK_SIZE_BYTES/2, NULL, TASK_PRIORITY, &(data->radioStatusTaskHandle));
+			xTaskCreate(transparentCommTask, (signed char *)"transparentComm", STACK_SIZE_BYTES, NULL, TASK_PRIORITY + 2, &(data->transparentCommTaskHandle));
+		xTaskCreate(radioReceiveTask, (signed char *)"RadioReceive", STACK_SIZE_BYTES, NULL, TASK_PRIORITY+ 2, &(data->radioReceiveTaskHandle));
+		xTaskCreate(sendPacketTask, (signed char *)"SendPacketTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY + 2, &(data->sendPacketTaskHandle));
+		xTaskCreate(sendDataTask, (signed char *)"SendDataTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY+ 2, &(data->sendDataTaskHandle));
+		xTaskCreate(radioStatusTask, (signed char *)"RadioStatus", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->radioStatusTaskHandle));
 #ifdef PIOS_INCLUDE_WDG
 		PIOS_WDG_RegisterFlag(PIOS_WDG_COMUAVTALK);
 		if(PIOS_COM_TRANS_COM)
@@ -268,7 +268,7 @@ static void comUAVTalkTask(void *parameters)
 		// Receive from USB HID if available, otherwise UAVTalk com if it's available.
 #if defined(PIOS_INCLUDE_USB)
 		// Determine input port (USB takes priority over telemetry port)
-		if (PIOS_USB_CheckAvailable(0) && PIOS_COM_USB_HID)
+		if (PIOS_USB_CheckAvailable(0))
 			BufferedReadSetCom(f, PIOS_COM_USB_HID);
 		else
 #endif /* PIOS_INCLUDE_USB */
@@ -322,8 +322,8 @@ static void comUAVTalkTask(void *parameters)
 		UAVTalkConnectionData *connection = (UAVTalkConnectionData*)(data->inUAVTalkCon);
 		UAVTalkInputProcessor *iproc = &(connection->iproc);
 
-		if (state == UAVTALK_STATE_COMPLETE) {
-
+		if (state == UAVTALK_STATE_COMPLETE)
+		{
 			// Is this a local UAVObject?
 			if (iproc->obj != NULL)
 			{
@@ -475,6 +475,7 @@ static void radioReceiveTask(void *parameters)
 		// Get a RX packet from the packet handler if required.
 		if (p == NULL)
 			p = PHGetRXPacket(pios_packet_handler);
+
 		if(p == NULL) {
 			DEBUG_PRINTF(2, "RX Packet Unavailable.!\n\r");
 			// Wait a bit for a packet to come available.
@@ -519,7 +520,8 @@ static void sendPacketTask(void *parameters)
 		// Wait for a packet on the queue.
 		if (xQueueReceive(data->sendPacketQueue, &p, MAX_PORT_DELAY) == pdTRUE) {
 			// Send the packet.
-			PHTransmitPacket(pios_packet_handler, p);
+			if(!PHTransmitPacket(pios_packet_handler, p))
+				PHReleaseTXPacket(pios_packet_handler, p);
 		}
 	}
 }
@@ -547,7 +549,7 @@ static void sendDataTask(void *parameters)
 				uint32_t retries = 0;
 				int32_t success = -1;
 				while (retries < MAX_RETRIES && success == -1) {
-					success = UAVTalkSendObject(data->outUAVTalkCon, ev.obj, 0, 0, REQ_TIMEOUT_MS);
+					success = UAVTalkSendObject(data->outUAVTalkCon, ev.obj, 0, 0, RETRY_TIMEOUT_MS);
 					++retries;
 				}
 				data->comTxRetries += retries;

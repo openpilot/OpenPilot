@@ -174,7 +174,10 @@ PHPacketHandle PHGetTXPacket(PHInstHandle h)
 	// Is the window full?
 	uint8_t next_end = (data->tx_win_end + 1) % data->cfg.winSize;
 	if(next_end == data->tx_win_start)
+	{
+		xSemaphoreGiveRecursive(data->lock);
 		return NULL;
+	}
 	data->tx_win_end = next_end;
 
 	// Release lock
@@ -202,7 +205,7 @@ void PHReleaseTXPacket(PHInstHandle h, PHPacketHandle p)
 
 	// If this packet is at the start of the window, increment the start index.
 	while ((data->tx_win_start != data->tx_win_end) &&
-				 (data->tx_packets[data->tx_win_start].header.type == PACKET_TYPE_NONE))
+	       (data->tx_packets[data->tx_win_start].header.type == PACKET_TYPE_NONE))
 		data->tx_win_start = (data->tx_win_start + 1) % data->cfg.winSize;
 
 	// Release lock
@@ -226,7 +229,11 @@ PHPacketHandle PHGetRXPacket(PHInstHandle h)
 	// Is the window full?
 	uint8_t next_end = (data->rx_win_end + 1) % data->cfg.winSize;
 	if(next_end == data->rx_win_start)
+	{
+		// Release lock
+		xSemaphoreGiveRecursive(data->lock);
 		return NULL;
+	}
 	data->rx_win_end = next_end;
 
 	// Release lock

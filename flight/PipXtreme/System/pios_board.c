@@ -94,7 +94,7 @@ void PIOS_Board_Init(void) {
 #endif	/* PIOS_INCLUDE_LED */
 
 	PipXSettingsData pipxSettings;
-#if defined(PIOS_INCLUDE_FLASH_EEPROM)
+#if defined(PIOS_INCLUDE_FLASH_EEPROM__NOT)
 	PIOS_EEPROM_Init(&pios_eeprom_cfg);
 
 	/* Read the settings from flash. */
@@ -126,9 +126,22 @@ void PIOS_Board_Init(void) {
 	/* Initialize board specific USB data */
 	PIOS_USB_BOARD_DATA_Init();
 
+	bool usb_cdc_present = false;
 #if defined(PIOS_INCLUDE_USB_CDC)
-	if (PIOS_USB_DESC_HID_CDC_Init()) {
-		PIOS_Assert(0);
+	switch (pipxSettings.VCPConfig)
+	{
+	case PIPXSETTINGS_VCPCONFIG_SERIAL:
+	case PIPXSETTINGS_VCPCONFIG_DEBUG:
+		if (PIOS_USB_DESC_HID_CDC_Init()) {
+			PIOS_Assert(0);
+		}
+		usb_cdc_present = true;
+		break;
+	case PIPXSETTINGS_VCPCONFIG_DISABLED:
+		if (PIOS_USB_DESC_HID_ONLY_Init()) {
+			PIOS_Assert(0);
+		}
+		break;
 	}
 #else
 	if (PIOS_USB_DESC_HID_ONLY_Init()) {
@@ -142,10 +155,7 @@ void PIOS_Board_Init(void) {
 #if defined(PIOS_INCLUDE_USB_CDC)
 
 #if defined(PIOS_INCLUDE_COM)
-	switch (pipxSettings.VCPConfig)
-	{
-	case PIPXSETTINGS_VCPCONFIG_SERIAL:
-	case PIPXSETTINGS_VCPCONFIG_DEBUG:
+	if(usb_cdc_present)
 	{
 		uint32_t pios_usb_cdc_id;
 		if (PIOS_USB_CDC_Init(&pios_usb_cdc_id, &pios_usb_cdc_cfg, pios_usb_id)) {
@@ -165,17 +175,10 @@ void PIOS_Board_Init(void) {
 		case PIPXSETTINGS_VCPCONFIG_SERIAL:
 			pios_com_trans_com_id = pios_com_vcp_id;
 			break;
-		case PIPXSETTINGS_VCPCONFIG_UAVTALK:
-			pios_com_uavtalk_com_id = pios_com_vcp_id;
-			break;
 		case PIPXSETTINGS_VCPCONFIG_DEBUG:
 			pios_com_debug_id = pios_com_vcp_id;
 			break;
 		}
-		break;
-	}
-	case PIPXSETTINGS_VCPCONFIG_DISABLED:
-		break;
 	}
 #endif	/* PIOS_INCLUDE_COM */
 

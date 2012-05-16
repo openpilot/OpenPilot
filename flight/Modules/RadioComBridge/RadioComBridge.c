@@ -238,6 +238,8 @@ static int32_t RadioComBridgeInitialize(void)
 		data->pairStats[i].resets = 0;
 		data->pairStats[i].lastContact = 0;
 	}
+	// The first slot is reserved for our current pairID
+	PipXSettingsPairIDGet(&(data->pairStats[0].pairID));
 
 	// Configure our UAVObjects for updates.
 	UAVObjConnectQueue(UAVObjGetByName("PipXStatus"), data->objEventQueue, EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ);
@@ -683,7 +685,7 @@ static void radioStatusTask(void *parameters)
 
 		// Get object data
 		PipXStatusGet(&pipxStatus);
-		PipXStatusPairIDsGet(&pairID);
+		PipXSettingsPairIDGet(&pairID);
 
 		// Update the status
 		pipxStatus.DeviceID = PIOS_RFM22B_DeviceID(pios_rfm22b_id);
@@ -848,14 +850,20 @@ static void StatusHandler(PHStatusPacketHandle status)
 	// If we haven't seen it, find a slot to put it in.
 	if (!found)
 	{
+		uint32_t pairID;
+		PipXSettingsPairIDGet(&pairID);
+
 		uint8_t min_idx = 0;
-		int8_t min_rssi = data->pairStats[0].rssi;
-		for (id_idx = 1; id_idx < PIPXSTATUS_PAIRIDS_NUMELEM; ++id_idx)
+		if(id != pairID)
 		{
-			if(data->pairStats[id_idx].rssi < min_rssi)
+			int8_t min_rssi = data->pairStats[0].rssi;
+			for (id_idx = 1; id_idx < PIPXSTATUS_PAIRIDS_NUMELEM; ++id_idx)
 			{
-				min_rssi = data->pairStats[id_idx].rssi;
-				min_idx = id_idx;
+				if(data->pairStats[id_idx].rssi < min_rssi)
+				{
+					min_rssi = data->pairStats[id_idx].rssi;
+					min_idx = id_idx;
+				}
 			}
 		}
 		data->pairStats[min_idx].pairID = id;

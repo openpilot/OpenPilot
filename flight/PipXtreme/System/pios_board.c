@@ -94,7 +94,7 @@ void PIOS_Board_Init(void) {
 #endif	/* PIOS_INCLUDE_LED */
 
 	PipXSettingsData pipxSettings;
-#if defined(PIOS_INCLUDE_FLASH_EEPROM__NOT)
+#if defined(PIOS_INCLUDE_FLASH_EEPROM)
 	PIOS_EEPROM_Init(&pios_eeprom_cfg);
 
 	/* Read the settings from flash. */

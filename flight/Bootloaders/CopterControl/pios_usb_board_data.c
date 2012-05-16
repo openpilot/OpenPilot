@@ -51,7 +51,7 @@ static const uint8_t usb_product_id[28] = {
 	'l', 0,
 };
 
-static uint8_t usb_serial_number[2 + 25*2 + 3*2] = {
+static uint8_t usb_serial_number[2 + PIOS_SYS_SERIAL_NUM_ASCII_LEN*2 + 3*2] = {
 	sizeof(usb_serial_number),
 	USB_DESC_TYPE_STRING,
 };
@@ -83,7 +83,7 @@ static const uint8_t usb_vendor_id[28] = {
 int32_t PIOS_USB_BOARD_DATA_Init(void)
 {
 	/* Load device serial number into serial number string */
-	uint8_t sn[25+3];
+	uint8_t sn[PIOS_SYS_SERIAL_NUM_ASCII_LEN+strlen(PIOS_USB_BOARD_SN_SUFFIX)+1];
 	PIOS_SYS_SerialNumberGet((char *)sn);
 
 	/* Add the appropriate suffix ("+BL" or "+FW") depending on what we're running */

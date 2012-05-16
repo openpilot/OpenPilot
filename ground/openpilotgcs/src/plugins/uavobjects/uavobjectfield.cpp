@@ -530,7 +530,7 @@ quint32 UAVObjectField::getNumBytes()
     switch (type)
     {
     case BITFIELD:
-        return numBytesPerElement * ((quint32) (numElements/8));
+        return numBytesPerElement * ((quint32) (1+(numElements-1)/8));
         break;
     default:
         return numBytesPerElement * numElements;
@@ -613,7 +613,7 @@ qint32 UAVObjectField::pack(quint8* dataOut)
         }
         break;
     case BITFIELD:
-        for (quint32 index = 0; index < (quint32)(numElements/8); ++index)
+        for (quint32 index = 0; index < (quint32)(1+(numElements-1)/8); ++index)
         {
             dataOut[numBytesPerElement*index] = data[offset + numBytesPerElement*index];
         }
@@ -688,7 +688,7 @@ qint32 UAVObjectField::unpack(const quint8* dataIn)
         }
         break;
     case BITFIELD:
-        for (quint32 index = 0; index < (quint32)(numElements/8); ++index)
+        for (quint32 index = 0; index < (quint32)(1+(numElements-1)/8); ++index)
         {
             data[offset + numBytesPerElement*index] = dataIn[numBytesPerElement*index];
         }

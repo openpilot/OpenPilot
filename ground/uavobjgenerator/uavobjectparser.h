@@ -53,7 +53,9 @@ typedef struct {
     QString name;
     QString units;
     FieldType type;
+    bool isArray;
     int numElements;
+    int numBaseElements;
     int numBytes;
     QStringList elementNames;
     QStringList options; // for enums only

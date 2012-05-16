@@ -84,6 +84,8 @@ QString UAVObjectGeneratorJava::getFieldTypeStr(int type,bool as_obj) {
     case FIELDTYPE_FLOAT32:
         return (QString(as_obj?"Float":"float"));
     case FIELDTYPE_ENUM:
+    case FIELDTYPE_BITFIELD:
+    case FIELDTYPE_STRING:
         return (QString(as_obj?"Byte":"byte"));
     default:
         return QString("error: unknown type");
@@ -127,6 +129,8 @@ QString UAVObjectGeneratorJava::serializeJavaValue(int type,QString name)
         break;
 
     case FIELDTYPE_UINT8:
+    case FIELDTYPE_BITFIELD:
+    case FIELDTYPE_STRING:
         res=QString("(byte)(%1&0xFF)").arg(name);
         break;
 
@@ -163,6 +167,8 @@ QString UAVObjectGeneratorJava::deSerializeJavaValue(int type,QString name)
             return (name.append("=arr[pos++];\n"));
 
         case FIELDTYPE_UINT8:
+        case FIELDTYPE_BITFIELD:
+        case FIELDTYPE_STRING:
             return (name.append("=arr[pos++]&0xFF;\n")); /*test */
 
         case FIELDTYPE_INT16:
@@ -204,7 +210,7 @@ bool UAVObjectGeneratorJava::process_object(ObjectInfo* info)
     for (int n = 0; n < info->fields.length(); ++n) {
         FieldInfo* act_field_info=info->fields[n];
 
-        bool is_array = info->fields[n]->numElements > 1;
+        bool is_array = act_field_info->isArray;
         type = getFieldTypeStr(act_field_info->type,false); // Determine type
 
         for (int enum_n = 0; enum_n < act_field_info->options.length(); ++enum_n)
@@ -217,20 +223,36 @@ bool UAVObjectGeneratorJava::process_object(ObjectInfo* info)
 
         fieldsinit.append(QString(" %1").arg(act_field_info->name));
 
-        if (!info->fields[n]->defaultValues.isEmpty()) { // if we have default vals
+        if (!act_field_info->defaultValues.isEmpty()) { // if we have default vals
             fieldsinit.append(QString("="));
             if ( is_array  )  {
                 fieldsinit.append(QString("{"));
-                for (int val_n = 0; val_n < act_field_info->defaultValues.length(); ++val_n)
-                    fieldsinit.append( ((val_n>0)?QString(","):QString() ) + formatJavaValue(act_field_info,val_n)  );
-                fieldsinit.append(QString("}"));
+                if (act_field_info->type==FIELDTYPE_BITFIELD)
+                {
+                    for (int val_n = 0; val_n < act_field_info->defaultValues.length(); val_n+=8)
+                    {
+                        int tmp=0;
+                        for (int t=0; t<8 && val_n+t < act_field_info->defaultValues.length(); t++)
+                        {
+                            tmp |= (( act_field_info->defaultValues[val_n+t].toInt() != 0 )?1:0) << t;
+                        }
+                        fieldsinit.append( ((val_n>0)?QString(","):QString() ) + tmp  );
+                    }
+                    fieldsinit.append(QString("}"));
+                }
+                else
+                {
+                    for (int val_n = 0; val_n < act_field_info->defaultValues.length(); ++val_n)
+                        fieldsinit.append( ((val_n>0)?QString(","):QString() ) + formatJavaValue(act_field_info,val_n)  );
+                    fieldsinit.append(QString("}"));
+                }
             }
             else
                 fieldsinit.append(formatJavaValue(act_field_info,0));
         }
         else {
             if ( is_array  ) // when it is an array
-                fieldsinit.append(QString("= new ") + type + QString("[%1]").arg(info->fields[n]->numElements));
+                fieldsinit.append(QString("= new ") + type + QString("[%1]").arg(act_field_info->numBaseElements));
         }
 
         fieldsinit.append(QString(";\n"));
@@ -239,20 +261,20 @@ bool UAVObjectGeneratorJava::process_object(ObjectInfo* info)
             serialize_code_inner.append(QString(","));
 
         if ( is_array ) {
-            for (int el=0;el<info->fields[n]->numElements;el++) {
+            for (int el=0;el<act_field_info->numBaseElements;el++) {
                 if (el!=0)
                     serialize_code_inner.append(QString(","));
 
-                serialize_code_inner.append(serializeJavaValue(info->fields[n]->type,info->fields[n]->name+ QString("[%1]").arg(el)));
-                deserialize_code.append(deSerializeJavaValue(info->fields[n]->type,info->fields[n]->name+ QString("[%1]").arg(el)));
+                serialize_code_inner.append(serializeJavaValue(act_field_info->type,act_field_info->name+ QString("[%1]").arg(el)));
+                deserialize_code.append(deSerializeJavaValue(act_field_info->type,act_field_info->name+ QString("[%1]").arg(el)));
             }
         }
         else { // no array
-            serialize_code_inner.append(serializeJavaValue(info->fields[n]->type,info->fields[n]->name));
-            deserialize_code.append(deSerializeJavaValue(info->fields[n]->type,info->fields[n]->name));
+            serialize_code_inner.append(serializeJavaValue(act_field_info->type,act_field_info->name));
+            deserialize_code.append(deSerializeJavaValue(act_field_info->type,act_field_info->name));
         }
 
-        serialize_code_inner.append(QString("//%1\n" ).arg(info->fields[n]->name));
+        serialize_code_inner.append(QString("//%1\n" ).arg(act_field_info->name));
 
         // Determine type
         type = getFieldTypeStr(act_field_info->type,false);
@@ -261,8 +283,15 @@ bool UAVObjectGeneratorJava::process_object(ObjectInfo* info)
 
         if ( is_array ) {
             typespec.append(QString("[]"));
-            fieldgetter.append(QString("case %1: return (Object)%2[arr_pos];\n").arg(n).arg(act_field_info->name));
-            fieldsetter.append(QString("case %1: %2[arr_pos]=(%3)obj;break;\n").arg(n).arg(act_field_info->name).arg( getFieldTypeStr(act_field_info->type,true)));
+            if (act_field_info->type==FIELDTYPE_BITFIELD) {
+                fieldgetter.append(QString("case %1: return (Object)(( %2[arr_pos/8] >> arr_pos\%8 ) & 1);\n").arg(n).arg(act_field_info->name));
+                fieldsetter.append(QString("case %1: %2[arr_pos/8] = ( %2[arr_pos/8] & ~(1 << arr_pos\%8)) | (((%3)obj) << arr_pos\%8);break;\n").arg(n).arg(act_field_info->name).arg( getFieldTypeStr(act_field_info->type,true)));
+            }
+            else
+            {
+                fieldgetter.append(QString("case %1: return (Object)%2[arr_pos];\n").arg(n).arg(act_field_info->name));
+                fieldsetter.append(QString("case %1: %2[arr_pos]=(%3)obj;break;\n").arg(n).arg(act_field_info->name).arg( getFieldTypeStr(act_field_info->type,true)));
+            }
         }
         else { // no array
             fieldgetter.append(QString("case %1: return (Object)%2;\n").arg(n).arg(act_field_info->name));
@@ -302,10 +331,16 @@ bool UAVObjectGeneratorJava::process_object(ObjectInfo* info)
 
         if ( is_array ) { // when it is an array create getter for the element names
             QString elementListGetter=QString("    public final static String[] get%1ElementNames() { return new String[] {").arg(act_field_info->name);
-            QStringList elemNames = info->fields[n]->elementNames;
+            QStringList elemNames = act_field_info->elementNames;
             for (int m = 0; m < elemNames.length(); ++m) {
                 gettersetter.append(QString("    public ") + type);
-                gettersetter.append(QString(" get%1%2() { return %1[%3]; }\n").arg(act_field_info->name).arg(elemNames[m]).arg(m));
+		if (act_field_info->type==FIELDTYPE_BITFIELD) {
+                    gettersetter.append(QString(" get%1%2() { return (%1[%3] >> %4) & 1; }\n").arg(act_field_info->name).arg(elemNames[m]).arg(m/8).arg(m%8));
+		}
+		else
+		{
+                    gettersetter.append(QString(" get%1%2() { return %1[%3]; }\n").arg(act_field_info->name).arg(elemNames[m]).arg(m));
+		}
                 if (m!=0)
                     elementListGetter.append(QString(","));
 

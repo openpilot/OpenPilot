@@ -26,8 +26,6 @@
 
 #include "uavobjectgeneratormatlab.h"
 
-#define BITELEMENTS(type,elements) (((type)==FIELDTYPE_BITFIELD)?( 1 + ((elements)-1)/8):elements)
-
 using namespace std;
 
 bool UAVObjectGeneratorMatlab::generate(UAVObjectParser* parser,QString templatepath,QString outputpath) {
@@ -99,8 +97,8 @@ bool UAVObjectGeneratorMatlab::process_object(ObjectInfo* info)
 			// Determine type
 			type = fieldTypeStrMatlab[info->fields[n]->type];
 			// Append field
-			if ( info->fields[n]->numElements > 1 )
-				allocfields.append("\t" + objectTableName + "(1)." + info->fields[n]->name + " = zeros(" + QString::number(BITELEMENTS(info->fields[n]->type,info->fields[n]->numElements), 10) + ",1);\n");
+			if ( info->fields[n]->isArray )
+				allocfields.append("\t" + objectTableName + "(1)." + info->fields[n]->name + " = zeros(" + QString::number(info->fields[n]->numBaseElements, 10) + ",1);\n");
 			else
 				allocfields.append("\t" + objectTableName + "(1)." + info->fields[n]->name + " = 0;\n");
 		}
@@ -114,8 +112,8 @@ bool UAVObjectGeneratorMatlab::process_object(ObjectInfo* info)
 			// Determine type
 			type = fieldTypeStrMatlab[info->fields[n]->type];
 			// Append field
-			if ( info->fields[n]->numElements > 1 )
-				allocfields.append(",...\n\t\t '" + info->fields[n]->name + "', zeros(" + QString::number(BITELEMENTS(info->fields[n]->type,info->fields[n]->numElements), 10) + ",1)");
+			if ( info->fields[n]->isArray )
+				allocfields.append(",...\n\t\t '" + info->fields[n]->name + "', zeros(" + QString::number(info->fields[n]->numBaseElements, 10) + ",1)");
 			else
 				allocfields.append(",...\n\t\t '" + info->fields[n]->name + "', 0");
 		}
@@ -187,8 +185,8 @@ bool UAVObjectGeneratorMatlab::process_object(ObjectInfo* info)
         // Determine type
         type = fieldTypeStrMatlab[info->fields[n]->type];
         // Append field
-        if ( info->fields[n]->numElements > 1 )
-            funcfields.append("\t" + objectName + "." + info->fields[n]->name + "(:," + tableIdxName + ") = double(fread(fid, " + QString::number(BITELEMENTS(info->fields[n]->type,info->fields[n]->numElements), 10) + ", '" + type + "'));\n");
+        if ( info->fields[n]->isArray )
+            funcfields.append("\t" + objectName + "." + info->fields[n]->name + "(:," + tableIdxName + ") = double(fread(fid, " + QString::number(info->fields[n]->numBaseElements, 10) + ", '" + type + "'));\n");
         else
             funcfields.append("\t" + objectName + "." + info->fields[n]->name + "(" + tableIdxName + ") = double(fread(fid, 1, '" + type + "'));\n");
     }

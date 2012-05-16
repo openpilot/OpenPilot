@@ -26,8 +26,6 @@
 
 #include "uavobjectgeneratorgcs.h"
 
-#define BITELEMENTS(type,elements) (((type)==FIELDTYPE_BITFIELD)?( 1 + ((elements)-1)/8):elements)
-
 using namespace std;
 
 bool UAVObjectGeneratorGCS::generate(UAVObjectParser* parser,QString templatepath,QString outputpath) {
@@ -98,10 +96,10 @@ bool UAVObjectGeneratorGCS::process_object(ObjectInfo* info)
         // Determine type
         type = fieldTypeStrCPP[info->fields[n]->type];
         // Append field
-        if ( info->fields[n]->numElements > 1 )
+        if ( info->fields[n]->isArray )
         {
             fields.append( QString("        %1 %2[%3];\n").arg(type).arg(info->fields[n]->name)
-                           .arg( BITELEMENTS(info->fields[n]->type,info->fields[n]->numElements)) );
+                           .arg( info->fields[n]->numBaseElements) );
         }
         else
         {
@@ -132,7 +130,7 @@ bool UAVObjectGeneratorGCS::process_object(ObjectInfo* info)
         // Determine type
         type = fieldTypeStrCPP[field->type];
         // Append field
-        if ( field->numElements > 1 ) {
+        if ( field->isArray ) {
             propertyGetters +=
                     QString("    Q_INVOKABLE %1 get%2(quint32 index) const;\n")
                     .arg(type).arg(field->name);
@@ -300,7 +298,7 @@ bool UAVObjectGeneratorGCS::process_object(ObjectInfo* info)
                           .arg( info->fields[n]->name ) );
         }
         // Generate element names (only if field has more than one element)
-        if (info->fields[n]->numElements > 1 && !info->fields[n]->defaultElementNames) {
+        if (info->fields[n]->isArray && !info->fields[n]->defaultElementNames) {
             enums.append(QString("    /* Array element names for field %1 */\n").arg(info->fields[n]->name));
             enums.append("    typedef enum { ");
             // Go through the element names
@@ -316,11 +314,11 @@ bool UAVObjectGeneratorGCS::process_object(ObjectInfo* info)
                           .arg( info->fields[n]->name ) );
         }
         // Generate array information
-        if (info->fields[n]->numElements > 1) {
+        if ( info->fields[n]->isArray ) {
             enums.append(QString("    /* Number of elements for field %1 */\n").arg(info->fields[n]->name));
             enums.append( QString("    static const quint32 %1_NUMELEM = %2;\n")
                           .arg( info->fields[n]->name.toUpper() )
-                          .arg( BITELEMENTS(info->fields[n]->type,info->fields[n]->numElements) ) );
+                          .arg( info->fields[n]->numElements ) );
         }
     }
     outInclude.replace(QString("$(DATAFIELDINFO)"), enums);
@@ -332,7 +330,7 @@ bool UAVObjectGeneratorGCS::process_object(ObjectInfo* info)
         if (!info->fields[n]->defaultValues.isEmpty() )
         {
             // For non-array fields
-            if ( info->fields[n]->numElements == 1)
+            if ( !info->fields[n]->isArray )
             {
                 if ( info->fields[n]->type == FIELDTYPE_ENUM )
                 {
@@ -371,10 +369,17 @@ bool UAVObjectGeneratorGCS::process_object(ObjectInfo* info)
                                     .arg( info->fields[n]->defaultValues[idx].toFloat() ) );
                     }
                     else if ( info->fields[n]->type == FIELDTYPE_BITFIELD ) {
-                        initfields.append( QString("    data.%1[%2/8] = (data.%1[%2/8] & ~(1 << (%2\%8))) | (%3 << (%2\%8));\n")
+                        initfields.append( QString("    data.%1[%2] = %3")
                                     .arg( info->fields[n]->name )
-                                    .arg( idx )
-                                    .arg( info->fields[n]->defaultValues[idx].toFloat() ) );
+                                    .arg( idx/8 )
+                                    .arg( (info->fields[n]->defaultValues[idx].toInt() != 0)?1:0 ) );
+                        for (int t=1; t<8 && idx+t<info->fields[n]->numElements; t++) {
+                            initfields.append( QString("\n    | ( %1 << %2 )")
+                                    .arg( (info->fields[n]->defaultValues[idx+t].toInt() != 0)?1:0 )
+                                    .arg( t ) );
+                        }
+                        idx+=8;
+                        initfields.append( QString(";\n") );
                     }
                     else {
                         initfields.append( QString("    data.%1[%2] = %3;\n")

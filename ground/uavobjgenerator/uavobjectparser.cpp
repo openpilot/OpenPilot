@@ -105,14 +105,7 @@ int UAVObjectParser::getNumBytes(int objIndex)
         int numBytes = 0;
         for (int n = 0; n < info->fields.length(); ++n)
         {
-            if (info->fields[n]->type==FIELDTYPE_BITFIELD)
-            {
-                numBytes += info->fields[n]->numBytes * (1 + (info->fields[n]->numElements-1)/8 );
-            }
-            else
-            {
-                numBytes += info->fields[n]->numBytes * info->fields[n]->numElements;
-            }
+            numBytes += info->fields[n]->numBytes * info->fields[n]->numBaseElements;
         }
         return numBytes;
     }
@@ -455,6 +448,21 @@ QString UAVObjectParser::processObjectFields(QDomNode& childNode, ObjectInfo* in
 
         field->options = options;
     }
+    // Specify base elements, its equal to elements for all types except bitfields, where it is the number of used bytes.
+    field->isArray = false;
+    if (field->type == FIELDTYPE_BITFIELD)
+    {
+    	field->isArray = true;
+        field->numBaseElements = 1 + (field->numElements-1)/8;
+    }
+    else
+    {
+    	if (field->numElements>1) {
+            field->isArray = true;
+	}
+        field->numBaseElements = field->numElements;
+    }
+
 
     // Get the default value attribute (required for settings objects, optional for the rest)
     elemAttr = elemAttributes.namedItem("defaultvalue");

@@ -82,7 +82,7 @@ bool UAVObjectGeneratorPython::process_object(ObjectInfo* info)
             }
         }
         // Generate element names (only if field has more than one element)
-        if (info->fields[n]->numElements > 1 && !info->fields[n]->defaultElementNames)
+        if (info->fields[n]->isArray && !info->fields[n]->defaultElementNames)
         {
             datafields.append(QString("\t# Array element names\n"));
             // Go through the element names

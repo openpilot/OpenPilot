@@ -26,8 +26,6 @@
 
 #include "uavobjectgeneratorflight.h"
 
-#define BITELEMENTS(type,elements) (((type)==FIELDTYPE_BITFIELD)?( 1 + ((elements)-1)/8):elements)
-
 using namespace std;
 
 bool UAVObjectGeneratorFlight::generate(UAVObjectParser* parser,QString templatepath,QString outputpath) {
@@ -124,10 +122,10 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo* info)
         // Determine type
         type = fieldTypeStrC[info->fields[n]->type];
         // Append field
-        if ( info->fields[n]->numElements > 1 )
+        if ( info->fields[n]->isArray )
         {
             fields.append( QString("    %1 %2[%3];\r\n").arg(type)
-                           .arg(info->fields[n]->name).arg(BITELEMENTS(info->fields[n]->type,info->fields[n]->numElements)) );
+                           .arg(info->fields[n]->name).arg(info->fields[n]->numBaseElements) );
         }
         else
         {
@@ -162,7 +160,7 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo* info)
                           .arg( info->fields[n]->name ) );
         }
         // Generate element names (only if field has more than one element)
-        if (info->fields[n]->numElements > 1 && !info->fields[n]->defaultElementNames)
+        if (info->fields[n]->isArray && !info->fields[n]->defaultElementNames)
         {
             enums.append(QString("/* Array element names for field %1 */\r\n").arg(info->fields[n]->name));
             enums.append("typedef enum { ");
@@ -183,13 +181,13 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo* info)
                           .arg( info->fields[n]->name ) );
         }
         // Generate array information
-        if (info->fields[n]->numElements > 1)
+        if ( info->fields[n]->isArray )
         {
             enums.append(QString("/* Number of elements for field %1 */\r\n").arg(info->fields[n]->name));
             enums.append( QString("#define %1_%2_NUMELEM %3\r\n")
                           .arg( info->name.toUpper() )
                           .arg( info->fields[n]->name.toUpper() )
-                          .arg( BITELEMENTS(info->fields[n]->type,info->fields[n]->numElements) ) );
+                          .arg( info->fields[n]->numElements ) );
         }
     }
     outInclude.replace(QString("$(DATAFIELDINFO)"), enums);
@@ -201,7 +199,7 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo* info)
         if (!info->fields[n]->defaultValues.isEmpty() )
         {
             // For non-array fields
-            if ( info->fields[n]->numElements == 1)
+            if ( !info->fields[n]->isArray )
             {
                 if ( info->fields[n]->type == FIELDTYPE_ENUM )
                 {
@@ -236,13 +234,13 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo* info)
                     }
                     else if ( info->fields[n]->type == FIELDTYPE_BITFIELD )
                     {
-                        initfields.append( QString("\tdata.%1[%2] = (%3 & 1)")
+                        initfields.append( QString("\tdata.%1[%2] = %3")
                                     .arg( info->fields[n]->name )
-                                    .arg( 1+(idx-1)/8 )
-                                    .arg( info->fields[n]->defaultValues[idx] ) );
+                                    .arg( idx/8 )
+                                    .arg( (info->fields[n]->defaultValues[idx].toInt() != 0)?1:0 ) );
                         for (int t=1; t<8 && idx+t<info->fields[n]->numElements; t++) {
-                            initfields.append( QString("\r\n\t| (%1 & 1) << %2")
-                                    .arg( info->fields[n]->defaultValues[idx+t] )
+                            initfields.append( QString("\r\n\t| ( %1 << %2 )")
+                                    .arg( (info->fields[n]->defaultValues[idx+t].toInt() != 0)?1:0 )
                                     .arg( t ) );
                         }
                         idx+=8;
@@ -281,7 +279,7 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo* info)
         setgetfields.append( QString("\tUAVObjSetDataField(%1Handle(), (void*)New%2, offsetof( %1Data, %2), %3*sizeof(%4));\r\n")
                         .arg( info->name )
                         .arg( info->fields[n]->name )
-                        .arg( BITELEMENTS(info->fields[n]->type,info->fields[n]->numElements) )
+                        .arg( info->fields[n]->numBaseElements )
                         .arg( fieldTypeStrC[info->fields[n]->type] ) );
         setgetfields.append( QString("}\r\n") );
 
@@ -294,7 +292,7 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo* info)
         setgetfields.append( QString("\tUAVObjGetDataField(%1Handle(), (void*)New%2, offsetof( %1Data, %2), %3*sizeof(%4));\r\n")
                         .arg( info->name )
                         .arg( info->fields[n]->name )
-                        .arg( BITELEMENTS(info->fields[n]->type,info->fields[n]->numElements) )
+                        .arg( info->fields[n]->numBaseElements )
                         .arg( fieldTypeStrC[info->fields[n]->type] ) );
         setgetfields.append( QString("}\r\n") );
     }

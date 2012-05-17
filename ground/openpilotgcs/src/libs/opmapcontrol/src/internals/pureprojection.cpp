@@ -215,6 +215,13 @@ Point PureProjection::FromLatLngToPixel(const PointLatLng &p,const int &zoom)
          Lat /= (PI / 180);
          Lng /= (PI / 180);
       }
+    double PureProjection::courseBetweenLatLng(PointLatLng const& p1,PointLatLng const& p2)
+    {
+        return fmod(atan2(sin(p1.Lng()-p2.Lng())*cos(p2.Lat()),
+                       cos(p1.Lat())*sin(p2.Lat())-sin(p1.Lat())*cos(p2.Lat())*cos(p1.Lng()-p2.Lng())), 2*PI);
+
+    }
+
     double PureProjection::DistanceBetweenLatLng(PointLatLng const& p1,PointLatLng const& p2)
     {
          double R = 6371; // km
@@ -229,4 +236,23 @@ Point PureProjection::FromLatLngToPixel(const PointLatLng &p,const int &zoom)
          double d = R * c;
          return d;
     }
+
+    void PureProjection::offSetFromLatLngs(PointLatLng p1,PointLatLng p2,double &dX,double &dY)
+    {
+        dX=DistanceBetweenLatLng(p1,p2)*sin(courseBetweenLatLng(p1,p2));
+        dY=DistanceBetweenLatLng(p1,p2)*sin(courseBetweenLatLng(p1,p2));
+    }
+
+    PointLatLng PureProjection::translate(PointLatLng  p1,double dX,double dY)
+    {
+        PointLatLng origin=p1;
+        PointLatLng ret;
+        double d=sqrt(pow(dX,2)+pow(dY,2));
+        double tc=atan2(dY,dX);
+        ret.SetLat(asin(sin(origin.Lat())*cos(d)+cos(origin.Lat())*sin(d)*cos(tc)));
+        double dlon=atan2(sin(tc)*sin(d)*cos(origin.Lat()),cos(d)-sin(origin.Lat())*sin(p1.Lat()));
+        ret.SetLng(fmod(origin.Lng()-dlon +PI,2*PI )-PI);
+        return ret;
+    }
+
 }

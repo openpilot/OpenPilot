@@ -67,11 +67,15 @@ namespace mapcontrol
         int safearea;
         int localsafearea;
         int altitude;
-
+        bool isDragging;
+    protected:
+        void mouseMoveEvent ( QGraphicsSceneMouseEvent * event );
+        void mousePressEvent ( QGraphicsSceneMouseEvent * event );
+        void mouseReleaseEvent ( QGraphicsSceneMouseEvent * event );
     public slots:
 
     signals:
-
+        void homePositionChanged(internals::PointLatLng coord);
     };
 }
 #endif // HOMEITEM_H

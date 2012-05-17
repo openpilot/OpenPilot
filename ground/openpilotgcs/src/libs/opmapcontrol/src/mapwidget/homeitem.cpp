@@ -27,15 +27,20 @@
 #include "homeitem.h"
 namespace mapcontrol
 {
-    HomeItem::HomeItem(MapGraphicItem* map,OPMapWidget* parent):safe(true),map(map),mapwidget(parent),showsafearea(true),safearea(1000),altitude(0)
+    HomeItem::HomeItem(MapGraphicItem* map,OPMapWidget* parent):safe(true),map(map),mapwidget(parent),showsafearea(true),safearea(1000),altitude(0),isDragging(false)
     {
         pic.load(QString::fromUtf8(":/markers/images/home2.svg"));
         pic=pic.scaled(30,30,Qt::IgnoreAspectRatio);
         this->setFlag(QGraphicsItem::ItemIgnoresTransformations,true);
+        this->setFlag(QGraphicsItem::ItemIsMovable,true);
+        this->setFlag(QGraphicsItem::ItemIsSelectable,true);
         localposition=map->FromLatLngToLocal(mapwidget->CurrentPosition());
         this->setPos(localposition.X(),localposition.Y());
         this->setZValue(4);
         coord=internals::PointLatLng(50,50);
+        setToolTip("AAAA");
+        qDebug()<<"HomeItem created type:"<<type();
+
     }
 
     void HomeItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -56,7 +61,7 @@ namespace mapcontrol
     }
     QRectF HomeItem::boundingRect()const
     {
-        if(!showsafearea)
+        if(pic.width()>localsafearea*2)
             return QRectF(-pic.width()/2,-pic.height()/2,pic.width(),pic.height());
         else
             return QRectF(-localsafearea,-localsafearea,localsafearea*2,localsafearea*2);
@@ -76,5 +81,34 @@ namespace mapcontrol
             localsafearea=safearea/map->Projection()->GetGroundResolution(map->ZoomTotal(),coord.Lat());
 
     }
+    void HomeItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
+    {
+        if(event->button()==Qt::LeftButton)
+        {
+            isDragging=true;
+        }
+        QGraphicsItem::mousePressEvent(event);
+    }
+    void HomeItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+    {
+        if(event->button()==Qt::LeftButton)
+        {
+            coord=map->FromLocalToLatLng(this->pos().x(),this->pos().y());
+            isDragging=false;
 
+            emit homePositionChanged(coord);
+        }
+        QGraphicsItem::mouseReleaseEvent(event);
+    }
+    void HomeItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+    {
+
+        if(isDragging)
+        {
+            coord=map->FromLocalToLatLng(this->pos().x(),this->pos().y());
+            emit homePositionChanged(coord);
+        }
+            QGraphicsItem::mouseMoveEvent(event);
+    }
 }
+

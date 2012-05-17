@@ -36,6 +36,8 @@ namespace mapcontrol
         pic.load(uavPic);
        // Don't scale but trust the image we are given
        // pic=pic.scaled(50,33,Qt::IgnoreAspectRatio);
+        this->setFlag(QGraphicsItem::ItemIsMovable,true);
+        this->setFlag(QGraphicsItem::ItemIsSelectable,true);
         localposition=map->FromLatLngToLocal(mapwidget->CurrentPosition());
         this->setPos(localposition.X(),localposition.Y());
         this->setZValue(4);
@@ -57,14 +59,14 @@ namespace mapcontrol
     {
         Q_UNUSED(option);
         Q_UNUSED(widget);
-       // painter->rotate(-90);
         painter->drawPixmap(-pic.width()/2,-pic.height()/2,pic);
-       //   painter->drawRect(QRectF(-pic.width()/2,-pic.height()/2,pic.width()-1,pic.height()-1));
     }
+
     QRectF UAVItem::boundingRect()const
     {
         return QRectF(-pic.width()/2,-pic.height()/2,pic.width(),pic.height());
     }
+
     void UAVItem::SetUAVPos(const internals::PointLatLng &position, const int &altitude)
     {
         if(coord.IsEmpty())

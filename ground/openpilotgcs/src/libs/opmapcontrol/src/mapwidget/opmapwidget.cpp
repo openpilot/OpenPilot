@@ -40,6 +40,9 @@ namespace mapcontrol
         map=new MapGraphicItem(core,config);
         mscene.addItem(map);
         this->setScene(&mscene);
+        Home=new HomeItem(map,this);
+        Home->setParentItem(map);
+        setStyleSheet("QToolTip {font-size:8pt; color:yellow;background-color : transparent; padding:2px; border-width:2px; border-style:solid; border-radius:4px }");
         this->adjustSize();
         connect(map,SIGNAL(zoomChanged(double,double,double)),this,SIGNAL(zoomChanged(double,double,double)));
         connect(map->core,SIGNAL(OnCurrentPositionChanged(internals::PointLatLng)),this,SIGNAL(OnCurrentPositionChanged(internals::PointLatLng)));
@@ -70,12 +73,23 @@ namespace mapcontrol
                 delete diagTimer;
                 diagTimer=0;
             }
+
+            if(GPS!=0)
+            {
+                delete GPS;
+                GPS=0;
+            }
         }
         else
         {
             diagTimer=new QTimer();
             connect(diagTimer,SIGNAL(timeout()),this,SLOT(diagRefresh()));
             diagTimer->start(500);
+            if(GPS==0)
+            {
+                GPS=new GPSItem(map,this);
+                GPS->setParentItem(map);
+            }
         }
 
     }
@@ -106,37 +120,10 @@ namespace mapcontrol
             }
 
         }
-        if(value && GPS==0)
-        {
-            GPS=new GPSItem(map,this);
-            GPS->setParentItem(map);
-        }
-        else if(!value)
-        {
-            if(GPS!=0)
-            {
-                delete GPS;
-                GPS=0;
-            }
-
-        }
     }
     void OPMapWidget::SetShowHome(const bool &value)
     {
-        if(value && Home==0)
-        {
-            Home=new HomeItem(map,this);
-            Home->setParentItem(map);
-        }
-        else if(!value)
-        {
-            if(Home!=0)
-            {
-                delete Home;
-                Home=0;
-            }
-
-        }
+            Home->setVisible(value);
     }
 
     void OPMapWidget::resizeEvent(QResizeEvent *event)
@@ -329,12 +316,12 @@ namespace mapcontrol
             compass->setScale(0.1+0.05*(qreal)(this->size().width())/1000*(qreal)(this->size().height())/600);
             //    compass->setTransformOriginPoint(compass->boundingRect().width(),compass->boundingRect().height());
             compass->setFlag(QGraphicsItem::ItemIsMovable,true);
+            compass->setFlag(QGraphicsItem::ItemIsSelectable,true);
             mscene.addItem(compass);
             compass->setTransformOriginPoint(compass->boundingRect().width()/2,compass->boundingRect().height()/2);            
             compass->setPos(55-compass->boundingRect().width()/2,55-compass->boundingRect().height()/2);
             compass->setZValue(3);
             compass->setOpacity(0.7);
-            
         }
         if(!value && compass)
         {

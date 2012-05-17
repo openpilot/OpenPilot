@@ -178,13 +178,13 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 
     m_map->UAV->SetTrailType(UAVTrailType::ByTimeElapsed);
 //  m_map->UAV->SetTrailType(UAVTrailType::ByDistance);
+    if(m_map->GPS)
+    {
+        m_map->GPS->SetTrailTime(uav_trail_time_list[0]);                           // seconds
+        m_map->GPS->SetTrailDistance(uav_trail_distance_list[1]);                   // meters
 
-    m_map->GPS->SetTrailTime(uav_trail_time_list[0]);                           // seconds
-    m_map->GPS->SetTrailDistance(uav_trail_distance_list[1]);                   // meters
-
-    m_map->GPS->SetTrailType(UAVTrailType::ByTimeElapsed);
-//  m_map->GPS->SetTrailType(UAVTrailType::ByDistance);
-
+        m_map->GPS->SetTrailType(UAVTrailType::ByTimeElapsed);
+    }
     // **************
 
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
@@ -269,8 +269,9 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 	m_map->SetCurrentPosition(m_home_position.coord);         // set the map position
 	m_map->Home->SetCoord(m_home_position.coord);             // set the HOME position
 	m_map->UAV->SetUAVPos(m_home_position.coord, 0.0);        // set the UAV position
-	m_map->GPS->SetUAVPos(m_home_position.coord, 0.0);        // set the UAV position
-
+    if(m_map->GPS)
+        m_map->GPS->SetUAVPos(m_home_position.coord, 0.0);        // set the UAV position
+    m_map->WPCreate();
     // **************
     // create various context menu (mouse right click menu) actions
 
@@ -390,22 +391,22 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
 
     QString s;
 
-	if (!m_widget || !m_map)
-		return;
+    if (!m_widget || !m_map)
+        return;
 
     if (event->reason() != QContextMenuEvent::Mouse)
         return;	// not a mouse click event
 
     // current mouse position
     QPoint p = m_map->mapFromGlobal(event->globalPos());
-	m_context_menu_lat_lon = m_map->GetFromLocalToLatLng(p);
+    m_context_menu_lat_lon = m_map->GetFromLocalToLatLng(p);
 //    m_context_menu_lat_lon = m_map->currentMousePosition();
 
     if (!m_map->contentsRect().contains(p))
         return;					    // the mouse click was not on the map
 
     // show the mouse position
-	s = QString::number(m_context_menu_lat_lon.Lat(), 'f', 7) + "  " + QString::number(m_context_menu_lat_lon.Lng(), 'f', 7);
+    s = QString::number(m_context_menu_lat_lon.Lat(), 'f', 7) + "  " + QString::number(m_context_menu_lat_lon.Lng(), 'f', 7);
     m_widget->labelMousePos->setText(s);
 
     // find out if we have a waypoint under the mouse cursor
@@ -434,12 +435,12 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
 
     menu.addSeparator();
 
-	QMenu maxUpdateRateSubMenu(tr("&Max Update Rate ") + "(" + QString::number(m_maxUpdateRate) + " ms)", this);
-	for (int i = 0; i < maxUpdateRateAct.count(); i++)
-		maxUpdateRateSubMenu.addAction(maxUpdateRateAct.at(i));
-	menu.addMenu(&maxUpdateRateSubMenu);
+    QMenu maxUpdateRateSubMenu(tr("&Max Update Rate ") + "(" + QString::number(m_maxUpdateRate) + " ms)", this);
+    for (int i = 0; i < maxUpdateRateAct.count(); i++)
+        maxUpdateRateSubMenu.addAction(maxUpdateRateAct.at(i));
+    menu.addMenu(&maxUpdateRateSubMenu);
 
-	menu.addSeparator();
+    menu.addSeparator();
 
     switch (m_map_mode)
     {
@@ -700,9 +701,11 @@ void OPMapGadgetWidget::updatePosition()
 
 	// *************
 	// set the GPS icon position on the map
-
-	m_map->GPS->SetUAVPos(gps_pos, gps_altitude); // set the maps GPS position
-	m_map->GPS->SetUAVHeading(gps_heading);       // set the maps GPS heading
+    if(m_map->GPS)
+    {
+        m_map->GPS->SetUAVPos(gps_pos, gps_altitude); // set the maps GPS position
+        m_map->GPS->SetUAVHeading(gps_heading);       // set the maps GPS heading
+    }
 
 	// *************
 }
@@ -1886,7 +1889,8 @@ void OPMapGadgetWidget::onClearUAVtrailAct_triggered()
 		return;
 
     m_map->UAV->DeleteTrail();
-    m_map->GPS->DeleteTrail();
+    if(m_map->GPS)
+        m_map->GPS->DeleteTrail();
 }
 
 void OPMapGadgetWidget::onUAVTrailTimeActGroup_triggered(QAction *action)

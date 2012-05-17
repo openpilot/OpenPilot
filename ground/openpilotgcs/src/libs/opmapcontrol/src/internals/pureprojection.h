@@ -81,6 +81,9 @@ public:
     void FromCartesianTGeodetic(const double &X,const double &Y,const double &Z,  double &Lat,  double &Lng);
     static double DistanceBetweenLatLng(PointLatLng const& p1,PointLatLng const& p2);
 
+    PointLatLng translate(PointLatLng p1, double dX, double dY);
+    double courseBetweenLatLng(const PointLatLng &p1, const PointLatLng &p2);
+    void offSetFromLatLngs(PointLatLng p1, PointLatLng p2, double &dX, double &dY);
 protected:
    
     static const double PI;

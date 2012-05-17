@@ -33,6 +33,8 @@
 #include "../internals/pointlatlng.h"
 #include "mapgraphicitem.h"
 #include <QObject>
+#include <QPoint>
+
 namespace mapcontrol
 {
 /**
@@ -46,15 +48,16 @@ class WayPointItem:public QObject,public QGraphicsItem
     Q_INTERFACES(QGraphicsItem)
 public:
     enum { Type = UserType + 1 };
+    enum wptype {absolute,relative};
     /**
     * @brief Constructer
     *
     * @param coord coordinates in LatLng of the Waypoint
     * @param altitude altitude of the WayPoint
     * @param map pointer to map to use
-    * @return 
+    * @return
     */
-    WayPointItem(internals::PointLatLng const& coord,int const& altitude,MapGraphicItem* map);
+    WayPointItem(internals::PointLatLng const& coord,int const& altitude,MapGraphicItem* map,wptype type=absolute);
     /**
     * @brief Constructer
     *
@@ -64,7 +67,9 @@ public:
     * @param map pointer to map to use
     * @return
     */
-    WayPointItem(internals::PointLatLng const& coord,int const& altitude,QString const& description,MapGraphicItem* map);
+    WayPointItem(internals::PointLatLng const& coord,int const& altitude,QString const& description,MapGraphicItem* map,wptype type=absolute);
+    WayPointItem(QPoint const& relativeCoord,int const& altitude,QString const& description,MapGraphicItem* map);
+
     /**
     * @brief Returns the WayPoint description
     *
@@ -149,9 +154,9 @@ protected:
     void mousePressEvent ( QGraphicsSceneMouseEvent * event );
     void mouseReleaseEvent ( QGraphicsSceneMouseEvent * event );
 
-
 private:
     internals::PointLatLng coord;//coordinates of this WayPoint
+    QPoint relativeCoord;
     bool reached;
     QString description;
     bool shownumber;
@@ -166,6 +171,8 @@ private:
     QGraphicsSimpleTextItem* numberI;
     QGraphicsRectItem* numberIBG;
     QTransform transf;
+
+    wptype myType;
 
 public slots:
     /**
@@ -189,6 +196,8 @@ public slots:
     * @param waypoint  a pointer to the WayPoint inserted
     */
     void WPInserted(int const& number,WayPointItem* waypoint);
+
+    void onHomePositionChanged(internals::PointLatLng);
 signals:
     /**
     * @brief fires when this WayPoint number changes (not fired if due to a auto-renumbering)

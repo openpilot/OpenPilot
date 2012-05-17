@@ -278,7 +278,10 @@ static void comUAVTalkTask(void *parameters)
 			if (PIOS_COM_UAVTALK)
 				BufferedReadSetCom(f, PIOS_COM_UAVTALK);
 			else
+			{
 				vTaskDelay(5);
+				continue;
+			}
 		}
 
 		// Read the next byte
@@ -627,7 +630,7 @@ static void transparentCommTask(void * parameters)
 
 		// Receive data from the com port
 		uint32_t cur_rx_bytes = PIOS_COM_ReceiveBuffer(PIOS_COM_TRANS_COM, p->data + p->header.data_size,
-							       PH_MAX_DATA - p->header.data_size, timeout);
+																									 PH_MAX_DATA - p->header.data_size, timeout);
 
 		// Do we have an data to send?
 		p->header.data_size += cur_rx_bytes;
@@ -657,8 +660,8 @@ static void transparentCommTask(void * parameters)
 			// Should we send this packet?
 			if (send_packet)
 			{
-				// Transmit the packet
-				PHTransmitPacket(pios_packet_handler, p);
+				// Queue the packet for transmission.
+				xQueueSend(data->sendPacketQueue, &p, MAX_PORT_DELAY);
 
 				// Reset the timeout
 				timeout = MAX_PORT_DELAY;

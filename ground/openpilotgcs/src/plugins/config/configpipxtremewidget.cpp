@@ -137,7 +137,7 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
 {
 
 	// Restart the disconnection timer.
-	timeOut->start(5000);
+	timeOut->start(10000);
 
 	// Request and update of the setting object if we haven't received it yet.
 	if (!settingsUpdated)
@@ -260,7 +260,6 @@ void ConfigPipXtremeWidget::disconnected()
 
 void ConfigPipXtremeWidget::pairIDToggled(bool checked, quint8 idx)
 {
-	qDebug() << "Toggled";
 	if(checked)
 	{
 		PipXStatus *pipxStatus = PipXStatus::GetInstance(getObjectManager());

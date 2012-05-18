@@ -91,7 +91,7 @@ PHInstHandle PHInitialize(PacketHandlerConfig *cfg)
 	data->lock = xSemaphoreCreateRecursiveMutex();
 
 	// Initialize the ECC library.
-  initialize_ecc();
+	initialize_ecc();
 
 	// Return the structure.
 	return (PHInstHandle)data;

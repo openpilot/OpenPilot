@@ -291,7 +291,7 @@ static void comUAVTalkTask(void *parameters)
 		data->txBytes++;
 
 		// Get a TX packet from the packet handler if required.
-		if ((p == NULL) && !PIOS_COM_TRANS_COM)
+		if (p == NULL)
 		{
 
 			// Wait until we receive a sync.
@@ -320,8 +320,7 @@ static void comUAVTalkTask(void *parameters)
 		}
 
 		// Insert this byte.
-		if(p)
-			p->data[p->header.data_size++] = rx_byte;
+		p->data[p->header.data_size++] = rx_byte;
 
 		// Keep reading until we receive a completed packet.
 		UAVTalkRxState state = UAVTalkProcessInputStreamQuiet(data->inUAVTalkCon, rx_byte);
@@ -391,14 +390,12 @@ static void comUAVTalkTask(void *parameters)
 						}
 
 						// Release the packet, since we don't need it.
-						if(p)
-							PHReleaseTXPacket(pios_packet_handler, p);
+						PHReleaseTXPacket(pios_packet_handler, p);
 					}
 					else
 					{
-						// Otherwise, queue the packet for transmission if we're using UAVTalk comms.
-						if(p)
-							xQueueSend(data->sendPacketQueue, &p, MAX_PORT_DELAY);
+						// Otherwise, queue the packet for transmission.
+						xQueueSend(data->sendPacketQueue, &p, MAX_PORT_DELAY);
 					}
 				}
 				else
@@ -428,15 +425,13 @@ static void comUAVTalkTask(void *parameters)
 					}
 
 					// Release the packet, since we don't need it.
-					if(p)
-						PHReleaseTXPacket(pios_packet_handler, p);
+					PHReleaseTXPacket(pios_packet_handler, p);
 				}
 			}
 			else
 			{
-				// Queue the packet for transmission if we're using UAVTalk comms.
-				if(p)
-					xQueueSend(data->sendPacketQueue, &p, MAX_PORT_DELAY);
+				// Queue the packet for transmission.
+				xQueueSend(data->sendPacketQueue, &p, MAX_PORT_DELAY);
 			}
 			p = NULL;
 
@@ -454,14 +449,12 @@ static void comUAVTalkTask(void *parameters)
 				xQueueSend(data->objEventQueue, &ev, MAX_PORT_DELAY);
 
 				// Release the packet and start over again.
-				if(p)
-					PHReleaseTXPacket(pios_packet_handler, p);
+				PHReleaseTXPacket(pios_packet_handler, p);
 			}
 			else
 			{
 				// Transmit the packet anyway...
-				if(p)
-					xQueueSend(data->sendPacketQueue, &p, MAX_PORT_DELAY);
+				xQueueSend(data->sendPacketQueue, &p, MAX_PORT_DELAY);
 			}
 			p = NULL;
 		}
@@ -637,7 +630,7 @@ static void transparentCommTask(void * parameters)
 
 		// Receive data from the com port
 		uint32_t cur_rx_bytes = PIOS_COM_ReceiveBuffer(PIOS_COM_TRANS_COM, p->data + p->header.data_size,
-							       PH_MAX_DATA - p->header.data_size, timeout);
+																									 PH_MAX_DATA - p->header.data_size, timeout);
 
 		// Do we have an data to send?
 		p->header.data_size += cur_rx_bytes;
@@ -698,6 +691,7 @@ static void radioStatusTask(void *parameters)
 		PipXSettingsPairIDGet(&pairID);
 
 		// Update the status
+		PIOS_BL_HELPER_FLASH_Read_Description(pipxStatus.Description, PIPXSTATUS_DESCRIPTION_NUMELEM);
 		pipxStatus.DeviceID = PIOS_RFM22B_DeviceID(pios_rfm22b_id);
 		pipxStatus.RSSI = PIOS_RFM22B_RSSI(pios_rfm22b_id);
 		pipxStatus.Retries = data->comTxRetries;

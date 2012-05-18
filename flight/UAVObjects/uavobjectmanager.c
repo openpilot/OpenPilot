@@ -58,14 +58,23 @@ struct ObjectEventListStruct {
 typedef struct ObjectEventListStruct ObjectEventList;
 
 /**
- * List of object instances, holds the actual data structure and instance ID
+ * List of object instances, holds a pointer to the next instance and some UAVObjectData
  */
 struct ObjectInstListStruct {
-	  void *data;
-	  uint16_t instId;
 	  struct ObjectInstListStruct *next;
-};
+} __attribute__((packed));
 typedef struct ObjectInstListStruct ObjectInstList;
+
+/** fake structure for arbitrary sizes **/
+struct ObjectInstanceStruct {
+	  ObjectInstList header;
+	  uint32_t data;
+} __attribute__((packed));
+typedef struct ObjectInstanceStruct ObjectInstance;
+#define ObjectInstanceSize(numBytes) (offsetof(ObjectInstance,data)+(numBytes))
+
+/** anonymous type for instances **/
+typedef void* InstanceHandle; 
 
 typedef enum {
 	OL_IS_METAOBJECT = 0x01, /** Set if this is a metaobject */
@@ -100,16 +109,37 @@ struct ObjectListStruct {
 		     /** The object ID */
 	  uint16_t numBytes;
 			   /** Number of data bytes contained in the object (for a single instance) */
-	  uint16_t numInstances;
-			       /** Number of instances */
-	  ObjectInstList instances;
-				  /** List of object instances, instance 0 always exists */
 	  MetaObject metaObj;
 					    /** Meta object of the UAVObject */
 	  struct ObjectListStruct *next;
 				       /** Needed by linked list library (utlist.h) */
 } __attribute__((packed));
 typedef struct ObjectListStruct ObjectList;
+
+/** fake structure for arbitrary sizes **/
+struct ObjectListInstanceStruct {
+	  ObjectList header;
+	  uint32_t data;
+} __attribute__((packed));
+typedef struct ObjectListInstanceStruct ObjectListInstance;
+#define ObjectListInstanceSize(numBytes) (offsetof(ObjectListInstance,data)+(numBytes))
+
+struct ObjectListMultiStruct {
+	  ObjectList header;
+	  uint16_t numInstances;
+			       /** Number of instances */
+	  ObjectInstList instances;
+				  /** List of object instances, instance 0 always exists */
+} __attribute__((packed));
+typedef struct ObjectListMultiStruct ObjectListMulti;
+
+/** fake structure for arbitrary sizes **/
+struct ObjectListMultiInstanceStruct {
+	  ObjectListMulti header;
+	  uint32_t data;
+} __attribute__((packed));
+typedef struct ObjectListMultiInstanceStruct ObjectListMultiInstance;
+#define ObjectListMultiInstanceSize(numBytes) (offsetof(ObjectListMultiInstance,data)+(numBytes))
 
 /** all information about a metaobject are hardcoded constants **/
 #define MetaNumBytes sizeof(UAVObjMetadata)
@@ -120,11 +150,17 @@ typedef struct ObjectListStruct ObjectList;
 #define MetaObjectId(id) (id+1)
 #define MetaNumInstances 1
 
+/** all information about instances are dependant on object type **/
+#define ObjNumInstances(obj) (OLGetIsSingleInstance((GenericObject*)(obj))?1:((ObjectListMulti *)(obj))->numInstances)
+#define ObjSingleInstanceDataOffset(obj) ((void*)(&(( (ObjectListInstance*)obj )->data)))
+#define InstanceDataOffset(inst) ((void*)&(( (ObjectInstance*)inst )->data))
+#define InstanceData(instance) (void*)instance
+
 // Private functions
 static int32_t sendEvent(GenericObject * obj, uint16_t instId,
 			 UAVObjEventType event);
-static ObjectInstList *createInstance(ObjectList * obj, uint16_t instId);
-static ObjectInstList *getInstance(ObjectList * obj, uint16_t instId);
+static InstanceHandle createInstance(ObjectList * obj, uint16_t instId);
+static InstanceHandle getInstance(ObjectList * obj, uint16_t instId);
 static int32_t connectObj(UAVObjHandle obj, xQueueHandle queue,
 			  UAVObjEventCallback cb, uint8_t eventMask);
 static int32_t disconnectObj(UAVObjHandle obj, xQueueHandle queue,
@@ -205,7 +241,6 @@ UAVObjHandle UAVObjRegister(uint32_t id, const char *name,
 			    UAVObjInitializeCallback initCb)
 {
 	  ObjectList *objEntry;
-	  ObjectInstList *instEntry;
 
 	  // Get lock
 	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
@@ -220,22 +255,30 @@ UAVObjHandle UAVObjRegister(uint32_t id, const char *name,
 	  }
 
 	  // Create and append entry
-	  objEntry = (ObjectList *) pvPortMalloc(sizeof(ObjectList));
+	  if (isSingleInstance) {
+	  	  objEntry = (ObjectList *) pvPortMalloc( ObjectListInstanceSize(numBytes) );
+      } else {
+		  objEntry = (ObjectList *) pvPortMalloc( ObjectListMultiInstanceSize(numBytes) );
+	  }
 	  if (objEntry == NULL) {
 		    xSemaphoreGiveRecursive(mutex);
 		    return NULL;
 	  }
-	  ((GenericObject*) objEntry)->name = name;
-	  ((GenericObject*) objEntry)->events = NULL;
+	  ( (GenericObject*)objEntry )->name = name;
+	  ( (GenericObject*)objEntry )->events = NULL;
 	  OLSetIsMetaobject(     (GenericObject*)objEntry, 0);
 	  OLSetIsSingleInstance( (GenericObject*)objEntry, isSingleInstance);
 	  OLSetIsSettings(       (GenericObject*)objEntry, isSettings);
 	  objEntry->id = id;
 	  objEntry->numBytes = numBytes;
-	  objEntry->numInstances = 0;
-	  objEntry->instances.data = NULL;
-	  objEntry->instances.instId = 0xFFFF;
-	  objEntry->instances.next = NULL;
+	  // Create instance
+	  if (isSingleInstance) {
+		  memset(ObjSingleInstanceDataOffset(objEntry), 0, numBytes);
+	  } else {
+		  ( (ObjectListMulti*)objEntry )->numInstances = 1;
+		  ( (ObjectListMulti*)objEntry )->instances.next = NULL;
+		  memset(InstanceDataOffset(&(( (ObjectListMulti*)objEntry )->instances)), 0, numBytes);
+	  }
 	  // Create metaobject
 	  memset(LinkedMetaDataPtr(objEntry), 0, MetaNumBytes);
 	  ( (GenericObject*)MetaObjectPtr(objEntry) )->flags = OL_IS_METAOBJECT | OL_IS_SINGLE_INSTANCE;
@@ -243,14 +286,9 @@ UAVObjHandle UAVObjRegister(uint32_t id, const char *name,
 	  ( (GenericObject*)MetaObjectPtr(objEntry) )->events = NULL;
 	  LL_APPEND(objList, objEntry);
 
-	  // Create instance zero
-	  instEntry = createInstance(objEntry, 0);
-	  if (instEntry == NULL) {
-		    xSemaphoreGiveRecursive(mutex);
-		    return NULL;
-	  }
+	  // fire events 
+	  UAVObjInstanceUpdated((UAVObjHandle) objEntry, 0);
 
-	  // create metadata "instance"
 	  UAVObjInstanceUpdated((UAVObjHandle) MetaObjectPtr(objEntry), 0);
 
 	  // Initialize object fields and metadata to default values
@@ -409,7 +447,7 @@ uint16_t UAVObjGetNumInstances(UAVObjHandle obj)
 	  }
 	  uint32_t numInstances;
 	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
-	  numInstances = ((ObjectList *) obj)->numInstances;
+	  numInstances = ObjNumInstances(obj);
 	  xSemaphoreGiveRecursive(mutex);
 	  return numInstances;
 }
@@ -427,26 +465,26 @@ uint16_t UAVObjCreateInstance(UAVObjHandle obj,
 		    return -1;
 	  }
 
-	  ObjectList *objEntry;
-	  ObjectInstList *instEntry;
+	  InstanceHandle instEntry;
+	  uint16_t instId;
 
 	  // Lock
 	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
 	  // Create new instance
-	  objEntry = (ObjectList *) obj;
-	  instEntry = createInstance(objEntry, objEntry->numInstances);
+	  instId = ObjNumInstances(obj);
+	  instEntry = createInstance( (ObjectList*)obj, instId);
 	  if (instEntry == NULL) {
 		    xSemaphoreGiveRecursive(mutex);
 		    return -1;
 	  }
 	  // Initialize instance data
 	  if (initCb != NULL) {
-		    initCb(obj, instEntry->instId);
+		    initCb(obj, instId);
 	  }
 	  // Unlock
 	  xSemaphoreGiveRecursive(mutex);
-	  return instEntry->instId;
+	  return instId;
 }
 
 /**
@@ -505,7 +543,7 @@ int32_t UAVObjUnpack(UAVObjHandle obj, uint16_t instId,
 		  memcpy(MetaDataPtr((MetaObject *)obj), dataIn, MetaNumBytes);
 	  } else {
 		  ObjectList *objEntry;
-		  ObjectInstList *instEntry;
+		  InstanceHandle instEntry;
 
 		  // Cast handle to object
 		  objEntry = (ObjectList *) obj;
@@ -523,7 +561,7 @@ int32_t UAVObjUnpack(UAVObjHandle obj, uint16_t instId,
 				}
 		  }
 		  // Set the data
-		  memcpy(instEntry->data, dataIn, objEntry->numBytes);
+		  memcpy(InstanceData(instEntry), dataIn, objEntry->numBytes);
 	  }
 
 	  // Fire event
@@ -556,7 +594,7 @@ int32_t UAVObjPack(UAVObjHandle obj, uint16_t instId, uint8_t * dataOut)
 		  memcpy(dataOut, MetaDataPtr((MetaObject *)obj), MetaNumBytes);
 	  } else {
 		  ObjectList *objEntry;
-		  ObjectInstList *instEntry;
+		  InstanceHandle instEntry;
 
 		  // Cast handle to object
 		  objEntry = (ObjectList *) obj;
@@ -569,7 +607,7 @@ int32_t UAVObjPack(UAVObjHandle obj, uint16_t instId, uint8_t * dataOut)
 				return -1;
 		  }
 		  // Pack data
-		  memcpy(dataOut, instEntry->data, objEntry->numBytes);
+		  memcpy(dataOut, InstanceData(instEntry), objEntry->numBytes);
 	  }
 
 	  // Unlock
@@ -619,7 +657,7 @@ int32_t UAVObjSaveToFile(UAVObjHandle obj, uint16_t instId,
 		  }
 	  } else {
 		  ObjectList *objEntry;
-		  ObjectInstList *instEntry;
+		  InstanceHandle instEntry;
 
 		  // Cast to object
 		  objEntry = (ObjectList *) obj;
@@ -636,11 +674,11 @@ int32_t UAVObjSaveToFile(UAVObjHandle obj, uint16_t instId,
 
 		  // Write the instance ID
 		  if (!OLGetIsSingleInstance((GenericObject*)obj)) {
-				PIOS_FWRITE(file, &instEntry->instId,
-					sizeof(instEntry->instId), &bytesWritten);
+				PIOS_FWRITE(file, &instId,
+					sizeof(instId), &bytesWritten);
 		  }
 		  // Write the data and check that the write was successful
-		  PIOS_FWRITE(file, instEntry->data, objEntry->numBytes,
+		  PIOS_FWRITE(file, InstanceData(instEntry), objEntry->numBytes,
 				  &bytesWritten);
 		  if (bytesWritten != objEntry->numBytes) {
 				xSemaphoreGiveRecursive(mutex);
@@ -674,22 +712,20 @@ int32_t UAVObjSave(UAVObjHandle obj, uint16_t instId)
 		  if (PIOS_FLASHFS_ObjSave(obj, instId, (uint8_t*) MetaDataPtr((MetaObject *)obj)) != 0)
 				return -1;
 	  } else {
-		  ObjectList *objEntry = (ObjectList *) obj;
-		  ObjectInstList *instEntry = getInstance(objEntry, instId);
+		  InstanceHandle instEntry = getInstance( (ObjectList*)obj, instId);
 
 		  if (instEntry == NULL)
 				return -1;
 
-		  if (instEntry->data == NULL)
+		  if (InstanceData(instEntry) == NULL)
 				return -1;
 
-		  if (PIOS_FLASHFS_ObjSave(obj, instId, instEntry->data) != 0)
+		  if (PIOS_FLASHFS_ObjSave(obj, instId, InstanceData(instEntry)) != 0)
 				return -1;
 	  }
 #endif
 #if defined(PIOS_INCLUDE_SDCARD)
 	  FILEINFO file;
-	  GenericObject *objEntry;
 	  uint8_t filename[14];
 
 	  // Check for file system availability
@@ -698,9 +734,6 @@ int32_t UAVObjSave(UAVObjHandle obj, uint16_t instId)
 	  }
 	  // Lock
 	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
-
-	  // Cast to object
-	  objEntry = (GenericObject *) obj;
 
 	  // Get filename
 	  objectFilename(obj, filename);
@@ -733,7 +766,7 @@ UAVObjHandle UAVObjLoadFromFile(FILEINFO * file)
 #if defined(PIOS_INCLUDE_SDCARD)
 	  uint32_t bytesRead;
 	  GenericObject *objEntry;
-	  ObjectInstList *instEntry;
+	  InstanceHandle instEntry;
 	  uint32_t objId;
 	  uint16_t instId;
 	  UAVObjHandle obj;
@@ -797,7 +830,7 @@ UAVObjHandle UAVObjLoadFromFile(FILEINFO * file)
 		  }
 		  // Read the instance data
 		  if (PIOS_FREAD
-			  (file, instEntry->data, ((ObjectList *)objEntry)->numBytes, &bytesRead)) {
+			  (file, InstanceData(instEntry), ((ObjectList *)objEntry)->numBytes, &bytesRead)) {
 				xSemaphoreGiveRecursive(mutex);
 				return NULL;
 		  }
@@ -838,17 +871,13 @@ int32_t UAVObjLoad(UAVObjHandle obj, uint16_t instId)
 			return -1;
 	} else {
 
-		ObjectList *objEntry = (ObjectList *) obj;
-		ObjectInstList *instEntry = getInstance(objEntry, instId);
+		InstanceHandle instEntry = getInstance( (ObjectList*)obj, instId);
 
 		if (instEntry == NULL)
 			return -1;
 
-		if (instEntry->data == NULL)
-			return -1;
-
 		// Fire event on success
-		if (PIOS_FLASHFS_ObjLoad(obj, instId, instEntry->data) == 0)
+		if (PIOS_FLASHFS_ObjLoad(obj, instId, InstanceData(instEntry)) == 0)
 			sendEvent((GenericObject*)obj, instId, EV_UNPACKED);
 		else
 			return -1;
@@ -858,7 +887,6 @@ int32_t UAVObjLoad(UAVObjHandle obj, uint16_t instId)
 
 #if defined(PIOS_INCLUDE_SDCARD)
 	  FILEINFO file;
-	  GenericObject *objEntry;
 	  UAVObjHandle loadedObj;
 	  uint8_t filename[14];
 
@@ -868,9 +896,6 @@ int32_t UAVObjLoad(UAVObjHandle obj, uint16_t instId)
 	  }
 	  // Lock
 	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
-
-	  // Cast to object
-	  objEntry = (GenericObject *) obj;
 
 	  // Get filename
 	  objectFilename(obj, filename);
@@ -913,7 +938,6 @@ int32_t UAVObjDelete(UAVObjHandle obj, uint16_t instId)
 	  PIOS_FLASHFS_ObjDelete(obj, instId);
 #endif
 #if defined(PIOS_INCLUDE_SDCARD)
-	  GenericObject *objEntry;
 	  uint8_t filename[14];
 
 	  // Check for file system availability
@@ -922,9 +946,6 @@ int32_t UAVObjDelete(UAVObjHandle obj, uint16_t instId)
 	  }
 	  // Lock
 	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
-
-	  // Cast to object
-	  objEntry = (GenericObject *) obj;
 
 	  // Get filename
 	  objectFilename(obj, filename);
@@ -1164,14 +1185,12 @@ int32_t UAVObjSetInstanceData(UAVObjHandle obj, uint16_t instId,
 	  // Check access level
 	  if (!OLGetIsMetaobject((GenericObject *)obj)) {
 		    ObjectList *objEntry;
-		    ObjectInstList *instEntry;
-		    UAVObjMetadata *mdata;
+		    InstanceHandle instEntry;
 
 		    // Cast to object info
 		    objEntry = (ObjectList *) obj;
 
-		    mdata =	LinkedMetaDataPtr(objEntry);
-		    if (UAVObjGetAccess(mdata) == ACCESS_READONLY) {
+		    if (UAVObjGetAccess( LinkedMetaDataPtr(objEntry) ) == ACCESS_READONLY) {
 			      xSemaphoreGiveRecursive(mutex);
 			      return -1;
 		    }
@@ -1183,7 +1202,7 @@ int32_t UAVObjSetInstanceData(UAVObjHandle obj, uint16_t instId,
 				return -1;
 			}
 			// Set data
-			memcpy(instEntry->data, dataIn, objEntry->numBytes);
+			memcpy(InstanceData(instEntry), dataIn, objEntry->numBytes);
 	  } else {
 			// Get instance information
 			if (instId != 0) {
@@ -1220,14 +1239,12 @@ int32_t UAVObjSetInstanceDataField(UAVObjHandle obj, uint16_t instId, const void
 	if ( !OLGetIsMetaobject( (GenericObject*) obj ) )
 	{
 		ObjectList* objEntry;
-		ObjectInstList* instEntry;
-		UAVObjMetadata* mdata;
+		InstanceHandle instEntry;
 
 		// Cast to object info
 		objEntry = (ObjectList*)obj;
 
-		mdata = LinkedMetaDataPtr(objEntry);
-		if ( UAVObjGetAccess(mdata) == ACCESS_READONLY )
+		if ( UAVObjGetAccess( LinkedMetaDataPtr(objEntry) ) == ACCESS_READONLY )
 		{
 			xSemaphoreGiveRecursive(mutex);
 			return -1;
@@ -1250,7 +1267,7 @@ int32_t UAVObjSetInstanceDataField(UAVObjHandle obj, uint16_t instId, const void
 		}
 
 		// Set data
-		memcpy(instEntry->data + offset, dataIn, size);
+		memcpy(InstanceData(instEntry) + offset, dataIn, size);
 	} else {
 		// Get instance information
 		if ( instId != 0 )
@@ -1297,7 +1314,7 @@ int32_t UAVObjGetInstanceData(UAVObjHandle obj, uint16_t instId,
 	  if ( !OLGetIsMetaobject( (GenericObject*) obj) )
 	  {
 		  ObjectList *objEntry;
-		  ObjectInstList *instEntry;
+		  InstanceHandle instEntry;
 
 		  // Cast to object info
 		  objEntry = (ObjectList *) obj;
@@ -1310,7 +1327,7 @@ int32_t UAVObjGetInstanceData(UAVObjHandle obj, uint16_t instId,
 				return -1;
 		  }
 		  // Set data
-		  memcpy(dataOut, instEntry->data, objEntry->numBytes);
+		  memcpy(dataOut, InstanceData(instEntry), objEntry->numBytes);
 	  } else {
 		  // Get instance information
 		  if (instId != 0) {
@@ -1343,7 +1360,7 @@ int32_t UAVObjGetInstanceDataField(UAVObjHandle obj, uint16_t instId, void* data
 	if ( !OLGetIsMetaobject( (GenericObject*) obj ) )
 	{
 		ObjectList* objEntry;
-		ObjectInstList* instEntry;
+		InstanceHandle instEntry;
 
 		// Cast to object info
 		objEntry = (ObjectList*)obj;
@@ -1366,7 +1383,7 @@ int32_t UAVObjGetInstanceDataField(UAVObjHandle obj, uint16_t instId, void* data
 		}
 		
 		// Set data
-		memcpy(dataOut, instEntry->data + offset, size);
+		memcpy(dataOut, InstanceData(instEntry) + offset, size);
 	} else {
 		// Get instance information
 		if ( instId != 0)
@@ -1402,15 +1419,13 @@ int32_t UAVObjGetInstanceDataField(UAVObjHandle obj, uint16_t instId, void* data
 int32_t UAVObjSetMetadata(UAVObjHandle obj, const UAVObjMetadata * dataIn)
 {
 	  PIOS_Assert(obj);
-	  ObjectList *objEntry;
 
 	  // Lock
 	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
 	  // Set metadata (metadata of metaobjects can not be modified)
-	  objEntry = (ObjectList *) obj;
 	  if (!OLGetIsMetaobject((GenericObject*)obj)) {
-		    UAVObjSetData((UAVObjHandle) MetaObjectPtr(objEntry),
+		    UAVObjSetData((UAVObjHandle) MetaObjectPtr( (ObjectList*)obj ),
 				  dataIn);
 	  } else {
 		    return -1;
@@ -1430,17 +1445,15 @@ int32_t UAVObjSetMetadata(UAVObjHandle obj, const UAVObjMetadata * dataIn)
 int32_t UAVObjGetMetadata(UAVObjHandle obj, UAVObjMetadata * dataOut)
 {
 	  PIOS_Assert(obj);
-	  ObjectList *objEntry;
 
 	  // Lock
 	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
 	  // Get metadata
-	  objEntry = (ObjectList *) obj;
 	  if (OLGetIsMetaobject((GenericObject*)obj)) {
 		    memcpy(dataOut, &defMetadata, sizeof(UAVObjMetadata));
 	  } else {
-		    UAVObjGetData((UAVObjHandle) MetaObjectPtr(objEntry),
+		    UAVObjGetData((UAVObjHandle) MetaObjectPtr( (ObjectList*)obj ),
 				  dataOut);
 	  }
 
@@ -1604,14 +1617,7 @@ int8_t UAVObjReadOnly(UAVObjHandle obj)
 {
 	  PIOS_Assert(obj);
 	  if (!OLGetIsMetaobject( (GenericObject *)obj)) {
-		    ObjectList *objEntry;
-		    UAVObjMetadata *mdata;
-
-		    // Cast to object info
-		    objEntry = (ObjectList *) obj;
-
-		    mdata =	LinkedMetaDataPtr(objEntry);
-		    return UAVObjGetAccess(mdata) == ACCESS_READONLY;
+		    return UAVObjGetAccess( LinkedMetaDataPtr( (ObjectList*)obj ) ) == ACCESS_READONLY;
 	  }
 	  return -1;
 }
@@ -1801,16 +1807,14 @@ static int32_t sendEvent(GenericObject * obj, uint16_t instId,
 /**
  * Create a new object instance, return the instance info or NULL if failure.
  */
-static ObjectInstList *createInstance(ObjectList * obj, uint16_t instId)
+static InstanceHandle createInstance(ObjectList * obj, uint16_t instId)
 {
 	  ObjectInstList *instEntry;
 	  int32_t n;
 
-	  // DO NOT EVER CALL FOR METAOBJECTS
-	  PIOS_Assert(!OLGetIsMetaobject((GenericObject*)obj));
-
-	  // For single instance objects, only instance zero is allowed
-	  if (OLGetIsSingleInstance((GenericObject*)obj) && instId != 0) {
+	  // For single instance objects, only instance zero is allowed (and zero gets created in RegisterObject)
+	  if (OLGetIsSingleInstance((GenericObject*)obj)) {
+	  PIOS_Assert(0);
 		    return NULL;
 	  }
 	  // Make sure that the instance ID is within limits
@@ -1818,60 +1822,54 @@ static ObjectInstList *createInstance(ObjectList * obj, uint16_t instId)
 		    return NULL;
 	  }
 	  // Check if the instance already exists
-	  if (getInstance(obj, instId) != NULL) {
+	  if ( instId< ObjNumInstances(obj) ) {
 		    return NULL;
 	  }
 	  // Create any missing instances (all instance IDs must be sequential)
-	  for (n = obj->numInstances; n < instId; ++n) {
+	  for (n = ObjNumInstances(obj); n < instId; ++n) {
 		    if (createInstance(obj, n) == NULL) {
 			      return NULL;
 		    }
 	  }
 
-	  if (instId == 0) {	/* Instance 0 ObjectInstList allocated with ObjectList element */
-		    instEntry = &obj->instances;
-		    instEntry->data = pvPortMalloc(obj->numBytes);
-		    if (instEntry->data == NULL)
-			      return NULL;
-		    memset(instEntry->data, 0, obj->numBytes);
-		    instEntry->instId = instId;
-	  } else {
-		    // Create the actual instance
-		    instEntry =
-			(ObjectInstList *)
-			pvPortMalloc(sizeof(ObjectInstList));
-		    if (instEntry == NULL)
-			      return NULL;
-		    instEntry->data = pvPortMalloc(obj->numBytes);
-		    if (instEntry->data == NULL)
-			      return NULL;
-		    memset(instEntry->data, 0, obj->numBytes);
-		    instEntry->instId = instId;
-		    LL_APPEND(obj->instances.next, instEntry);
-	  }
-	  ++obj->numInstances;
+	  // Create the actual instance
+	  instEntry =
+		  (ObjectInstList *)
+		  pvPortMalloc(sizeof(ObjectInstList)+obj->numBytes);
+	  if (instEntry == NULL)
+		  return NULL;
+	  memset(InstanceDataOffset(instEntry), 0, obj->numBytes);
+	  LL_APPEND(( (ObjectListMulti*)obj )->instances.next, instEntry);
+
+	  ( (ObjectListMulti*)obj )->numInstances++;
 
 	  // Fire event
 	  UAVObjInstanceUpdated((UAVObjHandle) obj, instId);
 
 	  // Done
-	  return instEntry;
+	  return InstanceDataOffset(instEntry);
 }
 
 /**
  * Get the instance information or NULL if the instance does not exist
  */
-static ObjectInstList *getInstance(ObjectList * obj, uint16_t instId)
+static InstanceHandle getInstance(ObjectList * obj, uint16_t instId)
 {
 	  ObjectInstList *instEntry;
-
-	  // DO NOT EVER CALL FOR METAOBJECTS
-	  PIOS_Assert(!OLGetIsMetaobject((GenericObject*)obj));
+	  // quick solutions
+	  if (OLGetIsSingleInstance((GenericObject*)(obj))) {
+		  if (instId!=0)
+			  return NULL;
+		  return ObjSingleInstanceDataOffset(obj);
+	  }
+	  if (instId>=ObjNumInstances(obj))
+		  return NULL;
 
 	  // Look for specified instance ID
-	  LL_FOREACH(&(obj->instances), instEntry) {
-		    if (instEntry->instId == instId) {
-			      return instEntry;
+	  uint16_t instance=0;
+	  LL_FOREACH(&(( (ObjectListMulti*)obj )->instances), instEntry) {
+		    if (instance++ == instId) {
+			      return InstanceDataOffset(instEntry);
 		    }
 	  }
 	  // If this point is reached then instance id was not found

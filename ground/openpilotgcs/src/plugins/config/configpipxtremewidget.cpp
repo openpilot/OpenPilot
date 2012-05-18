@@ -188,10 +188,29 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
 	// Update the Description field
 	UAVObjectField* descField = object->getField("Description");
 	if (descField) {
+		/*
+		 * This looks like a binary with a description at the end
+		 *  4 bytes: header: "OpFw"
+		 *  4 bytes: git commit hash (short version of SHA1)
+		 *  4 bytes: Unix timestamp of last git commit
+		 *  2 bytes: target platform. Should follow same rule as BOARD_TYPE and BOARD_REVISION in board define files.
+		 *  26 bytes: commit tag if it is there, otherwise "Unreleased". Zero-padded
+		 *   ---- 40 bytes limit ---
+		 *  20 bytes: SHA1 sum of the firmware.
+		 *  40 bytes: free for now.
+		 */
 		char buf[PipXStatus::DESCRIPTION_NUMELEM];
-		for (unsigned int i = 0; i < PipXStatus::DESCRIPTION_NUMELEM; ++i)
-			buf[i] = descField->getValue(i).toChar().toAscii();
-		m_pipx->FirmwareVersion->setText(buf);
+		for (unsigned int i = 0; i < 26; ++i)
+			buf[i] = descField->getValue(i + 14).toChar().toAscii();
+		buf[26] = '\0';
+		QString descstr(buf);
+		quint32 gitDate = descField->getValue(11).toChar().toAscii() & 0xFF;
+		for (int i = 1; i < 4; i++) {
+			gitDate = gitDate << 8;
+			gitDate += descField->getValue(11-i).toChar().toAscii() & 0xFF;
+		}
+		QString date = QDateTime::fromTime_t(gitDate).toUTC().toString("yyyy-MM-dd HH:mm");
+		m_pipx->FirmwareVersion->setText(descstr + " " + date);
  	} else {
  		qDebug() << "PipXtremeGadgetWidget: Count not read Description field.";
  	}
@@ -224,20 +243,7 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
  	// Update the link state
  	UAVObjectField* linkField = object->getField("LinkState");
  	if (linkField) {
-		const char *msg = "Unknown";
-		switch (linkField->getValue().toInt())
-		{
-		case PipXStatus::LINKSTATE_DISCONNECTED:
-			msg = "Disconnected";
-			break;
-		case PipXStatus::LINKSTATE_CONNECTING:
-			msg = "Connecting";
-			break;
-		case PipXStatus::LINKSTATE_CONNECTED:
-			msg = "Connected";
-			break;
-		}
-		m_pipx->LinkState->setText(msg);
+		m_pipx->LinkState->setText(linkField->getValue().toString());
 	} else {
 		qDebug() << "PipXtremeGadgetWidget: Count not read link state field.";
 	}

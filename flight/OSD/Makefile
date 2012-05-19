@@ -38,7 +38,7 @@ OUTDIR := $(TOP)/build/$(TARGET)
 DEBUG ?= NO
 
 # Set to YES when using Code Sourcery toolchain
-CODE_SOURCERY ?= YES
+CODE_SOURCERY ?= NO
 
 ifeq ($(CODE_SOURCERY), YES)
 REMOVE_CMD = cs-rm

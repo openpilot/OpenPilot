@@ -630,7 +630,7 @@ static void transparentCommTask(void * parameters)
 
 		// Receive data from the com port
 		uint32_t cur_rx_bytes = PIOS_COM_ReceiveBuffer(PIOS_COM_TRANS_COM, p->data + p->header.data_size,
-																									 PH_MAX_DATA - p->header.data_size, timeout);
+							       PH_MAX_DATA - p->header.data_size, timeout);
 
 		// Do we have an data to send?
 		p->header.data_size += cur_rx_bytes;

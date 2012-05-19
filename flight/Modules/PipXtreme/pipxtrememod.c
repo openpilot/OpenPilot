@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
- * @brief The OpenPilot Modules do the majority of the control in OpenPilot.  The 
+ * @brief The OpenPilot Modules do the majority of the control in OpenPilot.  The
  * @ref PipXtremeModule The PipXtreme Module is the equivalanet of the System
  * Module for the PipXtreme modem.  it starts all the other modules.
  #  This is done through the @ref PIOS "PIOS Hardware abstraction layer",
@@ -46,12 +46,6 @@
 // Private constants
 #define SYSTEM_UPDATE_PERIOD_MS 1000
 #define LED_BLINK_RATE_HZ 5
-
-#ifndef IDLE_COUNTS_PER_SEC_AT_NO_LOAD
-#define IDLE_COUNTS_PER_SEC_AT_NO_LOAD 995998	// calibrated by running tests/test_cpuload.c
-											  // must be updated if the FreeRTOS or compiler
-											  // optimisation options are changed.
-#endif
 
 #if defined(PIOS_SYSTEM_STACK_SIZE)
 #define STACK_SIZE_BYTES PIOS_SYSTEM_STACK_SIZE
@@ -108,7 +102,7 @@ int32_t PipXtremeModInitialize(void)
 	const struct pios_board_info * bdinfo = &pios_board_info_blob;
 
 	pipxStatus.BoardType= bdinfo->board_type;
-	//PIOS_BL_HELPER_FLASH_Read_Description(pipxStatus.Description, PIPXSTATUS_DESCRIPTION_NUMELEM);
+	PIOS_BL_HELPER_FLASH_Read_Description(pipxStatus.Description, PIPXSTATUS_DESCRIPTION_NUMELEM);
 	PIOS_SYS_SerialNumberGetBinary(pipxStatus.CPUSerial);
 	pipxStatus.BoardRevision= bdinfo->board_rev;
 
@@ -158,50 +152,6 @@ static void systemTask(void *parameters)
 		vTaskDelayUntil(&lastSysTime, SYSTEM_UPDATE_PERIOD_MS / portTICK_RATE_MS);
 	}
 }
-
-#ifdef NEVER
-/**
- * Called periodically to update the system stats
- */
-static uint16_t GetFreeIrqStackSize(void)
-{
-	uint32_t i = 0x200;
-
-#if !defined(ARCH_POSIX) && !defined(ARCH_WIN32) && defined(CHECK_IRQ_STACK)
-extern uint32_t _irq_stack_top;
-extern uint32_t _irq_stack_end;
-uint32_t pattern = 0x0000A5A5;
-uint32_t *ptr = &_irq_stack_end;
-
-#if 1 /* the ugly way accurate but takes more time, useful for debugging */
-	uint32_t stack_size = (((uint32_t)&_irq_stack_top - (uint32_t)&_irq_stack_end) & ~3 ) / 4;
-
-	for (i=0; i< stack_size; i++)
-	{
-		if (ptr[i] != pattern)
-		{
-			i=i*4;
-			break;
-		}
-	}
-#else /* faster way but not accurate */
-	if (*(volatile uint32_t *)((uint32_t)ptr + IRQSTACK_LIMIT_CRITICAL) != pattern)
-	{
-		i = IRQSTACK_LIMIT_CRITICAL - 1;
-	}
-	else if (*(volatile uint32_t *)((uint32_t)ptr + IRQSTACK_LIMIT_WARNING) != pattern)
-	{
-		i = IRQSTACK_LIMIT_WARNING - 1;
-	}
-	else
-	{
-		i = IRQSTACK_LIMIT_WARNING;
-	}
-#endif
-#endif
-	return i;
-}
-#endif
 
 /**
  * Called by the RTOS when the CPU is idle, used to measure the CPU idle time.

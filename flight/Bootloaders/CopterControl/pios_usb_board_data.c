@@ -59,7 +59,7 @@ static uint8_t usb_serial_number[2 + PIOS_SYS_SERIAL_NUM_ASCII_LEN*2 + 3*2] = {
 static const struct usb_string_langid usb_lang_id = {
 	.bLength = sizeof(usb_lang_id),
 	.bDescriptorType = USB_DESC_TYPE_STRING,
-	.bLangID = htousbs(USB_LANGID_ENGLISH_UK),
+	.bLangID = htousbs(USB_LANGID_ENGLISH_US),
 };
 
 static const uint8_t usb_vendor_id[28] = {

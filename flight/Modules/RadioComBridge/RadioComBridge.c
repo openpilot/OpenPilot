@@ -330,7 +330,8 @@ static void comUAVTalkTask(void *parameters)
 		if (state == UAVTALK_STATE_COMPLETE)
 		{
 			// Is this a local UAVObject?
-			if (iproc->obj != NULL)
+			// We only generate GcsReceiver ojects, we don't consume them.
+			if ((iproc->obj != NULL) && (iproc->objId != GCSRECEIVER_OBJID))
 			{
 				// We treat the ObjectPersistence object differently
 				if(iproc->objId == OBJECTPERSISTENCE_OBJID)
@@ -691,7 +692,6 @@ static void radioStatusTask(void *parameters)
 		PipXSettingsPairIDGet(&pairID);
 
 		// Update the status
-		PIOS_BL_HELPER_FLASH_Read_Description(pipxStatus.Description, PIPXSTATUS_DESCRIPTION_NUMELEM);
 		pipxStatus.DeviceID = PIOS_RFM22B_DeviceID(pios_rfm22b_id);
 		pipxStatus.RSSI = PIOS_RFM22B_RSSI(pios_rfm22b_id);
 		pipxStatus.Retries = data->comTxRetries;

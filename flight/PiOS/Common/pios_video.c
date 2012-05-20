@@ -32,9 +32,13 @@
 #include "pios.h"
 #if defined(PIOS_INCLUDE_VIDEO)
 
-extern xSemaphoreHandle osdSemaphore;
+// Private methods
+static void reset_hsync_timers();
 
+// Private variables
+extern xSemaphoreHandle osdSemaphore;
 static const struct pios_video_cfg * dev_cfg;
+
 
 // Define the buffers.
 // For 256x192 pixel mode:
@@ -85,7 +89,8 @@ void swap_buffers()
         SWAP_BUFFS(tmp, disp_buffer_level, draw_buffer_level);
 }
 
-void PIOS_Hsync_ISR() {
+void PIOS_Hsync_ISR()
+{
 	if(Vsync_update==11 && (DMA_GetCmdStatus(dev_cfg->level.dma.tx.channel)!=ENABLE))
 	{
 		// load first line of data
@@ -102,6 +107,9 @@ void PIOS_Hsync_ISR() {
 		DMA_Cmd(dev_cfg->mask.dma.tx.channel, ENABLE);
 	}
 	Vsync_update++;
+
+	reset_hsync_timers();
+
 #if 0
 	//if(dev_cfg->hsync->pin.gpio->IDR & dev_cfg->hsync->pin.init.GPIO_Pin) {
 			/*if(gLineType == LINE_TYPE_GRAPHICS)
@@ -185,8 +193,11 @@ static void reset_hsync_timers()
 	// Stop both timers
 	TIM_Cmd(dev_cfg->pixel_timer.timer, DISABLE);
 
+	TIM_ETRConfig(dev_cfg->pixel_timer.timer, TIM_ExtTRGPSC_OFF,
+				  TIM_ExtTRGPolarity_NonInverted, 0);
 	TIM_SelectInputTrigger(dev_cfg->pixel_timer.timer, TIM_TS_ETRF);
 	TIM_SelectSlaveMode(dev_cfg->pixel_timer.timer, TIM_SlaveMode_Trigger);
+//	TIM_SelectMasterSlaveMode(dev_cfg->pixel_timer.timer, ENABLE);
 	TIM_Cmd(dev_cfg->pixel_timer.timer, ENABLE);
 }
 /**
@@ -197,8 +208,8 @@ static void line_overflow(uint32_t tim_id, uint32_t context, uint8_t chan_idx, u
 	reset_hsync_timers();
 }
 
-const struct pios_tim_callbacks line_callback = {
-	.overflow = line_overflow,
+const struct pios_tim_callbacks px_callback = {
+	.overflow = NULL,
 	.edge = NULL,
 };
 
@@ -208,10 +219,11 @@ static void configure_hsync_timers()
 	TIM_Cmd(dev_cfg->pixel_timer.timer, DISABLE);
 	TIM_Cmd(dev_cfg->line_timer, DISABLE);
 
-	// Install timer end of line interrupt
+	// This is overkill but used for consistency.  No interrupts used for pixel clock
+	// but this function calls the GPIO_Remap
 	uint32_t tim_id;
 	const struct pios_tim_channel *channels = &dev_cfg->pixel_timer;
-	PIOS_TIM_InitChannels(&tim_id, channels, 1, &line_callback, 0);
+	PIOS_TIM_InitChannels(&tim_id, channels, 1, &px_callback, 0);
 
 	// Set up the channel to output the pixel clock
 	switch(dev_cfg->pixel_timer.timer_chan) {
@@ -223,7 +235,7 @@ static void configure_hsync_timers()
 		case TIM_Channel_2:
 			TIM_OC2Init(dev_cfg->pixel_timer.timer, &dev_cfg->tim_oc_init);
 			TIM_OC2PreloadConfig(dev_cfg->pixel_timer.timer, TIM_OCPreload_Enable);
-			TIM_SetCompare2(dev_cfg->pixel_timer.timer, 1);
+			TIM_SetCompare2(dev_cfg->pixel_timer.timer, 10);
 			break;
 		case TIM_Channel_3:
 			TIM_OC3Init(dev_cfg->pixel_timer.timer, &dev_cfg->tim_oc_init);
@@ -238,6 +250,11 @@ static void configure_hsync_timers()
 	}
 	TIM_ARRPreloadConfig(dev_cfg->pixel_timer.timer, ENABLE);
 	TIM_CtrlPWMOutputs(dev_cfg->pixel_timer.timer, ENABLE);
+	
+	// This shouldn't be needed as it should come from the config struture.  Something
+	// is clobbering that
+	TIM_PrescalerConfig(dev_cfg->pixel_timer.timer, 0, TIM_PSCReloadMode_Immediate);
+	TIM_SetAutoreload(dev_cfg->pixel_timer.timer, 15);
 
 	// Set up the timer to run the pixel clock on the next hsync
 	reset_hsync_timers();

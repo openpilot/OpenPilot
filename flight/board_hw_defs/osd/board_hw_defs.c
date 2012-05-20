@@ -641,6 +641,7 @@ static const struct pios_video_cfg pios_video_cfg = {
 			},
 			.pin_source = GPIO_PinSource5,
 		},
+		.remap = GPIO_AF_TIM3,
 	},
 	.tim_oc_init = {
 		.TIM_OCMode = TIM_OCMode_PWM1,

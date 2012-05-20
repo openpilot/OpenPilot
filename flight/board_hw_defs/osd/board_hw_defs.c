@@ -622,13 +622,36 @@ static const struct pios_video_cfg pios_video_cfg = {
 			.slave_count = 1,
 
 	},
-	/////////////////
 
 	.hsync = &pios_exti_hsync_cfg,
 	.vsync = &pios_exti_vsync_cfg,
 	
-	.pixel_timer = TIM3,
 	.line_timer = TIM4,
+	.pixel_timer = {
+		.timer = TIM3,
+		.timer_chan = TIM_Channel_2,
+		.pin = {
+			.gpio = GPIOB,
+			.init = {
+				.GPIO_Pin = GPIO_Pin_5,
+				.GPIO_Speed = GPIO_Speed_2MHz,
+				.GPIO_Mode  = GPIO_Mode_AF,
+				.GPIO_OType = GPIO_OType_PP,
+				.GPIO_PuPd  = GPIO_PuPd_UP
+			},
+			.pin_source = GPIO_PinSource5,
+		},
+	},
+	.tim_oc_init = {
+		.TIM_OCMode = TIM_OCMode_PWM1,
+		.TIM_OutputState = TIM_OutputState_Enable,
+		.TIM_OutputNState = TIM_OutputNState_Disable,
+		.TIM_Pulse = 1,
+		.TIM_OCPolarity = TIM_OCPolarity_High,
+		.TIM_OCNPolarity = TIM_OCPolarity_High,
+		.TIM_OCIdleState = TIM_OCIdleState_Reset,
+		.TIM_OCNIdleState = TIM_OCNIdleState_Reset,
+	},
 };
 
 

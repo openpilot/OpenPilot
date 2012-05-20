@@ -47,7 +47,8 @@ struct pios_video_cfg {
 	const struct pios_exti_cfg * hsync;
 	const struct pios_exti_cfg * vsync;
 
-	TIM_TypeDef * pixel_timer;
+	struct pios_tim_channel pixel_timer;
+	TIM_OCInitTypeDef tim_oc_init;
 	TIM_TypeDef * line_timer;
 };
 

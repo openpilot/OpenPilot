@@ -177,9 +177,78 @@ uint16_t PIOS_Video_GetOSDLines(void) {
 	return m_osdLines;
 }
 
-void PIOS_Video_Init(const struct pios_video_cfg * cfg){
+/**
+ * Reset the timer and configure for next call.  Keeps them synced.
+ */
+static void reset_hsync_timers()
+{
+	// Stop both timers
+	TIM_Cmd(dev_cfg->pixel_timer.timer, DISABLE);
+
+	TIM_SelectInputTrigger(dev_cfg->pixel_timer.timer, TIM_TS_ETRF);
+	TIM_SelectSlaveMode(dev_cfg->pixel_timer.timer, TIM_SlaveMode_Trigger);
+	TIM_Cmd(dev_cfg->pixel_timer.timer, ENABLE);
+}
+/**
+ * Called when the last pixel is clocked.
+ */
+static void line_overflow(uint32_t tim_id, uint32_t context, uint8_t chan_idx, uint16_t count)
+{
+	reset_hsync_timers();
+}
+
+const struct pios_tim_callbacks line_callback = {
+	.overflow = line_overflow,
+	.edge = NULL,
+};
+
+static void configure_hsync_timers()
+{
+	// Stop both timers
+	TIM_Cmd(dev_cfg->pixel_timer.timer, DISABLE);
+	TIM_Cmd(dev_cfg->line_timer, DISABLE);
+
+	// Install timer end of line interrupt
+	uint32_t tim_id;
+	const struct pios_tim_channel *channels = &dev_cfg->pixel_timer;
+	PIOS_TIM_InitChannels(&tim_id, channels, 1, &line_callback, 0);
+
+	// Set up the channel to output the pixel clock
+	switch(dev_cfg->pixel_timer.timer_chan) {
+		case TIM_Channel_1:
+			TIM_OC1Init(dev_cfg->pixel_timer.timer, &dev_cfg->tim_oc_init);
+			TIM_OC1PreloadConfig(dev_cfg->pixel_timer.timer, TIM_OCPreload_Enable);
+			TIM_SetCompare1(dev_cfg->pixel_timer.timer, 1);
+			break;
+		case TIM_Channel_2:
+			TIM_OC2Init(dev_cfg->pixel_timer.timer, &dev_cfg->tim_oc_init);
+			TIM_OC2PreloadConfig(dev_cfg->pixel_timer.timer, TIM_OCPreload_Enable);
+			TIM_SetCompare2(dev_cfg->pixel_timer.timer, 1);
+			break;
+		case TIM_Channel_3:
+			TIM_OC3Init(dev_cfg->pixel_timer.timer, &dev_cfg->tim_oc_init);
+			TIM_OC3PreloadConfig(dev_cfg->pixel_timer.timer, TIM_OCPreload_Enable);
+			TIM_SetCompare3(dev_cfg->pixel_timer.timer, 1);
+			break;
+		case TIM_Channel_4:
+			TIM_OC4Init(dev_cfg->pixel_timer.timer, &dev_cfg->tim_oc_init);
+			TIM_OC4PreloadConfig(dev_cfg->pixel_timer.timer, TIM_OCPreload_Enable);
+			TIM_SetCompare4(dev_cfg->pixel_timer.timer, 1);
+			break;
+	}
+	TIM_ARRPreloadConfig(dev_cfg->pixel_timer.timer, ENABLE);
+	TIM_CtrlPWMOutputs(dev_cfg->pixel_timer.timer, ENABLE);
+
+	// Set up the timer to run the pixel clock on the next hsync
+	reset_hsync_timers();
+}
+
+void PIOS_Video_Init(const struct pios_video_cfg * cfg)
+{
 
 	dev_cfg = cfg; // store config before enabling interrupt
+
+	configure_hsync_timers();
 
 	if (cfg->mask.remap) {
 		GPIO_PinAFConfig(cfg->mask.sclk.gpio,

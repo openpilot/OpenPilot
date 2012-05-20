@@ -222,7 +222,6 @@ bool PIOS_USB_CheckAvailable(uint8_t id)
 		return 0;
 
 	usb_found = (usb_dev->cfg->vsense.gpio->IDR & usb_dev->cfg->vsense.init.GPIO_Pin);
-	return usb_found;
 	return usb_found != 0 && transfer_possible ? 1 : 0;
 }
 

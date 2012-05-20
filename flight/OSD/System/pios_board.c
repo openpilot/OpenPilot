@@ -348,6 +348,63 @@ uint32_t pios_com_telem_usb_id;
 uint32_t pios_com_telem_rf_id;
 uint32_t pios_com_cotelem_id;
 
+/**
+ * TIM3 is triggered by the HSYNC signal into its ETR line and will divide the 
+ *  APB1_CLOCK to generate a pixel clock that is used by the SPI CLK lines.
+ * TIM4 will be synced to it and will divide by that times the pixel width to
+ *  fire an IRQ when the last pixel of the line has been output.  Then the timer will
+ *  be rearmed and wait for the next HSYNC signal.  
+ * The critical timing detail is that the task be _DISABLED_ at the end of the line
+ *  before an extra pixel is clocked out
+ *  or we will need to configure the DMA task per line
+ */
+#include "pios_tim_priv.h"
+#define NTSC_PX_CLOCK  6797088
+#define PAL_PX_CLOCK   6750130
+#define PX_PERIOD      ((PIOS_PERIPHERAL_APB1_CLOCK / NTSC_PX_CLOCK) + 1)
+#define LINE_PERIOD    PX_PERIOD * GRAPHICS_WIDTH
+static const TIM_TimeBaseInitTypeDef tim_3_time_base = {
+	.TIM_Prescaler = 0, //PIOS_PERIPHERAL_APB1_CLOCK,
+	.TIM_ClockDivision = TIM_CKD_DIV1,
+	.TIM_CounterMode = TIM_CounterMode_Up,
+	.TIM_Period = PX_PERIOD - 1,
+	// Plus 1 to ensure rounded value errs on the side of faster clock
+	.TIM_RepetitionCounter = 0x0000,
+};
+
+static const TIM_TimeBaseInitTypeDef tim_4_time_base = {
+	.TIM_Prescaler = 0, //PIOS_PERIPHERAL_APB1_CLOCK,
+	.TIM_ClockDivision = TIM_CKD_DIV1,
+	.TIM_CounterMode = TIM_CounterMode_Up,
+	.TIM_Period = LINE_PERIOD - 1,
+	.TIM_RepetitionCounter = 0x0000,
+};
+
+const static struct pios_tim_clock_cfg pios_tim3_cfg = {
+	.timer = TIM3,
+	.time_base_init = &tim_3_time_base,
+	.irq = {
+		.init = {
+			.NVIC_IRQChannel                   = TIM3_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
+			.NVIC_IRQChannelSubPriority        = 0,
+			.NVIC_IRQChannelCmd                = ENABLE,
+		},
+	}
+};
+
+const static struct pios_tim_clock_cfg pios_tim4_cfg = {
+	.timer = TIM4,
+	.time_base_init = &tim_4_time_base,
+	.irq = {
+		.init = {
+			.NVIC_IRQChannel                   = TIM4_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGHEST,
+			.NVIC_IRQChannelSubPriority        = 0,
+			.NVIC_IRQChannelCmd                = ENABLE,
+		},
+	}
+};
 
 void PIOS_Board_Init(void) {
 
@@ -378,6 +435,10 @@ void PIOS_Board_Init(void) {
 		HwSettingsSetDefaults(HwSettingsHandle(), 0);
 		AlarmsSet(SYSTEMALARMS_ALARM_BOOTFAULT, SYSTEMALARMS_ALARM_CRITICAL);
 	}
+
+	// Start the pixel and line clock counter
+	PIOS_TIM_InitClock(&pios_tim3_cfg);
+	PIOS_TIM_InitClock(&pios_tim4_cfg);
 
 #if defined(PIOS_INCLUDE_RTC)
 	/* Initialize the real-time clock and its associated tick */

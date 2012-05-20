@@ -47,12 +47,8 @@ struct pios_video_cfg {
 	const struct pios_exti_cfg * hsync;
 	const struct pios_exti_cfg * vsync;
 
-	/*struct stm32_exti hsync;
-	struct stm32_exti vsync;
-	struct stm32_gpio hsync_io;
-	struct stm32_gpio vsync_io;
-	struct stm32_irq hsync_irq;
-	struct stm32_irq vsync_irq;*/
+	TIM_TypeDef * pixel_timer;
+	TIM_TypeDef * line_timer;
 };
 
 // Time vars

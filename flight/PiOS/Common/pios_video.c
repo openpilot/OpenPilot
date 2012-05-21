@@ -193,11 +193,14 @@ static void reset_hsync_timers()
 	// Stop both timers
 	TIM_Cmd(dev_cfg->pixel_timer.timer, DISABLE);
 
-	TIM_ETRConfig(dev_cfg->pixel_timer.timer, TIM_ExtTRGPSC_OFF,
-				  TIM_ExtTRGPolarity_NonInverted, 0);
+	GPIO_PinAFConfig(GPIOD, GPIO_Pin_2, GPIO_AF_TIM3);
+
+	//TIM_ETRClockMode1Config(dev_cfg->pixel_timer.timer, TIM_ExtTRGPSC_OFF, TIM_ExtTRGPolarity_NonInverted, 0);
+	//TIM_ETRConfig(dev_cfg->pixel_timer.timer, TIM_ExtTRGPSC_OFF, TIM_ExtTRGPolarity_NonInverted, 0);
 	TIM_SelectInputTrigger(dev_cfg->pixel_timer.timer, TIM_TS_ETRF);
 	TIM_SelectSlaveMode(dev_cfg->pixel_timer.timer, TIM_SlaveMode_Trigger);
-//	TIM_SelectMasterSlaveMode(dev_cfg->pixel_timer.timer, ENABLE);
+	TIM_SelectMasterSlaveMode(dev_cfg->pixel_timer.timer, TIM_MasterSlaveMode_Enable);
+
 	TIM_Cmd(dev_cfg->pixel_timer.timer, ENABLE);
 }
 /**
@@ -378,6 +381,8 @@ void DMA2_Stream5_IRQHandler(void) __attribute__ ((alias("PIOS_VIDEO_DMA_Handler
  */
 void PIOS_VIDEO_DMA_Handler(void)
 {
+	TIM_Cmd(dev_cfg->pixel_timer.timer, DISABLE);
+
 	if (DMA_GetFlagStatus(DMA1_Stream7,DMA_FLAG_TCIF7)) {	// whole double buffer filled
 
 		DMA_ClearFlag(DMA1_Stream7,DMA_FLAG_TCIF7);

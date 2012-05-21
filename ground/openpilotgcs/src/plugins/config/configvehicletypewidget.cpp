@@ -233,7 +233,7 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
     setupGroundVehicleUI( m_aircraft->groundVehicleType->currentText() );
     setupFixedWingUI( m_aircraft->fixedWingType->currentText() );
 	
-    disbleMouseWheelEvents();
+    disableMouseWheelEvents();
 }
 
 

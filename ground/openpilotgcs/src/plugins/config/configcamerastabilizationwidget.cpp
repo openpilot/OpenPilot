@@ -90,7 +90,7 @@ ConfigCameraStabilizationWidget::ConfigCameraStabilizationWidget(QWidget *parent
     connect(m_camerastabilization->camerastabilizationSaveSD, SIGNAL(clicked()), this, SLOT(saveSettings()));
     connect(m_camerastabilization->camerastabilizationHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
 
-    disbleMouseWheelEvents();
+    disableMouseWheelEvents();
 }
 
 ConfigCameraStabilizationWidget::~ConfigCameraStabilizationWidget()

@@ -1,7 +1,6 @@
 <xml>
     <object name="PathPlannerSettings" singleinstance="true" settings="true">
         <description>Settings for the @ref PathPlanner Module</description>
-	<field name="PathMode" units="" type="enum" elements="1" options="ENDPOINT,PATH" defaultvalue="PATH"/>
 	<field name="PreprogrammedPath" units="" type="enum" elements="1" options="NONE,10M_BOX,LOGO" defaultvalue="NONE"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>

@@ -51,7 +51,6 @@ struct pios_video_cfg {
 	struct pios_tim_channel hsync_capture;
 
 	TIM_OCInitTypeDef tim_oc_init;
-	TIM_TypeDef * line_timer;
 };
 
 // Time vars

@@ -166,7 +166,6 @@ static void configure_hsync_timers()
 {
 	// Stop both timers
 	TIM_Cmd(dev_cfg->pixel_timer.timer, DISABLE);
-	TIM_Cmd(dev_cfg->line_timer, DISABLE);
 
 	TIM_DeInit(dev_cfg->pixel_timer.timer);
 

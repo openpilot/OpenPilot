@@ -626,7 +626,6 @@ static const struct pios_video_cfg pios_video_cfg = {
 	.hsync = &pios_exti_hsync_cfg,
 	.vsync = &pios_exti_vsync_cfg,
 	
-	.line_timer = TIM3,
 	.pixel_timer = {
 		.timer = TIM4,
 		.timer_chan = TIM_Channel_1,

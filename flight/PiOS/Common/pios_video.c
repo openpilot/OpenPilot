@@ -246,14 +246,14 @@ void PIOS_Video_Init(const struct pios_video_cfg * cfg)
 
 	configure_hsync_timers();
 
-	if (cfg->mask.remap) {
-		GPIO_PinAFConfig(cfg->mask.sclk.gpio,
-				__builtin_ctz(cfg->mask.sclk.init.GPIO_Pin),
-				cfg->mask.remap);
-		GPIO_PinAFConfig(cfg->mask.mosi.gpio,
-				__builtin_ctz(cfg->mask.mosi.init.GPIO_Pin),
-				cfg->mask.remap);
-	}
+//	if (cfg->mask.remap) {
+//		GPIO_PinAFConfig(cfg->mask.sclk.gpio,
+//				__builtin_ctz(cfg->mask.sclk.init.GPIO_Pin),
+//				cfg->mask.remap);
+//		GPIO_PinAFConfig(cfg->mask.mosi.gpio,
+//				__builtin_ctz(cfg->mask.mosi.init.GPIO_Pin),
+//				cfg->mask.remap);
+//	}
 	if (cfg->level.remap)
 	{
 		GPIO_PinAFConfig(cfg->level.sclk.gpio,
@@ -267,8 +267,8 @@ void PIOS_Video_Init(const struct pios_video_cfg * cfg)
 	}
 
 	/* SPI3 MASTER MASKBUFFER */
-	GPIO_Init(cfg->mask.sclk.gpio, (GPIO_InitTypeDef*)&(cfg->mask.sclk.init));
-	GPIO_Init(cfg->mask.mosi.gpio, (GPIO_InitTypeDef*)&(cfg->mask.mosi.init));
+//	GPIO_Init(cfg->mask.sclk.gpio, (GPIO_InitTypeDef*)&(cfg->mask.sclk.init));
+//	GPIO_Init(cfg->mask.mosi.gpio, (GPIO_InitTypeDef*)&(cfg->mask.mosi.init));
 
 	/* SPI1 SLAVE FRAMEBUFFER */
 	GPIO_Init(cfg->level.sclk.gpio, (GPIO_InitTypeDef*)&(cfg->level.sclk.init));
@@ -283,8 +283,8 @@ void PIOS_Video_Init(const struct pios_video_cfg * cfg)
 	SPI_Cmd(cfg->mask.regs, ENABLE);
 
 	/* Configure DMA for SPI Tx MASTER */
-	DMA_Cmd(cfg->mask.dma.tx.channel, DISABLE);
-	DMA_Init(cfg->mask.dma.tx.channel, (DMA_InitTypeDef*)&(cfg->mask.dma.tx.init));
+//	DMA_Cmd(cfg->mask.dma.tx.channel, DISABLE);
+//	DMA_Init(cfg->mask.dma.tx.channel, (DMA_InitTypeDef*)&(cfg->mask.dma.tx.init));
 
 	/* Configure DMA for SPI Tx SLAVE */
 	DMA_Cmd(cfg->level.dma.tx.channel, DISABLE);
@@ -292,22 +292,16 @@ void PIOS_Video_Init(const struct pios_video_cfg * cfg)
 
 
 	/* Trigger interrupt when for half conversions too to indicate double buffer */
-	//DMA_ITConfig(cfg->mask.dma.tx.channel, DMA_IT_TC, ENABLE);
 	DMA_ITConfig(cfg->level.dma.tx.channel, DMA_IT_TC, ENABLE);
-	/*DMA_ClearFlag(cfg->mask.dma.tx.channel,DMA_FLAG_TCIF5);
-	DMA_ClearITPendingBit(cfg->mask.dma.tx.channel, DMA_IT_TCIF5);
 
-	DMA_ClearFlag(cfg->level.dma.tx.channel,DMA_FLAG_TCIF5);
-	DMA_ClearITPendingBit(cfg->level.dma.tx.channel, DMA_IT_TCIF5);
-*/
     draw_buffer_level = buffer0_level;
     draw_buffer_mask = buffer0_mask;
     disp_buffer_level = buffer1_level;
     disp_buffer_mask = buffer1_mask;
 
 	/* Configure DMA interrupt */
+//	NVIC_Init(&cfg->mask.dma.irq.init);
 	NVIC_Init(&cfg->level.dma.irq.init);
-	NVIC_Init(&cfg->mask.dma.irq.init);
 
 	/* double buffer config */
 	for (uint16_t x = 0; x < GRAPHICS_WIDTH*GRAPHICS_HEIGHT; x++) {
@@ -319,22 +313,19 @@ void PIOS_Video_Init(const struct pios_video_cfg * cfg)
 		  draw_buffer_mask[x] = 0;
 	}
 
-	DMA_DoubleBufferModeConfig(cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[GRAPHICS_WIDTH],DMA_Memory_0);
+//	DMA_DoubleBufferModeConfig(cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[GRAPHICS_WIDTH],DMA_Memory_0);
 	DMA_DoubleBufferModeConfig(cfg->level.dma.tx.channel,(uint32_t)&disp_buffer_level[GRAPHICS_WIDTH],DMA_Memory_0);
 
+//	DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[0],DMA_Memory_0);
 	DMA_MemoryTargetConfig(dev_cfg->level.dma.tx.channel,(uint32_t)&disp_buffer_level[0],DMA_Memory_0);
-	DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[0],DMA_Memory_0);
 
 	/* Enable double buffering */
-	DMA_DoubleBufferModeCmd(cfg->mask.dma.tx.channel,ENABLE);
+//	DMA_DoubleBufferModeCmd(cfg->mask.dma.tx.channel,ENABLE);
 	DMA_DoubleBufferModeCmd(cfg->level.dma.tx.channel,ENABLE);
 
 	/* Enable SPI interrupts to DMA */
+//	SPI_I2S_DMACmd(cfg->mask.regs, SPI_I2S_DMAReq_Tx, ENABLE);
 	SPI_I2S_DMACmd(cfg->level.regs, SPI_I2S_DMAReq_Tx, ENABLE);
-	SPI_I2S_DMACmd(cfg->mask.regs, SPI_I2S_DMAReq_Tx, ENABLE);
-
-	//DMA_Cmd(dev_cfg->level.dma.tx.channel, ENABLE);
-	//DMA_Cmd(dev_cfg->mask.dma.tx.channel, ENABLE);
 
 	/* Configure the Video Line interrupt */
 	PIOS_EXTI_Init(cfg->hsync);

@@ -142,7 +142,7 @@ static void reset_hsync_timers()
 	TIM_Cmd(dev_cfg->pixel_timer.timer, DISABLE);
 
 	// Listen to Channel1 (HSYNC)
-	TIM_SelectInputTrigger(dev_cfg->pixel_timer.timer, TIM_TS_TI1FP1);
+	TIM_SelectInputTrigger(dev_cfg->pixel_timer.timer, TIM_TS_TI2FP2);
 	TIM_SelectSlaveMode(dev_cfg->pixel_timer.timer, TIM_SlaveMode_Trigger);
 	TIM_SelectMasterSlaveMode(dev_cfg->pixel_timer.timer, TIM_MasterSlaveMode_Enable);
 }

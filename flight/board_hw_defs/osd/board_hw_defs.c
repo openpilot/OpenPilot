@@ -363,11 +363,11 @@ const struct pios_usb_cdc_cfg pios_usb_cdc_cfg = {
 #include <pios_video.h>
 static const struct pios_exti_cfg pios_exti_hsync_cfg __exti_config = {
 	.vector = PIOS_Hsync_ISR,
-	.line = EXTI_Line2,
+	.line = EXTI_Line7,
 	.pin = {
-		.gpio = GPIOD,
+		.gpio = GPIOB,
 		.init = {
-			.GPIO_Pin = GPIO_Pin_2,
+			.GPIO_Pin = GPIO_Pin_7,
 			.GPIO_Speed = GPIO_Speed_100MHz,
 			.GPIO_Mode = GPIO_Mode_IN,
 			.GPIO_OType = GPIO_OType_OD,
@@ -376,7 +376,7 @@ static const struct pios_exti_cfg pios_exti_hsync_cfg __exti_config = {
 	},
 	.irq = {
 		.init = {
-			.NVIC_IRQChannel = EXTI2_IRQn,
+			.NVIC_IRQChannel = EXTI7_IRQn,
 			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGHEST,
 			.NVIC_IRQChannelSubPriority = 0,
 			.NVIC_IRQChannelCmd = ENABLE,
@@ -384,7 +384,7 @@ static const struct pios_exti_cfg pios_exti_hsync_cfg __exti_config = {
 	},
 	.exti = {
 		.init = {
-			.EXTI_Line = EXTI_Line2, // matches above GPIO pin
+			.EXTI_Line = EXTI_Line7, // matches above GPIO pin
 			.EXTI_Mode = EXTI_Mode_Interrupt,
 			//.EXTI_Trigger = EXTI_Trigger_Rising_Falling,
 			.EXTI_Trigger = EXTI_Trigger_Falling,
@@ -394,11 +394,11 @@ static const struct pios_exti_cfg pios_exti_hsync_cfg __exti_config = {
 };
 static const struct pios_exti_cfg pios_exti_vsync_cfg __exti_config = {
 		.vector = PIOS_Vsync_ISR,
-		.line = EXTI_Line11,
+		.line = EXTI_Line5,
 		.pin = {
-			.gpio = GPIOC,
+			.gpio = GPIOB,
 			.init = {
-				.GPIO_Pin = GPIO_Pin_11,
+				.GPIO_Pin = GPIO_Pin_5,
 				.GPIO_Speed = GPIO_Speed_100MHz,
 				.GPIO_Mode = GPIO_Mode_IN,
 				.GPIO_OType = GPIO_OType_OD,
@@ -407,7 +407,7 @@ static const struct pios_exti_cfg pios_exti_vsync_cfg __exti_config = {
 		},
 		.irq = {
 			.init = {
-				.NVIC_IRQChannel = EXTI15_10_IRQn,
+				.NVIC_IRQChannel = EXTI5_IRQn,
 				.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
 				.NVIC_IRQChannelSubPriority = 0,
 				.NVIC_IRQChannelCmd = ENABLE,
@@ -415,7 +415,7 @@ static const struct pios_exti_cfg pios_exti_vsync_cfg __exti_config = {
 		},
 		.exti = {
 			.init = {
-				.EXTI_Line = EXTI_Line11, // matches above GPIO pin
+				.EXTI_Line = EXTI_Line5, // matches above GPIO pin
 				.EXTI_Mode = EXTI_Mode_Interrupt,
 				.EXTI_Trigger = EXTI_Trigger_Falling,
 				.EXTI_LineCmd = ENABLE,
@@ -626,22 +626,22 @@ static const struct pios_video_cfg pios_video_cfg = {
 	.hsync = &pios_exti_hsync_cfg,
 	.vsync = &pios_exti_vsync_cfg,
 	
-	.line_timer = TIM4,
+	.line_timer = TIM3,
 	.pixel_timer = {
-		.timer = TIM3,
-		.timer_chan = TIM_Channel_2,
+		.timer = TIM4,
+		.timer_chan = TIM_Channel_1,
 		.pin = {
 			.gpio = GPIOB,
 			.init = {
-				.GPIO_Pin = GPIO_Pin_5,
+				.GPIO_Pin = GPIO_Pin_6,
 				.GPIO_Speed = GPIO_Speed_2MHz,
 				.GPIO_Mode  = GPIO_Mode_AF,
 				.GPIO_OType = GPIO_OType_PP,
 				.GPIO_PuPd  = GPIO_PuPd_UP
 			},
-			.pin_source = GPIO_PinSource5,
+			.pin_source = GPIO_PinSource6,
 		},
-		.remap = GPIO_AF_TIM3,
+		.remap = GPIO_AF_TIM4,
 	},
 	.tim_oc_init = {
 		.TIM_OCMode = TIM_OCMode_PWM1,

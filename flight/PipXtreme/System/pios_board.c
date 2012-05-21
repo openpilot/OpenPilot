@@ -57,6 +57,7 @@ uint32_t pios_com_trans_com_id = 0;
 uint32_t pios_com_debug_id = 0;
 uint32_t pios_com_rfm22b_id = 0;
 uint32_t pios_rfm22b_id = 0;
+uint32_t pios_ppm_rcvr_id = 0;
 
 /**
  * PIOS_Board_Init()
@@ -243,9 +244,6 @@ void PIOS_Board_Init(void) {
 		}
 		break;
 	}
-	case PIPXSETTINGS_TELEMETRYCONFIG_PPM_IN:
-	case PIPXSETTINGS_TELEMETRYCONFIG_PPM_OUT:
-	case PIPXSETTINGS_TELEMETRYCONFIG_RSSI:
 	case PIPXSETTINGS_TELEMETRYCONFIG_DISABLED:
 		break;
 	}
@@ -285,6 +283,16 @@ void PIOS_Board_Init(void) {
 		break;
 	}
 	case PIPXSETTINGS_FLEXICONFIG_PPM_IN:
+#if defined(PIOS_INCLUDE_PPM)
+	{
+			uint32_t pios_ppm_id;
+			PIOS_PPM_Init(&pios_ppm_id, &pios_ppm_cfg);
+
+			if (PIOS_RCVR_Init(&pios_ppm_rcvr_id, &pios_ppm_rcvr_driver, pios_ppm_id)) {
+				PIOS_Assert(0);
+			}
+		}
+#endif	/* PIOS_INCLUDE_PPM */
 	case PIPXSETTINGS_FLEXICONFIG_PPM_OUT:
 	case PIPXSETTINGS_FLEXICONFIG_RSSI:
 	case PIPXSETTINGS_FLEXICONFIG_DISABLED:

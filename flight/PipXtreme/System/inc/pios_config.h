@@ -44,7 +44,6 @@
 
 /* Supported receiver interfaces */
 #define PIOS_INCLUDE_PPM
-#define PIOS_INCLUDE_PWM
 
 /* Supported USART-based PIOS modules */
 #define PIOS_INCLUDE_SPI

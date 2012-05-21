@@ -76,6 +76,7 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 #define PIOS_WDG_SENDPACKET      0x0004
 #define PIOS_WDG_SENDDATA        0x0008
 #define PIOS_WDG_TRANSCOMM       0x0010
+#define PIOS_WDG_PPMINPUT        0x0020
 
 //------------------------
 // TELEMETRY
@@ -159,6 +160,7 @@ extern uint32_t pios_com_uavtalk_com_id;
 extern uint32_t pios_com_trans_com_id;
 extern uint32_t pios_com_debug_id;
 extern uint32_t pios_com_rfm22b_id;
+extern uint32_t pios_ppm_rcvr_id;
 #define PIOS_COM_USB_HID           (pios_com_telem_usb_id)
 #define PIOS_COM_TELEMETRY         (pios_com_telemetry_id)
 #define PIOS_COM_FLEXI             (pios_com_flexi_id)
@@ -168,6 +170,7 @@ extern uint32_t pios_com_rfm22b_id;
 #define PIOS_COM_DEBUG             (pios_com_debug_id)
 #define PIOS_COM_RADIO             (pios_com_rfm22b_id)
 #define PIOS_COM_TELEM_USB         PIOS_COM_USB_HID
+#define PIOS_PPM_RECEIVER          (pios_ppm_rcvr_id)
 
 #define DEBUG_LEVEL 2
 #if DEBUG_LEVEL > 0
@@ -221,18 +224,14 @@ extern uint32_t pios_com_rfm22b_id;
 //------------------------
 #define PIOS_RCVR_MAX_DEVS          3
 #define PIOS_RCVR_MAX_CHANNELS      12
+#define PIOS_GCSRCVR_TIMEOUT_MS     100
 
 //-------------------------
 // Receiver PPM input
 //-------------------------
 #define PIOS_PPM_MAX_DEVS     1
 #define PIOS_PPM_NUM_INPUTS   12
-
-//-------------------------
-// Receiver PWM input
-//-------------------------
-#define PIOS_PWM_MAX_DEVS    1
-#define PIOS_PWM_NUM_INPUTS   1
+#define PIOS_PPM_PACKET_UPDATE_PERIOD_MS 25
 
 //-------------------------
 // Servo outputs

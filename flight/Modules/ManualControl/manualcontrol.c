@@ -792,7 +792,7 @@ static bool forcedDisArm(void)
 	SystemAlarmsData alarms;
 	SystemAlarmsGet(&alarms);
 
-	if (alarms.Alarm[SYSTEMALARMS_ALARM_FORCEDISARM] == SYSTEMALARMS_ALARM_CRITICAL) {
+	if (alarms.Alarm[SYSTEMALARMS_ALARM_GUIDANCE] == SYSTEMALARMS_ALARM_CRITICAL) {
 		return true;
 	}
 	return false;

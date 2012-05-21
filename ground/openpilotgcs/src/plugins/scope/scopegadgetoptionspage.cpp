@@ -72,22 +72,22 @@ QWidget* ScopeGadgetOptionsPage::createPage(QWidget *parent)
     if(options_page->cmbUAVObjects->currentIndex() >= 0)
         on_cmbUAVObjects_currentIndexChanged(options_page->cmbUAVObjects->currentText());
 
-    options_page->cmbScale->addItem("E-9", -9);
-    options_page->cmbScale->addItem("E-6", -6);
-    options_page->cmbScale->addItem("E-5",-5);
-    options_page->cmbScale->addItem("E-4",-4);
-    options_page->cmbScale->addItem("E-3",-3);
-    options_page->cmbScale->addItem("E-2",-2);
-    options_page->cmbScale->addItem("E-1",-1);
-    options_page->cmbScale->addItem("E0",0);
-    options_page->cmbScale->addItem("E1",1);
-    options_page->cmbScale->addItem("E2",2);
-    options_page->cmbScale->addItem("E3",3);
-    options_page->cmbScale->addItem("E4",4);
-    options_page->cmbScale->addItem("E5",5);
-    options_page->cmbScale->addItem("E6",6);
-    options_page->cmbScale->addItem("E9",9);
-    options_page->cmbScale->addItem("E12",12);
+    options_page->cmbScale->addItem("10^-9", -9);
+    options_page->cmbScale->addItem("10^-6", -6);
+    options_page->cmbScale->addItem("10^-5",-5);
+    options_page->cmbScale->addItem("10^-4",-4);
+    options_page->cmbScale->addItem("10^-3",-3);
+    options_page->cmbScale->addItem("10^-2",-2);
+    options_page->cmbScale->addItem("10^-1",-1);
+    options_page->cmbScale->addItem("1",0);
+    options_page->cmbScale->addItem("10^1",1);
+    options_page->cmbScale->addItem("10^2",2);
+    options_page->cmbScale->addItem("10^3",3);
+    options_page->cmbScale->addItem("10^4",4);
+    options_page->cmbScale->addItem("10^5",5);
+    options_page->cmbScale->addItem("10^6",6);
+    options_page->cmbScale->addItem("10^9",9);
+    options_page->cmbScale->addItem("10^12",12);
     options_page->cmbScale->setCurrentIndex(7);
 
     //Set widget values from settings

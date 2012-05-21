@@ -202,7 +202,7 @@
        <item row="8" column="0">
         <widget class="QLabel" name="label_6">
          <property name="text">
-          <string>Scale:</string>
+          <string>Y-axis scale factor:</string>
          </property>
         </widget>
        </item>

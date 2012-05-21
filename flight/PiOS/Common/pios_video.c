@@ -35,6 +35,7 @@
 // Private methods
 static void stop_hsync_timers();
 static void reset_hsync_timers();
+static void prepare_line(uint32_t line_num);
 
 // Private variables
 extern xSemaphoreHandle osdSemaphore;
@@ -95,21 +96,8 @@ void PIOS_Hsync_ISR()
 	// On tenth line prepare data which will start clocking out on 11th line
 	if(Vsync_update==10 && (DMA_GetCmdStatus(dev_cfg->level.dma.tx.channel)!=ENABLE))
 	{
-		// load first line of data
-		DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[0],DMA_Memory_0);
-		DMA_MemoryTargetConfig(dev_cfg->level.dma.tx.channel,(uint32_t)&disp_buffer_level[0],DMA_Memory_0);
-
-		// load second line of data
-		DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[GRAPHICS_WIDTH],DMA_Memory_1);
-		DMA_MemoryTargetConfig(dev_cfg->level.dma.tx.channel,(uint32_t)&disp_buffer_level[GRAPHICS_WIDTH],DMA_Memory_1);
-
-		// Enable DMA, Slave first
-		DMA_SetCurrDataCounter(dev_cfg->level.dma.tx.channel,BUFFER_LINE_LENGTH);
-		DMA_SetCurrDataCounter(dev_cfg->mask.dma.tx.channel,BUFFER_LINE_LENGTH);
-		DMA_Cmd(dev_cfg->level.dma.tx.channel, ENABLE);
-		DMA_Cmd(dev_cfg->mask.dma.tx.channel, ENABLE);
-
-		reset_hsync_timers();
+		prepare_line(0);
+		gActiveLine = 1;
 	}
 	Vsync_update++;
 }
@@ -339,6 +327,29 @@ void PIOS_Video_Init(const struct pios_video_cfg * cfg)
 	PIOS_EXTI_Init(cfg->vsync);
 }
 
+/**
+ * Prepare the system to watch for a HSYNC pulse to trigger the pixel
+ * clock and clock out the next line
+ */
+static void prepare_line(uint32_t line_num)
+{
+
+	uint32_t buf_offset = line_num * GRAPHICS_WIDTH;
+
+	// load first line of data
+	DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[buf_offset],DMA_Memory_0);
+	DMA_MemoryTargetConfig(dev_cfg->level.dma.tx.channel,(uint32_t)&disp_buffer_level[buf_offset],DMA_Memory_0);
+
+	// Enable DMA, Slave first
+	DMA_SetCurrDataCounter(dev_cfg->level.dma.tx.channel,BUFFER_LINE_LENGTH);
+	DMA_SetCurrDataCounter(dev_cfg->mask.dma.tx.channel,BUFFER_LINE_LENGTH);
+
+	reset_hsync_timers();
+
+	DMA_Cmd(dev_cfg->level.dma.tx.channel, ENABLE);
+	DMA_Cmd(dev_cfg->mask.dma.tx.channel, ENABLE);
+}
+
 void PIOS_VIDEO_DMA_Handler(void);
 void DMA1_Stream7_IRQHandler(void) __attribute__ ((alias("PIOS_VIDEO_DMA_Handler")));
 void DMA2_Stream5_IRQHandler(void) __attribute__ ((alias("PIOS_VIDEO_DMA_Handler")));
@@ -356,12 +367,9 @@ void PIOS_VIDEO_DMA_Handler(void)
 {
 	PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
 
-	reset_hsync_timers();
-
+	// Handle flags from mask channel, not used
 	if (DMA_GetFlagStatus(DMA1_Stream7,DMA_FLAG_TCIF7)) {	// whole double buffer filled
-
 		DMA_ClearFlag(DMA1_Stream7,DMA_FLAG_TCIF7);
-		//PIOS_LED_Toggle(LED2);
 	}
 	else if (DMA_GetFlagStatus(DMA1_Stream7,DMA_FLAG_HTIF7)) {
 		DMA_ClearFlag(DMA1_Stream7,DMA_FLAG_HTIF7);
@@ -369,24 +377,14 @@ void PIOS_VIDEO_DMA_Handler(void)
 	else {
 
 	}
-
+	
+	// Handle flags from stream channel
 	if (DMA_GetFlagStatus(dev_cfg->level.dma.tx.channel,DMA_FLAG_TCIF5)) {	// whole double buffer filled
 
 		line = gActiveLine*GRAPHICS_WIDTH;
 		if(gActiveLine < GRAPHICS_HEIGHT-2)
 		{
-			// Load new line
-			switch(DMA_GetCurrentMemoryTarget(dev_cfg->mask.dma.tx.channel))
-			{
-			case 0:
-				DMA_MemoryTargetConfig(dev_cfg->level.dma.tx.channel,(uint32_t)&disp_buffer_level[line],DMA_Memory_1);
-				DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[line],DMA_Memory_1);
-				break;
-			case 1:
-				DMA_MemoryTargetConfig(dev_cfg->level.dma.tx.channel,(uint32_t)&disp_buffer_level[line],DMA_Memory_0);
-				DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[line],DMA_Memory_0);
-				break;
-			}
+			prepare_line(gActiveLine);
 		}
 		else if(gActiveLine == GRAPHICS_HEIGHT-2)
 		{
@@ -397,13 +395,10 @@ void PIOS_VIDEO_DMA_Handler(void)
 			// STOP DMA, master first
 			DMA_Cmd(dev_cfg->mask.dma.tx.channel, DISABLE);
 			DMA_Cmd(dev_cfg->level.dma.tx.channel, DISABLE);
-			gActiveLine = 0;
 		}
 		gActiveLine++;
 
-
 		DMA_ClearFlag(dev_cfg->level.dma.tx.channel,DMA_FLAG_TCIF5);
-		//PIOS_LED_Toggle(LED3);
 	}
 	else if (DMA_GetFlagStatus(dev_cfg->level.dma.tx.channel,DMA_FLAG_HTIF5)) {
 		DMA_ClearFlag(dev_cfg->level.dma.tx.channel,DMA_FLAG_HTIF5);

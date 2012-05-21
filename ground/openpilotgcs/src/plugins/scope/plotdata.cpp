@@ -87,7 +87,7 @@ PlotData::~PlotData()
 }
 
 
-bool SequencialPlotData::append(UAVObject* obj)
+bool SequentialPlotData::append(UAVObject* obj)
 {
     if (uavObject == obj->getName()) {
 

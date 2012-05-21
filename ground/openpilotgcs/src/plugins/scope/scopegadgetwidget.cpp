@@ -269,9 +269,9 @@ void ScopeGadgetWidget::showCurve(QwtPlotItem *item, bool on)
 	mutex.unlock();
 }
 
-void ScopeGadgetWidget::setupSequencialPlot()
+void ScopeGadgetWidget::setupSequentialPlot()
 {
-    preparePlot(SequencialPlot);
+    preparePlot(SequentialPlot);
 
 //	QwtText title("Index");
 ////	title.setFont(QFont("Helvetica", 20));
@@ -356,8 +356,8 @@ void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavFieldSubField
 {
     PlotData* plotData;
 
-    if (m_plotType == SequencialPlot)
-        plotData = new SequencialPlotData(uavObject, uavFieldSubField);
+    if (m_plotType == SequentialPlot)
+        plotData = new SequentialPlotData(uavObject, uavFieldSubField);
     else if (m_plotType == ChronoPlot)
         plotData = new ChronoPlotData(uavObject, uavFieldSubField);
     //else if (m_plotType == UAVObjectPlot)
@@ -471,7 +471,7 @@ void ScopeGadgetWidget::replotNewData()
 
 void ScopeGadgetWidget::setupExamplePlot()
 {
-    preparePlot(SequencialPlot);
+    preparePlot(SequentialPlot);
 
     // Show the axes
 

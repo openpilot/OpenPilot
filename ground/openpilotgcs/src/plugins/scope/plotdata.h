@@ -44,7 +44,7 @@
 \brief Defines the different type of plots.
   */
 enum PlotType {
-    SequencialPlot,
+    SequentialPlot,
     ChronoPlot,
     UAVObjectPlot,
 
@@ -93,16 +93,16 @@ signals:
 };
 
 /*!
-  \brief The sequencial plot have a fixed size buffer of data. All the curves in one plot
+  \brief The sequential plot have a fixed size buffer of data. All the curves in one plot
   have the same size buffer.
   */
-class SequencialPlotData : public PlotData
+class SequentialPlotData : public PlotData
 {
     Q_OBJECT
 public:
-    SequencialPlotData(QString uavObject, QString uavField)
+    SequentialPlotData(QString uavObject, QString uavField)
             : PlotData(uavObject, uavField) {}
-    ~SequencialPlotData() {}
+    ~SequentialPlotData() {}
 
     /*!
       \brief Append new data to the plot
@@ -113,7 +113,7 @@ public:
       \brief The type of plot
       */
     virtual PlotType plotType() {
-        return SequencialPlot;
+        return SequentialPlot;
     }
 
     /*!

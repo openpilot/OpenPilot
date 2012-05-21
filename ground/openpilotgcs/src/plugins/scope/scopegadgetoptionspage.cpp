@@ -53,7 +53,7 @@ QWidget* ScopeGadgetOptionsPage::createPage(QWidget *parent)
     //main layout
     options_page->setupUi(optionsPageWidget);
 
-    options_page->cmbPlotType->addItem("Sequencial Plot","");
+    options_page->cmbPlotType->addItem("Sequential Plot","");
     options_page->cmbPlotType->addItem("Chronological Plot","");
 
     // Fills the combo boxes for the UAVObjects

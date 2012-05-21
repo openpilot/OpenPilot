@@ -70,7 +70,7 @@ public:
     ScopeGadgetWidget(QWidget *parent = 0);
     ~ScopeGadgetWidget();
 
-    void setupSequencialPlot();
+    void setupSequentialPlot();
     void setupChronoPlot();
     void setupUAVObjectPlot();
     PlotType plotType(){return m_plotType;}

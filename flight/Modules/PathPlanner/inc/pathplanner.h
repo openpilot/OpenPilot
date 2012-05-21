@@ -2,11 +2,11 @@
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
  * @{
- * @addtogroup FlightPlan Flight Plan Module
+ * @addtogroup PathPlanner Flight Plan Module
  * @brief Executes flight plan scripts in Python
  * @{
  *
- * @file       flightplan.c
+ * @file       pathplanner.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      Executes flight plan scripts in Python
  *
@@ -28,9 +28,9 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef FLIGHTPLAN_H
-#define FLIGHTPLAN_H
+#ifndef PATHPLANNER_H
+#define PATHPLANNER_H
 
-int32_t FlightPlanInitialize();
+// public initialisations go here
 
-#endif // FLIGHTPLAN_H
+#endif // PATHPLANNER_H

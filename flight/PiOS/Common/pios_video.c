@@ -289,34 +289,19 @@ void PIOS_Video_Init(const struct pios_video_cfg * cfg)
 	/* Trigger interrupt when for half conversions too to indicate double buffer */
 	DMA_ITConfig(cfg->level.dma.tx.channel, DMA_IT_TC, ENABLE);
 
+	/* Configure and clear buffers */
     draw_buffer_level = buffer0_level;
     draw_buffer_mask = buffer0_mask;
     disp_buffer_level = buffer1_level;
     disp_buffer_mask = buffer1_mask;
+	memset(disp_buffer_mask, 0, GRAPHICS_WIDTH*GRAPHICS_HEIGHT);
+	memset(disp_buffer_level, 0, GRAPHICS_WIDTH*GRAPHICS_HEIGHT);
+	memset(draw_buffer_mask, 0, GRAPHICS_WIDTH*GRAPHICS_HEIGHT);
+	memset(draw_buffer_level, 0, GRAPHICS_WIDTH*GRAPHICS_HEIGHT);
 
 	/* Configure DMA interrupt */
 	NVIC_Init(&cfg->mask.dma.irq.init);
 	NVIC_Init(&cfg->level.dma.irq.init);
-
-	/* double buffer config */
-	for (uint16_t x = 0; x < GRAPHICS_WIDTH*GRAPHICS_HEIGHT; x++) {
-		  disp_buffer_level[x] = 0;
-		  disp_buffer_mask[x] = 0;
-	}
-	for (uint16_t x = 0; x < GRAPHICS_WIDTH*GRAPHICS_HEIGHT; x++) {
-		  draw_buffer_level[x] = 0;
-		  draw_buffer_mask[x] = 0;
-	}
-
-	DMA_DoubleBufferModeConfig(cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[GRAPHICS_WIDTH],DMA_Memory_0);
-	DMA_DoubleBufferModeConfig(cfg->level.dma.tx.channel,(uint32_t)&disp_buffer_level[GRAPHICS_WIDTH],DMA_Memory_0);
-
-	DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[0],DMA_Memory_0);
-	DMA_MemoryTargetConfig(dev_cfg->level.dma.tx.channel,(uint32_t)&disp_buffer_level[0],DMA_Memory_0);
-
-	/* Enable double buffering */
-	DMA_DoubleBufferModeCmd(cfg->mask.dma.tx.channel,ENABLE);
-	DMA_DoubleBufferModeCmd(cfg->level.dma.tx.channel,ENABLE);
 
 	/* Enable SPI interrupts to DMA */
 	SPI_I2S_DMACmd(cfg->mask.regs, SPI_I2S_DMAReq_Tx, ENABLE);

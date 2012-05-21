@@ -204,22 +204,22 @@ static void configure_hsync_timers()
 		case TIM_Channel_1:
 			TIM_OC1Init(dev_cfg->pixel_timer.timer, &dev_cfg->tim_oc_init);
 			TIM_OC1PreloadConfig(dev_cfg->pixel_timer.timer, TIM_OCPreload_Enable);
-			TIM_SetCompare1(dev_cfg->pixel_timer.timer, 7);
+			TIM_SetCompare1(dev_cfg->pixel_timer.timer, 12);
 			break;
 		case TIM_Channel_2:
 			TIM_OC2Init(dev_cfg->pixel_timer.timer, &dev_cfg->tim_oc_init);
 			TIM_OC2PreloadConfig(dev_cfg->pixel_timer.timer, TIM_OCPreload_Enable);
-			TIM_SetCompare2(dev_cfg->pixel_timer.timer, 7);
+			TIM_SetCompare2(dev_cfg->pixel_timer.timer, 12);
 			break;
 		case TIM_Channel_3:
 			TIM_OC3Init(dev_cfg->pixel_timer.timer, &dev_cfg->tim_oc_init);
 			TIM_OC3PreloadConfig(dev_cfg->pixel_timer.timer, TIM_OCPreload_Enable);
-			TIM_SetCompare3(dev_cfg->pixel_timer.timer, 7);
+			TIM_SetCompare3(dev_cfg->pixel_timer.timer, 12);
 			break;
 		case TIM_Channel_4:
 			TIM_OC4Init(dev_cfg->pixel_timer.timer, &dev_cfg->tim_oc_init);
 			TIM_OC4PreloadConfig(dev_cfg->pixel_timer.timer, TIM_OCPreload_Enable);
-			TIM_SetCompare4(dev_cfg->pixel_timer.timer, 7);
+			TIM_SetCompare4(dev_cfg->pixel_timer.timer, 12);
 			break;
 	}
 	TIM_ARRPreloadConfig(dev_cfg->pixel_timer.timer, ENABLE);
@@ -228,7 +228,7 @@ static void configure_hsync_timers()
 	// This shouldn't be needed as it should come from the config struture.  Something
 	// is clobbering that
 	TIM_PrescalerConfig(dev_cfg->pixel_timer.timer, 0, TIM_PSCReloadMode_Immediate);
-	TIM_SetAutoreload(dev_cfg->pixel_timer.timer, 15);
+	TIM_SetAutoreload(dev_cfg->pixel_timer.timer, 25);
 
 	// Set up the timer to run the pixel clock on the next hsync
 	reset_hsync_timers();

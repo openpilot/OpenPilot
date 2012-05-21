@@ -85,6 +85,7 @@ typedef struct {
 	xTaskHandle sendDataTaskHandle;
 	xTaskHandle radioStatusTaskHandle;
 	xTaskHandle transparentCommTaskHandle;
+	xTaskHandle ppmInputTaskHandle;
 
 	// The UAVTalk connection on the com side.
 	UAVTalkConnection inUAVTalkCon;
@@ -135,6 +136,7 @@ static void sendPacketTask(void *parameters);
 static void sendDataTask(void *parameters);
 static void transparentCommTask(void * parameters);
 static void radioStatusTask(void *parameters);
+static void ppmInputTask(void *parameters);
 static int32_t transmitData(uint8_t * data, int32_t length);
 static int32_t transmitPacket(PHPacketHandle packet);
 static void receiveData(uint8_t *buf, uint8_t len);
@@ -166,6 +168,8 @@ static int32_t RadioComBridgeStart(void)
 		xTaskCreate(sendPacketTask, (signed char *)"SendPacketTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY + 2, &(data->sendPacketTaskHandle));
 		xTaskCreate(sendDataTask, (signed char *)"SendDataTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY+ 2, &(data->sendDataTaskHandle));
 		xTaskCreate(radioStatusTask, (signed char *)"RadioStatus", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->radioStatusTaskHandle));
+		if(PIOS_PPM_RECEIVER)
+			xTaskCreate(ppmInputTask, (signed char *)"PPMInputTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY + 2, &(data->ppmInputTaskHandle));
 #ifdef PIOS_INCLUDE_WDG
 		PIOS_WDG_RegisterFlag(PIOS_WDG_COMUAVTALK);
 		if(PIOS_COM_TRANS_COM)
@@ -173,6 +177,8 @@ static int32_t RadioComBridgeStart(void)
 		PIOS_WDG_RegisterFlag(PIOS_WDG_RADIORECEIVE);
 		PIOS_WDG_RegisterFlag(PIOS_WDG_SENDPACKET);
 		//PIOS_WDG_RegisterFlag(PIOS_WDG_SENDDATA);
+		if(PIOS_PPM_RECEIVER)
+			PIOS_WDG_RegisterFlag(PIOS_WDG_PPMINPUT);
 #endif
 		return 0;
 	}
@@ -330,7 +336,8 @@ static void comUAVTalkTask(void *parameters)
 		if (state == UAVTALK_STATE_COMPLETE)
 		{
 			// Is this a local UAVObject?
-			if (iproc->obj != NULL)
+			// We only generate GcsReceiver ojects, we don't consume them.
+			if ((iproc->obj != NULL) && (iproc->objId != GCSRECEIVER_OBJID))
 			{
 				// We treat the ObjectPersistence object differently
 				if(iproc->objId == OBJECTPERSISTENCE_OBJID)
@@ -678,9 +685,6 @@ static void transparentCommTask(void * parameters)
 static void radioStatusTask(void *parameters)
 {
 	PHStatusPacket status_packet;
-	status_packet.header.destination_id = 0xffffffff;
-	status_packet.header.type = PACKET_TYPE_STATUS;
-	status_packet.header.data_size = PH_STATUS_DATA_SIZE(&status_packet);
 
 	while (1) {
 		PipXStatusData pipxStatus;
@@ -691,7 +695,6 @@ static void radioStatusTask(void *parameters)
 		PipXSettingsPairIDGet(&pairID);
 
 		// Update the status
-		PIOS_BL_HELPER_FLASH_Read_Description(pipxStatus.Description, PIPXSTATUS_DESCRIPTION_NUMELEM);
 		pipxStatus.DeviceID = PIOS_RFM22B_DeviceID(pios_rfm22b_id);
 		pipxStatus.RSSI = PIOS_RFM22B_RSSI(pios_rfm22b_id);
 		pipxStatus.Retries = data->comTxRetries;
@@ -730,6 +733,9 @@ static void radioStatusTask(void *parameters)
 			if(cntr++ == RADIOSTATS_UPDATE_PERIOD_MS / STATS_UPDATE_PERIOD_MS)
 			{
 				// Queue the status message
+				status_packet.header.destination_id = 0xffffffff;
+				status_packet.header.type = PACKET_TYPE_STATUS;
+				status_packet.header.data_size = PH_STATUS_DATA_SIZE(&status_packet);
 				status_packet.header.source_id = pipxStatus.DeviceID;
 				status_packet.header.rssi = pipxStatus.RSSI;
 				status_packet.retries = data->comTxRetries;
@@ -744,6 +750,37 @@ static void radioStatusTask(void *parameters)
 
 		// Delay until the next update period.
 		vTaskDelay(STATS_UPDATE_PERIOD_MS / portTICK_RATE_MS);
+	}
+}
+
+/**
+ * The PPM input task.
+ */
+static void ppmInputTask(void *parameters)
+{
+	PHPpmPacket ppm_packet;
+	PHPacketHandle pph = (PHPacketHandle)&ppm_packet;
+
+	while (1) {
+
+#ifdef PIOS_INCLUDE_WDG
+		// Update the watchdog timer.
+		PIOS_WDG_UpdateFlag(PIOS_WDG_PPMINPUT);
+#endif /* PIOS_INCLUDE_WDG */
+
+		// Send the PPM packet
+		for (uint8_t i = 1; i <= PIOS_PPM_NUM_INPUTS; ++i)
+			ppm_packet.channels[i - 1] = PIOS_RCVR_Read(PIOS_PPM_RECEIVER, i);
+
+		// Send the packet.
+		ppm_packet.header.destination_id = data->destination_id;
+		ppm_packet.header.source_id = PIOS_RFM22B_DeviceID(pios_rfm22b_id);
+		ppm_packet.header.type = PACKET_TYPE_PPM;
+		ppm_packet.header.data_size = PH_PPM_DATA_SIZE(&ppm_packet);
+		xQueueSend(data->sendPacketQueue, &pph, MAX_PORT_DELAY);
+
+		// Delay until the next update period.
+		vTaskDelay(PIOS_PPM_PACKET_UPDATE_PERIOD_MS / portTICK_RATE_MS);
 	}
 }
 

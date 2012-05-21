@@ -236,6 +236,89 @@ void PIOS_ADC_handler() {
 
 #endif	/* PIOS_INCLUDE_ADC */
 
+#if defined(PIOS_INCLUDE_TIM)
+
+#include "pios_tim_priv.h"
+
+static const TIM_TimeBaseInitTypeDef tim_1_2_3_4_time_base = {
+	.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1,
+	.TIM_ClockDivision = TIM_CKD_DIV1,
+	.TIM_CounterMode = TIM_CounterMode_Up,
+	.TIM_Period = ((1000000 / PIOS_SERVO_UPDATE_HZ) - 1),
+	.TIM_RepetitionCounter = 0x0000,
+};
+
+static const struct pios_tim_clock_cfg tim_1_cfg = {
+	.timer = TIM1,
+	.time_base_init = &tim_1_2_3_4_time_base,
+	.irq = {
+		.init = {
+			.NVIC_IRQChannel                   = TIM1_CC_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
+			.NVIC_IRQChannelSubPriority        = 0,
+			.NVIC_IRQChannelCmd                = ENABLE,
+		},
+	},
+};
+
+static const struct pios_tim_clock_cfg tim_2_cfg = {
+	.timer = TIM2,
+	.time_base_init = &tim_1_2_3_4_time_base,
+	.irq = {
+		.init = {
+			.NVIC_IRQChannel                   = TIM2_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
+			.NVIC_IRQChannelSubPriority        = 0,
+			.NVIC_IRQChannelCmd                = ENABLE,
+		},
+	},
+};
+
+static const struct pios_tim_clock_cfg tim_3_cfg = {
+	.timer = TIM3,
+	.time_base_init = &tim_1_2_3_4_time_base,
+	.irq = {
+		.init = {
+			.NVIC_IRQChannel                   = TIM3_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
+			.NVIC_IRQChannelSubPriority        = 0,
+			.NVIC_IRQChannelCmd                = ENABLE,
+		},
+	},
+};
+
+static const struct pios_tim_clock_cfg tim_4_cfg = {
+	.timer = TIM4,
+	.time_base_init = &tim_1_2_3_4_time_base,
+	.irq = {
+		.init = {
+			.NVIC_IRQChannel                   = TIM4_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
+			.NVIC_IRQChannelSubPriority        = 0,
+			.NVIC_IRQChannelCmd                = ENABLE,
+		},
+	},
+};
+
+static const struct pios_tim_channel pios_tim_ppm_flexi_port = {
+	//.timer = TIM2,
+	.timer = TIM4,
+	//.timer_chan = TIM_Channel_4,
+	.timer_chan = TIM_Channel_4,
+	.pin = {
+		.gpio = GPIOB,
+		.init = {
+			//.GPIO_Pin   = GPIO_Pin_11,
+			.GPIO_Pin   = GPIO_Pin_9,
+			.GPIO_Mode  = GPIO_Mode_IPD,
+			.GPIO_Speed = GPIO_Speed_2MHz,
+		},
+	},
+	//.remap = GPIO_PartialRemap_TIM2,
+};
+
+#endif	/* PIOS_INCLUDE_TIM */
+
 #if defined(PIOS_INCLUDE_USART)
 
 #include <pios_usart_priv.h>
@@ -359,71 +442,29 @@ void PIOS_RTC_IRQ_Handler (void)
 
 #endif
 
-#if defined(PIOS_INCLUDE_TIM)
+/*
+ * PPM Inputs
+ */
+#if defined(PIOS_INCLUDE_PPM)
+#include <pios_ppm_priv.h>
 
-#include "pios_tim_priv.h"
-
-static const TIM_TimeBaseInitTypeDef tim_1_2_3_4_time_base = {
-	.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1,
-	.TIM_ClockDivision = TIM_CKD_DIV1,
-	.TIM_CounterMode = TIM_CounterMode_Up,
-	.TIM_Period = ((1000000 / PIOS_SERVO_UPDATE_HZ) - 1),
-	.TIM_RepetitionCounter = 0x0000,
-};
-
-static const struct pios_tim_clock_cfg tim_1_cfg = {
-	.timer = TIM1,
-	.time_base_init = &tim_1_2_3_4_time_base,
-	.irq = {
-		.init = {
-			.NVIC_IRQChannel                   = TIM1_CC_IRQn,
-			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
-			.NVIC_IRQChannelSubPriority        = 0,
-			.NVIC_IRQChannelCmd                = ENABLE,
-		},
+const struct pios_ppm_cfg pios_ppm_cfg = {
+	.tim_ic_init = {
+		.TIM_ICPolarity = TIM_ICPolarity_Rising,
+		.TIM_ICSelection = TIM_ICSelection_DirectTI,
+		.TIM_ICPrescaler = TIM_ICPSC_DIV1,
+		.TIM_ICFilter = 0x0,
 	},
+	.channels = &pios_tim_ppm_flexi_port,
+	.num_channels = 1,
 };
 
-static const struct pios_tim_clock_cfg tim_2_cfg = {
-	.timer = TIM2,
-	.time_base_init = &tim_1_2_3_4_time_base,
-	.irq = {
-		.init = {
-			.NVIC_IRQChannel                   = TIM2_IRQn,
-			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
-			.NVIC_IRQChannelSubPriority        = 0,
-			.NVIC_IRQChannelCmd                = ENABLE,
-		},
-	},
-};
+#endif	/* PIOS_INCLUDE_PPM */
 
-static const struct pios_tim_clock_cfg tim_3_cfg = {
-	.timer = TIM3,
-	.time_base_init = &tim_1_2_3_4_time_base,
-	.irq = {
-		.init = {
-			.NVIC_IRQChannel                   = TIM3_IRQn,
-			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
-			.NVIC_IRQChannelSubPriority        = 0,
-			.NVIC_IRQChannelCmd                = ENABLE,
-		},
-	},
-};
+#if defined(PIOS_INCLUDE_RCVR)
+#include "pios_rcvr_priv.h"
 
-static const struct pios_tim_clock_cfg tim_4_cfg = {
-	.timer = TIM4,
-	.time_base_init = &tim_1_2_3_4_time_base,
-	.irq = {
-		.init = {
-			.NVIC_IRQChannel                   = TIM4_IRQn,
-			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
-			.NVIC_IRQChannelSubPriority        = 0,
-			.NVIC_IRQChannelCmd                = ENABLE,
-		},
-	},
-};
-
-#endif	/* PIOS_INCLUDE_TIM */
+#endif /* PIOS_INCLUDE_RCVR */
 
 #if defined(PIOS_INCLUDE_USB)
 #include "pios_usb_priv.h"

@@ -353,7 +353,7 @@ uint8_t PHReceivePacket(PHInstHandle h, PHPacketHandle p, bool rx_error)
 
 		if (!rx_error)
 
-			// Pass on the channels to the PPM handler.
+			// Pass on the channels to the status handler.
 			if(data->status_handler)
 				data->status_handler((PHStatusPacketHandle)p);
 

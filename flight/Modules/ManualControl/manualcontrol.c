@@ -767,6 +767,21 @@ static bool okToArm(void)
 
 	return true;
 }
+/**
+ * @brief Determine if the aircraft is forced to disarm by an explicit alarm
+ * @returns True if safe to arm, false otherwise
+ */
+static bool forcedDisArm(void)
+{
+	// read alarms
+	SystemAlarmsData alarms;
+	SystemAlarmsGet(&alarms);
+
+	if (alarms.Alarm[SYSTEMALARMS_ALARM_FORCEDISARM] == SYSTEMALARMS_ALARM_CRITICAL) {
+		return true;
+	}
+	return false;
+}
 
 /**
  * @brief Update the flightStatus object only if value changed.  Reduces callbacks
@@ -791,6 +806,12 @@ static void processArm(ManualControlCommandData * cmd, ManualControlSettingsData
 {
 
 	bool lowThrottle = cmd->Throttle <= 0;
+
+	if (forcedDisArm()) {
+		// PathPlanner forces explicit disarming due to error condition (crash, impact, fire, ...)
+		setArmedIfChanged(FLIGHTSTATUS_ARMED_DISARMED);
+		return;
+	}
 
 	if (settings->Arming == MANUALCONTROLSETTINGS_ARMING_ALWAYSDISARMED) {
 		// In this configuration we always disarm

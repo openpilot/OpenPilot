@@ -404,10 +404,12 @@ void deviceWidget::uploadFirmware()
     status("Starting firmware upload", STATUSICON_RUNNING);
     // We don't know which device was used previously, so we
     // are cautious and reenter DFU for this deviceID:
+    emit uploadStarted();
     if(!m_dfu->enterDFU(deviceID))
     {
         status("Error:Could not enter DFU mode", STATUSICON_FAIL);
         myDevice->updateButton->setEnabled(true);
+        emit uploadEnded(false);
         return;
     }
     OP_DFU::Status ret=m_dfu->StatusRequest();
@@ -421,6 +423,7 @@ void deviceWidget::uploadFirmware()
     if(!retstatus ) {
         status("Could not start upload", STATUSICON_FAIL);
         myDevice->updateButton->setEnabled(true);
+        emit uploadEnded(false);
         return;
     }
     status("Uploading, please wait...", STATUSICON_RUNNING);
@@ -480,6 +483,7 @@ void deviceWidget::uploadFinished(OP_DFU::Status retstatus)
     disconnect(m_dfu, SIGNAL(operationProgress(QString)), this, SLOT(dfuStatus(QString)));
     if(retstatus != OP_DFU::Last_operation_Success) {
         status(QString("Upload failed with code: ") + m_dfu->StatusToString(retstatus).toLatin1().data(), STATUSICON_FAIL);
+        emit uploadEnded(false);
         return;
     } else
         if (!descriptionArray.isEmpty()) {
@@ -489,6 +493,7 @@ void deviceWidget::uploadFinished(OP_DFU::Status retstatus)
             retstatus = m_dfu->UploadDescription(descriptionArray);
             if( retstatus != OP_DFU::Last_operation_Success) {
                 status(QString("Upload failed with code: ") + m_dfu->StatusToString(retstatus).toLatin1().data(), STATUSICON_FAIL);
+                emit uploadEnded(false);
                 return;
             }
 
@@ -499,10 +504,12 @@ void deviceWidget::uploadFinished(OP_DFU::Status retstatus)
             retstatus = m_dfu->UploadDescription(myDevice->description->text());
             if( retstatus != OP_DFU::Last_operation_Success) {
                 status(QString("Upload failed with code: ") + m_dfu->StatusToString(retstatus).toLatin1().data(), STATUSICON_FAIL);
+                emit uploadEnded(false);
                 return;
             }
         }
     populate();
+    emit uploadEnded(true);
     status("Upload successful", STATUSICON_OK);
 
 }

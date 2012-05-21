@@ -247,8 +247,8 @@ void PIOS_Video_Init(const struct pios_video_cfg * cfg)
 		GPIO_PinAFConfig(cfg->mask.sclk.gpio,
 				__builtin_ctz(cfg->mask.sclk.init.GPIO_Pin),
 				cfg->mask.remap);
-		GPIO_PinAFConfig(cfg->mask.mosi.gpio,
-				__builtin_ctz(cfg->mask.mosi.init.GPIO_Pin),
+		GPIO_PinAFConfig(cfg->mask.miso.gpio,
+				__builtin_ctz(cfg->mask.miso.init.GPIO_Pin),
 				cfg->mask.remap);
 	}
 	if (cfg->level.remap)

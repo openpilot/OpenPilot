@@ -94,74 +94,22 @@ void PIOS_Hsync_ISR()
 	if(Vsync_update==11 && (DMA_GetCmdStatus(dev_cfg->level.dma.tx.channel)!=ENABLE))
 	{
 		// load first line of data
+//		DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[0],DMA_Memory_0);
 		DMA_MemoryTargetConfig(dev_cfg->level.dma.tx.channel,(uint32_t)&disp_buffer_level[0],DMA_Memory_0);
-		DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[0],DMA_Memory_0);
+
 		// load second line of data
+//		DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[GRAPHICS_WIDTH],DMA_Memory_1);
 		DMA_MemoryTargetConfig(dev_cfg->level.dma.tx.channel,(uint32_t)&disp_buffer_level[GRAPHICS_WIDTH],DMA_Memory_1);
-		DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[GRAPHICS_WIDTH],DMA_Memory_1);
 
 		// Enable DMA, Slave first
 		DMA_SetCurrDataCounter(dev_cfg->level.dma.tx.channel,BUFFER_LINE_LENGTH);
-		DMA_SetCurrDataCounter(dev_cfg->mask.dma.tx.channel,BUFFER_LINE_LENGTH);
+//		DMA_SetCurrDataCounter(dev_cfg->mask.dma.tx.channel,BUFFER_LINE_LENGTH);
 		DMA_Cmd(dev_cfg->level.dma.tx.channel, ENABLE);
-		DMA_Cmd(dev_cfg->mask.dma.tx.channel, ENABLE);
+//		DMA_Cmd(dev_cfg->mask.dma.tx.channel, ENABLE);
+
+		reset_hsync_timers();
 	}
 	Vsync_update++;
-
-	reset_hsync_timers();
-
-#if 0
-	//if(dev_cfg->hsync->pin.gpio->IDR & dev_cfg->hsync->pin.init.GPIO_Pin) {
-			/*if(gLineType == LINE_TYPE_GRAPHICS)
-			{
-				for(int g=0;g<10;g++)
-				{
-					asm("nop");
-				}
-				// Activate new line
-				DMA_Cmd(dev_cfg->level.dma.tx.channel, ENABLE);
-				DMA_Cmd(dev_cfg->mask.dma.tx.channel, ENABLE);
-			}*/
-	//} else
-	{
-		//falling
-		/*gLineType = LINE_TYPE_UNKNOWN; // Default case
-		gActiveLine++;
-		if ((gActiveLine >= GRAPHICS_LINE) && (gActiveLine < (GRAPHICS_LINE + GRAPHICS_HEIGHT))) {
-			gLineType = LINE_TYPE_GRAPHICS;
-			gActivePixmapLine = (gActiveLine - GRAPHICS_LINE);
-			line = gActivePixmapLine*GRAPHICS_WIDTH;
-		}*/
-		line = gActiveLine*GRAPHICS_WIDTH;
-		if(gActiveLine < GRAPHICS_HEIGHT-2)
-		{
-			// Load new line
-			switch(DMA_GetCurrentMemoryTarget(dev_cfg->mask.dma.tx.channel))
-			{
-			case 0:
-				DMA_MemoryTargetConfig(dev_cfg->level.dma.tx.channel,(uint32_t)&disp_buffer_level[line],DMA_Memory_1);
-				DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[line],DMA_Memory_1);
-				break;
-			case 1:
-				DMA_MemoryTargetConfig(dev_cfg->level.dma.tx.channel,(uint32_t)&disp_buffer_level[line],DMA_Memory_0);
-				DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[line],DMA_Memory_0);
-				break;
-			}
-		}
-		else if(gActiveLine == GRAPHICS_HEIGHT-2)
-		{
-			// Do nothing
-		}
-		else if(gActiveLine >= GRAPHICS_HEIGHT-1)
-		{
-			// STOP DMA, master first
-			DMA_Cmd(dev_cfg->mask.dma.tx.channel, DISABLE);
-			DMA_Cmd(dev_cfg->level.dma.tx.channel, DISABLE);
-			gActiveLine = 0;
-		}
-		gActiveLine++;
-	}
-#endif
 }
 
 void PIOS_Vsync_ISR() {
@@ -193,15 +141,10 @@ static void reset_hsync_timers()
 	// Stop both timers
 	TIM_Cmd(dev_cfg->pixel_timer.timer, DISABLE);
 
-	GPIO_PinAFConfig(GPIOD, GPIO_Pin_2, GPIO_AF_TIM3);
-
-	//TIM_ETRClockMode1Config(dev_cfg->pixel_timer.timer, TIM_ExtTRGPSC_OFF, TIM_ExtTRGPolarity_NonInverted, 0);
-	//TIM_ETRConfig(dev_cfg->pixel_timer.timer, TIM_ExtTRGPSC_OFF, TIM_ExtTRGPolarity_NonInverted, 0);
-	TIM_SelectInputTrigger(dev_cfg->pixel_timer.timer, TIM_TS_ETRF);
+	// Listen to Channel1 (HSYNC)
+	TIM_SelectInputTrigger(dev_cfg->pixel_timer.timer, TIM_TS_TI1FP1);
 	TIM_SelectSlaveMode(dev_cfg->pixel_timer.timer, TIM_SlaveMode_Trigger);
 	TIM_SelectMasterSlaveMode(dev_cfg->pixel_timer.timer, TIM_MasterSlaveMode_Enable);
-
-	TIM_Cmd(dev_cfg->pixel_timer.timer, ENABLE);
 }
 /**
  * Called when the last pixel is clocked.
@@ -222,11 +165,44 @@ static void configure_hsync_timers()
 	TIM_Cmd(dev_cfg->pixel_timer.timer, DISABLE);
 	TIM_Cmd(dev_cfg->line_timer, DISABLE);
 
+	TIM_DeInit(dev_cfg->pixel_timer.timer);
+
 	// This is overkill but used for consistency.  No interrupts used for pixel clock
 	// but this function calls the GPIO_Remap
 	uint32_t tim_id;
 	const struct pios_tim_channel *channels = &dev_cfg->pixel_timer;
 	PIOS_TIM_InitChannels(&tim_id, channels, 1, &px_callback, 0);
+
+	GPIO_InitTypeDef GPIO_InitStructure;
+	
+	/* TIM3_CH1 pin (PC.06) configuration */
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_Init(GPIOC, &GPIO_InitStructure);
+	GPIO_PinAFConfig(GPIOC, GPIO_PinSource6, GPIO_AF_TIM3);
+	
+	/* TIM3_CH2 pin (PB0.5) configuration */
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5;
+	GPIO_Init(GPIOB, &GPIO_InitStructure);	
+	GPIO_PinAFConfig(GPIOB, GPIO_PinSource5, GPIO_AF_TIM3);
+	
+	/* TIM3_ETR pin (PD.02) configuration */
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;
+	GPIO_Init(GPIOD, &GPIO_InitStructure);	
+	GPIO_PinAFConfig(GPIOD, GPIO_PinSource2, GPIO_AF_TIM3);
+	
+	TIM_ICInitTypeDef  TIM_ICInitStructure;
+	TIM_ICInitStructure.TIM_Channel = TIM_Channel_1;
+	TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Rising;
+	TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
+	TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
+	TIM_ICInitStructure.TIM_ICFilter = 0;
+	
+	TIM_ICInit(dev_cfg->pixel_timer.timer, &TIM_ICInitStructure);
+
 
 	// Set up the channel to output the pixel clock
 	switch(dev_cfg->pixel_timer.timer_chan) {
@@ -238,7 +214,7 @@ static void configure_hsync_timers()
 		case TIM_Channel_2:
 			TIM_OC2Init(dev_cfg->pixel_timer.timer, &dev_cfg->tim_oc_init);
 			TIM_OC2PreloadConfig(dev_cfg->pixel_timer.timer, TIM_OCPreload_Enable);
-			TIM_SetCompare2(dev_cfg->pixel_timer.timer, 10);
+			TIM_SetCompare2(dev_cfg->pixel_timer.timer, 7);
 			break;
 		case TIM_Channel_3:
 			TIM_OC3Init(dev_cfg->pixel_timer.timer, &dev_cfg->tim_oc_init);
@@ -381,7 +357,9 @@ void DMA2_Stream5_IRQHandler(void) __attribute__ ((alias("PIOS_VIDEO_DMA_Handler
  */
 void PIOS_VIDEO_DMA_Handler(void)
 {
-	TIM_Cmd(dev_cfg->pixel_timer.timer, DISABLE);
+	PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
+
+	reset_hsync_timers();
 
 	if (DMA_GetFlagStatus(DMA1_Stream7,DMA_FLAG_TCIF7)) {	// whole double buffer filled
 

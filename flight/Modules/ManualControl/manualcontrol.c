@@ -641,7 +641,7 @@ static void updatePathDesired(ManualControlCommandData * cmd, bool changed,bool 
 		PathDesiredGet(&pathDesired);
 		pathDesired.End[PATHDESIRED_END_NORTH] = 0;
 		pathDesired.End[PATHDESIRED_END_EAST] = 0;
-		pathDesired.End[PATHDESIRED_END_DOWN] = positionActual.Down;
+		pathDesired.End[PATHDESIRED_END_DOWN] = positionActual.Down - 1;
 		pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
 		PathDesiredSet(&pathDesired);
 	} else if(changed) {
@@ -653,7 +653,7 @@ static void updatePathDesired(ManualControlCommandData * cmd, bool changed,bool 
 		PathDesiredGet(&pathDesired);
 		pathDesired.End[PATHDESIRED_END_NORTH] = positionActual.North;
 		pathDesired.End[PATHDESIRED_END_EAST] = positionActual.East;
-		pathDesired.End[PATHDESIRED_END_DOWN] = positionActual.Down;
+		pathDesired.End[PATHDESIRED_END_DOWN] = positionActual.Down - 1;
 		pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
 		PathDesiredSet(&pathDesired);
 	} else {

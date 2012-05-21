@@ -44,21 +44,17 @@
 #define  Pi 3.14159265358979323846
 
 
-ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
+ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : VehicleConfig(parent)
 {
     int i;
-    
-    m_ccpm = new Ui_ccpmWidget();
-    m_ccpm->setupUi(this);
     SwashLvlConfigurationInProgress=0;
     SwashLvlState=0;
     SwashLvlServoInterlock=0;
     updatingFromHardware=FALSE;
     updatingToHardware=FALSE;
 
-    // Now connect the widget to the ManualControlCommand / Channel UAVObject
-    //ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    //UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    m_ccpm = new Ui_ccpmWidget();
+    m_ccpm->setupUi(this);
 
     // Initialization of the swashplaye widget
     m_ccpm->SwashplateImage->setScene(new QGraphicsScene(this));
@@ -148,20 +144,20 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
     Q_ASSERT(curve2source);
 
     QStringList channels;
-    channels << "Channel1" << "Channel2" << "Channel3" << "Channel4" <<
-                "Channel5" << "Channel6" << "Channel7" << "Channel8" << "None";
+    channels  << "None" << "Channel1" << "Channel2" << "Channel3" << "Channel4" <<
+                "Channel5" << "Channel6" << "Channel7" << "Channel8";
     m_ccpm->ccpmEngineChannel->addItems(channels);
-    m_ccpm->ccpmEngineChannel->setCurrentIndex(8);
+    m_ccpm->ccpmEngineChannel->setCurrentIndex(0);
     m_ccpm->ccpmTailChannel->addItems(channels);
-    m_ccpm->ccpmTailChannel->setCurrentIndex(8);
+    m_ccpm->ccpmTailChannel->setCurrentIndex(0);
     m_ccpm->ccpmServoWChannel->addItems(channels);
-    m_ccpm->ccpmServoWChannel->setCurrentIndex(8);
+    m_ccpm->ccpmServoWChannel->setCurrentIndex(0);
     m_ccpm->ccpmServoXChannel->addItems(channels);
-    m_ccpm->ccpmServoXChannel->setCurrentIndex(8);
+    m_ccpm->ccpmServoXChannel->setCurrentIndex(0);
     m_ccpm->ccpmServoYChannel->addItems(channels);
-    m_ccpm->ccpmServoYChannel->setCurrentIndex(8);
+    m_ccpm->ccpmServoYChannel->setCurrentIndex(0);
     m_ccpm->ccpmServoZChannel->addItems(channels);
-    m_ccpm->ccpmServoZChannel->setCurrentIndex(8);
+    m_ccpm->ccpmServoZChannel->setCurrentIndex(0);
 
     QStringList Types;
     Types << QString::fromUtf8("CCPM 2 Servo 90º") << QString::fromUtf8("CCPM 3 Servo 90º") <<
@@ -170,11 +166,13 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
              QString::fromUtf8("Custom - User Angles") << QString::fromUtf8("Custom - Advanced Settings");
     m_ccpm->ccpmType->addItems(Types);
     m_ccpm->ccpmType->setCurrentIndex(m_ccpm->ccpmType->count() - 1);
-    requestccpmUpdate();
+
     UpdateCurveSettings();
 
     //disable changing number of points in curves until UAVObjects have more than 5
     m_ccpm->NumCurvePoints->setEnabled(0);
+
+    refreshWidgetsValues(QString("HeliCP"));
 
     UpdateType();
 
@@ -229,13 +227,91 @@ ConfigccpmWidget::~ConfigccpmWidget()
    // Do nothing
 }
 
+void ConfigccpmWidget::setupUI(QString frameType)
+{
+}
+
+void ConfigccpmWidget::ResetActuators(GUIConfigDataUnion* configData)
+{
+    configData->heli.Throttle = 0;
+    configData->heli.Tail = 0;
+    configData->heli.ServoIndexW = 0;
+    configData->heli.ServoIndexX = 0;
+    configData->heli.ServoIndexY = 0;
+    configData->heli.ServoIndexZ = 0;
+}
+
+QStringList ConfigccpmWidget::getChannelDescriptions()
+{
+    int i;
+    QStringList channelDesc;
+
+    // init a channel_numelem list of channel desc defaults
+    for (i=0; i < (int)(ConfigccpmWidget::CHANNEL_NUMELEM); i++)
+    {
+        channelDesc.append(QString("-"));
+    }
+
+    // get the gui config data
+    GUIConfigDataUnion configData = GetConfigData();
+    heliGUISettingsStruct heli = configData.heli;
+
+    if (heli.Throttle > 0)
+        channelDesc[heli.Throttle - 1] = QString("Throttle");
+    if (heli.Tail > 0)
+        channelDesc[heli.Tail - 1] = QString("Tail");
+
+    switch(heli.FirstServoIndex)
+    {
+        case 0:  //front
+            if (heli.ServoIndexW > 0)
+                channelDesc[heli.ServoIndexW - 1] = QString("Elevator");
+            if (heli.ServoIndexX > 0)
+                channelDesc[heli.ServoIndexX - 1] = QString("Roll1");
+            if (heli.ServoIndexY > 0)
+                channelDesc[heli.ServoIndexY - 1] = QString("Roll2");
+        break;
+
+        case 1:  //right
+            if (heli.ServoIndexW > 0)
+                channelDesc[heli.ServoIndexW - 1] = QString("ServoW");
+            if (heli.ServoIndexX > 0)
+                channelDesc[heli.ServoIndexX - 1] = QString("ServoX");
+            if (heli.ServoIndexY > 0)
+                channelDesc[heli.ServoIndexY - 1] = QString("ServoY");
+        break;
+
+        case 2:  //rear
+            if (heli.ServoIndexW > 0)
+                channelDesc[heli.ServoIndexW - 1] = QString("Elevator");
+            if (heli.ServoIndexX > 0)
+                channelDesc[heli.ServoIndexX - 1] = QString("Roll1");
+            if (heli.ServoIndexY > 0)
+                channelDesc[heli.ServoIndexY - 1] = QString("Roll2");
+        break;
+
+        case 3:  //left
+            if (heli.ServoIndexW > 0)
+                channelDesc[heli.ServoIndexW - 1] = QString("ServoW");
+            if (heli.ServoIndexX > 0)
+                channelDesc[heli.ServoIndexX - 1] = QString("ServoX");
+            if (heli.ServoIndexY > 0)
+                channelDesc[heli.ServoIndexY - 1] = QString("ServoY");
+        break;
+
+    }
+    if (heli.ServoIndexZ > 0)
+        channelDesc[heli.ServoIndexZ - 1] = QString("ServoZ");
+
+    return channelDesc;
+}
+
 void ConfigccpmWidget::UpdateType()
 {
     int TypeInt,SingleServoIndex,NumServosDefined;
     QString TypeText;
     double AdjustmentAngle=0;
 
-    UpdateCCPMOptionsFromUI();
     SetUIComponentVisibilities();
     
     TypeInt = m_ccpm->ccpmType->count() - m_ccpm->ccpmType->currentIndex()-1;
@@ -283,8 +359,8 @@ void ConfigccpmWidget::UpdateType()
             m_ccpm->ccpmAngleZ->setValue(0);
             m_ccpm->ccpmAngleY->setEnabled(0);
             m_ccpm->ccpmAngleZ->setEnabled(0);
-            m_ccpm->ccpmServoYChannel->setCurrentIndex(8);
-            m_ccpm->ccpmServoZChannel->setCurrentIndex(8);
+            m_ccpm->ccpmServoYChannel->setCurrentIndex(0);
+            m_ccpm->ccpmServoZChannel->setCurrentIndex(0);
             m_ccpm->ccpmServoYChannel->setEnabled(0);
             m_ccpm->ccpmServoZChannel->setEnabled(0);
             //m_ccpm->ccpmCorrectionAngle->setValue(0);
@@ -298,7 +374,7 @@ void ConfigccpmWidget::UpdateType()
             m_ccpm->ccpmAngleY->setValue(fmod(AdjustmentAngle + 180,360));
             m_ccpm->ccpmAngleZ->setValue(0);
             m_ccpm->ccpmAngleZ->setEnabled(0);
-            m_ccpm->ccpmServoZChannel->setCurrentIndex(8);
+            m_ccpm->ccpmServoZChannel->setCurrentIndex(0);
             m_ccpm->ccpmServoZChannel->setEnabled(0);
             //m_ccpm->ccpmCorrectionAngle->setValue(0);
             NumServosDefined=3;
@@ -323,7 +399,7 @@ void ConfigccpmWidget::UpdateType()
             m_ccpm->ccpmAngleY->setValue(fmod(AdjustmentAngle + 240,360));
             m_ccpm->ccpmAngleZ->setValue(0);
             m_ccpm->ccpmAngleZ->setEnabled(0);
-            m_ccpm->ccpmServoZChannel->setCurrentIndex(8);
+            m_ccpm->ccpmServoZChannel->setCurrentIndex(0);
             m_ccpm->ccpmServoZChannel->setEnabled(0);
             //m_ccpm->ccpmCorrectionAngle->setValue(0);
             NumServosDefined=3;
@@ -336,7 +412,7 @@ void ConfigccpmWidget::UpdateType()
             m_ccpm->ccpmAngleY->setValue(fmod(AdjustmentAngle + 220,360));
             m_ccpm->ccpmAngleZ->setValue(0);
             m_ccpm->ccpmAngleZ->setEnabled(0);
-            m_ccpm->ccpmServoZChannel->setCurrentIndex(8);
+            m_ccpm->ccpmServoZChannel->setCurrentIndex(0);
             m_ccpm->ccpmServoZChannel->setEnabled(0);
             //m_ccpm->ccpmCorrectionAngle->setValue(0);
             NumServosDefined=3;
@@ -350,8 +426,8 @@ void ConfigccpmWidget::UpdateType()
             m_ccpm->ccpmAngleZ->setValue(0);
             m_ccpm->ccpmAngleY->setEnabled(0);
             m_ccpm->ccpmAngleZ->setEnabled(0);
-            m_ccpm->ccpmServoYChannel->setCurrentIndex(8);
-            m_ccpm->ccpmServoZChannel->setCurrentIndex(8);
+            m_ccpm->ccpmServoYChannel->setCurrentIndex(0);
+            m_ccpm->ccpmServoZChannel->setCurrentIndex(0);
             m_ccpm->ccpmServoYChannel->setEnabled(0);
             m_ccpm->ccpmServoZChannel->setEnabled(0);
             //m_ccpm->ccpmCorrectionAngle->setValue(0);
@@ -735,10 +811,10 @@ void ConfigccpmWidget::ccpmSwashplateRedraw()
     defined[1]=(m_ccpm->ccpmServoXChannel->isEnabled());
     defined[2]=(m_ccpm->ccpmServoYChannel->isEnabled());
     defined[3]=(m_ccpm->ccpmServoZChannel->isEnabled());
-    used[0]=((m_ccpm->ccpmServoWChannel->currentIndex()<8)&&(m_ccpm->ccpmServoWChannel->isEnabled()));
-    used[1]=((m_ccpm->ccpmServoXChannel->currentIndex()<8)&&(m_ccpm->ccpmServoXChannel->isEnabled()));
-    used[2]=((m_ccpm->ccpmServoYChannel->currentIndex()<8)&&(m_ccpm->ccpmServoYChannel->isEnabled()));
-    used[3]=((m_ccpm->ccpmServoZChannel->currentIndex()<8)&&(m_ccpm->ccpmServoZChannel->isEnabled()));
+    used[0]=((m_ccpm->ccpmServoWChannel->currentIndex()>0)&&(m_ccpm->ccpmServoWChannel->isEnabled()));
+    used[1]=((m_ccpm->ccpmServoXChannel->currentIndex()>0)&&(m_ccpm->ccpmServoXChannel->isEnabled()));
+    used[2]=((m_ccpm->ccpmServoYChannel->currentIndex()>0)&&(m_ccpm->ccpmServoYChannel->isEnabled()));
+    used[3]=((m_ccpm->ccpmServoZChannel->currentIndex()>0)&&(m_ccpm->ccpmServoZChannel->isEnabled()));
     angle[0]=(CorrectionAngle+180+m_ccpm->ccpmAngleW->value())*Pi/180.00;
     angle[1]=(CorrectionAngle+180+m_ccpm->ccpmAngleX->value())*Pi/180.00;
     angle[2]=(CorrectionAngle+180+m_ccpm->ccpmAngleY->value())*Pi/180.00;
@@ -803,61 +879,6 @@ void ConfigccpmWidget::ccpmSwashplateUpdate()
     UpdateMixer();
 }
 
-void ConfigccpmWidget::ccpmChannelCheck()
-{
-    if((m_ccpm->ccpmServoWChannel->currentIndex()==8)&&(m_ccpm->ccpmServoWChannel->isEnabled()))
-    {
-        m_ccpm->ccpmServoWLabel->setText("<font color=red>Servo W</font>");   
-    }
-    else
-    {
-        m_ccpm->ccpmServoWLabel->setText("<font color=black>Servo W</font>");   
-    }
-    if((m_ccpm->ccpmServoXChannel->currentIndex()==8)&&(m_ccpm->ccpmServoXChannel->isEnabled()))
-    {
-        m_ccpm->ccpmServoXLabel->setText("<font color=red>Servo X</font>");   
-    }
-    else
-    {
-        m_ccpm->ccpmServoXLabel->setText("<font color=black>Servo X</font>");   
-    }
-    if((m_ccpm->ccpmServoYChannel->currentIndex()==8)&&(m_ccpm->ccpmServoYChannel->isEnabled()))
-    {
-        m_ccpm->ccpmServoYLabel->setText("<font color=red>Servo Y</font>");   
-    }
-    else
-    {
-        m_ccpm->ccpmServoYLabel->setText("<font color=black>Servo Y</font>");   
-    }
-    if((m_ccpm->ccpmServoZChannel->currentIndex()==8)&&(m_ccpm->ccpmServoZChannel->isEnabled()))
-    {
-        m_ccpm->ccpmServoZLabel->setText("<font color=red>Servo Z</font>");   
-    }
-    else
-    {
-        m_ccpm->ccpmServoZLabel->setText("<font color=black>Servo Z</font>");   
-    }
-
-    if((m_ccpm->ccpmEngineChannel->currentIndex()==8)&&(m_ccpm->ccpmEngineChannel->isEnabled()))
-    {
-        m_ccpm->ccpmEngineLabel->setText("<font color=red>Engine</font>");   
-    }
-    else
-    {
-        m_ccpm->ccpmEngineLabel->setText("<font color=black>Engine</font>");   
-    }
-    
-    if((m_ccpm->ccpmTailChannel->currentIndex()==8)&&(m_ccpm->ccpmTailChannel->isEnabled()))
-    {
-        m_ccpm->ccpmTailLabel->setText("<font color=red>Tail Rotor</font>");   
-    }
-    else
-    {
-        m_ccpm->ccpmTailLabel->setText("<font color=black>Tail Rotor</font>");   
-    }
-    
-}
-
 void ConfigccpmWidget::UpdateMixer()
 {
     bool useCCPM;
@@ -866,13 +887,16 @@ void ConfigccpmWidget::UpdateMixer()
     float CollectiveConstant,PitchConstant,RollConstant,ThisAngle[6];
     QString Channel;
 
-    ccpmChannelCheck();
-    UpdateCCPMOptionsFromUI();
- 
-    useCCPM = !(GUIConfigData.heli.ccpmCollectivePassthroughState || !GUIConfigData.heli.ccpmLinkCyclicState);
-    useCyclic = GUIConfigData.heli.ccpmLinkRollState;
+    throwConfigError(QString("HeliCP"));
 
-    CollectiveConstant = (float)GUIConfigData.heli.SliderValue0 / 100.00;
+    updateConfigObjectsFromWidgets();
+ 
+    GUIConfigDataUnion config = GetConfigData();
+
+    useCCPM = !(config.heli.ccpmCollectivePassthroughState || !config.heli.ccpmLinkCyclicState);
+    useCyclic = config.heli.ccpmLinkRollState;
+
+    CollectiveConstant = (float)config.heli.SliderValue0 / 100.00;
 
     if (useCCPM) 
     {//cyclic = 1 - collective
@@ -881,18 +905,18 @@ void ConfigccpmWidget::UpdateMixer()
     }
     else
     {
-        PitchConstant = (float)GUIConfigData.heli.SliderValue1 / 100.00;;
+        PitchConstant = (float)config.heli.SliderValue1 / 100.00;;
         if (useCyclic) 
         {
             RollConstant = PitchConstant;
         }   
         else
         {
-            RollConstant = (float)GUIConfigData.heli.SliderValue2 / 100.00;;
+            RollConstant = (float)config.heli.SliderValue2 / 100.00;;
         }               
     }
 
-    if (GUIConfigData.heli.SwashplateType>0)
+    if (config.heli.SwashplateType>0)
     {//not advanced settings
         //get the channel data from the ui
         MixerChannelData[0] = m_ccpm->ccpmEngineChannel->currentIndex();
@@ -914,18 +938,18 @@ void ConfigccpmWidget::UpdateMixer()
         ThisEnable[4] = m_ccpm->ccpmServoYChannel->isEnabled();
         ThisEnable[5] = m_ccpm->ccpmServoZChannel->isEnabled();
 
-        ServosText[0]->setPlainText(QString("%1").arg( MixerChannelData[2]+1 ));
-        ServosText[1]->setPlainText(QString("%1").arg( MixerChannelData[3]+1 ));
-        ServosText[2]->setPlainText(QString("%1").arg( MixerChannelData[4]+1 ));
-        ServosText[3]->setPlainText(QString("%1").arg( MixerChannelData[5]+1 ));
+        ServosText[0]->setPlainText(QString("%1").arg( MixerChannelData[2] ));
+        ServosText[1]->setPlainText(QString("%1").arg( MixerChannelData[3] ));
+        ServosText[2]->setPlainText(QString("%1").arg( MixerChannelData[4] ));
+        ServosText[3]->setPlainText(QString("%1").arg( MixerChannelData[5] ));
 
 
         //go through the user data and update the mixer matrix
         for (i=0;i<6;i++)
         {
-            if ((MixerChannelData[i]<8)&&((ThisEnable[i])||(i<2)))
+            if ((MixerChannelData[i]>0)&&((ThisEnable[i])||(i<2)))
             {
-                m_ccpm->ccpmAdvancedSettingsTable->item(i,0)->setText(QString("%1").arg( MixerChannelData[i]+1 ));
+                m_ccpm->ccpmAdvancedSettingsTable->item(i,0)->setText(QString("%1").arg( MixerChannelData[i] ));
                  //config the vector
                if (i==0)
                 {//motor-engine
@@ -947,8 +971,8 @@ void ConfigccpmWidget::UpdateMixer()
                 {//Swashplate
                     m_ccpm->ccpmAdvancedSettingsTable->item(i,1)->setText(QString("%1").arg(0));//ThrottleCurve1
                     m_ccpm->ccpmAdvancedSettingsTable->item(i,2)->setText(QString("%1").arg((int)(127.0*CollectiveConstant)));//ThrottleCurve2
-                    m_ccpm->ccpmAdvancedSettingsTable->item(i,3)->setText(QString("%1").arg((int)(127.0*(RollConstant)*sin((180+GUIConfigData.heli.CorrectionAngle + ThisAngle[i])*Pi/180.00))));//Roll
-                    m_ccpm->ccpmAdvancedSettingsTable->item(i,4)->setText(QString("%1").arg((int)(127.0*(PitchConstant)*cos((GUIConfigData.heli.CorrectionAngle + ThisAngle[i])*Pi/180.00))));//Pitch
+                    m_ccpm->ccpmAdvancedSettingsTable->item(i,3)->setText(QString("%1").arg((int)(127.0*(RollConstant)*sin((180+config.heli.CorrectionAngle + ThisAngle[i])*Pi/180.00))));//Roll
+                    m_ccpm->ccpmAdvancedSettingsTable->item(i,4)->setText(QString("%1").arg((int)(127.0*(PitchConstant)*cos((config.heli.CorrectionAngle + ThisAngle[i])*Pi/180.00))));//Pitch
                     m_ccpm->ccpmAdvancedSettingsTable->item(i,5)->setText(QString("%1").arg(0));//Yaw
 
                 }
@@ -970,131 +994,132 @@ void ConfigccpmWidget::UpdateMixer()
          }
     }
 
-
-
 }
-
-/**************************
-  * ccpm settings
-  **************************/
-/*
- Get the state of the UI check boxes and change the visibility of sliders
- typedef struct {
- uint SwasplateType:3;
- uint FirstServoIndex:2;
- uint CorrectionAngle:9;
- uint ccpmCollectivePassthroughState:1;
- uint ccpmLinkCyclicState:1;
- uint ccpmLinkRollState:1;
- uint CollectiveChannel:3;
- uint padding:12;
- } __attribute__((packed))  heliGUISettingsStruct;
-
- */
-void ConfigccpmWidget::UpdateCCPMOptionsFromUI()
+QString ConfigccpmWidget::updateConfigObjectsFromWidgets() //UpdateCCPMOptionsFromUI()
 {
+    QString airframeType = "HeliCP";
+
     bool useCCPM;
     bool useCyclic;
     
-    if (updatingFromHardware) return;
+    if (updatingFromHardware) return airframeType;
+
+    updatingFromHardware = TRUE;
+
     //get the user options
+    GUIConfigDataUnion config = GetConfigData();
+
     //swashplate config
-    GUIConfigData.heli.SwashplateType = m_ccpm->ccpmType->count() - m_ccpm->ccpmType->currentIndex()-1;
-    GUIConfigData.heli.FirstServoIndex = m_ccpm->ccpmSingleServo->currentIndex();
+    config.heli.SwashplateType = m_ccpm->ccpmType->count() - m_ccpm->ccpmType->currentIndex()-1;
+    config.heli.FirstServoIndex = m_ccpm->ccpmSingleServo->currentIndex();
     
     //ccpm mixing options
-    GUIConfigData.heli.ccpmCollectivePassthroughState = m_ccpm->ccpmCollectivePassthrough->isChecked();
-    GUIConfigData.heli.ccpmLinkCyclicState = m_ccpm->ccpmLinkCyclic->isChecked();
-    GUIConfigData.heli.ccpmLinkRollState = m_ccpm->ccpmLinkRoll->isChecked();
-    useCCPM = !(GUIConfigData.heli.ccpmCollectivePassthroughState || !GUIConfigData.heli.ccpmLinkCyclicState);
-    useCyclic = GUIConfigData.heli.ccpmLinkRollState;
+    config.heli.ccpmCollectivePassthroughState = m_ccpm->ccpmCollectivePassthrough->isChecked();
+    config.heli.ccpmLinkCyclicState = m_ccpm->ccpmLinkCyclic->isChecked();
+    config.heli.ccpmLinkRollState = m_ccpm->ccpmLinkRoll->isChecked();
+    useCCPM = !(config.heli.ccpmCollectivePassthroughState || !config.heli.ccpmLinkCyclicState);
+    useCyclic = config.heli.ccpmLinkRollState;
     
     //correction angle
-    GUIConfigData.heli.CorrectionAngle = m_ccpm->ccpmCorrectionAngle->value();
+    config.heli.CorrectionAngle = m_ccpm->ccpmCorrectionAngle->value();
     
     //update sliders
     if (useCCPM) 
     {
-        GUIConfigData.heli.SliderValue0 = m_ccpm->ccpmCollectiveSlider->value();
+        config.heli.SliderValue0 = m_ccpm->ccpmCollectiveSlider->value();
     }
     else
     {
-        GUIConfigData.heli.SliderValue0 = m_ccpm->ccpmCollectiveScale->value();
+        config.heli.SliderValue0 = m_ccpm->ccpmCollectiveScale->value();
     }
     if (useCyclic) 
     {
-        GUIConfigData.heli.SliderValue1 = m_ccpm->ccpmCyclicScale->value();
+        config.heli.SliderValue1 = m_ccpm->ccpmCyclicScale->value();
     }
     else
     {
-        GUIConfigData.heli.SliderValue1 = m_ccpm->ccpmPitchScale->value();
+        config.heli.SliderValue1 = m_ccpm->ccpmPitchScale->value();
     }    
-    GUIConfigData.heli.SliderValue2 = m_ccpm->ccpmRollScale->value();
+    config.heli.SliderValue2 = m_ccpm->ccpmRollScale->value();
     
     //servo assignments
-    GUIConfigData.heli.ServoIndexW = m_ccpm->ccpmServoWChannel->currentIndex();
-    GUIConfigData.heli.ServoIndexX = m_ccpm->ccpmServoXChannel->currentIndex();
-    GUIConfigData.heli.ServoIndexY = m_ccpm->ccpmServoYChannel->currentIndex();
-    GUIConfigData.heli.ServoIndexZ = m_ccpm->ccpmServoZChannel->currentIndex();
+    config.heli.ServoIndexW = m_ccpm->ccpmServoWChannel->currentIndex();
+    config.heli.ServoIndexX = m_ccpm->ccpmServoXChannel->currentIndex();
+    config.heli.ServoIndexY = m_ccpm->ccpmServoYChannel->currentIndex();
+    config.heli.ServoIndexZ = m_ccpm->ccpmServoZChannel->currentIndex();
 
     //throttle
-    GUIConfigData.heli.Throttle = m_ccpm->ccpmEngineChannel->currentIndex();
+    config.heli.Throttle = m_ccpm->ccpmEngineChannel->currentIndex();
     //tail
-    GUIConfigData.heli.Tail = m_ccpm->ccpmTailChannel->currentIndex();
+    config.heli.Tail = m_ccpm->ccpmTailChannel->currentIndex();
     
+    SetConfigData(config);
+
+    //setMixer();
+
+    updatingFromHardware = FALSE;
+    return airframeType;
 }
-void ConfigccpmWidget::UpdateCCPMUIFromOptions()
+
+void ConfigccpmWidget::refreshWidgetsValues(QString frameType) //UpdateCCPMUIFromOptions()
 {
+    Q_UNUSED(frameType);
+
+    GUIConfigDataUnion config = GetConfigData();
+
     //swashplate config
-    m_ccpm->ccpmType->setCurrentIndex(m_ccpm->ccpmType->count() - (GUIConfigData.heli.SwashplateType +1));
-    m_ccpm->ccpmSingleServo->setCurrentIndex(GUIConfigData.heli.FirstServoIndex);
+    setComboCurrentIndex( m_ccpm->ccpmType, m_ccpm->ccpmType->count() - (config.heli.SwashplateType +1));
+    setComboCurrentIndex(m_ccpm->ccpmSingleServo, config.heli.FirstServoIndex);
     
     //ccpm mixing options
-    m_ccpm->ccpmCollectivePassthrough->setChecked(GUIConfigData.heli.ccpmCollectivePassthroughState);
-    m_ccpm->ccpmLinkCyclic->setChecked(GUIConfigData.heli.ccpmLinkCyclicState);
-    m_ccpm->ccpmLinkRoll->setChecked(GUIConfigData.heli.ccpmLinkRollState);
+    m_ccpm->ccpmCollectivePassthrough->setChecked(config.heli.ccpmCollectivePassthroughState);
+    m_ccpm->ccpmLinkCyclic->setChecked(config.heli.ccpmLinkCyclicState);
+    m_ccpm->ccpmLinkRoll->setChecked(config.heli.ccpmLinkRollState);
     
     //correction angle
-    m_ccpm->ccpmCorrectionAngle->setValue(GUIConfigData.heli.CorrectionAngle);
+    m_ccpm->ccpmCorrectionAngle->setValue(config.heli.CorrectionAngle);
         
     //update sliders
-    m_ccpm->ccpmCollectiveScale->setValue(GUIConfigData.heli.SliderValue0);
-    m_ccpm->ccpmCollectiveScaleBox->setValue(GUIConfigData.heli.SliderValue0);
-    m_ccpm->ccpmCyclicScale->setValue(GUIConfigData.heli.SliderValue1);
-    m_ccpm->ccpmCyclicScaleBox->setValue(GUIConfigData.heli.SliderValue1);
-    m_ccpm->ccpmPitchScale->setValue(GUIConfigData.heli.SliderValue1);
-    m_ccpm->ccpmPitchScaleBox->setValue(GUIConfigData.heli.SliderValue1);
-    m_ccpm->ccpmRollScale->setValue(GUIConfigData.heli.SliderValue2);
-    m_ccpm->ccpmRollScaleBox->setValue(GUIConfigData.heli.SliderValue2);
-    m_ccpm->ccpmCollectiveSlider->setValue(GUIConfigData.heli.SliderValue0);
-    m_ccpm->ccpmCollectivespinBox->setValue(GUIConfigData.heli.SliderValue0);
+    m_ccpm->ccpmCollectiveScale->setValue(config.heli.SliderValue0);
+    m_ccpm->ccpmCollectiveScaleBox->setValue(config.heli.SliderValue0);
+    m_ccpm->ccpmCyclicScale->setValue(config.heli.SliderValue1);
+    m_ccpm->ccpmCyclicScaleBox->setValue(config.heli.SliderValue1);
+    m_ccpm->ccpmPitchScale->setValue(config.heli.SliderValue1);
+    m_ccpm->ccpmPitchScaleBox->setValue(config.heli.SliderValue1);
+    m_ccpm->ccpmRollScale->setValue(config.heli.SliderValue2);
+    m_ccpm->ccpmRollScaleBox->setValue(config.heli.SliderValue2);
+    m_ccpm->ccpmCollectiveSlider->setValue(config.heli.SliderValue0);
+    m_ccpm->ccpmCollectivespinBox->setValue(config.heli.SliderValue0);
     
     //servo assignments
-    m_ccpm->ccpmServoWChannel->setCurrentIndex(GUIConfigData.heli.ServoIndexW);
-    m_ccpm->ccpmServoXChannel->setCurrentIndex(GUIConfigData.heli.ServoIndexX);
-    m_ccpm->ccpmServoYChannel->setCurrentIndex(GUIConfigData.heli.ServoIndexY);
-    m_ccpm->ccpmServoZChannel->setCurrentIndex(GUIConfigData.heli.ServoIndexZ);
+    setComboCurrentIndex(m_ccpm->ccpmServoWChannel, config.heli.ServoIndexW);
+    setComboCurrentIndex( m_ccpm->ccpmServoXChannel,config.heli.ServoIndexX);
+    setComboCurrentIndex( m_ccpm->ccpmServoYChannel,config.heli.ServoIndexY);
+    setComboCurrentIndex( m_ccpm->ccpmServoZChannel,config.heli.ServoIndexZ);
 
     //throttle
-    m_ccpm->ccpmEngineChannel->setCurrentIndex(GUIConfigData.heli.Throttle);
+    setComboCurrentIndex( m_ccpm->ccpmEngineChannel, config.heli.Throttle);
     //tail
-    m_ccpm->ccpmTailChannel->setCurrentIndex((GUIConfigData.heli.Tail));
+    setComboCurrentIndex( m_ccpm->ccpmTailChannel, config.heli.Tail);
+
+    //getMixer();
 }
 
 
 void ConfigccpmWidget::SetUIComponentVisibilities()
 {
-    UpdateCCPMOptionsFromUI();
+    GUIConfigDataUnion config = GetConfigData();
+
     //set which sliders are user...
     m_ccpm->ccpmRevoMixingBox->setVisible(0);
     
-    m_ccpm->ccpmPitchMixingBox->setVisible(!GUIConfigData.heli.ccpmCollectivePassthroughState && GUIConfigData.heli.ccpmLinkCyclicState);
-    m_ccpm->ccpmCollectiveScalingBox->setVisible(GUIConfigData.heli.ccpmCollectivePassthroughState || !GUIConfigData.heli.ccpmLinkCyclicState);
+    m_ccpm->ccpmPitchMixingBox->setVisible(!config.heli.ccpmCollectivePassthroughState && config.heli.ccpmLinkCyclicState);
+    m_ccpm->ccpmCollectiveScalingBox->setVisible(config.heli.ccpmCollectivePassthroughState || !config.heli.ccpmLinkCyclicState);
 
-    m_ccpm->ccpmLinkCyclic->setVisible(!GUIConfigData.heli.ccpmCollectivePassthroughState);
+    m_ccpm->ccpmLinkCyclic->setVisible(!config.heli.ccpmCollectivePassthroughState);
     
-    m_ccpm->ccpmCyclicScalingBox->setVisible((GUIConfigData.heli.ccpmCollectivePassthroughState || !GUIConfigData.heli.ccpmLinkCyclicState) && GUIConfigData.heli.ccpmLinkRollState);
-    if (!GUIConfigData.heli.ccpmCollectivePassthroughState && GUIConfigData.heli.ccpmLinkCyclicState)
+    m_ccpm->ccpmCyclicScalingBox->setVisible((config.heli.ccpmCollectivePassthroughState || !config.heli.ccpmLinkCyclicState) && config.heli.ccpmLinkRollState);
+    if (!config.heli.ccpmCollectivePassthroughState && config.heli.ccpmLinkCyclicState)
     {
         m_ccpm->ccpmPitchScalingBox->setVisible(0);
         m_ccpm->ccpmRollScalingBox->setVisible(0);
@@ -1103,8 +1128,8 @@ void ConfigccpmWidget::SetUIComponentVisibilities()
     }
     else
     {
-        m_ccpm->ccpmPitchScalingBox->setVisible(!GUIConfigData.heli.ccpmLinkRollState);
-        m_ccpm->ccpmRollScalingBox->setVisible(!GUIConfigData.heli.ccpmLinkRollState);
+        m_ccpm->ccpmPitchScalingBox->setVisible(!config.heli.ccpmLinkRollState);
+        m_ccpm->ccpmRollScalingBox->setVisible(!config.heli.ccpmLinkRollState);
         m_ccpm->ccpmLinkRoll->setVisible(1);
     }
 
@@ -1112,115 +1137,17 @@ void ConfigccpmWidget::SetUIComponentVisibilities()
 /**
   Request the current value of the SystemSettings which holds the ccpm type
   */
-void ConfigccpmWidget::requestccpmUpdate()
+void ConfigccpmWidget::getMixer()
 {
-#define MaxAngleError 2
-    int MixerDataFromHeli[8][5];
-    quint8 MixerOutputType[8];
-    int EngineChannel,TailRotorChannel,ServoChannels[4],ServoAngles[4],SortAngles[4],ServoCurve2[4];
-    int NumServos=0;
-
     if (SwashLvlConfigurationInProgress)return;
     if (updatingToHardware)return;
     updatingFromHardware=TRUE;
     
-    unsigned int i,j;
-    
-//    SystemSettings * systemSettings = SystemSettings::GetInstance(getObjectManager());
-//    Q_ASSERT(systemSettings);
-//    SystemSettings::DataFields systemSettingsData = systemSettings->getData();
-
-//    Q_ASSERT(SystemSettings::GUICONFIGDATA_NUMELEM ==
-//             (sizeof(GUIConfigData.UAVObject) / sizeof(GUIConfigData.UAVObject[0])));
-
-//    for(i = 0; i < SystemSettings::GUICONFIGDATA_NUMELEM; i++)
-//        GUIConfigData.UAVObject[i]=systemSettingsData.GUIConfigData[i];
-
-    GUIConfigData = GUIManager.GetConfigData();
-
-    UpdateCCPMUIFromOptions();
+    int i;
 
     // Get existing mixer settings
     MixerSettings * mixerSettings = MixerSettings::GetInstance(getObjectManager());
     MixerSettings::DataFields mixerSettingsData = mixerSettings->getData();
-    
-    //go through the user data and update the mixer matrix
-    for (j=0;j<5;j++)
-    {
-        MixerDataFromHeli[0][j] = mixerSettingsData.Mixer1Vector[j];
-        MixerDataFromHeli[1][j] = mixerSettingsData.Mixer2Vector[j];
-        MixerDataFromHeli[2][j] = mixerSettingsData.Mixer3Vector[j];
-        MixerDataFromHeli[3][j] = mixerSettingsData.Mixer4Vector[j];
-        MixerDataFromHeli[4][j] = mixerSettingsData.Mixer5Vector[j];
-        MixerDataFromHeli[5][j] = mixerSettingsData.Mixer6Vector[j];
-        MixerDataFromHeli[6][j] = mixerSettingsData.Mixer7Vector[j];
-        MixerDataFromHeli[7][j] = mixerSettingsData.Mixer8Vector[j];
-    }
-
-    MixerOutputType[0] = mixerSettingsData.Mixer1Type;
-    MixerOutputType[1] = mixerSettingsData.Mixer2Type;
-    MixerOutputType[2] = mixerSettingsData.Mixer3Type;
-    MixerOutputType[3] = mixerSettingsData.Mixer4Type;
-    MixerOutputType[4] = mixerSettingsData.Mixer5Type;
-    MixerOutputType[5] = mixerSettingsData.Mixer6Type;
-    MixerOutputType[6] = mixerSettingsData.Mixer7Type;
-    MixerOutputType[7] = mixerSettingsData.Mixer8Type;
-
-    EngineChannel =-1;
-    TailRotorChannel =-1;
-    for (j=0;j<5;j++)
-    {
-        ServoChannels[j]=8;
-        ServoCurve2[j]=0;
-        ServoAngles[j]=0;
-        SortAngles[j]=j;
-    }
-
-    NumServos=0;
-    //process the data from Heli and try to figure out the settings...
-    for (i=0;i<8;i++)
-    {
-        //check if this is the engine... Throttle only
-        if ((MixerOutputType[i] == MixerSettings::MIXER1TYPE_MOTOR)&&
-            (MixerDataFromHeli[i][0]>0)&&//ThrottleCurve1
-            (MixerDataFromHeli[i][1]==0)&&//ThrottleCurve2
-            (MixerDataFromHeli[i][2]==0)&&//Roll
-            (MixerDataFromHeli[i][3]==0)&&//Pitch
-            (MixerDataFromHeli[i][4]==0))//Yaw
-        {
-            EngineChannel = i;
-            //m_ccpm->ccpmEngineChannel->setCurrentIndex(i);
-
-        }
-        //check if this is the tail rotor... REVO and YAW
-        if ((MixerOutputType[i] == MixerSettings::MIXER1TYPE_SERVO)&&
-            //(MixerDataFromHeli[i][0]!=0)&&//ThrottleCurve1
-            (MixerDataFromHeli[i][1]==0)&&//ThrottleCurve2
-            (MixerDataFromHeli[i][2]==0)&&//Roll
-            (MixerDataFromHeli[i][3]==0)&&//Pitch
-            (MixerDataFromHeli[i][4]!=0))//Yaw
-        {
-            TailRotorChannel = i;
-            //m_ccpm->ccpmTailChannel->setCurrentIndex(i);
-            m_ccpm->ccpmRevoSlider->setValue((MixerDataFromHeli[i][0]*100)/127);
-            m_ccpm->ccpmREVOspinBox->setValue((MixerDataFromHeli[i][0]*100)/127);
-        }
-        //check if this is a swashplate servo... Throttle is zero
-        if ((MixerOutputType[i] == MixerSettings::MIXER1TYPE_SERVO)&&
-            (MixerDataFromHeli[i][0]==0)&&//ThrottleCurve1
-            //(MixerDataFromHeli[i][1]==0)&&//ThrottleCurve2
-            //(MixerDataFromHeli[i][2]==0)&&//Roll
-            //(MixerDataFromHeli[i][3]==0)&&//Pitch
-            (MixerDataFromHeli[i][4]==0))//Yaw
-        {
-            ServoChannels[NumServos] = i;//record the channel for this servo
-            ServoCurve2[NumServos]=MixerDataFromHeli[i][1];//record the ThrottleCurve2 contribution to this servo
-            ServoAngles[NumServos]=NumServos*45;//make this 0 for the final version
-
-            NumServos++;
-        }
-
-    }
 
     //get the settings for the curve from the mixer settings
     for (i=0;i<5;i++)
@@ -1232,7 +1159,7 @@ void ConfigccpmWidget::requestccpmUpdate()
     }
 
     updatingFromHardware=FALSE;
-    UpdateCCPMUIFromOptions();
+
     ccpmSwashplateUpdate();
 }
 
@@ -1240,28 +1167,13 @@ void ConfigccpmWidget::requestccpmUpdate()
 /**
   Sends the config to the board (ccpm type)
   */
-void ConfigccpmWidget::sendccpmUpdate()
+void ConfigccpmWidget::setMixer()
 {
     int i,j;
 
     if (SwashLvlConfigurationInProgress)return;
     updatingToHardware=TRUE;
-    //ShowDisclaimer(1);
-    
-    UpdateCCPMOptionsFromUI();
 
-    GUIManager.SetConfigData(GUIConfigData);
-
-    // Store the data required to reconstruct
-//    SystemSettings * systemSettings = SystemSettings::GetInstance(getObjectManager());
-//    Q_ASSERT(systemSettings);
-//    SystemSettings::DataFields systemSettingsData = systemSettings->getData();
-//    for (i=0; i<SystemSettings::GUICONFIGDATA_NUMELEM; i++)
-//        systemSettingsData.GUIConfigData[i] = GUIConfigData.UAVObject[i];
-
-//    systemSettings->setData(systemSettingsData);
-//    systemSettings->updated();
-    
     MixerSettings * mixerSettings = MixerSettings::GetInstance(getObjectManager());
     Q_ASSERT(mixerSettings);
     MixerSettings::DataFields mixerSettingsData = mixerSettings->getData();
@@ -1316,7 +1228,7 @@ void ConfigccpmWidget::sendccpmUpdate()
     //mapping of collective input to curve 2...
     //MixerSettings.Curve2Source = Throttle,Roll,Pitch,Yaw,Accessory0,Accessory1,Accessory2,Accessory3,Accessory4,Accessory5
     //check if we are using throttle or directly from a channel...
-    if (GUIConfigData.heli.ccpmCollectivePassthroughState)
+    if (GetConfigData().heli.ccpmCollectivePassthroughState)
         mixerSettingsData.Curve2Source = MixerSettings::CURVE2SOURCE_COLLECTIVE;
     else
         mixerSettingsData.Curve2Source = MixerSettings::CURVE2SOURCE_THROTTLE;
@@ -1335,7 +1247,8 @@ void ConfigccpmWidget::saveccpmUpdate()
     if (SwashLvlConfigurationInProgress)return;
     ShowDisclaimer(0);
     // Send update so that the latest value is saved
-    sendccpmUpdate();
+    //sendccpmUpdate();
+    setMixer();
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(obj);
     saveObjectToSD(obj);
@@ -1402,7 +1315,8 @@ void ConfigccpmWidget::SwashLvlStartButtonPressed()
 
 
             //download the current settings to the OP hw
-            sendccpmUpdate();
+            //sendccpmUpdate();
+            setMixer();
 
             //change control mode to gcs control / disarmed
             //set throttle to 0
@@ -1427,10 +1341,10 @@ void ConfigccpmWidget::SwashLvlStartButtonPressed()
             oldSwashLvlConfiguration.ServoChannels[2]=m_ccpm->ccpmServoYChannel->currentIndex();
             oldSwashLvlConfiguration.ServoChannels[3]=m_ccpm->ccpmServoZChannel->currentIndex();
             //if servos are used
-            oldSwashLvlConfiguration.Used[0]=((m_ccpm->ccpmServoWChannel->currentIndex()<8)&&(m_ccpm->ccpmServoWChannel->isEnabled()));
-            oldSwashLvlConfiguration.Used[1]=((m_ccpm->ccpmServoXChannel->currentIndex()<8)&&(m_ccpm->ccpmServoXChannel->isEnabled()));
-            oldSwashLvlConfiguration.Used[2]=((m_ccpm->ccpmServoYChannel->currentIndex()<8)&&(m_ccpm->ccpmServoYChannel->isEnabled()));
-            oldSwashLvlConfiguration.Used[3]=((m_ccpm->ccpmServoZChannel->currentIndex()<8)&&(m_ccpm->ccpmServoZChannel->isEnabled()));
+            oldSwashLvlConfiguration.Used[0]=((m_ccpm->ccpmServoWChannel->currentIndex()>0)&&(m_ccpm->ccpmServoWChannel->isEnabled()));
+            oldSwashLvlConfiguration.Used[1]=((m_ccpm->ccpmServoXChannel->currentIndex()>0)&&(m_ccpm->ccpmServoXChannel->isEnabled()));
+            oldSwashLvlConfiguration.Used[2]=((m_ccpm->ccpmServoYChannel->currentIndex()>0)&&(m_ccpm->ccpmServoYChannel->isEnabled()));
+            oldSwashLvlConfiguration.Used[3]=((m_ccpm->ccpmServoZChannel->currentIndex()>0)&&(m_ccpm->ccpmServoZChannel->isEnabled()));
             //min,neutral,max values for the servos
             for (i=0;i<CCPM_MAX_SWASH_SERVOS;i++)
             {
@@ -1821,4 +1735,64 @@ void ConfigccpmWidget::SwashLvlSpinBoxChanged(int value)
     actuatorCommand->updated();
 
     return;
+}
+
+/**
+ This function displays text and color formatting in order to help the user understand what channels have not yet been configured.
+ */
+void ConfigccpmWidget::throwConfigError(QString airframeType)
+{
+    Q_UNUSED(airframeType);
+
+    if((m_ccpm->ccpmServoWChannel->currentIndex()==0)&&(m_ccpm->ccpmServoWChannel->isEnabled()))
+    {
+        m_ccpm->ccpmServoWLabel->setText("<font color=red>Servo W</font>");
+    }
+    else
+    {
+        m_ccpm->ccpmServoWLabel->setText("<font color=black>Servo W</font>");
+    }
+    if((m_ccpm->ccpmServoXChannel->currentIndex()==0)&&(m_ccpm->ccpmServoXChannel->isEnabled()))
+    {
+        m_ccpm->ccpmServoXLabel->setText("<font color=red>Servo X</font>");
+    }
+    else
+    {
+        m_ccpm->ccpmServoXLabel->setText("<font color=black>Servo X</font>");
+    }
+    if((m_ccpm->ccpmServoYChannel->currentIndex()==0)&&(m_ccpm->ccpmServoYChannel->isEnabled()))
+    {
+        m_ccpm->ccpmServoYLabel->setText("<font color=red>Servo Y</font>");
+    }
+    else
+    {
+        m_ccpm->ccpmServoYLabel->setText("<font color=black>Servo Y</font>");
+    }
+    if((m_ccpm->ccpmServoZChannel->currentIndex()==0)&&(m_ccpm->ccpmServoZChannel->isEnabled()))
+    {
+        m_ccpm->ccpmServoZLabel->setText("<font color=red>Servo Z</font>");
+    }
+    else
+    {
+        m_ccpm->ccpmServoZLabel->setText("<font color=black>Servo Z</font>");
+    }
+
+    if((m_ccpm->ccpmEngineChannel->currentIndex()==0)&&(m_ccpm->ccpmEngineChannel->isEnabled()))
+    {
+        m_ccpm->ccpmEngineLabel->setText("<font color=red>Engine</font>");
+    }
+    else
+    {
+        m_ccpm->ccpmEngineLabel->setText("<font color=black>Engine</font>");
+    }
+
+    if((m_ccpm->ccpmTailChannel->currentIndex()==0)&&(m_ccpm->ccpmTailChannel->isEnabled()))
+    {
+        m_ccpm->ccpmTailLabel->setText("<font color=red>Tail Rotor</font>");
+    }
+    else
+    {
+        m_ccpm->ccpmTailLabel->setText("<font color=black>Tail Rotor</font>");
+    }
+
 }

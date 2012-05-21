@@ -33,7 +33,7 @@
 #include "uavobjectmanager.h"
 #include "uavobject.h"
 #include "uavobjectutilmanager.h"
-#include "cfg_vehicletypes/guiconfigdata.h"
+#include "cfg_vehicletypes/vehicleconfig.h"
 #include <QtGui/QWidget>
 #include <QList>
 
@@ -62,8 +62,6 @@ private:
 	int mccDataRate;
 
 	UAVObject::Metadata accInitialData;
-
-    GUIConfigDataManager GUIManager;
 
 	bool firstUpdate;
 

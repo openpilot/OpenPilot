@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       guiconfigdata.h
+ * @file       vehicleconfig.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
@@ -24,13 +24,14 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef GUICONFIGDATA_H
-#define GUICONFIGDATA_H
+#ifndef GUIVEHICLECONFIG_H
+#define GUIVEHICLECONFIG_H
 
-
+#include "../uavobjectwidgetutils/configtaskwidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
+
 
 typedef struct {
     uint VTOLMotorN:4;
@@ -96,39 +97,46 @@ typedef union
 {
     uint                    UAVObject[4];   //32bits * 4
     heliGUISettingsStruct   heli;           //128bits
-    fixedGUISettingsStruct  fixed;
+    fixedGUISettingsStruct  fixedwing;
     multiGUISettingsStruct  multi;
     groundGUISettingsStruct ground;
 } GUIConfigDataUnion;
 
-class GUIConfigDataManager: public QObject
+
+class VehicleConfig: public ConfigTaskWidget
 {
     Q_OBJECT
 
     public:
-        GUIConfigDataManager();
-        ~GUIConfigDataManager();
+        VehicleConfig(QWidget *parent = 0);
+        ~VehicleConfig();
 
-        GUIConfigDataUnion GetConfigData();
-        void SetConfigData(GUIConfigDataUnion configData);
-        QStringList getChannelDescriptions();
-        void ResetActuators();
-        void ResetActuators(GUIConfigDataUnion* configData);
+        static GUIConfigDataUnion GetConfigData();
+        static void SetConfigData(GUIConfigDataUnion configData);
+        static void resetField(UAVObjectField * field);
+        static void setComboCurrentIndex(QComboBox* box, int index);
+
+        virtual void ResetActuators(GUIConfigDataUnion* configData);
+        virtual QStringList getChannelDescriptions();
+
+        QStringList mixerTypes;
+        QStringList mixerVectors;
 
         static const quint32 CHANNEL_NUMELEM = 10;
 
-        friend class ConfigTaskWidget;
-
     private:
-        UAVObjectManager* getObjectManager();
+
+        static UAVObjectManager* getUAVObjectManager();
 
     private slots:
 
     public slots:
 
+    signals:
+        //void ConfigurationChanged();
 
 protected:
 
 };
 
-#endif // GUICONFIGDATA_H
+#endif // GUIVEHICLECONFIG_H

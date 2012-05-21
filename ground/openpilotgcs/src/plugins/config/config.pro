@@ -32,7 +32,10 @@ HEADERS += configplugin.h \
     configtxpidwidget.h \
     outputchannelform.h \
     config_global.h \
-    cfg_vehicletypes/guiconfigdata.h
+    cfg_vehicletypes/configmultirotorwidget.h \
+    cfg_vehicletypes/configgroundvehiclewidget.h \
+    cfg_vehicletypes/configfixedwingwidget.h \
+    cfg_vehicletypes/vehicleconfig.h
 SOURCES += configplugin.cpp \
     configgadgetconfiguration.cpp \
     configgadgetwidget.cpp \
@@ -62,7 +65,7 @@ SOURCES += configplugin.cpp \
     cfg_vehicletypes/configfixedwingwidget.cpp \
     cfg_vehicletypes/configccpmwidget.cpp \
     outputchannelform.cpp \
-    cfg_vehicletypes/guiconfigdata.cpp
+    cfg_vehicletypes/vehicleconfig.cpp
 FORMS += airframe.ui \
     cc_hw_settings.ui \
     pro_hw_settings.ui \

@@ -27,6 +27,7 @@
 
 #include "configoutputwidget.h"
 #include "outputchannelform.h"
+#include "configvehicletypewidget.h"
 
 #include "uavtalk/telemetrymanager.h"
 
@@ -250,8 +251,8 @@ void ConfigOutputWidget::refreshWidgetsValues()
     Q_ASSERT(actuatorSettings);
     ActuatorSettings::DataFields actuatorSettingsData = actuatorSettings->getData();
 
-    // get helicp channel descriptions based on mixer settings
-    QStringList ChannelDesc = GUIManager.getChannelDescriptions();
+    // get channel descriptions
+    QStringList ChannelDesc = ConfigVehicleTypeWidget::getChannelDescriptions();
 
     // Initialize output forms
     QList<OutputChannelForm*> outputChannelForms = findChildren<OutputChannelForm*>();

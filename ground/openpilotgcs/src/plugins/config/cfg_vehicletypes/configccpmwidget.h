@@ -29,7 +29,7 @@
 
 #include "ui_ccpm.h"
 #include "../uavobjectwidgetutils/configtaskwidget.h"
-#include "guiconfigdata.h"
+#include "cfg_vehicletypes/vehicleconfig.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
@@ -50,33 +50,9 @@ typedef struct {
     int Neutral[CCPM_MAX_SWASH_SERVOS];
     int Min[CCPM_MAX_SWASH_SERVOS];
 } SwashplateServoSettingsStruct;
-//typedef struct {
-//    uint SwasplateType:3;
-//    uint FirstServoIndex:2;
-//    uint CorrectionAngle:9;
-//    uint ccpmCollectivePassthroughState:1;
-//    uint ccpmLinkCyclicState:1;
-//    uint ccpmLinkRollState:1;
-//    uint SliderValue0:7;
-//    uint SliderValue1:7;
-//    uint SliderValue2:7;//41bits
-//    uint ServoIndexW:4;
-//    uint ServoIndexX:4;
-//    uint ServoIndexY:4;
-//    uint ServoIndexZ:4;//57bits
-//    uint Throttle:4;
-//    uint Tail:4;       //65bits
-//    quint32 padding1:31;  //96bits
-//    quint32 padding2;  //128bits
-//} __attribute__((packed))  heliGUISettingsStruct;
 
-//typedef union
-//{
-//    uint                    UAVObject[4];//32bits * 4
-//    heliGUISettingsStruct   heli;//128bits
-//} GUIConfigDataUnion;
 
-class ConfigccpmWidget: public ConfigTaskWidget
+class ConfigccpmWidget: public VehicleConfig
 {
     Q_OBJECT
 
@@ -90,14 +66,6 @@ private:
         Ui_ccpmWidget *m_ccpm;
         QGraphicsSvgItem *SwashplateImg;
         QGraphicsSvgItem *CurveImg;
-        //QGraphicsSvgItem *ServoW;
-        //QGraphicsSvgItem *ServoX;
-        //QGraphicsSvgItem *ServoY;
-        //QGraphicsSvgItem *ServoZ;
-        //QGraphicsTextItem *ServoWText;
-        //QGraphicsTextItem *ServoXText;
-        //QGraphicsTextItem *ServoYText;
-        //QGraphicsTextItem *ServoZText;
         QGraphicsSvgItem *Servos[CCPM_MAX_SWASH_SERVOS];
         QGraphicsTextItem *ServosText[CCPM_MAX_SWASH_SERVOS];
         QGraphicsLineItem *ServoLines[CCPM_MAX_SWASH_SERVOS];
@@ -112,9 +80,6 @@ private:
         SwashplateServoSettingsStruct oldSwashLvlConfiguration;
         SwashplateServoSettingsStruct newSwashLvlConfiguration;
 
-        GUIConfigDataManager GUIManager;
-        GUIConfigDataUnion GUIConfigData;
-
         int MixerChannelData[6];
         int ShowDisclaimer(int messageID);
         virtual void enableControls(bool enable) { Q_UNUSED(enable)}; // Not used by this widget
@@ -122,7 +87,15 @@ private:
         bool updatingFromHardware;
         bool updatingToHardware;
 
+        virtual void ResetActuators(GUIConfigDataUnion* configData);
+        virtual QStringList getChannelDescriptions();
+
     private slots:
+        virtual void setupUI(QString airframeType);
+        virtual void refreshWidgetsValues(QString frameType);
+        virtual QString updateConfigObjectsFromWidgets();
+        virtual void throwConfigError(QString airframeType);
+
         void ccpmSwashplateUpdate();
         void ccpmSwashplateRedraw();
         void UpdateCurveSettings();
@@ -139,11 +112,10 @@ private:
         void SwashLvlCancelButtonPressed();
         void SwashLvlFinishButtonPressed();
 
-        void UpdateCCPMOptionsFromUI();
-        void UpdateCCPMUIFromOptions();
+        //void UpdateCCPMOptionsFromUI();
+        //void UpdateCCPMUIFromOptions();
 
         void SetUIComponentVisibilities();
-        void ccpmChannelCheck();
 
         void enableSwashplateLevellingControl(bool state);
         void setSwashplateLevel(int percent);
@@ -151,8 +123,8 @@ private:
         virtual void refreshValues() {}; // Not used
 
     public slots:
-        void requestccpmUpdate();
-        void sendccpmUpdate();
+        void getMixer();
+        void setMixer();
         void saveccpmUpdate();
 
 protected:

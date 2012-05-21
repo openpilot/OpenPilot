@@ -446,7 +446,7 @@ static const struct pios_video_cfg pios_video_cfg = {
 				.flags = (DMA_IT_TCIF7),
 				.init = {
 					.NVIC_IRQChannel = DMA1_Stream7_IRQn,
-					.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+					.NVIC_IRQChannelPreemptionPriority = 0,
 					.NVIC_IRQChannelSubPriority = 0,
 					.NVIC_IRQChannelCmd = ENABLE,
 				},
@@ -544,7 +544,7 @@ static const struct pios_video_cfg pios_video_cfg = {
 					.flags   = (DMA_IT_TCIF5),
 					.init    = {
 						.NVIC_IRQChannel                   = DMA2_Stream5_IRQn,
-						.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+						.NVIC_IRQChannelPreemptionPriority = 0,
 						.NVIC_IRQChannelSubPriority        = 0,
 						.NVIC_IRQChannelCmd                = ENABLE,
 					},

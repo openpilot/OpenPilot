@@ -33,6 +33,7 @@
 #if defined(PIOS_INCLUDE_VIDEO)
 
 // Private methods
+static void stop_hsync_timers();
 static void reset_hsync_timers();
 
 // Private variables
@@ -91,7 +92,8 @@ void swap_buffers()
 
 void PIOS_Hsync_ISR()
 {
-	if(Vsync_update==11 && (DMA_GetCmdStatus(dev_cfg->level.dma.tx.channel)!=ENABLE))
+	// On tenth line prepare data which will start clocking out on 11th line
+	if(Vsync_update==10 && (DMA_GetCmdStatus(dev_cfg->level.dma.tx.channel)!=ENABLE))
 	{
 		// load first line of data
 		DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[0],DMA_Memory_0);
@@ -119,8 +121,8 @@ void PIOS_Vsync_ISR() {
 	m_osdLines = gActiveLine;
 
 	// load second image buffer
+	stop_hsync_timers();
 	swap_buffers();
-
 
 	Vsync_update=0;
 	// trigger redraw
@@ -131,6 +133,17 @@ void PIOS_Vsync_ISR() {
 
 uint16_t PIOS_Video_GetOSDLines(void) {
 	return m_osdLines;
+}
+
+/**
+ * Stops the pixel clock and ensures it ignores the rising edge.  To be used after a 
+ * vsync until the first line is to be displayed
+ */
+static void stop_hsync_timers()
+{
+	// This removes the slave mode configuration
+	TIM_Cmd(dev_cfg->pixel_timer.timer, DISABLE);
+	TIM_InternalClockConfig(dev_cfg->pixel_timer.timer);
 }
 
 /**
@@ -230,9 +243,8 @@ static void configure_hsync_timers()
 	// is clobbering that
 	TIM_PrescalerConfig(dev_cfg->pixel_timer.timer, 0, TIM_PSCReloadMode_Immediate);
 	TIM_SetAutoreload(dev_cfg->pixel_timer.timer, 25);
-
-	// Set up the timer to run the pixel clock on the next hsync
-	reset_hsync_timers();
+	
+	TIM_Cmd(dev_cfg->pixel_timer, DISABLE);
 }
 
 void PIOS_Video_Init(const struct pios_video_cfg * cfg)
@@ -326,7 +338,6 @@ void PIOS_Video_Init(const struct pios_video_cfg * cfg)
 	PIOS_EXTI_Init(cfg->hsync);
 	PIOS_EXTI_Init(cfg->vsync);
 }
-
 
 void PIOS_VIDEO_DMA_Handler(void);
 void DMA1_Stream7_IRQHandler(void) __attribute__ ((alias("PIOS_VIDEO_DMA_Handler")));

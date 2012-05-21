@@ -156,13 +156,6 @@ static void reset_hsync_timers()
 	TIM_SelectSlaveMode(dev_cfg->pixel_timer.timer, TIM_SlaveMode_Trigger);
 	TIM_SelectMasterSlaveMode(dev_cfg->pixel_timer.timer, TIM_MasterSlaveMode_Enable);
 }
-/**
- * Called when the last pixel is clocked.
- */
-static void line_overflow(uint32_t tim_id, uint32_t context, uint8_t chan_idx, uint16_t count)
-{
-	reset_hsync_timers();
-}
 
 const struct pios_tim_callbacks px_callback = {
 	.overflow = NULL,

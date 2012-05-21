@@ -127,36 +127,37 @@ void PIOS_Board_Init(void) {
 	/* Initialize board specific USB data */
 	PIOS_USB_BOARD_DATA_Init();
 
+
+	/* Flags to determine if various USB interfaces are advertised */
+	bool usb_hid_present = false;
 	bool usb_cdc_present = false;
+
 #if defined(PIOS_INCLUDE_USB_CDC)
-	switch (pipxSettings.VCPConfig)
-	{
-	case PIPXSETTINGS_VCPCONFIG_SERIAL:
-	case PIPXSETTINGS_VCPCONFIG_DEBUG:
-		if (PIOS_USB_DESC_HID_CDC_Init()) {
-			PIOS_Assert(0);
-		}
-		usb_cdc_present = true;
-		break;
-	case PIPXSETTINGS_VCPCONFIG_DISABLED:
-		if (PIOS_USB_DESC_HID_ONLY_Init()) {
-			PIOS_Assert(0);
-		}
-		break;
+	if (PIOS_USB_DESC_HID_CDC_Init()) {
+		PIOS_Assert(0);
 	}
+	usb_hid_present = true;
+	usb_cdc_present = true;
 #else
 	if (PIOS_USB_DESC_HID_ONLY_Init()) {
 		PIOS_Assert(0);
 	}
+	usb_hid_present = true;
 #endif
 
 	uint32_t pios_usb_id;
 	PIOS_USB_Init(&pios_usb_id, &pios_usb_main_cfg);
 
 #if defined(PIOS_INCLUDE_USB_CDC)
+	if (!usb_cdc_present) {
+		/* Force VCP port function to disabled if we haven't advertised VCP in our USB descriptor */
+		pipxSettings.VCPConfig = PIPXSETTINGS_VCPCONFIG_DISABLED;
+	}
 
-#if defined(PIOS_INCLUDE_COM)
-	if(usb_cdc_present)
+	switch (pipxSettings.VCPConfig)
+	{
+	case PIPXSETTINGS_VCPCONFIG_SERIAL:
+	case PIPXSETTINGS_VCPCONFIG_DEBUG:
 	{
 		uint32_t pios_usb_cdc_id;
 		if (PIOS_USB_CDC_Init(&pios_usb_cdc_id, &pios_usb_cdc_cfg, pios_usb_id)) {
@@ -180,10 +181,12 @@ void PIOS_Board_Init(void) {
 			pios_com_debug_id = pios_com_vcp_id;
 			break;
 		}
+		break;
 	}
-#endif	/* PIOS_INCLUDE_COM */
-
-#endif	/* PIOS_INCLUDE_USB_CDC */
+	case PIPXSETTINGS_VCPCONFIG_DISABLED:
+		break;
+	}
+#endif
 
 #if defined(PIOS_INCLUDE_USB_HID)
 

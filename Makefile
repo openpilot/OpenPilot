@@ -230,7 +230,7 @@ openocd_install: openocd_clean
 	$(V1) mkdir -p "$(OPENOCD_DIR)"
 	$(V1) ( \
 	  cd $(OPENOCD_BUILD_DIR)/openocd-0.5.0 ; \
-	  ./configure --prefix="$(OPENOCD_DIR)" --enable-ft2232_libftdi --enable-buspirate; \
+	  ./configure --prefix="$(OPENOCD_DIR)" --enable-ft2232_libftdi ; \
 	  $(MAKE) --silent ; \
 	  $(MAKE) --silent install ; \
 	)

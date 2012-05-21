@@ -163,16 +163,16 @@ SRC += $(PIOSSTM32F10X)/pios_eeprom.c
 SRC += $(PIOSSTM32F10X)/pios_bl_helper.c
 
 # PIOS USB related files (seperated to make code maintenance more easy)
-ifeq ($(USE_USB), YES)
-	SRC += $(PIOSSTM32F10X)/pios_usb.c
-	SRC += $(PIOSSTM32F10X)/pios_usbhook.c
-	SRC += $(PIOSSTM32F10X)/pios_usb_hid.c
-	SRC += $(PIOSSTM32F10X)/pios_usb_hid_istr.c
-	SRC += $(PIOSSTM32F10X)/pios_usb_hid_pwr.c
-	SRC += $(HOME_DIR)/pios_usb_board_data.c
-	SRC += $(PIOSCOMMON)/pios_usb_desc_hid_only.c
-	SRC += $(PIOSCOMMON)/pios_usb_util.c
-endif
+SRC += $(PIOSSTM32F10X)/pios_usb.c
+SRC += $(PIOSSTM32F10X)/pios_usbhook.c
+SRC += $(PIOSSTM32F10X)/pios_usb_hid.c
+SRC += $(PIOSSTM32F10X)/pios_usb_cdc.c
+SRC += $(PIOSSTM32F10X)/pios_usb_hid_istr.c
+SRC += $(PIOSSTM32F10X)/pios_usb_hid_pwr.c
+SRC += $(OPSYSTEM)/pios_usb_board_data.c
+SRC += $(PIOSCOMMON)/pios_usb_desc_hid_cdc.c
+SRC += $(PIOSCOMMON)/pios_usb_desc_hid_only.c
+SRC += $(PIOSCOMMON)/pios_usb_util.c
 
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_crc.c

@@ -94,18 +94,18 @@ void PIOS_Hsync_ISR()
 	if(Vsync_update==11 && (DMA_GetCmdStatus(dev_cfg->level.dma.tx.channel)!=ENABLE))
 	{
 		// load first line of data
-//		DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[0],DMA_Memory_0);
+		DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[0],DMA_Memory_0);
 		DMA_MemoryTargetConfig(dev_cfg->level.dma.tx.channel,(uint32_t)&disp_buffer_level[0],DMA_Memory_0);
 
 		// load second line of data
-//		DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[GRAPHICS_WIDTH],DMA_Memory_1);
+		DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[GRAPHICS_WIDTH],DMA_Memory_1);
 		DMA_MemoryTargetConfig(dev_cfg->level.dma.tx.channel,(uint32_t)&disp_buffer_level[GRAPHICS_WIDTH],DMA_Memory_1);
 
 		// Enable DMA, Slave first
 		DMA_SetCurrDataCounter(dev_cfg->level.dma.tx.channel,BUFFER_LINE_LENGTH);
-//		DMA_SetCurrDataCounter(dev_cfg->mask.dma.tx.channel,BUFFER_LINE_LENGTH);
+		DMA_SetCurrDataCounter(dev_cfg->mask.dma.tx.channel,BUFFER_LINE_LENGTH);
 		DMA_Cmd(dev_cfg->level.dma.tx.channel, ENABLE);
-//		DMA_Cmd(dev_cfg->mask.dma.tx.channel, ENABLE);
+		DMA_Cmd(dev_cfg->mask.dma.tx.channel, ENABLE);
 
 		reset_hsync_timers();
 	}

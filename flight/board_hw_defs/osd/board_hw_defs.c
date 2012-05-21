@@ -643,6 +643,22 @@ static const struct pios_video_cfg pios_video_cfg = {
 		},
 		.remap = GPIO_AF_TIM4,
 	},
+	.hsync_capture = {
+		.timer = TIM4,
+		.timer_chan = TIM_Channel_2,
+		.pin = {
+			.gpio = GPIOB,
+			.init = {
+				.GPIO_Pin = GPIO_Pin_7,
+				.GPIO_Speed = GPIO_Speed_2MHz,
+				.GPIO_Mode  = GPIO_Mode_AF,
+				.GPIO_OType = GPIO_OType_PP,
+				.GPIO_PuPd  = GPIO_PuPd_UP
+			},
+			.pin_source = GPIO_PinSource7,
+		},
+		.remap = GPIO_AF_TIM4,
+	},
 	.tim_oc_init = {
 		.TIM_OCMode = TIM_OCMode_PWM1,
 		.TIM_OutputState = TIM_OutputState_Enable,

@@ -134,7 +134,8 @@ uint16_t PIOS_Video_GetOSDLines(void) {
 }
 
 /**
- * Reset the timer and configure for next call.  Keeps them synced.
+ * Reset the timer and configure for next call.  Keeps them synced.  Ideally this won't even be needed
+ * since I don't think the slave mode gets lost, and this can simply be disable timer
  */
 static void reset_hsync_timers()
 {
@@ -142,7 +143,16 @@ static void reset_hsync_timers()
 	TIM_Cmd(dev_cfg->pixel_timer.timer, DISABLE);
 
 	// Listen to Channel1 (HSYNC)
-	TIM_SelectInputTrigger(dev_cfg->pixel_timer.timer, TIM_TS_TI2FP2);
+	switch(dev_cfg->hsync_capture.timer_chan) {
+		case TIM_Channel_1:
+			TIM_SelectInputTrigger(dev_cfg->pixel_timer.timer, TIM_TS_TI1FP1);
+			break;
+		case TIM_Channel_2:
+			TIM_SelectInputTrigger(dev_cfg->pixel_timer.timer, TIM_TS_TI2FP2);
+			break;
+		default:
+			PIOS_Assert(0);
+	}
 	TIM_SelectSlaveMode(dev_cfg->pixel_timer.timer, TIM_SlaveMode_Trigger);
 	TIM_SelectMasterSlaveMode(dev_cfg->pixel_timer.timer, TIM_MasterSlaveMode_Enable);
 }
@@ -170,34 +180,33 @@ static void configure_hsync_timers()
 	// This is overkill but used for consistency.  No interrupts used for pixel clock
 	// but this function calls the GPIO_Remap
 	uint32_t tim_id;
-	const struct pios_tim_channel *channels = &dev_cfg->pixel_timer;
+	const struct pios_tim_channel *channels;
+	
+	// Init the channel to output the pixel clock
+	channels = &dev_cfg->pixel_timer;
+	PIOS_TIM_InitChannels(&tim_id, channels, 1, &px_callback, 0);
+	
+	// Init the channel to capture the pulse
+	channels = &dev_cfg->hsync_capture;
 	PIOS_TIM_InitChannels(&tim_id, channels, 1, &px_callback, 0);
 
-	GPIO_InitTypeDef GPIO_InitStructure;
-	
-	/* TIM4_CH1 pin (PC.06) configuration */
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-	GPIO_Init(GPIOB, &GPIO_InitStructure);
-	GPIO_PinAFConfig(GPIOB, GPIO_PinSource6, dev_cfg->pixel_timer.remap);
-	
-	/* TIM4_CH2 pin (PB0.7) configuration */
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_7;
-	GPIO_Init(GPIOB, &GPIO_InitStructure);	
-	GPIO_PinAFConfig(GPIOB, GPIO_PinSource7, dev_cfg->pixel_timer.remap);
-	
+	// Configure the input capture channel
 	TIM_ICInitTypeDef  TIM_ICInitStructure;
-	TIM_ICInitStructure.TIM_Channel = TIM_Channel_2;
+	switch(dev_cfg->hsync_capture.timer_chan) {
+		case TIM_Channel_1:
+			TIM_ICInitStructure.TIM_Channel = TIM_Channel_1;
+			break;
+		case TIM_Channel_2:
+			TIM_ICInitStructure.TIM_Channel = TIM_Channel_2;
+			break;
+		default:
+			PIOS_Assert(0);
+	}
 	TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Rising;
 	TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
 	TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
 	TIM_ICInitStructure.TIM_ICFilter = 0;
-	
 	TIM_ICInit(dev_cfg->pixel_timer.timer, &TIM_ICInitStructure);
-
 
 	// Set up the channel to output the pixel clock
 	switch(dev_cfg->pixel_timer.timer_chan) {

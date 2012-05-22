@@ -52,7 +52,7 @@ endif
 FLASH_TOOL = OPENOCD
 
 # List of modules to include
-MODULES = Attitude/revolution ManualControl Stabilization Actuator GPS AltitudeHold
+MODULES = ManualControl Stabilization GPS
 MODULES += CameraStab
 MODULES += Telemetry
 #MODULES += OveroSync

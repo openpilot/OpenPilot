@@ -7,10 +7,8 @@ static const struct pios_led pios_leds[] = {
 	[PIOS_LED_USB] = {
 		.pin = {
 			.gpio = GPIOA,
-			//.gpio = GPIOC,
 			.init = {
 				.GPIO_Pin   = GPIO_Pin_3,
-				//.GPIO_Pin   = GPIO_Pin_13,
 				.GPIO_Mode  = GPIO_Mode_Out_PP,
 				.GPIO_Speed = GPIO_Speed_50MHz,
 			},
@@ -301,20 +299,17 @@ static const struct pios_tim_clock_cfg tim_4_cfg = {
 };
 
 static const struct pios_tim_channel pios_tim_ppm_flexi_port = {
-	//.timer = TIM2,
-	.timer = TIM4,
-	//.timer_chan = TIM_Channel_4,
+	.timer = TIM2,
 	.timer_chan = TIM_Channel_4,
 	.pin = {
 		.gpio = GPIOB,
 		.init = {
-			//.GPIO_Pin   = GPIO_Pin_11,
-			.GPIO_Pin   = GPIO_Pin_9,
+			.GPIO_Pin   = GPIO_Pin_11,
 			.GPIO_Mode  = GPIO_Mode_IPD,
 			.GPIO_Speed = GPIO_Speed_2MHz,
 		},
 	},
-	//.remap = GPIO_PartialRemap_TIM2,
+	.remap = GPIO_PartialRemap2_TIM2,
 };
 
 #endif	/* PIOS_INCLUDE_TIM */

@@ -959,6 +959,10 @@ QVariant ConfigTaskWidget::getVariantFromWidget(QWidget * widget,double scale)
     {
         return (QString)(cb->isChecked()?"TRUE":"FALSE");
     }
+    else if(QLineEdit * cb=qobject_cast<QLineEdit *>(widget))
+    {
+        return (QString)cb->displayText();
+    }
     else
         return QVariant();
 }
@@ -1011,6 +1015,7 @@ bool ConfigTaskWidget::setWidgetFromVariant(QWidget *widget, QVariant value, dou
             cb->setText(value.toString());
         else
             cb->setText(QString::number((value.toDouble()/scale)));
+        return true;
     }
     else
         return false;

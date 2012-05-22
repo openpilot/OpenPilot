@@ -214,7 +214,7 @@ void ScopeGadgetOptionsPage::setYAxisWidgetFromPlotCurve()
     if(!parseOK) mean = 1;
     options_page->spnMeanSamples->setValue(mean);
 
-    currentIndex = options_page->mathFunctionComboBox->findData( listItem->data(Qt::UserRole + 5).toString());
+    currentIndex = options_page->mathFunctionComboBox->findText( listItem->data(Qt::UserRole + 5).toString());
     options_page->mathFunctionComboBox->setCurrentIndex(currentIndex);
 
 }

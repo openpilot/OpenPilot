@@ -33,6 +33,7 @@
 #if defined(PIOS_INCLUDE_VIDEO)
 
 // Private methods
+static void configure_hsync_timers();
 static void stop_hsync_timers();
 static void reset_hsync_timers();
 static void prepare_line(uint32_t line_num);
@@ -95,7 +96,7 @@ uint32_t counter_position = 0;
 void PIOS_Hsync_ISR()
 {
 	// On tenth line prepare data which will start clocking out on 11th line
-	if(Vsync_update==10 && (DMA_GetCmdStatus(dev_cfg->level.dma.tx.channel)!=ENABLE))
+	if(Vsync_update==10)
 	{
 		prepare_line(0);
 		gActiveLine = 1;
@@ -111,7 +112,7 @@ void PIOS_Vsync_ISR() {
 	m_osdLines = gActiveLine;
 
 	// load second image buffer
-	//stop_hsync_timers();
+	stop_hsync_timers();
 	swap_buffers();
 
 	Vsync_update=0;
@@ -141,10 +142,19 @@ static void stop_hsync_timers()
  * Reset the timer and configure for next call.  Keeps them synced.  Ideally this won't even be needed
  * since I don't think the slave mode gets lost, and this can simply be disable timer
  */
+uint32_t reset_count = 0;
+
 static void reset_hsync_timers()
 {
+
+	configure_hsync_timers();
+
+	reset_count++;
 	// Stop both timers
 	TIM_Cmd(dev_cfg->pixel_timer.timer, DISABLE);
+
+//	TIM4->CR1 |= 0x02 | 0x04; // Enable the UDIS/URS flags
+//	TIM4->SR = 0;
 
 	// Listen to Channel1 (HSYNC)
 	switch(dev_cfg->hsync_capture.timer_chan) {
@@ -159,8 +169,6 @@ static void reset_hsync_timers()
 	}
 	TIM_SelectSlaveMode(dev_cfg->pixel_timer.timer, TIM_SlaveMode_Trigger);
 	TIM_SelectMasterSlaveMode(dev_cfg->pixel_timer.timer, TIM_MasterSlaveMode_Enable);
-	
-	TIM_Cmd(dev_cfg->pixel_timer.timer, ENABLE);
 }
 
 const struct pios_tim_callbacks px_callback = {
@@ -172,8 +180,6 @@ static void configure_hsync_timers()
 {
 	// Stop both timers
 	TIM_Cmd(dev_cfg->pixel_timer.timer, DISABLE);
-
-	TIM_DeInit(dev_cfg->pixel_timer.timer);
 
 	// This is overkill but used for consistency.  No interrupts used for pixel clock
 	// but this function calls the GPIO_Remap
@@ -236,8 +242,6 @@ static void configure_hsync_timers()
 	// is clobbering that
 	TIM_PrescalerConfig(dev_cfg->pixel_timer.timer, 0, TIM_PSCReloadMode_Immediate);
 	TIM_SetAutoreload(dev_cfg->pixel_timer.timer, 25);
-
-	TIM_Cmd(dev_cfg->pixel_timer.timer, ENABLE);
 }
 
 void PIOS_Video_Init(const struct pios_video_cfg * cfg)

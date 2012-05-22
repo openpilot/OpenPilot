@@ -248,6 +248,8 @@ static void configure_hsync_timers()
 	TIM_SetAutoreload(dev_cfg->pixel_timer.timer, 10);
 }
 
+DMA_TypeDef * main_dma;
+DMA_Stream_TypeDef * main_stream;
 void PIOS_Video_Init(const struct pios_video_cfg * cfg)
 {
 	dev_cfg = cfg; // store config before enabling interrupt
@@ -320,10 +322,18 @@ void PIOS_Video_Init(const struct pios_video_cfg * cfg)
 	SPI_I2S_DMACmd(cfg->mask.regs, SPI_I2S_DMAReq_Tx, ENABLE);
 	SPI_I2S_DMACmd(cfg->level.regs, SPI_I2S_DMAReq_Tx, ENABLE);
 
+	main_dma = DMA2;
+	main_stream = cfg->level.dma.tx.channel;
 	/* Configure the Video Line interrupt */
 	PIOS_EXTI_Init(cfg->hsync);
 	PIOS_EXTI_Init(cfg->vsync);
 }
+
+uint8_t test_line[BUFFER_LINE_LENGTH] = {
+	       0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+	       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	       };
 
 /**
  * Prepare the system to watch for a HSYNC pulse to trigger the pixel
@@ -337,28 +347,39 @@ static void prepare_line(uint32_t line_num)
 	prepare_count++;
 
 	uint32_t buf_offset = line_num * GRAPHICS_WIDTH;
+	//buf_offset = (Vsync_update - 10) * GRAPHICS_WIDTH;
 
-	DMA_Cmd(dev_cfg->level.dma.tx.channel, DISABLE);
+	DMA_ClearFlag(dev_cfg->mask.dma.tx.channel, DMA_FLAG_FEIF7 | DMA_FLAG_TEIF7);
+	DMA_ClearFlag(dev_cfg->level.dma.tx.channel, DMA_FLAG_FEIF5 | DMA_FLAG_TEIF5);
+	
+	/* Configure DMA for SPI Tx SLAVE Maskbuffer */
 	DMA_Cmd(dev_cfg->mask.dma.tx.channel, DISABLE);
+	DMA_Init(dev_cfg->mask.dma.tx.channel, (DMA_InitTypeDef*)&(dev_cfg->mask.dma.tx.init));
+	
+	/* Configure DMA for SPI Tx SLAVE Framebuffer*/
+	DMA_Cmd(dev_cfg->level.dma.tx.channel, DISABLE);
+	DMA_Init(dev_cfg->level.dma.tx.channel, (DMA_InitTypeDef*)&(dev_cfg->level.dma.tx.init));
+
+	/* Trigger interrupt when for half conversions too to indicate double buffer */
+	DMA_ITConfig(dev_cfg->level.dma.tx.channel, DMA_IT_TC, ENABLE);
 
 	// Load new line
-	switch(DMA_GetCurrentMemoryTarget(dev_cfg->mask.dma.tx.channel))
-	{
-		case 0:
-			DMA_MemoryTargetConfig(dev_cfg->level.dma.tx.channel,(uint32_t)&disp_buffer_level[buf_offset],DMA_Memory_1);
-			DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[buf_offset],DMA_Memory_1);
-			break;
-		case 1:
-			DMA_MemoryTargetConfig(dev_cfg->level.dma.tx.channel,(uint32_t)&disp_buffer_level[buf_offset],DMA_Memory_0);
-			DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[buf_offset],DMA_Memory_0);
-			break;
-	}
+	DMA_MemoryTargetConfig(dev_cfg->level.dma.tx.channel,(uint32_t)&disp_buffer_level[buf_offset],DMA_Memory_0);
+	DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[buf_offset],DMA_Memory_0);
+
+//	DMA_MemoryTargetConfig(dev_cfg->level.dma.tx.channel,(uint32_t)&test_line[0],DMA_Memory_0);
+//	DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&test_line[0],DMA_Memory_0);
+
 
 	// Enable DMA, Slave first
 	DMA_SetCurrDataCounter(dev_cfg->level.dma.tx.channel, BUFFER_LINE_LENGTH);
 	DMA_SetCurrDataCounter(dev_cfg->mask.dma.tx.channel, BUFFER_LINE_LENGTH);
 
 	reset_hsync_timers();
+
+	/* Enable SPI interrupts to DMA */
+	SPI_I2S_DMACmd(dev_cfg->mask.regs, SPI_I2S_DMAReq_Tx, ENABLE);
+	SPI_I2S_DMACmd(dev_cfg->level.regs, SPI_I2S_DMAReq_Tx, ENABLE);
 
 	DMA_Cmd(dev_cfg->level.dma.tx.channel, ENABLE);
 	DMA_Cmd(dev_cfg->mask.dma.tx.channel, ENABLE);
@@ -377,9 +398,11 @@ void PIOS_VIDEO_DMA_Handler(void)
 {
 	dma_counter++;
 
+	stop_hsync_timers();
+
 	// Handle flags from stream channel
 	if (DMA_GetFlagStatus(dev_cfg->level.dma.tx.channel,DMA_FLAG_TCIF5)) {	// whole double buffer filled
-
+		DMA_ClearFlag(dev_cfg->level.dma.tx.channel,DMA_FLAG_TCIF5);
 		if(gActiveLine < GRAPHICS_HEIGHT-2)
 		{
 			PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
@@ -397,7 +420,6 @@ void PIOS_VIDEO_DMA_Handler(void)
 		}
 		gActiveLine++;
 
-		DMA_ClearFlag(dev_cfg->level.dma.tx.channel,DMA_FLAG_TCIF5);
 		c++;
 	}
 	else if (DMA_GetFlagStatus(dev_cfg->level.dma.tx.channel,DMA_FLAG_HTIF5)) {

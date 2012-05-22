@@ -52,13 +52,13 @@ typedef struct {
 } SwashplateServoSettingsStruct;
 
 
-class ConfigccpmWidget: public VehicleConfig
+class ConfigCcpmWidget: public VehicleConfig
 {
     Q_OBJECT
 
 public:
-    ConfigccpmWidget(QWidget *parent = 0);
-    ~ConfigccpmWidget();
+    ConfigCcpmWidget(QWidget *parent = 0);
+    ~ConfigCcpmWidget();
 
     friend class ConfigVehicleTypeWidget;
 

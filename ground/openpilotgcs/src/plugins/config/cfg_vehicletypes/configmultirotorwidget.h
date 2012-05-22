@@ -53,6 +53,7 @@ public:
 private:
     Ui_AircraftWidget *m_aircraft;
 
+    QWidget *uiowner;
     QGraphicsSvgItem *quad;
 
     bool setupQuad(bool pLayout);
@@ -74,6 +75,8 @@ private slots:
 
 protected:
 
+signals:
+    void configurationChanged();
 
 };
 

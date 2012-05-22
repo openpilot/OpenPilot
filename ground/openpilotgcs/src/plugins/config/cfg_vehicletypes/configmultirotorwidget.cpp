@@ -52,6 +52,9 @@
 ConfigMultiRotorWidget::ConfigMultiRotorWidget(Ui_AircraftWidget *aircraft, QWidget *parent) : VehicleConfig(parent)
 {
     m_aircraft = aircraft;
+
+    //connect(m_aircraft->multirotorFrameType, SIGNAL(currentIndexChanged(QString)), this, SLOT(setupUI(QString)));
+
 }
 
 /**
@@ -66,17 +69,23 @@ ConfigMultiRotorWidget::~ConfigMultiRotorWidget()
 void ConfigMultiRotorWidget::setupUI(QString frameType)
 {
     Q_ASSERT(m_aircraft);
+    Q_ASSERT(uiowner);
     Q_ASSERT(quad);
+
+    int i;
 
     // set aircraftType to Multirotor, disable triyaw channel
     setComboCurrentIndex(m_aircraft->aircraftType, m_aircraft->aircraftType->findText("Multirotor"));
     m_aircraft->triYawChannelBox->setEnabled(false);
 
     // disable all motor channel boxes
-    for (int i=1; i <=8; i++) {
-        QComboBox *combobox = qFindChild<QComboBox*>(this->parent(), "multiMotorChannelBox" + QString::number(i));
-        if (combobox)
+    for (i=1; i <=8; i++) {
+        // do it manually so we can turn off any error decorations
+        QComboBox *combobox = qFindChild<QComboBox*>(uiowner, "multiMotorChannelBox" + QString::number(i));
+        if (combobox) {
             combobox->setEnabled(false);
+            combobox->setItemData(0, 0, Qt::DecorationRole);
+        }
     }
 
     if (frameType == "Tri" || frameType == "Tricopter Y") {
@@ -84,10 +93,8 @@ void ConfigMultiRotorWidget::setupUI(QString frameType)
 		quad->setElementId("tri");
 
 		//Enable all necessary motor channel boxes...
-		for (int i=1; i <=3; i++) {
-            QComboBox *combobox = qFindChild<QComboBox*>(this->parent(), "multiMotorChannelBox" + QString::number(i));
-            if (combobox)
-                combobox->setEnabled(true);
+        for (i=1; i <=3; i++) {
+            enableComboBox(uiowner, QString("multiMotorChannelBox%0").arg(i), true);
 		}
 		
         m_aircraft->triYawChannelBox->setEnabled(true);
@@ -97,10 +104,8 @@ void ConfigMultiRotorWidget::setupUI(QString frameType)
 		quad->setElementId("quad-X");
 		
 		//Enable all necessary motor channel boxes...
-		for (int i=1; i <=4; i++) {
-            QComboBox *combobox = qFindChild<QComboBox*>(this->parent(), "multiMotorChannelBox" + QString::number(i));
-            if (combobox)
-                combobox->setEnabled(true);
+        for (i=1; i <=4; i++) {
+            enableComboBox(uiowner, QString("multiMotorChannelBox%0").arg(i), true);
 		}
 
 		m_aircraft->mrRollMixLevel->setValue(50);
@@ -112,10 +117,8 @@ void ConfigMultiRotorWidget::setupUI(QString frameType)
 		quad->setElementId("quad-plus");
 		
 		//Enable all necessary motor channel boxes...
-		for (int i=1; i <=4; i++) {
-            QComboBox *combobox = qFindChild<QComboBox*>(this->parent(), "multiMotorChannelBox" + QString::number(i));
-            if (combobox)
-                combobox->setEnabled(true);
+        for (i=1; i <=4; i++) {
+            enableComboBox(uiowner, QString("multiMotorChannelBox%0").arg(i), true);
 		}
 
 		m_aircraft->mrRollMixLevel->setValue(100);
@@ -128,10 +131,8 @@ void ConfigMultiRotorWidget::setupUI(QString frameType)
 		quad->setElementId("quad-hexa");
 		
 		//Enable all necessary motor channel boxes...
-		for (int i=1; i <=6; i++) {
-            QComboBox *combobox = qFindChild<QComboBox*>(this->parent(), "multiMotorChannelBox" + QString::number(i));
-            if (combobox)
-                combobox->setEnabled(true);
+        for (i=1; i <=6; i++) {
+            enableComboBox(uiowner, QString("multiMotorChannelBox%0").arg(i), true);
 		}
 
 		m_aircraft->mrRollMixLevel->setValue(50);
@@ -143,10 +144,8 @@ void ConfigMultiRotorWidget::setupUI(QString frameType)
 		quad->setElementId("quad-hexa-H");
 		
 		//Enable all necessary motor channel boxes...
-		for (int i=1; i <=6; i++) {
-            QComboBox *combobox = qFindChild<QComboBox*>(this->parent(), "multiMotorChannelBox" + QString::number(i));
-            if (combobox)
-                combobox->setEnabled(true);
+        for (i=1; i <=6; i++) {
+            enableComboBox(uiowner, QString("multiMotorChannelBox%0").arg(i), true);
 		}
 
 		m_aircraft->mrRollMixLevel->setValue(33);
@@ -160,10 +159,8 @@ void ConfigMultiRotorWidget::setupUI(QString frameType)
 		quad->setElementId("hexa-coax");
 		
 		//Enable all necessary motor channel boxes...
-		for (int i=1; i <=6; i++) {
-            QComboBox *combobox = qFindChild<QComboBox*>(this->parent(), "multiMotorChannelBox" + QString::number(i));
-            if (combobox)
-                combobox->setEnabled(true);
+        for (i=1; i <=6; i++) {
+            enableComboBox(uiowner, QString("multiMotorChannelBox%0").arg(i), true);
 		}
 
 		m_aircraft->mrRollMixLevel->setValue(100);
@@ -177,10 +174,8 @@ void ConfigMultiRotorWidget::setupUI(QString frameType)
 		quad->setElementId("quad-octo");
 		
 		//Enable all necessary motor channel boxes
-		for (int i=1; i <=8; i++) {
-            QComboBox *combobox = qFindChild<QComboBox*>(this->parent(), "multiMotorChannelBox" + QString::number(i));
-            if (combobox)
-                combobox->setEnabled(true);
+        for (i=1; i <=8; i++) {
+            enableComboBox(uiowner, QString("multiMotorChannelBox%0").arg(i), true);
 		}		
 
 		m_aircraft->mrRollMixLevel->setValue(33);
@@ -193,10 +188,8 @@ void ConfigMultiRotorWidget::setupUI(QString frameType)
 		quad->setElementId("quad-octo-v");
 
 		//Enable all necessary motor channel boxes
-		for (int i=1; i <=8; i++) {
-            QComboBox *combobox = qFindChild<QComboBox*>(this->parent(), "multiMotorChannelBox" + QString::number(i));
-            if (combobox)
-                combobox->setEnabled(true);
+        for (i=1; i <=8; i++) {
+            enableComboBox(uiowner, QString("multiMotorChannelBox%0").arg(i), true);
 		}		
 
 		m_aircraft->mrRollMixLevel->setValue(25);
@@ -210,10 +203,8 @@ void ConfigMultiRotorWidget::setupUI(QString frameType)
 		quad->setElementId("octo-coax-P");
 
 		//Enable all necessary motor channel boxes
-		for (int i=1; i <=8; i++) {
-            QComboBox *combobox = qFindChild<QComboBox*>(this->parent(), "multiMotorChannelBox" + QString::number(i));
-            if (combobox)
-                combobox->setEnabled(true);
+		for (int i=1; i <=8; i++) {            
+            enableComboBox(uiowner, QString("multiMotorChannelBox%0").arg(i), true);
 		}		
 
 		m_aircraft->mrRollMixLevel->setValue(100);
@@ -227,10 +218,8 @@ void ConfigMultiRotorWidget::setupUI(QString frameType)
 		quad->setElementId("octo-coax-X");
 
 		//Enable all necessary motor channel boxes
-		for (int i=1; i <=8; i++) {
-            QComboBox *combobox = qFindChild<QComboBox*>(this->parent(), "multiMotorChannelBox" + QString::number(i));
-            if (combobox)
-                combobox->setEnabled(true);
+		for (int i=1; i <=8; i++) {            
+            enableComboBox(uiowner, QString("multiMotorChannelBox%0").arg(i), true);
 		}		
 
 		m_aircraft->mrRollMixLevel->setValue(50);
@@ -1118,34 +1107,24 @@ bool ConfigMultiRotorWidget::setupMultiRotorMixer(double mixerFactors[8][3])
  This function displays text and color formatting in order to help the user understand what channels have not yet been configured.
  */
 void ConfigMultiRotorWidget::throwConfigError(int numMotors)
-{
+{    
 	//Initialize configuration error flag
 	bool error=false;
 
 	//Iterate through all instances of multiMotorChannelBox
 	for (int i=0; i<numMotors; i++) {
 		//Fine widgets with text "multiMotorChannelBox.x", where x is an integer
-        QComboBox *combobox = qFindChild<QComboBox*>(this, "multiMotorChannelBox" + QString::number(i+1));
-		if (combobox){  //if QLabel exists
-//			QLabel *label = qFindChild<QLabel*>(this, "MotorOutputLabel" + QString::number(i+1));
-
-			if (combobox->currentText() == "None") {
-
-//				label->setText("<font color='red'>" + label->text() + "</font>");
-			
+        QComboBox *combobox = qFindChild<QComboBox*>(uiowner, "multiMotorChannelBox" + QString::number(i+1));
+        if (combobox){
+            if (combobox->currentText() == "None") {
 				int size = combobox->style()->pixelMetric(QStyle::PM_SmallIconSize);
 				QPixmap pixmap(size,size);
 				pixmap.fill(QColor("red"));
-				combobox->setItemData(0, pixmap, Qt::DecorationRole);//Set color palettes 
-//				combobox->setStyleSheet("QComboBox { color: red}");
+                combobox->setItemData(0, pixmap, Qt::DecorationRole);//Set color palettes
 				error=true;
-
 			}
 			else {
-				combobox->setItemData(0, 0, Qt::DecorationRole);//Reset color palettes 
-//				combobox->setStyleSheet("color: black;");
-//				QTextEdit* htmlText=new QTextEdit(label->text());  // htmlText is any QString with html tags.
-//				label->setText(htmlText->toPlainText());
+                combobox->setItemData(0, 0, Qt::DecorationRole);//Reset color palettes
 			}
 		}
 	}

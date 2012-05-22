@@ -115,10 +115,12 @@ class VehicleConfig: public ConfigTaskWidget
         static void SetConfigData(GUIConfigDataUnion configData);
         static void resetField(UAVObjectField * field);
         static void setComboCurrentIndex(QComboBox* box, int index);
+        static void enableComboBox(QWidget* owner, QString boxName, bool enable);
 
         virtual void ResetActuators(GUIConfigDataUnion* configData);
         virtual QStringList getChannelDescriptions();
 
+        QStringList channelNames;
         QStringList mixerTypes;
         QStringList mixerVectors;
 

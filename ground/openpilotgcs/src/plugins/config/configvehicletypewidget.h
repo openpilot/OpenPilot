@@ -58,7 +58,7 @@ public:
 private:
     Ui_AircraftWidget *m_aircraft;
 
-    ConfigccpmWidget *m_heli;
+    ConfigCcpmWidget *m_heli;
     ConfigFixedWingWidget *m_fixedwing;
     ConfigMultiRotorWidget *m_multirotor;
     ConfigGroundVehicleWidget *m_groundvehicle;
@@ -70,9 +70,10 @@ private:
 
     //void setMixerChannel(int channelNumber, bool channelIsMotor, QList<double> vector);
 
-
+    QStringList channelNames;
     QStringList mixerTypes;
     QStringList mixerVectors;
+
     QGraphicsSvgItem *quad;
     bool ffTuningInProgress;
     bool ffTuningPhase;
@@ -84,7 +85,6 @@ private slots:
     virtual void updateObjectsFromWidgets();
 
     void setComboCurrentIndex(QComboBox* box, int index);
-
 
     void setupAirframeUI(QString type);
 	

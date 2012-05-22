@@ -44,7 +44,7 @@
 #define  Pi 3.14159265358979323846
 
 
-ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : VehicleConfig(parent)
+ConfigCcpmWidget::ConfigCcpmWidget(QWidget *parent) : VehicleConfig(parent)
 {
     int i;
     SwashLvlConfigurationInProgress=0;
@@ -143,20 +143,20 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : VehicleConfig(parent)
     UAVObjectField * curve2source = mixerSettings->getField("Curve2Source");
     Q_ASSERT(curve2source);
 
-    QStringList channels;
-    channels  << "None" << "Channel1" << "Channel2" << "Channel3" << "Channel4" <<
-                "Channel5" << "Channel6" << "Channel7" << "Channel8";
-    m_ccpm->ccpmEngineChannel->addItems(channels);
+//    QStringList channels;
+//    channels  << "None" << "Channel1" << "Channel2" << "Channel3" << "Channel4" <<
+//                "Channel5" << "Channel6" << "Channel7" << "Channel8";
+    m_ccpm->ccpmEngineChannel->addItems(channelNames);
     m_ccpm->ccpmEngineChannel->setCurrentIndex(0);
-    m_ccpm->ccpmTailChannel->addItems(channels);
+    m_ccpm->ccpmTailChannel->addItems(channelNames);
     m_ccpm->ccpmTailChannel->setCurrentIndex(0);
-    m_ccpm->ccpmServoWChannel->addItems(channels);
+    m_ccpm->ccpmServoWChannel->addItems(channelNames);
     m_ccpm->ccpmServoWChannel->setCurrentIndex(0);
-    m_ccpm->ccpmServoXChannel->addItems(channels);
+    m_ccpm->ccpmServoXChannel->addItems(channelNames);
     m_ccpm->ccpmServoXChannel->setCurrentIndex(0);
-    m_ccpm->ccpmServoYChannel->addItems(channels);
+    m_ccpm->ccpmServoYChannel->addItems(channelNames);
     m_ccpm->ccpmServoYChannel->setCurrentIndex(0);
-    m_ccpm->ccpmServoZChannel->addItems(channels);
+    m_ccpm->ccpmServoZChannel->addItems(channelNames);
     m_ccpm->ccpmServoZChannel->setCurrentIndex(0);
 
     QStringList Types;
@@ -222,16 +222,16 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : VehicleConfig(parent)
    ccpmSwashplateRedraw(); 
 }
 
-ConfigccpmWidget::~ConfigccpmWidget()
+ConfigCcpmWidget::~ConfigCcpmWidget()
 {
    // Do nothing
 }
 
-void ConfigccpmWidget::setupUI(QString frameType)
+void ConfigCcpmWidget::setupUI(QString frameType)
 {
 }
 
-void ConfigccpmWidget::ResetActuators(GUIConfigDataUnion* configData)
+void ConfigCcpmWidget::ResetActuators(GUIConfigDataUnion* configData)
 {
     configData->heli.Throttle = 0;
     configData->heli.Tail = 0;
@@ -241,13 +241,13 @@ void ConfigccpmWidget::ResetActuators(GUIConfigDataUnion* configData)
     configData->heli.ServoIndexZ = 0;
 }
 
-QStringList ConfigccpmWidget::getChannelDescriptions()
+QStringList ConfigCcpmWidget::getChannelDescriptions()
 {
     int i;
     QStringList channelDesc;
 
     // init a channel_numelem list of channel desc defaults
-    for (i=0; i < (int)(ConfigccpmWidget::CHANNEL_NUMELEM); i++)
+    for (i=0; i < (int)(ConfigCcpmWidget::CHANNEL_NUMELEM); i++)
     {
         channelDesc.append(QString("-"));
     }
@@ -306,7 +306,7 @@ QStringList ConfigccpmWidget::getChannelDescriptions()
     return channelDesc;
 }
 
-void ConfigccpmWidget::UpdateType()
+void ConfigCcpmWidget::UpdateType()
 {
     int TypeInt,SingleServoIndex,NumServosDefined;
     QString TypeText;
@@ -483,12 +483,12 @@ void ConfigccpmWidget::UpdateType()
 /**
   Resets a mixer curve
   */
-void ConfigccpmWidget::resetMixer(MixerCurveWidget *mixer, int numElements)
+void ConfigCcpmWidget::resetMixer(MixerCurveWidget *mixer, int numElements)
 {
     mixer->initLinearCurve(numElements,(double)1);
 }
 
-void ConfigccpmWidget::UpdateCurveWidgets()
+void ConfigCcpmWidget::UpdateCurveWidgets()
 {
     int NumCurvePoints,i,Changed;
     QList<double> curveValues;
@@ -522,7 +522,7 @@ void ConfigccpmWidget::UpdateCurveWidgets()
     if (Changed==1)m_ccpm->PitchCurve->setCurve(curveValues);
 }
 
-void ConfigccpmWidget::updatePitchCurveValue(QList<double> curveValues0,double Value0)
+void ConfigCcpmWidget::updatePitchCurveValue(QList<double> curveValues0,double Value0)
 {
     Q_UNUSED(curveValues0);
     Q_UNUSED(Value0);
@@ -546,7 +546,7 @@ void ConfigccpmWidget::updatePitchCurveValue(QList<double> curveValues0,double V
 
 }
 
-void ConfigccpmWidget::updateThrottleCurveValue(QList<double> curveValues0,double Value0)
+void ConfigCcpmWidget::updateThrottleCurveValue(QList<double> curveValues0,double Value0)
 {
     Q_UNUSED(curveValues0);
     Q_UNUSED(Value0);
@@ -571,7 +571,7 @@ void ConfigccpmWidget::updateThrottleCurveValue(QList<double> curveValues0,doubl
 }
 
 
-void ConfigccpmWidget::UpdateCurveSettings()
+void ConfigCcpmWidget::UpdateCurveSettings()
 {
     int NumCurvePoints,i;
     double scale;
@@ -701,7 +701,7 @@ void ConfigccpmWidget::UpdateCurveSettings()
 UpdateCurveWidgets();
 
 }
-void ConfigccpmWidget::GenerateCurve()
+void ConfigCcpmWidget::GenerateCurve()
 {
    int NumCurvePoints,CurveToGenerate,i;
    double value1, value2, value3, scale;
@@ -771,7 +771,7 @@ void ConfigccpmWidget::GenerateCurve()
 
 }
 
-void ConfigccpmWidget::ccpmSwashplateRedraw()
+void ConfigCcpmWidget::ccpmSwashplateRedraw()
 {
     double angle[CCPM_MAX_SWASH_SERVOS],CorrectionAngle,x,y,w,h,radius,CenterX,CenterY;
     int used[CCPM_MAX_SWASH_SERVOS],defined[CCPM_MAX_SWASH_SERVOS],i;
@@ -872,14 +872,14 @@ void ConfigccpmWidget::ccpmSwashplateRedraw()
     //m_ccpm->SwashplateImage->fitInView(SwashplateImg, Qt::KeepAspectRatio);
 }
 
-void ConfigccpmWidget::ccpmSwashplateUpdate()
+void ConfigCcpmWidget::ccpmSwashplateUpdate()
 {
     ccpmSwashplateRedraw();
     SetUIComponentVisibilities();
     UpdateMixer();
 }
 
-void ConfigccpmWidget::UpdateMixer()
+void ConfigCcpmWidget::UpdateMixer()
 {
     bool useCCPM;
     bool useCyclic;
@@ -995,7 +995,7 @@ void ConfigccpmWidget::UpdateMixer()
     }
 
 }
-QString ConfigccpmWidget::updateConfigObjectsFromWidgets() //UpdateCCPMOptionsFromUI()
+QString ConfigCcpmWidget::updateConfigObjectsFromWidgets() //UpdateCCPMOptionsFromUI()
 {
     QString airframeType = "HeliCP";
 
@@ -1061,7 +1061,7 @@ QString ConfigccpmWidget::updateConfigObjectsFromWidgets() //UpdateCCPMOptionsFr
     return airframeType;
 }
 
-void ConfigccpmWidget::refreshWidgetsValues(QString frameType) //UpdateCCPMUIFromOptions()
+void ConfigCcpmWidget::refreshWidgetsValues(QString frameType) //UpdateCCPMUIFromOptions()
 {
     Q_UNUSED(frameType);
 
@@ -1106,8 +1106,10 @@ void ConfigccpmWidget::refreshWidgetsValues(QString frameType) //UpdateCCPMUIFro
 }
 
 
-void ConfigccpmWidget::SetUIComponentVisibilities()
+void ConfigCcpmWidget::SetUIComponentVisibilities()
 {
+    //mdl updateObjectsFromWidgets();
+
     GUIConfigDataUnion config = GetConfigData();
 
     //set which sliders are user...
@@ -1137,7 +1139,7 @@ void ConfigccpmWidget::SetUIComponentVisibilities()
 /**
   Request the current value of the SystemSettings which holds the ccpm type
   */
-void ConfigccpmWidget::getMixer()
+void ConfigCcpmWidget::getMixer()
 {
     if (SwashLvlConfigurationInProgress)return;
     if (updatingToHardware)return;
@@ -1167,7 +1169,7 @@ void ConfigccpmWidget::getMixer()
 /**
   Sends the config to the board (ccpm type)
   */
-void ConfigccpmWidget::setMixer()
+void ConfigCcpmWidget::setMixer()
 {
     int i,j;
 
@@ -1242,7 +1244,7 @@ void ConfigccpmWidget::setMixer()
 /**
   Send ccpm type to the board and request saving to SD card
   */
-void ConfigccpmWidget::saveccpmUpdate()
+void ConfigCcpmWidget::saveccpmUpdate()
 {
     if (SwashLvlConfigurationInProgress)return;
     ShowDisclaimer(0);
@@ -1254,7 +1256,7 @@ void ConfigccpmWidget::saveccpmUpdate()
     saveObjectToSD(obj);
 }
 
-void ConfigccpmWidget::resizeEvent(QResizeEvent* event)
+void ConfigCcpmWidget::resizeEvent(QResizeEvent* event)
 {
     Q_UNUSED(event);
     // Make the custom table columns autostretch:
@@ -1266,7 +1268,7 @@ void ConfigccpmWidget::resizeEvent(QResizeEvent* event)
     ccpmSwashplateRedraw();
 
 }
-void ConfigccpmWidget::showEvent(QShowEvent *event)
+void ConfigCcpmWidget::showEvent(QShowEvent *event)
 {
     Q_UNUSED(event)
     m_ccpm->ccpmAdvancedSettingsTable->resizeColumnsToContents();
@@ -1278,7 +1280,7 @@ void ConfigccpmWidget::showEvent(QShowEvent *event)
 }
 
 
-void ConfigccpmWidget::SwashLvlStartButtonPressed()
+void ConfigCcpmWidget::SwashLvlStartButtonPressed()
 {
     QMessageBox msgBox;
     int i;
@@ -1377,7 +1379,7 @@ void ConfigccpmWidget::SwashLvlStartButtonPressed()
 
 
 }
-void ConfigccpmWidget::SwashLvlNextButtonPressed()
+void ConfigCcpmWidget::SwashLvlNextButtonPressed()
 {
     //ShowDisclaimer(2);
     SwashLvlState++;
@@ -1480,7 +1482,7 @@ void ConfigccpmWidget::SwashLvlNextButtonPressed()
         break;
     }
 }
-void ConfigccpmWidget::SwashLvlCancelButtonPressed()
+void ConfigCcpmWidget::SwashLvlCancelButtonPressed()
 {
     int i;
     SwashLvlState=0;
@@ -1528,7 +1530,7 @@ void ConfigccpmWidget::SwashLvlCancelButtonPressed()
 }
 
 
-void ConfigccpmWidget::SwashLvlFinishButtonPressed()
+void ConfigCcpmWidget::SwashLvlFinishButtonPressed()
 {
     int i;
 
@@ -1572,7 +1574,7 @@ void ConfigccpmWidget::SwashLvlFinishButtonPressed()
 
 }
 
-int ConfigccpmWidget::ShowDisclaimer(int messageID)
+int ConfigCcpmWidget::ShowDisclaimer(int messageID)
 {
      QMessageBox msgBox;
      msgBox.setText("<font color=red><h1>Warning!!!</h2></font>");
@@ -1621,7 +1623,7 @@ int ConfigccpmWidget::ShowDisclaimer(int messageID)
   Toggles the channel testing mode by making the GCS take over
   the ActuatorCommand objects
   */
-void ConfigccpmWidget::enableSwashplateLevellingControl(bool state)
+void ConfigCcpmWidget::enableSwashplateLevellingControl(bool state)
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
@@ -1661,7 +1663,7 @@ void ConfigccpmWidget::enableSwashplateLevellingControl(bool state)
   Sets the swashplate level to a given value based on current settings for Max, Neutral and Min values.
   level ranges -1 to +1
   */
-void ConfigccpmWidget::setSwashplateLevel(int percent)
+void ConfigCcpmWidget::setSwashplateLevel(int percent)
 {
     if (percent<0)return;// -1;
     if (percent>100)return;// -1;
@@ -1696,7 +1698,7 @@ return;
 }
 
 
-void ConfigccpmWidget::SwashLvlSpinBoxChanged(int value)
+void ConfigCcpmWidget::SwashLvlSpinBoxChanged(int value)
 {
     Q_UNUSED(value);
     int i;
@@ -1740,7 +1742,7 @@ void ConfigccpmWidget::SwashLvlSpinBoxChanged(int value)
 /**
  This function displays text and color formatting in order to help the user understand what channels have not yet been configured.
  */
-void ConfigccpmWidget::throwConfigError(QString airframeType)
+void ConfigCcpmWidget::throwConfigError(QString airframeType)
 {
     Q_UNUSED(airframeType);
 

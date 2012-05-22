@@ -106,13 +106,12 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
     ffTuningInProgress = false;
     ffTuningPhase = false;
 
-	//Generate list of channels
-    QStringList channels;
-    channels << "None";
+    //Generate lists of mixerTypeNames, mixerVectorNames, channelNames
+    channelNames << "None";
     for (int i = 0; i < ActuatorSettings::CHANNELADDR_NUMELEM; i++) {
         mixerTypes << QString("Mixer%1Type").arg(i+1);
         mixerVectors << QString("Mixer%1Vector").arg(i+1);
-        channels << QString("Channel%1").arg(i+1);
+        channelNames << QString("Channel%1").arg(i+1);
     }
 
     QStringList airframeTypes;
@@ -142,7 +141,7 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
 	//  The upshot of this is that ALL new ComboBox widgets for selecting the output channel must have "ChannelBox" in their name
 	foreach(QComboBox *combobox, this->findChildren<QComboBox*>(QRegExp("\\S+ChannelBo\\S+")))//FOR WHATEVER REASON, THIS DOES NOT WORK WITH ChannelBox. ChannelBo is sufficiently accurate
 	{
-        combobox->addItems(channels);
+        combobox->addItems(channelNames);
     }
 	
     // Setup the Multirotor picture in the Quad settings interface
@@ -173,18 +172,26 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
         m_aircraft->customMixerTable->setItemDelegateForRow(i, sbd);
     }
 
-    m_multirotor = new ConfigMultiRotorWidget(m_aircraft, this);
+    // create and setup a MultiRotor config widget
+    m_multirotor = new ConfigMultiRotorWidget(m_aircraft);
     m_multirotor->quad = quad;
+    m_multirotor->uiowner = this;
     m_multirotor->setupUI(m_aircraft->multirotorFrameType->currentText());
 
-    m_groundvehicle = new ConfigGroundVehicleWidget(m_aircraft, this);
+    // create and setup a GroundVehicle config widget
+    m_groundvehicle = new ConfigGroundVehicleWidget(m_aircraft);
     m_groundvehicle->setupUI(m_aircraft->groundVehicleType->currentText() );
 
-    m_fixedwing = new ConfigFixedWingWidget(m_aircraft, this);
+    // create and setup a FixedWing config widget
+    m_fixedwing = new ConfigFixedWingWidget(m_aircraft);
     m_fixedwing->setupUI(m_aircraft->fixedWingType->currentText() );
 
-    m_heli = m_aircraft->widget_3;// new ConfigccpmWidget(this);
+    // create and setup a Helicopter config widget
+    m_heli = m_aircraft->widget_3;
     m_heli->setupUI(QString("HeliCP"));
+
+    // initialize the ui to show the mixersettings tab
+    //mdl m_aircraft->tabWidget->setCurrentIndex(0);
 
 	//Connect aircraft type selection dropbox to callback function
     connect(m_aircraft->aircraftType, SIGNAL(currentIndexChanged(int)), this, SLOT(switchAirframeType(int)));
@@ -238,6 +245,11 @@ ConfigVehicleTypeWidget::~ConfigVehicleTypeWidget()
    // Do nothing
 }
 
+/**
+  Static function to get currently assigned channelDescriptions
+  for all known vehicle types;  instantiates the appropriate object
+  then asks it to supply channel descs
+  */
 QStringList ConfigVehicleTypeWidget::getChannelDescriptions()
 {    
     int i;
@@ -267,7 +279,7 @@ QStringList ConfigVehicleTypeWidget::getChannelDescriptions()
         // helicp
         case SystemSettings::AIRFRAMETYPE_HELICP:
         {
-            ConfigccpmWidget* heli = new ConfigccpmWidget();
+            ConfigCcpmWidget* heli = new ConfigCcpmWidget();
             channelDesc = heli->getChannelDescriptions();
         }
         break;
@@ -401,7 +413,6 @@ void ConfigVehicleTypeWidget::toggleRudder2(int index)
         m_aircraft->fwRudder2Label->setEnabled(false);
     }
 }
-
 
 /////////////////////////////////////////////////////////
 /// Feed Forward Testing

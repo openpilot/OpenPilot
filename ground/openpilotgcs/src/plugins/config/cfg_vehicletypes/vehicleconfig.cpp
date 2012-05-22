@@ -36,9 +36,12 @@
 
 VehicleConfig::VehicleConfig(QWidget *parent) : ConfigTaskWidget(parent)
 {
+    //Generate lists of mixerTypeNames, mixerVectorNames, channelNames
+    channelNames << "None";
     for (int i = 0; i < (int)(VehicleConfig::CHANNEL_NUMELEM); i++) {
         mixerTypes << QString("Mixer%1Type").arg(i+1);
         mixerVectors << QString("Mixer%1Vector").arg(i+1);
+        channelNames << QString("Channel%1").arg(i+1);
     }
 }
 
@@ -117,6 +120,17 @@ void VehicleConfig::setComboCurrentIndex(QComboBox* box, int index)
 
     if (index >= 0 && index < box->count())
         box->setCurrentIndex(index);
+}
+
+/**
+  Helper function:
+  enables/disables the named combobox within supplied uiowner
+ */
+void VehicleConfig::enableComboBox(QWidget* owner, QString boxName, bool enable)
+{
+    QComboBox* box = qFindChild<QComboBox*>(owner, boxName);
+    if (box)
+        box->setEnabled(enable);
 }
 
 

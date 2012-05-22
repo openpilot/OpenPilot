@@ -250,7 +250,6 @@ static void configure_hsync_timers()
 
 void PIOS_Video_Init(const struct pios_video_cfg * cfg)
 {
-
 	dev_cfg = cfg; // store config before enabling interrupt
 
 	configure_hsync_timers();
@@ -359,10 +358,10 @@ static void prepare_line(uint32_t line_num)
 	DMA_SetCurrDataCounter(dev_cfg->level.dma.tx.channel, BUFFER_LINE_LENGTH);
 	DMA_SetCurrDataCounter(dev_cfg->mask.dma.tx.channel, BUFFER_LINE_LENGTH);
 
-	//reset_hsync_timers();
+	reset_hsync_timers();
 
-	//DMA_Cmd(dev_cfg->level.dma.tx.channel, ENABLE);
-	//DMA_Cmd(dev_cfg->mask.dma.tx.channel, ENABLE);
+	DMA_Cmd(dev_cfg->level.dma.tx.channel, ENABLE);
+	DMA_Cmd(dev_cfg->mask.dma.tx.channel, ENABLE);
 }
 
 void PIOS_VIDEO_DMA_Handler(void);

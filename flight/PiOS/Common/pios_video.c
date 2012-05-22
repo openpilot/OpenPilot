@@ -109,6 +109,7 @@ void PIOS_Hsync_ISR()
 }
 
 void PIOS_Vsync_ISR() {
+	//GPIO_ResetBits(GPIOC, GPIO_Pin_11);
 	vsync_count++;
 	static portBASE_TYPE xHigherPriorityTaskWoken;
 	
@@ -249,30 +250,33 @@ static void configure_hsync_timers()
 }
 
 DMA_TypeDef * main_dma;
+DMA_TypeDef * mask_dma;
 DMA_Stream_TypeDef * main_stream;
+DMA_Stream_TypeDef * mask_stream;
 void PIOS_Video_Init(const struct pios_video_cfg * cfg)
 {
 	dev_cfg = cfg; // store config before enabling interrupt
 
 	configure_hsync_timers();
 
-	if (cfg->mask.remap) {
-		GPIO_PinAFConfig(cfg->mask.sclk.gpio,
-				__builtin_ctz(cfg->mask.sclk.init.GPIO_Pin),
-				cfg->mask.remap);
-		GPIO_PinAFConfig(cfg->mask.miso.gpio,
-				__builtin_ctz(cfg->mask.miso.init.GPIO_Pin),
-				cfg->mask.remap);
-	}
-	if (cfg->level.remap)
-	{
-		GPIO_PinAFConfig(cfg->level.sclk.gpio,
-				__builtin_ctz(cfg->level.sclk.init.GPIO_Pin),
-				cfg->level.remap);
-		GPIO_PinAFConfig(cfg->level.miso.gpio,
-				__builtin_ctz(cfg->level.miso.init.GPIO_Pin),
-				cfg->level.remap);
-	}
+	const GPIO_InitTypeDef initStruct = {
+		.GPIO_Pin = GPIO_Pin_12,
+		.GPIO_Speed = GPIO_Speed_100MHz,
+		.GPIO_Mode = GPIO_Mode_IN	,
+		.GPIO_OType = GPIO_OType_PP,
+		.GPIO_PuPd = GPIO_PuPd_NOPULL
+	};
+	GPIO_Init(GPIOC, &initStruct);
+	
+	/*const GPIO_InitTypeDef initStruct2 = {
+		.GPIO_Pin = GPIO_Pin_11,
+		.GPIO_Speed = GPIO_Speed_100MHz,
+		.GPIO_Mode = GPIO_Mode_OUT	,
+		.GPIO_OType = GPIO_OType_PP,
+		.GPIO_PuPd = GPIO_PuPd_NOPULL
+	};
+	GPIO_Init(GPIOC, &initStruct2);
+	GPIO_SetBits(GPIOC, GPIO_Pin_11);*/
 
 	/* SPI3 - MASKBUFFER */
 	GPIO_Init(cfg->mask.sclk.gpio, (GPIO_InitTypeDef*)&(cfg->mask.sclk.init));
@@ -281,6 +285,26 @@ void PIOS_Video_Init(const struct pios_video_cfg * cfg)
 	/* SPI1 SLAVE FRAMEBUFFER */
 	GPIO_Init(cfg->level.sclk.gpio, (GPIO_InitTypeDef*)&(cfg->level.sclk.init));
 	GPIO_Init(cfg->level.miso.gpio, (GPIO_InitTypeDef*)&(cfg->level.miso.init));
+
+	if (cfg->mask.remap) {
+		GPIO_PinAFConfig(cfg->mask.sclk.gpio,
+						 __builtin_ctz(cfg->mask.sclk.init.GPIO_Pin),
+						 cfg->mask.remap);
+		GPIO_PinAFConfig(cfg->mask.miso.gpio,
+						 __builtin_ctz(cfg->mask.miso.init.GPIO_Pin),
+						 cfg->mask.remap);
+	}
+	if (cfg->level.remap)
+	{
+		GPIO_PinAFConfig(cfg->level.sclk.gpio,
+						 __builtin_ctz(cfg->level.sclk.init.GPIO_Pin),
+						 cfg->level.remap);
+		GPIO_PinAFConfig(cfg->level.miso.gpio,
+						 __builtin_ctz(cfg->level.miso.init.GPIO_Pin),
+						 cfg->level.remap);
+	}
+	
+	
 
 	/* Initialize the SPI block */
 	SPI_Init(cfg->level.regs, (SPI_InitTypeDef*)&(cfg->level.init));
@@ -315,25 +339,21 @@ void PIOS_Video_Init(const struct pios_video_cfg * cfg)
 	memset(draw_buffer_level, 0, GRAPHICS_WIDTH*GRAPHICS_HEIGHT);
 
 	/* Configure DMA interrupt */
-	NVIC_Init(&cfg->mask.dma.irq.init);
+	
 	NVIC_Init(&cfg->level.dma.irq.init);
 
 	/* Enable SPI interrupts to DMA */
 	SPI_I2S_DMACmd(cfg->mask.regs, SPI_I2S_DMAReq_Tx, ENABLE);
 	SPI_I2S_DMACmd(cfg->level.regs, SPI_I2S_DMAReq_Tx, ENABLE);
 
+	mask_dma = DMA1;
 	main_dma = DMA2;
 	main_stream = cfg->level.dma.tx.channel;
+	mask_stream = cfg->mask.dma.tx.channel;
 	/* Configure the Video Line interrupt */
 	PIOS_EXTI_Init(cfg->hsync);
 	PIOS_EXTI_Init(cfg->vsync);
 }
-
-uint8_t test_line[BUFFER_LINE_LENGTH] = {
-	       0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-	       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	       };
 
 /**
  * Prepare the system to watch for a HSYNC pulse to trigger the pixel
@@ -349,7 +369,7 @@ static void prepare_line(uint32_t line_num)
 	uint32_t buf_offset = line_num * GRAPHICS_WIDTH;
 	//buf_offset = (Vsync_update - 10) * GRAPHICS_WIDTH;
 
-	DMA_ClearFlag(dev_cfg->mask.dma.tx.channel, DMA_FLAG_FEIF7 | DMA_FLAG_TEIF7);
+	DMA_ClearFlag(dev_cfg->mask.dma.tx.channel, DMA_FLAG_TCIF7 | DMA_FLAG_HTIF7 | DMA_FLAG_FEIF7 | DMA_FLAG_TEIF7);
 	DMA_ClearFlag(dev_cfg->level.dma.tx.channel, DMA_FLAG_FEIF5 | DMA_FLAG_TEIF5);
 	
 	/* Configure DMA for SPI Tx SLAVE Maskbuffer */
@@ -367,6 +387,8 @@ static void prepare_line(uint32_t line_num)
 	DMA_MemoryTargetConfig(dev_cfg->level.dma.tx.channel,(uint32_t)&disp_buffer_level[buf_offset],DMA_Memory_0);
 	DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[buf_offset],DMA_Memory_0);
 
+//	if(line_num > 20)
+//		GPIO_SetBits(GPIOC, GPIO_Pin_11);
 //	DMA_MemoryTargetConfig(dev_cfg->level.dma.tx.channel,(uint32_t)&test_line[0],DMA_Memory_0);
 //	DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&test_line[0],DMA_Memory_0);
 
@@ -394,8 +416,13 @@ void DMA2_Stream5_IRQHandler(void) __attribute__ ((alias("PIOS_VIDEO_DMA_Handler
  */
 uint32_t dma_counter = 0;
 uint32_t a=0, b=0, c=0, d=0;
+
+uint32_t dma_mask_pos, dma_level_pos;
 void PIOS_VIDEO_DMA_Handler(void)
 {
+	dma_mask_pos = DMA_GetCurrDataCounter(dev_cfg->mask.dma.tx.channel);
+	dma_level_pos = DMA_GetCurrDataCounter(dev_cfg->level.dma.tx.channel);
+
 	dma_counter++;
 
 	stop_hsync_timers();

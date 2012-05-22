@@ -40,7 +40,7 @@
 #if defined(PIOS_INCLUDE_USB_HID)
 
 /* Rx/Tx status */
-static uint8_t transfer_possible = 0;
+static bool transfer_possible = false;
 
 enum pios_usb_dev_magic {
 	PIOS_USB_DEV_MAGIC = 0x17365904,
@@ -152,7 +152,7 @@ int32_t PIOS_USB_ChangeConnectionState(bool Connected)
 {
 	// In all cases: re-initialise USB HID driver
 	if (Connected) {
-		transfer_possible = 1;
+		transfer_possible = true;
 
 		//TODO: Check SetEPRxValid(ENDP1);
 
@@ -161,7 +161,7 @@ int32_t PIOS_USB_ChangeConnectionState(bool Connected)
 #endif
 	} else {
 		// Cable disconnected: disable transfers
-		transfer_possible = 0;
+		transfer_possible = false;
 
 #if defined(USB_LED_OFF)
 		USB_LED_OFF;	// turn the USB led off
@@ -207,23 +207,30 @@ int32_t PIOS_USB_Reenumerate()
 	return 0;
 }
 
+bool PIOS_USB_CableConnected(uint8_t id)
+{
+	struct pios_usb_dev * usb_dev = (struct pios_usb_dev *) pios_usb_com_id;
+
+	if (PIOS_USB_validate(usb_dev) != 0)
+		return false;
+
+	return usb_dev->cfg->vsense.gpio->IDR & usb_dev->cfg->vsense.init.GPIO_Pin;
+}
+
 /**
  * This function returns the connection status of the USB HID interface
  * \return 1: interface available
  * \return 0: interface not available
  * \note Applications shouldn't call this function directly, instead please use \ref PIOS_COM layer functions
  */
-uint32_t usb_found;
 bool PIOS_USB_CheckAvailable(uint8_t id)
 {
 	struct pios_usb_dev * usb_dev = (struct pios_usb_dev *) pios_usb_com_id;
 
-	if(PIOS_USB_validate(usb_dev) != 0)
-		return 0;
+	if (PIOS_USB_validate(usb_dev) != 0)
+		return false;
 
-	usb_found = (usb_dev->cfg->vsense.gpio->IDR & usb_dev->cfg->vsense.init.GPIO_Pin);
-	return usb_found;
-	return usb_found != 0 && transfer_possible ? 1 : 0;
+	return PIOS_USB_CableConnected(id) && transfer_possible;
 }
 
 #endif

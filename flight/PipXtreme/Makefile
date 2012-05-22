@@ -118,6 +118,7 @@ ifeq ($(USE_USB), YES)
 	SRC += $(PIOSSTM32F10X)/pios_usb_hid_pwr.c
 	SRC += $(HOME_DIR)/pios_usb_board_data.c
 	SRC += $(PIOSCOMMON)/pios_usb_desc_hid_only.c
+	SRC += $(PIOSCOMMON)/pios_usb_util.c
 endif
 
 ## PIOS Hardware (Common)

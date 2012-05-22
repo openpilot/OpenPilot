@@ -321,9 +321,18 @@ static void prepare_line(uint32_t line_num)
 
 	uint32_t buf_offset = line_num * GRAPHICS_WIDTH;
 
-	// load first line of data
-	DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[buf_offset],DMA_Memory_0);
-	DMA_MemoryTargetConfig(dev_cfg->level.dma.tx.channel,(uint32_t)&disp_buffer_level[buf_offset],DMA_Memory_0);
+	// Load new line
+	switch(DMA_GetCurrentMemoryTarget(dev_cfg->mask.dma.tx.channel))
+	{
+		case 0:
+			DMA_MemoryTargetConfig(dev_cfg->level.dma.tx.channel,(uint32_t)&disp_buffer_level[buf_offset],DMA_Memory_1);
+			DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[buf_offset],DMA_Memory_1);
+			break;
+		case 1:
+			DMA_MemoryTargetConfig(dev_cfg->level.dma.tx.channel,(uint32_t)&disp_buffer_level[buf_offset],DMA_Memory_0);
+			DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[buf_offset],DMA_Memory_0);
+			break;
+	}
 
 	// Enable DMA, Slave first
 	DMA_SetCurrDataCounter(dev_cfg->level.dma.tx.channel,BUFFER_LINE_LENGTH);

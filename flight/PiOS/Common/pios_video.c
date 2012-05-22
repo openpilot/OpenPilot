@@ -93,8 +93,11 @@ void swap_buffers()
 }
 
 uint32_t counter_position = 0;
+uint32_t hsync_count, vsync_count;
+
 void PIOS_Hsync_ISR()
 {
+	hsync_count++;
 	// On tenth line prepare data which will start clocking out on 11th line
 	if(Vsync_update==10)
 	{
@@ -106,6 +109,7 @@ void PIOS_Hsync_ISR()
 }
 
 void PIOS_Vsync_ISR() {
+	vsync_count++;
 	static portBASE_TYPE xHigherPriorityTaskWoken;
 	
     xHigherPriorityTaskWoken = pdFALSE;
@@ -217,22 +221,22 @@ static void configure_hsync_timers()
 		case TIM_Channel_1:
 			TIM_OC1Init(dev_cfg->pixel_timer.timer, &dev_cfg->tim_oc_init);
 			TIM_OC1PreloadConfig(dev_cfg->pixel_timer.timer, TIM_OCPreload_Enable);
-			TIM_SetCompare1(dev_cfg->pixel_timer.timer, 12);
+			TIM_SetCompare1(dev_cfg->pixel_timer.timer, 5);
 			break;
 		case TIM_Channel_2:
 			TIM_OC2Init(dev_cfg->pixel_timer.timer, &dev_cfg->tim_oc_init);
 			TIM_OC2PreloadConfig(dev_cfg->pixel_timer.timer, TIM_OCPreload_Enable);
-			TIM_SetCompare2(dev_cfg->pixel_timer.timer, 12);
+			TIM_SetCompare2(dev_cfg->pixel_timer.timer, 5);
 			break;
 		case TIM_Channel_3:
 			TIM_OC3Init(dev_cfg->pixel_timer.timer, &dev_cfg->tim_oc_init);
 			TIM_OC3PreloadConfig(dev_cfg->pixel_timer.timer, TIM_OCPreload_Enable);
-			TIM_SetCompare3(dev_cfg->pixel_timer.timer, 12);
+			TIM_SetCompare3(dev_cfg->pixel_timer.timer, 5);
 			break;
 		case TIM_Channel_4:
 			TIM_OC4Init(dev_cfg->pixel_timer.timer, &dev_cfg->tim_oc_init);
 			TIM_OC4PreloadConfig(dev_cfg->pixel_timer.timer, TIM_OCPreload_Enable);
-			TIM_SetCompare4(dev_cfg->pixel_timer.timer, 12);
+			TIM_SetCompare4(dev_cfg->pixel_timer.timer, 5);
 			break;
 	}
 	TIM_ARRPreloadConfig(dev_cfg->pixel_timer.timer, ENABLE);
@@ -241,7 +245,7 @@ static void configure_hsync_timers()
 	// This shouldn't be needed as it should come from the config struture.  Something
 	// is clobbering that
 	TIM_PrescalerConfig(dev_cfg->pixel_timer.timer, 0, TIM_PSCReloadMode_Immediate);
-	TIM_SetAutoreload(dev_cfg->pixel_timer.timer, 25);
+	TIM_SetAutoreload(dev_cfg->pixel_timer.timer, 10);
 }
 
 void PIOS_Video_Init(const struct pios_video_cfg * cfg)
@@ -281,6 +285,9 @@ void PIOS_Video_Init(const struct pios_video_cfg * cfg)
 	SPI_Init(cfg->level.regs, (SPI_InitTypeDef*)&(cfg->level.init));
 	SPI_Init(cfg->mask.regs, (SPI_InitTypeDef*)&(cfg->mask.init));
 
+	//SPI_NSSInternalSoftwareConfig(cfg->level.regs,SPI_NSSInternalSoft_Set);
+	//SPI_NSSInternalSoftwareConfig(cfg->mask.regs,SPI_NSSInternalSoft_Set);
+	
 	/* Enable SPI */
 	SPI_Cmd(cfg->level.regs, ENABLE);
 	SPI_Cmd(cfg->mask.regs, ENABLE);
@@ -323,25 +330,17 @@ void PIOS_Video_Init(const struct pios_video_cfg * cfg)
  * Prepare the system to watch for a HSYNC pulse to trigger the pixel
  * clock and clock out the next line
  */
+uint32_t prepare_count = 0;
+uint32_t last_prepare = 0;
 static void prepare_line(uint32_t line_num)
 {
+	last_prepare = line_num;
+	prepare_count++;
+
 	uint32_t buf_offset = line_num * GRAPHICS_WIDTH;
 
 	DMA_Cmd(dev_cfg->level.dma.tx.channel, DISABLE);
 	DMA_Cmd(dev_cfg->mask.dma.tx.channel, DISABLE);
-
-	/* Configure DMA for SPI Tx SLAVE Maskbuffer */
-	DMA_Init(dev_cfg->mask.dma.tx.channel, (DMA_InitTypeDef*)&(dev_cfg->mask.dma.tx.init));
-	
-	/* Configure DMA for SPI Tx SLAVE Framebuffer*/
-	DMA_Init(dev_cfg->level.dma.tx.channel, (DMA_InitTypeDef*)&(dev_cfg->level.dma.tx.init));
-	
-	/* Trigger interrupt when for half conversions too to indicate double buffer */
-	DMA_ITConfig(dev_cfg->level.dma.tx.channel, DMA_IT_TC, ENABLE);
-
-	/* Enable SPI interrupts to DMA */
-	SPI_I2S_DMACmd(dev_cfg->mask.regs, SPI_I2S_DMAReq_Tx, ENABLE);
-	SPI_I2S_DMACmd(dev_cfg->level.regs, SPI_I2S_DMAReq_Tx, ENABLE);
 
 	// Load new line
 	switch(DMA_GetCurrentMemoryTarget(dev_cfg->mask.dma.tx.channel))
@@ -357,13 +356,13 @@ static void prepare_line(uint32_t line_num)
 	}
 
 	// Enable DMA, Slave first
-	DMA_SetCurrDataCounter(dev_cfg->level.dma.tx.channel,10); //BUFFER_LINE_LENGTH / 4);
-	DMA_SetCurrDataCounter(dev_cfg->mask.dma.tx.channel,10); //BUFFER_LINE_LENGTH / 4);
+	DMA_SetCurrDataCounter(dev_cfg->level.dma.tx.channel, BUFFER_LINE_LENGTH);
+	DMA_SetCurrDataCounter(dev_cfg->mask.dma.tx.channel, BUFFER_LINE_LENGTH);
 
-	reset_hsync_timers();
+	//reset_hsync_timers();
 
-	DMA_Cmd(dev_cfg->level.dma.tx.channel, ENABLE);
-	DMA_Cmd(dev_cfg->mask.dma.tx.channel, ENABLE);
+	//DMA_Cmd(dev_cfg->level.dma.tx.channel, ENABLE);
+	//DMA_Cmd(dev_cfg->mask.dma.tx.channel, ENABLE);
 }
 
 void PIOS_VIDEO_DMA_Handler(void);
@@ -378,15 +377,10 @@ uint32_t a=0, b=0, c=0, d=0;
 void PIOS_VIDEO_DMA_Handler(void)
 {
 	dma_counter++;
-	if(gActiveLine > 10)
-		PIOS_LED_On(PIOS_LED_HEARTBEAT);
-	else
-		PIOS_LED_Off(PIOS_LED_HEARTBEAT);
 
 	// Handle flags from stream channel
 	if (DMA_GetFlagStatus(dev_cfg->level.dma.tx.channel,DMA_FLAG_TCIF5)) {	// whole double buffer filled
 
-		line = gActiveLine*GRAPHICS_WIDTH;
 		if(gActiveLine < GRAPHICS_HEIGHT-2)
 		{
 			PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);

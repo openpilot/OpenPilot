@@ -70,6 +70,7 @@ QWidget* ScopeGadgetOptionsPage::createPage(QWidget *parent)
     connect(options_page->cmbUAVObjects, SIGNAL(currentIndexChanged(QString)), this, SLOT(on_cmbUAVObjects_currentIndexChanged(QString)));
 
     options_page->mathFunctionComboBox->addItem("None");
+    options_page->mathFunctionComboBox->addItem("Boxcar average");
     options_page->mathFunctionComboBox->addItem("Standard deviation");
 
     if(options_page->cmbUAVObjects->currentIndex() >= 0)
@@ -119,6 +120,7 @@ QWidget* ScopeGadgetOptionsPage::createPage(QWidget *parent)
     connect(options_page->btnRemoveCurve, SIGNAL(clicked()), this, SLOT(on_btnRemoveCurve_clicked()));
     connect(options_page->lstCurves, SIGNAL(currentRowChanged(int)), this, SLOT(on_lstCurves_currentRowChanged(int)));
     connect(options_page->btnColor, SIGNAL(clicked()), this, SLOT(on_btnColor_clicked()));
+    connect(options_page->mathFunctionComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(on_mathFunctionComboBox_currentIndexChanged(int)));
     connect(options_page->spnRefreshInterval, SIGNAL(valueChanged(int )), this, SLOT(on_spnRefreshInterval_valueChanged(int)));
 
     setYAxisWidgetFromPlotCurve();
@@ -132,9 +134,45 @@ QWidget* ScopeGadgetOptionsPage::createPage(QWidget *parent)
     connect(options_page->LoggingEnable, SIGNAL(clicked()), this, SLOT(on_loggingEnable_clicked()));
     on_loggingEnable_clicked();
 
+    //Disable mouse wheel events
+    foreach( QSpinBox * sp, findChildren<QSpinBox*>() ) {
+        sp->installEventFilter( this );
+    }
+    foreach( QDoubleSpinBox * sp, findChildren<QDoubleSpinBox*>() ) {
+        sp->installEventFilter( this );
+    }
+    foreach( QSlider * sp, findChildren<QSlider*>() ) {
+        sp->installEventFilter( this );
+    }
+    foreach( QComboBox * sp, findChildren<QComboBox*>() ) {
+        sp->installEventFilter( this );
+    }
 
 
     return optionsPageWidget;
+}
+
+bool ScopeGadgetOptionsPage::eventFilter( QObject * obj, QEvent * evt ) {
+    //Filter all wheel events, and ignore them
+    if ( evt->type() == QEvent::Wheel &&
+         (qobject_cast<QAbstractSpinBox*>( obj ) ||
+          qobject_cast<QComboBox*>( obj ) ||
+          qobject_cast<QAbstractSlider*>( obj ) ))
+    {
+        evt->ignore();
+        return true;
+    }
+    return ScopeGadgetOptionsPage::eventFilter( obj, evt );
+}
+
+void ScopeGadgetOptionsPage::on_mathFunctionComboBox_currentIndexChanged(int currentIndex){
+    if (currentIndex > 0){
+        options_page->spnMeanSamples->setEnabled(true);
+    }
+    else{
+        options_page->spnMeanSamples->setEnabled(false);
+    }
+
 }
 
 void ScopeGadgetOptionsPage::on_btnColor_clicked()

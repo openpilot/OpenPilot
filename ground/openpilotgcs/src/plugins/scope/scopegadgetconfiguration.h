@@ -71,7 +71,7 @@ public:
     int refreshInterval(){return m_refreshInterval;}
     QList<PlotCurveConfiguration*> plotCurveConfigs(){return m_PlotCurveConfigs;}
 
-//    void saveConfig(QSettings* settings) const; //THIS SEEMS TO BE UNUSED
+    void saveConfig(QSettings* settings) const; //THIS SEEMS TO BE UNUSED
     IUAVGadgetConfiguration *clone();
 
     bool getLoggingEnabled(){return m_LoggingEnabled;};

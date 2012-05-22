@@ -71,6 +71,7 @@ private:
     void setYAxisWidgetFromPlotCurve();
     void setButtonColor(const QColor &color);
     void validateRefreshInterval();
+    bool eventFilter( QObject * obj, QEvent * evt );
 
 private slots:
     void on_spnRefreshInterval_valueChanged(int );
@@ -79,6 +80,7 @@ private slots:
     void on_btnAddCurve_clicked();
     void on_cmbUAVObjects_currentIndexChanged(QString val);    
     void on_btnColor_clicked();
+    void on_mathFunctionComboBox_currentIndexChanged(int currentIndex);
     void on_loggingEnable_clicked();
 
 };

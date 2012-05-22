@@ -142,7 +142,7 @@ void ScopeGadgetWidget::mouseMoveEvent(QMouseEvent *e)
 
 void ScopeGadgetWidget::wheelEvent(QWheelEvent *e)
 {
-	QwtPlot::wheelEvent(e);
+    QwtPlot::wheelEvent(e);
 }
 
 /**

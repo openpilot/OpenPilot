@@ -100,7 +100,7 @@ bool SequentialPlotData::append(UAVObject* obj)
             double currentValue = valueAsDouble(obj, field) * pow(10, scalePower);
 
             //Compute boxcar average
-            if (meanSamples > 1){
+            if (mathFunction  == "Boxcar average" || mathFunction  == "Standard deviation"){
                 //Put the new value at the front
                 yDataHistory->append( currentValue );
 

@@ -1170,12 +1170,17 @@ void ConfigTaskWidget::disableMouseWheelEvents()
     foreach( QSlider * sp, findChildren<QSlider*>() ) {
         sp->installEventFilter( this );
     }
+    foreach( QComboBox * sp, findChildren<QComboBox*>() ) {
+        sp->installEventFilter( this );
+    }
 }
 
 bool ConfigTaskWidget::eventFilter( QObject * obj, QEvent * evt ) {
     //Filter all wheel events, and ignore them
     if ( evt->type() == QEvent::Wheel &&
-         (qobject_cast<QAbstractSpinBox*>( obj ) || qobject_cast<QAbstractSlider*>( obj ) ))
+         (qobject_cast<QAbstractSpinBox*>( obj ) ||
+          qobject_cast<QComboBox*>( obj ) ||
+          qobject_cast<QAbstractSlider*>( obj ) ))
     {
         evt->ignore();
         return true;

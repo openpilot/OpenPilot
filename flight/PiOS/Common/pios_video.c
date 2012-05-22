@@ -91,6 +91,7 @@ void swap_buffers()
         SWAP_BUFFS(tmp, disp_buffer_level, draw_buffer_level);
 }
 
+uint32_t counter_position = 0;
 void PIOS_Hsync_ISR()
 {
 	// On tenth line prepare data which will start clocking out on 11th line
@@ -100,19 +101,21 @@ void PIOS_Hsync_ISR()
 		gActiveLine = 1;
 	}
 	Vsync_update++;
+	counter_position = DMA_GetCurrDataCounter(dev_cfg->level.dma.tx.channel);
 }
 
 void PIOS_Vsync_ISR() {
 	static portBASE_TYPE xHigherPriorityTaskWoken;
-
+	
     xHigherPriorityTaskWoken = pdFALSE;
 	m_osdLines = gActiveLine;
 
 	// load second image buffer
-	stop_hsync_timers();
+	//stop_hsync_timers();
 	swap_buffers();
 
 	Vsync_update=0;
+
 	// trigger redraw
 	xHigherPriorityTaskWoken = xSemaphoreGiveFromISR(osdSemaphore, &xHigherPriorityTaskWoken);
 
@@ -156,6 +159,8 @@ static void reset_hsync_timers()
 	}
 	TIM_SelectSlaveMode(dev_cfg->pixel_timer.timer, TIM_SlaveMode_Trigger);
 	TIM_SelectMasterSlaveMode(dev_cfg->pixel_timer.timer, TIM_MasterSlaveMode_Enable);
+	
+	TIM_Cmd(dev_cfg->pixel_timer.timer, ENABLE);
 }
 
 const struct pios_tim_callbacks px_callback = {
@@ -174,11 +179,11 @@ static void configure_hsync_timers()
 	// but this function calls the GPIO_Remap
 	uint32_t tim_id;
 	const struct pios_tim_channel *channels;
-	
+
 	// Init the channel to output the pixel clock
 	channels = &dev_cfg->pixel_timer;
 	PIOS_TIM_InitChannels(&tim_id, channels, 1, &px_callback, 0);
-	
+
 	// Init the channel to capture the pulse
 	channels = &dev_cfg->hsync_capture;
 	PIOS_TIM_InitChannels(&tim_id, channels, 1, &px_callback, 0);
@@ -226,13 +231,13 @@ static void configure_hsync_timers()
 	}
 	TIM_ARRPreloadConfig(dev_cfg->pixel_timer.timer, ENABLE);
 	TIM_CtrlPWMOutputs(dev_cfg->pixel_timer.timer, ENABLE);
-	
+
 	// This shouldn't be needed as it should come from the config struture.  Something
 	// is clobbering that
 	TIM_PrescalerConfig(dev_cfg->pixel_timer.timer, 0, TIM_PSCReloadMode_Immediate);
 	TIM_SetAutoreload(dev_cfg->pixel_timer.timer, 25);
-	
-	TIM_Cmd(dev_cfg->pixel_timer, DISABLE);
+
+	TIM_Cmd(dev_cfg->pixel_timer.timer, ENABLE);
 }
 
 void PIOS_Video_Init(const struct pios_video_cfg * cfg)
@@ -253,12 +258,10 @@ void PIOS_Video_Init(const struct pios_video_cfg * cfg)
 	if (cfg->level.remap)
 	{
 		GPIO_PinAFConfig(cfg->level.sclk.gpio,
-				GPIO_PinSource3,
-				//__builtin_ctz(cfg->mask.sclk.init.GPIO_Pin),
+				__builtin_ctz(cfg->level.sclk.init.GPIO_Pin),
 				cfg->level.remap);
 		GPIO_PinAFConfig(cfg->level.miso.gpio,
-				GPIO_PinSource4,
-				//__builtin_ctz(cfg->level.miso.init.GPIO_Pin),
+				__builtin_ctz(cfg->level.miso.init.GPIO_Pin),
 				cfg->level.remap);
 	}
 
@@ -318,8 +321,23 @@ void PIOS_Video_Init(const struct pios_video_cfg * cfg)
  */
 static void prepare_line(uint32_t line_num)
 {
-
 	uint32_t buf_offset = line_num * GRAPHICS_WIDTH;
+
+	DMA_Cmd(dev_cfg->level.dma.tx.channel, DISABLE);
+	DMA_Cmd(dev_cfg->mask.dma.tx.channel, DISABLE);
+
+	/* Configure DMA for SPI Tx SLAVE Maskbuffer */
+	DMA_Init(dev_cfg->mask.dma.tx.channel, (DMA_InitTypeDef*)&(dev_cfg->mask.dma.tx.init));
+	
+	/* Configure DMA for SPI Tx SLAVE Framebuffer*/
+	DMA_Init(dev_cfg->level.dma.tx.channel, (DMA_InitTypeDef*)&(dev_cfg->level.dma.tx.init));
+	
+	/* Trigger interrupt when for half conversions too to indicate double buffer */
+	DMA_ITConfig(dev_cfg->level.dma.tx.channel, DMA_IT_TC, ENABLE);
+
+	/* Enable SPI interrupts to DMA */
+	SPI_I2S_DMACmd(dev_cfg->mask.regs, SPI_I2S_DMAReq_Tx, ENABLE);
+	SPI_I2S_DMACmd(dev_cfg->level.regs, SPI_I2S_DMAReq_Tx, ENABLE);
 
 	// Load new line
 	switch(DMA_GetCurrentMemoryTarget(dev_cfg->mask.dma.tx.channel))
@@ -335,8 +353,8 @@ static void prepare_line(uint32_t line_num)
 	}
 
 	// Enable DMA, Slave first
-	DMA_SetCurrDataCounter(dev_cfg->level.dma.tx.channel,BUFFER_LINE_LENGTH);
-	DMA_SetCurrDataCounter(dev_cfg->mask.dma.tx.channel,BUFFER_LINE_LENGTH);
+	DMA_SetCurrDataCounter(dev_cfg->level.dma.tx.channel,10); //BUFFER_LINE_LENGTH / 4);
+	DMA_SetCurrDataCounter(dev_cfg->mask.dma.tx.channel,10); //BUFFER_LINE_LENGTH / 4);
 
 	reset_hsync_timers();
 
@@ -350,34 +368,24 @@ void DMA2_Stream5_IRQHandler(void) __attribute__ ((alias("PIOS_VIDEO_DMA_Handler
 
 /**
  * @brief Interrupt for half and full buffer transfer
- *
- * This interrupt handler swaps between the two halfs of the double buffer to make
- * sure the ahrs uses the most recent data.  Only swaps data when AHRS is idle, but
- * really this is a pretense of a sanity check since the DMA engine is consantly
- * running in the background.  Keep an eye on the ekf_too_slow variable to make sure
- * it's keeping up.
  */
+uint32_t dma_counter = 0;
+uint32_t a=0, b=0, c=0, d=0;
 void PIOS_VIDEO_DMA_Handler(void)
 {
-	PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
+	dma_counter++;
+	if(gActiveLine > 10)
+		PIOS_LED_On(PIOS_LED_HEARTBEAT);
+	else
+		PIOS_LED_Off(PIOS_LED_HEARTBEAT);
 
-	// Handle flags from mask channel, not used
-	if (DMA_GetFlagStatus(DMA1_Stream7,DMA_FLAG_TCIF7)) {	// whole double buffer filled
-		DMA_ClearFlag(DMA1_Stream7,DMA_FLAG_TCIF7);
-	}
-	else if (DMA_GetFlagStatus(DMA1_Stream7,DMA_FLAG_HTIF7)) {
-		DMA_ClearFlag(DMA1_Stream7,DMA_FLAG_HTIF7);
-	}
-	else {
-
-	}
-	
 	// Handle flags from stream channel
 	if (DMA_GetFlagStatus(dev_cfg->level.dma.tx.channel,DMA_FLAG_TCIF5)) {	// whole double buffer filled
 
 		line = gActiveLine*GRAPHICS_WIDTH;
 		if(gActiveLine < GRAPHICS_HEIGHT-2)
 		{
+			PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
 			prepare_line(gActiveLine);
 		}
 		else if(gActiveLine == GRAPHICS_HEIGHT-2)
@@ -393,14 +401,16 @@ void PIOS_VIDEO_DMA_Handler(void)
 		gActiveLine++;
 
 		DMA_ClearFlag(dev_cfg->level.dma.tx.channel,DMA_FLAG_TCIF5);
+		c++;
 	}
 	else if (DMA_GetFlagStatus(dev_cfg->level.dma.tx.channel,DMA_FLAG_HTIF5)) {
 		DMA_ClearFlag(dev_cfg->level.dma.tx.channel,DMA_FLAG_HTIF5);
+		a++;
 	}
 	else {
-
+		b++;
 	}
-
+	d++;
 }
 
 

@@ -74,7 +74,7 @@ int main() {
 	PIOS_Board_Init();
 	PIOS_IAP_Init();
 	
-	USB_connected = PIOS_USB_CheckAvailable(0);
+	USB_connected = PIOS_USB_CableConnected(0);
 
 	if (PIOS_IAP_CheckRequest() == TRUE) {
 		PIOS_DELAY_WaitmS(1000);

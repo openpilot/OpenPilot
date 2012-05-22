@@ -124,6 +124,7 @@ SRC += $(OPSYSTEM)/alarms.c
 SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
 SRC += $(OPUAVOBJ)/eventdispatcher.c
+SRC += $(UAVOBJSYNTHDIR)/uavobjectsinit.c
 
 SRC += $(FLIGHTLIB)/CoordinateConversions.c
 SRC += $(FLIGHTLIB)/fifo_buffer.c
@@ -248,6 +249,7 @@ endif
 # common architecture-specific flags from the device-specific library makefile
 CFLAGS += $(ARCHFLAGS)
 
+CFLAGS += $(UAVOBJDEFINE)
 CFLAGS += -DDIAGNOSTICS
 CFLAGS += -DDIAG_TASKS
 

@@ -352,7 +352,7 @@ void ScopeGadgetWidget::setupChronoPlot()
 //	scaleWidget->setMinBorderDist(0, fmw);
 }
 
-void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavFieldSubField, int scaleOrderFactor, int interpolationSamples, QPen pen)
+void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavFieldSubField, int scaleOrderFactor, int meanSamples, QString mathFunction, QPen pen)
 {
     PlotData* plotData;
 
@@ -365,7 +365,8 @@ void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavFieldSubField
 
     plotData->m_xWindowSize = m_xWindowSize;
     plotData->scalePower = scaleOrderFactor;
-    plotData->interpolationSamples = interpolationSamples;
+    plotData->meanSamples = meanSamples;
+    plotData->mathFunction = mathFunction;
 
     //If the y-bounds are supplied, set them
     if (plotData->yMinimum != plotData->yMaximum)

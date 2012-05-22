@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>544</width>
-    <height>342</height>
+    <width>548</width>
+    <height>457</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -185,43 +185,43 @@
        <item row="6" column="1">
         <widget class="QComboBox" name="cmbUAVField"/>
        </item>
-       <item row="7" column="0">
+       <item row="8" column="0">
         <widget class="QLabel" name="label_3">
          <property name="text">
           <string>Color:</string>
          </property>
         </widget>
        </item>
-       <item row="7" column="1">
+       <item row="8" column="1">
         <widget class="QPushButton" name="btnColor">
          <property name="text">
           <string>Choose</string>
          </property>
         </widget>
        </item>
-       <item row="8" column="0">
+       <item row="9" column="0">
         <widget class="QLabel" name="label_6">
          <property name="text">
           <string>Y-axis scale factor:</string>
          </property>
         </widget>
        </item>
-       <item row="8" column="1">
+       <item row="9" column="1">
         <widget class="QComboBox" name="cmbScale">
          <property name="editable">
           <bool>false</bool>
          </property>
         </widget>
        </item>
-       <item row="9" column="0">
+       <item row="10" column="0">
         <widget class="QLabel" name="label_10">
          <property name="text">
-          <string>Display smoothed interpolation:</string>
+          <string>Display moving average:</string>
          </property>
         </widget>
        </item>
-       <item row="9" column="1">
-        <widget class="QSpinBox" name="spnInterpolationSamples">
+       <item row="10" column="1">
+        <widget class="QSpinBox" name="spnMeanSamples">
          <property name="suffix">
           <string> samples</string>
          </property>
@@ -238,6 +238,16 @@
           <number>1</number>
          </property>
         </widget>
+       </item>
+       <item row="7" column="0">
+        <widget class="QLabel" name="mathFunctionLabel">
+         <property name="text">
+          <string>Math function:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="1">
+        <widget class="QComboBox" name="mathFunctionComboBox"/>
        </item>
       </layout>
      </item>

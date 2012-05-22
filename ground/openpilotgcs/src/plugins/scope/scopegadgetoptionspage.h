@@ -66,8 +66,8 @@ private:
     Ui::ScopeGadgetOptionsPage *options_page;
     ScopeGadgetConfiguration *m_config;
 
-    void addPlotCurveConfig(QString uavObject, QString uavField, int scale, int interpolation, QVariant varColor);
-    void setCurvePlotProperties(QListWidgetItem *listWidgetItem, QString uavObject, QString uavField, int scale, int interpolation, QVariant varColor);
+    void addPlotCurveConfig(QString uavObject, QString uavField, int scale, int mean, QString mathFunction, QVariant varColor);
+    void setCurvePlotProperties(QListWidgetItem *listWidgetItem, QString uavObject, QString uavField, int scale, int mean, QString mathFunction, QVariant varColor);
     void setYAxisWidgetFromPlotCurve();
     void setButtonColor(const QColor &color);
     void validateRefreshInterval();

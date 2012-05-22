@@ -67,8 +67,9 @@ public:
     QString uavSubField;
     bool haveSubField;
     int scalePower; //This is the power to which each value must be raised
-    int interpolationSamples;
-    double interpolationSum;
+    int meanSamples;
+    double meanSum;
+    QString mathFunction;
     double correctionSum;
     int correctionCount;
     double yMinimum;

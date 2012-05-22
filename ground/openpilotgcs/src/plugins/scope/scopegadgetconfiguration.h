@@ -41,7 +41,8 @@ struct PlotCurveConfiguration
     QString uavField;
     int yScalePower; //This is the power to which each value must be raised
     QRgb color;
-    int yInterpolationSamples;
+    int yMeanSamples;
+    QString mathFunction;
     double yMinimum;
     double yMaximum;
 };
@@ -56,6 +57,7 @@ public:
 
     //configuration setter functions
     void setPlotType(int value){m_plotType = value;}
+    void setMathFunctionType(int value){m_mathFunctionType = value;}
     void setDataSize(int value){m_dataSize = value;}
     void setRefreashInterval(int value){m_refreshInterval = value;}
     void addPlotCurveConfig(PlotCurveConfiguration* value){m_PlotCurveConfigs.append(value);}
@@ -64,11 +66,12 @@ public:
 
     //configurations getter functions
     int plotType(){return m_plotType;}
+    int mathFunctionType(){return m_mathFunctionType;}
     int dataSize(){return m_dataSize;}
     int refreshInterval(){return m_refreshInterval;}
     QList<PlotCurveConfiguration*> plotCurveConfigs(){return m_PlotCurveConfigs;}
 
-    void saveConfig(QSettings* settings) const;
+//    void saveConfig(QSettings* settings) const; //THIS SEEMS TO BE UNUSED
     IUAVGadgetConfiguration *clone();
 
     bool getLoggingEnabled(){return m_LoggingEnabled;};
@@ -84,6 +87,7 @@ private:
     int m_plotType; //The type of the plot
     int m_dataSize; //The size of the data buffer to render in the curve plot
     int m_refreshInterval; //The interval to replot the curve widget. The data buffer is refresh as the data comes in.
+    int m_mathFunctionType; //The type of math function to be used in the scope analysis
     QList<PlotCurveConfiguration*> m_PlotCurveConfigs;
 
     void clearPlotData();

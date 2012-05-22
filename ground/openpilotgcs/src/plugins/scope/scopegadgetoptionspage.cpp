@@ -69,6 +69,9 @@ QWidget* ScopeGadgetOptionsPage::createPage(QWidget *parent)
     //Connect signals to slots cmbUAVObjects.currentIndexChanged
     connect(options_page->cmbUAVObjects, SIGNAL(currentIndexChanged(QString)), this, SLOT(on_cmbUAVObjects_currentIndexChanged(QString)));
 
+    options_page->mathFunctionComboBox->addItem("None");
+    options_page->mathFunctionComboBox->addItem("Standard deviation");
+
     if(options_page->cmbUAVObjects->currentIndex() >= 0)
         on_cmbUAVObjects_currentIndexChanged(options_page->cmbUAVObjects->currentText());
 
@@ -92,6 +95,7 @@ QWidget* ScopeGadgetOptionsPage::createPage(QWidget *parent)
 
     //Set widget values from settings
     options_page->cmbPlotType->setCurrentIndex(m_config->plotType());
+    options_page->mathFunctionComboBox->setCurrentIndex(m_config->mathFunctionType());
     options_page->spnDataSize->setValue(m_config->dataSize());
     options_page->spnRefreshInterval->setValue(m_config->refreshInterval());
 
@@ -101,10 +105,11 @@ QWidget* ScopeGadgetOptionsPage::createPage(QWidget *parent)
         QString uavObject = plotData->uavObject;
         QString uavField = plotData->uavField;
         int scale = plotData->yScalePower;
-        int interpolation = plotData->yInterpolationSamples;
+        int mean = plotData->yMeanSamples;
+        QString mathFunction = plotData->mathFunction;
         QVariant varColor = plotData->color;
 
-        addPlotCurveConfig(uavObject,uavField,scale,interpolation,varColor);
+        addPlotCurveConfig(uavObject,uavField,scale,mean,mathFunction,varColor);
     }
 
     if(m_config->plotCurveConfigs().count() > 0)
@@ -152,6 +157,7 @@ void ScopeGadgetOptionsPage::setYAxisWidgetFromPlotCurve()
     if(listItem == 0)
         return;
 
+    //WHAT IS UserRole DOING?
     int currentIndex = options_page->cmbUAVObjects->findText( listItem->data(Qt::UserRole + 0).toString());
     options_page->cmbUAVObjects->setCurrentIndex(currentIndex);
 
@@ -166,9 +172,13 @@ void ScopeGadgetOptionsPage::setYAxisWidgetFromPlotCurve()
 
     setButtonColor(QColor((QRgb)rgb));
 
-    int interpolation = listItem->data(Qt::UserRole + 4).toInt(&parseOK);
-    if(!parseOK) interpolation = 1;
-    options_page->spnInterpolationSamples->setValue(interpolation);
+    int mean = listItem->data(Qt::UserRole + 4).toInt(&parseOK);
+    if(!parseOK) mean = 1;
+    options_page->spnMeanSamples->setValue(mean);
+
+    currentIndex = options_page->mathFunctionComboBox->findData( listItem->data(Qt::UserRole + 5).toString());
+    options_page->mathFunctionComboBox->setCurrentIndex(currentIndex);
+
 }
 
 void ScopeGadgetOptionsPage::setButtonColor(const QColor &color)
@@ -221,6 +231,7 @@ void ScopeGadgetOptionsPage::apply()
 
     //Apply configuration changes
     m_config->setPlotType(options_page->cmbPlotType->currentIndex());
+    m_config->setMathFunctionType(options_page->mathFunctionComboBox->currentIndex());
     m_config->setDataSize(options_page->spnDataSize->value());
     m_config->setRefreashInterval(options_page->spnRefreshInterval->value());
 
@@ -241,10 +252,13 @@ void ScopeGadgetOptionsPage::apply()
             newPlotCurveConfigs->color = QColor(Qt::black).rgb();
         else
             newPlotCurveConfigs->color = (QRgb)rgb;
-	
-	newPlotCurveConfigs->yInterpolationSamples = listItem->data(Qt::UserRole + 4).toInt(&parseOK);
+
+        newPlotCurveConfigs->yMeanSamples = listItem->data(Qt::UserRole + 4).toInt(&parseOK);
         if(!parseOK)
-            newPlotCurveConfigs->yInterpolationSamples = 1;
+            newPlotCurveConfigs->yMeanSamples = 1;
+
+        newPlotCurveConfigs->mathFunction  = listItem->data(Qt::UserRole + 5).toString();
+
 
         plotCurveConfigs.append(newPlotCurveConfigs);
     }
@@ -271,7 +285,9 @@ void ScopeGadgetOptionsPage::on_btnAddCurve_clicked()
     if(!parseOK)
        scale = 0;
 
-    int interpolation = options_page->spnInterpolationSamples->value();
+    int mean = options_page->spnMeanSamples->value();
+    QString mathFunction = options_page->mathFunctionComboBox->currentText();
+
 
     QVariant varColor = (int)QColor(options_page->btnColor->text()).rgb();
 
@@ -281,27 +297,27 @@ void ScopeGadgetOptionsPage::on_btnAddCurve_clicked()
        options_page->lstCurves->currentItem()->text() == uavObject + "." + uavField)
     {
         QListWidgetItem *listWidgetItem = options_page->lstCurves->currentItem();
-        setCurvePlotProperties(listWidgetItem,uavObject,uavField,scale,interpolation,varColor);
+        setCurvePlotProperties(listWidgetItem,uavObject,uavField,scale,mean,mathFunction,varColor);
     }else
     {
-        addPlotCurveConfig(uavObject,uavField,scale,interpolation,varColor);
+        addPlotCurveConfig(uavObject,uavField,scale,mean,mathFunction,varColor);
 
         options_page->lstCurves->setCurrentRow(options_page->lstCurves->count() - 1);
     }
 }
 
-void ScopeGadgetOptionsPage::addPlotCurveConfig(QString uavObject, QString uavField, int scale, int interpolation, QVariant varColor)
+void ScopeGadgetOptionsPage::addPlotCurveConfig(QString uavObject, QString uavField, int scale, int mean, QString mathFunction, QVariant varColor)
 {
     //Add a new curve config to the list
     QString listItemDisplayText = uavObject + "." + uavField;
     options_page->lstCurves->addItem(listItemDisplayText);
     QListWidgetItem *listWidgetItem = options_page->lstCurves->item(options_page->lstCurves->count() - 1);
 
-    setCurvePlotProperties(listWidgetItem,uavObject,uavField,scale,interpolation,varColor);
+    setCurvePlotProperties(listWidgetItem,uavObject,uavField,scale,mean,mathFunction,varColor);
 
 }
 
-void ScopeGadgetOptionsPage::setCurvePlotProperties(QListWidgetItem *listWidgetItem,QString uavObject, QString uavField, int scale, int interpolation, QVariant varColor)
+void ScopeGadgetOptionsPage::setCurvePlotProperties(QListWidgetItem *listWidgetItem,QString uavObject, QString uavField, int scale, int mean, QString mathFunction, QVariant varColor)
 {
     bool parseOK = false;
 
@@ -317,7 +333,8 @@ void ScopeGadgetOptionsPage::setCurvePlotProperties(QListWidgetItem *listWidgetI
     listWidgetItem->setData(Qt::UserRole + 1,QVariant(uavField));
     listWidgetItem->setData(Qt::UserRole + 2,QVariant(scale));
     listWidgetItem->setData(Qt::UserRole + 3,varColor);
-    listWidgetItem->setData(Qt::UserRole + 4,QVariant(interpolation));
+    listWidgetItem->setData(Qt::UserRole + 4,QVariant(mean));
+    listWidgetItem->setData(Qt::UserRole + 5,QVariant(mathFunction));
 }
 
 /*!

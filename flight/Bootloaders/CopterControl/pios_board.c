@@ -76,10 +76,10 @@ void PIOS_Board_Init(void) {
 
 	uint32_t pios_usb_id;
 	switch(bdinfo->board_rev) {
-		case 0x01: // Revision 1
+		case BOARD_REVISION_CC:
 			PIOS_USB_Init(&pios_usb_id, &pios_usb_main_cfg_cc);
 			break;
-		case 0x02: // Revision 2
+		case BOARD_REVISION_CC3D:
 			PIOS_USB_Init(&pios_usb_id, &pios_usb_main_cfg_cc3d);
 			break;
 		default:

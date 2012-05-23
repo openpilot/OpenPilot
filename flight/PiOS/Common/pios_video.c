@@ -118,6 +118,16 @@ void PIOS_Vsync_ISR() {
 
 	// load second image buffer
 	stop_hsync_timers();
+	
+	// Wait for previous word to clock out of each
+	TIM_Cmd(dev_cfg->pixel_timer.timer, ENABLE);
+	uint32_t i = 0; 
+	while(SPI_I2S_GetFlagStatus(dev_cfg->level.regs ,SPI_I2S_FLAG_TXE) == RESET && i < 30000) i++;
+	while(SPI_I2S_GetFlagStatus(dev_cfg->mask.regs ,SPI_I2S_FLAG_TXE) == RESET && i < 30000) i++;
+	while(SPI_I2S_GetFlagStatus(dev_cfg->level.regs ,SPI_I2S_FLAG_BSY) == SET && i < 30000) i++;
+	while(SPI_I2S_GetFlagStatus(dev_cfg->mask.regs ,SPI_I2S_FLAG_BSY) == SET && i < 30000) i++;
+	TIM_Cmd(dev_cfg->pixel_timer.timer, DISABLE);	
+
 	swap_buffers();
 
 	Vsync_update=0;

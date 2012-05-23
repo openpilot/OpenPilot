@@ -1815,7 +1815,13 @@ void introGraphics() {
 	copyimage(GRAPHICS_WIDTH_REAL/2-(splash_info.width)/2, GRAPHICS_HEIGHT_REAL/2-(splash_info.height)/2,image);
 
 	/* frame */
-	drawBox(0,0,GRAPHICS_WIDTH_REAL-2,GRAPHICS_HEIGHT_REAL-1);
+	drawBox(0,0,GRAPHICS_WIDTH_REAL-17,GRAPHICS_HEIGHT_REAL-2);
+	
+	// Must mask out last half-word because SPI keeps clocking it out otherwise
+	for (uint32_t i = 0; i < 16; i++) {
+		write_vline( draw_buffer_level,GRAPHICS_WIDTH_REAL-i-1,0,GRAPHICS_HEIGHT_REAL-1,0);
+		write_vline( draw_buffer_mask,GRAPHICS_WIDTH_REAL-i-1,0,GRAPHICS_HEIGHT_REAL-1,0);
+	}
 }
 
 /*

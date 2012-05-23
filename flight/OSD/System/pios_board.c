@@ -363,14 +363,6 @@ uint32_t pios_com_cotelem_id;
 #define PAL_PX_CLOCK   6750130
 #define PX_PERIOD      ((PIOS_PERIPHERAL_APB1_CLOCK / NTSC_PX_CLOCK) + 1)
 #define LINE_PERIOD    PX_PERIOD * GRAPHICS_WIDTH
-static const TIM_TimeBaseInitTypeDef tim_3_time_base = {
-	.TIM_Prescaler = 0, //PIOS_PERIPHERAL_APB1_CLOCK,
-	.TIM_ClockDivision = TIM_CKD_DIV1,
-	.TIM_CounterMode = TIM_CounterMode_Up,
-	.TIM_Period = PX_PERIOD - 1,
-	// Plus 1 to ensure rounded value errs on the side of faster clock
-	.TIM_RepetitionCounter = 0x0000,
-};
 
 static const TIM_TimeBaseInitTypeDef tim_4_time_base = {
 	.TIM_Prescaler = 0, //PIOS_PERIPHERAL_APB1_CLOCK,
@@ -380,26 +372,13 @@ static const TIM_TimeBaseInitTypeDef tim_4_time_base = {
 	.TIM_RepetitionCounter = 0x0000,
 };
 
-const static struct pios_tim_clock_cfg pios_tim3_cfg = {
-	.timer = TIM3,
-	.time_base_init = &tim_3_time_base,
-	.irq = {
-		.init = {
-			.NVIC_IRQChannel                   = TIM3_IRQn,
-			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
-			.NVIC_IRQChannelSubPriority        = 0,
-			.NVIC_IRQChannelCmd                = ENABLE,
-		},
-	}
-};
-
 const static struct pios_tim_clock_cfg pios_tim4_cfg = {
 	.timer = TIM4,
 	.time_base_init = &tim_4_time_base,
 	.irq = {
 		.init = {
 			.NVIC_IRQChannel                   = TIM4_IRQn,
-			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGHEST,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
 			.NVIC_IRQChannelSubPriority        = 0,
 			.NVIC_IRQChannelCmd                = ENABLE,
 		},
@@ -437,7 +416,6 @@ void PIOS_Board_Init(void) {
 	}
 
 	// Start the pixel and line clock counter
-	PIOS_TIM_InitClock(&pios_tim3_cfg);
 	PIOS_TIM_InitClock(&pios_tim4_cfg);
 
 #if defined(PIOS_INCLUDE_RTC)

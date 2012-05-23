@@ -161,6 +161,8 @@ static void reset_hsync_timers()
 //	TIM4->CR1 |= 0x02 | 0x04; // Enable the UDIS/URS flags
 //	TIM4->SR = 0;
 
+	TIM4->CNT = 0;
+
 	// Listen to Channel1 (HSYNC)
 	switch(dev_cfg->hsync_capture.timer_chan) {
 		case TIM_Channel_1:
@@ -173,7 +175,7 @@ static void reset_hsync_timers()
 			PIOS_Assert(0);
 	}
 	TIM_SelectSlaveMode(dev_cfg->pixel_timer.timer, TIM_SlaveMode_Trigger);
-	TIM_SelectMasterSlaveMode(dev_cfg->pixel_timer.timer, TIM_MasterSlaveMode_Enable);
+	//TIM_SelectMasterSlaveMode(dev_cfg->pixel_timer.timer, TIM_MasterSlaveMode_Enable);
 }
 
 const struct pios_tim_callbacks px_callback = {
@@ -211,10 +213,10 @@ static void configure_hsync_timers()
 		default:
 			PIOS_Assert(0);
 	}
-	TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Rising;
+	TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Falling;
 	TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
 	TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
-	TIM_ICInitStructure.TIM_ICFilter = 0;
+	TIM_ICInitStructure.TIM_ICFilter = 10;
 	TIM_ICInit(dev_cfg->pixel_timer.timer, &TIM_ICInitStructure);
 
 	// Set up the channel to output the pixel clock
@@ -303,8 +305,6 @@ void PIOS_Video_Init(const struct pios_video_cfg * cfg)
 						 __builtin_ctz(cfg->level.miso.init.GPIO_Pin),
 						 cfg->level.remap);
 	}
-	
-	
 
 	/* Initialize the SPI block */
 	SPI_Init(cfg->level.regs, (SPI_InitTypeDef*)&(cfg->level.init));
@@ -369,6 +369,9 @@ static void prepare_line(uint32_t line_num)
 	uint32_t buf_offset = line_num * GRAPHICS_WIDTH;
 	//buf_offset = (Vsync_update - 10) * GRAPHICS_WIDTH;
 
+	SPI_Cmd(dev_cfg->level.regs, DISABLE);
+	SPI_Cmd(dev_cfg->mask.regs, DISABLE);
+
 	DMA_ClearFlag(dev_cfg->mask.dma.tx.channel, DMA_FLAG_TCIF7 | DMA_FLAG_HTIF7 | DMA_FLAG_FEIF7 | DMA_FLAG_TEIF7);
 	DMA_ClearFlag(dev_cfg->level.dma.tx.channel, DMA_FLAG_FEIF5 | DMA_FLAG_TEIF5);
 	
@@ -397,7 +400,8 @@ static void prepare_line(uint32_t line_num)
 	DMA_SetCurrDataCounter(dev_cfg->level.dma.tx.channel, BUFFER_LINE_LENGTH);
 	DMA_SetCurrDataCounter(dev_cfg->mask.dma.tx.channel, BUFFER_LINE_LENGTH);
 
-	reset_hsync_timers();
+	SPI_Cmd(dev_cfg->level.regs, ENABLE);
+	SPI_Cmd(dev_cfg->mask.regs, ENABLE);
 
 	/* Enable SPI interrupts to DMA */
 	SPI_I2S_DMACmd(dev_cfg->mask.regs, SPI_I2S_DMAReq_Tx, ENABLE);
@@ -405,6 +409,8 @@ static void prepare_line(uint32_t line_num)
 
 	DMA_Cmd(dev_cfg->level.dma.tx.channel, ENABLE);
 	DMA_Cmd(dev_cfg->mask.dma.tx.channel, ENABLE);
+	
+	reset_hsync_timers();
 }
 
 void PIOS_VIDEO_DMA_Handler(void);

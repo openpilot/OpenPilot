@@ -437,7 +437,7 @@ static const struct pios_video_cfg pios_video_cfg = {
 			.SPI_CRCPolynomial     = 7,
 			.SPI_CPOL              = SPI_CPOL_Low,
 			.SPI_CPHA              = SPI_CPHA_2Edge,
-			.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_4,
+			.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_2,
 		},
 		.use_crc = false,
 		.dma = {
@@ -482,7 +482,7 @@ static const struct pios_video_cfg pios_video_cfg = {
 					.DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
 					.DMA_MemoryInc          = DMA_MemoryInc_Enable,
 					.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord,
-					.DMA_MemoryDataSize     = DMA_MemoryDataSize_HalfWord,
+					.DMA_MemoryDataSize     = DMA_MemoryDataSize_Word,
 					.DMA_Mode               = DMA_Mode_Normal,
 					.DMA_Priority           = DMA_Priority_VeryHigh,
 					.DMA_FIFOMode           = DMA_FIFOMode_Enable,

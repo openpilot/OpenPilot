@@ -209,7 +209,7 @@ static void configure_hsync_timers()
 	TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Falling;
 	TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
 	TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
-	TIM_ICInitStructure.TIM_ICFilter = 10;
+	TIM_ICInitStructure.TIM_ICFilter = 0;
 	TIM_ICInit(dev_cfg->pixel_timer.timer, &TIM_ICInitStructure);
 
 	// Set up the channel to output the pixel clock
@@ -347,10 +347,8 @@ static void prepare_line(uint32_t line_num)
 	prepare_count++;
 
 	uint32_t buf_offset = line_num * GRAPHICS_WIDTH;
-	buf_offset = (Vsync_update - 10) * GRAPHICS_WIDTH;
+	//buf_offset = (Vsync_update - 10) * GRAPHICS_WIDTH;
 
-	SPI_Cmd(dev_cfg->level.regs, DISABLE);
-	SPI_Cmd(dev_cfg->mask.regs, DISABLE);
 
 	DMA_ClearFlag(dev_cfg->mask.dma.tx.channel, DMA_FLAG_TCIF7 | DMA_FLAG_HTIF7 | DMA_FLAG_FEIF7 | DMA_FLAG_TEIF7);
 	DMA_ClearFlag(dev_cfg->level.dma.tx.channel, DMA_FLAG_FEIF5 | DMA_FLAG_TEIF5);
@@ -396,14 +394,26 @@ void DMA2_Stream5_IRQHandler(void) __attribute__ ((alias("PIOS_VIDEO_DMA_Handler
  */
 void PIOS_VIDEO_DMA_Handler(void)
 {
-	stop_hsync_timers();
-
 	// Handle flags from stream channel
 	if (DMA_GetFlagStatus(dev_cfg->level.dma.tx.channel,DMA_FLAG_TCIF5)) {	// whole double buffer filled
 		DMA_ClearFlag(dev_cfg->level.dma.tx.channel,DMA_FLAG_TCIF5);
 		if(gActiveLine < GRAPHICS_HEIGHT-2)
 		{
-			PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
+
+			// Wait for previous word to clock out of each
+			if( TIM4->CR1 & 0x0001) {
+				PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
+/*				uint32_t i = 0;
+				while(SPI_I2S_GetFlagStatus(dev_cfg->level.regs ,SPI_I2S_FLAG_TXE) == RESET && i < 30000) i++;
+				while(SPI_I2S_GetFlagStatus(dev_cfg->mask.regs ,SPI_I2S_FLAG_TXE) == RESET && i < 30000) i++;
+				while(SPI_I2S_GetFlagStatus(dev_cfg->level.regs ,SPI_I2S_FLAG_BSY) == SET && i < 30000) i++;
+				while(SPI_I2S_GetFlagStatus(dev_cfg->mask.regs ,SPI_I2S_FLAG_BSY) == SET && i < 30000) i++; */
+			}
+
+			SPI_Cmd(dev_cfg->level.regs, DISABLE);
+			SPI_Cmd(dev_cfg->mask.regs, DISABLE);
+
+			stop_hsync_timers();
 			prepare_line(gActiveLine);
 		}
 		else if(gActiveLine == GRAPHICS_HEIGHT-2)

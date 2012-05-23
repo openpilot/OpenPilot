@@ -423,10 +423,30 @@ void PIOS_VIDEO_DMA_Handler(void)
 		}
 		else if(gActiveLine == GRAPHICS_HEIGHT-2)
 		{
-			// Do nothing
+			// Wait for previous word to clock out of each
+			if( dev_cfg->pixel_timer.timer->CR1 & 0x0001) {
+				PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
+				uint32_t i = 0;
+				while(SPI_I2S_GetFlagStatus(dev_cfg->level.regs ,SPI_I2S_FLAG_TXE) == RESET && i < 30000) i++;
+				while(SPI_I2S_GetFlagStatus(dev_cfg->mask.regs ,SPI_I2S_FLAG_TXE) == RESET && i < 30000) i++;
+				while(SPI_I2S_GetFlagStatus(dev_cfg->level.regs ,SPI_I2S_FLAG_BSY) == SET && i < 30000) i++;
+				while(SPI_I2S_GetFlagStatus(dev_cfg->mask.regs ,SPI_I2S_FLAG_BSY) == SET && i < 30000) i++;
+			}
+			SPI_Cmd(dev_cfg->level.regs, DISABLE);
+			SPI_Cmd(dev_cfg->mask.regs, DISABLE);
+			
+			stop_hsync_timers();
+
+			// STOP DMA, master first
+			DMA_Cmd(dev_cfg->mask.dma.tx.channel, DISABLE);
+			DMA_Cmd(dev_cfg->level.dma.tx.channel, DISABLE);
+
 		}
 		else if(gActiveLine >= GRAPHICS_HEIGHT-1)
 		{
+			SPI_Cmd(dev_cfg->level.regs, DISABLE);
+			SPI_Cmd(dev_cfg->mask.regs, DISABLE);
+
 			// STOP DMA, master first
 			DMA_Cmd(dev_cfg->mask.dma.tx.channel, DISABLE);
 			DMA_Cmd(dev_cfg->level.dma.tx.channel, DISABLE);

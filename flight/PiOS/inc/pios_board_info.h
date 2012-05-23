@@ -1,3 +1,8 @@
+#ifndef PIOS_BOARD_INFO_H
+#define PIOS_BOARD_INFO_H
+
+#include <stdint.h>		/* uint* */
+
 #define PIOS_BOARD_INFO_BLOB_MAGIC 0xBDBDBDBD
 
 struct pios_board_info {
@@ -15,3 +20,5 @@ struct pios_board_info {
 } __attribute__((packed));
 
 extern const struct pios_board_info pios_board_info_blob;
+
+#endif /* PIOS_BOARD_INFO_H */

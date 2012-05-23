@@ -143,17 +143,31 @@ static void stop_hsync_timers()
 	TIM_InternalClockConfig(dev_cfg->pixel_timer.timer);
 }
 
+const struct pios_tim_callbacks px_callback = {
+	.overflow = NULL,
+	.edge = NULL,
+};
+
 /**
  * Reset the timer and configure for next call.  Keeps them synced.  Ideally this won't even be needed
  * since I don't think the slave mode gets lost, and this can simply be disable timer
  */
+uint32_t failcount = 0;
 static void reset_hsync_timers()
 {
-
-	configure_hsync_timers();
-
 	// Stop both timers
 	TIM_Cmd(dev_cfg->pixel_timer.timer, DISABLE);
+
+	uint32_t tim_id;
+	const struct pios_tim_channel *channels = &dev_cfg->hsync_capture;
+
+	//BUG: This is nuts this line is needed.  It simply results in allocating
+	//all the memory but somehow leaving it out breaks the timer functionality.
+	// I do not see how these can be related
+	if (failcount == 0) {
+		if(PIOS_TIM_InitChannels(&tim_id, channels, 1, &px_callback, 0) < 0)
+			failcount++;
+	}
 
 	dev_cfg->pixel_timer.timer->CNT = 0;
 
@@ -171,10 +185,6 @@ static void reset_hsync_timers()
 	TIM_SelectSlaveMode(dev_cfg->pixel_timer.timer, TIM_SlaveMode_Trigger);
 }
 
-const struct pios_tim_callbacks px_callback = {
-	.overflow = NULL,
-	.edge = NULL,
-};
 
 static void configure_hsync_timers()
 {

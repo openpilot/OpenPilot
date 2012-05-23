@@ -2193,16 +2193,7 @@ void updateGraphics() {
 	GPSPositionGet(&gpsData);
 	HomeLocationData home;
 	HomeLocationGet(&home);
-	int plus_offset=40;
-/*
- * for(int i=0; i<10;i++)
-{
-	write_vline( draw_buffer_level,75+i*16,0,GRAPHICS_HEIGHT_REAL-1,1);
-	write_vline( draw_buffer_mask,75+i*16,0,GRAPHICS_HEIGHT_REAL-1,1);
-}
-*/
-
-
+	
 	if(home.Set == HOMELOCATION_SET_FALSE)
 	{
 		char temps[20]={0};
@@ -2210,180 +2201,184 @@ void updateGraphics() {
 		//printTextFB(x,y,temp);
 		write_string(temps, GRAPHICS_WIDTH_REAL/2-((12*12)/2), GRAPHICS_HEIGHT_REAL/2-18/2, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 3);
 	}
-	// Dave Simple
-	if(1)
-	{
-		if(gpsData.Heading>180)
-			setAttitudeOsd(0,0,(int16_t)(gpsData.Heading-360));
-		else
-			setAttitudeOsd(0,0,(int16_t)(gpsData.Heading));
-
-		char temp[50]={0};
-		memset(temp, ' ', 40);
-		sprintf(temp,"Lat:%11.7f",gpsData.Latitude/10000000.0f);
-		write_string(temp, 70, GRAPHICS_HEIGHT_REAL-30, 0, 0, TEXT_VA_BOTTOM, TEXT_HA_LEFT, 0, 3);
-		sprintf(temp,"Lon:%11.7f",gpsData.Longitude/10000000.0f);
-		write_string(temp, 70, GRAPHICS_HEIGHT_REAL-10, 0, 0, TEXT_VA_BOTTOM, TEXT_HA_LEFT, 0, 3);
-		sprintf(temp,"Sat:%d",(int)gpsData.Satellites);
-		write_string(temp, GRAPHICS_WIDTH_REAL-40, 30, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
-
-		/* Print ADC voltage FLIGHT*/
-		sprintf(temp,"V:%4.2fV",(PIOS_ADC_PinGet(2)*3.0f*6.1f/4096.0f));
-		write_string(temp, 70, 20, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 3);
-
-		calcHomeArrow();
-
-		// Last pixel
-		write_vline( draw_buffer_level,GRAPHICS_WIDTH_REAL-1,0,GRAPHICS_HEIGHT_REAL-1,0);
-		write_vline( draw_buffer_mask,GRAPHICS_WIDTH_REAL-1,0,GRAPHICS_HEIGHT_REAL-1,0);
-	}
-
-	if(0)
-	{
-		if(OsdSettings.Attitude == OSDSETTINGS_ATTITUDE_ENABLED)
+	
+	uint32_t disp = 0;
+	switch (disp) {
+		case 0: // Dave simple
 		{
-
-			// GPS HACK
 			if(gpsData.Heading>180)
 				setAttitudeOsd(0,0,(int16_t)(gpsData.Heading-360));
 			else
 				setAttitudeOsd(0,0,(int16_t)(gpsData.Heading));
-			/*drawBox(2,2,GRAPHICS_WIDTH_REAL-4,GRAPHICS_HEIGHT_REAL-4);
-			write_filled_rectangle(draw_buffer_mask,0,0,GRAPHICS_WIDTH_REAL-2,GRAPHICS_HEIGHT_REAL-2,0);
-			write_filled_rectangle(draw_buffer_mask,2,2,GRAPHICS_WIDTH_REAL-4-2,GRAPHICS_HEIGHT_REAL-4-2,2);
-			write_filled_rectangle(draw_buffer_mask,3,3,GRAPHICS_WIDTH_REAL-4-1,GRAPHICS_HEIGHT_REAL-4-1,0);*/
-			//write_filled_rectangle(draw_buffer_mask,5,5,GRAPHICS_WIDTH_REAL-4-5,GRAPHICS_HEIGHT_REAL-4-5,0);
-			//write_rectangle_outlined(10,10,GRAPHICS_WIDTH_REAL-20,GRAPHICS_HEIGHT_REAL-20,0,0);
-			//drawLine(GRAPHICS_WIDTH_REAL-1, GRAPHICS_HEIGHT_REAL-1,(GRAPHICS_WIDTH_REAL/2)-1, GRAPHICS_HEIGHT_REAL-1 );
-			//drawCircle((GRAPHICS_WIDTH_REAL/2)-1, (GRAPHICS_HEIGHT_REAL/2)-1, (GRAPHICS_HEIGHT_REAL/2)-1);
-			//drawCircle((GRAPHICS_SIZE/2)-1, (GRAPHICS_SIZE/2)-1, (GRAPHICS_SIZE/2)-2);
-			//drawLine(0, (GRAPHICS_SIZE/2)-1, GRAPHICS_SIZE-1, (GRAPHICS_SIZE/2)-1);
-			//drawLine((GRAPHICS_SIZE/2)-1, 0, (GRAPHICS_SIZE/2)-1, GRAPHICS_SIZE-1);
-			angleA++;
-			if(angleB<=-90)
-			{
-			sum=2;
-			}
-			if(angleB>=90)
-			{
-			sum=-2;
-			}
-			angleB+=sum;
-			angleC+=2;
-
-			calcHomeArrow();
-
-			/* Draw Attitude Indicator */
-			//if(OsdSettings.Attitude == OSDSETTINGS_ATTITUDE_ENABLED)
-			if(0)
-			{
-				drawAttitude(OsdSettings.AttitudeSetup[OSDSETTINGS_ATTITUDESETUP_X],OsdSettings.AttitudeSetup[OSDSETTINGS_ATTITUDESETUP_Y],attitude.Pitch,attitude.Roll,96);
-			}
-			//write_string("Hello OP-OSD", 60, 12, 1, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 0);
-			//printText16( 60, 12,"Hello OP-OSD");
-
+			
 			char temp[50]={0};
 			memset(temp, ' ', 40);
 			sprintf(temp,"Lat:%11.7f",gpsData.Latitude/10000000.0f);
-			write_string(temp, 5, 5, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+			write_string(temp, 70, GRAPHICS_HEIGHT_REAL-30, 0, 0, TEXT_VA_BOTTOM, TEXT_HA_LEFT, 0, 3);
 			sprintf(temp,"Lon:%11.7f",gpsData.Longitude/10000000.0f);
-			write_string(temp, 5, 15, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
-			sprintf(temp,"Fix:%d",(int)gpsData.Status);
-			write_string(temp, 5, 25, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+			write_string(temp, 70, GRAPHICS_HEIGHT_REAL-10, 0, 0, TEXT_VA_BOTTOM, TEXT_HA_LEFT, 0, 3);
 			sprintf(temp,"Sat:%d",(int)gpsData.Satellites);
-			write_string(temp, 5, 35, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
-
-
-			/* Print RTC time */
-			if(OsdSettings.Time == OSDSETTINGS_TIME_ENABLED)
-			{
-				printTime(OsdSettings.TimeSetup[OSDSETTINGS_TIMESETUP_X],OsdSettings.TimeSetup[OSDSETTINGS_TIMESETUP_Y]);
-			}
-
-			/* Print Number of detected video Lines */
-			sprintf(temp,"Lines:%4d",PIOS_Video_GetOSDLines());
-			write_string(temp, (GRAPHICS_WIDTH_REAL - 2),5, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
-
-			/* Print ADC voltage */
-			//sprintf(temp,"Rssi:%4dV",(int)(PIOS_ADC_PinGet(4)*3000/4096));
-			//write_string(temp, (GRAPHICS_WIDTH_REAL - 2),15, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
-			sprintf(temp,"Rssi:%4.2fV",(PIOS_ADC_PinGet(4)*3.0f/4096.0f));
-			write_string(temp, (GRAPHICS_WIDTH_REAL - 2),15, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
-
-			/* Print CPU temperature */
-			sprintf(temp,"Temp:%4.2fC",(PIOS_ADC_PinGet(6)*0.29296875f-264));
-			write_string(temp, (GRAPHICS_WIDTH_REAL - 2),25, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
-
+			write_string(temp, GRAPHICS_WIDTH_REAL-40, 30, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+			
 			/* Print ADC voltage FLIGHT*/
-			sprintf(temp,"FltV:%4.2fV",(PIOS_ADC_PinGet(2)*3.0f*6.1f/4096.0f));
-			write_string(temp, (GRAPHICS_WIDTH_REAL - 2),35, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
-
-			/* Print ADC voltage VIDEO*/
-			sprintf(temp,"VidV:%4.2fV",(PIOS_ADC_PinGet(3)*3.0f*6.1f/4096.0f));
-			write_string(temp, (GRAPHICS_WIDTH_REAL - 2),45, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
-
-			/* Print ADC voltage RSSI */
-			//sprintf(temp,"Curr:%4dA",(int)(PIOS_ADC_PinGet(0)*300*61/4096));
-			//write_string(temp, (GRAPHICS_WIDTH_REAL - 2),60, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
-
-			/* Draw Battery Gauge */
-			m_batt++;
-			uint8_t dir=3;
-			if(m_batt==101)
-				m_batt=0;
-			if(m_pitch>0)
-			{
-				dir=0;
-				m_alt+=m_pitch/2;
-			}
-			else if(m_pitch<0)
-			{
-				dir=1;
-				m_alt+=m_pitch/2;
-			}
-			//if(OsdSettings.Battery == OSDSETTINGS_BATTERY_ENABLED)
-			if(0)
-			{
-				drawBattery(OsdSettings.BatterySetup[OSDSETTINGS_BATTERYSETUP_X],OsdSettings.BatterySetup[OSDSETTINGS_BATTERYSETUP_Y],m_batt,16);
-			}
-
-			//drawAltitude(200,50,m_alt,dir);
-
-
-			//drawArrow(96,GRAPHICS_HEIGHT_REAL/2,angleB,32);
-
-			// Draw airspeed (left side.)
-			if(OsdSettings.Speed == OSDSETTINGS_SPEED_ENABLED)
-			{
-				hud_draw_vertical_scale((int)m_gpsSpd, 100, -1, OsdSettings.SpeedSetup[OSDSETTINGS_SPEEDSETUP_X],
-						OsdSettings.SpeedSetup[OSDSETTINGS_SPEEDSETUP_Y], 100, 10, 20, 7, 12, 15, 1000, HUD_VSCALE_FLAG_NO_NEGATIVE);
-			}
-			// Draw altimeter (right side.)
-			if(OsdSettings.Altitude == OSDSETTINGS_ALTITUDE_ENABLED)
-			{
-				hud_draw_vertical_scale((int)m_gpsAlt, 200, +1, OsdSettings.AltitudeSetup[OSDSETTINGS_ALTITUDESETUP_X],
-						OsdSettings.AltitudeSetup[OSDSETTINGS_ALTITUDESETUP_Y], 100, 20, 100, 7, 12, 15, 500, 0);
-			}
-			// Draw compass.
-			if(OsdSettings.Heading == OSDSETTINGS_HEADING_ENABLED)
-			{
-				if(m_yaw<0) {
-					hud_draw_linear_compass(360+m_yaw, 150, 120, OsdSettings.HeadingSetup[OSDSETTINGS_HEADINGSETUP_X],
-							OsdSettings.HeadingSetup[OSDSETTINGS_HEADINGSETUP_Y], 15, 30, 7, 12, 0);
-				} else {
-					hud_draw_linear_compass(m_yaw, 150, 120, OsdSettings.HeadingSetup[OSDSETTINGS_HEADINGSETUP_X],
-							OsdSettings.HeadingSetup[OSDSETTINGS_HEADINGSETUP_Y], 15, 30, 7, 12, 0);
-				}
-			}
-			//write_filled_rectangle(draw_buffer_level,20,20,30,30,1);
-			//write_filled_rectangle(draw_buffer_mask,30,30,30,30,1);
-			//lamas();
-			/* Make sure every line last bit is 0 */
+			sprintf(temp,"V:%4.2fV",(PIOS_ADC_PinGet(2)*3.0f*6.1f/4096.0f));
+			write_string(temp, 70, 20, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 3);
+			
+			calcHomeArrow();
+			
+			// Last pixel
 			write_vline( draw_buffer_level,GRAPHICS_WIDTH_REAL-1,0,GRAPHICS_HEIGHT_REAL-1,0);
 			write_vline( draw_buffer_mask,GRAPHICS_WIDTH_REAL-1,0,GRAPHICS_HEIGHT_REAL-1,0);
 		}
-		else
+			break;
+		case 1:
 		{
+			if(OsdSettings.Attitude == OSDSETTINGS_ATTITUDE_ENABLED)
+			{
+				
+				// GPS HACK
+				if(gpsData.Heading>180)
+					setAttitudeOsd(0,0,(int16_t)(gpsData.Heading-360));
+				else
+					setAttitudeOsd(0,0,(int16_t)(gpsData.Heading));
+				/*drawBox(2,2,GRAPHICS_WIDTH_REAL-4,GRAPHICS_HEIGHT_REAL-4);
+				 write_filled_rectangle(draw_buffer_mask,0,0,GRAPHICS_WIDTH_REAL-2,GRAPHICS_HEIGHT_REAL-2,0);
+				 write_filled_rectangle(draw_buffer_mask,2,2,GRAPHICS_WIDTH_REAL-4-2,GRAPHICS_HEIGHT_REAL-4-2,2);
+				 write_filled_rectangle(draw_buffer_mask,3,3,GRAPHICS_WIDTH_REAL-4-1,GRAPHICS_HEIGHT_REAL-4-1,0);*/
+				//write_filled_rectangle(draw_buffer_mask,5,5,GRAPHICS_WIDTH_REAL-4-5,GRAPHICS_HEIGHT_REAL-4-5,0);
+				//write_rectangle_outlined(10,10,GRAPHICS_WIDTH_REAL-20,GRAPHICS_HEIGHT_REAL-20,0,0);
+				//drawLine(GRAPHICS_WIDTH_REAL-1, GRAPHICS_HEIGHT_REAL-1,(GRAPHICS_WIDTH_REAL/2)-1, GRAPHICS_HEIGHT_REAL-1 );
+				//drawCircle((GRAPHICS_WIDTH_REAL/2)-1, (GRAPHICS_HEIGHT_REAL/2)-1, (GRAPHICS_HEIGHT_REAL/2)-1);
+				//drawCircle((GRAPHICS_SIZE/2)-1, (GRAPHICS_SIZE/2)-1, (GRAPHICS_SIZE/2)-2);
+				//drawLine(0, (GRAPHICS_SIZE/2)-1, GRAPHICS_SIZE-1, (GRAPHICS_SIZE/2)-1);
+				//drawLine((GRAPHICS_SIZE/2)-1, 0, (GRAPHICS_SIZE/2)-1, GRAPHICS_SIZE-1);
+				angleA++;
+				if(angleB<=-90)
+				{
+					sum=2;
+				}
+				if(angleB>=90)
+				{
+					sum=-2;
+				}
+				angleB+=sum;
+				angleC+=2;
+				
+				calcHomeArrow();
+				
+				/* Draw Attitude Indicator */
+				//if(OsdSettings.Attitude == OSDSETTINGS_ATTITUDE_ENABLED)
+				if(0)
+				{
+					drawAttitude(OsdSettings.AttitudeSetup[OSDSETTINGS_ATTITUDESETUP_X],OsdSettings.AttitudeSetup[OSDSETTINGS_ATTITUDESETUP_Y],attitude.Pitch,attitude.Roll,96);
+				}
+				//write_string("Hello OP-OSD", 60, 12, 1, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 0);
+				//printText16( 60, 12,"Hello OP-OSD");
+				
+				char temp[50]={0};
+				memset(temp, ' ', 40);
+				sprintf(temp,"Lat:%11.7f",gpsData.Latitude/10000000.0f);
+				write_string(temp, 5, 5, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+				sprintf(temp,"Lon:%11.7f",gpsData.Longitude/10000000.0f);
+				write_string(temp, 5, 15, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+				sprintf(temp,"Fix:%d",(int)gpsData.Status);
+				write_string(temp, 5, 25, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+				sprintf(temp,"Sat:%d",(int)gpsData.Satellites);
+				write_string(temp, 5, 35, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+				
+				
+				/* Print RTC time */
+				if(OsdSettings.Time == OSDSETTINGS_TIME_ENABLED)
+				{
+					printTime(OsdSettings.TimeSetup[OSDSETTINGS_TIMESETUP_X],OsdSettings.TimeSetup[OSDSETTINGS_TIMESETUP_Y]);
+				}
+				
+				/* Print Number of detected video Lines */
+				sprintf(temp,"Lines:%4d",PIOS_Video_GetOSDLines());
+				write_string(temp, (GRAPHICS_WIDTH_REAL - 2),5, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+				
+				/* Print ADC voltage */
+				//sprintf(temp,"Rssi:%4dV",(int)(PIOS_ADC_PinGet(4)*3000/4096));
+				//write_string(temp, (GRAPHICS_WIDTH_REAL - 2),15, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+				sprintf(temp,"Rssi:%4.2fV",(PIOS_ADC_PinGet(4)*3.0f/4096.0f));
+				write_string(temp, (GRAPHICS_WIDTH_REAL - 2),15, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+				
+				/* Print CPU temperature */
+				sprintf(temp,"Temp:%4.2fC",(PIOS_ADC_PinGet(6)*0.29296875f-264));
+				write_string(temp, (GRAPHICS_WIDTH_REAL - 2),25, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+				
+				/* Print ADC voltage FLIGHT*/
+				sprintf(temp,"FltV:%4.2fV",(PIOS_ADC_PinGet(2)*3.0f*6.1f/4096.0f));
+				write_string(temp, (GRAPHICS_WIDTH_REAL - 2),35, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+				
+				/* Print ADC voltage VIDEO*/
+				sprintf(temp,"VidV:%4.2fV",(PIOS_ADC_PinGet(3)*3.0f*6.1f/4096.0f));
+				write_string(temp, (GRAPHICS_WIDTH_REAL - 2),45, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+				
+				/* Print ADC voltage RSSI */
+				//sprintf(temp,"Curr:%4dA",(int)(PIOS_ADC_PinGet(0)*300*61/4096));
+				//write_string(temp, (GRAPHICS_WIDTH_REAL - 2),60, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+				
+				/* Draw Battery Gauge */
+				m_batt++;
+				uint8_t dir=3;
+				if(m_batt==101)
+					m_batt=0;
+				if(m_pitch>0)
+				{
+					dir=0;
+					m_alt+=m_pitch/2;
+				}
+				else if(m_pitch<0)
+				{
+					dir=1;
+					m_alt+=m_pitch/2;
+				}
+				//if(OsdSettings.Battery == OSDSETTINGS_BATTERY_ENABLED)
+				if(0)
+				{
+					drawBattery(OsdSettings.BatterySetup[OSDSETTINGS_BATTERYSETUP_X],OsdSettings.BatterySetup[OSDSETTINGS_BATTERYSETUP_Y],m_batt,16);
+				}
+				
+				//drawAltitude(200,50,m_alt,dir);
+				
+				
+				//drawArrow(96,GRAPHICS_HEIGHT_REAL/2,angleB,32);
+				
+				// Draw airspeed (left side.)
+				if(OsdSettings.Speed == OSDSETTINGS_SPEED_ENABLED)
+				{
+					hud_draw_vertical_scale((int)m_gpsSpd, 100, -1, OsdSettings.SpeedSetup[OSDSETTINGS_SPEEDSETUP_X],
+											OsdSettings.SpeedSetup[OSDSETTINGS_SPEEDSETUP_Y], 100, 10, 20, 7, 12, 15, 1000, HUD_VSCALE_FLAG_NO_NEGATIVE);
+				}
+				// Draw altimeter (right side.)
+				if(OsdSettings.Altitude == OSDSETTINGS_ALTITUDE_ENABLED)
+				{
+					hud_draw_vertical_scale((int)m_gpsAlt, 200, +1, OsdSettings.AltitudeSetup[OSDSETTINGS_ALTITUDESETUP_X],
+											OsdSettings.AltitudeSetup[OSDSETTINGS_ALTITUDESETUP_Y], 100, 20, 100, 7, 12, 15, 500, 0);
+				}
+				// Draw compass.
+				if(OsdSettings.Heading == OSDSETTINGS_HEADING_ENABLED)
+				{
+					if(m_yaw<0) {
+						hud_draw_linear_compass(360+m_yaw, 150, 120, OsdSettings.HeadingSetup[OSDSETTINGS_HEADINGSETUP_X],
+												OsdSettings.HeadingSetup[OSDSETTINGS_HEADINGSETUP_Y], 15, 30, 7, 12, 0);
+					} else {
+						hud_draw_linear_compass(m_yaw, 150, 120, OsdSettings.HeadingSetup[OSDSETTINGS_HEADINGSETUP_X],
+												OsdSettings.HeadingSetup[OSDSETTINGS_HEADINGSETUP_Y], 15, 30, 7, 12, 0);
+					}
+				}
+				//write_filled_rectangle(draw_buffer_level,20,20,30,30,1);
+				//write_filled_rectangle(draw_buffer_mask,30,30,30,30,1);
+				//lamas();
+				/* Make sure every line last bit is 0 */
+				for (uint32_t i = 0; i < 16; i++) {
+					write_vline( draw_buffer_level,GRAPHICS_WIDTH_REAL-i,0,GRAPHICS_HEIGHT_REAL-1,0);
+					write_vline( draw_buffer_mask,GRAPHICS_WIDTH_REAL-i,0,GRAPHICS_HEIGHT_REAL-1,0);
+				}
+			}
+			break;
+		default:
 			write_vline( draw_buffer_level,0,0,GRAPHICS_HEIGHT_REAL-1,1);
 			write_vline( draw_buffer_mask,0,0,GRAPHICS_HEIGHT_REAL-1,1);
 			write_vline( draw_buffer_level,16,0,GRAPHICS_HEIGHT_REAL-1,1);
@@ -2391,7 +2386,6 @@ void updateGraphics() {
 		}
 	}
 }
-
 
 void updateOnceEveryFrame() {
 	clearGraphics();

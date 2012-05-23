@@ -451,27 +451,7 @@ static const struct pios_video_cfg pios_video_cfg = {
 					.NVIC_IRQChannelCmd = ENABLE,
 				},
 			},
-
-			.rx = {
-				//not used
-				.channel = DMA1_Stream4,
-				.init = {
-					.DMA_Channel            = DMA_Channel_0,
-					.DMA_PeripheralBaseAddr = (uint32_t) & (SPI3->DR),
-					.DMA_DIR                = DMA_DIR_PeripheralToMemory,
-					.DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
-					.DMA_MemoryInc          = DMA_MemoryInc_Enable,
-					.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord,
-					.DMA_MemoryDataSize     = DMA_MemoryDataSize_HalfWord,
-					.DMA_Mode               = DMA_Mode_Normal,
-					.DMA_Priority           = DMA_Priority_Medium,
-					//TODO: Enable FIFO
-					.DMA_FIFOMode           = DMA_FIFOMode_Disable,
-					.DMA_FIFOThreshold      = DMA_FIFOThreshold_Full,
-					.DMA_MemoryBurst        = DMA_MemoryBurst_Single,
-					.DMA_PeripheralBurst    = DMA_PeripheralBurst_Single,
-				},
-			},
+			.rx = {},
 			.tx = {
 				.channel = DMA1_Stream7,
 				.init = {
@@ -512,16 +492,7 @@ static const struct pios_video_cfg pios_video_cfg = {
 				.GPIO_PuPd = GPIO_PuPd_NOPULL
 			},
 		},
-		.mosi = {
-			.gpio = GPIOC,
-			.init = {
-				.GPIO_Pin = GPIO_Pin_12,
-				.GPIO_Speed = GPIO_Speed_50MHz,
-				.GPIO_Mode = GPIO_Mode_AF,
-				.GPIO_OType = GPIO_OType_PP,
-				.GPIO_PuPd = GPIO_PuPd_NOPULL
-			},
-		},
+		.mosi = {},
 		.slave_count = 1,
 	},
 	.level = {
@@ -549,26 +520,7 @@ static const struct pios_video_cfg pios_video_cfg = {
 						.NVIC_IRQChannelCmd                = ENABLE,
 					},
 				},
-
-				.rx = {
-					//not used
-					.channel = DMA2_Stream0,
-					.init    = {
-		                .DMA_Channel            = DMA_Channel_3,
-						.DMA_PeripheralBaseAddr = (uint32_t)&(SPI1->DR),
-						.DMA_DIR                = DMA_DIR_PeripheralToMemory,
-						.DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
-						.DMA_MemoryInc          = DMA_MemoryInc_Enable,
-						.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte,
-						.DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte,
-						.DMA_Mode               = DMA_Mode_Normal,
-						.DMA_Priority           = DMA_Priority_Medium,
-						.DMA_FIFOMode           = DMA_FIFOMode_Disable,
-		                /* .DMA_FIFOThreshold */
-		                .DMA_MemoryBurst        = DMA_MemoryBurst_Single,
-		                .DMA_PeripheralBurst    = DMA_PeripheralBurst_Single,
-					},
-				},
+				.rx = {},
 				.tx = {
 					.channel = DMA2_Stream5,
 					.init    = {
@@ -609,16 +561,7 @@ static const struct pios_video_cfg pios_video_cfg = {
 					.GPIO_PuPd = GPIO_PuPd_UP
 				},
 			},
-			.mosi = {
-				.gpio = GPIOB,
-				.init = {
-					.GPIO_Pin   = GPIO_Pin_5,
-					.GPIO_Speed = GPIO_Speed_50MHz,
-					.GPIO_Mode  = GPIO_Mode_AF,
-					.GPIO_OType = GPIO_OType_PP,
-					.GPIO_PuPd = GPIO_PuPd_UP
-				},
-			},
+			.mosi = {},
 			.slave_count = 1,
 
 	},

@@ -161,7 +161,6 @@ void PIOS_Board_Init(void) {
 			PIOS_LED_Init(&pios_led_cfg_cc);
 			break;
 		case 0x02: // Revision 2
-			GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
 			PIOS_LED_Init(&pios_led_cfg_cc3d);
 			break;
 		default:

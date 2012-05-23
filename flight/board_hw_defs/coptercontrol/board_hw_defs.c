@@ -59,6 +59,7 @@ static const struct pios_led pios_leds_cc3d[] = {
 				.GPIO_Speed = GPIO_Speed_50MHz,
 			},
 		},
+		.remap = GPIO_Remap_SWJ_JTAGDisable,
 	},
 };
 

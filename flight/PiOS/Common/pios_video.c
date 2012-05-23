@@ -37,6 +37,7 @@ static void configure_hsync_timers();
 static void stop_hsync_timers();
 static void reset_hsync_timers();
 static void prepare_line(uint32_t line_num);
+static void flush_spi();
 
 // Private variables
 extern xSemaphoreHandle osdSemaphore;
@@ -121,11 +122,7 @@ void PIOS_Vsync_ISR() {
 	
 	// Wait for previous word to clock out of each
 	TIM_Cmd(dev_cfg->pixel_timer.timer, ENABLE);
-	uint32_t i = 0; 
-	while(SPI_I2S_GetFlagStatus(dev_cfg->level.regs ,SPI_I2S_FLAG_TXE) == RESET && i < 30000) i++;
-	while(SPI_I2S_GetFlagStatus(dev_cfg->mask.regs ,SPI_I2S_FLAG_TXE) == RESET && i < 30000) i++;
-	while(SPI_I2S_GetFlagStatus(dev_cfg->level.regs ,SPI_I2S_FLAG_BSY) == SET && i < 30000) i++;
-	while(SPI_I2S_GetFlagStatus(dev_cfg->mask.regs ,SPI_I2S_FLAG_BSY) == SET && i < 30000) i++;
+	flush_spi();
 	TIM_Cmd(dev_cfg->pixel_timer.timer, DISABLE);	
 
 	swap_buffers();
@@ -392,6 +389,42 @@ void DMA1_Stream7_IRQHandler(void) __attribute__ ((alias("PIOS_VIDEO_DMA_Handler
 void DMA2_Stream5_IRQHandler(void) __attribute__ ((alias("PIOS_VIDEO_DMA_Handler")));
 
 /**
+ * Check both SPI for the stop sequence before disabling them
+ */
+static void flush_spi()
+{
+	bool level_empty = false;
+	bool mask_empty = false;
+	bool level_stopped = false;
+	bool mask_stopped = false;
+	
+	// Can't flush if clock not running
+	while(dev_cfg->pixel_timer.timer->CR1 & 0x0001 &&  ( !level_stopped | !mask_stopped )) {
+
+		level_empty |= SPI_I2S_GetFlagStatus(dev_cfg->level.regs ,SPI_I2S_FLAG_TXE) == SET;
+		mask_empty |= SPI_I2S_GetFlagStatus(dev_cfg->mask.regs ,SPI_I2S_FLAG_TXE) == SET;
+
+		if (level_empty && !level_stopped) { // && SPI_I2S_GetFlagStatus(dev_cfg->level.regs ,SPI_I2S_FLAG_BSY) == RESET) {
+			SPI_Cmd(dev_cfg->level.regs, DISABLE);
+			level_stopped = true;
+		}
+
+		if (mask_empty && !mask_stopped) { // && SPI_I2S_GetFlagStatus(dev_cfg->mask.regs ,SPI_I2S_FLAG_BSY) == RESET) {
+			SPI_Cmd(dev_cfg->mask.regs, DISABLE);
+			mask_stopped = true;
+		}
+	}
+	/*
+	uint32_t i = 0;
+	while(SPI_I2S_GetFlagStatus(dev_cfg->level.regs ,SPI_I2S_FLAG_TXE) == RESET && i < 30000) i++;
+	while(SPI_I2S_GetFlagStatus(dev_cfg->mask.regs ,SPI_I2S_FLAG_TXE) == RESET && i < 30000) i++;
+	while(SPI_I2S_GetFlagStatus(dev_cfg->level.regs ,SPI_I2S_FLAG_BSY) == SET && i < 30000) i++;
+	while(SPI_I2S_GetFlagStatus(dev_cfg->mask.regs ,SPI_I2S_FLAG_BSY) == SET && i < 30000) i++;*/
+	SPI_Cmd(dev_cfg->mask.regs, DISABLE);
+	SPI_Cmd(dev_cfg->level.regs, DISABLE);	
+}
+
+/**
  * @brief Interrupt for half and full buffer transfer
  */
 void PIOS_VIDEO_DMA_Handler(void)
@@ -404,52 +437,21 @@ void PIOS_VIDEO_DMA_Handler(void)
 		DMA_ClearFlag(dev_cfg->level.dma.tx.channel,DMA_FLAG_TCIF5);
 		if(gActiveLine < GRAPHICS_HEIGHT-2)
 		{
-
-			// Wait for previous word to clock out of each
-			if( dev_cfg->pixel_timer.timer->CR1 & 0x0001) {
-				PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
-				uint32_t i = 0;
-				while(SPI_I2S_GetFlagStatus(dev_cfg->level.regs ,SPI_I2S_FLAG_TXE) == RESET && i < 30000) i++;
-				while(SPI_I2S_GetFlagStatus(dev_cfg->mask.regs ,SPI_I2S_FLAG_TXE) == RESET && i < 30000) i++;
-				while(SPI_I2S_GetFlagStatus(dev_cfg->level.regs ,SPI_I2S_FLAG_BSY) == SET && i < 30000) i++;
-				while(SPI_I2S_GetFlagStatus(dev_cfg->mask.regs ,SPI_I2S_FLAG_BSY) == SET && i < 30000) i++;
-			}
-
-			SPI_Cmd(dev_cfg->level.regs, DISABLE);
-			SPI_Cmd(dev_cfg->mask.regs, DISABLE);
-
+			flush_spi();
 			stop_hsync_timers();
 			prepare_line(gActiveLine);
 		}
 		else if(gActiveLine == GRAPHICS_HEIGHT-2)
 		{
-			// Wait for previous word to clock out of each
-			if( dev_cfg->pixel_timer.timer->CR1 & 0x0001) {
-				PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
-				uint32_t i = 0;
-				while(SPI_I2S_GetFlagStatus(dev_cfg->level.regs ,SPI_I2S_FLAG_TXE) == RESET && i < 30000) i++;
-				while(SPI_I2S_GetFlagStatus(dev_cfg->mask.regs ,SPI_I2S_FLAG_TXE) == RESET && i < 30000) i++;
-				while(SPI_I2S_GetFlagStatus(dev_cfg->level.regs ,SPI_I2S_FLAG_BSY) == SET && i < 30000) i++;
-				while(SPI_I2S_GetFlagStatus(dev_cfg->mask.regs ,SPI_I2S_FLAG_BSY) == SET && i < 30000) i++;
-			}
-			SPI_Cmd(dev_cfg->level.regs, DISABLE);
-			SPI_Cmd(dev_cfg->mask.regs, DISABLE);
-			
+			flush_spi();
 			stop_hsync_timers();
 
 			// STOP DMA, master first
 			DMA_Cmd(dev_cfg->mask.dma.tx.channel, DISABLE);
 			DMA_Cmd(dev_cfg->level.dma.tx.channel, DISABLE);
-
 		}
 		else if(gActiveLine >= GRAPHICS_HEIGHT-1)
 		{
-			SPI_Cmd(dev_cfg->level.regs, DISABLE);
-			SPI_Cmd(dev_cfg->mask.regs, DISABLE);
-
-			// STOP DMA, master first
-			DMA_Cmd(dev_cfg->mask.dma.tx.channel, DISABLE);
-			DMA_Cmd(dev_cfg->level.dma.tx.channel, DISABLE);
 		}
 		gActiveLine++;
 	}

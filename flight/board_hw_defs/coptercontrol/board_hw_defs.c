@@ -27,6 +27,10 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include <pios_config.h>
+#include <pios_board_info.h>
+
+#define BOARD_REVISION_CC   1
+#define BOARD_REVISION_CC3D 2
 
 #if defined(PIOS_INCLUDE_LED)
 
@@ -67,6 +71,15 @@ static const struct pios_led_cfg pios_led_cfg_cc3d = {
 	.leds     = pios_leds_cc3d,
 	.num_leds = NELEMENTS(pios_leds_cc3d),
 };
+
+const struct pios_led_cfg * PIOS_BOARD_HW_DEFS_GetLedCfg (uint32_t board_revision)
+{
+	switch (board_revision) {
+	case BOARD_REVISION_CC:		return &pios_led_cfg_cc;
+	case BOARD_REVISION_CC3D:	return &pios_led_cfg_cc3d;
+	default:			return NULL;
+	}
+}
 
 #endif	/* PIOS_INCLUDE_LED */
 

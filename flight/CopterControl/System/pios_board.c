@@ -156,16 +156,9 @@ void PIOS_Board_Init(void) {
 	const struct pios_board_info * bdinfo = &pios_board_info_blob;
 	
 #if defined(PIOS_INCLUDE_LED)
-	switch(bdinfo->board_rev) {
-		case 0x01: // Revision 1
-			PIOS_LED_Init(&pios_led_cfg_cc);
-			break;
-		case 0x02: // Revision 2
-			PIOS_LED_Init(&pios_led_cfg_cc3d);
-			break;
-		default:
-			PIOS_Assert(0);
-	}
+	const struct pios_led_cfg * led_cfg = PIOS_BOARD_HW_DEFS_GetLedCfg(bdinfo->board_rev);
+	PIOS_Assert(led_cfg);
+	PIOS_LED_Init(led_cfg);
 #endif	/* PIOS_INCLUDE_LED */
 
 #if defined(PIOS_INCLUDE_SPI)

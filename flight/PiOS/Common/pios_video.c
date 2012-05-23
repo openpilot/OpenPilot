@@ -339,31 +339,13 @@ void PIOS_Video_Init(const struct pios_video_cfg * cfg)
  * Prepare the system to watch for a HSYNC pulse to trigger the pixel
  * clock and clock out the next line
  */
-uint32_t prepare_count = 0;
-uint32_t last_prepare = 0;
 static void prepare_line(uint32_t line_num)
 {
-	last_prepare = line_num;
-	prepare_count++;
-
 	uint32_t buf_offset = line_num * GRAPHICS_WIDTH;
-	//buf_offset = (Vsync_update - 10) * GRAPHICS_WIDTH;
-
 
 	DMA_ClearFlag(dev_cfg->mask.dma.tx.channel, DMA_FLAG_TCIF7 | DMA_FLAG_HTIF7 | DMA_FLAG_FEIF7 | DMA_FLAG_TEIF7);
 	DMA_ClearFlag(dev_cfg->level.dma.tx.channel, DMA_FLAG_FEIF5 | DMA_FLAG_TEIF5);
 	
-	/* Configure DMA for SPI Tx SLAVE Maskbuffer */
-	DMA_Cmd(dev_cfg->mask.dma.tx.channel, DISABLE);
-	DMA_Init(dev_cfg->mask.dma.tx.channel, (DMA_InitTypeDef*)&(dev_cfg->mask.dma.tx.init));
-	
-	/* Configure DMA for SPI Tx SLAVE Framebuffer*/
-	DMA_Cmd(dev_cfg->level.dma.tx.channel, DISABLE);
-	DMA_Init(dev_cfg->level.dma.tx.channel, (DMA_InitTypeDef*)&(dev_cfg->level.dma.tx.init));
-
-	/* Trigger interrupt when for half conversions too to indicate double buffer */
-	DMA_ITConfig(dev_cfg->level.dma.tx.channel, DMA_IT_TC, ENABLE);
-
 	// Load new line
 	DMA_MemoryTargetConfig(dev_cfg->level.dma.tx.channel,(uint32_t)&disp_buffer_level[buf_offset],DMA_Memory_0);
 	DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[buf_offset],DMA_Memory_0);
@@ -394,6 +376,9 @@ void DMA2_Stream5_IRQHandler(void) __attribute__ ((alias("PIOS_VIDEO_DMA_Handler
  */
 void PIOS_VIDEO_DMA_Handler(void)
 {
+	// Try and make sure they can't get out of sync
+	DMA_Cmd(dev_cfg->mask.dma.tx.channel, DISABLE);
+
 	// Handle flags from stream channel
 	if (DMA_GetFlagStatus(dev_cfg->level.dma.tx.channel,DMA_FLAG_TCIF5)) {	// whole double buffer filled
 		DMA_ClearFlag(dev_cfg->level.dma.tx.channel,DMA_FLAG_TCIF5);

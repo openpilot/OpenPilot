@@ -147,21 +147,15 @@ static void stop_hsync_timers()
  * Reset the timer and configure for next call.  Keeps them synced.  Ideally this won't even be needed
  * since I don't think the slave mode gets lost, and this can simply be disable timer
  */
-uint32_t reset_count = 0;
-
 static void reset_hsync_timers()
 {
 
 	configure_hsync_timers();
 
-	reset_count++;
 	// Stop both timers
 	TIM_Cmd(dev_cfg->pixel_timer.timer, DISABLE);
 
-//	TIM4->CR1 |= 0x02 | 0x04; // Enable the UDIS/URS flags
-//	TIM4->SR = 0;
-
-	TIM4->CNT = 0;
+	dev_cfg->pixel_timer.timer->CNT = 0;
 
 	// Listen to Channel1 (HSYNC)
 	switch(dev_cfg->hsync_capture.timer_chan) {
@@ -175,7 +169,6 @@ static void reset_hsync_timers()
 			PIOS_Assert(0);
 	}
 	TIM_SelectSlaveMode(dev_cfg->pixel_timer.timer, TIM_SlaveMode_Trigger);
-	//TIM_SelectMasterSlaveMode(dev_cfg->pixel_timer.timer, TIM_MasterSlaveMode_Enable);
 }
 
 const struct pios_tim_callbacks px_callback = {
@@ -270,16 +263,6 @@ void PIOS_Video_Init(const struct pios_video_cfg * cfg)
 	};
 	GPIO_Init(GPIOC, &initStruct);
 	
-	/*const GPIO_InitTypeDef initStruct2 = {
-		.GPIO_Pin = GPIO_Pin_11,
-		.GPIO_Speed = GPIO_Speed_100MHz,
-		.GPIO_Mode = GPIO_Mode_OUT	,
-		.GPIO_OType = GPIO_OType_PP,
-		.GPIO_PuPd = GPIO_PuPd_NOPULL
-	};
-	GPIO_Init(GPIOC, &initStruct2);
-	GPIO_SetBits(GPIOC, GPIO_Pin_11);*/
-
 	/* SPI3 - MASKBUFFER */
 	GPIO_Init(cfg->mask.sclk.gpio, (GPIO_InitTypeDef*)&(cfg->mask.sclk.init));
 	GPIO_Init(cfg->mask.miso.gpio, (GPIO_InitTypeDef*)&(cfg->mask.miso.init));
@@ -309,9 +292,6 @@ void PIOS_Video_Init(const struct pios_video_cfg * cfg)
 	/* Initialize the SPI block */
 	SPI_Init(cfg->level.regs, (SPI_InitTypeDef*)&(cfg->level.init));
 	SPI_Init(cfg->mask.regs, (SPI_InitTypeDef*)&(cfg->mask.init));
-
-	//SPI_NSSInternalSoftwareConfig(cfg->level.regs,SPI_NSSInternalSoft_Set);
-	//SPI_NSSInternalSoftwareConfig(cfg->mask.regs,SPI_NSSInternalSoft_Set);
 	
 	/* Enable SPI */
 	SPI_Cmd(cfg->level.regs, ENABLE);
@@ -367,7 +347,7 @@ static void prepare_line(uint32_t line_num)
 	prepare_count++;
 
 	uint32_t buf_offset = line_num * GRAPHICS_WIDTH;
-	//buf_offset = (Vsync_update - 10) * GRAPHICS_WIDTH;
+	buf_offset = (Vsync_update - 10) * GRAPHICS_WIDTH;
 
 	SPI_Cmd(dev_cfg->level.regs, DISABLE);
 	SPI_Cmd(dev_cfg->mask.regs, DISABLE);
@@ -389,12 +369,6 @@ static void prepare_line(uint32_t line_num)
 	// Load new line
 	DMA_MemoryTargetConfig(dev_cfg->level.dma.tx.channel,(uint32_t)&disp_buffer_level[buf_offset],DMA_Memory_0);
 	DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[buf_offset],DMA_Memory_0);
-
-//	if(line_num > 20)
-//		GPIO_SetBits(GPIOC, GPIO_Pin_11);
-//	DMA_MemoryTargetConfig(dev_cfg->level.dma.tx.channel,(uint32_t)&test_line[0],DMA_Memory_0);
-//	DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&test_line[0],DMA_Memory_0);
-
 
 	// Enable DMA, Slave first
 	DMA_SetCurrDataCounter(dev_cfg->level.dma.tx.channel, BUFFER_LINE_LENGTH);
@@ -420,17 +394,8 @@ void DMA2_Stream5_IRQHandler(void) __attribute__ ((alias("PIOS_VIDEO_DMA_Handler
 /**
  * @brief Interrupt for half and full buffer transfer
  */
-uint32_t dma_counter = 0;
-uint32_t a=0, b=0, c=0, d=0;
-
-uint32_t dma_mask_pos, dma_level_pos;
 void PIOS_VIDEO_DMA_Handler(void)
 {
-	dma_mask_pos = DMA_GetCurrDataCounter(dev_cfg->mask.dma.tx.channel);
-	dma_level_pos = DMA_GetCurrDataCounter(dev_cfg->level.dma.tx.channel);
-
-	dma_counter++;
-
 	stop_hsync_timers();
 
 	// Handle flags from stream channel
@@ -452,17 +417,12 @@ void PIOS_VIDEO_DMA_Handler(void)
 			DMA_Cmd(dev_cfg->level.dma.tx.channel, DISABLE);
 		}
 		gActiveLine++;
-
-		c++;
 	}
 	else if (DMA_GetFlagStatus(dev_cfg->level.dma.tx.channel,DMA_FLAG_HTIF5)) {
 		DMA_ClearFlag(dev_cfg->level.dma.tx.channel,DMA_FLAG_HTIF5);
-		a++;
 	}
 	else {
-		b++;
 	}
-	d++;
 }
 
 

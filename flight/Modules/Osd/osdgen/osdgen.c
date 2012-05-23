@@ -2225,6 +2225,9 @@ void updateGraphics() {
 			write_string(temp, 70, 20, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 3);
 			
 			calcHomeArrow();
+
+			write_vline( draw_buffer_level,GRAPHICS_WIDTH_REAL-12,0,GRAPHICS_HEIGHT_REAL-1,1);
+			write_vline( draw_buffer_mask,GRAPHICS_WIDTH_REAL-12,0,GRAPHICS_HEIGHT_REAL-1,1);
 			
 			// Last pixel
 			write_vline( draw_buffer_level,GRAPHICS_WIDTH_REAL-1,0,GRAPHICS_HEIGHT_REAL-1,0);
@@ -2372,18 +2375,20 @@ void updateGraphics() {
 				//write_filled_rectangle(draw_buffer_mask,30,30,30,30,1);
 				//lamas();
 				/* Make sure every line last bit is 0 */
-				for (uint32_t i = 0; i < 16; i++) {
-					write_vline( draw_buffer_level,GRAPHICS_WIDTH_REAL-i,0,GRAPHICS_HEIGHT_REAL-1,0);
-					write_vline( draw_buffer_mask,GRAPHICS_WIDTH_REAL-i,0,GRAPHICS_HEIGHT_REAL-1,0);
-				}
 			}
-			break;
-		default:
-			write_vline( draw_buffer_level,0,0,GRAPHICS_HEIGHT_REAL-1,1);
-			write_vline( draw_buffer_mask,0,0,GRAPHICS_HEIGHT_REAL-1,1);
-			write_vline( draw_buffer_level,16,0,GRAPHICS_HEIGHT_REAL-1,1);
-			write_vline( draw_buffer_mask,16,0,GRAPHICS_HEIGHT_REAL-1,1);
 		}
+		break;
+	default:
+		write_vline( draw_buffer_level,0,0,GRAPHICS_HEIGHT_REAL-1,1);
+		write_vline( draw_buffer_mask,0,0,GRAPHICS_HEIGHT_REAL-1,1);
+		write_vline( draw_buffer_level,16,0,GRAPHICS_HEIGHT_REAL-1,1);
+		write_vline( draw_buffer_mask,16,0,GRAPHICS_HEIGHT_REAL-1,1);
+	}
+	
+	// Must mask out last half-word because SPI keeps clocking it out otherwise
+	for (uint32_t i = 0; i < 16; i++) {
+		write_vline( draw_buffer_level,GRAPHICS_WIDTH_REAL-i-1,0,GRAPHICS_HEIGHT_REAL-1,0);
+		write_vline( draw_buffer_mask,GRAPHICS_WIDTH_REAL-i-1,0,GRAPHICS_HEIGHT_REAL-1,0);
 	}
 }
 

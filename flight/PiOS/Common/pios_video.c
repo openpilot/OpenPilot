@@ -261,7 +261,7 @@ static void configure_hsync_timers()
 	// This shouldn't be needed as it should come from the config struture.  Something
 	// is clobbering that
 	TIM_PrescalerConfig(dev_cfg->pixel_timer.timer, 0, TIM_PSCReloadMode_Immediate);
-	TIM_SetAutoreload(dev_cfg->pixel_timer.timer, 10);
+	TIM_SetAutoreload(dev_cfg->pixel_timer.timer, 11);
 }
 
 DMA_TypeDef * main_dma;

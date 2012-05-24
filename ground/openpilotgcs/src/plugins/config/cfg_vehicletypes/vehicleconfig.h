@@ -111,11 +111,22 @@ class VehicleConfig: public ConfigTaskWidget
         VehicleConfig(QWidget *parent = 0);
         ~VehicleConfig();
 
+        /* Enumeration options for field MixerType */
+        typedef enum { MIXERTYPE_DISABLED=0, MIXERTYPE_MOTOR=1, MIXERTYPE_SERVO=2, MIXERTYPE_CAMERAROLL=3, MIXERTYPE_CAMERAPITCH=4, MIXERTYPE_CAMERAYAW=5, MIXERTYPE_ACCESSORY0=6, MIXERTYPE_ACCESSORY1=7, MIXERTYPE_ACCESSORY2=8, MIXERTYPE_ACCESSORY3=9, MIXERTYPE_ACCESSORY4=10, MIXERTYPE_ACCESSORY5=11 } MixerTypeElem;
+        /* Array element names for field MixerVector */
+        typedef enum { MIXERVECTOR_THROTTLECURVE1=0, MIXERVECTOR_THROTTLECURVE2=1, MIXERVECTOR_ROLL=2, MIXERVECTOR_PITCH=3, MIXERVECTOR_YAW=4 } MixerVectorElem;
+
         static GUIConfigDataUnion GetConfigData();
         static void SetConfigData(GUIConfigDataUnion configData);
         static void resetField(UAVObjectField * field);
         static void setComboCurrentIndex(QComboBox* box, int index);
         static void enableComboBox(QWidget* owner, QString boxName, bool enable);
+
+        double  getMixerVectorValue(UAVDataObject* mixer, int channel, MixerVectorElem elementName);
+        void    setMixerVectorValue(UAVDataObject* mixer, int channel, MixerVectorElem elementName, double value);
+        void    resetMixerVector(UAVDataObject* mixer, int channel);
+        QString getMixerType(UAVDataObject* mixer, int channel);
+        void    setMixerType(UAVDataObject* mixer, int channel, MixerTypeElem mixerType);
 
         virtual void ResetActuators(GUIConfigDataUnion* configData);
         virtual QStringList getChannelDescriptions();
@@ -123,6 +134,7 @@ class VehicleConfig: public ConfigTaskWidget
         QStringList channelNames;
         QStringList mixerTypes;
         QStringList mixerVectors;
+        QStringList mixerTypeDescriptions;
 
         static const quint32 CHANNEL_NUMELEM = 10;
 

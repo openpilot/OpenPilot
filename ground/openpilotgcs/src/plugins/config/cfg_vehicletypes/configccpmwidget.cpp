@@ -889,7 +889,7 @@ void ConfigCcpmWidget::UpdateMixer()
 
     throwConfigError(QString("HeliCP"));
 
-    updateConfigObjectsFromWidgets();
+    //updateConfigObjectsFromWidgets();
  
     GUIConfigDataUnion config = GetConfigData();
 
@@ -1055,7 +1055,7 @@ QString ConfigCcpmWidget::updateConfigObjectsFromWidgets() //UpdateCCPMOptionsFr
     
     SetConfigData(config);
 
-    //setMixer();
+    setMixer();
 
     updatingFromHardware = FALSE;
     return airframeType;
@@ -1102,7 +1102,7 @@ void ConfigCcpmWidget::refreshWidgetsValues(QString frameType) //UpdateCCPMUIFro
     //tail
     setComboCurrentIndex( m_ccpm->ccpmTailChannel, config.heli.Tail);
 
-    //getMixer();
+    getMixer();
 }
 
 
@@ -1204,19 +1204,23 @@ void ConfigCcpmWidget::setMixer()
         &mixerSettingsData.Mixer8Type
     };
 
+    //reset all to Disabled
+    for (i=0; i<8; i++)
+        *mixerTypes[i] = 0;
+
     //go through the user data and update the mixer matrix
     for (i=0;i<6;i++)
     {
-        if (MixerChannelData[i]<8)
+        if (MixerChannelData[i]>0)
         {
             //set the mixer type
-            *(mixerTypes[MixerChannelData[i]]) = i==0 ?
+            *(mixerTypes[MixerChannelData[i] - 1]) = i==0 ?
                         MixerSettings::MIXER1TYPE_MOTOR :
                         MixerSettings::MIXER1TYPE_SERVO;
 
             //config the vector
             for (j=0;j<5;j++)
-                mixers[MixerChannelData[i]][j] = m_ccpm->ccpmAdvancedSettingsTable->item(i,j+1)->text().toInt();
+                mixers[MixerChannelData[i] - 1][j] = m_ccpm->ccpmAdvancedSettingsTable->item(i,j+1)->text().toInt();
         }
     }
 

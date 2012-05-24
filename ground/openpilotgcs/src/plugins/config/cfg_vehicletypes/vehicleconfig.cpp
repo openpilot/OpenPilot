@@ -43,6 +43,15 @@ VehicleConfig::VehicleConfig(QWidget *parent) : ConfigTaskWidget(parent)
         mixerVectors << QString("Mixer%1Vector").arg(i+1);
         channelNames << QString("Channel%1").arg(i+1);
     }
+
+//    typedef enum { MIXERTYPE_DISABLED=0, MIXERTYPE_MOTOR=1, MIXERTYPE_SERVO=2,
+    //MIXERTYPE_CAMERAROLL=3, MIXERTYPE_CAMERAPITCH=4, MIXERTYPE_CAMERAYAW=5,
+    //MIXERTYPE_ACCESSORY0=6, MIXERTYPE_ACCESSORY1=7, MIXERTYPE_ACCESSORY2=8,
+    //MIXERTYPE_ACCESSORY3=9, MIXERTYPE_ACCESSORY4=10, MIXERTYPE_ACCESSORY5=11 } MixerTypeElem;
+
+    mixerTypeDescriptions << "Disabled" << "Motor" << "Servo" << "CameraRoll" << "CameraPitch"
+                          << "CameraYaw" << "Accessory0" << "Accessory1" << "Accessory2"
+                          << "Accessory3" << "Accessory4" << "Accessory5";
 }
 
 VehicleConfig::~VehicleConfig()
@@ -133,6 +142,89 @@ void VehicleConfig::enableComboBox(QWidget* owner, QString boxName, bool enable)
         box->setEnabled(enable);
 }
 
+QString VehicleConfig::getMixerType(UAVDataObject* mixer, int channel)
+{
+    Q_ASSERT(mixer);
+
+    QString mixerType = mixerTypeDescriptions[0];  //default to disabled
+
+    if (channel >= 0 && channel < mixerTypes.count()) {
+        UAVObjectField *field = mixer->getField(mixerTypes.at(channel));
+        Q_ASSERT(field);
+
+        if (field)
+        mixerType = field->getValue().toString();
+    }
+
+    return mixerType;
+}
+
+void VehicleConfig::setMixerType(UAVDataObject* mixer, int channel, MixerTypeElem mixerType)
+{
+    Q_ASSERT(mixer);
+
+    qDebug() << QString("setMixerType channel %0, type %1").arg(channel).arg(mixerType);
+
+    if (channel >= 0 && channel < mixerTypes.count()) {
+        UAVObjectField *field = mixer->getField(mixerTypes.at(channel));
+        Q_ASSERT(field);
+
+        if (field) {
+            if (mixerType >= 0 && mixerType < mixerTypeDescriptions.count())
+            {
+                field->setValue(mixerTypeDescriptions[mixerType]);
+                mixer->updated();
+            }
+        }
+    }
+}
+
+void VehicleConfig::resetMixerVector(UAVDataObject* mixer, int channel)
+{
+    Q_ASSERT(mixer);
+
+    if (channel >= 0 && channel < mixerVectors.count()) {
+        setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_THROTTLECURVE1, 0);
+        setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_THROTTLECURVE2, 0);
+        setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH, 0);
+        setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL, 0);
+        setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW, 0);
+    }
+}
+
+double VehicleConfig::getMixerVectorValue(UAVDataObject* mixer, int channel, MixerVectorElem elementName)
+{
+    Q_ASSERT(mixer);
+
+    double value = 0;
+
+    if (channel >= 0 && channel < mixerVectors.count()) {
+        UAVObjectField *field = mixer->getField(mixerVectors.at(channel));
+        Q_ASSERT(field);
+
+        if (field) {
+            value = field->getDouble(elementName);
+        }
+    }
+    return value;
+}
+
+void VehicleConfig::setMixerVectorValue(UAVDataObject* mixer, int channel, MixerVectorElem elementName, double value)
+{
+    Q_ASSERT(mixer);
+
+    qDebug() << QString("setMixerVectorValue channel %0, name %1, value %2").arg(channel).arg(elementName).arg(value);
+
+    if (channel >= 0 && channel < mixerVectors.count()) {
+        UAVObjectField *field = mixer->getField(mixerVectors.at(channel));
+        Q_ASSERT(field);
+
+        if (field) {
+            field->setDouble(value, elementName);
+            mixer->updated();
+        }
+    }
+}
 
 /**
   Reset the contents of a field

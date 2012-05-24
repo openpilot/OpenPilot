@@ -861,6 +861,9 @@ void ConfigVehicleTypeWidget::updateCustomAirframeUI()
 */
 void ConfigVehicleTypeWidget::updateObjectsFromWidgets()
 {
+    UAVDataObject* obj;
+    UAVObjectField* field;
+
     QString airframeType = "Custom"; //Sets airframe type default to "Custom"
     if (m_aircraft->aircraftType->currentText() == "Fixed Wing") {
         airframeType = m_fixedwing->updateConfigObjectsFromWidgets();
@@ -874,9 +877,9 @@ void ConfigVehicleTypeWidget::updateObjectsFromWidgets()
     else if (m_aircraft->aircraftType->currentText() == "Ground") {
          airframeType = m_groundvehicle->updateConfigObjectsFromWidgets();
     }
-
-        UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-        UAVObjectField* field = obj->getField(QString("FeedForward"));
+    else {
+        obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
+        field = obj->getField(QString("FeedForward"));
 
         // Curve is also common to all quads:
         field = obj->getField("ThrottleCurve1");
@@ -909,7 +912,7 @@ void ConfigVehicleTypeWidget::updateObjectsFromWidgets()
             ti = field->getElementNames().indexOf("Yaw");
             field->setValue(m_aircraft->customMixerTable->item(5,i)->text(),ti);
         }
-
+    }
     // set the airframe type
     obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("SystemSettings")));
     field = obj->getField(QString("AirframeType"));

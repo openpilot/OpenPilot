@@ -257,14 +257,16 @@ void ConfigGroundVehicleWidget::refreshWidgetsValues(QString frameType)
 		// Find the channel number for Motor1 
 		obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
 		Q_ASSERT(obj);
-		int chMixerNumber = m_aircraft->gvMotor1ChannelBox->currentIndex()-1;
-		if (chMixerNumber >= 0) { // If for some reason the actuators were incoherent, we might fail here, hence the check.
-			field = obj->getField(mixerVectors.at(chMixerNumber));
-			int ti = field->getElementNames().indexOf("Roll");
-			m_aircraft->differentialSteeringSlider1->setValue(field->getDouble(ti)*100);
-			
-			ti = field->getElementNames().indexOf("Pitch");
-			m_aircraft->differentialSteeringSlider2->setValue(field->getDouble(ti)*100);
+        int channel = m_aircraft->gvMotor1ChannelBox->currentIndex()-1;
+        if (channel >= 0) { // If for some reason the actuators were incoherent, we might fail here, hence the check.
+//			field = obj->getField(mixerVectors.at(chMixerNumber));
+//			int ti = field->getElementNames().indexOf("Roll");
+//			m_aircraft->differentialSteeringSlider1->setValue(field->getDouble(ti)*100);
+
+            m_aircraft->differentialSteeringSlider1->setValue(getMixerVectorValue(obj,channel,VehicleConfig::MIXERVECTOR_ROLL)*100);
+
+//			ti = field->getElementNames().indexOf("Pitch");
+            m_aircraft->differentialSteeringSlider2->setValue(getMixerVectorValue(obj,channel,VehicleConfig::MIXERVECTOR_PITCH)*100);
 		}
 	}
 	if (frameType == "GroundVehicleMotorcycle") {
@@ -312,81 +314,109 @@ bool ConfigGroundVehicleWidget::setupGroundVehicleMotorcycle(QString airframeTyp
 
     SetConfigData(config);
 	
-    UAVObject* obj;
-    UAVObjectField* field;
+    UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
+    Q_ASSERT(mixer);
 
-    obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-    Q_ASSERT(obj);
-    // ... and compute the matrix:
-    // In order to make code a bit nicer, we assume:
-    // - Channel dropdowns start with 'None', then 0 to 7
+    int channel;
+    //disable all
+    for (channel=0; channel<VehicleConfig::CHANNEL_NUMELEM; channel++) {
+        setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_DISABLED);
+        resetMixerVector(mixer, channel);
+    }
+
+    //motor
+    channel = m_aircraft->gvMotor2ChannelBox->currentIndex()-1;
+    setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_SERVO);
+    setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_THROTTLECURVE1, 127);
+    setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW, 127);
+
+    //steering
+    channel = m_aircraft->gvSteering1ChannelBox->currentIndex()-1;
+    setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_SERVO);
+    setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW, -127);
+    setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL, -127);
+
+    //balance
+    channel = m_aircraft->gvSteering2ChannelBox->currentIndex()-1;
+    setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_SERVO);
+    setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW, 127);
+    setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL, 127);
+
+//    UAVObject* obj;
+//    UAVObjectField* field;
+
+//    obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
+//    Q_ASSERT(obj);
+//    // ... and compute the matrix:
+//    // In order to make code a bit nicer, we assume:
+//    // - Channel dropdowns start with 'None', then 0 to 7
 	
-    // 1. Assign the servo/motor/none for each channel
+//    // 1. Assign the servo/motor/none for each channel
 	
-	int tmpVal, ti;
+//	int tmpVal, ti;
 	
-	// Disable all output channels
-    foreach(QString mixer, mixerTypes) {
-        field = obj->getField(mixer);
-        Q_ASSERT(field);
+//	// Disable all output channels
+//    foreach(QString mixer, mixerTypes) {
+//        field = obj->getField(mixer);
+//        Q_ASSERT(field);
 		
-		//Disable output channel
-        field->setValue("Disabled");
+//		//Disable output channel
+//        field->setValue("Disabled");
 		
-	}
+//	}
 	
-	// Set all mixer values to zero
-    foreach(QString mixer, mixerVectors) {
-		field = obj->getField(mixer);
-		resetField(field);
+//	// Set all mixer values to zero
+//    foreach(QString mixer, mixerVectors) {
+//		field = obj->getField(mixer);
+//		resetField(field);
 		
-		ti = field->getElementNames().indexOf("ThrottleCurve1");
-		field->setValue(0, ti);
-		ti = field->getElementNames().indexOf("ThrottleCurve2");
-		field->setValue(0, ti);
-		ti = field->getElementNames().indexOf("Yaw");
-		field->setValue(0, ti);
-		ti = field->getElementNames().indexOf("Pitch");
-		field->setValue(0, ti);
-		ti = field->getElementNames().indexOf("Roll");
-		field->setValue(0, ti);
-	}
+//		ti = field->getElementNames().indexOf("ThrottleCurve1");
+//		field->setValue(0, ti);
+//		ti = field->getElementNames().indexOf("ThrottleCurve2");
+//		field->setValue(0, ti);
+//		ti = field->getElementNames().indexOf("Yaw");
+//		field->setValue(0, ti);
+//		ti = field->getElementNames().indexOf("Pitch");
+//		field->setValue(0, ti);
+//		ti = field->getElementNames().indexOf("Roll");
+//		field->setValue(0, ti);
+//	}
 	
     // Motor
     // Setup motor
-    tmpVal = m_aircraft->gvMotor2ChannelBox->currentIndex()-1;
-	field = obj->getField(mixerTypes.at(tmpVal));
-	field->setValue("Servo"); //Set motor mixer type to Servo
-	field = obj->getField(mixerVectors.at(tmpVal));
-	resetField(field);
-	ti = field->getElementNames().indexOf("ThrottleCurve1"); //Set motor to full forward
-	field->setValue(127, ti);
+//    tmpVal = m_aircraft->gvMotor2ChannelBox->currentIndex()-1;
+//	field = obj->getField(mixerTypes.at(tmpVal));
+//	field->setValue("Servo"); //Set motor mixer type to Servo
+//	field = obj->getField(mixerVectors.at(tmpVal));
+//	resetField(field);
+//	ti = field->getElementNames().indexOf("ThrottleCurve1"); //Set motor to full forward
+//	field->setValue(127, ti);
 	
-	//Steering
-    // Setup steering
-    tmpVal = m_aircraft->gvSteering1ChannelBox->currentIndex()-1;
-	field = obj->getField(mixerTypes.at(tmpVal));
-	field->setValue("Servo"); //Set motor mixer type to Servo	
-	field = obj->getField(mixerVectors.at(tmpVal));
-	resetField(field);
-	ti = field->getElementNames().indexOf("Yaw"); //Set steering response to roll
-	field->setValue(-127, ti);
-	ti = field->getElementNames().indexOf("Roll"); //Set steering response to roll
-	field->setValue(-127, ti);
+//	//Steering
+//    // Setup steering
+//    tmpVal = m_aircraft->gvSteering1ChannelBox->currentIndex()-1;
+//	field = obj->getField(mixerTypes.at(tmpVal));
+//	field->setValue("Servo"); //Set motor mixer type to Servo
+//	field = obj->getField(mixerVectors.at(tmpVal));
+//	resetField(field);
+//	ti = field->getElementNames().indexOf("Yaw"); //Set steering response to roll
+//	field->setValue(-127, ti);
+//	ti = field->getElementNames().indexOf("Roll"); //Set steering response to roll
+//	field->setValue(-127, ti);
 
-	//Balancing
-    // Setup balancing servo
-    tmpVal = m_aircraft->gvSteering2ChannelBox->currentIndex()-1;
-	field = obj->getField(mixerTypes.at(tmpVal));
-	field->setValue("Servo"); //Set motor mixer type to Servo	
-	field = obj->getField(mixerVectors.at(tmpVal));
-	resetField(field);
-	ti = field->getElementNames().indexOf("Yaw"); //Set balance response to yaw
-	field->setValue(127, ti);
-	ti = field->getElementNames().indexOf("Roll"); //Set balance response to roll
-	field->setValue(127, ti);
+//	//Balancing
+//    // Setup balancing servo
+//    tmpVal = m_aircraft->gvSteering2ChannelBox->currentIndex()-1;
+//	field = obj->getField(mixerTypes.at(tmpVal));
+//	field->setValue("Servo"); //Set motor mixer type to Servo
+//	field = obj->getField(mixerVectors.at(tmpVal));
+//	resetField(field);
+//	ti = field->getElementNames().indexOf("Yaw"); //Set balance response to yaw
+//	field->setValue(127, ti);
+//	ti = field->getElementNames().indexOf("Roll"); //Set balance response to roll
+//	field->setValue(127, ti);
 	
-    obj->updated();
+//    obj->updated();
 	
 	//Output success message
 	m_aircraft->gvStatusLabel->setText("Mixer generated");
@@ -423,70 +453,61 @@ bool ConfigGroundVehicleWidget::setupGroundVehicleDifferential(QString airframeT
 
     SetConfigData((config));
 	
-    UAVObject* obj;
-    UAVObjectField* field;
+    UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
+    Q_ASSERT(mixer);
 
-    obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-    Q_ASSERT(obj);
+    int channel;
+    //disable all
+    for (channel=0; channel<VehicleConfig::CHANNEL_NUMELEM; channel++) {
+        setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_DISABLED);
+        resetMixerVector(mixer, channel);
+    }
+
+    //left motor
+    channel = m_aircraft->gvMotor1ChannelBox->currentIndex()-1;
+    setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_SERVO);
+    setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_THROTTLECURVE1, 127);
+    setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW, 127);
+
+    //right motor
+    channel = m_aircraft->gvMotor2ChannelBox->currentIndex()-1;
+    setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_SERVO);
+    setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_THROTTLECURVE2, 127);
+    setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW, -127);
+
     // ... and compute the matrix:
     // In order to make code a bit nicer, we assume:
     // - Channel dropdowns start with 'None', then 0 to 7
 	
     // 1. Assign the servo/motor/none for each channel
 	
-	int tmpVal, ti;
-	
-	// Disable all output channels
-    foreach(QString mixer, mixerTypes) {
-        field = obj->getField(mixer);
-        Q_ASSERT(field);
-		
-		//Disable output channel
-        field->setValue("Disabled");
-		
-	}
-	
-	// Set all mixer values to zero
-    foreach(QString mixer, mixerVectors) {
-		field = obj->getField(mixer);
-		resetField(field);
-		
-		ti = field->getElementNames().indexOf("ThrottleCurve1");
-		field->setValue(0, ti);
-		ti = field->getElementNames().indexOf("ThrottleCurve2");
-		field->setValue(0, ti);
-		ti = field->getElementNames().indexOf("Yaw");
-		field->setValue(0, ti);
-		ti = field->getElementNames().indexOf("Pitch");
-		field->setValue(0, ti);
-		ti = field->getElementNames().indexOf("Roll");
-		field->setValue(0, ti);
-	}
-	
+//	int tmpVal, ti;
+
+
     // Motor
     // Setup left motor
-    tmpVal = m_aircraft->gvMotor1ChannelBox->currentIndex()-1;
-	field = obj->getField(mixerTypes.at(tmpVal));
-	field->setValue("Servo"); //Set motor mixer type to Servo
-	field = obj->getField(mixerVectors.at(tmpVal));
-	resetField(field);
-	ti = field->getElementNames().indexOf("ThrottleCurve1"); //Set motor to full forward
-	field->setValue(127, ti);
-	ti = field->getElementNames().indexOf("Yaw"); //Set motor to turn right with increasing throttle
-	field->setValue(127, ti);
+//    tmpVal = m_aircraft->gvMotor1ChannelBox->currentIndex()-1;
+//	field = obj->getField(mixerTypes.at(tmpVal));
+//	field->setValue("Servo"); //Set motor mixer type to Servo
+//	field = obj->getField(mixerVectors.at(tmpVal));
+//	resetField(field);
+//	ti = field->getElementNames().indexOf("ThrottleCurve1"); //Set motor to full forward
+//	field->setValue(127, ti);
+//	ti = field->getElementNames().indexOf("Yaw"); //Set motor to turn right with increasing throttle
+//	field->setValue(127, ti);
 	
-    // Setup right motor
-    tmpVal = m_aircraft->gvMotor2ChannelBox->currentIndex()-1;
-	field = obj->getField(mixerTypes.at(tmpVal));
-	field->setValue("Servo"); //Set motor mixer type to Servo	
-	field = obj->getField(mixerVectors.at(tmpVal));
-	resetField(field);
-	ti = field->getElementNames().indexOf("ThrottleCurve2"); //Set motor to full forward
-	field->setValue(127, ti);
-	ti = field->getElementNames().indexOf("Yaw"); //Set motor to turn left with increasing throttle
-	field->setValue(-127, ti);
+//    // Setup right motor
+//    tmpVal = m_aircraft->gvMotor2ChannelBox->currentIndex()-1;
+//	field = obj->getField(mixerTypes.at(tmpVal));
+//	field->setValue("Servo"); //Set motor mixer type to Servo
+//	field = obj->getField(mixerVectors.at(tmpVal));
+//	resetField(field);
+//	ti = field->getElementNames().indexOf("ThrottleCurve2"); //Set motor to full forward
+//	field->setValue(127, ti);
+//	ti = field->getElementNames().indexOf("Yaw"); //Set motor to turn left with increasing throttle
+//	field->setValue(-127, ti);
 	
-    obj->updated();
+//    obj->updated();
 
 	//Output success message
 	m_aircraft->gvStatusLabel->setText("Mixer generated");
@@ -544,96 +565,88 @@ bool ConfigGroundVehicleWidget::setupGroundVehicleCar(QString airframeType)
     config.ground.GroundVehicleSteering2 = m_aircraft->gvSteering2ChannelBox->currentIndex();
 
     SetConfigData(config);
-	
-    UAVDataObject* obj;
-    UAVObjectField* field;
 
-    obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-    Q_ASSERT(obj);
+    UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
+    Q_ASSERT(mixer);
+
+    int channel;
+    //disable all
+    for (channel=0; channel<VehicleConfig::CHANNEL_NUMELEM; channel++) {
+        setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_DISABLED);
+        resetMixerVector(mixer, channel);
+    }
+
+    channel = m_aircraft->gvSteering1ChannelBox->currentIndex()-1;
+    setMixerType(mixer,channel, VehicleConfig::MIXERTYPE_SERVO);
+    setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW, 127);
+
+    channel = m_aircraft->gvSteering2ChannelBox->currentIndex()-1;
+    setMixerType(mixer,channel, VehicleConfig::MIXERTYPE_SERVO);
+    setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW, -127);
+
+    channel = m_aircraft->gvMotor1ChannelBox->currentIndex()-1;
+    setMixerType(mixer,channel, VehicleConfig::MIXERTYPE_SERVO);
+    setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_THROTTLECURVE1, 127);
+
+    channel = m_aircraft->gvMotor2ChannelBox->currentIndex()-1;
+    setMixerType(mixer,channel, VehicleConfig::MIXERTYPE_SERVO);
+    setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_THROTTLECURVE2, 127);
+
     // ... and compute the matrix:
     // In order to make code a bit nicer, we assume:
     // - Channel dropdowns start with 'None', then 0 to 7
 
     // 1. Assign the servo/motor/none for each channel
 
-	int tmpVal, ti;
-
-	// Disable all output channels
-    foreach(QString mixer, mixerTypes) {
-        field = obj->getField(mixer);
-        Q_ASSERT(field);
-		
-		//Disable output channel
-        field->setValue("Disabled");
-
-	}
-	
-	// Set all mixer values to zero
-    foreach(QString mixer, mixerVectors) {
-		field = obj->getField(mixer);
-		resetField(field);
-		
-		ti = field->getElementNames().indexOf("ThrottleCurve1");
-		field->setValue(0, ti);
-		ti = field->getElementNames().indexOf("ThrottleCurve2");
-		field->setValue(0, ti);
-		ti = field->getElementNames().indexOf("Yaw");
-		field->setValue(0, ti);
-		ti = field->getElementNames().indexOf("Pitch");
-		field->setValue(0, ti);
-		ti = field->getElementNames().indexOf("Roll");
-		field->setValue(0, ti);
-	}
-
     // Steering
     // Only set front steering if it is defined
-    tmpVal = m_aircraft->gvSteering1ChannelBox->currentIndex()-1;
-    // tmpVal will be -1 if steering is set to "None"
-    if (tmpVal > -1) {
-        field = obj->getField(mixerTypes.at(tmpVal));
-        field->setValue("Servo");
-        field = obj->getField(mixerVectors.at(tmpVal));
-        resetField(field);
-        ti = field->getElementNames().indexOf("Yaw");
-        field->setValue(127, ti);
-    } // Else: we have no front steering. We're fine with it as long as we have rear steering
+//    tmpVal = m_aircraft->gvSteering1ChannelBox->currentIndex()-1;
+//    // tmpVal will be -1 if steering is set to "None"
+//    if (tmpVal > -1) {
+//        field = obj->getField(mixerTypes.at(tmpVal));
+//        field->setValue("Servo");
+//        field = obj->getField(mixerVectors.at(tmpVal));
+//        resetField(field);
+//        ti = field->getElementNames().indexOf("Yaw");
+//        field->setValue(127, ti);
+//    } // Else: we have no front steering. We're fine with it as long as we have rear steering
 	
-    // Only set rear steering if it is defined
-    tmpVal = m_aircraft->gvSteering2ChannelBox->currentIndex()-1;
-    // tmpVal will be -1 if steering is set to "None"
-    if (tmpVal > -1) {
-        field = obj->getField(mixerTypes.at(tmpVal));
-        field->setValue("Servo");
-        field = obj->getField(mixerVectors.at(tmpVal));
-        resetField(field);
-        ti = field->getElementNames().indexOf("Yaw");
-        field->setValue(-127, ti);
-    } // Else: we have no rear steering. We're fine with it as long as we have front steering
+//    // Only set rear steering if it is defined
+//    tmpVal = m_aircraft->gvSteering2ChannelBox->currentIndex()-1;
+//    // tmpVal will be -1 if steering is set to "None"
+//    if (tmpVal > -1) {
+//        field = obj->getField(mixerTypes.at(tmpVal));
+//        field->setValue("Servo");
+//        field = obj->getField(mixerVectors.at(tmpVal));
+//        resetField(field);
+//        ti = field->getElementNames().indexOf("Yaw");
+//        field->setValue(-127, ti);
+//    } // Else: we have no rear steering. We're fine with it as long as we have front steering
 
-    // Motor
-    // Only set front motor if it is defined
-    tmpVal = m_aircraft->gvMotor1ChannelBox->currentIndex()-1;
-    if (tmpVal > -1) {
-		field = obj->getField(mixerTypes.at(tmpVal));
-		field->setValue("Servo");
-		field = obj->getField(mixerVectors.at(tmpVal));
-		resetField(field);
-		ti = field->getElementNames().indexOf("ThrottleCurve1");
-		field->setValue(127, ti);
-	}
+//    // Motor
+//    // Only set front motor if it is defined
+//    tmpVal = m_aircraft->gvMotor1ChannelBox->currentIndex()-1;
+//    if (tmpVal > -1) {
+//		field = obj->getField(mixerTypes.at(tmpVal));
+//		field->setValue("Servo");
+//		field = obj->getField(mixerVectors.at(tmpVal));
+//		resetField(field);
+//		ti = field->getElementNames().indexOf("ThrottleCurve1");
+//		field->setValue(127, ti);
+//	}
 	
-    // Only set rear motor if it is defined
-    tmpVal = m_aircraft->gvMotor2ChannelBox->currentIndex()-1;
-    if (tmpVal > -1) {
-        field = obj->getField(mixerTypes.at(tmpVal));
-        field->setValue("Servo");
-        field = obj->getField(mixerVectors.at(tmpVal));
-        resetField(field);
-        ti = field->getElementNames().indexOf("ThrottleCurve2");
-        field->setValue(127, ti);
-    }
+//    // Only set rear motor if it is defined
+//    tmpVal = m_aircraft->gvMotor2ChannelBox->currentIndex()-1;
+//    if (tmpVal > -1) {
+//        field = obj->getField(mixerTypes.at(tmpVal));
+//        field->setValue("Servo");
+//        field = obj->getField(mixerVectors.at(tmpVal));
+//        resetField(field);
+//        ti = field->getElementNames().indexOf("ThrottleCurve2");
+//        field->setValue(127, ti);
+//    }
 	
-    obj->updated();
+//    obj->updated();
 
 	//Output success message
     m_aircraft->gvStatusLabel->setText("Mixer generated");

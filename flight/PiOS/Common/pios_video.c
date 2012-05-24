@@ -45,10 +45,10 @@ static const struct pios_video_cfg * dev_cfg;
 // Must be allocated in one block, so it is in a struct.
 struct _buffers
 {
-        uint16_t buffer0_level[GRAPHICS_HEIGHT*GRAPHICS_WIDTH];
-        uint16_t buffer0_mask[GRAPHICS_HEIGHT*GRAPHICS_WIDTH];
-        uint16_t buffer1_level[GRAPHICS_HEIGHT*GRAPHICS_WIDTH];
-        uint16_t buffer1_mask[GRAPHICS_HEIGHT*GRAPHICS_WIDTH];
+        uint8_t buffer0_level[GRAPHICS_HEIGHT*GRAPHICS_WIDTH];
+        uint8_t buffer0_mask[GRAPHICS_HEIGHT*GRAPHICS_WIDTH];
+        uint8_t buffer1_level[GRAPHICS_HEIGHT*GRAPHICS_WIDTH];
+        uint8_t buffer1_mask[GRAPHICS_HEIGHT*GRAPHICS_WIDTH];
 } buffers;
 
 // Remove the struct definition (makes it easier to write for.)
@@ -58,10 +58,10 @@ struct _buffers
 #define         buffer1_mask    (buffers.buffer1_mask)
 
 // We define pointers to each of these buffers.
-uint16_t *draw_buffer_level;
-uint16_t *draw_buffer_mask;
-uint16_t *disp_buffer_level;
-uint16_t *disp_buffer_mask;
+uint8_t *draw_buffer_level;
+uint8_t *draw_buffer_mask;
+uint8_t *disp_buffer_level;
+uint8_t *disp_buffer_mask;
 
 volatile uint8_t gLineType = LINE_TYPE_UNKNOWN;
 volatile uint16_t gActiveLine = 0;

@@ -1,25 +1,17 @@
 <xml>
     <object name="FixedWingPathFollowerSettings" singleinstance="true" settings="true">
         <description>Settings for the @ref FixedWingPathFollowerModule</description>
-        <field name="GuidanceMode" units="" type="enum" elements="1" options="DUAL_LOOP,VELOCITY_CONTROL" defaultvalue="DUAL_LOOP"/>
-        <field name="PathMode" units="" type="enum" elements="1" options="ENDPOINT,PATH" defaultvalue="ENDPOINT"/>
-	<field name="ReturnTobaseAltitudeOffset" units="m" type="float" elements="1" defaultvalue="75.0"/>
-        <field name="HorizontalVelMax" units="m/s" type="float" elements="1" defaultvalue="0.3"/>
-        <field name="VerticalVelMax" units="m/s" type="float" elements="1" defaultvalue="0.15"/>
-        <field name="HorizontalPosPI" units="(m/s)/m" type="float" elementnames="Kp,Ki,ILimit" defaultvalue="0.1,0,0.3"/>
-        <field name="HorizontalVelPID" units="deg/(m/s)" type="float" elementnames="Kp,Ki,Kd,ILimit" defaultvalue="0.05,0.002,0,1000"/>
-        <field name="VerticalPosPI" units="m/s" type="float" elementnames="Kp,Ki,ILimit" defaultvalue="0.1,0,1.5"/>
-        <field name="VerticalVelPID" units="1/(m/s)" type="float" elementnames="Kp,Ki,Kd,ILimit" defaultvalue="0.1,0,0,0"/>
-	<field name="VelocityFeedforward" units="deg/(m/s)" type="float" elements="1" defaultvalue="0"/>
+        <field name="HorizontalVelMax" units="m/s" type="float" elements="1" defaultvalue="15"/>
+        <field name="HorizontalVelMin" units="m/s" type="float" elements="1" defaultvalue="10"/>
+        <field name="VerticalVelMax" units="m/s" type="float" elements="1" defaultvalue="2"/>
+        <field name="HorizontalPosP" units="(m/s)/m" type="float" elements="1" defaultvalue="0.05"/>
+        <field name="VerticalPosP" units="m/s" type="float" elements="1" defaultvalue="0.05"/>
         <field name="CoursePI" units="deg/deg" type="float" elements="3" elementnames="Kp,Ki,ILimit" defaultvalue="0.2,0.02,10"/>
         <field name="SpeedP" units="(m/s^2)/(m/s)" type="float" elementnames="Kp,Max" defaultvalue="10,10"/>
         <field name="AccelPI" units="deg/(m/s^2)" type="float" elements="3" elementnames="Kp,Ki,ILimit" defaultvalue="0.1,0.1,10"/>
         <field name="ClimbRateBoostFactor" units="" type="float" elements="1" defaultvalue="3.14"/>
         <field name="PowerPI" units="1/(m/s)" type="float" elements="3" elementnames="Kp,Ki,ILimit" defaultvalue="0.005,0.005,0.8"/>
         <field name="ThrottleControl" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>
-        <field name="VelocitySource" units="" type="enum" elements="1" options="EKF,NEDVEL,GPSPOS" defaultvalue="EKF"/>
-        <field name="PositionSource" units="" type="enum" elements="1" options="EKF,GPSPOS" defaultvalue="EKF"/>
-        <field name="CruiseSpeed" units="m/s" type="float" elements="1" defaultvalue="13"/>
         <field name="RollLimit" units="deg" type="float" elements="3" elementnames="Min,Neutral,Max" defaultvalue="-35,0,35" />
         <field name="PitchLimit" units="deg" type="float" elements="3" elementnames="Min,Neutral,Max" defaultvalue="-10,5,20" />
         <field name="ThrottleLimit" units="" type="float" elements="3" elementnames="Min,Neutral,Max" defaultvalue="0.1,0.5,0.9" />

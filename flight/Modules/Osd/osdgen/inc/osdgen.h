@@ -25,8 +25,8 @@ int32_t osdgenInitialize(void);
 
 // Macros for computing addresses and bit positions.
 // NOTE: /16 in y is because we are addressing by word not byte.
-#define CALC_BUFF_ADDR(x, y)    (((x) / 16) + ((y) * (DISP_WIDTH / 16)))
-#define CALC_BIT_IN_WORD(x)             ((x) & 15)
+#define CALC_BUFF_ADDR(x, y)    (((x) / 8) + ((y) * (DISP_WIDTH / 8)))
+#define CALC_BIT_IN_WORD(x)             ((x) & 7)
 #define DEBUG_DELAY
 // Macro for writing a word with a mode (NAND = clear, OR = set, XOR = toggle)
 // at a given position
@@ -42,8 +42,8 @@ int32_t osdgenInitialize(void);
 
 // Horizontal line calculations.
 // Edge cases.
-#define COMPUTE_HLINE_EDGE_L_MASK(b) ((1 << (16 - (b))) - 1)
-#define COMPUTE_HLINE_EDGE_R_MASK(b) (~((1 << (15 - (b))) - 1))
+#define COMPUTE_HLINE_EDGE_L_MASK(b) ((1 << (8 - (b))) - 1)
+#define COMPUTE_HLINE_EDGE_R_MASK(b) (~((1 << (7 - (b))) - 1))
 // This computes an island mask.
 #define COMPUTE_HLINE_ISLAND_MASK(b0, b1) (COMPUTE_HLINE_EDGE_L_MASK(b0) ^ COMPUTE_HLINE_EDGE_L_MASK(b1));
 
@@ -163,26 +163,26 @@ void updateGraphics();
 void drawGraphicsLine();
 
 void write_char16(char ch, unsigned int x, unsigned int y, int font);
-void write_pixel(uint16_t *buff, unsigned int x, unsigned int y, int mode);
+void write_pixel(uint8_t *buff, unsigned int x, unsigned int y, int mode);
 void write_pixel_lm(unsigned int x, unsigned int y, int mmode, int lmode);
-void write_hline(uint16_t *buff, unsigned int x0, unsigned int x1, unsigned int y, int mode);
+void write_hline(uint8_t *buff, unsigned int x0, unsigned int x1, unsigned int y, int mode);
 void write_hline_lm(unsigned int x0, unsigned int x1, unsigned int y, int lmode, int mmode);
 void write_hline_outlined(unsigned int x0, unsigned int x1, unsigned int y, int endcap0, int endcap1, int mode, int mmode);
-void write_vline(uint16_t *buff, unsigned int x, unsigned int y0, unsigned int y1, int mode);
+void write_vline(uint8_t *buff, unsigned int x, unsigned int y0, unsigned int y1, int mode);
 void write_vline_lm(unsigned int x, unsigned int y0, unsigned int y1, int lmode, int mmode);
 void write_vline_outlined(unsigned int x, unsigned int y0, unsigned int y1, int endcap0, int endcap1, int mode, int mmode);
-void write_filled_rectangle(uint16_t *buff, unsigned int x, unsigned int y, unsigned int width, unsigned int height, int mode);
+void write_filled_rectangle(uint8_t *buff, unsigned int x, unsigned int y, unsigned int width, unsigned int height, int mode);
 void write_filled_rectangle_lm(unsigned int x, unsigned int y, unsigned int width, unsigned int height, int lmode, int mmode);
 void write_rectangle_outlined(unsigned int x, unsigned int y, int width, int height, int mode, int mmode);
-void write_circle(uint16_t *buff, unsigned int cx, unsigned int cy, unsigned int r, unsigned int dashp, int mode);
+void write_circle(uint8_t *buff, unsigned int cx, unsigned int cy, unsigned int r, unsigned int dashp, int mode);
 void write_circle_outlined(unsigned int cx, unsigned int cy, unsigned int r, unsigned int dashp, int bmode, int mode, int mmode);
-void write_circle_filled(uint16_t *buff, unsigned int cx, unsigned int cy, unsigned int r, int mode);
-void write_line(uint16_t *buff, unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1, int mode);
+void write_circle_filled(uint8_t *buff, unsigned int cx, unsigned int cy, unsigned int r, int mode);
+void write_line(uint8_t *buff, unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1, int mode);
 void write_line_lm(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1, int mmode, int lmode);
 void write_line_outlined(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1, int endcap0, int endcap1, int mode, int mmode);
-void write_word_misaligned(uint16_t *buff, uint16_t word, unsigned int addr, unsigned int xoff, int mode);
-void write_word_misaligned_NAND(uint16_t *buff, uint16_t word, unsigned int addr, unsigned int xoff);
-void write_word_misaligned_OR(uint16_t *buff, uint16_t word, unsigned int addr, unsigned int xoff);
+void write_word_misaligned(uint8_t *buff, uint16_t word, unsigned int addr, unsigned int xoff, int mode);
+void write_word_misaligned_NAND(uint8_t *buff, uint16_t word, unsigned int addr, unsigned int xoff);
+void write_word_misaligned_OR(uint8_t *buff, uint16_t word, unsigned int addr, unsigned int xoff);
 void write_word_misaligned_lm(uint16_t wordl, uint16_t wordm, unsigned int addr, unsigned int xoff, int lmode, int mmode);
 //int fetch_font_info(char ch, int font, struct FontEntry *font_info, char *lookup);
 void write_char(char ch, unsigned int x, unsigned int y, int flags, int font);

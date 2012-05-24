@@ -63,10 +63,10 @@ static int32_t m_gpsLon=0;
 static float m_gpsAlt=0;
 static float m_gpsSpd=0;
 
-extern uint16_t *draw_buffer_level;
-extern uint16_t *draw_buffer_mask;
-extern uint16_t *disp_buffer_level;
-extern uint16_t *disp_buffer_mask;
+extern uint8_t *draw_buffer_level;
+extern uint8_t *draw_buffer_mask;
+extern uint8_t *disp_buffer_level;
+extern uint8_t *disp_buffer_mask;
 
 
 TTime time;
@@ -94,8 +94,8 @@ static xTaskHandle osdgenTaskHandle;
 struct splashEntry
 {
 	unsigned int width, height;
-	unsigned short *level;
-	unsigned short *mask;
+	uint8_t *level;
+	uint8_t *mask;
 };
 
 struct splashEntry splash[3] = {
@@ -177,35 +177,33 @@ uint8_t printCharFB(uint16_t ch, uint16_t x, uint16_t y) {
 
 uint16_t mirror(uint16_t source)
 {
-	int result = ((source & 0x8000) >> 15) | ((source & 0x4000) >> 13) |
-			((source & 0x2000) >> 11) | ((source & 0x1000) >> 9) |
-			((source & 0x0800) >> 7) | ((source & 0x0400) >> 5) |
-			((source & 0x0200) >> 3) | ((source & 0x0100) >> 1) |
-			((source & 0x0080) << 1) | ((source & 0x0040) << 3) |
-			((source & 0x0020) << 5) | ((source & 0x0010) << 7) |
-			((source & 0x0008) << 9) | ((source & 0x0004) << 11) |
-			((source & 0x0002) << 13) | ((source & 0x0001) << 15);
+	int result = ((source & 0x8000) >> 7) | ((source & 0x4000) >> 5) |
+			((source & 0x2000) >> 3) | ((source & 0x1000) >> 1) |
+			((source & 0x0800) << 1) | ((source & 0x0400) << 3) |
+			((source & 0x0200) << 5) | ((source & 0x0100) << 7) |
+			((source & 0x0080) >> 7) | ((source & 0x0040) >> 5) |
+			((source & 0x0020) >> 3) | ((source & 0x0010) >> 1) |
+			((source & 0x0008) << 1) | ((source & 0x0004) << 3) |
+			((source & 0x0002) << 5) | ((source & 0x0001) << 7);
 
 	   return result;
 }
 
 void clearGraphics() {
-	memset((uint8_t *) draw_buffer_mask, 0, GRAPHICS_WIDTH * GRAPHICS_HEIGHT * 2);
-	memset((uint8_t *) draw_buffer_level, 0, GRAPHICS_WIDTH * GRAPHICS_HEIGHT * 2);
+	memset((uint8_t *) draw_buffer_mask, 0, GRAPHICS_WIDTH * GRAPHICS_HEIGHT);
+	memset((uint8_t *) draw_buffer_level, 0, GRAPHICS_WIDTH * GRAPHICS_HEIGHT);
 }
 
 void copyimage(uint16_t offsetx, uint16_t offsety, int image) {
 	APPLY_DEADBAND(offsetx, offsety);
 	struct splashEntry splash_info;
 	splash_info = splash[image];
-	offsetx=offsetx/16;
-	int i=0;
-	  for (uint16_t y = offsety; y < ((splash_info.height)+offsety); y++) {
-		  for (uint16_t x = offsetx; x < (((splash_info.width)/16)+offsetx); x++) {
-			  draw_buffer_level[y*GRAPHICS_WIDTH+x] = mirror(splash_info.level[(y-offsety)*((splash_info.width)/16)+(x-offsetx)]);
-			  draw_buffer_mask[y*GRAPHICS_WIDTH+x] = mirror(splash_info.mask[(y-offsety)*((splash_info.width)/16)+(x-offsetx)]);
-			  i+=2;
-		  }
+	offsetx=offsetx/8;
+	for (uint16_t y = offsety; y < ((splash_info.height)+offsety); y++) {
+		for (uint16_t x = offsetx; x < (((splash_info.width)/8)+offsetx); x++) {
+			draw_buffer_level[y*GRAPHICS_WIDTH+x] = mirror(splash_info.level[(y-offsety)*((splash_info.width)/8)+(x-offsetx)]);
+			draw_buffer_mask[y*GRAPHICS_WIDTH+x] = mirror(splash_info.mask[(y-offsety)*((splash_info.width)/8)+(x-offsetx)]);
+		}
 	}
 }
 
@@ -221,9 +219,9 @@ void setPixel(uint16_t x, uint16_t y, uint8_t state) {
 	if (!validPos(x, y)) {
 		return;
 	}
-	uint8_t bitPos = 15-(x%16);
-	uint16_t tempf = draw_buffer_level[y*GRAPHICS_WIDTH+x/16];
-	uint16_t tempm = draw_buffer_mask[y*GRAPHICS_WIDTH+x/16];
+	uint8_t bitPos = 7-(x%8);
+	uint16_t tempf = draw_buffer_level[y*GRAPHICS_WIDTH+x/8];
+	uint16_t tempm = draw_buffer_mask[y*GRAPHICS_WIDTH+x/8];
 	if (state == 0) {
 		tempf &= ~(1<<bitPos);
 		tempm &= ~(1<<bitPos);
@@ -236,8 +234,8 @@ void setPixel(uint16_t x, uint16_t y, uint8_t state) {
 		tempf ^= (1<<bitPos);
 		tempm ^= (1<<bitPos);
 	}
-	draw_buffer_level[y*GRAPHICS_WIDTH+x/16] = tempf;
-	draw_buffer_mask[y*GRAPHICS_WIDTH+x/16] = tempm;
+	draw_buffer_level[y*GRAPHICS_WIDTH+x/8] = tempf;
+	draw_buffer_mask[y*GRAPHICS_WIDTH+x/8] = tempm;
 }
 
 // Credit for this one goes to wikipedia! :-)
@@ -482,7 +480,7 @@ void drawBox(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2)
  * @param       y               y coordinate
  * @param       mode    0 = clear bit, 1 = set bit, 2 = toggle bit
  */
-void write_pixel(uint16_t *buff, unsigned int x, unsigned int y, int mode)
+void write_pixel(uint8_t *buff, unsigned int x, unsigned int y, int mode)
 {
 	APPLY_DEADBAND(x, y);
 	CHECK_COORDS(x, y);
@@ -491,7 +489,7 @@ void write_pixel(uint16_t *buff, unsigned int x, unsigned int y, int mode)
 	int bitnum = CALC_BIT_IN_WORD(x);
 	int wordnum = CALC_BUFF_ADDR(x, y);
 	// Apply a mask.
-	uint16_t mask = 1 << (15 - bitnum);
+	uint16_t mask = 1 << (7 - bitnum);
 	WRITE_WORD_MODE(buff, wordnum, mask, mode);
 }
 
@@ -506,15 +504,15 @@ void write_pixel(uint16_t *buff, unsigned int x, unsigned int y, int mode)
  */
 void write_pixel_lm(unsigned int x, unsigned int y, int mmode, int lmode)
 {
-        CHECK_COORDS(x, y);
-        // Determine the bit in the word to be set and the word
-        // index to set it in.
-        int bitnum = CALC_BIT_IN_WORD(x);
-        int wordnum = CALC_BUFF_ADDR(x, y);
-        // Apply the masks.
-        uint16_t mask = 1 << (15 - bitnum);
-        WRITE_WORD_MODE(draw_buffer_mask, wordnum, mask, mmode);
-        WRITE_WORD_MODE(draw_buffer_level, wordnum, mask, lmode);
+	CHECK_COORDS(x, y);
+	// Determine the bit in the word to be set and the word
+	// index to set it in.
+	int bitnum = CALC_BIT_IN_WORD(x);
+	int wordnum = CALC_BUFF_ADDR(x, y);
+	// Apply the masks.
+	uint16_t mask = 1 << (7 - bitnum);
+	WRITE_WORD_MODE(draw_buffer_mask, wordnum, mask, mmode);
+	WRITE_WORD_MODE(draw_buffer_level, wordnum, mask, lmode);
 }
 
 
@@ -527,43 +525,43 @@ void write_pixel_lm(unsigned int x, unsigned int y, int mmode, int lmode)
  * @param       y               y coordinate
  * @param       mode    0 = clear, 1 = set, 2 = toggle
  */
-void write_hline(uint16_t *buff, unsigned int x0, unsigned int x1, unsigned int y, int mode)
+void write_hline(uint8_t *buff, unsigned int x0, unsigned int x1, unsigned int y, int mode)
 {
 	APPLY_DEADBAND(x0, y);
-        CLIP_COORDS(x0, y);
-        CLIP_COORDS(x1, y);
-        if(x0 > x1)
-        {
-                SWAP(x0, x1);
-        }
-        if(x0 == x1) return;
-        /* This is an optimised algorithm for writing horizontal lines.
-         * We begin by finding the addresses of the x0 and x1 points. */
-        int addr0 = CALC_BUFF_ADDR(x0, y);
-        int addr1 = CALC_BUFF_ADDR(x1, y);
-        int addr0_bit = CALC_BIT_IN_WORD(x0);
-        int addr1_bit = CALC_BIT_IN_WORD(x1);
-        int mask, mask_l, mask_r, i;
-        /* If the addresses are equal, we only need to write one word
-         * which is an island. */
-        if(addr0 == addr1)
-        {
-                mask = COMPUTE_HLINE_ISLAND_MASK(addr0_bit, addr1_bit);
-                WRITE_WORD_MODE(buff, addr0, mask, mode);
-        }
-        /* Otherwise we need to write the edges and then the middle. */
-        else
-        {
-                mask_l = COMPUTE_HLINE_EDGE_L_MASK(addr0_bit);
-                mask_r = COMPUTE_HLINE_EDGE_R_MASK(addr1_bit);
-                WRITE_WORD_MODE(buff, addr0, mask_l, mode);
-                WRITE_WORD_MODE(buff, addr1, mask_r, mode);
-                // Now write 0xffff words from start+1 to end-1.
-                for(i = addr0 + 1; i <= addr1 - 1; i++)
-                {
-                        WRITE_WORD_MODE(buff, i, 0xffff, mode);
-                }
-        }
+	CLIP_COORDS(x0, y);
+	CLIP_COORDS(x1, y);
+	if(x0 > x1)
+	{
+		SWAP(x0, x1);
+	}
+	if(x0 == x1) return;
+	/* This is an optimised algorithm for writing horizontal lines.
+	 * We begin by finding the addresses of the x0 and x1 points. */
+	int addr0 = CALC_BUFF_ADDR(x0, y);
+	int addr1 = CALC_BUFF_ADDR(x1, y);
+	int addr0_bit = CALC_BIT_IN_WORD(x0);
+	int addr1_bit = CALC_BIT_IN_WORD(x1);
+	int mask, mask_l, mask_r, i;
+	/* If the addresses are equal, we only need to write one word
+	 * which is an island. */
+	if(addr0 == addr1)
+	{
+		mask = COMPUTE_HLINE_ISLAND_MASK(addr0_bit, addr1_bit);
+		WRITE_WORD_MODE(buff, addr0, mask, mode);
+	}
+	/* Otherwise we need to write the edges and then the middle. */
+	else
+	{
+		mask_l = COMPUTE_HLINE_EDGE_L_MASK(addr0_bit);
+		mask_r = COMPUTE_HLINE_EDGE_R_MASK(addr1_bit);
+		WRITE_WORD_MODE(buff, addr0, mask_l, mode);
+		WRITE_WORD_MODE(buff, addr1, mask_r, mode);
+		// Now write 0xffff words from start+1 to end-1.
+		for(i = addr0 + 1; i <= addr1 - 1; i++)
+		{
+			WRITE_WORD_MODE(buff, i, 0xff, mode);
+		}
+	}
 }
 
 /**
@@ -577,10 +575,10 @@ void write_hline(uint16_t *buff, unsigned int x0, unsigned int x1, unsigned int 
  */
 void write_hline_lm(unsigned int x0, unsigned int x1, unsigned int y, int lmode, int mmode)
 {
-        // TODO: an optimisation would compute the masks and apply to
-        // both buffers simultaneously.
-        write_hline(draw_buffer_level, x0, x1, y, lmode);
-        write_hline(draw_buffer_mask, x0, x1, y, mmode);
+	// TODO: an optimisation would compute the masks and apply to
+	// both buffers simultaneously.
+	write_hline(draw_buffer_level, x0, x1, y, lmode);
+	write_hline(draw_buffer_mask, x0, x1, y, mmode);
 }
 
 /**
@@ -597,19 +595,19 @@ void write_hline_lm(unsigned int x0, unsigned int x1, unsigned int y, int lmode,
  */
 void write_hline_outlined(unsigned int x0, unsigned int x1, unsigned int y, int endcap0, int endcap1, int mode, int mmode)
 {
-        int stroke, fill;
-        SETUP_STROKE_FILL(stroke, fill, mode)
-        if(x0 > x1)
-        {
-                SWAP(x0, x1);
-        }
-        // Draw the main body of the line.
-        write_hline_lm(x0 + 1, x1 - 1, y - 1, stroke, mmode);
-        write_hline_lm(x0 + 1, x1 - 1, y + 1, stroke, mmode);
-        write_hline_lm(x0 + 1, x1 - 1, y, fill, mmode);
-        // Draw the endcaps, if any.
-        DRAW_ENDCAP_HLINE(endcap0, x0, y, stroke, fill, mmode);
-        DRAW_ENDCAP_HLINE(endcap1, x1, y, stroke, fill, mmode);
+	int stroke, fill;
+	SETUP_STROKE_FILL(stroke, fill, mode)
+	if(x0 > x1)
+	{
+		SWAP(x0, x1);
+	}
+	// Draw the main body of the line.
+	write_hline_lm(x0 + 1, x1 - 1, y - 1, stroke, mmode);
+	write_hline_lm(x0 + 1, x1 - 1, y + 1, stroke, mmode);
+	write_hline_lm(x0 + 1, x1 - 1, y, fill, mmode);
+	// Draw the endcaps, if any.
+	DRAW_ENDCAP_HLINE(endcap0, x0, y, stroke, fill, mmode);
+	DRAW_ENDCAP_HLINE(endcap1, x1, y, stroke, fill, mmode);
 }
 
 /**
@@ -621,30 +619,30 @@ void write_hline_outlined(unsigned int x0, unsigned int x1, unsigned int y, int 
  * @param       y1              y1 coordinate
  * @param       mode    0 = clear, 1 = set, 2 = toggle
  */
-void write_vline(uint16_t *buff, unsigned int x, unsigned int y0, unsigned int y1, int mode)
+void write_vline(uint8_t *buff, unsigned int x, unsigned int y0, unsigned int y1, int mode)
 {
 	APPLY_DEADBAND(x, y0);
-        unsigned int a;
-        CLIP_COORDS(x, y0);
-        CLIP_COORDS(x, y1);
-        if(y0 > y1)
-        {
-                SWAP(y0, y1);
-        }
-        if(y0 == y1) return;
-        /* This is an optimised algorithm for writing vertical lines.
-         * We begin by finding the addresses of the x,y0 and x,y1 points. */
-        int addr0 = CALC_BUFF_ADDR(x, y0);
-        int addr1 = CALC_BUFF_ADDR(x, y1);
-        /* Then we calculate the pixel data to be written. */
-        int bitnum = CALC_BIT_IN_WORD(x);
-        uint16_t mask = 1 << (15 - bitnum);
-        /* Run from addr0 to addr1 placing pixels. Increment by the number
-         * of words n each graphics line. */
-        for(a = addr0; a <= addr1; a += DISP_WIDTH / 16)
-        {
-                WRITE_WORD_MODE(buff, a, mask, mode);
-        }
+	unsigned int a;
+	CLIP_COORDS(x, y0);
+	CLIP_COORDS(x, y1);
+	if(y0 > y1)
+	{
+		SWAP(y0, y1);
+	}
+	if(y0 == y1) return;
+	/* This is an optimised algorithm for writing vertical lines.
+	 * We begin by finding the addresses of the x,y0 and x,y1 points. */
+	int addr0 = CALC_BUFF_ADDR(x, y0);
+	int addr1 = CALC_BUFF_ADDR(x, y1);
+	/* Then we calculate the pixel data to be written. */
+	int bitnum = CALC_BIT_IN_WORD(x);
+	uint16_t mask = 1 << (7 - bitnum);
+	/* Run from addr0 to addr1 placing pixels. Increment by the number
+	 * of words n each graphics line. */
+	for(a = addr0; a <= addr1; a += DISP_WIDTH / 8)
+	{
+		WRITE_WORD_MODE(buff, a, mask, mode);
+	}
 }
 
 /**
@@ -658,10 +656,10 @@ void write_vline(uint16_t *buff, unsigned int x, unsigned int y0, unsigned int y
  */
 void write_vline_lm(unsigned int x, unsigned int y0, unsigned int y1, int lmode, int mmode)
 {
-        // TODO: an optimisation would compute the masks and apply to
-        // both buffers simultaneously.
-        write_vline(draw_buffer_level, x, y0, y1, lmode);
-        write_vline(draw_buffer_mask, x, y0, y1, mmode);
+	// TODO: an optimisation would compute the masks and apply to
+	// both buffers simultaneously.
+	write_vline(draw_buffer_level, x, y0, y1, lmode);
+	write_vline(draw_buffer_mask, x, y0, y1, mmode);
 }
 
 /**
@@ -678,19 +676,19 @@ void write_vline_lm(unsigned int x, unsigned int y0, unsigned int y1, int lmode,
  */
 void write_vline_outlined(unsigned int x, unsigned int y0, unsigned int y1, int endcap0, int endcap1, int mode, int mmode)
 {
-        int stroke, fill;
-        if(y0 > y1)
-        {
-                SWAP(y0, y1);
-        }
-        SETUP_STROKE_FILL(stroke, fill, mode);
-        // Draw the main body of the line.
-        write_vline_lm(x - 1, y0 + 1, y1 - 1, stroke, mmode);
-        write_vline_lm(x + 1, y0 + 1, y1 - 1, stroke, mmode);
-        write_vline_lm(x, y0 + 1, y1 - 1, fill, mmode);
-        // Draw the endcaps, if any.
-        DRAW_ENDCAP_VLINE(endcap0, x, y0, stroke, fill, mmode);
-        DRAW_ENDCAP_VLINE(endcap1, x, y1, stroke, fill, mmode);
+	int stroke, fill;
+	if(y0 > y1)
+	{
+		SWAP(y0, y1);
+	}
+	SETUP_STROKE_FILL(stroke, fill, mode);
+	// Draw the main body of the line.
+	write_vline_lm(x - 1, y0 + 1, y1 - 1, stroke, mmode);
+	write_vline_lm(x + 1, y0 + 1, y1 - 1, stroke, mmode);
+	write_vline_lm(x, y0 + 1, y1 - 1, fill, mmode);
+	// Draw the endcaps, if any.
+	DRAW_ENDCAP_VLINE(endcap0, x, y0, stroke, fill, mmode);
+	DRAW_ENDCAP_VLINE(endcap1, x, y1, stroke, fill, mmode);
 }
 
 /**
@@ -707,7 +705,7 @@ void write_vline_outlined(unsigned int x, unsigned int y0, unsigned int y1, int 
  * @param       height  rectangle height
  * @param       mode    0 = clear, 1 = set, 2 = toggle
  */
-void write_filled_rectangle(uint16_t *buff, unsigned int x, unsigned int y, unsigned int width, unsigned int height, int mode)
+void write_filled_rectangle(uint8_t *buff, unsigned int x, unsigned int y, unsigned int width, unsigned int height, int mode)
 {
         int yy, addr0_old, addr1_old;
         CHECK_COORDS(x, y);
@@ -728,7 +726,7 @@ void write_filled_rectangle(uint16_t *buff, unsigned int x, unsigned int y, unsi
                 while(height--)
                 {
                         WRITE_WORD_MODE(buff, addr0, mask, mode);
-                        addr0 += DISP_WIDTH / 16;
+                        addr0 += DISP_WIDTH / 8;
                 }
         }
         // Otherwise we need to write the edges and then the middle repeatedly.
@@ -744,8 +742,8 @@ void write_filled_rectangle(uint16_t *buff, unsigned int x, unsigned int y, unsi
                 {
                         WRITE_WORD_MODE(buff, addr0, mask_l, mode);
                         WRITE_WORD_MODE(buff, addr1, mask_r, mode);
-                        addr0 += DISP_WIDTH / 16;
-                        addr1 += DISP_WIDTH / 16;
+                        addr0 += DISP_WIDTH / 8;
+                        addr1 += DISP_WIDTH / 8;
                         yy++;
                 }
                 // Now write 0xffff words from start+1 to end-1 for each row.
@@ -756,10 +754,10 @@ void write_filled_rectangle(uint16_t *buff, unsigned int x, unsigned int y, unsi
                 {
                         for(i = addr0 + 1; i <= addr1 - 1; i++)
                         {
-                                WRITE_WORD_MODE(buff, i, 0xffff, mode);
+                                WRITE_WORD_MODE(buff, i, 0xff, mode);
                         }
-                        addr0 += DISP_WIDTH / 16;
-                        addr1 += DISP_WIDTH / 16;
+                        addr0 += DISP_WIDTH / 8;
+                        addr1 += DISP_WIDTH / 8;
                         yy++;
                 }
         }
@@ -794,14 +792,14 @@ void write_filled_rectangle_lm(unsigned int x, unsigned int y, unsigned int widt
  */
 void write_rectangle_outlined(unsigned int x, unsigned int y, int width, int height, int mode, int mmode)
 {
-        //CHECK_COORDS(x, y);
-        //CHECK_COORDS(x + width, y + height);
-        //if((x + width) > DISP_WIDTH) width = DISP_WIDTH - x;
-        //if((y + height) > DISP_HEIGHT) height = DISP_HEIGHT - y;
-        write_hline_outlined(x, x + width, y, ENDCAP_ROUND, ENDCAP_ROUND, mode, mmode);
-        write_hline_outlined(x, x + width, y + height, ENDCAP_ROUND, ENDCAP_ROUND, mode, mmode);
-        write_vline_outlined(x, y, y + height, ENDCAP_ROUND, ENDCAP_ROUND, mode, mmode);
-        write_vline_outlined(x + width, y, y + height, ENDCAP_ROUND, ENDCAP_ROUND, mode, mmode);
+	//CHECK_COORDS(x, y);
+	//CHECK_COORDS(x + width, y + height);
+	//if((x + width) > DISP_WIDTH) width = DISP_WIDTH - x;
+	//if((y + height) > DISP_HEIGHT) height = DISP_HEIGHT - y;
+	write_hline_outlined(x, x + width, y, ENDCAP_ROUND, ENDCAP_ROUND, mode, mmode);
+	write_hline_outlined(x, x + width, y + height, ENDCAP_ROUND, ENDCAP_ROUND, mode, mmode);
+	write_vline_outlined(x, y, y + height, ENDCAP_ROUND, ENDCAP_ROUND, mode, mmode);
+	write_vline_outlined(x + width, y, y + height, ENDCAP_ROUND, ENDCAP_ROUND, mode, mmode);
 }
 
 /**
@@ -815,24 +813,24 @@ void write_rectangle_outlined(unsigned int x, unsigned int y, int width, int hei
  * @param       dashp   dash period (pixels) - zero for no dash
  * @param       mode    0 = clear, 1 = set, 2 = toggle
  */
-void write_circle(uint16_t *buff, unsigned int cx, unsigned int cy, unsigned int r, unsigned int dashp, int mode)
+void write_circle(uint8_t *buff, unsigned int cx, unsigned int cy, unsigned int r, unsigned int dashp, int mode)
 {
-        CHECK_COORDS(cx, cy);
-        int error = -r, x = r, y = 0;
-        while(x >= y)
-        {
-                if(dashp == 0 || (y % dashp) < (dashp / 2))
-                {
-                        CIRCLE_PLOT_8(buff, cx, cy, x, y, mode);
-                }
-                error += (y * 2) + 1;
-                y++;
-                if(error >= 0)
-                {
-                        --x;
-                        error -= x * 2;
-                }
-        }
+	CHECK_COORDS(cx, cy);
+	int error = -r, x = r, y = 0;
+	while(x >= y)
+	{
+		if(dashp == 0 || (y % dashp) < (dashp / 2))
+		{
+			CIRCLE_PLOT_8(buff, cx, cy, x, y, mode);
+		}
+		error += (y * 2) + 1;
+		y++;
+		if(error >= 0)
+		{
+			--x;
+			error -= x * 2;
+		}
+	}
 }
 
 /**
@@ -848,58 +846,58 @@ void write_circle(uint16_t *buff, unsigned int cx, unsigned int cy, unsigned int
  */
 void write_circle_outlined(unsigned int cx, unsigned int cy, unsigned int r, unsigned int dashp, int bmode, int mode, int mmode)
 {
-        int stroke, fill;
-        CHECK_COORDS(cx, cy);
-        SETUP_STROKE_FILL(stroke, fill, mode);
-        // This is a two step procedure. First, we draw the outline of the
-        // circle, then we draw the inner part.
-        int error = -r, x = r, y = 0;
-        while(x >= y)
-        {
-                if(dashp == 0 || (y % dashp) < (dashp / 2))
-                {
-                        CIRCLE_PLOT_8(draw_buffer_mask, cx, cy, x + 1, y, mmode);
-                        CIRCLE_PLOT_8(draw_buffer_level, cx, cy, x + 1, y, stroke);
-                        CIRCLE_PLOT_8(draw_buffer_mask, cx, cy, x, y + 1, mmode);
-                        CIRCLE_PLOT_8(draw_buffer_level, cx, cy, x, y + 1, stroke);
-                        CIRCLE_PLOT_8(draw_buffer_mask, cx, cy, x - 1, y, mmode);
-                        CIRCLE_PLOT_8(draw_buffer_level, cx, cy, x - 1, y, stroke);
-                        CIRCLE_PLOT_8(draw_buffer_mask, cx, cy, x, y - 1, mmode);
-                        CIRCLE_PLOT_8(draw_buffer_level, cx, cy, x, y - 1, stroke);
-                        if(bmode == 1)
-                        {
-                                CIRCLE_PLOT_8(draw_buffer_mask, cx, cy, x + 1, y + 1, mmode);
-                                CIRCLE_PLOT_8(draw_buffer_level, cx, cy, x + 1, y + 1, stroke);
-                                CIRCLE_PLOT_8(draw_buffer_mask, cx, cy, x - 1, y - 1, mmode);
-                                CIRCLE_PLOT_8(draw_buffer_level, cx, cy, x - 1, y - 1, stroke);
-                        }
-                }
-                error += (y * 2) + 1;
-                y++;
-                if(error >= 0)
-                {
-                        --x;
-                        error -= x * 2;
-                }
-        }
-        error = -r;
-        x = r;
-        y = 0;
-        while(x >= y)
-        {
-                if(dashp == 0 || (y % dashp) < (dashp / 2))
-                {
-                        CIRCLE_PLOT_8(draw_buffer_mask, cx, cy, x, y, mmode);
-                        CIRCLE_PLOT_8(draw_buffer_level, cx, cy, x, y, fill);
-                }
-                error += (y * 2) + 1;
-                y++;
-                if(error >= 0)
-                {
-                        --x;
-                        error -= x * 2;
-                }
-        }
+	int stroke, fill;
+	CHECK_COORDS(cx, cy);
+	SETUP_STROKE_FILL(stroke, fill, mode);
+	// This is a two step procedure. First, we draw the outline of the
+	// circle, then we draw the inner part.
+	int error = -r, x = r, y = 0;
+	while(x >= y)
+	{
+		if(dashp == 0 || (y % dashp) < (dashp / 2))
+		{
+			CIRCLE_PLOT_8(draw_buffer_mask, cx, cy, x + 1, y, mmode);
+			CIRCLE_PLOT_8(draw_buffer_level, cx, cy, x + 1, y, stroke);
+			CIRCLE_PLOT_8(draw_buffer_mask, cx, cy, x, y + 1, mmode);
+			CIRCLE_PLOT_8(draw_buffer_level, cx, cy, x, y + 1, stroke);
+			CIRCLE_PLOT_8(draw_buffer_mask, cx, cy, x - 1, y, mmode);
+			CIRCLE_PLOT_8(draw_buffer_level, cx, cy, x - 1, y, stroke);
+			CIRCLE_PLOT_8(draw_buffer_mask, cx, cy, x, y - 1, mmode);
+			CIRCLE_PLOT_8(draw_buffer_level, cx, cy, x, y - 1, stroke);
+			if(bmode == 1)
+			{
+				CIRCLE_PLOT_8(draw_buffer_mask, cx, cy, x + 1, y + 1, mmode);
+				CIRCLE_PLOT_8(draw_buffer_level, cx, cy, x + 1, y + 1, stroke);
+				CIRCLE_PLOT_8(draw_buffer_mask, cx, cy, x - 1, y - 1, mmode);
+				CIRCLE_PLOT_8(draw_buffer_level, cx, cy, x - 1, y - 1, stroke);
+			}
+		}
+		error += (y * 2) + 1;
+		y++;
+		if(error >= 0)
+		{
+			--x;
+			error -= x * 2;
+		}
+	}
+	error = -r;
+	x = r;
+	y = 0;
+	while(x >= y)
+	{
+		if(dashp == 0 || (y % dashp) < (dashp / 2))
+		{
+			CIRCLE_PLOT_8(draw_buffer_mask, cx, cy, x, y, mmode);
+			CIRCLE_PLOT_8(draw_buffer_level, cx, cy, x, y, fill);
+		}
+		error += (y * 2) + 1;
+		y++;
+		if(error >= 0)
+		{
+			--x;
+			error -= x * 2;
+		}
+	}
 }
 
 /**
@@ -911,44 +909,44 @@ void write_circle_outlined(unsigned int cx, unsigned int cy, unsigned int r, uns
  * @param       r               radius
  * @param       mode    0 = clear, 1 = set, 2 = toggle
  */
-void write_circle_filled(uint16_t *buff, unsigned int cx, unsigned int cy, unsigned int r, int mode)
+void write_circle_filled(uint8_t *buff, unsigned int cx, unsigned int cy, unsigned int r, int mode)
 {
-        CHECK_COORDS(cx, cy);
-        int error = -r, x = r, y = 0, xch = 0;
-        // It turns out that filled circles can take advantage of the midpoint
-        // circle algorithm. We simply draw very fast horizontal lines across each
-        // pair of X,Y coordinates. In some cases, this can even be faster than
-        // drawing an outlined circle!
-        //
-        // Due to multiple writes to each set of pixels, we have a special exception
-        // for when using the toggling draw mode.
-        while(x >= y)
-        {
-                if(y != 0)
-                {
-                        write_hline(buff, cx - x, cx + x, cy + y, mode);
-                        write_hline(buff, cx - x, cx + x, cy - y, mode);
-                        if(mode != 2 || (mode == 2 && xch && (cx - x) != (cx - y)))
-                        {
-                                write_hline(buff, cx - y, cx + y, cy + x, mode);
-                                write_hline(buff, cx - y, cx + y, cy - x, mode);
-                                xch = 0;
-                        }
-                }
-                error += (y * 2) + 1;
-                y++;
-                if(error >= 0)
-                {
-                        --x;
-                        xch = 1;
-                        error -= x * 2;
-                }
-        }
-        // Handle toggle mode.
-        if(mode == 2)
-        {
-                write_hline(buff, cx - r, cx + r, cy, mode);
-        }
+	CHECK_COORDS(cx, cy);
+	int error = -r, x = r, y = 0, xch = 0;
+	// It turns out that filled circles can take advantage of the midpoint
+	// circle algorithm. We simply draw very fast horizontal lines across each
+	// pair of X,Y coordinates. In some cases, this can even be faster than
+	// drawing an outlined circle!
+	//
+	// Due to multiple writes to each set of pixels, we have a special exception
+	// for when using the toggling draw mode.
+	while(x >= y)
+	{
+		if(y != 0)
+		{
+			write_hline(buff, cx - x, cx + x, cy + y, mode);
+			write_hline(buff, cx - x, cx + x, cy - y, mode);
+			if(mode != 2 || (mode == 2 && xch && (cx - x) != (cx - y)))
+			{
+				write_hline(buff, cx - y, cx + y, cy + x, mode);
+				write_hline(buff, cx - y, cx + y, cy - x, mode);
+				xch = 0;
+			}
+		}
+		error += (y * 2) + 1;
+		y++;
+		if(error >= 0)
+		{
+			--x;
+			xch = 1;
+			error -= x * 2;
+		}
+	}
+	// Handle toggle mode.
+	if(mode == 2)
+	{
+		write_hline(buff, cx - r, cx + r, cy, mode);
+	}
 }
 
 /**
@@ -961,66 +959,66 @@ void write_circle_filled(uint16_t *buff, unsigned int cx, unsigned int cy, unsig
  * @param       y1              second y coordinate
  * @param       mode    0 = clear, 1 = set, 2 = toggle
  */
-void write_line(uint16_t *buff, unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1, int mode)
+void write_line(uint8_t *buff, unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1, int mode)
 {
-        // Based on http://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
-        int steep = abs(y1 - y0) > abs(x1 - x0);
-        if(steep)
-        {
-                SWAP(x0, y0);
-                SWAP(x1, y1);
-        }
-        if(x0 > x1)
-        {
-                SWAP(x0, x1);
-                SWAP(y0, y1);
-        }
-        int deltax = x1 - x0;
-        int deltay = abs(y1 - y0);
-        int error = deltax / 2;
-        int ystep;
-        int y = y0;
-        int x, lasty = y, stox = 0;
-        if(y0 < y1)
-                ystep = 1;
-        else
-                ystep = -1;
-        for(x = x0; x < x1; x++)
-        {
-                if(steep)
-                {
-                        if(lasty != y)
-                        {
-                                if(x > lasty)
-                                        write_vline(buff, stox, y, lasty, mode);
-                                else
-                                        write_vline(buff, stox, lasty, y, mode);
-                                lasty = y;
-                                stox = x;
-                        }
-                }
-                else
-                {
-                        //write_pixel(buff, x, y, mode);
-                        /*
-                        if(lasty != y)
-                        {
-                                if(y > lasty)
-                                        write_vline(buff, stox, y, lasty, mode);
-                                else
-                                        write_vline(buff, stox, lasty, y, mode);
-                                lasty = y;
-                                stox = x;
-                        }
-                        */
-                }
-                error -= deltay;
-                if(error < 0)
-                {
-                        y += ystep;
-                        error += deltax;
-                }
-        }
+	// Based on http://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
+	int steep = abs(y1 - y0) > abs(x1 - x0);
+	if(steep)
+	{
+		SWAP(x0, y0);
+		SWAP(x1, y1);
+	}
+	if(x0 > x1)
+	{
+		SWAP(x0, x1);
+		SWAP(y0, y1);
+	}
+	int deltax = x1 - x0;
+	int deltay = abs(y1 - y0);
+	int error = deltax / 2;
+	int ystep;
+	int y = y0;
+	int x, lasty = y, stox = 0;
+	if(y0 < y1)
+		ystep = 1;
+	else
+		ystep = -1;
+	for(x = x0; x < x1; x++)
+	{
+		if(steep)
+		{
+			if(lasty != y)
+			{
+				if(x > lasty)
+					write_vline(buff, stox, y, lasty, mode);
+				else
+					write_vline(buff, stox, lasty, y, mode);
+				lasty = y;
+				stox = x;
+			}
+		}
+		else
+		{
+			//write_pixel(buff, x, y, mode);
+			/*
+			 if(lasty != y)
+			 {
+			 if(y > lasty)
+			 write_vline(buff, stox, y, lasty, mode);
+			 else
+			 write_vline(buff, stox, lasty, y, mode);
+			 lasty = y;
+			 stox = x;
+			 }
+			 */
+		}
+		error -= deltay;
+		if(error < 0)
+		{
+			y += ystep;
+			error += deltax;
+		}
+	}
 }
 
 /**
@@ -1035,8 +1033,8 @@ void write_line(uint16_t *buff, unsigned int x0, unsigned int y0, unsigned int x
  */
 void write_line_lm(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1, int mmode, int lmode)
 {
-        write_line(draw_buffer_mask, x0, y0, x1, y1, mmode);
-        write_line(draw_buffer_level, x0, y0, x1, y1, lmode);
+	write_line(draw_buffer_mask, x0, y0, x1, y1, mmode);
+	write_line(draw_buffer_level, x0, y0, x1, y1, lmode);
 }
 
 /**
@@ -1054,84 +1052,84 @@ void write_line_lm(unsigned int x0, unsigned int y0, unsigned int x1, unsigned i
  */
 void write_line_outlined(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1, int endcap0, int endcap1, int mode, int mmode)
 {
-        // Based on http://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
-        // This could be improved for speed.
-        int omode, imode;
-        if(mode == 0)
-        {
-                omode = 0;
-                imode = 1;
-        }
-        else
-        {
-                omode = 1;
-                imode = 0;
-        }
-        int steep = abs(y1 - y0) > abs(x1 - x0);
-        if(steep)
-        {
-                SWAP(x0, y0);
-                SWAP(x1, y1);
-        }
-        if(x0 > x1)
-        {
-                SWAP(x0, x1);
-                SWAP(y0, y1);
-        }
-        int deltax = x1 - x0;
-        int deltay = abs(y1 - y0);
-        int error = deltax / 2;
-        int ystep;
-        int y = y0;
-        int x;
-        if(y0 < y1)
-                ystep = 1;
-        else
-                ystep = -1;
-        // Draw the outline.
-        for(x = x0; x < x1; x++)
-        {
-                if(steep)
-                {
-                        write_pixel_lm(y - 1, x, mmode, omode);
-                        write_pixel_lm(y + 1, x, mmode, omode);
-                        write_pixel_lm(y, x - 1, mmode, omode);
-                        write_pixel_lm(y, x + 1, mmode, omode);
-                }
-                else
-                {
-                        write_pixel_lm(x - 1, y, mmode, omode);
-                        write_pixel_lm(x + 1, y, mmode, omode);
-                        write_pixel_lm(x, y - 1, mmode, omode);
-                        write_pixel_lm(x, y + 1, mmode, omode);
-                }
-                error -= deltay;
-                if(error < 0)
-                {
-                        y += ystep;
-                        error += deltax;
-                }
-        }
-        // Now draw the innards.
-        error = deltax / 2;
-        y = y0;
-        for(x = x0; x < x1; x++)
-        {
-                if(steep)
-                {
-                        write_pixel_lm(y, x, mmode, imode);
-                }
-                else
-                {
-                        write_pixel_lm(x, y, mmode, imode);
-                }
-                error -= deltay;
-                if(error < 0)
-                {
-                        y += ystep;
-                        error += deltax;
-                }
-        }
+	// Based on http://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
+	// This could be improved for speed.
+	int omode, imode;
+	if(mode == 0)
+	{
+		omode = 0;
+		imode = 1;
+	}
+	else
+	{
+		omode = 1;
+		imode = 0;
+	}
+	int steep = abs(y1 - y0) > abs(x1 - x0);
+	if(steep)
+	{
+		SWAP(x0, y0);
+		SWAP(x1, y1);
+	}
+	if(x0 > x1)
+	{
+		SWAP(x0, x1);
+		SWAP(y0, y1);
+	}
+	int deltax = x1 - x0;
+	int deltay = abs(y1 - y0);
+	int error = deltax / 2;
+	int ystep;
+	int y = y0;
+	int x;
+	if(y0 < y1)
+		ystep = 1;
+	else
+		ystep = -1;
+	// Draw the outline.
+	for(x = x0; x < x1; x++)
+	{
+		if(steep)
+		{
+			write_pixel_lm(y - 1, x, mmode, omode);
+			write_pixel_lm(y + 1, x, mmode, omode);
+			write_pixel_lm(y, x - 1, mmode, omode);
+			write_pixel_lm(y, x + 1, mmode, omode);
+		}
+		else
+		{
+			write_pixel_lm(x - 1, y, mmode, omode);
+			write_pixel_lm(x + 1, y, mmode, omode);
+			write_pixel_lm(x, y - 1, mmode, omode);
+			write_pixel_lm(x, y + 1, mmode, omode);
+		}
+		error -= deltay;
+		if(error < 0)
+		{
+			y += ystep;
+			error += deltax;
+		}
+	}
+	// Now draw the innards.
+	error = deltax / 2;
+	y = y0;
+	for(x = x0; x < x1; x++)
+	{
+		if(steep)
+		{
+			write_pixel_lm(y, x, mmode, imode);
+		}
+		else
+		{
+			write_pixel_lm(x, y, mmode, imode);
+		}
+		error -= deltay;
+		if(error < 0)
+		{
+			y += ystep;
+			error += deltax;
+		}
+	}
 }
 
 /**
@@ -1146,15 +1144,15 @@ void write_line_outlined(unsigned int x0, unsigned int y0, unsigned int x1, unsi
  * @param       xoff    x offset (0-15)
  * @param       mode    0 = clear, 1 = set, 2 = toggle
  */
-void write_word_misaligned(uint16_t *buff, uint16_t word, unsigned int addr, unsigned int xoff, int mode)
+void write_word_misaligned(uint8_t *buff, uint16_t word, unsigned int addr, unsigned int xoff, int mode)
 {
-        uint16_t firstmask = word >> xoff;
-        uint16_t lastmask = word << (16 - xoff);
-        WRITE_WORD_MODE(buff, addr, firstmask, mode);
-        if(xoff > 0)
-        {
-                WRITE_WORD_MODE(buff, addr + 1, lastmask, mode);
-        }
+	uint16_t firstmask = word >> xoff;
+	uint16_t lastmask = word << (8 - xoff);
+	WRITE_WORD_MODE(buff, addr, firstmask, mode);
+	if(xoff > 0)
+	{
+		WRITE_WORD_MODE(buff, addr + 1, lastmask, mode);
+	}
 }
 
 /**
@@ -1172,15 +1170,15 @@ void write_word_misaligned(uint16_t *buff, uint16_t word, unsigned int addr, uns
  * it doesn't go through a lot of switch logic which slows down text writing
  * a lot.
  */
-void write_word_misaligned_NAND(uint16_t *buff, uint16_t word, unsigned int addr, unsigned int xoff)
+void write_word_misaligned_NAND(uint8_t *buff, uint16_t word, unsigned int addr, unsigned int xoff)
 {
-        uint16_t firstmask = word >> xoff;
-        uint16_t lastmask = word << (16 - xoff);
-        WRITE_WORD_NAND(buff, addr, firstmask);
-        if(xoff > 0)
-        {
-                WRITE_WORD_NAND(buff, addr + 1, lastmask);
-        }
+	uint16_t firstmask = word >> xoff;
+	uint16_t lastmask = word << (8 - xoff);
+	WRITE_WORD_NAND(buff, addr, firstmask);
+	if(xoff > 0)
+	{
+		WRITE_WORD_NAND(buff, addr + 1, lastmask);
+	}
 }
 
 /**
@@ -1198,15 +1196,15 @@ void write_word_misaligned_NAND(uint16_t *buff, uint16_t word, unsigned int addr
  * it doesn't go through a lot of switch logic which slows down text writing
  * a lot.
  */
-void write_word_misaligned_OR(uint16_t *buff, uint16_t word, unsigned int addr, unsigned int xoff)
+void write_word_misaligned_OR(uint8_t *buff, uint16_t word, unsigned int addr, unsigned int xoff)
 {
-        uint16_t firstmask = word >> xoff;
-        uint16_t lastmask = word << (16 - xoff);
-        WRITE_WORD_OR(buff, addr, firstmask);
-        if(xoff > 0)
-        {
-                WRITE_WORD_OR(buff, addr + 1, lastmask);
-        }
+	uint16_t firstmask = word >> xoff;
+	uint16_t lastmask = word << (8 - xoff);
+	WRITE_WORD_OR(buff, addr, firstmask);
+	if(xoff > 0)
+	{
+		WRITE_WORD_OR(buff, addr + 1, lastmask);
+	}
 }
 
 /**
@@ -1223,8 +1221,8 @@ void write_word_misaligned_OR(uint16_t *buff, uint16_t word, unsigned int addr, 
  */
 void write_word_misaligned_lm(uint16_t wordl, uint16_t wordm, unsigned int addr, unsigned int xoff, int lmode, int mmode)
 {
-        write_word_misaligned(draw_buffer_level, wordl, addr, xoff, lmode);
-        write_word_misaligned(draw_buffer_mask, wordm, addr, xoff, mmode);
+	write_word_misaligned(draw_buffer_level, wordl, addr, xoff, lmode);
+	write_word_misaligned(draw_buffer_mask, wordm, addr, xoff, mmode);
 }
 
 /**
@@ -1235,19 +1233,19 @@ void write_word_misaligned_lm(uint16_t wordl, uint16_t wordm, unsigned int addr,
  */
 int fetch_font_info(char ch, int font, struct FontEntry *font_info, char *lookup)
 {
-        // First locate the font struct.
-        if(font > SIZEOF_ARRAY(fonts))
-                return 0; // font does not exist, exit.*/
-        // Load the font info; IDs are always sequential.
-        *font_info = fonts[font];
-        // Locate character in font lookup table. (If required.)
-        if(lookup != NULL)
-        {
-                *lookup = font_info->lookup[ch];
-                if(*lookup == 0xff)
-                        return 0; // character doesn't exist, don't bother writing it.
-        }
-        return 1;
+	// First locate the font struct.
+	if(font > SIZEOF_ARRAY(fonts))
+		return 0; // font does not exist, exit.*/
+	// Load the font info; IDs are always sequential.
+	*font_info = fonts[font];
+	// Locate character in font lookup table. (If required.)
+	if(lookup != NULL)
+	{
+		*lookup = font_info->lookup[ch];
+		if(*lookup == 0xff)
+			return 0; // character doesn't exist, don't bother writing it.
+	}
+	return 1;
 }
 
 
@@ -1270,7 +1268,7 @@ void write_char16(char ch, unsigned int x, unsigned int y, int font)
     struct FontEntry font_info;
     char lookup = 0;
     fetch_font_info(0, font, &font_info, NULL);
-
+	
     // Compute starting address (for x,y) of character.
     int addr = CALC_BUFF_ADDR(x, y);
     int wbit = CALC_BIT_IN_WORD(x);
@@ -1279,53 +1277,53 @@ void write_char16(char ch, unsigned int x, unsigned int y, int font)
     // How big is the character? We handle characters up to 8 pixels
     // wide for now. Support for large characters may be added in future.
     {
-            // Ensure we don't overflow.
-            if(x + wbit > DISP_WIDTH)
-                    return;
-            // Load data pointer.
-            row = ch * font_info.height;
-            row_temp = row;
-            addr_temp = addr;
-            xshift = 16 - font_info.width;
-            // We can write mask words easily.
-            for(yy = y; yy < y + font_info.height; yy++)
-            {
-            		if(font==3)
-            			write_word_misaligned_OR(draw_buffer_mask, font_mask12x18[row] << xshift, addr, wbit);
-            		else
-            			write_word_misaligned_OR(draw_buffer_mask, font_mask8x10[row] << xshift, addr, wbit);
-                    addr += DISP_WIDTH / 16;
-                    row++;
-            }
-            // Level bits are more complicated. We need to set or clear
-            // level bits, but only where the mask bit is set; otherwise,
-            // we need to leave them alone. To do this, for each word, we
-            // construct an AND mask and an OR mask, and apply each individually.
-            row = row_temp;
-            addr = addr_temp;
-            for(yy = y; yy < y + font_info.height; yy++)
-            {
-        			if(font==3)
-        			{
-						level_bits = font_frame12x18[row];
-						//if(!(flags & FONT_INVERT)) // data is normally inverted
-								level_bits = ~level_bits;
-						or_mask = font_mask12x18[row] << xshift;
-						and_mask = (font_mask12x18[row] & level_bits) << xshift;
-        			} else {
-						level_bits = font_frame8x10[row];
-						//if(!(flags & FONT_INVERT)) // data is normally inverted
-								level_bits = ~level_bits;
-						or_mask = font_mask8x10[row] << xshift;
-						and_mask = (font_mask8x10[row] & level_bits) << xshift;
-        			}
-                    write_word_misaligned_OR(draw_buffer_level, or_mask, addr, wbit);
-                    // If we're not bold write the AND mask.
-                    //if(!(flags & FONT_BOLD))
-                            write_word_misaligned_NAND(draw_buffer_level, and_mask, addr, wbit);
-                    addr += DISP_WIDTH / 16;
-                    row++;
-            }
+		// Ensure we don't overflow.
+		if(x + wbit > DISP_WIDTH)
+			return;
+		// Load data pointer.
+		row = ch * font_info.height;
+		row_temp = row;
+		addr_temp = addr;
+		xshift = 8 - font_info.width;
+		// We can write mask words easily.
+		for(yy = y; yy < y + font_info.height; yy++)
+		{
+			if(font==3)
+				write_word_misaligned_OR(draw_buffer_mask, font_mask12x18[row] << xshift, addr, wbit);
+			else
+				write_word_misaligned_OR(draw_buffer_mask, font_mask8x10[row] << xshift, addr, wbit);
+			addr += DISP_WIDTH / 8;
+			row++;
+		}
+		// Level bits are more complicated. We need to set or clear
+		// level bits, but only where the mask bit is set; otherwise,
+		// we need to leave them alone. To do this, for each word, we
+		// construct an AND mask and an OR mask, and apply each individually.
+		row = row_temp;
+		addr = addr_temp;
+		for(yy = y; yy < y + font_info.height; yy++)
+		{
+			if(font==3)
+			{
+				level_bits = font_frame12x18[row];
+				//if(!(flags & FONT_INVERT)) // data is normally inverted
+				level_bits = ~level_bits;
+				or_mask = font_mask12x18[row] << xshift;
+				and_mask = (font_mask12x18[row] & level_bits) << xshift;
+			} else {
+				level_bits = font_frame8x10[row];
+				//if(!(flags & FONT_INVERT)) // data is normally inverted
+				level_bits = ~level_bits;
+				or_mask = font_mask8x10[row] << xshift;
+				and_mask = (font_mask8x10[row] & level_bits) << xshift;
+			}
+			write_word_misaligned_OR(draw_buffer_level, or_mask, addr, wbit);
+			// If we're not bold write the AND mask.
+			//if(!(flags & FONT_BOLD))
+			write_word_misaligned_NAND(draw_buffer_level, and_mask, addr, wbit);
+			addr += DISP_WIDTH / 8;
+			row++;
+		}
     }
 }
 
@@ -1356,49 +1354,49 @@ void write_char(char ch, unsigned int x, unsigned int y, int flags, int font)
     // If font only supports lowercase or uppercase, make the letter
     // lowercase or uppercase.
     if(font_info.flags & FONT_LOWERCASE_ONLY)
-            ch = tolower(ch);
+		ch = tolower(ch);
     if(font_info.flags & FONT_UPPERCASE_ONLY)
-            ch = toupper(ch);
+		ch = toupper(ch);
     fetch_font_info(ch, font, &font_info, &lookup);
     // How big is the character? We handle characters up to 8 pixels
     // wide for now. Support for large characters may be added in future.
     if(font_info.width <= 8)
     {
-            // Ensure we don't overflow.
-            if(x + wbit > DISP_WIDTH)
-                    return;
-            // Load data pointer.
-            row = lookup * font_info.height * 2;
-            row_temp = row;
-            addr_temp = addr;
-            xshift = 16 - font_info.width;
-            // We can write mask words easily.
-            for(yy = y; yy < y + font_info.height; yy++)
-            {
-                    write_word_misaligned_OR(draw_buffer_mask, font_info.data[row] << xshift, addr, wbit);
-                    addr += DISP_WIDTH / 16;
-                    row++;
-            }
-            // Level bits are more complicated. We need to set or clear
-            // level bits, but only where the mask bit is set; otherwise,
-            // we need to leave them alone. To do this, for each word, we
-            // construct an AND mask and an OR mask, and apply each individually.
-            row = row_temp;
-            addr = addr_temp;
-            for(yy = y; yy < y + font_info.height; yy++)
-            {
-                    level_bits = font_info.data[row + font_info.height];
-                    if(!(flags & FONT_INVERT)) // data is normally inverted
-                            level_bits = ~level_bits;
-                    or_mask = font_info.data[row] << xshift;
-                    and_mask = (font_info.data[row] & level_bits) << xshift;
-                    write_word_misaligned_OR(draw_buffer_level, or_mask, addr, wbit);
-                    // If we're not bold write the AND mask.
-                    //if(!(flags & FONT_BOLD))
-                            write_word_misaligned_NAND(draw_buffer_level, and_mask, addr, wbit);
-                    addr += DISP_WIDTH / 16;
-                    row++;
-            }
+		// Ensure we don't overflow.
+		if(x + wbit > DISP_WIDTH)
+			return;
+		// Load data pointer.
+		row = lookup * font_info.height * 2;
+		row_temp = row;
+		addr_temp = addr;
+		xshift = 8 - font_info.width;
+		// We can write mask words easily.
+		for(yy = y; yy < y + font_info.height; yy++)
+		{
+			write_word_misaligned_OR(draw_buffer_mask, font_info.data[row] << xshift, addr, wbit);
+			addr += DISP_WIDTH / 8;
+			row++;
+		}
+		// Level bits are more complicated. We need to set or clear
+		// level bits, but only where the mask bit is set; otherwise,
+		// we need to leave them alone. To do this, for each word, we
+		// construct an AND mask and an OR mask, and apply each individually.
+		row = row_temp;
+		addr = addr_temp;
+		for(yy = y; yy < y + font_info.height; yy++)
+		{
+			level_bits = font_info.data[row + font_info.height];
+			if(!(flags & FONT_INVERT)) // data is normally inverted
+				level_bits = ~level_bits;
+			or_mask = font_info.data[row] << xshift;
+			and_mask = (font_info.data[row] & level_bits) << xshift;
+			write_word_misaligned_OR(draw_buffer_level, or_mask, addr, wbit);
+			// If we're not bold write the AND mask.
+			//if(!(flags & FONT_BOLD))
+			write_word_misaligned_NAND(draw_buffer_level, and_mask, addr, wbit);
+			addr += DISP_WIDTH / 8;
+			row++;
+		}
     }
 }
 
@@ -1418,18 +1416,18 @@ void calc_text_dimensions(char *str, struct FontEntry font, int xs, int ys, stru
     int max_length = 0, line_length = 0, lines = 1;
     while(*str != 0)
     {
-            line_length++;
-            if(*str == '\n' || *str == '\r')
-            {
-                    if(line_length > max_length)
-                            max_length = line_length;
-                    line_length = 0;
-                    lines++;
-            }
-            str++;
+		line_length++;
+		if(*str == '\n' || *str == '\r')
+		{
+			if(line_length > max_length)
+				max_length = line_length;
+			line_length = 0;
+			lines++;
+		}
+		str++;
     }
     if(line_length > max_length)
-            max_length = line_length;
+		max_length = line_length;
     dim->width = max_length * (font.width + xs);
     dim->height = lines * (font.height + ys);
 }
@@ -1458,37 +1456,37 @@ void write_string(char *str, unsigned int x, unsigned int y, unsigned int xs, un
     calc_text_dimensions(str, font_info, xs, ys, &dim);
     switch(va)
     {
-            case TEXT_VA_TOP:               yy = y; break;
-            case TEXT_VA_MIDDLE:    yy = y - (dim.height / 2); break;
-            case TEXT_VA_BOTTOM:    yy = y - dim.height; break;
+		case TEXT_VA_TOP:               yy = y; break;
+		case TEXT_VA_MIDDLE:    yy = y - (dim.height / 2); break;
+		case TEXT_VA_BOTTOM:    yy = y - dim.height; break;
     }
     switch(ha)
     {
-            case TEXT_HA_LEFT:              xx = x; break;
-            case TEXT_HA_CENTER:    xx = x - (dim.width / 2); break;
-            case TEXT_HA_RIGHT:             xx = x - dim.width; break;
+		case TEXT_HA_LEFT:              xx = x; break;
+		case TEXT_HA_CENTER:    xx = x - (dim.width / 2); break;
+		case TEXT_HA_RIGHT:             xx = x - dim.width; break;
     }
     // Then write each character.
     xx_original = xx;
     while(*str != 0)
     {
-            if(*str == '\n' || *str == '\r')
-            {
-                    yy += ys + font_info.height;
-                    xx = xx_original;
-            }
-            else
-            {
-                    if(xx >= 0 && xx < DISP_WIDTH)
-                    {
-                    	if(font_info.id<2)
-                            write_char(*str, xx, yy, flags, font);
-                    	else
-                    		write_char16(*str, xx, yy, font);
-                    }
-                    xx += font_info.width + xs;
-            }
-            str++;
+		if(*str == '\n' || *str == '\r')
+		{
+			yy += ys + font_info.height;
+			xx = xx_original;
+		}
+		else
+		{
+			if(xx >= 0 && xx < DISP_WIDTH)
+			{
+				if(font_info.id<2)
+					write_char(*str, xx, yy, flags, font);
+				else
+					write_char16(*str, xx, yy, font);
+			}
+			xx += font_info.width + xs;
+		}
+		str++;
     }
 }
 

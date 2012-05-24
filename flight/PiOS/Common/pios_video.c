@@ -155,6 +155,8 @@ const struct pios_tim_callbacks px_callback = {
 	.edge = NULL,
 };
 
+const uint32_t period = 11;
+const uint32_t dc = (11 / 2);
 /**
  * Reset the timer and configure for next call.  Keeps them synced.  Ideally this won't even be needed
  * since I don't think the slave mode gets lost, and this can simply be disable timer
@@ -176,7 +178,7 @@ static void reset_hsync_timers()
 			failcount++;
 	}
 
-	dev_cfg->pixel_timer.timer->CNT = 0;
+	dev_cfg->pixel_timer.timer->CNT = dc;
 
 	// Listen to Channel1 (HSYNC)
 	switch(dev_cfg->hsync_capture.timer_chan) {
@@ -234,22 +236,22 @@ static void configure_hsync_timers()
 		case TIM_Channel_1:
 			TIM_OC1Init(dev_cfg->pixel_timer.timer, &dev_cfg->tim_oc_init);
 			TIM_OC1PreloadConfig(dev_cfg->pixel_timer.timer, TIM_OCPreload_Enable);
-			TIM_SetCompare1(dev_cfg->pixel_timer.timer, 5);
+			TIM_SetCompare1(dev_cfg->pixel_timer.timer, dc);
 			break;
 		case TIM_Channel_2:
 			TIM_OC2Init(dev_cfg->pixel_timer.timer, &dev_cfg->tim_oc_init);
 			TIM_OC2PreloadConfig(dev_cfg->pixel_timer.timer, TIM_OCPreload_Enable);
-			TIM_SetCompare2(dev_cfg->pixel_timer.timer, 5);
+			TIM_SetCompare2(dev_cfg->pixel_timer.timer, dc);
 			break;
 		case TIM_Channel_3:
 			TIM_OC3Init(dev_cfg->pixel_timer.timer, &dev_cfg->tim_oc_init);
 			TIM_OC3PreloadConfig(dev_cfg->pixel_timer.timer, TIM_OCPreload_Enable);
-			TIM_SetCompare3(dev_cfg->pixel_timer.timer, 5);
+			TIM_SetCompare3(dev_cfg->pixel_timer.timer, dc);
 			break;
 		case TIM_Channel_4:
 			TIM_OC4Init(dev_cfg->pixel_timer.timer, &dev_cfg->tim_oc_init);
 			TIM_OC4PreloadConfig(dev_cfg->pixel_timer.timer, TIM_OCPreload_Enable);
-			TIM_SetCompare4(dev_cfg->pixel_timer.timer, 5);
+			TIM_SetCompare4(dev_cfg->pixel_timer.timer, dc);
 			break;
 	}
 	TIM_ARRPreloadConfig(dev_cfg->pixel_timer.timer, ENABLE);
@@ -258,7 +260,7 @@ static void configure_hsync_timers()
 	// This shouldn't be needed as it should come from the config struture.  Something
 	// is clobbering that
 	TIM_PrescalerConfig(dev_cfg->pixel_timer.timer, 0, TIM_PSCReloadMode_Immediate);
-	TIM_SetAutoreload(dev_cfg->pixel_timer.timer, 11);
+	TIM_SetAutoreload(dev_cfg->pixel_timer.timer, period);
 }
 
 DMA_TypeDef * main_dma;
@@ -360,6 +362,8 @@ static void prepare_line(uint32_t line_num)
 {
 	uint32_t buf_offset = line_num * GRAPHICS_WIDTH;
 
+	dev_cfg->pixel_timer.timer->CNT = dc;
+
 	DMA_ClearFlag(dev_cfg->mask.dma.tx.channel, DMA_FLAG_TCIF7 | DMA_FLAG_HTIF7 | DMA_FLAG_FEIF7 | DMA_FLAG_TEIF7);
 	DMA_ClearFlag(dev_cfg->level.dma.tx.channel, DMA_FLAG_FEIF5 | DMA_FLAG_TEIF5);
 	
@@ -429,9 +433,6 @@ static void flush_spi()
  */
 void PIOS_VIDEO_DMA_Handler(void)
 {
-	// Try and make sure they can't get out of sync
-	DMA_Cmd(dev_cfg->mask.dma.tx.channel, DISABLE);
-
 	// Handle flags from stream channel
 	if (DMA_GetFlagStatus(dev_cfg->level.dma.tx.channel,DMA_FLAG_TCIF5)) {	// whole double buffer filled
 		DMA_ClearFlag(dev_cfg->level.dma.tx.channel,DMA_FLAG_TCIF5);
@@ -439,6 +440,9 @@ void PIOS_VIDEO_DMA_Handler(void)
 		{
 			flush_spi();
 			stop_hsync_timers();
+
+			dev_cfg->pixel_timer.timer->CNT = dc;
+
 			prepare_line(gActiveLine);
 		}
 		else if(gActiveLine == GRAPHICS_HEIGHT-2)

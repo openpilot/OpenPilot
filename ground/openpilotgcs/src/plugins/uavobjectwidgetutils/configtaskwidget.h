@@ -86,7 +86,7 @@ public:
     ConfigTaskWidget(QWidget *parent = 0);
     ~ConfigTaskWidget();
 
-    void disbleMouseWheelEvents();
+    void disableMouseWheelEvents();
     bool eventFilter( QObject * obj, QEvent * evt );
 
     void saveObjectToSD(UAVObject *obj);

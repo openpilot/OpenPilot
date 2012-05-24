@@ -1147,12 +1147,13 @@ void write_line_outlined(unsigned int x0, unsigned int y0, unsigned int x1, unsi
 void write_word_misaligned(uint8_t *buff, uint16_t word, unsigned int addr, unsigned int xoff, int mode)
 {
 	uint16_t firstmask = word >> xoff;
-	uint16_t lastmask = word << (8 - xoff);
-	WRITE_WORD_MODE(buff, addr, firstmask, mode);
+	uint16_t lastmask = word << (16 - xoff);
+	WRITE_WORD_MODE(buff, addr+1, firstmask && 0x00ff, mode);
+	WRITE_WORD_MODE(buff, addr, (firstmask & 0xff00) >> 8, mode);
 	if(xoff > 0)
-	{
-		WRITE_WORD_MODE(buff, addr + 1, lastmask, mode);
-	}
+		WRITE_WORD_MODE(buff, addr+3, lastmask & 0x00ff, mode);
+	if(xoff > 8)
+		WRITE_WORD_MODE(buff, addr+2, (lastmask & 0xff00) >> 8, mode);
 }
 
 /**
@@ -1173,12 +1174,13 @@ void write_word_misaligned(uint8_t *buff, uint16_t word, unsigned int addr, unsi
 void write_word_misaligned_NAND(uint8_t *buff, uint16_t word, unsigned int addr, unsigned int xoff)
 {
 	uint16_t firstmask = word >> xoff;
-	uint16_t lastmask = word << (8 - xoff);
-	WRITE_WORD_NAND(buff, addr, firstmask);
+	uint16_t lastmask = word << (16 - xoff);
+	WRITE_WORD_NAND(buff, addr+1, firstmask & 0x00ff);
+	WRITE_WORD_NAND(buff, addr, (firstmask & 0xff00) >> 8);
 	if(xoff > 0)
-	{
-		WRITE_WORD_NAND(buff, addr + 1, lastmask);
-	}
+		WRITE_WORD_NAND(buff, addr+3, (lastmask & 0x00ff));
+	if (xoff > 8)
+		WRITE_WORD_NAND(buff, addr+2, (lastmask & 0xff00) >> 8);
 }
 
 /**
@@ -1199,12 +1201,14 @@ void write_word_misaligned_NAND(uint8_t *buff, uint16_t word, unsigned int addr,
 void write_word_misaligned_OR(uint8_t *buff, uint16_t word, unsigned int addr, unsigned int xoff)
 {
 	uint16_t firstmask = word >> xoff;
-	uint16_t lastmask = word << (8 - xoff);
-	WRITE_WORD_OR(buff, addr, firstmask);
+	uint16_t lastmask = word << (16 - xoff);
+	WRITE_WORD_OR(buff, addr+1, firstmask & 0x00ff);
+	WRITE_WORD_OR(buff, addr, (firstmask & 0xff00) >> 8);
 	if(xoff > 0)
-	{
-		WRITE_WORD_OR(buff, addr + 1, lastmask);
-	}
+		WRITE_WORD_OR(buff, addr + 3, lastmask & 0x00ff);
+	if(xoff > 8)
+		WRITE_WORD_OR(buff, addr + 2, (lastmask & 0xff00) >> 8);
+
 }
 
 /**
@@ -1284,7 +1288,7 @@ void write_char16(char ch, unsigned int x, unsigned int y, int font)
 		row = ch * font_info.height;
 		row_temp = row;
 		addr_temp = addr;
-		xshift = 8 - font_info.width;
+		xshift = 16 - font_info.width;
 		// We can write mask words easily.
 		for(yy = y; yy < y + font_info.height; yy++)
 		{
@@ -1369,7 +1373,7 @@ void write_char(char ch, unsigned int x, unsigned int y, int flags, int font)
 		row = lookup * font_info.height * 2;
 		row_temp = row;
 		addr_temp = addr;
-		xshift = 8 - font_info.width;
+		xshift = 16 - font_info.width;
 		// We can write mask words easily.
 		for(yy = y; yy < y + font_info.height; yy++)
 		{

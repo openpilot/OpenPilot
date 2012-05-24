@@ -1,0 +1,12 @@
+<xml>
+    <object name="GuidanceStatus" singleinstance="true" settings="false">
+        <description>Object Storing Debugging Information on PID internals</description>
+	<field name="E" units="" type="float" elementnames="Course,Speed,Accel,Power" />
+	<field name="A" units="" type="float" elementnames="Course,Speed,Accel,Power" />
+	<field name="C" units="" type="float" elementnames="Course,Speed,Accel,Power" />
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetryflight acked="false" updatemode="periodic" period="500"/>
+        <logging updatemode="manual" period="0"/>
+    </object>
+</xml>

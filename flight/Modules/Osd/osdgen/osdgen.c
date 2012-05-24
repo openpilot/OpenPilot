@@ -190,10 +190,8 @@ uint16_t mirror(uint16_t source)
 }
 
 void clearGraphics() {
-	for (uint16_t x = 0; x < GRAPHICS_WIDTH*GRAPHICS_HEIGHT; ++x) {
-		  draw_buffer_level[x] = 0x0000;
-		  draw_buffer_mask[x] = 0x0000;
-	}
+	memset((uint8_t *) draw_buffer_mask, 0, GRAPHICS_WIDTH * GRAPHICS_HEIGHT * 2);
+	memset((uint8_t *) draw_buffer_level, 0, GRAPHICS_WIDTH * GRAPHICS_HEIGHT * 2);
 }
 
 void copyimage(uint16_t offsetx, uint16_t offsety, int image) {

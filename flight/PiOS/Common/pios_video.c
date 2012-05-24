@@ -85,20 +85,16 @@ static int16_t m_osdLines=0;
  */
 void swap_buffers()
 {
-        // While we could use XOR swap this is more reliable and
-        // dependable and it's only called a few times per second.
-        // Many compliers should optimise these to EXCH instructions.
-        uint16_t *tmp;
-        SWAP_BUFFS(tmp, disp_buffer_mask, draw_buffer_mask);
-        SWAP_BUFFS(tmp, disp_buffer_level, draw_buffer_level);
+	// While we could use XOR swap this is more reliable and
+	// dependable and it's only called a few times per second.
+	// Many compliers should optimise these to EXCH instructions.
+	uint16_t *tmp;
+	SWAP_BUFFS(tmp, disp_buffer_mask, draw_buffer_mask);
+	SWAP_BUFFS(tmp, disp_buffer_level, draw_buffer_level);
 }
-
-uint32_t counter_position = 0;
-uint32_t hsync_count, vsync_count;
 
 void PIOS_Hsync_ISR()
 {
-	hsync_count++;
 	// On tenth line prepare data which will start clocking out on 11th line
 	if(Vsync_update==10)
 	{
@@ -106,12 +102,9 @@ void PIOS_Hsync_ISR()
 		gActiveLine = 1;
 	}
 	Vsync_update++;
-	counter_position = DMA_GetCurrDataCounter(dev_cfg->level.dma.tx.channel);
 }
 
 void PIOS_Vsync_ISR() {
-	//GPIO_ResetBits(GPIOC, GPIO_Pin_11);
-	vsync_count++;
 	static portBASE_TYPE xHigherPriorityTaskWoken;
 	
     xHigherPriorityTaskWoken = pdFALSE;
@@ -157,6 +150,7 @@ const struct pios_tim_callbacks px_callback = {
 
 const uint32_t period = 11;
 const uint32_t dc = (11 / 2);
+
 /**
  * Reset the timer and configure for next call.  Keeps them synced.  Ideally this won't even be needed
  * since I don't think the slave mode gets lost, and this can simply be disable timer
@@ -178,7 +172,7 @@ static void reset_hsync_timers()
 			failcount++;
 	}
 
-	dev_cfg->pixel_timer.timer->CNT = dc;
+	dev_cfg->pixel_timer.timer->CNT = 0xFFFF - 100; //dc;
 
 	// Listen to Channel1 (HSYNC)
 	switch(dev_cfg->hsync_capture.timer_chan) {

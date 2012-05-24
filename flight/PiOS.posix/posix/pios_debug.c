@@ -72,11 +72,10 @@ void PIOS_DEBUG_PinValue4BitL(uint8_t value)
 /**
  * Report a serious error and halt
  */
-void PIOS_DEBUG_Panic(const char *msg) __attribute__ ((noreturn))
+void PIOS_DEBUG_Panic(const char *msg)
 {
-#ifdef PIOS_COM_DEBUG
-	register int *lr asm("lr");	// Link-register holds the PC of the caller
-	PIOS_COM_SendFormattedStringNonBlocking(PIOS_COM_DEBUG, "\r%s @0x%x\r", msg, lr);
+#ifdef PIOS_COM_AUX
+	PIOS_COM_SendFormattedStringNonBlocking(PIOS_COM_DEBUG, "\r%s\r", msg);
 #endif
 
 	// tell the user whats going on on commandline too

@@ -1,16 +1,21 @@
 /**
  ******************************************************************************
+ * @addtogroup OpenPilotSystem OpenPilot System
+ * @{
+ * @addtogroup OpenPilotCore OpenPilot Core
+ * @{
  *
- * @file       posix.h  
- * @author     Corvus Corax Copyright (C) 2010.
- * @brief      Definitions to run PiOS on posix
- * @see        The GNU Public License (GPL) Version 2
+ * @file       op_config.h  
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @brief      OpenPilot configuration header. 
+ *             Compile time config for OpenPilot Application
+ * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
 /* 
  * This program is free software; you can redistribute it and/or modify 
  * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 2 of the License, or 
+ * the Free Software Foundation; either version 3 of the License, or 
  * (at your option) any later version.
  * 
  * This program is distributed in the hope that it will be useful, but 
@@ -23,22 +28,12 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_POSIX_H
-#define PIOS_POSIX_H
 
-#include <stdint.h>
+#ifndef OP_CONFIG_H
+#define OP_CONFIG_H
 
-typedef enum {FALSE = 0, TRUE = !FALSE} bool;
-
-#ifndef false
-	#define false FALSE
-	#define true TRUE
-#endif
-
-//#define FILEINFO FILE*
-
-//#define PIOS_SERVO_NUM_OUTPUTS 8
-//#define PIOS_SERVO_NUM_TIMERS PIOS_SERVO_NUM_OUTPUTS
-
-#endif
-
+#endif /* OP_CONFIG_H */
+/**
+ * @}
+ * @}
+ */

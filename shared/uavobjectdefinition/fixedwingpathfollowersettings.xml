@@ -1,6 +1,6 @@
 <xml>
-    <object name="GuidanceSettings" singleinstance="true" settings="true">
-        <description>Settings for the @ref GuidanceModule</description>
+    <object name="FixedWingPathFollowerSettings" singleinstance="true" settings="true">
+        <description>Settings for the @ref FixedWingPathFollowerModule</description>
         <field name="GuidanceMode" units="" type="enum" elements="1" options="DUAL_LOOP,VELOCITY_CONTROL" defaultvalue="DUAL_LOOP"/>
         <field name="PathMode" units="" type="enum" elements="1" options="ENDPOINT,PATH" defaultvalue="ENDPOINT"/>
 	<field name="ReturnTobaseAltitudeOffset" units="m" type="float" elements="1" defaultvalue="75.0"/>

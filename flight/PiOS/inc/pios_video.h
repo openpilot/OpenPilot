@@ -85,7 +85,7 @@ extern void PIOS_Vsync_ISR();
 #define GRAPHICS_HEIGHT GRAPHICS_HEIGHT_REAL
 
 // dma lenght
-#define BUFFER_LINE_LENGTH         GRAPHICS_WIDTH  //Yes, in 16 bit halfwords.
+#define BUFFER_LINE_LENGTH         (GRAPHICS_WIDTH*2)  //Yes, in 16 bit halfwords.
 
 // line types
 #define LINE_TYPE_UNKNOWN 0

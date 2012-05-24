@@ -46,7 +46,6 @@
 #include "openpilot.h"
 #include "paths.h"
 
-#include "fixedwingpathfollower.h"
 #include "accels.h"
 #include "hwsettings.h"
 #include "attitudeactual.h"
@@ -81,7 +80,7 @@
 // Private variables
 static bool followerEnabled = false;
 static xTaskHandle pathfollowerTaskHandle;
-static xQueueHandle queue;
+static PathDesiredData pathDesired;
 static FixedWingPathFollowerSettingsData fixedwingpathfollowerSettings;
 
 // Private functions
@@ -90,7 +89,7 @@ static void SettingsUpdatedCb(UAVObjEvent * ev);
 static void updatePathVelocity();
 static void updateEndpointVelocity();
 static void updateFixedDesiredAttitude();
-static void updateFixedFixedAttitude();
+static void updateFixedAttitude();
 static void baroAirspeedUpdatedCb(UAVObjEvent * ev);
 static float bound(float val, float min, float max);
 
@@ -118,7 +117,7 @@ int32_t FixedWingPathFollowerInitialize()
 	HwSettingsInitialize();
 	uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
 	HwSettingsOptionalModulesGet(optionalModules);
-	if (optionalModules[HWSETTINGS_OPTIONALMODULES_VTOLPATHFOLLOWER] == HWSETTINGS_OPTIONALMODULES_ENABLED) {
+	if (optionalModules[HWSETTINGS_OPTIONALMODULES_FIXEDWINGPATHFOLLOWER] == HWSETTINGS_OPTIONALMODULES_ENABLED) {
 		followerEnabled = true;
 		FixedWingPathFollowerSettingsInitialize();
 		FixedWingPathFollowerStatusInitialize();
@@ -184,7 +183,7 @@ static void pathfollowerTask(void *parameters)
 		}
 
 		// Continue collecting data if not enough time
-		vTaskDelayUntil(&lastUpdateTime, vtolpathfollowerSettings.UpdatePeriod / portTICK_RATE_MS);
+		vTaskDelayUntil(&lastUpdateTime, fixedwingpathfollowerSettings.UpdatePeriod / portTICK_RATE_MS);
 
 		
 		FlightStatusGet(&flightStatus);
@@ -196,7 +195,7 @@ static void pathfollowerTask(void *parameters)
 			case FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE:
 				if (pathDesired.Mode == PATHDESIRED_MODE_FLYENDPOINT) {
 					updateEndpointVelocity();
-					updateVtolDesiredAttitude();
+					updateFixedDesiredAttitude();
 					AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_OK);
 				} else {
 					AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_ERROR);
@@ -206,7 +205,7 @@ static void pathfollowerTask(void *parameters)
 				pathStatus.UID = pathDesired.UID;
 				pathStatus.Status = PATHSTATUS_STATUS_INPROGRESS;
 				switch(pathDesired.Mode) {
-					// TODO: Make updateVtolDesiredAttitude and velocity report success and update PATHSTATUS_STATUS accordingly
+					// TODO: Make updateFixedDesiredAttitude and velocity report success and update PATHSTATUS_STATUS accordingly
 					case PATHDESIRED_MODE_FLYENDPOINT:
 						updateEndpointVelocity();
 						updateFixedDesiredAttitude();
@@ -253,7 +252,7 @@ static void pathfollowerTask(void *parameters)
  */
 static void updatePathVelocity()
 {
-	float dT = vtolpathfollowerSettings.UpdatePeriod / 1000.0f;
+	//float dT = fixedwingpathfollowerSettings.UpdatePeriod / 1000.0f;
 	float downCommand;
 
 	PositionActualData positionActual;
@@ -273,7 +272,7 @@ static void updatePathVelocity()
 	velocityDesired.North = progress.path_direction[0] * groundspeed;
 	velocityDesired.East = progress.path_direction[1] * groundspeed;
 	
-	float error_speed = progress.error * vtolpathfollowerSettings.HorizontalPosP;
+	float error_speed = progress.error * fixedwingpathfollowerSettings.HorizontalPosP;
 	float correction_velocity[2] = {progress.correction_direction[0] * error_speed, 
 	    progress.correction_direction[1] * error_speed};
 	
@@ -284,10 +283,10 @@ static void updatePathVelocity()
 
 	float total_vel = sqrtf(powf(correction_velocity[0],2) + powf(correction_velocity[1],2));
 	float scale = 1;
-	if(total_vel > vtolpathfollowerSettings.HorizontalVelMax)
-		scale = vtolpathfollowerSettings.HorizontalVelMax / total_vel;
-	if (total_vel < vtolpathfollowerSettings.HorizontalVelMin)
-		scale = vtolpathfollowerSettings.HorizontalVelMin / total_vel;
+	if(total_vel > fixedwingpathfollowerSettings.HorizontalVelMax)
+		scale = fixedwingpathfollowerSettings.HorizontalVelMax / total_vel;
+	if (total_vel < fixedwingpathfollowerSettings.HorizontalVelMin)
+		scale = fixedwingpathfollowerSettings.HorizontalVelMin / total_vel;
 
 	velocityDesired.North += progress.correction_direction[0] * error_speed * scale;
 	velocityDesired.East += progress.correction_direction[1] * error_speed * scale;
@@ -296,10 +295,10 @@ static void updatePathVelocity()
 	    bound(progress.fractional_progress,0,1);
 
 	float downError = altitudeSetpoint - positionActual.Down;
-	downCommand = downError * vtolpathfollowerSettings.VerticalPosP;
+	downCommand = downError * fixedwingpathfollowerSettings.VerticalPosP;
 	velocityDesired.Down = bound(downCommand,
-					 -vtolpathfollowerSettings.VerticalVelMax,
-					 vtolpathfollowerSettings.VerticalVelMax);
+					 -fixedwingpathfollowerSettings.VerticalVelMax,
+					 fixedwingpathfollowerSettings.VerticalVelMax);
 
 	VelocityDesiredSet(&velocityDesired);
 }
@@ -312,7 +311,7 @@ static void updatePathVelocity()
  */
 void updateEndpointVelocity()
 {
-	float dT = vtolpathfollowerSettings.UpdatePeriod / 1000.0f;
+	//float dT = fixedwingpathfollowerSettings.UpdatePeriod / 1000.0f;
 
 	PositionActualData positionActual;
 	VelocityDesiredData velocityDesired;
@@ -326,40 +325,35 @@ void updateEndpointVelocity()
 	float northCommand;
 	float eastCommand;
 	float downCommand;
-	
-	float northPos = 0, eastPos = 0, downPos = 0;
-	northPos = positionActual.North;
-	eastPos = positionActual.East;
-	downPos = positionActual.Down;
 
 	// Compute commands
 	northError = pathDesired.End[PATHDESIRED_END_NORTH] - positionActual.North;
-	northCommand = northError * vtolpathfollowerSettings.HorizontalPosP;
+	northCommand = northError * fixedwingpathfollowerSettings.HorizontalPosP;
 
-	eastError = pathDesired.End[PATHDESIRED_END_EAST] - eastPos;
-	eastCommand = eastError * vtolpathfollowerSettings.HorizontalPosP;
+	eastError = pathDesired.End[PATHDESIRED_END_EAST] - positionActual.East;
+	eastCommand = eastError * fixedwingpathfollowerSettings.HorizontalPosP;
 	
 	// prevent div by zero
 	if (fabsf(northCommand)+fabsf(eastCommand) <1e-6) {
-		nortCommand=1e-6;
+		northCommand=1e-6;
 	}
 	
 	// Limit the maximum velocity
 	float total_vel = sqrtf(powf(northCommand,2) + powf(eastCommand,2));
 	float scale = 1;
-	if(total_vel > vtolpathfollowerSettings.HorizontalVelMax)
-		scale = vtolpathfollowerSettings.HorizontalVelMax / total_vel;
-	if (total_vel < vtolpathfollowerSettings.HorizontalVelMin)
-		scale = vtolpathfollowerSettings.HorizontalVelMin / total_vel;
+	if(total_vel > fixedwingpathfollowerSettings.HorizontalVelMax)
+		scale = fixedwingpathfollowerSettings.HorizontalVelMax / total_vel;
+	if (total_vel < fixedwingpathfollowerSettings.HorizontalVelMin)
+		scale = fixedwingpathfollowerSettings.HorizontalVelMin / total_vel;
 
 	velocityDesired.North = northCommand * scale;
 	velocityDesired.East = eastCommand * scale;
 
-	downError = pathDesired.End[PATHDESIRED_END_DOWN] - downPos;
-	downCommand = downError * vtolpathfollowerSettings.VerticalPosP;
+	downError = pathDesired.End[PATHDESIRED_END_DOWN] - positionActual.Down;
+	downCommand = downError * fixedwingpathfollowerSettings.VerticalPosP;
 	velocityDesired.Down = bound(downCommand,
-				     -vtolpathfollowerSettings.VerticalVelMax, 
-				     vtolpathfollowerSettings.VerticalVelMax);
+				     -fixedwingpathfollowerSettings.VerticalVelMax, 
+				     fixedwingpathfollowerSettings.VerticalVelMax);
 	
 	VelocityDesiredSet(&velocityDesired);	
 }
@@ -391,7 +385,7 @@ static void updateFixedAttitude(float* attitude)
  */
 static void updateFixedDesiredAttitude()
 {
-	float dT = vtolpathfollowerSettings.UpdatePeriod / 1000.0f;
+	float dT = fixedwingpathfollowerSettings.UpdatePeriod / 1000.0f;
 
 	VelocityDesiredData velocityDesired;
 	VelocityActualData velocityActual;
@@ -436,89 +430,89 @@ static void updateFixedDesiredAttitude()
 	if (courseError<-180.0f) courseError+=360.0f;
 	if (courseError>180.0f) courseError-=360.0f;
 
-	courseIntegral = bound(courseIntegral + courseError * dT * fixedwingpathfollowerSettings.CoursePI[GUIDANCESETTINGS_COURSEPI_KI], 
-		-fixedwingpathfollowerSettings.CoursePI[GUIDANCESETTINGS_COURSEPI_ILIMIT],
-		fixedwingpathfollowerSettings.CoursePI[GUIDANCESETTINGS_COURSEPI_ILIMIT]);
-	courseCommand = (courseError * fixedwingpathfollowerSettings.CoursePI[GUIDANCESETTINGS_COURSEPI_KP] +
+	courseIntegral = bound(courseIntegral + courseError * dT * fixedwingpathfollowerSettings.CoursePI[FIXEDWINGPATHFOLLOWERSETTINGS_COURSEPI_KI], 
+		-fixedwingpathfollowerSettings.CoursePI[FIXEDWINGPATHFOLLOWERSETTINGS_COURSEPI_ILIMIT],
+		fixedwingpathfollowerSettings.CoursePI[FIXEDWINGPATHFOLLOWERSETTINGS_COURSEPI_ILIMIT]);
+	courseCommand = (courseError * fixedwingpathfollowerSettings.CoursePI[FIXEDWINGPATHFOLLOWERSETTINGS_COURSEPI_KP] +
 		courseIntegral);
 
-	fixedwingpathfollowerStatus.E[GUIDANCESTATUS_E_COURSE] = courseError;
-	fixedwingpathfollowerStatus.A[GUIDANCESTATUS_A_COURSE] = courseIntegral;
-	fixedwingpathfollowerStatus.C[GUIDANCESTATUS_C_COURSE] = courseCommand;
+	fixedwingpathfollowerStatus.E[FIXEDWINGPATHFOLLOWERSTATUS_E_COURSE] = courseError;
+	fixedwingpathfollowerStatus.A[FIXEDWINGPATHFOLLOWERSTATUS_A_COURSE] = courseIntegral;
+	fixedwingpathfollowerStatus.C[FIXEDWINGPATHFOLLOWERSTATUS_C_COURSE] = courseCommand;
 	
-	stabDesired.Roll = bound( fixedwingpathfollowerSettings.RollLimit[GUIDANCESETTINGS_ROLLLIMIT_NEUTRAL] +
+	stabDesired.Roll = bound( fixedwingpathfollowerSettings.RollLimit[FIXEDWINGPATHFOLLOWERSETTINGS_ROLLLIMIT_NEUTRAL] +
 		courseCommand,
-		fixedwingpathfollowerSettings.RollLimit[GUIDANCESETTINGS_ROLLLIMIT_MIN],
-		fixedwingpathfollowerSettings.RollLimit[GUIDANCESETTINGS_ROLLLIMIT_MAX] );
+		fixedwingpathfollowerSettings.RollLimit[FIXEDWINGPATHFOLLOWERSETTINGS_ROLLLIMIT_MIN],
+		fixedwingpathfollowerSettings.RollLimit[FIXEDWINGPATHFOLLOWERSETTINGS_ROLLLIMIT_MAX] );
 
 	// Compute desired yaw command
 	// TODO implement raw control mode for yaw and base on Accels.X
 	stabDesired.Yaw = 0;
 
-	// Compute desired speed command  TODO: make cruise speed a variable
-	speedDesired = fixedwingpathfollowerSettings.CruiseSpeed;
+	// Compute desired speed command  TODO: find out wind vector and compensate
+	speedDesired = sqrtf(velocityDesired.North*velocityDesired.North + velocityDesired.East*velocityDesired.East);
 	speedError = speedDesired - speedActual;
 
-	accelDesired = bound( speedError * fixedwingpathfollowerSettings.SpeedP[GUIDANCESETTINGS_SPEEDP_KP],
-		-fixedwingpathfollowerSettings.SpeedP[GUIDANCESETTINGS_SPEEDP_MAX],
-		fixedwingpathfollowerSettings.SpeedP[GUIDANCESETTINGS_SPEEDP_MAX]);
+	accelDesired = bound( speedError * fixedwingpathfollowerSettings.SpeedP[FIXEDWINGPATHFOLLOWERSETTINGS_SPEEDP_KP],
+		-fixedwingpathfollowerSettings.SpeedP[FIXEDWINGPATHFOLLOWERSETTINGS_SPEEDP_MAX],
+		fixedwingpathfollowerSettings.SpeedP[FIXEDWINGPATHFOLLOWERSETTINGS_SPEEDP_MAX]);
 	
-	fixedwingpathfollowerStatus.E[GUIDANCESTATUS_E_SPEED] = speedError;
-	fixedwingpathfollowerStatus.A[GUIDANCESTATUS_A_SPEED] = 0.0f;
-	fixedwingpathfollowerStatus.C[GUIDANCESTATUS_C_SPEED] = accelDesired;
+	fixedwingpathfollowerStatus.E[FIXEDWINGPATHFOLLOWERSTATUS_E_SPEED] = speedError;
+	fixedwingpathfollowerStatus.A[FIXEDWINGPATHFOLLOWERSTATUS_A_SPEED] = 0.0f;
+	fixedwingpathfollowerStatus.C[FIXEDWINGPATHFOLLOWERSTATUS_C_SPEED] = accelDesired;
 	
 	accelError = accelDesired - accels.x;
-	accelIntegral = bound(accelIntegral + accelError * dT * fixedwingpathfollowerSettings.AccelPI[GUIDANCESETTINGS_ACCELPI_KI], 
-		-fixedwingpathfollowerSettings.AccelPI[GUIDANCESETTINGS_ACCELPI_ILIMIT],
-		fixedwingpathfollowerSettings.AccelPI[GUIDANCESETTINGS_ACCELPI_ILIMIT]);
-	accelCommand = (accelError * fixedwingpathfollowerSettings.AccelPI[GUIDANCESETTINGS_ACCELPI_KP] + 
+	accelIntegral = bound(accelIntegral + accelError * dT * fixedwingpathfollowerSettings.AccelPI[FIXEDWINGPATHFOLLOWERSETTINGS_ACCELPI_KI], 
+		-fixedwingpathfollowerSettings.AccelPI[FIXEDWINGPATHFOLLOWERSETTINGS_ACCELPI_ILIMIT],
+		fixedwingpathfollowerSettings.AccelPI[FIXEDWINGPATHFOLLOWERSETTINGS_ACCELPI_ILIMIT]);
+	accelCommand = (accelError * fixedwingpathfollowerSettings.AccelPI[FIXEDWINGPATHFOLLOWERSETTINGS_ACCELPI_KP] + 
 		 accelIntegral);
 	
-	fixedwingpathfollowerStatus.E[GUIDANCESTATUS_E_ACCEL] = accelError;
-	fixedwingpathfollowerStatus.A[GUIDANCESTATUS_A_ACCEL] = accelIntegral;
-	fixedwingpathfollowerStatus.C[GUIDANCESTATUS_C_ACCEL] = accelCommand;
+	fixedwingpathfollowerStatus.E[FIXEDWINGPATHFOLLOWERSTATUS_E_ACCEL] = accelError;
+	fixedwingpathfollowerStatus.A[FIXEDWINGPATHFOLLOWERSTATUS_A_ACCEL] = accelIntegral;
+	fixedwingpathfollowerStatus.C[FIXEDWINGPATHFOLLOWERSTATUS_C_ACCEL] = accelCommand;
 
-	stabDesired.Pitch = bound(fixedwingpathfollowerSettings.PitchLimit[GUIDANCESETTINGS_PITCHLIMIT_NEUTRAL] +
+	stabDesired.Pitch = bound(fixedwingpathfollowerSettings.PitchLimit[FIXEDWINGPATHFOLLOWERSETTINGS_PITCHLIMIT_NEUTRAL] +
 		-accelCommand,
-		fixedwingpathfollowerSettings.PitchLimit[GUIDANCESETTINGS_PITCHLIMIT_MIN],
-		fixedwingpathfollowerSettings.PitchLimit[GUIDANCESETTINGS_PITCHLIMIT_MAX]);
+		fixedwingpathfollowerSettings.PitchLimit[FIXEDWINGPATHFOLLOWERSETTINGS_PITCHLIMIT_MIN],
+		fixedwingpathfollowerSettings.PitchLimit[FIXEDWINGPATHFOLLOWERSETTINGS_PITCHLIMIT_MAX]);
 
 	// Compute desired power command
 	powerError =  -( velocityDesired.Down - velocityActual.Down ) * fixedwingpathfollowerSettings.ClimbRateBoostFactor + speedError;
-	powerIntegral =	bound(powerIntegral + powerError * dT * fixedwingpathfollowerSettings.PowerPI[GUIDANCESETTINGS_POWERPI_KI], 
-		-fixedwingpathfollowerSettings.PowerPI[GUIDANCESETTINGS_POWERPI_ILIMIT],
-		fixedwingpathfollowerSettings.PowerPI[GUIDANCESETTINGS_POWERPI_ILIMIT]);
-	powerCommand = (powerError * fixedwingpathfollowerSettings.PowerPI[GUIDANCESETTINGS_POWERPI_KP] +
-		powerIntegral) + fixedwingpathfollowerSettings.ThrottleLimit[GUIDANCESETTINGS_THROTTLELIMIT_NEUTRAL];
+	powerIntegral =	bound(powerIntegral + powerError * dT * fixedwingpathfollowerSettings.PowerPI[FIXEDWINGPATHFOLLOWERSETTINGS_POWERPI_KI], 
+		-fixedwingpathfollowerSettings.PowerPI[FIXEDWINGPATHFOLLOWERSETTINGS_POWERPI_ILIMIT],
+		fixedwingpathfollowerSettings.PowerPI[FIXEDWINGPATHFOLLOWERSETTINGS_POWERPI_ILIMIT]);
+	powerCommand = (powerError * fixedwingpathfollowerSettings.PowerPI[FIXEDWINGPATHFOLLOWERSETTINGS_POWERPI_KP] +
+		powerIntegral) + fixedwingpathfollowerSettings.ThrottleLimit[FIXEDWINGPATHFOLLOWERSETTINGS_THROTTLELIMIT_NEUTRAL];
 
 	// prevent integral running out of bounds 
-	if ( powerCommand > fixedwingpathfollowerSettings.ThrottleLimit[GUIDANCESETTINGS_THROTTLELIMIT_MAX]) {
+	if ( powerCommand > fixedwingpathfollowerSettings.ThrottleLimit[FIXEDWINGPATHFOLLOWERSETTINGS_THROTTLELIMIT_MAX]) {
 		powerIntegral = bound(
 			powerIntegral -
 				( powerCommand 
-				- fixedwingpathfollowerSettings.ThrottleLimit[GUIDANCESETTINGS_THROTTLELIMIT_MAX]),
-			-fixedwingpathfollowerSettings.PowerPI[GUIDANCESETTINGS_POWERPI_ILIMIT],
-			fixedwingpathfollowerSettings.PowerPI[GUIDANCESETTINGS_POWERPI_ILIMIT]);
-		powerCommand = fixedwingpathfollowerSettings.ThrottleLimit[GUIDANCESETTINGS_THROTTLELIMIT_MAX];
+				- fixedwingpathfollowerSettings.ThrottleLimit[FIXEDWINGPATHFOLLOWERSETTINGS_THROTTLELIMIT_MAX]),
+			-fixedwingpathfollowerSettings.PowerPI[FIXEDWINGPATHFOLLOWERSETTINGS_POWERPI_ILIMIT],
+			fixedwingpathfollowerSettings.PowerPI[FIXEDWINGPATHFOLLOWERSETTINGS_POWERPI_ILIMIT]);
+		powerCommand = fixedwingpathfollowerSettings.ThrottleLimit[FIXEDWINGPATHFOLLOWERSETTINGS_THROTTLELIMIT_MAX];
 	}
-	if ( powerCommand < fixedwingpathfollowerSettings.ThrottleLimit[GUIDANCESETTINGS_THROTTLELIMIT_MIN]) {
+	if ( powerCommand < fixedwingpathfollowerSettings.ThrottleLimit[FIXEDWINGPATHFOLLOWERSETTINGS_THROTTLELIMIT_MIN]) {
 		powerIntegral = bound(
 			powerIntegral -
 				( powerCommand
-				- fixedwingpathfollowerSettings.ThrottleLimit[GUIDANCESETTINGS_THROTTLELIMIT_MIN]),
-			-fixedwingpathfollowerSettings.PowerPI[GUIDANCESETTINGS_POWERPI_ILIMIT],
-			fixedwingpathfollowerSettings.PowerPI[GUIDANCESETTINGS_POWERPI_ILIMIT]);
-		powerCommand = fixedwingpathfollowerSettings.ThrottleLimit[GUIDANCESETTINGS_THROTTLELIMIT_MIN];
+				- fixedwingpathfollowerSettings.ThrottleLimit[FIXEDWINGPATHFOLLOWERSETTINGS_THROTTLELIMIT_MIN]),
+			-fixedwingpathfollowerSettings.PowerPI[FIXEDWINGPATHFOLLOWERSETTINGS_POWERPI_ILIMIT],
+			fixedwingpathfollowerSettings.PowerPI[FIXEDWINGPATHFOLLOWERSETTINGS_POWERPI_ILIMIT]);
+		powerCommand = fixedwingpathfollowerSettings.ThrottleLimit[FIXEDWINGPATHFOLLOWERSETTINGS_THROTTLELIMIT_MIN];
 	}
 
-	fixedwingpathfollowerStatus.E[GUIDANCESTATUS_E_POWER] = powerError;
-	fixedwingpathfollowerStatus.A[GUIDANCESTATUS_A_POWER] = powerIntegral;
-	fixedwingpathfollowerStatus.C[GUIDANCESTATUS_C_POWER] = powerCommand;
+	fixedwingpathfollowerStatus.E[FIXEDWINGPATHFOLLOWERSTATUS_E_POWER] = powerError;
+	fixedwingpathfollowerStatus.A[FIXEDWINGPATHFOLLOWERSTATUS_A_POWER] = powerIntegral;
+	fixedwingpathfollowerStatus.C[FIXEDWINGPATHFOLLOWERSTATUS_C_POWER] = powerCommand;
 
 	// set throttle
 	stabDesired.Throttle = powerCommand;
 
-	if(fixedwingpathfollowerSettings.ThrottleControl == GUIDANCESETTINGS_THROTTLECONTROL_FALSE) {
+	if(fixedwingpathfollowerSettings.ThrottleControl == FIXEDWINGPATHFOLLOWERSETTINGS_THROTTLECONTROL_FALSE) {
 		// For now override throttle with manual control.  Disable at your risk, quad goes to China.
 		ManualControlCommandData manualControl;
 		ManualControlCommandGet(&manualControl);
@@ -528,7 +522,7 @@ static void updateFixedDesiredAttitude()
 
 	stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_ROLL] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
 	stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_PITCH] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
-	stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW] = STABILIZATIONDESIRED_STABILIZATIONMODE_MANUAL;
+	stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW] = STABILIZATIONDESIRED_STABILIZATIONMODE_NONE;
 	
 	StabilizationDesiredSet(&stabDesired);
 
@@ -551,7 +545,7 @@ static float bound(float val, float min, float max)
 
 static void SettingsUpdatedCb(UAVObjEvent * ev)
 {
-	VtolPathFollowerSettingsGet(&vtolpathfollowerSettings);
+	FixedWingPathFollowerSettingsGet(&fixedwingpathfollowerSettings);
 	PathDesiredGet(&pathDesired);
 }
 

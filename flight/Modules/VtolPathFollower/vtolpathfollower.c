@@ -51,7 +51,6 @@
 #include "hwsettings.h"
 #include "attitudeactual.h"
 #include "pathdesired.h"        // object that will be updated by the module
-#include "positiondesired.h"    // object that will be updated by the module
 #include "positionactual.h"
 #include "manualcontrol.h"
 #include "flightstatus.h"
@@ -88,7 +87,7 @@ static void SettingsUpdatedCb(UAVObjEvent * ev);
 static void updateNedAccel();
 static void updatePathVelocity();
 static void updateEndpointVelocity();
-static void updateVtolFixedAttitude(float* attitude);
+static void updateFixedAttitude(float* attitude);
 static void updateVtolDesiredAttitude();
 static float bound(float val, float min, float max);
 
@@ -100,7 +99,7 @@ int32_t VtolPathFollowerStart()
 {
 	if (followerEnabled) {
 		// Start main task
-		xTaskCreate(vtolPathFollowerTask, (signed char *)"VtolPathFollower", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &pathfollowerTaskHandle);
+		xTaskCreate(vtolPathFollowerTask, (signed char *)"PathFollower", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &pathfollowerTaskHandle);
 		TaskMonitorAdd(TASKINFO_RUNNING_PATHFOLLOWER, pathfollowerTaskHandle);
 	}
 
@@ -116,7 +115,7 @@ int32_t VtolPathFollowerInitialize()
 	HwSettingsInitialize();
 	uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
 	HwSettingsOptionalModulesGet(optionalModules);
-    if (optionalModules[HWSETTINGS_OPTIONALMODULES_VTOLPATHFOLLOWER] == HWSETTINGS_OPTIONALMODULES_ENABLED) {
+	if (optionalModules[HWSETTINGS_OPTIONALMODULES_VTOLPATHFOLLOWER] == HWSETTINGS_OPTIONALMODULES_ENABLED) {
 		followerEnabled = true;
 		VtolPathFollowerSettingsInitialize();
 		NedAccelInitialize();
@@ -197,6 +196,7 @@ static void vtolPathFollowerTask(void *parameters)
 		// Check the combinations of flightmode and pathdesired mode
 		switch(flightStatus.FlightMode) {
 			case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
+			case FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE:
 				if (pathDesired.Mode == PATHDESIRED_MODE_FLYENDPOINT) {
 					updateEndpointVelocity();
 					updateVtolDesiredAttitude();
@@ -221,7 +221,7 @@ static void vtolPathFollowerTask(void *parameters)
 						AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_OK);
 						break;
 					case PATHDESIRED_MODE_FIXEDATTITUDE:
-						updateVtolFixedAttitude(pathDesired.ModeParameters);
+						updateFixedAttitude(pathDesired.ModeParameters);
 						AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_OK);
 						break;
 					case PATHDESIRED_MODE_DISARMALARM:
@@ -391,7 +391,7 @@ void updateEndpointVelocity()
  * Compute desired attitude from a fixed preset
  *
  */
-static void updateVtolFixedAttitude(float* attitude)
+static void updateFixedAttitude(float* attitude)
 {
 	StabilizationDesiredData stabDesired;
 	StabilizationDesiredGet(&stabDesired);

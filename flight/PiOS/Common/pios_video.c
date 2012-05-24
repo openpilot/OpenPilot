@@ -101,10 +101,6 @@ void PIOS_Hsync_ISR() {
 			//PIOS_LED_On(LED2);
 			if(gLineType == LINE_TYPE_GRAPHICS)
 			{
-				for(int g=0;g<95;g++)
-				{
-					asm("nop");
-				}
 				// Activate new line
 				DMA_Cmd(dev_cfg->level.dma.tx.channel, ENABLE);
 				DMA_Cmd(dev_cfg->mask.dma.tx.channel, ENABLE);
@@ -183,12 +179,10 @@ void PIOS_Video_Init(const struct pios_video_cfg * cfg){
 	if (cfg->level.remap)
 	{
 		GPIO_PinAFConfig(cfg->level.sclk.gpio,
-				GPIO_PinSource3,
-				//__builtin_ctz(cfg->mask.sclk.init.GPIO_Pin),
+				__builtin_ctz(cfg->level.sclk.init.GPIO_Pin),
 				cfg->level.remap);
 		GPIO_PinAFConfig(cfg->level.miso.gpio,
-				GPIO_PinSource4,
-				//__builtin_ctz(cfg->level.miso.init.GPIO_Pin),
+				__builtin_ctz(cfg->level.miso.init.GPIO_Pin),
 				cfg->level.remap);
 	}
 
@@ -243,6 +237,61 @@ void PIOS_Video_Init(const struct pios_video_cfg * cfg){
     draw_buffer_mask = buffer0_mask;
     disp_buffer_level = buffer1_level;
     disp_buffer_mask = buffer1_mask;
+}
+
+
+/**
+ * @brief Interrupt for half and full buffer transfer
+ *
+ * This interrupt handler swaps between the two halfs of the double buffer to make
+ * sure the ahrs uses the most recent data.  Only swaps data when AHRS is idle, but
+ * really this is a pretense of a sanity check since the DMA engine is consantly
+ * running in the background.  Keep an eye on the ekf_too_slow variable to make sure
+ * it's keeping up.
+ */
+
+void PIOS_VIDEO_DMA_Handler(void);
+void DMA1_Stream7_IRQHandler(void) __attribute__ ((alias("PIOS_VIDEO_DMA_Handler")));
+void DMA2_Stream5_IRQHandler(void) __attribute__ ((alias("PIOS_VIDEO_DMA_Handler")));
+
+
+void PIOS_VIDEO_DMA_Handler(void)
+{
+	if (DMA_GetFlagStatus(DMA1_Stream7,DMA_FLAG_TCIF7)) {	// transfer completed load next line
+		DMA_ClearFlag(DMA1_Stream7,DMA_FLAG_TCIF7);
+		//PIOS_LED_Off(LED2);
+		/*if(gLineType == LINE_TYPE_GRAPHICS)
+		{
+			// Load new line
+			DMA_Cmd(dev_cfg->mask.dma.tx.channel, DISABLE);
+			DMA_Cmd(dev_cfg->level.dma.tx.channel, DISABLE);
+			DMA_MemoryTargetConfig(dev_cfg->level.dma.tx.channel,(uint32_t)&disp_buffer_level[line],DMA_Memory_0);
+			DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[line],DMA_Memory_0);
+			//DMA_ClearFlag(dev_cfg->mask.dma.tx.channel,DMA_FLAG_TCIF5); // <-- TODO: HARDCODED
+			//DMA_ClearFlag(dev_cfg->level.dma.tx.channel,DMA_FLAG_TCIF5); // <-- TODO: HARDCODED
+			DMA_SetCurrDataCounter(dev_cfg->level.dma.tx.channel,BUFFER_LINE_LENGTH);
+			DMA_SetCurrDataCounter(dev_cfg->mask.dma.tx.channel,BUFFER_LINE_LENGTH);
+		}*/
+		//PIOS_LED_Toggle(LED2);
+	}
+	else if (DMA_GetFlagStatus(DMA1_Stream7,DMA_FLAG_HTIF7)) {
+		DMA_ClearFlag(DMA1_Stream7,DMA_FLAG_HTIF7);
+	}
+	else {
+
+	}
+
+	if (DMA_GetFlagStatus(DMA2_Stream5,DMA_FLAG_TCIF5)) {	// whole double buffer filled
+		DMA_ClearFlag(DMA2_Stream5,DMA_FLAG_TCIF5);
+		//PIOS_LED_Toggle(LED3);
+	}
+	else if (DMA_GetFlagStatus(DMA2_Stream5,DMA_FLAG_HTIF5)) {
+		DMA_ClearFlag(DMA2_Stream5,DMA_FLAG_HTIF5);
+	}
+	else {
+
+	}
+
 }
 
 

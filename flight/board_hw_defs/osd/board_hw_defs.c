@@ -363,7 +363,6 @@ const struct pios_usb_cdc_cfg pios_usb_cdc_cfg = {
 #include <pios_video.h>
 static const struct pios_exti_cfg pios_exti_hsync_cfg __exti_config = {
 	.vector = PIOS_Hsync_ISR,
-	.line = EXTI_Line7,
 	.line = EXTI_Line2,
 	.pin = {
 		.gpio = GPIOD,
@@ -378,7 +377,7 @@ static const struct pios_exti_cfg pios_exti_hsync_cfg __exti_config = {
 	.irq = {
 		.init = {
 			.NVIC_IRQChannel = EXTI2_IRQn,
-			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGHEST,
+			.NVIC_IRQChannelPreemptionPriority = 0,
 			.NVIC_IRQChannelSubPriority = 0,
 			.NVIC_IRQChannelCmd = ENABLE,
 		},
@@ -446,32 +445,13 @@ static const struct pios_video_cfg pios_video_cfg = {
 				.flags = (DMA_IT_TCIF7),
 				.init = {
 					.NVIC_IRQChannel = DMA1_Stream7_IRQn,
-					.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+					.NVIC_IRQChannelPreemptionPriority = 0,
 					.NVIC_IRQChannelSubPriority = 0,
 					.NVIC_IRQChannelCmd = ENABLE,
 				},
 			},
 
-			.rx = {
-				//not used
-				.channel = DMA1_Stream4,
-				.init = {
-					.DMA_Channel            = DMA_Channel_0,
-					.DMA_PeripheralBaseAddr = (uint32_t) & (SPI3->DR),
-					.DMA_DIR                = DMA_DIR_PeripheralToMemory,
-					.DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
-					.DMA_MemoryInc          = DMA_MemoryInc_Enable,
-					.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord,
-					.DMA_MemoryDataSize     = DMA_MemoryDataSize_HalfWord,
-					.DMA_Mode               = DMA_Mode_Normal,
-					.DMA_Priority           = DMA_Priority_Medium,
-					//TODO: Enable FIFO
-					.DMA_FIFOMode           = DMA_FIFOMode_Disable,
-					.DMA_FIFOThreshold      = DMA_FIFOThreshold_Full,
-					.DMA_MemoryBurst        = DMA_MemoryBurst_Single,
-					.DMA_PeripheralBurst    = DMA_PeripheralBurst_Single,
-				},
-			},
+			.rx = {},
 			.tx = {
 				.channel = DMA1_Stream7,
 				.init = {
@@ -482,9 +462,9 @@ static const struct pios_video_cfg pios_video_cfg = {
 					.DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
 					.DMA_MemoryInc          = DMA_MemoryInc_Enable,
 					.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte,
-					.DMA_MemoryDataSize     = DMA_MemoryDataSize_HalfWord,
+					.DMA_MemoryDataSize     = DMA_MemoryDataSize_Word,
 					.DMA_Mode               = DMA_Mode_Normal,
-					.DMA_Priority           = DMA_Priority_High,
+					.DMA_Priority           = DMA_Priority_VeryHigh,
 					.DMA_FIFOMode           = DMA_FIFOMode_Disable,
 					.DMA_FIFOThreshold      = DMA_FIFOThreshold_Full,
 					.DMA_MemoryBurst        = DMA_MemoryBurst_Single,
@@ -550,25 +530,7 @@ static const struct pios_video_cfg pios_video_cfg = {
 					},
 				},
 
-				.rx = {
-					//not used
-					.channel = DMA2_Stream0,
-					.init    = {
-		                .DMA_Channel            = DMA_Channel_3,
-						.DMA_PeripheralBaseAddr = (uint32_t)&(SPI1->DR),
-						.DMA_DIR                = DMA_DIR_PeripheralToMemory,
-						.DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
-						.DMA_MemoryInc          = DMA_MemoryInc_Enable,
-						.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte,
-						.DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte,
-						.DMA_Mode               = DMA_Mode_Normal,
-						.DMA_Priority           = DMA_Priority_Medium,
-						.DMA_FIFOMode           = DMA_FIFOMode_Disable,
-		                /* .DMA_FIFOThreshold */
-		                .DMA_MemoryBurst        = DMA_MemoryBurst_Single,
-		                .DMA_PeripheralBurst    = DMA_PeripheralBurst_Single,
-					},
-				},
+				.rx = {},
 				.tx = {
 					.channel = DMA2_Stream5,
 					.init    = {
@@ -579,9 +541,9 @@ static const struct pios_video_cfg pios_video_cfg = {
 						.DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
 						.DMA_MemoryInc          = DMA_MemoryInc_Enable,
 						.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte,
-						.DMA_MemoryDataSize     = DMA_MemoryDataSize_HalfWord,
+						.DMA_MemoryDataSize     = DMA_MemoryDataSize_Word,
 						.DMA_Mode               = DMA_Mode_Normal,
-						.DMA_Priority           = DMA_Priority_High,
+						.DMA_Priority           = DMA_Priority_VeryHigh,
 						.DMA_FIFOMode           = DMA_FIFOMode_Disable,
 						.DMA_FIFOThreshold      = DMA_FIFOThreshold_Full,
 		                .DMA_MemoryBurst        = DMA_MemoryBurst_Single,
@@ -629,46 +591,6 @@ static const struct pios_video_cfg pios_video_cfg = {
 };
 
 
-
-
-void PIOS_VIDEO_DMA_Handler(void);
-void DMA1_Stream7_IRQHandler(void) __attribute__ ((alias("PIOS_VIDEO_DMA_Handler")));
-void DMA2_Stream5_IRQHandler(void) __attribute__ ((alias("PIOS_VIDEO_DMA_Handler")));
-
-/**
- * @brief Interrupt for half and full buffer transfer
- *
- * This interrupt handler swaps between the two halfs of the double buffer to make
- * sure the ahrs uses the most recent data.  Only swaps data when AHRS is idle, but
- * really this is a pretense of a sanity check since the DMA engine is consantly
- * running in the background.  Keep an eye on the ekf_too_slow variable to make sure
- * it's keeping up.
- */
-void PIOS_VIDEO_DMA_Handler(void)
-{
-	if (DMA_GetFlagStatus(DMA1_Stream7,DMA_FLAG_TCIF7)) {	// whole double buffer filled
-		DMA_ClearFlag(DMA1_Stream7,DMA_FLAG_TCIF7);
-		//PIOS_LED_Toggle(LED2);
-	}
-	else if (DMA_GetFlagStatus(DMA1_Stream7,DMA_FLAG_HTIF7)) {
-		DMA_ClearFlag(DMA1_Stream7,DMA_FLAG_HTIF7);
-	}
-	else {
-
-	}
-
-	if (DMA_GetFlagStatus(DMA2_Stream5,DMA_FLAG_TCIF5)) {	// whole double buffer filled
-		DMA_ClearFlag(DMA2_Stream5,DMA_FLAG_TCIF5);
-		//PIOS_LED_Toggle(LED3);
-	}
-	else if (DMA_GetFlagStatus(DMA2_Stream5,DMA_FLAG_HTIF5)) {
-		DMA_ClearFlag(DMA2_Stream5,DMA_FLAG_HTIF5);
-	}
-	else {
-
-	}
-
-}
 
 #endif
 

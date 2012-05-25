@@ -142,7 +142,7 @@ void ScopeGadgetWidget::mouseMoveEvent(QMouseEvent *e)
 
 void ScopeGadgetWidget::wheelEvent(QWheelEvent *e)
 {
-	QwtPlot::wheelEvent(e);
+    QwtPlot::wheelEvent(e);
 }
 
 /**
@@ -269,9 +269,9 @@ void ScopeGadgetWidget::showCurve(QwtPlotItem *item, bool on)
 	mutex.unlock();
 }
 
-void ScopeGadgetWidget::setupSequencialPlot()
+void ScopeGadgetWidget::setupSequentialPlot()
 {
-    preparePlot(SequencialPlot);
+    preparePlot(SequentialPlot);
 
 //	QwtText title("Index");
 ////	title.setFont(QFont("Helvetica", 20));
@@ -352,12 +352,12 @@ void ScopeGadgetWidget::setupChronoPlot()
 //	scaleWidget->setMinBorderDist(0, fmw);
 }
 
-void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavFieldSubField, int scaleOrderFactor, int interpolationSamples, QPen pen)
+void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavFieldSubField, int scaleOrderFactor, int meanSamples, QString mathFunction, QPen pen)
 {
     PlotData* plotData;
 
-    if (m_plotType == SequencialPlot)
-        plotData = new SequencialPlotData(uavObject, uavFieldSubField);
+    if (m_plotType == SequentialPlot)
+        plotData = new SequentialPlotData(uavObject, uavFieldSubField);
     else if (m_plotType == ChronoPlot)
         plotData = new ChronoPlotData(uavObject, uavFieldSubField);
     //else if (m_plotType == UAVObjectPlot)
@@ -365,7 +365,8 @@ void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavFieldSubField
 
     plotData->m_xWindowSize = m_xWindowSize;
     plotData->scalePower = scaleOrderFactor;
-    plotData->interpolationSamples = interpolationSamples;
+    plotData->meanSamples = meanSamples;
+    plotData->mathFunction = mathFunction;
 
     //If the y-bounds are supplied, set them
     if (plotData->yMinimum != plotData->yMaximum)
@@ -471,7 +472,7 @@ void ScopeGadgetWidget::replotNewData()
 
 void ScopeGadgetWidget::setupExamplePlot()
 {
-    preparePlot(SequencialPlot);
+    preparePlot(SequentialPlot);
 
     // Show the axes
 

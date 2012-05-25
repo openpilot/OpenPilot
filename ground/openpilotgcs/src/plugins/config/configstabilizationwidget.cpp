@@ -53,7 +53,7 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
 
     connect(this,SIGNAL(widgetContentsChanged(QWidget*)),this,SLOT(processLinkedWidgets(QWidget*)));
 
-    disbleMouseWheelEvents();
+    disableMouseWheelEvents();
 }
 
 

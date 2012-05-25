@@ -1,9 +1,13 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup PIOS_DELAY Delay Functions
+ * @brief PiOS Delay functionality
+ * @{
  *
  * @file       pios_settings.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * 	       Parts by Thorsten Klose (tk@midibox.org)
  * @brief      Settings functions header 
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -27,11 +31,18 @@
 #ifndef PIOS_DELAY_H
 #define PIOS_DELAY_H
 
-
 /* Public Functions */
 extern int32_t PIOS_DELAY_Init(void);
-extern int32_t PIOS_DELAY_WaituS(uint16_t uS);
-extern int32_t PIOS_DELAY_WaitmS(uint16_t mS);
-
+extern int32_t PIOS_DELAY_WaituS(uint32_t uS);
+extern int32_t PIOS_DELAY_WaitmS(uint32_t mS);
+extern uint32_t PIOS_DELAY_GetuS();
+extern uint32_t PIOS_DELAY_GetuSSince(uint32_t t);
+extern uint32_t PIOS_DELAY_GetRaw();
+extern uint32_t PIOS_DELAY_DiffuS(uint32_t raw);
 
 #endif /* PIOS_DELAY_H */
+
+/**
+  * @}
+  * @}
+  */

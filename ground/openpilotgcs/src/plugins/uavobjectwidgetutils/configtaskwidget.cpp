@@ -1171,7 +1171,7 @@ void ConfigTaskWidget::loadWidgetLimits(QWidget * widget,UAVObjectField * field,
     }
 }
 
-void ConfigTaskWidget::disbleMouseWheelEvents()
+void ConfigTaskWidget::disableMouseWheelEvents()
 {
     //Disable mouse wheel events
     foreach( QSpinBox * sp, findChildren<QSpinBox*>() ) {
@@ -1183,12 +1183,17 @@ void ConfigTaskWidget::disbleMouseWheelEvents()
     foreach( QSlider * sp, findChildren<QSlider*>() ) {
         sp->installEventFilter( this );
     }
+    foreach( QComboBox * sp, findChildren<QComboBox*>() ) {
+        sp->installEventFilter( this );
+    }
 }
 
 bool ConfigTaskWidget::eventFilter( QObject * obj, QEvent * evt ) {
     //Filter all wheel events, and ignore them
     if ( evt->type() == QEvent::Wheel &&
-         (qobject_cast<QAbstractSpinBox*>( obj ) || qobject_cast<QAbstractSlider*>( obj ) ))
+         (qobject_cast<QAbstractSpinBox*>( obj ) ||
+          qobject_cast<QComboBox*>( obj ) ||
+          qobject_cast<QAbstractSlider*>( obj ) ))
     {
         evt->ignore();
         return true;

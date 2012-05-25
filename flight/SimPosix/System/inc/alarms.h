@@ -1,9 +1,12 @@
 /**
  ******************************************************************************
- *
- * @file       pios_board.c
+ * @addtogroup OpenPilotSystem OpenPilot System
+ * @{
+ * @addtogroup OpenPilotLibraries OpenPilot System Libraries
+ * @{
+ * @file       alarms.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Defines board specific static initializers for hardware for the PipBee board.
+ * @brief      Include file of the alarm library
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -22,37 +25,26 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+#ifndef ALARMS_H
+#define ALARMS_H
 
-/* Pull in the board-specific static HW definitions.
- * Including .c files is a bit ugly but this allows all of
- * the HW definitions to be const and static to limit their
- * scope.  
- *
- * NOTE: THIS IS THE ONLY PLACE THAT SHOULD EVER INCLUDE THIS FILE
+#include "systemalarms.h"
+#define SYSTEMALARMS_ALARM_DEFAULT SYSTEMALARMS_ALARM_UNINITIALISED
+
+int32_t AlarmsInitialize(void);
+int32_t AlarmsSet(SystemAlarmsAlarmElem alarm, SystemAlarmsAlarmOptions severity);
+SystemAlarmsAlarmOptions AlarmsGet(SystemAlarmsAlarmElem alarm);
+int32_t AlarmsDefault(SystemAlarmsAlarmElem alarm);
+void AlarmsDefaultAll();
+int32_t AlarmsClear(SystemAlarmsAlarmElem alarm);
+void AlarmsClearAll();
+int32_t AlarmsHasWarnings();
+int32_t AlarmsHasErrors();
+int32_t AlarmsHasCritical();
+
+#endif // ALARMS_H
+
+/**
+ * @}
+ * @}
  */
-#include "board_hw_defs.c"
-
-#include <pios.h>
-
-void PIOS_Board_Init(void) {
-	const struct pios_board_info * bdinfo = &pios_board_info_blob;
-
-	/* Enable Prefetch Buffer */
-	FLASH_PrefetchBufferCmd(FLASH_PrefetchBuffer_Enable);
-
-	/* Flash 2 wait state */
-	FLASH_SetLatency(FLASH_Latency_2);
-
-	/* Delay system */
-	PIOS_DELAY_Init();
-
-	/* LEDs */
-#if defined(PIOS_INCLUDE_LED)
-	const struct pios_led_cfg * led_cfg = PIOS_BOARD_HW_DEFS_GetLedCfg(bdinfo->board_rev);
-	PIOS_Assert(led_cfg);
-	PIOS_LED_Init(led_cfg);
-#endif	/* PIOS_INCLUDE_LED */
-
-	/* Initialize the PiOS library */
-	PIOS_GPIO_Init();
-}

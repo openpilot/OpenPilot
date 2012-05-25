@@ -224,14 +224,14 @@ extern uint32_t pios_ppm_rcvr_id;
 //------------------------
 #define PIOS_RCVR_MAX_DEVS          3
 #define PIOS_RCVR_MAX_CHANNELS      12
-#define PIOS_GCSRCVR_TIMEOUT_MS     100
+#define PIOS_GCSRCVR_TIMEOUT_MS     200
 
 //-------------------------
 // Receiver PPM input
 //-------------------------
 #define PIOS_PPM_MAX_DEVS     1
 #define PIOS_PPM_NUM_INPUTS   12
-#define PIOS_PPM_PACKET_UPDATE_PERIOD_MS 25
+#define PIOS_PPM_PACKET_UPDATE_PERIOD_MS 80
 
 //-------------------------
 // Servo outputs

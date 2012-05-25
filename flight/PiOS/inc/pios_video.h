@@ -62,7 +62,7 @@ typedef struct {
   uint8_t hour;
 } TTime;
 
-extern TTime time;
+extern TTime timex;
 
 extern void PIOS_Video_Init(const struct pios_video_cfg * cfg);
 uint16_t PIOS_Video_GetOSDLines(void);
@@ -72,9 +72,20 @@ extern void PIOS_Vsync_ISR();
 // First OSD line
 #define GRAPHICS_LINE 32
 
+//top/left deadband
+#define GRAPHICS_HDEADBAND 32
+#define GRAPHICS_VDEADBAND 0
+
 // Real OSD size
-#define GRAPHICS_WIDTH_REAL 360
-#define GRAPHICS_HEIGHT_REAL 270
+#define GRAPHICS_WIDTH_REAL (336+GRAPHICS_HDEADBAND)
+#define GRAPHICS_HEIGHT_REAL (270+GRAPHICS_VDEADBAND)
+
+//draw area
+#define GRAPHICS_TOP 0
+#define GRAPHICS_LEFT 0
+#define GRAPHICS_BOTTOM (GRAPHICS_HEIGHT_REAL-GRAPHICS_VDEADBAND-1)
+#define GRAPHICS_RIGHT (GRAPHICS_WIDTH_REAL-GRAPHICS_HDEADBAND-1)
+
 
 #define GRAPHICS_WIDTH (GRAPHICS_WIDTH_REAL/8)
 #define GRAPHICS_HEIGHT GRAPHICS_HEIGHT_REAL

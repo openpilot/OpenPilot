@@ -48,7 +48,9 @@ SECTIONS
     } > FLASH
     .ARM.exidx :
     {
+    	__exidx_start = .;
         *(.ARM.exidx* .gnu.linkonce.armexidx.*)
+        __exidx_end = .;
     } > FLASH
 
 	/*
@@ -108,7 +110,6 @@ SECTIONS
 	    PROVIDE ( _end = _ebss ) ;    
     } > SRAM
 
-	/*PROVIDE(__HEAP_START = _end );*/
 	/*
 	 * The heap consumes the remainder of the SRAM.
 	 */

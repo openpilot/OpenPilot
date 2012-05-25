@@ -683,17 +683,17 @@ static void Clock(uint32_t spektrum_id) {
 	++supv_timer;
 	if(supv_timer >= 625) {
 		supv_timer = 0;
-		time.sec++;
+		timex.sec++;
 	}
-	if (time.sec >= 60) {
-		time.sec = 0;
-		time.min++;
+	if (timex.sec >= 60) {
+		timex.sec = 0;
+		timex.min++;
 	}
-	if (time.min >= 60) {
-		time.min = 0;
-		time.hour++;
+	if (timex.min >= 60) {
+		timex.min = 0;
+		timex.hour++;
 	}
-	if (time.hour >= 99) {
-		time.hour = 0;
+	if (timex.hour >= 99) {
+		timex.hour = 0;
 	}
 }

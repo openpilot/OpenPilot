@@ -16,15 +16,12 @@ int32_t osdgenInitialize(void);
 // Size of an array (num items.)
 #define SIZEOF_ARRAY(x) (sizeof(x) / sizeof((x)[0]))
 
-
-#define DISP_HEIGHT GRAPHICS_HEIGHT_REAL
-#define DISP_WIDTH GRAPHICS_WIDTH_REAL
 #define HUD_VSCALE_FLAG_CLEAR                   1
 #define HUD_VSCALE_FLAG_NO_NEGATIVE             2
 
 // Macros for computing addresses and bit positions.
 // NOTE: /16 in y is because we are addressing by word not byte.
-#define CALC_BUFF_ADDR(x, y)    (((x) / 8) + ((y) * (DISP_WIDTH / 8)))
+#define CALC_BUFF_ADDR(x, y)    (((x) / 8) + ((y) * (GRAPHICS_WIDTH_REAL / 8)))
 #define CALC_BIT_IN_WORD(x)             ((x) & 7)
 #define DEBUG_DELAY
 // Macro for writing a word with a mode (NAND = clear, OR = set, XOR = toggle)
@@ -108,14 +105,19 @@ struct FontDimensions
 #define MAX3(a, b, c)   MAX(a, MAX(b, c))
 #define MIN3(a, b, c)   MIN(a, MIN(b, c))
 
+// Apply DeadBand
+#define APPLY_DEADBAND(x, y) { x = (x)+GRAPHICS_HDEADBAND; y=(y)+GRAPHICS_VDEADBAND; }
+#define APPLY_VDEADBAND(y) ((y)+GRAPHICS_VDEADBAND)
+#define APPLY_HDEADBAND(x) ((x)+GRAPHICS_HDEADBAND)
+
 // Check if coordinates are valid. If not, return.
-#define CHECK_COORDS(x, y) if(x < 0 || x >= DISP_WIDTH || y < 0 || y >= DISP_HEIGHT) return;
-#define CHECK_COORD_X(x) if(x < 0 || x >= DISP_WIDTH) return;
-#define CHECK_COORD_Y(y) if(y < 0 || y >= DISP_HEIGHT) return;
+#define CHECK_COORDS(x, y) if(x < 0 || x >= GRAPHICS_WIDTH_REAL || y < 0 || y >= GRAPHICS_HEIGHT_REAL) return;
+#define CHECK_COORD_X(x) if(x < 0 || x >= GRAPHICS_WIDTH_REAL) return;
+#define CHECK_COORD_Y(y) if(y < 0 || y >= GRAPHICS_HEIGHT_REAL) return;
 
 // Clip coordinates out of range.
-#define CLIP_COORD_X(x) { x = MAX(0, MIN(x, DISP_WIDTH)); }
-#define CLIP_COORD_Y(y) { y = MAX(0, MIN(y, DISP_HEIGHT)); }
+#define CLIP_COORD_X(x) { x = MAX(0, MIN(x, GRAPHICS_WIDTH_REAL)); }
+#define CLIP_COORD_Y(y) { y = MAX(0, MIN(y, GRAPHICS_HEIGHT_REAL)); }
 #define CLIP_COORDS(x, y) { CLIP_COORD_X(x); CLIP_COORD_Y(y); }
 
 // Macro to swap two variables using XOR swap.
@@ -124,7 +126,6 @@ struct FontDimensions
 
 // Line triggering
 #define LAST_LINE 312 //625/2 //PAL
-#define UPDATE_LINE GRAPHICS_LINE+GRAPHICS_HEIGHT_REAL+1
 //#define LAST_LINE 525/2 //NTSC
 
 // Global vars

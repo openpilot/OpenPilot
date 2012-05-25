@@ -108,7 +108,7 @@ SECTIONS
 	    PROVIDE ( _end = _ebss ) ;    
     } > SRAM
 
-	PROVIDE(__HEAP_START = _end );
+	PROVIDE(__HEAP_START = _ebss );
 	/*
 	 * The heap consumes the remainder of the SRAM.
 	 */

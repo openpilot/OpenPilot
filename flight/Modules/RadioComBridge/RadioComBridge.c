@@ -175,7 +175,7 @@ static int32_t RadioComBridgeStart(void)
 		if(PIOS_COM_TRANS_COM)
 			PIOS_WDG_RegisterFlag(PIOS_WDG_TRANSCOMM);
 		PIOS_WDG_RegisterFlag(PIOS_WDG_RADIORECEIVE);
-		PIOS_WDG_RegisterFlag(PIOS_WDG_SENDPACKET);
+		//PIOS_WDG_RegisterFlag(PIOS_WDG_SENDPACKET);
 		//PIOS_WDG_RegisterFlag(PIOS_WDG_SENDDATA);
 		if(PIOS_PPM_RECEIVER)
 			PIOS_WDG_RegisterFlag(PIOS_WDG_PPMINPUT);
@@ -527,7 +527,7 @@ static void sendPacketTask(void *parameters)
 	while (1) {
 #ifdef PIOS_INCLUDE_WDG
 		// Update the watchdog timer.
-		PIOS_WDG_UpdateFlag(PIOS_WDG_SENDPACKET);
+		//PIOS_WDG_UpdateFlag(PIOS_WDG_SENDPACKET);
 #endif /* PIOS_INCLUDE_WDG */
 		// Wait for a packet on the queue.
 		if (xQueueReceive(data->sendPacketQueue, &p, MAX_PORT_DELAY) == pdTRUE) {

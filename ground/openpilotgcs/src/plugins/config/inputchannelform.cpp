@@ -37,7 +37,7 @@ inputChannelForm::inputChannelForm(QWidget *parent,bool showlegend) :
     connect(ui->channelNumberDropdown,SIGNAL(currentIndexChanged(int)),this,SLOT(channelDropdownUpdated(int)));
     connect(ui->channelNumber,SIGNAL(valueChanged(int)),this,SLOT(channelNumberUpdated(int)));
 
-    disbleMouseWheelEvents();
+    disableMouseWheelEvents();
 }
 
 

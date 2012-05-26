@@ -233,7 +233,7 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
     setupGroundVehicleUI( m_aircraft->groundVehicleType->currentText() );
     setupFixedWingUI( m_aircraft->fixedWingType->currentText() );
 	
-    disbleMouseWheelEvents();
+    disableMouseWheelEvents();
 }
 
 
@@ -525,7 +525,7 @@ void ConfigVehicleTypeWidget::updateCustomThrottle2CurveValue(QList<double> list
 /**
   Refreshes the current value of the SystemSettings which holds the aircraft type
   */
-void ConfigVehicleTypeWidget::refreshWidgetsValues()
+void ConfigVehicleTypeWidget::refreshWidgetsValues(UAVObject *)
 {
     if(!allObjectsUpdated())
         return;

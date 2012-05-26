@@ -44,7 +44,8 @@
 #include "attitudeactual.h"
 #include "gpsposition.h"
 #include "homelocation.h"
-#include "attituderaw.h"
+#include "accels.h"
+#include "gyros.h"
 #include "gcstelemetrystats.h"
 #include "flightstatus.h"
 
@@ -177,7 +178,8 @@ protected:
 	VelocityActual* velActual;
 	PositionActual* posActual;
 	HomeLocation* posHome;
-	AttitudeRaw* attRaw;
+	Accels* accels;
+	Gyros*  gyros;
         GPSPosition* gpsPos;
 	GCSTelemetryStats* telStats;
 

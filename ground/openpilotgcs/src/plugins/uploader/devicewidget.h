@@ -59,7 +59,6 @@ private:
     deviceDescriptorStruct onBoardDescription;
     deviceDescriptorStruct LoadedDescription;
     QByteArray loadedFW;
-    QString idToBoardName(int id);
     Ui_deviceWidget *myDevice;
     int deviceID;
     DFUObject *m_dfu;

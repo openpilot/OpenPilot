@@ -26,6 +26,7 @@
  */
 #include "configtaskwidget.h"
 #include <QtGui/QWidget>
+#include <QtGui/QLineEdit>
 #include "uavsettingsimportexport/uavsettingsimportexportfactory.h"
 
 /**
@@ -126,7 +127,7 @@ void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString fiel
         Q_ASSERT(obj);
         objectUpdates.insert(obj,true);
         connect(obj, SIGNAL(objectUpdated(UAVObject*)),this, SLOT(objectUpdated(UAVObject*)));
-        connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshWidgetsValues()));
+        connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshWidgetsValues(UAVObject*)));
     }
     if(!field.isEmpty() && obj)
         _field = obj->getField(QString(field));
@@ -255,7 +256,7 @@ void ConfigTaskWidget::populateWidgets()
  * object field added to the framework pool
  * Overwrite this if you need to change the default behavior
  */
-void ConfigTaskWidget::refreshWidgetsValues()
+void ConfigTaskWidget::refreshWidgetsValues(UAVObject * obj)
 {
     bool dirtyBack=dirty;
     emit refreshWidgetsValuesRequested();
@@ -267,8 +268,8 @@ void ConfigTaskWidget::refreshWidgetsValues()
         }
         else
         {
-            setWidgetFromField(ow->widget,ow->field,ow->index,ow->scale,ow->isLimited);
-
+            if(ow->object==obj || obj==NULL)
+                setWidgetFromField(ow->widget,ow->field,ow->index,ow->scale,ow->isLimited);
         }
 
     }
@@ -465,7 +466,7 @@ void ConfigTaskWidget::enableObjUpdates()
     foreach(objectToWidget * obj,objOfInterest)
     {
         if(obj->object)
-            connect(obj->object, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshWidgetsValues()));
+            connect(obj->object, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshWidgetsValues(UAVObject*)));
     }
 }
 /**
@@ -958,6 +959,10 @@ QVariant ConfigTaskWidget::getVariantFromWidget(QWidget * widget,double scale)
     {
         return (QString)(cb->isChecked()?"TRUE":"FALSE");
     }
+    else if(QLineEdit * cb=qobject_cast<QLineEdit *>(widget))
+    {
+        return (QString)cb->displayText();
+    }
     else
         return QVariant();
 }
@@ -1002,6 +1007,14 @@ bool ConfigTaskWidget::setWidgetFromVariant(QWidget *widget, QVariant value, dou
     {
         bool bvalue=value.toString()=="TRUE";
         cb->setChecked(bvalue);
+        return true;
+    }
+    else if(QLineEdit * cb=qobject_cast<QLineEdit *>(widget))
+    {
+        if(scale==0)
+            cb->setText(value.toString());
+        else
+            cb->setText(QString::number((value.toDouble()/scale)));
         return true;
     }
     else
@@ -1158,7 +1171,7 @@ void ConfigTaskWidget::loadWidgetLimits(QWidget * widget,UAVObjectField * field,
     }
 }
 
-void ConfigTaskWidget::disbleMouseWheelEvents()
+void ConfigTaskWidget::disableMouseWheelEvents()
 {
     //Disable mouse wheel events
     foreach( QSpinBox * sp, findChildren<QSpinBox*>() ) {
@@ -1170,12 +1183,17 @@ void ConfigTaskWidget::disbleMouseWheelEvents()
     foreach( QSlider * sp, findChildren<QSlider*>() ) {
         sp->installEventFilter( this );
     }
+    foreach( QComboBox * sp, findChildren<QComboBox*>() ) {
+        sp->installEventFilter( this );
+    }
 }
 
 bool ConfigTaskWidget::eventFilter( QObject * obj, QEvent * evt ) {
     //Filter all wheel events, and ignore them
     if ( evt->type() == QEvent::Wheel &&
-         (qobject_cast<QAbstractSpinBox*>( obj ) || qobject_cast<QAbstractSlider*>( obj ) ))
+         (qobject_cast<QAbstractSpinBox*>( obj ) ||
+          qobject_cast<QComboBox*>( obj ) ||
+          qobject_cast<QAbstractSlider*>( obj ) ))
     {
         evt->ignore();
         return true;

@@ -36,6 +36,7 @@
 #include <QString>
 #include <QList>
 #include <QFile>
+#include <stdint.h>
 #include "uavobjectfield.h"
 
 #define UAVOBJ_ACCESS_SHIFT 0

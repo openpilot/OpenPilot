@@ -143,9 +143,6 @@ ConfigCcpmWidget::ConfigCcpmWidget(QWidget *parent) : VehicleConfig(parent)
     UAVObjectField * curve2source = mixerSettings->getField("Curve2Source");
     Q_ASSERT(curve2source);
 
-//    QStringList channels;
-//    channels  << "None" << "Channel1" << "Channel2" << "Channel3" << "Channel4" <<
-//                "Channel5" << "Channel6" << "Channel7" << "Channel8";
     m_ccpm->ccpmEngineChannel->addItems(channelNames);
     m_ccpm->ccpmEngineChannel->setCurrentIndex(0);
     m_ccpm->ccpmTailChannel->addItems(channelNames);
@@ -203,9 +200,6 @@ ConfigCcpmWidget::ConfigCcpmWidget(QWidget *parent) : VehicleConfig(parent)
     connect(m_ccpm->CurveSettings, SIGNAL(cellChanged (int, int)), this, SLOT(UpdateCurveWidgets()));
     connect(m_ccpm->TabObject, SIGNAL(currentChanged ( QWidget * )), this, SLOT(UpdateType()));
 
-//    connect(m_ccpm->SwashLvlSwashplateImage, SIGNAL(valueChanged(double)), this, SLOT(ccpmSwashplateRedraw()));
-
-
     connect(m_ccpm->PitchCurve, SIGNAL(curveUpdated(QList<double>,double)), this, SLOT(updatePitchCurveValue(QList<double>,double)));
     connect(m_ccpm->ThrottleCurve, SIGNAL(curveUpdated(QList<double>,double)), this, SLOT(updateThrottleCurveValue(QList<double>,double)));
 
@@ -214,6 +208,7 @@ ConfigCcpmWidget::ConfigCcpmWidget(QWidget *parent) : VehicleConfig(parent)
     connect(m_ccpm->SwashLvlCancelButton, SIGNAL(clicked()), this, SLOT(SwashLvlCancelButtonPressed()));
     connect(m_ccpm->SwashLvlFinishButton, SIGNAL(clicked()), this, SLOT(SwashLvlFinishButtonPressed()));
 
+    connect(m_ccpm->ccpmCollectivePassthrough, SIGNAL(clicked()),this, SLOT(SetUIComponentVisibilities()));
     connect(m_ccpm->ccpmLinkCyclic, SIGNAL(clicked()), this, SLOT(SetUIComponentVisibilities()));
     connect(m_ccpm->ccpmLinkRoll, SIGNAL(clicked()), this, SLOT(SetUIComponentVisibilities()));
 
@@ -889,8 +884,6 @@ void ConfigCcpmWidget::UpdateMixer()
 
     throwConfigError(QString("HeliCP"));
 
-    //updateConfigObjectsFromWidgets();
- 
     GUIConfigDataUnion config = GetConfigData();
 
     useCCPM = !(config.heli.ccpmCollectivePassthroughState || !config.heli.ccpmLinkCyclicState);
@@ -995,14 +988,14 @@ void ConfigCcpmWidget::UpdateMixer()
     }
 
 }
-QString ConfigCcpmWidget::updateConfigObjectsFromWidgets() //UpdateCCPMOptionsFromUI()
+QString ConfigCcpmWidget::updateConfigObjects()
 {
     QString airframeType = "HeliCP";
 
     bool useCCPM;
     bool useCyclic;
-    
-    if (updatingFromHardware) return airframeType;
+
+    if (updatingFromHardware == TRUE) return airframeType;
 
     updatingFromHardware = TRUE;
 
@@ -1012,19 +1005,19 @@ QString ConfigCcpmWidget::updateConfigObjectsFromWidgets() //UpdateCCPMOptionsFr
     //swashplate config
     config.heli.SwashplateType = m_ccpm->ccpmType->count() - m_ccpm->ccpmType->currentIndex()-1;
     config.heli.FirstServoIndex = m_ccpm->ccpmSingleServo->currentIndex();
-    
+
     //ccpm mixing options
     config.heli.ccpmCollectivePassthroughState = m_ccpm->ccpmCollectivePassthrough->isChecked();
     config.heli.ccpmLinkCyclicState = m_ccpm->ccpmLinkCyclic->isChecked();
     config.heli.ccpmLinkRollState = m_ccpm->ccpmLinkRoll->isChecked();
     useCCPM = !(config.heli.ccpmCollectivePassthroughState || !config.heli.ccpmLinkCyclicState);
     useCyclic = config.heli.ccpmLinkRollState;
-    
+
     //correction angle
     config.heli.CorrectionAngle = m_ccpm->ccpmCorrectionAngle->value();
-    
+
     //update sliders
-    if (useCCPM) 
+    if (useCCPM)
     {
         config.heli.SliderValue0 = m_ccpm->ccpmCollectiveSlider->value();
     }
@@ -1032,16 +1025,16 @@ QString ConfigCcpmWidget::updateConfigObjectsFromWidgets() //UpdateCCPMOptionsFr
     {
         config.heli.SliderValue0 = m_ccpm->ccpmCollectiveScale->value();
     }
-    if (useCyclic) 
+    if (useCyclic)
     {
         config.heli.SliderValue1 = m_ccpm->ccpmCyclicScale->value();
     }
     else
     {
         config.heli.SliderValue1 = m_ccpm->ccpmPitchScale->value();
-    }    
+    }
     config.heli.SliderValue2 = m_ccpm->ccpmRollScale->value();
-    
+
     //servo assignments
     config.heli.ServoIndexW = m_ccpm->ccpmServoWChannel->currentIndex();
     config.heli.ServoIndexX = m_ccpm->ccpmServoXChannel->currentIndex();
@@ -1052,12 +1045,19 @@ QString ConfigCcpmWidget::updateConfigObjectsFromWidgets() //UpdateCCPMOptionsFr
     config.heli.Throttle = m_ccpm->ccpmEngineChannel->currentIndex();
     //tail
     config.heli.Tail = m_ccpm->ccpmTailChannel->currentIndex();
-    
+
     SetConfigData(config);
+
+    updatingFromHardware = FALSE;
+    return airframeType;
+}
+
+QString ConfigCcpmWidget::updateConfigObjectsFromWidgets() //UpdateCCPMOptionsFromUI()
+{
+    QString airframeType = updateConfigObjects();
 
     setMixer();
 
-    updatingFromHardware = FALSE;
     return airframeType;
 }
 
@@ -1108,33 +1108,31 @@ void ConfigCcpmWidget::refreshWidgetsValues(QString frameType) //UpdateCCPMUIFro
 
 void ConfigCcpmWidget::SetUIComponentVisibilities()
 {
-    //mdl updateObjectsFromWidgets();
-
-    GUIConfigDataUnion config = GetConfigData();
-
-    //set which sliders are user...
     m_ccpm->ccpmRevoMixingBox->setVisible(0);
     
-    m_ccpm->ccpmPitchMixingBox->setVisible(!config.heli.ccpmCollectivePassthroughState && config.heli.ccpmLinkCyclicState);
-    m_ccpm->ccpmCollectiveScalingBox->setVisible(config.heli.ccpmCollectivePassthroughState || !config.heli.ccpmLinkCyclicState);
+    m_ccpm->ccpmPitchMixingBox->setVisible(!m_ccpm->ccpmCollectivePassthrough->isChecked() &&
+                                           m_ccpm->ccpmLinkCyclic->isChecked());
 
-    m_ccpm->ccpmLinkCyclic->setVisible(!config.heli.ccpmCollectivePassthroughState);
-    
-    m_ccpm->ccpmCyclicScalingBox->setVisible((config.heli.ccpmCollectivePassthroughState || !config.heli.ccpmLinkCyclicState) && config.heli.ccpmLinkRollState);
-    if (!config.heli.ccpmCollectivePassthroughState && config.heli.ccpmLinkCyclicState)
+    m_ccpm->ccpmCollectiveScalingBox->setVisible(m_ccpm->ccpmCollectivePassthrough->isChecked() || !m_ccpm->ccpmLinkCyclic->isChecked());
+
+    m_ccpm->ccpmLinkCyclic->setVisible(!m_ccpm->ccpmCollectivePassthrough->isChecked());
+
+    m_ccpm->ccpmCyclicScalingBox->setVisible((m_ccpm->ccpmCollectivePassthrough->isChecked() || !m_ccpm->ccpmLinkCyclic->isChecked()) &&
+                                              m_ccpm->ccpmLinkRoll->isChecked());
+
+    if (!m_ccpm->ccpmCollectivePassthrough->checkState() && m_ccpm->ccpmLinkCyclic->isChecked())
     {
         m_ccpm->ccpmPitchScalingBox->setVisible(0);
         m_ccpm->ccpmRollScalingBox->setVisible(0);
         m_ccpm->ccpmLinkRoll->setVisible(0);
-        
+
     }
     else
     {
-        m_ccpm->ccpmPitchScalingBox->setVisible(!config.heli.ccpmLinkRollState);
-        m_ccpm->ccpmRollScalingBox->setVisible(!config.heli.ccpmLinkRollState);
+        m_ccpm->ccpmPitchScalingBox->setVisible(!m_ccpm->ccpmLinkRoll->isChecked());
+        m_ccpm->ccpmRollScalingBox->setVisible(!m_ccpm->ccpmLinkRoll->isChecked());
         m_ccpm->ccpmLinkRoll->setVisible(1);
     }
-
 }
 /**
   Request the current value of the SystemSettings which holds the ccpm type
@@ -1174,6 +1172,8 @@ void ConfigCcpmWidget::setMixer()
     int i,j;
 
     if (SwashLvlConfigurationInProgress)return;
+    if (updatingToHardware == TRUE) return;
+
     updatingToHardware=TRUE;
 
     MixerSettings * mixerSettings = MixerSettings::GetInstance(getObjectManager());
@@ -1234,7 +1234,7 @@ void ConfigCcpmWidget::setMixer()
     //mapping of collective input to curve 2...
     //MixerSettings.Curve2Source = Throttle,Roll,Pitch,Yaw,Accessory0,Accessory1,Accessory2,Accessory3,Accessory4,Accessory5
     //check if we are using throttle or directly from a channel...
-    if (GetConfigData().heli.ccpmCollectivePassthroughState)
+    if (m_ccpm->ccpmCollectivePassthrough->isChecked())
         mixerSettingsData.Curve2Source = MixerSettings::CURVE2SOURCE_COLLECTIVE;
     else
         mixerSettingsData.Curve2Source = MixerSettings::CURVE2SOURCE_THROTTLE;

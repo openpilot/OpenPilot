@@ -90,6 +90,7 @@ private:
         virtual void ResetActuators(GUIConfigDataUnion* configData);
         virtual QStringList getChannelDescriptions();
 
+        QString updateConfigObjects();
     private slots:
         virtual void setupUI(QString airframeType);
         virtual void refreshWidgetsValues(QString frameType);

@@ -157,7 +157,6 @@ uint8_t validPos(uint16_t x, uint16_t y) {
 }
 
 void setPixel(uint16_t x, uint16_t y, uint8_t state) {
-	APPLY_DEADBAND(x, y);
 	if (!validPos(x, y)) {
 		return;
 	}
@@ -424,7 +423,6 @@ void drawBox(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2)
  */
 void write_pixel(uint8_t *buff, unsigned int x, unsigned int y, int mode)
 {
-	APPLY_DEADBAND(x, y);
 	CHECK_COORDS(x, y);
 	// Determine the bit in the word to be set and the word
 	// index to set it in.
@@ -469,7 +467,6 @@ void write_pixel_lm(unsigned int x, unsigned int y, int mmode, int lmode)
  */
 void write_hline(uint8_t *buff, unsigned int x0, unsigned int x1, unsigned int y, int mode)
 {
-	APPLY_DEADBAND(x0, y);
 	CLIP_COORDS(x0, y);
 	CLIP_COORDS(x1, y);
 	if(x0 > x1)
@@ -563,7 +560,6 @@ void write_hline_outlined(unsigned int x0, unsigned int x1, unsigned int y, int 
  */
 void write_vline(uint8_t *buff, unsigned int x, unsigned int y0, unsigned int y1, int mode)
 {
-	APPLY_DEADBAND(x, y0);
 	unsigned int a;
 	CLIP_COORDS(x, y0);
 	CLIP_COORDS(x, y1);
@@ -1093,8 +1089,6 @@ void write_word_misaligned(uint8_t *buff, uint16_t word, unsigned int addr, unsi
 	WRITE_WORD_MODE(buff, addr+1, firstmask && 0x00ff, mode);
 	WRITE_WORD_MODE(buff, addr, (firstmask & 0xff00) >> 8, mode);
 	if(xoff > 0)
-		WRITE_WORD_MODE(buff, addr+3, lastmask & 0x00ff, mode);
-	if(xoff > 8)
 		WRITE_WORD_MODE(buff, addr+2, (lastmask & 0xff00) >> 8, mode);
 }
 
@@ -1120,8 +1114,6 @@ void write_word_misaligned_NAND(uint8_t *buff, uint16_t word, unsigned int addr,
 	WRITE_WORD_NAND(buff, addr+1, firstmask & 0x00ff);
 	WRITE_WORD_NAND(buff, addr, (firstmask & 0xff00) >> 8);
 	if(xoff > 0)
-		WRITE_WORD_NAND(buff, addr+3, (lastmask & 0x00ff));
-	if (xoff > 8)
 		WRITE_WORD_NAND(buff, addr+2, (lastmask & 0xff00) >> 8);
 }
 
@@ -1147,8 +1139,6 @@ void write_word_misaligned_OR(uint8_t *buff, uint16_t word, unsigned int addr, u
 	WRITE_WORD_OR(buff, addr+1, firstmask & 0x00ff);
 	WRITE_WORD_OR(buff, addr, (firstmask & 0xff00) >> 8);
 	if(xoff > 0)
-		WRITE_WORD_OR(buff, addr + 3, lastmask & 0x00ff);
-	if(xoff > 8)
 		WRITE_WORD_OR(buff, addr + 2, (lastmask & 0xff00) >> 8);
 
 }
@@ -1208,7 +1198,6 @@ int fetch_font_info(char ch, int font, struct FontEntry *font_info, char *lookup
  */
 void write_char16(char ch, unsigned int x, unsigned int y, int font)
 {
-	APPLY_DEADBAND(x, y);
     int yy, addr_temp, row, row_temp, xshift;
     uint16_t and_mask, or_mask, level_bits;
     struct FontEntry font_info;
@@ -1288,7 +1277,6 @@ void write_char16(char ch, unsigned int x, unsigned int y, int font)
  */
 void write_char(char ch, unsigned int x, unsigned int y, int flags, int font)
 {
-	APPLY_DEADBAND(x, y);
     int yy, addr_temp, row, row_temp, xshift;
     uint16_t and_mask, or_mask, level_bits;
     struct FontEntry font_info;

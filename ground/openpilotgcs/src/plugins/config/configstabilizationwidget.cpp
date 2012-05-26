@@ -59,6 +59,24 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     connect(this,SIGNAL(widgetContentsChanged(QWidget*)),this,SLOT(processLinkedWidgets(QWidget*)));
 
     disableMouseWheelEvents();
+
+    // This is needed because new style tries to compact things as much as possible in grid
+    // and on OSX the widget sizes of PushButtons is reported incorrectly:
+    // https://bugreports.qt-project.org/browse/QTBUG-14591
+    m_stabilization->saveStabilizationToRAM_6->setAttribute(Qt::WA_LayoutUsesWidgetRect);
+    m_stabilization->saveStabilizationToSD_6->setAttribute(Qt::WA_LayoutUsesWidgetRect);
+    m_stabilization->stabilizationReloadBoardData_6->setAttribute(Qt::WA_LayoutUsesWidgetRect);
+    m_stabilization->saveStabilizationToRAM_7->setAttribute(Qt::WA_LayoutUsesWidgetRect);
+    m_stabilization->saveStabilizationToSD_7->setAttribute(Qt::WA_LayoutUsesWidgetRect);
+    m_stabilization->pushButton_2->setAttribute(Qt::WA_LayoutUsesWidgetRect);
+    m_stabilization->pushButton_3->setAttribute(Qt::WA_LayoutUsesWidgetRect);
+    m_stabilization->pushButton_4->setAttribute(Qt::WA_LayoutUsesWidgetRect);
+    m_stabilization->pushButton_19->setAttribute(Qt::WA_LayoutUsesWidgetRect);
+    m_stabilization->pushButton_20->setAttribute(Qt::WA_LayoutUsesWidgetRect);
+    m_stabilization->pushButton_21->setAttribute(Qt::WA_LayoutUsesWidgetRect);
+    m_stabilization->pushButton_22->setAttribute(Qt::WA_LayoutUsesWidgetRect);
+    m_stabilization->pushButton_23->setAttribute(Qt::WA_LayoutUsesWidgetRect);
+    m_stabilization->pushButton_24->setAttribute(Qt::WA_LayoutUsesWidgetRect);
 }
 
 

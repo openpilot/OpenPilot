@@ -55,15 +55,6 @@
 //
 #define SAMPLE_PERIOD_MS		500
 
-//#define ENABLE_DEBUG_MSG
-
-#ifdef ENABLE_DEBUG_MSG
-#define DEBUG_PORT			PIOS_COM_GPS
-#define DEBUG_MSG(format, ...) PIOS_COM_SendFormattedString(DEBUG_PORT, format, ## __VA_ARGS__)
-#else
-#define DEBUG_MSG(format, ...)
-#endif
-
 // Private types
 
 // Private variables
@@ -75,12 +66,10 @@ static void onTimer(UAVObjEvent* ev);
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
  */
-MODULE_INITCALL(BatteryInitialize, 0)
-
 int32_t BatteryInitialize(void)
 {
-	BatteryStateInitialze();
-	BatterySettingsInitialize();
+	FlightBatteryStateInitialize();
+	FlightBatterySettingsInitialize();
 	
 	static UAVObjEvent ev;
 
@@ -90,46 +79,22 @@ int32_t BatteryInitialize(void)
 	return 0;
 }
 
+MODULE_INITCALL(BatteryInitialize, 0)
+
 static void onTimer(UAVObjEvent* ev)
 {
-	static portTickType lastSysTime;
-	static bool firstRun = true;
-
 	static FlightBatteryStateData flightBatteryData;
 
-	if (firstRun) {
-		#ifdef ENABLE_DEBUG_MSG
-			PIOS_COM_ChangeBaud(DEBUG_PORT, 57600);
-		#endif
-		lastSysTime = xTaskGetTickCount();
-		//FlightBatteryStateGet(&flightBatteryData);
-
-		firstRun = false;
-	}
-
-
-	AlarmsSet(SYSTEMALARMS_ALARM_BATTERY, SYSTEMALARMS_ALARM_ERROR);
-
-
-	portTickType thisSysTime;
 	FlightBatterySettingsData batterySettings;
 	static float dT = SAMPLE_PERIOD_MS / 1000;
-	float Bob;
 	float energyRemaining;
-
-
-	// Check how long since last update
-	thisSysTime = xTaskGetTickCount();
-	if(thisSysTime > lastSysTime) // reuse dt in case of wraparound
-		dT = (float)(thisSysTime - lastSysTime) / (float)(portTICK_RATE_MS * 1000.0f);
-	//lastSysTime = thisSysTime;
 
 	FlightBatterySettingsGet(&batterySettings);
 
 	//calculate the battery parameters
-	flightBatteryData.Voltage = ((float)PIOS_ADC_PinGet(2)) * batterySettings.SensorCalibrations[FLIGHTBATTERYSETTINGS_SENSORCALIBRATIONS_VOLTAGEFACTOR]; //in Volts
+	flightBatteryData.Voltage = ((float)PIOS_ADC_PinGet(0)) * batterySettings.SensorCalibrations[FLIGHTBATTERYSETTINGS_SENSORCALIBRATIONS_VOLTAGEFACTOR]; //in Volts
 	flightBatteryData.Current = ((float)PIOS_ADC_PinGet(1)) * batterySettings.SensorCalibrations[FLIGHTBATTERYSETTINGS_SENSORCALIBRATIONS_CURRENTFACTOR]; //in Amps
-Bob =dT; // FIXME: something funky happens if I don't do this... Andrew
+
 	flightBatteryData.ConsumedEnergy += (flightBatteryData.Current * 1000.0 * dT / 3600.0) ;//in mAh
 
 	if (flightBatteryData.Current > flightBatteryData.PeakCurrent)flightBatteryData.PeakCurrent = flightBatteryData.Current; //in Amps
@@ -162,7 +127,6 @@ Bob =dT; // FIXME: something funky happens if I don't do this... Andrew
 			AlarmsSet(SYSTEMALARMS_ALARM_BATTERY, SYSTEMALARMS_ALARM_WARNING);
 		else AlarmsClear(SYSTEMALARMS_ALARM_BATTERY);
 	}
-	lastSysTime = thisSysTime;
 
 	FlightBatteryStateSet(&flightBatteryData);
 }

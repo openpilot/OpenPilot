@@ -77,6 +77,7 @@ static xQueueHandle queue;
 float gyro_alpha = 0;
 float gyro_filtered[3] = {0,0,0};
 float axis_lock_accum[3] = {0,0,0};
+float vbar_sensitivity[3] = {1, 1, 1};
 uint8_t max_axis_lock = 0;
 uint8_t max_axislock_rate = 0;
 float weak_leveling_kp = 0;
@@ -340,7 +341,7 @@ static void stabilizationTask(void* parameters)
 						gyro_gain = (1.0f - fabs(rateDesiredAxis[i]) * vbar_gyros_suppress / 100.0f);
 						gyro_gain = (gyro_gain < 0) ? 0 : gyro_gain;
 					}
-					float command = rateDesiredAxis[i] - gyro_gain * (
+					float command = rateDesiredAxis[i] * vbar_sensitivity[i] - gyro_gain * (
 							vbar_integral[i] * pids[PID_VBAR_ROLL + i].i +
 							gyro_filtered[i] * pids[PID_VBAR_ROLL + i].p);
 
@@ -490,6 +491,11 @@ static void SettingsUpdatedCb(UAVObjEvent * ev)
 	// Set the yaw attitude PI constants
 	pids[PID_VBAR_YAW].p = settings.VbarYawPI[STABILIZATIONSETTINGS_VBARYAWPI_KP];
 	pids[PID_VBAR_YAW].i = settings.VbarYawPI[STABILIZATIONSETTINGS_VBARYAWPI_KI];
+
+	// Need to store the vbar sensitivity
+	vbar_sensitivity[0] = settings.VbarSensitivity[0];
+	vbar_sensitivity[1] = settings.VbarSensitivity[1];
+	vbar_sensitivity[2] = settings.VbarSensitivity[2];
 
 	// Maximum deviation to accumulate for axis lock
 	max_axis_lock = settings.MaxAxisLock;

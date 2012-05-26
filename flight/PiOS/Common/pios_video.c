@@ -76,6 +76,7 @@ volatile uint16_t gActiveLine = 0;
 volatile uint16_t gActivePixmapLine = 0;
 volatile uint16_t line=0;
 volatile uint16_t Vsync_update=0;
+volatile uint16_t Hsync_update=0;
 static int16_t m_osdLines=0;
 
 /**
@@ -96,12 +97,12 @@ void swap_buffers()
 void PIOS_Hsync_ISR()
 {
 	// On tenth line prepare data which will start clocking out on 11th line
-	if(Vsync_update==10)
+	if(Hsync_update==10)
 	{
 		prepare_line(0);
 		gActiveLine = 1;
 	}
-	Vsync_update++;
+	Hsync_update++;
 }
 
 void PIOS_Vsync_ISR() {
@@ -110,7 +111,6 @@ void PIOS_Vsync_ISR() {
     xHigherPriorityTaskWoken = pdFALSE;
 	m_osdLines = gActiveLine;
 
-	// load second image buffer
 	stop_hsync_timers();
 	
 	// Wait for previous word to clock out of each
@@ -118,12 +118,17 @@ void PIOS_Vsync_ISR() {
 	flush_spi();
 	TIM_Cmd(dev_cfg->pixel_timer.timer, DISABLE);	
 
-	swap_buffers();
+	Hsync_update=0;
+	Vsync_update++;
+	if(Vsync_update>=2)
+	{
+		// load second image buffer
+		swap_buffers();
+		Vsync_update=0;
 
-	Vsync_update=0;
-
-	// trigger redraw
-	xHigherPriorityTaskWoken = xSemaphoreGiveFromISR(osdSemaphore, &xHigherPriorityTaskWoken);
+		// trigger redraw every second field
+		xHigherPriorityTaskWoken = xSemaphoreGiveFromISR(osdSemaphore, &xHigherPriorityTaskWoken);
+	}
 
 	portEND_SWITCHING_ISR(xHigherPriorityTaskWoken); 	//portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 }

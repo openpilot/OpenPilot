@@ -35,5 +35,6 @@ struct path_status {
 };
 
 void path_progress(float * start_point, float * end_point, float * cur_point, struct path_status * status);
+void circle_progress(float * start_point, float * end_point, float * cur_point, struct path_status * status, bool clockwise);
 
 #endif

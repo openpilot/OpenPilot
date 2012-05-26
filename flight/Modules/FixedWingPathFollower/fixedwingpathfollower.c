@@ -86,7 +86,7 @@ static FixedWingPathFollowerSettingsData fixedwingpathfollowerSettings;
 // Private functions
 static void pathfollowerTask(void *parameters);
 static void SettingsUpdatedCb(UAVObjEvent * ev);
-static void updatePathVelocity();
+static void updatePathVelocity(int8_t circledirection);
 static void updateEndpointVelocity();
 static void updateFixedDesiredAttitude();
 static void updateFixedAttitude();
@@ -140,7 +140,6 @@ static float courseIntegral = 0;
 static float speedIntegral = 0;
 static float accelIntegral = 0;
 static float powerIntegral = 0;
-static uint8_t positionHoldLast = 0;
 
 // correct speed by measured airspeed
 static float baroAirspeedBias = 0;
@@ -212,7 +211,17 @@ static void pathfollowerTask(void *parameters)
 						AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_OK);
 						break;
 					case PATHDESIRED_MODE_FLYVECTOR:
-						updatePathVelocity();
+						updatePathVelocity(0);
+						updateFixedDesiredAttitude();
+						AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_OK);
+						break;
+					case PATHDESIRED_MODE_FLYCIRCLERIGHT:
+						updatePathVelocity(1);
+						updateFixedDesiredAttitude();
+						AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_OK);
+						break;
+					case PATHDESIRED_MODE_FLYCIRCLELEFT:
+						updatePathVelocity(-1);
 						updateFixedDesiredAttitude();
 						AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_OK);
 						break;
@@ -250,7 +259,7 @@ static void pathfollowerTask(void *parameters)
  * Takes in @ref PositionActual and compares it to @ref PathDesired 
  * and computes @ref VelocityDesired
  */
-static void updatePathVelocity()
+static void updatePathVelocity(int8_t circledirection)
 {
 	//float dT = fixedwingpathfollowerSettings.UpdatePeriod / 1000.0f;
 	float downCommand;
@@ -260,36 +269,44 @@ static void updatePathVelocity()
 	
 	float cur[3] = {positionActual.North, positionActual.East, positionActual.Down};
 	struct path_status progress;
+
+	if (!circledirection) {
+		path_progress(pathDesired.Start, pathDesired.End, cur, &progress);
+	} else {
+		circle_progress(pathDesired.Start, pathDesired.End, cur, &progress, circledirection>0 );
+	}
 	
-	path_progress(pathDesired.Start, pathDesired.End, cur, &progress);
-	
-	float groundspeed = pathDesired.StartingVelocity + 
-	    (pathDesired.EndingVelocity - pathDesired.StartingVelocity) * progress.fractional_progress;
-	if(progress.fractional_progress > 1)
+	float groundspeed;
+	if (!circledirection && progress.fractional_progress<1) {
+		groundspeed = pathDesired.StartingVelocity + 
+	    	(pathDesired.EndingVelocity - pathDesired.StartingVelocity) * progress.fractional_progress;
+	} else {
 		groundspeed = pathDesired.EndingVelocity;
+	}
 	
 	VelocityDesiredData velocityDesired;
 	velocityDesired.North = progress.path_direction[0] * groundspeed;
 	velocityDesired.East = progress.path_direction[1] * groundspeed;
 	
 	float error_speed = progress.error * fixedwingpathfollowerSettings.HorizontalPosP;
-	float correction_velocity[2] = {progress.correction_direction[0] * error_speed, 
-	    progress.correction_direction[1] * error_speed};
 	
-	// prevent div by zero
-	if (fabsf(correction_velocity[0])+fabsf(correction_velocity[1]) <1e-6) {
-		correction_velocity[0]=1e-6;
-	}
-
-	float total_vel = sqrtf(powf(correction_velocity[0],2) + powf(correction_velocity[1],2));
+	velocityDesired.North += progress.correction_direction[0] * error_speed;
+	velocityDesired.East += progress.correction_direction[1] * error_speed;
+	
+	float total_vel = sqrtf(powf(velocityDesired.North,2) + powf(velocityDesired.East,2));
 	float scale = 1;
-	if(total_vel > fixedwingpathfollowerSettings.HorizontalVelMax)
+	if(total_vel > fixedwingpathfollowerSettings.HorizontalVelMax) {
 		scale = fixedwingpathfollowerSettings.HorizontalVelMax / total_vel;
-	if (total_vel < fixedwingpathfollowerSettings.HorizontalVelMin)
+	} else if (total_vel < fixedwingpathfollowerSettings.HorizontalVelMin && total_vel>1e-6) {
 		scale = fixedwingpathfollowerSettings.HorizontalVelMin / total_vel;
-
-	velocityDesired.North += progress.correction_direction[0] * error_speed * scale;
-	velocityDesired.East += progress.correction_direction[1] * error_speed * scale;
+	} else {
+		/* if we are not supposed to move, head north with minimum velocity - to prevent errors */
+		scale = 1;
+		velocityDesired.North = fixedwingpathfollowerSettings.HorizontalVelMin;
+		velocityDesired.East = 0;
+	}
+	velocityDesired.North*= scale;
+	velocityDesired.East *= scale;
 	
 	float altitudeSetpoint = pathDesired.Start[2] + (pathDesired.End[2] - pathDesired.Start[2]) *
 	    bound(progress.fractional_progress,0,1);

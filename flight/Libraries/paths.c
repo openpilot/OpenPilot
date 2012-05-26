@@ -78,3 +78,59 @@ void path_progress(float * start_point, float * end_point, float * cur_point, st
 	status->error = fabs(status->error);
 }
 
+/**
+ * @brief Compute progress along circular path and deviation from it
+ * @param[in] start_point Starting point
+ * @param[in] end_point Center point
+ * @param[in] cur_point Current location
+ * @param[out] status Structure containing progress along path and deviation
+ */
+void circle_progress(float * start_point, float * end_point, float * cur_point, struct path_status * status, bool clockwise)
+{
+	float radius_north, radius_east, diff_north, diff_east;
+	float radius;
+	float normal[2];
+
+	// Radius
+	radius_north = end_point[0] - start_point[0];
+	radius_east = end_point[1] - start_point[1];
+
+	// Current location relative to center
+	diff_north = cur_point[0] - end_point[0];
+	diff_east = cur_point[1] - end_point[1];
+
+	radius = sqrtf( radius_north * radius_north + radius_east * radius_east );
+
+	if(radius < 1e-3) {
+		status->fractional_progress = 1;
+		status->error = 0;
+		status->correction_direction[0] = status->correction_direction[1] = 0;
+		status->path_direction[0] = status->path_direction[1] = 0;
+		return;
+	}
+
+	if (clockwise) {
+		// Compute the normal to the radius clockwise
+		normal[0] = radius_east / radius;
+		normal[1] = -radius_north / radius;
+	} else {
+		// Compute the normal to the radius counter clockwise
+		normal[0] = -radius_east / radius;
+		normal[1] = radius_north / radius;
+	}
+	
+	status->fractional_progress = (clockwise?1:-1) * atan2f( diff_north, diff_east) - atan2f( radius_north, radius_east);
+
+	// error is current radius minus wanted radius - positive if too close
+	status->error = radius - sqrtf( diff_north * diff_north + diff_east * diff_east );
+
+	// Compute direction to correct error
+	status->correction_direction[0] = -status->error * radius_north / radius;
+	status->correction_direction[1] = -status->error * radius_east / radius;
+
+	// Compute direction to travel
+	status->path_direction[0] = normal[0];
+	status->path_direction[1] = normal[1];
+
+	status->error = fabs(status->error);
+}

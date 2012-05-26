@@ -1089,8 +1089,6 @@ void write_word_misaligned(uint8_t *buff, uint16_t word, unsigned int addr, unsi
 	WRITE_WORD_MODE(buff, addr+1, firstmask && 0x00ff, mode);
 	WRITE_WORD_MODE(buff, addr, (firstmask & 0xff00) >> 8, mode);
 	if(xoff > 0)
-		WRITE_WORD_MODE(buff, addr+3, lastmask & 0x00ff, mode);
-	if(xoff > 8)
 		WRITE_WORD_MODE(buff, addr+2, (lastmask & 0xff00) >> 8, mode);
 }
 
@@ -1116,8 +1114,6 @@ void write_word_misaligned_NAND(uint8_t *buff, uint16_t word, unsigned int addr,
 	WRITE_WORD_NAND(buff, addr+1, firstmask & 0x00ff);
 	WRITE_WORD_NAND(buff, addr, (firstmask & 0xff00) >> 8);
 	if(xoff > 0)
-		WRITE_WORD_NAND(buff, addr+3, (lastmask & 0x00ff));
-	if (xoff > 8)
 		WRITE_WORD_NAND(buff, addr+2, (lastmask & 0xff00) >> 8);
 }
 
@@ -1143,8 +1139,6 @@ void write_word_misaligned_OR(uint8_t *buff, uint16_t word, unsigned int addr, u
 	WRITE_WORD_OR(buff, addr+1, firstmask & 0x00ff);
 	WRITE_WORD_OR(buff, addr, (firstmask & 0xff00) >> 8);
 	if(xoff > 0)
-		WRITE_WORD_OR(buff, addr + 3, lastmask & 0x00ff);
-	if(xoff > 8)
 		WRITE_WORD_OR(buff, addr + 2, (lastmask & 0xff00) >> 8);
 
 }

@@ -78,27 +78,6 @@ void deviceWidget::setDfu(DFUObject *dfu)
     m_dfu = dfu;
 }
 
-QString deviceWidget::idToBoardName(int id)
-{
-    switch (id | 0x0011) {
-    case 0x0111://MB
-        return QString("OpenPilot MainBoard");
-        break;
-    case 0x0311://PipX
-        return QString("PipXtreme");
-        break;
-    case 0x0411://Coptercontrol
-        return QString("CopterControl");
-        break;
-    case 0x0211://INS
-        return QString("OpenPilot INS");
-        break;
-    default:
-        return QString("");
-        break;
-    }
-}
-
 /**
   Fills the various fields for the device
   */
@@ -124,6 +103,9 @@ void deviceWidget::populate()
         break;
     case 0x0401:
         devicePic->renderer()->load(QString(":/uploader/images/deviceID-0401.svg"));
+        break;
+    case 0x0402:
+        devicePic->renderer()->load(QString(":/uploader/images/deviceID-0402.svg"));
         break;
     case 0x0201:
         devicePic->renderer()->load(QString(":/uploader/images/deviceID-0201.svg"));
@@ -200,7 +182,7 @@ bool deviceWidget::populateBoardStructuredDescription(QByteArray desc)
             myDevice->lblCertified->setToolTip(tr("Untagged or custom firmware build"));
         }
 
-        myDevice->lblBrdName->setText(idToBoardName(onBoardDescription.boardType<<8));
+        myDevice->lblBrdName->setText(deviceDescriptorStruct::idToBoardName(onBoardDescription.boardType << 8 | onBoardDescription.boardRevision));
 
         return true;
     }
@@ -230,7 +212,7 @@ bool deviceWidget::populateLoadedStructuredDescription(QByteArray desc)
             myDevice->lblCertifiedL->setPixmap(pix);
             myDevice->lblCertifiedL->setToolTip(tr("Untagged or custom firmware build"));
         }
-        myDevice->lblBrdNameL->setText(deviceDescriptorStruct::idToBoardName(LoadedDescription.boardType<<8));
+        myDevice->lblBrdNameL->setText(deviceDescriptorStruct::idToBoardName(LoadedDescription.boardType << 8 | LoadedDescription.boardRevision));
 
         return true;
     }

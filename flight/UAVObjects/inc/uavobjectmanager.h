@@ -133,7 +133,7 @@ typedef void (*UAVObjEventCallback)(UAVObjEvent* ev);
 /**
  * Callback used to initialize the object fields to their default values.
  */
-typedef void (*UAVObjInitializeCallback)(UAVObjHandle obj, uint16_t instId);
+typedef void (*UAVObjInitializeCallback)(UAVObjHandle obj_handle, uint16_t instId);
 
 /**
  * Event manager statistics
@@ -157,16 +157,16 @@ const char* UAVObjGetName(UAVObjHandle obj);
 uint32_t UAVObjGetNumBytes(UAVObjHandle obj);
 uint16_t UAVObjGetNumInstances(UAVObjHandle obj);
 UAVObjHandle UAVObjGetLinkedObj(UAVObjHandle obj);
-uint16_t UAVObjCreateInstance(UAVObjHandle obj, UAVObjInitializeCallback initCb);
-int32_t UAVObjIsSingleInstance(UAVObjHandle obj);
-int32_t UAVObjIsMetaobject(UAVObjHandle obj);
-int32_t UAVObjIsSettings(UAVObjHandle obj);
-int32_t UAVObjUnpack(UAVObjHandle obj, uint16_t instId, const uint8_t* dataIn);
-int32_t UAVObjPack(UAVObjHandle obj, uint16_t instId, uint8_t* dataOut);
-int32_t UAVObjSave(UAVObjHandle obj, uint16_t instId);
-int32_t UAVObjLoad(UAVObjHandle obj, uint16_t instId);
-int32_t UAVObjDelete(UAVObjHandle obj, uint16_t instId);
-int32_t UAVObjSaveToFile(UAVObjHandle obj, uint16_t instId, FILEINFO* file);
+uint16_t UAVObjCreateInstance(UAVObjHandle obj_handle, UAVObjInitializeCallback initCb);
+bool UAVObjIsSingleInstance(UAVObjHandle obj);
+bool UAVObjIsMetaobject(UAVObjHandle obj);
+bool UAVObjIsSettings(UAVObjHandle obj);
+int32_t UAVObjUnpack(UAVObjHandle obj_handle, uint16_t instId, const uint8_t* dataIn);
+int32_t UAVObjPack(UAVObjHandle obj_handle, uint16_t instId, uint8_t* dataOut);
+int32_t UAVObjSave(UAVObjHandle obj_handle, uint16_t instId);
+int32_t UAVObjLoad(UAVObjHandle obj_handle, uint16_t instId);
+int32_t UAVObjDelete(UAVObjHandle obj_handle, uint16_t instId);
+int32_t UAVObjSaveToFile(UAVObjHandle obj_handle, uint16_t instId, FILEINFO* file);
 UAVObjHandle UAVObjLoadFromFile(FILEINFO* file);
 int32_t UAVObjSaveSettings();
 int32_t UAVObjLoadSettings();
@@ -174,18 +174,17 @@ int32_t UAVObjDeleteSettings();
 int32_t UAVObjSaveMetaobjects();
 int32_t UAVObjLoadMetaobjects();
 int32_t UAVObjDeleteMetaobjects();
-int32_t UAVObjSetData(UAVObjHandle obj, const void* dataIn);
-int32_t UAVObjSetDataField(UAVObjHandle obj, const void* dataIn, uint32_t offset, uint32_t size);
-int32_t UAVObjGetData(UAVObjHandle obj, void* dataOut);
-int32_t UAVObjGetDataField(UAVObjHandle obj, void* dataOut, uint32_t offset, uint32_t size);
-int32_t UAVObjSetInstanceData(UAVObjHandle obj, uint16_t instId, const void* dataIn);
-int32_t UAVObjSetInstanceDataField(UAVObjHandle obj, uint16_t instId, const void* dataIn, uint32_t offset, uint32_t size);
-int32_t UAVObjGetInstanceData(UAVObjHandle obj, uint16_t instId, void* dataOut);
-int32_t UAVObjGetInstanceDataField(UAVObjHandle obj, uint16_t instId, void* dataOut, uint32_t offset, uint32_t size);
-int32_t UAVObjSetMetadata(UAVObjHandle obj, const UAVObjMetadata* dataIn);
-int32_t UAVObjGetMetadata(UAVObjHandle obj, UAVObjMetadata* dataOut);
+int32_t UAVObjSetData(UAVObjHandle obj_handle, const void* dataIn);
+int32_t UAVObjSetDataField(UAVObjHandle obj_handle, const void* dataIn, uint32_t offset, uint32_t size);
+int32_t UAVObjGetData(UAVObjHandle obj_handle, void* dataOut);
+int32_t UAVObjGetDataField(UAVObjHandle obj_handle, void* dataOut, uint32_t offset, uint32_t size);
+int32_t UAVObjSetInstanceData(UAVObjHandle obj_handle, uint16_t instId, const void* dataIn);
+int32_t UAVObjSetInstanceDataField(UAVObjHandle obj_handle, uint16_t instId, const void* dataIn, uint32_t offset, uint32_t size);
+int32_t UAVObjGetInstanceData(UAVObjHandle obj_handle, uint16_t instId, void* dataOut);
+int32_t UAVObjGetInstanceDataField(UAVObjHandle obj_handle, uint16_t instId, void* dataOut, uint32_t offset, uint32_t size);
+int32_t UAVObjSetMetadata(UAVObjHandle obj_handle, const UAVObjMetadata* dataIn);
+int32_t UAVObjGetMetadata(UAVObjHandle obj_handle, UAVObjMetadata* dataOut);
 uint8_t UAVObjGetMetadataAccess(const UAVObjMetadata* dataOut);
-void UAVObjMetadataInitialize(UAVObjMetadata* dataOut);
 UAVObjAccessType UAVObjGetAccess(const UAVObjMetadata* dataOut);
 void UAVObjSetAccess(UAVObjMetadata* dataOut, UAVObjAccessType mode);
 UAVObjAccessType UAVObjGetGcsAccess(const UAVObjMetadata* dataOut);
@@ -199,14 +198,14 @@ void UAVObjSetTelemetryUpdateMode(UAVObjMetadata* dataOut, UAVObjUpdateMode val)
 UAVObjUpdateMode UAVObjGetGcsTelemetryUpdateMode(const UAVObjMetadata* dataOut);
 void UAVObjSetTelemetryGcsUpdateMode(UAVObjMetadata* dataOut, UAVObjUpdateMode val);
 int8_t UAVObjReadOnly(UAVObjHandle obj);
-int32_t UAVObjConnectQueue(UAVObjHandle obj, xQueueHandle queue, uint8_t eventMask);
-int32_t UAVObjDisconnectQueue(UAVObjHandle obj, xQueueHandle queue);
-int32_t UAVObjConnectCallback(UAVObjHandle obj, UAVObjEventCallback cb, uint8_t eventMask);
-int32_t UAVObjDisconnectCallback(UAVObjHandle obj, UAVObjEventCallback cb);
+int32_t UAVObjConnectQueue(UAVObjHandle obj_handle, xQueueHandle queue, uint8_t eventMask);
+int32_t UAVObjDisconnectQueue(UAVObjHandle obj_handle, xQueueHandle queue);
+int32_t UAVObjConnectCallback(UAVObjHandle obj_handle, UAVObjEventCallback cb, uint8_t eventMask);
+int32_t UAVObjDisconnectCallback(UAVObjHandle obj_handle, UAVObjEventCallback cb);
 void UAVObjRequestUpdate(UAVObjHandle obj);
-void UAVObjRequestInstanceUpdate(UAVObjHandle obj, uint16_t instId);
+void UAVObjRequestInstanceUpdate(UAVObjHandle obj_handle, uint16_t instId);
 void UAVObjUpdated(UAVObjHandle obj);
-void UAVObjInstanceUpdated(UAVObjHandle obj, uint16_t instId);
+void UAVObjInstanceUpdated(UAVObjHandle obj_handle, uint16_t instId);
 void UAVObjIterate(void (*iterator)(UAVObjHandle obj));
 
 #endif // UAVOBJECTMANAGER_H

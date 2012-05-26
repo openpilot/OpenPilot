@@ -2202,10 +2202,9 @@ void updateGraphics() {
 		}
 		break;
 	default:
-		write_vline( draw_buffer_level,0,0,GRAPHICS_HEIGHT_REAL-1,1);
-		write_vline( draw_buffer_mask,0,0,GRAPHICS_HEIGHT_REAL-1,1);
-		write_vline( draw_buffer_level,16,0,GRAPHICS_HEIGHT_REAL-1,1);
-		write_vline( draw_buffer_mask,16,0,GRAPHICS_HEIGHT_REAL-1,1);
+		write_vline_lm( APPLY_HDEADBAND(GRAPHICS_RIGHT/2),APPLY_VDEADBAND(0),APPLY_VDEADBAND(GRAPHICS_BOTTOM),1,1);
+		write_hline_lm( APPLY_HDEADBAND(0),APPLY_HDEADBAND(GRAPHICS_RIGHT),APPLY_VDEADBAND(GRAPHICS_BOTTOM/2),1,1);
+		break;
 	}
 	
 	// Must mask out last half-word because SPI keeps clocking it out otherwise

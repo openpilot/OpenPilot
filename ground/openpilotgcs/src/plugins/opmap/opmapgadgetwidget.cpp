@@ -271,7 +271,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 	m_map->UAV->SetUAVPos(m_home_position.coord, 0.0);        // set the UAV position
     if(m_map->GPS)
         m_map->GPS->SetUAVPos(m_home_position.coord, 0.0);        // set the UAV position
-    m_map->WPCreate();
+    m_map->WPCreate(QPoint(1000,1000),10,"aaa");
     // **************
     // create various context menu (mouse right click menu) actions
 

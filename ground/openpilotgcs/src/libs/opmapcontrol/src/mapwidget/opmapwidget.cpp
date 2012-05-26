@@ -211,6 +211,13 @@ namespace mapcontrol
         item->setParentItem(map);
         return item;
     }
+    WayPointItem* OPMapWidget::WPCreate(const QPoint &relativeCoord, const int &altitude, const QString &description)
+    {
+        WayPointItem* item=new WayPointItem(relativeCoord,altitude,description,map);
+        ConnectWP(item);
+        item->setParentItem(map);
+        return item;
+    }
     WayPointItem* OPMapWidget::WPInsert(const int &position)
     {
         WayPointItem* item=new WayPointItem(this->CurrentPosition(),0,map);

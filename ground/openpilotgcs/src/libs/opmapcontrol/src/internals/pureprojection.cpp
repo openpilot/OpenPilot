@@ -243,15 +243,27 @@ Point PureProjection::FromLatLngToPixel(const PointLatLng &p,const int &zoom)
         dY=DistanceBetweenLatLng(p1,p2)*sin(courseBetweenLatLng(p1,p2));
     }
 
+    double PureProjection::myfmod(double x,double y)
+    {
+        return x - y*floor(x/y);
+    }
+
     PointLatLng PureProjection::translate(PointLatLng  p1,double dX,double dY)
     {
-        PointLatLng origin=p1;
         PointLatLng ret;
         double d=sqrt(pow(dX,2)+pow(dY,2));
-        double tc=atan2(dY,dX);
-        ret.SetLat(asin(sin(origin.Lat())*cos(d)+cos(origin.Lat())*sin(d)*cos(tc)));
-        double dlon=atan2(sin(tc)*sin(d)*cos(origin.Lat()),cos(d)-sin(origin.Lat())*sin(p1.Lat()));
-        ret.SetLng(fmod(origin.Lng()-dlon +PI,2*PI )-PI);
+        double tc=(atan2(dY,dX));
+        double lat1=p1.Lat()*M_PI/180;
+        double lon1=p1.Lng()*M_PI/180;
+        double R=6378137;
+        double lat2 = asin(sin(lat1)*cos(d/R) + cos(lat1)*sin(d/R)*cos(tc) );
+        qDebug()<<lat2<<lat1;
+        double lon2 = lon1 + atan2(sin(tc)*sin(d/R)*cos(lat1),
+                             cos(d/R)-sin(lat1)*sin(lat2));
+        lat2=lat2*180/M_PI;
+        lon2=lon2*180/M_PI;
+        ret.SetLat(lat2);
+        ret.SetLng(lon2);
         return ret;
     }
 

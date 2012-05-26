@@ -33,7 +33,7 @@
 #include "pointlatlng.h"
 #include "cmath"
 #include "rectlatlng.h"
-
+#include <QDebug>
 using namespace core;
 
 namespace internals
@@ -106,7 +106,8 @@ protected:
     static double e3fn(const double &x);
     static double mlfn(const double &e0,const double &e1,const double &e2,const double &e3,const double &phi);
     static qlonglong GetUTMzone(const double &lon);
-
+private:
+    double myfmod(double x, double y);
 };
 }
 

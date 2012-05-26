@@ -278,6 +278,10 @@ WayPointItem::WayPointItem(const internals::PointLatLng &coord,int const& altitu
         if(myType==relative)
         {
             coord=map->Projection()->translate(homepos,relativeCoord.x(),relativeCoord.y());
+            emit WPValuesChanged(this);
+            RefreshPos();
+            RefreshToolTip();
+            this->update();
         }
     }
     void WayPointItem::WPRenumbered(const int &oldnumber, const int &newnumber, WayPointItem *waypoint)

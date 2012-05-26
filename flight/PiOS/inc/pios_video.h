@@ -68,14 +68,14 @@ extern void PIOS_Hsync_ISR();
 extern void PIOS_Vsync_ISR();
 
 // First OSD line
-#define GRAPHICS_LINE 0
+#define GRAPHICS_LINE 25
 
 //top/left deadband
-#define GRAPHICS_HDEADBAND 32
+#define GRAPHICS_HDEADBAND 72
 #define GRAPHICS_VDEADBAND 0
 
 // Real OSD size
-#define GRAPHICS_WIDTH_REAL (336+GRAPHICS_HDEADBAND)
+#define GRAPHICS_WIDTH_REAL (312+GRAPHICS_HDEADBAND)
 #define GRAPHICS_HEIGHT_REAL (270+GRAPHICS_VDEADBAND)
 
 //draw area

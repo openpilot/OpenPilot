@@ -96,8 +96,8 @@ void swap_buffers()
 
 void PIOS_Hsync_ISR()
 {
-	// On tenth line prepare data which will start clocking out on 11th line
-	if(Hsync_update==10)
+	// On tenth line prepare data which will start clocking out on GRAPHICS_LINE+1
+	if(Hsync_update==GRAPHICS_LINE)
 	{
 		prepare_line(0);
 		gActiveLine = 1;
@@ -118,7 +118,8 @@ void PIOS_Vsync_ISR() {
 	flush_spi();
 	TIM_Cmd(dev_cfg->pixel_timer.timer, DISABLE);	
 
-	Hsync_update=0;
+	gActiveLine = 0;
+	Hsync_update = 0;
 	Vsync_update++;
 	if(Vsync_update>=2)
 	{
@@ -435,7 +436,7 @@ void PIOS_VIDEO_DMA_Handler(void)
 	// Handle flags from stream channel
 	if (DMA_GetFlagStatus(dev_cfg->level.dma.tx.channel,DMA_FLAG_TCIF5)) {	// whole double buffer filled
 		DMA_ClearFlag(dev_cfg->level.dma.tx.channel,DMA_FLAG_TCIF5);
-		if(gActiveLine < GRAPHICS_HEIGHT-2)
+		if(gActiveLine < GRAPHICS_HEIGHT)
 		{
 			flush_spi();
 			stop_hsync_timers();
@@ -444,17 +445,15 @@ void PIOS_VIDEO_DMA_Handler(void)
 
 			prepare_line(gActiveLine);
 		}
-		else if(gActiveLine == GRAPHICS_HEIGHT-2)
+		else if(gActiveLine >= GRAPHICS_HEIGHT)
 		{
+			//last line completed
 			flush_spi();
 			stop_hsync_timers();
 
 			// STOP DMA, master first
 			DMA_Cmd(dev_cfg->mask.dma.tx.channel, DISABLE);
 			DMA_Cmd(dev_cfg->level.dma.tx.channel, DISABLE);
-		}
-		else if(gActiveLine >= GRAPHICS_HEIGHT-1)
-		{
 		}
 		gActiveLine++;
 	}

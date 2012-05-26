@@ -231,7 +231,7 @@ static void stabilizationTask(void* parameters)
 			switch(stabDesired.StabilizationMode[i])
 			{
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_RATE:
-				case STABILIZATIONDESIRED_STABILIZATIONMODE_VBAR:
+				case STABILIZATIONDESIRED_STABILIZATIONMODE_VIRTUALBAR:
 					rateDesiredAxis[i] = attitudeDesiredAxis[i];
 
 					// Zero attitude and axis lock accumulators
@@ -325,7 +325,7 @@ static void stabilizationTask(void* parameters)
 					actuatorDesiredAxis[i] = bound(command);
 					break;
 				}
-				case STABILIZATIONDESIRED_STABILIZATIONMODE_VBAR:
+				case STABILIZATIONDESIRED_STABILIZATIONMODE_VIRTUALBAR:
 				{
 					// Track the angle of the virtual flybar which includes a slow decay
 					vbar_integral[i] = vbar_integral[i] * vbar_decay + gyro_filtered[i] * dT;

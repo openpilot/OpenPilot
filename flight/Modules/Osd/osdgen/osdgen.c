@@ -8,7 +8,7 @@
  *
  * @file       osdgen.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      OSD gen module, handles OSD draw
+ * @brief      OSD gen module, handles OSD draw. Parts from CL-OSD and SUPEROSD projects
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -156,29 +156,6 @@ uint8_t validPos(uint16_t x, uint16_t y) {
 	return 1;
 }
 
-void setPixel(uint16_t x, uint16_t y, uint8_t state) {
-	if (!validPos(x, y)) {
-		return;
-	}
-	uint8_t bitPos = 7-(x%8);
-	uint16_t tempf = draw_buffer_level[y*GRAPHICS_WIDTH+x/8];
-	uint16_t tempm = draw_buffer_mask[y*GRAPHICS_WIDTH+x/8];
-	if (state == 0) {
-		tempf &= ~(1<<bitPos);
-		tempm &= ~(1<<bitPos);
-	}
-	else if (state == 1) {
-		tempf |= (1<<bitPos);
-		tempm |= (1<<bitPos);
-	}
-	else {
-		tempf ^= (1<<bitPos);
-		tempm ^= (1<<bitPos);
-	}
-	draw_buffer_level[y*GRAPHICS_WIDTH+x/8] = tempf;
-	draw_buffer_mask[y*GRAPHICS_WIDTH+x/8] = tempm;
-}
-
 // Credit for this one goes to wikipedia! :-)
 void drawCircle(uint16_t x0, uint16_t y0, uint16_t radius) {
 	  int f = 1 - radius;
@@ -187,10 +164,10 @@ void drawCircle(uint16_t x0, uint16_t y0, uint16_t radius) {
 	  int x = 0;
 	  int y = radius;
 
-	  setPixel(x0, y0 + radius,1);
-	  setPixel(x0, y0 - radius,1);
-	  setPixel(x0 + radius, y0,1);
-	  setPixel(x0 - radius, y0,1);
+	  write_pixel_lm(x0, y0 + radius,1,1);
+	  write_pixel_lm(x0, y0 - radius,1,1);
+	  write_pixel_lm(x0 + radius, y0,1,1);
+	  write_pixel_lm(x0 - radius, y0,1,1);
 
 	  while(x < y)
 	  {
@@ -206,14 +183,14 @@ void drawCircle(uint16_t x0, uint16_t y0, uint16_t radius) {
 	    x++;
 	    ddF_x += 2;
 	    f += ddF_x;
-	    setPixel(x0 + x, y0 + y,1);
-	    setPixel(x0 - x, y0 + y,1);
-	    setPixel(x0 + x, y0 - y,1);
-	    setPixel(x0 - x, y0 - y,1);
-	    setPixel(x0 + y, y0 + x,1);
-	    setPixel(x0 - y, y0 + x,1);
-	    setPixel(x0 + y, y0 - x,1);
-	    setPixel(x0 - y, y0 - x,1);
+	    write_pixel_lm(x0 + x, y0 + y,1,1);
+	    write_pixel_lm(x0 - x, y0 + y,1,1);
+	    write_pixel_lm(x0 + x, y0 - y,1,1);
+	    write_pixel_lm(x0 - x, y0 - y,1,1);
+	    write_pixel_lm(x0 + y, y0 + x,1,1);
+	    write_pixel_lm(x0 - y, y0 + x,1,1);
+	    write_pixel_lm(x0 + y, y0 - x,1,1);
+	    write_pixel_lm(x0 - y, y0 - x,1,1);
 	  }
 }
 
@@ -223,42 +200,6 @@ void swap(uint16_t* a, uint16_t* b) {
 	*b = temp;
 }
 
-
-void drawLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
-	uint8_t steep = abs(y1 - y0) > abs(x1 - x0);
-	if (steep) {
-		swap(&x0, &y0);
-		swap(&x1, &y1);
-	}
-	if (x0 > x1) {
-		swap(&x0, &x1);
-		swap(&y0, &y1);
-	}
-	int16_t deltax = x1 - x0;
-	int16_t deltay = abs(y1 - y0);
-	int16_t error = deltax / 2;
-	int16_t ystep;
-	int16_t y = y0;
-	if (y0 < y1) {
-		ystep = 1;
-	}
-	else {
-		ystep = -1;
-	}
-	for (uint16_t x = x0; x <= x1; ++x) {
-		if (steep) {
-			setPixel(y, x, 1);
-		}
-		else {
-			setPixel(x, y, 1);
-		}
-		error = error - deltay;
-		if (error < 0) {
-			y = y + ystep;
-			error = error + deltax;
-		}
-	}
-}
 
 const static int8_t sinData[91] = {
   0, 2, 3, 5, 7, 9, 10, 12, 14, 16, 17, 19, 21, 22, 24, 26, 28, 29, 31, 33,
@@ -287,28 +228,6 @@ static int8_t myCos(uint16_t angle) {
 	return mySin(angle + 90);
 }
 
-//fill the draw_buffer_level with junk, used for debugging
-/*void fillFrameBuffer(void)
-{
-	uint16_t i;
-	uint16_t j;
-	for(i = 0; i<(BUFFER_VERT_SIZE); i++)
-	{
-		for(j = 0; j<(BUFFER_LINE_LENGTH); j++)
-		{
-			if(j < LEFT_MARGIN)
-			{
-				draw_buffer_level[i*GRAPHICS_WIDTH+j] = 0;
-			} else if (j > 32){
-				draw_buffer_level[i*GRAPHICS_WIDTH+j] = 0;
-			} else {
-				draw_buffer_level[i*GRAPHICS_WIDTH+j] = i*j;
-			}
-		}
-	}
-}*/
-
-
 /// Draws four points relative to the given center point.
 ///
 /// \li centerX + X, centerY + Y
@@ -323,10 +242,10 @@ static int8_t myCos(uint16_t angle) {
 /// \param color the color to draw the pixels with.
 void plotFourQuadrants(int32_t centerX, int32_t centerY, int32_t deltaX, int32_t deltaY)
 {
-    setPixel(centerX + deltaX, centerY + deltaY,1);      // Ist      Quadrant
-    setPixel(centerX - deltaX, centerY + deltaY,1);      // IInd     Quadrant
-    setPixel(centerX - deltaX, centerY - deltaY,1);      // IIIrd    Quadrant
-    setPixel(centerX + deltaX, centerY - deltaY,1);      // IVth     Quadrant
+	write_pixel_lm(centerX + deltaX, centerY + deltaY,1,1);      // Ist      Quadrant
+	write_pixel_lm(centerX - deltaX, centerY + deltaY,1,1);      // IInd     Quadrant
+	write_pixel_lm(centerX - deltaX, centerY - deltaY,1,1);      // IIIrd    Quadrant
+	write_pixel_lm(centerX + deltaX, centerY - deltaY,1,1);      // IVth     Quadrant
 }
 
 /// Implements the midpoint ellipse drawing algorithm which is a bresenham
@@ -395,18 +314,18 @@ void drawArrow(uint16_t x, uint16_t y, uint16_t angle, uint16_t size)
 	int16_t b = mySin(angle);
 	a = (a * (size/2)) / 100;
 	b = (b * (size/2)) / 100;
-	drawLine((x)-1 - b, (y)-1 + a, (x)-1 + b, (y)-1 - a); //Direction line
-	//drawLine((GRAPHICS_SIZE/2)-1 + a/2, (GRAPHICS_SIZE/2)-1 + b/2, (GRAPHICS_SIZE/2)-1 - a/2, (GRAPHICS_SIZE/2)-1 - b/2); //Arrow bottom line
-	drawLine((x)-1 + b, (y)-1 - a, (x)-1 - a/2, (y)-1 - b/2); // Arrow "wings"
-	drawLine((x)-1 + b, (y)-1 - a, (x)-1 + a/2, (y)-1 + b/2);
+	write_line_lm((x)-1 - b, (y)-1 + a, (x)-1 + b, (y)-1 - a, 1, 1); //Direction line
+	//write_line_lm((GRAPHICS_SIZE/2)-1 + a/2, (GRAPHICS_SIZE/2)-1 + b/2, (GRAPHICS_SIZE/2)-1 - a/2, (GRAPHICS_SIZE/2)-1 - b/2, 1, 1); //Arrow bottom line
+	write_line_lm((x)-1 + b, (y)-1 - a, (x)-1 - a/2, (y)-1 - b/2, 1, 1); // Arrow "wings"
+	write_line_lm((x)-1 + b, (y)-1 - a, (x)-1 + a/2, (y)-1 + b/2, 1, 1);
 }
 
 void drawBox(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2)
 {
-	drawLine(x1, y1, x2, y1); //top
-	drawLine(x1, y1, x1, y2); //left
-	drawLine(x2, y1, x2, y2); //right
-	drawLine(x1, y2, x2, y2); //bottom
+	write_line_lm(x1, y1, x2, y1, 1, 1); //top
+	write_line_lm(x1, y1, x1, y2, 1, 1); //left
+	write_line_lm(x2, y1, x2, y2, 1, 1); //right
+	write_line_lm(x1, y2, x2, y2, 1, 1); //bottom
 }
 
 // simple routines
@@ -925,30 +844,11 @@ void write_line(uint8_t *buff, unsigned int x0, unsigned int y0, unsigned int x1
 	{
 		if(steep)
 		{
-			if(lasty != y)
-			{
-				if(x > lasty)
-					write_vline(buff, stox, y, lasty, mode);
-				else
-					write_vline(buff, stox, lasty, y, mode);
-				lasty = y;
-				stox = x;
-			}
+			write_pixel(buff, y, x, mode);
 		}
 		else
 		{
-			//write_pixel(buff, x, y, mode);
-			/*
-			 if(lasty != y)
-			 {
-			 if(y > lasty)
-			 write_vline(buff, stox, y, lasty, mode);
-			 else
-			 write_vline(buff, stox, lasty, y, mode);
-			 lasty = y;
-			 stox = x;
-			 }
-			 */
+			write_pixel(buff, x, y, mode);
 		}
 		error -= deltay;
 		if(error < 0)

@@ -76,7 +76,7 @@ private:
     UAVObject::Metadata accInitialData;
 
 private slots:
-    virtual void refreshWidgetsValues();
+    virtual void refreshWidgetsValues(UAVObject * obj = NULL);
 	void refreshFixedWingWidgetsValues(QString frameType);
 	void refreshMultiRotorWidgetsValues(QString frameType);
 	void refreshGroundVehicleWidgetsValues(QString frameType);

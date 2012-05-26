@@ -27,6 +27,8 @@
 
 #include "telemetry.h"
 #include "qxtlogger.h"
+#include "pipxsettings.h"
+#include "objectpersistence.h"
 #include <QTime>
 #include <QtGlobal>
 #include <stdlib.h>
@@ -393,7 +395,7 @@ void Telemetry::processObjectQueue()
     if ( gcsStats.Status != GCSTelemetryStats::STATUS_CONNECTED )
     {
         objQueue.clear();
-        if ( objInfo.obj->getObjID() != GCSTelemetryStats::OBJID )
+        if ( objInfo.obj->getObjID() != GCSTelemetryStats::OBJID && objInfo.obj->getObjID() != PipXSettings::OBJID  && objInfo.obj->getObjID() != ObjectPersistence::OBJID )
         {
             objInfo.obj->emitTransactionCompleted(false);
             return;

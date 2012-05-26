@@ -7,7 +7,12 @@ MCU                 := cortex-m3
 CHIP                := STM32F103CBT
 BOARD               := STM32103CB_PIPXTREME
 MODEL               := MD
-MODEL_SUFFIX        := 
+MODEL_SUFFIX        := _PX
+
+OPENOCD_CONFIG      := stm32f1x.cfg
+
+OPENOCD_JTAG_CONFIG := foss-jtag.revb.cfg
+OPENOCD_CONFIG      := stm32f1x.cfg
 
 OPENOCD_JTAG_CONFIG := foss-jtag.revb.cfg
 OPENOCD_CONFIG      := stm32f1x.cfg

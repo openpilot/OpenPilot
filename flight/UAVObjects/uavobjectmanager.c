@@ -49,118 +49,99 @@
 /**
  * List of event queues and the eventmask associated with the queue.
  */
-struct ObjectEventListStruct {
+struct ObjectEventList {
 	xQueueHandle queue;
 	UAVObjEventCallback cb;
 	uint8_t eventMask;
-	struct ObjectEventListStruct *next;
+	struct ObjectEventList *next;
 };
-typedef struct ObjectEventListStruct ObjectEventList;
 
 /**
  * List of object instances, holds a pointer to the next instance and some UAVObjectData
  */
-struct ObjectInstListStruct {
-	struct ObjectInstListStruct *next;
+struct ObjectInstList {
+	struct ObjectInstList *next;
 } __attribute__((packed));
-typedef struct ObjectInstListStruct ObjectInstList;
 
 /** fake structure for arbitrary sizes **/
-struct ObjectInstanceStruct {
-	ObjectInstList header;
+struct ObjectInstance {
+	struct ObjectInstList header;
 	uint32_t data;
 } __attribute__((packed));
-typedef struct ObjectInstanceStruct ObjectInstance;
-#define ObjectInstanceSize(numBytes) (offsetof(ObjectInstance,data)+(numBytes))
+#define ObjectInstanceSize(numBytes) (offsetof(struct ObjectInstance,data)+(numBytes))
 
 /** anonymous type for instances **/
 typedef void* InstanceHandle; 
 
-typedef enum {
+enum ObjectFlags {
 	OL_IS_METAOBJECT = 0x01, /** Set if this is a metaobject */
 	OL_IS_SINGLE_INSTANCE = 0x02, /** Set if this object has a single instance */
 	OL_IS_SETTINGS = 0x04 /** Set if this object is a settings object */
-} ObjectFlags;
+};
 
 /**
  * List of objects registered in the object manager
  */
 
-struct GenericObjectStruct {
-	ObjectFlags flags;
-	/** The object list mode flags */
-	const char *name;
-	/** The object name */
-	ObjectEventList *events;
-	/** Event queues registered on the object */
+struct GenericObject {
+	enum ObjectFlags flags; /* The object list mode flags */
+	const char *name;	  /* The object name */
+	struct ObjectEventList *events;	/* Event queues registered on the object */
 }  __attribute__((packed));
-typedef struct GenericObjectStruct GenericObject;
 
-struct MetaObjectStruct {
-	GenericObject header;
-	UAVObjMetadata data;
-	/** the actual metadata */
+struct MetaObject {
+	struct GenericObject header;
+	UAVObjMetadata data;	/* the actual metadata */
 } __attribute__((packed));
-typedef struct MetaObjectStruct MetaObject;
 
-struct ObjectListStruct {
-	GenericObject header;
-	uint32_t id;
-	/** The object ID */
-	uint16_t numBytes;
-	/** Number of data bytes contained in the object (for a single instance) */
-	MetaObject metaObj;
-	/** Meta object of the UAVObject */
-	struct ObjectListStruct *next;
-	/** Needed by linked list library (utlist.h) */
+struct ObjectList {
+	struct GenericObject header;
+	uint32_t id;		/* The object ID */
+	uint16_t numBytes; /* Number of data bytes contained in the object (for a single instance) */
+	struct MetaObject metaObj; /* Meta object of the UAVObject */
+	struct ObjectList *next; /* Needed by linked list library (utlist.h) */
 } __attribute__((packed));
-typedef struct ObjectListStruct ObjectList;
 
 /** fake structure for arbitrary sizes **/
-struct ObjectListInstanceStruct {
-	ObjectList header;
+struct ObjectListInstance {
+	struct ObjectList header;
 	uint32_t data;
 } __attribute__((packed));
-typedef struct ObjectListInstanceStruct ObjectListInstance;
-#define ObjectListInstanceSize(numBytes) (offsetof(ObjectListInstance,data)+(numBytes))
+#define ObjectListInstanceSize(numBytes) (offsetof(struct ObjectListInstance,data)+(numBytes))
 
-struct ObjectListMultiStruct {
-	ObjectList header;
-	uint16_t numInstances;
-	/** Number of instances */
-	ObjectInstList instances;
-	/** List of object instances, instance 0 always exists */
+struct ObjectListMulti {
+	struct ObjectList header;
+	uint16_t numInstances; /** Number of instances */
+	struct ObjectInstList instances; /** List of object instances, instance 0 always exists */
 } __attribute__((packed));
-typedef struct ObjectListMultiStruct ObjectListMulti;
 
 /** fake structure for arbitrary sizes **/
-struct ObjectListMultiInstanceStruct {
-	ObjectListMulti header;
+struct ObjectListMultiInstance {
+	struct ObjectListMulti header;
 	uint32_t data;
 } __attribute__((packed));
-typedef struct ObjectListMultiInstanceStruct ObjectListMultiInstance;
-#define ObjectListMultiInstanceSize(numBytes) (offsetof(ObjectListMultiInstance,data)+(numBytes))
+#define ObjectListMultiInstanceSize(numBytes) (offsetof(struct ObjectListMultiInstance,data)+(numBytes))
 
 /** all information about a metaobject are hardcoded constants **/
 #define MetaNumBytes sizeof(UAVObjMetadata)
-#define MetaBaseObjectPtr(obj) ((ObjectList *)((obj)-offsetof(ObjectList, metaObj)))
-#define MetaObjectPtr(obj) ((MetaObject*) &((obj)->metaObj))
+#define MetaBaseObjectPtr(obj) ((struct ObjectList *)((obj)-offsetof(struct ObjectList, metaObj)))
+#define MetaObjectPtr(obj) ((struct MetaObject*) &((obj)->metaObj))
 #define MetaDataPtr(obj) ((UAVObjMetadata*)&((obj)->data))
 #define LinkedMetaDataPtr(obj) ((UAVObjMetadata*)&((obj)->metaObj.data))
 #define MetaObjectId(id) (id+1)
 #define MetaNumInstances 1
 
 /** all information about instances are dependant on object type **/
-#define ObjNumInstances(obj) (OLGetIsSingleInstance((GenericObject*)(obj))?1:((ObjectListMulti *)(obj))->numInstances)
-#define ObjSingleInstanceDataOffset(obj) ((void*)(&(( (ObjectListInstance*)obj )->data)))
-#define InstanceDataOffset(inst) ((void*)&(( (ObjectInstance*)inst )->data))
+#define ObjNumInstances(obj) (OLGetIsSingleInstance((struct GenericObject*)(obj))?1:((struct ObjectListMulti *)(obj))->numInstances)
+#define ObjSingleInstanceDataOffset(obj) ((void*)(&(( (struct ObjectListInstance*)obj )->data)))
+#define InstanceDataOffset(inst) ((void*)&(( (struct ObjectInstance*)inst )->data))
 #define InstanceData(instance) (void*)instance
 
 // Private functions
-static int32_t sendEvent(GenericObject * obj, uint16_t instId,
+static int32_t sendEvent(struct GenericObject * obj, uint16_t instId,
 			UAVObjEventType event);
-static InstanceHandle createInstance(ObjectList * obj, uint16_t instId);
-static InstanceHandle getInstance(ObjectList * obj, uint16_t instId);
+static InstanceHandle createInstance(struct ObjectList * obj, uint16_t instId);
+static InstanceHandle getInstance(struct ObjectList * obj, uint16_t instId);
 static int32_t connectObj(UAVObjHandle obj, xQueueHandle queue,
 			UAVObjEventCallback cb, uint8_t eventMask);
 static int32_t disconnectObj(UAVObjHandle obj, xQueueHandle queue,
@@ -172,7 +153,7 @@ static void customSPrintf(uint8_t * buffer, uint8_t * format, ...);
 #endif
 
 // Private variables
-static ObjectList *objList;
+static struct ObjectList *objList;
 static xSemaphoreHandle mutex;
 static UAVObjMetadata defMetadata;
 static UAVObjStats stats;
@@ -240,7 +221,7 @@ UAVObjHandle UAVObjRegister(uint32_t id, const char *name,
 			uint32_t numBytes,
 			UAVObjInitializeCallback initCb)
 {
-	ObjectList *objEntry;
+	struct ObjectList *objEntry;
 
 	// Get lock
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
@@ -256,34 +237,34 @@ UAVObjHandle UAVObjRegister(uint32_t id, const char *name,
 
 	// Create and append entry
 	if (isSingleInstance) {
-		objEntry = (ObjectList *) pvPortMalloc( ObjectListInstanceSize(numBytes) );
+		objEntry = (struct ObjectList *) pvPortMalloc( ObjectListInstanceSize(numBytes) );
 	} else {
-		objEntry = (ObjectList *) pvPortMalloc( ObjectListMultiInstanceSize(numBytes) );
+		objEntry = (struct ObjectList *) pvPortMalloc( ObjectListMultiInstanceSize(numBytes) );
 	}
 	if (objEntry == NULL) {
 		xSemaphoreGiveRecursive(mutex);
 		return NULL;
 	}
-	( (GenericObject*)objEntry )->name = name;
-	( (GenericObject*)objEntry )->events = NULL;
-	OLSetIsMetaobject(     (GenericObject*)objEntry, 0);
-	OLSetIsSingleInstance( (GenericObject*)objEntry, isSingleInstance);
-	OLSetIsSettings(       (GenericObject*)objEntry, isSettings);
+	( (struct GenericObject*)objEntry )->name = name;
+	( (struct GenericObject*)objEntry )->events = NULL;
+	OLSetIsMetaobject(     (struct GenericObject*)objEntry, 0);
+	OLSetIsSingleInstance( (struct GenericObject*)objEntry, isSingleInstance);
+	OLSetIsSettings(       (struct GenericObject*)objEntry, isSettings);
 	objEntry->id = id;
 	objEntry->numBytes = numBytes;
 	// Create instance
 	if (isSingleInstance) {
 		memset(ObjSingleInstanceDataOffset(objEntry), 0, numBytes);
 	} else {
-		( (ObjectListMulti*)objEntry )->numInstances = 1;
-		( (ObjectListMulti*)objEntry )->instances.next = NULL;
-		memset(InstanceDataOffset(&(( (ObjectListMulti*)objEntry )->instances)), 0, numBytes);
+		( (struct ObjectListMulti*)objEntry )->numInstances = 1;
+		( (struct ObjectListMulti*)objEntry )->instances.next = NULL;
+		memset(InstanceDataOffset(&(( (struct ObjectListMulti*)objEntry )->instances)), 0, numBytes);
 	}
 	// Create metaobject
 	memset(LinkedMetaDataPtr(objEntry), 0, MetaNumBytes);
-	( (GenericObject*)MetaObjectPtr(objEntry) )->flags = OL_IS_METAOBJECT | OL_IS_SINGLE_INSTANCE;
-	( (GenericObject*)MetaObjectPtr(objEntry) )->name = metaName;
-	( (GenericObject*)MetaObjectPtr(objEntry) )->events = NULL;
+	( (struct GenericObject*)MetaObjectPtr(objEntry) )->flags = OL_IS_METAOBJECT | OL_IS_SINGLE_INSTANCE;
+	( (struct GenericObject*)MetaObjectPtr(objEntry) )->name = metaName;
+	( (struct GenericObject*)MetaObjectPtr(objEntry) )->events = NULL;
 	LL_APPEND(objList, objEntry);
 
 	// fire events 
@@ -296,11 +277,11 @@ UAVObjHandle UAVObjRegister(uint32_t id, const char *name,
 		initCb((UAVObjHandle) objEntry, 0);
 	}
 	// Attempt to load object's metadata from the SD card (not done directly on the metaobject, but through the object)
-	if (!OLGetIsMetaobject((GenericObject*)objEntry)) {
+	if (!OLGetIsMetaobject((struct GenericObject*)objEntry)) {
 		UAVObjLoad((UAVObjHandle) MetaObjectPtr(objEntry), 0);
 	}
 	// If this is a settings object, attempt to load from SD card
-	if (OLGetIsSettings((GenericObject*)objEntry)) {
+	if (OLGetIsSettings((struct GenericObject*)objEntry)) {
 		UAVObjLoad((UAVObjHandle) objEntry, 0);
 	}
 	// Release lock
@@ -315,7 +296,7 @@ UAVObjHandle UAVObjRegister(uint32_t id, const char *name,
  */
 UAVObjHandle UAVObjGetByID(uint32_t id)
 {
-	ObjectList *objEntry;
+	struct ObjectList *objEntry;
 
 	// Get lock
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
@@ -348,22 +329,22 @@ UAVObjHandle UAVObjGetByID(uint32_t id)
  */
 UAVObjHandle UAVObjGetByName(char *name)
 {
-	ObjectList *objEntry;
+	struct ObjectList *objEntry;
 
 	// Get lock
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
 	// Look for object
 	LL_FOREACH(objList, objEntry) {
-		if (      ( (GenericObject*)objEntry )->name != NULL
-			&& strcmp(( (GenericObject*)objEntry )->name, name) == 0) {
+		if (      ( (struct GenericObject*)objEntry )->name != NULL
+			&& strcmp(( (struct GenericObject*)objEntry )->name, name) == 0) {
 			// Release lock
 			xSemaphoreGiveRecursive(mutex);
 			// Done, object found
 			return (UAVObjHandle) objEntry;
 		}
-		if (      ( (GenericObject*)MetaObjectPtr(objEntry) )->name != NULL
-			&& strcmp(( (GenericObject*)MetaObjectPtr(objEntry) )->name, name) == 0) {
+		if (      ( (struct GenericObject*)MetaObjectPtr(objEntry) )->name != NULL
+			&& strcmp(( (struct GenericObject*)MetaObjectPtr(objEntry) )->name, name) == 0) {
 			// Release lock
 			xSemaphoreGiveRecursive(mutex);
 			// Done, object found
@@ -384,10 +365,10 @@ UAVObjHandle UAVObjGetByName(char *name)
 uint32_t UAVObjGetID(UAVObjHandle obj)
 {
 	PIOS_Assert(obj);
-	if (OLGetIsMetaobject( (GenericObject *) obj) ) {
+	if (OLGetIsMetaobject( (struct GenericObject *) obj) ) {
 		return MetaObjectId( MetaBaseObjectPtr(obj)->id );
 	} else {
-		return ((ObjectList *) obj)->id;
+		return ((struct ObjectList *) obj)->id;
 	}
 }
 
@@ -399,7 +380,7 @@ uint32_t UAVObjGetID(UAVObjHandle obj)
 const char *UAVObjGetName(UAVObjHandle obj)
 {
 	PIOS_Assert(obj);
-	return ((GenericObject *) obj)->name;
+	return ((struct GenericObject *) obj)->name;
 }
 
 /**
@@ -410,10 +391,10 @@ const char *UAVObjGetName(UAVObjHandle obj)
 uint32_t UAVObjGetNumBytes(UAVObjHandle obj)
 {
 	PIOS_Assert(obj);
-	if (OLGetIsMetaobject( (GenericObject *) obj) ) {
+	if (OLGetIsMetaobject( (struct GenericObject *) obj) ) {
 		return MetaNumBytes;
 	} else {
-		return ((ObjectList *) obj)->numBytes;
+		return ((struct ObjectList *) obj)->numBytes;
 	}
 }
 
@@ -427,10 +408,10 @@ uint32_t UAVObjGetNumBytes(UAVObjHandle obj)
 UAVObjHandle UAVObjGetLinkedObj(UAVObjHandle obj)
 {
 	PIOS_Assert(obj);
-	if (OLGetIsMetaobject( (GenericObject *) obj) ) {
+	if (OLGetIsMetaobject( (struct GenericObject *) obj) ) {
 		return (UAVObjHandle) MetaBaseObjectPtr(obj);
 	} else {
-		return (UAVObjHandle) MetaObjectPtr( (ObjectList*) obj);
+		return (UAVObjHandle) MetaObjectPtr( (struct ObjectList*) obj);
 	}
 }
 
@@ -442,7 +423,7 @@ UAVObjHandle UAVObjGetLinkedObj(UAVObjHandle obj)
 uint16_t UAVObjGetNumInstances(UAVObjHandle obj)
 {
 	PIOS_Assert(obj);
-	if (OLGetIsMetaobject( (GenericObject *) obj) ) {
+	if (OLGetIsMetaobject( (struct GenericObject *) obj) ) {
 		return MetaNumInstances;
 	}
 	uint32_t numInstances;
@@ -461,7 +442,7 @@ uint16_t UAVObjCreateInstance(UAVObjHandle obj,
 			UAVObjInitializeCallback initCb)
 {
 	PIOS_Assert(obj);
-	if (OLGetIsMetaobject( (GenericObject *) obj) ) {
+	if (OLGetIsMetaobject( (struct GenericObject *) obj) ) {
 		return -1;
 	}
 
@@ -473,7 +454,7 @@ uint16_t UAVObjCreateInstance(UAVObjHandle obj,
 
 	// Create new instance
 	instId = ObjNumInstances(obj);
-	instEntry = createInstance( (ObjectList*)obj, instId);
+	instEntry = createInstance( (struct ObjectList*)obj, instId);
 	if (instEntry == NULL) {
 		xSemaphoreGiveRecursive(mutex);
 		return -1;
@@ -495,7 +476,7 @@ uint16_t UAVObjCreateInstance(UAVObjHandle obj,
 int32_t UAVObjIsSingleInstance(UAVObjHandle obj)
 {
 	PIOS_Assert(obj);
-	return OLGetIsSingleInstance((GenericObject *) obj);
+	return OLGetIsSingleInstance((struct GenericObject *) obj);
 }
 
 /**
@@ -506,7 +487,7 @@ int32_t UAVObjIsSingleInstance(UAVObjHandle obj)
 int32_t UAVObjIsMetaobject(UAVObjHandle obj)
 {
 	PIOS_Assert(obj);
-	return OLGetIsMetaobject((GenericObject *) obj);
+	return OLGetIsMetaobject((struct GenericObject *) obj);
 }
 
 /**
@@ -517,7 +498,7 @@ int32_t UAVObjIsMetaobject(UAVObjHandle obj)
 int32_t UAVObjIsSettings(UAVObjHandle obj)
 {
 	PIOS_Assert(obj);
-	return OLGetIsSettings((GenericObject *) obj);
+	return OLGetIsSettings((struct GenericObject *) obj);
 }
 
 /**
@@ -534,19 +515,19 @@ int32_t UAVObjUnpack(UAVObjHandle obj, uint16_t instId,
 	// Lock
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
-	if (OLGetIsMetaobject( (GenericObject *) obj )) {
+	if (OLGetIsMetaobject( (struct GenericObject *) obj )) {
 		if (instId != 0) {
 			// Error, unlock and return
 			xSemaphoreGiveRecursive(mutex);
 			return -1;
 		}
-		memcpy(MetaDataPtr((MetaObject *)obj), dataIn, MetaNumBytes);
+		memcpy(MetaDataPtr((struct MetaObject *)obj), dataIn, MetaNumBytes);
 	} else {
-		ObjectList *objEntry;
+		struct ObjectList *objEntry;
 		InstanceHandle instEntry;
 
 		// Cast handle to object
-		objEntry = (ObjectList *) obj;
+		objEntry = (struct ObjectList *) obj;
 
 		// Get the instance
 		instEntry = getInstance(objEntry, instId);
@@ -565,7 +546,7 @@ int32_t UAVObjUnpack(UAVObjHandle obj, uint16_t instId,
 	}
 
 	// Fire event
-	sendEvent((GenericObject*)obj, instId, EV_UNPACKED);
+	sendEvent((struct GenericObject*)obj, instId, EV_UNPACKED);
 
 	// Unlock
 	xSemaphoreGiveRecursive(mutex);
@@ -585,19 +566,19 @@ int32_t UAVObjPack(UAVObjHandle obj, uint16_t instId, uint8_t * dataOut)
 	// Lock
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
-	if (OLGetIsMetaobject( (GenericObject *) obj )) {
+	if (OLGetIsMetaobject( (struct GenericObject *) obj )) {
 		if (instId != 0) {
 			// Error, unlock and return
 			xSemaphoreGiveRecursive(mutex);
 			return -1;
 		}
-		memcpy(dataOut, MetaDataPtr((MetaObject *)obj), MetaNumBytes);
+		memcpy(dataOut, MetaDataPtr((struct MetaObject *)obj), MetaNumBytes);
 	} else {
-		ObjectList *objEntry;
+		struct ObjectList *objEntry;
 		InstanceHandle instEntry;
 
 		// Cast handle to object
-		objEntry = (ObjectList *) obj;
+		objEntry = (struct ObjectList *) obj;
 
 		// Get the instance
 		instEntry = getInstance(objEntry, instId);
@@ -637,7 +618,7 @@ int32_t UAVObjSaveToFile(UAVObjHandle obj, uint16_t instId,
 	// Lock
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
-	if (OLGetIsMetaobject( (GenericObject *) obj )) {
+	if (OLGetIsMetaobject( (struct GenericObject *) obj )) {
 		// Get the instance information
 		if (instId != 0) {
 			xSemaphoreGiveRecursive(mutex);
@@ -649,18 +630,18 @@ int32_t UAVObjSaveToFile(UAVObjHandle obj, uint16_t instId,
 			&bytesWritten);
 
 		// Write the data and check that the write was successful
-		PIOS_FWRITE(file, MetaDataPtr((MetaObject *)obj), MetaNumBytes,
+		PIOS_FWRITE(file, MetaDataPtr((struct MetaObject *)obj), MetaNumBytes,
 			&bytesWritten);
 		if (bytesWritten != MetaNumBytes) {
 			xSemaphoreGiveRecursive(mutex);
 			return -1;
 		}
 	} else {
-		ObjectList *objEntry;
+		struct ObjectList *objEntry;
 		InstanceHandle instEntry;
 
 		// Cast to object
-		objEntry = (ObjectList *) obj;
+		objEntry = (struct ObjectList *) obj;
 
 		// Get the instance information
 		instEntry = getInstance(objEntry, instId);
@@ -673,7 +654,7 @@ int32_t UAVObjSaveToFile(UAVObjHandle obj, uint16_t instId,
 			&bytesWritten);
 
 		// Write the instance ID
-		if (!OLGetIsSingleInstance((GenericObject*)obj)) {
+		if (!OLGetIsSingleInstance((struct GenericObject*)obj)) {
 			PIOS_FWRITE(file, &instId,
 				sizeof(instId), &bytesWritten);
 		}
@@ -705,14 +686,14 @@ int32_t UAVObjSave(UAVObjHandle obj, uint16_t instId)
 {
 	PIOS_Assert(obj);
 #if defined(PIOS_INCLUDE_FLASH_SECTOR_SETTINGS)
-	if (OLGetIsMetaobject( (GenericObject *) obj )) {
+	if (OLGetIsMetaobject( (struct GenericObject *) obj )) {
 		if (instId != 0)
 			return -1;
 
-		if (PIOS_FLASHFS_ObjSave(obj, instId, (uint8_t*) MetaDataPtr((MetaObject *)obj)) != 0)
+		if (PIOS_FLASHFS_ObjSave(obj, instId, (uint8_t*) MetaDataPtr((struct MetaObject *)obj)) != 0)
 			return -1;
 	} else {
-		InstanceHandle instEntry = getInstance( (ObjectList*)obj, instId);
+		InstanceHandle instEntry = getInstance( (struct ObjectList*)obj, instId);
 
 		if (instEntry == NULL)
 			return -1;
@@ -765,7 +746,7 @@ UAVObjHandle UAVObjLoadFromFile(FILEINFO * file)
 {
 #if defined(PIOS_INCLUDE_SDCARD)
 	uint32_t bytesRead;
-	GenericObject *objEntry;
+	struct GenericObject *objEntry;
 	InstanceHandle instEntry;
 	uint32_t objId;
 	uint16_t instId;
@@ -789,7 +770,7 @@ UAVObjHandle UAVObjLoadFromFile(FILEINFO * file)
 		xSemaphoreGiveRecursive(mutex);
 		return NULL;
 	}
-	objEntry = (GenericObject *) obj;
+	objEntry = (struct GenericObject *) obj;
 
 	// Get the instance ID
 	instId = 0;
@@ -810,18 +791,18 @@ UAVObjHandle UAVObjLoadFromFile(FILEINFO * file)
 		}
 		// Read the instance data
 		if (PIOS_FREAD
-			(file, MetaDataPtr((MetaObject *)obj), MetaNumBytes, &bytesRead)) {
+			(file, MetaDataPtr((struct MetaObject *)obj), MetaNumBytes, &bytesRead)) {
 			xSemaphoreGiveRecursive(mutex);
 			return NULL;
 		}
 	} else {
 
 		// Get the instance information
-		instEntry = getInstance((ObjectList *)objEntry, instId);
+		instEntry = getInstance((struct ObjectList *)objEntry, instId);
 
 		// If the instance does not exist create it and any other instances before it
 		if (instEntry == NULL) {
-			instEntry = createInstance((ObjectList *)objEntry, instId);
+			instEntry = createInstance((struct ObjectList *)objEntry, instId);
 			if (instEntry == NULL) {
 				// Error, unlock and return
 				xSemaphoreGiveRecursive(mutex);
@@ -830,7 +811,7 @@ UAVObjHandle UAVObjLoadFromFile(FILEINFO * file)
 		}
 		// Read the instance data
 		if (PIOS_FREAD
-			(file, InstanceData(instEntry), ((ObjectList *)objEntry)->numBytes, &bytesRead)) {
+			(file, InstanceData(instEntry), ((struct ObjectList *)objEntry)->numBytes, &bytesRead)) {
 			xSemaphoreGiveRecursive(mutex);
 			return NULL;
 		}
@@ -860,25 +841,25 @@ int32_t UAVObjLoad(UAVObjHandle obj, uint16_t instId)
 {
 	PIOS_Assert(obj);
 #if defined(PIOS_INCLUDE_FLASH_SECTOR_SETTINGS)
-	if (OLGetIsMetaobject( (GenericObject*) obj )) {
+	if (OLGetIsMetaobject( (struct GenericObject*) obj )) {
 		if (instId != 0)
 			return -1;
 
 		// Fire event on success
-		if (PIOS_FLASHFS_ObjLoad(obj, instId, (uint8_t*) MetaDataPtr((MetaObject *)obj)) == 0)
-			sendEvent((GenericObject*)obj, instId, EV_UNPACKED);
+		if (PIOS_FLASHFS_ObjLoad(obj, instId, (uint8_t*) MetaDataPtr((struct MetaObject *)obj)) == 0)
+			sendEvent((struct GenericObject*)obj, instId, EV_UNPACKED);
 		else
 			return -1;
 	} else {
 
-		InstanceHandle instEntry = getInstance( (ObjectList*)obj, instId);
+		InstanceHandle instEntry = getInstance( (struct ObjectList*)obj, instId);
 
 		if (instEntry == NULL)
 			return -1;
 
 		// Fire event on success
 		if (PIOS_FLASHFS_ObjLoad(obj, instId, InstanceData(instEntry)) == 0)
-			sendEvent((GenericObject*)obj, instId, EV_UNPACKED);
+			sendEvent((struct GenericObject*)obj, instId, EV_UNPACKED);
 		else
 			return -1;
 	}
@@ -965,7 +946,7 @@ int32_t UAVObjDelete(UAVObjHandle obj, uint16_t instId)
  */
 int32_t UAVObjSaveSettings()
 {
-	ObjectList *objEntry;
+	struct ObjectList *objEntry;
 
 	// Get lock
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
@@ -973,7 +954,7 @@ int32_t UAVObjSaveSettings()
 	// Save all settings objects
 	LL_FOREACH(objList, objEntry) {
 		// Check if this is a settings object
-		if (OLGetIsSettings((GenericObject*)objEntry)) {
+		if (OLGetIsSettings((struct GenericObject*)objEntry)) {
 			// Save object
 			if (UAVObjSave((UAVObjHandle) objEntry, 0) ==
 				-1) {
@@ -994,7 +975,7 @@ int32_t UAVObjSaveSettings()
  */
 int32_t UAVObjLoadSettings()
 {
-	ObjectList *objEntry;
+	struct ObjectList *objEntry;
 
 	// Get lock
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
@@ -1002,7 +983,7 @@ int32_t UAVObjLoadSettings()
 	// Load all settings objects
 	LL_FOREACH(objList, objEntry) {
 		// Check if this is a settings object
-		if (OLGetIsSettings((GenericObject *)objEntry)) {
+		if (OLGetIsSettings((struct GenericObject *)objEntry)) {
 			// Load object
 			if (UAVObjLoad((UAVObjHandle) objEntry, 0) ==
 				-1) {
@@ -1023,7 +1004,7 @@ int32_t UAVObjLoadSettings()
  */
 int32_t UAVObjDeleteSettings()
 {
-	ObjectList *objEntry;
+	struct ObjectList *objEntry;
 
 	// Get lock
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
@@ -1031,7 +1012,7 @@ int32_t UAVObjDeleteSettings()
 	// Save all settings objects
 	LL_FOREACH(objList, objEntry) {
 		// Check if this is a settings object
-		if (OLGetIsSettings((GenericObject *)objEntry)) {
+		if (OLGetIsSettings((struct GenericObject *)objEntry)) {
 			// Save object
 			if (UAVObjDelete((UAVObjHandle) objEntry, 0)
 				== -1) {
@@ -1052,7 +1033,7 @@ int32_t UAVObjDeleteSettings()
  */
 int32_t UAVObjSaveMetaobjects()
 {
-	ObjectList *objEntry;
+	struct ObjectList *objEntry;
 
 	// Get lock
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
@@ -1078,7 +1059,7 @@ int32_t UAVObjSaveMetaobjects()
  */
 int32_t UAVObjLoadMetaobjects()
 {
-	ObjectList *objEntry;
+	struct ObjectList *objEntry;
 
 	// Get lock
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
@@ -1104,7 +1085,7 @@ int32_t UAVObjLoadMetaobjects()
  */
 int32_t UAVObjDeleteMetaobjects()
 {
-	ObjectList *objEntry;
+	struct ObjectList *objEntry;
 
 	// Get lock
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
@@ -1183,12 +1164,12 @@ int32_t UAVObjSetInstanceData(UAVObjHandle obj, uint16_t instId,
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
 	// Check access level
-	if (!OLGetIsMetaobject((GenericObject *)obj)) {
-		ObjectList *objEntry;
+	if (!OLGetIsMetaobject((struct GenericObject *)obj)) {
+		struct ObjectList *objEntry;
 		InstanceHandle instEntry;
 
 		// Cast to object info
-		objEntry = (ObjectList *) obj;
+		objEntry = (struct ObjectList *) obj;
 
 		if (UAVObjGetAccess( LinkedMetaDataPtr(objEntry) ) == ACCESS_READONLY) {
 			xSemaphoreGiveRecursive(mutex);
@@ -1211,11 +1192,11 @@ int32_t UAVObjSetInstanceData(UAVObjHandle obj, uint16_t instId,
 			return -1;
 		}
 		// Set data
-		memcpy(MetaDataPtr((MetaObject *)obj), dataIn, MetaNumBytes);
+		memcpy(MetaDataPtr((struct MetaObject *)obj), dataIn, MetaNumBytes);
 	}
 
 	// Fire event
-	sendEvent((GenericObject *)obj, instId, EV_UPDATED);
+	sendEvent((struct GenericObject *)obj, instId, EV_UPDATED);
 
 	// Unlock
 	xSemaphoreGiveRecursive(mutex);
@@ -1236,13 +1217,13 @@ int32_t UAVObjSetInstanceDataField(UAVObjHandle obj, uint16_t instId, const void
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
 	// Check access level
-	if ( !OLGetIsMetaobject( (GenericObject*) obj ) )
+	if ( !OLGetIsMetaobject( (struct GenericObject*) obj ) )
 	{
-		ObjectList* objEntry;
+		struct ObjectList* objEntry;
 		InstanceHandle instEntry;
 
 		// Cast to object info
-		objEntry = (ObjectList*)obj;
+		objEntry = (struct ObjectList*)obj;
 
 		if ( UAVObjGetAccess( LinkedMetaDataPtr(objEntry) ) == ACCESS_READONLY )
 		{
@@ -1285,12 +1266,12 @@ int32_t UAVObjSetInstanceDataField(UAVObjHandle obj, uint16_t instId, const void
 		}
 
 		// Set data
-		memcpy(MetaDataPtr((MetaObject *)obj) + offset, dataIn, size);
+		memcpy(MetaDataPtr((struct MetaObject *)obj) + offset, dataIn, size);
 	}
 
 
 	// Fire event
-	sendEvent((GenericObject *)obj, instId, EV_UPDATED);
+	sendEvent((struct GenericObject *)obj, instId, EV_UPDATED);
 
 	// Unlock
 	xSemaphoreGiveRecursive(mutex);
@@ -1311,13 +1292,13 @@ int32_t UAVObjGetInstanceData(UAVObjHandle obj, uint16_t instId,
 	// Lock
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
-	if ( !OLGetIsMetaobject( (GenericObject*) obj) )
+	if ( !OLGetIsMetaobject( (struct GenericObject*) obj) )
 	{
-		ObjectList *objEntry;
+		struct ObjectList *objEntry;
 		InstanceHandle instEntry;
 
 		// Cast to object info
-		objEntry = (ObjectList *) obj;
+		objEntry = (struct ObjectList *) obj;
 
 		// Get instance information
 		instEntry = getInstance(objEntry, instId);
@@ -1336,7 +1317,7 @@ int32_t UAVObjGetInstanceData(UAVObjHandle obj, uint16_t instId,
 			return -1;
 		}
 		// Set data
-		memcpy(dataOut, MetaDataPtr((MetaObject *)obj), MetaNumBytes);
+		memcpy(dataOut, MetaDataPtr((struct MetaObject *)obj), MetaNumBytes);
 	}
 
 	// Unlock
@@ -1357,13 +1338,13 @@ int32_t UAVObjGetInstanceDataField(UAVObjHandle obj, uint16_t instId, void* data
 	// Lock
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
-	if ( !OLGetIsMetaobject( (GenericObject*) obj ) )
+	if ( !OLGetIsMetaobject( (struct GenericObject*) obj ) )
 	{
-		ObjectList* objEntry;
+		struct ObjectList* objEntry;
 		InstanceHandle instEntry;
 
 		// Cast to object info
-		objEntry = (ObjectList*)obj;
+		objEntry = (struct ObjectList*)obj;
 
 		// Get instance information
 		instEntry = getInstance(objEntry, instId);
@@ -1402,7 +1383,7 @@ int32_t UAVObjGetInstanceDataField(UAVObjHandle obj, uint16_t instId, void* data
 		}
 		
 		// Set data
-		memcpy(dataOut, MetaDataPtr((MetaObject *)obj) + offset, size);
+		memcpy(dataOut, MetaDataPtr((struct MetaObject *)obj) + offset, size);
 	}
 
 	// Unlock
@@ -1424,8 +1405,8 @@ int32_t UAVObjSetMetadata(UAVObjHandle obj, const UAVObjMetadata * dataIn)
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
 	// Set metadata (metadata of metaobjects can not be modified)
-	if (!OLGetIsMetaobject((GenericObject*)obj)) {
-		UAVObjSetData((UAVObjHandle) MetaObjectPtr( (ObjectList*)obj ),
+	if (!OLGetIsMetaobject((struct GenericObject*)obj)) {
+		UAVObjSetData((UAVObjHandle) MetaObjectPtr( (struct ObjectList*)obj ),
 			dataIn);
 	} else {
 		return -1;
@@ -1450,10 +1431,10 @@ int32_t UAVObjGetMetadata(UAVObjHandle obj, UAVObjMetadata * dataOut)
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
 	// Get metadata
-	if (OLGetIsMetaobject((GenericObject*)obj)) {
+	if (OLGetIsMetaobject((struct GenericObject*)obj)) {
 		memcpy(dataOut, &defMetadata, sizeof(UAVObjMetadata));
 	} else {
-		UAVObjGetData((UAVObjHandle) MetaObjectPtr( (ObjectList*)obj ),
+		UAVObjGetData((UAVObjHandle) MetaObjectPtr( (struct ObjectList*)obj ),
 			dataOut);
 	}
 
@@ -1616,8 +1597,8 @@ void UAVObjSetGcsTelemetryUpdateMode(UAVObjMetadata* metadata, UAVObjUpdateMode 
 int8_t UAVObjReadOnly(UAVObjHandle obj)
 {
 	PIOS_Assert(obj);
-	if (!OLGetIsMetaobject( (GenericObject *)obj)) {
-		return UAVObjGetAccess( LinkedMetaDataPtr( (ObjectList*)obj ) ) == ACCESS_READONLY;
+	if (!OLGetIsMetaobject( (struct GenericObject *)obj)) {
+		return UAVObjGetAccess( LinkedMetaDataPtr( (struct ObjectList*)obj ) ) == ACCESS_READONLY;
 	}
 	return -1;
 }
@@ -1714,7 +1695,7 @@ void UAVObjRequestInstanceUpdate(UAVObjHandle obj, uint16_t instId)
 {
 	PIOS_Assert(obj);
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
-	sendEvent((GenericObject *) obj, instId, EV_UPDATE_REQ);
+	sendEvent((struct GenericObject *) obj, instId, EV_UPDATE_REQ);
 	xSemaphoreGiveRecursive(mutex);
 }
 
@@ -1736,7 +1717,7 @@ void UAVObjInstanceUpdated(UAVObjHandle obj, uint16_t instId)
 {
 	PIOS_Assert(obj);
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
-	sendEvent((GenericObject *) obj, instId, EV_UPDATED_MANUAL);
+	sendEvent((struct GenericObject *) obj, instId, EV_UPDATED_MANUAL);
 	xSemaphoreGiveRecursive(mutex);
 }
 
@@ -1748,7 +1729,7 @@ void UAVObjInstanceUpdated(UAVObjHandle obj, uint16_t instId)
 void UAVObjIterate(void (*iterator) (UAVObjHandle obj))
 {
 	PIOS_Assert(iterator);
-	ObjectList *objEntry;
+	struct ObjectList *objEntry;
 
 	// Get lock
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
@@ -1766,10 +1747,10 @@ void UAVObjIterate(void (*iterator) (UAVObjHandle obj))
 /**
  * Send an event to all event queues registered on the object.
  */
-static int32_t sendEvent(GenericObject * obj, uint16_t instId,
+static int32_t sendEvent(struct GenericObject * obj, uint16_t instId,
 			UAVObjEventType event)
 {
-	ObjectEventList *eventEntry;
+	struct ObjectEventList *eventEntry;
 	UAVObjEvent msg;
 
 	// Setup event
@@ -1807,13 +1788,13 @@ static int32_t sendEvent(GenericObject * obj, uint16_t instId,
 /**
  * Create a new object instance, return the instance info or NULL if failure.
  */
-static InstanceHandle createInstance(ObjectList * obj, uint16_t instId)
+static InstanceHandle createInstance(struct ObjectList * obj, uint16_t instId)
 {
-	ObjectInstList *instEntry;
+	struct ObjectInstList *instEntry;
 	int32_t n;
 
 	// For single instance objects, only instance zero is allowed (and zero gets created in RegisterObject)
-	if (OLGetIsSingleInstance((GenericObject*)obj)) {
+	if (OLGetIsSingleInstance((struct GenericObject*)obj)) {
 		PIOS_Assert(0);
 		return NULL;
 	}
@@ -1834,14 +1815,14 @@ static InstanceHandle createInstance(ObjectList * obj, uint16_t instId)
 
 	// Create the actual instance
 	instEntry =
-		(ObjectInstList *)
-		pvPortMalloc(sizeof(ObjectInstList)+obj->numBytes);
+		(struct ObjectInstList *)
+		pvPortMalloc(sizeof(struct ObjectInstList)+obj->numBytes);
 	if (instEntry == NULL)
 		return NULL;
 	memset(InstanceDataOffset(instEntry), 0, obj->numBytes);
-	LL_APPEND(( (ObjectListMulti*)obj )->instances.next, instEntry);
+	LL_APPEND(( (struct ObjectListMulti*)obj )->instances.next, instEntry);
 
-	( (ObjectListMulti*)obj )->numInstances++;
+	( (struct ObjectListMulti*)obj )->numInstances++;
 
 	// Fire event
 	UAVObjInstanceUpdated((UAVObjHandle) obj, instId);
@@ -1853,11 +1834,11 @@ static InstanceHandle createInstance(ObjectList * obj, uint16_t instId)
 /**
  * Get the instance information or NULL if the instance does not exist
  */
-static InstanceHandle getInstance(ObjectList * obj, uint16_t instId)
+static InstanceHandle getInstance(struct ObjectList * obj, uint16_t instId)
 {
-	ObjectInstList *instEntry;
+	struct ObjectInstList *instEntry;
 	// quick solutions
-	if (OLGetIsSingleInstance((GenericObject*)(obj))) {
+	if (OLGetIsSingleInstance((struct GenericObject*)(obj))) {
 		if (instId!=0)
 			return NULL;
 		return ObjSingleInstanceDataOffset(obj);
@@ -1867,7 +1848,7 @@ static InstanceHandle getInstance(ObjectList * obj, uint16_t instId)
 
 	// Look for specified instance ID
 	uint16_t instance=0;
-	LL_FOREACH(&(( (ObjectListMulti*)obj )->instances), instEntry) {
+	LL_FOREACH(&(( (struct ObjectListMulti*)obj )->instances), instEntry) {
 		if (instance++ == instId) {
 			return InstanceDataOffset(instEntry);
 		}
@@ -1887,11 +1868,11 @@ static InstanceHandle getInstance(ObjectList * obj, uint16_t instId)
 static int32_t connectObj(UAVObjHandle obj, xQueueHandle queue,
 			UAVObjEventCallback cb, uint8_t eventMask)
 {
-	ObjectEventList *eventEntry;
-	GenericObject *objEntry;
+	struct ObjectEventList *eventEntry;
+	struct GenericObject *objEntry;
 
 	// Check that the queue is not already connected, if it is simply update event mask
-	objEntry = (GenericObject *) obj;
+	objEntry = (struct GenericObject *) obj;
 	LL_FOREACH(objEntry->events, eventEntry) {
 		if (eventEntry->queue == queue && eventEntry->cb == cb) {
 			// Already connected, update event mask and return
@@ -1902,7 +1883,7 @@ static int32_t connectObj(UAVObjHandle obj, xQueueHandle queue,
 
 	// Add queue to list
 	eventEntry =
-		(ObjectEventList *) pvPortMalloc(sizeof(ObjectEventList));
+		(struct ObjectEventList *) pvPortMalloc(sizeof(struct ObjectEventList));
 	if (eventEntry == NULL) {
 		return -1;
 	}
@@ -1925,11 +1906,11 @@ static int32_t connectObj(UAVObjHandle obj, xQueueHandle queue,
 static int32_t disconnectObj(UAVObjHandle obj, xQueueHandle queue,
 			UAVObjEventCallback cb)
 {
-	ObjectEventList *eventEntry;
-	GenericObject *objEntry;
+	struct ObjectEventList *eventEntry;
+	struct GenericObject *objEntry;
 
 	// Find queue and remove it
-	objEntry = (GenericObject *) obj;
+	objEntry = (struct GenericObject *) obj;
 	LL_FOREACH(objEntry->events, eventEntry) {
 		if ((eventEntry->queue == queue
 				&& eventEntry->cb == cb)) {

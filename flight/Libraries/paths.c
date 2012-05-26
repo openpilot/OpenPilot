@@ -68,8 +68,11 @@ void path_progress(float * start_point, float * end_point, float * cur_point, st
 	status->error = normal[0] * diff_north + normal[1] * diff_east;
 
 	// Compute direction to correct error
-	status->correction_direction[0] = -status->error * normal[0];
-	status->correction_direction[1] = -status->error * normal[1];
+	status->correction_direction[0] = (status->error > 0) ? -normal[0] : normal[0];
+	status->correction_direction[1] = (status->error > 0) ? -normal[1] : normal[1];
+	
+	// Now just want magnitude of error
+	status->error = fabs(status->error);
 
 	// Compute direction to travel
 	status->path_direction[0] = path_north / sqrtf(dist_path2);

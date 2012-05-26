@@ -86,57 +86,36 @@ void swap_buffers()
 }
 
 void PIOS_Hsync_ISR() {
-	//PIOS_LED_Toggle(LED2);
-	//uint16_t currLine = gActivePixmapLine;
-	//PIOS_LED_Off(LED3);
-	/*for(int g=0;g<130;g++)
-	{
-		asm("nop");
-	}*/
-	//PIOS_DELAY_WaituS(5); // wait 5us to see if H or V sync
+
 	if(dev_cfg->hsync->pin.gpio->IDR & dev_cfg->hsync->pin.init.GPIO_Pin) {
-	//if(PIOS_VIDEO_HSYNC_GPIO_PORT->IDR & PIOS_VIDEO_HSYNC_GPIO_PIN) {
 		//rising
-		//if (gActiveLine != 0) {
-			//PIOS_LED_On(LED2);
-			if(gLineType == LINE_TYPE_GRAPHICS)
-			{
-				// Activate new line
-				DMA_Cmd(dev_cfg->level.dma.tx.channel, ENABLE);
-				DMA_Cmd(dev_cfg->mask.dma.tx.channel, ENABLE);
-			}
-		//}
+		if(gLineType == LINE_TYPE_GRAPHICS)
+		{
+			// Activate new line
+			DMA_Cmd(dev_cfg->level.dma.tx.channel, ENABLE);
+			DMA_Cmd(dev_cfg->mask.dma.tx.channel, ENABLE);
+		}
 	} else {
 		//falling
 		gLineType = LINE_TYPE_UNKNOWN; // Default case
 		gActiveLine++;
-		/*if (gActiveLine == UPDATE_LINE) {
-			gUpdateScreenData = 1; // trigger frame update
-		}
-		else */
+
 		if ((gActiveLine >= GRAPHICS_LINE) && (gActiveLine < (GRAPHICS_LINE + GRAPHICS_HEIGHT))) {
 			gLineType = LINE_TYPE_GRAPHICS;
 			gActivePixmapLine = (gActiveLine - GRAPHICS_LINE);
 			line = gActivePixmapLine*GRAPHICS_WIDTH;
 		}
-		//if (gActiveLine != 0) {
-		//if(DMA_GetFlagStatus(DMA1_Stream5,DMA_FLAG_TCIF5))
+
+		if(gLineType == LINE_TYPE_GRAPHICS)
 		{
-			//PIOS_LED_Off(LED2);
-			if(gLineType == LINE_TYPE_GRAPHICS)
-			{
-				// Load new line
-				DMA_Cmd(dev_cfg->mask.dma.tx.channel, DISABLE);
-				DMA_Cmd(dev_cfg->level.dma.tx.channel, DISABLE);
-				DMA_MemoryTargetConfig(dev_cfg->level.dma.tx.channel,(uint32_t)&disp_buffer_level[line],DMA_Memory_0);
-				DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[line],DMA_Memory_0);
-				//DMA_ClearFlag(dev_cfg->mask.dma.tx.channel,DMA_FLAG_TCIF5); // <-- TODO: HARDCODED
-				//DMA_ClearFlag(dev_cfg->level.dma.tx.channel,DMA_FLAG_TCIF5); // <-- TODO: HARDCODED
-				DMA_SetCurrDataCounter(dev_cfg->level.dma.tx.channel,BUFFER_LINE_LENGTH);
-				DMA_SetCurrDataCounter(dev_cfg->mask.dma.tx.channel,BUFFER_LINE_LENGTH);
-			}
+			// Load new line
+			DMA_Cmd(dev_cfg->mask.dma.tx.channel, DISABLE);
+			DMA_Cmd(dev_cfg->level.dma.tx.channel, DISABLE);
+			DMA_MemoryTargetConfig(dev_cfg->level.dma.tx.channel,(uint32_t)&disp_buffer_level[line],DMA_Memory_0);
+			DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel,(uint32_t)&disp_buffer_mask[line],DMA_Memory_0);
+			DMA_SetCurrDataCounter(dev_cfg->level.dma.tx.channel,BUFFER_LINE_LENGTH);
+			DMA_SetCurrDataCounter(dev_cfg->mask.dma.tx.channel,BUFFER_LINE_LENGTH);
 		}
-		//}
 	}
 }
 
@@ -150,7 +129,7 @@ void PIOS_Vsync_ISR() {
 	{
 		gActiveLine = 0;
 		Vsync_update++;
-		if(Vsync_update>=1)
+		if(Vsync_update>=2)
 		{
 			swap_buffers();
 			Vsync_update=0;

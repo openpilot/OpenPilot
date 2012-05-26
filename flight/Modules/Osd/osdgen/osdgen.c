@@ -2007,14 +2007,14 @@ void lamas(void)
 		for(int z=0; z<30;z++)
 		{
 
-			lama_loc[0][z]=rand()%(GRAPHICS_WIDTH_REAL-10);
-			lama_loc[1][z]=rand()%(GRAPHICS_HEIGHT_REAL-10);
+			lama_loc[0][z]=rand()%(GRAPHICS_RIGHT-10);
+			lama_loc[1][z]=rand()%(GRAPHICS_BOTTOM-10);
 		}
 	}
 	for(int z=0; z<30;z++)
 	{
 		sprintf(temp,"%c",0xe8+(lama_loc[0][z]%2));
-		write_string(temp,lama_loc[0][z],lama_loc[1][z], 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+		write_string(temp,APPLY_HDEADBAND(lama_loc[0][z]),APPLY_VDEADBAND(lama_loc[1][z]), 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
 	}
 }
 
@@ -2029,18 +2029,17 @@ void updateGraphics() {
 	HomeLocationData home;
 	HomeLocationGet(&home);
 	
-	if(home.Set == HOMELOCATION_SET_FALSE)
-	{
-		char temps[20]={0};
-		sprintf(temps,"HOME NOT SET");
-		//printTextFB(x,y,temp);
-		write_string(temps, APPLY_HDEADBAND(GRAPHICS_RIGHT/2), (GRAPHICS_BOTTOM/2), 0, 0, TEXT_VA_TOP, TEXT_HA_CENTER, 0, 3);
-	}
-	
-	uint32_t disp = 0;
-	switch (disp) {
+	switch (OsdSettings.Screen) {
 		case 0: // Dave simple
 		{
+			if(home.Set == HOMELOCATION_SET_FALSE)
+			{
+				char temps[20]={0};
+				sprintf(temps,"HOME NOT SET");
+				//printTextFB(x,y,temp);
+				write_string(temps, APPLY_HDEADBAND(GRAPHICS_RIGHT/2), (GRAPHICS_BOTTOM/2), 0, 0, TEXT_VA_TOP, TEXT_HA_CENTER, 0, 3);
+			}
+
 			if(gpsData.Heading>180)
 				setAttitudeOsd(0,0,(int16_t)(gpsData.Heading-360));
 			else
@@ -2061,12 +2060,9 @@ void updateGraphics() {
 			
 			calcHomeArrow();
 		}
-			break;
+		break;
 		case 1:
 		{
-			if(OsdSettings.Attitude == OSDSETTINGS_ATTITUDE_ENABLED)
-			{
-				
 				// GPS HACK
 				if(gpsData.Heading>180)
 					setAttitudeOsd(0,0,(int16_t)(gpsData.Heading-360));
@@ -2098,8 +2094,7 @@ void updateGraphics() {
 				calcHomeArrow();
 				
 				/* Draw Attitude Indicator */
-				//if(OsdSettings.Attitude == OSDSETTINGS_ATTITUDE_ENABLED)
-				if(0)
+				if(OsdSettings.Attitude == OSDSETTINGS_ATTITUDE_ENABLED)
 				{
 					drawAttitude(APPLY_HDEADBAND(OsdSettings.AttitudeSetup[OSDSETTINGS_ATTITUDESETUP_X]),APPLY_VDEADBAND(OsdSettings.AttitudeSetup[OSDSETTINGS_ATTITUDESETUP_Y]),attitude.Pitch,attitude.Roll,96);
 				}
@@ -2199,11 +2194,11 @@ void updateGraphics() {
 								APPLY_VDEADBAND(OsdSettings.HeadingSetup[OSDSETTINGS_HEADINGSETUP_Y]), 15, 30, 7, 12, 0);
 					}
 				}
-				//write_filled_rectangle(draw_buffer_level,20,20,30,30,1);
-				//write_filled_rectangle(draw_buffer_mask,30,30,30,30,1);
-				//lamas();
-				/* Make sure every line last bit is 0 */
-			}
+		}
+		break;
+		case 3:
+		{
+			lamas();
 		}
 		break;
 	default:

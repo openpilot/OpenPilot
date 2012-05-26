@@ -52,6 +52,13 @@ VehicleConfig::VehicleConfig(QWidget *parent) : ConfigTaskWidget(parent)
     mixerTypeDescriptions << "Disabled" << "Motor" << "Servo" << "CameraRoll" << "CameraPitch"
                           << "CameraYaw" << "Accessory0" << "Accessory1" << "Accessory2"
                           << "Accessory3" << "Accessory4" << "Accessory5";
+
+    // This is needed because new style tries to compact things as much as possible in grid
+    // and on OSX the widget sizes of PushButtons is reported incorrectly:
+    // https://bugreports.qt-project.org/browse/QTBUG-14591
+    foreach( QPushButton * btn, findChildren<QPushButton*>() ) {
+        btn->setAttribute(Qt::WA_LayoutUsesWidgetRect);
+    }
 }
 
 VehicleConfig::~VehicleConfig()

@@ -233,7 +233,7 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
     refreshWidgetsValues();
     addToDirtyMonitor();
 
-    disbleMouseWheelEvents();
+    disableMouseWheelEvents();
 }
 
 

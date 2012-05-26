@@ -49,7 +49,7 @@
  */
 ConfigFixedWingWidget::ConfigFixedWingWidget(Ui_AircraftWidget *aircraft, QWidget *parent) : VehicleConfig(parent)
 {
-    m_aircraft = aircraft;
+    m_aircraft = aircraft;    
 }
 
 /**

@@ -1145,7 +1145,7 @@ void ConfigTaskWidget::loadWidgetLimits(QWidget * widget,UAVObjectField * field,
     }
 }
 
-void ConfigTaskWidget::disbleMouseWheelEvents()
+void ConfigTaskWidget::disableMouseWheelEvents()
 {
     //Disable mouse wheel events
     foreach( QSpinBox * sp, findChildren<QSpinBox*>() ) {

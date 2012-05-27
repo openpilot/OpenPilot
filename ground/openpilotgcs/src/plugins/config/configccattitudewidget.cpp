@@ -61,6 +61,14 @@ ConfigCCAttitudeWidget::~ConfigCCAttitudeWidget()
     delete ui;
 }
 
+void ConfigCCAttitudeWidget::updateObjectsFromWidgets()
+{
+    ConfigTaskWidget::updateObjectsFromWidgets();
+
+    ui->zeroBiasProgress->setValue(0);
+
+}
+
 void ConfigCCAttitudeWidget::attitudeRawUpdated(UAVObject * obj) {
     QMutexLocker locker(&startStop);
 
@@ -101,7 +109,6 @@ void ConfigCCAttitudeWidget::attitudeRawUpdated(UAVObject * obj) {
         attitudeSettingsData.GyroBias[2] = -z_gyro_bias;
         attitudeSettingsData.BiasCorrectGyro = AttitudeSettings::BIASCORRECTGYRO_TRUE;
         AttitudeSettings::GetInstance(getObjectManager())->setData(attitudeSettingsData);
-
     } else {
 	// Possible to get here if weird threading stuff happens.  Just ignore updates.
 	qDebug("Unexpected accel update received.");

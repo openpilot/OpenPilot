@@ -46,6 +46,8 @@ public:
     explicit ConfigCCAttitudeWidget(QWidget *parent = 0);
     ~ConfigCCAttitudeWidget();
 
+    virtual void updateObjectsFromWidgets();
+
 private slots:
     void attitudeRawUpdated(UAVObject * obj);
     void timeout();

@@ -33,6 +33,7 @@
 #include "paths.h"
 
 #include "flightstatus.h"
+#include "baroairspeed.h" // TODO: make baroairspeed optional
 #include "pathaction.h"
 #include "pathdesired.h"
 #include "pathstatus.h"
@@ -65,7 +66,9 @@ static uint8_t conditionNone();
 static uint8_t conditionTimeOut();
 static uint8_t conditionDistanceToTarget();
 static uint8_t conditionLegRemaining();
+static uint8_t conditionBelowError();
 static uint8_t conditionAboveAltitude();
+static uint8_t conditionAboveSpeed();
 static uint8_t conditionPointingTowardsNext();
 static uint8_t conditionPythonScript();
 static uint8_t conditionImmediate();
@@ -107,6 +110,7 @@ int32_t PathPlannerInitialize()
 	PathStatusInitialize();
 	PathDesiredInitialize();
 	PositionActualInitialize();
+	BaroAirspeedInitialize();
 	VelocityActualInitialize();
 	WaypointInitialize();
 	WaypointActiveInitialize();
@@ -316,8 +320,14 @@ static uint8_t pathConditionCheck() {
 		case PATHACTION_ENDCONDITION_LEGREMAINING:
 			return conditionLegRemaining();
 			break;
+		case PATHACTION_ENDCONDITION_BELOWERROR:
+			return conditionBelowError();
+			break;
 		case PATHACTION_ENDCONDITION_ABOVEALTITUDE:
 			return conditionAboveAltitude();
+			break;
+		case PATHACTION_ENDCONDITION_ABOVESPEED:
+			return conditionAboveSpeed();
 			break;
 		case PATHACTION_ENDCONDITION_POINTINGTOWARDSNEXT:
 			return conditionPointingTowardsNext();
@@ -403,8 +413,30 @@ static uint8_t conditionLegRemaining() {
 	float cur[3] = {positionActual.North, positionActual.East, positionActual.Down};
 	struct path_status progress;
 
-	path_progress(pathDesired.Start, pathDesired.End, cur, &progress);
+	path_progress(pathDesired.Start, pathDesired.End, cur, &progress, pathDesired.Mode);
 	if ( progress.fractional_progress >= 1.0f - pathAction.ConditionParameters[0] ) {
+		return true;
+	}
+	return false;
+}
+
+/**
+ * the BelowError measures the error on a path segment 
+ * returns true if error is below margin
+ * Parameter 0: error margin (in m)
+ */
+static uint8_t conditionBelowError() {
+
+	PathDesiredData pathDesired;
+	PositionActualData positionActual;
+	PathDesiredGet(&pathDesired);
+	PositionActualGet(&positionActual);
+
+	float cur[3] = {positionActual.North, positionActual.East, positionActual.Down};
+	struct path_status progress;
+
+	path_progress(pathDesired.Start, pathDesired.End, cur, &progress, pathDesired.Mode);
+	if ( progress.error <= pathAction.ConditionParameters[0] ) {
 		return true;
 	}
 	return false;
@@ -425,6 +457,34 @@ static uint8_t conditionAboveAltitude() {
 	}
 	return false;
 }
+
+/**
+ * the AboveSpeed measures the movement speed (3d) 
+ * returns true if above critical speed
+ * Parameter 0:  speed in m/s
+ * Parameter 1:  flag: 0=groundspeed 1=airspeed
+ */
+static uint8_t conditionAboveSpeed() {
+
+	VelocityActualData velocityActual;
+	VelocityActualGet(&velocityActual);
+	float velocity = sqrtf( velocityActual.North*velocityActual.North + velocityActual.East*velocityActual.East + velocityActual.Down*velocityActual.Down );
+
+	// use airspeed if requested and available
+	if (pathAction.ConditionParameters[1]>0.5f) {
+		BaroAirspeedData baroAirspeed;
+		BaroAirspeedGet (&baroAirspeed);
+		if (baroAirspeed.Connected == BAROAIRSPEED_CONNECTED_TRUE) {
+			velocity = baroAirspeed.Airspeed;
+		}
+	}
+
+	if ( velocity >= pathAction.ConditionParameters[0]) {
+		return true;
+	}
+	return false;
+}
+
 
 /**
  * the PointingTowardsNext measures the horizontal movement vector direction relative to the next waypoint

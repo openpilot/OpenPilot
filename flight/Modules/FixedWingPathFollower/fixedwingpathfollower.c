@@ -82,13 +82,13 @@
 static bool followerEnabled = false;
 static xTaskHandle pathfollowerTaskHandle;
 static PathDesiredData pathDesired;
+static PathStatusData pathStatus;
 static FixedWingPathFollowerSettingsData fixedwingpathfollowerSettings;
 
 // Private functions
 static void pathfollowerTask(void *parameters);
 static void SettingsUpdatedCb(UAVObjEvent * ev);
-static void updatePathVelocity(int8_t circledirection);
-static void updateEndpointVelocity();
+static void updatePathVelocity();
 static uint8_t updateFixedDesiredAttitude();
 static void updateFixedAttitude();
 static void baroAirspeedUpdatedCb(UAVObjEvent * ev);
@@ -152,7 +152,6 @@ static void pathfollowerTask(void *parameters)
 {
 	SystemSettingsData systemSettings;
 	FlightStatusData flightStatus;
-	PathStatusData pathStatus;
 	
 	portTickType lastUpdateTime;
 	
@@ -195,7 +194,7 @@ static void pathfollowerTask(void *parameters)
 			case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
 			case FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE:
 				if (pathDesired.Mode == PATHDESIRED_MODE_FLYENDPOINT) {
-					updateEndpointVelocity();
+					updatePathVelocity();
 					result = updateFixedDesiredAttitude();
 					if (result) {
 						AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_OK);
@@ -210,39 +209,11 @@ static void pathfollowerTask(void *parameters)
 				pathStatus.UID = pathDesired.UID;
 				pathStatus.Status = PATHSTATUS_STATUS_INPROGRESS;
 				switch(pathDesired.Mode) {
-					// TODO: Make updateFixedDesiredAttitude and velocity report success and update PATHSTATUS_STATUS accordingly
 					case PATHDESIRED_MODE_FLYENDPOINT:
-						updateEndpointVelocity();
-						result = updateFixedDesiredAttitude();
-						if (result) {
-							AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_OK);
-						} else {
-							pathStatus.Status = PATHSTATUS_STATUS_CRITICAL;
-							AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_WARNING);
-						}
-						break;
 					case PATHDESIRED_MODE_FLYVECTOR:
-						updatePathVelocity(0);
-						result = updateFixedDesiredAttitude();
-						if (result) {
-							AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_OK);
-						} else {
-							pathStatus.Status = PATHSTATUS_STATUS_CRITICAL;
-							AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_WARNING);
-						}
-						break;
 					case PATHDESIRED_MODE_FLYCIRCLERIGHT:
-						updatePathVelocity(1);
-						result = updateFixedDesiredAttitude();
-						if (result) {
-							AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_OK);
-						} else {
-							pathStatus.Status = PATHSTATUS_STATUS_CRITICAL;
-							AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_WARNING);
-						}
-						break;
 					case PATHDESIRED_MODE_FLYCIRCLELEFT:
-						updatePathVelocity(-1);
+						updatePathVelocity();
 						result = updateFixedDesiredAttitude();
 						if (result) {
 							AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_OK);
@@ -286,7 +257,7 @@ static void pathfollowerTask(void *parameters)
  * Takes in @ref PositionActual and compares it to @ref PathDesired 
  * and computes @ref VelocityDesired
  */
-static void updatePathVelocity(int8_t circledirection)
+static void updatePathVelocity()
 {
 	PositionActualData positionActual;
 	PositionActualGet(&positionActual);
@@ -300,76 +271,51 @@ static void updatePathVelocity(int8_t circledirection)
 					};
 	struct path_status progress;
 
-	if (!circledirection) {
-		path_progress(pathDesired.Start, pathDesired.End, cur, &progress);
-	} else {
-		circle_progress(pathDesired.Start, pathDesired.End, cur, &progress, circledirection>0 );
-	}
+	path_progress(pathDesired.Start, pathDesired.End, cur, &progress, pathDesired.Mode);
 	
 	float groundspeed;
-	if (!circledirection && progress.fractional_progress<1) {
-		groundspeed = pathDesired.StartingVelocity + (pathDesired.EndingVelocity - pathDesired.StartingVelocity) *
-			bound(progress.fractional_progress,0,1);
-	} else {
-		groundspeed = pathDesired.EndingVelocity;
+	float altitudeSetpoint;
+	switch (pathDesired.Mode) {
+			case PATHDESIRED_MODE_FLYCIRCLERIGHT:
+			case PATHDESIRED_MODE_DRIVECIRCLERIGHT:
+			case PATHDESIRED_MODE_FLYCIRCLELEFT:
+			case PATHDESIRED_MODE_DRIVECIRCLELEFT:
+				groundspeed = pathDesired.EndingVelocity;
+				altitudeSetpoint = pathDesired.End[2];
+				break;
+			case PATHDESIRED_MODE_FLYENDPOINT:
+			case PATHDESIRED_MODE_DRIVEENDPOINT:
+			case PATHDESIRED_MODE_FLYVECTOR:
+			case PATHDESIRED_MODE_DRIVEVECTOR:
+			default:
+				groundspeed = pathDesired.StartingVelocity + (pathDesired.EndingVelocity - pathDesired.StartingVelocity) *
+					bound(progress.fractional_progress,0,1);
+				altitudeSetpoint = pathDesired.Start[2] + (pathDesired.End[2] - pathDesired.Start[2]) *
+					bound(progress.fractional_progress,0,1);
+				break;
 	}
 	
+	// calculate velocity - can be zero if waypoints are too close
 	VelocityDesiredData velocityDesired;
-	velocityDesired.North = progress.path_direction[0] * groundspeed;
-	velocityDesired.East = progress.path_direction[1] * groundspeed;
+	velocityDesired.North = progress.path_direction[0] * bound(groundspeed,1e-6,groundspeed);
+	velocityDesired.East = progress.path_direction[1] * bound(groundspeed,1e-6,groundspeed);
 	
 	float error_speed = progress.error * fixedwingpathfollowerSettings.HorizontalPosP;
 
+	// calculate correction - can also be zero if correction vector is 0 or no error present
 	velocityDesired.North += progress.correction_direction[0] * error_speed;
 	velocityDesired.East += progress.correction_direction[1] * error_speed;
 	
-	float altitudeSetpoint;
-	if (!circledirection) {
-		altitudeSetpoint = pathDesired.Start[2] + (pathDesired.End[2] - pathDesired.Start[2]) *
-	    bound(progress.fractional_progress,0,1);
-	} else {
-		altitudeSetpoint = pathDesired.End[2];
-	}
-
 	float downError = altitudeSetpoint - positionActual.Down;
 	velocityDesired.Down = downError * fixedwingpathfollowerSettings.VerticalPosP;
 
+	// update pathstatus
+	pathStatus.error = progress.error;
+	pathStatus.fractional_progress = progress.fractional_progress;
 
 	VelocityDesiredSet(&velocityDesired);
 }
 
-/**
- * Compute desired velocity from the current position
- *
- * Takes in @ref PositionActual and compares it to @ref PositionDesired 
- * and computes @ref VelocityDesired
- */
-void updateEndpointVelocity()
-{
-	PositionActualData positionActual;
-	VelocityActualData velocityActual;
-	VelocityDesiredData velocityDesired;
-	
-	PositionActualGet(&positionActual);
-	VelocityActualGet(&velocityActual);
-	VelocityDesiredGet(&velocityDesired);
-	
-	float northError;
-	float eastError;
-	float downError;
-
-	// Compute commands - look ahead fixedwingpathfollowerSettings.CourseFeedForward seconds
-	northError = pathDesired.End[PATHDESIRED_END_NORTH] - ( positionActual.North + (velocityActual.North * fixedwingpathfollowerSettings.CourseFeedForward));
-	velocityDesired.North = northError * fixedwingpathfollowerSettings.HorizontalPosP;
-
-	eastError = pathDesired.End[PATHDESIRED_END_EAST] - ( positionActual.East + (velocityActual.East * fixedwingpathfollowerSettings.CourseFeedForward));
-	velocityDesired.East = eastError * fixedwingpathfollowerSettings.HorizontalPosP;
-	
-	downError = pathDesired.End[PATHDESIRED_END_DOWN] - ( positionActual.Down + (velocityActual.Down * fixedwingpathfollowerSettings.CourseFeedForward));
-	velocityDesired.Down = downError * fixedwingpathfollowerSettings.VerticalPosP;
-	
-	VelocityDesiredSet(&velocityDesired);	
-}
 
 /**
  * Compute desired attitude from a fixed preset

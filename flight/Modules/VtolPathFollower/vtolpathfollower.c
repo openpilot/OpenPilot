@@ -216,6 +216,8 @@ static void vtolPathFollowerTask(void *parameters)
 						AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_OK);
 						break;
 					case PATHDESIRED_MODE_FLYVECTOR:
+					case PATHDESIRED_MODE_FLYCIRCLERIGHT:
+					case PATHDESIRED_MODE_FLYCIRCLELEFT:
 						updatePathVelocity();
 						updateVtolDesiredAttitude();
 						AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_OK);
@@ -269,10 +271,10 @@ static void updatePathVelocity()
 	float cur[3] = {positionActual.North, positionActual.East, positionActual.Down};
 	struct path_status progress;
 	
-	path_progress(pathDesired.Start, pathDesired.End, cur, &progress);
+	path_progress(pathDesired.Start, pathDesired.End, cur, &progress, pathDesired.Mode);
 	
 	float groundspeed = pathDesired.StartingVelocity + 
-	    (pathDesired.EndingVelocity - pathDesired.StartingVelocity) * progress.fractional_progress;
+	    (pathDesired.EndingVelocity - pathDesired.StartingVelocity) * bound ( progress.fractional_progress,0,1);
 	if(progress.fractional_progress > 1)
 		groundspeed = 0;
 	

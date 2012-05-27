@@ -27,6 +27,89 @@
 #include "pios.h"
 #include "paths.h"
 
+#include "uavobjectmanager.h" // <--.
+#include "pathdesired.h" //<-- needed only for correct ENUM macro usage with path modes (PATHDESIRED_MODE_xxx,
+// no direct UAVObject usage allowed in this file
+
+// private functions
+static void path_endpoint( float * start_point, float * end_point, float * cur_point, struct path_status * status);
+static void path_vector( float * start_point, float * end_point, float * cur_point, struct path_status * status);
+static void path_circle(float * start_point, float * end_point, float * cur_point, struct path_status * status, bool clockwise);
+
+/**
+ * @brief Compute progress along path and deviation from it
+ * @param[in] start_point Starting point
+ * @param[in] end_point Ending point
+ * @param[in] cur_point Current location
+ * @param[in] mode Path following mode
+ * @param[out] status Structure containing progress along path and deviation
+ */
+void path_progress(float * start_point, float * end_point, float * cur_point, struct path_status * status, uint8_t mode)
+{
+	switch(mode) {
+		case PATHDESIRED_MODE_FLYVECTOR:
+		case PATHDESIRED_MODE_DRIVEVECTOR:
+			return path_vector(start_point, end_point, cur_point, status);
+			break;
+		case PATHDESIRED_MODE_FLYCIRCLERIGHT:
+		case PATHDESIRED_MODE_DRIVECIRCLERIGHT:
+			return path_circle(start_point, end_point, cur_point, status, 1);
+			break;
+		case PATHDESIRED_MODE_FLYCIRCLELEFT:
+		case PATHDESIRED_MODE_DRIVECIRCLELEFT:
+			return path_circle(start_point, end_point, cur_point, status, 0);
+			break;
+		case PATHDESIRED_MODE_FLYENDPOINT:
+		case PATHDESIRED_MODE_DRIVEENDPOINT:
+		default:
+			// use the endpoint as default failsafe if called in unknown modes
+			return path_endpoint(start_point, end_point, cur_point, status);
+			break;
+	}
+}
+
+/**
+ * @brief Compute progress towards endpoint. Deviation equals distance
+ * @param[in] start_point Starting point
+ * @param[in] end_point Ending point
+ * @param[in] cur_point Current location
+ * @param[out] status Structure containing progress along path and deviation
+ */
+static void path_endpoint( float * start_point, float * end_point, float * cur_point, struct path_status * status)
+{
+	float path_north, path_east, diff_north, diff_east;
+	float dist_path, dist_diff;
+
+	// we do not correct in this mode
+	status->correction_direction[0] = status->correction_direction[1] = 0;
+
+	// Distance to go
+	path_north = end_point[0] - start_point[0];
+	path_east = end_point[1] - start_point[1];
+
+	// Current progress location relative to end
+	diff_north = end_point[0] - cur_point[0];
+	diff_east = end_point[1] - cur_point[1];
+
+	dist_diff = sqrtf( diff_north * diff_north + diff_east * diff_east );
+	dist_path = sqrtf( path_north * path_north + path_east * path_east );
+
+	if(dist_path < 1e-6 || dist_diff < 1e-6 ) {
+		status->fractional_progress = 1;
+		status->error = 0;
+		status->path_direction[0] = status->path_direction[1] = 0;
+		return;
+	}
+
+	status->fractional_progress = 1 - dist_diff / dist_path;
+	status->error = dist_diff;
+
+	// Compute direction to travel
+	status->path_direction[0] = diff_north / dist_diff;
+	status->path_direction[1] = diff_east / dist_diff;
+
+}
+
 /**
  * @brief Compute progress along path and deviation from it
  * @param[in] start_point Starting point
@@ -34,7 +117,7 @@
  * @param[in] cur_point Current location
  * @param[out] status Structure containing progress along path and deviation
  */
-void path_progress(float * start_point, float * end_point, float * cur_point, struct path_status * status)
+static void path_vector( float * start_point, float * end_point, float * cur_point, struct path_status * status)
 {
 	float path_north, path_east, diff_north, diff_east;
 	float dist_path;
@@ -56,7 +139,7 @@ void path_progress(float * start_point, float * end_point, float * cur_point, st
 		status->fractional_progress = 1;
 		status->error = 0;
 		status->correction_direction[0] = status->correction_direction[1] = 0;
-		status->path_direction[0] = status->path_direction[1] = 1e-6;
+		status->path_direction[0] = status->path_direction[1] = 0;
 		return;
 	}
 
@@ -85,7 +168,7 @@ void path_progress(float * start_point, float * end_point, float * cur_point, st
  * @param[in] cur_point Current location
  * @param[out] status Structure containing progress along path and deviation
  */
-void circle_progress(float * start_point, float * end_point, float * cur_point, struct path_status * status, bool clockwise)
+static void path_circle(float * start_point, float * end_point, float * cur_point, struct path_status * status, bool clockwise)
 {
 	float radius_north, radius_east, diff_north, diff_east;
 	float radius,cradius;

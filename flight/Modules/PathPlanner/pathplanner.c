@@ -478,6 +478,10 @@ static uint8_t conditionImmediate() {
 static void createPathBox()
 {
 
+	uint16_t t;
+	for (t=UAVObjGetNumInstances(PathActionHandle());t<10;t++) {
+		PathActionCreateInstance();
+	}
 	PathActionData action;
 	PathActionInstGet(0,&action);
 	action.Mode = PATHACTION_MODE_FLYVECTOR;
@@ -494,6 +498,8 @@ static void createPathBox()
 	action.JumpDestination = 0;
 	action.ErrorDestination = 0;
 	PathActionInstSet(0,&action);
+	PathActionInstSet(1,&action);
+	PathActionInstSet(2,&action);
 
 	WaypointCreateInstances(6);
 
@@ -531,6 +537,7 @@ static void createPathBox()
 // demo path - logo
 static void createPathLogo()
 {
+	#define SIZE 10.0f
 	PathActionData action;
 	PathActionInstGet(0,&action);
 	action.Mode = PATHACTION_MODE_FLYVECTOR;
@@ -547,6 +554,10 @@ static void createPathLogo()
 	action.JumpDestination = 0;
 	action.ErrorDestination = 0;
 	PathActionInstSet(0,&action);
+	uint16_t t;
+	for (t=UAVObjGetNumInstances(PathActionHandle());t<10;t++) {
+		PathActionCreateInstance();
+	}
 
 	WaypointCreateInstances(42);
 
@@ -555,53 +566,53 @@ static void createPathLogo()
 	waypoint.Velocity = 2; // Since for now this isn't directional just set a mag
 	waypoint.Action = 0;
 	for(uint32_t i = 0; i < 20; i++) {
-		waypoint.Position[1] = 30 * cos(i / 19.0 * 2 * M_PI);
-		waypoint.Position[0] = 50 * sin(i / 19.0 * 2 * M_PI);
+		waypoint.Position[1] = SIZE * 30 * cos(i / 19.0 * 2 * M_PI);
+		waypoint.Position[0] = SIZE * 50 * sin(i / 19.0 * 2 * M_PI);
 		waypoint.Position[2] = -50;
 		bad_inits += (WaypointInstSet(i, &waypoint) != 0);
 	}
 	
 	// Draw P
 	for(uint32_t i = 20; i < 35; i++) {
-		waypoint.Position[1] = 55 + 20 * cos(i / 10.0 * M_PI - M_PI / 2);
-		waypoint.Position[0] = 25 + 25 * sin(i / 10.0 * M_PI - M_PI / 2);
+		waypoint.Position[1] = SIZE * (55 + 20 * cos(i / 10.0 * M_PI - M_PI / 2));
+		waypoint.Position[0] = SIZE * (25 + 25 * sin(i / 10.0 * M_PI - M_PI / 2));
 		waypoint.Position[2] = -50;
 		bad_inits += (WaypointInstSet(i, &waypoint) != 0);
 	}
 		
-	waypoint.Position[1] = 35;
-	waypoint.Position[0] = -50;
+	waypoint.Position[1] = SIZE * 35;
+	waypoint.Position[0] = SIZE * -50;
 	waypoint.Position[2] = -50;
 	WaypointInstSet(35, &waypoint);
 	
 	// Draw Box
-	waypoint.Position[1] = 35;
-	waypoint.Position[0] = -60;
+	waypoint.Position[1] = SIZE * 35;
+	waypoint.Position[0] = SIZE * -60;
 	waypoint.Position[2] = -30;
 	WaypointInstSet(36, &waypoint);
 
-	waypoint.Position[1] = 85;
-	waypoint.Position[0] = -60;
+	waypoint.Position[1] = SIZE *  85;
+	waypoint.Position[0] = SIZE * -60;
 	waypoint.Position[2] = -30;
 	WaypointInstSet(37, &waypoint);
 
-	waypoint.Position[1] = 85;
-	waypoint.Position[0] = 60;
+	waypoint.Position[1] = SIZE * 85;
+	waypoint.Position[0] = SIZE * 60;
 	waypoint.Position[2] = -30;
 	WaypointInstSet(38, &waypoint);
 	
-	waypoint.Position[1] = -40;
-	waypoint.Position[0] = 60;
+	waypoint.Position[1] = SIZE * -40;
+	waypoint.Position[0] = SIZE * 60;
 	waypoint.Position[2] = -30;
 	WaypointInstSet(39, &waypoint);
 
-	waypoint.Position[1] = -40;
-	waypoint.Position[0] = -60;
+	waypoint.Position[1] = SIZE * -40;
+	waypoint.Position[0] = SIZE * -60;
 	waypoint.Position[2] = -30;
 	WaypointInstSet(40, &waypoint);
 
-	waypoint.Position[1] = 35;
-	waypoint.Position[0] = -60;
+	waypoint.Position[1] = SIZE * 35;
+	waypoint.Position[0] = SIZE * -60;
 	waypoint.Position[2] = -30;
 	WaypointInstSet(41, &waypoint);
 

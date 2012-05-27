@@ -217,8 +217,13 @@ Point PureProjection::FromLatLngToPixel(const PointLatLng &p,const int &zoom)
       }
     double PureProjection::courseBetweenLatLng(PointLatLng const& p1,PointLatLng const& p2)
     {
-        return fmod(atan2(sin(p1.Lng()-p2.Lng())*cos(p2.Lat()),
-                       cos(p1.Lat())*sin(p2.Lat())-sin(p1.Lat())*cos(p2.Lat())*cos(p1.Lng()-p2.Lng())), 2*PI);
+        double lon1=p1.Lng()* (PI / 180);;
+        double lat1=p1.Lat()* (PI / 180);;
+        double lon2=p2.Lng()* (PI / 180);;
+        double lat2=p2.Lat()* (PI / 180);;
+
+        return 2*M_PI-myfmod(atan2(sin(lon1-lon2)*cos(lat2),
+                       cos(lat1)*sin(lat2)-sin(lat1)*cos(lat2)*cos(lon1-lon2)), 2*PI);
 
     }
 
@@ -237,22 +242,22 @@ Point PureProjection::FromLatLngToPixel(const PointLatLng &p,const int &zoom)
          return d;
     }
 
-    void PureProjection::offSetFromLatLngs(PointLatLng p1,PointLatLng p2,double &dX,double &dY)
+    void PureProjection::offSetFromLatLngs(PointLatLng p1,PointLatLng p2,double &distance,double &bearing)
     {
-        dX=DistanceBetweenLatLng(p1,p2)*sin(courseBetweenLatLng(p1,p2));
-        dY=DistanceBetweenLatLng(p1,p2)*sin(courseBetweenLatLng(p1,p2));
-    }
+        distance=DistanceBetweenLatLng(p1,p2)*1000;
+        bearing=courseBetweenLatLng(p1,p2);
+      }
 
     double PureProjection::myfmod(double x,double y)
     {
         return x - y*floor(x/y);
     }
 
-    PointLatLng PureProjection::translate(PointLatLng  p1,double dX,double dY)
+    PointLatLng PureProjection::translate(PointLatLng  p1,double distance,double bearing)
     {
         PointLatLng ret;
-        double d=sqrt(pow(dX,2)+pow(dY,2));
-        double tc=(atan2(dY,dX));
+        double d=distance;
+        double tc=bearing;
         double lat1=p1.Lat()*M_PI/180;
         double lon1=p1.Lng()*M_PI/180;
         double R=6378137;

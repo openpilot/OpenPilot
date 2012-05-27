@@ -286,7 +286,7 @@ namespace mapcontrol
         * @param description the description of the WayPoint
         * @return WayPointItem a pointer to the WayPoint created
         */
-        WayPointItem *WPCreate(const QPoint &relativeCoord, const int &altitude, const QString &description);
+        WayPointItem *WPCreate(const distBearing &relativeCoord, const int &altitude, const QString &description);
         /**
         * @brief Inserts a new WayPoint on the specified position
         *

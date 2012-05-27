@@ -42,7 +42,7 @@ namespace mapcontrol
         this->setScene(&mscene);
         Home=new HomeItem(map,this);
         Home->setParentItem(map);
-        setStyleSheet("QToolTip {font-size:8pt; color:yellow;background-color : transparent; padding:2px; border-width:2px; border-style:solid; border-radius:4px }");
+        setStyleSheet("QToolTip {font-size:8pt; color:blue;opacity: 223; padding:2px; border-width:2px; border-style:solid; border-color: rgb(170, 170, 127);border-radius:4px }");
         this->adjustSize();
         connect(map,SIGNAL(zoomChanged(double,double,double)),this,SIGNAL(zoomChanged(double,double,double)));
         connect(map->core,SIGNAL(OnCurrentPositionChanged(internals::PointLatLng)),this,SIGNAL(OnCurrentPositionChanged(internals::PointLatLng)));
@@ -211,7 +211,7 @@ namespace mapcontrol
         item->setParentItem(map);
         return item;
     }
-    WayPointItem* OPMapWidget::WPCreate(const QPoint &relativeCoord, const int &altitude, const QString &description)
+    WayPointItem* OPMapWidget::WPCreate(const distBearing &relativeCoord, const int &altitude, const QString &description)
     {
         WayPointItem* item=new WayPointItem(relativeCoord,altitude,description,map);
         ConnectWP(item);

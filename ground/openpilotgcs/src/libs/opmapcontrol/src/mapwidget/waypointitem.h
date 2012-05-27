@@ -37,6 +37,12 @@
 
 namespace mapcontrol
 {
+struct distBearing
+{
+    double distante;
+    double bearing;
+};
+
 /**
 * @brief A QGraphicsItem representing a WayPoint
 *
@@ -68,7 +74,7 @@ public:
     * @return
     */
     WayPointItem(internals::PointLatLng const& coord,int const& altitude,QString const& description,MapGraphicItem* map,wptype type=absolute);
-    WayPointItem(QPoint const& relativeCoord,int const& altitude,QString const& description,MapGraphicItem* map);
+    WayPointItem(distBearing const& relativeCoord,int const& altitude,QString const& description,MapGraphicItem* map);
 
     /**
     * @brief Returns the WayPoint description
@@ -149,6 +155,7 @@ public:
 ~WayPointItem();
 
     static int snumber;
+    void changeWPType(wptype type);
 protected:
     void mouseMoveEvent ( QGraphicsSceneMouseEvent * event );
     void mousePressEvent ( QGraphicsSceneMouseEvent * event );
@@ -156,7 +163,7 @@ protected:
 
 private:
     internals::PointLatLng coord;//coordinates of this WayPoint
-    QPoint relativeCoord;
+    distBearing relativeCoord;
     bool reached;
     QString description;
     bool shownumber;

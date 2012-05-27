@@ -49,7 +49,7 @@ Simulator::Simulator(const SimulatorSettings& params) :
 	outSocket(NULL),
 	settings(params),
         updatePeriod(50),
-        simTimeout(2000),
+        simTimeout(8000),
 	autopilotConnectionStatus(false),
 	simConnectionStatus(false),
 	txTimer(NULL),
@@ -131,7 +131,8 @@ void Simulator::onStart()
 	posActual = PositionActual::GetInstance(objManager);
         altActual = BaroAltitude::GetInstance(objManager);
 	attActual = AttitudeActual::GetInstance(objManager);
-	attRaw = AttitudeRaw::GetInstance(objManager);
+	accels = Accels::GetInstance(objManager);
+	gyros = Gyros::GetInstance(objManager);
         gpsPos = GPSPosition::GetInstance(objManager);
 	telStats = GCSTelemetryStats::GetInstance(objManager);
 
@@ -225,7 +226,8 @@ void Simulator::setupObjects()
         setupOutputObject(posActual, 250);
         setupOutputObject(velActual, 250);
         setupOutputObject(posHome, 1000);
-        setupOutputObject(attRaw, 10);
+        setupOutputObject(accels, 10);
+        setupOutputObject(gyros, 10);
         //setupOutputObject(attRaw, 100);
 
 

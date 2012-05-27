@@ -40,6 +40,7 @@
 #include <QDesktopServices>
 #include <QUrl>
 #include <revocalibration.h>
+#include <homelocation.h>
 #include <accels.h>
 #include <gyros.h>
 #include <magnetometer.h>
@@ -571,12 +572,16 @@ int SixPointInConstFieldCal( double ConstMag, double x[6], double y[6], double z
 void ConfigRevoWidget::computeScaleBias()
 {
    double S[3], b[3];
+   double Be_lenght;
    RevoCalibration * revoCalibration = RevoCalibration::GetInstance(getObjectManager());
+   HomeLocation * homeLocation = HomeLocation::GetInstance(getObjectManager());
    Q_ASSERT(revoCalibration);
+   Q_ASSERT(homeLocation);
    RevoCalibration::DataFields revoCalibrationData = revoCalibration->getData();
+   HomeLocation::DataFields homeLocationData = homeLocation->getData();
 
-   // Calibration accel
-   SixPointInConstFieldCal( GRAVITY, accel_data_x, accel_data_y, accel_data_z, S, b);
+   // Calibration accel 
+   SixPointInConstFieldCal( homeLocationData.g_e, accel_data_x, accel_data_y, accel_data_z, S, b);
    revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_X] = fabs(S[0]);
    revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_Y] = fabs(S[1]);
    revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_Z] = fabs(S[2]);
@@ -586,7 +591,8 @@ void ConfigRevoWidget::computeScaleBias()
    revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Z] = -sign(S[2]) * b[2];
 
    // Calibration mag
-   SixPointInConstFieldCal( 1000, mag_data_x, mag_data_y, mag_data_z, S, b);
+   Be_lenght = sqrt(pow(homeLocationData.Be[0],2)+pow(homeLocationData.Be[1],2)+pow(homeLocationData.Be[2],2));
+   SixPointInConstFieldCal( Be_lenght, mag_data_x, mag_data_y, mag_data_z, S, b);
    revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_X] = fabs(S[0]);
    revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_Y] = fabs(S[1]);
    revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_Z] = fabs(S[2]);

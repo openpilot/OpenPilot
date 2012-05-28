@@ -630,7 +630,7 @@ all_$(1)_clean: $$(addsuffix _clean, $$(filter bu_$(1), $$(BU_TARGETS)))
 all_$(1)_clean: $$(addsuffix _clean, $$(filter ef_$(1), $$(EF_TARGETS)))
 endef
 
-ALL_BOARDS := coptercontrol pipxtreme revolution simposix osd
+ALL_BOARDS := coptercontrol pipxtreme revolution osd
 
 # Friendly names of each board (used to find source tree)
 coptercontrol_friendly := CopterControl

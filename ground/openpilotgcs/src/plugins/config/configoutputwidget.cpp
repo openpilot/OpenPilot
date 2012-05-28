@@ -50,14 +50,9 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
     m_config->setupUi(this);
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    addApplySaveButtons(m_config->saveRCOutputToRAM,m_config->saveRCOutputToSD);
-    addUAVObject("ActuatorSettings");
 
     UAVSettingsImportExportFactory * importexportplugin =  pm->getObject<UAVSettingsImportExportFactory>();
     connect(importexportplugin,SIGNAL(importAboutToBegin()),this,SLOT(stopTests()));
-
-    addApplySaveButtons(m_config->saveRCOutputToRAM,m_config->saveRCOutputToSD);
-        addUAVObject("ActuatorSettings");
 
     // NOTE: we have channel indices from 0 to 9, but the convention for OP is Channel 1 to Channel 10.
     // Register for ActuatorSettings changes:
@@ -73,23 +68,37 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
 
     connect(m_config->channelOutTest, SIGNAL(toggled(bool)), this, SLOT(runChannelTests(bool)));
 
-    refreshWidgetsValues();
 
     firstUpdate = true;
 
+    // Configure the task widget
     // Connect the help button
     connect(m_config->outputHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
+
+    // Add custom handling of displaying things
+    connect(this,SIGNAL(refreshWidgetsValuesRequested()), this, SLOT(refreshOutputWidgetsValues()));
+
+    addApplySaveButtons(m_config->saveRCOutputToRAM,m_config->saveRCOutputToSD);
+
+    // Track the ActuatorSettings object
+    addUAVObject("ActuatorSettings");
+
+    // Associate the buttons with their UAVO fields
     addWidget(m_config->cb_outputRate4);
     addWidget(m_config->cb_outputRate3);
     addWidget(m_config->cb_outputRate2);
     addWidget(m_config->cb_outputRate1);
     addWidget(m_config->spinningArmed);
 
+    disconnect(this, SLOT(refreshWidgetsValues(UAVObject*)));
+
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
     UAVObject* obj = objManager->getObject(QString("ActuatorCommand"));
     if(UAVObject::GetGcsTelemetryUpdateMode(obj->getMetadata()) == UAVObject::UPDATEMODE_ONCHANGE)
         this->setEnabled(false);
     connect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(disableIfNotMe(UAVObject*)));
+
+    refreshWidgetsValues();
 }
 void ConfigOutputWidget::enableControls(bool enable)
 {
@@ -222,10 +231,8 @@ void ConfigOutputWidget::sendChannelTest(int index, int value)
 /**
   Request the current config from the board (RC Output)
   */
-void ConfigOutputWidget::refreshWidgetsValues(UAVObject *)
+void ConfigOutputWidget::refreshOutputWidgetsValues(UAVObject *)
 {
-    bool dirty=isDirty();
-
     // Reset all channel assignements:
     QList<OutputChannelForm*> outputChannelForms = findChildren<OutputChannelForm*>();
     foreach(OutputChannelForm *outputChannelForm, outputChannelForms)
@@ -318,8 +325,6 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject *)
         int neutral = actuatorSettingsData.ChannelNeutral[outputChannelForm->index()];
         outputChannelForm->neutral(neutral);
     }
-
-    setDirty(dirty);
 }
 
 /**

@@ -69,11 +69,10 @@ private:
 private slots:
         void stopTests();
         void disableIfNotMe(UAVObject *obj);
-        virtual void refreshWidgetsValues();
+        virtual void refreshWidgetsValues(UAVObject * obj = NULL);
         void updateObjectsFromWidgets();
 	void runChannelTests(bool state);
         void sendChannelTest(int index, int value);
-        void setSpinningArmed(bool val);
         void openHelp();
 protected:
         void enableControls(bool enable);

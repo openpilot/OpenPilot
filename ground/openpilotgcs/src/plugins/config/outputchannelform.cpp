@@ -71,7 +71,7 @@ OutputChannelForm::OutputChannelForm(const int index, QWidget *parent, const boo
     connect(ui.actuatorLink, SIGNAL(toggled(bool)),
             this, SLOT(linkToggled(bool)));
 
-    disbleMouseWheelEvents();
+    disableMouseWheelEvents();
 }
 
 OutputChannelForm::~OutputChannelForm()

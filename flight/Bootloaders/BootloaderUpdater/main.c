@@ -28,12 +28,13 @@
 /* Bootloader Includes */
 #include <pios.h>
 #include <stdbool.h>
+#include "pios_board_info.h"
 
 #define MAX_WRI_RETRYS 3
 /* Prototype of PIOS_Board_Init() function */
 extern void PIOS_Board_Init(void);
 extern void FLASH_Download();
-void error(void);
+void error(int);
 
 /* The ADDRESSES of the _binary_* symbols are the important
  * data.  This is non-intuitive for _binary_size where you
@@ -50,12 +51,40 @@ int main() {
 
 	PIOS_SYS_Init();
 	PIOS_Board_Init();
+	PIOS_LED_On(PIOS_LED_HEARTBEAT);
+	PIOS_DELAY_WaitmS(3000);
+	PIOS_LED_Off(PIOS_LED_HEARTBEAT);
 
 	/// Self overwrite check
 	uint32_t base_address = SCB->VTOR;
 	if ((0x08000000 + embedded_image_size) > base_address)
-		error();
+		error(PIOS_LED_HEARTBEAT);
 	///
+
+	/*
+	 * Make sure the bootloader we're carrying is for the same
+	 * board type and board revision as the one we're running on.
+	 *
+	 * Assume the bootloader in flash and the bootloader contained in
+	 * the updater both carry a board_info_blob at the end of the image.
+	 */
+
+	/* Calculate how far the board_info_blob is from the beginning of the bootloader */
+	uint32_t board_info_blob_offset = (uint32_t)&pios_board_info_blob - (uint32_t)0x08000000;
+
+	/* Use the same offset into our embedded bootloader image */
+	struct pios_board_info * new_board_info_blob = (struct pios_board_info *)
+		((uint32_t)embedded_image_start + board_info_blob_offset);
+
+	/* Compare the two board info blobs to make sure they're for the same HW revision */
+	if ((pios_board_info_blob.magic != new_board_info_blob->magic) ||
+		(pios_board_info_blob.board_type != new_board_info_blob->board_type) ||
+		(pios_board_info_blob.board_rev != new_board_info_blob->board_rev)) {
+		error(PIOS_LED_HEARTBEAT);
+	}
+
+	/* Embedded bootloader looks like it's the right one for this HW, proceed... */
+
 	FLASH_Unlock();
 
 	/// Bootloader memory space erase
@@ -79,7 +108,7 @@ int main() {
 	}
 
 	if (fail == true)
-		error();
+		error(PIOS_LED_HEARTBEAT);
 
 
 	///
@@ -87,6 +116,7 @@ int main() {
 	/// Bootloader programing
 	for (uint32_t offset = 0; offset < embedded_image_size/sizeof(uint32_t); ++offset) {
 		bool result = false;
+		PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
 		for (uint8_t retry = 0; retry < MAX_WRI_RETRYS; ++retry) {
 			if (result == false) {
 				result = (FLASH_ProgramWord(0x08000000 + (offset * 4), embedded_image_start[offset])
@@ -94,9 +124,15 @@ int main() {
 			}
 		}
 		if (result == false)
-			error();
+			error(PIOS_LED_HEARTBEAT);
 	}
 	///
+	for (uint8_t x = 0; x < 3; ++x) {
+			PIOS_LED_On(PIOS_LED_HEARTBEAT);
+			PIOS_DELAY_WaitmS(1000);
+			PIOS_LED_Off(PIOS_LED_HEARTBEAT);
+			PIOS_DELAY_WaitmS(1000);
+	}
 
 	/// Invalidate the bootloader updater so we won't run
 	/// the update again on the next power cycle.
@@ -109,7 +145,11 @@ int main() {
 
 }
 
-void error(void) {
+void error(int led) {
 	for (;;) {
+		PIOS_LED_On(led);
+		PIOS_DELAY_WaitmS(500);
+		PIOS_LED_Off(led);
+		PIOS_DELAY_WaitmS(500);
 	}
 }

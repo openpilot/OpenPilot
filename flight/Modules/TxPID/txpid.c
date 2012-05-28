@@ -275,6 +275,9 @@ static void updatePIDs(UAVObjEvent* ev)
 			case TXPIDSETTINGS_PIDS_YAWATTITUDEILIMIT:
 				needsUpdate |= update(&stab.YawPI[STABILIZATIONSETTINGS_YAWPI_ILIMIT], value);
 				break;
+			case TXPIDSETTINGS_PIDS_GYROTAU:
+				needsUpdate |= update(&stab.GyroTau, value);
+				break;
 			default:
 				PIOS_Assert(0);
 			}

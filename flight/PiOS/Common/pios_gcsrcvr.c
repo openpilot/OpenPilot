@@ -152,10 +152,9 @@ static void PIOS_gcsrcvr_Supervisor(uint32_t gcsrcvr_id) {
 	}
 
 	/* 
-	 * RTC runs at 625Hz so divide down the base rate so
-	 * that this loop runs at 25Hz.
+	 * RTC runs at 625Hz.
 	 */
-	if(++(gcsrcvr_dev->supv_timer) < 25) {
+	if(++(gcsrcvr_dev->supv_timer) < (PIOS_GCSRCVR_TIMEOUT_MS * 1000 / 625)) {
 		return;
 	}
 	gcsrcvr_dev->supv_timer = 0;

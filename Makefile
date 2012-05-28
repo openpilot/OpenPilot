@@ -68,7 +68,7 @@ help:
 	@echo "   Here is a summary of the available targets:"
 	@echo
 	@echo "   [Tool Installers]"
-	@echo "     qt_sdk_install       - Install the QT v4.6.2 tools"
+	@echo "     qt_sdk_install       - Install the QT v4.7.3 tools"
 	@echo "     arm_sdk_install      - Install the Code Sourcery ARM gcc toolchain"
 	@echo "     openocd_install      - Install the OpenOCD JTAG daemon"
 	@echo "     stm32flash_install   - Install the stm32flash tool for unbricking boards"
@@ -114,9 +114,6 @@ help:
 	@echo "                            supported boards are ($(BL_BOARDS))"
 	@echo
 	@echo "   [Simulation]"
-	@echo "     sim_posix            - Build OpenPilot simulation firmware for"
-	@echo "                            a POSIX compatible system (Linux, Mac OS X, ...)"
-	@echo "     sim_posix_clean      - Delete all build output for the POSIX simulation"
 	@echo "     sim_win32            - Build OpenPilot simulation firmware for"
 	@echo "                            Windows using mingw and msys"
 	@echo "     sim_win32_clean      - Delete all build output for the win32 simulation"
@@ -161,20 +158,29 @@ $(BUILD_DIR):
 ###############################################################
 
 # Set up QT toolchain
-QT_SDK_DIR := $(TOOLS_DIR)/qtsdk-2010.02
+QT_SDK_DIR := $(TOOLS_DIR)/qtsdk-v1.2
 
 .PHONY: qt_sdk_install
-qt_sdk_install: QT_SDK_URL  := http://get.qt.nokia.com/qtsdk/qt-sdk-linux-x86-opensource-2010.02.bin
-qt_sdk_install: QT_SDK_FILE := $(notdir $(QT_SDK_URL))
+qt_sdk_install: QT_SDK_URL  := http://www.developer.nokia.com/dp?uri=http://sw.nokia.com/id/8ea74da4-fec1-4277-8b26-c58cc82e204b/Qt_SDK_Lin32_offline
+qt_sdk_install: QT_SDK_FILE := Qt_SDK_Lin32_offline_v1_2_en.run
+#qt_sdk_install: QT_SDK_URL  := http://www.developer.nokia.com/dp?uri=http://sw.nokia.com/id/c365bbf5-c2b9-4dda-9c1f-34b2c8d07785/Qt_SDK_Lin32_offline_v1_1_2
+#qt_sdk_install: QT_SDK_FILE := Qt_SDK_Lin32_offline_v1_1_2_en.run
 # order-only prereq on directory existance:
 qt_sdk_install : | $(DL_DIR) $(TOOLS_DIR)
 qt_sdk_install: qt_sdk_clean
         # download the source only if it's newer than what we already have
-	$(V1) wget -N -P "$(DL_DIR)" "$(QT_SDK_URL)"
+	$(V1) wget -N --content-disposition -P "$(DL_DIR)" "$(QT_SDK_URL)"
+        # tell the user exactly which path they should select in the GUI
+	$(V1) echo "*** NOTE NOTE NOTE ***"
+	$(V1) echo "*"
+	$(V1) echo "*  In the GUI, please use exactly this path as the installation path:"
+	$(V1) echo "*        $(QT_SDK_DIR)"
+	$(V1) echo "*"
+	$(V1) echo "*** NOTE NOTE NOTE ***"
 
         #installer is an executable, make it executable and run it
 	$(V1) chmod u+x "$(DL_DIR)/$(QT_SDK_FILE)"
-	"$(DL_DIR)/$(QT_SDK_FILE)" --installdir "$(QT_SDK_DIR)"
+	$(V1) "$(DL_DIR)/$(QT_SDK_FILE)" -style cleanlooks
 
 .PHONY: qt_sdk_clean
 qt_sdk_clean:
@@ -221,7 +227,7 @@ openocd_install: openocd_clean
 	$(V1) mkdir -p "$(OPENOCD_DIR)"
 	$(V1) ( \
 	  cd $(OPENOCD_BUILD_DIR)/openocd-0.5.0 ; \
-	  ./configure --prefix="$(OPENOCD_DIR)" --enable-ft2232_libftdi --enable-buspirate; \
+	  ./configure --prefix="$(OPENOCD_DIR)" --enable-ft2232_libftdi ; \
 	  $(MAKE) --silent ; \
 	  $(MAKE) --silent install ; \
 	)
@@ -281,13 +287,13 @@ libusb_win_clean:
 
 openocd_git_win_install: | $(DL_DIR) $(TOOLS_DIR)
 openocd_git_win_install: OPENOCD_URL  := git://openocd.git.sourceforge.net/gitroot/openocd/openocd
-openocd_git_win_install: OPENOCD_REV  := c59a4419fcc5568d59fbaee775132f91cb7fd26b
+openocd_git_win_install: OPENOCD_REV  := f1c0133321c8fcadadd10bba5537c0a634eb183b
 openocd_git_win_install: openocd_win_clean libusb_win_install ftd2xx_install
         # download the source
 	$(V0) @echo " DOWNLOAD     $(OPENOCD_URL) @ $(OPENOCD_REV)"
 	$(V1) [ ! -d "$(OPENOCD_BUILD_DIR)" ] || $(RM) -rf "$(OPENOCD_BUILD_DIR)"
 	$(V1) mkdir -p "$(OPENOCD_BUILD_DIR)"
-	$(V1) git clone --depth 1 --no-checkout $(OPENOCD_URL) "$(DL_DIR)/openocd-build"
+	$(V1) git clone --no-checkout $(OPENOCD_URL) "$(DL_DIR)/openocd-build"
 	$(V1) ( \
 	  cd $(OPENOCD_BUILD_DIR) ; \
 	  git checkout -q $(OPENOCD_REV) ; \
@@ -330,13 +336,13 @@ openocd_win_clean:
 
 openocd_git_install: | $(DL_DIR) $(TOOLS_DIR)
 openocd_git_install: OPENOCD_URL  := git://openocd.git.sourceforge.net/gitroot/openocd/openocd
-openocd_git_install: OPENOCD_REV  := c59a4419fcc5568d59fbaee775132f91cb7fd26b
+openocd_git_install: OPENOCD_REV  := f1c0133321c8fcadadd10bba5537c0a634eb183b
 openocd_git_install: openocd_clean
         # download the source
 	$(V0) @echo " DOWNLOAD     $(OPENOCD_URL) @ $(OPENOCD_REV)"
 	$(V1) [ ! -d "$(OPENOCD_BUILD_DIR)" ] || $(RM) -rf "$(OPENOCD_BUILD_DIR)"
 	$(V1) mkdir -p "$(OPENOCD_BUILD_DIR)"
-	$(V1) git clone --depth 1 --no-checkout $(OPENOCD_URL) "$(OPENOCD_BUILD_DIR)"
+	$(V1) git clone --no-checkout $(OPENOCD_URL) "$(OPENOCD_BUILD_DIR)"
 	$(V1) ( \
 	  cd $(OPENOCD_BUILD_DIR) ; \
 	  git checkout -q $(OPENOCD_REV) ; \
@@ -427,7 +433,7 @@ dfuutil_clean:
 ##############################
 
 ifeq ($(shell [ -d "$(QT_SDK_DIR)" ] && echo "exists"), exists)
-  QMAKE=$(QT_SDK_DIR)/qt/bin/qmake
+  QMAKE=$(QT_SDK_DIR)/Desktop/Qt/4.8.0/gcc/bin/qmake
 else
   # not installed, hope it's in the path...
   QMAKE=qmake
@@ -594,7 +600,7 @@ define EF_TEMPLATE
 .PHONY: ef_$(1)
 ef_$(1): ef_$(1)_bin
 
-ef_$(1)_%: bl_$(1)_bin fw_$(1)_bin
+ef_$(1)_%: bl_$(1)_bin fw_$(1)_opfw
 	$(V1) mkdir -p $(BUILD_DIR)/ef_$(1)/dep
 	$(V1) cd $(ROOT_DIR)/flight/EntireFlash && \
 		$$(MAKE) -r --no-print-directory \
@@ -624,12 +630,13 @@ all_$(1)_clean: $$(addsuffix _clean, $$(filter bu_$(1), $$(BU_TARGETS)))
 all_$(1)_clean: $$(addsuffix _clean, $$(filter ef_$(1), $$(EF_TARGETS)))
 endef
 
-ALL_BOARDS := coptercontrol pipxtreme revolution osd
+ALL_BOARDS := coptercontrol pipxtreme revolution simposix osd
 
 # Friendly names of each board (used to find source tree)
 coptercontrol_friendly := CopterControl
 pipxtreme_friendly     := PipXtreme
 revolution_friendly    := Revolution
+simposix_friendly      := SimPosix
 osd_friendly    := OSD
 
 # Start out assuming that we'll build fw, bl and bu for all boards
@@ -638,18 +645,15 @@ BL_BOARDS  := $(ALL_BOARDS)
 BU_BOARDS  := $(ALL_BOARDS)
 EF_BOARDS  := $(ALL_BOARDS)
 
-# FIXME: The INS build doesn't have a bootloader or bootloader
-#        updater yet so we need to filter them out to prevent errors.
-BL_BOARDS  := $(filter-out ins, $(BL_BOARDS))
-BU_BOARDS  := $(filter-out ins, $(BU_BOARDS))
+# FIXME: The BU image doesn't work for F4 boards so we need to
+#        filter them out to prevent errors.
+BU_BOARDS  := $(filter-out revolution, $(BU_BOARDS))
 
-# FIXME: The CC bootloader updaters don't work anymore due to
-#        differences between CC and CC3D
-BU_BOARDS  := $(filter-out coptercontrol, $(BU_BOARDS))
-
-# FIXME: PipXtreme bootloader updater doesn't work due to missing
-#        definitions for LEDs
-BU_BOARDS  := $(filter-out pipxtreme, $(BU_BOARDS))
+# SimPosix doesn't have a BL, BU or EF target so we need to
+# filter them out to prevent errors on the all_flight target.
+BL_BOARDS  := $(filter-out simposix, $(BL_BOARDS))
+BU_BOARDS  := $(filter-out simposix, $(BU_BOARDS))
+EF_BOARDS  := $(filter-out simposix, $(EF_BOARDS))
 
 # Generate the targets for whatever boards are left in each list
 FW_TARGETS := $(addprefix fw_, $(FW_BOARDS))
@@ -670,7 +674,7 @@ all_bu:        $(addsuffix _opfw,  $(BU_TARGETS))
 all_bu_clean:  $(addsuffix _clean, $(BU_TARGETS))
 
 .PHONY: all_ef all_ef_clean
-all_ef:        $(EF_TARGETS))
+all_ef:        $(EF_TARGETS)
 all_ef_clean:  $(addsuffix _clean, $(EF_TARGETS))
 
 .PHONY: all_flight all_flight_clean
@@ -691,14 +695,6 @@ $(foreach board, $(ALL_BOARDS), $(eval $(call BL_TEMPLATE,$(board),$($(board)_fr
 
 # Expand the entire-flash rules
 $(foreach board, $(ALL_BOARDS), $(eval $(call EF_TEMPLATE,$(board),$($(board)_friendly))))
-
-.PHONY: sim_posix
-sim_posix: sim_posix_elf
-
-sim_posix_%: uavobjects_flight
-	$(V1) mkdir -p $(BUILD_DIR)/sitl_posix
-	$(V1) $(MAKE) --no-print-directory \
-		-C $(ROOT_DIR)/flight/OpenPilot --file=$(ROOT_DIR)/flight/OpenPilot/Makefile.posix $*
 
 .PHONY: sim_win32
 sim_win32: sim_win32_exe

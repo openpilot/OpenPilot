@@ -166,6 +166,7 @@ SRC += $(PIOSCOMMON)/pios_crc.c
 SRC += $(PIOSCOMMON)/pios_video.c
 SRC += $(PIOSCOMMON)/pios_usb_desc_hid_cdc.c
 SRC += $(PIOSCOMMON)/pios_usb_desc_hid_only.c
+SRC += $(PIOSCOMMON)/pios_usb_util.c
 
 # optional component libraries
 include $(PIOSCOMMONLIB)/FreeRTOS/library.mk

@@ -55,20 +55,10 @@ void PIOS_SYS_Init(void)
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOC | RCC_APB2Periph_GPIOD | RCC_APB2Periph_GPIOE |
 			       RCC_APB2Periph_AFIO, ENABLE);
 
-	/* Activate pull-ups on all pins by default */
-	GPIO_InitTypeDef GPIO_InitStructure;
-	GPIO_StructInit(&GPIO_InitStructure);
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
-	GPIO_InitStructure.GPIO_Pin = 0xffff;
-	GPIO_Init(GPIOB, &GPIO_InitStructure);
-	GPIO_Init(GPIOD, &GPIO_InitStructure);
-#if (PIOS_USB_ENABLED)
-	GPIO_InitStructure.GPIO_Pin = 0xffff & ~GPIO_Pin_11 & ~GPIO_Pin_12;	/* Exclude USB pins */
-#endif
-	GPIO_Init(GPIOA, &GPIO_InitStructure);
-
 #if (PIOS_USB_ENABLED)
 	/*  Ensure that pull-up is active on detect pin */
+	GPIO_InitTypeDef GPIO_InitStructure;
+	GPIO_StructInit(&GPIO_InitStructure);
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
 	GPIO_InitStructure.GPIO_Pin = PIOS_USB_DETECT_GPIO_PIN;
 	GPIO_Init(PIOS_USB_DETECT_GPIO_PORT, &GPIO_InitStructure);
@@ -128,8 +118,8 @@ uint32_t PIOS_SYS_getCPUFlashSize(void)
 
 /**
 * Returns the serial number as a string
-* param[out] str pointer to a string which can store at least 32 digits + zero terminator!
-* (24 digits returned for STM32)
+* param[out] uint8_t pointer to a string which can store at least 12 bytes
+* (12 bytes returned for STM32)
 * return < 0 if feature not supported
 */
 int32_t PIOS_SYS_SerialNumberGetBinary(uint8_t *array)
@@ -137,7 +127,7 @@ int32_t PIOS_SYS_SerialNumberGetBinary(uint8_t *array)
 	int i;
 
 	/* Stored in the so called "electronic signature" */
-	for (i = 0; i < 12; ++i) {
+	for (i = 0; i < PIOS_SYS_SERIAL_NUM_BINARY_LEN; ++i) {
 		uint8_t b = MEM8(0x1ffff7e8 + i);
 
 		array[i] = b;
@@ -158,7 +148,7 @@ int32_t PIOS_SYS_SerialNumberGet(char *str)
 	int i;
 
 	/* Stored in the so called "electronic signature" */
-	for (i = 0; i < 24; ++i) {
+	for (i = 0; i < PIOS_SYS_SERIAL_NUM_ASCII_LEN; ++i) {
 		uint8_t b = MEM8(0x1ffff7e8 + (i / 2));
 		if (!(i & 1))
 			b >>= 4;

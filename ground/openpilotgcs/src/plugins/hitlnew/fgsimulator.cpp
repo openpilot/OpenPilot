@@ -308,13 +308,7 @@ void FGSimulator::processUpdate(const QByteArray& inp)
             double ECEF[3];
             double RNE[9];
             Utils::CoordinateConversions().RneFromLLA(LLA,(double (*)[3])RNE);
-            for (int t=0;t<9;t++) {
-                    homeData.RNE[t]=RNE[t];
-            }
             Utils::CoordinateConversions().LLA2ECEF(LLA,ECEF);
-            homeData.ECEF[0]=ECEF[0]*100;
-            homeData.ECEF[1]=ECEF[1]*100;
-            homeData.ECEF[2]=ECEF[2]*100;
             homeData.Be[0]=0;
             homeData.Be[1]=0;
             homeData.Be[2]=0;
@@ -335,7 +329,7 @@ void FGSimulator::processUpdate(const QByteArray& inp)
 	memset(&positionActualData, 0, sizeof(PositionActual::DataFields));
         positionActualData.North = 0; //Currently hardcoded as there is no way of setting up a reference point to calculate distance
 	positionActualData.East = 0; //Currently hardcoded as there is no way of setting up a reference point to calculate distance
-	positionActualData.Down = (altitude * 100); //Multiply by 100 because positionActual expects input in Centimeters.
+	positionActualData.Down = altitude ; //Multiply by 1 because positionActual expects input in meters.
         posActual->setData(positionActualData);
 
 	// Update AltitudeActual object
@@ -371,26 +365,39 @@ void FGSimulator::processUpdate(const QByteArray& inp)
         gpsPos->setData(gpsData);
 
         float NED[3];
-        double LLA[3] = {(double) gpsData.Latitude / 1e7, (double) gpsData.Longitude / 1e7, (double) (gpsData.GeoidSeparation + gpsData.Altitude)};
         // convert from cm back to meters
-        double ECEF[3] = {(double) (homeData.ECEF[0] / 100), (double) (homeData.ECEF[1] / 100), (double) (homeData.ECEF[2] / 100)};
-                Utils::CoordinateConversions().LLA2Base(LLA, ECEF, (float (*)[3]) homeData.RNE, NED);
 
-        positionActualData.North = NED[0]*100; //Currently hardcoded as there is no way of setting up a reference point to calculate distance
-        positionActualData.East = NED[1]*100; //Currently hardcoded as there is no way of setting up a reference point to calculate distance
-        positionActualData.Down = NED[2]*100; //Multiply by 100 because positionActual expects input in Centimeters.
+        double hLLA[3] = {(double) homeData.Latitude / 1e7, (double) homeData.Longitude / 1e7, (double) (homeData.Altitude)};
+            double ECEF[3];
+            double RNE[9];
+            Utils::CoordinateConversions().RneFromLLA(hLLA,(double (*)[3])RNE);
+            Utils::CoordinateConversions().LLA2ECEF(hLLA,ECEF);
+                Utils::CoordinateConversions().LLA2Base(hLLA, ECEF, (float (*)[3]) RNE, NED);
+
+        positionActualData.North = NED[0]; //Currently hardcoded as there is no way of setting up a reference point to calculate distance
+        positionActualData.East = NED[1]; //Currently hardcoded as there is no way of setting up a reference point to calculate distance
+        positionActualData.Down = NED[2]; //Multiply by 1 because positionActual expects input in meters.
         posActual->setData(positionActualData);
 
         // Update AttitudeRaw object (filtered gyros only for now)
-        AttitudeRaw::DataFields rawData;
-        memset(&rawData, 0, sizeof(AttitudeRaw::DataFields));
-        rawData = attRaw->getData();
-        rawData.gyros[0] = rollRate;
+        //AttitudeRaw::DataFields rawData;
+        //AttitudeRaw::DataFields rawData;
+        Gyros::DataFields gyroData;
+        Accels::DataFields accelData;
+        memset(&gyroData, 0, sizeof(Gyros::DataFields));
+        memset(&accelData, 0, sizeof(Accels::DataFields));
+        gyroData = gyros->getData();
+        accelData = accels->getData();
+        //rawData.gyros[0] = rollRate;
         //rawData.gyros[1] = cos(DEG2RAD * roll) * pitchRate + sin(DEG2RAD * roll) * yawRate;
         //rawData.gyros[2] = cos(DEG2RAD * roll) * yawRate - sin(DEG2RAD * roll) * pitchRate;
-        rawData.gyros[1] = pitchRate;
-        rawData.gyros[2] = yawRate;
-        attRaw->setData(rawData);
+        //rawData.gyros[1] = pitchRate;
+        //rawData.gyros[2] = yawRate;
+	gyroData.x = rollRate;
+	gyroData.y = pitchRate;
+	gyroData.z = yawRate;
+	// TODO: Accels are still missing!!!!
+        gyros->setData(gyroData);
         // attRaw->updated();
 }
 

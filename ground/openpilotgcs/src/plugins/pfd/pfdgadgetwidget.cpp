@@ -304,7 +304,7 @@ void PFDGadgetWidget::updateAirspeed(UAVObject *object) {
     UAVObjectField* eastField = object->getField("East");
     if (northField && eastField) {
         double val = floor(sqrt(pow(northField->getDouble(),2) + pow(eastField->getDouble(),2))*10)/10;
-        groundspeedTarget = 3.6*val*speedScaleHeight/3000;
+        groundspeedTarget = 3.6*val*speedScaleHeight/30;
 
         if (!dialTimer.isActive())
             dialTimer.start(); // Rearm the dial Timer which might be stopped.
@@ -321,7 +321,7 @@ void PFDGadgetWidget::updateAltitude(UAVObject *object) {
     UAVObjectField* downField = object->getField("Down");
     if (downField) {
         // The altitude scale represents 30 meters
-        altitudeTarget = -floor(downField->getDouble()*10)/10*altitudeScaleHeight/3000;
+        altitudeTarget = -floor(downField->getDouble()*10)/10*altitudeScaleHeight/30;
         if (!dialTimer.isActive())
             dialTimer.start(); // Rearm the dial Timer which might be stopped.
 

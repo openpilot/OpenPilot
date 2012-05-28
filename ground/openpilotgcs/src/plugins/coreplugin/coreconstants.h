@@ -49,6 +49,7 @@ const char * const GCS_VERSION_LONG      = GCS_VERSION;
 const char * const GCS_AUTHOR            = "OpenPilot Project";
 const char * const GCS_YEAR              = "2011";
 
+const char * const GCS_HELP              = "http://wiki.openpilot.org";
 #ifdef GCS_REVISION
 const char * const GCS_REVISION_STR      = STRINGIFY(GCS_REVISION);
 #else

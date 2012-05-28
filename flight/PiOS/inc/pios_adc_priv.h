@@ -37,30 +37,14 @@
 #include <fifo_buffer.h>
 
 struct pios_adc_cfg {
+	ADC_TypeDef* adc_dev;
 	struct stm32_dma dma;
 	uint32_t half_flag;
 	uint32_t full_flag;
+	uint16_t max_downsample;
 };
 
-struct pios_adc_dev {
-	const struct pios_adc_cfg *const cfg;	
-	ADCCallback callback_function;
-#if defined(PIOS_INCLUDE_FREERTOS)
-	xQueueHandle data_queue;
-#endif
-	volatile int16_t *valid_data_buffer;
-	volatile uint8_t adc_oversample;
-	uint8_t dma_block_size;
-	uint16_t dma_half_buffer_size;
-#if defined(PIOS_INCLUDE_ADC)
-	int16_t fir_coeffs[PIOS_ADC_MAX_SAMPLES+1]  __attribute__ ((aligned(4)));
-	volatile int16_t raw_data_buffer[PIOS_ADC_MAX_SAMPLES]  __attribute__ ((aligned(4)));	// Double buffer that DMA just used
-	float downsampled_buffer[PIOS_ADC_NUM_CHANNELS]  __attribute__ ((aligned(4)));
-#endif
-};
-
-extern struct pios_adc_dev pios_adc_devs[];
-extern uint8_t pios_adc_num_devices;
+int32_t PIOS_ADC_Init(const struct pios_adc_cfg * cfg);
 
 #endif /* PIOS_ADC_PRIV_H */
 
@@ -68,4 +52,3 @@ extern uint8_t pios_adc_num_devices;
  * @}
  * @}
  */
-

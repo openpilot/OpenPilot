@@ -89,7 +89,7 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
 
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
     UAVObject* obj = objManager->getObject(QString("ActuatorCommand"));
-    if(obj->getMetadata().gcsTelemetryUpdateMode == UAVObject::UPDATEMODE_ONCHANGE)
+    if(UAVObject::GetGcsTelemetryUpdateMode(obj->getMetadata()) == UAVObject::UPDATEMODE_ONCHANGE)
         this->setEnabled(false);
     connect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(disableIfNotMe(UAVObject*)));
 }
@@ -152,10 +152,10 @@ void ConfigOutputWidget::runChannelTests(bool state)
     {
         wasItMe=true;
         accInitialData = mdata;
-        mdata.flightAccess = UAVObject::ACCESS_READONLY;
-        mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
-        mdata.gcsTelemetryAcked = false;
-        mdata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
+        UAVObject::SetFlightAccess(mdata, UAVObject::ACCESS_READONLY);
+        UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_ONCHANGE);
+        UAVObject::SetGcsTelemetryAcked(mdata, false);
+        UAVObject::SetGcsTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_ONCHANGE);
         mdata.gcsTelemetryUpdatePeriod = 100;
     }
     else
@@ -242,7 +242,7 @@ void ConfigOutputWidget::sendChannelTest(int index, int value)
 /**
   Request the current config from the board (RC Output)
   */
-void ConfigOutputWidget::refreshWidgetsValues()
+void ConfigOutputWidget::refreshWidgetsValues(UAVObject *)
 {
     bool dirty=isDirty();
 
@@ -382,7 +382,7 @@ void ConfigOutputWidget::stopTests()
 
 void ConfigOutputWidget::disableIfNotMe(UAVObject* obj)
 {
-    if(obj->getMetadata().gcsTelemetryUpdateMode == UAVObject::UPDATEMODE_ONCHANGE)
+    if(UAVObject::GetGcsTelemetryUpdateMode(obj->getMetadata()) == UAVObject::UPDATEMODE_ONCHANGE)
     {
         if(!wasItMe)
             this->setEnabled(false);

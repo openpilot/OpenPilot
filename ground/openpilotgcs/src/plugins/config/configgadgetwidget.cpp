@@ -27,7 +27,7 @@
 
 #include "configgadgetwidget.h"
 
-#include "configairframewidget.h"
+#include "configvehicletypewidget.h"
 #include "configccattitudewidget.h"
 #include "configinputwidget.h"
 #include "configoutputwidget.h"
@@ -36,6 +36,7 @@
 #include "configtxpidwidget.h"
 #include "config_pro_hw_widget.h"
 #include "config_cc_hw_widget.h"
+#include "configpipxtremewidget.h"
 #include "configrevowidget.h"
 #include "defaultattitudewidget.h"
 #include "defaulthwsettingswidget.h"
@@ -68,7 +69,7 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     qwd = new DefaultHwSettingsWidget(this);
     ftw->insertTab(ConfigGadgetWidget::hardware, qwd, QIcon(":/configgadget/images/hw_config.png"), QString("HW Settings"));
 
-    qwd = new ConfigAirframeWidget(this);
+    qwd = new ConfigVehicleTypeWidget(this);
     ftw->insertTab(ConfigGadgetWidget::aircraft, qwd, QIcon(":/configgadget/images/Airframe.png"), QString("Aircraft"));
 
     qwd = new ConfigInputWidget(this);
@@ -89,8 +90,8 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     qwd = new ConfigTxPIDWidget(this);
     ftw->insertTab(ConfigGadgetWidget::txpid, qwd, QIcon(":/configgadget/images/txpid.png"), QString("TxPID"));
 
-//    qwd = new ConfigPipXtremeWidget(this);
-//    ftw->insertTab(5, qwd, QIcon(":/configgadget/images/PipXtreme.png"), QString("PipXtreme"));
+    qwd = new ConfigPipXtremeWidget(this);
+    ftw->insertTab(ConfigGadgetWidget::pipxtreme, qwd, QIcon(":/configgadget/images/PipXtreme.png"), QString("PipXtreme"));
 
     // *********************
     // Listen to autopilot connection events

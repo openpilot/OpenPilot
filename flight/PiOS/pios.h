@@ -100,6 +100,7 @@
 /* PIOS Hardware Includes (Common) */
 #include <pios_sdcard.h>
 #include <pios_com.h>
+#include <pios_etasv3.h>
 #if defined(PIOS_INCLUDE_BMP085)
 #include <pios_bmp085.h>
 #endif

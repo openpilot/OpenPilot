@@ -1734,6 +1734,7 @@
           <dataSize>60</dataSize>
           <plotCurve0>
             <color>4294901760</color>
+            <mathFunction>None</mathFunction>
             <uavField>x</uavField>
             <uavObject>Accels</uavObject>
             <yMaximum>0</yMaximum>
@@ -1742,6 +1743,7 @@
           </plotCurve0>
           <plotCurve1>
             <color>4283782655</color>
+            <mathFunction>None</mathFunction>
             <uavField>y</uavField>
             <uavObject>Accels</uavObject>
             <yMaximum>0</yMaximum>
@@ -1750,6 +1752,7 @@
           </plotCurve1>
           <plotCurve2>
             <color>4283804160</color>
+            <mathFunction>None</mathFunction>
             <uavField>z</uavField>
             <uavObject>Accels</uavObject>
             <yMaximum>0</yMaximum>
@@ -1774,6 +1777,7 @@
           <dataSize>20</dataSize>
           <plotCurve0>
             <color>4294901760</color>
+            <mathFunction>None</mathFunction>
             <uavField>Channel-4</uavField>
             <uavObject>ActuatorCommand</uavObject>
             <yMaximum>0</yMaximum>
@@ -1782,6 +1786,7 @@
           </plotCurve0>
           <plotCurve1>
             <color>4294901760</color>
+            <mathFunction>None</mathFunction>
             <uavField>Channel-5</uavField>
             <uavObject>ActuatorCommand</uavObject>
             <yMaximum>0</yMaximum>
@@ -1790,6 +1795,7 @@
           </plotCurve1>
           <plotCurve2>
             <color>4289374847</color>
+            <mathFunction>None</mathFunction>
             <uavField>Channel-6</uavField>
             <uavObject>ActuatorCommand</uavObject>
             <yMaximum>0</yMaximum>
@@ -1798,6 +1804,7 @@
           </plotCurve2>
           <plotCurve3>
             <color>4289374847</color>
+            <mathFunction>None</mathFunction>
             <uavField>Channel-7</uavField>
             <uavObject>ActuatorCommand</uavObject>
             <yMaximum>0</yMaximum>
@@ -1822,6 +1829,7 @@
           <dataSize>60</dataSize>
           <plotCurve0>
             <color>4283760895</color>
+            <mathFunction>None</mathFunction>
             <uavField>Roll</uavField>
             <uavObject>AttitudeActual</uavObject>
             <yMaximum>0</yMaximum>
@@ -1830,6 +1838,7 @@
           </plotCurve0>
           <plotCurve1>
             <color>4278233600</color>
+            <mathFunction>None</mathFunction>
             <uavField>Yaw</uavField>
             <uavObject>AttitudeActual</uavObject>
             <yMaximum>0</yMaximum>
@@ -1838,6 +1847,7 @@
           </plotCurve1>
           <plotCurve2>
             <color>4294901760</color>
+            <mathFunction>None</mathFunction>
             <uavField>Pitch</uavField>
             <uavObject>AttitudeActual</uavObject>
             <yMaximum>0</yMaximum>
@@ -1862,6 +1872,7 @@
           <dataSize>60</dataSize>
           <plotCurve0>
             <color>4278190080</color>
+            <mathFunction>None</mathFunction>
             <uavField>Pressure</uavField>
             <uavObject>BaroAltitude</uavObject>
             <yMaximum>0</yMaximum>
@@ -1886,6 +1897,7 @@
           <dataSize>40</dataSize>
           <plotCurve0>
             <color>4278190207</color>
+            <mathFunction>None</mathFunction>
             <uavField>Channel-1</uavField>
             <uavObject>ManualControlCommand</uavObject>
             <yMaximum>0</yMaximum>
@@ -1894,6 +1906,7 @@
           </plotCurve0>
           <plotCurve1>
             <color>4294901760</color>
+            <mathFunction>None</mathFunction>
             <uavField>Channel-4</uavField>
             <uavObject>ManualControlCommand</uavObject>
             <yMaximum>0</yMaximum>
@@ -1902,6 +1915,7 @@
           </plotCurve1>
           <plotCurve2>
             <color>4294901760</color>
+            <mathFunction>None</mathFunction>
             <uavField>Channel-5</uavField>
             <uavObject>ManualControlCommand</uavObject>
             <yMaximum>0</yMaximum>
@@ -1910,6 +1924,7 @@
           </plotCurve2>
           <plotCurve3>
             <color>4294901760</color>
+            <mathFunction>None</mathFunction>
             <uavField>Channel-6</uavField>
             <uavObject>ManualControlCommand</uavObject>
             <yMaximum>0</yMaximum>
@@ -1918,6 +1933,7 @@
           </plotCurve3>
           <plotCurve4>
             <color>4294901760</color>
+            <mathFunction>None</mathFunction>
             <uavField>Channel-7</uavField>
             <uavObject>ManualControlCommand</uavObject>
             <yMaximum>0</yMaximum>
@@ -1926,6 +1942,7 @@
           </plotCurve4>
           <plotCurve5>
             <color>4283825920</color>
+            <mathFunction>None</mathFunction>
             <uavField>Channel-2</uavField>
             <uavObject>ManualControlCommand</uavObject>
             <yMaximum>0</yMaximum>
@@ -1934,6 +1951,7 @@
           </plotCurve5>
           <plotCurve6>
             <color>4294923520</color>
+            <mathFunction>None</mathFunction>
             <uavField>Channel-3</uavField>
             <uavObject>ManualControlCommand</uavObject>
             <yMaximum>0</yMaximum>
@@ -1942,6 +1960,7 @@
           </plotCurve6>
           <plotCurve7>
             <color>4294967040</color>
+            <mathFunction>None</mathFunction>
             <uavField>Channel-0</uavField>
             <uavObject>ManualControlCommand</uavObject>
             <yMaximum>0</yMaximum>
@@ -1966,6 +1985,7 @@
           <dataSize>60</dataSize>
           <plotCurve0>
             <color>4294901760</color>
+            <mathFunction>None</mathFunction>
             <uavField>x</uavField>
             <uavObject>Accels</uavObject>
             <yMaximum>0</yMaximum>
@@ -1974,6 +1994,7 @@
           </plotCurve0>
           <plotCurve1>
             <color>4283782655</color>
+            <mathFunction>None</mathFunction>
             <uavField>y</uavField>
             <uavObject>Accels</uavObject>
             <yMaximum>0</yMaximum>
@@ -1982,6 +2003,7 @@
           </plotCurve1>
           <plotCurve2>
             <color>4283804160</color>
+            <mathFunction>None</mathFunction>
             <uavField>z</uavField>
             <uavObject>Accels</uavObject>
             <yMaximum>0</yMaximum>
@@ -2006,6 +2028,7 @@
           <dataSize>60</dataSize>
           <plotCurve0>
             <color>4283804160</color>
+            <mathFunction>None</mathFunction>
             <uavField>z</uavField>
             <uavObject>Gyros</uavObject>
             <yMaximum>0</yMaximum>
@@ -2014,6 +2037,7 @@
           </plotCurve0>
           <plotCurve1>
             <color>4283782655</color>
+            <mathFunction>None</mathFunction>
             <uavField>y</uavField>
             <uavObject>Gyros</uavObject>
             <yMaximum>0</yMaximum>
@@ -2022,6 +2046,7 @@
           </plotCurve1>
           <plotCurve2>
             <color>4294901760</color>
+            <mathFunction>None</mathFunction>
             <uavField>x</uavField>
             <uavObject>Gyros</uavObject>
             <yMaximum>0</yMaximum>
@@ -2046,6 +2071,7 @@
           <dataSize>60</dataSize>
           <plotCurve0>
             <color>4294901760</color>
+            <mathFunction>None</mathFunction>
             <uavField>X</uavField>
             <uavObject>Magnetometer</uavObject>
             <yMaximum>0</yMaximum>
@@ -2054,6 +2080,7 @@
           </plotCurve0>
           <plotCurve1>
             <color>4283782655</color>
+            <mathFunction>None</mathFunction>
             <uavField>Y</uavField>
             <uavObject>Magnetometer</uavObject>
             <yMaximum>0</yMaximum>
@@ -2062,6 +2089,7 @@
           </plotCurve1>
           <plotCurve2>
             <color>4283804160</color>
+            <mathFunction>None</mathFunction>
             <uavField>Z</uavField>
             <uavObject>Magnetometer</uavObject>
             <yMaximum>0</yMaximum>
@@ -2086,6 +2114,7 @@
           <dataSize>240</dataSize>
           <plotCurve0>
             <color>4294945280</color>
+            <mathFunction>None</mathFunction>
             <uavField>StackRemaining-System</uavField>
             <uavObject>TaskInfo</uavObject>
             <yMaximum>0</yMaximum>
@@ -2094,6 +2123,7 @@
           </plotCurve0>
           <plotCurve1>
             <color>4294945280</color>
+            <mathFunction>None</mathFunction>
             <uavField>StackRemaining-Actuator</uavField>
             <uavObject>TaskInfo</uavObject>
             <yMaximum>0</yMaximum>
@@ -2102,6 +2132,7 @@
           </plotCurve1>
           <plotCurve10>
             <color>4294945280</color>
+            <mathFunction>None</mathFunction>
             <uavField>StackRemaining-Guidance</uavField>
             <uavObject>TaskInfo</uavObject>
             <yMaximum>0</yMaximum>
@@ -2110,6 +2141,7 @@
           </plotCurve10>
           <plotCurve11>
             <color>4294945280</color>
+            <mathFunction>None</mathFunction>
             <uavField>StackRemaining-Watchdog</uavField>
             <uavObject>TaskInfo</uavObject>
             <yMaximum>0</yMaximum>
@@ -2118,6 +2150,7 @@
           </plotCurve11>
           <plotCurve2>
             <color>4294945280</color>
+            <mathFunction>None</mathFunction>
             <uavField>StackRemaining-TelemetryTx</uavField>
             <uavObject>TaskInfo</uavObject>
             <yMaximum>0</yMaximum>
@@ -2126,6 +2159,7 @@
           </plotCurve2>
           <plotCurve3>
             <color>4294945280</color>
+            <mathFunction>None</mathFunction>
             <uavField>StackRemaining-TelemetryTxPri</uavField>
             <uavObject>TaskInfo</uavObject>
             <yMaximum>0</yMaximum>
@@ -2134,6 +2168,7 @@
           </plotCurve3>
           <plotCurve4>
             <color>4294945280</color>
+            <mathFunction>None</mathFunction>
             <uavField>StackRemaining-TelemetryRx</uavField>
             <uavObject>TaskInfo</uavObject>
             <yMaximum>0</yMaximum>
@@ -2142,6 +2177,7 @@
           </plotCurve4>
           <plotCurve5>
             <color>4294945280</color>
+            <mathFunction>None</mathFunction>
             <uavField>StackRemaining-GPS</uavField>
             <uavObject>TaskInfo</uavObject>
             <yMaximum>0</yMaximum>
@@ -2150,6 +2186,7 @@
           </plotCurve5>
           <plotCurve6>
             <color>4294945280</color>
+            <mathFunction>None</mathFunction>
             <uavField>StackRemaining-ManualControl</uavField>
             <uavObject>TaskInfo</uavObject>
             <yMaximum>0</yMaximum>
@@ -2158,6 +2195,7 @@
           </plotCurve6>
           <plotCurve7>
             <color>4294945280</color>
+            <mathFunction>None</mathFunction>
             <uavField>StackRemaining-Altitude</uavField>
             <uavObject>TaskInfo</uavObject>
             <yMaximum>0</yMaximum>
@@ -2166,6 +2204,7 @@
           </plotCurve7>
           <plotCurve8>
             <color>4294945280</color>
+            <mathFunction>None</mathFunction>
             <uavField>StackRemaining-AHRSComms</uavField>
             <uavObject>TaskInfo</uavObject>
             <yMaximum>0</yMaximum>
@@ -2174,6 +2213,7 @@
           </plotCurve8>
           <plotCurve9>
             <color>4294945280</color>
+            <mathFunction>None</mathFunction>
             <uavField>StackRemaining-Stabilization</uavField>
             <uavObject>TaskInfo</uavObject>
             <yMaximum>0</yMaximum>
@@ -2198,6 +2238,7 @@
           <dataSize>20</dataSize>
           <plotCurve0>
             <color>4289374847</color>
+            <mathFunction>None</mathFunction>
             <uavField>TxFailures</uavField>
             <uavObject>GCSTelemetryStats</uavObject>
             <yMaximum>0</yMaximum>
@@ -2206,6 +2247,7 @@
           </plotCurve0>
           <plotCurve1>
             <color>4283782655</color>
+            <mathFunction>None</mathFunction>
             <uavField>RxFailures</uavField>
             <uavObject>GCSTelemetryStats</uavObject>
             <yMaximum>0</yMaximum>
@@ -2214,6 +2256,7 @@
           </plotCurve1>
           <plotCurve2>
             <color>4294901760</color>
+            <mathFunction>None</mathFunction>
             <uavField>TxRetries</uavField>
             <uavObject>GCSTelemetryStats</uavObject>
             <yMaximum>0</yMaximum>
@@ -2238,6 +2281,7 @@
           <dataSize>240</dataSize>
           <plotCurve0>
             <color>4294945407</color>
+            <mathFunction>None</mathFunction>
             <uavField>FlightTime</uavField>
             <uavObject>SystemStats</uavObject>
             <yMaximum>0</yMaximum>

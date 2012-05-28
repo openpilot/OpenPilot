@@ -23,6 +23,15 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+/* Pull in the board-specific static HW definitions.
+ * Including .c files is a bit ugly but this allows all of
+ * the HW definitions to be const and static to limit their
+ * scope.  
+ *
+ * NOTE: THIS IS THE ONLY PLACE THAT SHOULD EVER INCLUDE THIS FILE
+ */
+#include "board_hw_defs.c"
+
 #include <pios.h>
 #include <fifo_buffer.h>
 #include <openpilot.h>
@@ -31,7 +40,6 @@
 #include <manualcontrolsettings.h>
 #include <gcsreceiver.h>
 
-#include "board_hw_defs.c"
 
 
 #define TxBufferSize3   33
@@ -49,49 +57,38 @@ uint8_t RxBuffer3[TxBufferSize3];
 
 
 #if defined(PIOS_INCLUDE_ADC)
-/*
-* ADC system
-*/
-
-#include <pios_adc_priv.h>
-
-void PIOS_ADC_handler(void)
-{
-	PIOS_ADC_DMA_Handler();
-}
-
-void DMA2_Stream4_IRQHandler() __attribute__ ((alias("PIOS_ADC_handler")));
-
-const struct pios_adc_cfg pios_adc_cfg = {
+#include "pios_adc_priv.h"
+void PIOS_ADC_DMC_irq_handler(void);
+void DMA2_Stream4_IRQHandler(void) __attribute__((alias("PIOS_ADC_DMC_irq_handler")));
+struct pios_adc_cfg pios_adc_cfg = {
+	.adc_dev = ADC1,
 	.dma = {
-			.irq = {
-					.flags = (DMA_FLAG_TCIF4 | DMA_FLAG_TEIF4 | DMA_FLAG_HTIF4),
-					.init = {
-							.NVIC_IRQChannel = DMA2_Stream4_IRQn
-					},
+		.irq = {
+			.flags   = (DMA_FLAG_TCIF4 | DMA_FLAG_TEIF4 | DMA_FLAG_HTIF4),
+			.init    = {
+				.NVIC_IRQChannel                   = DMA2_Stream4_IRQn,
+				.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
+				.NVIC_IRQChannelSubPriority        = 0,
+				.NVIC_IRQChannelCmd                = ENABLE,
 			},
-			/* XXX there is secret knowledge here regarding the use of ADC1 by the pios_adc code */
-			.rx = {
-					.channel = DMA2_Stream4, // stream0 may be used by SPI1
-					.init = {
-							.DMA_Channel = DMA_Channel_0,
-							.DMA_PeripheralBaseAddr = (uint32_t) & ADC1->DR
-					},
-			}
+		},
+		.rx = {
+			.channel = DMA2_Stream4,
+			.init    = {
+				.DMA_Channel                    = DMA_Channel_0,
+				.DMA_PeripheralBaseAddr = (uint32_t) & ADC1->DR
+			},
+		}
 	},
 	.half_flag = DMA_IT_HTIF4,
 	.full_flag = DMA_IT_TCIF4,
-};
 
-struct pios_adc_dev pios_adc_devs[] = {
-	{
-		.cfg = &pios_adc_cfg,
-		.callback_function = NULL,
-		.data_queue = NULL
-	},
 };
-
-uint8_t pios_adc_num_devices = NELEMENTS(pios_adc_devs);
+void PIOS_ADC_DMC_irq_handler(void)
+{
+	/* Call into the generic code to handle the IRQ for this specific device */
+	PIOS_ADC_DMA_Handler();
+}
 
 #endif
 
@@ -395,28 +392,18 @@ void PIOS_Board_Init(void) {
 	bool usb_hid_present = false;
 	bool usb_cdc_present = false;
 
-	uint8_t hwsettings_usb_devicetype;
-	HwSettingsUSB_DeviceTypeGet(&hwsettings_usb_devicetype);
-
-	switch (hwsettings_usb_devicetype) {
-	case HWSETTINGS_USB_DEVICETYPE_HIDONLY:
-		if (PIOS_USB_DESC_HID_ONLY_Init()) {
-			PIOS_Assert(0);
-		}
-		usb_hid_present = true;
-		break;
-	case HWSETTINGS_USB_DEVICETYPE_HIDVCP:
-		if (PIOS_USB_DESC_HID_CDC_Init()) {
-			PIOS_Assert(0);
-		}
-		usb_hid_present = true;
-		usb_cdc_present = true;
-		break;
-	case HWSETTINGS_USB_DEVICETYPE_VCPONLY:
-		break;
-	default:
+#if defined(PIOS_INCLUDE_USB_CDC)
+	if (PIOS_USB_DESC_HID_CDC_Init()) {
 		PIOS_Assert(0);
 	}
+	usb_hid_present = true;
+	usb_cdc_present = true;
+#else
+	if (PIOS_USB_DESC_HID_ONLY_Init()) {
+		PIOS_Assert(0);
+	}
+	usb_hid_present = true;
+#endif
 
 	uint32_t pios_usb_id;
 	PIOS_USB_Init(&pios_usb_id, &pios_usb_main_cfg);
@@ -655,7 +642,9 @@ GPIO_InitTypeDef GPIO_InitStructure;
  //DAC_Ch2_SineWaveConfig();
 #endif
 	// ADC system
-	PIOS_ADC_Init();
+#if defined(PIOS_INCLUDE_ADC)
+	PIOS_ADC_Init(&pios_adc_cfg);
+#endif
 
 	// SPI link to master
 	/*if (PIOS_SPI_Init(&pios_spi_port_id, &pios_spi_port_cfg)) {

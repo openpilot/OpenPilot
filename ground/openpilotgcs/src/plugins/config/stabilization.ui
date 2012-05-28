@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>683</width>
-    <height>685</height>
+    <width>738</width>
+    <height>748</height>
    </rect>
   </property>
   <property name="palette">
@@ -496,8 +496,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>626</width>
-              <height>834</height>
+              <width>673</width>
+              <height>880</height>
              </rect>
             </property>
             <layout class="QGridLayout" name="gridLayout_23">
@@ -1127,6 +1127,9 @@ border-radius: 3;
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
+                  </property>
+                  <property name="focusPolicy">
+                   <enum>Qt::StrongFocus</enum>
                   </property>
                   <property name="styleSheet">
                    <string notr="true"/>
@@ -3377,6 +3380,13 @@ border-radius: 5;</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
+                     <property name="toolTip">
+                      <string>Slowly raise Proportional until you start seeing clear oscillations when you fly.
+Then lower the value by 5 or so.</string>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
@@ -3423,6 +3433,13 @@ border-radius: 5;</string>
                        <width>43</width>
                        <height>22</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
+                     <property name="toolTip">
+                      <string>Slowly raise Proportional until you start seeing clear oscillations when you fly.
+Then lower the value by 5 or so.</string>
                      </property>
                      <property name="maximum">
                       <number>200</number>
@@ -3472,6 +3489,13 @@ border-radius: 5;</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
+                     <property name="toolTip">
+                      <string>Slowly raise Proportional until you start seeing clear oscillations when you fly.
+Then lower the value by 5 or so.</string>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
@@ -3515,6 +3539,13 @@ border-radius: 5;</string>
                        <width>43</width>
                        <height>22</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
+                     <property name="toolTip">
+                      <string>Slowly raise Proportional until you start seeing clear oscillations when you fly.
+Then lower the value by 5 or so.</string>
                      </property>
                      <property name="maximum">
                       <number>200</number>
@@ -3564,6 +3595,13 @@ border-radius: 5;</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
+                     <property name="toolTip">
+                      <string>Slowly raise Proportional until you start seeing clear oscillations when you fly.
+Then lower the value by 5 or so.</string>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
@@ -3607,6 +3645,13 @@ border-radius: 5;</string>
                        <width>43</width>
                        <height>22</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
+                     <property name="toolTip">
+                      <string>Slowly raise Proportional until you start seeing clear oscillations when you fly.
+Then lower the value by 5 or so.</string>
                      </property>
                      <property name="maximum">
                       <number>200</number>
@@ -3659,6 +3704,13 @@ border-radius: 5;</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
+                     <property name="toolTip">
+                      <string>As a rule of thumb, you can set the Integral at roughly the same
+value as the Kp.</string>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
@@ -3703,6 +3755,13 @@ border-radius: 5;</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
+                     <property name="toolTip">
+                      <string>As a rule of thumb, you can set the Integral at roughly the same
+value as the Kp.</string>
+                     </property>
                      <property name="maximum">
                       <number>200</number>
                      </property>
@@ -3734,6 +3793,13 @@ border-radius: 5;</string>
                        <width>0</width>
                        <height>25</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
+                     <property name="toolTip">
+                      <string>As a rule of thumb, you can set the Integral at roughly the same
+value as the Kp.</string>
                      </property>
                      <property name="styleSheet">
                       <string notr="true"/>
@@ -3779,6 +3845,13 @@ border-radius: 5;</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
+                     <property name="toolTip">
+                      <string>As a rule of thumb, you can set the Integral at roughly the same
+value as the Kp.</string>
+                     </property>
                      <property name="maximum">
                       <number>200</number>
                      </property>
@@ -3810,6 +3883,13 @@ border-radius: 5;</string>
                        <width>0</width>
                        <height>25</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
+                     <property name="toolTip">
+                      <string>As a rule of thumb, you can set the Integral at roughly the same
+value as the Kp.</string>
                      </property>
                      <property name="styleSheet">
                       <string notr="true"/>
@@ -3854,6 +3934,13 @@ border-radius: 5;</string>
                        <width>43</width>
                        <height>22</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
+                     <property name="toolTip">
+                      <string>As a rule of thumb, you can set the Integral at roughly the same
+value as the Kp.</string>
                      </property>
                      <property name="maximum">
                       <number>200</number>
@@ -4505,6 +4592,9 @@ border-radius: 3;
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
+                  </property>
+                  <property name="focusPolicy">
+                   <enum>Qt::StrongFocus</enum>
                   </property>
                   <property name="styleSheet">
                    <string notr="true"/>
@@ -6697,6 +6787,9 @@ border-radius: 5;</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
@@ -6740,6 +6833,9 @@ border-radius: 5;</string>
                        <width>43</width>
                        <height>22</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="maximum">
                       <number>200</number>
@@ -6789,6 +6885,9 @@ border-radius: 5;</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
@@ -6832,6 +6931,9 @@ border-radius: 5;</string>
                        <width>43</width>
                        <height>22</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="maximum">
                       <number>200</number>
@@ -6881,6 +6983,9 @@ border-radius: 5;</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
@@ -6924,6 +7029,9 @@ border-radius: 5;</string>
                        <width>43</width>
                        <height>22</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="maximum">
                       <number>200</number>
@@ -6992,6 +7100,9 @@ border-radius: 5;</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
@@ -7036,6 +7147,9 @@ border-radius: 5;</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="maximum">
                       <number>200</number>
                      </property>
@@ -7067,6 +7181,9 @@ border-radius: 5;</string>
                        <width>0</width>
                        <height>25</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="styleSheet">
                       <string notr="true"/>
@@ -7112,6 +7229,9 @@ border-radius: 5;</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="maximum">
                       <number>200</number>
                      </property>
@@ -7143,6 +7263,9 @@ border-radius: 5;</string>
                        <width>0</width>
                        <height>25</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="styleSheet">
                       <string notr="true"/>
@@ -7187,6 +7310,9 @@ border-radius: 5;</string>
                        <width>43</width>
                        <height>22</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="maximum">
                       <number>200</number>
@@ -10120,7 +10246,7 @@ border-radius: 5;</string>
                      </property>
                      <property name="text">
                       <string>Full Stick
-Angle</string>
+Angle (deg)</string>
                      </property>
                      <property name="alignment">
                       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -10141,11 +10267,14 @@ Angle</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
                      <property name="maximum">
-                      <number>100</number>
+                      <number>180</number>
                      </property>
                      <property name="sliderPosition">
                       <number>50</number>
@@ -10164,7 +10293,7 @@ Angle</string>
                        <string>objname:StabilizationSettings</string>
                        <string>fieldname:RollMax</string>
                        <string>haslimits:yes</string>
-                       <string>scale:1.8</string>
+                       <string>scale:1.0</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10184,18 +10313,21 @@ Angle</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="maximum">
-                      <number>200</number>
+                      <number>180</number>
                      </property>
                      <property name="value">
-                      <number>200</number>
+                      <number>180</number>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
                        <string>objname:StabilizationSettings</string>
                        <string>fieldname:RollMax</string>
                        <string>haslimits:yes</string>
-                       <string>scale:1.8</string>
+                       <string>scale:1.0</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10231,11 +10363,14 @@ Angle</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
                      <property name="maximum">
-                      <number>100</number>
+                      <number>180</number>
                      </property>
                      <property name="sliderPosition">
                       <number>50</number>
@@ -10254,7 +10389,7 @@ Angle</string>
                        <string>objname:StabilizationSettings</string>
                        <string>fieldname:PitchMax</string>
                        <string>haslimits:yes</string>
-                       <string>scale:1.8</string>
+                       <string>scale:1.0</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10274,18 +10409,21 @@ Angle</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="maximum">
-                      <number>200</number>
+                      <number>180</number>
                      </property>
                      <property name="value">
-                      <number>200</number>
+                      <number>180</number>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
                        <string>objname:StabilizationSettings</string>
                        <string>fieldname:PitchMax</string>
                        <string>haslimits:yes</string>
-                       <string>scale:1.8</string>
+                       <string>scale:1.0</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10321,11 +10459,14 @@ Angle</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
                      <property name="maximum">
-                      <number>100</number>
+                      <number>180</number>
                      </property>
                      <property name="sliderPosition">
                       <number>50</number>
@@ -10344,7 +10485,7 @@ Angle</string>
                        <string>objname:StabilizationSettings</string>
                        <string>fieldname:YawMax</string>
                        <string>haslimits:yes</string>
-                       <string>scale:1.8</string>
+                       <string>scale:1.0</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10364,18 +10505,21 @@ Angle</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="maximum">
-                      <number>200</number>
+                      <number>180</number>
                      </property>
                      <property name="value">
-                      <number>200</number>
+                      <number>180</number>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
                        <string>objname:StabilizationSettings</string>
                        <string>fieldname:YawMax</string>
                        <string>haslimits:yes</string>
-                       <string>scale:1.8</string>
+                       <string>scale:1.0</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10394,7 +10538,7 @@ Angle</string>
                      </property>
                      <property name="text">
                       <string>Full Stick
-Rate</string>
+Rate (deg/s)</string>
                      </property>
                      <property name="alignment">
                       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -10415,11 +10559,14 @@ Rate</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
                      <property name="maximum">
-                      <number>100</number>
+                      <number>500</number>
                      </property>
                      <property name="sliderPosition">
                       <number>50</number>
@@ -10439,7 +10586,7 @@ Rate</string>
                        <string>fieldname:ManualRate</string>
                        <string>element:Roll</string>
                        <string>haslimits:yes</string>
-                       <string>scale:5</string>
+                       <string>scale:1</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10459,11 +10606,14 @@ Rate</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="maximum">
-                      <number>200</number>
+                      <number>500</number>
                      </property>
                      <property name="value">
-                      <number>200</number>
+                      <number>180</number>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -10471,7 +10621,7 @@ Rate</string>
                        <string>fieldname:ManualRate</string>
                        <string>element:Roll</string>
                        <string>haslimits:yes</string>
-                       <string>scale:5</string>
+                       <string>scale:1</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10491,11 +10641,14 @@ Rate</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
                      <property name="maximum">
-                      <number>100</number>
+                      <number>500</number>
                      </property>
                      <property name="sliderPosition">
                       <number>50</number>
@@ -10515,7 +10668,7 @@ Rate</string>
                        <string>fieldname:ManualRate</string>
                        <string>element:Pitch</string>
                        <string>haslimits:yes</string>
-                       <string>scale:5</string>
+                       <string>scale:1</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10535,11 +10688,14 @@ Rate</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="maximum">
-                      <number>200</number>
+                      <number>500</number>
                      </property>
                      <property name="value">
-                      <number>200</number>
+                      <number>180</number>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -10547,7 +10703,7 @@ Rate</string>
                        <string>fieldname:ManualRate</string>
                        <string>element:Pitch</string>
                        <string>haslimits:yes</string>
-                       <string>scale:5</string>
+                       <string>scale:1</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10567,11 +10723,14 @@ Rate</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
                      <property name="maximum">
-                      <number>100</number>
+                      <number>500</number>
                      </property>
                      <property name="sliderPosition">
                       <number>50</number>
@@ -10591,7 +10750,7 @@ Rate</string>
                        <string>fieldname:ManualRate</string>
                        <string>element:Yaw</string>
                        <string>haslimits:yes</string>
-                       <string>scale:5</string>
+                       <string>scale:1</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10611,11 +10770,14 @@ Rate</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="maximum">
-                      <number>200</number>
+                      <number>500</number>
                      </property>
                      <property name="value">
-                      <number>200</number>
+                      <number>180</number>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -10623,7 +10785,7 @@ Rate</string>
                        <string>fieldname:ManualRate</string>
                        <string>element:Yaw</string>
                        <string>haslimits:yes</string>
-                       <string>scale:5</string>
+                       <string>scale:1</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10663,11 +10825,14 @@ Attitude</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
                      <property name="maximum">
-                      <number>100</number>
+                      <number>500</number>
                      </property>
                      <property name="sliderPosition">
                       <number>50</number>
@@ -10687,7 +10852,7 @@ Attitude</string>
                        <string>fieldname:MaximumRate</string>
                        <string>element:Roll</string>
                        <string>haslimits:yes</string>
-                       <string>scale:5</string>
+                       <string>scale:1</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10707,8 +10872,11 @@ Attitude</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="maximum">
-                      <number>200</number>
+                      <number>500</number>
                      </property>
                      <property name="value">
                       <number>200</number>
@@ -10719,7 +10887,7 @@ Attitude</string>
                        <string>fieldname:MaximumRate</string>
                        <string>element:Roll</string>
                        <string>haslimits:yes</string>
-                       <string>scale:5</string>
+                       <string>scale:1</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10739,11 +10907,14 @@ Attitude</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
                      <property name="maximum">
-                      <number>100</number>
+                      <number>500</number>
                      </property>
                      <property name="sliderPosition">
                       <number>50</number>
@@ -10763,7 +10934,7 @@ Attitude</string>
                        <string>fieldname:MaximumRate</string>
                        <string>element:Pitch</string>
                        <string>haslimits:yes</string>
-                       <string>scale:5</string>
+                       <string>scale:1</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10783,8 +10954,11 @@ Attitude</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="maximum">
-                      <number>200</number>
+                      <number>500</number>
                      </property>
                      <property name="value">
                       <number>200</number>
@@ -10795,7 +10969,7 @@ Attitude</string>
                        <string>fieldname:MaximumRate</string>
                        <string>element:Pitch</string>
                        <string>haslimits:yes</string>
-                       <string>scale:5</string>
+                       <string>scale:1</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10815,11 +10989,14 @@ Attitude</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
                      <property name="maximum">
-                      <number>100</number>
+                      <number>500</number>
                      </property>
                      <property name="sliderPosition">
                       <number>50</number>
@@ -10839,7 +11016,7 @@ Attitude</string>
                        <string>fieldname:MaximumRate</string>
                        <string>element:Yaw</string>
                        <string>haslimits:yes</string>
-                       <string>scale:5</string>
+                       <string>scale:1</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10859,8 +11036,11 @@ Attitude</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="maximum">
-                      <number>200</number>
+                      <number>500</number>
                      </property>
                      <property name="value">
                       <number>200</number>
@@ -10871,7 +11051,7 @@ Attitude</string>
                        <string>fieldname:MaximumRate</string>
                        <string>element:Yaw</string>
                        <string>haslimits:yes</string>
-                       <string>scale:5</string>
+                       <string>scale:1</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -11577,6 +11757,10 @@ automatically every 300ms, which will help for fast tuning.</string>
                     <pointsize>8</pointsize>
                    </font>
                   </property>
+                  <property name="toolTip">
+                   <string>Reloads the saved settings into GCS.
+Useful if you have accidentally changed some settings.</string>
+                  </property>
                   <property name="styleSheet">
                    <string notr="true">QPushButton {
 border: 1px outset #999;
@@ -11753,9 +11937,9 @@ border-radius: 4;
             <property name="geometry">
              <rect>
               <x>0</x>
-              <y>-402</y>
-              <width>626</width>
-              <height>1026</height>
+              <y>0</y>
+              <width>673</width>
+              <height>1079</height>
              </rect>
             </property>
             <layout class="QGridLayout" name="gridLayout_15">
@@ -14600,6 +14784,9 @@ border-radius: 5;</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string>Slowly raise Kp until you start seeing clear oscillations when you fly.
 Then lower the value by 20% or so.</string>
@@ -14608,7 +14795,7 @@ Then lower the value by 20% or so.</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>5</number>
                      </property>
                      <property name="singleStep">
                       <double>0.000100000000000</double>
@@ -14645,6 +14832,9 @@ Then lower the value by 20% or so.</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string>Slowly raise Kp until you start seeing clear oscillations when you fly.
 Then lower the value by 20% or so.</string>
@@ -14653,7 +14843,7 @@ Then lower the value by 20% or so.</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>5</number>
                      </property>
                      <property name="singleStep">
                       <double>0.000100000000000</double>
@@ -14690,6 +14880,9 @@ Then lower the value by 20% or so.</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string>Slowly raise Kp until you start seeing clear oscillations when you fly.
 Then lower the value by 20% or so.
@@ -14700,7 +14893,7 @@ You can usually go for higher values for Yaw factors.</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>5</number>
                      </property>
                      <property name="singleStep">
                       <double>0.000100000000000</double>
@@ -14772,6 +14965,9 @@ You can usually go for higher values for Yaw factors.</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string>As a rule of thumb, you can set the Ki at roughly the same
 value as the Kp.</string>
@@ -14780,7 +14976,7 @@ value as the Kp.</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>5</number>
                      </property>
                      <property name="singleStep">
                       <double>0.000100000000000</double>
@@ -14833,6 +15029,9 @@ value as the Kp.</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string>As a rule of thumb, you can set the Ki at roughly the same
 value as the Kp.</string>
@@ -14841,7 +15040,7 @@ value as the Kp.</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>5</number>
                      </property>
                      <property name="singleStep">
                       <double>0.000100000000000</double>
@@ -14894,6 +15093,9 @@ value as the Kp.</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string>As a rule of thumb, you can set the Ki at roughly the same
 value as the Kp.</string>
@@ -14902,7 +15104,7 @@ value as the Kp.</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>5</number>
                      </property>
                      <property name="singleStep">
                       <double>0.000100000000000</double>
@@ -14970,6 +15172,9 @@ value as the Kp.</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string/>
                      </property>
@@ -14980,7 +15185,7 @@ value as the Kp.</string>
                       <number>6</number>
                      </property>
                      <property name="singleStep">
-                      <double>1.000000000000000</double>
+                      <double>0.000001000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -15014,6 +15219,9 @@ value as the Kp.</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
@@ -15021,7 +15229,7 @@ value as the Kp.</string>
                       <number>6</number>
                      </property>
                      <property name="singleStep">
-                      <double>1.000000000000000</double>
+                      <double>0.000001000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -15055,6 +15263,9 @@ value as the Kp.</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string/>
                      </property>
@@ -15065,7 +15276,7 @@ value as the Kp.</string>
                       <number>6</number>
                      </property>
                      <property name="singleStep">
-                      <double>1.000000000000000</double>
+                      <double>0.000001000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -15130,6 +15341,9 @@ value as the Kp.</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string/>
                      </property>
@@ -15137,10 +15351,13 @@ value as the Kp.</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>4</number>
+                     </property>
+                     <property name="maximum">
+                      <double>1.000000000000000</double>
                      </property>
                      <property name="singleStep">
-                      <double>1.000000000000000</double>
+                      <double>0.001000000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -15174,14 +15391,20 @@ value as the Kp.</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>4</number>
+                     </property>
+                     <property name="maximum">
+                      <double>1.000000000000000</double>
                      </property>
                      <property name="singleStep">
-                      <double>1.000000000000000</double>
+                      <double>0.001000000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -15215,6 +15438,9 @@ value as the Kp.</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string/>
                      </property>
@@ -15222,10 +15448,13 @@ value as the Kp.</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>4</number>
+                     </property>
+                     <property name="maximum">
+                      <double>1.000000000000000</double>
                      </property>
                      <property name="singleStep">
-                      <double>1.000000000000000</double>
+                      <double>0.001000000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -18115,6 +18344,9 @@ border-radius: 5;</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string/>
                      </property>
@@ -18122,7 +18354,7 @@ border-radius: 5;</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>3</number>
                      </property>
                      <property name="singleStep">
                       <double>0.100000000000000</double>
@@ -18159,11 +18391,14 @@ border-radius: 5;</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>3</number>
                      </property>
                      <property name="singleStep">
                       <double>0.100000000000000</double>
@@ -18200,6 +18435,9 @@ border-radius: 5;</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string/>
                      </property>
@@ -18207,7 +18445,7 @@ border-radius: 5;</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>3</number>
                      </property>
                      <property name="singleStep">
                       <double>0.100000000000000</double>
@@ -18279,6 +18517,9 @@ border-radius: 5;</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string/>
                      </property>
@@ -18286,7 +18527,7 @@ border-radius: 5;</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>3</number>
                      </property>
                      <property name="singleStep">
                       <double>0.100000000000000</double>
@@ -18339,11 +18580,14 @@ border-radius: 5;</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>3</number>
                      </property>
                      <property name="singleStep">
                       <double>0.100000000000000</double>
@@ -18396,6 +18640,9 @@ border-radius: 5;</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string/>
                      </property>
@@ -18403,7 +18650,7 @@ border-radius: 5;</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>3</number>
                      </property>
                      <property name="singleStep">
                       <double>0.100000000000000</double>
@@ -18471,6 +18718,9 @@ border-radius: 5;</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string/>
                      </property>
@@ -18478,7 +18728,7 @@ border-radius: 5;</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>2</number>
                      </property>
                      <property name="singleStep">
                       <double>0.100000000000000</double>
@@ -18515,11 +18765,14 @@ border-radius: 5;</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>2</number>
                      </property>
                      <property name="singleStep">
                       <double>0.100000000000000</double>
@@ -18556,6 +18809,9 @@ border-radius: 5;</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string/>
                      </property>
@@ -18563,7 +18819,7 @@ border-radius: 5;</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>2</number>
                      </property>
                      <property name="singleStep">
                       <double>0.100000000000000</double>
@@ -21412,6 +21668,9 @@ angle(deg)</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string/>
                      </property>
@@ -21457,6 +21716,9 @@ angle(deg)</string>
                        <width>16777215</width>
                        <height>22</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="styleSheet">
                       <string notr="true"/>
@@ -21537,6 +21799,9 @@ rate(deg/s)</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string/>
                      </property>
@@ -21544,13 +21809,13 @@ rate(deg/s)</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>0</number>
                      </property>
                      <property name="maximum">
                       <double>1000000.000000000000000</double>
                      </property>
                      <property name="singleStep">
-                      <double>0.100000000000000</double>
+                      <double>1.000000000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -21600,17 +21865,20 @@ rate(deg/s)</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>0</number>
                      </property>
                      <property name="maximum">
                       <double>1000000.000000000000000</double>
                      </property>
                      <property name="singleStep">
-                      <double>0.100000000000000</double>
+                      <double>1.000000000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -21660,6 +21928,9 @@ rate(deg/s)</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string/>
                      </property>
@@ -21667,13 +21938,13 @@ rate(deg/s)</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>0</number>
                      </property>
                      <property name="maximum">
                       <double>1000000.000000000000000</double>
                      </property>
                      <property name="singleStep">
-                      <double>0.100000000000000</double>
+                      <double>1.000000000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -21739,6 +22010,9 @@ rate(deg/s)</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string/>
                      </property>
@@ -21746,13 +22020,13 @@ rate(deg/s)</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>0</number>
                      </property>
                      <property name="maximum">
                       <double>1000000.000000000000000</double>
                      </property>
                      <property name="singleStep">
-                      <double>0.100000000000000</double>
+                      <double>1.000000000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -21786,17 +22060,20 @@ rate(deg/s)</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>0</number>
                      </property>
                      <property name="maximum">
                       <double>1000000.000000000000000</double>
                      </property>
                      <property name="singleStep">
-                      <double>0.100000000000000</double>
+                      <double>1.000000000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -21830,6 +22107,9 @@ rate(deg/s)</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string/>
                      </property>
@@ -21837,13 +22117,13 @@ rate(deg/s)</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>0</number>
                      </property>
                      <property name="maximum">
                       <double>1000000.000000000000000</double>
                      </property>
                      <property name="singleStep">
-                      <double>0.100000000000000</double>
+                      <double>1.000000000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -21876,6 +22156,9 @@ rate(deg/s)</string>
                        <width>16777215</width>
                        <height>22</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="toolTip">
                       <string/>
@@ -24702,6 +24985,9 @@ border-radius: 5;</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string>GyroTau is a gyro filter, the higher the factor the more filtering is applied to the gyros</string>
                      </property>
@@ -24715,7 +25001,7 @@ border-radius: 5;</string>
                       <double>1000000.000000000000000</double>
                      </property>
                      <property name="singleStep">
-                      <double>1.000000000000000</double>
+                      <double>0.001000000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -24748,6 +25034,9 @@ border-radius: 5;</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string>The proportional term for the accelerometer, the higher this term the more weight the  accel is given</string>
                      </property>
@@ -24761,7 +25050,7 @@ border-radius: 5;</string>
                       <double>1000000.000000000000000</double>
                      </property>
                      <property name="singleStep">
-                      <double>1.000000000000000</double>
+                      <double>0.010000000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -24794,6 +25083,9 @@ border-radius: 5;</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string>The intergral term for the accelerometer within the filter </string>
                      </property>
@@ -24807,7 +25099,7 @@ border-radius: 5;</string>
                       <double>1000000.000000000000000</double>
                      </property>
                      <property name="singleStep">
-                      <double>1.000000000000000</double>
+                      <double>0.000100000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -25598,6 +25890,109 @@ border-radius: 4;
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>scrollArea</tabstop>
+  <tabstop>checkBox_7</tabstop>
+  <tabstop>pushButton_19</tabstop>
+  <tabstop>pushButton_20</tabstop>
+  <tabstop>horizontalSlider_76</tabstop>
+  <tabstop>spinBox_7</tabstop>
+  <tabstop>PitchPSlider</tabstop>
+  <tabstop>spinBox_PitchRateP</tabstop>
+  <tabstop>horizontalSlider_78</tabstop>
+  <tabstop>spinBox_12</tabstop>
+  <tabstop>horizontalSlider_79</tabstop>
+  <tabstop>spinBox_8</tabstop>
+  <tabstop>horizontalSlider_80</tabstop>
+  <tabstop>spinBox_9</tabstop>
+  <tabstop>horizontalSlider_81</tabstop>
+  <tabstop>spinBox_10</tabstop>
+  <tabstop>checkBox_8</tabstop>
+  <tabstop>pushButton_21</tabstop>
+  <tabstop>pushButton_22</tabstop>
+  <tabstop>horizontalSlider_82</tabstop>
+  <tabstop>spinBox_13</tabstop>
+  <tabstop>horizontalSlider_83</tabstop>
+  <tabstop>spinBox_14</tabstop>
+  <tabstop>horizontalSlider_84</tabstop>
+  <tabstop>spinBox_15</tabstop>
+  <tabstop>horizontalSlider_85</tabstop>
+  <tabstop>spinBox_18</tabstop>
+  <tabstop>horizontalSlider_86</tabstop>
+  <tabstop>spinBox_19</tabstop>
+  <tabstop>horizontalSlider_87</tabstop>
+  <tabstop>spinBox_20</tabstop>
+  <tabstop>pushButton_23</tabstop>
+  <tabstop>pushButton_24</tabstop>
+  <tabstop>horizontalSlider_88</tabstop>
+  <tabstop>spinBox_16</tabstop>
+  <tabstop>horizontalSlider_89</tabstop>
+  <tabstop>spinBox_17</tabstop>
+  <tabstop>horizontalSlider_90</tabstop>
+  <tabstop>spinBox_21</tabstop>
+  <tabstop>horizontalSlider_91</tabstop>
+  <tabstop>spinBox_22</tabstop>
+  <tabstop>horizontalSlider_92</tabstop>
+  <tabstop>spinBox_23</tabstop>
+  <tabstop>horizontalSlider_93</tabstop>
+  <tabstop>spinBox_24</tabstop>
+  <tabstop>horizontalSlider_94</tabstop>
+  <tabstop>spinBox_25</tabstop>
+  <tabstop>horizontalSlider_95</tabstop>
+  <tabstop>spinBox_26</tabstop>
+  <tabstop>horizontalSlider_96</tabstop>
+  <tabstop>spinBox_27</tabstop>
+  <tabstop>lowThrottleZeroIntegral_8</tabstop>
+  <tabstop>realTimeUpdates_6</tabstop>
+  <tabstop>stabilizationReloadBoardData_6</tabstop>
+  <tabstop>saveStabilizationToRAM_6</tabstop>
+  <tabstop>saveStabilizationToSD_6</tabstop>
+  <tabstop>scrollArea_2</tabstop>
+  <tabstop>checkBox_3</tabstop>
+  <tabstop>pushButton_4</tabstop>
+  <tabstop>RateRollKp_2</tabstop>
+  <tabstop>RatePitchKp</tabstop>
+  <tabstop>RateYawKp</tabstop>
+  <tabstop>RateRollKi_2</tabstop>
+  <tabstop>RatePitchKi</tabstop>
+  <tabstop>RateYawKi</tabstop>
+  <tabstop>RollRateKd</tabstop>
+  <tabstop>PitchRateKd</tabstop>
+  <tabstop>YawRateKd</tabstop>
+  <tabstop>RateRollILimit_2</tabstop>
+  <tabstop>RatePitchILimit</tabstop>
+  <tabstop>RateYawILimit</tabstop>
+  <tabstop>checkBox_2</tabstop>
+  <tabstop>pushButton_2</tabstop>
+  <tabstop>AttitudeRollKp</tabstop>
+  <tabstop>AttitudePitchKp_2</tabstop>
+  <tabstop>AttitudeYawKp</tabstop>
+  <tabstop>AttitudeRollKi</tabstop>
+  <tabstop>AttitudePitchKi_2</tabstop>
+  <tabstop>AttitudeYawKi</tabstop>
+  <tabstop>AttitudeRollILimit</tabstop>
+  <tabstop>AttitudePitchILimit_2</tabstop>
+  <tabstop>AttitudeYawILimit</tabstop>
+  <tabstop>pushButton_3</tabstop>
+  <tabstop>rateRollKp_3</tabstop>
+  <tabstop>ratePitchKp_4</tabstop>
+  <tabstop>rateYawKp_3</tabstop>
+  <tabstop>rateRollKi_3</tabstop>
+  <tabstop>ratePitchKi_4</tabstop>
+  <tabstop>rateYawKi_3</tabstop>
+  <tabstop>rateRollILimit_3</tabstop>
+  <tabstop>ratePitchILimit_4</tabstop>
+  <tabstop>rateYawILimit_3</tabstop>
+  <tabstop>pushButton_5</tabstop>
+  <tabstop>GyroTau</tabstop>
+  <tabstop>AccelKp</tabstop>
+  <tabstop>AccelKi</tabstop>
+  <tabstop>lowThrottleZeroIntegral_9</tabstop>
+  <tabstop>realTimeUpdates_7</tabstop>
+  <tabstop>saveStabilizationToRAM_7</tabstop>
+  <tabstop>saveStabilizationToSD_7</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

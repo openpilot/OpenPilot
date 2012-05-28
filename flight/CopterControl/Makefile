@@ -39,6 +39,7 @@ DEBUG ?= NO
 
 # Include objects that are just nice information to show
 DIAGNOSTICS ?= NO
+DIAG_TASKS ?= NO
 
 # Set to YES to build a FW version that will erase all flash memory
 ERASE_FLASH ?= NO
@@ -242,14 +243,14 @@ SRC += $(PIOSSTM32F10X)/pios_usb_hid_pwr.c
 SRC += $(OPSYSTEM)/pios_usb_board_data.c
 SRC += $(PIOSCOMMON)/pios_usb_desc_hid_cdc.c
 SRC += $(PIOSCOMMON)/pios_usb_desc_hid_only.c
+SRC += $(PIOSCOMMON)/pios_usb_util.c
 
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_crc.c
 SRC += $(PIOSCOMMON)/pios_flashfs_objlist.c
 SRC += $(PIOSCOMMON)/pios_flash_jedec.c
 SRC += $(PIOSCOMMON)/pios_adxl345.c
-SRC += $(PIOSCOMMON)/pios_l3gd20.c
-SRC += $(PIOSCOMMON)/pios_bma180.c
+SRC += $(PIOSCOMMON)/pios_mpu6000.c
 SRC += $(PIOSCOMMON)/pios_com.c
 #SRC += $(PIOSCOMMON)/pios_i2c_esc.c
 #SRC += $(PIOSCOMMON)/pios_bmp085.c

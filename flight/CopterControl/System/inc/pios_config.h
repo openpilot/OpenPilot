@@ -77,11 +77,8 @@
 
 #define PIOS_INCLUDE_ADXL345
 #define PIOS_INCLUDE_FLASH
-#define PIOS_INCLUDE_BMA180
-#define PIOS_INCLUDE_L3GD20
-/*
-#define PIOS_INCLUDE_BMP085
-*/
+#define PIOS_INCLUDE_MPU6000
+#define PIOS_MPU6000_ACCEL
 
 /* A really shitty setting saving implementation */
 #define PIOS_INCLUDE_FLASH_SECTOR_SETTINGS

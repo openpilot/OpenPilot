@@ -34,7 +34,7 @@ UAVObjectParser::UAVObjectParser()
     fieldTypeStrXML << "int8" << "int16" << "int32" << "uint8"
         << "uint16" << "uint32" <<"float" << "enum";
 
-    updateModeStrXML << "periodic" << "onchange" << "manual" << "never";
+    updateModeStrXML << "periodic" << "onchange" << "throttled" << "manual";
 
     accessModeStr << "ACCESS_READWRITE" << "ACCESS_READONLY";
 

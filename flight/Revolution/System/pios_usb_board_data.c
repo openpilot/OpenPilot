@@ -31,6 +31,7 @@
 #include "pios_usb_board_data.h" /* struct usb_*, USB_* */
 #include "pios_sys.h"		 /* PIOS_SYS_SerialNumberGet */
 #include "pios_usbhook.h"	 /* PIOS_USBHOOK_* */
+#include "pios_usb_util.h"	 /* PIOS_USB_UTIL_AsciiToUtf8 */
 
 static const uint8_t usb_product_id[22] = {
 	sizeof(usb_product_id),
@@ -47,40 +48,15 @@ static const uint8_t usb_product_id[22] = {
 	'n', 0,
 };
 
-static uint8_t usb_serial_number[52] = {
+static uint8_t usb_serial_number[2 + PIOS_SYS_SERIAL_NUM_ASCII_LEN*2 + (sizeof(PIOS_USB_BOARD_SN_SUFFIX)-1)*2] = {
 	sizeof(usb_serial_number),
 	USB_DESC_TYPE_STRING,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0,
-	0, 0
 };
 
 static const struct usb_string_langid usb_lang_id = {
 	.bLength = sizeof(usb_lang_id),
 	.bDescriptorType = USB_DESC_TYPE_STRING,
-	.bLangID = htousbs(USB_LANGID_ENGLISH_UK),
+	.bLangID = htousbs(USB_LANGID_ENGLISH_US),
 };
 
 static const uint8_t usb_vendor_id[28] = {
@@ -104,11 +80,13 @@ static const uint8_t usb_vendor_id[28] = {
 int32_t PIOS_USB_BOARD_DATA_Init(void)
 {
 	/* Load device serial number into serial number string */
-	uint8_t sn[25];
+	uint8_t sn[PIOS_SYS_SERIAL_NUM_ASCII_LEN + 1];
 	PIOS_SYS_SerialNumberGet((char *)sn);
-	for (uint8_t i = 0; sn[i] != '\0' && (2 * i) < usb_serial_number[0]; i++) {
-		usb_serial_number[2 + 2 * i] = sn[i];
-	}
+
+	/* Concatenate the device serial number and the appropriate suffix ("+BL" or "+FW") into the USB serial number */
+	uint8_t * utf8 = &(usb_serial_number[2]);
+	utf8 = PIOS_USB_UTIL_AsciiToUtf8(utf8, sn, PIOS_SYS_SERIAL_NUM_ASCII_LEN);
+	utf8 = PIOS_USB_UTIL_AsciiToUtf8(utf8, (uint8_t *)PIOS_USB_BOARD_SN_SUFFIX, sizeof(PIOS_USB_BOARD_SN_SUFFIX)-1);
 
 	PIOS_USBHOOK_RegisterString(USB_STRING_DESC_PRODUCT, (uint8_t *)&usb_product_id, sizeof(usb_product_id));
 	PIOS_USBHOOK_RegisterString(USB_STRING_DESC_SERIAL, (uint8_t *)&usb_serial_number, sizeof(usb_serial_number));

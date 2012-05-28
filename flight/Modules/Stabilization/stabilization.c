@@ -99,6 +99,15 @@ static void SettingsUpdatedCb(UAVObjEvent * ev);
 int32_t StabilizationStart()
 {
 	// Initialize variables
+	// Create object queue
+	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
+
+	// Listen for updates.
+	//	AttitudeActualConnectQueue(queue);
+	GyrosConnectQueue(queue);
+
+	StabilizationSettingsConnectCallback(SettingsUpdatedCb);
+	SettingsUpdatedCb(StabilizationSettingsHandle());
 
 	// Start main task
 	xTaskCreate(stabilizationTask, (signed char*)"Stabilization", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
@@ -118,17 +127,6 @@ int32_t StabilizationInitialize()
 #if defined(DIAGNOSTICS)
 	RateDesiredInitialize();
 #endif
-
-	// Create object queue
-	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
-
-	// Listen for updates.
-	//	AttitudeActualConnectQueue(queue);
-	GyrosConnectQueue(queue);
-
-	StabilizationSettingsConnectCallback(SettingsUpdatedCb);
-	SettingsUpdatedCb(StabilizationSettingsHandle());
-	// Start main task
 
 	return 0;
 }
@@ -211,7 +209,7 @@ static void stabilizationTask(void* parameters)
 		float local_error[3] = {stabDesired.Roll - attitudeActual.Roll,
 			stabDesired.Pitch - attitudeActual.Pitch,
 			stabDesired.Yaw - attitudeActual.Yaw};
-		local_error[2] = fmod(local_error[2] + 180, 360) - 180;
+		local_error[2] = fmodf(local_error[2] + 180, 360) - 180;
 #endif
 
 

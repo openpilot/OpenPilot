@@ -70,7 +70,7 @@ public:
     ScopeGadgetWidget(QWidget *parent = 0);
     ~ScopeGadgetWidget();
 
-    void setupSequencialPlot();
+    void setupSequentialPlot();
     void setupChronoPlot();
     void setupUAVObjectPlot();
     PlotType plotType(){return m_plotType;}
@@ -81,7 +81,7 @@ public:
     int refreshInterval(){return m_refreshInterval;}
 
 
-    void addCurvePlot(QString uavObject, QString uavFieldSubField, int scaleOrderFactor = 0, int interpolationSamples = 1, QPen pen = QPen(Qt::black));
+    void addCurvePlot(QString uavObject, QString uavFieldSubField, int scaleOrderFactor = 0, int meanSamples = 1, QString mathFunction= "None", QPen pen = QPen(Qt::black));
     //void removeCurvePlot(QString uavObject, QString uavField);
     void clearCurvePlots();
     int csvLoggingStart();

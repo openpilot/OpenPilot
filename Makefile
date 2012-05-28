@@ -600,7 +600,7 @@ define EF_TEMPLATE
 .PHONY: ef_$(1)
 ef_$(1): ef_$(1)_bin
 
-ef_$(1)_%: bl_$(1)_bin fw_$(1)_bin
+ef_$(1)_%: bl_$(1)_bin fw_$(1)_opfw
 	$(V1) mkdir -p $(BUILD_DIR)/ef_$(1)/dep
 	$(V1) cd $(ROOT_DIR)/flight/EntireFlash && \
 		$$(MAKE) -r --no-print-directory \

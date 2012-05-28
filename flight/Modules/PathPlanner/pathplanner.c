@@ -130,7 +130,6 @@ MODULE_INITCALL(PathPlannerInitialize, PathPlannerStart)
 /**
  * Module task
  */
-int32_t bad_inits;
 static void pathPlannerTask(void *parameters)
 {
 	// update settings on change
@@ -182,7 +181,8 @@ static void pathPlannerTask(void *parameters)
 			continue;
 		}
 
-		if (pathStatus.Status == PATHSTATUS_STATUS_CRITICAL) {
+		// negative destinations DISABLE this feature
+		if (pathStatus.Status == PATHSTATUS_STATUS_CRITICAL && waypointActive.Index != pathAction.ErrorDestination && pathAction.ErrorDestination >= 0) {
 			setWaypoint(pathAction.ErrorDestination);
 			continue;
 		}
@@ -192,21 +192,31 @@ static void pathPlannerTask(void *parameters)
 
 		// decide what to do
 		switch (pathAction.Command) {
+			case PATHACTION_COMMAND_ONNOTCONDITIONNEXTWAYPOINT:
+				endCondition = !endCondition;
 			case PATHACTION_COMMAND_ONCONDITIONNEXTWAYPOINT:
 				if (endCondition) setWaypoint(waypointActive.Index+1);
 				break;
-			case PATHACTION_COMMAND_ONNOTCONDITIONNEXTWAYPOINT:
-				if (!endCondition) setWaypoint(waypointActive.Index+1);
-				break;
-			case PATHACTION_COMMAND_ONCONDITIONJUMPWAYPOINT:
-				if (endCondition) setWaypoint(pathAction.JumpDestination);
-				break;
 			case PATHACTION_COMMAND_ONNOTCONDITIONJUMPWAYPOINT:
-				if (!endCondition) setWaypoint(pathAction.JumpDestination);
+				endCondition = !endCondition;
+			case PATHACTION_COMMAND_ONCONDITIONJUMPWAYPOINT:
+				if (endCondition) {
+					if (pathAction.JumpDestination<0) {
+						// waypoint ids <0 code relative jumps
+						setWaypoint(waypointActive.Index - pathAction.JumpDestination );
+					} else {
+						setWaypoint(pathAction.JumpDestination);
+					}
+				}
 				break;
 			case PATHACTION_COMMAND_IFCONDITIONJUMPWAYPOINTELSENEXTWAYPOINT:
 				if (endCondition) {
-					setWaypoint(pathAction.JumpDestination);
+					if (pathAction.JumpDestination<0) {
+						// waypoint ids <0 code relative jumps
+						setWaypoint(waypointActive.Index - pathAction.JumpDestination );
+					} else {
+						setWaypoint(pathAction.JumpDestination);
+					}
 				} else {
 					setWaypoint(waypointActive.Index+1);
 				}
@@ -265,11 +275,11 @@ void updatePathDesired(UAVObjEvent * ev) {
 	pathDesired.UID = waypointActive.Index;
 
 	if(waypointActive.Index == 0) {
-		// Get home position as start point
+		// First waypoint has itself as start point (used to be home position but that proved dangerous when looping)
 
-		pathDesired.Start[PATHDESIRED_START_NORTH] = 0;
-		pathDesired.Start[PATHDESIRED_START_EAST] = 0;
-		pathDesired.Start[PATHDESIRED_START_DOWN] = -1;
+		pathDesired.Start[PATHDESIRED_START_NORTH] =  waypoint.Position[WAYPOINT_POSITION_NORTH];
+		pathDesired.Start[PATHDESIRED_START_EAST] =  waypoint.Position[WAYPOINT_POSITION_EAST];
+		pathDesired.Start[PATHDESIRED_START_DOWN] =  waypoint.Position[WAYPOINT_POSITION_DOWN];
 		pathDesired.StartingVelocity = pathDesired.EndingVelocity;
 	} else {
 		// Get previous waypoint as start point
@@ -635,7 +645,7 @@ static void createPathLogo()
 		waypoint.Position[1] = SIZE * 30 * cos(i / 19.0 * 2 * M_PI);
 		waypoint.Position[0] = SIZE * 50 * sin(i / 19.0 * 2 * M_PI);
 		waypoint.Position[2] = -50;
-		bad_inits += (WaypointInstSet(i, &waypoint) != 0);
+		WaypointInstSet(i, &waypoint);
 	}
 	
 	// Draw P
@@ -643,7 +653,7 @@ static void createPathLogo()
 		waypoint.Position[1] = SIZE * (55 + 20 * cos(i / 10.0 * M_PI - M_PI / 2));
 		waypoint.Position[0] = SIZE * (25 + 25 * sin(i / 10.0 * M_PI - M_PI / 2));
 		waypoint.Position[2] = -50;
-		bad_inits += (WaypointInstSet(i, &waypoint) != 0);
+		WaypointInstSet(i, &waypoint);
 	}
 		
 	waypoint.Position[1] = SIZE * 35;

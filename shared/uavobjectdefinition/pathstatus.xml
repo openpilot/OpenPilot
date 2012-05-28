@@ -2,7 +2,7 @@
     <object name="PathStatus" singleinstance="true" settings="false">
         <description>Status of the current path mode  Can come from any @ref PathFollower module</description>
 
-	<field name="UID" units="" type="uint8" elements="1" default="0"/>
+	<field name="UID" units="" type="int16" elements="1" default="0"/>
 	<!-- unique ID confirmed with pathfollower in pathstatus to acknowledge a change in PathDesired -->
 	<field name="Status" units="" type="enum" elements="1" options="InProgress,Completed,Warning,Critical"/>
 	<field name="fractional_progress" units="" type="float" elements="1"/>

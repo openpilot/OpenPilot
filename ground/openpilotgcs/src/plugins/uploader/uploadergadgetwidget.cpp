@@ -116,6 +116,12 @@ QString UploaderGadgetWidget::getPortDevice(const QString &friendName)
         }
     return "";
 }
+
+void UploaderGadgetWidget::connectSignalSlot(QWidget *widget)
+{
+    connect(qobject_cast<deviceWidget *>(widget),SIGNAL(uploadStarted()),this,SLOT(uploadStarted()));
+    connect(qobject_cast<deviceWidget *>(widget),SIGNAL(uploadEnded(bool)),this,SLOT(uploadEnded(bool)));
+}
 void UploaderGadgetWidget::onPhisicalHWConnect()
 {
     m_config->bootButton->setEnabled(false);
@@ -305,6 +311,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
         }
         for(int i=0;i<dfu->numberOfDevices;i++) {
             deviceWidget* dw = new deviceWidget(this);
+            connectSignalSlot(dw);
             dw->setDeviceID(i);
             dw->setDfu(dfu);
             dw->populate();
@@ -540,6 +547,7 @@ void UploaderGadgetWidget::systemRescue()
     }
     for(int i=0;i<dfu->numberOfDevices;i++) {
         deviceWidget* dw = new deviceWidget(this);
+        connectSignalSlot(dw);
         dw->setDeviceID(i);
         dw->setDfu(dfu);
         dw->populate();
@@ -565,6 +573,19 @@ void UploaderGadgetWidget::cancel()
 {
     m_timer->stop();
     m_eventloop.exit();
+}
+
+void UploaderGadgetWidget::uploadStarted()
+{
+    m_config->bootButton->setEnabled(false);
+    m_config->safeBootButton->setEnabled(false);
+}
+
+void UploaderGadgetWidget::uploadEnded(bool succeed)
+{
+    Q_UNUSED(succeed);
+    m_config->bootButton->setEnabled(true);
+    m_config->safeBootButton->setEnabled(true);
 }
 
 /**

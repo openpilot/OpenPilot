@@ -3383,6 +3383,10 @@ border-radius: 5;</string>
                      <property name="focusPolicy">
                       <enum>Qt::StrongFocus</enum>
                      </property>
+                     <property name="toolTip">
+                      <string>Slowly raise Proportional until you start seeing clear oscillations when you fly.
+Then lower the value by 5 or so.</string>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
@@ -3432,6 +3436,10 @@ border-radius: 5;</string>
                      </property>
                      <property name="focusPolicy">
                       <enum>Qt::StrongFocus</enum>
+                     </property>
+                     <property name="toolTip">
+                      <string>Slowly raise Proportional until you start seeing clear oscillations when you fly.
+Then lower the value by 5 or so.</string>
                      </property>
                      <property name="maximum">
                       <number>200</number>
@@ -3484,6 +3492,10 @@ border-radius: 5;</string>
                      <property name="focusPolicy">
                       <enum>Qt::StrongFocus</enum>
                      </property>
+                     <property name="toolTip">
+                      <string>Slowly raise Proportional until you start seeing clear oscillations when you fly.
+Then lower the value by 5 or so.</string>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
@@ -3530,6 +3542,10 @@ border-radius: 5;</string>
                      </property>
                      <property name="focusPolicy">
                       <enum>Qt::StrongFocus</enum>
+                     </property>
+                     <property name="toolTip">
+                      <string>Slowly raise Proportional until you start seeing clear oscillations when you fly.
+Then lower the value by 5 or so.</string>
                      </property>
                      <property name="maximum">
                       <number>200</number>
@@ -3582,6 +3598,10 @@ border-radius: 5;</string>
                      <property name="focusPolicy">
                       <enum>Qt::StrongFocus</enum>
                      </property>
+                     <property name="toolTip">
+                      <string>Slowly raise Proportional until you start seeing clear oscillations when you fly.
+Then lower the value by 5 or so.</string>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
@@ -3628,6 +3648,10 @@ border-radius: 5;</string>
                      </property>
                      <property name="focusPolicy">
                       <enum>Qt::StrongFocus</enum>
+                     </property>
+                     <property name="toolTip">
+                      <string>Slowly raise Proportional until you start seeing clear oscillations when you fly.
+Then lower the value by 5 or so.</string>
                      </property>
                      <property name="maximum">
                       <number>200</number>
@@ -3683,6 +3707,10 @@ border-radius: 5;</string>
                      <property name="focusPolicy">
                       <enum>Qt::StrongFocus</enum>
                      </property>
+                     <property name="toolTip">
+                      <string>As a rule of thumb, you can set the Integral at roughly the same
+value as the Kp.</string>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
@@ -3730,6 +3758,10 @@ border-radius: 5;</string>
                      <property name="focusPolicy">
                       <enum>Qt::StrongFocus</enum>
                      </property>
+                     <property name="toolTip">
+                      <string>As a rule of thumb, you can set the Integral at roughly the same
+value as the Kp.</string>
+                     </property>
                      <property name="maximum">
                       <number>200</number>
                      </property>
@@ -3764,6 +3796,10 @@ border-radius: 5;</string>
                      </property>
                      <property name="focusPolicy">
                       <enum>Qt::StrongFocus</enum>
+                     </property>
+                     <property name="toolTip">
+                      <string>As a rule of thumb, you can set the Integral at roughly the same
+value as the Kp.</string>
                      </property>
                      <property name="styleSheet">
                       <string notr="true"/>
@@ -3812,6 +3848,10 @@ border-radius: 5;</string>
                      <property name="focusPolicy">
                       <enum>Qt::StrongFocus</enum>
                      </property>
+                     <property name="toolTip">
+                      <string>As a rule of thumb, you can set the Integral at roughly the same
+value as the Kp.</string>
+                     </property>
                      <property name="maximum">
                       <number>200</number>
                      </property>
@@ -3846,6 +3886,10 @@ border-radius: 5;</string>
                      </property>
                      <property name="focusPolicy">
                       <enum>Qt::StrongFocus</enum>
+                     </property>
+                     <property name="toolTip">
+                      <string>As a rule of thumb, you can set the Integral at roughly the same
+value as the Kp.</string>
                      </property>
                      <property name="styleSheet">
                       <string notr="true"/>
@@ -3893,6 +3937,10 @@ border-radius: 5;</string>
                      </property>
                      <property name="focusPolicy">
                       <enum>Qt::StrongFocus</enum>
+                     </property>
+                     <property name="toolTip">
+                      <string>As a rule of thumb, you can set the Integral at roughly the same
+value as the Kp.</string>
                      </property>
                      <property name="maximum">
                       <number>200</number>
@@ -11708,6 +11756,10 @@ automatically every 300ms, which will help for fast tuning.</string>
                    <font>
                     <pointsize>8</pointsize>
                    </font>
+                  </property>
+                  <property name="toolTip">
+                   <string>Reloads the saved settings into GCS.
+Useful if you have accidentally changed some settings.</string>
                   </property>
                   <property name="styleSheet">
                    <string notr="true">QPushButton {

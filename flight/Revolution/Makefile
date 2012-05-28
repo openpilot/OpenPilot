@@ -52,6 +52,7 @@ FLASH_TOOL = OPENOCD
 MODULES = Sensors Attitude/revolution ManualControl Stabilization Actuator
 MODULES += Battery
 MODULES += Altitude/revolution  GPS FirmwareIAP
+MODULES += Airspeed/revolution
 MODULES += AltitudeHold VtolPathFollower PathPlanner
 MODULES += CameraStab
 MODULES += OveroSync
@@ -147,6 +148,7 @@ include $(PIOS)/STM32F4xx/library.mk
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_mpu6000.c
 SRC += $(PIOSCOMMON)/pios_bma180.c
+SRC += $(PIOSCOMMON)/pios_etasv3.c
 SRC += $(PIOSCOMMON)/pios_l3gd20.c
 SRC += $(PIOSCOMMON)/pios_hmc5883.c
 SRC += $(PIOSCOMMON)/pios_ms5611.c
@@ -158,6 +160,7 @@ SRC += $(PIOSCOMMON)/pios_flashfs_objlist.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c
 SRC += $(PIOSCOMMON)/pios_usb_desc_hid_cdc.c
 SRC += $(PIOSCOMMON)/pios_usb_desc_hid_only.c
+SRC += $(PIOSCOMMON)/pios_usb_util.c
 
 include ./UAVObjects.inc
 SRC += $(UAVOBJSRC)

@@ -59,7 +59,6 @@ private:
     deviceDescriptorStruct onBoardDescription;
     deviceDescriptorStruct LoadedDescription;
     QByteArray loadedFW;
-    QString idToBoardName(int id);
     Ui_deviceWidget *myDevice;
     int deviceID;
     DFUObject *m_dfu;
@@ -72,7 +71,8 @@ private:
     bool populateLoadedStructuredDescription(QByteArray arr);
 
 signals:
-
+    void uploadStarted();
+    void uploadEnded(bool success);
 public slots:
     void uploadFirmware();
     void loadFirmware();

@@ -644,10 +644,9 @@ BL_BOARDS  := $(ALL_BOARDS)
 BU_BOARDS  := $(ALL_BOARDS)
 EF_BOARDS  := $(ALL_BOARDS)
 
-# FIXME: The INS build doesn't have a bootloader or bootloader
-#        updater yet so we need to filter them out to prevent errors.
-BL_BOARDS  := $(filter-out ins, $(BL_BOARDS))
-BU_BOARDS  := $(filter-out ins, $(BU_BOARDS))
+# FIXME: The BU image doesn't work for F4 boards so we need to
+#        filter them out to prevent errors.
+BU_BOARDS  := $(filter-out revolution, $(BU_BOARDS))
 
 # Generate the targets for whatever boards are left in each list
 FW_TARGETS := $(addprefix fw_, $(FW_BOARDS))

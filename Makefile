@@ -602,7 +602,7 @@ define EF_TEMPLATE
 .PHONY: ef_$(1)
 ef_$(1): ef_$(1)_bin
 
-ef_$(1)_%: bl_$(1)_bin fw_$(1)_bin
+ef_$(1)_%: bl_$(1)_bin fw_$(1)_opfw
 	$(V1) mkdir -p $(BUILD_DIR)/ef_$(1)/dep
 	$(V1) cd $(ROOT_DIR)/flight/EntireFlash && \
 		$$(MAKE) -r --no-print-directory \
@@ -646,10 +646,15 @@ BL_BOARDS  := $(ALL_BOARDS)
 BU_BOARDS  := $(ALL_BOARDS)
 EF_BOARDS  := $(ALL_BOARDS)
 
-# FIXME: The INS build doesn't have a bootloader or bootloader
-#        updater yet so we need to filter them out to prevent errors.
-BL_BOARDS  := $(filter-out ins, $(BL_BOARDS))
-BU_BOARDS  := $(filter-out ins, $(BU_BOARDS))
+# FIXME: The BU image doesn't work for F4 boards so we need to
+#        filter them out to prevent errors.
+BU_BOARDS  := $(filter-out revolution, $(BU_BOARDS))
+
+# SimPosix doesn't have a BL, BU or EF target so we need to
+# filter them out to prevent errors on the all_flight target.
+BL_BOARDS  := $(filter-out simposix, $(BL_BOARDS))
+BU_BOARDS  := $(filter-out simposix, $(BU_BOARDS))
+EF_BOARDS  := $(filter-out simposix, $(EF_BOARDS))
 
 # Generate the targets for whatever boards are left in each list
 FW_TARGETS := $(addprefix fw_, $(FW_BOARDS))
@@ -670,7 +675,7 @@ all_bu:        $(addsuffix _opfw,  $(BU_TARGETS))
 all_bu_clean:  $(addsuffix _clean, $(BU_TARGETS))
 
 .PHONY: all_ef all_ef_clean
-all_ef:        $(EF_TARGETS))
+all_ef:        $(EF_TARGETS)
 all_ef_clean:  $(addsuffix _clean, $(EF_TARGETS))
 
 .PHONY: all_flight all_flight_clean

@@ -98,15 +98,8 @@ SECTIONS
         _init_stack_top = . - 4 ;
     } > SRAM
 
-    
-    _free_ram = . ;
-    .free_ram (NOLOAD) :
-    {
-	. = ORIGIN(SRAM) + LENGTH(SRAM) - _free_ram ;
-        /* This is used by the startup in order to initialize the .bss section */
-	_ebss = . ;
-	_eram = . ;
-    } > SRAM
+    _eram = ORIGIN(SRAM) + LENGTH(SRAM) ;
+    _ebss = _eram;
 
     /* keep the heap section at the end of the SRAM
      * this will allow to claim the remaining bytes not used

@@ -190,6 +190,10 @@ void PIOS_Board_Init(void) {
 
 #if defined(PIOS_INCLUDE_USB_HID)
 
+	if (!usb_hid_present) {
+		PIOS_Assert(0);
+	}
+
 	/* Configure the usb HID port */
 #if defined(PIOS_INCLUDE_COM)
 	{

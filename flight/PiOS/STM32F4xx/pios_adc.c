@@ -45,6 +45,8 @@
 #include "pios.h"
 #include <pios_adc_priv.h>
 
+#if defined(PIOS_INCLUDE_ADC)
+
 #if !defined(PIOS_ADC_MAX_SAMPLES)
 #define PIOS_ADC_MAX_SAMPLES 0
 #endif
@@ -464,6 +466,8 @@ void PIOS_ADC_DMA_Handler(void)
 	}
 #endif
 }
+
+#endif /* PIOS_INCLUDE_ADC */
 
 /** 
  * @}

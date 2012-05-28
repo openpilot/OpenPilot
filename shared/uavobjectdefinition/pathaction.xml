@@ -9,8 +9,8 @@
 	<field name="ModeParameters" units="" type="float" elements="4" default="0"/>
 
 	<field name="EndCondition" units="" type="enum" elements="1" options="None,TimeOut,
-		DistanceToTarget,LegRemaining,
-		AboveAltitude,
+		DistanceToTarget,LegRemaining,BelowError,
+		AboveAltitude,AboveSpeed,
 		PointingTowardsNext,
 		PythonScript,
 		Immediate" default="None" />

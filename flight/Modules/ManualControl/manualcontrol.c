@@ -639,9 +639,14 @@ static void updatePathDesired(ManualControlCommandData * cmd, bool changed,bool 
 		
 		PathDesiredData pathDesired;
 		PathDesiredGet(&pathDesired);
+		pathDesired.Start[PATHDESIRED_START_NORTH] = 0;
+		pathDesired.Start[PATHDESIRED_START_EAST] = 0;
+		pathDesired.Start[PATHDESIRED_START_DOWN] = positionActual.Down - 10;
 		pathDesired.End[PATHDESIRED_END_NORTH] = 0;
 		pathDesired.End[PATHDESIRED_END_EAST] = 0;
-		pathDesired.End[PATHDESIRED_END_DOWN] = positionActual.Down - 1;
+		pathDesired.End[PATHDESIRED_END_DOWN] = positionActual.Down - 10;
+		pathDesired.StartingVelocity=1;
+		pathDesired.EndingVelocity=0;
 		pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
 		PathDesiredSet(&pathDesired);
 	} else if(changed) {
@@ -651,9 +656,14 @@ static void updatePathDesired(ManualControlCommandData * cmd, bool changed,bool 
 		
 		PathDesiredData pathDesired;
 		PathDesiredGet(&pathDesired);
+		pathDesired.Start[PATHDESIRED_END_NORTH] = positionActual.North;
+		pathDesired.Start[PATHDESIRED_END_EAST] = positionActual.East;
+		pathDesired.Start[PATHDESIRED_END_DOWN] = positionActual.Down - 10;
 		pathDesired.End[PATHDESIRED_END_NORTH] = positionActual.North;
 		pathDesired.End[PATHDESIRED_END_EAST] = positionActual.East;
-		pathDesired.End[PATHDESIRED_END_DOWN] = positionActual.Down - 1;
+		pathDesired.End[PATHDESIRED_END_DOWN] = positionActual.Down - 10;
+		pathDesired.StartingVelocity=1;
+		pathDesired.EndingVelocity=0;
 		pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
 		PathDesiredSet(&pathDesired);
 	} else {

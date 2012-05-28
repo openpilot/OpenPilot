@@ -33,6 +33,9 @@
 #include "paths.h"
 
 #include "flightstatus.h"
+#ifdef airspeedsensor // TODO: only added in backport, use a proper config option
+	#include "baroairspeed.h" // TODO: make baroairspeed optional
+#endif
 #include "pathaction.h"
 #include "pathdesired.h"
 #include "pathstatus.h"
@@ -65,7 +68,9 @@ static uint8_t conditionNone();
 static uint8_t conditionTimeOut();
 static uint8_t conditionDistanceToTarget();
 static uint8_t conditionLegRemaining();
+static uint8_t conditionBelowError();
 static uint8_t conditionAboveAltitude();
+static uint8_t conditionAboveSpeed();
 static uint8_t conditionPointingTowardsNext();
 static uint8_t conditionPythonScript();
 static uint8_t conditionImmediate();
@@ -107,6 +112,9 @@ int32_t PathPlannerInitialize()
 	PathStatusInitialize();
 	PathDesiredInitialize();
 	PositionActualInitialize();
+#ifdef airspeedsensor // TODO: only added in backport, use a proper config option
+	BaroAirspeedInitialize();
+#endif
 	VelocityActualInitialize();
 	WaypointInitialize();
 	WaypointActiveInitialize();
@@ -316,8 +324,14 @@ static uint8_t pathConditionCheck() {
 		case PATHACTION_ENDCONDITION_LEGREMAINING:
 			return conditionLegRemaining();
 			break;
+		case PATHACTION_ENDCONDITION_BELOWERROR:
+			return conditionBelowError();
+			break;
 		case PATHACTION_ENDCONDITION_ABOVEALTITUDE:
 			return conditionAboveAltitude();
+			break;
+		case PATHACTION_ENDCONDITION_ABOVESPEED:
+			return conditionAboveSpeed();
 			break;
 		case PATHACTION_ENDCONDITION_POINTINGTOWARDSNEXT:
 			return conditionPointingTowardsNext();
@@ -403,8 +417,30 @@ static uint8_t conditionLegRemaining() {
 	float cur[3] = {positionActual.North, positionActual.East, positionActual.Down};
 	struct path_status progress;
 
-	path_progress(pathDesired.Start, pathDesired.End, cur, &progress);
+	path_progress(pathDesired.Start, pathDesired.End, cur, &progress, pathDesired.Mode);
 	if ( progress.fractional_progress >= 1.0f - pathAction.ConditionParameters[0] ) {
+		return true;
+	}
+	return false;
+}
+
+/**
+ * the BelowError measures the error on a path segment 
+ * returns true if error is below margin
+ * Parameter 0: error margin (in m)
+ */
+static uint8_t conditionBelowError() {
+
+	PathDesiredData pathDesired;
+	PositionActualData positionActual;
+	PathDesiredGet(&pathDesired);
+	PositionActualGet(&positionActual);
+
+	float cur[3] = {positionActual.North, positionActual.East, positionActual.Down};
+	struct path_status progress;
+
+	path_progress(pathDesired.Start, pathDesired.End, cur, &progress, pathDesired.Mode);
+	if ( progress.error <= pathAction.ConditionParameters[0] ) {
 		return true;
 	}
 	return false;
@@ -425,6 +461,36 @@ static uint8_t conditionAboveAltitude() {
 	}
 	return false;
 }
+
+/**
+ * the AboveSpeed measures the movement speed (3d) 
+ * returns true if above critical speed
+ * Parameter 0:  speed in m/s
+ * Parameter 1:  flag: 0=groundspeed 1=airspeed
+ */
+static uint8_t conditionAboveSpeed() {
+
+	VelocityActualData velocityActual;
+	VelocityActualGet(&velocityActual);
+	float velocity = sqrtf( velocityActual.North*velocityActual.North + velocityActual.East*velocityActual.East + velocityActual.Down*velocityActual.Down );
+
+#ifdef airspeedsensor // TODO: only added in backport, use a proper config option
+	// use airspeed if requested and available
+	if (pathAction.ConditionParameters[1]>0.5f) {
+		BaroAirspeedData baroAirspeed;
+		BaroAirspeedGet (&baroAirspeed);
+		if (baroAirspeed.Connected == BAROAIRSPEED_CONNECTED_TRUE) {
+			velocity = baroAirspeed.Airspeed;
+		}
+	}
+#endif
+
+	if ( velocity >= pathAction.ConditionParameters[0]) {
+		return true;
+	}
+	return false;
+}
+
 
 /**
  * the PointingTowardsNext measures the horizontal movement vector direction relative to the next waypoint
@@ -478,6 +544,10 @@ static uint8_t conditionImmediate() {
 static void createPathBox()
 {
 
+	uint16_t t;
+	for (t=UAVObjGetNumInstances(PathActionHandle());t<10;t++) {
+		PathActionCreateInstance();
+	}
 	PathActionData action;
 	PathActionInstGet(0,&action);
 	action.Mode = PATHACTION_MODE_FLYVECTOR;
@@ -494,6 +564,8 @@ static void createPathBox()
 	action.JumpDestination = 0;
 	action.ErrorDestination = 0;
 	PathActionInstSet(0,&action);
+	PathActionInstSet(1,&action);
+	PathActionInstSet(2,&action);
 
 	WaypointCreateInstances(6);
 
@@ -531,6 +603,7 @@ static void createPathBox()
 // demo path - logo
 static void createPathLogo()
 {
+	#define SIZE 10.0f
 	PathActionData action;
 	PathActionInstGet(0,&action);
 	action.Mode = PATHACTION_MODE_FLYVECTOR;
@@ -547,6 +620,10 @@ static void createPathLogo()
 	action.JumpDestination = 0;
 	action.ErrorDestination = 0;
 	PathActionInstSet(0,&action);
+	uint16_t t;
+	for (t=UAVObjGetNumInstances(PathActionHandle());t<10;t++) {
+		PathActionCreateInstance();
+	}
 
 	WaypointCreateInstances(42);
 
@@ -555,53 +632,53 @@ static void createPathLogo()
 	waypoint.Velocity = 2; // Since for now this isn't directional just set a mag
 	waypoint.Action = 0;
 	for(uint32_t i = 0; i < 20; i++) {
-		waypoint.Position[1] = 30 * cos(i / 19.0 * 2 * M_PI);
-		waypoint.Position[0] = 50 * sin(i / 19.0 * 2 * M_PI);
+		waypoint.Position[1] = SIZE * 30 * cos(i / 19.0 * 2 * M_PI);
+		waypoint.Position[0] = SIZE * 50 * sin(i / 19.0 * 2 * M_PI);
 		waypoint.Position[2] = -50;
 		bad_inits += (WaypointInstSet(i, &waypoint) != 0);
 	}
 	
 	// Draw P
 	for(uint32_t i = 20; i < 35; i++) {
-		waypoint.Position[1] = 55 + 20 * cos(i / 10.0 * M_PI - M_PI / 2);
-		waypoint.Position[0] = 25 + 25 * sin(i / 10.0 * M_PI - M_PI / 2);
+		waypoint.Position[1] = SIZE * (55 + 20 * cos(i / 10.0 * M_PI - M_PI / 2));
+		waypoint.Position[0] = SIZE * (25 + 25 * sin(i / 10.0 * M_PI - M_PI / 2));
 		waypoint.Position[2] = -50;
 		bad_inits += (WaypointInstSet(i, &waypoint) != 0);
 	}
 		
-	waypoint.Position[1] = 35;
-	waypoint.Position[0] = -50;
+	waypoint.Position[1] = SIZE * 35;
+	waypoint.Position[0] = SIZE * -50;
 	waypoint.Position[2] = -50;
 	WaypointInstSet(35, &waypoint);
 	
 	// Draw Box
-	waypoint.Position[1] = 35;
-	waypoint.Position[0] = -60;
+	waypoint.Position[1] = SIZE * 35;
+	waypoint.Position[0] = SIZE * -60;
 	waypoint.Position[2] = -30;
 	WaypointInstSet(36, &waypoint);
 
-	waypoint.Position[1] = 85;
-	waypoint.Position[0] = -60;
+	waypoint.Position[1] = SIZE *  85;
+	waypoint.Position[0] = SIZE * -60;
 	waypoint.Position[2] = -30;
 	WaypointInstSet(37, &waypoint);
 
-	waypoint.Position[1] = 85;
-	waypoint.Position[0] = 60;
+	waypoint.Position[1] = SIZE * 85;
+	waypoint.Position[0] = SIZE * 60;
 	waypoint.Position[2] = -30;
 	WaypointInstSet(38, &waypoint);
 	
-	waypoint.Position[1] = -40;
-	waypoint.Position[0] = 60;
+	waypoint.Position[1] = SIZE * -40;
+	waypoint.Position[0] = SIZE * 60;
 	waypoint.Position[2] = -30;
 	WaypointInstSet(39, &waypoint);
 
-	waypoint.Position[1] = -40;
-	waypoint.Position[0] = -60;
+	waypoint.Position[1] = SIZE * -40;
+	waypoint.Position[0] = SIZE * -60;
 	waypoint.Position[2] = -30;
 	WaypointInstSet(40, &waypoint);
 
-	waypoint.Position[1] = 35;
-	waypoint.Position[0] = -60;
+	waypoint.Position[1] = SIZE * 35;
+	waypoint.Position[0] = SIZE * -60;
 	waypoint.Position[2] = -30;
 	WaypointInstSet(41, &waypoint);
 

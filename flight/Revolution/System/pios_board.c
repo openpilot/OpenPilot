@@ -27,14 +27,20 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include <pios.h>
+/* Pull in the board-specific static HW definitions.
+ * Including .c files is a bit ugly but this allows all of
+ * the HW definitions to be const and static to limit their
+ * scope.  
+ *
+ * NOTE: THIS IS THE ONLY PLACE THAT SHOULD EVER INCLUDE THIS FILE
+ */
+#include "board_hw_defs.c"
 
+#include <pios.h>
 #include <openpilot.h>
 #include <uavobjectsinit.h>
 #include "hwsettings.h"
 #include "manualcontrolsettings.h"
-
-#include "board_hw_defs.c"
 
 /**
  * Sensor configurations 
@@ -413,28 +419,18 @@ void PIOS_Board_Init(void) {
 	bool usb_hid_present = false;
 	bool usb_cdc_present = false;
 
-	uint8_t hwsettings_usb_devicetype;
-	HwSettingsUSB_DeviceTypeGet(&hwsettings_usb_devicetype);
-
-	switch (hwsettings_usb_devicetype) {
-	case HWSETTINGS_USB_DEVICETYPE_HIDONLY:
-		if (PIOS_USB_DESC_HID_ONLY_Init()) {
-			PIOS_Assert(0);
-		}
-		usb_hid_present = true;
-		break;
-	case HWSETTINGS_USB_DEVICETYPE_HIDVCP:
-		if (PIOS_USB_DESC_HID_CDC_Init()) {
-			PIOS_Assert(0);
-		}
-		usb_hid_present = true;
-		usb_cdc_present = true;
-		break;
-	case HWSETTINGS_USB_DEVICETYPE_VCPONLY:
-		break;
-	default:
+#if defined(PIOS_INCLUDE_USB_CDC)
+	if (PIOS_USB_DESC_HID_CDC_Init()) {
 		PIOS_Assert(0);
 	}
+	usb_hid_present = true;
+	usb_cdc_present = true;
+#else
+	if (PIOS_USB_DESC_HID_ONLY_Init()) {
+		PIOS_Assert(0);
+	}
+	usb_hid_present = true;
+#endif
 
 	uint32_t pios_usb_id;
 	PIOS_USB_Init(&pios_usb_id, &pios_usb_main_cfg);

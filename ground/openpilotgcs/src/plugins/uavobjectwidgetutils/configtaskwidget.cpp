@@ -32,7 +32,7 @@
 /**
  * Constructor
  */
-ConfigTaskWidget::ConfigTaskWidget(QWidget *parent) : QWidget(parent),isConnected(false),smartsave(NULL),dirty(false),outOfLimitsStyle("background-color: rgb(255, 0, 0);"),timeOut(NULL)
+ConfigTaskWidget::ConfigTaskWidget(QWidget *parent) : QWidget(parent),isConnected(false),smartsave(NULL),dirty(false),outOfLimitsStyle("background-color: rgb(255, 0, 0);"),timeOut(NULL),allowWidgetUpdates(true)
 {
     pm = ExtensionSystem::PluginManager::instance();
     objManager = pm->getObject<UAVObjectManager>();
@@ -127,7 +127,7 @@ void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString fiel
         Q_ASSERT(obj);
         objectUpdates.insert(obj,true);
         connect(obj, SIGNAL(objectUpdated(UAVObject*)),this, SLOT(objectUpdated(UAVObject*)));
-        connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshWidgetsValues(UAVObject*)));
+        connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshWidgetsValues(UAVObject*)), Qt::UniqueConnection);
     }
     if(!field.isEmpty() && obj)
         _field = obj->getField(QString(field));
@@ -258,6 +258,9 @@ void ConfigTaskWidget::populateWidgets()
  */
 void ConfigTaskWidget::refreshWidgetsValues(UAVObject * obj)
 {
+    if (!allowWidgetUpdates)
+        return;
+
     bool dirtyBack=dirty;
     emit refreshWidgetsValuesRequested();
     foreach(objectToWidget * ow,objOfInterest)
@@ -452,10 +455,10 @@ bool ConfigTaskWidget::isDirty()
  */
 void ConfigTaskWidget::disableObjUpdates()
 {
+    allowWidgetUpdates = false;
     foreach(objectToWidget * obj,objOfInterest)
     {
-        if(obj->object)
-            disconnect(obj->object, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshWidgetsValues()));
+        if(obj->object)disconnect(obj->object, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshWidgetsValues(UAVObject*)));
     }
 }
 /**
@@ -463,10 +466,11 @@ void ConfigTaskWidget::disableObjUpdates()
  */
 void ConfigTaskWidget::enableObjUpdates()
 {
+    allowWidgetUpdates = true;
     foreach(objectToWidget * obj,objOfInterest)
     {
         if(obj->object)
-            connect(obj->object, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshWidgetsValues(UAVObject*)));
+            connect(obj->object, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshWidgetsValues(UAVObject*)), Qt::UniqueConnection);
     }
 }
 /**

@@ -68,7 +68,7 @@ ConfigTxPIDWidget::ConfigTxPIDWidget(QWidget *parent) : ConfigTaskWidget(parent)
     populateWidgets();
     refreshWidgetsValues();
 
-    disbleMouseWheelEvents();
+    disableMouseWheelEvents();
 }
 
 ConfigTxPIDWidget::~ConfigTxPIDWidget()

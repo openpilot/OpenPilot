@@ -35,10 +35,10 @@ typedef enum {FALSE = 0, TRUE = !FALSE} bool;
 	#define true TRUE
 #endif
 
-#define FILEINFO FILE*
+//#define FILEINFO FILE*
 
-#define PIOS_SERVO_NUM_OUTPUTS 8
-#define PIOS_SERVO_NUM_TIMERS PIOS_SERVO_NUM_OUTPUTS
+//#define PIOS_SERVO_NUM_OUTPUTS 8
+//#define PIOS_SERVO_NUM_TIMERS PIOS_SERVO_NUM_OUTPUTS
 
 #endif
 

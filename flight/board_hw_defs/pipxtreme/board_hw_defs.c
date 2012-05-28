@@ -1,5 +1,58 @@
 #include <pios_config.h>
 
+#if defined(PIOS_INCLUDE_LED)
+
+#include <pios_led_priv.h>
+static const struct pios_led pios_leds[] = {
+	[PIOS_LED_USB] = {
+		.pin = {
+			.gpio = GPIOA,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_3,
+				.GPIO_Mode  = GPIO_Mode_Out_PP,
+				.GPIO_Speed = GPIO_Speed_50MHz,
+			},
+		},
+	},
+	[PIOS_LED_LINK] = {
+		.pin = {
+			.gpio = GPIOB,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_5,
+				.GPIO_Mode  = GPIO_Mode_Out_PP,
+				.GPIO_Speed = GPIO_Speed_50MHz,
+			},
+		},
+	},
+	[PIOS_LED_RX] = {
+		.pin = {
+			.gpio = GPIOB,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_6,
+				.GPIO_Mode  = GPIO_Mode_Out_PP,
+				.GPIO_Speed = GPIO_Speed_50MHz,
+			},
+		},
+	},
+	[PIOS_LED_TX] = {
+		.pin = {
+			.gpio = GPIOB,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_7,
+				.GPIO_Mode  = GPIO_Mode_Out_PP,
+				.GPIO_Speed = GPIO_Speed_50MHz,
+			},
+		},
+	},
+};
+
+static const struct pios_led_cfg pios_led_cfg = {
+	.leds     = pios_leds,
+	.num_leds = NELEMENTS(pios_leds),
+};
+
+#endif	/* PIOS_INCLUDE_LED */
+
 #if defined(PIOS_INCLUDE_SPI)
 
 #include <pios_spi_priv.h>
@@ -74,9 +127,9 @@ static const struct pios_spi_cfg pios_spi_port_cfg =
 		      },
 		    },
 	},
-
+	.slave_count = 1,
 	.ssel =
-	{
+	{{
 		.gpio = GPIOA,
 		.init =
 		{
@@ -84,7 +137,7 @@ static const struct pios_spi_cfg pios_spi_port_cfg =
 			.GPIO_Speed = GPIO_Speed_10MHz,
 			.GPIO_Mode = GPIO_Mode_Out_PP,
 		},
-	},
+	}},
 	.sclk =
 	{
 		.gpio = GPIOA,
@@ -181,6 +234,86 @@ void PIOS_ADC_handler() {
 
 #endif	/* PIOS_INCLUDE_ADC */
 
+#if defined(PIOS_INCLUDE_TIM)
+
+#include "pios_tim_priv.h"
+
+static const TIM_TimeBaseInitTypeDef tim_1_2_3_4_time_base = {
+	.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1,
+	.TIM_ClockDivision = TIM_CKD_DIV1,
+	.TIM_CounterMode = TIM_CounterMode_Up,
+	.TIM_Period = ((1000000 / PIOS_SERVO_UPDATE_HZ) - 1),
+	.TIM_RepetitionCounter = 0x0000,
+};
+
+static const struct pios_tim_clock_cfg tim_1_cfg = {
+	.timer = TIM1,
+	.time_base_init = &tim_1_2_3_4_time_base,
+	.irq = {
+		.init = {
+			.NVIC_IRQChannel                   = TIM1_CC_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
+			.NVIC_IRQChannelSubPriority        = 0,
+			.NVIC_IRQChannelCmd                = ENABLE,
+		},
+	},
+};
+
+static const struct pios_tim_clock_cfg tim_2_cfg = {
+	.timer = TIM2,
+	.time_base_init = &tim_1_2_3_4_time_base,
+	.irq = {
+		.init = {
+			.NVIC_IRQChannel                   = TIM2_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
+			.NVIC_IRQChannelSubPriority        = 0,
+			.NVIC_IRQChannelCmd                = ENABLE,
+		},
+	},
+};
+
+static const struct pios_tim_clock_cfg tim_3_cfg = {
+	.timer = TIM3,
+	.time_base_init = &tim_1_2_3_4_time_base,
+	.irq = {
+		.init = {
+			.NVIC_IRQChannel                   = TIM3_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
+			.NVIC_IRQChannelSubPriority        = 0,
+			.NVIC_IRQChannelCmd                = ENABLE,
+		},
+	},
+};
+
+static const struct pios_tim_clock_cfg tim_4_cfg = {
+	.timer = TIM4,
+	.time_base_init = &tim_1_2_3_4_time_base,
+	.irq = {
+		.init = {
+			.NVIC_IRQChannel                   = TIM4_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
+			.NVIC_IRQChannelSubPriority        = 0,
+			.NVIC_IRQChannelCmd                = ENABLE,
+		},
+	},
+};
+
+static const struct pios_tim_channel pios_tim_ppm_flexi_port = {
+	.timer = TIM2,
+	.timer_chan = TIM_Channel_4,
+	.pin = {
+		.gpio = GPIOB,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_11,
+			.GPIO_Mode  = GPIO_Mode_IPD,
+			.GPIO_Speed = GPIO_Speed_2MHz,
+		},
+	},
+	.remap = GPIO_PartialRemap2_TIM2,
+};
+
+#endif	/* PIOS_INCLUDE_TIM */
+
 #if defined(PIOS_INCLUDE_USART)
 
 #include <pios_usart_priv.h>
@@ -232,6 +365,42 @@ static const struct pios_usart_cfg pios_usart_serial_cfg =
 	},
 };
 
+static const struct pios_usart_cfg pios_usart_telem_flexi_cfg = {
+  .regs  = USART3,
+  .init = {
+    .USART_BaudRate            = 57600,
+    .USART_WordLength          = USART_WordLength_8b,
+    .USART_Parity              = USART_Parity_No,
+    .USART_StopBits            = USART_StopBits_1,
+    .USART_HardwareFlowControl = USART_HardwareFlowControl_None,
+    .USART_Mode                = USART_Mode_Rx | USART_Mode_Tx,
+  },
+  .irq = {
+    .init    = {
+      .NVIC_IRQChannel                   = USART3_IRQn,
+      .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
+      .NVIC_IRQChannelSubPriority        = 0,
+      .NVIC_IRQChannelCmd                = ENABLE,
+    },
+  },
+  .rx   = {
+    .gpio = GPIOB,
+    .init = {
+      .GPIO_Pin   = GPIO_Pin_11,
+      .GPIO_Speed = GPIO_Speed_2MHz,
+      .GPIO_Mode  = GPIO_Mode_IPU,
+    },
+  },
+  .tx   = {
+    .gpio = GPIOB,
+    .init = {
+      .GPIO_Pin   = GPIO_Pin_10,
+      .GPIO_Speed = GPIO_Speed_2MHz,
+      .GPIO_Mode  = GPIO_Mode_AF_PP,
+    },
+  },
+};
+
 #endif /* PIOS_INCLUDE_USART */
 
 #if defined(PIOS_INCLUDE_COM)
@@ -240,34 +409,136 @@ static const struct pios_usart_cfg pios_usart_serial_cfg =
 
 #endif /* PIOS_INCLUDE_COM */
 
-// ***********************************************************************************
+#if defined(PIOS_INCLUDE_RTC)
+/*
+ * Realtime Clock (RTC)
+ */
+#include <pios_rtc_priv.h>
+
+void PIOS_RTC_IRQ_Handler (void);
+void RTC_IRQHandler() __attribute__ ((alias ("PIOS_RTC_IRQ_Handler")));
+static const struct pios_rtc_cfg pios_rtc_main_cfg = {
+	.clksrc = RCC_RTCCLKSource_HSE_Div128,
+	.prescaler = 100,
+	.irq = {
+		.init = {
+			.NVIC_IRQChannel                   = RTC_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
+			.NVIC_IRQChannelSubPriority        = 0,
+			.NVIC_IRQChannelCmd                = ENABLE,
+		  },
+	},
+};
+
+void PIOS_RTC_IRQ_Handler (void)
+{
+	PIOS_RTC_irq_handler ();
+}
+
+#endif
+
+/*
+ * PPM Inputs
+ */
+#if defined(PIOS_INCLUDE_PPM)
+#include <pios_ppm_priv.h>
+
+const struct pios_ppm_cfg pios_ppm_cfg = {
+	.tim_ic_init = {
+		.TIM_ICPolarity = TIM_ICPolarity_Rising,
+		.TIM_ICSelection = TIM_ICSelection_DirectTI,
+		.TIM_ICPrescaler = TIM_ICPSC_DIV1,
+		.TIM_ICFilter = 0x0,
+	},
+	.channels = &pios_tim_ppm_flexi_port,
+	.num_channels = 1,
+};
+
+#endif	/* PIOS_INCLUDE_PPM */
+
+#if defined(PIOS_INCLUDE_RCVR)
+#include "pios_rcvr_priv.h"
+
+#endif /* PIOS_INCLUDE_RCVR */
 
 #if defined(PIOS_INCLUDE_USB)
 #include "pios_usb_priv.h"
 
 static const struct pios_usb_cfg pios_usb_main_cfg = {
-  .irq = {
-    .init    = {
-      .NVIC_IRQChannel                   = USB_LP_CAN1_RX0_IRQn,
-      .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
-      .NVIC_IRQChannelSubPriority        = 0,
-      .NVIC_IRQChannelCmd                = ENABLE,
-    },
-  },
+	.irq = {
+		.init    = {
+			.NVIC_IRQChannel                   = USB_LP_CAN1_RX0_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
+			.NVIC_IRQChannelSubPriority        = 0,
+			.NVIC_IRQChannelCmd                = ENABLE,
+		},
+	},
+	.vsense = {
+		.gpio = GPIOA,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_8,
+			.GPIO_Speed = GPIO_Speed_10MHz,
+			.GPIO_Mode  = GPIO_Mode_AF_OD,
+		},
+	}
 };
 
 #include "pios_usb_board_data_priv.h"
+#include "pios_usb_desc_hid_cdc_priv.h"
 #include "pios_usb_desc_hid_only_priv.h"
 
 #endif	/* PIOS_INCLUDE_USB */
+
+#if defined(PIOS_INCLUDE_COM_MSG)
+
+#include <pios_com_msg_priv.h>
+
+#endif /* PIOS_INCLUDE_COM_MSG */
 
 #if defined(PIOS_INCLUDE_USB_HID)
 #include <pios_usb_hid_priv.h>
 
 const struct pios_usb_hid_cfg pios_usb_hid_cfg = {
-	.data_if = 0,
+	.data_if = 2,
 	.data_rx_ep = 1,
 	.data_tx_ep = 1,
 };
+#endif /* PIOS_INCLUDE_USB_HID */
 
-#endif	/* PIOS_INCLUDE_USB_HID */
+#if defined(PIOS_INCLUDE_USB_CDC)
+#include <pios_usb_cdc_priv.h>
+
+const struct pios_usb_cdc_cfg pios_usb_cdc_cfg = {
+	.ctrl_if = 0,
+	.ctrl_tx_ep = 2,
+
+	.data_if = 1,
+	.data_rx_ep = 3,
+	.data_tx_ep = 3,
+};
+#endif	/* PIOS_INCLUDE_USB_CDC */
+
+#if defined(PIOS_INCLUDE_FLASH_EEPROM)
+#include <pios_eeprom.h>
+
+const struct pios_eeprom_cfg pios_eeprom_cfg = {
+	.base_address = PIOS_FLASH_EEPROM_ADDR,
+	.max_size = PIOS_FLASH_EEPROM_LEN,
+};
+#endif /* PIOS_INCLUDE_FLASH_EEPROM */
+
+#if defined(PIOS_INCLUDE_RFM22B)
+#include <pios_rfm22b_priv.h>
+
+#endif /* PIOS_INCLUDE_RFM22B */
+
+#if defined(PIOS_INCLUDE_PACKET_HANDLER)
+#include <packet_handler.h>
+
+// Initialize the packet handler
+PacketHandlerConfig pios_ph_cfg = {
+	.winSize = PIOS_PH_WIN_SIZE,
+	.maxConnections = PIOS_PH_MAX_CONNECTIONS,
+};
+
+#endif /* PIOS_INCLUDE_PACKET_HANDLER */

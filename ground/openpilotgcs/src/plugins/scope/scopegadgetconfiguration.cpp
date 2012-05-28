@@ -31,7 +31,8 @@ ScopeGadgetConfiguration::ScopeGadgetConfiguration(QString classId, QSettings* q
         IUAVGadgetConfiguration(classId, parent),
         m_plotType((int)ChronoPlot),
         m_dataSize(60),
-        m_refreshInterval(1000)
+        m_refreshInterval(1000),
+        m_mathFunctionType(0)
 {
     uint currentStreamVersion = 0;
     int plotCurveCount = 0;
@@ -65,8 +66,11 @@ ScopeGadgetConfiguration::ScopeGadgetConfiguration(QString classId, QSettings* q
             color = qSettings->value("color").value<QRgb>();
             plotCurveConf->color = color;
             plotCurveConf->yScalePower = qSettings->value("yScalePower").toInt();
-            plotCurveConf->yInterpolationSamples = qSettings->value("yInterpolationSamples").toInt();
-            if (!plotCurveConf->yInterpolationSamples) plotCurveConf->yInterpolationSamples = 1; // fallback for backward compatibility with earlier versions
+            plotCurveConf->mathFunction = qSettings->value("mathFunction").toString();
+            plotCurveConf->yMeanSamples = qSettings->value("yMeanSamples").toInt();
+
+            if (!plotCurveConf->yMeanSamples) plotCurveConf->yMeanSamples = 1; // fallback for backward compatibility with earlier versions //IS THIS STILL NECESSARY?
+
             plotCurveConf->yMinimum = qSettings->value("yMinimum").toDouble();
             plotCurveConf->yMaximum = qSettings->value("yMaximum").toDouble();
 
@@ -105,8 +109,9 @@ IUAVGadgetConfiguration *ScopeGadgetConfiguration::clone()
     int plotDatasLoadIndex = 0;
 
     ScopeGadgetConfiguration *m = new ScopeGadgetConfiguration(this->classId());
-    m->setPlotType(m_plotType);
+    m->setPlotType( m_plotType);
     m->setDataSize( m_dataSize);
+    m->setMathFunctionType( m_mathFunctionType);
     m->setRefreashInterval( m_refreshInterval);
 
     plotCurveCount = m_PlotCurveConfigs.size();
@@ -120,7 +125,9 @@ IUAVGadgetConfiguration *ScopeGadgetConfiguration::clone()
         newPlotCurveConf->uavField = currentPlotCurveConf->uavField;
         newPlotCurveConf->color = currentPlotCurveConf->color;
         newPlotCurveConf->yScalePower = currentPlotCurveConf->yScalePower;
-        newPlotCurveConf->yInterpolationSamples = currentPlotCurveConf->yInterpolationSamples;
+        newPlotCurveConf->yMeanSamples = currentPlotCurveConf->yMeanSamples;
+        newPlotCurveConf->mathFunction = currentPlotCurveConf->mathFunction;
+
         newPlotCurveConf->yMinimum = currentPlotCurveConf->yMinimum;
         newPlotCurveConf->yMaximum = currentPlotCurveConf->yMaximum;
 
@@ -136,8 +143,9 @@ IUAVGadgetConfiguration *ScopeGadgetConfiguration::clone()
     return m;
 }
 
+
 /**
- * Saves a configuration.
+ * Saves a configuration. //REDEFINES saveConfig CHILD BEHAVIOR?
  *
  */
 void ScopeGadgetConfiguration::saveConfig(QSettings* qSettings) const {
@@ -159,8 +167,9 @@ void ScopeGadgetConfiguration::saveConfig(QSettings* qSettings) const {
         qSettings->setValue("uavObject",  plotCurveConf->uavObject);
         qSettings->setValue("uavField",  plotCurveConf->uavField);
         qSettings->setValue("color",  plotCurveConf->color);
+        qSettings->setValue("mathFunction",  plotCurveConf->mathFunction);
         qSettings->setValue("yScalePower",  plotCurveConf->yScalePower);
-        qSettings->setValue("yInterpolationSamples",  plotCurveConf->yInterpolationSamples);
+        qSettings->setValue("yMeanSamples",  plotCurveConf->yMeanSamples);
         qSettings->setValue("yMinimum",  plotCurveConf->yMinimum);
         qSettings->setValue("yMaximum",  plotCurveConf->yMaximum);
 

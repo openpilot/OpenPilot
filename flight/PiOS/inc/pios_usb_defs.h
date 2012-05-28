@@ -300,7 +300,7 @@ struct usb_cdc_union_func_desc {
 	uint8_t  bSlaveInterface;
 } __attribute__((packed));
 
-#define USB_LANGID_ENGLISH_UK 0x0809
+#define USB_LANGID_ENGLISH_US 0x0409
 
 struct usb_string_langid {
 	uint8_t  bLength;

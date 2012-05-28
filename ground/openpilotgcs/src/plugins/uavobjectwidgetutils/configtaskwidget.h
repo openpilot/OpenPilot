@@ -86,7 +86,7 @@ public:
     ConfigTaskWidget(QWidget *parent = 0);
     ~ConfigTaskWidget();
 
-    void disbleMouseWheelEvents();
+    void disableMouseWheelEvents();
     bool eventFilter( QObject * obj, QEvent * evt );
 
     void saveObjectToSD(UAVObject *obj);
@@ -164,13 +164,14 @@ private:
     void disconnectWidgetUpdatesToSlot(QWidget *widget, const char *function);
     void loadWidgetLimits(QWidget *widget, UAVObjectField *field, int index, bool hasLimits, double sclale);
     QString outOfLimitsStyle;
+    QTimer * timeOut;
 protected slots:
     virtual void disableObjUpdates();
     virtual void enableObjUpdates();
     virtual void clearDirty();
     virtual void widgetsContentsChanged();
     virtual void populateWidgets();
-    virtual void refreshWidgetsValues();
+    virtual void refreshWidgetsValues(UAVObject * obj=NULL);
     virtual void updateObjectsFromWidgets();
     virtual void helpButtonPressed();
 protected:

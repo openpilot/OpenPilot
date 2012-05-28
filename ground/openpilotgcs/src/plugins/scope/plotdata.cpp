@@ -53,8 +53,9 @@ PlotData::PlotData(QString p_uavObject, QString p_uavField)
 
     curve = 0;
     scalePower = 0;
-    interpolationSamples = 1;
-    interpolationSum = 0.0f;
+    meanSamples = 1;
+    meanSum = 0.0f;
+//    mathFunction=0;
     correctionSum = 0.0f;
     correctionCount = 0;
     yMinimum = 0;
@@ -87,7 +88,7 @@ PlotData::~PlotData()
 }
 
 
-bool SequencialPlotData::append(UAVObject* obj)
+bool SequentialPlotData::append(UAVObject* obj)
 {
     if (uavObject == obj->getName()) {
 
@@ -96,28 +97,50 @@ bool SequencialPlotData::append(UAVObject* obj)
 
         if (field) {
 
-            //Shift data forward and put the new value at the front
-
-            // calculate interpolated (smoothed) value
             double currentValue = valueAsDouble(obj, field) * pow(10, scalePower);
-            yDataHistory->append( currentValue );
-            interpolationSum += currentValue;
-            if(yDataHistory->size() > interpolationSamples) {
-                interpolationSum -= yDataHistory->first();
-                yDataHistory->pop_front();
+
+            //Compute boxcar average
+            if (mathFunction  == "Boxcar average" || mathFunction  == "Standard deviation"){
+                //Put the new value at the front
+                yDataHistory->append( currentValue );
+
+                // calculate average value
+                meanSum += currentValue;
+                if(yDataHistory->size() > meanSamples) {
+                    meanSum -= yDataHistory->first();
+                    yDataHistory->pop_front();
+                }
+
+                // make sure to correct the sum every meanSamples steps to prevent it
+                // from running away due to floating point rounding errors
+                correctionSum+=currentValue;
+                if (++correctionCount >= meanSamples) {
+                    meanSum = correctionSum;
+                    correctionSum = 0.0f;
+                    correctionCount = 0;
+                }
+
+                double boxcarAvg=meanSum/yDataHistory->size();
+
+                if ( mathFunction  == "Standard deviation" ){
+                    //Calculate square of sample standard deviation, with Bessel's correction
+                    double stdSum=0;
+                    for (int i=0; i < yDataHistory->size(); i++){
+                        stdSum+= pow(yDataHistory->at(i)- boxcarAvg,2)/(meanSamples-1);
+                    }
+                    yData->append(sqrt(stdSum));
+                }
+                else  {
+                    yData->append(boxcarAvg);
+                }
             }
-            // make sure to correct the sum every interpolationSamples steps to prevent it
-            // from running away due to flouting point rounding errors
-            correctionSum += currentValue;
-            if (++correctionCount >= interpolationSamples) {
-                interpolationSum = correctionSum;
-                correctionSum = 0.0f;
-                correctionCount = 0;
+            else{
+                yData->append( currentValue );
             }
-            yData->append(interpolationSum/yDataHistory->size());
-            if (yData->size() > m_xWindowSize) {
+
+            if (yData->size() > m_xWindowSize) { //If new data overflows the window, remove old data...
                 yData->pop_front();
-            } else
+            } else //...otherwise, add a new y point at position xData
                 xData->insert(xData->size(), xData->size());
 
             //notify the gui of changes in the data
@@ -137,30 +160,49 @@ bool ChronoPlotData::append(UAVObject* obj)
         //qDebug() << "uavObject: " << uavObject << ", uavField: " << uavField;
 
         if (field) {
-            //Put the new value at the front
-            QDateTime NOW = QDateTime::currentDateTime();
-
-            // calculate interpolated (smoothed) value
+            QDateTime NOW = QDateTime::currentDateTime(); //THINK ABOUT REIMPLEMENTING THIS TO SHOW UAVO TIME, NOT SYSTEM TIME
             double currentValue = valueAsDouble(obj, field) * pow(10, scalePower);
-            yDataHistory->append( currentValue );
-            interpolationSum += currentValue;
-            if(yDataHistory->size() > interpolationSamples) {
-                interpolationSum -= yDataHistory->first();
-                yDataHistory->pop_front();
+
+            //Compute boxcar average
+            if (meanSamples > 1){
+                //Put the new value at the front
+                yDataHistory->append( currentValue );
+
+                // calculate average value
+                meanSum += currentValue;
+                if(yDataHistory->size() > meanSamples) {
+                    meanSum -= yDataHistory->first();
+                    yDataHistory->pop_front();
+                }
+                // make sure to correct the sum every meanSamples steps to prevent it
+                // from running away due to floating point rounding errors
+                correctionSum+=currentValue;
+                if (++correctionCount >= meanSamples) {
+                    meanSum = correctionSum;
+                    correctionSum = 0.0f;
+                    correctionCount = 0;
+                }
+
+                double boxcarAvg=meanSum/yDataHistory->size();
+//qDebug()<<mathFunction;
+                if ( mathFunction  == "Standard deviation" ){
+                    //Calculate square of sample standard deviation, with Bessel's correction
+                    double stdSum=0;
+                    for (int i=0; i < yDataHistory->size(); i++){
+                        stdSum+= pow(yDataHistory->at(i)- boxcarAvg,2)/(meanSamples-1);
+                    }
+                    yData->append(sqrt(stdSum));
+                }
+                else  {
+                    yData->append(boxcarAvg);
+                }
             }
-            // make sure to correct the sum every interpolationSamples steps to prevent it
-            // from running away due to flouting point rounding errors
-            correctionSum += currentValue;
-            if (++correctionCount >= interpolationSamples) {
-                interpolationSum = correctionSum;
-                correctionSum = 0.0f;
-                correctionCount = 0;
+            else{
+                yData->append( currentValue );
             }
 
             double valueX = NOW.toTime_t() + NOW.time().msec() / 1000.0;
-            double valueY = interpolationSum/yDataHistory->size();
             xData->append(valueX);
-            yData->append(valueY);
 
             //qDebug() << "Data  " << uavObject << "." << field->getName() << " X,Y:" << valueX << "," <<  valueY;
 

@@ -156,29 +156,21 @@ void PIOS_Board_Init(void) {
 	const struct pios_board_info * bdinfo = &pios_board_info_blob;
 	
 #if defined(PIOS_INCLUDE_LED)
-	switch(bdinfo->board_rev) {
-		case 0x01: // Revision 1
-			PIOS_LED_Init(&pios_led_cfg_cc);
-			break;
-		case 0x02: // Revision 2
-			GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
-			PIOS_LED_Init(&pios_led_cfg_cc3d);
-			break;
-		default:
-			PIOS_Assert(0);
-	}
+	const struct pios_led_cfg * led_cfg = PIOS_BOARD_HW_DEFS_GetLedCfg(bdinfo->board_rev);
+	PIOS_Assert(led_cfg);
+	PIOS_LED_Init(led_cfg);
 #endif	/* PIOS_INCLUDE_LED */
 
 #if defined(PIOS_INCLUDE_SPI)
 	/* Set up the SPI interface to the serial flash */
 
 	switch(bdinfo->board_rev) {
-		case 0x01: // Revision 1
+		case BOARD_REVISION_CC:
 			if (PIOS_SPI_Init(&pios_spi_flash_accel_id, &pios_spi_flash_accel_cfg_cc)) {
 				PIOS_Assert(0);
 			}
 			break;
-		case 0x02: // Revision 2
+		case BOARD_REVISION_CC3D:
 			if (PIOS_SPI_Init(&pios_spi_flash_accel_id, &pios_spi_flash_accel_cfg_cc3d)) {
 				PIOS_Assert(0);
 			}
@@ -190,11 +182,11 @@ void PIOS_Board_Init(void) {
 #endif
 
 	switch(bdinfo->board_rev) {
-		case 0x01: // Revision 1
+		case BOARD_REVISION_CC:
 			PIOS_Flash_Jedec_Init(pios_spi_flash_accel_id, 1, &flash_w25x_cfg);	
 			PIOS_FLASHFS_Init(&flashfs_w25x_cfg);
 			break;
-		case 0x02: // Revision 2
+		case BOARD_REVISION_CC3D:
 			PIOS_Flash_Jedec_Init(pios_spi_flash_accel_id, 0, &flash_m25p_cfg);	
 			PIOS_FLASHFS_Init(&flashfs_m25p_cfg);
 			break;
@@ -246,40 +238,31 @@ void PIOS_Board_Init(void) {
 	/* Initialize board specific USB data */
 	PIOS_USB_BOARD_DATA_Init();
 
+
 	/* Flags to determine if various USB interfaces are advertised */
 	bool usb_hid_present = false;
 	bool usb_cdc_present = false;
 
-	uint8_t hwsettings_usb_devicetype;
-	HwSettingsUSB_DeviceTypeGet(&hwsettings_usb_devicetype);
-
-	switch (hwsettings_usb_devicetype) {
-	case HWSETTINGS_USB_DEVICETYPE_HIDONLY:
-		if (PIOS_USB_DESC_HID_ONLY_Init()) {
-			PIOS_Assert(0);
-		}
-		usb_hid_present = true;
-		break;
-	case HWSETTINGS_USB_DEVICETYPE_HIDVCP:
-		if (PIOS_USB_DESC_HID_CDC_Init()) {
-			PIOS_Assert(0);
-		}
-		usb_hid_present = true;
-		usb_cdc_present = true;
-		break;
-	case HWSETTINGS_USB_DEVICETYPE_VCPONLY:
-		break;
-	default:
+#if defined(PIOS_INCLUDE_USB_CDC)
+	if (PIOS_USB_DESC_HID_CDC_Init()) {
 		PIOS_Assert(0);
 	}
+	usb_hid_present = true;
+	usb_cdc_present = true;
+#else
+	if (PIOS_USB_DESC_HID_ONLY_Init()) {
+		PIOS_Assert(0);
+	}
+	usb_hid_present = true;
+#endif
 
 	uint32_t pios_usb_id;
 	
 	switch(bdinfo->board_rev) {
-		case 0x01: // Revision 1
+		case BOARD_REVISION_CC:
 			PIOS_USB_Init(&pios_usb_id, &pios_usb_main_cfg_cc);
 			break;
-		case 0x02: // Revision 2
+		case BOARD_REVISION_CC3D:
 			PIOS_USB_Init(&pios_usb_id, &pios_usb_main_cfg_cc3d);
 			break;
 		default:
@@ -699,7 +682,7 @@ void PIOS_Board_Init(void) {
 #endif	/* PIOS_DEBUG_ENABLE_DEBUG_PINS */
 
 	switch(bdinfo->board_rev) {
-		case 0x01:
+		case BOARD_REVISION_CC:
 			// Revision 1 with invensense gyros, start the ADC
 #if defined(PIOS_INCLUDE_ADC)
 			PIOS_ADC_Init(&pios_adc_cfg);
@@ -708,7 +691,7 @@ void PIOS_Board_Init(void) {
 			PIOS_ADXL345_Init(pios_spi_flash_accel_id, 0);
 #endif
 			break;
-		case 0x02:
+		case BOARD_REVISION_CC3D:
 			// Revision 2 with L3GD20 gyros, start a SPI interface and connect to it
 			GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
 

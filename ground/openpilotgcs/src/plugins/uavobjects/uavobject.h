@@ -36,6 +36,7 @@
 #include <QString>
 #include <QList>
 #include <QFile>
+#include <stdint.h>
 #include "uavobjectfield.h"
 
 #define UAVOBJ_ACCESS_SHIFT 0
@@ -89,10 +90,10 @@ public:
      *    6-7    gcsTelemetryUpdateMode     Update mode used by the GCS (UAVObjUpdateMode)
      */
      typedef struct {
-         uint8_t flags; /** Defines flags for update and logging modes and whether an update should be ACK'd (bits defined above) */
-         uint16_t flightTelemetryUpdatePeriod; /** Update period used by the telemetry module (only if telemetry mode is PERIODIC) */
-         uint16_t gcsTelemetryUpdatePeriod; /** Update period used by the GCS (only if telemetry mode is PERIODIC) */
-         uint16_t loggingUpdatePeriod; /** Update period used by the logging module (only if logging mode is PERIODIC) */
+        quint8 flags; /** Defines flags for update and logging modes and whether an update should be ACK'd (bits defined above) */
+        quint16 flightTelemetryUpdatePeriod; /** Update period used by the telemetry module (only if telemetry mode is PERIODIC) */
+        quint16 gcsTelemetryUpdatePeriod; /** Update period used by the GCS (only if telemetry mode is PERIODIC) */
+        quint16 loggingUpdatePeriod; /** Update period used by the logging module (only if logging mode is PERIODIC) */
      } __attribute__((packed)) Metadata;
 
 
@@ -131,10 +132,10 @@ public:
     static void SetFlightAccess(Metadata& meta, AccessMode mode);
     static AccessMode GetGcsAccess(const Metadata& meta);
     static void SetGcsAccess(Metadata& meta, AccessMode mode);
-    static uint8_t GetFlightTelemetryAcked(const Metadata& meta);
-    static void SetFlightTelemetryAcked(Metadata& meta, uint8_t val);
-    static uint8_t GetGcsTelemetryAcked(const Metadata& meta);
-    static void SetGcsTelemetryAcked(Metadata& meta, uint8_t val);
+    static quint8 GetFlightTelemetryAcked(const Metadata& meta);
+    static void SetFlightTelemetryAcked(Metadata& meta, quint8 val);
+    static quint8 GetGcsTelemetryAcked(const Metadata& meta);
+    static void SetGcsTelemetryAcked(Metadata& meta, quint8 val);
     static UpdateMode GetFlightTelemetryUpdateMode(const Metadata& meta);
     static void SetFlightTelemetryUpdateMode(Metadata& meta, UpdateMode val);
     static UpdateMode GetGcsTelemetryUpdateMode(const Metadata& meta);

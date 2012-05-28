@@ -97,6 +97,9 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
 	// Request and update of the setting object.
 	settingsUpdated = false;
 	pipxSettingsObj->requestUpdate();
+
+    disableMouseWheelEvents();
+
 }
 
 ConfigPipXtremeWidget::~ConfigPipXtremeWidget()

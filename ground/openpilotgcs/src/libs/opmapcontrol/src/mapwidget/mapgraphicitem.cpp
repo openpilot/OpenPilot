@@ -216,10 +216,8 @@ namespace mapcontrol
     }
     void MapGraphicItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     {
-        qDebug()<<"mouse press";
         if(!IsMouseOverMarker())
         {
-            qDebug()<<"not over marker";
             if(event->button() == config->DragButton && CanDragMap()&& !((event->modifiers()==Qt::ShiftModifier)||(event->modifiers()==Qt::ControlModifier)))
             {
                 core->mouseDown.SetX(event->pos().x());

@@ -262,7 +262,6 @@ Point PureProjection::FromLatLngToPixel(const PointLatLng &p,const int &zoom)
         double lon1=p1.Lng()*M_PI/180;
         double R=6378137;
         double lat2 = asin(sin(lat1)*cos(d/R) + cos(lat1)*sin(d/R)*cos(tc) );
-        qDebug()<<lat2<<lat1;
         double lon2 = lon1 + atan2(sin(tc)*sin(d/R)*cos(lat1),
                              cos(d/R)-sin(lat1)*sin(lat2));
         lat2=lat2*180/M_PI;

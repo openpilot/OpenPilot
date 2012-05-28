@@ -39,6 +39,8 @@
 #include <QMutexLocker>
 #include <QPointF>
 
+#include "opmap_edit_waypoint_dialog.h"
+#include "opmap_waypointeditor_dialog.h"
 #include "opmapcontrol/opmapcontrol.h"
 
 #include "opmap_overlay_widget.h"
@@ -52,6 +54,7 @@
 #include "uavobjectmanager.h"
 #include "uavobject.h"
 #include "objectpersistence.h"
+
 
 // ******************************************************
 
@@ -142,21 +145,21 @@ private slots:
     *
     * Some are currently disabled for the v1.0 plugin version.
     */
-//    void comboBoxFindPlace_returnPressed();
-//    void on_toolButtonFindPlace_clicked();
+    void comboBoxFindPlace_returnPressed();
+    void on_toolButtonFindPlace_clicked();
     void on_toolButtonZoomM_clicked();
     void on_toolButtonZoomP_clicked();
     void on_toolButtonMapHome_clicked();
     void on_toolButtonMapUAV_clicked();
     void on_toolButtonMapUAVheading_clicked();
     void on_horizontalSliderZoom_sliderMoved(int position);
-//    void on_toolButtonAddWaypoint_clicked();
-//    void on_treeViewWaypoints_clicked(QModelIndex index);
-//    void on_toolButtonHome_clicked();
-//    void on_toolButtonNextWaypoint_clicked();
-//    void on_toolButtonPrevWaypoint_clicked();
-//    void on_toolButtonHoldPosition_clicked();
-//    void on_toolButtonGo_clicked();
+    void on_toolButtonAddWaypoint_clicked();
+    void on_treeViewWaypoints_clicked(QModelIndex index);
+    void on_toolButtonHome_clicked();
+    void on_toolButtonNextWaypoint_clicked();
+    void on_toolButtonPrevWaypoint_clicked();
+    void on_toolButtonHoldPosition_clicked();
+    void on_toolButtonGo_clicked();
     void on_toolButtonMagicWaypointMapMode_clicked();
     void on_toolButtonNormalMapMode_clicked();
     void on_toolButtonHomeWaypoint_clicked();
@@ -191,7 +194,7 @@ private slots:
     void onCopyMouseLatLonToClipAct_triggered();
     void onCopyMouseLatToClipAct_triggered();
     void onCopyMouseLonToClipAct_triggered();
-//    void onFindPlaceAct_triggered();
+    void onFindPlaceAct_triggered();
     void onShowCompassAct_toggled(bool show);
     void onShowDiagnostics_toggled(bool show);
     void onShowUAVAct_toggled(bool show);
@@ -206,14 +209,14 @@ private slots:
     void onGoUAVAct_triggered();
     void onFollowUAVpositionAct_toggled(bool checked);
     void onFollowUAVheadingAct_toggled(bool checked);
-/*
+
     void onOpenWayPointEditorAct_triggered();
     void onAddWayPointAct_triggered();
     void onEditWayPointAct_triggered();
     void onLockWayPointAct_triggered();
     void onDeleteWayPointAct_triggered();
     void onClearWayPointsAct_triggered();
-*/
+
     void onMapModeActGroup_triggered(QAction *action);
     void onZoomActGroup_triggered(QAction *action);
     void onHomeMagicWaypointAct_triggered();
@@ -224,6 +227,8 @@ private slots:
     void onUAVTrailTimeActGroup_triggered(QAction *action);
     void onUAVTrailDistanceActGroup_triggered(QAction *action);
 	void onMaxUpdateRateActGroup_triggered(QAction *action);
+
+    void on_tbFind_clicked();
 
 private:
 
@@ -261,9 +266,9 @@ private:
 	UAVObjectManager *obm;
 	UAVObjectUtilManager *obum;
 
-	//opmap_waypointeditor_dialog waypoint_editor_dialog;
+    opmap_waypointeditor_dialog waypoint_editor_dialog;
 
-    //opmap_edit_waypoint_dialog waypoint_edit_dialog;
+    opmap_edit_waypoint_dialog waypoint_edit_dialog;
 
     QStandardItemModel wayPoint_treeView_model;
 
@@ -300,14 +305,14 @@ private:
     QAction *goUAVAct;
     QAction *followUAVpositionAct;
     QAction *followUAVheadingAct;
-    /*
+
     QAction *wayPointEditorAct;
     QAction *addWayPointAct;
     QAction *editWayPointAct;
     QAction *lockWayPointAct;
     QAction *deleteWayPointAct;
     QAction *clearWayPointsAct;
-    */
+
     QAction *homeMagicWaypointAct;
 
     QAction *showSafeAreaAct;

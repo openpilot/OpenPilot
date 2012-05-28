@@ -42,7 +42,7 @@ struct distBearing
     double distante;
     double bearing;
 };
-
+class HomeItem;
 /**
 * @brief A QGraphicsItem representing a WayPoint
 *
@@ -178,7 +178,7 @@ private:
     QGraphicsSimpleTextItem* numberI;
     QGraphicsRectItem* numberIBG;
     QTransform transf;
-
+    HomeItem * myHome;
     wptype myType;
 
 public slots:

@@ -39,8 +39,6 @@ namespace mapcontrol
         this->setZValue(4);
         coord=internals::PointLatLng(50,50);
         setToolTip("AAAA");
-        qDebug()<<"HomeItem created type:"<<type();
-
     }
 
     void HomeItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)

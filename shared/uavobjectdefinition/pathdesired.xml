@@ -17,7 +17,7 @@
 	<!-- Circle Mode - move a circular pattern around End with radius End-Start (straight line in the vertical)-->
 	<field name="ModeParameters" units="" type="float" elements="4" default="0"/>
 
-	<field name="UID" units="" type="uint8" elements="1" default="0"/>
+	<field name="UID" units="" type="int16" elements="1" default="0"/>
 	<!-- unique ID confirmed with pathfollower in pathstatus to acknowledge a change in PathDesired -->
 
         <access gcs="readwrite" flight="readwrite"/>

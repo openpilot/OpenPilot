@@ -101,11 +101,7 @@ static void path_endpoint( float * start_point, float * end_point, float * cur_p
 		return;
 	}
 
-	if(dist_path < 1e-6) {
-		status->fractional_progress = 0;
-	} else {
-		status->fractional_progress = 1 - dist_diff / dist_path;
-	}
+	status->fractional_progress = 1 - dist_diff / (1 + dist_path);
 	status->error = dist_diff;
 
 	// Compute direction to travel
@@ -140,10 +136,11 @@ static void path_vector( float * start_point, float * end_point, float * cur_poi
 	dist_path = sqrtf( path_north * path_north + path_east * path_east );
 
 	if(dist_path < 1e-6) {
+		// if the path is too short, we cannot determine vector direction.
+		// Fly towards the endpoint to prevent flying away,
+		// but assume progress=1 either way.
+		path_endpoint( start_point, end_point, cur_point, status );
 		status->fractional_progress = 1;
-		status->error = 0;
-		status->correction_direction[0] = status->correction_direction[1] = 0;
-		status->path_direction[0] = status->path_direction[1] = 0;
 		return;
 	}
 

@@ -86,7 +86,7 @@ static void onTimer(UAVObjEvent* ev)
 	static FlightBatteryStateData flightBatteryData;
 
 	FlightBatterySettingsData batterySettings;
-	static float dT = SAMPLE_PERIOD_MS / 1000;
+	static float dT = SAMPLE_PERIOD_MS / 1000.0;
 	float energyRemaining;
 
 	FlightBatterySettingsGet(&batterySettings);
@@ -95,8 +95,7 @@ static void onTimer(UAVObjEvent* ev)
 	flightBatteryData.Voltage = ((float)PIOS_ADC_PinGet(0)) * batterySettings.SensorCalibrations[FLIGHTBATTERYSETTINGS_SENSORCALIBRATIONS_VOLTAGEFACTOR]; //in Volts
 	flightBatteryData.Current = ((float)PIOS_ADC_PinGet(1)) * batterySettings.SensorCalibrations[FLIGHTBATTERYSETTINGS_SENSORCALIBRATIONS_CURRENTFACTOR]; //in Amps
 
-	flightBatteryData.ConsumedEnergy += (flightBatteryData.Current * 1000.0 * dT / 3600.0) ;//in mAh
-
+	flightBatteryData.ConsumedEnergy += (flightBatteryData.Current * 1000.0f * dT / 3600.0f) ;//in mAh
 	if (flightBatteryData.Current > flightBatteryData.PeakCurrent)flightBatteryData.PeakCurrent = flightBatteryData.Current; //in Amps
 	flightBatteryData.AvgCurrent=(flightBatteryData.AvgCurrent*0.8)+(flightBatteryData.Current*0.2); //in Amps
 

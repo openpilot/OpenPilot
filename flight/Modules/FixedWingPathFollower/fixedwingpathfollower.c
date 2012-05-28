@@ -415,19 +415,27 @@ static uint8_t updateFixedDesiredAttitude()
 	climbspeedError = climbspeedDesired - velocityActual.Down;
 
 	// Error condition: wind speed is higher than maximum allowed speed. We are forced backwards!
+	fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_WIND] = 0;
 	if (groundspeedDesired - baroAirspeedBias <= 0 ) {
+		fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_WIND] = 1;
 		result = 0;
 	}
 	// Error condition: plane too slow or too fast
-	if ( airspeedActual >  fixedwingpathfollowerSettings.AirSpeedMax * 1.2f
-		 || airspeedActual < fixedwingpathfollowerSettings.AirSpeedMin * 0.8f
-		) {
+	fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_HIGHSPEED] = 0;
+	fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_LOWSPEED] = 0;
+	if ( airspeedActual >  fixedwingpathfollowerSettings.AirSpeedMax * 1.2f) {
+		fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_HIGHSPEED] = 1;
+		result = 0;
+	}
+	if (airspeedActual < fixedwingpathfollowerSettings.AirSpeedMin * 0.8f) {
+		fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_LOWSPEED] = 1;
 		result = 0;
 	}
 
 	if (airspeedActual<1e-6) {
 		// prevent division by zero, abort without controlling anything. This guidance mode is not suited for takeoff or touchdown, or handling stationary planes
 		// also we cannot handle planes flying backwards, lets just wait until the nose drops
+		fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_LOWSPEED] = 1;
 		return 0;
 	}
 
@@ -475,21 +483,25 @@ static uint8_t updateFixedDesiredAttitude()
 	stabDesired.Throttle = powerCommand;
 
 	// Error condition: plane cannot hold altitude at current speed.
+	fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_LOWPOWER] = 0;
 	if (
 		powerCommand == fixedwingpathfollowerSettings.ThrottleLimit[FIXEDWINGPATHFOLLOWERSETTINGS_THROTTLELIMIT_MAX] // throttle at maximum
 		&& velocityActual.Down > 0 // we ARE going down
 		&& climbspeedDesired < 0 // we WANT to go up
 		&& speedError > 0 // we are too slow already
 		) {
+		fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_LOWPOWER] = 1;
 		result = 0;
 	}
 	// Error condition: plane keeps climbing despite minimum throttle (opposite of above)
+	fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_HIGHPOWER] = 0;
 	if (
 		powerCommand == fixedwingpathfollowerSettings.ThrottleLimit[FIXEDWINGPATHFOLLOWERSETTINGS_THROTTLELIMIT_MIN] // throttle at minimum
 		&& velocityActual.Down < 0 // we ARE going up
 		&& climbspeedDesired > 0 // we WANT to go down
 		&& speedError < 0 // we are too fast already
 		) {
+		fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_HIGHPOWER] = 1;
 		result = 0;
 	}
 
@@ -531,12 +543,14 @@ static uint8_t updateFixedDesiredAttitude()
 		fixedwingpathfollowerSettings.PitchLimit[FIXEDWINGPATHFOLLOWERSETTINGS_PITCHLIMIT_MAX]);
 
 	// Error condition: high speed dive
+	fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_PITCHCONTROL] = 0;
 	if (
 		pitchCommand == fixedwingpathfollowerSettings.PitchLimit[FIXEDWINGPATHFOLLOWERSETTINGS_PITCHLIMIT_MAX] // pitch demand is full up
 		&& velocityActual.Down > 0 // we ARE going down
 		&& climbspeedDesired < 0 // we WANT to go up
 		&& speedError < 0 // we are too fast already
 		) {
+		fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_PITCHCONTROL] = 1;
 		result = 0;
 	}
 

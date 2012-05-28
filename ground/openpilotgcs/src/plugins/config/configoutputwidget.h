@@ -73,7 +73,6 @@ private slots:
         void updateObjectsFromWidgets();
 	void runChannelTests(bool state);
         void sendChannelTest(int index, int value);
-        void setSpinningArmed(bool val);
         void openHelp();
 protected:
         void enableControls(bool enable);

@@ -51,6 +51,7 @@ FLASH_TOOL = OPENOCD
 # List of modules to include
 MODULES = Sensors Attitude/revolution ManualControl Stabilization Altitude/revolution Actuator GPS FirmwareIAP 
 MODULES += AltitudeHold
+MODULES += Airspeed/revolution
 MODULES += CameraStab
 MODULES += Telemetry
 #MODULES += OveroSync
@@ -144,6 +145,7 @@ include $(PIOS)/STM32F4xx/library.mk
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_mpu6000.c
 SRC += $(PIOSCOMMON)/pios_bma180.c
+SRC += $(PIOSCOMMON)/pios_etasv3.c
 SRC += $(PIOSCOMMON)/pios_l3gd20.c
 SRC += $(PIOSCOMMON)/pios_hmc5883.c
 SRC += $(PIOSCOMMON)/pios_ms5611.c

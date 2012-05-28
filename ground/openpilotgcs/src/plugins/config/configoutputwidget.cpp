@@ -77,8 +77,6 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
 
     firstUpdate = true;
 
-    connect(m_config->spinningArmed, SIGNAL(toggled(bool)), this, SLOT(setSpinningArmed(bool)));
-
     // Connect the help button
     connect(m_config->outputHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
     addWidget(m_config->cb_outputRate4);
@@ -194,24 +192,6 @@ void ConfigOutputWidget::assignOutputChannel(UAVDataObject *obj, QString str)
     OutputChannelForm *outputChannelForm = getOutputChannelForm(index);
     if(outputChannelForm)
         outputChannelForm->setAssignment(str);
-}
-
-/**
-  * Set the "Spin motors at neutral when armed" flag in ActuatorSettings
-  */
-void ConfigOutputWidget::setSpinningArmed(bool val)
-{
-    ActuatorSettings *actuatorSettings = ActuatorSettings::GetInstance(getObjectManager());
-    Q_ASSERT(actuatorSettings);
-    ActuatorSettings::DataFields actuatorSettingsData = actuatorSettings->getData();
-
-    if(val)
-        actuatorSettingsData.MotorsSpinWhileArmed = ActuatorSettings::MOTORSSPINWHILEARMED_TRUE;
-    else
-        actuatorSettingsData.MotorsSpinWhileArmed = ActuatorSettings::MOTORSSPINWHILEARMED_FALSE;
-
-    // Apply settings
-    actuatorSettings->setData(actuatorSettingsData);
 }
 
 /**
@@ -347,26 +327,36 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject *)
   */
 void ConfigOutputWidget::updateObjectsFromWidgets()
 {
+    emit updateObjectsFromWidgetsRequested();
+
     ActuatorSettings *actuatorSettings = ActuatorSettings::GetInstance(getObjectManager());
     Q_ASSERT(actuatorSettings);
-    ActuatorSettings::DataFields actuatorSettingsData = actuatorSettings->getData();
+    if(actuatorSettings) {
+        ActuatorSettings::DataFields actuatorSettingsData = actuatorSettings->getData();
 
-    // Set channel ranges
-    QList<OutputChannelForm*> outputChannelForms = findChildren<OutputChannelForm*>();
-    foreach(OutputChannelForm *outputChannelForm, outputChannelForms)
-    {
-        actuatorSettingsData.ChannelMax[outputChannelForm->index()] = outputChannelForm->max();
-        actuatorSettingsData.ChannelMin[outputChannelForm->index()] = outputChannelForm->min();
-        actuatorSettingsData.ChannelNeutral[outputChannelForm->index()] = outputChannelForm->neutral();
+        // Set channel ranges
+        QList<OutputChannelForm*> outputChannelForms = findChildren<OutputChannelForm*>();
+        foreach(OutputChannelForm *outputChannelForm, outputChannelForms)
+        {
+            actuatorSettingsData.ChannelMax[outputChannelForm->index()] = outputChannelForm->max();
+            actuatorSettingsData.ChannelMin[outputChannelForm->index()] = outputChannelForm->min();
+            actuatorSettingsData.ChannelNeutral[outputChannelForm->index()] = outputChannelForm->neutral();
+        }
+
+        // Set update rates
+        actuatorSettingsData.ChannelUpdateFreq[0] = m_config->cb_outputRate1->currentText().toUInt();
+        actuatorSettingsData.ChannelUpdateFreq[1] = m_config->cb_outputRate2->currentText().toUInt();
+        actuatorSettingsData.ChannelUpdateFreq[2] = m_config->cb_outputRate3->currentText().toUInt();
+        actuatorSettingsData.ChannelUpdateFreq[3] = m_config->cb_outputRate4->currentText().toUInt();
+
+        if(m_config->spinningArmed->isChecked() == true)
+            actuatorSettingsData.MotorsSpinWhileArmed = ActuatorSettings::MOTORSSPINWHILEARMED_TRUE;
+        else
+            actuatorSettingsData.MotorsSpinWhileArmed = ActuatorSettings::MOTORSSPINWHILEARMED_FALSE;
+
+        // Apply settings
+        actuatorSettings->setData(actuatorSettingsData);
     }
-
-    // Set update rates
-    actuatorSettingsData.ChannelUpdateFreq[0] = m_config->cb_outputRate1->currentText().toUInt();
-    actuatorSettingsData.ChannelUpdateFreq[1] = m_config->cb_outputRate2->currentText().toUInt();
-    actuatorSettingsData.ChannelUpdateFreq[2] = m_config->cb_outputRate3->currentText().toUInt();
-    actuatorSettingsData.ChannelUpdateFreq[3] = m_config->cb_outputRate4->currentText().toUInt();
-    // Apply settings
-    actuatorSettings->setData(actuatorSettingsData);
 }
 
 void ConfigOutputWidget::openHelp()

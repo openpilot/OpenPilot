@@ -45,6 +45,43 @@
 /**
  * Sensor configurations 
  */
+
+#if defined(PIOS_INCLUDE_ADC)
+#include "pios_adc_priv.h"
+void PIOS_ADC_DMC_irq_handler(void);
+void DMA2_Stream4_IRQHandler(void) __attribute__((alias("PIOS_ADC_DMC_irq_handler")));
+struct pios_adc_cfg pios_adc_cfg = {
+	.adc_dev = ADC1,
+	.dma = {
+		.irq = {
+			.flags   = (DMA_FLAG_TCIF4 | DMA_FLAG_TEIF4 | DMA_FLAG_HTIF4),
+			.init    = {
+				.NVIC_IRQChannel                   = DMA2_Stream4_IRQn,
+				.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
+				.NVIC_IRQChannelSubPriority        = 0,
+				.NVIC_IRQChannelCmd                = ENABLE,
+			},
+		},
+		.rx = {
+			.channel = DMA2_Stream4,
+			.init    = {
+				.DMA_Channel                    = DMA_Channel_0,
+				.DMA_PeripheralBaseAddr = (uint32_t) & ADC1->DR
+			},
+		}
+	},
+	.half_flag = DMA_IT_HTIF4,
+	.full_flag = DMA_IT_TCIF4,
+
+};
+void PIOS_ADC_DMC_irq_handler(void)
+{
+	/* Call into the generic code to handle the IRQ for this specific device */
+	PIOS_ADC_DMA_Handler();
+}
+
+#endif
+
 #if defined(PIOS_INCLUDE_HMC5883)
 #include "pios_hmc5883.h"
 static const struct pios_exti_cfg pios_exti_hmc5883_cfg __exti_config = {
@@ -787,6 +824,10 @@ void PIOS_Board_Init(void) {
 	}
 	
 	PIOS_DELAY_WaitmS(50);
+
+#if defined(PIOS_INCLUDE_ADC)
+	PIOS_ADC_Init(&pios_adc_cfg);
+#endif
 
 #if defined(PIOS_INCLUDE_HMC5883)
 	PIOS_HMC5883_Init(&pios_hmc5883_cfg);

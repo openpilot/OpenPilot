@@ -145,6 +145,7 @@ private slots:
     void reloadButtonClicked();
 private:
     bool isConnected;
+    bool allowWidgetUpdates;
     QStringList objectsList;
     QList <objectToWidget*> objOfInterest;
     ExtensionSystem::PluginManager *pm;

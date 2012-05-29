@@ -152,14 +152,16 @@ static void path_vector( float * start_point, float * end_point, float * cur_poi
 	status->error = normal[0] * diff_north + normal[1] * diff_east;
 
 	// Compute direction to correct error
-	status->correction_direction[0] = (status->error>0?1:-1) * -normal[0];
-	status->correction_direction[1] = (status->error>0?1:-1) * -normal[1];
+	status->correction_direction[0] = (status->error > 0) ? -normal[0] : normal[0];
+	status->correction_direction[1] = (status->error > 0) ? -normal[1] : normal[1];
+	
+	// Now just want magnitude of error
+	status->error = fabs(status->error);
 
 	// Compute direction to travel
 	status->path_direction[0] = path_north / dist_path;
 	status->path_direction[1] = path_east / dist_path;
 
-	status->error = fabs(status->error);
 }
 
 /**

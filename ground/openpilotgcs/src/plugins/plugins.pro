@@ -134,6 +134,12 @@ plugin_qmlview.depends = plugin_coreplugin
 plugin_qmlview.depends += plugin_uavobjects
 SUBDIRS += plugin_qmlview
 
+# PathAction Editor gadget
+plugin_pathactioneditor.subdir = pathactioneditor
+plugin_pathactioneditor.depends = plugin_coreplugin
+plugin_pathactioneditor.depends += plugin_uavobjects
+SUBDIRS += plugin_pathactioneditor
+
 # Waypoint Editor gadget
 plugin_waypointeditor.subdir = waypointeditor
 plugin_waypointeditor.depends = plugin_coreplugin

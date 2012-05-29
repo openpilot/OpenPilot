@@ -632,6 +632,12 @@ endef
 
 ALL_BOARDS := coptercontrol pipxtreme simposix
 
+# SimPosix only builds on Linux so drop it from the list for
+# all other platforms.
+ifneq ($(UNAME), Linux)
+ALL_BOARDS  := $(filter-out simposix, $(ALL_BOARDS))
+endif
+
 # Friendly names of each board (used to find source tree)
 coptercontrol_friendly := CopterControl
 pipxtreme_friendly     := PipXtreme

@@ -94,7 +94,6 @@ static bool PIOS_ADC_validate(struct pios_adc_dev *);
 #if defined(PIOS_INCLUDE_ADC)
 static void init_pins(void);
 static void init_dma(void);
-static void init_timer(void);
 static void init_adc(void);
 #endif
 
@@ -175,33 +174,6 @@ init_dma(void)
 	NVIC_InitTypeDef NVICInit = pios_adc_dev->cfg->dma.irq.init;
 	NVIC_Init(&NVICInit);
 }
-
-#if 0
-static void
-init_timer(void)
-{
-	RCC_ClocksTypeDef	clocks;
-	TIM_TimeBaseInitTypeDef TIMInit;
-
-	/* get clock info */
-	RCC_GetClocksFreq(&clocks);
-
-	/* reset/disable the timer */
-	TIM_DeInit(PIOS_ADC_TIMER);
-
-	/* configure for 1kHz auto-reload cycle */
-	TIM_TimeBaseStructInit(&TIMInit);
-	TIMInit.TIM_Prescaler							= clocks.PCLK1_Frequency / 1000000;	/* 1MHz base clock*/
-	TIMInit.TIM_CounterMode							= TIM_CounterMode_Down;
-	TIMInit.TIM_Period								= 1000;							/* 1kHz conversion rate */
-	TIMInit.TIM_ClockDivision						= TIM_CKD_DIV1;					/* no additional divisor */
-	TIM_TimeBaseInit(PIOS_ADC_TIMER, &TIMInit);
-
-	/* configure trigger output on reload */
-	TIM_SelectOutputTrigger(PIOS_ADC_TIMER, TIM_TRGOSource_Update);
-	TIM_Cmd(PIOS_ADC_TIMER, ENABLE);
-}
-#endif
 
 static void
 init_adc(void)
@@ -300,7 +272,6 @@ int32_t PIOS_ADC_Init(const struct pios_adc_cfg * cfg)
 #if defined(PIOS_INCLUDE_ADC)
 	init_pins();
 	init_dma();
-	//init_timer();
 	init_adc();
 #endif
 

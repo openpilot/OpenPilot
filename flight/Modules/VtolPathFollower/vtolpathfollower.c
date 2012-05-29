@@ -50,7 +50,6 @@
 #include "accels.h"
 #include "attitudeactual.h"
 #include "pathdesired.h"        // object that will be updated by the module
-#include "positiondesired.h"    // object that will be updated by the module
 #include "positionactual.h"
 #include "manualcontrol.h"
 #include "flightstatus.h"

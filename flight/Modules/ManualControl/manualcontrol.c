@@ -695,12 +695,16 @@ static void altitudeHoldDesired(ManualControlCommandData * cmd, bool changed)
 	AltitudeHoldDesiredSet(&altitudeHoldDesired);
 }
 #else
-static void positionDesired(ManualControlCommandData * cmd)
+
+// TODO: These functions should never be accessible on CC.  Any configuration that
+// could allow them to be called sholud already throw an error to prevent this happening
+// in flight
+static void updatePathDesired(ManualControlCommandData * cmd, bool changed)
 {
 	AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_ERROR);
 }
 
-static void altitudeHoldDesired(ManualControlCommandData * cmd)
+static void altitudeHoldDesired(ManualControlCommandData * cmd, bool changed)
 {
 	AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_ERROR);
 }

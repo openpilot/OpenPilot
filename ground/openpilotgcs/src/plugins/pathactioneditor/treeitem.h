@@ -71,6 +71,7 @@ public:
 
     inline bool highlighted() { return m_highlight; }
     void setHighlight(bool highlight);
+    void setActive(bool highlight);
 
     inline bool changed() { return m_changed; }
     inline void setChanged(bool changed) { m_changed = changed; if(changed) emit updateHighlight(this); }

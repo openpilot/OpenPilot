@@ -31,6 +31,7 @@
 #include <QtGui/QWidget>
 #include <QtGui/QTreeView>
 #include "pathaction.h"
+#include "waypoint.h"
 #include "pathactioneditortreemodel.h"
 
 class Ui_PathActionEditor;
@@ -47,12 +48,14 @@ signals:
 
 protected slots:
     void pathactionChanged(UAVObject *);
-    void addInstance();
+    void addPathActionInstance();
+    void addWaypointInstance();
 
 private:
     Ui_PathActionEditor * m_pathactioneditor;
     PathActionEditorTreeModel *m_model;
     PathAction *pathactionObj;
+    Waypoint *waypointObj;
 };
 
 #endif /* PathActionEditorGADGETWIDGET_H_ */

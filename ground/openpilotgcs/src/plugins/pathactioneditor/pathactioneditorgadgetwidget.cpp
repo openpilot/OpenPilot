@@ -57,10 +57,14 @@ PathActionEditorGadgetWidget::PathActionEditorGadgetWidget(QWidget *parent) : QL
     Q_ASSERT(objManager != NULL);
     pathactionObj = PathAction::GetInstance(objManager);
     Q_ASSERT(pathactionObj != NULL);
+    waypointObj = Waypoint::GetInstance(objManager);
+    Q_ASSERT(waypointObj != NULL);
 
     // Connect the signals
     connect(m_pathactioneditor->buttonNewPathAction, SIGNAL(clicked()),
-            this, SLOT(addInstance()));
+            this, SLOT(addPathActionInstance()));
+    connect(m_pathactioneditor->buttonNewWaypoint, SIGNAL(clicked()),
+            this, SLOT(addWaypointInstance()));
 }
 
 PathActionEditorGadgetWidget::~PathActionEditorGadgetWidget()
@@ -72,7 +76,7 @@ void PathActionEditorGadgetWidget::pathactionChanged(UAVObject *)
 {
 }
 
-void PathActionEditorGadgetWidget::addInstance()
+void PathActionEditorGadgetWidget::addPathActionInstance()
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     Q_ASSERT(pm != NULL);
@@ -85,6 +89,21 @@ void PathActionEditorGadgetWidget::addInstance()
     obj->initialize(newInstId,obj->getMetaObject());
     objManager->registerObject(obj);
     qDebug() << "Instances after: " << objManager->getNumInstances(pathactionObj->getObjID());
+}
+
+void PathActionEditorGadgetWidget::addWaypointInstance()
+{
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    Q_ASSERT(pm != NULL);
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    Q_ASSERT(objManager != NULL);
+
+    qDebug() << "Instances before: " << objManager->getNumInstances(waypointObj->getObjID());
+    Waypoint *obj = new Waypoint();
+    quint32 newInstId = objManager->getNumInstances(waypointObj->getObjID());
+    obj->initialize(newInstId,obj->getMetaObject());
+    objManager->registerObject(obj);
+    qDebug() << "Instances after: " << objManager->getNumInstances(waypointObj->getObjID());
 }
 
 /**

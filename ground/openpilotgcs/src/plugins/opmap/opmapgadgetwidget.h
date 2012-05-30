@@ -119,7 +119,8 @@ public:
     void setCacheLocation(QString cacheLocation);
     void setMapMode(opMapModeType mode);
 	void SetUavPic(QString UAVPic);
-	void setMaxUpdateRate(int update_rate);
+    void setMaxUpdateRate(int update_rate);
+
 
 public slots:
     void homePositionUpdated(UAVObject *);
@@ -131,8 +132,8 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
     void contextMenuEvent(QContextMenuEvent *event);
     void keyPressEvent(QKeyEvent* event);
-
 private slots:
+    void wpDoubleClickEvent(WayPointItem *wp);
     void updatePosition();
 
     void updateMousePos();

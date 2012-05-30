@@ -39,7 +39,7 @@ namespace mapcontrol
 {
 struct distBearing
 {
-    double distante;
+    double distance;
     double bearing;
 };
 class HomeItem;
@@ -145,6 +145,8 @@ public:
     * @param value
     */
     void SetAltitude(int const& value);
+    void setRelativeCoord(distBearing value);
+    distBearing getRelativeCoord(){return relativeCoord;}
     int type() const;
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
@@ -155,12 +157,13 @@ public:
 ~WayPointItem();
 
     static int snumber;
-    void changeWPType(wptype type);
+    void setWPType(wptype type);
+    wptype WPType(){return myType;}
 protected:
     void mouseMoveEvent ( QGraphicsSceneMouseEvent * event );
     void mousePressEvent ( QGraphicsSceneMouseEvent * event );
     void mouseReleaseEvent ( QGraphicsSceneMouseEvent * event );
-
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
 private:
     internals::PointLatLng coord;//coordinates of this WayPoint
     distBearing relativeCoord;
@@ -220,7 +223,7 @@ signals:
     * @param waypoint a pointer to this WayPoint
     */
     void WPValuesChanged(WayPointItem* waypoint);
-
+    void waypointdoubleclick(WayPointItem* waypoint);
 };
 }
 #endif // WAYPOINTITEM_H

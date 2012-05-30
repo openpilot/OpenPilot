@@ -478,6 +478,7 @@ namespace mapcontrol
         * @param number the number of tiles still in the queue
         */
         void OnTilesStillToLoad(int number);
+        void OnWayPointDoubleClicked(WayPointItem * waypoint);
     public slots:
         /**
         * @brief Ripps the current selection to the DB

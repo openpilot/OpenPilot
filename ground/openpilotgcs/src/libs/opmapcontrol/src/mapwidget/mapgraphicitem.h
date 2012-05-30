@@ -40,8 +40,10 @@
 #include <QObject>
 #include "waypointitem.h"
 //#include "uavitem.h"
+
 namespace mapcontrol
 {
+    class WayPointItem;
     class OPMapWidget;
     /**
     * @brief The main graphicsItem used on the widget, contains the map and map logic
@@ -213,6 +215,7 @@ namespace mapcontrol
         *
         * @param zoom
         */
+        void wpdoubleclicked(WayPointItem * wp);
         void zoomChanged(double zoomtotal,double zoomreal,double zoomdigi);
     };
 }

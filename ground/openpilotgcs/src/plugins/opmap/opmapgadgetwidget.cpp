@@ -264,14 +264,14 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     connect(m_map, SIGNAL(WPValuesChanged(WayPointItem*)), this, SLOT(WPValuesChanged(WayPointItem*)));
     connect(m_map, SIGNAL(WPInserted(int const&, WayPointItem*)), this, SLOT(WPInserted(int const&, WayPointItem*)));
     connect(m_map, SIGNAL(WPDeleted(int const&)), this, SLOT(WPDeleted(int const&)));
-
+    connect(m_map,SIGNAL(OnWayPointDoubleClicked(WayPointItem*)),this,SLOT(wpDoubleClickEvent(WayPointItem*)));
 	m_map->SetCurrentPosition(m_home_position.coord);         // set the map position
 	m_map->Home->SetCoord(m_home_position.coord);             // set the HOME position
 	m_map->UAV->SetUAVPos(m_home_position.coord, 0.0);        // set the UAV position
     if(m_map->GPS)
         m_map->GPS->SetUAVPos(m_home_position.coord, 0.0);        // set the UAV position
     distBearing db;
-    db.distante=100;
+    db.distance=100;
     db.bearing=0;
     m_map->WPCreate(db,10,"aaa");
     // **************
@@ -386,6 +386,11 @@ void OPMapGadgetWidget::mouseMoveEvent(QMouseEvent *event)
     }
 
     QWidget::mouseMoveEvent(event);
+}
+void OPMapGadgetWidget::wpDoubleClickEvent(WayPointItem  *wp)
+{
+        m_mouse_waypoint = wp;
+        onEditWayPointAct_triggered();
 }
 
 void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)

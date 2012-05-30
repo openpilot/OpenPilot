@@ -36,8 +36,8 @@ opmap_edit_waypoint_dialog::opmap_edit_waypoint_dialog(QWidget *parent) :
     ui(new Ui::opmap_edit_waypoint_dialog)
 {
     ui->setupUi(this);
-
     waypoint_item = NULL;
+    connect(ui->rbRelative,SIGNAL(toggled(bool)),this,SLOT(setupWidgets(bool)));
 }
 
 // destrutor
@@ -87,6 +87,22 @@ void opmap_edit_waypoint_dialog::on_pushButtonRevert_clicked()
     saveSettings();
 }
 
+void opmap_edit_waypoint_dialog::setupWidgets(bool isRelative)
+{
+    ui->lbLong->setVisible(!isRelative);
+    ui->lbDegLong->setVisible(!isRelative);
+    ui->doubleSpinBoxLongitude->setVisible(!isRelative);
+    ui->lbLat->setVisible(!isRelative);
+    ui->lbDegLat->setVisible(!isRelative);
+    ui->doubleSpinBoxLatitude->setVisible(!isRelative);
+    ui->lbDistance->setVisible(isRelative);
+    ui->lbDistanceMeters->setVisible(isRelative);
+    ui->lbBearing->setVisible(isRelative);
+    ui->lbBearingDeg->setVisible(isRelative);
+    ui->spinBoxDistance->setVisible(isRelative);
+    ui->doubleSpinBoxBearing->setVisible(isRelative);
+}
+
 void opmap_edit_waypoint_dialog::on_pushButtonCancel_clicked()
 {
     waypoint_item = NULL;
@@ -123,7 +139,14 @@ int opmap_edit_waypoint_dialog::saveSettings()
     waypoint_item->SetAltitude(altitude);
     waypoint_item->SetDescription(description);
     waypoint_item->setFlag(QGraphicsItem::ItemIsMovable, !locked);
-
+    if(ui->rbAbsolute->isChecked())
+        waypoint_item->setWPType(mapcontrol::WayPointItem::absolute);
+    else
+        waypoint_item->setWPType(mapcontrol::WayPointItem::relative);
+    mapcontrol::distBearing pt;
+    pt.distance=ui->spinBoxDistance->value();
+    pt.bearing=ui->doubleSpinBoxBearing->value()/180*M_PI;
+    this->waypoint_item->setRelativeCoord(pt);
     // ********************
 
     return 0;	// all ok
@@ -143,14 +166,22 @@ void opmap_edit_waypoint_dialog::editWaypoint(mapcontrol::WayPointItem *waypoint
     original_coord = this->waypoint_item->Coord();
     original_altitude = this->waypoint_item->Altitude();
     original_description = this->waypoint_item->Description().simplified();
-
+    original_type=this->waypoint_item->WPType();
+    original_distance=this->waypoint_item->getRelativeCoord().distance;
+    original_bearing=this->waypoint_item->getRelativeCoord().bearing*180/M_PI;
     ui->checkBoxLocked->setChecked(original_locked);
     ui->spinBoxNumber->setValue(original_number);
     ui->doubleSpinBoxLatitude->setValue(original_coord.Lat());
     ui->doubleSpinBoxLongitude->setValue(original_coord.Lng());
     ui->doubleSpinBoxAltitude->setValue(original_altitude);
     ui->lineEditDescription->setText(original_description);
-
+    if(original_type==mapcontrol::WayPointItem::absolute)
+        ui->rbAbsolute->setChecked(true);
+    else
+        ui->rbRelative->setChecked(true);
+    ui->doubleSpinBoxBearing->setValue(original_bearing);
+    ui->spinBoxDistance->setValue(original_distance);
+    setupWidgets(ui->rbRelative->isChecked());
     show();
 }
 

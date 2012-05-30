@@ -53,9 +53,10 @@ WayPointItem::WayPointItem(const internals::PointLatLng &coord,int const& altitu
         }
 
         if(myHome)
-            map->Projection()->offSetFromLatLngs(myHome->Coord(),coord,relativeCoord.distante,relativeCoord.bearing);
-
+            map->Projection()->offSetFromLatLngs(myHome->Coord(),coord,relativeCoord.distance,relativeCoord.bearing);
+        qDebug()<<"RELATIVE DISTANCE SET ON CTOR1"<<relativeCoord.distance;
         connect(myHome,SIGNAL(homePositionChanged(internals::PointLatLng)),this,SLOT(onHomePositionChanged(internals::PointLatLng)));
+    connect(this,SIGNAL(waypointdoubleclick(WayPointItem*)),map,SIGNAL(wpdoubleclicked(WayPointItem*)));
     }
     WayPointItem::WayPointItem(const internals::PointLatLng &coord,int const& altitude, const QString &description, MapGraphicItem *map,wptype type):coord(coord),reached(false),description(description),shownumber(true),isDragging(false),altitude(altitude),map(map),myType(type)
     {
@@ -80,13 +81,16 @@ WayPointItem::WayPointItem(const internals::PointLatLng &coord,int const& altitu
         }
         if(myHome)
         {
-            map->Projection()->offSetFromLatLngs(myHome->Coord(),coord,relativeCoord.distante,relativeCoord.bearing);
+            map->Projection()->offSetFromLatLngs(myHome->Coord(),coord,relativeCoord.distance,relativeCoord.bearing);
+            qDebug()<<"RELATIVE DISTANCE SET ON CTOR2"<<relativeCoord.distance;
             connect(myHome,SIGNAL(homePositionChanged(internals::PointLatLng)),this,SLOT(onHomePositionChanged(internals::PointLatLng)));
         }
+        connect(this,SIGNAL(waypointdoubleclick(WayPointItem*)),map,SIGNAL(wpdoubleclicked(WayPointItem*)));
     }
 
-    WayPointItem::WayPointItem(const distBearing &relativeCoord, const int &altitude, const QString &description, MapGraphicItem *map):relativeCoord(relativeCoord),reached(false),description(description),shownumber(true),isDragging(false),altitude(altitude),map(map)
+    WayPointItem::WayPointItem(const distBearing &relativeCoordenate, const int &altitude, const QString &description, MapGraphicItem *map):relativeCoord(relativeCoordenate),reached(false),description(description),shownumber(true),isDragging(false),altitude(altitude),map(map)
     {
+        qDebug()<<"RELATIVE DISTANCE SET ON CTOR3"<<relativeCoord.distance;
         myHome=NULL;
         QList<QGraphicsItem *> list=map->childItems();
         foreach(QGraphicsItem * obj,list)
@@ -98,7 +102,7 @@ WayPointItem::WayPointItem(const internals::PointLatLng &coord,int const& altitu
         if(myHome)
         {
             connect(myHome,SIGNAL(homePositionChanged(internals::PointLatLng)),this,SLOT(onHomePositionChanged(internals::PointLatLng)));
-            coord=map->Projection()->translate(myHome->Coord(),relativeCoord.distante,relativeCoord.bearing);
+            coord=map->Projection()->translate(myHome->Coord(),relativeCoord.distance,relativeCoord.bearing);
         }
         myType=relative;
         text=0;
@@ -112,9 +116,11 @@ WayPointItem::WayPointItem(const internals::PointLatLng &coord,int const& altitu
         SetShowNumber(shownumber);
         RefreshToolTip();
         RefreshPos();
+        connect(this,SIGNAL(waypointdoubleclick(WayPointItem*)),map,SIGNAL(wpdoubleclicked(WayPointItem*)));
+
     }
 
-    void WayPointItem::changeWPType(wptype type)
+    void WayPointItem::setWPType(wptype type)
     {
         myType=type;
         emit WPValuesChanged(this);
@@ -135,6 +141,14 @@ WayPointItem::WayPointItem(const internals::PointLatLng &coord,int const& altitu
         if(this->isSelected())
             painter->drawRect(QRectF(-picture.width()/2,-picture.height(),picture.width()-1,picture.height()-1));
     }
+    void WayPointItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+    {
+        if(event->button()==Qt::LeftButton)
+        {
+            emit waypointdoubleclick(this);
+        }
+    }
+
     void WayPointItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     {
         if(event->button()==Qt::LeftButton)
@@ -157,11 +171,17 @@ WayPointItem::WayPointItem(const internals::PointLatLng &coord,int const& altitu
     {
         if(event->button()==Qt::LeftButton)
         {
-            delete text;
-            delete textBG;
-            coord=map->FromLocalToLatLng(this->pos().x(),this->pos().y());
-            if(myHome)
-                map->Projection()->offSetFromLatLngs(myHome->Coord(),coord,relativeCoord.distante,relativeCoord.bearing);
+            if(text)
+            {
+                delete text;
+                text=NULL;
+            }
+            if(textBG)
+            {
+                delete textBG;
+                textBG=NULL;
+            }
+
             isDragging=false;
             RefreshToolTip();
 
@@ -177,8 +197,11 @@ WayPointItem::WayPointItem(const internals::PointLatLng &coord,int const& altitu
             coord=map->FromLocalToLatLng(this->pos().x(),this->pos().y());
             QString coord_str = " " + QString::number(coord.Lat(), 'f', 6) + "   " + QString::number(coord.Lng(), 'f', 6);
             if(myHome)
-                map->Projection()->offSetFromLatLngs(myHome->Coord(),coord,relativeCoord.distante,relativeCoord.bearing);
-            QString relativeCoord_str = QString::number(relativeCoord.distante) + "m " + QString::number(relativeCoord.bearing*180/M_PI)+"deg";
+            {
+                map->Projection()->offSetFromLatLngs(myHome->Coord(),coord,relativeCoord.distance,relativeCoord.bearing);
+                qDebug()<<"RELATIVE DISTANCE SET ON MOUSEMOVEEVENT"<<relativeCoord.distance;
+            }
+            QString relativeCoord_str = QString::number(relativeCoord.distance) + "m " + QString::number(relativeCoord.bearing*180/M_PI)+"deg";
             text->setText(coord_str+"\n"+relativeCoord_str);
             textBG->setRect(text->boundingRect());
 
@@ -192,6 +215,18 @@ WayPointItem::WayPointItem(const internals::PointLatLng &coord,int const& altitu
         RefreshToolTip();
 
         emit WPValuesChanged(this);
+        this->update();
+    }
+
+    void WayPointItem::setRelativeCoord(distBearing value)
+    {
+        relativeCoord=value;
+        if(myHome)
+        {
+               coord=map->Projection()->translate(myHome->Coord(),relativeCoord.distance,relativeCoord.bearing);
+        }
+        RefreshPos();
+        RefreshToolTip();
         this->update();
     }
     void WayPointItem::SetCoord(const internals::PointLatLng &value)
@@ -275,7 +310,7 @@ WayPointItem::WayPointItem(const internals::PointLatLng &coord,int const& altitu
     {
         if(myType==relative)
         {
-            coord=map->Projection()->translate(homepos,relativeCoord.distante,relativeCoord.bearing);
+            coord=map->Projection()->translate(homepos,relativeCoord.distance,relativeCoord.bearing);
             emit WPValuesChanged(this);
             RefreshPos();
             RefreshToolTip();
@@ -332,7 +367,7 @@ WayPointItem::WayPointItem(const internals::PointLatLng &coord,int const& altitu
         else
             type_str="Absolute";
         QString coord_str = " " + QString::number(coord.Lat(), 'f', 6) + "   " + QString::number(coord.Lng(), 'f', 6);
-        QString relativeCoord_str = " Distance:" + QString::number(relativeCoord.distante) + " Bearing:" + QString::number(relativeCoord.bearing*180/M_PI);
+        QString relativeCoord_str = " Distance:" + QString::number(relativeCoord.distance) + " Bearing:" + QString::number(relativeCoord.bearing*180/M_PI);
         setToolTip(QString("WayPoint Number:%1\nDescription:%2\nCoordinate:%4\nFrom Home:%5\nAltitude:%6\nType:%7").arg(QString::number(WayPointItem::number)).arg(description).arg(coord_str).arg(relativeCoord_str).arg(QString::number(altitude)).arg(type_str));
     }
 

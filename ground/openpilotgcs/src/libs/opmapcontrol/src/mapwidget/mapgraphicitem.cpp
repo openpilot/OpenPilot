@@ -46,6 +46,7 @@ namespace mapcontrol
         connect(core,SIGNAL(OnMapZoomChanged()),this,SLOT(ChildPosRefresh()));
         //resize();
     }
+
     void MapGraphicItem::start()
     {
         core->StartSystem();

@@ -61,6 +61,9 @@ private:
     internals::PointLatLng original_coord;
     double original_altitude;
     QString original_description;
+    double original_distance;
+    double original_bearing;
+    mapcontrol::WayPointItem::wptype original_type;
 
     mapcontrol::WayPointItem *waypoint_item;
 
@@ -69,6 +72,7 @@ private:
 private slots:
 
 private slots:
+    void setupWidgets(bool isRelative);
     void on_pushButtonCancel_clicked();
     void on_pushButtonRevert_clicked();
     void on_pushButtonApply_clicked();

@@ -37,6 +37,7 @@
 /* Prototype of PIOS_Board_Init() function */
 extern void PIOS_Board_Init(void);
 extern void FLASH_Download();
+void check_bor();
 #define BSL_HOLD_STATE ((PIOS_USB_DETECT_GPIO_PORT->IDR & PIOS_USB_DETECT_GPIO_PIN) ? 0 : 1)
 
 /* Private typedef -----------------------------------------------------------*/
@@ -74,6 +75,10 @@ int main() {
 	PIOS_SYS_Init();	
 	PIOS_Board_Init();
 	PIOS_IAP_Init();
+
+	// Make sure the brown out reset value for this chip
+	// is 2.7 volts
+	check_bor();
 
 	USB_connected = PIOS_USB_CheckAvailable(0);
 
@@ -204,5 +209,21 @@ uint8_t processRX() {
 		processComand(mReceive_Buffer);
 	}
 	return true;
+}
+
+/**
+ * Check the brown out reset threshold is 2.7 volts and if not
+ * resets it.  This solves an issue that can prevent boards
+ * powering up with some BEC
+ */
+void check_bor()
+{
+	uint8_t bor = FLASH_OB_GetBOR();
+	if(bor != OB_BOR_LEVEL3) {
+		FLASH_OB_Unlock();
+		FLASH_OB_BORConfig(OB_BOR_LEVEL3);
+		FLASH_OB_Lock();
+		while(FLASH_WaitForLastOperation() == FLASH_BUSY);
+	}
 }
 

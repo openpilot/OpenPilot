@@ -39,6 +39,7 @@
 #include <QtCore/QSignalMapper>
 #include <QtCore/QDebug>
 #include "waypoint.h"
+#include "waypointactive.h"
 #include "pathaction.h"
 
 PathActionEditorTreeModel::PathActionEditorTreeModel(QObject *parent) :
@@ -50,6 +51,7 @@ PathActionEditorTreeModel::PathActionEditorTreeModel(QObject *parent) :
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
     connect(objManager, SIGNAL(newInstance(UAVObject*)), this, SLOT(newInstance(UAVObject*)));
+    connect(objManager->getObject("WaypointActive"),SIGNAL(objectUpdated(UAVObject*)), this, SLOT(objUpdated(UAVObject*)));
 
     setupModelData(objManager);
 }
@@ -324,8 +326,8 @@ void PathActionEditorTreeModel::updateHighlight(TreeItem *item)
         searchItem = searchItem->parent();
     }
     if (objItem) {
-	item->apply();
-	objItem->apply();
+    item->apply();
+    objItem->apply();
         UAVObject *obj = objItem->object();
         Q_ASSERT(obj);
         obj->updated();
@@ -336,11 +338,11 @@ void PathActionEditorTreeModel::highlightUpdatedObject(UAVObject *obj)
 {
     Q_ASSERT(obj);
     if (obj->getName().compare("Waypoint")==0) {
-	    m_waypointsTree->update();
-	    //emit dataChanged(index(m_waypointsTree), index(m_waypointsTree));
+        m_waypointsTree->update();
+        //emit dataChanged(index(m_waypointsTree), index(m_waypointsTree));
     } else if (obj->getName().compare("PathAction")==0) {
-	    m_pathactionsTree->update();
-	    //emit dataChanged(index(m_pathactionsTree), index(m_pathactionsTree));
+        m_pathactionsTree->update();
+        //emit dataChanged(index(m_pathactionsTree), index(m_pathactionsTree));
     }
 }
 
@@ -348,11 +350,37 @@ void PathActionEditorTreeModel::newInstance(UAVObject *obj)
 {
    
     if (obj->getName().compare("Waypoint")==0) {
-	    addInstance(obj,m_waypointsTree);
-	    m_waypointsTree->update();
+        addInstance(obj,m_waypointsTree);
+        m_waypointsTree->update();
     } else if (obj->getName().compare("PathAction")==0) {
-	    addInstance(obj,m_pathactionsTree);
-	    m_pathactionsTree->update();
+        addInstance(obj,m_pathactionsTree);
+        m_pathactionsTree->update();
+    }
+    emit layoutChanged();
+}
+
+void PathActionEditorTreeModel::objUpdated(UAVObject *obj)
+{
+    if (obj->getName().compare("WaypointActive")==0) {
+        qint16 index = obj->getField("Index")->getValue().toInt();
+        qint16 action;
+        foreach (TreeItem *child,m_waypointsTree->treeChildren()) {
+            ObjectTreeItem *objItem = dynamic_cast<ObjectTreeItem*>(child);
+            if (index == objItem->object()->getInstID()) {
+                child->setActive(true);
+                action = objItem->object()->getField("Action")->getValue().toInt();
+            } else {
+                child->setActive(false);
+            }
+        }
+        foreach (TreeItem *child,m_pathactionsTree->treeChildren()) {
+            ObjectTreeItem *objItem = dynamic_cast<ObjectTreeItem*>(child);
+            if (action == objItem->object()->getInstID()) {
+                child->setActive(true);
+            } else {
+                child->setActive(false);
+            }
+        }
     }
     emit layoutChanged();
 }

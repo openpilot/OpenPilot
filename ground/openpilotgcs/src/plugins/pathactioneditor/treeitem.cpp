@@ -105,9 +105,16 @@ void TreeItem::apply() {
 }
 
 void TreeItem::setHighlight(bool highlight) {
-    m_highlight = highlight;
+    //m_highlight = highlight;
     m_changed = false;
 }
+
+void TreeItem::setActive(bool highlight) {
+    m_highlight = highlight;
+    foreach(TreeItem *child, treeChildren())
+        child->setActive(highlight);
+}
+
 
 void TreeItem::removeHighlight() {
     m_highlight = false;

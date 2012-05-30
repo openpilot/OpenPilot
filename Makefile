@@ -655,7 +655,7 @@ EF_BOARDS  := $(ALL_BOARDS)
 
 # FIXME: The BU image doesn't work for F4 boards so we need to
 #        filter them out to prevent errors.
-BU_BOARDS  := $(filter-out revolution, $(BU_BOARDS))
+BU_BOARDS  := $(filter-out revolution osd, $(BU_BOARDS))
 
 # SimPosix doesn't have a BL, BU or EF target so we need to
 # filter them out to prevent errors on the all_flight target.

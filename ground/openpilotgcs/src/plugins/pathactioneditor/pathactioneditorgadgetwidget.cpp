@@ -45,6 +45,7 @@ PathActionEditorGadgetWidget::PathActionEditorGadgetWidget(QWidget *parent) : QL
     m_model = new PathActionEditorTreeModel();
     m_pathactioneditor->pathactions->setModel(m_model);
     m_pathactioneditor->pathactions->setColumnWidth(0, 300);
+    m_pathactioneditor->pathactions->setColumnWidth(1, 500);
     m_pathactioneditor->pathactions->expandAll();
     BrowserItemDelegate *m_delegate = new BrowserItemDelegate();
     m_pathactioneditor->pathactions->setItemDelegate(m_delegate);

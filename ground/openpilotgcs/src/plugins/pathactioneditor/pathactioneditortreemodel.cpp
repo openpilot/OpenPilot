@@ -48,12 +48,14 @@ PathActionEditorTreeModel::PathActionEditorTreeModel(QObject *parent) :
         m_manuallyChangedColor(QColor(230, 230, 255))
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    m_objManager = pm->getObject<UAVObjectManager>();
 
-    connect(objManager, SIGNAL(newInstance(UAVObject*)), this, SLOT(newInstance(UAVObject*)));
-    connect(objManager->getObject("WaypointActive"),SIGNAL(objectUpdated(UAVObject*)), this, SLOT(objUpdated(UAVObject*)));
+    connect(m_objManager, SIGNAL(newInstance(UAVObject*)), this, SLOT(newInstance(UAVObject*)));
+    connect(m_objManager->getObject("WaypointActive"),SIGNAL(objectUpdated(UAVObject*)), this, SLOT(objUpdated(UAVObject*)));
+    connect(m_objManager->getObject("PathAction"),SIGNAL(objectUpdated(UAVObject*)), this, SLOT(objUpdated(UAVObject*)));
+    connect(m_objManager->getObject("Waypoint"),SIGNAL(objectUpdated(UAVObject*)), this, SLOT(objUpdated(UAVObject*)));
 
-    setupModelData(objManager);
+    setupModelData();
 }
 
 PathActionEditorTreeModel::~PathActionEditorTreeModel()
@@ -61,8 +63,12 @@ PathActionEditorTreeModel::~PathActionEditorTreeModel()
     delete m_rootItem;
 }
 
-void PathActionEditorTreeModel::setupModelData(UAVObjectManager *objManager)
+void PathActionEditorTreeModel::setupModelData()
 {
+
+    m_actions = new QStringList();
+    updateActions();
+
     // root
     QList<QVariant> rootData;
     rootData << tr("Property") << tr("Value") << tr("Unit");
@@ -77,17 +83,34 @@ void PathActionEditorTreeModel::setupModelData(UAVObjectManager *objManager)
     connect(m_waypointsTree, SIGNAL(updateHighlight(TreeItem*)), this, SLOT(updateHighlight(TreeItem*)));
 
     {
-        QList<UAVObject*> list = objManager->getObjectInstances("PathAction");
+        QList<UAVObject*> list = m_objManager->getObjectInstances("PathAction");
         foreach (UAVObject* obj, list) {
             addInstance(obj,m_pathactionsTree);
         }
     }
     {
-        QList<UAVObject*> list = objManager->getObjectInstances("Waypoint");
+        QList<UAVObject*> list = m_objManager->getObjectInstances("Waypoint");
         foreach (UAVObject* obj, list) {
             addInstance(obj,m_waypointsTree);
         }
     }
+}
+
+void PathActionEditorTreeModel::updateActions() {
+	m_actions->clear();
+        QList<UAVObject*> list = m_objManager->getObjectInstances("PathAction");
+        foreach (UAVObject* obj, list) {
+	    QString title;
+	    title.append((QVariant(obj->getInstID()).toString()));
+	    title.append(" ");
+	    title.append((obj->getField("Mode")->getValue().toString()));
+	    title.append(" ");
+	    title.append((obj->getField("Command")->getValue().toString()));
+	    title.append(":");
+	    title.append((obj->getField("EndCondition")->getValue().toString()));
+	    title.append(" ");
+	    m_actions->append(title);
+        }
 }
 
 void PathActionEditorTreeModel::addInstance(UAVObject *obj, TreeItem *parent)
@@ -128,6 +151,12 @@ void PathActionEditorTreeModel::addSingleField(int index, UAVObjectField *field,
 
     FieldTreeItem *item;
     UAVObjectField::FieldType type = field->getType();
+    // hack: list available actions in an enum
+    if (field->getName().compare("Action")==0 && type==UAVObjectField::UINT8) {
+	data.append( field->getValue(index).toInt());
+        data.append( field->getUnits());
+        item = new ActionFieldTreeItem(field, index, data, m_actions);
+    } else {
     switch (type) {
     case UAVObjectField::ENUM: {
         QStringList options = field->getOptions();
@@ -154,6 +183,7 @@ void PathActionEditorTreeModel::addSingleField(int index, UAVObjectField *field,
         break;
     default:
         Q_ASSERT(false);
+    }
     }
     connect(item, SIGNAL(updateHighlight(TreeItem*)), this, SLOT(updateHighlight(TreeItem*)));
     parent->appendChild(item);
@@ -272,7 +302,13 @@ QVariant PathActionEditorTreeModel::data(const QModelIndex &index, int role) con
         if (fieldItem) {
             int enumIndex = fieldItem->data(index.column()).toInt();
             return fieldItem->enumOptions(enumIndex);
-        }
+        } else {
+            ActionFieldTreeItem *afieldItem = dynamic_cast<ActionFieldTreeItem*>(item);
+            if (afieldItem) {
+                int enumIndex = afieldItem->data(index.column()).toInt();
+                return afieldItem->enumOptions(enumIndex);
+            }
+	}
     }
 
     return item->data(index.column());
@@ -356,32 +392,32 @@ void PathActionEditorTreeModel::newInstance(UAVObject *obj)
         addInstance(obj,m_pathactionsTree);
         m_pathactionsTree->update();
     }
+    updateActions();
     emit layoutChanged();
 }
 
 void PathActionEditorTreeModel::objUpdated(UAVObject *obj)
 {
-    if (obj->getName().compare("WaypointActive")==0) {
-        qint16 index = obj->getField("Index")->getValue().toInt();
-        qint16 action;
-        foreach (TreeItem *child,m_waypointsTree->treeChildren()) {
-            ObjectTreeItem *objItem = dynamic_cast<ObjectTreeItem*>(child);
-            if (index == objItem->object()->getInstID()) {
-                child->setActive(true);
-                action = objItem->object()->getField("Action")->getValue().toInt();
-            } else {
-                child->setActive(false);
-            }
-        }
-        foreach (TreeItem *child,m_pathactionsTree->treeChildren()) {
-            ObjectTreeItem *objItem = dynamic_cast<ObjectTreeItem*>(child);
-            if (action == objItem->object()->getInstID()) {
-                child->setActive(true);
-            } else {
-                child->setActive(false);
-            }
+    quint16 index = m_objManager->getObject("WaypointActive")->getField("Index")->getValue().toInt();
+    quint16 action;
+    foreach (TreeItem *child,m_waypointsTree->treeChildren()) {
+        ObjectTreeItem *objItem = dynamic_cast<ObjectTreeItem*>(child);
+        if (index == objItem->object()->getInstID()) {
+            child->setActive(true);
+            action = objItem->object()->getField("Action")->getValue().toInt();
+        } else {
+            child->setActive(false);
         }
     }
+    foreach (TreeItem *child,m_pathactionsTree->treeChildren()) {
+        ObjectTreeItem *objItem = dynamic_cast<ObjectTreeItem*>(child);
+        if (action == objItem->object()->getInstID()) {
+            child->setActive(true);
+        } else {
+            child->setActive(false);
+        }
+    }
+    updateActions();
     emit layoutChanged();
 }
 

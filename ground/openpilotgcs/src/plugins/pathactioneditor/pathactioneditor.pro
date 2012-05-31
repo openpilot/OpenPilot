@@ -23,6 +23,7 @@ SOURCES += treeitem.cpp
 SOURCES += fieldtreeitem.cpp
 SOURCES += browseritemdelegate.cpp
 
+
 OTHER_FILES += pathactioneditor.pluginspec
 
 FORMS += pathactioneditor.ui

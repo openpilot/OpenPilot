@@ -270,4 +270,58 @@ private:
     UAVObjectField *m_field;
 };
 
+class ActionFieldTreeItem : public FieldTreeItem
+{
+Q_OBJECT
+public:
+    ActionFieldTreeItem(UAVObjectField *field, int index, const QList<QVariant> &data, QStringList *actions,
+                      TreeItem *parent = 0) :
+    FieldTreeItem(index, data, parent), m_field(field) { m_enumOptions=actions; }
+    ActionFieldTreeItem(UAVObjectField *field, int index, const QVariant &data, QStringList *actions,
+                      TreeItem *parent = 0) :
+    FieldTreeItem(index, data, parent), m_field(field) { m_enumOptions=actions; }
+    void setData(QVariant value, int column) {
+        int tmpValIndex = m_field->getValue(m_index).toInt();
+        TreeItem::setData(value, column);
+        setChanged(tmpValIndex != value);
+    }
+    QString enumOptions(int index) {
+        if((index < 0) || (index >= m_enumOptions->length())) {
+            return QString("Invalid Value (") + QString().setNum(index) + QString(")");
+        }
+        return m_enumOptions->at(index);
+    }
+    void apply() {
+        int value = data(dataColumn).toInt();
+        m_field->setValue(value, m_index);
+        setChanged(false);
+    }
+    void update() {
+        int valIndex = m_field->getValue(m_index).toInt();
+        if (data() != valIndex || changed()) {
+            TreeItem::setData(valIndex);
+            setHighlight(true);
+        }
+    }
+    QWidget *createEditor(QWidget *parent) {
+        QComboBox *editor = new QComboBox(parent);
+        foreach (QString option, *m_enumOptions)
+            editor->addItem(option);
+        return editor;
+    }
+
+    QVariant getEditorValue(QWidget *editor) {
+        QComboBox *comboBox = static_cast<QComboBox*>(editor);
+        return comboBox->currentIndex();
+    }
+
+    void setEditorValue(QWidget *editor, QVariant value) {
+        QComboBox *comboBox = static_cast<QComboBox*>(editor);
+        comboBox->setCurrentIndex(value.toInt());
+    }
+private:
+    QStringList *m_enumOptions;
+    UAVObjectField *m_field;
+};
+
 #endif // FIELDTREEITEM_H

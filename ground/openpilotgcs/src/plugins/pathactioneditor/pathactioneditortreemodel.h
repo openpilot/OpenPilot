@@ -82,7 +82,11 @@ private:
     void addSingleField(int index, UAVObjectField *field, TreeItem *parent);
     void addInstance(UAVObject *obj, TreeItem *parent);
     //QString updateMode(quint8 updateMode);
-    void setupModelData(UAVObjectManager *objManager);
+    void setupModelData();
+    void updateActions();
+
+    UAVObjectManager *m_objManager;
+    QStringList *m_actions;
 
     TreeItem *m_rootItem;
     TopTreeItem *m_pathactionsTree;

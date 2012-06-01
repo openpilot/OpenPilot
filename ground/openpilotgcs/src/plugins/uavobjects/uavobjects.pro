@@ -74,8 +74,10 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/attitudesettings.h \
     $$UAVOBJECT_SYNTHETICS/txpidsettings.h \
     $$UAVOBJECT_SYNTHETICS/cameradesired.h \
-    $$UAVOBJECT_SYNTHETICS/faultsettings.h
-
+    $$UAVOBJECT_SYNTHETICS/faultsettings.h \
+    $$UAVOBJECT_SYNTHETICS/waypoint.h \
+    $$UAVOBJECT_SYNTHETICS/waypointactive.h \
+    $$UAVOBJECT_SYNTHETICS/pathaction.h
 SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/ahrsstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/ahrscalibration.cpp \
@@ -128,4 +130,7 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/attitudesettings.cpp \
     $$UAVOBJECT_SYNTHETICS/txpidsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/cameradesired.cpp \
-    $$UAVOBJECT_SYNTHETICS/faultsettings.cpp
+    $$UAVOBJECT_SYNTHETICS/faultsettings.cpp \
+    $$UAVOBJECT_SYNTHETICS/waypoint.cpp \
+    $$UAVOBJECT_SYNTHETICS/waypointactive.cpp \
+    $$UAVOBJECT_SYNTHETICS/pathaction.cpp

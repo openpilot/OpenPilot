@@ -147,20 +147,12 @@ private slots:
     * Some are currently disabled for the v1.0 plugin version.
     */
     void comboBoxFindPlace_returnPressed();
-    void on_toolButtonFindPlace_clicked();
     void on_toolButtonZoomM_clicked();
     void on_toolButtonZoomP_clicked();
     void on_toolButtonMapHome_clicked();
     void on_toolButtonMapUAV_clicked();
     void on_toolButtonMapUAVheading_clicked();
     void on_horizontalSliderZoom_sliderMoved(int position);
-    void on_toolButtonAddWaypoint_clicked();
-    void on_treeViewWaypoints_clicked(QModelIndex index);
-    void on_toolButtonHome_clicked();
-    void on_toolButtonNextWaypoint_clicked();
-    void on_toolButtonPrevWaypoint_clicked();
-    void on_toolButtonHoldPosition_clicked();
-    void on_toolButtonGo_clicked();
     void on_toolButtonMagicWaypointMapMode_clicked();
     void on_toolButtonNormalMapMode_clicked();
     void on_toolButtonHomeWaypoint_clicked();
@@ -195,7 +187,6 @@ private slots:
     void onCopyMouseLatLonToClipAct_triggered();
     void onCopyMouseLatToClipAct_triggered();
     void onCopyMouseLonToClipAct_triggered();
-    void onFindPlaceAct_triggered();
     void onShowCompassAct_toggled(bool show);
     void onShowDiagnostics_toggled(bool show);
     void onShowUAVAct_toggled(bool show);
@@ -293,7 +284,6 @@ private:
 	QAction *copyMouseLatLonToClipAct;
     QAction *copyMouseLatToClipAct;
     QAction *copyMouseLonToClipAct;
-    QAction *findPlaceAct;
     QAction *showCompassAct;
     QAction *showDiagnostics;
     QAction *showHomeAct;

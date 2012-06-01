@@ -488,9 +488,6 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
 
     menu.addSeparator();
 
-
-    menu.addAction(findPlaceAct);
-
     menu.addSeparator();
 
     QMenu safeArea("Safety Area definitions");
@@ -1448,13 +1445,6 @@ void OPMapGadgetWidget::createActions()
     copyMouseLonToClipAct = new QAction(tr("Mouse longitude"), this);
     copyMouseLonToClipAct->setStatusTip(tr("Copy the mouse longitude to the clipboard"));
     connect(copyMouseLonToClipAct, SIGNAL(triggered()), this, SLOT(onCopyMouseLonToClipAct_triggered()));
-
-
-    findPlaceAct = new QAction(tr("&Find place"), this);
-    findPlaceAct->setShortcut(tr("Ctrl+F"));
-    findPlaceAct->setStatusTip(tr("Find a location"));
-    connect(findPlaceAct, SIGNAL(triggered()), this, SLOT(onFindPlaceAct_triggered()));
-
 
     showCompassAct = new QAction(tr("Show compass"), this);
     showCompassAct->setStatusTip(tr("Show/Hide the compass"));

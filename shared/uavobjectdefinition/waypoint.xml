@@ -1,0 +1,12 @@
+<xml>
+    <object name="Waypoint" singleinstance="false" settings="false">
+        <description>A waypoint the aircraft can try and hit.  Used by the @ref PathPlanner module</description>
+        <field name="Position" units="m" type="float" elementnames="North, East, Down"/>
+	<field name="Velocity" units="m/s" type="float" elements="1"/>
+	<field name="Action" units="" type="uint8" elements="1" />
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetryflight acked="false" updatemode="periodic" period="4000"/>
+        <logging updatemode="periodic" period="1000"/>
+    </object>
+</xml>

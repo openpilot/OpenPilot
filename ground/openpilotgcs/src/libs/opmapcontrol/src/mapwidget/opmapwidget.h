@@ -43,6 +43,7 @@
 #include "mapripper.h"
 #include "waypointline.h"
 #include "waypointcircle.h"
+#include "waypointitem.h"
 namespace mapcontrol
 {
     class UAVItem;

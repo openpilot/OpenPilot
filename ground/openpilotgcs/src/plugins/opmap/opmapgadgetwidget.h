@@ -146,7 +146,6 @@ private slots:
     *
     * Some are currently disabled for the v1.0 plugin version.
     */
-    void comboBoxFindPlace_returnPressed();
     void on_toolButtonZoomM_clicked();
     void on_toolButtonZoomP_clicked();
     void on_toolButtonMapHome_clicked();

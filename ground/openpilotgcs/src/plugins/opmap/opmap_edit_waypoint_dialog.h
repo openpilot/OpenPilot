@@ -63,6 +63,8 @@ private:
     QString original_description;
     double original_distance;
     double original_bearing;
+
+
     mapcontrol::WayPointItem::wptype original_type;
 
     mapcontrol::WayPointItem *waypoint_item;

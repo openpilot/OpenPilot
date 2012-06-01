@@ -55,8 +55,8 @@
 #define BRIDGE_BUF_LEN 512
 #define MAX_RETRIES 2
 #define RETRY_TIMEOUT_MS 20
-#define STATS_UPDATE_PERIOD_MS 2000
-#define RADIOSTATS_UPDATE_PERIOD_MS 1000
+#define STATS_UPDATE_PERIOD_MS 500
+#define RADIOSTATS_UPDATE_PERIOD_MS 250
 #define MAX_LOST_CONTACT_TIME 4
 #define PACKET_QUEUE_SIZE 10
 #define MAX_PORT_DELAY 200
@@ -294,7 +294,6 @@ static void comUAVTalkTask(void *parameters)
 		uint8_t rx_byte;
 		if(!BufferedRead(f, &rx_byte, MAX_PORT_DELAY))
 			continue;
-		data->txBytes++;
 
 		// Get a TX packet from the packet handler if required.
 		if (p == NULL)
@@ -814,6 +813,7 @@ static int32_t transmitData(uint8_t *buf, int32_t length)
  */
 static int32_t transmitPacket(PHPacketHandle p)
 {
+	data->txBytes += PH_PACKET_SIZE(p);
 	return PIOS_COM_SendBuffer(PIOS_COM_RADIO, (uint8_t*)p, PH_PACKET_SIZE(p));
 }
 

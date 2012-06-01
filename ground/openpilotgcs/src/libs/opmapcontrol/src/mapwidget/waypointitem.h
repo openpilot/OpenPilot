@@ -154,6 +154,10 @@ public:
     void RefreshPos();
     void RefreshToolTip();
     QPixmap picture;
+    QVariant customData(){return myCustomData;}
+    void setCustomData(QVariant arg){myCustomData=arg;}
+    QString customString(){return myCustomString;}
+    void setCustomString(QString arg){myCustomString=arg;}
 ~WayPointItem();
 
     static int snumber;
@@ -183,6 +187,8 @@ private:
     QTransform transf;
     HomeItem * myHome;
     wptype myType;
+    QVariant myCustomData;
+    QString myCustomString;
 
 public slots:
     /**
@@ -224,6 +230,8 @@ signals:
     */
     void WPValuesChanged(WayPointItem* waypoint);
     void waypointdoubleclick(WayPointItem* waypoint);
+    void localPositionChanged(QPointF point);
+    void aboutToBeDeleted(WayPointItem *);
 };
 }
 #endif // WAYPOINTITEM_H

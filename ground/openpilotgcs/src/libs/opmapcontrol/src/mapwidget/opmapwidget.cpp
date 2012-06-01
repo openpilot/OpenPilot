@@ -42,6 +42,7 @@ namespace mapcontrol
         this->setScene(&mscene);
         Home=new HomeItem(map,this);
         Home->setParentItem(map);
+        Home->setZValue(-1);
         setStyleSheet("QToolTip {font-size:8pt; color:blue;opacity: 223; padding:2px; border-width:2px; border-style:solid; border-color: rgb(170, 170, 127);border-radius:4px }");
         this->adjustSize();
         connect(map,SIGNAL(zoomChanged(double,double,double)),this,SIGNAL(zoomChanged(double,double,double)));
@@ -102,6 +103,15 @@ namespace mapcontrol
             GPS->SetUavPic(UAVPic);
 
 
+    }
+
+    WayPointLine * OPMapWidget::WPLineCreate(WayPointItem *from, WayPointItem *to)
+    {
+        return new WayPointLine(from,to,map);
+    }
+    WayPointCircle * OPMapWidget::WPCircleCreate(WayPointItem *from, WayPointItem *to, bool clockwise)
+    {
+        return new WayPointCircle(from,to,clockwise,map);
     }
     void OPMapWidget::SetShowUAV(const bool &value)
     {

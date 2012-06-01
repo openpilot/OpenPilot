@@ -41,6 +41,8 @@
 #include "gpsitem.h"
 #include "homeitem.h"
 #include "mapripper.h"
+#include "waypointline.h"
+#include "waypointcircle.h"
 namespace mapcontrol
 {
     class UAVItem;
@@ -358,6 +360,8 @@ namespace mapcontrol
         bool ShowHome()const{return showhome;}
         void SetShowDiagnostics(bool const& value);
         void SetUavPic(QString UAVPic);
+        WayPointLine * WPLineCreate(WayPointItem *from,WayPointItem *to);
+        WayPointCircle *WPCircleCreate(WayPointItem *from, WayPointItem *to,bool clockwise);
     private:
         internals::Core *core;
         MapGraphicItem *map;

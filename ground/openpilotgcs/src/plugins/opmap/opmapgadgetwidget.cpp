@@ -273,7 +273,18 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     distBearing db;
     db.distance=100;
     db.bearing=0;
-    m_map->WPCreate(db,10,"aaa");
+    WayPointItem * p1=m_map->WPCreate(db,10,"aaa");
+
+    db.distance=100;
+    db.bearing=45;
+    WayPointItem * p2=m_map->WPCreate(db,10,"bbb");
+    m_map->WPCircleCreate(p2,p1,true);
+    t_waypoint *wp = new t_waypoint;
+    wp->map_wp_item=p1;
+    m_waypoint_list.append(wp);
+    wp=new t_waypoint;
+    wp->map_wp_item=p2;
+    m_waypoint_list.append(wp);
     // **************
     // create various context menu (mouse right click menu) actions
 

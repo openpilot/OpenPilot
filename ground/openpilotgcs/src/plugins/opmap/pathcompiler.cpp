@@ -24,10 +24,12 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#include "pathcompiler.h"
-#include "uavobjectmanager.h"
-#include "waypoint.h"
-#include "homelocation.h"
+#include <pathcompiler.h>
+#include <extensionsystem/pluginmanager.h>
+#include <utils/coordinateconversions.h>
+#include <uavobjectmanager.h>
+#include <waypoint.h>
+#include <homelocation.h>
 
 PathCompiler::PathCompiler(QObject *parent) :
     QObject(parent)
@@ -36,7 +38,7 @@ PathCompiler::PathCompiler(QObject *parent) :
     HomeLocation *homeLocation = NULL;
 
     /* Connect the object updates */
-    waypoint = Waypoint::GetInstance(getObjectManger());
+    waypoint = Waypoint::GetInstance(getObjectManager());
     Q_ASSERT(waypoint);
     if(waypoint)
         connect(waypoint, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(doUpdateFromUAV()));
@@ -53,12 +55,12 @@ PathCompiler::PathCompiler(QObject *parent) :
 UAVObjectManager * PathCompiler::getObjectManager()
 {
     ExtensionSystem::PluginManager *pm = NULL;
-    UAVObjectUtilManager *objMngr = NULL;
+    UAVObjectManager *objMngr = NULL;
 
     pm = ExtensionSystem::PluginManager::instance();
     Q_ASSERT(pm);
     if(pm)
-        objMngr = pm->getObject<UAVObjectUtilManager>();
+        objMngr = pm->getObject<UAVObjectManager>();
     Q_ASSERT(objMngr);
 
     return objMngr;
@@ -69,8 +71,9 @@ UAVObjectManager * PathCompiler::getObjectManager()
  * @param filename The file to save the path to
  * @returns -1 for failure, 0 for success
  */
-int PathCompiler::savePath(QString filename = null)
+int PathCompiler::savePath(QString filename)
 {
+    Q_UNUSED(filename);
     return -1;
 }
 
@@ -79,8 +82,9 @@ int PathCompiler::savePath(QString filename = null)
  * @param filename The file to load from
  * @returns -1 for failure, 0 for success
  */
-int PathCompiler::loadPath(QString filename = null)
+int PathCompiler::loadPath(QString filename)
 {
+    Q_UNUSED(filename);
     return -1;
 }
 
@@ -89,18 +93,24 @@ int PathCompiler::loadPath(QString filename = null)
   * @param waypoint the new waypoint to add
   * @param position which position to insert it to, defaults to end
   */
-void PathCompiler::doAddWaypoint(struct PathCompiler::waypoint, int position = -1)
+void PathCompiler::doAddWaypoint(struct PathCompiler::waypoint, int /* position */)
 {
-    emit visualizationChanged(waypoints);
+
 }
 
 /**
   * Delete a waypoint
   * @param index which waypoint to delete
   */
-void PathCompiler::doDelWaypoint(int index)
+void PathCompiler::doDelWaypoint(int /*index*/)
 {
-    emit visualizationChanged(waypoints);
+    // This method is awkward because there is no support
+    // on the FC for actually deleting a waypoint.  We need
+    // to shift them all by one and set the new "last" waypoint
+    // to a stop action
+
+    // Not implemented yet
+    Q_ASSERT(false);
 }
 
 /**
@@ -109,5 +119,71 @@ void PathCompiler::doDelWaypoint(int index)
   */
 void PathCompiler::doUpdateFromUAV()
 {
+    UAVObjectManager *objManager = getObjectManager();
+    if (!objManager)
+        return;
+
+    Waypoint *waypointObj = Waypoint::GetInstance(getObjectManager());
+    Q_ASSERT(waypointObj);
+    if (waypointObj == NULL)
+        return;
+
+    /* Get all the waypoints from the UAVO and create a representation for the visualization */
+    QList <struct PathCompiler::waypoint> waypoints;
+    waypoints.clear();
+    int numWaypoints = objManager->getNumInstances(waypointObj->getObjID());
+    for (int i = 0; i < numWaypoints; i++) {
+        Waypoint *waypoint = Waypoint::GetInstance(objManager, i);
+        Q_ASSERT(waypoint);
+        if(waypoint == NULL)
+            return;
+
+        waypoints.append(UavoToInternal(waypoint->getData()));
+    }
+
+    /* Inform visualization */
     emit visualizationChanged(waypoints);
 }
+
+/**
+  * Convert a UAVO waypoint to the local structure
+  * @param uavo The UAVO data representation
+  * @return The waypoint structure for visualization
+  */
+struct PathCompiler::waypoint PathCompiler::UavoToInternal(Waypoint::DataFields uavo)
+{
+    double homeLLA[3];
+    double LLA[3];
+    double NED[3];
+    struct PathCompiler::waypoint internalWaypoint;
+
+    HomeLocation *homeLocation = HomeLocation::GetInstance(getObjectManager());
+    Q_ASSERT(homeLocation);
+    if (homeLocation == NULL)
+        return internalWaypoint;
+    HomeLocation::DataFields homeLocationData = homeLocation->getData();
+    homeLLA[0] = homeLocationData.Latitude / 10e6;
+    homeLLA[1] = homeLocationData.Longitude / 10e6;
+    homeLLA[2] = homeLocationData.Altitude;
+
+    NED[0] = uavo.Position[Waypoint::POSITION_NORTH];
+    NED[1] = uavo.Position[Waypoint::POSITION_EAST];
+    NED[2] = uavo.Position[Waypoint::POSITION_DOWN];
+    Utils::CoordinateConversions().GetLLA(homeLLA, NED, LLA);
+
+    internalWaypoint.latitude = LLA[0];
+    internalWaypoint.longitude = LLA[1];
+    return internalWaypoint;
+}
+
+/**
+  * Convert a UAVO waypoint to the local structure
+  * @param internal The internal structure type
+  * @returns The waypoint UAVO data structure
+  */
+Waypoint::DataFields PathCompiler::InternalToUavo(struct waypoint /*internal*/)
+{
+    Waypoint::DataFields uavo;
+    return uavo;
+}
+

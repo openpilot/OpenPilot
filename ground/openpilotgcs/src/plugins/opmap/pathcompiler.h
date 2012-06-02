@@ -30,6 +30,7 @@
 #include <QObject>
 #include <uavobject.h>
 #include <uavobjectmanager.h>
+#include <waypoint.h>
 
 // TODO: Make this a singleton class and separate from map library.  Not sure of the proper design pattern in Qt.
 // factory? static variables?
@@ -47,23 +48,26 @@ public:
     explicit PathCompiler(QObject *parent = 0);
 
     //! This method opens a dialog (if filename is null) and saves the path
-    int savePath(QString filename = null);
+    int savePath(QString filename = NULL);
 
     //! This method opens a dialog (if filename is null) and loads the path
-    int loadPath(QString filename = null);
+    int loadPath(QString filename = NULL);
 
     //! Waypoint representation that is exchanged between visualization
     struct waypoint {
-        float latitude;
-        float longitude;
+        double latitude;
+        double longitude;
     };
 
 private:
     //! Helper method to get uavobject manager
     UAVObjectManager * getObjectManager();
 
-    //! The internal list of waypoints
-    QList <struct waypoint> waypoints;
+    //! Convert a UAVO waypoint to the local structure
+    struct PathCompiler::waypoint UavoToInternal(Waypoint::DataFields);
+
+    //! Convert a UAVO waypoint to the local structure
+    Waypoint::DataFields InternalToUavo(struct waypoint);
 
 signals:
     /**

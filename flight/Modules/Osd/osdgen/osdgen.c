@@ -1897,6 +1897,91 @@ void setGpsOsd(uint8_t status, int32_t lat, int32_t lon, float alt, float spd)
 	m_gpsSpd=spd;
 }
 
+void draw_artificial_horizon(float angle, float pitch, int16_t l_x, int16_t l_y, int16_t size )
+{
+	float alpha;
+
+	int16_t x1,x2,x3,x4;
+	int16_t y1,y2,y3,y4;
+	int16_t y_pitch;
+	// rotated corners
+	int16_t ax1,ax2,ax3,ax4,ay1,ay2,ay3,ay4;
+	int16_t refx,refy;
+	alpha=DEG2RAD(angle);
+
+	// move up or down Size
+	y_pitch=(pitch/90.0f*(size/2))+size/2;
+
+	// center rotate point
+	refx=l_x + size/2;
+	refy=l_y + size/2;
+
+	x1=l_x - size/2;
+	y1=l_y + y_pitch;
+	x2=l_x + size + size/2;
+	y2=l_y + y_pitch;
+	x3=l_x + size + size/2;
+	y3=l_y + size + y_pitch;
+	x4=l_x - size/2;
+	y4=l_y + size + y_pitch;
+
+	ax1=refy+(x1-refx)*cosf(alpha)-(y1-refy)*sinf(alpha);
+	ay1=refy+(x1-refx)*sinf(alpha)+(y1-refy)*cosf(alpha);
+
+	ax2=refy+(x2-refx)*cosf(alpha)-(y2-refy)*sinf(alpha);
+	ay2=refy+(x2-refx)*sinf(alpha)+(y2-refy)*cosf(alpha);
+
+	ax3=refy+(x3-refx)*cosf(alpha)-(y3-refy)*sinf(alpha);
+	ay3=refy+(x3-refx)*sinf(alpha)+(y3-refy)*cosf(alpha);
+
+	ax4=refy+(x4-refx)*cosf(alpha)-(y4-refy)*sinf(alpha);
+	ay4=refy+(x4-refx)*sinf(alpha)+(y4-refy)*cosf(alpha);
+
+	write_line_outlined(ax1,ay1,ax2,ay2,0,0,0,1);
+	//fill
+	for(int i=0;i<(size);i++)
+	{
+		x1=l_x - size/2;
+		y1=l_y + y_pitch + i;
+		x2=l_x + size + size/2;
+		y2=l_y + y_pitch + i;
+		ax1=refy+(x1-refx)*cosf(alpha)-(y1-refy)*sinf(alpha);
+		ay1=refy+(x1-refx)*sinf(alpha)+(y1-refy)*cosf(alpha);
+		ax2=refy+(x2-refx)*cosf(alpha)-(y2-refy)*sinf(alpha);
+		ay2=refy+(x2-refx)*sinf(alpha)+(y2-refy)*cosf(alpha);
+
+		write_line_lm(ax1,ay1,ax2,ay2,1,1);
+	}
+	//fill2
+	for(int i=0;i<(size*2);i++)
+	{
+		x1=l_x - size/2 + i;
+		y1=l_y + y_pitch;
+		x4=l_x - size/2 + i;
+		y4=l_y + size + y_pitch;
+		ax1=refy+(x1-refx)*cosf(alpha)-(y1-refy)*sinf(alpha);
+		ay1=refy+(x1-refx)*sinf(alpha)+(y1-refy)*cosf(alpha);
+		ax4=refy+(x4-refx)*cosf(alpha)-(y4-refy)*sinf(alpha);
+		ay4=refy+(x4-refx)*sinf(alpha)+(y4-refy)*cosf(alpha);
+
+		write_line_lm(ax1,ay1,ax4,ay4,1,1);
+	}
+
+	//sides
+	write_line_outlined(l_x,l_y,l_x,l_y+size,0,0,0,1);
+	write_line_outlined(l_x+size,l_y,l_x+size,l_y+size,0,0,0,1);
+	//plane
+	write_line_outlined(refx-5,refy,refx+6,refy,0,0,0,1);
+	write_line_outlined(refx,refy,refx,refy-3,0,0,0,1);
+	//needs better way to limit drawing outside the box
+	write_filled_rectangle_lm(l_x - size - size/2-1,	l_y - size - size/2-1,	size + size/2, 	size*4+2,		0,0); //left
+	write_filled_rectangle_lm(l_x + size + 1, 			l_y - size - size/2-1,	size + size/2, 	size*4+2,		0,0); //right
+	write_filled_rectangle_lm(l_x-1, 					l_y + size + 1,        	size+2, 		size + size/2,   0,0); //bot
+	write_filled_rectangle_lm(l_x-1, 					l_y - size - size/2-1, 	size+1, 		size + size/2+1, 0,0); //top
+
+}
+
+
 void introText(){
 	write_string("ver 0.2", APPLY_HDEADBAND((GRAPHICS_RIGHT/2)),APPLY_VDEADBAND(GRAPHICS_BOTTOM-10), 0, 0, TEXT_VA_BOTTOM, TEXT_HA_CENTER, 0, 3);
 }
@@ -2196,6 +2281,11 @@ void updateGraphics() {
 				}
 		}
 		break;
+		case 2:
+		{
+			draw_artificial_horizon(-attitude.Roll,attitude.Pitch,100,100,30);
+		}
+		break;
 		case 3:
 		{
 			lamas();
@@ -2273,7 +2363,7 @@ static void osdgenTask(void *parameters)
 	lastSysTime = xTaskGetTickCount();
 
 	// intro
-	for(int i=0; i<125; i++)
+	for(int i=0; i<63; i++)
 	{
         if( xSemaphoreTake( osdSemaphore, LONG_TIME ) == pdTRUE )
         {
@@ -2281,7 +2371,7 @@ static void osdgenTask(void *parameters)
 			introGraphics();
         }
 	}
-	for(int i=0; i<125; i++)
+	for(int i=0; i<63; i++)
 	{
         if( xSemaphoreTake( osdSemaphore, LONG_TIME ) == pdTRUE )
         {

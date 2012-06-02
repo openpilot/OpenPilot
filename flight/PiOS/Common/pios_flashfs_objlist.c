@@ -186,6 +186,7 @@ static int32_t PIOS_FLASHFS_GetObjAddress(uint32_t objId, uint16_t instId)
  * @retval -2 No room in object table
  * @retval -3 Unable to write entry into object table
  * @retval -4 FS not initialized
+ * @retval -5
  */
 int32_t PIOS_FLASHFS_GetNewAddress(uint32_t objId, uint16_t instId)
 {
@@ -205,6 +206,10 @@ int32_t PIOS_FLASHFS_GetNewAddress(uint32_t objId, uint16_t instId)
 	// No room for this header in object table
 	if((addr + sizeof(header)) > cfg->obj_table_end)
 		return -2;
+
+	// Verify the address is within the chip
+	if((addr + cfg->sector_size) > cfg->chip_size)
+		return -5;
 
 	if(PIOS_Flash_Jedec_WriteData(addr, (uint8_t *) &header, sizeof(header)) != 0)
 		return -3;

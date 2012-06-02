@@ -40,7 +40,7 @@
 
 #include "homelocation.h"
 #include "positionactual.h"
-
+#include <pathcompiler.h>
 #include <math.h>
 
 #include "utils/stylehelper.h"
@@ -145,6 +145,10 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_magic_waypoint.time_seconds = 0;
     m_magic_waypoint.hold_time_seconds = 0;
 
+    // Connect to the path compiler to get updates from the waypoints
+    pathCompiler = new PathCompiler(this);
+    connect(pathCompiler,SIGNAL(visualizationChanged(QList<PathCompiler::waypoint>)),
+            this, SLOT(doVisualizationChanged(QList<PathCompiler::waypoint>)));
     // **************
     // create the widget that holds the user controls and the map
 
@@ -2415,4 +2419,22 @@ bool OPMapGadgetWidget::setHomeLocationObject()
 void OPMapGadgetWidget::SetUavPic(QString UAVPic)
 {
     m_map->SetUavPic(UAVPic);
+}
+
+/**
+  * Called from path compiler whenever the path to visualize has changed
+  */
+void OPMapGadgetWidget::doVisualizationChanged(QList<PathCompiler::waypoint> waypoints)
+{
+    m_map->WPDeleteAll();
+    foreach (PathCompiler::waypoint waypoint, waypoints) {
+        internals::PointLatLng position(waypoint.latitude, waypoint.longitude);
+
+        WayPointItem * wayPointItem = m_map->WPCreate(position, 0, "Waypoint");
+        Q_ASSERT(wayPointItem);
+        if(wayPointItem) {
+            wayPointItem->setFlag(QGraphicsItem::ItemIsMovable, false);
+            wayPointItem->picture.load(QString::fromUtf8(":/opmap/images/waypoint_marker1.png"));
+        }
+    }
 }

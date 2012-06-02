@@ -53,6 +53,7 @@
 #include "uavobject.h"
 #include "objectpersistence.h"
 
+#include <pathcompiler.h>
 // ******************************************************
 
 namespace Ui
@@ -182,6 +183,7 @@ private slots:
     void WPValuesChanged(WayPointItem* waypoint);
     void WPInserted(int const& number, WayPointItem* waypoint);
     void WPDeleted(int const& number);
+    void doVisualizationChanged(QList<PathCompiler::waypoint>);
 
     /**
     * @brief mouse right click context menu signals
@@ -267,7 +269,9 @@ private:
 
     mapcontrol::WayPointItem *m_mouse_waypoint;
 
+    PathCompiler *pathCompiler;
     QList<t_waypoint *> m_waypoint_list;
+
     QMutex m_waypoint_list_mutex;
 
     QMutex m_map_mutex;

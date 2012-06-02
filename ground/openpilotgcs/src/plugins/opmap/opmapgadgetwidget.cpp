@@ -2427,14 +2427,16 @@ void OPMapGadgetWidget::SetUavPic(QString UAVPic)
 void OPMapGadgetWidget::doVisualizationChanged(QList<PathCompiler::waypoint> waypoints)
 {
     m_map->WPDeleteAll();
+    int index = 0;
     foreach (PathCompiler::waypoint waypoint, waypoints) {
         internals::PointLatLng position(waypoint.latitude, waypoint.longitude);
 
-        WayPointItem * wayPointItem = m_map->WPCreate(position, 0, "Waypoint");
+        WayPointItem * wayPointItem = m_map->WPCreate(position, 0, QString(index));
         Q_ASSERT(wayPointItem);
         if(wayPointItem) {
             wayPointItem->setFlag(QGraphicsItem::ItemIsMovable, false);
             wayPointItem->picture.load(QString::fromUtf8(":/opmap/images/waypoint_marker1.png"));
+            index++;
         }
     }
 }

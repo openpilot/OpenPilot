@@ -40,6 +40,18 @@
   * UAVObject representation on the flight controller.  It also can support multiple
   * ways of converting a path from what the user clicked to the underlying representation
   * to achieve the desired end flight trajectory
+  *
+  * So the chain of data for the map lib is:
+  *    FC <-> PathCompiler <-> OPMapGadget <-> OPMapLib
+  *
+  * The goal is that PathCompiler be as state free as is possible.  Eventually for more
+  * complicated path compilation this will probably not be achievable.  That means it
+  * should not cache a copy of waypoints locally if that can be avoided (i.e. it should
+  * refer directly to what is stored on the FC).
+  *
+  * For the visualization to have the ability to manipulate the path though it needs to
+  * be able to map unambiguously from the graphical items to the internal waypoints. It
+  * must cache a lookup from the graphical item to the index from this tool.
   */
 class PathCompiler : public QObject
 {

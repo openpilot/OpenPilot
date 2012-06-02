@@ -178,7 +178,9 @@ void PathCompiler::doDelWaypoint(int index)
             return;
 
         // Copy the data down an index
-        waypointDest->setData(waypointSrc->getData());
+        Waypoint::DataFields waypoint = waypointSrc->getData();
+        waypointDest->setData(waypoint);
+        waypointDest->updated();
     }
 
     // Set the second to last waypoint to stop (and last for safety)
@@ -191,10 +193,9 @@ void PathCompiler::doDelWaypoint(int index)
             Waypoint::DataFields waypointData = waypoint->getData();
             waypointData.Action = Waypoint::ACTION_STOP;
             waypoint->setData(waypointData);
+            waypoint->updated();
         }
     }
-
-    waypoint->updated();
 }
 
 /**

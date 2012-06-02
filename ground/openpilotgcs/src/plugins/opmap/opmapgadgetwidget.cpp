@@ -1332,23 +1332,6 @@ void OPMapGadgetWidget::setMapMode(opMapModeType mode)
         }
         m_map->WPDeleteAll();
 
-        // restore the normal waypoints on the map
-        m_waypoint_list_mutex.lock();
-        foreach (t_waypoint *wp, m_waypoint_list)
-        {
-            if (!wp) continue;
-            wp->map_wp_item = m_map->WPCreate(wp->coord, wp->altitude, wp->description);
-            if (!wp->map_wp_item) continue;
-            wp->map_wp_item->setZValue(10 + wp->map_wp_item->Number());
-            wp->map_wp_item->setFlag(QGraphicsItem::ItemIsMovable, !wp->locked);
-            if (!wp->locked)
-                wp->map_wp_item->picture.load(QString::fromUtf8(":/opmap/images/waypoint_marker1.png"));
-            else
-                wp->map_wp_item->picture.load(QString::fromUtf8(":/opmap/images/waypoint_marker2.png"));
-            wp->map_wp_item->update();
-        }
-        m_waypoint_list_mutex.unlock();
-
         break;
 
     case MagicWaypoint_MapMode:
@@ -1896,6 +1879,10 @@ void OPMapGadgetWidget::onUAVTrailDistanceActGroup_triggered(QAction *action)
     m_map->UAV->SetTrailDistance(trail_distance);
 }
 
+/**
+  * Called when the add waypoint menu item is selected
+  * the coordinate clicked is in m_context_menu_lat_lon
+  */
 void OPMapGadgetWidget::onAddWayPointAct_triggered()
 {
     Q_ASSERT(m_widget);
@@ -1955,6 +1942,10 @@ void OPMapGadgetWidget::onLockWayPointAct_triggered()
     m_mouse_waypoint = NULL;
 }
 
+/**
+  * Called when the delete waypoint menu item is selected
+  * the waypoint clicked is in m_mouse_waypoint
+  */
 void OPMapGadgetWidget::onDeleteWayPointAct_triggered()
 {
     Q_ASSERT(m_widget);
@@ -1968,8 +1959,12 @@ void OPMapGadgetWidget::onDeleteWayPointAct_triggered()
 
     Q_ASSERT(m_mouse_waypoint);
     if(m_mouse_waypoint) {
-        int waypointIdx = m_mouse_waypoint->Description().toInt();
+        int waypointIdx = m_mouse_waypoint->Number();
 
+        if(waypointIdx < 0) {
+            qDebug() << "WTF Map gadget.  Wrong number";
+            return;
+        }
         Q_ASSERT(pathCompiler);
         if(pathCompiler)
             pathCompiler->doDelWaypoint(waypointIdx);
@@ -2373,7 +2368,7 @@ void OPMapGadgetWidget::doVisualizationChanged(QList<PathCompiler::waypoint> way
         WayPointItem * wayPointItem = m_map->WPCreate(position, 0, QString(index));
         Q_ASSERT(wayPointItem);
         if(wayPointItem) {
-            wayPointItem->setFlag(QGraphicsItem::ItemIsMovable, false);
+            wayPointItem->setFlag(QGraphicsItem::ItemIsMovable, true);
             wayPointItem->picture.load(QString::fromUtf8(":/opmap/images/waypoint_marker1.png"));
             index++;
         }

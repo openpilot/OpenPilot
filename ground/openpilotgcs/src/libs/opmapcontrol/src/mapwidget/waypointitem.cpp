@@ -97,8 +97,14 @@ namespace mapcontrol
     {
         if(event->button()==Qt::LeftButton)
         {
-            delete text;
-            delete textBG;
+            if(text) {
+                delete text;
+                text = NULL;
+            }
+            if(textBG) {
+                delete textBG;
+                textBG = NULL;
+            }
             coord=map->FromLocalToLatLng(this->pos().x(),this->pos().y());
             isDragging=false;
             RefreshToolTip();

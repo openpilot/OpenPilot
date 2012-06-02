@@ -109,6 +109,11 @@ public slots:
       */
     void doDelWaypoint(int index);
 
+    /**
+      * Delete all the waypoints
+      */
+    void doDelAllWaypoints();
+
 public slots:
     /**
       * These are slots that the UAV can call to update the path.

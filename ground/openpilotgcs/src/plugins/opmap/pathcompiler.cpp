@@ -121,7 +121,7 @@ void PathCompiler::doAddWaypoint(struct PathCompiler::waypoint waypoint, int /*p
   * Delete a waypoint
   * @param index which waypoint to delete
   */
-void PathCompiler::doDelWaypoint(int /*index*/)
+void PathCompiler::doDelWaypoint(int index)
 {
     // This method is awkward because there is no support
     // on the FC for actually deleting a waypoint.  We need
@@ -130,6 +130,14 @@ void PathCompiler::doDelWaypoint(int /*index*/)
 
     // Not implemented yet
     Q_ASSERT(false);
+}
+
+/**
+  * Delete all the waypoints
+  */
+void PathCompiler::doDelAllWaypoints()
+{
+
 }
 
 /**

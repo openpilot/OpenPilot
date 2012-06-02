@@ -1957,52 +1957,22 @@ void OPMapGadgetWidget::onLockWayPointAct_triggered()
 
 void OPMapGadgetWidget::onDeleteWayPointAct_triggered()
 {
+    Q_ASSERT(m_widget);
+    Q_ASSERT(m_map);
+
     if (!m_widget || !m_map)
         return;
 
     if (m_map_mode != Normal_MapMode)
         return;
 
-    if (!m_mouse_waypoint)
-        return;
+    Q_ASSERT(m_mouse_waypoint);
+    if(m_mouse_waypoint) {
+        int waypointIdx = m_mouse_waypoint->Description().toInt();
 
-    bool locked = (m_mouse_waypoint->flags() & QGraphicsItem::ItemIsMovable) == 0;
-
-    if (locked) return;	// waypoint is locked
-
-    QMutexLocker locker(&m_waypoint_list_mutex);
-
-    for (int i = 0; i < m_waypoint_list.count(); i++)
-    {
-        t_waypoint *wp = m_waypoint_list.at(i);
-        if (!wp) continue;
-        if (!wp->map_wp_item || wp->map_wp_item != m_mouse_waypoint) continue;
-
-        // delete the waypoint from the map
-        m_map->WPDelete(wp->map_wp_item);
-
-        // delete the waypoint from our local waypoint list
-        m_waypoint_list.removeAt(i);
-
-        delete wp;
-
-        break;
-    }
-
-    foreach (t_waypoint *wp, m_waypoint_list)
-    {
-        if (!wp) continue;
-        if (!wp->map_wp_item || wp->map_wp_item != m_mouse_waypoint) continue;
-
-        // delete the waypoint from the map
-        m_map->WPDelete(wp->map_wp_item);
-
-        // delete the waypoint from our local waypoint list
-        m_waypoint_list.removeOne(wp);
-
-        delete wp;
-
-        break;
+        Q_ASSERT(pathCompiler);
+        if(pathCompiler)
+            pathCompiler->doDelWaypoint(waypointIdx);
     }
 
     m_mouse_waypoint = NULL;
@@ -2013,26 +1983,18 @@ void OPMapGadgetWidget::onDeleteWayPointAct_triggered()
   */
 void OPMapGadgetWidget::onClearWayPointsAct_triggered()
 {
+    Q_ASSERT(m_widget);
+    Q_ASSERT(m_map);
+
     if (!m_widget || !m_map)
         return;
 
     if (m_map_mode != Normal_MapMode)
         return;
 
-    QMutexLocker locker(&m_waypoint_list_mutex);
-
-    m_map->WPDeleteAll();
-
-    foreach (t_waypoint *wp, m_waypoint_list)
-    {
-        if (wp)
-        {
-            delete wp;
-            wp = NULL;
-        }
-    }
-
-    m_waypoint_list.clear();
+    Q_ASSERT(pathCompiler);
+    if(pathCompiler)
+        pathCompiler->doDelAllWaypoints();
 }
 
 void OPMapGadgetWidget::onHomeMagicWaypointAct_triggered()

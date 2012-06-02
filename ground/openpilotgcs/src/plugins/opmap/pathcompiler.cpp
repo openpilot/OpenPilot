@@ -128,8 +128,38 @@ void PathCompiler::doDelWaypoint(int index)
     // to shift them all by one and set the new "last" waypoint
     // to a stop action
 
-    // Not implemented yet
-    Q_ASSERT(false);
+    UAVObjectManager *objManager = getObjectManager();
+    Waypoint *waypoint = Waypoint::GetInstance(objManager);
+    Q_ASSERT(waypoint);
+    if (!waypoint)
+        return;
+
+    int numWaypoints = objManager->getNumInstances(waypoint->getObjID());
+    for (int i = index; i < numWaypoints - 1; i++) {
+        Waypoint *waypointDest = Waypoint::GetInstance(objManager, i);
+        Q_ASSERT(waypointDest);
+
+        Waypoint *waypointSrc = Waypoint::GetInstance(objManager, i + 1);
+        Q_ASSERT(waypointSrc);
+
+        if (!waypointDest || !waypointSrc)
+            return;
+
+        // Copy the data down an index
+        waypointDest->setData(waypointSrc->getData());
+    }
+
+    // Set the second to last waypoint to stop (and last for safety)
+    // the functional equivalent to deleting
+    for (int i = numWaypoints - 2; i < numWaypoints; i++) {
+        waypoint = Waypoint::GetInstance(objManager, i);
+        Q_ASSERT(waypoint);
+        if (waypoint) {
+            Waypoint::DataFields waypointData = waypoint->getData();
+            waypointData.Action = Waypoint::ACTION_STOP;
+            waypoint->setData(waypointData);
+        }
+    }
 }
 
 /**
@@ -137,7 +167,21 @@ void PathCompiler::doDelWaypoint(int index)
   */
 void PathCompiler::doDelAllWaypoints()
 {
+    Waypoint *waypointObj = Waypoint::GetInstance(getObjectManager(), 0);
+    Q_ASSERT(waypointObj);
+    if (waypointObj == NULL)
+        return;
 
+    int numWaypoints = getObjectManager()->getNumInstances(waypointObj->getObjID());
+    for (int i = 0; i < numWaypoints; i++) {
+        Waypoint *waypoint = Waypoint::GetInstance(getObjectManager(), i);
+        Q_ASSERT(waypoint);
+        if (waypoint) {
+            Waypoint::DataFields waypointData = waypoint->getData();
+            waypointData.Action = Waypoint::ACTION_STOP;
+            waypoint->setData(waypointData);
+        }
+    }
 }
 
 /**
@@ -159,13 +203,16 @@ void PathCompiler::doUpdateFromUAV()
     QList <struct PathCompiler::waypoint> waypoints;
     waypoints.clear();
     int numWaypoints = objManager->getNumInstances(waypointObj->getObjID());
-    for (int i = 0; i < numWaypoints; i++) {
+    bool stopped = false;
+    for (int i = 0; i < numWaypoints && !stopped; i++) {
         Waypoint *waypoint = Waypoint::GetInstance(objManager, i);
         Q_ASSERT(waypoint);
         if(waypoint == NULL)
             return;
 
-        waypoints.append(UavoToInternal(waypoint->getData()));
+        Waypoint::DataFields waypointData = waypoint->getData();
+        waypoints.append(UavoToInternal(waypointData));
+        stopped = waypointData.Action == Waypoint::ACTION_STOP;
     }
 
     /* Inform visualization */
@@ -215,7 +262,6 @@ Waypoint::DataFields PathCompiler::InternalToUavo(struct waypoint internal)
     double homeLLA[3];
     double LLA[3];
     double NED[3];
-    struct PathCompiler::waypoint internalWaypoint;
 
     HomeLocation *homeLocation = HomeLocation::GetInstance(getObjectManager());
     Q_ASSERT(homeLocation);
@@ -237,7 +283,7 @@ Waypoint::DataFields PathCompiler::InternalToUavo(struct waypoint internal)
     uavo.Position[Waypoint::POSITION_EAST] = NED[1];
     uavo.Position[Waypoint::POSITION_DOWN] = NED[2];
 
-    uavo.Action = Waypoint::ACTION_NEXT;
+    uavo.Action = Waypoint::ACTION_PATHTONEXT;
 
     uavo.Velocity[Waypoint::VELOCITY_NORTH] = 5;
     uavo.Velocity[Waypoint::VELOCITY_EAST] = 0;

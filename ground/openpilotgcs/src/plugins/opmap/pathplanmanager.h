@@ -30,14 +30,10 @@
 
 #include <QWidget>
 #include "opmapcontrol/opmapcontrol.h"
-
-namespace Ui {
-class pathPlanManager;
-}
-using namespace mapcontrol;
-class pathPlanManager : public QWidget
+#include "pathaction.h"
+#include "waypoint.h"
+namespace mapcontrol
 {
-    Q_OBJECT
     struct customData
     {
         float velocity;
@@ -49,17 +45,30 @@ class pathPlanManager : public QWidget
         int jumpdestination;
         int errordestination;
     };
+
+}
+Q_DECLARE_METATYPE(mapcontrol::customData)
+namespace Ui {
+class pathPlanManager;
+}
+using namespace mapcontrol;
+class pathPlanManager : public QDialog
+{
+    Q_OBJECT
 public:
     explicit pathPlanManager(QWidget *parent,OPMapWidget * map);
     ~pathPlanManager();
+    WayPointItem *findWayPointNumber(int number);
 private slots:
-    void on_WPDeleted(int);
+    void refreshOverlays();
+    void on_WPDeleted(int wp_numberint, WayPointItem *);
     void on_WPInserted(int,WayPointItem*);
     void on_WPNumberChanged(int,int,WayPointItem*);
     void on_WPValuesChanged(WayPointItem*);
 private:
     Ui::pathPlanManager *ui;
     OPMapWidget * myMap;
+    QList<WayPointItem*> * waypoints;
 };
 
 #endif // PATHPLANMANAGER_H

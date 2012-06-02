@@ -176,7 +176,7 @@ private slots:
     void WPNumberChanged(int const& oldnumber,int const& newnumber, WayPointItem* waypoint);
     void WPValuesChanged(WayPointItem* waypoint);
     void WPInserted(int const& number, WayPointItem* waypoint);
-    void WPDeleted(int const& number);
+    void WPDeleted(int const& number, WayPointItem* waypoint);
 
     /**
     * @brief mouse right click context menu signals

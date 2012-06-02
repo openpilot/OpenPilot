@@ -44,13 +44,14 @@ class WayPointLine:public QObject,public QGraphicsLineItem
 public:
     enum { Type = UserType + 8 };
     WayPointLine(WayPointItem * from, WayPointItem * to,MapGraphicItem * map,QColor color=Qt::green);
+    WayPointLine(HomeItem * from, WayPointItem * to,MapGraphicItem * map,QColor color=Qt::green);
     int type() const;
     QPainterPath shape() const;
     void setColor(const QColor &color)
         { myColor = color; }
 private:
-    WayPointItem * source;
-    WayPointItem * destination;
+    QGraphicsItem * source;
+    QGraphicsItem * destination;
     MapGraphicItem * my_map;
     QPolygonF arrowHead;
     QColor myColor;

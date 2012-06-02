@@ -362,7 +362,10 @@ namespace mapcontrol
         void SetShowDiagnostics(bool const& value);
         void SetUavPic(QString UAVPic);
         WayPointLine * WPLineCreate(WayPointItem *from,WayPointItem *to);
-        WayPointCircle *WPCircleCreate(WayPointItem *from, WayPointItem *to,bool clockwise);
+        WayPointLine * WPLineCreate(HomeItem *from,WayPointItem *to);
+        WayPointCircle *WPCircleCreate(WayPointItem *center, WayPointItem *radius,bool clockwise);
+        WayPointCircle *WPCircleCreate(HomeItem *center, WayPointItem *radius,bool clockwise);
+        void deleteAllOverlays();
     private:
         internals::Core *core;
         MapGraphicItem *map;
@@ -412,6 +415,9 @@ namespace mapcontrol
         * @param waypoint WayPoint inserted
         */
         void WPReached(WayPointItem* waypoint);
+
+        void WPCreated(int const& number,WayPointItem* waypoint);
+
         /**
                * @brief Fires when a new WayPoint is inserted
                *
@@ -424,7 +430,7 @@ namespace mapcontrol
         *
         * @param number number of the deleted WayPoint
         */
-        void WPDeleted(int const& number);
+        void WPDeleted(int const& number,WayPointItem* waypoint);
         /**
         * @brief Fires When a WayPoint is Reached
         *

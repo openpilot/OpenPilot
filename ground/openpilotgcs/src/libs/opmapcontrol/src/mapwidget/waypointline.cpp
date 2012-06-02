@@ -26,7 +26,7 @@
 */
 #include "waypointline.h"
 #include <math.h>
-
+#include "homeitem.h"
 const qreal Pi = 3.14;
 
 namespace mapcontrol
@@ -35,10 +35,19 @@ WayPointLine::WayPointLine(WayPointItem *from, WayPointItem *to, MapGraphicItem 
     destination(to),my_map(map),QGraphicsLineItem(map),myColor(color)
 {
     this->setLine(to->pos().x(),to->pos().y(),from->pos().x(),from->pos().y());
-    connect(source,SIGNAL(localPositionChanged(QPointF)),this,SLOT(refreshLocations()));
-    connect(destination,SIGNAL(localPositionChanged(QPointF)),this,SLOT(refreshLocations()));
-    connect(source,SIGNAL(aboutToBeDeleted(WayPointItem*)),this,SLOT(waypointdeleted()));
-    connect(destination,SIGNAL(aboutToBeDeleted(WayPointItem*)),this,SLOT(waypointdeleted()));
+    connect(from,SIGNAL(localPositionChanged(QPointF)),this,SLOT(refreshLocations()));
+    connect(to,SIGNAL(localPositionChanged(QPointF)),this,SLOT(refreshLocations()));
+    connect(from,SIGNAL(aboutToBeDeleted(WayPointItem*)),this,SLOT(waypointdeleted()));
+    connect(to,SIGNAL(aboutToBeDeleted(WayPointItem*)),this,SLOT(waypointdeleted()));
+}
+
+WayPointLine::WayPointLine(HomeItem *from, WayPointItem *to, MapGraphicItem *map, QColor color):source(from),
+    destination(to),my_map(map),QGraphicsLineItem(map),myColor(color)
+{
+    this->setLine(to->pos().x(),to->pos().y(),from->pos().x(),from->pos().y());
+    connect(from,SIGNAL(homePositionChanged(internals::PointLatLng)),this,SLOT(refreshLocations()));
+    connect(to,SIGNAL(localPositionChanged(QPointF)),this,SLOT(refreshLocations()));
+    connect(to,SIGNAL(aboutToBeDeleted(WayPointItem*)),this,SLOT(waypointdeleted()));
 }
 int WayPointLine::type() const
 {

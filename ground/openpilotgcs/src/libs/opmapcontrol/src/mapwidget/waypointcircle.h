@@ -44,14 +44,15 @@ class WayPointCircle:public QObject,public QGraphicsEllipseItem
     Q_INTERFACES(QGraphicsItem)
 public:
     enum { Type = UserType + 9 };
-    WayPointCircle(WayPointItem * from, WayPointItem * to,bool clockwise,MapGraphicItem * map,QColor color=Qt::green);
+    WayPointCircle(WayPointItem * center, WayPointItem * radius,bool clockwise,MapGraphicItem * map,QColor color=Qt::green);
+    WayPointCircle(HomeItem * center, WayPointItem * radius,bool clockwise,MapGraphicItem * map,QColor color=Qt::green);
     int type() const;
     QPainterPath shape() const;
     void setColor(const QColor &color)
         { myColor = color; }
 private:
-    WayPointItem * source;
-    WayPointItem * destination;
+    QGraphicsItem * my_center;
+    QGraphicsItem * my_radius;
     MapGraphicItem * my_map;
     QPolygonF arrowHead;
     QColor myColor;

@@ -247,12 +247,14 @@ WayPointItem::WayPointItem(const internals::PointLatLng &coord,int const& altitu
     }
     void WayPointItem::SetNumber(const int &value)
     {
-        emit WPNumberChanged(number,value,this);
+        int oldnumber=number;
         number=value;
         RefreshToolTip();
         numberI->setText(QString::number(number));
         numberIBG->setRect(numberI->boundingRect().adjusted(-2,0,1,0));
         this->update();
+        qDebug()<<"emit"<<oldnumber<<value;
+        emit WPNumberChanged(oldnumber,value,this);
     }
     void WayPointItem::SetReached(const bool &value)
     {
@@ -288,22 +290,16 @@ WayPointItem::WayPointItem(const internals::PointLatLng &coord,int const& altitu
         }
         this->update();
     }
-    void WayPointItem::WPDeleted(const int &onumber)
+    void WayPointItem::WPDeleted(const int &onumber,WayPointItem *waypoint)
     {
-        if(number>onumber) --number;
-        numberI->setText(QString::number(number));
-        numberIBG->setRect(numberI->boundingRect().adjusted(-2,0,1,0));
-        RefreshToolTip();
-        this->update();
+        Q_UNUSED(waypoint);
+        if(number>onumber) SetNumber(--number);
     }
     void WayPointItem::WPInserted(const int &onumber, WayPointItem *waypoint)
     {
         if(waypoint!=this)
         {
-            if(onumber<=number) ++number;
-            numberI->setText(QString::number(number));
-            RefreshToolTip();
-            this->update();
+            if(onumber<=number) SetNumber(++number);
         }
     }
 
@@ -324,25 +320,16 @@ WayPointItem::WayPointItem(const internals::PointLatLng &coord,int const& altitu
         {
             if(((oldnumber>number) && (newnumber<=number)))
             {
-                ++number;
-                numberI->setText(QString::number(number));
-                numberIBG->setRect(numberI->boundingRect().adjusted(-2,0,1,0));
-                RefreshToolTip();
+                SetNumber(++number);
             }
             else if (((oldnumber<number) && (newnumber>number)))
             {
-                --number;
-                numberI->setText(QString::number(number));
-                numberIBG->setRect(numberI->boundingRect().adjusted(-2,0,1,0));
-                RefreshToolTip();
+                SetNumber(--number);
             }
             else if (newnumber==number)
             {
-                ++number;
-                numberI->setText(QString::number(number));
-                RefreshToolTip();
+                SetNumber(++number);
             }
-            this->update();
         }
     }
     int WayPointItem::type() const

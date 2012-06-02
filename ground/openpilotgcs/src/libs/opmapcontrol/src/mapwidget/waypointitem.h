@@ -196,7 +196,7 @@ public slots:
     *
     * @param number number of the WayPoint that was deleted
     */
-    void WPDeleted(int const& number);
+    void WPDeleted(int const& number,WayPointItem *waypoint);
     /**
     * @brief Called when a WayPoint is renumbered
     *

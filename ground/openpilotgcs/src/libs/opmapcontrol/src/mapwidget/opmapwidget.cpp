@@ -101,17 +101,32 @@ namespace mapcontrol
             UAV->SetUavPic(UAVPic);
         if(GPS!=0)
             GPS->SetUavPic(UAVPic);
-
-
     }
 
     WayPointLine * OPMapWidget::WPLineCreate(WayPointItem *from, WayPointItem *to)
     {
+        if(!from|!to)
+            return NULL;
         return new WayPointLine(from,to,map);
     }
-    WayPointCircle * OPMapWidget::WPCircleCreate(WayPointItem *from, WayPointItem *to, bool clockwise)
+    WayPointLine * OPMapWidget::WPLineCreate(HomeItem *from, WayPointItem *to)
     {
-        return new WayPointCircle(from,to,clockwise,map);
+        if(!from|!to)
+            return NULL;
+        return new WayPointLine(from,to,map);
+    }
+    WayPointCircle * OPMapWidget::WPCircleCreate(WayPointItem *center, WayPointItem *radius, bool clockwise)
+    {
+        if(!center|!radius)
+            return NULL;
+        return new WayPointCircle(center,radius,clockwise,map);
+    }
+
+    WayPointCircle *OPMapWidget::WPCircleCreate(HomeItem *center, WayPointItem *radius, bool clockwise)
+    {
+        if(!center|!radius)
+            return NULL;
+        return new WayPointCircle(center,radius,clockwise,map);
     }
     void OPMapWidget::SetShowUAV(const bool &value)
     {
@@ -201,18 +216,24 @@ namespace mapcontrol
         WayPointItem* item=new WayPointItem(this->CurrentPosition(),0,map);
         ConnectWP(item);
         item->setParentItem(map);
+        int position=item->Number();
+        emit WPCreated(position,item);
         return item;
     }
     void OPMapWidget::WPCreate(WayPointItem* item)
     {
         ConnectWP(item);
         item->setParentItem(map);
+        int position=item->Number();
+        emit WPCreated(position,item);
     }
     WayPointItem* OPMapWidget::WPCreate(internals::PointLatLng const& coord,int const& altitude)
     {
         WayPointItem* item=new WayPointItem(coord,altitude,map);
         ConnectWP(item);
         item->setParentItem(map);
+        int position=item->Number();
+        emit WPCreated(position,item);
         return item;
     }
     WayPointItem* OPMapWidget::WPCreate(internals::PointLatLng const& coord,int const& altitude, QString const& description)
@@ -220,6 +241,8 @@ namespace mapcontrol
         WayPointItem* item=new WayPointItem(coord,altitude,description,map);
         ConnectWP(item);
         item->setParentItem(map);
+        int position=item->Number();
+        emit WPCreated(position,item);
         return item;
     }
     WayPointItem* OPMapWidget::WPCreate(const distBearing &relativeCoord, const int &altitude, const QString &description)
@@ -227,6 +250,8 @@ namespace mapcontrol
         WayPointItem* item=new WayPointItem(relativeCoord,altitude,description,map);
         ConnectWP(item);
         item->setParentItem(map);
+        int position=item->Number();
+        emit WPCreated(position,item);
         return item;
     }
     WayPointItem* OPMapWidget::WPInsert(const int &position)
@@ -266,7 +291,7 @@ namespace mapcontrol
     }
     void OPMapWidget::WPDelete(WayPointItem *item)
     {
-        emit WPDeleted(item->Number());
+        emit WPDeleted(item->Number(),item);
         delete item;
     }
     void OPMapWidget::WPDeleteAll()
@@ -276,6 +301,21 @@ namespace mapcontrol
             WayPointItem* w=qgraphicsitem_cast<WayPointItem*>(i);
             if(w)
                 delete w;
+        }
+    }
+    void OPMapWidget::deleteAllOverlays()
+    {
+        foreach(QGraphicsItem* i,map->childItems())
+        {
+            WayPointLine* w=qgraphicsitem_cast<WayPointLine*>(i);
+            if(w)
+                delete w;
+            else
+            {
+                WayPointCircle* ww=qgraphicsitem_cast<WayPointCircle*>(i);
+                if(ww)
+                    delete ww;
+            }
         }
     }
     QList<WayPointItem*> OPMapWidget::WPSelected()
@@ -300,7 +340,7 @@ namespace mapcontrol
         connect(item,SIGNAL(WPValuesChanged(WayPointItem*)),this,SIGNAL(WPValuesChanged(WayPointItem*)));
         connect(this,SIGNAL(WPInserted(int,WayPointItem*)),item,SLOT(WPInserted(int,WayPointItem*)));
         connect(this,SIGNAL(WPNumberChanged(int,int,WayPointItem*)),item,SLOT(WPRenumbered(int,int,WayPointItem*)));
-        connect(this,SIGNAL(WPDeleted(int)),item,SLOT(WPDeleted(int)));
+        connect(this,SIGNAL(WPDeleted(int,WayPointItem*)),item,SLOT(WPDeleted(int,WayPointItem*)));
     }
     void OPMapWidget::diagRefresh()
     {

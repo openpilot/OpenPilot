@@ -48,7 +48,7 @@
 
 #include "positionactual.h"
 #include "homelocation.h"
-
+#include "pathplanmanager.h"
 #define allow_manual_home_location_move
 
 // *************************************************************************************
@@ -263,13 +263,18 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     connect(m_map, SIGNAL(WPNumberChanged(int const&,int const&,WayPointItem*)), this, SLOT(WPNumberChanged(int const&,int const&,WayPointItem*)));
     connect(m_map, SIGNAL(WPValuesChanged(WayPointItem*)), this, SLOT(WPValuesChanged(WayPointItem*)));
     connect(m_map, SIGNAL(WPInserted(int const&, WayPointItem*)), this, SLOT(WPInserted(int const&, WayPointItem*)));
-    connect(m_map, SIGNAL(WPDeleted(int const&)), this, SLOT(WPDeleted(int const&)));
+    connect(m_map, SIGNAL(WPDeleted(int,WayPointItem*)), this, SLOT(WPDeleted(int,WayPointItem*)));
     connect(m_map,SIGNAL(OnWayPointDoubleClicked(WayPointItem*)),this,SLOT(wpDoubleClickEvent(WayPointItem*)));
 	m_map->SetCurrentPosition(m_home_position.coord);         // set the map position
 	m_map->Home->SetCoord(m_home_position.coord);             // set the HOME position
 	m_map->UAV->SetUAVPos(m_home_position.coord, 0.0);        // set the UAV position
     if(m_map->GPS)
         m_map->GPS->SetUAVPos(m_home_position.coord, 0.0);        // set the UAV position
+
+
+    pathPlanManager * plan=new pathPlanManager(new QWidget(),m_map);
+    plan->show();
+
     distBearing db;
     db.distance=100;
     db.bearing=0;
@@ -285,6 +290,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     wp=new t_waypoint;
     wp->map_wp_item=p2;
     m_waypoint_list.append(wp);
+
     // **************
     // create various context menu (mouse right click menu) actions
 
@@ -959,9 +965,10 @@ void OPMapGadgetWidget::WPInserted(int const &number, WayPointItem *waypoint)
 /**
   TODO: slot to do something upon Waypoint deletion
   */
-void OPMapGadgetWidget::WPDeleted(int const &number)
+void OPMapGadgetWidget::WPDeleted(int const &number, WayPointItem *waypoint)
 {
     Q_UNUSED(number);
+    Q_UNUSED(waypoint);
 }
 
 

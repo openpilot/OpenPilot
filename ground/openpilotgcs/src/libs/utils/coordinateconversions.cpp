@@ -143,6 +143,29 @@ int CoordinateConversions::GetLLA(double homeLLA[3], double NED[3], double posit
     return 0;
 }
 
+/**
+  * Get the current location in Longitude, Latitude Altitude (above WSG-48 ellipsoid)
+  * @param[in] BaseECEF the ECEF of the home location (in cm)
+  * @param[in] position three element double for position in degrees and meters
+  * @param[out] NED the offset from the home location (in m)
+  * @returns
+  *  @arg 0 success
+  *  @arg -1 for failure
+  */
+int CoordinateConversions::GetNED(double homeLLA[3], double position[3], double NED[3])
+{
+    double T[3];
+    T[0] = homeLLA[2]+6.378137E6f * M_PI / 180.0;
+    T[1] = cosf(homeLLA[0] * M_PI / 180.0)*(homeLLA[2]+6.378137E6f) * M_PI / 180.0;
+    T[2] = -1.0f;
+
+    NED[0] = (position[0] - homeLLA[0]) * T[0];
+    NED[1] = (position[1] - homeLLA[1]) * T[1];
+    NED[2] = (position[2] - homeLLA[2]) * T[2];
+
+    return 0;
+}
+
 void CoordinateConversions::LLA2Base(double LLA[3], double BaseECEF[3], float Rne[3][3], float NED[3])
 {
         double ECEF[3];

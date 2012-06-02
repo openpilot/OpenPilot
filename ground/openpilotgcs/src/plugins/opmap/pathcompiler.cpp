@@ -93,9 +93,28 @@ int PathCompiler::loadPath(QString filename)
   * @param waypoint the new waypoint to add
   * @param position which position to insert it to, defaults to end
   */
-void PathCompiler::doAddWaypoint(struct PathCompiler::waypoint, int /* position */)
+void PathCompiler::doAddWaypoint(struct PathCompiler::waypoint waypoint, int /*position*/)
 {
+    UAVObjectManager *objMngr;
+    objMngr = getObjectManager();
+    if (objMngr == NULL)
+        return;
 
+    /* TODO: If a waypoint is inserted not at the end shift them all by one and */
+    /* add the data there */
+
+    Waypoint *obj = new Waypoint();
+    Q_ASSERT(obj);
+    if (obj) {
+        // Register a new waypoint instance
+        quint32 newInstId = objMngr->getNumInstances(obj->getObjID());
+        obj->initialize(newInstId,obj->getMetaObject());
+        objMngr->registerObject(obj);
+
+        // Set the data in the new object
+        Waypoint::DataFields newWaypoint = InternalToUavo(waypoint);
+        obj->setData(newWaypoint);
+    }
 }
 
 /**
@@ -181,9 +200,41 @@ struct PathCompiler::waypoint PathCompiler::UavoToInternal(Waypoint::DataFields 
   * @param internal The internal structure type
   * @returns The waypoint UAVO data structure
   */
-Waypoint::DataFields PathCompiler::InternalToUavo(struct waypoint /*internal*/)
+Waypoint::DataFields PathCompiler::InternalToUavo(struct waypoint internal)
 {
     Waypoint::DataFields uavo;
+
+    double homeLLA[3];
+    double LLA[3];
+    double NED[3];
+    struct PathCompiler::waypoint internalWaypoint;
+
+    HomeLocation *homeLocation = HomeLocation::GetInstance(getObjectManager());
+    Q_ASSERT(homeLocation);
+    if (homeLocation == NULL)
+        return uavo;
+    HomeLocation::DataFields homeLocationData = homeLocation->getData();
+    homeLLA[0] = homeLocationData.Latitude / 10e6;
+    homeLLA[1] = homeLocationData.Longitude / 10e6;
+    homeLLA[2] = homeLocationData.Altitude;
+
+    // TODO: Give the point a concept of altitude
+    LLA[0] = internal.latitude;
+    LLA[1] = internal.longitude;
+    LLA[2] = -50;
+
+    Utils::CoordinateConversions().GetNED(homeLLA, LLA, NED);
+
+    uavo.Position[Waypoint::POSITION_NORTH] = NED[0];
+    uavo.Position[Waypoint::POSITION_EAST] = NED[1];
+    uavo.Position[Waypoint::POSITION_DOWN] = NED[2];
+
+    uavo.Action = Waypoint::ACTION_NEXT;
+
+    uavo.Velocity[Waypoint::VELOCITY_NORTH] = 5;
+    uavo.Velocity[Waypoint::VELOCITY_EAST] = 0;
+    uavo.Velocity[Waypoint::VELOCITY_DOWN] = 0;
+
     return uavo;
 }
 

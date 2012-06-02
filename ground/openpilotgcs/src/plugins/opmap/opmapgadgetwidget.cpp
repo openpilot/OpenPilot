@@ -2,7 +2,7 @@
  ******************************************************************************
  *
  * @file       opmapgadgetwidget.cpp
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup OPMapPlugin OpenPilot Map Plugin
@@ -1898,42 +1898,19 @@ void OPMapGadgetWidget::onUAVTrailDistanceActGroup_triggered(QAction *action)
 
 void OPMapGadgetWidget::onAddWayPointAct_triggered()
 {
+    Q_ASSERT(m_widget);
+    Q_ASSERT(m_map);
+
     if (!m_widget || !m_map)
         return;
 
     if (m_map_mode != Normal_MapMode)
         return;
 
-    m_waypoint_list_mutex.lock();
-
-    // create a waypoint on the map at the last known mouse position
-    t_waypoint *wp = new t_waypoint;
-    wp->map_wp_item = NULL;
-    wp->coord = m_context_menu_lat_lon;
-    wp->altitude = 0;
-    wp->description = "";
-    wp->locked = false;
-    wp->time_seconds = 0;
-    wp->hold_time_seconds = 0;
-    wp->map_wp_item = m_map->WPCreate(wp->coord, wp->altitude, wp->description);
-
-    wp->map_wp_item->setZValue(10 + wp->map_wp_item->Number());
-
-    wp->map_wp_item->setFlag(QGraphicsItem::ItemIsMovable, !wp->locked);
-
-    if (wp->map_wp_item)
-    {
-        if (!wp->locked)
-            wp->map_wp_item->picture.load(QString::fromUtf8(":/opmap/images/waypoint_marker1.png"));
-        else
-            wp->map_wp_item->picture.load(QString::fromUtf8(":/opmap/images/waypoint_marker2.png"));
-        wp->map_wp_item->update();
-    }
-
-    // and remember it in our own local waypoint list
-    m_waypoint_list.append(wp);
-
-    m_waypoint_list_mutex.unlock();
+    struct PathCompiler::waypoint newWaypoint;
+    newWaypoint.latitude = m_context_menu_lat_lon.Lat();
+    newWaypoint.longitude = m_context_menu_lat_lon.Lng();
+    pathCompiler->doAddWaypoint(newWaypoint);
 }
 
 /**

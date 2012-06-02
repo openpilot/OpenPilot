@@ -31,6 +31,8 @@
 #include <waypoint.h>
 #include <homelocation.h>
 
+#include <QDebug>
+
 PathCompiler::PathCompiler(QObject *parent) :
     QObject(parent)
 {
@@ -95,25 +97,54 @@ int PathCompiler::loadPath(QString filename)
   */
 void PathCompiler::doAddWaypoint(struct PathCompiler::waypoint waypoint, int /*position*/)
 {
-    UAVObjectManager *objMngr;
-    objMngr = getObjectManager();
-    if (objMngr == NULL)
-        return;
-
     /* TODO: If a waypoint is inserted not at the end shift them all by one and */
     /* add the data there */
 
-    Waypoint *obj = new Waypoint();
-    Q_ASSERT(obj);
-    if (obj) {
-        // Register a new waypoint instance
-        quint32 newInstId = objMngr->getNumInstances(obj->getObjID());
-        obj->initialize(newInstId,obj->getMetaObject());
-        objMngr->registerObject(obj);
+    UAVObjectManager *objManager = getObjectManager();
 
-        // Set the data in the new object
-        Waypoint::DataFields newWaypoint = InternalToUavo(waypoint);
-        obj->setData(newWaypoint);
+    // Format the data from the map into a UAVO
+    Waypoint::DataFields newWaypoint = InternalToUavo(waypoint);
+
+    // Search for any waypoints set to stop, because if they exist we
+    // should add the waypoint immediately after that one
+    int numWaypoints = objManager->getNumInstances(Waypoint::OBJID);
+    int i;
+    for (i = 0; i < numWaypoints; i++) {
+        Waypoint *waypoint = Waypoint::GetInstance(objManager, i);
+        Q_ASSERT(waypoint);
+        if(waypoint == NULL)
+            return;
+
+        Waypoint::DataFields waypointData = waypoint->getData();
+        if(waypointData.Action == Waypoint::ACTION_STOP) {
+            waypointData.Action = Waypoint::ACTION_PATHTONEXT;
+            waypoint->setData(waypointData);
+            break;
+        }
+    }
+
+    if (i >= numWaypoints - 1) {
+        // We reached end of list so new waypoint needs to be registered
+
+        Waypoint *waypoint = new Waypoint();
+        Q_ASSERT(waypoint);
+        if (waypoint) {
+            // Register a new waypoint instance
+            quint32 newInstId = objManager->getNumInstances(waypoint->getObjID());
+            waypoint->initialize(newInstId,waypoint->getMetaObject());
+            objManager->registerObject(waypoint);
+
+            // Set the data in the new object
+            waypoint->setData(newWaypoint);
+            waypoint->updated();
+        }
+    } else {
+        Waypoint *waypoint = Waypoint::GetInstance(objManager, i + 1);
+        Q_ASSERT(waypoint);
+        if (waypoint) {
+            waypoint->setData(newWaypoint);
+            waypoint->updated();
+        }
     }
 }
 
@@ -136,6 +167,7 @@ void PathCompiler::doDelWaypoint(int index)
 
     int numWaypoints = objManager->getNumInstances(waypoint->getObjID());
     for (int i = index; i < numWaypoints - 1; i++) {
+        qDebug() << "Copying from" << i+1 << "to" << i;
         Waypoint *waypointDest = Waypoint::GetInstance(objManager, i);
         Q_ASSERT(waypointDest);
 
@@ -152,6 +184,7 @@ void PathCompiler::doDelWaypoint(int index)
     // Set the second to last waypoint to stop (and last for safety)
     // the functional equivalent to deleting
     for (int i = numWaypoints - 2; i < numWaypoints; i++) {
+        qDebug() << "Stopping" << i;
         waypoint = Waypoint::GetInstance(objManager, i);
         Q_ASSERT(waypoint);
         if (waypoint) {
@@ -160,6 +193,8 @@ void PathCompiler::doDelWaypoint(int index)
             waypoint->setData(waypointData);
         }
     }
+
+    waypoint->updated();
 }
 
 /**
@@ -182,6 +217,8 @@ void PathCompiler::doDelAllWaypoints()
             waypoint->setData(waypointData);
         }
     }
+
+    waypointObj->updated();
 }
 
 /**

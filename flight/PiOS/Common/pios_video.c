@@ -80,7 +80,7 @@ void swap_buffers()
         // While we could use XOR swap this is more reliable and
         // dependable and it's only called a few times per second.
         // Many compliers should optimise these to EXCH instructions.
-        uint16_t *tmp;
+        uint8_t *tmp;
         SWAP_BUFFS(tmp, disp_buffer_mask, draw_buffer_mask);
         SWAP_BUFFS(tmp, disp_buffer_level, draw_buffer_level);
 }

@@ -256,7 +256,10 @@ void NotifyPluginOptionsPage::addDynamicField(UAVObjectField* objField)
         _dynamicFieldCondition->removeItem(smaller);
         _dynamicFieldCondition->removeItem(bigger);
     }
-    _dynamicFieldCondition->setCurrentIndex(_dynamicFieldCondition->findText(NotifyPluginOptionsPage::conditionValues.at(_selectedNotification->getCondition())));
+    int cond=_selectedNotification->getCondition();
+    if(cond<0)
+        return;
+    _dynamicFieldCondition->setCurrentIndex(_dynamicFieldCondition->findText(NotifyPluginOptionsPage::conditionValues.at(cond)));
 
             connect(_dynamicFieldCondition, SIGNAL(currentIndexChanged(QString)),
                     this, SLOT(on_changedIndex_rangeValue(QString)));
@@ -434,8 +437,10 @@ void NotifyPluginOptionsPage::updateConfigView(NotificationItem* notification)
         _optionsPage->SoundCollectionList->setCurrentIndex(_optionsPage->SoundCollectionList->findText("default"));
         _optionsPage->Sound3->setCurrentIndex(_optionsPage->Sound3->findText(notification->getSound3()));
     }
-
-    _dynamicFieldCondition->setCurrentIndex(_dynamicFieldCondition->findText(NotifyPluginOptionsPage::conditionValues.at(notification->getCondition())));
+    int cond=notification->getCondition();
+    if(cond<0)
+        return;
+    _dynamicFieldCondition->setCurrentIndex(_dynamicFieldCondition->findText(NotifyPluginOptionsPage::conditionValues.at(cond)));
 
     _sayOrder->setCurrentIndex(notification->getSayOrder());
 

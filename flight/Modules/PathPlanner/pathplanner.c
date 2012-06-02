@@ -146,7 +146,7 @@ static void pathPlannerTask(void *parameters)
 				// We hit this waypoint
 				if (r2 < (MIN_RADIUS * MIN_RADIUS)) {
 					switch(waypoint.Action) {
-						case WAYPOINT_ACTION_NEXT:
+						case WAYPOINT_ACTION_PATHTONEXT:
 							waypointActive.Index++;
 							WaypointActiveSet(&waypointActive);
 
@@ -159,6 +159,8 @@ static void pathPlannerTask(void *parameters)
 							pathDesired.End[PATHDESIRED_END_DOWN] = -20;
 							pathDesired.Mode = PATHDESIRED_MODE_ENDPOINT;
 							PathDesiredSet(&pathDesired);
+							break;
+						case WAYPOINT_ACTION_STOP:
 							break;
 						default:
 							PIOS_DEBUG_Assert(0);
@@ -179,7 +181,7 @@ static void pathPlannerTask(void *parameters)
 
 				if (progress.fractional_progress >= 1) {
 					switch(waypoint.Action) {
-						case WAYPOINT_ACTION_NEXT:
+						case WAYPOINT_ACTION_PATHTONEXT:
 							waypointActive.Index++;
 							WaypointActiveSet(&waypointActive);
 
@@ -192,6 +194,8 @@ static void pathPlannerTask(void *parameters)
 							pathDesired.End[PATHDESIRED_END_DOWN] = -20;
 							pathDesired.Mode = PATHDESIRED_MODE_ENDPOINT;
 							PathDesiredSet(&pathDesired);
+							break;
+						case WAYPOINT_ACTION_STOP:
 							break;
 						default:
 							PIOS_DEBUG_Assert(0);
@@ -300,7 +304,7 @@ static void createPathBox()
 	// Draw O
 	WaypointData waypoint;
 	waypoint.Velocity[0] = 2; // Since for now this isn't directional just set a mag
-	waypoint.Action = WAYPOINT_ACTION_NEXT;
+	waypoint.Action = WAYPOINT_ACTION_PATHTONEXT;
 
 	waypoint.Position[0] = 5;
 	waypoint.Position[1] = 5;
@@ -337,7 +341,7 @@ static void createPathLogo()
 		waypoint.Position[1] = 30 * cos(i / 19.0 * 2 * M_PI);
 		waypoint.Position[0] = 50 * sin(i / 19.0 * 2 * M_PI);
 		waypoint.Position[2] = -50;
-		waypoint.Action = WAYPOINT_ACTION_NEXT;
+		waypoint.Action = WAYPOINT_ACTION_PATHTONEXT;
 		WaypointCreateInstance();
 		bad_inits += (WaypointInstSet(i, &waypoint) != 0);
 	}
@@ -347,7 +351,7 @@ static void createPathLogo()
 		waypoint.Position[1] = 55 + 20 * cos(i / 10.0 * M_PI - M_PI / 2);
 		waypoint.Position[0] = 25 + 25 * sin(i / 10.0 * M_PI - M_PI / 2);
 		waypoint.Position[2] = -50;
-		waypoint.Action = WAYPOINT_ACTION_NEXT;
+		waypoint.Action = WAYPOINT_ACTION_PATHTONEXT;
 		WaypointCreateInstance();
 		bad_inits += (WaypointInstSet(i, &waypoint) != 0);
 	}
@@ -355,7 +359,7 @@ static void createPathLogo()
 	waypoint.Position[1] = 35;
 	waypoint.Position[0] = -50;
 	waypoint.Position[2] = -50;
-	waypoint.Action = WAYPOINT_ACTION_NEXT;
+	waypoint.Action = WAYPOINT_ACTION_PATHTONEXT;
 	WaypointCreateInstance();
 	WaypointInstSet(35, &waypoint);
 	
@@ -363,42 +367,42 @@ static void createPathLogo()
 	waypoint.Position[1] = 35;
 	waypoint.Position[0] = -60;
 	waypoint.Position[2] = -30;
-	waypoint.Action = WAYPOINT_ACTION_NEXT;
+	waypoint.Action = WAYPOINT_ACTION_PATHTONEXT;
 	WaypointCreateInstance();
 	WaypointInstSet(36, &waypoint);
 
 	waypoint.Position[1] = 85;
 	waypoint.Position[0] = -60;
 	waypoint.Position[2] = -30;
-	waypoint.Action = WAYPOINT_ACTION_NEXT;
+	waypoint.Action = WAYPOINT_ACTION_PATHTONEXT;
 	WaypointCreateInstance();
 	WaypointInstSet(37, &waypoint);
 
 	waypoint.Position[1] = 85;
 	waypoint.Position[0] = 60;
 	waypoint.Position[2] = -30;
-	waypoint.Action = WAYPOINT_ACTION_NEXT;
+	waypoint.Action = WAYPOINT_ACTION_PATHTONEXT;
 	WaypointCreateInstance();
 	WaypointInstSet(38, &waypoint);
 	
 	waypoint.Position[1] = -40;
 	waypoint.Position[0] = 60;
 	waypoint.Position[2] = -30;
-	waypoint.Action = WAYPOINT_ACTION_NEXT;
+	waypoint.Action = WAYPOINT_ACTION_PATHTONEXT;
 	WaypointCreateInstance();
 	WaypointInstSet(39, &waypoint);
 
 	waypoint.Position[1] = -40;
 	waypoint.Position[0] = -60;
 	waypoint.Position[2] = -30;
-	waypoint.Action = WAYPOINT_ACTION_NEXT;
+	waypoint.Action = WAYPOINT_ACTION_PATHTONEXT;
 	WaypointCreateInstance();
 	WaypointInstSet(40, &waypoint);
 
 	waypoint.Position[1] = 35;
 	waypoint.Position[0] = -60;
 	waypoint.Position[2] = -30;
-	waypoint.Action = WAYPOINT_ACTION_NEXT;
+	waypoint.Action = WAYPOINT_ACTION_PATHTONEXT;
 	WaypointCreateInstance();
 	WaypointInstSet(41, &waypoint);
 

@@ -1997,7 +1997,7 @@ void introGraphics() {
 	}
 }
 
-void calcHomeArrow(uint16_t m_yaw)
+void calcHomeArrow(int16_t m_yaw)
 {
 	HomeLocationData home;
 	HomeLocationGet (&home);

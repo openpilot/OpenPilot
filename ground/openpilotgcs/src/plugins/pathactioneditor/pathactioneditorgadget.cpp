@@ -1,12 +1,12 @@
 /**
  ******************************************************************************
- *
- * @file       paths.h
+ * @file       pathactioneditorgadget.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
- * @brief      Header for path manipulation library 
- *
- * @see        The GNU Public License (GPL) Version 3
- *
+ * @addtogroup PathAction Editor GCS Plugins
+ * @{
+ * @addtogroup PathActionEditorGadgetPlugin PathAction Editor Gadget Plugin
+ * @{
+ * @brief A gadget to edit a list of pathactions
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -23,17 +23,26 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+#include "pathactioneditorgadget.h"
+#include "pathactioneditorgadgetwidget.h"
 
-#ifndef PATHS_H_
-#define PATHS_H_
+#include "extensionsystem/pluginmanager.h"
+#include "uavobjectmanager.h"
+#include "uavobject.h"
+#include <QDebug>
 
-struct path_status {
-	float fractional_progress;
-	float error;
-	float correction_direction[2];
-	float path_direction[2];
-};
+PathActionEditorGadget::PathActionEditorGadget(QString classId, PathActionEditorGadgetWidget *widget, QWidget *parent) :
+        IUAVGadget(classId, parent),
+        m_widget(widget)
+{
+}
 
-void path_progress(float * start_point, float * end_point, float * cur_point, struct path_status * status, uint8_t mode);
+PathActionEditorGadget::~PathActionEditorGadget()
+{
+    delete m_widget;
+}
 
-#endif
+void PathActionEditorGadget::loadConfiguration(IUAVGadgetConfiguration* config)
+{
+    Q_UNUSED(config);
+}

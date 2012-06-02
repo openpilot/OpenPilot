@@ -632,7 +632,7 @@ all_$(1)_clean: $$(addsuffix _clean, $$(filter bu_$(1), $$(BU_TARGETS)))
 all_$(1)_clean: $$(addsuffix _clean, $$(filter ef_$(1), $$(EF_TARGETS)))
 endef
 
-ALL_BOARDS := coptercontrol pipxtreme revolution osd
+ALL_BOARDS := coptercontrol pipxtreme revolution simposix osd
 
 # SimPosix only builds on Linux so drop it from the list for
 # all other platforms.

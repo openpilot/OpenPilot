@@ -530,6 +530,7 @@ fw_$(1)_%: uavobjects_flight
 	$(V1) cd $(ROOT_DIR)/flight/$(2) && \
 		$$(MAKE) -r --no-print-directory \
 		BOARD_NAME=$(1) \
+		BUILD_TYPE=fw \
 		TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
 		REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" \
 		$$*
@@ -553,6 +554,7 @@ bl_$(1)_%:
 	$(V1) cd $(ROOT_DIR)/flight/Bootloaders/$(2) && \
 		$$(MAKE) -r --no-print-directory \
 		BOARD_NAME=$(1) \
+		BUILD_TYPE=bl \
 		TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
 		REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" \
 		$$*
@@ -587,6 +589,7 @@ bu_$(1)_%: bl_$(1)_bino
 	$(V1) cd $(ROOT_DIR)/flight/Bootloaders/BootloaderUpdater && \
 		$$(MAKE) -r --no-print-directory \
 		BOARD_NAME=$(1) \
+		BUILD_TYPE=bu \
 		TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
 		REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" \
 		$$*
@@ -607,6 +610,7 @@ ef_$(1)_%: bl_$(1)_bin fw_$(1)_opfw
 	$(V1) cd $(ROOT_DIR)/flight/EntireFlash && \
 		$$(MAKE) -r --no-print-directory \
 		BOARD_NAME=$(1) \
+		BUILD_TYPE=ef \
 		TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
 		DFU_CMD="$(DFUUTIL_DIR)/bin/dfu-util" \
 		$$*

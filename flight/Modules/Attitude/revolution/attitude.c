@@ -77,6 +77,12 @@
 
 #define F_PI 3.14159265358979323846f
 #define PI_MOD(x) (fmodf(x + F_PI, F_PI * 2) - F_PI)
+
+// low pass filter configuration to calculate offset
+// of barometric altitude sensor
+// reasoning: updates at: 10 Hz, tau= 300 s settle time
+// exp(-(1/f) / tau ) ~=~ 0.9997
+#define BARO_OFFSET_LOWPASS_ALPHA 0.9997f 
 // Private types
 
 // Private variables
@@ -506,6 +512,8 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	static bool gps_updated;
 	static bool gps_vel_updated;
 
+	static float baroOffset = 0;
+
 	static uint32_t ins_last_time = 0;
 	static bool inited;
 
@@ -576,7 +584,10 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 			float Pdiag[16]={25.0f,25.0f,25.0f,5.0f,5.0f,5.0f,1e-5f,1e-5f,1e-5f,1e-5f,1e-5f,1e-5f,1e-5f,1e-4f,1e-4f,1e-4f};
 			float q[4];
 			float pos[3] = {0.0f, 0.0f, 0.0f};
-			pos[2] = baroData.Altitude * -1.0f;
+
+			// Initialize barometric offset to homelocation altitude
+			baroOffset = -baroData.Altitude;
+			pos[2] = -(baroData.Altitude + baroOffset);
 
 			// Reset the INS algorithm
 			INSGPSInit();
@@ -621,6 +632,9 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 
 			// Transform the GPS position into NED coordinates
 			getNED(&gpsPosition, NED);
+			
+			// Initialize barometric offset to cirrent GPS NED coordinate
+			baroOffset = -NED[2] - baroData.Altitude;
 
 			xQueueReceive(magQueue, &ev, 100 / portTICK_RATE_MS);
 			MagnetometerGet(&magData);
@@ -645,9 +659,9 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 			dT = PIOS_DELAY_DiffuS(ins_last_time) / 1.0e6f;
 
 			GyrosBiasGet(&gyrosBias);
-			float gyros[3] = {(gyrosData.x + gyrosBias.x) * F_PI / 180.0f, 
-				(gyrosData.y + gyrosBias.y) * F_PI / 180.0f, 
-				(gyrosData.z + gyrosBias.z) * F_PI / 180.0f};
+			float gyros[3] = {(gyrosData.x - gyrosBias.x) * F_PI / 180.0f, 
+				(gyrosData.y - gyrosBias.y) * F_PI / 180.0f, 
+				(gyrosData.z - gyrosBias.z) * F_PI / 180.0f};
 			INSStatePrediction(gyros, &accelsData.x, dT);
 			
 			AttitudeActualData attitude;
@@ -732,6 +746,11 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 		// Transform the GPS position into NED coordinates
 		getNED(&gpsData, NED);
 
+		// Track barometric altitude offset with a low pass filter
+		baroOffset = BARO_OFFSET_LOWPASS_ALPHA * baroOffset +
+		    (1.0f - BARO_OFFSET_LOWPASS_ALPHA )
+		    * ( -NED[2] - baroData.Altitude );
+
 		// Store this for inspecting offline
 		NEDPositionData nedPos;
 		NEDPositionGet(&nedPos);
@@ -744,7 +763,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 		INSSetPosVelVar(1e2f, 1e2f);
 		vel[0] = vel[1] = vel[2] = 0;
 		NED[0] = NED[1] = 0;
-		NED[2] = baroData.Altitude;
+		NED[2] = -(baroData.Altitude + baroOffset);
 		sensors |= HORIZ_SENSORS | HORIZ_POS_SENSORS;
 		sensors |= POS_SENSORS |VERT_SENSORS;
 	}
@@ -761,7 +780,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	 * although probably should occur within INS itself
 	 */
 	if (sensors)
-		INSCorrection(&magData.x, NED, vel, baroData.Altitude, sensors);
+		INSCorrection(&magData.x, NED, vel, ( baroData.Altitude + baroOffset ), sensors);
 
 	// Copy the position and velocity into the UAVO
 	PositionActualData positionActual;
@@ -778,7 +797,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	velocityActual.Down = Nav.Vel[2];
 	VelocityActualSet(&velocityActual);
 	
-	if(fabs(Nav.gyro_bias[0]) > 0.1f || fabs(Nav.gyro_bias[1]) > 0.1f || fabs(Nav.gyro_bias[2]) > 0.1f) {
+	if(fabs(Nav.gyro_bias[0]) > 0.5f || fabs(Nav.gyro_bias[1]) > 0.5f || fabs(Nav.gyro_bias[2]) > 0.5f) {
 		float zeros[3] = {0.0f,0.0f,0.0f};
 		INSSetGyroBias(zeros);
 	}

@@ -42,6 +42,7 @@ class QTCREATOR_UTILS_EXPORT CoordinateConversions
 public:
     CoordinateConversions();
     int GetLLA(double LLA[3], double NED[3], double position[3]);
+    int GetNED(double homeLLA[3], double position[3], double NED[3]);
     void RneFromLLA(double LLA[3], double Rne[3][3]);
     void LLA2ECEF(double LLA[3], double ECEF[3]);
     int ECEF2LLA(double ECEF[3], double LLA[3]);

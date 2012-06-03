@@ -7,7 +7,7 @@
 	<field name="StartingVelocity" units="m/s" type="float" elements="1" default="0"/>
 	<field name="EndingVelocity" units="m/s" type="float" elements="1" default="0"/>
 
-	<field name="Mode" units="" type="enum" elements="1" options="Endpoint,Path" default="0"/>
+	<field name="Mode" units="" type="enum" elements="1" options="Endpoint,Path,Land" default="0"/>
 	<!-- Endpoint Mode - Fly to end location and attempt to stay there -->
 	<!-- Path Mode - Attempt to fly a line from Start to End using specifed velocity -->
 

@@ -44,6 +44,8 @@ public slots:
     void SetPercentage(int const& perc);
     void SetProvider(QString const& prov,int const& zoom);
     void SetNumberOfTiles(int const& total,int const& actual);
+signals:
+    void cancelRequest();
 private:
     Ui::MapRipForm *ui;
 };

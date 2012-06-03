@@ -40,6 +40,7 @@ namespace mapcontrol
         core->SetCurrentRegion(internals::Rectangle(0, 0, maprect.width(), maprect.height()));
         core->SetMapType(MapType::GoogleHybrid);
         this->SetZoom(2);
+        this->setFlag(ItemIsFocusable);
         connect(core,SIGNAL(OnNeedInvalidation()),this,SLOT(Core_OnNeedInvalidation()));
         connect(core,SIGNAL(OnMapDrag()),this,SLOT(ChildPosRefresh()));
         connect(core,SIGNAL(OnMapZoomChanged()),this,SLOT(ChildPosRefresh()));
@@ -196,7 +197,7 @@ namespace mapcontrol
             }
 
         }
-        else if(isSelected && !selectionStart.IsEmpty() && (event->modifiers() == Qt::AltModifier || event->modifiers() == Qt::ShiftModifier))
+        else if(isSelected && !selectionStart.IsEmpty() && (event->modifiers() == Qt::ControlModifier || event->modifiers() == Qt::ShiftModifier))
         {
             selectionEnd = FromLocalToLatLng(event->pos().x(), event->pos().y());
             {
@@ -216,11 +217,9 @@ namespace mapcontrol
     void MapGraphicItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     {
 
-
-
         if(!IsMouseOverMarker())
         {
-            if(event->button() == config->DragButton && CanDragMap()&& !((event->modifiers()==Qt::AltModifier)||(event->modifiers()==Qt::ShiftModifier)))
+            if(event->button() == config->DragButton && CanDragMap()&& !((event->modifiers()==Qt::ShiftModifier)||(event->modifiers()==Qt::ControlModifier)))
             {
                 core->mouseDown.SetX(event->pos().x());
                 core->mouseDown.SetY(event->pos().y());
@@ -232,7 +231,7 @@ namespace mapcontrol
                 this->update();
 
             }
-            else if(!isSelected && ((event->modifiers()==Qt::AltModifier)||(event->modifiers()==Qt::ShiftModifier)))
+            else if(!isSelected && ((event->modifiers()==Qt::ControlModifier)||(event->modifiers()==Qt::ShiftModifier)))
             {
                 isSelected = true;
                     SetSelectedArea (internals::RectLatLng::Empty);
@@ -240,7 +239,6 @@ namespace mapcontrol
                     selectionStart = FromLocalToLatLng(event->pos().x(), event->pos().y());
                 }
             }
-
     }
     void MapGraphicItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     {
@@ -273,6 +271,16 @@ namespace mapcontrol
             }
 
         }
+    }
+    void MapGraphicItem::keyPressEvent(QKeyEvent *event)
+    {
+        if(event->modifiers()&(Qt::ShiftModifier|Qt::ControlModifier))
+            this->setCursor(Qt::CrossCursor);
+    }
+    void MapGraphicItem::keyReleaseEvent(QKeyEvent *event)
+    {
+        if((event->modifiers()&(Qt::ShiftModifier|Qt::ControlModifier))==0)
+            this->setCursor(Qt::ArrowCursor);
     }
     bool MapGraphicItem::SetZoomToFitRect(internals::RectLatLng const& rect)
           {
@@ -431,11 +439,6 @@ namespace mapcontrol
                 }
             }
         }
-        // painter->drawRect(core->GetrenderOffset().X()-lastimagepoint.X()-3,core->GetrenderOffset().Y()-lastimagepoint.Y()-3,lastimage.width(),lastimage.height());
-//        painter->setPen(Qt::red);
-//        painter->drawLine(-10,-10,10,10);
-//        painter->drawLine(10,10,-10,-10);
-//        painter->drawRect(boundingRect().adjusted(100,100,-100,-100));
     }
 
 

@@ -242,7 +242,10 @@ static void objectUpdatedCb(UAVObjEvent * ev)
 				}
 				// Save selected instance
 				retval = UAVObjSave(obj, objper.InstanceID);
-				
+
+				// Not sure why this is needed
+				vTaskDelay(10);
+
 				// Verify saving worked
 				if (retval == 0)
 					retval = UAVObjLoad(obj, objper.InstanceID);

@@ -41,7 +41,8 @@ OPMapGadgetConfiguration::OPMapGadgetConfiguration(QString classId,  QSettings* 
     m_useMemoryCache(true),
     m_cacheLocation(Utils::PathUtils().GetStoragePath() + "mapscache" + QDir::separator()),
 	m_uavSymbol(QString::fromUtf8(":/uavs/images/mapquad.png")),
-	m_maxUpdateRate(2000)	// ms
+    m_maxUpdateRate(2000),	// ms
+    m_settings(qSettings)
 {
 
     //if a saved configuration exists load it
@@ -97,7 +98,21 @@ IUAVGadgetConfiguration * OPMapGadgetConfiguration::clone()
 
     return m;
 }
-
+void OPMapGadgetConfiguration::saveConfig() const {
+    if(!m_settings)
+        return;
+   m_settings->setValue("mapProvider", m_mapProvider);
+   m_settings->setValue("defaultZoom", m_defaultZoom);
+   m_settings->setValue("defaultLatitude", m_defaultLatitude);
+   m_settings->setValue("defaultLongitude", m_defaultLongitude);
+   m_settings->setValue("useOpenGL", m_useOpenGL);
+   m_settings->setValue("showTileGridLines", m_showTileGridLines);
+   m_settings->setValue("accessMode", m_accessMode);
+   m_settings->setValue("useMemoryCache", m_useMemoryCache);
+   m_settings->setValue("uavSymbol", m_uavSymbol);
+   m_settings->setValue("cacheLocation", Utils::PathUtils().RemoveStoragePath(m_cacheLocation));
+   m_settings->setValue("maxUpdateRate", m_maxUpdateRate);
+}
 void OPMapGadgetConfiguration::saveConfig(QSettings* qSettings) const {
    qSettings->setValue("mapProvider", m_mapProvider);
    qSettings->setValue("defaultZoom", m_defaultZoom);

@@ -74,18 +74,6 @@ typedef struct t_home
     bool locked;
 } t_home;
 
-// local waypoint list item structure
-typedef struct t_waypoint
-{
-    mapcontrol::WayPointItem *map_wp_item;
-    internals::PointLatLng coord;
-    double altitude;
-    QString description;
-    bool locked;
-    int time_seconds;
-    int hold_time_seconds;
-} t_waypoint;
-
 // ******************************************************
 
 enum opMapModeType { Normal_MapMode = 0,
@@ -120,7 +108,9 @@ public:
     void setMapMode(opMapModeType mode);
 	void SetUavPic(QString UAVPic);
     void setMaxUpdateRate(int update_rate);
-
+    void setHomePosition(QPointF pos);
+signals:
+    void defaultLocationAndZoomChanged(double lng,double lat,double zoom);
 
 public slots:
     void homePositionUpdated(UAVObject *);
@@ -131,7 +121,6 @@ protected:
     void resizeEvent(QResizeEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void contextMenuEvent(QContextMenuEvent *event);
-    void keyPressEvent(QKeyEvent* event);
 private slots:
     void wpDoubleClickEvent(WayPointItem *wp);
     void updatePosition();
@@ -174,7 +163,6 @@ private slots:
       * Unused for now, hooks for future waypoint support
       */
     void WPNumberChanged(int const& oldnumber,int const& newnumber, WayPointItem* waypoint);
-    void WPValuesChanged(WayPointItem* waypoint);
     void WPInserted(int const& number, WayPointItem* waypoint);
     void WPDeleted(int const& number, WayPointItem* waypoint);
 
@@ -218,7 +206,7 @@ private slots:
     void onUAVTrailTimeActGroup_triggered(QAction *action);
     void onUAVTrailDistanceActGroup_triggered(QAction *action);
 	void onMaxUpdateRateActGroup_triggered(QAction *action);
-
+    void onChangeDefaultLocalAndZoom();
     void on_tbFind_clicked();
 
 private:
@@ -241,8 +229,6 @@ private:
 
 	t_home m_home_position;
 
-	t_waypoint m_magic_waypoint;
-
 	QStringList findPlaceWordList;
     QCompleter *findPlaceCompleter;
 
@@ -264,9 +250,6 @@ private:
     QStandardItemModel wayPoint_treeView_model;
 
     mapcontrol::WayPointItem *m_mouse_waypoint;
-
-    QList<t_waypoint *> m_waypoint_list;
-    QMutex m_waypoint_list_mutex;
 
     QMutex m_map_mutex;
 
@@ -306,6 +289,7 @@ private:
     QAction *homeMagicWaypointAct;
 
     QAction *showSafeAreaAct;
+    QAction *changeDefaultLocalAndZoom;
     QActionGroup *safeAreaActGroup;
     QList<QAction *> safeAreaAct;
 
@@ -334,9 +318,6 @@ private:
 
     void moveToMagicWaypointPosition();
 
-    void loadComboBoxLines(QComboBox *comboBox, QString filename);
-    void saveComboBoxLines(QComboBox *comboBox, QString filename);
-
     void hideMagicWaypointControls();
     void showMagicWaypointControls();
 
@@ -353,6 +334,9 @@ private:
     void setMapFollowingMode();
 
 	bool setHomeLocationObject();
+    QMenu contextMenu;
+    internals::PointLatLng lastLatLngMouse;
+    WayPointItem * magicWayPoint;
 };
 
 #endif /* OPMAP_GADGETWIDGET_H_ */

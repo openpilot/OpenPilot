@@ -220,6 +220,13 @@ namespace mapcontrol
         emit WPCreated(position,item);
         return item;
     }
+    WayPointItem* OPMapWidget::magicWPCreate()
+    {
+        WayPointItem* item=new WayPointItem(map,true);
+        item->SetShowNumber(false);
+        item->setParentItem(map);
+        return item;
+    }
     void OPMapWidget::WPCreate(WayPointItem* item)
     {
         ConnectWP(item);
@@ -294,13 +301,46 @@ namespace mapcontrol
         emit WPDeleted(item->Number(),item);
         delete item;
     }
-    void OPMapWidget::WPDeleteAll()
+    void OPMapWidget::WPSetVisibleAll(bool value)
     {
         foreach(QGraphicsItem* i,map->childItems())
         {
             WayPointItem* w=qgraphicsitem_cast<WayPointItem*>(i);
             if(w)
-                delete w;
+            {
+                if(w->Number()!=-1)
+                    w->setVisible(value);
+            }
+        }
+    }
+    void OPMapWidget::WPDeleteAll()
+    {
+        int x=0;
+        foreach(QGraphicsItem* i,map->childItems())
+        {
+            WayPointItem* w=qgraphicsitem_cast<WayPointItem*>(i);
+            if(w)
+            {
+                if(w->Number()!=-1)
+                {
+                    emit WPDeleted(w->Number(),w);
+                    delete w;
+                }
+            }
+        }
+    }
+    bool OPMapWidget::WPPresent()
+    {
+        foreach(QGraphicsItem* i,map->childItems())
+        {
+            WayPointItem* w=qgraphicsitem_cast<WayPointItem*>(i);
+            if(w)
+            {
+                if(w->Number()!=-1)
+                {
+                    return true;
+                }
+            }
         }
     }
     void OPMapWidget::deleteAllOverlays()
@@ -309,12 +349,12 @@ namespace mapcontrol
         {
             WayPointLine* w=qgraphicsitem_cast<WayPointLine*>(i);
             if(w)
-                delete w;
+                w->deleteLater();
             else
             {
                 WayPointCircle* ww=qgraphicsitem_cast<WayPointCircle*>(i);
                 if(ww)
-                    delete ww;
+                    ww->deleteLater();
             }
         }
     }
@@ -336,11 +376,11 @@ namespace mapcontrol
 
     void OPMapWidget::ConnectWP(WayPointItem *item)
     {
-        connect(item,SIGNAL(WPNumberChanged(int,int,WayPointItem*)),this,SIGNAL(WPNumberChanged(int,int,WayPointItem*)));
-        connect(item,SIGNAL(WPValuesChanged(WayPointItem*)),this,SIGNAL(WPValuesChanged(WayPointItem*)));
-        connect(this,SIGNAL(WPInserted(int,WayPointItem*)),item,SLOT(WPInserted(int,WayPointItem*)));
-        connect(this,SIGNAL(WPNumberChanged(int,int,WayPointItem*)),item,SLOT(WPRenumbered(int,int,WayPointItem*)));
-        connect(this,SIGNAL(WPDeleted(int,WayPointItem*)),item,SLOT(WPDeleted(int,WayPointItem*)));
+        connect(item,SIGNAL(WPNumberChanged(int,int,WayPointItem*)),this,SIGNAL(WPNumberChanged(int,int,WayPointItem*)),Qt::DirectConnection);
+        connect(item,SIGNAL(WPValuesChanged(WayPointItem*)),this,SIGNAL(WPValuesChanged(WayPointItem*)),Qt::DirectConnection);
+        connect(this,SIGNAL(WPInserted(int,WayPointItem*)),item,SLOT(WPInserted(int,WayPointItem*)),Qt::DirectConnection);
+        connect(this,SIGNAL(WPNumberChanged(int,int,WayPointItem*)),item,SLOT(WPRenumbered(int,int,WayPointItem*)),Qt::DirectConnection);
+        connect(this,SIGNAL(WPDeleted(int,WayPointItem*)),item,SLOT(WPDeleted(int,WayPointItem*)),Qt::DirectConnection);
     }
     void OPMapWidget::diagRefresh()
     {

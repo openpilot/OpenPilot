@@ -30,6 +30,7 @@
 
 #include <coreplugin/iuavgadget.h>
 #include "opmapgadgetwidget.h"
+#include "opmapgadgetconfiguration.h"
 
 class IUAVGadget;
 //class QList<int>;
@@ -47,10 +48,12 @@ public:
     ~OPMapGadget();
 
     QWidget *widget() { return m_widget; }
-    void loadConfiguration(IUAVGadgetConfiguration* config);
-
+    void loadConfiguration(IUAVGadgetConfiguration* m_config);
 private:
     OPMapGadgetWidget *m_widget;
+    OPMapGadgetConfiguration *m_config;
+private slots:
+    void saveConfiguration(double lng, double lat, double zoom);
 };
 
 

@@ -64,6 +64,7 @@ public:
     * @return
     */
     WayPointItem(internals::PointLatLng const& coord,int const& altitude,MapGraphicItem* map,wptype type=absolute);
+    WayPointItem(MapGraphicItem* map,bool magicwaypoint);
     /**
     * @brief Constructer
     *

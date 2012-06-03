@@ -65,8 +65,8 @@ public:
     bool useMemoryCache() const { return m_useMemoryCache; }
     QString cacheLocation() const { return m_cacheLocation; }
     QString uavSymbol() const { return m_uavSymbol; }
-	int maxUpdateRate() const { return m_maxUpdateRate; }
-
+    int maxUpdateRate() const { return m_maxUpdateRate; }
+    void saveConfig() const;
 public slots:
     void setMapProvider(QString provider) { m_mapProvider = provider; }
     void setZoom(int zoom) { m_defaultZoom = zoom; }
@@ -92,6 +92,7 @@ private:
     QString m_cacheLocation;
     QString m_uavSymbol;
 	int m_maxUpdateRate;
+    QSettings * m_settings;
 };
 
 #endif // OPMAP_GADGETCONFIGURATION_H

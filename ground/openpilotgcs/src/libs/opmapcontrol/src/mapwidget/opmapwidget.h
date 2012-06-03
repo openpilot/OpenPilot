@@ -366,6 +366,9 @@ namespace mapcontrol
         WayPointCircle *WPCircleCreate(WayPointItem *center, WayPointItem *radius,bool clockwise);
         WayPointCircle *WPCircleCreate(HomeItem *center, WayPointItem *radius,bool clockwise);
         void deleteAllOverlays();
+        void WPSetVisibleAll(bool value);
+        WayPointItem *magicWPCreate();
+        bool WPPresent();
     private:
         internals::Core *core;
         MapGraphicItem *map;

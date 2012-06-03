@@ -276,6 +276,7 @@ namespace mapcontrol
     {
         if(event->modifiers()&(Qt::ShiftModifier|Qt::ControlModifier))
             this->setCursor(Qt::CrossCursor);
+        QGraphicsItem::keyPressEvent(event);
     }
     void MapGraphicItem::keyReleaseEvent(QKeyEvent *event)
     {

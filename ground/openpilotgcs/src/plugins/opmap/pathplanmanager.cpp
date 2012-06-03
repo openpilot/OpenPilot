@@ -31,9 +31,9 @@ pathPlanManager::pathPlanManager(QWidget *parent,OPMapWidget *map):
     QDialog(parent, Qt::Dialog),myMap(map),
     ui(new Ui::pathPlanManager)
 {
-    waypoints=new QList<WayPointItem*>();
+    waypoints=new QList<QPointer<WayPointItem> >();
     ui->setupUi(this);
-    connect(myMap,SIGNAL(WPDeleted(int,WayPointItem*)),this,SLOT(on_WPDeleted(int,WayPointItem*)));
+    connect(myMap,SIGNAL(WPDeleted(int,WayPointItem*)),this,SLOT(on_WPDeleted(int,WayPointItem*)),Qt::DirectConnection);
     connect(myMap,SIGNAL(WPInserted(int,WayPointItem*)),this,SLOT(on_WPInserted(int,WayPointItem*)));
     connect(myMap,SIGNAL(WPCreated(int,WayPointItem*)),this,SLOT(on_WPInserted(int,WayPointItem*)));
     connect(myMap,SIGNAL(WPNumberChanged(int,int,WayPointItem*)),this,SLOT(refreshOverlays()));
@@ -46,13 +46,20 @@ pathPlanManager::~pathPlanManager()
 }
 void pathPlanManager::on_WPDeleted(int wp_numberint,WayPointItem * wp)
 {
+    QMutexLocker locker(&wplistmutex);
+    if(wp_numberint<0)
+        return;
     waypoints->removeOne(wp);
 }
 
 void pathPlanManager::on_WPInserted(int wp_number, WayPointItem * wp)
 {
-    qDebug()<<"pathplanner waypoint added";
+    if(waypoints->contains(wp))
+        return;
+    wplistmutex.lock();
     waypoints->append(wp);
+    wplistmutex.unlock();
+    wp->setWPType(WayPointItem::relative);
     customData data;
     data.mode=PathAction::MODE_FLYENDPOINT;
     data.condition=PathAction::ENDCONDITION_NONE;
@@ -61,24 +68,16 @@ void pathPlanManager::on_WPInserted(int wp_number, WayPointItem * wp)
     refreshOverlays();
 }
 
-void pathPlanManager::on_WPNumberChanged(int oldNumber, int newNumber, WayPointItem * wp)
-{
-}
-
 void pathPlanManager::on_WPValuesChanged(WayPointItem * wp)
 {
 }
-//typedef enum { MODE_FLYENDPOINT=0, MODE_FLYVECTOR=1, MODE_FLYCIRCLERIGHT=2,
-//MODE_FLYCIRCLELEFT=3, MODE_DRIVEENDPOINT=4, MODE_DRIVEVECTOR=5, MODE_DRIVECIRCLELEFT=6,
-//MODE_DRIVECIRCLERIGHT=7, MODE_FIXEDATTITUDE=8, MODE_SETACCESSORY=9, MODE_DISARMALARM=10 } ModeOptions;
 
 void pathPlanManager::refreshOverlays()
 {
+    QMutexLocker locker(&wplistmutex);
     myMap->deleteAllOverlays();
-    qDebug()<<"foreach start";
     foreach(WayPointItem * wp,*waypoints)
     {
-        qDebug()<<"wp:"<<wp->Number();
         customData data=wp->customData().value<customData>();
         switch(data.mode)
         {
@@ -86,7 +85,6 @@ void pathPlanManager::refreshOverlays()
         case PathAction::MODE_FLYVECTOR:
         case PathAction::MODE_DRIVEENDPOINT:
         case PathAction::MODE_DRIVEVECTOR:
-            qDebug()<<"addline";
             if(wp->Number()==0)
                 myMap->WPLineCreate((HomeItem*)myMap->Home,wp);
             else
@@ -105,11 +103,12 @@ void pathPlanManager::refreshOverlays()
 
         }
     }
-    qDebug()<<"foreach end";
 }
 
 WayPointItem * pathPlanManager::findWayPointNumber(int number)
 {
+    if(number<0)
+        return NULL;
     foreach(WayPointItem * wp,*waypoints)
     {
         if(wp->Number()==number)

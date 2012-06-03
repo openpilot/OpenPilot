@@ -32,6 +32,8 @@
 #include "opmapcontrol/opmapcontrol.h"
 #include "pathaction.h"
 #include "waypoint.h"
+#include "QMutexLocker"
+#include "QPointer"
 namespace mapcontrol
 {
     struct customData
@@ -63,12 +65,12 @@ private slots:
     void refreshOverlays();
     void on_WPDeleted(int wp_numberint, WayPointItem *);
     void on_WPInserted(int,WayPointItem*);
-    void on_WPNumberChanged(int,int,WayPointItem*);
     void on_WPValuesChanged(WayPointItem*);
 private:
     Ui::pathPlanManager *ui;
     OPMapWidget * myMap;
-    QList<WayPointItem*> * waypoints;
+    QList<QPointer<WayPointItem> > * waypoints;
+    QMutex wplistmutex;
 };
 
 #endif // PATHPLANMANAGER_H

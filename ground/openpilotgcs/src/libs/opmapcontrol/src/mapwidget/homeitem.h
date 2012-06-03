@@ -53,7 +53,7 @@ namespace mapcontrol
         int SafeArea()const{return safearea;}
         void SetSafeArea(int const& value){safearea=value;}
         bool safe;
-        void SetCoord(internals::PointLatLng const& value){coord=value;}
+        void SetCoord(internals::PointLatLng const& value){emit homePositionChanged(value);coord=value;}
         internals::PointLatLng Coord()const{return coord;}
         void SetAltitude(int const& value){altitude=value;}
         int Altitude()const{return altitude;}

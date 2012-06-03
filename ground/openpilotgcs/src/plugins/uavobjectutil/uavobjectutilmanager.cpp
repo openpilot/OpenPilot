@@ -199,21 +199,28 @@ void UAVObjectUtilManager::objectPersistenceOperationFailed()
   */
 void UAVObjectUtilManager::objectPersistenceUpdated(UAVObject * obj)
 {
-    qDebug() << "objectPersistenceUpdated: " << obj->getField("Operation")->getValue().toString();
-    Q_ASSERT(obj->getName().compare("ObjectPersistence") == 0);
-    if(saveState == AWAITING_COMPLETED) {
-        failureTimer.stop();
-        // Check flight is saying it completed.  This is the only thing flight should do to trigger an update.
-        Q_ASSERT( obj->getField("Operation")->getValue().toString().compare(QString("Completed")) == 0 );
+    Q_ASSERT(obj);
+    Q_ASSERT(obj->getObjID() == ObjectPersistence::OBJID);
+    ObjectPersistence::DataFields objectPersistence = ((ObjectPersistence *)obj)->getData();
 
+    if(saveState == AWAITING_COMPLETED && objectPersistence.Operation == ObjectPersistence::OPERATION_ERROR) {
+        failureTimer.stop();
+        objectPersistenceOperationFailed();
+    } else if (saveState == AWAITING_COMPLETED &&
+               objectPersistence.Operation == ObjectPersistence::OPERATION_COMPLETED) {
+        failureTimer.stop();
         // Check right object saved
         UAVObject* savingObj = queue.head();
-        Q_ASSERT( obj->getField("ObjectID")->getValue() == savingObj->getObjID() );
+        if(objectPersistence.ObjectID != savingObj->getObjID() ) {
+            objectPersistenceOperationFailed();
+            return;
+        }
 
         obj->disconnect(this);
         queue.dequeue(); // We can now remove the object, it's done.
         saveState = IDLE;
-        emit saveCompleted(obj->getField("ObjectID")->getValue().toInt(), true);
+
+        emit saveCompleted(objectPersistence.ObjectID, true);
         saveNextObject();
     }
 }

@@ -35,6 +35,7 @@
 #include <QEventLoop>
 #include <QTimer>
 #include <objectpersistence.h>
+#include <firmwareiapobj.h>
 
 // ******************************
 // constructor/destructor
@@ -225,6 +226,37 @@ void UAVObjectUtilManager::objectPersistenceUpdated(UAVObject * obj)
     }
 }
 
+/**
+  * Helper function that makes sure FirmwareIAP is updated and then returns the data
+  */
+FirmwareIAPObj::DataFields UAVObjectUtilManager::getFirmwareIap()
+{
+    FirmwareIAPObj::DataFields dummy;
+
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    Q_ASSERT(pm);
+    if (!pm)
+        return dummy;
+    UAVObjectManager *om = pm->getObject<UAVObjectManager>();
+    Q_ASSERT(om);
+    if (!om)
+        return dummy;
+
+    FirmwareIAPObj *firmwareIap = FirmwareIAPObj::GetInstance(om);
+    Q_ASSERT(firmwareIap);
+    if (!firmwareIap)
+        return dummy;
+
+    // The code below will ask for the object update and wait for the updated to be received,
+    // or the timeout of the timer, set to 1 second.
+    QEventLoop loop;
+    connect(firmwareIap, SIGNAL(objectUpdated(UAVObject*)), &loop, SLOT(quit()));
+    QTimer::singleShot(1000, &loop, SLOT(quit())); // Create a timeout
+    firmwareIap->requestUpdate();
+    loop.exec();
+
+    return firmwareIap->getData();
+}
 
 /**
   * Get the UAV Board model, for anyone interested. Return format is:
@@ -232,25 +264,8 @@ void UAVObjectUtilManager::objectPersistenceUpdated(UAVObject * obj)
   */
 int UAVObjectUtilManager::getBoardModel()
 {
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    if (!pm)
-        return 0;
-    UAVObjectManager *om = pm->getObject<UAVObjectManager>();
-    if (!om)
-        return 0;
-
-    UAVDataObject *obj = dynamic_cast<UAVDataObject *>(om->getObject(QString("FirmwareIAPObj")));
-    // The code below will ask for the object update and wait for the updated to be received,
-    // or the timeout of the timer, set to 1 second.
-    QEventLoop loop;
-    connect(obj, SIGNAL(objectUpdated(UAVObject*)), &loop, SLOT(quit()));
-    QTimer::singleShot(1000, &loop, SLOT(quit())); // Create a timeout
-    obj->requestUpdate();
-    loop.exec();
-
-    int boardType = (obj->getField("BoardType")->getValue().toInt()) << 8;
-    boardType += obj->getField("BoardRevision")->getValue().toInt();
-    return boardType;
+    FirmwareIAPObj::DataFields firmwareIapData = getFirmwareIap();
+    return (firmwareIapData.BoardType << 8) + firmwareIapData.BoardRevision;
 }
 
 /**
@@ -259,54 +274,18 @@ int UAVObjectUtilManager::getBoardModel()
 QByteArray UAVObjectUtilManager::getBoardCPUSerial()
 {
     QByteArray cpuSerial;
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    if (!pm)
-        return 0;
-    UAVObjectManager *om = pm->getObject<UAVObjectManager>();
-    if (!om)
-        return 0;
+    FirmwareIAPObj::DataFields firmwareIapData = getFirmwareIap();
 
-    UAVDataObject *obj = dynamic_cast<UAVDataObject *>(om->getObject(QString("FirmwareIAPObj")));
-    // The code below will ask for the object update and wait for the updated to be received,
-    // or the timeout of the timer, set to 1 second.
-    QEventLoop loop;
-    connect(obj, SIGNAL(objectUpdated(UAVObject*)), &loop, SLOT(quit()));
-    QTimer::singleShot(1000, &loop, SLOT(quit())); // Create a timeout
-    obj->requestUpdate();
-    loop.exec();
+    for (int i = 0; i < FirmwareIAPObj::CPUSERIAL_NUMELEM; i++)
+        cpuSerial.append(firmwareIapData.CPUSerial[i]);
 
-    UAVObjectField* cpuField = obj->getField("CPUSerial");
-    for (uint i = 0; i < cpuField->getNumElements(); ++i) {
-        cpuSerial.append(cpuField->getValue(i).toUInt());
-    }
     return cpuSerial;
 }
 
 quint32 UAVObjectUtilManager::getFirmwareCRC()
 {
-    quint32 fwCRC;
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    if (!pm)
-        return 0;
-    UAVObjectManager *om = pm->getObject<UAVObjectManager>();
-    if (!om)
-        return 0;
-
-    UAVDataObject *obj = dynamic_cast<UAVDataObject *>(om->getObject(QString("FirmwareIAPObj")));
-    obj->getField("crc")->setValue(0);
-    obj->updated();
-    // The code below will ask for the object update and wait for the updated to be received,
-    // or the timeout of the timer, set to 1 second.
-    QEventLoop loop;
-    connect(obj, SIGNAL(objectUpdated(UAVObject*)), &loop, SLOT(quit()));
-    QTimer::singleShot(1000, &loop, SLOT(quit())); // Create a timeout
-    obj->requestUpdate();
-    loop.exec();
-
-    UAVObjectField* fwCRCField = obj->getField("crc");
-
-    fwCRC=(quint32)fwCRCField->getValue().toLongLong();
-    return fwCRC;
+    FirmwareIAPObj::DataFields firmwareIapData = getFirmwareIap();
+    return firmwareIapData.crc;
 }
 
 /**
@@ -315,27 +294,11 @@ quint32 UAVObjectUtilManager::getFirmwareCRC()
 QByteArray UAVObjectUtilManager::getBoardDescription()
 {
     QByteArray ret;
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    if (!pm)
-        return 0;
-    UAVObjectManager *om = pm->getObject<UAVObjectManager>();
-    if (!om)
-        return 0;
+    FirmwareIAPObj::DataFields firmwareIapData = getFirmwareIap();
 
-    UAVDataObject *obj = dynamic_cast<UAVDataObject *>(om->getObject(QString("FirmwareIAPObj")));
-    // The code below will ask for the object update and wait for the updated to be received,
-    // or the timeout of the timer, set to 1 second.
-    QEventLoop loop;
-    connect(obj, SIGNAL(objectUpdated(UAVObject*)), &loop, SLOT(quit()));
-    QTimer::singleShot(1000, &loop, SLOT(quit())); // Create a timeout
-    obj->requestUpdate();
-    loop.exec();
+    for (int i = 0; i < FirmwareIAPObj::DESCRIPTION_NUMELEM; i++)
+        ret.append(firmwareIapData.Description[i]);
 
-    UAVObjectField* descriptionField = obj->getField("Description");
-    // Description starts with an offset of
-    for (uint i = 0; i < descriptionField->getNumElements(); ++i) {
-        ret.append(descriptionField->getValue(i).toInt());
-    }
     return ret;
 }
 

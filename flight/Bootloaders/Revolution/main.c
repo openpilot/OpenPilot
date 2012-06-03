@@ -221,6 +221,8 @@ void check_bor()
 	if(bor != OB_BOR_LEVEL3) {
 		FLASH_OB_Unlock();
 		FLASH_OB_BORConfig(OB_BOR_LEVEL3);
+		FLASH_OB_Launch();
+		while(FLASH_WaitForLastOperation() == FLASH_BUSY);
 		FLASH_OB_Lock();
 		while(FLASH_WaitForLastOperation() == FLASH_BUSY);
 	}

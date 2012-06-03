@@ -54,12 +54,17 @@ static WaypointActiveData waypointActive;
 static WaypointData waypoint;
 
 // Private functions
+static void advanceWaypoint();
+static void checkTerminationCondition();
+static void activateWaypoint();
+
 static void pathPlannerTask(void *parameters);
 static void settingsUpdated(UAVObjEvent * ev);
 static void waypointsUpdated(UAVObjEvent * ev);
 static void createPathBox();
 static void createPathLogo();
 
+static int32_t active_waypoint = -1;
 /**
  * Module initialization
  */
@@ -107,11 +112,7 @@ static void pathPlannerTask(void *parameters)
 	WaypointActiveConnectCallback(waypointsUpdated);
 
 	FlightStatusData flightStatus;
-	PathDesiredData pathDesired;
-	PositionActualData positionActual;
 	
-	const float MIN_RADIUS = 4.0f; // Radius to consider at waypoint (m)
-
 	// Main thread loop
 	bool pathplanner_active = false;
 	while (1)
@@ -124,6 +125,8 @@ static void pathPlannerTask(void *parameters)
 			pathplanner_active = false;
 			continue;
 		}
+		
+		checkTerminationCondition();
 
 		if(pathplanner_active == false) {
 			// This triggers callback to update variable
@@ -135,75 +138,6 @@ static void pathPlannerTask(void *parameters)
 			continue;
 		}
 		
-		switch(pathPlannerSettings.PathMode) {
-			case PATHPLANNERSETTINGS_PATHMODE_ENDPOINT:
-				PositionActualGet(&positionActual);
-				
-				float r2 = powf(positionActual.North - waypoint.Position[WAYPOINT_POSITION_NORTH], 2) +
-				powf(positionActual.East - waypoint.Position[WAYPOINT_POSITION_EAST], 2) +
-				powf(positionActual.Down - waypoint.Position[WAYPOINT_POSITION_DOWN], 2);
-				
-				// We hit this waypoint
-				if (r2 < (MIN_RADIUS * MIN_RADIUS)) {
-					switch(waypoint.Action) {
-						case WAYPOINT_ACTION_PATHTONEXT:
-							waypointActive.Index++;
-							WaypointActiveSet(&waypointActive);
-
-							break;
-						case WAYPOINT_ACTION_RTH:
-							// Fly back to the home location but 20 m above it
-							PathDesiredGet(&pathDesired);
-							pathDesired.End[PATHDESIRED_END_NORTH] = 0;
-							pathDesired.End[PATHDESIRED_END_EAST] = 0;
-							pathDesired.End[PATHDESIRED_END_DOWN] = -20;
-							pathDesired.Mode = PATHDESIRED_MODE_ENDPOINT;
-							PathDesiredSet(&pathDesired);
-							break;
-						case WAYPOINT_ACTION_STOP:
-							break;
-						default:
-							PIOS_DEBUG_Assert(0);
-					}
-				}
-
-				break;
-
-			case PATHPLANNERSETTINGS_PATHMODE_PATH:
-
-				PathDesiredGet(&pathDesired);
-				PositionActualGet(&positionActual);
-
-				float cur[3] = {positionActual.North, positionActual.East, positionActual.Down};
-				struct path_status progress;
-
-				path_progress(pathDesired.Start, pathDesired.End, cur, &progress);
-
-				if (progress.fractional_progress >= 1) {
-					switch(waypoint.Action) {
-						case WAYPOINT_ACTION_PATHTONEXT:
-							waypointActive.Index++;
-							WaypointActiveSet(&waypointActive);
-
-							break;
-						case WAYPOINT_ACTION_RTH:
-							// Fly back to the home location but 20 m above it
-							PathDesiredGet(&pathDesired);
-							pathDesired.End[PATHDESIRED_END_NORTH] = 0;
-							pathDesired.End[PATHDESIRED_END_EAST] = 0;
-							pathDesired.End[PATHDESIRED_END_DOWN] = -20;
-							pathDesired.Mode = PATHDESIRED_MODE_ENDPOINT;
-							PathDesiredSet(&pathDesired);
-							break;
-						case WAYPOINT_ACTION_STOP:
-							break;
-						default:
-							PIOS_DEBUG_Assert(0);
-					}
-				}
-
-				break;
-		}
 	}
 }
 
@@ -219,25 +153,109 @@ static void waypointsUpdated(UAVObjEvent * ev)
 		return;
 	
 	WaypointActiveGet(&waypointActive);
-	WaypointInstGet(waypointActive.Index, &waypoint);
+	if(active_waypoint != waypointActive.Index)
+		activateWaypoint(waypointActive.Index);
+}
+
+/**
+ * This method checks the current position against the active waypoint
+ * to determine if it has been reached
+ */
+static void checkTerminationCondition()
+{
+	const float MIN_RADIUS = 4.0f; // Radius to consider at waypoint (m)
+
+	PositionActualData positionActual;
+	PathDesiredData pathDesired;
+
+	switch(waypoint.Action) {
+		case WAYPOINT_ACTION_ENDPOINTTONEXT:
+			PositionActualGet(&positionActual);
+
+			float r2 = powf(positionActual.North - waypoint.Position[WAYPOINT_POSITION_NORTH], 2) +
+			powf(positionActual.East - waypoint.Position[WAYPOINT_POSITION_EAST], 2) +
+			powf(positionActual.Down - waypoint.Position[WAYPOINT_POSITION_DOWN], 2);
+
+			// We hit this waypoint
+			if (r2 < (MIN_RADIUS * MIN_RADIUS))
+				advanceWaypoint();
+
+			break;
+
+		case WAYPOINT_ACTION_PATHTONEXT:
+
+			PathDesiredGet(&pathDesired);
+			PositionActualGet(&positionActual);
+
+			float cur[3] = {positionActual.North, positionActual.East, positionActual.Down};
+			struct path_status progress;
+
+			path_progress(pathDesired.Start, pathDesired.End, cur, &progress);
+
+			if (progress.fractional_progress >= 1)
+				advanceWaypoint();
+
+			break;
+		case WAYPOINT_ACTION_STOP:
+			// Never advance even when you hit a stop waypoint
+			break;
+	}
+
+}
+
+/**
+ * Increment the waypoint index which triggers the active waypoint method
+ */
+static void advanceWaypoint()
+{
+	WaypointActiveGet(&waypointActive);
+	waypointActive.Index++;
+	WaypointActiveSet(&waypointActive);
+}
+
+/**
+ * This method is called when a new waypoint is activated
+ */
+static void activateWaypoint(int idx)
+{	
+	active_waypoint = idx;
+
+	uint8_t waypoint_mode = WAYPOINT_ACTION_PATHTONEXT;
+	if (idx > 0) {
+		WaypointData prevWaypoint;
+		WaypointInstGet(idx - 1, &prevWaypoint);
+		waypoint_mode = prevWaypoint.Action;
+	}
 
 	PathDesiredData pathDesired;
 
-	switch(pathPlannerSettings.PathMode) {
-		case PATHPLANNERSETTINGS_PATHMODE_ENDPOINT:
+	switch(waypoint_mode) {
+		case WAYPOINT_ACTION_RTH:
 		{
+			PathDesiredGet(&pathDesired);
+			pathDesired.End[PATHDESIRED_END_NORTH] = 0;
+			pathDesired.End[PATHDESIRED_END_EAST] = 0;
+			pathDesired.End[PATHDESIRED_END_DOWN] = -50; // TODO: Get alt from somewhere?
+			pathDesired.Mode = PATHDESIRED_MODE_ENDPOINT;
+			PathDesiredSet(&pathDesired);
+		}
+			break;
+		case WAYPOINT_ACTION_ENDPOINTTONEXT:
+		{
+			WaypointInstGet(idx, &waypoint);
+
 			PathDesiredGet(&pathDesired);
 			pathDesired.End[PATHDESIRED_END_NORTH] = waypoint.Position[WAYPOINT_POSITION_NORTH];
 			pathDesired.End[PATHDESIRED_END_EAST] = waypoint.Position[WAYPOINT_POSITION_EAST];
 			pathDesired.End[PATHDESIRED_END_DOWN] = -waypoint.Position[WAYPOINT_POSITION_DOWN];
 			pathDesired.Mode = PATHDESIRED_MODE_ENDPOINT;
 			PathDesiredSet(&pathDesired);
-
 		}
 			break;
-
-		case PATHPLANNERSETTINGS_PATHMODE_PATH:
+		case WAYPOINT_ACTION_PATHTONEXT:
 		{
+			WaypointInstGet(idx, &waypoint);
+
 			PathDesiredData pathDesired;
 
 			pathDesired.End[PATHDESIRED_END_NORTH] = waypoint.Position[WAYPOINT_POSITION_NORTH];
@@ -251,7 +269,7 @@ static void waypointsUpdated(UAVObjEvent * ev)
 				// Get current position as start point
 				PositionActualData positionActual;
 				PositionActualGet(&positionActual);
-
+				
 				pathDesired.Start[PATHDESIRED_START_NORTH] = positionActual.North;
 				pathDesired.Start[PATHDESIRED_START_EAST] = positionActual.East;
 				pathDesired.Start[PATHDESIRED_START_DOWN] = positionActual.Down - 1;
@@ -260,19 +278,18 @@ static void waypointsUpdated(UAVObjEvent * ev)
 				// Get previous waypoint as start point
 				WaypointData waypointPrev;
 				WaypointInstGet(waypointActive.Index - 1, &waypointPrev);
-
+				
 				pathDesired.Start[PATHDESIRED_END_NORTH] = waypointPrev.Position[WAYPOINT_POSITION_NORTH];
 				pathDesired.Start[PATHDESIRED_END_EAST] = waypointPrev.Position[WAYPOINT_POSITION_EAST];
 				pathDesired.Start[PATHDESIRED_END_DOWN] = waypointPrev.Position[WAYPOINT_POSITION_DOWN];
 				pathDesired.StartingVelocity = sqrtf(powf(waypointPrev.Velocity[WAYPOINT_VELOCITY_NORTH],2) +
-												   powf(waypointPrev.Velocity[WAYPOINT_VELOCITY_EAST],2));
-
+													 powf(waypointPrev.Velocity[WAYPOINT_VELOCITY_EAST],2));
 			}
-
 			PathDesiredSet(&pathDesired);
 		}
 			break;
 	}
+
 }
 
 void settingsUpdated(UAVObjEvent * ev) {

@@ -626,6 +626,13 @@ ef_$(1)_clean:
 	$(V1) $(RM) -fr $(BUILD_DIR)/ef_$(1)
 endef
 
+# When building any of the "all_*" targets, tell all sub makefiles to display
+# additional details on each line of output to describe which build and target
+# that each line applies to.
+ifneq ($(strip $(filter all_%,$(MAKECMDGOALS))),)
+export ENABLE_MSG_EXTRA := yes
+endif
+
 # $(1) = Canonical board name all in lower case (e.g. coptercontrol)
 define BOARD_PHONY_TEMPLATE
 .PHONY: all_$(1)
@@ -730,7 +737,7 @@ sim_win32_%: uavobjects_flight
 
 .PHONY: sim_osx
 sim_osx: sim_osx_elf
- 
+
 sim_osx_%: uavobjects_flight
 	$(V1) mkdir -p $(BUILD_DIR)/sim_osx
 	$(V1) $(MAKE) --no-print-directory \

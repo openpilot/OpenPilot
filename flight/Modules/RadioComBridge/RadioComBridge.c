@@ -117,6 +117,9 @@ typedef struct {
 	// Track other radios that are in range.
 	PairStats pairStats[PIPXSTATUS_PAIRIDS_NUMELEM];
 
+	// The RSSI of the last packet received.
+	int8_t RSSI;
+
 } RadioComBridgeData;
 
 typedef struct {
@@ -502,6 +505,7 @@ static void radioReceiveTask(void *parameters)
 
 		// Verify that the packet is valid and pass it on.
 		if(PHVerifyPacket(pios_packet_handler, p, rx_bytes) > 0) {
+			data->RSSI = p->header.rssi;
 			UAVObjEvent ev;
 			ev.obj = (UAVObjHandle)p;
 			ev.event = EV_PACKET_RECEIVED;
@@ -509,7 +513,7 @@ static void radioReceiveTask(void *parameters)
 		} else
 		{
 			data->packetErrors++;
-			PHReceivePacket(pios_packet_handler, p, false);
+			PHReceivePacket(pios_packet_handler, p, true);
 		}
 		p = NULL;
 	}
@@ -695,7 +699,6 @@ static void radioStatusTask(void *parameters)
 
 		// Update the status
 		pipxStatus.DeviceID = PIOS_RFM22B_DeviceID(pios_rfm22b_id);
-		pipxStatus.RSSI = PIOS_RFM22B_RSSI(pios_rfm22b_id);
 		pipxStatus.Retries = data->comTxRetries;
 		pipxStatus.Errors = data->packetErrors;
 		pipxStatus.UAVTalkErrors = data->UAVTalkErrors;
@@ -736,7 +739,7 @@ static void radioStatusTask(void *parameters)
 				status_packet.header.type = PACKET_TYPE_STATUS;
 				status_packet.header.data_size = PH_STATUS_DATA_SIZE(&status_packet);
 				status_packet.header.source_id = pipxStatus.DeviceID;
-				status_packet.header.rssi = pipxStatus.RSSI;
+				status_packet.header.rssi = data->RSSI;
 				status_packet.retries = data->comTxRetries;
 				status_packet.errors = data->packetErrors;
 				status_packet.uavtalk_errors = data->UAVTalkErrors;

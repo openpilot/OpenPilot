@@ -185,11 +185,15 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
 	}
 	UAVObjectField* pairRssiField = object->getField("PairSignalStrengths");
 	if (pairRssiField) {
-		m_pipx->PairSignalStrength1->setValue(pairRssiField->getValue(0).toInt());
-		m_pipx->PairSignalStrength2->setValue(pairRssiField->getValue(1).toInt());
-		m_pipx->PairSignalStrength3->setValue(pairRssiField->getValue(2).toInt());
-		m_pipx->PairSignalStrength4->setValue(pairRssiField->getValue(3).toInt());
-	} else {
+        m_pipx->PairSignalStrengthBar1->setValue(pairRssiField->getValue(0).toInt());
+        m_pipx->PairSignalStrengthBar2->setValue(pairRssiField->getValue(1).toInt());
+        m_pipx->PairSignalStrengthBar3->setValue(pairRssiField->getValue(2).toInt());
+        m_pipx->PairSignalStrengthBar4->setValue(pairRssiField->getValue(3).toInt());
+        m_pipx->PairSignalStrengthLabel1->setText(QString("%1dB").arg(pairRssiField->getValue(0).toInt()));
+        m_pipx->PairSignalStrengthLabel2->setText(QString("%1dB").arg(pairRssiField->getValue(1).toInt()));
+        m_pipx->PairSignalStrengthLabel3->setText(QString("%1dB").arg(pairRssiField->getValue(2).toInt()));
+        m_pipx->PairSignalStrengthLabel4->setText(QString("%1dB").arg(pairRssiField->getValue(3).toInt()));
+    } else {
 		qDebug() << "PipXtremeGadgetWidget: Count not read PairID field.";
 	}
 

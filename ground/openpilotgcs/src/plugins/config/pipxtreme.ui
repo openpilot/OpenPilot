@@ -145,7 +145,7 @@
              <widget class="QLineEdit" name="PairID1"/>
             </item>
             <item row="0" column="3">
-             <widget class="QProgressBar" name="PairSignalStrength1">
+             <widget class="QProgressBar" name="PairSignalStrengthBar1">
               <property name="minimum">
                <number>-127</number>
               </property>
@@ -174,7 +174,7 @@
              <widget class="QLineEdit" name="PairID2"/>
             </item>
             <item row="1" column="3">
-             <widget class="QProgressBar" name="PairSignalStrength2">
+             <widget class="QProgressBar" name="PairSignalStrengthBar2">
               <property name="minimum">
                <number>-127</number>
               </property>
@@ -203,7 +203,7 @@
              <widget class="QLineEdit" name="PairID3"/>
             </item>
             <item row="2" column="3">
-             <widget class="QProgressBar" name="PairSignalStrength3">
+             <widget class="QProgressBar" name="PairSignalStrengthBar3">
               <property name="minimum">
                <number>-127</number>
               </property>
@@ -232,7 +232,7 @@
              <widget class="QLineEdit" name="PairID4"/>
             </item>
             <item row="3" column="3">
-             <widget class="QProgressBar" name="PairSignalStrength4">
+             <widget class="QProgressBar" name="PairSignalStrengthBar4">
               <property name="minimum">
                <number>-127</number>
               </property>
@@ -247,6 +247,34 @@
               </property>
               <property name="format">
                <string>%v dBm</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="4">
+             <widget class="QLabel" name="PairSignalStrengthLabel1">
+              <property name="text">
+               <string>-100dB</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="4">
+             <widget class="QLabel" name="PairSignalStrengthLabel2">
+              <property name="text">
+               <string>-100dB</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="4">
+             <widget class="QLabel" name="PairSignalStrengthLabel3">
+              <property name="text">
+               <string>-100dB</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="4">
+             <widget class="QLabel" name="PairSignalStrengthLabel4">
+              <property name="text">
+               <string>-100dB</string>
               </property>
              </widget>
             </item>

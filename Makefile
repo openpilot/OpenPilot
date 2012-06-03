@@ -631,6 +631,12 @@ ifneq ($(strip $(filter all_%,$(MAKECMDGOALS))),)
 export ENABLE_MSG_EXTRA := yes
 endif
 
+# When building more than one goal in a single make invocation, also
+# enable the extra context for each output line
+ifneq ($(word 2,$(MAKECMDGOALS)),)
+export ENABLE_MSG_EXTRA := yes
+endif
+
 # $(1) = Canonical board name all in lower case (e.g. coptercontrol)
 define BOARD_PHONY_TEMPLATE
 .PHONY: all_$(1)

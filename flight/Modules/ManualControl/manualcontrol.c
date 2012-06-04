@@ -363,14 +363,24 @@ static void manualControlTask(void *parameters)
 				}
 
 
-				processFlightMode(&settings, flightMode);
 
 			}
 			
-			if (processFailsafe(valid_input_detected, &settings) == false) {
+			if (processFailsafe(cmd.Connected == MANUALCONTROLCOMMAND_CONNECTED_TRUE, &settings) == false) {
 				// Process arming outside conditional so system will disarm when disconnected.  However don't do
 				// it when in failsafe mode
+
+				// Only update the flight mode when we got valid data
+				if (cmd.Connected == MANUALCONTROLCOMMAND_CONNECTED_TRUE)
+					processFlightMode(&settings, flightMode);
+
+				// However process arming all the time so it can time out
 				processArm(&cmd, &settings);
+
+			} else {
+				// In the case of failsafe don't process the channels to update the flight mode
+				ManualControlCommandSet(&cmd);
+				continue;
 			}
 			
 			// Update cmd object
@@ -641,6 +651,11 @@ static void setRTH(bool changed)
 	}
 }
 
+/**
+ * Determine based on flight settings if we should enter failsafe when there is no valid input
+ * it returns true when the failsafe is engaged and the informs the rest of the system not to
+ * use the inputs
+ */
 static bool processFailsafe(bool valid_input_detected, ManualControlSettingsData *settings)
 {
 	static bool failsafe_enaged = false;
@@ -666,9 +681,9 @@ static bool processFailsafe(bool valid_input_detected, ManualControlSettingsData
 				// exclude fixed wing.
 				if (guidanceSettings.ThrottleControl == GUIDANCESETTINGS_THROTTLECONTROL_TRUE &&
 					flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED) {
-					
 					setRTH(true);
 					flightStatus.FlightMode = FLIGHTSTATUS_FLIGHTMODE_RTH;
+					FlightStatusSet(&flightStatus);
 					failsafe_enaged = true;
 				}
 			}

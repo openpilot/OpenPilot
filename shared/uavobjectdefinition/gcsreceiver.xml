@@ -1,8 +1,8 @@
 <xml>
     <object name="GCSReceiver" singleinstance="true" settings="false">
         <description>A receiver channel group carried over the telemetry link.</description>
-	<field name="Channel" units="us" type="uint16" elements="6"/>
-        <access gcs="readwrite" flight="readwrite"/>
+        <field name="Channel" units="us" type="uint16" elements="8"/>
+        <access gcs="readwrite" flight="readonly"/>
         <telemetrygcs acked="false" updatemode="onchange" period="0"/>
         <telemetryflight acked="false" updatemode="onchange" period="0"/>
         <logging updatemode="manual" period="0"/>

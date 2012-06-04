@@ -120,7 +120,7 @@ static void altitudeTask(void *parameters)
 {
 	BaroAltitudeData data;
 	portTickType lastSysTime;
-
+	
 #if defined(PIOS_INCLUDE_HCSR04)
 	SonarAltitudeData sonardata;
 	int32_t value=0,timeout=5;
@@ -129,7 +129,7 @@ static void altitudeTask(void *parameters)
 	PIOS_HCSR04_Trigger();
 #endif
 	PIOS_BMP085_Init();
-
+	
 	// Main task loop
 	lastSysTime = xTaskGetTickCount();
 	while (1)
@@ -145,7 +145,7 @@ static void altitudeTask(void *parameters)
 				height_out = (height_out * (1 - coeff)) + (height_in * coeff);
 				sonardata.Altitude = height_out; // m/us
 			}
-
+			
 			// Update the AltitudeActual UAVObject
 			SonarAltitudeSet(&sonardata);
 			timeout=5;
@@ -167,7 +167,7 @@ static void altitudeTask(void *parameters)
 #endif
 		PIOS_BMP085_ReadADC();
 		alt_ds_temp += PIOS_BMP085_GetTemperature();
-
+		
 		// Update the pressure data
 		PIOS_BMP085_StartADC(PressureConv);
 #ifdef PIOS_BMP085_HAS_GPIOS
@@ -177,7 +177,7 @@ static void altitudeTask(void *parameters)
 #endif
 		PIOS_BMP085_ReadADC();
 		alt_ds_pres += PIOS_BMP085_GetPressure();
-
+		
 		if (++alt_ds_count >= alt_ds_size)
 		{
 			alt_ds_count = 0;
@@ -203,6 +203,6 @@ static void altitudeTask(void *parameters)
 }
 
 /**
-  * @}
+ * @}
  * @}
  */

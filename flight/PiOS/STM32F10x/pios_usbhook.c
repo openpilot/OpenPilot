@@ -36,6 +36,9 @@
 #include "pios_usb_cdc_priv.h"	/* PIOS_USB_CDC_* */
 #include "pios_usb_board_data.h" /* PIOS_USB_BOARD_* */
 
+/* STM32 USB Library Definitions */
+#include "usb_lib.h"
+
 static ONE_DESCRIPTOR Device_Descriptor;
 
 void PIOS_USBHOOK_RegisterDevice(const uint8_t * desc, uint16_t desc_size)
@@ -62,17 +65,17 @@ void PIOS_USBHOOK_RegisterString(enum usb_string_desc string_id, const uint8_t *
 	}
 }
 
-static ONE_DESCRIPTOR Hid_Interface_Descriptor;
+static ONE_DESCRIPTOR Hid_Descriptor;
 
-void PIOS_USBHOOK_RegisterHidInterface(const uint8_t * desc, uint16_t desc_size)
+void PIOS_USB_HID_RegisterHidDescriptor(const uint8_t * desc, uint16_t desc_size)
 {
-	Hid_Interface_Descriptor.Descriptor      = desc;
-	Hid_Interface_Descriptor.Descriptor_Size = desc_size;
+	Hid_Descriptor.Descriptor      = desc;
+	Hid_Descriptor.Descriptor_Size = desc_size;
 }
 
 static ONE_DESCRIPTOR Hid_Report_Descriptor;
 
-void PIOS_USBHOOK_RegisterHidReport(const uint8_t * desc, uint16_t desc_size)
+void PIOS_USB_HID_RegisterHidReport(const uint8_t * desc, uint16_t desc_size)
 {
 	Hid_Report_Descriptor.Descriptor      = desc;
 	Hid_Report_Descriptor.Descriptor_Size = desc_size;
@@ -290,6 +293,8 @@ static void PIOS_USBHOOK_Status_Out(void)
 * Output         : None.
 * Return         : USB_UNSUPPORT or USB_SUCCESS.
 *******************************************************************************/
+extern const uint8_t *PIOS_USB_CDC_GetLineCoding(uint16_t Length);
+
 static RESULT PIOS_USBHOOK_Data_Setup(uint8_t RequestNo)
 {
 	const uint8_t *(*CopyRoutine) (uint16_t);
@@ -318,7 +323,7 @@ static RESULT PIOS_USBHOOK_Data_Setup(uint8_t RequestNo)
 		switch (pInformation->USBwIndex0) {
 		case 0:		/* HID Interface */
 			switch (RequestNo) {
-			case GET_PROTOCOL:
+			case USB_HID_REQ_GET_PROTOCOL:
 				CopyRoutine = PIOS_USBHOOK_GetProtocolValue;
 				break;
 			}
@@ -327,7 +332,7 @@ static RESULT PIOS_USBHOOK_Data_Setup(uint8_t RequestNo)
 #if defined(PIOS_INCLUDE_USB_CDC)
 		case 1:		/* CDC Call Control Interface */
 			switch (RequestNo) {
-			case GET_LINE_CODING:
+			case USB_CDC_REQ_GET_LINE_CODING:
 				CopyRoutine = PIOS_USB_CDC_GetLineCoding;
 				break;
 			}
@@ -363,6 +368,9 @@ static RESULT PIOS_USBHOOK_Data_Setup(uint8_t RequestNo)
 * Output         : None.
 * Return         : USB_UNSUPPORT or USB_SUCCESS.
 *******************************************************************************/
+extern RESULT PIOS_USB_CDC_SetControlLineState(void);
+extern RESULT PIOS_USB_CDC_SetLineCoding(void);
+
 static RESULT PIOS_USBHOOK_NoData_Setup(uint8_t RequestNo)
 {
 	switch (Type_Recipient) {
@@ -370,7 +378,7 @@ static RESULT PIOS_USBHOOK_NoData_Setup(uint8_t RequestNo)
 		switch (pInformation->USBwIndex0) {
 		case 0:		/* HID */
 			switch (RequestNo) {
-			case SET_PROTOCOL:
+			case USB_HID_REQ_SET_PROTOCOL:
 				return PIOS_USBHOOK_SetProtocol();
 				break;
 			}
@@ -380,10 +388,10 @@ static RESULT PIOS_USBHOOK_NoData_Setup(uint8_t RequestNo)
 #if defined(PIOS_INCLUDE_USB_CDC)
 		case 1:		/* CDC Call Control Interface */
 			switch (RequestNo) {
-			case SET_LINE_CODING:
+			case USB_CDC_REQ_SET_LINE_CODING:
 				return PIOS_USB_CDC_SetLineCoding();
 				break;
-			case SET_CONTROL_LINE_STATE:
+			case USB_CDC_REQ_SET_CONTROL_LINE_STATE:
 				return PIOS_USB_CDC_SetControlLineState();
 				break;
 			}
@@ -460,7 +468,7 @@ static const uint8_t *PIOS_USBHOOK_GetReportDescriptor(uint16_t Length)
 *******************************************************************************/
 static const uint8_t *PIOS_USBHOOK_GetHIDDescriptor(uint16_t Length)
 {
-	return Standard_GetDescriptorData(Length, &Hid_Interface_Descriptor);
+	return Standard_GetDescriptorData(Length, &Hid_Descriptor);
 }
 
 /*******************************************************************************

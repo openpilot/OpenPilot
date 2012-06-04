@@ -15,7 +15,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QGroupBox" name="horizontalGroupBox">
+    <widget class="QGroupBox" name="horizontalGroupBox1">
      <property name="title">
       <string>Device Information</string>
      </property>
@@ -92,7 +92,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="horizontalGroupBox">
+    <widget class="QGroupBox" name="horizontalGroupBox2">
      <property name="title">
       <string>Firmware Information</string>
      </property>

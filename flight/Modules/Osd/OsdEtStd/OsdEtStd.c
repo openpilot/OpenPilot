@@ -248,7 +248,7 @@ static bool Read(uint32_t start, uint8_t length, uint8_t * buffer)
 	cmd[3] = (uint8_t) (start >> 8);
 	cmd[4] = length;
 
-	return PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list));
+	return PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list)) == 0;
 }
 
 static bool Write(uint32_t start, uint8_t length, const uint8_t * buffer)

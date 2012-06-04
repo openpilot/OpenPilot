@@ -49,7 +49,7 @@ public:
     virtual void updateObjectsFromWidgets();
 
 private slots:
-    void attitudeRawUpdated(UAVObject * obj);
+    void accelsUpdated(UAVObject * obj);
     void timeout();
     void startAccelCalibration();
     void openHelp();

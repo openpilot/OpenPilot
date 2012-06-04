@@ -66,8 +66,8 @@ typedef struct {
 typedef enum {
     UPDATEMODE_PERIODIC = 0, /** Automatically update object at periodic intervals */
     UPDATEMODE_ONCHANGE, /** Only update object when its data changes */
-    UPDATEMODE_MANUAL,  /** Manually update object, by calling the updated() function */
-    UPDATEMODE_NEVER /** Object is never updated */
+    UPDATEMODE_THROTTLED, /** Object is updated on change, but not more often than the interval time */
+    UPDATEMODE_MANUAL  /** Manually update object, by calling the updated() function */
 } UpdateMode;
 
 

@@ -38,7 +38,7 @@ void replaceCommonTags(QString& out, ObjectInfo* info)
 
     QStringList updateModeStr,accessModeStr;
     updateModeStr << "UPDATEMODE_PERIODIC" << "UPDATEMODE_ONCHANGE"
-        << "UPDATEMODE_MANUAL" << "UPDATEMODE_NEVER";
+                  << "UPDATEMODE_THROTTLED" << "UPDATEMODE_MANUAL";
 
     accessModeStr << "ACCESS_READWRITE" << "ACCESS_READONLY";
 

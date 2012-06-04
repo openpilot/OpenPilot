@@ -5,10 +5,13 @@
 		<field name="CC_MainPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,S.Bus,DSM2,DSMX (10bit),DSMX (11bit),ComAux,ComBridge" defaultvalue="Disabled"/>
 		<field name="CC_FlexiPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,I2C,DSM2,DSMX (10bit),DSMX (11bit),ComAux,ComBridge" defaultvalue="Disabled"/>
 
-		<field name="OP_RcvrPort" units="function" type="enum" elements="1" options="Disabled,PWM,PPM,DSM2,DSMX (10bit),DSMX (11bit),Debug" defaultvalue="PWM"/>
-		<field name="OP_MainPort" units="function" type="enum" elements="1" options="Disabled,Telemetry" defaultvalue="Telemetry"/>
-		<field name="OP_FlexiPort" units="function" type="enum" elements="1" options="Disabled,GPS" defaultvalue="GPS"/>
-
+		<field name="RV_RcvrPort" units="function" type="enum" elements="1" options="Disabled,PWM,PPM,PPM+Outputs,Outputs" defaultvalue="PWM"/>
+		<field name="RV_AuxPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,DSM2,DSMX (10bit),DSMX (11bit),ComAux,ComBridge" defaultvalue="Disabled"/>
+		<field name="RV_AuxSBusPort" units="function" type="enum" elements="1" options="Disabled,S.Bus,DSM2,DSMX (10bit),DSMX (11bit),ComAux,ComBridge" defaultvalue="Disabled"/>
+		<field name="RV_FlexiPort" units="function" type="enum" elements="1" options="Disabled,I2C,DSM2,DSMX (10bit),DSMX (11bit),ComAux,ComBridge" defaultvalue="Disabled"/>
+		<field name="RV_TelemetryPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,ComAux,ComBridge" defaultvalue="Telemetry"/>
+		<field name="RV_GPSPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,ComAux,ComBridge" defaultvalue="GPS"/>
+		  
 		<field name="TelemetrySpeed" units="bps" type="enum" elements="1" options="2400,4800,9600,19200,38400,57600,115200" defaultvalue="57600"/>
 		<field name="GPSSpeed" units="bps" type="enum" elements="1" options="2400,4800,9600,19200,38400,57600,115200" defaultvalue="57600"/>
 		<field name="ComUsbBridgeSpeed" units="bps" type="enum" elements="1" options="2400,4800,9600,19200,38400,57600,115200" defaultvalue="57600"/>
@@ -22,6 +25,6 @@
 		<access gcs="readwrite" flight="readwrite"/>
 		<telemetrygcs acked="true" updatemode="onchange" period="0"/>
 		<telemetryflight acked="true" updatemode="onchange" period="0"/>
-		<logging updatemode="never" period="0"/>
+		<logging updatemode="manual" period="0"/>
     </object>
 </xml>

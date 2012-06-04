@@ -31,6 +31,7 @@
  * Event dispatcher statistics
  */
 typedef struct {
+	uint32_t lastErrorID;
 	uint32_t eventErrors;
 } EventStats;
 
@@ -39,9 +40,9 @@ int32_t EventDispatcherInitialize();
 void EventGetStats(EventStats* statsOut);
 void EventClearStats();
 int32_t EventCallbackDispatch(UAVObjEvent* ev, UAVObjEventCallback cb);
-int32_t EventPeriodicCallbackCreate(UAVObjEvent* ev, UAVObjEventCallback cb, int32_t periodMs);
-int32_t EventPeriodicCallbackUpdate(UAVObjEvent* ev, UAVObjEventCallback cb, int32_t periodMs);
-int32_t EventPeriodicQueueCreate(UAVObjEvent* ev, xQueueHandle queue, int32_t periodMs);
-int32_t EventPeriodicQueueUpdate(UAVObjEvent* ev, xQueueHandle queue, int32_t periodMs);
+int32_t EventPeriodicCallbackCreate(UAVObjEvent* ev, UAVObjEventCallback cb, uint16_t periodMs);
+int32_t EventPeriodicCallbackUpdate(UAVObjEvent* ev, UAVObjEventCallback cb, uint16_t periodMs);
+int32_t EventPeriodicQueueCreate(UAVObjEvent* ev, xQueueHandle queue, uint16_t periodMs);
+int32_t EventPeriodicQueueUpdate(UAVObjEvent* ev, xQueueHandle queue, uint16_t periodMs);
 
 #endif // EVENTDISPATCHER_H

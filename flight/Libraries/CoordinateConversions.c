@@ -31,16 +31,17 @@
 #include <stdint.h>
 #include "CoordinateConversions.h"
 
-#define RAD2DEG (180.0/M_PI)
-#define DEG2RAD (M_PI/180.0)
+#define F_PI 3.14159265358979323846f
+#define RAD2DEG (180.0f/ F_PI)
+#define DEG2RAD (F_PI /180.0f)
 
 // ****** convert Lat,Lon,Alt to ECEF  ************
-void LLA2ECEF(double LLA[3], double ECEF[3])
+void LLA2ECEF(float LLA[3], float ECEF[3])
 {
-	const double a = 6378137.0;	// Equatorial Radius
-	const double e = 8.1819190842622e-2;	// Eccentricity
-	double sinLat, sinLon, cosLat, cosLon;
-	double N;
+	const float a = 6378137.0;	// Equatorial Radius
+	const float e = 8.1819190842622e-2;	// Eccentricity
+	float sinLat, sinLon, cosLat, cosLon;
+	float N;
 
 	sinLat = sin(DEG2RAD * LLA[0]);
 	sinLon = sin(DEG2RAD * LLA[1]);
@@ -55,7 +56,7 @@ void LLA2ECEF(double LLA[3], double ECEF[3])
 }
 
 // ****** convert ECEF to Lat,Lon,Alt (ITERATIVE!) *********
-uint16_t ECEF2LLA(double ECEF[3], double LLA[3])
+uint16_t ECEF2LLA(float ECEF[3], float LLA[3])
 {
 	/**
 	 * LLA parameter is used to prime the iteration.
@@ -66,10 +67,10 @@ uint16_t ECEF2LLA(double ECEF[3], double LLA[3])
 	 * Suggestion: [0,0,0]
 	 **/
 
-	const double a = 6378137.0;	// Equatorial Radius
-	const double e = 8.1819190842622e-2;	// Eccentricity
-	double x = ECEF[0], y = ECEF[1], z = ECEF[2];
-	double Lat, N, NplusH, delta, esLat;
+	const float a = 6378137.0;	// Equatorial Radius
+	const float e = 8.1819190842622e-2;	// Eccentricity
+	float x = ECEF[0], y = ECEF[1], z = ECEF[2];
+	float Lat, N, NplusH, delta, esLat;
 	uint16_t iter;
 #define MAX_ITER 10		// should not take more than 5 for valid coordinates
 #define ACCURACY 1.0e-11	// used to be e-14, but we don't need sub micrometer exact calculations
@@ -99,7 +100,7 @@ uint16_t ECEF2LLA(double ECEF[3], double LLA[3])
 }
 
 // ****** find ECEF to NED rotation matrix ********
-void RneFromLLA(double LLA[3], float Rne[3][3])
+void RneFromLLA(float LLA[3], float Rne[3][3])
 {
 	float sinLat, sinLon, cosLat, cosLon;
 
@@ -128,10 +129,10 @@ void Quaternion2RPY(const float q[4], float rpy[3])
 	float q2s = q[2] * q[2];
 	float q3s = q[3] * q[3];
 
-	R13 = 2 * (q[1] * q[3] - q[0] * q[2]);
+	R13 = 2.0f * (q[1] * q[3] - q[0] * q[2]);
 	R11 = q0s + q1s - q2s - q3s;
-	R12 = 2 * (q[1] * q[2] + q[0] * q[3]);
-	R23 = 2 * (q[2] * q[3] + q[0] * q[1]);
+	R12 = 2.0f * (q[1] * q[2] + q[0] * q[3]);
+	R23 = 2.0f * (q[2] * q[3] + q[0] * q[1]);
 	R33 = q0s - q1s - q2s + q3s;
 
 	rpy[1] = RAD2DEG * asinf(-R13);	// pitch always between -pi/2 to pi/2
@@ -188,9 +189,9 @@ void Quaternion2R(float q[4], float Rbe[3][3])
 }
 
 // ****** Express LLA in a local NED Base Frame ********
-void LLA2Base(double LLA[3], double BaseECEF[3], float Rne[3][3], float NED[3])
+void LLA2Base(float LLA[3], float BaseECEF[3], float Rne[3][3], float NED[3])
 {
-	double ECEF[3];
+	float ECEF[3];
 	float diff[3];
 
 	LLA2ECEF(LLA, ECEF);
@@ -205,7 +206,7 @@ void LLA2Base(double LLA[3], double BaseECEF[3], float Rne[3][3], float NED[3])
 }
 
 // ****** Express ECEF in a local NED Base Frame ********
-void ECEF2Base(double ECEF[3], double BaseECEF[3], float Rne[3][3], float NED[3])
+void ECEF2Base(float ECEF[3], float BaseECEF[3], float Rne[3][3], float NED[3])
 {
 	float diff[3];
 
@@ -239,7 +240,7 @@ void R2Quaternion(float R[3][3], float q[4])
 			index = i;
 		}
 	}
-	mag = 2*sqrt(mag);
+	mag = 2*sqrtf(mag);
 
 	if (index == 0) {
 		q[0] = mag/4;
@@ -373,7 +374,7 @@ void CrossProduct(const float v1[3], const float v2[3], float result[3])
 // ****** Vector Magnitude ********
 float VectorMagnitude(const float v[3])
 {
-	return(sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]));
+	return(sqrtf(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]));
 }
 
 /**

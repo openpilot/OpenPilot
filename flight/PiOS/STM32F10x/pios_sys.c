@@ -55,20 +55,10 @@ void PIOS_SYS_Init(void)
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOC | RCC_APB2Periph_GPIOD | RCC_APB2Periph_GPIOE |
 			       RCC_APB2Periph_AFIO, ENABLE);
 
-	/* Activate pull-ups on all pins by default */
-	GPIO_InitTypeDef GPIO_InitStructure;
-	GPIO_StructInit(&GPIO_InitStructure);
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
-	GPIO_InitStructure.GPIO_Pin = 0xffff;
-	GPIO_Init(GPIOB, &GPIO_InitStructure);
-	GPIO_Init(GPIOD, &GPIO_InitStructure);
-#if (PIOS_USB_ENABLED)
-	GPIO_InitStructure.GPIO_Pin = 0xffff & ~GPIO_Pin_11 & ~GPIO_Pin_12;	/* Exclude USB pins */
-#endif
-	GPIO_Init(GPIOA, &GPIO_InitStructure);
-
 #if (PIOS_USB_ENABLED)
 	/*  Ensure that pull-up is active on detect pin */
+	GPIO_InitTypeDef GPIO_InitStructure;
+	GPIO_StructInit(&GPIO_InitStructure);
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
 	GPIO_InitStructure.GPIO_Pin = PIOS_USB_DETECT_GPIO_PIN;
 	GPIO_Init(PIOS_USB_DETECT_GPIO_PORT, &GPIO_InitStructure);

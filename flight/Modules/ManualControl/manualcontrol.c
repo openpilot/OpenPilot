@@ -40,6 +40,7 @@
 #include "baroaltitude.h"
 #include "flighttelemetrystats.h"
 #include "flightstatus.h"
+#include "guidancesettings.h"
 #include "manualcontrol.h"
 #include "manualcontrolsettings.h"
 #include "manualcontrolcommand.h"
@@ -85,9 +86,10 @@ static void updateActuatorDesired(ManualControlCommandData * cmd);
 static void updateStabilizationDesired(ManualControlCommandData * cmd, ManualControlSettingsData * settings);
 static void altitudeHoldDesired(ManualControlCommandData * cmd, bool changed);
 static void updatePathDesired(ManualControlCommandData * cmd, bool changed);
-static void setRTH(ManualControlCommandData * cmd, bool changed);
+static void setRTH(bool changed);
 static void processFlightMode(ManualControlSettingsData * settings, float flightMode);
 static void processArm(ManualControlCommandData * cmd, ManualControlSettingsData * settings);
+static bool processFailsafe(bool valid_input_detected, ManualControlSettingsData * settings);
 static void setArmedIfChanged(uint8_t val);
 
 static void manualControlTask(void *parameters);
@@ -228,9 +230,9 @@ static void manualControlTask(void *parameters)
 				
 				// If a channel has timed out this is not valid data and we shouldn't update anything
 				// until we decide to go to failsafe
-				if(cmd.Channel[n] == PIOS_RCVR_TIMEOUT)
+				if(cmd.Channel[n] == PIOS_RCVR_TIMEOUT) {
 					valid_input_detected = false;
-				else
+				} else
 					scaledChannel[n] = scaleChannel(cmd.Channel[n], settings.ChannelMax[n],	settings.ChannelMin[n], settings.ChannelNeutral[n]);
 			}
 
@@ -364,9 +366,12 @@ static void manualControlTask(void *parameters)
 				processFlightMode(&settings, flightMode);
 
 			}
-
-			// Process arming outside conditional so system will disarm when disconnected
-			processArm(&cmd, &settings);
+			
+			if (processFailsafe(valid_input_detected, &settings) == false) {
+				// Process arming outside conditional so system will disarm when disconnected.  However don't do
+				// it when in failsafe mode
+				processArm(&cmd, &settings);
+			}
 			
 			// Update cmd object
 			ManualControlCommandSet(&cmd);
@@ -399,7 +404,7 @@ static void manualControlTask(void *parameters)
 						updatePathDesired(&cmd, lastFlightMode != flightStatus.FlightMode);
 						break;
 					case FLIGHTSTATUS_FLIGHTMODE_RTH:
-						setRTH(&cmd, lastFlightMode != flightStatus.FlightMode);
+						setRTH(lastFlightMode != flightStatus.FlightMode);
 						break;
 					default:
 						AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_CRITICAL);
@@ -618,7 +623,7 @@ static void updateStabilizationDesired(ManualControlCommandData * cmd, ManualCon
 }
 
 #if defined(REVOLUTION)
-static void setRTH(ManualControlCommandData * cmd, bool changed)
+static void setRTH(bool changed)
 {
 	if(changed) {
 		PositionActualData positionActual;
@@ -636,6 +641,46 @@ static void setRTH(ManualControlCommandData * cmd, bool changed)
 	}
 }
 
+static bool processFailsafe(bool valid_input_detected, ManualControlSettingsData *settings)
+{
+	static bool failsafe_enaged = false;
+
+	if (valid_input_detected) {
+		failsafe_enaged = false;
+	} else if (!failsafe_enaged) {
+		switch(settings->FailsafeBehavior) {
+			case MANUALCONTROLSETTINGS_FAILSAFEBEHAVIOR_NONE:
+				failsafe_enaged = false;
+				break;
+			case MANUALCONTROLSETTINGS_FAILSAFEBEHAVIOR_RTH: 
+			{
+				GuidanceSettingsData guidanceSettings;
+				GuidanceSettingsGet(&guidanceSettings);
+				
+				FlightStatusData flightStatus;
+				FlightStatusGet(&flightStatus);
+				
+				// Only makes sense to try and RTH if the AP is controlling throttle and we are
+				// already armed.  It would be _really_ nice to have some indication we are actively
+				// flying to put here.  I would like to check the throttle is engaged but that would
+				// exclude fixed wing.
+				if (guidanceSettings.ThrottleControl == GUIDANCESETTINGS_THROTTLECONTROL_TRUE &&
+					flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED) {
+					
+					setRTH(true);
+					flightStatus.FlightMode = FLIGHTSTATUS_FLIGHTMODE_RTH;
+					failsafe_enaged = true;
+				}
+			}
+				break;
+		}
+	} else if (failsafe_enaged) {
+		// Eventually process more sophisticated behavior here like triggering landing
+	}
+
+	return failsafe_enaged;
+}
+  
 /**
  * @brief Update the position desired to current location when
  * enabled and allow the waypoint to be moved by transmitter
@@ -721,7 +766,12 @@ static void altitudeHoldDesired(ManualControlCommandData * cmd, bool changed)
 // could allow them to be called sholud already throw an error to prevent this happening
 // in flight
 
-static void setRTH(ManualControlCommandData * cmd, bool changed)
+static bool processFailsafe(bool valid_input_detected, ManualControlSettingsData *settings)
+{
+	return false;
+}
+
+static void setRTH(bool changed)
 {
 	AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_ERROR);
 }

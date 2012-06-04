@@ -26,6 +26,7 @@
         <field name="FlightModePosition" units="" type="enum" elements="3" options="Manual,Stabilized1,Stabilized2,Stabilized3,AltitudeHold,VelocityControl,PositionHold,PathPlanner,RTH,Land" defaultvalue="Manual,Stabilized1,Stabilized2"/>
 
         <field name="ArmedTimeout" units="ms" type="uint16" elements="1" defaultvalue="30000"/>
+        <field name="FailsafeBehavior" units="" type="enum" elements="1" options="None,RTH" defaultvalue="None"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

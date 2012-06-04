@@ -1,5 +1,12 @@
 Short summary of changes.  For a complete list see the git log.
 
+2012-05-26
+Revert some UI changes that didn't work consistently between OSX and Windows.
+
+2012-05-24
+Merged the updated firmware for the PipXtreme, thanks to Brian for a lot of
+work on this.
+
 2012-05-04
 Support for CC3D.  This involved changes to various things such as the sensors
 being split from AttitudeRaw to Accels,Gyros,Magnetometer.  A single firmware

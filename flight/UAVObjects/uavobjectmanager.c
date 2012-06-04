@@ -721,10 +721,11 @@ int32_t UAVObjLoad(UAVObjHandle obj, uint16_t instId)
 		return -1;
 
 	// Fire event on success
-	if (PIOS_FLASHFS_ObjLoad(obj, instId, instEntry->data) == 0)
+	int32_t retval;
+	if ((retval = PIOS_FLASHFS_ObjLoad(obj, instId, instEntry->data)) == 0)
 		sendEvent(objEntry, instId, EV_UNPACKED);
 	else
-		return -1;
+		return retval;
 #endif
 
 #if defined(PIOS_INCLUDE_SDCARD)

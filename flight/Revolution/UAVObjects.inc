@@ -45,6 +45,7 @@ UAVOBJSRCFILENAMES += flightplansettings
 UAVOBJSRCFILENAMES += flightplanstatus
 UAVOBJSRCFILENAMES += flighttelemetrystats
 UAVOBJSRCFILENAMES += gcstelemetrystats
+UAVOBJSRCFILENAMES += gcsreceiver
 UAVOBJSRCFILENAMES += gpsposition
 UAVOBJSRCFILENAMES += gpssatellites
 UAVOBJSRCFILENAMES += gpstime

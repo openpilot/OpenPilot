@@ -1754,10 +1754,13 @@ static const struct pios_ppm_cfg pios_ppm_cfg = {
 
 #endif //PPM
 
+#if defined(PIOS_INCLUDE_GCSRCVR)
+#include "pios_gcsrcvr_priv.h"
+#endif	/* PIOS_INCLUDE_GCSRCVR */
+
 #if defined(PIOS_INCLUDE_RCVR)
 #include "pios_rcvr_priv.h"
-
-#endif
+#endif /* PIOS_INCLUDE_RCVR */
 
 #if defined(PIOS_INCLUDE_USB)
 #include "pios_usb_priv.h"

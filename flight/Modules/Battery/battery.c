@@ -49,6 +49,7 @@
 
 #include "flightbatterystate.h"
 #include "flightbatterysettings.h"
+#include "hwsettings.h"
 
 //
 // Configuration
@@ -58,6 +59,7 @@
 // Private types
 
 // Private variables
+static bool batteryEnabled = false;
 
 // Private functions
 static void onTimer(UAVObjEvent* ev);
@@ -68,13 +70,30 @@ static void onTimer(UAVObjEvent* ev);
  */
 int32_t BatteryInitialize(void)
 {
-	FlightBatteryStateInitialize();
-	FlightBatterySettingsInitialize();
-	
-	static UAVObjEvent ev;
 
-	memset(&ev,0,sizeof(UAVObjEvent));
-	EventPeriodicCallbackCreate(&ev, onTimer, SAMPLE_PERIOD_MS / portTICK_RATE_MS);
+#ifdef MODULE_BATTERY_BUILTIN
+	batteryEnabled = true;
+#else
+	HwSettingsInitialize();
+	uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
+
+	HwSettingsOptionalModulesGet(optionalModules);
+
+	if (optionalModules[HWSETTINGS_OPTIONALMODULES_BATTERY] == HWSETTINGS_OPTIONALMODULES_ENABLED)
+		batteryEnabled = true;
+	else
+		batteryEnabled = false;
+#endif
+
+	if (batteryEnabled) {
+		FlightBatteryStateInitialize();
+		FlightBatterySettingsInitialize();
+	
+		static UAVObjEvent ev;
+
+		memset(&ev,0,sizeof(UAVObjEvent));
+		EventPeriodicCallbackCreate(&ev, onTimer, SAMPLE_PERIOD_MS / portTICK_RATE_MS);
+	}
 
 	return 0;
 }

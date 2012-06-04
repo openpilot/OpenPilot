@@ -189,6 +189,7 @@ extern uint32_t pios_com_vcp_id;
 //------------------------
 #define PIOS_RCVR_MAX_DEVS           3
 #define PIOS_RCVR_MAX_CHANNELS       12
+#define PIOS_GCSRCVR_TIMEOUT_MS      100
 
 //-------------------------
 // Receiver PPM input

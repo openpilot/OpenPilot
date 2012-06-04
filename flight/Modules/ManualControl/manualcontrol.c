@@ -85,6 +85,7 @@ static void updateActuatorDesired(ManualControlCommandData * cmd);
 static void updateStabilizationDesired(ManualControlCommandData * cmd, ManualControlSettingsData * settings);
 static void altitudeHoldDesired(ManualControlCommandData * cmd, bool changed);
 static void updatePathDesired(ManualControlCommandData * cmd, bool changed);
+static void setRTH(ManualControlCommandData * cmd, bool changed);
 static void processFlightMode(ManualControlSettingsData * settings, float flightMode);
 static void processArm(ManualControlCommandData * cmd, ManualControlSettingsData * settings);
 static void setArmedIfChanged(uint8_t val);
@@ -397,6 +398,9 @@ static void manualControlTask(void *parameters)
 					case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
 						updatePathDesired(&cmd, lastFlightMode != flightStatus.FlightMode);
 						break;
+					case FLIGHTSTATUS_FLIGHTMODE_RTH:
+						setRTH(&cmd, lastFlightMode != flightStatus.FlightMode);
+						break;
 					default:
 						AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_CRITICAL);
 				}
@@ -614,7 +618,24 @@ static void updateStabilizationDesired(ManualControlCommandData * cmd, ManualCon
 }
 
 #if defined(REVOLUTION)
-// TODO: Need compile flag to exclude this from copter control
+static void setRTH(ManualControlCommandData * cmd, bool changed)
+{
+	if(changed) {
+		PositionActualData positionActual;
+		PositionActualGet(&positionActual);
+
+		PathDesiredData pathDesired;
+		PathDesiredGet(&pathDesired);
+
+		// Attempt to fly to home 10 m above the current location
+		pathDesired.End[PATHDESIRED_END_NORTH] = 0;
+		pathDesired.End[PATHDESIRED_END_EAST] = 0;
+		pathDesired.End[PATHDESIRED_END_DOWN] = positionActual.Down - 10;
+		pathDesired.Mode = PATHDESIRED_MODE_ENDPOINT;
+		PathDesiredSet(&pathDesired);
+	}
+}
+
 /**
  * @brief Update the position desired to current location when
  * enabled and allow the waypoint to be moved by transmitter
@@ -699,6 +720,12 @@ static void altitudeHoldDesired(ManualControlCommandData * cmd, bool changed)
 // TODO: These functions should never be accessible on CC.  Any configuration that
 // could allow them to be called sholud already throw an error to prevent this happening
 // in flight
+
+static void setRTH(ManualControlCommandData * cmd, bool changed)
+{
+	AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_ERROR);
+}
+
 static void updatePathDesired(ManualControlCommandData * cmd, bool changed)
 {
 	AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_ERROR);

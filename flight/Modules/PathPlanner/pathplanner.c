@@ -230,16 +230,6 @@ static void activateWaypoint(int idx)
 	PathDesiredData pathDesired;
 
 	switch(waypoint_mode) {
-		case WAYPOINT_ACTION_RTH:
-		{
-			PathDesiredGet(&pathDesired);
-			pathDesired.End[PATHDESIRED_END_NORTH] = 0;
-			pathDesired.End[PATHDESIRED_END_EAST] = 0;
-			pathDesired.End[PATHDESIRED_END_DOWN] = -50; // TODO: Get alt from somewhere?
-			pathDesired.Mode = PATHDESIRED_MODE_ENDPOINT;
-			PathDesiredSet(&pathDesired);
-		}
-			break;
 		case WAYPOINT_ACTION_ENDPOINTTONEXT:
 		{
 			WaypointInstGet(idx, &waypoint);

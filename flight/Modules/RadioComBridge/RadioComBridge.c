@@ -55,8 +55,8 @@
 #define BRIDGE_BUF_LEN 512
 #define MAX_RETRIES 2
 #define RETRY_TIMEOUT_MS 20
-#define STATS_UPDATE_PERIOD_MS 2000
-#define RADIOSTATS_UPDATE_PERIOD_MS 1000
+#define STATS_UPDATE_PERIOD_MS 500
+#define RADIOSTATS_UPDATE_PERIOD_MS 250
 #define MAX_LOST_CONTACT_TIME 4
 #define PACKET_QUEUE_SIZE 10
 #define MAX_PORT_DELAY 200
@@ -117,6 +117,9 @@ typedef struct {
 	// Track other radios that are in range.
 	PairStats pairStats[PIPXSTATUS_PAIRIDS_NUMELEM];
 
+	// The RSSI of the last packet received.
+	int8_t RSSI;
+
 } RadioComBridgeData;
 
 typedef struct {
@@ -175,7 +178,7 @@ static int32_t RadioComBridgeStart(void)
 		if(PIOS_COM_TRANS_COM)
 			PIOS_WDG_RegisterFlag(PIOS_WDG_TRANSCOMM);
 		PIOS_WDG_RegisterFlag(PIOS_WDG_RADIORECEIVE);
-		PIOS_WDG_RegisterFlag(PIOS_WDG_SENDPACKET);
+		//PIOS_WDG_RegisterFlag(PIOS_WDG_SENDPACKET);
 		//PIOS_WDG_RegisterFlag(PIOS_WDG_SENDDATA);
 		if(PIOS_PPM_RECEIVER)
 			PIOS_WDG_RegisterFlag(PIOS_WDG_PPMINPUT);
@@ -294,7 +297,6 @@ static void comUAVTalkTask(void *parameters)
 		uint8_t rx_byte;
 		if(!BufferedRead(f, &rx_byte, MAX_PORT_DELAY))
 			continue;
-		data->txBytes++;
 
 		// Get a TX packet from the packet handler if required.
 		if (p == NULL)
@@ -503,6 +505,7 @@ static void radioReceiveTask(void *parameters)
 
 		// Verify that the packet is valid and pass it on.
 		if(PHVerifyPacket(pios_packet_handler, p, rx_bytes) > 0) {
+			data->RSSI = p->header.rssi;
 			UAVObjEvent ev;
 			ev.obj = (UAVObjHandle)p;
 			ev.event = EV_PACKET_RECEIVED;
@@ -510,7 +513,7 @@ static void radioReceiveTask(void *parameters)
 		} else
 		{
 			data->packetErrors++;
-			PHReceivePacket(pios_packet_handler, p, false);
+			PHReceivePacket(pios_packet_handler, p, true);
 		}
 		p = NULL;
 	}
@@ -527,7 +530,7 @@ static void sendPacketTask(void *parameters)
 	while (1) {
 #ifdef PIOS_INCLUDE_WDG
 		// Update the watchdog timer.
-		PIOS_WDG_UpdateFlag(PIOS_WDG_SENDPACKET);
+		//PIOS_WDG_UpdateFlag(PIOS_WDG_SENDPACKET);
 #endif /* PIOS_INCLUDE_WDG */
 		// Wait for a packet on the queue.
 		if (xQueueReceive(data->sendPacketQueue, &p, MAX_PORT_DELAY) == pdTRUE) {
@@ -696,7 +699,6 @@ static void radioStatusTask(void *parameters)
 
 		// Update the status
 		pipxStatus.DeviceID = PIOS_RFM22B_DeviceID(pios_rfm22b_id);
-		pipxStatus.RSSI = PIOS_RFM22B_RSSI(pios_rfm22b_id);
 		pipxStatus.Retries = data->comTxRetries;
 		pipxStatus.Errors = data->packetErrors;
 		pipxStatus.UAVTalkErrors = data->UAVTalkErrors;
@@ -737,7 +739,7 @@ static void radioStatusTask(void *parameters)
 				status_packet.header.type = PACKET_TYPE_STATUS;
 				status_packet.header.data_size = PH_STATUS_DATA_SIZE(&status_packet);
 				status_packet.header.source_id = pipxStatus.DeviceID;
-				status_packet.header.rssi = pipxStatus.RSSI;
+				status_packet.header.rssi = data->RSSI;
 				status_packet.retries = data->comTxRetries;
 				status_packet.errors = data->packetErrors;
 				status_packet.uavtalk_errors = data->UAVTalkErrors;
@@ -814,6 +816,7 @@ static int32_t transmitData(uint8_t *buf, int32_t length)
  */
 static int32_t transmitPacket(PHPacketHandle p)
 {
+	data->txBytes += PH_PACKET_SIZE(p);
 	return PIOS_COM_SendBuffer(PIOS_COM_RADIO, (uint8_t*)p, PH_PACKET_SIZE(p));
 }
 

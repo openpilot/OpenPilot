@@ -171,7 +171,7 @@ protected slots:
     virtual void clearDirty();
     virtual void widgetsContentsChanged();
     virtual void populateWidgets();
-    virtual void refreshWidgetsValues();
+    virtual void refreshWidgetsValues(UAVObject * obj=NULL);
     virtual void updateObjectsFromWidgets();
     virtual void helpButtonPressed();
 protected:

@@ -20,6 +20,7 @@ HEADERS += configplugin.h \
     config_pro_hw_widget.h \
     config_cc_hw_widget.h \
     configccattitudewidget.h \
+    configpipxtremewidget.h \
     cfg_vehicletypes/configccpmwidget.h \
     configstabilizationwidget.h \
     assertions.h \
@@ -50,6 +51,7 @@ SOURCES += configplugin.cpp \
     config_cc_hw_widget.cpp \
     configccattitudewidget.cpp \
     configstabilizationwidget.cpp \
+    configpipxtremewidget.cpp \
     twostep.cpp \
     legacy-calibration.cpp \
     gyro-calibration.cpp \
@@ -80,5 +82,6 @@ FORMS += airframe.ui \
     camerastabilization.ui \
     outputchannelform.ui \
     revosensors.ui \
-    txpid.ui 
+    txpid.ui \
+    pipxtreme.ui
 RESOURCES += configgadget.qrc

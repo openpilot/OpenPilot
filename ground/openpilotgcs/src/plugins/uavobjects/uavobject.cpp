@@ -531,7 +531,7 @@ void UAVObject::SetGcsAccess(UAVObject::Metadata& metadata, UAVObject::AccessMod
  * \param[in] metadata The metadata object
  * \return the telemetry acked boolean
  */
-uint8_t UAVObject::GetFlightTelemetryAcked(const UAVObject::Metadata& metadata) {
+quint8 UAVObject::GetFlightTelemetryAcked(const UAVObject::Metadata& metadata) {
 	return (metadata.flags >> UAVOBJ_TELEMETRY_ACKED_SHIFT) & 1;
 }
 
@@ -540,7 +540,7 @@ uint8_t UAVObject::GetFlightTelemetryAcked(const UAVObject::Metadata& metadata) 
  * \param[in] metadata The metadata object
  * \param[in] val The telemetry acked boolean
  */
-void UAVObject::SetFlightTelemetryAcked(UAVObject::Metadata& metadata, uint8_t val) {
+void UAVObject::SetFlightTelemetryAcked(UAVObject::Metadata& metadata, quint8 val) {
 	SET_BITS(metadata.flags, UAVOBJ_TELEMETRY_ACKED_SHIFT, val, 1);
 }
 
@@ -549,7 +549,7 @@ void UAVObject::SetFlightTelemetryAcked(UAVObject::Metadata& metadata, uint8_t v
  * \param[in] metadata The metadata object
  * \return the telemetry acked boolean
  */
-uint8_t UAVObject::GetGcsTelemetryAcked(const UAVObject::Metadata& metadata) {
+quint8 UAVObject::GetGcsTelemetryAcked(const UAVObject::Metadata& metadata) {
 	return (metadata.flags >> UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT) & 1;
 }
 
@@ -558,7 +558,7 @@ uint8_t UAVObject::GetGcsTelemetryAcked(const UAVObject::Metadata& metadata) {
  * \param[in] metadata The metadata object
  * \param[in] val The GCS telemetry acked boolean
  */
-void UAVObject::SetGcsTelemetryAcked(UAVObject::Metadata& metadata, uint8_t val) {
+void UAVObject::SetGcsTelemetryAcked(UAVObject::Metadata& metadata, quint8 val) {
 	SET_BITS(metadata.flags, UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT, val, 1);
 }
 

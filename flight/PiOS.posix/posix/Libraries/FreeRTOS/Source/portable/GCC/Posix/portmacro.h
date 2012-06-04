@@ -142,17 +142,6 @@ extern void vPortAddTaskHandle( void *pxTaskHandle );
 
 /* Posix Signal definitions that can be changed or read as appropriate. */
 #define SIG_SUSPEND					SIGUSR1
-#define SIG_RESUME					SIGUSR2
-
-/* Enable the following hash defines to make use of the real-time tick where time progresses at real-time. */
-#define SIG_TICK					SIGALRM
-#define TIMER_TYPE					ITIMER_REAL
-/* Enable the following hash defines to make use of the process tick where time progresses only when the process is executing.
-#define SIG_TICK					SIGVTALRM
-#define TIMER_TYPE					ITIMER_VIRTUAL		*/
-/* Enable the following hash defines to make use of the profile tick where time progresses when the process or system calls are executing.
-#define SIG_TICK					SIGPROF
-#define TIMER_TYPE					ITIMER_PROF */
 
 /* Make use of times(man 2) to gather run-time statistics on the tasks. */
 extern void vPortFindTicksPerSecond( void );

@@ -27,6 +27,10 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include <pios_config.h>
+#include <pios_board_info.h>
+
+#define BOARD_REVISION_CC   1
+#define BOARD_REVISION_CC3D 2
 
 #if defined(PIOS_INCLUDE_LED)
 
@@ -59,6 +63,7 @@ static const struct pios_led pios_leds_cc3d[] = {
 				.GPIO_Speed = GPIO_Speed_50MHz,
 			},
 		},
+		.remap = GPIO_Remap_SWJ_JTAGDisable,
 	},
 };
 
@@ -66,6 +71,15 @@ static const struct pios_led_cfg pios_led_cfg_cc3d = {
 	.leds     = pios_leds_cc3d,
 	.num_leds = NELEMENTS(pios_leds_cc3d),
 };
+
+const struct pios_led_cfg * PIOS_BOARD_HW_DEFS_GetLedCfg (uint32_t board_revision)
+{
+	switch (board_revision) {
+	case BOARD_REVISION_CC:		return &pios_led_cfg_cc;
+	case BOARD_REVISION_CC3D:	return &pios_led_cfg_cc3d;
+	default:			return NULL;
+	}
+}
 
 #endif	/* PIOS_INCLUDE_LED */
 
@@ -1263,20 +1277,21 @@ static const struct pios_usb_cfg pios_usb_main_cfg_cc3d = {
 #include <pios_usb_hid_priv.h>
 
 const struct pios_usb_hid_cfg pios_usb_hid_cfg = {
-	.data_if = 0,
+	.data_if = 2,
 	.data_rx_ep = 1,
 	.data_tx_ep = 1,
 };
+
 #endif /* PIOS_INCLUDE_USB_HID */
 
 #if defined(PIOS_INCLUDE_USB_CDC)
 #include <pios_usb_cdc_priv.h>
 
 const struct pios_usb_cdc_cfg pios_usb_cdc_cfg = {
-	.ctrl_if = 1,
+	.ctrl_if = 0,
 	.ctrl_tx_ep = 2,
 
-	.data_if = 2,
+	.data_if = 1,
 	.data_rx_ep = 3,
 	.data_tx_ep = 3,
 };

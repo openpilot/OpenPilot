@@ -1,5 +1,12 @@
 Short summary of changes.  For a complete list see the git log.
 
+2012-06-04
+AeroSimRC support merged into next
+
+2012-05-26
+VirtualFlybar which allows a more aggressive flight mode than rate mode
+support.  Also PiroCompensation added.
+
 2012-05-26
 Revert some UI changes that didn't work consistently between OSX and Windows.
 

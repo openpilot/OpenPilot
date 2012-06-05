@@ -87,6 +87,16 @@ UAVSettingsImportExportFactory::UAVSettingsImportExportFactory(QObject *parent):
     cmd->action()->setText(tr("Export UAV Data..."));
     ac->addAction(cmd, Core::Constants::G_HELP_HELP);
     connect(cmd->action(), SIGNAL(triggered(bool)), this, SLOT(exportUAVData()));
+
+    ac = am->actionContainer(Core::Constants::M_FILE);
+    cmd = am->registerAction(new QAction(this),
+                             "UAVSettingsImportExportPlugin.UAVWaypointsExport",
+                             QList<int>() <<
+                             Core::Constants::C_GLOBAL_ID);
+    cmd->action()->setText(tr("Export UAV Waypoints..."));
+    ac->addAction(cmd, Core::Constants::G_FILE_SAVE);
+    connect(cmd->action(), SIGNAL(triggered(bool)), this, SLOT(exportWaypoints()));
+
 }
 
 // Slot called by the menu manager on user action
@@ -258,6 +268,7 @@ QString UAVSettingsImportExportFactory::createXMLDocument(const enum storedData 
     // create settings and/or data elements
     QDomElement settings = doc.createElement("settings");
     QDomElement data = doc.createElement("data");
+    QDomElement waypoints = doc.createElement("waypoints");
 
     switch (what)
     {
@@ -271,61 +282,121 @@ QString UAVSettingsImportExportFactory::createXMLDocument(const enum storedData 
         root.appendChild(data);
         root.appendChild(settings);
         break;
+    case Waypoints:
+        root.appendChild(waypoints);
+        break;
     }
 
-    // iterate over settings objects
-    QList< QList<UAVDataObject*> > objList = objManager->getDataObjects();
-    foreach (QList<UAVDataObject*> list, objList) {
-        foreach (UAVDataObject *obj, list) {
-            if (((what == Settings) && obj->isSettings()) ||
-                ((what == Data) && !obj->isSettings()) ||
-                 (what == Both)) {
+    switch (what)
+    {
+    case Settings:
+    case Data:
+    case Both:
+    {
+        // iterate over settings objects
+        QList< QList<UAVDataObject*> > objList = objManager->getDataObjects();
+        foreach (QList<UAVDataObject*> list, objList) {
+            foreach (UAVDataObject *obj, list) {
+                if (((what == Settings) && obj->isSettings()) ||
+                        ((what == Data) && !obj->isSettings()) ||
+                        (what == Both)) {
 
-                // add each object to the XML
-                QDomElement o = doc.createElement("object");
-                o.setAttribute("name", obj->getName());
-                o.setAttribute("id", QString("0x")+ QString().setNum(obj->getObjID(),16).toUpper());
-                if (fullExport) {
-                    QDomElement d = doc.createElement("description");
-                    QDomText t = doc.createTextNode(obj->getDescription().remove("@Ref ", Qt::CaseInsensitive));
-                    d.appendChild(t);
-                    o.appendChild(d);
-                }
-
-                // iterate over fields
-                QList<UAVObjectField*> fieldList = obj->getFields();
-
-                foreach (UAVObjectField* field, fieldList) {
-                    QDomElement f = doc.createElement("field");
-
-                    // iterate over values
-                    QString vals;
-                    quint32 nelem = field->getNumElements();
-                    for (unsigned int n = 0; n < nelem; ++n) {
-                        vals.append(QString("%1,").arg(field->getValue(n).toString()));
-                    }
-                    vals.chop(1);
-
-                    f.setAttribute("name", field->getName());
-                    f.setAttribute("values", vals);
+                    // add each object to the XML
+                    QDomElement o = doc.createElement("object");
+                    o.setAttribute("name", obj->getName());
+                    o.setAttribute("id", QString("0x")+ QString().setNum(obj->getObjID(),16).toUpper());
                     if (fullExport) {
-                        f.setAttribute("type", field->getTypeAsString());
-                        f.setAttribute("units", field->getUnits());
-                        f.setAttribute("elements", nelem);
-                        if (field->getType() == UAVObjectField::ENUM) {
-                            f.setAttribute("options", field->getOptions().join(","));
-                        }
+                        QDomElement d = doc.createElement("description");
+                        QDomText t = doc.createTextNode(obj->getDescription().remove("@Ref ", Qt::CaseInsensitive));
+                        d.appendChild(t);
+                        o.appendChild(d);
                     }
-                    o.appendChild(f);
-                }
 
-                // append to the settings or data element
-                if (obj->isSettings())
-                    settings.appendChild(o);
-                else
-                    data.appendChild(o);
+                    // iterate over fields
+                    QList<UAVObjectField*> fieldList = obj->getFields();
+
+                    foreach (UAVObjectField* field, fieldList) {
+                        QDomElement f = doc.createElement("field");
+
+                        // iterate over values
+                        QString vals;
+                        quint32 nelem = field->getNumElements();
+                        for (unsigned int n = 0; n < nelem; ++n) {
+                            vals.append(QString("%1,").arg(field->getValue(n).toString()));
+                        }
+                        vals.chop(1);
+
+                        f.setAttribute("name", field->getName());
+                        f.setAttribute("values", vals);
+                        if (fullExport) {
+                            f.setAttribute("type", field->getTypeAsString());
+                            f.setAttribute("units", field->getUnits());
+                            f.setAttribute("elements", nelem);
+                            if (field->getType() == UAVObjectField::ENUM) {
+                                f.setAttribute("options", field->getOptions().join(","));
+                            }
+                        }
+                        o.appendChild(f);
+                    }
+
+                    // append to the settings or data element
+                    if (obj->isSettings())
+                        settings.appendChild(o);
+                    else
+                        data.appendChild(o);
+                }
             }
         }
+    }
+        break;
+    case Waypoints:
+    {
+        // iterate over waypoints until the first one that is set to Stop
+        QList<UAVObject*> list = objManager->getObjectInstances("Waypoint");
+        foreach (UAVObject *obj, list) {
+            // add each object to the XML
+            QDomElement o = doc.createElement("object");
+            o.setAttribute("name", obj->getName());
+            o.setAttribute("id", QString("0x")+ QString().setNum(obj->getObjID(),16).toUpper());
+            o.setAttribute("instId",QString().setNum(obj->getInstID()));
+
+            // iterate over fields
+            QList<UAVObjectField*> fieldList = obj->getFields();
+
+            foreach (UAVObjectField* field, fieldList) {
+                QDomElement f = doc.createElement("field");
+
+                // iterate over values
+                QString vals;
+                quint32 nelem = field->getNumElements();
+                for (unsigned int n = 0; n < nelem; ++n) {
+                    vals.append(QString("%1,").arg(field->getValue(n).toString()));
+                }
+                vals.chop(1);
+
+                f.setAttribute("name", field->getName());
+                f.setAttribute("values", vals);
+                if (fullExport) {
+                    f.setAttribute("type", field->getTypeAsString());
+                    f.setAttribute("units", field->getUnits());
+                    f.setAttribute("elements", nelem);
+                    if (field->getType() == UAVObjectField::ENUM) {
+                        f.setAttribute("options", field->getOptions().join(","));
+                    }
+                }
+                o.appendChild(f);
+            }
+            waypoints.appendChild(o);
+
+            // If this waypoint was stop, then don't add anymore
+            UAVObjectField *field = obj->getField("Action");
+            Q_ASSERT(field);
+            if(field && field->getValue().toString().compare("Stop") == 0)
+                break;
+
+        }
+        break;
+    }
     }
 
     return doc.toString(4);
@@ -404,6 +475,43 @@ void UAVSettingsImportExportFactory::exportUAVData()
 
     // generate an XML first (used for all export formats as a formatted data source)
     QString xml = createXMLDocument(Both, fullExport);
+
+    // save file
+    QFile file(fileName);
+    if (file.open(QIODevice::WriteOnly) &&
+            (file.write(xml.toAscii()) != -1)) {
+        file.close();
+    } else {
+        QMessageBox::critical(0,
+                              tr("UAV Data Export"),
+                              tr("Unable to save data: ") + fileName,
+                              QMessageBox::Ok);
+        return;
+    }
+
+    QMessageBox msgBox;
+    msgBox.setText(tr("Data saved."));
+    msgBox.setStandardButtons(QMessageBox::Ok);
+    msgBox.exec();
+}
+
+/**
+  * Slot called by the menu manager on user action
+  */
+void UAVSettingsImportExportFactory::exportWaypoints()
+{
+
+    // ask for file name
+    QString fileName;
+    QString filters = tr("UAVObjects XML files (*.xml)");
+
+    fileName = QFileDialog::getSaveFileName(0, tr("Save waypoint File As"), "", filters);
+    if (fileName.isEmpty()) {
+        return;
+    }
+
+    // generate an XML first (used for all export formats as a formatted data source)
+    QString xml = createXMLDocument(Waypoints, false);
 
     // save file
     QFile file(fileName);

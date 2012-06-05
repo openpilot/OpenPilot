@@ -43,6 +43,8 @@
 #include <QQueue>
 #include <QComboBox>
 #include <QDateTime>
+#include <firmwareiapobj.h>
+
 class UAVOBJECTUTIL_EXPORT UAVObjectUtilManager: public QObject
 {
     Q_OBJECT
@@ -69,6 +71,8 @@ public:
         static bool descriptionToStructure(QByteArray desc,deviceDescriptorStruct * struc);
         UAVObjectManager* getObjectManager();
         void saveObjectToSD(UAVObject *obj);
+protected:
+        FirmwareIAPObj::DataFields getFirmwareIap();
 
 signals:
         void saveCompleted(int objectID, bool status);

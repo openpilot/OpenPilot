@@ -234,17 +234,21 @@ static void AttitudeTask(void *parameters)
 
 		AccelsData accels;
 		GyrosData gyros;
-		int32_t retval;
-		if(cc3d) 
+		int32_t retval = 0;
+
+		if (cc3d)
 			retval = updateSensorsCC3D(&accels, &gyros);
 		else
 			retval = updateSensors(&accels, &gyros);
 
-		if(retval != 0)
+		// Only update attitude when sensor data is good
+		if (retval != 0)
 			AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
 		else {
-			// Only update attitude when sensor data is good
-			updateAttitude(&accels, &gyros);
+			// Do not update attitude data in simulation mode
+			if (!AttitudeActualReadOnly())
+				updateAttitude(&accels, &gyros);
+
 			AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
 		}
 	}
@@ -267,7 +271,11 @@ static int32_t updateSensors(AccelsData * accels, GyrosData * gyros)
 		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
 		return -1;
 	}
-	
+
+	// Do not read raw sensor data in simulation mode
+	if (GyrosReadOnly() || AccelsReadOnly())
+		return 0;
+
 	// No accel data available
 	if(PIOS_ADXL345_FifoElements() == 0)
 		return -1;

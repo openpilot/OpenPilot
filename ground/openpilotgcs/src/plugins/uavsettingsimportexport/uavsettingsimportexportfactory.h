@@ -45,7 +45,9 @@ private slots:
     void importUAVSettings();
     void exportUAVSettings();
     void exportUAVData();
+
     void exportWaypoints();
+    void importWaypoints();
 signals:
     void importAboutToBegin();
     void importEnded();

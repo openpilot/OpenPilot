@@ -93,9 +93,18 @@ UAVSettingsImportExportFactory::UAVSettingsImportExportFactory(QObject *parent):
                              "UAVSettingsImportExportPlugin.UAVWaypointsExport",
                              QList<int>() <<
                              Core::Constants::C_GLOBAL_ID);
-    cmd->action()->setText(tr("Export UAV Waypoints..."));
+    cmd->action()->setText(tr("Export Waypoints..."));
     ac->addAction(cmd, Core::Constants::G_FILE_SAVE);
     connect(cmd->action(), SIGNAL(triggered(bool)), this, SLOT(exportWaypoints()));
+
+    ac = am->actionContainer(Core::Constants::M_FILE);
+    cmd = am->registerAction(new QAction(this),
+                             "UAVSettingsImportExportPlugin.UAVWaypointsImport",
+                             QList<int>() <<
+                             Core::Constants::C_GLOBAL_ID);
+    cmd->action()->setText(tr("Import Waypoints..."));
+    ac->addAction(cmd, Core::Constants::G_FILE_SAVE);
+    connect(cmd->action(), SIGNAL(triggered(bool)), this, SLOT(importWaypoints()));
 
 }
 
@@ -221,6 +230,125 @@ void UAVSettingsImportExportFactory::importUAVSettings()
     }
     qDebug() << "End import";
     swui.exec();
+}
+
+
+// Slot called by the menu manager on user action
+void UAVSettingsImportExportFactory::importWaypoints()
+{
+    // ask for file name
+    QString fileName;
+    QString filters = tr("Waypoint XML files (*.xml)");
+    fileName = QFileDialog::getOpenFileName(0, tr("Import waypoints"), "", filters);
+    if (fileName.isEmpty()) {
+        return;
+    }
+
+    // Now open the file
+    QFile file(fileName);
+    QDomDocument doc("UAVObjects");
+    file.open(QFile::ReadOnly|QFile::Text);
+    if (!doc.setContent(file.readAll())) {
+        QMessageBox msgBox;
+        msgBox.setText(tr("File Parsing Failed."));
+        msgBox.setInformativeText(tr("This file is not a correct XML file"));
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.exec();
+        return;
+    }
+    file.close();
+
+    // find the root of settings subtree
+    emit importAboutToBegin();
+    qDebug()<<"Import about to begin";
+
+    QDomElement root = doc.documentElement();
+    if (root.tagName() == "uavobjects") {
+        root = root.firstChildElement("waypoints");
+    }
+    if (root.isNull() || (root.tagName() != "waypoints")) {
+        QMessageBox msgBox;
+        msgBox.setText(tr("Wrong file contents"));
+        msgBox.setInformativeText(tr("This file does not contain waypoints"));
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.exec();
+        return;
+    }
+
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+
+    QDomNode node = root.firstChild();
+    while (!node.isNull()) {
+        QDomElement e = node.toElement();
+        if (e.tagName() == "object") {
+
+            //  - Read each object
+            QString uavObjectName  = e.attribute("name");
+            uint uavObjectID = e.attribute("id").toUInt(NULL,16);
+            uint instId = e.attribute("instId").toUInt(NULL,10);
+
+            // Sanity Check:
+            UAVDataObject * obj = dynamic_cast<UAVDataObject*>(objManager->getObject(uavObjectName));
+            if (obj == NULL) {
+                // This object is unknown!
+                qDebug() << "Object unknown:" << uavObjectName << uavObjectID;
+            } else {
+
+                int numInstances = objManager->getNumInstances(obj->getObjID());
+                if (instId >= numInstances) {
+                    obj = obj->clone(instId);
+                    objManager->registerObject(obj);
+                    qDebug() << "Cloned new object";
+                } else {
+                    obj = dynamic_cast<UAVDataObject*>(objManager->getObject(uavObjectName, instId));
+                    Q_ASSERT(obj);
+                    qDebug() << "Setting existing object";
+                }
+
+                //  - Update each field
+                //  - Issue and "updated" command
+                bool error = false;
+                bool setError = false;
+                QDomNode field = node.firstChild();
+                while(!field.isNull()) {
+                    QDomElement f = field.toElement();
+                    if (f.tagName() == "field") {
+                        UAVObjectField *uavfield = obj->getField(f.attribute("name"));
+                        if (uavfield) {
+                            QStringList list = f.attribute("values").split(",");
+                            if (list.length() == 1) {
+                                if (false == uavfield->checkValue(f.attribute("values"))) {
+                                    qDebug() << "checkValue returned false on: " << uavObjectName << f.attribute("values");
+                                    setError = true;
+                                } else {
+                                    uavfield->setValue(f.attribute("values"));
+                                }
+                            } else {
+                                // This is an enum:
+                                int i = 0;
+                                QStringList list = f.attribute("values").split(",");
+                                foreach (QString element, list) {
+                                    if (false == uavfield->checkValue(element, i)) {
+                                        qDebug() << "checkValue(list) returned false on: " << uavObjectName << list;
+                                        setError = true;
+                                    } else {
+                                         uavfield->setValue(element,i);
+                                    }
+                                    i++;
+                                }
+                            }
+                        } else {
+                            error = true;
+                        }
+                    }
+                    field = field.nextSibling();
+                }
+            }
+        }
+        node = node.nextSibling();
+    }
+    qDebug() << "End import";
 }
 
 // Create an XML document from UAVObject database

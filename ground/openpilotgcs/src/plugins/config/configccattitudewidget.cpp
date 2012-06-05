@@ -33,6 +33,8 @@
 #include <QDebug>
 #include <QDesktopServices>
 #include <QUrl>
+#include "accels.h"
+#include "gyros.h"
 
 ConfigCCAttitudeWidget::ConfigCCAttitudeWidget(QWidget *parent) :
         ConfigTaskWidget(parent),

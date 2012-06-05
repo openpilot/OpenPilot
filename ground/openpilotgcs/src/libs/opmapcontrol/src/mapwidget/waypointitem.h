@@ -198,12 +198,20 @@ signals:
     * @param waypoint a pointer to this WayPoint
     */
     void WPNumberChanged(int const& oldnumber,int const& newnumber,WayPointItem* waypoint);
+
     /**
     * @brief Fired when the description, altitude or coordinates change
     *
     * @param waypoint a pointer to this WayPoint
     */
     void WPValuesChanged(WayPointItem* waypoint);
+
+    /**
+    * @brief Fired when the waypoint is dropped somewhere
+    *
+    * @param waypoint a pointer to this WayPoint
+    */
+    void WPDropped(WayPointItem* waypoint);
 
 };
 }

@@ -887,26 +887,19 @@ void OPMapGadgetWidget::WPNumberChanged(int const &oldnumber, int const &newnumb
     Q_UNUSED(waypoint);
 }
 
+/**
+  * Called whenever a waypoint item is changed on the mapcontrol.  Needs to update
+  * the backend appropriately
+  */
 void OPMapGadgetWidget::WPValuesChanged(WayPointItem *waypoint)
 {
-    //    qDebug("opmap: WPValuesChanged");
-
     switch (m_map_mode)
     {
     case Normal_MapMode:
-        m_waypoint_list_mutex.lock();
-        foreach (t_waypoint *wp, m_waypoint_list)
-        {   // search for the waypoint in our own waypoint list and update it
-            if (!wp) continue;
-            if (!wp->map_wp_item) continue;
-            if (wp->map_wp_item != waypoint) continue;
-            // found the waypoint in our list
-            wp->coord = waypoint->Coord();
-            wp->altitude = waypoint->Altitude();
-            wp->description = waypoint->Description();
-            break;
-        }
-        m_waypoint_list_mutex.unlock();
+    {
+        // TODO: We don't parse changes in position here as it's too dense
+        // however a change in something like
+    }
         break;
 
     case MagicWaypoint_MapMode:
@@ -2359,6 +2352,7 @@ void OPMapGadgetWidget::SetUavPic(QString UAVPic)
   */
 void OPMapGadgetWidget::doVisualizationChanged(QList<PathCompiler::waypoint> waypoints)
 {
+    disconnect(this,SLOT(WPDropped(WayPointItem*)));
     m_map->WPDeleteAll();
     int index = 0;
     foreach (PathCompiler::waypoint waypoint, waypoints) {
@@ -2371,5 +2365,24 @@ void OPMapGadgetWidget::doVisualizationChanged(QList<PathCompiler::waypoint> way
             wayPointItem->picture.load(QString::fromUtf8(":/opmap/images/waypoint_marker1.png"));
             index++;
         }
+        connect(wayPointItem, SIGNAL(WPDropped(WayPointItem*)), this, SLOT(WPDropped(WayPointItem*)));
+    }
+}
+
+/**
+  * Called when a waypoint is dropped at a new location.  Waypoint changed
+  * can't be used as it is updated too frequently and we don't want to
+  * overload the pathcompiler with unnecessary updates
+  */
+void OPMapGadgetWidget::WPDropped(WayPointItem *waypoint)
+{
+    switch (m_map_mode)
+    {
+    case Normal_MapMode:
+        PathCompiler::waypoint newWaypoint;
+        newWaypoint.latitude = waypoint->Coord().Lat();
+        newWaypoint.longitude = waypoint->Coord().Lng();
+        pathCompiler->doUpdateWaypoints(newWaypoint,waypoint->Number());
+        break;
     }
 }

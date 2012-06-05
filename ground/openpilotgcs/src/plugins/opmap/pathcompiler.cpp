@@ -140,6 +140,7 @@ void PathCompiler::doAddWaypoint(waypoint newWaypointInternal, int /*position*/)
         if(waypointData.Action == Waypoint::ACTION_STOP) {
             waypointData.Action = Waypoint::ACTION_PATHTONEXT;
             waypoint->setData(waypointData);
+            waypoint->updated();
             break;
         }
     }
@@ -167,6 +168,30 @@ void PathCompiler::doAddWaypoint(waypoint newWaypointInternal, int /*position*/)
             waypoint->updated();
         }
     }
+}
+
+/**
+  * Update waypoint
+  */
+void PathCompiler::doUpdateWaypoints(PathCompiler::waypoint changedWaypoint, int position)
+{
+    int numWaypoints = getObjectManager()->getNumInstances(Waypoint::OBJID);
+    Q_ASSERT(position < numWaypoints);
+    if (position >= numWaypoints)
+        return;
+
+    Waypoint *waypointInst = Waypoint::GetInstance(getObjectManager(), position);
+    Q_ASSERT(waypointInst);
+
+    // Mirror over the updated position.  We don't just use the changedWaypoint
+    // because things like action might need to be preserved
+    Waypoint::DataFields changedWaypointUAVO = InternalToUavo(changedWaypoint);
+    Waypoint::DataFields oldWaypointUAVO = waypointInst->getData();
+    oldWaypointUAVO.Position[0] = changedWaypointUAVO.Position[0];
+    oldWaypointUAVO.Position[1] = changedWaypointUAVO.Position[1];
+    oldWaypointUAVO.Position[2] = changedWaypointUAVO.Position[2];
+    waypointInst->setData(oldWaypointUAVO);
+    waypointInst->updated();
 }
 
 /**
@@ -254,10 +279,6 @@ void PathCompiler::doUpdateFromUAV(UAVObject *obj)
     UAVObjectManager *objManager = getObjectManager();
     if (!objManager)
         return;
-
-    if(obj) {
-        qDebug() << "Update:" << obj->getInstID();
-    }
 
     Waypoint *waypointObj = Waypoint::GetInstance(getObjectManager());
     Q_ASSERT(waypointObj);

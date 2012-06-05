@@ -118,7 +118,7 @@ public slots:
     /**
       * Update waypoint
       */
-    //void doUpdateWaypoints(struct PathCompiler::waypoint, int position);
+    void doUpdateWaypoints(PathCompiler::waypoint, int position);
 
     /**
       * Delete a waypoint

@@ -179,6 +179,7 @@ private slots:
     /**
       * Unused for now, hooks for future waypoint support
       */
+    void WPDropped(WayPointItem *waypoint);
     void WPNumberChanged(int const& oldnumber,int const& newnumber, WayPointItem* waypoint);
     void WPValuesChanged(WayPointItem* waypoint);
     void WPInserted(int const& number, WayPointItem* waypoint);

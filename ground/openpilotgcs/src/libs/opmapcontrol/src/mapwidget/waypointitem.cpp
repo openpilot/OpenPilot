@@ -95,6 +95,7 @@ namespace mapcontrol
     }
     void WayPointItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     {
+        QGraphicsItem::mouseReleaseEvent(event);
         if(event->button()==Qt::LeftButton)
         {
             if(text) {
@@ -110,8 +111,8 @@ namespace mapcontrol
             RefreshToolTip();
 
             emit WPValuesChanged(this);
+            emit WPDropped(this);
         }
-        QGraphicsItem::mouseReleaseEvent(event);
     }
     void WayPointItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     {

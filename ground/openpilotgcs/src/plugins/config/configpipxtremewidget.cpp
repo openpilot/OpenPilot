@@ -76,6 +76,7 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
 	addUAVObjectToWidgetRelation("PipXStatus", "Errors", m_pipx->Errors);
 	addUAVObjectToWidgetRelation("PipXStatus", "UAVTalkErrors", m_pipx->UAVTalkErrors);
 	addUAVObjectToWidgetRelation("PipXStatus", "Resets", m_pipx->Resets);
+	addUAVObjectToWidgetRelation("PipXStatus", "Dropped", m_pipx->Dropped);
 	addUAVObjectToWidgetRelation("PipXStatus", "RXRate", m_pipx->RXRate);
 	addUAVObjectToWidgetRelation("PipXStatus", "TXRate", m_pipx->TXRate);
 

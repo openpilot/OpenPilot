@@ -83,6 +83,7 @@ typedef struct {
 	uint16_t retries;
 	uint16_t errors;
 	uint16_t uavtalk_errors;
+	uint16_t dropped;
 	uint16_t resets;
 	uint8_t ecc[RS_ECC_NPARITY];
 } PHStatusPacket, *PHStatusPacketHandle;

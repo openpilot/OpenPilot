@@ -73,6 +73,7 @@ typedef struct {
 	uint16_t errors;
 	uint16_t uavtalk_errors;
 	uint16_t resets;
+	uint16_t dropped;
 	int8_t rssi;
 	uint8_t lastContact;
 } PairStats;
@@ -104,6 +105,7 @@ typedef struct {
 	uint32_t radioRxErrors;
 	uint32_t UAVTalkErrors;
 	uint32_t packetErrors;
+	uint32_t droppedPackets;
 	uint16_t txBytes;
 	uint16_t rxBytes;
 
@@ -245,6 +247,7 @@ static int32_t RadioComBridgeInitialize(void)
 		data->pairStats[i].errors = 0;
 		data->pairStats[i].uavtalk_errors = 0;
 		data->pairStats[i].resets = 0;
+		data->pairStats[i].dropped = 0;
 		data->pairStats[i].lastContact = 0;
 	}
 	// The first slot is reserved for our current pairID
@@ -313,7 +316,7 @@ static void comUAVTalkTask(void *parameters)
 			// No packets available?
 			if (p == NULL)
 			{
-				DEBUG_PRINTF(2, "Packet dropped!\n\r");
+				data->droppedPackets++;
 				continue;
 			}
 
@@ -625,6 +628,7 @@ static void transparentCommTask(void * parameters)
 			// No packets available?
 			if (p == NULL)
 			{
+				data->droppedPackets++;
 				// Wait a bit for a packet to come available.
 				vTaskDelay(5);
 				continue;
@@ -702,6 +706,7 @@ static void radioStatusTask(void *parameters)
 		pipxStatus.Retries = data->comTxRetries;
 		pipxStatus.Errors = data->packetErrors;
 		pipxStatus.UAVTalkErrors = data->UAVTalkErrors;
+		pipxStatus.Dropped = data->droppedPackets;
 		pipxStatus.Resets = PIOS_RFM22B_Resets(pios_rfm22b_id);
 		pipxStatus.TXRate = (uint16_t)((float)(data->txBytes * 1000) / STATS_UPDATE_PERIOD_MS);
 		data->txBytes = 0;
@@ -721,6 +726,7 @@ static void radioStatusTask(void *parameters)
 				pipxStatus.Retries += data->pairStats[i].retries;
 				pipxStatus.Errors += data->pairStats[i].errors;
 				pipxStatus.UAVTalkErrors += data->pairStats[i].uavtalk_errors;
+				pipxStatus.Dropped += data->pairStats[i].dropped;
 				pipxStatus.Resets += data->pairStats[i].resets;
 				pipxStatus.LinkState = PIPXSTATUS_LINKSTATE_CONNECTED;
 			}

@@ -156,7 +156,7 @@
                <number>-127</number>
               </property>
               <property name="textVisible">
-               <bool>true</bool>
+               <bool>false</bool>
               </property>
               <property name="format">
                <string>%v dBm</string>
@@ -185,7 +185,7 @@
                <number>0</number>
               </property>
               <property name="textVisible">
-               <bool>true</bool>
+               <bool>false</bool>
               </property>
               <property name="format">
                <string>%v dBm</string>
@@ -214,7 +214,7 @@
                <number>0</number>
               </property>
               <property name="textVisible">
-               <bool>true</bool>
+               <bool>false</bool>
               </property>
               <property name="format">
                <string>%v dBm</string>
@@ -243,7 +243,7 @@
                <number>0</number>
               </property>
               <property name="textVisible">
-               <bool>true</bool>
+               <bool>false</bool>
               </property>
               <property name="format">
                <string>%v dBm</string>
@@ -631,7 +631,7 @@
              </widget>
             </item>
             <item row="9" column="0">
-             <widget class="QLabel" name="label_18">
+             <widget class="QLabel" name="RetriesLabel">
               <property name="text">
                <string>Retries</string>
               </property>
@@ -775,9 +775,9 @@
              </widget>
             </item>
             <item row="13" column="0">
-             <widget class="QLabel" name="TXRateLabel">
+             <widget class="QLabel" name="DroppedLabel">
               <property name="text">
-               <string>TX Rate (B/s)</string>
+               <string>Dropped</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -785,7 +785,7 @@
              </widget>
             </item>
             <item row="13" column="1">
-             <widget class="QLineEdit" name="TXRate">
+             <widget class="QLineEdit" name="Dropped">
               <property name="font">
                <font>
                 <weight>75</weight>
@@ -811,6 +811,42 @@
              </widget>
             </item>
             <item row="14" column="0">
+             <widget class="QLabel" name="TXRateLabel">
+              <property name="text">
+               <string>TX Rate (B/s)</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="14" column="1">
+             <widget class="QLineEdit" name="TXRate">
+              <property name="font">
+               <font>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLineEdit {
+  border: none;
+  border-radius: 1px;
+  padding: 0 8px;
+  background: rgba(0, 0, 0, 16);
+/*  background: transparent; */
+/*     selection-background-color: darkgray;*/
+}</string>
+              </property>
+              <property name="frame">
+               <bool>false</bool>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="15" column="0">
              <widget class="QLabel" name="RXRateLabel">
               <property name="text">
                <string>RX Rate (B/s)</string>
@@ -820,7 +856,7 @@
               </property>
              </widget>
             </item>
-            <item row="14" column="1">
+            <item row="15" column="1">
              <widget class="QLineEdit" name="RXRate">
               <property name="font">
                <font>

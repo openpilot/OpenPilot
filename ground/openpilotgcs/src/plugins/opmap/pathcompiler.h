@@ -66,7 +66,14 @@ public:
     int loadPath(QString filename = NULL);
 
     //! Waypoint representation that is exchanged between visualization
-    struct waypoint {
+    class waypoint {
+    public:
+        waypoint() {}
+
+        const bool operator==(const waypoint other) {
+            return (other.latitude == latitude) && (other.longitude == longitude);
+        }
+
         double latitude;
         double longitude;
     };
@@ -79,14 +86,14 @@ private:
     struct PathCompiler::waypoint UavoToInternal(Waypoint::DataFields);
 
     //! Convert a UAVO waypoint to the local structure
-    Waypoint::DataFields InternalToUavo(struct waypoint);
+    Waypoint::DataFields InternalToUavo(waypoint);
 
 signals:
     /**
       * Indicates something changed the waypoints and the map should
       * update the display
       */
-    void visualizationChanged(QList<struct PathCompiler::waypoint>);
+    void visualizationChanged(QList<PathCompiler::waypoint>);
 
 public slots:
     /**
@@ -106,7 +113,7 @@ public slots:
       * @param waypoint the new waypoint to add
       * @param position which position to insert it to, defaults to end
       */
-    void doAddWaypoint(struct PathCompiler::waypoint, int position = -1);
+    void doAddWaypoint(waypoint, int position = -1);
 
     /**
       * Update waypoint

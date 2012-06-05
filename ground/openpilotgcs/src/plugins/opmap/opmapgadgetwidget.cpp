@@ -2237,7 +2237,6 @@ bool OPMapGadgetWidget::getUAVPosition(double &latitude, double &longitude, doub
     double NED[3];
     double LLA[3];
     double homeLLA[3];
-    UAVObject *obj;
 
     Q_ASSERT(obm != NULL);
 

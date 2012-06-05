@@ -116,7 +116,7 @@ void PathCompiler::doNewInstance(UAVObject* obj)
   * @param waypoint the new waypoint to add
   * @param position which position to insert it to, defaults to end
   */
-void PathCompiler::doAddWaypoint(struct PathCompiler::waypoint waypoint, int /*position*/)
+void PathCompiler::doAddWaypoint(waypoint newWaypointInternal, int /*position*/)
 {
     /* TODO: If a waypoint is inserted not at the end shift them all by one and */
     /* add the data there */
@@ -124,7 +124,7 @@ void PathCompiler::doAddWaypoint(struct PathCompiler::waypoint waypoint, int /*p
     UAVObjectManager *objManager = getObjectManager();
 
     // Format the data from the map into a UAVO
-    Waypoint::DataFields newWaypoint = InternalToUavo(waypoint);
+    Waypoint::DataFields newWaypoint = InternalToUavo(newWaypointInternal);
 
     // Search for any waypoints set to stop, because if they exist we
     // should add the waypoint immediately after that one
@@ -249,6 +249,8 @@ void PathCompiler::doDelAllWaypoints()
   */
 void PathCompiler::doUpdateFromUAV(UAVObject *obj)
 {
+    static QList<waypoint> previousWaypoints;
+
     UAVObjectManager *objManager = getObjectManager();
     if (!objManager)
         return;
@@ -263,7 +265,7 @@ void PathCompiler::doUpdateFromUAV(UAVObject *obj)
         return;
 
     /* Get all the waypoints from the UAVO and create a representation for the visualization */
-    QList <struct PathCompiler::waypoint> waypoints;
+    QList <waypoint> waypoints;
     waypoints.clear();
     int numWaypoints = objManager->getNumInstances(waypointObj->getObjID());
     bool stopped = false;
@@ -278,8 +280,14 @@ void PathCompiler::doUpdateFromUAV(UAVObject *obj)
         stopped = waypointData.Action == Waypoint::ACTION_STOP;
     }
 
-    /* Inform visualization */
-    emit visualizationChanged(waypoints);
+    if (previousWaypoints != waypoints) {
+        /* Because the waypoints have to update periodically (or we miss new ones on the FC */
+        /* side - needs telem fix) we want to filter updates to map that are simply periodic */
+        previousWaypoints = waypoints;
+
+        /* Inform visualization */
+        emit visualizationChanged(waypoints);
+    }
 }
 
 /**
@@ -292,7 +300,7 @@ struct PathCompiler::waypoint PathCompiler::UavoToInternal(Waypoint::DataFields 
     double homeLLA[3];
     double LLA[3];
     double NED[3];
-    struct PathCompiler::waypoint internalWaypoint;
+    waypoint internalWaypoint;
 
     HomeLocation *homeLocation = HomeLocation::GetInstance(getObjectManager());
     Q_ASSERT(homeLocation);
@@ -318,7 +326,7 @@ struct PathCompiler::waypoint PathCompiler::UavoToInternal(Waypoint::DataFields 
   * @param internal The internal structure type
   * @returns The waypoint UAVO data structure
   */
-Waypoint::DataFields PathCompiler::InternalToUavo(struct waypoint internal)
+Waypoint::DataFields PathCompiler::InternalToUavo(waypoint internal)
 {
     Waypoint::DataFields uavo;
 

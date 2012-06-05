@@ -45,9 +45,18 @@ WaypointTable::WaypointTable(QObject *parent) :
 
     // Unfortunately there is no per object new instance signal yet
     connect(objManager, SIGNAL(newInstance(UAVObject*)),
-            this, SLOT(waypointsUpdated(UAVObject*)));
+            this, SLOT(doNewInstance(UAVObject*)));
     connect(waypointActiveObj, SIGNAL(objectUpdated(UAVObject*)),
             this, SLOT(waypointsUpdated(UAVObject*)));
+
+    int numWaypoints = objManager->getNumInstances(Waypoint::OBJID);
+    for (int i = 0; i < numWaypoints; i++) {
+        Waypoint *waypoint = Waypoint::GetInstance(objManager, i);
+        Q_ASSERT(waypoint);
+        if(waypoint)
+            connect(waypoint, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(waypointsUpdated(UAVObject*)));
+    }
+
     connect(waypointObj, SIGNAL(),
             this, SLOT(waypointsUpdated(UAVObject*)));
 
@@ -113,6 +122,20 @@ QVariant WaypointTable::headerData(int section, Qt::Orientation orientation, int
 }
 
 /**
+  * Called for any new UAVO instance and when that is a Waypoint register
+  * to update the table
+  */
+void WaypointTable::doNewInstance(UAVObject*obj)
+{
+    Q_ASSERT(obj);
+    if (!obj)
+        return;
+
+    if (obj->getObjID() == Waypoint::OBJID)
+        connect(obj, SIGNAL(objectUpdated(UAVObject*)),this,SLOT(waypointsUpdated(UAVObject*)));
+}
+
+/**
   * Called whenever the waypoints are updated to inform
   * the view
   */
@@ -122,7 +145,6 @@ void WaypointTable::waypointsUpdated(UAVObject *)
 
     // Currently only support adding instances which is all the UAVO manager
     // supports
-    qDebug() << "Elements before " << elementsNow << " and cached " << elements;
     if (elementsNow > elements) {
         beginInsertRows(QModelIndex(), elements, elementsNow-1);
         elements = elementsNow;
@@ -141,8 +163,7 @@ Qt::ItemFlags WaypointTable::flags(const QModelIndex &index) const
 
 bool WaypointTable::setData ( const QModelIndex & index, const QVariant & value, int role = Qt::EditRole )
 {
-//    if(role != Qt::EditRole)
-//        return false;
+    Q_UNUSED(role);
 
     double val = value.toDouble();
     qDebug() << "New value " << val << " for column " << index.column();

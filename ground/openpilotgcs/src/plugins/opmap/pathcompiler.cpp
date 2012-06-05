@@ -36,19 +36,25 @@
 PathCompiler::PathCompiler(QObject *parent) :
     QObject(parent)
 {
-    Waypoint *waypoint = NULL;
     HomeLocation *homeLocation = NULL;
 
+    /* To catch new waypoint UAVOs */
+    connect(getObjectManager(), SIGNAL(newInstance(UAVObject*)), this, SLOT(doNewInstance(UAVObject*)));
+
     /* Connect the object updates */
-    waypoint = Waypoint::GetInstance(getObjectManager());
-    Q_ASSERT(waypoint);
-    if(waypoint)
-        connect(waypoint, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(doUpdateFromUAV()));
+    int numWaypoints = getObjectManager()->getNumInstances(Waypoint::OBJID);
+    for (int i = 0; i < numWaypoints; i++) {
+        qDebug() << "Registering waypoint" << i;
+        Waypoint *waypoint = Waypoint::GetInstance(getObjectManager(), i);
+        Q_ASSERT(waypoint);
+        if(waypoint)
+            connect(waypoint, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(doUpdateFromUAV(UAVObject*)));
+    }
 
     homeLocation = HomeLocation::GetInstance(getObjectManager());
     Q_ASSERT(homeLocation);
     if(homeLocation)
-        connect(homeLocation, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(doUpdateFromUAV()));
+        connect(homeLocation, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(doUpdateFromUAV(UAVObject*)));
 }
 
 /**
@@ -88,6 +94,21 @@ int PathCompiler::loadPath(QString filename)
 {
     Q_UNUSED(filename);
     return -1;
+}
+
+/**
+  * Called whenever a new object instance is created so we can check
+  * if it's a waypoint and if so connect to it
+  * @param [in] obj The point to the object being created
+  */
+void PathCompiler::doNewInstance(UAVObject* obj)
+{
+    Q_ASSERT(obj);
+    if (!obj)
+        return;
+
+    if (obj->getObjID() == Waypoint::OBJID)
+        connect(obj, SIGNAL(objectUpdated(UAVObject*)),this,SLOT(doUpdateFromUAV(UAVObject*)));
 }
 
 /**
@@ -226,11 +247,15 @@ void PathCompiler::doDelAllWaypoints()
   * When the UAV waypoints change trigger the pathcompiler to
   * get the latest version and then update the visualization
   */
-void PathCompiler::doUpdateFromUAV()
+void PathCompiler::doUpdateFromUAV(UAVObject *obj)
 {
     UAVObjectManager *objManager = getObjectManager();
     if (!objManager)
         return;
+
+    if(obj) {
+        qDebug() << "Update:" << obj->getInstID();
+    }
 
     Waypoint *waypointObj = Waypoint::GetInstance(getObjectManager());
     Q_ASSERT(waypointObj);

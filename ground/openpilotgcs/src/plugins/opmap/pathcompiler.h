@@ -97,6 +97,11 @@ public slots:
       */
 
     /**
+      * Called when new instances are registered
+      */
+    void doNewInstance(UAVObject*);
+
+    /**
       * add a waypoint
       * @param waypoint the new waypoint to add
       * @param position which position to insert it to, defaults to end
@@ -128,7 +133,7 @@ public slots:
       * When the UAV waypoints change trigger the pathcompiler to
       * get the latest version and then update the visualization
       */
-    void doUpdateFromUAV();
+    void doUpdateFromUAV(UAVObject *);
 };
 
 #endif // PATHCOMPILER_H

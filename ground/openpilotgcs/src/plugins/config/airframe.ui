@@ -91,7 +91,7 @@ QGroupBox::title {
  }</string>
          </property>
          <property name="currentIndex">
-          <number>2</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="fixedWing">
           <property name="enabled">
@@ -3045,6 +3045,22 @@ p, li { white-space: pre-wrap; }
     <hint type="destinationlabel">
      <x>121</x>
      <y>172</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mrPitchMixLevel</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>mrPitchMixValue</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>92</x>
+     <y>222</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>92</x>
+     <y>151</y>
     </hint>
    </hints>
   </connection>

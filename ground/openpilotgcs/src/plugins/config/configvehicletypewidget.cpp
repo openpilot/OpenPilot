@@ -230,7 +230,6 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
 
     // Connect the help pushbutton
     connect(m_aircraft->airframeHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
-	
     enableControls(false);
     refreshWidgetsValues();
     addToDirtyMonitor();
@@ -609,8 +608,10 @@ void ConfigVehicleTypeWidget::updateCustomThrottle2CurveValue(QList<double> list
 /**
   Refreshes the current value of the SystemSettings which holds the aircraft type
   */
-void ConfigVehicleTypeWidget::refreshWidgetsValues()
+void ConfigVehicleTypeWidget::refreshWidgetsValues(UAVObject * o)
 {
+    Q_UNUSED(o);
+
     if(!allObjectsUpdated())
         return;
 	
@@ -971,6 +972,9 @@ void ConfigVehicleTypeWidget::addToDirtyMonitor()
     addWidget(m_aircraft->multiMotorChannelBox6);
     addWidget(m_aircraft->multiMotorChannelBox7);
     addWidget(m_aircraft->multiMotorChannelBox8);
+    addWidget(m_aircraft->mrPitchMixLevel);
+    addWidget(m_aircraft->mrRollMixLevel);
+    addWidget(m_aircraft->mrYawMixLevel);
     addWidget(m_aircraft->triYawChannelBox);
     addWidget(m_aircraft->aircraftType);
     addWidget(m_aircraft->fwEngineChannelBox);

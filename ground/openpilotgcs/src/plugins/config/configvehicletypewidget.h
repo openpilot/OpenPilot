@@ -81,7 +81,7 @@ private:
 
 private slots:
 
-    virtual void refreshWidgetsValues();
+    virtual void refreshWidgetsValues(UAVObject * o=NULL);
     virtual void updateObjectsFromWidgets();
 
     void setComboCurrentIndex(QComboBox* box, int index);

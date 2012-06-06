@@ -242,8 +242,10 @@ void ConfigOutputWidget::sendChannelTest(int index, int value)
 /**
   Request the current config from the board (RC Output)
   */
-void ConfigOutputWidget::refreshWidgetsValues()
+void ConfigOutputWidget::refreshWidgetsValues(UAVObject * obj)
 {
+    Q_UNUSED(obj);
+
     bool dirty=isDirty();
 
     // Get Actuator Settings

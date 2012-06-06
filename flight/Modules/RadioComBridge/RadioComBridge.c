@@ -713,6 +713,7 @@ static void radioStatusTask(void *parameters)
 		pipxStatus.RXRate = (uint16_t)((float)(data->rxBytes * 1000) / STATS_UPDATE_PERIOD_MS);
 		data->rxBytes = 0;
 		pipxStatus.LinkState = PIPXSTATUS_LINKSTATE_DISCONNECTED;
+		LINK_LED_OFF;
 
 		// Update the potential pairing contacts
 		for (uint8_t i = 0; i < PIPXSTATUS_PAIRIDS_NUMELEM; ++i)
@@ -742,6 +743,7 @@ static void radioStatusTask(void *parameters)
 				pipxStatus.Resets += data->pairStats[i].resets;
 				pipxStatus.Dropped += data->pairStats[i].dropped;
 				pipxStatus.LinkState = PIPXSTATUS_LINKSTATE_CONNECTED;
+				LINK_LED_ON;
 			}
 		}
 

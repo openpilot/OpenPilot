@@ -300,8 +300,6 @@ const uint8_t ss_reg_71[] = {  0x2B, 0x23}; // rfm22_modulation_mode_control2
 
 volatile bool		initialized = false;
 
-struct pios_rfm22b_dev * rfm22b_dev;
-
 #if defined(RFM22_EXT_INT_USE)
 volatile bool		exec_using_spi;					// set this if you want to access the SPI bus outside of the interrupt
 #endif
@@ -443,7 +441,7 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, const struct pios_rfm22b_cfg *cfg)
 	PIOS_DEBUG_Assert(cfg);
 
 	// Allocate the device structure.
-	rfm22b_dev = (struct pios_rfm22b_dev *) PIOS_RFM22B_alloc();
+	struct pios_rfm22b_dev * rfm22b_dev = (struct pios_rfm22b_dev *) PIOS_RFM22B_alloc();
 	if (!rfm22b_dev)
 		return(-1);
 
@@ -559,20 +557,19 @@ static void PIOS_RFM22B_TxStart(uint32_t rfm22b_id, uint16_t tx_bytes_avail)
 
 	// Get some data to send
 	bool need_yield = false;
-	if(tx_pre_buffer_size== 0)
+	if(tx_pre_buffer_size == 0)
 		tx_pre_buffer_size = (rfm22b_dev->tx_out_cb)(rfm22b_dev->tx_out_context, tx_pre_buffer,
-																								 TX_BUFFER_SIZE, NULL, &need_yield);
+							     TX_BUFFER_SIZE, NULL, &need_yield);
 
 	if(tx_pre_buffer_size > 0)
 	{
-
 		// already have data to be sent
 		if (tx_data_wr > 0)
 			return;
 
 		// we are currently transmitting or scanning the spectrum
 		if (rf_mode == TX_DATA_MODE || rf_mode == TX_STREAM_MODE || rf_mode == TX_CARRIER_MODE ||
-				rf_mode == TX_PN_MODE || rf_mode == RX_SCAN_SPECTRUM)
+		    rf_mode == TX_PN_MODE || rf_mode == RX_SCAN_SPECTRUM)
 			return;
 
 		// is the channel clear to transmit on?
@@ -638,19 +635,33 @@ static void PIOS_RFM22B_Supervisor(uint32_t rfm22b_id)
 		return;
 	}
 
-	/* Not a problem if we're waiting for a packet. */
+	/* If we're waiting for a receive, we just need to make sure that there are no packets waiting to be transmitted. */
 	if(rf_mode == RX_WAIT_SYNC_MODE)
+	{
+		/* Start a packet transfer if one is available. */
+		PIOS_RFM22B_TxStart(rfm22b_id, 0);
 		return;
+	}
 
 	/* The radio must be locked up if the timer reaches 0 */
 	if(--(rfm22b_dev->supv_timer) != 0)
 		return;
 	++(rfm22b_dev->resets);
 
+	TX_LED_OFF;
+	TX_LED_OFF;
+
+	/* Clear the TX buffer in case we locked up in a transmit */
+	tx_data_wr = 0;
+
+	rfm22_init_normal(rfm22b_dev->deviceID, rfm22b_dev->cfg.minFrequencyHz, rfm22b_dev->cfg.maxFrequencyHz, 50000);
+
 	/* Start a packet transfer if one is available. */
-	if(!rfm22_txStart())
+	rf_mode = RX_WAIT_SYNC_MODE;
+	PIOS_RFM22B_TxStart(rfm22b_id, 0);
+	if(rf_mode == RX_WAIT_SYNC_MODE)
 	{
-		/* Otherwise, switch to RX mode */
+		/* Switch to RX mode */
 		rfm22_setRxMode(RX_WAIT_PREAMBLE_MODE, false);
 	}
 }
@@ -816,9 +827,10 @@ void rfm22_setNominalCarrierFrequency(uint32_t frequency_hz)
 
 	// *******
 
-	if (frequency_hz < lower_carrier_frequency_limit_Hz) frequency_hz = lower_carrier_frequency_limit_Hz;
-	else
-		if (frequency_hz > upper_carrier_frequency_limit_Hz) frequency_hz = upper_carrier_frequency_limit_Hz;
+	if (frequency_hz < lower_carrier_frequency_limit_Hz)
+		frequency_hz = lower_carrier_frequency_limit_Hz;
+	else if (frequency_hz > upper_carrier_frequency_limit_Hz)
+		frequency_hz = upper_carrier_frequency_limit_Hz;
 
 	if (frequency_hz < 480000000)
 		hbsel = 1;
@@ -1177,7 +1189,7 @@ uint8_t rfm22_txStart()
 	PIOS_IRQ_Disable();
 
 	// Initialize the supervisor timer.
-	rfm22b_dev->supv_timer = PIOS_RFM22B_SUPERVISOR_TIMEOUT;
+	rfm22b_dev_g->supv_timer = PIOS_RFM22B_SUPERVISOR_TIMEOUT;
 
 	// disable interrupts
 	rfm22_write(RFM22_interrupt_enable1, 0x00);
@@ -1647,7 +1659,7 @@ static void rfm22_processInt(void)
 	exec_using_spi = TRUE;
 
 	// Reset the supervisor timer.
-	rfm22b_dev->supv_timer = PIOS_RFM22B_SUPERVISOR_TIMEOUT;
+	rfm22b_dev_g->supv_timer = PIOS_RFM22B_SUPERVISOR_TIMEOUT;
 
 	// ********************************
 	// read the RF modules current status registers

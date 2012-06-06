@@ -89,9 +89,17 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
 	timeOut = new QTimer(this);
 	connect(timeOut, SIGNAL(timeout()),this,SLOT(disconnected()));
 
+    //Add scroll bar when necessary
+    QScrollArea *scroll = new QScrollArea;
+    scroll->setWidget(m_pipx->frame_3);
+    m_pipx->verticalLayout_3->addWidget(scroll);
+
 	// Request and update of the setting object.
 	settingsUpdated = false;
 	pipxSettingsObj->requestUpdate();
+
+    disableMouseWheelEvents();
+
 }
 
 ConfigPipXtremeWidget::~ConfigPipXtremeWidget()

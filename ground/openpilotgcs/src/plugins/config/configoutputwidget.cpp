@@ -53,8 +53,6 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
     m_config->setupUi(this);
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    addApplySaveButtons(m_config->saveRCOutputToRAM,m_config->saveRCOutputToSD);
-    addUAVObject("ActuatorSettings");
 
     UAVSettingsImportExportFactory * importexportplugin =  pm->getObject<UAVSettingsImportExportFactory>();
     connect(importexportplugin,SIGNAL(importAboutToBegin()),this,SLOT(stopTests()));
@@ -73,25 +71,37 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
 
     connect(m_config->channelOutTest, SIGNAL(toggled(bool)), this, SLOT(runChannelTests(bool)));
 
-    refreshWidgetsValues();
 
     firstUpdate = true;
 
-    connect(m_config->spinningArmed, SIGNAL(toggled(bool)), this, SLOT(setSpinningArmed(bool)));
-
+    // Configure the task widget
     // Connect the help button
     connect(m_config->outputHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
+
+    // Add custom handling of displaying things
+    connect(this,SIGNAL(refreshWidgetsValuesRequested()), this, SLOT(refreshOutputWidgetsValues()));
+
+    addApplySaveButtons(m_config->saveRCOutputToRAM,m_config->saveRCOutputToSD);
+
+    // Track the ActuatorSettings object
+    addUAVObject("ActuatorSettings");
+
+    // Associate the buttons with their UAVO fields
     addWidget(m_config->cb_outputRate4);
     addWidget(m_config->cb_outputRate3);
     addWidget(m_config->cb_outputRate2);
     addWidget(m_config->cb_outputRate1);
     addWidget(m_config->spinningArmed);
 
+    disconnect(this, SLOT(refreshWidgetsValues(UAVObject*)));
+
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
     UAVObject* obj = objManager->getObject(QString("ActuatorCommand"));
     if(UAVObject::GetGcsTelemetryUpdateMode(obj->getMetadata()) == UAVObject::UPDATEMODE_ONCHANGE)
         this->setEnabled(false);
     connect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(disableIfNotMe(UAVObject*)));
+
+    refreshWidgetsValues();
 }
 void ConfigOutputWidget::enableControls(bool enable)
 {
@@ -194,24 +204,6 @@ void ConfigOutputWidget::assignOutputChannel(UAVDataObject *obj, QString str)
     OutputChannelForm *outputChannelForm = getOutputChannelForm(index);
     if(outputChannelForm)
         outputChannelForm->setAssignment(str);
-}
-
-/**
-  * Set the "Spin motors at neutral when armed" flag in ActuatorSettings
-  */
-void ConfigOutputWidget::setSpinningArmed(bool val)
-{
-    ActuatorSettings *actuatorSettings = ActuatorSettings::GetInstance(getObjectManager());
-    Q_ASSERT(actuatorSettings);
-    ActuatorSettings::DataFields actuatorSettingsData = actuatorSettings->getData();
-
-    if(val)
-        actuatorSettingsData.MotorsSpinWhileArmed = ActuatorSettings::MOTORSSPINWHILEARMED_TRUE;
-    else
-        actuatorSettingsData.MotorsSpinWhileArmed = ActuatorSettings::MOTORSSPINWHILEARMED_FALSE;
-
-    // Apply settings
-    actuatorSettings->setData(actuatorSettingsData);
 }
 
 /**
@@ -328,7 +320,16 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject * obj)
         }
     }
 
-    setDirty(dirty);
+    // Get Channel ranges:
+    foreach(OutputChannelForm *outputChannelForm, outputChannelForms)
+    {
+        int minValue = actuatorSettingsData.ChannelMin[outputChannelForm->index()];
+        int maxValue = actuatorSettingsData.ChannelMax[outputChannelForm->index()];
+        outputChannelForm->minmax(minValue, maxValue);
+
+        int neutral = actuatorSettingsData.ChannelNeutral[outputChannelForm->index()];
+        outputChannelForm->neutral(neutral);
+    }
 }
 
 /**
@@ -336,26 +337,36 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject * obj)
   */
 void ConfigOutputWidget::updateObjectsFromWidgets()
 {
+    emit updateObjectsFromWidgetsRequested();
+
     ActuatorSettings *actuatorSettings = ActuatorSettings::GetInstance(getObjectManager());
     Q_ASSERT(actuatorSettings);
-    ActuatorSettings::DataFields actuatorSettingsData = actuatorSettings->getData();
+    if(actuatorSettings) {
+        ActuatorSettings::DataFields actuatorSettingsData = actuatorSettings->getData();
 
-    // Set channel ranges
-    QList<OutputChannelForm*> outputChannelForms = findChildren<OutputChannelForm*>();
-    foreach(OutputChannelForm *outputChannelForm, outputChannelForms)
-    {
-        actuatorSettingsData.ChannelMax[outputChannelForm->index()] = outputChannelForm->max();
-        actuatorSettingsData.ChannelMin[outputChannelForm->index()] = outputChannelForm->min();
-        actuatorSettingsData.ChannelNeutral[outputChannelForm->index()] = outputChannelForm->neutral();
+        // Set channel ranges
+        QList<OutputChannelForm*> outputChannelForms = findChildren<OutputChannelForm*>();
+        foreach(OutputChannelForm *outputChannelForm, outputChannelForms)
+        {
+            actuatorSettingsData.ChannelMax[outputChannelForm->index()] = outputChannelForm->max();
+            actuatorSettingsData.ChannelMin[outputChannelForm->index()] = outputChannelForm->min();
+            actuatorSettingsData.ChannelNeutral[outputChannelForm->index()] = outputChannelForm->neutral();
+        }
+
+        // Set update rates
+        actuatorSettingsData.ChannelUpdateFreq[0] = m_config->cb_outputRate1->currentText().toUInt();
+        actuatorSettingsData.ChannelUpdateFreq[1] = m_config->cb_outputRate2->currentText().toUInt();
+        actuatorSettingsData.ChannelUpdateFreq[2] = m_config->cb_outputRate3->currentText().toUInt();
+        actuatorSettingsData.ChannelUpdateFreq[3] = m_config->cb_outputRate4->currentText().toUInt();
+
+        if(m_config->spinningArmed->isChecked() == true)
+            actuatorSettingsData.MotorsSpinWhileArmed = ActuatorSettings::MOTORSSPINWHILEARMED_TRUE;
+        else
+            actuatorSettingsData.MotorsSpinWhileArmed = ActuatorSettings::MOTORSSPINWHILEARMED_FALSE;
+
+        // Apply settings
+        actuatorSettings->setData(actuatorSettingsData);
     }
-
-    // Set update rates
-    actuatorSettingsData.ChannelUpdateFreq[0] = m_config->cb_outputRate1->currentText().toUInt();
-    actuatorSettingsData.ChannelUpdateFreq[1] = m_config->cb_outputRate2->currentText().toUInt();
-    actuatorSettingsData.ChannelUpdateFreq[2] = m_config->cb_outputRate3->currentText().toUInt();
-    actuatorSettingsData.ChannelUpdateFreq[3] = m_config->cb_outputRate4->currentText().toUInt();
-    // Apply settings
-    actuatorSettings->setData(actuatorSettingsData);
 }
 
 void ConfigOutputWidget::openHelp()

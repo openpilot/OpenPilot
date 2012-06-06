@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>720</width>
-    <height>567</height>
+    <height>739</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,23 +16,6 @@
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
     <widget class="QScrollArea" name="scrollArea">
-     <property name="styleSheet">
-      <string notr="true">#groupBox_5,#groupBox{
-background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0 rgba(243, 243, 243, 255), stop:1 rgba(250, 250, 250, 255));
-border: 1px outset #999;
-border-radius: 3;
-font:bold;
-}
-
-QGroupBox::title {
-     subcontrol-origin: margin;
-     subcontrol-position: top center; /* position at the top center */
-     padding: 0 3px;
-     background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                       stop: 0 #FFOECE, stop: 1 #FFFFFF);
-	top: 5px;
- }</string>
-     </property>
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
@@ -44,8 +27,8 @@ QGroupBox::title {
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>702</width>
-        <height>484</height>
+        <width>696</width>
+        <height>635</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -107,7 +90,7 @@ QGroupBox::title {
           <string>Basic Settings (Stabilization)</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_9">
-          <item row="3" column="3">
+          <item row="2" column="3">
            <widget class="QSpinBox" name="yawOutputRange">
             <property name="focusPolicy">
              <enum>Qt::StrongFocus</enum>
@@ -126,7 +109,7 @@ have to define channel output range using Output configuration tab.</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="2">
+          <item row="2" column="2">
            <widget class="QSpinBox" name="pitchOutputRange">
             <property name="focusPolicy">
              <enum>Qt::StrongFocus</enum>
@@ -145,7 +128,7 @@ have to define channel output range using Output configuration tab.</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
+          <item row="2" column="1">
            <widget class="QSpinBox" name="rollOutputRange">
             <property name="focusPolicy">
              <enum>Qt::StrongFocus</enum>
@@ -164,7 +147,7 @@ have to define channel output range using Output configuration tab.</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="3">
+          <item row="1" column="3">
            <widget class="QComboBox" name="yawChannel">
             <property name="focusPolicy">
              <enum>Qt::StrongFocus</enum>
@@ -179,7 +162,7 @@ have to define channel output range using Output configuration tab.</string>
             </item>
            </widget>
           </item>
-          <item row="2" column="2">
+          <item row="1" column="2">
            <widget class="QComboBox" name="pitchChannel">
             <property name="focusPolicy">
              <enum>Qt::StrongFocus</enum>
@@ -194,7 +177,7 @@ have to define channel output range using Output configuration tab.</string>
             </item>
            </widget>
           </item>
-          <item row="2" column="1">
+          <item row="1" column="1">
            <widget class="QComboBox" name="rollChannel">
             <property name="focusPolicy">
              <enum>Qt::StrongFocus</enum>
@@ -209,21 +192,21 @@ have to define channel output range using Output configuration tab.</string>
             </item>
            </widget>
           </item>
-          <item row="2" column="0">
+          <item row="1" column="0">
            <widget class="QLabel" name="label_42">
             <property name="text">
              <string>Output Channel</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="0">
+          <item row="2" column="0">
            <widget class="QLabel" name="label_43">
             <property name="text">
              <string>Output Range</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="3">
+          <item row="0" column="3">
            <widget class="QLabel" name="label_44">
             <property name="styleSheet">
              <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
@@ -240,7 +223,7 @@ margin:1px;</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="2">
+          <item row="0" column="2">
            <widget class="QLabel" name="label_45">
             <property name="styleSheet">
              <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
@@ -257,7 +240,7 @@ margin:1px;</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="1">
+          <item row="0" column="1">
            <widget class="QLabel" name="label_46">
             <property name="styleSheet">
              <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
@@ -274,37 +257,8 @@ margin:1px;</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="2">
-           <spacer name="verticalSpacer_4">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>40</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
          </layout>
         </widget>
-       </item>
-       <item>
-        <spacer name="verticalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Preferred</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>10</height>
-          </size>
-         </property>
-        </spacer>
        </item>
        <item>
         <widget class="QGroupBox" name="groupBox">
@@ -324,7 +278,7 @@ margin:1px;</string>
           <string>Advanced Settings (Control)</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_8">
-          <item row="1" column="3">
+          <item row="0" column="3">
            <widget class="QLabel" name="label_32">
             <property name="styleSheet">
              <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
@@ -341,7 +295,7 @@ margin:1px;</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="2">
+          <item row="0" column="2">
            <widget class="QLabel" name="label_33">
             <property name="styleSheet">
              <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
@@ -358,7 +312,7 @@ margin:1px;</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="1">
+          <item row="0" column="1">
            <widget class="QLabel" name="label_34">
             <property name="styleSheet">
              <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
@@ -375,7 +329,7 @@ margin:1px;</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="3">
+          <item row="1" column="3">
            <widget class="QComboBox" name="yawInputChannel">
             <property name="focusPolicy">
              <enum>Qt::StrongFocus</enum>
@@ -392,7 +346,7 @@ Don't forget to map this channel using Input configuration tab.</string>
             </item>
            </widget>
           </item>
-          <item row="2" column="2">
+          <item row="1" column="2">
            <widget class="QComboBox" name="pitchInputChannel">
             <property name="focusPolicy">
              <enum>Qt::StrongFocus</enum>
@@ -409,7 +363,7 @@ Don't forget to map this channel using Input configuration tab.</string>
             </item>
            </widget>
           </item>
-          <item row="2" column="1">
+          <item row="1" column="1">
            <widget class="QComboBox" name="rollInputChannel">
             <property name="focusPolicy">
              <enum>Qt::StrongFocus</enum>
@@ -426,14 +380,14 @@ Don't forget to map this channel using Input configuration tab.</string>
             </item>
            </widget>
           </item>
-          <item row="2" column="0">
+          <item row="1" column="0">
            <widget class="QLabel" name="label_35">
             <property name="text">
              <string>Input Channel</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="3">
+          <item row="2" column="3">
            <widget class="QComboBox" name="yawStabilizationMode">
             <property name="focusPolicy">
              <enum>Qt::StrongFocus</enum>
@@ -451,7 +405,7 @@ AxisLock: camera remembers tracking attitude. Input controls the rate of deflect
             </item>
            </widget>
           </item>
-          <item row="4" column="3">
+          <item row="3" column="3">
            <widget class="QSpinBox" name="yawInputRange">
             <property name="focusPolicy">
              <enum>Qt::StrongFocus</enum>
@@ -467,7 +421,7 @@ AxisLock: camera remembers tracking attitude. Input controls the rate of deflect
             </property>
            </widget>
           </item>
-          <item row="5" column="3">
+          <item row="4" column="3">
            <widget class="QSpinBox" name="yawInputRate">
             <property name="focusPolicy">
              <enum>Qt::StrongFocus</enum>
@@ -483,7 +437,7 @@ AxisLock: camera remembers tracking attitude. Input controls the rate of deflect
             </property>
            </widget>
           </item>
-          <item row="6" column="3">
+          <item row="5" column="3">
            <widget class="QSpinBox" name="yawResponseTime">
             <property name="focusPolicy">
              <enum>Qt::StrongFocus</enum>
@@ -501,7 +455,7 @@ This option smoothes the stick input. Zero value disables LPF.</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="2">
+          <item row="2" column="2">
            <widget class="QComboBox" name="pitchStabilizationMode">
             <property name="focusPolicy">
              <enum>Qt::StrongFocus</enum>
@@ -519,7 +473,7 @@ AxisLock: camera remembers tracking attitude. Input controls the rate of deflect
             </item>
            </widget>
           </item>
-          <item row="4" column="2">
+          <item row="3" column="2">
            <widget class="QSpinBox" name="pitchInputRange">
             <property name="focusPolicy">
              <enum>Qt::StrongFocus</enum>
@@ -535,7 +489,7 @@ AxisLock: camera remembers tracking attitude. Input controls the rate of deflect
             </property>
            </widget>
           </item>
-          <item row="5" column="2">
+          <item row="4" column="2">
            <widget class="QSpinBox" name="pitchInputRate">
             <property name="focusPolicy">
              <enum>Qt::StrongFocus</enum>
@@ -551,7 +505,7 @@ AxisLock: camera remembers tracking attitude. Input controls the rate of deflect
             </property>
            </widget>
           </item>
-          <item row="6" column="2">
+          <item row="5" column="2">
            <widget class="QSpinBox" name="pitchResponseTime">
             <property name="focusPolicy">
              <enum>Qt::StrongFocus</enum>
@@ -569,7 +523,7 @@ This option smoothes the stick input. Zero value disables LPF.</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
+          <item row="2" column="1">
            <widget class="QComboBox" name="rollStabilizationMode">
             <property name="focusPolicy">
              <enum>Qt::StrongFocus</enum>
@@ -587,7 +541,7 @@ AxisLock: camera remembers tracking attitude. Input controls the rate of deflect
             </item>
            </widget>
           </item>
-          <item row="4" column="1">
+          <item row="3" column="1">
            <widget class="QSpinBox" name="rollInputRange">
             <property name="focusPolicy">
              <enum>Qt::StrongFocus</enum>
@@ -603,7 +557,7 @@ AxisLock: camera remembers tracking attitude. Input controls the rate of deflect
             </property>
            </widget>
           </item>
-          <item row="5" column="1">
+          <item row="4" column="1">
            <widget class="QSpinBox" name="rollInputRate">
             <property name="focusPolicy">
              <enum>Qt::StrongFocus</enum>
@@ -619,7 +573,7 @@ AxisLock: camera remembers tracking attitude. Input controls the rate of deflect
             </property>
            </widget>
           </item>
-          <item row="6" column="1">
+          <item row="5" column="1">
            <widget class="QSpinBox" name="rollResponseTime">
             <property name="focusPolicy">
              <enum>Qt::StrongFocus</enum>
@@ -637,49 +591,49 @@ This option smoothes the stick input. Zero value disables LPF.</string>
             </property>
            </widget>
           </item>
-          <item row="7" column="0">
+          <item row="6" column="0">
            <widget class="QLabel" name="label_36">
             <property name="text">
              <string>MaxAxisLockRate</string>
             </property>
            </widget>
           </item>
-          <item row="6" column="0">
+          <item row="5" column="0">
            <widget class="QLabel" name="label_37">
             <property name="text">
              <string>Response Time</string>
             </property>
            </widget>
           </item>
-          <item row="5" column="0">
+          <item row="4" column="0">
            <widget class="QLabel" name="label_38">
             <property name="text">
              <string>Input Rate</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="0">
+          <item row="3" column="0">
            <widget class="QLabel" name="label_39">
             <property name="text">
              <string>Input Range</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="0">
+          <item row="2" column="0">
            <widget class="QLabel" name="label_40">
             <property name="text">
              <string>Stabilization Mode</string>
             </property>
            </widget>
           </item>
-          <item row="7" column="2" colspan="2">
+          <item row="6" column="2" colspan="2">
            <widget class="QLabel" name="label_41">
             <property name="text">
              <string>(the same value for Roll, Pitch, Yaw)</string>
             </property>
            </widget>
           </item>
-          <item row="7" column="1">
+          <item row="6" column="1">
            <widget class="QDoubleSpinBox" name="MaxAxisLockRate">
             <property name="focusPolicy">
              <enum>Qt::StrongFocus</enum>
@@ -704,19 +658,6 @@ value.</string>
              <double>1.000000000000000</double>
             </property>
            </widget>
-          </item>
-          <item row="0" column="2">
-           <spacer name="verticalSpacer_5">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>40</height>
-             </size>
-            </property>
-           </spacer>
           </item>
          </layout>
         </widget>

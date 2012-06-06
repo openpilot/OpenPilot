@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>840</width>
-    <height>724</height>
+    <height>834</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,6 +23,96 @@
       <enum>QFrame::Raised</enum>
      </property>
      <layout class="QGridLayout" name="gridLayout">
+      <item row="1" column="0" colspan="2">
+       <layout class="QHBoxLayout" name="horizontalLayout_12">
+        <item>
+         <widget class="QGraphicsView" name="graphicsView_Spectrum">
+          <property name="backgroundBrush">
+           <brush brushstyle="NoBrush">
+            <color alpha="255">
+             <red>0</red>
+             <green>0</green>
+             <blue>0</blue>
+            </color>
+           </brush>
+          </property>
+          <property name="foregroundBrush">
+           <brush brushstyle="NoBrush">
+            <color alpha="255">
+             <red>0</red>
+             <green>0</green>
+             <blue>0</blue>
+            </color>
+           </brush>
+          </property>
+          <property name="interactive">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="2" column="0" colspan="2">
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QLabel" name="message">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="submitButtons">
+          <item>
+           <widget class="QFrame" name="frame">
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="Apply">
+            <property name="toolTip">
+             <string>Send settings to the board but do not save to the non-volatile memory</string>
+            </property>
+            <property name="text">
+             <string>Apply</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="Save">
+            <property name="toolTip">
+             <string>Send settings to the board and save to the non-volatile memory</string>
+            </property>
+            <property name="text">
+             <string>Save</string>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
       <item row="0" column="0">
        <widget class="QFrame" name="frame_2">
         <property name="frameShape">
@@ -165,6 +255,12 @@
          </item>
          <item>
           <widget class="QGroupBox" name="groupBox_3">
+           <property name="minimumSize">
+            <size>
+             <width>400</width>
+             <height>0</height>
+            </size>
+           </property>
            <property name="font">
             <font>
              <weight>75</weight>
@@ -374,7 +470,7 @@
             <item row="6" column="0">
              <widget class="QLabel" name="label_12">
               <property name="text">
-               <string>Frequency Step Size</string>
+               <string>Freq. Step Size</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -779,7 +875,7 @@
          <item row="0" column="0">
           <widget class="QLabel" name="TelemPortConfigLabel">
            <property name="text">
-            <string>Telemetry Port Configuration</string>
+            <string>Telemetry Port Config.</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -1105,13 +1201,13 @@
             <bool>true</bool>
            </property>
            <property name="minimum">
-            <double>0</double>
+            <number>0</number>
            </property>
            <property name="maximum">
-            <double>1000000000</double>
+            <number>1000000000</number>
            </property>
            <property name="singleStep">
-            <double>100000</double>
+            <number>100000</number>
            </property>
           </widget>
          </item>
@@ -1213,98 +1309,51 @@
      </layout>
     </widget>
    </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_12">
-     <item>
-      <widget class="QGraphicsView" name="graphicsView_Spectrum">
-       <property name="backgroundBrush">
-        <brush brushstyle="NoBrush">
-         <color alpha="255">
-          <red>0</red>
-          <green>0</green>
-          <blue>0</blue>
-         </color>
-        </brush>
-       </property>
-       <property name="foregroundBrush">
-        <brush brushstyle="NoBrush">
-         <color alpha="255">
-          <red>0</red>
-          <green>0</green>
-          <blue>0</blue>
-         </color>
-        </brush>
-       </property>
-       <property name="interactive">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QVBoxLayout" name="verticalLayout">
-     <item>
-      <widget class="QLabel" name="message">
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="submitButtons">
-       <item>
-        <widget class="QFrame" name="frame">
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="horizontalSpacer">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
-        <widget class="QPushButton" name="Apply">
-         <property name="toolTip">
-          <string>Send settings to the board but do not save to the non-volatile memory</string>
-         </property>
-         <property name="text">
-          <string>Apply</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="Save">
-         <property name="toolTip">
-          <string>Send settings to the board and save to the non-volatile memory</string>
-         </property>
-         <property name="text">
-          <string>Save</string>
-         </property>
-         <property name="checked">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-    </layout>
-   </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>PairSelect1</tabstop>
+  <tabstop>PairID1</tabstop>
+  <tabstop>PairSelect2</tabstop>
+  <tabstop>PairID2</tabstop>
+  <tabstop>PairSelect3</tabstop>
+  <tabstop>PairID3</tabstop>
+  <tabstop>PairSelect4</tabstop>
+  <tabstop>PairID4</tabstop>
+  <tabstop>FirmwareVersion</tabstop>
+  <tabstop>SerialNumber</tabstop>
+  <tabstop>DeviceID</tabstop>
+  <tabstop>MinFrequency</tabstop>
+  <tabstop>MaxFrequency</tabstop>
+  <tabstop>FrequencyStepSize</tabstop>
+  <tabstop>LinkState</tabstop>
+  <tabstop>RxAFC</tabstop>
+  <tabstop>Retries</tabstop>
+  <tabstop>Errors</tabstop>
+  <tabstop>UAVTalkErrors</tabstop>
+  <tabstop>Resets</tabstop>
+  <tabstop>TXRate</tabstop>
+  <tabstop>RXRate</tabstop>
+  <tabstop>TelemPortConfig</tabstop>
+  <tabstop>TelemPortSpeed</tabstop>
+  <tabstop>FlexiPortConfig</tabstop>
+  <tabstop>FlexiPortSpeed</tabstop>
+  <tabstop>VCPConfig</tabstop>
+  <tabstop>VCPSpeed</tabstop>
+  <tabstop>MaxRFDatarate</tabstop>
+  <tabstop>MaxRFTxPower</tabstop>
+  <tabstop>SendTimeout</tabstop>
+  <tabstop>MinPacketSize</tabstop>
+  <tabstop>FrequencyCalibration</tabstop>
+  <tabstop>Frequency</tabstop>
+  <tabstop>ScanSpectrum</tabstop>
+  <tabstop>AESKey</tabstop>
+  <tabstop>AESKeyRandom</tabstop>
+  <tabstop>AESEnable</tabstop>
+  <tabstop>graphicsView_Spectrum</tabstop>
+  <tabstop>Apply</tabstop>
+  <tabstop>Save</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

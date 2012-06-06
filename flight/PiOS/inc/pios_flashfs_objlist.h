@@ -37,6 +37,7 @@ struct flashfs_cfg {
 	uint32_t obj_table_start;
 	uint32_t obj_table_end;
 	uint32_t sector_size;
+	uint32_t chip_size;
 };
 
 int32_t PIOS_FLASHFS_Init(const struct flashfs_cfg * cfg);

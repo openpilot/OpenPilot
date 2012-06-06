@@ -3,9 +3,9 @@
  *
  * @file       vtolpathfollower.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
- * @brief      This module compared @ref PositionActuatl to @ref ActiveWaypoint 
- * and sets @ref AttitudeDesired.  It only does this when the FlightMode field
- * of @ref ManualControlCommand is Auto.
+ * @brief      This module compared @ref PositionActual to @ref PathDesired 
+ * and sets @ref Stabilization.  It only does this when the FlightMode field
+ * of @ref FlightStatus is PathPlanner or RTH.
  *
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -27,12 +27,15 @@
  */
 
 /**
- * Input object: ActiveWaypoint
+ * Input object: FlightStatus
+ * Input object: PathDesired
  * Input object: PositionActual
- * Input object: ManualControlCommand
- * Output object: AttitudeDesired
+ * Output object: StabilizationDesired
  *
- * This module will periodically update the value of the AttitudeDesired object.
+ * This module will periodically update the value of the @ref StabilizationDesired object based on 
+ * @ref PathDesired and @PositionActual when the Flight Mode selected in @FlightStatus is supported
+ * by this module.  Otherwise another module (e.g. @ref ManualControlCommand) is expected to be
+ * writing to @ref StabilizationDesired.
  *
  * The module executes in its own thread in this example.
  *

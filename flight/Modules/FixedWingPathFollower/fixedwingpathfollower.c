@@ -244,14 +244,9 @@ static void updatePathVelocity()
 	VelocityActualData velocityActual;
 	VelocityActualGet(&velocityActual);
 
-	// look ahead fixedwingpathfollowerSettings.CourseFeedForward seconds
-	float cur[3] = {positionActual.North + (velocityActual.North * fixedwingpathfollowerSettings.CourseFeedForward),
-					positionActual.East + (velocityActual.East * fixedwingpathfollowerSettings.CourseFeedForward),
-					positionActual.Down + (velocityActual.Down * fixedwingpathfollowerSettings.CourseFeedForward)
-					};
 	struct path_status progress;
 
-	path_progress(pathDesired.Start, pathDesired.End, cur, &progress);
+	path_progress(pathDesired.Start, pathDesired.End, &positionActual.North, &progress);
 	
 	float groundspeed;
 	float altitudeSetpoint;
@@ -260,9 +255,9 @@ static void updatePathVelocity()
 		case PATHDESIRED_MODE_ENDPOINT:
 		default:
 			groundspeed = pathDesired.StartingVelocity + (pathDesired.EndingVelocity - pathDesired.StartingVelocity) *
-			bound(progress.fractional_progress,0,1);
+			              bound(progress.fractional_progress,0,1);
 			altitudeSetpoint = pathDesired.Start[2] + (pathDesired.End[2] - pathDesired.Start[2]) *
-			bound(progress.fractional_progress,0,1);
+						bound(progress.fractional_progress,0,1);
 			break;
 	}
 	
@@ -354,7 +349,7 @@ static uint8_t updateFixedDesiredAttitude()
 							fixedwingpathfollowerSettings.AirSpeedMax);
 
 	// Airspeed error
-	speedError = airspeedDesired - ( airspeedActual );
+	speedError = airspeedDesired - airspeedActual;
 	// Vertical error
 	climbspeedDesired = bound (
 						velocityDesired.Down,

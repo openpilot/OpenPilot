@@ -10,9 +10,6 @@
         <field name="VerticalVelMax" units="m/s" type="float" elements="1" defaultvalue="10"/>
                 <!-- maximum allowed climb or sink rate in guided flight-->
 
-        <field name="CourseFeedForward" units="s" type="float" elements="1" defaultvalue="3.0"/>
-                <!-- how many seconds to plan the flight vector ahead when initiating necessary course changes - increase for planes with sluggish response -->
-
         <field name="HorizontalPosP" units="(m/s)/m" type="float" elements="1" defaultvalue="0.05"/>
                 <!-- proportional coefficient for correction vector in path vector field to get back on course - reduce for fast planes to prevent course oscillations -->
         <field name="VerticalPosP" units="(m/s)/m" type="float" elements="1" defaultvalue="0.05"/>

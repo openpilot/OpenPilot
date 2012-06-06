@@ -720,14 +720,27 @@ static void radioStatusTask(void *parameters)
 			pipxStatus.PairIDs[i] = data->pairStats[i].pairID;
 			pipxStatus.PairSignalStrengths[i] = data->pairStats[i].rssi;
 			data->pairStats[i].lastContact++;
-			// Add the paired devices stats to ours.
-			if(data->pairStats[i].pairID == pairID)
+			// Remove this device if it's stale.
+			if(data->pairStats[i].lastContact > MAX_LOST_CONTACT_TIME)
+			{
+				data->pairStats[i].pairID = 0;
+				data->pairStats[i].rssi = -127;
+				data->pairStats[i].retries = 0;
+				data->pairStats[i].errors = 0;
+				data->pairStats[i].uavtalk_errors = 0;
+				data->pairStats[i].resets = 0;
+				data->pairStats[i].dropped = 0;
+				data->pairStats[i].lastContact = 0;
+			}
+			// Add the paired devices statistics to ours.
+			if(pairID && (data->pairStats[i].pairID == pairID) && (data->pairStats[i].rssi > -127))
 			{
 				pipxStatus.Retries += data->pairStats[i].retries;
 				pipxStatus.Errors += data->pairStats[i].errors;
 				pipxStatus.UAVTalkErrors += data->pairStats[i].uavtalk_errors;
 				pipxStatus.Dropped += data->pairStats[i].dropped;
 				pipxStatus.Resets += data->pairStats[i].resets;
+				pipxStatus.Dropped += data->pairStats[i].dropped;
 				pipxStatus.LinkState = PIPXSTATUS_LINKSTATE_CONNECTED;
 			}
 		}
@@ -749,6 +762,7 @@ static void radioStatusTask(void *parameters)
 				status_packet.retries = data->comTxRetries;
 				status_packet.errors = data->packetErrors;
 				status_packet.uavtalk_errors = data->UAVTalkErrors;
+				status_packet.dropped = data->droppedPackets;
 				status_packet.resets = PIOS_RFM22B_Resets(pios_rfm22b_id);
 				PHPacketHandle sph = (PHPacketHandle)&status_packet;
 				xQueueSend(data->sendPacketQueue, &sph, MAX_PORT_DELAY);
@@ -879,22 +893,8 @@ static void StatusHandler(PHStatusPacketHandle status)
 		data->pairStats[id_idx].errors = status->errors;
 		data->pairStats[id_idx].uavtalk_errors = status->uavtalk_errors;
 		data->pairStats[id_idx].resets = status->resets;
+		data->pairStats[id_idx].dropped = status->dropped;
 		data->pairStats[id_idx].lastContact = 0;
-	}
-
-	// Remove any contacts that we haven't seen for a while.
-	for (id_idx = 0; id_idx < PIPXSTATUS_PAIRIDS_NUMELEM; ++id_idx)
-	{
-		if(data->pairStats[id_idx].lastContact > MAX_LOST_CONTACT_TIME)
-		{
-			data->pairStats[id_idx].pairID = 0;
-			data->pairStats[id_idx].rssi = -127;
-			data->pairStats[id_idx].retries = 0;
-			data->pairStats[id_idx].errors = 0;
-			data->pairStats[id_idx].uavtalk_errors = 0;
-			data->pairStats[id_idx].resets = 0;
-			data->pairStats[id_idx].lastContact = 0;
-		}
 	}
 
 	// If we haven't seen it, find a slot to put it in.
@@ -922,6 +922,7 @@ static void StatusHandler(PHStatusPacketHandle status)
 		data->pairStats[min_idx].errors = status->errors;
 		data->pairStats[min_idx].uavtalk_errors = status->uavtalk_errors;
 		data->pairStats[min_idx].resets = status->resets;
+		data->pairStats[min_idx].dropped = status->dropped;
 		data->pairStats[min_idx].lastContact = 0;
 	}
 }

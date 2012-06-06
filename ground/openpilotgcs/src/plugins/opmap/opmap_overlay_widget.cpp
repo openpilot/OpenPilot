@@ -32,7 +32,7 @@ opmap_overlay_widget::opmap_overlay_widget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::opmap_overlay_widget)
 {
-    ui->setupUi(this);
+
 }
 
 opmap_overlay_widget::~opmap_overlay_widget()

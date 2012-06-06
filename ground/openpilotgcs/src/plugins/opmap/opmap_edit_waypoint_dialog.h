@@ -35,6 +35,7 @@
 namespace Ui {
     class opmap_edit_waypoint_dialog;
 }
+using namespace mapcontrol;
 
 class opmap_edit_waypoint_dialog : public QDialog
 {
@@ -50,31 +51,21 @@ public:
     */
     void editWaypoint(mapcontrol::WayPointItem *waypoint_item);
 
+    void loadFromWP(mapcontrol::WayPointItem *waypoint_item);
 protected:
     void changeEvent(QEvent *e);
 
 private:
     Ui::opmap_edit_waypoint_dialog *ui;
-
-    int original_number;
-    bool original_locked;
-    internals::PointLatLng original_coord;
-    double original_altitude;
-    QString original_description;
-    double original_distance;
-    double original_bearing;
-
-
-    mapcontrol::WayPointItem::wptype original_type;
-
-    mapcontrol::WayPointItem *waypoint_item;
-
+    mapcontrol::WayPointItem * my_waypoint;
     int saveSettings();
 
 private slots:
 
 private slots:
-    void setupWidgets(bool isRelative);
+    void setupModeWidgets();
+    void setupPositionWidgets(bool isRelative);
+    void setupConditionWidgets();
     void on_pushButtonCancel_clicked();
     void on_pushButtonRevert_clicked();
     void on_pushButtonApply_clicked();

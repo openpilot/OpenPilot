@@ -153,18 +153,7 @@ private slots:
     void OnCurrentPositionChanged(internals::PointLatLng point);
     void OnTileLoadComplete();
     void OnTileLoadStart();
-    void OnMapDrag();
-    void OnMapZoomChanged();
-    void OnMapTypeChanged(MapType::Types type);
-    void OnEmptyTileError(int zoom, core::Point pos);
     void OnTilesStillToLoad(int number);
-
-    /**
-      * Unused for now, hooks for future waypoint support
-      */
-    void WPNumberChanged(int const& oldnumber,int const& newnumber, WayPointItem* waypoint);
-    void WPInserted(int const& number, WayPointItem* waypoint);
-    void WPDeleted(int const& number, WayPointItem* waypoint);
 
     /**
     * @brief mouse right click context menu signals
@@ -190,7 +179,9 @@ private slots:
     void onFollowUAVheadingAct_toggled(bool checked);
 
     void onOpenWayPointEditorAct_triggered();
-    void onAddWayPointAct_triggered();
+    void onAddWayPointAct_triggeredFromContextMenu();
+    void onAddWayPointAct_triggeredFromThis();
+    void onAddWayPointAct_triggered(internals::PointLatLng coord);
     void onEditWayPointAct_triggered();
     void onLockWayPointAct_triggered();
     void onDeleteWayPointAct_triggered();
@@ -280,7 +271,8 @@ private:
     QAction *followUAVheadingAct;
 
     QAction *wayPointEditorAct;
-    QAction *addWayPointAct;
+    QAction *addWayPointActFromThis;
+    QAction *addWayPointActFromContextMenu;
     QAction *editWayPointAct;
     QAction *lockWayPointAct;
     QAction *deleteWayPointAct;

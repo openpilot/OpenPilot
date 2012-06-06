@@ -155,10 +155,9 @@ public:
     void RefreshPos();
     void RefreshToolTip();
     QPixmap picture;
-    QVariant customData(){return myCustomData;}
-    void setCustomData(QVariant arg){myCustomData=arg;}
     QString customString(){return myCustomString;}
     void setCustomString(QString arg){myCustomString=arg;}
+    void setFlag(GraphicsItemFlag flag, bool enabled);
 ~WayPointItem();
 
     static int snumber;
@@ -188,7 +187,6 @@ private:
     QTransform transf;
     HomeItem * myHome;
     wptype myType;
-    QVariant myCustomData;
     QString myCustomString;
 
 public slots:

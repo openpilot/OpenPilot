@@ -38,14 +38,17 @@ WayPointCircle::WayPointCircle(WayPointItem *center, WayPointItem *radius,bool c
     connect(radius,SIGNAL(localPositionChanged(QPointF)),this,SLOT(refreshLocations()));
     connect(center,SIGNAL(aboutToBeDeleted(WayPointItem*)),this,SLOT(waypointdeleted()));
     connect(radius,SIGNAL(aboutToBeDeleted(WayPointItem*)),this,SLOT(waypointdeleted()));
+    refreshLocations();
+
 }
 
-WayPointCircle::WayPointCircle(HomeItem *center, WayPointItem *radius, bool clockwise, MapGraphicItem *map, QColor color):my_center(center),
+WayPointCircle::WayPointCircle(HomeItem *radius, WayPointItem *center, bool clockwise, MapGraphicItem *map, QColor color):my_center(center),
     my_radius(radius),my_map(map),QGraphicsEllipseItem(map),myColor(color),myClockWise(clockwise)
 {
-    connect(center,SIGNAL(homePositionChanged(internals::PointLatLng)),this,SLOT(refreshLocations()));
-    connect(radius,SIGNAL(localPositionChanged(QPointF)),this,SLOT(refreshLocations()));
-    connect(radius,SIGNAL(aboutToBeDeleted(WayPointItem*)),this,SLOT(waypointdeleted()));
+    connect(radius,SIGNAL(homePositionChanged(internals::PointLatLng)),this,SLOT(refreshLocations()));
+    connect(center,SIGNAL(localPositionChanged(QPointF)),this,SLOT(refreshLocations()));
+    connect(center,SIGNAL(aboutToBeDeleted(WayPointItem*)),this,SLOT(waypointdeleted()));
+    refreshLocations();
 }
 
 int WayPointCircle::type() const
@@ -53,21 +56,13 @@ int WayPointCircle::type() const
     // Enable the use of qgraphicsitem_cast with this item.
     return Type;
 }
-QPainterPath WayPointCircle::shape() const
-{
-    QPainterPath path = QGraphicsEllipseItem::shape();
-    path.addPolygon(arrowHead);
-    return path;
-}
+
 void WayPointCircle::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     QPointF p1;
     QPointF p2;
-    p1=my_center->pos();
-    p2=my_center->pos();
-    QLineF line(my_radius->pos(),my_center->pos());
-    p1.ry()=p1.ry()+line.length();
-    p2.ry()=p2.ry()-line.length();
+    p1=QPointF(line.p1().x(),line.p1().y()+line.length());
+    p2=QPointF(line.p1().x(),line.p1().y()-line.length());
     QPen myPen = pen();
     myPen.setColor(myColor);
     qreal arrowSize = 10;
@@ -75,10 +70,8 @@ void WayPointCircle::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     QBrush brush=painter->brush();
     painter->setBrush(myColor);
     double angle =0;
-    if(myClockWise)
+    if(!myClockWise)
         angle+=Pi;
-    if (line.dy() >= 0)
-        angle = (Pi) - angle;
 
         QPointF arrowP1 = p1 + QPointF(sin(angle + Pi / 3) * arrowSize,
                                         cos(angle + Pi / 3) * arrowSize);
@@ -104,8 +97,9 @@ void WayPointCircle::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 
 void WayPointCircle::refreshLocations()
 {
-    QLineF line(my_center->pos(),my_radius->pos());
+    line=QLineF(my_center->pos(),my_radius->pos());
     this->setRect(my_center->pos().x(),my_center->pos().y(),2*line.length(),2*line.length());
+    this->update();
 }
 
 void WayPointCircle::waypointdeleted()

@@ -47,7 +47,6 @@ public:
     WayPointCircle(WayPointItem * center, WayPointItem * radius,bool clockwise,MapGraphicItem * map,QColor color=Qt::green);
     WayPointCircle(HomeItem * center, WayPointItem * radius,bool clockwise,MapGraphicItem * map,QColor color=Qt::green);
     int type() const;
-    QPainterPath shape() const;
     void setColor(const QColor &color)
         { myColor = color; }
 private:
@@ -57,6 +56,7 @@ private:
     QPolygonF arrowHead;
     QColor myColor;
     bool myClockWise;
+    QLineF line;
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 public slots:

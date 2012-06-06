@@ -34,22 +34,7 @@
 #include "waypoint.h"
 #include "QMutexLocker"
 #include "QPointer"
-namespace mapcontrol
-{
-    struct customData
-    {
-        float velocity;
-        int mode;
-        float mode_params[4];
-        int condition;
-        float condition_params[4];
-        int command;
-        int jumpdestination;
-        int errordestination;
-    };
 
-}
-Q_DECLARE_METATYPE(mapcontrol::customData)
 namespace Ui {
 class pathPlanManager;
 }

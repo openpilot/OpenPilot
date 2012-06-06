@@ -206,14 +206,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     connect(m_map, SIGNAL(OnCurrentPositionChanged(internals::PointLatLng)), this, SLOT(OnCurrentPositionChanged(internals::PointLatLng)));    // map poisition change signals
     connect(m_map, SIGNAL(OnTileLoadComplete()), this, SLOT(OnTileLoadComplete()));					// tile loading stop signals
     connect(m_map, SIGNAL(OnTileLoadStart()), this, SLOT(OnTileLoadStart()));					// tile loading start signals
-    connect(m_map, SIGNAL(OnMapDrag()), this, SLOT(OnMapDrag()));							// map drag signals
-    connect(m_map, SIGNAL(OnMapZoomChanged()), this, SLOT(OnMapZoomChanged()));					// map zoom changed
-    connect(m_map, SIGNAL(OnMapTypeChanged(MapType::Types)), this, SLOT(OnMapTypeChanged(MapType::Types)));		// map type changed
-    connect(m_map, SIGNAL(OnEmptyTileError(int, core::Point)), this, SLOT(OnEmptyTileError(int, core::Point)));	// tile error
     connect(m_map, SIGNAL(OnTilesStillToLoad(int)), this, SLOT(OnTilesStillToLoad(int)));				// tile loading signals
-  //  connect(m_map, SIGNAL(WPNumberChanged(int const&,int const&,WayPointItem*)), this, SLOT(WPNumberChanged(int const&,int const&,WayPointItem*)));
-  //  connect(m_map, SIGNAL(WPInserted(int const&, WayPointItem*)), this, SLOT(WPInserted(int const&, WayPointItem*)));
-  //  connect(m_map, SIGNAL(WPDeleted(int,WayPointItem*)), this, SLOT(WPDeleted(int,WayPointItem*)));
     connect(m_map,SIGNAL(OnWayPointDoubleClicked(WayPointItem*)),this,SLOT(wpDoubleClickEvent(WayPointItem*)));
 	m_map->SetCurrentPosition(m_home_position.coord);         // set the map position
 	m_map->Home->SetCoord(m_home_position.coord);             // set the HOME position
@@ -490,7 +483,7 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
             contextMenu.addSeparator()->setText(tr("Waypoints"));
 
             contextMenu.addAction(wayPointEditorAct);
-            contextMenu.addAction(addWayPointAct);
+            contextMenu.addAction(addWayPointActFromContextMenu);
 
             if (m_mouse_waypoint)
             {	// we have a waypoint under the mouse
@@ -701,10 +694,6 @@ void OPMapGadgetWidget::zoomChanged(double zoomt, double zoom, double zoomd)
 	zoomAct.at(index0_zoom)->setChecked(true);		// set the right-click context menu zoom level
 }
 
-void OPMapGadgetWidget::OnMapDrag()
-{
-}
-
 void OPMapGadgetWidget::OnCurrentPositionChanged(internals::PointLatLng point)
 {
 	if (!m_widget || !m_map)
@@ -753,47 +742,6 @@ void OPMapGadgetWidget::OnTileLoadComplete()
 
     m_widget->progressBarMap->setVisible(false);
 }
-
-void OPMapGadgetWidget::OnMapZoomChanged()
-{
-}
-
-void OPMapGadgetWidget::OnMapTypeChanged(MapType::Types type)
-{
-    Q_UNUSED(type);
-}
-
-void OPMapGadgetWidget::OnEmptyTileError(int zoom, core::Point pos)
-{
-    Q_UNUSED(zoom);
-    Q_UNUSED(pos);
-}
-
-void OPMapGadgetWidget::WPNumberChanged(int const &oldnumber, int const &newnumber, WayPointItem *waypoint)
-{
-    Q_UNUSED(oldnumber);
-    Q_UNUSED(newnumber);
-    Q_UNUSED(waypoint);
-}
-
-/**
-  TODO: slot to do something upon Waypoint insertion
-  */
-void OPMapGadgetWidget::WPInserted(int const &number, WayPointItem *waypoint)
-{
-    Q_UNUSED(number);
-    Q_UNUSED(waypoint);
-}
-
-/**
-  TODO: slot to do something upon Waypoint deletion
-  */
-void OPMapGadgetWidget::WPDeleted(int const &number, WayPointItem *waypoint)
-{
-    Q_UNUSED(number);
-    Q_UNUSED(waypoint);
-}
-
 
 void OPMapGadgetWidget::on_toolButtonZoomP_clicked()
 {
@@ -1334,11 +1282,16 @@ void OPMapGadgetWidget::createActions()
     wayPointEditorAct->setEnabled(true);   // temporary
     connect(wayPointEditorAct, SIGNAL(triggered()), this, SLOT(onOpenWayPointEditorAct_triggered()));
 
-    addWayPointAct = new QAction(tr("&Add waypoint"), this);
-    addWayPointAct->setShortcut(tr("Ctrl+A"));
-    addWayPointAct->setStatusTip(tr("Add waypoint"));
-    connect(addWayPointAct, SIGNAL(triggered()), this, SLOT(onAddWayPointAct_triggered()));
-    this->addAction(addWayPointAct);
+    addWayPointActFromContextMenu = new QAction(tr("&Add waypoint"), this);
+    addWayPointActFromContextMenu->setShortcut(tr("Ctrl+A"));
+    addWayPointActFromContextMenu->setStatusTip(tr("Add waypoint"));
+    connect(addWayPointActFromContextMenu, SIGNAL(triggered()), this, SLOT(onAddWayPointAct_triggeredFromContextMenu()));
+
+    addWayPointActFromThis = new QAction(tr("&Add waypoint"), this);
+    addWayPointActFromThis->setShortcut(tr("Ctrl+A"));
+    addWayPointActFromThis->setStatusTip(tr("Add waypoint"));
+    connect(addWayPointActFromThis, SIGNAL(triggered()), this, SLOT(onAddWayPointAct_triggeredFromThis()));
+    this->addAction(addWayPointActFromThis);
 
     editWayPointAct = new QAction(tr("&Edit waypoint"), this);
     editWayPointAct->setShortcut(tr("Ctrl+E"));
@@ -1738,8 +1691,16 @@ void OPMapGadgetWidget::onOpenWayPointEditorAct_triggered()
 {
     waypoint_editor_dialog.show();
 }
+void OPMapGadgetWidget::onAddWayPointAct_triggeredFromContextMenu()
+{
+    onAddWayPointAct_triggered(m_context_menu_lat_lon);
+}
+void OPMapGadgetWidget::onAddWayPointAct_triggeredFromThis()
+{
+    onAddWayPointAct_triggered(lastLatLngMouse);
+}
 
-void OPMapGadgetWidget::onAddWayPointAct_triggered()
+void OPMapGadgetWidget::onAddWayPointAct_triggered(internals::PointLatLng coord)
 {
 	if (!m_widget || !m_map)
 		return;
@@ -1747,20 +1708,11 @@ void OPMapGadgetWidget::onAddWayPointAct_triggered()
     if (m_map_mode != Normal_MapMode)
         return;
 
-  //  m_waypoint_list_mutex.lock();
-
-	// create a waypoint on the map at the last known mouse position
-    internals::PointLatLng coord;
-    if(this->contextMenu.isVisible())
-        coord = m_context_menu_lat_lon;
-    else
-        coord=lastLatLngMouse;
     m_map->WPCreate(coord, 0, "");
 
 
             //wp->map_wp_item->picture.load(QString::fromUtf8(":/opmap/images/waypoint_marker1.png"));
             //wp->map_wp_item->picture.load(QString::fromUtf8(":/opmap/images/waypoint_marker2.png"));
-
 }
 
 

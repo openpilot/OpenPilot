@@ -267,6 +267,7 @@ namespace mapcontrol
                 if(!selectedArea.IsEmpty() && event->modifiers() == Qt::ShiftModifier)
                 {
                        SetZoomToFitRect(SelectedArea());
+                       selectedArea=internals::RectLatLng::Empty;
                 }
             }
 
@@ -276,6 +277,8 @@ namespace mapcontrol
     {
         if(event->modifiers()&(Qt::ShiftModifier|Qt::ControlModifier))
             this->setCursor(Qt::CrossCursor);
+        if(event->key()==Qt::Key_Escape)
+            selectedArea=internals::RectLatLng::Empty;
         QGraphicsItem::keyPressEvent(event);
     }
     void MapGraphicItem::keyReleaseEvent(QKeyEvent *event)

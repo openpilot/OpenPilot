@@ -64,21 +64,25 @@ void pathPlanManager::on_WPInserted(int wp_number, WayPointItem * wp)
     data.mode=PathAction::MODE_FLYENDPOINT;
     data.condition=PathAction::ENDCONDITION_NONE;
     data.velocity=0;
-    wp->customData().setValue(data);
+    QVariant var;
+    var.setValue(data);
+    wp->setData(0,var);
     refreshOverlays();
 }
 
 void pathPlanManager::on_WPValuesChanged(WayPointItem * wp)
 {
 }
-
+//typedef enum { MODE_FLYENDPOINT=0, MODE_FLYVECTOR=1, MODE_FLYCIRCLERIGHT=2,
+//MODE_FLYCIRCLELEFT=3, MODE_DRIVEENDPOINT=4, MODE_DRIVEVECTOR=5, MODE_DRIVECIRCLELEFT=6,
+//MODE_DRIVECIRCLERIGHT=7, MODE_FIXEDATTITUDE=8, MODE_SETACCESSORY=9, MODE_DISARMALARM=10 } ModeOptions;
 void pathPlanManager::refreshOverlays()
 {
     QMutexLocker locker(&wplistmutex);
     myMap->deleteAllOverlays();
     foreach(WayPointItem * wp,*waypoints)
     {
-        customData data=wp->customData().value<customData>();
+        customData data=wp->data(0).value<customData>();
         switch(data.mode)
         {
         case PathAction::MODE_FLYENDPOINT:
@@ -92,10 +96,14 @@ void pathPlanManager::refreshOverlays()
             break;
         case PathAction::MODE_FLYCIRCLERIGHT:
         case PathAction::MODE_DRIVECIRCLERIGHT:
+            if(wp->Number()==0)
+                myMap->WPCircleCreate((HomeItem*)myMap->Home,wp,true);
             myMap->WPCircleCreate(findWayPointNumber(wp->Number()-1),wp,true);
             break;
         case PathAction::MODE_FLYCIRCLELEFT:
         case PathAction::MODE_DRIVECIRCLELEFT:
+            if(wp->Number()==0)
+                myMap->WPCircleCreate((HomeItem*)myMap->Home,wp,false);
             myMap->WPCircleCreate(findWayPointNumber(wp->Number()-1),wp,false);
             break;
         default:

@@ -1,6 +1,6 @@
+QT      +=  webkit network
 TEMPLATE = lib
 TARGET = OPMapGadget
-
 include(../../openpilotgcsplugin.pri)
 include(../../plugins/coreplugin/coreplugin.pri)
 include(../../libs/opmapcontrol/opmapcontrol.pri)

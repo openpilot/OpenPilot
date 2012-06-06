@@ -297,8 +297,10 @@ WayPointItem::WayPointItem(MapGraphicItem *map, bool magicwaypoint):reached(fals
         emit WPValuesChanged(this);
         if(value)
             picture.load(QString::fromUtf8(":/markers/images/bigMarkerGreen.png"));
-        else
+        else if(this->flags() & QGraphicsItem::ItemIsMovable==QGraphicsItem::ItemIsMovable)
             picture.load(QString::fromUtf8(":/markers/images/marker.png"));
+        else
+            picture.load(QString::fromUtf8(":/markers/images/waypoint_marker2.png"));
         this->update();
 
     }
@@ -401,6 +403,18 @@ WayPointItem::WayPointItem(MapGraphicItem *map, bool magicwaypoint):reached(fals
             setToolTip(QString("WayPoint Number:%1\nDescription:%2\nCoordinate:%4\nFrom Home:%5\nAltitude:%6\nType:%7\n%8").arg(QString::number(Number())).arg(description).arg(coord_str).arg(relativeCoord_str).arg(QString::number(altitude)).arg(type_str).arg(myCustomString));
         else
             setToolTip(QString("Magic WayPoint\nCoordinate:%1\nFrom Home:%2\nAltitude:%3\nType:%4\n%5").arg(coord_str).arg(relativeCoord_str).arg(QString::number(altitude)).arg(type_str).arg(myCustomString));
+    }
+
+    void WayPointItem::setFlag(QGraphicsItem::GraphicsItemFlag flag, bool enabled)
+    {
+        if(flag==QGraphicsItem::ItemIsMovable)
+        {
+            if(enabled)
+                picture.load(QString::fromUtf8(":/markers/images/marker.png"));
+            else
+                picture.load(QString::fromUtf8(":/markers/images/waypoint_marker2.png"));
+        }
+        QGraphicsItem::setFlag(flag,enabled);
     }
 
     int WayPointItem::snumber=0;

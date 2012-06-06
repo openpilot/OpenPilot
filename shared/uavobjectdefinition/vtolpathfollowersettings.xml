@@ -1,6 +1,6 @@
 <xml>
-    <object name="GuidanceSettings" singleinstance="true" settings="true">
-        <description>Settings for the @ref GuidanceModule</description>
+    <object name="VtolPathFollowerSettings" singleinstance="true" settings="true">
+        <description>Settings for the @ref VtolPathFollower module</description>
         <field name="GuidanceMode" units="" type="enum" elements="1" options="DUAL_LOOP,VELOCITY_CONTROL" defaultvalue="DUAL_LOOP"/>
 	<field name="HorizontalVelMax" units="m/s" type="uint16" elements="1" defaultvalue="10"/>
         <field name="VerticalVelMax" units="m/s" type="uint16" elements="1" defaultvalue="1"/>

@@ -40,7 +40,7 @@
 #include "baroaltitude.h"
 #include "flighttelemetrystats.h"
 #include "flightstatus.h"
-#include "guidancesettings.h"
+#include "vtolpathfollowersettings.h"
 #include "manualcontrol.h"
 #include "manualcontrolsettings.h"
 #include "manualcontrolcommand.h"
@@ -672,8 +672,8 @@ static bool processFailsafe(bool valid_input_detected, ManualControlSettingsData
 				break;
 			case MANUALCONTROLSETTINGS_FAILSAFEBEHAVIOR_RTH: 
 			{
-				GuidanceSettingsData guidanceSettings;
-				GuidanceSettingsGet(&guidanceSettings);
+				VtolPathFollowerSettingsData guidanceSettings;
+				VtolPathFollowerSettingsGet(&guidanceSettings);
 				
 				FlightStatusData flightStatus;
 				FlightStatusGet(&flightStatus);
@@ -682,7 +682,7 @@ static bool processFailsafe(bool valid_input_detected, ManualControlSettingsData
 				// already armed.  It would be _really_ nice to have some indication we are actively
 				// flying to put here.  I would like to check the throttle is engaged but that would
 				// exclude fixed wing.
-				if (guidanceSettings.ThrottleControl == GUIDANCESETTINGS_THROTTLECONTROL_TRUE &&
+				if (guidanceSettings.ThrottleControl == VTOLPATHFOLLOWERSETTINGS_THROTTLECONTROL_TRUE &&
 					flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED) {
 					setRTH(true);
 					flightStatus.FlightMode = FLIGHTSTATUS_FLIGHTMODE_RTH;

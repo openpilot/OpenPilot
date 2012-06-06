@@ -74,7 +74,6 @@ int32_t BatteryInitialize(void)
 #ifdef MODULE_BATTERY_BUILTIN
 	batteryEnabled = true;
 #else
-	HwSettingsInitialize();
 	uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
 
 	HwSettingsOptionalModulesGet(optionalModules);

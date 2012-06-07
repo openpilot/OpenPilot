@@ -3959,7 +3959,7 @@ margin:1px;</string>
  <connections>
   <connection>
    <sender>ccpmCollectiveSlider</sender>
-   <signal>sliderMoved(int)</signal>
+   <signal>valueChanged(int)</signal>
    <receiver>ccpmCollectivespinBox</receiver>
    <slot>setValue(int)</slot>
    <hints>
@@ -4007,7 +4007,7 @@ margin:1px;</string>
   </connection>
   <connection>
    <sender>ccpmRevoSlider</sender>
-   <signal>sliderMoved(int)</signal>
+   <signal>valueChanged(int)</signal>
    <receiver>ccpmREVOspinBox</receiver>
    <slot>setValue(int)</slot>
    <hints>
@@ -4023,7 +4023,7 @@ margin:1px;</string>
   </connection>
   <connection>
    <sender>SwashLvlPositionSlider</sender>
-   <signal>sliderMoved(int)</signal>
+   <signal>valueChanged(int)</signal>
    <receiver>SwashLvlPositionSpinBox</receiver>
    <slot>setValue(int)</slot>
    <hints>
@@ -4071,7 +4071,7 @@ margin:1px;</string>
   </connection>
   <connection>
    <sender>ccpmCollectiveScale</sender>
-   <signal>sliderMoved(int)</signal>
+   <signal>valueChanged(int)</signal>
    <receiver>ccpmCollectiveScaleBox</receiver>
    <slot>setValue(int)</slot>
    <hints>
@@ -4087,7 +4087,7 @@ margin:1px;</string>
   </connection>
   <connection>
    <sender>ccpmCyclicScale</sender>
-   <signal>sliderMoved(int)</signal>
+   <signal>valueChanged(int)</signal>
    <receiver>ccpmCyclicScaleBox</receiver>
    <slot>setValue(int)</slot>
    <hints>
@@ -4119,7 +4119,7 @@ margin:1px;</string>
   </connection>
   <connection>
    <sender>ccpmPitchScale</sender>
-   <signal>sliderMoved(int)</signal>
+   <signal>valueChanged(int)</signal>
    <receiver>ccpmPitchScaleBox</receiver>
    <slot>setValue(int)</slot>
    <hints>
@@ -4167,7 +4167,7 @@ margin:1px;</string>
   </connection>
   <connection>
    <sender>ccpmRollScale</sender>
-   <signal>sliderMoved(int)</signal>
+   <signal>valueChanged(int)</signal>
    <receiver>ccpmRollScaleBox</receiver>
    <slot>setValue(int)</slot>
    <hints>

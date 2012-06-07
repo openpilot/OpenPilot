@@ -30,10 +30,11 @@ CLEAN_FLIGHT := YES
 endif
 
 # Set up targets
-FW_TARGETS        := $(addprefix fw_, coptercontrol) $(addprefix fw_, revolution)
-FW_TARGETS_TOOLS  := $(addprefix fw_, coptercontrol)
-BL_TARGETS        := $(addprefix bl_, coptercontrol)
-BU_TARGETS        := $(addprefix bu_, coptercontrol)
+ALL_BOARDS        := coptercontrol pipxtreme revolution
+FW_TARGETS        := $(addprefix fw_, $(ALL_BOARDS))
+FW_TARGETS_TOOLS  := $(addprefix fw_, $(ALL_BOARDS))
+BL_TARGETS        := $(addprefix bl_, $(ALL_BOARDS))
+BU_TARGETS        := $(addprefix bu_, $(ALL_BOARDS))
 
 help:
 	@echo

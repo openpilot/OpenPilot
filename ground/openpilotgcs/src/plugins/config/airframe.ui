@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>796</width>
-    <height>605</height>
+    <width>730</width>
+    <height>602</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1359,7 +1359,7 @@ margin:1px;</string>
               <number>0</number>
              </property>
              <item>
-              <widget class="ConfigccpmWidget" name="widget_3" native="true"/>
+              <widget class="ConfigCcpmWidget" name="widget_3" native="true"/>
              </item>
             </layout>
            </item>
@@ -2893,7 +2893,7 @@ p, li { white-space: pre-wrap; }
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>ConfigccpmWidget</class>
+   <class>ConfigCcpmWidget</class>
    <extends>QWidget</extends>
    <header>cfg_vehicletypes/configccpmwidget.h</header>
    <container>1</container>
@@ -3000,22 +3000,6 @@ p, li { white-space: pre-wrap; }
    </hints>
   </connection>
   <connection>
-   <sender>mrPitchMixLevel</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>mrPitchMixValue</receiver>
-   <slot>setNum(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>83</x>
-     <y>228</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>82</x>
-     <y>168</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>mrRollMixLevel</sender>
    <signal>valueChanged(int)</signal>
    <receiver>mrRollMixValue</receiver>
@@ -3044,6 +3028,22 @@ p, li { white-space: pre-wrap; }
     <hint type="destinationlabel">
      <x>121</x>
      <y>172</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mrPitchMixLevel</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>mrPitchMixValue</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>92</x>
+     <y>222</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>92</x>
+     <y>151</y>
     </hint>
    </hints>
   </connection>

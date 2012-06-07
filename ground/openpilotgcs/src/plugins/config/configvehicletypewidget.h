@@ -33,6 +33,12 @@
 #include "uavobjectmanager.h"
 #include "uavobject.h"
 #include "uavtalk/telemetrymanager.h"
+
+#include "cfg_vehicletypes/configccpmwidget.h"
+#include "cfg_vehicletypes/configfixedwingwidget.h"
+#include "cfg_vehicletypes/configmultirotorwidget.h"
+#include "cfg_vehicletypes/configgroundvehiclewidget.h"
+
 #include <QtGui/QWidget>
 #include <QList>
 #include <QItemDelegate>
@@ -47,54 +53,40 @@ public:
     ConfigVehicleTypeWidget(QWidget *parent = 0);
     ~ConfigVehicleTypeWidget();
 
+    static QStringList getChannelDescriptions();
+
 private:
     Ui_AircraftWidget *m_aircraft;
-    bool setupFrameFixedWing(QString airframeType);
-    bool setupFrameElevon(QString airframeType);
-    bool setupFrameVtail(QString airframeType);
-    bool setupQuad(bool pLayout);
-    bool setupHexa(bool pLayout);
-    bool setupOcto();
-    bool setupGroundVehicleCar(QString airframeType);
-    bool setupGroundVehicleDifferential(QString airframeType);
-    bool setupGroundVehicleMotorcycle(QString airframeType);
+
+    ConfigCcpmWidget *m_heli;
+    ConfigFixedWingWidget *m_fixedwing;
+    ConfigMultiRotorWidget *m_multirotor;
+    ConfigGroundVehicleWidget *m_groundvehicle;
+
     void updateCustomAirframeUI();
-    bool setupMultiRotorMixer(double mixerFactors[8][3]);
-    void setupMotors(QList<QString> motorList);
     void addToDirtyMonitor();
     void resetField(UAVObjectField * field);
     void resetMixer (MixerCurveWidget *mixer, int numElements, double maxvalue);
-    void resetActuators();
-    //void setMixerChannel(int channelNumber, bool channelIsMotor, QList<double> vector);
-    void setupQuadMotor(int channel, double roll, double pitch, double yaw);
 
+    //void setMixerChannel(int channelNumber, bool channelIsMotor, QList<double> vector);
+
+    QStringList channelNames;
     QStringList mixerTypes;
     QStringList mixerVectors;
+
     QGraphicsSvgItem *quad;
     bool ffTuningInProgress;
     bool ffTuningPhase;
     UAVObject::Metadata accInitialData;
 
 private slots:
-    virtual void refreshWidgetsValues(UAVObject * obj = NULL);
-	void refreshFixedWingWidgetsValues(QString frameType);
-	void refreshMultiRotorWidgetsValues(QString frameType);
-	void refreshGroundVehicleWidgetsValues(QString frameType);
-	
-    void updateObjectsFromWidgets();
-	QString updateFixedWingObjectsFromWidgets();
-	QString updateMultiRotorObjectsFromWidgets();
-	QString updateGroundVehicleObjectsFromWidgets();
-   // void saveAircraftUpdate();
+
+    virtual void refreshWidgetsValues(UAVObject * o=NULL);
+    virtual void updateObjectsFromWidgets();
+
+    void setComboCurrentIndex(QComboBox* box, int index);
 
     void setupAirframeUI(QString type);
-	void setupFixedWingUI(QString frameType);
-	void setupMultiRotorUI(QString frameType);
-	void setupGroundVehicleUI(QString frameType);
-	
-	void throwMultiRotorChannelConfigError(int numMotors);
-	void throwFixedWingChannelConfigError(QString airframeType);
-	void throwGroundVehicleChannelConfigError(QString airframeType);
 	
     void toggleAileron2(int index);
     void toggleElevator2(int index);

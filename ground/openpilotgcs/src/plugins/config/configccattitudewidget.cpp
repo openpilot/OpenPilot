@@ -33,8 +33,8 @@
 #include <QDebug>
 #include <QDesktopServices>
 #include <QUrl>
-#include <accels.h>
-#include <gyros.h>
+#include "accels.h"
+#include "gyros.h"
 
 ConfigCCAttitudeWidget::ConfigCCAttitudeWidget(QWidget *parent) :
         ConfigTaskWidget(parent),
@@ -107,7 +107,6 @@ void ConfigCCAttitudeWidget::accelsUpdated(UAVObject * obj) {
         attitudeSettingsData.GyroBias[2] = -z_gyro_bias;
         attitudeSettingsData.BiasCorrectGyro = AttitudeSettings::BIASCORRECTGYRO_TRUE;
         AttitudeSettings::GetInstance(getObjectManager())->setData(attitudeSettingsData);
-
     } else {
 	// Possible to get here if weird threading stuff happens.  Just ignore updates.
 	qDebug("Unexpected accel update received.");
@@ -173,4 +172,11 @@ void ConfigCCAttitudeWidget::enableControls(bool enable)
         ui->zeroBias->setEnabled(enable);
     ConfigTaskWidget::enableControls(enable);
 
+}
+
+void ConfigCCAttitudeWidget::updateObjectsFromWidgets()
+{
+    ConfigTaskWidget::updateObjectsFromWidgets();
+
+    ui->zeroBiasProgress->setValue(0);
 }

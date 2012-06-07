@@ -34,7 +34,7 @@ HITLConfiguration::HITLConfiguration(QString classId,
 {
 //    qDebug() << "HITLV2Configuration";
     // default values
-    QString simulatorId     = "";
+    QString simulatorId     = "ASimRC";
     QString hostAddress     = "127.0.0.1";
     int inPort              = 40100;
     QString remoteAddress   = "127.0.0.1";

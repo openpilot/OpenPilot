@@ -90,9 +90,6 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     qwd = new ConfigTxPIDWidget(this);
     ftw->insertTab(ConfigGadgetWidget::txpid, qwd, QIcon(":/configgadget/images/txpid.png"), QString("TxPID"));
 
-    qwd = new ConfigPipXtremeWidget(this);
-    ftw->insertTab(ConfigGadgetWidget::pipxtreme, qwd, QIcon(":/configgadget/images/PipXtreme.png"), QString("PipXtreme"));
-
     // *********************
     // Listen to autopilot connection events
 
@@ -108,6 +105,19 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     help = 0;
     connect(ftw,SIGNAL(currentAboutToShow(int,bool*)),this,SLOT(tabAboutToChange(int,bool*)));//,Qt::BlockingQueuedConnection);
 
+    // Connect to the PipXStatus object updates
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    pipxStatusObj = dynamic_cast<UAVDataObject*>(objManager->getObject("PipXStatus"));
+    if (pipxStatusObj != NULL ) {
+        connect(pipxStatusObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updatePipXStatus(UAVObject*)));
+    } else {
+	qDebug() << "Error: Object is unknown (PipXStatus).";
+    }
+
+    // Create the timer that is used to timeout the connection to the PipX.
+    pipxTimeout = new QTimer(this);
+    connect(pipxTimeout, SIGNAL(timeout()),this,SLOT(onPipxtremeDisconnect()));
+    pipxConnected = false;
 }
 
 ConfigGadgetWidget::~ConfigGadgetWidget()
@@ -203,5 +213,27 @@ void ConfigGadgetWidget::tabAboutToChange(int i,bool * proceed)
     }
 }
 
+/*!
+  \brief Called by updates to @PipXStatus
+  */
+void ConfigGadgetWidget::updatePipXStatus(UAVObject *object)
+{
 
+	// Restart the disconnection timer.
+	pipxTimeout->start(5000);
+	if (!pipxConnected)
+	{
+		qDebug()<<"ConfigGadgetWidget onPipxtremeConnect";
+		QWidget *qwd = new ConfigPipXtremeWidget(this);
+		ftw->insertTab(ConfigGadgetWidget::pipxtreme, qwd, QIcon(":/configgadget/images/PipXtreme.png"), QString("PipXtreme"));
+		ftw->setCurrentIndex(ConfigGadgetWidget::pipxtreme);
+		pipxConnected = true;
+	}
+}
 
+void ConfigGadgetWidget::onPipxtremeDisconnect() {
+	qDebug()<<"ConfigGadgetWidget onPipxtremeDisconnect";
+	pipxTimeout->stop();
+	ftw->removeTab(ConfigGadgetWidget::pipxtreme);
+	pipxConnected = false;
+}

@@ -53,9 +53,6 @@ private:
 
 	bool settingsUpdated;
 
-	// A timer that timesout the connction to the PipX.
-	QTimer *timeOut;
-
 private slots:
 	void refreshValues();
 	void applySettings();

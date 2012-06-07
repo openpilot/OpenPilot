@@ -56,14 +56,25 @@ public slots:
     void onAutopilotConnect();
     void onAutopilotDisconnect();
     void tabAboutToChange(int i,bool *);
+    void updatePipXStatus(UAVObject *object);
+    void onPipxtremeDisconnect();
 
 signals:
     void autopilotConnected();
     void autopilotDisconnected();
+    void pipxtremeConnect();
+    void pipxtremeDisconnect();
 
 protected:
         void resizeEvent(QResizeEvent * event);
         MyTabbedStackWidget *ftw;
+
+private:
+	UAVDataObject* pipxStatusObj;
+
+	// A timer that timesout the connction to the PipX.
+	QTimer *pipxTimeout;
+	bool pipxConnected;
 };
 
 #endif // CONFIGGADGETWIDGET_H

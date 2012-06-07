@@ -73,6 +73,7 @@ typedef struct {
 	uint16_t errors;
 	uint16_t uavtalk_errors;
 	uint16_t resets;
+	uint16_t dropped;
 	int8_t rssi;
 	uint8_t lastContact;
 } PairStats;
@@ -104,6 +105,7 @@ typedef struct {
 	uint32_t radioRxErrors;
 	uint32_t UAVTalkErrors;
 	uint32_t packetErrors;
+	uint32_t droppedPackets;
 	uint16_t txBytes;
 	uint16_t rxBytes;
 
@@ -142,8 +144,8 @@ static void radioStatusTask(void *parameters);
 static void ppmInputTask(void *parameters);
 static int32_t transmitData(uint8_t * data, int32_t length);
 static int32_t transmitPacket(PHPacketHandle packet);
-static void receiveData(uint8_t *buf, uint8_t len);
-static void StatusHandler(PHStatusPacketHandle p);
+static void receiveData(uint8_t *buf, uint8_t len, int8_t rssi, int8_t afc);
+static void StatusHandler(PHStatusPacketHandle p, int8_t rssi, int8_t afc);
 static void PPMHandler(uint16_t *channels);
 static BufferedReadHandle BufferedReadInit(uint32_t com_port, uint16_t buffer_length);
 static bool BufferedRead(BufferedReadHandle h, uint8_t *value, uint32_t timeout_ms);
@@ -225,6 +227,7 @@ static int32_t RadioComBridgeInitialize(void)
 	data->comRxErrors = 0;
 	data->UAVTalkErrors = 0;
 	data->packetErrors = 0;
+	data->RSSI = -127;
 
 	// Register the callbacks with the packet handler
 	PHRegisterOutputStream(pios_packet_handler, transmitPacket);
@@ -245,6 +248,7 @@ static int32_t RadioComBridgeInitialize(void)
 		data->pairStats[i].errors = 0;
 		data->pairStats[i].uavtalk_errors = 0;
 		data->pairStats[i].resets = 0;
+		data->pairStats[i].dropped = 0;
 		data->pairStats[i].lastContact = 0;
 	}
 	// The first slot is reserved for our current pairID
@@ -313,7 +317,7 @@ static void comUAVTalkTask(void *parameters)
 			// No packets available?
 			if (p == NULL)
 			{
-				DEBUG_PRINTF(2, "Packet dropped!\n\r");
+				data->droppedPackets++;
 				continue;
 			}
 
@@ -505,7 +509,6 @@ static void radioReceiveTask(void *parameters)
 
 		// Verify that the packet is valid and pass it on.
 		if(PHVerifyPacket(pios_packet_handler, p, rx_bytes) > 0) {
-			data->RSSI = p->header.rssi;
 			UAVObjEvent ev;
 			ev.obj = (UAVObjHandle)p;
 			ev.event = EV_PACKET_RECEIVED;
@@ -625,6 +628,7 @@ static void transparentCommTask(void * parameters)
 			// No packets available?
 			if (p == NULL)
 			{
+				data->droppedPackets++;
 				// Wait a bit for a packet to come available.
 				vTaskDelay(5);
 				continue;
@@ -702,12 +706,15 @@ static void radioStatusTask(void *parameters)
 		pipxStatus.Retries = data->comTxRetries;
 		pipxStatus.Errors = data->packetErrors;
 		pipxStatus.UAVTalkErrors = data->UAVTalkErrors;
+		pipxStatus.Dropped = data->droppedPackets;
 		pipxStatus.Resets = PIOS_RFM22B_Resets(pios_rfm22b_id);
 		pipxStatus.TXRate = (uint16_t)((float)(data->txBytes * 1000) / STATS_UPDATE_PERIOD_MS);
 		data->txBytes = 0;
 		pipxStatus.RXRate = (uint16_t)((float)(data->rxBytes * 1000) / STATS_UPDATE_PERIOD_MS);
 		data->rxBytes = 0;
 		pipxStatus.LinkState = PIPXSTATUS_LINKSTATE_DISCONNECTED;
+		pipxStatus.RSSI = data->RSSI;
+		LINK_LED_OFF;
 
 		// Update the potential pairing contacts
 		for (uint8_t i = 0; i < PIPXSTATUS_PAIRIDS_NUMELEM; ++i)
@@ -715,14 +722,29 @@ static void radioStatusTask(void *parameters)
 			pipxStatus.PairIDs[i] = data->pairStats[i].pairID;
 			pipxStatus.PairSignalStrengths[i] = data->pairStats[i].rssi;
 			data->pairStats[i].lastContact++;
-			// Add the paired devices stats to ours.
-			if(data->pairStats[i].pairID == pairID)
+			// Remove this device if it's stale.
+			if(data->pairStats[i].lastContact > MAX_LOST_CONTACT_TIME)
+			{
+				data->pairStats[i].pairID = 0;
+				data->pairStats[i].rssi = -127;
+				data->pairStats[i].retries = 0;
+				data->pairStats[i].errors = 0;
+				data->pairStats[i].uavtalk_errors = 0;
+				data->pairStats[i].resets = 0;
+				data->pairStats[i].dropped = 0;
+				data->pairStats[i].lastContact = 0;
+			}
+			// Add the paired devices statistics to ours.
+			if(pairID && (data->pairStats[i].pairID == pairID) && (data->pairStats[i].rssi > -127))
 			{
 				pipxStatus.Retries += data->pairStats[i].retries;
 				pipxStatus.Errors += data->pairStats[i].errors;
 				pipxStatus.UAVTalkErrors += data->pairStats[i].uavtalk_errors;
+				pipxStatus.Dropped += data->pairStats[i].dropped;
 				pipxStatus.Resets += data->pairStats[i].resets;
+				pipxStatus.Dropped += data->pairStats[i].dropped;
 				pipxStatus.LinkState = PIPXSTATUS_LINKSTATE_CONNECTED;
+				LINK_LED_ON;
 			}
 		}
 
@@ -739,10 +761,10 @@ static void radioStatusTask(void *parameters)
 				status_packet.header.type = PACKET_TYPE_STATUS;
 				status_packet.header.data_size = PH_STATUS_DATA_SIZE(&status_packet);
 				status_packet.header.source_id = pipxStatus.DeviceID;
-				status_packet.header.rssi = data->RSSI;
 				status_packet.retries = data->comTxRetries;
 				status_packet.errors = data->packetErrors;
 				status_packet.uavtalk_errors = data->UAVTalkErrors;
+				status_packet.dropped = data->droppedPackets;
 				status_packet.resets = PIOS_RFM22B_Resets(pios_rfm22b_id);
 				PHPacketHandle sph = (PHPacketHandle)&status_packet;
 				xQueueSend(data->sendPacketQueue, &sph, MAX_PORT_DELAY);
@@ -825,8 +847,10 @@ static int32_t transmitPacket(PHPacketHandle p)
  * \param[in] buf The received data buffer
  * \param[in] length Length of buffer
  */
-static void receiveData(uint8_t *buf, uint8_t len)
+static void receiveData(uint8_t *buf, uint8_t len, int8_t rssi, int8_t afc)
 {
+	data->RSSI = rssi;
+
 	// Packet data should go to transparent com if it's configured,
 	// USB HID if it's connected, otherwise, UAVTalk com if it's configured.
 	uint32_t outputPort = PIOS_COM_TRANS_COM;
@@ -852,7 +876,7 @@ static void receiveData(uint8_t *buf, uint8_t len)
  * Receive a status packet
  * \param[in] status The status structure
  */
-static void StatusHandler(PHStatusPacketHandle status)
+static void StatusHandler(PHStatusPacketHandle status, int8_t rssi, int8_t afc)
 {
 	uint32_t id = status->header.source_id;
 	bool found = false;
@@ -868,27 +892,13 @@ static void StatusHandler(PHStatusPacketHandle status)
 	// If we have seen it, update the RSSI and reset the last contact couter
 	if(found)
 	{
-		data->pairStats[id_idx].rssi = status->header.rssi;
+		data->pairStats[id_idx].rssi = rssi;
 		data->pairStats[id_idx].retries = status->retries;
 		data->pairStats[id_idx].errors = status->errors;
 		data->pairStats[id_idx].uavtalk_errors = status->uavtalk_errors;
 		data->pairStats[id_idx].resets = status->resets;
+		data->pairStats[id_idx].dropped = status->dropped;
 		data->pairStats[id_idx].lastContact = 0;
-	}
-
-	// Remove any contacts that we haven't seen for a while.
-	for (id_idx = 0; id_idx < PIPXSTATUS_PAIRIDS_NUMELEM; ++id_idx)
-	{
-		if(data->pairStats[id_idx].lastContact > MAX_LOST_CONTACT_TIME)
-		{
-			data->pairStats[id_idx].pairID = 0;
-			data->pairStats[id_idx].rssi = -127;
-			data->pairStats[id_idx].retries = 0;
-			data->pairStats[id_idx].errors = 0;
-			data->pairStats[id_idx].uavtalk_errors = 0;
-			data->pairStats[id_idx].resets = 0;
-			data->pairStats[id_idx].lastContact = 0;
-		}
 	}
 
 	// If we haven't seen it, find a slot to put it in.
@@ -911,11 +921,12 @@ static void StatusHandler(PHStatusPacketHandle status)
 			}
 		}
 		data->pairStats[min_idx].pairID = id;
-		data->pairStats[min_idx].rssi = status->header.rssi;
+		data->pairStats[min_idx].rssi = rssi;
 		data->pairStats[min_idx].retries = status->retries;
 		data->pairStats[min_idx].errors = status->errors;
 		data->pairStats[min_idx].uavtalk_errors = status->uavtalk_errors;
 		data->pairStats[min_idx].resets = status->resets;
+		data->pairStats[min_idx].dropped = status->dropped;
 		data->pairStats[min_idx].lastContact = 0;
 	}
 }

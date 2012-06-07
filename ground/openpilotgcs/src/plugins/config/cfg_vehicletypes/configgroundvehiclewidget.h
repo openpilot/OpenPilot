@@ -1,13 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       configccattitudewidget.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @file       configairframetwidget.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup ConfigPlugin Config Plugin
  * @{
- * @brief Configure the properties of the attitude module in CopterControl
+ * @brief Airframe configuration panel
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -24,52 +24,51 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef CCATTITUDEWIDGET_H
-#define CCATTITUDEWIDGET_H
+#ifndef CONFIGGROUNDVEHICLEWIDGET_H
+#define CONFIGGROUNDVEHICLEWIDGET_H
 
-#include "ui_ccattitude.h"
+#include "ui_airframe.h"
 #include "../uavobjectwidgetutils/configtaskwidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
+#include "uavtalk/telemetrymanager.h"
 #include <QtGui/QWidget>
-#include <QTimer>
-#include <QMutex>
+#include <QList>
+#include <QItemDelegate>
 
 class Ui_Widget;
 
-class ConfigCCAttitudeWidget : public ConfigTaskWidget
+class ConfigGroundVehicleWidget: public VehicleConfig
 {
     Q_OBJECT
 
 public:
-    explicit ConfigCCAttitudeWidget(QWidget *parent = 0);
-    ~ConfigCCAttitudeWidget();
+    ConfigGroundVehicleWidget(Ui_AircraftWidget *aircraft = 0, QWidget *parent = 0);
+    ~ConfigGroundVehicleWidget();
 
-    virtual void updateObjectsFromWidgets();
-
-private slots:
-    void accelsUpdated(UAVObject * obj);
-    void timeout();
-    void startAccelCalibration();
-    void openHelp();
+    friend class ConfigVehicleTypeWidget;
 
 private:
-    QMutex startStop;
-    Ui_ccattitude *ui;
-    QTimer timer;
-    UAVObject::Metadata initialMdata;
+    Ui_AircraftWidget *m_aircraft;
 
-    int updates;
+    bool setupGroundVehicleCar(QString airframeType);
+    bool setupGroundVehicleDifferential(QString airframeType);
+    bool setupGroundVehicleMotorcycle(QString airframeType);
 
-    QList<double> x_accum, y_accum, z_accum;
-    QList<double> x_gyro_accum, y_gyro_accum, z_gyro_accum;
+    virtual void ResetActuators(GUIConfigDataUnion* configData);
+    virtual QStringList getChannelDescriptions();
 
-    static const int NUM_ACCEL_UPDATES = 60;
-    static const float ACCEL_SCALE = 0.004f * 9.81f;
+private slots:
+    virtual void setupUI(QString airframeType);
+    virtual void refreshWidgetsValues(QString frameType);
+    virtual QString updateConfigObjectsFromWidgets();
+    virtual void throwConfigError(QString airframeType);
+
+
 protected:
-    virtual void enableControls(bool enable);
 
 };
 
-#endif // CCATTITUDEWIDGET_H
+
+#endif // CONFIGGROUNDVEHICLEWIDGET_H

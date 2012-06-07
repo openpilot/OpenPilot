@@ -14,6 +14,7 @@
 		<field name="Retries" units="" type="uint16" elements="1" defaultvalue="0"/>
 		<field name="Errors" units="" type="uint16" elements="1" defaultvalue="0"/>
 		<field name="UAVTalkErrors" units="" type="uint16" elements="1" defaultvalue="0"/>
+		<field name="Dropped" units="" type="uint16" elements="1" defaultvalue="0"/>
 		<field name="Resets" units="" type="uint16" elements="1" defaultvalue="0"/>
 		<field name="TXRate" units="Bps" type="uint16" elements="1" defaultvalue="0"/>
 		<field name="RXRate" units="Bps" type="uint16" elements="1" defaultvalue="0"/>

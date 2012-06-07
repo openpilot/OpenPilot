@@ -59,8 +59,6 @@ typedef struct {
 	uint8_t data_size;
 	uint8_t tx_seq;
 	uint8_t rx_seq;
-	int8_t rssi;
-	int8_t afc;
 } PHPacketHeader;
 
 #define PH_MAX_DATA (PIOS_PH_MAX_PACKET - sizeof(PHPacketHeader) - RS_ECC_NPARITY)
@@ -83,6 +81,7 @@ typedef struct {
 	uint16_t retries;
 	uint16_t errors;
 	uint16_t uavtalk_errors;
+	uint16_t dropped;
 	uint16_t resets;
 	uint8_t ecc[RS_ECC_NPARITY];
 } PHStatusPacket, *PHStatusPacketHandle;
@@ -93,8 +92,8 @@ typedef struct {
 } PacketHandlerConfig;
 
 typedef int32_t (*PHOutputStream)(PHPacketHandle packet);
-typedef void (*PHDataHandler)(uint8_t *data, uint8_t len);
-typedef void (*PHStatusHandler)(PHStatusPacketHandle s);
+typedef void (*PHDataHandler)(uint8_t *data, uint8_t len, int8_t rssi, int8_t afc);
+typedef void (*PHStatusHandler)(PHStatusPacketHandle s, int8_t rssi, int8_t afc);
 typedef void (*PHPPMHandler)(uint16_t *channels);
 
 typedef uint32_t PHInstHandle;

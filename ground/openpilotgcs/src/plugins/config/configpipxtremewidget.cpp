@@ -76,6 +76,7 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
 	addUAVObjectToWidgetRelation("PipXStatus", "Errors", m_pipx->Errors);
 	addUAVObjectToWidgetRelation("PipXStatus", "UAVTalkErrors", m_pipx->UAVTalkErrors);
 	addUAVObjectToWidgetRelation("PipXStatus", "Resets", m_pipx->Resets);
+	addUAVObjectToWidgetRelation("PipXStatus", "Dropped", m_pipx->Dropped);
 	addUAVObjectToWidgetRelation("PipXStatus", "RXRate", m_pipx->RXRate);
 	addUAVObjectToWidgetRelation("PipXStatus", "TXRate", m_pipx->TXRate);
 
@@ -85,21 +86,16 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
 	connect(m_pipx->PairSelect3, SIGNAL(toggled(bool)), this, SLOT(pair3Toggled(bool)));
 	connect(m_pipx->PairSelect4, SIGNAL(toggled(bool)), this, SLOT(pair4Toggled(bool)));
 
-	// Create the timer that is used to timeout the connection to the PipX.
-	timeOut = new QTimer(this);
-	connect(timeOut, SIGNAL(timeout()),this,SLOT(disconnected()));
-
-    //Add scroll bar when necessary
-    QScrollArea *scroll = new QScrollArea;
-    scroll->setWidget(m_pipx->frame_3);
-    m_pipx->verticalLayout_3->addWidget(scroll);
+	//Add scroll bar when necessary
+	QScrollArea *scroll = new QScrollArea;
+	scroll->setWidget(m_pipx->frame_3);
+	m_pipx->verticalLayout_3->addWidget(scroll);
 
 	// Request and update of the setting object.
 	settingsUpdated = false;
-	pipxSettingsObj->requestUpdate();
+	//pipxSettingsObj->requestUpdate();
 
-    disableMouseWheelEvents();
-
+	disableMouseWheelEvents();
 }
 
 ConfigPipXtremeWidget::~ConfigPipXtremeWidget()
@@ -144,9 +140,6 @@ void ConfigPipXtremeWidget::saveSettings()
 void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
 {
 
-	// Restart the disconnection timer.
-	timeOut->start(10000);
-
 	// Request and update of the setting object if we haven't received it yet.
 	if (!settingsUpdated)
 		pipxSettingsObj->requestUpdate();
@@ -185,11 +178,15 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
 	}
 	UAVObjectField* pairRssiField = object->getField("PairSignalStrengths");
 	if (pairRssiField) {
-		m_pipx->PairSignalStrength1->setValue(pairRssiField->getValue(0).toInt());
-		m_pipx->PairSignalStrength2->setValue(pairRssiField->getValue(1).toInt());
-		m_pipx->PairSignalStrength3->setValue(pairRssiField->getValue(2).toInt());
-		m_pipx->PairSignalStrength4->setValue(pairRssiField->getValue(3).toInt());
-	} else {
+        m_pipx->PairSignalStrengthBar1->setValue(pairRssiField->getValue(0).toInt());
+        m_pipx->PairSignalStrengthBar2->setValue(pairRssiField->getValue(1).toInt());
+        m_pipx->PairSignalStrengthBar3->setValue(pairRssiField->getValue(2).toInt());
+        m_pipx->PairSignalStrengthBar4->setValue(pairRssiField->getValue(3).toInt());
+        m_pipx->PairSignalStrengthLabel1->setText(QString("%1dB").arg(pairRssiField->getValue(0).toInt()));
+        m_pipx->PairSignalStrengthLabel2->setText(QString("%1dB").arg(pairRssiField->getValue(1).toInt()));
+        m_pipx->PairSignalStrengthLabel3->setText(QString("%1dB").arg(pairRssiField->getValue(2).toInt()));
+        m_pipx->PairSignalStrengthLabel4->setText(QString("%1dB").arg(pairRssiField->getValue(3).toInt()));
+    } else {
 		qDebug() << "PipXtremeGadgetWidget: Count not read PairID field.";
 	}
 
@@ -262,14 +259,20 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
   */
 void ConfigPipXtremeWidget::updateSettings(UAVObject *object)
 {
-	settingsUpdated = true;
-        enableControls(true);
+	if (!settingsUpdated)
+	{
+		settingsUpdated = true;
+		enableControls(true);
+	}
 }
 
 void ConfigPipXtremeWidget::disconnected()
 {
-	settingsUpdated = false;
-	enableControls(false);
+	if (settingsUpdated)
+	{
+		settingsUpdated = false;
+		enableControls(false);
+	}
 }
 
 void ConfigPipXtremeWidget::pairIDToggled(bool checked, quint8 idx)

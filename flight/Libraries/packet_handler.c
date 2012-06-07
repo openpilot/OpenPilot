@@ -343,9 +343,9 @@ uint8_t PHReceivePacket(PHInstHandle h, PHPacketHandle p, bool rx_error)
 	PHPacketDataHandle data = (PHPacketDataHandle)h;
 	uint16_t len = PHPacketSizeECC(p);
 
-	// Add the RSSI and AFC to the packet.
-	p->header.rssi = *(((int8_t*)p) + len);
-	p->header.afc = *(((int8_t*)p) + len + 1);
+	// Extract the RSSI and AFC.
+	int8_t rssi = *(((int8_t*)p) + len);
+	int8_t afc = *(((int8_t*)p) + len + 1);
 
 	switch (p->header.type) {
 
@@ -355,7 +355,7 @@ uint8_t PHReceivePacket(PHInstHandle h, PHPacketHandle p, bool rx_error)
 
 			// Pass on the channels to the status handler.
 			if(data->status_handler)
-				data->status_handler((PHStatusPacketHandle)p);
+				data->status_handler((PHStatusPacketHandle)p, rssi, afc);
 
 		break;
 
@@ -374,7 +374,7 @@ uint8_t PHReceivePacket(PHInstHandle h, PHPacketHandle p, bool rx_error)
 
 			// Pass on the data.
 			if(data->data_handler)
-				data->data_handler(p->data, p->header.data_size);
+				data->data_handler(p->data, p->header.data_size, rssi, afc);
 		}
 
 		break;
@@ -424,7 +424,7 @@ uint8_t PHReceivePacket(PHInstHandle h, PHPacketHandle p, bool rx_error)
 
 			// Pass on the data to the data handler.
 			if(data->data_handler)
-				data->data_handler(p->data, p->header.data_size);
+				data->data_handler(p->data, p->header.data_size, rssi, afc);
 
 		break;
 

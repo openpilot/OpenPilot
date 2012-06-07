@@ -144,8 +144,8 @@ static void radioStatusTask(void *parameters);
 static void ppmInputTask(void *parameters);
 static int32_t transmitData(uint8_t * data, int32_t length);
 static int32_t transmitPacket(PHPacketHandle packet);
-static void receiveData(uint8_t *buf, uint8_t len);
-static void StatusHandler(PHStatusPacketHandle p);
+static void receiveData(uint8_t *buf, uint8_t len, int8_t rssi, int8_t afc);
+static void StatusHandler(PHStatusPacketHandle p, int8_t rssi, int8_t afc);
 static void PPMHandler(uint16_t *channels);
 static BufferedReadHandle BufferedReadInit(uint32_t com_port, uint16_t buffer_length);
 static bool BufferedRead(BufferedReadHandle h, uint8_t *value, uint32_t timeout_ms);
@@ -227,6 +227,7 @@ static int32_t RadioComBridgeInitialize(void)
 	data->comRxErrors = 0;
 	data->UAVTalkErrors = 0;
 	data->packetErrors = 0;
+	data->RSSI = -127;
 
 	// Register the callbacks with the packet handler
 	PHRegisterOutputStream(pios_packet_handler, transmitPacket);
@@ -508,7 +509,6 @@ static void radioReceiveTask(void *parameters)
 
 		// Verify that the packet is valid and pass it on.
 		if(PHVerifyPacket(pios_packet_handler, p, rx_bytes) > 0) {
-			data->RSSI = p->header.rssi;
 			UAVObjEvent ev;
 			ev.obj = (UAVObjHandle)p;
 			ev.event = EV_PACKET_RECEIVED;
@@ -713,6 +713,7 @@ static void radioStatusTask(void *parameters)
 		pipxStatus.RXRate = (uint16_t)((float)(data->rxBytes * 1000) / STATS_UPDATE_PERIOD_MS);
 		data->rxBytes = 0;
 		pipxStatus.LinkState = PIPXSTATUS_LINKSTATE_DISCONNECTED;
+		pipxStatus.RSSI = data->RSSI;
 		LINK_LED_OFF;
 
 		// Update the potential pairing contacts
@@ -760,7 +761,6 @@ static void radioStatusTask(void *parameters)
 				status_packet.header.type = PACKET_TYPE_STATUS;
 				status_packet.header.data_size = PH_STATUS_DATA_SIZE(&status_packet);
 				status_packet.header.source_id = pipxStatus.DeviceID;
-				status_packet.header.rssi = data->RSSI;
 				status_packet.retries = data->comTxRetries;
 				status_packet.errors = data->packetErrors;
 				status_packet.uavtalk_errors = data->UAVTalkErrors;
@@ -847,8 +847,10 @@ static int32_t transmitPacket(PHPacketHandle p)
  * \param[in] buf The received data buffer
  * \param[in] length Length of buffer
  */
-static void receiveData(uint8_t *buf, uint8_t len)
+static void receiveData(uint8_t *buf, uint8_t len, int8_t rssi, int8_t afc)
 {
+	data->RSSI = rssi;
+
 	// Packet data should go to transparent com if it's configured,
 	// USB HID if it's connected, otherwise, UAVTalk com if it's configured.
 	uint32_t outputPort = PIOS_COM_TRANS_COM;
@@ -874,7 +876,7 @@ static void receiveData(uint8_t *buf, uint8_t len)
  * Receive a status packet
  * \param[in] status The status structure
  */
-static void StatusHandler(PHStatusPacketHandle status)
+static void StatusHandler(PHStatusPacketHandle status, int8_t rssi, int8_t afc)
 {
 	uint32_t id = status->header.source_id;
 	bool found = false;
@@ -890,7 +892,7 @@ static void StatusHandler(PHStatusPacketHandle status)
 	// If we have seen it, update the RSSI and reset the last contact couter
 	if(found)
 	{
-		data->pairStats[id_idx].rssi = status->header.rssi;
+		data->pairStats[id_idx].rssi = rssi;
 		data->pairStats[id_idx].retries = status->retries;
 		data->pairStats[id_idx].errors = status->errors;
 		data->pairStats[id_idx].uavtalk_errors = status->uavtalk_errors;
@@ -919,7 +921,7 @@ static void StatusHandler(PHStatusPacketHandle status)
 			}
 		}
 		data->pairStats[min_idx].pairID = id;
-		data->pairStats[min_idx].rssi = status->header.rssi;
+		data->pairStats[min_idx].rssi = rssi;
 		data->pairStats[min_idx].retries = status->retries;
 		data->pairStats[min_idx].errors = status->errors;
 		data->pairStats[min_idx].uavtalk_errors = status->uavtalk_errors;

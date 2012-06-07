@@ -343,8 +343,8 @@ volatile uint8_t	prev_int_status1;				//  "          "
 volatile uint8_t	prev_int_status2;				//  "          "
 volatile uint8_t	prev_ezmac_status;				//  "          "
 
-const char *debug_msg = NULL;
-const char *error_msg = NULL;
+const char *debug_msg = "";
+const char *error_msg = "";
 static uint32_t debug_val = 0;
 #endif
 

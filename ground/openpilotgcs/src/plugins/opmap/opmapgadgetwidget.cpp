@@ -511,32 +511,64 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
 
     menu.addSeparator()->setText(tr("UAV Trail"));
 
+    QMenu uavTrailSubMenu(tr("UAV Trail"), this);
+
     QMenu uavTrailTypeSubMenu(tr("UAV trail type") + " (" + mapcontrol::Helper::StrFromUAVTrailType(m_map->UAV->GetTrailType()) + ")", this);
     for (int i = 0; i < uavTrailTypeAct.count(); i++)
         uavTrailTypeSubMenu.addAction(uavTrailTypeAct.at(i));
-    menu.addMenu(&uavTrailTypeSubMenu);
+    uavTrailSubMenu.addMenu(&uavTrailTypeSubMenu);
 
     QMenu uavTrailTimeSubMenu(tr("UAV trail time") + " (" + QString::number(m_map->UAV->TrailTime()) + " sec)", this);
     for (int i = 0; i < uavTrailTimeAct.count(); i++)
         uavTrailTimeSubMenu.addAction(uavTrailTimeAct.at(i));
-    menu.addMenu(&uavTrailTimeSubMenu);
+    uavTrailSubMenu.addMenu(&uavTrailTimeSubMenu);
 
     QMenu uavTrailDistanceSubMenu(tr("UAV trail distance") + " (" + QString::number(m_map->UAV->TrailDistance()) + " meters)", this);
     for (int i = 0; i < uavTrailDistanceAct.count(); i++)
         uavTrailDistanceSubMenu.addAction(uavTrailDistanceAct.at(i));
-    menu.addMenu(&uavTrailDistanceSubMenu);
+    uavTrailSubMenu.addMenu(&uavTrailDistanceSubMenu);
 
-    menu.addAction(showTrailAct);
+    uavTrailSubMenu.addAction(showUAVtrailAct);
 
-    menu.addAction(showTrailLineAct);
+    uavTrailSubMenu.addAction(showUAVtrailLineAct);
 
-    menu.addAction(clearUAVtrailAct);
+    uavTrailSubMenu.addAction(clearUAVtrailAct);
+    menu.addMenu(&uavTrailSubMenu);
+
+    // gps trails
+
+    //menu.addSeparator()->setText(tr("GPS Trail"));
+
+    QMenu gpsTrailSubMenu(tr("GPS Trail"), this);
+
+    QMenu gpsTrailTypeSubMenu(tr("GPS trail type") + " (" + mapcontrol::Helper::StrFromUAVTrailType(m_map->GPS->GetTrailType()) + ")", this);
+    for (int i = 0; i < gpsTrailTypeAct.count(); i++)
+        gpsTrailTypeSubMenu.addAction(gpsTrailTypeAct.at(i));
+    gpsTrailSubMenu.addMenu(&gpsTrailTypeSubMenu);
+
+    QMenu gpsTrailTimeSubMenu(tr("GPS trail time") + " (" + QString::number(m_map->GPS->TrailTime()) + " sec)", this);
+    for (int i = 0; i < gpsTrailTimeAct.count(); i++)
+        gpsTrailTimeSubMenu.addAction(gpsTrailTimeAct.at(i));
+    gpsTrailSubMenu.addMenu(&gpsTrailTimeSubMenu);
+
+    QMenu gpsTrailDistanceSubMenu(tr("GPS trail distance") + " (" + QString::number(m_map->GPS->TrailDistance()) + " meters)", this);
+    for (int i = 0; i < gpsTrailDistanceAct.count(); i++)
+        gpsTrailDistanceSubMenu.addAction(gpsTrailDistanceAct.at(i));
+    gpsTrailSubMenu.addMenu(&gpsTrailDistanceSubMenu);
+
+    gpsTrailSubMenu.addAction(showGPStrailAct);
+
+    gpsTrailSubMenu.addAction(showGPStrailLineAct);
+
+    gpsTrailSubMenu.addAction(clearGPStrailAct);
+    menu.addMenu(&gpsTrailSubMenu);
 
     // ****
 
     menu.addSeparator()->setText(tr("UAV"));
 
     menu.addAction(showUAVAct);
+    menu.addAction(showGPSAct);
     menu.addAction(followUAVpositionAct);
     menu.addAction(followUAVheadingAct);
     menu.addAction(goUAVAct);
@@ -1450,12 +1482,6 @@ void OPMapGadgetWidget::createActions()
     showHomeAct->setChecked(true);
     connect(showHomeAct, SIGNAL(toggled(bool)), this, SLOT(onShowHomeAct_toggled(bool)));
 
-    showUAVAct = new QAction(tr("Show UAV"), this);
-    showUAVAct->setStatusTip(tr("Show/Hide the UAV"));
-    showUAVAct->setCheckable(true);
-    showUAVAct->setChecked(true);
-    connect(showUAVAct, SIGNAL(toggled(bool)), this, SLOT(onShowUAVAct_toggled(bool)));
-
     zoomInAct = new QAction(tr("Zoom &In"), this);
     zoomInAct->setShortcut(Qt::Key_PageUp);
     zoomInAct->setStatusTip(tr("Zoom the map in"));
@@ -1613,6 +1639,11 @@ void OPMapGadgetWidget::createActions()
 
     // *****
     // UAV trail
+    showUAVAct = new QAction(tr("Show UAV"), this);
+    showUAVAct->setStatusTip(tr("Show/Hide the UAV"));
+    showUAVAct->setCheckable(true);
+    showUAVAct->setChecked(true);
+    connect(showUAVAct, SIGNAL(toggled(bool)), this, SLOT(onShowUAVAct_toggled(bool)));
 
     uavTrailTypeActGroup = new QActionGroup(this);
     connect(uavTrailTypeActGroup, SIGNAL(triggered(QAction *)), this, SLOT(onUAVTrailTypeActGroup_triggered(QAction *)));
@@ -1628,24 +1659,24 @@ void OPMapGadgetWidget::createActions()
         uavTrailTypeAct.append(uavTrailType_act);
     }
 
-    showTrailAct = new QAction(tr("Show Trail dots"), this);
-    showTrailAct->setStatusTip(tr("Show/Hide the Trail dots"));
-    showTrailAct->setCheckable(true);
-    showTrailAct->setChecked(true);
-    connect(showTrailAct, SIGNAL(toggled(bool)), this, SLOT(onShowTrailAct_toggled(bool)));
+    showUAVtrailAct = new QAction(tr("Show Trail dots"), this);
+    showUAVtrailAct->setStatusTip(tr("Show/Hide the Trail dots"));
+    showUAVtrailAct->setCheckable(true);
+    showUAVtrailAct->setChecked(true);
+    connect(showUAVtrailAct, SIGNAL(toggled(bool)), this, SLOT(onShowUAVtrailAct_toggled(bool)));
 
-    showTrailLineAct = new QAction(tr("Show Trail lines"), this);
-    showTrailLineAct->setStatusTip(tr("Show/Hide the Trail lines"));
-    showTrailLineAct->setCheckable(true);
-    showTrailLineAct->setChecked(true);
-    connect(showTrailLineAct, SIGNAL(toggled(bool)), this, SLOT(onShowTrailLineAct_toggled(bool)));
+    showUAVtrailLineAct = new QAction(tr("Show Trail lines"), this);
+    showUAVtrailLineAct->setStatusTip(tr("Show/Hide the Trail lines"));
+    showUAVtrailLineAct->setCheckable(true);
+    showUAVtrailLineAct->setChecked(true);
+    connect(showUAVtrailLineAct, SIGNAL(toggled(bool)), this, SLOT(onShowUAVtrailLineAct_toggled(bool)));
 
     clearUAVtrailAct = new QAction(tr("Clear UAV trail"), this);
     clearUAVtrailAct->setStatusTip(tr("Clear the UAV trail"));
     connect(clearUAVtrailAct, SIGNAL(triggered()), this, SLOT(onClearUAVtrailAct_triggered()));
 
     uavTrailTimeActGroup = new QActionGroup(this);
-    connect(uavTrailTimeActGroup, SIGNAL(triggered(QAction *)), this, SLOT(onUAVTrailTimeActGroup_triggered(QAction *)));
+    connect(uavTrailTimeActGroup, SIGNAL(triggered(QAction *)), this, SLOT(onUAVtrailTimeActGroup_triggered(QAction *)));
     uavTrailTimeAct.clear();
 	list_size = sizeof(uav_trail_time_list) / sizeof(uav_trail_time_list[0]);
 	for (int i = 0; i < list_size; i++)
@@ -1659,7 +1690,7 @@ void OPMapGadgetWidget::createActions()
     }
 
     uavTrailDistanceActGroup = new QActionGroup(this);
-    connect(uavTrailDistanceActGroup, SIGNAL(triggered(QAction *)), this, SLOT(onUAVTrailDistanceActGroup_triggered(QAction *)));
+    connect(uavTrailDistanceActGroup, SIGNAL(triggered(QAction *)), this, SLOT(onUAVtrailDistanceActGroup_triggered(QAction *)));
     uavTrailDistanceAct.clear();
 	list_size = sizeof(uav_trail_distance_list) / sizeof(uav_trail_distance_list[0]);
 	for (int i = 0; i < list_size; i++)
@@ -1673,6 +1704,75 @@ void OPMapGadgetWidget::createActions()
     }
 
     // *****
+
+    // *****
+    // GPS trail
+    showGPSAct = new QAction(tr("Show GPS"), this);
+    showGPSAct->setStatusTip(tr("Show/Hide the GPS"));
+    showGPSAct->setCheckable(true);
+    showGPSAct->setChecked(false);
+    connect(showGPSAct, SIGNAL(toggled(bool)), this, SLOT(onShowGPSAct_toggled(bool)));
+
+    gpsTrailTypeActGroup = new QActionGroup(this);
+    connect(gpsTrailTypeActGroup, SIGNAL(triggered(QAction *)), this, SLOT(onGPStrailTypeActGroup_triggered(QAction *)));
+    gpsTrailTypeAct.clear();
+    QStringList gps_trail_type_list = mapcontrol::Helper::UAVTrailTypes();
+    for (int i = 0; i < gps_trail_type_list.count(); i++)
+    {
+        mapcontrol::UAVTrailType::Types gps_trail_type = mapcontrol::Helper::UAVTrailTypeFromString(gps_trail_type_list[i]);
+        QAction *gpsTrailType_act = new QAction(mapcontrol::Helper::StrFromUAVTrailType(gps_trail_type), gpsTrailTypeActGroup);
+        gpsTrailType_act->setCheckable(true);
+        gpsTrailType_act->setChecked(gps_trail_type == m_map->GPS->GetTrailType());
+        gpsTrailType_act->setData(i);
+        gpsTrailTypeAct.append(gpsTrailType_act);
+    }
+
+    showGPStrailAct = new QAction(tr("Show Trail dots"), this);
+    showGPStrailAct->setStatusTip(tr("Show/Hide the Trail dots"));
+    showGPStrailAct->setCheckable(true);
+    showGPStrailAct->setChecked(false);
+    connect(showGPStrailAct, SIGNAL(toggled(bool)), this, SLOT(onShowGPStrailAct_toggled(bool)));
+
+    showGPStrailLineAct = new QAction(tr("Show Trail lines"), this);
+    showGPStrailLineAct->setStatusTip(tr("Show/Hide the Trail lines"));
+    showGPStrailLineAct->setCheckable(true);
+    showGPStrailLineAct->setChecked(true);
+    connect(showGPStrailLineAct, SIGNAL(toggled(bool)), this, SLOT(onShowGPStrailLineAct_toggled(bool)));
+
+    clearGPStrailAct = new QAction(tr("Clear GPS trail"), this);
+    clearGPStrailAct->setStatusTip(tr("Clear the GPS trail"));
+    connect(clearGPStrailAct, SIGNAL(triggered()), this, SLOT(onClearGPStrailAct_triggered()));
+
+    gpsTrailTimeActGroup = new QActionGroup(this);
+    connect(gpsTrailTimeActGroup, SIGNAL(triggered(QAction *)), this, SLOT(onGPStrailTimeActGroup_triggered(QAction *)));
+    gpsTrailTimeAct.clear();
+    list_size = sizeof(uav_trail_time_list) / sizeof(uav_trail_time_list[0]);
+    for (int i = 0; i < list_size; i++)
+    {
+        int gps_trail_time = uav_trail_time_list[i];
+        QAction *gpsTrailTime_act = new QAction(QString::number(gps_trail_time) + " sec", gpsTrailTimeActGroup);
+        gpsTrailTime_act->setCheckable(true);
+        gpsTrailTime_act->setChecked(gps_trail_time == m_map->GPS->TrailTime());
+        gpsTrailTime_act->setData(gps_trail_time);
+        gpsTrailTimeAct.append(gpsTrailTime_act);
+    }
+
+    gpsTrailDistanceActGroup = new QActionGroup(this);
+    connect(gpsTrailDistanceActGroup, SIGNAL(triggered(QAction *)), this, SLOT(onGPStrailDistanceActGroup_triggered(QAction *)));
+    gpsTrailDistanceAct.clear();
+    list_size = sizeof(uav_trail_distance_list) / sizeof(uav_trail_distance_list[0]);
+    for (int i = 0; i < list_size; i++)
+    {
+        int gps_trail_distance = uav_trail_distance_list[i];
+        QAction *gpsTrailDistance_act = new QAction(QString::number(gps_trail_distance) + " meters", gpsTrailDistanceActGroup);
+        gpsTrailDistance_act->setCheckable(true);
+        gpsTrailDistance_act->setChecked(gps_trail_distance == m_map->GPS->TrailDistance());
+        gpsTrailDistance_act->setData(gps_trail_distance);
+        gpsTrailDistanceAct.append(gpsTrailDistance_act);
+    }
+
+    // *****
+
 
     // ***********************
 }
@@ -1726,33 +1826,6 @@ void OPMapGadgetWidget::onShowHomeAct_toggled(bool show)
 		return;
 
     m_map->Home->setVisible(show);
-}
-
-void OPMapGadgetWidget::onShowUAVAct_toggled(bool show)
-{
-	if (!m_widget || !m_map)
-		return;
-
-    m_map->UAV->setVisible(show);
-    m_map->GPS->setVisible(show);
-}
-
-void OPMapGadgetWidget::onShowTrailAct_toggled(bool show)
-{
-	if (!m_widget || !m_map)
-		return;
-
-    m_map->UAV->SetShowTrail(show);
-    m_map->GPS->SetShowTrail(show);
-}
-
-void OPMapGadgetWidget::onShowTrailLineAct_toggled(bool show)
-{
-	if (!m_widget || !m_map)
-		return;
-
-    m_map->UAV->SetShowTrailLine(show);
-    m_map->GPS->SetShowTrailLine(show);
 }
 
 void OPMapGadgetWidget::onMapModeActGroup_triggered(QAction *action)
@@ -1854,18 +1927,29 @@ void OPMapGadgetWidget::onFollowUAVheadingAct_toggled(bool checked)
 
     setMapFollowingMode();
 }
-
-void OPMapGadgetWidget::onUAVTrailTypeActGroup_triggered(QAction *action)
+/* UAV */
+void OPMapGadgetWidget::onShowUAVAct_toggled(bool show)
 {
-	if (!m_widget || !m_map || !action)
-		return;
+    if (!m_widget || !m_map)
+        return;
 
-    int trail_type_idx = action->data().toInt();
+    m_map->UAV->setVisible(show);
+}
 
-    QStringList uav_trail_type_list = mapcontrol::Helper::UAVTrailTypes();
-    mapcontrol::UAVTrailType::Types uav_trail_type = mapcontrol::Helper::UAVTrailTypeFromString(uav_trail_type_list[trail_type_idx]);
+void OPMapGadgetWidget::onShowUAVtrailAct_toggled(bool show)
+{
+    if (!m_widget || !m_map)
+        return;
 
-    m_map->UAV->SetTrailType(uav_trail_type);
+    m_map->UAV->SetShowTrail(show);
+}
+
+void OPMapGadgetWidget::onShowUAVtrailLineAct_toggled(bool show)
+{
+    if (!m_widget || !m_map)
+        return;
+
+    m_map->UAV->SetShowTrailLine(show);
 }
 
 void OPMapGadgetWidget::onClearUAVtrailAct_triggered()
@@ -1874,10 +1958,9 @@ void OPMapGadgetWidget::onClearUAVtrailAct_triggered()
 		return;
 
     m_map->UAV->DeleteTrail();
-    m_map->GPS->DeleteTrail();
 }
 
-void OPMapGadgetWidget::onUAVTrailTimeActGroup_triggered(QAction *action)
+void OPMapGadgetWidget::onUAVtrailTimeActGroup_triggered(QAction *action)
 {
 	if (!m_widget || !m_map || !action)
 		return;
@@ -1887,7 +1970,7 @@ void OPMapGadgetWidget::onUAVTrailTimeActGroup_triggered(QAction *action)
     m_map->UAV->SetTrailTime(trail_time);
 }
 
-void OPMapGadgetWidget::onUAVTrailDistanceActGroup_triggered(QAction *action)
+void OPMapGadgetWidget::onUAVtrailDistanceActGroup_triggered(QAction *action)
 {
 	if (!m_widget || !m_map || !action)
 		return;
@@ -1895,6 +1978,85 @@ void OPMapGadgetWidget::onUAVTrailDistanceActGroup_triggered(QAction *action)
     int trail_distance = action->data().toInt();
 
     m_map->UAV->SetTrailDistance(trail_distance);
+}
+
+void OPMapGadgetWidget::onUAVtrailTypeActGroup_triggered(QAction *action)
+{
+    if (!m_widget || !m_map || !action)
+        return;
+
+    int trail_type_idx = action->data().toInt();
+
+    QStringList uav_trail_type_list = mapcontrol::Helper::UAVTrailTypes();
+    mapcontrol::UAVTrailType::Types uav_trail_type = mapcontrol::Helper::UAVTrailTypeFromString(uav_trail_type_list[trail_type_idx]);
+
+    m_map->UAV->SetTrailType(uav_trail_type);
+}
+
+/*GPS*/
+void OPMapGadgetWidget::onShowGPSAct_toggled(bool show)
+{
+    if (!m_widget || !m_map)
+        return;
+
+    m_map->GPS->setVisible(show);
+}
+
+void OPMapGadgetWidget::onShowGPStrailAct_toggled(bool show)
+{
+    if (!m_widget || !m_map)
+        return;
+
+    m_map->GPS->SetShowTrail(show);
+}
+
+void OPMapGadgetWidget::onShowGPStrailLineAct_toggled(bool show)
+{
+    if (!m_widget || !m_map)
+        return;
+
+    m_map->GPS->SetShowTrailLine(show);
+}
+
+void OPMapGadgetWidget::onClearGPStrailAct_triggered()
+{
+    if (!m_widget || !m_map)
+        return;
+
+    m_map->GPS->DeleteTrail();
+}
+
+void OPMapGadgetWidget::onGPStrailTimeActGroup_triggered(QAction *action)
+{
+    if (!m_widget || !m_map || !action)
+        return;
+
+    int trail_time = (double)action->data().toInt();
+
+    m_map->GPS->SetTrailTime(trail_time);
+}
+
+void OPMapGadgetWidget::onGPStrailDistanceActGroup_triggered(QAction *action)
+{
+    if (!m_widget || !m_map || !action)
+        return;
+
+    int trail_distance = action->data().toInt();
+
+    m_map->GPS->SetTrailDistance(trail_distance);
+}
+
+void OPMapGadgetWidget::onGPStrailTypeActGroup_triggered(QAction *action)
+{
+    if (!m_widget || !m_map || !action)
+        return;
+
+    int trail_type_idx = action->data().toInt();
+
+    QStringList uav_trail_type_list = mapcontrol::Helper::UAVTrailTypes();
+    mapcontrol::UAVTrailType::Types uav_trail_type = mapcontrol::Helper::UAVTrailTypeFromString(uav_trail_type_list[trail_type_idx]);
+
+    m_map->GPS->SetTrailType(uav_trail_type);
 }
 
 /**

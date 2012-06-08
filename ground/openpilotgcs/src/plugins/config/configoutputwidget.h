@@ -33,6 +33,7 @@
 #include "uavobjectmanager.h"
 #include "uavobject.h"
 #include "uavobjectutilmanager.h"
+#include "cfg_vehicletypes/vehicleconfig.h"
 #include <QtGui/QWidget>
 #include <QList>
 
@@ -57,8 +58,7 @@ private:
 
 	void assignChannel(UAVDataObject *obj, QString str);
 	void assignOutputChannel(UAVDataObject *obj, QString str);
-        OutputChannelForm* getOutputChannelForm(const int index) const;
-
+    OutputChannelForm* getOutputChannelForm(const int index) const;
 	int mccDataRate;
 
 	UAVObject::Metadata accInitialData;
@@ -69,7 +69,7 @@ private:
 private slots:
         void stopTests();
         void disableIfNotMe(UAVObject *obj);
-        void refreshOutputWidgetsValues(UAVObject * obj = NULL);
+        virtual void refreshWidgetsValues(UAVObject * obj=NULL);
         void updateObjectsFromWidgets();
 	void runChannelTests(bool state);
         void sendChannelTest(int index, int value);

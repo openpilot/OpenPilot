@@ -543,6 +543,7 @@ static void simulateModelAirplane()
 	static float baro_offset = 0.0f;
 	float Rbe[3][3];
 	
+	const float LIFT_SPEED = 8; // (m/s) where achieve lift for zero pitch
 	const float ACTUATOR_ALPHA = 0.8;
 	const float MAX_THRUST = 9.81 * 2;
 	const float K_FRICTION = 0.2;
@@ -657,7 +658,7 @@ static void simulateModelAirplane()
 	double forces[3]; // X, Y, Z
 	forces[0] = thrust - pitch * PITCH_THRUST_COUPLING - forwardAirspeed * K_FRICTION;         // Friction is applied in all directions in NED
 	forces[1] = 0 - sidewaysAirspeed * K_FRICTION * 100;      // No side slip
-	forces[2] = GRAV + downwardAirspeed * K_FRICTION * 100;    // Stupidly simple, always have gravity lift when straight and level
+	forces[2] = GRAV * (forwardAirspeed - LIFT_SPEED) + downwardAirspeed * K_FRICTION * 100;    // Stupidly simple, always have gravity lift when straight and level
 	
 	// Negate force[2] as NED defines down as possitive, aircraft convention is Z up is positive (?)
 	ned_accel[0] = forces[0] * Rbe[0][0] + forces[1] * Rbe[1][0] - forces[2] * Rbe[2][0];

@@ -99,6 +99,7 @@ using namespace osgEarth::Annotation;
 #include "gpsposition.h"
 #include "homelocation.h"
 #include "positionactual.h"
+#include "systemsettings.h"
 
 using namespace Utils;
 
@@ -208,7 +209,28 @@ osg::Camera* OsgViewerWidget::createCamera( int x, int y, int w, int h, const st
 osg::Node* OsgViewerWidget::createAirplane()
 {
     osg::Group* model = new osg::Group;
-    osg::Node *uav = osgDB::readNodeFile("/Users/jcotton81/Documents/Programming/OpenPilot/artwork/3D Model/multi/joes_cnc/J14-QT_+.3DS");
+    osg::Node *uav;
+
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    Q_ASSERT(pm);
+    UAVObjectManager * objMngr = pm->getObject<UAVObjectManager>();
+    Q_ASSERT(objMngr);
+
+    SystemSettings *systemSettingsObj = SystemSettings::GetInstance(objMngr);
+    SystemSettings::DataFields systemSettings = systemSettingsObj->getData();
+
+    qDebug() << "Frame type:" << systemSettingsObj->getField("AirframeType")->getValue().toString();
+    // Get model that matches airframe type
+    switch(systemSettings.AirframeType) {
+    case SystemSettings::AIRFRAMETYPE_FIXEDWING:
+    case SystemSettings::AIRFRAMETYPE_FIXEDWINGELEVON:
+    case  SystemSettings::AIRFRAMETYPE_FIXEDWINGVTAIL:
+        uav = osgDB::readNodeFile("/Users/jcotton81/Documents/Programming/OpenPilot/artwork/3D Model/planes/Easystar/easystar.3ds");
+        break;
+    default:
+        uav = osgDB::readNodeFile("/Users/jcotton81/Documents/Programming/OpenPilot/artwork/3D Model/multi/joes_cnc/J14-QT_+.3DS");
+    }
+
     if(uav) {
         uavAttitudeAndScale = new osg::MatrixTransform();
         uavAttitudeAndScale->setMatrix(osg::Matrixd::scale(0.2e0,0.2e0,0.2e0));

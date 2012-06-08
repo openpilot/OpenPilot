@@ -245,19 +245,25 @@ static void updatePathVelocity()
 	VelocityActualGet(&velocityActual);
 
 	struct path_status progress;
-
-	path_progress(pathDesired.Start, pathDesired.End, &positionActual.North, &progress);
 	
 	float groundspeed;
 	float altitudeSetpoint;
 	switch (pathDesired.Mode) {
 		case PATHDESIRED_MODE_PATH:
-		case PATHDESIRED_MODE_ENDPOINT:
-		default:
+			path_progress(pathDesired.Start, pathDesired.End, &positionActual.North, &progress);
 			groundspeed = pathDesired.StartingVelocity + (pathDesired.EndingVelocity - pathDesired.StartingVelocity) *
 			              bound(progress.fractional_progress,0,1);
 			altitudeSetpoint = pathDesired.Start[2] + (pathDesired.End[2] - pathDesired.Start[2]) *
 						bound(progress.fractional_progress,0,1);
+			break;
+		case PATHDESIRED_MODE_ENDPOINT:
+			path_progress(&positionActual.North, pathDesired.End, &positionActual.North, &progress);
+			groundspeed = pathDesired.StartingVelocity + (pathDesired.EndingVelocity - pathDesired.StartingVelocity) *
+						bound(progress.fractional_progress,0,1);
+			altitudeSetpoint = pathDesired.Start[2] + (pathDesired.End[2] - pathDesired.Start[2]) *
+			            bound(progress.fractional_progress,0,1);
+			break;
+		default:
 			break;
 	}
 	

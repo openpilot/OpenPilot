@@ -649,6 +649,8 @@ static void setRTH(bool changed)
 		pathDesired.End[PATHDESIRED_END_NORTH] = 0;
 		pathDesired.End[PATHDESIRED_END_EAST] = 0;
 		pathDesired.End[PATHDESIRED_END_DOWN] = positionActual.Down - 10;
+		pathDesired.StartingVelocity = 2;
+		pathDesired.EndingVelocity = 2;
 		pathDesired.Mode = PATHDESIRED_MODE_ENDPOINT;
 		PathDesiredSet(&pathDesired);
 	}

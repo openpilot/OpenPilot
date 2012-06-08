@@ -220,13 +220,12 @@ private slots:
     void onMaxUpdateRateActGroup_triggered(QAction *action);
 
     /*UAV*/
+    void onShowTrailAct_toggled(bool show);
+    void onShowTrailLineAct_toggled(bool);
     void onShowUAVAct_toggled(bool show);
     void onShowUAVtrailLineAct_toggled(bool show);
     void onShowUAVtrailAct_toggled(bool show);
     void onClearUAVtrailAct_triggered();
-    void onUAVTrailTimeActGroup_triggered(QAction *action);
-    void onUAVTrailDistanceActGroup_triggered(QAction *action);
-    void onMaxUpdateRateActGroup_triggered(QAction *action);
     void onUAVtrailTimeActGroup_triggered(QAction *action);
     void onUAVtrailDistanceActGroup_triggered(QAction *action);
     void onUAVtrailTypeActGroup_triggered(QAction *action);

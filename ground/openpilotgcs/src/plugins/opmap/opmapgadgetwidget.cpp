@@ -1803,15 +1803,6 @@ void OPMapGadgetWidget::onShowHomeAct_toggled(bool show)
     m_map->Home->setVisible(show);
 }
 
-void OPMapGadgetWidget::onShowUAVAct_toggled(bool show)
-{
-    if (!m_widget || !m_map)
-        return;
-
-    m_map->UAV->setVisible(show);
-    m_map->GPS->setVisible(show);
-}
-
 void OPMapGadgetWidget::onShowTrailAct_toggled(bool show)
 {
     if (!m_widget || !m_map)
@@ -1940,7 +1931,7 @@ void OPMapGadgetWidget::onShowUAVAct_toggled(bool show)
 
 void OPMapGadgetWidget::onShowUAVtrailAct_toggled(bool show)
 {
-    if (!m_widget || !m_map || !action)
+    if (!m_widget || !m_map)
         return;
 
     m_map->UAV->SetShowTrail(show);

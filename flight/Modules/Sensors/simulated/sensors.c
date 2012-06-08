@@ -399,8 +399,8 @@ static void simulateModelQuadcopter()
 	
 	// Apply acceleration based on velocity
 	ned_accel[0] -= K_FRICTION * (vel[0] - wind[0]);
-	ned_accel[1] -= K_FRICTION * (vel[1] - wind[0]);
-	ned_accel[2] -= K_FRICTION * (vel[2] - wind[0]);
+	ned_accel[1] -= K_FRICTION * (vel[1] - wind[1]);
+	ned_accel[2] -= K_FRICTION * (vel[2] - wind[2]);
 
 	// Predict the velocity forward in time
 	vel[0] = vel[0] + ned_accel[0] * dT;
@@ -655,8 +655,8 @@ static void simulateModelAirplane()
 
 	// Apply acceleration based on velocity
 	ned_accel[0] -= K_FRICTION * (vel[0] - wind[0]);
-	ned_accel[1] -= K_FRICTION * (vel[1] - wind[0]);
-	ned_accel[2] -= K_FRICTION * (vel[2] - wind[0]);
+	ned_accel[1] -= K_FRICTION * (vel[1] - wind[1]);
+	ned_accel[2] -= K_FRICTION * (vel[2] - wind[2]);
 	
 	// Predict the velocity forward in time
 	vel[0] = vel[0] + ned_accel[0] * dT;

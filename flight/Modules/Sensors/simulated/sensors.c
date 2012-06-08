@@ -545,11 +545,12 @@ static void simulateModelAirplane()
 	
 	const float ACTUATOR_ALPHA = 0.8;
 	const float MAX_THRUST = 9.81 * 2;
-	const float K_FRICTION = 1;
+	const float K_FRICTION = 0.2;
 	const float GPS_PERIOD = 0.1;
 	const float MAG_PERIOD = 1.0 / 75.0;
 	const float BARO_PERIOD = 1.0 / 20.0;
 	const float ROLL_HEADING_COUPLING = 0.1; // (deg/s) heading change per deg of roll
+	const float PITCH_THRUST_COUPLING = 0.2; // (m/s^2) of forward acceleration per deg of pitch
 	
 	static uint32_t last_time;
 	
@@ -585,18 +586,17 @@ static void simulateModelAirplane()
 	RateDesiredData rateDesired;
 	RateDesiredGet(&rateDesired);
 	
-	// Need to compute roll angle for easy cross coupling
-	//Quaternion2RPY(q,rpy);
-	//float roll = rpy[0];
-	
+	// Need to get roll angle for easy cross coupling
+	AttitudeActualData attitudeActual;
+	AttitudeActualGet(&attitudeActual);
+	double roll = attitudeActual.Roll;
+	double pitch = attitudeActual.Pitch;
+
 	rpy[0] = (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED) * rateDesired.Roll * (1 - ACTUATOR_ALPHA) + rpy[0] * ACTUATOR_ALPHA;
 	rpy[1] = (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED) * rateDesired.Pitch * (1 - ACTUATOR_ALPHA) + rpy[1] * ACTUATOR_ALPHA;
 	rpy[2] = (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED) * rateDesired.Yaw * (1 - ACTUATOR_ALPHA) + rpy[2] * ACTUATOR_ALPHA;
-	{
-		AttitudeActualData attitudeActual;
-		AttitudeActualGet(&attitudeActual);
-		rpy[2] += attitudeActual.Roll * ROLL_HEADING_COUPLING;
-	}
+	rpy[2] += roll * ROLL_HEADING_COUPLING;
+	
 
 	GyrosData gyrosData; // Skip get as we set all the fields
 	gyrosData.x = rpy[0] + rand_gauss();
@@ -638,16 +638,27 @@ static void simulateModelAirplane()
 	wind[0] = wind[0] * 0.95 + rand_gauss() / 10.0;
 	wind[1] = wind[1] * 0.95 + rand_gauss() / 10.0;
 	wind[2] = wind[2] * 0.95 + rand_gauss() / 10.0;
+	wind[0] = 0;
+	wind[1] = 0;
+	wind[2] = 0;
+	
+	// Rbe takes a vector from body to earth.  If we take (1,0,0)^T through this and then dot with airspeed
+	// we get forward airspeed		
+	Quaternion2R(q,Rbe);
+
+	double airspeed[3] = {vel[0] - wind[0], vel[1] - wind[1], vel[2] - wind[2]};
+	double forwardAirspeed = Rbe[0][0] * airspeed[0] + Rbe[0][1] * airspeed[1] + Rbe[0][2] * airspeed[2];
+	double sidewaysAirspeed = Rbe[1][0] * airspeed[0] + Rbe[1][1] * airspeed[1] + Rbe[1][2] * airspeed[2];
+	double downwardAirspeed = Rbe[2][0] * airspeed[0] + Rbe[2][1] * airspeed[1] + Rbe[2][2] * airspeed[2];
 	
 	/* Compute aerodynamic forces in body referenced frame.  Later use more sophisticated equations  */
 	/* TODO: This should become more accurate.  Use the force equations to calculate lift from the   */
 	/* various surfaces based on AoA and airspeed.  From that compute torques and forces.  For later */
 	double forces[3]; // X, Y, Z
-	forces[0] = thrust; // Friction is applied in all directions in NED
-	forces[1] = 0;      // No side slip
-	forces[2] = GRAV;   // Stupidly simple, always have gravity lift when straight and level
+	forces[0] = thrust - pitch * PITCH_THRUST_COUPLING - forwardAirspeed * K_FRICTION;         // Friction is applied in all directions in NED
+	forces[1] = 0 - sidewaysAirspeed * K_FRICTION * 100;      // No side slip
+	forces[2] = GRAV + downwardAirspeed * K_FRICTION * 100;    // Stupidly simple, always have gravity lift when straight and level
 	
-	Quaternion2R(q,Rbe);
 	// Negate force[2] as NED defines down as possitive, aircraft convention is Z up is positive (?)
 	ned_accel[0] = forces[0] * Rbe[0][0] + forces[1] * Rbe[1][0] - forces[2] * Rbe[2][0];
 	ned_accel[1] = forces[0] * Rbe[0][1] + forces[1] * Rbe[1][1] - forces[2] * Rbe[2][1];
@@ -708,15 +719,10 @@ static void simulateModelAirplane()
 	// Update baro airpseed periodically	
 	static uint32_t last_airspeed_time = 0;
 	if(PIOS_DELAY_DiffuS(last_airspeed_time) / 1.0e6 > BARO_PERIOD) {
-		// Rbe takes a vector from body to earth.  If we take (1,0,0)^T through this and then dot with airspeed
-		// we get forward airspeed
-		float airspeed[3] = {vel[0] - wind[0], vel[1] - wind[1], vel[2] - wind[2]};
-		float forwardSpeed = Rbe[0][0] * airspeed[0] + Rbe[1][0] * airspeed[1] + Rbe[2][0] * airspeed[2];
-		
 		BaroAirspeedData baroAirspeed;
 		baroAirspeed.Connected = BAROAIRSPEED_CONNECTED_TRUE;
 		baroAirspeed.ZeroPoint = 0;
-		baroAirspeed.Airspeed = forwardSpeed;
+		baroAirspeed.Airspeed = forwardAirspeed;
 		BaroAirspeedSet(&baroAirspeed);
 		last_airspeed_time = PIOS_DELAY_GetRaw();
 	}

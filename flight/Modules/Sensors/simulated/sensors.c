@@ -547,6 +547,7 @@ static void simulateModelAirplane()
 	const float GPS_PERIOD = 0.1;
 	const float MAG_PERIOD = 1.0 / 75.0;
 	const float BARO_PERIOD = 1.0 / 20.0;
+	const float ROLL_HEADING_COUPLING = 0.1; // (deg/s) heading change per deg of roll
 	
 	static uint32_t last_time;
 	
@@ -582,10 +583,19 @@ static void simulateModelAirplane()
 	RateDesiredData rateDesired;
 	RateDesiredGet(&rateDesired);
 	
+	// Need to compute roll angle for easy cross coupling
+	//Quaternion2RPY(q,rpy);
+	//float roll = rpy[0];
+	
 	rpy[0] = (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED) * rateDesired.Roll * (1 - ACTUATOR_ALPHA) + rpy[0] * ACTUATOR_ALPHA;
 	rpy[1] = (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED) * rateDesired.Pitch * (1 - ACTUATOR_ALPHA) + rpy[1] * ACTUATOR_ALPHA;
 	rpy[2] = (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED) * rateDesired.Yaw * (1 - ACTUATOR_ALPHA) + rpy[2] * ACTUATOR_ALPHA;
-	
+	{
+		AttitudeActualData attitudeActual;
+		AttitudeActualGet(&attitudeActual);
+		rpy[2] += attitudeActual.Roll * ROLL_HEADING_COUPLING;
+	}
+
 	GyrosData gyrosData; // Skip get as we set all the fields
 	gyrosData.x = rpy[0] + rand_gauss();
 	gyrosData.y = rpy[1] + rand_gauss();

@@ -54,6 +54,7 @@
 #include "attitudeactual.h"
 #include "attitudesimulated.h"
 #include "attitudesettings.h"
+#include "baroairspeed.h"
 #include "baroaltitude.h"
 #include "gyros.h"
 #include "gyrosbias.h"
@@ -107,6 +108,7 @@ int32_t SensorsInitialize(void)
 	AccelsInitialize();
 	AttitudeSimulatedInitialize();
 	BaroAltitudeInitialize();
+	BaroAirspeedInitialize();
 	GyrosInitialize();
 	GyrosBiasInitialize();
 	GPSPositionInitialize();
@@ -701,6 +703,22 @@ static void simulateModelAirplane()
 		baroAltitude.Altitude = -pos[2] + baro_offset;
 		BaroAltitudeSet(&baroAltitude);
 		last_baro_time = PIOS_DELAY_GetRaw();
+	}
+	
+	// Update baro airpseed periodically	
+	static uint32_t last_airspeed_time = 0;
+	if(PIOS_DELAY_DiffuS(last_airspeed_time) / 1.0e6 > BARO_PERIOD) {
+		// Rbe takes a vector from body to earth.  If we take (1,0,0)^T through this and then dot with airspeed
+		// we get forward airspeed
+		float airspeed[3] = {vel[0] - wind[0], vel[1] - wind[1], vel[2] - wind[2]};
+		float forwardSpeed = Rbe[0][0] * airspeed[0] + Rbe[1][0] * airspeed[1] + Rbe[2][0] * airspeed[2];
+		
+		BaroAirspeedData baroAirspeed;
+		baroAirspeed.Connected = BAROAIRSPEED_CONNECTED_TRUE;
+		baroAirspeed.ZeroPoint = 0;
+		baroAirspeed.Airspeed = forwardSpeed;
+		BaroAirspeedSet(&baroAirspeed);
+		last_airspeed_time = PIOS_DELAY_GetRaw();
 	}
 	
 	HomeLocationData homeLocation;

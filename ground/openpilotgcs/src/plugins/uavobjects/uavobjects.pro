@@ -41,6 +41,7 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/camerastabsettings.h \
     $$UAVOBJECT_SYNTHETICS/flighttelemetrystats.h \
     $$UAVOBJECT_SYNTHETICS/fixedwingpathfollowersettings.h \
+    $$UAVOBJECT_SYNTHETICS/fixedwingpathfollowerstatus.h \
     $$UAVOBJECT_SYNTHETICS/systemstats.h \
     $$UAVOBJECT_SYNTHETICS/systemalarms.h \
     $$UAVOBJECT_SYNTHETICS/objectpersistence.h \
@@ -122,6 +123,7 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/actuatordesired.cpp \
     $$UAVOBJECT_SYNTHETICS/actuatorcommand.cpp \
     $$UAVOBJECT_SYNTHETICS/fixedwingpathfollowersettings.cpp \
+    $$UAVOBJECT_SYNTHETICS/fixedwingpathfollowerstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/gpsposition.cpp \
     $$UAVOBJECT_SYNTHETICS/gpstime.cpp \
     $$UAVOBJECT_SYNTHETICS/gpssatellites.cpp \

@@ -135,16 +135,40 @@
            </property>
            <layout class="QGridLayout" name="gridLayout_3">
             <item row="0" column="0">
+             <widget class="QRadioButton" name="PairSelectB">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLineEdit" name="PairIDB">
+              <property name="text">
+               <string>0</string>
+              </property>
+	      <property name="enabled">
+		<bool>false</bool>
+	      </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <widget class="QLabel" name="PaidIDBLabel">
+              <property name="text">
+               <string>Broadcast Address</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
              <widget class="QRadioButton" name="PairSelect1">
               <property name="text">
                <string/>
               </property>
              </widget>
             </item>
-            <item row="0" column="1" colspan="2">
+            <item row="1" column="1">
              <widget class="QLineEdit" name="PairID1"/>
             </item>
-            <item row="0" column="3">
+            <item row="1" column="2">
              <widget class="QProgressBar" name="PairSignalStrengthBar1">
               <property name="minimum">
                <number>-127</number>
@@ -163,17 +187,24 @@
               </property>
              </widget>
             </item>
-            <item row="1" column="0">
+            <item row="1" column="3">
+             <widget class="QLabel" name="PairSignalStrengthLabel1">
+              <property name="text">
+               <string>-100dB</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
              <widget class="QRadioButton" name="PairSelect2">
               <property name="text">
                <string/>
               </property>
              </widget>
             </item>
-            <item row="1" column="1" colspan="2">
+            <item row="2" column="1">
              <widget class="QLineEdit" name="PairID2"/>
             </item>
-            <item row="1" column="3">
+            <item row="2" column="2">
              <widget class="QProgressBar" name="PairSignalStrengthBar2">
               <property name="minimum">
                <number>-127</number>
@@ -192,17 +223,24 @@
               </property>
              </widget>
             </item>
-            <item row="2" column="0">
+            <item row="2" column="3">
+             <widget class="QLabel" name="PairSignalStrengthLabel2">
+              <property name="text">
+               <string>-100dB</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
              <widget class="QRadioButton" name="PairSelect3">
               <property name="text">
                <string/>
               </property>
              </widget>
             </item>
-            <item row="2" column="1" colspan="2">
+            <item row="3" column="1">
              <widget class="QLineEdit" name="PairID3"/>
             </item>
-            <item row="2" column="3">
+            <item row="3" column="2">
              <widget class="QProgressBar" name="PairSignalStrengthBar3">
               <property name="minimum">
                <number>-127</number>
@@ -221,17 +259,24 @@
               </property>
              </widget>
             </item>
-            <item row="3" column="0">
+            <item row="3" column="3">
+             <widget class="QLabel" name="PairSignalStrengthLabel3">
+              <property name="text">
+               <string>-100dB</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="0">
              <widget class="QRadioButton" name="PairSelect4">
               <property name="text">
                <string/>
               </property>
              </widget>
             </item>
-            <item row="3" column="1" colspan="2">
+            <item row="4" column="1">
              <widget class="QLineEdit" name="PairID4"/>
             </item>
-            <item row="3" column="3">
+            <item row="4" column="2">
              <widget class="QProgressBar" name="PairSignalStrengthBar4">
               <property name="minimum">
                <number>-127</number>
@@ -250,28 +295,7 @@
               </property>
              </widget>
             </item>
-            <item row="0" column="4">
-             <widget class="QLabel" name="PairSignalStrengthLabel1">
-              <property name="text">
-               <string>-100dB</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="4">
-             <widget class="QLabel" name="PairSignalStrengthLabel2">
-              <property name="text">
-               <string>-100dB</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="4">
-             <widget class="QLabel" name="PairSignalStrengthLabel3">
-              <property name="text">
-               <string>-100dB</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="4">
+            <item row="4" column="3">
              <widget class="QLabel" name="PairSignalStrengthLabel4">
               <property name="text">
                <string>-100dB</string>
@@ -393,7 +417,69 @@
               </property>
              </widget>
             </item>
+            <item row="3" column="1">
+             <widget class="QLineEdit" name="DeviceID">
+              <property name="font">
+               <font>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLineEdit {
+  border: none;
+  border-radius: 1px;
+  padding: 0 8px;
+  background: rgba(0, 0, 0, 16);
+/*  background: transparent; */
+/*     selection-background-color: darkgray;*/
+}</string>
+              </property>
+              <property name="frame">
+               <bool>false</bool>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="1">
+             <widget class="QLineEdit" name="PairID">
+              <property name="font">
+               <font>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLineEdit {
+  border: none;
+  border-radius: 1px;
+  padding: 0 8px;
+  background: rgba(0, 0, 0, 16);
+/*  background: transparent; */
+/*     selection-background-color: darkgray;*/
+}</string>
+              </property>
+              <property name="frame">
+               <bool>false</bool>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
             <item row="4" column="0">
+             <widget class="QLabel" name="label_20">
+              <property name="text">
+               <string>Pair ID</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="0">
              <widget class="QLabel" name="label_3">
               <property name="text">
                <string>Min Frequency</string>
@@ -403,7 +489,7 @@
               </property>
              </widget>
             </item>
-            <item row="4" column="1">
+            <item row="5" column="1">
              <widget class="QLineEdit" name="MinFrequency">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -444,7 +530,7 @@
               </property>
              </widget>
             </item>
-            <item row="5" column="0">
+            <item row="6" column="0">
              <widget class="QLabel" name="label_4">
               <property name="text">
                <string>Max Frequency</string>
@@ -454,7 +540,7 @@
               </property>
              </widget>
             </item>
-            <item row="5" column="1">
+            <item row="6" column="1">
              <widget class="QLineEdit" name="MaxFrequency">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -495,7 +581,7 @@
               </property>
              </widget>
             </item>
-            <item row="6" column="0">
+            <item row="7" column="0">
              <widget class="QLabel" name="label_12">
               <property name="text">
                <string>Freq. Step Size</string>
@@ -505,7 +591,7 @@
               </property>
              </widget>
             </item>
-            <item row="6" column="1">
+            <item row="7" column="1">
              <widget class="QLineEdit" name="FrequencyStepSize">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -546,7 +632,7 @@
               </property>
              </widget>
             </item>
-            <item row="7" column="0">
+            <item row="8" column="0">
              <widget class="QLabel" name="label_11">
               <property name="text">
                <string>Link State</string>
@@ -556,7 +642,7 @@
               </property>
              </widget>
             </item>
-            <item row="7" column="1">
+            <item row="8" column="1">
              <widget class="QLineEdit" name="LinkState">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -597,7 +683,7 @@
               </property>
              </widget>
             </item>
-            <item row="8" column="0">
+            <item row="9" column="0">
              <widget class="QLabel" name="label_17">
               <property name="text">
                <string>Rx AFC</string>
@@ -607,7 +693,7 @@
               </property>
              </widget>
             </item>
-            <item row="8" column="1">
+            <item row="9" column="1">
              <widget class="QLineEdit" name="RxAFC">
               <property name="font">
                <font>
@@ -630,7 +716,7 @@
               </property>
              </widget>
             </item>
-            <item row="9" column="0">
+            <item row="10" column="0">
              <widget class="QLabel" name="RetriesLabel">
               <property name="text">
                <string>Retries</string>
@@ -640,7 +726,7 @@
               </property>
              </widget>
             </item>
-            <item row="9" column="1">
+            <item row="10" column="1">
              <widget class="QLineEdit" name="Retries">
               <property name="font">
                <font>
@@ -666,7 +752,7 @@
               </property>
              </widget>
             </item>
-            <item row="10" column="1">
+            <item row="11" column="1">
              <widget class="QLineEdit" name="Errors">
               <property name="font">
                <font>
@@ -692,7 +778,7 @@
               </property>
              </widget>
             </item>
-            <item row="10" column="0">
+            <item row="11" column="0">
              <widget class="QLabel" name="label_19">
               <property name="text">
                <string>Errors</string>
@@ -702,7 +788,7 @@
               </property>
              </widget>
             </item>
-            <item row="11" column="0">
+            <item row="12" column="0">
              <widget class="QLabel" name="UAVTalkErrorsLabel">
               <property name="text">
                <string>UAVTalk Errors</string>
@@ -712,7 +798,7 @@
               </property>
              </widget>
             </item>
-            <item row="11" column="1">
+            <item row="12" column="1">
              <widget class="QLineEdit" name="UAVTalkErrors">
               <property name="font">
                <font>
@@ -738,7 +824,7 @@
               </property>
              </widget>
             </item>
-            <item row="12" column="0">
+            <item row="13" column="0">
              <widget class="QLabel" name="ResetsLabel">
               <property name="text">
                <string>Resets</string>
@@ -748,7 +834,7 @@
               </property>
              </widget>
             </item>
-            <item row="12" column="1">
+            <item row="13" column="1">
              <widget class="QLineEdit" name="Resets">
               <property name="font">
                <font>
@@ -774,7 +860,7 @@
               </property>
              </widget>
             </item>
-            <item row="13" column="0">
+            <item row="14" column="0">
              <widget class="QLabel" name="DroppedLabel">
               <property name="text">
                <string>Dropped</string>
@@ -784,7 +870,7 @@
               </property>
              </widget>
             </item>
-            <item row="13" column="1">
+            <item row="14" column="1">
              <widget class="QLineEdit" name="Dropped">
               <property name="font">
                <font>
@@ -810,7 +896,7 @@
               </property>
              </widget>
             </item>
-            <item row="14" column="0">
+            <item row="15" column="0">
              <widget class="QLabel" name="TXRateLabel">
               <property name="text">
                <string>TX Rate (B/s)</string>
@@ -820,7 +906,7 @@
               </property>
              </widget>
             </item>
-            <item row="14" column="1">
+            <item row="15" column="1">
              <widget class="QLineEdit" name="TXRate">
               <property name="font">
                <font>
@@ -846,7 +932,7 @@
               </property>
              </widget>
             </item>
-            <item row="15" column="0">
+            <item row="16" column="0">
              <widget class="QLabel" name="RXRateLabel">
               <property name="text">
                <string>RX Rate (B/s)</string>
@@ -856,7 +942,7 @@
               </property>
              </widget>
             </item>
-            <item row="15" column="1">
+            <item row="16" column="1">
              <widget class="QLineEdit" name="RXRate">
               <property name="font">
                <font>
@@ -879,42 +965,6 @@
               </property>
               <property name="readOnly">
                <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="1">
-             <widget class="QLineEdit" name="DeviceID">
-              <property name="font">
-               <font>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">QLineEdit {
-  border: none;
-  border-radius: 1px;
-  padding: 0 8px;
-  background: rgba(0, 0, 0, 16);
-/*  background: transparent; */
-/*     selection-background-color: darkgray;*/
-}</string>
-              </property>
-              <property name="frame">
-               <bool>false</bool>
-              </property>
-              <property name="readOnly">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0">
-             <widget class="QLabel" name="label_20">
-              <property name="text">
-               <string>Device ID</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
               </property>
              </widget>
             </item>

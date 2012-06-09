@@ -148,7 +148,7 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
 	PipXSettings *pipxSettings = PipXSettings::GetInstance(getObjectManager());
 	quint32 pairID = 0;
 	if (pipxSettings)
-		pipxSettings->getPairID();
+		pairID = pipxSettings->getPairID();
 
 	// Update the detected devices.
 	UAVObjectField* pairIdField = object->getField("PairIDs");
@@ -244,6 +244,9 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
 	} else {
 		qDebug() << "PipXtremeGadgetWidget: Count not read DeviceID field.";
 	}
+
+	// Update the PairID field
+	m_pipx->PairID->setText(QString::number(pairID, 16).toUpper());
 
  	// Update the link state
  	UAVObjectField* linkField = object->getField("LinkState");

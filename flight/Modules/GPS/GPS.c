@@ -61,13 +61,17 @@ static float GravityAccel(float latitude, float longitude, float altitude);
 // Private constants
 
 #define GPS_TIMEOUT_MS                  500
+
+#if defined(REVOLUTION)
+#define NMEA_MAX_PACKET_LENGTH			MAX_SVINFO_MSG_SIZE
+#else
 #define NMEA_MAX_PACKET_LENGTH          96 // 82 max NMEA msg size plus 12 margin (because some vendors add custom crap) plus CR plus Linefeed
 // same as in COM buffer
-
+#endif
 
 #ifdef PIOS_GPS_SETS_HOMELOCATION
 // Unfortunately need a good size stack for the WMM calculation
-	#define STACK_SIZE_BYTES            800
+	#define STACK_SIZE_BYTES            950
 #else
 	#define STACK_SIZE_BYTES            650
 #endif
@@ -193,9 +197,86 @@ static void gpsTask(void *parameters)
 			// detect start while acquiring stream
 			if (!start_flag && (c == '$'))
 			{
-				start_flag = true;
-				found_cr = false;
-				rx_count = 0;
+				case START: // detect protocol
+					switch (c)
+					{
+						case UBX_SYNC1: // first UBX sync char found
+							proto_state = UBX_SY2;
+							continue;
+						case '$': // NMEA identifier found
+							proto_state = NMEA;
+							found_cr = false;
+							rx_count = 0;
+							break;
+						default:
+							continue;
+					}
+					break;
+				case UBX_SY2:
+					if (c == UBX_SYNC2) // second UBX sync char found
+					{
+						proto_state = UBX_CLASS;
+						found_cr = false;
+						rx_count = 0;
+					}
+					else
+					{
+						proto_state = START; // reset state
+					}
+					continue;
+				case UBX_CLASS:
+					ubx->header.class = c;
+					proto_state = UBX_ID;
+					continue;
+				case UBX_ID:
+					ubx->header.id = c;
+					proto_state = UBX_LEN1;
+					continue;
+				case UBX_LEN1:
+					ubx->header.len = c;
+					proto_state = UBX_LEN2;
+					continue;
+				case UBX_LEN2:
+					ubx->header.len += (c << 8);
+					if ((sizeof (UBXHeader)) + ubx->header.len > NMEA_MAX_PACKET_LENGTH)
+					{
+						gpsRxOverflow++;
+						proto_state = START;
+						found_cr = false;
+						rx_count = 0;
+					}
+					else
+					{
+						proto_state = UBX_PAYLOAD;
+					}
+					continue;
+				case UBX_PAYLOAD:
+					if (rx_count < ubx->header.len)
+					{
+						ubx->payload.payload[rx_count] = c;
+						if (++rx_count == ubx->header.len)
+							proto_state = UBX_CHK1;
+					}
+					else
+						proto_state = START;
+					continue;
+				case UBX_CHK1:
+					ubx->header.ck_a = c;
+					proto_state = UBX_CHK2;
+					continue;
+				case UBX_CHK2:
+					ubx->header.ck_b = c;
+					if (checksum_ubx_message(ubx)) // message complete and valid
+					{
+						parse_ubx_message(ubx, &GpsData);
+						timeNowMs = xTaskGetTickCount() * portTICK_RATE_MS;
+						timeOfLastUpdateMs = timeNowMs;
+						timeOfLastCommandMs = timeNowMs;
+					}
+					proto_state = START;
+					continue;
+				case NMEA:
+					break;
 			}
 			else
 			if (!start_flag)

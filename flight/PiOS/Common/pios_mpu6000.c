@@ -354,7 +354,7 @@ float PIOS_MPU6000_GetAccelScale()
  * \return 0 if test succeeded
  * \return non-zero value if test succeeded
  */
-uint8_t PIOS_MPU6000_Test(void)
+int32_t PIOS_MPU6000_Test(void)
 {
 	/* Verify that ID matches (MPU6000 ID is 0x69) */
 	int32_t mpu6000_id = PIOS_MPU6000_ReadID();

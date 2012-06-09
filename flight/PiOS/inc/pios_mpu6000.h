@@ -154,7 +154,7 @@ extern int32_t PIOS_MPU6000_Init(uint32_t spi_id, uint32_t slave_num, const stru
 extern xQueueHandle PIOS_MPU6000_GetQueue();
 extern int32_t PIOS_MPU6000_ReadGyros(struct pios_mpu6000_data * buffer);
 extern int32_t PIOS_MPU6000_ReadID();
-extern uint8_t PIOS_MPU6000_Test();
+extern int32_t PIOS_MPU6000_Test();
 extern float PIOS_MPU6000_GetScale();
 extern float PIOS_MPU6000_GetAccelScale();
 extern void PIOS_MPU6000_IRQHandler(void);

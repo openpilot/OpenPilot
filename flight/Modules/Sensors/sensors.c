@@ -241,6 +241,30 @@ static void SensorsTask(void *parameters)
 		accel_samples = 0;
 		gyro_samples = 0;
 
+#if defined(PIOS_INCLUDE_HMC5883)
+		MagnetometerData mag;
+		if (PIOS_HMC5883_NewDataAvailable() || PIOS_DELAY_DiffuS(mag_update_time) > 150000) {
+			int16_t values[3];
+			PIOS_HMC5883_ReadMag(values);
+			float mags[3] = {(float) values[1] * mag_scale[0] - mag_bias[0],
+				(float) values[0] * mag_scale[1] - mag_bias[1],
+				-(float) values[2] * mag_scale[2] - mag_bias[2]};
+			if (rotate) {
+				float mag_out[3];
+				rot_mult(R, mags, mag_out);
+				mag.x = mag_out[0];
+				mag.y = mag_out[1];
+				mag.z = mag_out[2];
+			} else {
+				mag.x = mags[0];
+				mag.y = mags[1];
+				mag.z = mags[2];
+			}
+			MagnetometerSet(&mag);
+			mag_update_time = PIOS_DELAY_GetRaw();
+		}
+#endif
+
 		AccelsData accelsData;
 		GyrosData gyrosData;
 
@@ -384,33 +408,6 @@ static void SensorsTask(void *parameters)
 			gyrosData.z += gyrosBias.z;
 		}
 		GyrosSet(&gyrosData);
-		
-		// Because most crafts wont get enough information from gravity to zero yaw gyro, we try
-		// and make it average zero (weakly)
-
-#if defined(PIOS_INCLUDE_HMC5883)
-		MagnetometerData mag;
-		if (PIOS_HMC5883_NewDataAvailable() || PIOS_DELAY_DiffuS(mag_update_time) > 150000) {
-			int16_t values[3];
-			PIOS_HMC5883_ReadMag(values);
-			float mags[3] = {(float) values[1] * mag_scale[0] - mag_bias[0],
-			                (float) values[0] * mag_scale[1] - mag_bias[1],
-			                -(float) values[2] * mag_scale[2] - mag_bias[2]};
-			if (rotate) {
-				float mag_out[3];
-				rot_mult(R, mags, mag_out);
-				mag.x = mag_out[0];
-				mag.y = mag_out[1];
-				mag.z = mag_out[2];
-			} else {
-				mag.x = mags[0];
-				mag.y = mags[1];
-				mag.z = mags[2];
-			}
-			MagnetometerSet(&mag);
-			mag_update_time = PIOS_DELAY_GetRaw();
-		}
-#endif
 
 		PIOS_WDG_UpdateFlag(PIOS_WDG_SENSORS);
 

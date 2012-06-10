@@ -277,6 +277,7 @@ static const struct flashfs_cfg flashfs_m25p_cfg = {
 	.obj_table_start = 0x00000010,
 	.obj_table_end = 0x00010000,
 	.sector_size = 0x00010000,
+	.chip_size = 0x00200000,
 };
 
 static const struct pios_flash_jedec_cfg flash_m25p_cfg = {

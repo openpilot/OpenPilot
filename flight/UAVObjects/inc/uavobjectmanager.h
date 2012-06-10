@@ -74,8 +74,8 @@ typedef enum {
  *
  *   Bit(s)  Name                     Meaning
  *   ------  ----                     -------
- *      0    access                   Defines the access level for the local transactions (readonly=0 and readwrite=1)
- *      1    gcsAccess                Defines the access level for the local GCS transactions (readonly=0 and readwrite=1), not used in the flight s/w
+ *      0    access                   Defines the access level for the local transactions (readonly=1 and readwrite=0)
+ *      1    gcsAccess                Defines the access level for the local GCS transactions (readonly=1 and readwrite=0), not used in the flight s/w
  *      2    telemetryAcked           Defines if an ack is required for the transactions of this object (1:acked, 0:not acked)
  *      3    gcsTelemetryAcked        Defines if an ack is required for the transactions of this object (1:acked, 0:not acked)
  *    4-5    telemetryUpdateMode      Update mode used by the telemetry module (UAVObjUpdateMode)

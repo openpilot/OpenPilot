@@ -51,37 +51,37 @@ Rectangle {
                 WelcomePageButton {
                     baseIconName: "flightdata"
                     label: "Flight Data"
-                    onClicked: welcomePlugin.openPage("Mode1")
+                    onClicked: welcomePlugin.openPage("Flight data")
                 }
 
                 WelcomePageButton {
                     baseIconName: "config"
                     label: "Configuration"
-                    onClicked: welcomePlugin.openPage("Mode2")
+                    onClicked: welcomePlugin.openPage("Configuration")
                 }
 
                 WelcomePageButton {
                     baseIconName: "planner"
                     label: "Flight Planner"
-                    onClicked: welcomePlugin.openPage("Mode3")
+                    onClicked: welcomePlugin.openPage("Flight Planner")
                 }
 
                 WelcomePageButton {
                     baseIconName: "scopes"
                     label: "Scopes"
-                    onClicked: welcomePlugin.openPage("Mode4")
+                    onClicked: welcomePlugin.openPage("Scopes")
                 }
 
                 WelcomePageButton {
                     baseIconName: "hitl"
-                    label: "HIL"
-                    onClicked: welcomePlugin.openPage("Mode5")
+                    label: "HITL"
+                    onClicked: welcomePlugin.openPage("HITL")
                 }
 
                 WelcomePageButton {
                     baseIconName: "firmware"
                     label: "Firmware"
-                    onClicked: welcomePlugin.openPage("Mode6")
+                    onClicked: welcomePlugin.openPage("Firmware")
                 }
             } //icons grid
         } // images row

@@ -63,8 +63,6 @@ private:
 
 	UAVObject::Metadata accInitialData;
 
-	bool firstUpdate;
-
         bool wasItMe;
 private slots:
         void stopTests();

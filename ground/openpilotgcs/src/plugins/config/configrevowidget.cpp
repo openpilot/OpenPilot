@@ -204,14 +204,13 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     mag_z->setTransform(QTransform::fromScale(1,0),true);
 
     // Connect the signals
-    connect(m_ui->ahrsCalibStart, SIGNAL(clicked()), this, SLOT(measureNoise()));
     connect(m_ui->accelBiasStart, SIGNAL(clicked()), this, SLOT(launchAccelBiasCalibration()));
 
     RevoCalibration * revoCalibration = RevoCalibration::GetInstance(getObjectManager());
     Q_ASSERT(revoCalibration);
     connect(revoCalibration, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshValues()));
 
-    connect(m_ui->ahrsSettingsSaveRAM, SIGNAL(clicked()), this, SLOT(SettingsToRam()));
+    connect(m_ui->ahrsSettingsSaveRAM, SIGNAL(clicked()), this, SLOT(SettingsToRAM()));
     connect(m_ui->ahrsSettingsSaveSD, SIGNAL(clicked()), this, SLOT(SettingsToFlash()));
     connect(m_ui->sixPointsStart, SIGNAL(clicked()), this, SLOT(sixPointCalibrationMode()));
     connect(m_ui->sixPointsSave, SIGNAL(clicked()), this, SLOT(savePositionData()));

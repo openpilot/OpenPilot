@@ -361,7 +361,7 @@ int32_t PIOS_MPU6000_Test(void)
 	if(mpu6000_id < 0)
 		return -1;
 	
-	if(mpu6000_id != 0x68);
+	if(mpu6000_id != 0x68)
 		return -2;
 	
 	return 0;

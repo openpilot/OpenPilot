@@ -79,7 +79,7 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
     connect(m_config->outputHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
 
     // Add custom handling of displaying things
-    connect(this,SIGNAL(refreshWidgetsValuesRequested()), this, SLOT(refreshOutputWidgetsValues()));
+    connect(this,SIGNAL(refreshWidgetsValuesRequested()), this, SLOT(refreshWidgetsValues()));
 
     addApplySaveButtons(m_config->saveRCOutputToRAM,m_config->saveRCOutputToSD);
 

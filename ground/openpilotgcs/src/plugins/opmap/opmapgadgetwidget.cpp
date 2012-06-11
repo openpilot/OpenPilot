@@ -1646,7 +1646,7 @@ void OPMapGadgetWidget::createActions()
     connect(showUAVAct, SIGNAL(toggled(bool)), this, SLOT(onShowUAVAct_toggled(bool)));
 
     uavTrailTypeActGroup = new QActionGroup(this);
-    connect(uavTrailTypeActGroup, SIGNAL(triggered(QAction *)), this, SLOT(onUAVTrailTypeActGroup_triggered(QAction *)));
+    connect(uavTrailTypeActGroup, SIGNAL(triggered(QAction *)), this, SLOT(onUAVtrailTypeActGroup_triggered(QAction *)));
     uavTrailTypeAct.clear();
     QStringList uav_trail_type_list = mapcontrol::Helper::UAVTrailTypes();
     for (int i = 0; i < uav_trail_type_list.count(); i++)

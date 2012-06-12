@@ -256,7 +256,7 @@ void Telemetry::transactionCompleted(UAVObject* obj, bool success)
 /**
  * Called when a transaction is not completed within the timeout period (timer event)
  */
-bool Telemetry::transactionTimeout(ObjectTransactionInfo *transInfo)
+void Telemetry::transactionTimeout(ObjectTransactionInfo *transInfo)
 {
     //qDebug() << "Telemetry: transaction timeout.";
 

@@ -75,7 +75,7 @@ public:
     ~Telemetry();
     TelemetryStats getStats();
     void resetStats();
-    bool transactionTimeout(ObjectTransactionInfo *info);
+    void transactionTimeout(ObjectTransactionInfo *info);
 
 signals:
 

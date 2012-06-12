@@ -30,6 +30,7 @@
 #include <QIODevice>
 #include <QMutex>
 #include <QMutexLocker>
+#include <QMap>
 #include <QSemaphore>
 #include "uavobjectmanager.h"
 #include "uavtalk_global.h"
@@ -54,7 +55,7 @@ public:
     ~UAVTalk();
     bool sendObject(UAVObject* obj, bool acked, bool allInstances);
     bool sendObjectRequest(UAVObject* obj, bool allInstances);
-    void cancelTransaction();
+    void cancelTransaction(UAVObject* obj);
     ComStats getStats();
     void resetStats();
 
@@ -65,6 +66,12 @@ private slots:
     void processInputStream(void);
 
 private:
+
+    typedef struct {
+        UAVObject* obj;
+        bool allInstances;
+    } Transaction;
+
     // Constants
     static const int TYPE_MASK = 0xF8;
     static const int TYPE_VER = 0x20;
@@ -96,8 +103,7 @@ private:
     QIODevice* io;
     UAVObjectManager* objMngr;
     QMutex* mutex;
-    UAVObject* respObj;
-    bool respAllInstances;
+    QMap<quint32, Transaction*> transMap;
     quint8 rxBuffer[MAX_PACKET_LENGTH];
     quint8 txBuffer[MAX_PACKET_LENGTH];
     // Variables used by the receive state machine

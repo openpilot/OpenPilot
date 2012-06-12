@@ -72,8 +72,6 @@ UAVTalk::UAVTalk(QIODevice* iodev, UAVObjectManager* objMngr)
 
     mutex = new QMutex(QMutex::Recursive);
 
-    respObj = NULL;
-
     memset(&stats, 0, sizeof(ComStats));
 
     connect(io, SIGNAL(readyRead()), this, SLOT(processInputStream()));
@@ -155,10 +153,16 @@ bool UAVTalk::sendObject(UAVObject* obj, bool acked, bool allInstances)
 /**
  * Cancel a pending transaction
  */
-void UAVTalk::cancelTransaction()
+void UAVTalk::cancelTransaction(UAVObject* obj)
 {
     QMutexLocker locker(mutex);
-    respObj = NULL;
+    quint32 objId = obj->getObjID();
+    QMap<quint32, Transaction*>::iterator itr = transMap.find(objId);
+    if ( itr != transMap.end() )
+    {
+        transMap.remove(objId);
+	delete itr.value();
+    }
 }
 
 /**
@@ -178,8 +182,10 @@ bool UAVTalk::objectTransaction(UAVObject* obj, quint8 type, bool allInstances)
     {
         if ( transmitObject(obj, type, allInstances) )
         {
-            respObj = obj;
-            respAllInstances = allInstances;    
+	    Transaction *trans = new Transaction();
+	    trans->obj = obj;
+	    trans->allInstances = allInstances;
+            transMap.insert(obj->getObjID(), trans);
             return true;
         }
         else
@@ -625,9 +631,12 @@ UAVObject* UAVTalk::updateObject(quint32 objId, quint16 instId, quint8* data)
  */
 void UAVTalk::updateNack(UAVObject* obj)
 {
-    if (respObj != NULL && respObj->getObjID() == obj->getObjID() && (respObj->getInstID() == obj->getInstID() || respAllInstances))
+    quint32 objId = obj->getObjID();
+    QMap<quint32, Transaction*>::iterator itr = transMap.find(objId);
+    if ( itr != transMap.end() && (itr.value()->obj->getInstID() == obj->getInstID() || itr.value()->allInstances))
     {
-        respObj = NULL;
+        transMap.remove(objId);
+	delete itr.value();
         emit transactionCompleted(obj, false);
     }
 }
@@ -638,9 +647,12 @@ void UAVTalk::updateNack(UAVObject* obj)
  */
 void UAVTalk::updateAck(UAVObject* obj)
 {
-    if (respObj != NULL && respObj->getObjID() == obj->getObjID() && (respObj->getInstID() == obj->getInstID() || respAllInstances))
+    quint32 objId = obj->getObjID();
+    QMap<quint32, Transaction*>::iterator itr = transMap.find(objId);
+    if ( itr != transMap.end() && (itr.value()->obj->getInstID() == obj->getInstID() || itr.value()->allInstances))
     {
-        respObj = NULL;
+        transMap.remove(objId);
+	delete itr.value();
         emit transactionCompleted(obj, true);
     }
 }

@@ -495,7 +495,7 @@
             <property name="geometry">
              <rect>
               <x>0</x>
-              <y>-114</y>
+              <y>0</y>
               <width>673</width>
               <height>790</height>
              </rect>
@@ -11797,7 +11797,7 @@ border-radius: 4;
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="2">
+                <item row="0" column="3">
                  <widget class="QPushButton" name="pushButton_4">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -11850,7 +11850,7 @@ border-radius: 4;
                   </property>
                  </widget>
                 </item>
-                <item row="1" column="0" colspan="3">
+                <item row="1" column="0" colspan="4">
                  <widget class="QGroupBox" name="RateStabilizationGroup_9">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -14693,6 +14693,19 @@ value as the Kp.</string>
                   </layout>
                  </widget>
                 </item>
+                <item row="0" column="2">
+                 <spacer name="horizontalSpacer_2">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
                </layout>
               </widget>
              </item>
@@ -15272,7 +15285,7 @@ value as the Kp.</string>
                 <bool>false</bool>
                </property>
                <layout class="QGridLayout" name="gridLayout_4">
-                <item row="1" column="0" colspan="3">
+                <item row="1" column="0" colspan="4">
                  <widget class="QGroupBox" name="RateStabilizationGroup_5">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -17936,7 +17949,7 @@ border-radius: 5;</string>
                   </property>
                  </spacer>
                 </item>
-                <item row="0" column="2">
+                <item row="0" column="3">
                  <widget class="QPushButton" name="pushButton_2">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -17998,6 +18011,19 @@ border-radius: 4;
                    <string>Link Roll and Pitch</string>
                   </property>
                  </widget>
+                </item>
+                <item row="0" column="2">
+                 <spacer name="horizontalSpacer">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
                 </item>
                </layout>
               </widget>

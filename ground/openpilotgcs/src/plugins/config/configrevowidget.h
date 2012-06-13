@@ -104,8 +104,8 @@ private slots:
     virtual void refreshWidgetsValues(UAVObject * obj=NULL);
     void savePositionData();
     void computeScaleBias();
-    void sixPointCalibrationMode();
-    void sensorsUpdated(UAVObject * obj);
+    void doStartSixPointCalibration();
+    void doGetSixPointCalibrationMeasurement(UAVObject * obj);
     void doGetAccelBiasData(UAVObject*);
 
 protected:

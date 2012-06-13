@@ -215,7 +215,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
 
     // Connect the signals
     connect(m_ui->accelBiasStart, SIGNAL(clicked()), this, SLOT(launchAccelBiasCalibration()));
-    connect(m_ui->sixPointsStart, SIGNAL(clicked()), this, SLOT(sixPointCalibrationMode()));
+    connect(m_ui->sixPointsStart, SIGNAL(clicked()), this, SLOT(doStartSixPointCalibration()));
     connect(m_ui->sixPointsSave, SIGNAL(clicked()), this, SLOT(savePositionData()));
 
     // Leave this timer permanently connected.  The timer itself is started and stopped.
@@ -342,7 +342,7 @@ void ConfigRevoWidget::incrementProgress()
     }
 }
 
-void ConfigRevoWidget::sensorsUpdated(UAVObject * obj)
+void ConfigRevoWidget::doGetSixPointCalibrationMeasurement(UAVObject * obj)
 {
     QMutexLocker lock(&sensorsUpdateLock);
 
@@ -380,8 +380,8 @@ void ConfigRevoWidget::sensorsUpdated(UAVObject * obj)
         Q_ASSERT(accels);
         Magnetometer * mag = Magnetometer::GetInstance(getObjectManager());
         Q_ASSERT(mag);
-        disconnect(accels,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(sensorsUpdated(UAVObject*)));
-        disconnect(mag,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(sensorsUpdated(UAVObject*)));
+        disconnect(accels,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(doGetSixPointCalibrationMeasurement(UAVObject*)));
+        disconnect(mag,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(doGetSixPointCalibrationMeasurement(UAVObject*)));
 
         m_ui->sixPointsSave->setEnabled(true);
 #ifdef SIX_POINT_CAL_ACCEL
@@ -451,8 +451,8 @@ void ConfigRevoWidget::savePositionData()
     Magnetometer * mag = Magnetometer::GetInstance(getObjectManager());
     Q_ASSERT(mag);
 
-    connect(accels, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(sensorsUpdated(UAVObject*)));
-    connect(mag, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(sensorsUpdated(UAVObject*)));
+    connect(accels, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(doGetSixPointCalibrationMeasurement(UAVObject*)));
+    connect(mag, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(doGetSixPointCalibrationMeasurement(UAVObject*)));
 
     m_ui->sixPointCalibInstructions->append("Hold...");
 }
@@ -606,7 +606,7 @@ void ConfigRevoWidget::computeScaleBias()
 /**
   Six point calibration mode
   */
-void ConfigRevoWidget::sixPointCalibrationMode()
+void ConfigRevoWidget::doStartSixPointCalibration()
 {
     RevoCalibration * revoCalibration = RevoCalibration::GetInstance(getObjectManager());
     HomeLocation * homeLocation = HomeLocation::GetInstance(getObjectManager());
@@ -745,6 +745,23 @@ void ConfigRevoWidget::drawVariancesGraph()
     float mag_z_var = -1/steps*(1+steps+log10(1e-3*revoCalibrationData.mag_var[RevoCalibration::MAG_VAR_Z]));
     if(mag_z)
         mag_z->setTransform(QTransform::fromScale(1,mag_z_var),false);
+}
+
+/**
+  * Connect sensor updates and timeout for measuring the noise
+  */
+void ConfigRevoWidget::doStartNoiseMeasurement()
+{
+
+}
+
+/**
+  * Called when any of the sensors are updated.  Stores the sample for measuring the
+  * variance at the end
+  */
+void ConfigRevoWidget::doGetNoiseSample(UAVObject *)
+{
+
 }
 
 /**

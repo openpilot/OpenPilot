@@ -174,7 +174,7 @@ Tip: lower is better!</string>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout">
                 <item>
-                 <widget class="QPushButton" name="ahrsCalibStart">
+                 <widget class="QPushButton" name="noiseMeasurementStart">
                   <property name="enabled">
                    <bool>false</bool>
                   </property>
@@ -189,7 +189,7 @@ Hint: run this with engines at cruising speed.</string>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QProgressBar" name="calibProgress">
+                 <widget class="QProgressBar" name="noiseMeasurementProgress">
                   <property name="enabled">
                    <bool>true</bool>
                   </property>

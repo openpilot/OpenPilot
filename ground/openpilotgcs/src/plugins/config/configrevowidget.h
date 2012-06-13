@@ -68,7 +68,7 @@ private:
     QGraphicsSvgItem *mag_x;
     QGraphicsSvgItem *mag_y;
     QGraphicsSvgItem *mag_z;
-    QMutex attitudeRawUpdateLock;
+    QMutex sensorsUpdateLock;
     double maxBarHeight;
     int phaseCounter;
     int progressBarIndex;
@@ -100,14 +100,13 @@ private slots:
     void incrementProgress();
 
     virtual void refreshValues();
-    //void ahrsSettingsRequest();
     void SettingsToRAM();
     void SettingsToFlash();
     void savePositionData();
     void computeScaleBias();
     void sixPointCalibrationMode();
     void sensorsUpdated(UAVObject * obj);
-    void accelBiasattitudeRawUpdated(UAVObject*);
+    void doGetAccelBiasData(UAVObject*);
 
 protected:
     void showEvent(QShowEvent *event);

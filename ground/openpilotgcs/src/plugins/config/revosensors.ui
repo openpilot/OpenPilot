@@ -51,7 +51,7 @@
                    </font>
                   </property>
                   <property name="text">
-                   <string>#1: Multi-Point Calibration</string>
+                   <string>#1: Magnetometer calibrtion</string>
                   </property>
                  </widget>
                 </item>
@@ -157,7 +157,7 @@
                </layout>
               </item>
               <item>
-               <widget class="QGraphicsView" name="ahrsBargraph">
+               <widget class="QGraphicsView" name="sensorsBargraph">
                 <property name="toolTip">
                  <string>These are the sensor variance values computed by the AHRS.
 
@@ -630,7 +630,7 @@ new home location unless it is in indoor mode.</string>
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="ahrsHelp">
+      <widget class="QPushButton" name="Help">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -673,7 +673,7 @@ new home location unless it is in indoor mode.</string>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="ahrsSettingsSaveRAM">
+      <widget class="QPushButton" name="revoCalSettingsSaveRAM">
        <property name="toolTip">
         <string>Save settings to the board (RAM only).
 
@@ -686,7 +686,7 @@ specific calibration button on top of the screen.</string>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="ahrsSettingsSaveSD">
+      <widget class="QPushButton" name="revoCalSettingsSaveSD">
        <property name="toolTip">
         <string>Send settings to the board, and save to the non-volatile memory.</string>
        </property>

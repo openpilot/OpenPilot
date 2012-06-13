@@ -87,16 +87,16 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     m_ui->sixPointsHelp->setSceneRect(paperplane->boundingRect());
 
     // Initialization of the Revo sensor noise bargraph graph
-    m_ui->ahrsBargraph->setScene(new QGraphicsScene(this));
+    m_ui->sensorsBargraph->setScene(new QGraphicsScene(this));
 
     QSvgRenderer *renderer = new QSvgRenderer();
-    ahrsbargraph = new QGraphicsSvgItem();
+    sensorsBargraph = new QGraphicsSvgItem();
     renderer->load(QString(":/configgadget/images/ahrs-calib.svg"));
-    ahrsbargraph->setSharedRenderer(renderer);
-    ahrsbargraph->setElementId("background");
-    ahrsbargraph->setObjectName("background");
-    m_ui->ahrsBargraph->scene()->addItem(ahrsbargraph);
-    m_ui->ahrsBargraph->setSceneRect(ahrsbargraph->boundingRect());
+    sensorsBargraph->setSharedRenderer(renderer);
+    sensorsBargraph->setElementId("background");
+    sensorsBargraph->setObjectName("background");
+    m_ui->sensorsBargraph->scene()->addItem(sensorsBargraph);
+    m_ui->sensorsBargraph->setSceneRect(sensorsBargraph->boundingRect());
 
     // Initialize the 9 bargraph values:
 
@@ -113,7 +113,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     accel_x = new QGraphicsSvgItem();
     accel_x->setSharedRenderer(renderer);
     accel_x->setElementId("accel_x");
-    m_ui->ahrsBargraph->scene()->addItem(accel_x);
+    m_ui->sensorsBargraph->scene()->addItem(accel_x);
     accel_x->setPos(startX, startY);
     accel_x->setTransform(QTransform::fromScale(1,0),true);
 
@@ -124,7 +124,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     accel_y = new QGraphicsSvgItem();
     accel_y->setSharedRenderer(renderer);
     accel_y->setElementId("accel_y");
-    m_ui->ahrsBargraph->scene()->addItem(accel_y);
+    m_ui->sensorsBargraph->scene()->addItem(accel_y);
     accel_y->setPos(startX,startY);
     accel_y->setTransform(QTransform::fromScale(1,0),true);
 
@@ -135,7 +135,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     accel_z = new QGraphicsSvgItem();
     accel_z->setSharedRenderer(renderer);
     accel_z->setElementId("accel_z");
-    m_ui->ahrsBargraph->scene()->addItem(accel_z);
+    m_ui->sensorsBargraph->scene()->addItem(accel_z);
     accel_z->setPos(startX,startY);
     accel_z->setTransform(QTransform::fromScale(1,0),true);
 
@@ -146,7 +146,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     gyro_x = new QGraphicsSvgItem();
     gyro_x->setSharedRenderer(renderer);
     gyro_x->setElementId("gyro_x");
-    m_ui->ahrsBargraph->scene()->addItem(gyro_x);
+    m_ui->sensorsBargraph->scene()->addItem(gyro_x);
     gyro_x->setPos(startX,startY);
     gyro_x->setTransform(QTransform::fromScale(1,0),true);
 
@@ -157,7 +157,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     gyro_y = new QGraphicsSvgItem();
     gyro_y->setSharedRenderer(renderer);
     gyro_y->setElementId("gyro_y");
-    m_ui->ahrsBargraph->scene()->addItem(gyro_y);
+    m_ui->sensorsBargraph->scene()->addItem(gyro_y);
     gyro_y->setPos(startX,startY);
     gyro_y->setTransform(QTransform::fromScale(1,0),true);
 
@@ -169,7 +169,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     gyro_z = new QGraphicsSvgItem();
     gyro_z->setSharedRenderer(renderer);
     gyro_z->setElementId("gyro_z");
-    m_ui->ahrsBargraph->scene()->addItem(gyro_z);
+    m_ui->sensorsBargraph->scene()->addItem(gyro_z);
     gyro_z->setPos(startX,startY);
     gyro_z->setTransform(QTransform::fromScale(1,0),true);
 
@@ -180,7 +180,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     mag_x = new QGraphicsSvgItem();
     mag_x->setSharedRenderer(renderer);
     mag_x->setElementId("mag_x");
-    m_ui->ahrsBargraph->scene()->addItem(mag_x);
+    m_ui->sensorsBargraph->scene()->addItem(mag_x);
     mag_x->setPos(startX,startY);
     mag_x->setTransform(QTransform::fromScale(1,0),true);
 
@@ -191,7 +191,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     mag_y = new QGraphicsSvgItem();
     mag_y->setSharedRenderer(renderer);
     mag_y->setElementId("mag_y");
-    m_ui->ahrsBargraph->scene()->addItem(mag_y);
+    m_ui->sensorsBargraph->scene()->addItem(mag_y);
     mag_y->setPos(startX,startY);
     mag_y->setTransform(QTransform::fromScale(1,0),true);
 
@@ -202,7 +202,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     mag_z = new QGraphicsSvgItem();
     mag_z->setSharedRenderer(renderer);
     mag_z->setElementId("mag_z");
-    m_ui->ahrsBargraph->scene()->addItem(mag_z);
+    m_ui->sensorsBargraph->scene()->addItem(mag_z);
     mag_z->setPos(startX,startY);
     mag_z->setTransform(QTransform::fromScale(1,0),true);
 
@@ -213,8 +213,8 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     Q_ASSERT(revoCalibration);
     connect(revoCalibration, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshValues()));
 
-    connect(m_ui->ahrsSettingsSaveRAM, SIGNAL(clicked()), this, SLOT(SettingsToRAM()));
-    connect(m_ui->ahrsSettingsSaveSD, SIGNAL(clicked()), this, SLOT(SettingsToFlash()));
+    connect(m_ui->revoCalSettingsSaveRAM, SIGNAL(clicked()), this, SLOT(SettingsToRAM()));
+    connect(m_ui->revoCalSettingsSaveSD, SIGNAL(clicked()), this, SLOT(SettingsToFlash()));
     connect(m_ui->sixPointsStart, SIGNAL(clicked()), this, SLOT(sixPointCalibrationMode()));
     connect(m_ui->sixPointsSave, SIGNAL(clicked()), this, SLOT(savePositionData()));
 
@@ -230,7 +230,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     connect(parent, SIGNAL(autopilotDisconnected()), this, SLOT(onAutopilotDisconnect()));
 
     // Connect the help button
-    connect(m_ui->ahrsHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
+    connect(m_ui->Help, SIGNAL(clicked()), this, SLOT(openHelp()));
 }
 
 ConfigRevoWidget::~ConfigRevoWidget()
@@ -244,15 +244,15 @@ void ConfigRevoWidget::showEvent(QShowEvent *event)
     Q_UNUSED(event)
     // Thit fitInView method should only be called now, once the
     // widget is shown, otherwise it cannot compute its values and
-    // the result is usually a ahrsbargraph that is way too small.
-    m_ui->ahrsBargraph->fitInView(ahrsbargraph, Qt::KeepAspectRatio);
+    // the result is usually a sensorsBargraph that is way too small.
+    m_ui->sensorsBargraph->fitInView(sensorsBargraph, Qt::KeepAspectRatio);
     m_ui->sixPointsHelp->fitInView(paperplane,Qt::KeepAspectRatio);
 }
 
 void ConfigRevoWidget::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event)
-    m_ui->ahrsBargraph->fitInView(ahrsbargraph, Qt::KeepAspectRatio);
+    m_ui->sensorsBargraph->fitInView(sensorsBargraph, Qt::KeepAspectRatio);
     m_ui->sixPointsHelp->fitInView(paperplane,Qt::KeepAspectRatio);
 }
 
@@ -293,13 +293,13 @@ void ConfigRevoWidget::launchAccelBiasCalibration()
 
     // Now connect to the accels and mag updates, gather for 100 samples
     collectingData = true;
-    connect(accels, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(accelBiasattitudeRawUpdated(UAVObject*)));
+    connect(accels, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(doGetAccelBiasData(UAVObject*)));
 }
 
 /**
   Updates the accel bias raw values
   */
-void ConfigRevoWidget::accelBiasattitudeRawUpdated(UAVObject *obj)
+void ConfigRevoWidget::doGetAccelBiasData(UAVObject *obj)
 {
     Q_UNUSED(obj);
 
@@ -318,7 +318,7 @@ void ConfigRevoWidget::accelBiasattitudeRawUpdated(UAVObject *obj)
 
     if(accel_accum_x.size() >= 100 && collectingData == true) {
         collectingData = false;
-        disconnect(accels,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(accelBiasattitudeRawUpdated(UAVObject*)));
+        disconnect(accels,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(doGetAccelBiasData(UAVObject*)));
         m_ui->accelBiasStart->setEnabled(true);
 
         RevoCalibration * revoCalibration = RevoCalibration::GetInstance(getObjectManager());
@@ -359,7 +359,7 @@ void ConfigRevoWidget::incrementProgress()
 
 void ConfigRevoWidget::sensorsUpdated(UAVObject * obj)
 {
-    QMutexLocker lock(&attitudeRawUpdateLock);
+    QMutexLocker lock(&sensorsUpdateLock);
 
     // This is necessary to prevent a race condition on disconnect signal and another update
     if (collectingData == true) {
@@ -447,7 +447,7 @@ void ConfigRevoWidget::sensorsUpdated(UAVObject * obj)
   */
 void ConfigRevoWidget::savePositionData()
 {    
-    QMutexLocker lock(&attitudeRawUpdateLock);
+    QMutexLocker lock(&sensorsUpdateLock);
     m_ui->sixPointsSave->setEnabled(false);
 
     accel_accum_x.clear();

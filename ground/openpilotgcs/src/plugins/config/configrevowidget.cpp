@@ -267,11 +267,11 @@ void ConfigRevoWidget::launchAccelBiasCalibration()
     accel_accum_y.clear();
     accel_accum_z.clear();
 
-    /* Need to get as many AttitudeRaw updates as possible */
+    /* Need to get as many accel updates as possible */
     Accels * accels = Accels::GetInstance(getObjectManager());
     Q_ASSERT(accels);
-    initialMdata = accels->getMetadata();
-    UAVObject::Metadata mdata = initialMdata;
+    initialAccelsMdata = accels->getMetadata();
+    UAVObject::Metadata mdata = initialAccelsMdata;
     UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
     mdata.flightTelemetryUpdatePeriod = 100;
     accels->setMetadata(mdata);
@@ -318,7 +318,7 @@ void ConfigRevoWidget::doGetAccelBiasData(UAVObject *obj)
         revoCalibration->setData(revoCalibrationData);
         revoCalibration->updated();
 
-        accels->setMetadata(initialMdata);
+        accels->setMetadata(initialAccelsMdata);
     }
 }
 
@@ -358,7 +358,6 @@ void ConfigRevoWidget::sensorsUpdated(UAVObject * obj)
             accel_accum_z.append(accelsData.z);
 #endif
         } else if( obj->getObjID() == Magnetometer::OBJID ) {
-            qDebug() << "Mag";
             Magnetometer * mag = Magnetometer::GetInstance(getObjectManager());
             Q_ASSERT(mag);
             Magnetometer::DataFields magData = mag->getData();
@@ -421,8 +420,8 @@ void ConfigRevoWidget::sensorsUpdated(UAVObject * obj)
             m_ui->sixPointsSave->setEnabled(false);
 
             /* Cleanup original settings */
-            accels->setMetadata(initialMdata);
-            mag->setMetadata(initialMdata);
+            accels->setMetadata(initialAccelsMdata);
+            mag->setMetadata(initialMagMdata);
         }
     }
 }
@@ -667,13 +666,14 @@ void ConfigRevoWidget::sixPointCalibrationMode()
    Magnetometer * mag = Magnetometer::GetInstance(getObjectManager());
    Q_ASSERT(mag);
 
-   initialMdata = accels->getMetadata();
-   UAVObject::Metadata mdata = initialMdata;
+   initialAccelsMdata = accels->getMetadata();
+   UAVObject::Metadata mdata = initialAccelsMdata;
    UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
    mdata.flightTelemetryUpdatePeriod = 100;
    accels->setMetadata(mdata);
 
-   mdata = mag->getMetadata();
+   initialMagMdata = mag->getMetadata();
+   mdata = initialMagMdata;
    UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
    mdata.flightTelemetryUpdatePeriod = 100;
    mag->setMetadata(mdata);

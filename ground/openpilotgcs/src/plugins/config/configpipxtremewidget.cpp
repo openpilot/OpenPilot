@@ -284,8 +284,6 @@ void ConfigPipXtremeWidget::disconnected()
 
 void ConfigPipXtremeWidget::pairIDToggled(bool checked, quint8 idx)
 {
-	qDebug() << QString("Pairid toggled %1").arg(checked);
-	qDebug() << QString("idx %1").arg(idx);
 	if(checked)
 	{
 		PipXStatus *pipxStatus = PipXStatus::GetInstance(getObjectManager());
@@ -295,17 +293,13 @@ void ConfigPipXtremeWidget::pairIDToggled(bool checked, quint8 idx)
 		{
 			if (idx == 4)
 			{
-				qDebug() << QString("PairID 0");
 				pipxSettings->setPairID(0);
 			}
 			else
 			{
 				quint32 pairID = pipxStatus->getPairIDs(idx);
 				if (pairID)
-				{
-					qDebug() << QString("Pairid %1").arg(pairID);
 					pipxSettings->setPairID(pairID);
-				}
 			}
 		}
 	}

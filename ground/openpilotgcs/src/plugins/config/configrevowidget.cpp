@@ -71,10 +71,13 @@ public:
 ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     ConfigTaskWidget(parent),
     collectingData(false),
-    position(-1),
-    m_ui(new Ui_RevoSensorsWidget())
+    position(-1)
 {
+    m_ui = new Ui_RevoSensorsWidget();
     m_ui->setupUi(this);
+
+    addUAVObject("RevoCalibration");
+    autoLoadWidgets();
 
     // Initialization of the Paper plane widget
     m_ui->sixPointsHelp->setScene(new QGraphicsScene(this));
@@ -209,10 +212,6 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     // Connect the signals
     connect(m_ui->accelBiasStart, SIGNAL(clicked()), this, SLOT(launchAccelBiasCalibration()));
 
-    RevoCalibration * revoCalibration = RevoCalibration::GetInstance(getObjectManager());
-    Q_ASSERT(revoCalibration);
-    connect(revoCalibration, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshValues()));
-
     connect(m_ui->revoCalSettingsSaveRAM, SIGNAL(clicked()), this, SLOT(SettingsToRAM()));
     connect(m_ui->revoCalSettingsSaveSD, SIGNAL(clicked()), this, SLOT(SettingsToFlash()));
     connect(m_ui->sixPointsStart, SIGNAL(clicked()), this, SLOT(sixPointCalibrationMode()));
@@ -221,16 +220,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     // Leave this timer permanently connected.  The timer itself is started and stopped.
     connect(&progressBarTimer, SIGNAL(timeout()), this, SLOT(incrementProgress()));
 
-    // Order is important: 1st request the settings (it will also enable the controls)
-    // then explicitely disable them. They will be re-enabled right afterwards by the
-    // configgadgetwidget if the autopilot is actually connected.
-    refreshValues();
-    // when the AHRS Widget is instanciated, the autopilot is always connected // enableControls(false);
-    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(onAutopilotConnect()));
-    connect(parent, SIGNAL(autopilotDisconnected()), this, SLOT(onAutopilotDisconnect()));
-
     // Connect the help button
-    connect(m_ui->Help, SIGNAL(clicked()), this, SLOT(openHelp()));
 }
 
 ConfigRevoWidget::~ConfigRevoWidget()
@@ -256,12 +246,6 @@ void ConfigRevoWidget::resizeEvent(QResizeEvent *event)
     m_ui->sixPointsHelp->fitInView(paperplane,Qt::KeepAspectRatio);
 }
 
-
-void ConfigRevoWidget::enableControls(bool enable)
-{
-    //m_ui->ahrsSettingsSaveRAM->setEnabled(enable);
-    m_ui->ahrsSettingsSaveSD->setEnabled(enable);
-}
 
 /**
   Starts an accelerometer bias calibration.
@@ -752,9 +736,10 @@ void ConfigRevoWidget::drawVariancesGraph()
 }
 
 /**
-  Request current settings from the AHRS
+  * Called by the ConfigTaskWidget parent when RevoCalibration is updated
+  * to update the UI
   */
-void ConfigRevoWidget::refreshValues()
+void ConfigRevoWidget::refreshWidgetsValues(UAVObject *)
 {
     drawVariancesGraph();
 
@@ -764,34 +749,6 @@ void ConfigRevoWidget::refreshValues()
     m_ui->startDriftCalib->setEnabled(true);
 
     m_ui->calibInstructions->setText(QString("Press \"Start\" above to calibrate."));
-}
-
-
-/**
-  Save current settings to RAM
-  */
-void ConfigRevoWidget::SettingsToRAM()
-{
-    RevoCalibration * revoCalibration = RevoCalibration::GetInstance(getObjectManager());
-    Q_ASSERT(revoCalibration);
-    revoCalibration->updated();
-}
-
-/**
-Save Revo calibration settings to flash
-  */
-void ConfigRevoWidget::SettingsToFlash()
-{
-    SettingsToRAM();
-
-    RevoCalibration * revoCalibration = RevoCalibration::GetInstance(getObjectManager());
-    Q_ASSERT(revoCalibration);
-    saveObjectToSD(revoCalibration);
-}
-
-void ConfigRevoWidget::openHelp()
-{
-    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/Revo+Configuration", QUrl::StrictMode) );
 }
 
 /**

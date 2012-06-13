@@ -670,6 +670,12 @@ new home location unless it is in indoor mode.</string>
        <property name="flat">
         <bool>true</bool>
        </property>
+       <property name="objrelation" stdset="0">
+        <stringlist>
+         <string>button:help</string>
+         <string>url:http://wiki.openpilot.org/display/Doc/Revo+Configuration</string>
+        </stringlist>
+       </property>
       </widget>
      </item>
      <item>
@@ -683,6 +689,9 @@ specific calibration button on top of the screen.</string>
        <property name="text">
         <string>Apply</string>
        </property>
+       <property name="objrelation" stdset="0">
+        <string>button:apply</string>
+       </property>
       </widget>
      </item>
      <item>
@@ -695,6 +704,9 @@ specific calibration button on top of the screen.</string>
        </property>
        <property name="checked">
         <bool>false</bool>
+       </property>
+       <property name="objrelation" stdset="0">
+        <string>button:save</string>
        </property>
       </widget>
      </item>

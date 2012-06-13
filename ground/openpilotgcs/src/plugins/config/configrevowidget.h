@@ -54,11 +54,10 @@ public:
 private:
     void drawVariancesGraph();
     void displayPlane(QString elementID);
-    virtual void enableControls(bool enable);
 
     Ui_RevoSensorsWidget *m_ui;
     QGraphicsSvgItem *paperplane;
-    QGraphicsSvgItem *ahrsbargraph;
+    QGraphicsSvgItem *sensorsBargraph;
     QGraphicsSvgItem *accel_x;
     QGraphicsSvgItem *accel_y;
     QGraphicsSvgItem *accel_z;
@@ -95,13 +94,10 @@ private:
     int position;
 
 private slots:
-    void openHelp();
     void launchAccelBiasCalibration();
     void incrementProgress();
 
-    virtual void refreshValues();
-    void SettingsToRAM();
-    void SettingsToFlash();
+    virtual void refreshWidgetsValues(UAVObject * obj=NULL);
     void savePositionData();
     void computeScaleBias();
     void sixPointCalibrationMode();

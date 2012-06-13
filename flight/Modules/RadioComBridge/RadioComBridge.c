@@ -567,8 +567,9 @@ static void sendDataTask(void *parameters)
 				uint32_t retries = 0;
 				int32_t success = -1;
 				while (retries < MAX_RETRIES && success == -1) {
-					success = UAVTalkSendObject(data->outUAVTalkCon, ev.obj, 0, 0, RETRY_TIMEOUT_MS);
-					++retries;
+					success = UAVTalkSendObject(data->outUAVTalkCon, ev.obj, 0, 0, RETRY_TIMEOUT_MS) == 0;
+					if (!success)
+						++retries;
 				}
 				data->comTxRetries += retries;
 			}
@@ -578,8 +579,9 @@ static void sendDataTask(void *parameters)
 				uint32_t retries = 0;
 				int32_t success = -1;
 				while (retries < MAX_RETRIES && success == -1) {
-					success = UAVTalkSendAck(data->outUAVTalkCon, ev.obj, ev.instId);
-					++retries;
+					success = UAVTalkSendAck(data->outUAVTalkCon, ev.obj, ev.instId) == 0;
+					if (!success)
+						++retries;
 				}
 				data->comTxRetries += retries;
 			}
@@ -589,8 +591,9 @@ static void sendDataTask(void *parameters)
 				uint32_t retries = 0;
 				int32_t success = -1;
 				while (retries < MAX_RETRIES && success == -1) {
-					success = UAVTalkSendNack(data->outUAVTalkCon, UAVObjGetID(ev.obj));
-					++retries;
+					success = UAVTalkSendNack(data->outUAVTalkCon, UAVObjGetID(ev.obj)) == 0;
+					if (!success)
+						++retries;
 				}
 				data->comTxRetries += retries;
 			}

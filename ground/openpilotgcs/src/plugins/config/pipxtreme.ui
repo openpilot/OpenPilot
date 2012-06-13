@@ -81,7 +81,7 @@
             <property name="sizeHint" stdset="0">
              <size>
               <width>40</width>
-              <height>20</height>
+              <height>5</height>
              </size>
             </property>
            </spacer>
@@ -144,7 +144,7 @@
             <item row="0" column="1">
              <widget class="QLineEdit" name="PairIDB">
               <property name="text">
-               <string>0</string>
+               <string>Broadcast</string>
               </property>
 	      <property name="enabled">
 		<bool>false</bool>
@@ -326,14 +326,14 @@
             <item row="0" column="0">
              <widget class="QLabel" name="label_9">
               <property name="text">
-               <string>Firmware Version</string>
+               <string>Firmware Ver.</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
               </property>
              </widget>
             </item>
-            <item row="0" column="1">
+            <item row="0" column="1" colspan="3">
              <widget class="QLineEdit" name="FirmwareVersion">
               <property name="font">
                <font>
@@ -369,7 +369,7 @@
               </property>
              </widget>
             </item>
-            <item row="2" column="1">
+            <item row="2" column="1" colspan="3">
              <widget class="QLineEdit" name="SerialNumber">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -417,6 +417,16 @@
               </property>
              </widget>
             </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="DeviceIDLabel">
+              <property name="text">
+               <string>Device ID</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
             <item row="3" column="1">
              <widget class="QLineEdit" name="DeviceID">
               <property name="font">
@@ -443,7 +453,17 @@
               </property>
              </widget>
             </item>
-            <item row="4" column="1">
+            <item row="3" column="2">
+             <widget class="QLabel" name="PairIDLabel">
+              <property name="text">
+               <string>Pair ID</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="3">
              <widget class="QLineEdit" name="PairID">
               <property name="font">
                <font>
@@ -470,16 +490,6 @@
              </widget>
             </item>
             <item row="4" column="0">
-             <widget class="QLabel" name="label_20">
-              <property name="text">
-               <string>Pair ID</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="5" column="0">
              <widget class="QLabel" name="label_3">
               <property name="text">
                <string>Min Frequency</string>
@@ -489,7 +499,7 @@
               </property>
              </widget>
             </item>
-            <item row="5" column="1">
+            <item row="4" column="1">
              <widget class="QLineEdit" name="MinFrequency">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -530,7 +540,7 @@
               </property>
              </widget>
             </item>
-            <item row="6" column="0">
+            <item row="4" column="2">
              <widget class="QLabel" name="label_4">
               <property name="text">
                <string>Max Frequency</string>
@@ -540,7 +550,7 @@
               </property>
              </widget>
             </item>
-            <item row="6" column="1">
+            <item row="4" column="3">
              <widget class="QLineEdit" name="MaxFrequency">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -581,7 +591,7 @@
               </property>
              </widget>
             </item>
-            <item row="7" column="0">
+            <item row="5" column="0">
              <widget class="QLabel" name="label_12">
               <property name="text">
                <string>Freq. Step Size</string>
@@ -591,7 +601,7 @@
               </property>
              </widget>
             </item>
-            <item row="7" column="1">
+            <item row="5" column="1">
              <widget class="QLineEdit" name="FrequencyStepSize">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -626,6 +636,195 @@
               </property>
               <property name="alignment">
                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="2">
+             <widget class="QLabel" name="FreqBandLabel">
+              <property name="text">
+               <string>Freq. Band</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="3">
+             <widget class="QLineEdit" name="FreqBand">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="toolTip">
+               <string>The current frequency band</string>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLineEdit {
+  border: none;
+  border-radius: 1px;
+  padding: 0 8px;
+  background: rgba(0, 0, 0, 16);
+/*  background: transparent; */
+/*     selection-background-color: darkgray;*/
+}</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="0">
+             <widget class="QLabel" name="RSSILabel">
+              <property name="text">
+               <string>RSSI</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="1">
+             <widget class="QLineEdit" name="RSSI">
+              <property name="font">
+               <font>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLineEdit {
+  border: none;
+  border-radius: 1px;
+  padding: 0 8px;
+  background: rgba(0, 0, 0, 16);
+/*  background: transparent; */
+/*     selection-background-color: darkgray;*/
+}</string>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="2">
+             <widget class="QLabel" name="RxAFCLabel">
+              <property name="text">
+               <string>Rx AFC</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="3">
+             <widget class="QLineEdit" name="RxAFC">
+              <property name="font">
+               <font>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLineEdit {
+  border: none;
+  border-radius: 1px;
+  padding: 0 8px;
+  background: rgba(0, 0, 0, 16);
+/*  background: transparent; */
+/*     selection-background-color: darkgray;*/
+}</string>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="7" column="0">
+             <widget class="QLabel" name="TXRateLabel">
+              <property name="text">
+               <string>TX Rate (B/s)</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="7" column="1">
+             <widget class="QLineEdit" name="TXRate">
+              <property name="font">
+               <font>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLineEdit {
+  border: none;
+  border-radius: 1px;
+  padding: 0 8px;
+  background: rgba(0, 0, 0, 16);
+/*  background: transparent; */
+/*     selection-background-color: darkgray;*/
+}</string>
+              </property>
+              <property name="frame">
+               <bool>false</bool>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="7" column="2">
+             <widget class="QLabel" name="RXRateLabel">
+              <property name="text">
+               <string>RX Rate (B/s)</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="7" column="3">
+             <widget class="QLineEdit" name="RXRate">
+              <property name="font">
+               <font>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLineEdit {
+  border: none;
+  border-radius: 1px;
+  padding: 0 8px;
+  background: rgba(0, 0, 0, 16);
+/*  background: transparent; */
+/*     selection-background-color: darkgray;*/
+}</string>
+              </property>
+              <property name="frame">
+               <bool>false</bool>
               </property>
               <property name="readOnly">
                <bool>true</bool>
@@ -683,76 +882,17 @@
               </property>
              </widget>
             </item>
-            <item row="9" column="0">
-             <widget class="QLabel" name="label_17">
+            <item row="8" column="2">
+             <widget class="QLabel" name="label_19">
               <property name="text">
-               <string>Rx AFC</string>
+               <string>Errors</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
               </property>
              </widget>
             </item>
-            <item row="9" column="1">
-             <widget class="QLineEdit" name="RxAFC">
-              <property name="font">
-               <font>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">QLineEdit {
-  border: none;
-  border-radius: 1px;
-  padding: 0 8px;
-  background: rgba(0, 0, 0, 16);
-/*  background: transparent; */
-/*     selection-background-color: darkgray;*/
-}</string>
-              </property>
-              <property name="readOnly">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="10" column="0">
-             <widget class="QLabel" name="RetriesLabel">
-              <property name="text">
-               <string>Retries</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="10" column="1">
-             <widget class="QLineEdit" name="Retries">
-              <property name="font">
-               <font>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">QLineEdit {
-  border: none;
-  border-radius: 1px;
-  padding: 0 8px;
-  background: rgba(0, 0, 0, 16);
-/*  background: transparent; */
-/*     selection-background-color: darkgray;*/
-}</string>
-              </property>
-              <property name="frame">
-               <bool>false</bool>
-              </property>
-              <property name="readOnly">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="11" column="1">
+            <item row="8" column="3">
              <widget class="QLineEdit" name="Errors">
               <property name="font">
                <font>
@@ -778,17 +918,43 @@
               </property>
              </widget>
             </item>
-            <item row="11" column="0">
-             <widget class="QLabel" name="label_19">
+            <item row="9" column="0">
+             <widget class="QLabel" name="RetriesLabel">
               <property name="text">
-               <string>Errors</string>
+               <string>Retries</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
               </property>
              </widget>
             </item>
-            <item row="12" column="0">
+            <item row="9" column="1">
+             <widget class="QLineEdit" name="Retries">
+              <property name="font">
+               <font>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLineEdit {
+  border: none;
+  border-radius: 1px;
+  padding: 0 8px;
+  background: rgba(0, 0, 0, 16);
+/*  background: transparent; */
+/*     selection-background-color: darkgray;*/
+}</string>
+              </property>
+              <property name="frame">
+               <bool>false</bool>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="9" column="2">
              <widget class="QLabel" name="UAVTalkErrorsLabel">
               <property name="text">
                <string>UAVTalk Errors</string>
@@ -798,7 +964,7 @@
               </property>
              </widget>
             </item>
-            <item row="12" column="1">
+            <item row="9" column="3">
              <widget class="QLineEdit" name="UAVTalkErrors">
               <property name="font">
                <font>
@@ -824,7 +990,7 @@
               </property>
              </widget>
             </item>
-            <item row="13" column="0">
+            <item row="10" column="0">
              <widget class="QLabel" name="ResetsLabel">
               <property name="text">
                <string>Resets</string>
@@ -834,7 +1000,7 @@
               </property>
              </widget>
             </item>
-            <item row="13" column="1">
+            <item row="10" column="1">
              <widget class="QLineEdit" name="Resets">
               <property name="font">
                <font>
@@ -860,7 +1026,7 @@
               </property>
              </widget>
             </item>
-            <item row="14" column="0">
+            <item row="10" column="2">
              <widget class="QLabel" name="DroppedLabel">
               <property name="text">
                <string>Dropped</string>
@@ -870,80 +1036,8 @@
               </property>
              </widget>
             </item>
-            <item row="14" column="1">
+            <item row="10" column="3">
              <widget class="QLineEdit" name="Dropped">
-              <property name="font">
-               <font>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">QLineEdit {
-  border: none;
-  border-radius: 1px;
-  padding: 0 8px;
-  background: rgba(0, 0, 0, 16);
-/*  background: transparent; */
-/*     selection-background-color: darkgray;*/
-}</string>
-              </property>
-              <property name="frame">
-               <bool>false</bool>
-              </property>
-              <property name="readOnly">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="15" column="0">
-             <widget class="QLabel" name="TXRateLabel">
-              <property name="text">
-               <string>TX Rate (B/s)</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="15" column="1">
-             <widget class="QLineEdit" name="TXRate">
-              <property name="font">
-               <font>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">QLineEdit {
-  border: none;
-  border-radius: 1px;
-  padding: 0 8px;
-  background: rgba(0, 0, 0, 16);
-/*  background: transparent; */
-/*     selection-background-color: darkgray;*/
-}</string>
-              </property>
-              <property name="frame">
-               <bool>false</bool>
-              </property>
-              <property name="readOnly">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="16" column="0">
-             <widget class="QLabel" name="RXRateLabel">
-              <property name="text">
-               <string>RX Rate (B/s)</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="16" column="1">
-             <widget class="QLineEdit" name="RXRate">
               <property name="font">
                <font>
                 <weight>75</weight>

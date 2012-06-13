@@ -71,6 +71,8 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
 	addUAVObjectToWidgetRelation("PipXStatus", "MinFrequency", m_pipx->MinFrequency);
 	addUAVObjectToWidgetRelation("PipXStatus", "MaxFrequency", m_pipx->MaxFrequency);
 	addUAVObjectToWidgetRelation("PipXStatus", "FrequencyStepSize", m_pipx->FrequencyStepSize);
+	addUAVObjectToWidgetRelation("PipXStatus", "FrequencyBand", m_pipx->FreqBand);
+	addUAVObjectToWidgetRelation("PipXStatus", "RSSI", m_pipx->RSSI);
 	addUAVObjectToWidgetRelation("PipXStatus", "AFC", m_pipx->RxAFC);
 	addUAVObjectToWidgetRelation("PipXStatus", "Retries", m_pipx->Retries);
 	addUAVObjectToWidgetRelation("PipXStatus", "Errors", m_pipx->Errors);
@@ -81,6 +83,7 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
 	addUAVObjectToWidgetRelation("PipXStatus", "TXRate", m_pipx->TXRate);
 
 	// Connect to the pair ID radio buttons.
+	connect(m_pipx->PairSelectB, SIGNAL(toggled(bool)), this, SLOT(pairBToggled(bool)));
 	connect(m_pipx->PairSelect1, SIGNAL(toggled(bool)), this, SLOT(pair1Toggled(bool)));
 	connect(m_pipx->PairSelect2, SIGNAL(toggled(bool)), this, SLOT(pair2Toggled(bool)));
 	connect(m_pipx->PairSelect3, SIGNAL(toggled(bool)), this, SLOT(pair3Toggled(bool)));
@@ -89,6 +92,7 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
 	//Add scroll bar when necessary
 	QScrollArea *scroll = new QScrollArea;
 	scroll->setWidget(m_pipx->frame_3);
+	scroll->setWidgetResizable(true);
 	m_pipx->verticalLayout_3->addWidget(scroll);
 
 	// Request and update of the setting object.
@@ -280,6 +284,8 @@ void ConfigPipXtremeWidget::disconnected()
 
 void ConfigPipXtremeWidget::pairIDToggled(bool checked, quint8 idx)
 {
+	qDebug() << QString("Pairid toggled %1").arg(checked);
+	qDebug() << QString("idx %1").arg(idx);
 	if(checked)
 	{
 		PipXStatus *pipxStatus = PipXStatus::GetInstance(getObjectManager());
@@ -287,9 +293,20 @@ void ConfigPipXtremeWidget::pairIDToggled(bool checked, quint8 idx)
 
 		if (pipxStatus && pipxSettings)
 		{
-			quint32 pairID = pipxStatus->getPairIDs(idx);
-			if (pairID)
-				pipxSettings->setPairID(pairID);
+			if (idx == 4)
+			{
+				qDebug() << QString("PairID 0");
+				pipxSettings->setPairID(0);
+			}
+			else
+			{
+				quint32 pairID = pipxStatus->getPairIDs(idx);
+				if (pairID)
+				{
+					qDebug() << QString("Pairid %1").arg(pairID);
+					pipxSettings->setPairID(pairID);
+				}
+			}
 		}
 	}
 }
@@ -312,6 +329,11 @@ void ConfigPipXtremeWidget::pair3Toggled(bool checked)
 void ConfigPipXtremeWidget::pair4Toggled(bool checked)
 {
 	pairIDToggled(checked, 3);
+}
+
+void ConfigPipXtremeWidget::pairBToggled(bool checked)
+{
+	pairIDToggled(checked, 4);
 }
 
 /**

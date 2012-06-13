@@ -76,9 +76,6 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     m_ui = new Ui_RevoSensorsWidget();
     m_ui->setupUi(this);
 
-    addUAVObject("RevoCalibration");
-    autoLoadWidgets();
-
     // Initialization of the Paper plane widget
     m_ui->sixPointsHelp->setScene(new QGraphicsScene(this));
 
@@ -208,6 +205,11 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     m_ui->sensorsBargraph->scene()->addItem(mag_z);
     mag_z->setPos(startX,startY);
     mag_z->setTransform(QTransform::fromScale(1,0),true);
+
+    // Must set up the UI (above) before setting up the UAVO mappings or refreshWidgetValues
+    // will be dealing with some null pointers
+    addUAVObject("RevoCalibration");
+    autoLoadWidgets();
 
     // Connect the signals
     connect(m_ui->accelBiasStart, SIGNAL(clicked()), this, SLOT(launchAccelBiasCalibration()));
@@ -708,31 +710,42 @@ void ConfigRevoWidget::drawVariancesGraph()
 {
     RevoCalibration * revoCalibration = RevoCalibration::GetInstance(getObjectManager());
     Q_ASSERT(revoCalibration);
+    if(!revoCalibration)
+        return;
     RevoCalibration::DataFields revoCalibrationData = revoCalibration->getData();
 
     // The expected range is from 1E-6 to 1E-1
     double steps = 6; // 6 bars on the graph
     float accel_x_var = -1/steps*(1+steps+log10(revoCalibrationData.accel_var[RevoCalibration::ACCEL_VAR_X]));
-    accel_x->setTransform(QTransform::fromScale(1,accel_x_var),false);
+    if(accel_x)
+        accel_x->setTransform(QTransform::fromScale(1,accel_x_var),false);
     float accel_y_var = -1/steps*(1+steps+log10(revoCalibrationData.accel_var[RevoCalibration::ACCEL_VAR_Y]));
-    accel_y->setTransform(QTransform::fromScale(1,accel_y_var),false);
+    if(accel_y)
+        accel_y->setTransform(QTransform::fromScale(1,accel_y_var),false);
     float accel_z_var = -1/steps*(1+steps+log10(revoCalibrationData.accel_var[RevoCalibration::ACCEL_VAR_Z]));
-    accel_z->setTransform(QTransform::fromScale(1,accel_z_var),false);
+    if(accel_z)
+        accel_z->setTransform(QTransform::fromScale(1,accel_z_var),false);
 
     float gyro_x_var = -1/steps*(1+steps+log10(revoCalibrationData.gyro_var[RevoCalibration::GYRO_VAR_X]));
-    gyro_x->setTransform(QTransform::fromScale(1,gyro_x_var),false);
+    if(gyro_x)
+        gyro_x->setTransform(QTransform::fromScale(1,gyro_x_var),false);
     float gyro_y_var = -1/steps*(1+steps+log10(revoCalibrationData.gyro_var[RevoCalibration::GYRO_VAR_Y]));
-    gyro_y->setTransform(QTransform::fromScale(1,gyro_y_var),false);
+    if(gyro_y)
+        gyro_y->setTransform(QTransform::fromScale(1,gyro_y_var),false);
     float gyro_z_var = -1/steps*(1+steps+log10(revoCalibrationData.gyro_var[RevoCalibration::GYRO_VAR_Z]));
-    gyro_z->setTransform(QTransform::fromScale(1,gyro_z_var),false);
+    if(gyro_z)
+        gyro_z->setTransform(QTransform::fromScale(1,gyro_z_var),false);
 
     // Scale by 1e-3 because mag vars are much higher.
     float mag_x_var = -1/steps*(1+steps+log10(1e-3*revoCalibrationData.mag_var[RevoCalibration::MAG_VAR_X]));
-    mag_x->setTransform(QTransform::fromScale(1,mag_x_var),false);
+    if(mag_x)
+        mag_x->setTransform(QTransform::fromScale(1,mag_x_var),false);
     float mag_y_var = -1/steps*(1+steps+log10(1e-3*revoCalibrationData.mag_var[RevoCalibration::MAG_VAR_Y]));
-    mag_y->setTransform(QTransform::fromScale(1,mag_y_var),false);
+    if(mag_y)
+        mag_y->setTransform(QTransform::fromScale(1,mag_y_var),false);
     float mag_z_var = -1/steps*(1+steps+log10(1e-3*revoCalibrationData.mag_var[RevoCalibration::MAG_VAR_Z]));
-    mag_z->setTransform(QTransform::fromScale(1,mag_z_var),false);
+    if(mag_z)
+        mag_z->setTransform(QTransform::fromScale(1,mag_z_var),false);
 }
 
 /**

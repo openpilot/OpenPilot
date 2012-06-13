@@ -95,7 +95,7 @@ $(eval $(call INSTALL_TEMPLATE,all_bl,uavobjects,$(BL_DIR),,-$(PACKAGE_LBL),,,$(
 $(eval $(call INSTALL_TEMPLATE,all_bu,all_bl,$(BU_DIR),,-$(PACKAGE_LBL),,,$(BU_TARGETS),install))
 
 # Order-only dependencies
-package_flight: | all_fw all_bu
+package_flight: | all_fw 
 
 package_ground: | ground_package
 

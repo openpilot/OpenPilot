@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>730</width>
-    <height>602</height>
+    <width>796</width>
+    <height>618</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -74,7 +74,7 @@
        <item>
         <widget class="QStackedWidget" name="airframesWidget">
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="fixedWing">
           <property name="enabled">

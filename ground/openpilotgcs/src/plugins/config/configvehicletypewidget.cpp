@@ -119,7 +119,8 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
     airframeTypes << "Fixed Wing" << "Multirotor" << "Helicopter" << "Ground" << "Custom";
     m_aircraft->aircraftType->addItems(airframeTypes);
 
-    m_aircraft->aircraftType->setCurrentIndex(0); //Set default vehicle to Fixed Wing
+    m_aircraft->aircraftType->setCurrentIndex(0);    //Set default vehicle to Fixed Wing
+    m_aircraft->airframesWidget->setCurrentIndex(0); // Force the tab index to match
 
     QStringList fixedWingTypes;
     fixedWingTypes << "Elevator aileron rudder" << "Elevon" << "Vtail";

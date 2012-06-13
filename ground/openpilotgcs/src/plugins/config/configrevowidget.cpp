@@ -52,7 +52,9 @@
 
 #define sign(x) ((x < 0) ? -1 : 1)
 
-#define SIX_POINT_CAL_ACCEL 0
+// Uncomment this to enable 6 point calibration on the accels
+//#define SIX_POINT_CAL_ACCEL
+
 const double ConfigRevoWidget::maxVarValue = 0.1;
 
 // *****************
@@ -213,9 +215,6 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
 
     // Connect the signals
     connect(m_ui->accelBiasStart, SIGNAL(clicked()), this, SLOT(launchAccelBiasCalibration()));
-
-    connect(m_ui->revoCalSettingsSaveRAM, SIGNAL(clicked()), this, SLOT(SettingsToRAM()));
-    connect(m_ui->revoCalSettingsSaveSD, SIGNAL(clicked()), this, SLOT(SettingsToFlash()));
     connect(m_ui->sixPointsStart, SIGNAL(clicked()), this, SLOT(sixPointCalibrationMode()));
     connect(m_ui->sixPointsSave, SIGNAL(clicked()), this, SLOT(savePositionData()));
 

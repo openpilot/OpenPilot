@@ -182,18 +182,16 @@ QString ConfigFixedWingWidget::updateConfigObjectsFromWidgets()
 	QString airframeType = "FixedWing";
 	
 	// Save the curve (common to all Fixed wing frames)
-	UAVDataObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-	
+    UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
+    Q_ASSERT(mixer);
+
 	// Remove Feed Forward, it is pointless on a plane:
-	UAVObjectField* field = obj->getField(QString("FeedForward"));
+    UAVObjectField* field = mixer->getField(QString("FeedForward"));
 	field->setDouble(0);
 	
-	field = obj->getField("ThrottleCurve1");
-	QList<double> curve = m_aircraft->fixedWingThrottle->getCurve();
-	for (int i=0;i<curve.length();i++) {
-		field->setValue(curve.at(i),i);
-	}
-	
+    // Set the throttle curve
+    setThrottleCurve(mixer,VehicleConfig::MIXER_THROTTLECURVE1, m_aircraft->fixedWingThrottle->getCurve());
+
 	//All airframe types must start with "FixedWing"
 	if (m_aircraft->fixedWingType->currentText() == "Elevator aileron rudder" ) {
 		airframeType = "FixedWing";
@@ -229,36 +227,26 @@ void ConfigFixedWingWidget::refreshWidgetsValues(QString frameType)
     setComboCurrentIndex(m_aircraft->fwRudder1ChannelBox, fixed.FixedWingYaw1);
     setComboCurrentIndex(m_aircraft->fwRudder2ChannelBox, fixed.FixedWingYaw2);
 
-    UAVDataObject* obj;
-    UAVObjectField *field;
+    UAVDataObject* mixer= dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
+    Q_ASSERT(mixer);
 
+    int channel;
 	if (frameType == "FixedWingElevon") {
         // If the airframe is elevon, restore the slider setting
-		// Find the channel number for Elevon1 (FixedWingRoll1)
-		obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-		Q_ASSERT(obj);
-		int chMixerNumber = m_aircraft->fwAileron1ChannelBox->currentIndex()-1;
-		if (chMixerNumber >= 0) { // If for some reason the actuators were incoherent, we might fail here, hence the check.
-			field = obj->getField(mixerVectors.at(chMixerNumber));
-			int ti = field->getElementNames().indexOf("Roll");
-			m_aircraft->elevonSlider1->setValue(field->getDouble(ti)*100);
-			ti = field->getElementNames().indexOf("Pitch");
-			m_aircraft->elevonSlider2->setValue(field->getDouble(ti)*100);
+        // Find the channel number for Elevon1 (FixedWingRoll1)
+        channel = m_aircraft->fwAileron1ChannelBox->currentIndex()-1;
+        if (channel > -1) { // If for some reason the actuators were incoherent, we might fail here, hence the check.
+            m_aircraft->elevonSlider1->setValue(getMixerVectorValue(mixer,channel,VehicleConfig::MIXERVECTOR_ROLL)*100);
+            m_aircraft->elevonSlider2->setValue(getMixerVectorValue(mixer,channel,VehicleConfig::MIXERVECTOR_PITCH)*100);
 		}
 	}
-	if (frameType == "FixedWingVtail") {
-		obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-		Q_ASSERT(obj);
-		int chMixerNumber = m_aircraft->fwElevator1ChannelBox->currentIndex()-1;
-		if (chMixerNumber >=0) {
-			field = obj->getField(mixerVectors.at(chMixerNumber));
-			int ti = field->getElementNames().indexOf("Yaw");
-			m_aircraft->elevonSlider1->setValue(field->getDouble(ti)*100);
-			ti = field->getElementNames().indexOf("Pitch");
-			m_aircraft->elevonSlider2->setValue(field->getDouble(ti)*100);
-		}
-	}
-	
+    if (frameType == "FixedWingVtail") {
+        channel = m_aircraft->fwElevator1ChannelBox->currentIndex()-1;
+        if (channel > -1) { // If for some reason the actuators were incoherent, we might fail here, hence the check.
+            m_aircraft->elevonSlider1->setValue(getMixerVectorValue(mixer,channel,VehicleConfig::MIXERVECTOR_YAW)*100);
+            m_aircraft->elevonSlider2->setValue(getMixerVectorValue(mixer,channel,VehicleConfig::MIXERVECTOR_PITCH)*100);
+        }
+	}	
 }
 
 

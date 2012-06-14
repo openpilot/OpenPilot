@@ -233,6 +233,60 @@ void VehicleConfig::setMixerVectorValue(UAVDataObject* mixer, int channel, Mixer
     }
 }
 
+void VehicleConfig::setThrottleCurve(UAVDataObject* mixer, MixerThrottleCurveElem curveType, QList<double> curve)
+{
+    QPointer<UAVObjectField> field;
+
+    switch (curveType)
+    {
+        case MIXER_THROTTLECURVE1:
+        {
+            field = mixer->getField("ThrottleCurve1");
+            break;
+        }
+        case MIXER_THROTTLECURVE2:
+        {
+            field = mixer->getField("ThrottleCurve2");
+            break;
+        }
+    }
+
+    if (field && field->getNumElements() == curve.length()) {
+        for (int i=0;i<curve.length();i++) {
+           field->setValue(curve.at(i),i);
+        }
+    }
+}
+
+void VehicleConfig::getThrottleCurve(UAVDataObject* mixer, MixerThrottleCurveElem curveType, QList<double>* curve)
+{
+    Q_ASSERT(mixer);
+    Q_ASSERT(curve);
+
+    QPointer<UAVObjectField> field;
+
+    switch (curveType)
+    {
+        case MIXER_THROTTLECURVE1:
+        {
+            field = mixer->getField("ThrottleCurve1");
+            break;
+        }
+        case MIXER_THROTTLECURVE2:
+        {
+            field = mixer->getField("ThrottleCurve2");
+            break;
+        }
+    }
+
+    if (field) {
+        curve->clear();
+        for (unsigned int i=0; i < field->getNumElements(); i++) {
+            curve->append(field->getValue(i).toDouble());
+        }
+    }
+}
+
 /**
   Reset the contents of a field
   */

@@ -1302,8 +1302,7 @@ int n_innovation = 0;
 				
 				robot_ptr_t robPtr = pinfo.sen->robotPtr();
 //std::cout << "Frame " << (*world)->t << " using sen " << pinfo.sen->id() << " at time " << std::setprecision(16) << newt << std::endl;
-				if (intOpts[iRobot] == 2) robPtr->move(robPtr->control, newt);
-				else robPtr->move(newt);
+				robPtr->move(newt);
 				
 				JFR_DEBUG("Robot " << robPtr->id() << " state after move " << robPtr->state.x() << " ; euler " << quaternion::q2e(ublas::subrange(robPtr->state.x(), 3, 7)));
 				JFR_DEBUG("Robot state stdev after move " << stdevFromCov(robPtr->state.P()));

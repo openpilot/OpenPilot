@@ -218,9 +218,8 @@ namespace jafar {
 					move();
 				}
 				
-				void move(double time);
+				virtual void move(double time);
 				void move_fake(double time);
-				void move(const vec & u_, double time);
 
 				/**
 				 * Compute robot process noise \a Q in state space.

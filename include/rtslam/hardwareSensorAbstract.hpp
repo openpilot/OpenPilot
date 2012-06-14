@@ -35,6 +35,7 @@ struct RawVec
 	jblas::vec data;
 	double arrival;
 	RawVec(unsigned n): data(n), arrival(0.) {}
+	void resize(unsigned n) { data.resize(n); }
 	RawVec() {}
 };
 
@@ -195,18 +196,40 @@ class HardwareSensorAbstract
 class HardwareSensorProprioAbstract: public HardwareSensorAbstract<RawVec>
 {
 	public:
-		enum Quantity { qPos, qOriQuat, qOriEuler, qVel, qAbsVel, qAngVel, qAbsAngVel, qAcc, qAbsAcc, qNQuantity };
+		/**
+		 * @brief enumerates the different quantities that a proprioceptive sensor can provide
+		 * @param qPos position (x y z)
+		 * @param qOriQuat orientation as a quaternion (qx qy qz qw)
+		 * @param qOriEuler orientation as euler angles (ex ey ez)
+		 * @param qVel linear velocity in the sensor's frame (vx vy vz)
+		 * @param qAbsVel linear velocity in the world's frame (vx vy vz)
+		 * @param qAngVel angular velocity in the sensor's frame (wx wy wz)
+		 * @param qAbsAngVel angular velocity in the world's frame (wx wy wz)
+		 * @param qAcc acceleration in the sensor's frame (ax ay az)
+		 * @param qAbsAcc acceleration in the world's frame (ax ay az)
+		 * @param qBundleobs observation of the direction between the robot and some known position (landmark, robot, ...) (x y z ux uy uz).
+		 *                   Note that the observation can be made by the robot itself or by something else and sent to the robot, but
+		 *                   the convention is that in any case (ux,uy,uz) must be oriented from the robot.
+		 */
+		enum Quantity { qPos, qOriQuat, qOriEuler, qVel, qAbsVel, qAngVel, qAbsAngVel, qAcc, qAbsAcc, qBundleobs, qNQuantity };
+		static const int QuantityDataSizes[qNQuantity];
+		static const int QuantityObsSizes[qNQuantity];
 	private:
-		size_t quantities[qNQuantity];
+		int quantities[qNQuantity];
 		size_t data_size;
+		size_t obs_size;
+		bool full_cov;
 	protected:
-		void addQuantity(Quantity quantity, size_t index, size_t size) { quantities[quantity] = index; data_size += size; }
-		void clearQuantities() { for(int i = 0; i < qNQuantity; ++i) quantities[i] = 0; data_size = 0; }
+		void addQuantity(Quantity quantity) { quantities[quantity] = data_size+1; data_size += QuantityDataSizes[quantity]; obs_size += QuantityObsSizes[quantity]; }
+		void clearQuantities() { for(int i = 0; i < qNQuantity; ++i) quantities[i] = -1; data_size = obs_size = 0; }
 	public:
-		HardwareSensorProprioAbstract(kernel::VariableCondition<int> &condition, unsigned bufferSize):
-			HardwareSensorAbstract<RawVec>(condition, bufferSize) { clearQuantities(); }
-		int dataSize() { return data_size; } /// number of measure variables provided (without timestamp and variance)
-		inline size_t getQuantity(Quantity quantity) { return quantities[quantity]; } /// get index of quantity, 0 if not measured
+		HardwareSensorProprioAbstract(kernel::VariableCondition<int> &condition, unsigned bufferSize, bool fullCov):
+			HardwareSensorAbstract<RawVec>(condition, bufferSize), full_cov(fullCov) { clearQuantities(); }
+		size_t dataSize() { return data_size; } /// number of measure variables provided (without timestamp and variance)
+		size_t obsSize() { return obs_size; } /// number of observation variables among measure variables (that can be predicted from the robot state and the rest of the measure variables)
+		size_t readingSize() { if (full_cov) return 1+data_size*(data_size+3)/2; else return 1+data_size*2; } /// the size of a reading vector that stores everything
+		size_t getQuantity(Quantity quantity) { return quantities[quantity]; } /// get index of quantity, -1 if not measured
+		bool hasFullCov() { return full_cov; } /// does this hardware sensor return full covariance matrices with data?
 };
 
 class HardwareSensorExteroAbstract: public HardwareSensorAbstract<raw_ptr_t>

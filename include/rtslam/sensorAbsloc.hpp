@@ -43,9 +43,16 @@ namespace jafar {
 				jblas::mat EXP_rs;
 				jblas::mat INN_rs;
 				jblas::mat EXP_q;
-				int inns;
+				int inns; /// innovation size
+				int dats; /// data size
 				bool absolute;
 				bool first;
+
+			private:
+				size_t indexE_OriEuler, indexE_Pos, indexE_Bundleobs; /// indexes in expectation
+				int indexD_Pos, indexD_OriEuler, indexD_Bundleobs; /// indexes in sensor's data
+				bool full_cov;
+
 			public:
 				/**
 					@param absolute do we estimate the absolute position as returned by the sensor,
@@ -55,14 +62,15 @@ namespace jafar {
 				SensorAbsloc(const robot_ptr_t & robPtr, const filtered_obj_t inFilter = UNFILTERED, bool absolute = false):
 				  SensorProprioAbstract(robPtr, inFilter),
 					ia_rs(ia_globalPose), innovation(NULL), measurement(NULL), expectation(NULL),
-					inns(0), absolute(absolute), first(true)
+					inns(0), dats(0), absolute(absolute), first(true)
 				{}
 				~SensorAbsloc() { delete innovation; delete measurement; }
 				virtual void setHardwareSensor(hardware::hardware_sensorprop_ptr_t hardwareSensorPtr_)
 				{
 					hardwareSensorPtr = hardwareSensorPtr_;
 					// initialize jacobians and innovation sizes
-					inns = hardwareSensorPtr->dataSize();
+					inns = hardwareSensorPtr->obsSize();
+					dats = hardwareSensorPtr->dataSize();
 					innovation = new Innovation(inns);
 					measurement = new Measurement(inns);
 					expectation = new Expectation(inns);
@@ -77,12 +85,26 @@ namespace jafar {
 					RawInfos infos;
 					queryAvailableRaws(infos);
 
+					// initialize type of data the hardware sensor is providing
+					size_t indexE = 0; // current index when building expectation
+
+					indexD_Pos = hardwareSensorPtr->getQuantity(hardware::HardwareSensorProprioAbstract::qPos);
+					if (indexD_Pos >= 0) { indexE_Pos = indexE; indexE += hardwareSensorPtr->QuantityObsSizes[hardware::HardwareSensorProprioAbstract::qPos]; }
+
+					indexD_OriEuler = hardwareSensorPtr->getQuantity(hardware::HardwareSensorProprioAbstract::qOriEuler);
+					if (indexD_OriEuler >= 0) { indexE_OriEuler = indexE; indexE += hardwareSensorPtr->QuantityObsSizes[hardware::HardwareSensorProprioAbstract::qOriEuler]; }
+
+					indexD_Bundleobs = hardwareSensorPtr->getQuantity(hardware::HardwareSensorProprioAbstract::qBundleobs);
+					if (indexD_Bundleobs >= 0) { indexE_Bundleobs = indexE; indexE += hardwareSensorPtr->QuantityObsSizes[hardware::HardwareSensorProprioAbstract::qBundleobs]; }
+
+					full_cov = hardwareSensorPtr->hasFullCov();
+
 					// find minimum variance
 					jblas::vec3 min_var; min_var(0) = min_var(1) = min_var(2) = 1e3;
 					for(std::vector<RawInfo>::iterator it = infos.available.begin(); it != infos.available.end(); ++it)
 					{
 						hardwareSensorPtr->observeRaw((*it).id, reading);
-						for(int i = 0; i < 3; ++i) if (reading.data(i+1+inns) < min_var(i)) min_var(i) = reading.data(i+1+inns);
+						for(int i = 0; i < 3; ++i) if (reading.data(i+1+dats) < min_var(i)) min_var(i) = reading.data(i+1+dats);
 						if ((*it).id == id) break;
 					}
 
@@ -93,14 +115,14 @@ namespace jafar {
 					{
 						hardwareSensorPtr->observeRaw((*it).id, reading);
 						for(int i = 0; i < 3; ++i)
-							if (reading.data(i+1+inns) < 2*min_var(i))
-								{ average(i) += reading.data(i+1)*reading.data(i+1+inns); sum_coeffs(i) += reading.data(i+1+inns); }
+							if (reading.data(i+1+dats) < 2*min_var(i))
+								{ average(i) += reading.data(i+1)*reading.data(i+1+dats); sum_coeffs(i) += reading.data(i+1+dats); }
 						if ((*it).id == id) break;
 					}
 					for(int i = 0; i < 3; ++i) average(i) /= sum_coeffs(i);
 
 					// now initialize the robot state with this variance
-					for(int i = 0; i < 3; ++i) { reading.data(i+1) = average(i); reading.data(i+1+inns) = min_var(i); }
+					for(int i = 0; i < 3; ++i) { reading.data(i+1) = average(i); reading.data(i+1+dats) = min_var(i); }
 				}
 				
 
@@ -112,40 +134,31 @@ namespace jafar {
 						hardwareSensorPtr->getRaw(id, reading);
 
 					EXP_rs.clear();
+					expectation->P() = jblas::zero_mat(inns);
 					jblas::vec T = ublas::subrange(pose.x(), 0, 3);
 					jblas::vec r = ublas::subrange(pose.x(), 3, 7);
 					jblas::vec p = ublas::subrange(robotPtr()->pose.x(), 0, 3);
 					jblas::vec q = ublas::subrange(robotPtr()->pose.x(), 3, 7);
 					jblas::vec Tr = quaternion::rotate(q,T);
 
-					size_t indexE = 0;
-					size_t indexE_OriEuler = 0, indexE_Pos = 0;
-					size_t indexD_OriEuler = hardwareSensorPtr->getQuantity(hardware::HardwareSensorProprioAbstract::qOriEuler);
-					size_t indexD_Pos = hardwareSensorPtr->getQuantity(hardware::HardwareSensorProprioAbstract::qPos);
-
 					// POSITION
-					if (indexD_Pos)
+					if (indexD_Pos >= 0)
 					{
 						// compute expectation->x and EXP_rs
 						quaternion::rotate_by_dq(q, T, EXP_q);
-						ublas::subrange(EXP_rs, indexE,indexE+3, 0,3) = jblas::identity_mat(3);
-						ublas::subrange(EXP_rs, indexE,indexE+3, 3,7) = EXP_q;
-						ublas::subrange(expectation->x(), indexE,indexE+3) = p + Tr;
+						ublas::subrange(EXP_rs, indexE_Pos,indexE_Pos+3, 0,3) = jblas::identity_mat(3);
+						ublas::subrange(EXP_rs, indexE_Pos,indexE_Pos+3, 3,7) = EXP_q;
+						ublas::subrange(expectation->x(), indexE_Pos,indexE_Pos+3) = p + Tr;
 
 						// fill measurement
-						ublas::subrange(measurement->x(), indexE,indexE+3) = ublas::subrange(reading.data, indexD_Pos,indexD_Pos+3) - robotPtr()->origin_sensors;
-						measurement->P()(0,0) = jmath::sqr(reading.data(indexD_Pos+0+inns));
-						measurement->P()(1,1) = jmath::sqr(reading.data(indexD_Pos+1+inns));
-						measurement->P()(2,2) = jmath::sqr(reading.data(indexD_Pos+2+inns));
+						ublas::subrange(measurement->x(), indexE_Pos,indexE_Pos+3) = ublas::subrange(reading.data, indexD_Pos,indexD_Pos+3) - robotPtr()->origin_sensors;
+						for(int i = 0; i < 3; ++i) measurement->P()(indexE_Pos+i,indexE_Pos+i) = jmath::sqr(reading.data(indexD_Pos+i+dats));
 
 						// TODO gating ?
-
-						indexE_Pos = indexE;
-						indexE += 3;
 					}
 
 					// ORIENTATION EULER
-					if (indexD_OriEuler)
+					if (indexD_OriEuler >= 0)
 					{
 						// compute expectation->x and EXP_rs
 						jblas::mat QR_q(4,4), E_qr(3,4);
@@ -153,17 +166,53 @@ namespace jafar {
 						jblas::vec4 qr = quaternion::qProd(q, r);
 						quaternion::qProd_by_dq1(r, QR_q);
 						quaternion::q2e(qr, e, E_qr);
-						ublas::subrange(expectation->x(), indexE,indexE+3) = e;
-						ublas::subrange(EXP_rs, indexE,indexE+3, 3,7) = ublas::prod(E_qr, QR_q);
+						ublas::subrange(expectation->x(), indexE_OriEuler,indexE_OriEuler+3) = e;
+						ublas::subrange(EXP_rs, indexE_OriEuler,indexE_OriEuler+3, 3,7) = ublas::prod(E_qr, QR_q);
 
 						// fill measurement
-						ublas::subrange(measurement->x(), indexE,indexE+3) = ublas::subrange(reading.data, indexD_OriEuler,indexD_OriEuler+3);
-						measurement->P()(3,3) = jmath::sqr(reading.data(indexD_OriEuler+0+inns));
-						measurement->P()(4,4) = jmath::sqr(reading.data(indexD_OriEuler+1+inns));
-						measurement->P()(5,5) = jmath::sqr(reading.data(indexD_OriEuler+2+inns));
+						ublas::subrange(measurement->x(), indexE_OriEuler,indexE_OriEuler+3) = ublas::subrange(reading.data, indexD_OriEuler,indexD_OriEuler+3);
+						for(int i = 0; i < 3; ++i) measurement->P()(indexE_OriEuler+i,indexE_OriEuler+i) = jmath::sqr(reading.data(indexD_OriEuler+i+dats));
+					}
 
-						indexE_OriEuler = indexE;
-						indexE += 3;
+					// BUNDLE OBSERVATION
+					if (indexD_Bundleobs >= 0)
+					{
+						// get data
+						jblas::vec3 pos = ublas::subrange(reading.data, indexD_Bundleobs+0,indexD_Bundleobs+3);
+						jblas::vec3 dir = ublas::subrange(reading.data, indexD_Bundleobs+3,indexD_Bundleobs+6);
+
+						// compute expectation->x and EXP_rs and expectation->P
+						jblas::mat33 U_p;
+						jblas::vec3 u = pos-p;
+						jmath::ublasExtra::normalizeJac(u, U_p);
+						jmath::ublasExtra::normalize(u);
+						ublas::subrange(expectation->x(), indexE_Bundleobs,indexE_Bundleobs+3) = u;
+						ublas::subrange(EXP_rs, indexE_Bundleobs,indexE_Bundleobs+3, 0,3) = -U_p;
+
+						jblas::sym_mat33 Pos; Pos.clear();
+						if (full_cov)
+						{
+							Pos = ublasExtra::createSymMat(reading.data, dats+1, dats, 0, 3);
+//							for(int i = 0; i < 3; ++i)
+//							{
+//								int k = dats+1 + (dats)*(dats+1)/2 - (dats-i)*(dats-i+1)/2;
+//								for(int j = i; j < 3; ++j) Pos(i,j) = reading.data(k+(j-i));
+//							}
+						} else
+						{
+							for(int i = 0; i < 3; ++i) Pos(i,i) = reading.data(indexE_Bundleobs+i+dats);
+						}
+						ublas::subrange(expectation->P(), indexE_Bundleobs,indexE_Bundleobs+3, indexE_Bundleobs,indexE_Bundleobs+3) = prod_JPJt(Pos, U_p);
+
+						// fill measurement
+						ublas::subrange(measurement->x(), indexE_Bundleobs,indexE_Bundleobs+3) = dir;
+						ublas::subrange(measurement->P(), indexE_Bundleobs,indexE_Bundleobs+3, indexE_Bundleobs,indexE_Bundleobs+3) =
+							ublasExtra::createSymMat(reading.data, dats+1, dats, 3, 3);
+//						for(int i = 0; i < 3; ++i)
+//						{
+//							int k = dats+1 + (dats)*(dats+1)/2 - (dats-(i+3))*(dats-(i+3)+1)/2;
+//							for(int j = i; j < 3; ++j) measurement->P()(indexE_Bundleobs+i,indexE_Bundleobs+j) = reading.data(k+(j-i));
+//						}
 					}
 
 
@@ -213,7 +262,7 @@ namespace jafar {
 					} else
 					{
 						// compute expectation->P and innovation
-						ublas::subrange(expectation->P(), 0,inns, 0,inns) = ublasExtra::prod_JPJt(ublas::project(robotPtr()->mapPtr()->filterPtr->P(), ia_rs, ia_rs), EXP_rs);
+						expectation->P() += ublasExtra::prod_JPJt(ublas::project(robotPtr()->mapPtr()->filterPtr->P(), ia_rs, ia_rs), EXP_rs);
 						innovation->x() = measurement->x() - expectation->x();
 						innovation->P() = measurement->P() + expectation->P();
 						INN_rs = -EXP_rs;

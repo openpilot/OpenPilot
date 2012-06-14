@@ -103,10 +103,11 @@ namespace hardware {
 	
 	
 	HardwareSensorGpsGenom::HardwareSensorGpsGenom(kernel::VariableCondition<int> &condition, unsigned bufferSize, const std::string machine, int mode, std::string dump_path):
-		HardwareSensorProprioAbstract(condition, bufferSize), reading(7), mode(mode), dump_path(dump_path)
+		HardwareSensorProprioAbstract(condition, bufferSize, false), mode(mode), dump_path(dump_path)
 	{
-		addQuantity(qPos, 1, 3);
-		//addQuantity(qAbsVel, 4, 3);
+		addQuantity(qPos);
+		//addQuantity(qAbsVel);
+		reading.resize(readingSize());
 		// configure
 		if (mode == 0 || mode == 1)
 		{

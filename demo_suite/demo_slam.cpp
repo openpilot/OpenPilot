@@ -161,6 +161,7 @@
 #include "rtslam/hardwareSensorGpsGenom.hpp"
 #include "rtslam/hardwareSensorMocap.hpp"
 #include "rtslam/hardwareEstimatorOdo.hpp" 
+#include "rtslam/hardwareSensorExternalLoc.hpp"
 
 #include "rtslam/display_qt.hpp"
 #include "rtslam/display_gdhe.hpp"

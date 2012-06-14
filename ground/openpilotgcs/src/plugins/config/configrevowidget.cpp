@@ -311,9 +311,9 @@ void ConfigRevoWidget::doGetAccelBiasData(UAVObject *obj)
         RevoCalibration::DataFields revoCalibrationData = revoCalibration->getData();
         revoCalibrationData.BiasCorrectedRaw = RevoCalibration::BIASCORRECTEDRAW_TRUE;
 
-        revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_X] -= listMean(accel_accum_x);
-        revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Y] -= listMean(accel_accum_y);
-        revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Z] -= GRAVITY + listMean(accel_accum_z);
+        revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_X] += listMean(accel_accum_x);
+        revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Y] += listMean(accel_accum_y);
+        revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Z] += ( listMean(accel_accum_z) + GRAVITY );
 
         revoCalibration->setData(revoCalibrationData);
         revoCalibration->updated();
@@ -685,7 +685,6 @@ void ConfigRevoWidget::doStartSixPointCalibration()
    m_ui->sixPointsStart->setEnabled(false);
    m_ui->sixPointsSave->setEnabled(true);
    position = 0;
-   qDebug() << "Starting";
 }
 
 

@@ -40,6 +40,7 @@
 #include <iostream>
 #include <QDesktopServices>
 #include <QUrl>
+#include <attitudesettings.h>
 #include <revocalibration.h>
 #include <homelocation.h>
 #include <accels.h>
@@ -214,15 +215,10 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     autoLoadWidgets();
 
     // Connect the signals
-    connect(m_ui->accelBiasStart, SIGNAL(clicked()), this, SLOT(launchAccelBiasCalibration()));
+    connect(m_ui->accelBiasStart, SIGNAL(clicked()), this, SLOT(doStartAccelGyroBiasCalibration()));
     connect(m_ui->sixPointsStart, SIGNAL(clicked()), this, SLOT(doStartSixPointCalibration()));
     connect(m_ui->sixPointsSave, SIGNAL(clicked()), this, SLOT(savePositionData()));
     connect(m_ui->noiseMeasurementStart, SIGNAL(clicked()), this, SLOT(doStartNoiseMeasurement()));
-
-    // Leave this timer permanently connected.  The timer itself is started and stopped.
-    connect(&progressBarTimer, SIGNAL(timeout()), this, SLOT(incrementProgress()));
-
-    // Connect the help button
 }
 
 ConfigRevoWidget::~ConfigRevoWidget()
@@ -248,11 +244,10 @@ void ConfigRevoWidget::resizeEvent(QResizeEvent *event)
     m_ui->sixPointsHelp->fitInView(paperplane,Qt::KeepAspectRatio);
 }
 
-
 /**
-  Starts an accelerometer bias calibration.
+  * Starts an accelerometer bias calibration.
   */
-void ConfigRevoWidget::launchAccelBiasCalibration()
+void ConfigRevoWidget::doStartAccelGyroBiasCalibration()
 {
     m_ui->accelBiasStart->setEnabled(false);
     m_ui->accelBiasProgress->setValue(0);
@@ -264,47 +259,98 @@ void ConfigRevoWidget::launchAccelBiasCalibration()
     revoCalibration->setData(revoCalibrationData);
     revoCalibration->updated();
 
+    // Disable gyro bias correction while calibrating
+    AttitudeSettings * attitudeSettings = AttitudeSettings::GetInstance(getObjectManager());
+    Q_ASSERT(attitudeSettings);
+    AttitudeSettings::DataFields attitudeSettingsData = attitudeSettings->getData();
+    attitudeSettingsData.BiasCorrectGyro = AttitudeSettings::BIASCORRECTGYRO_FALSE;
+    attitudeSettings->setData(attitudeSettingsData);
+    attitudeSettings->updated();
+
     accel_accum_x.clear();
     accel_accum_y.clear();
     accel_accum_z.clear();
+    gyro_accum_x.clear();
+    gyro_accum_y.clear();
+    gyro_accum_z.clear();
+
+    UAVObject::Metadata mdata;
 
     /* Need to get as many accel updates as possible */
     Accels * accels = Accels::GetInstance(getObjectManager());
     Q_ASSERT(accels);
     initialAccelsMdata = accels->getMetadata();
-    UAVObject::Metadata mdata = initialAccelsMdata;
+    mdata = initialAccelsMdata;
     UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
     mdata.flightTelemetryUpdatePeriod = 100;
     accels->setMetadata(mdata);
 
+    Gyros * gyros = Gyros::GetInstance(getObjectManager());
+    Q_ASSERT(gyros);
+    initialGyrosMdata = gyros->getMetadata();
+    mdata = initialGyrosMdata;
+    UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
+    mdata.flightTelemetryUpdatePeriod = 100;
+    gyros->setMetadata(mdata);
+
     // Now connect to the accels and mag updates, gather for 100 samples
     collectingData = true;
-    connect(accels, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(doGetAccelBiasData(UAVObject*)));
+    connect(accels, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(doGetAccelGyroBiasData(UAVObject*)));
+    connect(gyros, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(doGetAccelGyroBiasData(UAVObject*)));
 }
 
 /**
   Updates the accel bias raw values
   */
-void ConfigRevoWidget::doGetAccelBiasData(UAVObject *obj)
+void ConfigRevoWidget::doGetAccelGyroBiasData(UAVObject *obj)
 {
-    Q_UNUSED(obj);
+    QMutexLocker lock(&sensorsUpdateLock);
+    Q_UNUSED(lock);
 
-    Accels * accels = Accels::GetInstance(getObjectManager());
-    Q_ASSERT(accels);
-    Accels::DataFields accelsData = accels->getData();
+    switch(obj->getObjID()) {
+    case Accels::OBJID:
+    {
+        Accels * accels = Accels::GetInstance(getObjectManager());
+        Q_ASSERT(accels);
+        Accels::DataFields accelsData = accels->getData();
 
-    // This is necessary to prevent a race condition on disconnect signal and another update
-    if (collectingData == true) {
         accel_accum_x.append(accelsData.x);
         accel_accum_y.append(accelsData.y);
         accel_accum_z.append(accelsData.z);
+        break;
+    }
+    case Gyros::OBJID:
+    {
+        Gyros * gyros = Gyros::GetInstance(getObjectManager());
+        Q_ASSERT(gyros);
+        Gyros::DataFields gyrosData = gyros->getData();
+
+        gyro_accum_x.append(gyrosData.x);
+        gyro_accum_y.append(gyrosData.y);
+        gyro_accum_z.append(gyrosData.z);
+        break;
+    }
+    default:
+        Q_ASSERT(0);
     }
 
-    m_ui->accelBiasProgress->setValue(m_ui->accelBiasProgress->value()+1);
+    // Work out the progress based on whichever has less
+    double p1 = (double) accel_accum_x.size() / (double) NOISE_SAMPLES;
+    double p2 = (double) accel_accum_y.size() / (double) NOISE_SAMPLES;
+    m_ui->accelBiasProgress->setValue(((p1 < p2) ? p1 : p2) * 100);
 
-    if(accel_accum_x.size() >= 100 && collectingData == true) {
+    if(accel_accum_x.size() >= NOISE_SAMPLES &&
+            gyro_accum_y.size() >= NOISE_SAMPLES &&
+            collectingData == true) {
+
         collectingData = false;
-        disconnect(accels,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(doGetAccelBiasData(UAVObject*)));
+
+        Accels * accels = Accels::GetInstance(getObjectManager());
+        Gyros * gyros = Gyros::GetInstance(getObjectManager());
+
+        disconnect(accels,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(doGetAccelGyroBiasData(UAVObject*)));
+        disconnect(gyros,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(doGetAccelGyroBiasData(UAVObject*)));
+
         m_ui->accelBiasStart->setEnabled(true);
 
         RevoCalibration * revoCalibration = RevoCalibration::GetInstance(getObjectManager());
@@ -312,34 +358,26 @@ void ConfigRevoWidget::doGetAccelBiasData(UAVObject *obj)
         RevoCalibration::DataFields revoCalibrationData = revoCalibration->getData();
         revoCalibrationData.BiasCorrectedRaw = RevoCalibration::BIASCORRECTEDRAW_TRUE;
 
+        // Update the biases based on collected data
         revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_X] += listMean(accel_accum_x);
         revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Y] += listMean(accel_accum_y);
         revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Z] += ( listMean(accel_accum_z) + GRAVITY );
+        revoCalibrationData.gyro_bias[RevoCalibration::GYRO_BIAS_X] = listMean(gyro_accum_x);
+        revoCalibrationData.gyro_bias[RevoCalibration::GYRO_BIAS_Y] = listMean(gyro_accum_y);
+        revoCalibrationData.gyro_bias[RevoCalibration::GYRO_BIAS_Z] = listMean(gyro_accum_z);
 
         revoCalibration->setData(revoCalibrationData);
         revoCalibration->updated();
 
+        AttitudeSettings * attitudeSettings = AttitudeSettings::GetInstance(getObjectManager());
+        Q_ASSERT(attitudeSettings);
+        AttitudeSettings::DataFields attitudeSettingsData = attitudeSettings->getData();
+        attitudeSettingsData.BiasCorrectGyro = AttitudeSettings::BIASCORRECTGYRO_TRUE;
+        attitudeSettings->setData(attitudeSettingsData);
+        attitudeSettings->updated();
+
         accels->setMetadata(initialAccelsMdata);
-    }
-}
-
-/**
-  Increment progress bar for noise measurements (not really based on feedback)
-  */
-void ConfigRevoWidget::incrementProgress()
-{
-    m_ui->noiseMeasurementProgress->setValue(m_ui->noiseMeasurementProgress->value()+1);
-    if (m_ui->noiseMeasurementProgress->value() >= m_ui->noiseMeasurementProgress->maximum()) {
-        progressBarTimer.stop();
-
-        RevoCalibration * revoCalibration = RevoCalibration::GetInstance(getObjectManager());
-        Q_ASSERT(revoCalibration);
-        disconnect(revoCalibration, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(noiseMeasured()));
-        collectingData = false;
-
-        QErrorMessage err(this);
-        err.showMessage("Noise measurement timed out.  State undetermined.  Please power cycle.");
-        err.exec();
+        gyros->setMetadata(initialGyrosMdata);
     }
 }
 

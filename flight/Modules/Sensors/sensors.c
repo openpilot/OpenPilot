@@ -88,6 +88,7 @@ static float mag_bias[3] = {0,0,0};
 static float mag_scale[3] = {0,0,0};
 static float accel_bias[3] = {0,0,0};
 static float accel_scale[3] = {0,0,0};
+static float gyro_bias[3] = {0,0,0};
 
 static float R[3][3] = {{0}};
 static int8_t rotate = 0;
@@ -379,9 +380,9 @@ static void SensorsTask(void *parameters)
 			// Apply bias correction to the gyros
 			GyrosBiasData gyrosBias;
 			GyrosBiasGet(&gyrosBias);
-			gyrosData.x += gyrosBias.x;
-			gyrosData.y += gyrosBias.y;
-			gyrosData.z += gyrosBias.z;
+			gyrosData.x += gyrosBias.x - gyro_bias[0];
+			gyrosData.y += gyrosBias.y - gyro_bias[1];
+			gyrosData.z += gyrosBias.z - gyro_bias[2];
 		}
 		GyrosSet(&gyrosData);
 		
@@ -448,9 +449,13 @@ static void settingsUpdatedCb(UAVObjEvent * objEv) {
 	accel_scale[0] = cal.accel_scale[REVOCALIBRATION_ACCEL_SCALE_X];
 	accel_scale[1] = cal.accel_scale[REVOCALIBRATION_ACCEL_SCALE_Y];
 	accel_scale[2] = cal.accel_scale[REVOCALIBRATION_ACCEL_SCALE_Z];
+	gyro_bias[0] = cal.gyro_bias[REVOCALIBRATION_GYRO_BIAS_X];
+	gyro_bias[1] = cal.gyro_bias[REVOCALIBRATION_GYRO_BIAS_Y];
+	gyro_bias[2] = cal.gyro_bias[REVOCALIBRATION_GYRO_BIAS_Z];
 
 	AttitudeSettingsData attitudeSettings;
 	AttitudeSettingsGet(&attitudeSettings);
+	bias_correct_gyro = (attitudeSettings.BiasCorrectGyro == ATTITUDESETTINGS_BIASCORRECTGYRO_TRUE);
 
 	// Indicates not to expend cycles on rotation
 	if(attitudeSettings.BoardRotation[0] == 0 && attitudeSettings.BoardRotation[1] == 0 &&

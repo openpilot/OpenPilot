@@ -55,6 +55,9 @@ private:
     void drawVariancesGraph();
     void displayPlane(QString elementID);
 
+    //! Computes the scale and bias of the mag based on collected data
+    void computeScaleBias();
+
     Ui_RevoSensorsWidget *m_ui;
     QGraphicsSvgItem *paperplane;
     QGraphicsSvgItem *sensorsBargraph;
@@ -70,8 +73,6 @@ private:
     QMutex sensorsUpdateLock;
     double maxBarHeight;
     int phaseCounter;
-    int progressBarIndex;
-    QTimer progressBarTimer;
     const static double maxVarValue;
     const static int calibrationDelay = 10;
 
@@ -100,15 +101,17 @@ private:
     static const int NOISE_SAMPLES = 100;
 
 private slots:
-    void launchAccelBiasCalibration();
-    void incrementProgress();
-
+    //! Overriden method from the configTaskWidget to update UI
     virtual void refreshWidgetsValues(UAVObject * obj=NULL);
-    void savePositionData();
-    void computeScaleBias();
+
+    // Slots for calibrating the mags
     void doStartSixPointCalibration();
     void doGetSixPointCalibrationMeasurement(UAVObject * obj);
-    void doGetAccelBiasData(UAVObject*);
+    void savePositionData();
+
+    // Slots for calibrating the accel and gyro
+    void doStartAccelGyroBiasCalibration();
+    void doGetAccelGyroBiasData(UAVObject*);
 
     // Slots for measuring the sensor noise
     void doStartNoiseMeasurement();

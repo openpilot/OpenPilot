@@ -369,6 +369,9 @@ namespace mapcontrol
         void WPSetVisibleAll(bool value);
         WayPointItem *magicWPCreate();
         bool WPPresent();
+        void WPDelete(int number);
+        WayPointItem *WPFind(int number);
+        void setSelectedWP(QList<WayPointItem *> list);
     private:
         internals::Core *core;
         MapGraphicItem *map;
@@ -434,6 +437,9 @@ namespace mapcontrol
         * @param number number of the deleted WayPoint
         */
         void WPDeleted(int const& number,WayPointItem* waypoint);
+
+        void WPLocalPositionChanged(QPointF,WayPointItem*);
+        void WPManualCoordChange(WayPointItem*);
         /**
         * @brief Fires When a WayPoint is Reached
         *
@@ -493,11 +499,13 @@ namespace mapcontrol
         */
         void OnTilesStillToLoad(int number);
         void OnWayPointDoubleClicked(WayPointItem * waypoint);
+        void selectedWPChanged(QList<WayPointItem*>);
     public slots:
         /**
         * @brief Ripps the current selection to the DB
         */
         void RipMap();
+        void OnSelectionChanged();
 
     };
 }

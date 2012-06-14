@@ -1,4 +1,4 @@
-QT      +=  webkit network
+QT += xml
 TEMPLATE = lib
 TARGET = OPMapGadget
 include(../../openpilotgcsplugin.pri)
@@ -15,12 +15,13 @@ HEADERS += opmapplugin.h \
     opmapgadgetconfiguration.h \
     opmapgadget.h \
     opmapgadgetwidget.h \
-    opmap_waypointeditor_dialog.h \
     opmap_edit_waypoint_dialog.h \
     opmap_zoom_slider_widget.h \
     opmap_statusbar_widget.h \
-    opmap_overlay_widget.h \
-    pathplanmanager.h
+    flightdatamodel.h \
+    modelmapproxy.h \
+    widgetdelegates.h \
+    pathplanner.h
 
 SOURCES += opmapplugin.cpp \
     opmapgadgetwidget.cpp \
@@ -28,22 +29,22 @@ SOURCES += opmapplugin.cpp \
     opmapgadgetfactory.cpp \
     opmapgadgetconfiguration.cpp \
     opmapgadget.cpp \
-    opmap_waypointeditor_dialog.cpp \
     opmap_edit_waypoint_dialog.cpp \
     opmap_zoom_slider_widget.cpp \
     opmap_statusbar_widget.cpp \
-    opmap_overlay_widget.cpp \
-    pathplanmanager.cpp
+    flightdatamodel.cpp \
+    modelmapproxy.cpp \
+    widgetdelegates.cpp \
+    pathplanner.cpp
 
 OTHER_FILES += OPMapGadget.pluginspec
 
 FORMS += opmapgadgetoptionspage.ui \
     opmap_widget.ui \
-    opmap_waypointeditor_dialog.ui \
     opmap_edit_waypoint_dialog.ui \
     opmap_zoom_slider_widget.ui \
     opmap_statusbar_widget.ui \
     opmap_overlay_widget.ui \
-    pathplanmanager.ui
+    pathplanner.ui
 
 RESOURCES += opmap.qrc

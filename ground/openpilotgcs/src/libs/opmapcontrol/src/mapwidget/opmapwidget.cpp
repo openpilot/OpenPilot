@@ -55,6 +55,7 @@ namespace mapcontrol
         connect(map->core,SIGNAL(OnTileLoadStart()),this,SIGNAL(OnTileLoadStart()));
         connect(map->core,SIGNAL(OnTilesStillToLoad(int)),this,SIGNAL(OnTilesStillToLoad(int)));
         connect(map,SIGNAL(wpdoubleclicked(WayPointItem*)),this,SIGNAL(OnWayPointDoubleClicked(WayPointItem*)));
+        connect(&mscene,SIGNAL(selectionChanged()),this,SLOT(OnSelectionChanged()));
         SetShowDiagnostics(showDiag);
         this->setMouseTracking(followmouse);
         SetShowCompass(true);
@@ -301,6 +302,37 @@ namespace mapcontrol
         emit WPDeleted(item->Number(),item);
         delete item;
     }
+    void OPMapWidget::WPDelete(int number)
+    {
+        foreach(QGraphicsItem* i,map->childItems())
+        {
+            WayPointItem* w=qgraphicsitem_cast<WayPointItem*>(i);
+            if(w)
+            {
+                if(w->Number()==number)
+                {
+                    emit WPDeleted(w->Number(),w);
+                    delete w;
+                    return;
+                }
+            }
+        }
+    }
+    WayPointItem * OPMapWidget::WPFind(int number)
+    {
+        foreach(QGraphicsItem* i,map->childItems())
+        {
+            WayPointItem* w=qgraphicsitem_cast<WayPointItem*>(i);
+            if(w)
+            {
+                if(w->Number()==number)
+                {
+                    return w;
+                }
+            }
+        }
+        return NULL;
+    }
     void OPMapWidget::WPSetVisibleAll(bool value)
     {
         foreach(QGraphicsItem* i,map->childItems())
@@ -378,6 +410,8 @@ namespace mapcontrol
     {
         connect(item,SIGNAL(WPNumberChanged(int,int,WayPointItem*)),this,SIGNAL(WPNumberChanged(int,int,WayPointItem*)),Qt::DirectConnection);
         connect(item,SIGNAL(WPValuesChanged(WayPointItem*)),this,SIGNAL(WPValuesChanged(WayPointItem*)),Qt::DirectConnection);
+        connect(item,SIGNAL(localPositionChanged(QPointF,WayPointItem*)),this,SIGNAL(WPLocalPositionChanged(QPointF,WayPointItem*)),Qt::DirectConnection);
+        connect(item,SIGNAL(manualCoordChange(WayPointItem*)),this,SIGNAL(WPManualCoordChange(WayPointItem*)),Qt::DirectConnection);
         connect(this,SIGNAL(WPInserted(int,WayPointItem*)),item,SLOT(WPInserted(int,WayPointItem*)),Qt::DirectConnection);
         connect(this,SIGNAL(WPNumberChanged(int,int,WayPointItem*)),item,SLOT(WPRenumbered(int,int,WayPointItem*)),Qt::DirectConnection);
         connect(this,SIGNAL(WPDeleted(int,WayPointItem*)),item,SLOT(WPDeleted(int,WayPointItem*)),Qt::DirectConnection);
@@ -437,5 +471,29 @@ namespace mapcontrol
     void OPMapWidget::RipMap()
     {
         new MapRipper(core,map->SelectedArea());
+    }
+
+    void OPMapWidget::setSelectedWP(QList<WayPointItem * >list)
+    {
+        this->scene()->clearSelection();
+        foreach(WayPointItem * wp,list)
+        {
+            wp->setSelected(true);
+        }
+    }
+
+    void OPMapWidget::OnSelectionChanged()
+    {
+        QList<QGraphicsItem*> list;
+        QList<WayPointItem*> wplist;
+        list=this->scene()->selectedItems();
+        foreach(QGraphicsItem* item,list)
+        {
+            WayPointItem * wp=qgraphicsitem_cast<WayPointItem*>(item);
+            if(wp)
+                wplist.append(wp);
+        }
+        if(wplist.length()>0)
+            emit selectedWPChanged(wplist);
     }
 }

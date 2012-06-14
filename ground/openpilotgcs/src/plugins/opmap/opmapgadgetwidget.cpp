@@ -48,7 +48,6 @@
 
 #include "positionactual.h"
 #include "homelocation.h"
-#include "pathplanmanager.h"
 #define allow_manual_home_location_move
 
 // *************************************************************************************
@@ -215,8 +214,15 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
         m_map->GPS->SetUAVPos(m_home_position.coord, 0.0);        // set the UAV position
 
 
-    pathPlanManager * plan=new pathPlanManager(new QWidget(),m_map);
-    plan->show();
+    model=new flightDataModel(this);
+    table=new pathPlanner();
+    selectionModel=new QItemSelectionModel(model);
+    proxy=new modelMapProxy(this,m_map,model,selectionModel);
+    table->setModel(model,selectionModel);
+    table->show();
+    waypoint_edit_dialog=new opmap_edit_waypoint_dialog(NULL,model,selectionModel);
+
+
 /*
     distBearing db;
     db.distance=100;
@@ -1684,12 +1690,9 @@ void OPMapGadgetWidget::onUAVTrailDistanceActGroup_triggered(QAction *action)
     m_map->UAV->SetTrailDistance(trail_distance);
 }
 
-/**
-  * TODO: unused for v1.0
-  **/
 void OPMapGadgetWidget::onOpenWayPointEditorAct_triggered()
 {
-    waypoint_editor_dialog.show();
+    //TODO
 }
 void OPMapGadgetWidget::onAddWayPointAct_triggeredFromContextMenu()
 {
@@ -1708,8 +1711,8 @@ void OPMapGadgetWidget::onAddWayPointAct_triggered(internals::PointLatLng coord)
     if (m_map_mode != Normal_MapMode)
         return;
 
-    m_map->WPCreate(coord, 0, "");
-
+   // m_map->WPCreate(coord, 0, "");
+    proxy->createWayPoint(coord);
 
             //wp->map_wp_item->picture.load(QString::fromUtf8(":/opmap/images/waypoint_marker1.png"));
             //wp->map_wp_item->picture.load(QString::fromUtf8(":/opmap/images/waypoint_marker2.png"));
@@ -1734,7 +1737,7 @@ void OPMapGadgetWidget::onEditWayPointAct_triggered()
     if (!m_mouse_waypoint)
         return;
 
-    waypoint_edit_dialog.editWaypoint(m_mouse_waypoint);
+    waypoint_edit_dialog->editWaypoint(m_mouse_waypoint);
 
     m_mouse_waypoint = NULL;
 }
@@ -1775,8 +1778,7 @@ void OPMapGadgetWidget::onDeleteWayPointAct_triggered()
     if (!m_mouse_waypoint)
         return;
 
-        // delete the waypoint from the map
-    m_map->WPDelete(m_mouse_waypoint);
+    proxy->deleteWayPoint(m_mouse_waypoint->Number());
 }
 
 void OPMapGadgetWidget::onClearWayPointsAct_triggered()
@@ -1787,7 +1789,7 @@ void OPMapGadgetWidget::onClearWayPointsAct_triggered()
     if (m_map_mode != Normal_MapMode)
         return;
 
-	m_map->WPDeleteAll();
+    proxy->deleteAll();
 
  }
 

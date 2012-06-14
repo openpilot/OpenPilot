@@ -41,6 +41,8 @@ struct distBearing
 {
     double distance;
     double bearing;
+    double bearingToDegrees(){return bearing*180/M_PI;}
+    void setBearingFromDegrees(double degrees){bearing=degrees*M_PI/180;}
 };
 class HomeItem;
 /**
@@ -227,9 +229,11 @@ signals:
     *
     * @param waypoint a pointer to this WayPoint
     */
+
     void WPValuesChanged(WayPointItem* waypoint);
     void waypointdoubleclick(WayPointItem* waypoint);
-    void localPositionChanged(QPointF point);
+    void localPositionChanged(QPointF point,WayPointItem* waypoint);
+    void manualCoordChange(WayPointItem *);
     void aboutToBeDeleted(WayPointItem *);
 };
 }

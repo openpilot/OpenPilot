@@ -28,48 +28,66 @@
 #include "opmap_edit_waypoint_dialog.h"
 #include "ui_opmap_edit_waypoint_dialog.h"
 #include "opmapcontrol/opmapcontrol.h"
+#include "widgetdelegates.h"
 // *********************************************************************
-typedef enum { MODE_FLYENDPOINT=0, MODE_FLYVECTOR=1, MODE_FLYCIRCLERIGHT=2, MODE_FLYCIRCLELEFT=3,
-               MODE_DRIVEENDPOINT=4, MODE_DRIVEVECTOR=5, MODE_DRIVECIRCLELEFT=6, MODE_DRIVECIRCLERIGHT=7,
-               MODE_FIXEDATTITUDE=8, MODE_SETACCESSORY=9, MODE_DISARMALARM=10 } ModeOptions;
-typedef enum { ENDCONDITION_NONE=0, ENDCONDITION_TIMEOUT=1, ENDCONDITION_DISTANCETOTARGET=2,
-               ENDCONDITION_LEGREMAINING=3, ENDCONDITION_ABOVEALTITUDE=4, ENDCONDITION_POINTINGTOWARDSNEXT=5,
-               ENDCONDITION_PYTHONSCRIPT=6, ENDCONDITION_IMMEDIATE=7 } EndConditionOptions;
-
 
 // constructor
-opmap_edit_waypoint_dialog::opmap_edit_waypoint_dialog(QWidget *parent) :
-    QDialog(parent, Qt::Dialog),
+opmap_edit_waypoint_dialog::opmap_edit_waypoint_dialog(QWidget *parent,QAbstractItemModel * model,QItemSelectionModel * selection) :
+    QWidget(parent),model(model),itemSelection(selection),
     ui(new Ui::opmap_edit_waypoint_dialog)
-{
+{  
     ui->setupUi(this);
     my_waypoint = NULL;
-    connect(ui->rbRelative,SIGNAL(toggled(bool)),this,SLOT(setupPositionWidgets(bool)));
+    connect(ui->checkBoxLocked,SIGNAL(toggled(bool)),this,SLOT(enableEditWidgets(bool)));
     connect(ui->cbMode,SIGNAL(currentIndexChanged(int)),this,SLOT(setupModeWidgets()));
     connect(ui->cbCondition,SIGNAL(currentIndexChanged(int)),this,SLOT(setupConditionWidgets()));
-    ui->cbMode->addItem("Fly Direct",MODE_FLYENDPOINT);
-    ui->cbMode->addItem("Fly Vector",MODE_FLYVECTOR);
-    ui->cbMode->addItem("Fly Circle Right",MODE_FLYCIRCLERIGHT);
-    ui->cbMode->addItem("Fly Circle Left",MODE_FLYCIRCLELEFT);
 
-    ui->cbMode->addItem("Drive Direct",MODE_DRIVEENDPOINT);
-    ui->cbMode->addItem("Drive Vector",MODE_DRIVEVECTOR);
-    ui->cbMode->addItem("Drive Circle Right",MODE_DRIVECIRCLELEFT);
-    ui->cbMode->addItem("Drive Circle Left",MODE_DRIVECIRCLERIGHT);
+    ComboBoxDelegate::loadComboBox(ui->cbMode,flightDataModel::MODE);
+    ComboBoxDelegate::loadComboBox(ui->cbCondition,flightDataModel::CONDITION);
+    ComboBoxDelegate::loadComboBox(ui->cbCommand,flightDataModel::COMMAND);
 
-    ui->cbMode->addItem("Fixed Attitude",MODE_FIXEDATTITUDE);
-    ui->cbMode->addItem("Set Accessory",MODE_SETACCESSORY);
-    ui->cbMode->addItem("Disarm Alarm",MODE_DISARMALARM);
+     //   VELOCITY,
 
-    ui->cbCondition->addItem("None",ENDCONDITION_NONE);
-    ui->cbCondition->addItem("Timeout",ENDCONDITION_TIMEOUT);
-    ui->cbCondition->addItem("Distance to tgt",ENDCONDITION_DISTANCETOTARGET);
-    ui->cbCondition->addItem("Leg remaining",ENDCONDITION_LEGREMAINING);
-    ui->cbCondition->addItem("Above Altitude",ENDCONDITION_ABOVEALTITUDE);
-    ui->cbCondition->addItem("Pointing towards next",ENDCONDITION_POINTINGTOWARDSNEXT);
-    ui->cbCondition->addItem("Python script",ENDCONDITION_PYTHONSCRIPT);
-    ui->cbCondition->addItem("Immediate",ENDCONDITION_IMMEDIATE);
+    mapper = new QDataWidgetMapper(this);
 
+    mapper->setItemDelegate(new ComboBoxDelegate(this));
+    connect(mapper,SIGNAL(currentIndexChanged(int)),this,SLOT(on_currentIndexChanged(int)));
+     mapper->setModel(model);
+     //mapper->addMapping(ui->spinBoxNumber,
+     mapper->addMapping(ui->checkBoxLocked,flightDataModel::LOCKED);
+     mapper->addMapping(ui->doubleSpinBoxLatitude,flightDataModel::LATPOSITION);
+     mapper->addMapping(ui->doubleSpinBoxLongitude,flightDataModel::LNGPOSITION);
+     mapper->addMapping(ui->doubleSpinBoxAltitude,flightDataModel::ALTITUDE);
+     mapper->addMapping(ui->lineEditDescription,flightDataModel::WPDESCRITPTION);
+     mapper->addMapping(ui->checkBoxRelative,flightDataModel::ISRELATIVE);
+     mapper->addMapping(ui->doubleSpinBoxBearing,flightDataModel::BEARELATIVE);
+     mapper->addMapping(ui->doubleSpinBoxVelocity,flightDataModel::VELOCITY);
+     mapper->addMapping(ui->spinBoxDistance,flightDataModel::DISRELATIVE);
+     mapper->addMapping(ui->cbMode,flightDataModel::MODE);
+     mapper->addMapping(ui->dsb_modeParam1,flightDataModel::MODE_PARAMS0);
+     mapper->addMapping(ui->dsb_modeParam2,flightDataModel::MODE_PARAMS1);
+     mapper->addMapping(ui->dsb_modeParam3,flightDataModel::MODE_PARAMS2);
+     mapper->addMapping(ui->dsb_modeParam4,flightDataModel::MODE_PARAMS3);
+
+     mapper->addMapping(ui->cbCondition,flightDataModel::CONDITION);
+     mapper->addMapping(ui->dsb_condParam1,flightDataModel::CONDITION_PARAMS0);
+     mapper->addMapping(ui->dsb_condParam2,flightDataModel::CONDITION_PARAMS1);
+     mapper->addMapping(ui->dsb_condParam3,flightDataModel::CONDITION_PARAMS2);
+     mapper->addMapping(ui->dsb_condParam4,flightDataModel::CONDITION_PARAMS0);
+
+     mapper->addMapping(ui->cbCommand,flightDataModel::COMMAND);
+     mapper->addMapping(ui->sbJump,flightDataModel::JUMPDESTINATION);
+     mapper->addMapping(ui->sbError,flightDataModel::ERRORDESTINATION);
+     connect(itemSelection,SIGNAL(currentRowChanged(QModelIndex,QModelIndex)),this,SLOT(on_currentRowChanged(QModelIndex,QModelIndex)));
+}
+void opmap_edit_waypoint_dialog::on_currentIndexChanged(int index)
+{
+    ui->lbNumber->setText(QString::number(index));
+    QModelIndex idx=mapper->model()->index(index,0);
+    if(index==itemSelection->currentIndex().row())
+        return;
+    itemSelection->clear();
+    itemSelection->setCurrentIndex(idx,QItemSelectionModel::Select | QItemSelectionModel::Rows);
 }
 
 // destrutor
@@ -80,68 +98,36 @@ opmap_edit_waypoint_dialog::~opmap_edit_waypoint_dialog()
 
 // *********************************************************************
 
-void opmap_edit_waypoint_dialog::changeEvent(QEvent *e)
-{
-    QDialog::changeEvent(e);
-    switch (e->type()) {
-    case QEvent::LanguageChange:
-        ui->retranslateUi(this);
-        break;
-    default:
-        break;
-    }
-}
-
 void opmap_edit_waypoint_dialog::on_pushButtonOK_clicked()
 {
-    int res = saveSettings();
-    if (res < 0) return;
-
-    my_waypoint = NULL;
 
     close();
 }
 
 void opmap_edit_waypoint_dialog::on_pushButtonApply_clicked()
 {
-    saveSettings();
+
 }
 
 void opmap_edit_waypoint_dialog::on_pushButtonRevert_clicked()
 {
-    loadFromWP(my_waypoint);
-}
 
-void opmap_edit_waypoint_dialog::setupPositionWidgets(bool isRelative)
-{
-    ui->lbLong->setVisible(!isRelative);
-    ui->lbDegLong->setVisible(!isRelative);
-    ui->doubleSpinBoxLongitude->setVisible(!isRelative);
-    ui->lbLat->setVisible(!isRelative);
-    ui->lbDegLat->setVisible(!isRelative);
-    ui->doubleSpinBoxLatitude->setVisible(!isRelative);
-    ui->lbDistance->setVisible(isRelative);
-    ui->lbDistanceMeters->setVisible(isRelative);
-    ui->lbBearing->setVisible(isRelative);
-    ui->lbBearingDeg->setVisible(isRelative);
-    ui->spinBoxDistance->setVisible(isRelative);
-    ui->doubleSpinBoxBearing->setVisible(isRelative);
 }
 
 void opmap_edit_waypoint_dialog::setupModeWidgets()
 {
-    ModeOptions mode=(ModeOptions)ui->cbMode->itemData(ui->cbMode->currentIndex()).toInt();
+    ComboBoxDelegate::ModeOptions mode=(ComboBoxDelegate::ModeOptions)ui->cbMode->itemData(ui->cbMode->currentIndex()).toInt();
     switch(mode)
     {
-    case MODE_FLYENDPOINT:
-    case MODE_FLYVECTOR:
-    case MODE_FLYCIRCLERIGHT:
-    case MODE_FLYCIRCLELEFT:
-    case MODE_DRIVEENDPOINT:
-    case MODE_DRIVEVECTOR:
-    case MODE_DRIVECIRCLELEFT:
-    case MODE_DRIVECIRCLERIGHT:
-    case MODE_DISARMALARM:
+    case ComboBoxDelegate::MODE_FLYENDPOINT:
+    case ComboBoxDelegate::MODE_FLYVECTOR:
+    case ComboBoxDelegate::MODE_FLYCIRCLERIGHT:
+    case ComboBoxDelegate::MODE_FLYCIRCLELEFT:
+    case ComboBoxDelegate::MODE_DRIVEENDPOINT:
+    case ComboBoxDelegate::MODE_DRIVEVECTOR:
+    case ComboBoxDelegate::MODE_DRIVECIRCLELEFT:
+    case ComboBoxDelegate::MODE_DRIVECIRCLERIGHT:
+    case ComboBoxDelegate::MODE_DISARMALARM:
         ui->modeParam1->setVisible(false);
         ui->modeParam2->setVisible(false);
         ui->modeParam3->setVisible(false);
@@ -151,7 +137,7 @@ void opmap_edit_waypoint_dialog::setupModeWidgets()
         ui->dsb_modeParam3->setVisible(false);
         ui->dsb_modeParam4->setVisible(false);
         break;
-    case MODE_FIXEDATTITUDE:
+    case ComboBoxDelegate::MODE_FIXEDATTITUDE:
         ui->modeParam1->setText("pitch");
         ui->modeParam2->setText("roll");
         ui->modeParam3->setText("yaw");
@@ -165,7 +151,7 @@ void opmap_edit_waypoint_dialog::setupModeWidgets()
         ui->dsb_modeParam3->setVisible(true);
         ui->dsb_modeParam4->setVisible(true);
         break;
-    case MODE_SETACCESSORY:
+    case ComboBoxDelegate::MODE_SETACCESSORY:
         ui->modeParam1->setText("Acc.channel");
         ui->modeParam2->setText("Value");
         ui->modeParam1->setVisible(true);
@@ -181,12 +167,12 @@ void opmap_edit_waypoint_dialog::setupModeWidgets()
 }
 void opmap_edit_waypoint_dialog::setupConditionWidgets()
 {
-    EndConditionOptions mode=(EndConditionOptions)ui->cbCondition->itemData(ui->cbCondition->currentIndex()).toInt();
+    ComboBoxDelegate::EndConditionOptions mode=(ComboBoxDelegate::EndConditionOptions)ui->cbCondition->itemData(ui->cbCondition->currentIndex()).toInt();
     switch(mode)
     {
-    case ENDCONDITION_NONE:
-    case ENDCONDITION_IMMEDIATE:
-    case ENDCONDITION_PYTHONSCRIPT:
+    case ComboBoxDelegate::ENDCONDITION_NONE:
+    case ComboBoxDelegate::ENDCONDITION_IMMEDIATE:
+    case ComboBoxDelegate::ENDCONDITION_PYTHONSCRIPT:
         ui->condParam1->setVisible(false);
         ui->condParam2->setVisible(false);
         ui->condParam3->setVisible(false);
@@ -196,7 +182,7 @@ void opmap_edit_waypoint_dialog::setupConditionWidgets()
         ui->dsb_condParam3->setVisible(false);
         ui->dsb_condParam4->setVisible(false);
         break;
-    case ENDCONDITION_TIMEOUT:
+    case ComboBoxDelegate::ENDCONDITION_TIMEOUT:
         ui->condParam1->setVisible(true);
         ui->condParam2->setVisible(false);
         ui->condParam3->setVisible(false);
@@ -207,7 +193,7 @@ void opmap_edit_waypoint_dialog::setupConditionWidgets()
         ui->dsb_condParam4->setVisible(false);
         ui->condParam1->setText("Timeout(ms)");
         break;
-    case ENDCONDITION_DISTANCETOTARGET:
+    case ComboBoxDelegate::ENDCONDITION_DISTANCETOTARGET:
         ui->condParam1->setVisible(true);
         ui->condParam2->setVisible(true);
         ui->condParam3->setVisible(false);
@@ -219,7 +205,7 @@ void opmap_edit_waypoint_dialog::setupConditionWidgets()
         ui->condParam1->setText("Distance(m)");
         ui->condParam2->setText("Flag(0=2D,1=3D)");//FIXME
         break;
-    case ENDCONDITION_LEGREMAINING:
+    case ComboBoxDelegate::ENDCONDITION_LEGREMAINING:
         ui->condParam1->setVisible(true);
         ui->condParam2->setVisible(false);
         ui->condParam3->setVisible(false);
@@ -230,7 +216,7 @@ void opmap_edit_waypoint_dialog::setupConditionWidgets()
         ui->dsb_condParam4->setVisible(false);
         ui->condParam1->setText("Relative Distance(0=complete,1=just starting)");
         break;
-    case ENDCONDITION_ABOVEALTITUDE:
+    case ComboBoxDelegate::ENDCONDITION_ABOVEALTITUDE:
         ui->condParam1->setVisible(true);
         ui->condParam2->setVisible(false);
         ui->condParam3->setVisible(false);
@@ -241,7 +227,7 @@ void opmap_edit_waypoint_dialog::setupConditionWidgets()
         ui->dsb_condParam4->setVisible(false);
         ui->condParam1->setText("Altitude in meters (negative)");
         break;
-    case ENDCONDITION_POINTINGTOWARDSNEXT:
+    case ComboBoxDelegate::ENDCONDITION_POINTINGTOWARDSNEXT:
         ui->condParam1->setVisible(true);
         ui->condParam2->setVisible(false);
         ui->condParam3->setVisible(false);
@@ -265,80 +251,57 @@ void opmap_edit_waypoint_dialog::on_pushButtonCancel_clicked()
 
 int opmap_edit_waypoint_dialog::saveSettings()
 {
-    int number = ui->spinBoxNumber->value();
-    if (number < 0)
-    {
-	return -1;
-    }
-    customData data;
-    data.mode=ui->cbMode->itemData(ui->cbMode->currentIndex()).toInt();
-    data.mode_params[0]=ui->dsb_modeParam1->value();
-    data.mode_params[1]=ui->dsb_modeParam2->value();
-    data.mode_params[2]=ui->dsb_modeParam3->value();
-    data.mode_params[3]=ui->dsb_modeParam4->value();
 
-    data.condition=ui->cbCondition->itemData(ui->cbCondition->currentIndex()).toInt();
-    data.condition_params[0]=ui->dsb_condParam1->value();
-    data.condition_params[1]=ui->dsb_condParam2->value();
-    data.condition_params[2]=ui->dsb_condParam3->value();
-    data.condition_params[3]=ui->dsb_condParam4->value();
-
-    QVariant var;
-    var.setValue(data);
-    my_waypoint->setData(0,var);
-
-    my_waypoint->SetNumber(ui->spinBoxNumber->value());
-    my_waypoint->SetCoord(internals::PointLatLng(ui->doubleSpinBoxLatitude->value(), ui->doubleSpinBoxLongitude->value()));
-    my_waypoint->SetAltitude(ui->doubleSpinBoxAltitude->value());
-    my_waypoint->SetDescription(ui->lineEditDescription->displayText().simplified());
-    my_waypoint->setFlag(QGraphicsItem::ItemIsMovable, !ui->checkBoxLocked->isChecked());
-    if(ui->rbAbsolute->isChecked())
-        my_waypoint->setWPType(mapcontrol::WayPointItem::absolute);
-    else
-        my_waypoint->setWPType(mapcontrol::WayPointItem::relative);
-    mapcontrol::distBearing pt;
-    pt.distance=ui->spinBoxDistance->value();
-    pt.bearing=ui->doubleSpinBoxBearing->value()/180*M_PI;
-    my_waypoint->setRelativeCoord(pt);
-    return 0;	// all ok
 }
 
 void opmap_edit_waypoint_dialog::loadFromWP(mapcontrol::WayPointItem *waypoint_item)
 {
-    customData data=waypoint_item->data(0).value<customData>();
-    ui->spinBoxNumber->setValue(waypoint_item->Number());
-    ui->doubleSpinBoxLatitude->setValue(waypoint_item->Coord().Lat());
-    ui->doubleSpinBoxLongitude->setValue(waypoint_item->Coord().Lng());
-    ui->doubleSpinBoxAltitude->setValue(waypoint_item->Altitude());
-    ui->lineEditDescription->setText(waypoint_item->Description());
-    if(waypoint_item->WPType()==mapcontrol::WayPointItem::absolute)
-        ui->rbAbsolute->setChecked(true);
-    else
-        ui->rbRelative->setChecked(true);
-    ui->doubleSpinBoxBearing->setValue(waypoint_item->getRelativeCoord().bearing*180/M_PI);
-    ui->spinBoxDistance->setValue(waypoint_item->getRelativeCoord().distance);
 
-    ui->cbMode->setCurrentIndex(ui->cbMode->findData(data.mode));
-    ui->dsb_modeParam1->setValue(data.mode_params[0]);
-    ui->dsb_modeParam2->setValue(data.mode_params[1]);
-    ui->dsb_modeParam3->setValue(data.mode_params[2]);
-    ui->dsb_modeParam4->setValue(data.mode_params[3]);
-
-    ui->cbCondition->setCurrentIndex(ui->cbCondition->findData(data.condition));
-    ui->dsb_condParam1->setValue(data.condition_params[0]);
-    ui->dsb_condParam2->setValue(data.condition_params[1]);
-    ui->dsb_condParam3->setValue(data.condition_params[2]);
-    ui->dsb_condParam4->setValue(data.condition_params[3]);
 }
 
 void opmap_edit_waypoint_dialog::editWaypoint(mapcontrol::WayPointItem *waypoint_item)
 {
     if (!waypoint_item) return;
-
-    this->my_waypoint = waypoint_item;
-    loadFromWP(waypoint_item);
-    setupPositionWidgets(ui->rbRelative->isChecked());
     show();
+    mapper->setCurrentIndex(waypoint_item->Number());
 }
 
 // *********************************************************************
+
+void opmap_edit_waypoint_dialog::on_pushButton_clicked()
+{
+    mapper->toPrevious();
+}
+
+void opmap_edit_waypoint_dialog::on_pushButton_2_clicked()
+{
+    mapper->toNext();
+}
+
+void opmap_edit_waypoint_dialog::enableEditWidgets(bool value)
+{
+    QWidget * w;
+    foreach(QWidget * obj,this->findChildren<QWidget *>())
+    {
+        w=qobject_cast<QComboBox*>(obj);
+        if(w)
+            w->setEnabled(!value);
+        w=qobject_cast<QLineEdit*>(obj);
+        if(w)
+            w->setEnabled(!value);
+        w=qobject_cast<QDoubleSpinBox*>(obj);
+        if(w)
+            w->setEnabled(!value);
+        w=qobject_cast<QCheckBox*>(obj);
+        if(w && w!=ui->checkBoxLocked)
+            w->setEnabled(!value);
+        w=qobject_cast<QSpinBox*>(obj);
+        if(w)
+            w->setEnabled(!value);
+    }
+}
+
+void opmap_edit_waypoint_dialog::on_currentRowChanged(QModelIndex current, QModelIndex previous)
+{
+    mapper->setCurrentIndex(current.row());
+}

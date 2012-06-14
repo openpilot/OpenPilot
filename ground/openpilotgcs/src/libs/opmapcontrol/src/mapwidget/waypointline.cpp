@@ -46,7 +46,7 @@ WayPointLine::WayPointLine(HomeItem *from, WayPointItem *to, MapGraphicItem *map
 {
     this->setLine(to->pos().x(),to->pos().y(),from->pos().x(),from->pos().y());
     connect(from,SIGNAL(homePositionChanged(internals::PointLatLng)),this,SLOT(refreshLocations()));
-    connect(to,SIGNAL(localPositionChanged(QPointF)),this,SLOT(refreshLocations()));
+    connect(to,SIGNAL(localPositionChanged(QPointF,WayPointItem*)),this,SLOT(refreshLocations()));
     connect(to,SIGNAL(aboutToBeDeleted(WayPointItem*)),this,SLOT(waypointdeleted()));
 }
 int WayPointLine::type() const

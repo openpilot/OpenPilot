@@ -30,6 +30,11 @@
 
 // ******************************************************
 
+
+#include "flightdatamodel.h"
+#include "pathplanner.h"
+#include "modelmapproxy.h"
+
 #include <QtGui/QWidget>
 #include <QtGui/QMenu>
 #include <QStringList>
@@ -39,11 +44,8 @@
 #include <QMutexLocker>
 #include <QPointF>
 
-#include "opmap_edit_waypoint_dialog.h"
-#include "opmap_waypointeditor_dialog.h"
 #include "opmapcontrol/opmapcontrol.h"
 
-#include "opmap_overlay_widget.h"
 #include "opmap_zoom_slider_widget.h"
 #include "opmap_statusbar_widget.h"
 
@@ -54,7 +56,8 @@
 #include "uavobjectmanager.h"
 #include "uavobject.h"
 #include "objectpersistence.h"
-
+#include <QItemSelectionModel>
+#include "opmap_edit_waypoint_dialog.h"
 
 // ******************************************************
 
@@ -234,9 +237,8 @@ private:
 	UAVObjectManager *obm;
 	UAVObjectUtilManager *obum;
 
-    opmap_waypointeditor_dialog waypoint_editor_dialog;
 
-    opmap_edit_waypoint_dialog waypoint_edit_dialog;
+    opmap_edit_waypoint_dialog * waypoint_edit_dialog;
 
     QStandardItemModel wayPoint_treeView_model;
 
@@ -329,6 +331,11 @@ private:
     QMenu contextMenu;
     internals::PointLatLng lastLatLngMouse;
     WayPointItem * magicWayPoint;
+
+    flightDataModel * model;
+    pathPlanner * table;
+    modelMapProxy * proxy;
+    QItemSelectionModel * selectionModel;
 };
 
 #endif /* OPMAP_GADGETWIDGET_H_ */

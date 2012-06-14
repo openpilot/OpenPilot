@@ -25,5 +25,15 @@
         <file>images/home_wp.png</file>
         <file>images/move_to_wp.png</file>
         <file>images/center_wp.png</file>
+        <file>images/Ekisho Deep Ocean HD1.png</file>
+        <file>images/forward button white.png</file>
+        <file>images/new archive.png</file>
+        <file>images/rewind button white.png</file>
+        <file>images/stopb.png</file>
+        <file>images/unarchive.png</file>
+        <file>images/up_alt.png</file>
+        <file>images/plus3.png</file>
+        <file>images/forward_alt.png</file>
+        <file>images/star.png</file>
     </qresource>
 </RCC>

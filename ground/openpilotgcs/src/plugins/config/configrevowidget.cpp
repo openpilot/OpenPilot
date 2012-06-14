@@ -415,19 +415,22 @@ void ConfigRevoWidget::doGetSixPointCalibrationMeasurement(UAVObject * obj)
 #endif
         collectingData = false;
 
+        m_ui->sixPointsSave->setEnabled(true);
+
+#ifdef SIX_POINT_CAL_ACCEL
+        // Store the mean for this position for the accel
         Accels * accels = Accels::GetInstance(getObjectManager());
         Q_ASSERT(accels);
-        Magnetometer * mag = Magnetometer::GetInstance(getObjectManager());
-        Q_ASSERT(mag);
         disconnect(accels,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(doGetSixPointCalibrationMeasurement(UAVObject*)));
-        disconnect(mag,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(doGetSixPointCalibrationMeasurement(UAVObject*)));
-
-        m_ui->sixPointsSave->setEnabled(true);
-#ifdef SIX_POINT_CAL_ACCEL
         accel_data_x[position] = listMean(accel_accum_x);
         accel_data_y[position] = listMean(accel_accum_y);
         accel_data_z[position] = listMean(accel_accum_z);
 #endif
+
+        // Store the mean for this position for the mag
+        Magnetometer * mag = Magnetometer::GetInstance(getObjectManager());
+        Q_ASSERT(mag);
+        disconnect(mag,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(doGetSixPointCalibrationMeasurement(UAVObject*)));
         mag_data_x[position] = listMean(mag_accum_x);
         mag_data_y[position] = listMean(mag_accum_y);
         mag_data_z[position] = listMean(mag_accum_z);
@@ -459,7 +462,9 @@ void ConfigRevoWidget::doGetSixPointCalibrationMeasurement(UAVObject * obj)
             m_ui->sixPointsSave->setEnabled(false);
 
             /* Cleanup original settings */
+#ifdef SIX_POINT_CAL_ACCEL
             accels->setMetadata(initialAccelsMdata);
+#endif
             mag->setMetadata(initialMagMdata);
         }
     }
@@ -597,10 +602,14 @@ int SixPointInConstFieldCal( double ConstMag, double x[6], double y[6], double z
  return 1;
 }
 
+/**
+  * Computes the scale and bias for the magnetomer and (compile option)
+  * for the accel once all the data has been collected in 6 positions.
+  */
 void ConfigRevoWidget::computeScaleBias()
 {
    double S[3], b[3];
-   double Be_lenght;
+   double Be_length;
    RevoCalibration * revoCalibration = RevoCalibration::GetInstance(getObjectManager());
    HomeLocation * homeLocation = HomeLocation::GetInstance(getObjectManager());
    Q_ASSERT(revoCalibration);
@@ -621,8 +630,8 @@ void ConfigRevoWidget::computeScaleBias()
 #endif
 
    // Calibration mag
-   Be_lenght = sqrt(pow(homeLocationData.Be[0],2)+pow(homeLocationData.Be[1],2)+pow(homeLocationData.Be[2],2));
-   SixPointInConstFieldCal( Be_lenght, mag_data_x, mag_data_y, mag_data_z, S, b);
+   Be_length = sqrt(pow(homeLocationData.Be[0],2)+pow(homeLocationData.Be[1],2)+pow(homeLocationData.Be[2],2));
+   SixPointInConstFieldCal( Be_length, mag_data_x, mag_data_y, mag_data_z, S, b);
    revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_X] = fabs(S[0]);
    revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_Y] = fabs(S[1]);
    revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_Z] = fabs(S[2]);
@@ -699,18 +708,21 @@ void ConfigRevoWidget::doStartSixPointCalibration()
    mag_accum_y.clear();
    mag_accum_z.clear();
 
-   /* Need to get as many accel and mag updates as possible */
+#ifdef SIX_POINT_CAL_ACCEL
+   /* Need to get as many accel updates as possible */
    Accels * accels = Accels::GetInstance(getObjectManager());
    Q_ASSERT(accels);
-   Magnetometer * mag = Magnetometer::GetInstance(getObjectManager());
-   Q_ASSERT(mag);
 
    initialAccelsMdata = accels->getMetadata();
    UAVObject::Metadata mdata = initialAccelsMdata;
    UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
    mdata.flightTelemetryUpdatePeriod = 100;
    accels->setMetadata(mdata);
+#endif
 
+   /* Need to get as many mag updates as possible */
+   Magnetometer * mag = Magnetometer::GetInstance(getObjectManager());
+   Q_ASSERT(mag);
    initialMagMdata = mag->getMetadata();
    mdata = initialMagMdata;
    UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);

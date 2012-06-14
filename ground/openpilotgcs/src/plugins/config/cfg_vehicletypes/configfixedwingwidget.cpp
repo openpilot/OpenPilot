@@ -312,7 +312,10 @@ bool ConfigFixedWingWidget::setupFrameFixedWing(QString airframeType)
     int channel;
     //disable all
     for (channel=0; channel<VehicleConfig::CHANNEL_NUMELEM; channel++)
+    {
         setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_DISABLED);
+        resetMixerVector(mixer, channel);
+    }
 
     //motor
     channel = m_aircraft->fwEngineChannelBox->currentIndex()-1;
@@ -396,7 +399,10 @@ bool ConfigFixedWingWidget::setupFrameElevon(QString airframeType)
     double value;
     //disable all
     for (channel=0; channel<VehicleConfig::CHANNEL_NUMELEM; channel++)
+    {
         setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_DISABLED);
+        resetMixerVector(mixer, channel);
+    }
 
     //motor
     channel = m_aircraft->fwEngineChannelBox->currentIndex()-1;
@@ -478,7 +484,10 @@ bool ConfigFixedWingWidget::setupFrameVtail(QString airframeType)
     double value;
     //disable all
     for (channel=0; channel<VehicleConfig::CHANNEL_NUMELEM; channel++)
+    {
         setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_DISABLED);
+        resetMixerVector(mixer, channel);
+    }
 
     //motor
     channel = m_aircraft->fwEngineChannelBox->currentIndex()-1;

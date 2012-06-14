@@ -97,6 +97,8 @@ private:
 
     int position;
 
+    static const int NOISE_SAMPLES = 100;
+
 private slots:
     void launchAccelBiasCalibration();
     void incrementProgress();
@@ -107,6 +109,10 @@ private slots:
     void doStartSixPointCalibration();
     void doGetSixPointCalibrationMeasurement(UAVObject * obj);
     void doGetAccelBiasData(UAVObject*);
+
+    // Slots for measuring the sensor noise
+    void doStartNoiseMeasurement();
+    void doGetNoiseSample(UAVObject *);
 
 protected:
     void showEvent(QShowEvent *event);

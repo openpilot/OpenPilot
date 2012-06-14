@@ -92,6 +92,7 @@ public:
     void saveObjectToSD(UAVObject *obj);
     UAVObjectManager* getObjectManager();
     static double listMean(QList<double> list);
+    static double listVar(QList<double> list);
 
     void addUAVObject(QString objectName);
     void addWidget(QWidget * widget);

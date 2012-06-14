@@ -201,6 +201,7 @@ UAVObjectManager* ConfigTaskWidget::getObjectManager() {
     Q_ASSERT(objMngr);
     return objMngr;
 }
+
 /**
  * Utility function which calculates the Mean value of a list of values
  * @param list list of double values
@@ -212,6 +213,28 @@ double ConfigTaskWidget::listMean(QList<double> list)
     for(int i = 0; i < list.size(); i++)
         accum += list[i];
     return accum / list.size();
+}
+
+/**
+ * Utility function which calculates the Variance value of a list of values
+ * @param list list of double values
+ * @returns Variance of the list of parameter values
+ */
+double ConfigTaskWidget::listVar(QList<double> list)
+{
+    double mean_accum = 0;
+    double var_accum = 0;
+    double mean;
+
+    for(int i = 0; i < list.size(); i++)
+        mean_accum += list[i];
+    mean = mean_accum / list.size();
+
+    for(int i = 0; i < list.size(); i++)
+        var_accum += (list[i] - mean) * (list[i] - mean);
+
+    // Use unbiased estimator
+    return var_accum / (list.size() - 1);
 }
 
 // ************************************

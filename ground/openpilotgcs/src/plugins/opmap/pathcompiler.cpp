@@ -44,7 +44,6 @@ PathCompiler::PathCompiler(QObject *parent) :
     /* Connect the object updates */
     int numWaypoints = getObjectManager()->getNumInstances(Waypoint::OBJID);
     for (int i = 0; i < numWaypoints; i++) {
-        qDebug() << "Registering waypoint" << i;
         Waypoint *waypoint = Waypoint::GetInstance(getObjectManager(), i);
         Q_ASSERT(waypoint);
         if(waypoint)

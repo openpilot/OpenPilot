@@ -217,6 +217,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     connect(m_ui->accelBiasStart, SIGNAL(clicked()), this, SLOT(launchAccelBiasCalibration()));
     connect(m_ui->sixPointsStart, SIGNAL(clicked()), this, SLOT(doStartSixPointCalibration()));
     connect(m_ui->sixPointsSave, SIGNAL(clicked()), this, SLOT(savePositionData()));
+    connect(m_ui->noiseMeasurementStart, SIGNAL(clicked()), this, SLOT(doStartNoiseMeasurement()));
 
     // Leave this timer permanently connected.  The timer itself is started and stopped.
     connect(&progressBarTimer, SIGNAL(timeout()), this, SLOT(incrementProgress()));
@@ -327,8 +328,8 @@ void ConfigRevoWidget::doGetAccelBiasData(UAVObject *obj)
   */
 void ConfigRevoWidget::incrementProgress()
 {
-    m_ui->calibProgress->setValue(m_ui->calibProgress->value()+1);
-    if (m_ui->calibProgress->value() >= m_ui->calibProgress->maximum()) {
+    m_ui->noiseMeasurementProgress->setValue(m_ui->noiseMeasurementProgress->value()+1);
+    if (m_ui->noiseMeasurementProgress->value() >= m_ui->noiseMeasurementProgress->maximum()) {
         progressBarTimer.stop();
 
         RevoCalibration * revoCalibration = RevoCalibration::GetInstance(getObjectManager());
@@ -751,16 +752,139 @@ void ConfigRevoWidget::drawVariancesGraph()
   */
 void ConfigRevoWidget::doStartNoiseMeasurement()
 {
+    QMutexLocker lock(&sensorsUpdateLock);
+    Q_UNUSED(lock);
 
+    RevoCalibration * revoCalibration = RevoCalibration::GetInstance(getObjectManager());
+    Q_ASSERT(revoCalibration);
+
+    accel_accum_x.clear();
+    accel_accum_y.clear();
+    accel_accum_z.clear();
+    gyro_accum_x.clear();
+    gyro_accum_y.clear();
+    gyro_accum_z.clear();
+    mag_accum_x.clear();
+    mag_accum_y.clear();
+    mag_accum_z.clear();
+
+    /* Need to get as many accel, mag and gyro updates as possible */
+    Accels * accels = Accels::GetInstance(getObjectManager());
+    Q_ASSERT(accels);
+    Gyros * gyros = Gyros::GetInstance(getObjectManager());
+    Q_ASSERT(gyros);
+    Magnetometer * mag = Magnetometer::GetInstance(getObjectManager());
+    Q_ASSERT(mag);
+
+    UAVObject::Metadata mdata;
+
+    initialAccelsMdata = accels->getMetadata();
+    mdata = initialAccelsMdata;
+    UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
+    mdata.flightTelemetryUpdatePeriod = 100;
+    accels->setMetadata(mdata);
+
+    initialGyrosMdata = gyros->getMetadata();
+    mdata = initialGyrosMdata;
+    UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
+    mdata.flightTelemetryUpdatePeriod = 100;
+    gyros->setMetadata(mdata);
+
+    initialMagMdata = mag->getMetadata();
+    mdata = initialMagMdata;
+    UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
+    mdata.flightTelemetryUpdatePeriod = 100;
+    mag->setMetadata(mdata);
+
+    /* Connect for updates */
+    connect(accels, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(doGetNoiseSample(UAVObject*)));
+    connect(gyros, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(doGetNoiseSample(UAVObject*)));
+    connect(mag, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(doGetNoiseSample(UAVObject*)));
 }
 
 /**
   * Called when any of the sensors are updated.  Stores the sample for measuring the
   * variance at the end
   */
-void ConfigRevoWidget::doGetNoiseSample(UAVObject *)
+void ConfigRevoWidget::doGetNoiseSample(UAVObject * obj)
 {
+    QMutexLocker lock(&sensorsUpdateLock);
+    Q_UNUSED(lock);
 
+    Q_ASSERT(obj);
+
+    switch(obj->getObjID()) {
+    case Gyros::OBJID:
+    {
+        Gyros * gyros = Gyros::GetInstance(getObjectManager());
+        Q_ASSERT(gyros);
+        Gyros::DataFields gyroData = gyros->getData();
+        gyro_accum_x.append(gyroData.x);
+        gyro_accum_y.append(gyroData.y);
+        gyro_accum_z.append(gyroData.z);
+        break;
+    }
+    case Accels::OBJID:
+    {
+        Accels * accels = Accels::GetInstance(getObjectManager());
+        Q_ASSERT(accels);
+        Accels::DataFields accelsData = accels->getData();
+        accel_accum_x.append(accelsData.x);
+        accel_accum_y.append(accelsData.y);
+        accel_accum_z.append(accelsData.z);
+        break;
+    }
+    case Magnetometer::OBJID:
+    {
+        Magnetometer * mags = Magnetometer::GetInstance(getObjectManager());
+        Q_ASSERT(mags);
+        Magnetometer::DataFields magData = mags->getData();
+        mag_accum_x.append(magData.x);
+        mag_accum_y.append(magData.y);
+        mag_accum_z.append(magData.z);
+        break;
+    }
+    default:
+        Q_ASSERT(0);
+    }
+
+    float p1 = (float) mag_accum_x.length() / (float) NOISE_SAMPLES;
+    float p2 = (float) gyro_accum_x.length() / (float) NOISE_SAMPLES;
+    float p3 = (float) accel_accum_x.length() / (float) NOISE_SAMPLES;
+
+    float prog = (p1 < p2) ? p1 : p2;
+    prog = (prog < p3) ? prog : p3;
+
+    m_ui->noiseMeasurementProgress->setValue(prog * 100);
+
+    if(mag_accum_x.length() >= NOISE_SAMPLES &&
+            gyro_accum_x.length() >= NOISE_SAMPLES &&
+            accel_accum_x.length() >= NOISE_SAMPLES) {
+
+        // No need to for more updates
+        Magnetometer * mags = Magnetometer::GetInstance(getObjectManager());
+        Accels * accels = Accels::GetInstance(getObjectManager());
+        Gyros * gyros = Gyros::GetInstance(getObjectManager());
+        disconnect(accels, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(doGetNoiseSample(UAVObject*)));
+        disconnect(gyros, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(doGetNoiseSample(UAVObject*)));
+        disconnect(mags, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(doGetNoiseSample(UAVObject*)));
+
+        RevoCalibration *revoCalibration = RevoCalibration::GetInstance(getObjectManager());
+        Q_ASSERT(revoCalibration);
+        if(revoCalibration) {
+            RevoCalibration::DataFields revoCalData = revoCalibration->getData();
+            revoCalData.accel_var[RevoCalibration::ACCEL_BIAS_X] = listVar(accel_accum_x);
+            revoCalData.accel_var[RevoCalibration::ACCEL_BIAS_Y] = listVar(accel_accum_y);
+            revoCalData.accel_var[RevoCalibration::ACCEL_BIAS_Z] = listVar(accel_accum_z);
+            revoCalData.gyro_var[RevoCalibration::GYRO_BIAS_X] = listVar(gyro_accum_x);
+            revoCalData.gyro_var[RevoCalibration::GYRO_BIAS_Y] = listVar(gyro_accum_y);
+            revoCalData.gyro_var[RevoCalibration::GYRO_BIAS_Z] = listVar(gyro_accum_z);
+            revoCalData.mag_var[RevoCalibration::MAG_BIAS_X] = listVar(mag_accum_x);
+            revoCalData.mag_var[RevoCalibration::MAG_BIAS_Y] = listVar(mag_accum_y);
+            revoCalData.mag_var[RevoCalibration::MAG_BIAS_Z] = listVar(mag_accum_z);
+            revoCalibration->setData(revoCalData);
+        }
+    }
 }
 
 /**
@@ -771,7 +895,7 @@ void ConfigRevoWidget::refreshWidgetsValues(UAVObject *)
 {
     drawVariancesGraph();
 
-    m_ui->ahrsCalibStart->setEnabled(true);
+    m_ui->noiseMeasurementStart->setEnabled(true);
     m_ui->sixPointsStart->setEnabled(true);
     m_ui->accelBiasStart->setEnabled(true);
     m_ui->startDriftCalib->setEnabled(true);

@@ -537,43 +537,43 @@ void ConfigRevoWidget::doStartSixPointCalibration()
 
     revoCalibration->setData(revoCalibrationData);
 
-   Thread::usleep(100000);
+    Thread::usleep(100000);
 
-   gyro_accum_x.clear();
-   gyro_accum_y.clear();
-   gyro_accum_z.clear();
-   mag_accum_x.clear();
-   mag_accum_y.clear();
-   mag_accum_z.clear();
+    gyro_accum_x.clear();
+    gyro_accum_y.clear();
+    gyro_accum_z.clear();
+    mag_accum_x.clear();
+    mag_accum_y.clear();
+    mag_accum_z.clear();
 
 #ifdef SIX_POINT_CAL_ACCEL
-   /* Need to get as many accel updates as possible */
-   Accels * accels = Accels::GetInstance(getObjectManager());
-   Q_ASSERT(accels);
+    /* Need to get as many accel updates as possible */
+    Accels * accels = Accels::GetInstance(getObjectManager());
+    Q_ASSERT(accels);
 
-   initialAccelsMdata = accels->getMetadata();
-   UAVObject::Metadata mdata = initialAccelsMdata;
-   UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
-   mdata.flightTelemetryUpdatePeriod = 100;
-   accels->setMetadata(mdata);
+    initialAccelsMdata = accels->getMetadata();
+    UAVObject::Metadata mdata = initialAccelsMdata;
+    UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
+    mdata.flightTelemetryUpdatePeriod = 100;
+    accels->setMetadata(mdata);
 #endif
 
-   /* Need to get as many mag updates as possible */
-   Magnetometer * mag = Magnetometer::GetInstance(getObjectManager());
-   Q_ASSERT(mag);
-   initialMagMdata = mag->getMetadata();
-   mdata = initialMagMdata;
-   UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
-   mdata.flightTelemetryUpdatePeriod = 100;
-   mag->setMetadata(mdata);
+    /* Need to get as many mag updates as possible */
+    Magnetometer * mag = Magnetometer::GetInstance(getObjectManager());
+    Q_ASSERT(mag);
+    initialMagMdata = mag->getMetadata();
+    mdata = initialMagMdata;
+    UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
+    mdata.flightTelemetryUpdatePeriod = 100;
+    mag->setMetadata(mdata);
 
-   /* Show instructions and enable controls */
-   m_ui->sixPointCalibInstructions->clear();
-   m_ui->sixPointCalibInstructions->append("Place horizontally and click save position...");
-   displayPlane("plane-horizontal");
-   m_ui->sixPointsStart->setEnabled(false);
-   m_ui->sixPointsSave->setEnabled(true);
-   position = 0;
+    /* Show instructions and enable controls */
+    m_ui->sixPointCalibInstructions->clear();
+    m_ui->sixPointCalibInstructions->append("Place horizontally and click save position...");
+    displayPlane("plane-horizontal");
+    m_ui->sixPointsStart->setEnabled(false);
+    m_ui->sixPointsSave->setEnabled(true);
+    position = 0;
 }
 
 /**
@@ -592,9 +592,6 @@ void ConfigRevoWidget::savePositionData()
     mag_accum_x.clear();
     mag_accum_y.clear();
     mag_accum_z.clear();
-    gyro_accum_x.clear();
-    gyro_accum_y.clear();
-    gyro_accum_z.clear();
 
     collectingData = true;
 

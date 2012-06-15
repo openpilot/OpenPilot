@@ -88,6 +88,7 @@ private:
     //! Convert a UAVO waypoint to the local structure
     Waypoint::DataFields InternalToUavo(waypoint);
 
+    QList <waypoint> previousWaypoints;
 signals:
     /**
       * Indicates something changed the waypoints and the map should

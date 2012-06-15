@@ -213,7 +213,6 @@ void PathCompiler::doDelWaypoint(int index)
 
     int numWaypoints = objManager->getNumInstances(waypoint->getObjID());
     for (int i = index; i < numWaypoints - 1; i++) {
-        qDebug() << "Copying from" << i+1 << "to" << i;
         Waypoint *waypointDest = Waypoint::GetInstance(objManager, i);
         Q_ASSERT(waypointDest);
 
@@ -232,7 +231,6 @@ void PathCompiler::doDelWaypoint(int index)
     // Set the second to last waypoint to stop (and last for safety)
     // the functional equivalent to deleting
     for (int i = numWaypoints - 2; i < numWaypoints; i++) {
-        qDebug() << "Stopping" << i;
         waypoint = Waypoint::GetInstance(objManager, i);
         Q_ASSERT(waypoint);
         if (waypoint) {
@@ -274,8 +272,6 @@ void PathCompiler::doDelAllWaypoints()
   */
 void PathCompiler::doUpdateFromUAV(UAVObject *obj)
 {
-    static QList<waypoint> previousWaypoints;
-
     UAVObjectManager *objManager = getObjectManager();
     if (!objManager)
         return;

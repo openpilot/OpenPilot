@@ -2541,12 +2541,14 @@ void OPMapGadgetWidget::doVisualizationChanged(QList<PathCompiler::waypoint> way
         WayPointItem * wayPointItem = m_map->WPCreate(position, 0, QString(index));
         Q_ASSERT(wayPointItem);
         if(wayPointItem) {
+            wayPointItem->SetNumber(index);
             wayPointItem->setFlag(QGraphicsItem::ItemIsMovable, true);
             wayPointItem->picture.load(QString::fromUtf8(":/opmap/images/waypoint_marker1.png"));
             index++;
         }
         connect(wayPointItem, SIGNAL(WPDropped(WayPointItem*)), this, SLOT(WPDropped(WayPointItem*)));
     }
+
 }
 
 /**

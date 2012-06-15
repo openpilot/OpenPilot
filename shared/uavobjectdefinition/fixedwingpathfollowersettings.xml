@@ -3,15 +3,21 @@
         <description>Settings for the @ref FixedWingPathFollowerModule</description>
 
         <!-- these coefficients control desired movement in airspace -->
-        <field name="AirSpeedMax" units="m/s" type="float" elements="1" defaultvalue="15"/>
-                <!-- maximum speed the aircraft can reach in level flight at full throttle without loosing altitude - leave some safety margin -->
-        <field name="AirSpeedMin" units="m/s" type="float" elements="1" defaultvalue="10"/>
-                <!-- stall speed - leave some safety margin -->
+        <field name="AirSpeedMax" units="m/s" type="float" elements="1" defaultvalue="20"/>
+                <!-- Vne, i.e. maximum airspeed the airframe can handle -->
+        <field name="CruiseSpeed" units="m/s" type="float" elements="1" defaultvalue="20"/>
+                <!-- Cruise speed the in level flight - leave some safety margin -->
+        <field name="BestClimbRateSpeed" units="m/s" type="float" elements="1" defaultvalue="10"/>
+                <!-- V_y, i.e. airspeed at which plane climbs the best -->
+        <field name="StallSpeedClean" units="m/s" type="float" elements="1" defaultvalue="8"/>
+                <!-- Vs1, i.e. stall speed in clean configuration- leave some safety margin -->
+        <field name="StallSpeedDirty" units="m/s" type="float" elements="1" defaultvalue="8"/>
+                <!-- Vs0, i.e. stall speed with flaps and landing gear deployed - leave some safety margin -->
         <field name="VerticalVelMax" units="m/s" type="float" elements="1" defaultvalue="10"/>
                 <!-- maximum allowed climb or sink rate in guided flight-->
 
-        <field name="CourseFeedForward" units="s" type="float" elements="1" defaultvalue="3.0"/>
-                <!-- how many seconds to plan the flight vector ahead when initiating necessary course changes - increase for planes with sluggish response -->
+        <field name="HeadingFeedForward" units="s" type="float" elements="1" defaultvalue="3.0"/>
+                <!-- how many seconds to plan the flight vector ahead when initiating necessary heading changes - increase for planes with sluggish response -->
 
         <field name="HorizontalPosP" units="(m/s)/m" type="float" elements="1" defaultvalue="0.05"/>
                 <!-- proportional coefficient for correction vector in path vector field to get back on course - reduce for fast planes to prevent course oscillations -->
@@ -19,19 +25,19 @@
                 <!-- proportional coefficient for desired vertical speed in relation to altitude displacement-->
 
         <!-- these coefficients control actual control outputs -->
-        <field name="CoursePI" units="deg/deg" type="float" elements="3" elementnames="Kp,Ki,ILimit" defaultvalue="0.2, 0, 0"/>
-                <!-- coefficients for desired bank angle in relation to ground heading error - this controls heading -->
+        <field name="BearingPI" units="deg/deg" type="float" elements="3" elementnames="Kp,Ki,ILimit" defaultvalue="0.2, 0, 0"/>
+                <!-- coefficients for desired bank angle in relation to ground bearing error - this controls heading -->
 
         <field name="SpeedP" units="(m/s^2) / ((m/s)/(m/s)" type="float" elementnames="Kp,Max" defaultvalue="10,10"/>
                 <!-- coefficients for desired acceleration
                      in relation to relative airspeed error (IASerror/IASactual)-->
-        <field name="AccelPI" units="deg / (m/s^2)" type="float" elements="3" elementnames="Kp,Ki,ILimit" defaultvalue="1.5, 1.5, 20"/>
+        <field name="AccelPI" units="deg / (m/s^2)" type="float" elements="3" elementnames="Kp,Ki,ILimit" defaultvalue="1.5, .15, 20"/>
                 <!-- coefficients for desired pitch
                      in relation to acceleration error -->
-        <field name="VerticalToPitchCrossFeed" units="deg / ((m/s)/(m/s))" type="float" elementnames="Kp,Max" defaultvalue="50, 5"/>
+        <field name="VerticalToPitchCrossFeed" units="deg / ((m/s)/(m/s))" type="float" elementnames="Kp,Max" defaultvalue="5, 10"/>
                 <!-- coefficients for adjusting desired pitch
                      in relation to "vertical speed error relative to airspeed" (verror/IASactual) -->
-        <field name="AirspeedToVerticalCrossFeed" units="(m/s) / ((m/s)/(m/s))" type="float" elementnames="Kp,Max" defaultvalue="100, 100"/>
+        <field name="AirspeedToVerticalCrossFeed" units="(m/s) / ((m/s)/(m/s))" type="float" elementnames="Kp,Max" defaultvalue="10, 100"/>
                 <!-- proportional coefficient for adjusting vertical speed error for power calculation
                      in relation to relative airspeed error (IASerror/IASactual) -->
         <field name="PowerPI" units="1/(m/s)" type="float" elements="3" elementnames="Kp,Ki,ILimit" defaultvalue="0.01,0.01,0.8"/>
@@ -41,7 +47,7 @@
         <!-- output limits -->
         <field name="RollLimit" units="deg" type="float" elements="3" elementnames="Min,Neutral,Max" defaultvalue="-35,0,35" />
                 <!-- maximum allowed bank angles in navigates flight -->
-        <field name="PitchLimit" units="deg" type="float" elements="3" elementnames="Min,Neutral,Max" defaultvalue="-10,5,20" />
+        <field name="PitchLimit" units="deg" type="float" elements="3" elementnames="Min,Neutral,Max" defaultvalue="-10,5,10" />
                 <!-- maximum allowed pitch angles and setpoint for neutral pitch -->
         <field name="ThrottleLimit" units="" type="float" elements="3" elementnames="Min,Neutral,Max" defaultvalue="0.1,0.5,0.9" />
                 <!-- minimum and maximum allowed throttle and setpoint for cruise speed -->

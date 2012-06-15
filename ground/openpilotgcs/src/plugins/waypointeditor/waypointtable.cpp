@@ -57,9 +57,6 @@ WaypointTable::WaypointTable(QObject *parent) :
             connect(waypoint, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(waypointsUpdated(UAVObject*)));
     }
 
-    connect(waypointObj, SIGNAL(),
-            this, SLOT(waypointsUpdated(UAVObject*)));
-
     headers.clear();
     headers.append(QString("North"));
     headers.append(QString("East"));

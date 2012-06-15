@@ -367,10 +367,10 @@ void Telemetry::processObjectQueue()
 {
   //  qDebug() << "Process object queue " << tr("- Depth (%1 %2)").arg(objQueue.length()).arg(objPriorityQueue.length());
 
-    // Don nothing if a transaction is already in progress (should not happen)
+    // Do nothing if a transaction is already in progress (should not happen)
+    // but it does a lot
     if (transPending)
     {
-        qxtLog->error("Telemetry: Dequeue while a transaction pending!");
         return;
     }
 

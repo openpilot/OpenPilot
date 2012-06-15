@@ -188,7 +188,8 @@ void PathCompiler::doUpdateWaypoints(PathCompiler::waypoint changedWaypoint, int
     Waypoint::DataFields oldWaypointUAVO = waypointInst->getData();
     oldWaypointUAVO.Position[0] = changedWaypointUAVO.Position[0];
     oldWaypointUAVO.Position[1] = changedWaypointUAVO.Position[1];
-    oldWaypointUAVO.Position[2] = changedWaypointUAVO.Position[2];
+    // Don't take the altitude from the map for now
+
     waypointInst->setData(oldWaypointUAVO);
     waypointInst->updated();
 }

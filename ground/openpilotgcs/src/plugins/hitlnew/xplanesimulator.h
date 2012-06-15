@@ -45,12 +45,8 @@ private slots:
 	void transmitUpdate();
 
 private:
-        bool once;
-        float initX;
-        float initY;
-        float initZ;
-	enum XplaneOutputData
-	{
+    enum XplaneOutputData //***WARNING***: Elements in this enum are in a precise order, do
+    {                     // not change. Cf. http://www.nuclearprojects.com/xplane/info.shtml
 		FramRate,
 		Times,
 		SimStats,
@@ -68,10 +64,10 @@ private:
 		Brakes,
 		AngularMoments,
 		AngularAccelerations,
-                AngularVelocities,
-		PitchRollHeading,
+        AngularVelocities,
+        PitchRollHeading,
 		AoA,
-		LatitudeLongitude,
+        LatitudeLongitudeAltitude,
 		LocVelDistTraveled
 	};
 

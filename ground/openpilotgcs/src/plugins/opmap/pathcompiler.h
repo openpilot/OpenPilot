@@ -76,6 +76,7 @@ public:
 
         double latitude;
         double longitude;
+        double altitude;
     };
 
 private:

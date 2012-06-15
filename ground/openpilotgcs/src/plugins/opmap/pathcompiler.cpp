@@ -335,6 +335,7 @@ struct PathCompiler::waypoint PathCompiler::UavoToInternal(Waypoint::DataFields 
 
     internalWaypoint.latitude = LLA[0];
     internalWaypoint.longitude = LLA[1];
+    internalWaypoint.altitude = LLA[2];
     return internalWaypoint;
 }
 
@@ -363,7 +364,7 @@ Waypoint::DataFields PathCompiler::InternalToUavo(waypoint internal)
     // TODO: Give the point a concept of altitude
     LLA[0] = internal.latitude;
     LLA[1] = internal.longitude;
-    LLA[2] = -50;
+    LLA[2] = internal.altitude;
 
     Utils::CoordinateConversions().GetNED(homeLLA, LLA, NED);
 

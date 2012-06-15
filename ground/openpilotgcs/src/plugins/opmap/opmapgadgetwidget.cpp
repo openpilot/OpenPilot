@@ -2538,7 +2538,7 @@ void OPMapGadgetWidget::doVisualizationChanged(QList<PathCompiler::waypoint> way
     foreach (PathCompiler::waypoint waypoint, waypoints) {
         internals::PointLatLng position(waypoint.latitude, waypoint.longitude);
 
-        WayPointItem * wayPointItem = m_map->WPCreate(position, 0, QString(index));
+        WayPointItem * wayPointItem = m_map->WPCreate(position, waypoint.altitude, QString(index));
         Q_ASSERT(wayPointItem);
         if(wayPointItem) {
             wayPointItem->SetNumber(index);

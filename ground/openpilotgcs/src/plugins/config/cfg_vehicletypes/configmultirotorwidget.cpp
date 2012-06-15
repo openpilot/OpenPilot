@@ -25,7 +25,6 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "configmultirotorwidget.h"
-#include "mixersettings.h"
 
 #include <QDebug>
 #include <QStringList>
@@ -296,12 +295,8 @@ QString ConfigMultiRotorWidget::updateConfigObjectsFromWidgets()
 	field = obj->getField(QString("MaxAccel"));
 	field->setDouble(m_aircraft->maxAccelSlider->value());
 	
-	// Curve is also common to all quads:
-	field = obj->getField("ThrottleCurve1");
-	QList<double> curve = m_aircraft->multiThrottleCurve->getCurve();
-	for (int i=0;i<curve.length();i++) {
-		field->setValue(curve.at(i),i);
-	}
+    // Curve is also common to all quads:
+    setThrottleCurve(obj, VehicleConfig::MIXER_THROTTLECURVE1, m_aircraft->multiThrottleCurve->getCurve() );
 	
 	if (m_aircraft->multirotorFrameType->currentText() == "Quad +") {
 		airframeType = "QuadP";
@@ -1036,20 +1031,22 @@ bool ConfigMultiRotorWidget::setupMultiRotorMixer(double mixerFactors[8][3])
     qDebug()<<mixerFactors[5][0]<<" "<<mixerFactors[5][1]<<" "<<mixerFactors[5][2];
     qDebug()<<mixerFactors[6][0]<<" "<<mixerFactors[6][1]<<" "<<mixerFactors[6][2];
     qDebug()<<mixerFactors[7][0]<<" "<<mixerFactors[7][1]<<" "<<mixerFactors[7][2];
-	
-    UAVObjectField *field;
+
     QList<QComboBox*> mmList;
     mmList << m_aircraft->multiMotorChannelBox1 << m_aircraft->multiMotorChannelBox2 << m_aircraft->multiMotorChannelBox3
 	<< m_aircraft->multiMotorChannelBox4 << m_aircraft->multiMotorChannelBox5 << m_aircraft->multiMotorChannelBox6
 	<< m_aircraft->multiMotorChannelBox7 << m_aircraft->multiMotorChannelBox8;
-    UAVDataObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-    // 1. Assign the servo/motor/none for each channel
-    // Disable all
-    foreach(QString mixer, mixerTypes) {
-        field = obj->getField(mixer);
-        Q_ASSERT(field);
-        field->setValue("Disabled");
+
+    UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
+    Q_ASSERT(mixer);
+
+    //disable all
+    for (int channel=0; channel<VehicleConfig::CHANNEL_NUMELEM; channel++)
+    {
+        setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_DISABLED);
+        resetMixerVector(mixer, channel);
     }
+
     // and enable only the relevant channels:
     double pFactor = (double)m_aircraft->mrPitchMixLevel->value()/100;
     double rFactor = (double)m_aircraft->mrRollMixLevel->value()/100;

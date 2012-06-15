@@ -93,6 +93,23 @@ namespace jafar {
 				return out;
 			}
 
+			/**
+			 general subrange from jblas::vec or c array to jblas::vec
+			 @param v the whole vector
+			 @param pos block position
+			 @param size block size
+			*/
+			template <class T>
+			jblas::vec createVector(T const & v, size_t pos, size_t size)
+			{
+				jblas::vec res(size);
+
+				for(size_t i = 0; i < size; ++i)
+					res(i) = v[pos+i];
+
+				return res;
+			}
+
 			/** Creates a vector with the contents of a c-array
 			 */
 			template<int size, typename W>
@@ -103,6 +120,46 @@ namespace jafar {
 					out(i,i) = std[i] * std[i];
 				return out;
 			}
+
+			/**
+			 Convert an aligned full symmetric matrix (jblas::vec or c array) to a sym_mat
+			 @param v the vector that contains the upper triangle aligned
+			 @param csize container size
+			 @param pos block position
+			 @param size block size
+			*/
+			template <class T>
+			jblas::sym_mat createSymMat(T const & v, size_t shift, size_t csize, size_t pos, size_t size)
+			{
+				jblas::sym_mat m(size);
+
+				for(size_t i = 0; i < size; ++i)
+				{
+					size_t k = shift + (csize)*(csize+1)/2 - (csize-(i+pos))*(csize-(i+pos)+1)/2;
+					for(size_t j = i; j < size; ++j) m(i,j) = v[k+(j-i)];
+				}
+
+				return m;
+			}
+
+			/**
+			 Convert an aligned full symmetric matrix (jblas::vec or c array) to a sym_mat
+			 @param m the matrix to convert
+			 @param v the vector that will contains the upper triangle aligned (needs to be allocated to the right size)
+			 @param csize container size
+			 @param pos block position
+			 @param size block size
+			*/
+			template <class T>
+			void explodeSymMat(jblas::sym_mat const & m, T & v, size_t shift, size_t csize, size_t pos, size_t size)
+			{
+				for(size_t i = 0; i < size; ++i)
+				{
+					size_t k = shift + (csize)*(csize+1)/2 - (csize-(i+pos))*(csize-(i+pos)+1)/2;
+					for(size_t j = i; j < size; ++j) v[k+(j-i)] = m(i,j);
+				}
+			}
+
 
 #define DECL_VEC(name,size,values) jblas::vec name(size); { const double tmp[size] = {values}; fillVector(name, tmp); }
 #define INIT_VEC(size,values) fillVector2<size>((double[]){ values })

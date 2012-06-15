@@ -546,13 +546,15 @@ void ConfigRevoWidget::doStartSixPointCalibration()
     mag_accum_y.clear();
     mag_accum_z.clear();
 
+    UAVObject::Metadata mdata;
+
 #ifdef SIX_POINT_CAL_ACCEL
     /* Need to get as many accel updates as possible */
     Accels * accels = Accels::GetInstance(getObjectManager());
     Q_ASSERT(accels);
 
     initialAccelsMdata = accels->getMetadata();
-    UAVObject::Metadata mdata = initialAccelsMdata;
+    mdata = initialAccelsMdata;
     UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
     mdata.flightTelemetryUpdatePeriod = 100;
     accels->setMetadata(mdata);

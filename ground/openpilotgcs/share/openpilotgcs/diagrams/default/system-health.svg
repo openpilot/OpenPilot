@@ -28,9 +28,9 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="9.3551549"
-     inkscape:cx="37.147432"
-     inkscape:cy="34.009214"
-     inkscape:current-layer="background"
+     inkscape:cx="42.866204"
+     inkscape:cy="35.940147"
+     inkscape:current-layer="g4794"
      id="namedview3608"
      showgrid="false"
      inkscape:window-width="1920"
@@ -1862,17 +1862,59 @@
   </g>
   <g
      style="display:none"
-     inkscape:label="BootFault-Critical"
+     inkscape:label="BootFault-OK"
      id="g4794"
      inkscape:groupmode="layer">
     <rect
-       style="fill:#cf0e0e;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
-       id="BootFault-Critical"
+       style="fill:#04b629;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
+       id="BootFault-OK"
        width="18.153212"
        height="8.1216154"
        x="17.567717"
        y="31.277248"
        inkscape:label="#rect4080" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="g3546"
+     inkscape:label="BootFault-Warning"
+     style="display:none">
+    <rect
+       inkscape:label="#rect4080"
+       y="31.277248"
+       x="17.567717"
+       height="8.1216154"
+       width="18.153212"
+       id="BootFault-Warning"
+       style="fill:#f1b907;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline" />
+  </g>
+  <g
+     style="display:none"
+     inkscape:label="BootFault-Error"
+     id="g3550"
+     inkscape:groupmode="layer">
+    <rect
+       style="fill:#cf0e0e;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
+       id="BootFault-Error"
+       width="18.153212"
+       height="8.1216154"
+       x="17.567717"
+       y="31.277248"
+       inkscape:label="#rect4080" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="g3554"
+     inkscape:label="BootFault-Critical"
+     style="display:none">
+    <rect
+       inkscape:label="#rect4080"
+       y="31.277248"
+       x="17.567717"
+       height="8.1216154"
+       width="18.153212"
+       id="BootFault-Critical"
+       style="fill:#cf0e0e;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline" />
   </g>
   <g
      inkscape:groupmode="layer"

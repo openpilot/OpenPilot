@@ -38,6 +38,7 @@
 #include "cfg_vehicletypes/configfixedwingwidget.h"
 #include "cfg_vehicletypes/configmultirotorwidget.h"
 #include "cfg_vehicletypes/configgroundvehiclewidget.h"
+#include "cfg_vehicletypes/vehicleconfig.h"
 
 #include <QtGui/QWidget>
 #include <QList>

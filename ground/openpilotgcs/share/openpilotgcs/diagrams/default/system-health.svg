@@ -28,7 +28,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="9.3551549"
-     inkscape:cx="50.081478"
+     inkscape:cx="37.147432"
      inkscape:cy="34.009214"
      inkscape:current-layer="background"
      id="namedview3608"
@@ -706,14 +706,6 @@
        height="56.637238"
        x="576.71594"
        y="365.44907" />
-    <rect
-       inkscape:label="#rect4000-7-6-51-2-0-4"
-       y="406.95688"
-       x="569.32855"
-       height="15.007023"
-       width="5.311192"
-       id="SDCard"
-       style="fill:#332d2d;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
     <rect
        inkscape:label="#rect4000-7-6-2-2"
        style="fill:#332d2d;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
@@ -1394,69 +1386,25 @@
        style="fill:#cf0e0e;fill-opacity:1;stroke:#ffffff;stroke-width:0.29055119;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline" />
   </g>
   <g
-     style="display:none"
+     style="display:inline"
      inkscape:label="SDCard-OK"
      id="layer1"
-     inkscape:groupmode="layer">
-    <rect
-       inkscape:label="#rect3846"
-       style="fill:#04b629;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
-       id="SDCard-OK"
-       width="5.311192"
-       height="15.007023"
-       x="569.32855"
-       y="406.95688"
-       transform="translate(-497.66563,-344.28037)" />
-  </g>
+     inkscape:groupmode="layer" />
   <g
-     style="display:none"
+     style="display:inline"
      inkscape:label="SDCard-Warning"
      id="layer6"
-     inkscape:groupmode="layer">
-    <rect
-       transform="translate(-497.66563,-344.28037)"
-       y="406.95688"
-       x="569.32855"
-       height="15.007023"
-       width="5.311192"
-       id="SDCard-Warning"
-       style="fill:#f1b907;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
-       inkscape:label="#rect3846" />
-  </g>
+     inkscape:groupmode="layer" />
   <g
-     style="display:none"
+     style="display:inline"
      inkscape:label="SDCard-Error"
      id="layer11"
-     inkscape:groupmode="layer">
-    <g
-       inkscape:label="#g3858"
-       style="stroke:#cf0e0e;stroke-opacity:1;display:inline"
-       id="SDCard-Error">
-      <path
-         style="fill:none;stroke:#cf0e0e;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         d="m 71.967477,62.881039 4.478881,14.250985"
-         id="path3854" />
-      <path
-         style="fill:none;stroke:#cf0e0e;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         d="M 71.865684,77.233817 76.853529,62.881039"
-         id="path3856" />
-    </g>
-  </g>
+     inkscape:groupmode="layer" />
   <g
-     style="display:none"
+     style="display:inline"
      inkscape:label="SDCard-Critical"
      id="layer20"
-     inkscape:groupmode="layer">
-    <rect
-       inkscape:label="#rect3846"
-       style="fill:#cf0e0e;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
-       id="SDCard-Critical"
-       width="5.311192"
-       height="15.007023"
-       x="569.32855"
-       y="406.95688"
-       transform="translate(-497.66563,-344.28037)" />
-  </g>
+     inkscape:groupmode="layer" />
   <g
      style="display:none"
      inkscape:label="Memory-OK"
@@ -2174,25 +2122,6 @@
          id="path4222"
          style="font-size:4px;fill:#ffffff"
          d="m 74.535549,46.551937 c -0.101564,0.260416 -0.200522,0.430338 -0.296875,0.509766 -0.09636,0.07943 -0.225261,0.11914 -0.386719,0.11914 l -0.287109,0 0,-0.300781 0.210938,0 c 0.09896,0 0.17578,-0.02344 0.230468,-0.07031 0.05469,-0.04688 0.115234,-0.157553 0.181641,-0.332032 l 0.06445,-0.164062 -0.884766,-2.152344 0.38086,0 0.683594,1.710938 0.683593,-1.710938 0.38086,0 -0.960938,2.390625" />
-    </g>
-    <g
-       id="text4548-2-7-0"
-       style="font-size:40px;font-style:normal;font-weight:normal;fill:#ffffff;fill-opacity:1;stroke:none;display:inline;font-family:Bitstream Vera Sans">
-      <path
-         inkscape:connector-curvature="0"
-         id="path4259"
-         style="font-size:4px;writing-mode:tb-rl;fill:#ffffff"
-         d="m 73.367149,65.780605 0,-1.324218 0.359375,0 0,1.310546 c 0,0.207032 0.04036,0.362631 0.121094,0.466797 0.08073,0.102865 0.201822,0.154297 0.363281,0.154297 0.194009,0 0.347004,-0.06185 0.458985,-0.185547 0.113279,-0.123697 0.16992,-0.292317 0.169922,-0.505859 l 0,-1.240234 0.359375,0 0,2.1875 -0.359375,0 0,-0.335938 c -0.08724,0.132813 -0.188804,0.231771 -0.304688,0.296875 -0.114585,0.0638 -0.248048,0.0957 -0.400391,0.0957 -0.251302,0 -0.442057,-0.07813 -0.572265,-0.234375 -0.130209,-0.156249 -0.195313,-0.384765 -0.195313,-0.685547 m 0.904297,-1.376953 0,0" />
-      <path
-         inkscape:connector-curvature="0"
-         id="path4261"
-         style="font-size:4px;writing-mode:tb-rl;fill:#ffffff"
-         d="m 75.167931,68.479824 0,0.384766 c -0.149742,-0.07161 -0.291018,-0.124998 -0.423829,-0.160157 -0.132814,-0.03515 -0.261069,-0.05273 -0.384765,-0.05273 -0.214845,3e-6 -0.38086,0.04167 -0.498047,0.125 -0.115886,0.08334 -0.173829,0.201825 -0.173828,0.355469 -10e-7,0.128908 0.03841,0.226564 0.115234,0.292969 0.07812,0.06511 0.22526,0.11784 0.441406,0.158203 l 0.238282,0.04883 c 0.294269,0.05599 0.511065,0.154949 0.65039,0.296875 0.140623,0.140626 0.210936,0.329428 0.210938,0.566406 -2e-6,0.282553 -0.09505,0.496745 -0.285156,0.642578 -0.188804,0.145834 -0.466148,0.21875 -0.832032,0.21875 -0.138022,0 -0.285157,-0.01563 -0.441406,-0.04687 -0.154948,-0.03125 -0.315756,-0.07747 -0.482422,-0.138672 l 0,-0.40625 c 0.160156,0.08985 0.317057,0.157553 0.470703,0.203125 0.153645,0.04557 0.304687,0.06836 0.453125,0.06836 0.225259,0 0.399087,-0.04427 0.521485,-0.132813 0.122394,-0.08854 0.183592,-0.214843 0.183593,-0.378906 -10e-7,-0.143228 -0.04427,-0.255207 -0.132812,-0.335938 -0.08724,-0.08073 -0.231121,-0.141274 -0.431641,-0.18164 l -0.240234,-0.04687 c -0.294272,-0.05859 -0.507162,-0.150389 -0.638672,-0.275391 -0.131511,-0.124998 -0.197266,-0.298826 -0.197266,-0.521484 0,-0.25781 0.0905,-0.460935 0.271485,-0.609375 0.182291,-0.148435 0.432942,-0.222653 0.751953,-0.222656 0.136717,3e-6 0.27604,0.01237 0.417969,0.03711 0.141925,0.02474 0.287107,0.06185 0.435547,0.111328" />
-      <path
-         inkscape:connector-curvature="0"
-         id="path4263"
-         style="font-size:4px;writing-mode:tb-rl;fill:#ffffff"
-         d="m 73.544884,73.36459 0,2.267578 0.476562,0 c 0.402342,0 0.696613,-0.09115 0.882813,-0.273438 0.187497,-0.182291 0.281247,-0.470051 0.28125,-0.863281 -3e-6,-0.390623 -0.09375,-0.67643 -0.28125,-0.857422 -0.1862,-0.182289 -0.480471,-0.273435 -0.882813,-0.273437 l -0.476562,0 m -0.394532,-0.324219 0.810547,0 c 0.565103,3e-6 0.979816,0.117841 1.244141,0.353516 0.26432,0.234377 0.396482,0.601564 0.396484,1.101562 -2e-6,0.502605 -0.132815,0.871745 -0.398437,1.107422 -0.265627,0.235677 -0.679689,0.353516 -1.242188,0.353516 l -0.810547,0 0,-2.916016" />
     </g>
     <rect
        y="366.52393"

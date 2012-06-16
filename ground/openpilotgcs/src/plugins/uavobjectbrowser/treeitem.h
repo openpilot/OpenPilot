@@ -32,10 +32,31 @@
 #include "uavmetaobject.h"
 #include "uavobjectfield.h"
 #include <QtCore/QList>
+#include <QtCore/QLinkedList>
 #include <QtCore/QVariant>
+#include <QTCore/QTime>
 #include <QtCore/QTimer>
 #include <QtCore/QObject>
+#include <QtCore/QDebug>
 
+class TreeItem;
+
+class HighLightManager : public QObject
+{
+Q_OBJECT
+public:
+    HighLightManager(long checkingInterval);
+    bool add(TreeItem* itemToAdd);
+    bool remove(TreeItem* itemToRemove);
+
+private slots:
+    void checkItemsExpired();
+
+private:
+    QTimer m_expirationTimer;
+    QLinkedList<TreeItem*> m_itemsList;
+    QMutex m_listMutex;
+};
 
 class TreeItem : public QObject
 {
@@ -77,11 +98,16 @@ public:
     inline bool changed() { return m_changed; }
     inline void setChanged(bool changed) { m_changed = changed; }
 
+    virtual void setHighlightManager(HighLightManager* mgr);
+
+    QTime getHiglightExpires();
+
+    virtual void removeHighlight();
+
 signals:
     void updateHighlight(TreeItem*);
 
 private slots:
-    void removeHighlight();
 
 private:
     QList<TreeItem*> m_children;
@@ -91,7 +117,8 @@ private:
     TreeItem *m_parent;
     bool m_highlight;
     bool m_changed;
-    QTimer m_timer;
+    QTime m_highlightExpires;
+    HighLightManager* m_highlightManager;
 public:
     static const int dataColumn = 1;
 private:

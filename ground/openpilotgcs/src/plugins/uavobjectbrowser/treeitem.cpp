@@ -27,6 +27,45 @@
 
 #include "treeitem.h"
 
+HighLightManager::HighLightManager(long checkingInterval)
+{
+    m_expirationTimer.start(checkingInterval);
+    connect(&m_expirationTimer, SIGNAL(timeout()), this, SLOT(checkItemsExpired()));
+}
+
+bool HighLightManager::add(TreeItem *itemToAdd)
+{
+    QMutexLocker locker(&m_listMutex);
+    if(!m_itemsList.contains(itemToAdd))
+    {
+        m_itemsList.append(itemToAdd);
+        return true;
+    }
+    return false;
+}
+
+bool HighLightManager::remove(TreeItem *itemToRemove)
+{
+    QMutexLocker locker(&m_listMutex);
+    return m_itemsList.removeOne(itemToRemove);
+}
+
+void HighLightManager::checkItemsExpired()
+{
+    QMutexLocker locker(&m_listMutex);
+    QMutableLinkedListIterator<TreeItem*> iter(m_itemsList);
+    QTime now = QTime::currentTime();
+    while(iter.hasNext())
+    {
+        TreeItem* item = iter.next();
+        if(item->getHiglightExpires() < now)
+        {
+            item->removeHighlight();
+            iter.remove();
+        }
+    }
+}
+
 int TreeItem::m_highlightTimeMs = 500;
 
 TreeItem::TreeItem(const QList<QVariant> &data, TreeItem *parent) :
@@ -36,7 +75,6 @@ TreeItem::TreeItem(const QList<QVariant> &data, TreeItem *parent) :
         m_highlight(false),
         m_changed(false)
 {
-    connect(&m_timer, SIGNAL(timeout()), this, SLOT(removeHighlight()));
 }
 
 TreeItem::TreeItem(const QVariant &data, TreeItem *parent) :
@@ -46,7 +84,6 @@ TreeItem::TreeItem(const QVariant &data, TreeItem *parent) :
         m_changed(false)
 {
     m_data << data << "" << "";
-    connect(&m_timer, SIGNAL(timeout()), this, SLOT(removeHighlight()));
 }
 
 TreeItem::~TreeItem()
@@ -112,17 +149,34 @@ void TreeItem::setHighlight(bool highlight) {
     m_highlight = highlight;
     m_changed = false;
     if (highlight) {
-        if (m_timer.isActive()) {
-            m_timer.stop();
+        m_highlightExpires = QTime::currentTime().addMSecs(m_highlightTimeMs);
+        if(m_highlightManager->add(this))
+        {
+            emit updateHighlight(this);
         }
-        m_timer.setSingleShot(true);
-        m_timer.start(m_highlightTimeMs);
     }
-    emit updateHighlight(this);
+    else if(m_highlightManager->remove(this))
+    {
+        emit updateHighlight(this);
+    }
+    if(m_parent)
+    {
+        m_parent->setHighlight(highlight);
+    }
 }
 
 void TreeItem::removeHighlight() {
     m_highlight = false;
-    update();
+    //update();
     emit updateHighlight(this);
+}
+
+void TreeItem::setHighlightManager(HighLightManager *mgr)
+{
+    m_highlightManager = mgr;
+}
+
+QTime TreeItem::getHiglightExpires()
+{
+    return m_highlightExpires;
 }

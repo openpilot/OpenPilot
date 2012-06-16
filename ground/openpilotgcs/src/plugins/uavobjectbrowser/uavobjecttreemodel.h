@@ -97,6 +97,7 @@ private:
     int m_recentlyUpdatedTimeout;
     QColor m_recentlyUpdatedColor;
     QColor m_manuallyChangedColor;
+    HighLightManager *m_highlightManager;
 };
 
 #endif // UAVOBJECTTREEMODEL_H

@@ -105,6 +105,8 @@ static void onTimer(UAVObjEvent* ev)
 {
 	static FlightBatteryStateData flightBatteryData;
 	static bool BoardPowerWarning= false;
+	// prevent that the initial ramp up of the power supply rail is identified as a power failure.
+	static bool BoardPowerOk = false;
 	FlightBatterySettingsData batterySettings;
 
 	FlightBatterySettingsGet(&batterySettings);
@@ -193,15 +195,16 @@ static void onTimer(UAVObjEvent* ev)
 		{
 			AlarmsSet(SYSTEMALARMS_ALARM_POWER, SYSTEMALARMS_ALARM_ERROR);
 			BoardPowerWarning=false;
+			BoardPowerOk = false;
 		}
 		else 
 		{
-			if(flightBatteryData.BoardSupplyVoltage < BATTERY_BOARD_VOLTAGE_CRITICAL)
+			if(BoardPowerOk && flightBatteryData.BoardSupplyVoltage < BATTERY_BOARD_VOLTAGE_CRITICAL)
 			{
 				AlarmsSet(SYSTEMALARMS_ALARM_POWER, SYSTEMALARMS_ALARM_CRITICAL);
 				BoardPowerWarning=true;
 			}
-			else if (flightBatteryData.BoardSupplyVoltage < BATTERY_BOARD_VOLTAGE_WARNING)
+			else if (BoardPowerOk && flightBatteryData.BoardSupplyVoltage < BATTERY_BOARD_VOLTAGE_WARNING)
 			{
 				AlarmsSet(SYSTEMALARMS_ALARM_POWER, SYSTEMALARMS_ALARM_WARNING);
 				BoardPowerWarning=true;
@@ -213,6 +216,7 @@ static void onTimer(UAVObjEvent* ev)
 					AlarmsSet(SYSTEMALARMS_ALARM_POWER, SYSTEMALARMS_ALARM_WARNING);
 				else
 					AlarmsClear(SYSTEMALARMS_ALARM_POWER);
+				BoardPowerOk |= flightBatteryData.BoardSupplyVoltage > BATTERY_BOARD_VOLTAGE_WARNING;
 			}
 		}		
 	}		

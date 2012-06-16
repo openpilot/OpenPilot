@@ -55,7 +55,9 @@
 // Configuration
 //
 #define SAMPLE_PERIOD_MS		500
-
+#define BATTERY_BOARD_VOLTAGE_WARNING 4.5
+#define BATTERY_BOARD_VOLTAGE_CRITICAL 3.5
+#define BATTERY_BOARD_VOLTAGE_ERROR 1.0
 // Private types
 
 // Private variables
@@ -98,53 +100,122 @@ int32_t BatteryInitialize(void)
 }
 
 MODULE_INITCALL(BatteryInitialize, 0)
-
+#define HAS_SENSOR(x) batterySettings.SensorType[x]==FLIGHTBATTERYSETTINGS_SENSORTYPE_ENABLED 
 static void onTimer(UAVObjEvent* ev)
 {
 	static FlightBatteryStateData flightBatteryData;
-
+	static bool BoardPowerWarning= false;
 	FlightBatterySettingsData batterySettings;
-	static float dT = SAMPLE_PERIOD_MS / 1000.0;
-	float energyRemaining;
 
 	FlightBatterySettingsGet(&batterySettings);
 
+	static float dT = SAMPLE_PERIOD_MS / 1000.0;
+	float energyRemaining;
+
+	if(HAS_SENSOR(FLIGHTBATTERYSETTINGS_SENSORTYPE_BOARDVOLTAGE) )
+		flightBatteryData.BoardSupplyVoltage=((float)PIOS_ADC_PinGet(4)) * PIOS_ADC_VOLTAGE_SCALE * 6.1;
+	else
+		flightBatteryData.BoardSupplyVoltage = -1;
+
 	//calculate the battery parameters
-	flightBatteryData.Voltage = ((float)PIOS_ADC_PinGet(0)) * batterySettings.SensorCalibrations[FLIGHTBATTERYSETTINGS_SENSORCALIBRATIONS_VOLTAGEFACTOR]; //in Volts
-	flightBatteryData.Current = ((float)PIOS_ADC_PinGet(1)) * batterySettings.SensorCalibrations[FLIGHTBATTERYSETTINGS_SENSORCALIBRATIONS_CURRENTFACTOR]; //in Amps
+	if(HAS_SENSOR(FLIGHTBATTERYSETTINGS_SENSORTYPE_BATTERYVOLTAGE) )
+		flightBatteryData.Voltage = ((float)PIOS_ADC_PinGet(0)) * PIOS_ADC_VOLTAGE_SCALE * batterySettings.SensorCalibrations[FLIGHTBATTERYSETTINGS_SENSORCALIBRATIONS_VOLTAGEFACTOR]; //in Volts
+	else 
+		flightBatteryData.Voltage = -1;
 
-	flightBatteryData.ConsumedEnergy += (flightBatteryData.Current * 1000.0f * dT / 3600.0f) ;//in mAh
-	if (flightBatteryData.Current > flightBatteryData.PeakCurrent)flightBatteryData.PeakCurrent = flightBatteryData.Current; //in Amps
-	flightBatteryData.AvgCurrent=(flightBatteryData.AvgCurrent*0.8)+(flightBatteryData.Current*0.2); //in Amps
+	
+	if(HAS_SENSOR(FLIGHTBATTERYSETTINGS_SENSORTYPE_BATTERYCURRENT))
+	{
+		flightBatteryData.Current = ((float)PIOS_ADC_PinGet(1)) * PIOS_ADC_VOLTAGE_SCALE * batterySettings.SensorCalibrations[FLIGHTBATTERYSETTINGS_SENSORCALIBRATIONS_CURRENTFACTOR]; //in Amps
+		flightBatteryData.ConsumedEnergy += (flightBatteryData.Current * 1000.0f * dT / 3600.0f) ;//in mAh
+		
+		if (flightBatteryData.Current > flightBatteryData.PeakCurrent)
+			flightBatteryData.PeakCurrent = flightBatteryData.Current; //in Amps
+		
+		flightBatteryData.AvgCurrent=(flightBatteryData.AvgCurrent*0.8)+(flightBatteryData.Current*0.2); //in Amps
 
-	//sanity checks
-	if (flightBatteryData.AvgCurrent<0)flightBatteryData.AvgCurrent=0.0;
-	if (flightBatteryData.PeakCurrent<0)flightBatteryData.PeakCurrent=0.0;
-	if (flightBatteryData.ConsumedEnergy<0)flightBatteryData.ConsumedEnergy=0.0;
+		//sanity checks
+		if (flightBatteryData.AvgCurrent<0)
+			flightBatteryData.AvgCurrent=0.0;
+		if (flightBatteryData.PeakCurrent<0)
+			flightBatteryData.PeakCurrent=0.0;
+		if (flightBatteryData.ConsumedEnergy<0)
+			flightBatteryData.ConsumedEnergy=0.0;
 
-	energyRemaining = batterySettings.Capacity - flightBatteryData.ConsumedEnergy; // in mAh
-	flightBatteryData.EstimatedFlightTime = ((energyRemaining / (flightBatteryData.AvgCurrent*1000.0))*3600.0);//in Sec
+		energyRemaining = batterySettings.Capacity - flightBatteryData.ConsumedEnergy; // in mAh
+		flightBatteryData.EstimatedFlightTime = ((energyRemaining / (flightBatteryData.AvgCurrent*1000.0))*3600.0);//in Sec
+	}
+	else 
+		if(flightBatteryData.Current != -1)
+		{
+			flightBatteryData.Current = -1;
+			flightBatteryData.EstimatedFlightTime = 0;
+			flightBatteryData.AvgCurrent = 0;
+			flightBatteryData.ConsumedEnergy = 0;
+		}
 
-	//generate alarms where needed...
-	if ((flightBatteryData.Voltage<=0)&&(flightBatteryData.Current<=0))
+		//Check for battery inputs disconnection (don't think this really works. Do we need pull down on inputs?).
+	if (flightBatteryData.Voltage == 0 || 
+		 flightBatteryData.Current == 0 )
 	{
 		AlarmsSet(SYSTEMALARMS_ALARM_BATTERY, SYSTEMALARMS_ALARM_ERROR);
 		AlarmsSet(SYSTEMALARMS_ALARM_FLIGHTTIME, SYSTEMALARMS_ALARM_ERROR);
 	}
 	else
 	{
-		if (flightBatteryData.EstimatedFlightTime < 30) AlarmsSet(SYSTEMALARMS_ALARM_FLIGHTTIME, SYSTEMALARMS_ALARM_CRITICAL);
-		else if (flightBatteryData.EstimatedFlightTime < 60) AlarmsSet(SYSTEMALARMS_ALARM_FLIGHTTIME, SYSTEMALARMS_ALARM_WARNING);
-		else AlarmsClear(SYSTEMALARMS_ALARM_FLIGHTTIME);
-
+		if(HAS_SENSOR(FLIGHTBATTERYSETTINGS_SENSORTYPE_BATTERYCURRENT))
+		{
+			if (flightBatteryData.EstimatedFlightTime < 30) 
+				AlarmsSet(SYSTEMALARMS_ALARM_FLIGHTTIME, SYSTEMALARMS_ALARM_CRITICAL);
+			else 
+				if (flightBatteryData.EstimatedFlightTime < 60) 
+					AlarmsSet(SYSTEMALARMS_ALARM_FLIGHTTIME, SYSTEMALARMS_ALARM_WARNING);
+				else 
+					AlarmsClear(SYSTEMALARMS_ALARM_FLIGHTTIME);
+		}
+		
 		// FIXME: should make the battery voltage detection dependent on battery type.
-		if (flightBatteryData.Voltage < batterySettings.VoltageThresholds[FLIGHTBATTERYSETTINGS_VOLTAGETHRESHOLDS_ALARM])
-			AlarmsSet(SYSTEMALARMS_ALARM_BATTERY, SYSTEMALARMS_ALARM_CRITICAL);
-		else if (flightBatteryData.Voltage < batterySettings.VoltageThresholds[FLIGHTBATTERYSETTINGS_VOLTAGETHRESHOLDS_WARNING])
-			AlarmsSet(SYSTEMALARMS_ALARM_BATTERY, SYSTEMALARMS_ALARM_WARNING);
-		else AlarmsClear(SYSTEMALARMS_ALARM_BATTERY);
+		if(HAS_SENSOR(FLIGHTBATTERYSETTINGS_SENSORTYPE_BATTERYVOLTAGE)){
+			if (flightBatteryData.Voltage < batterySettings.VoltageThresholds[FLIGHTBATTERYSETTINGS_VOLTAGETHRESHOLDS_ALARM] )
+				AlarmsSet(SYSTEMALARMS_ALARM_BATTERY, SYSTEMALARMS_ALARM_CRITICAL);
+			else 
+				if (flightBatteryData.Voltage < batterySettings.VoltageThresholds[FLIGHTBATTERYSETTINGS_VOLTAGETHRESHOLDS_WARNING])
+					AlarmsSet(SYSTEMALARMS_ALARM_BATTERY, SYSTEMALARMS_ALARM_WARNING);
+				else 
+					AlarmsClear(SYSTEMALARMS_ALARM_BATTERY);
+		}
 	}
-
+	
+	if(HAS_SENSOR(FLIGHTBATTERYSETTINGS_SENSORTYPE_BOARDVOLTAGE) )
+	{
+		// power ia disconnected from the board (it is powered by usb)
+		if(flightBatteryData.BoardSupplyVoltage!= -1 && flightBatteryData.BoardSupplyVoltage < BATTERY_BOARD_VOLTAGE_ERROR)
+		{
+			AlarmsSet(SYSTEMALARMS_ALARM_POWER, SYSTEMALARMS_ALARM_ERROR);
+			BoardPowerWarning=false;
+		}
+		else 
+		{
+			if(flightBatteryData.BoardSupplyVoltage < BATTERY_BOARD_VOLTAGE_CRITICAL)
+			{
+				AlarmsSet(SYSTEMALARMS_ALARM_POWER, SYSTEMALARMS_ALARM_CRITICAL);
+				BoardPowerWarning=true;
+			}
+			else if (flightBatteryData.BoardSupplyVoltage < BATTERY_BOARD_VOLTAGE_WARNING)
+			{
+				AlarmsSet(SYSTEMALARMS_ALARM_POWER, SYSTEMALARMS_ALARM_WARNING);
+				BoardPowerWarning=true;
+			}
+			else 
+			{
+				// if there was any previous warning/critical condition, notify the problem leaving the warning
+				if(BoardPowerWarning)
+					AlarmsSet(SYSTEMALARMS_ALARM_POWER, SYSTEMALARMS_ALARM_WARNING);
+				else
+					AlarmsClear(SYSTEMALARMS_ALARM_POWER);
+			}
+		}		
+	}		
 	FlightBatteryStateSet(&flightBatteryData);
 }
 

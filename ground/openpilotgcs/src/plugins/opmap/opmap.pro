@@ -21,7 +21,8 @@ HEADERS += opmapplugin.h \
     flightdatamodel.h \
     modelmapproxy.h \
     widgetdelegates.h \
-    pathplanner.h
+    pathplanner.h \
+    modeluavoproxy.h
 
 SOURCES += opmapplugin.cpp \
     opmapgadgetwidget.cpp \
@@ -35,7 +36,8 @@ SOURCES += opmapplugin.cpp \
     flightdatamodel.cpp \
     modelmapproxy.cpp \
     widgetdelegates.cpp \
-    pathplanner.cpp
+    pathplanner.cpp \
+    modeluavoproxy.cpp
 
 OTHER_FILES += OPMapGadget.pluginspec
 

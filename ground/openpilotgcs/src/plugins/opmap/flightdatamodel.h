@@ -25,6 +25,7 @@ struct pathPlanData
 
 class flightDataModel:public QAbstractTableModel
 {
+    Q_OBJECT
 public:
     enum pathPlanDataEnum
     {

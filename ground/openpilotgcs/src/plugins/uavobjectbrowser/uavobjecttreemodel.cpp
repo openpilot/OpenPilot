@@ -46,6 +46,8 @@ UAVObjectTreeModel::UAVObjectTreeModel(QObject *parent) :
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+
+    // Create highlight manager, let it run every 300 ms.
     m_highlightManager = new HighLightManager(300);
     connect(objManager, SIGNAL(newObject(UAVObject*)), this, SLOT(newObject(UAVObject*)));
     connect(objManager, SIGNAL(newInstance(UAVObject*)), this, SLOT(newObject(UAVObject*)));

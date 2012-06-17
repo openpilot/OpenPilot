@@ -97,6 +97,8 @@ private:
     int m_recentlyUpdatedTimeout;
     QColor m_recentlyUpdatedColor;
     QColor m_manuallyChangedColor;
+
+    // Highlight manager to handle highlighting of tree items.
     HighLightManager *m_highlightManager;
 };
 

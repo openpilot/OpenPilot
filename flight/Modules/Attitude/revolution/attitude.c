@@ -104,7 +104,7 @@ const uint32_t SENSOR_QUEUE_SIZE = 10;
 // Private functions
 static void AttitudeTask(void *parameters);
 
-static int32_t updateAttitudeComplimentary(bool first_run);
+static int32_t updateAttitudeComplementary(bool first_run);
 static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode);
 static void settingsUpdatedCb(UAVObjEvent * objEv);
 
@@ -223,8 +223,8 @@ static void AttitudeTask(void *parameters)
 
 		// This  function blocks on data queue
 		switch (revoSettings.FusionAlgorithm ) {
-			case REVOSETTINGS_FUSIONALGORITHM_COMPLIMENTARY:
-				ret_val = updateAttitudeComplimentary(first_run);
+			case REVOSETTINGS_FUSIONALGORITHM_COMPLEMENTARY:
+				ret_val = updateAttitudeComplementary(first_run);
 				break;
 			case REVOSETTINGS_FUSIONALGORITHM_INSOUTDOOR:
 				ret_val = updateAttitudeINSGPS(first_run, true);
@@ -251,7 +251,7 @@ float mag_err[3];
 float magKi = 0.000001f;
 float magKp = 0.01f;
 
-static int32_t updateAttitudeComplimentary(bool first_run)
+static int32_t updateAttitudeComplementary(bool first_run)
 {
 	UAVObjEvent ev;
 	GyrosData gyrosData;

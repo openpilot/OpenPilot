@@ -113,6 +113,13 @@ namespace correl {
 	}
 
 
+	double Zncc::compute8noborne(image::Image const& im1, image::Image const& im2)
+	{
+		JFR_PRECOND(im1.depth() == im2.depth(), "The depth of both images is different");
+		JFR_PRECOND(im1.depth() == CV_8U, "The depth of images must be CV_8U");
+		return computeTpl<CV_8U, uint8_t,uint8_t,0,255,false,false>(im1,im2);
+	}
+
 	double Zncc::compute(image::Image const& im1, image::Image const& im2, float const* weightMatrix)
 	{
 		JFR_PRECOND(im1.depth() == im2.depth(), "The depth of both images is different");

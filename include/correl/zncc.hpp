@@ -34,6 +34,7 @@ namespace jafar {
 				@return ZNCC correlation score between 0 and 1
 			*/
 			static double compute(image::Image const& im1, image::Image const& im2, float const* weightMatrix = NULL);
+			static double compute8noborne(image::Image const& im1, image::Image const& im2);
 			/**
 			* This function return the best ZNCC between two images, the second images get rotated
 			* @param im1 the first image ; the roi can be set (with set_roi(CvRect))

@@ -127,7 +127,7 @@ namespace correl {
 			if (res > (force?-1.5:-3.5)) { JFR_ASSERT(bestx >= 0 && besty >= 0 && best_score > -3.5, ""); return; } // already computed
 			cv::Rect patch_in_im2(x-hpatch_in_im1.width, y-hpatch_in_im1.height, patch_in_im1.width, patch_in_im1.height);
 			im2.setROI(patch_in_im2);
-			double score = Zncc::compute(im1, im2, NULL);
+			double score = Zncc::compute8noborne(im1, im2);
 			res = score;
 // JFR_DEBUG("doCorrelationRobust " << x << "," << y << "," << score);
 			if (score > best_score) { best_score = score; bestx = x; besty = y; }
@@ -170,6 +170,7 @@ namespace correl {
 		double FastTranslationMatcherZncc::match(image::Image const& im1, image::Image const& im2_, 
 			image::ConvexRoi const &roi_in_im2, double &xres, double &yres, double &xstd, double &ystd, cv::Mat **results_)
 		{
+			double ambiguity_thres = 0.02;
 			///-- init
 // JFR_DEBUG("### FastTranslationMatcherZncc::match im1 " << im1.getROI() << " im2 " << roi_in_im2);
 			// current roi
@@ -187,7 +188,7 @@ namespace correl {
 			// init results matrix
 			cv::Mat *results;
 			if (results_ == NULL) 
-				results = new cv::Mat(result_in_im2.height, result_in_im2.width, CV_64FC1); else  // add 1 border for interpolation
+				results = new cv::Mat(result_in_im2.height, result_in_im2.width, CV_64FC1); else  // add 1 pixel border for interpolation
 				results = *results_;
 			*results = -4; // init all elements
 			// global vars
@@ -336,6 +337,8 @@ namespace correl {
 			} while (bestx != nbestx || besty != nbesty);
 			
 // JFR_DEBUG("### interpolate (" << bestx << "," << besty << "," << best_score << ")");
+			bool ambiguous;
+
 			///-- interpolate
 			double a1, a2, a3, best_score_x, best_score_y;
 			// interpolate x
@@ -345,9 +348,15 @@ namespace correl {
 			a2 = results->at<double>((besty  )-result_in_im2.y,(bestx  )-result_in_im2.x);
 			if (bestx < result_in_im2.x+result_in_im2.width-1)
 				a3 = results->at<double>((besty  )-result_in_im2.y,(bestx+1)-result_in_im2.x);
-			if (a1 > -1.5 && a3 > -1.5) jmath::parabolicInterpolation(a1,a2,a3, xres, best_score_x, xstd);
+			ambiguous = false;
+			if (a1 > -1.5 && a3 > -1.5)
+			{
+				jmath::parabolicInterpolation(a1,a2,a3, xres, best_score_x, xstd);
+				if (a1 > a2-ambiguity_thres && a3 > a2-ambiguity_thres) ambiguous = true;
+			} else ambiguous = true;
 			xres += bestx+0.5;
 			xstd = -1.0/(2*xstd);
+			if (ambiguous) xstd = 1e6;
 			
 			// interpolate y
 			best_score_y = best_score; yres = 0; a1 = a2 = a3 = -2;
@@ -356,13 +365,20 @@ namespace correl {
 			a2 = results->at<double>((besty  )-result_in_im2.y,(bestx  )-result_in_im2.x);
 			if (besty < result_in_im2.y+result_in_im2.height-1)
 				a3 = results->at<double>((besty+1)-result_in_im2.y,(bestx  )-result_in_im2.x);
-			if (a1 > -1.5 && a3 > -1.5) jmath::parabolicInterpolation(a1,a2,a3, yres, best_score_y, ystd);
+			ambiguous = false;
+			if (a1 > -1.5 && a3 > -1.5)
+			{
+				jmath::parabolicInterpolation(a1,a2,a3, yres, best_score_y, ystd);
+				if (a1 > a2-ambiguity_thres && a3 > a2-ambiguity_thres) ambiguous = true;
+			} else ambiguous = true;
 			yres += besty+0.5;
 			ystd = -1.0/(2*ystd);
+			if (ambiguous) ystd = 1e6;
+
 			// merge score interpolations
 			// we could do better, with 3+3+2 interpolations, but it's too much work
-			//best_score = std::max(best_score_x, best_score_y); // approx 1, minoring
-			best_score = std::min(1.0,best_score_x+best_score_y-best_score); // approx 2, should be closer, but not guaranted to be minoring
+			//best_score = std::max(best_score_x, best_score_y); // approx #1, minoring
+			best_score = std::min(1.0,best_score_x+best_score_y-best_score); // approx #2, should be closer, but not guaranted to be minoring
 			
 // JFR_DEBUG("### end (" << xres << "," << yres << "," << best_score << ")");
 			if (results_ == NULL) delete results;

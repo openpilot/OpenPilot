@@ -12,5 +12,6 @@
         <file>images/application-certificate.svg</file>
         <file>images/warning.svg</file>
         <file>images/error.svg</file>
+        <file>images/deviceID-0402.svg</file>
     </qresource>
 </RCC>

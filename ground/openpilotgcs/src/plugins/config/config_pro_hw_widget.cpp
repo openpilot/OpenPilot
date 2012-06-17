@@ -43,7 +43,7 @@ ConfigProHWWidget::ConfigProHWWidget(QWidget *parent) : ConfigTaskWidget(parent)
     addUAVObjectToWidgetRelation("HwSettings","TelemetrySpeed",m_telemetry->telemetrySpeed);
     enableControls(false);
     populateWidgets();
-    refreshWidgetsValues();
+    refreshWidgetsValues(NULL);
 }
 
 ConfigProHWWidget::~ConfigProHWWidget()

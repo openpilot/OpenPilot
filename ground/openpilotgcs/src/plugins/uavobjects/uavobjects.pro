@@ -24,18 +24,23 @@ OTHER_FILES += UAVObjects.pluginspec
 
 # Add in all of the synthetic/generated uavobject files
 HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
-    $$UAVOBJECT_SYNTHETICS/ahrsstatus.h \
-    $$UAVOBJECT_SYNTHETICS/ahrscalibration.h \
     $$UAVOBJECT_SYNTHETICS/baroaltitude.h \
     $$UAVOBJECT_SYNTHETICS/attitudeactual.h \
-    $$UAVOBJECT_SYNTHETICS/ahrssettings.h \
+    $$UAVOBJECT_SYNTHETICS/altholdsmoothed.h \
+    $$UAVOBJECT_SYNTHETICS/altitudeholddesired.h \
+    $$UAVOBJECT_SYNTHETICS/altitudeholdsettings.h \
+    $$UAVOBJECT_SYNTHETICS/revocalibration.h \
     $$UAVOBJECT_SYNTHETICS/gcstelemetrystats.h \
-    $$UAVOBJECT_SYNTHETICS/attituderaw.h \
+    $$UAVOBJECT_SYNTHETICS/gyros.h \
+    $$UAVOBJECT_SYNTHETICS/gyrosbias.h \
+    $$UAVOBJECT_SYNTHETICS/accels.h \
+    $$UAVOBJECT_SYNTHETICS/magnetometer.h \
     $$UAVOBJECT_SYNTHETICS/camerastabsettings.h \
     $$UAVOBJECT_SYNTHETICS/flighttelemetrystats.h \
     $$UAVOBJECT_SYNTHETICS/systemstats.h \
     $$UAVOBJECT_SYNTHETICS/systemalarms.h \
     $$UAVOBJECT_SYNTHETICS/objectpersistence.h \
+    $$UAVOBJECT_SYNTHETICS/overosyncstats.h \
     $$UAVOBJECT_SYNTHETICS/systemsettings.h \
     $$UAVOBJECT_SYNTHETICS/stabilizationsettings.h \
     $$UAVOBJECT_SYNTHETICS/manualcontrolsettings.h \
@@ -75,22 +80,27 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/txpidsettings.h \
     $$UAVOBJECT_SYNTHETICS/cameradesired.h \
     $$UAVOBJECT_SYNTHETICS/faultsettings.h \
-    $$UAVOBJECT_SYNTHETICS/waypoint.h \
-    $$UAVOBJECT_SYNTHETICS/waypointactive.h \
-    $$UAVOBJECT_SYNTHETICS/pathaction.h
+    $$UAVOBJECT_SYNTHETICS/pipxsettings.h \
+    $$UAVOBJECT_SYNTHETICS/pipxstatus.h
+
 SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
-    $$UAVOBJECT_SYNTHETICS/ahrsstatus.cpp \
-    $$UAVOBJECT_SYNTHETICS/ahrscalibration.cpp \
     $$UAVOBJECT_SYNTHETICS/baroaltitude.cpp \
     $$UAVOBJECT_SYNTHETICS/attitudeactual.cpp \
-    $$UAVOBJECT_SYNTHETICS/ahrssettings.cpp \
+    $$UAVOBJECT_SYNTHETICS/altholdsmoothed.cpp \
+    $$UAVOBJECT_SYNTHETICS/altitudeholddesired.cpp \
+    $$UAVOBJECT_SYNTHETICS/altitudeholdsettings.cpp \
+    $$UAVOBJECT_SYNTHETICS/revocalibration.cpp \
     $$UAVOBJECT_SYNTHETICS/gcstelemetrystats.cpp \
-    $$UAVOBJECT_SYNTHETICS/attituderaw.cpp \
+    $$UAVOBJECT_SYNTHETICS/accels.cpp \
+    $$UAVOBJECT_SYNTHETICS/gyros.cpp \
+    $$UAVOBJECT_SYNTHETICS/gyrosbias.cpp \
+    $$UAVOBJECT_SYNTHETICS/magnetometer.cpp \
     $$UAVOBJECT_SYNTHETICS/camerastabsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/flighttelemetrystats.cpp \
     $$UAVOBJECT_SYNTHETICS/systemstats.cpp \
     $$UAVOBJECT_SYNTHETICS/systemalarms.cpp \
     $$UAVOBJECT_SYNTHETICS/objectpersistence.cpp \
+    $$UAVOBJECT_SYNTHETICS/overosyncstats.cpp \
     $$UAVOBJECT_SYNTHETICS/systemsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/stabilizationsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/manualcontrolsettings.cpp \
@@ -131,6 +141,5 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/txpidsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/cameradesired.cpp \
     $$UAVOBJECT_SYNTHETICS/faultsettings.cpp \
-    $$UAVOBJECT_SYNTHETICS/waypoint.cpp \
-    $$UAVOBJECT_SYNTHETICS/waypointactive.cpp \
-    $$UAVOBJECT_SYNTHETICS/pathaction.cpp
+    $$UAVOBJECT_SYNTHETICS/pipxsettings.cpp \
+    $$UAVOBJECT_SYNTHETICS/pipxstatus.cpp

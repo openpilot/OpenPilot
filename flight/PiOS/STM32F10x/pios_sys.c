@@ -118,8 +118,8 @@ uint32_t PIOS_SYS_getCPUFlashSize(void)
 
 /**
 * Returns the serial number as a string
-* param[out] str pointer to a string which can store at least 32 digits + zero terminator!
-* (24 digits returned for STM32)
+* param[out] uint8_t pointer to a string which can store at least 12 bytes
+* (12 bytes returned for STM32)
 * return < 0 if feature not supported
 */
 int32_t PIOS_SYS_SerialNumberGetBinary(uint8_t *array)
@@ -127,7 +127,7 @@ int32_t PIOS_SYS_SerialNumberGetBinary(uint8_t *array)
 	int i;
 
 	/* Stored in the so called "electronic signature" */
-	for (i = 0; i < 12; ++i) {
+	for (i = 0; i < PIOS_SYS_SERIAL_NUM_BINARY_LEN; ++i) {
 		uint8_t b = MEM8(0x1ffff7e8 + i);
 
 		array[i] = b;
@@ -148,7 +148,7 @@ int32_t PIOS_SYS_SerialNumberGet(char *str)
 	int i;
 
 	/* Stored in the so called "electronic signature" */
-	for (i = 0; i < 24; ++i) {
+	for (i = 0; i < PIOS_SYS_SERIAL_NUM_ASCII_LEN; ++i) {
 		uint8_t b = MEM8(0x1ffff7e8 + (i / 2));
 		if (!(i & 1))
 			b >>= 4;

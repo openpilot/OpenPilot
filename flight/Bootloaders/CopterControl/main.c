@@ -70,14 +70,13 @@ uint8_t processRX();
 void jump_to_app();
 
 int main() {
-	PIOS_SYS_Init();
-	if (BSL_HOLD_STATE == 0)
-		USB_connected = TRUE;
-
+	PIOS_SYS_Init();	
+	PIOS_Board_Init();
 	PIOS_IAP_Init();
+	
+	USB_connected = PIOS_USB_CableConnected(0);
 
 	if (PIOS_IAP_CheckRequest() == TRUE) {
-		PIOS_Board_Init();
 		PIOS_DELAY_WaitmS(1000);
 		User_DFU_request = TRUE;
 		PIOS_IAP_ClearRequest();

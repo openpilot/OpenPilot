@@ -911,7 +911,13 @@ out_fail:
 	return(-1);
 }
 
-bool PIOS_I2C_Transfer(uint32_t i2c_id, const struct pios_i2c_txn txn_list[], uint32_t num_txns)
+/**
+ * @brief Perform a series of I2C transactions
+ * @returns 0 if success or error code
+ * @retval -1 for failed transaction 
+ * @retval -2 for failure to get semaphore
+ */
+int32_t PIOS_I2C_Transfer(uint32_t i2c_id, const struct pios_i2c_txn txn_list[], uint32_t num_txns)
 {
 	struct pios_i2c_adapter * i2c_adapter = (struct pios_i2c_adapter *)i2c_id;
 
@@ -928,6 +934,17 @@ bool PIOS_I2C_Transfer(uint32_t i2c_id, const struct pios_i2c_txn txn_list[], ui
 	portTickType timeout;
 	timeout = i2c_adapter->cfg->transfer_timeout_ms / portTICK_RATE_MS;
 	semaphore_success &= (xSemaphoreTake(i2c_adapter->sem_busy, timeout) == pdTRUE);
+#else
+	uint32_t timeout = 0xfff;
+	while(i2c_adapter->busy && --timeout);
+	if(timeout == 0) //timed out
+		return false;
+	
+	PIOS_IRQ_Disable();
+	if(i2c_adapter->busy)
+		return false;
+	i2c_adapter->busy = 1;
+	PIOS_IRQ_Enable();
 #endif /* USE_FREERTOS */
 
 	PIOS_DEBUG_Assert(i2c_adapter->curr_state == I2C_STATE_STOPPED);
@@ -948,6 +965,10 @@ bool PIOS_I2C_Transfer(uint32_t i2c_id, const struct pios_i2c_txn txn_list[], ui
 #ifdef USE_FREERTOS
 	semaphore_success &= (xSemaphoreTake(i2c_adapter->sem_ready, timeout) == pdTRUE);
 	xSemaphoreGive(i2c_adapter->sem_ready);
+#else
+	PIOS_IRQ_Disable();
+	i2c_adapter->busy = 0;
+	PIOS_IRQ_Enable();
 #endif /* USE_FREERTOS */
 
 	/* Spin waiting for the transfer to finish */
@@ -966,7 +987,9 @@ bool PIOS_I2C_Transfer(uint32_t i2c_id, const struct pios_i2c_txn txn_list[], ui
 		i2c_timeout_counter++;
 #endif /* USE_FREERTOS */
 
-	return (!i2c_adapter->bus_error) && semaphore_success;
+	return !semaphore_success ? -2 :
+		i2c_adapter->bus_error ? -1 :
+		0;
 }
 
 

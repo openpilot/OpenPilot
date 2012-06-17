@@ -16,7 +16,8 @@
 			Roll Rate.ILimit, Pitch Rate.ILimit, Roll+Pitch Rate.ILimit, Yaw Rate.ILimit,
 			Roll Attitude.Kp, Pitch Attitude.Kp, Roll+Pitch Attitude.Kp, Yaw Attitude.Kp,
 			Roll Attitude.Ki, Pitch Attitude.Ki, Roll+Pitch Attitude.Ki, Yaw Attitude.Ki,
-			Roll Attitude.ILimit, Pitch Attitude.ILimit, Roll+Pitch Attitude.ILimit, Yaw Attitude.ILimit"
+			Roll Attitude.ILimit, Pitch Attitude.ILimit, Roll+Pitch Attitude.ILimit, Yaw Attitude.ILimit,
+			GyroTau"
 		defaultvalue="Disabled"/>
         <field name="MinPID" units="" type="float" elementnames="Instance1,Instance2,Instance3" defaultvalue="0"/>
         <field name="MaxPID" units="" type="float" elementnames="Instance1,Instance2,Instance3" defaultvalue="0"/>
@@ -24,6 +25,6 @@
 	<access gcs="readwrite" flight="readwrite"/>
 	<telemetrygcs acked="true" updatemode="onchange" period="0"/>
 	<telemetryflight acked="true" updatemode="onchange" period="0"/>
-	<logging updatemode="never" period="0"/>
+	<logging updatemode="manual" period="0"/>
     </object>
 </xml>

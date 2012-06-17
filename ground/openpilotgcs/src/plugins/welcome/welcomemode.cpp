@@ -124,7 +124,7 @@ void WelcomeMode::openUrl(const QString &url)
 
 void WelcomeMode::openPage(const QString &page)
 {
-    Core::ModeManager::instance()->activateMode(page);
+    Core::ModeManager::instance()->activateModeByWorkspaceName(page);
 }
 
 } // namespace Welcome

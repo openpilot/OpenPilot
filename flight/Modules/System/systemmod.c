@@ -65,7 +65,7 @@
 #define STACK_SIZE_BYTES 924
 #endif
 
-#define TASK_PRIORITY (tskIDLE_PRIORITY+2)
+#define TASK_PRIORITY (tskIDLE_PRIORITY+1)
 
 // Private types
 
@@ -215,7 +215,7 @@ static void objectUpdatedCb(UAVObjEvent * ev)
 		// Get object data
 		ObjectPersistenceGet(&objper);
 
-		int retval = -1;
+		int retval = 1;
 		// Execute action
 		if (objper.Operation == OBJECTPERSISTENCE_OPERATION_LOAD) {
 			if (objper.Selection == OBJECTPERSISTENCE_SELECTION_SINGLEOBJECT) {
@@ -242,6 +242,13 @@ static void objectUpdatedCb(UAVObjEvent * ev)
 				}
 				// Save selected instance
 				retval = UAVObjSave(obj, objper.InstanceID);
+
+				// Not sure why this is needed
+				vTaskDelay(10);
+
+				// Verify saving worked
+				if (retval == 0)
+					retval = UAVObjLoad(obj, objper.InstanceID);
 			} else if (objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLSETTINGS
 				   || objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLOBJECTS) {
 				retval = UAVObjSaveSettings();
@@ -271,9 +278,17 @@ static void objectUpdatedCb(UAVObjEvent * ev)
 			retval = PIOS_FLASHFS_Format();
 #endif
 		}
-		if(retval == 0) { 
-			objper.Operation = OBJECTPERSISTENCE_OPERATION_COMPLETED;
-			ObjectPersistenceSet(&objper);
+		switch(retval) {
+			case 0:
+				objper.Operation = OBJECTPERSISTENCE_OPERATION_COMPLETED;
+				ObjectPersistenceSet(&objper);
+				break;
+			case -1:
+				objper.Operation = OBJECTPERSISTENCE_OPERATION_ERROR;
+				ObjectPersistenceSet(&objper);
+				break;
+			default:
+				break;
 		}
 	}
 }
@@ -384,7 +399,7 @@ static void updateStats()
 	if (now > lastTickCount) {
 		uint32_t dT = (xTaskGetTickCount() - lastTickCount) * portTICK_RATE_MS;	// in ms
 		stats.CPULoad =
-			100 - (uint8_t) round(100.0 * ((float)idleCounter / ((float)dT / 1000.0)) / (float)IDLE_COUNTS_PER_SEC_AT_NO_LOAD);
+			100 - (uint8_t) roundf(100.0f * ((float)idleCounter / ((float)dT / 1000.0f)) / (float)IDLE_COUNTS_PER_SEC_AT_NO_LOAD);
 	} //else: TickCount has wrapped, do not calc now
 	lastTickCount = now;
 	idleCounterClear = 1;
@@ -457,11 +472,21 @@ static void updateSystemAlarms()
 	EventGetStats(&evStats);
 	UAVObjClearStats();
 	EventClearStats();
-	if (objStats.eventErrors > 0 || evStats.eventErrors > 0) {
+	if (objStats.eventCallbackErrors > 0 || objStats.eventQueueErrors > 0  || evStats.eventErrors > 0) {
 		AlarmsSet(SYSTEMALARMS_ALARM_EVENTSYSTEM, SYSTEMALARMS_ALARM_WARNING);
 	} else {
 		AlarmsClear(SYSTEMALARMS_ALARM_EVENTSYSTEM);
 	}
+	
+	if (objStats.lastCallbackErrorID || objStats.lastQueueErrorID || evStats.lastErrorID) {
+		SystemStatsData sysStats;
+		SystemStatsGet(&sysStats);
+		sysStats.EventSystemWarningID = evStats.lastErrorID;
+		sysStats.ObjectManagerCallbackID = objStats.lastCallbackErrorID;
+		sysStats.ObjectManagerQueueID = objStats.lastQueueErrorID;
+		SystemStatsSet(&sysStats);
+	}
+		
 }
 
 /**

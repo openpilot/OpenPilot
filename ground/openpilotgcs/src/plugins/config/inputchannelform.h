@@ -7,7 +7,7 @@ namespace Ui {
     class inputChannelForm;
 }
 
-class inputChannelForm : public QWidget
+class inputChannelForm : public ConfigTaskWidget
 {
     Q_OBJECT
 

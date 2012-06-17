@@ -39,6 +39,7 @@ DEBUG ?= NO
 
 # Include objects that are just nice information to show
 DIAGNOSTICS ?= NO
+DIAG_TASKS ?= NO
 
 # Set to YES to build a FW version that will erase all flash memory
 ERASE_FLASH ?= NO
@@ -49,7 +50,7 @@ ENABLE_DEBUG_PINS ?= NO
 ENABLE_AUX_UART ?= NO
 
 # Set to YES when using Code Sourcery toolchain
-CODE_SOURCERY ?= YES
+CODE_SOURCERY ?= NO
 
 # Remove command is different for Code Sourcery on Windows
 ifeq ($(CODE_SOURCERY), YES)
@@ -185,7 +186,8 @@ SRC += $(OPUAVSYNTHDIR)/stabilizationsettings.c
 SRC += $(OPUAVSYNTHDIR)/actuatorcommand.c
 SRC += $(OPUAVSYNTHDIR)/actuatordesired.c
 SRC += $(OPUAVSYNTHDIR)/actuatorsettings.c
-SRC += $(OPUAVSYNTHDIR)/attituderaw.c
+SRC += $(OPUAVSYNTHDIR)/accels.c
+SRC += $(OPUAVSYNTHDIR)/gyros.c
 SRC += $(OPUAVSYNTHDIR)/attitudeactual.c
 SRC += $(OPUAVSYNTHDIR)/manualcontrolcommand.c
 SRC += $(OPUAVSYNTHDIR)/i2cstats.c
@@ -227,8 +229,9 @@ SRC += $(PIOSSTM32F10X)/pios_gpio.c
 SRC += $(PIOSSTM32F10X)/pios_exti.c
 SRC += $(PIOSSTM32F10X)/pios_rtc.c
 SRC += $(PIOSSTM32F10X)/pios_wdg.c
+SRC += $(PIOSSTM32F10X)/pios_iap.c
 SRC += $(PIOSSTM32F10X)/pios_tim.c
-
+SRC += $(PIOSSTM32F10X)/pios_bl_helper.c
 
 # PIOS USB related files (separated to make code maintenance more easy)
 SRC += $(PIOSSTM32F10X)/pios_usb.c
@@ -240,17 +243,17 @@ SRC += $(PIOSSTM32F10X)/pios_usb_hid_pwr.c
 SRC += $(OPSYSTEM)/pios_usb_board_data.c
 SRC += $(PIOSCOMMON)/pios_usb_desc_hid_cdc.c
 SRC += $(PIOSCOMMON)/pios_usb_desc_hid_only.c
+SRC += $(PIOSCOMMON)/pios_usb_util.c
 
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_crc.c
 SRC += $(PIOSCOMMON)/pios_flashfs_objlist.c
-SRC += $(PIOSCOMMON)/pios_flash_w25x.c
+SRC += $(PIOSCOMMON)/pios_flash_jedec.c
 SRC += $(PIOSCOMMON)/pios_adxl345.c
+SRC += $(PIOSCOMMON)/pios_mpu6000.c
 SRC += $(PIOSCOMMON)/pios_com.c
-SRC += $(PIOSCOMMON)/pios_i2c_esc.c
-SRC += $(PIOSCOMMON)/pios_bmp085.c
-SRC += $(PIOSCOMMON)/pios_iap.c
-SRC += $(PIOSCOMMON)/pios_bl_helper.c
+#SRC += $(PIOSCOMMON)/pios_i2c_esc.c
+#SRC += $(PIOSCOMMON)/pios_bmp085.c
 SRC += $(PIOSCOMMON)/pios_rcvr.c
 SRC += $(PIOSCOMMON)/pios_gcsrcvr.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c
@@ -603,7 +606,7 @@ $(OUTDIR)/$(TARGET).bin.o: $(OUTDIR)/$(TARGET).bin
 $(eval $(call OPFW_TEMPLATE,$(OUTDIR)/$(TARGET).bin,$(BOARD_TYPE),$(BOARD_REVISION)))
 
 # Add jtag targets (program and wipe)
-$(eval $(call JTAG_TEMPLATE,$(OUTDIR)/$(TARGET).bin,$(FW_BANK_BASE),$(FW_BANK_SIZE),$(OPENOCD_CONFIG)))
+$(eval $(call JTAG_TEMPLATE,$(OUTDIR)/$(TARGET).bin,$(FW_BANK_BASE),$(FW_BANK_SIZE),$(OPENOCD_JTAG_CONFIG),$(OPENOCD_CONFIG)))
 
 .PHONY: elf lss sym hex bin bino opfw
 elf: $(OUTDIR)/$(TARGET).elf

@@ -29,11 +29,6 @@
 #define PLOTDATA_H
 
 #include "uavobject.h"
-#include "baroaltitude.h"
-#include "positionactual.h"
-#include "attituderaw.h"
-#include "manualcontrolcommand.h"
-
 
 #include "qwt/src/qwt.h"
 #include "qwt/src/qwt_plot.h"
@@ -49,7 +44,7 @@
 \brief Defines the different type of plots.
   */
 enum PlotType {
-    SequencialPlot,
+    SequentialPlot,
     ChronoPlot,
     UAVObjectPlot,
 
@@ -72,8 +67,9 @@ public:
     QString uavSubField;
     bool haveSubField;
     int scalePower; //This is the power to which each value must be raised
-    int interpolationSamples;
-    double interpolationSum;
+    int meanSamples;
+    double meanSum;
+    QString mathFunction;
     double correctionSum;
     int correctionCount;
     double yMinimum;
@@ -98,16 +94,16 @@ signals:
 };
 
 /*!
-  \brief The sequencial plot have a fixed size buffer of data. All the curves in one plot
+  \brief The sequential plot have a fixed size buffer of data. All the curves in one plot
   have the same size buffer.
   */
-class SequencialPlotData : public PlotData
+class SequentialPlotData : public PlotData
 {
     Q_OBJECT
 public:
-    SequencialPlotData(QString uavObject, QString uavField)
+    SequentialPlotData(QString uavObject, QString uavField)
             : PlotData(uavObject, uavField) {}
-    ~SequencialPlotData() {}
+    ~SequentialPlotData() {}
 
     /*!
       \brief Append new data to the plot
@@ -118,7 +114,7 @@ public:
       \brief The type of plot
       */
     virtual PlotType plotType() {
-        return SequencialPlot;
+        return SequentialPlot;
     }
 
     /*!

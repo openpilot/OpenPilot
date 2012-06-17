@@ -7,8 +7,7 @@
  * @{
  *
  * @file       pios_hmc5883.h
- * @author     David "Buzz" Carlson (buzz@chebuzz.com)
- * 				The OpenPilot Team, http://www.openpilot.org Copyright (C) 2011.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @brief      HMC5883 functions header.
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -31,6 +30,8 @@
 
 #ifndef PIOS_HMC5883_H
 #define PIOS_HMC5883_H
+
+#include <pios.h>
 
 /* HMC5883 Addresses */
 #define PIOS_HMC5883_I2C_ADDR			0x1E
@@ -90,13 +91,23 @@
 #define PIOS_HMC5883_Sensitivity_5_6Ga		330	// LSB/Ga
 #define PIOS_HMC5883_Sensitivity_8_1Ga		230	// LSB/Ga  --> NOT RECOMMENDED
 
-/* Public Functions */
-extern void PIOS_HMC5883_Init(void);
-extern bool PIOS_HMC5883_NewDataAvailable(void);
-extern void PIOS_HMC5883_ReadMag(int16_t out[3]);
-extern void PIOS_HMC5883_ReadID(uint8_t out[4]);
-extern int32_t PIOS_HMC5883_Test(void);
 
+struct pios_hmc5883_cfg {
+	const struct pios_exti_cfg * exti_cfg; /* Pointer to the EXTI configuration */
+	uint8_t M_ODR;		/* OUTPUT DATA RATE --> here below the relative define (See datasheet page 11 for more details) */
+	uint8_t Meas_Conf;	/* Measurement Configuration,: Normal, positive bias, or negative bias --> here below the relative define */
+	uint8_t Gain;		/* Gain Configuration, select the full scale --> here below the relative define (See datasheet page 11 for more details) */
+	uint8_t Mode;
+	
+};
+
+/* Public Functions */
+extern void PIOS_HMC5883_Init(const struct pios_hmc5883_cfg * cfg);
+extern bool PIOS_HMC5883_NewDataAvailable(void);
+extern int32_t PIOS_HMC5883_ReadMag(int16_t out[3]);
+extern uint8_t PIOS_HMC5883_ReadID(uint8_t out[4]);
+extern int32_t PIOS_HMC5883_Test(void);
+extern void PIOS_HMC5883_IRQHandler();
 #endif /* PIOS_HMC5883_H */
 
 /** 

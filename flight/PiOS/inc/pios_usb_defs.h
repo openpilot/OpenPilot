@@ -219,6 +219,57 @@ struct usb_endpoint_desc {
 	uint8_t  bInterval;
 } __attribute__((packed));
 
+struct usb_setup_request {
+	uint8_t  bmRequestType;
+	uint8_t  bRequest;
+	uint16_t wValue;
+	uint16_t wIndex;
+	uint16_t wLength;
+} __attribute__((packed));
+
+#define USB_REQ_TYPE_STANDARD                          0x00
+#define USB_REQ_TYPE_CLASS                             0x20
+#define USB_REQ_TYPE_VENDOR                            0x40
+#define USB_REQ_TYPE_MASK                              0x60
+
+#define USB_REQ_RECIPIENT_DEVICE                       0x00
+#define USB_REQ_RECIPIENT_INTERFACE                    0x01
+#define USB_REQ_RECIPIENT_ENDPOINT                     0x02
+#define USB_REQ_RECIPIENT_MASK                         0x03
+
+enum usb_standard_requests {
+	USB_REQ_GET_STATUS         = 0x00,
+	USB_REQ_CLEAR_FEATURE      = 0x01,
+	/* what is 0x02? */
+	USB_REQ_SET_FEATURE        = 0x03,
+	/* what is 0x04? */
+	USB_REQ_SET_ADDRESS        = 0x05,
+	USB_REQ_GET_DESCRIPTOR     = 0x06,
+	USB_REQ_SET_DESCRIPTOR     = 0x07,
+	USB_REQ_GET_CONFIGURATION  = 0x08,
+	USB_REQ_SET_CONFIGURATION  = 0x09,
+	USB_REQ_GET_INTERFACE      = 0x0A,
+	USB_REQ_SET_INTERFACE      = 0x0B,
+	USB_REQ_SYNCH_FRAME        = 0x0C,
+};
+
+enum usb_hid_requests {
+	USB_HID_REQ_GET_REPORT     = 0x01,
+	USB_HID_REQ_GET_IDLE       = 0x02,
+	USB_HID_REQ_GET_PROTOCOL   = 0x03,
+	/* 0x04-0x08 Reserved */
+	USB_HID_REQ_SET_REPORT     = 0x09,
+	USB_HID_REQ_SET_IDLE       = 0x0A,
+	USB_HID_REQ_SET_PROTOCOL   = 0x0B,
+};
+
+enum usb_cdc_requests {
+	USB_CDC_REQ_SET_LINE_CODING        = 0x20,
+	USB_CDC_REQ_GET_LINE_CODING        = 0x21,
+
+	USB_CDC_REQ_SET_CONTROL_LINE_STATE = 0x23,
+};
+
 struct usb_cdc_header_func_desc {
 	uint8_t  bLength;
 	uint8_t  bDescriptorType;
@@ -249,7 +300,7 @@ struct usb_cdc_union_func_desc {
 	uint8_t  bSlaveInterface;
 } __attribute__((packed));
 
-#define USB_LANGID_ENGLISH_UK 0x0809
+#define USB_LANGID_ENGLISH_US 0x0409
 
 struct usb_string_langid {
 	uint8_t  bLength;
@@ -301,6 +352,10 @@ enum usb_product_ids {
 	USB_PRODUCT_ID_OPENPILOT_MAIN = 0x415A,
 	USB_PRODUCT_ID_COPTERCONTROL  = 0x415B,
 	USB_PRODUCT_ID_PIPXTREME      = 0x415C,
+	USB_PRODUCT_ID_CC3D           = 0x415D,
+	USB_PRODUCT_ID_REVOLUTION     = 0x415E,
+	USB_PRODUCT_ID_OSD            = 0x4194,
+	USB_PRODUCT_ID_SPARE          = 0x4195,
 } __attribute__((packed));
 
 enum usb_op_board_ids {
@@ -308,6 +363,7 @@ enum usb_op_board_ids {
 	/* Board ID 2 may be unused or AHRS */
 	USB_OP_BOARD_ID_PIPXTREME      = 3,
 	USB_OP_BOARD_ID_COPTERCONTROL  = 4,
+	USB_OP_BOARD_ID_REVOLUTION     = 5,
 } __attribute__((packed));
 
 enum usb_op_board_modes {

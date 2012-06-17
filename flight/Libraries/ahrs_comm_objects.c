@@ -30,15 +30,16 @@
 
 static AttitudeRawData AttitudeRaw;
 static AttitudeActualData AttitudeActual;
-static AHRSCalibrationData AHRSCalibration;
-static AhrsStatusData AhrsStatus;
 static BaroAltitudeData BaroAltitude;
 static GPSPositionData GPSPosition;
+static HomeLocationData HomeLocation;
+static InsStatusData InsStatus;
+static InsSettingsData InsSettings;
+static FirmwareIAPObjData FirmwareIAPObj;
 static PositionActualData PositionActual;
 static VelocityActualData VelocityActual;
-static HomeLocationData HomeLocation;
-static AHRSSettingsData AHRSSettings;
-static FirmwareIAPObjData FirmwareIAPObj;
+static GPSSatellitesData GPSSatellites;
+static GPSTimeData GPSTime;
 
 AhrsSharedObject objectHandles[MAX_AHRS_OBJECTS];
 
@@ -54,17 +55,18 @@ AhrsSharedObject objectHandles[MAX_AHRS_OBJECTS];
 
 CREATEHANDLE(0, AttitudeRaw);
 CREATEHANDLE(1, AttitudeActual);
-CREATEHANDLE(2, AHRSCalibration);
-CREATEHANDLE(3, AhrsStatus);
+CREATEHANDLE(2, InsSettings);
+CREATEHANDLE(3, InsStatus);
 CREATEHANDLE(4, BaroAltitude);
 CREATEHANDLE(5, GPSPosition);
 CREATEHANDLE(6, PositionActual);
 CREATEHANDLE(7, VelocityActual);
 CREATEHANDLE(8, HomeLocation);
-CREATEHANDLE(9, AHRSSettings);
-CREATEHANDLE(10, FirmwareIAPObj);
+CREATEHANDLE(9, FirmwareIAPObj);
+CREATEHANDLE(10, GPSSatellites);
+CREATEHANDLE(11, GPSTime);
 
-#if 11 != MAX_AHRS_OBJECTS	//sanity check
+#if 12 != MAX_AHRS_OBJECTS	//sanity check
 #error We did not create the correct number of xxxHandle() functions
 #endif
 
@@ -97,15 +99,17 @@ void AhrsInitHandles(void)
 //the last has the lowest priority
 	ADDHANDLE(idx++, AttitudeRaw);
 	ADDHANDLE(idx++, AttitudeActual);
-	ADDHANDLE(idx++, AHRSCalibration);
-	ADDHANDLE(idx++, AhrsStatus);
+	ADDHANDLE(idx++, InsSettings);
+	ADDHANDLE(idx++, InsStatus);
 	ADDHANDLE(idx++, BaroAltitude);
 	ADDHANDLE(idx++, GPSPosition);
 	ADDHANDLE(idx++, PositionActual);
 	ADDHANDLE(idx++, VelocityActual);
 	ADDHANDLE(idx++, HomeLocation);
-	ADDHANDLE(idx++, AHRSSettings);
 	ADDHANDLE(idx++, FirmwareIAPObj);
+	ADDHANDLE(idx++, GPSSatellites);
+	ADDHANDLE(idx++, GPSTime);
+
 	if (idx != MAX_AHRS_OBJECTS) {
 		PIOS_DEBUG_Assert(0);
 	}
@@ -113,11 +117,8 @@ void AhrsInitHandles(void)
 //When the AHRS writes to these the data does a round trip
 //AHRS->OP->AHRS due to these events
 #ifndef IN_AHRS
-	AHRSSettingsConnectCallback(ObjectUpdatedCb);
-	BaroAltitudeConnectCallback(ObjectUpdatedCb);
-	GPSPositionConnectCallback(ObjectUpdatedCb);
+	InsSettingsConnectCallback(ObjectUpdatedCb);
 	HomeLocationConnectCallback(ObjectUpdatedCb);
-	AHRSCalibrationConnectCallback(ObjectUpdatedCb);
 	FirmwareIAPObjConnectCallback(ObjectUpdatedCb);
 #endif
 }

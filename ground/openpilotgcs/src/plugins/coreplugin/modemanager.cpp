@@ -124,6 +124,17 @@ void ModeManager::activateMode(const QString &id)
         m_modeStack->setCurrentIndex(index);
 }
 
+void ModeManager::activateModeByWorkspaceName(const QString &id)
+{
+    for (int i = 0; i < m_modes.count(); ++i) {
+        if (m_modes.at(i)->name() == id)
+        {
+            m_modeStack->setCurrentIndex(i);
+            return;
+        }
+    }
+}
+
 void ModeManager::objectAdded(QObject *obj)
 {
     IMode *mode = Aggregation::query<IMode>(obj);

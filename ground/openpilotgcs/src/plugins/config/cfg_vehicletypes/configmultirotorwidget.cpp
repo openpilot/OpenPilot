@@ -24,9 +24,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-//#include "configmultirotorwidget.h"
-#include "configvehicletypewidget.h"
-#include "mixersettings.h"
+#include "configmultirotorwidget.h"
 
 #include <QDebug>
 #include <QStringList>
@@ -34,200 +32,192 @@
 #include <QtGui/QTextEdit>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QPushButton>
+#include <QtGui/QComboBox>
 #include <QBrush>
 #include <math.h>
 #include <QMessageBox>
 
 #include "mixersettings.h"
 #include "systemsettings.h"
+#include "actuatorsettings.h"
 #include "actuatorcommand.h"
 
 //#define  Pi 3.14159265358979323846
 
 
 /**
- Helper function to setup the UI
+ Constructor
  */
-void ConfigVehicleTypeWidget::setupMultiRotorUI(QString frameType)
+ConfigMultiRotorWidget::ConfigMultiRotorWidget(Ui_AircraftWidget *aircraft, QWidget *parent) : VehicleConfig(parent)
 {
-	if (frameType == "Tri" || frameType == "Tricopter Y") {
-		m_aircraft->aircraftType->setCurrentIndex(m_aircraft->aircraftType->findText("Multirotor"));
-		m_aircraft->multirotorFrameType->setCurrentIndex(m_aircraft->multirotorFrameType->findText("Tricopter Y"));
+    m_aircraft = aircraft;
+}
+
+/**
+ Destructor
+ */
+ConfigMultiRotorWidget::~ConfigMultiRotorWidget()
+{
+   // Do nothing
+}
+
+
+void ConfigMultiRotorWidget::setupUI(QString frameType)
+{
+    Q_ASSERT(m_aircraft);
+    Q_ASSERT(uiowner);
+    Q_ASSERT(quad);
+
+    int i;
+
+    // set aircraftType to Multirotor, disable triyaw channel
+    setComboCurrentIndex(m_aircraft->aircraftType, m_aircraft->aircraftType->findText("Multirotor"));
+    m_aircraft->triYawChannelBox->setEnabled(false);
+
+    // disable all motor channel boxes
+    for (i=1; i <=8; i++) {
+        // do it manually so we can turn off any error decorations
+        QComboBox *combobox = qFindChild<QComboBox*>(uiowner, "multiMotorChannelBox" + QString::number(i));
+        if (combobox) {
+            combobox->setEnabled(false);
+            combobox->setItemData(0, 0, Qt::DecorationRole);
+        }
+    }
+
+    if (frameType == "Tri" || frameType == "Tricopter Y") {
+        setComboCurrentIndex( m_aircraft->multirotorFrameType, m_aircraft->multirotorFrameType->findText("Tricopter Y"));
 		quad->setElementId("tri");
 
 		//Enable all necessary motor channel boxes...
-		for (int i=1; i <=3; i++) {
-			QComboBox *combobox = qFindChild<QComboBox*>(this, "multiMotorChannelBox" + QString::number(i));
-			combobox->setEnabled(true);
-		}
-		//and grey out all unused motor channel boxes
-		for (int i=4; i <=8; i++) {
-			QComboBox *combobox = qFindChild<QComboBox*>(this, "multiMotorChannelBox" + QString::number(i));
-			combobox->setEnabled(false);
+        for (i=1; i <=3; i++) {
+            enableComboBox(uiowner, QString("multiMotorChannelBox%0").arg(i), true);
 		}
 		
-		m_aircraft->triYawChannelBox->setEnabled(true);
-	} else if (frameType == "QuadX" || frameType == "Quad X") {
-		m_aircraft->aircraftType->setCurrentIndex(m_aircraft->aircraftType->findText("Multirotor"));
-		m_aircraft->multirotorFrameType->setCurrentIndex(m_aircraft->multirotorFrameType->findText("Quad X"));
+        m_aircraft->triYawChannelBox->setEnabled(true);
+    }
+    else if (frameType == "QuadX" || frameType == "Quad X") {
+        setComboCurrentIndex( m_aircraft->multirotorFrameType, m_aircraft->multirotorFrameType->findText("Quad X"));
 		quad->setElementId("quad-X");
 		
 		//Enable all necessary motor channel boxes...
-		for (int i=1; i <=4; i++) {
-			QComboBox *combobox = qFindChild<QComboBox*>(this, "multiMotorChannelBox" + QString::number(i));
-			combobox->setEnabled(true);
+        for (i=1; i <=4; i++) {
+            enableComboBox(uiowner, QString("multiMotorChannelBox%0").arg(i), true);
 		}
-		//and grey out all unused motor channel boxes
-		for (int i=5; i <=8; i++) {
-			QComboBox *combobox = qFindChild<QComboBox*>(this, "multiMotorChannelBox" + QString::number(i));
-			combobox->setEnabled(false);
-		}
-		
-		m_aircraft->triYawChannelBox->setEnabled(false);
+
 		m_aircraft->mrRollMixLevel->setValue(50);
 		m_aircraft->mrPitchMixLevel->setValue(50);
 		m_aircraft->mrYawMixLevel->setValue(50);
-	} else if (frameType == "QuadP" || frameType == "Quad +") {
-		m_aircraft->aircraftType->setCurrentIndex(m_aircraft->aircraftType->findText("Multirotor"));
-		m_aircraft->multirotorFrameType->setCurrentIndex(m_aircraft->multirotorFrameType->findText("Quad +"));
+    }
+    else if (frameType == "QuadP" || frameType == "Quad +") {
+        setComboCurrentIndex( m_aircraft->multirotorFrameType, m_aircraft->multirotorFrameType->findText("Quad +"));
 		quad->setElementId("quad-plus");
 		
 		//Enable all necessary motor channel boxes...
-		for (int i=1; i <=4; i++) {
-			QComboBox *combobox = qFindChild<QComboBox*>(this, "multiMotorChannelBox" + QString::number(i));
-			combobox->setEnabled(true);
-		}
-		//and grey out all unused motor channel boxes
-		for (int i=5; i <=8; i++) {
-			QComboBox *combobox = qFindChild<QComboBox*>(this, "multiMotorChannelBox" + QString::number(i));
-			combobox->setEnabled(false);
+        for (i=1; i <=4; i++) {
+            enableComboBox(uiowner, QString("multiMotorChannelBox%0").arg(i), true);
 		}
 
-		m_aircraft->triYawChannelBox->setEnabled(false);
 		m_aircraft->mrRollMixLevel->setValue(100);
 		m_aircraft->mrPitchMixLevel->setValue(100);
 		m_aircraft->mrYawMixLevel->setValue(50);
-	} else if (frameType == "Hexa" || frameType == "Hexacopter") {
-		m_aircraft->aircraftType->setCurrentIndex(m_aircraft->aircraftType->findText("Multirotor"));
-		m_aircraft->multirotorFrameType->setCurrentIndex(m_aircraft->multirotorFrameType->findText("Hexacopter"));
+    }
+    else if (frameType == "Hexa" || frameType == "Hexacopter")
+    {
+        setComboCurrentIndex( m_aircraft->multirotorFrameType, m_aircraft->multirotorFrameType->findText("Hexacopter"));
 		quad->setElementId("quad-hexa");
 		
 		//Enable all necessary motor channel boxes...
-		for (int i=1; i <=6; i++) {
-			QComboBox *combobox = qFindChild<QComboBox*>(this, "multiMotorChannelBox" + QString::number(i));
-			combobox->setEnabled(true);
+        for (i=1; i <=6; i++) {
+            enableComboBox(uiowner, QString("multiMotorChannelBox%0").arg(i), true);
 		}
-		//and grey out all unused motor channel boxes
-		for (int i=7; i <=8; i++) {
-			QComboBox *combobox = qFindChild<QComboBox*>(this, "multiMotorChannelBox" + QString::number(i));
-			combobox->setEnabled(false);
-		}
-		
-		m_aircraft->triYawChannelBox->setEnabled(false);
+
 		m_aircraft->mrRollMixLevel->setValue(50);
 		m_aircraft->mrPitchMixLevel->setValue(33);
 		m_aircraft->mrYawMixLevel->setValue(33);
-	} else if (frameType == "HexaX" || frameType == "Hexacopter X" ) {
-		m_aircraft->aircraftType->setCurrentIndex(m_aircraft->aircraftType->findText("Multirotor"));
-		m_aircraft->multirotorFrameType->setCurrentIndex(m_aircraft->multirotorFrameType->findText("Hexacopter X"));
+    }
+    else if (frameType == "HexaX" || frameType == "Hexacopter X" ) {
+        setComboCurrentIndex( m_aircraft->multirotorFrameType, m_aircraft->multirotorFrameType->findText("Hexacopter X"));
 		quad->setElementId("quad-hexa-H");
 		
 		//Enable all necessary motor channel boxes...
-		for (int i=1; i <=6; i++) {
-			QComboBox *combobox = qFindChild<QComboBox*>(this, "multiMotorChannelBox" + QString::number(i));
-			combobox->setEnabled(true);
+        for (i=1; i <=6; i++) {
+            enableComboBox(uiowner, QString("multiMotorChannelBox%0").arg(i), true);
 		}
-		//and grey out all unused motor channel boxes
-		for (int i=7; i <=8; i++) {
-			QComboBox *combobox = qFindChild<QComboBox*>(this, "multiMotorChannelBox" + QString::number(i));
-			combobox->setEnabled(false);
-		}
-		
-		m_aircraft->triYawChannelBox->setEnabled(false);
+
 		m_aircraft->mrRollMixLevel->setValue(33);
 		m_aircraft->mrPitchMixLevel->setValue(50);
 		m_aircraft->mrYawMixLevel->setValue(33);
 		
-	} else if (frameType == "HexaCoax" || frameType == "Hexacopter Y6") {
-		m_aircraft->aircraftType->setCurrentIndex(m_aircraft->aircraftType->findText("Multirotor"));
-		m_aircraft->multirotorFrameType->setCurrentIndex(m_aircraft->multirotorFrameType->findText("Hexacopter Y6"));
+    }
+    else if (frameType == "HexaCoax" || frameType == "Hexacopter Y6")
+    {
+        setComboCurrentIndex( m_aircraft->multirotorFrameType, m_aircraft->multirotorFrameType->findText("Hexacopter Y6"));
 		quad->setElementId("hexa-coax");
 		
 		//Enable all necessary motor channel boxes...
-		for (int i=1; i <=6; i++) {
-			QComboBox *combobox = qFindChild<QComboBox*>(this, "multiMotorChannelBox" + QString::number(i));
-			combobox->setEnabled(true);
+        for (i=1; i <=6; i++) {
+            enableComboBox(uiowner, QString("multiMotorChannelBox%0").arg(i), true);
 		}
-		//and grey out all unused motor channel boxes
-		for (int i=7; i <=8; i++) {
-			QComboBox *combobox = qFindChild<QComboBox*>(this, "multiMotorChannelBox" + QString::number(i));
-			combobox->setEnabled(false);
-		}
-		
-		m_aircraft->triYawChannelBox->setEnabled(false);
+
 		m_aircraft->mrRollMixLevel->setValue(100);
 		m_aircraft->mrPitchMixLevel->setValue(50);
 		m_aircraft->mrYawMixLevel->setValue(66);
 		
-	} else if (frameType == "Octo" || frameType == "Octocopter") {
-		m_aircraft->aircraftType->setCurrentIndex(m_aircraft->aircraftType->findText("Multirotor"));
-		m_aircraft->multirotorFrameType->setCurrentIndex(m_aircraft->multirotorFrameType->findText("Octocopter"));
+    }
+    else if (frameType == "Octo" || frameType == "Octocopter")
+    {
+        setComboCurrentIndex( m_aircraft->multirotorFrameType, m_aircraft->multirotorFrameType->findText("Octocopter"));
 		quad->setElementId("quad-octo");
 		
 		//Enable all necessary motor channel boxes
-		for (int i=1; i <=8; i++) {
-			QComboBox *combobox = qFindChild<QComboBox*>(this, "multiMotorChannelBox" + QString::number(i));
-			combobox->setEnabled(true);
+        for (i=1; i <=8; i++) {
+            enableComboBox(uiowner, QString("multiMotorChannelBox%0").arg(i), true);
 		}		
-		
-		m_aircraft->triYawChannelBox->setEnabled(false);
+
 		m_aircraft->mrRollMixLevel->setValue(33);
 		m_aircraft->mrPitchMixLevel->setValue(33);
 		m_aircraft->mrYawMixLevel->setValue(25);
-	} else if (frameType == "OctoV" || frameType == "Octocopter V") {
-		m_aircraft->aircraftType->setCurrentIndex(m_aircraft->aircraftType->findText("Multirotor"));
-		m_aircraft->multirotorFrameType->setCurrentIndex(m_aircraft->multirotorFrameType->findText("Octocopter V"));
+    }
+    else if (frameType == "OctoV" || frameType == "Octocopter V")
+    {
+        setComboCurrentIndex( m_aircraft->multirotorFrameType, m_aircraft->multirotorFrameType->findText("Octocopter V"));
 		quad->setElementId("quad-octo-v");
 
 		//Enable all necessary motor channel boxes
-		for (int i=1; i <=8; i++) {
-			QComboBox *combobox = qFindChild<QComboBox*>(this, "multiMotorChannelBox" + QString::number(i));
-			combobox->setEnabled(true);
+        for (i=1; i <=8; i++) {
+            enableComboBox(uiowner, QString("multiMotorChannelBox%0").arg(i), true);
 		}		
 
-		m_aircraft->triYawChannelBox->setEnabled(false);
 		m_aircraft->mrRollMixLevel->setValue(25);
 		m_aircraft->mrPitchMixLevel->setValue(25);
 		m_aircraft->mrYawMixLevel->setValue(25);
 		
-	} else if (frameType == "OctoCoaxP" || frameType == "Octo Coax +") {
-		m_aircraft->aircraftType->setCurrentIndex(m_aircraft->aircraftType->findText("Multirotor"));
-		m_aircraft->multirotorFrameType->setCurrentIndex(m_aircraft->multirotorFrameType->findText("Octo Coax +"));
+    }
+    else if (frameType == "OctoCoaxP" || frameType == "Octo Coax +")
+    {
+        setComboCurrentIndex( m_aircraft->multirotorFrameType, m_aircraft->multirotorFrameType->findText("Octo Coax +"));
 		quad->setElementId("octo-coax-P");
 
 		//Enable all necessary motor channel boxes
-		for (int i=1; i <=8; i++) {
-			QComboBox *combobox = qFindChild<QComboBox*>(this, "multiMotorChannelBox" + QString::number(i));
-			combobox->setEnabled(true);
+		for (int i=1; i <=8; i++) {            
+            enableComboBox(uiowner, QString("multiMotorChannelBox%0").arg(i), true);
 		}		
 
-		m_aircraft->triYawChannelBox->setEnabled(false);
 		m_aircraft->mrRollMixLevel->setValue(100);
 		m_aircraft->mrPitchMixLevel->setValue(100);
 		m_aircraft->mrYawMixLevel->setValue(50);
 		
-	} else if (frameType == "OctoCoaxX" || frameType == "Octo Coax X") {
-		m_aircraft->aircraftType->setCurrentIndex(m_aircraft->aircraftType->findText("Multirotor"));
-		m_aircraft->multirotorFrameType->setCurrentIndex(m_aircraft->multirotorFrameType->findText("Octo Coax X"));
+    }
+    else if (frameType == "OctoCoaxX" || frameType == "Octo Coax X")
+    {
+        setComboCurrentIndex( m_aircraft->multirotorFrameType, m_aircraft->multirotorFrameType->findText("Octo Coax X"));
 		quad->setElementId("octo-coax-X");
 
 		//Enable all necessary motor channel boxes
-		for (int i=1; i <=8; i++) {
-			QComboBox *combobox = qFindChild<QComboBox*>(this, "multiMotorChannelBox" + QString::number(i));
-			combobox->setEnabled(true);
+		for (int i=1; i <=8; i++) {            
+            enableComboBox(uiowner, QString("multiMotorChannelBox%0").arg(i), true);
 		}		
 
-		m_aircraft->triYawChannelBox->setEnabled(false);
 		m_aircraft->mrRollMixLevel->setValue(50);
 		m_aircraft->mrPitchMixLevel->setValue(50);
 		m_aircraft->mrYawMixLevel->setValue(50);
@@ -235,12 +225,61 @@ void ConfigVehicleTypeWidget::setupMultiRotorUI(QString frameType)
 	} 	
 }
 
+void ConfigMultiRotorWidget::ResetActuators(GUIConfigDataUnion* configData)
+{
+    configData->multi.VTOLMotorN = 0;
+    configData->multi.VTOLMotorNE = 0;
+    configData->multi.VTOLMotorE = 0;
+    configData->multi.VTOLMotorSE = 0;
+    configData->multi.VTOLMotorS = 0;
+    configData->multi.VTOLMotorSW = 0;
+    configData->multi.VTOLMotorW = 0;
+    configData->multi.VTOLMotorNW = 0;
+    configData->multi.TRIYaw = 0;
+}
+
+QStringList ConfigMultiRotorWidget::getChannelDescriptions()
+{
+    int i;
+    QStringList channelDesc;
+
+    // init a channel_numelem list of channel desc defaults
+    for (i=0; i < (int)(ConfigMultiRotorWidget::CHANNEL_NUMELEM); i++)
+    {
+        channelDesc.append(QString("-"));
+    }
+
+    // get the gui config data
+    GUIConfigDataUnion configData = GetConfigData();
+    multiGUISettingsStruct multi = configData.multi;
+
+    if (multi.VTOLMotorN > 0 && multi.VTOLMotorN < ConfigMultiRotorWidget::CHANNEL_NUMELEM)
+        channelDesc[multi.VTOLMotorN-1] = QString("VTOLMotorN");
+    if (multi.VTOLMotorNE > 0 && multi.VTOLMotorNE < ConfigMultiRotorWidget::CHANNEL_NUMELEM)
+        channelDesc[multi.VTOLMotorNE-1] = QString("VTOLMotorNE");
+    if (multi.VTOLMotorNW > 0 && multi.VTOLMotorNW < ConfigMultiRotorWidget::CHANNEL_NUMELEM)
+        channelDesc[multi.VTOLMotorNW-1] = QString("VTOLMotorNW");
+    if (multi.VTOLMotorS > 0 && multi.VTOLMotorS < ConfigMultiRotorWidget::CHANNEL_NUMELEM)
+        channelDesc[multi.VTOLMotorS-1] = QString("VTOLMotorS");
+    if (multi.VTOLMotorSE > 0 && multi.VTOLMotorSE < ConfigMultiRotorWidget::CHANNEL_NUMELEM)
+        channelDesc[multi.VTOLMotorSE-1] = QString("VTOLMotorSE");
+    if (multi.VTOLMotorSW > 0 && multi.VTOLMotorSW < ConfigMultiRotorWidget::CHANNEL_NUMELEM)
+        channelDesc[multi.VTOLMotorSW-1] = QString("VTOLMotorSW");
+    if (multi.VTOLMotorW > 0 && multi.VTOLMotorW < ConfigMultiRotorWidget::CHANNEL_NUMELEM)
+        channelDesc[multi.VTOLMotorW-1] = QString("VTOLMotorW");
+    if (multi.VTOLMotorE > 0 && multi.VTOLMotorE < ConfigMultiRotorWidget::CHANNEL_NUMELEM)
+        channelDesc[multi.VTOLMotorE-1] = QString("VTOLMotorE");
+
+    return channelDesc;
+}
+
+
 
 
 /**
  Helper function to update the UI widget objects
  */
-QString ConfigVehicleTypeWidget::updateMultiRotorObjectsFromWidgets()
+QString ConfigMultiRotorWidget::updateConfigObjectsFromWidgets()
 {
 	QString airframeType;
 	QList<QString> motorList;
@@ -256,12 +295,8 @@ QString ConfigVehicleTypeWidget::updateMultiRotorObjectsFromWidgets()
 	field = obj->getField(QString("MaxAccel"));
 	field->setDouble(m_aircraft->maxAccelSlider->value());
 	
-	// Curve is also common to all quads:
-	field = obj->getField("ThrottleCurve1");
-	QList<double> curve = m_aircraft->multiThrottleCurve->getCurve();
-	for (int i=0;i<curve.length();i++) {
-		field->setValue(curve.at(i),i);
-	}
+    // Curve is also common to all quads:
+    setThrottleCurve(obj, VehicleConfig::MIXER_THROTTLECURVE1, m_aircraft->multiThrottleCurve->getCurve() );
 	
 	if (m_aircraft->multirotorFrameType->currentText() == "Quad +") {
 		airframeType = "QuadP";
@@ -279,7 +314,7 @@ QString ConfigVehicleTypeWidget::updateMultiRotorObjectsFromWidgets()
 		airframeType = "HexaCoax";
 		
 		//Show any config errors in GUI
-		throwMultiRotorChannelConfigError(6);
+        throwConfigError(6);
 
 		if (m_aircraft->multiMotorChannelBox1->currentText() == "None" ||
 			m_aircraft->multiMotorChannelBox2->currentText() == "None" ||
@@ -313,7 +348,7 @@ QString ConfigVehicleTypeWidget::updateMultiRotorObjectsFromWidgets()
 		airframeType = "Octo";
 		
 		//Show any config errors in GUI
-		throwMultiRotorChannelConfigError(8);
+        throwConfigError(8);
 
 		if (m_aircraft->multiMotorChannelBox1->currentText() == "None" ||
 			m_aircraft->multiMotorChannelBox2->currentText() == "None" ||
@@ -348,7 +383,7 @@ QString ConfigVehicleTypeWidget::updateMultiRotorObjectsFromWidgets()
 		airframeType = "OctoV";
 		
 		//Show any config errors in GUI
-		throwMultiRotorChannelConfigError(8);
+        throwConfigError(8);
 
 		if (m_aircraft->multiMotorChannelBox1->currentText() == "None" ||
 			m_aircraft->multiMotorChannelBox2->currentText() == "None" ||
@@ -384,7 +419,7 @@ QString ConfigVehicleTypeWidget::updateMultiRotorObjectsFromWidgets()
 		airframeType = "OctoCoaxP";
 
 		//Show any config errors in GUI
-		throwMultiRotorChannelConfigError(8);
+        throwConfigError(8);
 
 		if (m_aircraft->multiMotorChannelBox1->currentText() == "None" ||
 			m_aircraft->multiMotorChannelBox2->currentText() == "None" ||
@@ -419,7 +454,7 @@ QString ConfigVehicleTypeWidget::updateMultiRotorObjectsFromWidgets()
 		airframeType = "OctoCoaxX";
 		
 		//Show any config errors in GUI
-		throwMultiRotorChannelConfigError(8);
+        throwConfigError(8);
 		
 		if (m_aircraft->multiMotorChannelBox1->currentText() == "None" ||
 			m_aircraft->multiMotorChannelBox2->currentText() == "None" ||
@@ -454,7 +489,7 @@ QString ConfigVehicleTypeWidget::updateMultiRotorObjectsFromWidgets()
 		airframeType = "Tri";
 
 		//Show any config errors in GUI
-		throwMultiRotorChannelConfigError(3);
+        throwConfigError(3);
 		if (m_aircraft->multiMotorChannelBox1->currentText() == "None" ||
 			m_aircraft->multiMotorChannelBox2->currentText() == "None" ||
 			m_aircraft->multiMotorChannelBox3->currentText() == "None" ) {
@@ -467,10 +502,11 @@ QString ConfigVehicleTypeWidget::updateMultiRotorObjectsFromWidgets()
 		}
 		motorList << "VTOLMotorNW" << "VTOLMotorNE" << "VTOLMotorS";
 		setupMotors(motorList);
-		obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorSettings")));
-		Q_ASSERT(obj);
-		field = obj->getField("FixedWingYaw1");
-		field->setValue(m_aircraft->triYawChannelBox->currentText());
+
+        GUIConfigDataUnion config = GetConfigData();
+        config.multi.TRIYaw = m_aircraft->triYawChannelBox->currentIndex();
+        SetConfigData(config);
+
 		
 		// Motor 1 to 6, Y6 Layout:
 		//     pitch   roll    yaw
@@ -485,21 +521,20 @@ QString ConfigVehicleTypeWidget::updateMultiRotorObjectsFromWidgets()
 			{  0,  0,  0}
 		};
 		setupMultiRotorMixer(mixer);
-		
-		int tmpVal = m_aircraft->triYawChannelBox->currentIndex()-1;
-		obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-		field = obj->getField(mixerTypes.at(tmpVal));
-		field->setValue("Servo");
-		field = obj->getField(mixerVectors.at(tmpVal));
-		resetField(field);
-		int ti = field->getElementNames().indexOf("Yaw");
-		field->setValue(127,ti);
+
+        //tell the mixer about tricopter yaw channel
+        UAVDataObject* mixerObj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
+        Q_ASSERT(mixerObj);
+
+        int channel = m_aircraft->triYawChannelBox->currentIndex()-1;
+        if (channel > -1){
+            setMixerType(mixerObj, channel, VehicleConfig::MIXERTYPE_SERVO);
+            setMixerVectorValue(mixerObj, channel, VehicleConfig::MIXERVECTOR_YAW, 127);
+        }
 		
 		m_aircraft->mrStatusLabel->setText("SUCCESS: Mixer Saved OK");
 		
-	}
-	// Now reflect those settings in the "Custom" panel as well
-	updateCustomAirframeUI();
+    }
 	
 	return airframeType;
 }
@@ -509,342 +544,253 @@ QString ConfigVehicleTypeWidget::updateMultiRotorObjectsFromWidgets()
 /**
  Helper function to refresh the UI widget values
  */
-void ConfigVehicleTypeWidget::refreshMultiRotorWidgetsValues(QString frameType)
+void ConfigMultiRotorWidget::refreshWidgetsValues(QString frameType)
 {
-	//////////////////////////////////////////////////////////////////
-	// Retrieve settings
-	//////////////////////////////////////////////////////////////////
-	
-	UAVDataObject*	obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorSettings")));
-	Q_ASSERT(obj);
-	UAVObjectField *field;
-	
+    int channel;
+    double value;
+
+    GUIConfigDataUnion config = GetConfigData();
+    multiGUISettingsStruct multi = config.multi;
+
+    UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
+    Q_ASSERT(mixer);
+
 	if (frameType == "QuadP") {
-		// Motors 1/2/3/4 are: N / E / S / W
-		field = obj->getField(QString("VTOLMotorN"));
-		Q_ASSERT(field);
-		m_aircraft->multiMotorChannelBox1->setCurrentIndex(m_aircraft->multiMotorChannelBox1->findText(field->getValue().toString()));
-		field = obj->getField(QString("VTOLMotorE"));
-		Q_ASSERT(field);
-		m_aircraft->multiMotorChannelBox2->setCurrentIndex(m_aircraft->multiMotorChannelBox2->findText(field->getValue().toString()));
-		field = obj->getField(QString("VTOLMotorS"));
-		Q_ASSERT(field);
-		m_aircraft->multiMotorChannelBox3->setCurrentIndex(m_aircraft->multiMotorChannelBox3->findText(field->getValue().toString()));
-		field = obj->getField(QString("VTOLMotorW"));
-		Q_ASSERT(field);
-		m_aircraft->multiMotorChannelBox4->setCurrentIndex(m_aircraft->multiMotorChannelBox4->findText(field->getValue().toString()));
-		
+        // Motors 1/2/3/4 are: N / E / S / W
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox1,multi.VTOLMotorN);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox2,multi.VTOLMotorE);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox3,multi.VTOLMotorS);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox4,multi.VTOLMotorW);
+
 		// Now, read the 1st mixer R/P/Y levels and initialize the mix sliders.
 		// This assumes that all vectors are identical - if not, the user should use the
 		// "custom" setting.
-		obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-		Q_ASSERT(obj);
-		int tmpVal= m_aircraft->multiMotorChannelBox1->currentIndex()-1;
-		// tmpVal will be -1 if value is set to "None"
-		if (tmpVal > -1) {
-			field = obj->getField(mixerVectors.at(tmpVal));
-			int i = field->getElementNames().indexOf("Pitch");
-			double val = field->getDouble(i)/1.27;
-			m_aircraft->mrPitchMixLevel->setValue(val);
-			i = field->getElementNames().indexOf("Yaw");
-			val = (1-field->getDouble(i)/1.27);
-			m_aircraft->mrYawMixLevel->setValue(val);
-			tmpVal = m_aircraft->multiMotorChannelBox2->currentIndex()-1;
-			field = obj->getField(mixerVectors.at(tmpVal));
-			i = field->getElementNames().indexOf("Roll");
-			val = -field->getDouble(i)/1.27;
-			m_aircraft->mrRollMixLevel->setValue(val);
-		}
+
+        channel = m_aircraft->multiMotorChannelBox1->currentIndex() - 1;
+        if (channel > -1)
+        {
+            value = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH);
+            m_aircraft->mrPitchMixLevel->setValue( value/1.27 );
+
+            value = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW);
+            m_aircraft->mrYawMixLevel->setValue( 1-value/1.27 );
+
+            channel = m_aircraft->multiMotorChannelBox2->currentIndex() - 1;
+            value = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL);
+            m_aircraft->mrRollMixLevel->setValue( -value/1.27);
+
+        }
 	} else if (frameType == "QuadX") {
-		// Motors 1/2/3/4 are: NW / NE / SE / SW
-		field = obj->getField(QString("VTOLMotorNW"));
-		Q_ASSERT(field);
-		m_aircraft->multiMotorChannelBox1->setCurrentIndex(m_aircraft->multiMotorChannelBox1->findText(field->getValue().toString()));
-		field = obj->getField(QString("VTOLMotorNE"));
-		Q_ASSERT(field);
-		m_aircraft->multiMotorChannelBox2->setCurrentIndex(m_aircraft->multiMotorChannelBox2->findText(field->getValue().toString()));
-		field = obj->getField(QString("VTOLMotorSE"));
-		Q_ASSERT(field);
-		m_aircraft->multiMotorChannelBox3->setCurrentIndex(m_aircraft->multiMotorChannelBox3->findText(field->getValue().toString()));
-		field = obj->getField(QString("VTOLMotorSW"));
-		Q_ASSERT(field);
-		m_aircraft->multiMotorChannelBox4->setCurrentIndex(m_aircraft->multiMotorChannelBox4->findText(field->getValue().toString()));
-		
-		// Now, read the 1st mixer R/P/Y levels and initialize the mix sliders.
-		// This assumes that all vectors are identical - if not, the user should use the
-		// "custom" setting.
-		obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-		Q_ASSERT(obj);
-		int tmpVal= m_aircraft->multiMotorChannelBox1->currentIndex()-1;
-		// tmpVal will be -1 if value is set to "None"
-		if (tmpVal > -1) {
-			field = obj->getField(mixerVectors.at(tmpVal));
-			int i = field->getElementNames().indexOf("Pitch");
-			double val = field->getDouble(i)/1.27;
-			m_aircraft->mrPitchMixLevel->setValue(val);
-			i = field->getElementNames().indexOf("Yaw");
-			val = 1-field->getDouble(i)/1.27;
-			m_aircraft->mrYawMixLevel->setValue(val);
-			i = field->getElementNames().indexOf("Roll");
-			val = field->getDouble(i)/1.27;
-			m_aircraft->mrRollMixLevel->setValue(val);
-		}
+        // Motors 1/2/3/4 are: NW / NE / SE / SW
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox1,multi.VTOLMotorNW);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox2,multi.VTOLMotorNE);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox3,multi.VTOLMotorSE);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox4,multi.VTOLMotorSW);
+
+        // Now, read the 1st mixer R/P/Y levels and initialize the mix sliders.
+        // This assumes that all vectors are identical - if not, the user should use the
+        // "custom" setting.
+        channel = m_aircraft->multiMotorChannelBox1->currentIndex() - 1;
+        if (channel > -1)
+        {
+            value = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH);
+            m_aircraft->mrPitchMixLevel->setValue( value/1.27 );
+
+            value = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW);
+            m_aircraft->mrYawMixLevel->setValue( 1-value/1.27 );
+
+            value = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL);
+            m_aircraft->mrRollMixLevel->setValue( value/1.27);
+
+        }
+
 	} else if (frameType == "Hexa") {
 		// Motors 1/2/3 4/5/6 are: N / NE / SE / S / SW / NW
-		field = obj->getField(QString("VTOLMotorN"));
-		m_aircraft->multiMotorChannelBox1->setCurrentIndex(m_aircraft->multiMotorChannelBox1->findText(field->getValue().toString()));
-		field = obj->getField(QString("VTOLMotorNE"));
-		m_aircraft->multiMotorChannelBox2->setCurrentIndex(m_aircraft->multiMotorChannelBox2->findText(field->getValue().toString()));
-		field = obj->getField(QString("VTOLMotorSE"));
-		m_aircraft->multiMotorChannelBox3->setCurrentIndex(m_aircraft->multiMotorChannelBox3->findText(field->getValue().toString()));
-		field = obj->getField(QString("VTOLMotorS"));
-		m_aircraft->multiMotorChannelBox4->setCurrentIndex(m_aircraft->multiMotorChannelBox4->findText(field->getValue().toString()));
-		field = obj->getField(QString("VTOLMotorSW"));
-		m_aircraft->multiMotorChannelBox5->setCurrentIndex(m_aircraft->multiMotorChannelBox4->findText(field->getValue().toString()));
-		field = obj->getField(QString("VTOLMotorNW"));
-		m_aircraft->multiMotorChannelBox6->setCurrentIndex(m_aircraft->multiMotorChannelBox4->findText(field->getValue().toString()));
-		
-		// Now, read the 1st mixer R/P/Y levels and initialize the mix sliders.
-		// This assumes that all vectors are identical - if not, the user should use the
-		// "custom" setting.
-		obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-		int tmpVal= m_aircraft->multiMotorChannelBox1->currentIndex()-1;
-		// tmpVal will be -1 if value is set to "None"
-		if (tmpVal > -1) {
-			field = obj->getField(mixerVectors.at(tmpVal));
-			int i = field->getElementNames().indexOf("Pitch");
-			double val = floor(field->getDouble(i)/1.27);
-			m_aircraft->mrPitchMixLevel->setValue(val);
-			i = field->getElementNames().indexOf("Yaw");
-			val = floor(-field->getDouble(i)/1.27);
-			m_aircraft->mrYawMixLevel->setValue(val);
-			tmpVal = m_aircraft->multiMotorChannelBox2->currentIndex()-1;
-			if(tmpVal>-1)
-			{
-				field = obj->getField(mixerVectors.at(tmpVal));
-				i = field->getElementNames().indexOf("Roll");
-				val = floor(1-field->getDouble(i)/1.27);
-				m_aircraft->mrRollMixLevel->setValue(val);
-			}
-		}
+
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox1,multi.VTOLMotorN);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox2,multi.VTOLMotorNE);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox3,multi.VTOLMotorSE);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox4,multi.VTOLMotorS);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox5,multi.VTOLMotorSW);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox6,multi.VTOLMotorNW);
+
+        // Now, read the 1st mixer R/P/Y levels and initialize the mix sliders.
+        // This assumes that all vectors are identical - if not, the user should use the
+        // "custom" setting.
+
+        channel = m_aircraft->multiMotorChannelBox1->currentIndex() - 1;
+        if (channel > -1)
+        {
+            value = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH);
+            m_aircraft->mrPitchMixLevel->setValue( floor(value/1.27) );
+
+            value = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW);
+            m_aircraft->mrYawMixLevel->setValue( floor(-value/1.27) );
+
+            //change channels
+            channel = m_aircraft->multiMotorChannelBox2->currentIndex() - 1;
+            value = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL);
+            m_aircraft->mrRollMixLevel->setValue( floor(1-value/1.27) );
+
+        }
+
+
 	} else if (frameType == "HexaX") {
-		// Motors 1/2/3 4/5/6 are: NE / E / SE / SW / W / NW
-		field = obj->getField(QString("VTOLMotorNE"));
-		m_aircraft->multiMotorChannelBox1->setCurrentIndex(m_aircraft->multiMotorChannelBox1->findText(field->getValue().toString()));
-		field = obj->getField(QString("VTOLMotorE"));
-		m_aircraft->multiMotorChannelBox2->setCurrentIndex(m_aircraft->multiMotorChannelBox2->findText(field->getValue().toString()));
-		field = obj->getField(QString("VTOLMotorSE"));
-		m_aircraft->multiMotorChannelBox3->setCurrentIndex(m_aircraft->multiMotorChannelBox3->findText(field->getValue().toString()));
-		field = obj->getField(QString("VTOLMotorSW"));
-		m_aircraft->multiMotorChannelBox4->setCurrentIndex(m_aircraft->multiMotorChannelBox4->findText(field->getValue().toString()));
-		field = obj->getField(QString("VTOLMotorW"));
-		m_aircraft->multiMotorChannelBox5->setCurrentIndex(m_aircraft->multiMotorChannelBox4->findText(field->getValue().toString()));
-		field = obj->getField(QString("VTOLMotorNW"));
-		m_aircraft->multiMotorChannelBox6->setCurrentIndex(m_aircraft->multiMotorChannelBox4->findText(field->getValue().toString()));
-		
-		// Now, read the 1st mixer R/P/Y levels and initialize the mix sliders.
-		// This assumes that all vectors are identical - if not, the user should use the
-		// "custom" setting.
-		obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-		int tmpVal= m_aircraft->multiMotorChannelBox1->currentIndex()-1;
-		// tmpVal will be -1 if value is set to "None"
-		if (tmpVal > -1) {
-			field = obj->getField(mixerVectors.at(tmpVal));
-			int i = field->getElementNames().indexOf("Pitch");
-			double val = floor(field->getDouble(i)/1.27);
-			m_aircraft->mrPitchMixLevel->setValue(val);
-			i = field->getElementNames().indexOf("Yaw");
-			val = floor(-field->getDouble(i)/1.27);
-			m_aircraft->mrYawMixLevel->setValue(val);
-			tmpVal = m_aircraft->multiMotorChannelBox2->currentIndex()-1;
-			field = obj->getField(mixerVectors.at(tmpVal));
-			i = field->getElementNames().indexOf("Roll");
-			val = floor(1-field->getDouble(i)/1.27);
-			m_aircraft->mrRollMixLevel->setValue(val);
-		}
+        // Motors 1/2/3 4/5/6 are: NE / E / SE / SW / W / NW
+
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox1,multi.VTOLMotorNE);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox2,multi.VTOLMotorE);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox3,multi.VTOLMotorSE);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox4,multi.VTOLMotorSW);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox5,multi.VTOLMotorW);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox6,multi.VTOLMotorNW);
+
+        // Now, read the 1st mixer R/P/Y levels and initialize the mix sliders.
+        // This assumes that all vectors are identical - if not, the user should use the
+        // "custom" setting.
+
+        channel = m_aircraft->multiMotorChannelBox1->currentIndex() - 1;
+        if (channel > -1)
+        {
+            value = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH);
+            m_aircraft->mrPitchMixLevel->setValue( floor(value/1.27) );
+
+            value = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW);
+            m_aircraft->mrYawMixLevel->setValue( floor(-value/1.27) );
+
+            channel = m_aircraft->multiMotorChannelBox2->currentIndex() - 1;
+            value = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL);
+            m_aircraft->mrRollMixLevel->setValue( floor(1-value/1.27) );
+        }
 	} else if (frameType == "HexaCoax") {
-		// Motors 1/2/3 4/5/6 are: NW/W NE/E S/SE
-		field = obj->getField(QString("VTOLMotorNW"));
-		m_aircraft->multiMotorChannelBox1->setCurrentIndex(m_aircraft->multiMotorChannelBox1->findText(field->getValue().toString()));
-		field = obj->getField(QString("VTOLMotorW"));
-		m_aircraft->multiMotorChannelBox2->setCurrentIndex(m_aircraft->multiMotorChannelBox2->findText(field->getValue().toString()));
-		field = obj->getField(QString("VTOLMotorNE"));
-		m_aircraft->multiMotorChannelBox3->setCurrentIndex(m_aircraft->multiMotorChannelBox3->findText(field->getValue().toString()));
-		field = obj->getField(QString("VTOLMotorE"));
-		m_aircraft->multiMotorChannelBox4->setCurrentIndex(m_aircraft->multiMotorChannelBox4->findText(field->getValue().toString()));
-		field = obj->getField(QString("VTOLMotorS"));
-		m_aircraft->multiMotorChannelBox5->setCurrentIndex(m_aircraft->multiMotorChannelBox4->findText(field->getValue().toString()));
-		field = obj->getField(QString("VTOLMotorSE"));
-		m_aircraft->multiMotorChannelBox6->setCurrentIndex(m_aircraft->multiMotorChannelBox4->findText(field->getValue().toString()));
-		
-		// Now, read the 1st mixer R/P/Y levels and initialize the mix sliders.
-		// This assumes that all vectors are identical - if not, the user should use the
-		// "custom" setting.
-		obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-		int tmpVal= m_aircraft->multiMotorChannelBox1->currentIndex()-1;
-		// tmpVal will be -1 if value is set to "None"
-		if (tmpVal > -1) {
-			field = obj->getField(mixerVectors.at(tmpVal));
-			int i = field->getElementNames().indexOf("Pitch");
-			double val = floor(2*field->getDouble(i)/1.27);
-			m_aircraft->mrPitchMixLevel->setValue(val);
-			i = field->getElementNames().indexOf("Yaw");
-			val = floor(-field->getDouble(i)/1.27);
-			m_aircraft->mrYawMixLevel->setValue(val);
-			i = field->getElementNames().indexOf("Roll");
-			val = floor(field->getDouble(i)/1.27);
-			m_aircraft->mrRollMixLevel->setValue(val);
-		}
+        // Motors 1/2/3 4/5/6 are: NW/W NE/E S/SE
+
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox1,multi.VTOLMotorNW);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox2,multi.VTOLMotorW);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox3,multi.VTOLMotorNE);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox4,multi.VTOLMotorE);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox5,multi.VTOLMotorS);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox6,multi.VTOLMotorSE);
+
+        // Now, read the 1st mixer R/P/Y levels and initialize the mix sliders.
+        // This assumes that all vectors are identical - if not, the user should use the
+        // "custom" setting.
+        channel = m_aircraft->multiMotorChannelBox1->currentIndex() - 1;
+        if (channel > -1)
+        {
+            value = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH);
+            m_aircraft->mrPitchMixLevel->setValue( value/1.27 );
+
+            value = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW);
+            m_aircraft->mrYawMixLevel->setValue( value/1.27 );
+
+            channel = m_aircraft->multiMotorChannelBox2->currentIndex() - 1;
+            value = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL);
+            m_aircraft->mrRollMixLevel->setValue( value/1.27);
+        }
 	}  else if (frameType == "Octo" || frameType == "OctoV" ||
 				frameType == "OctoCoaxP") {
-		// Motors 1 to 8 are N / NE / E / etc
-		field = obj->getField(QString("VTOLMotorN"));
-		Q_ASSERT(field);
-		m_aircraft->multiMotorChannelBox1->setCurrentIndex(m_aircraft->multiMotorChannelBox1->findText(field->getValue().toString()));
-		field = obj->getField(QString("VTOLMotorNE"));
-		Q_ASSERT(field);
-		m_aircraft->multiMotorChannelBox2->setCurrentIndex(m_aircraft->multiMotorChannelBox2->findText(field->getValue().toString()));
-		field = obj->getField(QString("VTOLMotorE"));
-		Q_ASSERT(field);
-		m_aircraft->multiMotorChannelBox3->setCurrentIndex(m_aircraft->multiMotorChannelBox3->findText(field->getValue().toString()));
-		field = obj->getField(QString("VTOLMotorSE"));
-		Q_ASSERT(field);
-		m_aircraft->multiMotorChannelBox4->setCurrentIndex(m_aircraft->multiMotorChannelBox4->findText(field->getValue().toString()));
-		field = obj->getField(QString("VTOLMotorS"));
-		Q_ASSERT(field);
-		m_aircraft->multiMotorChannelBox5->setCurrentIndex(m_aircraft->multiMotorChannelBox4->findText(field->getValue().toString()));
-		field = obj->getField(QString("VTOLMotorSW"));
-		Q_ASSERT(field);
-		m_aircraft->multiMotorChannelBox6->setCurrentIndex(m_aircraft->multiMotorChannelBox4->findText(field->getValue().toString()));
-		field = obj->getField(QString("VTOLMotorW"));
-		Q_ASSERT(field);
-		m_aircraft->multiMotorChannelBox7->setCurrentIndex(m_aircraft->multiMotorChannelBox4->findText(field->getValue().toString()));
-		field = obj->getField(QString("VTOLMotorNW"));
-		Q_ASSERT(field);
-		m_aircraft->multiMotorChannelBox8->setCurrentIndex(m_aircraft->multiMotorChannelBox4->findText(field->getValue().toString()));
-		
-		// Now, read the 1st mixer R/P/Y levels and initialize the mix sliders.
-		// This assumes that all vectors are identical - if not, the user should use the
-		// "custom" setting.
-		obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-		int tmpVal= m_aircraft->multiMotorChannelBox1->currentIndex()-1;
-		// tmpVal will be -1 if value is set to "None"
-		if (tmpVal > -1) {
-			if (frameType == "Octo") {
-				field = obj->getField(mixerVectors.at(tmpVal));
-				int i = field->getElementNames().indexOf("Pitch");
-				double val = floor(field->getDouble(i)/1.27);
-				m_aircraft->mrPitchMixLevel->setValue(val);
-				i = field->getElementNames().indexOf("Yaw");
-				val = floor(-field->getDouble(i)/1.27);
-				m_aircraft->mrYawMixLevel->setValue(val);
-				tmpVal = m_aircraft->multiMotorChannelBox2->currentIndex()-1;
-				field = obj->getField(mixerVectors.at(tmpVal));
-				i = field->getElementNames().indexOf("Roll");
-				val = floor(-field->getDouble(i)/1.27);
-				m_aircraft->mrRollMixLevel->setValue(val);
-			} else if (frameType == "OctoV") {
-				field = obj->getField(mixerVectors.at(tmpVal));
-				int i = field->getElementNames().indexOf("Yaw");
-				double val = floor(-field->getDouble(i)/1.27);
-				m_aircraft->mrYawMixLevel->setValue(val);
-				i = field->getElementNames().indexOf("Roll");
-				val = floor(-field->getDouble(i)/1.27);
-				m_aircraft->mrRollMixLevel->setValue(val);
-				tmpVal = m_aircraft->multiMotorChannelBox2->currentIndex()-1;
-				field = obj->getField(mixerVectors.at(tmpVal));
-				i = field->getElementNames().indexOf("Pitch");
-				val = floor(field->getDouble(i)/1.27);
-				m_aircraft->mrPitchMixLevel->setValue(val);
-				
-			} else if (frameType == "OctoCoaxP") {
-				field = obj->getField(mixerVectors.at(tmpVal));
-				int i = field->getElementNames().indexOf("Pitch");
-				double val = floor(field->getDouble(i)/1.27);
-				m_aircraft->mrPitchMixLevel->setValue(val);
-				i = field->getElementNames().indexOf("Yaw");
-				val = floor(-field->getDouble(i)/1.27);
-				m_aircraft->mrYawMixLevel->setValue(val);
-				tmpVal = m_aircraft->multiMotorChannelBox3->currentIndex()-1;
-				field = obj->getField(mixerVectors.at(tmpVal));
-				i = field->getElementNames().indexOf("Roll");
-				val = floor(-field->getDouble(i)/1.27);
-				m_aircraft->mrRollMixLevel->setValue(val);
-				
-			}
-		}
+        // Motors 1 to 8 are N / NE / E / etc
+
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox1,multi.VTOLMotorN);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox2,multi.VTOLMotorNE);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox3,multi.VTOLMotorE);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox4,multi.VTOLMotorSE);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox5,multi.VTOLMotorS);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox6,multi.VTOLMotorSW);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox7,multi.VTOLMotorW);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox8,multi.VTOLMotorNW);
+
+        // Now, read the 1st mixer R/P/Y levels and initialize the mix sliders.
+        // This assumes that all vectors are identical - if not, the user should use the
+        // "custom" setting.
+        channel = m_aircraft->multiMotorChannelBox1->currentIndex() - 1;
+        if (channel > -1)
+        {
+            if (frameType == "Octo") {
+                value = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH);
+                m_aircraft->mrPitchMixLevel->setValue( floor(value/1.27) );
+
+                value = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW);
+                m_aircraft->mrYawMixLevel->setValue( floor(-value/1.27) );
+
+                //change channels
+                channel = m_aircraft->multiMotorChannelBox2->currentIndex() - 1;
+                value = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL);
+                m_aircraft->mrRollMixLevel->setValue( floor(-value/1.27) );
+            }
+            else if (frameType == "OctoV") {
+                value = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH);
+                m_aircraft->mrPitchMixLevel->setValue( floor(value/1.27) );
+
+                value = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW);
+                m_aircraft->mrYawMixLevel->setValue( floor(-value/1.27) );
+
+                //change channels
+                channel = m_aircraft->multiMotorChannelBox2->currentIndex() - 1;
+                value = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL);
+                m_aircraft->mrRollMixLevel->setValue( floor(-value/1.27) );
+            }
+            else if (frameType == "OctoCoaxP") {
+                value = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH);
+                m_aircraft->mrPitchMixLevel->setValue( floor(value/1.27) );
+
+                value = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW);
+                m_aircraft->mrYawMixLevel->setValue( floor(-value/1.27) );
+
+                //change channels
+                channel = m_aircraft->multiMotorChannelBox3->currentIndex() - 1;
+                value = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL);
+                m_aircraft->mrRollMixLevel->setValue( floor(-value/1.27) );
+            }
+
+        }
 	} else if (frameType == "OctoCoaxX") {
-		// Motors 1 to 8 are N / NE / E / etc
-		field = obj->getField(QString("VTOLMotorNW"));
-		Q_ASSERT(field);
-		m_aircraft->multiMotorChannelBox1->setCurrentIndex(m_aircraft->multiMotorChannelBox1->findText(field->getValue().toString()));
-		field = obj->getField(QString("VTOLMotorN"));
-		Q_ASSERT(field);
-		m_aircraft->multiMotorChannelBox2->setCurrentIndex(m_aircraft->multiMotorChannelBox2->findText(field->getValue().toString()));
-		field = obj->getField(QString("VTOLMotorNE"));
-		Q_ASSERT(field);
-		m_aircraft->multiMotorChannelBox3->setCurrentIndex(m_aircraft->multiMotorChannelBox3->findText(field->getValue().toString()));
-		field = obj->getField(QString("VTOLMotorE"));
-		Q_ASSERT(field);
-		m_aircraft->multiMotorChannelBox4->setCurrentIndex(m_aircraft->multiMotorChannelBox4->findText(field->getValue().toString()));
-		field = obj->getField(QString("VTOLMotorSE"));
-		Q_ASSERT(field);
-		m_aircraft->multiMotorChannelBox5->setCurrentIndex(m_aircraft->multiMotorChannelBox4->findText(field->getValue().toString()));
-		field = obj->getField(QString("VTOLMotorS"));
-		Q_ASSERT(field);
-		m_aircraft->multiMotorChannelBox6->setCurrentIndex(m_aircraft->multiMotorChannelBox4->findText(field->getValue().toString()));
-		field = obj->getField(QString("VTOLMotorSW"));
-		Q_ASSERT(field);
-		m_aircraft->multiMotorChannelBox7->setCurrentIndex(m_aircraft->multiMotorChannelBox4->findText(field->getValue().toString()));
-		field = obj->getField(QString("VTOLMotorW"));
-		Q_ASSERT(field);
-		m_aircraft->multiMotorChannelBox8->setCurrentIndex(m_aircraft->multiMotorChannelBox4->findText(field->getValue().toString()));
-		
-		// Now, read the 1st mixer R/P/Y levels and initialize the mix sliders.
-		// This assumes that all vectors are identical - if not, the user should use the
-		// "custom" setting.
-		obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-		int tmpVal= m_aircraft->multiMotorChannelBox1->currentIndex()-1;
-		// tmpVal will be -1 if value is set to "None"
-		if (tmpVal > -1) {
-			field = obj->getField(mixerVectors.at(tmpVal));
-			int i = field->getElementNames().indexOf("Pitch");
-			double val = floor(field->getDouble(i)/1.27);
-			m_aircraft->mrPitchMixLevel->setValue(val);
-			i = field->getElementNames().indexOf("Yaw");
-			val = floor(-field->getDouble(i)/1.27);
-			m_aircraft->mrYawMixLevel->setValue(val);
-			i = field->getElementNames().indexOf("Roll");
-			val = floor(field->getDouble(i)/1.27);
-			m_aircraft->mrRollMixLevel->setValue(val);
-		}
+        // Motors 1 to 8 are N / NE / E / etc
+
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox1,multi.VTOLMotorNW);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox2,multi.VTOLMotorN);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox3,multi.VTOLMotorNE);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox4,multi.VTOLMotorE);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox5,multi.VTOLMotorSE);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox6,multi.VTOLMotorS);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox7,multi.VTOLMotorSW);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox8,multi.VTOLMotorW);
+
+        // Now, read the 1st mixer R/P/Y levels and initialize the mix sliders.
+        // This assumes that all vectors are identical - if not, the user should use the
+        // "custom" setting.
+        channel = m_aircraft->multiMotorChannelBox1->currentIndex() - 1;
+        if (channel > -1)
+        {
+            value = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH);
+            m_aircraft->mrPitchMixLevel->setValue( floor(value/1.27) );
+
+            value = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW);
+            m_aircraft->mrYawMixLevel->setValue( floor(-value/1.27) );
+
+            value = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL);
+            m_aircraft->mrRollMixLevel->setValue( floor(value/1.27) );
+        }
 	} else if (frameType == "Tri") {
-		// Motors 1 to 8 are N / NE / E / etc
-		field = obj->getField(QString("VTOLMotorNW"));
-		Q_ASSERT(field);
-		m_aircraft->multiMotorChannelBox1->setCurrentIndex(m_aircraft->multiMotorChannelBox1->findText(field->getValue().toString()));
-		field = obj->getField(QString("VTOLMotorNE"));
-		Q_ASSERT(field);
-		m_aircraft->multiMotorChannelBox2->setCurrentIndex(m_aircraft->multiMotorChannelBox2->findText(field->getValue().toString()));
-		field = obj->getField(QString("VTOLMotorS"));
-		Q_ASSERT(field);
-		m_aircraft->multiMotorChannelBox3->setCurrentIndex(m_aircraft->multiMotorChannelBox3->findText(field->getValue().toString()));
-		field = obj->getField(QString("FixedWingYaw1"));
-		Q_ASSERT(field);
-		m_aircraft->triYawChannelBox->setCurrentIndex(m_aircraft->multiMotorChannelBox3->findText(field->getValue().toString()));
-		
-		obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-		int tmpVal= m_aircraft->multiMotorChannelBox1->currentIndex()-1;
-		// tmpVal will be -1 if value is set to "None"
-		if (tmpVal > -1) {
-			field = obj->getField(mixerVectors.at(tmpVal));
-			int i = field->getElementNames().indexOf("Pitch");
-			double val = floor(2*field->getDouble(i)/1.27);
-			m_aircraft->mrPitchMixLevel->setValue(val);
-			i = field->getElementNames().indexOf("Roll");
-			val = floor(field->getDouble(i)/1.27);
-			m_aircraft->mrRollMixLevel->setValue(val);
-		}
+        // Motors 1 to 8 are N / NE / E / etc
+
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox1,multi.VTOLMotorNW);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox2,multi.VTOLMotorNE);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox3,multi.VTOLMotorS);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox4,multi.VTOLMotorS);
+        setComboCurrentIndex(m_aircraft->triYawChannelBox,multi.TRIYaw);
+
+        channel = m_aircraft->multiMotorChannelBox1->currentIndex() - 1;
+        if (channel > -1)
+        {
+            value = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH);
+            m_aircraft->mrPitchMixLevel->setValue( floor(2*value/1.27) );
+
+            value = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL);
+            m_aircraft->mrRollMixLevel->setValue( floor(value/1.27) );
+
+        }
 	}
 }
 
@@ -853,27 +799,20 @@ void ConfigVehicleTypeWidget::refreshMultiRotorWidgetsValues(QString frameType)
 /**
  Helper function: setupQuadMotor
  */
-void ConfigVehicleTypeWidget::setupQuadMotor(int channel, double pitch, double roll, double yaw)
+void ConfigMultiRotorWidget::setupQuadMotor(int channel, double pitch, double roll, double yaw)
 {
     qDebug()<<QString("Setup quad motor channel=%0 pitch=%1 roll=%2 yaw=%3").arg(channel).arg(pitch).arg(roll).arg(yaw);
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-    Q_ASSERT(obj);
-    UAVObjectField *field = obj->getField(mixerTypes.at(channel));
-    field->setValue("Motor");
-    field = obj->getField(mixerVectors.at(channel));
-    // First of all reset the vector
-    resetField(field);
-    int ti = field->getElementNames().indexOf("ThrottleCurve1");
-    field->setValue(127, ti);
-    ti = field->getElementNames().indexOf("Roll");
-    field->setValue(roll*127,ti);
-    qDebug()<<"Set roll="<<roll*127;
-    ti = field->getElementNames().indexOf("Pitch");
-    field->setValue(pitch*127,ti);
-    qDebug()<<"Set pitch="<<pitch*127;
-    ti = field->getElementNames().indexOf("Yaw");
-    field->setValue(yaw*127,ti);
-    qDebug()<<"Set yaw="<<yaw*127;
+
+    UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
+    Q_ASSERT(mixer);
+
+    setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_MOTOR);
+
+    setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_THROTTLECURVE1, 127);
+    setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_THROTTLECURVE2, 0);
+    setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL, roll*127);
+    setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH, pitch*127);
+    setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW, yaw*127);
 }
 
 
@@ -881,21 +820,42 @@ void ConfigVehicleTypeWidget::setupQuadMotor(int channel, double pitch, double r
 /**
  Helper function: setup motors. Takes a list of channel names in input.
  */
-void ConfigVehicleTypeWidget::setupMotors(QList<QString> motorList)
+void ConfigMultiRotorWidget::setupMotors(QList<QString> motorList)
 {
-    resetActuators();
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorSettings")));
-    Q_ASSERT(obj);
-    UAVObjectField *field;
     QList<QComboBox*> mmList;
     mmList << m_aircraft->multiMotorChannelBox1 << m_aircraft->multiMotorChannelBox2 << m_aircraft->multiMotorChannelBox3
 	<< m_aircraft->multiMotorChannelBox4 << m_aircraft->multiMotorChannelBox5 << m_aircraft->multiMotorChannelBox6
 	<< m_aircraft->multiMotorChannelBox7 << m_aircraft->multiMotorChannelBox8;
+
+    GUIConfigDataUnion configData = GetConfigData();
+    ResetActuators(&configData);
+
+    int index;
     foreach (QString motor, motorList) {
-        field = obj->getField(motor);
-        field->setValue(mmList.takeFirst()->currentText());
+
+        index = mmList.takeFirst()->currentIndex();
+
+        //qDebug()<<QString("Setup motor: %0 = %1").arg(motor).arg(index);
+
+        if (motor == QString("VTOLMotorN"))
+            configData.multi.VTOLMotorN = index;
+        else if (motor == QString("VTOLMotorNE"))
+            configData.multi.VTOLMotorNE = index;
+        else if (motor == QString("VTOLMotorE"))
+            configData.multi.VTOLMotorE = index;
+        else if (motor == QString("VTOLMotorSE"))
+            configData.multi.VTOLMotorSE = index;
+        else if (motor == QString( "VTOLMotorS"))
+            configData.multi.VTOLMotorS = index;
+        else if (motor == QString( "VTOLMotorSW"))
+            configData.multi.VTOLMotorSW = index;
+        else if (motor == QString( "VTOLMotorW"))
+            configData.multi.VTOLMotorW = index;
+        else if (motor == QString( "VTOLMotorNW"))
+            configData.multi.VTOLMotorNW = index;
     }
-    //obj->updated(); // Save...
+    SetConfigData(configData);
+
 }
 
 
@@ -903,12 +863,12 @@ void ConfigVehicleTypeWidget::setupMotors(QList<QString> motorList)
 /**
  Set up a Quad-X or Quad-P mixer
  */
-bool ConfigVehicleTypeWidget::setupQuad(bool pLayout)
+bool ConfigMultiRotorWidget::setupQuad(bool pLayout)
 {
     // Check coherence:
 	
 	//Show any config errors in GUI
-	throwMultiRotorChannelConfigError(4);
+    throwConfigError(4);
 
     // - Four engines have to be defined
     if (m_aircraft->multiMotorChannelBox1->currentText() == "None" ||
@@ -979,11 +939,11 @@ bool ConfigVehicleTypeWidget::setupQuad(bool pLayout)
 /**
  Set up a Hexa-X or Hexa-P mixer
  */
-bool ConfigVehicleTypeWidget::setupHexa(bool pLayout)
+bool ConfigMultiRotorWidget::setupHexa(bool pLayout)
 {
     // Check coherence:
 	//Show any config errors in GUI
-	throwMultiRotorChannelConfigError(6);
+    throwConfigError(6);
 	
     // - Four engines have to be defined
     if (m_aircraft->multiMotorChannelBox1->currentText() == "None" ||
@@ -1060,7 +1020,7 @@ bool ConfigVehicleTypeWidget::setupHexa(bool pLayout)
 /**
  This function sets up the multirotor mixer values.
  */
-bool ConfigVehicleTypeWidget::setupMultiRotorMixer(double mixerFactors[8][3])
+bool ConfigMultiRotorWidget::setupMultiRotorMixer(double mixerFactors[8][3])
 {
     qDebug()<<"Mixer factors";
     qDebug()<<mixerFactors[0][0]<<" "<<mixerFactors[0][1]<<" "<<mixerFactors[0][2];
@@ -1071,20 +1031,22 @@ bool ConfigVehicleTypeWidget::setupMultiRotorMixer(double mixerFactors[8][3])
     qDebug()<<mixerFactors[5][0]<<" "<<mixerFactors[5][1]<<" "<<mixerFactors[5][2];
     qDebug()<<mixerFactors[6][0]<<" "<<mixerFactors[6][1]<<" "<<mixerFactors[6][2];
     qDebug()<<mixerFactors[7][0]<<" "<<mixerFactors[7][1]<<" "<<mixerFactors[7][2];
-	
-    UAVObjectField *field;
+
     QList<QComboBox*> mmList;
     mmList << m_aircraft->multiMotorChannelBox1 << m_aircraft->multiMotorChannelBox2 << m_aircraft->multiMotorChannelBox3
 	<< m_aircraft->multiMotorChannelBox4 << m_aircraft->multiMotorChannelBox5 << m_aircraft->multiMotorChannelBox6
 	<< m_aircraft->multiMotorChannelBox7 << m_aircraft->multiMotorChannelBox8;
-    UAVDataObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-    // 1. Assign the servo/motor/none for each channel
-    // Disable all
-    foreach(QString mixer, mixerTypes) {
-        field = obj->getField(mixer);
-        Q_ASSERT(field);
-        field->setValue("Disabled");
+
+    UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
+    Q_ASSERT(mixer);
+
+    //disable all
+    for (int channel=0; channel<VehicleConfig::CHANNEL_NUMELEM; channel++)
+    {
+        setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_DISABLED);
+        resetMixerVector(mixer, channel);
     }
+
     // and enable only the relevant channels:
     double pFactor = (double)m_aircraft->mrPitchMixLevel->value()/100;
     double rFactor = (double)m_aircraft->mrRollMixLevel->value()/100;
@@ -1107,34 +1069,25 @@ bool ConfigVehicleTypeWidget::setupMultiRotorMixer(double mixerFactors[8][3])
 /**
  This function displays text and color formatting in order to help the user understand what channels have not yet been configured.
  */
-void ConfigVehicleTypeWidget::throwMultiRotorChannelConfigError(int numMotors)
-{
+void ConfigMultiRotorWidget::throwConfigError(int numMotors)
+{    
 	//Initialize configuration error flag
 	bool error=false;
 
 	//Iterate through all instances of multiMotorChannelBox
 	for (int i=0; i<numMotors; i++) {
 		//Fine widgets with text "multiMotorChannelBox.x", where x is an integer
-		QComboBox *combobox = qFindChild<QComboBox*>(this, "multiMotorChannelBox" + QString::number(i+1));
-		if (combobox){  //if QLabel exists
-			QLabel *label = qFindChild<QLabel*>(this, "MotorOutputLabel" + QString::number(i+1));
-			if (combobox->currentText() == "None") {
-
-//				label->setText("<font color='red'>" + label->text() + "</font>");
-			
+        QComboBox *combobox = qFindChild<QComboBox*>(uiowner, "multiMotorChannelBox" + QString::number(i+1));
+        if (combobox){
+            if (combobox->currentText() == "None") {
 				int size = combobox->style()->pixelMetric(QStyle::PM_SmallIconSize);
 				QPixmap pixmap(size,size);
 				pixmap.fill(QColor("red"));
-				combobox->setItemData(0, pixmap, Qt::DecorationRole);//Set color palettes 
-//				combobox->setStyleSheet("QComboBox { color: red}");
+                combobox->setItemData(0, pixmap, Qt::DecorationRole);//Set color palettes
 				error=true;
-
 			}
 			else {
-				combobox->setItemData(0, 0, Qt::DecorationRole);//Reset color palettes 
-//				combobox->setStyleSheet("color: black;");
-//				QTextEdit* htmlText=new QTextEdit(label->text());  // htmlText is any QString with html tags.
-//				label->setText(htmlText->toPlainText());
+                combobox->setItemData(0, 0, Qt::DecorationRole);//Reset color palettes
 			}
 		}
 	}
@@ -1144,3 +1097,5 @@ void ConfigVehicleTypeWidget::throwMultiRotorChannelConfigError(int numMotors)
 		m_aircraft->mrStatusLabel->setText(QString("<font color='red'>ERROR: Assign all %1 motor channels</font>").arg(numMotors));
 	}
 }
+
+

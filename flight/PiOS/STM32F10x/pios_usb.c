@@ -40,7 +40,7 @@
 #if defined(PIOS_INCLUDE_USB_HID)
 
 /* Rx/Tx status */
-static uint8_t transfer_possible = 0;
+static bool transfer_possible = false;
 
 enum pios_usb_dev_magic {
 	PIOS_USB_DEV_MAGIC = 0x17365904,
@@ -51,12 +51,20 @@ struct pios_usb_dev {
 	const struct pios_usb_cfg * cfg;
 };
 
-#if 0
-static bool PIOS_USB_validate(struct pios_usb_dev * usb_dev)
+/**
+ * @brief Validate the usb device structure
+ * @returns 0 if valid device or -1 otherwise
+ */
+static int32_t PIOS_USB_validate(struct pios_usb_dev * usb_dev)
 {
-	return (usb_dev->magic == PIOS_USB_DEV_MAGIC);
+	if(usb_dev == NULL)
+		return -1;
+
+	if (usb_dev->magic != PIOS_USB_DEV_MAGIC)
+		return -1;
+
+	return 0;
 }
-#endif
 
 #if defined(PIOS_INCLUDE_FREERTOS)
 static struct pios_usb_dev * PIOS_USB_alloc(void)
@@ -140,11 +148,11 @@ out_fail:
  * \return < 0 on errors
  * \note Applications shouldn't call this function directly, instead please use \ref PIOS_COM layer functions
  */
-int32_t PIOS_USB_ChangeConnectionState(uint32_t Connected)
+int32_t PIOS_USB_ChangeConnectionState(bool Connected)
 {
 	// In all cases: re-initialise USB HID driver
 	if (Connected) {
-		transfer_possible = 1;
+		transfer_possible = true;
 
 		//TODO: Check SetEPRxValid(ENDP1);
 
@@ -153,7 +161,7 @@ int32_t PIOS_USB_ChangeConnectionState(uint32_t Connected)
 #endif
 	} else {
 		// Cable disconnected: disable transfers
-		transfer_possible = 0;
+		transfer_possible = false;
 
 #if defined(USB_LED_OFF)
 		USB_LED_OFF;	// turn the USB led off
@@ -199,6 +207,16 @@ int32_t PIOS_USB_Reenumerate()
 	return 0;
 }
 
+bool PIOS_USB_CableConnected(uint8_t id)
+{
+	struct pios_usb_dev * usb_dev = (struct pios_usb_dev *) pios_usb_com_id;
+
+	if (PIOS_USB_validate(usb_dev) != 0)
+		return false;
+
+	return usb_dev->cfg->vsense.gpio->IDR & usb_dev->cfg->vsense.init.GPIO_Pin;
+}
+
 /**
  * This function returns the connection status of the USB HID interface
  * \return 1: interface available
@@ -207,7 +225,12 @@ int32_t PIOS_USB_Reenumerate()
  */
 bool PIOS_USB_CheckAvailable(uint8_t id)
 {
-	return (PIOS_USB_DETECT_GPIO_PORT->IDR & PIOS_USB_DETECT_GPIO_PIN) != 0 && transfer_possible ? 1 : 0;
+	struct pios_usb_dev * usb_dev = (struct pios_usb_dev *) pios_usb_com_id;
+
+	if (PIOS_USB_validate(usb_dev) != 0)
+		return false;
+
+	return PIOS_USB_CableConnected(id) && transfer_possible;
 }
 
 #endif

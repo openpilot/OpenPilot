@@ -66,8 +66,6 @@ static portTickType lastResetSysTime;
 // Private functions
 static void FirmwareIAPCallback(UAVObjEvent* ev);
 
-FirmwareIAPObjData 	data;
-
 static uint32_t	get_time(void);
 
 // Private types
@@ -95,6 +93,9 @@ int32_t FirmwareIAPInitialize()
 	FirmwareIAPObjInitialize();
 	
 	const struct pios_board_info * bdinfo = &pios_board_info_blob;
+
+	FirmwareIAPObjData data;
+	FirmwareIAPObjGet(&data);
 
 	data.BoardType= bdinfo->board_type;
 	PIOS_BL_HELPER_FLASH_Read_Description(data.Description,FIRMWAREIAPOBJ_DESCRIPTION_NUMELEM);
@@ -125,6 +126,9 @@ static void FirmwareIAPCallback(UAVObjEvent* ev)
 	
 	if(iap_state == IAP_STATE_RESETTING)
 		return;
+
+	FirmwareIAPObjData data;
+	FirmwareIAPObjGet(&data);
 	
 	if ( ev->obj == FirmwareIAPObjHandle() )	{
 		// Get the input object data
@@ -238,7 +242,10 @@ static void resetTask(UAVObjEvent * ev)
 #if defined (PIOS_LED_ALARM)
 	PIOS_LED_Toggle(PIOS_LED_ALARM);
 #endif	/* PIOS_LED_ALARM */
-	
+
+	FirmwareIAPObjData data;
+	FirmwareIAPObjGet(&data);
+
 	if((portTickType) (xTaskGetTickCount() - lastResetSysTime) > RESET_DELAY / portTICK_RATE_MS) {
 		lastResetSysTime = xTaskGetTickCount();
 		data.BoardType=0xFF;

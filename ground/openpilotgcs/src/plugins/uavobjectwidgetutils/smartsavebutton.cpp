@@ -77,7 +77,7 @@ void smartSaveButton::processOperation(QPushButton * button,bool save)
     foreach(UAVDataObject * obj,objects)
     {
         UAVObject::Metadata mdata= obj->getMetadata();
-        if(mdata.gcsAccess==UAVObject::ACCESS_READONLY)
+        if(UAVObject::GetGcsAccess(mdata)==UAVObject::ACCESS_READONLY)
             continue;
         up_result=false;
         current_object=obj;
@@ -87,7 +87,7 @@ void smartSaveButton::processOperation(QPushButton * button,bool save)
             connect(obj,SIGNAL(transactionCompleted(UAVObject*,bool)),this,SLOT(transaction_finished(UAVObject*, bool)));
             connect(&timer,SIGNAL(timeout()),&loop,SLOT(quit()));
             obj->updated();
-            timer.start(1000);
+            timer.start(3000);
             //qDebug()<<"begin loop";
             loop.exec();
             //qDebug()<<"end loop";
@@ -113,7 +113,7 @@ void smartSaveButton::processOperation(QPushButton * button,bool save)
                 connect(utilMngr,SIGNAL(saveCompleted(int,bool)),this,SLOT(saving_finished(int,bool)));
                 connect(&timer,SIGNAL(timeout()),&loop,SLOT(quit()));
                 utilMngr->saveObjectToSD(obj);
-                timer.start(1000);
+                timer.start(3000);
                 loop.exec();
                 timer.stop();
                 disconnect(utilMngr,SIGNAL(saveCompleted(int,bool)),this,SLOT(saving_finished(int,bool)));

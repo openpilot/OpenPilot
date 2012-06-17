@@ -147,6 +147,13 @@ plugin_hitlnew.depends += plugin_uavobjects
 plugin_hitlnew.depends += plugin_uavtalk
 SUBDIRS += plugin_hitlnew
 
+#HITLNEW Simulation gadget v2
+plugin_hitl_v2.subdir = hitlv2
+plugin_hitl_v2.depends = plugin_coreplugin
+plugin_hitl_v2.depends += plugin_uavobjects
+plugin_hitl_v2.depends += plugin_uavtalk
+SUBDIRS += plugin_hitl_v2
+
 # Export and Import GCS Configuration
 plugin_importexport.subdir = importexport
 plugin_importexport.depends = plugin_coreplugin
@@ -171,13 +178,6 @@ SUBDIRS += plugin_gcscontrol
 #plugin_antennatrack.depends = plugin_coreplugin
 #plugin_antennatrack.depends += plugin_uavtalk
 #SUBDIRS += plugin_antennatrack
-
-#PipXtreme gadget
-plugin_pipxtreme.subdir = pipxtreme
-plugin_pipxtreme.depends = plugin_coreplugin
-plugin_pipxtreme.depends += plugin_uavobjects
-plugin_pipxtreme.depends += plugin_rawhid
-SUBDIRS += plugin_pipxtreme
 
 #Scope OpenGL Gadget
 #plugin_scopeogl.subdir = scopeogl

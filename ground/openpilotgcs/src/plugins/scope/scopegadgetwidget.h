@@ -62,35 +62,6 @@ private:
 //    double baseTime;
 };
 
-/*!
-  \brief This class is used to inject UAVTalk messages for testing.
-  */
-class TestDataGen : QObject
-{
-    Q_OBJECT
-
-public:
-
-    TestDataGen();
-    ~TestDataGen();
-
-private:
-    BaroAltitude* baroAltitude;
-    PositionActual* gps;
-    AttitudeRaw* attRaw;
-    ManualControlCommand* manCtrlCmd;
-
-    QTimer *timer;
-    double testTime;
-    int periodMs;
-
-    int debugCounter;
-
-private slots:
-    void genTestData();
-};
-
-
 class ScopeGadgetWidget : public QwtPlot
 {
     Q_OBJECT
@@ -99,7 +70,7 @@ public:
     ScopeGadgetWidget(QWidget *parent = 0);
     ~ScopeGadgetWidget();
 
-    void setupSequencialPlot();
+    void setupSequentialPlot();
     void setupChronoPlot();
     void setupUAVObjectPlot();
     PlotType plotType(){return m_plotType;}
@@ -110,7 +81,7 @@ public:
     int refreshInterval(){return m_refreshInterval;}
 
 
-    void addCurvePlot(QString uavObject, QString uavFieldSubField, int scaleOrderFactor = 0, int interpolationSamples = 1, QPen pen = QPen(Qt::black));
+    void addCurvePlot(QString uavObject, QString uavFieldSubField, int scaleOrderFactor = 0, int meanSamples = 1, QString mathFunction= "None", QPen pen = QPen(Qt::black));
     //void removeCurvePlot(QString uavObject, QString uavField);
     void clearCurvePlots();
     int csvLoggingStart();
@@ -147,8 +118,6 @@ private:
     int m_refreshInterval;
     QList<QString> m_connectedUAVObjects;
     QMap<QString, PlotData*> m_curvesData;
-
-    static TestDataGen* testDataGen;    
 
     QTimer *replotTimer;
 

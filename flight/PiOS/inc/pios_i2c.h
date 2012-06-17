@@ -48,7 +48,7 @@ struct pios_i2c_txn {
 	uint8_t *buf;
 };
 
-#define I2C_LOG_DEPTH 5
+#define I2C_LOG_DEPTH 20
 enum pios_i2c_error_type {
 	PIOS_I2C_ERROR_EVENT, 
 	PIOS_I2C_ERROR_FSM,
@@ -64,7 +64,8 @@ struct pios_i2c_fault_history {
 };
 
 /* Public Functions */
-extern bool PIOS_I2C_Transfer(uint32_t i2c_id, const struct pios_i2c_txn txn_list[], uint32_t num_txns);
+extern int32_t PIOS_I2C_Transfer(uint32_t i2c_id, const struct pios_i2c_txn txn_list[], uint32_t num_txns);
+extern int32_t PIOS_I2C_Transfer_Callback(uint32_t i2c_id, const struct pios_i2c_txn txn_list[], uint32_t num_txns, void *callback);
 extern void PIOS_I2C_EV_IRQ_Handler(uint32_t i2c_id);
 extern void PIOS_I2C_ER_IRQ_Handler(uint32_t i2c_id);
 extern void PIOS_I2C_GetDiagnostics(struct pios_i2c_fault_history * data, uint8_t * error_counts);

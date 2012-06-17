@@ -31,7 +31,7 @@
  * NOTE: THIS IS THE ONLY PLACE THAT SHOULD EVER INCLUDE THIS FILE
  */
 #include "board_hw_defs.c"
-
+#include <pios_board_info.h>
 #include <pios.h>
 
 uint32_t pios_com_telem_usb_id;
@@ -59,8 +59,12 @@ void PIOS_Board_Init(void) {
 	/* Initialize the PiOS library */
 	PIOS_GPIO_Init();
 
+	const struct pios_board_info * bdinfo = &pios_board_info_blob;
+	
 #if defined(PIOS_INCLUDE_LED)
-	PIOS_LED_Init(&pios_led_cfg);
+	const struct pios_led_cfg * led_cfg = PIOS_BOARD_HW_DEFS_GetLedCfg(bdinfo->board_rev);
+	PIOS_Assert(led_cfg);
+	PIOS_LED_Init(led_cfg);
 #endif	/* PIOS_INCLUDE_LED */
 
 #if defined(PIOS_INCLUDE_USB)
@@ -71,8 +75,15 @@ void PIOS_Board_Init(void) {
 	PIOS_USB_DESC_HID_ONLY_Init();
 
 	uint32_t pios_usb_id;
-	if (PIOS_USB_Init(&pios_usb_id, &pios_usb_main_cfg)) {
-		PIOS_Assert(0);
+	switch(bdinfo->board_rev) {
+		case BOARD_REVISION_CC:
+			PIOS_USB_Init(&pios_usb_id, &pios_usb_main_cfg_cc);
+			break;
+		case BOARD_REVISION_CC3D:
+			PIOS_USB_Init(&pios_usb_id, &pios_usb_main_cfg_cc3d);
+			break;
+		default:
+			PIOS_Assert(0);
 	}
 #if defined(PIOS_INCLUDE_USB_HID) && defined(PIOS_INCLUDE_COM_MSG)
 	uint32_t pios_usb_hid_id;
@@ -89,4 +100,8 @@ void PIOS_Board_Init(void) {
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_CRC, ENABLE);//TODO Tirar
 
 	board_init_complete = true;
+}
+
+void PIOS_ADC_DMA_Handler()
+{
 }

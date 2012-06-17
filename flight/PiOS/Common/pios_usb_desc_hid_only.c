@@ -32,6 +32,7 @@
 #include "pios_usb_defs.h"		 /* struct usb_*, USB_* */
 #include "pios_usb_board_data.h"	 /* PIOS_USB_BOARD_* */
 #include "pios_usbhook.h"		 /* PIOS_USBHOOK_Register* */
+#include "pios_usb_hid.h"		 /* PIOS_USB_HID_Register* */
 
 static const struct usb_device_desc device_desc = {
 	.bLength            = sizeof(struct usb_device_desc),
@@ -75,7 +76,7 @@ static const uint8_t hid_report_desc[36] = {
 	HID_MAIN_ITEM_1 (HID_TAG_MAIN_INPUT),
 	0x03,			/* Variable, Constant (read-only) */
 
-	/* Host -> Host emulated serial channel */
+	/* Host -> Device emulated serial channel */
 	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_REPORT_ID),
 	0x02,                   /* OpenPilot emulated Serial Channel (Host -> Device) */
 	HID_LOCAL_ITEM_1  (HID_TAG_LOCAL_USAGE),
@@ -157,8 +158,8 @@ int32_t PIOS_USB_DESC_HID_ONLY_Init(void)
 
 	PIOS_USBHOOK_RegisterDevice((uint8_t *)&device_desc, sizeof(device_desc));
 
-	PIOS_USBHOOK_RegisterHidInterface((uint8_t *)&(config_hid_only.hid_if), sizeof(config_hid_only.hid_if));
-	PIOS_USBHOOK_RegisterHidReport((uint8_t *)hid_report_desc, sizeof(hid_report_desc));
+	PIOS_USB_HID_RegisterHidDescriptor((uint8_t *)&(config_hid_only.hid), sizeof(config_hid_only.hid));
+	PIOS_USB_HID_RegisterHidReport((uint8_t *)hid_report_desc, sizeof(hid_report_desc));
 
 	return 0;
 }

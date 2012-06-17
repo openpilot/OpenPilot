@@ -80,6 +80,7 @@ signals:
 
 public slots:
     void activateMode(const QString &id);
+    void activateModeByWorkspaceName(const QString &id);
     void setFocusToCurrentMode();
 
 private slots:

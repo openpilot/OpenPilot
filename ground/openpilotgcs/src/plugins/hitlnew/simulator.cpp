@@ -49,7 +49,7 @@ Simulator::Simulator(const SimulatorSettings& params) :
 	outSocket(NULL),
 	settings(params),
         updatePeriod(50),
-        simTimeout(2000),
+        simTimeout(8000),
 	autopilotConnectionStatus(false),
 	simConnectionStatus(false),
 	txTimer(NULL),
@@ -131,7 +131,8 @@ void Simulator::onStart()
 	posActual = PositionActual::GetInstance(objManager);
         altActual = BaroAltitude::GetInstance(objManager);
 	attActual = AttitudeActual::GetInstance(objManager);
-	attRaw = AttitudeRaw::GetInstance(objManager);
+	accels = Accels::GetInstance(objManager);
+	gyros = Gyros::GetInstance(objManager);
         gpsPos = GPSPosition::GetInstance(objManager);
 	telStats = GCSTelemetryStats::GetInstance(objManager);
 
@@ -225,7 +226,8 @@ void Simulator::setupObjects()
         setupOutputObject(posActual, 250);
         setupOutputObject(velActual, 250);
         setupOutputObject(posHome, 1000);
-        setupOutputObject(attRaw, 10);
+        setupOutputObject(accels, 10);
+        setupOutputObject(gyros, 10);
         //setupOutputObject(attRaw, 100);
 
 
@@ -236,12 +238,12 @@ void Simulator::setupInputObject(UAVObject* obj, int updatePeriod)
 {
 	UAVObject::Metadata mdata;
 	mdata = obj->getDefaultMetadata();
-	mdata.flightAccess = UAVObject::ACCESS_READWRITE;
-	mdata.gcsAccess = UAVObject::ACCESS_READWRITE;
-	mdata.flightTelemetryAcked = false;
-	mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
+	UAVObject::SetFlightAccess(mdata, UAVObject::ACCESS_READWRITE);
+	UAVObject::SetGcsAccess(mdata, UAVObject::ACCESS_READWRITE);
+	UAVObject::SetFlightTelemetryAcked(mdata, false);
+	UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
 	mdata.flightTelemetryUpdatePeriod = updatePeriod;
-	mdata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_MANUAL;
+	UAVObject::SetGcsTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_MANUAL);
 	obj->setMetadata(mdata);
 }
 
@@ -249,11 +251,11 @@ void Simulator::setupOutputObject(UAVObject* obj, int updatePeriod)
 {
 	UAVObject::Metadata mdata;
 	mdata = obj->getDefaultMetadata();
-	mdata.flightAccess = UAVObject::ACCESS_READONLY;
-	mdata.gcsAccess = UAVObject::ACCESS_READWRITE;
-	mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_NEVER;
-	mdata.gcsTelemetryAcked = false;
-	mdata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
+	UAVObject::SetFlightAccess(mdata, UAVObject::ACCESS_READONLY);
+	UAVObject::SetGcsAccess(mdata, UAVObject::ACCESS_READWRITE);
+	UAVObject::SetFlightTelemetryUpdateMode(mdata,UAVObject::UPDATEMODE_MANUAL);
+	UAVObject::SetGcsTelemetryAcked(mdata, false);
+	UAVObject::SetGcsTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
 	mdata.gcsTelemetryUpdatePeriod = updatePeriod;
 	obj->setMetadata(mdata);
 }

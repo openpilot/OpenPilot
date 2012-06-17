@@ -393,6 +393,19 @@ static void comUAVTalkTask(void *parameters)
 #endif
 							break;
 						}
+						case OBJECTPERSISTENCE_OPERATION_DELETE:
+						{
+#if defined(PIOS_INCLUDE_FLASH_EEPROM)
+							// Erase the settings.
+							PipXSettingsData pipxSettings;
+							uint8_t *ptr = (uint8_t*)&pipxSettings;
+							memset(ptr, 0, sizeof(PipXSettingsData));
+							int32_t ret = PIOS_EEPROM_Save(ptr, sizeof(PipXSettingsData));
+							if (ret != 0)
+								success = false;
+#endif
+							break;
+						}
 						default:
 							break;
 						}

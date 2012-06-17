@@ -212,17 +212,23 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 	m_map->UAV->SetUAVPos(m_home_position.coord, 0.0);        // set the UAV position
     if(m_map->GPS)
         m_map->GPS->SetUAVPos(m_home_position.coord, 0.0);        // set the UAV position
-
-
+/*
+    qDebug()<<"here0";
     model=new flightDataModel(this);
+    qDebug()<<"here1";
     table=new pathPlanner();
+    qDebug()<<"here2";
     selectionModel=new QItemSelectionModel(model);
+    qDebug()<<"here3";
     proxy=new modelMapProxy(this,m_map,model,selectionModel);
+    qDebug()<<"here4";
     table->setModel(model,selectionModel);
+    qDebug()<<"here5";
     table->show();
+    qDebug()<<"here6";
     waypoint_edit_dialog=new opmap_edit_waypoint_dialog(NULL,model,selectionModel);
-
-
+    qDebug()<<"here7";
+*/
 /*
     distBearing db;
     db.distance=100;

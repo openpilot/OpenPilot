@@ -80,6 +80,51 @@ void modelMapProxy::on_selectedWPChanged(QList<WayPointItem *> list)
         selection->setCurrentIndex(index,QItemSelectionModel::Select | QItemSelectionModel::Rows);
     }
 }
+
+modelMapProxy::overlayType modelMapProxy::overlayTranslate(int type)
+{
+    switch(type)
+    {
+    case ComboBoxDelegate::MODE_FLYENDPOINT:
+    case ComboBoxDelegate::MODE_FLYVECTOR:
+    case ComboBoxDelegate::MODE_DRIVEENDPOINT:
+    case ComboBoxDelegate::MODE_DRIVEVECTOR:
+       return OVERLAY_LINE;
+        break;
+    case ComboBoxDelegate::MODE_FLYCIRCLERIGHT:
+    case ComboBoxDelegate::MODE_DRIVECIRCLERIGHT:
+        return OVERLAY_CIRCLE_RIGHT;
+         break;
+    case ComboBoxDelegate::MODE_FLYCIRCLELEFT:
+    case ComboBoxDelegate::MODE_DRIVECIRCLELEFT:
+        return OVERLAY_CIRCLE_LEFT;
+        break;
+    default:
+        break;
+    }
+}
+
+void modelMapProxy::createOverlay(WayPointItem *from, WayPointItem *to, modelMapProxy::overlayType type,QColor color)
+{
+    if(from==NULL || to==NULL || from==to)
+        return;
+    switch(type)
+    {
+    case OVERLAY_LINE:
+        myMap->WPLineCreate(from,to,color);
+        break;
+    case OVERLAY_CIRCLE_RIGHT:
+        myMap->WPCircleCreate(to,from,true,color);
+        break;
+    case OVERLAY_CIRCLE_LEFT:
+        myMap->WPCircleCreate(to,from,false,color);
+        break;
+    default:
+        break;
+
+    }
+}
+
 /*
 typedef enum { MODE_FLYENDPOINT=0, MODE_FLYVECTOR=1, MODE_FLYCIRCLERIGHT=2, MODE_FLYCIRCLELEFT=3,
                MODE_DRIVEENDPOINT=4, MODE_DRIVEVECTOR=5, MODE_DRIVECIRCLELEFT=6, MODE_DRIVECIRCLERIGHT=7,
@@ -93,48 +138,60 @@ typedef enum { COMMAND_ONCONDITIONNEXTWAYPOINT=0, COMMAND_ONNOTCONDITIONNEXTWAYP
 */
 void modelMapProxy::refreshOverlays()
 {
-    /*
-    QMutexLocker locker(&wplistmutex);
+    qDebug()<<"REFRESH OVERLAYS START";
     myMap->deleteAllOverlays();
-    foreach(WayPointItem * wp,*waypoints)
+    WayPointItem * wp_current=NULL;
+    WayPointItem * wp_next=NULL;
+    int wp_jump;
+    int wp_error;
+    overlayType wp_next_overlay;
+    overlayType wp_jump_overlay;
+    overlayType wp_error_overlay;
+    for(int x=0;x<model->rowCount();++x)
     {
-        customData data=wp->data(0).value<customData>();
-
-        switch(data.condition)
+        qDebug()<<"REFRESH OVERLAYS WP:"<<x;
+        wp_current=findWayPointNumber(x);
+        wp_jump=model->data(model->index(x,flightDataModel::JUMPDESTINATION)).toInt();
+        wp_error=model->data(model->index(x,flightDataModel::ERRORDESTINATION)).toInt();
+        wp_next_overlay=overlayTranslate(model->data(model->index(x+1,flightDataModel::MODE)).toInt());
+                wp_jump_overlay=overlayTranslate(model->data(model->index(wp_jump,flightDataModel::MODE)).toInt());
+                wp_error_overlay=overlayTranslate(model->data(model->index(wp_error,flightDataModel::MODE)).toInt());
+                createOverlay(wp_current,findWayPointNumber(wp_error),wp_error_overlay,Qt::red);
+        switch(model->data(model->index(x,flightDataModel::COMMAND)).toInt())
         {
-
-        }
-
-        switch(data.mode)
-        {
-        case PathAction::MODE_FLYENDPOINT:
-        case PathAction::MODE_FLYVECTOR:
-        case PathAction::MODE_DRIVEENDPOINT:
-        case PathAction::MODE_DRIVEVECTOR:
-            if(wp->Number()==0)
-                myMap->WPLineCreate((HomeItem*)myMap->Home,wp);
-            else
-                myMap->WPLineCreate(findWayPointNumber(wp->Number()-1),wp);
+        case ComboBoxDelegate::COMMAND_ONCONDITIONNEXTWAYPOINT:
+            wp_next=findWayPointNumber(x+1);
+            createOverlay(wp_current,wp_next,wp_next_overlay,Qt::green);
+            qDebug()<<"REFRESH OVERLAYS"<<"AKI0";
             break;
-        case PathAction::MODE_FLYCIRCLERIGHT:
-        case PathAction::MODE_DRIVECIRCLERIGHT:
-            if(wp->Number()==0)
-                myMap->WPCircleCreate((HomeItem*)myMap->Home,wp,true);
-            myMap->WPCircleCreate(findWayPointNumber(wp->Number()-1),wp,true);
+        case ComboBoxDelegate::COMMAND_ONCONDITIONJUMPWAYPOINT:
+            wp_next=findWayPointNumber(wp_jump);
+            createOverlay(wp_current,wp_next,wp_jump_overlay,Qt::green);
+            qDebug()<<"REFRESH OVERLAYS"<<"AKI1";
             break;
-        case PathAction::MODE_FLYCIRCLELEFT:
-        case PathAction::MODE_DRIVECIRCLELEFT:
-            if(wp->Number()==0)
-                myMap->WPCircleCreate((HomeItem*)myMap->Home,wp,false);
-            myMap->WPCircleCreate(findWayPointNumber(wp->Number()-1),wp,false);
+        case ComboBoxDelegate::COMMAND_ONNOTCONDITIONJUMPWAYPOINT:
+            wp_next=findWayPointNumber(wp_jump);
+            createOverlay(wp_current,wp_next,wp_jump_overlay,Qt::yellow);
+            qDebug()<<"REFRESH OVERLAYS"<<"AKI2";
             break;
-        default:
+        case ComboBoxDelegate::COMMAND_ONNOTCONDITIONNEXTWAYPOINT:
+            wp_next=findWayPointNumber(x+1);
+            createOverlay(wp_current,wp_next,wp_next_overlay,Qt::yellow);
+            qDebug()<<"REFRESH OVERLAYS"<<"AKI3";
             break;
-
+        case ComboBoxDelegate::COMMAND_IFCONDITIONJUMPWAYPOINTELSENEXTWAYPOINT:
+            wp_next=findWayPointNumber(wp_jump);
+            createOverlay(wp_current,wp_next,wp_jump_overlay,Qt::green);
+            wp_next=findWayPointNumber(x+1);
+            createOverlay(wp_current,wp_next,wp_next_overlay,Qt::green);
+            qDebug()<<"REFRESH OVERLAYS"<<"AKI4";
+            break;
         }
     }
-    */
 }
+
+
+
 
 WayPointItem * modelMapProxy::findWayPointNumber(int number)
 {
@@ -158,6 +215,7 @@ void modelMapProxy::on_rowsRemoved(const QModelIndex &parent, int first, int las
     {
         myMap->WPDelete(x);
     }
+    refreshOverlays();
 }
 
 void modelMapProxy::on_dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
@@ -174,6 +232,13 @@ void modelMapProxy::on_dataChanged(const QModelIndex &topLeft, const QModelIndex
     QString desc;
     switch(topLeft.column())
     {
+    case flightDataModel::COMMAND:
+    case flightDataModel::CONDITION:
+    case flightDataModel::JUMPDESTINATION:
+    case flightDataModel::ERRORDESTINATION:
+    case flightDataModel::MODE:
+        refreshOverlays();
+    break;
     case flightDataModel::WPDESCRITPTION:
         index=model->index(x,flightDataModel::WPDESCRITPTION);
         desc=index.data(Qt::DisplayRole).toString();
@@ -250,6 +315,7 @@ void modelMapProxy::on_rowsInserted(const QModelIndex &parent, int first, int la
         if(relative)
             item->setWPType(mapcontrol::WayPointItem::relative);
     }
+    refreshOverlays();
 }
 void modelMapProxy::deleteWayPoint(int number)
 {

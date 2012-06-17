@@ -35,8 +35,8 @@ WayPointLine::WayPointLine(WayPointItem *from, WayPointItem *to, MapGraphicItem 
     destination(to),my_map(map),QGraphicsLineItem(map),myColor(color)
 {
     this->setLine(to->pos().x(),to->pos().y(),from->pos().x(),from->pos().y());
-    connect(from,SIGNAL(localPositionChanged(QPointF)),this,SLOT(refreshLocations()));
-    connect(to,SIGNAL(localPositionChanged(QPointF)),this,SLOT(refreshLocations()));
+    connect(from,SIGNAL(localPositionChanged(QPointF,WayPointItem*)),this,SLOT(refreshLocations()));
+    connect(to,SIGNAL(localPositionChanged(QPointF,WayPointItem*)),this,SLOT(refreshLocations()));
     connect(from,SIGNAL(aboutToBeDeleted(WayPointItem*)),this,SLOT(waypointdeleted()));
     connect(to,SIGNAL(aboutToBeDeleted(WayPointItem*)),this,SLOT(waypointdeleted()));
 }

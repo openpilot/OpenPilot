@@ -34,8 +34,9 @@ namespace mapcontrol
 WayPointCircle::WayPointCircle(WayPointItem *center, WayPointItem *radius,bool clockwise, MapGraphicItem *map,QColor color):my_center(center),
     my_radius(radius),my_map(map),QGraphicsEllipseItem(map),myColor(color),myClockWise(clockwise)
 {
-    connect(center,SIGNAL(localPositionChanged(QPointF)),this,SLOT(refreshLocations()));
-    connect(radius,SIGNAL(localPositionChanged(QPointF)),this,SLOT(refreshLocations()));
+    qDebug()<<"circle clock:"<<clockwise;
+    connect(center,SIGNAL(localPositionChanged(QPointF,WayPointItem*)),this,SLOT(refreshLocations()));
+    connect(radius,SIGNAL(localPositionChanged(QPointF,WayPointItem*)),this,SLOT(refreshLocations()));
     connect(center,SIGNAL(aboutToBeDeleted(WayPointItem*)),this,SLOT(waypointdeleted()));
     connect(radius,SIGNAL(aboutToBeDeleted(WayPointItem*)),this,SLOT(waypointdeleted()));
     refreshLocations();
@@ -45,6 +46,7 @@ WayPointCircle::WayPointCircle(WayPointItem *center, WayPointItem *radius,bool c
 WayPointCircle::WayPointCircle(HomeItem *radius, WayPointItem *center, bool clockwise, MapGraphicItem *map, QColor color):my_center(center),
     my_radius(radius),my_map(map),QGraphicsEllipseItem(map),myColor(color),myClockWise(clockwise)
 {
+    qDebug()<<"circle clock:"<<clockwise;
     connect(radius,SIGNAL(homePositionChanged(internals::PointLatLng)),this,SLOT(refreshLocations()));
     connect(center,SIGNAL(localPositionChanged(QPointF)),this,SLOT(refreshLocations()));
     connect(center,SIGNAL(aboutToBeDeleted(WayPointItem*)),this,SLOT(waypointdeleted()));

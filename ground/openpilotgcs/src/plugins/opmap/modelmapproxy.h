@@ -8,12 +8,13 @@
 #include "QPointer"
 #include "flightdatamodel.h"
 #include <QItemSelectionModel>
-
+#include <widgetdelegates.h>
 
 
 using namespace mapcontrol;
 class modelMapProxy:public QObject
 {
+    typedef enum {OVERLAY_LINE,OVERLAY_CIRCLE_RIGHT,OVERLAY_CIRCLE_LEFT} overlayType;
     Q_OBJECT
 public:
     explicit modelMapProxy(QObject *parent,OPMapWidget * map,flightDataModel * model,QItemSelectionModel * selectionModel);
@@ -32,6 +33,8 @@ private slots:
     void on_currentRowChanged(QModelIndex,QModelIndex);
     void on_selectedWPChanged(QList<WayPointItem*>);
 private:
+    overlayType overlayTranslate(int type);
+    void createOverlay(WayPointItem * from,WayPointItem * to,overlayType type,QColor color);
     OPMapWidget * myMap;
     flightDataModel * model;
     void refreshOverlays();

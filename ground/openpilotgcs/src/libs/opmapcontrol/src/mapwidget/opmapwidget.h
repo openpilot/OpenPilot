@@ -361,9 +361,9 @@ namespace mapcontrol
         bool ShowHome()const{return showhome;}
         void SetShowDiagnostics(bool const& value);
         void SetUavPic(QString UAVPic);
-        WayPointLine * WPLineCreate(WayPointItem *from,WayPointItem *to);
+        WayPointLine * WPLineCreate(WayPointItem *from,WayPointItem *to, QColor color);
         WayPointLine * WPLineCreate(HomeItem *from,WayPointItem *to);
-        WayPointCircle *WPCircleCreate(WayPointItem *center, WayPointItem *radius,bool clockwise);
+        WayPointCircle *WPCircleCreate(WayPointItem *center, WayPointItem *radius,bool clockwise,QColor color);
         WayPointCircle *WPCircleCreate(HomeItem *center, WayPointItem *radius,bool clockwise);
         void deleteAllOverlays();
         void WPSetVisibleAll(bool value);

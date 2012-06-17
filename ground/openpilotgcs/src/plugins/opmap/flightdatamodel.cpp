@@ -22,7 +22,7 @@ QVariant flightDataModel::data(const QModelIndex &index, int role) const
          {
             int rowNumber=index.row();
             int columnNumber=index.column();
-            if(rowNumber>dataStorage.length()-1)
+            if(rowNumber>dataStorage.length()-1 || rowNumber<0)
                 return QVariant();
             pathPlanData * myRow=dataStorage.at(rowNumber);
             QVariant ret=getColumnByIndex(myRow,columnNumber);

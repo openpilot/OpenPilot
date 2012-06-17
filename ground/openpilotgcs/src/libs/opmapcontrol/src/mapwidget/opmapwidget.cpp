@@ -104,11 +104,11 @@ namespace mapcontrol
             GPS->SetUavPic(UAVPic);
     }
 
-    WayPointLine * OPMapWidget::WPLineCreate(WayPointItem *from, WayPointItem *to)
+    WayPointLine * OPMapWidget::WPLineCreate(WayPointItem *from, WayPointItem *to,QColor color)
     {
         if(!from|!to)
             return NULL;
-        return new WayPointLine(from,to,map);
+        return new WayPointLine(from,to,map,color);
     }
     WayPointLine * OPMapWidget::WPLineCreate(HomeItem *from, WayPointItem *to)
     {
@@ -116,11 +116,11 @@ namespace mapcontrol
             return NULL;
         return new WayPointLine(from,to,map);
     }
-    WayPointCircle * OPMapWidget::WPCircleCreate(WayPointItem *center, WayPointItem *radius, bool clockwise)
+    WayPointCircle * OPMapWidget::WPCircleCreate(WayPointItem *center, WayPointItem *radius, bool clockwise,QColor color)
     {
         if(!center|!radius)
             return NULL;
-        return new WayPointCircle(center,radius,clockwise,map);
+        return new WayPointCircle(center,radius,clockwise,map,color);
     }
 
     WayPointCircle *OPMapWidget::WPCircleCreate(HomeItem *center, WayPointItem *radius, bool clockwise)
@@ -290,11 +290,22 @@ namespace mapcontrol
     }
     WayPointItem* OPMapWidget::WPInsert(internals::PointLatLng const& coord,int const& altitude, QString const& description,const int &position)
     {
-        WayPointItem* item=new WayPointItem(coord,altitude,description,map);
+        internals::PointLatLng mcoord;
+        bool reloc=false;
+        if(mcoord==internals::PointLatLng(0,0))
+        {
+            mcoord=CurrentPosition();
+            reloc=true;
+        }
+        else
+            mcoord=coord;
+        WayPointItem* item=new WayPointItem(mcoord,altitude,description,map);
         item->SetNumber(position);
         ConnectWP(item);
         item->setParentItem(map);
         emit WPInserted(position,item);
+        if(reloc)
+            emit WPValuesChanged(item);
         return item;
     }
     void OPMapWidget::WPDelete(WayPointItem *item)

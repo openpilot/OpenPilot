@@ -136,15 +136,17 @@ void MixerCurveWidget::initCurve(QList<double> points)
 
 void MixerCurveWidget::initNodes(int numPoints)
 {
-    // First of all, reset the list
-    // TODO: one edge might not get deleted properly, small mem leak maybe...
-
+    // First of all, clear any existing list
     if (nodeList.count()) {
         foreach (Node *node, nodeList ) {
             QList<Edge*> edges = node->edges();
             foreach(Edge *edge, edges) {
-                if (scene()->items().contains(edge))
-                        scene()->removeItem(edge);
+                if (edge->destNode() == node) {
+                    delete edge;
+                }
+                else {
+                    scene()->removeItem(edge);
+                }
             }
             scene()->removeItem(node);
         }
@@ -152,19 +154,20 @@ void MixerCurveWidget::initNodes(int numPoints)
         nodeList.clear();
     }
 
-    // Create the nodes
-
+    // Create the nodes and edges
+    Node* prevNode = 0;
     for (int i=0; i<numPoints; i++) {
 
         Node *node = getNode(i);
 
         nodeList.append(node);
         scene()->addItem(node);
-    }
 
-    // ... and link them together:
-    for (int i=0; i<(numPoints-1); i++) {
-        scene()->addItem(getEdge(i, nodeList.at(i),nodeList.at(i+1)));
+        if (prevNode) {
+            scene()->addItem(getEdge(i, prevNode, node));
+        }
+
+        prevNode = node;
     }
 }
 
@@ -187,9 +190,13 @@ QList<double> MixerCurveWidget::getCurve() {
   */
 void MixerCurveWidget::initLinearCurve(quint32 numPoints, double maxValue, double minValue)
 {
+    Q_UNUSED(maxValue);
+    Q_UNUSED(minValue);
+
     QList<double> points;
     for (double i=0; i<numPoints;i++) {
-        points.append(maxValue * (i/(numPoints-1)) );
+        double val = ((curveMax - curveMin) * (i/(numPoints-1))) + curveMin;
+        points.append(val);
     }
     initCurve(points);
 }

@@ -1,5 +1,6 @@
 <xml>
     <object name="Gyros" singleinstance="true" settings="false">
+        <category>Sensors</category>
         <description>The gyro data.</description>
 	<field name="x" units="deg/s" type="float" elements="1"/>
 	<field name="y" units="deg/s" type="float" elements="1"/>

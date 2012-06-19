@@ -198,6 +198,12 @@ QString UAVObjectParser::parseXML(QString& xml, QString& filename)
 
                 descriptionFound = true;
             }
+            else if ( childNode.nodeName().compare(QString("category")) == 0 ) {
+                QString status = processObjectCategory(childNode, &info->category);
+
+                if (!status.isNull())
+                    return status;
+            }
             else if (!childNode.isComment()) {
                 return QString("Unknown object element");
             }
@@ -538,5 +544,14 @@ QString UAVObjectParser::processObjectAttributes(QDomNode& node, ObjectInfo* inf
 QString UAVObjectParser::processObjectDescription(QDomNode& childNode, QString * description)
 {
     description->append(childNode.firstChild().nodeValue());
+    return QString();
+}
+
+/**
+ * Process the category field from the XML file
+ */
+QString UAVObjectParser::processObjectCategory(QDomNode& childNode, QString * category)
+{
+    category->append(childNode.firstChild().nodeValue());
     return QString();
 }

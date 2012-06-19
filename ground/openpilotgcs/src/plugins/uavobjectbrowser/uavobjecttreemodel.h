@@ -68,6 +68,7 @@ public:
         m_recentlyUpdatedTimeout = timeout;
         TreeItem::setHighlightTime(timeout);
     }
+    void setOnlyHilightChangedValues(bool hilight) {m_onlyHilightChangedValues = hilight; }
 
 signals:
 
@@ -97,6 +98,7 @@ private:
     int m_recentlyUpdatedTimeout;
     QColor m_recentlyUpdatedColor;
     QColor m_manuallyChangedColor;
+    bool m_onlyHilightChangedValues;
 
     // Highlight manager to handle highlighting of tree items.
     HighLightManager *m_highlightManager;

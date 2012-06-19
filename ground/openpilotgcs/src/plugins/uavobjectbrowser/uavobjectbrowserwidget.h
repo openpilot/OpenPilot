@@ -48,6 +48,8 @@ public:
     void setRecentlyUpdatedColor(QColor color) { m_model->setRecentlyUpdatedColor(color); }
     void setManuallyChangedColor(QColor color) { m_model->setManuallyChangedColor(color); }
     void setRecentlyUpdatedTimeout(int timeout) { m_model->setRecentlyUpdatedTimeout(timeout); }
+    void setOnlyHilightChangedValues(bool hilight) { m_model->setOnlyHilightChangedValues(hilight); }
+
 
 public slots:
     void showMetaData(bool show);

@@ -31,7 +31,7 @@
 /**
  * Constructor
  */
-UAVMetaObject::UAVMetaObject(quint32 objID, const QString& name, UAVObject* parent):
+UAVMetaObject::UAVMetaObject(quint32 objID, const QString& name, UAVObject *parent):
         UAVObject(objID, true, name)
 {
     this->parent = parent;

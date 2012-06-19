@@ -175,12 +175,11 @@ void MixerCurveWidget::initNodes(int numPoints)
   Returns the current curve settings
   */
 QList<double> MixerCurveWidget::getCurve() {
+
     QList<double> list;
 
-    qreal h = plot->boundingRect().height();
     foreach(Node *node, nodeList) {
-        double val = ((curveMax-curveMin)*(h-node->pos().y())/h)+curveMin;
-        list.append(val);
+        list.append(node->getValue());
     }
 
     return list;
@@ -270,6 +269,14 @@ void MixerCurveWidget::setMin(double value)
 void MixerCurveWidget::setMax(double value)
 {
     curveMax = value;
+}
+double MixerCurveWidget::getMin()
+{
+    return curveMin;
+}
+double MixerCurveWidget::getMax()
+{
+    return curveMax;
 }
 void MixerCurveWidget::setRange(double min, double max)
 {

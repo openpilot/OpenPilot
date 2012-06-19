@@ -43,6 +43,7 @@ Node::Node(MixerCurveWidget *graphWidget)
     setCacheMode(DeviceCoordinateCache);
     setZValue(-1);
     vertical = false;
+    value = 0;
 }
 
 void Node::addEdge(Edge *edge)
@@ -98,6 +99,15 @@ void Node::verticalMove(bool flag){
     vertical = flag;
 }
 
+double Node::getValue() {
+    return value;
+}
+
+void Node::setValue(double val) {
+    value = val;
+}
+
+
 QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
 {
 
@@ -117,11 +127,19 @@ QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
                 newPos.setY(h);
               return newPos;
     }
-    case ItemPositionHasChanged:
+    case ItemPositionHasChanged: {
         foreach (Edge *edge, edgeList)
             edge->adjust();
-        graph->itemMoved((h-newPos.y())/h);
+
+        double min = graph->getMin();
+        double range = graph->getMax() - min;
+        double ratio = (h - newPos.y()) / h;
+        double val = (range * ratio ) + min;
+        setValue(val);
+
+        graph->itemMoved(val);
         break;
+    }
     default:
         break;
     };

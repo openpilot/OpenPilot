@@ -49,7 +49,9 @@ public:
    void initLinearCurve(quint32 numPoints, double maxValue = 1, double minValue = 0);
    void setCurve(QList<double>);
    void setMin(double value);
+   double getMin();
    void setMax(double value);
+   double getMax();
    void setRange(double min, double max);
 
    static const int NODE_NUMELEM = 5;

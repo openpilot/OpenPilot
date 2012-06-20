@@ -47,7 +47,7 @@ WayPointCircle::WayPointCircle(HomeItem *radius, WayPointItem *center, bool cloc
     my_radius(radius),my_map(map),QGraphicsEllipseItem(map),myColor(color),myClockWise(clockwise)
 {
     qDebug()<<"circle clock:"<<clockwise;
-    connect(radius,SIGNAL(homePositionChanged(internals::PointLatLng)),this,SLOT(refreshLocations()));
+    connect(radius,SIGNAL(homePositionChanged(internals::PointLatLng,float)),this,SLOT(refreshLocations()));
     connect(center,SIGNAL(localPositionChanged(QPointF)),this,SLOT(refreshLocations()));
     connect(center,SIGNAL(aboutToBeDeleted(WayPointItem*)),this,SLOT(waypointdeleted()));
     refreshLocations();

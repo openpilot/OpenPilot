@@ -253,9 +253,9 @@ namespace mapcontrol
         emit WPCreated(position,item);
         return item;
     }
-    WayPointItem* OPMapWidget::WPCreate(const distBearing &relativeCoord, const int &altitude, const QString &description)
+    WayPointItem* OPMapWidget::WPCreate(const distBearingAltitude &relativeCoord, const QString &description)
     {
-        WayPointItem* item=new WayPointItem(relativeCoord,altitude,description,map);
+        WayPointItem* item=new WayPointItem(relativeCoord,description,map);
         ConnectWP(item);
         item->setParentItem(map);
         int position=item->Number();
@@ -306,6 +306,15 @@ namespace mapcontrol
         emit WPInserted(position,item);
         if(reloc)
             emit WPValuesChanged(item);
+        return item;
+    }
+    WayPointItem* OPMapWidget::WPInsert(distBearingAltitude const& relative, QString const& description,const int &position)
+    {
+        WayPointItem* item=new WayPointItem(relative,description,map);
+        item->SetNumber(position);
+        ConnectWP(item);
+        item->setParentItem(map);
+        emit WPInserted(position,item);
         return item;
     }
     void OPMapWidget::WPDelete(WayPointItem *item)

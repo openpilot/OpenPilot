@@ -289,7 +289,7 @@ namespace mapcontrol
         * @param description the description of the WayPoint
         * @return WayPointItem a pointer to the WayPoint created
         */
-        WayPointItem *WPCreate(const distBearing &relativeCoord, const int &altitude, const QString &description);
+        WayPointItem *WPCreate(const distBearingAltitude &relativeCoord, const QString &description);
         /**
         * @brief Inserts a new WayPoint on the specified position
         *
@@ -323,6 +323,7 @@ namespace mapcontrol
         * @return WayPointItem a pointer to the WayPoint Inserted
         */
         WayPointItem* WPInsert(internals::PointLatLng const& coord,int const& altitude, QString const& description,int const& position);
+        WayPointItem *WPInsert(const distBearingAltitude &relative, const QString &description, const int &position);
 
         /**
         * @brief Deletes the WayPoint
@@ -372,7 +373,7 @@ namespace mapcontrol
         void WPDelete(int number);
         WayPointItem *WPFind(int number);
         void setSelectedWP(QList<WayPointItem *> list);
-    private:
+      private:
         internals::Core *core;
         MapGraphicItem *map;
         QGraphicsScene mscene;

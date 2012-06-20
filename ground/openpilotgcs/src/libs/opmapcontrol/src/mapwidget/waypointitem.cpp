@@ -52,8 +52,11 @@ WayPointItem::WayPointItem(const internals::PointLatLng &coord,int const& altitu
         }
 
         if(myHome)
+        {
             map->Projection()->offSetFromLatLngs(myHome->Coord(),coord,relativeCoord.distance,relativeCoord.bearing);
-        connect(myHome,SIGNAL(homePositionChanged(internals::PointLatLng)),this,SLOT(onHomePositionChanged(internals::PointLatLng)));
+            relativeCoord.altitudeRelative=Altitude()-myHome->Altitude();
+            connect(myHome,SIGNAL(homePositionChanged(internals::PointLatLng,float)),this,SLOT(onHomePositionChanged(internals::PointLatLng,float)));
+        }
         connect(this,SIGNAL(waypointdoubleclick(WayPointItem*)),map,SIGNAL(wpdoubleclicked(WayPointItem*)));
         emit manualCoordChange(this);
 }
@@ -62,6 +65,7 @@ WayPointItem::WayPointItem(MapGraphicItem *map, bool magicwaypoint):reached(fals
 {
     relativeCoord.bearing=0;
     relativeCoord.distance=0;
+    relativeCoord.altitudeRelative=0;
     myType=relative;
     if(magicwaypoint)
     {
@@ -93,7 +97,8 @@ WayPointItem::WayPointItem(MapGraphicItem *map, bool magicwaypoint):reached(fals
     if(myHome)
     {
         coord=map->Projection()->translate(myHome->Coord(),relativeCoord.distance,relativeCoord.bearing);
-        connect(myHome,SIGNAL(homePositionChanged(internals::PointLatLng)),this,SLOT(onHomePositionChanged(internals::PointLatLng)));
+        SetAltitude(myHome->Altitude()+relativeCoord.altitudeRelative);
+        connect(myHome,SIGNAL(homePositionChanged(internals::PointLatLng,float)),this,SLOT(onHomePositionChanged(internals::PointLatLng,float)));
     }
     connect(this,SIGNAL(waypointdoubleclick(WayPointItem*)),map,SIGNAL(wpdoubleclicked(WayPointItem*)));
     emit manualCoordChange(this);
@@ -122,14 +127,14 @@ WayPointItem::WayPointItem(MapGraphicItem *map, bool magicwaypoint):reached(fals
         if(myHome)
         {
             map->Projection()->offSetFromLatLngs(myHome->Coord(),coord,relativeCoord.distance,relativeCoord.bearing);
-            connect(myHome,SIGNAL(homePositionChanged(internals::PointLatLng)),this,SLOT(onHomePositionChanged(internals::PointLatLng)));
+            relativeCoord.altitudeRelative=Altitude()-myHome->Altitude();
+            connect(myHome,SIGNAL(homePositionChanged(internals::PointLatLng,float)),this,SLOT(onHomePositionChanged(internals::PointLatLng,float)));
         }
         connect(this,SIGNAL(waypointdoubleclick(WayPointItem*)),map,SIGNAL(wpdoubleclicked(WayPointItem*)));
-        qDebug()<<"Waypoint CTOR distance"<<relativeCoord.distance;
         emit manualCoordChange(this);
     }
 
-    WayPointItem::WayPointItem(const distBearing &relativeCoordenate, const int &altitude, const QString &description, MapGraphicItem *map):relativeCoord(relativeCoordenate),reached(false),description(description),shownumber(true),isDragging(false),altitude(altitude),map(map)
+    WayPointItem::WayPointItem(const distBearingAltitude &relativeCoordenate, const QString &description, MapGraphicItem *map):relativeCoord(relativeCoordenate),reached(false),description(description),shownumber(true),isDragging(false),map(map)
     {
         myHome=NULL;
         QList<QGraphicsItem *> list=map->childItems();
@@ -141,8 +146,9 @@ WayPointItem::WayPointItem(MapGraphicItem *map, bool magicwaypoint):reached(fals
         }
         if(myHome)
         {
-            connect(myHome,SIGNAL(homePositionChanged(internals::PointLatLng)),this,SLOT(onHomePositionChanged(internals::PointLatLng)));
+            connect(myHome,SIGNAL(homePositionChanged(internals::PointLatLng,float)),this,SLOT(onHomePositionChanged(internals::PointLatLng,float)));
             coord=map->Projection()->translate(myHome->Coord(),relativeCoord.distance,relativeCoord.bearing);
+            SetAltitude(myHome->Altitude()+relativeCoord.altitudeRelative);
         }
         myType=relative;
         text=0;
@@ -250,16 +256,15 @@ WayPointItem::WayPointItem(MapGraphicItem *map, bool magicwaypoint):reached(fals
         }
             QGraphicsItem::mouseMoveEvent(event);
     }
-    void WayPointItem::SetAltitude(const int &value)
+    void WayPointItem::SetAltitude(const float &value)
     {
         altitude=value;
         RefreshToolTip();
-
         emit WPValuesChanged(this);
         this->update();
     }
 
-    void WayPointItem::setRelativeCoord(distBearing value)
+    void WayPointItem::setRelativeCoord(distBearingAltitude value)
     {
         relativeCoord=value;
         if(myHome)
@@ -279,7 +284,7 @@ WayPointItem::WayPointItem(MapGraphicItem *map, bool magicwaypoint):reached(fals
         if(coord!=value)
             abs_coord=true;
         coord=value;
-        distBearing back=relativeCoord;
+        distBearingAltitude back=relativeCoord;
         qDebug()<<"SET COORD"<<value.Lat()<<value.Lng();
         if(myHome)
             map->Projection()->offSetFromLatLngs(myHome->Coord(),coord,relativeCoord.distance,relativeCoord.bearing);
@@ -361,11 +366,12 @@ WayPointItem::WayPointItem(MapGraphicItem *map, bool magicwaypoint):reached(fals
         }
     }
 
-    void WayPointItem::onHomePositionChanged(internals::PointLatLng homepos)
+    void WayPointItem::onHomePositionChanged(internals::PointLatLng homepos, float homeAltitude)
     {
         if(myType==relative)
         {
             coord=map->Projection()->translate(homepos,relativeCoord.distance,relativeCoord.bearing);
+            SetAltitude(relativeCoord.altitudeRelative+homeAltitude);
             emit WPValuesChanged(this);
             RefreshPos();
             RefreshToolTip();
@@ -374,7 +380,10 @@ WayPointItem::WayPointItem(MapGraphicItem *map, bool magicwaypoint):reached(fals
         else
         {
             if(myHome)
+            {
                 map->Projection()->offSetFromLatLngs(myHome->Coord(),coord,relativeCoord.distance,relativeCoord.bearing);
+                relativeCoord.altitudeRelative=Altitude()-homeAltitude;
+            }
             emit WPValuesChanged(this);
         }
     }

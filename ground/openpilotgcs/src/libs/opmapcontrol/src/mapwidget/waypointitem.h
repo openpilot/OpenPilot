@@ -37,10 +37,11 @@
 
 namespace mapcontrol
 {
-struct distBearing
+struct distBearingAltitude
 {
     double distance;
     double bearing;
+    float altitudeRelative;
     double bearingToDegrees(){return bearing*180/M_PI;}
     void setBearingFromDegrees(double degrees){bearing=degrees*M_PI/180;}
 };
@@ -77,7 +78,7 @@ public:
     * @return
     */
     WayPointItem(internals::PointLatLng const& coord,int const& altitude,QString const& description,MapGraphicItem* map,wptype type=absolute);
-    WayPointItem(distBearing const& relativeCoord,int const& altitude,QString const& description,MapGraphicItem* map);
+    WayPointItem(distBearingAltitude const& relativeCoord,QString const& description,MapGraphicItem* map);
 
     /**
     * @brief Returns the WayPoint description
@@ -141,15 +142,15 @@ public:
     *
     * @return int
     */
-    int Altitude(){return altitude;}
+    float Altitude(){return altitude;}
     /**
     * @brief Sets the WayPoint Altitude
     *
     * @param value
     */
-    void SetAltitude(int const& value);
-    void setRelativeCoord(distBearing value);
-    distBearing getRelativeCoord(){return relativeCoord;}
+    void SetAltitude(const float &value);
+    void setRelativeCoord(distBearingAltitude value);
+    distBearingAltitude getRelativeCoord(){return relativeCoord;}
     int type() const;
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
@@ -172,12 +173,12 @@ protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
 private:
     internals::PointLatLng coord;//coordinates of this WayPoint
-    distBearing relativeCoord;
+    distBearingAltitude relativeCoord;
     bool reached;
     QString description;
     bool shownumber;
     bool isDragging;
-    int altitude;
+    float altitude;
     MapGraphicItem* map;
     int number;
 
@@ -214,7 +215,7 @@ public slots:
     */
     void WPInserted(int const& number,WayPointItem* waypoint);
 
-    void onHomePositionChanged(internals::PointLatLng);
+    void onHomePositionChanged(internals::PointLatLng,float altitude);
 signals:
     /**
     * @brief fires when this WayPoint number changes (not fired if due to a auto-renumbering)

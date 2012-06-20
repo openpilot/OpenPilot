@@ -132,7 +132,9 @@ class VehicleConfig: public ConfigTaskWidget
         void    setMixerType(UAVDataObject* mixer, int channel, MixerTypeElem mixerType);
         void    setThrottleCurve(UAVDataObject* mixer, MixerThrottleCurveElem curveType, QList<double> curve);
         void    getThrottleCurve(UAVDataObject* mixer, MixerThrottleCurveElem curveType, QList<double>* curve);
-
+        bool    isValidThrottleCurve(QList<double>* curve);
+        double  getCurveMin(QList<double>* curve);
+        double  getCurveMax(QList<double>* curve);
         virtual void ResetActuators(GUIConfigDataUnion* configData);
         virtual QStringList getChannelDescriptions();
 

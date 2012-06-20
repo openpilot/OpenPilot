@@ -287,6 +287,36 @@ void VehicleConfig::getThrottleCurve(UAVDataObject* mixer, MixerThrottleCurveEle
     }
 }
 
+bool VehicleConfig::isValidThrottleCurve(QList<double>* curve)
+{
+    Q_ASSERT(curve);
+
+    if (curve) {
+        for (int i=0; i < curve->count(); i++) {
+            if (curve->at(i) != 0)
+                return true;
+        }
+    }
+    return false;
+}
+
+double VehicleConfig::getCurveMin(QList<double>* curve)
+{
+    double min = 0;
+    for (int i=0; i<curve->count(); i++)
+        min = std::min(min, curve->at(i));
+
+    return min;
+}
+
+double VehicleConfig::getCurveMax(QList<double>* curve)
+{
+    double max = 0;
+    for (int i=0; i<curve->count(); i++)
+        max = std::max(max, curve->at(i));
+
+    return max;
+}
 /**
   Reset the contents of a field
   */

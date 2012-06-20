@@ -77,11 +77,11 @@ MixerCurveWidget::MixerCurveWidget(QWidget *parent) : QGraphicsView(parent)
 
 MixerCurveWidget::~MixerCurveWidget()
 {
-    for (int i=0; i<nodePool.count(); i++)
-        delete nodePool.at(i);
+    while (!nodePool.isEmpty())
+        delete nodePool.takeFirst();
 
-    for (int i=0; i<edgePool.count(); i++)
-        delete edgePool.at(i);
+    while (!edgePool.isEmpty())
+        delete edgePool.takeFirst();
 }
 
 Node* MixerCurveWidget::getNode(int index)

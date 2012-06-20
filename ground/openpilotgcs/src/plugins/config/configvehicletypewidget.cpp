@@ -614,84 +614,55 @@ void ConfigVehicleTypeWidget::refreshWidgetsValues(UAVObject * o)
 {
     Q_UNUSED(o);
 
-    if(!allObjectsUpdated())
-        return;
+    //if(!allObjectsUpdated())
+      //  return;
 	
 	//WHAT DOES THIS DO?
     bool dirty=isDirty(); //WHY IS THIS CALLED HERE AND THEN AGAIN SEVERAL LINES LATER IN setupAirframeUI()
 	
     // Get the Airframe type from the system settings:
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("SystemSettings")));
-    Q_ASSERT(obj);
-    UAVObjectField *field = obj->getField(QString("AirframeType"));
+    UAVDataObject* system = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("SystemSettings")));
+    Q_ASSERT(system);
+
+    UAVObjectField *field = system->getField(QString("AirframeType"));
     Q_ASSERT(field);
     // At this stage, we will need to have some hardcoded settings in this code, this
     // is not ideal, but here you go.
     QString frameType = field->getValue().toString();
     setupAirframeUI(frameType);
 
-    obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-    Q_ASSERT(obj);
-    field = obj->getField(QString("ThrottleCurve1"));
-    Q_ASSERT(field);
-    QList<double> curveValues;
-    // If the 1st element of the curve is <= -10, then the curve
-    // is a straight line (that's how the mixer works on the mainboard):
-    if (field->getValue(0).toInt() <= -10) {
-        m_aircraft->multiThrottleCurve->initLinearCurve(field->getNumElements(),(double)1);
-        m_aircraft->fixedWingThrottle->initLinearCurve(field->getNumElements(),(double)1);
-        m_aircraft->groundVehicleThrottle1->initLinearCurve(field->getNumElements(),(double)1);
+    UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
+    Q_ASSERT(mixer);
+
+    QPointer<VehicleConfig> vconfig = new VehicleConfig();
+
+    QList<double> curveValues;    
+    vconfig->getThrottleCurve(mixer, VehicleConfig::MIXER_THROTTLECURVE1, &curveValues);
+
+    // is at least one of the curve values != 0?
+    if (vconfig->isValidThrottleCurve(&curveValues)) {
+        // yes, use the curve we just read from mixersettings
+        m_aircraft->multiThrottleCurve->initCurve(curveValues);
+        m_aircraft->fixedWingThrottle->initCurve(curveValues);
+        m_aircraft->groundVehicleThrottle1->initCurve(curveValues);
     }
     else {
-        double temp=0;
-        double value;
-        for (unsigned int i=0; i < field->getNumElements(); i++) {
-            value=field->getValue(i).toDouble();
-            temp+=value;
-            curveValues.append(value);
-        }
-        if(temp==0)
-        {
-            m_aircraft->multiThrottleCurve->initLinearCurve(field->getNumElements(),0.9);
-            m_aircraft->fixedWingThrottle->initLinearCurve(field->getNumElements(),(double)1);
-            m_aircraft->groundVehicleThrottle1->initLinearCurve(field->getNumElements(),(double)1);
-        }
-        else
-        {
-            m_aircraft->multiThrottleCurve->initCurve(curveValues);
-            m_aircraft->fixedWingThrottle->initCurve(curveValues);
-            m_aircraft->groundVehicleThrottle1->initCurve(curveValues);
-        }
+        // no, init a straight curve
+        m_aircraft->multiThrottleCurve->initLinearCurve(curveValues.count(),0.9);
+        m_aircraft->fixedWingThrottle->initLinearCurve(curveValues.count(),(double)1);
+        m_aircraft->groundVehicleThrottle1->initLinearCurve(curveValues.count(),(double)1);
     }
 	
     // Setup all Throttle2 curves for all types of airframes //AT THIS MOMENT, THAT MEANS ONLY GROUND VEHICLES
-	Q_ASSERT(obj);
-    field = obj->getField(QString("ThrottleCurve2"));
-    Q_ASSERT(field);
-    curveValues.clear();
-    // If the 1st element of the curve is <= -10, then the curve
-    // is a straight line (that's how the mixer works on the mainboard):
-    if (field->getValue(0).toInt() <= -10) {
-        m_aircraft->groundVehicleThrottle2->initLinearCurve(field->getNumElements(),(double)1);
+    vconfig->getThrottleCurve(mixer, VehicleConfig::MIXER_THROTTLECURVE2, &curveValues);
+
+    if (vconfig->isValidThrottleCurve(&curveValues)) {
+        m_aircraft->groundVehicleThrottle2->initCurve(curveValues);
     }
     else {
-        double temp=0;
-        double value;
-        for (unsigned int i=0; i < field->getNumElements(); i++) {
-            value=field->getValue(i).toDouble();
-            temp+=value;
-            curveValues.append(value);
-        }
-        if(temp==0)
-        {
-            m_aircraft->groundVehicleThrottle2->initLinearCurve(field->getNumElements(),(double)1);
-        }
-        else
-        {
-            m_aircraft->groundVehicleThrottle2->initCurve(curveValues);
-        }
+        m_aircraft->groundVehicleThrottle2->initLinearCurve(curveValues.count(),(double)1);
     }
-    
+
     // Load the Settings for fixed wing frames:
     if (frameType.startsWith("FixedWing")) {
 		
@@ -716,8 +687,7 @@ void ConfigVehicleTypeWidget::refreshWidgetsValues(UAVObject * o)
 		
 	} else if (frameType == "Custom") {
         setComboCurrentIndex(m_aircraft->aircraftType, m_aircraft->aircraftType->findText("Custom"));
-	}
-	
+	}	
 	
     updateCustomAirframeUI();
     setDirty(dirty);
@@ -786,38 +756,34 @@ void ConfigVehicleTypeWidget::updateCustomAirframeUI()
     UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(mixer);
 
-    VehicleConfig* vconfig = new VehicleConfig();
+    QPointer<VehicleConfig> vconfig = new VehicleConfig();
 
     QList<double> curveValues;
+    vconfig->getThrottleCurve(mixer, VehicleConfig::MIXER_THROTTLECURVE1, &curveValues);
 
-    // setup throttlecurve 1
-    vconfig->getThrottleCurve(mixer,VehicleConfig::MIXER_THROTTLECURVE1,&curveValues);
-
-    int total = 0;
-    for (int i=0; i<curveValues.length(); i++)
-        total += curveValues.at(i);
-
-    if (curveValues.at(0) <= -10 || total == 0) {
-        m_aircraft->customThrottle1Curve->initLinearCurve(curveValues.length(),(double)1);
-    }
-    else {
+    // is at least one of the curve values != 0?
+    if (vconfig->isValidThrottleCurve(&curveValues)) {
+        // yes, use the curve we just read from mixersettings
+        m_aircraft->customThrottle1Curve->setMin(vconfig->getCurveMin(&curveValues));
+        m_aircraft->customThrottle1Curve->setMax(vconfig->getCurveMax(&curveValues));
         m_aircraft->customThrottle1Curve->initCurve(curveValues);
     }
-
-    // setup throttlecurve 2
-    vconfig->getThrottleCurve(mixer,VehicleConfig::MIXER_THROTTLECURVE2,&curveValues);
-
-    total = 0;
-    for (int i=0; i<curveValues.length(); i++)
-        total += curveValues.at(i);
-
-    if (curveValues.at(0) <= -10 || total == 0) {
-        m_aircraft->customThrottle2Curve->initLinearCurve(curveValues.length(),(double)1);
-    }
     else {
+        // no, init a straight curve
+        m_aircraft->customThrottle1Curve->initLinearCurve(curveValues.count(),(double)1);
+    }
+
+    // Setup all Throttle2 curves for all types of airframes //AT THIS MOMENT, THAT MEANS ONLY GROUND VEHICLES
+    vconfig->getThrottleCurve(mixer, VehicleConfig::MIXER_THROTTLECURVE2, &curveValues);
+
+    if (vconfig->isValidThrottleCurve(&curveValues)) {
+        m_aircraft->customThrottle2Curve->setMin(vconfig->getCurveMin(&curveValues));
+        m_aircraft->customThrottle2Curve->setMax(vconfig->getCurveMax(&curveValues));
         m_aircraft->customThrottle2Curve->initCurve(curveValues);
     }
-
+    else {
+        m_aircraft->customThrottle2Curve->initLinearCurve(curveValues.count(),(double)1);
+    }
 
     // Update the mixer table:
     for (int channel=0; channel<8; channel++) {

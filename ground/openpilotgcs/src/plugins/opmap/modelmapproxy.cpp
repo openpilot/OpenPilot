@@ -59,6 +59,8 @@ void modelMapProxy::on_WPValuesChanged(WayPointItem * wp)
     model->setData(index,wp->getRelativeCoord().distance,Qt::EditRole);
     index=model->index(wp->Number(),flightDataModel::BEARELATIVE);
     model->setData(index,wp->getRelativeCoord().bearingToDegrees(),Qt::EditRole);
+    index=model->index(wp->Number(),flightDataModel::ALTITUDERELATIVE);
+    model->setData(index,wp->getRelativeCoord().altitudeRelative,Qt::EditRole);
 }
 
 void modelMapProxy::on_currentRowChanged(QModelIndex current, QModelIndex previous)
@@ -125,20 +127,8 @@ void modelMapProxy::createOverlay(WayPointItem *from, WayPointItem *to, modelMap
     }
 }
 
-/*
-typedef enum { MODE_FLYENDPOINT=0, MODE_FLYVECTOR=1, MODE_FLYCIRCLERIGHT=2, MODE_FLYCIRCLELEFT=3,
-               MODE_DRIVEENDPOINT=4, MODE_DRIVEVECTOR=5, MODE_DRIVECIRCLELEFT=6, MODE_DRIVECIRCLERIGHT=7,
-               MODE_FIXEDATTITUDE=8, MODE_SETACCESSORY=9, MODE_DISARMALARM=10 } ModeOptions;
-typedef enum { ENDCONDITION_NONE=0, ENDCONDITION_TIMEOUT=1, ENDCONDITION_DISTANCETOTARGET=2,
-               ENDCONDITION_LEGREMAINING=3, ENDCONDITION_ABOVEALTITUDE=4, ENDCONDITION_POINTINGTOWARDSNEXT=5,
-               ENDCONDITION_PYTHONSCRIPT=6, ENDCONDITION_IMMEDIATE=7 } EndConditionOptions;
-typedef enum { COMMAND_ONCONDITIONNEXTWAYPOINT=0, COMMAND_ONNOTCONDITIONNEXTWAYPOINT=1,
-               COMMAND_ONCONDITIONJUMPWAYPOINT=2, COMMAND_ONNOTCONDITIONJUMPWAYPOINT=3,
-               COMMAND_IFCONDITIONJUMPWAYPOINTELSENEXTWAYPOINT=4 } CommandOptions;
-*/
 void modelMapProxy::refreshOverlays()
 {
-    qDebug()<<"REFRESH OVERLAYS START";
     myMap->deleteAllOverlays();
     WayPointItem * wp_current=NULL;
     WayPointItem * wp_next=NULL;
@@ -149,7 +139,6 @@ void modelMapProxy::refreshOverlays()
     overlayType wp_error_overlay;
     for(int x=0;x<model->rowCount();++x)
     {
-        qDebug()<<"REFRESH OVERLAYS WP:"<<x;
         wp_current=findWayPointNumber(x);
         wp_jump=model->data(model->index(x,flightDataModel::JUMPDESTINATION)).toInt();
         wp_error=model->data(model->index(x,flightDataModel::ERRORDESTINATION)).toInt();
@@ -162,36 +151,28 @@ void modelMapProxy::refreshOverlays()
         case ComboBoxDelegate::COMMAND_ONCONDITIONNEXTWAYPOINT:
             wp_next=findWayPointNumber(x+1);
             createOverlay(wp_current,wp_next,wp_next_overlay,Qt::green);
-            qDebug()<<"REFRESH OVERLAYS"<<"AKI0";
             break;
         case ComboBoxDelegate::COMMAND_ONCONDITIONJUMPWAYPOINT:
             wp_next=findWayPointNumber(wp_jump);
             createOverlay(wp_current,wp_next,wp_jump_overlay,Qt::green);
-            qDebug()<<"REFRESH OVERLAYS"<<"AKI1";
             break;
         case ComboBoxDelegate::COMMAND_ONNOTCONDITIONJUMPWAYPOINT:
             wp_next=findWayPointNumber(wp_jump);
             createOverlay(wp_current,wp_next,wp_jump_overlay,Qt::yellow);
-            qDebug()<<"REFRESH OVERLAYS"<<"AKI2";
             break;
         case ComboBoxDelegate::COMMAND_ONNOTCONDITIONNEXTWAYPOINT:
             wp_next=findWayPointNumber(x+1);
             createOverlay(wp_current,wp_next,wp_next_overlay,Qt::yellow);
-            qDebug()<<"REFRESH OVERLAYS"<<"AKI3";
             break;
         case ComboBoxDelegate::COMMAND_IFCONDITIONJUMPWAYPOINTELSENEXTWAYPOINT:
             wp_next=findWayPointNumber(wp_jump);
             createOverlay(wp_current,wp_next,wp_jump_overlay,Qt::green);
             wp_next=findWayPointNumber(x+1);
             createOverlay(wp_current,wp_next,wp_next_overlay,Qt::green);
-            qDebug()<<"REFRESH OVERLAYS"<<"AKI4";
             break;
         }
     }
 }
-
-
-
 
 WayPointItem * modelMapProxy::findWayPointNumber(int number)
 {
@@ -199,13 +180,6 @@ WayPointItem * modelMapProxy::findWayPointNumber(int number)
         return NULL;
     return myMap->WPFind(number);
 }
-/*
-WPDESCRITPTION,LATPOSITION,LNGPOSITION,DISRELATIVE,BEARELATIVE,ISRELATIVE,ALTITUDE,
-    VELOCITY,MODE,MODE_PARAMS0,MODE_PARAMS1,MODE_PARAMS2,MODE_PARAMS3,
-    CONDITION,CONDITION_PARAMS0,CONDITION_PARAMS1,CONDITION_PARAMS2,CONDITION_PARAMS3,
-    COMMAND,JUMPDESTINATION,ERRORDESTINATION
-*/
-
 
 void modelMapProxy::on_rowsRemoved(const QModelIndex &parent, int first, int last)
 {
@@ -225,7 +199,7 @@ void modelMapProxy::on_dataChanged(const QModelIndex &topLeft, const QModelIndex
         return;
     internals::PointLatLng latlng;
     int x=topLeft.row();
-    distBearing distBearing;
+    distBearingAltitude distBearing;
     double altitude;
     bool relative;
     QModelIndex index;
@@ -266,7 +240,11 @@ void modelMapProxy::on_dataChanged(const QModelIndex &topLeft, const QModelIndex
         index=model->index(x,flightDataModel::DISRELATIVE);
         distBearing.distance=index.data(Qt::DisplayRole).toDouble();
         break;
-
+    case flightDataModel::ALTITUDERELATIVE:
+        distBearing=item->getRelativeCoord();
+        index=model->index(x,flightDataModel::ALTITUDERELATIVE);
+        distBearing.altitudeRelative=index.data(Qt::DisplayRole).toFloat();
+        break;
     case flightDataModel::ISRELATIVE:
         index=model->index(x,flightDataModel::ISRELATIVE);
         relative=index.data(Qt::DisplayRole).toBool();
@@ -293,7 +271,7 @@ void modelMapProxy::on_rowsInserted(const QModelIndex &parent, int first, int la
         QModelIndex index;
         WayPointItem * item;
         internals::PointLatLng latlng;
-        distBearing distBearing;
+        distBearingAltitude distBearing;
         double altitude;
         bool relative;
         index=model->index(x,flightDataModel::WPDESCRITPTION);
@@ -306,14 +284,16 @@ void modelMapProxy::on_rowsInserted(const QModelIndex &parent, int first, int la
         distBearing.distance=index.data(Qt::DisplayRole).toDouble();
         index=model->index(x,flightDataModel::BEARELATIVE);
         distBearing.setBearingFromDegrees(index.data(Qt::DisplayRole).toDouble());
+        index=model->index(x,flightDataModel::ALTITUDERELATIVE);
+        distBearing.altitudeRelative=index.data(Qt::DisplayRole).toFloat();
         index=model->index(x,flightDataModel::ISRELATIVE);
         relative=index.data(Qt::DisplayRole).toBool();
         index=model->index(x,flightDataModel::ALTITUDE);
         altitude=index.data(Qt::DisplayRole).toDouble();
-        item=myMap->WPInsert(latlng,altitude,desc,x);
-        item->setRelativeCoord(distBearing);
         if(relative)
-            item->setWPType(mapcontrol::WayPointItem::relative);
+            item=myMap->WPInsert(distBearing,desc,x);
+        else
+            item=myMap->WPInsert(latlng,altitude,desc,x);
     }
     refreshOverlays();
 }

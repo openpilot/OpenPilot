@@ -11,25 +11,39 @@ int flightDataModel::rowCount(const QModelIndex &/*parent*/) const
     return dataStorage.length();
 }
 
-int flightDataModel::columnCount(const QModelIndex &/*parent*/) const
+int flightDataModel::columnCount(const QModelIndex &parent) const
 {
-    return 22;
+    if (parent.isValid())
+        return 0;
+    return 23;
 }
 
 QVariant flightDataModel::data(const QModelIndex &index, int role) const
 {
     if (role == Qt::DisplayRole||role==Qt::EditRole)
-         {
-            int rowNumber=index.row();
-            int columnNumber=index.column();
-            if(rowNumber>dataStorage.length()-1 || rowNumber<0)
-                return QVariant();
-            pathPlanData * myRow=dataStorage.at(rowNumber);
-            QVariant ret=getColumnByIndex(myRow,columnNumber);
-            return ret;
-         }
-         return QVariant();
+    {
+        int rowNumber=index.row();
+        int columnNumber=index.column();
+        if(rowNumber>dataStorage.length()-1 || rowNumber<0)
+            return QVariant::Invalid;
+        pathPlanData * myRow=dataStorage.at(rowNumber);
+        QVariant ret=getColumnByIndex(myRow,columnNumber);
+        return ret;
+    }
+    /*
+    else if (role == Qt::BackgroundRole) {
+      //  WaypointActive::DataFields waypointActive = waypointActiveObj->getData();
+
+        if(index.row() == waypointActive.Index) {
+            return QBrush(Qt::lightGray);
+        } else
+            return QVariant::Invalid;
+    }*/
+    else {
+        return QVariant::Invalid;
+    }
 }
+
 bool flightDataModel::setColumnByIndex(pathPlanData  *row,const int index,const QVariant value)
 {
     switch(index)
@@ -52,6 +66,10 @@ bool flightDataModel::setColumnByIndex(pathPlanData  *row,const int index,const 
         break;
     case BEARELATIVE:
         row->beaRelative=value.toDouble();
+        return true;
+        break;
+    case ALTITUDERELATIVE:
+        row->altitudeRelative=value.toFloat();
         return true;
         break;
     case ISRELATIVE:
@@ -144,6 +162,9 @@ QVariant flightDataModel::getColumnByIndex(const pathPlanData *row,const int ind
     case BEARELATIVE:
         return row->beaRelative;
         break;
+    case ALTITUDERELATIVE:
+        return row->altitudeRelative;
+        break;
     case ISRELATIVE:
         return row->isRelative;
         break;
@@ -222,6 +243,9 @@ QVariant flightDataModel::headerData(int section, Qt::Orientation orientation, i
              case BEARELATIVE:
                  return QString("Bearing from home");
                  break;
+             case ALTITUDERELATIVE:
+                 return QString("Altitude above home");
+                 break;
              case ISRELATIVE:
                  return QString("Relative to home");
                  break;
@@ -279,13 +303,13 @@ QVariant flightDataModel::headerData(int section, Qt::Orientation orientation, i
              }
          }
      }
-     return QVariant();
+     else
+       return QAbstractTableModel::headerData(section, orientation, role);
 }
 bool flightDataModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     if (role == Qt::EditRole)
     {
-        //save value from editor to member m_gridData
         int columnIndex=index.column();
         int rowIndex=index.row();
         if(rowIndex>dataStorage.length()-1)
@@ -293,7 +317,6 @@ bool flightDataModel::setData(const QModelIndex &index, const QVariant &value, i
         pathPlanData * myRow=dataStorage.at(rowIndex);
         setColumnByIndex(myRow,columnIndex,value);
         emit dataChanged(index,index);
-        //for presentation purposes only: build and emit a joined string
     }
     return true;
 }
@@ -314,6 +337,7 @@ bool flightDataModel::insertRows(int row, int count, const QModelIndex &/*parent
         data->lngPosition=0;
         data->disRelative=0;
         data->beaRelative=0;
+        data->altitudeRelative=0;
         data->isRelative=0;
         data->altitude=0;
         data->velocity=0;
@@ -390,6 +414,11 @@ bool flightDataModel::writeToFile(QString fileName)
         field=doc.createElement("field");
         field.setAttribute("value",obj->beaRelative);
         field.setAttribute("name","bearing_from_home");
+        waypoint.appendChild(field);
+
+        field=doc.createElement("field");
+        field.setAttribute("value",obj->altitudeRelative);
+        field.setAttribute("name","altitude_above_home");
         waypoint.appendChild(field);
 
         field=doc.createElement("field");
@@ -534,6 +563,8 @@ void flightDataModel::readFromFile(QString fileName)
                         data->disRelative=field.attribute("value").toDouble();
                     else if(field.attribute("name")=="bearing_from_home")
                         data->beaRelative=field.attribute("value").toDouble();
+                    else if(field.attribute("name")=="altitude_above_home")
+                        data->altitudeRelative=field.attribute("value").toFloat();
                     else if(field.attribute("name")=="is_relative_to_home")
                         data->isRelative=field.attribute("value").toInt();
                     else if(field.attribute("name")=="altitude")

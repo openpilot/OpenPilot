@@ -14,7 +14,11 @@ public:
 public slots:
     void modelToObjects();
     void objectsToModel();
-
+private:
+    UAVObjectManager *objManager;
+    Waypoint * waypointObj;
+    PathAction * pathactionObj;
+    flightDataModel * myModel;
 };
 
 #endif // MODELUAVOPROXY_H

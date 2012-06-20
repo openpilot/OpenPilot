@@ -22,7 +22,8 @@ HEADERS += opmapplugin.h \
     modelmapproxy.h \
     widgetdelegates.h \
     pathplanner.h \
-    modeluavoproxy.h
+    modeluavoproxy.h \
+    homeeditor.h
 
 SOURCES += opmapplugin.cpp \
     opmapgadgetwidget.cpp \
@@ -37,7 +38,8 @@ SOURCES += opmapplugin.cpp \
     modelmapproxy.cpp \
     widgetdelegates.cpp \
     pathplanner.cpp \
-    modeluavoproxy.cpp
+    modeluavoproxy.cpp \
+    homeeditor.cpp
 
 OTHER_FILES += OPMapGadget.pluginspec
 
@@ -47,6 +49,7 @@ FORMS += opmapgadgetoptionspage.ui \
     opmap_zoom_slider_widget.ui \
     opmap_statusbar_widget.ui \
     opmap_overlay_widget.ui \
-    pathplanner.ui
+    pathplanner.ui \
+    homeeditor.ui
 
 RESOURCES += opmap.qrc

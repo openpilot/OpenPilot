@@ -98,7 +98,7 @@ public:
     * @param
     */
     void setHome(QPointF pos);
-    void setHome(internals::PointLatLng pos_lat_lon);
+    void setHome(internals::PointLatLng pos_lat_lon, double altitude);
     void goHome();
     void setZoom(int zoom);
     void setPosition(QPointF pos);

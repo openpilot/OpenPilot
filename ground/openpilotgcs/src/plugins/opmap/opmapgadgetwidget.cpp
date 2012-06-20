@@ -840,7 +840,7 @@ void OPMapGadgetWidget::onTelemetryConnect()
 	if (obum->getHomeLocation(set, LLA) < 0)
 		return;	// error
 
-	setHome(internals::PointLatLng(LLA[0], LLA[1]));
+    setHome(internals::PointLatLng(LLA[0], LLA[1]),LLA[2]);
 
     if (m_map)
 		m_map->SetCurrentPosition(m_home_position.coord);         // set the map position
@@ -856,12 +856,14 @@ void OPMapGadgetWidget::onTelemetryDisconnect()
 // Updates the Home position icon whenever the HomePosition object is updated
 void OPMapGadgetWidget::homePositionUpdated(UAVObject *hp)
 {
-    if (!hp)
-        return;
+    Q_UNUSED(hp);
+    if (!obum) return;
+    bool set;
+    double LLA[3];
+    if (obum->getHomeLocation(set, LLA) < 0)
+        return;	// error
+    setHome(internals::PointLatLng(LLA[0], LLA[1]),LLA[2]);
 
-    double lat = hp->getField("Latitude")->getDouble() * 1e-7;
-    double lon = hp->getField("Longitude")->getDouble() * 1e-7;
-    setHome(internals::PointLatLng(lat, lon));
 }
 
 // *************************************************************************************
@@ -888,13 +890,13 @@ void OPMapGadgetWidget::setHome(QPointF pos)
     else
     if (longitude < -180) longitude = -180;
 
-    setHome(internals::PointLatLng(latitude, longitude));
+    setHome(internals::PointLatLng(latitude, longitude),0);
 }
 
 /**
   Sets the home position on the map widget
   */
-void OPMapGadgetWidget::setHome(internals::PointLatLng pos_lat_lon)
+void OPMapGadgetWidget::setHome(internals::PointLatLng pos_lat_lon,double altitude)
 {
 	if (!m_widget || !m_map)
 		return;
@@ -916,12 +918,14 @@ void OPMapGadgetWidget::setHome(internals::PointLatLng pos_lat_lon)
     if (longitude >  180) longitude =  180;
     else
     if (longitude < -180) longitude = -180;
+    else if(altitude != altitude) altitude=0;
 
     // *********
 
 	m_home_position.coord = internals::PointLatLng(latitude, longitude);
 
 	m_map->Home->SetCoord(m_home_position.coord);
+    m_map->Home->SetAltitude(altitude);
     m_map->Home->RefreshPos();
 
     // move the magic waypoint to keep it within the safe area boundry
@@ -1602,7 +1606,7 @@ void OPMapGadgetWidget::onSetHomeAct_triggered()
 	if (!m_widget || !m_map)
 		return;
 
-	setHome(m_context_menu_lat_lon);
+    setHome(m_context_menu_lat_lon,0);
 
     setHomeLocationObject();  // update the HomeLocation UAVObject
 }

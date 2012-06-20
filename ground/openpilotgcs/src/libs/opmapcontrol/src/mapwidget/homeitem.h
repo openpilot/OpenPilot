@@ -53,10 +53,10 @@ namespace mapcontrol
         int SafeArea()const{return safearea;}
         void SetSafeArea(int const& value){safearea=value;}
         bool safe;
-        void SetCoord(internals::PointLatLng const& value){emit homePositionChanged(value);coord=value;}
+        void SetCoord(internals::PointLatLng const& value){coord=value;emit homePositionChanged(value,Altitude());}
         internals::PointLatLng Coord()const{return coord;}
-        void SetAltitude(int const& value){altitude=value;}
-        int Altitude()const{return altitude;}
+        void SetAltitude(float const& value){altitude=value;emit homePositionChanged(Coord(),Altitude());}
+        float Altitude()const{return altitude;}
     private:
         MapGraphicItem* map;
         OPMapWidget* mapwidget;
@@ -66,16 +66,18 @@ namespace mapcontrol
         bool showsafearea;
         int safearea;
         int localsafearea;
-        int altitude;
+        float altitude;
         bool isDragging;
     protected:
         void mouseMoveEvent ( QGraphicsSceneMouseEvent * event );
         void mousePressEvent ( QGraphicsSceneMouseEvent * event );
         void mouseReleaseEvent ( QGraphicsSceneMouseEvent * event );
+        void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
     public slots:
 
     signals:
-        void homePositionChanged(internals::PointLatLng coord);
+        void homePositionChanged(internals::PointLatLng coord,float);
+        void homedoubleclick(HomeItem* waypoint);
     };
 }
 #endif // HOMEITEM_H

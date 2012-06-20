@@ -94,9 +94,16 @@ namespace mapcontrol
             coord=map->FromLocalToLatLng(this->pos().x(),this->pos().y());
             isDragging=false;
 
-            emit homePositionChanged(coord);
+            emit homePositionChanged(coord,Altitude());
         }
         QGraphicsItem::mouseReleaseEvent(event);
+    }
+    void HomeItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+    {
+        if(event->button()==Qt::LeftButton)
+        {
+            emit homedoubleclick(this);
+        }
     }
     void HomeItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     {
@@ -104,7 +111,7 @@ namespace mapcontrol
         if(isDragging)
         {
             coord=map->FromLocalToLatLng(this->pos().x(),this->pos().y());
-            emit homePositionChanged(coord);
+            emit homePositionChanged(coord,Altitude());
         }
             QGraphicsItem::mouseMoveEvent(event);
     }

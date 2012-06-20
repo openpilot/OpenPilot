@@ -554,7 +554,7 @@ void ConfigCcpmWidget::updateThrottleCurveValue(QList<double> curveValues0,doubl
 
     for (i=0; i<internalCurveValues.length(); i++)
     {
-        CurrentValue=m_ccpm->CurveSettings->item(i, 1 )->text().toDouble();
+        CurrentValue=m_ccpm->CurveSettings->item(i, 0 )->text().toDouble();
         if (CurrentValue!=internalCurveValues[i])
         {
             m_ccpm->CurveSettings->item(i, 0)->setText(QString().sprintf("%.3f",internalCurveValues.at(i)));
@@ -1224,11 +1224,10 @@ void ConfigCcpmWidget::setMixer()
     }
 
     //get the user data for the curve into the mixer settings
-    for (i=0;i<5;i++)
+    for (i=0;i<5;i++) {
         mixerSettingsData.ThrottleCurve1[i] = m_ccpm->CurveSettings->item(i, 0)->text().toDouble();
-
-    for (i=0;i<5;i++)
         mixerSettingsData.ThrottleCurve2[i] = m_ccpm->CurveSettings->item(i, 1)->text().toDouble();
+    }
     
     //mapping of collective input to curve 2...
     //MixerSettings.Curve2Source = Throttle,Roll,Pitch,Yaw,Accessory0,Accessory1,Accessory2,Accessory3,Accessory4,Accessory5

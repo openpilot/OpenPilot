@@ -34,7 +34,7 @@
 /* Prototype of PIOS_Board_Init() function */
 extern void PIOS_Board_Init(void);
 extern void FLASH_Download();
-void error(int);
+void error(int,int);
 
 /* The ADDRESSES of the _binary_* symbols are the important
  * data.  This is non-intuitive for _binary_size where you
@@ -58,7 +58,7 @@ int main() {
 	/// Self overwrite check
 	uint32_t base_address = SCB->VTOR;
 	if ((0x08000000 + embedded_image_size) > base_address)
-		error(PIOS_LED_HEARTBEAT);
+		error(PIOS_LED_HEARTBEAT,1);
 	///
 
 	/*
@@ -80,7 +80,7 @@ int main() {
 	if ((pios_board_info_blob.magic != new_board_info_blob->magic) ||
 		(pios_board_info_blob.board_type != new_board_info_blob->board_type) ||
 		(pios_board_info_blob.board_rev != new_board_info_blob->board_rev)) {
-		error(PIOS_LED_HEARTBEAT);
+		error(PIOS_LED_HEARTBEAT,2);
 	}
 
 	/* Embedded bootloader looks like it's the right one for this HW, proceed... */
@@ -108,7 +108,7 @@ int main() {
 	}
 
 	if (fail == true)
-		error(PIOS_LED_HEARTBEAT);
+		error(PIOS_LED_HEARTBEAT,3);
 
 
 	///
@@ -124,7 +124,7 @@ int main() {
 			}
 		}
 		if (result == false)
-			error(PIOS_LED_HEARTBEAT);
+			error(PIOS_LED_HEARTBEAT,4);
 	}
 	///
 	for (uint8_t x = 0; x < 3; ++x) {
@@ -145,11 +145,24 @@ int main() {
 
 }
 
-void error(int led) {
-	for (;;) {
-		PIOS_LED_On(led);
-		PIOS_DELAY_WaitmS(500);
-		PIOS_LED_Off(led);
-		PIOS_DELAY_WaitmS(500);
+void error(int led,int code) {
+	for(;;)
+	{
+		PIOS_DELAY_WaitmS(1000);
+		for (int x=0;x<code;x++)
+		{
+			PIOS_LED_On(led);
+			PIOS_DELAY_WaitmS(200);
+			PIOS_LED_Off(led);
+			PIOS_DELAY_WaitmS(1000);
+		}
+		PIOS_DELAY_WaitmS(1000);
+		for (int x=0;x<10;x++)
+		{
+			PIOS_LED_On(led);
+			PIOS_DELAY_WaitmS(200);
+			PIOS_LED_Off(led);
+			PIOS_DELAY_WaitmS(200);
+		}
 	}
 }

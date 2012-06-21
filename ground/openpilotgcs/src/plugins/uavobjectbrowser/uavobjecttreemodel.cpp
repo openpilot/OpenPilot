@@ -47,6 +47,8 @@ UAVObjectTreeModel::UAVObjectTreeModel(QObject *parent) :
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
+    // Create highlight manager, let it run every 300 ms.
+    m_highlightManager = new HighLightManager(300);
     connect(objManager, SIGNAL(newObject(UAVObject*)), this, SLOT(newObject(UAVObject*)));
     connect(objManager, SIGNAL(newInstance(UAVObject*)), this, SLOT(newObject(UAVObject*)));
 
@@ -56,6 +58,7 @@ UAVObjectTreeModel::UAVObjectTreeModel(QObject *parent) :
 
 UAVObjectTreeModel::~UAVObjectTreeModel()
 {
+    delete m_highlightManager;
     delete m_rootItem;
 }
 
@@ -67,9 +70,12 @@ void UAVObjectTreeModel::setupModelData(UAVObjectManager *objManager)
     m_rootItem = new TreeItem(rootData);
 
     m_settingsTree = new TopTreeItem(tr("Settings"), m_rootItem);
+    m_settingsTree->setHighlightManager(m_highlightManager);
     m_rootItem->appendChild(m_settingsTree);
     m_nonSettingsTree = new TopTreeItem(tr("Data Objects"), m_rootItem);
+    m_nonSettingsTree->setHighlightManager(m_highlightManager);
     m_rootItem->appendChild(m_nonSettingsTree);
+    m_rootItem->setHighlightManager(m_highlightManager);
     connect(m_settingsTree, SIGNAL(updateHighlight(TreeItem*)), this, SLOT(updateHighlight(TreeItem*)));
     connect(m_nonSettingsTree, SIGNAL(updateHighlight(TreeItem*)), this, SLOT(updateHighlight(TreeItem*)));
 
@@ -96,6 +102,7 @@ void UAVObjectTreeModel::addDataObject(UAVDataObject *obj)
         addInstance(obj, root->child(index));
     } else {
         DataObjectTreeItem *data = new DataObjectTreeItem(obj->getName() + " (" + QString::number(obj->getNumBytes()) + " bytes)");
+        data->setHighlightManager(m_highlightManager);
         connect(data, SIGNAL(updateHighlight(TreeItem*)), this, SLOT(updateHighlight(TreeItem*)));
         int index = root->nameIndex(obj->getName());
         root->insert(index, data);
@@ -110,6 +117,7 @@ void UAVObjectTreeModel::addMetaObject(UAVMetaObject *obj, TreeItem *parent)
 {
     connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(highlightUpdatedObject(UAVObject*)));
     MetaObjectTreeItem *meta = new MetaObjectTreeItem(obj, tr("Meta Data"));
+    meta->setHighlightManager(m_highlightManager);
     connect(meta, SIGNAL(updateHighlight(TreeItem*)), this, SLOT(updateHighlight(TreeItem*)));
     foreach (UAVObjectField *field, obj->getFields()) {
         if (field->getNumElements() > 1) {
@@ -132,6 +140,7 @@ void UAVObjectTreeModel::addInstance(UAVObject *obj, TreeItem *parent)
     } else {
         QString name = tr("Instance") +  " " + QString::number(obj->getInstID());
         item = new InstanceTreeItem(obj, name);
+        item->setHighlightManager(m_highlightManager);
         connect(item, SIGNAL(updateHighlight(TreeItem*)), this, SLOT(updateHighlight(TreeItem*)));
         parent->appendChild(item);
     }
@@ -148,6 +157,7 @@ void UAVObjectTreeModel::addInstance(UAVObject *obj, TreeItem *parent)
 void UAVObjectTreeModel::addArrayField(UAVObjectField *field, TreeItem *parent)
 {
     TreeItem *item = new ArrayFieldTreeItem(field->getName());
+    item->setHighlightManager(m_highlightManager);
     connect(item, SIGNAL(updateHighlight(TreeItem*)), this, SLOT(updateHighlight(TreeItem*)));
     for (uint i = 0; i < field->getNumElements(); ++i) {
         addSingleField(i, field, item);
@@ -192,6 +202,7 @@ void UAVObjectTreeModel::addSingleField(int index, UAVObjectField *field, TreeIt
     default:
         Q_ASSERT(false);
     }
+    item->setHighlightManager(m_highlightManager);
     connect(item, SIGNAL(updateHighlight(TreeItem*)), this, SLOT(updateHighlight(TreeItem*)));
     parent->appendChild(item);
 }
@@ -352,7 +363,6 @@ void UAVObjectTreeModel::highlightUpdatedObject(UAVObject *obj)
     Q_ASSERT(obj);
     ObjectTreeItem *item = findObjectTreeItem(obj);
     Q_ASSERT(item);
-    item->setHighlight(true);
     item->update();
     QModelIndex itemIndex = index(item);
     Q_ASSERT(itemIndex != QModelIndex());

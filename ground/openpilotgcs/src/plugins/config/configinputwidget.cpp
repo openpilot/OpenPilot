@@ -46,7 +46,7 @@
 #define STICK_MIN_MOVE -8
 #define STICK_MAX_MOVE 8
 
-ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent),wizardStep(wizardNone),loop(NULL),skipflag(false),transmitterType(heli)
+ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent),wizardStep(wizardNone),transmitterType(heli),loop(NULL),skipflag(false)
 {
     manualCommandObj = ManualControlCommand::GetInstance(getObjectManager());
     manualSettingsObj = ManualControlSettings::GetInstance(getObjectManager());

@@ -1,5 +1,5 @@
 TEMPLATE = lib
-TARGET = HITLV2
+TARGET = HITLv2
 QT += network
 include(../../openpilotgcsplugin.pri)
 include(hitlv2_dependencies.pri)

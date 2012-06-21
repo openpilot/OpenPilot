@@ -71,15 +71,9 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
 
     connect(m_config->channelOutTest, SIGNAL(toggled(bool)), this, SLOT(runChannelTests(bool)));
 
-
-    firstUpdate = true;
-
     // Configure the task widget
     // Connect the help button
     connect(m_config->outputHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
-
-    // Add custom handling of displaying things
-    connect(this,SIGNAL(refreshWidgetsValuesRequested()), this, SLOT(refreshOutputWidgetsValues()));
 
     addApplySaveButtons(m_config->saveRCOutputToRAM,m_config->saveRCOutputToSD);
 
@@ -125,7 +119,6 @@ ConfigOutputWidget::~ConfigOutputWidget()
   */
 void ConfigOutputWidget::runChannelTests(bool state)
 {
-    qDebug()<<"configoutputwidget runChannelTests"<<state;
     SystemAlarms * systemAlarmsObj = SystemAlarms::GetInstance(getObjectManager());
     SystemAlarms::DataFields systemAlarms = systemAlarmsObj->getData();
 

@@ -43,7 +43,6 @@ Node::Node(MixerCurveWidget *graphWidget)
     setCacheMode(DeviceCoordinateCache);
     setZValue(-1);
     vertical = false;
-    value = 0;
 }
 
 void Node::addEdge(Edge *edge)
@@ -61,14 +60,14 @@ QList<Edge *> Node::edges() const
 QRectF Node::boundingRect() const
 {
     qreal adjust = 2;
-    return QRectF(-10 - adjust, -10 - adjust,
-                  23 + adjust, 23 + adjust);
+    return QRectF(-12 - adjust, -12 - adjust,
+                  28 + adjust, 28 + adjust);
 }
 
 QPainterPath Node::shape() const
 {
     QPainterPath path;
-    path.addEllipse(-10, -10, 20, 20);
+    path.addEllipse(-12, -12, 25, 25);
     return path;
 }
 
@@ -92,59 +91,60 @@ void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
     }
     painter->setBrush(gradient);
     painter->setPen(QPen(Qt::black, 0));
-    painter->drawEllipse(-10, -10, 20, 20);
+    painter->drawEllipse(-12, -12, 25, 25);
+
+    painter->setPen(QPen(Qt::white, 0));
+    painter->drawText(-10, 3, QString().sprintf("%.2f", value()));
 }
 
 void Node::verticalMove(bool flag){
     vertical = flag;
 }
 
-double Node::getValue() {
-    return value;
-}
-
-void Node::setValue(double val) {
-    value = val;
-}
-
-
-QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
-{
-
-    QPointF newPos = value.toPointF();
+double Node::value() {
     double h = graph->sceneRect().height();
+    double min = graph->getMin();
+    double range = graph->getMax() - min;
+    double ratio = (h - pos().y()) / h;
+    return (range * ratio ) + min;
+}
+
+
+QVariant Node::itemChange(GraphicsItemChange change, const QVariant &val)
+{
+    QPointF newPos = val.toPointF();
+    double h = graph->sceneRect().height();
+
     switch (change) {
     case ItemPositionChange: {
-            if (!vertical)
-                    break;
-            // Force node to move vertically
-            newPos.setX(pos().x());
-            // Stay inside graph
-            if (newPos.y() < 0)
-                newPos.setY(0);
-            //qDebug() << h << " - " << newPos.y();
-            if (newPos.y() > h)
-                newPos.setY(h);
-              return newPos;
+
+        if (!vertical)
+                break;
+
+        // Force node to move vertically
+        newPos.setX(pos().x());
+        // Stay inside graph
+        if (newPos.y() < 0)
+            newPos.setY(0);
+        //qDebug() << h << " - " << newPos.y();
+        if (newPos.y() > h)
+            newPos.setY(h);
+          return newPos;
     }
     case ItemPositionHasChanged: {
         foreach (Edge *edge, edgeList)
             edge->adjust();
 
-        double min = graph->getMin();
-        double range = graph->getMax() - min;
-        double ratio = (h - newPos.y()) / h;
-        double val = (range * ratio ) + min;
-        setValue(val);
+        update();
 
-        graph->itemMoved(val);
+        graph->itemMoved(value());
         break;
     }
     default:
         break;
     };
 
-    return QGraphicsItem::itemChange(change, value);
+    return QGraphicsItem::itemChange(change, val);
 }
 
 void Node::mousePressEvent(QGraphicsSceneMouseEvent *event)

@@ -163,6 +163,8 @@ void MixerCurveWidget::initNodes(int numPoints)
         nodeList.append(node);
         scene()->addItem(node);
 
+        node->setPos(0,0);
+
         if (prevNode) {
             scene()->addItem(getEdge(i, prevNode, node));
         }
@@ -179,7 +181,7 @@ QList<double> MixerCurveWidget::getCurve() {
     QList<double> list;
 
     foreach(Node *node, nodeList) {
-        list.append(node->getValue());
+        list.append(node->value());
     }
 
     return list;
@@ -212,8 +214,10 @@ void MixerCurveWidget::setCurve(QList<double> points)
     double min = curveMin + 10;
     double max = curveMax + 10;
 
-    qreal w = plot->boundingRect().width()/(points.count()-1);
-    qreal h = plot->boundingRect().height();
+    QRectF plotRect = plot->boundingRect();
+
+    qreal w = plotRect.width()/(points.count()-1);
+    qreal h = plotRect.height();
     for (int i=0; i<points.count(); i++) {
 
         double val = points.at(i);
@@ -226,11 +230,14 @@ void MixerCurveWidget::setCurve(QList<double> points)
         val -= min;
         val /= (max - min);
 
-        nodeList.at(i)->setPos(w*i, h - (val*h));
-        nodeList.at(i)->verticalMove(true);
-    }
+        Node* node = nodeList.at(i);
+        node->setPos(w*i, h - (val*h));
+        node->verticalMove(true);
 
+    }
     curveUpdating = false;
+
+    update();
 
     emit curveUpdated(points, (double)0);
 }
@@ -252,13 +259,10 @@ void MixerCurveWidget::resizeEvent(QResizeEvent* event)
     fitInView(plot, Qt::KeepAspectRatio);
 }
 
-
-
 void MixerCurveWidget::itemMoved(double itemValue)
 {
     if (!curveUpdating) {
-        QList<double> list = getCurve();
-        emit curveUpdated(list, itemValue);
+        emit curveUpdated(getCurve(), itemValue);
     }
 }
 

@@ -238,7 +238,6 @@ void Telemetry::transactionCompleted(UAVObject* obj, bool success)
     if ( itr != transMap.end() )
     {
 	ObjectTransactionInfo *transInfo = itr.value();
-	//qDebug() << QString("Telemetry: transaction completed for %1").arg(obj->getName());
         // Remove this transaction as it's complete.
 	transInfo->timer->stop();
 	transMap.remove(objId);
@@ -258,8 +257,6 @@ void Telemetry::transactionCompleted(UAVObject* obj, bool success)
  */
 void Telemetry::transactionTimeout(ObjectTransactionInfo *transInfo)
 {
-    //qDebug() << "Telemetry: transaction timeout.";
-
     transInfo->timer->stop();
     // Check if more retries are pending
     if (transInfo->retriesRemaining > 0)
@@ -291,7 +288,6 @@ void Telemetry::transactionTimeout(ObjectTransactionInfo *transInfo)
 void Telemetry::processObjectTransaction(ObjectTransactionInfo *transInfo)
 {
 
-    //qDebug() << tr("Process Object transaction for %1").arg(transInfo->obj->getName());
     // Initiate transaction
     if (transInfo->objRequest)
     {
@@ -309,7 +305,6 @@ void Telemetry::processObjectTransaction(ObjectTransactionInfo *transInfo)
     else
     {
         // Otherwise, remove this transaction as it's complete.
-	transInfo->timer->stop();
 	transMap.remove(transInfo->obj->getObjID());
 	delete transInfo;
     }
@@ -320,8 +315,6 @@ void Telemetry::processObjectTransaction(ObjectTransactionInfo *transInfo)
  */
 void Telemetry::processObjectUpdates(UAVObject* obj, EventMask event, bool allInstances, bool priority)
 {
-    //qDebug() << "Push event into queue for obj " << QString("%1 event %2").arg(obj->getName()).arg(event);
-
     // Push event into queue
     ObjectQueueInfo objInfo;
     objInfo.obj = obj;
@@ -362,8 +355,6 @@ void Telemetry::processObjectUpdates(UAVObject* obj, EventMask event, bool allIn
  */
 void Telemetry::processObjectQueue()
 {
-    //qDebug() << "Process object queue " << tr("- Depth (%1 %2)").arg(objQueue.length()).arg(objPriorityQueue.length());
-
     // Get object information from queue (first the priority and then the regular queue)
     ObjectQueueInfo objInfo;
     if ( !objPriorityQueue.isEmpty() )
@@ -415,9 +406,6 @@ void Telemetry::processObjectQueue()
 	// Insert the transaction into the transaction map.
 	transMap.insert(objInfo.obj->getObjID(), transInfo);
         processObjectTransaction(transInfo);
-    } else
-    {
-	qDebug() << QString("Process object queue: this is an unpack event for %1").arg(objInfo.obj->getName());
     }
 
     // If this is a metaobject then make necessary telemetry updates

@@ -633,6 +633,9 @@ UAVObject* UAVTalk::updateObject(quint32 objId, quint16 instId, quint8* data)
  */
 void UAVTalk::updateNack(UAVObject* obj)
 {
+    Q_ASSERT(obj);
+    if ( ! obj )
+        return;
     quint32 objId = obj->getObjID();
     QMap<quint32, Transaction*>::iterator itr = transMap.find(objId);
     if ( itr != transMap.end() && (itr.value()->obj->getInstID() == obj->getInstID() || itr.value()->allInstances))

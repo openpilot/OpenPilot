@@ -27,6 +27,7 @@
 #ifndef UAVTALK_H
 #define UAVTALK_H
 
+#include <QtCore>
 #include <QIODevice>
 #include <QMutex>
 #include <QMutexLocker>
@@ -100,7 +101,7 @@ private:
     typedef enum {STATE_SYNC, STATE_TYPE, STATE_SIZE, STATE_OBJID, STATE_INSTID, STATE_DATA, STATE_CS} RxStateType;
 
     // Variables
-    QIODevice* io;
+    QPointer<QIODevice> io;
     UAVObjectManager* objMngr;
     QMutex* mutex;
     QMap<quint32, Transaction*> transMap;

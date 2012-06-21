@@ -29,6 +29,7 @@
 
 #include "ui_airframe.h"
 #include "../uavobjectwidgetutils/configtaskwidget.h"
+#include "cfg_vehicletypes/vehicleconfig.h"
 
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"

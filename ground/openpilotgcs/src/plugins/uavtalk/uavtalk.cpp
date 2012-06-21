@@ -110,10 +110,12 @@ void UAVTalk::processInputStream()
 {
     quint8 tmp;
 
-    while (io->bytesAvailable() > 0)
-    {
-        io->read((char*)&tmp, 1);
-        processInputByte(tmp);
+    if (io && io->isReadable()) {
+        while (io->bytesAvailable() > 0)
+        {
+            io->read((char*)&tmp, 1);
+            processInputByte(tmp);
+        }
     }
 }
 
@@ -731,9 +733,8 @@ bool UAVTalk::transmitNack(quint32 objId)
 
     qToLittleEndian<quint16>(dataOffset, &txBuffer[2]);
 
-
     // Send buffer, check that the transmit backlog does not grow above limit
-    if ( io->bytesToWrite() < TX_BUFFER_SIZE )
+    if (io && io->isWritable() && io->bytesToWrite() < TX_BUFFER_SIZE )
     {
         io->write((const char*)txBuffer, dataOffset+CHECKSUM_LENGTH);
     }
@@ -823,7 +824,7 @@ bool UAVTalk::transmitSingleObject(UAVObject* obj, quint8 type, bool allInstance
     txBuffer[dataOffset+length] = updateCRC(0, txBuffer, dataOffset + length);
 
     // Send buffer, check that the transmit backlog does not grow above limit
-    if ( io->bytesToWrite() < TX_BUFFER_SIZE )
+    if (io && io->isWritable() && io->bytesToWrite() < TX_BUFFER_SIZE )
     {
         io->write((const char*)txBuffer, dataOffset+length+CHECKSUM_LENGTH);
     }

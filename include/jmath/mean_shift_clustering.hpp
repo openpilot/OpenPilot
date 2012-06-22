@@ -57,7 +57,7 @@ namespace jafar {
 												 const vector_type& mean, 
 												 vector_type& center)
 			{
-				JFR_DEBUG("nb of points "<<points.size())
+				JFR_DEBUG("nb of points "<<points.size());
 					center = ublas::zero_vector<NUMTYPE>(D);
 				for(typename std::vector<vector_type>::const_iterator pt = points.begin();
 						pt != points.end();
@@ -106,8 +106,8 @@ namespace jafar {
 				using namespace jafar::jmath;
 				using namespace std;
  
-				JFR_ASSERT(data.size1() > 1, "need at least two points")
-					JFR_ASSERT(data.size2() == D, "points must be of dimension D")
+				JFR_ASSERT(data.size1() > 1, "need at least two points");
+					JFR_ASSERT(data.size2() == D, "points must be of dimension D");
 					jann::KD_tree_index< flann::L2<NUMTYPE> > points_tree(data, 4);
 				points_tree.build();
 				vector_type current_center;
@@ -121,7 +121,7 @@ namespace jafar {
 						ublas::vector<NUMTYPE> this_distances;
 						int nb_neighbours = points_tree.radius_search(current_center, this_indices, this_distances, window_radius, jann::search_params(128, 0, true));
 						//found some neighbours
-						JFR_DEBUG("neighbours found: " << nb_neighbours)
+						JFR_DEBUG("neighbours found: " << nb_neighbours);
 							if(nb_neighbours > 0) {
 								this_indices.resize(nb_neighbours, true);
 								std::vector<vector_type> this_neighbours;
@@ -151,7 +151,7 @@ namespace jafar {
 					}while((iter < max_iterations) && (ublas::norm_2(this_difference) > convergence_threshold));
 					//if the clusters are empty add the found center as a cluster center
 					if(clusters.size() == 0) {
-						JFR_DEBUG("added first cluster")
+						JFR_DEBUG("added first cluster");
 							clusters[0] = cluster(current_center);
 						//				clusters[0] = cluster(current_center, &this_indices[0], this_indices.size());
 						continue;
@@ -233,7 +233,7 @@ namespace jafar {
 			template <typename T>
 			T distance_2(const ublas::vector<T>& v1, const ublas::vector<T>& v2) {
 				JFR_ASSERT(v1.size() == v2.size(), 
-									 "mean_shift_clustering::distance_2: v1 and v2 sizes differ")
+									 "mean_shift_clustering::distance_2: v1 and v2 sizes differ");
 					ublas::vector<T> dif = v1 -v2;
 				return sum_2(dif);
 			}

@@ -89,7 +89,7 @@ namespace jann {
 		inline void convert(const flann::Matrix<T>& flann_mat, ublas::matrix<T>& ublas_mat){
 			JFR_ASSERT(((flann_mat.rows == ublas_mat.size1()) && 
 									(flann_mat.cols == ublas_mat.size2())),
-								 "ublas matrix and flann matrix need to have the same sizes")
+								 "ublas matrix and flann matrix need to have the same sizes");
 			for(size_t r = 0; r < flann_mat.rows; r++)
 				for(size_t c = 0; c < flann_mat.cols; c++)
 					ublas_mat(r,c) = flann_mat[r][c];
@@ -99,7 +99,7 @@ namespace jann {
 		inline void convert(const ublas::matrix<T>& ublas_mat, flann::Matrix<T>& flann_mat){
 			JFR_ASSERT(((flann_mat.rows == ublas_mat.size1()) && 
 									(flann_mat.cols == ublas_mat.size2())),
-								 "ublas matrix and flann matrix need to have the same sizes")
+								 "ublas matrix and flann matrix need to have the same sizes");
 			for(size_t r = 0; r < flann_mat.rows; r++)
 				for(size_t c = 0; c < flann_mat.cols; c++)
 					flann_mat[r][c] = ublas_mat(r,c);
@@ -110,7 +110,7 @@ namespace jann {
 		template<typename T>
 		inline void convert(const flann::Matrix<T>& flann_mat, ublas::vector<T>& ublas_vec){
 			JFR_ASSERT(((flann_mat.rows == 1) && (flann_mat.cols >= ublas_vec.size())),
-								 "ublas vector and flann matrix rows need to have the same sizes")
+								 "ublas vector and flann matrix rows need to have the same sizes");
 			if(flann_mat.cols > ublas_vec.size())
 				ublas_vec.resize(flann_mat.cols);
 			for(size_t counter = 0; counter < ublas_vec.size(); counter++)
@@ -120,7 +120,7 @@ namespace jann {
 		template<typename T>
 		inline void convert(const ublas::vector<T>& ublas_vec, flann::Matrix<T>& flann_mat){
 			JFR_ASSERT(((flann_mat.rows == 1) && (flann_mat.cols >= ublas_vec.size())),
-								 "ublas vector and flann matrix rows need to have the same sizes")
+								 "ublas vector and flann matrix rows need to have the same sizes");
 				for(size_t counter = 0; counter < ublas_vec.size(); counter++)
 					flann_mat[0][counter] = ublas_vec[counter];
 		}
@@ -128,7 +128,7 @@ namespace jann {
 		template<typename T>
 		inline void convert(const std::vector<T>& std_vec, flann::Matrix<T>& flann_mat){
 			JFR_ASSERT(((flann_mat.rows == 1) && (flann_mat.cols >= std_vec.size())),
-								 "std vector and flann matrix rows need to have the same sizes")
+								 "std vector and flann matrix rows need to have the same sizes");
 				for(size_t counter = 0; counter < std_vec.size(); counter++)
 					flann_mat[0][counter] = std_vec[counter];
 		}
@@ -446,7 +446,7 @@ namespace jann {
 		 */	
 		K_means_index(const ublas::matrix<typename DISTANCE::ElementType>& dataset,
 									int branching = 32, int iterations = 11, 
-									flann_centers_init_t init = CENTERS_RANDOM, 
+									flann::flann_centers_init_t init = flann::CENTERS_RANDOM, 
 									float cb_index = 0.2 ) :
 			index_factory<DISTANCE>(dataset, 
 															flann::KMeansIndexParams(branching, iterations, 
@@ -467,7 +467,7 @@ namespace jann {
 		 */
 		composite_index(const ublas::matrix<typename DISTANCE::ElementType>& dataset,
 										int trees = 4, int branching = 32, int iterations = 11,
-										flann_centers_init_t init = CENTERS_RANDOM, float cb_index = 0.2 ) :
+										flann::flann_centers_init_t init = flann::CENTERS_RANDOM, float cb_index = 0.2 ) :
 			index_factory<DISTANCE>(dataset, 
 															flann::CompositeIndexParams(trees, branching,
 																													iterations, init,

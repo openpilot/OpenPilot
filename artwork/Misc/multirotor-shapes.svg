@@ -3564,8 +3564,8 @@
      id="namedview4185"
      showgrid="false"
      inkscape:zoom="0.25"
-     inkscape:cx="2015.1441"
-     inkscape:cy="662.66747"
+     inkscape:cx="2447.9751"
+     inkscape:cy="482.05665"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
@@ -3573,7 +3573,8 @@
      fit-margin-top="0"
      fit-margin-left="0"
      fit-margin-right="0"
-     fit-margin-bottom="0" /><g
+     fit-margin-bottom="0"
+     inkscape:snap-grids="false" /><g
      id="g4191"
      inkscape:groupmode="layer"
      inkscape:label="diagrams"
@@ -4560,10 +4561,6 @@
                      style="fill:url(#radialGradient22756);fill-opacity:1;stroke:none"
                      id="path6523"
                      inkscape:connector-curvature="0" /></g></g></g></g></g></g><path
-         d="m 2994.6201,1498.5205 c -1.059,2.493 -3.25,4.004 -5.686,3.723 l 0.348,-3.343 c 1.07,0.112 2.127,-0.443 2.578,-1.506 0.467,-1.102 0.194,-2.336 -1.121,-2.894 -1.625,-0.688 -2.711,0.583 -3.277,1.916 -0.41,0.967 -0.758,2.485 -0.821,3.599 l -7.687,-3.651 3.561,-8.388 2.783,1.181 -2.34,5.509 2.115,1.035 c 0.076,-0.448 0.276,-1.025 0.447,-1.43 1.166,-2.745 3.571,-4.324 6.45,-3.103 3.324,1.412 3.791,4.666 2.65,7.352"
-         style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         id="path6527"
-         inkscape:connector-curvature="0" /><path
          d="m 3231.1162,1452.9903 c 9.404,9.41 9.405,24.666 -0.01,34.074 -9.406,9.408 -24.66,9.412 -34.072,0 -9.406,-9.406 -9.408,-24.664 0,-34.068 9.407,-9.412 24.664,-9.414 34.076,-0.01"
          style="fill:#48484a;fill-opacity:1;fill-rule:nonzero;stroke:none"
          id="path6531"
@@ -4767,7 +4764,7 @@
            style="opacity:0.5"><g
              transform="translate(3126.2354,1053.3057)"
              id="g6909"><path
-               d="m 0,0 c -0.035,-46.947 -38.111,-85.025 -85.06,-84.99 -46.979,-0.002 -85.057,38.076 -85.028,85.027 -0.027,46.943 38.047,85.022 85.026,85.016 C -38.085,85.057 -0.006,46.979 0,0"
+               d="m 0.4,0 c -0.035,-46.947 -38.111,-85.025 -85.06,-84.99 -46.979,-0.002 -85.057,38.076 -85.028,85.027 -0.027,46.943 38.047,85.022 85.026,85.016 C -37.685,85.057 0.394,46.979 0.4,0"
                style="fill:#b1c7eb;fill-opacity:1;fill-rule:nonzero;stroke:none"
                id="path6911"
                inkscape:connector-curvature="0" /></g></g></g><g

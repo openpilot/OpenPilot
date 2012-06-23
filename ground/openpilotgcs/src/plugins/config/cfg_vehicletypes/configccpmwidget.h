@@ -103,7 +103,6 @@ private:
         void GenerateCurve();
         void UpdateMixer();
         void UpdateType();
-        void resetMixer(MixerCurveWidget *mixer, int numElements);
         void UpdateCurveWidgets();
         void updatePitchCurveValue(QList<double>,double);
         void updateThrottleCurveValue(QList<double>,double);

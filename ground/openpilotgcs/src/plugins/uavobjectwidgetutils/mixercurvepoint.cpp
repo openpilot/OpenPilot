@@ -103,10 +103,8 @@ void Node::verticalMove(bool flag){
 
 double Node::value() {
     double h = graph->sceneRect().height();
-    double min = graph->getMin();
-    double range = graph->getMax() - min;
     double ratio = (h - pos().y()) / h;
-    return (range * ratio ) + min;
+    return ((graph->getMax() - graph->getMin()) * ratio ) + graph->getMin();
 }
 
 
@@ -123,12 +121,14 @@ QVariant Node::itemChange(GraphicsItemChange change, const QVariant &val)
 
         // Force node to move vertically
         newPos.setX(pos().x());
+
         // Stay inside graph
         if (newPos.y() < 0)
             newPos.setY(0);
         //qDebug() << h << " - " << newPos.y();
         if (newPos.y() > h)
             newPos.setY(h);
+
           return newPos;
     }
     case ItemPositionHasChanged: {

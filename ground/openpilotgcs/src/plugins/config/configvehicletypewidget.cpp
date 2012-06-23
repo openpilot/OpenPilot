@@ -648,9 +648,9 @@ void ConfigVehicleTypeWidget::refreshWidgetsValues(UAVObject * o)
     }
     else {
         // no, init a straight curve
-        m_aircraft->multiThrottleCurve->initLinearCurve(curveValues.count(),0.9);
-        m_aircraft->fixedWingThrottle->initLinearCurve(curveValues.count(),(double)1);
-        m_aircraft->groundVehicleThrottle1->initLinearCurve(curveValues.count(),(double)1);
+        m_aircraft->multiThrottleCurve->initLinearCurve(curveValues.count(), 0.9);
+        m_aircraft->fixedWingThrottle->initLinearCurve(curveValues.count(), 1.0);
+        m_aircraft->groundVehicleThrottle1->initLinearCurve(curveValues.count(), 1.0);
     }
 	
     // Setup all Throttle2 curves for all types of airframes //AT THIS MOMENT, THAT MEANS ONLY GROUND VEHICLES
@@ -660,7 +660,7 @@ void ConfigVehicleTypeWidget::refreshWidgetsValues(UAVObject * o)
         m_aircraft->groundVehicleThrottle2->initCurve(curveValues);
     }
     else {
-        m_aircraft->groundVehicleThrottle2->initLinearCurve(curveValues.count(),(double)1);
+        m_aircraft->groundVehicleThrottle2->initLinearCurve(curveValues.count(), 1.0);
     }
 
     // Load the Settings for fixed wing frames:

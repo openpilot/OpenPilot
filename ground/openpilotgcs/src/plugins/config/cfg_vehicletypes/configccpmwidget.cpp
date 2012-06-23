@@ -132,16 +132,11 @@ ConfigCcpmWidget::ConfigCcpmWidget(QWidget *parent) : VehicleConfig(parent)
 
     }
 
-    m_ccpm->PitchCurve->setMin(-1);
+    //initialize our two mixer curves
+    m_ccpm->PitchCurve->initLinearCurve(5, 1.0, -1.0);
+    m_ccpm->ThrottleCurve->initLinearCurve(5, 1.0);
 
-    resetMixer(m_ccpm->PitchCurve, 5);
-    resetMixer(m_ccpm->ThrottleCurve, 5);
-
-    MixerSettings * mixerSettings = MixerSettings::GetInstance(getObjectManager());
-    Q_ASSERT(mixerSettings);
-    UAVObjectField * curve2source = mixerSettings->getField("Curve2Source");
-    Q_ASSERT(curve2source);
-
+    //initialize channel names
     m_ccpm->ccpmEngineChannel->addItems(channelNames);
     m_ccpm->ccpmEngineChannel->setCurrentIndex(0);
     m_ccpm->ccpmTailChannel->addItems(channelNames);
@@ -474,14 +469,6 @@ void ConfigCcpmWidget::UpdateType()
     
 }
 
-/**
-  Resets a mixer curve
-  */
-void ConfigCcpmWidget::resetMixer(MixerCurveWidget *mixer, int numElements)
-{
-    mixer->initLinearCurve(numElements,(double)1);
-}
-
 void ConfigCcpmWidget::UpdateCurveWidgets()
 {
     int NumCurvePoints,i,Changed;
@@ -501,7 +488,8 @@ void ConfigCcpmWidget::UpdateCurveWidgets()
         if (ThisValue!=OldCurveValues.at(i))Changed=1;
     }
     // Setup all Throttle1 curves for all types of airframes
-    if (Changed==1)m_ccpm->ThrottleCurve->setCurve(curveValues);
+    if (Changed==1)
+        m_ccpm->ThrottleCurve->setCurve(curveValues);
 
     curveValues.clear();
     Changed=0;
@@ -513,7 +501,8 @@ void ConfigCcpmWidget::UpdateCurveWidgets()
         if (ThisValue!=OldCurveValues.at(i))Changed=1;
     }
     // Setup all Throttle1 curves for all types of airframes
-    if (Changed==1)m_ccpm->PitchCurve->setCurve(curveValues);
+    if (Changed==1)
+        m_ccpm->PitchCurve->setCurve(curveValues);
 }
 
 void ConfigCcpmWidget::updatePitchCurveValue(QList<double> curveValues0,double Value0)
@@ -606,50 +595,40 @@ void ConfigCcpmWidget::UpdateCurveSettings()
     m_ccpm->CurveValue2->setCorrectionMode(QAbstractSpinBox::CorrectToNearestValue);
     m_ccpm->CurveValue3->setCorrectionMode(QAbstractSpinBox::CorrectToNearestValue);
 
+    //set default visible
+    m_ccpm->CurveLabel1->setVisible(true);
+    m_ccpm->CurveValue1->setVisible(true);
+    m_ccpm->CurveLabel2->setVisible(false);
+    m_ccpm->CurveValue2->setVisible(false);
+    m_ccpm->CurveLabel3->setVisible(false);
+    m_ccpm->CurveValue3->setVisible(false);
+    m_ccpm->ccpmGenerateCurve->setVisible(true);
+    m_ccpm->CurveToGenerate->setVisible(true);
+
     if ( CurveType.compare("Flat")==0)
     {
         m_ccpm->CurveLabel1->setText("Value");
-        m_ccpm->CurveLabel1->setVisible(true);
-        m_ccpm->CurveValue1->setVisible(true);
-        m_ccpm->CurveLabel2->setVisible(false);
-        m_ccpm->CurveValue2->setVisible(false);
-        m_ccpm->CurveLabel3->setVisible(false);
-        m_ccpm->CurveValue3->setVisible(false);
-        m_ccpm->ccpmGenerateCurve->setVisible(true);
-        m_ccpm->CurveToGenerate->setVisible(true);
     }
     if ( CurveType.compare("Linear")==0)
     {
         m_ccpm->CurveLabel1->setText("Min");
-        m_ccpm->CurveLabel1->setVisible(true);
-        m_ccpm->CurveValue1->setVisible(true);
         m_ccpm->CurveLabel2->setText("Max");
         m_ccpm->CurveLabel2->setVisible(true);
         m_ccpm->CurveValue2->setVisible(true);
-        m_ccpm->CurveLabel3->setVisible(false);
-        m_ccpm->CurveValue3->setVisible(false);
-        m_ccpm->ccpmGenerateCurve->setVisible(true);
-        m_ccpm->CurveToGenerate->setVisible(true);
     }
     if ( CurveType.compare("Step")==0)
     {
         m_ccpm->CurveLabel1->setText("Min");
-        m_ccpm->CurveLabel1->setVisible(true);
-        m_ccpm->CurveValue1->setVisible(true);
         m_ccpm->CurveLabel2->setText("Max");
         m_ccpm->CurveLabel2->setVisible(true);
         m_ccpm->CurveValue2->setVisible(true);
         m_ccpm->CurveLabel3->setText("Step at");
         m_ccpm->CurveLabel3->setVisible(true);
         m_ccpm->CurveValue3->setVisible(true);
-        m_ccpm->ccpmGenerateCurve->setVisible(true);
-        m_ccpm->CurveToGenerate->setVisible(true);
     }
     if ( CurveType.compare("Exp")==0)
     {
         m_ccpm->CurveLabel1->setText("Min");
-        m_ccpm->CurveLabel1->setVisible(true);
-        m_ccpm->CurveValue1->setVisible(true);
         m_ccpm->CurveLabel2->setText("Max");
         m_ccpm->CurveLabel2->setVisible(true);
         m_ccpm->CurveValue2->setVisible(true);
@@ -660,14 +639,10 @@ void ConfigCcpmWidget::UpdateCurveSettings()
         m_ccpm->CurveValue3->setMaximum(100.0);
         m_ccpm->CurveValue3->setSingleStep(1.0);
         m_ccpm->CurveValue3->setCorrectionMode(QAbstractSpinBox::CorrectToNearestValue);;
-        m_ccpm->ccpmGenerateCurve->setVisible(true);
-        m_ccpm->CurveToGenerate->setVisible(true);
     }
     if ( CurveType.compare("Log")==0)
     {
         m_ccpm->CurveLabel1->setText("Min");
-        m_ccpm->CurveLabel1->setVisible(true);
-        m_ccpm->CurveValue1->setVisible(true);
         m_ccpm->CurveLabel2->setText("Max");
         m_ccpm->CurveLabel2->setVisible(true);
         m_ccpm->CurveValue2->setVisible(true);
@@ -677,22 +652,17 @@ void ConfigCcpmWidget::UpdateCurveSettings()
         m_ccpm->CurveValue3->setMinimum(1.0);
         m_ccpm->CurveValue3->setMaximum(100.0);
         m_ccpm->CurveValue3->setSingleStep(1.0);
-        m_ccpm->CurveValue3->setCorrectionMode(QAbstractSpinBox::CorrectToNearestValue);;
-        m_ccpm->ccpmGenerateCurve->setVisible(true);
-        m_ccpm->CurveToGenerate->setVisible(true);
+        m_ccpm->CurveValue3->setCorrectionMode(QAbstractSpinBox::CorrectToNearestValue);
     }
     if ( CurveType.compare("Custom")==0)
     {
         m_ccpm->CurveLabel1->setVisible(false);
         m_ccpm->CurveValue1->setVisible(false);
-        m_ccpm->CurveLabel2->setVisible(false);
-        m_ccpm->CurveValue2->setVisible(false);
-        m_ccpm->CurveLabel3->setVisible(false);
-        m_ccpm->CurveValue3->setVisible(false);
         m_ccpm->ccpmGenerateCurve->setVisible(false);
         m_ccpm->CurveToGenerate->setVisible(false);
     }
-UpdateCurveWidgets();
+
+    UpdateCurveWidgets();
 
 }
 void ConfigCcpmWidget::GenerateCurve()

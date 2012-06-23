@@ -46,7 +46,7 @@ public:
    void itemMoved(double itemValue); // Callback when a point is moved, to be updated
    void initCurve (QList<double> points);
    QList<double> getCurve();
-   void initLinearCurve(quint32 numPoints, double maxValue = 1, double minValue = 0);
+   void initLinearCurve(int numPoints, double maxValue = 1, double minValue = 0);
    void setCurve(QList<double>);
    void setMin(double value);
    double getMin();

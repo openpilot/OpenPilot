@@ -128,9 +128,6 @@ void MixerCurveWidget::initCurve(QList<double> points)
     if (points.length() < 2)
         return; // We need at least 2 points on a curve!
 
-    if (nodeList.count() != points.count())
-        initNodes(points.count());
-
     // finally, set node positions
     setCurve(points);
 }
@@ -204,32 +201,25 @@ void MixerCurveWidget::setCurve(QList<double> points)
 {
     curveUpdating = true;
 
-    if (nodeList.count() != points.count())
-        initNodes(points.count());
+    int ptCnt = points.count();
+    if (nodeList.count() != ptCnt)
+        initNodes(ptCnt);
 
-    double min = curveMin + 10;
-    double max = curveMax + 10;
+    double range = curveMax - curveMin;
 
-    QRectF plotRect = plot->boundingRect();
+    qreal w = plot->boundingRect().width()/(ptCnt-1);
+    qreal h = plot->boundingRect().height();
+    for (int i=0; i<ptCnt; i++) {
 
-    qreal w = plotRect.width()/(points.count()-1);
-    qreal h = plotRect.height();
-    for (int i=0; i<points.count(); i++) {
+        double val = (points.at(i) < curveMin) ? curveMin : (points.at(i) > curveMax) ? curveMax : points.at(i);
 
-        double val = points.at(i);
-        if (val < curveMin)
-            val = curveMin;
-        if (val > curveMax)
-            val = curveMax;
-
-        val += 10;
-        val -= min;
-        val /= (max - min);
+        val += range;
+        val -= (curveMin + range);
+        val /= range;
 
         Node* node = nodeList.at(i);
         node->setPos(w*i, h - (val*h));
         node->verticalMove(true);
-
     }
     curveUpdating = false;
 

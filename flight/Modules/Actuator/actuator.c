@@ -67,7 +67,8 @@ static xTaskHandle taskHandle;
 static float lastResult[MAX_MIX_ACTUATORS]={0,0,0,0,0,0,0,0};
 static float lastFilteredResult[MAX_MIX_ACTUATORS]={0,0,0,0,0,0,0,0};
 static float filterAccumulator[MAX_MIX_ACTUATORS]={0,0,0,0,0,0,0,0};
-
+// used to inform the actuator thread that actuator update rate is changed
+static uint8_t updateRateChanged = 0;
 
 // Private functions
 static void actuatorTask(void* parameters);
@@ -76,6 +77,7 @@ static int16_t scaleChannel(float value, int16_t max, int16_t min, int16_t neutr
 static void setFailsafe();
 static float MixerCurve(const float throttle, const float* curve, uint8_t elements);
 static bool set_channel(uint8_t mixer_channel, uint16_t value);
+static void change_update_rate();
 float ProcessMixer(const int index, const float curve1, const float curve2,
 		   MixerSettingsData* mixerSettings, ActuatorDesiredData* desired,
 		   const float period);
@@ -157,10 +159,9 @@ static void actuatorTask(void* parameters)
 	int16_t ChannelMax[ACTUATORCOMMAND_CHANNEL_NUMELEM];
 	int16_t ChannelMin[ACTUATORCOMMAND_CHANNEL_NUMELEM];
 	int16_t ChannelNeutral[ACTUATORCOMMAND_CHANNEL_NUMELEM];
-	uint16_t ChannelUpdateFreq[ACTUATORSETTINGS_CHANNELUPDATEFREQ_NUMELEM];
-	ActuatorSettingsChannelUpdateFreqGet(ChannelUpdateFreq);
-	PIOS_Servo_SetHz(&ChannelUpdateFreq[0], ACTUATORSETTINGS_CHANNELUPDATEFREQ_NUMELEM);
 
+	change_update_rate();
+	
 	float * status = (float *)&mixerStatus; //access status objects as an array of floats
 
 	// Go to the neutral (failsafe) values until an ActuatorDesired update is received
@@ -179,6 +180,12 @@ static void actuatorTask(void* parameters)
 			continue;
 		}
 
+		if(updateRateChanged!=0)
+		{
+			change_update_rate();
+			updateRateChanged=0;
+		}
+		
 		// Check how long since last update
 		thisSysTime = xTaskGetTickCount();
 		if(thisSysTime > lastSysTime) // reuse dt in case of wraparound
@@ -546,11 +553,29 @@ static void setFailsafe()
  */
 static void actuator_update_rate(UAVObjEvent * ev)
 {
+	static uint16_t lastChannelUpdateFreq[ACTUATORSETTINGS_CHANNELUPDATEFREQ_NUMELEM] = {0,0,0,0};
 	uint16_t ChannelUpdateFreq[ACTUATORSETTINGS_CHANNELUPDATEFREQ_NUMELEM];
-	if ( ev->obj == ActuatorSettingsHandle() ) {
-		ActuatorSettingsChannelUpdateFreqGet(ChannelUpdateFreq);
-		PIOS_Servo_SetHz(&ChannelUpdateFreq[0], ACTUATORSETTINGS_CHANNELUPDATEFREQ_NUMELEM);
-	}
+	// ActuatoSettings are not changed 
+	if ( ev->obj != ActuatorSettingsHandle() )
+		return;
+	
+	ActuatorSettingsChannelUpdateFreqGet(ChannelUpdateFreq);
+	// check if the any rate setting is changed 	
+	if (lastChannelUpdateFreq[0]!=0 && memcmp(&lastChannelUpdateFreq[0], &ChannelUpdateFreq[0], sizeof(int16_t) * ACTUATORSETTINGS_CHANNELUPDATEFREQ_NUMELEM) ==0)
+		return;
+	// save the new rates 
+	memcpy(lastChannelUpdateFreq, ChannelUpdateFreq, sizeof(int16_t) * ACTUATORSETTINGS_CHANNELUPDATEFREQ_NUMELEM);
+	// signal to the actuator task that ChannelUpdateFreq are changed 
+	updateRateChanged = 1;	
+}
+/**
+ * @brief Change the update rates according to the ActuatorSettingsChannelUpdateFreq.
+ */
+static void change_update_rate()
+{
+	uint16_t ChannelUpdateFreq[ACTUATORSETTINGS_CHANNELUPDATEFREQ_NUMELEM];
+	ActuatorSettingsChannelUpdateFreqGet(ChannelUpdateFreq);
+	PIOS_Servo_SetHz(&ChannelUpdateFreq[0], ACTUATORSETTINGS_CHANNELUPDATEFREQ_NUMELEM);
 }
 
 #if defined(ARCH_POSIX) || defined(ARCH_WIN32)

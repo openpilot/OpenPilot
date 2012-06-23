@@ -23,32 +23,41 @@ else
 	quote =
 endif
 
+# Add a board designator to the terse message text
+ifeq ($(ENABLE_MSG_EXTRA),yes)
+	MSG_EXTRA := [$(BUILD_TYPE)|$(BOARD_SHORT_NAME)]
+else
+	MSG_BOARD :=
+endif
+
 # Define Messages
 # English
-MSG_FORMATERROR      := ${quote} Can not handle output-format${quote}
-MSG_MODINIT          := ${quote} MODINIT   ${quote}
-MSG_SIZE             := ${quote} SIZE      ${quote}
-MSG_LOAD_FILE        := ${quote} BIN/HEX   ${quote}
-MSG_BIN_OBJ          := ${quote} BINO      ${quote}
-MSG_STRIP_FILE       := ${quote} STRIP     ${quote}
-MSG_EXTENDED_LISTING := ${quote} LIS       ${quote}
-MSG_SYMBOL_TABLE     := ${quote} NM        ${quote}
-MSG_LINKING          := ${quote} LD        ${quote}
-MSG_COMPILING        := ${quote} CC        ${quote}
-MSG_COMPILING_ARM    := ${quote} CC-ARM    ${quote}
-MSG_COMPILINGCPP     := ${quote} CXX       ${quote}
-MSG_COMPILINGCPP_ARM := ${quote} CXX-ARM   ${quote}
-MSG_ASSEMBLING       := ${quote} AS        ${quote}
-MSG_ASSEMBLING_ARM   := ${quote} AS-ARM    ${quote}
-MSG_CLEANING         := ${quote} CLEAN     ${quote}
-MSG_ASMFROMC         := ${quote} AS(C)     ${quote}
-MSG_ASMFROMC_ARM     := ${quote} AS(C)-ARM ${quote}
-MSG_PYMITEINIT       := ${quote} PY        ${quote}
-MSG_INSTALLING       := ${quote} INSTALL   ${quote}
-MSG_OPFIRMWARE       := ${quote} OPFW      ${quote}
-MSG_FWINFO           := ${quote} FWINFO    ${quote}
-MSG_JTAG_PROGRAM     := ${quote} JTAG-PGM  ${quote}
-MSG_JTAG_WIPE        := ${quote} JTAG-WIPE ${quote}
+MSG_FORMATERROR      = ${quote} Can not handle output-format${quote}
+MSG_MODINIT          = ${quote} MODINIT   $(MSG_EXTRA) ${quote}
+MSG_SIZE             = ${quote} SIZE      $(MSG_EXTRA) ${quote}
+MSG_LOAD_FILE        = ${quote} BIN/HEX   $(MSG_EXTRA) ${quote}
+MSG_BIN_OBJ          = ${quote} BINO      $(MSG_EXTRA) ${quote}
+MSG_STRIP_FILE       = ${quote} STRIP     $(MSG_EXTRA) ${quote}
+MSG_EXTENDED_LISTING = ${quote} LIS       $(MSG_EXTRA) ${quote}
+MSG_SYMBOL_TABLE     = ${quote} NM        $(MSG_EXTRA) ${quote}
+MSG_LINKING          = ${quote} LD        $(MSG_EXTRA) ${quote}
+MSG_COMPILING        = ${quote} CC        ${MSG_EXTRA} ${quote}
+MSG_COMPILING_ARM    = ${quote} CC-ARM    $(MSG_EXTRA) ${quote}
+MSG_COMPILINGCPP     = ${quote} CXX       $(MSG_EXTRA) ${quote}
+MSG_COMPILINGCPP_ARM = ${quote} CXX-ARM   $(MSG_EXTRA) ${quote}
+MSG_ASSEMBLING       = ${quote} AS        $(MSG_EXTRA) ${quote}
+MSG_ASSEMBLING_ARM   = ${quote} AS-ARM    $(MSG_EXTRA) ${quote}
+MSG_CLEANING         = ${quote} CLEAN     $(MSG_EXTRA) ${quote}
+MSG_ASMFROMC         = ${quote} AS(C)     $(MSG_EXTRA) ${quote}
+MSG_ASMFROMC_ARM     = ${quote} AS(C)-ARM $(MSG_EXTRA) ${quote}
+MSG_PYMITEINIT       = ${quote} PY        $(MSG_EXTRA) ${quote}
+MSG_INSTALLING       = ${quote} INSTALL   $(MSG_EXTRA) ${quote}
+MSG_OPFIRMWARE       = ${quote} OPFW      $(MSG_EXTRA) ${quote}
+MSG_FWINFO           = ${quote} FWINFO    $(MSG_EXTRA) ${quote}
+MSG_JTAG_PROGRAM     = ${quote} JTAG-PGM  $(MSG_EXTRA) ${quote}
+MSG_JTAG_WIPE        = ${quote} JTAG-WIPE $(MSG_EXTRA) ${quote}
+MSG_PADDING          = ${quote} PADDING   $(MSG_EXTRA) ${quote}
+MSG_FLASH_IMG        = ${quote} FLASH_IMG $(MSG_EXTRA) ${quote}
 
 toprel = $(subst $(realpath $(TOP))/,,$(abspath $(1)))
 

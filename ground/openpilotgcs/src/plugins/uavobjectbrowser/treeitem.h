@@ -34,7 +34,7 @@
 #include <QtCore/QList>
 #include <QtCore/QLinkedList>
 #include <QtCore/QVariant>
-#include <QTCore/QTime>
+#include <QtCore/QTime>
 #include <QtCore/QTimer>
 #include <QtCore/QObject>
 #include <QtCore/QDebug>

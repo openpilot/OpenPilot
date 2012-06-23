@@ -85,6 +85,10 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
     addUAVObjectToWidgetRelation("ManualControlSettings","FlightModePosition",m_config->fmsModePos1,0);
     addUAVObjectToWidgetRelation("ManualControlSettings","FlightModePosition",m_config->fmsModePos2,1);
     addUAVObjectToWidgetRelation("ManualControlSettings","FlightModePosition",m_config->fmsModePos3,2);
+    addUAVObjectToWidgetRelation("ManualControlSettings","FlightModePosition",m_config->fmsModePos4,3);
+    addUAVObjectToWidgetRelation("ManualControlSettings","FlightModePosition",m_config->fmsModePos5,4);
+    addUAVObjectToWidgetRelation("ManualControlSettings","FlightModePosition",m_config->fmsModePos6,5);
+    addUAVObjectToWidgetRelation("ManualControlSettings","FlightModeNumber",m_config->fmsPosNum);
 
     addUAVObjectToWidgetRelation("ManualControlSettings","Stabilization1Settings",m_config->fmsSsPos1Roll,"Roll");
     addUAVObjectToWidgetRelation("ManualControlSettings","Stabilization2Settings",m_config->fmsSsPos2Roll,"Roll");
@@ -99,6 +103,7 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
     addUAVObjectToWidgetRelation("ManualControlSettings","Arming",m_config->armControl);
     addUAVObjectToWidgetRelation("ManualControlSettings","ArmedTimeout",m_config->armTimeout,0,1000);
     connect( ManualControlCommand::GetInstance(getObjectManager()),SIGNAL(objectUpdated(UAVObject*)),this,SLOT(moveFMSlider()));
+    connect( ManualControlSettings::GetInstance(getObjectManager()),SIGNAL(objectUpdated(UAVObject*)),this,SLOT(updatePositionSlider()));
     enableControls(false);
 
     populateWidgets();
@@ -1113,6 +1118,7 @@ void ConfigInputWidget::invertControls()
     }
     manualSettingsObj->setData(manualSettingsData);
 }
+
 void ConfigInputWidget::moveFMSlider()
 {
     ManualControlSettings::DataFields manualSettingsDataPriv = manualSettingsObj->getData();
@@ -1139,12 +1145,78 @@ void ConfigInputWidget::moveFMSlider()
             valueScaled = 0;
     }
 
-    if(valueScaled < -(1.0 / 3.0))
-        m_config->fmsSlider->setValue(-100);
-    else if (valueScaled > (1.0/3.0))
-        m_config->fmsSlider->setValue(100);
-    else
-        m_config->fmsSlider->setValue(0);
+    // Bound and scale FlightMode from [-1..+1] to [0..1] range
+    if (valueScaled < -1.0)
+        valueScaled = -1.0;
+    if (valueScaled >  1.0)
+        valueScaled =  1.0;
+    float scaledFlightMode = (valueScaled + 1.0) / 2.0;
+
+    // Display current channel value for tuning (in percents)
+    m_config->fmsValue->setText(QString::number(scaledFlightMode * 100.0, 'f', 0));
+
+    // Find and display the current FlightMode using the same logic as in a flight code
+    float delta = 1.0 / (float)(manualSettingsDataPriv.FlightModeNumber);
+    float bound = delta;
+    int i;
+    for (i = 1; i < manualSettingsDataPriv.FlightModeNumber; i++, bound += delta) {
+        if (scaledFlightMode < bound)
+            break;
+    }
+    m_config->fmsSlider->setValue(i - 1);
+}
+
+void ConfigInputWidget::updatePositionSlider()
+{
+    ManualControlSettings::DataFields manualSettingsDataPriv = manualSettingsObj->getData();
+
+    switch(manualSettingsDataPriv.FlightModeNumber) {
+    default:
+    case 6:
+        m_config->fmsModePos6->setEnabled(true);
+	// pass through
+    case 5:
+        m_config->fmsModePos5->setEnabled(true);
+	// pass through
+    case 4:
+        m_config->fmsModePos4->setEnabled(true);
+	// pass through
+    case 3:
+        m_config->fmsModePos3->setEnabled(true);
+	// pass through
+    case 2:
+        m_config->fmsModePos2->setEnabled(true);
+	// pass through
+    case 1:
+        m_config->fmsModePos1->setEnabled(true);
+	// pass through
+    case 0:
+	break;
+    }
+
+    switch(manualSettingsDataPriv.FlightModeNumber) {
+    case 0:
+        m_config->fmsModePos1->setEnabled(false);
+	// pass through
+    case 1:
+        m_config->fmsModePos2->setEnabled(false);
+	// pass through
+    case 2:
+        m_config->fmsModePos3->setEnabled(false);
+	// pass through
+    case 3:
+        m_config->fmsModePos4->setEnabled(false);
+	// pass through
+    case 4:
+        m_config->fmsModePos5->setEnabled(false);
+	// pass through
+    case 5:
+        m_config->fmsModePos6->setEnabled(false);
+	// pass through
+    case 6:
+    default:
+	break;
+    }
 }
 
 void ConfigInputWidget::updateCalibration()

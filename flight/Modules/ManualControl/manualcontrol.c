@@ -58,7 +58,6 @@
 #define TASK_PRIORITY (tskIDLE_PRIORITY+4)
 #define UPDATE_PERIOD_MS 20
 #define THROTTLE_FAILSAFE -0.1f
-#define FLIGHT_MODE_LIMIT 1.0f/3.0f
 #define ARMED_TIME_MS      1000
 #define ARMED_THRESHOLD    0.50f
 //safe band to allow a bit of calibration error or trim offset (in microseconds)
@@ -847,30 +846,38 @@ static void processArm(ManualControlCommandData * cmd, ManualControlSettingsData
 }
 
 /**
- * @brief Determine which of three positions the flight mode switch is in and set flight mode accordingly
+ * @brief Determine which of N positions the flight mode switch is in and set flight mode accordingly
  * @param[out] cmd Pointer to the command structure to set the flight mode in
  * @param[in] settings The settings which indicate which position is which mode
  * @param[in] flightMode the value of the switch position
  */
-static void processFlightMode(ManualControlSettingsData * settings, float flightMode)
+static void processFlightMode(ManualControlSettingsData *settings, float flightMode)
 {
 	FlightStatusData flightStatus;
 	FlightStatusGet(&flightStatus);
 
-	uint8_t newMode;
-	// Note here the code is ass
-	if (flightMode < -FLIGHT_MODE_LIMIT)
-		newMode = settings->FlightModePosition[0];
-	else if (flightMode > FLIGHT_MODE_LIMIT)
-		newMode = settings->FlightModePosition[2];
-	else
-		newMode = settings->FlightModePosition[1];
+	// Check the FlightModeNumber: it shouldn't be set higher than number of FlightModePosition elements
+	if ((settings->FlightModeNumber < 1) || (settings->FlightModeNumber > MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_NUMELEM)) {
+		AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_CRITICAL);
+		return;
+	}
 
-	if(flightStatus.FlightMode != newMode) {
+	// Scale flightMode from [-1..+1] to [0..1] range and calculate a delta
+	float scaledFlightMode = (flightMode + 1.0) / 2.0;
+	float delta = 1.0 / (float)(settings->FlightModeNumber);
+	float bound = delta;
+
+	uint8_t i;
+	for (i = 1; i < settings->FlightModeNumber; i++, bound += delta) {
+		if (scaledFlightMode < bound)
+			break;
+	}
+	uint8_t newMode = settings->FlightModePosition[i - 1];
+
+	if (flightStatus.FlightMode != newMode) {
 		flightStatus.FlightMode = newMode;
 		FlightStatusSet(&flightStatus);
 	}
-
 }
 
 /**

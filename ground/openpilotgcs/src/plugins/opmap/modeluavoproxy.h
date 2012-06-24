@@ -11,6 +11,7 @@ class modelUavoProxy:public QObject
     Q_OBJECT
 public:
     explicit modelUavoProxy(QObject *parent, flightDataModel *model);
+    int addAction(PathAction *actionObj, PathAction::DataFields actionFields,int lastaction);
 public slots:
     void modelToObjects();
     void objectsToModel();

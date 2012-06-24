@@ -444,16 +444,17 @@ void ConfigVehicleTypeWidget::enableFFTest()
         // Depending on phase, either move actuator or send FF settings:
         if (ffTuningPhase) {
             // Send FF settings to the board
-            UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-            UAVObjectField* field = obj->getField(QString("FeedForward"));
-            field->setDouble((double)m_aircraft->feedForwardSlider->value()/100);
-            field = obj->getField(QString("AccelTime"));
-            field->setDouble(m_aircraft->accelTime->value());
-            field = obj->getField(QString("DecelTime"));
-            field->setDouble(m_aircraft->decelTime->value());
-            field = obj->getField(QString("MaxAccel"));
-            field->setDouble(m_aircraft->maxAccelSlider->value());
-            obj->updated();
+            UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
+            Q_ASSERT(mixer);
+
+            VehicleConfig* vconfig = new VehicleConfig();
+
+            // Update feed forward settings
+            vconfig->setMixerValue(mixer, "FeedForward", m_aircraft->feedForwardSlider->value() / 100.0);
+            vconfig->setMixerValue(mixer, "AccelTime", m_aircraft->accelTime->value());
+            vconfig->setMixerValue(mixer, "DecelTime", m_aircraft->decelTime->value());
+            vconfig->setMixerValue(mixer, "MaxAccel", m_aircraft->maxAccelSlider->value());
+            mixer->updated();
         } else  {
             // Toggle motor state
             UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ManualControlCommand")));
@@ -809,6 +810,12 @@ void ConfigVehicleTypeWidget::updateCustomAirframeUI()
                 QString::number(vconfig->getMixerVectorValue(mixer,channel,VehicleConfig::MIXERVECTOR_YAW)));
         }
     }
+
+    // Update feed forward settings
+    m_aircraft->feedForwardSlider->setValue(vconfig->getMixerValue(mixer,"FeedForward") * 100);
+    m_aircraft->accelTime->setValue(vconfig->getMixerValue(mixer,"AccelTime"));
+    m_aircraft->decelTime->setValue(vconfig->getMixerValue(mixer,"DecelTime"));
+    m_aircraft->maxAccelSlider->setValue(vconfig->getMixerValue(mixer,"MaxAccel"));
 }
 
 
@@ -821,6 +828,17 @@ void ConfigVehicleTypeWidget::updateCustomAirframeUI()
 */
 void ConfigVehicleTypeWidget::updateObjectsFromWidgets()
 {
+    UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
+    Q_ASSERT(mixer);
+
+    VehicleConfig* vconfig = new VehicleConfig();
+
+    // Update feed forward settings
+    vconfig->setMixerValue(mixer, "FeedForward", m_aircraft->feedForwardSlider->value() / 100.0);
+    vconfig->setMixerValue(mixer, "AccelTime", m_aircraft->accelTime->value());
+    vconfig->setMixerValue(mixer, "DecelTime", m_aircraft->decelTime->value());
+    vconfig->setMixerValue(mixer, "MaxAccel", m_aircraft->maxAccelSlider->value());
+
     QString airframeType = "Custom"; //Sets airframe type default to "Custom"
     if (m_aircraft->aircraftType->currentText() == "Fixed Wing") {
         airframeType = m_fixedwing->updateConfigObjectsFromWidgets();
@@ -835,12 +853,6 @@ void ConfigVehicleTypeWidget::updateObjectsFromWidgets()
          airframeType = m_groundvehicle->updateConfigObjectsFromWidgets();
     }
     else {
-
-        UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-        Q_ASSERT(mixer);
-
-        VehicleConfig* vconfig = new VehicleConfig();
-
         vconfig->setThrottleCurve(mixer, VehicleConfig::MIXER_THROTTLECURVE1, m_aircraft->customThrottle1Curve->getCurve());
         vconfig->setThrottleCurve(mixer, VehicleConfig::MIXER_THROTTLECURVE2, m_aircraft->customThrottle2Curve->getCurve());
 

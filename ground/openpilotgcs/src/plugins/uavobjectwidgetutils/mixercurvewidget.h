@@ -52,7 +52,7 @@ public:
    double getMin();
    void setMax(double value);
    double getMax();
-   void setRange(double min, double max);
+   double setRange(double min, double max);
 
    static const int NODE_NUMELEM = 5;
 

@@ -233,6 +233,30 @@ void VehicleConfig::setMixerVectorValue(UAVDataObject* mixer, int channel, Mixer
     }
 }
 
+double VehicleConfig::getMixerValue(UAVDataObject* mixer, QString elementName)
+{
+    Q_ASSERT(mixer);
+
+    double value = 0.0;
+
+    QPointer<UAVObjectField> field = mixer->getField(elementName);
+    if (field) {
+        value = field->getDouble();
+    }
+    return value;
+}
+
+void VehicleConfig::setMixerValue(UAVDataObject* mixer, QString elementName, double value)
+{
+    Q_ASSERT(mixer);
+
+    QPointer<UAVObjectField> field = mixer->getField(elementName);
+    if (field) {
+        field->setDouble(value);
+    }
+}
+
+
 void VehicleConfig::setThrottleCurve(UAVDataObject* mixer, MixerThrottleCurveElem curveType, QList<double> curve)
 {
     QPointer<UAVObjectField> field;

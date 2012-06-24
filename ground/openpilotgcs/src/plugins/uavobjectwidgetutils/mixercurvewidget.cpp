@@ -185,11 +185,11 @@ QList<double> MixerCurveWidget::getCurve() {
   */
 void MixerCurveWidget::initLinearCurve(int numPoints, double maxValue, double minValue)
 {
-    setRange(minValue, maxValue);
+    double range = setRange(minValue, maxValue);
 
     QList<double> points;
     for (double i=0; i < (double)numPoints; i++) {
-        double val = ((curveMax - curveMin) * ( i / (double)(numPoints-1) ) ) + curveMin;
+        double val = (range * ( i / (double)(numPoints-1) ) ) + minValue;
         points.append(val);
     }
     initCurve(points);
@@ -268,8 +268,9 @@ double MixerCurveWidget::getMax()
 {
     return curveMax;
 }
-void MixerCurveWidget::setRange(double min, double max)
+double MixerCurveWidget::setRange(double min, double max)
 {
     curveMin = min;
     curveMax = max;
+    return curveMax - curveMin;
 }

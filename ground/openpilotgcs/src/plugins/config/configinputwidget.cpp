@@ -637,7 +637,8 @@ void ConfigInputWidget::setChannel(int newChan)
         m_config->wzText->setText(QString(tr("Please move each control once at a time according to the instructions and picture below.\n\n"
                                  "Move the %1 stick")).arg(manualSettingsObj->getField("ChannelGroups")->getElementNames().at(newChan)));
 
-    if(manualSettingsObj->getField("ChannelGroups")->getElementNames().at(newChan).contains("Accessory")) {
+    if(manualSettingsObj->getField("ChannelGroups")->getElementNames().at(newChan).contains("Accessory") ||
+       manualSettingsObj->getField("ChannelGroups")->getElementNames().at(newChan).contains("FlightMode")) {
         m_config->wzNext->setEnabled(true);
         m_config->wzText->setText(m_config->wzText->text() + tr(" or click next to skip this channel."));
     } else

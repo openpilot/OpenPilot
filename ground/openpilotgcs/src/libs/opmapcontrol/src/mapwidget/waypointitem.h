@@ -181,7 +181,7 @@ private:
     float altitude;
     MapGraphicItem* map;
     int number;
-
+    bool isMagic;
 
     QGraphicsSimpleTextItem* text;
     QGraphicsRectItem* textBG;

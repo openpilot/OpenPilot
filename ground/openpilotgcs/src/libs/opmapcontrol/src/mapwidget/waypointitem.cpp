@@ -33,6 +33,7 @@ WayPointItem::WayPointItem(const internals::PointLatLng &coord,int const& altitu
     {
         text=0;
         numberI=0;
+        isMagic=false;
         picture.load(QString::fromUtf8(":/markers/images/marker.png"));
         number=WayPointItem::snumber;
         ++WayPointItem::snumber;
@@ -69,11 +70,13 @@ WayPointItem::WayPointItem(MapGraphicItem *map, bool magicwaypoint):reached(fals
     myType=relative;
     if(magicwaypoint)
     {
+        isMagic=true;
         picture.load(QString::fromUtf8(":/opmap/images/waypoint_marker3.png"));
         number=-1;
     }
     else
     {
+        isMagic=false;
         number=WayPointItem::snumber;
         ++WayPointItem::snumber;
     }
@@ -107,6 +110,7 @@ WayPointItem::WayPointItem(MapGraphicItem *map, bool magicwaypoint):reached(fals
     {
         text=0;
         numberI=0;
+        isMagic=false;
         picture.load(QString::fromUtf8(":/markers/images/marker.png"));
         number=WayPointItem::snumber;
         ++WayPointItem::snumber;
@@ -153,6 +157,7 @@ WayPointItem::WayPointItem(MapGraphicItem *map, bool magicwaypoint):reached(fals
         myType=relative;
         text=0;
         numberI=0;
+        isMagic=false;
         picture.load(QString::fromUtf8(":/markers/images/marker.png"));
         number=WayPointItem::snumber;
         ++WayPointItem::snumber;
@@ -266,6 +271,11 @@ WayPointItem::WayPointItem(MapGraphicItem *map, bool magicwaypoint):reached(fals
 
     void WayPointItem::setRelativeCoord(distBearingAltitude value)
     {
+        qDebug()<<"SET RELATIVE0";
+        if(value.altitudeRelative==relativeCoord.altitudeRelative
+                && value.bearing==relativeCoord.bearing && value.distance==relativeCoord.distance)
+            return;
+        qDebug()<<"SET RELATIVE1";
         relativeCoord=value;
         if(myHome)
         {
@@ -273,12 +283,17 @@ WayPointItem::WayPointItem(MapGraphicItem *map, bool magicwaypoint):reached(fals
         }
         RefreshPos();
         RefreshToolTip();
+        emit WPValuesChanged(this);
         this->update();
     }
     void WayPointItem::SetCoord(const internals::PointLatLng &value)
     {
-        if(this->WPType()==relative)
+        qDebug()<<"SET ABSOLUTE0";
+       // if(this->WPType()==relative)
+         //   return;
+        if(Coord()==value)
             return;
+        qDebug()<<"SET ABSOLUTE1";
         bool abs_coord=false;
         bool rel_coord=false;
         if(coord!=value)
@@ -298,6 +313,8 @@ WayPointItem::WayPointItem(MapGraphicItem *map, bool magicwaypoint):reached(fals
     }
     void WayPointItem::SetDescription(const QString &value)
     {
+        if(description==value)
+            return;
         description=value;
         RefreshToolTip();
         emit WPValuesChanged(this);
@@ -319,11 +336,21 @@ WayPointItem::WayPointItem(MapGraphicItem *map, bool magicwaypoint):reached(fals
         emit WPValuesChanged(this);
         if(value)
             picture.load(QString::fromUtf8(":/markers/images/bigMarkerGreen.png"));
-        else if(this->flags() & QGraphicsItem::ItemIsMovable==QGraphicsItem::ItemIsMovable)
-            picture.load(QString::fromUtf8(":/markers/images/marker.png"));
         else
-            picture.load(QString::fromUtf8(":/markers/images/waypoint_marker2.png"));
-        this->update();
+        {
+            if(!isMagic)
+            {
+                if(this->flags() & QGraphicsItem::ItemIsMovable==QGraphicsItem::ItemIsMovable)
+                    picture.load(QString::fromUtf8(":/markers/images/marker.png"));
+                else
+                    picture.load(QString::fromUtf8(":/markers/images/waypoint_marker2.png"));
+            }
+            else
+            {
+                picture.load(QString::fromUtf8(":/opmap/images/waypoint_marker3.png"));
+            }
+        }
+            this->update();
 
     }
     void WayPointItem::SetShowNumber(const bool &value)
@@ -439,7 +466,12 @@ WayPointItem::WayPointItem(MapGraphicItem *map, bool magicwaypoint):reached(fals
 
     void WayPointItem::setFlag(QGraphicsItem::GraphicsItemFlag flag, bool enabled)
     {
-        if(flag==QGraphicsItem::ItemIsMovable)
+        if(isMagic)
+        {
+            QGraphicsItem::setFlag(flag,enabled);
+            return;
+        }
+        else if(flag==QGraphicsItem::ItemIsMovable)
         {
             if(enabled)
                 picture.load(QString::fromUtf8(":/markers/images/marker.png"));

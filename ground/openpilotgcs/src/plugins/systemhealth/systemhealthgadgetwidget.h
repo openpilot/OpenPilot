@@ -34,6 +34,7 @@
 #include <QGraphicsView>
 #include <QtSvg/QSvgRenderer>
 #include <QtSvg/QGraphicsSvgItem>
+#include <QMouseEvent>
 
 #include <QFile>
 #include <QTimer>
@@ -52,6 +53,7 @@ public:
 protected:
    void paintEvent(QPaintEvent *event);
    void resizeEvent(QResizeEvent *event);
+   void mousePressEvent ( QMouseEvent * event );
 
 private slots:
    void updateAlarms(UAVObject *systemAlarm); // Called by the systemalarms UAVObject

@@ -32,6 +32,7 @@
 #include "systemalarms.h"
 
 #include <QDebug>
+#include <QWhatsThis>
 
 /*
  * Initialize the widget
@@ -194,4 +195,19 @@ void SystemHealthGadgetWidget::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event);
     fitInView(background, Qt::KeepAspectRatio );
+}
+
+void SystemHealthGadgetWidget::mousePressEvent ( QMouseEvent * event )
+{
+    QGraphicsScene *graphicsScene = scene();
+    if(graphicsScene){
+        QPoint point = event->pos();
+        foreach(QGraphicsItem* sceneItem, items(point)){
+            QGraphicsSvgItem *clickedItem = dynamic_cast<QGraphicsSvgItem*>(sceneItem);
+
+            if(clickedItem && (clickedItem != foreground) && clickedItem != background){
+                QWhatsThis::showText(event->globalPos(), clickedItem->elementId().split('-').at(0) + "\nIt's all gone horribly wrong!");
+            }
+        }
+    }
 }

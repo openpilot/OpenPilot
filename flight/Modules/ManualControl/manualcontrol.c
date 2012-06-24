@@ -862,17 +862,12 @@ static void processFlightMode(ManualControlSettingsData *settings, float flightM
 		return;
 	}
 
-	// Scale flightMode from [-1..+1] to [0..1] range and calculate a delta
-	float scaledFlightMode = (flightMode + 1.0) / 2.0;
-	float delta = 1.0 / (float)(settings->FlightModeNumber);
-	float bound = delta;
+	// Convert flightMode value into the switch position in the range [0..N-1]
+	uint8_t pos = (uint8_t)((flightMode + 1.0f) * settings->FlightModeNumber) >> 1;
+	if (pos >= settings->FlightModeNumber)
+		pos = settings->FlightModeNumber - 1;
 
-	uint8_t i;
-	for (i = 1; i < settings->FlightModeNumber; i++, bound += delta) {
-		if (scaledFlightMode < bound)
-			break;
-	}
-	uint8_t newMode = settings->FlightModePosition[i - 1];
+	uint8_t newMode = settings->FlightModePosition[pos];
 
 	if (flightStatus.FlightMode != newMode) {
 		flightStatus.FlightMode = newMode;

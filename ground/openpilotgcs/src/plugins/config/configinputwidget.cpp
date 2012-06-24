@@ -1148,22 +1148,20 @@ void ConfigInputWidget::moveFMSlider()
     // Bound and scale FlightMode from [-1..+1] to [0..1] range
     if (valueScaled < -1.0)
         valueScaled = -1.0;
+    else
     if (valueScaled >  1.0)
         valueScaled =  1.0;
-    float scaledFlightMode = (valueScaled + 1.0) / 2.0;
 
     // Display current channel value for tuning (in percents)
+    float scaledFlightMode = (valueScaled + 1.0) / 2.0;
     m_config->fmsValue->setText(QString::number(scaledFlightMode * 100.0, 'f', 0));
 
-    // Find and display the current FlightMode using the same logic as in a flight code
-    float delta = 1.0 / (float)(manualSettingsDataPriv.FlightModeNumber);
-    float bound = delta;
-    int i;
-    for (i = 1; i < manualSettingsDataPriv.FlightModeNumber; i++, bound += delta) {
-        if (scaledFlightMode < bound)
-            break;
-    }
-    m_config->fmsSlider->setValue(i - 1);
+    // Convert flightMode value into the switch position in the range [0..N-1]
+    // This should use the same logic as flight code to be consistent
+    uint8_t pos = (uint8_t)((valueScaled + 1.0) * manualSettingsDataPriv.FlightModeNumber) >> 1;
+    if (pos >= manualSettingsDataPriv.FlightModeNumber)
+        pos = manualSettingsDataPriv.FlightModeNumber - 1;
+    m_config->fmsSlider->setValue(pos);
 }
 
 void ConfigInputWidget::updatePositionSlider()

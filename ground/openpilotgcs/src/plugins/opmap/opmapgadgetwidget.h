@@ -34,6 +34,7 @@
 #include "flightdatamodel.h"
 #include "pathplanner.h"
 #include "modelmapproxy.h"
+#include "modeluavoproxy.h"
 
 #include <QtGui/QWidget>
 #include <QtGui/QMenu>
@@ -58,6 +59,8 @@
 #include "objectpersistence.h"
 #include <QItemSelectionModel>
 #include "opmap_edit_waypoint_dialog.h"
+
+#include "homeeditor.h"
 
 // ******************************************************
 
@@ -124,6 +127,7 @@ protected:
     void resizeEvent(QResizeEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void contextMenuEvent(QContextMenuEvent *event);
+    void closeEvent(QCloseEvent *);
 private slots:
     void wpDoubleClickEvent(WayPointItem *wp);
     void updatePosition();
@@ -202,7 +206,7 @@ private slots:
 	void onMaxUpdateRateActGroup_triggered(QAction *action);
     void onChangeDefaultLocalAndZoom();
     void on_tbFind_clicked();
-
+    void onHomeDoubleClick(HomeItem*);
 private:
 
 	// *****
@@ -243,6 +247,10 @@ private:
     QStandardItemModel wayPoint_treeView_model;
 
     mapcontrol::WayPointItem *m_mouse_waypoint;
+
+    modelUavoProxy * UAVProxy;
+
+
 
     QMutex m_map_mutex;
 
@@ -334,7 +342,7 @@ private:
 
     flightDataModel * model;
     pathPlanner * table;
-    modelMapProxy * proxy;
+    modelMapProxy * mapProxy;
     QItemSelectionModel * selectionModel;
 };
 

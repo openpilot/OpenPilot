@@ -35,5 +35,6 @@
         <file>images/plus3.png</file>
         <file>images/forward_alt.png</file>
         <file>images/star.png</file>
+        <file>images/down_alt.png</file>
     </qresource>
 </RCC>

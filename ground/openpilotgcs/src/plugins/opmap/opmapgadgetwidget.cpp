@@ -161,6 +161,8 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 	m_map->Home->SetSafeArea(safe_area_radius_list[0]);                         // set radius (meters)
     m_map->Home->SetShowSafeArea(true);                                         // show the safe area
 
+    if(m_map->Home)
+        connect(m_map->Home,SIGNAL(homedoubleclick(HomeItem*)),this,SLOT(onHomeDoubleClick(HomeItem*)));
     m_map->UAV->SetTrailTime(uav_trail_time_list[0]);                           // seconds
     m_map->UAV->SetTrailDistance(uav_trail_distance_list[1]);                   // meters
 
@@ -213,39 +215,16 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     if(m_map->GPS)
         m_map->GPS->SetUAVPos(m_home_position.coord, 0.0);        // set the UAV position
 
-    qDebug()<<"here0";
     model=new flightDataModel(this);
-    qDebug()<<"here1";
     table=new pathPlanner();
-    qDebug()<<"here2";
     selectionModel=new QItemSelectionModel(model);
-    qDebug()<<"here3";
-    proxy=new modelMapProxy(this,m_map,model,selectionModel);
-    qDebug()<<"here4";
+    mapProxy=new modelMapProxy(this,m_map,model,selectionModel);
     table->setModel(model,selectionModel);
-    qDebug()<<"here5";
-    table->show();
-    qDebug()<<"here6";
     waypoint_edit_dialog=new opmap_edit_waypoint_dialog(NULL,model,selectionModel);
-    qDebug()<<"here7";
+    UAVProxy=new modelUavoProxy(this,model);
+    connect(table,SIGNAL(sendPathPlanToUAV()),UAVProxy,SLOT(modelToObjects()));
+    connect(table,SIGNAL(receivePathPlanFromUAV()),UAVProxy,SLOT(objectsToModel()));
 
-/*
-    distBearing db;
-    db.distance=100;
-    db.bearing=0;
-    WayPointItem * p1=m_map->WPCreate(db,10,"aaa");
-
-    db.distance=100;
-    db.bearing=45;
-    WayPointItem * p2=m_map->WPCreate(db,10,"bbb");
-    m_map->WPCircleCreate(p2,p1,true);
-    t_waypoint *wp = new t_waypoint;
-    wp->map_wp_item=p1;
-    m_waypoint_list.append(wp);
-    wp=new t_waypoint;
-    wp->map_wp_item=p2;
-    m_waypoint_list.append(wp);
-*/
     magicWayPoint=m_map->magicWPCreate();
     magicWayPoint->setVisible(false);
 
@@ -310,6 +289,18 @@ OPMapGadgetWidget::~OPMapGadgetWidget()
 		delete m_map;
 		m_map = NULL;
 	}
+    if(model)
+        delete model;
+    if(table)
+        delete table;
+    if(selectionModel)
+        delete selectionModel;
+    if(mapProxy)
+        delete mapProxy;
+    if(waypoint_edit_dialog)
+        delete waypoint_edit_dialog;
+    if(UAVProxy)
+        delete UAVProxy;
 }
 
 // *************************************************************************************
@@ -528,6 +519,12 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
     contextMenu.exec(event->globalPos());  // popup the menu
 
     // ****************
+}
+
+void OPMapGadgetWidget::closeEvent(QCloseEvent *event)
+{
+    table->close();
+    QWidget::closeEvent(event);
 }
 
 // *************************************************************************************
@@ -1295,7 +1292,6 @@ void OPMapGadgetWidget::createActions()
     wayPointEditorAct = new QAction(tr("&Waypoint editor"), this);
     wayPointEditorAct->setShortcut(tr("Ctrl+W"));
     wayPointEditorAct->setStatusTip(tr("Open the waypoint editor"));
-    wayPointEditorAct->setEnabled(true);   // temporary
     connect(wayPointEditorAct, SIGNAL(triggered()), this, SLOT(onOpenWayPointEditorAct_triggered()));
 
     addWayPointActFromContextMenu = new QAction(tr("&Add waypoint"), this);
@@ -1702,7 +1698,7 @@ void OPMapGadgetWidget::onUAVTrailDistanceActGroup_triggered(QAction *action)
 
 void OPMapGadgetWidget::onOpenWayPointEditorAct_triggered()
 {
-    //TODO
+    table->show();
 }
 void OPMapGadgetWidget::onAddWayPointAct_triggeredFromContextMenu()
 {
@@ -1722,7 +1718,7 @@ void OPMapGadgetWidget::onAddWayPointAct_triggered(internals::PointLatLng coord)
         return;
 
    // m_map->WPCreate(coord, 0, "");
-    proxy->createWayPoint(coord);
+    mapProxy->createWayPoint(coord);
 
             //wp->map_wp_item->picture.load(QString::fromUtf8(":/opmap/images/waypoint_marker1.png"));
             //wp->map_wp_item->picture.load(QString::fromUtf8(":/opmap/images/waypoint_marker2.png"));
@@ -1748,7 +1744,6 @@ void OPMapGadgetWidget::onEditWayPointAct_triggered()
         return;
 
     waypoint_edit_dialog->editWaypoint(m_mouse_waypoint);
-
     m_mouse_waypoint = NULL;
 }
 
@@ -1788,7 +1783,7 @@ void OPMapGadgetWidget::onDeleteWayPointAct_triggered()
     if (!m_mouse_waypoint)
         return;
 
-    proxy->deleteWayPoint(m_mouse_waypoint->Number());
+    mapProxy->deleteWayPoint(m_mouse_waypoint->Number());
 }
 
 void OPMapGadgetWidget::onClearWayPointsAct_triggered()
@@ -1799,7 +1794,7 @@ void OPMapGadgetWidget::onClearWayPointsAct_triggered()
     if (m_map_mode != Normal_MapMode)
         return;
 
-    proxy->deleteAll();
+    mapProxy->deleteAll();
 
  }
 
@@ -2116,4 +2111,9 @@ void OPMapGadgetWidget::on_tbFind_clicked()
         pal.setColor( m_widget->leFind->backgroundRole(), Qt::red);
         m_widget->leFind->setPalette(pal);
     }
+}
+
+void OPMapGadgetWidget::onHomeDoubleClick(HomeItem *)
+{
+    new homeEditor(m_map->Home,this);
 }

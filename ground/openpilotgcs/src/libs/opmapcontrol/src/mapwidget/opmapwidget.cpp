@@ -110,11 +110,11 @@ namespace mapcontrol
             return NULL;
         return new WayPointLine(from,to,map,color);
     }
-    WayPointLine * OPMapWidget::WPLineCreate(HomeItem *from, WayPointItem *to)
+    WayPointLine * OPMapWidget::WPLineCreate(HomeItem *from, WayPointItem *to,QColor color)
     {
         if(!from|!to)
             return NULL;
-        return new WayPointLine(from,to,map);
+        return new WayPointLine(from,to,map,color);
     }
     WayPointCircle * OPMapWidget::WPCircleCreate(WayPointItem *center, WayPointItem *radius, bool clockwise,QColor color)
     {
@@ -123,11 +123,11 @@ namespace mapcontrol
         return new WayPointCircle(center,radius,clockwise,map,color);
     }
 
-    WayPointCircle *OPMapWidget::WPCircleCreate(HomeItem *center, WayPointItem *radius, bool clockwise)
+    WayPointCircle *OPMapWidget::WPCircleCreate(HomeItem *center, WayPointItem *radius, bool clockwise,QColor color)
     {
         if(!center|!radius)
             return NULL;
-        return new WayPointCircle(center,radius,clockwise,map);
+        return new WayPointCircle(center,radius,clockwise,map,color);
     }
     void OPMapWidget::SetShowUAV(const bool &value)
     {

@@ -126,10 +126,31 @@ void modelMapProxy::createOverlay(WayPointItem *from, WayPointItem *to, modelMap
 
     }
 }
+void modelMapProxy::createOverlay(WayPointItem *from, HomeItem *to, modelMapProxy::overlayType type,QColor color)
+{
+    if(from==NULL || to==NULL)
+        return;
+    switch(type)
+    {
+    case OVERLAY_LINE:
+        myMap->WPLineCreate(to,from,color);
+        break;
+    case OVERLAY_CIRCLE_RIGHT:
+        myMap->WPCircleCreate(to,from,true,color);
+        break;
+    case OVERLAY_CIRCLE_LEFT:
+        myMap->WPCircleCreate(to,from,false,color);
+        break;
+    default:
+        break;
 
+    }
+}
 void modelMapProxy::refreshOverlays()
 {
     myMap->deleteAllOverlays();
+    if(model->rowCount()<1)
+        return;
     WayPointItem * wp_current=NULL;
     WayPointItem * wp_next=NULL;
     int wp_jump;
@@ -137,15 +158,18 @@ void modelMapProxy::refreshOverlays()
     overlayType wp_next_overlay;
     overlayType wp_jump_overlay;
     overlayType wp_error_overlay;
+    wp_current=findWayPointNumber(0);
+    overlayType wp_current_overlay=overlayTranslate(model->data(model->index(0,flightDataModel::MODE)).toInt());
+    createOverlay(wp_current,myMap->Home,wp_current_overlay,Qt::green);
     for(int x=0;x<model->rowCount();++x)
     {
         wp_current=findWayPointNumber(x);
         wp_jump=model->data(model->index(x,flightDataModel::JUMPDESTINATION)).toInt();
         wp_error=model->data(model->index(x,flightDataModel::ERRORDESTINATION)).toInt();
         wp_next_overlay=overlayTranslate(model->data(model->index(x+1,flightDataModel::MODE)).toInt());
-                wp_jump_overlay=overlayTranslate(model->data(model->index(wp_jump,flightDataModel::MODE)).toInt());
-                wp_error_overlay=overlayTranslate(model->data(model->index(wp_error,flightDataModel::MODE)).toInt());
-                createOverlay(wp_current,findWayPointNumber(wp_error),wp_error_overlay,Qt::red);
+        wp_jump_overlay=overlayTranslate(model->data(model->index(wp_jump,flightDataModel::MODE)).toInt());
+        wp_error_overlay=overlayTranslate(model->data(model->index(wp_error,flightDataModel::MODE)).toInt());
+        createOverlay(wp_current,findWayPointNumber(wp_error),wp_error_overlay,Qt::red);
         switch(model->data(model->index(x,flightDataModel::COMMAND)).toInt())
         {
         case ComboBoxDelegate::COMMAND_ONCONDITIONNEXTWAYPOINT:
@@ -234,22 +258,27 @@ void modelMapProxy::on_dataChanged(const QModelIndex &topLeft, const QModelIndex
         distBearing=item->getRelativeCoord();
         index=model->index(x,flightDataModel::BEARELATIVE);
         distBearing.setBearingFromDegrees(index.data(Qt::DisplayRole).toDouble());
+        item->setRelativeCoord(distBearing);
         break;
     case flightDataModel::DISRELATIVE:
         distBearing=item->getRelativeCoord();
         index=model->index(x,flightDataModel::DISRELATIVE);
         distBearing.distance=index.data(Qt::DisplayRole).toDouble();
+        item->setRelativeCoord(distBearing);
         break;
     case flightDataModel::ALTITUDERELATIVE:
         distBearing=item->getRelativeCoord();
         index=model->index(x,flightDataModel::ALTITUDERELATIVE);
         distBearing.altitudeRelative=index.data(Qt::DisplayRole).toFloat();
+        item->setRelativeCoord(distBearing);
         break;
     case flightDataModel::ISRELATIVE:
         index=model->index(x,flightDataModel::ISRELATIVE);
         relative=index.data(Qt::DisplayRole).toBool();
         if(relative)
             item->setWPType(mapcontrol::WayPointItem::relative);
+        else
+            item->setWPType(mapcontrol::WayPointItem::absolute);
         break;
     case flightDataModel::ALTITUDE:
         index=model->index(x,flightDataModel::ALTITUDE);

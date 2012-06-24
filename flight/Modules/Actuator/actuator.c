@@ -82,6 +82,7 @@ float ProcessMixer(const int index, const float curve1, const float curve2,
 		   MixerSettingsData* mixerSettings, ActuatorDesiredData* desired,
 		   const float period);
 
+static uint16_t lastChannelUpdateFreq[ACTUATORSETTINGS_CHANNELUPDATEFREQ_NUMELEM] = {0,0,0,0};
 //this structure is equivalent to the UAVObjects for one mixer.
 typedef struct {
 	uint8_t type;
@@ -553,7 +554,6 @@ static void setFailsafe()
  */
 static void actuator_update_rate(UAVObjEvent * ev)
 {
-	static uint16_t lastChannelUpdateFreq[ACTUATORSETTINGS_CHANNELUPDATEFREQ_NUMELEM] = {0,0,0,0};
 	uint16_t ChannelUpdateFreq[ACTUATORSETTINGS_CHANNELUPDATEFREQ_NUMELEM];
 	// ActuatoSettings are not changed 
 	if ( ev->obj != ActuatorSettingsHandle() )
@@ -563,9 +563,7 @@ static void actuator_update_rate(UAVObjEvent * ev)
 	// check if the any rate setting is changed 	
 	if (lastChannelUpdateFreq[0]!=0 && memcmp(&lastChannelUpdateFreq[0], &ChannelUpdateFreq[0], sizeof(int16_t) * ACTUATORSETTINGS_CHANNELUPDATEFREQ_NUMELEM) ==0)
 		return;
-	// save the new rates 
-	memcpy(lastChannelUpdateFreq, ChannelUpdateFreq, sizeof(int16_t) * ACTUATORSETTINGS_CHANNELUPDATEFREQ_NUMELEM);
-	// signal to the actuator task that ChannelUpdateFreq are changed 
+		// signal to the actuator task that ChannelUpdateFreq are changed 
 	updateRateChanged = 1;	
 }
 /**
@@ -574,7 +572,9 @@ static void actuator_update_rate(UAVObjEvent * ev)
 static void change_update_rate()
 {
 	uint16_t ChannelUpdateFreq[ACTUATORSETTINGS_CHANNELUPDATEFREQ_NUMELEM];
+	// save the new rates 
 	ActuatorSettingsChannelUpdateFreqGet(ChannelUpdateFreq);
+	memcpy(lastChannelUpdateFreq, ChannelUpdateFreq, sizeof(int16_t) * ACTUATORSETTINGS_CHANNELUPDATEFREQ_NUMELEM);
 	PIOS_Servo_SetHz(&ChannelUpdateFreq[0], ACTUATORSETTINGS_CHANNELUPDATEFREQ_NUMELEM);
 }
 

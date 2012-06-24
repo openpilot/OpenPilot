@@ -16,6 +16,7 @@ homeEditor::homeEditor(HomeItem *home, QWidget *parent) :
     ui->altitude->setValue(home->Altitude());
     ui->latitude->setValue(home->Coord().Lat());
     ui->longitude->setValue(home->Coord().Lng());
+    this->show();
 }
 
 homeEditor::~homeEditor()

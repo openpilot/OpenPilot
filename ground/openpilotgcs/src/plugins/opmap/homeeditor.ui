@@ -46,6 +46,9 @@
    </item>
    <item row="2" column="1">
     <widget class="QDoubleSpinBox" name="altitude">
+     <property name="minimum">
+      <double>-999999999.000000000000000</double>
+     </property>
      <property name="maximum">
       <double>999999999.000000000000000</double>
      </property>
@@ -56,6 +59,12 @@
    </item>
    <item row="1" column="1">
     <widget class="QDoubleSpinBox" name="longitude">
+     <property name="decimals">
+      <number>8</number>
+     </property>
+     <property name="minimum">
+      <double>-999999999.000000000000000</double>
+     </property>
      <property name="maximum">
       <double>999999999.000000000000000</double>
      </property>
@@ -77,6 +86,12 @@
        <width>0</width>
        <height>0</height>
       </size>
+     </property>
+     <property name="decimals">
+      <number>8</number>
+     </property>
+     <property name="minimum">
+      <double>-999999999.000000000000000</double>
      </property>
      <property name="maximum">
       <double>999999999.000000000000000</double>

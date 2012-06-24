@@ -267,5 +267,19 @@ extern uint32_t pios_com_telem_usb_id;
 #define PIOS_USB_ENABLED                        1 /* Should remove all references to this */
 #define PIOS_USB_HID_MAX_DEVS                   1
 
+//------------------------
+// PIOS_I2C
+// See also pios_board.c
+//------------------------
+#define PIOS_I2C_MAX_DEVS			1
+extern uint32_t pios_i2c_flexiport_adapter_id;
+#define PIOS_I2C_MAIN_ADAPTER			(pios_i2c_flexiport_adapter_id)
+#define PIOS_I2C_ESC_ADAPTER			(pios_i2c_flexiport_adapter_id)
+#define PIOS_I2C_BMP085_ADAPTER			(pios_i2c_flexiport_adapter_id)
+
+//------------------------
+// PIOS_BMP085
+//------------------------
+#define PIOS_BMP085_OVERSAMPLING                3
 
 #endif /* PIOS_BOARD_H */

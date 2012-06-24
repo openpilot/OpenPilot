@@ -54,8 +54,10 @@ void PIOS_HMC5883_Init(const struct pios_hmc5883_cfg * cfg)
 {
 	dev_cfg = cfg; // store config before enabling interrupt
 
+#ifdef PIOS_HMC5883_HAS_GPIOS
 	PIOS_EXTI_Init(cfg->exti_cfg);
-	
+#endif
+
 	int32_t val = PIOS_HMC5883_Config(cfg);
 	
 	PIOS_Assert(val == 0);

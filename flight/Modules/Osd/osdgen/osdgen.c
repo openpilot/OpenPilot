@@ -2313,7 +2313,7 @@ int32_t osdgenStart(void)
 	// Start gps task
 	vSemaphoreCreateBinary( osdSemaphore);
 	xTaskCreate(osdgenTask, (signed char *)"OSDGEN", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &osdgenTaskHandle);
-	TaskMonitorAdd(TASKINFO_RUNNING_GPS, osdgenTaskHandle);
+	//TaskMonitorAdd(TASKINFO_RUNNING_GPS, osdgenTaskHandle);
 
 	return 0;
 }

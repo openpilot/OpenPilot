@@ -247,6 +247,7 @@ void PIOS_Board_Init(void) {
 	EventDispatcherInitialize();
 	UAVObjInitialize();
 
+	HwSettingsInitialize();
 
 	/* Initialize the alarms library */
 	AlarmsInitialize();
@@ -457,6 +458,58 @@ void PIOS_Board_Init(void) {
 #endif	/* PIOS_INCLUDE_COM_TELEM */
 
 #endif	/* PIOS_INCLUDE_COM */
+
+
+	/* Configure FlexiPort */
+
+/*	uint8_t hwsettings_rv_flexiport;
+	HwSettingsRV_FlexiPortGet(&hwsettings_rv_flexiport);
+
+	switch (hwsettings_rv_flexiport) {
+		case HWSETTINGS_RV_FLEXIPORT_DISABLED:
+			break;
+		case HWSETTINGS_RV_FLEXIPORT_I2C:*/
+#if defined(PIOS_INCLUDE_I2C)
+		{
+			if (PIOS_I2C_Init(&pios_i2c_flexiport_adapter_id, &pios_i2c_flexiport_adapter_cfg)) {
+				PIOS_Assert(0);
+			}
+		}
+#endif	/* PIOS_INCLUDE_I2C */
+/*			break;
+
+		case HWSETTINGS_RV_FLEXIPORT_DSM2:
+		case HWSETTINGS_RV_FLEXIPORT_DSMX10BIT:
+		case HWSETTINGS_RV_FLEXIPORT_DSMX11BIT:
+		{
+			enum pios_dsm_proto proto;
+			switch (hwsettings_rv_flexiport) {
+				case HWSETTINGS_RV_FLEXIPORT_DSM2:
+					proto = PIOS_DSM_PROTO_DSM2;
+					break;
+				case HWSETTINGS_RV_FLEXIPORT_DSMX10BIT:
+					proto = PIOS_DSM_PROTO_DSMX10BIT;
+					break;
+				case HWSETTINGS_RV_FLEXIPORT_DSMX11BIT:
+					proto = PIOS_DSM_PROTO_DSMX11BIT;
+					break;
+				default:
+					PIOS_Assert(0);
+					break;
+			}
+			//TODO: Define the various Channelgroup for Revo dsm inputs and handle here
+			PIOS_Board_configure_dsm(&pios_usart_dsm_flexi_cfg, &pios_dsm_flexi_cfg,
+											 &pios_usart_com_driver, &proto, MANUALCONTROLSETTINGS_CHANNELGROUPS_DSMMAINPORT,&hwsettings_DSMxBind);
+		}
+			break;
+		case HWSETTINGS_RV_FLEXIPORT_COMAUX:
+			PIOS_Board_configure_com(&pios_usart_flexi_cfg, PIOS_COM_AUX_RX_BUF_LEN, PIOS_COM_AUX_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_aux_id);
+			break;
+		case HWSETTINGS_RV_FLEXIPORT_COMBRIDGE:
+			PIOS_Board_configure_com(&pios_usart_flexi_cfg, PIOS_COM_BRIDGE_RX_BUF_LEN, PIOS_COM_BRIDGE_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_bridge_id);
+			break;
+	}*/
+		/* hwsettings_rv_flexiport */
 
 
 #if 1

@@ -36,10 +36,17 @@ private slots:
 
         void on_tbDetails_clicked();
 
+        void on_tbSendToUAV_clicked();
+
+        void on_tbFetchFromUAV_clicked();
+
 private:
     Ui::testTable *ui;
     opmap_edit_waypoint_dialog * wid;
     flightDataModel * myModel;
+signals:
+    void sendPathPlanToUAV();
+    void receivePathPlanFromUAV();
 };
 
 #endif // TESTTABLE_H

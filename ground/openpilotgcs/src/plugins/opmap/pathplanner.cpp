@@ -91,3 +91,13 @@ void pathPlanner::on_tbDetails_clicked()
     if(wid)
        wid->show();
 }
+
+void pathPlanner::on_tbSendToUAV_clicked()
+{
+    emit sendPathPlanToUAV();
+}
+
+void pathPlanner::on_tbFetchFromUAV_clicked()
+{
+    emit receivePathPlanFromUAV();
+}

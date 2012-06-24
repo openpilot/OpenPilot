@@ -141,8 +141,8 @@ void PIOS_BMP085_Init(void)
 
 	/* Read all 22 bytes of calibration data in one transfer, this is a very optimized way of doing things */
 	uint8_t Data[BMP085_CALIB_LEN];
-	while (!PIOS_BMP085_Read(BMP085_CALIB_ADDR, Data, BMP085_CALIB_LEN))
-		continue;
+	PIOS_BMP085_Read(BMP085_CALIB_ADDR, Data, BMP085_CALIB_LEN);
+	//	continue;
 
 	/* Parameters AC1-AC6 */
 	CalibData.AC1 = (Data[0] << 8) | Data[1];
@@ -171,10 +171,10 @@ void PIOS_BMP085_StartADC(ConversionTypeTypeDef Type)
 {
 	/* Start the conversion */
 	if (Type == TemperatureConv) {
-		while (!PIOS_BMP085_Write(BMP085_CTRL_ADDR, BMP085_TEMP_ADDR))
+		while (PIOS_BMP085_Write(BMP085_CTRL_ADDR, BMP085_TEMP_ADDR) != 0)
 			continue;
 	} else if (Type == PressureConv) {
-		while (!PIOS_BMP085_Write(BMP085_CTRL_ADDR, BMP085_PRES_ADDR))
+		while (PIOS_BMP085_Write(BMP085_CTRL_ADDR, BMP085_PRES_ADDR) != 0)
 			continue;
 	}
 
@@ -196,8 +196,8 @@ void PIOS_BMP085_ReadADC(void)
 	/* Read and store the 16bit result */
 	if (CurrentRead == TemperatureConv) {
 		/* Read the temperature conversion */
-		while (!PIOS_BMP085_Read(BMP085_ADC_MSB, Data, 2))
-			continue;
+		PIOS_BMP085_Read(BMP085_ADC_MSB, Data, 2);
+		//	continue;
 		RawTemperature = ((Data[0] << 8) | Data[1]);
 
 		X1 = (RawTemperature - CalibData.AC6) * CalibData.AC5 >> 15;
@@ -206,8 +206,8 @@ void PIOS_BMP085_ReadADC(void)
 		Temperature = (B5 + 8) >> 4;
 	} else {
 		/* Read the pressure conversion */
-		while (!PIOS_BMP085_Read(BMP085_ADC_MSB, Data, 3))
-			continue;
+		PIOS_BMP085_Read(BMP085_ADC_MSB, Data, 3);
+		//	continue;
 		RawPressure = ((Data[0] << 16) | (Data[1] << 8) | Data[2]) >> (8 - BMP085_OVERSAMPLING);
 
 		B6 = B5 - 4000;

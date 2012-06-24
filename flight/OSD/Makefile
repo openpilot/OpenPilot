@@ -48,10 +48,53 @@ endif
 
 FLASH_TOOL = OPENOCD
 
-# List of modules to include
-MODULES = Osd/osdgen GPS
+# Optional module and driver defaults
+USE_CAMERASTAB ?= NO
+USE_COMUSBBRIDGE ?= NO
+USE_GPS ?= NO
+USE_TXPID ?= NO
+USE_I2C ?= NO
+USE_ALTITUDE ?= NO
+TEST_FAULTS ?= NO
+USE_MAGBARO ?= NO
 
+# List of optional modules to include
+OPTMODULES =
+ifeq ($(USE_CAMERASTAB), YES)
+OPTMODULES += CameraStab
+endif
+ifeq ($(USE_COMUSBBRIDGE), YES)
+OPTMODULES += ComUsbBridge
+endif
+ifeq ($(USE_GPS), YES)
+OPTMODULES += GPS
+endif
+ifeq ($(USE_TXPID), YES)
+OPTMODULES += TxPID
+endif
+ifeq ($(USE_ALTITUDE), YES)
+ifeq ($(USE_I2C), YES)
+OPTMODULES += Altitude
+else
+$(error "Altitude module (USE_ALTITUDE=YES) requires i2c (USE_I2C=YES)")
+endif
+endif
+ifeq ($(TEST_FAULTS), YES)
+OPTMODULES += Fault
+endif
+ifeq ($(USE_MAGBARO), YES)
+ifeq ($(USE_I2C), YES)
+OPTMODULES += Extensions/MagBaro
+else
+$(error "MagBaro module (USE_MAGBARO=YES) requires i2c (USE_I2C=YES)")
+endif
+endif
+
+# List of mandatory modules to include
+MODULES = Osd/osdgen
+MODULES += GPS
 MODULES += Osd/osdinput
+MODULES += Extensions/MagBaro
 MODULES += Telemetry
 MODULES += FirmwareIAP
 
@@ -94,6 +137,7 @@ OPUAVSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
 # use file-extension c for "c-only"-files
 
 ## MODULES
+SRC += ${foreach MOD, ${OPTMODULES}, ${wildcard ${OPMODULEDIR}/${MOD}/*.c}}
 SRC += ${foreach MOD, ${MODULES}, ${wildcard ${OPMODULEDIR}/${MOD}/*.c}}
 ## OPENPILOT CORE:
 SRC += ${OPMODULEDIR}/System/systemmod.c
@@ -135,8 +179,8 @@ SRC += $(OPUAVSYNTHDIR)/systemsettings.c
 #SRC += $(OPUAVSYNTHDIR)/attituderaw.c
 SRC += $(OPUAVSYNTHDIR)/attitudeactual.c
 #SRC += $(OPUAVSYNTHDIR)/manualcontrolcommand.c
-#SRC += $(OPUAVSYNTHDIR)/i2cstats.c
-#S#RC += $(OPUAVSYNTHDIR)/watchdogstatus.c
+SRC += $(OPUAVSYNTHDIR)/i2cstats.c
+SRC += $(OPUAVSYNTHDIR)/watchdogstatus.c
 #SRC += $(OPUAVSYNTHDIR)/telemetrysettings.c
 #SRC += $(OPUAVSYNTHDIR)/manualcontrolsettings.c
 #SRC += $(OPUAVSYNTHDIR)/mixersettings.c
@@ -157,10 +201,13 @@ SRC += $(OPUAVSYNTHDIR)/gpssettings.c
 SRC += $(OPUAVSYNTHDIR)/gpsvelocity.c
 SRC += $(OPUAVSYNTHDIR)/gpstime.c
 SRC += $(OPUAVSYNTHDIR)/osdsettings.c
+SRC += $(OPUAVSYNTHDIR)/baroaltitude.c
+SRC += $(OPUAVSYNTHDIR)/magnetometer.c
 
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_com.c
-#SRC += $(PIOSCOMMON)/pios_hmc5843.c
+SRC += $(PIOSCOMMON)/pios_bmp085.c
+SRC += $(PIOSCOMMON)/pios_hmc5883.c
 #SRC += $(PIOSCOMMON)/printf-stdarg.c
 SRC += $(PIOSCOMMON)/printf2.c
 SRC += $(PIOSCOMMON)/pios_crc.c
@@ -228,7 +275,7 @@ EXTRAINCDIRS  += $(OPUAVSYNTHDIR)
 EXTRAINCDIRS  += $(BOOTINC)
 EXTRAINCDIRS  += $(HWDEFSINC)
 
-EXTRAINCDIRS += ${foreach MOD, ${MODULES}, ${OPMODULEDIR}/${MOD}/inc} ${OPMODULEDIR}/System/inc
+EXTRAINCDIRS += ${foreach MOD, ${OPTMODULES} ${MODULES}, ${OPMODULEDIR}/${MOD}/inc} ${OPMODULEDIR}/System/inc
 
 # List any extra directories to look for library files here.
 # Also add directories where the linker should search for
@@ -266,8 +313,8 @@ endif
 CFLAGS += $(ARCHFLAGS)
 
 
-#CFLAGS += -DDIAGNOSTICS
-#CFLAGS += -DDIAG_TASKS
+CFLAGS += -DDIAGNOSTICS
+CFLAGS += -DDIAG_TASKS
 
 # This is not the best place for these.  Really should abstract out
 # to the board file or something
@@ -291,6 +338,9 @@ CDEFS += -DHSE_VALUE=$(OSCILLATOR_FREQ)
 CDEFS += -DSYSCLK_FREQ=$(SYSCLK_FREQ)
 CDEFS += -DUSE_STDPERIPH_DRIVER
 CDEFS += -DUSE_$(BOARD)
+
+# Declare all non-optional modules as built-in to force inclusion
+CDEFS += $(foreach MOD, $(notdir $(MODULES)), -DMODULE_$(MOD)_BUILTIN)
 
 # Place project-specific -D and/or -U options for
 # Assembler with preprocessor here.

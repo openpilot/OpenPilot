@@ -33,7 +33,6 @@
 #include "opmapgadgetconfiguration.h"
 
 class IUAVGadget;
-//class QList<int>;
 class QWidget;
 class QString;
 class OPMapGadgetWidget;

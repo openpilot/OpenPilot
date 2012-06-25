@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       pathplanmanager.cpp
+ * @file       modelmapproxy.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
@@ -35,15 +35,6 @@ modelMapProxy::modelMapProxy(QObject *parent,OPMapWidget *map,flightDataModel * 
     connect(model,SIGNAL(dataChanged(QModelIndex,QModelIndex)),this,SLOT(on_dataChanged(QModelIndex,QModelIndex)));
     connect(myMap,SIGNAL(selectedWPChanged(QList<WayPointItem*>)),this,SLOT(on_selectedWPChanged(QList<WayPointItem*>)));
     connect(myMap,SIGNAL(WPValuesChanged(WayPointItem*)),this,SLOT(on_WPValuesChanged(WayPointItem*)));
-}
-
-void modelMapProxy::on_WPDeleted(int wp_numberint,WayPointItem * wp)
-{
-}
-
-void modelMapProxy::on_WPInserted(int wp_number, WayPointItem * wp)
-{
-
 }
 
 void modelMapProxy::on_WPValuesChanged(WayPointItem * wp)
@@ -87,18 +78,18 @@ modelMapProxy::overlayType modelMapProxy::overlayTranslate(int type)
 {
     switch(type)
     {
-    case ComboBoxDelegate::MODE_FLYENDPOINT:
-    case ComboBoxDelegate::MODE_FLYVECTOR:
-    case ComboBoxDelegate::MODE_DRIVEENDPOINT:
-    case ComboBoxDelegate::MODE_DRIVEVECTOR:
+    case mapDataDelegate::MODE_FLYENDPOINT:
+    case mapDataDelegate::MODE_FLYVECTOR:
+    case mapDataDelegate::MODE_DRIVEENDPOINT:
+    case mapDataDelegate::MODE_DRIVEVECTOR:
        return OVERLAY_LINE;
         break;
-    case ComboBoxDelegate::MODE_FLYCIRCLERIGHT:
-    case ComboBoxDelegate::MODE_DRIVECIRCLERIGHT:
+    case mapDataDelegate::MODE_FLYCIRCLERIGHT:
+    case mapDataDelegate::MODE_DRIVECIRCLERIGHT:
         return OVERLAY_CIRCLE_RIGHT;
          break;
-    case ComboBoxDelegate::MODE_FLYCIRCLELEFT:
-    case ComboBoxDelegate::MODE_DRIVECIRCLELEFT:
+    case mapDataDelegate::MODE_FLYCIRCLELEFT:
+    case mapDataDelegate::MODE_DRIVECIRCLELEFT:
         return OVERLAY_CIRCLE_LEFT;
         break;
     default:
@@ -172,23 +163,23 @@ void modelMapProxy::refreshOverlays()
         createOverlay(wp_current,findWayPointNumber(wp_error),wp_error_overlay,Qt::red);
         switch(model->data(model->index(x,flightDataModel::COMMAND)).toInt())
         {
-        case ComboBoxDelegate::COMMAND_ONCONDITIONNEXTWAYPOINT:
+        case mapDataDelegate::COMMAND_ONCONDITIONNEXTWAYPOINT:
             wp_next=findWayPointNumber(x+1);
             createOverlay(wp_current,wp_next,wp_next_overlay,Qt::green);
             break;
-        case ComboBoxDelegate::COMMAND_ONCONDITIONJUMPWAYPOINT:
+        case mapDataDelegate::COMMAND_ONCONDITIONJUMPWAYPOINT:
             wp_next=findWayPointNumber(wp_jump);
             createOverlay(wp_current,wp_next,wp_jump_overlay,Qt::green);
             break;
-        case ComboBoxDelegate::COMMAND_ONNOTCONDITIONJUMPWAYPOINT:
+        case mapDataDelegate::COMMAND_ONNOTCONDITIONJUMPWAYPOINT:
             wp_next=findWayPointNumber(wp_jump);
             createOverlay(wp_current,wp_next,wp_jump_overlay,Qt::yellow);
             break;
-        case ComboBoxDelegate::COMMAND_ONNOTCONDITIONNEXTWAYPOINT:
+        case mapDataDelegate::COMMAND_ONNOTCONDITIONNEXTWAYPOINT:
             wp_next=findWayPointNumber(x+1);
             createOverlay(wp_current,wp_next,wp_next_overlay,Qt::yellow);
             break;
-        case ComboBoxDelegate::COMMAND_IFCONDITIONJUMPWAYPOINTELSENEXTWAYPOINT:
+        case mapDataDelegate::COMMAND_IFCONDITIONJUMPWAYPOINTELSENEXTWAYPOINT:
             wp_next=findWayPointNumber(wp_jump);
             createOverlay(wp_current,wp_next,wp_jump_overlay,Qt::green);
             wp_next=findWayPointNumber(x+1);
@@ -207,8 +198,6 @@ WayPointItem * modelMapProxy::findWayPointNumber(int number)
 
 void modelMapProxy::on_rowsRemoved(const QModelIndex &parent, int first, int last)
 {
-    qDebug()<<"modelMapProxy::on_rowsRemoved"<<"first"<<first<<"last"<<last;
-
     for(int x=last;x>first-1;x--)
     {
         myMap->WPDelete(x);

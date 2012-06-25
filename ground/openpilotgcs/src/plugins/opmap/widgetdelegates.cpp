@@ -1,8 +1,34 @@
+/**
+ ******************************************************************************
+ *
+ * @file       widgetdelegates.cpp
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @addtogroup GCSPlugins GCS Plugins
+ * @{
+ * @addtogroup OPMapPlugin OpenPilot Map Plugin
+ * @{
+ * @brief The OpenPilot Map plugin
+ *****************************************************************************/
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
 #include "widgetdelegates.h"
 #include <QComboBox>
 #include <QRadioButton>
 #include <QDebug>
-QWidget *ComboBoxDelegate::createEditor(QWidget *parent,
+QWidget *mapDataDelegate::createEditor(QWidget *parent,
                                         const QStyleOptionViewItem & option,
                                         const QModelIndex & index) const
 {
@@ -12,18 +38,18 @@ QWidget *ComboBoxDelegate::createEditor(QWidget *parent,
     {
     case flightDataModel::MODE:
         box=new QComboBox(parent);
-        ComboBoxDelegate::loadComboBox(box,flightDataModel::MODE);
+        mapDataDelegate::loadComboBox(box,flightDataModel::MODE);
         return box;
         break;
     case flightDataModel::CONDITION:
         box=new QComboBox(parent);
-        ComboBoxDelegate::loadComboBox(box,flightDataModel::CONDITION);
+        mapDataDelegate::loadComboBox(box,flightDataModel::CONDITION);
         return box;
         break;
 
     case flightDataModel::COMMAND:
         box=new QComboBox(parent);
-        ComboBoxDelegate::loadComboBox(box,flightDataModel::COMMAND);
+        mapDataDelegate::loadComboBox(box,flightDataModel::COMMAND);
         return box;
         break;
     default:
@@ -35,7 +61,7 @@ QWidget *ComboBoxDelegate::createEditor(QWidget *parent,
     return editor;
 }
 
-void ComboBoxDelegate::setEditorData(QWidget *editor,
+void mapDataDelegate::setEditorData(QWidget *editor,
                                      const QModelIndex &index) const
 {
     QString className=editor->metaObject()->className();
@@ -46,16 +72,11 @@ void ComboBoxDelegate::setEditorData(QWidget *editor,
         qDebug()<<"VALUE="<<x;
         comboBox->setCurrentIndex(x);
     }
-  /*  else if (className.contains("QRadioButton")) {
-        bool value = index.model()->data(index, Qt::EditRole).toBool();
-        QRadioButton *radioButton = static_cast<QRadioButton*>(editor);
-        radioButton->setChecked(value);
-    }*/
     else
         QItemDelegate::setEditorData(editor, index);
 }
 
-void ComboBoxDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
+void mapDataDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
                                     const QModelIndex &index) const
 {
     QString className=editor->metaObject()->className();
@@ -63,23 +84,18 @@ void ComboBoxDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
         QComboBox *comboBox = static_cast<QComboBox*>(editor);
         int value = comboBox->itemData(comboBox->currentIndex()).toInt();
         model->setData(index, value, Qt::EditRole);
-    }/*
-    else if (className.contains("QRadioButton")) {
-        QRadioButton *radioButton = static_cast<QRadioButton*>(editor);
-        bool value = radioButton->isChecked();
-        model->setData(index, value, Qt::EditRole);
-    }*/
+    }
     else
         QItemDelegate::setModelData(editor,model,index);
 }
 
-void ComboBoxDelegate::updateEditorGeometry(QWidget *editor,
+void mapDataDelegate::updateEditorGeometry(QWidget *editor,
                                             const QStyleOptionViewItem &option, const QModelIndex &/* index */) const
 {
     editor->setGeometry(option.rect);
 }
 
-void ComboBoxDelegate::loadComboBox(QComboBox *combo, flightDataModel::pathPlanDataEnum type)
+void mapDataDelegate::loadComboBox(QComboBox *combo, flightDataModel::pathPlanDataEnum type)
 {
     switch(type)
     {
@@ -119,15 +135,7 @@ void ComboBoxDelegate::loadComboBox(QComboBox *combo, flightDataModel::pathPlanD
         break;
     }
 }
-/*
-void ComboBoxDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
-{
-    QStyleOptionComboBox opt;
-    opt.rect=option.rect;
-    QApplication::style()->drawComplexControl(QStyle::CC_ComboBox, &opt,
-    painter,createEditor(this,option,index));
-}*/
 
-ComboBoxDelegate::ComboBoxDelegate(QObject *parent):QItemDelegate(parent)
+mapDataDelegate::mapDataDelegate(QObject *parent):QItemDelegate(parent)
 {
 }

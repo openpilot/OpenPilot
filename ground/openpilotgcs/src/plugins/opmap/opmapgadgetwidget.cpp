@@ -289,17 +289,17 @@ OPMapGadgetWidget::~OPMapGadgetWidget()
 		delete m_map;
 		m_map = NULL;
 	}
-    if(model)
+    if(!model.isNull())
         delete model;
-    if(table)
+    if(!table.isNull())
         delete table;
-    if(selectionModel)
+    if(!selectionModel.isNull())
         delete selectionModel;
-    if(mapProxy)
+    if(!mapProxy.isNull())
         delete mapProxy;
-    if(waypoint_edit_dialog)
+    if(!waypoint_edit_dialog.isNull())
         delete waypoint_edit_dialog;
-    if(UAVProxy)
+    if(!UAVProxy.isNull())
         delete UAVProxy;
 }
 
@@ -625,9 +625,6 @@ void OPMapGadgetWidget::updateMousePos()
     // find out if we are over the home position
     mapcontrol::HomeItem *home = qgraphicsitem_cast<mapcontrol::HomeItem *>(item);
 
-    // find out if we are over the UAV
-    mapcontrol::UAVItem *uav = qgraphicsitem_cast<mapcontrol::UAVItem *>(item);
-
     // find out if we have a waypoint under the mouse cursor
     mapcontrol::WayPointItem *wp = qgraphicsitem_cast<mapcontrol::WayPointItem *>(item);
 
@@ -657,19 +654,6 @@ void OPMapGadgetWidget::updateMousePos()
 		double bear = bearing(home_lat_lon, m_mouse_lat_lon);
         s += "  " + QString::number(dist * 1000, 'f', 1) + "m";
         s += "  " + QString::number(bear, 'f', 1) + "deg";
-    }
-    else
-    if (uav)
-    {
-        s += "  uav";
-
-        double latitude;
-        double longitude;
-        double altitude;
-		if (getUAVPosition(latitude, longitude, altitude))  // get current UAV position
-        {
-            internals::PointLatLng uav_pos = internals::PointLatLng(latitude, longitude);
-        }
     }
     m_widget->labelMousePos->setText(s);
 }
@@ -1459,10 +1443,6 @@ void OPMapGadgetWidget::createActions()
         uavTrailDistance_act->setData(uav_trail_distance);
         uavTrailDistanceAct.append(uavTrailDistance_act);
     }
-
-    // *****
-
-    // ***********************
 }
 
 void OPMapGadgetWidget::onReloadAct_triggered()

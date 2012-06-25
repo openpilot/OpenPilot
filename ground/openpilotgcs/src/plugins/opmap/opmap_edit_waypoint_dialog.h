@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       opmap_edit_waypoint_dialog.cpp
+ * @file       opmap_edit_waypoint_dialog.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
@@ -51,12 +51,9 @@ public:
     */
     void editWaypoint(mapcontrol::WayPointItem *waypoint_item);
 
-    void loadFromWP(mapcontrol::WayPointItem *waypoint_item);
-
 private:
     Ui::opmap_edit_waypoint_dialog *ui;
     mapcontrol::WayPointItem * my_waypoint;
-    int saveSettings();
     QDataWidgetMapper *mapper;
     QAbstractItemModel * model;
     QItemSelectionModel * itemSelection;
@@ -68,8 +65,6 @@ private slots:
     void setupPositionWidgets(bool isRelative);
     void setupConditionWidgets();
     void on_pushButtonCancel_clicked();
-    void on_pushButtonRevert_clicked();
-    void on_pushButtonApply_clicked();
     void on_pushButtonOK_clicked();
     void on_pushButton_clicked();
     void on_pushButton_2_clicked();

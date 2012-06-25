@@ -1,3 +1,30 @@
+/**
+ ******************************************************************************
+ *
+ * @file       flightdatamodel.cpp
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @addtogroup GCSPlugins GCS Plugins
+ * @{
+ * @addtogroup OPMapPlugin OpenPilot Map Plugin
+ * @{
+ * @brief The OpenPilot Map plugin
+ *****************************************************************************/
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
+
 #include "flightdatamodel.h"
 #include <QMessageBox>
 #include <QDomDocument>
@@ -517,7 +544,6 @@ void flightDataModel::readFromFile(QString fileName)
     removeRows(0,rowCount());
     QFile file(fileName);
     QDomDocument doc("PathPlan");
-    qDebug()<<"FILE OPEN"<<file.open(QFile::ReadOnly|QFile::Text);
     if (!doc.setContent(file.readAll())) {
         QMessageBox msgBox;
         msgBox.setText(tr("File Parsing Failed."));
@@ -544,13 +570,11 @@ void flightDataModel::readFromFile(QString fileName)
     while (!node.isNull()) {
         QDomElement e = node.toElement();
         if (e.tagName() == "waypoint") {
-            qDebug()<<"waypoint number"<<e.attribute("number");
             QDomNode fieldNode=e.firstChild();
             data=new pathPlanData;
             while (!fieldNode.isNull()) {
                 QDomElement field = fieldNode.toElement();
                 if (field.tagName() == "field") {
-                    qDebug()<<field.attribute("name");
                     if(field.attribute("name")=="altitude")
                         data->altitude=field.attribute("value").toDouble();
                     else if(field.attribute("name")=="description")
@@ -602,7 +626,6 @@ void flightDataModel::readFromFile(QString fileName)
 
                 }
                 fieldNode=fieldNode.nextSibling();
-                qDebug()<<"field node is null"<<fieldNode.isNull();
             }
         beginInsertRows(QModelIndex(),dataStorage.length(),dataStorage.length());
         dataStorage.append(data);

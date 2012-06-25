@@ -208,58 +208,30 @@ private slots:
     void on_tbFind_clicked();
     void onHomeDoubleClick(HomeItem*);
 private:
-
-	// *****
-
 	int m_min_zoom;
 	int m_max_zoom;
-
     double m_heading;	// uav heading
-
 	internals::PointLatLng m_mouse_lat_lon;
 	internals::PointLatLng m_context_menu_lat_lon;
-
 	int m_prev_tile_number;
-
     opMapModeType m_map_mode;
-
 	int m_maxUpdateRate;
-
 	t_home m_home_position;
-
 	QStringList findPlaceWordList;
     QCompleter *findPlaceCompleter;
-
     QTimer *m_updateTimer;
     QTimer *m_statusUpdateTimer;
-
     Ui::OPMap_Widget *m_widget;
-
     mapcontrol::OPMapWidget *m_map;
-
 	ExtensionSystem::PluginManager *pm;
 	UAVObjectManager *obm;
 	UAVObjectUtilManager *obum;
-
-
-    opmap_edit_waypoint_dialog * waypoint_edit_dialog;
-
+    QPointer<opmap_edit_waypoint_dialog> waypoint_edit_dialog;
     QStandardItemModel wayPoint_treeView_model;
-
     mapcontrol::WayPointItem *m_mouse_waypoint;
-
-    modelUavoProxy * UAVProxy;
-
-
-
+    QPointer<modelUavoProxy> UAVProxy;
     QMutex m_map_mutex;
-
 	bool m_telemetry_connected;
-
-	// *****
-
-    void createActions();
-
     QAction *closeAct1;
     QAction *closeAct2;
     QAction *reloadAct;
@@ -314,15 +286,11 @@ private:
 	QActionGroup *maxUpdateRateActGroup;
 	QList<QAction *> maxUpdateRateAct;
 
-	// *****
-
+    void createActions();
 	void homeMagicWaypoint();
-
     void moveToMagicWaypointPosition();
-
     void hideMagicWaypointControls();
     void showMagicWaypointControls();
-
     void keepMagicWaypointWithInSafeArea();
 
     double distance(internals::PointLatLng from, internals::PointLatLng to);
@@ -340,10 +308,10 @@ private:
     internals::PointLatLng lastLatLngMouse;
     WayPointItem * magicWayPoint;
 
-    flightDataModel * model;
-    pathPlanner * table;
-    modelMapProxy * mapProxy;
-    QItemSelectionModel * selectionModel;
+    QPointer<flightDataModel> model;
+    QPointer<pathPlanner> table;
+    QPointer<modelMapProxy> mapProxy;
+    QPointer<QItemSelectionModel> selectionModel;
 };
 
 #endif /* OPMAP_GADGETWIDGET_H_ */

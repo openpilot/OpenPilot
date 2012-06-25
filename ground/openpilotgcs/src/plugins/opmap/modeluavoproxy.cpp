@@ -1,3 +1,29 @@
+/**
+ ******************************************************************************
+ *
+ * @file       modeluavproxy.cpp
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @addtogroup GCSPlugins GCS Plugins
+ * @{
+ * @addtogroup OPMapPlugin OpenPilot Map Plugin
+ * @{
+ * @brief The OpenPilot Map plugin
+ *****************************************************************************/
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
 #include "modeluavoproxy.h"
 #include "extensionsystem/pluginmanager.h"
 #include <math.h>
@@ -11,32 +37,7 @@ modelUavoProxy::modelUavoProxy(QObject *parent,flightDataModel * model):QObject(
     Q_ASSERT(waypointObj != NULL);
     pathactionObj=PathAction::GetInstance(objManager);
     Q_ASSERT(pathactionObj != NULL);
-
-    /*
-    int instances=objManager->getNumInstances(pathactionObj->getObjID());
-    PathAction * actionObj=new PathAction;
-    actionObj->initialize(instances,actionObj->getMetaObject());
-    objManager->registerObject(actionObj);
-    actionObj->updated();
-
-    instances=objManager->getNumInstances(pathactionObj->getObjID());
-    actionObj=new PathAction;
-    actionObj->initialize(instances,actionObj->getMetaObject());
-    objManager->registerObject(actionObj);
-    actionObj->updated();
-
-    instances=objManager->getNumInstances(pathactionObj->getObjID());
-    actionObj=new PathAction;
-    actionObj->initialize(instances,actionObj->getMetaObject());
-    objManager->registerObject(actionObj);
-    actionObj->updated();
-    */
 }
-/*WPDESCRITPTION,LATPOSITION,LNGPOSITION,DISRELATIVE,BEARELATIVE,ISRELATIVE,ALTITUDE,
-            VELOCITY,MODE,MODE_PARAMS0,MODE_PARAMS1,MODE_PARAMS2,MODE_PARAMS3,
-            CONDITION,CONDITION_PARAMS0,CONDITION_PARAMS1,CONDITION_PARAMS2,CONDITION_PARAMS3,
-            COMMAND,JUMPDESTINATION,ERRORDESTINATION,LOCKED
-            */
 void modelUavoProxy::modelToObjects()
 {
     PathAction * act=NULL;

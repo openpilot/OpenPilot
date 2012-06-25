@@ -49,12 +49,12 @@ public:
     void deleteWayPoint(int number);
     void deleteAll();
 private slots:
-    void on_dataChanged ( const QModelIndex & topLeft, const QModelIndex & bottomRight );
-    void on_rowsInserted ( const QModelIndex & parent, int first, int last );
-    void on_rowsRemoved ( const QModelIndex & parent, int first, int last );
-    void on_WPValuesChanged(WayPointItem *wp);
-    void on_currentRowChanged(QModelIndex,QModelIndex);
-    void on_selectedWPChanged(QList<WayPointItem*>);
+    void dataChanged ( const QModelIndex & topLeft, const QModelIndex & bottomRight );
+    void rowsInserted ( const QModelIndex & parent, int first, int last );
+    void rowsRemoved ( const QModelIndex & parent, int first, int last );
+    void WPValuesChanged(WayPointItem *wp);
+    void currentRowChanged(QModelIndex,QModelIndex);
+    void selectedWPChanged(QList<WayPointItem*>);
 private:
     overlayType overlayTranslate(int type);
     void createOverlay(WayPointItem * from,WayPointItem * to,overlayType type,QColor color);

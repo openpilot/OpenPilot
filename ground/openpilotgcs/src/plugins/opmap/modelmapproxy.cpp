@@ -29,15 +29,15 @@
 
 modelMapProxy::modelMapProxy(QObject *parent,OPMapWidget *map,flightDataModel * model,QItemSelectionModel * selectionModel):QObject(parent),myMap(map),model(model),selection(selectionModel)
 {
-    connect(model,SIGNAL(rowsInserted(const QModelIndex&,int,int)),this,SLOT(on_rowsInserted(const QModelIndex&,int,int)));
-    connect(model,SIGNAL(rowsRemoved(const QModelIndex&,int,int)),this,SLOT(on_rowsRemoved(const QModelIndex&,int,int)));
-    connect(selection,SIGNAL(currentRowChanged(QModelIndex,QModelIndex)),this,SLOT(on_currentRowChanged(QModelIndex,QModelIndex)));
-    connect(model,SIGNAL(dataChanged(QModelIndex,QModelIndex)),this,SLOT(on_dataChanged(QModelIndex,QModelIndex)));
-    connect(myMap,SIGNAL(selectedWPChanged(QList<WayPointItem*>)),this,SLOT(on_selectedWPChanged(QList<WayPointItem*>)));
-    connect(myMap,SIGNAL(WPValuesChanged(WayPointItem*)),this,SLOT(on_WPValuesChanged(WayPointItem*)));
+    connect(model,SIGNAL(rowsInserted(const QModelIndex&,int,int)),this,SLOT(rowsInserted(const QModelIndex&,int,int)));
+    connect(model,SIGNAL(rowsRemoved(const QModelIndex&,int,int)),this,SLOT(rowsRemoved(const QModelIndex&,int,int)));
+    connect(selection,SIGNAL(currentRowChanged(QModelIndex,QModelIndex)),this,SLOT(currentRowChanged(QModelIndex,QModelIndex)));
+    connect(model,SIGNAL(dataChanged(QModelIndex,QModelIndex)),this,SLOT(dataChanged(QModelIndex,QModelIndex)));
+    connect(myMap,SIGNAL(selectedWPChanged(QList<WayPointItem*>)),this,SLOT(selectedWPChanged(QList<WayPointItem*>)));
+    connect(myMap,SIGNAL(WPValuesChanged(WayPointItem*)),this,SLOT(WPValuesChanged(WayPointItem*)));
 }
 
-void modelMapProxy::on_WPValuesChanged(WayPointItem * wp)
+void modelMapProxy::WPValuesChanged(WayPointItem * wp)
 {
     QModelIndex index;
     index=model->index(wp->Number(),flightDataModel::LATPOSITION);
@@ -54,7 +54,7 @@ void modelMapProxy::on_WPValuesChanged(WayPointItem * wp)
     model->setData(index,wp->getRelativeCoord().altitudeRelative,Qt::EditRole);
 }
 
-void modelMapProxy::on_currentRowChanged(QModelIndex current, QModelIndex previous)
+void modelMapProxy::currentRowChanged(QModelIndex current, QModelIndex previous)
 {
     QList<WayPointItem*> list;
     WayPointItem * wp=findWayPointNumber(current.row());
@@ -64,7 +64,7 @@ void modelMapProxy::on_currentRowChanged(QModelIndex current, QModelIndex previo
     myMap->setSelectedWP(list);
 }
 
-void modelMapProxy::on_selectedWPChanged(QList<WayPointItem *> list)
+void modelMapProxy::selectedWPChanged(QList<WayPointItem *> list)
 {
     selection->clearSelection();
     foreach(WayPointItem * wp,list)
@@ -196,7 +196,7 @@ WayPointItem * modelMapProxy::findWayPointNumber(int number)
     return myMap->WPFind(number);
 }
 
-void modelMapProxy::on_rowsRemoved(const QModelIndex &parent, int first, int last)
+void modelMapProxy::rowsRemoved(const QModelIndex &parent, int first, int last)
 {
     for(int x=last;x>first-1;x--)
     {
@@ -205,7 +205,7 @@ void modelMapProxy::on_rowsRemoved(const QModelIndex &parent, int first, int las
     refreshOverlays();
 }
 
-void modelMapProxy::on_dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
+void modelMapProxy::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
 {
     WayPointItem * item=findWayPointNumber(topLeft.row());
     if(!item)
@@ -281,7 +281,7 @@ void modelMapProxy::on_dataChanged(const QModelIndex &topLeft, const QModelIndex
     }
 }
 
-void modelMapProxy::on_rowsInserted(const QModelIndex &parent, int first, int last)
+void modelMapProxy::rowsInserted(const QModelIndex &parent, int first, int last)
 {
     Q_UNUSED(parent);
     for(int x=first;x<last+1;x++)

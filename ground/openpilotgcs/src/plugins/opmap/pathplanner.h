@@ -45,7 +45,7 @@ public:
     
     void setModel(flightDataModel *model,QItemSelectionModel *selection);
 private slots:
-        void on_rowsInserted ( const QModelIndex & parent, int start, int end );
+        void rowsInserted ( const QModelIndex & parent, int start, int end );
 
         void on_tbAdd_clicked();
 
@@ -56,10 +56,6 @@ private slots:
         void on_tbReadFromFile_clicked();
 
         void on_tbSaveToFile_clicked();
-
-        void on_groupBox_clicked();
-
-        void on_groupBox_toggled(bool arg1);
 
         void on_tbDetails_clicked();
 

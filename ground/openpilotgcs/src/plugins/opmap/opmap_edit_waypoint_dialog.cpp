@@ -48,7 +48,7 @@ opmap_edit_waypoint_dialog::opmap_edit_waypoint_dialog(QWidget *parent,QAbstract
     mapper = new QDataWidgetMapper(this);
 
     mapper->setItemDelegate(new mapDataDelegate(this));
-    connect(mapper,SIGNAL(currentIndexChanged(int)),this,SLOT(on_currentIndexChanged(int)));
+    connect(mapper,SIGNAL(currentIndexChanged(int)),this,SLOT(currentIndexChanged(int)));
     mapper->setModel(model);
     mapper->addMapping(ui->checkBoxLocked,flightDataModel::LOCKED);
     mapper->addMapping(ui->doubleSpinBoxLatitude,flightDataModel::LATPOSITION);
@@ -74,9 +74,9 @@ opmap_edit_waypoint_dialog::opmap_edit_waypoint_dialog(QWidget *parent,QAbstract
     mapper->addMapping(ui->cbCommand,flightDataModel::COMMAND);
     mapper->addMapping(ui->sbJump,flightDataModel::JUMPDESTINATION);
     mapper->addMapping(ui->sbError,flightDataModel::ERRORDESTINATION);
-    connect(itemSelection,SIGNAL(currentRowChanged(QModelIndex,QModelIndex)),this,SLOT(on_currentRowChanged(QModelIndex,QModelIndex)));
+    connect(itemSelection,SIGNAL(currentRowChanged(QModelIndex,QModelIndex)),this,SLOT(currentRowChanged(QModelIndex,QModelIndex)));
 }
-void opmap_edit_waypoint_dialog::on_currentIndexChanged(int index)
+void opmap_edit_waypoint_dialog::currentIndexChanged(int index)
 {
     ui->lbNumber->setText(QString::number(index));
     QModelIndex idx=mapper->model()->index(index,0);
@@ -226,7 +226,7 @@ void opmap_edit_waypoint_dialog::setupConditionWidgets()
         break;
     }
 }
-void opmap_edit_waypoint_dialog::on_pushButtonCancel_clicked()
+void opmap_edit_waypoint_dialog::pushButtonCancel_clicked()
 {
     my_waypoint = NULL;
     close();
@@ -272,7 +272,7 @@ void opmap_edit_waypoint_dialog::enableEditWidgets(bool value)
     }
 }
 
-void opmap_edit_waypoint_dialog::on_currentRowChanged(QModelIndex current, QModelIndex previous)
+void opmap_edit_waypoint_dialog::currentRowChanged(QModelIndex current, QModelIndex previous)
 {
     mapper->setCurrentIndex(current.row());
 }

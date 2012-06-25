@@ -51,12 +51,12 @@ void pathPlanner::setModel(flightDataModel *model,QItemSelectionModel *selection
     ui->tableView->setSelectionModel(selection);
     ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tableView->setItemDelegate(new mapDataDelegate(this));
-    connect(model,SIGNAL(rowsInserted(const QModelIndex&,int,int)),this,SLOT(on_rowsInserted(const QModelIndex&,int,int)));
+    connect(model,SIGNAL(rowsInserted(const QModelIndex&,int,int)),this,SLOT(rowsInserted(const QModelIndex&,int,int)));
     wid=new opmap_edit_waypoint_dialog(NULL,model,selection);
     ui->tableView->resizeColumnsToContents();
 }
 
-void pathPlanner::on_rowsInserted ( const QModelIndex & parent, int start, int end )
+void pathPlanner::rowsInserted ( const QModelIndex & parent, int start, int end )
 {
     Q_UNUSED(parent);
     for(int x=start;x<end+1;x++)
@@ -100,16 +100,6 @@ void pathPlanner::on_tbSaveToFile_clicked()
         return;
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"));
     myModel->writeToFile(fileName);
-}
-
-void pathPlanner::on_groupBox_clicked()
-{
-
-}
-
-void pathPlanner::on_groupBox_toggled(bool arg1)
-{
-    wid->setVisible(arg1);
 }
 
 void pathPlanner::on_tbDetails_clicked()

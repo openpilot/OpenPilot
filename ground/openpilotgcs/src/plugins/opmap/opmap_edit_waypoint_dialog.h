@@ -60,16 +60,16 @@ private:
 private slots:
 
 private slots:
-    void on_currentIndexChanged(int index);
+    void currentIndexChanged(int index);
     void setupModeWidgets();
     void setupPositionWidgets(bool isRelative);
     void setupConditionWidgets();
-    void on_pushButtonCancel_clicked();
+    void pushButtonCancel_clicked();
     void on_pushButtonOK_clicked();
     void on_pushButton_clicked();
     void on_pushButton_2_clicked();
     void enableEditWidgets(bool);
-    void on_currentRowChanged(QModelIndex,QModelIndex);
+    void currentRowChanged(QModelIndex,QModelIndex);
 };
 
 #endif // OPMAP_EDIT_WAYPOINT_DIALOG_H

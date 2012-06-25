@@ -148,12 +148,10 @@ typedef struct {
 int32_t UAVObjInitialize();
 void UAVObjGetStats(UAVObjStats* statsOut);
 void UAVObjClearStats();
-UAVObjHandle UAVObjRegister(uint32_t id, const char* name, const char* metaName,
+UAVObjHandle UAVObjRegister(uint32_t id,
 		int32_t isSingleInstance, int32_t isSettings, uint32_t numBytes, UAVObjInitializeCallback initCb);
 UAVObjHandle UAVObjGetByID(uint32_t id);
-UAVObjHandle UAVObjGetByName(char* name);
 uint32_t UAVObjGetID(UAVObjHandle obj);
-const char* UAVObjGetName(UAVObjHandle obj);
 uint32_t UAVObjGetNumBytes(UAVObjHandle obj);
 uint16_t UAVObjGetNumInstances(UAVObjHandle obj);
 UAVObjHandle UAVObjGetLinkedObj(UAVObjHandle obj);

@@ -81,7 +81,6 @@ struct UAVOBase {
 		bool isSettings    : 1;
 	} flags;
 
-	const char              * name;
 } __attribute__((packed));
 
 /* Augmented type for Meta UAVO */
@@ -237,14 +236,13 @@ static void UAVObjInitMetaData (struct UAVOMeta * obj_meta)
 	memset(uavo_base, 0, sizeof(*uavo_base));
 	uavo_base->flags.isMeta   = true;
 	uavo_base->flags.isSingle = true;
-	uavo_base->name           = name;
 	uavo_base->next_event     = NULL;
 
 	/* Clear the instance data carried in the UAVO */
 	memset(&(obj_meta->instance0), 0, sizeof(obj_meta->instance0));
 }
 
-static struct UAVOData * UAVObjAllocSingle(uint32_t num_bytes, const char * name)
+static struct UAVOData * UAVObjAllocSingle(uint32_t num_bytes)
 {
 	/* Compute the complete size of the object, including the data for a single embedded instance */
 	uint32_t object_size = sizeof(struct UAVOSingle) + num_bytes;
@@ -258,7 +256,6 @@ static struct UAVOData * UAVObjAllocSingle(uint32_t num_bytes, const char * name
 	struct UAVOBase * uavo_base = &(uavo_single->uavo.base);
 	memset(uavo_base, 0, sizeof(*uavo_base));
 	uavo_base->flags.isSingle = true;
-	uavo_base->name           = name;
 	uavo_base->next_event     = NULL;
 
 	/* Clear the instance data carried in the UAVO */
@@ -268,7 +265,7 @@ static struct UAVOData * UAVObjAllocSingle(uint32_t num_bytes, const char * name
 	return (&(uavo_single->uavo));
 }
 
-static struct UAVOData * UAVObjAllocMulti(uint32_t num_bytes, const char * name)
+static struct UAVOData * UAVObjAllocMulti(uint32_t num_bytes)
 {
 	/* Compute the complete size of the object, including the data for a single embedded instance */
 	uint32_t object_size = sizeof(struct UAVOMulti) + num_bytes;
@@ -282,7 +279,6 @@ static struct UAVOData * UAVObjAllocMulti(uint32_t num_bytes, const char * name)
 	struct UAVOBase * uavo_base = &(uavo_multi->uavo.base);
 	memset(uavo_base, 0, sizeof(*uavo_base));
 	uavo_base->flags.isSingle = false;
-	uavo_base->name           = name;
 	uavo_base->next_event     = NULL;
 
 	/* Set up the type-specific part of the UAVO */
@@ -302,8 +298,6 @@ static struct UAVOData * UAVObjAllocMulti(uint32_t num_bytes, const char * name)
 /**
  * Register and new object in the object manager.
  * \param[in] id Unique object ID
- * \param[in] name Object name
- * \param[in] nameName Metaobject name
  * \param[in] isSingleInstance Is this a single instance or multi-instance object
  * \param[in] isSettings Is this a settings object
  * \param[in] numBytes Number of bytes of object data (for one instance)
@@ -311,8 +305,7 @@ static struct UAVOData * UAVObjAllocMulti(uint32_t num_bytes, const char * name)
  * \return Object handle, or NULL if failure.
  * \return
  */
-UAVObjHandle UAVObjRegister(uint32_t id, const char *name,
-			const char *metaName,
+UAVObjHandle UAVObjRegister(uint32_t id, 
 			int32_t isSingleInstance, int32_t isSettings,
 			uint32_t num_bytes,
 			UAVObjInitializeCallback initCb)
@@ -327,9 +320,9 @@ UAVObjHandle UAVObjRegister(uint32_t id, const char *name,
 
 	/* Map the various flags to one of the UAVO types we understand */
 	if (isSingleInstance) {
-		uavo_data = UAVObjAllocSingle (num_bytes, name);
+		uavo_data = UAVObjAllocSingle (num_bytes);
 	} else {
-		uavo_data = UAVObjAllocMulti (num_bytes, name);
+		uavo_data = UAVObjAllocMulti (num_bytes);
 	}
 
 	if (!uavo_data)
@@ -343,7 +336,7 @@ UAVObjHandle UAVObjRegister(uint32_t id, const char *name,
 	}
 
 	/* Initialize the embedded meta UAVO */
-	UAVObjInitMetaData (&uavo_data->metaObj, metaName);
+	UAVObjInitMetaData (&uavo_data->metaObj);
 
 	/* Add the newly created object to the global list of objects */
 	LL_APPEND(uavo_list, uavo_data);
@@ -399,40 +392,6 @@ unlock_exit:
 }
 
 /**
- * Retrieve an object from the list given its name
- * \param[in] name The name of the object
- * \return The object or NULL if not found.
- */
-UAVObjHandle UAVObjGetByName(char *name)
-{
-	UAVObjHandle * found_obj = (UAVObjHandle *) NULL;
-
-	// Get lock
-	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
-
-	// Look for object
-	struct UAVO * tmp_obj;
-	LL_FOREACH(uavo_list, tmp_obj) {
-		if ((tmp_obj->common.name) &&
-			strcmp(tmp_obj->common.name, name) == 0) {
-
-			found_obj = (UAVObjHandle) tmp_obj;
-			goto unlock_exit;
-		}
-		if ((tmp_obj->metaObj.common.name) &&
-			strcmp(tmp_obj->metaObj.common.name, name) == 0) {
-
-			found_obj = (UAVObjHandle) &(tmp_obj->metaObj);
-			goto unlock_exit;
-		}
-	}
-
-unlock_exit:
-	xSemaphoreGiveRecursive(mutex);
-	return found_obj;
-}
-
-/**
  * Get the object's ID
  * \param[in] obj The object handle
  * \return The object ID
@@ -455,21 +414,6 @@ uint32_t UAVObjGetID(UAVObjHandle obj_handle)
 
 		return (uavo_data->id);
 	}
-}
-
-/**
- * Get the object's name
- * \param[in] obj The object handle
- * \return The object's name
- */
-const char *UAVObjGetName(UAVObjHandle obj)
-{
-	PIOS_Assert(obj);
-
-	/* Recover the common object header */
-	struct UAVObjectCommon * uavo_common = (struct UAVObjectCommon *) obj;
-
-	return (uavo_common->name);
 }
 
 /**

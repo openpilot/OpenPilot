@@ -860,7 +860,7 @@ static void processFlightMode(ManualControlSettingsData *settings, float flightM
 	FlightStatusGet(&flightStatus);
 
 	// Convert flightMode value into the switch position in the range [0..N-1]
-	uint8_t pos = (uint8_t)((flightMode + 1.0f) * settings->FlightModeNumber) >> 1;
+	uint8_t pos = ((int16_t)(flightMode * 256.0f) + 256) * settings->FlightModeNumber >> 9;
 	if (pos >= settings->FlightModeNumber)
 		pos = settings->FlightModeNumber - 1;
 

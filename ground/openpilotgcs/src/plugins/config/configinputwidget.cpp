@@ -1158,8 +1158,8 @@ void ConfigInputWidget::moveFMSlider()
     m_config->fmsValue->setText(QString::number(scaledFlightMode * 100.0, 'f', 0));
 
     // Convert flightMode value into the switch position in the range [0..N-1]
-    // This should use the same logic as flight code to be consistent
-    uint8_t pos = (uint8_t)((valueScaled + 1.0) * manualSettingsDataPriv.FlightModeNumber) >> 1;
+    // This uses the same optimized computation as flight code to be consistent
+    uint8_t pos = ((int16_t)(valueScaled * 256) + 256) * manualSettingsDataPriv.FlightModeNumber >> 9;
     if (pos >= manualSettingsDataPriv.FlightModeNumber)
         pos = manualSettingsDataPriv.FlightModeNumber - 1;
     m_config->fmsSlider->setValue(pos);

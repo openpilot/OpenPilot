@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/systemhealth">
+        <file>html/Actuator-Critical.html</file>
+    </qresource>
+</RCC>

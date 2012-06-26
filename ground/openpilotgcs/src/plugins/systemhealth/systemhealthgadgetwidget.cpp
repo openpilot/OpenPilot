@@ -206,7 +206,11 @@ void SystemHealthGadgetWidget::mousePressEvent ( QMouseEvent * event )
             QGraphicsSvgItem *clickedItem = dynamic_cast<QGraphicsSvgItem*>(sceneItem);
 
             if(clickedItem && (clickedItem != foreground) && clickedItem != background){
-                QWhatsThis::showText(event->globalPos(), clickedItem->elementId().split('-').at(0) + "\nIt's all gone horribly wrong!");
+            QFile alarmDescription(":/systemhealth/html/" + clickedItem->elementId() + ".html");
+                if(alarmDescription.open(QIODevice::ReadOnly | QIODevice::Text)){
+                    QTextStream textStream(&alarmDescription);
+                    QWhatsThis::showText(event->globalPos(), textStream.readAll());
+                }
             }
         }
     }

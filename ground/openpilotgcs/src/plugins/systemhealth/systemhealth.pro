@@ -18,3 +18,6 @@ SOURCES += systemhealthgadgetconfiguration.cpp
 SOURCES += systemhealthgadgetoptionspage.cpp
 OTHER_FILES += SystemHealthGadget.pluginspec
 FORMS += systemhealthgadgetoptionspage.ui
+
+RESOURCES += \
+    systemhealth.qrc

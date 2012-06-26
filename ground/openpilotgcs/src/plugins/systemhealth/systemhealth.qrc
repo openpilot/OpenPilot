@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/systemhealth">
         <file>html/Actuator-Critical.html</file>
+        <file>html/ManualControl-Critical.html</file>
+        <file>html/ManualControl-Warning.html</file>
     </qresource>
 </RCC>

@@ -518,6 +518,7 @@ uavobjects_clean:
 
 # $(1) = Canonical board name all in lower case (e.g. coptercontrol)
 # $(2) = Name of board used in source tree (e.g. CopterControl)
+# $(3) = Short name for board (e.g CC)
 define FW_TEMPLATE
 .PHONY: $(1) fw_$(1)
 $(1): fw_$(1)_opfw
@@ -528,6 +529,8 @@ fw_$(1)_%: uavobjects_flight
 	$(V1) cd $(ROOT_DIR)/flight/$(2) && \
 		$$(MAKE) -r --no-print-directory \
 		BOARD_NAME=$(1) \
+		BOARD_SHORT_NAME=$(3) \
+		BUILD_TYPE=fw \
 		TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
 		REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" \
 		$$*
@@ -551,6 +554,8 @@ bl_$(1)_%:
 	$(V1) cd $(ROOT_DIR)/flight/Bootloaders/$(2) && \
 		$$(MAKE) -r --no-print-directory \
 		BOARD_NAME=$(1) \
+		BOARD_SHORT_NAME=$(3) \
+		BUILD_TYPE=bl \
 		TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
 		REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" \
 		$$*
@@ -585,6 +590,8 @@ bu_$(1)_%: bl_$(1)_bino
 	$(V1) cd $(ROOT_DIR)/flight/Bootloaders/BootloaderUpdater && \
 		$$(MAKE) -r --no-print-directory \
 		BOARD_NAME=$(1) \
+		BOARD_SHORT_NAME=$(3) \
+		BUILD_TYPE=bu \
 		TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
 		REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" \
 		$$*
@@ -600,11 +607,13 @@ define EF_TEMPLATE
 .PHONY: ef_$(1)
 ef_$(1): ef_$(1)_bin
 
-ef_$(1)_%: bl_$(1)_bin fw_$(1)_bin
+ef_$(1)_%: bl_$(1)_bin fw_$(1)_opfw
 	$(V1) mkdir -p $(BUILD_DIR)/ef_$(1)/dep
 	$(V1) cd $(ROOT_DIR)/flight/EntireFlash && \
 		$$(MAKE) -r --no-print-directory \
 		BOARD_NAME=$(1) \
+		BOARD_SHORT_NAME=$(3) \
+		BUILD_TYPE=ef \
 		TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
 		DFU_CMD="$(DFUUTIL_DIR)/bin/dfu-util" \
 		$$*
@@ -614,6 +623,19 @@ ef_$(1)_clean:
 	$(V0) @echo " CLEAN      $$@"
 	$(V1) $(RM) -fr $(BUILD_DIR)/ef_$(1)
 endef
+
+# When building any of the "all_*" targets, tell all sub makefiles to display
+# additional details on each line of output to describe which build and target
+# that each line applies to.
+ifneq ($(strip $(filter all_%,$(MAKECMDGOALS))),)
+export ENABLE_MSG_EXTRA := yes
+endif
+
+# When building more than one goal in a single make invocation, also
+# enable the extra context for each output line
+ifneq ($(word 2,$(MAKECMDGOALS)),)
+export ENABLE_MSG_EXTRA := yes
+endif
 
 # $(1) = Canonical board name all in lower case (e.g. coptercontrol)
 define BOARD_PHONY_TEMPLATE
@@ -632,6 +654,12 @@ endef
 
 ALL_BOARDS := coptercontrol pipxtreme simposix
 
+# SimPosix only builds on Linux so drop it from the list for
+# all other platforms.
+ifneq ($(UNAME), Linux)
+ALL_BOARDS  := $(filter-out simposix, $(ALL_BOARDS))
+endif
+
 # Friendly names of each board (used to find source tree)
 coptercontrol_friendly := CopterControl
 pipxtreme_friendly     := PipXtreme
@@ -644,6 +672,13 @@ ifneq ($(UNAME), Linux)
 ALL_BOARDS  := $(filter-out simposix, $(ALL_BOARDS))
 endif
 
+# Short hames of each board (used to display board name in parallel builds)
+coptercontrol_short    := 'cc  '
+pipxtreme_short        := 'pipx'
+revolution_short       := 'revo'
+simposix_short         := 'posx'
+osd_short              := 'osd '
+
 # Start out assuming that we'll build fw, bl and bu for all boards
 FW_BOARDS  := $(ALL_BOARDS)
 BL_BOARDS  := $(ALL_BOARDS)
@@ -654,6 +689,12 @@ EF_BOARDS  := $(ALL_BOARDS)
 #        updater yet so we need to filter them out to prevent errors.
 BL_BOARDS  := $(filter-out ins, $(BL_BOARDS))
 BU_BOARDS  := $(filter-out ins, $(BU_BOARDS))
+
+# SimPosix doesn't have a BL, BU or EF target so we need to
+# filter them out to prevent errors on the all_flight target.
+BL_BOARDS  := $(filter-out simposix, $(BL_BOARDS))
+BU_BOARDS  := $(filter-out simposix, $(BU_BOARDS))
+EF_BOARDS  := $(filter-out simposix, $(EF_BOARDS))
 
 # Generate the targets for whatever boards are left in each list
 FW_TARGETS := $(addprefix fw_, $(FW_BOARDS))
@@ -674,7 +715,7 @@ all_bu:        $(addsuffix _opfw,  $(BU_TARGETS))
 all_bu_clean:  $(addsuffix _clean, $(BU_TARGETS))
 
 .PHONY: all_ef all_ef_clean
-all_ef:        $(EF_TARGETS))
+all_ef:        $(EF_TARGETS)
 all_ef_clean:  $(addsuffix _clean, $(EF_TARGETS))
 
 .PHONY: all_flight all_flight_clean
@@ -685,16 +726,16 @@ all_flight_clean: all_fw_clean all_bl_clean all_bu_clean all_ef_clean
 $(foreach board, $(ALL_BOARDS), $(eval $(call BOARD_PHONY_TEMPLATE,$(board))))
 
 # Expand the bootloader updater rules
-$(foreach board, $(ALL_BOARDS), $(eval $(call BU_TEMPLATE,$(board),$($(board)_friendly))))
+$(foreach board, $(ALL_BOARDS), $(eval $(call BU_TEMPLATE,$(board),$($(board)_friendly),$($(board)_short))))
 
 # Expand the firmware rules
-$(foreach board, $(ALL_BOARDS), $(eval $(call FW_TEMPLATE,$(board),$($(board)_friendly))))
+$(foreach board, $(ALL_BOARDS), $(eval $(call FW_TEMPLATE,$(board),$($(board)_friendly),$($(board)_short))))
 
 # Expand the bootloader rules
-$(foreach board, $(ALL_BOARDS), $(eval $(call BL_TEMPLATE,$(board),$($(board)_friendly))))
+$(foreach board, $(ALL_BOARDS), $(eval $(call BL_TEMPLATE,$(board),$($(board)_friendly),$($(board)_short))))
 
 # Expand the entire-flash rules
-$(foreach board, $(ALL_BOARDS), $(eval $(call EF_TEMPLATE,$(board),$($(board)_friendly))))
+$(foreach board, $(ALL_BOARDS), $(eval $(call EF_TEMPLATE,$(board),$($(board)_friendly),$($(board)_short))))
 
 .PHONY: sim_win32
 sim_win32: sim_win32_exe

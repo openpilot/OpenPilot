@@ -331,10 +331,10 @@ int32_t PIOS_Flash_Jedec_EraseChip()
 	// Keep polling when bus is busy too
 	int i = 0;
 	while(PIOS_Flash_Jedec_Busy() != 0) {
-#if defined(PIOS_INCLUDE_FREERTOS)
+#if defined(FLASH_FREERTOS)
 		vTaskDelay(1);
 #endif
-		if ((i++) % 100 == 0)
+		if ((i++) % 10000 == 0)
 			PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
 	
 }

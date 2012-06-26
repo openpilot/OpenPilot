@@ -31,11 +31,7 @@ namespace mapcontrol
     UAVItem::UAVItem(MapGraphicItem* map,OPMapWidget* parent,QString uavPic):map(map),mapwidget(parent),showtrail(true),showtrailline(true),trailtime(5),traildistance(50),autosetreached(true)
     ,autosetdistance(100)
     {
-        //QDir dir(":/uavs/images/");
-        //QStringList list=dir.entryList();
         pic.load(uavPic);
-       // Don't scale but trust the image we are given
-       // pic=pic.scaled(50,33,Qt::IgnoreAspectRatio);
         this->setFlag(QGraphicsItem::ItemIsMovable,true);
         this->setFlag(QGraphicsItem::ItemIsSelectable,true);
         localposition=map->FromLatLngToLocal(mapwidget->CurrentPosition());

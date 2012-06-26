@@ -392,7 +392,6 @@ namespace mapcontrol
                                             found = true;
                                         {
                                             painter->drawPixmap(core->tileRect.X(),core->tileRect.Y(), core->tileRect.Width(), core->tileRect.Height(),PureImageProxy::FromStream(img));
-                                           // qDebug()<<"tile:"<<core->tileRect.X()<<core->tileRect.Y();
                                         }
                                     }
                                 }
@@ -406,7 +405,6 @@ namespace mapcontrol
                                     painter->setFont(config->MissingDataFont);
                                     painter->setPen(Qt::red);
                                     painter->drawText(QRectF(core->tileRect.X(), core->tileRect.Y(), core->tileRect.Width(), core->tileRect.Height()),Qt::AlignCenter,(core->GettilePoint() == core->GetcenterTileXYLocation()? "CENTER: " :"TILE: ")+core->GettilePoint().ToString());
-                                    //qDebug()<<"ShowTileGridLine:"<<core->GettilePoint().ToString()<<"=="<<core->GetcenterTileXYLocation().ToString();
                                 }
                             }
 
@@ -513,7 +511,6 @@ namespace mapcontrol
                 float scaleValue = zoomDigi+remainder + 1;
                 {
                     MapRenderTransform = scaleValue;
-                  //  qDebug()<<"scale="<<scaleValue<<"zoomdigi:"<<ZoomDigi()<<"integer:"<<integer;
                 }
                 if(integer>MaxZoom())
                     integer=MaxZoom();

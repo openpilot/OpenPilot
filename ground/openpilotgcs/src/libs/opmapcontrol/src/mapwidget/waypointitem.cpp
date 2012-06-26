@@ -271,11 +271,9 @@ WayPointItem::WayPointItem(MapGraphicItem *map, bool magicwaypoint):reached(fals
 
     void WayPointItem::setRelativeCoord(distBearingAltitude value)
     {
-        qDebug()<<"SET RELATIVE0";
-        if(value.altitudeRelative==relativeCoord.altitudeRelative
+         if(value.altitudeRelative==relativeCoord.altitudeRelative
                 && value.bearing==relativeCoord.bearing && value.distance==relativeCoord.distance)
             return;
-        qDebug()<<"SET RELATIVE1";
         relativeCoord=value;
         if(myHome)
         {
@@ -288,19 +286,14 @@ WayPointItem::WayPointItem(MapGraphicItem *map, bool magicwaypoint):reached(fals
     }
     void WayPointItem::SetCoord(const internals::PointLatLng &value)
     {
-        qDebug()<<"SET ABSOLUTE0";
-       // if(this->WPType()==relative)
-         //   return;
         if(Coord()==value)
             return;
-        qDebug()<<"SET ABSOLUTE1";
         bool abs_coord=false;
         bool rel_coord=false;
         if(coord!=value)
             abs_coord=true;
         coord=value;
         distBearingAltitude back=relativeCoord;
-        qDebug()<<"SET COORD"<<value.Lat()<<value.Lng();
         if(myHome)
             map->Projection()->offSetFromLatLngs(myHome->Coord(),coord,relativeCoord.distance,relativeCoord.bearing);
         if(back.distance!=relativeCoord.distance||back.bearing!=relativeCoord.bearing)

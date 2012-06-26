@@ -93,6 +93,10 @@ void ConfigMultiRotorWidget::setupUI(QString frameType)
             enableComboBox(uiowner, QString("multiMotorChannelBox%0").arg(i), true);
 		}
 		
+        m_aircraft->mrRollMixLevel->setValue(100);
+        m_aircraft->mrPitchMixLevel->setValue(100);
+        m_aircraft->mrYawMixLevel->setValue(50);
+
         m_aircraft->triYawChannelBox->setEnabled(true);
     }
     else if (frameType == "QuadX" || frameType == "Quad X") {
@@ -104,6 +108,7 @@ void ConfigMultiRotorWidget::setupUI(QString frameType)
             enableComboBox(uiowner, QString("multiMotorChannelBox%0").arg(i), true);
 		}
 
+        // init mixer levels
 		m_aircraft->mrRollMixLevel->setValue(50);
 		m_aircraft->mrPitchMixLevel->setValue(50);
 		m_aircraft->mrYawMixLevel->setValue(50);

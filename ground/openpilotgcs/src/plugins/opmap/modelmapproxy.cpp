@@ -46,6 +46,10 @@ void modelMapProxy::WPValuesChanged(WayPointItem * wp)
     model->setData(index,wp->Coord().Lat(),Qt::EditRole);
     index=model->index(wp->Number(),flightDataModel::LNGPOSITION);
     model->setData(index,wp->Coord().Lng(),Qt::EditRole);
+
+    index=model->index(wp->Number(),flightDataModel::ALTITUDE);
+    model->setData(index,wp->Altitude(),Qt::EditRole);
+
     index=model->index(wp->Number(),flightDataModel::DISRELATIVE);
     model->setData(index,wp->getRelativeCoord().distance,Qt::EditRole);
     index=model->index(wp->Number(),flightDataModel::BEARELATIVE);

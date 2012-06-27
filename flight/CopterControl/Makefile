@@ -66,9 +66,10 @@ USE_CAMERASTAB ?= YES
 USE_COMUSBBRIDGE ?= YES
 USE_GPS ?= YES
 USE_TXPID ?= YES
-USE_I2C ?= NO
+USE_I2C ?= YES
 USE_ALTITUDE ?= NO
 TEST_FAULTS ?= NO
+USE_MAGBARO ?= YES
 
 # List of optional modules to include
 OPTMODULES =
@@ -93,6 +94,13 @@ endif
 endif
 ifeq ($(TEST_FAULTS), YES)
 OPTMODULES += Fault
+endif
+ifeq ($(USE_MAGBARO), YES)
+ifeq ($(USE_I2C), YES)
+OPTMODULES += Extensions/MagBaro
+else
+$(error "MagBaro module (USE_MAGBARO=YES) requires i2c (USE_I2C=YES)")
+endif
 endif
 
 # List of mandatory modules to include
@@ -206,6 +214,7 @@ SRC += $(OPUAVSYNTHDIR)/taskinfo.c
 SRC += $(OPUAVSYNTHDIR)/mixerstatus.c
 SRC += $(OPUAVSYNTHDIR)/ratedesired.c
 SRC += $(OPUAVSYNTHDIR)/baroaltitude.c
+SRC += $(OPUAVSYNTHDIR)/magnetometer.c
 SRC += $(OPUAVSYNTHDIR)/txpidsettings.c
 
 endif
@@ -253,7 +262,8 @@ SRC += $(PIOSCOMMON)/pios_adxl345.c
 SRC += $(PIOSCOMMON)/pios_mpu6000.c
 SRC += $(PIOSCOMMON)/pios_com.c
 #SRC += $(PIOSCOMMON)/pios_i2c_esc.c
-#SRC += $(PIOSCOMMON)/pios_bmp085.c
+SRC += $(PIOSCOMMON)/pios_bmp085.c
+SRC += $(PIOSCOMMON)/pios_hmc5883.c
 SRC += $(PIOSCOMMON)/pios_rcvr.c
 SRC += $(PIOSCOMMON)/pios_gcsrcvr.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c
@@ -431,7 +441,7 @@ ifeq ($(ERASE_FLASH), YES)
 CDEFS += -DERASE_FLASH
 endif
 
-ifneq ($(USE_GPS), NO)
+ifeq ($(USE_GPS), YES)
 CDEFS += -DUSE_GPS
 endif
 
@@ -440,7 +450,7 @@ CDEFS += -DUSE_I2C
 endif
 
 # Declare all non-optional modules as built-in to force inclusion
-CDEFS += ${foreach MOD, ${MODULES}, -DMODULE_$(MOD)_BUILTIN }
+CDEFS += $(foreach MOD, $(notdir $(MODULES)), -DMODULE_$(MOD)_BUILTIN)
 
 # Place project-specific -D and/or -U options for
 # Assembler with preprocessor here.

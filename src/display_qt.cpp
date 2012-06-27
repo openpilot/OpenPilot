@@ -84,7 +84,7 @@ namespace display {
 				{
 					rawImg = dynamic_cast<RawImage*>(raw.get());
 					isImage = ((rawImg != NULL) ? 1 : 0);
-					if (isImage) size = image.size();
+					if (isImage) size = rawImg->img->size();
 				} else
 				if (isImage) rawImg = PTR_CAST<RawImage*>(raw.get());
 				// FIXME RawSimu should export a size somehow
@@ -107,7 +107,7 @@ std::cout << "connecting slots" << std::endl;
 				std::cout << "connect onKeyPress failed" << std::endl;
 			if (!connect(viewer_, SIGNAL(onMouseClick(QGraphicsSceneMouseEvent*, bool)), this, SLOT(onMouseClick(QGraphicsSceneMouseEvent*, bool)), Qt::DirectConnection))
 				std::cout << "connect onMouseClick failed" << std::endl;
-		
+
 			view_private = new qdisplay::ImageView();
 			viewer_->setImageView(view_private, 0, 0);
 			viewer_->resize(size.width+20,size.height+20);
@@ -136,7 +136,7 @@ std::cout << "connecting slots" << std::endl;
 		switch (type_)
 		{
 			case SensorAbstract::PINHOLE:
-			case SensorAbstract::BARRETO: {
+			case SensorAbstract::BARRETO: if (image.data()) {
 				view()->setImage(image);
 				std::ostringstream oss; oss << "#" << framenumber << "  |  " << std::setprecision(3) << avg_framerate*1000 << " ms";
 				framenumber_label->setPlainText(oss.str().c_str());
@@ -151,7 +151,7 @@ std::cout << "connecting slots" << std::endl;
 					<< std::setw(4) << (int)euler(0) << ", " <<  std::setw(4) << (int)euler(1) << ", " <<  std::setw(4) << (int)euler(2) << "] deg";
 				sensorpose_label->setPlainText(oss.str().c_str());
 				
-				break; }
+				} break;
 			default:
 				JFR_ERROR(RtslamException, RtslamException::UNKNOWN_SENSOR_TYPE, "Don't know how to display this type of sensor" << type_);
 		}

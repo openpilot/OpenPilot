@@ -195,14 +195,6 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 
     m_widget->progressBarMap->setMaximum(1);
 
-    #if defined(Q_OS_MAC)
-    #elif defined(Q_OS_WIN)
-	m_widget->comboBoxFindPlace->clear();
-	loadComboBoxLines(m_widget->comboBoxFindPlace, QCoreApplication::applicationDirPath() + "/opmap_find_place_history.txt");
-	m_widget->comboBoxFindPlace->setCurrentIndex(-1);
-    #else
-    #endif
-
     connect(m_map, SIGNAL(zoomChanged(double, double, double)), this, SLOT(zoomChanged(double, double, double)));					// map zoom change signals
     connect(m_map, SIGNAL(OnCurrentPositionChanged(internals::PointLatLng)), this, SLOT(OnCurrentPositionChanged(internals::PointLatLng)));    // map poisition change signals
     connect(m_map, SIGNAL(OnTileLoadComplete()), this, SLOT(OnTileLoadComplete()));					// tile loading stop signals

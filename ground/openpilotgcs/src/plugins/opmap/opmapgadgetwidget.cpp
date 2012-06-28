@@ -1713,11 +1713,12 @@ void OPMapGadgetWidget::onAddWayPointAct_triggered(internals::PointLatLng coord)
     if (m_map_mode != Normal_MapMode)
         return;
 
-   // m_map->WPCreate(coord, 0, "");
-    mapProxy->createWayPoint(coord);
+    // m_map->WPCreate(coord, 0, "");
+    float alt=15;
+    mapProxy->createWayPoint(coord, alt);
 
-            //wp->map_wp_item->picture.load(QString::fromUtf8(":/opmap/images/waypoint_marker1.png"));
-            //wp->map_wp_item->picture.load(QString::fromUtf8(":/opmap/images/waypoint_marker2.png"));
+    //wp->map_wp_item->picture.load(QString::fromUtf8(":/opmap/images/waypoint_marker1.png"));
+    //wp->map_wp_item->picture.load(QString::fromUtf8(":/opmap/images/waypoint_marker2.png"));
 }
 
 
@@ -1784,6 +1785,19 @@ void OPMapGadgetWidget::onDeleteWayPointAct_triggered()
 
 void OPMapGadgetWidget::onClearWayPointsAct_triggered()
 {
+
+    //First, ask to ensure this is what the user wants to do
+    QMessageBox msgBox;
+    msgBox.setText(tr("Are you sure you want to clear waypoints?"));
+    msgBox.setInformativeText(tr("All associated data will be lost."));
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    int ret = msgBox.exec();
+
+    if (ret == QMessageBox::No)
+    {
+        return;
+    }
+
     if (!m_widget || !m_map)
         return;
 

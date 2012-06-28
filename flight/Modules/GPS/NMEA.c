@@ -30,10 +30,15 @@
 
 #include "openpilot.h"
 #include "pios.h"
+
+#if defined(PIOS_INCLUDE_GPS_NMEA_PARSER)
+
+#include "gpsposition.h"
 #include "NMEA.h"
 #include "gpsposition.h"
 #include "gpstime.h"
 #include "gpssatellites.h"
+#include "GPS.h"
 
 //#define ENABLE_DEBUG_MSG						///< define to enable debug-messages
 #define DEBUG_PORT		PIOS_COM_TELEM_RF		///< defines which serial port is ued for debug-messages
@@ -75,6 +80,9 @@ static bool nmeaProcessGPGSA(GPSPositionData * GpsData, bool* gpsDataUpdated, ch
 	static bool nmeaProcessGPGSV(GPSPositionData * GpsData, bool* gpsDataUpdated, char* param[], uint8_t nbParam);
 #endif //PIOS_GPS_MINIMAL
 
+static uint32_t numUpdates;
+static uint32_t numChecksumErrors;
+static uint32_t numParsingErrors;
 
 static struct nmea_parser nmea_parsers[] = {
 	{
@@ -110,6 +118,88 @@ static struct nmea_parser nmea_parsers[] = {
 	},
 #endif //PIOS_GPS_MINIMAL
 };
+
+int parse_nmea_stream (uint8_t c, char *gps_rx_buffer, GPSPositionData *GpsData)
+{
+	static uint8_t rx_count = 0;
+	static bool start_flag = false;
+	static bool found_cr = false;
+
+	// detect start while acquiring stream
+	if (!start_flag && (c == '$')) // NMEA identifier found
+	{
+		start_flag = true;
+		found_cr = false;
+		rx_count = 0;
+	}
+	else
+	if (!start_flag)
+		return PARSER_ERROR;
+
+	if (rx_count >= NMEA_MAX_PACKET_LENGTH)
+	{
+		// The buffer is already full and we haven't found a valid NMEA sentence.
+		// Flush the buffer and note the overflow event.
+//		gpsRxOverflow++;
+		start_flag = false;
+		found_cr = false;
+		rx_count = 0;
+		return PARSER_OVERRUN;
+	}
+	else
+	{
+		gps_rx_buffer[rx_count] = c;
+		rx_count++;
+	}
+
+	// look for ending '\r\n' sequence
+	if (!found_cr && (c == '\r') )
+		found_cr = true;
+	else
+	if (found_cr && (c != '\n') )
+		found_cr = false;  // false end flag
+	else
+	if (found_cr && (c == '\n') )
+	{
+		// The NMEA functions require a zero-terminated string
+		// As we detected \r\n, the string as for sure 2 bytes long, we will also strip the \r\n
+		gps_rx_buffer[rx_count-2] = 0;
+
+		// prepare to parse next sentence
+		start_flag = false;
+		found_cr = false;
+		rx_count = 0;
+		// Our rxBuffer must look like this now:
+		//   [0]           = '$'
+		//   ...           = zero or more bytes of sentence payload
+		//   [end_pos - 1] = '\r'
+		//   [end_pos]     = '\n'
+		//
+		// Prepare to consume the sentence from the buffer
+
+		// Validate the checksum over the sentence
+		if (!NMEA_checksum(&gps_rx_buffer[1]))
+		{	// Invalid checksum.  May indicate dropped characters on Rx.
+			//PIOS_DEBUG_PinHigh(2);
+			++numChecksumErrors;
+			//PIOS_DEBUG_PinLow(2);
+			return PARSER_ERROR;
+		}
+		else
+		{	// Valid checksum, use this packet to update the GPS position
+			if (!NMEA_update_position(&gps_rx_buffer[1], GpsData)) {
+				//PIOS_DEBUG_PinHigh(2);
+				++numParsingErrors;
+				//PIOS_DEBUG_PinLow(2);
+			}
+			else
+				++numUpdates;
+
+			return PARSER_COMPLETE;
+		}
+	}
+	return PARSER_INCOMPLETE;
+}
 
 static struct nmea_parser *NMEA_find_parser_by_prefix(const char *prefix)
 {
@@ -352,7 +442,7 @@ bool NMEA_update_position(char *nmea_sentence)
 
 
 	// All is fine :)  Update object if data has changed
-	if (gpsDataUpdated) {
+	if (gpsDataUpdated || (GpsData->Status == GPSPOSITION_STATUS_NOFIX)) {
 		#ifdef DEBUG_MGSID_IN
 			DEBUG_MSG("U");
 		#endif
@@ -400,6 +490,12 @@ static bool nmeaProcessGPGGA(GPSPositionData * GpsData, bool* gpsDataUpdated, ch
 		return false;
 	}
 
+
+	// check for invalid GPS fix
+	if (param[6][0] == '0') {
+		// return false;
+		GpsData->Status = GPSPOSITION_STATUS_NOFIX; // treat invalid fix as NOFIX
+	}
 	// get number of satellites used in GPS solution
 	GpsData->Satellites = atoi(param[7]);
 
@@ -669,3 +765,4 @@ static bool nmeaProcessGPGSA(GPSPositionData * GpsData, bool* gpsDataUpdated, ch
 	return true;
 }
 
+#endif // PIOS_INCLUDE_GPS_NMEA_PARSER

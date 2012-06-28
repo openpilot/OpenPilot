@@ -13,7 +13,7 @@
     <x>0</x>
     <y>0</y>
     <width>606</width>
-    <height>387</height>
+    <height>420</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -111,7 +111,7 @@
             </sizepolicy>
            </property>
            <property name="decimals">
-            <number>7</number>
+            <number>5</number>
            </property>
            <property name="minimum">
             <double>-90.000000000000000</double>
@@ -124,7 +124,7 @@
          <item row="3" column="2">
           <widget class="QDoubleSpinBox" name="doubleSpinBoxLongitude">
            <property name="decimals">
-            <number>7</number>
+            <number>5</number>
            </property>
            <property name="minimum">
             <double>-180.000000000000000</double>
@@ -164,13 +164,6 @@
            </property>
           </widget>
          </item>
-         <item row="6" column="2">
-          <widget class="QSpinBox" name="spinBoxDistance">
-           <property name="maximum">
-            <number>999999999</number>
-           </property>
-          </widget>
-         </item>
          <item row="6" column="3">
           <widget class="QLabel" name="lbDistanceMeters">
            <property name="text">
@@ -197,6 +190,9 @@
          </item>
          <item row="7" column="2">
           <widget class="QDoubleSpinBox" name="doubleSpinBoxBearing">
+           <property name="decimals">
+            <number>2</number>
+           </property>
            <property name="maximum">
             <double>360.000000000000000</double>
            </property>
@@ -281,16 +277,6 @@
            </property>
           </widget>
          </item>
-         <item row="4" column="2">
-          <widget class="QDoubleSpinBox" name="doubleSpinBoxAltitude">
-           <property name="minimum">
-            <double>-5000.000000000000000</double>
-           </property>
-           <property name="maximum">
-            <double>5000.000000000000000</double>
-           </property>
-          </widget>
-         </item>
          <item row="4" column="3">
           <widget class="QLabel" name="label_6">
            <property name="text">
@@ -315,6 +301,26 @@
           <widget class="QLabel" name="label_9">
            <property name="text">
             <string>meters</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="2">
+          <widget class="QDoubleSpinBox" name="doubleSpinBoxDistance">
+           <property name="decimals">
+            <number>0</number>
+           </property>
+           <property name="maximum">
+            <double>999999999.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="2">
+          <widget class="QDoubleSpinBox" name="doubleSpinBoxAltitude">
+           <property name="minimum">
+            <double>-5000.000000000000000</double>
+           </property>
+           <property name="maximum">
+            <double>5000.000000000000000</double>
            </property>
           </widget>
          </item>

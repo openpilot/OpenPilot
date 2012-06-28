@@ -273,22 +273,21 @@ WayPointItem::WayPointItem(MapGraphicItem *map, bool magicwaypoint):reached(fals
 
     void WayPointItem::setRelativeCoord(distBearingAltitude value)
     {
-        qDebug()<<"AKI0"<<value.altitudeRelative<<relativeCoord.altitudeRelative;
-         if(value.altitudeRelative==relativeCoord.altitudeRelative
-                && value.bearing==relativeCoord.bearing && value.distance==relativeCoord.distance)
+        if(value.altitudeRelative-relativeCoord.altitudeRelative<0.0001
+                && value.bearing-relativeCoord.bearing<0.0001 && value.distance==relativeCoord.distance)
             return;
-        qDebug()<<"AKI1"<<value.altitudeRelative<<relativeCoord.altitudeRelative;
-         relativeCoord=value;
+        relativeCoord=value;
         if(myHome)
         {
-               coord=map->Projection()->translate(myHome->Coord(),relativeCoord.distance,relativeCoord.bearing);
-               SetAltitude(myHome->Altitude()+relativeCoord.altitudeRelative);
+            coord=map->Projection()->translate(myHome->Coord(),relativeCoord.distance,relativeCoord.bearing);
+            SetAltitude(myHome->Altitude()+relativeCoord.altitudeRelative);
         }
         RefreshPos();
         RefreshToolTip();
         emit WPValuesChanged(this);
         this->update();
     }
+
     void WayPointItem::SetCoord(const internals::PointLatLng &value)
     {
         if(Coord()==value)
@@ -412,6 +411,7 @@ WayPointItem::WayPointItem(MapGraphicItem *map, bool magicwaypoint):reached(fals
             emit WPValuesChanged(this);
         }
     }
+
     void WayPointItem::WPRenumbered(const int &oldnumber, const int &newnumber, WayPointItem *waypoint)
     {
         if (waypoint!=this)

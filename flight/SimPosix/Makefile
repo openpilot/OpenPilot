@@ -56,6 +56,7 @@ MODULES = ManualControl Stabilization GPS
 MODULES += CameraStab
 MODULES += Telemetry
 MODULES += LogReplay
+MODULES += SLAM
 #MODULES += OveroSync
 PYMODULES = 
 #FlightPlan

@@ -1,0 +1,10 @@
+<xml>
+    <object name="SLAMSettings" singleinstance="true" settings="true">
+        <description>Configuration for the OpenCV based SLAM algorithm running on SimPosix (for example on overo)</description>
+	<field name="FrameDimensions" units="pixels" type="uint16" elementnames="x,y" defaultvalue="640x480" />
+	<access gcs="readwrite" flight="readwrite"/>
+	<telemetrygcs acked="true" updatemode="onchange" period="0"/>
+	<telemetryflight acked="true" updatemode="onchange" period="0"/>
+	<logging updatemode="manual" period="0"/>
+    </object>
+</xml>

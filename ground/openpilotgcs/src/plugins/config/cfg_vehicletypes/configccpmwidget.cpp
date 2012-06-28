@@ -489,7 +489,7 @@ void ConfigCcpmWidget::UpdateCurveWidgets()
     }
     // Setup all Throttle1 curves for all types of airframes
     if (Changed==1)
-        m_ccpm->ThrottleCurve->setCurve(curveValues);
+        m_ccpm->ThrottleCurve->setCurve(&curveValues);
 
     curveValues.clear();
     Changed=0;
@@ -502,7 +502,7 @@ void ConfigCcpmWidget::UpdateCurveWidgets()
     }
     // Setup all Throttle1 curves for all types of airframes
     if (Changed==1)
-        m_ccpm->PitchCurve->setCurve(curveValues);
+        m_ccpm->PitchCurve->setCurve(&curveValues);
 }
 
 void ConfigCcpmWidget::updatePitchCurveValue(QList<double> curveValues0,double Value0)

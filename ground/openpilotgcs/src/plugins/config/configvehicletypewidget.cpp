@@ -274,7 +274,7 @@ QStringList ConfigVehicleTypeWidget::getChannelDescriptions()
         case SystemSettings::AIRFRAMETYPE_FIXEDWINGELEVON:
         case SystemSettings::AIRFRAMETYPE_FIXEDWINGVTAIL:
         {
-            ConfigFixedWingWidget* fixedwing = new ConfigFixedWingWidget();
+            QPointer<ConfigFixedWingWidget> fixedwing = new ConfigFixedWingWidget();
             channelDesc = fixedwing->getChannelDescriptions();
         }
         break;
@@ -282,7 +282,7 @@ QStringList ConfigVehicleTypeWidget::getChannelDescriptions()
         // helicp
         case SystemSettings::AIRFRAMETYPE_HELICP:
         {
-            ConfigCcpmWidget* heli = new ConfigCcpmWidget();
+            QPointer<ConfigCcpmWidget> heli = new ConfigCcpmWidget();
             channelDesc = heli->getChannelDescriptions();
         }
         break;
@@ -300,7 +300,7 @@ QStringList ConfigVehicleTypeWidget::getChannelDescriptions()
         case SystemSettings::AIRFRAMETYPE_HEXACOAX:
         case SystemSettings::AIRFRAMETYPE_HEXA:
         {
-            ConfigMultiRotorWidget* multi = new ConfigMultiRotorWidget();
+            QPointer<ConfigMultiRotorWidget> multi = new ConfigMultiRotorWidget();
             channelDesc = multi->getChannelDescriptions();
         }
         break;
@@ -310,7 +310,7 @@ QStringList ConfigVehicleTypeWidget::getChannelDescriptions()
         case SystemSettings::AIRFRAMETYPE_GROUNDVEHICLEDIFFERENTIAL:
         case SystemSettings::AIRFRAMETYPE_GROUNDVEHICLEMOTORCYCLE:
         {
-            ConfigGroundVehicleWidget* ground = new ConfigGroundVehicleWidget();
+            QPointer<ConfigGroundVehicleWidget> ground = new ConfigGroundVehicleWidget();
             channelDesc = ground->getChannelDescriptions();
         }
         break;
@@ -643,9 +643,9 @@ void ConfigVehicleTypeWidget::refreshWidgetsValues(UAVObject * o)
     // is at least one of the curve values != 0?
     if (vconfig->isValidThrottleCurve(&curveValues)) {
         // yes, use the curve we just read from mixersettings
-        m_aircraft->multiThrottleCurve->initCurve(curveValues);
-        m_aircraft->fixedWingThrottle->initCurve(curveValues);
-        m_aircraft->groundVehicleThrottle1->initCurve(curveValues);
+        m_aircraft->multiThrottleCurve->initCurve(&curveValues);
+        m_aircraft->fixedWingThrottle->initCurve(&curveValues);
+        m_aircraft->groundVehicleThrottle1->initCurve(&curveValues);
     }
     else {
         // no, init a straight curve
@@ -658,7 +658,7 @@ void ConfigVehicleTypeWidget::refreshWidgetsValues(UAVObject * o)
     vconfig->getThrottleCurve(mixer, VehicleConfig::MIXER_THROTTLECURVE2, &curveValues);
 
     if (vconfig->isValidThrottleCurve(&curveValues)) {
-        m_aircraft->groundVehicleThrottle2->initCurve(curveValues);
+        m_aircraft->groundVehicleThrottle2->initCurve(&curveValues);
     }
     else {
         m_aircraft->groundVehicleThrottle2->initLinearCurve(curveValues.count(), 1.0);
@@ -767,7 +767,7 @@ void ConfigVehicleTypeWidget::updateCustomAirframeUI()
         // yes, use the curve we just read from mixersettings
         m_aircraft->customThrottle1Curve->setMin(vconfig->getCurveMin(&curveValues));
         m_aircraft->customThrottle1Curve->setMax(vconfig->getCurveMax(&curveValues));
-        m_aircraft->customThrottle1Curve->initCurve(curveValues);
+        m_aircraft->customThrottle1Curve->initCurve(&curveValues);
     }
     else {
         // no, init a straight curve
@@ -780,7 +780,7 @@ void ConfigVehicleTypeWidget::updateCustomAirframeUI()
     if (vconfig->isValidThrottleCurve(&curveValues)) {
         m_aircraft->customThrottle2Curve->setMin(vconfig->getCurveMin(&curveValues));
         m_aircraft->customThrottle2Curve->setMax(vconfig->getCurveMax(&curveValues));
-        m_aircraft->customThrottle2Curve->initCurve(curveValues);
+        m_aircraft->customThrottle2Curve->initCurve(&curveValues);
     }
     else {
         m_aircraft->customThrottle2Curve->initLinearCurve(curveValues.count(),(double)1);

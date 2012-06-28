@@ -44,10 +44,10 @@ public:
     MixerCurveWidget(QWidget *parent = 0);
    ~MixerCurveWidget();
    void itemMoved(double itemValue); // Callback when a point is moved, to be updated
-   void initCurve (QList<double> points);
+   void initCurve (const QList<double>* points);
    QList<double> getCurve();
    void initLinearCurve(int numPoints, double maxValue = 1, double minValue = 0);
-   void setCurve(QList<double>);
+   void setCurve(const QList<double>* points);
    void setMin(double value);
    double getMin();
    void setMax(double value);
@@ -57,7 +57,7 @@ public:
    static const int NODE_NUMELEM = 5;
 
 signals:
-   void curveUpdated(QList<double>, double );
+   void curveUpdated(const QList<double>* points, const double value);
 
 private slots:
 

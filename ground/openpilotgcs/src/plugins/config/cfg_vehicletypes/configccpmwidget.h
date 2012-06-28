@@ -95,7 +95,7 @@ private:
         virtual void setupUI(QString airframeType);
         virtual void refreshWidgetsValues(QString frameType);
         virtual QString updateConfigObjectsFromWidgets();
-        virtual void throwConfigError(QString airframeType);
+        virtual bool throwConfigError(QString airframeType);
 
         void ccpmSwashplateUpdate();
         void ccpmSwashplateRedraw();

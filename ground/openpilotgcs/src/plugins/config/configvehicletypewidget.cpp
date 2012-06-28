@@ -447,7 +447,7 @@ void ConfigVehicleTypeWidget::enableFFTest()
             UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
             Q_ASSERT(mixer);
 
-            VehicleConfig* vconfig = new VehicleConfig();
+            QPointer<VehicleConfig> vconfig = new VehicleConfig();
 
             // Update feed forward settings
             vconfig->setMixerValue(mixer, "FeedForward", m_aircraft->feedForwardSlider->value() / 100.0);
@@ -831,7 +831,7 @@ void ConfigVehicleTypeWidget::updateObjectsFromWidgets()
     UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(mixer);
 
-    VehicleConfig* vconfig = new VehicleConfig();
+    QPointer<VehicleConfig> vconfig = new VehicleConfig();
 
     // Update feed forward settings
     vconfig->setMixerValue(mixer, "FeedForward", m_aircraft->feedForwardSlider->value() / 100.0);

@@ -851,7 +851,8 @@ void ConfigCcpmWidget::UpdateMixer()
     float CollectiveConstant,PitchConstant,RollConstant,ThisAngle[6];
     QString Channel;
 
-    throwConfigError(QString("HeliCP"));
+    if (throwConfigError(QString("HeliCP")))
+        return;
 
     GUIConfigDataUnion config = GetConfigData();
 
@@ -1714,13 +1715,16 @@ void ConfigCcpmWidget::SwashLvlSpinBoxChanged(int value)
 /**
  This function displays text and color formatting in order to help the user understand what channels have not yet been configured.
  */
-void ConfigCcpmWidget::throwConfigError(QString airframeType)
+bool ConfigCcpmWidget::throwConfigError(QString airframeType)
 {
     Q_UNUSED(airframeType);
+
+    bool error = false;
 
     if((m_ccpm->ccpmServoWChannel->currentIndex()==0)&&(m_ccpm->ccpmServoWChannel->isEnabled()))
     {
         m_ccpm->ccpmServoWLabel->setText("<font color=red>Servo W</font>");
+        error = true;
     }
     else
     {
@@ -1729,6 +1733,7 @@ void ConfigCcpmWidget::throwConfigError(QString airframeType)
     if((m_ccpm->ccpmServoXChannel->currentIndex()==0)&&(m_ccpm->ccpmServoXChannel->isEnabled()))
     {
         m_ccpm->ccpmServoXLabel->setText("<font color=red>Servo X</font>");
+        error = true;
     }
     else
     {
@@ -1737,6 +1742,7 @@ void ConfigCcpmWidget::throwConfigError(QString airframeType)
     if((m_ccpm->ccpmServoYChannel->currentIndex()==0)&&(m_ccpm->ccpmServoYChannel->isEnabled()))
     {
         m_ccpm->ccpmServoYLabel->setText("<font color=red>Servo Y</font>");
+        error = true;
     }
     else
     {
@@ -1745,6 +1751,7 @@ void ConfigCcpmWidget::throwConfigError(QString airframeType)
     if((m_ccpm->ccpmServoZChannel->currentIndex()==0)&&(m_ccpm->ccpmServoZChannel->isEnabled()))
     {
         m_ccpm->ccpmServoZLabel->setText("<font color=red>Servo Z</font>");
+        error = true;
     }
     else
     {
@@ -1763,10 +1770,12 @@ void ConfigCcpmWidget::throwConfigError(QString airframeType)
     if((m_ccpm->ccpmTailChannel->currentIndex()==0)&&(m_ccpm->ccpmTailChannel->isEnabled()))
     {
         m_ccpm->ccpmTailLabel->setText("<font color=red>Tail Rotor</font>");
+        error = true;
     }
     else
     {
         m_ccpm->ccpmTailLabel->setText("<font color=black>Tail Rotor</font>");
     }
 
+    return error;
 }

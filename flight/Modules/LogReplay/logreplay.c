@@ -31,18 +31,18 @@
  */
 
 #include "openpilot.h"
+#include "hwsettings.h"
 
 // Private constants
-#define MAX_QUEUE_SIZE   TELEM_QUEUE_SIZE
 #define STACK_SIZE_BYTES PIOS_TELEM_STACK_SIZE
 #define TASK_PRIORITY_RX (tskIDLE_PRIORITY + 2)
-#define REQ_TIMEOUT_MS 250
-#define MAX_RETRIES 2
 
 // Private types
 
 // Private variables
 static uint32_t logreplayPort;
+
+static bool logreplayEnabled;
 
 static xTaskHandle logreplayRxTaskHandle;
 static uint32_t timeOfLastObjectUpdate;
@@ -59,10 +59,14 @@ static void logreplayRxTask(void *parameters);
 int32_t LogReplayStart(void)
 {
     
-	// Start logreplay tasks
-	xTaskCreate(logreplayRxTask, (signed char *)"LogRx", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY_RX, &logreplayRxTaskHandle);
-	TaskMonitorAdd(TASKINFO_RUNNING_LOGREPLAYRX, logreplayRxTaskHandle);
-
+	if (logreplayEnabled) {
+		// Initialise UAVTalk
+		uavTalkCon = UAVTalkInitialize(NULL);
+	    
+		// Start logreplay tasks
+		xTaskCreate(logreplayRxTask, (signed char *)"LogRx", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY_RX, &logreplayRxTaskHandle);
+		TaskMonitorAdd(TASKINFO_RUNNING_LOGREPLAYRX, logreplayRxTaskHandle);
+	}
 
 	return 0;
 }
@@ -79,9 +83,15 @@ int32_t LogReplayInitialize(void)
 
 	// Update logreplay settings
 	logreplayPort = PIOS_COM_AUX;
-    
-	// Initialise UAVTalk
-	uavTalkCon = UAVTalkInitialize(NULL);
+
+	HwSettingsInitialize();
+	uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
+	HwSettingsOptionalModulesGet(optionalModules);
+	if (optionalModules[HWSETTINGS_OPTIONALMODULES_LOGREPLAY] == HWSETTINGS_OPTIONALMODULES_ENABLED)
+		logreplayEnabled = true;
+	else
+		logreplayEnabled = false;
+
     
 	return 0;
 }

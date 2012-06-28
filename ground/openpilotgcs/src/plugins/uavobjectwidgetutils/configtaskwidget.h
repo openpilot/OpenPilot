@@ -84,7 +84,7 @@ public:
     };
 
     ConfigTaskWidget(QWidget *parent = 0);
-    ~ConfigTaskWidget();
+    virtual ~ConfigTaskWidget();
 
     void disableMouseWheelEvents();
     bool eventFilter( QObject * obj, QEvent * evt );

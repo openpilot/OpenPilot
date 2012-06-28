@@ -656,6 +656,12 @@ endef
 
 ALL_BOARDS := coptercontrol pipxtreme revolution simposix
 
+# SimPosix only builds on Linux so drop it from the list for
+# all other platforms.
+ifneq ($(UNAME), Linux)
+ALL_BOARDS  := $(filter-out simposix, $(ALL_BOARDS))
+endif
+
 # Friendly names of each board (used to find source tree)
 coptercontrol_friendly := CopterControl
 pipxtreme_friendly     := PipXtreme
@@ -675,6 +681,13 @@ ifneq ($(UNAME), Linux)
 ALL_BOARDS  := $(filter-out simposix, $(ALL_BOARDS))
 endif
 
+# Short hames of each board (used to display board name in parallel builds)
+coptercontrol_short    := 'cc  '
+pipxtreme_short        := 'pipx'
+revolution_short       := 'revo'
+simposix_short         := 'posx'
+osd_short              := 'osd '
+
 # Start out assuming that we'll build fw, bl and bu for all boards
 FW_BOARDS  := $(ALL_BOARDS)
 BL_BOARDS  := $(ALL_BOARDS)
@@ -684,6 +697,12 @@ EF_BOARDS  := $(ALL_BOARDS)
 # FIXME: The BU image doesn't work for F4 boards so we need to
 #        filter them out to prevent errors.
 BU_BOARDS  := $(filter-out revolution, $(BU_BOARDS))
+
+# SimPosix doesn't have a BL, BU or EF target so we need to
+# filter them out to prevent errors on the all_flight target.
+BL_BOARDS  := $(filter-out simposix, $(BL_BOARDS))
+BU_BOARDS  := $(filter-out simposix, $(BU_BOARDS))
+EF_BOARDS  := $(filter-out simposix, $(EF_BOARDS))
 
 # SimPosix doesn't have a BL, BU or EF target so we need to
 # filter them out to prevent errors on the all_flight target.

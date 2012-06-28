@@ -57,7 +57,9 @@ namespace mapcontrol
         internals::PointLatLng Coord()const{return coord;}
         void SetAltitude(float const& value){altitude=value;emit homePositionChanged(Coord(),Altitude());}
         float Altitude()const{return altitude;}
+        void RefreshToolTip();
     private:
+
         MapGraphicItem* map;
         OPMapWidget* mapwidget;
         QPixmap pic;

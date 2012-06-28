@@ -38,8 +38,16 @@ namespace mapcontrol
         this->setPos(localposition.X(),localposition.Y());
         this->setZValue(4);
         coord=internals::PointLatLng(50,50);
-        setToolTip("AAAA");
+        RefreshToolTip();
     }
+
+    void HomeItem::RefreshToolTip()
+    {
+        QString coord_str = " " + QString::number(coord.Lat(), 'f', 6) + "   " + QString::number(coord.Lng(), 'f', 6);
+
+        setToolTip(QString("Waypoint: Home\nCoordinate:%1\nAltitude:%2\n").arg(coord_str).arg(QString::number(altitude)));
+    }
+
 
     void HomeItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
     {
@@ -70,6 +78,7 @@ namespace mapcontrol
     {
         return Type;
     }
+
     void HomeItem::RefreshPos()
     {
         prepareGeometryChange();
@@ -78,7 +87,10 @@ namespace mapcontrol
         if(showsafearea)
             localsafearea=safearea/map->Projection()->GetGroundResolution(map->ZoomTotal(),coord.Lat());
 
+        RefreshToolTip();
+
     }
+
     void HomeItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     {
         if(event->button()==Qt::LeftButton)
@@ -87,6 +99,7 @@ namespace mapcontrol
         }
         QGraphicsItem::mousePressEvent(event);
     }
+
     void HomeItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     {
         if(event->button()==Qt::LeftButton)
@@ -97,6 +110,8 @@ namespace mapcontrol
             emit homePositionChanged(coord,Altitude());
         }
         QGraphicsItem::mouseReleaseEvent(event);
+
+        RefreshToolTip();
     }
     void HomeItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     {

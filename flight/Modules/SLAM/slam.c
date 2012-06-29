@@ -187,7 +187,7 @@ static void slamTask(void *parameters)
 				  settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_X]/2
 				,
 				  settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_Y]/2
-				  - attitudeActual.Pitch * settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_Y]/60.
+				  + attitudeActual.Pitch * settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_Y]/60.
 				);
 			// i want overloaded operands damnit!
 			CvPoint right = cvPoint(
@@ -196,7 +196,7 @@ static void slamTask(void *parameters)
 					settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_Y]
 				  )*cos(DEG2RAD*attitudeActual.Roll)/3
 				,
-				  fmin(
+				  -fmin(
 					settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_X],
 					settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_Y]
 				  )*sin(DEG2RAD*attitudeActual.Roll)/3

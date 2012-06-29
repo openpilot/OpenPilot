@@ -217,7 +217,7 @@ extern volatile uint32_t pm_timerMsTicks;
 #include "global.h"
 #include "class.h"
 #include "thread.h"
-#include "float.h"
+#include "pyfloat.h"
 #include "plat_interface.h"
 #include "bytearray.h"
 

@@ -46,8 +46,9 @@
 
 
 #include "opencv/cv.h"		// OpenCV library
-#include "opencv/highgui.h"	// GUI for debug outpt
+#include "opencv/highgui.h"	// HighGUI offers video IO and debug output to screen when run on a PC
 
+#include "backgroundio.h"	// video IO runs in background even if FreeRTOS gives control to another task
 
 #include "openpilot.h"
 #include "slamsettings.h"	// object holding module settings
@@ -59,6 +60,7 @@
 // Private constants
 #define STACK_SIZE 16386 // doesn't really mater as long as big enough
 #define TASK_PRIORITY (tskIDLE_PRIORITY+1)
+#define DEG2RAD (3.1415926535897932/180.0)
 
 // Private variables
 static xTaskHandle taskHandle;
@@ -121,34 +123,50 @@ static void slamTask(void *parameters)
 
 	/* Initialize OpenCV */
 	//CvCapture *VideoSource = NULL; //cvCaptureFromFile("test.avi");
-	//CvCapture *VideoSource = cvCaptureFromFile("test.avi");
-	CvCapture *VideoSource = cvCaptureFromCAM(0);
+	CvCapture *VideoSource = cvCaptureFromFile("test.avi");
+	//CvCapture *VideoSource = cvCaptureFromCAM(0);
 
 
-	//cvSetCaptureProperty(VideoSource, CV_CAP_PROP_FRAME_WIDTH,  settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_X]);
-	//cvSetCaptureProperty(VideoSource, CV_CAP_PROP_FRAME_HEIGHT, settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_Y]);
+	if (VideoSource) {
+		cvGrabFrame(VideoSource);
+		currentFrame = cvRetrieveFrame(VideoSource, 0);
+		cvSetCaptureProperty(VideoSource, CV_CAP_PROP_FRAME_WIDTH,  settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_X]);
+		cvSetCaptureProperty(VideoSource, CV_CAP_PROP_FRAME_HEIGHT, settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_Y]);
+	}
 
-	if (VideoSource) cvGrabFrame(VideoSource);
-	if (VideoSource) currentFrame = cvRetrieveFrame(VideoSource, 0);
 	if (currentFrame) lastFrame = cvCloneImage(currentFrame);
 
 	// debug output
 	cvNamedWindow("debug",CV_WINDOW_AUTOSIZE);
 
-	uint32_t starttime = PIOS_DELAY_GetRaw();
-	uint32_t timeval = starttime;
-	fprintf(stderr,"init at %i\n",timeval);
+	uint32_t timeval = PIOS_DELAY_GetRaw();
+	portTickType currentTime,startTime = xTaskGetTickCount();
+	portTickType increment = ((float)(1000./settings.FrameRate)) / portTICK_RATE_MS;
+	fprintf(stderr,"init at %i increment is %i\n",timeval, increment);
+
+	// synchronization delay, wait for attitude data - any attitude data
+	// this is an evil hack but necessary for tests with log data to synchronize video and telemetry
+	AttitudeActualGet(&attitudeActual);
+	attitudeActual.Pitch=100;
+	AttitudeActualSet(&attitudeActual);
+	while (attitudeActual.Pitch==100) AttitudeActualGet(&attitudeActual);
 
 	// Main task loop
 	while (1) {
+		frame++;
 		cvWaitKey(1);
-		vTaskDelay(10);
+		currentTime = startTime;
+		vTaskDelayUntil(&currentTime,startTime+(frame*increment));
 
 		float dT = PIOS_DELAY_DiffuS(timeval) * 1.0e-6f;
 		timeval = PIOS_DELAY_GetRaw();
 
 		// Grab the current camera image
-		if (VideoSource) cvGrabFrame(VideoSource);
+		if (VideoSource) {
+			// frame grabbing must take place outside of FreeRTOS scheduler,
+			// since OpenCV's hardware IO does not like being interrupted.
+			backgroundGrabFrame(VideoSource);
+		}
 		
 		// Get the object data
 		AttitudeActualGet(&attitudeActual);
@@ -158,14 +176,41 @@ static void slamTask(void *parameters)
 		if (VideoSource) currentFrame = cvRetrieveFrame(VideoSource, 0);
 
 		if (lastFrame) {
-			cvShowImage("debug",lastFrame);
 			cvReleaseImage(&lastFrame);
 		}
-		if (currentFrame) lastFrame = cvCloneImage(currentFrame);
+		if (currentFrame) {
+			lastFrame = cvCloneImage(currentFrame);
 
 
-		fprintf(stderr,"frame at %i\n",timeval);
-		PIOS_DELAY_WaitmS(10000);
+			// draw a line in the video coresponding to artificial horizon (roll+pitch)
+			CvPoint center = cvPoint(
+				  settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_X]/2
+				,
+				  settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_Y]/2
+				  - attitudeActual.Pitch * settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_Y]/60.
+				);
+			// i want overloaded operands damnit!
+			CvPoint right = cvPoint(
+				  fmin(
+					settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_X],
+					settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_Y]
+				  )*cos(DEG2RAD*attitudeActual.Roll)/3
+				,
+				  fmin(
+					settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_X],
+					settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_Y]
+				  )*sin(DEG2RAD*attitudeActual.Roll)/3
+				);
+			CvPoint left = cvPoint(center.x-right.x,center.y-right.y);
+			right.x += center.x;
+			right.y += center.y;
+			cvLine(lastFrame,left,right,CV_RGB(255,255,0),3,8,0);
+
+			cvShowImage("debug",lastFrame);
+		}
+
+
+		fprintf(stderr,"frame %i at %i\n",frame,currentTime);
 	}
 }
 

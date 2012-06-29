@@ -347,6 +347,7 @@ LDFLAGS += -lc
 LDFLAGS += $(patsubst %,-l%,$(EXTRA_LIBS))
 LDFLAGS += $(MATH_LIB)
 LDFLAGS += -lc -lgcc -lpthread -lrt
+LDFLAGS += `pkg-config --libs opencv`
 
 #Linker scripts                                                                                                                                                                                                              
 LDFLAGS += $(addprefix -T,$(LINKER_SCRIPTS_APP))

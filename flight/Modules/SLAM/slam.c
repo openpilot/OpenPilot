@@ -44,6 +44,11 @@
  *
  */
 
+
+#include "opencv/cv.h"		// OpenCV library
+#include "opencv/highgui.h"	// GUI for debug outpt
+
+
 #include "openpilot.h"
 #include "slamsettings.h"	// object holding module settings
 #include "hwsettings.h"		// object holding module system configuration
@@ -53,7 +58,7 @@
 
 // Private constants
 #define STACK_SIZE 16386 // doesn't really mater as long as big enough
-#define TASK_PRIORITY (tskIDLE_PRIORITY+2)
+#define TASK_PRIORITY (tskIDLE_PRIORITY+1)
 
 // Private variables
 static xTaskHandle taskHandle;
@@ -111,21 +116,56 @@ static void slamTask(void *parameters)
 	AttitudeActualData attitudeActual;
 	PositionActualData positionActual;
 	VelocityActualData velocityActual;
+	IplImage *currentFrame = NULL, *lastFrame = NULL;
+	uint32_t frame = 0;
 
-	uint32_t timeval = PIOS_DELAY_GetRaw();
+	/* Initialize OpenCV */
+	//CvCapture *VideoSource = NULL; //cvCaptureFromFile("test.avi");
+	//CvCapture *VideoSource = cvCaptureFromFile("test.avi");
+	CvCapture *VideoSource = cvCaptureFromCAM(0);
+
+
+	//cvSetCaptureProperty(VideoSource, CV_CAP_PROP_FRAME_WIDTH,  settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_X]);
+	//cvSetCaptureProperty(VideoSource, CV_CAP_PROP_FRAME_HEIGHT, settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_Y]);
+
+	if (VideoSource) cvGrabFrame(VideoSource);
+	if (VideoSource) currentFrame = cvRetrieveFrame(VideoSource, 0);
+	if (currentFrame) lastFrame = cvCloneImage(currentFrame);
+
+	// debug output
+	cvNamedWindow("debug",CV_WINDOW_AUTOSIZE);
+
+	uint32_t starttime = PIOS_DELAY_GetRaw();
+	uint32_t timeval = starttime;
+	fprintf(stderr,"init at %i\n",timeval);
 
 	// Main task loop
 	while (1) {
+		cvWaitKey(1);
+		vTaskDelay(10);
 
-		
 		float dT = PIOS_DELAY_DiffuS(timeval) * 1.0e-6f;
 		timeval = PIOS_DELAY_GetRaw();
 
+		// Grab the current camera image
+		if (VideoSource) cvGrabFrame(VideoSource);
+		
 		// Get the object data
 		AttitudeActualGet(&attitudeActual);
 		PositionActualGet(&positionActual);
 		VelocityActualGet(&velocityActual);
 
+		if (VideoSource) currentFrame = cvRetrieveFrame(VideoSource, 0);
+
+		if (lastFrame) {
+			cvShowImage("debug",lastFrame);
+			cvReleaseImage(&lastFrame);
+		}
+		if (currentFrame) lastFrame = cvCloneImage(currentFrame);
+
+
+		fprintf(stderr,"frame at %i\n",timeval);
+		PIOS_DELAY_WaitmS(10000);
 	}
 }
 

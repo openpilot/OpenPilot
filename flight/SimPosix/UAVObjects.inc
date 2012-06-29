@@ -31,6 +31,7 @@ UAVOBJSRCFILENAMES += actuatorsettings
 UAVOBJSRCFILENAMES += altholdsmoothed
 UAVOBJSRCFILENAMES += attitudesettings
 UAVOBJSRCFILENAMES += attitudeactual
+UAVOBJSRCFILENAMES += attituderaw
 UAVOBJSRCFILENAMES += gyros
 UAVOBJSRCFILENAMES += gyrosbias
 UAVOBJSRCFILENAMES += accels

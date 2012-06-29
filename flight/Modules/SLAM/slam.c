@@ -79,9 +79,8 @@ static void SettingsUpdatedCb(UAVObjEvent * ev);
 int32_t SLAMStart()
 {
 	if (slamEnabled) {
-		// register callback and update settings
+		// register callback
 		SLAMSettingsConnectCallback(SettingsUpdatedCb);
-		SettingsUpdatedCb(SLAMSettingsHandle());
 
 		// Start main task
 		xTaskCreate(slamTask, (signed char *)"SLAM", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
@@ -127,6 +126,7 @@ static void slamTask(void *parameters)
 	CvCapture *VideoSource = cvCaptureFromFile("test.avi");
 	//CvCapture *VideoSource = cvCaptureFromCAM(0);
 
+	SettingsUpdatedCb(SLAMSettingsHandle());
 
 	if (VideoSource) {
 		cvGrabFrame(VideoSource);
@@ -139,18 +139,19 @@ static void slamTask(void *parameters)
 
 	// debug output
 	cvNamedWindow("debug",CV_WINDOW_AUTOSIZE);
-
-	uint32_t timeval = PIOS_DELAY_GetRaw();
-	portTickType currentTime,startTime = xTaskGetTickCount();
-	portTickType increment = ((float)(1000./settings.FrameRate)) / portTICK_RATE_MS;
-	fprintf(stderr,"init at %i increment is %i\n",timeval, increment);
-
+	
 	// synchronization delay, wait for attitude data - any attitude data
 	// this is an evil hack but necessary for tests with log data to synchronize video and telemetry
 	AttitudeActualGet(&attitudeActual);
 	attitudeActual.Pitch=100;
 	AttitudeActualSet(&attitudeActual);
 	while (attitudeActual.Pitch==100) AttitudeActualGet(&attitudeActual);
+
+
+	uint32_t timeval = PIOS_DELAY_GetRaw();
+	portTickType currentTime,startTime = xTaskGetTickCount();
+	portTickType increment = ((float)(1000./settings.FrameRate)) / portTICK_RATE_MS;
+	fprintf(stderr,"init at %i increment is %i\n",timeval, increment);
 
 	// Main task loop
 	while (1) {

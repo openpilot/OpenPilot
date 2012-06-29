@@ -95,10 +95,17 @@ static inline ssize_t mywrite(int fd, void* buf, size_t count) {
 
 
 
-int main() {
+int main(int argc, char** argv) {
 
 	struct timeval starttime,ctime;
 	gettimeofday(&starttime,NULL);
+
+	int32_t startoffset = 0;
+	if (argc>1) {
+		sscanf(argv[1],"%i",&startoffset);
+		fprintf(stderr," start offset: %i ms\n",startoffset);
+	}
+
 
 	findgranularity();
 
@@ -118,7 +125,7 @@ int main() {
 		perror("failed to connect :");
 		return 1;
 	}
-	printf("connected\n");
+	fprintf(stderr,"connected\n");
 
 
 	int input = open(logfile,O_RDONLY);
@@ -133,9 +140,11 @@ int main() {
 		n = myread(input,buffer,dataSize);
 		if (n<=0) return(0);
 
-		dosleep(&starttime,timestamp*1000);
+		if ((long)timestamp>=startoffset) {
+			dosleep(&starttime,((long)timestamp-startoffset)*1000);
 
-		mywrite(sock,buffer,dataSize);
+			mywrite(sock,buffer,dataSize);
+		}
 
 	}
 	fprintf(stderr,"aborting: %s\n",strerror(-n));

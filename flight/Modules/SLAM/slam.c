@@ -49,6 +49,7 @@
 #include "opencv/highgui.h"	// HighGUI offers video IO and debug output to screen when run on a PC
 
 #include "backgroundio.h"	// video IO runs in background even if FreeRTOS gives control to another task
+#include "opencvslam.h"		// bridge to C++ part of module
 
 #include "openpilot.h"
 #include "slamsettings.h"	// object holding module settings
@@ -174,6 +175,9 @@ static void slamTask(void *parameters)
 		VelocityActualGet(&velocityActual);
 
 		if (VideoSource) currentFrame = cvRetrieveFrame(VideoSource, 0);
+
+		struct opencvslam_input i = {.x=0};
+		struct opencvslam_output *o = opencvslam_run(i);
 
 		if (lastFrame) {
 			cvReleaseImage(&lastFrame);

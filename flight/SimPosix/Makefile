@@ -164,6 +164,9 @@ SRCARM =
 # use file-extension .cpp for C++-files (not .C)
 CPPSRC =
 
+## MODULES
+CPPSRC += ${foreach MOD, ${MODULES}, ${wildcard ${OPMODULEDIR}/${MOD}/*.cpp}}
+
 # List C++ source files here which must be compiled in ARM-Mode.
 # use file-extension .cpp for C++-files (not .C)
 #CPPSRCARM = $(TARGET).cpp

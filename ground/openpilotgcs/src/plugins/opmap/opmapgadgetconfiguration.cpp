@@ -42,7 +42,8 @@ OPMapGadgetConfiguration::OPMapGadgetConfiguration(QString classId,  QSettings* 
     m_cacheLocation(Utils::PathUtils().GetStoragePath() + "mapscache" + QDir::separator()),
 	m_uavSymbol(QString::fromUtf8(":/uavs/images/mapquad.png")),
     m_maxUpdateRate(2000),	// ms
-    m_settings(qSettings)
+    m_settings(qSettings),
+    m_opacity(1)
 {
 
     //if a saved configuration exists load it
@@ -59,6 +60,8 @@ OPMapGadgetConfiguration::OPMapGadgetConfiguration(QString classId,  QSettings* 
         QString cacheLocation= qSettings->value("cacheLocation").toString();
         QString uavSymbol=qSettings->value("uavSymbol").toString();
 		int max_update_rate = qSettings->value("maxUpdateRate").toInt();
+
+        m_opacity=qSettings->value("overlayOpacity",1).toReal();
 
         if (!mapProvider.isEmpty()) m_mapProvider = mapProvider;
         m_defaultZoom = zoom;
@@ -95,6 +98,7 @@ IUAVGadgetConfiguration * OPMapGadgetConfiguration::clone()
     m->m_cacheLocation = m_cacheLocation;
 	m->m_uavSymbol = m_uavSymbol;
 	m->m_maxUpdateRate = m_maxUpdateRate;
+    m->m_opacity=m_opacity;
 
     return m;
 }
@@ -112,6 +116,7 @@ void OPMapGadgetConfiguration::saveConfig() const {
    m_settings->setValue("uavSymbol", m_uavSymbol);
    m_settings->setValue("cacheLocation", Utils::PathUtils().RemoveStoragePath(m_cacheLocation));
    m_settings->setValue("maxUpdateRate", m_maxUpdateRate);
+   m_settings->setValue("overlayOpacity",m_opacity);
 }
 void OPMapGadgetConfiguration::saveConfig(QSettings* qSettings) const {
    qSettings->setValue("mapProvider", m_mapProvider);
@@ -125,6 +130,7 @@ void OPMapGadgetConfiguration::saveConfig(QSettings* qSettings) const {
    qSettings->setValue("uavSymbol", m_uavSymbol);
    qSettings->setValue("cacheLocation", Utils::PathUtils().RemoveStoragePath(m_cacheLocation));
    qSettings->setValue("maxUpdateRate", m_maxUpdateRate);
+   qSettings->setValue("overlayOpacity",m_opacity);
 }
 void OPMapGadgetConfiguration::setCacheLocation(QString cacheLocation){
     m_cacheLocation = cacheLocation;

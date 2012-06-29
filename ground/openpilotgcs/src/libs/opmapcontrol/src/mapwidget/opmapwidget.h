@@ -353,6 +353,8 @@ namespace mapcontrol
 
         void SetShowCompass(bool const& value);
 
+        void setOverlayOpacity(qreal value);
+
         UAVItem* UAV;
         GPSItem* GPS;
         HomeItem* Home;
@@ -390,6 +392,7 @@ namespace mapcontrol
         QTimer * diagTimer;
         QGraphicsTextItem * diagGraphItem;
         bool showDiag;
+        qreal overlayOpacity;
     private slots:
         void diagRefresh();
         //   WayPointItem* item;//apagar

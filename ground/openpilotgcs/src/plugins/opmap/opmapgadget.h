@@ -52,7 +52,8 @@ private:
     OPMapGadgetWidget *m_widget;
     OPMapGadgetConfiguration *m_config;
 private slots:
-    void saveConfiguration(double lng, double lat, double zoom);
+    void saveOpacity(qreal value);
+    void saveDefaultLocation(double lng, double lat, double zoom);
 };
 
 

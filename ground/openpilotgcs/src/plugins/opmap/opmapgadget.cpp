@@ -31,14 +31,15 @@ OPMapGadget::OPMapGadget(QString classId, OPMapGadgetWidget *widget, QWidget *pa
         IUAVGadget(classId, parent),
     m_widget(widget),m_config(NULL)
 {
-    connect(m_widget,SIGNAL(defaultLocationAndZoomChanged(double,double,double)),this,SLOT(saveConfiguration(double,double,double)));
+    connect(m_widget,SIGNAL(defaultLocationAndZoomChanged(double,double,double)),this,SLOT(saveDefaultLocation(double,double,double)));
+    connect(m_widget,SIGNAL(overlayOpacityChanged(qreal)),this,SLOT(saveOpacity(qreal)));
 }
 
 OPMapGadget::~OPMapGadget()
 {
     delete m_widget;
 }
-void OPMapGadget::saveConfiguration(double lng,double lat,double zoom)
+void OPMapGadget::saveDefaultLocation(double lng,double lat,double zoom)
 {
     if(m_config)
     {
@@ -49,6 +50,13 @@ void OPMapGadget::saveConfiguration(double lng,double lat,double zoom)
     }
 }
 
+void OPMapGadget::saveOpacity(qreal value)
+{
+    if(m_config)
+    {
+        m_config->setOpacity(value);
+    }
+}
 void OPMapGadget::loadConfiguration(IUAVGadgetConfiguration *config)
 {
     m_config = qobject_cast<OPMapGadgetConfiguration*>(config);
@@ -62,6 +70,6 @@ void OPMapGadget::loadConfiguration(IUAVGadgetConfiguration *config)
     m_widget->setZoom(m_config->zoom());
     m_widget->setPosition(QPointF(m_config->longitude(), m_config->latitude()));
     m_widget->setHomePosition(QPointF(m_config->longitude(), m_config->latitude()));
-
+    m_widget->setOverlayOpacity(m_config->opacity());
 }
 

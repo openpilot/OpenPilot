@@ -115,8 +115,10 @@ public:
 	void SetUavPic(QString UAVPic);
     void setMaxUpdateRate(int update_rate);
     void setHomePosition(QPointF pos);
+    void setOverlayOpacity(qreal value);
 signals:
     void defaultLocationAndZoomChanged(double lng,double lat,double zoom);
+    void overlayOpacityChanged(qreal);
 
 public slots:
     void homePositionUpdated(UAVObject *);
@@ -207,6 +209,7 @@ private slots:
     void onChangeDefaultLocalAndZoom();
     void on_tbFind_clicked();
     void onHomeDoubleClick(HomeItem*);
+    void onOverlayOpacityActGroup_triggered(QAction *action);
 private:
 	int m_min_zoom;
 	int m_max_zoom;
@@ -281,7 +284,9 @@ private:
     QList<QAction *> mapModeAct;
 
     QActionGroup *zoomActGroup;
+    QActionGroup *overlayOpacityActGroup;
     QList<QAction *> zoomAct;
+    QList<QAction *> overlayOpacityAct;
 
 	QActionGroup *maxUpdateRateActGroup;
 	QList<QAction *> maxUpdateRateAct;

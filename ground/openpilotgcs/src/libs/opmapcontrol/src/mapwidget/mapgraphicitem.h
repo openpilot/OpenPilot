@@ -94,7 +94,6 @@ namespace mapcontrol
         bool IsDragging()const{return core->IsDragging();}
 
         QImage lastimage;
-//        QPainter* imagePainter;
         core::Point lastimagepoint;
         void paintImage(QPainter* painter);
         void ConstructLastImage(int const& zoomdiff);
@@ -102,7 +101,7 @@ namespace mapcontrol
         double Zoom();
         double ZoomDigi();
         double ZoomTotal();
-
+        void setOverlayOpacity(qreal value);
     protected:
         void mouseMoveEvent ( QGraphicsSceneMouseEvent * event );
         void mousePressEvent ( QGraphicsSceneMouseEvent * event );

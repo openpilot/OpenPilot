@@ -59,6 +59,7 @@ namespace mapcontrol
         SetShowDiagnostics(showDiag);
         this->setMouseTracking(followmouse);
         SetShowCompass(true);
+        overlayOpacity=1;
 
     }
     void OPMapWidget::SetShowDiagnostics(bool const& value)
@@ -92,6 +93,7 @@ namespace mapcontrol
             {
                 GPS=new GPSItem(map,this);
                 GPS->setParentItem(map);
+                setOverlayOpacity(overlayOpacity);
             }
         }
 
@@ -108,26 +110,34 @@ namespace mapcontrol
     {
         if(!from|!to)
             return NULL;
-        return new WayPointLine(from,to,map,color);
+        WayPointLine* ret= new WayPointLine(from,to,map,color);
+        setOverlayOpacity(overlayOpacity);
+        return ret;
     }
     WayPointLine * OPMapWidget::WPLineCreate(HomeItem *from, WayPointItem *to,QColor color)
     {
         if(!from|!to)
             return NULL;
-        return new WayPointLine(from,to,map,color);
+        WayPointLine* ret= new WayPointLine(from,to,map,color);
+        setOverlayOpacity(overlayOpacity);
+        return ret;
     }
     WayPointCircle * OPMapWidget::WPCircleCreate(WayPointItem *center, WayPointItem *radius, bool clockwise,QColor color)
     {
         if(!center|!radius)
             return NULL;
-        return new WayPointCircle(center,radius,clockwise,map,color);
+        WayPointCircle* ret= new WayPointCircle(center,radius,clockwise,map,color);
+        setOverlayOpacity(overlayOpacity);
+        return ret;
     }
 
     WayPointCircle *OPMapWidget::WPCircleCreate(HomeItem *center, WayPointItem *radius, bool clockwise,QColor color)
     {
         if(!center|!radius)
             return NULL;
-        return new WayPointCircle(center,radius,clockwise,map,color);
+        WayPointCircle* ret= new WayPointCircle(center,radius,clockwise,map,color);
+        setOverlayOpacity(overlayOpacity);
+        return ret;
     }
     void OPMapWidget::SetShowUAV(const bool &value)
     {
@@ -137,6 +147,7 @@ namespace mapcontrol
             UAV->setParentItem(map);
             connect(this,SIGNAL(UAVLeftSafetyBouble(internals::PointLatLng)),UAV,SIGNAL(UAVLeftSafetyBouble(internals::PointLatLng)));
             connect(this,SIGNAL(UAVReachedWayPoint(int,WayPointItem*)),UAV,SIGNAL(UAVReachedWayPoint(int,WayPointItem*)));
+            setOverlayOpacity(overlayOpacity);
         }
         else if(!value)
         {
@@ -234,6 +245,7 @@ namespace mapcontrol
         item->setParentItem(map);
         int position=item->Number();
         emit WPCreated(position,item);
+        setOverlayOpacity(overlayOpacity);
     }
     WayPointItem* OPMapWidget::WPCreate(internals::PointLatLng const& coord,int const& altitude)
     {
@@ -242,6 +254,7 @@ namespace mapcontrol
         item->setParentItem(map);
         int position=item->Number();
         emit WPCreated(position,item);
+        setOverlayOpacity(overlayOpacity);
         return item;
     }
     WayPointItem* OPMapWidget::WPCreate(internals::PointLatLng const& coord,int const& altitude, QString const& description)
@@ -251,6 +264,7 @@ namespace mapcontrol
         item->setParentItem(map);
         int position=item->Number();
         emit WPCreated(position,item);
+        setOverlayOpacity(overlayOpacity);
         return item;
     }
     WayPointItem* OPMapWidget::WPCreate(const distBearingAltitude &relativeCoord, const QString &description)
@@ -260,6 +274,7 @@ namespace mapcontrol
         item->setParentItem(map);
         int position=item->Number();
         emit WPCreated(position,item);
+        setOverlayOpacity(overlayOpacity);
         return item;
     }
     WayPointItem* OPMapWidget::WPInsert(const int &position)
@@ -269,6 +284,7 @@ namespace mapcontrol
         ConnectWP(item);
         item->setParentItem(map);
         emit WPInserted(position,item);
+        setOverlayOpacity(overlayOpacity);
         return item;
     }
     void OPMapWidget::WPInsert(WayPointItem* item,const int &position)
@@ -277,7 +293,7 @@ namespace mapcontrol
         ConnectWP(item);
         item->setParentItem(map);
         emit WPInserted(position,item);
-
+        setOverlayOpacity(overlayOpacity);
     }
     WayPointItem* OPMapWidget::WPInsert(internals::PointLatLng const& coord,int const& altitude,const int &position)
     {
@@ -286,6 +302,7 @@ namespace mapcontrol
         ConnectWP(item);
         item->setParentItem(map);
         emit WPInserted(position,item);
+        setOverlayOpacity(overlayOpacity);
         return item;
     }
     WayPointItem* OPMapWidget::WPInsert(internals::PointLatLng const& coord,int const& altitude, QString const& description,const int &position)
@@ -306,6 +323,7 @@ namespace mapcontrol
         emit WPInserted(position,item);
         if(reloc)
             emit WPValuesChanged(item);
+        setOverlayOpacity(overlayOpacity);
         return item;
     }
     WayPointItem* OPMapWidget::WPInsert(distBearingAltitude const& relative, QString const& description,const int &position)
@@ -315,6 +333,7 @@ namespace mapcontrol
         ConnectWP(item);
         item->setParentItem(map);
         emit WPInserted(position,item);
+        setOverlayOpacity(overlayOpacity);
         return item;
     }
     void OPMapWidget::WPDelete(WayPointItem *item)
@@ -480,6 +499,12 @@ namespace mapcontrol
             delete compass;
             compass=0;
         }
+    }
+
+    void OPMapWidget::setOverlayOpacity(qreal value)
+    {
+        map->setOverlayOpacity(value);
+        overlayOpacity=value;
     }
     void OPMapWidget::SetRotate(qreal const& value)
     {

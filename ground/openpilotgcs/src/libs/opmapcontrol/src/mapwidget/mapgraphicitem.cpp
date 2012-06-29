@@ -113,6 +113,31 @@ namespace mapcontrol
                 wwww->RefreshPos();
         }
     }
+    void MapGraphicItem::setOverlayOpacity(qreal value)
+    {
+        foreach(QGraphicsItem* i,this->childItems())
+        {
+            WayPointItem* w=qgraphicsitem_cast<WayPointItem*>(i);
+            if(w)
+                w->setOpacity(value);
+            UAVItem* ww=qgraphicsitem_cast<UAVItem*>(i);
+            if(ww)
+                ww->setOpacity(value);
+            HomeItem* www=qgraphicsitem_cast<HomeItem*>(i);
+            if(www)
+                www->setOpacity(value);
+            GPSItem* wwww=qgraphicsitem_cast<GPSItem*>(i);
+            if(wwww)
+                wwww->setOpacity(value);
+            WayPointLine* wwwww=qgraphicsitem_cast<WayPointLine*>(i);
+            if(wwwww)
+                wwwww->setOpacity(value);
+            WayPointCircle* wwwwww=qgraphicsitem_cast<WayPointCircle*>(i);
+            if(wwwwww)
+                wwwwww->setOpacity(value);
+
+        }
+    }
     void MapGraphicItem::ConstructLastImage(int const& zoomdiff)
     {
         QImage temp;

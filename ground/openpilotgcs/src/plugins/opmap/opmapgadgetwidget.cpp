@@ -220,6 +220,8 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     magicWayPoint=m_map->magicWPCreate();
     magicWayPoint->setVisible(false);
 
+    m_map->setOverlayOpacity(0.5);
+
     // **************
     // create various context menu (mouse right click menu) actions
 
@@ -504,6 +506,10 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
 
     // *********
 
+    QMenu overlaySubMenu(tr("&Overlay Opacity "),this);
+    for (int i = 0; i < overlayOpacityAct.count(); i++)
+        overlaySubMenu.addAction(overlayOpacityAct.at(i));
+    contextMenu.addMenu(&overlaySubMenu);
     contextMenu.addSeparator();
 
     contextMenu.addAction(closeAct2);
@@ -676,7 +682,7 @@ void OPMapGadgetWidget::zoomChanged(double zoomt, double zoom, double zoomd)
 
 	int index0_zoom = i_zoom - m_min_zoom;			// zoom level starting at index level '0'
     if (index0_zoom < zoomAct.count())
-	zoomAct.at(index0_zoom)->setChecked(true);		// set the right-click context menu zoom level
+    zoomAct.at(index0_zoom)->setChecked(true);		// set the right-click context menu zoom level
 }
 
 void OPMapGadgetWidget::OnCurrentPositionChanged(internals::PointLatLng point)
@@ -987,6 +993,14 @@ void OPMapGadgetWidget::setZoom(int zoom)
 
     m_map->SetMouseWheelZoomType(zoom_type);
 }
+void OPMapGadgetWidget::setOverlayOpacity(qreal value)
+{
+    if (!m_widget || !m_map)
+        return;
+    m_map->setOverlayOpacity(value);
+    overlayOpacityAct.at(value*10)->setChecked(true);
+}
+
 void OPMapGadgetWidget::setHomePosition(QPointF pos)
 {
     if (!m_widget || !m_map)
@@ -1302,6 +1316,16 @@ void OPMapGadgetWidget::createActions()
     clearWayPointsAct->setStatusTip(tr("Clear waypoints"));
     connect(clearWayPointsAct, SIGNAL(triggered()), this, SLOT(onClearWayPointsAct_triggered()));
 
+    overlayOpacityActGroup = new QActionGroup(this);
+    connect(overlayOpacityActGroup, SIGNAL(triggered(QAction *)), this, SLOT(onOverlayOpacityActGroup_triggered(QAction *)));
+    overlayOpacityAct.clear();
+    for (int i = 0; i <= 10; i++)
+    {
+        QAction *overlayAct = new QAction(QString::number(i*10), overlayOpacityActGroup);
+        overlayAct->setCheckable(true);
+        overlayAct->setData(i*10);
+        overlayOpacityAct.append(overlayAct);
+    }
 
     homeMagicWaypointAct = new QAction(tr("Home magic waypoint"), this);
     homeMagicWaypointAct->setStatusTip(tr("Move the magic waypoint to the home position"));
@@ -2088,4 +2112,13 @@ void OPMapGadgetWidget::on_tbFind_clicked()
 void OPMapGadgetWidget::onHomeDoubleClick(HomeItem *)
 {
     new homeEditor(m_map->Home,this);
+}
+
+void OPMapGadgetWidget::onOverlayOpacityActGroup_triggered(QAction *action)
+{
+    if (!m_widget || !m_map || !action)
+        return;
+
+    m_map->setOverlayOpacity(action->data().toReal()/100);
+    emit overlayOpacityChanged(action->data().toReal()/100);
 }

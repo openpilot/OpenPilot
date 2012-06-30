@@ -123,7 +123,7 @@ void GpsConstellationWidget::updateSat(int index, int prn, int elevation, int az
     satellites[index][2] = azimuth;
     satellites[index][3] = snr;
 
-    if (prn) {
+    if (prn && elevation >= 0) {
         QPointF opd = polarToCoord(elevation,azimuth);
         opd += QPointF(-satIcons[index]->boundingRect().center().x(),
                        -satIcons[index]->boundingRect().center().y());

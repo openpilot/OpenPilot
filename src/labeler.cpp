@@ -274,15 +274,15 @@ void Labeler::onKeyPress(QKeyEvent *event)
 		case Qt::Key_L: // load
 			load();
 			break;
-	case Qt::Key_W: // qual good
-		quality(LabeledImage::qlGood);
-		break;
-	case Qt::Key_X: // qual ok
-		quality(LabeledImage::qlOk);
-		break;
-	case Qt::Key_C: // qual bad
-		quality(LabeledImage::qlBad);
-		break;
+		case Qt::Key_W: // qual good
+			quality(LabeledImage::qlGood);
+			break;
+		case Qt::Key_X: // qual ok
+			quality(LabeledImage::qlOk);
+			break;
+		case Qt::Key_C: // qual bad
+			quality(LabeledImage::qlBad);
+			break;
 		case Qt::Key_Q: // quit
 			QApplication::quit();
 			break;

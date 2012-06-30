@@ -36,18 +36,28 @@ public:
 	Keyboard:
 	- Left/right | S/F: prev/next image
 	- Up/Down | E/D: increase/decrease rect size
+	- R: remove label
 	- U: go to next uninitialized frame
-		O: go to next frame with labeled object
+	- O: go to next frame with labeled object
 	- P: print to files
 	- L: load from files
+	- W: quality good (must be detected by the algorithm)
+	- X: quality ok (should be detected if the algorithm is very good)
+	- C: quality bad (cannot ask to an algorithm to detect it, for instance if it is partial, but don't consider it as false positive either!)
+	- Q: quit
+	
 	Mouse:
 	- Left click: record the position of the object
 	- Middle click: record that the object is absent from the frame
 	- Wheel: zoom
+	
 	Cursor color:
-	- blue:
+	- blue: labeled as nothing (bright/dark/very dark: quality good/ok/bad)
+	- red: not labeled or labeled as object (bright/dark/very dark: quality good/ok/bad)
 
 	Object color:
+	- green: manually labeled
+	- yellow: interpolated
 	*/
 class Labeler: public QObject
 {

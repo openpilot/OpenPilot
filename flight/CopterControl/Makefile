@@ -70,6 +70,7 @@ USE_I2C ?= YES
 USE_ALTITUDE ?= NO
 TEST_FAULTS ?= NO
 USE_MAGBARO ?= YES
+USE_OSDHK ?= YES
 
 # List of optional modules to include
 OPTMODULES =
@@ -101,6 +102,9 @@ OPTMODULES += Extensions/MagBaro
 else
 $(error "MagBaro module (USE_MAGBARO=YES) requires i2c (USE_I2C=YES)")
 endif
+endif
+ifeq ($(USE_OSDHK), YES)
+OPTMODULES += Osd/OsdHk
 endif
 
 # List of mandatory modules to include

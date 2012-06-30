@@ -285,8 +285,7 @@ void parse_ubx_nav_svinfo (UBX_NAV_SVINFO *svinfo)
 
 	svdata.SatsInView = 0;
 	for (chan = 0; chan < svinfo->numCh;	chan++) {
-		if ((svinfo->sv[chan].elev > 0) &&	// some unhealthy SV report negative elevation
-				(svdata.SatsInView < GPSSATELLITES_PRN_NUMELEM)) {
+		if (svdata.SatsInView < GPSSATELLITES_PRN_NUMELEM) {
 			svdata.Azimuth[svdata.SatsInView] = (float)svinfo->sv[chan].azim;
 			svdata.Elevation[svdata.SatsInView] = (float)svinfo->sv[chan].elev;
 			svdata.PRN[svdata.SatsInView] = svinfo->sv[chan].svid;

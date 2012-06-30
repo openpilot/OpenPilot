@@ -69,6 +69,7 @@ UAVObjectBrowserWidget::~UAVObjectBrowserWidget()
 
 void UAVObjectBrowserWidget::showMetaData(bool show)
 {
+    /*
     int topRowCount = m_model->rowCount(QModelIndex());
     for (int i = 0; i < topRowCount; ++i) {
         QModelIndex index = m_model->index(i, 0, QModelIndex());
@@ -76,6 +77,12 @@ void UAVObjectBrowserWidget::showMetaData(bool show)
         for (int j = 0; j < subRowCount; ++j) {
             m_browser->treeView->setRowHidden(0, index.child(j,0), !show);
         }
+    }
+    */
+    QList<QModelIndex> metaIndexes = m_model->getMetaDataIndexes();
+    foreach(QModelIndex index , metaIndexes)
+    {
+        m_browser->treeView->setRowHidden(index.row(), index.parent(), !show);
     }
 }
 

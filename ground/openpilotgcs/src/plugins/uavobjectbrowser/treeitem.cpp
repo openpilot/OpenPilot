@@ -129,21 +129,23 @@ void TreeItem::appendChild(TreeItem *child)
     child->setParentTree(this);
 }
 
-void TreeItem::insert(int index, TreeItem *child)
+void TreeItem::insertChild(TreeItem *child)
 {
+    int index = nameIndex(child->data(0).toString());
     m_children.insert(index, child);
     child->setParentTree(this);
 }
 
-TreeItem *TreeItem::child(int row)
+TreeItem *TreeItem::getChild(int index)
 {
-    return m_children.value(row);
+    return m_children.value(index);
 }
 
 int TreeItem::childCount() const
 {
     return m_children.count();
 }
+
 int TreeItem::row() const
 {
     if (m_parent)
@@ -223,4 +225,9 @@ void TreeItem::setHighlightManager(HighLightManager *mgr)
 QTime TreeItem::getHiglightExpires()
 {
     return m_highlightExpires;
+}
+
+QList<MetaObjectTreeItem *> TopTreeItem::getMetaObjectItems()
+{
+    return m_metaObjectTreeItemsPerObjectIds.values();
 }

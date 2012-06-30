@@ -35,6 +35,7 @@ void MixerCurve::ResetCurve()
 
     m_mixerUI->CurveMin->setValue(m_curve->getMin());
     m_mixerUI->CurveMax->setValue(m_curve->getMax());
+    m_mixerUI->CurveType->setCurrentIndex(m_mixerUI->CurveType->findText("Linear"));
 
     initLinearCurve(MixerCurveWidget::NODE_NUMELEM, m_curve->getMax(), m_curve->getMin());
 
@@ -108,6 +109,8 @@ void MixerCurve::UpdateCurveSettings()
         m_mixerUI->stepLabel->setVisible(true);
         m_mixerUI->CurveStep->setVisible(true);
     }
+
+    GenerateCurve();
 }
 
 void MixerCurve::GenerateCurve()
@@ -116,9 +119,9 @@ void MixerCurve::GenerateCurve()
    double newValue;
 
    //get the user settings
-   double value1 = getMin();
-   double value2 = getMax();
-   double value3 = getStep();
+   double value1 = getCurveMin();
+   double value2 = getCurveMax();
+   double value3 = getCurveStep();
 
    QString CurveType = m_mixerUI->CurveType->currentText();
 
@@ -165,7 +168,7 @@ void MixerCurve::GenerateCurve()
 
 void MixerCurve::initCurve (const QList<double>* points)
 {
-    m_curve->initCurve(points);
+    m_curve->setCurve(points);
     UpdateSettings();
 }
 
@@ -205,7 +208,16 @@ double MixerCurve::getMax()
     return m_curve->getMax();
 }
 
-double MixerCurve::getStep()
+double MixerCurve::getCurveMin()
+{
+    return m_mixerUI->CurveMin->value();
+}
+double MixerCurve::getCurveMax()
+{
+    return m_mixerUI->CurveMax->value();
+}
+
+double MixerCurve::getCurveStep()
 {
     return m_mixerUI->CurveStep->value();
 }
@@ -225,21 +237,25 @@ void MixerCurve::UpdateSettings()
 
 void MixerCurve::CurveMinChanged(double value)
 {
-    setMin(value);
+    //setMin(value);
 
     // the min changed so redraw the curve
     //  mixercurvewidget::setCurve will trim any points below min
     QList<double> points = getCurve();
+    points.removeFirst();
+    points.push_front(value);
     setCurve(&points);
 }
 
 void MixerCurve::CurveMaxChanged(double value)
 {
-    setMax(value);
+    //setMax(value);
 
     // the max changed so redraw the curve
     //  mixercurvewidget::setCurve will trim any points above max
     QList<double> points = getCurve();
+    points.removeLast();
+    points.append(value);
     setCurve(&points);
 }
 

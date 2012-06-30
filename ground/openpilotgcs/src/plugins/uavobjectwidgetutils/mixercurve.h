@@ -34,7 +34,9 @@ public:
     double getMin();
     void setMax(double value);
     double getMax();
-    double getStep();
+    double getCurveMin();
+    double getCurveMax();
+    double getCurveStep();
     double setRange(double min, double max);
 
 

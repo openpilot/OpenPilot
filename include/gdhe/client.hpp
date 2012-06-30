@@ -13,7 +13,7 @@
 #include <boost/filesystem.hpp>
 
 
-#include <GDHE_client_prot.h>
+#include <gdhe/GDHE_client_prot.h>
 
 #include "kernel/IdFactory.hpp"
 #include "jmath/misc.hpp"

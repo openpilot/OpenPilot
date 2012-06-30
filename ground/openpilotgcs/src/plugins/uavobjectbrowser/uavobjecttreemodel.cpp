@@ -205,6 +205,7 @@ void UAVObjectTreeModel::addSingleField(int index, UAVObjectField *field, TreeIt
     FieldTreeItem *item;
     UAVObjectField::FieldType type = field->getType();
     switch (type) {
+    case UAVObjectField::BITFIELD:
     case UAVObjectField::ENUM: {
         QStringList options = field->getOptions();
         QVariant value = field->getValue();

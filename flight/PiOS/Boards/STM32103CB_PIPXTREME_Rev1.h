@@ -77,6 +77,7 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 #define PIOS_WDG_SENDDATA        0x0008
 #define PIOS_WDG_TRANSCOMM       0x0010
 #define PIOS_WDG_PPMINPUT        0x0020
+#define PIOS_WDG_COMGCS          0x0040
 
 //------------------------
 // TELEMETRY
@@ -157,6 +158,7 @@ extern uint32_t pios_com_telemetry_id;
 extern uint32_t pios_com_flexi_id;
 extern uint32_t pios_com_vcp_id;
 extern uint32_t pios_com_uavtalk_com_id;
+extern uint32_t pios_com_gcs_com_id;
 extern uint32_t pios_com_trans_com_id;
 extern uint32_t pios_com_debug_id;
 extern uint32_t pios_com_rfm22b_id;
@@ -166,6 +168,7 @@ extern uint32_t pios_ppm_rcvr_id;
 #define PIOS_COM_FLEXI             (pios_com_flexi_id)
 #define PIOS_COM_VCP               (pios_com_vcp_id)
 #define PIOS_COM_UAVTALK           (pios_com_uavtalk_com_id)
+#define PIOS_COM_GCS               (pios_com_gcs_com_id)
 #define PIOS_COM_TRANS_COM         (pios_com_trans_com_id)
 #define PIOS_COM_DEBUG             (pios_com_debug_id)
 #define PIOS_COM_RADIO             (pios_com_rfm22b_id)

@@ -53,6 +53,7 @@ uint32_t pios_com_telemetry_id;
 uint32_t pios_com_flexi_id;
 uint32_t pios_com_vcp_id;
 uint32_t pios_com_uavtalk_com_id = 0;
+uint32_t pios_com_gcs_com_id = 0;
 uint32_t pios_com_trans_com_id = 0;
 uint32_t pios_com_debug_id = 0;
 uint32_t pios_com_rfm22b_id = 0;
@@ -96,7 +97,7 @@ void PIOS_Board_Init(void) {
 
 	PipXSettingsData pipxSettings;
 #if defined(PIOS_INCLUDE_FLASH_EEPROM)
-	PIOS_EEPROM_Init(&pios_eeprom_cfg);
+ 	PIOS_EEPROM_Init(&pios_eeprom_cfg);
 
 	/* Read the settings from flash. */
 	/* NOTE: We probably need to save/restore the objID here incase the object changed but the size doesn't */
@@ -218,6 +219,7 @@ void PIOS_Board_Init(void) {
 	{
 	case PIPXSETTINGS_TELEMETRYCONFIG_SERIAL:
 	case PIPXSETTINGS_TELEMETRYCONFIG_UAVTALK:
+	case PIPXSETTINGS_TELEMETRYCONFIG_GCS:
 	case PIPXSETTINGS_TELEMETRYCONFIG_DEBUG:
 	{
 		uint32_t pios_usart1_id;
@@ -241,6 +243,9 @@ void PIOS_Board_Init(void) {
 		case PIPXSETTINGS_TELEMETRYCONFIG_UAVTALK:
 			pios_com_uavtalk_com_id = pios_com_telemetry_id;
 			break;
+		case PIPXSETTINGS_TELEMETRYCONFIG_GCS:
+			pios_com_gcs_com_id = pios_com_telemetry_id;
+			break;
 		case PIPXSETTINGS_TELEMETRYCONFIG_DEBUG:
 			pios_com_debug_id = pios_com_telemetry_id;
 			break;
@@ -256,6 +261,7 @@ void PIOS_Board_Init(void) {
 	{
 	case PIPXSETTINGS_FLEXICONFIG_SERIAL:
 	case PIPXSETTINGS_FLEXICONFIG_UAVTALK:
+	case PIPXSETTINGS_FLEXICONFIG_GCS:
 	case PIPXSETTINGS_FLEXICONFIG_DEBUG:
 	{
 		uint32_t pios_usart3_id;
@@ -278,6 +284,9 @@ void PIOS_Board_Init(void) {
 			break;
 		case PIPXSETTINGS_FLEXICONFIG_UAVTALK:
 			pios_com_uavtalk_com_id = pios_com_flexi_id;
+			break;
+		case PIPXSETTINGS_FLEXICONFIG_GCS:
+			pios_com_gcs_com_id = pios_com_flexi_id;
 			break;
 		case PIPXSETTINGS_FLEXICONFIG_DEBUG:
 			pios_com_debug_id = pios_com_flexi_id;

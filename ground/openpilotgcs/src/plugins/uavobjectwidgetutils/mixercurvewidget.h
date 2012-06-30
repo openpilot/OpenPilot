@@ -57,7 +57,9 @@ public:
    static const int NODE_NUMELEM = 5;
 
 signals:
-   void curveUpdated(const QList<double>* points, const double value);
+   void curveUpdated();
+   void curveMinChanged(double value);
+   void curveMaxChanged(double value);
 
 private slots:
 

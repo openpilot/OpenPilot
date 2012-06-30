@@ -220,12 +220,13 @@ void MixerCurveWidget::setCurve(const QList<double>* points)
         Node* node = nodeList.at(i);
         node->setPos(w*i, h - (val*h));
         node->verticalMove(true);
+        node->update();
     }
     curveUpdating = false;
 
     update();
 
-    emit curveUpdated(points, (double)0);
+    emit curveUpdated();
 }
 
 
@@ -248,19 +249,26 @@ void MixerCurveWidget::resizeEvent(QResizeEvent* event)
 void MixerCurveWidget::itemMoved(double itemValue)
 {
     if (!curveUpdating) {
-        QList<double> curve = getCurve();
-        emit curveUpdated(&curve, itemValue);
+        emit curveUpdated();
     }
 }
 
 void MixerCurveWidget::setMin(double value)
 {
+    if (curveMin != value)
+        emit curveMinChanged(value);
+
     curveMin = value;
 }
+
 void MixerCurveWidget::setMax(double value)
 {
+    if (curveMax != value)
+        emit curveMaxChanged(value);
+
     curveMax = value;
 }
+
 double MixerCurveWidget::getMin()
 {
     return curveMin;

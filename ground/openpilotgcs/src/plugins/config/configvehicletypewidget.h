@@ -99,7 +99,6 @@ private slots:
     void resetGvRearMixer();
     void resetCt1Mixer();
     void resetCt2Mixer();
-    void updateFwThrottleCurveValue(QList<double> list, double value);
     void updateMrThrottleCurveValue(QList<double> list, double value);
     void updateGvThrottle1CurveValue(QList<double> list, double value);
     void updateGvThrottle2CurveValue(QList<double> list, double value);

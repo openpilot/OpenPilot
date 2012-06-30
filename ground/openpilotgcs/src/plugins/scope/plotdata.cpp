@@ -99,7 +99,7 @@ bool SequentialPlotData::append(UAVObject* obj)
 
             double currentValue = valueAsDouble(obj, field) * pow(10, scalePower);
 
-            //Compute boxcar average
+            //Perform scope math, if necessary
             if (mathFunction  == "Boxcar average" || mathFunction  == "Standard deviation"){
                 //Put the new value at the front
                 yDataHistory->append( currentValue );
@@ -163,8 +163,8 @@ bool ChronoPlotData::append(UAVObject* obj)
             QDateTime NOW = QDateTime::currentDateTime(); //THINK ABOUT REIMPLEMENTING THIS TO SHOW UAVO TIME, NOT SYSTEM TIME
             double currentValue = valueAsDouble(obj, field) * pow(10, scalePower);
 
-            //Compute boxcar average
-            if (meanSamples > 1){
+            //Perform scope math, if necessary
+            if (mathFunction  == "Boxcar average" || mathFunction  == "Standard deviation"){
                 //Put the new value at the front
                 yDataHistory->append( currentValue );
 

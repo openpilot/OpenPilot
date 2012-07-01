@@ -42,7 +42,7 @@ class UAVOBJECTS_EXPORT UAVObjectField: public QObject
     Q_OBJECT
 
 public:
-    typedef enum { INT8 = 0, INT16, INT32, UINT8, UINT16, UINT32, FLOAT32, ENUM, STRING } FieldType;
+    typedef enum { INT8 = 0, INT16, INT32, UINT8, UINT16, UINT32, FLOAT32, ENUM, BITFIELD, STRING } FieldType;
     typedef enum { EQUAL,NOT_EQUAL,BETWEEN,BIGGER,SMALLER } LimitType;
     typedef struct
     {
@@ -70,7 +70,6 @@ public:
     void setDouble(double value, quint32 index = 0);
     quint32 getDataOffset();
     quint32 getNumBytes();
-    quint32 getNumBytesElement();
     bool isNumeric();
     bool isText();
     QString toString();

@@ -48,20 +48,15 @@
 #include "opencv/cv.h"		// OpenCV library
 #include "opencv/highgui.h"	// HighGUI offers video IO and debug output to screen when run on a PC
 
-#include "backgroundio.h"	// video IO runs in background even if FreeRTOS gives control to another task
-#include "opencvslam.h"		// bridge to C++ part of module
-
 #include "openpilot.h"
 #include "slamsettings.h"	// object holding module settings
 #include "hwsettings.h"		// object holding module system configuration
-#include "attitudeactual.h"	// orientation in space
-#include "velocityactual.h"	// 3d velocity
-#include "positionactual.h"	// 3d position
+
+#include "opencvslam.h"		// bridge to C++ part of module
 
 // Private constants
 #define STACK_SIZE 16386 // doesn't really mater as long as big enough
 #define TASK_PRIORITY (tskIDLE_PRIORITY+1)
-#define DEG2RAD (3.1415926535897932/180.0)
 
 // Private variables
 static xTaskHandle taskHandle;
@@ -115,117 +110,11 @@ MODULE_INITCALL(SLAMInitialize, SLAMStart)
  */
 static void slamTask(void *parameters)
 {
-	AttitudeActualData attitudeActual;
-	PositionActualData positionActual;
-	VelocityActualData velocityActual;
-	IplImage *currentFrame = NULL, *lastFrame = NULL;
-	uint32_t frame = 0;
-
-	/* Initialize OpenCV */
-	//CvCapture *VideoSource = NULL; //cvCaptureFromFile("test.avi");
-	CvCapture *VideoSource = cvCaptureFromFile("test.avi");
-	//CvCapture *VideoSource = cvCaptureFromCAM(0);
-
 	SettingsUpdatedCb(SLAMSettingsHandle());
 
-	if (VideoSource) {
-		cvGrabFrame(VideoSource);
-		currentFrame = cvRetrieveFrame(VideoSource, 0);
-		cvSetCaptureProperty(VideoSource, CV_CAP_PROP_FRAME_WIDTH,  settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_X]);
-		cvSetCaptureProperty(VideoSource, CV_CAP_PROP_FRAME_HEIGHT, settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_Y]);
-	}
-
-	if (currentFrame) lastFrame = cvCloneImage(currentFrame);
-
-	// debug output
-	cvNamedWindow("debug",CV_WINDOW_AUTOSIZE);
-	
-	// synchronization delay, wait for attitude data - any attitude data
-	// this is an evil hack but necessary for tests with log data to synchronize video and telemetry
-	AttitudeActualGet(&attitudeActual);
-	attitudeActual.Pitch=100;
-	AttitudeActualSet(&attitudeActual);
-	cvShowImage("debug",lastFrame);
-	cvWaitKey(1);
-	while (attitudeActual.Pitch==100) AttitudeActualGet(&attitudeActual);
-
-
-	uint32_t timeval = PIOS_DELAY_GetRaw();
-	int32_t increment = floor(1000000./settings.FrameRate);
-	int32_t extraincrement=0;
-	fprintf(stderr,"init at %i increment is %i at %f fps\n",timeval, increment,settings.FrameRate);
-
-	// Main task loop
-	double oldpos=0;
-	while (1) {
-		frame++;
-		cvWaitKey(1);
-		if (VideoSource) {
-			double pos=cvGetCaptureProperty(VideoSource, CV_CAP_PROP_POS_MSEC);
-			increment=floor((pos-oldpos)*1000.);
-			oldpos = pos;
-		}
-
-		while (PIOS_DELAY_DiffuS(timeval)<increment+extraincrement+1000.) vTaskDelay(1/portTICK_RATE_MS);
-		float dT = PIOS_DELAY_DiffuS(timeval) * 1.0e-6f;
-		extraincrement = (increment+extraincrement)-PIOS_DELAY_DiffuS(timeval);
-		timeval = PIOS_DELAY_GetRaw();
-
-		// Grab the current camera image
-		if (VideoSource) {
-			// frame grabbing must take place outside of FreeRTOS scheduler,
-			// since OpenCV's hardware IO does not like being interrupted.
-			backgroundGrabFrame(VideoSource);
-		}
-		
-		// Get the object data
-		AttitudeActualGet(&attitudeActual);
-		PositionActualGet(&positionActual);
-		VelocityActualGet(&velocityActual);
-
-		if (VideoSource) currentFrame = cvRetrieveFrame(VideoSource,0);
-
-		struct opencvslam_input i = {.x=0};
-		struct opencvslam_output *o = opencvslam_run(i);
-
-		if (lastFrame) {
-			cvReleaseImage(&lastFrame);
-		}
-		if (currentFrame) {
-			lastFrame = cvCloneImage(currentFrame);
-
-
-			// draw a line in the video coresponding to artificial horizon (roll+pitch)
-			CvPoint center = cvPoint(
-				  (settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_X]/2)
-				  + (attitudeActual.Pitch * settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_X]/60.)
-				  *sin(DEG2RAD*attitudeActual.Roll)
-				,
-				  (settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_Y]/2)
-				  + (attitudeActual.Pitch * settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_X]/60.)
-				  *cos(DEG2RAD*attitudeActual.Roll)
-				);
-			// i want overloaded operands damnit!
-			CvPoint right = cvPoint(
-				  settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_X]*cos(DEG2RAD*attitudeActual.Roll)/3
-				,
-				  -settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_X]*sin(DEG2RAD*attitudeActual.Roll)/3
-				);
-			CvPoint left = cvPoint(center.x-right.x,center.y-right.y);
-			right.x += center.x;
-			right.y += center.y;
-			cvLine(lastFrame,left,right,CV_RGB(255,255,0),3,8,0);
-
-			cvShowImage("debug",lastFrame);
-		}
-
-
-		//fprintf(stderr,"frame %i took %f ms (%f fps)\n",frame,dT,1./dT);
-	}
+	// Run C++ class through wrapper
+	opencvslam(&settings);
 }
-
-
-
 
 static void SettingsUpdatedCb(UAVObjEvent * ev)
 {

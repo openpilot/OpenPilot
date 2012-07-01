@@ -884,13 +884,13 @@ static void ppmInputTask(void *parameters)
 		PIOS_WDG_UpdateFlag(PIOS_WDG_PPMINPUT);
 #endif /* PIOS_INCLUDE_WDG */
 
+		// Read the receiver.
+		for (uint8_t i = 1; i <= PIOS_PPM_NUM_INPUTS; ++i)
+			ppm_packet.channels[i - 1] = PIOS_RCVR_Read(PIOS_PPM_RECEIVER, i);
+
 		// Send the PPM packet
 		if (data->ppmOutQueue)
 		{
-			for (uint8_t i = 1; i <= PIOS_PPM_NUM_INPUTS; ++i)
-				ppm_packet.channels[i - 1] = PIOS_RCVR_Read(PIOS_PPM_RECEIVER, i);
-
-			// Send the packet.
 			ppm_packet.header.destination_id = data->destination_id;
 			ppm_packet.header.source_id = PIOS_RFM22B_DeviceID(pios_rfm22b_id);
 			ppm_packet.header.type = PACKET_TYPE_PPM;

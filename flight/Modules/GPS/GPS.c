@@ -35,15 +35,17 @@
 
 #include <stdbool.h>
 
-#include "NMEA.h"
-
 #include "gpsposition.h"
 #include "homelocation.h"
 #include "gpstime.h"
 #include "gpssatellites.h"
+#include "gpsvelocity.h"
 #include "WorldMagModel.h"
 #include "CoordinateConversions.h"
 #include "hwsettings.h"
+
+#include "NMEA.h"
+#include "UBX.h"
 
 
 // ****************
@@ -129,12 +131,23 @@ int32_t GPSInitialize(void)
 
 	HwSettingsOptionalModulesGet(optionalModules);
 
-	//if (optionalModules[HWSETTINGS_OPTIONALMODULES_GPS] == HWSETTINGS_OPTIONALMODULES_ENABLED)
+	if (optionalModules[HWSETTINGS_OPTIONALMODULES_GPS] == HWSETTINGS_OPTIONALMODULES_ENABLED)
 		gpsEnabled = true;
-	//else
-	//	gpsEnabled = false;
+	else
+		gpsEnabled = false;
 #endif
 
+#if defined(REVOLUTION)
+	// Revolution expects these objects to always be defined.  Not doing so will fail some
+	// queue connections in navigation
+	GPSPositionInitialize();
+	GPSVelocityInitialize();
+	GPSTimeInitialize();
+	GPSSatellitesInitialize();
+	HomeLocationInitialize();
+	updateSettings();
+
+#else
 	if (gpsPort && gpsEnabled) {
 		GPSPositionInitialize();
 #if !defined(PIOS_GPS_MINIMAL)
@@ -145,7 +158,10 @@ int32_t GPSInitialize(void)
 		HomeLocationInitialize();
 #endif
 		updateSettings();
+	}
+#endif
 
+	if (gpsPort && gpsEnabled) {
 		gps_rx_buffer = pvPortMalloc(NMEA_MAX_PACKET_LENGTH);
 		PIOS_Assert(gps_rx_buffer);
 
@@ -167,10 +183,14 @@ static void gpsTask(void *parameters)
 	portTickType xDelay = 100 / portTICK_RATE_MS;
 	uint32_t timeNowMs = xTaskGetTickCount() * portTICK_RATE_MS;;
 	GPSPositionData GpsData;
+	UBXPacket *ubx = (UBXPacket *)gps_rx_buffer;
 	
 	uint8_t rx_count = 0;
-	bool start_flag = false;
+//	bool start_flag = false;
 	bool found_cr = false;
+	enum proto_states {START,NMEA,UBX_SY2,UBX_CLASS,UBX_ID,UBX_LEN1,
+		UBX_LEN2,UBX_PAYLOAD,UBX_CHK1,UBX_CHK2};
+	enum proto_states proto_state = START;
 	int32_t gpsRxOverflow = 0;
 	
 	numUpdates = 0;
@@ -180,10 +200,13 @@ static void gpsTask(void *parameters)
 	timeOfLastUpdateMs = timeNowMs;
 	timeOfLastCommandMs = timeNowMs;
 
+
+	GPSPositionGet(&GpsData);
 	// Loop forever
 	while (1)
 	{
 		uint8_t c;
+
 		// NMEA or SINGLE-SENTENCE GPS mode
 
 		// This blocks the task until there is something on the buffer
@@ -191,22 +214,94 @@ static void gpsTask(void *parameters)
 		{
 		
 			// detect start while acquiring stream
-			if (!start_flag && (c == '$'))
+			switch (proto_state)
 			{
-				start_flag = true;
-				found_cr = false;
-				rx_count = 0;
+				case START: // detect protocol
+					switch (c)
+					{
+						case UBX_SYNC1: // first UBX sync char found
+							proto_state = UBX_SY2;
+							continue;
+						case '$': // NMEA identifier found
+							proto_state = NMEA;
+							found_cr = false;
+							rx_count = 0;
+							break;
+						default:
+							continue;
+					}
+					break;
+				case UBX_SY2:
+					if (c == UBX_SYNC2) // second UBX sync char found
+					{
+						proto_state = UBX_CLASS;
+						found_cr = false;
+						rx_count = 0;
+					}
+					else
+					{
+						proto_state = START; // reset state
+					}
+					continue;
+				case UBX_CLASS:
+					ubx->header.class = c;
+					proto_state = UBX_ID;
+					continue;
+				case UBX_ID:
+					ubx->header.id = c;
+					proto_state = UBX_LEN1;
+					continue;
+				case UBX_LEN1:
+					ubx->header.len = c;
+					proto_state = UBX_LEN2;
+					continue;
+				case UBX_LEN2:
+					ubx->header.len += (c << 8);
+					if ((sizeof (UBXHeader)) + ubx->header.len > NMEA_MAX_PACKET_LENGTH)
+					{
+						gpsRxOverflow++;
+						proto_state = START;
+						found_cr = false;
+						rx_count = 0;
+					}
+					else
+					{
+						proto_state = UBX_PAYLOAD;
+					}
+					continue;
+				case UBX_PAYLOAD:
+					if (rx_count < ubx->header.len)
+					{
+						ubx->payload.payload[rx_count] = c;
+						if (++rx_count == ubx->header.len)
+							proto_state = UBX_CHK1;
+					}
+					else
+						proto_state = START;
+					continue;
+				case UBX_CHK1:
+					ubx->header.ck_a = c;
+					proto_state = UBX_CHK2;
+					continue;
+				case UBX_CHK2:
+					ubx->header.ck_b = c;
+					if (checksum_ubx_message(ubx))
+					{
+						parse_ubx_message(ubx);
+					}
+					proto_state = START;
+					continue;
+				case NMEA:
+					break;
 			}
-			else
-			if (!start_flag)
-				continue;
-		
+
+
 			if (rx_count >= NMEA_MAX_PACKET_LENGTH)
 			{
 				// The buffer is already full and we haven't found a valid NMEA sentence.
 				// Flush the buffer and note the overflow event.
 				gpsRxOverflow++;
-				start_flag = false;
+				proto_state = START;
 				found_cr = false;
 				rx_count = 0;
 			}
@@ -230,7 +325,7 @@ static void gpsTask(void *parameters)
 				gps_rx_buffer[rx_count-2] = 0;
 
 				// prepare to parse next sentence
-				start_flag = false;
+				proto_state = START;
 				found_cr = false;
 				rx_count = 0;
 				// Our rxBuffer must look like this now:
@@ -250,7 +345,7 @@ static void gpsTask(void *parameters)
 				}
 				else
 				{	// Valid checksum, use this packet to update the GPS position
-					if (!NMEA_update_position(&gps_rx_buffer[1])) {
+					if (!NMEA_update_position(&gps_rx_buffer[1],&GpsData)) {
 						//PIOS_DEBUG_PinHigh(2);
 						++numParsingErrors;
 						//PIOS_DEBUG_PinLow(2);
@@ -271,7 +366,6 @@ static void gpsTask(void *parameters)
 		{	// we have not received any valid GPS sentences for a while.
 			// either the GPS is not plugged in or a hardware problem or the GPS has locked up.
 
-			GPSPositionGet(&GpsData);
 			GpsData.Status = GPSPOSITION_STATUS_NOGPS;
 			GPSPositionSet(&GpsData);
 			AlarmsSet(SYSTEMALARMS_ALARM_GPS, SYSTEMALARMS_ALARM_ERROR);
@@ -279,8 +373,6 @@ static void gpsTask(void *parameters)
 		}
 		else
 		{	// we appear to be receiving GPS sentences OK, we've had an update
-
-			GPSPositionGet(&GpsData);
 
 #ifdef PIOS_GPS_SETS_HOMELOCATION
 			HomeLocationData home;
@@ -337,16 +429,7 @@ static void setHomeLocation(GPSPositionData * gpsData)
 		home.Altitude = gpsData->Altitude + gpsData->GeoidSeparation;
 
 		// Compute home ECEF coordinates and the rotation matrix into NED
-#if defined(WORLD_MODEL)
 		double LLA[3] = { ((double)home.Latitude) / 10e6, ((double)home.Longitude) / 10e6, ((double)home.Altitude) };
-		double ECEF[3];
-		RneFromLLA(LLA, (float (*)[3])home.RNE);
-		LLA2ECEF(LLA, ECEF);
-		// TODO: Currently UAVTalk only supports float but these conversions use double
-		// need to find out if they require that precision and if so extend UAVTAlk
-		home.ECEF[0] = (int32_t) (ECEF[0] * 100);
-		home.ECEF[1] = (int32_t) (ECEF[1] * 100);
-		home.ECEF[2] = (int32_t) (ECEF[2] * 100);
 
 		// Compute magnetic flux direction at home location
 		if (WMM_GetMagVector(LLA[0], LLA[1], LLA[2], gps.Month, gps.Day, gps.Year, &home.Be[0]) >= 0)
@@ -359,10 +442,6 @@ static void setHomeLocation(GPSPositionData * gpsData)
 			home.Set = HOMELOCATION_SET_TRUE;
 			HomeLocationSet(&home);
 		}
-#else
-		home.Set = HOMELOCATION_SET_TRUE;
-		HomeLocationSet(&home);
-#endif
 	}
 }
 #endif

@@ -46,7 +46,7 @@ namespace Utils {
 	// input params: LLA
 	//
 	// output params: ECEF, RNE and Be
-	int HomeLocationUtil::getDetails(double LLA[3], double ECEF[3], double RNE[9], double Be[3])
+        int HomeLocationUtil::getDetails(double LLA[3], double Be[3])
     {
 		// *************
 		// check input parms
@@ -66,10 +66,7 @@ namespace Utils {
 
 		QDateTime dt = QDateTime::currentDateTime().toUTC();
 
-		CoordinateConversions().LLA2ECEF(LLA, ECEF);
-		CoordinateConversions().RneFromLLA(LLA, (double (*)[3])RNE);
-		if (WorldMagModel().GetMagVector(LLA, dt.date().month(), dt.date().day(), dt.date().year(), Be) < 0)
-			return -6;
+                Q_ASSERT(WorldMagModel().GetMagVector(LLA, dt.date().month(), dt.date().day(), dt.date().year(), Be) >= 0);
 
 		return 0;	// OK
     }

@@ -29,7 +29,7 @@
 #define MagicWaypointGADGETWIDGET_H_
 
 #include <QtGui/QLabel>
-#include "positiondesired.h"
+#include "pathdesired.h"
 #include "positionactual.h"
 
 class Ui_MagicWaypoint;
@@ -48,11 +48,12 @@ signals:
 
 protected slots:
     void scaleChanged(int scale);
-    void positionObjectChanged(UAVObject *);
+    void positionActualChanged(UAVObject *);
+    void pathDesiredChanged(UAVObject *);
     void positionSelected(double north, double east);
 
 private:
-    PositionDesired * getPositionDesired();
+    PathDesired * getPathDesired();
     PositionActual * getPositionActual();
     Ui_MagicWaypoint * m_magicwaypoint;
 };

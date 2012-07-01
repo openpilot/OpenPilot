@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>683</width>
-    <height>685</height>
+    <width>738</width>
+    <height>748</height>
    </rect>
   </property>
   <property name="palette">
@@ -496,28 +496,12 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>626</width>
-              <height>834</height>
+              <width>673</width>
+              <height>790</height>
              </rect>
             </property>
             <layout class="QGridLayout" name="gridLayout_23">
-             <item row="0" column="3">
-              <spacer name="verticalSpacer_6">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeType">
-                <enum>QSizePolicy::Fixed</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>10</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="1" column="1">
+             <item row="0" column="0">
               <spacer name="horizontalSpacer_15">
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
@@ -533,7 +517,7 @@
                </property>
               </spacer>
              </item>
-             <item row="1" column="2">
+             <item row="0" column="1">
               <widget class="QLabel" name="label_137">
                <property name="minimumSize">
                 <size>
@@ -541,19 +525,12 @@
                  <height>16</height>
                 </size>
                </property>
-               <property name="font">
-                <font>
-                 <pointsize>9</pointsize>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                </font>
-               </property>
                <property name="text">
                 <string>Rate Stabilization (Inner Loop)</string>
                </property>
               </widget>
              </item>
-             <item row="2" column="1" colspan="4">
+             <item row="1" column="0" colspan="3">
               <widget class="QGroupBox" name="RateStabilizationGroup_15">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -572,530 +549,6 @@
                  <width>16777215</width>
                  <height>181</height>
                 </size>
-               </property>
-               <property name="palette">
-                <palette>
-                 <active>
-                  <colorrole role="WindowText">
-                   <brush brushstyle="SolidPattern">
-                    <color alpha="255">
-                     <red>0</red>
-                     <green>0</green>
-                     <blue>0</blue>
-                    </color>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="Button">
-                   <brush brushstyle="LinearGradientPattern">
-                    <gradient startx="0.507000000000000" starty="0.869318000000000" endx="0.507000000000000" endy="0.096590900000000" type="LinearGradient" spread="PadSpread" coordinatemode="ObjectBoundingMode">
-                     <gradientstop position="0.000000000000000">
-                      <color alpha="255">
-                       <red>243</red>
-                       <green>243</green>
-                       <blue>243</blue>
-                      </color>
-                     </gradientstop>
-                     <gradientstop position="1.000000000000000">
-                      <color alpha="255">
-                       <red>250</red>
-                       <green>250</green>
-                       <blue>250</blue>
-                      </color>
-                     </gradientstop>
-                    </gradient>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="Light">
-                   <brush brushstyle="SolidPattern">
-                    <color alpha="255">
-                     <red>255</red>
-                     <green>255</green>
-                     <blue>255</blue>
-                    </color>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="Midlight">
-                   <brush brushstyle="SolidPattern">
-                    <color alpha="255">
-                     <red>251</red>
-                     <green>251</green>
-                     <blue>251</blue>
-                    </color>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="Dark">
-                   <brush brushstyle="SolidPattern">
-                    <color alpha="255">
-                     <red>124</red>
-                     <green>124</green>
-                     <blue>124</blue>
-                    </color>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="Mid">
-                   <brush brushstyle="SolidPattern">
-                    <color alpha="255">
-                     <red>165</red>
-                     <green>165</green>
-                     <blue>165</blue>
-                    </color>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="Text">
-                   <brush brushstyle="SolidPattern">
-                    <color alpha="255">
-                     <red>0</red>
-                     <green>0</green>
-                     <blue>0</blue>
-                    </color>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="BrightText">
-                   <brush brushstyle="SolidPattern">
-                    <color alpha="255">
-                     <red>255</red>
-                     <green>255</green>
-                     <blue>255</blue>
-                    </color>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="ButtonText">
-                   <brush brushstyle="SolidPattern">
-                    <color alpha="255">
-                     <red>0</red>
-                     <green>0</green>
-                     <blue>0</blue>
-                    </color>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="Base">
-                   <brush brushstyle="LinearGradientPattern">
-                    <gradient startx="0.507000000000000" starty="0.869318000000000" endx="0.507000000000000" endy="0.096590900000000" type="LinearGradient" spread="PadSpread" coordinatemode="ObjectBoundingMode">
-                     <gradientstop position="0.000000000000000">
-                      <color alpha="255">
-                       <red>243</red>
-                       <green>243</green>
-                       <blue>243</blue>
-                      </color>
-                     </gradientstop>
-                     <gradientstop position="1.000000000000000">
-                      <color alpha="255">
-                       <red>250</red>
-                       <green>250</green>
-                       <blue>250</blue>
-                      </color>
-                     </gradientstop>
-                    </gradient>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="Window">
-                   <brush brushstyle="LinearGradientPattern">
-                    <gradient startx="0.507000000000000" starty="0.869318000000000" endx="0.507000000000000" endy="0.096590900000000" type="LinearGradient" spread="PadSpread" coordinatemode="ObjectBoundingMode">
-                     <gradientstop position="0.000000000000000">
-                      <color alpha="255">
-                       <red>243</red>
-                       <green>243</green>
-                       <blue>243</blue>
-                      </color>
-                     </gradientstop>
-                     <gradientstop position="1.000000000000000">
-                      <color alpha="255">
-                       <red>250</red>
-                       <green>250</green>
-                       <blue>250</blue>
-                      </color>
-                     </gradientstop>
-                    </gradient>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="Shadow">
-                   <brush brushstyle="SolidPattern">
-                    <color alpha="255">
-                     <red>0</red>
-                     <green>0</green>
-                     <blue>0</blue>
-                    </color>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="AlternateBase">
-                   <brush brushstyle="SolidPattern">
-                    <color alpha="255">
-                     <red>251</red>
-                     <green>251</green>
-                     <blue>251</blue>
-                    </color>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="ToolTipBase">
-                   <brush brushstyle="SolidPattern">
-                    <color alpha="255">
-                     <red>255</red>
-                     <green>255</green>
-                     <blue>220</blue>
-                    </color>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="ToolTipText">
-                   <brush brushstyle="SolidPattern">
-                    <color alpha="255">
-                     <red>0</red>
-                     <green>0</green>
-                     <blue>0</blue>
-                    </color>
-                   </brush>
-                  </colorrole>
-                 </active>
-                 <inactive>
-                  <colorrole role="WindowText">
-                   <brush brushstyle="SolidPattern">
-                    <color alpha="255">
-                     <red>0</red>
-                     <green>0</green>
-                     <blue>0</blue>
-                    </color>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="Button">
-                   <brush brushstyle="LinearGradientPattern">
-                    <gradient startx="0.507000000000000" starty="0.869318000000000" endx="0.507000000000000" endy="0.096590900000000" type="LinearGradient" spread="PadSpread" coordinatemode="ObjectBoundingMode">
-                     <gradientstop position="0.000000000000000">
-                      <color alpha="255">
-                       <red>243</red>
-                       <green>243</green>
-                       <blue>243</blue>
-                      </color>
-                     </gradientstop>
-                     <gradientstop position="1.000000000000000">
-                      <color alpha="255">
-                       <red>250</red>
-                       <green>250</green>
-                       <blue>250</blue>
-                      </color>
-                     </gradientstop>
-                    </gradient>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="Light">
-                   <brush brushstyle="SolidPattern">
-                    <color alpha="255">
-                     <red>255</red>
-                     <green>255</green>
-                     <blue>255</blue>
-                    </color>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="Midlight">
-                   <brush brushstyle="SolidPattern">
-                    <color alpha="255">
-                     <red>251</red>
-                     <green>251</green>
-                     <blue>251</blue>
-                    </color>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="Dark">
-                   <brush brushstyle="SolidPattern">
-                    <color alpha="255">
-                     <red>124</red>
-                     <green>124</green>
-                     <blue>124</blue>
-                    </color>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="Mid">
-                   <brush brushstyle="SolidPattern">
-                    <color alpha="255">
-                     <red>165</red>
-                     <green>165</green>
-                     <blue>165</blue>
-                    </color>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="Text">
-                   <brush brushstyle="SolidPattern">
-                    <color alpha="255">
-                     <red>0</red>
-                     <green>0</green>
-                     <blue>0</blue>
-                    </color>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="BrightText">
-                   <brush brushstyle="SolidPattern">
-                    <color alpha="255">
-                     <red>255</red>
-                     <green>255</green>
-                     <blue>255</blue>
-                    </color>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="ButtonText">
-                   <brush brushstyle="SolidPattern">
-                    <color alpha="255">
-                     <red>0</red>
-                     <green>0</green>
-                     <blue>0</blue>
-                    </color>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="Base">
-                   <brush brushstyle="LinearGradientPattern">
-                    <gradient startx="0.507000000000000" starty="0.869318000000000" endx="0.507000000000000" endy="0.096590900000000" type="LinearGradient" spread="PadSpread" coordinatemode="ObjectBoundingMode">
-                     <gradientstop position="0.000000000000000">
-                      <color alpha="255">
-                       <red>243</red>
-                       <green>243</green>
-                       <blue>243</blue>
-                      </color>
-                     </gradientstop>
-                     <gradientstop position="1.000000000000000">
-                      <color alpha="255">
-                       <red>250</red>
-                       <green>250</green>
-                       <blue>250</blue>
-                      </color>
-                     </gradientstop>
-                    </gradient>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="Window">
-                   <brush brushstyle="LinearGradientPattern">
-                    <gradient startx="0.507000000000000" starty="0.869318000000000" endx="0.507000000000000" endy="0.096590900000000" type="LinearGradient" spread="PadSpread" coordinatemode="ObjectBoundingMode">
-                     <gradientstop position="0.000000000000000">
-                      <color alpha="255">
-                       <red>243</red>
-                       <green>243</green>
-                       <blue>243</blue>
-                      </color>
-                     </gradientstop>
-                     <gradientstop position="1.000000000000000">
-                      <color alpha="255">
-                       <red>250</red>
-                       <green>250</green>
-                       <blue>250</blue>
-                      </color>
-                     </gradientstop>
-                    </gradient>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="Shadow">
-                   <brush brushstyle="SolidPattern">
-                    <color alpha="255">
-                     <red>0</red>
-                     <green>0</green>
-                     <blue>0</blue>
-                    </color>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="AlternateBase">
-                   <brush brushstyle="SolidPattern">
-                    <color alpha="255">
-                     <red>251</red>
-                     <green>251</green>
-                     <blue>251</blue>
-                    </color>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="ToolTipBase">
-                   <brush brushstyle="SolidPattern">
-                    <color alpha="255">
-                     <red>255</red>
-                     <green>255</green>
-                     <blue>220</blue>
-                    </color>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="ToolTipText">
-                   <brush brushstyle="SolidPattern">
-                    <color alpha="255">
-                     <red>0</red>
-                     <green>0</green>
-                     <blue>0</blue>
-                    </color>
-                   </brush>
-                  </colorrole>
-                 </inactive>
-                 <disabled>
-                  <colorrole role="WindowText">
-                   <brush brushstyle="SolidPattern">
-                    <color alpha="255">
-                     <red>124</red>
-                     <green>124</green>
-                     <blue>124</blue>
-                    </color>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="Button">
-                   <brush brushstyle="LinearGradientPattern">
-                    <gradient startx="0.507000000000000" starty="0.869318000000000" endx="0.507000000000000" endy="0.096590900000000" type="LinearGradient" spread="PadSpread" coordinatemode="ObjectBoundingMode">
-                     <gradientstop position="0.000000000000000">
-                      <color alpha="255">
-                       <red>243</red>
-                       <green>243</green>
-                       <blue>243</blue>
-                      </color>
-                     </gradientstop>
-                     <gradientstop position="1.000000000000000">
-                      <color alpha="255">
-                       <red>250</red>
-                       <green>250</green>
-                       <blue>250</blue>
-                      </color>
-                     </gradientstop>
-                    </gradient>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="Light">
-                   <brush brushstyle="SolidPattern">
-                    <color alpha="255">
-                     <red>255</red>
-                     <green>255</green>
-                     <blue>255</blue>
-                    </color>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="Midlight">
-                   <brush brushstyle="SolidPattern">
-                    <color alpha="255">
-                     <red>251</red>
-                     <green>251</green>
-                     <blue>251</blue>
-                    </color>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="Dark">
-                   <brush brushstyle="SolidPattern">
-                    <color alpha="255">
-                     <red>124</red>
-                     <green>124</green>
-                     <blue>124</blue>
-                    </color>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="Mid">
-                   <brush brushstyle="SolidPattern">
-                    <color alpha="255">
-                     <red>165</red>
-                     <green>165</green>
-                     <blue>165</blue>
-                    </color>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="Text">
-                   <brush brushstyle="SolidPattern">
-                    <color alpha="255">
-                     <red>124</red>
-                     <green>124</green>
-                     <blue>124</blue>
-                    </color>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="BrightText">
-                   <brush brushstyle="SolidPattern">
-                    <color alpha="255">
-                     <red>255</red>
-                     <green>255</green>
-                     <blue>255</blue>
-                    </color>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="ButtonText">
-                   <brush brushstyle="SolidPattern">
-                    <color alpha="255">
-                     <red>124</red>
-                     <green>124</green>
-                     <blue>124</blue>
-                    </color>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="Base">
-                   <brush brushstyle="LinearGradientPattern">
-                    <gradient startx="0.507000000000000" starty="0.869318000000000" endx="0.507000000000000" endy="0.096590900000000" type="LinearGradient" spread="PadSpread" coordinatemode="ObjectBoundingMode">
-                     <gradientstop position="0.000000000000000">
-                      <color alpha="255">
-                       <red>243</red>
-                       <green>243</green>
-                       <blue>243</blue>
-                      </color>
-                     </gradientstop>
-                     <gradientstop position="1.000000000000000">
-                      <color alpha="255">
-                       <red>250</red>
-                       <green>250</green>
-                       <blue>250</blue>
-                      </color>
-                     </gradientstop>
-                    </gradient>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="Window">
-                   <brush brushstyle="LinearGradientPattern">
-                    <gradient startx="0.507000000000000" starty="0.869318000000000" endx="0.507000000000000" endy="0.096590900000000" type="LinearGradient" spread="PadSpread" coordinatemode="ObjectBoundingMode">
-                     <gradientstop position="0.000000000000000">
-                      <color alpha="255">
-                       <red>243</red>
-                       <green>243</green>
-                       <blue>243</blue>
-                      </color>
-                     </gradientstop>
-                     <gradientstop position="1.000000000000000">
-                      <color alpha="255">
-                       <red>250</red>
-                       <green>250</green>
-                       <blue>250</blue>
-                      </color>
-                     </gradientstop>
-                    </gradient>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="Shadow">
-                   <brush brushstyle="SolidPattern">
-                    <color alpha="255">
-                     <red>0</red>
-                     <green>0</green>
-                     <blue>0</blue>
-                    </color>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="AlternateBase">
-                   <brush brushstyle="SolidPattern">
-                    <color alpha="255">
-                     <red>248</red>
-                     <green>248</green>
-                     <blue>248</blue>
-                    </color>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="ToolTipBase">
-                   <brush brushstyle="SolidPattern">
-                    <color alpha="255">
-                     <red>255</red>
-                     <green>255</green>
-                     <blue>220</blue>
-                    </color>
-                   </brush>
-                  </colorrole>
-                  <colorrole role="ToolTipText">
-                   <brush brushstyle="SolidPattern">
-                    <color alpha="255">
-                     <red>0</red>
-                     <green>0</green>
-                     <blue>0</blue>
-                    </color>
-                   </brush>
-                  </colorrole>
-                 </disabled>
-                </palette>
-               </property>
-               <property name="autoFillBackground">
-                <bool>false</bool>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">#RateStabilizationGroup_15{background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0 rgba(243, 243, 243, 255), stop:1 rgba(250, 250, 250, 255));
-
-border: 1px outset #999;
-border-radius: 3;
-}</string>
                </property>
                <property name="title">
                 <string/>
@@ -1127,6 +580,9 @@ border-radius: 3;
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
+                  </property>
+                  <property name="focusPolicy">
+                   <enum>Qt::StrongFocus</enum>
                   </property>
                   <property name="styleSheet">
                    <string notr="true"/>
@@ -3377,6 +2833,13 @@ border-radius: 5;</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
+                     <property name="toolTip">
+                      <string>Slowly raise Proportional until you start seeing clear oscillations when you fly.
+Then lower the value by 5 or so.</string>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
@@ -3423,6 +2886,13 @@ border-radius: 5;</string>
                        <width>43</width>
                        <height>22</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
+                     <property name="toolTip">
+                      <string>Slowly raise Proportional until you start seeing clear oscillations when you fly.
+Then lower the value by 5 or so.</string>
                      </property>
                      <property name="maximum">
                       <number>200</number>
@@ -3472,6 +2942,13 @@ border-radius: 5;</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
+                     <property name="toolTip">
+                      <string>Slowly raise Proportional until you start seeing clear oscillations when you fly.
+Then lower the value by 5 or so.</string>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
@@ -3515,6 +2992,13 @@ border-radius: 5;</string>
                        <width>43</width>
                        <height>22</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
+                     <property name="toolTip">
+                      <string>Slowly raise Proportional until you start seeing clear oscillations when you fly.
+Then lower the value by 5 or so.</string>
                      </property>
                      <property name="maximum">
                       <number>200</number>
@@ -3564,6 +3048,13 @@ border-radius: 5;</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
+                     <property name="toolTip">
+                      <string>Slowly raise Proportional until you start seeing clear oscillations when you fly.
+Then lower the value by 5 or so.</string>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
@@ -3607,6 +3098,13 @@ border-radius: 5;</string>
                        <width>43</width>
                        <height>22</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
+                     <property name="toolTip">
+                      <string>Slowly raise Proportional until you start seeing clear oscillations when you fly.
+Then lower the value by 5 or so.</string>
                      </property>
                      <property name="maximum">
                       <number>200</number>
@@ -3659,6 +3157,13 @@ border-radius: 5;</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
+                     <property name="toolTip">
+                      <string>As a rule of thumb, you can set the Integral at roughly the same
+value as the Kp.</string>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
@@ -3703,6 +3208,13 @@ border-radius: 5;</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
+                     <property name="toolTip">
+                      <string>As a rule of thumb, you can set the Integral at roughly the same
+value as the Kp.</string>
+                     </property>
                      <property name="maximum">
                       <number>200</number>
                      </property>
@@ -3734,6 +3246,13 @@ border-radius: 5;</string>
                        <width>0</width>
                        <height>25</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
+                     <property name="toolTip">
+                      <string>As a rule of thumb, you can set the Integral at roughly the same
+value as the Kp.</string>
                      </property>
                      <property name="styleSheet">
                       <string notr="true"/>
@@ -3779,6 +3298,13 @@ border-radius: 5;</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
+                     <property name="toolTip">
+                      <string>As a rule of thumb, you can set the Integral at roughly the same
+value as the Kp.</string>
+                     </property>
                      <property name="maximum">
                       <number>200</number>
                      </property>
@@ -3810,6 +3336,13 @@ border-radius: 5;</string>
                        <width>0</width>
                        <height>25</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
+                     <property name="toolTip">
+                      <string>As a rule of thumb, you can set the Integral at roughly the same
+value as the Kp.</string>
                      </property>
                      <property name="styleSheet">
                       <string notr="true"/>
@@ -3855,6 +3388,13 @@ border-radius: 5;</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
+                     <property name="toolTip">
+                      <string>As a rule of thumb, you can set the Integral at roughly the same
+value as the Kp.</string>
+                     </property>
                      <property name="maximum">
                       <number>200</number>
                      </property>
@@ -3879,23 +3419,7 @@ border-radius: 5;</string>
                </layout>
               </widget>
              </item>
-             <item row="3" column="2">
-              <spacer name="verticalSpacer_7">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeType">
-                <enum>QSizePolicy::Fixed</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>15</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="4" column="1">
+             <item row="2" column="0">
               <spacer name="horizontalSpacer_18">
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
@@ -3911,7 +3435,7 @@ border-radius: 5;</string>
                </property>
               </spacer>
              </item>
-             <item row="4" column="2">
+             <item row="2" column="1">
               <widget class="QLabel" name="label_149">
                <property name="minimumSize">
                 <size>
@@ -3919,19 +3443,12 @@ border-radius: 5;</string>
                  <height>16</height>
                 </size>
                </property>
-               <property name="font">
-                <font>
-                 <pointsize>9</pointsize>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                </font>
-               </property>
                <property name="text">
                 <string>Attitude Stabilization (Outer Loop)</string>
                </property>
               </widget>
              </item>
-             <item row="5" column="1" colspan="4">
+             <item row="3" column="0" colspan="3">
               <widget class="QGroupBox" name="RateStabilizationGroup_17">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -4468,13 +3985,6 @@ border-radius: 5;</string>
                <property name="autoFillBackground">
                 <bool>false</bool>
                </property>
-               <property name="styleSheet">
-                <string notr="true">#RateStabilizationGroup_17{background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0 rgba(243, 243, 243, 255), stop:1 rgba(250, 250, 250, 255));
-
-border: 1px outset #999;
-border-radius: 3;
-}</string>
-               </property>
                <property name="title">
                 <string/>
                </property>
@@ -4506,6 +4016,9 @@ border-radius: 3;
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
+                  <property name="focusPolicy">
+                   <enum>Qt::StrongFocus</enum>
+                  </property>
                   <property name="styleSheet">
                    <string notr="true"/>
                   </property>
@@ -4514,21 +4027,9 @@ border-radius: 3;
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="3">
+                <item row="0" column="4">
                  <widget class="QPushButton" name="pushButton_22">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
                   <property name="minimumSize">
-                   <size>
-                    <width>81</width>
-                    <height>28</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
                    <size>
                     <width>81</width>
                     <height>28</height>
@@ -4566,7 +4067,7 @@ border-radius: 4;
                   </property>
                  </widget>
                 </item>
-                <item row="1" column="0" colspan="4">
+                <item row="1" column="0" colspan="5">
                  <widget class="QGroupBox" name="RateStabilizationGroup_18">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -6697,6 +6198,9 @@ border-radius: 5;</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
@@ -6740,6 +6244,9 @@ border-radius: 5;</string>
                        <width>43</width>
                        <height>22</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="maximum">
                       <number>200</number>
@@ -6789,6 +6296,9 @@ border-radius: 5;</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
@@ -6832,6 +6342,9 @@ border-radius: 5;</string>
                        <width>43</width>
                        <height>22</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="maximum">
                       <number>200</number>
@@ -6881,6 +6394,9 @@ border-radius: 5;</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
@@ -6924,6 +6440,9 @@ border-radius: 5;</string>
                        <width>43</width>
                        <height>22</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="maximum">
                       <number>200</number>
@@ -6992,6 +6511,9 @@ border-radius: 5;</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
@@ -7036,6 +6558,9 @@ border-radius: 5;</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="maximum">
                       <number>200</number>
                      </property>
@@ -7067,6 +6592,9 @@ border-radius: 5;</string>
                        <width>0</width>
                        <height>25</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="styleSheet">
                       <string notr="true"/>
@@ -7112,6 +6640,9 @@ border-radius: 5;</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="maximum">
                       <number>200</number>
                      </property>
@@ -7143,6 +6674,9 @@ border-radius: 5;</string>
                        <width>0</width>
                        <height>25</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="styleSheet">
                       <string notr="true"/>
@@ -7188,6 +6722,9 @@ border-radius: 5;</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="maximum">
                       <number>200</number>
                      </property>
@@ -7209,21 +6746,9 @@ border-radius: 5;</string>
                   </layout>
                  </widget>
                 </item>
-                <item row="0" column="2">
+                <item row="0" column="3">
                  <widget class="QPushButton" name="pushButton_21">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
                   <property name="minimumSize">
-                   <size>
-                    <width>51</width>
-                    <height>28</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
                    <size>
                     <width>51</width>
                     <height>28</height>
@@ -7261,42 +6786,23 @@ border-radius: 4;
                   </property>
                  </widget>
                 </item>
+                <item row="0" column="2">
+                 <spacer name="horizontalSpacer_4">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
                </layout>
               </widget>
              </item>
-             <item row="5" column="5">
-              <spacer name="horizontalSpacer_20">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeType">
-                <enum>QSizePolicy::Fixed</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>2</width>
-                 <height>10</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="6" column="2">
-              <spacer name="verticalSpacer_8">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeType">
-                <enum>QSizePolicy::Fixed</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>15</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="7" column="1">
+             <item row="4" column="0">
               <spacer name="horizontalSpacer_21">
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
@@ -7312,7 +6818,7 @@ border-radius: 4;
                </property>
               </spacer>
              </item>
-             <item row="7" column="2">
+             <item row="4" column="1">
               <widget class="QLabel" name="label_161">
                <property name="minimumSize">
                 <size>
@@ -7320,19 +6826,12 @@ border-radius: 4;
                  <height>16</height>
                 </size>
                </property>
-               <property name="font">
-                <font>
-                 <pointsize>9</pointsize>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                </font>
-               </property>
                <property name="text">
                 <string>Stick Range and Limits</string>
                </property>
               </widget>
              </item>
-             <item row="8" column="1" colspan="4">
+             <item row="5" column="0" colspan="3">
               <widget class="QGroupBox" name="RateStabilizationGroup_19">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -7866,16 +7365,6 @@ border-radius: 4;
                  </disabled>
                 </palette>
                </property>
-               <property name="autoFillBackground">
-                <bool>false</bool>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">#RateStabilizationGroup_19{background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0 rgba(243, 243, 243, 255), stop:1 rgba(250, 250, 250, 255));
-
-border: 1px outset #999;
-border-radius: 3;
-}</string>
-               </property>
                <property name="title">
                 <string/>
                </property>
@@ -7893,7 +7382,7 @@ border-radius: 3;
                   </property>
                   <property name="sizeHint" stdset="0">
                    <size>
-                    <width>10</width>
+                    <width>1000</width>
                     <height>10</height>
                    </size>
                   </property>
@@ -7901,19 +7390,7 @@ border-radius: 3;
                 </item>
                 <item row="0" column="1">
                  <widget class="QPushButton" name="pushButton_23">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
                   <property name="minimumSize">
-                   <size>
-                    <width>51</width>
-                    <height>28</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
                    <size>
                     <width>51</width>
                     <height>28</height>
@@ -7960,12 +7437,6 @@ border-radius: 4;
                    </sizepolicy>
                   </property>
                   <property name="minimumSize">
-                   <size>
-                    <width>81</width>
-                    <height>28</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
                    <size>
                     <width>81</width>
                     <height>28</height>
@@ -10120,7 +9591,7 @@ border-radius: 5;</string>
                      </property>
                      <property name="text">
                       <string>Full Stick
-Angle</string>
+Angle (deg)</string>
                      </property>
                      <property name="alignment">
                       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -10141,11 +9612,14 @@ Angle</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
                      <property name="maximum">
-                      <number>100</number>
+                      <number>180</number>
                      </property>
                      <property name="sliderPosition">
                       <number>50</number>
@@ -10164,7 +9638,7 @@ Angle</string>
                        <string>objname:StabilizationSettings</string>
                        <string>fieldname:RollMax</string>
                        <string>haslimits:yes</string>
-                       <string>scale:1.8</string>
+                       <string>scale:1.0</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10184,18 +9658,21 @@ Angle</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="maximum">
-                      <number>200</number>
+                      <number>180</number>
                      </property>
                      <property name="value">
-                      <number>200</number>
+                      <number>180</number>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
                        <string>objname:StabilizationSettings</string>
                        <string>fieldname:RollMax</string>
                        <string>haslimits:yes</string>
-                       <string>scale:1.8</string>
+                       <string>scale:1.0</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10231,11 +9708,14 @@ Angle</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
                      <property name="maximum">
-                      <number>100</number>
+                      <number>180</number>
                      </property>
                      <property name="sliderPosition">
                       <number>50</number>
@@ -10254,7 +9734,7 @@ Angle</string>
                        <string>objname:StabilizationSettings</string>
                        <string>fieldname:PitchMax</string>
                        <string>haslimits:yes</string>
-                       <string>scale:1.8</string>
+                       <string>scale:1.0</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10274,18 +9754,21 @@ Angle</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="maximum">
-                      <number>200</number>
+                      <number>180</number>
                      </property>
                      <property name="value">
-                      <number>200</number>
+                      <number>180</number>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
                        <string>objname:StabilizationSettings</string>
                        <string>fieldname:PitchMax</string>
                        <string>haslimits:yes</string>
-                       <string>scale:1.8</string>
+                       <string>scale:1.0</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10321,11 +9804,14 @@ Angle</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
                      <property name="maximum">
-                      <number>100</number>
+                      <number>180</number>
                      </property>
                      <property name="sliderPosition">
                       <number>50</number>
@@ -10344,7 +9830,7 @@ Angle</string>
                        <string>objname:StabilizationSettings</string>
                        <string>fieldname:YawMax</string>
                        <string>haslimits:yes</string>
-                       <string>scale:1.8</string>
+                       <string>scale:1.0</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10364,18 +9850,21 @@ Angle</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="maximum">
-                      <number>200</number>
+                      <number>180</number>
                      </property>
                      <property name="value">
-                      <number>200</number>
+                      <number>180</number>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
                        <string>objname:StabilizationSettings</string>
                        <string>fieldname:YawMax</string>
                        <string>haslimits:yes</string>
-                       <string>scale:1.8</string>
+                       <string>scale:1.0</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10394,7 +9883,7 @@ Angle</string>
                      </property>
                      <property name="text">
                       <string>Full Stick
-Rate</string>
+Rate (deg/s)</string>
                      </property>
                      <property name="alignment">
                       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -10415,11 +9904,14 @@ Rate</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
                      <property name="maximum">
-                      <number>100</number>
+                      <number>500</number>
                      </property>
                      <property name="sliderPosition">
                       <number>50</number>
@@ -10439,7 +9931,7 @@ Rate</string>
                        <string>fieldname:ManualRate</string>
                        <string>element:Roll</string>
                        <string>haslimits:yes</string>
-                       <string>scale:5</string>
+                       <string>scale:1</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10459,11 +9951,14 @@ Rate</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="maximum">
-                      <number>200</number>
+                      <number>500</number>
                      </property>
                      <property name="value">
-                      <number>200</number>
+                      <number>180</number>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -10471,7 +9966,7 @@ Rate</string>
                        <string>fieldname:ManualRate</string>
                        <string>element:Roll</string>
                        <string>haslimits:yes</string>
-                       <string>scale:5</string>
+                       <string>scale:1</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10491,11 +9986,14 @@ Rate</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
                      <property name="maximum">
-                      <number>100</number>
+                      <number>500</number>
                      </property>
                      <property name="sliderPosition">
                       <number>50</number>
@@ -10515,7 +10013,7 @@ Rate</string>
                        <string>fieldname:ManualRate</string>
                        <string>element:Pitch</string>
                        <string>haslimits:yes</string>
-                       <string>scale:5</string>
+                       <string>scale:1</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10535,11 +10033,14 @@ Rate</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="maximum">
-                      <number>200</number>
+                      <number>500</number>
                      </property>
                      <property name="value">
-                      <number>200</number>
+                      <number>180</number>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -10547,7 +10048,7 @@ Rate</string>
                        <string>fieldname:ManualRate</string>
                        <string>element:Pitch</string>
                        <string>haslimits:yes</string>
-                       <string>scale:5</string>
+                       <string>scale:1</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10567,11 +10068,14 @@ Rate</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
                      <property name="maximum">
-                      <number>100</number>
+                      <number>500</number>
                      </property>
                      <property name="sliderPosition">
                       <number>50</number>
@@ -10591,7 +10095,7 @@ Rate</string>
                        <string>fieldname:ManualRate</string>
                        <string>element:Yaw</string>
                        <string>haslimits:yes</string>
-                       <string>scale:5</string>
+                       <string>scale:1</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10611,11 +10115,14 @@ Rate</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="maximum">
-                      <number>200</number>
+                      <number>500</number>
                      </property>
                      <property name="value">
-                      <number>200</number>
+                      <number>180</number>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -10623,7 +10130,7 @@ Rate</string>
                        <string>fieldname:ManualRate</string>
                        <string>element:Yaw</string>
                        <string>haslimits:yes</string>
-                       <string>scale:5</string>
+                       <string>scale:1</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10663,11 +10170,14 @@ Attitude</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
                      <property name="maximum">
-                      <number>100</number>
+                      <number>500</number>
                      </property>
                      <property name="sliderPosition">
                       <number>50</number>
@@ -10687,7 +10197,7 @@ Attitude</string>
                        <string>fieldname:MaximumRate</string>
                        <string>element:Roll</string>
                        <string>haslimits:yes</string>
-                       <string>scale:5</string>
+                       <string>scale:1</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10707,8 +10217,11 @@ Attitude</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="maximum">
-                      <number>200</number>
+                      <number>500</number>
                      </property>
                      <property name="value">
                       <number>200</number>
@@ -10719,7 +10232,7 @@ Attitude</string>
                        <string>fieldname:MaximumRate</string>
                        <string>element:Roll</string>
                        <string>haslimits:yes</string>
-                       <string>scale:5</string>
+                       <string>scale:1</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10739,11 +10252,14 @@ Attitude</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
                      <property name="maximum">
-                      <number>100</number>
+                      <number>500</number>
                      </property>
                      <property name="sliderPosition">
                       <number>50</number>
@@ -10763,7 +10279,7 @@ Attitude</string>
                        <string>fieldname:MaximumRate</string>
                        <string>element:Pitch</string>
                        <string>haslimits:yes</string>
-                       <string>scale:5</string>
+                       <string>scale:1</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10783,8 +10299,11 @@ Attitude</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="maximum">
-                      <number>200</number>
+                      <number>500</number>
                      </property>
                      <property name="value">
                       <number>200</number>
@@ -10795,7 +10314,7 @@ Attitude</string>
                        <string>fieldname:MaximumRate</string>
                        <string>element:Pitch</string>
                        <string>haslimits:yes</string>
-                       <string>scale:5</string>
+                       <string>scale:1</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10815,11 +10334,14 @@ Attitude</string>
                        <height>25</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
                      <property name="maximum">
-                      <number>100</number>
+                      <number>500</number>
                      </property>
                      <property name="sliderPosition">
                       <number>50</number>
@@ -10839,7 +10361,7 @@ Attitude</string>
                        <string>fieldname:MaximumRate</string>
                        <string>element:Yaw</string>
                        <string>haslimits:yes</string>
-                       <string>scale:5</string>
+                       <string>scale:1</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10859,8 +10381,11 @@ Attitude</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="maximum">
-                      <number>200</number>
+                      <number>500</number>
                      </property>
                      <property name="value">
                       <number>200</number>
@@ -10871,7 +10396,7 @@ Attitude</string>
                        <string>fieldname:MaximumRate</string>
                        <string>element:Yaw</string>
                        <string>haslimits:yes</string>
-                       <string>scale:5</string>
+                       <string>scale:1</string>
                        <string>buttongroup:3,10</string>
                       </stringlist>
                      </property>
@@ -10883,23 +10408,7 @@ Attitude</string>
                </layout>
               </widget>
              </item>
-             <item row="9" column="3">
-              <spacer name="verticalSpacer_9">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeType">
-                <enum>QSizePolicy::Fixed</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>10</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="11" column="4">
+             <item row="7" column="2">
               <spacer name="verticalSpacer_10">
                <property name="orientation">
                 <enum>Qt::Vertical</enum>
@@ -10915,23 +10424,7 @@ Attitude</string>
                </property>
               </spacer>
              </item>
-             <item row="2" column="0">
-              <spacer name="horizontalSpacer_16">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeType">
-                <enum>QSizePolicy::Fixed</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>2</width>
-                 <height>10</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="10" column="1" colspan="4">
+             <item row="6" column="0" colspan="3">
               <widget class="QGroupBox" name="RateStabilizationGroup_21">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -11468,13 +10961,6 @@ Attitude</string>
                <property name="autoFillBackground">
                 <bool>false</bool>
                </property>
-               <property name="styleSheet">
-                <string notr="true">#RateStabilizationGroup_21{background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0 rgba(243, 243, 243, 255), stop:1 rgba(250, 250, 250, 255));
-
-border: 1px outset #999;
-border-radius: 3;
-}</string>
-               </property>
                <property name="title">
                 <string/>
                </property>
@@ -11554,28 +11040,15 @@ automatically every 300ms, which will help for fast tuning.</string>
                 </item>
                 <item row="1" column="2">
                  <widget class="QPushButton" name="stabilizationReloadBoardData_6">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
                   <property name="minimumSize">
                    <size>
                     <width>120</width>
                     <height>28</height>
                    </size>
                   </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>120</width>
-                    <height>28</height>
-                   </size>
-                  </property>
-                  <property name="font">
-                   <font>
-                    <pointsize>8</pointsize>
-                   </font>
+                  <property name="toolTip">
+                   <string>Reloads the saved settings into GCS.
+Useful if you have accidentally changed some settings.</string>
                   </property>
                   <property name="styleSheet">
                    <string notr="true">QPushButton {
@@ -11611,28 +11084,11 @@ border-radius: 4;
                 </item>
                 <item row="1" column="3">
                  <widget class="QPushButton" name="saveStabilizationToRAM_6">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
                   <property name="minimumSize">
                    <size>
                     <width>60</width>
                     <height>28</height>
                    </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>60</width>
-                    <height>28</height>
-                   </size>
-                  </property>
-                  <property name="font">
-                   <font>
-                    <pointsize>8</pointsize>
-                   </font>
                   </property>
                   <property name="toolTip">
                    <string>Send settings to the board but do not save to the non-volatile memory</string>
@@ -11670,28 +11126,11 @@ border-radius: 4;
                 </item>
                 <item row="1" column="4">
                  <widget class="QPushButton" name="saveStabilizationToSD_6">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
                   <property name="minimumSize">
                    <size>
                     <width>60</width>
                     <height>28</height>
                    </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>60</width>
-                    <height>28</height>
-                   </size>
-                  </property>
-                  <property name="font">
-                   <font>
-                    <pointsize>8</pointsize>
-                   </font>
                   </property>
                   <property name="toolTip">
                    <string>Send settings to the board and save to the non-volatile memory</string>
@@ -11753,29 +11192,13 @@ border-radius: 4;
             <property name="geometry">
              <rect>
               <x>0</x>
-              <y>-402</y>
-              <width>626</width>
-              <height>1026</height>
+              <y>0</y>
+              <width>673</width>
+              <height>981</height>
              </rect>
             </property>
             <layout class="QGridLayout" name="gridLayout_15">
-             <item row="0" column="2">
-              <spacer name="verticalSpacer_11">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeType">
-                <enum>QSizePolicy::Fixed</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>25</width>
-                 <height>10</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="1" column="1">
+             <item row="0" column="0">
               <spacer name="horizontalSpacer_25">
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
@@ -11791,7 +11214,7 @@ border-radius: 4;
                </property>
               </spacer>
              </item>
-             <item row="1" column="2" colspan="2">
+             <item row="0" column="1" colspan="2">
               <widget class="QLabel" name="label_41">
                <property name="minimumSize">
                 <size>
@@ -11799,19 +11222,12 @@ border-radius: 4;
                  <height>16</height>
                 </size>
                </property>
-               <property name="font">
-                <font>
-                 <pointsize>9</pointsize>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                </font>
-               </property>
                <property name="text">
                 <string>Rate Stabization Coefficients (Inner Loop)</string>
                </property>
               </widget>
              </item>
-             <item row="2" column="1" rowspan="2" colspan="3">
+             <item row="1" column="0" rowspan="2" colspan="3">
               <widget class="QGroupBox" name="RateStabilizationGroup_8">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -12345,16 +11761,6 @@ border-radius: 4;
                  </disabled>
                 </palette>
                </property>
-               <property name="autoFillBackground">
-                <bool>false</bool>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">#RateStabilizationGroup_8{background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0 rgba(243, 243, 243, 255), stop:1 rgba(250, 250, 250, 255));
-
-border: 1px outset #999;
-border-radius: 3;
-}</string>
-               </property>
                <property name="title">
                 <string/>
                </property>
@@ -12391,7 +11797,7 @@ border-radius: 3;
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="2">
+                <item row="0" column="3">
                  <widget class="QPushButton" name="pushButton_4">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -12444,7 +11850,7 @@ border-radius: 4;
                   </property>
                  </widget>
                 </item>
-                <item row="1" column="0" colspan="3">
+                <item row="1" column="0" colspan="4">
                  <widget class="QGroupBox" name="RateStabilizationGroup_9">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -14600,6 +14006,9 @@ border-radius: 5;</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string>Slowly raise Kp until you start seeing clear oscillations when you fly.
 Then lower the value by 20% or so.</string>
@@ -14608,7 +14017,7 @@ Then lower the value by 20% or so.</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>5</number>
                      </property>
                      <property name="singleStep">
                       <double>0.000100000000000</double>
@@ -14645,6 +14054,9 @@ Then lower the value by 20% or so.</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string>Slowly raise Kp until you start seeing clear oscillations when you fly.
 Then lower the value by 20% or so.</string>
@@ -14653,7 +14065,7 @@ Then lower the value by 20% or so.</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>5</number>
                      </property>
                      <property name="singleStep">
                       <double>0.000100000000000</double>
@@ -14690,6 +14102,9 @@ Then lower the value by 20% or so.</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string>Slowly raise Kp until you start seeing clear oscillations when you fly.
 Then lower the value by 20% or so.
@@ -14700,7 +14115,7 @@ You can usually go for higher values for Yaw factors.</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>5</number>
                      </property>
                      <property name="singleStep">
                       <double>0.000100000000000</double>
@@ -14772,6 +14187,9 @@ You can usually go for higher values for Yaw factors.</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string>As a rule of thumb, you can set the Ki at roughly the same
 value as the Kp.</string>
@@ -14780,7 +14198,7 @@ value as the Kp.</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>5</number>
                      </property>
                      <property name="singleStep">
                       <double>0.000100000000000</double>
@@ -14833,6 +14251,9 @@ value as the Kp.</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string>As a rule of thumb, you can set the Ki at roughly the same
 value as the Kp.</string>
@@ -14841,7 +14262,7 @@ value as the Kp.</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>5</number>
                      </property>
                      <property name="singleStep">
                       <double>0.000100000000000</double>
@@ -14894,6 +14315,9 @@ value as the Kp.</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string>As a rule of thumb, you can set the Ki at roughly the same
 value as the Kp.</string>
@@ -14902,7 +14326,7 @@ value as the Kp.</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>5</number>
                      </property>
                      <property name="singleStep">
                       <double>0.000100000000000</double>
@@ -14970,6 +14394,9 @@ value as the Kp.</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string/>
                      </property>
@@ -14980,7 +14407,7 @@ value as the Kp.</string>
                       <number>6</number>
                      </property>
                      <property name="singleStep">
-                      <double>1.000000000000000</double>
+                      <double>0.000001000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -15014,6 +14441,9 @@ value as the Kp.</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
@@ -15021,7 +14451,7 @@ value as the Kp.</string>
                       <number>6</number>
                      </property>
                      <property name="singleStep">
-                      <double>1.000000000000000</double>
+                      <double>0.000001000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -15055,6 +14485,9 @@ value as the Kp.</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string/>
                      </property>
@@ -15065,7 +14498,7 @@ value as the Kp.</string>
                       <number>6</number>
                      </property>
                      <property name="singleStep">
-                      <double>1.000000000000000</double>
+                      <double>0.000001000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -15130,6 +14563,9 @@ value as the Kp.</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string/>
                      </property>
@@ -15137,10 +14573,13 @@ value as the Kp.</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>4</number>
+                     </property>
+                     <property name="maximum">
+                      <double>1.000000000000000</double>
                      </property>
                      <property name="singleStep">
-                      <double>1.000000000000000</double>
+                      <double>0.001000000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -15174,14 +14613,20 @@ value as the Kp.</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>4</number>
+                     </property>
+                     <property name="maximum">
+                      <double>1.000000000000000</double>
                      </property>
                      <property name="singleStep">
-                      <double>1.000000000000000</double>
+                      <double>0.001000000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -15215,6 +14660,9 @@ value as the Kp.</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string/>
                      </property>
@@ -15222,10 +14670,13 @@ value as the Kp.</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>4</number>
+                     </property>
+                     <property name="maximum">
+                      <double>1.000000000000000</double>
                      </property>
                      <property name="singleStep">
-                      <double>1.000000000000000</double>
+                      <double>0.001000000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -15242,58 +14693,23 @@ value as the Kp.</string>
                   </layout>
                  </widget>
                 </item>
+                <item row="0" column="2">
+                 <spacer name="horizontalSpacer_2">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
                </layout>
               </widget>
              </item>
-             <item row="2" column="4">
-              <spacer name="horizontalSpacer">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeType">
-                <enum>QSizePolicy::Fixed</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>2</width>
-                 <height>10</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
              <item row="3" column="0">
-              <spacer name="horizontalSpacer_2">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeType">
-                <enum>QSizePolicy::Fixed</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>2</width>
-                 <height>10</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="4" column="2">
-              <spacer name="verticalSpacer_12">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeType">
-                <enum>QSizePolicy::Fixed</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>15</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="5" column="1">
               <spacer name="horizontalSpacer_12">
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
@@ -15309,7 +14725,7 @@ value as the Kp.</string>
                </property>
               </spacer>
              </item>
-             <item row="5" column="2" colspan="2">
+             <item row="3" column="1" colspan="2">
               <widget class="QLabel" name="label_35">
                <property name="minimumSize">
                 <size>
@@ -15317,19 +14733,12 @@ value as the Kp.</string>
                  <height>16</height>
                 </size>
                </property>
-               <property name="font">
-                <font>
-                 <pointsize>9</pointsize>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                </font>
-               </property>
                <property name="text">
                 <string>Attitude Stabization Coefficients (Outer Loop)</string>
                </property>
               </widget>
              </item>
-             <item row="6" column="1" colspan="3">
+             <item row="4" column="0" colspan="3">
               <widget class="QGroupBox" name="RateStabilizationGroup_4">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -15866,13 +15275,6 @@ value as the Kp.</string>
                <property name="autoFillBackground">
                 <bool>false</bool>
                </property>
-               <property name="styleSheet">
-                <string notr="true">#RateStabilizationGroup_4{background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0 rgba(243, 243, 243, 255), stop:1 rgba(250, 250, 250, 255));
-
-border: 1px outset #999;
-border-radius: 3;
-}</string>
-               </property>
                <property name="title">
                 <string/>
                </property>
@@ -15883,86 +15285,7 @@ border-radius: 3;
                 <bool>false</bool>
                </property>
                <layout class="QGridLayout" name="gridLayout_4">
-                <item row="0" column="0">
-                 <spacer name="horizontalSpacer_7">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeType">
-                   <enum>QSizePolicy::Fixed</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>10</width>
-                    <height>10</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-                <item row="0" column="1">
-                 <widget class="QCheckBox" name="checkBox_2">
-                  <property name="styleSheet">
-                   <string notr="true"/>
-                  </property>
-                  <property name="text">
-                   <string>Link Roll and Pitch</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="2">
-                 <widget class="QPushButton" name="pushButton_2">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>81</width>
-                    <height>28</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>81</width>
-                    <height>28</height>
-                   </size>
-                  </property>
-                  <property name="styleSheet">
-                   <string notr="true">QPushButton {
-border: 1px outset #999;
-border-radius: 5;
-background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0.28 rgba(236, 236, 236, 255), stop:1 rgba(252, 252, 252, 255));
-}
-
-QPushButton:pressed {
-
-    border-style: inset;
-	background-color: qlineargradient(spread:pad, x1:0.502, y1:0.664864, x2:0.502, y2:0.034, stop:0.358209 rgba(250, 250, 250, 255), stop:0.626866 rgba(235, 235, 235, 255));
-
-}
-
-
-QPushButton:hover  {
-	border: 1px outset #999;	
-border-color: rgb(83, 83, 83);
-border-radius: 4;
-	}</string>
-                  </property>
-                  <property name="text">
-                   <string>Default</string>
-                  </property>
-                  <property name="objrelation" stdset="0">
-                   <stringlist>
-                    <string>objname:StabilizationSettings</string>
-                    <string>button:default</string>
-                    <string>buttongroup:5</string>
-                   </stringlist>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="0" colspan="3">
+                <item row="1" column="0" colspan="4">
                  <widget class="QGroupBox" name="RateStabilizationGroup_5">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -18115,6 +17438,9 @@ border-radius: 5;</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string/>
                      </property>
@@ -18122,7 +17448,7 @@ border-radius: 5;</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>3</number>
                      </property>
                      <property name="singleStep">
                       <double>0.100000000000000</double>
@@ -18159,11 +17485,14 @@ border-radius: 5;</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>3</number>
                      </property>
                      <property name="singleStep">
                       <double>0.100000000000000</double>
@@ -18200,6 +17529,9 @@ border-radius: 5;</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string/>
                      </property>
@@ -18207,7 +17539,7 @@ border-radius: 5;</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>3</number>
                      </property>
                      <property name="singleStep">
                       <double>0.100000000000000</double>
@@ -18279,6 +17611,9 @@ border-radius: 5;</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string/>
                      </property>
@@ -18286,7 +17621,7 @@ border-radius: 5;</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>3</number>
                      </property>
                      <property name="singleStep">
                       <double>0.100000000000000</double>
@@ -18339,11 +17674,14 @@ border-radius: 5;</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>3</number>
                      </property>
                      <property name="singleStep">
                       <double>0.100000000000000</double>
@@ -18396,6 +17734,9 @@ border-radius: 5;</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string/>
                      </property>
@@ -18403,7 +17744,7 @@ border-radius: 5;</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>3</number>
                      </property>
                      <property name="singleStep">
                       <double>0.100000000000000</double>
@@ -18471,6 +17812,9 @@ border-radius: 5;</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string/>
                      </property>
@@ -18478,7 +17822,7 @@ border-radius: 5;</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>2</number>
                      </property>
                      <property name="singleStep">
                       <double>0.100000000000000</double>
@@ -18515,11 +17859,14 @@ border-radius: 5;</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>2</number>
                      </property>
                      <property name="singleStep">
                       <double>0.100000000000000</double>
@@ -18556,6 +17903,9 @@ border-radius: 5;</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string/>
                      </property>
@@ -18563,7 +17913,7 @@ border-radius: 5;</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>2</number>
                      </property>
                      <property name="singleStep">
                       <double>0.100000000000000</double>
@@ -18583,26 +17933,102 @@ border-radius: 5;</string>
                   </layout>
                  </widget>
                 </item>
+                <item row="0" column="0">
+                 <spacer name="horizontalSpacer_7">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::Fixed</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>10</width>
+                    <height>10</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item row="0" column="3">
+                 <widget class="QPushButton" name="pushButton_2">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>81</width>
+                    <height>28</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>81</width>
+                    <height>28</height>
+                   </size>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QPushButton {
+border: 1px outset #999;
+border-radius: 5;
+background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0.28 rgba(236, 236, 236, 255), stop:1 rgba(252, 252, 252, 255));
+}
+
+QPushButton:pressed {
+
+    border-style: inset;
+	background-color: qlineargradient(spread:pad, x1:0.502, y1:0.664864, x2:0.502, y2:0.034, stop:0.358209 rgba(250, 250, 250, 255), stop:0.626866 rgba(235, 235, 235, 255));
+
+}
+
+
+QPushButton:hover  {
+	border: 1px outset #999;	
+border-color: rgb(83, 83, 83);
+border-radius: 4;
+	}</string>
+                  </property>
+                  <property name="text">
+                   <string>Default</string>
+                  </property>
+                  <property name="objrelation" stdset="0">
+                   <stringlist>
+                    <string>objname:StabilizationSettings</string>
+                    <string>button:default</string>
+                    <string>buttongroup:5</string>
+                   </stringlist>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QCheckBox" name="checkBox_2">
+                  <property name="styleSheet">
+                   <string notr="true"/>
+                  </property>
+                  <property name="text">
+                   <string>Link Roll and Pitch</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="2">
+                 <spacer name="horizontalSpacer">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
                </layout>
               </widget>
              </item>
-             <item row="7" column="2">
-              <spacer name="verticalSpacer_13">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeType">
-                <enum>QSizePolicy::Fixed</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>15</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="8" column="1">
+             <item row="5" column="0">
               <spacer name="horizontalSpacer_13">
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
@@ -18618,7 +18044,7 @@ border-radius: 5;</string>
                </property>
               </spacer>
              </item>
-             <item row="8" column="2" colspan="2">
+             <item row="5" column="1" colspan="2">
               <widget class="QLabel" name="label_36">
                <property name="minimumSize">
                 <size>
@@ -18626,19 +18052,12 @@ border-radius: 5;</string>
                  <height>16</height>
                 </size>
                </property>
-               <property name="font">
-                <font>
-                 <pointsize>9</pointsize>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                </font>
-               </property>
                <property name="text">
                 <string>Stick Range and Limits</string>
                </property>
               </widget>
              </item>
-             <item row="9" column="1" colspan="3">
+             <item row="6" column="0" colspan="3">
               <widget class="QGroupBox" name="RateStabilizationGroup_6">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -19172,16 +18591,6 @@ border-radius: 5;</string>
                  </disabled>
                 </palette>
                </property>
-               <property name="autoFillBackground">
-                <bool>false</bool>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">#RateStabilizationGroup_6{background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0 rgba(243, 243, 243, 255), stop:1 rgba(250, 250, 250, 255));
-
-border: 1px outset #999;
-border-radius: 3;
-}</string>
-               </property>
                <property name="title">
                 <string/>
                </property>
@@ -19199,7 +18608,7 @@ border-radius: 3;
                   </property>
                   <property name="sizeHint" stdset="0">
                    <size>
-                    <width>10</width>
+                    <width>10000</width>
                     <height>10</height>
                    </size>
                   </property>
@@ -19207,19 +18616,7 @@ border-radius: 3;
                 </item>
                 <item row="0" column="1">
                  <widget class="QPushButton" name="pushButton_3">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
                   <property name="minimumSize">
-                   <size>
-                    <width>81</width>
-                    <height>28</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
                    <size>
                     <width>81</width>
                     <height>28</height>
@@ -21412,6 +20809,9 @@ angle(deg)</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string/>
                      </property>
@@ -21457,6 +20857,9 @@ angle(deg)</string>
                        <width>16777215</width>
                        <height>22</height>
                       </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
                      </property>
                      <property name="styleSheet">
                       <string notr="true"/>
@@ -21537,6 +20940,9 @@ rate(deg/s)</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string/>
                      </property>
@@ -21544,13 +20950,13 @@ rate(deg/s)</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>0</number>
                      </property>
                      <property name="maximum">
                       <double>1000000.000000000000000</double>
                      </property>
                      <property name="singleStep">
-                      <double>0.100000000000000</double>
+                      <double>1.000000000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -21600,17 +21006,20 @@ rate(deg/s)</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>0</number>
                      </property>
                      <property name="maximum">
                       <double>1000000.000000000000000</double>
                      </property>
                      <property name="singleStep">
-                      <double>0.100000000000000</double>
+                      <double>1.000000000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -21660,6 +21069,9 @@ rate(deg/s)</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string/>
                      </property>
@@ -21667,13 +21079,13 @@ rate(deg/s)</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>0</number>
                      </property>
                      <property name="maximum">
                       <double>1000000.000000000000000</double>
                      </property>
                      <property name="singleStep">
-                      <double>0.100000000000000</double>
+                      <double>1.000000000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -21739,6 +21151,9 @@ rate(deg/s)</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string/>
                      </property>
@@ -21746,13 +21161,13 @@ rate(deg/s)</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>0</number>
                      </property>
                      <property name="maximum">
                       <double>1000000.000000000000000</double>
                      </property>
                      <property name="singleStep">
-                      <double>0.100000000000000</double>
+                      <double>1.000000000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -21786,17 +21201,20 @@ rate(deg/s)</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>0</number>
                      </property>
                      <property name="maximum">
                       <double>1000000.000000000000000</double>
                      </property>
                      <property name="singleStep">
-                      <double>0.100000000000000</double>
+                      <double>1.000000000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -21830,6 +21248,9 @@ rate(deg/s)</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string/>
                      </property>
@@ -21837,13 +21258,13 @@ rate(deg/s)</string>
                       <string notr="true"/>
                      </property>
                      <property name="decimals">
-                      <number>6</number>
+                      <number>0</number>
                      </property>
                      <property name="maximum">
                       <double>1000000.000000000000000</double>
                      </property>
                      <property name="singleStep">
-                      <double>0.100000000000000</double>
+                      <double>1.000000000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -21877,6 +21298,9 @@ rate(deg/s)</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string/>
                      </property>
@@ -21909,23 +21333,7 @@ rate(deg/s)</string>
                </layout>
               </widget>
              </item>
-             <item row="10" column="3">
-              <spacer name="verticalSpacer_14">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeType">
-                <enum>QSizePolicy::Fixed</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>10</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="11" column="1">
+             <item row="7" column="0">
               <spacer name="horizontalSpacer_41">
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
@@ -21941,7 +21349,7 @@ rate(deg/s)</string>
                </property>
               </spacer>
              </item>
-             <item row="11" column="2" colspan="2">
+             <item row="7" column="1" colspan="2">
               <widget class="QLabel" name="label_45">
                <property name="minimumSize">
                 <size>
@@ -21949,26 +21357,13 @@ rate(deg/s)</string>
                  <height>16</height>
                 </size>
                </property>
-               <property name="font">
-                <font>
-                 <pointsize>9</pointsize>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                </font>
-               </property>
                <property name="text">
                 <string>Sensor Tunning</string>
                </property>
               </widget>
              </item>
-             <item row="12" column="1" colspan="3">
+             <item row="8" column="0" colspan="3">
               <widget class="QGroupBox" name="RateStabilizationGroup_23">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
                <property name="minimumSize">
                 <size>
                  <width>0</width>
@@ -22497,13 +21892,6 @@ rate(deg/s)</string>
                </property>
                <property name="autoFillBackground">
                 <bool>false</bool>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">#RateStabilizationGroup_23{background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0 rgba(243, 243, 243, 255), stop:1 rgba(250, 250, 250, 255));
-
-border: 1px outset #999;
-border-radius: 3;
-}</string>
                </property>
                <property name="title">
                 <string/>
@@ -24702,6 +24090,9 @@ border-radius: 5;</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string>GyroTau is a gyro filter, the higher the factor the more filtering is applied to the gyros</string>
                      </property>
@@ -24715,7 +24106,7 @@ border-radius: 5;</string>
                       <double>1000000.000000000000000</double>
                      </property>
                      <property name="singleStep">
-                      <double>1.000000000000000</double>
+                      <double>0.001000000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -24748,6 +24139,9 @@ border-radius: 5;</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string>The proportional term for the accelerometer, the higher this term the more weight the  accel is given</string>
                      </property>
@@ -24761,7 +24155,7 @@ border-radius: 5;</string>
                       <double>1000000.000000000000000</double>
                      </property>
                      <property name="singleStep">
-                      <double>1.000000000000000</double>
+                      <double>0.010000000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -24794,6 +24188,9 @@ border-radius: 5;</string>
                        <height>22</height>
                       </size>
                      </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::StrongFocus</enum>
+                     </property>
                      <property name="toolTip">
                       <string>The intergral term for the accelerometer within the filter </string>
                      </property>
@@ -24807,7 +24204,7 @@ border-radius: 5;</string>
                       <double>1000000.000000000000000</double>
                      </property>
                      <property name="singleStep">
-                      <double>1.000000000000000</double>
+                      <double>0.000100000000000</double>
                      </property>
                      <property name="objrelation" stdset="0">
                       <stringlist>
@@ -24826,23 +24223,7 @@ border-radius: 5;</string>
                </layout>
               </widget>
              </item>
-             <item row="13" column="1" colspan="2">
-              <spacer name="verticalSpacer_15">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeType">
-                <enum>QSizePolicy::Fixed</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>10</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="14" column="1" colspan="3">
+             <item row="9" column="0" colspan="3">
               <widget class="QGroupBox" name="RateStabilizationGroup_22">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -25379,13 +24760,6 @@ border-radius: 5;</string>
                <property name="autoFillBackground">
                 <bool>false</bool>
                </property>
-               <property name="styleSheet">
-                <string notr="true">#RateStabilizationGroup_22{background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0 rgba(243, 243, 243, 255), stop:1 rgba(250, 250, 250, 255));
-
-border: 1px outset #999;
-border-radius: 3;
-}</string>
-               </property>
                <property name="title">
                 <string/>
                </property>
@@ -25432,13 +24806,6 @@ border-radius: 3;
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
-                  <property name="font">
-                   <font>
-                    <pointsize>9</pointsize>
-                    <weight>50</weight>
-                    <bold>false</bold>
-                   </font>
-                  </property>
                   <property name="toolTip">
                    <string>If you check this, the GCS will udpate the stabilization factors 
 automatically every 300ms, which will help for fast tuning.</string>
@@ -25483,11 +24850,6 @@ automatically every 300ms, which will help for fast tuning.</string>
                     <width>60</width>
                     <height>28</height>
                    </size>
-                  </property>
-                  <property name="font">
-                   <font>
-                    <pointsize>8</pointsize>
-                   </font>
                   </property>
                   <property name="toolTip">
                    <string>Send settings to the board but do not save to the non-volatile memory</string>
@@ -25543,11 +24905,6 @@ border-radius: 4;
                     <height>28</height>
                    </size>
                   </property>
-                  <property name="font">
-                   <font>
-                    <pointsize>8</pointsize>
-                   </font>
-                  </property>
                   <property name="toolTip">
                    <string>Send settings to the board and save to the non-volatile memory</string>
                   </property>
@@ -25598,6 +24955,109 @@ border-radius: 4;
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>scrollArea</tabstop>
+  <tabstop>checkBox_7</tabstop>
+  <tabstop>pushButton_19</tabstop>
+  <tabstop>pushButton_20</tabstop>
+  <tabstop>horizontalSlider_76</tabstop>
+  <tabstop>spinBox_7</tabstop>
+  <tabstop>PitchPSlider</tabstop>
+  <tabstop>spinBox_PitchRateP</tabstop>
+  <tabstop>horizontalSlider_78</tabstop>
+  <tabstop>spinBox_12</tabstop>
+  <tabstop>horizontalSlider_79</tabstop>
+  <tabstop>spinBox_8</tabstop>
+  <tabstop>horizontalSlider_80</tabstop>
+  <tabstop>spinBox_9</tabstop>
+  <tabstop>horizontalSlider_81</tabstop>
+  <tabstop>spinBox_10</tabstop>
+  <tabstop>checkBox_8</tabstop>
+  <tabstop>pushButton_21</tabstop>
+  <tabstop>pushButton_22</tabstop>
+  <tabstop>horizontalSlider_82</tabstop>
+  <tabstop>spinBox_13</tabstop>
+  <tabstop>horizontalSlider_83</tabstop>
+  <tabstop>spinBox_14</tabstop>
+  <tabstop>horizontalSlider_84</tabstop>
+  <tabstop>spinBox_15</tabstop>
+  <tabstop>horizontalSlider_85</tabstop>
+  <tabstop>spinBox_18</tabstop>
+  <tabstop>horizontalSlider_86</tabstop>
+  <tabstop>spinBox_19</tabstop>
+  <tabstop>horizontalSlider_87</tabstop>
+  <tabstop>spinBox_20</tabstop>
+  <tabstop>pushButton_23</tabstop>
+  <tabstop>pushButton_24</tabstop>
+  <tabstop>horizontalSlider_88</tabstop>
+  <tabstop>spinBox_16</tabstop>
+  <tabstop>horizontalSlider_89</tabstop>
+  <tabstop>spinBox_17</tabstop>
+  <tabstop>horizontalSlider_90</tabstop>
+  <tabstop>spinBox_21</tabstop>
+  <tabstop>horizontalSlider_91</tabstop>
+  <tabstop>spinBox_22</tabstop>
+  <tabstop>horizontalSlider_92</tabstop>
+  <tabstop>spinBox_23</tabstop>
+  <tabstop>horizontalSlider_93</tabstop>
+  <tabstop>spinBox_24</tabstop>
+  <tabstop>horizontalSlider_94</tabstop>
+  <tabstop>spinBox_25</tabstop>
+  <tabstop>horizontalSlider_95</tabstop>
+  <tabstop>spinBox_26</tabstop>
+  <tabstop>horizontalSlider_96</tabstop>
+  <tabstop>spinBox_27</tabstop>
+  <tabstop>lowThrottleZeroIntegral_8</tabstop>
+  <tabstop>realTimeUpdates_6</tabstop>
+  <tabstop>stabilizationReloadBoardData_6</tabstop>
+  <tabstop>saveStabilizationToRAM_6</tabstop>
+  <tabstop>saveStabilizationToSD_6</tabstop>
+  <tabstop>scrollArea_2</tabstop>
+  <tabstop>checkBox_3</tabstop>
+  <tabstop>pushButton_4</tabstop>
+  <tabstop>RateRollKp_2</tabstop>
+  <tabstop>RatePitchKp</tabstop>
+  <tabstop>RateYawKp</tabstop>
+  <tabstop>RateRollKi_2</tabstop>
+  <tabstop>RatePitchKi</tabstop>
+  <tabstop>RateYawKi</tabstop>
+  <tabstop>RollRateKd</tabstop>
+  <tabstop>PitchRateKd</tabstop>
+  <tabstop>YawRateKd</tabstop>
+  <tabstop>RateRollILimit_2</tabstop>
+  <tabstop>RatePitchILimit</tabstop>
+  <tabstop>RateYawILimit</tabstop>
+  <tabstop>checkBox_2</tabstop>
+  <tabstop>pushButton_2</tabstop>
+  <tabstop>AttitudeRollKp</tabstop>
+  <tabstop>AttitudePitchKp_2</tabstop>
+  <tabstop>AttitudeYawKp</tabstop>
+  <tabstop>AttitudeRollKi</tabstop>
+  <tabstop>AttitudePitchKi_2</tabstop>
+  <tabstop>AttitudeYawKi</tabstop>
+  <tabstop>AttitudeRollILimit</tabstop>
+  <tabstop>AttitudePitchILimit_2</tabstop>
+  <tabstop>AttitudeYawILimit</tabstop>
+  <tabstop>pushButton_3</tabstop>
+  <tabstop>rateRollKp_3</tabstop>
+  <tabstop>ratePitchKp_4</tabstop>
+  <tabstop>rateYawKp_3</tabstop>
+  <tabstop>rateRollKi_3</tabstop>
+  <tabstop>ratePitchKi_4</tabstop>
+  <tabstop>rateYawKi_3</tabstop>
+  <tabstop>rateRollILimit_3</tabstop>
+  <tabstop>ratePitchILimit_4</tabstop>
+  <tabstop>rateYawILimit_3</tabstop>
+  <tabstop>pushButton_5</tabstop>
+  <tabstop>GyroTau</tabstop>
+  <tabstop>AccelKp</tabstop>
+  <tabstop>AccelKi</tabstop>
+  <tabstop>lowThrottleZeroIntegral_9</tabstop>
+  <tabstop>realTimeUpdates_7</tabstop>
+  <tabstop>saveStabilizationToRAM_7</tabstop>
+  <tabstop>saveStabilizationToSD_7</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

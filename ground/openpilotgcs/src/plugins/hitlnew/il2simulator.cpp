@@ -84,7 +84,7 @@ const float IL2Simulator::TEMP_LAPSE_RATE = -0.0065; //degrees per meter
 const float IL2Simulator::AIR_CONST_FACTOR = -0.0341631947363104; //several nature constants calculated into one
 
 IL2Simulator::IL2Simulator(const SimulatorSettings& params) :
-                Simulator(params)
+    Simulator(params)
 {
 
 }
@@ -96,31 +96,31 @@ IL2Simulator::~IL2Simulator()
 
 void IL2Simulator::setupUdpPorts(const QString& host, int inPort, int outPort)
 {
-        inSocket->connectToHost(host,inPort); // IL2
-        if(!inSocket->waitForConnected())
-                qxtLog->error(Name() + " cann't connect to UDP Port: " + QString::number(inPort));
+    inSocket->connectToHost(host,inPort); // IL2
+    if(!inSocket->waitForConnected())
+        qxtLog->error(Name() + " cann't connect to UDP Port: " + QString::number(inPort));
 
 }
 
 void IL2Simulator::transmitUpdate()
 {
-        // Read ActuatorDesired from autopilot
-        ActuatorDesired::DataFields actData = actDesired->getData();
-        float ailerons = actData.Roll;
-        float elevator = actData.Pitch;
-        float rudder = actData.Yaw;
-        float throttle = actData.Throttle*2-1.0;
+    // Read ActuatorDesired from autopilot
+    ActuatorDesired::DataFields actData = actDesired->getData();
+    float ailerons = actData.Roll;
+    float elevator = actData.Pitch;
+    float rudder = actData.Yaw;
+    float throttle = actData.Throttle*2-1.0;
 
-        // Send update to Il2
-        QString cmd;
-        cmd=QString("R/30/32/40/42/46/48/81\\%1/85\\%2/87\\%3/89\\%4/")
-                .arg(throttle)
-                .arg(ailerons)
-                .arg(elevator)
-                .arg(rudder);
-        QByteArray data = cmd.toAscii();
-        //outSocket->write(data);
-        inSocket->write(data);  // for IL2 must send to the same port as input!!!!!!!!!!!!!
+    // Send update to Il2
+    QString cmd;
+    cmd=QString("R/30/32/40/42/46/48/81\\%1/85\\%2/87\\%3/89\\%4/")
+            .arg(throttle)
+            .arg(ailerons)
+            .arg(elevator)
+            .arg(rudder);
+    QByteArray data = cmd.toAscii();
+    //outSocket->write(data);
+    inSocket->write(data);  // for IL2 must send to the same port as input!!!!!!!!!!!!!
 }
 
 
@@ -128,25 +128,25 @@ void IL2Simulator::transmitUpdate()
  * calculate air density from altitude
  */
 float IL2Simulator::DENSITY(float alt) {
-        return (GROUNDDENSITY * pow(
-                                ((TEMP_GROUND+(TEMP_LAPSE_RATE*alt))/TEMP_GROUND),
-                                ((AIR_CONST_FACTOR/TEMP_LAPSE_RATE)-1) )
-                                );
+    return (GROUNDDENSITY * pow(
+                ((TEMP_GROUND+(TEMP_LAPSE_RATE*alt))/TEMP_GROUND),
+                ((AIR_CONST_FACTOR/TEMP_LAPSE_RATE)-1) )
+            );
 }
 
 /**
  * calculate air pressure from altitude
  */
 float IL2Simulator::PRESSURE(float alt) {
-        return DENSITY(alt)*(TEMP_GROUND+(alt*TEMP_LAPSE_RATE))*AIR_CONST;
+    return DENSITY(alt)*(TEMP_GROUND+(alt*TEMP_LAPSE_RATE))*AIR_CONST;
 
 }
 
 /**
- * calculate TAS from IAS and altitude
+ * calculate CAS from IAS and altitude
  */
-float IL2Simulator::TAS(float IAS, float alt) {
-        return (IAS*sqrt(GROUNDDENSITY/DENSITY(alt)));
+float IL2Simulator::CAS(float IAS, float alt) {
+    return (IAS*sqrt(GROUNDDENSITY/DENSITY(alt)));
 }
 
 /**
@@ -154,203 +154,166 @@ float IL2Simulator::TAS(float IAS, float alt) {
  */
 void IL2Simulator::processUpdate(const QByteArray& inp)
 {
-        // save old flight data to calculate delta's later
-        old=current;
-        QString data(inp);
-        // Split
-        QStringList fields = data.split("/");
+    // save old flight data to calculate delta's later
+    old=current;
+    QString data(inp);
+    // Split
+    QStringList fields = data.split("/");
 
-        // split up response string
-        int t;
-        for (t=0; t<fields.length(); t++) {
-                QStringList values = fields[t].split("\\");
+    // split up response string
+    int t;
+    for (t=0; t<fields.length(); t++) {
+        QStringList values = fields[t].split("\\");
         // parse values
         if (values.length()>=2) {
-                int id = values[0].toInt();
-                float value = values[1].toFloat();
-                switch (id) {
-                        case 30:
-                        current.ias=value * KMH2MPS;
-                        break;
-                        case 32:
-                        current.dZ=value;
-                        break;
-                        case 40:
-                        current.Z=value;
-                        break;
-                        case 42:
-                        current.azimuth=value;
-                        break;
-                        case 46:
-                        current.roll=-value;
-                        break;
-                        case 48:
-                        current.pitch=value;
-                        break;
-                }
+            int id = values[0].toInt();
+            float value = values[1].toFloat();
+            switch (id) {
+            case 30:
+                current.ias=value * KMH2MPS;
+                break;
+            case 32:
+                current.dZ=value;
+                break;
+            case 40:
+                current.Z=value;
+                break;
+            case 42:
+                current.azimuth=value;
+                break;
+            case 46:
+                current.roll=-value;
+                break;
+            case 48:
+                current.pitch=value;
+                break;
+            }
         }
-        }
+    }
 
-        // measure time
-        current.dT = ((float)time->restart()) / 1000.0;
-        if (current.dT<0.001)  current.dT=0.001;
-        current.T = old.T+current.dT;
-        current.i = old.i+1;
-        if (current.i==1) {
-                old.dRoll=0;
-                old.dPitch=0;
-                old.dAzimuth=0;
-                old.ddX=0;
-                old.ddX=0;
-                old.ddX=0;
-        }
+    // measure time
+    current.dT = ((float)time->restart()) / 1000.0;
+    if (current.dT<0.001)  current.dT=0.001;
+    current.T = old.T+current.dT;
+    current.i = old.i+1;
+    if (current.i==1) {
+        old.dRoll=0;
+        old.dPitch=0;
+        old.dAzimuth=0;
+        old.ddX=0;
+        old.ddX=0;
+        old.ddX=0;
+    }
 
-        // calculate TAS from alt and IAS
-        current.tas = TAS(current.ias,current.Z);
+    // calculate CAS from alt and IAS
+    current.tas = CAS(current.ias,current.Z);
 
-        // assume the plane actually flies straight and no wind
-        // groundspeed is horizontal vector of TAS
-        current.groundspeed = current.tas*cos(current.pitch*DEG2RAD);
-        // x and y vector components
-        current.dX = current.groundspeed*sin(current.azimuth*DEG2RAD);
-        current.dY = current.groundspeed*cos(current.azimuth*DEG2RAD);
+    // assume the plane actually flies straight and no wind
+    // groundspeed is horizontal vector of TAS
+    current.groundspeed = current.tas*cos(current.pitch*DEG2RAD);
+    // x and y vector components
+    current.dX = current.groundspeed*sin(current.azimuth*DEG2RAD);
+    current.dY = current.groundspeed*cos(current.azimuth*DEG2RAD);
 
-        // simple IMS - integration over time the easy way...
-        current.X = old.X + (current.dX*current.dT);
-        current.Y = old.Y + (current.dY*current.dT);
+    // simple IMS - integration over time the easy way...
+    current.X = old.X + (current.dX*current.dT);
+    current.Y = old.Y + (current.dY*current.dT);
 
-        // accelerations (filtered)
-	if (isnan(old.ddX) || isinf(old.ddX)) old.ddX=0;
-	if (isnan(old.ddY) || isinf(old.ddY)) old.ddY=0;
-	if (isnan(old.ddZ) || isinf(old.ddZ)) old.ddZ=0;
+    // accelerations (filtered)
+    if (isnan(old.ddX) || isinf(old.ddX)) old.ddX=0;
+    if (isnan(old.ddY) || isinf(old.ddY)) old.ddY=0;
+    if (isnan(old.ddZ) || isinf(old.ddZ)) old.ddZ=0;
 #define SPEED_FILTER 10
-        current.ddX = ((current.dX-old.dX)/current.dT + SPEED_FILTER * (old.ddX)) / (SPEED_FILTER+1);
-        current.ddY = ((current.dY-old.dY)/current.dT + SPEED_FILTER * (old.ddY)) / (SPEED_FILTER+1);
-        current.ddZ = ((current.dZ-old.dZ)/current.dT + SPEED_FILTER * (old.ddZ)) / (SPEED_FILTER+1);
+    current.ddX = ((current.dX-old.dX)/current.dT + SPEED_FILTER * (old.ddX)) / (SPEED_FILTER+1);
+    current.ddY = ((current.dY-old.dY)/current.dT + SPEED_FILTER * (old.ddY)) / (SPEED_FILTER+1);
+    current.ddZ = ((current.dZ-old.dZ)/current.dT + SPEED_FILTER * (old.ddZ)) / (SPEED_FILTER+1);
 
 #define TURN_FILTER 10
-        // turn speeds (filtered)
-	if (isnan(old.dAzimuth) || isinf(old.dAzimuth)) old.dAzimuth=0;
-	if (isnan(old.dPitch) || isinf(old.dPitch)) old.dPitch=0;
-	if (isnan(old.dRoll) || isinf(old.dRoll)) old.dRoll=0;
-        current.dAzimuth = (angleDifference(current.azimuth,old.azimuth)/current.dT + TURN_FILTER * (old.dAzimuth)) / (TURN_FILTER+1);
-        current.dPitch   = (angleDifference(current.pitch,old.pitch)/current.dT     + TURN_FILTER * (old.dPitch))   / (TURN_FILTER+1);
-        current.dRoll    = (angleDifference(current.roll,old.roll)/current.dT       + TURN_FILTER * (old.dRoll))    / (TURN_FILTER+1);
-        // Update AltitudeActual object
-        BaroAltitude::DataFields altActualData;
-        memset(&altActualData, 0, sizeof(BaroAltitude::DataFields));
-        altActualData.Altitude = current.Z;
-        altActualData.Temperature = TEMP_GROUND + (current.Z * TEMP_LAPSE_RATE) - 273.0;
-        altActualData.Pressure = PRESSURE(current.Z)/1000.0; // kpa
+    // turn speeds (filtered)
+    if (isnan(old.dAzimuth) || isinf(old.dAzimuth)) old.dAzimuth=0;
+    if (isnan(old.dPitch) || isinf(old.dPitch)) old.dPitch=0;
+    if (isnan(old.dRoll) || isinf(old.dRoll)) old.dRoll=0;
+    current.dAzimuth = (angleDifference(current.azimuth,old.azimuth)/current.dT + TURN_FILTER * (old.dAzimuth)) / (TURN_FILTER+1);
+    current.dPitch   = (angleDifference(current.pitch,old.pitch)/current.dT     + TURN_FILTER * (old.dPitch))   / (TURN_FILTER+1);
+    current.dRoll    = (angleDifference(current.roll,old.roll)/current.dT       + TURN_FILTER * (old.dRoll))    / (TURN_FILTER+1);
 
-        // Update attActual object
-        AttitudeActual::DataFields attActualData;
-        memset(&attActualData, 0, sizeof(AttitudeActual::DataFields));
-        attActualData.Roll = current.roll;
-        attActualData.Pitch = current.pitch;
-        attActualData.Yaw = current.azimuth;
-	float rpy[3];
-	float quat[4];
-	rpy[0]=current.roll;
-	rpy[1]=current.pitch;
-	rpy[2]=current.azimuth;
-        Utils::CoordinateConversions().RPY2Quaternion(rpy,quat);
-        attActualData.q1 = quat[0];
-        attActualData.q2 = quat[1];
-        attActualData.q3 = quat[2];
-        attActualData.q4 = quat[3];
+    ///////
+    // Output formatting
+    ///////
+    Output2OP out;
+    memset(&out, 0, sizeof(Output2OP));
 
-        // Update positionActual objects
-        PositionActual::DataFields posData;
-        memset(&posData, 0, sizeof(PositionActual::DataFields));
-        posData.North =  current.Y*100;
-        posData.East = current.X*100;
-        posData.Down = current.Z*-100;
+    // Compute rotation matrix, for later calculations
+    float Rbe[3][3];
+    float rpy[3];
+    float quat[4];
+    rpy[0]=current.roll;
+    rpy[1]=current.pitch;
+    rpy[2]=current.azimuth;
+    Utils::CoordinateConversions().RPY2Quaternion(rpy,quat);
+    Utils::CoordinateConversions().Quaternion2R(quat,Rbe);
 
-        // Update velocityActual objects
-        VelocityActual::DataFields velData;
-        memset(&velData, 0, sizeof(VelocityActual::DataFields));
-        velData.North = current.dY*100;
-        velData.East = current.dX*100;
-        velData.Down = current.dZ*-100;
+    //Calculate ECEF
+    double RNE[9];
+    double ECEF[3];
+    double LLA[3];
+    LLA[0]=settings.latitude.toFloat();
+    LLA[1]=settings.longitude.toFloat();
+    LLA[2]=0;
+    Utils::CoordinateConversions().RneFromLLA(LLA,(double (*)[3])RNE);
+    Utils::CoordinateConversions().LLA2ECEF(LLA,ECEF);
 
-        // Update AttitudeRaw object (filtered gyros and accels only for now)
-        AttitudeRaw::DataFields rawData;
-        memset(&rawData, 0, sizeof(AttitudeRaw::DataFields));
-        rawData = attRaw->getData();
-	// rotate turn rates and accelerations into body frame
-	// (note: rotation deltas are NOT in NED frame but in RPY - manual conversion!)
-	rawData.gyros[0] = current.dRoll;
-	rawData.gyros[1] = cos(DEG2RAD * current.roll) * current.dPitch + sin(DEG2RAD * current.roll) * current.dAzimuth;
-	rawData.gyros[2] = cos(DEG2RAD * current.roll) * current.dAzimuth - sin(DEG2RAD * current.roll) * current.dPitch;
-	// accels are in NED and can be converted using standard ned->local rotation matrix
-	float Rbe[3][3];
-	Utils::CoordinateConversions().Quaternion2R(quat,Rbe);
-	for (int t=0;t<3;t++) {
-		rawData.accels[t]=current.ddX*Rbe[t][0]
-				+current.ddY*Rbe[t][1]
-				+(current.ddZ+GEE)*Rbe[t][2];
-	}
-	rawData.accels[2]=-rawData.accels[2];
+    // Update GPS Position objects
+    double NED[3];
+    NED[0] = current.Y;
+    NED[1] = current.X;
+    NED[2] = -current.Z;
+    Utils::CoordinateConversions().GetLLA(ECEF,NED,LLA);
+    out.latitude = settings.latitude.toFloat() * 1e7;
+    out.longitude = settings.longitude.toFloat() * 1e7;
+    out.groundspeed = current.groundspeed;
 
-        // Update homelocation
-        HomeLocation::DataFields homeData;
-        memset(&homeData, 0, sizeof(HomeLocation::DataFields));
-        homeData = posHome->getData();
-        homeData.Latitude = settings.latitude.toFloat() * 10e6;
-        homeData.Longitude = settings.longitude.toFloat() * 10e6;
-        homeData.Altitude = 0;
-        double LLA[3];
-        LLA[0]=settings.latitude.toFloat();
-        LLA[1]=settings.longitude.toFloat();
-        LLA[2]=0;
-        double ECEF[3];
-	double RNE[9];
-        Utils::CoordinateConversions().RneFromLLA(LLA,(double (*)[3])RNE);
-	for (int t=0;t<9;t++) {
-		homeData.RNE[t]=RNE[t];
-	}
-        Utils::CoordinateConversions().LLA2ECEF(LLA,ECEF);
-        homeData.ECEF[0]=ECEF[0]*100;
-        homeData.ECEF[1]=ECEF[1]*100;
-        homeData.ECEF[2]=ECEF[2]*100;
-        homeData.Be[0]=0;
-        homeData.Be[1]=0;
-        homeData.Be[2]=0;
-        homeData.Set=1;
+    out.airspeed = current.ias;
 
-        // Update gps objects
-        GPSPosition::DataFields gpsData;
-        memset(&gpsData, 0, sizeof(GPSPosition::DataFields));
-        gpsData.Altitude = current.Z;
-        gpsData.Heading = current.azimuth;
-        gpsData.Groundspeed = current.groundspeed;
-        double NED[3];
-        NED[0] = current.Y;
-        NED[1] = current.X;
-        NED[2] = -current.Z;
-        Utils::CoordinateConversions().GetLLA(ECEF,NED,LLA);
-        gpsData.Latitude = LLA[0] * 10e6;
-        gpsData.Longitude = LLA[1] * 10e6;
-        gpsData.Satellites = 7;
-        gpsData.Status = GPSPosition::STATUS_FIX3D;
+    out.dstN=current.Y;
+    out.dstE=current.X;
+    out.dstD=-current.Z;
 
-        // issue manual update
-        // update every time (50ms)
-        attActual->setData(attActualData);
-        //attActual->updated();
-        attRaw->setData(rawData);
-        //attRaw->updated();
-	velActual->setData(velData);
-	//velActual->updated();
-	posActual->setData(posData);
-	//posActual->updated();
-	altActual->setData(altActualData);
-	//altActual->updated();
-	gpsPos->setData(gpsData);
-	//gpsPos->updated();
-	posHome->setData(homeData);
-	//posHome->updated();
+    // Update BaroAltitude object
+    out.altitude = current.Z;
+    out.temperature = TEMP_GROUND + (current.Z * TEMP_LAPSE_RATE) - 273.0;
+    out.pressure = PRESSURE(current.Z)/1000.0; // kpa
+
+
+    // Update attActual object
+    out.roll = current.roll;   //roll;
+    out.pitch = current.pitch;  // pitch
+    out.heading = current.azimuth; // yaw
+
+
+    // Update VelocityActual.{North,East,Down}
+    out.velNorth = current.dY;
+    out.velEast = current.dX;
+    out.velDown = -current.dZ;
+
+    // rotate turn rates and accelerations into body frame
+    // (note: rotation deltas are NOT in NED frame but in RPY - manual conversion!)
+    out.rollRate = current.dRoll;
+    out.pitchRate = cos(DEG2RAD * current.roll) * current.dPitch + sin(DEG2RAD * current.roll) * current.dAzimuth;
+    out.yawRate = cos(DEG2RAD * current.roll) * current.dAzimuth - sin(DEG2RAD * current.roll) * current.dPitch;
+
+    //Update accelerometer sensor data
+    out.accX = current.ddX*Rbe[0][0]
+            +current.ddY*Rbe[0][1]
+            +(current.ddZ+GEE)*Rbe[0][2];
+    out.accY = current.ddX*Rbe[1][0]
+            +current.ddY*Rbe[1][1]
+            +(current.ddZ+GEE)*Rbe[1][2];
+    out.accZ = - (current.ddX*Rbe[2][0]
+                     +current.ddY*Rbe[2][1]
+                     +(current.ddZ+GEE)*Rbe[2][2]);
+
+    updateUAVOs(out);
 }
 
 /**
@@ -358,8 +321,8 @@ void IL2Simulator::processUpdate(const QByteArray& inp)
  */
 float IL2Simulator::angleDifference(float a, float b)
 {
-        float d=a-b;
-        if (d>180) d-=360;
-        if (d<-180)d+=360;
-        return d;
+    float d=a-b;
+    if (d>180) d-=360;
+    if (d<-180)d+=360;
+    return d;
 }

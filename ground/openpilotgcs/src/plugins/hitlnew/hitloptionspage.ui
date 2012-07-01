@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>590</width>
+    <width>599</width>
     <height>367</height>
    </rect>
   </property>
@@ -40,7 +40,7 @@
      </property>
     </widget>
    </item>
-   <item row="11" column="2">
+   <item row="12" column="2">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -256,6 +256,13 @@
      </property>
      <property name="toolTip">
       <string>For communication with sim computer via network. Should be the IP address of one of the interfaces of the GCS computer.</string>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="1">
+    <widget class="QCheckBox" name="noiseCheckBox">
+     <property name="text">
+      <string>Add noise</string>
      </property>
     </widget>
    </item>

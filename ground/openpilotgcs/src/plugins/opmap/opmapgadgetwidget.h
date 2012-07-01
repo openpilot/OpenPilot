@@ -193,10 +193,7 @@ private slots:
 //    void onFindPlaceAct_triggered();
     void onShowCompassAct_toggled(bool show);
     void onShowDiagnostics_toggled(bool show);
-    void onShowUAVAct_toggled(bool show);
     void onShowHomeAct_toggled(bool show);
-    void onShowTrailLineAct_toggled(bool show);
-    void onShowTrailAct_toggled(bool show);
     void onGoZoomInAct_triggered();
     void onGoZoomOutAct_triggered();
     void onGoMouseClickAct_triggered();
@@ -218,11 +215,26 @@ private slots:
     void onHomeMagicWaypointAct_triggered();
     void onShowSafeAreaAct_toggled(bool show);
     void onSafeAreaActGroup_triggered(QAction *action);
-    void onUAVTrailTypeActGroup_triggered(QAction *action);
+    void onMaxUpdateRateActGroup_triggered(QAction *action);
+
+    /*UAV*/
+    void onShowUAVAct_toggled(bool show);
+    void onShowUAVtrailLineAct_toggled(bool show);
+    void onShowUAVtrailAct_toggled(bool show);
     void onClearUAVtrailAct_triggered();
-    void onUAVTrailTimeActGroup_triggered(QAction *action);
-    void onUAVTrailDistanceActGroup_triggered(QAction *action);
-	void onMaxUpdateRateActGroup_triggered(QAction *action);
+    void onUAVtrailTimeActGroup_triggered(QAction *action);
+    void onUAVtrailDistanceActGroup_triggered(QAction *action);
+    void onUAVtrailTypeActGroup_triggered(QAction *action);
+
+    /*GPS*/
+    void onShowGPSAct_toggled(bool show);
+    void onShowGPStrailLineAct_toggled(bool show);
+    void onShowGPStrailAct_toggled(bool show);
+    void onClearGPStrailAct_triggered();
+    void onGPStrailTimeActGroup_triggered(QAction *action);
+    void onGPStrailDistanceActGroup_triggered(QAction *action);
+    void onGPStrailTypeActGroup_triggered(QAction *action);
+
 
 private:
 
@@ -289,7 +301,6 @@ private:
     QAction *showCompassAct;
     QAction *showDiagnostics;
     QAction *showHomeAct;
-    QAction *showUAVAct;
     QAction *zoomInAct;
     QAction *zoomOutAct;
     QAction *goMouseClickAct;
@@ -312,15 +323,30 @@ private:
     QActionGroup *safeAreaActGroup;
     QList<QAction *> safeAreaAct;
 
+    // UAV
+    QAction *showUAVAct;
     QActionGroup *uavTrailTypeActGroup;
     QList<QAction *> uavTrailTypeAct;
     QAction *clearUAVtrailAct;
     QActionGroup *uavTrailTimeActGroup;
-    QAction *showTrailLineAct;
-    QAction *showTrailAct;
+    QAction *showUAVtrailLineAct;
+    QAction *showUAVtrailAct;
     QList<QAction *> uavTrailTimeAct;
     QActionGroup *uavTrailDistanceActGroup;
     QList<QAction *> uavTrailDistanceAct;
+
+    //GPS
+    QAction *showGPSAct;
+    QActionGroup *gpsTrailTypeActGroup;
+    QList<QAction *> gpsTrailTypeAct;
+    QAction *clearGPStrailAct;
+    QActionGroup *gpsTrailTimeActGroup;
+    QAction *showGPStrailLineAct;
+    QAction *showGPStrailAct;
+    QList<QAction *> gpsTrailTimeAct;
+    QActionGroup *gpsTrailDistanceActGroup;
+    QList<QAction *> gpsTrailDistanceAct;
+
 
     QActionGroup *mapModeActGroup;
     QList<QAction *> mapModeAct;

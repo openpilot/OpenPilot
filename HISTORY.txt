@@ -1,5 +1,36 @@
 Short summary of changes.  For a complete list see the git log.
 
+2012-06-04
+AeroSimRC support merged into next
+
+2012-05-26
+VirtualFlybar which allows a more aggressive flight mode than rate mode
+support.  Also PiroCompensation added.
+
+2012-05-26
+Revert some UI changes that didn't work consistently between OSX and Windows.
+
+2012-05-24
+Merged the updated firmware for the PipXtreme, thanks to Brian for a lot of
+work on this.
+
+2012-05-04
+Support for CC3D.  This involved changes to various things such as the sensors
+being split from AttitudeRaw to Accels,Gyros,Magnetometer.  A single firmware
+image fw_coptercontrol will run on both CC and CC3D.  When compiling the
+bootloader one must set the HW_REVISION to the appropriate value.  0x01 is for
+CC and 0x02 is for CC3D.  If the wrong bootloader is installed the firmware
+will not run.
+
+2012-05-02
+Reduction in the memory usage due to the UAVObject metadata.  Now the update
+periods are using a smaller data type and the various flags relating to access
+controls and update modes are stored in a bitfield.  The UAVObjectBrowser has
+not been updated to allow these modes to be easily changed.
+
+2012-03-31
+Support for ground vehicle configuration has been added to the the GCS.
+
 2012-02-14
 New QML based system to allow more flexible UI.  Upgraded stabilization
 configuration.

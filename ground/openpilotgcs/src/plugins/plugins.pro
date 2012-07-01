@@ -134,19 +134,36 @@ plugin_qmlview.depends = plugin_coreplugin
 plugin_qmlview.depends += plugin_uavobjects
 SUBDIRS += plugin_qmlview
 
+# PathAction Editor gadget
+plugin_pathactioneditor.subdir = pathactioneditor
+plugin_pathactioneditor.depends = plugin_coreplugin
+plugin_pathactioneditor.depends += plugin_uavobjects
+SUBDIRS += plugin_pathactioneditor
+
+# Waypoint Editor gadget
+plugin_waypointeditor.subdir = waypointeditor
+plugin_waypointeditor.depends = plugin_coreplugin
+plugin_waypointeditor.depends += plugin_uavobjects
+SUBDIRS += plugin_waypointeditor
 
 #IP connection plugin
 plugin_ipconnection.subdir = ipconnection
 plugin_ipconnection.depends = plugin_coreplugin
 SUBDIRS += plugin_ipconnection
 
-# Disable until updated to the new sensor objects
 #HITLNEW Simulation gadget
-#plugin_hitlnew.subdir = hitlnew
-#plugin_hitlnew.depends = plugin_coreplugin
-#plugin_hitlnew.depends += plugin_uavobjects
-#plugin_hitlnew.depends += plugin_uavtalk
-#SUBDIRS += plugin_hitlnew
+plugin_hitlnew.subdir = hitlnew
+plugin_hitlnew.depends = plugin_coreplugin
+plugin_hitlnew.depends += plugin_uavobjects
+plugin_hitlnew.depends += plugin_uavtalk
+SUBDIRS += plugin_hitlnew
+
+#HITLNEW Simulation gadget v2
+plugin_hitl_v2.subdir = hitlv2
+plugin_hitl_v2.depends = plugin_coreplugin
+plugin_hitl_v2.depends += plugin_uavobjects
+plugin_hitl_v2.depends += plugin_uavtalk
+SUBDIRS += plugin_hitl_v2
 
 # Export and Import GCS Configuration
 plugin_importexport.subdir = importexport
@@ -173,13 +190,6 @@ SUBDIRS += plugin_gcscontrol
 #plugin_antennatrack.depends += plugin_uavtalk
 #SUBDIRS += plugin_antennatrack
 
-#PipXtreme gadget
-plugin_pipxtreme.subdir = pipxtreme
-plugin_pipxtreme.depends = plugin_coreplugin
-plugin_pipxtreme.depends += plugin_uavobjects
-plugin_pipxtreme.depends += plugin_rawhid
-SUBDIRS += plugin_pipxtreme
-
 #Scope OpenGL Gadget
 #plugin_scopeogl.subdir = scopeogl
 #plugin_scopeogl.depends = plugin_coreplugin
@@ -191,6 +201,13 @@ plugin_uavobjectutil.subdir = uavobjectutil
 plugin_uavobjectutil.depends = plugin_coreplugin
 plugin_uavobjectutil.depends += plugin_uavobjects
 SUBDIRS += plugin_uavobjectutil
+
+# OSG Earth View plugin
+#plugin_osgearthview.subdir = osgearthview
+#plugin_osgearthview.depends = plugin_coreplugin
+#plugin_osgearthview.depends += plugin_uavobjects
+#plugin_osgearthview.depends += plugin_uavobjectwidgetutils
+#SUBDIRS += plugin_osgearthview
 
 # Magic Waypoint gadget
 plugin_magicwaypoint.subdir = magicwaypoint

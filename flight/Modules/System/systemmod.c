@@ -65,7 +65,7 @@
 #define STACK_SIZE_BYTES 924
 #endif
 
-#define TASK_PRIORITY (tskIDLE_PRIORITY+2)
+#define TASK_PRIORITY (tskIDLE_PRIORITY+1)
 
 // Private types
 
@@ -215,7 +215,7 @@ static void objectUpdatedCb(UAVObjEvent * ev)
 		// Get object data
 		ObjectPersistenceGet(&objper);
 
-		int retval = -1;
+		int retval = 1;
 		// Execute action
 		if (objper.Operation == OBJECTPERSISTENCE_OPERATION_LOAD) {
 			if (objper.Selection == OBJECTPERSISTENCE_SELECTION_SINGLEOBJECT) {
@@ -242,6 +242,13 @@ static void objectUpdatedCb(UAVObjEvent * ev)
 				}
 				// Save selected instance
 				retval = UAVObjSave(obj, objper.InstanceID);
+
+				// Not sure why this is needed
+				vTaskDelay(10);
+
+				// Verify saving worked
+				if (retval == 0)
+					retval = UAVObjLoad(obj, objper.InstanceID);
 			} else if (objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLSETTINGS
 				   || objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLOBJECTS) {
 				retval = UAVObjSaveSettings();
@@ -271,9 +278,17 @@ static void objectUpdatedCb(UAVObjEvent * ev)
 			retval = PIOS_FLASHFS_Format();
 #endif
 		}
-		if(retval == 0) { 
-			objper.Operation = OBJECTPERSISTENCE_OPERATION_COMPLETED;
-			ObjectPersistenceSet(&objper);
+		switch(retval) {
+			case 0:
+				objper.Operation = OBJECTPERSISTENCE_OPERATION_COMPLETED;
+				ObjectPersistenceSet(&objper);
+				break;
+			case -1:
+				objper.Operation = OBJECTPERSISTENCE_OPERATION_ERROR;
+				ObjectPersistenceSet(&objper);
+				break;
+			default:
+				break;
 		}
 	}
 }

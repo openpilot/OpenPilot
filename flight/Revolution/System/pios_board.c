@@ -27,18 +27,61 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include <pios.h>
+/* Pull in the board-specific static HW definitions.
+ * Including .c files is a bit ugly but this allows all of
+ * the HW definitions to be const and static to limit their
+ * scope.  
+ *
+ * NOTE: THIS IS THE ONLY PLACE THAT SHOULD EVER INCLUDE THIS FILE
+ */
+#include "board_hw_defs.c"
 
+#include <pios.h>
 #include <openpilot.h>
 #include <uavobjectsinit.h>
 #include "hwsettings.h"
 #include "manualcontrolsettings.h"
 
-#include "board_hw_defs.c"
-
 /**
  * Sensor configurations 
  */
+
+#if defined(PIOS_INCLUDE_ADC)
+#include "pios_adc_priv.h"
+void PIOS_ADC_DMC_irq_handler(void);
+void DMA2_Stream4_IRQHandler(void) __attribute__((alias("PIOS_ADC_DMC_irq_handler")));
+struct pios_adc_cfg pios_adc_cfg = {
+	.adc_dev = ADC1,
+	.dma = {
+		.irq = {
+			.flags   = (DMA_FLAG_TCIF4 | DMA_FLAG_TEIF4 | DMA_FLAG_HTIF4),
+			.init    = {
+				.NVIC_IRQChannel                   = DMA2_Stream4_IRQn,
+				.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
+				.NVIC_IRQChannelSubPriority        = 0,
+				.NVIC_IRQChannelCmd                = ENABLE,
+			},
+		},
+		.rx = {
+			.channel = DMA2_Stream4,
+			.init    = {
+				.DMA_Channel                    = DMA_Channel_0,
+				.DMA_PeripheralBaseAddr = (uint32_t) & ADC1->DR
+			},
+		}
+	},
+	.half_flag = DMA_IT_HTIF4,
+	.full_flag = DMA_IT_TCIF4,
+
+};
+void PIOS_ADC_DMC_irq_handler(void)
+{
+	/* Call into the generic code to handle the IRQ for this specific device */
+	PIOS_ADC_DMA_Handler();
+}
+
+#endif
+
 #if defined(PIOS_INCLUDE_HMC5883)
 #include "pios_hmc5883.h"
 static const struct pios_exti_cfg pios_exti_hmc5883_cfg __exti_config = {
@@ -174,11 +217,12 @@ static const struct pios_mpu6000_cfg pios_mpu6000_cfg = {
 	.exti_cfg = &pios_exti_mpu6000_cfg,
 	.Fifo_store = PIOS_MPU6000_FIFO_TEMP_OUT | PIOS_MPU6000_FIFO_GYRO_X_OUT | PIOS_MPU6000_FIFO_GYRO_Y_OUT | PIOS_MPU6000_FIFO_GYRO_Z_OUT,
 	// Clock at 8 khz, downsampled by 8 for 1khz
-	.Smpl_rate_div = 7, 
+	.Smpl_rate_div = 15,
 	.interrupt_cfg = PIOS_MPU6000_INT_CLR_ANYRD,
 	.interrupt_en = PIOS_MPU6000_INTEN_DATA_RDY,
-	.User_ctl = PIOS_MPU6000_USERCTL_FIFO_EN,
+	.User_ctl = PIOS_MPU6000_USERCTL_FIFO_EN | PIOS_MPU6000_USERCTL_DIS_I2C,
 	.Pwr_mgmt_clk = PIOS_MPU6000_PWRMGMT_PLL_X_CLK,
+	.accel_range = PIOS_MPU6000_ACCEL_8G,
 	.gyro_range = PIOS_MPU6000_SCALE_500_DEG,
 	.filter = PIOS_MPU6000_LOWPASS_256_HZ
 };
@@ -233,6 +277,7 @@ static const struct flashfs_cfg flashfs_m25p_cfg = {
 	.obj_table_start = 0x00000010,
 	.obj_table_end = 0x00010000,
 	.sector_size = 0x00010000,
+	.chip_size = 0x00200000,
 };
 
 static const struct pios_flash_jedec_cfg flash_m25p_cfg = {
@@ -412,28 +457,18 @@ void PIOS_Board_Init(void) {
 	bool usb_hid_present = false;
 	bool usb_cdc_present = false;
 
-	uint8_t hwsettings_usb_devicetype;
-	HwSettingsUSB_DeviceTypeGet(&hwsettings_usb_devicetype);
-
-	switch (hwsettings_usb_devicetype) {
-	case HWSETTINGS_USB_DEVICETYPE_HIDONLY:
-		if (PIOS_USB_DESC_HID_ONLY_Init()) {
-			PIOS_Assert(0);
-		}
-		usb_hid_present = true;
-		break;
-	case HWSETTINGS_USB_DEVICETYPE_HIDVCP:
-		if (PIOS_USB_DESC_HID_CDC_Init()) {
-			PIOS_Assert(0);
-		}
-		usb_hid_present = true;
-		usb_cdc_present = true;
-		break;
-	case HWSETTINGS_USB_DEVICETYPE_VCPONLY:
-		break;
-	default:
+#if defined(PIOS_INCLUDE_USB_CDC)
+	if (PIOS_USB_DESC_HID_CDC_Init()) {
 		PIOS_Assert(0);
 	}
+	usb_hid_present = true;
+	usb_cdc_present = true;
+#else
+	if (PIOS_USB_DESC_HID_ONLY_Init()) {
+		PIOS_Assert(0);
+	}
+	usb_hid_present = true;
+#endif
 
 	uint32_t pios_usb_id;
 	PIOS_USB_Init(&pios_usb_id, &pios_usb_main_cfg);
@@ -668,15 +703,12 @@ void PIOS_Board_Init(void) {
 		case HWSETTINGS_RV_FLEXIPORT_DISABLED:
 			break;
 		case HWSETTINGS_RV_FLEXIPORT_I2C:
-//TODO: Enable I2C
 #if defined(PIOS_INCLUDE_I2C)
-/*		
 		{
-			if (PIOS_I2C_Init(&pios_i2c_flexi_adapter_id, &pios_i2c_flexi_adapter_cfg)) {
+			if (PIOS_I2C_Init(&pios_i2c_flexiport_adapter_id, &pios_i2c_flexiport_adapter_cfg)) {
 				PIOS_Assert(0);
 			}
 		}
-*/
 #endif	/* PIOS_INCLUDE_I2C */
 			break;
 			
@@ -794,6 +826,10 @@ void PIOS_Board_Init(void) {
 	
 	PIOS_DELAY_WaitmS(50);
 
+#if defined(PIOS_INCLUDE_ADC)
+	PIOS_ADC_Init(&pios_adc_cfg);
+#endif
+
 #if defined(PIOS_INCLUDE_HMC5883)
 	PIOS_HMC5883_Init(&pios_hmc5883_cfg);
 #endif
@@ -815,8 +851,7 @@ void PIOS_Board_Init(void) {
 			break;
 		case 0x02:
 #if defined(PIOS_INCLUDE_MPU6000)
-			PIOS_MPU6000_Attach(pios_spi_gyro_id);
-			PIOS_MPU6000_Init(&pios_mpu6000_cfg);
+			PIOS_MPU6000_Init(pios_spi_gyro_id,0, &pios_mpu6000_cfg);
 #endif
 			break;
 		default:

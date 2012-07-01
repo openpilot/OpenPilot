@@ -61,7 +61,7 @@ static void OpOsdTask(void *parameters);
 // ****************
 // Private variables
 
-//static uint32_t oposdPort;
+static uint32_t oposdPort;
 
 static xTaskHandle OpOsdTaskHandle;
 
@@ -111,7 +111,7 @@ int32_t OpOsdInitialize(void)
 
 
 	// TODO: Get gps settings object
-/*	oposdPort = PIOS_COM_OSD;*/
+	oposdPort = PIOS_COM_OSD;
 
 	oposd_rx_buffer = pvPortMalloc(NMEA_MAX_PACKET_LENGTH);
 	PIOS_Assert(oposd_rx_buffer);
@@ -127,6 +127,7 @@ MODULE_INITCALL(OpOsdInitialize, OpOsdStart)
 
 static void OpOsdTask(void *parameters)
 {
+	portTickType xDelay = 100 / portTICK_RATE_MS;
 	portTickType lastSysTime;
 	// Loop forever
 	lastSysTime = xTaskGetTickCount();	//portTickType xDelay = 100 / portTICK_RATE_MS;
@@ -152,7 +153,7 @@ static void OpOsdTask(void *parameters)
 	// Loop forever
 	while (1)
 	{
-		//DMA_Cmd(DMA1_Stream2, DISABLE);   //prohibit  channel3 for a little time
+		/*//DMA_Cmd(DMA1_Stream2, DISABLE);   //prohibit  channel3 for a little time
 		uint16_t cnt = DMA_GetCurrDataCounter(DMA1_Stream2);
     	rx.wr = rx.buf_size-cnt;
 		if(rx.wr)
@@ -199,9 +200,9 @@ static void OpOsdTask(void *parameters)
 						attitude.Pitch = (int16_t)(oposd_rx_buffer[5] | oposd_rx_buffer[6]<<8);
 						attitude.Yaw = (int16_t)(oposd_rx_buffer[7] | oposd_rx_buffer[8]<<8);
 						AttitudeActualSet(&attitude);
-						/*setAttitudeOsd((int16_t)(oposd_rx_buffer[5] | oposd_rx_buffer[6]<<8), //pitch
-								(int16_t)(oposd_rx_buffer[3] | oposd_rx_buffer[4]<<8), //roll
-								(int16_t)(oposd_rx_buffer[7] | oposd_rx_buffer[8]<<8)); //yaw*/
+						//setAttitudeOsd((int16_t)(oposd_rx_buffer[5] | oposd_rx_buffer[6]<<8), //pitch
+						//		(int16_t)(oposd_rx_buffer[3] | oposd_rx_buffer[4]<<8), //roll
+						//		(int16_t)(oposd_rx_buffer[7] | oposd_rx_buffer[8]<<8)); //yaw
 
 					}
 					//frame completed
@@ -212,9 +213,8 @@ static void OpOsdTask(void *parameters)
 		}
 		//DMA_Cmd(DMA1_Stream2, ENABLE);
 
+		 */
 
-
-		/*uint8_t c=0xAA;
 		//PIOS_COM_SendBufferNonBlocking(oposdPort, &c, 1);
 
 		// This blocks the task until there is something on the buffer
@@ -246,18 +246,25 @@ static void OpOsdTask(void *parameters)
 			}
 			if (rx_count == 11)
 			{
-				AttitudeActualData attitude;
-				AttitudeActualGet(&attitude);
-				attitude.q1 = 1;
-				attitude.q2 = 0;
-				attitude.q3 = 0;
-				attitude.q4 = 0;
-				attitude.Roll = (int16_t)(oposd_rx_buffer[3] | oposd_rx_buffer[4]<<8);
-				attitude.Pitch = (int16_t)(oposd_rx_buffer[5] | oposd_rx_buffer[6]<<8);
-				attitude.Yaw = 0;
-				AttitudeActualSet(&attitude);
+				if(oposd_rx_buffer[1]==3)
+				{
+					AttitudeActualData attitude;
+					AttitudeActualGet(&attitude);
+					attitude.q1 = 1;
+					attitude.q2 = 0;
+					attitude.q3 = 0;
+					attitude.q4 = 0;
+					attitude.Roll = (int16_t)(oposd_rx_buffer[3] | oposd_rx_buffer[4]<<8);
+					attitude.Pitch = (int16_t)(oposd_rx_buffer[5] | oposd_rx_buffer[6]<<8);
+					attitude.Yaw = (int16_t)(oposd_rx_buffer[7] | oposd_rx_buffer[8]<<8);
+					AttitudeActualSet(&attitude);
+				}
+				//frame completed
+				start_flag = false;
+				rx_count = 0;
+
 			}
-		}*/
+		}
 		vTaskDelayUntil(&lastSysTime, 50 / portTICK_RATE_MS);
 		// Check for GPS timeout
 		timeNowMs = xTaskGetTickCount() * portTICK_RATE_MS;

@@ -49,11 +49,14 @@ endif
 FLASH_TOOL = OPENOCD
 
 # List of modules to include
-MODULES = Sensors Attitude/revolution ManualControl Stabilization Altitude/revolution Actuator GPS FirmwareIAP 
-MODULES += AltitudeHold
+MODULES = Sensors Attitude/revolution ManualControl Stabilization Actuator
+MODULES += Battery
+MODULES += Altitude/revolution  GPS FirmwareIAP
+MODULES += Airspeed/revolution
+MODULES += AltitudeHold VtolPathFollower FixedWingPathFollower PathPlanner
 MODULES += CameraStab
+MODULES += OveroSync
 MODULES += Telemetry
-#MODULES += OveroSync
 PYMODULES = 
 #FlightPlan
 
@@ -133,6 +136,7 @@ SRC += $(OPSYSTEM)/cm3_fault_handlers.c
 #endif
 
 SRC += $(FLIGHTLIB)/CoordinateConversions.c
+SRC += $(FLIGHTLIB)/paths.c
 SRC += $(FLIGHTLIB)/fifo_buffer.c
 SRC += $(FLIGHTLIB)/WorldMagModel.c
 SRC += $(FLIGHTLIB)/insgps13state.c
@@ -144,6 +148,7 @@ include $(PIOS)/STM32F4xx/library.mk
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_mpu6000.c
 SRC += $(PIOSCOMMON)/pios_bma180.c
+SRC += $(PIOSCOMMON)/pios_etasv3.c
 SRC += $(PIOSCOMMON)/pios_l3gd20.c
 SRC += $(PIOSCOMMON)/pios_hmc5883.c
 SRC += $(PIOSCOMMON)/pios_ms5611.c
@@ -155,6 +160,7 @@ SRC += $(PIOSCOMMON)/pios_flashfs_objlist.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c
 SRC += $(PIOSCOMMON)/pios_usb_desc_hid_cdc.c
 SRC += $(PIOSCOMMON)/pios_usb_desc_hid_only.c
+SRC += $(PIOSCOMMON)/pios_usb_util.c
 
 include ./UAVObjects.inc
 SRC += $(UAVOBJSRC)

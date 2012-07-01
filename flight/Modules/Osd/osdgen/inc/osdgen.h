@@ -188,8 +188,6 @@ void write_char(char ch, unsigned int x, unsigned int y, int flags, int font);
 void write_string(char *str, unsigned int x, unsigned int y, unsigned int xs, unsigned int ys, int va, int ha, int flags, int font);
 void write_string_formatted(char *str, unsigned int x, unsigned int y, unsigned int xs, unsigned int ys, int va, int ha, int flags);
 
-void setAttitudeOsd(int16_t pitch, int16_t roll, int16_t yaw);
-void setGpsOsd(uint8_t status, int32_t lat, int32_t lon, float alt, float spd);
 void updateOnceEveryFrame();
 
 

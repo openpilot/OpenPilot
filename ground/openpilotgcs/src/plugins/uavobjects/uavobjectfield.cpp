@@ -833,7 +833,7 @@ bool UAVObjectField::checkValue(const QVariant& value, quint32 index)
     // Get metadata
     UAVObject::Metadata mdata = obj->getMetadata();
     // Update value if the access mode permits
-    if ( mdata.gcsAccess == UAVObject::ACCESS_READWRITE )
+    if ( UAVObject::GetFlightAccess(mdata) == UAVObject::ACCESS_READWRITE )
     {
         switch (type)
         {
@@ -873,7 +873,7 @@ void UAVObjectField::setValue(const QVariant& value, quint32 index)
     // Get metadata
     UAVObject::Metadata mdata = obj->getMetadata();
     // Update value if the access mode permits
-    if ( mdata.gcsAccess == UAVObject::ACCESS_READWRITE )
+    if ( UAVObject::GetGcsAccess(mdata) == UAVObject::ACCESS_READWRITE )
     {
         switch (type)
         {

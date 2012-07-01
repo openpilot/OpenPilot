@@ -129,24 +129,16 @@ int CoordinateConversions::ECEF2LLA(double ECEF[3], double LLA[3])
   *  @arg 0 success
   *  @arg -1 for failure
   */
-int CoordinateConversions::GetLLA(double BaseECEFcm[3], double NED[3], double position[3])
+int CoordinateConversions::GetLLA(double homeLLA[3], double NED[3], double position[3])
 {
-    int i;
-    // stored value is in cm, convert to m
-    double BaseECEFm[3] = {BaseECEFcm[0], BaseECEFcm[1], BaseECEFcm[2]};
-    double BaseLLA[3];
-    double ECEF[3];
-    double Rne [3][3];
+    double T[3];
+    T[0] = homeLLA[2]+6.378137E6f * M_PI / 180.0;
+    T[1] = cosf(homeLLA[0] * M_PI / 180.0)*(homeLLA[2]+6.378137E6f) * M_PI / 180.0;
+    T[2] = -1.0f;
 
-    // Get LLA address to compute conversion matrix
-    ECEF2LLA(BaseECEFm, BaseLLA);
-    RneFromLLA(BaseLLA, Rne);
-
-    /* P = ECEF + Rne' * NED */
-    for(i = 0; i < 3; i++)
-        ECEF[i] = BaseECEFm[i] + Rne[0][i]*NED[0] + Rne[1][i]*NED[1] + Rne[2][i]*NED[2];
-
-    ECEF2LLA(ECEF,position);
+    position[0] = homeLLA[0] + NED[0] / T[0];
+    position[1] = homeLLA[1] + NED[1] / T[1];
+    position[2] = homeLLA[2] + NED[2] / T[2];
 
     return 0;
 }

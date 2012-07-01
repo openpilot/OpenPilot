@@ -28,6 +28,7 @@
 /* Bootloader Includes */
 #include <pios.h>
 #include <stdbool.h>
+#include "pios_board_info.h"
 
 #define MAX_WRI_RETRYS 3
 /* Prototype of PIOS_Board_Init() function */
@@ -59,6 +60,31 @@ int main() {
 	if ((0x08000000 + embedded_image_size) > base_address)
 		error(PIOS_LED_HEARTBEAT);
 	///
+
+	/*
+	 * Make sure the bootloader we're carrying is for the same
+	 * board type and board revision as the one we're running on.
+	 *
+	 * Assume the bootloader in flash and the bootloader contained in
+	 * the updater both carry a board_info_blob at the end of the image.
+	 */
+
+	/* Calculate how far the board_info_blob is from the beginning of the bootloader */
+	uint32_t board_info_blob_offset = (uint32_t)&pios_board_info_blob - (uint32_t)0x08000000;
+
+	/* Use the same offset into our embedded bootloader image */
+	struct pios_board_info * new_board_info_blob = (struct pios_board_info *)
+		((uint32_t)embedded_image_start + board_info_blob_offset);
+
+	/* Compare the two board info blobs to make sure they're for the same HW revision */
+	if ((pios_board_info_blob.magic != new_board_info_blob->magic) ||
+		(pios_board_info_blob.board_type != new_board_info_blob->board_type) ||
+		(pios_board_info_blob.board_rev != new_board_info_blob->board_rev)) {
+		error(PIOS_LED_HEARTBEAT);
+	}
+
+	/* Embedded bootloader looks like it's the right one for this HW, proceed... */
+
 	FLASH_Unlock();
 
 	/// Bootloader memory space erase

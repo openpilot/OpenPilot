@@ -29,12 +29,13 @@
 #include "uavobjectutilmanager.h"
 
 #include "utils/homelocationutil.h"
-
+#include "homelocation.h"
 #include <QMutexLocker>
 #include <QDebug>
 #include <QEventLoop>
 #include <QTimer>
 #include <objectpersistence.h>
+#include <firmwareiapobj.h>
 
 // ******************************
 // constructor/destructor
@@ -150,7 +151,7 @@ void UAVObjectUtilManager::objectPersistenceTransactionCompleted(UAVObject* obj,
         // the queue:
         saveState = AWAITING_COMPLETED;
         disconnect(obj, SIGNAL(transactionCompleted(UAVObject*,bool)), this, SLOT(objectPersistenceTransactionCompleted(UAVObject*,bool)));
-        failureTimer.start(1000); // Create a timeout
+        failureTimer.start(2000); // Create a timeout
     } else {
         // Can be caused by timeout errors on sending.  Forget it and send next.
         qDebug() << "objectPersistenceTranscationCompleted (error)";
@@ -199,25 +200,63 @@ void UAVObjectUtilManager::objectPersistenceOperationFailed()
   */
 void UAVObjectUtilManager::objectPersistenceUpdated(UAVObject * obj)
 {
-    qDebug() << "objectPersistenceUpdated: " << obj->getField("Operation")->getValue().toString();
-    Q_ASSERT(obj->getName().compare("ObjectPersistence") == 0);
-    if(saveState == AWAITING_COMPLETED) {
-        failureTimer.stop();
-        // Check flight is saying it completed.  This is the only thing flight should do to trigger an update.
-        Q_ASSERT( obj->getField("Operation")->getValue().toString().compare(QString("Completed")) == 0 );
+    Q_ASSERT(obj);
+    Q_ASSERT(obj->getObjID() == ObjectPersistence::OBJID);
+    ObjectPersistence::DataFields objectPersistence = ((ObjectPersistence *)obj)->getData();
 
+    if(saveState == AWAITING_COMPLETED && objectPersistence.Operation == ObjectPersistence::OPERATION_ERROR) {
+        failureTimer.stop();
+        objectPersistenceOperationFailed();
+    } else if (saveState == AWAITING_COMPLETED &&
+               objectPersistence.Operation == ObjectPersistence::OPERATION_COMPLETED) {
+        failureTimer.stop();
         // Check right object saved
         UAVObject* savingObj = queue.head();
-        Q_ASSERT( obj->getField("ObjectID")->getValue() == savingObj->getObjID() );
+        if(objectPersistence.ObjectID != savingObj->getObjID() ) {
+            objectPersistenceOperationFailed();
+            return;
+        }
 
         obj->disconnect(this);
         queue.dequeue(); // We can now remove the object, it's done.
         saveState = IDLE;
-        emit saveCompleted(obj->getField("ObjectID")->getValue().toInt(), true);
+
+        emit saveCompleted(objectPersistence.ObjectID, true);
         saveNextObject();
     }
 }
 
+/**
+  * Helper function that makes sure FirmwareIAP is updated and then returns the data
+  */
+FirmwareIAPObj::DataFields UAVObjectUtilManager::getFirmwareIap()
+{
+    FirmwareIAPObj::DataFields dummy;
+
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    Q_ASSERT(pm);
+    if (!pm)
+        return dummy;
+    UAVObjectManager *om = pm->getObject<UAVObjectManager>();
+    Q_ASSERT(om);
+    if (!om)
+        return dummy;
+
+    FirmwareIAPObj *firmwareIap = FirmwareIAPObj::GetInstance(om);
+    Q_ASSERT(firmwareIap);
+    if (!firmwareIap)
+        return dummy;
+
+    // The code below will ask for the object update and wait for the updated to be received,
+    // or the timeout of the timer, set to 1 second.
+    QEventLoop loop;
+    connect(firmwareIap, SIGNAL(objectUpdated(UAVObject*)), &loop, SLOT(quit()));
+    QTimer::singleShot(1000, &loop, SLOT(quit())); // Create a timeout
+    firmwareIap->requestUpdate();
+    loop.exec();
+
+    return firmwareIap->getData();
+}
 
 /**
   * Get the UAV Board model, for anyone interested. Return format is:
@@ -225,25 +264,8 @@ void UAVObjectUtilManager::objectPersistenceUpdated(UAVObject * obj)
   */
 int UAVObjectUtilManager::getBoardModel()
 {
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    if (!pm)
-        return 0;
-    UAVObjectManager *om = pm->getObject<UAVObjectManager>();
-    if (!om)
-        return 0;
-
-    UAVDataObject *obj = dynamic_cast<UAVDataObject *>(om->getObject(QString("FirmwareIAPObj")));
-    // The code below will ask for the object update and wait for the updated to be received,
-    // or the timeout of the timer, set to 1 second.
-    QEventLoop loop;
-    connect(obj, SIGNAL(objectUpdated(UAVObject*)), &loop, SLOT(quit()));
-    QTimer::singleShot(1000, &loop, SLOT(quit())); // Create a timeout
-    obj->requestUpdate();
-    loop.exec();
-
-    int boardType = (obj->getField("BoardType")->getValue().toInt()) << 8;
-    boardType += obj->getField("BoardRevision")->getValue().toInt();
-    return boardType;
+    FirmwareIAPObj::DataFields firmwareIapData = getFirmwareIap();
+    return (firmwareIapData.BoardType << 8) + firmwareIapData.BoardRevision;
 }
 
 /**
@@ -252,54 +274,18 @@ int UAVObjectUtilManager::getBoardModel()
 QByteArray UAVObjectUtilManager::getBoardCPUSerial()
 {
     QByteArray cpuSerial;
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    if (!pm)
-        return 0;
-    UAVObjectManager *om = pm->getObject<UAVObjectManager>();
-    if (!om)
-        return 0;
+    FirmwareIAPObj::DataFields firmwareIapData = getFirmwareIap();
 
-    UAVDataObject *obj = dynamic_cast<UAVDataObject *>(om->getObject(QString("FirmwareIAPObj")));
-    // The code below will ask for the object update and wait for the updated to be received,
-    // or the timeout of the timer, set to 1 second.
-    QEventLoop loop;
-    connect(obj, SIGNAL(objectUpdated(UAVObject*)), &loop, SLOT(quit()));
-    QTimer::singleShot(1000, &loop, SLOT(quit())); // Create a timeout
-    obj->requestUpdate();
-    loop.exec();
+    for (int i = 0; i < FirmwareIAPObj::CPUSERIAL_NUMELEM; i++)
+        cpuSerial.append(firmwareIapData.CPUSerial[i]);
 
-    UAVObjectField* cpuField = obj->getField("CPUSerial");
-    for (uint i = 0; i < cpuField->getNumElements(); ++i) {
-        cpuSerial.append(cpuField->getValue(i).toUInt());
-    }
     return cpuSerial;
 }
 
 quint32 UAVObjectUtilManager::getFirmwareCRC()
 {
-    quint32 fwCRC;
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    if (!pm)
-        return 0;
-    UAVObjectManager *om = pm->getObject<UAVObjectManager>();
-    if (!om)
-        return 0;
-
-    UAVDataObject *obj = dynamic_cast<UAVDataObject *>(om->getObject(QString("FirmwareIAPObj")));
-    obj->getField("crc")->setValue(0);
-    obj->updated();
-    // The code below will ask for the object update and wait for the updated to be received,
-    // or the timeout of the timer, set to 1 second.
-    QEventLoop loop;
-    connect(obj, SIGNAL(objectUpdated(UAVObject*)), &loop, SLOT(quit()));
-    QTimer::singleShot(1000, &loop, SLOT(quit())); // Create a timeout
-    obj->requestUpdate();
-    loop.exec();
-
-    UAVObjectField* fwCRCField = obj->getField("crc");
-
-    fwCRC=(quint32)fwCRCField->getValue().toLongLong();
-    return fwCRC;
+    FirmwareIAPObj::DataFields firmwareIapData = getFirmwareIap();
+    return firmwareIapData.crc;
 }
 
 /**
@@ -308,27 +294,11 @@ quint32 UAVObjectUtilManager::getFirmwareCRC()
 QByteArray UAVObjectUtilManager::getBoardDescription()
 {
     QByteArray ret;
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    if (!pm)
-        return 0;
-    UAVObjectManager *om = pm->getObject<UAVObjectManager>();
-    if (!om)
-        return 0;
+    FirmwareIAPObj::DataFields firmwareIapData = getFirmwareIap();
 
-    UAVDataObject *obj = dynamic_cast<UAVDataObject *>(om->getObject(QString("FirmwareIAPObj")));
-    // The code below will ask for the object update and wait for the updated to be received,
-    // or the timeout of the timer, set to 1 second.
-    QEventLoop loop;
-    connect(obj, SIGNAL(objectUpdated(UAVObject*)), &loop, SLOT(quit()));
-    QTimer::singleShot(1000, &loop, SLOT(quit())); // Create a timeout
-    obj->requestUpdate();
-    loop.exec();
+    for (int i = 0; i < FirmwareIAPObj::DESCRIPTION_NUMELEM; i++)
+        ret.append(firmwareIapData.Description[i]);
 
-    UAVObjectField* descriptionField = obj->getField("Description");
-    // Description starts with an offset of
-    for (uint i = 0; i < descriptionField->getNumElements(); ++i) {
-        ret.append(descriptionField->getValue(i).toInt());
-    }
     return ret;
 }
 
@@ -339,17 +309,13 @@ QByteArray UAVObjectUtilManager::getBoardDescription()
 
 int UAVObjectUtilManager::setHomeLocation(double LLA[3], bool save_to_sdcard)
 {
-	double ECEF[3];
-	double RNE[9];
 	double Be[3];
-	UAVObjectField *field;
 
 	QMutexLocker locker(mutex);
 
-	if (Utils::HomeLocationUtil().getDetails(LLA, ECEF, RNE, Be) < 0)
-		return -1;	// error
+        Q_ASSERT (Utils::HomeLocationUtil().getDetails(LLA, Be) >= 0);
 
-	// ******************
+        // ******************
 	// save the new settings
 
 	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
@@ -358,68 +324,27 @@ int UAVObjectUtilManager::setHomeLocation(double LLA[3], bool save_to_sdcard)
 	UAVObjectManager *om = pm->getObject<UAVObjectManager>();
 	if (!om) return -3;
 
-	UAVDataObject *obj = dynamic_cast<UAVDataObject *>(om->getObject(QString("HomeLocation")));
-	if (!obj) return -4;
+        HomeLocation *homeLocation = HomeLocation::GetInstance(om);
+        Q_ASSERT(homeLocation != NULL);
 
-	UAVObjectField *ECEF_field = obj->getField(QString("ECEF"));
-	if (!ECEF_field) return -5;
+        HomeLocation::DataFields homeLocationData = homeLocation->getData();
+        homeLocationData.Latitude = LLA[0] * 10e6;
+        homeLocationData.Longitude = LLA[1] * 10e6;
+        homeLocationData.Altitude = LLA[2] * 10e6;
 
-	UAVObjectField *RNE_field = obj->getField(QString("RNE"));
-	if (!RNE_field) return -6;
+        homeLocationData.Be[0] = Be[0];
+        homeLocationData.Be[1] = Be[1];
+        homeLocationData.Be[2] = Be[2];
 
-	UAVObjectField *Be_field = obj->getField(QString("Be"));
-	if (!Be_field) return -7;
+        homeLocationData.Set = HomeLocation::SET_TRUE;
 
-	field = obj->getField("Latitude");
-	if (!field) return -8;
-	field->setDouble(LLA[0] * 10e6);
-
-	field = obj->getField("Longitude");
-	if (!field) return -9;
-	field->setDouble(LLA[1] * 10e6);
-
-	field = obj->getField("Altitude");
-	if (!field) return -10;
-	field->setDouble(LLA[2]);
-
-	for (int i = 0; i < 3; i++)
-		ECEF_field->setDouble(ECEF[i] * 100, i);
-
-	for (int i = 0; i < 9; i++)
-		RNE_field->setDouble(RNE[i], i);
-
-	for (int i = 0; i < 3; i++)
-		Be_field->setDouble(Be[i], i);
-
-	field = obj->getField("Set");
-	if (!field) return -11;
-	field->setValue("TRUE");
-
-	obj->updated();
-
-	// ******************
-	// save the new setting to SD card
+        homeLocation->setData(homeLocationData);
+        homeLocation->updated();
 
 	if (save_to_sdcard)
-		saveObjectToSD(obj);
+                saveObjectToSD(homeLocation);
 
-	// ******************
-	// debug
-/*
-	qDebug() << "setting HomeLocation UAV Object .. " << endl;
-	QString s;
-	s = "        LAT:" + QString::number(LLA[0], 'f', 7) + " LON:" + QString::number(LLA[1], 'f', 7) + " ALT:" + QString::number(LLA[2], 'f', 1);
-	qDebug() << s << endl;
-	s = "        ECEF "; for (int i = 0; i < 3; i++) s += " " + QString::number((int)(ECEF[i] * 100));
-	qDebug() << s << endl;
-	s = "        RNE  ";  for (int i = 0; i < 9; i++) s += " " + QString::number(RNE[i], 'f', 7);
-	qDebug() << s << endl;
-	s = "        Be   ";  for (int i = 0; i < 3; i++) s += " " + QString::number(Be[i], 'f', 2);
-	qDebug() << s << endl;
-*/
-	// ******************
-
-	return 0;	// OK
+        return 0;
 }
 
 int UAVObjectUtilManager::getHomeLocation(bool &set, double LLA[3])

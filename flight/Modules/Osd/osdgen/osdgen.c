@@ -45,7 +45,7 @@
 #include "WMMInternal.h"
 
 #include "splash.h"
-
+/*
 static uint16_t angleA=0;
 static int16_t angleB=90;
 static int16_t angleC=0;
@@ -61,7 +61,7 @@ static uint8_t m_gpsStatus=0;
 static int32_t m_gpsLat=0;
 static int32_t m_gpsLon=0;
 static float m_gpsAlt=0;
-static float m_gpsSpd=0;
+static float m_gpsSpd=0;*/
 
 extern uint8_t *draw_buffer_level;
 extern uint8_t *draw_buffer_mask;
@@ -94,23 +94,23 @@ static xTaskHandle osdgenTaskHandle;
 struct splashEntry
 {
 	unsigned int width, height;
-	uint8_t *level;
-	uint8_t *mask;
+	const uint16_t *level;
+	const uint16_t *mask;
 };
 
 struct splashEntry splash[3] = {
 	{	oplogo_width,
 		oplogo_height,
-		&oplogo_bits,
-		&oplogo_mask_bits },
+		oplogo_bits,
+		oplogo_mask_bits },
 	{	level_width,
 		level_height,
-		&level_bits,
-		&level_mask_bits },
+		level_bits,
+		level_mask_bits },
 	{	llama_width,
 		llama_height,
-		&llama_bits,
-		&llama_mask_bits },
+		llama_bits,
+		llama_mask_bits },
 
 };
 
@@ -142,9 +142,13 @@ void copyimage(uint16_t offsetx, uint16_t offsety, int image) {
 	splash_info = splash[image];
 	offsetx=offsetx/8;
 	for (uint16_t y = offsety; y < ((splash_info.height)+offsety); y++) {
-		for (uint16_t x = offsetx; x < (((splash_info.width)/8)+offsetx); x++) {
-			draw_buffer_level[y*GRAPHICS_WIDTH+x] = mirror(splash_info.level[(y-offsety)*((splash_info.width)/8)+(x-offsetx)]);
-			draw_buffer_mask[y*GRAPHICS_WIDTH+x] = mirror(splash_info.mask[(y-offsety)*((splash_info.width)/8)+(x-offsetx)]);
+		uint16_t x1=offsetx;
+		for (uint16_t x = offsetx; x < (((splash_info.width)/16)+offsetx); x++) {
+			draw_buffer_level[y*GRAPHICS_WIDTH+x1+1] = (uint8_t)(mirror(splash_info.level[(y-offsety)*((splash_info.width)/16)+(x-offsetx)])>>8);
+			draw_buffer_level[y*GRAPHICS_WIDTH+x1] = (uint8_t)(mirror(splash_info.level[(y-offsety)*((splash_info.width)/16)+(x-offsetx)])&0xFF);
+			draw_buffer_mask[y*GRAPHICS_WIDTH+x1+1] = (uint8_t)(mirror(splash_info.mask[(y-offsety)*((splash_info.width)/16)+(x-offsetx)])>>8);
+			draw_buffer_mask[y*GRAPHICS_WIDTH+x1] = (uint8_t)(mirror(splash_info.mask[(y-offsety)*((splash_info.width)/16)+(x-offsetx)])&0xFF);
+			x1+=2;
 		}
 	}
 }
@@ -417,7 +421,8 @@ void write_hline(uint8_t *buff, unsigned int x0, unsigned int x1, unsigned int y
 		// Now write 0xffff words from start+1 to end-1.
 		for(i = addr0 + 1; i <= addr1 - 1; i++)
 		{
-			WRITE_WORD_MODE(buff, i, 0xff, mode);
+			uint8_t m=0xff;
+			WRITE_WORD_MODE(buff, i, m, mode);
 		}
 	}
 }
@@ -611,7 +616,8 @@ void write_filled_rectangle(uint8_t *buff, unsigned int x, unsigned int y, unsig
                 {
                         for(i = addr0 + 1; i <= addr1 - 1; i++)
                         {
-                                WRITE_WORD_MODE(buff, i, 0xff, mode);
+                        	uint8_t m=0xff;
+                            WRITE_WORD_MODE(buff, i, m, mode);
                         }
                         addr0 += GRAPHICS_WIDTH_REAL / 8;
                         addr1 += GRAPHICS_WIDTH_REAL / 8;
@@ -835,7 +841,7 @@ void write_line(uint8_t *buff, unsigned int x0, unsigned int y0, unsigned int x1
 	int error = deltax / 2;
 	int ystep;
 	int y = y0;
-	int x, lasty = y, stox = 0;
+	int x; //, lasty = y, stox = 0;
 	if(y0 < y1)
 		ystep = 1;
 	else
@@ -1067,7 +1073,7 @@ void write_word_misaligned_lm(uint16_t wordl, uint16_t wordm, unsigned int addr,
  * @param       ch              character
  * @param       font    font id
  */
-int fetch_font_info(char ch, int font, struct FontEntry *font_info, char *lookup)
+int fetch_font_info(uint8_t ch, int font, struct FontEntry *font_info, char *lookup)
 {
 	// First locate the font struct.
 	if(font > SIZEOF_ARRAY(fonts))
@@ -1101,7 +1107,7 @@ void write_char16(char ch, unsigned int x, unsigned int y, int font)
     int yy, addr_temp, row, row_temp, xshift;
     uint16_t and_mask, or_mask, level_bits;
     struct FontEntry font_info;
-    char lookup = 0;
+    //char lookup = 0;
     fetch_font_info(0, font, &font_info, NULL);
 	
     // Compute starting address (for x,y) of character.
@@ -1187,10 +1193,10 @@ void write_char(char ch, unsigned int x, unsigned int y, int flags, int font)
     int wbit = CALC_BIT_IN_WORD(x);
     // If font only supports lowercase or uppercase, make the letter
     // lowercase or uppercase.
-    if(font_info.flags & FONT_LOWERCASE_ONLY)
+    /*if(font_info.flags & FONT_LOWERCASE_ONLY)
 		ch = tolower(ch);
     if(font_info.flags & FONT_UPPERCASE_ONLY)
-		ch = toupper(ch);
+		ch = toupper(ch);*/
     fetch_font_info(ch, font, &font_info, &lookup);
     // How big is the character? We handle characters up to 8 pixels
     // wide for now. Support for large characters may be added in future.
@@ -1410,7 +1416,7 @@ void write_string_formatted(char *str, unsigned int x, unsigned int y, unsigned 
     str = ostr;
     // Now we've parsed it and got a bbox, we need to work out the dimensions of it
     // and how to align it.
-    int width = max_xx - x;
+    /*int width = max_xx - x;
     int height = yy - y;
     int ay, ax;
     switch(va)
@@ -1424,7 +1430,7 @@ void write_string_formatted(char *str, unsigned int x, unsigned int y, unsigned 
             case TEXT_HA_LEFT:              ax = x; break;
             case TEXT_HA_CENTER:    ax = x - (width / 2); break;
             case TEXT_HA_RIGHT:             ax = x - width; break;
-    }
+    }*/
     // So ax,ay is our new text origin. Parse the text format again and paint
     // the text on the display.
     fcode = 0;
@@ -1627,7 +1633,7 @@ void drawAltitude(uint16_t x, uint16_t y, int16_t alt, uint8_t dir) {
 		updown=25;
 	sprintf(temp,"%c%6dm",updown,alt);
 	printTextFB(charx,y+2,temp);
-	/* frame *
+	// frame
 	drawBox(charx*16-3,y,charx*16+strlen(temp)*8+3,y+11);
 }*/
 
@@ -1681,8 +1687,8 @@ void hud_draw_vertical_scale(int v, int range, int halign, int x, int y, int hei
         int max_text_y = 0, text_length = 0;
         int small_font_char_width = font_info.width + 1; // +1 for horizontal spacing = 1
         // For -(range / 2) to +(range / 2), draw the scale.
-        int range_2 = range / 2, height_2 = height / 2;
-        int calc_ys = 0, r = 0, rr = 0, rv = 0, ys = 0, style = 0;
+        int range_2 = range / 2; //, height_2 = height / 2;
+        int r = 0, rr = 0, rv = 0, ys = 0, style = 0; //calc_ys = 0,
         // Iterate through each step.
         for(r = -range_2; r <= +range_2; r++)
         {
@@ -1815,13 +1821,13 @@ void hud_draw_linear_compass(int v, int range, int width, int x, int y, int mint
         mintick_start = y;
         mintick_end = y - mintick_len;
         textoffset = 8;
-        int r, style, rr, rv, xs;
+        int r, style, rr, xs; // rv,
         int range_2 = range / 2;
         for(r = -range_2; r <= +range_2; r++)
         {
                 style = 0;
                 rr = (v + r + 360) % 360; // normalise range for modulo, add to move compass track
-                rv = -rr + range_2; // for number display
+                //rv = -rr + range_2; // for number display
                 if(rr % majtick_step == 0)
                         style = 1; // major tick
                 else if(rr % mintick_step == 0)
@@ -1881,21 +1887,93 @@ void hud_draw_linear_compass(int v, int range, int width, int x, int y, int mint
 }
 // CORE draw routines end here
 
-void setAttitudeOsd(int16_t pitch, int16_t roll, int16_t yaw)
+void draw_artificial_horizon(float angle, float pitch, int16_t l_x, int16_t l_y, int16_t size )
 {
-	m_pitch=pitch;
-	m_roll=roll;
-	m_yaw=yaw;
+	float alpha;
+
+	int16_t x1,x2,x4; //x3
+	int16_t y1,y2,y4; //y3
+	int16_t y_pitch;
+	// rotated corners
+	int16_t ax1,ay1;
+	int16_t ax2,ay2;
+	//int16_t ax3,ay3;
+	int16_t ax4,ay4;
+	int16_t refx,refy;
+	alpha=DEG2RAD(angle);
+
+	// move up or down Size
+	y_pitch=(pitch/90.0f*(size/2))+size/2;
+
+	// center rotate point
+	refx=l_x + size/2;
+	refy=l_y + size/2;
+
+	x1=l_x - size/2;
+	y1=l_y + y_pitch;
+	x2=l_x + size + size/2;
+	y2=l_y + y_pitch;
+	//x3=l_x + size + size/2;
+	//y3=l_y + size + y_pitch;
+	x4=l_x - size/2;
+	y4=l_y + size + y_pitch;
+
+	ax1=refy+(x1-refx)*cosf(alpha)-(y1-refy)*sinf(alpha);
+	ay1=refy+(x1-refx)*sinf(alpha)+(y1-refy)*cosf(alpha);
+
+	ax2=refy+(x2-refx)*cosf(alpha)-(y2-refy)*sinf(alpha);
+	ay2=refy+(x2-refx)*sinf(alpha)+(y2-refy)*cosf(alpha);
+
+	//ax3=refy+(x3-refx)*cosf(alpha)-(y3-refy)*sinf(alpha);
+	//ay3=refy+(x3-refx)*sinf(alpha)+(y3-refy)*cosf(alpha);
+
+	//ax4=refy+(x4-refx)*cosf(alpha)-(y4-refy)*sinf(alpha);
+	//ay4=refy+(x4-refx)*sinf(alpha)+(y4-refy)*cosf(alpha);
+
+	write_line_outlined(ax1,ay1,ax2,ay2,0,0,0,1);
+	//fill
+	for(int i=0;i<(size);i++)
+	{
+		x1=l_x - size/2;
+		y1=l_y + y_pitch + i;
+		x2=l_x + size + size/2;
+		y2=l_y + y_pitch + i;
+		ax1=refy+(x1-refx)*cosf(alpha)-(y1-refy)*sinf(alpha);
+		ay1=refy+(x1-refx)*sinf(alpha)+(y1-refy)*cosf(alpha);
+		ax2=refy+(x2-refx)*cosf(alpha)-(y2-refy)*sinf(alpha);
+		ay2=refy+(x2-refx)*sinf(alpha)+(y2-refy)*cosf(alpha);
+
+		write_line_lm(ax1,ay1,ax2,ay2,1,1);
+	}
+	//fill2
+	for(int i=0;i<(size*2);i++)
+	{
+		x1=l_x - size/2 + i;
+		y1=l_y + y_pitch;
+		x4=l_x - size/2 + i;
+		y4=l_y + size + y_pitch;
+		ax1=refy+(x1-refx)*cosf(alpha)-(y1-refy)*sinf(alpha);
+		ay1=refy+(x1-refx)*sinf(alpha)+(y1-refy)*cosf(alpha);
+		ax4=refy+(x4-refx)*cosf(alpha)-(y4-refy)*sinf(alpha);
+		ay4=refy+(x4-refx)*sinf(alpha)+(y4-refy)*cosf(alpha);
+
+		write_line_lm(ax1,ay1,ax4,ay4,1,1);
+	}
+
+	//sides
+	write_line_outlined(l_x,l_y,l_x,l_y+size,0,0,0,1);
+	write_line_outlined(l_x+size,l_y,l_x+size,l_y+size,0,0,0,1);
+	//plane
+	write_line_outlined(refx-5,refy,refx+6,refy,0,0,0,1);
+	write_line_outlined(refx,refy,refx,refy-3,0,0,0,1);
+	//needs better way to limit drawing outside the box
+	write_filled_rectangle_lm(l_x - size - size/2-1,	l_y - size - size/2-1,	size + size/2, 	size*4+2,		0,0); //left
+	write_filled_rectangle_lm(l_x + size + 1, 			l_y - size - size/2-1,	size + size/2, 	size*4+2,		0,0); //right
+	write_filled_rectangle_lm(l_x-1, 					l_y + size + 1,        	size+2, 		size + size/2,   0,0); //bot
+	write_filled_rectangle_lm(l_x-1, 					l_y - size - size/2-1, 	size+1, 		size + size/2+1, 0,0); //top
+
 }
 
-void setGpsOsd(uint8_t status, int32_t lat, int32_t lon, float alt, float spd)
-{
-	m_gpsStatus=status;
-	m_gpsLat=lat;
-	m_gpsLon=lon;
-	m_gpsAlt=alt;
-	m_gpsSpd=spd;
-}
 
 void introText(){
 	write_string("ver 0.2", APPLY_HDEADBAND((GRAPHICS_RIGHT/2)),APPLY_VDEADBAND(GRAPHICS_BOTTOM-10), 0, 0, TEXT_VA_BOTTOM, TEXT_HA_CENTER, 0, 3);
@@ -1919,7 +1997,7 @@ void introGraphics() {
 	}
 }
 
-void calcHomeArrow(void)
+void calcHomeArrow(int16_t m_yaw)
 {
 	HomeLocationData home;
 	HomeLocationGet (&home);
@@ -1948,7 +2026,7 @@ void calcHomeArrow(void)
     **/
     y = sinf(lon2-lon1) * cosf(lat2);
     x = cosf(lat1) * sinf(lat2) - sinf(lat1) * cosf(lat2) * cosf(lon2-lon1);
-    brng = RAD2DEG(atan2f((sinf(lon2-lon1)*cosf(lat2)),(cosf(lat1)*sinf(lat2)-sinf(lat1)*cosf(lat2)*cosf(lon2-lon1))));
+    brng = RAD2DEG(atan2f(y,x));
     if(brng<0)
         brng+=360;
 
@@ -2028,6 +2106,9 @@ void updateGraphics() {
 	GPSPositionGet(&gpsData);
 	HomeLocationData home;
 	HomeLocationGet(&home);
+
+	PIOS_Servo_Set(0,OsdSettings.White);
+	PIOS_Servo_Set(1,OsdSettings.Black);
 	
 	switch (OsdSettings.Screen) {
 		case 0: // Dave simple
@@ -2040,10 +2121,6 @@ void updateGraphics() {
 				write_string(temps, APPLY_HDEADBAND(GRAPHICS_RIGHT/2), (GRAPHICS_BOTTOM/2), 0, 0, TEXT_VA_TOP, TEXT_HA_CENTER, 0, 3);
 			}
 
-			if(gpsData.Heading>180)
-				setAttitudeOsd(0,0,(int16_t)(gpsData.Heading-360));
-			else
-				setAttitudeOsd(0,0,(int16_t)(gpsData.Heading));
 			
 			char temp[50]={0};
 			memset(temp, ' ', 40);
@@ -2058,16 +2135,14 @@ void updateGraphics() {
 			sprintf(temp,"V:%5.2fV",(PIOS_ADC_PinGet(2)*3*6.1f/4096));
 			write_string(temp, APPLY_HDEADBAND(20), APPLY_VDEADBAND(20), 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 3);
 			
-			calcHomeArrow();
+			if(gpsData.Heading>180)
+				calcHomeArrow((int16_t)(gpsData.Heading-360));
+			else
+				calcHomeArrow((int16_t)(gpsData.Heading));
 		}
 		break;
 		case 1:
 		{
-				// GPS HACK
-				if(gpsData.Heading>180)
-					setAttitudeOsd(0,0,(int16_t)(gpsData.Heading-360));
-				else
-					setAttitudeOsd(0,0,(int16_t)(gpsData.Heading));
 				/*drawBox(2,2,GRAPHICS_WIDTH_REAL-4,GRAPHICS_HEIGHT_REAL-4);
 				 write_filled_rectangle(draw_buffer_mask,0,0,GRAPHICS_WIDTH_REAL-2,GRAPHICS_HEIGHT_REAL-2,0);
 				 write_filled_rectangle(draw_buffer_mask,2,2,GRAPHICS_WIDTH_REAL-4-2,GRAPHICS_HEIGHT_REAL-4-2,2);
@@ -2079,7 +2154,7 @@ void updateGraphics() {
 				//drawCircle((GRAPHICS_SIZE/2)-1, (GRAPHICS_SIZE/2)-1, (GRAPHICS_SIZE/2)-2);
 				//drawLine(0, (GRAPHICS_SIZE/2)-1, GRAPHICS_SIZE-1, (GRAPHICS_SIZE/2)-1);
 				//drawLine((GRAPHICS_SIZE/2)-1, 0, (GRAPHICS_SIZE/2)-1, GRAPHICS_SIZE-1);
-				angleA++;
+				/*angleA++;
 				if(angleB<=-90)
 				{
 					sum=2;
@@ -2089,9 +2164,13 @@ void updateGraphics() {
 					sum=-2;
 				}
 				angleB+=sum;
-				angleC+=2;
+				angleC+=2;*/
 				
-				calcHomeArrow();
+				// GPS HACK
+				if(gpsData.Heading>180)
+					calcHomeArrow((int16_t)(gpsData.Heading-360));
+				else
+					calcHomeArrow((int16_t)(gpsData.Heading));
 				
 				/* Draw Attitude Indicator */
 				if(OsdSettings.Attitude == OSDSETTINGS_ATTITUDE_ENABLED)
@@ -2121,32 +2200,32 @@ void updateGraphics() {
 				
 				/* Print Number of detected video Lines */
 				sprintf(temp,"Lines:%4d",PIOS_Video_GetOSDLines());
-				write_string(temp, APPLY_HDEADBAND((GRAPHICS_RIGHT - 2)),APPLY_VDEADBAND(5), 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+				write_string(temp, APPLY_HDEADBAND((GRAPHICS_RIGHT - 8)),APPLY_VDEADBAND(5), 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 				
 				/* Print ADC voltage */
 				//sprintf(temp,"Rssi:%4dV",(int)(PIOS_ADC_PinGet(4)*3000/4096));
 				//write_string(temp, (GRAPHICS_WIDTH_REAL - 2),15, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 				sprintf(temp,"Rssi:%4.2fV",(PIOS_ADC_PinGet(4)*3.0f/4096.0f));
-				write_string(temp, APPLY_HDEADBAND((GRAPHICS_RIGHT - 2)),APPLY_VDEADBAND(15), 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+				write_string(temp, APPLY_HDEADBAND((GRAPHICS_RIGHT - 8)),APPLY_VDEADBAND(15), 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 				
 				/* Print CPU temperature */
 				sprintf(temp,"Temp:%4.2fC",(PIOS_ADC_PinGet(6)*0.29296875f-264));
-				write_string(temp, APPLY_HDEADBAND((GRAPHICS_RIGHT - 2)),APPLY_VDEADBAND(25), 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+				write_string(temp, APPLY_HDEADBAND((GRAPHICS_RIGHT - 8)),APPLY_VDEADBAND(25), 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 				
 				/* Print ADC voltage FLIGHT*/
 				sprintf(temp,"FltV:%4.2fV",(PIOS_ADC_PinGet(2)*3.0f*6.1f/4096.0f));
-				write_string(temp, APPLY_HDEADBAND((GRAPHICS_RIGHT - 2)),APPLY_VDEADBAND(35), 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+				write_string(temp, APPLY_HDEADBAND((GRAPHICS_RIGHT - 8)),APPLY_VDEADBAND(35), 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 				
 				/* Print ADC voltage VIDEO*/
 				sprintf(temp,"VidV:%4.2fV",(PIOS_ADC_PinGet(3)*3.0f*6.1f/4096.0f));
-				write_string(temp, APPLY_HDEADBAND((GRAPHICS_RIGHT - 2)),APPLY_VDEADBAND(45), 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+				write_string(temp, APPLY_HDEADBAND((GRAPHICS_RIGHT - 8)),APPLY_VDEADBAND(45), 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 				
 				/* Print ADC voltage RSSI */
 				//sprintf(temp,"Curr:%4dA",(int)(PIOS_ADC_PinGet(0)*300*61/4096));
 				//write_string(temp, (GRAPHICS_WIDTH_REAL - 2),60, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 				
 				/* Draw Battery Gauge */
-				m_batt++;
+				/*m_batt++;
 				uint8_t dir=3;
 				if(m_batt==101)
 					m_batt=0;
@@ -2159,12 +2238,12 @@ void updateGraphics() {
 				{
 					dir=1;
 					m_alt+=m_pitch/2;
-				}
-				//if(OsdSettings.Battery == OSDSETTINGS_BATTERY_ENABLED)
-				if(0)
+				}*/
+
+				/*if(OsdSettings.Battery == OSDSETTINGS_BATTERY_ENABLED)
 				{
 					drawBattery(APPLY_HDEADBAND(OsdSettings.BatterySetup[OSDSETTINGS_BATTERYSETUP_X]),APPLY_VDEADBAND(OsdSettings.BatterySetup[OSDSETTINGS_BATTERYSETUP_Y]),m_batt,16);
-				}
+				}*/
 				
 				//drawAltitude(200,50,m_alt,dir);
 				
@@ -2174,31 +2253,47 @@ void updateGraphics() {
 				// Draw airspeed (left side.)
 				if(OsdSettings.Speed == OSDSETTINGS_SPEED_ENABLED)
 				{
-					hud_draw_vertical_scale((int)m_gpsSpd, 100, -1, APPLY_HDEADBAND(OsdSettings.SpeedSetup[OSDSETTINGS_SPEEDSETUP_X]),
+					hud_draw_vertical_scale((int)gpsData.Groundspeed, 100, -1, APPLY_HDEADBAND(OsdSettings.SpeedSetup[OSDSETTINGS_SPEEDSETUP_X]),
 							APPLY_VDEADBAND(OsdSettings.SpeedSetup[OSDSETTINGS_SPEEDSETUP_Y]), 100, 10, 20, 7, 12, 15, 1000, HUD_VSCALE_FLAG_NO_NEGATIVE);
 				}
 				// Draw altimeter (right side.)
 				if(OsdSettings.Altitude == OSDSETTINGS_ALTITUDE_ENABLED)
 				{
-					hud_draw_vertical_scale((int)m_gpsAlt, 200, +1, APPLY_HDEADBAND(OsdSettings.AltitudeSetup[OSDSETTINGS_ALTITUDESETUP_X]),
+					hud_draw_vertical_scale((int)gpsData.Altitude, 200, +1, APPLY_HDEADBAND(OsdSettings.AltitudeSetup[OSDSETTINGS_ALTITUDESETUP_X]),
 							APPLY_VDEADBAND(OsdSettings.AltitudeSetup[OSDSETTINGS_ALTITUDESETUP_Y]), 100, 20, 100, 7, 12, 15, 500, 0);
 				}
 				// Draw compass.
 				if(OsdSettings.Heading == OSDSETTINGS_HEADING_ENABLED)
 				{
-					if(m_yaw<0) {
-						hud_draw_linear_compass(360+m_yaw, 150, 120, APPLY_HDEADBAND(OsdSettings.HeadingSetup[OSDSETTINGS_HEADINGSETUP_X]),
+					if(attitude.Yaw<0) {
+						hud_draw_linear_compass(360+attitude.Yaw, 150, 120, APPLY_HDEADBAND(OsdSettings.HeadingSetup[OSDSETTINGS_HEADINGSETUP_X]),
 								APPLY_VDEADBAND(OsdSettings.HeadingSetup[OSDSETTINGS_HEADINGSETUP_Y]), 15, 30, 7, 12, 0);
 					} else {
-						hud_draw_linear_compass(m_yaw, 150, 120, APPLY_HDEADBAND(OsdSettings.HeadingSetup[OSDSETTINGS_HEADINGSETUP_X]),
+						hud_draw_linear_compass(attitude.Yaw, 150, 120, APPLY_HDEADBAND(OsdSettings.HeadingSetup[OSDSETTINGS_HEADINGSETUP_X]),
 								APPLY_VDEADBAND(OsdSettings.HeadingSetup[OSDSETTINGS_HEADINGSETUP_Y]), 15, 30, 7, 12, 0);
 					}
 				}
 		}
 		break;
+		case 2:
+		{
+			draw_artificial_horizon(-attitude.Roll,attitude.Pitch,100,100,30);
+		}
+		break;
 		case 3:
 		{
 			lamas();
+		}
+		break;
+		case 4:
+		case 5:
+		case 6:
+		{
+			int image=OsdSettings.Screen-4;
+			struct splashEntry splash_info;
+			splash_info = splash[image];
+
+			copyimage(APPLY_HDEADBAND(GRAPHICS_RIGHT/2-(splash_info.width)/2), APPLY_VDEADBAND(GRAPHICS_BOTTOM/2-(splash_info.height)/2),image);
 		}
 		break;
 	default:
@@ -2232,7 +2327,7 @@ int32_t osdgenStart(void)
 	// Start gps task
 	vSemaphoreCreateBinary( osdSemaphore);
 	xTaskCreate(osdgenTask, (signed char *)"OSDGEN", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &osdgenTaskHandle);
-	TaskMonitorAdd(TASKINFO_RUNNING_GPS, osdgenTaskHandle);
+	//TaskMonitorAdd(TASKINFO_RUNNING_GPS, osdgenTaskHandle);
 
 	return 0;
 }
@@ -2268,12 +2363,12 @@ MODULE_INITCALL(osdgenInitialize, osdgenStart)
 
 static void osdgenTask(void *parameters)
 {
-	portTickType lastSysTime;
+	//portTickType lastSysTime;
 	// Loop forever
-	lastSysTime = xTaskGetTickCount();
+	//lastSysTime = xTaskGetTickCount();
 
 	// intro
-	for(int i=0; i<125; i++)
+	for(int i=0; i<63; i++)
 	{
         if( xSemaphoreTake( osdSemaphore, LONG_TIME ) == pdTRUE )
         {
@@ -2281,7 +2376,7 @@ static void osdgenTask(void *parameters)
 			introGraphics();
         }
 	}
-	for(int i=0; i<125; i++)
+	for(int i=0; i<63; i++)
 	{
         if( xSemaphoreTake( osdSemaphore, LONG_TIME ) == pdTRUE )
         {

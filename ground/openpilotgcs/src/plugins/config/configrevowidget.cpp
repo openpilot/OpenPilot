@@ -34,12 +34,14 @@
 #include <QtGui/QTextEdit>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QPushButton>
+#include <QMessageBox>
 #include <QThread>
 #include <QErrorMessage>
 #include <iostream>
 #include <QDesktopServices>
 #include <QUrl>
 #include <revocalibration.h>
+#include <homelocation.h>
 #include <accels.h>
 #include <gyros.h>
 #include <magnetometer.h>
@@ -204,14 +206,13 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     mag_z->setTransform(QTransform::fromScale(1,0),true);
 
     // Connect the signals
-    connect(m_ui->ahrsCalibStart, SIGNAL(clicked()), this, SLOT(measureNoise()));
     connect(m_ui->accelBiasStart, SIGNAL(clicked()), this, SLOT(launchAccelBiasCalibration()));
 
     RevoCalibration * revoCalibration = RevoCalibration::GetInstance(getObjectManager());
     Q_ASSERT(revoCalibration);
     connect(revoCalibration, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshValues()));
 
-    connect(m_ui->ahrsSettingsSaveRAM, SIGNAL(clicked()), this, SLOT(SettingsToRam()));
+    connect(m_ui->ahrsSettingsSaveRAM, SIGNAL(clicked()), this, SLOT(SettingsToRAM()));
     connect(m_ui->ahrsSettingsSaveSD, SIGNAL(clicked()), this, SLOT(SettingsToFlash()));
     connect(m_ui->sixPointsStart, SIGNAL(clicked()), this, SLOT(sixPointCalibrationMode()));
     connect(m_ui->sixPointsSave, SIGNAL(clicked()), this, SLOT(savePositionData()));
@@ -285,7 +286,7 @@ void ConfigRevoWidget::launchAccelBiasCalibration()
     Q_ASSERT(accels);
     initialMdata = accels->getMetadata();
     UAVObject::Metadata mdata = initialMdata;
-    mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
+    UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
     mdata.flightTelemetryUpdatePeriod = 100;
     accels->setMetadata(mdata);
 
@@ -571,12 +572,16 @@ int SixPointInConstFieldCal( double ConstMag, double x[6], double y[6], double z
 void ConfigRevoWidget::computeScaleBias()
 {
    double S[3], b[3];
+   double Be_lenght;
    RevoCalibration * revoCalibration = RevoCalibration::GetInstance(getObjectManager());
+   HomeLocation * homeLocation = HomeLocation::GetInstance(getObjectManager());
    Q_ASSERT(revoCalibration);
+   Q_ASSERT(homeLocation);
    RevoCalibration::DataFields revoCalibrationData = revoCalibration->getData();
+   HomeLocation::DataFields homeLocationData = homeLocation->getData();
 
-   // Calibration accel
-   SixPointInConstFieldCal( GRAVITY, accel_data_x, accel_data_y, accel_data_z, S, b);
+   // Calibration accel 
+   SixPointInConstFieldCal( homeLocationData.g_e, accel_data_x, accel_data_y, accel_data_z, S, b);
    revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_X] = fabs(S[0]);
    revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_Y] = fabs(S[1]);
    revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_Z] = fabs(S[2]);
@@ -586,7 +591,8 @@ void ConfigRevoWidget::computeScaleBias()
    revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Z] = -sign(S[2]) * b[2];
 
    // Calibration mag
-   SixPointInConstFieldCal( 1000, mag_data_x, mag_data_y, mag_data_z, S, b);
+   Be_lenght = sqrt(pow(homeLocationData.Be[0],2)+pow(homeLocationData.Be[1],2)+pow(homeLocationData.Be[2],2));
+   SixPointInConstFieldCal( Be_lenght, mag_data_x, mag_data_y, mag_data_z, S, b);
    revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_X] = fabs(S[0]);
    revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_Y] = fabs(S[1]);
    revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_Z] = fabs(S[2]);
@@ -607,10 +613,24 @@ void ConfigRevoWidget::computeScaleBias()
   */
 void ConfigRevoWidget::sixPointCalibrationMode()
 {
-    double S[3], b[3];
     RevoCalibration * revoCalibration = RevoCalibration::GetInstance(getObjectManager());
+    HomeLocation * homeLocation = HomeLocation::GetInstance(getObjectManager());
     Q_ASSERT(revoCalibration);
+    Q_ASSERT(homeLocation);
     RevoCalibration::DataFields revoCalibrationData = revoCalibration->getData();
+    HomeLocation::DataFields homeLocationData = homeLocation->getData();
+
+    //check if Homelocation is set
+    if(!homeLocationData.Set)
+    {
+        QMessageBox msgBox;
+        msgBox.setInformativeText(tr("<p>HomeLocation not SET.</p><p>Please set your HomeLocation and try again. Aborting calibration!</p>"));
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setDefaultButton(QMessageBox::Ok);
+        msgBox.setIcon(QMessageBox::Information);
+        msgBox.exec();
+        return;
+    }
 
     // Calibration accel
     revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_X] = 1;
@@ -650,12 +670,12 @@ void ConfigRevoWidget::sixPointCalibrationMode()
 
    initialMdata = accels->getMetadata();
    UAVObject::Metadata mdata = initialMdata;
-   mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
+   UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
    mdata.flightTelemetryUpdatePeriod = 100;
    accels->setMetadata(mdata);
 
    mdata = mag->getMetadata();
-   mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
+   UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
    mdata.flightTelemetryUpdatePeriod = 100;
    mag->setMetadata(mdata);
 

@@ -103,6 +103,9 @@ TIM8  |           |           |           |
 #define PIOS_I2C_MAX_DEVS			3
 extern uint32_t pios_i2c_mag_adapter_id;
 #define PIOS_I2C_MAIN_ADAPTER			(pios_i2c_mag_adapter_id)
+extern uint32_t pios_i2c_flexiport_adapter_id;
+#define PIOS_I2C_FLEXI_ADAPTER			(pios_i2c_flexiport_adapter_id)
+#define PIOS_I2C_ETASV3_ADAPTER			(PIOS_I2C_FLEXI_ADAPTER)
 
 //-------------------------
 // PIOS_USART
@@ -134,7 +137,7 @@ extern uint32_t pios_com_vcp_id;
 //------------------------
 // TELEMETRY 
 //------------------------
-#define TELEM_QUEUE_SIZE         20
+#define TELEM_QUEUE_SIZE         80
 #define PIOS_TELEM_STACK_SIZE    624
 
 //-------------------------
@@ -230,8 +233,25 @@ extern uint32_t pios_com_vcp_id;
 
 //-------------------------
 // ADC
-// None.
+// PIOS_ADC_PinGet(0) = Current sensor
+// PIOS_ADC_PinGet(1) = Voltage sensor
+// PIOS_ADC_PinGet(4) = VREF
+// PIOS_ADC_PinGet(5) = Temperature sensor
 //-------------------------
+#define PIOS_DMA_PIN_CONFIG                                                                         \
+{                                                                                                   \
+	{GPIOC, GPIO_Pin_0,     ADC_Channel_10},                                                        \
+	{GPIOC, GPIO_Pin_1,     ADC_Channel_11},                                                        \
+	{NULL,  0,                      ADC_Channel_Vrefint},           /* Voltage reference */         \
+	{NULL,  0,                      ADC_Channel_TempSensor}         /* Temperature sensor */        \
+}
+
+/* we have to do all this to satisfy the PIOS_ADC_MAX_SAMPLES define in pios_adc.h */
+/* which is annoying because this then determines the rate at which we generate buffer turnover events */
+/* the objective here is to get enough buffer space to support 100Hz averaging rate */
+#define PIOS_ADC_NUM_CHANNELS           4
+#define PIOS_ADC_MAX_OVERSAMPLING       2
+#define PIOS_ADC_USE_ADC2               0
 
 //-------------------------
 // USB

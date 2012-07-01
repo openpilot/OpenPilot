@@ -62,7 +62,7 @@ private:
 
 	float DENSITY(float pressure);
 	float PRESSURE(float alt);
-	float TAS(float ias,float alt);
+    float CAS(float ias,float alt);
 
 	void processUpdate(const QByteArray& data);
 	float angleDifference(float a,float b);

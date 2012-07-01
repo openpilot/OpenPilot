@@ -23,34 +23,41 @@ else
 	quote =
 endif
 
+# Add a board designator to the terse message text
+ifeq ($(ENABLE_MSG_EXTRA),yes)
+	MSG_EXTRA := [$(BUILD_TYPE)|$(BOARD_SHORT_NAME)]
+else
+	MSG_BOARD :=
+endif
+
 # Define Messages
 # English
-MSG_FORMATERROR      := ${quote} Can not handle output-format${quote}
-MSG_MODINIT          := ${quote} MODINIT   ${quote}
-MSG_SIZE             := ${quote} SIZE      ${quote}
-MSG_LOAD_FILE        := ${quote} BIN/HEX   ${quote}
-MSG_BIN_OBJ          := ${quote} BINO      ${quote}
-MSG_STRIP_FILE       := ${quote} STRIP     ${quote}
-MSG_EXTENDED_LISTING := ${quote} LIS       ${quote}
-MSG_SYMBOL_TABLE     := ${quote} NM        ${quote}
-MSG_LINKING          := ${quote} LD        ${quote}
-MSG_COMPILING        := ${quote} CC        ${quote}
-MSG_COMPILING_ARM    := ${quote} CC-ARM    ${quote}
-MSG_COMPILINGCPP     := ${quote} CXX       ${quote}
-MSG_COMPILINGCPP_ARM := ${quote} CXX-ARM   ${quote}
-MSG_ASSEMBLING       := ${quote} AS        ${quote}
-MSG_ASSEMBLING_ARM   := ${quote} AS-ARM    ${quote}
-MSG_CLEANING         := ${quote} CLEAN     ${quote}
-MSG_ASMFROMC         := ${quote} AS(C)     ${quote}
-MSG_ASMFROMC_ARM     := ${quote} AS(C)-ARM ${quote}
-MSG_PYMITEINIT       := ${quote} PY        ${quote}
-MSG_INSTALLING       := ${quote} INSTALL   ${quote}
-MSG_OPFIRMWARE       := ${quote} OPFW      ${quote}
-MSG_FWINFO           := ${quote} FWINFO    ${quote}
-MSG_JTAG_PROGRAM     := ${quote} JTAG-PGM  ${quote}
-MSG_JTAG_WIPE        := ${quote} JTAG-WIPE ${quote}
-MSG_JTAG_RESET       := ${quote} JTAG-RST  ${quote}
-MSG_JTAG_SAFEBOOT    := ${quote} JTAG-SAFE ${quote}
+MSG_FORMATERROR      = ${quote} Can not handle output-format${quote}
+MSG_MODINIT          = ${quote} MODINIT   $(MSG_EXTRA) ${quote}
+MSG_SIZE             = ${quote} SIZE      $(MSG_EXTRA) ${quote}
+MSG_LOAD_FILE        = ${quote} BIN/HEX   $(MSG_EXTRA) ${quote}
+MSG_BIN_OBJ          = ${quote} BINO      $(MSG_EXTRA) ${quote}
+MSG_STRIP_FILE       = ${quote} STRIP     $(MSG_EXTRA) ${quote}
+MSG_EXTENDED_LISTING = ${quote} LIS       $(MSG_EXTRA) ${quote}
+MSG_SYMBOL_TABLE     = ${quote} NM        $(MSG_EXTRA) ${quote}
+MSG_LINKING          = ${quote} LD        $(MSG_EXTRA) ${quote}
+MSG_COMPILING        = ${quote} CC        ${MSG_EXTRA} ${quote}
+MSG_COMPILING_ARM    = ${quote} CC-ARM    $(MSG_EXTRA) ${quote}
+MSG_COMPILINGCPP     = ${quote} CXX       $(MSG_EXTRA) ${quote}
+MSG_COMPILINGCPP_ARM = ${quote} CXX-ARM   $(MSG_EXTRA) ${quote}
+MSG_ASSEMBLING       = ${quote} AS        $(MSG_EXTRA) ${quote}
+MSG_ASSEMBLING_ARM   = ${quote} AS-ARM    $(MSG_EXTRA) ${quote}
+MSG_CLEANING         = ${quote} CLEAN     $(MSG_EXTRA) ${quote}
+MSG_ASMFROMC         = ${quote} AS(C)     $(MSG_EXTRA) ${quote}
+MSG_ASMFROMC_ARM     = ${quote} AS(C)-ARM $(MSG_EXTRA) ${quote}
+MSG_PYMITEINIT       = ${quote} PY        $(MSG_EXTRA) ${quote}
+MSG_INSTALLING       = ${quote} INSTALL   $(MSG_EXTRA) ${quote}
+MSG_OPFIRMWARE       = ${quote} OPFW      $(MSG_EXTRA) ${quote}
+MSG_FWINFO           = ${quote} FWINFO    $(MSG_EXTRA) ${quote}
+MSG_JTAG_PROGRAM     = ${quote} JTAG-PGM  $(MSG_EXTRA) ${quote}
+MSG_JTAG_WIPE        = ${quote} JTAG-WIPE $(MSG_EXTRA) ${quote}
+MSG_PADDING          = ${quote} PADDING   $(MSG_EXTRA) ${quote}
+MSG_FLASH_IMG        = ${quote} FLASH_IMG $(MSG_EXTRA) ${quote}
 
 toprel = $(subst $(realpath $(TOP))/,,$(abspath $(1)))
 
@@ -137,7 +144,7 @@ endef
 define ASSEMBLE_TEMPLATE
 $(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
 	@echo $(MSG_ASSEMBLING) $$(call toprel, $$<)
-	$(V1) $(CC) -c -mthumb $$(ASFLAGS) $$< -o $$@
+	$(V1) $(CC) -c $(THUMB) $$(ASFLAGS) $$< -o $$@
 endef
 
 # Assemble: create object files from assembler source files. ARM-only
@@ -151,7 +158,7 @@ endef
 define COMPILE_C_TEMPLATE
 $(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
 	@echo $(MSG_COMPILING) $$(call toprel, $$<)
-	$(V1) $(CC) -c -mthumb $$(CFLAGS) $$(CONLYFLAGS) $$< -o $$@
+	$(V1) $(CC) -c $(THUMB) $$(CFLAGS) $$(CONLYFLAGS) $$< -o $$@
 endef
 
 # Compile: create object files from C source files. ARM-only
@@ -165,7 +172,7 @@ endef
 define COMPILE_CPP_TEMPLATE
 $(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
 	@echo $(MSG_COMPILINGCPP) $$(call toprel, $$<)
-	$(V1) $(CC) -c -mthumb $$(CFLAGS) $$(CPPFLAGS) $$< -o $$@
+	$(V1) $(CC) -c $(THUMB) $$(CFLAGS) $$(CPPFLAGS) $$< -o $$@
 endef
 
 # Compile: create object files from C++ source files. ARM-only
@@ -183,14 +190,14 @@ define LINK_TEMPLATE
 .PRECIOUS : $(2)
 $(1):  $(2)
 	@echo $(MSG_LINKING) $$(call toprel, $$@)
-	$(V1) $(CC) -mthumb $$(CFLAGS) $(2) --output $$@ $$(LDFLAGS)
+	$(V1) $(CC) $(THUMB) $$(CFLAGS) $(2) --output $$@ $$(LDFLAGS)
 endef
 
 # Compile: create assembler files from C source files. ARM/Thumb
 define PARTIAL_COMPILE_TEMPLATE
 $($(1):.c=.s) : %.s : %.c
 	@echo $(MSG_ASMFROMC) $$(call toprel, $$<)
-	$(V1) $(CC) -mthumb -S $$(CFLAGS) $$(CONLYFLAGS) $$< -o $$@
+	$(V1) $(CC) $(THUMB) -S $$(CFLAGS) $$(CONLYFLAGS) $$< -o $$@
 endef
 
 # Compile: create assembler files from C source files. ARM only
@@ -244,35 +251,6 @@ wipe:
 		$$(OOCD_JTAG_SETUP) \
 		$$(OOCD_BOARD_RESET) \
 		-c "flash erase_address pad $(2) $(3)" \
-		-c "reset run" \
-		-c "shutdown"
-
-reset:
-	@echo $(MSG_JTAG_RESET) resetting device
-	$(V1) $(OOCD_EXE) \
-		$$(OOCD_JTAG_SETUP) \
-		$$(OOCD_BOARD_RESET) \
-		-c "reset run" \
-		-c "shutdown"
-
-# Enable PWR and BKP clocks (set RCC_APB1ENR[PWREN|BKPEN])
-OOCD_WRITE_BKPDR3 =  -c "mww 0x4002101C 0x18000000"
-# Enable writes to BKP registers (set PWR_CR[DBP] via bit op alias address)
-#
-# Direct register access would be:
-#    mww 0x40007000 0x00000100
-#
-# Direct _bit_ access is:
-#    Bit 8 in 0x40007000 = 0x42000000 + 0x7000 * 32 + 8 * 4 = 420E0020
-OOCD_WRITE_BKPDR3 += -c "mww 0x420E0020 0x00000001"
-# Set BR3 to max value to force a safe boot
-OOCD_WRITE_BKPDR3 += -c "mwh 0x40006C0C 0xFFFF"
-safeboot:
-	@echo $(MSG_JTAG_SAFEBOOT) forcing boot into safe mode
-	$(V1) $(OOCD_EXE) \
-		$$(OOCD_JTAG_SETUP) \
-		$$(OOCD_BOARD_RESET) \
-		$$(OOCD_WRITE_BKPDR3) \
 		-c "reset run" \
 		-c "shutdown"
 endef

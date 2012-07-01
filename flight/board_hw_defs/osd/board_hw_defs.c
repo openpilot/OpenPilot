@@ -27,6 +27,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include <pios_config.h>
+#include <pios_board_info.h>
 
 #if defined(PIOS_INCLUDE_LED)
 
@@ -34,9 +35,9 @@
 static const struct pios_led pios_leds[] = {
 	[PIOS_LED_HEARTBEAT] = {
 		.pin = {
-			.gpio = GPIOC,
+			.gpio = GPIOD,
 			.init = {
-				.GPIO_Pin   = GPIO_Pin_5,
+				.GPIO_Pin   = GPIO_Pin_13,
 				.GPIO_Speed = GPIO_Speed_50MHz,
 				.GPIO_Mode  = GPIO_Mode_OUT,
 				.GPIO_OType = GPIO_OType_PP,
@@ -46,9 +47,9 @@ static const struct pios_led pios_leds[] = {
 	},
 	[PIOS_LED_ALARM] = {
 		.pin = {
-			.gpio = GPIOC,
+			.gpio = GPIOD,
 			.init = {
-				.GPIO_Pin   = GPIO_Pin_4,
+				.GPIO_Pin   = GPIO_Pin_12,
 				.GPIO_Speed = GPIO_Speed_50MHz,
 				.GPIO_Mode  = GPIO_Mode_OUT,
 				.GPIO_OType = GPIO_OType_PP,
@@ -63,11 +64,59 @@ static const struct pios_led_cfg pios_led_cfg = {
 	.num_leds = NELEMENTS(pios_leds),
 };
 
+const struct pios_led_cfg * PIOS_BOARD_HW_DEFS_GetLedCfg (uint32_t board_revision)
+{
+	return &pios_led_cfg;
+}
+
 #endif	/* PIOS_INCLUDE_LED */
 
 #include <pios_usart_priv.h>
 
 #if defined(PIOS_INCLUDE_GPS)
+
+static const struct pios_usart_cfg pios_usart_gps_cfg = {
+	.regs = USART2,
+	.remap = GPIO_AF_USART2,
+	.init = {
+		.USART_BaudRate = 38400,
+		.USART_WordLength = USART_WordLength_8b,
+		.USART_Parity = USART_Parity_No,
+		.USART_StopBits = USART_StopBits_1,
+		.USART_HardwareFlowControl =
+		USART_HardwareFlowControl_None,
+		.USART_Mode = USART_Mode_Rx | USART_Mode_Tx,
+	},
+	.irq = {
+		.init = {
+			.NVIC_IRQChannel = USART2_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
+			.NVIC_IRQChannelSubPriority = 0,
+			.NVIC_IRQChannelCmd = ENABLE,
+		},
+	},
+	.rx = {
+		.gpio = GPIOA,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_3,
+			.GPIO_Speed = GPIO_Speed_2MHz,
+			.GPIO_Mode  = GPIO_Mode_AF,
+			.GPIO_OType = GPIO_OType_PP,
+			.GPIO_PuPd  = GPIO_PuPd_UP
+		},
+	},
+	.tx = {
+		.gpio = GPIOA,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_2,
+			.GPIO_Speed = GPIO_Speed_2MHz,
+			.GPIO_Mode  = GPIO_Mode_AF,
+			.GPIO_OType = GPIO_OType_PP,
+			.GPIO_PuPd  = GPIO_PuPd_UP
+		},
+	},
+};
+#if 0
 /*
  * GPS USART
  */
@@ -75,7 +124,7 @@ static const struct pios_usart_cfg pios_usart_gps_cfg = {
 	.regs = USART1,
 	.remap = GPIO_AF_USART1,
 	.init = {
-		.USART_BaudRate = 38400,
+		.USART_BaudRate = 57600,
 		.USART_WordLength = USART_WordLength_8b,
 		.USART_Parity = USART_Parity_No,
 		.USART_StopBits = USART_StopBits_1,
@@ -112,7 +161,7 @@ static const struct pios_usart_cfg pios_usart_gps_cfg = {
 		},
 	},
 };
-
+#endif
 #endif /* PIOS_INCLUDE_GPS */
 
 #ifdef PIOS_INCLUDE_COM_AUX
@@ -123,7 +172,7 @@ static const struct pios_usart_cfg pios_usart_aux_cfg = {
 	.regs = USART2,
 	.remap = GPIO_AF_USART2,
 	.init = {
-		.USART_BaudRate = 230400,
+		.USART_BaudRate = 57600,
 		.USART_WordLength = USART_WordLength_8b,
 		.USART_Parity = USART_Parity_No,
 		.USART_StopBits = USART_StopBits_1,
@@ -211,56 +260,6 @@ static const struct pios_usart_cfg pios_usart_telem_main_cfg = {
 
 #endif /* PIOS_COM_TELEM */
 
-
-#if 0
-/*
- * COTelemetry on main USART
- */
-static const struct pios_usart_cfg pios_usart_cotelem_main_cfg = {
-	.regs = UART4,
-	.remap = GPIO_AF_UART4,
-	.init = {
-		.USART_BaudRate = 57600,
-		.USART_WordLength = USART_WordLength_8b,
-		.USART_Parity = USART_Parity_No,
-		.USART_StopBits = USART_StopBits_1,
-		.USART_HardwareFlowControl =
-		USART_HardwareFlowControl_None,
-		.USART_Mode = USART_Mode_Rx | USART_Mode_Tx,
-	},
-	.irq = {
-		.init = {
-			.NVIC_IRQChannel = UART4_IRQn,
-			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
-			.NVIC_IRQChannelSubPriority = 0,
-			.NVIC_IRQChannelCmd = ENABLE,
-		},
-	},
-	.rx = {
-		.gpio = GPIOA,
-		.init = {
-			.GPIO_Pin   = GPIO_Pin_1,
-			.GPIO_Speed = GPIO_Speed_2MHz,
-			.GPIO_Mode  = GPIO_Mode_AF,
-			.GPIO_OType = GPIO_OType_PP,
-			.GPIO_PuPd  = GPIO_PuPd_UP
-		},
-	},
-	.tx = {
-		.gpio = GPIOA,
-		.init = {
-			.GPIO_Pin   = GPIO_Pin_0,
-			.GPIO_Speed = GPIO_Speed_2MHz,
-			.GPIO_Mode  = GPIO_Mode_AF,
-			.GPIO_OType = GPIO_OType_PP,
-			.GPIO_PuPd  = GPIO_PuPd_UP
-		},
-	},
-};
-
-#endif /* PIOS_COM_COTELEM */
-
-
 #if defined(PIOS_INCLUDE_COM)
 
 #include <pios_com_priv.h>
@@ -314,7 +313,7 @@ static const struct pios_usb_cfg pios_usb_main_cfg = {
 	.vsense = {
 		.gpio = GPIOA,
 		.init = {
-			.GPIO_Pin   = GPIO_Pin_15,
+			.GPIO_Pin   = GPIO_Pin_9,
 			.GPIO_Speed = GPIO_Speed_25MHz,
 			.GPIO_Mode  = GPIO_Mode_IN,
 			.GPIO_OType = GPIO_OType_OD,
@@ -360,6 +359,83 @@ const struct pios_usb_cdc_cfg pios_usb_cdc_cfg = {
 
 #if defined(PIOS_INCLUDE_VIDEO)
 
+static const TIM_TimeBaseInitTypeDef tim_8_time_base = {
+	.TIM_Prescaler = (PIOS_PERIPHERAL_APB2_CLOCK / 1000000) - 1,
+	.TIM_ClockDivision = TIM_CKD_DIV1,
+	.TIM_CounterMode = TIM_CounterMode_Up,
+	.TIM_Period = ((1000000 / 50000) - 1),
+	.TIM_RepetitionCounter = 0x0000,
+};
+
+static const struct pios_tim_clock_cfg tim_8_cfg = {
+	.timer = TIM8,
+	.time_base_init = &tim_8_time_base,
+	.irq = {
+		.init = {
+			.NVIC_IRQChannel                   = TIM8_CC_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
+			.NVIC_IRQChannelSubPriority        = 0,
+			.NVIC_IRQChannelCmd                = ENABLE,
+		},
+	},
+};
+
+/**
+ * Pios servo configuration structures
+ */
+#include <pios_servo_priv.h>
+static const struct pios_tim_channel pios_tim_servoport_all_pins[] = {
+		{
+			.timer = TIM8,
+			.timer_chan = TIM_Channel_3,
+			.pin = {
+				.gpio = GPIOC,
+				.init = {
+					.GPIO_Pin = GPIO_Pin_8,
+					.GPIO_Speed = GPIO_Speed_2MHz,
+					.GPIO_Mode  = GPIO_Mode_AF,
+					.GPIO_OType = GPIO_OType_PP,
+					.GPIO_PuPd  = GPIO_PuPd_UP
+				},
+				.pin_source = GPIO_PinSource8,
+			},
+			.remap = GPIO_AF_TIM8,
+		},
+		{
+			.timer = TIM8,
+			.timer_chan = TIM_Channel_4,
+			.pin = {
+				.gpio = GPIOC,
+				.init = {
+					.GPIO_Pin = GPIO_Pin_9,
+					.GPIO_Speed = GPIO_Speed_2MHz,
+					.GPIO_Mode  = GPIO_Mode_AF,
+					.GPIO_OType = GPIO_OType_PP,
+					.GPIO_PuPd  = GPIO_PuPd_UP
+				},
+				.pin_source = GPIO_PinSource9,
+			},
+			.remap = GPIO_AF_TIM8,
+		},
+};
+
+const struct pios_servo_cfg pios_servo_cfg = {
+	.tim_oc_init = {
+		.TIM_OCMode = TIM_OCMode_PWM1,
+		.TIM_OutputState = TIM_OutputState_Enable,
+		.TIM_OutputNState = TIM_OutputNState_Disable,
+		.TIM_Pulse = 0,
+		.TIM_OCPolarity = TIM_OCPolarity_High,
+		.TIM_OCNPolarity = TIM_OCPolarity_High,
+		.TIM_OCIdleState = TIM_OCIdleState_Reset,
+		.TIM_OCNIdleState = TIM_OCNIdleState_Reset,
+	},
+	.channels = pios_tim_servoport_all_pins,
+	.num_channels = NELEMENTS(pios_tim_servoport_all_pins),
+};
+
+
+
 #include <pios_video.h>
 static const struct pios_exti_cfg pios_exti_hsync_cfg __exti_config = {
 	.vector = PIOS_Hsync_ISR,
@@ -388,6 +464,7 @@ static const struct pios_exti_cfg pios_exti_hsync_cfg __exti_config = {
 			.EXTI_Mode = EXTI_Mode_Interrupt,
 			//.EXTI_Trigger = EXTI_Trigger_Rising_Falling,
 			.EXTI_Trigger = EXTI_Trigger_Falling,
+			//.EXTI_Trigger = EXTI_Trigger_Rising,
 			.EXTI_LineCmd = ENABLE,
 		},
 	},
@@ -612,8 +689,6 @@ static const struct pios_video_cfg pios_video_cfg = {
 		.TIM_OCNIdleState = TIM_OCNIdleState_Reset,
 	},
 };
-
-
 
 
 

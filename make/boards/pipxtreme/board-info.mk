@@ -1,13 +1,21 @@
 BOARD_TYPE          := 0x03
 BOARD_REVISION      := 0x01
-BOOTLOADER_VERSION  := 0x01
+BOOTLOADER_VERSION  := 0x02
 HW_TYPE             := 0x01
 
 MCU                 := cortex-m3
 CHIP                := STM32F103CBT
 BOARD               := STM32103CB_PIPXTREME
 MODEL               := MD
-MODEL_SUFFIX        := 
+MODEL_SUFFIX        := _PX
+
+OPENOCD_CONFIG      := stm32f1x.cfg
+
+OPENOCD_JTAG_CONFIG := foss-jtag.revb.cfg
+OPENOCD_CONFIG      := stm32f1x.cfg
+
+OPENOCD_JTAG_CONFIG := foss-jtag.revb.cfg
+OPENOCD_CONFIG      := stm32f1x.cfg
 
 OPENOCD_JTAG_CONFIG := foss-jtag.revb.cfg
 OPENOCD_CONFIG      := stm32f1x.cfg

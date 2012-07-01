@@ -63,6 +63,7 @@
 #define STACK_SIZE_BYTES 540
 #define TASK_PRIORITY (tskIDLE_PRIORITY+3)
 
+#define SENSOR_PERIOD 4
 #define UPDATE_RATE  25.0f
 #define GYRO_NEUTRAL 1665
 
@@ -183,22 +184,21 @@ static void AttitudeTask(void *parameters)
 	bool cc3d = bdinfo->board_rev == 0x02;
 
 	if(cc3d) {
-#if defined(PIOS_INCLUDE_BMA180)
-		accel_test = PIOS_BMA180_Test();
-#endif
-#if defined(PIOS_INCLUDE_L3GD20)
-		gyro_test = PIOS_L3GD20_Test();
+#if defined(PIOS_INCLUDE_MPU6000)
+		gyro_test = PIOS_MPU6000_Test();
 #endif
 	} else {
 #if defined(PIOS_INCLUDE_ADXL345)
 		accel_test = PIOS_ADXL345_Test();
 #endif
-		
+
+#if defined(PIOS_INCLUDE_ADC)
 		// Create queue for passing gyro data, allow 2 back samples in case
 		gyro_queue = xQueueCreate(1, sizeof(float) * 4);
 		PIOS_Assert(gyro_queue != NULL);
 		PIOS_ADC_SetQueue(gyro_queue);
 		PIOS_ADC_Config((PIOS_ADC_RATE / 1000.0f) * UPDATE_RATE);
+#endif
 
 	}
 	// Force settings update to make sure rotation loaded
@@ -234,18 +234,21 @@ static void AttitudeTask(void *parameters)
 
 		AccelsData accels;
 		GyrosData gyros;
-		int32_t retval;
-		if(cc3d) 
+		int32_t retval = 0;
+
+		if (cc3d)
 			retval = updateSensorsCC3D(&accels, &gyros);
 		else
 			retval = updateSensors(&accels, &gyros);
 
-		if(retval != 0)
+		// Only update attitude when sensor data is good
+		if (retval != 0)
 			AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
 		else {
-			// Only update attitude when sensor data is good
-			updateAttitude(&accels, &gyros);
-			AccelsSet(&accels);
+			// Do not update attitude data in simulation mode
+			if (!AttitudeActualReadOnly())
+				updateAttitude(&accels, &gyros);
+
 			AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
 		}
 	}
@@ -268,7 +271,11 @@ static int32_t updateSensors(AccelsData * accels, GyrosData * gyros)
 		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
 		return -1;
 	}
-	
+
+	// Do not read raw sensor data in simulation mode
+	if (GyrosReadOnly() || AccelsReadOnly())
+		return 0;
+
 	// No accel data available
 	if(PIOS_ADXL345_FifoElements() == 0)
 		return -1;
@@ -345,9 +352,8 @@ static int32_t updateSensors(AccelsData * accels, GyrosData * gyros)
 	// and make it average zero (weakly)
 	gyro_correct_int[2] += - gyros->z * yawBiasRate;
 
-	gyros_passed[0] = gyros->x;
-	gyros_passed[1] = gyros->y;
-	gyros_passed[2] = gyros->z;
+	GyrosSet(gyros);
+	AccelsSet(accels);
 
 	return 0;
 }
@@ -357,111 +363,62 @@ static int32_t updateSensors(AccelsData * accels, GyrosData * gyros)
  * @param[in] attitudeRaw Populate the UAVO instead of saving right here
  * @return 0 if successfull, -1 if not
  */
-struct pios_bma180_data accel;
-struct pios_l3gd20_data gyro;
+struct pios_mpu6000_data mpu6000_data;
 static int32_t updateSensorsCC3D(AccelsData * accelsData, GyrosData * gyrosData)
 {
-	static portTickType lastSysTime;
-	uint32_t accel_samples = 0;
-	int32_t accel_accum[3] = {0, 0, 0};
-	float gyro_scaling = 1;
-	float gyros_accum[3] = {0, 0, 0};
-	float accel_scaling = 1;
-
-#if defined(PIOS_INCLUDE_L3GD20)
-	xQueueHandle gyro_queue = PIOS_L3GD20_GetQueue();
-	struct pios_l3gd20_data gyro;
-	gyro_scaling = PIOS_L3GD20_GetScale();
-
-	if(xQueueReceive(gyro_queue, (void *) &gyro, 3) == errQUEUE_EMPTY) {
-		// Unfortunately if the L3GD20 ever misses getting read, then it will not
-		// trigger more interrupts.  In this case we must force a read to kickstart
-		// it.
-		PIOS_L3GD20_ReadGyros(&gyro);	
-		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
-		return -1;
-	}
-
-	gyrosData->x = gyro.gyro_x * gyro_scaling;
-	gyrosData->y = -gyro.gyro_y * gyro_scaling;
-	gyrosData->z = -gyro.gyro_z * gyro_scaling;
-	gyrosData->temperature = 0;
-	GyrosSet(gyrosData);
-
-	gyros_accum[0] = gyrosData->x;
-	gyros_accum[1] = gyrosData->y;
-	gyros_accum[2] = gyrosData->z;
+	float accels[3], gyros[3];
 	
-	if(xQueueReceive(gyro_queue, (void * const) &gyro, 3) == errQUEUE_EMPTY) {
-		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
-		return -1;
-	}
-
-	gyrosData->x = gyro.gyro_x * gyro_scaling;
-	gyrosData->y = -gyro.gyro_y * gyro_scaling;
-	gyrosData->z = -gyro.gyro_z * gyro_scaling;
-	gyrosData->temperature = 0;
-
-	gyros_accum[0] += gyrosData->x;
-	gyros_accum[1] += gyrosData->y;
-	gyros_accum[2] += gyrosData->z;
-
-	if(xQueueReceive(gyro_queue, (void * const) &gyro, 3) == errQUEUE_EMPTY) {
-		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
-		return -1;
-	}
+#if defined(PIOS_INCLUDE_MPU6000)
 	
-	gyrosData->x = gyro.gyro_x * gyro_scaling;
-	gyrosData->y = -gyro.gyro_y * gyro_scaling;
-	gyrosData->z = -gyro.gyro_z * gyro_scaling;
-	gyrosData->temperature = 0;
-	GyrosSet(gyrosData);
-
-	gyros_accum[0] += gyrosData->x;
-	gyros_accum[1] += gyrosData->y;
-	gyros_accum[2] += gyrosData->z;
+	xQueueHandle queue = PIOS_MPU6000_GetQueue();
 	
-	gyros_passed[0] = gyros_accum[0] / 3;
-	gyros_passed[1] = gyros_accum[1] / 3;
-	gyros_passed[2] = gyros_accum[2] / 3;
-#endif	
+	if(xQueueReceive(queue, (void *) &mpu6000_data, SENSOR_PERIOD) == errQUEUE_EMPTY)
+		return -1;	// Error, no data
 
-#if defined(PIOS_INCLUDE_BMA180)
-	struct pios_bma180_data accel;
-	accel_samples = 0;
-	bool error = false;
-	int32_t accel_read_good;
+	gyros[0] = -mpu6000_data.gyro_y * PIOS_MPU6000_GetScale();
+	gyros[1] = -mpu6000_data.gyro_x * PIOS_MPU6000_GetScale();
+	gyros[2] = -mpu6000_data.gyro_z * PIOS_MPU6000_GetScale();
 	
-	while((accel_read_good = PIOS_BMA180_ReadFifo(&accel)) != 0 && !error)
-		error = ((xTaskGetTickCount() - lastSysTime) > 5) ? true : error;
-	if (error) {
-		// Unfortunately if the BMA180 ever misses getting read, then it will not
-		// trigger more interrupts.  In this case we must force a read to kickstart
-		// it.
-		PIOS_BMA180_ReadAccels(&accel);
-		lastSysTime = xTaskGetTickCount();
-		return -1;
-	}
-	while(accel_read_good == 0) {	
-		accel_samples++;
-		
-		accel_accum[0] += accel.x;
-		accel_accum[1] += accel.y;
-		accel_accum[2] += accel.z;
-		
-		accel_read_good = PIOS_BMA180_ReadFifo(&accel);
-	}
-	accel_scaling = PIOS_BMA180_GetScale();
+	accels[0] = -mpu6000_data.accel_y * PIOS_MPU6000_GetAccelScale();
+	accels[1] = -mpu6000_data.accel_x * PIOS_MPU6000_GetAccelScale();
+	accels[2] = -mpu6000_data.accel_z * PIOS_MPU6000_GetAccelScale();
+
+	gyrosData->temperature = 35.0f + ((float) mpu6000_data.temperature + 512.0f) / 340.0f;
+	accelsData->temperature = 35.0f + ((float) mpu6000_data.temperature + 512.0f) / 340.0f;
 #endif
-	
-	float accels[3] = {(float) -accel_accum[1] / accel_samples, (float) -accel_accum[0] / accel_samples, -(float) accel_accum[2] / accel_samples};
-	
-	accelsData->x = (accels[0] - accelbias[0]) * accel_scaling;
-	accelsData->y = (accels[1] - accelbias[1]) * accel_scaling;
-	accelsData->z = (accels[2] - accelbias[2]) * accel_scaling;
-	
-	lastSysTime = xTaskGetTickCount();
-	
+
+	if(rotate) {
+		// TODO: rotate sensors too so stabilization is well behaved
+		float vec_out[3];
+		rot_mult(R, accels, vec_out);
+		accels[0] = vec_out[0];
+		accels[1] = vec_out[1];
+		accels[2] = vec_out[2];
+		rot_mult(R, gyros, vec_out);
+		gyros[0] = vec_out[0];
+		gyros[1] = vec_out[1];
+		gyros[2] = vec_out[2];
+	}
+
+	accelsData->x = accels[0] - accelbias[0] * ACCEL_SCALE; // Applying arbitrary scale here to match CC v1
+	accelsData->y = accels[1] - accelbias[1] * ACCEL_SCALE;
+	accelsData->z = accels[2] - accelbias[2] * ACCEL_SCALE;
+	AccelsSet(&accelsData);
+
+	gyrosData->x = gyros[0];
+	gyrosData->y = gyros[1];
+	gyrosData->z = gyros[2];
+
+	if(bias_correct_gyro) {
+		// Applying integral component here so it can be seen on the gyros and correct bias
+		gyrosData->x += gyro_correct_int[0];
+		gyrosData->y += gyro_correct_int[1];
+		gyrosData->z += gyro_correct_int[2];
+	}
+
+	GyrosSet(gyrosData);
+	AccelsSet(accelsData);
+
 	return 0;
 }
 
@@ -475,7 +432,7 @@ static void updateAttitude(AccelsData * accelsData, GyrosData * gyrosData)
 	lastSysTime = thisSysTime;
 	
 	// Bad practice to assume structure order, but saves memory
-	float * gyros = gyros_passed;
+	float * gyros = &gyrosData->x;
 	float * accels = &accelsData->x;
 	
 	float grot[3];
@@ -489,6 +446,9 @@ static void updateAttitude(AccelsData * accelsData, GyrosData * gyrosData)
 	
 	// Account for accel magnitude
 	float accel_mag = sqrtf(accels[0]*accels[0] + accels[1]*accels[1] + accels[2]*accels[2]);
+	if(accel_mag < 1.0e-3f)
+		return;
+
 	accel_err[0] /= accel_mag;
 	accel_err[1] /= accel_mag;
 	accel_err[2] /= accel_mag;

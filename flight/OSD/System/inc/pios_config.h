@@ -54,7 +54,7 @@
 /* Com systems to include */
 #define PIOS_INCLUDE_COM
 #define PIOS_INCLUDE_COM_TELEM
-//#define PIOS_INCLUDE_COM_AUX
+#define PIOS_INCLUDE_COM_AUX
 #define PIOS_INCLUDE_GPS
 //#define PIOS_OVERO_SPI
 

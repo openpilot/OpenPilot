@@ -87,6 +87,7 @@
 
 /* User control functionality */
 #define PIOS_MPU6000_USERCTL_FIFO_EN      0X40
+#define PIOS_MPU6000_USERCTL_DIS_I2C      0X10
 #define PIOS_MPU6000_USERCTL_FIFO_RST     0X02
 #define PIOS_MPU6000_USERCTL_GYRO_RST     0X01
 
@@ -115,6 +116,13 @@ enum pios_mpu6000_filter {
 	PIOS_MPU6000_LOWPASS_5_HZ   = 0x06
 };
 
+enum pios_mpu6000_accel_range {
+	PIOS_MPU6000_ACCEL_2G = 0x00,
+	PIOS_MPU6000_ACCEL_4G = 0x08,
+	PIOS_MPU6000_ACCEL_8G = 0x10,
+	PIOS_MPU6000_ACCEL_16G = 0x18
+};
+
 struct pios_mpu6000_data {
 	int16_t gyro_x;
 	int16_t gyro_y;
@@ -136,14 +144,14 @@ struct pios_mpu6000_cfg {
 	uint8_t interrupt_en;	/* Interrupt configuration (See datasheet page 35 for more details) */
 	uint8_t User_ctl;		/* User control settings (See datasheet page 41 for more details)  */
 	uint8_t Pwr_mgmt_clk;	/* Power management and clock selection (See datasheet page 32 for more details) */
+	enum pios_mpu6000_accel_range accel_range;
 	enum pios_mpu6000_range gyro_range;
 	enum pios_mpu6000_filter filter;
 };
 
 /* Public Functions */
-extern void PIOS_MPU6000_Init(const struct pios_mpu6000_cfg * cfg);
-extern void PIOS_MPU6000_Attach(uint32_t spi_id);
-extern int32_t PIOS_MPU6000_ReadFifo(struct pios_mpu6000_data * buffer);
+extern int32_t PIOS_MPU6000_Init(uint32_t spi_id, uint32_t slave_num, const struct pios_mpu6000_cfg * new_cfg);
+extern xQueueHandle PIOS_MPU6000_GetQueue();
 extern int32_t PIOS_MPU6000_ReadGyros(struct pios_mpu6000_data * buffer);
 extern int32_t PIOS_MPU6000_ReadID();
 extern uint8_t PIOS_MPU6000_Test();

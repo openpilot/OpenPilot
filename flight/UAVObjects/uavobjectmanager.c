@@ -37,13 +37,22 @@
 
 // Private types
 
+// Macros
+#define SET_BITS(var, shift, value, mask) var = (var & ~(mask << shift)) | (value << shift);
+#define OLGetIsMetaobject(olp)  ((olp)->flags & OL_IS_METAOBJECT)
+#define OLSetIsMetaobject(olp, val)  ((olp)->flags = (((val) == 0) ? ((olp)->flags & ~OL_IS_METAOBJECT) : ((olp)->flags | OL_IS_METAOBJECT)))
+#define OLGetIsSingleInstance(olp)  ((olp)->flags & OL_IS_SINGLE_INSTANCE)
+#define OLSetIsSingleInstance(olp, val)  ((olp)->flags = (((val) == 0) ? ((olp)->flags & ~OL_IS_SINGLE_INSTANCE) : ((olp)->flags | OL_IS_SINGLE_INSTANCE)))
+#define OLGetIsSettings(olp)  ((olp)->flags & OL_IS_SETTINGS)
+#define OLSetIsSettings(olp, val)  ((olp)->flags = (((val) == 0) ? ((olp)->flags & ~OL_IS_SETTINGS) : ((olp)->flags | OL_IS_SETTINGS)))
+
 /**
  * List of event queues and the eventmask associated with the queue.
  */
 struct ObjectEventListStruct {
 	  xQueueHandle queue;
 	  UAVObjEventCallback cb;
-	  int32_t eventMask;
+	  uint8_t eventMask;
 	  struct ObjectEventListStruct *next;
 };
 typedef struct ObjectEventListStruct ObjectEventList;
@@ -58,6 +67,12 @@ struct ObjectInstListStruct {
 };
 typedef struct ObjectInstListStruct ObjectInstList;
 
+typedef enum {
+	OL_IS_METAOBJECT = 0x01, /** Set if this is a metaobject */
+	OL_IS_SINGLE_INSTANCE = 0x02, /** Set if this object has a single instance */
+	OL_IS_SETTINGS = 0x04 /** Set if this object is a settings object */
+} ObjectListFlags;
+	
 /**
  * List of objects registered in the object manager
  */
@@ -66,12 +81,8 @@ struct ObjectListStruct {
 		     /** The object ID */
 	  const char *name;
 			  /** The object name */
-	  int8_t isMetaobject;
-			     /** Set to 1 if this is a metaobject */
-	  int8_t isSingleInstance;
-				 /** Set to 1 if this object has a single instance */
-	  int8_t isSettings;
-			   /** Set to 1 if this object is a settings object */
+	  ObjectListFlags flags;
+                               /** The object list mode flags */
 	  uint16_t numBytes;
 			   /** Number of data bytes contained in the object (for a single instance) */
 	  uint16_t numInstances;
@@ -93,7 +104,7 @@ static int32_t sendEvent(ObjectList * obj, uint16_t instId,
 static ObjectInstList *createInstance(ObjectList * obj, uint16_t instId);
 static ObjectInstList *getInstance(ObjectList * obj, uint16_t instId);
 static int32_t connectObj(UAVObjHandle obj, xQueueHandle queue,
-			  UAVObjEventCallback cb, int32_t eventMask);
+			  UAVObjEventCallback cb, uint8_t eventMask);
 static int32_t disconnectObj(UAVObjHandle obj, xQueueHandle queue,
 			     UAVObjEventCallback cb);
 
@@ -125,16 +136,7 @@ int32_t UAVObjInitialize()
 		    return -1;
 
 	  // Initialize default metadata structure (metadata of metaobjects)
-	  defMetadata.access = ACCESS_READWRITE;
-	  defMetadata.gcsAccess = ACCESS_READWRITE;
-	  defMetadata.telemetryAcked = 1;
-	  defMetadata.telemetryUpdateMode = UPDATEMODE_ONCHANGE;
-	  defMetadata.telemetryUpdatePeriod = 0;
-	  defMetadata.gcsTelemetryAcked = 1;
-	  defMetadata.gcsTelemetryUpdateMode = UPDATEMODE_ONCHANGE;
-	  defMetadata.gcsTelemetryUpdatePeriod = 0;
-	  defMetadata.loggingUpdateMode = UPDATEMODE_ONCHANGE;
-	  defMetadata.loggingUpdatePeriod = 0;
+	  UAVObjMetadataInitialize(&defMetadata);
 
 	  // Done
 	  return 0;
@@ -204,9 +206,9 @@ UAVObjHandle UAVObjRegister(uint32_t id, const char *name,
 	  }
 	  objEntry->id = id;
 	  objEntry->name = name;
-	  objEntry->isMetaobject = (int8_t) isMetaobject;
-	  objEntry->isSingleInstance = (int8_t) isSingleInstance;
-	  objEntry->isSettings = (int8_t) isSettings;
+	  OLSetIsMetaobject(objEntry, isMetaobject);
+	  OLSetIsSingleInstance(objEntry, isSingleInstance);
+	  OLSetIsSettings(objEntry, isSettings);
 	  objEntry->numBytes = numBytes;
 	  objEntry->events = NULL;
 	  objEntry->numInstances = 0;
@@ -243,11 +245,11 @@ UAVObjHandle UAVObjRegister(uint32_t id, const char *name,
 		    initCb((UAVObjHandle) objEntry, 0);
 	  }
 	  // Attempt to load object's metadata from the SD card (not done directly on the metaobject, but through the object)
-	  if (!objEntry->isMetaobject) {
+	  if (!OLGetIsMetaobject(objEntry)) {
 		    UAVObjLoad((UAVObjHandle) objEntry->linkedObj, 0);
 	  }
 	  // If this is a settings object, attempt to load from SD card
-	  if (objEntry->isSettings) {
+	  if (OLGetIsSettings(objEntry)) {
 		    UAVObjLoad((UAVObjHandle) objEntry, 0);
 	  }
 	  // Release lock
@@ -403,7 +405,7 @@ uint16_t UAVObjCreateInstance(UAVObjHandle obj,
  */
 int32_t UAVObjIsSingleInstance(UAVObjHandle obj)
 {
-	  return ((ObjectList *) obj)->isSingleInstance;
+	  return OLGetIsSingleInstance((ObjectList *) obj);
 }
 
 /**
@@ -413,7 +415,7 @@ int32_t UAVObjIsSingleInstance(UAVObjHandle obj)
  */
 int32_t UAVObjIsMetaobject(UAVObjHandle obj)
 {
-	  return ((ObjectList *) obj)->isMetaobject;
+	  return OLGetIsMetaobject((ObjectList *) obj);
 }
 
 /**
@@ -423,7 +425,7 @@ int32_t UAVObjIsMetaobject(UAVObjHandle obj)
  */
 int32_t UAVObjIsSettings(UAVObjHandle obj)
 {
-	  return ((ObjectList *) obj)->isSettings;
+	  return OLGetIsSettings((ObjectList *) obj);
 }
 
 /**
@@ -539,7 +541,7 @@ int32_t UAVObjSaveToFile(UAVObjHandle obj, uint16_t instId,
 		      &bytesWritten);
 
 	  // Write the instance ID
-	  if (!objEntry->isSingleInstance) {
+	  if (!OLGetIsSingleInstance(objEntry)) {
 		    PIOS_FWRITE(file, &instEntry->instId,
 				sizeof(instEntry->instId), &bytesWritten);
 	  }
@@ -658,7 +660,7 @@ UAVObjHandle UAVObjLoadFromFile(FILEINFO * file)
 
 	  // Get the instance ID
 	  instId = 0;
-	  if (!objEntry->isSingleInstance) {
+	  if (!OLGetIsSingleInstance(objEntry)) {
 		    if (PIOS_FREAD
 			(file, &instId, sizeof(instId), &bytesRead)) {
 			      xSemaphoreGiveRecursive(mutex);
@@ -719,10 +721,11 @@ int32_t UAVObjLoad(UAVObjHandle obj, uint16_t instId)
 		return -1;
 
 	// Fire event on success
-	if (PIOS_FLASHFS_ObjLoad(obj, instId, instEntry->data) == 0)
+	int32_t retval;
+	if ((retval = PIOS_FLASHFS_ObjLoad(obj, instId, instEntry->data)) == 0)
 		sendEvent(objEntry, instId, EV_UNPACKED);
 	else
-		return -1;
+		return retval;
 #endif
 
 #if defined(PIOS_INCLUDE_SDCARD)
@@ -822,7 +825,7 @@ int32_t UAVObjSaveSettings()
 	  // Save all settings objects
 	  LL_FOREACH(objList, objEntry) {
 		    // Check if this is a settings object
-		    if (objEntry->isSettings) {
+		    if (OLGetIsSettings(objEntry)) {
 			      // Save object
 			      if (UAVObjSave((UAVObjHandle) objEntry, 0) ==
 				  -1) {
@@ -851,7 +854,7 @@ int32_t UAVObjLoadSettings()
 	  // Load all settings objects
 	  LL_FOREACH(objList, objEntry) {
 		    // Check if this is a settings object
-		    if (objEntry->isSettings) {
+		    if (OLGetIsSettings(objEntry)) {
 			      // Load object
 			      if (UAVObjLoad((UAVObjHandle) objEntry, 0) ==
 				  -1) {
@@ -880,7 +883,7 @@ int32_t UAVObjDeleteSettings()
 	  // Save all settings objects
 	  LL_FOREACH(objList, objEntry) {
 		    // Check if this is a settings object
-		    if (objEntry->isSettings) {
+		    if (OLGetIsSettings(objEntry)) {
 			      // Save object
 			      if (UAVObjDelete((UAVObjHandle) objEntry, 0)
 				  == -1) {
@@ -909,7 +912,7 @@ int32_t UAVObjSaveMetaobjects()
 	  // Save all settings objects
 	  LL_FOREACH(objList, objEntry) {
 		    // Check if this is a settings object
-		    if (objEntry->isMetaobject) {
+		    if (OLGetIsMetaobject(objEntry)) {
 			      // Save object
 			      if (UAVObjSave((UAVObjHandle) objEntry, 0) ==
 				  -1) {
@@ -938,7 +941,7 @@ int32_t UAVObjLoadMetaobjects()
 	  // Load all settings objects
 	  LL_FOREACH(objList, objEntry) {
 		    // Check if this is a settings object
-		    if (objEntry->isMetaobject) {
+		    if (OLGetIsMetaobject(objEntry)) {
 			      // Load object
 			      if (UAVObjLoad((UAVObjHandle) objEntry, 0) ==
 				  -1) {
@@ -967,7 +970,7 @@ int32_t UAVObjDeleteMetaobjects()
 	  // Load all settings objects
 	  LL_FOREACH(objList, objEntry) {
 		    // Check if this is a settings object
-		    if (objEntry->isMetaobject) {
+		    if (OLGetIsMetaobject(objEntry)) {
 			      // Load object
 			      if (UAVObjDelete((UAVObjHandle) objEntry, 0)
 				  == -1) {
@@ -1047,11 +1050,11 @@ int32_t UAVObjSetInstanceData(UAVObjHandle obj, uint16_t instId,
 	  objEntry = (ObjectList *) obj;
 
 	  // Check access level
-	  if (!objEntry->isMetaobject) {
+	  if (!OLGetIsMetaobject(objEntry)) {
 		    mdata =
 			(UAVObjMetadata *) (objEntry->linkedObj->instances.
 					    data);
-		    if (mdata->access == ACCESS_READONLY) {
+		    if (UAVObjGetAccess(mdata) == ACCESS_READONLY) {
 			      xSemaphoreGiveRecursive(mutex);
 			      return -1;
 		    }
@@ -1094,10 +1097,10 @@ int32_t UAVObjSetInstanceDataField(UAVObjHandle obj, uint16_t instId, const void
 	objEntry = (ObjectList*)obj;
 
 	// Check access level
-	if ( !objEntry->isMetaobject )
+	if ( !OLGetIsMetaobject(objEntry) )
 	{
 		mdata = (UAVObjMetadata*)(objEntry->linkedObj->instances.data);
-		if ( mdata->access == ACCESS_READONLY )
+		if ( UAVObjGetAccess(mdata) == ACCESS_READONLY )
 		{
 			xSemaphoreGiveRecursive(mutex);
 			return -1;
@@ -1223,7 +1226,7 @@ int32_t UAVObjSetMetadata(UAVObjHandle obj, const UAVObjMetadata * dataIn)
 
 	  // Set metadata (metadata of metaobjects can not be modified)
 	  objEntry = (ObjectList *) obj;
-	  if (!objEntry->isMetaobject) {
+	  if (!OLGetIsMetaobject(objEntry)) {
 		    UAVObjSetData((UAVObjHandle) objEntry->linkedObj,
 				  dataIn);
 	  } else {
@@ -1250,7 +1253,7 @@ int32_t UAVObjGetMetadata(UAVObjHandle obj, UAVObjMetadata * dataOut)
 
 	  // Get metadata
 	  objEntry = (ObjectList *) obj;
-	  if (objEntry->isMetaobject) {
+	  if (OLGetIsMetaobject(objEntry)) {
 		    memcpy(dataOut, &defMetadata, sizeof(UAVObjMetadata));
 	  } else {
 		    UAVObjGetData((UAVObjHandle) objEntry->linkedObj,
@@ -1261,6 +1264,136 @@ int32_t UAVObjGetMetadata(UAVObjHandle obj, UAVObjMetadata * dataOut)
 	  xSemaphoreGiveRecursive(mutex);
 	  return 0;
 }
+
+/**
+ * Initialize a UAVObjMetadata object.
+ * \param[in] metadata The metadata object
+ */
+void UAVObjMetadataInitialize(UAVObjMetadata* metadata)
+{
+	metadata->flags =
+		ACCESS_READWRITE << UAVOBJ_ACCESS_SHIFT |
+		ACCESS_READWRITE << UAVOBJ_GCS_ACCESS_SHIFT |
+		1 << UAVOBJ_TELEMETRY_ACKED_SHIFT |
+		1 << UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT |
+		UPDATEMODE_ONCHANGE << UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT |
+		UPDATEMODE_ONCHANGE << UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT;
+	metadata->telemetryUpdatePeriod = 0;
+	metadata->gcsTelemetryUpdatePeriod = 0;
+	metadata->loggingUpdatePeriod = 0;
+}
+
+/**
+ * Get the UAVObject metadata access member
+ * \param[in] metadata The metadata object
+ * \return the access type
+ */
+UAVObjAccessType UAVObjGetAccess(const UAVObjMetadata* metadata)
+{
+	return (metadata->flags >> UAVOBJ_ACCESS_SHIFT) & 1;
+}
+
+/**
+ * Set the UAVObject metadata access member
+ * \param[in] metadata The metadata object
+ * \param[in] mode The access mode
+ */
+void UAVObjSetAccess(UAVObjMetadata* metadata, UAVObjAccessType mode)
+{
+	SET_BITS(metadata->flags, UAVOBJ_ACCESS_SHIFT, mode, 1);
+}
+
+/**
+ * Get the UAVObject metadata GCS access member
+ * \param[in] metadata The metadata object
+ * \return the GCS access type
+ */
+UAVObjAccessType UAVObjGetGcsAccess(const UAVObjMetadata* metadata)
+{
+	return (metadata->flags >> UAVOBJ_GCS_ACCESS_SHIFT) & 1;
+}
+
+/**
+ * Set the UAVObject metadata GCS access member
+ * \param[in] metadata The metadata object
+ * \param[in] mode The access mode
+ */
+void UAVObjSetGcsAccess(UAVObjMetadata* metadata, UAVObjAccessType mode) {
+	SET_BITS(metadata->flags, UAVOBJ_GCS_ACCESS_SHIFT, mode, 1);
+}
+
+/**
+ * Get the UAVObject metadata telemetry acked member
+ * \param[in] metadata The metadata object
+ * \return the telemetry acked boolean
+ */
+uint8_t UAVObjGetTelemetryAcked(const UAVObjMetadata* metadata) {
+	return (metadata->flags >> UAVOBJ_TELEMETRY_ACKED_SHIFT) & 1;
+}
+
+/**
+ * Set the UAVObject metadata telemetry acked member
+ * \param[in] metadata The metadata object
+ * \param[in] val The telemetry acked boolean
+ */
+void UAVObjSetTelemetryAcked(UAVObjMetadata* metadata, uint8_t val) {
+	SET_BITS(metadata->flags, UAVOBJ_TELEMETRY_ACKED_SHIFT, val, 1);
+}
+
+/**
+ * Get the UAVObject metadata GCS telemetry acked member
+ * \param[in] metadata The metadata object
+ * \return the telemetry acked boolean
+ */
+uint8_t UAVObjGetGcsTelemetryAcked(const UAVObjMetadata* metadata) {
+	return (metadata->flags >> UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT) & 1;
+}
+
+/**
+ * Set the UAVObject metadata GCS telemetry acked member
+ * \param[in] metadata The metadata object
+ * \param[in] val The GCS telemetry acked boolean
+ */
+void UAVObjSetGcsTelemetryAcked(UAVObjMetadata* metadata, uint8_t val) {
+	SET_BITS(metadata->flags, UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT, val, 1);
+}
+
+/**
+ * Get the UAVObject metadata telemetry update mode
+ * \param[in] metadata The metadata object
+ * \return the telemetry update mode
+ */
+UAVObjUpdateMode UAVObjGetTelemetryUpdateMode(const UAVObjMetadata* metadata) {
+	return (metadata->flags >> UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT) & UAVOBJ_UPDATE_MODE_MASK;
+}
+
+/**
+ * Set the UAVObject metadata telemetry update mode member
+ * \param[in] metadata The metadata object
+ * \param[in] val The telemetry update mode
+ */
+void UAVObjSetTelemetryUpdateMode(UAVObjMetadata* metadata, UAVObjUpdateMode val) {
+	SET_BITS(metadata->flags, UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT, val, UAVOBJ_UPDATE_MODE_MASK);
+}
+
+/**
+ * Get the UAVObject metadata GCS telemetry update mode
+ * \param[in] metadata The metadata object
+ * \return the GCS telemetry update mode
+ */
+UAVObjUpdateMode UAVObjGetGcsTelemetryUpdateMode(const UAVObjMetadata* metadata) {
+	return (metadata->flags >> UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT) & UAVOBJ_UPDATE_MODE_MASK;
+}
+
+/**
+ * Set the UAVObject metadata GCS telemetry update mode member
+ * \param[in] metadata The metadata object
+ * \param[in] val The GCS telemetry update mode
+ */
+void UAVObjSetGcsTelemetryUpdateMode(UAVObjMetadata* metadata, UAVObjUpdateMode val) {
+	SET_BITS(metadata->flags, UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT, val, UAVOBJ_UPDATE_MODE_MASK);
+}
+
 
 /**
  * Check if an object is read only
@@ -1279,11 +1412,11 @@ int8_t UAVObjReadOnly(UAVObjHandle obj)
 	  objEntry = (ObjectList *) obj;
 
 	  // Check access level
-	  if (!objEntry->isMetaobject) {
+	  if (!OLGetIsMetaobject(objEntry)) {
 		    mdata =
 			(UAVObjMetadata *) (objEntry->linkedObj->instances.
 					    data);
-		    return mdata->access == ACCESS_READONLY;
+		    return UAVObjGetAccess(mdata) == ACCESS_READONLY;
 	  }
 	  return -1;
 }
@@ -1297,7 +1430,7 @@ int8_t UAVObjReadOnly(UAVObjHandle obj)
  * \return 0 if success or -1 if failure
  */
 int32_t UAVObjConnectQueue(UAVObjHandle obj, xQueueHandle queue,
-			   int32_t eventMask)
+			   uint8_t eventMask)
 {
 	  int32_t res;
 	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
@@ -1330,7 +1463,7 @@ int32_t UAVObjDisconnectQueue(UAVObjHandle obj, xQueueHandle queue)
  * \return 0 if success or -1 if failure
  */
 int32_t UAVObjConnectCallback(UAVObjHandle obj, UAVObjEventCallback cb,
-			      int32_t eventMask)
+			      uint8_t eventMask)
 {
 	  int32_t res;
 	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
@@ -1469,7 +1602,7 @@ static ObjectInstList *createInstance(ObjectList * obj, uint16_t instId)
 	  int32_t n;
 
 	  // For single instance objects, only instance zero is allowed
-	  if (obj->isSingleInstance && instId != 0) {
+	  if (OLGetIsSingleInstance(obj) && instId != 0) {
 		    return NULL;
 	  }
 	  // Make sure that the instance ID is within limits
@@ -1543,7 +1676,7 @@ static ObjectInstList *getInstance(ObjectList * obj, uint16_t instId)
  * \return 0 if success or -1 if failure
  */
 static int32_t connectObj(UAVObjHandle obj, xQueueHandle queue,
-			  UAVObjEventCallback cb, int32_t eventMask)
+			  UAVObjEventCallback cb, uint8_t eventMask)
 {
 	  ObjectEventList *eventEntry;
 	  ObjectList *objEntry;

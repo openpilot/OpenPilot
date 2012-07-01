@@ -37,8 +37,8 @@
 
 // Private constants
 #define OVEROSYNC_PACKET_SIZE 1024
-#define MAX_QUEUE_SIZE   10
-#define STACK_SIZE_BYTES 4096
+#define MAX_QUEUE_SIZE   40
+#define STACK_SIZE_BYTES 512
 #define TASK_PRIORITY (tskIDLE_PRIORITY + 0)
 
 // Private types
@@ -235,8 +235,15 @@ static void overoSyncTask(void *parameters)
 	while (1) {
 		// Wait for queue message
 		if (xQueueReceive(queue, &ev, portMAX_DELAY) == pdTRUE) {
-			// Process event.  This calls transmitData
-			UAVTalkSendObject(uavTalkCon, ev.obj, ev.instId, false, 0);
+		
+			// Check it will fit before packetizing
+			if ((overosync->write_pointer + UAVObjGetNumBytes(ev.obj) + 12) >=
+				sizeof(overosync->transactions[overosync->loading_transaction_id].tx_buffer)) {
+				overosync->failed_objects ++;
+			} else {
+				// Process event.  This calls transmitData
+				UAVTalkSendObject(uavTalkCon, ev.obj, ev.instId, false, 0);
+			}
 
 			updateTime = xTaskGetTickCount();
 			if(((portTickType) (updateTime - lastUpdateTime)) > 1000) {

@@ -29,7 +29,7 @@
 #include "configoutputwidget.h"
 
 OutputChannelForm::OutputChannelForm(const int index, QWidget *parent, const bool showLegend) :
-        QWidget(parent),
+        ConfigTaskWidget(parent),
         ui(),
         m_index(index),
         m_inChannelTest(false)
@@ -70,6 +70,8 @@ OutputChannelForm::OutputChannelForm(const int index, QWidget *parent, const boo
     ui.actuatorLink->setChecked(false);
     connect(ui.actuatorLink, SIGNAL(toggled(bool)),
             this, SLOT(linkToggled(bool)));
+
+    disableMouseWheelEvents();
 }
 
 OutputChannelForm::~OutputChannelForm()

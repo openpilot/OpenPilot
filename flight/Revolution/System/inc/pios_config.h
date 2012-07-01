@@ -39,7 +39,7 @@
 #define PIOS_INCLUDE_BL_HELPER
 
 /* Enable/Disable PiOS Modules */
-//#define PIOS_INCLUDE_ADC
+#define PIOS_INCLUDE_ADC
 #define PIOS_INCLUDE_DELAY
 #define PIOS_INCLUDE_I2C
 #define PIOS_INCLUDE_IRQ
@@ -63,6 +63,7 @@
 #define PIOS_MPU6000_ACCEL
 #define PIOS_INCLUDE_L3GD20
 #define PIOS_INCLUDE_MS5611
+#define PIOS_INCLUDE_ETASV3
 //#define PIOS_INCLUDE_HCSR04
 #define PIOS_FLASH_ON_ACCEL /* true for second revo */
 #define FLASH_FREERTOS
@@ -94,12 +95,12 @@
 /* Flags that alter behaviors - mostly to lower resources for CC */
 #define PIOS_INCLUDE_INITCALL           /* Include init call structures */
 #define PIOS_TELEM_PRIORITY_QUEUE       /* Enable a priority queue in telemetry */
-#define PIOS_QUATERNION_STABILIZATION   /* Stabilization options */
-//#define PIOS_GPS_SETS_HOMELOCATION      /* GPS options */
+//#define PIOS_QUATERNION_STABILIZATION   /* Stabilization options */
+#define PIOS_GPS_SETS_HOMELOCATION      /* GPS options */
 
 /* Alarm Thresholds */
-#define HEAP_LIMIT_WARNING		4000
-#define HEAP_LIMIT_CRITICAL		1000
+#define HEAP_LIMIT_WARNING		1000
+#define HEAP_LIMIT_CRITICAL		500
 #define IRQSTACK_LIMIT_WARNING		150
 #define IRQSTACK_LIMIT_CRITICAL		80
 #define CPULOAD_LIMIT_WARNING		80

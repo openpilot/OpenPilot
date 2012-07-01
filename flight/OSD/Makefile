@@ -53,7 +53,6 @@ MODULES = Osd/osdgen
 MODULES += GPS
 
 #MODULES += Osd/osdinput
-#MODULES += COTelemetry
 MODULES += Telemetry
 MODULES += FirmwareIAP
 
@@ -137,8 +136,8 @@ SRC += $(OPUAVSYNTHDIR)/systemsettings.c
 #SRC += $(OPUAVSYNTHDIR)/attituderaw.c
 SRC += $(OPUAVSYNTHDIR)/attitudeactual.c
 #SRC += $(OPUAVSYNTHDIR)/manualcontrolcommand.c
-#SRC += $(OPUAVSYNTHDIR)/i2cstats.c
-#S#RC += $(OPUAVSYNTHDIR)/watchdogstatus.c
+SRC += $(OPUAVSYNTHDIR)/i2cstats.c
+SRC += $(OPUAVSYNTHDIR)/watchdogstatus.c
 #SRC += $(OPUAVSYNTHDIR)/telemetrysettings.c
 #SRC += $(OPUAVSYNTHDIR)/manualcontrolsettings.c
 #SRC += $(OPUAVSYNTHDIR)/mixersettings.c
@@ -167,6 +166,7 @@ SRC += $(PIOSCOMMON)/pios_crc.c
 SRC += $(PIOSCOMMON)/pios_video.c
 SRC += $(PIOSCOMMON)/pios_usb_desc_hid_cdc.c
 SRC += $(PIOSCOMMON)/pios_usb_desc_hid_only.c
+SRC += $(PIOSCOMMON)/pios_usb_util.c
 
 # optional component libraries
 include $(PIOSCOMMONLIB)/FreeRTOS/library.mk
@@ -265,8 +265,8 @@ endif
 CFLAGS += $(ARCHFLAGS)
 
 
-#CFLAGS += -DDIAGNOSTICS
-#CFLAGS += -DDIAG_TASKS
+CFLAGS += -DDIAGNOSTICS
+CFLAGS += -DDIAG_TASKS
 
 # This is not the best place for these.  Really should abstract out
 # to the board file or something

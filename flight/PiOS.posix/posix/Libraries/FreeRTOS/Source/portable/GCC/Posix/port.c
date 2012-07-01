@@ -588,6 +588,8 @@ void vPortClearInterruptMask( portBASE_TYPE xMask )
  */
 void vPortSystemTickHandler()
 {
+	static portBASE_TYPE missedTicks = 0;
+
 	/**
 	 * the problem with the tick handler is, that it runs outside of the schedulers domain - worse,
 	 * on a multi core machine there might be a task running *right now*
@@ -598,6 +600,7 @@ void vPortSystemTickHandler()
 	/* thread MUST be running */
 	if ( prvGetThreadHandle(xTaskGetCurrentTaskHandle())->threadStatus!=THREAD_RUNNING ) {
 		xPendYield = pdTRUE;
+		missedTicks++;
 		PORT_UNLOCK( xGuardMutex );
 		return;
 	}
@@ -605,6 +608,7 @@ void vPortSystemTickHandler()
 	/* interrupts MUST be enabled */
 	if ( xInterruptsEnabled != pdTRUE ) {
 		xPendYield = pdTRUE;
+		missedTicks++;
 		PORT_UNLOCK( xGuardMutex );
 		return;
 	}
@@ -646,9 +650,11 @@ void vPortSystemTickHandler()
 	 */
 
 	/**
-	 * call tick handler
+	 * call tick handler for every missed tick plus one
 	 */
-	vTaskIncrementTick();
+	for (portBASE_TYPE t = 0; t <= missedTicks; t++)
+		vTaskIncrementTick();
+	missedTicks = 0;
 
 	
 #if ( configUSE_PREEMPTION == 1 )

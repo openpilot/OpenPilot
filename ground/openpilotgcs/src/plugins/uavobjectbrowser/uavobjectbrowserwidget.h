@@ -53,6 +53,7 @@ public:
 
 public slots:
     void showMetaData(bool show);
+    void categorize(bool categorize);
 
 private slots:
     void sendUpdate();

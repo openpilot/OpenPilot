@@ -38,7 +38,7 @@
 #include <QtCore/QSignalMapper>
 #include <QtCore/QDebug>
 
-UAVObjectTreeModel::UAVObjectTreeModel(QObject *parent) :
+UAVObjectTreeModel::UAVObjectTreeModel(QObject *parent, bool categorize) :
         QAbstractItemModel(parent),
         m_recentlyUpdatedTimeout(500), // ms
         m_recentlyUpdatedColor(QColor(255, 230, 230)),
@@ -53,7 +53,7 @@ UAVObjectTreeModel::UAVObjectTreeModel(QObject *parent) :
     connect(objManager, SIGNAL(newInstance(UAVObject*)), this, SLOT(newObject(UAVObject*)));
 
     TreeItem::setHighlightTime(m_recentlyUpdatedTimeout);
-    setupModelData(objManager);
+    setupModelData(objManager, categorize);
 }
 
 UAVObjectTreeModel::~UAVObjectTreeModel()
@@ -62,7 +62,7 @@ UAVObjectTreeModel::~UAVObjectTreeModel()
     delete m_rootItem;
 }
 
-void UAVObjectTreeModel::setupModelData(UAVObjectManager *objManager)
+void UAVObjectTreeModel::setupModelData(UAVObjectManager *objManager, bool categorize)
 {
     // root
     QList<QVariant> rootData;
@@ -82,7 +82,7 @@ void UAVObjectTreeModel::setupModelData(UAVObjectManager *objManager)
     QList< QList<UAVDataObject*> > objList = objManager->getDataObjects();
     foreach (QList<UAVDataObject*> list, objList) {
         foreach (UAVDataObject* obj, list) {
-            addDataObject(obj);
+            addDataObject(obj, categorize);
         }
     }
 }
@@ -95,13 +95,13 @@ void UAVObjectTreeModel::newObject(UAVObject *obj)
     }
 }
 
-void UAVObjectTreeModel::addDataObject(UAVDataObject *obj)
+void UAVObjectTreeModel::addDataObject(UAVDataObject *obj, bool categorize)
 {
     TopTreeItem *root = obj->isSettings() ? m_settingsTree : m_nonSettingsTree;
 
     TreeItem* parent = root;
 
-    if(obj->getCategory() != 0 && !obj->getCategory().isEmpty()) {
+    if(categorize && obj->getCategory() != 0 && !obj->getCategory().isEmpty()) {
         QStringList categoryPath = obj->getCategory().split('/');
         parent = createCategoryItems(categoryPath, root);
     }

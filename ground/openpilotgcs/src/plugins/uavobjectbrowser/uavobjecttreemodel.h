@@ -49,7 +49,7 @@ class UAVObjectTreeModel : public QAbstractItemModel
 {
 Q_OBJECT
 public:
-    explicit UAVObjectTreeModel(QObject *parent = 0);
+    explicit UAVObjectTreeModel(QObject *parent = 0, bool categorize=true);
     ~UAVObjectTreeModel();
 
     QVariant data(const QModelIndex &index, int role) const;
@@ -83,18 +83,17 @@ private slots:
     void updateHighlight(TreeItem*);
 
 private:
+    void setupModelData(UAVObjectManager *objManager, bool categorize = true);
     QModelIndex index(TreeItem *item);
-    void addDataObject(UAVDataObject *obj);
+    void addDataObject(UAVDataObject *obj, bool categorize = true);
     MetaObjectTreeItem *addMetaObject(UAVMetaObject *obj, TreeItem *parent);
     void addArrayField(UAVObjectField *field, TreeItem *parent);
-
     void addSingleField(int index, UAVObjectField *field, TreeItem *parent);
     void addInstance(UAVObject *obj, TreeItem *parent);
 
     TreeItem *createCategoryItems(QStringList categoryPath, TreeItem *root);
 
     QString updateMode(quint8 updateMode);
-    void setupModelData(UAVObjectManager *objManager);
     ObjectTreeItem *findObjectTreeItem(UAVObject *obj);
     DataObjectTreeItem *findDataObjectTreeItem(UAVDataObject *obj);
     MetaObjectTreeItem *findMetaObjectTreeItem(UAVMetaObject *obj);

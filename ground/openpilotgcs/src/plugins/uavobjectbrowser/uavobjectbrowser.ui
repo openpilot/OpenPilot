@@ -203,6 +203,19 @@
       </widget>
      </item>
      <item>
+      <widget class="QCheckBox" name="categorizeCheckbox">
+       <property name="toolTip">
+        <string>Select to sort objects in to categories.</string>
+       </property>
+       <property name="text">
+        <string>Categorize Objects</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer_3">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>

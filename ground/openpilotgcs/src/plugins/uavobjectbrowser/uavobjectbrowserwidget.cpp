@@ -54,6 +54,7 @@ UAVObjectBrowserWidget::UAVObjectBrowserWidget(QWidget *parent) : QWidget(parent
     showMetaData(m_browser->metaCheckBox->isChecked());
     connect(m_browser->treeView->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), this, SLOT(currentChanged(QModelIndex,QModelIndex)));
     connect(m_browser->metaCheckBox, SIGNAL(toggled(bool)), this, SLOT(showMetaData(bool)));
+    connect(m_browser->categorizeCheckbox, SIGNAL(toggled(bool)), this, SLOT(categorize(bool)));
     connect(m_browser->saveSDButton, SIGNAL(clicked()), this, SLOT(saveObject()));
     connect(m_browser->readSDButton, SIGNAL(clicked()), this, SLOT(loadObject()));
     connect(m_browser->eraseSDButton, SIGNAL(clicked()), this, SLOT(eraseObject()));
@@ -69,21 +70,25 @@ UAVObjectBrowserWidget::~UAVObjectBrowserWidget()
 
 void UAVObjectBrowserWidget::showMetaData(bool show)
 {
-    /*
-    int topRowCount = m_model->rowCount(QModelIndex());
-    for (int i = 0; i < topRowCount; ++i) {
-        QModelIndex index = m_model->index(i, 0, QModelIndex());
-        int subRowCount = m_model->rowCount(index);
-        for (int j = 0; j < subRowCount; ++j) {
-            m_browser->treeView->setRowHidden(0, index.child(j,0), !show);
-        }
-    }
-    */
     QList<QModelIndex> metaIndexes = m_model->getMetaDataIndexes();
     foreach(QModelIndex index , metaIndexes)
     {
         m_browser->treeView->setRowHidden(index.row(), index.parent(), !show);
     }
+}
+
+void UAVObjectBrowserWidget::categorize(bool categorize)
+{
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    Q_ASSERT(pm);
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    Q_ASSERT(objManager);
+
+    UAVObjectTreeModel* tmpModel = m_model;
+    m_model = new UAVObjectTreeModel(0, categorize);
+    m_browser->treeView->setModel(m_model);
+
+    delete tmpModel;
 }
 
 void UAVObjectBrowserWidget::sendUpdate()

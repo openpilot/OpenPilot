@@ -84,6 +84,7 @@ typedef struct {
 	UAVTalkConnection UAVTalkCon;
 	xQueueHandle sendQueue;
 	xQueueHandle recvQueue;
+	xQueueHandle gcsQueue;
 	uint16_t wdg;
 	bool checkHID;
 } UAVTalkComTaskParams;
@@ -313,6 +314,7 @@ static int32_t RadioComBridgeInitialize(void)
 		data->uavtalk_params.UAVTalkCon = data->UAVTalkCon;
 		data->uavtalk_params.sendQueue = data->radioPacketQueue;
 		data->uavtalk_params.recvQueue = data->uavtalkEventQueue;
+		data->uavtalk_params.gcsQueue = data->gcsEventQueue;
 		data->uavtalk_params.wdg = PIOS_WDG_COMUAVTALK;
 		data->uavtalk_params.checkHID = false;
 		data->uavtalk_params.comPort = PIOS_COM_UAVTALK;
@@ -401,6 +403,12 @@ static void UAVTalkRecvTask(void *parameters)
 
 		if (state == UAVTALK_STATE_COMPLETE)
 		{
+			xQueueHandle sendQueue = params->sendQueue;
+#if defined(PIOS_INCLUDE_USB)
+			if (params->gcsQueue)
+				if (PIOS_USB_CheckAvailable(0) && PIOS_COM_USB_HID)
+					sendQueue = params->gcsQueue;
+#endif /* PIOS_INCLUDE_USB */
 
 			// Is this a local UAVObject?
 			// We only generate GcsReceiver ojects, we don't consume them.
@@ -478,7 +486,7 @@ static void UAVTalkRecvTask(void *parameters)
 					else
 					{
 						// Otherwise, queue the packet for transmission.
-						queueEvent(params->sendQueue, (void*)p, 0, EV_TRANSMIT_PACKET);
+						queueEvent(sendQueue, (void*)p, 0, EV_TRANSMIT_PACKET);
 					}
 				}
 				else
@@ -514,11 +522,17 @@ static void UAVTalkRecvTask(void *parameters)
 			else
 			{
 				// Queue the packet for transmission.
-				queueEvent(params->sendQueue, (void*)p, 0, EV_TRANSMIT_PACKET);
+				queueEvent(sendQueue, (void*)p, 0, EV_TRANSMIT_PACKET);
 			}
 			p = NULL;
 
 		} else if(state == UAVTALK_STATE_ERROR) {
+			xQueueHandle sendQueue = params->sendQueue;
+#if defined(PIOS_INCLUDE_USB)
+			if (params->gcsQueue)
+				if (PIOS_USB_CheckAvailable(0) && PIOS_COM_USB_HID)
+					sendQueue = params->gcsQueue;
+#endif /* PIOS_INCLUDE_USB */
 			data->UAVTalkErrors++;
 
 			// Send a NACK if required.
@@ -533,7 +547,7 @@ static void UAVTalkRecvTask(void *parameters)
 			else
 			{
 				// Transmit the packet anyway...
-				queueEvent(params->sendQueue, (void*)p, 0, EV_TRANSMIT_PACKET);
+				queueEvent(sendQueue, (void*)p, 0, EV_TRANSMIT_PACKET);
 			}
 			p = NULL;
 		}

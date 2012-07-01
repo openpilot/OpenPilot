@@ -145,22 +145,30 @@ static void slamTask(void *parameters)
 	AttitudeActualGet(&attitudeActual);
 	attitudeActual.Pitch=100;
 	AttitudeActualSet(&attitudeActual);
+	cvShowImage("debug",lastFrame);
+	cvWaitKey(1);
 	while (attitudeActual.Pitch==100) AttitudeActualGet(&attitudeActual);
 
 
 	uint32_t timeval = PIOS_DELAY_GetRaw();
-	portTickType currentTime,startTime = xTaskGetTickCount();
-	portTickType increment = ((float)(1000./settings.FrameRate)) / portTICK_RATE_MS;
-	fprintf(stderr,"init at %i increment is %i\n",timeval, increment);
+	int32_t increment = floor(1000000./settings.FrameRate);
+	int32_t extraincrement=0;
+	fprintf(stderr,"init at %i increment is %i at %f fps\n",timeval, increment,settings.FrameRate);
 
 	// Main task loop
+	double oldpos=0;
 	while (1) {
 		frame++;
 		cvWaitKey(1);
-		currentTime = startTime;
-		vTaskDelayUntil(&currentTime,startTime+(frame*increment));
+		if (VideoSource) {
+			double pos=cvGetCaptureProperty(VideoSource, CV_CAP_PROP_POS_MSEC);
+			increment=floor((pos-oldpos)*1000.);
+			oldpos = pos;
+		}
 
+		while (PIOS_DELAY_DiffuS(timeval)<increment+extraincrement+1000.) vTaskDelay(1/portTICK_RATE_MS);
 		float dT = PIOS_DELAY_DiffuS(timeval) * 1.0e-6f;
+		extraincrement = (increment+extraincrement)-PIOS_DELAY_DiffuS(timeval);
 		timeval = PIOS_DELAY_GetRaw();
 
 		// Grab the current camera image
@@ -175,7 +183,7 @@ static void slamTask(void *parameters)
 		PositionActualGet(&positionActual);
 		VelocityActualGet(&velocityActual);
 
-		if (VideoSource) currentFrame = cvRetrieveFrame(VideoSource, 0);
+		if (VideoSource) currentFrame = cvRetrieveFrame(VideoSource,0);
 
 		struct opencvslam_input i = {.x=0};
 		struct opencvslam_output *o = opencvslam_run(i);
@@ -189,22 +197,19 @@ static void slamTask(void *parameters)
 
 			// draw a line in the video coresponding to artificial horizon (roll+pitch)
 			CvPoint center = cvPoint(
-				  settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_X]/2
+				  (settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_X]/2)
+				  + (attitudeActual.Pitch * settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_X]/60.)
+				  *sin(DEG2RAD*attitudeActual.Roll)
 				,
-				  settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_Y]/2
-				  + attitudeActual.Pitch * settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_Y]/60.
+				  (settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_Y]/2)
+				  + (attitudeActual.Pitch * settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_X]/60.)
+				  *cos(DEG2RAD*attitudeActual.Roll)
 				);
 			// i want overloaded operands damnit!
 			CvPoint right = cvPoint(
-				  fmin(
-					settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_X],
-					settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_Y]
-				  )*cos(DEG2RAD*attitudeActual.Roll)/3
+				  settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_X]*cos(DEG2RAD*attitudeActual.Roll)/3
 				,
-				  -fmin(
-					settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_X],
-					settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_Y]
-				  )*sin(DEG2RAD*attitudeActual.Roll)/3
+				  -settings.FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_X]*sin(DEG2RAD*attitudeActual.Roll)/3
 				);
 			CvPoint left = cvPoint(center.x-right.x,center.y-right.y);
 			right.x += center.x;
@@ -215,7 +220,7 @@ static void slamTask(void *parameters)
 		}
 
 
-		fprintf(stderr,"frame %i at %i\n",frame,currentTime);
+		//fprintf(stderr,"frame %i took %f ms (%f fps)\n",frame,dT,1./dT);
 	}
 }
 

@@ -33,7 +33,6 @@
 #include "signal.h"
 #include "pthread.h"
 
-
 static void* grabThread(void* arg) {
 	sigset_t set;
 	sigfillset(&set);
@@ -42,6 +41,20 @@ static void* grabThread(void* arg) {
 	return NULL;
 }
 
+static void* waitkeyThread(void* arg) {
+	sigset_t set;
+	sigfillset(&set);
+	pthread_sigmask(SIG_BLOCK, &set, NULL);
+	cvWaitKey(*((uint32_t*)arg));
+	return NULL;
+}
+
+static void* retrieveThread(void* arg) {
+	sigset_t set;
+	sigfillset(&set);
+	pthread_sigmask(SIG_BLOCK, &set, NULL);
+	return cvRetrieveFrame((CvCapture*)arg,0);	
+}
 
 void backgroundGrabFrame(CvCapture *VideoSource) {
 	pthread_t grabber;
@@ -51,13 +64,30 @@ void backgroundGrabFrame(CvCapture *VideoSource) {
 	pthread_create( &grabber, &threadAttributes,
                           &grabThread, VideoSource);
 	pthread_join(grabber,NULL);
+}
+
+void backgroundWaitKey(uint32_t ms) {
+	pthread_t waitkeyer;
+	pthread_attr_t threadAttributes;
+	pthread_attr_init( &threadAttributes );
+	pthread_attr_setdetachstate( &threadAttributes, PTHREAD_CREATE_JOINABLE );
+	pthread_create( &waitkeyer, &threadAttributes,
+                          &waitkeyThread, &ms);
+	pthread_join(waitkeyer,NULL);
 
 }
 
-
-
-
-
+IplImage* backgroundRetrieveFrame(CvCapture *VideoSource) {
+	IplImage* result;
+	pthread_t retriever;
+	pthread_attr_t threadAttributes;
+	pthread_attr_init( &threadAttributes );
+	pthread_attr_setdetachstate( &threadAttributes, PTHREAD_CREATE_JOINABLE );
+	pthread_create( &retriever, &threadAttributes,
+                          &retrieveThread, VideoSource);
+	pthread_join(retriever,(void**)&result);
+	return result;
+}
 
 
 /**

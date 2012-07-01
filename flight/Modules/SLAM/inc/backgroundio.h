@@ -31,6 +31,8 @@
 #include "opencv/cv.h"
 
 void backgroundGrabFrame(CvCapture *VideoSource);
+IplImage* backgroundRetrieveFrame(CvCapture *VideoSource);
+void backgroundWaitKey(uint32_t ms);
 
 #endif // BACKGROUNDIO_H
 

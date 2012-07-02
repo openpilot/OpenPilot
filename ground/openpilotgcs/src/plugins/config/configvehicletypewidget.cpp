@@ -109,7 +109,7 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
 
     //Generate lists of mixerTypeNames, mixerVectorNames, channelNames
     channelNames << "None";
-    for (int i = 0; i < ActuatorSettings::CHANNELADDR_NUMELEM; i++) {
+    for (int i = 0; i < (int)ActuatorSettings::CHANNELADDR_NUMELEM; i++) {
 
         mixerTypes << QString("Mixer%1Type").arg(i+1);
         mixerVectors << QString("Mixer%1Vector").arg(i+1);
@@ -205,25 +205,6 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
     connect(m_aircraft->multirotorFrameType, SIGNAL(currentIndexChanged(QString)), this, SLOT(setupAirframeUI(QString)));
     connect(m_aircraft->groundVehicleType, SIGNAL(currentIndexChanged(QString)), this, SLOT(setupAirframeUI(QString)));
     //mdl connect(m_heli->m_ccpm->ccpmType, SIGNAL(currentIndexChanged(QString)), this, SLOT(setupAirframeUI(QString)));
-
-	//Connect throttle curve reset pushbuttons to reset functions
-    //connect(m_aircraft->fwThrottleReset, SIGNAL(clicked()), this, SLOT(resetFwMixer()));
-    connect(m_aircraft->mrThrottleCurveReset, SIGNAL(clicked()), this, SLOT(resetMrMixer()));
-    connect(m_aircraft->gvThrottleCurve1Reset, SIGNAL(clicked()), this, SLOT(resetGvFrontMixer()));	
-    connect(m_aircraft->gvThrottleCurve2Reset, SIGNAL(clicked()), this, SLOT(resetGvRearMixer()));	
-    connect(m_aircraft->customReset1, SIGNAL(clicked()), this, SLOT(resetCt1Mixer()));
-    connect(m_aircraft->customReset2, SIGNAL(clicked()), this, SLOT(resetCt2Mixer()));
-
-	//Connect throttle curve manipulation points to output text
-    connect(m_aircraft->fixedWingThrottle, SIGNAL(curveUpdated(QList<double>,double)), this, SLOT(updateFwThrottleCurveValue(QList<double>,double)));
-    connect(m_aircraft->multiThrottleCurve, SIGNAL(curveUpdated(QList<double>,double)), this, SLOT(updateMrThrottleCurveValue(QList<double>,double)));
-    connect(m_aircraft->groundVehicleThrottle1, SIGNAL(curveUpdated(QList<double>,double)), this, SLOT(updateGvThrottle1CurveValue(QList<double>,double)));
-    connect(m_aircraft->groundVehicleThrottle2, SIGNAL(curveUpdated(QList<double>,double)), this, SLOT(updateGvThrottle2CurveValue(QList<double>,double)));
-    connect(m_aircraft->customThrottle1Curve, SIGNAL(curveUpdated(QList<double>,double)), this, SLOT(updateCustomThrottle1CurveValue(QList<double>,double)));
-    connect(m_aircraft->customThrottle2Curve, SIGNAL(curveUpdated(QList<double>,double)), this, SLOT(updateCustomThrottle2CurveValue(QList<double>,double)));
-
-//    connect(m_aircraft->fwAileron1Channel, SIGNAL(currentIndexChanged(int)), this, SLOT(toggleAileron2(int)));
-//    connect(m_aircraft->fwElevator1Channel, SIGNAL(currentIndexChanged(int)), this, SLOT(toggleElevator2(int)));
 
     //Connect the three feed forward test checkboxes
     connect(m_aircraft->ffTestBox1, SIGNAL(clicked(bool)), this, SLOT(enableFFTest()));
@@ -479,68 +460,6 @@ void ConfigVehicleTypeWidget::enableFFTest()
     }
 }
 
-
-/**
-  Resets Fixed wing throttle mixer
-  */
-void ConfigVehicleTypeWidget::resetFwMixer()
-{
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-    UAVObjectField* field = obj->getField(QString("ThrottleCurve1"));
-    //resetMixer(m_aircraft->fixedWingThrottle, field->getNumElements(),1);
-}
-
-/**
-  Resets Multirotor throttle mixer
-  */
-void ConfigVehicleTypeWidget::resetMrMixer()
-{
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-    UAVObjectField* field = obj->getField(QString("ThrottleCurve1"));
-    //resetMixer(m_aircraft->multiThrottleCurve, field->getNumElements(),0.9);
-}
-
-/**
- Resets Ground vehicle front throttle mixer
- */
-void ConfigVehicleTypeWidget::resetGvFrontMixer()
-{
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-    UAVObjectField* field = obj->getField(QString("ThrottleCurve1"));
-    //resetMixer(m_aircraft->groundVehicleThrottle1, field->getNumElements(),1);
-}
-
-/**
- Resets Ground vehicle rear throttle mixer
- */
-void ConfigVehicleTypeWidget::resetGvRearMixer()
-{
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-    UAVObjectField* field = obj->getField(QString("ThrottleCurve2"));
-    //resetMixer(m_aircraft->groundVehicleThrottle2, field->getNumElements(),1);
-}
-
-/**
-  Resets Custom throttle 1 mixer
-  */
-void ConfigVehicleTypeWidget::resetCt1Mixer()
-{
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-    UAVObjectField* field = obj->getField(QString("ThrottleCurve1"));
-    resetMixer(m_aircraft->customThrottle1Curve, field->getNumElements(),1);
-}
-
-/**
-  Resets Custom throttle 2 mixer
-  */
-void ConfigVehicleTypeWidget::resetCt2Mixer()
-{
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-    UAVObjectField* field = obj->getField(QString("ThrottleCurve2"));
-    //resetMixer(m_aircraft->customThrottle2Curve, field->getNumElements(),1);
-}
-
-
 /**
   Resets a mixer curve
   */
@@ -549,52 +468,6 @@ void ConfigVehicleTypeWidget::resetMixer(MixerCurveWidget *mixer, int numElement
     // Setup all Throttle1 curves for all types of airframes
     mixer->initLinearCurve((quint32)numElements,maxvalue);
 }
-
-/**
-  Updates the currently moved multi-rotor throttle curve item value
-  */
-void ConfigVehicleTypeWidget::updateMrThrottleCurveValue(QList<double> list, double value)
-{
-    Q_UNUSED(list);
-    m_aircraft->mrThrottleCurveItemValue->setText(QString().sprintf("Val: %.2f",value));
-}
-
-/**
- Updates the moved ground vehicle front throttle curve item value
- */
-void ConfigVehicleTypeWidget::updateGvThrottle1CurveValue(QList<double> list, double value)
-{
-    Q_UNUSED(list);
-    m_aircraft->gvThrottleCurve1ItemValue->setText(QString().sprintf("Val: %.2f",value));
-}
-
-/**
- Updates the moved ground vehicle rear throttle curve item value
- */
-void ConfigVehicleTypeWidget::updateGvThrottle2CurveValue(QList<double> list, double value)
-{
-    Q_UNUSED(list);
-    m_aircraft->gvThrottleCurve2ItemValue->setText(QString().sprintf("Val: %.2f",value));
-}
-
-/**
-  Updates the currently moved custom throttle curve item value (Custom throttle 1)
-  */
-void ConfigVehicleTypeWidget::updateCustomThrottle1CurveValue(QList<double> list, double value)
-{
-    Q_UNUSED(list);
-    m_aircraft->customThrottleCurve1Value->setText(QString().sprintf("Val: %.2f",value));
-}
-
-/**
-  Updates the currently moved custom throttle curve item value (Custom throttle 2)
-  */
-void ConfigVehicleTypeWidget::updateCustomThrottle2CurveValue(QList<double> list, double value)
-{
-    Q_UNUSED(list);
-    m_aircraft->customThrottleCurve2Value->setText(QString().sprintf("Val: %.2f",value));
-}
-
 
 /**************************
   * Aircraft settings

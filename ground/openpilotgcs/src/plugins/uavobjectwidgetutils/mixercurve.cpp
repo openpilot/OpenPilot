@@ -28,6 +28,11 @@ MixerCurve::~MixerCurve()
     delete m_mixerUI;
 }
 
+void MixerCurve::setMixerType(MixerCurveType curveType)
+{
+    m_curveType = curveType;
+}
+
 void MixerCurve::ResetCurve()
 {
     m_curve->setMin((m_curveType == MixerCurve::MIXERCURVE_THROTTLE) ? 0.0 : -1.0);
@@ -266,16 +271,14 @@ double MixerCurve::setRange(double min, double max)
 
 void MixerCurve::showEvent(QShowEvent *event)
 {
-    Q_UNUSED(event)
-    // Thit fitInView method should only be called now, once the
-    // widget is shown, otherwise it cannot compute its values and
-    // the result is usually a ahrsbargraph that is way too small.
-    //fitInView(this, Qt::KeepAspectRatio);
+    Q_UNUSED(event);
 
+    m_curve->showEvent(event);
 }
 
 void MixerCurve::resizeEvent(QResizeEvent* event)
 {
     Q_UNUSED(event);
-    //fitInView(this, Qt::KeepAspectRatio);
+
+    m_curve->resizeEvent(event);
 }

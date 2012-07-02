@@ -87,7 +87,7 @@ QGroupBox::title {
  }</string>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>2</number>
        </property>
        <widget class="QWidget" name="BasicTab">
         <attribute name="title">
@@ -3912,7 +3912,7 @@ margin:1px;</string>
   <customwidget>
    <class>MixerCurveWidget</class>
    <extends>QWidget</extends>
-   <header>mixercurvewidget.h</header>
+   <header location="global">uavobjectwidgetutils/mixercurvewidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

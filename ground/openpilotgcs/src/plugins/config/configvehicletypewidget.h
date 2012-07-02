@@ -93,17 +93,7 @@ private slots:
     void toggleElevator2(int index);
     void toggleRudder2(int index);
     void switchAirframeType(int index);
-    void resetFwMixer();
-    void resetMrMixer();
-    void resetGvFrontMixer();
-    void resetGvRearMixer();
-    void resetCt1Mixer();
-    void resetCt2Mixer();
-    void updateMrThrottleCurveValue(QList<double> list, double value);
-    void updateGvThrottle1CurveValue(QList<double> list, double value);
-    void updateGvThrottle2CurveValue(QList<double> list, double value);
-    void updateCustomThrottle1CurveValue(QList<double> list, double value);
-    void updateCustomThrottle2CurveValue(QList<double> list, double value);
+
     void enableFFTest();
     void openHelp();
 

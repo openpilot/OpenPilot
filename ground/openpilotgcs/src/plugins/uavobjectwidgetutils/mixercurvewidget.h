@@ -43,6 +43,9 @@ class UAVOBJECTWIDGETUTILS_EXPORT MixerCurveWidget : public QGraphicsView
 public:
     MixerCurveWidget(QWidget *parent = 0);
    ~MixerCurveWidget();
+
+    friend class MixerCurve;
+
    void itemMoved(double itemValue); // Callback when a point is moved, to be updated
    void initCurve (const QList<double>* points);
    QList<double> getCurve();

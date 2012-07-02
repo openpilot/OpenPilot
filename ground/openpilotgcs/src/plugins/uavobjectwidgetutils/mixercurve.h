@@ -26,6 +26,7 @@ public:
     /* Enumeration options for ThrottleCurves */
     typedef enum { MIXERCURVE_THROTTLE=0, MIXERCURVEPITCH=1 } MixerCurveType;
 
+    void setMixerType(MixerCurveType curveType);
     void initCurve (const QList<double>* points);
     QList<double> getCurve();
     void initLinearCurve(int numPoints, double maxValue = 1, double minValue = 0);

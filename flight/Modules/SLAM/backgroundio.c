@@ -56,6 +56,14 @@ static void* retrieveThread(void* arg) {
 	return cvRetrieveFrame((CvCapture*)arg,0);	
 }
 
+static void* writeThread(void* arg) {
+	sigset_t set;
+	sigfillset(&set);
+	pthread_sigmask(SIG_BLOCK, &set, NULL);
+	cvWriteFrame(((struct writeframestruct*)arg)->VideoDest,((struct writeframestruct*)arg)->frame);
+	return NULL;
+}
+
 void backgroundGrabFrame(CvCapture *VideoSource) {
 	pthread_t grabber;
 	pthread_attr_t threadAttributes;
@@ -87,6 +95,16 @@ IplImage* backgroundRetrieveFrame(CvCapture *VideoSource) {
                           &retrieveThread, VideoSource);
 	pthread_join(retriever,(void**)&result);
 	return result;
+}
+
+void backgroundWriteFrame(struct writeframestruct info) {
+	pthread_t writer;
+	pthread_attr_t threadAttributes;
+	pthread_attr_init( &threadAttributes );
+	pthread_attr_setdetachstate( &threadAttributes, PTHREAD_CREATE_JOINABLE );
+	pthread_create( &writer, &threadAttributes,
+                          &writeThread, &info);
+	pthread_join(writer,NULL);
 }
 
 

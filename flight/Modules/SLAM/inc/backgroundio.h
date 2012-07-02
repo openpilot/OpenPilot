@@ -29,10 +29,20 @@
 #define BACKGROUNDIO_H
 
 #include "opencv/cv.h"
+#include "opencv/highgui.h"
+
+
 
 void backgroundGrabFrame(CvCapture *VideoSource);
 IplImage* backgroundRetrieveFrame(CvCapture *VideoSource);
 void backgroundWaitKey(uint32_t ms);
+
+struct writeframestruct {
+	CvVideoWriter * VideoDest;
+	IplImage * frame;
+};
+
+void backgroundWriteFrame(struct writeframestruct info);
 
 #endif // BACKGROUNDIO_H
 

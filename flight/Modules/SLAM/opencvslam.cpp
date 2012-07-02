@@ -47,7 +47,7 @@ void OpenCVslam::run() {
 	//VideoSource = NULL; //cvCaptureFromFile("test.avi");
 	VideoSource = cvCaptureFromFile("test.avi");
 	//VideoSource = cvCaptureFromCAM(0);
-	CvVideoWriter *VideoDest = cvCreateVideoWriter("output.avi",CV_FOURCC('M','J','P','G'),settings->FrameRate,cvSize(640,480),1);
+	CvVideoWriter *VideoDest = cvCreateVideoWriter("output.avi",CV_FOURCC('F','M','P','4'),settings->FrameRate,cvSize(640,480),1);
 
 	if (VideoSource) {
 		cvGrabFrame(VideoSource);
@@ -89,71 +89,84 @@ void OpenCVslam::run() {
 			increment=floor((pos-oldpos)*1000.);
 			oldpos = pos;
 		}
+		if (extraincrement<-(increment+1000)) extraincrement=-(increment+1000);
 
-		while (
-			(PIOS_DELAY_DiffuS(timeval)<increment+extraincrement+1000.) &&
-			(PIOS_DELAY_DiffuS(writeval)<writeincrement+writeextra+1000.)
+		while (	(PIOS_DELAY_DiffuS(timeval)<(uint32_t)increment+extraincrement+1000)) {
 
-			) vTaskDelay(1/portTICK_RATE_MS);
-
-		if (PIOS_DELAY_DiffuS(timeval)>=increment+extraincrement+1000.) {
-			float dT = PIOS_DELAY_DiffuS(timeval) * 1.0e-6f;
-			extraincrement = (increment+extraincrement)-PIOS_DELAY_DiffuS(timeval);
-			timeval = PIOS_DELAY_GetRaw();
-
-			// Grab the current camera image
-			if (VideoSource) {
-				// frame grabbing must take place outside of FreeRTOS scheduler,
-				// since OpenCV's hardware IO does not like being interrupted.
-				backgroundGrabFrame(VideoSource);
+			if (PIOS_DELAY_DiffuS(writeval)>=(uint32_t)writeincrement+writeextra+1000) {
+				writeextra = (writeincrement+writeextra)-PIOS_DELAY_DiffuS(writeval);
+				writeval = PIOS_DELAY_GetRaw();
+				if (writeincrement+writeextra+1000<0) {
+					writeextra=-(writeincrement+1000);
+				}
+				struct writeframestruct x={VideoDest,lastFrame};
+				backgroundWriteFrame(x);
+				fprintf(stderr,".");
+			} else {
+				vTaskDelay(1/portTICK_RATE_MS);
 			}
-			
-			// Get the object data
-			AttitudeActualGet(&attitudeActual);
-			PositionActualGet(&positionActual);
-			VelocityActualGet(&velocityActual);
+		}
+			if (PIOS_DELAY_DiffuS(writeval)>=(uint32_t)writeincrement+writeextra+1000) {
+				writeextra = (writeincrement+writeextra)-PIOS_DELAY_DiffuS(writeval);
+				writeval = PIOS_DELAY_GetRaw();
+				if (writeincrement+writeextra+1000<0) {
+					writeextra=-(writeincrement+1000);
+				}
 
-			if (VideoSource) currentFrame = cvRetrieveFrame(VideoSource,0);
-
-			if (lastFrame) {
-				cvReleaseImage(&lastFrame);
+				struct writeframestruct x={VideoDest,lastFrame};
+				backgroundWriteFrame(x);
+				fprintf(stderr,".");
 			}
-			if (currentFrame) {
-				lastFrame = cvCloneImage(currentFrame);
+
+		float dT = PIOS_DELAY_DiffuS(timeval) * 1.0e-6f;
+		extraincrement = (increment+extraincrement)-PIOS_DELAY_DiffuS(timeval);
+		timeval = PIOS_DELAY_GetRaw();
+
+		// Grab the current camera image
+		if (VideoSource) {
+			// frame grabbing must take place outside of FreeRTOS scheduler,
+			// since OpenCV's hardware IO does not like being interrupted.
+			backgroundGrabFrame(VideoSource);
+		}
+		
+		// Get the object data
+		AttitudeActualGet(&attitudeActual);
+		PositionActualGet(&positionActual);
+		VelocityActualGet(&velocityActual);
+
+		if (VideoSource) currentFrame = cvRetrieveFrame(VideoSource,0);
+
+		if (lastFrame) {
+			cvReleaseImage(&lastFrame);
+		}
+		if (currentFrame) {
+			lastFrame = cvCloneImage(currentFrame);
 
 
-				// draw a line in the video coresponding to artificial horizon (roll+pitch)
-				CvPoint center = cvPoint(
-					  (settings->FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_X]/2)
-					  + (attitudeActual.Pitch * settings->FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_X]/50.)
-					  *sin(DEG2RAD*(attitudeActual.Roll))
-					,
-					  (settings->FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_Y]/2) // -200
-					  + (attitudeActual.Pitch * settings->FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_X]/50.)
-					  *cos(DEG2RAD*(attitudeActual.Roll))
-					);
-				// i want overloaded operands damnit!
-				CvPoint right = cvPoint(
-					  settings->FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_X]*cos(DEG2RAD*(attitudeActual.Roll))/3
-					,
-					  -settings->FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_X]*sin(DEG2RAD*(attitudeActual.Roll))/3
-					);
-				CvPoint left = cvPoint(center.x-right.x,center.y-right.y);
-				right.x += center.x;
-				right.y += center.y;
-				cvLine(lastFrame,left,right,CV_RGB(255,255,0),3,8,0);
+			// draw a line in the video coresponding to artificial horizon (roll+pitch)
+			CvPoint center = cvPoint(
+				  (settings->FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_X]/2)
+				  + (attitudeActual.Pitch * settings->FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_X]/50.)
+				  *sin(DEG2RAD*(attitudeActual.Roll))
+				,
+				  (settings->FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_Y]/2) // -200
+				  + (attitudeActual.Pitch * settings->FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_X]/50.)
+				  *cos(DEG2RAD*(attitudeActual.Roll))
+				);
+			// i want overloaded operands damnit!
+			CvPoint right = cvPoint(
+				  settings->FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_X]*cos(DEG2RAD*(attitudeActual.Roll))/3
+				,
+				  -settings->FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_X]*sin(DEG2RAD*(attitudeActual.Roll))/3
+				);
+			CvPoint left = cvPoint(center.x-right.x,center.y-right.y);
+			right.x += center.x;
+			right.y += center.y;
+			cvLine(lastFrame,left,right,CV_RGB(255,255,0),3,8,0);
 
-				cvShowImage("debug",lastFrame);
-			}
+			cvShowImage("debug",lastFrame);
+		}
 	
-		}
-		if (PIOS_DELAY_DiffuS(writeval)>=writeincrement+writeextra+1000.) {
-			writeextra = (writeincrement+writeextra)-PIOS_DELAY_DiffuS(writeval);
-			writeval = PIOS_DELAY_GetRaw();
-
-			//cvWriteFrame(VideoDest,lastFrame);
-			fprintf(stderr,".");
-		}
 
 
 		//fprintf(stderr,"frame %i took %f ms (%f fps)\n",frame,dT,1./dT);

@@ -2,7 +2,7 @@
  ******************************************************************************
  *
  * @file       systemhealthgadgetwidget.cpp
- * @author     Edouard Lafargue Copyright (C) 2010.
+ * @author     OpenPilot Team & Edouard Lafargue Copyright (C) 2012.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup SystemHealthPlugin System Health Plugin
@@ -206,7 +206,7 @@ void SystemHealthGadgetWidget::mousePressEvent ( QMouseEvent * event )
             QGraphicsSvgItem *clickedItem = dynamic_cast<QGraphicsSvgItem*>(sceneItem);
 
             if(clickedItem && (clickedItem != foreground) && clickedItem != background){
-            QFile alarmDescription(":/systemhealth/html/" + clickedItem->elementId() + ".html");
+	        QFile alarmDescription(":/systemhealth/html/" + clickedItem->elementId() + ".html");
                 if(alarmDescription.open(QIODevice::ReadOnly | QIODevice::Text)){
                     QTextStream textStream(&alarmDescription);
                     QWhatsThis::showText(event->globalPos(), textStream.readAll());

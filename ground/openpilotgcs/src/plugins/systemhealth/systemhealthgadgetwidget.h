@@ -2,7 +2,7 @@
  ******************************************************************************
  *
  * @file       systemhealthgadgetwidget.h
- * @author     Edouard Lafargue Copyright (C) 2010.
+ * @author     OpenPilot Team & Edouard Lafargue Copyright (C) 2012.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup SystemHealthPlugin System Health Plugin

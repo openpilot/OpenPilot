@@ -812,7 +812,7 @@ bool UAVTalk::transmitSingleObject(UAVObject* obj, quint8 type, bool allInstance
     txBuffer[dataOffset+length] = updateCRC(0, txBuffer, dataOffset + length);
 
     // Send buffer, check that the transmit backlog does not grow above limit
-    if (io && io->isWritable() && io->bytesToWrite() < TX_BUFFER_SIZE )
+    if (!io.isNull() && io->isWritable() && io->bytesToWrite() < TX_BUFFER_SIZE )
     {
         io->write((const char*)txBuffer, dataOffset+length+CHECKSUM_LENGTH);
     }

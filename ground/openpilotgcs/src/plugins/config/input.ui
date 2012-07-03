@@ -516,8 +516,9 @@ margin:1px;</string>
         </property>
         <property name="toolTip">
          <string>This slider moves when you move the flight mode switch
-on your remote. Setup the flightmode channel on the RC Input tab
-if you have not done so already.</string>
+on your remote. It shows currently active flight mode.
+
+Setup the flight mode channel on the RC Input tab if you have not done so already.</string>
         </property>
         <property name="minimum">
          <number>0</number>
@@ -631,7 +632,7 @@ if you have not done so already.</string>
        <widget class="QSpinBox" name="fmsPosNum">
         <property name="geometry">
          <rect>
-          <x>410</x>
+          <x>464</x>
           <y>20</y>
           <width>61</width>
           <height>20</height>
@@ -660,8 +661,8 @@ channel value for each flight mode.</string>
        <widget class="QLabel" name="label">
         <property name="geometry">
          <rect>
-          <x>270</x>
-          <y>20</y>
+          <x>305</x>
+          <y>22</y>
           <width>141</width>
           <height>16</height>
          </rect>
@@ -670,24 +671,11 @@ channel value for each flight mode.</string>
          <string>Number of switch positions:</string>
         </property>
        </widget>
-       <widget class="QLabel" name="label_2">
-        <property name="geometry">
-         <rect>
-          <x>270</x>
-          <y>50</y>
-          <width>141</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Channel value (0..100):</string>
-        </property>
-       </widget>
        <widget class="QLabel" name="label_15">
         <property name="geometry">
          <rect>
-          <x>300</x>
-          <y>130</y>
+          <x>310</x>
+          <y>90</y>
           <width>191</width>
           <height>30</height>
          </rect>
@@ -705,26 +693,56 @@ channel value for each flight mode.</string>
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="fmsValue">
+       <widget class="QSlider" name="fmsChannelSlider">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
-          <x>410</x>
-          <y>51</y>
-          <width>46</width>
-          <height>13</height>
+          <x>265</x>
+          <y>16</y>
+          <width>20</width>
+          <height>181</height>
          </rect>
         </property>
-        <property name="toolTip">
-         <string>FlightMode channel value is shown here for reference.
-
-Whole range [0..100] in spit into number of intervals - one per
-FlightMode (switch position).
-
-Hint: make sure that you have the FlightMode channel neutral
-value defined.</string>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
         </property>
-        <property name="text">
-         <string>0</string>
+        <property name="toolTip">
+         <string>This slider shows the real value of your remote channel.</string>
+        </property>
+        <property name="minimum">
+         <number>0</number>
+        </property>
+        <property name="maximum">
+         <number>100</number>
+        </property>
+        <property name="singleStep">
+         <number>1</number>
+        </property>
+        <property name="pageStep">
+         <number>10</number>
+        </property>
+        <property name="value">
+         <number>0</number>
+        </property>
+        <property name="sliderPosition">
+         <number>0</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="invertedAppearance">
+         <bool>true</bool>
+        </property>
+        <property name="invertedControls">
+         <bool>false</bool>
+        </property>
+        <property name="tickPosition">
+         <enum>QSlider::NoTicks</enum>
+        </property>
+        <property name="tickInterval">
+         <number>1</number>
         </property>
        </widget>
       </widget>

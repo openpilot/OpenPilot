@@ -1123,7 +1123,7 @@ void ConfigInputWidget::invertControls()
 void ConfigInputWidget::moveFMSlider()
 {
     ManualControlSettings::DataFields manualSettingsDataPriv = manualSettingsObj->getData();
-    ManualControlCommand::DataFields manualCommandDataPriv=manualCommandObj->getData();
+    ManualControlCommand::DataFields manualCommandDataPriv = manualCommandObj->getData();
 
     float valueScaled;
     int chMin = manualSettingsDataPriv.ChannelMin[ManualControlSettings::CHANNELMIN_FLIGHTMODE];
@@ -1155,7 +1155,10 @@ void ConfigInputWidget::moveFMSlider()
 
     // Display current channel value for tuning (in percents)
     float scaledFlightMode = (valueScaled + 1.0) / 2.0;
-    m_config->fmsValue->setText(QString::number(scaledFlightMode * 100.0, 'f', 0));
+    m_config->fmsChannelSlider->setValue(scaledFlightMode * 100.0
+        /  ManualControlSettings::FLIGHTMODEPOSITION_NUMELEM * manualSettingsDataPriv.FlightModeNumber);
+    m_config->fmsChannelSlider->setToolTip(
+        "Current flight mode channel value: " + QString::number(scaledFlightMode * 100.0, 'f', 0) + '%');
 
     // Convert flightMode value into the switch position in the range [0..N-1]
     // This uses the same optimized computation as flight code to be consistent

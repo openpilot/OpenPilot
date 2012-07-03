@@ -410,6 +410,9 @@ margin:1px;</string>
         <string>FlightMode Switch Positions</string>
        </property>
        <widget class="QComboBox" name="fmsModePos5">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>100</x>
@@ -423,6 +426,9 @@ margin:1px;</string>
         </property>
        </widget>
        <widget class="QComboBox" name="fmsModePos4">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>100</x>
@@ -452,6 +458,9 @@ margin:1px;</string>
         </property>
        </widget>
        <widget class="QComboBox" name="fmsModePos6">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>100</x>

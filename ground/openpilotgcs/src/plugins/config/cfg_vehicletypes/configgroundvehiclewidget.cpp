@@ -289,16 +289,9 @@ void ConfigGroundVehicleWidget::refreshWidgetsValues(QString frameType)
 bool ConfigGroundVehicleWidget::setupGroundVehicleMotorcycle(QString airframeType){
 	// Check coherence:
 	//Show any config errors in GUI
-    throwConfigError(airframeType);
-	
-    // - Motor, steering, and balance
-    if (m_aircraft->gvMotor2ChannelBox->currentText() == "None" ||
-        (m_aircraft->gvSteering1ChannelBox->currentText() == "None" ||
-		 m_aircraft->gvSteering2ChannelBox->currentText() == "None") )
-	{
+    if (throwConfigError(airframeType)) {
 		return false;
-	}
-	
+	}	
 
 	// Now setup the channels:
     GUIConfigDataUnion config = GetConfigData();
@@ -352,15 +345,10 @@ bool ConfigGroundVehicleWidget::setupGroundVehicleMotorcycle(QString airframeTyp
 bool ConfigGroundVehicleWidget::setupGroundVehicleDifferential(QString airframeType){
 	// Check coherence:
 	//Show any config errors in GUI
-    throwConfigError(airframeType);
-	
-    // - Left and right steering
-    if ( m_aircraft->gvMotor2ChannelBox->currentText() == "None" ||
-		m_aircraft->gvSteering1ChannelBox->currentText() == "None") 
-	{
+
+    if (throwConfigError(airframeType)) {
 		return false;
 	}
-
 
     // Now setup the channels:
     GUIConfigDataUnion config = GetConfigData();
@@ -411,14 +399,7 @@ bool ConfigGroundVehicleWidget::setupGroundVehicleCar(QString airframeType)
 {
     // Check coherence:
 	//Show any config errors in GUI
-    throwConfigError(airframeType);
-	
-    // - At least one motor and one steering servo
-    if ((m_aircraft->gvMotor1ChannelBox->currentText() == "None" &&
-		 m_aircraft->gvMotor2ChannelBox->currentText() == "None") ||
-        (m_aircraft->gvSteering1ChannelBox->currentText() == "None" &&
-		 m_aircraft->gvSteering2ChannelBox->currentText() == "None")) 
-	{
+    if (throwConfigError(airframeType)) {
 		return false;
 	}
 
@@ -468,7 +449,7 @@ bool ConfigGroundVehicleWidget::setupGroundVehicleCar(QString airframeType)
 /**
  This function displays text and color formatting in order to help the user understand what channels have not yet been configured.
  */
-void ConfigGroundVehicleWidget::throwConfigError(QString airframeType)
+bool ConfigGroundVehicleWidget::throwConfigError(QString airframeType)
 {
 	//Initialize configuration error flag
 	bool error=false;
@@ -558,5 +539,6 @@ void ConfigGroundVehicleWidget::throwConfigError(QString airframeType)
 	if (error){
 		m_aircraft->gvStatusLabel->setText(QString("<font color='red'>ERROR: Assign all necessary channels</font>"));
 	}
+    return error;
 }
 

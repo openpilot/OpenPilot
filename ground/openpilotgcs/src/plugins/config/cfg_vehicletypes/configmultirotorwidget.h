@@ -71,7 +71,7 @@ private slots:
     virtual void setupUI(QString airframeType);
     virtual void refreshWidgetsValues(QString frameType);
     virtual QString updateConfigObjectsFromWidgets();
-    void throwConfigError(int numMotors);
+    virtual bool throwConfigError(int numMotors);
 
 
 protected:

@@ -93,6 +93,10 @@ void ConfigMultiRotorWidget::setupUI(QString frameType)
             enableComboBox(uiowner, QString("multiMotorChannelBox%0").arg(i), true);
 		}
 		
+        m_aircraft->mrRollMixLevel->setValue(100);
+        m_aircraft->mrPitchMixLevel->setValue(100);
+        m_aircraft->mrYawMixLevel->setValue(50);
+
         m_aircraft->triYawChannelBox->setEnabled(true);
     }
     else if (frameType == "QuadX" || frameType == "Quad X") {
@@ -104,6 +108,7 @@ void ConfigMultiRotorWidget::setupUI(QString frameType)
             enableComboBox(uiowner, QString("multiMotorChannelBox%0").arg(i), true);
 		}
 
+        // init mixer levels
 		m_aircraft->mrRollMixLevel->setValue(50);
 		m_aircraft->mrPitchMixLevel->setValue(50);
 		m_aircraft->mrYawMixLevel->setValue(50);
@@ -283,20 +288,12 @@ QString ConfigMultiRotorWidget::updateConfigObjectsFromWidgets()
 {
 	QString airframeType;
 	QList<QString> motorList;
-	
-	// We can already setup the feedforward here, as it is common to all platforms
-	UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-	UAVObjectField* field = obj->getField(QString("FeedForward"));
-	field->setDouble((double)m_aircraft->feedForwardSlider->value()/100);
-	field = obj->getField(QString("AccelTime"));
-	field->setDouble(m_aircraft->accelTime->value());
-	field = obj->getField(QString("DecelTime"));
-	field->setDouble(m_aircraft->decelTime->value());
-	field = obj->getField(QString("MaxAccel"));
-	field->setDouble(m_aircraft->maxAccelSlider->value());
-	
+
+    UAVDataObject* mixerObj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
+    Q_ASSERT(mixerObj);
+
     // Curve is also common to all quads:
-    setThrottleCurve(obj, VehicleConfig::MIXER_THROTTLECURVE1, m_aircraft->multiThrottleCurve->getCurve() );
+    setThrottleCurve(mixerObj, VehicleConfig::MIXER_THROTTLECURVE1, m_aircraft->multiThrottleCurve->getCurve() );
 	
 	if (m_aircraft->multirotorFrameType->currentText() == "Quad +") {
 		airframeType = "QuadP";
@@ -314,15 +311,7 @@ QString ConfigMultiRotorWidget::updateConfigObjectsFromWidgets()
 		airframeType = "HexaCoax";
 		
 		//Show any config errors in GUI
-        throwConfigError(6);
-
-		if (m_aircraft->multiMotorChannelBox1->currentText() == "None" ||
-			m_aircraft->multiMotorChannelBox2->currentText() == "None" ||
-			m_aircraft->multiMotorChannelBox3->currentText() == "None" ||
-			m_aircraft->multiMotorChannelBox4->currentText() == "None" ||
-			m_aircraft->multiMotorChannelBox5->currentText() == "None" ||
-			m_aircraft->multiMotorChannelBox6->currentText() == "None" ) {
-
+        if (throwConfigError(6)) {
 			return airframeType;
 		}
 		motorList << "VTOLMotorNW" << "VTOLMotorW" << "VTOLMotorNE" << "VTOLMotorE"
@@ -348,18 +337,9 @@ QString ConfigMultiRotorWidget::updateConfigObjectsFromWidgets()
 		airframeType = "Octo";
 		
 		//Show any config errors in GUI
-        throwConfigError(8);
-
-		if (m_aircraft->multiMotorChannelBox1->currentText() == "None" ||
-			m_aircraft->multiMotorChannelBox2->currentText() == "None" ||
-			m_aircraft->multiMotorChannelBox3->currentText() == "None" ||
-			m_aircraft->multiMotorChannelBox4->currentText() == "None" ||
-			m_aircraft->multiMotorChannelBox5->currentText() == "None" ||
-			m_aircraft->multiMotorChannelBox6->currentText() == "None" ||
-			m_aircraft->multiMotorChannelBox7->currentText() == "None" ||
-			m_aircraft->multiMotorChannelBox8->currentText() == "None") {
-			
+        if (throwConfigError(8)) {
 			return airframeType;
+
 		}
 		motorList << "VTOLMotorN" << "VTOLMotorNE" << "VTOLMotorE" << "VTOLMotorSE"
 		<< "VTOLMotorS" << "VTOLMotorSW" << "VTOLMotorW" << "VTOLMotorNW";
@@ -383,17 +363,7 @@ QString ConfigMultiRotorWidget::updateConfigObjectsFromWidgets()
 		airframeType = "OctoV";
 		
 		//Show any config errors in GUI
-        throwConfigError(8);
-
-		if (m_aircraft->multiMotorChannelBox1->currentText() == "None" ||
-			m_aircraft->multiMotorChannelBox2->currentText() == "None" ||
-			m_aircraft->multiMotorChannelBox3->currentText() == "None" ||
-			m_aircraft->multiMotorChannelBox4->currentText() == "None" ||
-			m_aircraft->multiMotorChannelBox5->currentText() == "None" ||
-			m_aircraft->multiMotorChannelBox6->currentText() == "None" ||
-			m_aircraft->multiMotorChannelBox7->currentText() == "None" ||
-			m_aircraft->multiMotorChannelBox8->currentText() == "None") {
-
+        if (throwConfigError(8)) {
 			return airframeType;
 		}
 		motorList << "VTOLMotorN" << "VTOLMotorNE" << "VTOLMotorE" << "VTOLMotorSE"
@@ -419,17 +389,7 @@ QString ConfigMultiRotorWidget::updateConfigObjectsFromWidgets()
 		airframeType = "OctoCoaxP";
 
 		//Show any config errors in GUI
-        throwConfigError(8);
-
-		if (m_aircraft->multiMotorChannelBox1->currentText() == "None" ||
-			m_aircraft->multiMotorChannelBox2->currentText() == "None" ||
-			m_aircraft->multiMotorChannelBox3->currentText() == "None" ||
-			m_aircraft->multiMotorChannelBox4->currentText() == "None" ||
-			m_aircraft->multiMotorChannelBox5->currentText() == "None" ||
-			m_aircraft->multiMotorChannelBox6->currentText() == "None" ||
-			m_aircraft->multiMotorChannelBox7->currentText() == "None" ||
-			m_aircraft->multiMotorChannelBox8->currentText() == "None") {
-
+        if (throwConfigError(8)) {
 			return airframeType;
 		}
 		motorList << "VTOLMotorN" << "VTOLMotorNE" << "VTOLMotorE" << "VTOLMotorSE"
@@ -454,17 +414,7 @@ QString ConfigMultiRotorWidget::updateConfigObjectsFromWidgets()
 		airframeType = "OctoCoaxX";
 		
 		//Show any config errors in GUI
-        throwConfigError(8);
-		
-		if (m_aircraft->multiMotorChannelBox1->currentText() == "None" ||
-			m_aircraft->multiMotorChannelBox2->currentText() == "None" ||
-			m_aircraft->multiMotorChannelBox3->currentText() == "None" ||
-			m_aircraft->multiMotorChannelBox4->currentText() == "None" ||
-			m_aircraft->multiMotorChannelBox5->currentText() == "None" ||
-			m_aircraft->multiMotorChannelBox6->currentText() == "None" ||
-			m_aircraft->multiMotorChannelBox7->currentText() == "None" ||
-			m_aircraft->multiMotorChannelBox8->currentText() == "None") {
-			
+        if (throwConfigError(8)) {
 			return airframeType;
 		}
 		motorList << "VTOLMotorNW" << "VTOLMotorN" << "VTOLMotorNE" << "VTOLMotorE"
@@ -489,12 +439,9 @@ QString ConfigMultiRotorWidget::updateConfigObjectsFromWidgets()
 		airframeType = "Tri";
 
 		//Show any config errors in GUI
-        throwConfigError(3);
-		if (m_aircraft->multiMotorChannelBox1->currentText() == "None" ||
-			m_aircraft->multiMotorChannelBox2->currentText() == "None" ||
-			m_aircraft->multiMotorChannelBox3->currentText() == "None" ) {
-	
+        if (throwConfigError(3)) {
 			return airframeType;
+
 		}
 		if (m_aircraft->triYawChannelBox->currentText() == "None") {
 			m_aircraft->mrStatusLabel->setText("<font color='red'>Error: Assign a Yaw channel</font>");
@@ -523,8 +470,6 @@ QString ConfigMultiRotorWidget::updateConfigObjectsFromWidgets()
 		setupMultiRotorMixer(mixer);
 
         //tell the mixer about tricopter yaw channel
-        UAVDataObject* mixerObj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-        Q_ASSERT(mixerObj);
 
         int channel = m_aircraft->triYawChannelBox->currentIndex()-1;
         if (channel > -1){
@@ -868,14 +813,7 @@ bool ConfigMultiRotorWidget::setupQuad(bool pLayout)
     // Check coherence:
 	
 	//Show any config errors in GUI
-    throwConfigError(4);
-
-    // - Four engines have to be defined
-    if (m_aircraft->multiMotorChannelBox1->currentText() == "None" ||
-        m_aircraft->multiMotorChannelBox2->currentText() == "None" ||
-        m_aircraft->multiMotorChannelBox3->currentText() == "None" ||
-        m_aircraft->multiMotorChannelBox4->currentText() == "None") {		
-
+    if (throwConfigError(4)) {
 		return false;
     }
 	
@@ -943,19 +881,9 @@ bool ConfigMultiRotorWidget::setupHexa(bool pLayout)
 {
     // Check coherence:
 	//Show any config errors in GUI
-    throwConfigError(6);
-	
-    // - Four engines have to be defined
-    if (m_aircraft->multiMotorChannelBox1->currentText() == "None" ||
-        m_aircraft->multiMotorChannelBox2->currentText() == "None" ||
-        m_aircraft->multiMotorChannelBox3->currentText() == "None" ||
-        m_aircraft->multiMotorChannelBox4->currentText() == "None" ||
-        m_aircraft->multiMotorChannelBox5->currentText() == "None" ||
-        m_aircraft->multiMotorChannelBox6->currentText() == "None") {
-		
+    if (throwConfigError(6))
 		return false;
-    }
-	
+
     QList<QString> motorList;
     if (pLayout) {
         motorList << "VTOLMotorN" << "VTOLMotorNE" << "VTOLMotorSE"
@@ -1069,7 +997,7 @@ bool ConfigMultiRotorWidget::setupMultiRotorMixer(double mixerFactors[8][3])
 /**
  This function displays text and color formatting in order to help the user understand what channels have not yet been configured.
  */
-void ConfigMultiRotorWidget::throwConfigError(int numMotors)
+bool ConfigMultiRotorWidget::throwConfigError(int numMotors)
 {    
 	//Initialize configuration error flag
 	bool error=false;
@@ -1096,6 +1024,7 @@ void ConfigMultiRotorWidget::throwConfigError(int numMotors)
 	if (error){
 		m_aircraft->mrStatusLabel->setText(QString("<font color='red'>ERROR: Assign all %1 motor channels</font>").arg(numMotors));
 	}
+    return error;
 }
 
 

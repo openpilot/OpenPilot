@@ -632,7 +632,7 @@ Setup the flight mode channel on the RC Input tab if you have not done so alread
        <widget class="QSpinBox" name="fmsPosNum">
         <property name="geometry">
          <rect>
-          <x>464</x>
+          <x>440</x>
           <y>20</y>
           <width>61</width>
           <height>20</height>
@@ -668,7 +668,7 @@ channel value for each flight mode.</string>
          </rect>
         </property>
         <property name="text">
-         <string>Number of switch positions:</string>
+         <string>Number of modes:</string>
         </property>
        </widget>
        <widget class="QLabel" name="label_15">

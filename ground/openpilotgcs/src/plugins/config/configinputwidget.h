@@ -146,6 +146,7 @@ private slots:
         void moveSticks();
         void dimOtherControls(bool value);
         void moveFMSlider();
+        void updatePositionSlider();
         void invertControls();
         void simpleCalibration(bool state);
         void updateCalibration();

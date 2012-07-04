@@ -165,14 +165,14 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     UAVObjectField* field = obj->getField(QString("Mixer1Type"));
     QStringList list = field->getOptions();
-    for (int i=0;i<8;i++) {
+    for (int i=0; i<(int)(VehicleConfig::CHANNEL_NUMELEM); i++) {
         QComboBox* qb = new QComboBox(m_aircraft->customMixerTable);
         qb->addItems(list);
         m_aircraft->customMixerTable->setCellWidget(0,i,qb);
     }
 
     SpinBoxDelegate *sbd = new SpinBoxDelegate();
-    for (int i=1;i<8; i++) {
+    for (int i=1; i<(int)(VehicleConfig::CHANNEL_NUMELEM); i++) {
         m_aircraft->customMixerTable->setItemDelegateForRow(i, sbd);
     }
 
@@ -323,7 +323,7 @@ void ConfigVehicleTypeWidget::switchAirframeType(int index)
     m_aircraft->quadShape->fitInView(quad, Qt::KeepAspectRatio);
     if (m_aircraft->aircraftType->findText("Custom")) {
         m_aircraft->customMixerTable->resizeColumnsToContents();
-        for (int i=0;i<8;i++) {
+        for (int i=0;i<(int)(VehicleConfig::CHANNEL_NUMELEM);i++) {
             m_aircraft->customMixerTable->setColumnWidth(i,(m_aircraft->customMixerTable->width()-
                                                             m_aircraft->customMixerTable->verticalHeader()->width())/8);
         }
@@ -342,7 +342,7 @@ void ConfigVehicleTypeWidget::showEvent(QShowEvent *event)
     // the result is usually a ahrsbargraph that is way too small.
     m_aircraft->quadShape->fitInView(quad, Qt::KeepAspectRatio);
     m_aircraft->customMixerTable->resizeColumnsToContents();
-    for (int i=0;i<8;i++) {
+    for (int i=0;i<(int)(VehicleConfig::CHANNEL_NUMELEM);i++) {
         m_aircraft->customMixerTable->setColumnWidth(i,(m_aircraft->customMixerTable->width()-
                                                         m_aircraft->customMixerTable->verticalHeader()->width())/8);
     }
@@ -651,7 +651,7 @@ void ConfigVehicleTypeWidget::updateCustomAirframeUI()
     }
 
     // Update the mixer table:
-    for (int channel=0; channel<8; channel++) {
+    for (int channel=0; channel<(int)(VehicleConfig::CHANNEL_NUMELEM); channel++) {
         UAVObjectField* field = mixer->getField(mixerTypes.at(channel));
         if (field)
         {
@@ -721,7 +721,7 @@ void ConfigVehicleTypeWidget::updateObjectsFromWidgets()
         vconfig->setThrottleCurve(mixer, VehicleConfig::MIXER_THROTTLECURVE2, m_aircraft->customThrottle2Curve->getCurve());
 
         // Update the table:
-        for (int channel=0; channel<8; channel++) {
+        for (int channel=0; channel<(int)(VehicleConfig::CHANNEL_NUMELEM); channel++) {
             QComboBox* q = (QComboBox*)m_aircraft->customMixerTable->cellWidget(0,channel);
 
             vconfig->setMixerType(mixer,channel,

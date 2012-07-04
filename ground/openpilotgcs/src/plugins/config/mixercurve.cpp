@@ -1,5 +1,33 @@
+/**
+ ******************************************************************************
+ *
+ * @file       mixercurve.cpp
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @addtogroup GCSPlugins GCS Plugins
+ * @{
+ * @addtogroup ConfigPlugin Config Plugin
+ * @{
+ * @brief A MixerCurve Gadget used to update settings in the firmware
+ *****************************************************************************/
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
+
 #include <math.h>
 #include "mixercurve.h"
+#include "doublespindelegate.h"
 
 MixerCurve::MixerCurve(QWidget *parent) :
     QFrame(parent),
@@ -11,13 +39,18 @@ MixerCurve::MixerCurve(QWidget *parent) :
     m_curve = m_mixerUI->CurveWidget;
     m_settings = m_mixerUI->CurveSettings;
 
-    UpdateCurveSettings();
+    DoubleSpinDelegate *sbd = new DoubleSpinDelegate();
+    for (int i=0; i<MixerCurveWidget::NODE_NUMELEM; i++) {
+        m_settings->setItemDelegateForRow(i, sbd);
+    }
 
-    connect(m_mixerUI->CurveType, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateCurveSettings()));
+    UpdateCurveUI();
+
+    connect(m_mixerUI->CurveType, SIGNAL(currentIndexChanged(int)), this, SLOT(CurveTypeChanged()));
     connect(m_mixerUI->ResetCurve, SIGNAL(clicked()), this, SLOT(ResetCurve()));
     connect(m_mixerUI->GenerateCurve, SIGNAL(clicked()), this, SLOT(GenerateCurve()));
-    connect(m_curve, SIGNAL(curveUpdated()), this, SLOT(UpdateSettings()));
-
+    connect(m_curve, SIGNAL(curveUpdated()), this, SLOT(UpdateSettingsTable()));
+    connect(m_settings, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(SettingsTableChanged()));
     connect(m_mixerUI->CurveMin, SIGNAL(valueChanged(double)), this, SLOT(CurveMinChanged(double)));
     connect(m_mixerUI->CurveMax, SIGNAL(valueChanged(double)), this, SLOT(CurveMaxChanged(double)));
     connect(m_mixerUI->CurveStep, SIGNAL(valueChanged(double)), this, SLOT(GenerateCurve()));
@@ -35,19 +68,16 @@ void MixerCurve::setMixerType(MixerCurveType curveType)
 
 void MixerCurve::ResetCurve()
 {
-    m_curve->setMin((m_curveType == MixerCurve::MIXERCURVE_THROTTLE) ? 0.0 : -1.0);
-    m_curve->setMax(1.0);
-
     m_mixerUI->CurveMin->setValue(m_curve->getMin());
     m_mixerUI->CurveMax->setValue(m_curve->getMax());
     m_mixerUI->CurveType->setCurrentIndex(m_mixerUI->CurveType->findText("Linear"));
 
     initLinearCurve(MixerCurveWidget::NODE_NUMELEM, m_curve->getMax(), m_curve->getMin());
 
-    UpdateSettings();
+    UpdateSettingsTable();
 }
 
-void MixerCurve::UpdateCurveSettings()
+void MixerCurve::UpdateCurveUI()
 {
     //get the user settings
     QString curveType = m_mixerUI->CurveType->currentText();
@@ -60,7 +90,7 @@ void MixerCurve::UpdateCurveSettings()
             m_mixerUI->CurveStep->setMinimum(0.0);
             break;
         }
-        case MixerCurve::MIXERCURVEPITCH:
+        case MixerCurve::MIXERCURVE_PITCH:
         {
             m_mixerUI->CurveMin->setMinimum(-1.0);
             m_mixerUI->CurveMax->setMinimum(-1.0);
@@ -68,8 +98,8 @@ void MixerCurve::UpdateCurveSettings()
             break;
         }
     }
-    m_mixerUI->CurveMin->setMaximum(1.0);
-    m_mixerUI->CurveMax->setMaximum(1.0);
+    m_mixerUI->CurveMin->setMaximum(m_curve->getMax());
+    m_mixerUI->CurveMax->setMaximum(m_curve->getMax());
     m_mixerUI->CurveStep->setMaximum(100.0);
 
     //set default visible
@@ -168,50 +198,56 @@ void MixerCurve::GenerateCurve()
        }
    }
 
-   initCurve(&points);
+   setCurve(&points);
 }
 
+/**
+  Wrappers for mixercurvewidget.
+  */
 void MixerCurve::initCurve (const QList<double>* points)
 {
     m_curve->setCurve(points);
-    UpdateSettings();
+    UpdateSettingsTable();
 }
-
 QList<double> MixerCurve::getCurve()
 {
     return m_curve->getCurve();
 }
-
 void MixerCurve::initLinearCurve(int numPoints, double maxValue, double minValue)
 {
+    setMin(minValue);
+    setMax(maxValue);
+
     m_curve->initLinearCurve(numPoints, maxValue, minValue);
 }
-
 void MixerCurve::setCurve(const QList<double>* points)
 {
     m_curve->setCurve(points);
-    UpdateSettings();
+    UpdateSettingsTable();
 }
-
 void MixerCurve::setMin(double value)
 {
     m_curve->setMin(value);
+    m_mixerUI->CurveMin->setMinimum(value);
 }
-
 double MixerCurve::getMin()
 {
     return m_curve->getMin();
 }
-
 void MixerCurve::setMax(double value)
 {
     m_curve->setMax(value);
+    m_mixerUI->CurveMax->setMaximum(value);
 }
-
 double MixerCurve::getMax()
 {
     return m_curve->getMax();
 }
+double MixerCurve::setRange(double min, double max)
+{
+    return m_curve->setRange(min, max);
+}
+
 
 double MixerCurve::getCurveMin()
 {
@@ -227,26 +263,48 @@ double MixerCurve::getCurveStep()
     return m_mixerUI->CurveStep->value();
 }
 
-void MixerCurve::UpdateSettings()
+void MixerCurve::UpdateSettingsTable()
 {
     QList<double> points = m_curve->getCurve();
-
     int ptCnt = points.count();
+
     for (int i=0; i<ptCnt; i++)
     {
-        QTableWidgetItem* item = m_settings->item((ptCnt - 1) - i, 0);
+        QTableWidgetItem* item = m_settings->item(i, 0);
         if (item)
-            item->setText(QString().sprintf("%.2f",points.at(i)));
+            item->setText(QString().sprintf("%.2f",points.at( (ptCnt - 1) - i )));
     }
+}
+
+void MixerCurve::SettingsTableChanged()
+{
+    QList<double> points;
+
+    for (int i=0; i < m_settings->rowCount(); i++)
+    {
+        QTableWidgetItem* item = m_settings->item(i, 0);
+
+        if (item)
+            points.push_front(item->text().toDouble());
+    }
+
+    m_curve->setCurve(&points);
+}
+
+void MixerCurve::CurveTypeChanged()
+{
+    // setup the ui for this curvetype
+    UpdateCurveUI();
+
+    // and generate a curve based on the selection
+    GenerateCurve();
 }
 
 void MixerCurve::CurveMinChanged(double value)
 {
-    //setMin(value);
-
     // the min changed so redraw the curve
     //  mixercurvewidget::setCurve will trim any points below min
-    QList<double> points = getCurve();
+    QList<double> points = m_curve->getCurve();
     points.removeFirst();
     points.push_front(value);
     setCurve(&points);
@@ -254,19 +312,12 @@ void MixerCurve::CurveMinChanged(double value)
 
 void MixerCurve::CurveMaxChanged(double value)
 {
-    //setMax(value);
-
     // the max changed so redraw the curve
     //  mixercurvewidget::setCurve will trim any points above max
-    QList<double> points = getCurve();
+    QList<double> points = m_curve->getCurve();
     points.removeLast();
     points.append(value);
     setCurve(&points);
-}
-
-double MixerCurve::setRange(double min, double max)
-{
-    return m_curve->setRange(min, max);
 }
 
 void MixerCurve::showEvent(QShowEvent *event)

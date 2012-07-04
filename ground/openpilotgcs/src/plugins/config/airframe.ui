@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>939</width>
-    <height>635</height>
+    <height>657</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -74,7 +74,7 @@
        <item>
         <widget class="QStackedWidget" name="airframesWidget">
          <property name="currentIndex">
-          <number>4</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="fixedWing">
           <property name="enabled">
@@ -473,15 +473,15 @@ margin:1px;</string>
                   <item>
                    <widget class="MixerCurve" name="fixedWingThrottle" native="true">
                     <property name="sizePolicy">
-                     <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
+                     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                      <horstretch>1</horstretch>
+                      <verstretch>1</verstretch>
                      </sizepolicy>
                     </property>
                     <property name="minimumSize">
                      <size>
-                      <width>0</width>
-                      <height>0</height>
+                      <width>450</width>
+                      <height>400</height>
                      </size>
                     </property>
                     <property name="maximumSize">
@@ -494,6 +494,12 @@ margin:1px;</string>
                      <size>
                       <width>10</width>
                       <height>10</height>
+                     </size>
+                    </property>
+                    <property name="baseSize">
+                     <size>
+                      <width>300</width>
+                      <height>300</height>
                      </size>
                     </property>
                    </widget>
@@ -1619,22 +1625,9 @@ margin:1px;</string>
                 </widget>
                </item>
                <item>
-                <spacer name="horizontalSpacer_24">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item>
                 <widget class="QGroupBox" name="gvThrottleCurve1GroupBox">
                  <property name="sizePolicy">
-                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
                    <horstretch>0</horstretch>
                    <verstretch>100</verstretch>
                   </sizepolicy>
@@ -1676,6 +1669,12 @@ margin:1px;</string>
                </item>
                <item>
                 <widget class="QGroupBox" name="gvThrottleCurve2GroupBox">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
                  <property name="title">
                   <string>Rear throttle curve</string>
                  </property>
@@ -1775,7 +1774,7 @@ margin:1px;</string>
                   <item>
                    <widget class="MixerCurve" name="customThrottle1Curve" native="true">
                     <property name="sizePolicy">
-                     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                     <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
                       <horstretch>1</horstretch>
                       <verstretch>1</verstretch>
                      </sizepolicy>
@@ -1800,8 +1799,8 @@ margin:1px;</string>
                     </property>
                     <property name="baseSize">
                      <size>
-                      <width>200</width>
-                      <height>200</height>
+                      <width>300</width>
+                      <height>350</height>
                      </size>
                     </property>
                    </widget>
@@ -1818,7 +1817,7 @@ margin:1px;</string>
                   <item>
                    <widget class="MixerCurve" name="customThrottle2Curve" native="true">
                     <property name="sizePolicy">
-                     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                     <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
                       <horstretch>1</horstretch>
                       <verstretch>1</verstretch>
                      </sizepolicy>
@@ -1843,8 +1842,8 @@ margin:1px;</string>
                     </property>
                     <property name="baseSize">
                      <size>
-                      <width>200</width>
-                      <height>200</height>
+                      <width>300</width>
+                      <height>350</height>
                      </size>
                     </property>
                    </widget>
@@ -1941,6 +1940,16 @@ margin:1px;</string>
                  <string>Ch 8</string>
                 </property>
                </column>
+               <column>
+                <property name="text">
+                 <string>Ch 9</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Ch 10</string>
+                </property>
+               </column>
                <item row="0" column="0">
                 <property name="text">
                  <string>-</string>
@@ -1998,6 +2007,22 @@ margin:1px;</string>
                 </property>
                </item>
                <item row="0" column="7">
+                <property name="text">
+                 <string>-</string>
+                </property>
+                <property name="textAlignment">
+                 <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+                </property>
+               </item>
+               <item row="0" column="8">
+                <property name="text">
+                 <string>-</string>
+                </property>
+                <property name="textAlignment">
+                 <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+                </property>
+               </item>
+               <item row="0" column="9">
                 <property name="text">
                  <string>-</string>
                 </property>
@@ -2069,6 +2094,22 @@ margin:1px;</string>
                  <set>AlignHCenter|AlignVCenter|AlignCenter</set>
                 </property>
                </item>
+               <item row="1" column="8">
+                <property name="text">
+                 <string>-</string>
+                </property>
+                <property name="textAlignment">
+                 <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+                </property>
+               </item>
+               <item row="1" column="9">
+                <property name="text">
+                 <string>-</string>
+                </property>
+                <property name="textAlignment">
+                 <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+                </property>
+               </item>
                <item row="2" column="0">
                 <property name="text">
                  <string>-</string>
@@ -2126,6 +2167,22 @@ margin:1px;</string>
                 </property>
                </item>
                <item row="2" column="7">
+                <property name="text">
+                 <string>-</string>
+                </property>
+                <property name="textAlignment">
+                 <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+                </property>
+               </item>
+               <item row="2" column="8">
+                <property name="text">
+                 <string>-</string>
+                </property>
+                <property name="textAlignment">
+                 <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+                </property>
+               </item>
+               <item row="2" column="9">
                 <property name="text">
                  <string>-</string>
                 </property>
@@ -2197,6 +2254,22 @@ margin:1px;</string>
                  <set>AlignHCenter|AlignVCenter|AlignCenter</set>
                 </property>
                </item>
+               <item row="3" column="8">
+                <property name="text">
+                 <string>-</string>
+                </property>
+                <property name="textAlignment">
+                 <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+                </property>
+               </item>
+               <item row="3" column="9">
+                <property name="text">
+                 <string>-</string>
+                </property>
+                <property name="textAlignment">
+                 <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+                </property>
+               </item>
                <item row="4" column="0">
                 <property name="text">
                  <string>-</string>
@@ -2261,6 +2334,22 @@ margin:1px;</string>
                  <set>AlignHCenter|AlignVCenter|AlignCenter</set>
                 </property>
                </item>
+               <item row="4" column="8">
+                <property name="text">
+                 <string>-</string>
+                </property>
+                <property name="textAlignment">
+                 <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+                </property>
+               </item>
+               <item row="4" column="9">
+                <property name="text">
+                 <string>-</string>
+                </property>
+                <property name="textAlignment">
+                 <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+                </property>
+               </item>
                <item row="5" column="0">
                 <property name="text">
                  <string>-</string>
@@ -2318,6 +2407,22 @@ margin:1px;</string>
                 </property>
                </item>
                <item row="5" column="7">
+                <property name="text">
+                 <string>-</string>
+                </property>
+                <property name="textAlignment">
+                 <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+                </property>
+               </item>
+               <item row="5" column="8">
+                <property name="text">
+                 <string>-</string>
+                </property>
+                <property name="textAlignment">
+                 <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+                </property>
+               </item>
+               <item row="5" column="9">
                 <property name="text">
                  <string>-</string>
                 </property>
@@ -2747,7 +2852,7 @@ p, li { white-space: pre-wrap; }
   <customwidget>
    <class>MixerCurve</class>
    <extends>QWidget</extends>
-   <header location="global">uavobjectwidgetutils/mixercurve.h</header>
+   <header location="global">mixercurve.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

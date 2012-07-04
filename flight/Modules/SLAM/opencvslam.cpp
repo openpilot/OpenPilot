@@ -31,6 +31,8 @@
 // Private constants
 #define DEG2RAD (3.1415926535897932/180.0)
 
+using namespace cv;
+
 OpenCVslam::OpenCVslam(SLAMSettingsData * newsettings) {
 
 	settings = newsettings;
@@ -47,7 +49,7 @@ void OpenCVslam::run() {
 	//VideoSource = NULL; //cvCaptureFromFile("test.avi");
 	VideoSource = cvCaptureFromFile("test.avi");
 	//VideoSource = cvCaptureFromCAM(0);
-	CvVideoWriter *VideoDest = cvCreateVideoWriter("output.avi",CV_FOURCC('F','M','P','4'),settings->FrameRate,cvSize(640,480),1);
+	//CvVideoWriter *VideoDest = cvCreateVideoWriter("output.avi",CV_FOURCC('F','M','P','4'),settings->FrameRate,cvSize(640,480),1);
 
 	if (VideoSource) {
 		cvGrabFrame(VideoSource);
@@ -56,7 +58,12 @@ void OpenCVslam::run() {
 		cvSetCaptureProperty(VideoSource, CV_CAP_PROP_FRAME_HEIGHT, settings->FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_Y]);
 	}
 
+	Mat last,current;
+	pyrDown(Mat(currentFrame),current);
 	if (currentFrame) lastFrame = cvCloneImage(currentFrame);
+	pyrDown(Mat(currentFrame),current);
+	pyrDown(current,current);
+	last=current;
 
 	// debug output
 	cvNamedWindow("debug",CV_WINDOW_AUTOSIZE);
@@ -79,6 +86,10 @@ void OpenCVslam::run() {
 	int32_t writeextra=0;
 	fprintf(stderr,"init at %i increment is %i at %f fps\n",timeval, increment,settings->FrameRate);
 
+
+	Mat flow; // = Mat(480,640,CV_32FC1);
+	Mat sflow[3];
+	Mat cflow;
 	// Main task loop
 	double oldpos=0;
 	while (1) {
@@ -99,9 +110,9 @@ void OpenCVslam::run() {
 				if (writeincrement+writeextra+1000<0) {
 					writeextra=-(writeincrement+1000);
 				}
-				struct writeframestruct x={VideoDest,lastFrame};
-				backgroundWriteFrame(x);
-				fprintf(stderr,".");
+				//struct writeframestruct x={VideoDest,lastFrame};
+				//backgroundWriteFrame(x);
+				//fprintf(stderr,".");
 			} else {
 				vTaskDelay(1/portTICK_RATE_MS);
 			}
@@ -113,9 +124,9 @@ void OpenCVslam::run() {
 					writeextra=-(writeincrement+1000);
 				}
 
-				struct writeframestruct x={VideoDest,lastFrame};
-				backgroundWriteFrame(x);
-				fprintf(stderr,".");
+				//struct writeframestruct x={VideoDest,lastFrame};
+				//backgroundWriteFrame(x);
+				//fprintf(stderr,".");
 			}
 
 		float dT = PIOS_DELAY_DiffuS(timeval) * 1.0e-6f;
@@ -136,6 +147,27 @@ void OpenCVslam::run() {
 
 		if (VideoSource) currentFrame = cvRetrieveFrame(VideoSource,0);
 
+		if (currentFrame) {
+			last=current;
+			pyrDown(Mat(currentFrame),current);
+			pyrDown(current,current);
+		}
+		if (currentFrame && lastFrame) {
+			Mat x1,x2;
+			cvtColor(last,x1,CV_RGB2GRAY);
+			cvtColor(current,x2,CV_RGB2GRAY);
+			//flow=x2;
+			fprintf(stderr,"calculate flow...");
+			//vPortEnterCritical();
+			//calcOpticalFlowFarneback(x1,x2, flow, 0.5, 3, 9, 9, 5, 1.1, 0);
+			calcOpticalFlowFarneback(x1,x2, flow, 0.5, 4, 13, 1, 5, 1.1, 0);
+			//vPortExitCritical();
+			fprintf(stderr,"done\n");
+			split(flow,sflow);
+			sflow[2]=sflow[1];
+			merge(sflow,3,cflow);
+			//fprintf(stderr," we have %i\n",x2.channels());
+		}
 		if (lastFrame) {
 			cvReleaseImage(&lastFrame);
 		}
@@ -162,9 +194,11 @@ void OpenCVslam::run() {
 			CvPoint left = cvPoint(center.x-right.x,center.y-right.y);
 			right.x += center.x;
 			right.y += center.y;
-			cvLine(lastFrame,left,right,CV_RGB(255,255,0),3,8,0);
+			//cvLine(lastFrame,left,right,CV_RGB(255,255,0),3,8,0);
 
-			cvShowImage("debug",lastFrame);
+			IplImage xflow = cflow;
+			cvShowImage("debug",&xflow);
+		cvWaitKey(1);
 		}
 	
 

@@ -4,11 +4,19 @@
     <AutoSelect>true</AutoSelect>
     <LastPreferenceCategory>LineardialGadget</LastPreferenceCategory>
     <LastPreferencePage>Mainboard CPU</LastPreferencePage>
-    <OverrideLanguage>en_AU</OverrideLanguage>
     <SaveSettingsOnExit>true</SaveSettingsOnExit>
     <SettingsWindowHeight>476</SettingsWindowHeight>
     <SettingsWindowWidth>697</SettingsWindowWidth>
   </General>
+  <IPconnection>
+    <Current>
+      <arr_1>
+        <Port>1</Port>
+        <UseTCP>0</UseTCP>
+      </arr_1>
+      <size>1</size>
+    </Current>
+  </IPconnection>
   <KeyBindings>
     <size>0</size>
   </KeyBindings>
@@ -25,6 +33,9 @@
     <Mode5>87</Mode5>
     <Welcome>100</Welcome>
   </ModePriorities>
+  <SerialConnection>
+    <speed>57600</speed>
+  </SerialConnection>
   <UAVGadgetConfigurations>
     <ConfigGadget>
       <default>
@@ -48,7 +59,7 @@
           <dialNeedleID1>needle</dialNeedleID1>
           <dialNeedleID2>needle</dialNeedleID2>
           <dialNeedleID3>needle3</dialNeedleID3>
-          <font>Ubuntu,11,-1,5,50,0,0,0,0,0</font>
+          <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
           <needle1DataObject>AttitudeActual</needle1DataObject>
           <needle1Factor>-1</needle1Factor>
           <needle1MaxValue>360</needle1MaxValue>
@@ -83,7 +94,7 @@
           <dialNeedleID1>needle</dialNeedleID1>
           <dialNeedleID2>needle2</dialNeedleID2>
           <dialNeedleID3>needle3</dialNeedleID3>
-          <font>Ubuntu,11,-1,5,50,0,0,0,0,0</font>
+          <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
           <needle1DataObject>BaroAltitude</needle1DataObject>
           <needle1Factor>1</needle1Factor>
           <needle1MaxValue>10</needle1MaxValue>
@@ -115,7 +126,7 @@
           <dialBackgroundID>background</dialBackgroundID>
           <dialFile>%%DATAPATH%%dials/default/barometer.svg</dialFile>
           <dialNeedleID1>needle</dialNeedleID1>
-          <font>Ubuntu,11,-1,5,50,0,0,0,0,0</font>
+          <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
           <needle1DataObject>BaroAltitude</needle1DataObject>
           <needle1Factor>10</needle1Factor>
           <needle1MaxValue>1120</needle1MaxValue>
@@ -147,7 +158,7 @@
           <dialBackgroundID>background</dialBackgroundID>
           <dialFile>%%DATAPATH%%dials/default/vsi.svg</dialFile>
           <dialNeedleID1>needle</dialNeedleID1>
-          <font>Ubuntu,11,-1,5,50,0,0,0,0,0</font>
+          <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
           <needle1DataObject>VelocityActual</needle1DataObject>
           <needle1Factor>0.01</needle1Factor>
           <needle1MaxValue>12</needle1MaxValue>
@@ -180,7 +191,7 @@
           <dialFile>%%DATAPATH%%dials/default/compass.svg</dialFile>
           <dialForegroundID>foreground</dialForegroundID>
           <dialNeedleID1>needle</dialNeedleID1>
-          <font>Ubuntu,11,-1,5,50,0,0,0,0,0</font>
+          <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
           <needle1DataObject>AttitudeActual</needle1DataObject>
           <needle1Factor>-1</needle1Factor>
           <needle1MaxValue>360</needle1MaxValue>
@@ -215,7 +226,7 @@
           <dialNeedleID1>needle</dialNeedleID1>
           <dialNeedleID2>needle</dialNeedleID2>
           <dialNeedleID3>needle3</dialNeedleID3>
-          <font>Ubuntu,11,-1,5,50,0,0,0,0,0</font>
+          <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
           <needle1DataObject>AttitudeActual</needle1DataObject>
           <needle1Factor>-1</needle1Factor>
           <needle1MaxValue>360</needle1MaxValue>
@@ -250,7 +261,7 @@
           <dialNeedleID1>needle</dialNeedleID1>
           <dialNeedleID2>needle2</dialNeedleID2>
           <dialNeedleID3>needle3</dialNeedleID3>
-          <font>Ubuntu,11,-1,5,50,0,0,0,0,0</font>
+          <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
           <needle1DataObject>BaroAltitude</needle1DataObject>
           <needle1Factor>1</needle1Factor>
           <needle1MaxValue>10</needle1MaxValue>
@@ -283,7 +294,7 @@
           <dialFile>%%DATAPATH%%dials/deluxe/barometer.svg</dialFile>
           <dialForegroundID>foreground</dialForegroundID>
           <dialNeedleID1>needle</dialNeedleID1>
-          <font>Ubuntu,11,-1,5,50,0,0,0,0,0</font>
+          <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
           <needle1DataObject>BaroAltitude</needle1DataObject>
           <needle1Factor>10</needle1Factor>
           <needle1MaxValue>1120</needle1MaxValue>
@@ -316,7 +327,7 @@
           <dialFile>%%DATAPATH%%dials/deluxe/vsi.svg</dialFile>
           <dialForegroundID>foreground</dialForegroundID>
           <dialNeedleID1>needle</dialNeedleID1>
-          <font>Ubuntu,11,-1,5,50,0,0,0,0,0</font>
+          <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
           <needle1DataObject>VelocityActual</needle1DataObject>
           <needle1Factor>0.01</needle1Factor>
           <needle1MaxValue>11.2</needle1MaxValue>
@@ -349,7 +360,7 @@
           <dialFile>%%DATAPATH%%dials/deluxe/compass.svg</dialFile>
           <dialForegroundID>foreground</dialForegroundID>
           <dialNeedleID1>needle</dialNeedleID1>
-          <font>Ubuntu,11,-1,5,50,0,0,0,0,0</font>
+          <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
           <needle1DataObject>AttitudeActual</needle1DataObject>
           <needle1Factor>-1</needle1Factor>
           <needle1MaxValue>360</needle1MaxValue>
@@ -382,7 +393,7 @@
           <dialFile>%%DATAPATH%%dials/deluxe/speed.svg</dialFile>
           <dialForegroundID>foreground</dialForegroundID>
           <dialNeedleID1>needle</dialNeedleID1>
-          <font>Ubuntu,11,-1,5,50,0,0,0,0,0</font>
+          <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
           <needle1DataObject>GPSPosition</needle1DataObject>
           <needle1Factor>3.6</needle1Factor>
           <needle1MaxValue>120</needle1MaxValue>
@@ -417,7 +428,7 @@
           <dialNeedleID1>needle</dialNeedleID1>
           <dialNeedleID2>needle2</dialNeedleID2>
           <dialNeedleID3>needle3</dialNeedleID3>
-          <font>Ubuntu,11,-1,5,50,0,0,0,0,0</font>
+          <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
           <needle1DataObject>BaroAltitude</needle1DataObject>
           <needle1Factor>1</needle1Factor>
           <needle1MaxValue>120</needle1MaxValue>
@@ -452,7 +463,7 @@
           <dialNeedleID1>needle</dialNeedleID1>
           <dialNeedleID2>needle2</dialNeedleID2>
           <dialNeedleID3>needle2</dialNeedleID3>
-          <font>Ubuntu,11,-1,5,50,0,0,0,0,0</font>
+          <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
           <needle1DataObject>AttitudeActual</needle1DataObject>
           <needle1Factor>-1</needle1Factor>
           <needle1MaxValue>360</needle1MaxValue>
@@ -484,7 +495,7 @@
           <dialBackgroundID>background</dialBackgroundID>
           <dialFile>%%DATAPATH%%dials/default/speed.svg</dialFile>
           <dialNeedleID1>needle</dialNeedleID1>
-          <font>Ubuntu,11,-1,5,50,0,0,0,0,0</font>
+          <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
           <needle1DataObject>GPSPosition</needle1DataObject>
           <needle1Factor>3.6</needle1Factor>
           <needle1MaxValue>120</needle1MaxValue>
@@ -519,7 +530,7 @@
           <dialNeedleID1>needle</dialNeedleID1>
           <dialNeedleID2>needle</dialNeedleID2>
           <dialNeedleID3>needle3</dialNeedleID3>
-          <font>Ubuntu,11,-1,5,50,0,0,0,0,0</font>
+          <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
           <needle1DataObject>AttitudeActual</needle1DataObject>
           <needle1Factor>-1</needle1Factor>
           <needle1MaxValue>360</needle1MaxValue>
@@ -554,7 +565,7 @@
           <dialNeedleID1>needle</dialNeedleID1>
           <dialNeedleID2>needle2</dialNeedleID2>
           <dialNeedleID3>needle3</dialNeedleID3>
-          <font>Ubuntu,11,-1,5,50,0,0,0,0,0</font>
+          <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
           <needle1DataObject>BaroAltitude</needle1DataObject>
           <needle1Factor>1</needle1Factor>
           <needle1MaxValue>10</needle1MaxValue>
@@ -586,7 +597,7 @@
           <dialBackgroundID>background</dialBackgroundID>
           <dialFile>%%DATAPATH%%dials/hi-contrast/barometer.svg</dialFile>
           <dialNeedleID1>needle</dialNeedleID1>
-          <font>Ubuntu,11,-1,5,50,0,0,0,0,0</font>
+          <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
           <needle1DataObject>BaroAltitude</needle1DataObject>
           <needle1Factor>10</needle1Factor>
           <needle1MaxValue>1120</needle1MaxValue>
@@ -618,7 +629,7 @@
           <dialBackgroundID>background</dialBackgroundID>
           <dialFile>%%DATAPATH%%dials/hi-contrast/vsi.svg</dialFile>
           <dialNeedleID1>needle</dialNeedleID1>
-          <font>Ubuntu,11,-1,5,50,0,0,0,0,0</font>
+          <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
           <needle1DataObject>VelocityActual</needle1DataObject>
           <needle1Factor>0.01</needle1Factor>
           <needle1MaxValue>12</needle1MaxValue>
@@ -651,7 +662,7 @@
           <dialFile>%%DATAPATH%%dials/hi-contrast/compass.svg</dialFile>
           <dialForegroundID>foreground</dialForegroundID>
           <dialNeedleID1>needle</dialNeedleID1>
-          <font>Ubuntu,11,-1,5,50,0,0,0,0,0</font>
+          <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
           <needle1DataObject>AttitudeActual</needle1DataObject>
           <needle1Factor>-1</needle1Factor>
           <needle1MaxValue>360</needle1MaxValue>
@@ -683,7 +694,7 @@
           <dialBackgroundID>background</dialBackgroundID>
           <dialFile>%%DATAPATH%%dials/hi-contrast/speed.svg</dialFile>
           <dialNeedleID1>needle</dialNeedleID1>
-          <font>Ubuntu,11,-1,5,50,0,0,0,0,0</font>
+          <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
           <needle1DataObject>GPSPosition</needle1DataObject>
           <needle1Factor>3.6</needle1Factor>
           <needle1MaxValue>120</needle1MaxValue>
@@ -717,7 +728,7 @@
           <dialNeedleID1>needle</dialNeedleID1>
           <dialNeedleID2>needle2</dialNeedleID2>
           <dialNeedleID3>needle3</dialNeedleID3>
-          <font>Ubuntu,11,-1,5,50,0,0,0,0,0</font>
+          <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
           <needle1DataObject>BaroAltitude</needle1DataObject>
           <needle1Factor>1</needle1Factor>
           <needle1MaxValue>120</needle1MaxValue>
@@ -751,7 +762,7 @@
           <dialNeedleID1>needle</dialNeedleID1>
           <dialNeedleID2>needle2</dialNeedleID2>
           <dialNeedleID3>needle3</dialNeedleID3>
-          <font>Ubuntu,11,-1,5,50,0,0,0,0,0</font>
+          <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
           <needle1DataObject>ManualControlCommand</needle1DataObject>
           <needle1Factor>1</needle1Factor>
           <needle1MaxValue>2000</needle1MaxValue>
@@ -785,7 +796,7 @@
           <dialNeedleID1>needle</dialNeedleID1>
           <dialNeedleID2>needle2</dialNeedleID2>
           <dialNeedleID3>needle3</dialNeedleID3>
-          <font>Ubuntu,11,-1,5,50,0,0,0,0,0</font>
+          <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
           <needle1DataObject>BaroAltitude</needle1DataObject>
           <needle1Factor>1</needle1Factor>
           <needle1MaxValue>120</needle1MaxValue>
@@ -866,7 +877,7 @@
           <defaultDataBits>3</defaultDataBits>
           <defaultFlow>0</defaultFlow>
           <defaultParity>0</defaultParity>
-          <defaultPort>Serial port 0</defaultPort>
+          <defaultPort>Communications Port (COM1)</defaultPort>
           <defaultSpeed>11</defaultSpeed>
           <defaultStopBits>0</defaultStopBits>
         </data>
@@ -881,7 +892,7 @@
           <defaultDataBits>3</defaultDataBits>
           <defaultFlow>0</defaultFlow>
           <defaultParity>0</defaultParity>
-          <defaultPort>Serial port 0</defaultPort>
+          <defaultPort>Communications Port (COM1)</defaultPort>
           <defaultSpeed>17</defaultSpeed>
           <defaultStopBits>0</defaultStopBits>
         </data>
@@ -1151,17 +1162,17 @@
           <decimalPlaces>0</decimalPlaces>
           <factor>1</factor>
           <font>Andale Mono,12,-1,5,75,0,0,0,0,0</font>
-          <greenMax>50</greenMax>
+          <greenMax>90</greenMax>
           <greenMin>0</greenMin>
           <maxValue>100</maxValue>
           <minValue>0</minValue>
           <redMax>100</redMax>
-          <redMin>80</redMin>
+          <redMin>95</redMin>
           <sourceDataObject>SystemStats</sourceDataObject>
           <sourceObjectField>CPULoad</sourceObjectField>
           <useOpenGLFlag>false</useOpenGLFlag>
-          <yellowMax>80</yellowMax>
-          <yellowMin>50</yellowMin>
+          <yellowMax>95</yellowMax>
+          <yellowMin>90</yellowMin>
         </data>
       </Mainboard__PCT__20CPU>
       <Pitch__PCT__20Desired>
@@ -2853,7 +2864,7 @@
   </UAVGadgetManager>
   <Workspace>
     <AllowTabBarMovement>false</AllowTabBarMovement>
-    <Icon1>:/core/images/ah.png</Icon1>
+    <Icon1>:\core\images\ah.png</Icon1>
     <Icon10>:/core/images/openpilot_logo_64.png</Icon10>
     <Icon2>:/core/images/config.png</Icon2>
     <Icon3>:/core/images/scopes.png</Icon3>

@@ -33,7 +33,7 @@
 
 // constructor
 opmap_edit_waypoint_dialog::opmap_edit_waypoint_dialog(QWidget *parent,QAbstractItemModel * model,QItemSelectionModel * selection) :
-    QWidget(parent),model(model),itemSelection(selection),
+    QWidget(parent,Qt::Window),model(model),itemSelection(selection),
     ui(new Ui::opmap_edit_waypoint_dialog)
 {  
     ui->setupUi(this);
@@ -235,7 +235,14 @@ void opmap_edit_waypoint_dialog::pushButtonCancel_clicked()
 void opmap_edit_waypoint_dialog::editWaypoint(mapcontrol::WayPointItem *waypoint_item)
 {
     if (!waypoint_item) return;
-    show();
+    if(!isVisible())
+        show();
+    if(isMinimized())
+        showNormal();
+    if(!isActiveWindow())
+        activateWindow();
+    raise();
+    setFocus(Qt::OtherFocusReason);
     mapper->setCurrentIndex(waypoint_item->Number());
 }
 

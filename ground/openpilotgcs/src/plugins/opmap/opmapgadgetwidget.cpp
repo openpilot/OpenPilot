@@ -212,7 +212,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     selectionModel=new QItemSelectionModel(model);
     mapProxy=new modelMapProxy(this,m_map,model,selectionModel);
     table->setModel(model,selectionModel);
-    waypoint_edit_dialog=new opmap_edit_waypoint_dialog(NULL,model,selectionModel);
+    waypoint_edit_dialog=new opmap_edit_waypoint_dialog(this,model,selectionModel);
     UAVProxy=new modelUavoProxy(this,model);
     connect(table,SIGNAL(sendPathPlanToUAV()),UAVProxy,SLOT(modelToObjects()));
     connect(table,SIGNAL(receivePathPlanFromUAV()),UAVProxy,SLOT(objectsToModel()));
@@ -1712,13 +1712,8 @@ void OPMapGadgetWidget::onAddWayPointAct_triggered(internals::PointLatLng coord)
 
     if (m_map_mode != Normal_MapMode)
         return;
-
-    // m_map->WPCreate(coord, 0, "");
     float alt=15;
-    mapProxy->createWayPoint(coord, alt);
-
-    //wp->map_wp_item->picture.load(QString::fromUtf8(":/opmap/images/waypoint_marker1.png"));
-    //wp->map_wp_item->picture.load(QString::fromUtf8(":/opmap/images/waypoint_marker2.png"));
+    mapProxy->createWayPoint(coord);
 }
 
 

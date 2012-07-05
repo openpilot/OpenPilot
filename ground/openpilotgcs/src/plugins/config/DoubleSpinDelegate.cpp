@@ -31,14 +31,13 @@
   Helper delegate for the custom mixer editor table.
   */
 DoubleSpinDelegate::DoubleSpinDelegate(QObject *parent)
-     : QItemDelegate(parent),
-       m_min(0.0),
-       m_max(1.0),
-       m_decimals(2),
-       m_step(0.01)
- {
+     : QItemDelegate(parent)
+ {    
+    m_min = 0.0;
+    m_max = 1.0;
+    m_decimals = 2;
+    m_step = 0.01;
  }
-
 
 QWidget *DoubleSpinDelegate::createEditor(QWidget *parent,
     const QStyleOptionViewItem &/* option */,
@@ -49,6 +48,9 @@ QWidget *DoubleSpinDelegate::createEditor(QWidget *parent,
     editor->setMaximum(m_max);
     editor->setDecimals(m_decimals);
     editor->setSingleStep(m_step);
+
+    connect(editor,SIGNAL(valueChanged(double)), this, SLOT(valueChanged()));
+
     return editor;
 }
 
@@ -75,5 +77,10 @@ void DoubleSpinDelegate::updateEditorGeometry(QWidget *editor,
     const QStyleOptionViewItem &option, const QModelIndex &/* index */) const
 {
     editor->setGeometry(option.rect);
+}
+
+void DoubleSpinDelegate::valueChanged()
+{
+    emit ValueChanged();
 }
 

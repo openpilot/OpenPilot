@@ -62,7 +62,7 @@
        <widget class="QGroupBox" name="CurveGroup">
         <property name="maximumSize">
          <size>
-          <width>100</width>
+          <width>150</width>
           <height>16777215</height>
          </size>
         </property>
@@ -74,7 +74,7 @@
           <widget class="QTableWidget" name="CurveSettings">
            <property name="maximumSize">
             <size>
-             <width>71</width>
+             <width>100</width>
              <height>200</height>
             </size>
            </property>
@@ -281,7 +281,6 @@
              <pointsize>7</pointsize>
             </font>
            </property>
-           <zorder>CurveGroup</zorder>
           </widget>
          </item>
          <item row="2" column="0">

@@ -31,18 +31,14 @@
 
 MixerCurve::MixerCurve(QWidget *parent) :
     QFrame(parent),
-    m_mixerUI(new Ui::MixerCurve),
-    m_curveType(MixerCurve::MIXERCURVE_THROTTLE)
+    m_mixerUI(new Ui::MixerCurve)
 {
     m_mixerUI->setupUi(this);
 
     m_curve = m_mixerUI->CurveWidget;
     m_settings = m_mixerUI->CurveSettings;
 
-    DoubleSpinDelegate *sbd = new DoubleSpinDelegate();
-    for (int i=0; i<MixerCurveWidget::NODE_NUMELEM; i++) {
-        m_settings->setItemDelegateForRow(i, sbd);
-    }
+    setMixerType(MixerCurve::MIXERCURVE_THROTTLE);
 
     UpdateCurveUI();
 
@@ -50,7 +46,7 @@ MixerCurve::MixerCurve(QWidget *parent) :
     connect(m_mixerUI->ResetCurve, SIGNAL(clicked()), this, SLOT(ResetCurve()));
     connect(m_mixerUI->GenerateCurve, SIGNAL(clicked()), this, SLOT(GenerateCurve()));
     connect(m_curve, SIGNAL(curveUpdated()), this, SLOT(UpdateSettingsTable()));
-    connect(m_settings, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(SettingsTableChanged()));
+    connect(m_settings, SIGNAL(cellChanged(int,int)), this, SLOT(SettingsTableChanged()));
     connect(m_mixerUI->CurveMin, SIGNAL(valueChanged(double)), this, SLOT(CurveMinChanged(double)));
     connect(m_mixerUI->CurveMax, SIGNAL(valueChanged(double)), this, SLOT(CurveMaxChanged(double)));
     connect(m_mixerUI->CurveStep, SIGNAL(valueChanged(double)), this, SLOT(GenerateCurve()));
@@ -64,7 +60,33 @@ MixerCurve::~MixerCurve()
 void MixerCurve::setMixerType(MixerCurveType curveType)
 {
     m_curveType = curveType;
-    m_mixerUI->CurveGroup->setTitle( (m_curveType == MixerCurve::MIXERCURVE_THROTTLE) ? "Throttle Curve" : "Pitch Curve");
+
+    switch (m_curveType) {
+        case MixerCurve::MIXERCURVE_THROTTLE:
+        {
+            m_mixerUI->CurveGroup->setTitle("Throttle Curve");
+            m_curve->setRange(0.0, 1.0);
+            m_mixerUI->CurveMin->setMinimum(0.0);
+            m_mixerUI->CurveMax->setMinimum(0.0);
+            break;
+        }
+        case MixerCurve::MIXERCURVE_PITCH:
+        {
+            m_mixerUI->CurveGroup->setTitle("Pitch Curve");
+            m_curve->setRange(-1.0, 1.0);
+            m_mixerUI->CurveMin->setMinimum(-1.0);
+            m_mixerUI->CurveMax->setMinimum(-1.0);
+            break;
+        }
+    }
+
+    DoubleSpinDelegate *sbd = new DoubleSpinDelegate();
+    sbd->setRange(m_curve->getMin(), m_curve->getMax());
+    for (int i=0; i<MixerCurveWidget::NODE_NUMELEM; i++) {
+        m_settings->setItemDelegateForRow(i, sbd);
+    }
+
+    ResetCurve();
 }
 
 void MixerCurve::ResetCurve()
@@ -328,12 +350,18 @@ void MixerCurve::showEvent(QShowEvent *event)
 {
     Q_UNUSED(event);
 
+    m_settings->resizeColumnsToContents();
+    m_settings->setColumnWidth(0,(m_settings->width()-  m_settings->verticalHeader()->width()));
+
     m_curve->showEvent(event);
 }
 
 void MixerCurve::resizeEvent(QResizeEvent* event)
 {
     Q_UNUSED(event);
+
+    m_settings->resizeColumnsToContents();
+    m_settings->setColumnWidth(0,(m_settings->width()-  m_settings->verticalHeader()->width()));
 
     m_curve->resizeEvent(event);
 }

@@ -325,7 +325,7 @@ void ConfigVehicleTypeWidget::switchAirframeType(int index)
         m_aircraft->customMixerTable->resizeColumnsToContents();
         for (int i=0;i<(int)(VehicleConfig::CHANNEL_NUMELEM);i++) {
             m_aircraft->customMixerTable->setColumnWidth(i,(m_aircraft->customMixerTable->width()-
-                                                            m_aircraft->customMixerTable->verticalHeader()->width())/8);
+                                                            m_aircraft->customMixerTable->verticalHeader()->width())/10);
         }
     }
 }
@@ -344,7 +344,7 @@ void ConfigVehicleTypeWidget::showEvent(QShowEvent *event)
     m_aircraft->customMixerTable->resizeColumnsToContents();
     for (int i=0;i<(int)(VehicleConfig::CHANNEL_NUMELEM);i++) {
         m_aircraft->customMixerTable->setColumnWidth(i,(m_aircraft->customMixerTable->width()-
-                                                        m_aircraft->customMixerTable->verticalHeader()->width())/8);
+                                                        m_aircraft->customMixerTable->verticalHeader()->width())/ 10);
     }
 }
 
@@ -357,9 +357,9 @@ void ConfigVehicleTypeWidget::resizeEvent(QResizeEvent* event)
     m_aircraft->quadShape->fitInView(quad, Qt::KeepAspectRatio);
     // Make the custom table columns autostretch:
     m_aircraft->customMixerTable->resizeColumnsToContents();
-    for (int i=0;i<8;i++) {
+    for (int i=0;i<(int)(VehicleConfig::CHANNEL_NUMELEM);i++) {
         m_aircraft->customMixerTable->setColumnWidth(i,(m_aircraft->customMixerTable->width()-
-                                                        m_aircraft->customMixerTable->verticalHeader()->width())/8);
+                                                        m_aircraft->customMixerTable->verticalHeader()->width())/ 10);
     }
 
 }

@@ -135,10 +135,10 @@ ConfigCcpmWidget::ConfigCcpmWidget(QWidget *parent) : VehicleConfig(parent)
     //initialize our two mixer curves
 
     m_ccpm->ThrottleCurve->setMixerType(MixerCurve::MIXERCURVE_THROTTLE);
-    m_ccpm->ThrottleCurve->initLinearCurve(5, 1.0);
+    m_ccpm->ThrottleCurve->ResetCurve();
 
     m_ccpm->PitchCurve->setMixerType(MixerCurve::MIXERCURVE_PITCH);
-    m_ccpm->PitchCurve->initLinearCurve(5, 1.0, -1.0);
+    m_ccpm->PitchCurve->ResetCurve();
 
     //initialize channel names
     m_ccpm->ccpmEngineChannel->addItems(channelNames);
@@ -840,10 +840,24 @@ void ConfigCcpmWidget::getMixer()
 
     QList<double> curveValues;
     vconfig->getThrottleCurve(mixer, VehicleConfig::MIXER_THROTTLECURVE1, &curveValues);
-    m_ccpm->ThrottleCurve->setCurve(&curveValues);
+
+    // is at least one of the curve values != 0?
+    if (vconfig->isValidThrottleCurve(&curveValues)) {
+        m_ccpm->ThrottleCurve->setCurve(&curveValues);
+    }
+    else {
+        m_ccpm->ThrottleCurve->ResetCurve();
+    }
+
 
     vconfig->getThrottleCurve(mixer, VehicleConfig::MIXER_THROTTLECURVE2, &curveValues);
-    m_ccpm->PitchCurve->setCurve(&curveValues);
+    // is at least one of the curve values != 0?
+    if (vconfig->isValidThrottleCurve(&curveValues)) {
+        m_ccpm->PitchCurve->setCurve(&curveValues);
+    }
+    else {
+        m_ccpm->PitchCurve->ResetCurve();
+    }
 
     updatingFromHardware=FALSE;
 

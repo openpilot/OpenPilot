@@ -30,6 +30,11 @@
 #include <QDoubleSpinBox>
 #include <QItemDelegate>
 
+
+namespace Ui {
+class DoubleSpinDelegate;
+}
+
 class DoubleSpinDelegate : public QItemDelegate
 {
     Q_OBJECT
@@ -47,11 +52,23 @@ public:
     void updateEditorGeometry(QWidget *editor,
         const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
+    void setMin(double min) { m_min = min; }
+    void setMax(double max) { m_max = max; }
+    void setRange(double min, double max) { m_min = min; m_max = max; }
+    void setStep(double step) { m_step = step; }
+    void setDecimals(int decimals) { m_decimals = decimals; }
+
 private:
     double  m_min;
     double  m_max;
     double  m_step;
     int     m_decimals;
+
+signals:
+    void ValueChanged();
+
+private slots:
+    void valueChanged()    ;
 };
 
 #endif // DOUBLESPINDELEGATE_H

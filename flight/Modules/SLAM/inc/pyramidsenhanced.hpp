@@ -26,40 +26,15 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef OPENCVSLAM_HPP
-#define OPENCVSLAM_HPP
+#ifndef PYRAMIDSENHANCED_HPP
+#define PYRAMIDSENHANCED_HPP
 
-#include "opencv/cv.h"
-#include "opencv/highgui.h"
-extern "C" {
-	#include "openpilot.h"		// openpilot framework
-	#include "slamsettings.h"	// module settings
-	#include "attitudeactual.h"	// orientation in space
-	#include "velocityactual.h"	// 3d velocity
-	#include "positionactual.h"	// 3d position
-	#include "opencvslam.h"		// c wrapper
-	#include "backgroundio.h"	// c wrapper
-};
-
-class OpenCVslam {
-
-
+class PyrDownEnhanced {
 public:
-	OpenCVslam(SLAMSettingsData * newsettings);
-	void shrinkAndEnhance(const cv::Mat& src, cv::Mat& dst);
-	void run();
-
-protected:
-	SLAMSettingsData *settings;
-	AttitudeActualData attitudeActual;
-	VelocityActualData velocityActual;
-	PositionActualData positionActual;
-	IplImage *currentFrame, *lastFrame;
-	uint32_t frame;
-	CvCapture *VideoSource;
+	void pyrDownEnhanced( cv::InputArray _src, cv::OutputArray _dst, char CV1, char CV2, char CV3 );
 };
 
-#endif // OPENCVSLAM_HPP
+#endif // PYRAMIDSENHANCED_HPP
 
 /**
  * @}

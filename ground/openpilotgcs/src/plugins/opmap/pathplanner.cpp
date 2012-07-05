@@ -78,7 +78,7 @@ void pathPlanner::on_tbAdd_clicked()
 
 void pathPlanner::on_tbDelete_clicked()
 {
-
+    ui->tableView->model()->removeRow(ui->tableView->selectionModel()->currentIndex().row());
 }
 
 void pathPlanner::on_tbInsert_clicked()

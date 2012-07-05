@@ -73,14 +73,12 @@ void WayPointLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     if (line().dy() >= 0)
         angle = (Pi * 2) - angle;
 
-        QPointF arrowP1 = line().p1() + QPointF(sin(angle + Pi / 3) * arrowSize,
+        QPointF arrowP1 = line().pointAt(0.5) + QPointF(sin(angle + Pi / 3) * arrowSize,
                                         cos(angle + Pi / 3) * arrowSize);
-        QPointF arrowP2 = line().p1() + QPointF(sin(angle + Pi - Pi / 3) * arrowSize,
+        QPointF arrowP2 = line().pointAt(0.5) + QPointF(sin(angle + Pi - Pi / 3) * arrowSize,
                                         cos(angle + Pi - Pi / 3) * arrowSize);
-
         arrowHead.clear();
-        arrowHead << line().p1() << arrowP1 << arrowP2;
-//! [6] //! [7]
+        arrowHead << line().pointAt(0.5) << arrowP1 << arrowP2;
         painter->drawLine(line());
         painter->drawPolygon(arrowHead);
 }

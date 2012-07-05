@@ -59,9 +59,7 @@ QList<Edge *> Node::edges() const
 
 QRectF Node::boundingRect() const
 {
-    qreal adjust = 2;
-    return QRectF(-12 - adjust, -12 - adjust,
-                  28 + adjust, 28 + adjust);
+    return QRectF(-12, -12, 25, 25);
 }
 
 QPainterPath Node::shape() const

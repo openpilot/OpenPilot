@@ -841,13 +841,6 @@ void ConfigVehicleTypeWidget::addToDirtyMonitor()
     addWidget(m_heli->m_ccpm->ccpmRollScaleBox);
     addWidget(m_heli->m_ccpm->SwashLvlPositionSlider);
     addWidget(m_heli->m_ccpm->SwashLvlPositionSpinBox);
-    addWidget(m_heli->m_ccpm->CurveType);
-    addWidget(m_heli->m_ccpm->NumCurvePoints);
-    addWidget(m_heli->m_ccpm->CurveValue1);
-    addWidget(m_heli->m_ccpm->CurveValue2);
-    addWidget(m_heli->m_ccpm->CurveValue3);
-    addWidget(m_heli->m_ccpm->CurveToGenerate);
-    addWidget(m_heli->m_ccpm->CurveSettings);
     addWidget(m_heli->m_ccpm->ThrottleCurve);
     addWidget(m_heli->m_ccpm->PitchCurve);
     addWidget(m_heli->m_ccpm->ccpmAdvancedSettingsTable);

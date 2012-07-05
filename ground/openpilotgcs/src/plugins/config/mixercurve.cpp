@@ -64,6 +64,7 @@ MixerCurve::~MixerCurve()
 void MixerCurve::setMixerType(MixerCurveType curveType)
 {
     m_curveType = curveType;
+    m_mixerUI->CurveGroup->setTitle( (m_curveType == MixerCurve::MIXERCURVE_THROTTLE) ? "Throttle Curve" : "Pitch Curve");
 }
 
 void MixerCurve::ResetCurve()
@@ -87,19 +88,19 @@ void MixerCurve::UpdateCurveUI()
         {
             m_mixerUI->CurveMin->setMinimum(0.0);
             m_mixerUI->CurveMax->setMinimum(0.0);
-            m_mixerUI->CurveStep->setMinimum(0.0);
             break;
         }
         case MixerCurve::MIXERCURVE_PITCH:
         {
             m_mixerUI->CurveMin->setMinimum(-1.0);
             m_mixerUI->CurveMax->setMinimum(-1.0);
-            m_mixerUI->CurveStep->setMinimum(0.0);
             break;
         }
     }
     m_mixerUI->CurveMin->setMaximum(m_curve->getMax());
     m_mixerUI->CurveMax->setMaximum(m_curve->getMax());
+
+    m_mixerUI->CurveStep->setMinimum(0.0);
     m_mixerUI->CurveStep->setMaximum(100.0);
 
     //set default visible
@@ -135,6 +136,8 @@ void MixerCurve::UpdateCurveUI()
         m_mixerUI->stepLabel->setText("Strength");
         m_mixerUI->stepLabel->setVisible(true);
         m_mixerUI->CurveStep->setVisible(true);
+
+        m_mixerUI->CurveStep->setMinimum(1.0);
     }
     if ( curveType.compare("Log")==0)
     {
@@ -142,7 +145,8 @@ void MixerCurve::UpdateCurveUI()
         m_mixerUI->CurveMax->setVisible(true);
         m_mixerUI->stepLabel->setText("Strength");
         m_mixerUI->stepLabel->setVisible(true);
-        m_mixerUI->CurveStep->setVisible(true);
+        m_mixerUI->CurveStep->setVisible(true);        
+        m_mixerUI->CurveStep->setMinimum(1.0);
     }
 
     GenerateCurve();

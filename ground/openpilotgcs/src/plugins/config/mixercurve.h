@@ -68,6 +68,7 @@ public:
     double getCurveStep();
     double setRange(double min, double max);
 
+    MixerCurveWidget* getCurveWidget() { return m_curve; }
 
 signals:
 

@@ -777,13 +777,13 @@ void ConfigVehicleTypeWidget::setComboCurrentIndex(QComboBox* box, int index)
 void ConfigVehicleTypeWidget::addToDirtyMonitor()
 {
     addWidget(m_aircraft->customMixerTable);
-    addWidget(m_aircraft->customThrottle1Curve);
-    addWidget(m_aircraft->customThrottle2Curve);
-    addWidget(m_aircraft->multiThrottleCurve);
-    addWidget(m_aircraft->fixedWingThrottle);
+    addWidget(m_aircraft->customThrottle1Curve->getCurveWidget());
+    addWidget(m_aircraft->customThrottle2Curve->getCurveWidget());
+    addWidget(m_aircraft->multiThrottleCurve->getCurveWidget());
+    addWidget(m_aircraft->fixedWingThrottle->getCurveWidget());
     addWidget(m_aircraft->fixedWingType);
-    addWidget(m_aircraft->groundVehicleThrottle1);
-    addWidget(m_aircraft->groundVehicleThrottle2);
+    addWidget(m_aircraft->groundVehicleThrottle1->getCurveWidget());
+    addWidget(m_aircraft->groundVehicleThrottle2->getCurveWidget());
     addWidget(m_aircraft->groundVehicleType);
     addWidget(m_aircraft->feedForwardSlider);
     addWidget(m_aircraft->accelTime);
@@ -841,8 +841,8 @@ void ConfigVehicleTypeWidget::addToDirtyMonitor()
     addWidget(m_heli->m_ccpm->ccpmRollScaleBox);
     addWidget(m_heli->m_ccpm->SwashLvlPositionSlider);
     addWidget(m_heli->m_ccpm->SwashLvlPositionSpinBox);
-    addWidget(m_heli->m_ccpm->ThrottleCurve);
-    addWidget(m_heli->m_ccpm->PitchCurve);
+    addWidget(m_heli->m_ccpm->ThrottleCurve->getCurveWidget());
+    addWidget(m_heli->m_ccpm->PitchCurve->getCurveWidget());
     addWidget(m_heli->m_ccpm->ccpmAdvancedSettingsTable);
 }
 

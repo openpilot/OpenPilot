@@ -36,17 +36,7 @@ namespace mapcontrol
         pen.setWidth(1);
         this->setPen(pen);
     }
-/*
-    void TrailLineItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-    {
-      //  painter->drawRect(QRectF(-3,-3,6,6));
-        painter->setBrush(m_brush);
-        QPen pen;
-        pen.setBrush(m_brush);
-        pen.setWidth(2);
-        painter->drawLine(this->line().x1(),this->line().y1(),this->line().x2(),this->line().y2());
-    }
-*/
+
     int TrailLineItem::type()const
     {
         return Type;

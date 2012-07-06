@@ -780,6 +780,20 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QPushButton" name="pushButtonApply">
+       <property name="text">
+        <string>Apply</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButtonCancel">
+       <property name="text">
+        <string>Cancel</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
   </layout>

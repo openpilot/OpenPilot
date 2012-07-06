@@ -37,11 +37,11 @@ opmap_edit_waypoint_dialog::opmap_edit_waypoint_dialog(QWidget *parent,QAbstract
     ui(new Ui::opmap_edit_waypoint_dialog)
 {  
     ui->setupUi(this);
-    my_waypoint = NULL;
     connect(ui->checkBoxLocked,SIGNAL(toggled(bool)),this,SLOT(enableEditWidgets(bool)));
     connect(ui->cbMode,SIGNAL(currentIndexChanged(int)),this,SLOT(setupModeWidgets()));
     connect(ui->cbCondition,SIGNAL(currentIndexChanged(int)),this,SLOT(setupConditionWidgets()));
-
+    connect(ui->pushButtonApply,SIGNAL(clicked()),this,SLOT(pushButtonApply_clicked()));
+    connect(ui->pushButtonCancel,SIGNAL(clicked()),this,SLOT(pushButtonCancel_clicked()));
     mapDataDelegate::loadComboBox(ui->cbMode,flightDataModel::MODE);
     mapDataDelegate::loadComboBox(ui->cbCondition,flightDataModel::CONDITION);
     mapDataDelegate::loadComboBox(ui->cbCommand,flightDataModel::COMMAND);
@@ -50,6 +50,7 @@ opmap_edit_waypoint_dialog::opmap_edit_waypoint_dialog(QWidget *parent,QAbstract
     mapper->setItemDelegate(new mapDataDelegate(this));
     connect(mapper,SIGNAL(currentIndexChanged(int)),this,SLOT(currentIndexChanged(int)));
     mapper->setModel(model);
+    mapper->setSubmitPolicy(QDataWidgetMapper::ManualSubmit);
     mapper->addMapping(ui->checkBoxLocked,flightDataModel::LOCKED);
     mapper->addMapping(ui->doubleSpinBoxLatitude,flightDataModel::LATPOSITION);
     mapper->addMapping(ui->doubleSpinBoxLongitude,flightDataModel::LNGPOSITION);
@@ -94,6 +95,7 @@ opmap_edit_waypoint_dialog::~opmap_edit_waypoint_dialog()
 
 void opmap_edit_waypoint_dialog::on_pushButtonOK_clicked()
 {
+    mapper->submit();
     close();
 }
 
@@ -226,12 +228,16 @@ void opmap_edit_waypoint_dialog::setupConditionWidgets()
         break;
     }
 }
+
 void opmap_edit_waypoint_dialog::pushButtonCancel_clicked()
 {
-    my_waypoint = NULL;
+    mapper->revert();
     close();
 }
-
+void opmap_edit_waypoint_dialog::pushButtonApply_clicked()
+{
+    mapper->submit();
+}
 void opmap_edit_waypoint_dialog::editWaypoint(mapcontrol::WayPointItem *waypoint_item)
 {
     if (!waypoint_item) return;

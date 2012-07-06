@@ -58,50 +58,17 @@ void OpenCVslam::shrinkAndEnhance(const Mat& src, Mat& dst) {
 	// -3 4 14 4 -3
 	// or with double laplace
 	// -7 4 22 4 -7
-	//dst=Mat((src.rows+1)/2,(src.cols+1)/2,CV_8UC3);
 	PyrDownEnhanced enhanced;
 	enhanced.pyrDownEnhanced(src,dst,-3,4,14);
 	
-	#if 0
-	Mat laplaceX,laplaceY,gauss;
-	gauss=getGaussianKernel(5,-1,CV_32F);
-	getDerivKernels(laplaceX,laplaceY,2,2,5,true, CV_32F);
-	Mat mykernel=gauss-(2*laplaceX);
-
-	#if 0
-	//dst=src.clone();
-	Ptr<FilterEngine> myfilter=createSeparableLinearFilter(
-	src.type(),src.type(),mykernel,mykernel); // CV_8UC3
-	vPortEnterCritical();
-	myfilter->apply(src,dst);
-	vPortExitCritical();
-	#endif
-
-
-	//#if 0
-	fprintf(stderr,"gauss.cols is %i\n",gauss.cols);
-	fprintf(stderr,"gauss.rows is %i\n",gauss.rows);
-	fprintf(stderr,"laplaceX.cols is %i\n",laplaceX.cols);
-	fprintf(stderr,"laplaceX.rows is %i\n",laplaceX.rows);
-	fprintf(stderr,"laplaceY.cols is %i\n",laplaceY.cols);
-	fprintf(stderr,"laplaceY.rows is %i\n",laplaceY.rows);
-	float sum=0;
-	for (int t=0;t<gauss.rows;t++) {
-		//fprintf(stderr,"[%i]=%f\n",t,gauss.at<float>(t,0));
-		//fprintf(stderr,"lx[%i]=%f\n",t,laplaceX.at<float>(t,0));
-		//fprintf(stderr,"iy[%i]=%f\n",t,laplaceY.at<float>(t,0));
-		fprintf(stderr,"y[%i]=%f\n",t,16*mykernel.at<float>(t,0));
-		sum+=mykernel.at<float>(t,0);
-	}
-	fprintf(stderr,"sum is %f\n",sum);
-	exit(1);
-	//#endif
-	#endif
 }
 
 
 void OpenCVslam::run() {
-	
+
+	Mat current[5]; // "pyramid" of current frame
+	Mat last[5];    // "pyramid" of previous frame
+
 	/* Initialize OpenCV */
 	//VideoSource = NULL; //cvCaptureFromFile("test.avi");
 	VideoSource = cvCaptureFromFile("test.avi");

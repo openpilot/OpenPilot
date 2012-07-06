@@ -57,11 +57,15 @@ MixerCurve::MixerCurve(QWidget *parent) :
 MixerCurve::~MixerCurve()
 {
     delete m_mixerUI;
+    delete m_spinDelegate;
 }
 
 void MixerCurve::setMixerType(MixerCurveType curveType)
 {
     m_curveType = curveType;
+
+    m_mixerUI->CurveMin->setMaximum(1.0);
+    m_mixerUI->CurveMax->setMaximum(1.0);
 
     switch (m_curveType) {
         case MixerCurve::MIXERCURVE_THROTTLE:
@@ -82,10 +86,10 @@ void MixerCurve::setMixerType(MixerCurveType curveType)
         }
     }
 
-    DoubleSpinDelegate *sbd = new DoubleSpinDelegate();
-    sbd->setRange(m_curve->getMin(), m_curve->getMax());
+    m_spinDelegate = new DoubleSpinDelegate();
+    m_spinDelegate->setRange(m_mixerUI->CurveMin->minimum(), m_mixerUI->CurveMax->maximum());
     for (int i=0; i<MixerCurveWidget::NODE_NUMELEM; i++) {
-        m_settings->setItemDelegateForRow(i, sbd);
+        m_settings->setItemDelegateForRow(i, m_spinDelegate);
     }
 
     ResetCurve();
@@ -93,11 +97,11 @@ void MixerCurve::setMixerType(MixerCurveType curveType)
 
 void MixerCurve::ResetCurve()
 {
-    m_mixerUI->CurveMin->setValue(m_curve->getMin());
-    m_mixerUI->CurveMax->setValue(m_curve->getMax());
+    m_mixerUI->CurveMin->setValue(m_mixerUI->CurveMin->minimum());
+    m_mixerUI->CurveMax->setValue(m_mixerUI->CurveMax->maximum());
     m_mixerUI->CurveType->setCurrentIndex(m_mixerUI->CurveType->findText("Linear"));
 
-    initLinearCurve(MixerCurveWidget::NODE_NUMELEM, m_curve->getMax(), m_curve->getMin());
+    initLinearCurve(MixerCurveWidget::NODE_NUMELEM, getCurveMax(), getCurveMin());
 
     UpdateSettingsTable();
 }
@@ -106,23 +110,6 @@ void MixerCurve::UpdateCurveUI()
 {
     //get the user settings
     QString curveType = m_mixerUI->CurveType->currentText();
-
-    switch (m_curveType) {
-        case MixerCurve::MIXERCURVE_THROTTLE:
-        {
-            m_mixerUI->CurveMin->setMinimum(0.0);
-            m_mixerUI->CurveMax->setMinimum(0.0);
-            break;
-        }
-        case MixerCurve::MIXERCURVE_PITCH:
-        {
-            m_mixerUI->CurveMin->setMinimum(-1.0);
-            m_mixerUI->CurveMax->setMinimum(-1.0);
-            break;
-        }
-    }
-    m_mixerUI->CurveMin->setMaximum(m_curve->getMax());
-    m_mixerUI->CurveMax->setMaximum(m_curve->getMax());
 
     m_mixerUI->CurveStep->setMinimum(0.0);
     m_mixerUI->CurveStep->setMaximum(100.0);
@@ -151,7 +138,8 @@ void MixerCurve::UpdateCurveUI()
         m_mixerUI->CurveMax->setVisible(true);
         m_mixerUI->stepLabel->setText("Step at");
         m_mixerUI->stepLabel->setVisible(true);
-        m_mixerUI->CurveStep->setVisible(true);
+        m_mixerUI->CurveStep->setVisible(true);        
+        m_mixerUI->CurveStep->setMaximum(4.0);
     }
     if ( curveType.compare("Exp")==0)
     {
@@ -247,6 +235,9 @@ void MixerCurve::initLinearCurve(int numPoints, double maxValue, double minValue
     setMax(maxValue);
 
     m_curve->initLinearCurve(numPoints, maxValue, minValue);
+
+    if (m_spinDelegate)
+        m_spinDelegate->setRange(minValue, maxValue);
 }
 void MixerCurve::setCurve(const QList<double>* points)
 {
@@ -255,7 +246,7 @@ void MixerCurve::setCurve(const QList<double>* points)
 }
 void MixerCurve::setMin(double value)
 {
-    m_curve->setMin(value);
+    //m_curve->setMin(value);
     m_mixerUI->CurveMin->setMinimum(value);
 }
 double MixerCurve::getMin()
@@ -264,7 +255,7 @@ double MixerCurve::getMin()
 }
 void MixerCurve::setMax(double value)
 {
-    m_curve->setMax(value);
+    //m_curve->setMax(value);
     m_mixerUI->CurveMax->setMaximum(value);
 }
 double MixerCurve::getMax()
@@ -330,11 +321,25 @@ void MixerCurve::CurveTypeChanged()
 
 void MixerCurve::CurveMinChanged(double value)
 {
-    // the min changed so redraw the curve
-    //  mixercurvewidget::setCurve will trim any points below min
     QList<double> points = m_curve->getCurve();
-    points.removeFirst();
-    points.push_front(value);
+    QString CurveType = m_mixerUI->CurveType->currentText();
+
+    if ( CurveType.compare("Flat")==0) {
+        // the min changed so redraw the curve
+        //  but since the curve is flat make all points = value
+        //  because we use curveMin for the flat value in ui
+        for (int i = 0; i < points.count(); i++) {
+            points.pop_back();
+            points.push_front(value);
+        }
+    }
+    else {
+        // the min changed so redraw the curve
+        //  mixercurvewidget::setCurve will trim any points below min
+
+        points.removeFirst();
+        points.push_front(value);
+    }
     setCurve(&points);
 }
 
@@ -355,9 +360,6 @@ void MixerCurve::showEvent(QShowEvent *event)
     m_settings->resizeColumnsToContents();
     m_settings->setColumnWidth(0,(m_settings->width()-  m_settings->verticalHeader()->width()));
 
-//    const QRectF& rectRef = QRectF(0,0,parentWidget()->width() - 50 , parentWidget()->width() - 50);
-//    m_curve->fitInView(rectRef, Qt::KeepAspectRatio);
-
     m_curve->showEvent(event);
 }
 
@@ -365,9 +367,6 @@ void MixerCurve::resizeEvent(QResizeEvent* event)
 {
     m_settings->resizeColumnsToContents();
     m_settings->setColumnWidth(0,(m_settings->width() -  m_settings->verticalHeader()->width()));
-
-//    const QRectF& rectRef = QRectF(0,0,parentWidget()->width() - 50 , parentWidget()->width() - 50);
-//    m_curve->fitInView(rectRef, Qt::KeepAspectRatio);
 
     m_curve->resizeEvent(event);
 }

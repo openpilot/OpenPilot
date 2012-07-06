@@ -34,6 +34,7 @@
 
 #include "ui_mixercurve.h"
 #include "mixercurvewidget.h"
+#include "doublespindelegate.h"
 #include "uavobjectwidgetutils_global.h"
 
 
@@ -91,6 +92,7 @@ private:
     MixerCurveWidget* m_curve;
     QTableWidget* m_settings;
     MixerCurveType m_curveType;
+    DoubleSpinDelegate* m_spinDelegate;
 
 };
 

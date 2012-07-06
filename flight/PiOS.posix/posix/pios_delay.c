@@ -64,7 +64,7 @@ int32_t PIOS_DELAY_WaituS(uint32_t uS)
 	static struct timespec wait,rest;
 	wait.tv_sec=0;
 	wait.tv_nsec=1000*uS;
-	while (!nanosleep(&wait,&rest)) {
+	while (nanosleep(&wait,&rest)!=0) {
 		wait=rest;
 	}
 
@@ -90,7 +90,7 @@ int32_t PIOS_DELAY_WaitmS(uint32_t mS)
 	static struct timespec wait,rest;
 	wait.tv_sec=mS/1000;
 	wait.tv_nsec=(mS%1000)*1000000;
-	while (!nanosleep(&wait,&rest)) {
+	while (nanosleep(&wait,&rest)!=0) {
 		wait=rest;
 	}
 	//}

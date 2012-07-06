@@ -2,7 +2,7 @@
  ******************************************************************************
  *
  * @file       systemhealthgadgetwidget.h
- * @author     Edouard Lafargue Copyright (C) 2010.
+ * @author     OpenPilot Team & Edouard Lafargue Copyright (C) 2012.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup SystemHealthPlugin System Health Plugin
@@ -34,6 +34,7 @@
 #include <QGraphicsView>
 #include <QtSvg/QSvgRenderer>
 #include <QtSvg/QGraphicsSvgItem>
+#include <QMouseEvent>
 
 #include <QFile>
 #include <QTimer>
@@ -52,6 +53,7 @@ public:
 protected:
    void paintEvent(QPaintEvent *event);
    void resizeEvent(QResizeEvent *event);
+   void mousePressEvent ( QMouseEvent * event );
 
 private slots:
    void updateAlarms(UAVObject *systemAlarm); // Called by the systemalarms UAVObject

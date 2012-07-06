@@ -2,7 +2,7 @@
  ******************************************************************************
  *
  * @file       systemhealthgadgetwidget.cpp
- * @author     Edouard Lafargue Copyright (C) 2010.
+ * @author     OpenPilot Team & Edouard Lafargue Copyright (C) 2012.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup SystemHealthPlugin System Health Plugin
@@ -32,6 +32,7 @@
 #include "systemalarms.h"
 
 #include <QDebug>
+#include <QWhatsThis>
 
 /*
  * Initialize the widget
@@ -194,4 +195,23 @@ void SystemHealthGadgetWidget::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event);
     fitInView(background, Qt::KeepAspectRatio );
+}
+
+void SystemHealthGadgetWidget::mousePressEvent ( QMouseEvent * event )
+{
+    QGraphicsScene *graphicsScene = scene();
+    if(graphicsScene){
+        QPoint point = event->pos();
+        foreach(QGraphicsItem* sceneItem, items(point)){
+            QGraphicsSvgItem *clickedItem = dynamic_cast<QGraphicsSvgItem*>(sceneItem);
+
+            if(clickedItem && (clickedItem != foreground) && clickedItem != background){
+	        QFile alarmDescription(":/systemhealth/html/" + clickedItem->elementId() + ".html");
+                if(alarmDescription.open(QIODevice::ReadOnly | QIODevice::Text)){
+                    QTextStream textStream(&alarmDescription);
+                    QWhatsThis::showText(event->globalPos(), textStream.readAll());
+                }
+            }
+        }
+    }
 }

@@ -389,6 +389,8 @@ bool flightDataModel::insertRows(int row, int count, const QModelIndex &/*parent
 
 bool flightDataModel::removeRows(int row, int count, const QModelIndex &/*parent*/)
 {
+    if(row<0)
+        return false;
     beginRemoveRows(QModelIndex(),row,row+count-1);
     for(int x=0; x<count;++x)
     {

@@ -273,9 +273,10 @@ WayPointItem::WayPointItem(MapGraphicItem *map, bool magicwaypoint):reached(fals
 
     void WayPointItem::setRelativeCoord(distBearingAltitude value)
     {
-        if(value.altitudeRelative-relativeCoord.altitudeRelative<0.0001
-                && value.bearing-relativeCoord.bearing<0.0001 && value.distance==relativeCoord.distance)
+        if(qAbs(value.altitudeRelative-relativeCoord.altitudeRelative<0.0001)
+                && qAbs(value.bearing-relativeCoord.bearing<0.0001) && value.distance==relativeCoord.distance)
             return;
+        qDebug()<<"setRelative";
         relativeCoord=value;
         if(myHome)
         {
@@ -290,8 +291,9 @@ WayPointItem::WayPointItem(MapGraphicItem *map, bool magicwaypoint):reached(fals
 
     void WayPointItem::SetCoord(const internals::PointLatLng &value)
     {
-        if(Coord()==value)
+        if(qAbs(Coord().Lat()-value.Lat()<0.0001 && qAbs(Coord().Lng()-value.Lng()<0.0001)))
             return;
+        qDebug()<<"setCoord";
         bool abs_coord=false;
         bool rel_coord=false;
         if(coord!=value)

@@ -64,6 +64,8 @@ QWidget *mapDataDelegate::createEditor(QWidget *parent,
 void mapDataDelegate::setEditorData(QWidget *editor,
                                      const QModelIndex &index) const
 {
+    if(!index.isValid())
+        return;
     QString className=editor->metaObject()->className();
     if (className.contains("QComboBox")) {
         int value = index.model()->data(index, Qt::EditRole).toInt();

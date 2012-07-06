@@ -366,6 +366,10 @@ void MixerCurve::showEvent(QShowEvent *event)
     m_settings->resizeColumnsToContents();
     m_settings->setColumnWidth(0,(m_settings->width()-  m_settings->verticalHeader()->width()));
 
+    int h = (m_settings->height() -  m_settings->horizontalHeader()->height()) / m_settings->rowCount();
+    for (int i=0; i<m_settings->rowCount(); i++)
+        m_settings->setRowHeight(i, h);
+
     m_curve->showEvent(event);
 }
 
@@ -373,6 +377,10 @@ void MixerCurve::resizeEvent(QResizeEvent* event)
 {
     m_settings->resizeColumnsToContents();
     m_settings->setColumnWidth(0,(m_settings->width() -  m_settings->verticalHeader()->width()));
+
+    int h = (m_settings->height() -  m_settings->horizontalHeader()->height()) / m_settings->rowCount();
+    for (int i=0; i<m_settings->rowCount(); i++)
+        m_settings->setRowHeight(i, h);
 
     m_curve->resizeEvent(event);
 }

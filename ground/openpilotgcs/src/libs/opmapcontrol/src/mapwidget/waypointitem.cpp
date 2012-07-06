@@ -322,7 +322,7 @@ WayPointItem::WayPointItem(MapGraphicItem *map, bool magicwaypoint):reached(fals
         int oldnumber=number;
         number=value;
         RefreshToolTip();
-        numberI->setText(QString::number(number));
+        numberI->setText(QString::number(numberAdjusted()));
         numberIBG->setRect(numberI->boundingRect().adjusted(-2,0,1,0));
         this->update();
         emit WPNumberChanged(oldnumber,value,this);
@@ -363,7 +363,7 @@ WayPointItem::WayPointItem(MapGraphicItem *map, bool magicwaypoint):reached(fals
             numberI->setPen(QPen(Qt::blue));
             numberI->setPos(0,-13-picture.height());
             numberIBG->setPos(0,-13-picture.height());
-            numberI->setText(QString::number(number));
+            numberI->setText(QString::number(numberAdjusted()));
             numberIBG->setRect(numberI->boundingRect().adjusted(-2,0,1,0));
         }
         else if (!value && numberI)
@@ -458,7 +458,7 @@ WayPointItem::WayPointItem(MapGraphicItem *map, bool magicwaypoint):reached(fals
         QString relativeCoord_str = " Distance:" + QString::number(relativeCoord.distance) + " Bearing:" + QString::number(relativeCoord.bearing*180/M_PI);
         QString relativeAltitude_str=QString::number(relativeCoord.altitudeRelative);
         if(Number()!=-1)
-            setToolTip(QString("WayPoint Number:%1\nDescription:%2\nCoordinate:%4\nFrom Home:%5\nRelative altitude:%6\nAltitude:%7\nType:%8\n%9").arg(QString::number(Number())).arg(description).arg(coord_str).arg(relativeCoord_str).arg(relativeAltitude_str).arg(QString::number(altitude)).arg(type_str).arg(myCustomString));
+            setToolTip(QString("WayPoint Number:%1\nDescription:%2\nCoordinate:%4\nFrom Home:%5\nRelative altitude:%6\nAltitude:%7\nType:%8\n%9").arg(QString::number(numberAdjusted())).arg(description).arg(coord_str).arg(relativeCoord_str).arg(relativeAltitude_str).arg(QString::number(altitude)).arg(type_str).arg(myCustomString));
         else
             setToolTip(QString("Magic WayPoint\nCoordinate:%1\nFrom Home:%2\nAltitude:%3\nType:%4\n%5").arg(coord_str).arg(relativeCoord_str).arg(QString::number(altitude)).arg(type_str).arg(myCustomString));
     }

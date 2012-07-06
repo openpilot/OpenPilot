@@ -109,6 +109,7 @@ public:
     *
     */
     int Number(){return number;}
+    int numberAdjusted(){return number+1;}
     /**
     * @brief Sets WayPoint number
     *

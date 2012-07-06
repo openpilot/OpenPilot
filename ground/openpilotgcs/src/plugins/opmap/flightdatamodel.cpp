@@ -250,7 +250,7 @@ QVariant flightDataModel::headerData(int section, Qt::Orientation orientation, i
      {
          if(orientation==Qt::Vertical)
          {
-             return QString::number(section);
+             return QString::number(section+1);
          }
          else if (orientation == Qt::Horizontal) {
              switch (section)

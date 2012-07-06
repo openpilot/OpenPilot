@@ -636,7 +636,7 @@ void OPMapGadgetWidget::updateMousePos()
 	QString s = QString::number(m_mouse_lat_lon.Lat(), 'f', 7) + "  " + QString::number(m_mouse_lat_lon.Lng(), 'f', 7);
     if (wp)
     {
-        s += "  wp[" + QString::number(wp->Number()) + "]";
+        s += "  wp[" + QString::number(wp->numberAdjusted()) + "]";
 
         double dist = distance(home_lat_lon, wp->Coord());
         double bear = bearing(home_lat_lon, wp->Coord());

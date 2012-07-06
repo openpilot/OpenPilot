@@ -79,7 +79,7 @@ opmap_edit_waypoint_dialog::opmap_edit_waypoint_dialog(QWidget *parent,QAbstract
 }
 void opmap_edit_waypoint_dialog::currentIndexChanged(int index)
 {
-    ui->lbNumber->setText(QString::number(index));
+    ui->lbNumber->setText(QString::number(index+1));
     QModelIndex idx=mapper->model()->index(index,0);
     if(index==itemSelection->currentIndex().row())
         return;

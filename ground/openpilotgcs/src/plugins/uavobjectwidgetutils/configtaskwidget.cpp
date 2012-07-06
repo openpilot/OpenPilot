@@ -843,7 +843,7 @@ void ConfigTaskWidget::connectWidgetUpdatesToSlot(QWidget * widget,const char* f
     }
     else if(MixerCurveWidget * cb=qobject_cast<MixerCurveWidget *>(widget))
     {
-        connect(cb,SIGNAL(curveUpdated(QList<double>,double)),this,function);
+        connect(cb,SIGNAL(curveUpdated()),this,function);
     }
     else if(QTableWidget * cb=qobject_cast<QTableWidget *>(widget))
     {
@@ -886,7 +886,7 @@ void ConfigTaskWidget::disconnectWidgetUpdatesToSlot(QWidget * widget,const char
     }
     else if(MixerCurveWidget * cb=qobject_cast<MixerCurveWidget *>(widget))
     {
-        disconnect(cb,SIGNAL(curveUpdated(QList<double>,double)),this,function);
+        disconnect(cb,SIGNAL(curveUpdated()),this,function);
     }
     else if(QTableWidget * cb=qobject_cast<QTableWidget *>(widget))
     {

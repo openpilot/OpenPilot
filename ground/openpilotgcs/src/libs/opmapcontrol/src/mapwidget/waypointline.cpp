@@ -39,6 +39,12 @@ WayPointLine::WayPointLine(WayPointItem *from, WayPointItem *to, MapGraphicItem 
     connect(to,SIGNAL(localPositionChanged(QPointF,WayPointItem*)),this,SLOT(refreshLocations()));
     connect(from,SIGNAL(aboutToBeDeleted(WayPointItem*)),this,SLOT(waypointdeleted()));
     connect(to,SIGNAL(aboutToBeDeleted(WayPointItem*)),this,SLOT(waypointdeleted()));
+    if(myColor==Qt::green)
+        this->setZValue(10);
+    else if(myColor==Qt::yellow)
+        this->setZValue(9);
+    else if(myColor==Qt::red)
+        this->setZValue(8);
 }
 
 WayPointLine::WayPointLine(HomeItem *from, WayPointItem *to, MapGraphicItem *map, QColor color):source(from),
@@ -48,6 +54,12 @@ WayPointLine::WayPointLine(HomeItem *from, WayPointItem *to, MapGraphicItem *map
     connect(from,SIGNAL(homePositionChanged(internals::PointLatLng,float)),this,SLOT(refreshLocations()));
     connect(to,SIGNAL(localPositionChanged(QPointF,WayPointItem*)),this,SLOT(refreshLocations()));
     connect(to,SIGNAL(aboutToBeDeleted(WayPointItem*)),this,SLOT(waypointdeleted()));
+    if(myColor==Qt::green)
+        this->setZValue(10);
+    else if(myColor==Qt::yellow)
+        this->setZValue(9);
+    else if(myColor==Qt::red)
+        this->setZValue(8);
 }
 int WayPointLine::type() const
 {
@@ -79,8 +91,16 @@ void WayPointLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
                                         cos(angle + Pi - Pi / 3) * arrowSize);
         arrowHead.clear();
         arrowHead << line().pointAt(0.5) << arrowP1 << arrowP2;
-        painter->drawLine(line());
         painter->drawPolygon(arrowHead);
+        if(myColor==Qt::red)
+            myPen.setWidth(3);
+        else if(myColor==Qt::yellow)
+            myPen.setWidth(2);
+        else if(myColor==Qt::green)
+            myPen.setWidth(1);
+        painter->setPen(myPen);
+        painter->drawLine(line());
+
 }
 
 void WayPointLine::refreshLocations()

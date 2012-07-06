@@ -58,6 +58,7 @@ public:
     bool saveSettingsOnExit() const;
     bool autoConnect() const;
     bool autoSelect() const;
+    bool useUDPMirror() const;
     void readSettings(QSettings* qs);
     void saveSettings(QSettings* qs);
 
@@ -68,6 +69,7 @@ private slots:
     void resetLanguage();
     void showHelpForExternalEditor();
     void slotAutoConnect(int);
+    void showHidden();
 
 private:
     void fillLanguageBox() const;
@@ -78,9 +80,20 @@ private:
     bool m_saveSettingsOnExit;
     bool m_autoConnect;
     bool m_autoSelect;
+    bool m_useUDPMirror;
     QPointer<QWidget> m_dialog;
     QList<QTextCodec *> m_codecs;
 
+};
+class globalSettingsWidget:public QWidget
+{
+    Q_OBJECT
+public:
+    globalSettingsWidget(QWidget * parent);
+protected:
+    void keyPressEvent(QKeyEvent *);
+signals:
+    void showHidden();
 };
 
 } // namespace Internal

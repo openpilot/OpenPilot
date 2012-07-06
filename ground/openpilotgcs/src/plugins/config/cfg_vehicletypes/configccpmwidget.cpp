@@ -133,12 +133,12 @@ ConfigCcpmWidget::ConfigCcpmWidget(QWidget *parent) : VehicleConfig(parent)
     }
 
     //initialize our two mixer curves
+    // mixercurve defaults to mixercurve_throttle
+    m_ccpm->ThrottleCurve->initLinearCurve(5, 1.0, 0.0);
 
-    m_ccpm->ThrottleCurve->setMixerType(MixerCurve::MIXERCURVE_THROTTLE);
-    m_ccpm->ThrottleCurve->ResetCurve();
-
+    // tell mixercurve this is a pitch curve
     m_ccpm->PitchCurve->setMixerType(MixerCurve::MIXERCURVE_PITCH);
-    m_ccpm->PitchCurve->ResetCurve();
+    m_ccpm->PitchCurve->initLinearCurve(5, 1.0, -1.0);
 
     //initialize channel names
     m_ccpm->ccpmEngineChannel->addItems(channelNames);

@@ -37,13 +37,20 @@ MixerCurve::MixerCurve(QWidget *parent) :
 {
     m_mixerUI->setupUi(this);
 
+    // setup some convienence pointers
     m_curve = m_mixerUI->CurveWidget;
     m_settings = m_mixerUI->CurveSettings;
 
+    // create our spin delegate
+    m_spinDelegate = new DoubleSpinDelegate();
+
+    // set the default mixer type
     setMixerType(MixerCurve::MIXERCURVE_THROTTLE);
 
+    // paint the ui
     UpdateCurveUI();
 
+    // wire up our signals
     connect(m_mixerUI->CurveType, SIGNAL(currentIndexChanged(int)), this, SLOT(CurveTypeChanged()));
     connect(m_mixerUI->ResetCurve, SIGNAL(clicked()), this, SLOT(ResetCurve()));
     connect(m_mixerUI->GenerateCurve, SIGNAL(clicked()), this, SLOT(GenerateCurve()));
@@ -86,7 +93,6 @@ void MixerCurve::setMixerType(MixerCurveType curveType)
         }
     }
 
-    m_spinDelegate = new DoubleSpinDelegate();
     m_spinDelegate->setRange(m_mixerUI->CurveMin->minimum(), m_mixerUI->CurveMax->maximum());
     for (int i=0; i<MixerCurveWidget::NODE_NUMELEM; i++) {
         m_settings->setItemDelegateForRow(i, m_spinDelegate);

@@ -236,15 +236,19 @@ void MixerCurveWidget::showEvent(QShowEvent *event)
     // Thit fitInView method should only be called now, once the
     // widget is shown, otherwise it cannot compute its values and
     // the result is usually a ahrsbargraph that is way too small.
-    fitInView(plot, Qt::KeepAspectRatio);
 
+    QRectF rect = plot->boundingRect();
+
+    fitInView(rect.adjusted(-12,-12,12,12), Qt::KeepAspectRatio);
 }
 
 void MixerCurveWidget::resizeEvent(QResizeEvent* event)
 {
     Q_UNUSED(event);
 
-    fitInView(plot, Qt::KeepAspectRatio);
+    QRectF rect = plot->boundingRect();
+
+    fitInView(rect.adjusted(-12,-12,12,12), Qt::KeepAspectRatio);
 }
 
 void MixerCurveWidget::itemMoved(double itemValue)

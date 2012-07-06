@@ -313,6 +313,9 @@ void MixerCurve::SettingsTableChanged()
             points.push_front(item->text().toDouble());
     }
 
+    m_mixerUI->CurveMin->setValue(points.first());
+    m_mixerUI->CurveMax->setValue(points.last());
+
     m_curve->setCurve(&points);
 }
 

@@ -25,6 +25,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#include <QtGui/QWidget>
+#include <QResizeEvent>
 #include <math.h>
 #include "mixercurve.h"
 #include "doublespindelegate.h"
@@ -64,7 +66,7 @@ void MixerCurve::setMixerType(MixerCurveType curveType)
     switch (m_curveType) {
         case MixerCurve::MIXERCURVE_THROTTLE:
         {
-            m_mixerUI->CurveGroup->setTitle("Throttle Curve");
+            m_mixerUI->SettingsGroup->setTitle("Throttle Curve");
             m_curve->setRange(0.0, 1.0);
             m_mixerUI->CurveMin->setMinimum(0.0);
             m_mixerUI->CurveMax->setMinimum(0.0);
@@ -72,7 +74,7 @@ void MixerCurve::setMixerType(MixerCurveType curveType)
         }
         case MixerCurve::MIXERCURVE_PITCH:
         {
-            m_mixerUI->CurveGroup->setTitle("Pitch Curve");
+            m_mixerUI->SettingsGroup->setTitle("Pitch Curve");
             m_curve->setRange(-1.0, 1.0);
             m_mixerUI->CurveMin->setMinimum(-1.0);
             m_mixerUI->CurveMax->setMinimum(-1.0);
@@ -353,15 +355,19 @@ void MixerCurve::showEvent(QShowEvent *event)
     m_settings->resizeColumnsToContents();
     m_settings->setColumnWidth(0,(m_settings->width()-  m_settings->verticalHeader()->width()));
 
+//    const QRectF& rectRef = QRectF(0,0,parentWidget()->width() - 50 , parentWidget()->width() - 50);
+//    m_curve->fitInView(rectRef, Qt::KeepAspectRatio);
+
     m_curve->showEvent(event);
 }
 
 void MixerCurve::resizeEvent(QResizeEvent* event)
 {
-    Q_UNUSED(event);
-
     m_settings->resizeColumnsToContents();
-    m_settings->setColumnWidth(0,(m_settings->width()-  m_settings->verticalHeader()->width()));
+    m_settings->setColumnWidth(0,(m_settings->width() -  m_settings->verticalHeader()->width()));
+
+//    const QRectF& rectRef = QRectF(0,0,parentWidget()->width() - 50 , parentWidget()->width() - 50);
+//    m_curve->fitInView(rectRef, Qt::KeepAspectRatio);
 
     m_curve->resizeEvent(event);
 }

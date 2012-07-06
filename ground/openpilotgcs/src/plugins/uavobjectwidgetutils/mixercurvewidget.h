@@ -72,7 +72,6 @@ private:
    QList<Node*> nodePool;
    QList<Edge*> edgePool;
    QList<Node*> nodeList;
-   QList<double> points;
 
    double curveMin;
    double curveMax;

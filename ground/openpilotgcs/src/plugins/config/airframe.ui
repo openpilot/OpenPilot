@@ -480,8 +480,8 @@ margin:1px;</string>
                     </property>
                     <property name="minimumSize">
                      <size>
-                      <width>450</width>
-                      <height>400</height>
+                      <width>0</width>
+                      <height>0</height>
                      </size>
                     </property>
                     <property name="maximumSize">
@@ -499,7 +499,7 @@ margin:1px;</string>
                     <property name="baseSize">
                      <size>
                       <width>300</width>
-                      <height>300</height>
+                      <height>350</height>
                      </size>
                     </property>
                    </widget>
@@ -874,6 +874,18 @@ margin:1px;</string>
                      <size>
                       <width>0</width>
                       <height>0</height>
+                     </size>
+                    </property>
+                    <property name="sizeIncrement">
+                     <size>
+                      <width>10</width>
+                      <height>10</height>
+                     </size>
+                    </property>
+                    <property name="baseSize">
+                     <size>
+                      <width>300</width>
+                      <height>350</height>
                      </size>
                     </property>
                     <property name="styleSheet">
@@ -1627,7 +1639,7 @@ margin:1px;</string>
                <item>
                 <widget class="QGroupBox" name="gvThrottleCurve1GroupBox">
                  <property name="sizePolicy">
-                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                    <horstretch>0</horstretch>
                    <verstretch>100</verstretch>
                   </sizepolicy>
@@ -1662,6 +1674,12 @@ margin:1px;</string>
                       <height>10</height>
                      </size>
                     </property>
+                    <property name="baseSize">
+                     <size>
+                      <width>300</width>
+                      <height>350</height>
+                     </size>
+                    </property>
                    </widget>
                   </item>
                  </layout>
@@ -1670,7 +1688,7 @@ margin:1px;</string>
                <item>
                 <widget class="QGroupBox" name="gvThrottleCurve2GroupBox">
                  <property name="sizePolicy">
-                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
@@ -1697,6 +1715,18 @@ margin:1px;</string>
                      <size>
                       <width>500</width>
                       <height>500</height>
+                     </size>
+                    </property>
+                    <property name="sizeIncrement">
+                     <size>
+                      <width>10</width>
+                      <height>10</height>
+                     </size>
+                    </property>
+                    <property name="baseSize">
+                     <size>
+                      <width>300</width>
+                      <height>350</height>
                      </size>
                     </property>
                    </widget>
@@ -1762,7 +1792,7 @@ margin:1px;</string>
                <item>
                 <widget class="QGroupBox" name="groupBox_4">
                  <property name="sizePolicy">
-                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>

@@ -243,6 +243,7 @@ void MixerCurveWidget::showEvent(QShowEvent *event)
 void MixerCurveWidget::resizeEvent(QResizeEvent* event)
 {
     Q_UNUSED(event);
+
     fitInView(plot, Qt::KeepAspectRatio);
 }
 

@@ -152,7 +152,7 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
     m_aircraft->quadShape->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_aircraft->quadShape->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     QSvgRenderer *renderer = new QSvgRenderer();
-    renderer->load(QString(":/configgadget/images/quad-shapes.svg"));
+    renderer->load(QString(":/configgadget/images/multirotor-shapes.svg"));
     quad = new QGraphicsSvgItem();
     quad->setSharedRenderer(renderer);
     quad->setElementId("quad-plus");

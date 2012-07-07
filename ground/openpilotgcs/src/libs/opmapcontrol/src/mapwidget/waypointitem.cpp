@@ -266,6 +266,10 @@ WayPointItem::WayPointItem(MapGraphicItem *map, bool magicwaypoint):reached(fals
         if(altitude==value)
             return;
         altitude=value;
+        if(myHome)
+        {
+            relativeCoord.altitudeRelative=altitude-myHome->Altitude();
+        }
         RefreshToolTip();
         emit WPValuesChanged(this);
         this->update();
@@ -273,42 +277,47 @@ WayPointItem::WayPointItem(MapGraphicItem *map, bool magicwaypoint):reached(fals
 
     void WayPointItem::setRelativeCoord(distBearingAltitude value)
     {
-        if(qAbs(value.altitudeRelative-relativeCoord.altitudeRelative<0.0001)
-                && qAbs(value.bearing-relativeCoord.bearing<0.0001) && value.distance==relativeCoord.distance)
+        qDebug()<<"SetRelative("<<value.distance<<","<<value.bearing<<")"<<"OLD:"<<relativeCoord.distance<<","<<relativeCoord.bearing;
+        if(qAbs(value.distance-relativeCoord.distance)<0.1
+                && qAbs(value.bearing-relativeCoord.bearing)<0.01 && value.altitudeRelative==relativeCoord.altitudeRelative)
             return;
-        qDebug()<<"setRelative";
+        qDebug()<<"setRelative values need update";
         relativeCoord=value;
         if(myHome)
         {
-            coord=map->Projection()->translate(myHome->Coord(),relativeCoord.distance,relativeCoord.bearing);
+            SetCoord(map->Projection()->translate(myHome->Coord(),relativeCoord.distance,relativeCoord.bearing));
             SetAltitude(myHome->Altitude()+relativeCoord.altitudeRelative);
         }
         RefreshPos();
         RefreshToolTip();
         emit WPValuesChanged(this);
         this->update();
+        qDebug()<<"setRelativeCoord EXIT";
     }
 
     void WayPointItem::SetCoord(const internals::PointLatLng &value)
     {
-        if(qAbs(Coord().Lat()-value.Lat()<0.0001 && qAbs(Coord().Lng()-value.Lng()<0.0001)))
+        qDebug()<<"1 SetCoord("<<value.Lat()<<","<<value.Lng()<<")"<<"OLD:"<<Coord().Lat()<<","<<Coord().Lng();
+        if(qAbs(Coord().Lat()-value.Lat())<0.0001 && qAbs(Coord().Lng()-value.Lng())<0.0001)
+        {
+            qDebug()<<"2 SetCoord nothing changed returning";
             return;
-        qDebug()<<"setCoord";
-        bool abs_coord=false;
-        bool rel_coord=false;
-        if(coord!=value)
-            abs_coord=true;
+        }
+        qDebug()<<"3 setCoord there were changes";
         coord=value;
         distBearingAltitude back=relativeCoord;
         if(myHome)
-            map->Projection()->offSetFromLatLngs(myHome->Coord(),coord,relativeCoord.distance,relativeCoord.bearing);
-        if(back.distance!=relativeCoord.distance||back.bearing!=relativeCoord.bearing)
-            rel_coord=true;
-        if(abs_coord||rel_coord)
-            emit WPValuesChanged(this);
+            map->Projection()->offSetFromLatLngs(myHome->Coord(),Coord(),back.distance,back.bearing);
+        if(qAbs(back.bearing-relativeCoord.bearing)>0.01 || qAbs(back.distance-relativeCoord.distance)>0.1)
+        {
+            qDebug()<<"4 setCoord-relative coordinates where also updated";
+            relativeCoord=back;
+        }
+        emit WPValuesChanged(this);
         RefreshPos();
         RefreshToolTip();
         this->update();
+        qDebug()<<"5 setCoord EXIT";
     }
     void WayPointItem::SetDescription(const QString &value)
     {

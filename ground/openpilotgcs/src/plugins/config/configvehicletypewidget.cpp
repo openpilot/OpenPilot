@@ -612,9 +612,6 @@ void ConfigVehicleTypeWidget::updateCustomAirframeUI()
 
     // is at least one of the curve values != 0?
     if (vconfig->isValidThrottleCurve(&curveValues)) {
-        // yes, use the curve we just read from mixersettings
-        m_aircraft->customThrottle1Curve->setMin(vconfig->getCurveMin(&curveValues));
-        m_aircraft->customThrottle1Curve->setMax(vconfig->getCurveMax(&curveValues));
         m_aircraft->customThrottle1Curve->initCurve(&curveValues);
     }
     else {
@@ -622,12 +619,18 @@ void ConfigVehicleTypeWidget::updateCustomAirframeUI()
         m_aircraft->customThrottle1Curve->initLinearCurve(curveValues.count(),(double)1);
     }
 
-    // Setup all Throttle2 curves for all types of airframes //AT THIS MOMENT, THAT MEANS ONLY GROUND VEHICLES
+    if (MixerSettings* mxr = qobject_cast<MixerSettings *>(mixer)) {
+        MixerSettings::DataFields mixerSettingsData = mxr->getData();
+        if (mixerSettingsData.Curve2Source == MixerSettings::CURVE2SOURCE_THROTTLE)
+            m_aircraft->customThrottle2Curve->setMixerType(MixerCurve::MIXERCURVE_THROTTLE);
+        else
+            m_aircraft->customThrottle2Curve->setMixerType(MixerCurve::MIXERCURVE_PITCH);
+    }
+
+    // Setup all Throttle2 curves for all types of airframes
     vconfig->getThrottleCurve(mixer, VehicleConfig::MIXER_THROTTLECURVE2, &curveValues);
 
     if (vconfig->isValidThrottleCurve(&curveValues)) {
-        m_aircraft->customThrottle2Curve->setMin(vconfig->getCurveMin(&curveValues));
-        m_aircraft->customThrottle2Curve->setMax(vconfig->getCurveMax(&curveValues));
         m_aircraft->customThrottle2Curve->initCurve(&curveValues);
     }
     else {

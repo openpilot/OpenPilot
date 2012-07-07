@@ -616,15 +616,16 @@ void ConfigVehicleTypeWidget::updateCustomAirframeUI()
     }
     else {
         // no, init a straight curve
-        m_aircraft->customThrottle1Curve->initLinearCurve(curveValues.count(),(double)1);
+        m_aircraft->customThrottle1Curve->initLinearCurve(curveValues.count(), 1.0);
     }
 
     if (MixerSettings* mxr = qobject_cast<MixerSettings *>(mixer)) {
         MixerSettings::DataFields mixerSettingsData = mxr->getData();
         if (mixerSettingsData.Curve2Source == MixerSettings::CURVE2SOURCE_THROTTLE)
             m_aircraft->customThrottle2Curve->setMixerType(MixerCurve::MIXERCURVE_THROTTLE);
-        else
+        else {
             m_aircraft->customThrottle2Curve->setMixerType(MixerCurve::MIXERCURVE_PITCH);
+        }
     }
 
     // Setup all Throttle2 curves for all types of airframes
@@ -634,7 +635,7 @@ void ConfigVehicleTypeWidget::updateCustomAirframeUI()
         m_aircraft->customThrottle2Curve->initCurve(&curveValues);
     }
     else {
-        m_aircraft->customThrottle2Curve->initLinearCurve(curveValues.count(),(double)1);
+        m_aircraft->customThrottle2Curve->initLinearCurve(curveValues.count(), 1.0, m_aircraft->customThrottle2Curve->getMin());
     }
 
     // Update the mixer table:

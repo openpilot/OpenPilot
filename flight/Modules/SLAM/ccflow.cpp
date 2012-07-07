@@ -51,8 +51,10 @@ CCFlow::CCFlow(cv::RNG *rnginit, cv::Mat* last[], cv::Mat* current[], int pyrami
 		} else {
 			tr = Vec3f(0,0,0);
 		}
-		tr = Vec3f(0,0,0);
-		particleMatch(*last[0],*current[0],CC_PARTICLES,CC_PDEPTH,CC_ZOOMFACTOR,tr,CC_INITIAL);
+		//tr = Vec3f(0,0,0);
+		Mat ref=(*current[0])(Rect(1, 1, current[0]->cols-2, current[0]->rows-2));
+		Mat tst=(*last[0])(Rect(1, 1, last[0]->cols-2, last[0]->rows-2));
+		particleMatch(tst,ref,CC_PARTICLES,CC_PDEPTH,CC_ZOOMFACTOR,tr,CC_INITIAL);
 	}
 
 }
@@ -76,56 +78,61 @@ void CCFlow::particleMatch(cv::Mat test, cv::Mat reference,
 	float worstMatchScore = 0; // small
 
 	for (int g=0;g<generations;g++) {
-		for (int t=0;t<particleNum;t++) {
-			particles[t] = Vec3f( initial[0], initial[1],
-					rng->gaussian(initialRange[2])+initial[2]);
-			Mat rotMatrix = getRotationMatrix2D(Point2f(test.cols/2.,test.rows/2.),(particles[t])[2],1.0f);
-			rotMatrix.at<double>(0,2)+=(particles[t])[0];
-			rotMatrix.at<double>(1,2)+=(particles[t])[1];
-			fprintf(stderr,",,,x: %f y: %f r: %f\n",(particles[t])[0],(particles[t])[1],(particles[t])[2]);
+		for (int type=0;type<5;type++) {
+			for (int t=0;t<particleNum;t++) {
+				particles[t] = Vec3f( initial[0], initial[1], initial[2] );
+				if (type==0 || type==1) {
+					(particles[t])[2] += rng->gaussian(initialRange[2]);
+				}
+				if (type==0 || type==2 || type==3) {
+					(particles[t])[0] += rng->gaussian(initialRange[0]);
+				}
+				if (type==0 || type==2 || type==4) {
+					(particles[t])[1] += rng->gaussian(initialRange[1]);
+				}
+				Mat rotMatrix = getRotationMatrix2D(Point2f(test.cols/2.,test.rows/2.),(particles[t])[2],1.0f);
+				rotMatrix.at<double>(0,2)+=(particles[t])[0];
+				rotMatrix.at<double>(1,2)+=(particles[t])[1];
+				//fprintf(stderr,",,,x: %f y: %f r: %f\n",(particles[t])[0],(particles[t])[1],(particles[t])[2]);
 
-			float squareError = correlate(reference,test,rotMatrix);
-			if (squareError<bestMatchScore) {
-				bestMatch = t;
-				bestMatchScore = squareError;
+				float squareError = correlate(reference,test,rotMatrix);
+				if (squareError>0 && squareError<bestMatchScore) {
+					bestMatch = t;
+					bestMatchScore = squareError;
+				}
+				if (squareError>worstMatchScore) worstMatchScore=squareError;
 			}
-			if (squareError>worstMatchScore) worstMatchScore=squareError;
-		}
-		if (bestMatch!=-1) {
-			initial[0] = (particles[bestMatch])[0];
-			initial[1] = (particles[bestMatch])[1];
-			initial[2] = (particles[bestMatch])[2];
-			bestMatch = -1;
-			fprintf(stderr,"YYYx: %f y: %f r: %f\n",initial[0],initial[1],initial[2]);
-		}
-		for (int t=0;t<particleNum;t++) {
-			particles[t] = Vec3f( rng->gaussian(initialRange[0])+initial[0],
-					rng->gaussian(initialRange[1])+initial[1],
-					initial[2]);
-			Mat rotMatrix = getRotationMatrix2D(Point2f(test.cols/2.,test.rows/2.),(particles[t])[2],1.0f);
-			rotMatrix.at<double>(0,2)+=(particles[t])[0];
-			rotMatrix.at<double>(1,2)+=(particles[t])[1];
-			fprintf(stderr,"...x: %f y: %f r: %f\n",(particles[t])[0],(particles[t])[1],(particles[t])[2]);
-
-			float squareError = correlate(reference,test,rotMatrix);
-			//fprintf(stderr,"%f\n",squareError);
-			if (squareError<bestMatchScore) {
-				bestMatch = t;
-				bestMatchScore = squareError;
+			if (bestMatch!=-1) {
+				initial[0] = (particles[bestMatch])[0];
+				initial[1] = (particles[bestMatch])[1];
+				initial[2] = (particles[bestMatch])[2];
+				bestMatch = -1;
+				fprintf(stderr,"gen %i, type %i, score: %f\tx: %f y: %f r: %f\n",g,type,bestMatchScore,initial[0],initial[1],initial[2]);
 			}
-			if (squareError>worstMatchScore) worstMatchScore=squareError;
-		}
-		if (bestMatch!=-1) {
-			initial[0] = (particles[bestMatch])[0];
-			initial[1] = (particles[bestMatch])[1];
-			initial[2] = (particles[bestMatch])[2];
-			bestMatch = -1;
-			fprintf(stderr,"XXXx: %f y: %f r: %f\n",initial[0],initial[1],initial[2]);
 		}
 		initialRange[0] /=  stepFactor;
 		initialRange[1] /=  stepFactor;
 		initialRange[2] /=  stepFactor;
 	}
+	Mat d;
+	pyrUp (reference,d);
+	pyrUp (d,d);
+	pyrUp (d,d);
+	imshow("debug1",d);
+	pyrUp (test,d);
+	pyrUp (d,d);
+	pyrUp (d,d);
+	imshow("debug2",d);
+	Mat rotMatrix = getRotationMatrix2D(Point2f(test.cols/2.,test.rows/2.),initial[2],1.0f);
+	rotMatrix.at<double>(0,2)+=initial[0];
+	rotMatrix.at<double>(1,2)+=initial[1];
+	warpAffine(test,d,rotMatrix,test.size(),INTER_LINEAR+WARP_INVERSE_MAP);
+	pyrUp (d,d);
+	pyrUp (d,d);
+	pyrUp (d,d);
+	imshow("debug3",d);
+	fprintf(stderr,"x: %f y: %f r: %f - %f > %f\n",initial[0],initial[1],initial[2],bestMatchScore,worstMatchScore);
+	waitKey(1);
 	translation = Vec2f(initial[0],initial[1]);
 	rotation = initial[2];
 	best = bestMatchScore;
@@ -137,9 +144,9 @@ float CCFlow::correlate(cv::Mat reference, cv::Mat test, cv::Mat rotMatrix) {
 
 	double * m = (double*)rotMatrix.data;
 	float squareError=0;
-	int   pixels=0;
+	int   pixels=0,missed=0;
 
-Mat debug=test.clone()*0;
+//Mat debug=test.clone()*0;
 	for (int y=0;y<reference.rows;y++) {
 		for (int x=0;x<reference.cols;x++) {
 			int tx = (float)(16.0f*(m[0]*x + m[1]*y + m[2]));
@@ -160,14 +167,18 @@ Mat debug=test.clone()*0;
 				c[2]>>=8;
 				tmp -= c;
 				//debug.at<Vec3b>(y,x) = Vec3b(tmp[0]*tmp[0],tmp[1]*tmp[1],tmp[2]*tmp[2]);
-				debug.at<Vec3b>(y,x) = c;
+				//debug.at<Vec3b>(y,x) = c;
 
 				squareError += tmp[0]*tmp[0] + tmp[1]+tmp[1] + tmp[2]*tmp[2];
+			} else {
+				pixels++;
+				missed++;
+				squareError += 128*128*3;
 			}
 		}
 	}
-	if (pixels==0) return reference.rows*reference.cols*3*256;
-//#if 0
+	if (pixels<3*missed) return -1;
+#if 0
 	pyrUp(debug,debug);
 	pyrUp(debug,debug);
 	pyrUp(debug,debug);
@@ -184,7 +195,7 @@ Mat debug=test.clone()*0;
 	waitKey(0);
 	imshow("debug",debug);
 	waitKey(0);
-//#endif
+#endif
 
 	return squareError/pixels;
 }

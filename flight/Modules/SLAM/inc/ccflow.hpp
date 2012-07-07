@@ -37,10 +37,10 @@
 // Y: displacement in vertical (pixels)
 // R: rotation in degrees (OpenCV operates in degrees)
 
-#define CC_PARTICLES 10
-#define CC_PDEPTH 5
+#define CC_PARTICLES 15
+#define CC_PDEPTH 3
 #define CC_ZOOMFACTOR 2
-#define CC_INITIAL Vec3f(4.0,4.0,8.0)
+#define CC_INITIAL Vec3f(2.0,2.0,5.0)
 
 typedef cv::Vec3f TransRot;
 
@@ -51,7 +51,7 @@ public:
 	
 	// methods
 	CCFlow(cv::RNG *rnginit, cv::Mat* last[], cv::Mat* current[], int pyramidDepth,
-		TransRot estTransrotation=cv::Vec3f(0,0,1000), CCFlow* oldflow=NULL, cv::Vec4s borders=cv::Vec4s(0,0,0,0),int depth=0);
+		TransRot estTransrotation=cv::Vec3f(0,0,1000), CCFlow* oldflow=NULL, cv::Vec4s borders=cv::Vec4s(1,1,1,1),int depth=0);
 
 	TransRot transrotation();
 	TransRot transrotation(cv:: Point2i position);

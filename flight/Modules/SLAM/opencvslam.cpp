@@ -60,7 +60,10 @@ void OpenCVslam::shrinkAndEnhance(const Mat& src, Mat& dst) {
 	// or with double laplace
 	// -7 4 22 4 -7
 	PyrDownEnhanced enhanced;
-	enhanced.pyrDownEnhanced(src,dst,-3,4,14);
+	//enhanced.pyrDownEnhanced(src,dst,-3,4,14);
+	//enhanced.pyrDownEnhanced(src,dst,-4,4,16);
+	//enhanced.pyrDownEnhanced(src,dst,-5,4,18);
+	enhanced.pyrDownEnhanced(src,dst,1,4,6);
 	
 }
 
@@ -100,6 +103,9 @@ void OpenCVslam::run() {
 
 	// debug output
 	cvNamedWindow("debug",CV_WINDOW_AUTOSIZE);
+	cvNamedWindow("debug1",CV_WINDOW_AUTOSIZE);
+	cvNamedWindow("debug2",CV_WINDOW_AUTOSIZE);
+	cvNamedWindow("debug3",CV_WINDOW_AUTOSIZE);
 	
 	// synchronization delay, wait for attitude data - any attitude data
 	// this is an evil hack but necessary for tests with log data to synchronize video and telemetry

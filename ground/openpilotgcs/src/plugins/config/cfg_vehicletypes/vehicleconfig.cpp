@@ -113,17 +113,6 @@ void VehicleConfig::SetConfigData(GUIConfigDataUnion configData) {
 void VehicleConfig::ResetActuators(GUIConfigDataUnion* configData)
 {
 }
-QStringList VehicleConfig::getChannelDescriptions()
-{
-    QStringList channelDesc;
-
-    // init a channel_numelem list of channel desc defaults
-    for (int i=0; i < (int)(VehicleConfig::CHANNEL_NUMELEM); i++)
-    {
-        channelDesc.append(QString("-"));
-    }    
-    return channelDesc;
-}
 
 /**
   Helper function:

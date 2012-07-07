@@ -138,7 +138,6 @@ class VehicleConfig: public ConfigTaskWidget
         double  getCurveMin(QList<double>* curve);
         double  getCurveMax(QList<double>* curve);
         virtual void ResetActuators(GUIConfigDataUnion* configData);
-        virtual QStringList getChannelDescriptions();
 
         QStringList channelNames;
         QStringList mixerTypes;

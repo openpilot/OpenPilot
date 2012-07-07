@@ -67,7 +67,6 @@ private:
     void updateCustomAirframeUI();
     void addToDirtyMonitor();
     void resetField(UAVObjectField * field);
-    void resetMixer (MixerCurveWidget *mixer, int numElements, double maxvalue);
 
     //void setMixerChannel(int channelNumber, bool channelIsMotor, QList<double> vector);
 

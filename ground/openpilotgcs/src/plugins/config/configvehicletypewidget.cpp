@@ -120,7 +120,7 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
     airframeTypes << "Fixed Wing" << "Multirotor" << "Helicopter" << "Ground" << "Custom";
     m_aircraft->aircraftType->addItems(airframeTypes);
 
-    m_aircraft->aircraftType->setCurrentIndex(0);    //Set default vehicle to Fixed Wing
+    m_aircraft->aircraftType->setCurrentIndex(0);    //Set default vehicle to Fixedwing
     m_aircraft->airframesWidget->setCurrentIndex(0); // Force the tab index to match
 
     QStringList fixedWingTypes;
@@ -138,7 +138,7 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
 					"Hexacopter" << "Hexacopter X" << "Hexacopter Y6" <<
 					"Octocopter" << "Octocopter V" << "Octo Coax +" << "Octo Coax X" ;
     m_aircraft->multirotorFrameType->addItems(multiRotorTypes);
-    m_aircraft->multirotorFrameType->setCurrentIndex(1); //Set default model to "Quad +"
+    m_aircraft->multirotorFrameType->setCurrentIndex(2); //Set default model to "Quad X"
 
 
 	//NEW STYLE: Loop through the widgets looking for all widgets that have "ChannelBox" in their name
@@ -193,9 +193,6 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
     // create and setup a Helicopter config widget
     m_heli = m_aircraft->widget_3;
     m_heli->setupUI(QString("HeliCP"));
-
-    // initialize the ui to show the mixersettings tab
-    //mdl m_aircraft->tabWidget->setCurrentIndex(0);
 
 	//Connect aircraft type selection dropbox to callback function
     connect(m_aircraft->aircraftType, SIGNAL(currentIndexChanged(int)), this, SLOT(switchAirframeType(int)));
@@ -255,16 +252,14 @@ QStringList ConfigVehicleTypeWidget::getChannelDescriptions()
         case SystemSettings::AIRFRAMETYPE_FIXEDWINGELEVON:
         case SystemSettings::AIRFRAMETYPE_FIXEDWINGVTAIL:
         {
-            QPointer<ConfigFixedWingWidget> fixedwing = new ConfigFixedWingWidget();
-            channelDesc = fixedwing->getChannelDescriptions();
+            channelDesc = ConfigFixedWingWidget::getChannelDescriptions();
         }
         break;
 
         // helicp
         case SystemSettings::AIRFRAMETYPE_HELICP:
         {
-            QPointer<ConfigCcpmWidget> heli = new ConfigCcpmWidget();
-            channelDesc = heli->getChannelDescriptions();
+            channelDesc = ConfigCcpmWidget::getChannelDescriptions();
         }
         break;
 
@@ -281,8 +276,7 @@ QStringList ConfigVehicleTypeWidget::getChannelDescriptions()
         case SystemSettings::AIRFRAMETYPE_HEXACOAX:
         case SystemSettings::AIRFRAMETYPE_HEXA:
         {
-            QPointer<ConfigMultiRotorWidget> multi = new ConfigMultiRotorWidget();
-            channelDesc = multi->getChannelDescriptions();
+            channelDesc = ConfigMultiRotorWidget::getChannelDescriptions();
         }
         break;
 
@@ -291,8 +285,7 @@ QStringList ConfigVehicleTypeWidget::getChannelDescriptions()
         case SystemSettings::AIRFRAMETYPE_GROUNDVEHICLEDIFFERENTIAL:
         case SystemSettings::AIRFRAMETYPE_GROUNDVEHICLEMOTORCYCLE:
         {
-            QPointer<ConfigGroundVehicleWidget> ground = new ConfigGroundVehicleWidget();
-            channelDesc = ground->getChannelDescriptions();
+            channelDesc = ConfigGroundVehicleWidget::getChannelDescriptions();
         }
         break;
 
@@ -458,15 +451,6 @@ void ConfigVehicleTypeWidget::enableFFTest()
             obj->setMetadata(mdata);
         }
     }
-}
-
-/**
-  Resets a mixer curve
-  */
-void ConfigVehicleTypeWidget::resetMixer(MixerCurveWidget *mixer, int numElements, double maxvalue)
-{
-    // Setup all Throttle1 curves for all types of airframes
-    mixer->initLinearCurve((quint32)numElements,maxvalue);
 }
 
 /**************************

@@ -88,7 +88,7 @@ private:
         bool updatingToHardware;
 
         virtual void ResetActuators(GUIConfigDataUnion* configData);
-        virtual QStringList getChannelDescriptions();
+        static QStringList getChannelDescriptions();
 
         QString updateConfigObjects();
     private slots:

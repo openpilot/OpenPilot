@@ -66,6 +66,7 @@ private:
 
     virtual void ResetActuators(GUIConfigDataUnion* configData);
     static QStringList getChannelDescriptions();
+    static const QString CHANNELBOXNAME;
 
 private slots:
     virtual void setupUI(QString airframeType);

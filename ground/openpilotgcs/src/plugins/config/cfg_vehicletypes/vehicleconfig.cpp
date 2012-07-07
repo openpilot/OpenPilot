@@ -129,15 +129,16 @@ void VehicleConfig::setComboCurrentIndex(QComboBox* box, int index)
 
 /**
   Helper function:
-  enables/disables the named combobox within supplied uiowner
+  enables/disables the named comboboxes within supplied uiowner
  */
-void VehicleConfig::enableComboBox(QWidget* owner, QString boxName, bool enable)
+void VehicleConfig::enableComboBoxes(QWidget* owner, QString boxName, int boxCount, bool enable)
 {
-    QComboBox* box = qFindChild<QComboBox*>(owner, boxName);
-    if (box)
-        box->setEnabled(enable);
+    for (int i = 1; i <= boxCount; i++) {
+        QComboBox* box = qFindChild<QComboBox*>(owner, QString("%0%1").arg(boxName).arg(i));
+        if (box)
+            box->setEnabled(enable);
+    }
 }
-
 QString VehicleConfig::getMixerType(UAVDataObject* mixer, int channel)
 {
     Q_ASSERT(mixer);

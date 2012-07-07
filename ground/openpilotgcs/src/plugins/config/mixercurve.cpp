@@ -117,6 +117,9 @@ void MixerCurve::UpdateCurveUI()
     //get the user settings
     QString curveType = m_mixerUI->CurveType->currentText();
 
+    m_mixerUI->CurveMin->setValue(m_mixerUI->CurveMin->minimum());
+    m_mixerUI->CurveMax->setValue(m_mixerUI->CurveMax->maximum());
+
     m_mixerUI->CurveStep->setMinimum(0.0);
     m_mixerUI->CurveStep->setMaximum(100.0);
 
@@ -323,9 +326,6 @@ void MixerCurve::CurveTypeChanged()
 {
     // setup the ui for this curvetype
     UpdateCurveUI();
-
-    // and generate a curve based on the selection
-    GenerateCurve();
 }
 
 void MixerCurve::CurveMinChanged(double value)

@@ -146,10 +146,9 @@ private:
     bool m_changed;
     QTime m_highlightExpires;
     HighLightManager* m_highlightManager;
+    static int m_highlightTimeMs;
 public:
     static const int dataColumn = 1;
-private:
-    static int m_highlightTimeMs;
 };
 
 class TopTreeItem : public TreeItem

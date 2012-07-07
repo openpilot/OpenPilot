@@ -59,6 +59,7 @@ UAVObjectBrowserWidget::UAVObjectBrowserWidget(QWidget *parent) : QWidget(parent
     connect(m_browser->eraseSDButton, SIGNAL(clicked()), this, SLOT(eraseObject()));
     connect(m_browser->sendButton, SIGNAL(clicked()), this, SLOT(sendUpdate()));
     connect(m_browser->requestButton, SIGNAL(clicked()), this, SLOT(requestUpdate()));
+    connect(m_browser->scientificNotationCheckbox, SIGNAL(toggled(bool)), this, SLOT(useScientificNotation(bool)));
     enableSendRequest(false);
 }
 
@@ -77,6 +78,20 @@ void UAVObjectBrowserWidget::showMetaData(bool show)
             m_browser->treeView->setRowHidden(0, index.child(j,0), !show);
         }
     }
+}
+
+void UAVObjectBrowserWidget::useScientificNotation(bool scientific)
+{
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    Q_ASSERT(pm);
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    Q_ASSERT(objManager);
+
+    UAVObjectTreeModel* tmpModel = m_model;
+    m_model = new UAVObjectTreeModel(0, scientific);
+    m_browser->treeView->setModel(m_model);
+
+    delete tmpModel;
 }
 
 void UAVObjectBrowserWidget::sendUpdate()

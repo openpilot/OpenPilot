@@ -48,7 +48,7 @@ class UAVObjectTreeModel : public QAbstractItemModel
 {
 Q_OBJECT
 public:
-    explicit UAVObjectTreeModel(QObject *parent = 0);
+    explicit UAVObjectTreeModel(QObject *parent = 0, bool useScientificNotation = false);
     ~UAVObjectTreeModel();
 
     QVariant data(const QModelIndex &index, int role) const;
@@ -97,6 +97,7 @@ private:
     int m_recentlyUpdatedTimeout;
     QColor m_recentlyUpdatedColor;
     QColor m_manuallyChangedColor;
+    bool m_useScientificFloatNotation;
 
     // Highlight manager to handle highlighting of tree items.
     HighLightManager *m_highlightManager;

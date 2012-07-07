@@ -100,7 +100,7 @@ void ConfigMultiRotorWidget::setupUI(QString frameType)
     }
     else if (frameType == "QuadX" || frameType == "Quad X") {
         setComboCurrentIndex( m_aircraft->multirotorFrameType, m_aircraft->multirotorFrameType->findText("Quad X"));
-		quad->setElementId("quad-X");
+        quad->setElementId("quad-x");
 		
         //Enable all necessary motor channel boxes...
         enableComboBoxes(uiowner, CHANNELBOXNAME, 4, true);

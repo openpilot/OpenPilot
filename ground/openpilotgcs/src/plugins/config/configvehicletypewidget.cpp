@@ -120,7 +120,7 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
     airframeTypes << "Fixed Wing" << "Multirotor" << "Helicopter" << "Ground" << "Custom";
     m_aircraft->aircraftType->addItems(airframeTypes);
 
-    m_aircraft->aircraftType->setCurrentIndex(1);    //Set default vehicle to Fixed Wing
+    m_aircraft->aircraftType->setCurrentIndex(1);    //Set default vehicle to MultiRotor
     m_aircraft->airframesWidget->setCurrentIndex(1); // Force the tab index to match
 
     QStringList fixedWingTypes;
@@ -155,7 +155,7 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
     renderer->load(QString(":/configgadget/images/multirotor-shapes.svg"));
     quad = new QGraphicsSvgItem();
     quad->setSharedRenderer(renderer);
-    quad->setElementId("quad-plus");
+    quad->setElementId("quad-x");
     QGraphicsScene *scene = new QGraphicsScene(this);
     scene->addItem(quad);
     scene->setSceneRect(quad->boundingRect());

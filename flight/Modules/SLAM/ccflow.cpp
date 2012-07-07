@@ -28,6 +28,7 @@
 
 #include "ccflow.hpp"
 #include "pyramidsenhanced.hpp"
+#include "opencv/highgui.h"
 
 using namespace cv;
 
@@ -35,21 +36,23 @@ using namespace cv;
 
 
 
-CCFlow::CCFlow(cv::InputArray last[], cv::InputArray current[], int pyramidDepth, TransRot estTransrotation=Vec3f(0,0,256), CCFlow* oldflow=NULL, cv::Vec4s borders=Vec4s(0,0,0,0)) {
+CCFlow::CCFlow(cv::RNG *rnginit, cv::Mat* last[], cv::Mat* current[], int pyramidDepth, TransRot estTransrotation, CCFlow* oldflow, cv::Vec4s borders, int depth) {
 
+	rng = rnginit;
 	border=borders;
 
-	if (pyramidDepth == 1) {
+	if (depth == 0) {
+		TransRot tr;
 		// initialize transrotation
-		if (estTransrotation[2] != 256) {
-			transrotation = estTransotation;
+		if (estTransrotation[2] < 999) {
+			tr = estTransrotation;
 		} else if (oldflow) {
-			transrotation = oldflow->transrotation;
+			tr = oldflow->transrotation();
 		} else {
-			transrotation = Vec3f(0,0,0);
+			tr = Vec3f(0,0,0);
 		}
-		particleMatch(last[0],current[0]);
-		
+		tr = Vec3f(0,0,0);
+		particleMatch(*last[0],*current[0],CC_PARTICLES,CC_PDEPTH,CC_ZOOMFACTOR,tr,CC_INITIAL);
 	}
 
 }
@@ -61,15 +64,8 @@ TransRot CCFlow::transrotation() {
 
 
 
-TransRot particleRandom(TransRot initial, TransRot initialRange) {
-	return Vec3f( RNG:gaussian(initialRange[0])+initial[0],
-		RNG:gaussian(initialRange[1])+initial[1],
-		RNG:gaussian(initialRange[2])+initial[2]);
-}
-
-
-void CCFlow::particleMatch(cv::Mat& test, cv::Mat& reference,
-				int particleNum, int generations,
+void CCFlow::particleMatch(cv::Mat test, cv::Mat reference,
+				int particleNum, int generations, int stepFactor,
 				TransRot initial, TransRot initialRange )
 {
 
@@ -77,47 +73,120 @@ void CCFlow::particleMatch(cv::Mat& test, cv::Mat& reference,
 	TransRot particles[particleNum];
 	int bestMatch = -1;
 	float bestMatchScore = 1000000000; // huge
+	float worstMatchScore = 0; // small
 
-	for (int t=0;t<particleNum;t++) {
-		particle[t] = particleRandom(initial,initialRange);
-		Mat rotMatrix = getRotationMatrix2D(Point2f(test.cols/2.,test.rows/2.),particle[t][2]);
-		rotMatrix.at(0,2)+=particle[t][0];
-		rotMatrix.at(1,2)+=particle[t][1];
+	for (int g=0;g<generations;g++) {
+		for (int t=0;t<particleNum;t++) {
+			particles[t] = Vec3f( initial[0], initial[1],
+					rng->gaussian(initialRange[2])+initial[2]);
+			Mat rotMatrix = getRotationMatrix2D(Point2f(test.cols/2.,test.rows/2.),(particles[t])[2],1.0f);
+			rotMatrix.at<double>(0,2)+=(particles[t])[0];
+			rotMatrix.at<double>(1,2)+=(particles[t])[1];
+			fprintf(stderr,",,,x: %f y: %f r: %f\n",(particles[t])[0],(particles[t])[1],(particles[t])[2]);
 
-		float squareError = correlate(reference,test,rotMatrix);
-		if (squareError<bestMatchScore) {
-			bestMatch = t;
-			bestMatchScore = squareError;
+			float squareError = correlate(reference,test,rotMatrix);
+			if (squareError<bestMatchScore) {
+				bestMatch = t;
+				bestMatchScore = squareError;
+			}
+			if (squareError>worstMatchScore) worstMatchScore=squareError;
 		}
+		if (bestMatch!=-1) {
+			initial[0] = (particles[bestMatch])[0];
+			initial[1] = (particles[bestMatch])[1];
+			initial[2] = (particles[bestMatch])[2];
+			bestMatch = -1;
+			fprintf(stderr,"YYYx: %f y: %f r: %f\n",initial[0],initial[1],initial[2]);
+		}
+		for (int t=0;t<particleNum;t++) {
+			particles[t] = Vec3f( rng->gaussian(initialRange[0])+initial[0],
+					rng->gaussian(initialRange[1])+initial[1],
+					initial[2]);
+			Mat rotMatrix = getRotationMatrix2D(Point2f(test.cols/2.,test.rows/2.),(particles[t])[2],1.0f);
+			rotMatrix.at<double>(0,2)+=(particles[t])[0];
+			rotMatrix.at<double>(1,2)+=(particles[t])[1];
+			fprintf(stderr,"...x: %f y: %f r: %f\n",(particles[t])[0],(particles[t])[1],(particles[t])[2]);
+
+			float squareError = correlate(reference,test,rotMatrix);
+			//fprintf(stderr,"%f\n",squareError);
+			if (squareError<bestMatchScore) {
+				bestMatch = t;
+				bestMatchScore = squareError;
+			}
+			if (squareError>worstMatchScore) worstMatchScore=squareError;
+		}
+		if (bestMatch!=-1) {
+			initial[0] = (particles[bestMatch])[0];
+			initial[1] = (particles[bestMatch])[1];
+			initial[2] = (particles[bestMatch])[2];
+			bestMatch = -1;
+			fprintf(stderr,"XXXx: %f y: %f r: %f\n",initial[0],initial[1],initial[2]);
+		}
+		initialRange[0] /=  stepFactor;
+		initialRange[1] /=  stepFactor;
+		initialRange[2] /=  stepFactor;
 	}
+	translation = Vec2f(initial[0],initial[1]);
+	rotation = initial[2];
+	best = bestMatchScore;
+	worst = worstMatchScore;
 }
 
 
-float CCFlow::correlate(cv::Mat& reference, cv::Mat& test, cv::Mat& rotMatrix) {
+float CCFlow::correlate(cv::Mat reference, cv::Mat test, cv::Mat rotMatrix) {
 
-	float M11=rotMatrix.at(0,0);
-	float M12=rotMatrix.at(0,1);
-	float M13=rotMatrix.at(0,2);
-	float M21=rotMatrix.at(1,0);
-	float M22=rotMatrix.at(1,1);
-	float M23=rotMatrix.at(1,2);
+	double * m = (double*)rotMatrix.data;
 	float squareError=0;
 	int   pixels=0;
+
+Mat debug=test.clone()*0;
 	for (int y=0;y<reference.rows;y++) {
-		for (x=0;x<reference.cols;x++) {
-			int tx = (float)(M11*x + M12*y + M13);
-			int ty = (float)(M21*x + M22*y + M23);
+		for (int x=0;x<reference.cols;x++) {
+			int tx = (float)(16.0f*(m[0]*x + m[1]*y + m[2]));
+			int ty = (float)(16.0f*(m[3]*x + m[4]*y + m[5]));
 			// check whether source pixel is within outer boundaries
-			if (tx>=0-border[0] && tx<reference.cols+border[1] && ty>=0-border[2] && ty<reference.rows+border[3]) {
+			if ((tx/16)>=0-border[0] && (tx/16)+1<test.cols+border[1] && (ty/16)>=0-border[2] && (ty/16)+1<test.rows+border[3]) {
 				pixels++;
-				for (cv=0;cv<3;cv++) {
-					float tmp = reference.at(x,y,cv)-test.at(tx,ty,cv);
-					squareError += tmp*tmp;
-				}
+				Vec3i tmp = reference.at<Vec3b>(y,x);
+				Vec3i a1 = test.at<Vec3b>(ty/16,tx/16);
+				Vec3i a2 = test.at<Vec3b>(ty/16,tx/16 +1);
+				Vec3i b1 = test.at<Vec3b>(ty/16 +1,tx/16);
+				Vec3i b2 = test.at<Vec3b>(ty/16 +1,tx/16 +1);
+				Vec3i a = (16-(tx%16))*a1 + (tx%16)*a2;
+				Vec3i b = (16-(tx%16))*b1 + (tx%16)*b2;
+				Vec3i c = ((16-(ty%16))*a + (ty%16)*b);
+				c[0]>>=8;
+				c[1]>>=8;
+				c[2]>>=8;
+				tmp -= c;
+				//debug.at<Vec3b>(y,x) = Vec3b(tmp[0]*tmp[0],tmp[1]*tmp[1],tmp[2]*tmp[2]);
+				debug.at<Vec3b>(y,x) = c;
+
+				squareError += tmp[0]*tmp[0] + tmp[1]+tmp[1] + tmp[2]*tmp[2];
+			}
 		}
 	}
+	if (pixels==0) return reference.rows*reference.cols*3*256;
+//#if 0
+	pyrUp(debug,debug);
+	pyrUp(debug,debug);
+	pyrUp(debug,debug);
+	Mat x1;
+	pyrUp(reference,x1);
+	pyrUp(x1,x1);
+	pyrUp(x1,x1);
+	imshow("debug",x1);
+	waitKey(0);
+	pyrUp(test,x1);
+	pyrUp(x1,x1);
+	pyrUp(x1,x1);
+	imshow("debug",x1);
+	waitKey(0);
+	imshow("debug",debug);
+	waitKey(0);
+//#endif
 
-	return squareErrors/pixels;
+	return squareError/pixels;
 }
 
 

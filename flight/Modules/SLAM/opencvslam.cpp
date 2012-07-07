@@ -28,6 +28,7 @@
 
 #include "opencvslam.hpp"
 #include "pyramidsenhanced.hpp"
+#include "ccflow.hpp"
 
 // Private constants
 #define DEG2RAD (3.1415926535897932/180.0)
@@ -66,9 +67,12 @@ void OpenCVslam::shrinkAndEnhance(const Mat& src, Mat& dst) {
 
 void OpenCVslam::run() {
 
-	Mat current[5]; // "pyramid" of current frame
-	Mat last[5];    // "pyramid" of previous frame
+	Mat* current[6]={NULL}; // "pyramid" of current frame
+	Mat* last[6]={NULL};    // "pyramid" of previous frame
 
+	RNG rng;
+	CCFlow *currentFlow=NULL;
+	CCFlow *lastFlow=NULL;
 	/* Initialize OpenCV */
 	//VideoSource = NULL; //cvCaptureFromFile("test.avi");
 	VideoSource = cvCaptureFromFile("test.avi");
@@ -82,20 +86,17 @@ void OpenCVslam::run() {
 		cvSetCaptureProperty(VideoSource, CV_CAP_PROP_FRAME_HEIGHT, settings->FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_Y]);
 	}
 
-	Mat last,current;
 	Mat flow; // = Mat(480,640,CV_32FC1);
-	Mat sflow[3];
 	Mat cflow;
 
 
 	//pyrDown(Mat(currentFrame),current);
-	if (currentFrame) lastFrame = cvCloneImage(currentFrame);
-	Mat(currentFrame).convertTo(current, CV_32F,1/256);
+	//
+	//if (currentFrame) lastFrame = cvCloneImage(currentFrame);
+	//Mat(currentFrame).convertTo(current, CV_32F,1/256);
 	//pyrDown(Mat(currentFrame),current);
 	//pyrDown(current,current);
-	last=current;
-
-shrinkAndEnhance(current,flow);
+	//last=current;
 
 	// debug output
 	cvNamedWindow("debug",CV_WINDOW_AUTOSIZE);
@@ -105,7 +106,7 @@ shrinkAndEnhance(current,flow);
 	AttitudeActualGet(&attitudeActual);
 	attitudeActual.Pitch=100;
 	AttitudeActualSet(&attitudeActual);
-	cvShowImage("debug",lastFrame);
+	cvShowImage("debug",currentFrame);
 	cvWaitKey(1);
 	while (attitudeActual.Pitch==100) AttitudeActualGet(&attitudeActual);
 
@@ -177,33 +178,53 @@ shrinkAndEnhance(current,flow);
 		if (VideoSource) currentFrame = cvRetrieveFrame(VideoSource,0);
 
 		if (currentFrame) {
-			last=current;
-			current=Mat(currentFrame);
-			//Mat(currentFrame).convertTo(current, CV_32F,1./256.);
-shrinkAndEnhance(current,flow);
-//shrinkAndEnhance(flow,flow);
-//shrinkAndEnhance(flow,flow);
-//shrinkAndEnhance(flow,flow);
-//shrinkAndEnhance(flow,flow);
-			//pyrDown(Mat(currentFrame),current);
-			//pyrDown(current,current);
+			//last=current;
+			if (last[5]) delete last[5];
+			if (last[4])delete last[4];
+			if (last[3])delete last[3];
+			if (last[2])delete last[2];
+			if (last[1])delete last[1];
+			if (last[0])delete last[0];
+			last[5]=current[5];
+			last[4]=current[4];
+			last[3]=current[3];
+			last[2]=current[2];
+			last[1]=current[1];
+			last[0]=current[0];
+			current[5]=new Mat(currentFrame);
+			current[4]= new Mat();
+			current[3]= new Mat();
+			current[2]= new Mat();
+			current[1]= new Mat();
+			current[0]= new Mat();
+			//current=Mat(currentFrame);
+			shrinkAndEnhance(*current[5],*current[4]);
+			shrinkAndEnhance(*current[4],*current[3]);
+			shrinkAndEnhance(*current[3],*current[2]);
+			shrinkAndEnhance(*current[2],*current[1]);
+			shrinkAndEnhance(*current[1],*current[0]);
+			flow=*current[3];
 		}
 		if (currentFrame && lastFrame) {
 			//Mat x1,x2;
 			//cvtColor(last,x1,CV_RGB2GRAY);
 			//cvtColor(current,x2,CV_RGB2GRAY);
 			//flow=x2;
-			//fprintf(stderr,"calculate flow...");
+			fprintf(stderr,"calculate flow...\n");
+			if (lastFlow) delete lastFlow;
+			lastFlow = currentFlow;
+			currentFlow = new CCFlow(&rng, last,current,5,Vec3f(0,0,1000),lastFlow);
+			fprintf(stderr,"rotation: %f degrees,\tx: %f\ty: %f\t  %f > %f\n",currentFlow->rotation,currentFlow->translation[0],currentFlow->translation[1],currentFlow->best,currentFlow->worst);
 			//vPortEnterCritical();
 			//calcOpticalFlowFarneback(x1,x2, flow, 0.5, 3, 9, 9, 5, 1.1, 0);
 			//calcOpticalFlowFarneback(x1,x2, flow, 0.5, 4, 13, 1, 5, 1.1, 0);
 			//calcOpticalFlowCorvus(last,curent,flow);
 			//vPortExitCritical();
-			//fprintf(stderr,"done\n");
+			fprintf(stderr,"done\n");
 			//split(flow,sflow);
 			//sflow[2]=sflow[1];
 			//merge(sflow,3,cflow);
-			fprintf(stderr,".");
+			//fprintf(stderr,".");
 		}
 		if (lastFrame) {
 			cvReleaseImage(&lastFrame);

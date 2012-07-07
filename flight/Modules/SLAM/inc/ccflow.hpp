@@ -38,9 +38,11 @@
 // R: rotation in degrees (OpenCV operates in degrees)
 
 #define CC_PARTICLES 10
-#define CC_PDEPTH 3
+#define CC_PDEPTH 5
+#define CC_ZOOMFACTOR 2
+#define CC_INITIAL Vec3f(4.0,4.0,8.0)
 
-typedef cc::Vec3f TransRot
+typedef cv::Vec3f TransRot;
 
 class CCFlow {
 
@@ -48,29 +50,33 @@ class CCFlow {
 public:
 	
 	// methods
-	CCFlow(cv::InputArray last[], cv::InputArray current[], int pyramidDepth,
-		TransRot estTransrotation=Vec3f(0,0,0), CCFlow* oldflow=NULL, cv::Vec4s borders=Vec4s(0,0,0,0));
+	CCFlow(cv::RNG *rnginit, cv::Mat* last[], cv::Mat* current[], int pyramidDepth,
+		TransRot estTransrotation=cv::Vec3f(0,0,1000), CCFlow* oldflow=NULL, cv::Vec4s borders=cv::Vec4s(0,0,0,0),int depth=0);
 
 	TransRot transrotation();
 	TransRot transrotation(cv:: Point2i position);
 	TransRot transrotation(cv:: Point3i position);
 
 	// finds the best transrotation between two templates of equal size via particle filter approach
-	void particleMatch(cv::Mat& test, cv::Mat& reference, int particleNum, int generations, TransRot initial, TransRot initialRange);
+	void particleMatch(cv::Mat test, cv::Mat reference, int particleNum, int generations, int stepFactor, TransRot initial, TransRot initialRange);
 
 	// finds the mean square error between two templates of equal size of which one is transrotated
-	float correlate(cv::Mat& reference, cv::Mat& test, cv::Mat& rotMatrix);
+	float correlate(cv::Mat reference, cv::Mat test, cv::Mat rotMatrix);
+
 
 	// properties
-	CCFlow[][] quarters; // subcomponents
+	CCFlow *children; // subcomponents
 	
 	cv::Size origSize; // size of area before shrinking
 	cv::Mat area; // mat after rotation (and possibly shrinkage)
-private:
+	
 	cv::Vec2f translation;
 	float rotation;
+	float best;
+	float worst;
+private:
 	cv::Vec4i border;
-
+	cv::RNG *rng;
 
 };
 

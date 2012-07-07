@@ -120,8 +120,8 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
     airframeTypes << "Fixed Wing" << "Multirotor" << "Helicopter" << "Ground" << "Custom";
     m_aircraft->aircraftType->addItems(airframeTypes);
 
-    m_aircraft->aircraftType->setCurrentIndex(0);    //Set default vehicle to Fixed Wing
-    m_aircraft->airframesWidget->setCurrentIndex(0); // Force the tab index to match
+    m_aircraft->aircraftType->setCurrentIndex(1);    //Set default vehicle to Fixed Wing
+    m_aircraft->airframesWidget->setCurrentIndex(1); // Force the tab index to match
 
     QStringList fixedWingTypes;
     fixedWingTypes << "Elevator aileron rudder" << "Elevon" << "Vtail";
@@ -138,7 +138,7 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
 					"Hexacopter" << "Hexacopter X" << "Hexacopter Y6" <<
 					"Octocopter" << "Octocopter V" << "Octo Coax +" << "Octo Coax X" ;
     m_aircraft->multirotorFrameType->addItems(multiRotorTypes);
-    m_aircraft->multirotorFrameType->setCurrentIndex(1); //Set default model to "Quad +"
+    m_aircraft->multirotorFrameType->setCurrentIndex(2); //Set default model to "Quad X"
 
 
 	//NEW STYLE: Loop through the widgets looking for all widgets that have "ChannelBox" in their name
@@ -152,7 +152,7 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
     m_aircraft->quadShape->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_aircraft->quadShape->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     QSvgRenderer *renderer = new QSvgRenderer();
-    renderer->load(QString(":/configgadget/images/quad-shapes.svg"));
+    renderer->load(QString(":/configgadget/images/multirotor-shapes.svg"));
     quad = new QGraphicsSvgItem();
     quad->setSharedRenderer(renderer);
     quad->setElementId("quad-plus");

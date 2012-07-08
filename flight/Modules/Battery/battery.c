@@ -78,32 +78,39 @@ static void onTimer(UAVObjEvent* ev);
 int32_t BatteryInitialize(void)
 {
 
+	
 #ifdef MODULE_BATTERY_BUILTIN
 	batteryEnabled = true;
 #else
 	HwSettingsInitialize();
 	uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
-	uint8_t adcRouting[HWSETTINGS_ADCROUTING_NUMELEM];
 
 	HwSettingsOptionalModulesGet(optionalModules);
-	HwSettingsADCRoutingGet(adcRouting);
 
-	//Determine if the battery sensors are routed to ADC pins 
-	for (int i=0; i < HWSETTINGS_ADCROUTING_NUMELEM; i++) {
-		if (adcRouting[i] == HWSETTINGS_ADCROUTING_VOLTAGE) {
-			voltageADCPin = i;
-		}
-		if (adcRouting[i] == HWSETTINGS_ADCROUTING_CURRENT) {
-			currentADCPin = i;
-		}
-	}
-
-	if ((optionalModules[HWSETTINGS_OPTIONALMODULES_BATTERY] == HWSETTINGS_OPTIONALMODULES_ENABLED) && (voltageADCPin >=0 || currentADCPin >=0))
+	if ((optionalModules[HWSETTINGS_OPTIONALMODULES_BATTERY] == HWSETTINGS_OPTIONALMODULES_ENABLED))
 		batteryEnabled = true;
 	else
 		batteryEnabled = false;
 #endif
 
+	uint8_t adcRouting[HWSETTINGS_ADCROUTING_NUMELEM];	
+	HwSettingsADCRoutingGet(adcRouting);
+	
+	//Determine if the battery sensors are routed to ADC pins 
+	for (int i=0; i < HWSETTINGS_ADCROUTING_NUMELEM; i++) {
+		if (adcRouting[i] == HWSETTINGS_ADCROUTING_BATTERYVOLTAGE) {
+			voltageADCPin = i;
+		}
+		if (adcRouting[i] == HWSETTINGS_ADCROUTING_BATTERYCURRENT) {
+			currentADCPin = i;
+		}
+	}
+	
+	//Don't enable module if no ADC pins are routed to the sensors
+	if (voltageADCPin <0 && currentADCPin <0)
+		batteryEnabled = false;
+
+	//Start module
 	if (batteryEnabled) {
 		FlightBatteryStateInitialize();
 		FlightBatterySettingsInitialize();
@@ -133,6 +140,10 @@ static void onTimer(UAVObjEvent* ev)
 	if (voltageADCPin >=0) {
 		flightBatteryData.Voltage = ((float)PIOS_ADC_PinGet(voltageADCPin)) * batterySettings.SensorCalibrations[FLIGHTBATTERYSETTINGS_SENSORCALIBRATIONS_VOLTAGEFACTOR]; //in Volts
 	}
+	else {
+		flightBatteryData.Voltage=1234; //Dummy placeholder value. This is in case we get another source of battery current which is not from the ADC
+	}
+
 	if (currentADCPin >=0) {
 		flightBatteryData.Current = ((float)PIOS_ADC_PinGet(currentADCPin)) * batterySettings.SensorCalibrations[FLIGHTBATTERYSETTINGS_SENSORCALIBRATIONS_CURRENTFACTOR]; //in Amps
 		if (flightBatteryData.Current > flightBatteryData.PeakCurrent) 
@@ -158,7 +169,10 @@ static void onTimer(UAVObjEvent* ev)
 //	if (flightBatteryData.ConsumedEnergy<0) flightBatteryData.ConsumedEnergy=0.0f;
 
 	energyRemaining = batterySettings.Capacity - flightBatteryData.ConsumedEnergy; // in mAh
-	flightBatteryData.EstimatedFlightTime = ((energyRemaining / (flightBatteryData.AvgCurrent*1000.0f))*3600.0f);//in Sec
+	if (flightBatteryData.AvgCurrent > 0)
+		flightBatteryData.EstimatedFlightTime = (energyRemaining / (flightBatteryData.AvgCurrent*1000.0f))*3600.0f;//in Sec
+	else
+		flightBatteryData.EstimatedFlightTime = 9999;
 
 	//generate alarms where needed...
 	if ((flightBatteryData.Voltage<=0) && (flightBatteryData.Current<=0))

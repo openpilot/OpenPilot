@@ -91,6 +91,7 @@ void UAVObjectBrowserWidget::categorize(bool categorize)
     m_model->setRecentlyUpdatedTimeout(m_recentlyUpdatedTimeout);
     m_model->setOnlyHilightChangedValues(m_onlyHilightChangedValues);
     m_browser->treeView->setModel(m_model);
+    showMetaData(m_browser->metaCheckBox->isChecked());
 
     delete tmpModel;
 }

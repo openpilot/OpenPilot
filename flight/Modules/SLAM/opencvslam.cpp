@@ -60,10 +60,10 @@ void OpenCVslam::shrinkAndEnhance(const Mat& src, Mat& dst) {
 	// or with double laplace
 	// -7 4 22 4 -7
 	PyrDownEnhanced enhanced;
-	//enhanced.pyrDownEnhanced(src,dst,-3,4,14);
+	enhanced.pyrDownEnhanced(src,dst,-3,4,14);
 	//enhanced.pyrDownEnhanced(src,dst,-4,4,16);
 	//enhanced.pyrDownEnhanced(src,dst,-5,4,18);
-	enhanced.pyrDownEnhanced(src,dst,1,4,6);
+	//enhanced.pyrDownEnhanced(src,dst,0,4,8);
 	
 }
 
@@ -80,7 +80,7 @@ void OpenCVslam::run() {
 	//VideoSource = NULL; //cvCaptureFromFile("test.avi");
 	VideoSource = cvCaptureFromFile("test.avi");
 	//VideoSource = cvCaptureFromCAM(0);
-	//CvVideoWriter *VideoDest = cvCreateVideoWriter("output.avi",CV_FOURCC('F','M','P','4'),settings->FrameRate,cvSize(640,480),1);
+	CvVideoWriter *VideoDest = cvCreateVideoWriter("output.avi",CV_FOURCC('F','M','P','4'),settings->FrameRate,cvSize(640,480),1);
 
 	if (VideoSource) {
 		cvGrabFrame(VideoSource);
@@ -103,9 +103,9 @@ void OpenCVslam::run() {
 
 	// debug output
 	cvNamedWindow("debug",CV_WINDOW_AUTOSIZE);
-	cvNamedWindow("debug1",CV_WINDOW_AUTOSIZE);
-	cvNamedWindow("debug2",CV_WINDOW_AUTOSIZE);
-	cvNamedWindow("debug3",CV_WINDOW_AUTOSIZE);
+	//cvNamedWindow("debug1",CV_WINDOW_AUTOSIZE);
+	//cvNamedWindow("debug2",CV_WINDOW_AUTOSIZE);
+	//cvNamedWindow("debug3",CV_WINDOW_AUTOSIZE);
 	
 	// synchronization delay, wait for attitude data - any attitude data
 	// this is an evil hack but necessary for tests with log data to synchronize video and telemetry
@@ -146,8 +146,8 @@ void OpenCVslam::run() {
 				if (writeincrement+writeextra+1000<0) {
 					writeextra=-(writeincrement+1000);
 				}
-				//struct writeframestruct x={VideoDest,lastFrame};
-				//backgroundWriteFrame(x);
+				struct writeframestruct x={VideoDest,lastFrame};
+				if (lastFrame) backgroundWriteFrame(x);
 				//fprintf(stderr,".");
 			} else {
 				vTaskDelay(1/portTICK_RATE_MS);
@@ -160,8 +160,8 @@ void OpenCVslam::run() {
 					writeextra=-(writeincrement+1000);
 				}
 
-				//struct writeframestruct x={VideoDest,lastFrame};
-				//backgroundWriteFrame(x);
+				struct writeframestruct x={VideoDest,lastFrame};
+				if (lastFrame) backgroundWriteFrame(x);
 				//fprintf(stderr,".");
 			}
 
@@ -183,6 +183,7 @@ void OpenCVslam::run() {
 
 		if (VideoSource) currentFrame = cvRetrieveFrame(VideoSource,0);
 
+		vPortEnterCritical();
 		if (currentFrame) {
 			//last=current;
 			if (last[5]) delete last[5];
@@ -211,27 +212,28 @@ void OpenCVslam::run() {
 			shrinkAndEnhance(*current[1],*current[0]);
 			flow=*current[3];
 		}
-		if (currentFrame && lastFrame) {
+		if (currentFrame && lastFrame ) {
 			//Mat x1,x2;
 			//cvtColor(last,x1,CV_RGB2GRAY);
 			//cvtColor(current,x2,CV_RGB2GRAY);
 			//flow=x2;
-			fprintf(stderr,"calculate flow...\n");
+			//fprintf(stderr,"calculate flow...\n");
 			if (lastFlow) delete lastFlow;
 			lastFlow = currentFlow;
 			currentFlow = new CCFlow(&rng, last,current,5,Vec3f(0,0,1000),lastFlow);
-			fprintf(stderr,"rotation: %f degrees,\tx: %f\ty: %f\t  %f > %f\n",currentFlow->rotation,currentFlow->translation[0],currentFlow->translation[1],currentFlow->best,currentFlow->worst);
+			//fprintf(stderr,"rotation: %f degrees,\tx: %f\ty: %f\t  %f > %f\n",currentFlow->rotation,currentFlow->translation[0],currentFlow->translation[1],currentFlow->best,currentFlow->worst);
 			//vPortEnterCritical();
 			//calcOpticalFlowFarneback(x1,x2, flow, 0.5, 3, 9, 9, 5, 1.1, 0);
 			//calcOpticalFlowFarneback(x1,x2, flow, 0.5, 4, 13, 1, 5, 1.1, 0);
 			//calcOpticalFlowCorvus(last,curent,flow);
 			//vPortExitCritical();
-			fprintf(stderr,"done\n");
+			//fprintf(stderr,"done\n");
 			//split(flow,sflow);
 			//sflow[2]=sflow[1];
 			//merge(sflow,3,cflow);
 			//fprintf(stderr,".");
 		}
+		vPortExitCritical();
 		if (lastFrame) {
 			cvReleaseImage(&lastFrame);
 		}
@@ -258,11 +260,18 @@ void OpenCVslam::run() {
 			CvPoint left = cvPoint(center.x-right.x,center.y-right.y);
 			right.x += center.x;
 			right.y += center.y;
-			//cvLine(lastFrame,left,right,CV_RGB(255,255,0),3,8,0);
+			cvLine(lastFrame,left,right,CV_RGB(255,255,0),3,8,0);
+			center = cvPoint(settings->FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_X]/2,settings->FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_Y]/2);
+			if (currentFlow) {
+				cvLine(lastFrame,center,cvPoint(center.x+(currentFlow->translation[0])*32,center.y+(currentFlow->translation[1])*32),CV_RGB(255,0,0),2,8,0);
+				cvLine(lastFrame,cvPoint(center.x+200,center.y),cvPoint(center.x+200,center.y-(currentFlow->rotation)*10),CV_RGB(0,0,255),2,8,0);
+				cvLine(lastFrame,cvPoint(center.x-200,center.y),cvPoint(center.x-200,center.y+(currentFlow->rotation)*10),CV_RGB(0,0,255),2,8,0);
+				//fprintf(stderr,".");
+			}
 
-			IplImage xflow = flow;
-			cvShowImage("debug",&xflow);
-		cvWaitKey(1);
+			//IplImage xflow = flow;
+			cvShowImage("debug",lastFrame);
+		//cvWaitKey(1);
 		}
 	
 

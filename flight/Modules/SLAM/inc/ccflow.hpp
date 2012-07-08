@@ -40,7 +40,12 @@
 #define CC_PARTICLES 15
 #define CC_PDEPTH 3
 #define CC_ZOOMFACTOR 2
-#define CC_INITIAL Vec3f(2.0,2.0,5.0)
+#define CC_INITIAL Vec3f(5.0,5.0,5.0)
+
+#define CC_ADJFACTOR 0.985f
+#define CC_MAXCOUNT 200
+#define CC_ENDCOUNT 75
+
 
 typedef cv::Vec3f TransRot;
 
@@ -59,6 +64,9 @@ public:
 
 	// finds the best transrotation between two templates of equal size via particle filter approach
 	void particleMatch(cv::Mat test, cv::Mat reference, int particleNum, int generations, int stepFactor, TransRot initial, TransRot initialRange);
+	
+	// finds the best transrotation between two templates of equal size via tempered random jump gradient search
+	void temperMatch(cv::Mat test, cv::Mat reference, int endCount, int maxCount, float adjFactor, TransRot initial, TransRot initialRange);
 
 	// finds the mean square error between two templates of equal size of which one is transrotated
 	float correlate(cv::Mat reference, cv::Mat test, cv::Mat rotMatrix);

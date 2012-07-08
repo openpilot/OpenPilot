@@ -86,6 +86,10 @@ void UAVObjectBrowserWidget::categorize(bool categorize)
 
     UAVObjectTreeModel* tmpModel = m_model;
     m_model = new UAVObjectTreeModel(0, categorize);
+    m_model->setRecentlyUpdatedColor(m_recentlyUpdatedColor);
+    m_model->setManuallyChangedColor(m_manuallyChangedColor);
+    m_model->setRecentlyUpdatedTimeout(m_recentlyUpdatedTimeout);
+    m_model->setOnlyHilightChangedValues(m_onlyHilightChangedValues);
     m_browser->treeView->setModel(m_model);
 
     delete tmpModel;

@@ -859,7 +859,7 @@ margin:1px;</string>
                <item>
                 <widget class="QGroupBox" name="groupBox_6">
                  <property name="title">
-                  <string>Throtte Curve</string>
+                  <string>Throttle Curve</string>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_9">
                   <item>

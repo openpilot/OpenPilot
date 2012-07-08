@@ -59,13 +59,13 @@ QList<Edge *> Node::edges() const
 
 QRectF Node::boundingRect() const
 {
-    return QRectF(-12, -12, 25, 25);
+    return QRectF(-13, -13, 26, 26);
 }
 
 QPainterPath Node::shape() const
 {
     QPainterPath path;
-    path.addEllipse(-12, -12, 25, 25);
+    path.addEllipse(-13, -13, 26, 26);
     return path;
 }
 
@@ -89,10 +89,16 @@ void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
     }
     painter->setBrush(gradient);
     painter->setPen(QPen(Qt::black, 0));
-    painter->drawEllipse(-12, -12, 25, 25);
+    painter->drawEllipse(-13, -13, 26, 26);
 
-    painter->setPen(QPen(Qt::white, 0));
-    painter->drawText(-10, 3, QString().sprintf("%.2f", value()));
+    if (value() < 0) {
+        painter->setPen(QPen(Qt::red, 0));
+        painter->drawText(-12, 4, QString().sprintf("%.2f", value()));
+    }
+    else {
+        painter->setPen(QPen(Qt::white, 0));
+        painter->drawText(-11, 4, QString().sprintf("%.2f", value()));
+    }
 }
 
 void Node::verticalMove(bool flag){

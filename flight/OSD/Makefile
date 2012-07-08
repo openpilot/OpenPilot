@@ -94,7 +94,7 @@ endif
 MODULES = Osd/osdgen
 MODULES += GPS
 MODULES += Osd/osdinput
-MODULES += Extensions/MagBaro
+#MODULES += Extensions/MagBaro
 MODULES += Telemetry
 MODULES += FirmwareIAP
 
@@ -215,10 +215,11 @@ SRC += $(PIOSCOMMON)/pios_video.c
 SRC += $(PIOSCOMMON)/pios_usb_desc_hid_cdc.c
 SRC += $(PIOSCOMMON)/pios_usb_desc_hid_only.c
 SRC += $(PIOSCOMMON)/pios_usb_util.c
+SRC += $(PIOSCOMMON)/pios_sdcard.c
 
 # optional component libraries
 include $(PIOSCOMMONLIB)/FreeRTOS/library.mk
-#include $(PIOSCOMMONLIB)/dosfs/library.mk
+include $(PIOSCOMMONLIB)/dosfs/library.mk
 include $(PIOSCOMMONLIB)/msheap/library.mk
 
 ## PIOS Hardware (STM32F4xx)

@@ -243,6 +243,17 @@ void PIOS_Board_Init(void) {
 
 	PIOS_LED_Init(&pios_led_cfg);
 
+#if defined(PIOS_INCLUDE_SPI)
+	/* Set up the SPI interface to the SD card */
+	if (PIOS_SPI_Init(&pios_spi_sdcard_id, &pios_spi_sdcard_cfg)) {
+		PIOS_Assert(0);
+	}
+
+	/* Enable and mount the SDCard */
+	PIOS_SDCARD_Init(pios_spi_sdcard_id);
+	PIOS_SDCARD_MountFS(0);
+#endif /* PIOS_INCLUDE_SPI */
+
 	/* Initialize UAVObject libraries */
 	EventDispatcherInitialize();
 	UAVObjInitialize();

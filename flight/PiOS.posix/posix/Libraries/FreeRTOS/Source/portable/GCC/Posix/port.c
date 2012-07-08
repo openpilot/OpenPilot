@@ -274,7 +274,6 @@ void vPortStartFirstTask( void )
  */
 portBASE_TYPE xPortStartScheduler( void )
 {
-	portBASE_TYPE xResult;
 	sigset_t xSignalToBlock;
 
 	/**
@@ -337,9 +336,9 @@ portBASE_TYPE xPortStartScheduler( void )
 
 	PORT_PRINT( "Cleaning Up, Exiting.\n" );
 	/* Cleanup the mutexes */
-	xResult = pthread_mutex_destroy( &xRunningThreadMutex );
-	xResult = pthread_mutex_destroy( &xYieldingThreadMutex );
-	xResult = pthread_mutex_destroy( &xGuardMutex );
+	pthread_mutex_destroy( &xRunningThreadMutex );
+	pthread_mutex_destroy( &xYieldingThreadMutex );
+	pthread_mutex_destroy( &xGuardMutex );
 	vPortFree( (void *)pxThreads );
 
 	/* Should not get here! */
@@ -353,13 +352,12 @@ portBASE_TYPE xPortStartScheduler( void )
 void vPortEndScheduler( void )
 {
 portBASE_TYPE xNumberOfThreads;
-portBASE_TYPE xResult;
 	for ( xNumberOfThreads = 0; xNumberOfThreads < MAX_NUMBER_OF_TASKS; xNumberOfThreads++ )
 	{
 		if ( ( pthread_t )NULL != pxThreads[ xNumberOfThreads ].hThread )
 		{
 			/* Kill all of the threads, they are in the detached state. */
-			xResult = pthread_cancel( pxThreads[ xNumberOfThreads ].hThread );
+			pthread_cancel( pxThreads[ xNumberOfThreads ].hThread );
 		}
 	}
 
@@ -683,7 +681,6 @@ void vPortForciblyEndThread( void *pxTaskToDelete )
 xTaskHandle hTaskToDelete = ( xTaskHandle )pxTaskToDelete;
 xThreadState* xTaskToDelete;
 xThreadState* xTaskToResume;
-portBASE_TYPE xResult;
 
 	PORT_ENTER();
 
@@ -706,7 +703,7 @@ portBASE_TYPE xResult;
 
 		/* Send a signal to wake the task so that it definitely cancels. */
 		pthread_testcancel();
-		xResult = pthread_cancel( xTaskToDelete->hThread );
+		pthread_cancel( xTaskToDelete->hThread );
 
 	}
 	else

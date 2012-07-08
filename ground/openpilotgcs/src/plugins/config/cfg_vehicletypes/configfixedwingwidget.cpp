@@ -262,15 +262,7 @@ bool ConfigFixedWingWidget::setupFrameFixedWing(QString airframeType)
 {
     // Check coherence:
 	//Show any config errors in GUI
-    throwConfigError(airframeType);
-    
-	// - At least Pitch and either Roll or Yaw
-    if (m_aircraft->fwEngineChannelBox->currentText() == "None" ||
-        m_aircraft->fwElevator1ChannelBox->currentText() == "None" ||
-        ((m_aircraft->fwAileron1ChannelBox->currentText() == "None") &&
-		 (m_aircraft->fwRudder1ChannelBox->currentText() == "None"))) {
-			// TODO: explain the problem in the UI
-//			m_aircraft->fwStatusLabel->setText("ERROR: check channel assignment");
+    if (throwConfigError(airframeType)) {
 			return false;
 		}
 
@@ -351,14 +343,7 @@ bool ConfigFixedWingWidget::setupFrameElevon(QString airframeType)
 {
     // Check coherence:
 	//Show any config errors in GUI
-    throwConfigError(airframeType);
-
-    // - At least Aileron1 and Aileron 2, and engine
-    if (m_aircraft->fwEngineChannelBox->currentText() == "None" ||
-        m_aircraft->fwAileron1ChannelBox->currentText() == "None" ||
-        m_aircraft->fwAileron2ChannelBox->currentText() == "None") {
-        // TODO: explain the problem in the UI
-//        m_aircraft->fwStatusLabel->setText("ERROR: check channel assignment");
+    if (throwConfigError(airframeType)) {
         return false;
     }
 	
@@ -436,14 +421,7 @@ bool ConfigFixedWingWidget::setupFrameVtail(QString airframeType)
 {
     // Check coherence:
 	//Show any config errors in GUI
-    throwConfigError(airframeType);
-    
-	// - At least Pitch1 and Pitch2, and engine
-    if (m_aircraft->fwEngineChannelBox->currentText() == "None" ||
-        m_aircraft->fwElevator1ChannelBox->currentText() == "None" ||
-        m_aircraft->fwElevator2ChannelBox->currentText() == "None") {
-        // TODO: explain the problem in the UI
-//        m_aircraft->fwStatusLabel->setText("WARNING: check channel assignment");
+    if (throwConfigError(airframeType)) {
         return false;
     }
 	
@@ -526,7 +504,7 @@ bool ConfigFixedWingWidget::setupFrameVtail(QString airframeType)
 /**
  This function displays text and color formatting in order to help the user understand what channels have not yet been configured.
  */
-void ConfigFixedWingWidget::throwConfigError(QString airframeType)
+bool ConfigFixedWingWidget::throwConfigError(QString airframeType)
 {
 	//Initialize configuration error flag
 	bool error=false;
@@ -618,4 +596,6 @@ void ConfigFixedWingWidget::throwConfigError(QString airframeType)
 	if (error){
 		m_aircraft->fwStatusLabel->setText(QString("<font color='red'>ERROR: Assign all necessary channels</font>"));
 	}
+
+    return error;
 }

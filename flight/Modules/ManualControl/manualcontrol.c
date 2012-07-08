@@ -59,7 +59,6 @@
 #define TASK_PRIORITY (tskIDLE_PRIORITY+4)
 #define UPDATE_PERIOD_MS 20
 #define THROTTLE_FAILSAFE -0.1f
-#define FLIGHT_MODE_LIMIT 1.0f/3.0f
 #define ARMED_TIME_MS      1000
 #define ARMED_THRESHOLD    0.50f
 //safe band to allow a bit of calibration error or trim offset (in microseconds)
@@ -238,19 +237,23 @@ static void manualControlTask(void *parameters)
 				settings.ChannelGroups[MANUALCONTROLSETTINGS_CHANNELGROUPS_PITCH] >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE ||
 				settings.ChannelGroups[MANUALCONTROLSETTINGS_CHANNELGROUPS_YAW] >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE ||
 				settings.ChannelGroups[MANUALCONTROLSETTINGS_CHANNELGROUPS_THROTTLE] >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE ||
-				settings.ChannelGroups[MANUALCONTROLSETTINGS_CHANNELGROUPS_FLIGHTMODE] >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE ||
 				// Check all channel mappings are valid
 				cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_ROLL] == (uint16_t) PIOS_RCVR_INVALID ||
 				cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_PITCH] == (uint16_t) PIOS_RCVR_INVALID ||
 				cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_YAW] == (uint16_t) PIOS_RCVR_INVALID ||
 				cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_THROTTLE] == (uint16_t) PIOS_RCVR_INVALID ||
-				cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_FLIGHTMODE] == (uint16_t) PIOS_RCVR_INVALID ||
-				// Check the driver is exists
+				// Check the driver exists
 				cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_ROLL] == (uint16_t) PIOS_RCVR_NODRIVER ||
 				cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_PITCH] == (uint16_t) PIOS_RCVR_NODRIVER ||
 				cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_YAW] == (uint16_t) PIOS_RCVR_NODRIVER ||
 				cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_THROTTLE] == (uint16_t) PIOS_RCVR_NODRIVER ||
-				cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_FLIGHTMODE] == (uint16_t) PIOS_RCVR_NODRIVER) {
+				// Check the FlightModeNumber is valid
+				settings.FlightModeNumber < 1 || settings.FlightModeNumber > MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_NUMELEM ||
+				// Similar checks for FlightMode channel but only if more than one flight mode has been set. Otherwise don't care
+				((settings.FlightModeNumber > 1) && (
+					settings.ChannelGroups[MANUALCONTROLSETTINGS_CHANNELGROUPS_FLIGHTMODE] >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE ||
+					cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_FLIGHTMODE] == (uint16_t) PIOS_RCVR_INVALID ||
+					cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_FLIGHTMODE] == (uint16_t) PIOS_RCVR_NODRIVER))) {
 
 				AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_CRITICAL);
 				cmd.Connected = MANUALCONTROLCOMMAND_CONNECTED_FALSE;
@@ -358,7 +361,6 @@ static void manualControlTask(void *parameters)
 					if(AccessoryDesiredInstSet(2, &accessory) != 0)
 						AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
 				}
-
 
 				processFlightMode(&settings, flightMode);
 
@@ -950,30 +952,27 @@ static void processArm(ManualControlCommandData * cmd, ManualControlSettingsData
 }
 
 /**
- * @brief Determine which of three positions the flight mode switch is in and set flight mode accordingly
+ * @brief Determine which of N positions the flight mode switch is in and set flight mode accordingly
  * @param[out] cmd Pointer to the command structure to set the flight mode in
  * @param[in] settings The settings which indicate which position is which mode
  * @param[in] flightMode the value of the switch position
  */
-static void processFlightMode(ManualControlSettingsData * settings, float flightMode)
+static void processFlightMode(ManualControlSettingsData *settings, float flightMode)
 {
 	FlightStatusData flightStatus;
 	FlightStatusGet(&flightStatus);
 
-	uint8_t newMode;
-	// Note here the code is ass
-	if (flightMode < -FLIGHT_MODE_LIMIT)
-		newMode = settings->FlightModePosition[0];
-	else if (flightMode > FLIGHT_MODE_LIMIT)
-		newMode = settings->FlightModePosition[2];
-	else
-		newMode = settings->FlightModePosition[1];
+	// Convert flightMode value into the switch position in the range [0..N-1]
+	uint8_t pos = ((int16_t)(flightMode * 256.0f) + 256) * settings->FlightModeNumber >> 9;
+	if (pos >= settings->FlightModeNumber)
+		pos = settings->FlightModeNumber - 1;
 
-	if(flightStatus.FlightMode != newMode) {
+	uint8_t newMode = settings->FlightModePosition[pos];
+
+	if (flightStatus.FlightMode != newMode) {
 		flightStatus.FlightMode = newMode;
 		FlightStatusSet(&flightStatus);
 	}
-
 }
 
 /**

@@ -200,6 +200,8 @@ Section "Shortcuts" InSecShortcuts
   CreateDirectory "$SMPROGRAMS\OpenPilot"
   CreateShortCut "$SMPROGRAMS\OpenPilot\OpenPilot GCS.lnk" "$INSTDIR\bin\openpilotgcs.exe" \
 	"" "$INSTDIR\bin\openpilotgcs.exe" 0 "" "" "${PRODUCT_NAME} ${PRODUCT_VERSION}. ${BUILD_DESCRIPTION}"
+  CreateShortCut "$SMPROGRAMS\OpenPilot\OpenPilot GCS (clean configuration).lnk" "$INSTDIR\bin\openpilotgcs.exe" \
+	"-clean-config" "$INSTDIR\bin\openpilotgcs.exe" 0 "" "" "${PRODUCT_NAME} ${PRODUCT_VERSION}. ${BUILD_DESCRIPTION}"
   CreateShortCut "$SMPROGRAMS\OpenPilot\OpenPilot ChangeLog.lnk" "$INSTDIR\HISTORY.txt" \
 	"" "$INSTDIR\bin\openpilotgcs.exe" 0
   CreateShortCut "$SMPROGRAMS\OpenPilot\OpenPilot Website.lnk" "http://www.openpilot.org" \

@@ -88,7 +88,7 @@ int32_t BatteryInitialize(void)
 	HwSettingsOptionalModulesGet(optionalModules);
 	HwSettingsADCRoutingGet(adcRouting);
 
-	//Determine if the 
+	//Determine if the battery sensors are routed to ADC pins 
 	for (int i=0; i < HWSETTINGS_ADCROUTING_NUMELEM; i++) {
 		if (adcRouting[i] == HWSETTINGS_ADCROUTING_VOLTAGE) {
 			voltageADCPin = i;

@@ -19,6 +19,7 @@
 		<field name="USB_VCPPort" units="function" type="enum" elements="1" options="USBTelemetry,ComBridge,Disabled" defaultvalue="Disabled"/>
 
 		<field name="OptionalModules" units="" type="enum" elementnames="CameraStab,GPS,ComUsbBridge,Fault,Altitude,Airspeed,TxPID,VtolPathFollower,FixedWingPathFollower,Battery,Overo" options="Disabled,Enabled" defaultvalue="Disabled"/>
+		<field name="ADCRouting" units="" type="enum" elementnames="ADC0,ADC1,ADC2,ADC3" options="Disabled,Voltage,Current,Airspeed,Generic" defaultvalue="Disabled"/>
 		<field name="DSMxBind" units=""  type="uint8"  elements="1" defaultvalue="0"/>
 
 		<access gcs="readwrite" flight="readwrite"/>

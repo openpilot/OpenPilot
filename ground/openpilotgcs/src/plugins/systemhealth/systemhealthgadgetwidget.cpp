@@ -63,6 +63,7 @@ SystemHealthGadgetWidget::SystemHealthGadgetWidget(QWidget *parent) : QGraphicsV
     connect(telMngr, SIGNAL(connected()), this, SLOT(onAutopilotConnect()));
     connect(telMngr, SIGNAL(disconnected()), this, SLOT(onAutopilotDisconnect()));
 
+    setToolTip(tr("Displays flight system errors. Click on an alarm for more information."));
 }
 
 /**
@@ -206,12 +207,31 @@ void SystemHealthGadgetWidget::mousePressEvent ( QMouseEvent * event )
             QGraphicsSvgItem *clickedItem = dynamic_cast<QGraphicsSvgItem*>(sceneItem);
 
             if(clickedItem && (clickedItem != foreground) && clickedItem != background){
-            QFile alarmDescription(":/systemhealth/html/" + clickedItem->elementId() + ".html");
-                if(alarmDescription.open(QIODevice::ReadOnly | QIODevice::Text)){
-                    QTextStream textStream(&alarmDescription);
-                    QWhatsThis::showText(event->globalPos(), textStream.readAll());
+                // Clicked an actual alarm
+                QString itemId = clickedItem->elementId();
+                if(itemId.contains("OK")){
+                    // No alarm set for this item
+                    showAlarmDescriptionForItemId("AlarmOK", event->globalPos());
+                }else{
+                    // Warning, error or critical alarm
+                    showAlarmDescriptionForItemId(itemId, event->globalPos());
                 }
+            }else if(clickedItem){
+                // Clicked foreground or background
+                showAllAlarmDescriptions();
             }
         }
     }
+}
+
+void SystemHealthGadgetWidget::showAlarmDescriptionForItemId(const QString itemId, const QPoint& location){
+    QFile alarmDescription(":/systemhealth/html/" + itemId + ".html");
+    if(alarmDescription.open(QIODevice::ReadOnly | QIODevice::Text)){
+        QTextStream textStream(&alarmDescription);
+        QWhatsThis::showText(location, textStream.readAll());
+    }
+}
+
+void SystemHealthGadgetWidget::showAllAlarmDescriptions(){
+
 }

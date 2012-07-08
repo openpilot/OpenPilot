@@ -89,7 +89,11 @@ void UAVObjectBrowserWidget::useScientificNotation(bool scientific)
 
     UAVObjectTreeModel* tmpModel = m_model;
     m_model = new UAVObjectTreeModel(0, scientific);
+    m_model->setRecentlyUpdatedColor(m_recentlyUpdatedColor);
+    m_model->setManuallyChangedColor(m_manuallyChangedColor);
+    m_model->setRecentlyUpdatedTimeout(m_recentlyUpdatedTimeout);
     m_browser->treeView->setModel(m_model);
+    showMetaData(m_browser->metaCheckBox->isChecked());
 
     delete tmpModel;
 }

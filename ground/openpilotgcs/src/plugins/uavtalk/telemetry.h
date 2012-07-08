@@ -41,14 +41,14 @@ class ObjectTransactionInfo: public QObject {
     Q_OBJECT
 
 public:
-    ObjectTransactionInfo();
+    ObjectTransactionInfo(QObject * parent);
     ~ObjectTransactionInfo();
     UAVObject* obj;
     bool allInstances;
     bool objRequest;
     qint32 retriesRemaining;
     bool acked;
-    class Telemetry* telem;
+    QPointer<class Telemetry>telem;
     QTimer* timer;
 private slots:
     void timeout();

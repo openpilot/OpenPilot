@@ -282,4 +282,22 @@ extern uint32_t pios_i2c_flexiport_adapter_id;
 //------------------------
 #define PIOS_BMP085_OVERSAMPLING                3
 
+
+/**
+ * glue macros for file IO
+ * STM32 uses DOSFS for file IO
+ */
+#define PIOS_FOPEN_READ(filename,file)  DFS_OpenFile(&PIOS_SDCARD_VolInfo, (uint8_t *)filename, DFS_READ, PIOS_SDCARD_Sector, &file) != DFS_OK
+
+#define PIOS_FOPEN_WRITE(filename,file) DFS_OpenFile(&PIOS_SDCARD_VolInfo, (uint8_t *)filename, DFS_WRITE, PIOS_SDCARD_Sector, &file) != DFS_OK
+
+#define PIOS_FREAD(file,bufferadr,length,resultadr)     DFS_ReadFile(file, PIOS_SDCARD_Sector, (uint8_t*)bufferadr, resultadr, length) != DFS_OK
+
+#define PIOS_FWRITE(file,bufferadr,length,resultadr)    DFS_WriteFile(file, PIOS_SDCARD_Sector, (uint8_t*)bufferadr, resultadr, length)
+
+#define PIOS_FCLOSE(file)               DFS_Close(&file)
+
+#define PIOS_FUNLINK(filename)          DFS_UnlinkFile(&PIOS_SDCARD_VolInfo, (uint8_t *)filename, PIOS_SDCARD_Sector)
+
+
 #endif /* PIOS_BOARD_H */

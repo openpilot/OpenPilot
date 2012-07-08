@@ -63,7 +63,7 @@
 #include <dosfs.h>
 
 /* Mass Storage Device Includes */
-#include <msd.h>
+//#include <msd.h>
 #endif
 
 /* Generic initcall infrastructure */

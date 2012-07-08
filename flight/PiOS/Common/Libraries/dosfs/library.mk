@@ -3,6 +3,6 @@
 #
 
 DOSFS_DIR		:=	$(dir $(lastword $(MAKEFILE_LIST)))
-SRC			+=	$(wildcard $(DOSFS_DIR)/*.c)
+SRC			+=	$(wildcard $(DOSFS_DIR)*.c)
 EXTRAINCDIRS		+=	$(DOSFS_DIR)
 

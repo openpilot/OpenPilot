@@ -81,22 +81,30 @@ void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
     if (option->state & QStyle::State_Sunken) {
         gradient.setCenter(3, 3);
         gradient.setFocalPoint(3, 3);
-        gradient.setColorAt(1, QColor("#1c870b").light(120));
-        gradient.setColorAt(0, QColor("#116703").light(120));
+        //gradient.setColorAt(1, QColor("#1c870b").light(120));
+        //gradient.setColorAt(0, QColor("#116703").light(120));
+
+        gradient.setColorAt(1, Qt::darkBlue);
+        gradient.setColorAt(0, Qt::darkBlue);
     } else {
-        gradient.setColorAt(0, "#1c870b");
-        gradient.setColorAt(1, "#116703");
+        if (value() < 0) {
+            gradient.setColorAt(0, Qt::red);
+            gradient.setColorAt(1, Qt::red);
+        }
+        else {
+            gradient.setColorAt(0, "#1c870b");
+            gradient.setColorAt(1, "#116703");
+        }
     }
     painter->setBrush(gradient);
     painter->setPen(QPen(Qt::black, 0));
     painter->drawEllipse(-13, -13, 26, 26);
 
+    painter->setPen(QPen(Qt::white, 0));
     if (value() < 0) {
-        painter->setPen(QPen(Qt::red, 0));
-        painter->drawText(-12, 4, QString().sprintf("%.2f", value()));
+        painter->drawText(-13, 4, QString().sprintf("% .2f", value()));
     }
     else {
-        painter->setPen(QPen(Qt::white, 0));
         painter->drawText(-11, 4, QString().sprintf("%.2f", value()));
     }
 }

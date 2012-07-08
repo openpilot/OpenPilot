@@ -248,7 +248,7 @@ void MixerCurveWidget::resizeEvent(QResizeEvent* event)
 
     QRectF rect = plot->boundingRect();
 
-    fitInView(rect.adjusted(-12,-12,12,12), Qt::KeepAspectRatio);
+    fitInView(rect.adjusted(-15,-15,15,15), Qt::KeepAspectRatio);
 }
 
 void MixerCurveWidget::itemMoved(double itemValue)

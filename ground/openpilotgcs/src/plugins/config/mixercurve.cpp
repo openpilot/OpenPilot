@@ -150,7 +150,6 @@ void MixerCurve::UpdateCurveUI()
         m_mixerUI->CurveStep->setVisible(true);
 
         m_mixerUI->CurveStep->setMinimum(1.0);
-        m_mixerUI->CurveStep->setMaximum(4.0);
     }
     if ( curveType.compare("Exp")==0)
     {
@@ -204,7 +203,7 @@ void MixerCurve::GenerateCurve()
        }
        if ( CurveType.compare("Step")==0)
        {
-           if (i < value3) //(scale*100<value3)
+           if (scale*100<value3)
            {
                points.append(value1);
            }

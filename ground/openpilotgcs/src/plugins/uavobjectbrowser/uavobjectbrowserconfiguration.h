@@ -39,6 +39,7 @@ Q_OBJECT
 Q_PROPERTY(QColor m_recentlyUpdatedColor READ recentlyUpdatedColor WRITE setRecentlyUpdatedColor)
 Q_PROPERTY(QColor m_manuallyChangedColor READ manuallyChangedColor WRITE setManuallyChangedColor)
 Q_PROPERTY(int m_recentlyUpdatedTimeout READ recentlyUpdatedTimeout WRITE setRecentlyUpdatedTimeout)
+Q_PROPERTY(bool m_onlyHilightChangedValues READ onlyHighlightChangedValues WRITE setOnlyHighlightChangedValues)
 public:
     explicit UAVObjectBrowserConfiguration(QString classId, QSettings* qSettings = 0, QObject *parent = 0);
 
@@ -48,6 +49,7 @@ public:
     QColor recentlyUpdatedColor() const { return m_recentlyUpdatedColor; }
     QColor manuallyChangedColor() const { return m_manuallyChangedColor; }
     int recentlyUpdatedTimeout() const { return m_recentlyUpdatedTimeout; }
+    bool onlyHighlightChangedValues() const {return m_onlyHilightChangedValues;}
 
 signals:
 
@@ -55,11 +57,13 @@ public slots:
     void setRecentlyUpdatedColor(QColor color) { m_recentlyUpdatedColor = color; }
     void setManuallyChangedColor(QColor color) { m_manuallyChangedColor = color; }
     void setRecentlyUpdatedTimeout(int timeout) { m_recentlyUpdatedTimeout = timeout; }
+    void setOnlyHighlightChangedValues(bool hilight) { m_onlyHilightChangedValues = hilight; }
 
 private:
     QColor m_recentlyUpdatedColor;
     QColor m_manuallyChangedColor;
     int m_recentlyUpdatedTimeout;
+    bool m_onlyHilightChangedValues;
 };
 
 #endif // UAVOBJECTBROWSERCONFIGURATION_H

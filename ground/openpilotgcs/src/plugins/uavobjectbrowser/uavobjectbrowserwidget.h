@@ -45,12 +45,15 @@ class UAVObjectBrowserWidget : public QWidget
 public:
     UAVObjectBrowserWidget(QWidget *parent = 0);
     ~UAVObjectBrowserWidget();
-    void setRecentlyUpdatedColor(QColor color) { m_model->setRecentlyUpdatedColor(color); }
-    void setManuallyChangedColor(QColor color) { m_model->setManuallyChangedColor(color); }
-    void setRecentlyUpdatedTimeout(int timeout) { m_model->setRecentlyUpdatedTimeout(timeout); }
+    void setRecentlyUpdatedColor(QColor color) { m_recentlyUpdatedColor = color; m_model->setRecentlyUpdatedColor(color); }
+    void setManuallyChangedColor(QColor color) { m_manuallyChangedColor = color; m_model->setManuallyChangedColor(color); }
+    void setRecentlyUpdatedTimeout(int timeout) { m_recentlyUpdatedTimeout = timeout; m_model->setRecentlyUpdatedTimeout(timeout); }
+    void setOnlyHilightChangedValues(bool hilight) { m_onlyHilightChangedValues = hilight; m_model->setOnlyHilightChangedValues(hilight); }
+
 
 public slots:
     void showMetaData(bool show);
+    void categorize(bool categorize);
 
 private slots:
     void sendUpdate();
@@ -65,6 +68,11 @@ private:
     QPushButton *m_sendUpdate;
     Ui_UAVObjectBrowser *m_browser;
     UAVObjectTreeModel *m_model;
+
+    int m_recentlyUpdatedTimeout;
+    QColor m_recentlyUpdatedColor;
+    QColor m_manuallyChangedColor;
+    bool m_onlyHilightChangedValues;
 
     void updateObjectPersistance(ObjectPersistence::OperationOptions op, UAVObject *obj);
     void enableSendRequest(bool enable);

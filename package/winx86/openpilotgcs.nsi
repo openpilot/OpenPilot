@@ -1,7 +1,7 @@
 ﻿#
 # Project: OpenPilot
 # NSIS configuration file for OpenPilot GCS
-# The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2010-2011.
+# The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2010-2012.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@
   !define PROJECT_ROOT   "..\.."
   !define NSIS_DATA_TREE "."
   !define GCS_BUILD_TREE "..\..\build\ground\openpilotgcs"
+  !define UAVO_SYNTH_TREE "..\..\build\uavobject-synthetics"
 
   ; Default installation folder
   InstallDir "$LOCALAPPDATA\OpenPilot"
@@ -191,7 +192,18 @@ Section "Firmware" InSecFirmware
 ; SetOutPath "$INSTDIR\firmware\${FIRMWARE_DIR}"
 ; File /r "${PACKAGE_DIR}\${FIRMWARE_DIR}\*"
   SetOutPath "$INSTDIR\firmware"
-  File /r "${PACKAGE_DIR}\${FIRMWARE_DIR}\fw_coptercontrol-${PACKAGE_LBL}.opfw"
+  File "${PACKAGE_DIR}\${FIRMWARE_DIR}\fw_coptercontrol-${PACKAGE_LBL}.opfw"
+  File "${PACKAGE_DIR}\${FIRMWARE_DIR}\fw_pipxtreme-${PACKAGE_LBL}.opfw"
+SectionEnd
+
+Section "-Utilities" InSecUtilities
+  SetOutPath "$INSTDIR\utilities"
+  File "/oname=OPLogConvert-${PACKAGE_LBL}.m" "${UAVO_SYNTH_TREE}\matlab\OPLogConvert.m"
+SectionEnd
+
+Section "-Drivers" InSecDrivers
+  SetOutPath "$INSTDIR\drivers"
+  File "${PROJECT_ROOT}\flight\Project\Windows USB\OpenPilot-CDC.inf"
 SectionEnd
 
 Section "Shortcuts" InSecShortcuts
@@ -239,6 +251,8 @@ SectionEnd
     !insertmacro MUI_DESCRIPTION_TEXT ${InSecSounds} $(DESC_InSecSounds)
     !insertmacro MUI_DESCRIPTION_TEXT ${InSecLocalization} $(DESC_InSecLocalization)
     !insertmacro MUI_DESCRIPTION_TEXT ${InSecFirmware} $(DESC_InSecFirmware)
+    !insertmacro MUI_DESCRIPTION_TEXT ${InSecUtilities} $(DESC_InSecUtilities)
+    !insertmacro MUI_DESCRIPTION_TEXT ${InSecDrivers} $(DESC_InSecDrivers)
     !insertmacro MUI_DESCRIPTION_TEXT ${InSecShortcuts} $(DESC_InSecShortcuts)
   !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
@@ -260,6 +274,8 @@ Section "un.OpenPilot GCS" UnSecProgram
   RMDir /r /rebootok "$INSTDIR\lib"
   RMDir /r /rebootok "$INSTDIR\share"
   RMDir /r /rebootok "$INSTDIR\firmware"
+  RMDir /r /rebootok "$INSTDIR\utilities"
+  RMDir /r /rebootok "$INSTDIR\drivers"
   Delete /rebootok "$INSTDIR\HISTORY.txt"
   Delete /rebootok "$INSTDIR\Uninstall.exe"
 

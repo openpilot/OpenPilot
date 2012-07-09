@@ -203,22 +203,29 @@ void SystemHealthGadgetWidget::mousePressEvent ( QMouseEvent * event )
     QGraphicsScene *graphicsScene = scene();
     if(graphicsScene){
         QPoint point = event->pos();
+        bool haveAlarmItem = false;
         foreach(QGraphicsItem* sceneItem, items(point)){
             QGraphicsSvgItem *clickedItem = dynamic_cast<QGraphicsSvgItem*>(sceneItem);
 
-            if(clickedItem && (clickedItem != foreground) && clickedItem != background){
-                // Clicked an actual alarm
-                QString itemId = clickedItem->elementId();
-                if(itemId.contains("OK")){
-                    // No alarm set for this item
-                    showAlarmDescriptionForItemId("AlarmOK", event->globalPos());
-                }else{
-                    // Warning, error or critical alarm
-                    showAlarmDescriptionForItemId(itemId, event->globalPos());
+            if(clickedItem){
+                if((clickedItem != foreground) && (clickedItem != background)){
+                    // Clicked an actual alarm. We need to set haveAlarmItem to true
+                    // as two of the items in this loop will always be foreground and
+                    // background. Without this flag, at some point in the loop we
+                    // would always call showAllAlarmDescriptions...
+                    haveAlarmItem = true;
+                    QString itemId = clickedItem->elementId();
+                    if(itemId.contains("OK")){
+                        // No alarm set for this item
+                        showAlarmDescriptionForItemId("AlarmOK", event->globalPos());
+                    }else{
+                        // Warning, error or critical alarm
+                        showAlarmDescriptionForItemId(itemId, event->globalPos());
+                    }
+                }else if(!haveAlarmItem){
+                    // Clicked foreground or background
+                    showAllAlarmDescriptions(event->globalPos());
                 }
-            }else if(clickedItem){
-                // Clicked foreground or background
-                showAllAlarmDescriptions();
             }
         }
     }
@@ -232,6 +239,31 @@ void SystemHealthGadgetWidget::showAlarmDescriptionForItemId(const QString itemI
     }
 }
 
-void SystemHealthGadgetWidget::showAllAlarmDescriptions(){
+void SystemHealthGadgetWidget::showAllAlarmDescriptions(const QPoint& location){
+    QGraphicsScene *graphicsScene = scene();
+    if(graphicsScene){
+        QString alarmsText;
 
+        // Loop through all items in the scene looking for svg items that represent alarms
+        foreach(QGraphicsItem* curItem, graphicsScene->items()){
+            QGraphicsSvgItem* curSvgItem = dynamic_cast<QGraphicsSvgItem*>(curItem);
+            if(curSvgItem && (curSvgItem != foreground) && (curSvgItem != background)){
+                QString elementId = curSvgItem->elementId();
+                if(!elementId.contains("OK")){
+                    // Found an alarm, get its corresponding alarm html file contents
+                    // and append to the cumulative string for all alarms.
+                    QFile alarmDescription(":/systemhealth/html/" + elementId + ".html");
+                    if(alarmDescription.open(QIODevice::ReadOnly | QIODevice::Text)){
+                        QTextStream textStream(&alarmDescription);
+                        alarmsText.append(textStream.readAll());
+                    }
+                }
+            }
+        }
+
+        // Show alarms text if we have any
+        if(alarmsText.length() > 0){
+            QWhatsThis::showText(location, alarmsText);
+        }
+    }
 }

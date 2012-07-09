@@ -70,7 +70,7 @@ private:
    bool fgenabled; // layer does not exist.
 
    void showAlarmDescriptionForItemId(const QString itemId, const QPoint& location);
-   void showAllAlarmDescriptions();
+   void showAllAlarmDescriptions(const QPoint &location);
 
 };
 #endif /* SYSTEMHEALTHGADGETWIDGET_H_ */

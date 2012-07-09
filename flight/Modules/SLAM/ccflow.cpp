@@ -58,7 +58,8 @@ CCFlow::CCFlow(cv::RNG *rnginit, cv::Mat* last[], cv::Mat* current[], int pyrami
 		//temperMatch(tst,ref,CC_ENDCOUNT,CC_MAXCOUNT,CC_ADJFACTOR,tr,CC_INITIAL);
 		//fullMatch(tst,ref,1.0/16.0,Vec3f(0,0,0),Vec3f(10,10,10));
 		//gradientMatch(tst,ref,Vec3f(0,0,0),Vec3f(10,10,10));
-		gradientMatch(tst,ref,50,Vec3f(0,0,0),Vec3f(1,1,1));
+		iterations=0;
+		gradientMatch(tst,ref,50,tr,Vec3f(1,1,1));
 	}
 
 }
@@ -299,18 +300,24 @@ void CCFlow::gradientMatch(cv::Mat test, cv::Mat reference, int maxcount,TransRo
 	float worstMatchScore = 0; // small
 	TransRot current = initial;
 	TransRot last = current;
+	TransRot bestMatch = current;
 	TransRot step = initialRange;
 	Vec4f prev=Vec4f(0,0,0,bestMatchScore);
 
 	//Mat debug=Mat::ones(20*16,20*16,CV_32FC1);
 	//debug = debug.ones();
-	fprintf(stderr,"initial, at %f %f %f\n",current[0],current[1],current[2]);
+	//fprintf(stderr,"initial, at %f %f %f\n",current[0],current[1],current[2]);
 	while (step[0]>1./16. && maxcount-->0) {
 		Vec4f grad = gradient(test,reference,current);
-		fprintf(stderr,"gradient is %f %f %f %f \n",grad[0],grad[1],grad[2],grad[3]);
+		//fprintf(stderr,"gradient is %f %f %f %f \n",grad[0],grad[1],grad[2],grad[3]);
 
 		Vec3f combined = Vec3f(prev[0]+grad[0],prev[1]+grad[1],prev[2]+grad[2]);
 
+		if (grad[3]>worstMatchScore) worstMatchScore=grad[3];
+		if (grad[3]>0 && grad[3]<bestMatchScore) {
+			bestMatchScore = grad[3];
+			bestMatch = current;
+		}
 		if ((grad[0]==0 && grad[1]==0 && grad[2]==0) || combined==Vec3f(0,0,0) || step[0]>4*initialRange[0]) {
 			last = current = initial;
 			current[0] += rng->gaussian(initialRange[0]);
@@ -323,28 +330,27 @@ void CCFlow::gradientMatch(cv::Mat test, cv::Mat reference, int maxcount,TransRo
 			combined *= 1.0/length(combined); // normalize
 
 			float success = (grad[0]*prev[0]+grad[1]*prev[1]+grad[2]*prev[2]); // dot product
-			step *= 1.0+(success/2);
+			if (success<0) step *= 1.0+(success/2);
 
 
-			current[0] = last[0] + ((current[0]-last[0])/2) + step[0] * combined[0];
-			current[1] = last[1] + ((current[1]-last[1])/2) + step[1] * combined[1];
-			current[2] = last[2] + ((current[2]-last[2])/2) + step[2] * combined[2];
+			current[0] = last[0] + step[0] * combined[0];
+			current[1] = last[1] + step[1] * combined[1];
+			current[2] = last[2] + step[2] * combined[2];
 
 			line(debug,Point(16*(last[0]+10.),16*(last[1]+10.)),Point(16*(current[0]+10.),16*(current[1]+10.)),0.5+ success/2);
 			last=current;
 
-			fprintf(stderr,"success, now at %f %f %f\n",current[0],current[1],current[2]);
-			fprintf(stderr,"step is now %f %f %f %f\n",step[0],step[1],step[2],(grad[0]*prev[0]+grad[1]*prev[1]+grad[2]*prev[2]));
+			//fprintf(stderr,"success, now at %f %f %f\n",current[0],current[1],current[2]);
+			//fprintf(stderr,"step is now %f %f %f %f\n",step[0],step[1],step[2],(grad[0]*prev[0]+grad[1]*prev[1]+grad[2]*prev[2]));
 			
 			prev=grad;
 		}
-		if (grad[3]>worstMatchScore) worstMatchScore=grad[3];
-		if (grad[3]>0 && grad[3]<bestMatchScore) bestMatchScore = grad[3];
 		//imshow("debug3",debug);
 		//waitKey(0);
+		iterations++;
 	}
-	translation = Vec2f(current[0],current[1]);
-	rotation = current[2];
+	translation = Vec2f(bestMatch[0],bestMatch[1]);
+	rotation = bestMatch[2];
 	best = bestMatchScore;
 	worst = worstMatchScore;
 }
@@ -383,6 +389,7 @@ float CCFlow::correlate(cv::Mat reference, cv::Mat test, cv::Mat rotMatrix) {
 				squareError += tmp[0]*tmp[0] + tmp[1]+tmp[1] + tmp[2]*tmp[2];
 			} else {
 				missed++;
+				squareError += 32*32*3;
 				//pixels++;
 			}
 		}

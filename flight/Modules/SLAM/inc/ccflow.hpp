@@ -88,6 +88,7 @@ public:
 	float rotation;
 	float best;
 	float worst;
+	int iterations;
 private:
 	cv::Vec4i border;
 	cv::RNG *rng;

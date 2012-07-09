@@ -78,8 +78,8 @@ void OpenCVslam::run() {
 	CCFlow *lastFlow=NULL;
 	/* Initialize OpenCV */
 	//VideoSource = NULL; //cvCaptureFromFile("test.avi");
-	//VideoSource = cvCaptureFromFile("test.avi");
-	VideoSource = cvCaptureFromCAM(0);
+	VideoSource = cvCaptureFromFile("test.avi");
+	//VideoSource = cvCaptureFromCAM(0);
 	//CvVideoWriter *VideoDest = cvCreateVideoWriter("output.avi",CV_FOURCC('F','M','P','4'),settings->FrameRate,cvSize(640,480),1);
 
 	if (VideoSource) {
@@ -128,6 +128,10 @@ void OpenCVslam::run() {
 
 	// Main task loop
 	double oldpos=0;
+
+
+	// debugging iterations
+	int iterations;
 	while (1) {
 		frame++;
 		cvWaitKey(1);
@@ -221,7 +225,8 @@ void OpenCVslam::run() {
 			if (lastFlow) delete lastFlow;
 			lastFlow = currentFlow;
 			currentFlow = new CCFlow(&rng, last,current,5,Vec3f(0,0,1000),lastFlow);
-			//fprintf(stderr,"rotation: %f degrees,\tx: %f\ty: %f\t  %f > %f\n",currentFlow->rotation,currentFlow->translation[0],currentFlow->translation[1],currentFlow->best,currentFlow->worst);
+			iterations += currentFlow->iterations;
+			fprintf(stderr,"rotation: %f degrees,\tx: %f\ty: %f\t  %f > %f\t checks: %i avg: %f\n",currentFlow->rotation,currentFlow->translation[0],currentFlow->translation[1],currentFlow->best,currentFlow->worst, currentFlow->iterations, (float)iterations/frame);
 			//vPortEnterCritical();
 			//calcOpticalFlowFarneback(x1,x2, flow, 0.5, 3, 9, 9, 5, 1.1, 0);
 			//calcOpticalFlowFarneback(x1,x2, flow, 0.5, 4, 13, 1, 5, 1.1, 0);

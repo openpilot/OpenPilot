@@ -94,6 +94,9 @@ void runningDeviceWidget::populate()
     case 0x0401:
         devicePic->renderer()->load(QString(":/uploader/images/deviceID-0401.svg"));
         break;
+    case 0x0402:
+        devicePic->renderer()->load(QString(":/uploader/images/deviceID-0402.svg"));
+        break;
     case 0x0201:
         devicePic->renderer()->load(QString(":/uploader/images/deviceID-0201.svg"));
         break;

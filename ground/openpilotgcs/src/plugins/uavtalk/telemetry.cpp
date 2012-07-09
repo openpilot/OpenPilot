@@ -389,7 +389,7 @@ void Telemetry::processObjectQueue()
     if ( ( objInfo.event != EV_UNPACKED ) && ( ( objInfo.event != EV_UPDATED_PERIODIC ) || ( updateMode != UAVObject::UPDATEMODE_THROTTLED ) ) )
     {
         UAVObject::Metadata metadata = objInfo.obj->getMetadata();
-	ObjectTransactionInfo *transInfo = new ObjectTransactionInfo();
+        ObjectTransactionInfo *transInfo = new ObjectTransactionInfo(this);
         transInfo->obj = objInfo.obj;
         transInfo->allInstances = objInfo.allInstances;
         transInfo->retriesRemaining = MAX_RETRIES;
@@ -402,9 +402,9 @@ void Telemetry::processObjectQueue()
         {
             transInfo->objRequest = true;
         }
-	transInfo->telem = this;
-	// Insert the transaction into the transaction map.
-	transMap.insert(objInfo.obj->getObjID(), transInfo);
+        transInfo->telem = this;
+        // Insert the transaction into the transaction map.
+        transMap.insert(objInfo.obj->getObjID(), transInfo);
         processObjectTransaction(transInfo);
     }
 
@@ -559,7 +559,7 @@ void Telemetry::newInstance(UAVObject* obj)
     registerObject(obj);
 }
 
-ObjectTransactionInfo::ObjectTransactionInfo()
+ObjectTransactionInfo::ObjectTransactionInfo(QObject* parent):QObject(parent)
 {
     obj = 0;
     allInstances = false;
@@ -582,6 +582,6 @@ ObjectTransactionInfo::~ObjectTransactionInfo()
 
 void ObjectTransactionInfo::timeout()
 {
-    if (telem)
+    if (!telem.isNull())
         telem->transactionTimeout(this);
 }

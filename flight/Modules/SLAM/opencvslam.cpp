@@ -60,10 +60,10 @@ void OpenCVslam::shrinkAndEnhance(const Mat& src, Mat& dst) {
 	// or with double laplace
 	// -7 4 22 4 -7
 	PyrDownEnhanced enhanced;
-	enhanced.pyrDownEnhanced(src,dst,-3,4,14);
+	//enhanced.pyrDownEnhanced(src,dst,-3,4,14);
 	//enhanced.pyrDownEnhanced(src,dst,-4,4,16);
 	//enhanced.pyrDownEnhanced(src,dst,-5,4,18);
-	//enhanced.pyrDownEnhanced(src,dst,0,4,8);
+	enhanced.pyrDownEnhanced(src,dst,1,4,6);
 	
 }
 
@@ -78,15 +78,15 @@ void OpenCVslam::run() {
 	CCFlow *lastFlow=NULL;
 	/* Initialize OpenCV */
 	//VideoSource = NULL; //cvCaptureFromFile("test.avi");
-	VideoSource = cvCaptureFromFile("test.avi");
-	//VideoSource = cvCaptureFromCAM(0);
-	CvVideoWriter *VideoDest = cvCreateVideoWriter("output.avi",CV_FOURCC('F','M','P','4'),settings->FrameRate,cvSize(640,480),1);
+	//VideoSource = cvCaptureFromFile("test.avi");
+	VideoSource = cvCaptureFromCAM(0);
+	//CvVideoWriter *VideoDest = cvCreateVideoWriter("output.avi",CV_FOURCC('F','M','P','4'),settings->FrameRate,cvSize(640,480),1);
 
 	if (VideoSource) {
-		cvGrabFrame(VideoSource);
-		currentFrame = cvRetrieveFrame(VideoSource, 0);
 		cvSetCaptureProperty(VideoSource, CV_CAP_PROP_FRAME_WIDTH,  settings->FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_X]);
 		cvSetCaptureProperty(VideoSource, CV_CAP_PROP_FRAME_HEIGHT, settings->FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_Y]);
+		cvGrabFrame(VideoSource);
+		currentFrame = cvRetrieveFrame(VideoSource, 0);
 	}
 
 	Mat flow; // = Mat(480,640,CV_32FC1);
@@ -103,9 +103,9 @@ void OpenCVslam::run() {
 
 	// debug output
 	cvNamedWindow("debug",CV_WINDOW_AUTOSIZE);
-	//cvNamedWindow("debug1",CV_WINDOW_AUTOSIZE);
-	//cvNamedWindow("debug2",CV_WINDOW_AUTOSIZE);
-	//cvNamedWindow("debug3",CV_WINDOW_AUTOSIZE);
+	cvNamedWindow("debug1",CV_WINDOW_AUTOSIZE);
+	cvNamedWindow("debug2",CV_WINDOW_AUTOSIZE);
+	cvNamedWindow("debug3",CV_WINDOW_AUTOSIZE);
 	
 	// synchronization delay, wait for attitude data - any attitude data
 	// this is an evil hack but necessary for tests with log data to synchronize video and telemetry
@@ -146,8 +146,8 @@ void OpenCVslam::run() {
 				if (writeincrement+writeextra+1000<0) {
 					writeextra=-(writeincrement+1000);
 				}
-				struct writeframestruct x={VideoDest,lastFrame};
-				if (lastFrame) backgroundWriteFrame(x);
+				//struct writeframestruct x={VideoDest,lastFrame};
+				//if (lastFrame) backgroundWriteFrame(x);
 				//fprintf(stderr,".");
 			} else {
 				vTaskDelay(1/portTICK_RATE_MS);
@@ -160,8 +160,8 @@ void OpenCVslam::run() {
 					writeextra=-(writeincrement+1000);
 				}
 
-				struct writeframestruct x={VideoDest,lastFrame};
-				if (lastFrame) backgroundWriteFrame(x);
+				//struct writeframestruct x={VideoDest,lastFrame};
+				//if (lastFrame) backgroundWriteFrame(x);
 				//fprintf(stderr,".");
 			}
 
@@ -208,9 +208,9 @@ void OpenCVslam::run() {
 			shrinkAndEnhance(*current[5],*current[4]);
 			shrinkAndEnhance(*current[4],*current[3]);
 			shrinkAndEnhance(*current[3],*current[2]);
-			shrinkAndEnhance(*current[2],*current[1]);
-			shrinkAndEnhance(*current[1],*current[0]);
-			flow=*current[3];
+			shrinkAndEnhance(*current[2],*current[0]);
+			//shrinkAndEnhance(*current[1],*current[0]);
+			//flow=*current[3];
 		}
 		if (currentFrame && lastFrame ) {
 			//Mat x1,x2;

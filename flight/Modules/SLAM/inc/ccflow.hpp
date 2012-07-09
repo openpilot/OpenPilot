@@ -40,10 +40,11 @@
 #define CC_PARTICLES 15
 #define CC_PDEPTH 3
 #define CC_ZOOMFACTOR 2
-#define CC_INITIAL Vec3f(5.0,5.0,5.0)
+//#define CC_INITIAL Vec3f(5.0,5.0,5.0)
+#define CC_INITIAL Vec3f(1.0,1.0,1.0)
 
 #define CC_ADJFACTOR 0.985f
-#define CC_MAXCOUNT 200
+#define CC_MAXCOUNT 30
 #define CC_ENDCOUNT 75
 
 
@@ -68,9 +69,14 @@ public:
 	// finds the best transrotation between two templates of equal size via tempered random jump gradient search
 	void temperMatch(cv::Mat test, cv::Mat reference, int endCount, int maxCount, float adjFactor, TransRot initial, TransRot initialRange);
 
+	void fullMatch(cv::Mat test, cv::Mat reference, float resolution, TransRot initial, TransRot initialRange);
+	
+	void gradientMatch(cv::Mat test, cv::Mat reference, int maxcount, TransRot initial, TransRot initialRange);
+
 	// finds the mean square error between two templates of equal size of which one is transrotated
 	float correlate(cv::Mat reference, cv::Mat test, cv::Mat rotMatrix);
 
+	cv::Vec4f gradient(cv::Mat test, cv::Mat reference, TransRot position);
 
 	// properties
 	CCFlow *children; // subcomponents
@@ -85,6 +91,7 @@ public:
 private:
 	cv::Vec4i border;
 	cv::RNG *rng;
+	cv::Mat debug;
 
 };
 

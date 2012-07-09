@@ -34,7 +34,7 @@
 
 #include "ui_mixercurve.h"
 #include "mixercurvewidget.h"
-#include "doublespindelegate.h"
+#include "dblspindelegate.h"
 #include "uavobjectwidgetutils_global.h"
 
 

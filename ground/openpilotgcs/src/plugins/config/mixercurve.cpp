@@ -29,7 +29,7 @@
 #include <QResizeEvent>
 #include <math.h>
 #include "mixercurve.h"
-#include "doublespindelegate.h"
+#include "dblspindelegate.h"
 
 MixerCurve::MixerCurve(QWidget *parent) :
     QFrame(parent),

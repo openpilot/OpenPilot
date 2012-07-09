@@ -31,7 +31,7 @@
 
 #include <openpilot.h>
 #include <uavobjectsinit.h>
-#include "hwsettings.h"
+#include <hwsettings.h>
 #include "manualcontrolsettings.h"
 
 #include "board_hw_defs.c"
@@ -483,8 +483,8 @@ void PIOS_Board_Init(void) {
 	case HWSETTINGS_USB_HIDPORT_USBTELEMETRY:
 #if defined(PIOS_INCLUDE_COM)
 		{
-			uint32_t pios_usb_hid_id;
-			if (PIOS_USB_HID_Init(&pios_usb_hid_id, &pios_usb_hid_cfg, pios_usb_id)) {
+			uint32_t pios_usb_cdc_id;
+			if (PIOS_USB_CDC_Init(&pios_usb_cdc_id, &pios_usb_cdc_cfg, pios_usb_id)) {
 				PIOS_Assert(0);
 			}
 			uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_USB_RX_BUF_LEN);

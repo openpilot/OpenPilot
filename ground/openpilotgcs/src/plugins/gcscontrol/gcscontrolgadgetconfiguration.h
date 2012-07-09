@@ -29,12 +29,18 @@
 #define GCSCONTROLGADGETCONFIGURATION_H
 
 #include <coreplugin/iuavgadgetconfiguration.h>
+#include <QtNetwork/QHostAddress>
 
 typedef struct{
     int     ActionID;
     int     FunctionID;
     double  Amount;
 }buttonSettingsStruct;
+
+typedef struct{
+    int port;
+    QHostAddress address;
+}portSettingsStruct;
 
 
 using namespace Core;
@@ -49,6 +55,9 @@ class GCSControlGadgetConfiguration : public IUAVGadgetConfiguration
 
     void setControlsMode(int mode) { controlsMode = mode; }
     void setRPYTchannels(int roll, int pitch, int yaw, int throttle);
+    void setUDPControlSettings(int port, QString host);
+    int getUDPControlPort();
+    QHostAddress getUDPControlHost();
     int getControlsMode() { return controlsMode; }
     QList<int>  getChannelsMapping();
     QList<bool>  getChannelsReverse();
@@ -72,6 +81,8 @@ class GCSControlGadgetConfiguration : public IUAVGadgetConfiguration
         int throttleChannel;
         buttonSettingsStruct buttonSettings[8];
         bool channelReverse[8];
+        int udp_port;
+        QHostAddress udp_host;
 
 
 };

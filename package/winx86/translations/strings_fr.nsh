@@ -33,6 +33,7 @@
   LangString DESC_InSecFirmware ${LANG_FRENCH} "OpenPilot firmware binaries."
   LangString DESC_InSecUtilities ${LANG_FRENCH} "OpenPilot utilities (Matlab log parser)."
   LangString DESC_InSecDrivers ${LANG_FRENCH} "OpenPilot hardware driver files (optional OpenPilot CDC driver)."
+  LangString DESC_InSecInstallDrivers ${LANG_FRENCH} "Install OpenPilot CDC driver (optional)."
   LangString DESC_InSecShortcuts ${LANG_FRENCH} "Installer les raccourcis dans le menu démarrer."
 
 ;--------------------------------

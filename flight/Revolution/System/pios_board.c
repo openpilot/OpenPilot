@@ -252,7 +252,6 @@ uint32_t pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE];
 #define PIOS_COM_TELEM_RF_TX_BUF_LEN 512
 
 #define PIOS_COM_GPS_RX_BUF_LEN 32
-#define PIOS_COM_GPS_TX_BUF_LEN 32
 
 #define PIOS_COM_TELEM_USB_RX_BUF_LEN 65
 #define PIOS_COM_TELEM_USB_TX_BUF_LEN 65
@@ -544,7 +543,7 @@ void PIOS_Board_Init(void) {
 			break;
 			
 		case HWSETTINGS_RV_GPSPORT_GPS:
-			PIOS_Board_configure_com(&pios_usart_gps_cfg, PIOS_COM_GPS_RX_BUF_LEN, PIOS_COM_GPS_TX_BUF_LEN,  &pios_usart_com_driver, &pios_com_gps_id);
+			PIOS_Board_configure_com(&pios_usart_gps_cfg, PIOS_COM_GPS_RX_BUF_LEN, -1,  &pios_usart_com_driver, &pios_com_gps_id);
 			break;
 		
 		case HWSETTINGS_RV_GPSPORT_COMAUX:

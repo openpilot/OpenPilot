@@ -32,10 +32,14 @@
 
 class SetupWizard : public QWizard
 {
-   Q_OBJECT
+    Q_OBJECT
 
 public:
-   SetupWizard(QWidget *parent = 0);
+    SetupWizard(QWidget *parent = 0);
+    int nextId() const;
+private:
+    enum {PAGE_START, PAGE_END};
+    void createPages();
 };
 
 #endif // SETUPWIZARD_H

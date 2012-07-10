@@ -7,7 +7,7 @@
  * @{
  * @addtogroup Setup Wizard  Plugin
  * @{
- * @brief A Wizards to make the initial setup easy for everyone.
+ * @brief A Wizard to make the initial setup easy for everyone.
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -26,12 +26,29 @@
  */
 
 #include "setupwizard.h"
+#include "pages/startpage.h"
+#include "pages/endpage.h"
 
 SetupWizard::SetupWizard(QWidget *parent) : QWizard(parent)
 {
-    setWindowTitle("GCS Setup Wizard");
-    QWizardPage* page = new QWizardPage();
-    page->setFixedSize(300, 300);
-    addPage(page);
+    setWindowTitle("OpenPilot Setup Wizard");
+    createPages();
 }
 
+int SetupWizard::nextId() const
+{
+    switch (currentId()) {
+    case PAGE_START:
+        return PAGE_END;
+    default:
+        return -1;
+    }
+}
+
+void SetupWizard::createPages()
+{
+    setPage(PAGE_START, new StartPage());
+    setPage(PAGE_END, new EndPage());
+
+    setStartId(PAGE_START);
+}

@@ -5,7 +5,7 @@
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
- * @addtogroup SetupWizardPlugin Do Nothing Plugin
+ * @addtogroup SetupWizardPlugin
  * @{
  * @brief A Setup Wizard Plugin
  *****************************************************************************/
@@ -59,7 +59,7 @@ bool SetupWizardPlugin::initialize(const QStringList& args, QString *errMsg)
                                             QList<int>() <<
                                             Core::Constants::C_GLOBAL_ID);
     cmd->setDefaultKeySequence(QKeySequence("Ctrl+W"));
-    cmd->action()->setText(tr("GCS Setup Wizard"));
+    cmd->action()->setText(tr("OpenPilot Setup Wizard"));
 
     ac->menu()->addSeparator();
     ac->appendGroup("Wizard");

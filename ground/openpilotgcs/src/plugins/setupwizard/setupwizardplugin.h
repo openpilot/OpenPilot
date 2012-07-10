@@ -5,9 +5,9 @@
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
- * @addtogroup DoNothingPlugin Do Nothing Plugin
+ * @addtogroup SetupWizardPlugin
  * @{
- * @brief A minimal example plugin
+ * @brief A Setup Wizard Plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify

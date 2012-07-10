@@ -309,7 +309,17 @@ static void setHomeLocation(GPSPositionData * gpsData)
 
 		// Compute home ECEF coordinates and the rotation matrix into NED
 		double LLA[3] = { ((double)home.Latitude) / 10e6, ((double)home.Longitude) / 10e6, ((double)home.Altitude) };
+#if !defined(REVOLUTION)
+		double ECEF[3];
+		RneFromLLA(LLA, (float (*)[3])home.RNE);
+		LLA2ECEF(LLA, ECEF);
+		// TODO: Currently UAVTalk only supports float but these conversions use double
+		// need to find out if they require that precision and if so extend UAVTAlk
+		home.ECEF[0] = (int32_t) (ECEF[0] * 100);
+		home.ECEF[1] = (int32_t) (ECEF[1] * 100);
+		home.ECEF[2] = (int32_t) (ECEF[2] * 100);
 
+#endif // !defined (Revolution)
 		// Compute magnetic flux direction at home location
 		if (WMM_GetMagVector(LLA[0], LLA[1], LLA[2], gps.Month, gps.Day, gps.Year, &home.Be[0]) >= 0)
 		{   // calculations appeared to go OK

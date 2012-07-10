@@ -47,6 +47,7 @@
 #define CC_MAXCOUNT 30
 #define CC_ENDCOUNT 75
 
+#define CC_BORDERWIDTH 1
 
 typedef cv::Vec3f TransRot;
 
@@ -57,11 +58,13 @@ public:
 	
 	// methods
 	CCFlow(cv::RNG *rnginit, cv::Mat* last[], cv::Mat* current[], int pyramidDepth,
-		TransRot estTransrotation=cv::Vec3f(0,0,1000), CCFlow* oldflow=NULL, cv::Vec4s borders=cv::Vec4s(1,1,1,1),int depth=0);
+		TransRot estTransrotation=cv::Vec3f(0,0,1000), CCFlow* oldflow=NULL, cv::Vec4s borders=cv::Vec4s(CC_BORDERWIDTH,CC_BORDERWIDTH,CC_BORDERWIDTH,CC_BORDERWIDTH),int depth=0);
+	
+	~CCFlow();
 
 	TransRot transrotation();
-	TransRot transrotation(cv:: Point2i position);
-	TransRot transrotation(cv:: Point3i position);
+	TransRot transrotation(cv:: Point3f position);
+	TransRot transrotation(cv:: Point2f position);
 
 	// finds the best transrotation between two templates of equal size via particle filter approach
 	void particleMatch(cv::Mat test, cv::Mat reference, int particleNum, int generations, int stepFactor, TransRot initial, TransRot initialRange);
@@ -79,10 +82,7 @@ public:
 	cv::Vec4f gradient(cv::Mat test, cv::Mat reference, TransRot position);
 
 	// properties
-	CCFlow *children; // subcomponents
-	
-	cv::Size origSize; // size of area before shrinking
-	cv::Mat area; // mat after rotation (and possibly shrinkage)
+	CCFlow *children[4]; // subcomponents
 	
 	cv::Vec2f translation;
 	float rotation;
@@ -93,6 +93,11 @@ private:
 	cv::Vec4i border;
 	cv::RNG *rng;
 	cv::Mat debug;
+	int mydepth,maxdepth;
+
+	cv::Point2f center;
+	cv::Point2f corners[4];
+	cv::Point2f subcenters[4];
 
 };
 

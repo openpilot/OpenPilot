@@ -39,36 +39,137 @@ using namespace cv;
 CCFlow::CCFlow(cv::RNG *rnginit, cv::Mat* last[], cv::Mat* current[], int pyramidDepth, TransRot estTransrotation, CCFlow* oldflow, cv::Vec4s borders, int depth) {
 
 	rng = rnginit;
-	border=borders;
+	border = borders;
+	mydepth = depth;
+	maxdepth = pyramidDepth;
 
-	if (depth == 0) {
-		TransRot tr;
-		// initialize transrotation
-		if (estTransrotation[2] < 999) {
-			tr = estTransrotation;
-		} else if (oldflow) {
-			tr = oldflow->transrotation();
-		} else {
-			tr = Vec3f(0,0,0);
-		}
-		//tr = Vec3f(0,0,0);
-		Mat ref=(*current[0])(Rect(6, 6, current[0]->cols-12, current[0]->rows-12));
-		Mat tst=(*last[0])(Rect(6, 6, last[0]->cols-12, last[0]->rows-12));
-		//particleMatch(tst,ref,CC_PARTICLES,CC_PDEPTH,CC_ZOOMFACTOR,tr,CC_INITIAL);
-		//temperMatch(tst,ref,CC_ENDCOUNT,CC_MAXCOUNT,CC_ADJFACTOR,tr,CC_INITIAL);
-		//fullMatch(tst,ref,1.0/16.0,Vec3f(0,0,0),Vec3f(10,10,10));
-		//gradientMatch(tst,ref,Vec3f(0,0,0),Vec3f(10,10,10));
-		iterations=0;
+	TransRot tr;
+	// initialize transrotation
+	if (estTransrotation[2] < 999) {
+		tr = estTransrotation;
+	} else if (oldflow) {
+		tr = oldflow->transrotation();
+	} else {
+		tr = Vec3f(0,0,0);
+	}
+	//tr = Vec3f(0,0,0);
+	Mat ref=(*current[mydepth])(Rect(border[0], border[1], current[mydepth]->cols-(border[0]+border[2]), current[mydepth]->rows-(border[1]+border[3])));
+	Mat tst=(*last[mydepth])(Rect(border[0], border[1], last[mydepth]->cols-(border[0]+border[2]), last[mydepth]->rows-(border[1]+border[3])));
+
+	//particleMatch(tst,ref,CC_PARTICLES,CC_PDEPTH,CC_ZOOMFACTOR,tr,CC_INITIAL);
+	//temperMatch(tst,ref,CC_ENDCOUNT,CC_MAXCOUNT,CC_ADJFACTOR,tr,CC_INITIAL);
+	//fullMatch(tst,ref,1.0/16.0,Vec3f(0,0,0),Vec3f(10,10,10));
+	//gradientMatch(tst,ref,Vec3f(0,0,0),Vec3f(10,10,10));
+	iterations=0;
+	if (depth==0) {
 		gradientMatch(tst,ref,50,tr,Vec3f(1,1,1));
+	} else {
+		gradientMatch(tst,ref,20,tr,Vec3f(0.5,0.5,0.5));
+	}
+
+	if ((mydepth+1)<maxdepth) {
+		center = Point(
+			border[0] + (last[mydepth]->cols-(border[0]+border[2]))/2,
+			border[1] + (last[mydepth]->rows-(border[1]+border[3]))/2
+			);
+		corners[0] = Point(border[0], border[1]);
+		corners[1] = Point(last[mydepth]->cols-border[2], border[1]);
+		corners[2] = Point(border[0], last[mydepth]->rows-border[3]);
+		corners[3] = Point(last[mydepth]->cols-border[2], last[mydepth]->rows-border[3]);
+
+		subcenters[0] = corners[0] + 0.5 * (center-corners[0]);
+		subcenters[1] = corners[1] + 0.5 * (center-corners[1]);
+		subcenters[2] = corners[2] + 0.5 * (center-corners[2]);
+		subcenters[3] = corners[3] + 0.5 * (center-corners[3]);
+
+		/*fprintf(stderr,"subcenters are at %f/%f, %f/%f, %f/%f, %f/%f \n",
+			subcenters[0].x,subcenters[0].y,
+			subcenters[1].x,subcenters[1].y,
+			subcenters[2].x,subcenters[2].y,
+			subcenters[3].x,subcenters[3].y);*/
+
+		TransRot shift[4] = {
+			transrotation(Point3f(subcenters[0].x,subcenters[0].y,mydepth)),
+			transrotation(Point3f(subcenters[1].x,subcenters[1].y,mydepth)),
+			transrotation(Point3f(subcenters[2].x,subcenters[2].y,mydepth)),
+			transrotation(Point3f(subcenters[3].x,subcenters[3].y,mydepth))
+		};
+
+		children[0] = new CCFlow( rnginit, last, current, maxdepth, shift[0], oldflow?oldflow->children[0]:NULL,
+					Vec4s( 2*corners[0].x, 2*corners[0].y, last[mydepth+1]->cols - 2*center.x, last[mydepth+1]->rows - 2*center.y ), mydepth+1);
+		children[1] = new CCFlow( rnginit, last, current, maxdepth, shift[1], oldflow?oldflow->children[1]:NULL,
+					Vec4s( 2*center.x,     2*corners[1].y, last[mydepth+1]->cols - 2*corners[1].x, last[mydepth+1]->rows - 2*center.y ), mydepth+1);
+		children[2] = new CCFlow( rnginit, last, current, maxdepth, shift[2], oldflow?oldflow->children[2]:NULL,
+					Vec4s( 2*corners[2].x, 2*center.y, last[mydepth+1]->cols - 2*center.x, last[mydepth+1]->rows - 2*corners[2].y ), mydepth+1);
+		children[3] = new CCFlow( rnginit, last, current, maxdepth, shift[3], oldflow?oldflow->children[3]:NULL,
+					Vec4s( 2*center.x,     2*center.y, last[mydepth+1]->cols - 2*corners[3].x, last[mydepth+1]->rows - 2*corners[3].y ), mydepth+1);
+
+
+	} else {
+		children[0]=NULL;
+		children[1]=NULL;
+		children[2]=NULL;
+		children[3]=NULL;
 	}
 
 }
 
-// return global flow of this flow segment
+// destructor
+CCFlow::~CCFlow() {
+	if (children[0]) delete children[0];
+	if (children[1]) delete children[1];
+	if (children[2]) delete children[2];
+	if (children[3]) delete children[3];
+}
+
+
+// return global flow of the current flow segment
 TransRot CCFlow::transrotation() {
 	return Vec3f(translation[0],translation[1],rotation);
 }
 
+// return local flow of the smallest flow segment
+TransRot CCFlow::transrotation(cv:: Point2f position) {
+	return transrotation(Point3f(position.x,position.y,maxdepth-1));
+}
+
+// return local flow of the given flow segment
+TransRot CCFlow::transrotation(cv:: Point3f position) {
+	Point2f pos(position.x,position.y);
+	int depth = position.z;
+	// calculate which subdivision is responsible
+	if (depth>mydepth && mydepth+1<maxdepth) {
+		for (int t=mydepth; t<maxdepth && t<depth; t++) {
+			pos = pos * 0.5;
+		}
+		if (pos.y<center.y) {
+			if (pos.x<center.x) {
+				return children[0]->transrotation(position);
+			} else {
+				return children[1]->transrotation(position);
+			}
+		} else {
+			if (pos.x<center.x) {
+				return children[2]->transrotation(position);
+			} else {
+				return children[3]->transrotation(position);
+			}
+		}
+	} else {
+	// we are responsible
+		Mat rotMatrix = getRotationMatrix2D(center,rotation,1.0f);
+		rotMatrix.at<double>(0,2)+=translation[0];
+		rotMatrix.at<double>(1,2)+=translation[1];
+		double * m = (double*)rotMatrix.data;
+		Point2f source(
+			m[0]*pos.x + m[1]*pos.y + m[2],
+			m[3]*pos.x + m[4]*pos.y + m[5]
+			);
+
+		Point2f trans(source-pos);
+		return Vec3f(trans.x,trans.y,rotation);
+	}
+}
 
 
 void CCFlow::particleMatch(cv::Mat test, cv::Mat reference,
@@ -325,7 +426,7 @@ void CCFlow::gradientMatch(cv::Mat test, cv::Mat reference, int maxcount,TransRo
 			current[2] += rng->gaussian(initialRange[2]);
 			step = initialRange;
 			prev=Vec4f(0,0,0,bestMatchScore);
-			fprintf(stderr,"failure, now at %f %f %f\n",current[0],current[1],current[2]);
+			//fprintf(stderr,"failure, now at %f %f %f\n",current[0],current[1],current[2]);
 		} else {
 			combined *= 1.0/length(combined); // normalize
 
@@ -337,7 +438,7 @@ void CCFlow::gradientMatch(cv::Mat test, cv::Mat reference, int maxcount,TransRo
 			current[1] = last[1] + step[1] * combined[1];
 			current[2] = last[2] + step[2] * combined[2];
 
-			line(debug,Point(16*(last[0]+10.),16*(last[1]+10.)),Point(16*(current[0]+10.),16*(current[1]+10.)),0.5+ success/2);
+			//line(debug,Point(16*(last[0]+10.),16*(last[1]+10.)),Point(16*(current[0]+10.),16*(current[1]+10.)),0.5+ success/2);
 			last=current;
 
 			//fprintf(stderr,"success, now at %f %f %f\n",current[0],current[1],current[2]);

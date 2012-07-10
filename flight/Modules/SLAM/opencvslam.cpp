@@ -78,8 +78,8 @@ void OpenCVslam::run() {
 	CCFlow *lastFlow=NULL;
 	/* Initialize OpenCV */
 	//VideoSource = NULL; //cvCaptureFromFile("test.avi");
-	VideoSource = cvCaptureFromFile("test.avi");
-	//VideoSource = cvCaptureFromCAM(0);
+	//VideoSource = cvCaptureFromFile("test.avi");
+	VideoSource = cvCaptureFromCAM(0);
 	//CvVideoWriter *VideoDest = cvCreateVideoWriter("output.avi",CV_FOURCC('F','M','P','4'),settings->FrameRate,cvSize(640,480),1);
 
 	if (VideoSource) {
@@ -202,18 +202,19 @@ void OpenCVslam::run() {
 			last[2]=current[2];
 			last[1]=current[1];
 			last[0]=current[0];
-			current[5]=new Mat(currentFrame);
-			current[4]= new Mat();
-			current[3]= new Mat();
-			current[2]= new Mat();
-			current[1]= new Mat();
-			current[0]= new Mat();
+			//current[5] = NULL;
+			current[5] = new Mat(currentFrame);
+			current[4] = new Mat();
+			current[3] = new Mat();
+			current[2] = new Mat();
+			current[1] = new Mat();
+			current[0] = new Mat();
 			//current=Mat(currentFrame);
 			shrinkAndEnhance(*current[5],*current[4]);
 			shrinkAndEnhance(*current[4],*current[3]);
 			shrinkAndEnhance(*current[3],*current[2]);
-			shrinkAndEnhance(*current[2],*current[0]);
-			//shrinkAndEnhance(*current[1],*current[0]);
+			shrinkAndEnhance(*current[2],*current[1]);
+			shrinkAndEnhance(*current[1],*current[0]);
 			//flow=*current[3];
 		}
 		if (currentFrame && lastFrame ) {
@@ -224,7 +225,8 @@ void OpenCVslam::run() {
 			//fprintf(stderr,"calculate flow...\n");
 			if (lastFlow) delete lastFlow;
 			lastFlow = currentFlow;
-			currentFlow = new CCFlow(&rng, last,current,5,Vec3f(0,0,1000),lastFlow);
+			//currentFlow = new CCFlow(&rng, last,current,5,Vec3f(0,0,1000),lastFlow);
+			currentFlow = new CCFlow(&rng, last,current,3,Vec3f(0,0,1000),lastFlow);
 			iterations += currentFlow->iterations;
 			fprintf(stderr,"rotation: %f degrees,\tx: %f\ty: %f\t  %f > %f\t checks: %i avg: %f\n",currentFlow->rotation,currentFlow->translation[0],currentFlow->translation[1],currentFlow->best,currentFlow->worst, currentFlow->iterations, (float)iterations/frame);
 			//vPortEnterCritical();
@@ -272,6 +274,12 @@ void OpenCVslam::run() {
 				cvLine(lastFrame,cvPoint(center.x+200,center.y),cvPoint(center.x+200,center.y-(currentFlow->rotation)*10),CV_RGB(0,0,255),2,8,0);
 				cvLine(lastFrame,cvPoint(center.x-200,center.y),cvPoint(center.x-200,center.y+(currentFlow->rotation)*10),CV_RGB(0,0,255),2,8,0);
 				//fprintf(stderr,".");
+				for (int y = 8; y<Mat(currentFrame).rows; y+=16 ) {
+					for (int x = 8; x<Mat(currentFrame).cols; x+=16 ) {
+						TransRot bla = currentFlow->transrotation(Point2f(x/8,y/8));
+						cvLine(lastFrame,cvPoint(x,y),cvPoint(x+bla[0],y+bla[1]),CV_RGB(0,255,0),1,8,0);
+					}
+				}
 			}
 
 			//IplImage xflow = flow;

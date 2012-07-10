@@ -307,7 +307,7 @@ void CCFlow::gradientMatch(cv::Mat test, cv::Mat reference, int maxcount,TransRo
 	//Mat debug=Mat::ones(20*16,20*16,CV_32FC1);
 	//debug = debug.ones();
 	//fprintf(stderr,"initial, at %f %f %f\n",current[0],current[1],current[2]);
-	while (step[0]>1./16. && maxcount-->0) {
+	while (step[0]>1./8. && maxcount-->0) {
 		Vec4f grad = gradient(test,reference,current);
 		//fprintf(stderr,"gradient is %f %f %f %f \n",grad[0],grad[1],grad[2],grad[3]);
 
@@ -330,7 +330,7 @@ void CCFlow::gradientMatch(cv::Mat test, cv::Mat reference, int maxcount,TransRo
 			combined *= 1.0/length(combined); // normalize
 
 			float success = (grad[0]*prev[0]+grad[1]*prev[1]+grad[2]*prev[2]); // dot product
-			if (success<0) step *= 1.0+(success/2);
+			if (success<0) step *= 1.0+(2*success/3);
 
 
 			current[0] = last[0] + step[0] * combined[0];

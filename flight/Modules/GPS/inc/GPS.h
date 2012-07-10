@@ -39,7 +39,7 @@
 #include "gpsposition.h"
 #include "gpstime.h"
 
-#define	NO_PARSER		-3 // no parser available
+#define	NO_PARSER	-3 // no parser available
 #define	PARSER_OVERRUN	-2 // message buffer overrun before completing the message
 #define	PARSER_ERROR	-1 // message unparsable by this parser
 #define PARSER_INCOMPLETE	0 // parser needs more data to complete the message

@@ -32,6 +32,8 @@
 #include "uavobject.h"
 #include <QStringList>
 #include <QVariant>
+#include <QList>
+#include <QMap>
 
 class UAVObject;
 
@@ -40,10 +42,16 @@ class UAVOBJECTS_EXPORT UAVObjectField: public QObject
     Q_OBJECT
 
 public:
-    typedef enum { INT8 = 0, INT16, INT32, UINT8, UINT16, UINT32, FLOAT32, ENUM, STRING } FieldType;
+    typedef enum { INT8 = 0, INT16, INT32, UINT8, UINT16, UINT32, FLOAT32, ENUM, BITFIELD, STRING } FieldType;
+    typedef enum { EQUAL,NOT_EQUAL,BETWEEN,BIGGER,SMALLER } LimitType;
+    typedef struct
+    {
+        LimitType type;
+        QList<QVariant> values;
+    } LimitStruct;
 
-    UAVObjectField(const QString& name, const QString& units, FieldType type, quint32 numElements, const QStringList& options);
-    UAVObjectField(const QString& name, const QString& units, FieldType type, const QStringList& elementNames, const QStringList& options);
+    UAVObjectField(const QString& name, const QString& units, FieldType type, quint32 numElements, const QStringList& options,const QString& limits=QString());
+    UAVObjectField(const QString& name, const QString& units, FieldType type, const QStringList& elementNames, const QStringList& options,const QString& limits=QString());
     void initialize(quint8* data, quint32 dataOffset, UAVObject* obj);
     UAVObject* getObject();
     FieldType getType();
@@ -62,11 +70,13 @@ public:
     void setDouble(double value, quint32 index = 0);
     quint32 getDataOffset();
     quint32 getNumBytes();
-    quint32 getNumBytesElement();
     bool isNumeric();
     bool isText();
     QString toString();
 
+    bool isWithinLimits(QVariant var, quint32 index);
+    QVariant getMaxLimit(quint32 index);
+    QVariant getMinLimit(quint32 index);
 signals:
     void fieldUpdated(UAVObjectField* field);
 
@@ -81,9 +91,10 @@ protected:
     quint32 offset;
     quint8* data;
     UAVObject* obj;
-
+    QMap<quint32,LimitStruct> elementLimits;
     void clear();
-    void constructorInitialize(const QString& name, const QString& units, FieldType type, const QStringList& elementNames, const QStringList& options);
+    void constructorInitialize(const QString& name, const QString& units, FieldType type, const QStringList& elementNames, const QStringList& options, const QString &limits);
+    void limitsInitialize(const QString &limits);
 
 
 };

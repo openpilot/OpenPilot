@@ -27,6 +27,8 @@
 
 #include "telemetry.h"
 #include "qxtlogger.h"
+#include "pipxsettings.h"
+#include "objectpersistence.h"
 #include <QTime>
 #include <QtGlobal>
 #include <stdlib.h>
@@ -53,11 +55,6 @@ Telemetry::Telemetry(UAVTalk* utalk, UAVObjectManager* objMngr)
     connect(utalk, SIGNAL(transactionCompleted(UAVObject*,bool)), this, SLOT(transactionCompleted(UAVObject*,bool)));
     // Get GCS stats object
     gcsStatsObj = GCSTelemetryStats::GetInstance(objMngr);
-    // Setup transaction timer
-    transPending = false;
-    transTimer = new QTimer(this);
-    transTimer->stop();
-    connect(transTimer, SIGNAL(timeout()), this, SLOT(transactionTimeout()));
     // Setup and start the periodic timer
     timeToNextUpdateMs = 0;
     updateTimer = new QTimer(this);
@@ -66,6 +63,12 @@ Telemetry::Telemetry(UAVTalk* utalk, UAVObjectManager* objMngr)
     // Setup and start the stats timer
     txErrors = 0;
     txRetries = 0;
+}
+
+Telemetry::~Telemetry()
+{
+    for (QMap<quint32, ObjectTransactionInfo*>::iterator itr = transMap.begin(); itr != transMap.end(); ++itr)
+        delete itr.value();
 }
 
 /**
@@ -77,7 +80,7 @@ void Telemetry::registerObject(UAVObject* obj)
     addObject(obj);
 
     // Setup object for telemetry updates
-    updateObject(obj);
+    updateObject(obj, EV_NONE);
 }
 
 /**
@@ -142,6 +145,10 @@ void Telemetry::connectToObjectInstances(UAVObject* obj, quint32 eventMask)
         {
             connect(objs[n], SIGNAL(objectUpdatedManual(UAVObject*)), this, SLOT(objectUpdatedManual(UAVObject*)));
         }
+        if ( (eventMask&EV_UPDATED_PERIODIC) != 0)
+        {
+            connect(objs[n], SIGNAL(objectUpdatedPeriodic(UAVObject*)), this, SLOT(objectUpdatedPeriodic(UAVObject*)));
+        }
         if ( (eventMask&EV_UPDATE_REQ) != 0)
         {
             connect(objs[n], SIGNAL(updateRequested(UAVObject*)), this, SLOT(updateRequested(UAVObject*)));
@@ -152,26 +159,27 @@ void Telemetry::connectToObjectInstances(UAVObject* obj, quint32 eventMask)
 /**
  * Update an object based on its metadata properties
  */
-void Telemetry::updateObject(UAVObject* obj)
+void Telemetry::updateObject(UAVObject* obj, quint32 eventType)
 {
     // Get metadata
     UAVObject::Metadata metadata = obj->getMetadata();
+    UAVObject::UpdateMode updateMode = UAVObject::GetGcsTelemetryUpdateMode(metadata);
 
     // Setup object depending on update mode
     qint32 eventMask;
-    if ( metadata.gcsTelemetryUpdateMode == UAVObject::UPDATEMODE_PERIODIC )
+    if ( updateMode == UAVObject::UPDATEMODE_PERIODIC )
     {
         // Set update period
         setUpdatePeriod(obj, metadata.gcsTelemetryUpdatePeriod);
         // Connect signals for all instances
-        eventMask = EV_UPDATED_MANUAL | EV_UPDATE_REQ;
+        eventMask = EV_UPDATED_MANUAL | EV_UPDATE_REQ | EV_UPDATED_PERIODIC;
         if( dynamic_cast<UAVMetaObject*>(obj) != NULL )
         {
             eventMask |= EV_UNPACKED; // we also need to act on remote updates (unpack events)
         }
         connectToObjectInstances(obj, eventMask);
     }
-    else if ( metadata.gcsTelemetryUpdateMode == UAVObject::UPDATEMODE_ONCHANGE )
+    else if ( updateMode == UAVObject::UPDATEMODE_ONCHANGE )
     {
         // Set update period
         setUpdatePeriod(obj, 0);
@@ -183,7 +191,29 @@ void Telemetry::updateObject(UAVObject* obj)
         }
         connectToObjectInstances(obj, eventMask);
     }
-    else if ( metadata.gcsTelemetryUpdateMode == UAVObject::UPDATEMODE_MANUAL )
+    else if ( updateMode == UAVObject::UPDATEMODE_THROTTLED )
+    {
+        // If we received a periodic update, we can change back to update on change
+	if ((eventType == EV_UPDATED_PERIODIC) || (eventType == EV_NONE)) {
+            // Set update period
+            if (eventType == EV_NONE)
+                 setUpdatePeriod(obj, metadata.gcsTelemetryUpdatePeriod);
+            // Connect signals for all instances
+	    eventMask = EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ | EV_UPDATED_PERIODIC;
+	}
+	else
+	{
+            // Otherwise, we just received an object update, so switch to periodic for the timeout period to prevent more updates
+            // Connect signals for all instances
+            eventMask = EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ;
+	}
+        if( dynamic_cast<UAVMetaObject*>(obj) != NULL )
+        {
+           eventMask |= EV_UNPACKED; // we also need to act on remote updates (unpack events)
+        }
+        connectToObjectInstances(obj, eventMask);
+    }
+    else if ( updateMode == UAVObject::UPDATEMODE_MANUAL )
     {
         // Set update period
         setUpdatePeriod(obj, 0);
@@ -195,13 +225,6 @@ void Telemetry::updateObject(UAVObject* obj)
         }
         connectToObjectInstances(obj, eventMask);
     }
-    else if ( metadata.gcsTelemetryUpdateMode == UAVObject::UPDATEMODE_NEVER )
-    {
-        // Set update period
-        setUpdatePeriod(obj, 0);
-        // Disconnect from object
-        connectToObjectInstances(obj, 0);
-    }
 }
 
 /**
@@ -209,84 +232,81 @@ void Telemetry::updateObject(UAVObject* obj)
  */
 void Telemetry::transactionCompleted(UAVObject* obj, bool success)
 {
-    // Check if there is a pending transaction and the objects match
-    if ( transPending && transInfo.obj->getObjID() == obj->getObjID() )
+    // Lookup the transaction in the transaction map.
+    quint32 objId = obj->getObjID();
+    QMap<quint32, ObjectTransactionInfo*>::iterator itr = transMap.find(objId);
+    if ( itr != transMap.end() )
     {
-    //    qDebug() << QString("Telemetry: transaction completed for %1").arg(obj->getName());
-        // Complete transaction
-        transTimer->stop();
-        transPending = false;
+	ObjectTransactionInfo *transInfo = itr.value();
+        // Remove this transaction as it's complete.
+	transInfo->timer->stop();
+	transMap.remove(objId);
+	delete transInfo;
         // Send signal
         obj->emitTransactionCompleted(success);
         // Process new object updates from queue
         processObjectQueue();
     } else
     {
-  //      qDebug() << "Error: received a transaction completed when did not expect it.";
+	qDebug() << "Error: received a transaction completed when did not expect it.";
     }
 }
 
 /**
  * Called when a transaction is not completed within the timeout period (timer event)
  */
-void Telemetry::transactionTimeout()
+void Telemetry::transactionTimeout(ObjectTransactionInfo *transInfo)
 {
-//    qDebug() << "Telemetry: transaction timeout.";
-    transTimer->stop();
-    // Proceed only if there is a pending transaction
-    if ( transPending )
+    transInfo->timer->stop();
+    // Check if more retries are pending
+    if (transInfo->retriesRemaining > 0)
     {
-        // Check if more retries are pending
-        if (transInfo.retriesRemaining > 0)
-        {
-            --transInfo.retriesRemaining;
-            processObjectTransaction();
-            ++txRetries;
-        }
-        else
-        {
-            // Terminate transaction
-            utalk->cancelTransaction();
-            transPending = false;
-            // Send signal
-            transInfo.obj->emitTransactionCompleted(false);
-            // Process new object updates from queue
-            processObjectQueue();
-            ++txErrors;
-        }
+        --transInfo->retriesRemaining;
+        processObjectTransaction(transInfo);
+        ++txRetries;
+    }
+    else
+    {
+	// Stop the timer.
+	transInfo->timer->stop();
+        // Terminate transaction
+        utalk->cancelTransaction(transInfo->obj);
+        // Send signal
+        transInfo->obj->emitTransactionCompleted(false);
+        // Remove this transaction as it's complete.
+	transMap.remove(transInfo->obj->getObjID());
+	delete transInfo;
+	// Process new object updates from queue
+        processObjectQueue();
+        ++txErrors;
     }
 }
 
 /**
  * Start an object transaction with UAVTalk, all information is stored in transInfo
  */
-void Telemetry::processObjectTransaction()
+void Telemetry::processObjectTransaction(ObjectTransactionInfo *transInfo)
 {
-    if (transPending)
+
+    // Initiate transaction
+    if (transInfo->objRequest)
     {
-    //    qDebug() << tr("Process Object transaction for %1").arg(transInfo.obj->getName());
-        // Initiate transaction
-        if (transInfo.objRequest)
-        {
-            utalk->sendObjectRequest(transInfo.obj, transInfo.allInstances);
-        }
-        else
-        {
-            utalk->sendObject(transInfo.obj, transInfo.acked, transInfo.allInstances);
-        }
-        // Start timer if a response is expected
-        if ( transInfo.objRequest || transInfo.acked )
-        {
-            transTimer->start(REQ_TIMEOUT_MS);
-        }
-        else
-        {
-            transTimer->stop();
-            transPending = false;
-        }
-    } else
+        utalk->sendObjectRequest(transInfo->obj, transInfo->allInstances);
+    }
+    else
     {
-  //      qDebug() << "Error: inside of processObjectTransaction with no transPending";
+        utalk->sendObject(transInfo->obj, transInfo->acked, transInfo->allInstances);
+    }
+    // Start timer if a response is expected
+    if ( transInfo->objRequest || transInfo->acked )
+    {
+        transInfo->timer->start(REQ_TIMEOUT_MS);
+    }
+    else
+    {
+        // Otherwise, remove this transaction as it's complete.
+	transMap.remove(transInfo->obj->getObjID());
+	delete transInfo;
     }
 }
 
@@ -296,7 +316,6 @@ void Telemetry::processObjectTransaction()
 void Telemetry::processObjectUpdates(UAVObject* obj, EventMask event, bool allInstances, bool priority)
 {
     // Push event into queue
-//    qDebug() << "Push event into queue for obj " << QString("%1 event %2").arg(obj->getName()).arg(event);
     ObjectQueueInfo objInfo;
     objInfo.obj = obj;
     objInfo.event = event;
@@ -327,15 +346,8 @@ void Telemetry::processObjectUpdates(UAVObject* obj, EventMask event, bool allIn
         }
     }
 
-    // If there is no transaction in progress then process event
-    if (!transPending)
-    {
-    //    qDebug() << "No transaction pending, process object queue...";
-        processObjectQueue();
-    } else
-    {
-   //     qDebug() << "Transaction pending, DO NOT process object queue...";
-    }
+    // Process the transaction
+    processObjectQueue();
 }
 
 /**
@@ -343,15 +355,6 @@ void Telemetry::processObjectUpdates(UAVObject* obj, EventMask event, bool allIn
  */
 void Telemetry::processObjectQueue()
 {
-  //  qDebug() << "Process object queue " << tr("- Depth (%1 %2)").arg(objQueue.length()).arg(objPriorityQueue.length());
-
-    // Don nothing if a transaction is already in progress (should not happen)
-    if (transPending)
-    {
-        qxtLog->error("Telemetry: Dequeue while a transaction pending!");
-        return;
-    }
-
     // Get object information from queue (first the priority and then the regular queue)
     ObjectQueueInfo objInfo;
     if ( !objPriorityQueue.isEmpty() )
@@ -373,7 +376,7 @@ void Telemetry::processObjectQueue()
     if ( gcsStats.Status != GCSTelemetryStats::STATUS_CONNECTED )
     {
         objQueue.clear();
-        if ( objInfo.obj->getObjID() != GCSTelemetryStats::OBJID )
+        if ( objInfo.obj->getObjID() != GCSTelemetryStats::OBJID && objInfo.obj->getObjID() != PipXSettings::OBJID  && objInfo.obj->getObjID() != ObjectPersistence::OBJID )
         {
             objInfo.obj->emitTransactionCompleted(false);
             return;
@@ -381,34 +384,39 @@ void Telemetry::processObjectQueue()
     }
 
     // Setup transaction (skip if unpack event)
-    if ( objInfo.event != EV_UNPACKED )
+    UAVObject::Metadata metadata = objInfo.obj->getMetadata();
+    UAVObject::UpdateMode updateMode = UAVObject::GetGcsTelemetryUpdateMode(metadata);
+    if ( ( objInfo.event != EV_UNPACKED ) && ( ( objInfo.event != EV_UPDATED_PERIODIC ) || ( updateMode != UAVObject::UPDATEMODE_THROTTLED ) ) )
     {
         UAVObject::Metadata metadata = objInfo.obj->getMetadata();
-        transInfo.obj = objInfo.obj;
-        transInfo.allInstances = objInfo.allInstances;
-        transInfo.retriesRemaining = MAX_RETRIES;
-        transInfo.acked = metadata.gcsTelemetryAcked;
-        if ( objInfo.event == EV_UPDATED || objInfo.event == EV_UPDATED_MANUAL )
+        ObjectTransactionInfo *transInfo = new ObjectTransactionInfo(this);
+        transInfo->obj = objInfo.obj;
+        transInfo->allInstances = objInfo.allInstances;
+        transInfo->retriesRemaining = MAX_RETRIES;
+        transInfo->acked = UAVObject::GetGcsTelemetryAcked(metadata);
+        if ( objInfo.event == EV_UPDATED || objInfo.event == EV_UPDATED_MANUAL || objInfo.event == EV_UPDATED_PERIODIC )
         {
-            transInfo.objRequest = false;
+            transInfo->objRequest = false;
         }
         else if ( objInfo.event == EV_UPDATE_REQ )
         {
-            transInfo.objRequest = true;
+            transInfo->objRequest = true;
         }
-        // Start transaction
-        transPending = true;
-        processObjectTransaction();
-    } else
-    {
-//        qDebug() << QString("Process object queue: this is an unpack event for %1").arg(objInfo.obj->getName());
+        transInfo->telem = this;
+        // Insert the transaction into the transaction map.
+        transMap.insert(objInfo.obj->getObjID(), transInfo);
+        processObjectTransaction(transInfo);
     }
 
     // If this is a metaobject then make necessary telemetry updates
     UAVMetaObject* metaobj = dynamic_cast<UAVMetaObject*>(objInfo.obj);
     if ( metaobj != NULL )
     {
-        updateObject( metaobj->getParentObject() );
+        updateObject( metaobj->getParentObject(), EV_NONE );
+    }
+    else if ( updateMode != UAVObject::UPDATEMODE_THROTTLED )
+    {
+        updateObject( objInfo.obj, objInfo.event );
     }
 
     // The fact we received an unpacked event does not mean that
@@ -417,7 +425,6 @@ void Telemetry::processObjectQueue()
     // stuck:
     if ( objInfo.event == EV_UNPACKED )
         processObjectQueue();
-
 }
 
 /**
@@ -453,7 +460,7 @@ void Telemetry::processPeriodicUpdates()
                 objinfo->timeToNextUpdateMs = objinfo->updatePeriodMs - offset;
                 // Send object
                 time.start();
-                processObjectUpdates(objinfo->obj, EV_UPDATED_MANUAL, true, false);
+                processObjectUpdates(objinfo->obj, EV_UPDATED_PERIODIC, true, false);
                 elapsedMs = time.elapsed();
                 // Update timeToNextUpdateMs with the elapsed delay of sending the object;
                 timeToNextUpdateMs += elapsedMs;
@@ -522,6 +529,12 @@ void Telemetry::objectUpdatedManual(UAVObject* obj)
     processObjectUpdates(obj, EV_UPDATED_MANUAL, false, true);
 }
 
+void Telemetry::objectUpdatedPeriodic(UAVObject* obj)
+{
+    QMutexLocker locker(mutex);
+    processObjectUpdates(obj, EV_UPDATED_PERIODIC, false, true);
+}
+
 void Telemetry::objectUnpacked(UAVObject* obj)
 {
     QMutexLocker locker(mutex);
@@ -546,6 +559,29 @@ void Telemetry::newInstance(UAVObject* obj)
     registerObject(obj);
 }
 
+ObjectTransactionInfo::ObjectTransactionInfo(QObject* parent):QObject(parent)
+{
+    obj = 0;
+    allInstances = false;
+    objRequest = false;
+    retriesRemaining = 0;
+    acked = false;
+    telem = 0;
+    // Setup transaction timer
+    timer = new QTimer(this);
+    timer->stop();
+    connect(timer, SIGNAL(timeout()), this, SLOT(timeout()));
+}
 
+ObjectTransactionInfo::~ObjectTransactionInfo()
+{
+    telem = 0;
+    timer->stop();
+    delete timer;
+}
 
-
+void ObjectTransactionInfo::timeout()
+{
+    if (!telem.isNull())
+        telem->transactionTimeout(this);
+}

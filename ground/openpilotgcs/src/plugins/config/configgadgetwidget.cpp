@@ -25,17 +25,19 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "configahrswidget.h"
 #include "configgadgetwidget.h"
 
-#include "configairframewidget.h"
+#include "configvehicletypewidget.h"
 #include "configccattitudewidget.h"
 #include "configinputwidget.h"
 #include "configoutputwidget.h"
 #include "configstabilizationwidget.h"
 #include "configcamerastabilizationwidget.h"
+#include "configtxpidwidget.h"
 #include "config_pro_hw_widget.h"
 #include "config_cc_hw_widget.h"
+#include "configpipxtremewidget.h"
+#include "configrevowidget.h"
 #include "defaultattitudewidget.h"
 #include "defaulthwsettingswidget.h"
 #include "uavobjectutilmanager.h"
@@ -67,7 +69,7 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     qwd = new DefaultHwSettingsWidget(this);
     ftw->insertTab(ConfigGadgetWidget::hardware, qwd, QIcon(":/configgadget/images/hw_config.png"), QString("HW Settings"));
 
-    qwd = new ConfigAirframeWidget(this);
+    qwd = new ConfigVehicleTypeWidget(this);
     ftw->insertTab(ConfigGadgetWidget::aircraft, qwd, QIcon(":/configgadget/images/Airframe.png"), QString("Aircraft"));
 
     qwd = new ConfigInputWidget(this);
@@ -77,7 +79,7 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     ftw->insertTab(ConfigGadgetWidget::output, qwd, QIcon(":/configgadget/images/Servo.png"), QString("Output"));
 
     qwd = new DefaultAttitudeWidget(this);
-    ftw->insertTab(ConfigGadgetWidget::ins, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("INS"));
+    ftw->insertTab(ConfigGadgetWidget::sensors, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("INS"));
 
     qwd = new ConfigStabilizationWidget(this);
     ftw->insertTab(ConfigGadgetWidget::stabilization, qwd, QIcon(":/configgadget/images/gyroscope.png"), QString("Stabilization"));
@@ -85,9 +87,8 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     qwd = new ConfigCameraStabilizationWidget(this);
     ftw->insertTab(ConfigGadgetWidget::camerastabilization, qwd, QIcon(":/configgadget/images/camera.png"), QString("Camera Stab"));
 
-
-//    qwd = new ConfigPipXtremeWidget(this);
-//    ftw->insertTab(5, qwd, QIcon(":/configgadget/images/PipXtreme.png"), QString("PipXtreme"));
+    qwd = new ConfigTxPIDWidget(this);
+    ftw->insertTab(ConfigGadgetWidget::txpid, qwd, QIcon(":/configgadget/images/txpid.png"), QString("TxPID"));
 
     // *********************
     // Listen to autopilot connection events
@@ -104,6 +105,19 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     help = 0;
     connect(ftw,SIGNAL(currentAboutToShow(int,bool*)),this,SLOT(tabAboutToChange(int,bool*)));//,Qt::BlockingQueuedConnection);
 
+    // Connect to the PipXStatus object updates
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    pipxStatusObj = dynamic_cast<UAVDataObject*>(objManager->getObject("PipXStatus"));
+    if (pipxStatusObj != NULL ) {
+        connect(pipxStatusObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updatePipXStatus(UAVObject*)));
+    } else {
+	qDebug() << "Error: Object is unknown (PipXStatus).";
+    }
+
+    // Create the timer that is used to timeout the connection to the PipX.
+    pipxTimeout = new QTimer(this);
+    connect(pipxTimeout, SIGNAL(timeout()),this,SLOT(onPipxtremeDisconnect()));
+    pipxConnected = false;
 }
 
 ConfigGadgetWidget::~ConfigGadgetWidget()
@@ -121,9 +135,9 @@ void ConfigGadgetWidget::resizeEvent(QResizeEvent *event)
 
 void ConfigGadgetWidget::onAutopilotDisconnect() {
     ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
-    ftw->removeTab(ConfigGadgetWidget::ins);
+    ftw->removeTab(ConfigGadgetWidget::sensors);
     QWidget *qwd = new DefaultAttitudeWidget(this);
-    ftw->insertTab(ConfigGadgetWidget::ins, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("INS"));
+    ftw->insertTab(ConfigGadgetWidget::sensors, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("INS"));
     ftw->removeTab(ConfigGadgetWidget::hardware);
     qwd = new DefaultHwSettingsWidget(this);
     ftw->insertTab(ConfigGadgetWidget::hardware, qwd, QIcon(":/configgadget/images/hw_config.png"), QString("HW Settings"));
@@ -141,24 +155,36 @@ void ConfigGadgetWidget::onAutopilotConnect() {
     UAVObjectUtilManager* utilMngr = pm->getObject<UAVObjectUtilManager>();
     if (utilMngr) {
         int board = utilMngr->getBoardModel();
-        qDebug() << "Board model: " << board;
         if ((board & 0xff00) == 1024) {
             // CopterControl family
             // Delete the INS panel, replace with CC Panel:
             ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
-            ftw->removeTab(ConfigGadgetWidget::ins);
+            ftw->removeTab(ConfigGadgetWidget::sensors);
             QWidget *qwd = new ConfigCCAttitudeWidget(this);
-            ftw->insertTab(ConfigGadgetWidget::ins, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("Attitude"));
+            ftw->insertTab(ConfigGadgetWidget::sensors, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("Attitude"));
             ftw->removeTab(ConfigGadgetWidget::hardware);
             qwd = new ConfigCCHWWidget(this);
             ftw->insertTab(ConfigGadgetWidget::hardware, qwd, QIcon(":/configgadget/images/hw_config.png"), QString("HW Settings"));
             ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
         } else if ((board & 0xff00) == 256 ) {
             // Mainboard family
+            Q_ASSERT(0);
+            /*
             ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
-            ftw->removeTab(ConfigGadgetWidget::ins);
+            ftw->removeTab(ConfigGadgetWidget::sensors);
             QWidget *qwd = new ConfigAHRSWidget(this);
-            ftw->insertTab(ConfigGadgetWidget::ins, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("INS"));
+            ftw->insertTab(ConfigGadgetWidget::sensors, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("INS"));
+            ftw->removeTab(ConfigGadgetWidget::hardware);
+            qwd = new ConfigProHWWidget(this);
+            ftw->insertTab(ConfigGadgetWidget::hardware, qwd, QIcon(":/configgadget/images/hw_config.png"), QString("HW Settings"));
+            ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
+            */
+        } else if ((board & 0xff00) == 0x0900) {
+            // Revolution sensor calibration
+            ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
+            ftw->removeTab(ConfigGadgetWidget::sensors);
+            QWidget *qwd = new ConfigRevoWidget(this);
+            ftw->insertTab(ConfigGadgetWidget::sensors, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("Revo"));
             ftw->removeTab(ConfigGadgetWidget::hardware);
             qwd = new ConfigProHWWidget(this);
             ftw->insertTab(ConfigGadgetWidget::hardware, qwd, QIcon(":/configgadget/images/hw_config.png"), QString("HW Settings"));
@@ -187,5 +213,27 @@ void ConfigGadgetWidget::tabAboutToChange(int i,bool * proceed)
     }
 }
 
+/*!
+  \brief Called by updates to @PipXStatus
+  */
+void ConfigGadgetWidget::updatePipXStatus(UAVObject *object)
+{
 
+	// Restart the disconnection timer.
+	pipxTimeout->start(5000);
+	if (!pipxConnected)
+	{
+		qDebug()<<"ConfigGadgetWidget onPipxtremeConnect";
+		QWidget *qwd = new ConfigPipXtremeWidget(this);
+		ftw->insertTab(ConfigGadgetWidget::pipxtreme, qwd, QIcon(":/configgadget/images/PipXtreme.png"), QString("PipXtreme"));
+		ftw->setCurrentIndex(ConfigGadgetWidget::pipxtreme);
+		pipxConnected = true;
+	}
+}
 
+void ConfigGadgetWidget::onPipxtremeDisconnect() {
+	qDebug()<<"ConfigGadgetWidget onPipxtremeDisconnect";
+	pipxTimeout->stop();
+	ftw->removeTab(ConfigGadgetWidget::pipxtreme);
+	pipxConnected = false;
+}

@@ -31,49 +31,60 @@
 
 #include <QAbstractTableModel>
 #include <QList>
-#include "notifypluginconfiguration.h"
+#include "notificationitem.h"
+
+enum ColumnNames { eMessageName, eRepeatValue, eExpireTimer, eTurnOn };
 
 class NotifyTableModel : public QAbstractTableModel
 {
-	Q_OBJECT
-  public:
-	NotifyTableModel(QList<NotifyPluginConfiguration*> *parentList, const QStringList& parentHeaderList, QObject *parent = 0)
-		 : QAbstractTableModel(parent),
-		  _list(parentList),
-		  headerStrings(parentHeaderList)
-	{ }
+    Q_OBJECT
 
-	int rowCount(const QModelIndex &parent = QModelIndex()) const
-	{
-		return _list->count();
-	}
+    enum {eColumnCount = 4 };
 
-	int columnCount(const QModelIndex &/*parent*/) const
-	{
-		return 3;
-	}
+public:
 
-	Qt::ItemFlags flags(const QModelIndex &index) const
-	{
-		if (!index.isValid())
-			return Qt::ItemIsEnabled;
+    NotifyTableModel(QList<NotificationItem*>& parentList, QObject* parent = 0);
+    int rowCount(const QModelIndex& parent = QModelIndex()) const
+    {
+        return _list.count();
+    }
 
-		return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
-	}
+    int columnCount(const QModelIndex &/*parent*/) const
+    {
+        return eColumnCount;
+    }
 
-	bool setData(const QModelIndex &index, const QVariant &value, int role);
-	QVariant data(const QModelIndex &index, int role) const;
-	QVariant headerData(int section, Qt::Orientation orientation, int role) const;
-	bool insertRows(int position, int rows, const QModelIndex &index);
-	bool removeRows(int position, int rows, const QModelIndex &index);
+    Qt::ItemFlags flags(const QModelIndex &index) const
+    {
+        if (!index.isValid())
+            return Qt::ItemIsEnabled | Qt::ItemIsDropEnabled;
+
+        return QAbstractItemModel::flags(index) | Qt::ItemIsEditable | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
+    }
+    QStringList mimeTypes() const;
+    Qt::DropActions supportedDropActions() const;
+    bool dropMimeData( const QMimeData * data, Qt::DropAction action, int row,
+                                       int column, const QModelIndex& parent);
+    QMimeData* mimeData(const QModelIndexList &indexes) const;
+
+
+    bool setData(const QModelIndex &index, const QVariant &value, int role);
+    QVariant data(const QModelIndex &index, int role) const;
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const;
+    bool insertRows(int position, int rows, const QModelIndex &index);
+    bool removeRows(int position, int rows, const QModelIndex &index);
+    void entryAdded(NotificationItem* item);
+
+signals:
+    void dragRows(int position, int count);
 
 private slots:
-	void entryUpdated(int offset);
-	void entryAdded(int position);
-private:
-	QList<NotifyPluginConfiguration*> *_list;
-	QStringList headerStrings;
-};
+    void entryUpdated(int offset);
+    void dropRows(int position, int count) const;
 
+private:
+    QList<NotificationItem*>& _list;
+    QStringList _headerStrings;
+};
 
 #endif // NOTIFYTABLEMODEL_H

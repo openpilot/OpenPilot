@@ -57,16 +57,17 @@ typedef struct {
     QStringList options; // for enums only
     bool defaultElementNames;
     QStringList defaultValues;
+    QString limitValues;
 } FieldInfo;
 
 /**
  * Object update mode
  */
 typedef enum {
-    UPDATEMODE_PERIODIC = 0, /** Automatically update object at periodic intervals */
-    UPDATEMODE_ONCHANGE, /** Only update object when its data changes */
-    UPDATEMODE_MANUAL,  /** Manually update object, by calling the updated() function */
-    UPDATEMODE_NEVER /** Object is never updated */
+    UPDATEMODE_MANUAL =    0, /** Manually update object, by calling the updated() function */
+    UPDATEMODE_PERIODIC =  1, /** Automatically update object at periodic intervals */
+    UPDATEMODE_ONCHANGE  = 2, /** Only update object when its data changes */
+    UPDATEMODE_THROTTLED = 3  /** Object is updated on change, but not more often than the interval time */
 } UpdateMode;
 
 
@@ -95,6 +96,7 @@ typedef struct  {
     int loggingUpdatePeriod; /** Update period used by the logging module (only if logging mode is PERIODIC) */
     QList<FieldInfo*> fields; /** The data fields for the object **/
     QString description; /** Description used for Doxygen **/
+    QString category; /** Description used for Doxygen **/
 } ObjectInfo;
 
 class UAVObjectParser
@@ -126,6 +128,7 @@ private:
     QString processObjectFields(QDomNode& childNode, ObjectInfo* info);
     QString processObjectAccess(QDomNode& childNode, ObjectInfo* info);
     QString processObjectDescription(QDomNode& childNode, QString * description);
+    QString processObjectCategory(QDomNode& childNode, QString * category);
     QString processObjectMetadata(QDomNode& childNode, UpdateMode* mode, int* period, bool* acked);
     void calculateID(ObjectInfo* info);
     quint32 updateHash(quint32 value, quint32 hash);

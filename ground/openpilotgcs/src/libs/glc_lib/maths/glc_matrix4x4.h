@@ -278,17 +278,6 @@ the matrix :
 
 };
 
-//! Return the determinant of the given Matrix 3X3
-inline double getDeterminant3x3(const double *Mat3x3)
-{
-	double Determinant;
-
-	Determinant= Mat3x3[0] * ( Mat3x3[4] * Mat3x3[8] - Mat3x3[7] * Mat3x3[5]);
-	Determinant+= - Mat3x3[3] * ( Mat3x3[1] * Mat3x3[8] - Mat3x3[7] * Mat3x3[2]);
-	Determinant+= Mat3x3[6] * ( Mat3x3[1] * Mat3x3[5] - Mat3x3[4] * Mat3x3[2]);
-
-	return Determinant;
-}
 
 //////////////////////////////////////////////////////////////////////
 // Constructor/Destructor

@@ -121,6 +121,9 @@ public:
 	//! Return materials Set of this 3DRep
 	QSet<GLC_Material*> materialSet() const;
 
+	//! Return the volume of this 3DRep
+	double volume() const;
+
 //@}
 
 //////////////////////////////////////////////////////////////////////
@@ -168,6 +171,8 @@ public:
 	//! Transform 3DRep sub mesh vertice with the given matrix
 	void transformSubGeometries(const GLC_Matrix4x4& matrix);
 
+	//! Set VBO usage
+	void setVboUsage(bool usage);
 
 //@}
 

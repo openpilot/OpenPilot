@@ -29,7 +29,7 @@
 #include "configoutputwidget.h"
 
 OutputChannelForm::OutputChannelForm(const int index, QWidget *parent, const bool showLegend) :
-        QWidget(parent),
+        ConfigTaskWidget(parent),
         ui(),
         m_index(index),
         m_inChannelTest(false)
@@ -70,6 +70,8 @@ OutputChannelForm::OutputChannelForm(const int index, QWidget *parent, const boo
     ui.actuatorLink->setChecked(false);
     connect(ui.actuatorLink, SIGNAL(toggled(bool)),
             this, SLOT(linkToggled(bool)));
+
+    disableMouseWheelEvents();
 }
 
 OutputChannelForm::~OutputChannelForm()
@@ -185,6 +187,18 @@ void OutputChannelForm::neutral(int value)
 void OutputChannelForm::setAssignment(const QString &assignment)
 {
     ui.actuatorName->setText(assignment);
+    QFontMetrics metrics(ui.actuatorName->font());
+    int width=metrics.width(assignment)+1;
+    foreach(OutputChannelForm * form,parent()->findChildren<OutputChannelForm*>())
+    {
+        if(form==this)
+            continue;
+        if(form->ui.actuatorName->minimumSize().width()<width)
+            form->ui.actuatorName->setMinimumSize(width,0);
+        else
+            width=form->ui.actuatorName->minimumSize().width();
+    }
+    ui.actuatorName->setMinimumSize(width,0);
 }
 
 /**

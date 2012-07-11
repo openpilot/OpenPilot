@@ -52,11 +52,10 @@
 
 #include "ahrs_comms.h"
 #include "ahrs_spi_comm.h"
-#include "ahrsstatus.h"
-#include "ahrscalibration.h"
+#include "insstatus.h"
 
 // Private constants
-#define STACK_SIZE configMINIMAL_STACK_SIZE-128
+#define STACK_SIZE configMINIMAL_STACK_SIZE
 #define TASK_PRIORITY (tskIDLE_PRIORITY+4)
 
 // Private types
@@ -87,9 +86,10 @@ int32_t AHRSCommsStart(void)
  */
 int32_t AHRSCommsInitialize(void)
 {
-	AhrsStatusInitialize();
-	AHRSCalibrationInitialize();
+	InsStatusInitialize();
+	InsSettingsInitialize();
 	AttitudeRawInitialize();
+	AttitudeActualInitialize();
 	VelocityActualInitialize();
 	PositionActualInitialize();
 
@@ -109,19 +109,17 @@ static void ahrscommsTask(void *parameters)
 	// Main task loop
 	while (1) {
 		PIOS_WDG_UpdateFlag(PIOS_WDG_AHRS);
+		AhrsCommStatus stat;
 		
-		AHRSSettingsData settings;
-		AHRSSettingsGet(&settings);
-
 		AhrsSendObjects();
-		AhrsCommStatus stat = AhrsGetStatus();
+		AhrsGetStatus(&stat);
 		if (stat.linkOk) {
 			AlarmsClear(SYSTEMALARMS_ALARM_AHRSCOMMS);
 		} else {
 			AlarmsSet(SYSTEMALARMS_ALARM_AHRSCOMMS, SYSTEMALARMS_ALARM_WARNING);
 		}
-		AhrsStatusData sData;
-		AhrsStatusGet(&sData);
+		InsStatusData sData;
+		InsStatusGet(&sData);
 
 		sData.LinkRunning = stat.linkOk;
 		sData.AhrsKickstarts = stat.remote.kickStarts;
@@ -132,9 +130,9 @@ static void ahrscommsTask(void *parameters)
 		sData.OpRetries = stat.local.retries;
 		sData.OpInvalidPackets = stat.local.invalidPacket;
 
-		AhrsStatusSet(&sData);
+		InsStatusSet(&sData);
 		/* Wait for the next update interval */
-		vTaskDelayUntil(&lastSysTime, settings.UpdatePeriod / portTICK_RATE_MS);
+		vTaskDelayUntil(&lastSysTime, 2 / portTICK_RATE_MS);
 
 	}
 }

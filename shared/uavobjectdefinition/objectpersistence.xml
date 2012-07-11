@@ -1,13 +1,13 @@
 <xml>
     <object name="ObjectPersistence" singleinstance="true" settings="false">
         <description>Someone who knows please enter this</description>
-        <field name="Operation" units="" type="enum" elements="1" options="NOP,Load,Save,Delete,FullErase,Completed"/>
+        <field name="Operation" units="" type="enum" elements="1" options="NOP,Load,Save,Delete,FullErase,Completed,Error"/>
         <field name="Selection" units="" type="enum" elements="1" options="SingleObject,AllSettings,AllMetaObjects,AllObjects"/>
         <field name="ObjectID" units="" type="uint32" elements="1"/>
         <field name="InstanceID" units="" type="uint32" elements="1"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="manual" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>
-        <logging updatemode="never" period="0"/>
+        <logging updatemode="manual" period="0"/>
     </object>
 </xml>

@@ -23,40 +23,16 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+/* Pull in the board-specific static HW definitions.
+ * Including .c files is a bit ugly but this allows all of
+ * the HW definitions to be const and static to limit their
+ * scope.  
+ *
+ * NOTE: THIS IS THE ONLY PLACE THAT SHOULD EVER INCLUDE THIS FILE
+ */
+#include "board_hw_defs.c"
+#include <pios_board_info.h>
 #include <pios.h>
-
-// ***********************************************************************************
-
-#if defined(PIOS_INCLUDE_COM)
-
-#include <pios_com_priv.h>
-
-#define PIOS_COM_TELEM_USB_RX_BUF_LEN 192
-#define PIOS_COM_TELEM_USB_TX_BUF_LEN 192
-
-static uint8_t pios_com_telem_usb_rx_buffer[PIOS_COM_TELEM_USB_RX_BUF_LEN];
-static uint8_t pios_com_telem_usb_tx_buffer[PIOS_COM_TELEM_USB_TX_BUF_LEN];
-
-#endif /* PIOS_INCLUDE_COM */
-
-// ***********************************************************************************
-
-#if defined(PIOS_INCLUDE_USB_HID)
-#include "pios_usb_hid_priv.h"
-
-static const struct pios_usb_hid_cfg pios_usb_hid_main_cfg = {
-  .irq = {
-    .init    = {
-      .NVIC_IRQChannel                   = USB_LP_CAN1_RX0_IRQn,
-      .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
-      .NVIC_IRQChannelSubPriority        = 0,
-      .NVIC_IRQChannelCmd                = ENABLE,
-    },
-  },
-};
-#endif	/* PIOS_INCLUDE_USB_HID */
-
-extern const struct pios_com_driver pios_usb_com_driver;
 
 uint32_t pios_com_telem_usb_id;
 
@@ -83,21 +59,49 @@ void PIOS_Board_Init(void) {
 	/* Initialize the PiOS library */
 	PIOS_GPIO_Init();
 
-#if defined(PIOS_INCLUDE_USB_HID)
+	const struct pios_board_info * bdinfo = &pios_board_info_blob;
+	
+#if defined(PIOS_INCLUDE_LED)
+	const struct pios_led_cfg * led_cfg = PIOS_BOARD_HW_DEFS_GetLedCfg(bdinfo->board_rev);
+	PIOS_Assert(led_cfg);
+	PIOS_LED_Init(led_cfg);
+#endif	/* PIOS_INCLUDE_LED */
+
+#if defined(PIOS_INCLUDE_USB)
+	/* Initialize board specific USB data */
+	PIOS_USB_BOARD_DATA_Init();
+
+	/* Activate the HID-only USB configuration */
+	PIOS_USB_DESC_HID_ONLY_Init();
+
+	uint32_t pios_usb_id;
+	switch(bdinfo->board_rev) {
+		case BOARD_REVISION_CC:
+			PIOS_USB_Init(&pios_usb_id, &pios_usb_main_cfg_cc);
+			break;
+		case BOARD_REVISION_CC3D:
+			PIOS_USB_Init(&pios_usb_id, &pios_usb_main_cfg_cc3d);
+			break;
+		default:
+			PIOS_Assert(0);
+	}
+#if defined(PIOS_INCLUDE_USB_HID) && defined(PIOS_INCLUDE_COM_MSG)
 	uint32_t pios_usb_hid_id;
-	if (PIOS_USB_HID_Init(&pios_usb_hid_id, &pios_usb_hid_main_cfg)) {
+	if (PIOS_USB_HID_Init(&pios_usb_hid_id, &pios_usb_hid_cfg, pios_usb_id)) {
 		PIOS_Assert(0);
 	}
-#if defined(PIOS_INCLUDE_COM)
-	if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_com_driver, pios_usb_hid_id,
-			  pios_com_telem_usb_rx_buffer, sizeof(pios_com_telem_usb_rx_buffer),
-			  pios_com_telem_usb_tx_buffer, sizeof(pios_com_telem_usb_tx_buffer))) {
+	if (PIOS_COM_MSG_Init(&pios_com_telem_usb_id, &pios_usb_hid_com_driver, pios_usb_hid_id)) {
 		PIOS_Assert(0);
 	}
-#endif	/* PIOS_INCLUDE_COM */
-#endif	/* PIOS_INCLUDE_USB_HID */
+#endif	/* PIOS_INCLUDE_USB_HID && PIOS_INCLUDE_COM_MSG */
+
+#endif	/* PIOS_INCLUDE_USB */
 
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_CRC, ENABLE);//TODO Tirar
 
 	board_init_complete = true;
+}
+
+void PIOS_ADC_DMA_Handler()
+{
 }

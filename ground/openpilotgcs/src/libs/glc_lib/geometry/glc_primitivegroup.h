@@ -28,7 +28,7 @@
 #include "../glc_ext.h"
 #include "../glc_global.h"
 
-#include "glc_config.h"
+#include "../glc_config.h"
 
 //////////////////////////////////////////////////////////////////////
 //! \class GLC_PrimitiveGroup
@@ -231,8 +231,8 @@ public:
 	//! Set base triangle fan offset
 	void setBaseTrianglesFanOffseti(int);
 
-	//! Change index to VBO mode
-	void changeToVboMode();
+	//! Compute VBO offset
+	void computeVboOffset();
 
 	//! The mesh wich use this group is finished
 	inline void finish()

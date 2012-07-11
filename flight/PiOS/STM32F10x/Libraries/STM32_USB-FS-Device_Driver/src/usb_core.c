@@ -58,7 +58,7 @@ static void Data_Setup0(void);
 * Return         : Return 1 , if the request is invalid when "Length" is 0.
 *                  Return "Buffer" if the "Length" is not 0.
 *******************************************************************************/
-uint8_t *Standard_GetConfiguration(uint16_t Length)
+const uint8_t *Standard_GetConfiguration(uint16_t Length)
 {
   if (Length == 0)
   {
@@ -104,7 +104,7 @@ RESULT Standard_SetConfiguration(void)
 * Return         : Return 0, if the request is invalid when "Length" is 0.
 *                  Return "Buffer" if the "Length" is not 0.
 *******************************************************************************/
-uint8_t *Standard_GetInterface(uint16_t Length)
+const uint8_t *Standard_GetInterface(uint16_t Length)
 {
   if (Length == 0)
   {
@@ -160,7 +160,7 @@ RESULT Standard_SetInterface(void)
 * Return         : Return 0, if the request is at end of data block,
 *                  or is invalid when "Length" is 0.
 *******************************************************************************/
-uint8_t *Standard_GetStatus(uint16_t Length)
+const uint8_t *Standard_GetStatus(uint16_t Length)
 {
   if (Length == 0)
   {
@@ -415,7 +415,7 @@ RESULT Standard_SetDeviceFeature(void)
 *                  wOffset The buffer pointed by this address contains at least
 *                  Length bytes.
 *******************************************************************************/
-uint8_t *Standard_GetDescriptorData(uint16_t Length, ONE_DESCRIPTOR *pDesc)
+const uint8_t *Standard_GetDescriptorData(uint16_t Length, PONE_DESCRIPTOR pDesc)
 {
   uint32_t  wOffset;
 
@@ -443,7 +443,7 @@ void DataStageOut(void)
 
   save_rLength = pEPinfo->Usb_rLength;
 
-  if (pEPinfo->CopyData && save_rLength)
+  if (pEPinfo->CopyDataOut && save_rLength)
   {
     uint8_t *Buffer;
     uint32_t Length;
@@ -454,7 +454,7 @@ void DataStageOut(void)
       Length = save_rLength;
     }
 
-    Buffer = (*pEPinfo->CopyData)(Length);
+    Buffer = (*pEPinfo->CopyDataOut)(Length);
     pEPinfo->Usb_rLength -= Length;
     pEPinfo->Usb_rOffset += Length;
 
@@ -503,7 +503,7 @@ void DataStageIn(void)
   uint32_t save_wLength = pEPinfo->Usb_wLength;
   uint32_t ControlState = pInformation->ControlState;
 
-  uint8_t *DataBuffer;
+  const uint8_t *DataBuffer;
   uint32_t Length;
 
   if ((save_wLength == 0) && (ControlState == LAST_IN_DATA))
@@ -540,7 +540,7 @@ void DataStageIn(void)
     Length = save_wLength;
   }
 
-  DataBuffer = (*pEPinfo->CopyData)(Length);
+  DataBuffer = (*pEPinfo->CopyDataIn)(Length);
 
 #ifdef STM32F10X_CL
   PCD_EP_Write (ENDP0, DataBuffer, Length);
@@ -697,7 +697,7 @@ exit_NoData_Setup0:
 *******************************************************************************/
 void Data_Setup0(void)
 {
-  uint8_t *(*CopyRoutine)(uint16_t);
+  const uint8_t *(*CopyRoutine)(uint16_t);
   RESULT Result;
   uint32_t Request_No = pInformation->USBbRequest;
 
@@ -802,7 +802,7 @@ void Data_Setup0(void)
   if (CopyRoutine)
   {
     pInformation->Ctrl_Info.Usb_wOffset = wOffset;
-    pInformation->Ctrl_Info.CopyData = CopyRoutine;
+    pInformation->Ctrl_Info.CopyDataIn = CopyRoutine;
     /* sb in the original the cast to word was directly */
     /* now the cast is made step by step */
     (*CopyRoutine)(0);

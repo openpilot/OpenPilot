@@ -32,10 +32,59 @@
 #include "uavmetaobject.h"
 #include "uavobjectfield.h"
 #include <QtCore/QList>
+#include <QtCore/QLinkedList>
+#include <QtCore/QMap>
 #include <QtCore/QVariant>
+#include <QtCore/QTime>
 #include <QtCore/QTimer>
 #include <QtCore/QObject>
+#include <QtCore/QDebug>
 
+class TreeItem;
+
+/*
+* Small utility class that handles the higlighting of
+* tree grid items.
+* Basicly it maintains all items due to be restored to
+* non highlighted state in a linked list.
+* A timer traverses this list periodically to find out
+* if any of the items should be restored. All items are
+* updated withan expiration timestamp when they expires.
+* An item that is beeing restored is removed from the
+* list and its removeHighlight() method is called. Items
+* that are not expired are left in the list til next time.
+* Items that are updated during the expiration time are
+* left untouched in the list. This reduces unwanted emits
+* of signals to the repaint/update function.
+*/
+class HighLightManager : public QObject
+{
+Q_OBJECT
+public:
+    // Constructor taking the checking interval in ms.
+    HighLightManager(long checkingInterval);
+
+    // This is called when an item has been set to
+    // highlighted = true.
+    bool add(TreeItem* itemToAdd);
+
+    //This is called when an item is set to highlighted = false;
+    bool remove(TreeItem* itemToRemove);
+
+private slots:
+    // Timer callback method.
+    void checkItemsExpired();
+
+private:
+    // The timer checking highlight expiration.
+    QTimer m_expirationTimer;
+
+    // The list holding all items due to be updated.
+    QLinkedList<TreeItem*> m_itemsList;
+
+    //Mutex to lock when accessing list.
+    QMutex m_listMutex;
+};
 
 class TreeItem : public QObject
 {
@@ -46,9 +95,9 @@ public:
     virtual ~TreeItem();
 
     void appendChild(TreeItem *child);
-    void insert(int index, TreeItem *child);
+    void insertChild(TreeItem *child);
 
-    TreeItem *child(int row);
+    TreeItem *getChild(int index);
     inline QList<TreeItem*> treeChildren() const { return m_children; }
     int childCount() const;
     int columnCount() const;
@@ -77,11 +126,34 @@ public:
     inline bool changed() { return m_changed; }
     inline void setChanged(bool changed) { m_changed = changed; }
 
+    virtual void setHighlightManager(HighLightManager* mgr);
+
+    QTime getHiglightExpires();
+
+    virtual void removeHighlight();
+
+    int nameIndex(QString name) {
+        for (int i = 0; i < childCount(); ++i) {
+            if (name < getChild(i)->data(0).toString())
+                return i;
+        }
+        return childCount();
+    }
+
+    TreeItem* findChildByName(QString name)
+    {
+        foreach (TreeItem* child, m_children) {
+            if (name == child->data(0).toString()) {
+                return child;
+            }
+        }
+        return 0;
+    }
+
 signals:
     void updateHighlight(TreeItem*);
 
 private slots:
-    void removeHighlight();
 
 private:
     QList<TreeItem*> m_children;
@@ -91,12 +163,16 @@ private:
     TreeItem *m_parent;
     bool m_highlight;
     bool m_changed;
-    QTimer m_timer;
+    QTime m_highlightExpires;
+    HighLightManager* m_highlightManager;
 public:
     static const int dataColumn = 1;
 private:
     static int m_highlightTimeMs;
 };
+
+class DataObjectTreeItem;
+class MetaObjectTreeItem;
 
 class TopTreeItem : public TreeItem
 {
@@ -105,19 +181,27 @@ public:
     TopTreeItem(const QList<QVariant> &data, TreeItem *parent = 0) : TreeItem(data, parent) { }
     TopTreeItem(const QVariant &data, TreeItem *parent = 0) : TreeItem(data, parent) { }
 
-    QList<quint32> objIds() { return m_objIds; }
-    void addObjId(quint32 objId) { m_objIds.append(objId); }
-    void insertObjId(int index, quint32 objId) { m_objIds.insert(index, objId); }
-    int nameIndex(QString name) {
-        for (int i = 0; i < childCount(); ++i) {
-            if (name < child(i)->data(0).toString())
-                return i;
-        }
-        return childCount();
+    void addObjectTreeItem(quint32 objectId, DataObjectTreeItem* oti) {
+        m_objectTreeItemsPerObjectIds[objectId] = oti;
     }
 
+    DataObjectTreeItem* findDataObjectTreeItemByObjectId(quint32 objectId) {
+        return m_objectTreeItemsPerObjectIds.contains(objectId) ? m_objectTreeItemsPerObjectIds[objectId] : 0;
+    }
+
+    void addMetaObjectTreeItem(quint32 objectId, MetaObjectTreeItem* oti) {
+        m_metaObjectTreeItemsPerObjectIds[objectId] = oti;
+    }
+
+    MetaObjectTreeItem* findMetaObjectTreeItemByObjectId(quint32 objectId) {
+        return m_metaObjectTreeItemsPerObjectIds.contains(objectId) ? m_metaObjectTreeItemsPerObjectIds[objectId] : 0;
+    }
+
+    QList<MetaObjectTreeItem*> getMetaObjectItems();
+
 private:
-    QList<quint32> m_objIds;
+    QMap<quint32, DataObjectTreeItem*> m_objectTreeItemsPerObjectIds;
+    QMap<quint32, MetaObjectTreeItem*> m_metaObjectTreeItemsPerObjectIds;
 };
 
 class ObjectTreeItem : public TreeItem

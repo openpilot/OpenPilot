@@ -28,7 +28,7 @@
 #define CONFIGGADGET_H
 
 #include <coreplugin/iuavgadget.h>
-#include "configgadgetwidget.h"
+#include "../uavobjectwidgetutils/configtaskwidget.h"
 
 class IUAVGadget;
 //class QList<int>;
@@ -46,7 +46,7 @@ public:
     ConfigGadget(QString classId, ConfigGadgetWidget *widget, QWidget *parent = 0);
     ~ConfigGadget();
 
-    QWidget *widget() { return m_widget; }
+    QWidget *widget() { return (QWidget*)m_widget; }
     void loadConfiguration(IUAVGadgetConfiguration* config);
 
 private:

@@ -62,15 +62,15 @@ GLC_Mover* GLC_PanMover::clone() const
 //////////////////////////////////////////////////////////////////////
 
 // Initialized the mover
-void GLC_PanMover::init(QMouseEvent * e)
+void GLC_PanMover::init(const GLC_UserInput& userInput)
 {
-	m_PreviousVector= m_pViewport->mapPosMouse(static_cast<double>(e->x()), static_cast<double>(e->y()));
+	m_PreviousVector= m_pViewport->mapPosMouse(static_cast<double>(userInput.x()), static_cast<double>(userInput.y()));
 }
 
 // Move the camera
-bool GLC_PanMover::move(QMouseEvent * e)
+bool GLC_PanMover::move(const GLC_UserInput& userInput)
 {
-	const GLC_Vector3d VectCur(m_pViewport->mapPosMouse(static_cast<double>(e->x()), static_cast<double>(e->y())));
+	const GLC_Vector3d VectCur(m_pViewport->mapPosMouse(static_cast<double>(userInput.x()), static_cast<double>(userInput.y())));
 	const GLC_Vector3d VectPan= VectCur - m_PreviousVector;	// moving Vector
 
 	// Pan the camera

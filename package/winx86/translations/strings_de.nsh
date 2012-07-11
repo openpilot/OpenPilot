@@ -31,6 +31,9 @@
   LangString DESC_InSecSounds ${LANG_GERMAN} "GCS Sounddateien (benötigt für akustische Ereignisbenachrichtigungen)."
   LangString DESC_InSecLocalization ${LANG_GERMAN} "GCS Lokalisierung (für unterstützte Sprachen)."
   LangString DESC_InSecFirmware ${LANG_GERMAN} "OpenPilot firmware binaries."
+  LangString DESC_InSecUtilities ${LANG_GERMAN} "OpenPilot utilities (Matlab log parser)."
+  LangString DESC_InSecDrivers ${LANG_GERMAN} "OpenPilot hardware driver files (optional OpenPilot CDC driver)."
+  LangString DESC_InSecInstallDrivers ${LANG_GERMAN} "Install OpenPilot CDC driver (optional)."
   LangString DESC_InSecShortcuts ${LANG_GERMAN} "Installiere Verknüpfungen unter Startmenü->Anwendungen."
 
 ;--------------------------------

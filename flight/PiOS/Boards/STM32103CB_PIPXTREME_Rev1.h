@@ -23,20 +23,22 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_BOARD_H
-#define PIOS_BOARD_H
+#ifndef STM32103CB_PIPXTREME_H_
+#define STM32103CB_PIPXTREME_H_
 
-// *****************************************************************
+#define ADD_ONE_ADC
+
+//------------------------
 // Timers and Channels Used
-
+//------------------------
 /*
-Timer | Channel 1  | Channel 2  | Channel 3  | Channel 4
-------+------------+------------+------------+------------
-TIM1  |                       DELAY                      |
-TIM2  |                         | PPM Output | PPM Input |
-TIM3  |                  TIMER INTERRUPT                 |
-TIM4  |                     STOPWATCH                    |
-------+------------+------------+------------+------------
+Timer | Channel 1 | Channel 2 | Channel 3 | Channel 4
+------+-----------+-----------+-----------+----------
+TIM1  |  Servo 4  |           |           |
+TIM2  |  RC In 5  |  RC In 6  |  Servo 6  |
+TIM3  |  Servo 5  |  RC In 2  |  RC In 3  |  RC In 4
+TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
+------+-----------+-----------+-----------+----------
 */
 
 //------------------------
@@ -55,6 +57,7 @@ TIM4  |                     STOPWATCH                    |
 /* Channel 11 - 				*/
 /* Channel 12 - 				*/
 
+
 //------------------------
 // BOOTLOADER_SETTINGS
 //------------------------
@@ -63,71 +66,71 @@ TIM4  |                     STOPWATCH                    |
 #define MAX_DEL_RETRYS	3
 
 
-// *****************************************************************
+//------------------------
+// WATCHDOG_SETTINGS
+//------------------------
+#define PIOS_WATCHDOG_TIMEOUT    500
+#define PIOS_WDG_REGISTER        BKP_DR4
+#define PIOS_WDG_COMUAVTALK      0x0001
+#define PIOS_WDG_RADIORECEIVE    0x0002
+#define PIOS_WDG_SENDPACKET      0x0004
+#define PIOS_WDG_SENDDATA        0x0008
+#define PIOS_WDG_TRANSCOMM       0x0010
+#define PIOS_WDG_PPMINPUT        0x0020
+
+//------------------------
+// TELEMETRY
+//------------------------
+#define TELEM_QUEUE_SIZE         20
+
+//------------------------
+// PIOS_LED
+//------------------------
+#define PIOS_LED_USB	0
+#define PIOS_LED_LINK	1
+#define PIOS_LED_RX	2
+#define PIOS_LED_TX	3
+
+#define PIOS_LED_HEARTBEAT PIOS_LED_USB
+#define PIOS_LED_ALARM PIOS_LED_TX
+
+#define USB_LED_ON					PIOS_LED_On(PIOS_LED_USB)
+#define USB_LED_OFF					PIOS_LED_Off(PIOS_LED_USB)
+#define USB_LED_TOGGLE					PIOS_LED_Toggle(PIOS_LED_USB)
+
+#define LINK_LED_ON					PIOS_LED_On(PIOS_LED_LINK)
+#define LINK_LED_OFF					PIOS_LED_Off(PIOS_LED_LINK)
+#define LINK_LED_TOGGLE					PIOS_LED_Toggle(PIOS_LED_LINK)
+
+#define RX_LED_ON					PIOS_LED_On(PIOS_LED_RX)
+#define RX_LED_OFF					PIOS_LED_Off(PIOS_LED_RX)
+#define RX_LED_TOGGLE					PIOS_LED_Toggle(PIOS_LED_RX)
+
+#define TX_LED_ON					PIOS_LED_On(PIOS_LED_TX)
+#define TX_LED_OFF					PIOS_LED_Off(PIOS_LED_TX)
+#define TX_LED_TOGGLE					PIOS_LED_Toggle(PIOS_LED_TX)
+
+//-------------------------
 // System Settings
+//-------------------------
+#define PIOS_MASTER_CLOCK			72000000
+#define PIOS_PERIPHERAL_CLOCK			(PIOS_MASTER_CLOCK / 2)
 
-#define PIOS_MASTER_CLOCK                       72000000ul
-#define PIOS_PERIPHERAL_CLOCK                   (PIOS_MASTER_CLOCK / 2)
-
-// *****************************************************************
+//-------------------------
 // Interrupt Priorities
-
+//-------------------------
 #define PIOS_IRQ_PRIO_LOW			12		// lower than RTOS
 #define PIOS_IRQ_PRIO_MID			8		// higher than RTOS
 #define PIOS_IRQ_PRIO_HIGH			5		// for SPI, ADC, I2C etc...
-#define PIOS_IRQ_PRIO_HIGHEST		4 		// for USART etc...
+#define PIOS_IRQ_PRIO_HIGHEST			4 		// for USART etc...
 
-// *****************************************************************
-// PIOS_LED
-
-#define PIOS_LED_LED1_GPIO_PORT			GPIOA					// USB Activity LED
-#define PIOS_LED_LED1_GPIO_PIN			GPIO_Pin_3
-#define PIOS_LED_LED1_GPIO_CLK			RCC_APB2Periph_GPIOA
-
-#define PIOS_LED_LED2_GPIO_PORT			GPIOB					// LINK LED
-#define PIOS_LED_LED2_GPIO_PIN			GPIO_Pin_5
-#define PIOS_LED_LED2_GPIO_CLK			RCC_APB2Periph_GPIOB
-
-#define PIOS_LED_LED3_GPIO_PORT			GPIOB					// RX LED
-#define PIOS_LED_LED3_GPIO_PIN			GPIO_Pin_6
-#define PIOS_LED_LED3_GPIO_CLK			RCC_APB2Periph_GPIOB
-
-#define PIOS_LED_LED4_GPIO_PORT			GPIOB					// TX LED
-#define PIOS_LED_LED4_GPIO_PIN			GPIO_Pin_7
-#define PIOS_LED_LED4_GPIO_CLK			RCC_APB2Periph_GPIOB
-
-#define PIOS_LED_NUM					4
-#define PIOS_LED_PORTS					{ PIOS_LED_LED1_GPIO_PORT, PIOS_LED_LED2_GPIO_PORT, PIOS_LED_LED3_GPIO_PORT, PIOS_LED_LED4_GPIO_PORT }
-#define PIOS_LED_PINS					{ PIOS_LED_LED1_GPIO_PIN,  PIOS_LED_LED2_GPIO_PIN,  PIOS_LED_LED3_GPIO_PIN,  PIOS_LED_LED4_GPIO_PIN }
-#define PIOS_LED_CLKS					{ PIOS_LED_LED1_GPIO_CLK,  PIOS_LED_LED2_GPIO_CLK,  PIOS_LED_LED3_GPIO_CLK,  PIOS_LED_LED4_GPIO_CLK }
-
-#define USB_LED_ON						PIOS_LED_On(LED1)
-#define USB_LED_OFF						PIOS_LED_Off(LED1)
-#define USB_LED_TOGGLE					PIOS_LED_Toggle(LED1)
-
-#define LINK_LED_ON						PIOS_LED_On(LED2)
-#define LINK_LED_OFF					PIOS_LED_Off(LED2)
-#define LINK_LED_TOGGLE					PIOS_LED_Toggle(LED2)
-
-#define RX_LED_ON						PIOS_LED_On(LED3)
-#define RX_LED_OFF						PIOS_LED_Off(LED3)
-#define RX_LED_TOGGLE					PIOS_LED_Toggle(LED3)
-
-#define TX_LED_ON						PIOS_LED_On(LED4)
-#define TX_LED_OFF						PIOS_LED_Off(LED4)
-#define TX_LED_TOGGLE					PIOS_LED_Toggle(LED4)
-
-// *****************************************************************
-// Timer interrupt
-
-#define TIMER_INT_TIMER					TIM3
-#define TIMER_INT_FUNC					TIM3_IRQHandler
-#define TIMER_INT_PRIORITY				2
-
-// *****************************************************************
-// Stop watch timer
-
-#define STOPWATCH_TIMER					TIM4
+//------------------------
+// PIOS_I2C
+// See also pios_board.c
+//------------------------
+#define PIOS_I2C_MAX_DEVS			1
+extern uint32_t pios_i2c_flexi_adapter_id;
+#define PIOS_I2C_MAIN_ADAPTER			(pios_i2c_flexi_adapter_id)
 
 //------------------------
 // PIOS_SPI
@@ -139,285 +142,170 @@ extern uint32_t pios_spi_port_id;
 
 //-------------------------
 // PIOS_USART
-//
-// See also pios_board.c
 //-------------------------
-#define PIOS_USART_MAX_DEVS             1
+#define PIOS_USART_MAX_DEVS			3
 
 //-------------------------
 // PIOS_COM
 //
 // See also pios_board.c
 //-------------------------
-#define PIOS_COM_MAX_DEVS               2
+#define PIOS_COM_MAX_DEVS			5
 
-extern uint32_t pios_com_serial_id;
-#define PIOS_COM_SERIAL                 (pios_com_serial_id)
-//#define PIOS_COM_DEBUG                  PIOS_COM_SERIAL           // uncomment this to send debug info out the serial port
-
-#if defined(PIOS_INCLUDE_USB_HID)
 extern uint32_t pios_com_telem_usb_id;
-#define PIOS_COM_TELEM_USB              (pios_com_telem_usb_id)
-#endif
+extern uint32_t pios_com_telemetry_id;
+extern uint32_t pios_com_flexi_id;
+extern uint32_t pios_com_vcp_id;
+extern uint32_t pios_com_uavtalk_com_id;
+extern uint32_t pios_com_trans_com_id;
+extern uint32_t pios_com_debug_id;
+extern uint32_t pios_com_rfm22b_id;
+extern uint32_t pios_ppm_rcvr_id;
+#define PIOS_COM_USB_HID           (pios_com_telem_usb_id)
+#define PIOS_COM_TELEMETRY         (pios_com_telemetry_id)
+#define PIOS_COM_FLEXI             (pios_com_flexi_id)
+#define PIOS_COM_VCP               (pios_com_vcp_id)
+#define PIOS_COM_UAVTALK           (pios_com_uavtalk_com_id)
+#define PIOS_COM_TRANS_COM         (pios_com_trans_com_id)
+#define PIOS_COM_DEBUG             (pios_com_debug_id)
+#define PIOS_COM_RADIO             (pios_com_rfm22b_id)
+#define PIOS_COM_TELEM_USB         PIOS_COM_USB_HID
+#define PIOS_PPM_RECEIVER          (pios_ppm_rcvr_id)
 
-#if defined(PIOS_COM_DEBUG)
-//  #define DEBUG_PRINTF(...) PIOS_COM_SendFormattedString(PIOS_COM_DEBUG, __VA_ARGS__)
-  #define DEBUG_PRINTF(...) PIOS_COM_SendFormattedStringNonBlocking(PIOS_COM_DEBUG, __VA_ARGS__)
+#define DEBUG_LEVEL 2
+#if DEBUG_LEVEL > 0
+#define DEBUG_PRINTF(level, ...) {if(level <= DEBUG_LEVEL && PIOS_COM_DEBUG > 0) { PIOS_COM_SendFormattedStringNonBlocking(PIOS_COM_DEBUG, __VA_ARGS__); }}
 #else
-  #define DEBUG_PRINTF(...)
+#define DEBUG_PRINTF(...)
 #endif
+#define RFM22_DEBUG 1
 
 //-------------------------
-// PPM input/output
-//-------------------------
-#define PIOS_PPM_IN_GPIO_PORT               GPIOB
-#define PIOS_PPM_IN_GPIO_PIN                GPIO_Pin_11
-#define PIOS_PPM_IN_TIM_CHANNEL             TIM_Channel_4
-#define PIOS_PPM_IN_TIM_CCR                 TIM_IT_CC4
-#define PIOS_PPM_IN_TIM_GETCAP_FUNC         TIM_GetCapture4
-
-#define PIOS_PPM_OUT_GPIO_PORT              GPIOB
-#define PIOS_PPM_OUT_GPIO_PIN               GPIO_Pin_10
-#define PIOS_PPM_OUT_TIM_CHANNEL            TIM_Channel_3
-#define PIOS_PPM_OUT_TIM_CCR                TIM_IT_CC3
-
-#define PIOS_PPM_MAX_CHANNELS               7
-#define PIOS_PPM_TIM_PORT                   TIM2
-#define PIOS_PPM_TIM                        TIM2
-#define PIOS_PPM_TIM_IRQ                    TIM2_IRQn
-#define PIOS_PPM_CC_IRQ_FUNC                TIM2_IRQHandler
-#define PIOS_PPM_TIMER_EN_RCC_FUNC	        RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE)
-#define PIOS_PPM_TIMER_DIS_RCC_FUNC	        RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, DISABLE)
-
-// *****************************************************************
 // ADC
+// None
+//-------------------------
+//#define PIOS_ADC_OVERSAMPLING_RATE		1
+#define PIOS_ADC_USE_TEMP_SENSOR		0
+#define PIOS_ADC_TEMP_SENSOR_ADC		ADC1
+#define PIOS_ADC_TEMP_SENSOR_ADC_CHANNEL	1
 
-// PIOS_ADC_PinGet(0) = Temperature Sensor (On-board)
-// PIOS_ADC_PinGet(1) = PSU Voltage
+#define PIOS_ADC_NUM_PINS			0
 
-#define PIOS_ADC_OVERSAMPLING_RATE			2
+#define PIOS_ADC_PORTS				{ }
+#define PIOS_ADC_PINS				{ }
+#define PIOS_ADC_CHANNELS			{ }
+#define PIOS_ADC_MAPPING			{ }
+#define PIOS_ADC_CHANNEL_MAPPING		{ }
+#define PIOS_ADC_NUM_CHANNELS			(PIOS_ADC_NUM_PINS + PIOS_ADC_USE_TEMP_SENSOR)
+#define PIOS_ADC_NUM_ADC_CHANNELS		0
+#define PIOS_ADC_USE_ADC2			0
+#define PIOS_ADC_CLOCK_FUNCTION			RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1 | RCC_APB2Periph_ADC2, ENABLE)
+#define PIOS_ADC_ADCCLK				RCC_PCLK2_Div8
+/* RCC_PCLK2_Div2: ADC clock = PCLK2/2 */
+/* RCC_PCLK2_Div4: ADC clock = PCLK2/4 */
+/* RCC_PCLK2_Div6: ADC clock = PCLK2/6 */
+/* RCC_PCLK2_Div8: ADC clock = PCLK2/8 */
+#define PIOS_ADC_SAMPLE_TIME			ADC_SampleTime_239Cycles5
+/* Sample time: */
+/* With an ADCCLK = 14 MHz and a sampling time of 239.5 cycles: */
+/* Tconv = 239.5 + 12.5 = 252 cycles = 18�s */
+/* (1 / (ADCCLK / CYCLES)) = Sample Time (�S) */
+#define PIOS_ADC_IRQ_PRIO			PIOS_IRQ_PRIO_LOW
 
-#define PIOS_ADC_USE_TEMP_SENSOR			1
-#define PIOS_ADC_TEMP_SENSOR_ADC			ADC1
-#define PIOS_ADC_TEMP_SENSOR_ADC_CHANNEL	16		// Temperature sensor channel
-//#define PIOS_ADC_TEMP_SENSOR_ADC_CHANNEL	17		// VREF channel
+// Currently analog acquistion hard coded at 480 Hz
+// PCKL2 = HCLK / 16
+// ADCCLK = PCLK2 / 2
+#define PIOS_ADC_RATE		(72.0e6 / 1.0 / 8.0 / 252.0 / (PIOS_ADC_NUM_CHANNELS >> PIOS_ADC_USE_ADC2))
+#define PIOS_ADC_MAX_OVERSAMPLING               36
 
-#define PIOS_ADC_PIN1_GPIO_PORT				GPIOB			// Port B (PSU Voltage)
-#define PIOS_ADC_PIN1_GPIO_PIN				GPIO_Pin_1		// PB1 .. ADC12_IN9
-#define PIOS_ADC_PIN1_GPIO_CHANNEL			ADC_Channel_9
-#define PIOS_ADC_PIN1_ADC					ADC2
-#define PIOS_ADC_PIN1_ADC_NUMBER			1
+//------------------------
+// PIOS_RCVR
+// See also pios_board.c
+//------------------------
+#define PIOS_RCVR_MAX_DEVS          3
+#define PIOS_RCVR_MAX_CHANNELS      12
+#define PIOS_GCSRCVR_TIMEOUT_MS     100
 
-#define PIOS_ADC_NUM_PINS					1
+//-------------------------
+// Receiver PPM input
+//-------------------------
+#define PIOS_PPM_MAX_DEVS     1
+#define PIOS_PPM_NUM_INPUTS   12
+#define PIOS_PPM_PACKET_UPDATE_PERIOD_MS 25
 
-#define PIOS_ADC_PORTS						{ PIOS_ADC_PIN1_GPIO_PORT    }
-#define PIOS_ADC_PINS						{ PIOS_ADC_PIN1_GPIO_PIN     }
-#define PIOS_ADC_CHANNELS					{ PIOS_ADC_PIN1_GPIO_CHANNEL }
-#define PIOS_ADC_MAPPING					{ PIOS_ADC_PIN1_ADC          }
-#define PIOS_ADC_CHANNEL_MAPPING			{ PIOS_ADC_PIN1_ADC_NUMBER   }
+//-------------------------
+// Servo outputs
+//-------------------------
+#define PIOS_SERVO_UPDATE_HZ                    50
+#define PIOS_SERVOS_INITIAL_POSITION            0 /* dont want to start motors, have no pulse till settings loaded */
 
-#define PIOS_ADC_NUM_CHANNELS				(PIOS_ADC_NUM_PINS + PIOS_ADC_USE_TEMP_SENSOR)
-#define PIOS_ADC_NUM_ADC_CHANNELS			2
-#define PIOS_ADC_USE_ADC2					1
-#define PIOS_ADC_CLOCK_FUNCTION				RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1 | RCC_APB2Periph_ADC2, ENABLE)
-//#define PIOS_ADC_ADCCLK					RCC_PCLK2_Div2	// ADC clock = PCLK2/2
-//#define PIOS_ADC_ADCCLK					RCC_PCLK2_Div4	// ADC clock = PCLK2/4
-//#define PIOS_ADC_ADCCLK					RCC_PCLK2_Div6	// ADC clock = PCLK2/6
-#define PIOS_ADC_ADCCLK						RCC_PCLK2_Div8	// ADC clock = PCLK2/8
-//#define PIOS_ADC_SAMPLE_TIME				ADC_SampleTime_1Cycles5
-//#define PIOS_ADC_SAMPLE_TIME				ADC_SampleTime_7Cycles5
-//#define PIOS_ADC_SAMPLE_TIME				ADC_SampleTime_13Cycles5
-//#define PIOS_ADC_SAMPLE_TIME				ADC_SampleTime_28Cycles5
-//#define PIOS_ADC_SAMPLE_TIME				ADC_SampleTime_41Cycles5
-//#define PIOS_ADC_SAMPLE_TIME				ADC_SampleTime_55Cycles5
-//#define PIOS_ADC_SAMPLE_TIME				ADC_SampleTime_71Cycles5
-#define PIOS_ADC_SAMPLE_TIME				ADC_SampleTime_239Cycles5
-						/* Sample time: */
-						/* With an ADCCLK = 14 MHz and a sampling time of 293.5 cycles: */
-						/* Tconv = 239.5 + 12.5 = 252 cycles = 18�s */
-						/* (1 / (ADCCLK / CYCLES)) = Sample Time (�S) */
-#define PIOS_ADC_IRQ_PRIO                       3
-#define PIOS_ADC_MAX_OVERSAMPLING               1
-#define PIOS_ADC_RATE                           (72.0e6 / 1 / 8 / 252 / (PIOS_ADC_NUM_ADC_CHANNELS >> PIOS_ADC_USE_ADC2))
+//--------------------------
+// Timer controller settings
+//--------------------------
+#define PIOS_TIM_MAX_DEVS			3
 
-// *****************************************************************
-// GPIO output pins
+//-------------------------
+// GPIO
+//-------------------------
+#define PIOS_GPIO_PORTS				{ }
+#define PIOS_GPIO_PINS				{ }
+#define PIOS_GPIO_CLKS				{ }
+#define PIOS_GPIO_NUM				0
 
-// GPIO_Mode_Out_OD        Open Drain Output
-// GPIO_Mode_Out_PP        Push-Pull Output
-// GPIO_Mode_AF_OD         Open Drain Output Alternate-Function
-// GPIO_Mode_AF_PP         Push-Pull Output Alternate-Function
-
-// Serial port RTS line
-#define PIOS_GPIO_OUT_0_PORT		GPIOB
-#define PIOS_GPIO_OUT_0_PIN			GPIO_Pin_15
-#define PIOS_GPIO_OUT_0_GPIO_CLK	RCC_APB2Periph_GPIOB
-
-// RF module chip-select line
-#define PIOS_GPIO_OUT_1_PORT		GPIOA
-#define PIOS_GPIO_OUT_1_PIN			GPIO_Pin_4
-#define PIOS_GPIO_OUT_1_GPIO_CLK	RCC_APB2Periph_GPIOA
-
-// PPM OUT line
-#define PIOS_GPIO_OUT_2_PORT		GPIOB
-#define PIOS_GPIO_OUT_2_PIN			GPIO_Pin_10
-#define PIOS_GPIO_OUT_2_GPIO_CLK	RCC_APB2Periph_GPIOB
-
-// spare pin
-#define PIOS_GPIO_OUT_3_PORT		GPIOA
-#define PIOS_GPIO_OUT_3_PIN			GPIO_Pin_0
-#define PIOS_GPIO_OUT_3_GPIO_CLK	RCC_APB2Periph_GPIOA
-
-// spare pin
-#define PIOS_GPIO_OUT_4_PORT		GPIOA
-#define PIOS_GPIO_OUT_4_PIN			GPIO_Pin_1
-#define PIOS_GPIO_OUT_4_GPIO_CLK	RCC_APB2Periph_GPIOA
-
-// spare pin
-#define PIOS_GPIO_OUT_5_PORT		GPIOC
-#define PIOS_GPIO_OUT_5_PIN			GPIO_Pin_13
-#define PIOS_GPIO_OUT_5_GPIO_CLK	RCC_APB2Periph_GPIOC
-
-// spare pin
-#define PIOS_GPIO_OUT_6_PORT		GPIOC
-#define PIOS_GPIO_OUT_6_PIN			GPIO_Pin_14
-#define PIOS_GPIO_OUT_6_GPIO_CLK	RCC_APB2Periph_GPIOC
-
-// spare pin
-#define PIOS_GPIO_OUT_7_PORT		GPIOC
-#define PIOS_GPIO_OUT_7_PIN			GPIO_Pin_15
-#define PIOS_GPIO_OUT_7_GPIO_CLK	RCC_APB2Periph_GPIOC
-
-#define PIOS_GPIO_NUM				8
-#define PIOS_GPIO_PORTS				{PIOS_GPIO_OUT_0_PORT,     PIOS_GPIO_OUT_1_PORT,     PIOS_GPIO_OUT_2_PORT,     PIOS_GPIO_OUT_3_PORT,     PIOS_GPIO_OUT_4_PORT,     PIOS_GPIO_OUT_5_PORT,     PIOS_GPIO_OUT_6_PORT,     PIOS_GPIO_OUT_7_PORT}
-#define PIOS_GPIO_PINS				{PIOS_GPIO_OUT_0_PIN,      PIOS_GPIO_OUT_1_PIN,      PIOS_GPIO_OUT_2_PIN,      PIOS_GPIO_OUT_3_PIN,      PIOS_GPIO_OUT_4_PIN,      PIOS_GPIO_OUT_5_PIN,      PIOS_GPIO_OUT_6_PIN,      PIOS_GPIO_OUT_7_PIN}
-#define PIOS_GPIO_CLKS				{PIOS_GPIO_OUT_0_GPIO_CLK, PIOS_GPIO_OUT_1_GPIO_CLK, PIOS_GPIO_OUT_2_GPIO_CLK, PIOS_GPIO_OUT_3_GPIO_CLK, PIOS_GPIO_OUT_4_GPIO_CLK, PIOS_GPIO_OUT_5_GPIO_CLK, PIOS_GPIO_OUT_6_GPIO_CLK, PIOS_GPIO_OUT_7_GPIO_CLK}
-
-#define SERIAL_RTS_ENABLE			PIOS_GPIO_Enable(0)
-#define SERIAL_RTS_SET				PIOS_GPIO_Off(0)
-#define SERIAL_RTS_CLEAR			PIOS_GPIO_On(0)
-
-#define RF_CS_ENABLE				PIOS_GPIO_Enable(1)
-#define RF_CS_HIGH					PIOS_GPIO_Off(1)
-#define RF_CS_LOW					PIOS_GPIO_On(1)
-
-#define PPM_OUT_PIN                 PIOS_GPIO_OUT_2_PIN
-#define PPM_OUT_PORT                PIOS_GPIO_OUT_2_PORT
-#define PPM_OUT_ENABLE				PIOS_GPIO_Enable(2)
-#define PPM_OUT_HIGH				PIOS_GPIO_Off(2)
-#define PPM_OUT_LOW					PIOS_GPIO_On(2)
-
-#define SPARE1_ENABLE				PIOS_GPIO_Enable(3)
-#define SPARE1_HIGH					PIOS_GPIO_Off(3)
-#define SPARE1_LOW					PIOS_GPIO_On(3)
-
-#define SPARE2_ENABLE				PIOS_GPIO_Enable(4)
-#define SPARE2_HIGH					PIOS_GPIO_Off(4)
-#define SPARE2_LOW					PIOS_GPIO_On(4)
-
-#define SPARE3_ENABLE				PIOS_GPIO_Enable(5)
-#define SPARE3_HIGH					PIOS_GPIO_Off(5)
-#define SPARE3_LOW					PIOS_GPIO_On(5)
-
-#define SPARE4_ENABLE				PIOS_GPIO_Enable(6)
-#define SPARE4_HIGH					PIOS_GPIO_Off(6)
-#define SPARE4_LOW					PIOS_GPIO_On(6)
-
-#define SPARE5_ENABLE				PIOS_GPIO_Enable(7)
-#define SPARE5_HIGH					PIOS_GPIO_Off(7)
-#define SPARE5_LOW					PIOS_GPIO_On(7)
-
-// *****************************************************************
-// GPIO input pins
-
-// GPIO_Mode_AIN           Analog Input
-// GPIO_Mode_IN_FLOATING   Input Floating
-// GPIO_Mode_IPD           Input Pull-Down
-// GPIO_Mode_IPU           Input Pull-up
-
-// API mode line
-#define GPIO_IN_0_PORT			GPIOB
-#define GPIO_IN_0_PIN			GPIO_Pin_13
-#define GPIO_IN_0_MODE			GPIO_Mode_IPU
-
-// Serial port CTS line
-#define GPIO_IN_1_PORT			GPIOB
-#define GPIO_IN_1_PIN			GPIO_Pin_14
-#define GPIO_IN_1_MODE			GPIO_Mode_IPU
-
-// VBUS sense line
-#define GPIO_IN_2_PORT			GPIOA
-#define GPIO_IN_2_PIN			GPIO_Pin_8
-#define GPIO_IN_2_MODE			GPIO_Mode_IN_FLOATING
-
-// 868MHz jumper option
-#define GPIO_IN_3_PORT			GPIOB
-#define GPIO_IN_3_PIN			GPIO_Pin_8
-#define GPIO_IN_3_MODE			GPIO_Mode_IPU
-
-// 915MHz jumper option
-#define GPIO_IN_4_PORT			GPIOB
-#define GPIO_IN_4_PIN			GPIO_Pin_9
-#define GPIO_IN_4_MODE			GPIO_Mode_IPU
-
-// RF INT line
-#define GPIO_IN_5_PORT			GPIOA
-#define GPIO_IN_5_PIN			GPIO_Pin_2
-#define GPIO_IN_5_MODE			GPIO_Mode_IN_FLOATING
-
-// RF misc line
-#define GPIO_IN_6_PORT			GPIOB
-#define GPIO_IN_6_PIN			GPIO_Pin_0
-#define GPIO_IN_6_MODE			GPIO_Mode_IN_FLOATING
-
-// PPM IN line
-#define PPM_IN_PORT			    GPIOB
-#define PPM_IN_PIN			    GPIO_Pin_11
-#define PPM_IN_MODE	      		GPIO_Mode_IPD
-
-#define GPIO_IN_NUM				8
-#define GPIO_IN_PORTS			{ GPIO_IN_0_PORT, GPIO_IN_1_PORT, GPIO_IN_2_PORT, GPIO_IN_3_PORT, GPIO_IN_4_PORT, GPIO_IN_5_PORT, GPIO_IN_6_PORT, PPM_IN_PORT }
-#define GPIO_IN_PINS			{ GPIO_IN_0_PIN,  GPIO_IN_1_PIN,  GPIO_IN_2_PIN,  GPIO_IN_3_PIN,  GPIO_IN_4_PIN,  GPIO_IN_5_PIN,  GPIO_IN_6_PIN,  PPM_IN_PIN  }
-#define GPIO_IN_MODES			{ GPIO_IN_0_MODE, GPIO_IN_1_MODE, GPIO_IN_2_MODE, GPIO_IN_3_MODE, GPIO_IN_4_MODE, GPIO_IN_5_MODE, GPIO_IN_6_MODE, PPM_IN_MODE }
-
-#define API_MODE_PIN			0
-#define SERIAL_CTS_PIN			1
-#define VBUS_SENSE_PIN			2
-#define _868MHz_PIN				3
-#define _915MHz_PIN				4
-#define RF_INT_PIN				5
-#define RF_MISC_PIN				6
-
-// *****************************************************************
+//-------------------------
 // USB
+//-------------------------
+#define PIOS_USB_HID_MAX_DEVS                   1
+#define PIOS_USB_ENABLED                        1
+#define PIOS_USB_HID_MAX_DEVS                   1
+#define PIOS_USB_MAX_DEVS                       1
+#define PIOS_USB_DETECT_GPIO_PORT               GPIOC
+#define PIOS_USB_DETECT_GPIO_PIN                GPIO_Pin_15
+#define PIOS_USB_DETECT_EXTI_LINE               EXTI_Line15
 
-#if defined(PIOS_INCLUDE_USB_HID)
-	#define PIOS_USB_ENABLED				1
-	#define PIOS_USB_HID_MAX_DEVS                   1
-	#define PIOS_USB_DETECT_GPIO_PORT		GPIO_IN_2_PORT
-	#define PIOS_USB_DETECT_GPIO_PIN		GPIO_IN_2_PIN
-	#define PIOS_USB_DETECT_EXTI_LINE		EXTI_Line4
-	#define PIOS_IRQ_USB_PRIORITY			8
-#endif
-
-// *****************************************************************
+//-------------------------
 // RFM22
+//-------------------------
 
-//#define RFM22_EXT_INT_USE
-
-#define RFM22_PIOS_SPI						PIOS_SPI_PORT	// SPIx
+extern uint32_t pios_rfm22b_id;
+#define RFM22_EXT_INT_USE
+#define RFM22_PIOS_SPI	PIOS_SPI_PORT	// SPIx
 
 #if defined(RFM22_EXT_INT_USE)
-	#define RFM22_EXT_INT_PORT_SOURCE		GPIO_PortSourceGPIOA
-	#define RFM22_EXT_INT_PIN_SOURCE		GPIO_PinSource2
-
-	#define RFM22_EXT_INT_LINE				EXTI_Line2
-	#define RFM22_EXT_INT_IRQn				EXTI2_IRQn
-	#define	RFM22_EXT_INT_FUNC				EXTI2_IRQHandler
-
-	#define RFM22_EXT_INT_PRIORITY			1
+#define PIOS_RFM22_EXTI_GPIO_PORT               GPIOA
+#define PIOS_RFM22_EXTI_GPIO_PIN                GPIO_Pin_2
+#define PIOS_RFM22_EXTI_PORT_SOURCE             GPIO_PortSourceGPIOA
+#define PIOS_RFM22_EXTI_PIN_SOURCE              GPIO_PinSource2
+#define PIOS_RFM22_EXTI_CLK                     RCC_APB2Periph_GPIOA
+#define PIOS_RFM22_EXTI_LINE                    EXTI_Line2
+#define PIOS_RFM22_EXTI_IRQn                    EXTI2_IRQn
+#define PIOS_RFM22_EXTI_PRIO                    PIOS_IRQ_PRIO_LOW
 #endif
 
-// *****************************************************************
+//-------------------------
+// Packet Handler
+//-------------------------
 
-#endif /* PIOS_BOARD_H */
+uint32_t pios_packet_handler;
+#define PIOS_INCLUDE_PACKET_HANDLER
+#define PIOS_PH_MAX_PACKET 255
+#define PIOS_PH_WIN_SIZE 3
+#define PIOS_PH_MAX_CONNECTIONS 1
+
+//-------------------------
+// Reed-Solomon ECC
+//-------------------------
+
+#define RS_ECC_NPARITY 4
+
+//-------------------------
+// Flash EEPROM Emulation
+//-------------------------
+
+#define PIOS_FLASH_SIZE 0x20000
+#define PIOS_FLASH_EEPROM_START_ADDR 0x08000000
+#define PIOS_FLASH_PAGE_SIZE 1024
+#define PIOS_FLASH_EEPROM_ADDR (PIOS_FLASH_EEPROM_START_ADDR + PIOS_FLASH_SIZE - PIOS_FLASH_PAGE_SIZE)
+#define PIOS_FLASH_EEPROM_LEN PIOS_FLASH_PAGE_SIZE
+
+#endif /* STM32103CB_PIPXTREME_H_ */

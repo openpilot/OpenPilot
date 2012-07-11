@@ -35,6 +35,7 @@
 #include <QEventLoop>
 #include <QTimer>
 #include <objectpersistence.h>
+#include <firmwareiapobj.h>
 
 // ******************************
 // constructor/destructor
@@ -150,7 +151,7 @@ void UAVObjectUtilManager::objectPersistenceTransactionCompleted(UAVObject* obj,
         // the queue:
         saveState = AWAITING_COMPLETED;
         disconnect(obj, SIGNAL(transactionCompleted(UAVObject*,bool)), this, SLOT(objectPersistenceTransactionCompleted(UAVObject*,bool)));
-        failureTimer.start(1000); // Create a timeout
+        failureTimer.start(2000); // Create a timeout
     } else {
         // Can be caused by timeout errors on sending.  Forget it and send next.
         qDebug() << "objectPersistenceTranscationCompleted (error)";
@@ -199,25 +200,63 @@ void UAVObjectUtilManager::objectPersistenceOperationFailed()
   */
 void UAVObjectUtilManager::objectPersistenceUpdated(UAVObject * obj)
 {
-    qDebug() << "objectPersistenceUpdated: " << obj->getField("Operation")->getValue().toString();
-    Q_ASSERT(obj->getName().compare("ObjectPersistence") == 0);
-    if(saveState == AWAITING_COMPLETED) {
-        failureTimer.stop();
-        // Check flight is saying it completed.  This is the only thing flight should do to trigger an update.
-        Q_ASSERT( obj->getField("Operation")->getValue().toString().compare(QString("Completed")) == 0 );
+    Q_ASSERT(obj);
+    Q_ASSERT(obj->getObjID() == ObjectPersistence::OBJID);
+    ObjectPersistence::DataFields objectPersistence = ((ObjectPersistence *)obj)->getData();
 
+    if(saveState == AWAITING_COMPLETED && objectPersistence.Operation == ObjectPersistence::OPERATION_ERROR) {
+        failureTimer.stop();
+        objectPersistenceOperationFailed();
+    } else if (saveState == AWAITING_COMPLETED &&
+               objectPersistence.Operation == ObjectPersistence::OPERATION_COMPLETED) {
+        failureTimer.stop();
         // Check right object saved
         UAVObject* savingObj = queue.head();
-        Q_ASSERT( obj->getField("ObjectID")->getValue() == savingObj->getObjID() );
+        if(objectPersistence.ObjectID != savingObj->getObjID() ) {
+            objectPersistenceOperationFailed();
+            return;
+        }
 
         obj->disconnect(this);
         queue.dequeue(); // We can now remove the object, it's done.
         saveState = IDLE;
-        emit saveCompleted(obj->getField("ObjectID")->getValue().toInt(), true);
+
+        emit saveCompleted(objectPersistence.ObjectID, true);
         saveNextObject();
     }
 }
 
+/**
+  * Helper function that makes sure FirmwareIAP is updated and then returns the data
+  */
+FirmwareIAPObj::DataFields UAVObjectUtilManager::getFirmwareIap()
+{
+    FirmwareIAPObj::DataFields dummy;
+
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    Q_ASSERT(pm);
+    if (!pm)
+        return dummy;
+    UAVObjectManager *om = pm->getObject<UAVObjectManager>();
+    Q_ASSERT(om);
+    if (!om)
+        return dummy;
+
+    FirmwareIAPObj *firmwareIap = FirmwareIAPObj::GetInstance(om);
+    Q_ASSERT(firmwareIap);
+    if (!firmwareIap)
+        return dummy;
+
+    // The code below will ask for the object update and wait for the updated to be received,
+    // or the timeout of the timer, set to 1 second.
+    QEventLoop loop;
+    connect(firmwareIap, SIGNAL(objectUpdated(UAVObject*)), &loop, SLOT(quit()));
+    QTimer::singleShot(1000, &loop, SLOT(quit())); // Create a timeout
+    firmwareIap->requestUpdate();
+    loop.exec();
+
+    return firmwareIap->getData();
+}
 
 /**
   * Get the UAV Board model, for anyone interested. Return format is:
@@ -225,25 +264,8 @@ void UAVObjectUtilManager::objectPersistenceUpdated(UAVObject * obj)
   */
 int UAVObjectUtilManager::getBoardModel()
 {
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    if (!pm)
-        return 0;
-    UAVObjectManager *om = pm->getObject<UAVObjectManager>();
-    if (!om)
-        return 0;
-
-    UAVDataObject *obj = dynamic_cast<UAVDataObject *>(om->getObject(QString("FirmwareIAPObj")));
-    // The code below will ask for the object update and wait for the updated to be received,
-    // or the timeout of the timer, set to 1 second.
-    QEventLoop loop;
-    connect(obj, SIGNAL(objectUpdated(UAVObject*)), &loop, SLOT(quit()));
-    QTimer::singleShot(1000, &loop, SLOT(quit())); // Create a timeout
-    obj->requestUpdate();
-    loop.exec();
-
-    int boardType = (obj->getField("BoardType")->getValue().toInt()) << 8;
-    boardType += obj->getField("BoardRevision")->getValue().toInt();
-    return boardType;
+    FirmwareIAPObj::DataFields firmwareIapData = getFirmwareIap();
+    return (firmwareIapData.BoardType << 8) + firmwareIapData.BoardRevision;
 }
 
 /**
@@ -252,54 +274,18 @@ int UAVObjectUtilManager::getBoardModel()
 QByteArray UAVObjectUtilManager::getBoardCPUSerial()
 {
     QByteArray cpuSerial;
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    if (!pm)
-        return 0;
-    UAVObjectManager *om = pm->getObject<UAVObjectManager>();
-    if (!om)
-        return 0;
+    FirmwareIAPObj::DataFields firmwareIapData = getFirmwareIap();
 
-    UAVDataObject *obj = dynamic_cast<UAVDataObject *>(om->getObject(QString("FirmwareIAPObj")));
-    // The code below will ask for the object update and wait for the updated to be received,
-    // or the timeout of the timer, set to 1 second.
-    QEventLoop loop;
-    connect(obj, SIGNAL(objectUpdated(UAVObject*)), &loop, SLOT(quit()));
-    QTimer::singleShot(1000, &loop, SLOT(quit())); // Create a timeout
-    obj->requestUpdate();
-    loop.exec();
+    for (int i = 0; i < FirmwareIAPObj::CPUSERIAL_NUMELEM; i++)
+        cpuSerial.append(firmwareIapData.CPUSerial[i]);
 
-    UAVObjectField* cpuField = obj->getField("CPUSerial");
-    for (uint i = 0; i < cpuField->getNumElements(); ++i) {
-        cpuSerial.append(cpuField->getValue(i).toUInt());
-    }
     return cpuSerial;
 }
 
 quint32 UAVObjectUtilManager::getFirmwareCRC()
 {
-    quint32 fwCRC;
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    if (!pm)
-        return 0;
-    UAVObjectManager *om = pm->getObject<UAVObjectManager>();
-    if (!om)
-        return 0;
-
-    UAVDataObject *obj = dynamic_cast<UAVDataObject *>(om->getObject(QString("FirmwareIAPObj")));
-    obj->getField("crc")->setValue(0);
-    obj->updated();
-    // The code below will ask for the object update and wait for the updated to be received,
-    // or the timeout of the timer, set to 1 second.
-    QEventLoop loop;
-    connect(obj, SIGNAL(objectUpdated(UAVObject*)), &loop, SLOT(quit()));
-    QTimer::singleShot(1000, &loop, SLOT(quit())); // Create a timeout
-    obj->requestUpdate();
-    loop.exec();
-
-    UAVObjectField* fwCRCField = obj->getField("crc");
-
-    fwCRC=(quint32)fwCRCField->getValue().toLongLong();
-    return fwCRC;
+    FirmwareIAPObj::DataFields firmwareIapData = getFirmwareIap();
+    return firmwareIapData.crc;
 }
 
 /**
@@ -308,27 +294,11 @@ quint32 UAVObjectUtilManager::getFirmwareCRC()
 QByteArray UAVObjectUtilManager::getBoardDescription()
 {
     QByteArray ret;
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    if (!pm)
-        return 0;
-    UAVObjectManager *om = pm->getObject<UAVObjectManager>();
-    if (!om)
-        return 0;
+    FirmwareIAPObj::DataFields firmwareIapData = getFirmwareIap();
 
-    UAVDataObject *obj = dynamic_cast<UAVDataObject *>(om->getObject(QString("FirmwareIAPObj")));
-    // The code below will ask for the object update and wait for the updated to be received,
-    // or the timeout of the timer, set to 1 second.
-    QEventLoop loop;
-    connect(obj, SIGNAL(objectUpdated(UAVObject*)), &loop, SLOT(quit()));
-    QTimer::singleShot(1000, &loop, SLOT(quit())); // Create a timeout
-    obj->requestUpdate();
-    loop.exec();
+    for (int i = 0; i < FirmwareIAPObj::DESCRIPTION_NUMELEM; i++)
+        ret.append(firmwareIapData.Description[i]);
 
-    UAVObjectField* descriptionField = obj->getField("Description");
-    // Description starts with an offset of
-    for (uint i = 0; i < descriptionField->getNumElements(); ++i) {
-        ret.append(descriptionField->getValue(i).toInt());
-    }
     return ret;
 }
 
@@ -669,42 +639,45 @@ deviceDescriptorStruct UAVObjectUtilManager::getBoardDescriptionStruct()
 
 bool UAVObjectUtilManager::descriptionToStructure(QByteArray desc, deviceDescriptorStruct *struc)
 {
-       if (desc.startsWith("OpFw")) {
-           // This looks like a binary with a description at the end
-           /*
-            #  4 bytes: header: "OpFw"
-            #  4 bytes: GIT commit tag (short version of SHA1)
-            #  4 bytes: Unix timestamp of compile time
-            #  2 bytes: target platform. Should follow same rule as BOARD_TYPE and BOARD_REVISION in board define files.
-            #  26 bytes: commit tag if it is there, otherwise "Unreleased". Zero-padded
-            #   ---- 40 bytes limit ---
-            #  20 bytes: SHA1 sum of the firmware.
-            #  40 bytes: free for now.
-            */
+   if (desc.startsWith("OpFw")) {
+       /*
+        * This looks like a binary with a description at the end
+        *  4 bytes: header: "OpFw"
+        *  4 bytes: git commit hash (short version of SHA1)
+        *  4 bytes: Unix timestamp of last git commit
+        *  2 bytes: target platform. Should follow same rule as BOARD_TYPE and BOARD_REVISION in board define files.
+        *  26 bytes: commit tag if it is there, otherwise "Unreleased". Zero-padded
+        *   ---- 40 bytes limit ---
+        *  20 bytes: SHA1 sum of the firmware.
+        *  40 bytes: free for now.
+        */
 
-           // Note: the ARM binary is big-endian:
-           quint32 gitCommitTag = desc.at(7)&0xFF;
-           for (int i=1;i<4;i++) {
-               gitCommitTag = gitCommitTag<<8;
-               gitCommitTag += desc.at(7-i) & 0xFF;
-           }
-           struc->gitTag=QString::number(gitCommitTag,16);
-           quint32 buildDate = desc.at(11)&0xFF;
-           for (int i=1;i<4;i++) {
-               buildDate = buildDate<<8;
-               buildDate += desc.at(11-i) & 0xFF;
-           }
-           struc->buildDate= QDateTime::fromTime_t(buildDate).toUTC().toString("yyyyMMdd HH:mm");
-           QByteArray targetPlatform = desc.mid(12,2);
-           // TODO: check platform compatibility
-           QString dscText = QString(desc.mid(14,26));
-           struc->boardType=(int)targetPlatform.at(0);
-           struc->boardRevision=(int)targetPlatform.at(1);
-           struc->description=dscText;
-           return true;
+       // Note: the ARM binary is big-endian:
+       quint32 gitCommitHash = desc.at(7) & 0xFF;
+       for (int i = 1; i < 4; i++) {
+           gitCommitHash = gitCommitHash << 8;
+           gitCommitHash += desc.at(7-i) & 0xFF;
        }
-       return false;
+       struc->gitHash = QString::number(gitCommitHash, 16);
 
+       quint32 gitDate = desc.at(11) & 0xFF;
+       for (int i = 1; i < 4; i++) {
+           gitDate = gitDate << 8;
+           gitDate += desc.at(11-i) & 0xFF;
+       }
+       struc->gitDate = QDateTime::fromTime_t(gitDate).toUTC().toString("yyyyMMdd HH:mm");
+
+       QString gitTag = QString(desc.mid(14,26));
+       struc->gitTag = gitTag;
+
+       // TODO: check platform compatibility
+       QByteArray targetPlatform = desc.mid(12,2);
+       struc->boardType = (int)targetPlatform.at(0);
+       struc->boardRevision = (int)targetPlatform.at(1);
+
+       return true;
+   }
+   return false;
 }
 
 // ******************************

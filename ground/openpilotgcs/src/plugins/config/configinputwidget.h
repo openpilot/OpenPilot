@@ -28,7 +28,7 @@
 #define CONFIGINPUTWIDGET_H
 
 #include "ui_input.h"
-#include "configtaskwidget.h"
+#include "../uavobjectwidgetutils/configtaskwidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
@@ -146,6 +146,7 @@ private slots:
         void moveSticks();
         void dimOtherControls(bool value);
         void moveFMSlider();
+        void updatePositionSlider();
         void invertControls();
         void simpleCalibration(bool state);
         void updateCalibration();

@@ -38,9 +38,8 @@ public:
    ~UAVSettingsImportExportFactory();
 
 private:
-   QString createXMLDocument(const QString docName,
-                             const bool isSettings,
-                             const bool fullExport);
+   enum storedData { Settings, Data, Both };
+   QString createXMLDocument(const enum storedData, const bool fullExport);
 
 private slots:
    void importUAVSettings();

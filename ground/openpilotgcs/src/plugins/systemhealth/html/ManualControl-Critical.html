@@ -1,0 +1,24 @@
+<html>
+  <head>
+    <title></title>
+    <meta content="">
+    <style></style>
+  </head>
+  <body>
+    <h1>RC Input: Critical</h1>
+    <p>
+    One of the following conditions may be present:
+    <ul>
+    <li>
+      <p>One or more of the r/c input channel types is not set.</p>
+      <p>On the GCS configuration page, make sure all inputs have a Type set.</p>
+    </li>
+    <li>One or more of the r/c input channel mappings are invalid.</li>
+    <li>The driver is uninitialized for one or more of the r/c input channels.</li>
+    <li>Current flight mode is undefined: this indicates a bug in the code.</li>
+    <li>Current flight mode set to guidance but flight status flight mode is reported as something other than altitude hold.</li>
+    <li>During update of desired stabilization mode, flight status is reported as something other than stabilized 1, 2 or 3.</li>
+    </ul>
+    </p>
+  </body>
+</html>

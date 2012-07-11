@@ -145,7 +145,7 @@ void ConfigPlugin::eraseAllSettings()
     // based on UAVO meta data
     objper->setData(data);
     objper->updated();
-    QTimer::singleShot(6000,this,SLOT(eraseFailed()));
+    QTimer::singleShot(FLASH_ERASE_TIMEOUT_MS,this,SLOT(eraseFailed()));
 
 }
 
@@ -163,7 +163,7 @@ void ConfigPlugin::eraseFailed()
         data.Selection = ObjectPersistence::SELECTION_ALLSETTINGS;
         objper->setData(data);
         objper->updated();
-        QTimer::singleShot(1500,this,SLOT(eraseFailed()));
+        QTimer::singleShot(FLASH_ERASE_TIMEOUT_MS,this,SLOT(eraseFailed()));
     } else {
         disconnect(objper, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(eraseDone(UAVObject *)));
         QMessageBox msgBox;
@@ -190,7 +190,7 @@ void ConfigPlugin::eraseDone(UAVObject * obj)
     if (data.Operation == ObjectPersistence::OPERATION_COMPLETED) {
         settingsErased = true;
         msgBox.setText(tr("Settings are now erased."));
-        msgBox.setInformativeText(tr("Please now power-cycle your board to complete reset."));
+        msgBox.setInformativeText(tr("Please wait for the status LED to begin flashing regularly (up to a minute) then power-cycle your board to complete reset."));
     } else {
         msgBox.setText(tr("Error trying to erase settings."));
         msgBox.setInformativeText(tr("Power-cycle your board after removing all blades. Settings might be inconsistent."));

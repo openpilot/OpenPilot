@@ -148,6 +148,25 @@ uint32_t PIOS_DELAY_GetuSSince(uint32_t t)
 	return (PIOS_DELAY_GetuS() - t);
 }
 
+/**
+ * @brief Get the raw delay timer, useful for timing
+ * @return Unitless value (uint32 wrap around)
+ */
+uint32_t PIOS_DELAY_GetRaw()
+{
+	return DWT_CYCCNT;
+}
+
+/**
+ * @brief Compare to raw times to and convert to us 
+ * @return A microsecond value
+ */
+uint32_t PIOS_DELAY_DiffuS(uint32_t raw)
+{
+	uint32_t diff = DWT_CYCCNT - raw;
+	return diff / us_ticks;
+}
+
 #endif
 
 /**

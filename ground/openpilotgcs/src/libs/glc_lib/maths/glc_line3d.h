@@ -26,7 +26,7 @@
 
 #include "glc_vector3d.h"
 
-#include "glc_config.h"
+#include "../glc_config.h"
 
 //////////////////////////////////////////////////////////////////////
 //! \class GLC_Line3d

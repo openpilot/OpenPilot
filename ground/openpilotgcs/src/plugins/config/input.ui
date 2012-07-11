@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="RCInput">
       <attribute name="title">
@@ -27,12 +27,84 @@
        <item row="0" column="0">
         <widget class="QStackedWidget" name="stackedWidget">
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="advancedPage">
           <layout class="QVBoxLayout" name="verticalLayout_4">
            <item>
             <layout class="QVBoxLayout" name="channelSettings"/>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Preferred</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>5</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <layout class="QGridLayout" name="gridLayout_3">
+             <item row="0" column="0">
+              <widget class="QLabel" name="labelDeadband">
+               <property name="text">
+                <string>Roll/Pitch/Yaw stick deadband</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QDoubleSpinBox" name="deadband">
+               <property name="toolTip">
+                <string>Stick deadband in percents of full range (0-10), zero to disable</string>
+               </property>
+               <property name="decimals">
+                <number>1</number>
+               </property>
+               <property name="maximum">
+                <double>10.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.100000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="3">
+              <spacer name="horizontalSpacer_3">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_4">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Preferred</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>5</height>
+              </size>
+             </property>
+            </spacer>
            </item>
            <item>
             <widget class="QPushButton" name="configurationWizard">
@@ -132,88 +204,40 @@
       <attribute name="title">
        <string>Flight Mode Switch Settings</string>
       </attribute>
-      <widget class="QLabel" name="label_15">
-       <property name="geometry">
-        <rect>
-         <x>310</x>
-         <y>10</y>
-         <width>201</width>
-         <height>17</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Warning: avoid &quot;Manual&quot;</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_16">
-       <property name="geometry">
-        <rect>
-         <x>310</x>
-         <y>30</y>
-         <width>201</width>
-         <height>17</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>for multirotors!</string>
-       </property>
-      </widget>
       <widget class="QGroupBox" name="groupBox">
        <property name="geometry">
         <rect>
          <x>30</x>
-         <y>130</y>
-         <width>445</width>
-         <height>155</height>
+         <y>260</y>
+         <width>541</width>
+         <height>161</height>
         </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true"/>
        </property>
        <property name="title">
         <string>Configure each stabilization mode for each axis</string>
        </property>
        <layout class="QGridLayout" name="gridLayout_2">
-        <item row="0" column="1">
-         <widget class="QLabel" name="label_8">
-          <property name="text">
-           <string>Roll</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignBottom|Qt::AlignHCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="2">
-         <widget class="QLabel" name="label_9">
-          <property name="text">
-           <string>Pitch</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignBottom|Qt::AlignHCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="3">
+        <item row="1" column="3">
          <widget class="QLabel" name="label_10">
+          <property name="styleSheet">
+           <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;
+font: bold 12px;
+margin:1px;</string>
+          </property>
           <property name="text">
            <string>Yaw</string>
           </property>
           <property name="alignment">
-           <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+           <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
-        <item row="1" column="0">
+        <item row="2" column="0">
          <widget class="QLabel" name="label_14">
           <property name="text">
            <string>Stabilized1</string>
@@ -223,16 +247,46 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="1">
-         <widget class="QComboBox" name="fmsSsPos1Roll"/>
+        <item row="2" column="1">
+         <widget class="QComboBox" name="fmsSsPos1Roll">
+          <property name="minimumSize">
+           <size>
+            <width>102</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::StrongFocus</enum>
+          </property>
+         </widget>
         </item>
-        <item row="1" column="2">
-         <widget class="QComboBox" name="fmsSsPos1Pitch"/>
+        <item row="2" column="2">
+         <widget class="QComboBox" name="fmsSsPos1Pitch">
+          <property name="minimumSize">
+           <size>
+            <width>102</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::StrongFocus</enum>
+          </property>
+         </widget>
         </item>
-        <item row="1" column="3">
-         <widget class="QComboBox" name="fmsSsPos1Yaw"/>
+        <item row="2" column="3">
+         <widget class="QComboBox" name="fmsSsPos1Yaw">
+          <property name="minimumSize">
+           <size>
+            <width>102</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::StrongFocus</enum>
+          </property>
+         </widget>
         </item>
-        <item row="2" column="0">
+        <item row="3" column="0">
          <widget class="QLabel" name="label_21">
           <property name="text">
            <string>Stabilized2</string>
@@ -242,16 +296,28 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="1">
-         <widget class="QComboBox" name="fmsSsPos2Roll"/>
+        <item row="3" column="1">
+         <widget class="QComboBox" name="fmsSsPos2Roll">
+          <property name="focusPolicy">
+           <enum>Qt::StrongFocus</enum>
+          </property>
+         </widget>
         </item>
-        <item row="2" column="2">
-         <widget class="QComboBox" name="fmsSsPos2Pitch"/>
+        <item row="3" column="2">
+         <widget class="QComboBox" name="fmsSsPos2Pitch">
+          <property name="focusPolicy">
+           <enum>Qt::StrongFocus</enum>
+          </property>
+         </widget>
         </item>
-        <item row="2" column="3">
-         <widget class="QComboBox" name="fmsSsPos2Yaw"/>
+        <item row="3" column="3">
+         <widget class="QComboBox" name="fmsSsPos2Yaw">
+          <property name="focusPolicy">
+           <enum>Qt::StrongFocus</enum>
+          </property>
+         </widget>
         </item>
-        <item row="3" column="0">
+        <item row="4" column="0">
          <widget class="QLabel" name="label_22">
           <property name="text">
            <string>Stabilized3</string>
@@ -261,14 +327,73 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="1">
-         <widget class="QComboBox" name="fmsSsPos3Roll"/>
+        <item row="4" column="1">
+         <widget class="QComboBox" name="fmsSsPos3Roll">
+          <property name="focusPolicy">
+           <enum>Qt::StrongFocus</enum>
+          </property>
+         </widget>
         </item>
-        <item row="3" column="2">
-         <widget class="QComboBox" name="fmsSsPos3Pitch"/>
+        <item row="4" column="2">
+         <widget class="QComboBox" name="fmsSsPos3Pitch">
+          <property name="focusPolicy">
+           <enum>Qt::StrongFocus</enum>
+          </property>
+         </widget>
         </item>
-        <item row="3" column="3">
-         <widget class="QComboBox" name="fmsSsPos3Yaw"/>
+        <item row="4" column="3">
+         <widget class="QComboBox" name="fmsSsPos3Yaw">
+          <property name="focusPolicy">
+           <enum>Qt::StrongFocus</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLabel" name="label_8">
+          <property name="styleSheet">
+           <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;
+font: bold 12px;
+margin:1px;</string>
+          </property>
+          <property name="text">
+           <string>Roll</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QLabel" name="label_9">
+          <property name="styleSheet">
+           <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;
+font: bold 12px;
+margin:1px;</string>
+          </property>
+          <property name="text">
+           <string>Pitch</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <spacer name="verticalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
         </item>
        </layout>
       </widget>
@@ -276,84 +401,102 @@
        <property name="geometry">
         <rect>
          <x>30</x>
-         <y>0</y>
-         <width>261</width>
-         <height>121</height>
+         <y>20</y>
+         <width>541</width>
+         <height>211</height>
         </rect>
        </property>
        <property name="title">
         <string>FlightMode Switch Positions</string>
        </property>
-       <widget class="QComboBox" name="fmsModePos2">
+       <widget class="QComboBox" name="fmsModePos5">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>100</x>
-          <y>55</y>
+          <y>140</y>
           <width>151</width>
           <height>26</height>
          </rect>
         </property>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
        </widget>
-       <widget class="QComboBox" name="fmsModePos3">
+       <widget class="QComboBox" name="fmsModePos4">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>100</x>
-          <y>25</y>
+          <y>110</y>
           <width>151</width>
           <height>26</height>
          </rect>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
          <string>Select the stabilization mode on this position (manual/stabilized/auto)</string>
         </property>
        </widget>
-       <widget class="QLabel" name="label_11">
+       <widget class="QLabel" name="label_pos4">
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>30</y>
+          <y>115</y>
           <width>62</width>
           <height>17</height>
          </rect>
         </property>
         <property name="text">
-         <string>Pos. 3</string>
+         <string>Pos. 4</string>
         </property>
        </widget>
-       <widget class="QComboBox" name="fmsModePos1">
+       <widget class="QComboBox" name="fmsModePos6">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>100</x>
-          <y>85</y>
+          <y>170</y>
           <width>151</width>
           <height>26</height>
          </rect>
         </property>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
        </widget>
-       <widget class="QLabel" name="label_12">
+       <widget class="QLabel" name="label_pos5">
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>60</y>
+          <y>145</y>
           <width>62</width>
           <height>17</height>
          </rect>
         </property>
         <property name="text">
-         <string>Pos. 2</string>
+         <string>Pos. 5</string>
         </property>
        </widget>
-       <widget class="QLabel" name="label_13">
+       <widget class="QLabel" name="label_pos6">
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>90</y>
+          <y>175</y>
           <width>62</width>
           <height>17</height>
          </rect>
         </property>
         <property name="text">
-         <string>Pos. 1</string>
+         <string>Pos. 6</string>
         </property>
        </widget>
        <widget class="QSlider" name="fmsSlider">
@@ -363,39 +506,196 @@
         <property name="geometry">
          <rect>
           <x>70</x>
-          <y>30</y>
+          <y>28</y>
           <width>20</width>
-          <height>81</height>
+          <height>160</height>
          </rect>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
          <string>This slider moves when you move the flight mode switch
-on your remote. Setup the flightmode channel on the RC Input tab
-if you have not done so already.</string>
+on your remote. It shows currently active flight mode.
+
+Setup the flight mode channel on the RC Input tab if you have not done so already.</string>
         </property>
         <property name="minimum">
-         <number>-100</number>
+         <number>0</number>
         </property>
         <property name="maximum">
-         <number>100</number>
+         <number>5</number>
         </property>
         <property name="pageStep">
          <number>10</number>
         </property>
+        <property name="value">
+         <number>0</number>
+        </property>
         <property name="sliderPosition">
-         <number>-100</number>
+         <number>0</number>
         </property>
         <property name="orientation">
          <enum>Qt::Vertical</enum>
+        </property>
+        <property name="invertedAppearance">
+         <bool>true</bool>
         </property>
         <property name="tickPosition">
          <enum>QSlider::TicksBelow</enum>
         </property>
         <property name="tickInterval">
-         <number>100</number>
+         <number>1</number>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="fmsModePos2">
+        <property name="geometry">
+         <rect>
+          <x>100</x>
+          <y>50</y>
+          <width>151</width>
+          <height>26</height>
+         </rect>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="fmsModePos3">
+        <property name="geometry">
+         <rect>
+          <x>100</x>
+          <y>80</y>
+          <width>151</width>
+          <height>26</height>
+         </rect>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="fmsModePos1">
+        <property name="geometry">
+         <rect>
+          <x>100</x>
+          <y>20</y>
+          <width>151</width>
+          <height>26</height>
+         </rect>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
+        <property name="toolTip">
+         <string>Select the stabilization mode on this position (manual/stabilized/auto)</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_pos2">
+        <property name="geometry">
+         <rect>
+          <x>11</x>
+          <y>55</y>
+          <width>62</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Pos. 2</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_pos1">
+        <property name="geometry">
+         <rect>
+          <x>11</x>
+          <y>25</y>
+          <width>62</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Pos. 1</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_pos3">
+        <property name="geometry">
+         <rect>
+          <x>11</x>
+          <y>85</y>
+          <width>62</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Pos. 3</string>
+        </property>
+       </widget>
+       <widget class="QSpinBox" name="fmsPosNum">
+        <property name="geometry">
+         <rect>
+          <x>458</x>
+          <y>20</y>
+          <width>61</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Number of positions your FlightMode switch has.
+
+Default is 3.
+
+It will be 2 or 3 for most of setups, but it also can be up to 6.
+In that case you have to configure your radio mixers so the whole range
+from min to max is split into N equal intervals, and you may set arbitrary
+channel value for each flight mode.</string>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>6</number>
+        </property>
+        <property name="value">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label">
+        <property name="geometry">
+         <rect>
+          <x>277</x>
+          <y>22</y>
+          <width>171</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Number of flight modes:</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_15">
+        <property name="geometry">
+         <rect>
+          <x>310</x>
+          <y>120</y>
+          <width>191</width>
+          <height>30</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>Avoid &quot;Manual&quot; for multirotors!</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
         </property>
        </widget>
       </widget>
+      <zorder>groupBox_2</zorder>
+      <zorder>groupBox</zorder>
      </widget>
      <widget class="QWidget" name="tab_4">
       <attribute name="title">
@@ -419,6 +719,9 @@ if you have not done so already.</string>
          </item>
          <item>
           <widget class="QComboBox" name="armControl">
+           <property name="focusPolicy">
+            <enum>Qt::StrongFocus</enum>
+           </property>
            <property name="toolTip">
             <string>Indicate the control used for arming the airframe, in addition to setting the throttle to its minimum position. In other terms &quot;Throttle Off&quot;.</string>
            </property>
@@ -450,6 +753,9 @@ if you have not done so already.</string>
          </item>
          <item>
           <widget class="QSpinBox" name="armTimeout">
+           <property name="focusPolicy">
+            <enum>Qt::StrongFocus</enum>
+           </property>
            <property name="toolTip">
             <string>After the time indicated here, the frame go back to disarmed state.</string>
            </property>
@@ -579,18 +885,28 @@ Applies and Saves all settings to SD</string>
  </widget>
  <tabstops>
   <tabstop>fmsSlider</tabstop>
-  <tabstop>fmsModePos3</tabstop>
-  <tabstop>fmsSsPos3Roll</tabstop>
-  <tabstop>fmsSsPos3Pitch</tabstop>
-  <tabstop>fmsSsPos3Yaw</tabstop>
-  <tabstop>fmsModePos2</tabstop>
-  <tabstop>fmsSsPos2Roll</tabstop>
-  <tabstop>fmsSsPos2Pitch</tabstop>
-  <tabstop>fmsSsPos2Yaw</tabstop>
-  <tabstop>fmsModePos1</tabstop>
   <tabstop>fmsSsPos1Roll</tabstop>
   <tabstop>fmsSsPos1Pitch</tabstop>
   <tabstop>fmsSsPos1Yaw</tabstop>
+  <tabstop>fmsSsPos2Roll</tabstop>
+  <tabstop>fmsSsPos2Pitch</tabstop>
+  <tabstop>fmsSsPos2Yaw</tabstop>
+  <tabstop>fmsSsPos3Roll</tabstop>
+  <tabstop>fmsSsPos3Pitch</tabstop>
+  <tabstop>fmsSsPos3Yaw</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>deadband</tabstop>
+  <tabstop>configurationWizard</tabstop>
+  <tabstop>runCalibration</tabstop>
+  <tabstop>graphicsView</tabstop>
+  <tabstop>wzBack</tabstop>
+  <tabstop>wzNext</tabstop>
+  <tabstop>wzCancel</tabstop>
+  <tabstop>armControl</tabstop>
+  <tabstop>armTimeout</tabstop>
+  <tabstop>inputHelp</tabstop>
+  <tabstop>saveRCInputToRAM</tabstop>
+  <tabstop>saveRCInputToSD</tabstop>
  </tabstops>
  <resources>
   <include location="../coreplugin/core.qrc"/>

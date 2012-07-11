@@ -129,7 +129,7 @@ namespace OP_DFU {
         // Service commands:
         bool enterDFU(int const &devNumber);
         bool findDevices();
-        int JumpToApp();
+        int JumpToApp(bool);
         int ResetDevice(void);
         OP_DFU::Status StatusRequest();
         bool EndOperation();

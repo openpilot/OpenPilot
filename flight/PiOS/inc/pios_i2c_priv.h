@@ -3,7 +3,6 @@
  *
  * @file       pios_i2c_priv.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * 	       Parts by Thorsten Klose (tk@midibox.org)
  * @brief      I2C private definitions.
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -33,6 +32,7 @@
 
 struct pios_i2c_adapter_cfg {
 	I2C_TypeDef *regs;
+	uint32_t remap;
 	I2C_InitTypeDef init;
 
 	uint32_t transfer_timeout_ms;
@@ -85,19 +85,23 @@ enum pios_i2c_adapter_magic {
 struct pios_i2c_adapter {
 	enum pios_i2c_adapter_magic         magic;
 	const struct pios_i2c_adapter_cfg * cfg;
-	void (*callback) (uint8_t, uint8_t);
 #ifdef PIOS_INCLUDE_FREERTOS
 	xSemaphoreHandle sem_busy;
 	xSemaphoreHandle sem_ready;
+#else
+	uint8_t busy;
 #endif
 
 	bool bus_error;
+	bool nack;
 
 	volatile enum i2c_adapter_state curr_state;
 	const struct pios_i2c_txn *first_txn;
 	const struct pios_i2c_txn *active_txn;
 	const struct pios_i2c_txn *last_txn;
 
+	void (*callback) ();
+	
 	uint8_t *active_byte;
 	uint8_t *last_byte;
 };

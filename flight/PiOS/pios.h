@@ -46,9 +46,17 @@
 #include <string.h>
 #include <math.h>
 
+#include "pios_config.h"
 /* STM32 Std Perf Lib */
+#if defined(STM32F4XX)
+# include <stm32f4xx.h>
+# include <stm32f4xx_rcc.h>
+#elif defined(STM32F2XX)
+#include <stm32f2xx.h>
+#include <stm32f2xx_syscfg.h>
+#else
 #include <stm32f10x.h>
-#include <stm32f10x_conf.h>
+#endif
 
 #if defined(PIOS_INCLUDE_SDCARD)
 /* Dosfs Includes */
@@ -86,9 +94,7 @@
 #include <pios_usb_hid.h>
 #include <pios_debug.h>
 #include <pios_gpio.h>
-#if defined(PIOS_INCLUDE_EXTI)
 #include <pios_exti.h>
-#endif
 #include <pios_wdg.h>
 
 /* PIOS Hardware Includes (Common) */
@@ -112,18 +118,30 @@
 #if defined(PIOS_INCLUDE_IMU3000)
 #include <pios_imu3000.h>
 #endif
+#if defined(PIOS_INCLUDE_MPU6050)
+#include <pios_mpu6050.h>
+#endif
+#if defined(PIOS_INCLUDE_MPU6000)
+#include <pios_mpu6000.h>
+#endif
+#if defined(PIOS_INCLUDE_L3GD20)
+#include <pios_l3gd20.h>
+#endif
+#if defined(PIOS_INCLUDE_MS5611)
+#include <pios_ms5611.h>
+#endif
+#if defined(PIOS_INCLUDE_IAP)
 #include <pios_iap.h>
-
+#endif
 #if defined(PIOS_INCLUDE_ADXL345)
 #include <pios_adxl345.h>
 #endif
-
 #if defined(PIOS_INCLUDE_BMA180)
 #include <pios_bma180.h>
 #endif
 
 #if defined(PIOS_INCLUDE_FLASH)
-#include <pios_flash_w25x.h>
+#include <pios_flash_jedec.h>
 #include <pios_flashfs_objlist.h>
 #endif
 
@@ -132,8 +150,7 @@
 #endif
 
 #if defined(PIOS_INCLUDE_USB)
-/* USB Libs */
-#include <usb_lib.h>
+#include <pios_usb.h>
 #endif
 
 #include <pios_crc.h>

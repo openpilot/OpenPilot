@@ -40,7 +40,7 @@
 #include <QMessageBox>
 //#include "fancytabwidget.h"
 #include "utils/mytabbedstackwidget.h"
-#include "configtaskwidget.h"
+#include "../uavobjectwidgetutils/configtaskwidget.h"
 
 class ConfigGadgetWidget: public QWidget
 {
@@ -50,20 +50,31 @@ class ConfigGadgetWidget: public QWidget
 public:
     ConfigGadgetWidget(QWidget *parent = 0);
     ~ConfigGadgetWidget();
-    enum widgetTabs {hardware=0, aircraft, input, output, ins, stabilization, camerastabilization};
+    enum widgetTabs {hardware=0, aircraft, input, output, sensors, stabilization, camerastabilization, txpid, pipxtreme};
 
 public slots:
     void onAutopilotConnect();
     void onAutopilotDisconnect();
     void tabAboutToChange(int i,bool *);
+    void updatePipXStatus(UAVObject *object);
+    void onPipxtremeDisconnect();
 
 signals:
     void autopilotConnected();
     void autopilotDisconnected();
+    void pipxtremeConnect();
+    void pipxtremeDisconnect();
 
 protected:
         void resizeEvent(QResizeEvent * event);
         MyTabbedStackWidget *ftw;
+
+private:
+	UAVDataObject* pipxStatusObj;
+
+	// A timer that timesout the connction to the PipX.
+	QTimer *pipxTimeout;
+	bool pipxConnected;
 };
 
 #endif // CONFIGGADGETWIDGET_H

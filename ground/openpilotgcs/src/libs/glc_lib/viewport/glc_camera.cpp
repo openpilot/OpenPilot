@@ -24,11 +24,7 @@
 //! \file glc_camera.cpp Implementation of the GLC_Camera class.
 
 #include "glc_camera.h"
-
-#if defined(Q_OS_MAC)
-#include "gl.h"
-#include "glu.h"
-#endif
+#include "../glc_context.h"
 
 #include <QtDebug>
 
@@ -267,7 +263,7 @@ GLC_Camera& GLC_Camera::setCam(GLC_Point3d Eye, GLC_Point3d Target, GLC_Vector3d
 	//Q_ASSERT((Angle > EPSILON) && ((PI - Angle) > EPSILON));
 
 	if ( !qFuzzyCompare(Angle - (PI / 2), 0.0))
-	{	// Angle not equal to 90¡
+	{	// Angle not equal to 90
 		const GLC_Vector3d AxeRot(VectCam ^ Up);
 		GLC_Matrix4x4 MatRot(AxeRot, PI / 2);
 		Up= MatRot * VectCam;
@@ -436,9 +432,7 @@ GLC_Camera GLC_Camera::isoView() const
 //////////////////////////////////////////////////////////////////////
 void GLC_Camera::glExecute()
 {
-	gluLookAt(m_Eye.x(), m_Eye.y(), m_Eye.z(),
-		m_Target.x(), m_Target.y(), m_Target.z(),
-		m_VectUp.x(), m_VectUp.y(), m_VectUp.z());
+	GLC_Context::current()->glcMultMatrix(modelViewMatrix());
 }
 
 //////////////////////////////////////////////////////////////////////

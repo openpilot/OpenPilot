@@ -161,7 +161,7 @@ private:
 //////////////////////////////////////////////////////////////////////
 public:
 	//! Default constructor
-	GLC_ColladaToWorld(const QGLContext*);
+	GLC_ColladaToWorld();
 
 	//! Destructor
 	virtual ~GLC_ColladaToWorld();
@@ -367,9 +367,6 @@ private:
 private:
 	//! The world to built
 	GLC_World* m_pWorld;
-
-	//! OpenGL Context
-	const QGLContext* m_pQGLContext;
 
 	//! Xml Reader
 	QXmlStreamReader* m_pStreamReader;

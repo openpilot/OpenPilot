@@ -1,0 +1,79 @@
+From 07081d82193928ffd0b45df446546f0a41373db7 Mon Sep 17 00:00:00 2001
+From: Stacey Sheldon <stac@solidgoldbomb.org>
+Date: Thu, 2 Feb 2012 22:42:03 -0500
+Subject: [PATCH 1/2] armv7m: remove dummy FP regs for new gdb
+
+---
+ src/rtos/rtos_standard_stackings.c |    7 +++++++
+ src/target/armv7m.c                |   16 ++++++++++++++++
+ 2 files changed, 23 insertions(+), 0 deletions(-)
+
+diff --git a/src/rtos/rtos_standard_stackings.c b/src/rtos/rtos_standard_stackings.c
+index 30d9cd9..6ea6565 100644
+--- a/src/rtos/rtos_standard_stackings.c
++++ b/src/rtos/rtos_standard_stackings.c
+@@ -41,6 +41,7 @@ static const struct stack_register_offset rtos_standard_Cortex_M3_stack_offsets[
+ 	{ -2,   32 },		/* sp   */
+ 	{ 0x34, 32 },		/* lr   */
+ 	{ 0x38, 32 },		/* pc   */
++#ifdef USE_DUMMY_FP_REGS
+ 	{ -1,   96 },		/* FPA1 */
+ 	{ -1,   96 },		/* FPA2 */
+ 	{ -1,   96 },		/* FPA3 */
+@@ -50,13 +51,19 @@ static const struct stack_register_offset rtos_standard_Cortex_M3_stack_offsets[
+ 	{ -1,   96 },		/* FPA7 */
+ 	{ -1,   96 },		/* FPA8 */
+ 	{ -1,   32 },		/* FPS  */
++#endif
+ 	{ 0x3c, 32 },		/* xPSR */
+ };
+ 
++
+ const struct rtos_register_stacking rtos_standard_Cortex_M3_stacking = {
+ 	0x40,					/* stack_registers_size */
+ 	-1,					/* stack_growth_direction */
++#ifdef USE_DUMMY_FP_REGS
+ 	26,					/* num_output_registers */
++#else
++	17,
++#endif
+ 	8,					/* stack_alignment */
+ 	rtos_standard_Cortex_M3_stack_offsets	/* register_offsets */
+ };
+diff --git a/src/target/armv7m.c b/src/target/armv7m.c
+index 258653e..50b26d4 100644
+--- a/src/target/armv7m.c
++++ b/src/target/armv7m.c
+@@ -267,6 +267,7 @@ int armv7m_get_gdb_reg_list(struct target *target, struct reg **reg_list[], int
+ 	struct armv7m_common *armv7m = target_to_armv7m(target);
+ 	int i;
+ 
++#ifdef USE_DUMMY_FP_REGS
+ 	*reg_list_size = 26;
+ 	*reg_list = malloc(sizeof(struct reg *) * (*reg_list_size));
+ 
+@@ -295,6 +296,21 @@ int armv7m_get_gdb_reg_list(struct target *target, struct reg **reg_list[], int
+ 	(*reg_list)[25] = &armv7m->core_cache->reg_list[ARMV7M_xPSR];
+ #endif
+ 
++#else
++	*reg_list_size = 17;
++	*reg_list = malloc(sizeof(struct reg*) * (*reg_list_size));
++
++	/*
++	 * GDB register packet format for ARM:
++	 * - the first 16 registers are r0..r15
++	 * - followed by xPSR
++	 */
++	for (i = 0; i < *reg_list_size; i++)
++	{
++		(*reg_list)[i] = &armv7m->core_cache->reg_list[i];
++	}
++#endif
++
+ 	return ERROR_OK;
+ }
+ 
+-- 
+1.7.5.4
+

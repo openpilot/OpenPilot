@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>660</width>
+    <width>850</width>
     <height>572</height>
    </rect>
   </property>
@@ -68,6 +68,23 @@
          <width>300</width>
          <height>300</height>
         </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">#SwashplateBox,#SwashplateBox_2,#SwashplateBox_3,#SwashplateBox_4,#ccpmSwashImageBox,#SwashLvlInstructionsBox,#SwashLvlccpmSwashImageBox,#SwashLvlccpmSliderBox,#SwashLvlStatusBox,#ThrottleCurveBox,#PitchCurveBox{
+background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0 rgba(243, 243, 243, 255), stop:1 rgba(250, 250, 250, 255));
+border: 1px outset #999;
+border-radius: 3;
+font:bold;
+}
+
+QGroupBox::title {
+     subcontrol-origin: margin;
+     subcontrol-position: top center; /* position at the top center */
+     padding: 0 3px;
+     background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                       stop: 0 #FFOECE, stop: 1 #FFFFFF);
+	top: 5px;
+ }</string>
        </property>
        <property name="currentIndex">
         <number>0</number>
@@ -215,6 +232,22 @@
                 </property>
                </widget>
               </item>
+              <item row="0" column="0">
+               <spacer name="verticalSpacer_5">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Fixed</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
              </layout>
             </widget>
            </item>
@@ -245,7 +278,7 @@
               <property name="margin">
                <number>3</number>
               </property>
-              <item row="0" column="0">
+              <item row="1" column="0">
                <widget class="QLabel" name="ccpmServoWLabel">
                 <property name="enabled">
                  <bool>true</bool>
@@ -273,7 +306,7 @@
                 </property>
                </widget>
               </item>
-              <item row="0" column="1">
+              <item row="1" column="1">
                <widget class="QComboBox" name="ccpmServoWChannel">
                 <property name="enabled">
                  <bool>true</bool>
@@ -298,7 +331,7 @@
                 </property>
                </widget>
               </item>
-              <item row="1" column="1">
+              <item row="2" column="1">
                <widget class="QComboBox" name="ccpmServoXChannel">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -320,7 +353,7 @@
                 </property>
                </widget>
               </item>
-              <item row="3" column="1">
+              <item row="4" column="1">
                <widget class="QComboBox" name="ccpmServoYChannel">
                 <property name="enabled">
                  <bool>true</bool>
@@ -345,7 +378,7 @@
                 </property>
                </widget>
               </item>
-              <item row="1" column="0">
+              <item row="2" column="0">
                <widget class="QLabel" name="ccpmServoXLabel">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -370,7 +403,7 @@
                 </property>
                </widget>
               </item>
-              <item row="5" column="1">
+              <item row="6" column="1">
                <widget class="QComboBox" name="ccpmSingleServo">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
@@ -412,7 +445,7 @@
                 </item>
                </widget>
               </item>
-              <item row="5" column="0">
+              <item row="6" column="0">
                <widget class="QLabel" name="ccpmServoZLabel_3">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -437,7 +470,7 @@
                 </property>
                </widget>
               </item>
-              <item row="4" column="1">
+              <item row="5" column="1">
                <widget class="QComboBox" name="ccpmServoZChannel">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -459,7 +492,7 @@
                 </property>
                </widget>
               </item>
-              <item row="4" column="0">
+              <item row="5" column="0">
                <widget class="QLabel" name="ccpmServoZLabel">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -484,7 +517,7 @@
                 </property>
                </widget>
               </item>
-              <item row="3" column="0">
+              <item row="4" column="0">
                <widget class="QLabel" name="ccpmServoYLabel">
                 <property name="enabled">
                  <bool>true</bool>
@@ -511,6 +544,22 @@
                  <string>Servo Y</string>
                 </property>
                </widget>
+              </item>
+              <item row="0" column="0">
+               <spacer name="verticalSpacer_6">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Fixed</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
               </item>
              </layout>
             </widget>
@@ -548,7 +597,7 @@
               <property name="margin">
                <number>3</number>
               </property>
-              <item row="0" column="1">
+              <item row="1" column="1">
                <widget class="QDoubleSpinBox" name="ccpmAngleW">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -579,7 +628,7 @@
                 </property>
                </widget>
               </item>
-              <item row="0" column="0">
+              <item row="1" column="0">
                <widget class="QLabel" name="ccpmServoWLabel_2">
                 <property name="enabled">
                  <bool>true</bool>
@@ -607,7 +656,7 @@
                 </property>
                </widget>
               </item>
-              <item row="1" column="0">
+              <item row="2" column="0">
                <widget class="QLabel" name="ccpmServoXLabel_2">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -632,7 +681,7 @@
                 </property>
                </widget>
               </item>
-              <item row="2" column="0">
+              <item row="3" column="0">
                <widget class="QLabel" name="ccpmServoYLabel_2">
                 <property name="enabled">
                  <bool>true</bool>
@@ -660,7 +709,7 @@
                 </property>
                </widget>
               </item>
-              <item row="4" column="0">
+              <item row="5" column="0">
                <widget class="QLabel" name="ccpmServoZLabel_2">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -685,7 +734,7 @@
                 </property>
                </widget>
               </item>
-              <item row="5" column="0">
+              <item row="6" column="0">
                <widget class="QLabel" name="label_10">
                 <property name="enabled">
                  <bool>true</bool>
@@ -716,7 +765,7 @@
                 </property>
                </widget>
               </item>
-              <item row="1" column="1">
+              <item row="2" column="1">
                <widget class="QDoubleSpinBox" name="ccpmAngleX">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -747,7 +796,7 @@
                 </property>
                </widget>
               </item>
-              <item row="5" column="1">
+              <item row="6" column="1">
                <widget class="QDoubleSpinBox" name="ccpmCorrectionAngle">
                 <property name="enabled">
                  <bool>true</bool>
@@ -781,7 +830,7 @@
                 </property>
                </widget>
               </item>
-              <item row="4" column="1">
+              <item row="5" column="1">
                <widget class="QDoubleSpinBox" name="ccpmAngleZ">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -812,7 +861,7 @@
                 </property>
                </widget>
               </item>
-              <item row="2" column="1">
+              <item row="3" column="1">
                <widget class="QDoubleSpinBox" name="ccpmAngleY">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -842,6 +891,22 @@
                  <double>15.000000000000000</double>
                 </property>
                </widget>
+              </item>
+              <item row="0" column="0">
+               <spacer name="verticalSpacer_7">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Fixed</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
               </item>
              </layout>
             </widget>
@@ -873,14 +938,14 @@
               <property name="margin">
                <number>3</number>
               </property>
-              <item row="1" column="0">
+              <item row="2" column="0">
                <widget class="QCheckBox" name="ccpmCollectivePassthrough">
                 <property name="text">
                  <string>Collective Pass through</string>
                 </property>
                </widget>
               </item>
-              <item row="3" column="0">
+              <item row="4" column="0">
                <widget class="QCheckBox" name="ccpmLinkRoll">
                 <property name="text">
                  <string>Link Roll/Pitch</string>
@@ -890,7 +955,7 @@
                 </property>
                </widget>
               </item>
-              <item row="2" column="0">
+              <item row="3" column="0">
                <widget class="QCheckBox" name="ccpmLinkCyclic">
                 <property name="text">
                  <string>Link Cyclic/Collective</string>
@@ -899,6 +964,22 @@
                  <bool>true</bool>
                 </property>
                </widget>
+              </item>
+              <item row="1" column="0">
+               <spacer name="verticalSpacer_8">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Fixed</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
               </item>
              </layout>
             </widget>
@@ -960,7 +1041,9 @@
              </property>
              <property name="font">
               <font>
-               <pointsize>11</pointsize>
+               <weight>75</weight>
+               <italic>false</italic>
+               <bold>true</bold>
               </font>
              </property>
              <property name="title">
@@ -982,7 +1065,7 @@
               <property name="margin">
                <number>3</number>
               </property>
-              <item row="0" column="0">
+              <item row="1" column="0">
                <widget class="QSplitter" name="splitter_3">
                 <property name="orientation">
                  <enum>Qt::Vertical</enum>
@@ -1068,6 +1151,22 @@
                 </widget>
                </widget>
               </item>
+              <item row="0" column="0">
+               <spacer name="verticalSpacer_9">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Fixed</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
              </layout>
             </widget>
            </item>
@@ -1107,6 +1206,21 @@
                <height>600</height>
               </size>
              </property>
+             <property name="font">
+              <font>
+               <pointsize>9</pointsize>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">QGroupBox::title {
+   background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;
+margin:1px;
+ }</string>
+             </property>
              <property name="title">
               <string>REVO</string>
              </property>
@@ -1117,6 +1231,22 @@
               <property name="margin">
                <number>3</number>
               </property>
+              <item>
+               <spacer name="verticalSpacer_10">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Minimum</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>7</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
               <item>
                <widget class="QLabel" name="label_14">
                 <property name="enabled">
@@ -1230,7 +1360,7 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>50</width>
+               <width>60</width>
                <height>100</height>
               </size>
              </property>
@@ -1239,6 +1369,21 @@
                <width>50</width>
                <height>600</height>
               </size>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>9</pointsize>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">QGroupBox::title {
+   background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;
+margin:1px;
+ }</string>
              </property>
              <property name="title">
               <string>CCPM</string>
@@ -1253,6 +1398,22 @@
               <property name="margin">
                <number>3</number>
               </property>
+              <item>
+               <spacer name="verticalSpacer_11">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Minimum</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>7</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
               <item>
                <widget class="QLabel" name="label_15">
                 <property name="enabled">
@@ -1382,7 +1543,7 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>50</width>
+               <width>70</width>
                <height>100</height>
               </size>
              </property>
@@ -1391,6 +1552,21 @@
                <width>50</width>
                <height>600</height>
               </size>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>9</pointsize>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">QGroupBox::title {
+   background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;
+margin:1px;
+ }</string>
              </property>
              <property name="title">
               <string>Collective</string>
@@ -1405,6 +1581,22 @@
               <property name="margin">
                <number>3</number>
               </property>
+              <item>
+               <spacer name="verticalSpacer_12">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Minimum</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>7</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_11">
                 <item>
@@ -1505,6 +1697,21 @@
                <height>600</height>
               </size>
              </property>
+             <property name="font">
+              <font>
+               <pointsize>9</pointsize>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">QGroupBox::title {
+   background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;
+margin:1px;
+ }</string>
+             </property>
              <property name="title">
               <string>Cyclic</string>
              </property>
@@ -1521,6 +1728,22 @@
               <property name="margin">
                <number>3</number>
               </property>
+              <item>
+               <spacer name="verticalSpacer_13">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Minimum</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>7</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_7">
                 <item>
@@ -1621,6 +1844,21 @@
                <height>600</height>
               </size>
              </property>
+             <property name="font">
+              <font>
+               <pointsize>9</pointsize>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">QGroupBox::title {
+   background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;
+margin:1px;
+ }</string>
+             </property>
              <property name="title">
               <string>Pitch</string>
              </property>
@@ -1634,6 +1872,22 @@
               <property name="margin">
                <number>3</number>
               </property>
+              <item>
+               <spacer name="verticalSpacer_14">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Minimum</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>7</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_12">
                 <item>
@@ -1734,6 +1988,21 @@
                <height>600</height>
               </size>
              </property>
+             <property name="font">
+              <font>
+               <pointsize>9</pointsize>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">QGroupBox::title {
+   background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;
+margin:1px;
+ }</string>
+             </property>
              <property name="title">
               <string>Roll</string>
              </property>
@@ -1747,6 +2016,22 @@
               <property name="margin">
                <number>3</number>
               </property>
+              <item>
+               <spacer name="verticalSpacer_15">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Minimum</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>7</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_8">
                 <item>
@@ -1865,6 +2150,22 @@
               <property name="margin">
                <number>3</number>
               </property>
+              <item>
+               <spacer name="verticalSpacer_16">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Fixed</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_9">
                 <property name="spacing">
@@ -2087,6 +2388,22 @@
                 </item>
                </widget>
               </item>
+              <item row="0" column="0">
+               <spacer name="verticalSpacer_19">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Fixed</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
              </layout>
             </widget>
            </item>
@@ -2121,7 +2438,7 @@
            </property>
            <property name="minimumSize">
             <size>
-             <width>50</width>
+             <width>70</width>
              <height>100</height>
             </size>
            </property>
@@ -2145,9 +2462,32 @@
              <number>3</number>
             </property>
             <item>
+             <spacer name="verticalSpacer_18">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
              <widget class="QLabel" name="label_17">
               <property name="enabled">
                <bool>true</bool>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;
+font: bold 12px;
+margin:1px;</string>
               </property>
               <property name="text">
                <string>Max</string>
@@ -2226,6 +2566,13 @@
               <property name="enabled">
                <bool>true</bool>
               </property>
+              <property name="styleSheet">
+               <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;
+font: bold 12px;
+margin:1px;</string>
+              </property>
               <property name="text">
                <string>Min</string>
               </property>
@@ -2301,7 +2648,7 @@
             <property name="margin">
              <number>3</number>
             </property>
-            <item row="0" column="0">
+            <item row="1" column="0">
              <widget class="QSplitter" name="splitter_4">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
@@ -2389,6 +2736,22 @@
                </property>
               </widget>
              </widget>
+            </item>
+            <item row="0" column="0">
+             <spacer name="verticalSpacer_17">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
             </item>
            </layout>
           </widget>
@@ -2507,6 +2870,13 @@
           <layout class="QGridLayout" name="gridLayout_2">
            <item row="0" column="0">
             <widget class="QLabel" name="CurveLabel1">
+             <property name="styleSheet">
+              <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;
+font: bold 12px;
+margin:1px;</string>
+             </property>
              <property name="text">
               <string>Min</string>
              </property>
@@ -2514,6 +2884,13 @@
            </item>
            <item row="0" column="1">
             <widget class="QLabel" name="CurveLabel2">
+             <property name="styleSheet">
+              <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;
+font: bold 12px;
+margin:1px;</string>
+             </property>
              <property name="text">
               <string>Max</string>
              </property>
@@ -2521,6 +2898,13 @@
            </item>
            <item row="0" column="2">
             <widget class="QLabel" name="CurveLabel3">
+             <property name="styleSheet">
+              <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;
+font: bold 12px;
+margin:1px;</string>
+             </property>
              <property name="text">
               <string>Step point</string>
              </property>
@@ -3575,7 +3959,7 @@
  <connections>
   <connection>
    <sender>ccpmCollectiveSlider</sender>
-   <signal>sliderMoved(int)</signal>
+   <signal>valueChanged(int)</signal>
    <receiver>ccpmCollectivespinBox</receiver>
    <slot>setValue(int)</slot>
    <hints>
@@ -3623,7 +4007,7 @@
   </connection>
   <connection>
    <sender>ccpmRevoSlider</sender>
-   <signal>sliderMoved(int)</signal>
+   <signal>valueChanged(int)</signal>
    <receiver>ccpmREVOspinBox</receiver>
    <slot>setValue(int)</slot>
    <hints>
@@ -3639,7 +4023,7 @@
   </connection>
   <connection>
    <sender>SwashLvlPositionSlider</sender>
-   <signal>sliderMoved(int)</signal>
+   <signal>valueChanged(int)</signal>
    <receiver>SwashLvlPositionSpinBox</receiver>
    <slot>setValue(int)</slot>
    <hints>
@@ -3687,7 +4071,7 @@
   </connection>
   <connection>
    <sender>ccpmCollectiveScale</sender>
-   <signal>sliderMoved(int)</signal>
+   <signal>valueChanged(int)</signal>
    <receiver>ccpmCollectiveScaleBox</receiver>
    <slot>setValue(int)</slot>
    <hints>
@@ -3703,7 +4087,7 @@
   </connection>
   <connection>
    <sender>ccpmCyclicScale</sender>
-   <signal>sliderMoved(int)</signal>
+   <signal>valueChanged(int)</signal>
    <receiver>ccpmCyclicScaleBox</receiver>
    <slot>setValue(int)</slot>
    <hints>
@@ -3735,7 +4119,7 @@
   </connection>
   <connection>
    <sender>ccpmPitchScale</sender>
-   <signal>sliderMoved(int)</signal>
+   <signal>valueChanged(int)</signal>
    <receiver>ccpmPitchScaleBox</receiver>
    <slot>setValue(int)</slot>
    <hints>
@@ -3783,7 +4167,7 @@
   </connection>
   <connection>
    <sender>ccpmRollScale</sender>
-   <signal>sliderMoved(int)</signal>
+   <signal>valueChanged(int)</signal>
    <receiver>ccpmRollScaleBox</receiver>
    <slot>setValue(int)</slot>
    <hints>

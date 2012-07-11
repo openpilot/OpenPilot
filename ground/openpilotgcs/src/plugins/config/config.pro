@@ -1,15 +1,12 @@
 TEMPLATE = lib
 TARGET = Config
+DEFINES += CONFIG_LIBRARY
 QT += svg
-include(../../openpilotgcsplugin.pri)
-include(../../libs/utils/utils.pri)
-include(../../plugins/uavtalk/uavtalk.pri)
-include(../../plugins/coreplugin/coreplugin.pri)
-include(../../plugins/uavobjects/uavobjects.pri)
-include(../../plugins/uavobjectutil/uavobjectutil.pri)
-include(../../plugins/uavsettingsimportexport/uavsettingsimportexport.pri)
+include(config_dependencies.pri)
 INCLUDEPATH += ../../libs/eigen
+
 OTHER_FILES += Config.pluginspec
+
 HEADERS += configplugin.h \
     configgadgetconfiguration.h \
     configgadgetwidget.h \
@@ -19,25 +16,27 @@ HEADERS += configplugin.h \
     fancytabwidget.h \
     configinputwidget.h \
     configoutputwidget.h \
-    configtaskwidget.h \
-    configairframewidget.h \
+    configvehicletypewidget.h \
     config_pro_hw_widget.h \
     config_cc_hw_widget.h \
-    configahrswidget.h \
     configccattitudewidget.h \
-    mixercurvewidget.h \
-    mixercurvepoint.h \
-    mixercurveline.h \
-    configccpmwidget.h \
+    configpipxtremewidget.h \
+    cfg_vehicletypes/configccpmwidget.h \
     configstabilizationwidget.h \
     assertions.h \
     calibration.h \
     defaultattitudewidget.h \
-    smartsavebutton.h \
     defaulthwsettingswidget.h \
     inputchannelform.h \
     configcamerastabilizationwidget.h \
-    outputchannelform.h
+    configtxpidwidget.h \
+    outputchannelform.h \    
+    cfg_vehicletypes/configmultirotorwidget.h \
+    cfg_vehicletypes/configgroundvehiclewidget.h \
+    cfg_vehicletypes/configfixedwingwidget.h \
+    cfg_vehicletypes/vehicleconfig.h \
+    configrevowidget.h \
+    config_global.h
 SOURCES += configplugin.cpp \
     configgadgetconfiguration.cpp \
     configgadgetwidget.cpp \
@@ -45,33 +44,33 @@ SOURCES += configplugin.cpp \
     configgadgetoptionspage.cpp \
     configgadget.cpp \
     fancytabwidget.cpp \
-    configtaskwidget.cpp \
     configinputwidget.cpp \
     configoutputwidget.cpp \
-    configairframewidget.cpp \
+    configvehicletypewidget.cpp \
     config_pro_hw_widget.cpp \
     config_cc_hw_widget.cpp \
-    configahrswidget.cpp \
     configccattitudewidget.cpp \
-    mixercurvewidget.cpp \
-    mixercurvepoint.cpp \
-    mixercurveline.cpp \
-    configccpmwidget.cpp \
     configstabilizationwidget.cpp \
+    configpipxtremewidget.cpp \
     twostep.cpp \
     legacy-calibration.cpp \
     gyro-calibration.cpp \
     alignment-calibration.cpp \
     defaultattitudewidget.cpp \
-    smartsavebutton.cpp \
     defaulthwsettingswidget.cpp \
     inputchannelform.cpp \
     configcamerastabilizationwidget.cpp \
-    outputchannelform.cpp
+    configrevowidget.cpp \
+    configtxpidwidget.cpp \
+    cfg_vehicletypes/configmultirotorwidget.cpp \
+    cfg_vehicletypes/configgroundvehiclewidget.cpp \
+    cfg_vehicletypes/configfixedwingwidget.cpp \
+    cfg_vehicletypes/configccpmwidget.cpp \
+    outputchannelform.cpp \
+    cfg_vehicletypes/vehicleconfig.cpp
 FORMS += airframe.ui \
     cc_hw_settings.ui \
     pro_hw_settings.ui \
-    ahrs.ui \
     ccpm.ui \
     stabilization.ui \
     input.ui \
@@ -81,5 +80,8 @@ FORMS += airframe.ui \
     defaulthwsettings.ui \
     inputchannelform.ui \
     camerastabilization.ui \
-    outputchannelform.ui
+    outputchannelform.ui \
+    revosensors.ui \
+    txpid.ui \
+    pipxtreme.ui
 RESOURCES += configgadget.qrc

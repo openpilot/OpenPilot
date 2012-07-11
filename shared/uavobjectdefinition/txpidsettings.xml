@@ -1,0 +1,30 @@
+<xml>
+    <object name="TxPIDSettings" singleinstance="true" settings="true">
+        <description>Settings used by @ref TxPID optional module to tune PID settings using R/C transmitter</description>
+        <field name="UpdateMode" units="option" type="enum" elements="1" options="Never,When Armed,Always" defaultvalue="When Armed"/>
+        <field name="Inputs" units="channel" type="enum"
+		elementnames="Instance1,Instance2,Instance3"
+		options="Throttle,Accessory0,Accessory1,Accessory2,Accessory3,Accessory4,Accessory5"
+		defaultvalue="Throttle,Accessory0,Accessory1"/>
+        <field name="ThrottleRange" units="%" type="float" elements="2" elementnames="Min,Max" defaultvalue="0.20,0.80"/>
+        <field name="PIDs" units="option" type="enum"
+		elementnames="Instance1,Instance2,Instance3"
+		options="Disabled,
+			Roll Rate.Kp, Pitch Rate.Kp, Roll+Pitch Rate.Kp, Yaw Rate.Kp, 
+			Roll Rate.Ki, Pitch Rate.Ki, Roll+Pitch Rate.Ki, Yaw Rate.Ki,
+			Roll Rate.Kd, Pitch Rate.Kd, Roll+Pitch Rate.Kd, Yaw Rate.Kd,
+			Roll Rate.ILimit, Pitch Rate.ILimit, Roll+Pitch Rate.ILimit, Yaw Rate.ILimit,
+			Roll Attitude.Kp, Pitch Attitude.Kp, Roll+Pitch Attitude.Kp, Yaw Attitude.Kp,
+			Roll Attitude.Ki, Pitch Attitude.Ki, Roll+Pitch Attitude.Ki, Yaw Attitude.Ki,
+			Roll Attitude.ILimit, Pitch Attitude.ILimit, Roll+Pitch Attitude.ILimit, Yaw Attitude.ILimit,
+			GyroTau"
+		defaultvalue="Disabled"/>
+        <field name="MinPID" units="" type="float" elementnames="Instance1,Instance2,Instance3" defaultvalue="0"/>
+        <field name="MaxPID" units="" type="float" elementnames="Instance1,Instance2,Instance3" defaultvalue="0"/>
+
+	<access gcs="readwrite" flight="readwrite"/>
+	<telemetrygcs acked="true" updatemode="onchange" period="0"/>
+	<telemetryflight acked="true" updatemode="onchange" period="0"/>
+	<logging updatemode="manual" period="0"/>
+    </object>
+</xml>

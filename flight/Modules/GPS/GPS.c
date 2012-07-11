@@ -121,6 +121,9 @@ int32_t GPSInitialize(void)
 {
 	gpsPort = PIOS_COM_GPS;
 
+#ifdef MODULE_GPS_BUILTIN
+	gpsEnabled = true;
+#else
 	HwSettingsInitialize();
 	uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
 
@@ -130,6 +133,7 @@ int32_t GPSInitialize(void)
 		gpsEnabled = true;
 	else
 		gpsEnabled = false;
+#endif
 
 	if (gpsPort && gpsEnabled) {
 		GPSPositionInitialize();
@@ -140,7 +144,6 @@ int32_t GPSInitialize(void)
 #ifdef PIOS_GPS_SETS_HOMELOCATION
 		HomeLocationInitialize();
 #endif
-		HwSettingsInitialize();
 		updateSettings();
 
 		gps_rx_buffer = pvPortMalloc(NMEA_MAX_PACKET_LENGTH);

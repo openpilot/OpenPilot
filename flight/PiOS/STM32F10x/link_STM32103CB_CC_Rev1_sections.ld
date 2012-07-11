@@ -1,5 +1,5 @@
 /* This is the size of the stack for all FreeRTOS IRQs */
-_irq_stack_size = 0x1E6;
+_irq_stack_size = 0x240;
 /* This is the size of the stack for early init: life span is until scheduler starts */
 _init_stack_size = 0x100;
 
@@ -98,16 +98,9 @@ SECTIONS
         _init_stack_top = . - 4 ;
     } > SRAM
 
+    _eram = ORIGIN(SRAM) + LENGTH(SRAM) ;
+    _ebss = _eram ;
     
-    _free_ram = . ;
-    .free_ram (NOLOAD) :
-    {
-	. = ORIGIN(SRAM) + LENGTH(SRAM) - _free_ram ;
-        /* This is used by the startup in order to initialize the .bss section */
-	_ebss = . ;
-	_eram = . ;
-    } > SRAM
-
     /* keep the heap section at the end of the SRAM
      * this will allow to claim the remaining bytes not used
      * at run time! (done by the reset vector).

@@ -1,5 +1,5 @@
 /* This is the size of the stack for early init and for all FreeRTOS IRQs */
-_irq_stack_size = 0x400;
+_irq_stack_size = 0x800;
 
 /* Check valid alignment for VTOR */
 ASSERT(ORIGIN(BL_FLASH) == ALIGN(ORIGIN(BL_FLASH), 0x80), "Start of memory region flash not aligned for startup vector table");

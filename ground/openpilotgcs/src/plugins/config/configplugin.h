@@ -65,6 +65,8 @@ private slots:
     Core::Command* cmd;
     bool settingsErased;
 
+    static const int FLASH_ERASE_TIMEOUT_MS = 45000;
+
 };
 
 #endif // CONFIGPLUGIN_H

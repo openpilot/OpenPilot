@@ -7,7 +7,7 @@
         <file>images/AHRS-v1.3.png</file>
         <file>images/paper-plane.svg</file>
         <file>images/curve-bg.svg</file>
-        <file>images/quad-shapes.svg</file>
+        <file>images/multirotor-shapes.svg</file>
         <file>images/ccpm_setup.svg</file>
         <file>images/PipXtreme.png</file>
         <file>images/Transmitter.png</file>
@@ -16,7 +16,8 @@
         <file>images/hw_config.png</file>
         <file>images/gyroscope.png</file>
         <file>images/TX.svg</file>
-        <file>images/camera.png</file>
         <file>images/TX2.svg</file>
+        <file>images/camera.png</file>
+        <file>images/txpid.png</file>
     </qresource>
 </RCC>

@@ -69,13 +69,13 @@ plugin_uavobjectbrowser.depends = plugin_coreplugin
 plugin_uavobjectbrowser.depends += plugin_uavobjects
 SUBDIRS += plugin_uavobjectbrowser
 
-!contains(QT_VERSION, ^4\\.8\\..*) {
 # ModelView UAVGadget
 plugin_modelview.subdir = modelview
 plugin_modelview.depends = plugin_coreplugin
 plugin_modelview.depends += plugin_uavobjects
 SUBDIRS += plugin_modelview
 
+!contains(QT_VERSION, ^4\\.8\\..*) {
 #Notify gadget
 plugin_notify.subdir = notify
 plugin_notify.depends = plugin_coreplugin
@@ -112,6 +112,7 @@ SUBDIRS += plugin_systemhealth
 plugin_config.subdir = config
 plugin_config.depends = plugin_coreplugin
 plugin_config.depends += plugin_uavobjects
+plugin_config.depends += plugin_uavobjectwidgetutils
 plugin_config.depends += plugin_uavsettingsimportexport
 SUBDIRS += plugin_config
 
@@ -127,6 +128,13 @@ plugin_pfd.depends = plugin_coreplugin
 plugin_pfd.depends += plugin_uavobjects
 SUBDIRS += plugin_pfd
 
+# Primary Flight Display (PFD) gadget
+plugin_qmlview.subdir = qmlview
+plugin_qmlview.depends = plugin_coreplugin
+plugin_qmlview.depends += plugin_uavobjects
+SUBDIRS += plugin_qmlview
+
+
 #IP connection plugin
 plugin_ipconnection.subdir = ipconnection
 plugin_ipconnection.depends = plugin_coreplugin
@@ -138,6 +146,13 @@ plugin_hitlnew.depends = plugin_coreplugin
 plugin_hitlnew.depends += plugin_uavobjects
 plugin_hitlnew.depends += plugin_uavtalk
 SUBDIRS += plugin_hitlnew
+
+#HITLNEW Simulation gadget v2
+plugin_hitl_v2.subdir = hitlv2
+plugin_hitl_v2.depends = plugin_coreplugin
+plugin_hitl_v2.depends += plugin_uavobjects
+plugin_hitl_v2.depends += plugin_uavtalk
+SUBDIRS += plugin_hitl_v2
 
 # Export and Import GCS Configuration
 plugin_importexport.subdir = importexport
@@ -164,13 +179,6 @@ SUBDIRS += plugin_gcscontrol
 #plugin_antennatrack.depends += plugin_uavtalk
 #SUBDIRS += plugin_antennatrack
 
-#PipXtreme gadget
-plugin_pipxtreme.subdir = pipxtreme
-plugin_pipxtreme.depends = plugin_coreplugin
-plugin_pipxtreme.depends += plugin_uavobjects
-plugin_pipxtreme.depends += plugin_rawhid
-SUBDIRS += plugin_pipxtreme
-
 #Scope OpenGL Gadget
 #plugin_scopeogl.subdir = scopeogl
 #plugin_scopeogl.depends = plugin_coreplugin
@@ -194,6 +202,13 @@ plugin_uavsettingsimportexport.subdir = uavsettingsimportexport
 plugin_uavsettingsimportexport.depends = plugin_coreplugin
 plugin_uavsettingsimportexport.depends += plugin_uavobjects
 SUBDIRS += plugin_uavsettingsimportexport
+
+# UAV Object Widget Utility plugin
+plugin_uavobjectwidgetutils.subdir = uavobjectwidgetutils
+plugin_uavobjectwidgetutils.depends = plugin_coreplugin
+plugin_uavobjectwidgetutils.depends += plugin_uavobjects
+plugin_uavobjectwidgetutils.depends += plugin_uavsettingsimportexport
+SUBDIRS += plugin_uavobjectwidgetutils
 
 # Junsi Powerlog plugin
 #plugin_powerlog.subdir = powerlog

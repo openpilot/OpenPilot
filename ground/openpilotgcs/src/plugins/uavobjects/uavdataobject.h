@@ -47,6 +47,7 @@ public:
     Metadata getMetadata();
     UAVMetaObject* getMetaObject();
     virtual UAVDataObject* clone(quint32 instID = 0) = 0;
+    virtual UAVDataObject* dirtyClone() = 0;
 
 private:
     UAVMetaObject* mobj;

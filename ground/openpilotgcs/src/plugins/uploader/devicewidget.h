@@ -40,6 +40,8 @@
 #include <QCryptographicHash>
 #include "uavobjectutilmanager.h"
 #include "devicedescriptorstruct.h"
+#include <QDir>
+#include <QCoreApplication>
 using namespace OP_DFU;
 class deviceWidget : public QWidget
 {
@@ -54,10 +56,9 @@ public:
     QString setOpenFileName();
     QString setSaveFileName();
 private:
-    deviceDescriptorStruct onBoardDescrition;
-    deviceDescriptorStruct LoadedDescrition;
+    deviceDescriptorStruct onBoardDescription;
+    deviceDescriptorStruct LoadedDescription;
     QByteArray loadedFW;
-    QString idToBoardName(int id);
     Ui_deviceWidget *myDevice;
     int deviceID;
     DFUObject *m_dfu;
@@ -70,7 +71,8 @@ private:
     bool populateLoadedStructuredDescription(QByteArray arr);
 
 signals:
-
+    void uploadStarted();
+    void uploadEnded(bool success);
 public slots:
     void uploadFirmware();
     void loadFirmware();

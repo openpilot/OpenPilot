@@ -80,6 +80,9 @@ public:
 	inline GLC_Matrix4x4 absoluteMatrix() const
 	{ return m_AbsoluteMatrix;}
 
+	//! Return the surcharged relative matrix
+	GLC_Matrix4x4 occurrenceRelativeMatrix() const;
+
 	//! Return true if this occurence is orphan
 	inline bool isOrphan() const
 	{ return NULL == m_pParent;}
@@ -178,7 +181,9 @@ public:
 	inline bool useAutomatic3DViewInstanceCreation() const
 	{return m_AutomaticCreationOf3DViewInstance;}
 
-
+	//! Return true if this occurence is flexible
+	inline bool isFlexible() const
+	{return (m_pRelativeMatrix != NULL);}
 //@}
 //////////////////////////////////////////////////////////////////////
 /*! \name Set Functions*/
@@ -250,7 +255,11 @@ public:
 	inline void setAutomatic3DViewInstanceCreationUsage(bool usage)
 	{m_AutomaticCreationOf3DViewInstance= usage;}
 
+	//! Make this occurence a flexible occurence
+	void makeFlexible(const GLC_Matrix4x4& relativeMatrix);
 
+	//! Make this occurence rigid
+	void makeRigid();
 //@}
 
 //////////////////////////////////////////////////////////////////////
@@ -296,6 +305,9 @@ private:
 
 	//! Automatique création of 3DViewInstance
 	bool m_AutomaticCreationOf3DViewInstance;
+
+	//! The relative matrix of this occurence if this occurence is flexible
+	GLC_Matrix4x4* m_pRelativeMatrix;
 
 };
 

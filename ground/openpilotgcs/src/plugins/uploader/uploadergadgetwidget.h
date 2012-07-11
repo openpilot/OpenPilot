@@ -55,6 +55,7 @@
 #include "devicedescriptorstruct.h"
 #include <QProgressDialog>
 #include <QErrorMessage>
+#include <QDesktopServices>
 
 using namespace OP_DFU;
 
@@ -74,6 +75,7 @@ public slots:
     void onAutopilotConnect();
     void onAutopilotDisconnect();
     void populate();
+    void openHelp();
 private:
      Ui_UploaderWidget *m_config;
      DFUObject *dfu;
@@ -86,6 +88,7 @@ private:
      QLineEdit* openFileNameLE;
      QEventLoop m_eventloop;
      QErrorMessage * msg;
+     void connectSignalSlot(QWidget * widget);
 private slots:
     void onPhisicalHWConnect();
     void versionMatchCheck();
@@ -94,10 +97,14 @@ private slots:
     void goToBootloader(UAVObject* = NULL, bool = false);
     void systemReset();
     void systemBoot();
+    void systemSafeBoot();
+    void commonSystemBoot(bool = false);
     void systemRescue();
     void getSerialPorts();
     void perform();
     void cancel();
+    void uploadStarted();
+    void uploadEnded(bool succeed);
 
 };
 

@@ -39,6 +39,7 @@ DEBUG ?= NO
 
 # Include objects that are just nice information to show
 DIAGNOSTICS ?= NO
+DIAG_TASKS ?= NO
 
 # Set to YES to build a FW version that will erase all flash memory
 ERASE_FLASH ?= NO
@@ -48,12 +49,8 @@ ENABLE_DEBUG_PINS ?= NO
 # Set to Yes to enable the AUX UART which is mapped on the S1 (Tx) and S2 (Rx) servo outputs
 ENABLE_AUX_UART ?= NO
 
-USE_GPS ?= YES
-
-USE_I2C ?= NO
-
 # Set to YES when using Code Sourcery toolchain
-CODE_SOURCERY ?= YES
+CODE_SOURCERY ?= NO
 
 # Remove command is different for Code Sourcery on Windows
 ifeq ($(CODE_SOURCERY), YES)
@@ -64,12 +61,41 @@ endif
 
 FLASH_TOOL = OPENOCD
 
-# List of modules to include
-OPTMODULES = CameraStab
+# Optional module and driver defaults
+USE_CAMERASTAB ?= YES
+USE_COMUSBBRIDGE ?= YES
+USE_GPS ?= YES
+USE_TXPID ?= YES
+USE_I2C ?= NO
+USE_ALTITUDE ?= NO
+TEST_FAULTS ?= NO
+
+# List of optional modules to include
+OPTMODULES =
+ifeq ($(USE_CAMERASTAB), YES)
+OPTMODULES += CameraStab
+endif
+ifeq ($(USE_COMUSBBRIDGE), YES)
+OPTMODULES += ComUsbBridge
+endif
 ifeq ($(USE_GPS), YES)
 OPTMODULES += GPS
 endif
+ifeq ($(USE_TXPID), YES)
+OPTMODULES += TxPID
+endif
+ifeq ($(USE_ALTITUDE), YES)
+ifeq ($(USE_I2C), YES)
+OPTMODULES += Altitude
+else
+$(error "Altitude module (USE_ALTITUDE=YES) requires i2c (USE_I2C=YES)")
+endif
+endif
+ifeq ($(TEST_FAULTS), YES)
+OPTMODULES += Fault
+endif
 
+# List of mandatory modules to include
 MODULES = Attitude Stabilization Actuator ManualControl FirmwareIAP
 # Telemetry must be last to grab the optional modules (why?)
 MODULES += Telemetry
@@ -117,6 +143,7 @@ PYMITEINC += $(PYMITEPLAT)
 PYMITEINC += $(OUTDIR)
 FLIGHTPLANLIB = $(OPMODULEDIR)/FlightPlan/lib
 FLIGHTPLANS = $(OPMODULEDIR)/FlightPlan/flightplans
+HWDEFSINC = ../board_hw_defs/$(BOARD_NAME)
 
 OPUAVSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
 
@@ -132,11 +159,9 @@ SRC += ${OPMODULEDIR}/System/systemmod.c
 SRC += $(OPSYSTEM)/coptercontrol.c
 SRC += $(OPSYSTEM)/pios_board.c
 SRC += $(OPSYSTEM)/alarms.c
-SRC += $(OPSYSTEM)/taskmonitor.c
 SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
 SRC += $(OPUAVOBJ)/eventdispatcher.c
-SRC += $(OPSYSTEM)/pios_usb_hid_desc.c
 else
 ## TESTCODE
 SRC += $(OPTESTS)/test_common.c
@@ -151,6 +176,7 @@ SRC += $(OPUAVSYNTHDIR)/accessorydesired.c
 SRC += $(OPUAVSYNTHDIR)/objectpersistence.c
 SRC += $(OPUAVSYNTHDIR)/gcstelemetrystats.c
 SRC += $(OPUAVSYNTHDIR)/flighttelemetrystats.c
+SRC += $(OPUAVSYNTHDIR)/faultsettings.c
 SRC += $(OPUAVSYNTHDIR)/flightstatus.c
 SRC += $(OPUAVSYNTHDIR)/systemstats.c
 SRC += $(OPUAVSYNTHDIR)/systemalarms.c
@@ -160,7 +186,8 @@ SRC += $(OPUAVSYNTHDIR)/stabilizationsettings.c
 SRC += $(OPUAVSYNTHDIR)/actuatorcommand.c
 SRC += $(OPUAVSYNTHDIR)/actuatordesired.c
 SRC += $(OPUAVSYNTHDIR)/actuatorsettings.c
-SRC += $(OPUAVSYNTHDIR)/attituderaw.c
+SRC += $(OPUAVSYNTHDIR)/accels.c
+SRC += $(OPUAVSYNTHDIR)/gyros.c
 SRC += $(OPUAVSYNTHDIR)/attitudeactual.c
 SRC += $(OPUAVSYNTHDIR)/manualcontrolcommand.c
 SRC += $(OPUAVSYNTHDIR)/i2cstats.c
@@ -178,6 +205,8 @@ SRC += $(OPUAVSYNTHDIR)/receiveractivity.c
 SRC += $(OPUAVSYNTHDIR)/taskinfo.c
 SRC += $(OPUAVSYNTHDIR)/mixerstatus.c
 SRC += $(OPUAVSYNTHDIR)/ratedesired.c
+SRC += $(OPUAVSYNTHDIR)/baroaltitude.c
+SRC += $(OPUAVSYNTHDIR)/txpidsettings.c
 
 endif
 
@@ -200,30 +229,38 @@ SRC += $(PIOSSTM32F10X)/pios_gpio.c
 SRC += $(PIOSSTM32F10X)/pios_exti.c
 SRC += $(PIOSSTM32F10X)/pios_rtc.c
 SRC += $(PIOSSTM32F10X)/pios_wdg.c
+SRC += $(PIOSSTM32F10X)/pios_iap.c
 SRC += $(PIOSSTM32F10X)/pios_tim.c
+SRC += $(PIOSSTM32F10X)/pios_bl_helper.c
 
-
-# PIOS USB related files (seperated to make code maintenance more easy)
+# PIOS USB related files (separated to make code maintenance more easy)
+SRC += $(PIOSSTM32F10X)/pios_usb.c
+SRC += $(PIOSSTM32F10X)/pios_usbhook.c
 SRC += $(PIOSSTM32F10X)/pios_usb_hid.c
+SRC += $(PIOSSTM32F10X)/pios_usb_cdc.c
 SRC += $(PIOSSTM32F10X)/pios_usb_hid_istr.c
-SRC += $(PIOSSTM32F10X)/pios_usb_hid_prop.c
 SRC += $(PIOSSTM32F10X)/pios_usb_hid_pwr.c
+SRC += $(OPSYSTEM)/pios_usb_board_data.c
+SRC += $(PIOSCOMMON)/pios_usb_desc_hid_cdc.c
+SRC += $(PIOSCOMMON)/pios_usb_desc_hid_only.c
+SRC += $(PIOSCOMMON)/pios_usb_util.c
 
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_crc.c
 SRC += $(PIOSCOMMON)/pios_flashfs_objlist.c
-SRC += $(PIOSCOMMON)/pios_flash_w25x.c
+SRC += $(PIOSCOMMON)/pios_flash_jedec.c
 SRC += $(PIOSCOMMON)/pios_adxl345.c
+SRC += $(PIOSCOMMON)/pios_mpu6000.c
 SRC += $(PIOSCOMMON)/pios_com.c
-SRC += $(PIOSCOMMON)/pios_i2c_esc.c
-SRC += $(PIOSCOMMON)/pios_iap.c
-SRC += $(PIOSCOMMON)/pios_bl_helper.c
+#SRC += $(PIOSCOMMON)/pios_i2c_esc.c
+#SRC += $(PIOSCOMMON)/pios_bmp085.c
 SRC += $(PIOSCOMMON)/pios_rcvr.c
 SRC += $(PIOSCOMMON)/pios_gcsrcvr.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c
 ## Libraries for flight calculations
 SRC += $(FLIGHTLIB)/fifo_buffer.c
 SRC += $(FLIGHTLIB)/CoordinateConversions.c
+SRC += $(FLIGHTLIB)/taskmonitor.c
 
 ## CMSIS for STM32
 SRC += $(CMSISDIR)/core_cm3.c
@@ -337,6 +374,7 @@ EXTRAINCDIRS  += $(APPLIBDIR)
 EXTRAINCDIRS  += $(RTOSSRCDIR)/portable/GCC/ARM_CM3
 EXTRAINCDIRS  += $(AHRSBOOTLOADERINC)
 EXTRAINCDIRS  += $(PYMITEINC)
+EXTRAINCDIRS  += $(HWDEFSINC)
 
 EXTRAINCDIRS += ${foreach MOD, ${OPTMODULES} ${MODULES}, ${OPMODULEDIR}/${MOD}/inc} ${OPMODULEDIR}/System/inc
 
@@ -401,6 +439,9 @@ ifeq ($(USE_I2C), YES)
 CDEFS += -DUSE_I2C
 endif
 
+# Declare all non-optional modules as built-in to force inclusion
+CDEFS += ${foreach MOD, ${MODULES}, -DMODULE_$(MOD)_BUILTIN }
+
 # Place project-specific -D and/or -U options for
 # Assembler with preprocessor here.
 #ADEFS = -DUSE_IRQ_ASM_WRAPPER
@@ -427,11 +468,15 @@ CSTANDARD = -std=gnu99
 # Flags for C and C++ (arm-elf-gcc/arm-elf-g++)
 
 ifeq ($(DEBUG),YES)
-CFLAGS = -DDEBUG
+CFLAGS += -DDEBUG
 endif
 
 ifeq ($(DIAGNOSTICS),YES)
-CFLAGS = -DDIAGNOSTICS
+CFLAGS += -DDIAGNOSTICS
+endif
+
+ifeq ($(DIAG_TASKS),YES)
+CFLAGS += -DDIAG_TASKS
 endif
 
 CFLAGS += -g$(DEBUGF)
@@ -561,7 +606,7 @@ $(OUTDIR)/$(TARGET).bin.o: $(OUTDIR)/$(TARGET).bin
 $(eval $(call OPFW_TEMPLATE,$(OUTDIR)/$(TARGET).bin,$(BOARD_TYPE),$(BOARD_REVISION)))
 
 # Add jtag targets (program and wipe)
-$(eval $(call JTAG_TEMPLATE,$(OUTDIR)/$(TARGET).bin,$(FW_BANK_BASE),$(FW_BANK_SIZE),$(OPENOCD_CONFIG)))
+$(eval $(call JTAG_TEMPLATE,$(OUTDIR)/$(TARGET).bin,$(FW_BANK_BASE),$(FW_BANK_SIZE),$(OPENOCD_JTAG_CONFIG),$(OPENOCD_CONFIG)))
 
 .PHONY: elf lss sym hex bin bino opfw
 elf: $(OUTDIR)/$(TARGET).elf

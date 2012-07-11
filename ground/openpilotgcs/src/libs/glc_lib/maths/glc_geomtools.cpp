@@ -27,6 +27,9 @@
 
 #include <QtGlobal>
 
+
+double glc::comparedPrecision= glc::defaultPrecision;
+
 //////////////////////////////////////////////////////////////////////
 //Tools Functions
 //////////////////////////////////////////////////////////////////////
@@ -520,12 +523,112 @@ bool glc::lineIntersectPlane(const GLC_Line3d& line, const GLC_Plane& plane, GLC
 
 GLC_Point3d glc::project(const GLC_Point3d& point, const GLC_Line3d& line)
 {
-	// Create the plane from the point with normal define by the line direction
-	const GLC_Plane plane(line.direction().normalize(), point);
-	GLC_Point3d intersection;
-	const bool intersect= lineIntersectPlane(line, plane, &intersection);
-	Q_ASSERT(intersect == true);
-	return intersection;
+	const GLC_Vector3d lineDirection(line.direction().normalize());
+	double t= lineDirection * (point - line.startingPoint());
+	GLC_Point3d projectedPoint= line.startingPoint() + (t * lineDirection);
+	return projectedPoint;
 }
 
+double glc::pointLineDistance(const GLC_Point3d& point, const GLC_Line3d& line)
+{
+	const GLC_Vector3d lineDirection(line.direction().normalize());
+	double t= lineDirection * (point - line.startingPoint());
+	GLC_Point3d projectedPoint= line.startingPoint() + (t * lineDirection);
+	return (point - projectedPoint).length();
+}
 
+bool glc::pointsAreCollinear(const GLC_Point3d& p1, const GLC_Point3d& p2, const GLC_Point3d& p3)
+{
+	bool subject= false;
+	if (compare(p1, p2) || compare(p1, p3) || compare(p2, p3))
+	{
+		subject= true;
+	}
+	else
+	{
+		GLC_Vector3d p1p2= (p2 - p1).setLength(1.0);
+		GLC_Vector3d p2p3= (p3 - p2).setLength(1.0);
+		subject= (compare(p1p2, p2p3)  || compare(p1p2, p2p3.inverted()));
+	}
+	return subject;
+}
+
+bool glc::compare(double p1, double p2)
+{
+	return qAbs(p1 - p2) <= comparedPrecision;
+}
+
+bool glc::compareAngle(double p1, double p2)
+{
+	const double anglePrecision= toRadian(comparedPrecision);
+	return qAbs(p1 - p2) <= anglePrecision;
+}
+
+bool glc::compare(const GLC_Vector3d& v1, const GLC_Vector3d& v2)
+{
+	bool compareResult= (qAbs(v1.x() - v2.x()) <= comparedPrecision);
+	compareResult= compareResult && (qAbs(v1.y() - v2.y()) <= comparedPrecision);
+	compareResult= compareResult && (qAbs(v1.z() - v2.z()) <= comparedPrecision);
+
+	return compareResult;
+}
+
+bool glc::compare(const GLC_Vector2d& v1, const GLC_Vector2d& v2)
+{
+	bool compareResult= (qAbs(v1.getX() - v2.getX()) <= comparedPrecision);
+	return compareResult && (qAbs(v1.getY() - v2.getY()) <= comparedPrecision);
+}
+
+bool glc::compare(const QPointF& v1, const QPointF& v2)
+{
+	bool compareResult= (qAbs(v1.x() - v2.x()) <= comparedPrecision);
+	return compareResult && (qAbs(v1.y() - v2.y()) <= comparedPrecision);
+}
+
+bool glc::pointInPolygon(const GLC_Point2d& point, const QList<GLC_Point2d>& polygon)
+{
+	const int polygonSize= polygon.size();
+	bool inside= false;
+	int i= 0;
+	int j= polygonSize - 1;
+
+	while (i < polygonSize)
+	{
+		const GLC_Point2d point0= polygon.at(i);
+		const GLC_Point2d point1= polygon.at(j);
+		if (point.getY() < point1.getY())
+		{
+			//point1 above ray
+			if (point0.getY() <= point.getY())
+			{
+				//point2 on or below ray
+				const double val1= (point.getY() - point0.getY()) * (point1.getX() - point0.getX());
+				const double val2= (point.getX() - point0.getX()) * (point1.getY() - point0.getY());
+				if (val1 > val2) inside= !inside;
+			}
+		}
+		else if (point.getY() < point0.getY())
+		{
+			// point 1 on or below ray, point0 above ray
+			const double val1= (point.getY() - point0.getY()) * (point1.getX() - point0.getX());
+			const double val2= (point.getX() - point0.getX()) * (point1.getY() - point0.getY());
+			if (val1 < val2) inside= !inside;
+		}
+		j= i;
+		++i;
+	}
+	return inside;
+}
+
+double glc::zeroTo2PIAngle(double angle)
+{
+	if (qFuzzyCompare(fabs(angle), glc::PI))
+	{
+		angle= glc::PI;
+	}
+	else if (angle < 0)
+	{
+		angle= (2.0 * glc::PI) + angle;
+	}
+	return angle;
+}

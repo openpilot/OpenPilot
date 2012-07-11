@@ -39,6 +39,7 @@
 class UAVOBJECTS_EXPORT $(NAME): public UAVDataObject
 {
     Q_OBJECT
+$(PROPERTIES)
 
 public:
     // Field structure
@@ -53,6 +54,7 @@ $(DATAFIELDINFO)
     static const quint32 OBJID = $(OBJIDHEX);
     static const QString NAME;
     static const QString DESCRIPTION;
+    static const QString CATEGORY;
     static const bool ISSINGLEINST = $(ISSINGLEINST);
     static const bool ISSETTINGS = $(ISSETTINGS);
     static const quint32 NUMBYTES = sizeof(DataFields);
@@ -64,8 +66,20 @@ $(DATAFIELDINFO)
     void setData(const DataFields& data);
     Metadata getDefaultMetadata();
     UAVDataObject* clone(quint32 instID);
-
+	UAVDataObject* dirtyClone();
+	
     static $(NAME)* GetInstance(UAVObjectManager* objMngr, quint32 instID = 0);
+
+$(PROPERTY_GETTERS)
+
+public slots:
+$(PROPERTY_SETTERS)
+
+signals:
+$(PROPERTY_NOTIFICATIONS)
+
+private slots:
+    void emitNotifications();
 	
 private:
     DataFields data;

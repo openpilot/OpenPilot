@@ -1,6 +1,6 @@
 BOARD_TYPE          := 0x04
-BOARD_REVISION      := 0x01
-BOOTLOADER_VERSION  := 0x01
+BOARD_REVISION      := 0x02
+BOOTLOADER_VERSION  := 0x03
 HW_TYPE             := 0x01
 
 MCU                 := cortex-m3
@@ -9,6 +9,7 @@ BOARD               := STM32103CB_CC_Rev1
 MODEL               := MD
 MODEL_SUFFIX        := _CC
 
+OPENOCD_JTAG_CONFIG := foss-jtag.revb.cfg
 OPENOCD_CONFIG      := stm32f1x.cfg
 
 # Note: These must match the values in link_$(BOARD)_memory.ld

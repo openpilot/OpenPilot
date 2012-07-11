@@ -49,7 +49,6 @@
 #include "watchdogstatus.h"
 #include "taskmonitor.h"
 
-
 // Private constants
 #define SYSTEM_UPDATE_PERIOD_MS 1000
 #define LED_BLINK_RATE_HZ 5
@@ -66,7 +65,7 @@
 #define STACK_SIZE_BYTES 924
 #endif
 
-#define TASK_PRIORITY (tskIDLE_PRIORITY+2)
+#define TASK_PRIORITY (tskIDLE_PRIORITY+1)
 
 // Private types
 
@@ -115,8 +114,10 @@ int32_t SystemModInitialize(void)
 	SystemStatsInitialize();
 	FlightStatusInitialize();
 	ObjectPersistenceInitialize();
-#if defined(DIAGNOSTICS)
+#if defined(DIAG_TASKS)
 	TaskInfoInitialize();
+#endif
+#if defined(DIAGNOSTICS)
 	I2CStatsInitialize();
 	WatchdogStatusInitialize();
 #endif
@@ -135,7 +136,20 @@ static void systemTask(void *parameters)
 	portTickType lastSysTime;
 
 	/* create all modules thread */
-	MODULE_TASKCREATE_ALL
+	MODULE_TASKCREATE_ALL;
+
+	if (mallocFailed) {
+		/* We failed to malloc during task creation,
+		 * system behaviour is undefined.  Reset and let
+		 * the BootFault code recover for us.
+		 */
+		PIOS_SYS_Reset();
+	}
+
+#if defined(PIOS_INCLUDE_IAP)
+	/* Record a successful boot */
+	PIOS_IAP_WriteBootCount(0);
+#endif
 
 	// Initialize vars
 	idleCounter = 0;
@@ -156,20 +170,25 @@ static void systemTask(void *parameters)
 		updateI2Cstats();
 		updateWDGstats();
 #endif
+
+#if defined(DIAG_TASKS)
 		// Update the task status object
 		TaskMonitorUpdateAll();
+#endif
 
 		// Flash the heartbeat LED
-		PIOS_LED_Toggle(LED1);
+#if defined(PIOS_LED_HEARTBEAT)
+		PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
+#endif	/* PIOS_LED_HEARTBEAT */
 
 		// Turn on the error LED if an alarm is set
-#if (PIOS_LED_NUM > 1)
+#if defined (PIOS_LED_ALARM)
 		if (AlarmsHasWarnings()) {
-			PIOS_LED_On(LED2);
+			PIOS_LED_On(PIOS_LED_ALARM);
 		} else {
-			PIOS_LED_Off(LED2);
+			PIOS_LED_Off(PIOS_LED_ALARM);
 		}
-#endif
+#endif	/* PIOS_LED_ALARM */
 
 		FlightStatusData flightStatus;
 		FlightStatusGet(&flightStatus);
@@ -196,7 +215,7 @@ static void objectUpdatedCb(UAVObjEvent * ev)
 		// Get object data
 		ObjectPersistenceGet(&objper);
 
-		int retval = -1;
+		int retval = 1;
 		// Execute action
 		if (objper.Operation == OBJECTPERSISTENCE_OPERATION_LOAD) {
 			if (objper.Selection == OBJECTPERSISTENCE_SELECTION_SINGLEOBJECT) {
@@ -223,6 +242,13 @@ static void objectUpdatedCb(UAVObjEvent * ev)
 				}
 				// Save selected instance
 				retval = UAVObjSave(obj, objper.InstanceID);
+
+				// Not sure why this is needed
+				vTaskDelay(10);
+
+				// Verify saving worked
+				if (retval == 0)
+					retval = UAVObjLoad(obj, objper.InstanceID);
 			} else if (objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLSETTINGS
 				   || objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLOBJECTS) {
 				retval = UAVObjSaveSettings();
@@ -252,9 +278,17 @@ static void objectUpdatedCb(UAVObjEvent * ev)
 			retval = PIOS_FLASHFS_Format();
 #endif
 		}
-		if(retval == 0) { 
-			objper.Operation = OBJECTPERSISTENCE_OPERATION_COMPLETED;
-			ObjectPersistenceSet(&objper);
+		switch(retval) {
+			case 0:
+				objper.Operation = OBJECTPERSISTENCE_OPERATION_COMPLETED;
+				ObjectPersistenceSet(&objper);
+				break;
+			case -1:
+				objper.Operation = OBJECTPERSISTENCE_OPERATION_ERROR;
+				ObjectPersistenceSet(&objper);
+				break;
+			default:
+				break;
 		}
 	}
 }
@@ -365,7 +399,7 @@ static void updateStats()
 	if (now > lastTickCount) {
 		uint32_t dT = (xTaskGetTickCount() - lastTickCount) * portTICK_RATE_MS;	// in ms
 		stats.CPULoad =
-			100 - (uint8_t) round(100.0 * ((float)idleCounter / ((float)dT / 1000.0)) / (float)IDLE_COUNTS_PER_SEC_AT_NO_LOAD);
+			100 - (uint8_t) roundf(100.0f * ((float)idleCounter / ((float)dT / 1000.0f)) / (float)IDLE_COUNTS_PER_SEC_AT_NO_LOAD);
 	} //else: TickCount has wrapped, do not calc now
 	lastTickCount = now;
 	idleCounterClear = 1;
@@ -438,11 +472,21 @@ static void updateSystemAlarms()
 	EventGetStats(&evStats);
 	UAVObjClearStats();
 	EventClearStats();
-	if (objStats.eventErrors > 0 || evStats.eventErrors > 0) {
+	if (objStats.eventCallbackErrors > 0 || objStats.eventQueueErrors > 0  || evStats.eventErrors > 0) {
 		AlarmsSet(SYSTEMALARMS_ALARM_EVENTSYSTEM, SYSTEMALARMS_ALARM_WARNING);
 	} else {
 		AlarmsClear(SYSTEMALARMS_ALARM_EVENTSYSTEM);
 	}
+	
+	if (objStats.lastCallbackErrorID || objStats.lastQueueErrorID || evStats.lastErrorID) {
+		SystemStatsData sysStats;
+		SystemStatsGet(&sysStats);
+		sysStats.EventSystemWarningID = evStats.lastErrorID;
+		sysStats.ObjectManagerCallbackID = objStats.lastCallbackErrorID;
+		sysStats.ObjectManagerQueueID = objStats.lastQueueErrorID;
+		SystemStatsSet(&sysStats);
+	}
+		
 }
 
 /**

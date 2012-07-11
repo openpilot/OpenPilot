@@ -1,0 +1,12 @@
+<xml>
+	<object name="FaultSettings" singleinstance="true" settings="true">
+		<description>Allows testers to simulate various fault scenarios.</description>
+
+		<field name="ActivateFault" units="fault" type="enum" elements="1" options="NoFault,ModuleInitAssert,InitOutOfMemory,InitBusError,RunawayTask,TaskOutOfMemory" defaultvalue="NoFault"/>
+
+		<access gcs="readwrite" flight="readwrite"/>
+		<telemetrygcs acked="true" updatemode="onchange" period="0"/>
+		<telemetryflight acked="true" updatemode="onchange" period="0"/>
+		<logging updatemode="manual" period="0"/>
+    </object>
+</xml>

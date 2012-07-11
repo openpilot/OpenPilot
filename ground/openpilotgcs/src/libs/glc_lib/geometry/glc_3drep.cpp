@@ -28,7 +28,6 @@
 // Class chunk id
 quint32 GLC_3DRep::m_ChunkId= 0xA702;
 
-// Default constructor
 GLC_3DRep::GLC_3DRep()
 : GLC_Rep()
 , m_pGeomList(new QList<GLC_Geometry*>)
@@ -37,7 +36,6 @@ GLC_3DRep::GLC_3DRep()
 
 }
 
-// Construct a 3DRep with a geometry
 GLC_3DRep::GLC_3DRep(GLC_Geometry* pGeom)
 : GLC_Rep()
 , m_pGeomList(new QList<GLC_Geometry*>)
@@ -48,7 +46,6 @@ GLC_3DRep::GLC_3DRep(GLC_Geometry* pGeom)
 	setName(pGeom->name());
 }
 
-// Copy Constructor
 GLC_3DRep::GLC_3DRep(const GLC_3DRep& rep)
 : GLC_Rep(rep)
 , m_pGeomList(rep.m_pGeomList)
@@ -57,7 +54,6 @@ GLC_3DRep::GLC_3DRep(const GLC_3DRep& rep)
 
 }
 
-// Assignement operator
 GLC_3DRep& GLC_3DRep::operator=(const GLC_Rep& rep)
 {
 	const GLC_3DRep* p3DRep= dynamic_cast<const GLC_3DRep*>(&rep);
@@ -73,13 +69,11 @@ GLC_3DRep& GLC_3DRep::operator=(const GLC_Rep& rep)
 	return *this;
 }
 
-// Clone the representation
 GLC_Rep* GLC_3DRep::clone() const
 {
 	return new GLC_3DRep(*this);
 }
 
-// Make a deep copy of the 3DRep
 GLC_Rep* GLC_3DRep::deepCopy() const
 {
 	GLC_3DRep* pCloneRep= new GLC_3DRep;
@@ -95,7 +89,6 @@ GLC_Rep* GLC_3DRep::deepCopy() const
 	return pCloneRep;
 }
 
-// Destructor
 GLC_3DRep::~GLC_3DRep()
 {
 	clear();
@@ -104,13 +97,11 @@ GLC_3DRep::~GLC_3DRep()
 //////////////////////////////////////////////////////////////////////
 // Get functions
 //////////////////////////////////////////////////////////////////////
-// Return the class Chunk ID
 quint32 GLC_3DRep::chunckID()
 {
 	return m_ChunkId;
 }
 
-// Return the type of representation
 int GLC_3DRep::type() const
 {
 	return (*m_pType);
@@ -120,7 +111,6 @@ int GLC_3DRep::type() const
 // Get functions
 //////////////////////////////////////////////////////////////////////
 
-// Return true if the rep bounding box is valid
 bool GLC_3DRep::boundingBoxIsValid() const
 {
 	bool result= !m_pGeomList->isEmpty();
@@ -134,7 +124,6 @@ bool GLC_3DRep::boundingBoxIsValid() const
 	return result;
 }
 
-// Return the 3DRep bounding Box
 GLC_BoundingBox GLC_3DRep::boundingBox() const
 {
 	GLC_BoundingBox resultBox;
@@ -146,7 +135,6 @@ GLC_BoundingBox GLC_3DRep::boundingBox() const
 	return resultBox;
 }
 
-// Get number of faces
 unsigned int GLC_3DRep::faceCount() const
 {
 	unsigned int result= 0;
@@ -162,7 +150,6 @@ unsigned int GLC_3DRep::faceCount() const
 	return result;
 }
 
-// Get number of vertex
 unsigned int GLC_3DRep::vertexCount() const
 {
 	unsigned int result= 0;
@@ -178,7 +165,6 @@ unsigned int GLC_3DRep::vertexCount() const
 	return result;
 }
 
-// Get number of materials
 unsigned int GLC_3DRep::materialCount() const
 {
 	unsigned int result= 0;
@@ -194,7 +180,6 @@ unsigned int GLC_3DRep::materialCount() const
 	return result;
 }
 
-// Get materials List
 QSet<GLC_Material*> GLC_3DRep::materialSet() const
 {
 	QSet<GLC_Material*> result;
@@ -210,7 +195,18 @@ QSet<GLC_Material*> GLC_3DRep::materialSet() const
 	return result;
 }
 
-// Remove empty geometries
+double GLC_3DRep::volume() const
+{
+	double resultVolume= 0.0;
+	const int geomCount= m_pGeomList->count();
+	for (int i= 0; i < geomCount; ++i)
+	{
+		resultVolume+= m_pGeomList->at(i)->volume();
+	}
+
+	return resultVolume;
+}
+
 void GLC_3DRep::clean()
 {
 	QList<GLC_Geometry*>::iterator iGeomList= m_pGeomList->begin();
@@ -229,7 +225,6 @@ void GLC_3DRep::clean()
 	}
 }
 
-// Reverse geometries normals
 void GLC_3DRep::reverseNormals()
 {
 	const int size= m_pGeomList->size();
@@ -239,7 +234,6 @@ void GLC_3DRep::reverseNormals()
 	}
 }
 
-// Load the representation
 bool GLC_3DRep::load()
 {
 	bool loadSucces= false;
@@ -274,7 +268,7 @@ bool GLC_3DRep::load()
 	return loadSucces;
 
 }
-// Replace the representation
+
 void GLC_3DRep::replace(GLC_Rep* pRep)
 {
 	GLC_3DRep* p3DRep= dynamic_cast<GLC_3DRep*>(pRep);
@@ -295,7 +289,6 @@ void GLC_3DRep::replace(GLC_Rep* pRep)
 	}
 }
 
-// Replace the specified material by a new one
 void GLC_3DRep::replaceMaterial(GLC_uint oldId, GLC_Material* pNewMaterial)
 {
 	//qDebug() << "GLC_3DRep::replaceMaterial";
@@ -315,7 +308,6 @@ void GLC_3DRep::replaceMaterial(GLC_uint oldId, GLC_Material* pNewMaterial)
 	}
 }
 
-// Merge this 3Drep with another 3DRep
 void GLC_3DRep::merge(const GLC_3DRep* pRep)
 {
 	// Get the number of geometry of pRep
@@ -361,7 +353,6 @@ void GLC_3DRep::transformSubGeometries(const GLC_Matrix4x4& matrix)
 {
 	// Get the number of geometry of pRep
 	const int repCount= m_pGeomList->size();
-	qDebug() << "repCount " << repCount;
 	for (int i= 0; i < repCount; ++i)
 	{
 		GLC_Mesh* pCurrentMesh= dynamic_cast<GLC_Mesh*>(geomAt(i));
@@ -372,7 +363,16 @@ void GLC_3DRep::transformSubGeometries(const GLC_Matrix4x4& matrix)
 	}
 }
 
-// UnLoad the representation
+void GLC_3DRep::setVboUsage(bool usage)
+{
+	// Get the number of geometry of pRep
+	const int repCount= m_pGeomList->size();
+	for (int i= 0; i < repCount; ++i)
+	{
+		m_pGeomList->at(i)->setVboUsage(usage);
+	}
+}
+
 bool GLC_3DRep::unload()
 {
 	bool unloadSucess= false;
@@ -404,7 +404,6 @@ bool GLC_3DRep::unload()
 // private services functions
 //////////////////////////////////////////////////////////////////////
 
-// Clear the 3D representation
 void GLC_3DRep::clear()
 {
 	if (isTheLast())
@@ -422,7 +421,6 @@ void GLC_3DRep::clear()
 	}
 }
 // Non Member methods
-// Non-member stream operator
 QDataStream &operator<<(QDataStream & stream, const GLC_3DRep & rep)
 {
 	quint32 chunckId= GLC_3DRep::m_ChunkId;
@@ -457,6 +455,7 @@ QDataStream &operator<<(QDataStream & stream, const GLC_3DRep & rep)
 
 	return stream;
 }
+
 QDataStream &operator>>(QDataStream & stream, GLC_3DRep & rep)
 {
 	Q_ASSERT(rep.isEmpty());

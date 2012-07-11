@@ -37,6 +37,7 @@
  */
 
 #include "openpilot.h"
+#include "hwsettings.h"
 #include "altitude.h"
 #include "baroaltitude.h"	// object that will be updated by the module
 #if defined(PIOS_INCLUDE_HCSR04)
@@ -46,8 +47,7 @@
 // Private constants
 #define STACK_SIZE_BYTES 500
 #define TASK_PRIORITY (tskIDLE_PRIORITY+1)
-//#define UPDATE_PERIOD 100
-#define UPDATE_PERIOD 25
+#define UPDATE_PERIOD 50
 
 // Private types
 
@@ -60,6 +60,8 @@ static int32_t alt_ds_temp = 0;
 static int32_t alt_ds_pres = 0;
 static int alt_ds_count = 0;
 
+static bool altitudeEnabled;
+
         // Private functions
 static void altitudeTask(void *parameters);
 
@@ -69,17 +71,19 @@ static void altitudeTask(void *parameters);
  */
 int32_t AltitudeStart()
 {
-	
-	BaroAltitudeInitialize();
-#if defined(PIOS_INCLUDE_HCSR04)
-	SonarAltitudeInitialze();
-#endif
-	
-	// Start main task
-	xTaskCreate(altitudeTask, (signed char *)"Altitude", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
-	TaskMonitorAdd(TASKINFO_RUNNING_ALTITUDE, taskHandle);
 
-	return 0;
+	if (altitudeEnabled) {
+		BaroAltitudeInitialize();
+#if defined(PIOS_INCLUDE_HCSR04)
+		SonarAltitudeInitialze();
+#endif
+
+		// Start main task
+		xTaskCreate(altitudeTask, (signed char *)"Altitude", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
+		TaskMonitorAdd(TASKINFO_RUNNING_ALTITUDE, taskHandle);
+		return 0;
+	}
+	return -1;
 }
 
 /**
@@ -88,11 +92,23 @@ int32_t AltitudeStart()
  */
 int32_t AltitudeInitialize()
 {
+#ifdef MODULE_Altitude_BUILTIN
+	altitudeEnabled = 1;
+#else
+	HwSettingsInitialize();
+	uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
+	HwSettingsOptionalModulesGet(optionalModules);
+	if (optionalModules[HWSETTINGS_OPTIONALMODULES_ALTITUDE] == HWSETTINGS_OPTIONALMODULES_ENABLED) {
+		altitudeEnabled = 1;
+	} else {
+		altitudeEnabled = 0;
+	}
+#endif
 
 	// init down-sampling data
-    alt_ds_temp = 0;
-    alt_ds_pres = 0;
-    alt_ds_count = 0;
+	alt_ds_temp = 0;
+	alt_ds_pres = 0;
+	alt_ds_count = 0;
 
 	return 0;
 }
@@ -104,7 +120,7 @@ static void altitudeTask(void *parameters)
 {
 	BaroAltitudeData data;
 	portTickType lastSysTime;
-
+	
 #if defined(PIOS_INCLUDE_HCSR04)
 	SonarAltitudeData sonardata;
 	int32_t value=0,timeout=5;
@@ -113,7 +129,7 @@ static void altitudeTask(void *parameters)
 	PIOS_HCSR04_Trigger();
 #endif
 	PIOS_BMP085_Init();
-
+	
 	// Main task loop
 	lastSysTime = xTaskGetTickCount();
 	while (1)
@@ -129,7 +145,7 @@ static void altitudeTask(void *parameters)
 				height_out = (height_out * (1 - coeff)) + (height_in * coeff);
 				sonardata.Altitude = height_out; // m/us
 			}
-
+			
 			// Update the AltitudeActual UAVObject
 			SonarAltitudeSet(&sonardata);
 			timeout=5;
@@ -144,34 +160,42 @@ static void altitudeTask(void *parameters)
 #endif
 		// Update the temperature data
 		PIOS_BMP085_StartADC(TemperatureConv);
+#ifdef PIOS_BMP085_HAS_GPIOS
 		xSemaphoreTake(PIOS_BMP085_EOC, portMAX_DELAY);
+#else
+		vTaskDelay(5 / portTICK_RATE_MS);
+#endif
 		PIOS_BMP085_ReadADC();
 		alt_ds_temp += PIOS_BMP085_GetTemperature();
-
+		
 		// Update the pressure data
 		PIOS_BMP085_StartADC(PressureConv);
+#ifdef PIOS_BMP085_HAS_GPIOS
 		xSemaphoreTake(PIOS_BMP085_EOC, portMAX_DELAY);
+#else
+		vTaskDelay(26 / portTICK_RATE_MS);
+#endif
 		PIOS_BMP085_ReadADC();
 		alt_ds_pres += PIOS_BMP085_GetPressure();
-
+		
 		if (++alt_ds_count >= alt_ds_size)
-        {
-		    alt_ds_count = 0;
+		{
+			alt_ds_count = 0;
 
-		    // Convert from 1/10ths of degC to degC
-            data.Temperature = alt_ds_temp / (10.0 * alt_ds_size);
-            alt_ds_temp = 0;
+			// Convert from 1/10ths of degC to degC
+			data.Temperature = alt_ds_temp / (10.0 * alt_ds_size);
+			alt_ds_temp = 0;
 
-            // Convert from Pa to kPa
-            data.Pressure = alt_ds_pres / (1000.0f * alt_ds_size);
-            alt_ds_pres = 0;
+			// Convert from Pa to kPa
+			data.Pressure = alt_ds_pres / (1000.0f * alt_ds_size);
+			alt_ds_pres = 0;
 
-            // Compute the current altitude (all pressures in kPa)
-            data.Altitude = 44330.0 * (1.0 - powf((data.Pressure / (BMP085_P0 / 1000.0)), (1.0 / 5.255)));
+			// Compute the current altitude (all pressures in kPa)
+			data.Altitude = 44330.0 * (1.0 - powf((data.Pressure / (BMP085_P0 / 1000.0)), (1.0 / 5.255)));
 
-            // Update the AltitudeActual UAVObject
-            BaroAltitudeSet(&data);
-        }
+			// Update the AltitudeActual UAVObject
+			BaroAltitudeSet(&data);
+		}
 
 		// Delay until it is time to read the next sample
 		vTaskDelayUntil(&lastSysTime, UPDATE_PERIOD / portTICK_RATE_MS);
@@ -179,6 +203,6 @@ static void altitudeTask(void *parameters)
 }
 
 /**
-  * @}
+ * @}
  * @}
  */

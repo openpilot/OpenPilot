@@ -66,12 +66,6 @@ defined in linker script */
   .type  Reset_Handler, %function
 Reset_Handler:  
 
-/* FSMC Bank1 NOR/SRAM3 is used for the STM3210E-EVAL, if another Bank is 
-  required, then adjust the Register Addresses */
-  bl  SystemInit_ExtMemCtl
-/* restore original stack pointer */  
-  LDR r0, =_estack
-  MSR msp, r0
 /* Copy the data segment initializers from flash to SRAM */  
   movs  r1, #0
   b  LoopCopyDataInit
@@ -140,7 +134,7 @@ Infinite_Loop:
     
     
 g_pfnVectors:
-  .word  Initial_spTop
+  .word  _estack
   .word  Reset_Handler
   .word  NMI_Handler
   .word  HardFault_Handler

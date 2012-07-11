@@ -66,17 +66,21 @@ private:
     Ui::ScopeGadgetOptionsPage *options_page;
     ScopeGadgetConfiguration *m_config;
 
-    void addPlotCurveConfig(QString uavObject, QString uavField, int scale, QVariant varColor);
-    void setCurvePlotProperties(QListWidgetItem *listWidgetItem, QString uavObject, QString uavField, int scale, QVariant varColor);
+    void addPlotCurveConfig(QString uavObject, QString uavField, int scale, int mean, QString mathFunction, QVariant varColor);
+    void setCurvePlotProperties(QListWidgetItem *listWidgetItem, QString uavObject, QString uavField, int scale, int mean, QString mathFunction, QVariant varColor);
     void setYAxisWidgetFromPlotCurve();
     void setButtonColor(const QColor &color);
+    void validateRefreshInterval();
+    bool eventFilter( QObject * obj, QEvent * evt );
 
 private slots:
+    void on_spnRefreshInterval_valueChanged(int );
     void on_lstCurves_currentRowChanged(int currentRow);
     void on_btnRemoveCurve_clicked();
     void on_btnAddCurve_clicked();
     void on_cmbUAVObjects_currentIndexChanged(QString val);    
     void on_btnColor_clicked();
+    void on_mathFunctionComboBox_currentIndexChanged(int currentIndex);
     void on_loggingEnable_clicked();
 
 };

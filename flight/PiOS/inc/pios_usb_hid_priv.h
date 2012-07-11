@@ -1,14 +1,14 @@
- /**
+/**
  ******************************************************************************
  * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
- * @addtogroup   PIOS_USB_HID USB_HID Functions
- * @brief PIOS interface for USB_HID port
+ * @addtogroup PIOS_USB_COM USB HID COM layer functions
+ * @brief Hardware communication layer
  * @{
  *
  * @file       pios_usb_hid_priv.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      USB_HID private definitions.
+ * @brief      USB COM HID private definitions.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -31,14 +31,15 @@
 #ifndef PIOS_USB_HID_PRIV_H
 #define PIOS_USB_HID_PRIV_H
 
-#include <pios.h>
-#include <pios_stm32.h>
-
 struct pios_usb_hid_cfg {
-	struct stm32_irq irq;
+	uint8_t data_if;
+	uint8_t data_rx_ep;
+	uint8_t data_tx_ep;
 };
 
-extern int32_t PIOS_USB_HID_Init(uint32_t * usb_hid_id, const struct pios_usb_hid_cfg * cfg);
+extern const struct pios_com_driver pios_usb_hid_com_driver;
+
+extern int32_t PIOS_USB_HID_Init(uint32_t * usbhid_id, const struct pios_usb_hid_cfg * cfg, uint32_t lower_id);
 
 #endif /* PIOS_USB_HID_PRIV_H */
 
@@ -46,4 +47,3 @@ extern int32_t PIOS_USB_HID_Init(uint32_t * usb_hid_id, const struct pios_usb_hi
   * @}
   * @}
   */
-

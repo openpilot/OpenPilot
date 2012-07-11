@@ -6,475 +6,650 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>659</width>
-    <height>523</height>
+    <width>664</width>
+    <height>791</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout_4">
+   <property name="spacing">
+    <number>12</number>
+   </property>
    <item>
-    <widget class="QFrame" name="frame">
-     <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="tabShape">
+      <enum>QTabWidget::Rounded</enum>
      </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
+     <property name="currentIndex">
+      <number>0</number>
      </property>
-     <layout class="QGridLayout" name="gridLayout">
-      <property name="leftMargin">
-       <number>1</number>
-      </property>
-      <property name="topMargin">
-       <number>1</number>
-      </property>
-      <property name="rightMargin">
-       <number>1</number>
-      </property>
-      <property name="bottomMargin">
-       <number>3</number>
-      </property>
-      <property name="spacing">
-       <number>2</number>
-      </property>
-      <item row="0" column="0">
-       <layout class="QHBoxLayout" name="horizontalLayout_6">
-        <item>
-         <spacer name="horizontalSpacer_3">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
+     <property name="elideMode">
+      <enum>Qt::ElideMiddle</enum>
+     </property>
+     <widget class="QWidget" name="tab">
+      <attribute name="title">
+       <string>Output</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <property name="leftMargin">
+        <number>12</number>
+       </property>
+       <property name="rightMargin">
+        <number>12</number>
+       </property>
+       <property name="bottomMargin">
+        <number>12</number>
+       </property>
+       <item>
+        <widget class="QScrollArea" name="scrollArea">
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="widgetResizable">
+          <bool>true</bool>
+         </property>
+         <widget class="QWidget" name="scrollAreaWidgetContents">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>610</width>
+            <height>634</height>
+           </rect>
           </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Minimum</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_9">
-          <property name="font">
-           <font>
-            <weight>75</weight>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="text">
-           <string>Channel:</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
+          <layout class="QVBoxLayout" name="verticalLayout">
+           <item>
+            <widget class="QGroupBox" name="groupBox_2">
+             <property name="title">
+              <string/>
+             </property>
+             <layout class="QGridLayout" name="gridLayout">
+              <item row="0" column="0">
+               <spacer name="horizontalSpacer_3">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Minimum</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>25</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLabel" name="label_9">
+                <property name="font">
+                 <font>
+                  <weight>75</weight>
+                  <bold>true</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Channel:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2">
+               <widget class="QLabel" name="chBank1">
+                <property name="text">
+                 <string>-</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="3">
+               <widget class="QLabel" name="chBank2">
+                <property name="text">
+                 <string>-</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="4">
+               <widget class="QLabel" name="chBank3">
+                <property name="text">
+                 <string>-</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="5">
+               <widget class="QLabel" name="chBank4">
+                <property name="text">
+                 <string>-</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <spacer name="horizontalSpacer_4">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>20</height>
+                 </size>
+                </property>
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Minimum</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>25</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLabel" name="label_3">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>20</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <weight>75</weight>
+                  <bold>true</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Update rate:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="2">
+               <widget class="QComboBox" name="cb_outputRate1">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>20</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>Setup &quot;TurboPWM&quot; here: usual value is 400 Hz for multirotor airframes.
+Leave at 50Hz for fixed wing.</string>
+                </property>
+                <item>
+                 <property name="text">
+                  <string>50</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>60</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>125</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>165</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>270</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>330</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>400</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item row="1" column="3">
+               <widget class="QComboBox" name="cb_outputRate2">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>20</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>Setup &quot;TurboPWM&quot; here: usual value is 400 Hz for multirotor airframes.
+Leave at 50Hz for fixed wing.</string>
+                </property>
+                <item>
+                 <property name="text">
+                  <string>50</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>60</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>125</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>165</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>270</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>330</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>400</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item row="1" column="4">
+               <widget class="QComboBox" name="cb_outputRate3">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>20</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>Setup &quot;TurboPWM&quot; here: usual value is 400 Hz for multirotor airframes.
+Leave at 50Hz for fixed wing.</string>
+                </property>
+                <item>
+                 <property name="text">
+                  <string>50</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>60</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>125</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>165</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>270</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>330</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>400</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item row="1" column="5">
+               <widget class="QComboBox" name="cb_outputRate4">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>20</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>Setup &quot;TurboPWM&quot; here: usual value is 400 Hz for multirotor airframes.
+Leave at 50Hz for fixed wing.</string>
+                </property>
+                <item>
+                 <property name="text">
+                  <string>50</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>60</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>125</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>165</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>270</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>330</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>400</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" name="channelLayout">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <property name="sizeConstraint">
+              <enum>QLayout::SetNoConstraint</enum>
+             </property>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_2">
+             <item>
+              <widget class="QCheckBox" name="spinningArmed">
+               <property name="minimumSize">
+                <size>
+                 <width>519</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>Motors spin at neutral output when armed and throttle below zero (be careful)</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_2">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <spacer name="verticalSpacer">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>458</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
          </widget>
-        </item>
-       </layout>
-      </item>
-      <item row="1" column="0">
-       <layout class="QHBoxLayout" name="horizontalLayout_7">
-        <item>
-         <spacer name="horizontalSpacer_4">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Minimum</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_3">
-          <property name="font">
-           <font>
-            <weight>75</weight>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="text">
-           <string>Update rate:</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item row="1" column="1">
-       <widget class="QComboBox" name="cb_outputRate1">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="toolTip">
-         <string>Setup &quot;TurboPWM&quot; here: usual value is 400 Hz for multirotor airframes.
-Leave at 50Hz for fixed wing.</string>
-        </property>
-        <item>
-         <property name="text">
-          <string>50</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>60</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>125</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>165</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>270</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>330</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>400</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="1" column="2">
-       <widget class="QComboBox" name="cb_outputRate2">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="toolTip">
-         <string>Setup &quot;TurboPWM&quot; here: usual value is 400 Hz for multirotor airframes.
-Leave at 50Hz for fixed wing.</string>
-        </property>
-        <item>
-         <property name="text">
-          <string>50</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>60</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>125</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>165</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>270</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>330</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>400</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="1" column="3">
-       <widget class="QComboBox" name="cb_outputRate3">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="toolTip">
-         <string>Setup &quot;TurboPWM&quot; here: usual value is 400 Hz for multirotor airframes.
-Leave at 50Hz for fixed wing.</string>
-        </property>
-        <item>
-         <property name="text">
-          <string>50</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>60</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>125</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>165</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>270</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>330</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>400</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="1" column="4">
-       <widget class="QComboBox" name="cb_outputRate4">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="toolTip">
-         <string>Setup &quot;TurboPWM&quot; here: usual value is 400 Hz for multirotor airframes.
-Leave at 50Hz for fixed wing.</string>
-        </property>
-        <item>
-         <property name="text">
-          <string>50</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>60</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>125</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>165</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>270</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>330</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>400</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QLabel" name="chBank1">
-        <property name="text">
-         <string>-</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2">
-       <widget class="QLabel" name="chBank2">
-        <property name="text">
-         <string>-</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="3">
-       <widget class="QLabel" name="chBank3">
-        <property name="text">
-         <string>-</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="4">
-       <widget class="QLabel" name="chBank4">
-        <property name="text">
-         <string>-</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-     </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
    <item>
-    <layout class="QVBoxLayout" name="channelLayout"/>
-   </item>
-   <item>
-    <spacer name="verticalSpacer_2">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string/>
      </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <widget class="QCheckBox" name="spinningArmed">
-       <property name="text">
-        <string>Motors spin at neutral output when armed and throttle below zero (be careful)</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QCheckBox" name="channelOutTest">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="toolTip">
-        <string>Move the servos using the sliders. Two important things:
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QCheckBox" name="channelOutTest">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>105</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>Move the servos using the sliders. Two important things:
 - Take extra care if the output is connected to an motor controller!
 - Will only work if the RC receiver is working (failsafe)</string>
-       </property>
-       <property name="text">
-        <string>Test outputs</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="outputHelp">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>32</width>
-         <height>32</height>
-        </size>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset resource="../coreplugin/core.qrc">
-         <normaloff>:/core/images/helpicon.svg</normaloff>:/core/images/helpicon.svg</iconset>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>32</width>
-         <height>32</height>
-        </size>
-       </property>
-       <property name="flat">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="saveRCOutputToRAM">
-       <property name="toolTip">
-        <string>Send to OpenPilot but don't write in SD.
+          </property>
+          <property name="text">
+           <string>Test outputs</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="outputHelp">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="../coreplugin/core.qrc">
+            <normaloff>:/core/images/helpicon.svg</normaloff>:/core/images/helpicon.svg</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="flat">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="saveRCOutputToRAM">
+          <property name="minimumSize">
+           <size>
+            <width>60</width>
+            <height>28</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>Send to OpenPilot but don't write in SD.
 Be sure to set the Neutral position on all sliders before sending!</string>
-       </property>
-       <property name="text">
-        <string>Apply</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="saveRCOutputToSD">
-       <property name="toolTip">
-        <string>Be sure to set the Neutral position on all sliders before sending!
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QPushButton {
+border: 1px outset #999;
+border-radius: 5;
+background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0.28 rgba(236, 236, 236, 255), stop:1 rgba(252, 252, 252, 255));
+}
+
+QPushButton:pressed {
+
+    border-style: inset;
+	background-color: qlineargradient(spread:pad, x1:0.502, y1:0.664864, x2:0.502, y2:0.034, stop:0.358209 rgba(250, 250, 250, 255), stop:0.626866 rgba(235, 235, 235, 255));
+
+}
+
+
+QPushButton:hover  {
+	border: 1px outset #999;	
+border-color: rgb(83, 83, 83);
+border-radius: 4;
+	}</string>
+          </property>
+          <property name="text">
+           <string>Apply</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="saveRCOutputToSD">
+          <property name="minimumSize">
+           <size>
+            <width>60</width>
+            <height>28</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>Be sure to set the Neutral position on all sliders before sending!
 Applies and Saves all settings to SD</string>
-       </property>
-       <property name="text">
-        <string>Save</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QPushButton {
+border: 1px outset #999;
+border-radius: 5;
+background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0.28 rgba(236, 236, 236, 255), stop:1 rgba(252, 252, 252, 255));
+}
+
+QPushButton:pressed {
+
+    border-style: inset;
+	background-color: qlineargradient(spread:pad, x1:0.502, y1:0.664864, x2:0.502, y2:0.034, stop:0.358209 rgba(250, 250, 250, 255), stop:0.626866 rgba(235, 235, 235, 255));
+
+}
+
+
+QPushButton:hover  {
+	border: 1px outset #999;	
+border-color: rgb(83, 83, 83);
+border-radius: 4;
+	}</string>
+          </property>
+          <property name="text">
+           <string>Save</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
    </item>
   </layout>
  </widget>

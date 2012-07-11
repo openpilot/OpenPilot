@@ -48,7 +48,7 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     autoLoadWidgets();
     realtimeUpdates=new QTimer(this);
     connect(m_stabilization->realTimeUpdates_6,SIGNAL(stateChanged(int)),this,SLOT(realtimeUpdatesSlot(int)));
-    connect(m_stabilization->realTimeUpdates_7,SIGNAL(stateChanged(int)),this,SLOT(realtimeUpdatesSlot(int)));
+    //connect(m_stabilization->realTimeUpdates_7,SIGNAL(stateChanged(int)),this,SLOT(realtimeUpdatesSlot(int)));
     connect(realtimeUpdates,SIGNAL(timeout()),this,SLOT(apply()));
 
     connect(m_stabilization->checkBox_7,SIGNAL(stateChanged(int)),this,SLOT(linkCheckBoxes(int)));
@@ -66,8 +66,8 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     m_stabilization->saveStabilizationToRAM_6->setAttribute(Qt::WA_LayoutUsesWidgetRect);
     m_stabilization->saveStabilizationToSD_6->setAttribute(Qt::WA_LayoutUsesWidgetRect);
     m_stabilization->stabilizationReloadBoardData_6->setAttribute(Qt::WA_LayoutUsesWidgetRect);
-    m_stabilization->saveStabilizationToRAM_7->setAttribute(Qt::WA_LayoutUsesWidgetRect);
-    m_stabilization->saveStabilizationToSD_7->setAttribute(Qt::WA_LayoutUsesWidgetRect);
+   // m_stabilization->saveStabilizationToRAM_7->setAttribute(Qt::WA_LayoutUsesWidgetRect);
+   // m_stabilization->saveStabilizationToSD_7->setAttribute(Qt::WA_LayoutUsesWidgetRect);
     m_stabilization->pushButton_2->setAttribute(Qt::WA_LayoutUsesWidgetRect);
     m_stabilization->pushButton_3->setAttribute(Qt::WA_LayoutUsesWidgetRect);
     m_stabilization->pushButton_4->setAttribute(Qt::WA_LayoutUsesWidgetRect);
@@ -88,7 +88,7 @@ ConfigStabilizationWidget::~ConfigStabilizationWidget()
 void ConfigStabilizationWidget::realtimeUpdatesSlot(int value)
 {
     m_stabilization->realTimeUpdates_6->setCheckState((Qt::CheckState)value);
-    m_stabilization->realTimeUpdates_7->setCheckState((Qt::CheckState)value);
+    //m_stabilization->realTimeUpdates_7->setCheckState((Qt::CheckState)value);
     if(value==Qt::Checked && !realtimeUpdates->isActive())
         realtimeUpdates->start(300);
     else if(value==Qt::Unchecked)

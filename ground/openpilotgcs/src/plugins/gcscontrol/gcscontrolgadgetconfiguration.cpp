@@ -54,7 +54,7 @@ GCSControlGadgetConfiguration::GCSControlGadgetConfiguration(QString classId, QS
         yawChannel = qSettings->value("yawChannel").toInt();
         throttleChannel = qSettings->value("throttleChannel").toInt();
 
-        udp_port = qSettings->value("controlPortUDP").toInt();
+        udp_port = qSettings->value("controlPortUDP").toUInt();
         udp_host = QHostAddress(qSettings->value("controlHostUDP").toString());
 
         int i;

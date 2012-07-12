@@ -95,7 +95,7 @@ void MixerCurve::setMixerType(MixerCurveType curveType)
         {
             m_mixerUI->SettingsGroup->setTitle("Pitch Curve");
             m_curve->setRange(-1.0, 1.0);            
-            m_curve->setPositiveColor("#0000ff", "#0000ff");
+            m_curve->setPositiveColor("#0000aa", "#0000aa");
             m_mixerUI->CurveMin->setMinimum(-1.0);
             m_mixerUI->CurveMax->setMinimum(-1.0);
             break;

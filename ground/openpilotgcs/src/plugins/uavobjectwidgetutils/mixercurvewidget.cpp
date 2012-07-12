@@ -82,6 +82,7 @@ MixerCurveWidget::MixerCurveWidget(QWidget *parent) : QGraphicsView(parent)
     // reset
     Node* node = getCommandNode(0);    
     node->setName("Reset");
+    node->setToolTip("Reset Curve to Defaults");
     node->setToggle(false);
     node->setPositiveColor("#ffffff", "#ffffff");  //white
     node->setNegativeColor("#ffffff", "#ffffff");
@@ -90,30 +91,35 @@ MixerCurveWidget::MixerCurveWidget(QWidget *parent) : QGraphicsView(parent)
     // linear
     node = getCommandNode(1);
     node->setName("Linear");
+    node->setToolTip("Generate a Linear Curve");
     node->commandText("/");
     scene->addItem(node);
 
     // log
     node = getCommandNode(2);
     node->setName("Log");
+    node->setToolTip("Generate a Logarithmic Curve");
     node->commandText("(");
     scene->addItem(node);
 
     // exp
     node = getCommandNode(3);
     node->setName("Exp");
+    node->setToolTip("Generate an Exponential Curve");
     node->commandText(")");
     scene->addItem(node);
 
     // flat
     node = getCommandNode(4);
     node->setName("Flat");
+    node->setToolTip("Generate a Flat Curve");
     node->commandText("--");
     scene->addItem(node);
 
     // step
     node = getCommandNode(5);
     node->setName("Step");
+    node->setToolTip("Generate a Stepped Curve");
     node->commandText("z");
     scene->addItem(node);
 
@@ -121,57 +127,64 @@ MixerCurveWidget::MixerCurveWidget(QWidget *parent) : QGraphicsView(parent)
     // curve min/max nodes
     node = getCommandNode(6);
     node->setName("MinPlus");
+    node->setToolTip("Increase Curve Minimum");
     node->setToggle(false);
-    node->setPositiveColor("#00ff00", "#00ff00");   //green
-    node->setNegativeColor("#00ff00", "#00ff00");
+    node->setPositiveColor("#00aa00", "#00aa00");   //green
+    node->setNegativeColor("#00aa00", "#00aa00");
     node->commandText("+");
     scene->addItem(node);
 
     node = getCommandNode(7);
     node->setName("MinMinus");
+    node->setToolTip("Decrease Curve Minimum");
     node->setToggle(false);
-    node->setPositiveColor("#ff0000", "#ff0000");   //red
-    node->setNegativeColor("#ff0000", "#ff0000");
+    node->setPositiveColor("#aa0000", "#aa0000");   //red
+    node->setNegativeColor("#aa0000", "#aa0000");
     node->commandText("-");
     scene->addItem(node);
 
     node = getCommandNode(8);
     node->setName("MaxPlus");
+    node->setToolTip("Increase Curve Maximum");
     node->setToggle(false);
-    node->setPositiveColor("#00ff00", "#00ff00");   //green
-    node->setNegativeColor("#00ff00", "#00ff00");
+    node->setPositiveColor("#00aa00", "#00aa00");   //green
+    node->setNegativeColor("#00aa00", "#00aa00");
     node->commandText("+");
     scene->addItem(node);
 
     node = getCommandNode(9);
     node->setName("MaxMinus");
+    node->setToolTip("Decrease Curve Maximum");
     node->setToggle(false);
-    node->setPositiveColor("#ff0000", "#ff0000");   //red
-    node->setNegativeColor("#ff0000", "#ff0000");
+    node->setPositiveColor("#aa0000", "#aa0000");   //red
+    node->setNegativeColor("#aa0000", "#aa0000");
     node->commandText("-");
     scene->addItem(node);
 
     node = getCommandNode(10);
     node->setName("StepPlus");
+    node->setToolTip("Increase Step/Power Value");
     node->setToggle(false);
-    node->setPositiveColor("#00ff00", "#00ff00");   //green
-    node->setNegativeColor("#00ff00", "#00ff00");
+    node->setPositiveColor("#00aa00", "#00aa00");   //green
+    node->setNegativeColor("#00aa00", "#00aa00");
     node->commandText("+");
     scene->addItem(node);
 
     node = getCommandNode(11);
     node->setName("StepMinus");
+    node->setToolTip("Decrease Step/Power Value");
     node->setToggle(false);
-    node->setPositiveColor("#ff0000", "#ff0000");   //red
-    node->setNegativeColor("#ff0000", "#ff0000");
+    node->setPositiveColor("#aa0000", "#aa0000");   //red
+    node->setNegativeColor("#aa0000", "#aa0000");
     node->commandText("-");
     scene->addItem(node);
 
     node = getCommandNode(12);
     node->setName("StepValue");
+    node->setToolTip("Current Step/Power Value");
     node->setToggle(false);
-    node->setPositiveColor("#0000ff", "#0000ff");  //blue
-    node->setNegativeColor("#0000ff", "#0000ff");
+    node->setPositiveColor("#0000aa", "#0000aa");  //blue
+    node->setNegativeColor("#0000aa", "#0000aa");
     scene->addItem(node);
 
     resizeCommands();
@@ -206,8 +219,8 @@ Node* MixerCurveWidget::getCommandNode(int index)
         node->commandText("");
         node->setCommandIndex(index);
         node->setActive(false);        
-        node->setPositiveColor("#ff0000", "#ff0000");
-        node->setNegativeColor("#0000cc", "#0000cc");
+        node->setPositiveColor("#aaaa00", "#aaaa00");
+        node->setNegativeColor("#aa00aa", "#aa00aa");
         cmdNodePool.append(node);
     }
     return node;
@@ -368,8 +381,8 @@ void MixerCurveWidget::setCurve(const QList<double>* points)
         node->setPos(w*i, h - (val*h));
         node->verticalMove(true);
 
-        node->setPositiveColor(posColor0, posColor1);
-        node->setNegativeColor(negColor0, negColor1);
+//        node->setPositiveColor(posColor0, posColor1);
+//        node->setNegativeColor(negColor0, negColor1);
 
         node->update();
     }
@@ -407,10 +420,19 @@ void MixerCurveWidget::resizeCommands()
     QRectF rect = plot->boundingRect();
 
     Node* node;
-    for (int i = 0; i<6; i++) {
+    node = getCommandNode(0);
+
+    //centered under widget
+    node->setPos((rect.left() + rect.width() / 2) - 5, rect.height() + 10);
+
+    for (int i = 1; i<6; i++) {
         node = getCommandNode(i);
 
-        node->setPos((rect.left() + rect.width() / 2) - 60 + (i * 20), rect.height() + 10);
+        //centered under widget
+        //node->setPos((rect.left() + rect.width() / 2) - 60 + (i * 20), rect.height() + 10);
+
+        //bottom right of widget
+        node->setPos(rect.right() - 120 + (i * 20), rect.bottomRight().x() - 14);
     }
 
     //curveminplus
@@ -431,15 +453,15 @@ void MixerCurveWidget::resizeCommands()
 
     //stepplus
     node = getCommandNode(10);
-    node->setPos(rect.bottomRight().x() - 60, rect.bottomRight().y() + 8);
+    node->setPos(rect.bottomRight().x() - 38, rect.bottomRight().y() + 5);
 
     //stepminus
     node = getCommandNode(11);
-    node->setPos(rect.bottomRight().x() - 40, rect.bottomRight().y() + 8);
+    node->setPos(rect.bottomRight().x() - 38, rect.bottomRight().y() + 15);
 
     //step
     node = getCommandNode(12);
-    node->setPos(rect.bottomRight().x() - 20, rect.bottomRight().y() + 8);
+    node->setPos(rect.bottomRight().x() - 20, rect.bottomRight().y() + 9);
 }
 
 void MixerCurveWidget::itemMoved(double itemValue)

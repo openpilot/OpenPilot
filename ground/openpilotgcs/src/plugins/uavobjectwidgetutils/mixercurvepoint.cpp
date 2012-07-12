@@ -50,8 +50,8 @@ Node::Node(MixerCurveWidget *graphWidget)
 
     posColor0 = "#1c870b";  //greenish?
     posColor1 = "#116703";  //greenish?
-    negColor0 = "#ff0000";  //red
-    negColor1 = "#ff0000";  //red
+    negColor0 = "#aa0000";  //red
+    negColor1 = "#aa0000";  //red
 
 }
 

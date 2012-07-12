@@ -1,0 +1,30 @@
+<RCC>
+    <qresource prefix="/systemhealth">
+        <file>html/Actuator-Critical.html</file>
+        <file>html/ManualControl-Critical.html</file>
+        <file>html/ManualControl-Warning.html</file>
+        <file>html/CPU-Critical.html</file>
+        <file>html/CPU-Warning.html</file>
+        <file>html/FlightTime-Error.html</file>
+        <file>html/Battery-Warning.html</file>
+        <file>html/BootFault-Critical.html</file>
+        <file>html/EventSystem-Warning.html</file>
+        <file>html/FlightTime-Critical.html</file>
+        <file>html/AlarmOK.html</file>
+        <file>html/Attitude-Critical.html</file>
+        <file>html/Attitude-Error.html</file>
+        <file>html/Battery-Critical.html</file>
+        <file>html/Battery-Error.html</file>
+        <file>html/FlightTime-Warning.html</file>
+        <file>html/GPS-Critical.html</file>
+        <file>html/GPS-Error.html</file>
+        <file>html/GPS-Warning.html</file>
+        <file>html/Guidance-Warning.html</file>
+        <file>html/Memory-Critical.html</file>
+        <file>html/Memory-Warning.html</file>
+        <file>html/Sensors-Critical.html</file>
+        <file>html/Stabilization-Warning.html</file>
+        <file>html/Stack-Critical.html</file>
+        <file>html/Telemetry-Error.html</file>
+    </qresource>
+</RCC>

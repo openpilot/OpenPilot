@@ -35,6 +35,24 @@
 #include <QMutexLocker>
 #include <QTimer>
 #include <QQueue>
+#include <QMap>
+
+class ObjectTransactionInfo: public QObject {
+    Q_OBJECT
+
+public:
+    ObjectTransactionInfo(QObject * parent);
+    ~ObjectTransactionInfo();
+    UAVObject* obj;
+    bool allInstances;
+    bool objRequest;
+    qint32 retriesRemaining;
+    bool acked;
+    QPointer<class Telemetry>telem;
+    QTimer* timer;
+private slots:
+    void timeout();
+};
 
 class Telemetry: public QObject
 {
@@ -54,23 +72,12 @@ public:
     } TelemetryStats;
 
     Telemetry(UAVTalk* utalk, UAVObjectManager* objMngr);
+    ~Telemetry();
     TelemetryStats getStats();
     void resetStats();
-
+    void transactionTimeout(ObjectTransactionInfo *info);
 
 signals:
-
-private slots:
-    void objectUpdatedAuto(UAVObject* obj);
-    void objectUpdatedManual(UAVObject* obj);
-    void objectUpdatedPeriodic(UAVObject* obj);
-    void objectUnpacked(UAVObject* obj);
-    void updateRequested(UAVObject* obj);
-    void newObject(UAVObject* obj);
-    void newInstance(UAVObject* obj);
-    void processPeriodicUpdates();
-    void transactionCompleted(UAVObject* obj, bool success);
-    void transactionTimeout();
 
 private:
     // Constants
@@ -105,14 +112,6 @@ private:
         bool allInstances;
     } ObjectQueueInfo;
 
-    typedef struct {
-        UAVObject* obj;
-        bool allInstances;
-        bool objRequest;
-        qint32 retriesRemaining;
-        bool acked;
-    } ObjectTransactionInfo;
-
     // Variables
     UAVObjectManager* objMngr;
     UAVTalk* utalk;
@@ -120,11 +119,9 @@ private:
     QList<ObjectTimeInfo> objList;
     QQueue<ObjectQueueInfo> objQueue;
     QQueue<ObjectQueueInfo> objPriorityQueue;
-    ObjectTransactionInfo transInfo;
-    bool transPending;
+    QMap<quint32, ObjectTransactionInfo*>transMap;
     QMutex* mutex;
     QTimer* updateTimer;
-    QTimer* transTimer;
     QTimer* statsTimer;
     qint32 timeToNextUpdateMs;
     quint32 txErrors;
@@ -137,9 +134,19 @@ private:
     void connectToObjectInstances(UAVObject* obj, quint32 eventMask);
     void updateObject(UAVObject* obj, quint32 eventMask);
     void processObjectUpdates(UAVObject* obj, EventMask event, bool allInstances, bool priority);
-    void processObjectTransaction();
+    void processObjectTransaction(ObjectTransactionInfo *transInfo);
     void processObjectQueue();
 
+private slots:
+    void objectUpdatedAuto(UAVObject* obj);
+    void objectUpdatedManual(UAVObject* obj);
+    void objectUpdatedPeriodic(UAVObject* obj);
+    void objectUnpacked(UAVObject* obj);
+    void updateRequested(UAVObject* obj);
+    void newObject(UAVObject* obj);
+    void newInstance(UAVObject* obj);
+    void processPeriodicUpdates();
+    void transactionCompleted(UAVObject* obj, bool success);
 
 };
 

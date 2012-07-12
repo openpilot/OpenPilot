@@ -444,7 +444,6 @@ static float bound(float val)
 
 static void SettingsUpdatedCb(UAVObjEvent * ev)
 {
-	memset(pids,0,sizeof (pid_type) * PID_MAX);
 	StabilizationSettingsGet(&settings);
 
 	// Set the roll rate PID constants

@@ -187,6 +187,15 @@ MixerCurveWidget::MixerCurveWidget(QWidget *parent) : QGraphicsView(parent)
     node->setNegativeColor("#0000aa", "#0000aa");
     scene->addItem(node);
 
+    // commands toggle
+    node = getCommandNode(13);
+    node->setName("Commands");
+    node->setToolTip("Toggle Command Buttons On/Off");
+    node->setToggle(true);
+    node->setPositiveColor("#00aa00", "#00aa00");  //greenish
+    node->setNegativeColor("#000000", "#000000");
+    scene->addItem(node);
+
     resizeCommands();
 
     initNodes(MixerCurveWidget::NODE_NUMELEM);
@@ -420,10 +429,13 @@ void MixerCurveWidget::resizeCommands()
     QRectF rect = plot->boundingRect();
 
     Node* node;
+    //reset
     node = getCommandNode(0);
+    node->setPos((rect.left() + rect.width() / 2) - 10, rect.height() + 10);
 
-    //centered under widget
-    node->setPos((rect.left() + rect.width() / 2) - 5, rect.height() + 10);
+    //commands on/off
+    node = getCommandNode(13);
+    node->setPos((rect.left() + rect.width() / 2) + 10, rect.height() + 10);
 
     for (int i = 1; i<6; i++) {
         node = getCommandNode(i);
@@ -527,23 +539,42 @@ void MixerCurveWidget::setCommandText(const QString& name, const QString& text)
 }
 void MixerCurveWidget::activateCommand(const QString& name)
 {
-    for (int i=0; i<cmdNodePool.count(); i++) {
+    for (int i=1; i<cmdNodePool.count()-1; i++) {
         Node* node = cmdNodePool.at(i);
-        node->setActive(node->getName() == name);
+        node->setCommandActive(node->getName() == name);
         node->update();
     }
 }
 
+void MixerCurveWidget::showCommands(bool show)
+{
+    for (int i=1; i<cmdNodePool.count()-1; i++) {
+        Node* node = cmdNodePool.at(i);
+        if (show)
+            node->show();
+        else
+            node->hide();
+
+        node->update();
+    }
+}
 void MixerCurveWidget::cmdActivated(Node* node)
 {
     if (node->getToggle()) {
-        for (int i=0; i<cmdNodePool.count(); i++) {
-            Node* n = cmdNodePool.at(i);
-            n->setActive(false);
-            n->update();
+        if (node->getName() == "Commands") {
+            node->setCommandActive(!node->getCommandActive());
+            showCommands(node->getCommandActive());
+        }
+        else {
+            for (int i=1; i<cmdNodePool.count()-1; i++) {
+                Node* n = cmdNodePool.at(i);
+                n->setCommandActive(false);
+                n->update();
+            }
+
+            node->setCommandActive(true);
         }
 
-        node->setActive(true);
     }
     node->update();
     emit commandActivated(node);

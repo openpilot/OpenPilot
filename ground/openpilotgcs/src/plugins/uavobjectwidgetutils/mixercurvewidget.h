@@ -58,8 +58,10 @@ public:
    double getMax();
    double setRange(double min, double max);
 
+
    void cmdActivated(Node* node);
    void activateCommand(const QString& name);
+   void showCommands(bool show);
    Node* getCmdNode(const QString& name);
    void setCommandText(const QString& name, const QString& text);
 

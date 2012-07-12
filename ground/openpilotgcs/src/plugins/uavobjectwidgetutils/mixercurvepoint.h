@@ -57,7 +57,9 @@ public:
     void commandText(QString text);
     int  getCommandIndex() { return index; }
     void setCommandIndex(int idx) { index = idx; }
-    void setActive(bool enable) { cmdActive = enable; }
+
+    bool getCommandActive() { return cmdActive; }
+    void setCommandActive(bool enable) { cmdActive = enable; }
     void setToggle(bool enable) { cmdToggle = enable; }
     bool getToggle() { return cmdToggle; }
 

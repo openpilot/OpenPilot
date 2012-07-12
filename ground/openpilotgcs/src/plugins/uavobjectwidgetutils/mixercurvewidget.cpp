@@ -29,6 +29,7 @@
 #include "mixercurveline.h"
 #include "mixercurvepoint.h"
 
+#include <QObject>
 #include <QtGui>
 #include <QDebug>
 
@@ -57,7 +58,6 @@ MixerCurveWidget::MixerCurveWidget(QWidget *parent) : QGraphicsView(parent)
     curveMin=0.0;
     curveMax=1.0;
 
-
     setFrameStyle(QFrame::NoFrame);
     setStyleSheet("background:transparent");
 
@@ -73,7 +73,111 @@ MixerCurveWidget::MixerCurveWidget(QWidget *parent) : QGraphicsView(parent)
     scene->setSceneRect(plot->boundingRect());
     setScene(scene);
 
+    posColor0 = "#1c870b";  //greenish?
+    posColor1 = "#116703";  //greenish?
+    negColor0 = "#ff0000";  //red
+    negColor1 = "#ff0000";  //red
+
+    // commmand nodes
+    // reset
+    Node* node = getCommandNode(0);    
+    node->setName("Reset");
+    node->setToggle(false);
+    node->setPositiveColor("#ffffff", "#ffffff");  //white
+    node->setNegativeColor("#ffffff", "#ffffff");
+    scene->addItem(node);
+
+    // linear
+    node = getCommandNode(1);
+    node->setName("Linear");
+    node->commandText("/");
+    scene->addItem(node);
+
+    // log
+    node = getCommandNode(2);
+    node->setName("Log");
+    node->commandText("(");
+    scene->addItem(node);
+
+    // exp
+    node = getCommandNode(3);
+    node->setName("Exp");
+    node->commandText(")");
+    scene->addItem(node);
+
+    // flat
+    node = getCommandNode(4);
+    node->setName("Flat");
+    node->commandText("--");
+    scene->addItem(node);
+
+    // step
+    node = getCommandNode(5);
+    node->setName("Step");
+    node->commandText("z");
+    scene->addItem(node);
+
+
+    // curve min/max nodes
+    node = getCommandNode(6);
+    node->setName("MinPlus");
+    node->setToggle(false);
+    node->setPositiveColor("#00ff00", "#00ff00");   //green
+    node->setNegativeColor("#00ff00", "#00ff00");
+    node->commandText("+");
+    scene->addItem(node);
+
+    node = getCommandNode(7);
+    node->setName("MinMinus");
+    node->setToggle(false);
+    node->setPositiveColor("#ff0000", "#ff0000");   //red
+    node->setNegativeColor("#ff0000", "#ff0000");
+    node->commandText("-");
+    scene->addItem(node);
+
+    node = getCommandNode(8);
+    node->setName("MaxPlus");
+    node->setToggle(false);
+    node->setPositiveColor("#00ff00", "#00ff00");   //green
+    node->setNegativeColor("#00ff00", "#00ff00");
+    node->commandText("+");
+    scene->addItem(node);
+
+    node = getCommandNode(9);
+    node->setName("MaxMinus");
+    node->setToggle(false);
+    node->setPositiveColor("#ff0000", "#ff0000");   //red
+    node->setNegativeColor("#ff0000", "#ff0000");
+    node->commandText("-");
+    scene->addItem(node);
+
+    node = getCommandNode(10);
+    node->setName("StepPlus");
+    node->setToggle(false);
+    node->setPositiveColor("#00ff00", "#00ff00");   //green
+    node->setNegativeColor("#00ff00", "#00ff00");
+    node->commandText("+");
+    scene->addItem(node);
+
+    node = getCommandNode(11);
+    node->setName("StepMinus");
+    node->setToggle(false);
+    node->setPositiveColor("#ff0000", "#ff0000");   //red
+    node->setNegativeColor("#ff0000", "#ff0000");
+    node->commandText("-");
+    scene->addItem(node);
+
+    node = getCommandNode(12);
+    node->setName("StepValue");
+    node->setToggle(false);
+    node->setPositiveColor("#0000ff", "#0000ff");  //blue
+    node->setNegativeColor("#0000ff", "#0000ff");
+    scene->addItem(node);
+
+    resizeCommands();
+
     initNodes(MixerCurveWidget::NODE_NUMELEM);
+
 }
 
 MixerCurveWidget::~MixerCurveWidget()
@@ -83,6 +187,30 @@ MixerCurveWidget::~MixerCurveWidget()
 
     while (!edgePool.isEmpty())
         delete edgePool.takeFirst();
+
+    while (!cmdNodePool.isEmpty())
+        delete cmdNodePool.takeFirst();
+}
+
+Node* MixerCurveWidget::getCommandNode(int index)
+{
+    Node* node;
+
+    if (index >= 0 && index < cmdNodePool.count())
+    {
+        node = cmdNodePool.at(index);
+    }
+    else {
+        node = new Node(this);        
+        node->commandNode(true);
+        node->commandText("");
+        node->setCommandIndex(index);
+        node->setActive(false);        
+        node->setPositiveColor("#ff0000", "#ff0000");
+        node->setNegativeColor("#0000cc", "#0000cc");
+        cmdNodePool.append(node);
+    }
+    return node;
 }
 
 Node* MixerCurveWidget::getNode(int index)
@@ -99,7 +227,6 @@ Node* MixerCurveWidget::getNode(int index)
     }
     return node;
 }
-
 Edge* MixerCurveWidget::getEdge(int index, Node* sourceNode, Node* destNode)
 {
     Edge* edge;
@@ -116,6 +243,26 @@ Edge* MixerCurveWidget::getEdge(int index, Node* sourceNode, Node* destNode)
     }
     return edge;
 }
+
+void MixerCurveWidget::setPositiveColor(QString color0, QString color1)
+{
+    posColor0 = color0;
+    posColor1 = color1;
+    for (int i=0; i<nodePool.count(); i++) {
+        Node* node = nodePool.at(i);
+        node->setPositiveColor(color0, color1);
+    }
+}
+void MixerCurveWidget::setNegativeColor(QString color0, QString color1)
+{
+    negColor0 = color0;
+    negColor1 = color1;
+    for (int i=0; i<nodePool.count(); i++) {
+        Node* node = nodePool.at(i);
+        node->setNegativeColor(color0, color1);
+    }
+}
+
 
 /**
   Init curve: create a (flat) curve with a specified number of points.
@@ -220,6 +367,10 @@ void MixerCurveWidget::setCurve(const QList<double>* points)
         Node* node = nodeList.at(i);
         node->setPos(w*i, h - (val*h));
         node->verticalMove(true);
+
+        node->setPositiveColor(posColor0, posColor1);
+        node->setNegativeColor(negColor0, negColor1);
+
         node->update();
     }
     curveUpdating = false;
@@ -238,7 +389,7 @@ void MixerCurveWidget::showEvent(QShowEvent *event)
     // the result is usually a ahrsbargraph that is way too small.
 
     QRectF rect = plot->boundingRect();
-
+    resizeCommands();
     fitInView(rect.adjusted(-15,-15,15,15), Qt::KeepAspectRatio);
 }
 
@@ -247,12 +398,54 @@ void MixerCurveWidget::resizeEvent(QResizeEvent* event)
     Q_UNUSED(event);
 
     QRectF rect = plot->boundingRect();
-
+    resizeCommands();
     fitInView(rect.adjusted(-15,-15,15,15), Qt::KeepAspectRatio);
+}
+
+void MixerCurveWidget::resizeCommands()
+{
+    QRectF rect = plot->boundingRect();
+
+    Node* node;
+    for (int i = 0; i<6; i++) {
+        node = getCommandNode(i);
+
+        node->setPos((rect.left() + rect.width() / 2) - 60 + (i * 20), rect.height() + 10);
+    }
+
+    //curveminplus
+    node = getCommandNode(6);
+    node->setPos(rect.bottomLeft().x() + 15, rect.bottomLeft().y() - 10);
+
+    //curveminminus
+    node = getCommandNode(7);
+    node->setPos(rect.bottomLeft().x() + 15, rect.bottomLeft().y() + 5);
+
+    //curvemaxplus
+    node = getCommandNode(8);
+    node->setPos(rect.topRight().x() - 20, rect.topRight().y() - 7);
+
+    //curvemaxminus
+    node = getCommandNode(9);
+    node->setPos(rect.topRight().x() - 20, rect.topRight().y() + 8);
+
+    //stepplus
+    node = getCommandNode(10);
+    node->setPos(rect.bottomRight().x() - 60, rect.bottomRight().y() + 8);
+
+    //stepminus
+    node = getCommandNode(11);
+    node->setPos(rect.bottomRight().x() - 40, rect.bottomRight().y() + 8);
+
+    //step
+    node = getCommandNode(12);
+    node->setPos(rect.bottomRight().x() - 20, rect.bottomRight().y() + 8);
 }
 
 void MixerCurveWidget::itemMoved(double itemValue)
 {
+    Q_UNUSED(itemValue);
+
     if (!curveUpdating) {
         emit curveUpdated();
     }
@@ -288,3 +481,49 @@ double MixerCurveWidget::setRange(double min, double max)
     curveMax = max;
     return curveMax - curveMin;
 }
+
+Node* MixerCurveWidget::getCmdNode(const QString& name)
+{
+    Node* node = 0;
+    for (int i=0; i<cmdNodePool.count(); i++) {
+        Node* n = cmdNodePool.at(i);
+        if (n->getName() == name)
+            node = n;
+    }
+    return node;
+}
+
+void MixerCurveWidget::setCommandText(const QString& name, const QString& text)
+{
+    for (int i=0; i<cmdNodePool.count(); i++) {
+        Node* n = cmdNodePool.at(i);
+        if (n->getName() == name) {
+            n->commandText(text);
+            n->update();
+        }
+    }
+}
+void MixerCurveWidget::activateCommand(const QString& name)
+{
+    for (int i=0; i<cmdNodePool.count(); i++) {
+        Node* node = cmdNodePool.at(i);
+        node->setActive(node->getName() == name);
+        node->update();
+    }
+}
+
+void MixerCurveWidget::cmdActivated(Node* node)
+{
+    if (node->getToggle()) {
+        for (int i=0; i<cmdNodePool.count(); i++) {
+            Node* n = cmdNodePool.at(i);
+            n->setActive(false);
+            n->update();
+        }
+
+        node->setActive(true);
+    }
+    node->update();
+    emit commandActivated(node);
+}
+

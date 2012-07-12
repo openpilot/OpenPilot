@@ -47,18 +47,26 @@ MixerCurve::MixerCurve(QWidget *parent) :
     // set the default mixer type
     setMixerType(MixerCurve::MIXERCURVE_THROTTLE);
 
+    // setup and turn off advanced mode
+    CommandActivated();
+
     // paint the ui
     UpdateCurveUI();
 
     // wire up our signals
+
     connect(m_mixerUI->CurveType, SIGNAL(currentIndexChanged(int)), this, SLOT(CurveTypeChanged()));
     connect(m_mixerUI->ResetCurve, SIGNAL(clicked()), this, SLOT(ResetCurve()));
     connect(m_mixerUI->GenerateCurve, SIGNAL(clicked()), this, SLOT(GenerateCurve()));
     connect(m_curve, SIGNAL(curveUpdated()), this, SLOT(UpdateSettingsTable()));
+    connect(m_curve, SIGNAL(commandActivated(Node*)),this, SLOT(CommandActivated(Node*)));
     connect(m_settings, SIGNAL(cellChanged(int,int)), this, SLOT(SettingsTableChanged()));
     connect(m_mixerUI->CurveMin, SIGNAL(valueChanged(double)), this, SLOT(CurveMinChanged(double)));
     connect(m_mixerUI->CurveMax, SIGNAL(valueChanged(double)), this, SLOT(CurveMaxChanged(double)));
     connect(m_mixerUI->CurveStep, SIGNAL(valueChanged(double)), this, SLOT(GenerateCurve()));
+
+
+
 }
 
 MixerCurve::~MixerCurve()
@@ -86,7 +94,8 @@ void MixerCurve::setMixerType(MixerCurveType curveType)
         case MixerCurve::MIXERCURVE_PITCH:
         {
             m_mixerUI->SettingsGroup->setTitle("Pitch Curve");
-            m_curve->setRange(-1.0, 1.0);
+            m_curve->setRange(-1.0, 1.0);            
+            m_curve->setPositiveColor("#0000ff", "#0000ff");
             m_mixerUI->CurveMin->setMinimum(-1.0);
             m_mixerUI->CurveMax->setMinimum(-1.0);
             break;
@@ -109,6 +118,8 @@ void MixerCurve::ResetCurve()
 
     initLinearCurve(MixerCurveWidget::NODE_NUMELEM, getCurveMax(), getCurveMin());
 
+    m_curve->activateCommand("Linear");
+
     UpdateSettingsTable();
 }
 
@@ -117,14 +128,11 @@ void MixerCurve::UpdateCurveUI()
     //get the user settings
     QString curveType = m_mixerUI->CurveType->currentText();
 
-    m_mixerUI->CurveMin->setValue(m_mixerUI->CurveMin->minimum());
-    m_mixerUI->CurveMax->setValue(m_mixerUI->CurveMax->maximum());
-
     m_mixerUI->CurveStep->setMinimum(0.0);
     m_mixerUI->CurveStep->setMaximum(100.0);
+    m_mixerUI->CurveStep->setSingleStep(1.00);
 
     //set default visible
-    m_mixerUI->minLabel->setText("Min");
     m_mixerUI->minLabel->setVisible(true);
     m_mixerUI->CurveMin->setVisible(true);
     m_mixerUI->maxLabel->setVisible(false);
@@ -134,7 +142,10 @@ void MixerCurve::UpdateCurveUI()
 
     if ( curveType.compare("Flat")==0)
     {
-        m_mixerUI->minLabel->setText("Value");
+        m_mixerUI->CurveStep->setMinimum(m_mixerUI->CurveMin->minimum());
+        m_mixerUI->CurveStep->setMaximum(m_mixerUI->CurveMax->maximum());
+        m_mixerUI->CurveStep->setSingleStep(0.01);
+        m_mixerUI->CurveStep->setValue(m_mixerUI->CurveMax->value() / 2);
     }
     if ( curveType.compare("Linear")==0)
     {
@@ -155,7 +166,7 @@ void MixerCurve::UpdateCurveUI()
     {
         m_mixerUI->maxLabel->setVisible(true);
         m_mixerUI->CurveMax->setVisible(true);
-        m_mixerUI->stepLabel->setText("Strength");
+        m_mixerUI->stepLabel->setText("Power");
         m_mixerUI->stepLabel->setVisible(true);
         m_mixerUI->CurveStep->setVisible(true);
 
@@ -165,7 +176,7 @@ void MixerCurve::UpdateCurveUI()
     {
         m_mixerUI->maxLabel->setVisible(true);
         m_mixerUI->CurveMax->setVisible(true);
-        m_mixerUI->stepLabel->setText("Strength");
+        m_mixerUI->stepLabel->setText("Power");
         m_mixerUI->stepLabel->setVisible(true);
         m_mixerUI->CurveStep->setVisible(true);        
         m_mixerUI->CurveStep->setMinimum(1.0);
@@ -184,6 +195,8 @@ void MixerCurve::GenerateCurve()
    double value2 = getCurveMax();
    double value3 = getCurveStep();
 
+   m_curve->setCommandText("StepValue", QString("%0").arg(value3));
+
    QString CurveType = m_mixerUI->CurveType->currentText();
 
    QList<double> points;
@@ -194,7 +207,7 @@ void MixerCurve::GenerateCurve()
 
        if ( CurveType.compare("Flat")==0)
        {
-           points.append(value1);
+           points.append(value3);
        }
        if ( CurveType.compare("Linear")==0)
        {
@@ -321,6 +334,57 @@ void MixerCurve::SettingsTableChanged()
     m_mixerUI->CurveMax->setValue(points.last());
 
     m_curve->setCurve(&points);
+}
+
+void MixerCurve::CommandActivated(Node* node)
+{
+    //m_mixerUI->GenerateCurve->hide();
+
+    m_mixerUI->SettingsGroup->hide();
+    m_mixerUI->ValuesGroup->hide();
+
+    QString name = (node) ? node->getName() : "Reset";
+
+    if (name == "Reset") {
+        ResetCurve();
+    }
+    else if (name == "Linear") {
+        m_mixerUI->CurveType->setCurrentIndex(m_mixerUI->CurveType->findText("Linear"));
+    }
+    else if (name == "Log") {
+        m_mixerUI->CurveType->setCurrentIndex(m_mixerUI->CurveType->findText("Log"));
+    }
+    else if (name == "Exp") {
+        m_mixerUI->CurveType->setCurrentIndex(m_mixerUI->CurveType->findText("Exp"));
+    }
+    else if (name == "Flat") {
+        m_mixerUI->CurveType->setCurrentIndex(m_mixerUI->CurveType->findText("Flat"));
+    }
+    else if (name == "Step") {
+        m_mixerUI->CurveType->setCurrentIndex(m_mixerUI->CurveType->findText("Step"));
+    }
+    else if (name ==  "MinPlus") {
+        m_mixerUI->CurveMin->stepUp();
+    }
+    else if (name ==  "MinMinus") {
+        m_mixerUI->CurveMin->stepDown();
+    }
+    else if (name == "MaxPlus") {
+        m_mixerUI->CurveMax->stepUp();
+    }
+    else if (name == "MaxMinus"){
+        m_mixerUI->CurveMax->stepDown();
+    }
+    else if (name ==  "StepPlus") {
+        m_mixerUI->CurveStep->stepUp();
+        m_curve->setCommandText("StepValue", QString("%0").arg(getCurveStep()));
+    }
+    else if (name == "StepMinus") {
+        m_mixerUI->CurveStep->stepDown();
+        m_curve->setCommandText("StepValue", QString("%0").arg(getCurveStep()));
+    }
+
+    GenerateCurve();
 }
 
 void MixerCurve::CurveTypeChanged()

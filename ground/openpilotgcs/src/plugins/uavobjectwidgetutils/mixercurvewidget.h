@@ -28,6 +28,7 @@
 #ifndef MIXERCURVEWIDGET_H_
 #define MIXERCURVEWIDGET_H_
 
+#include <QObject>
 #include <QGraphicsView>
 #include <QtSvg/QSvgRenderer>
 #include <QtSvg/QGraphicsSvgItem>
@@ -57,12 +58,18 @@ public:
    double getMax();
    double setRange(double min, double max);
 
+   void cmdActivated(Node* node);
+   void activateCommand(const QString& name);
+   Node* getCmdNode(const QString& name);
+   void setCommandText(const QString& name, const QString& text);
+
    static const int NODE_NUMELEM = 5;
 
 signals:
    void curveUpdated();
    void curveMinChanged(double value);
    void curveMaxChanged(double value);
+   void commandActivated(Node* node);
 
 private slots:
 
@@ -70,6 +77,7 @@ private:
    QGraphicsSvgItem *plot;
 
    QList<Node*> nodePool;
+   QList<Node*> cmdNodePool;
    QList<Edge*> edgePool;
    QList<Node*> nodeList;
 
@@ -77,9 +85,19 @@ private:
    double curveMax;
    bool   curveUpdating;
 
+   QString posColor0;
+   QString posColor1;
+   QString negColor0;
+   QString negColor1;
+
    void  initNodes(int numPoints);
    Node* getNode(int index);
+   Node* getCommandNode(int index);
    Edge* getEdge(int index, Node* sourceNode, Node* destNode);
+   void setPositiveColor(QString color0 = "#00ff00", QString color1 = "#00ff00");
+   void setNegativeColor(QString color0 = "#ff0000", QString color1 = "#ff0000");
+
+   void  resizeCommands();
 
 protected:
     void showEvent(QShowEvent *event);

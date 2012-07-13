@@ -57,8 +57,8 @@ struct UBX_NAV_POSLLH {
 	uint32_t	iTOW;   // GPS Millisecond Time of Week (ms)
 	int32_t		lon;    // Longitude (deg*1e-7)
 	int32_t		lat;    // Latitude (deg*1e-7)
-	int32_t		height; // Height above Ellipoid (mm)
-	int32_t		hMSL;   // Height abobe mean sea level (mm)
+	int32_t		height; // Height above Ellipsoid (mm)
+	int32_t		hMSL;   // Height above mean sea level (mm)
 	uint32_t	hAcc;   // Horizontal Accuracy Estimate (mm)
 	uint32_t	vAcc;   // Vertical Accuracy Estimate (mm)
 };
@@ -103,7 +103,7 @@ struct UBX_NAV_DOP {
 
 struct UBX_NAV_SOL {
 	uint32_t	iTOW;       // GPS Millisecond Time of Week (ms)
-	int32_t		fTOW;       // fracional nanoseconds (ns)
+	int32_t		fTOW;       // fractional nanoseconds (ns)
 	int16_t		week;       // GPS week
 	uint8_t		gpsFix;     // GPS fix type
 	uint8_t		flags;      // Fix status flags

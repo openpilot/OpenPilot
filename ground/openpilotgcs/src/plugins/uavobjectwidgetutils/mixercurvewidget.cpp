@@ -92,35 +92,56 @@ MixerCurveWidget::MixerCurveWidget(QWidget *parent) : QGraphicsView(parent)
     node = getCommandNode(1);
     node->setName("Linear");
     node->setToolTip("Generate a Linear Curve");
-    node->commandText("/");
+    QImage img = QImage(":/core/images/curve_linear.png");
+    if (!img.isNull())
+        node->setImage(img);
+    else
+        node->commandText("/");
+
     scene->addItem(node);
 
     // log
     node = getCommandNode(2);
     node->setName("Log");
     node->setToolTip("Generate a Logarithmic Curve");
-    node->commandText("(");
+    img = QImage(":/core/images/curve_log.png");
+    if (!img.isNull())
+        node->setImage(img);
+    else
+        node->commandText("(");
     scene->addItem(node);
 
     // exp
     node = getCommandNode(3);
     node->setName("Exp");
     node->setToolTip("Generate an Exponential Curve");
-    node->commandText(")");
+    img = QImage(":/core/images/curve_exp.png");
+    if (!img.isNull())
+        node->setImage(img);
+    else
+        node->commandText(")");
     scene->addItem(node);
 
     // flat
     node = getCommandNode(4);
     node->setName("Flat");
     node->setToolTip("Generate a Flat Curve");
-    node->commandText("--");
+    img = QImage(":/core/images/curve_flat.png");
+    if (!img.isNull())
+        node->setImage(img);
+    else
+        node->commandText("--");
     scene->addItem(node);
 
     // step
     node = getCommandNode(5);
     node->setName("Step");
     node->setToolTip("Generate a Stepped Curve");
-    node->commandText("z");
+    img = QImage(":/core/images/curve_step.png");
+    if (!img.isNull())
+        node->setImage(img);
+    else
+        node->commandText("z");
     scene->addItem(node);
 
 
@@ -128,55 +149,83 @@ MixerCurveWidget::MixerCurveWidget(QWidget *parent) : QGraphicsView(parent)
     node = getCommandNode(6);
     node->setName("MinPlus");
     node->setToolTip("Increase Curve Minimum");
+    img = QImage(":/core/images/curve_plus.png");
+    if (!img.isNull())
+        node->setImage(img);
+    else
+        node->commandText("+");
     node->setToggle(false);
     node->setPositiveColor("#00aa00", "#00aa00");   //green
     node->setNegativeColor("#00aa00", "#00aa00");
-    node->commandText("+");
     scene->addItem(node);
 
     node = getCommandNode(7);
     node->setName("MinMinus");
     node->setToolTip("Decrease Curve Minimum");
+    img = QImage(":/core/images/curve_minus.png");
+    if (!img.isNull())
+        node->setImage(img);
+    else
+        node->commandText("-");
+
     node->setToggle(false);
     node->setPositiveColor("#aa0000", "#aa0000");   //red
     node->setNegativeColor("#aa0000", "#aa0000");
-    node->commandText("-");
     scene->addItem(node);
 
     node = getCommandNode(8);
     node->setName("MaxPlus");
     node->setToolTip("Increase Curve Maximum");
+    img = QImage(":/core/images/curve_plus.png");
+    if (!img.isNull())
+        node->setImage(img);
+    else
+        node->commandText("+");
+
     node->setToggle(false);
     node->setPositiveColor("#00aa00", "#00aa00");   //green
     node->setNegativeColor("#00aa00", "#00aa00");
-    node->commandText("+");
     scene->addItem(node);
 
     node = getCommandNode(9);
     node->setName("MaxMinus");
     node->setToolTip("Decrease Curve Maximum");
+    img = QImage(":/core/images/curve_plus.png");
+    if (!img.isNull())
+        node->setImage(img);
+    else
+        node->commandText("-");
+
     node->setToggle(false);
     node->setPositiveColor("#aa0000", "#aa0000");   //red
     node->setNegativeColor("#aa0000", "#aa0000");
-    node->commandText("-");
     scene->addItem(node);
 
     node = getCommandNode(10);
     node->setName("StepPlus");
     node->setToolTip("Increase Step/Power Value");
+    img = QImage(":/core/images/curve_plus.png");
+    if (!img.isNull())
+        node->setImage(img);
+    else
+        node->commandText("+");
     node->setToggle(false);
     node->setPositiveColor("#00aa00", "#00aa00");   //green
     node->setNegativeColor("#00aa00", "#00aa00");
-    node->commandText("+");
     scene->addItem(node);
 
     node = getCommandNode(11);
     node->setName("StepMinus");
     node->setToolTip("Decrease Step/Power Value");
+    img = QImage(":/core/images/curve_minus.png");
+    if (!img.isNull())
+        node->setImage(img);
+    else
+        node->commandText("-");
+
     node->setToggle(false);
     node->setPositiveColor("#aa0000", "#aa0000");   //red
     node->setNegativeColor("#aa0000", "#aa0000");
-    node->commandText("-");
     scene->addItem(node);
 
     node = getCommandNode(12);

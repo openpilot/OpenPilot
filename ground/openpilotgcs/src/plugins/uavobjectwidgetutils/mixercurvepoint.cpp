@@ -46,7 +46,7 @@ Node::Node(MixerCurveWidget *graphWidget)
     cmdActive = false;
     vertical = false;
     cmdNode = false;
-    cmdToggle = true;
+    cmdToggle = true;    
 
     posColor0 = "#1c870b";  //greenish?
     posColor1 = "#116703";  //greenish?
@@ -109,6 +109,8 @@ void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
     painter->setBrush(gradient);
     painter->setPen(QPen(Qt::black, 0));
     painter->drawEllipse(boundingRect());
+    if (!image.isNull())
+        painter->drawImage(boundingRect().adjusted(1,1,-1,-1), image);
 
     painter->setPen(QPen(Qt::white, 0));
     if (cmdNode) {

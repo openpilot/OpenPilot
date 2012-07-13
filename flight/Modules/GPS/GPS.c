@@ -33,8 +33,6 @@
 #include "openpilot.h"
 #include "GPS.h"
 
-//#include <stdbool.h>
-
 #include "gpsposition.h"
 #include "homelocation.h"
 #include "gpstime.h"

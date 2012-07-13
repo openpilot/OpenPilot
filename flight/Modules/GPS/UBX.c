@@ -48,7 +48,7 @@ int parse_ubx_stream (uint8_t c, char *gps_rx_buffer, GPSPositionData *GpsData)
 		UBX_LEN2,UBX_PAYLOAD,UBX_CHK1,UBX_CHK2,FINISHED};
 	static enum proto_states proto_state = START;
 	static uint8_t rx_count = 0;
-	UBXPacket *ubx = (UBXPacket *)gps_rx_buffer;
+	struct UBXPacket *ubx = (struct UBXPacket *)gps_rx_buffer;
 
 	switch (proto_state) {
 		case START: // detect protocol
@@ -153,7 +153,7 @@ bool check_msgtracker (uint32_t tow, uint8_t msg_flag)
 	return true;
 }
 
-bool checksum_ubx_message (UBXPacket *ubx)
+bool checksum_ubx_message (struct UBXPacket *ubx)
 {
 	int i;
 	uint8_t ck_a, ck_b;
@@ -183,7 +183,7 @@ bool checksum_ubx_message (UBXPacket *ubx)
 
 }
 
-void parse_ubx_nav_posllh (UBX_NAV_POSLLH *posllh, GPSPositionData *GpsPosition)
+void parse_ubx_nav_posllh (struct UBX_NAV_POSLLH *posllh, GPSPositionData *GpsPosition)
 {
 	if (check_msgtracker(posllh->iTOW, POSLLH_RECEIVED)) {
 		if (GpsPosition->Status != GPSPOSITION_STATUS_NOFIX) {
@@ -195,7 +195,7 @@ void parse_ubx_nav_posllh (UBX_NAV_POSLLH *posllh, GPSPositionData *GpsPosition)
 	}
 }
 
-void parse_ubx_nav_status (UBX_NAV_STATUS *status, GPSPositionData *GpsPosition)
+void parse_ubx_nav_status (struct UBX_NAV_STATUS *status, GPSPositionData *GpsPosition)
 {
 #if 0 // we already get this info from NAV_SOL
 	if (check_msgtracker(status->iTOW, STATUS_RECEIVED)) {
@@ -212,7 +212,7 @@ void parse_ubx_nav_status (UBX_NAV_STATUS *status, GPSPositionData *GpsPosition)
 #endif
 }
 
-void parse_ubx_nav_sol (UBX_NAV_SOL *sol, GPSPositionData *GpsPosition)
+void parse_ubx_nav_sol (struct UBX_NAV_SOL *sol, GPSPositionData *GpsPosition)
 {
 	if (check_msgtracker(sol->iTOW, SOL_RECEIVED)) {
 		GpsPosition->Satellites = sol->numSV;
@@ -233,7 +233,7 @@ void parse_ubx_nav_sol (UBX_NAV_SOL *sol, GPSPositionData *GpsPosition)
 	}
 }
 
-void parse_ubx_nav_dop (UBX_NAV_DOP *dop, GPSPositionData *GpsPosition)
+void parse_ubx_nav_dop (struct UBX_NAV_DOP *dop, GPSPositionData *GpsPosition)
 {
 	if (check_msgtracker(dop->iTOW, DOP_RECEIVED)) {
 		GpsPosition->HDOP = (float)dop->hDOP * 0.01f;
@@ -242,7 +242,7 @@ void parse_ubx_nav_dop (UBX_NAV_DOP *dop, GPSPositionData *GpsPosition)
 	}
 }
 
-void parse_ubx_nav_velned (UBX_NAV_VELNED *velned, GPSPositionData *GpsPosition)
+void parse_ubx_nav_velned (struct UBX_NAV_VELNED *velned, GPSPositionData *GpsPosition)
 {
 	GPSVelocityData GpsVelocity;
 
@@ -309,7 +309,7 @@ void parse_ubx_nav_svinfo (UBX_NAV_SVINFO *svinfo)
 // UBX message parser
 // returns UAVObjectID if a UAVObject structure is ready for further processing
 
-uint32_t parse_ubx_message (UBXPacket *ubx, GPSPositionData *GpsPosition)
+uint32_t parse_ubx_message (struct UBXPacket *ubx, GPSPositionData *GpsPosition)
 {
 	uint32_t id = 0;
 

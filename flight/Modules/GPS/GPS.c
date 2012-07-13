@@ -172,7 +172,7 @@ int32_t GPSInitialize(void)
 				gps_rx_buffer = pvPortMalloc(NMEA_MAX_PACKET_LENGTH);
 				break;
 			case GPSSETTINGS_DATAPROTOCOL_UBX:
-				gps_rx_buffer = pvPortMalloc(sizeof(UBXPacket));
+				gps_rx_buffer = pvPortMalloc(sizeof(struct UBXPacket));
 				break;
 			default:
 				gps_rx_buffer = NULL;

@@ -53,7 +53,7 @@
 // private structures
 
 // Geodetic Position Solution
-typedef struct {
+struct UBX_NAV_POSLLH {
 	uint32_t	iTOW;   // GPS Millisecond Time of Week (ms)
 	int32_t		lon;    // Longitude (deg*1e-7)
 	int32_t		lat;    // Latitude (deg*1e-7)
@@ -61,7 +61,7 @@ typedef struct {
 	int32_t		hMSL;   // Height abobe mean sea level (mm)
 	uint32_t	hAcc;   // Horizontal Accuracy Estimate (mm)
 	uint32_t	vAcc;   // Vertical Accuracy Estimate (mm)
-} UBX_NAV_POSLLH;
+};
 
 // Receiver Navigation Status
 
@@ -77,7 +77,7 @@ typedef struct {
 #define STATUS_FLAGS_WKNSET		(1 << 2)
 #define STATUS_FLAGS_TOWSET		(1 << 3)
 
-typedef struct {
+struct UBX_NAV_STATUS {
 	uint32_t	iTOW;    // GPS Millisecond Time of Week (ms)
 	uint8_t		gpsFix;  // GPS fix type
 	uint8_t		flags;   // Navigation Status Flags
@@ -85,10 +85,10 @@ typedef struct {
 	uint8_t		flags2;  // Additional navigation output information
 	uint32_t	ttff;    // Time to first fix (ms)
 	uint32_t	msss;    // Milliseconds since startup/reset (ms)
-} UBX_NAV_STATUS;
+};
 
 // Dilution of precision
-typedef struct {
+struct UBX_NAV_DOP {
 	uint32_t	iTOW;  // GPS Millisecond Time of Week (ms)
 	uint16_t	gDOP;  // Geometric DOP
 	uint16_t	pDOP;  // Position DOP
@@ -97,11 +97,11 @@ typedef struct {
 	uint16_t	hDOP;  // Horizontal DOP
 	uint16_t	nDOP;  // Northing DOP
 	uint16_t	eDOP;  // Easting DOP
-} UBX_NAV_DOP;
+};
 
 // Navigation solution
 
-typedef struct {
+struct UBX_NAV_SOL {
 	uint32_t	iTOW;       // GPS Millisecond Time of Week (ms)
 	int32_t		fTOW;       // fracional nanoseconds (ns)
 	int16_t		week;       // GPS week
@@ -119,11 +119,11 @@ typedef struct {
 	uint8_t		reserved1;  // Reserved
 	uint8_t		numSV;      // Number of SVs used in Nav Solution
 	uint32_t	reserved2;  // Reserved
-} UBX_NAV_SOL;
+};
 
 // North/East/Down velocity
 
-typedef struct  {
+struct UBX_NAV_VELNED {
 	uint32_t	iTOW;     // ms GPS Millisecond Time of Week
 	int32_t		velN;     // cm/s NED north velocity
 	int32_t		velE;     // cm/s NED east velocity
@@ -133,7 +133,7 @@ typedef struct  {
 	int32_t		heading;  // 1e-5 *deg Heading of motion 2-D
 	uint32_t	sAcc;     // cm/s Speed Accuracy Estimate
 	uint32_t	cAcc;     // 1e-5 *deg Course / Heading Accuracy Estimate
-} UBX_NAV_VELNED;
+};
 
 // UTC Time Solution
 
@@ -141,7 +141,7 @@ typedef struct  {
 #define TIMEUTC_VALIDWKN	(1 << 1)
 #define TIMEUTC_VALIDUTC	(1 << 2)
 
-typedef struct {
+struct UBX_NAV_TIMEUTC {
 	uint32_t	iTOW;   // GPS Millisecond Time of Week (ms)
 	uint32_t	tAcc;   // Time Accuracy Estimate (ns)
 	int32_t		nano;   // Nanoseconds of second
@@ -152,7 +152,7 @@ typedef struct {
 	uint8_t		min;
 	uint8_t		sec;
 	uint8_t		valid;  // Validity Flags
-} UBX_NAV_TIMEUTC;
+};
 
 // Space Vehicle (SV) Information
 
@@ -167,7 +167,7 @@ typedef struct {
 #define ORBITAOP	(1 << 6) // Orbit information is AssistNow Autonomous
 #define	SMOOTHED	(1 << 7) // Carrier smoothed pseudoranges used
 
-typedef struct {
+struct UBX_NAV_SVINFO_SV {
 	uint8_t		chn;      // Channel number
 	uint8_t		svid;     // Satellite ID
 	uint8_t		flags;    // Misc SV information
@@ -176,47 +176,47 @@ typedef struct {
 	int8_t		elev;     // Elevation (integer degrees)
 	int16_t		azim;     // Azimuth	(integer degrees)
 	int32_t		prRes;    // Pseudo range residual (cm)
-} UBX_NAV_SVINFO_SV;
+};
 
 // SV information message
 #define MAX_SVS	16
 
-typedef struct {
+struct UBX_NAV_SVINFO {
 	uint32_t	iTOW;         // GPS Millisecond Time of Week (ms)
 	uint8_t		numCh;        // Number of channels
 	uint8_t		globalFlags;  //
 	uint16_t	reserved2;    // Reserved
-	UBX_NAV_SVINFO_SV	sv[MAX_SVS]; // Repeated 'numCh' times
-} UBX_NAV_SVINFO;
+	struct UBX_NAV_SVINFO_SV	sv[MAX_SVS]; // Repeated 'numCh' times
+};
 
 typedef union {
 	uint8_t		payload[0];
-	UBX_NAV_POSLLH	nav_posllh;
-	UBX_NAV_STATUS	nav_status;
-	UBX_NAV_DOP		nav_dop;
-	UBX_NAV_SOL		nav_sol;
-	UBX_NAV_VELNED	nav_velned;
+	struct UBX_NAV_POSLLH	nav_posllh;
+	struct UBX_NAV_STATUS	nav_status;
+	struct UBX_NAV_DOP		nav_dop;
+	struct UBX_NAV_SOL		nav_sol;
+	struct UBX_NAV_VELNED	nav_velned;
 #if !defined(PIOS_GPS_MINIMAL)
-	UBX_NAV_TIMEUTC	nav_timeutc;
-	UBX_NAV_SVINFO	nav_svinfo;
+	struct UBX_NAV_TIMEUTC	nav_timeutc;
+	struct UBX_NAV_SVINFO	nav_svinfo;
 #endif
 } UBXPayload;
 
-typedef struct {
+struct UBXHeader {
 	uint8_t 	class;
 	uint8_t 	id;
 	uint16_t	len;
 	uint8_t 	ck_a;
 	uint8_t 	ck_b;
-} UBXHeader;
+};
 
-typedef struct {
-	UBXHeader	header;
+struct UBXPacket {
+	struct UBXHeader	header;
 	UBXPayload	payload;
-} UBXPacket;
+};
 
-bool checksum_ubx_message(UBXPacket *);
-uint32_t parse_ubx_message(UBXPacket *, GPSPositionData *);
+bool checksum_ubx_message(struct UBXPacket *);
+uint32_t parse_ubx_message(struct UBXPacket *, GPSPositionData *);
 int  parse_ubx_stream(uint8_t, char *, GPSPositionData *);
 
 #endif /* UBX_H */

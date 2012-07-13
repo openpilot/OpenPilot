@@ -44,6 +44,7 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     // To bring old style sheet back without adding it manually do this:
     // Alternatively apply a global stylesheet to the QGroupBox
     // setStyleSheet("QGroupBox {background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0 rgba(243, 243, 243, 255), stop:1 rgba(250, 250, 250, 255)); border: 1px outset #999; border-radius: 3; }");
+    setStyleSheet("QPushButton {\nborder: 1px outset #999;\nborder-radius: 5;\nbackground-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0.28 rgba(236, 236, 236, 255), stop:1 rgba(252, 252, 252, 255));\n}\n\nQPushButton:pressed {\n\n    border-style: inset;\n	background-color: qlineargradient(spread:pad, x1:0.502, y1:0.664864, x2:0.502, y2:0.034, stop:0.358209 rgba(250, 250, 250, 255), stop:0.626866 rgba(235, 235, 235, 255));\n\n}\n\n\nQPushButton:hover  {\n	border: 1px outset #999;	\nborder-color: rgb(83, 83, 83);\nborder-radius: 4;\n}");
 
     autoLoadWidgets();
     realtimeUpdates=new QTimer(this);

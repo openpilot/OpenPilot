@@ -24239,25 +24239,7 @@ border-radius: 5;</string>
 Useful if you have accidentally changed some settings.</string>
           </property>
           <property name="styleSheet">
-           <string notr="true">QPushButton {
-border: 1px outset #999;
-border-radius: 5;
-background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0.28 rgba(236, 236, 236, 255), stop:1 rgba(252, 252, 252, 255));
-}
-
-QPushButton:pressed {
-
-    border-style: inset;
-	background-color: qlineargradient(spread:pad, x1:0.502, y1:0.664864, x2:0.502, y2:0.034, stop:0.358209 rgba(250, 250, 250, 255), stop:0.626866 rgba(235, 235, 235, 255));
-
-}
-
-
-QPushButton:hover  {
-	border: 1px outset #999;	
-border-color: rgb(83, 83, 83);
-border-radius: 4;
-	}</string>
+           <string notr="true"/>
           </property>
           <property name="text">
            <string>Reload Board Data</string>
@@ -24288,25 +24270,7 @@ border-radius: 4;
            <string>Send settings to the board but do not save to the non-volatile memory</string>
           </property>
           <property name="styleSheet">
-           <string notr="true">QPushButton {
-border: 1px outset #999;
-border-radius: 5;
-background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0.28 rgba(236, 236, 236, 255), stop:1 rgba(252, 252, 252, 255));
-}
-
-QPushButton:pressed {
-
-    border-style: inset;
-	background-color: qlineargradient(spread:pad, x1:0.502, y1:0.664864, x2:0.502, y2:0.034, stop:0.358209 rgba(250, 250, 250, 255), stop:0.626866 rgba(235, 235, 235, 255));
-
-}
-
-
-QPushButton:hover  {
-	border: 1px outset #999;	
-border-color: rgb(83, 83, 83);
-border-radius: 4;
-	}</string>
+           <string notr="true"/>
           </property>
           <property name="text">
            <string>Apply</string>
@@ -24336,25 +24300,7 @@ border-radius: 4;
            <string>Send settings to the board and save to the non-volatile memory</string>
           </property>
           <property name="styleSheet">
-           <string notr="true">QPushButton {
-border: 1px outset #999;
-border-radius: 5;
-background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0.28 rgba(236, 236, 236, 255), stop:1 rgba(252, 252, 252, 255));
-}
-
-QPushButton:pressed {
-
-    border-style: inset;
-	background-color: qlineargradient(spread:pad, x1:0.502, y1:0.664864, x2:0.502, y2:0.034, stop:0.358209 rgba(250, 250, 250, 255), stop:0.626866 rgba(235, 235, 235, 255));
-
-}
-
-
-QPushButton:hover  {
-	border: 1px outset #999;	
-border-color: rgb(83, 83, 83);
-border-radius: 4;
-	}</string>
+           <string notr="true"/>
           </property>
           <property name="text">
            <string>Save</string>

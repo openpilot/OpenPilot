@@ -10,13 +10,15 @@ HEADERS += uavobjectwidgetutils_global.h \
     mixercurvewidget.h \
     mixercurvepoint.h \
     mixercurveline.h \
- smartsavebutton.h
+ smartsavebutton.h \
+    popupwidget.h
 SOURCES += uavobjectwidgetutilsplugin.cpp \
     configtaskwidget.cpp \
     mixercurvewidget.cpp \
     mixercurvepoint.cpp \
     mixercurveline.cpp \
-    smartsavebutton.cpp
+    smartsavebutton.cpp \
+    popupwidget.cpp
 
 
 OTHER_FILES += UAVObjectWidgetUtils.pluginspec

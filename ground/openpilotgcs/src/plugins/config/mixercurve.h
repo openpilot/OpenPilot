@@ -36,6 +36,7 @@
 #include "mixercurvewidget.h"
 #include "dblspindelegate.h"
 #include "uavobjectwidgetutils_global.h"
+#include "uavobjectwidgetutils/popupwidget.h"
 
 
 namespace Ui {

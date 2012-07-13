@@ -196,6 +196,15 @@ MixerCurveWidget::MixerCurveWidget(QWidget *parent) : QGraphicsView(parent)
     node->setNegativeColor("#000000", "#000000");
     scene->addItem(node);
 
+    // popup
+    node = getCommandNode(14);
+    node->setName("Popup");
+    node->setToolTip("Advanced Mode...");
+    node->setToggle(false);
+    node->setPositiveColor("#ff0000", "#ff0000");  //red
+    node->setNegativeColor("#ff0000", "#ff0000");
+    scene->addItem(node);
+
     resizeCommands();
 
     initNodes(MixerCurveWidget::NODE_NUMELEM);
@@ -229,10 +238,11 @@ Node* MixerCurveWidget::getCommandNode(int index)
         node->setCommandIndex(index);
         node->setActive(false);        
         node->setPositiveColor("#aaaa00", "#aaaa00");
-        node->setNegativeColor("#aa00aa", "#aa00aa");
+        node->setNegativeColor("#1c870b", "#116703");
         cmdNodePool.append(node);
     }
     return node;
+
 }
 
 Node* MixerCurveWidget::getNode(int index)
@@ -429,13 +439,17 @@ void MixerCurveWidget::resizeCommands()
     QRectF rect = plot->boundingRect();
 
     Node* node;
+    //popup
+    node = getCommandNode(14);
+    node->setPos((rect.left() + rect.width() / 2) - 20, rect.height() + 10);
+
     //reset
     node = getCommandNode(0);
-    node->setPos((rect.left() + rect.width() / 2) - 10, rect.height() + 10);
+    node->setPos((rect.left() + rect.width() / 2) + 20, rect.height() + 10);
 
     //commands on/off
     node = getCommandNode(13);
-    node->setPos((rect.left() + rect.width() / 2) + 10, rect.height() + 10);
+    node->setPos((rect.left() + rect.width() / 2) + 40, rect.height() + 10);
 
     for (int i = 1; i<6; i++) {
         node = getCommandNode(i);
@@ -539,7 +553,7 @@ void MixerCurveWidget::setCommandText(const QString& name, const QString& text)
 }
 void MixerCurveWidget::activateCommand(const QString& name)
 {
-    for (int i=1; i<cmdNodePool.count()-1; i++) {
+    for (int i=1; i<cmdNodePool.count()-2; i++) {
         Node* node = cmdNodePool.at(i);
         node->setCommandActive(node->getName() == name);
         node->update();
@@ -548,7 +562,7 @@ void MixerCurveWidget::activateCommand(const QString& name)
 
 void MixerCurveWidget::showCommands(bool show)
 {
-    for (int i=1; i<cmdNodePool.count()-1; i++) {
+    for (int i=1; i<cmdNodePool.count()-2; i++) {
         Node* node = cmdNodePool.at(i);
         if (show)
             node->show();
@@ -566,7 +580,7 @@ void MixerCurveWidget::cmdActivated(Node* node)
             showCommands(node->getCommandActive());
         }
         else {
-            for (int i=1; i<cmdNodePool.count()-1; i++) {
+            for (int i=1; i<cmdNodePool.count()-2; i++) {
                 Node* n = cmdNodePool.at(i);
                 n->setCommandActive(false);
                 n->update();

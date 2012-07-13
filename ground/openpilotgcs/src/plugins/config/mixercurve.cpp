@@ -41,6 +41,11 @@ MixerCurve::MixerCurve(QWidget *parent) :
     m_curve = m_mixerUI->CurveWidget;
     m_settings = m_mixerUI->CurveSettings;
 
+
+    m_mixerUI->SettingsGroup->hide();
+    m_mixerUI->ValuesGroup->hide();
+    m_curve->showCommands(false);
+
     // create our spin delegate
     m_spinDelegate = new DoubleSpinDelegate();
 
@@ -338,15 +343,26 @@ void MixerCurve::SettingsTableChanged()
 
 void MixerCurve::CommandActivated(Node* node)
 {
-    //m_mixerUI->GenerateCurve->hide();
-
-    m_mixerUI->SettingsGroup->hide();
-    m_mixerUI->ValuesGroup->hide();
-
     QString name = (node) ? node->getName() : "Reset";
 
-    if (name == "Reset") {
+    if (name == "Reset") {        
         ResetCurve();
+        m_curve->showCommands(false);
+    }
+    else if (name == "Commands") {
+
+    }
+    else if (name == "Popup") {
+        m_mixerUI->SettingsGroup->show();
+        m_mixerUI->ValuesGroup->show();
+
+        PopupWidget* popup = new PopupWidget();
+        popup->setWidget(this);
+        popup->exec();
+
+        m_mixerUI->SettingsGroup->hide();
+        m_mixerUI->ValuesGroup->hide();
+        m_curve->showCommands(false);
     }
     else if (name == "Linear") {
         m_mixerUI->CurveType->setCurrentIndex(m_mixerUI->CurveType->findText("Linear"));

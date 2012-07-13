@@ -109,7 +109,10 @@ class UAVObject:
 
 	def addField(self, field):
 		append(self.fields, field)
-
+	'''
+	#
+	# Support for getName was removed from embedded UAVO database to save RAM + Flash
+	#
 	def getName(self):
 		"""__NATIVE__
 		UAVObjHandle objHandle;
@@ -143,6 +146,7 @@ class UAVObject:
 		return PM_RET_OK;
 		"""
 		pass
+	'''
 
 	def read(self):
 		"""__NATIVE__

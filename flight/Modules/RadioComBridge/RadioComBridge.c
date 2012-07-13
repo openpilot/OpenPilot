@@ -255,9 +255,9 @@ static int32_t RadioComBridgeInitialize(void)
 	PipXSettingsPairIDGet(&(data->pairStats[0].pairID));
 
 	// Configure our UAVObjects for updates.
-	UAVObjConnectQueue(UAVObjGetByName("PipXStatus"), data->objEventQueue, EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ);
-	UAVObjConnectQueue(UAVObjGetByName("GCSReceiver"), data->objEventQueue, EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ);
-	UAVObjConnectQueue(UAVObjGetByName("ObjectPersistence"), data->objEventQueue, EV_UPDATED | EV_UPDATED_MANUAL);
+	UAVObjConnectQueue(UAVObjGetByID(PIPXSTATUS_OBJID), data->objEventQueue, EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ);
+	UAVObjConnectQueue(UAVObjGetByID(GCSRECEIVER_OBJID), data->objEventQueue, EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ);
+	UAVObjConnectQueue(UAVObjGetByID(OBJECTPERSISTENCE_OBJID), data->objEventQueue, EV_UPDATED | EV_UPDATED_MANUAL);
 
 	return 0;
 }

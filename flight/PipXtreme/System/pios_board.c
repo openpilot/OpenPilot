@@ -130,20 +130,17 @@ void PIOS_Board_Init(void) {
 
 
 	/* Flags to determine if various USB interfaces are advertised */
-	bool usb_hid_present = false;
 	bool usb_cdc_present = false;
 
 #if defined(PIOS_INCLUDE_USB_CDC)
 	if (PIOS_USB_DESC_HID_CDC_Init()) {
 		PIOS_Assert(0);
 	}
-	usb_hid_present = true;
 	usb_cdc_present = true;
 #else
 	if (PIOS_USB_DESC_HID_ONLY_Init()) {
 		PIOS_Assert(0);
 	}
-	usb_hid_present = true;
 #endif
 
 	uint32_t pios_usb_id;

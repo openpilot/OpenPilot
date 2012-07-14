@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>786</width>
+    <width>757</width>
     <height>993</height>
    </rect>
   </property>
@@ -509,7 +509,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>732</width>
+            <width>703</width>
             <height>832</height>
            </rect>
           </property>
@@ -10587,7 +10587,7 @@ Attitude</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>717</width>
+            <width>470</width>
             <height>923</height>
            </rect>
           </property>
@@ -23648,7 +23648,7 @@ border-radius: 5;</string>
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>79</height>
+       <height>75</height>
       </size>
      </property>
      <property name="maximumSize">
@@ -24199,7 +24199,7 @@ border-radius: 5;</string>
           </property>
           <property name="minimumSize">
            <size>
-            <width>300</width>
+            <width>150</width>
             <height>20</height>
            </size>
           </property>
@@ -24315,14 +24315,14 @@ Useful if you have accidentally changed some settings.</string>
         <item row="1" column="0">
          <widget class="QCheckBox" name="realTimeUpdates_6">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
           <property name="minimumSize">
            <size>
-            <width>136</width>
+            <width>300</width>
             <height>20</height>
            </size>
           </property>

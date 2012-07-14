@@ -50,7 +50,7 @@
             <x>0</x>
             <y>0</y>
             <width>654</width>
-            <height>671</height>
+            <height>659</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -582,6 +582,12 @@ margin:1px;</string>
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>75</height>
+      </size>
      </property>
      <property name="maximumSize">
       <size>

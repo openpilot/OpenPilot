@@ -79,6 +79,7 @@ protected:
 
 public slots:
     void ResetCurve();
+    void PopupCurve();
     void GenerateCurve();
     void UpdateSettingsTable();
 

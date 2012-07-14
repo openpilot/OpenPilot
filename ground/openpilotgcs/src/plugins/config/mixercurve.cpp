@@ -43,8 +43,10 @@ MixerCurve::MixerCurve(QWidget *parent) :
 
 
     m_mixerUI->SettingsGroup->hide();
-    m_mixerUI->ValuesGroup->hide();
     m_curve->showCommands(false);
+    m_curve->showCommand("Reset", false);
+    m_curve->showCommand("Popup", false);
+    m_curve->showCommand("Commands", false);
 
     // create our spin delegate
     m_spinDelegate = new DoubleSpinDelegate();
@@ -62,6 +64,7 @@ MixerCurve::MixerCurve(QWidget *parent) :
 
     connect(m_mixerUI->CurveType, SIGNAL(currentIndexChanged(int)), this, SLOT(CurveTypeChanged()));
     connect(m_mixerUI->ResetCurve, SIGNAL(clicked()), this, SLOT(ResetCurve()));
+    connect(m_mixerUI->PopupCurve, SIGNAL(clicked()),this,SLOT(PopupCurve()));
     connect(m_mixerUI->GenerateCurve, SIGNAL(clicked()), this, SLOT(GenerateCurve()));
     connect(m_curve, SIGNAL(curveUpdated()), this, SLOT(UpdateSettingsTable()));
     connect(m_curve, SIGNAL(commandActivated(Node*)),this, SLOT(CommandActivated(Node*)));
@@ -128,6 +131,21 @@ void MixerCurve::ResetCurve()
     UpdateSettingsTable();
 }
 
+void MixerCurve::PopupCurve()
+{
+    if (!m_curve->isCommandActive("Popup")) {
+
+        m_mixerUI->SettingsGroup->show();
+        m_mixerUI->PopupCurve->hide();
+
+        PopupWidget* popup = new PopupWidget();
+        popup->popUp(this);
+
+        m_mixerUI->SettingsGroup->hide();
+        m_mixerUI->PopupCurve->show();
+        m_curve->showCommands(false);
+    }
+}
 void MixerCurve::UpdateCurveUI()
 {
     //get the user settings
@@ -363,18 +381,8 @@ void MixerCurve::CommandActivated(Node* node)
     else if (name == "Commands") {
 
     }
-    else if (name == "Popup" && !m_curve->isCommandActive("Popup")) {
-        m_mixerUI->SettingsGroup->show();
-        m_mixerUI->ValuesGroup->show();
-        m_curve->showCommand("Popup", false);
-
-        PopupWidget* popup = new PopupWidget();
-        popup->popUp(this);
-
-        m_mixerUI->SettingsGroup->hide();
-        m_mixerUI->ValuesGroup->hide();
-        m_curve->showCommands(false);
-        m_curve->showCommand("Popup", true);
+    else if (name == "Popup" ) {
+        PopupCurve();
     }
     else if (name == "Linear") {
         m_mixerUI->CurveType->setCurrentIndex(m_mixerUI->CurveType->findText("Linear"));

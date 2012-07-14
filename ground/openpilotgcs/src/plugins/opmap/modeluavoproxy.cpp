@@ -106,9 +106,9 @@ void modelUavoProxy::modelToObjects()
         index=myModel->index(x,flightDataModel::COMMAND);
         action.Command=myModel->data(index).toInt();
         index=myModel->index(x,flightDataModel::JUMPDESTINATION);
-        action.JumpDestination=myModel->data(index).toInt();
+        action.JumpDestination=myModel->data(index).toInt()-1;
         index=myModel->index(x,flightDataModel::ERRORDESTINATION);
-        action.ErrorDestination=myModel->data(index).toInt();
+        action.ErrorDestination=myModel->data(index).toInt()-1;
 
         int actionNumber=addAction(act,action,lastaction);
         if(actionNumber>lastaction)
@@ -178,10 +178,10 @@ void modelUavoProxy::objectsToModel()
         myModel->setData(index,actionfields.EndCondition);
 
         index=myModel->index(x,flightDataModel::ERRORDESTINATION);
-        myModel->setData(index,actionfields.ErrorDestination);
+        myModel->setData(index,actionfields.ErrorDestination+1);
 
         index=myModel->index(x,flightDataModel::JUMPDESTINATION);
-        myModel->setData(index,actionfields.JumpDestination);
+        myModel->setData(index,actionfields.JumpDestination+1);
 
         index=myModel->index(x,flightDataModel::MODE);
         myModel->setData(index,actionfields.Mode);

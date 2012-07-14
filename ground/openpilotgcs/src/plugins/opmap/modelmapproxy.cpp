@@ -159,8 +159,8 @@ void modelMapProxy::refreshOverlays()
     for(int x=0;x<model->rowCount();++x)
     {
         wp_current=findWayPointNumber(x);
-        wp_jump=model->data(model->index(x,flightDataModel::JUMPDESTINATION)).toInt();
-        wp_error=model->data(model->index(x,flightDataModel::ERRORDESTINATION)).toInt();
+        wp_jump=model->data(model->index(x,flightDataModel::JUMPDESTINATION)).toInt()-1;
+        wp_error=model->data(model->index(x,flightDataModel::ERRORDESTINATION)).toInt()-1;
         wp_next_overlay=overlayTranslate(model->data(model->index(x+1,flightDataModel::MODE)).toInt());
         wp_jump_overlay=overlayTranslate(model->data(model->index(wp_jump,flightDataModel::MODE)).toInt());
         wp_error_overlay=overlayTranslate(model->data(model->index(wp_error,flightDataModel::MODE)).toInt());
@@ -331,6 +331,10 @@ void modelMapProxy::createWayPoint(internals::PointLatLng coord)
     model->setData(index,coord.Lat(),Qt::EditRole);
     index=model->index(model->rowCount()-1,flightDataModel::LNGPOSITION,QModelIndex());
     model->setData(index,coord.Lng(),Qt::EditRole);
+    index=model->index(model->rowCount()-1,flightDataModel::JUMPDESTINATION,QModelIndex());
+    model->setData(index,1,Qt::EditRole);
+    index=model->index(model->rowCount()-1,flightDataModel::ERRORDESTINATION,QModelIndex());
+    model->setData(index,1,Qt::EditRole);
 }
 void modelMapProxy::deleteAll()
 {

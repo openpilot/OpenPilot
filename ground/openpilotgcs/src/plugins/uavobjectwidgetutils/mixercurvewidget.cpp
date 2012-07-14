@@ -230,6 +230,7 @@ MixerCurveWidget::MixerCurveWidget(QWidget *parent) : QGraphicsView(parent)
 
     node = getCommandNode(12);
     node->setName("StepValue");
+    node->setDrawNode(false);
     node->setToolTip("Current Step/Power Value");
     node->setToggle(false);
     node->setPositiveColor("#0000aa", "#0000aa");  //blue
@@ -249,6 +250,7 @@ MixerCurveWidget::MixerCurveWidget(QWidget *parent) : QGraphicsView(parent)
     node = getCommandNode(14);
     node->setName("Popup");
     node->setToolTip("Advanced Mode...");
+    node->commandText("");
     node->setToggle(false);
     node->setPositiveColor("#ff0000", "#ff0000");  //red
     node->setNegativeColor("#ff0000", "#ff0000");
@@ -449,9 +451,6 @@ void MixerCurveWidget::setCurve(const QList<double>* points)
         node->setPos(w*i, h - (val*h));
         node->verticalMove(true);
 
-//        node->setPositiveColor(posColor0, posColor1);
-//        node->setNegativeColor(negColor0, negColor1);
-
         node->update();
     }
     curveUpdating = false;
@@ -498,16 +497,13 @@ void MixerCurveWidget::resizeCommands()
 
     //commands on/off
     node = getCommandNode(13);
-    node->setPos((rect.left() + rect.width() / 2) + 40, rect.height() + 10);
+    node->setPos(rect.right() - 15, rect.bottomRight().x() - 14);
 
     for (int i = 1; i<6; i++) {
         node = getCommandNode(i);
 
-        //centered under widget
-        //node->setPos((rect.left() + rect.width() / 2) - 60 + (i * 20), rect.height() + 10);
-
         //bottom right of widget
-        node->setPos(rect.right() - 120 + (i * 20), rect.bottomRight().x() - 14);
+        node->setPos(rect.right() - 130 + (i * 18), rect.bottomRight().x() - 14);
     }
 
     //curveminplus
@@ -528,15 +524,15 @@ void MixerCurveWidget::resizeCommands()
 
     //stepplus
     node = getCommandNode(10);
-    node->setPos(rect.bottomRight().x() - 38, rect.bottomRight().y() + 5);
+    node->setPos(rect.bottomRight().x() - 40, rect.bottomRight().y() + 5);
 
     //stepminus
     node = getCommandNode(11);
-    node->setPos(rect.bottomRight().x() - 38, rect.bottomRight().y() + 15);
+    node->setPos(rect.bottomRight().x() - 40, rect.bottomRight().y() + 15);
 
     //step
     node = getCommandNode(12);
-    node->setPos(rect.bottomRight().x() - 20, rect.bottomRight().y() + 9);
+    node->setPos(rect.bottomRight().x() - 22, rect.bottomRight().y() + 9);
 }
 
 void MixerCurveWidget::itemMoved(double itemValue)
@@ -609,6 +605,16 @@ void MixerCurveWidget::activateCommand(const QString& name)
     }
 }
 
+void MixerCurveWidget::showCommand(const QString& name, bool show)
+{
+    Node* node = getCmdNode(name);
+    if (node) {
+        if (show)
+            node->show();
+        else
+            node->hide();
+    }
+}
 void MixerCurveWidget::showCommands(bool show)
 {
     for (int i=1; i<cmdNodePool.count()-2; i++) {
@@ -621,6 +627,16 @@ void MixerCurveWidget::showCommands(bool show)
         node->update();
     }
 }
+bool MixerCurveWidget::isCommandActive(const QString& name)
+{
+    bool active = false;
+    Node* node = getCmdNode(name);
+    if (node) {
+        active = node->getCommandActive();
+    }
+    return active;
+}
+
 void MixerCurveWidget::cmdActivated(Node* node)
 {
     if (node->getToggle()) {

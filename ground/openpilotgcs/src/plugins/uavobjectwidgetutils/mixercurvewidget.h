@@ -61,6 +61,8 @@ public:
 
    void cmdActivated(Node* node);
    void activateCommand(const QString& name);
+   bool isCommandActive(const QString& name);
+   void showCommand(const QString& name, bool show);
    void showCommands(bool show);
    Node* getCmdNode(const QString& name);
    void setCommandText(const QString& name, const QString& text);

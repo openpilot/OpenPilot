@@ -18,6 +18,7 @@ class UAVOBJECTWIDGETUTILS_EXPORT PopupWidget : public QDialog
 public:
     explicit PopupWidget(QWidget *parent = 0);
     
+    void         popUp(QWidget* widget = 0);
     void         setWidget(QWidget* widget);
     QWidget*     getWidget() { return m_widget; }
     QHBoxLayout* getLayout() { return m_layout; }
@@ -25,7 +26,9 @@ public:
 signals:
     
 public slots:
-    
+    bool close();
+    void done(int result);
+
 private slots:
     void closePopup();
 

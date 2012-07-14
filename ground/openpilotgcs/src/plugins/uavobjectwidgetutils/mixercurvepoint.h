@@ -66,6 +66,8 @@ public:
     void setPositiveColor(QString color0 = "#00ff00", QString color1 = "#00ff00") { posColor0 = color0;  posColor1 = color1; }
     void setNegativeColor(QString color0 = "#ff0000", QString color1 = "#ff0000") { negColor0 = color0; negColor1 = color1; }
     void setImage(QImage img) { image = img; }
+    void setDrawNode(bool draw) { drawNode = draw; }
+    void setDrawText(bool draw) { drawText = draw; }
 
     QRectF boundingRect() const;
     QPainterPath shape() const;
@@ -98,6 +100,8 @@ private:
     bool    cmdNode;
     bool    cmdToggle;
     QString cmdText;    
+    bool    drawNode;
+    bool    drawText;
     int     index;
 
 };

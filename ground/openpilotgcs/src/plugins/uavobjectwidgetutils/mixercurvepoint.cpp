@@ -47,6 +47,8 @@ Node::Node(MixerCurveWidget *graphWidget)
     vertical = false;
     cmdNode = false;
     cmdToggle = true;    
+    drawNode = true;
+    drawText = true;
 
     posColor0 = "#1c870b";  //greenish?
     posColor1 = "#116703";  //greenish?
@@ -81,43 +83,48 @@ QPainterPath Node::shape() const
 
 void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *)
 {
-    QString text = cmdNode ? cmdText : QString().sprintf("% .2f", value());
+    QString text = cmdNode ? cmdText : QString().sprintf("%.2f", value());
 
-    QRadialGradient gradient(-3, -3, 10);
-    if (option->state & QStyle::State_Sunken) {
-        gradient.setCenter(3, 3);
-        gradient.setFocalPoint(3, 3);
+    if (drawNode) {
+        QRadialGradient gradient(-3, -3, 10);
+        if (option->state & QStyle::State_Sunken) {
+            gradient.setCenter(3, 3);
+            gradient.setFocalPoint(3, 3);
 
-        gradient.setColorAt(1, Qt::darkBlue);
-        gradient.setColorAt(0, Qt::darkBlue);
-    } else {
-        if (cmdNode) {
-            gradient.setColorAt(0, cmdActive ? posColor0 : negColor0);
-            gradient.setColorAt(1, cmdActive ? posColor1 : negColor1);
-        }
-        else {
-            if (value() < 0) {
-                gradient.setColorAt(0, negColor0);
-                gradient.setColorAt(1, negColor1);
+            gradient.setColorAt(1, Qt::darkBlue);
+            gradient.setColorAt(0, Qt::darkBlue);
+        } else {
+            if (cmdNode) {
+                gradient.setColorAt(0, cmdActive ? posColor0 : negColor0);
+                gradient.setColorAt(1, cmdActive ? posColor1 : negColor1);
             }
             else {
-                gradient.setColorAt(0, posColor0);
-                gradient.setColorAt(1, posColor1);
+                if (value() < 0) {
+                    gradient.setColorAt(0, negColor0);
+                    gradient.setColorAt(1, negColor1);
+                }
+                else {
+                    gradient.setColorAt(0, posColor0);
+                    gradient.setColorAt(1, posColor1);
+                }
             }
         }
-    }
-    painter->setBrush(gradient);
-    painter->setPen(QPen(Qt::black, 0));
-    painter->drawEllipse(boundingRect());
-    if (!image.isNull())
-        painter->drawImage(boundingRect().adjusted(1,1,-1,-1), image);
+        painter->setBrush(gradient);
+        painter->setPen(QPen(Qt::black, 0));
+        painter->drawEllipse(boundingRect());
 
-    painter->setPen(QPen(Qt::white, 0));
-    if (cmdNode) {
-        painter->drawText(0,4,text);
+        if (!image.isNull())
+            painter->drawImage(boundingRect().adjusted(1,1,-1,-1), image);
     }
-    else {
-        painter->drawText(-13, 4, text);
+
+    if (drawText) {
+        painter->setPen(QPen(drawNode ? Qt::white : Qt::black, 0));
+        if (cmdNode) {
+            painter->drawText(0,4,text);
+        }
+        else {
+            painter->drawText(-13, 4, text);
+        }
     }
 }
 

@@ -21,7 +21,15 @@ PopupWidget::PopupWidget(QWidget *parent) :
 
     setLayout(mainLayout);
 
-    connect(m_closeButton,SIGNAL(clicked()), this, SLOT(closePopup()));
+    connect(m_closeButton,SIGNAL(clicked()), this, SLOT(close()));
+    connect(this, SIGNAL(accepted()),this,SLOT(close()));
+    connect(this,SIGNAL(rejected()), this, SLOT(close()));
+}
+
+void PopupWidget::popUp(QWidget* widget)
+{
+    setWidget(widget);
+    exec();
 }
 
 void PopupWidget::setWidget(QWidget* widget)
@@ -32,6 +40,19 @@ void PopupWidget::setWidget(QWidget* widget)
     m_layout->addWidget(m_widget);
 }
 
+bool PopupWidget::close()
+{
+    closePopup();
+
+    return QDialog::close();
+}
+
+void PopupWidget::done(int result)
+{
+    closePopup();
+
+    QDialog::done(result);
+}
 
 void PopupWidget::closePopup()
 {
@@ -41,6 +62,4 @@ void PopupWidget::closePopup()
             w->layout()->addWidget(m_widget);
         }
     }
-
-    close();
 }

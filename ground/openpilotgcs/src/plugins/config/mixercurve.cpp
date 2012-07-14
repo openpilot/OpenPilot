@@ -133,6 +133,13 @@ void MixerCurve::UpdateCurveUI()
     //get the user settings
     QString curveType = m_mixerUI->CurveType->currentText();
 
+    m_curve->activateCommand(curveType);
+    bool cmdsActive = m_curve->isCommandActive("Commands");
+
+    m_curve->showCommand("StepPlus", cmdsActive && curveType != "Linear");
+    m_curve->showCommand("StepMinus", cmdsActive && curveType != "Linear");
+    m_curve->showCommand("StepValue", cmdsActive && curveType != "Linear");
+
     m_mixerUI->CurveStep->setMinimum(0.0);
     m_mixerUI->CurveStep->setMaximum(100.0);
     m_mixerUI->CurveStep->setSingleStep(1.00);
@@ -147,6 +154,10 @@ void MixerCurve::UpdateCurveUI()
 
     if ( curveType.compare("Flat")==0)
     {
+        m_mixerUI->minLabel->setVisible(false);
+        m_mixerUI->CurveMin->setVisible(false);
+        m_mixerUI->stepLabel->setVisible(true);
+        m_mixerUI->CurveStep->setVisible(true);
         m_mixerUI->CurveStep->setMinimum(m_mixerUI->CurveMin->minimum());
         m_mixerUI->CurveStep->setMaximum(m_mixerUI->CurveMax->maximum());
         m_mixerUI->CurveStep->setSingleStep(0.01);
@@ -352,17 +363,18 @@ void MixerCurve::CommandActivated(Node* node)
     else if (name == "Commands") {
 
     }
-    else if (name == "Popup") {
+    else if (name == "Popup" && !m_curve->isCommandActive("Popup")) {
         m_mixerUI->SettingsGroup->show();
         m_mixerUI->ValuesGroup->show();
+        m_curve->showCommand("Popup", false);
 
         PopupWidget* popup = new PopupWidget();
-        popup->setWidget(this);
-        popup->exec();
+        popup->popUp(this);
 
         m_mixerUI->SettingsGroup->hide();
         m_mixerUI->ValuesGroup->hide();
         m_curve->showCommands(false);
+        m_curve->showCommand("Popup", true);
     }
     else if (name == "Linear") {
         m_mixerUI->CurveType->setCurrentIndex(m_mixerUI->CurveType->findText("Linear"));
@@ -412,24 +424,8 @@ void MixerCurve::CurveTypeChanged()
 void MixerCurve::CurveMinChanged(double value)
 {
     QList<double> points = m_curve->getCurve();
-    QString CurveType = m_mixerUI->CurveType->currentText();
-
-    if ( CurveType.compare("Flat")==0) {
-        // the min changed so redraw the curve
-        //  but since the curve is flat make all points = value
-        //  because we use curveMin for the flat value in ui
-        for (int i = 0; i < points.count(); i++) {
-            points.pop_back();
-            points.push_front(value);
-        }
-    }
-    else {
-        // the min changed so redraw the curve
-        //  mixercurvewidget::setCurve will trim any points below min
-
-        points.removeFirst();
-        points.push_front(value);
-    }
+    points.removeFirst();
+    points.push_front(value);
     setCurve(&points);
 }
 

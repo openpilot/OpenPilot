@@ -95,7 +95,7 @@ static const struct pios_spi_cfg pios_spi_sdcard_cfg = {
 		.SPI_CRCPolynomial     = 7,
 		.SPI_CPOL              = SPI_CPOL_High,
 		.SPI_CPHA              = SPI_CPHA_2Edge,
-		.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_256, /* Maximum divider (ie. slowest clock rate) */
+		.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_16, /* Maximum divider (ie. slowest clock rate) */
 	},
 	.use_crc = false,
 	.dma = {
@@ -751,7 +751,99 @@ static const struct pios_video_cfg pios_video_cfg = {
 	.vsync = &pios_exti_vsync_cfg,
 };
 
+#endif
 
+#if defined(PIOS_INCLUDE_WAVE)
+#include <pios_wavplay.h>
+#include <pios_tim_priv.h>
 
+static const TIM_TimeBaseInitTypeDef tim_6_time_base = {
+	.TIM_Prescaler = 0,
+	.TIM_ClockDivision = TIM_CKD_DIV1,
+	.TIM_CounterMode = TIM_CounterMode_Up,
+	.TIM_Period = (PIOS_PERIPHERAL_APB1_CLOCK / 44100),
+	.TIM_RepetitionCounter = 0x0000,
+};
+
+static const struct pios_tim_clock_cfg tim_6_cfg = {
+	.timer = TIM6,
+	.time_base_init = &tim_6_time_base,
+	.irq = {
+		.init = {
+			.NVIC_IRQChannel                   = TIM6_DAC_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
+			.NVIC_IRQChannelSubPriority        = 0,
+			.NVIC_IRQChannelCmd                = ENABLE,
+		},
+	},
+};
+
+static const struct pios_dac_cfg pios_dac_cfg = {
+		.timer = TIM6,
+		.time_base_init = {
+				.TIM_Prescaler = 0,
+				.TIM_ClockDivision = TIM_CKD_DIV1,
+				.TIM_CounterMode = TIM_CounterMode_Up,
+				.TIM_Period = (PIOS_PERIPHERAL_APB1_CLOCK / 44100),
+				.TIM_RepetitionCounter = 0x0000,
+			},
+		.irq = {
+			.init = {
+				.NVIC_IRQChannel                   = TIM6_DAC_IRQn,
+				.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
+				.NVIC_IRQChannelSubPriority        = 0,
+				.NVIC_IRQChannelCmd                = ENABLE,
+			},
+		},
+		.dma = {
+			.irq = {
+				// Note this is the stream ID that triggers interrupts (in this case RX)
+				.flags = (DMA_IT_TCIF5),
+				.init = {
+					.NVIC_IRQChannel = DMA1_Stream5_IRQn,
+					.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
+					.NVIC_IRQChannelSubPriority = 0,
+					.NVIC_IRQChannelCmd = ENABLE,
+				},
+			},
+
+			.rx = {},
+			.tx = {
+				.channel = DMA1_Stream5,
+				.init = {
+					.DMA_Channel            = DMA_Channel_7,
+					.DMA_PeripheralBaseAddr = (uint32_t)&DAC->DHR8R1,
+					.DMA_DIR                = DMA_DIR_MemoryToPeripheral,
+					.DMA_BufferSize 		= BUFFERSIZE,
+					.DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
+					.DMA_MemoryInc          = DMA_MemoryInc_Enable,
+					.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte,
+					.DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte,
+					.DMA_Mode               = DMA_Mode_Circular,
+					.DMA_Priority           = DMA_Priority_High,
+					.DMA_FIFOMode           = DMA_FIFOMode_Disable,
+					.DMA_FIFOThreshold      = DMA_FIFOThreshold_Full,
+					.DMA_MemoryBurst        = DMA_MemoryBurst_Single,
+					.DMA_PeripheralBurst    = DMA_PeripheralBurst_Single,
+				},
+			},
+		},
+		.channel = DAC_Channel_1,
+		.dac_init = {
+				.DAC_Trigger = DAC_Trigger_T6_TRGO,
+				.DAC_WaveGeneration = DAC_WaveGeneration_None,
+				.DAC_OutputBuffer = DAC_OutputBuffer_Enable,
+		},
+		.dac_io = {
+			.gpio = GPIOA,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_4,
+				.GPIO_Speed = GPIO_Speed_50MHz,
+				.GPIO_Mode  = GPIO_Mode_AN,
+				.GPIO_OType = GPIO_OType_PP,
+				.GPIO_PuPd = GPIO_PuPd_NOPULL,
+			},
+		},
+};
 #endif
 

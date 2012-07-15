@@ -151,6 +151,9 @@
 #if defined(PIOS_INCLUDE_VIDEO)
 #include <pios_video.h>
 #endif
+#if defined(PIOS_INCLUDE_WAVE)
+#include <pios_wavplay.h>
+#endif
 
 #if defined(PIOS_INCLUDE_FLASH)
 #include <pios_flash_jedec.h>

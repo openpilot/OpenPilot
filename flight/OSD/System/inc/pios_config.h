@@ -60,7 +60,7 @@
 #define PIOS_INCLUDE_BMP085
 #define PIOS_INCLUDE_HMC5883
 #define PIOS_INCLUDE_SDCARD
-
+#define PIOS_INCLUDE_WAVE
 /* Supported receiver interfaces */
 //#define PIOS_INCLUDE_RCVR
 //#define PIOS_INCLUDE_DSM

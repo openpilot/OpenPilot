@@ -94,6 +94,7 @@ endif
 MODULES = Osd/osdgen
 MODULES += GPS
 MODULES += Osd/osdinput
+MODULES += Osd/WavPlayer
 #MODULES += Extensions/MagBaro
 MODULES += Telemetry
 MODULES += FirmwareIAP
@@ -210,6 +211,7 @@ SRC += $(PIOSCOMMON)/pios_hmc5883.c
 SRC += $(PIOSCOMMON)/printf2.c
 SRC += $(PIOSCOMMON)/pios_crc.c
 SRC += $(PIOSCOMMON)/pios_video.c
+SRC += $(PIOSCOMMON)/pios_wavplay.c
 SRC += $(PIOSCOMMON)/pios_usb_desc_hid_cdc.c
 SRC += $(PIOSCOMMON)/pios_usb_desc_hid_only.c
 SRC += $(PIOSCOMMON)/pios_usb_util.c
@@ -411,7 +413,7 @@ LDFLAGS += $(patsubst %,-l%,$(EXTRA_LIBS))
 LDFLAGS += $(MATH_LIB)
 LDFLAGS += -lc -lgcc
 
-#Linker scripts                                                                                                                                                                                                              
+#Linker scripts
 LDFLAGS += $(addprefix -T,$(LINKER_SCRIPTS_APP))
 
 

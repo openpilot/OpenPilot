@@ -491,9 +491,6 @@ static void UAVTalkRecvTask(void *parameters)
 				}
 				else
 				{
-					UAVObjEvent ev;
-					ev.obj = iproc->obj;
-					ev.instId = 0;
 					switch (iproc->type)
 					{
 					case UAVTALK_TYPE_OBJ:
@@ -502,16 +499,12 @@ static void UAVTalkRecvTask(void *parameters)
 						break;
 					case UAVTALK_TYPE_OBJ_REQ:
 						// Queue up an object send request.
-						ev.event = EV_UPDATE_REQ;
-						xQueueSend(params->recvQueue, &ev, MAX_PORT_DELAY);
+						queueEvent(params->recvQueue, (void*)iproc->obj, iproc->instId, EV_UPDATE_REQ);
 						break;
 					case UAVTALK_TYPE_OBJ_ACK:
 						if (UAVObjUnpack(iproc->obj, iproc->instId, connection->rxBuffer) == 0)
-						{
 							// Queue up an ACK
-							ev.event = EV_SEND_ACK;
-							xQueueSend(params->recvQueue, &ev, MAX_PORT_DELAY);
-						}
+							queueEvent(params->recvQueue, (void*)iproc->obj, iproc->instId, EV_SEND_ACK);
 						break;
 					}
 
@@ -735,7 +728,7 @@ static void transparentCommTask(void * parameters)
 		}
 
 		// Receive data from the com port
-		uint32_t cur_rx_bytes = PIOS_COM_ReceiveBuffer(PIOS_COM_TRANS_COM, p->data + p->header.data_size,
+		uint32_t cur_rx_bytes =	PIOS_COM_ReceiveBuffer(PIOS_COM_TRANS_COM, p->data + p->header.data_size,
 							       PH_MAX_DATA - p->header.data_size, timeout);
 
 		// Do we have an data to send?
@@ -1002,7 +995,8 @@ static void receiveData(uint8_t *buf, uint8_t len, int8_t rssi, int8_t afc)
 	// Packet data should go to transparent com if it's configured,
 	// USB HID if it's connected, otherwise, UAVTalk com if it's configured.
 	uint32_t outputPort = PIOS_COM_TRANS_COM ? PIOS_COM_TRANS_COM : PIOS_COM_UAVTALK;
-	transmitData(outputPort, buf, len, true);
+	bool checkHid = (PIOS_COM_TRANS_COM == 0);
+	transmitData(outputPort, buf, len, checkHid);
 }
 
 /**

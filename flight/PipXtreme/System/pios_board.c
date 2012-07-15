@@ -170,7 +170,7 @@ void PIOS_Board_Init(void) {
 											tx_buffer, PIOS_COM_VCP_USB_TX_BUF_LEN)) {
 			PIOS_Assert(0);
 		}
-		switch (pipxSettings.TelemetryConfig)
+		switch (pipxSettings.VCPConfig)
 		{
 		case PIPXSETTINGS_VCPCONFIG_SERIAL:
 			pios_com_trans_com_id = pios_com_vcp_id;

@@ -123,7 +123,7 @@ void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
             painter->drawText(0,4,text);
         }
         else {
-            painter->drawText(-13, 4, text);
+            painter->drawText( (value() < 0) ? -13 : -11, 4, text);
         }
     }
 }

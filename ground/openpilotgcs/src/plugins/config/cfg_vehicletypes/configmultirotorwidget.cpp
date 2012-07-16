@@ -253,6 +253,8 @@ QStringList ConfigMultiRotorWidget::getChannelDescriptions()
         channelDesc[multi.VTOLMotorW-1] = QString("VTOLMotorW");
     if (multi.VTOLMotorE > 0 && multi.VTOLMotorE <= ConfigMultiRotorWidget::CHANNEL_NUMELEM)
         channelDesc[multi.VTOLMotorE-1] = QString("VTOLMotorE");
+    if (multi.TRIYaw > 0 && multi.TRIYaw <= ConfigMultiRotorWidget::CHANNEL_NUMELEM)
+        channelDesc[multi.TRIYaw-1] = QString("Tri-Yaw");
 
     return channelDesc;
 }

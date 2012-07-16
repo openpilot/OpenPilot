@@ -1,13 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       startpage.cpp
+ * @file       vehiclepage.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
- * @addtogroup GCSPlugins GCS Plugins
+ * @addtogroup
  * @{
- * @addtogroup Setup Wizard  Plugin
+ * @addtogroup VehiclePage
  * @{
- * @brief A Wizard to make the initial setup easy for everyone.
+ * @brief
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -24,25 +24,27 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef STARTPAGE_H
-#define STARTPAGE_H
+
+#ifndef VEHICLEPAGE_H
+#define VEHICLEPAGE_H
 
 #include "abstractwizardpage.h"
 
 namespace Ui {
-class StartPage;
+class VehiclePage;
 }
 
-class StartPage : public AbstractWizardPage
+class VehiclePage : public AbstractWizardPage
 {
     Q_OBJECT
     
 public:
-    explicit StartPage(SetupWizard *wizard, QWidget *parent = 0);
-    ~StartPage();
-    
+    explicit VehiclePage(SetupWizard *wizard, QWidget *parent = 0);
+    ~VehiclePage();
+    bool validatePage();
+
 private:
-    Ui::StartPage *ui;
+    Ui::VehiclePage *ui;
 };
 
-#endif // STARTPAGE_H
+#endif // VEHICLEPAGE_H

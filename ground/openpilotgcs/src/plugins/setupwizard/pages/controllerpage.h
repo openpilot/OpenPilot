@@ -1,13 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       startpage.cpp
+ * @file       controllerpage.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
- * @addtogroup GCSPlugins GCS Plugins
+ * @addtogroup
  * @{
- * @addtogroup Setup Wizard  Plugin
+ * @addtogroup ControllerPage
  * @{
- * @brief A Wizard to make the initial setup easy for everyone.
+ * @brief
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -24,25 +24,44 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef STARTPAGE_H
-#define STARTPAGE_H
 
+#ifndef CONTROLLERPAGE_H
+#define CONTROLLERPAGE_H
+
+#include <coreplugin/icore.h>
+#include <coreplugin/connectionmanager.h>
+#include "setupwizard.h"
 #include "abstractwizardpage.h"
 
 namespace Ui {
-class StartPage;
+class ControllerPage;
 }
 
-class StartPage : public AbstractWizardPage
+class ControllerPage : public AbstractWizardPage
 {
     Q_OBJECT
     
 public:
-    explicit StartPage(SetupWizard *wizard, QWidget *parent = 0);
-    ~StartPage();
+    explicit ControllerPage(SetupWizard *wizard, QWidget *parent = 0);
+    ~ControllerPage();
+    void initializePage();
+    bool isComplete() const;
+    bool validatePage();
     
 private:
-    Ui::StartPage *ui;
+    Ui::ControllerPage *ui;
+    bool anyControllerConnected();
+    SetupWizard::CONTROLLER_TYPE getControllerType();
+    void setupDeviceList();
+    void setupBoardTypes();
+    void setControllerType(SetupWizard::CONTROLLER_TYPE type);
+    Core::ConnectionManager *m_connectionManager;
+
+private slots:
+    void devicesChanged(QLinkedList<Core::devListItem> devices);
+    void connectionStatusChanged();
+    void identificationModeChanged();
+    void connectDisconnect();
 };
 
-#endif // STARTPAGE_H
+#endif // CONTROLLERPAGE_H

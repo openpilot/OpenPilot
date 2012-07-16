@@ -1,13 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       startpage.cpp
+ * @file       multipage.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
- * @addtogroup GCSPlugins GCS Plugins
+ * @addtogroup
  * @{
- * @addtogroup Setup Wizard  Plugin
+ * @addtogroup MultiPage
  * @{
- * @brief A Wizard to make the initial setup easy for everyone.
+ * @brief
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -24,25 +24,36 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef STARTPAGE_H
-#define STARTPAGE_H
+
+#ifndef MULTIPAGE_H
+#define MULTIPAGE_H
+
+#include <QtSvg/QGraphicsSvgItem>
+#include <QtSvg/QSvgRenderer>
 
 #include "abstractwizardpage.h"
 
 namespace Ui {
-class StartPage;
+class MultiPage;
 }
 
-class StartPage : public AbstractWizardPage
+class MultiPage : public AbstractWizardPage
 {
     Q_OBJECT
     
 public:
-    explicit StartPage(SetupWizard *wizard, QWidget *parent = 0);
-    ~StartPage();
+    explicit MultiPage(SetupWizard *wizard, QWidget *parent = 0);
+    ~MultiPage();
+
+    void initializePage();
     
 private:
-    Ui::StartPage *ui;
+    Ui::MultiPage *ui;
+    void setupMultiTypesCombo();
+    QGraphicsSvgItem *multiPic;
+
+private slots:
+    void updateImageAndDescription();
 };
 
-#endif // STARTPAGE_H
+#endif // MULTIPAGE_H

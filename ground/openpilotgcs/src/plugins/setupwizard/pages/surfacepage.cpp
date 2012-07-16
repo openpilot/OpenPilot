@@ -1,13 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       startpage.cpp
+ * @file       surfacepage.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
- * @addtogroup GCSPlugins GCS Plugins
+ * @addtogroup
  * @{
- * @addtogroup Setup Wizard  Plugin
+ * @addtogroup SurfacePage
  * @{
- * @brief A Wizard to make the initial setup easy for everyone.
+ * @brief
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -24,25 +24,19 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef STARTPAGE_H
-#define STARTPAGE_H
 
-#include "abstractwizardpage.h"
+#include "surfacepage.h"
+#include "ui_surfacepage.h"
 
-namespace Ui {
-class StartPage;
+SurfacePage::SurfacePage(SetupWizard *wizard, QWidget *parent) :
+    AbstractWizardPage(wizard, parent),
+    ui(new Ui::SurfacePage)
+{
+    ui->setupUi(this);
+    setFinalPage(true);
 }
 
-class StartPage : public AbstractWizardPage
+SurfacePage::~SurfacePage()
 {
-    Q_OBJECT
-    
-public:
-    explicit StartPage(SetupWizard *wizard, QWidget *parent = 0);
-    ~StartPage();
-    
-private:
-    Ui::StartPage *ui;
-};
-
-#endif // STARTPAGE_H
+    delete ui;
+}

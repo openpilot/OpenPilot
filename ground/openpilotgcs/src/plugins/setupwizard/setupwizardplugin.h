@@ -1,8 +1,8 @@
 /**
  ******************************************************************************
  *
- * @file       donothingplugin.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @file       setupwizardplugin.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup SetupWizardPlugin

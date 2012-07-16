@@ -71,7 +71,7 @@ p, li { white-space: pre-wrap; }
     </rect>
    </property>
    <property name="text">
-    <string>Uppload configuration</string>
+    <string>Upload configuration</string>
    </property>
   </widget>
  </widget>

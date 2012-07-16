@@ -31,7 +31,6 @@ deviceWidget::deviceWidget(QWidget *parent) :
 {
     myDevice = new Ui_deviceWidget();
     myDevice->setupUi(this);
-    devicePic = NULL; // Initialize pointer to null
 
     // Initialization of the Device icon display
     myDevice->verticalGroupBox_loaded->setVisible(false);
@@ -54,18 +53,14 @@ void deviceWidget::showEvent(QShowEvent *event)
     Q_UNUSED(event)
     // Thit fitInView method should only be called now, once the
     // widget is shown, otherwise it cannot compute its values and
-    // the result is usually a ahrsbargraph that is way too small.
-    if (devicePic)
-    {
-        myDevice->gVDevice->fitInView(devicePic,Qt::KeepAspectRatio);
-    }
+    // the result is usually a ahrsbargraph that is way too small
+    myDevice->gVDevice->fitInView(devicePic.rect(),Qt::KeepAspectRatio);
 }
 
 void deviceWidget::resizeEvent(QResizeEvent* event)
 {
     Q_UNUSED(event);
-    if (devicePic)
-        myDevice->gVDevice->fitInView(devicePic, Qt::KeepAspectRatio);
+    myDevice->gVDevice->fitInView(devicePic.rect(), Qt::KeepAspectRatio);
 }
 
 
@@ -92,31 +87,28 @@ void deviceWidget::populate()
     myDevice->lblDevName->setText(deviceDescriptorStruct::idToBoardName(id));
     myDevice->lblHWRev->setText(QString(tr("HW Revision: "))+QString::number(id & 0x00FF, 16));
 
-    devicePic = new QGraphicsSvgItem();
-    devicePic->setSharedRenderer(new QSvgRenderer());
     switch (id) {
     case 0x0101:
-        devicePic->renderer()->load(QString(":/uploader/images/deviceID-0101.svg"));
-        break;
-    case 0x0301:
-        devicePic->renderer()->load(QString(":/uploader/images/deviceID-0301.svg"));
-        break;
-    case 0x0401:
-        devicePic->renderer()->load(QString(":/uploader/images/deviceID-0401.svg"));
-        break;
-    case 0x0402:
-        devicePic->renderer()->load(QString(":/uploader/images/deviceID-0402.svg"));
+        devicePic.load("");//TODO
         break;
     case 0x0201:
-        devicePic->renderer()->load(QString(":/uploader/images/deviceID-0201.svg"));
+        devicePic.load("");//TODO
+        break;
+    case 0x0301:
+        devicePic.load("");//TODO
+        break;
+    case 0x0401:
+        devicePic.load(":/uploader/images/gcs-board-cc.png");
+        break;
+    case 0x0402:
+        devicePic.load(":/uploader/images/gcs-board-cc3d.png");
         break;
     default:
         break;
     }
-    devicePic->setElementId("device");
-    myDevice->gVDevice->scene()->addItem(devicePic);
-    myDevice->gVDevice->setSceneRect(devicePic->boundingRect());
-    myDevice->gVDevice->fitInView(devicePic,Qt::KeepAspectRatio);
+    myDevice->gVDevice->scene()->addPixmap(devicePic);
+    myDevice->gVDevice->setSceneRect(devicePic.rect());
+    myDevice->gVDevice->fitInView(devicePic.rect(),Qt::KeepAspectRatio);
 
     bool r = m_dfu->devices[deviceID].Readable;
     bool w = m_dfu->devices[deviceID].Writable;

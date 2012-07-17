@@ -1890,74 +1890,167 @@ void hud_draw_linear_compass(int v, int range, int width, int x, int y, int mint
 void draw_artificial_horizon(float angle, float pitch, int16_t l_x, int16_t l_y, int16_t size )
 {
 	float alpha;
-
-	int16_t x1,x2,x4; //x3
-	int16_t y1,y2,y4; //y3
-	int16_t y_pitch;
-	// rotated corners
-	int16_t ax1,ay1;
-	int16_t ax2,ay2;
-	//int16_t ax3,ay3;
-	int16_t ax4,ay4;
+	uint8_t vertical=0,horizontal=0;
+	int16_t x1,x2;
+	int16_t y1,y2;
 	int16_t refx,refy;
 	alpha=DEG2RAD(angle);
-
-	// move up or down Size
-	y_pitch=(pitch/90.0f*(size/2))+size/2;
-
-	// center rotate point
 	refx=l_x + size/2;
 	refy=l_y + size/2;
 
-	x1=l_x - size/2;
-	y1=l_y + y_pitch;
-	x2=l_x + size + size/2;
-	y2=l_y + y_pitch;
-	//x3=l_x + size + size/2;
-	//y3=l_y + size + y_pitch;
-	x4=l_x - size/2;
-	y4=l_y + size + y_pitch;
-
-	ax1=refy+(x1-refx)*cosf(alpha)-(y1-refy)*sinf(alpha);
-	ay1=refy+(x1-refx)*sinf(alpha)+(y1-refy)*cosf(alpha);
-
-	ax2=refy+(x2-refx)*cosf(alpha)-(y2-refy)*sinf(alpha);
-	ay2=refy+(x2-refx)*sinf(alpha)+(y2-refy)*cosf(alpha);
-
-	//ax3=refy+(x3-refx)*cosf(alpha)-(y3-refy)*sinf(alpha);
-	//ay3=refy+(x3-refx)*sinf(alpha)+(y3-refy)*cosf(alpha);
-
-	//ax4=refy+(x4-refx)*cosf(alpha)-(y4-refy)*sinf(alpha);
-	//ay4=refy+(x4-refx)*sinf(alpha)+(y4-refy)*cosf(alpha);
-
-	write_line_outlined(ax1,ay1,ax2,ay2,0,0,0,1);
-	//fill
-	for(int i=0;i<(size);i++)
+	//
+	float k=0;
+	float dx = sinf(alpha)*(pitch/90.0f*(size/2));
+	float dy = cosf(alpha)*(pitch/90.0f*(size/2));
+	int16_t x0 = (size/2)-dx;
+	int16_t y0 = (size/2)+dy;
+	// calculate the line function
+	if((angle != 90) && (angle != -90))
 	{
-		x1=l_x - size/2;
-		y1=l_y + y_pitch + i;
-		x2=l_x + size + size/2;
-		y2=l_y + y_pitch + i;
-		ax1=refy+(x1-refx)*cosf(alpha)-(y1-refy)*sinf(alpha);
-		ay1=refy+(x1-refx)*sinf(alpha)+(y1-refy)*cosf(alpha);
-		ax2=refy+(x2-refx)*cosf(alpha)-(y2-refy)*sinf(alpha);
-		ay2=refy+(x2-refx)*sinf(alpha)+(y2-refy)*cosf(alpha);
-
-		write_line_lm(ax1,ay1,ax2,ay2,1,1);
+		k = tanf(alpha);
+		vertical = 0;
+		if(k==0)
+		{
+			horizontal=1;
+		}
 	}
-	//fill2
-	for(int i=0;i<(size*2);i++)
+	else
 	{
-		x1=l_x - size/2 + i;
-		y1=l_y + y_pitch;
-		x4=l_x - size/2 + i;
-		y4=l_y + size + y_pitch;
-		ax1=refy+(x1-refx)*cosf(alpha)-(y1-refy)*sinf(alpha);
-		ay1=refy+(x1-refx)*sinf(alpha)+(y1-refy)*cosf(alpha);
-		ax4=refy+(x4-refx)*cosf(alpha)-(y4-refy)*sinf(alpha);
-		ay4=refy+(x4-refx)*sinf(alpha)+(y4-refy)*cosf(alpha);
+		vertical = 1;
+	}
 
-		write_line_lm(ax1,ay1,ax4,ay4,1,1);
+	// crossing point of line
+	if(!vertical && !horizontal)
+	{
+		// y-y0=k(x-x0)
+		int16_t x=0;
+		int16_t y=k*(x-x0)+y0;
+		// find right crossing point
+		x1=x;
+		y1=y;
+		if(y<0)
+		{
+			y1=0;
+			x1=((y1-y0)+k*x0)/k;
+		}
+		if(y>size)
+		{
+			y1=size;
+			x1=((y1-y0)+k*x0)/k;
+		}
+		// left crossing point
+		x=size;
+		y=k*(x-x0)+y0;
+		x2=x;
+		y2=y;
+		if(y<0)
+		{
+			y2=0;
+			x2=((y2-y0)+k*x0)/k;
+		}
+		if(y>size)
+		{
+			y2=size;
+			x2=((y2-y0)+k*x0)/k;
+		}
+		// move to location
+		// horizon line
+		write_line_outlined(x1+l_x,y1+l_y,x2+l_x,y2+l_y,0,0,0,1);
+		//fill
+		if(angle<=0 && angle>-90)
+		{
+			//write_string("1", APPLY_HDEADBAND((GRAPHICS_RIGHT/2)),APPLY_VDEADBAND(GRAPHICS_BOTTOM-10), 0, 0, TEXT_VA_BOTTOM, TEXT_HA_CENTER, 0, 3);
+			for(int i=y2;i<size;i++)
+			{
+				x2=((i-y0)+k*x0)/k;
+				if(x2>size)
+					x2=size;
+				if(x2<0)
+					x2=0;
+				write_hline_lm(x2+l_x,size+l_x,i+l_y,1,1);
+			}
+		}
+		else if(angle<-90)
+		{
+			//write_string("2", APPLY_HDEADBAND((GRAPHICS_RIGHT/2)),APPLY_VDEADBAND(GRAPHICS_BOTTOM-10), 0, 0, TEXT_VA_BOTTOM, TEXT_HA_CENTER, 0, 3);
+			for(int i=0;i<y2;i++)
+			{
+				x2=((i-y0)+k*x0)/k;
+				if(x2>size)
+					x2=size;
+				if(x2<0)
+					x2=0;
+				write_hline_lm(size+l_x,x2+l_x,i+l_y,1,1);
+			}
+		}
+		else if(angle>0 && angle<90)
+		{
+			//write_string("3", APPLY_HDEADBAND((GRAPHICS_RIGHT/2)),APPLY_VDEADBAND(GRAPHICS_BOTTOM-10), 0, 0, TEXT_VA_BOTTOM, TEXT_HA_CENTER, 0, 3);
+			for(int i=y1;i<size;i++)
+			{
+				x2=((i-y0)+k*x0)/k;
+				if(x2>size)
+					x2=size;
+				if(x2<0)
+					x2=0;
+				write_hline_lm(0+l_x,x2+l_x,i+l_y,1,1);
+			}
+		}
+		else if(angle>90)
+		{
+			//write_string("4", APPLY_HDEADBAND((GRAPHICS_RIGHT/2)),APPLY_VDEADBAND(GRAPHICS_BOTTOM-10), 0, 0, TEXT_VA_BOTTOM, TEXT_HA_CENTER, 0, 3);
+			for(int i=0;i<y1;i++)
+			{
+				x2=((i-y0)+k*x0)/k;
+				if(x2>size)
+					x2=size;
+				if(x2<0)
+					x2=0;
+				write_hline_lm(x2+l_x,0+l_x,i+l_y,1,1);
+			}
+		}
+	}
+	else if(vertical)
+	{
+		// horizon line
+		write_line_outlined(x0+l_x,0+l_y,x0+l_x,size+l_y,0,0,0,1);
+		if(angle==90)
+		{
+			//write_string("5", APPLY_HDEADBAND((GRAPHICS_RIGHT/2)),APPLY_VDEADBAND(GRAPHICS_BOTTOM-10), 0, 0, TEXT_VA_BOTTOM, TEXT_HA_CENTER, 0, 3);
+			for(int i=0;i<size;i++)
+			{
+				write_hline_lm(0+l_x,x0+l_x,i+l_y,1,1);
+			}
+		}
+		else
+		{
+			//write_string("6", APPLY_HDEADBAND((GRAPHICS_RIGHT/2)),APPLY_VDEADBAND(GRAPHICS_BOTTOM-10), 0, 0, TEXT_VA_BOTTOM, TEXT_HA_CENTER, 0, 3);
+			for(int i=0;i<size;i++)
+			{
+				write_hline_lm(size+l_x,x0+l_x,i+l_y,1,1);
+			}
+		}
+	}
+	else if(horizontal)
+	{
+		// horizon line
+		write_hline_outlined(0+l_x,size+l_x,y0+l_y,0,0,0,1);
+		if(angle<0)
+		{
+			//write_string("7", APPLY_HDEADBAND((GRAPHICS_RIGHT/2)),APPLY_VDEADBAND(GRAPHICS_BOTTOM-10), 0, 0, TEXT_VA_BOTTOM, TEXT_HA_CENTER, 0, 3);
+			for(int i=0;i<y0;i++)
+			{
+				write_hline_lm(0+l_x,size+l_x,i+l_y,1,1);
+			}
+		}
+		else
+		{
+			//write_string("8", APPLY_HDEADBAND((GRAPHICS_RIGHT/2)),APPLY_VDEADBAND(GRAPHICS_BOTTOM-10), 0, 0, TEXT_VA_BOTTOM, TEXT_HA_CENTER, 0, 3);
+			for(int i=y0;i<size;i++)
+			{
+				write_hline_lm(0+l_x,size+l_x,i+l_y,1,1);
+			}
+		}
 	}
 
 	//sides
@@ -1966,12 +2059,6 @@ void draw_artificial_horizon(float angle, float pitch, int16_t l_x, int16_t l_y,
 	//plane
 	write_line_outlined(refx-5,refy,refx+6,refy,0,0,0,1);
 	write_line_outlined(refx,refy,refx,refy-3,0,0,0,1);
-	//needs better way to limit drawing outside the box
-	write_filled_rectangle_lm(l_x - size - size/2-1,	l_y - size - size/2-1,	size + size/2, 	size*4+2,		0,0); //left
-	write_filled_rectangle_lm(l_x + size + 1, 			l_y - size - size/2-1,	size + size/2, 	size*4+2,		0,0); //right
-	write_filled_rectangle_lm(l_x-1, 					l_y + size + 1,        	size+2, 		size + size/2,   0,0); //bot
-	write_filled_rectangle_lm(l_x-1, 					l_y - size - size/2-1, 	size+1, 		size + size/2+1, 0,0); //top
-
 }
 
 
@@ -2274,7 +2361,7 @@ void updateGraphics() {
 		break;
 		case 2:
 		{
-			draw_artificial_horizon(-attitude.Roll,attitude.Pitch,100,100,30);
+			draw_artificial_horizon(-attitude.Roll,attitude.Pitch,100,100,64);
 		}
 		break;
 		case 3:

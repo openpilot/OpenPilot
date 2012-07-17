@@ -56,6 +56,15 @@ CCFlow::CCFlow(cv::RNG *rnginit, cv::Mat* last[], cv::Mat* current[], int pyrami
 	Mat ref=(*current[mydepth])(Rect(border[0], border[1], current[mydepth]->cols-(border[0]+border[2]), current[mydepth]->rows-(border[1]+border[3])));
 	Mat tst=(*last[mydepth])(Rect(border[0], border[1], last[mydepth]->cols-(border[0]+border[2]), last[mydepth]->rows-(border[1]+border[3])));
 
+fprintf(stderr,"Doing subcheck on level %i subsize %i,%i of %i,%i from %i,%i to %i,%i\n",
+	depth,
+	ref.cols,ref.rows,
+	current[mydepth]->cols,current[mydepth]->rows,
+	border[0],border[1],
+	current[mydepth]->cols-border[2],current[mydepth]->rows-border[3]);
+
+
+
 	//particleMatch(tst,ref,CC_PARTICLES,CC_PDEPTH,CC_ZOOMFACTOR,tr,CC_INITIAL);
 	//temperMatch(tst,ref,CC_ENDCOUNT,CC_MAXCOUNT,CC_ADJFACTOR,tr,CC_INITIAL);
 	//fullMatch(tst,ref,1.0/16.0,Vec3f(0,0,0),Vec3f(10,10,10));
@@ -64,23 +73,28 @@ CCFlow::CCFlow(cv::RNG *rnginit, cv::Mat* last[], cv::Mat* current[], int pyrami
 	if (depth==0) {
 		gradientMatch(tst,ref,50,tr,Vec3f(1,1,1));
 	} else {
-		gradientMatch(tst,ref,20,tr,Vec3f(0.5,0.5,0.5));
+		gradientMatch(tst,ref,20,tr,Vec3f(0.5,0.5,0.1));
 	}
 
+	center = Point2f(
+		border[0] + 0.5*(last[mydepth]->cols-(border[0]+border[2])),
+		border[1] + 0.5*(last[mydepth]->rows-(border[1]+border[3]))
+		);
 	if ((mydepth+1)<maxdepth) {
-		center = Point(
-			border[0] + (last[mydepth]->cols-(border[0]+border[2]))/2,
-			border[1] + (last[mydepth]->rows-(border[1]+border[3]))/2
+		Vec4i newborder = border * 2;
+		Point2f newcenter = Point2f(
+			newborder[0] + 0.5*(last[mydepth+1]->cols-(newborder[0]+newborder[2])),
+			newborder[1] + 0.5*(last[mydepth+1]->rows-(newborder[1]+newborder[3]))
 			);
-		corners[0] = Point(border[0], border[1]);
-		corners[1] = Point(last[mydepth]->cols-border[2], border[1]);
-		corners[2] = Point(border[0], last[mydepth]->rows-border[3]);
-		corners[3] = Point(last[mydepth]->cols-border[2], last[mydepth]->rows-border[3]);
+		corners[0] = Point2f(newborder[0], newborder[1]);
+		corners[1] = Point2f(last[mydepth+1]->cols-newborder[2], newborder[1]);
+		corners[2] = Point2f(newborder[0], last[mydepth+1]->rows-newborder[3]);
+		corners[3] = Point2f(last[mydepth+1]->cols-newborder[2], last[mydepth+1]->rows-newborder[3]);
 
-		subcenters[0] = corners[0] + 0.5 * (center-corners[0]);
-		subcenters[1] = corners[1] + 0.5 * (center-corners[1]);
-		subcenters[2] = corners[2] + 0.5 * (center-corners[2]);
-		subcenters[3] = corners[3] + 0.5 * (center-corners[3]);
+		subcenters[0] = corners[0] + 0.5 * (newcenter-corners[0]);
+		subcenters[1] = corners[1] + 0.5 * (newcenter-corners[1]);
+		subcenters[2] = corners[2] + 0.5 * (newcenter-corners[2]);
+		subcenters[3] = corners[3] + 0.5 * (newcenter-corners[3]);
 
 		/*fprintf(stderr,"subcenters are at %f/%f, %f/%f, %f/%f, %f/%f \n",
 			subcenters[0].x,subcenters[0].y,
@@ -89,20 +103,20 @@ CCFlow::CCFlow(cv::RNG *rnginit, cv::Mat* last[], cv::Mat* current[], int pyrami
 			subcenters[3].x,subcenters[3].y);*/
 
 		TransRot shift[4] = {
-			transrotation(Point3f(subcenters[0].x,subcenters[0].y,mydepth)),
-			transrotation(Point3f(subcenters[1].x,subcenters[1].y,mydepth)),
-			transrotation(Point3f(subcenters[2].x,subcenters[2].y,mydepth)),
-			transrotation(Point3f(subcenters[3].x,subcenters[3].y,mydepth))
+			transrotation(Point3f(subcenters[0].x/2,subcenters[0].y/2,mydepth)),
+			transrotation(Point3f(subcenters[1].x/2,subcenters[1].y/2,mydepth)),
+			transrotation(Point3f(subcenters[2].x/2,subcenters[2].y/2,mydepth)),
+			transrotation(Point3f(subcenters[3].x/2,subcenters[3].y/2,mydepth))
 		};
 
 		children[0] = new CCFlow( rnginit, last, current, maxdepth, shift[0], oldflow?oldflow->children[0]:NULL,
-					Vec4s( 2*corners[0].x, 2*corners[0].y, last[mydepth+1]->cols - 2*center.x, last[mydepth+1]->rows - 2*center.y ), mydepth+1);
+					Vec4s( corners[0].x, corners[0].y, last[mydepth+1]->cols - newcenter.x, last[mydepth+1]->rows - newcenter.y ), mydepth+1);
 		children[1] = new CCFlow( rnginit, last, current, maxdepth, shift[1], oldflow?oldflow->children[1]:NULL,
-					Vec4s( 2*center.x,     2*corners[1].y, last[mydepth+1]->cols - 2*corners[1].x, last[mydepth+1]->rows - 2*center.y ), mydepth+1);
+					Vec4s( newcenter.x,     corners[1].y, last[mydepth+1]->cols - corners[1].x, last[mydepth+1]->rows - newcenter.y ), mydepth+1);
 		children[2] = new CCFlow( rnginit, last, current, maxdepth, shift[2], oldflow?oldflow->children[2]:NULL,
-					Vec4s( 2*corners[2].x, 2*center.y, last[mydepth+1]->cols - 2*center.x, last[mydepth+1]->rows - 2*corners[2].y ), mydepth+1);
+					Vec4s( corners[2].x, newcenter.y, last[mydepth+1]->cols - newcenter.x, last[mydepth+1]->rows - corners[2].y ), mydepth+1);
 		children[3] = new CCFlow( rnginit, last, current, maxdepth, shift[3], oldflow?oldflow->children[3]:NULL,
-					Vec4s( 2*center.x,     2*center.y, last[mydepth+1]->cols - 2*corners[3].x, last[mydepth+1]->rows - 2*corners[3].y ), mydepth+1);
+					Vec4s( newcenter.x,     newcenter.y, last[mydepth+1]->cols - corners[3].x, last[mydepth+1]->rows - corners[3].y ), mydepth+1);
 
 
 	} else {
@@ -139,7 +153,7 @@ TransRot CCFlow::transrotation(cv:: Point3f position) {
 	int depth = position.z;
 	// calculate which subdivision is responsible
 	if (depth>mydepth && mydepth+1<maxdepth) {
-		for (int t=mydepth; t<maxdepth && t<depth; t++) {
+		for (int t=mydepth; t<depth; t++) {
 			pos = pos * 0.5;
 		}
 		if (pos.y<center.y) {
@@ -156,7 +170,13 @@ TransRot CCFlow::transrotation(cv:: Point3f position) {
 			}
 		}
 	} else {
-	// we are responsible
+		// we are responsible
+		// adjust position for correct scale (even if the flow hasnt bee calculatd to that scale)
+		int disp=1;
+		for (int t=mydepth; t<depth; t++) {
+			pos = pos * 0.5;
+			disp *=2;
+		}
 		Mat rotMatrix = getRotationMatrix2D(center,rotation,1.0f);
 		rotMatrix.at<double>(0,2)+=translation[0];
 		rotMatrix.at<double>(1,2)+=translation[1];
@@ -167,7 +187,7 @@ TransRot CCFlow::transrotation(cv:: Point3f position) {
 			);
 
 		Point2f trans(source-pos);
-		return Vec3f(trans.x,trans.y,rotation);
+		return Vec3f(disp*trans.x,disp*trans.y,rotation);
 	}
 }
 
@@ -462,7 +482,7 @@ float CCFlow::correlate(cv::Mat reference, cv::Mat test, cv::Mat rotMatrix) {
 	double * m = (double*)rotMatrix.data;
 	float squareError=0;
 	int   pixels=0,missed=0;
-	#define subres 16
+	#define subres 32
 
 //Mat debug=test.clone()*0;
 	for (int y=0;y<reference.rows;y++) {
@@ -480,9 +500,9 @@ float CCFlow::correlate(cv::Mat reference, cv::Mat test, cv::Mat rotMatrix) {
 				Vec3i a = ((subres-1)-(tx%subres))*a1 + (tx%subres)*a2;
 				Vec3i b = ((subres-1)-(tx%subres))*b1 + (tx%subres)*b2;
 				Vec3i c = (((subres-1)-(ty%subres))*a + (ty%subres)*b);
-				c[0]>>=8;
-				c[1]>>=8;
-				c[2]>>=8;
+				c[0]>>=10;
+				c[1]>>=10;
+				c[2]>>=10;
 				tmp -= c;
 				//debug.at<Vec3b>(y,x) = Vec3b(tmp[0]*tmp[0],tmp[1]*tmp[1],tmp[2]*tmp[2]);
 				//debug.at<Vec3b>(y,x) = c;

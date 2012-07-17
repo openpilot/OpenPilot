@@ -226,7 +226,7 @@ void OpenCVslam::run() {
 			if (lastFlow) delete lastFlow;
 			lastFlow = currentFlow;
 			//currentFlow = new CCFlow(&rng, last,current,5,Vec3f(0,0,1000),lastFlow);
-			currentFlow = new CCFlow(&rng, last,current,3,Vec3f(0,0,1000),lastFlow);
+			currentFlow = new CCFlow(&rng, last,current,4,Vec3f(0,0,1000),lastFlow);
 			iterations += currentFlow->iterations;
 			fprintf(stderr,"rotation: %f degrees,\tx: %f\ty: %f\t  %f > %f\t checks: %i avg: %f\n",currentFlow->rotation,currentFlow->translation[0],currentFlow->translation[1],currentFlow->best,currentFlow->worst, currentFlow->iterations, (float)iterations/frame);
 			//vPortEnterCritical();
@@ -274,9 +274,10 @@ void OpenCVslam::run() {
 				cvLine(lastFrame,cvPoint(center.x+200,center.y),cvPoint(center.x+200,center.y-(currentFlow->rotation)*10),CV_RGB(0,0,255),2,8,0);
 				cvLine(lastFrame,cvPoint(center.x-200,center.y),cvPoint(center.x-200,center.y+(currentFlow->rotation)*10),CV_RGB(0,0,255),2,8,0);
 				//fprintf(stderr,".");
+				int div=Mat(currentFrame).rows/2;
 				for (int y = 8; y<Mat(currentFrame).rows; y+=16 ) {
 					for (int x = 8; x<Mat(currentFrame).cols; x+=16 ) {
-						TransRot bla = currentFlow->transrotation(Point2f(x/8,y/8));
+						TransRot bla = currentFlow->transrotation(Point3f(x,y,5));
 						cvLine(lastFrame,cvPoint(x,y),cvPoint(x+bla[0],y+bla[1]),CV_RGB(0,255,0),1,8,0);
 					}
 				}

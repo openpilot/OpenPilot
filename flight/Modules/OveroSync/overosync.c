@@ -67,9 +67,8 @@ struct overosync {
 	struct dma_transaction transactions[2];
 	uint32_t active_transaction_id;
 	uint32_t loading_transaction_id;
-	xSemaphoreHandle transaction_lock;
 	xSemaphoreHandle buffer_lock;
-	volatile bool transaction_done;
+	uint32_t packets;
 	uint32_t sent_bytes;
 	uint32_t write_pointer;
 	uint32_t sent_objects;
@@ -132,10 +131,6 @@ int32_t OveroSyncStart(void)
 	if(overosync == NULL)
 		return -1;
 
-	overosync->transaction_lock = xSemaphoreCreateMutex();
-	if(overosync->transaction_lock == NULL)
-		return -1;
-
 	overosync->buffer_lock = xSemaphoreCreateMutex();
 	if(overosync->buffer_lock == NULL)
 		return -1;
@@ -145,6 +140,7 @@ int32_t OveroSyncStart(void)
 	overosync->write_pointer = 0;
 	overosync->sent_bytes = 0;
 	overosync->framesync_error = 0;
+	overosync->packets = 0;
 
 	// Process all registered objects and connect queue for updates
 	UAVObjIterate(&registerObject);
@@ -188,7 +184,6 @@ static void overoSyncTask(void *parameters)
 	UAVObjEvent ev;
 
 	// Kick off SPI transfers (once one is completed another will automatically transmit)
-	overosync->transaction_done = true;
 	overosync->sent_objects = 0;
 	overosync->failed_objects = 0;
 	overosync->received_objects = 0;
@@ -222,6 +217,7 @@ static void overoSyncTask(void *parameters)
 				syncStats.Connected = syncStats.Send > 500 ? OVEROSYNCSTATS_CONNECTED_TRUE : OVEROSYNCSTATS_CONNECTED_FALSE;
 				syncStats.DroppedUpdates = overosync->failed_objects;
 				syncStats.FramesyncErrors = overosync->framesync_error;
+				syncStats.Packets = overosync->packets;
 				OveroSyncStatsSet(&syncStats);
 				overosync->failed_objects = 0;
 				overosync->sent_bytes = 0;
@@ -281,7 +277,7 @@ static void transmitDataDone()
 		return;
 	}
 
-	overosync->transaction_done = false;
+	overosync->packets++;
 
 	// Swap buffers
 	overosync->active_transaction_id = overosync->loading_transaction_id;

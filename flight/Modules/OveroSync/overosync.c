@@ -58,7 +58,6 @@ static int32_t packData(uint8_t * data, int32_t length);
 static int32_t transmitData();
 static void transmitDataDone(bool crc_ok, uint8_t crc_val);
 static void registerObject(UAVObjHandle obj);
-
 // External variables
 extern int32_t pios_spi_overo_id;
 
@@ -277,6 +276,7 @@ static void overoSyncTask(void *parameters)
 				syncStats.Received = 0;
 				syncStats.Connected = syncStats.Send > 500 ? OVEROSYNCSTATS_CONNECTED_TRUE : OVEROSYNCSTATS_CONNECTED_FALSE;
 				syncStats.DroppedUpdates = overosync->failed_objects;
+				syncStats.FramesyncErrors = overosync->framesync_error;
 				OveroSyncStatsSet(&syncStats);
 				overosync->failed_objects = 0;
 				overosync->sent_bytes = 0;
@@ -342,7 +342,7 @@ static int32_t packData(uint8_t * data, int32_t length)
 
 	xSemaphoreGive(overosync->buffer_lock);
 	
-	// When the NSS line rises while we are packing data then a transaction doesn't start
+/*	// When the NSS line rises while we are packing data then a transaction doesn't start
 	// because that means we will be here very shortly afterwards (priority of task making that
 	// not always perfectly true) schedule the transaction here.
 	if (buffer_swap_failed && (PIOS_DELAY_DiffuS(buffer_swap_timeval) < 50)) {
@@ -352,7 +352,7 @@ static int32_t packData(uint8_t * data, int32_t length)
 		buffer_swap_failed = false;
 		too_long++;
 	}
-
+*/
 	return length;
 }
 

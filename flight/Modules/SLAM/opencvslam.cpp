@@ -78,9 +78,9 @@ void OpenCVslam::run() {
 	CCFlow *lastFlow=NULL;
 	/* Initialize OpenCV */
 	//VideoSource = NULL; //cvCaptureFromFile("test.avi");
-	//VideoSource = cvCaptureFromFile("test.avi");
-	VideoSource = cvCaptureFromCAM(0);
-	//CvVideoWriter *VideoDest = cvCreateVideoWriter("output.avi",CV_FOURCC('F','M','P','4'),settings->FrameRate,cvSize(640,480),1);
+	VideoSource = cvCaptureFromFile("test.avi");
+	//VideoSource = cvCaptureFromCAM(0);
+	CvVideoWriter *VideoDest = cvCreateVideoWriter("output.avi",CV_FOURCC('F','M','P','4'),settings->FrameRate,cvSize(640,480),1);
 
 	if (VideoSource) {
 		cvSetCaptureProperty(VideoSource, CV_CAP_PROP_FRAME_WIDTH,  settings->FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_X]);
@@ -150,9 +150,11 @@ void OpenCVslam::run() {
 				if (writeincrement+writeextra+1000<0) {
 					writeextra=-(writeincrement+1000);
 				}
-				//struct writeframestruct x={VideoDest,lastFrame};
-				//if (lastFrame) backgroundWriteFrame(x);
-				//fprintf(stderr,".");
+				if (VideoDest) {
+					struct writeframestruct x={VideoDest,lastFrame};
+					if (lastFrame) backgroundWriteFrame(x);
+					fprintf(stderr,".");
+				}
 			} else {
 				vTaskDelay(1/portTICK_RATE_MS);
 			}
@@ -164,9 +166,11 @@ void OpenCVslam::run() {
 					writeextra=-(writeincrement+1000);
 				}
 
-				//struct writeframestruct x={VideoDest,lastFrame};
-				//if (lastFrame) backgroundWriteFrame(x);
-				//fprintf(stderr,".");
+				if (VideoDest) {
+					struct writeframestruct x={VideoDest,lastFrame};
+					if (lastFrame) backgroundWriteFrame(x);
+					fprintf(stderr,".");
+				}
 			}
 
 		float dT = PIOS_DELAY_DiffuS(timeval) * 1.0e-6f;
@@ -228,7 +232,7 @@ void OpenCVslam::run() {
 			//currentFlow = new CCFlow(&rng, last,current,5,Vec3f(0,0,1000),lastFlow);
 			currentFlow = new CCFlow(&rng, last,current,4,Vec3f(0,0,1000),lastFlow);
 			iterations += currentFlow->iterations;
-			fprintf(stderr,"rotation: %f degrees,\tx: %f\ty: %f\t  %f > %f\t checks: %i avg: %f\n",currentFlow->rotation,currentFlow->translation[0],currentFlow->translation[1],currentFlow->best,currentFlow->worst, currentFlow->iterations, (float)iterations/frame);
+			//fprintf(stderr,"rotation: %f degrees,\tx: %f\ty: %f\t  %f > %f\t checks: %i avg: %f\n",currentFlow->rotation,currentFlow->translation[0],currentFlow->translation[1],currentFlow->best,currentFlow->worst, currentFlow->iterations, (float)iterations/frame);
 			//vPortEnterCritical();
 			//calcOpticalFlowFarneback(x1,x2, flow, 0.5, 3, 9, 9, 5, 1.1, 0);
 			//calcOpticalFlowFarneback(x1,x2, flow, 0.5, 4, 13, 1, 5, 1.1, 0);
@@ -267,7 +271,7 @@ void OpenCVslam::run() {
 			CvPoint left = cvPoint(center.x-right.x,center.y-right.y);
 			right.x += center.x;
 			right.y += center.y;
-			cvLine(lastFrame,left,right,CV_RGB(255,255,0),3,8,0);
+			//cvLine(lastFrame,left,right,CV_RGB(255,255,0),3,8,0);
 			center = cvPoint(settings->FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_X]/2,settings->FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_Y]/2);
 			if (currentFlow) {
 				cvLine(lastFrame,center,cvPoint(center.x+(currentFlow->translation[0])*32,center.y+(currentFlow->translation[1])*32),CV_RGB(255,0,0),2,8,0);
@@ -277,7 +281,7 @@ void OpenCVslam::run() {
 				int div=Mat(currentFrame).rows/2;
 				for (int y = 8; y<Mat(currentFrame).rows; y+=16 ) {
 					for (int x = 8; x<Mat(currentFrame).cols; x+=16 ) {
-						TransRot bla = currentFlow->transrotation(Point3f(x,y,5));
+						TransRot bla = currentFlow->transrotationSmoothed(Point3f(x,y,5));
 						cvLine(lastFrame,cvPoint(x,y),cvPoint(x+bla[0],y+bla[1]),CV_RGB(0,255,0),1,8,0);
 					}
 				}

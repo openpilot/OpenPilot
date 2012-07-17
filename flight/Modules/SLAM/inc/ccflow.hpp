@@ -49,6 +49,8 @@
 
 #define CC_BORDERWIDTH 1
 
+#define CC_QUALITYMARGIN 100
+
 typedef cv::Vec3f TransRot;
 
 class CCFlow {
@@ -65,6 +67,8 @@ public:
 	TransRot transrotation();
 	TransRot transrotation(cv:: Point3f position);
 	TransRot transrotation(cv:: Point2f position);
+	CCFlow* responsibleFlow(cv:: Point3f position);
+	TransRot transrotationSmoothed(cv:: Point3f position);
 
 	// finds the best transrotation between two templates of equal size via particle filter approach
 	void particleMatch(cv::Mat test, cv::Mat reference, int particleNum, int generations, int stepFactor, TransRot initial, TransRot initialRange);
@@ -93,7 +97,7 @@ private:
 	cv::Vec4i border;
 	cv::RNG *rng;
 	cv::Mat debug;
-	int mydepth,maxdepth;
+	int mydepth,maxdepth,width,height;
 
 	cv::Point2f center;
 	cv::Point2f corners[4];

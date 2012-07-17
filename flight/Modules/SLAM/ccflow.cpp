@@ -55,13 +55,15 @@ CCFlow::CCFlow(cv::RNG *rnginit, cv::Mat* last[], cv::Mat* current[], int pyrami
 	//tr = Vec3f(0,0,0);
 	Mat ref=(*current[mydepth])(Rect(border[0], border[1], current[mydepth]->cols-(border[0]+border[2]), current[mydepth]->rows-(border[1]+border[3])));
 	Mat tst=(*last[mydepth])(Rect(border[0], border[1], last[mydepth]->cols-(border[0]+border[2]), last[mydepth]->rows-(border[1]+border[3])));
+	width  = ref.cols;
+	height = ref.rows;
 
-fprintf(stderr,"Doing subcheck on level %i subsize %i,%i of %i,%i from %i,%i to %i,%i\n",
+/*fprintf(stderr,"Doing subcheck on level %i subsize %i,%i of %i,%i from %i,%i to %i,%i\n",
 	depth,
 	ref.cols,ref.rows,
 	current[mydepth]->cols,current[mydepth]->rows,
 	border[0],border[1],
-	current[mydepth]->cols-border[2],current[mydepth]->rows-border[3]);
+	current[mydepth]->cols-border[2],current[mydepth]->rows-border[3]);*/
 
 
 
@@ -74,6 +76,10 @@ fprintf(stderr,"Doing subcheck on level %i subsize %i,%i of %i,%i from %i,%i to 
 		gradientMatch(tst,ref,50,tr,Vec3f(1,1,1));
 	} else {
 		gradientMatch(tst,ref,20,tr,Vec3f(0.5,0.5,0.1));
+	}
+	if (worst-best < CC_QUALITYMARGIN && estTransrotation[2]<999 ) {
+		translation=Vec2f(estTransrotation[0],estTransrotation[1]);
+		rotation=estTransrotation[2];
 	}
 
 	center = Point2f(
@@ -147,8 +153,8 @@ TransRot CCFlow::transrotation(cv:: Point2f position) {
 	return transrotation(Point3f(position.x,position.y,maxdepth-1));
 }
 
-// return local flow of the given flow segment
-TransRot CCFlow::transrotation(cv:: Point3f position) {
+
+CCFlow* CCFlow::responsibleFlow(cv:: Point3f position) {
 	Point2f pos(position.x,position.y);
 	int depth = position.z;
 	// calculate which subdivision is responsible
@@ -158,37 +164,89 @@ TransRot CCFlow::transrotation(cv:: Point3f position) {
 		}
 		if (pos.y<center.y) {
 			if (pos.x<center.x) {
-				return children[0]->transrotation(position);
+				return children[0]->responsibleFlow(position);
 			} else {
-				return children[1]->transrotation(position);
+				return children[1]->responsibleFlow(position);
 			}
 		} else {
 			if (pos.x<center.x) {
-				return children[2]->transrotation(position);
+				return children[2]->responsibleFlow(position);
 			} else {
-				return children[3]->transrotation(position);
+				return children[3]->responsibleFlow(position);
 			}
 		}
 	} else {
-		// we are responsible
-		// adjust position for correct scale (even if the flow hasnt bee calculatd to that scale)
-		int disp=1;
-		for (int t=mydepth; t<depth; t++) {
-			pos = pos * 0.5;
-			disp *=2;
-		}
-		Mat rotMatrix = getRotationMatrix2D(center,rotation,1.0f);
-		rotMatrix.at<double>(0,2)+=translation[0];
-		rotMatrix.at<double>(1,2)+=translation[1];
-		double * m = (double*)rotMatrix.data;
-		Point2f source(
-			m[0]*pos.x + m[1]*pos.y + m[2],
-			m[3]*pos.x + m[4]*pos.y + m[5]
-			);
-
-		Point2f trans(source-pos);
-		return Vec3f(disp*trans.x,disp*trans.y,rotation);
+		return this;
 	}
+}
+
+TransRot CCFlow::transrotationSmoothed(cv:: Point3f position) {
+	CCFlow* ref = responsibleFlow(position);
+	Point2f pos(position.x,position.y);
+	int depth = position.z;
+	int disp=1;
+	// correct scale to find out tile size
+	for (int t=ref->mydepth; t<depth; t++) {
+		pos = pos * 0.5;
+		disp *=2;
+	}
+	Point2f xpos(pos.x-(ref->width/2),pos.y-(ref->height/2));
+	CCFlow* A1 = responsibleFlow(Point3f(xpos.x,xpos.y,ref->mydepth));
+	CCFlow* A2 = responsibleFlow(Point3f(xpos.x+ref->width,xpos.y,ref->mydepth));
+	CCFlow* B1 = responsibleFlow(Point3f(xpos.x,xpos.y+ref->height,ref->mydepth));
+	CCFlow* B2 = responsibleFlow(Point3f(xpos.x+ref->width,xpos.y+ref->height,ref->mydepth));
+	float tx = (xpos.x-A1->border[0])/ref->width;
+	float ty = (xpos.y-A1->border[1])/ref->height;
+	//fprintf(stderr, " tx,tz %f,%f\n",tx,ty);
+	if (tx<0) tx=0;
+	if (tx>1) tx=1;
+	if (ty<0) ty=0;
+	if (ty>1) ty=1;
+	TransRot a = (1-tx)*TransRot(A1->translation[0],A1->translation[1],A1->rotation) + tx*TransRot(A2->translation[0],A2->translation[1],A2->rotation);
+	TransRot b = (1-tx)*TransRot(B1->translation[0],B1->translation[1],B1->rotation) + tx*TransRot(B2->translation[0],B2->translation[1],B2->rotation);
+	TransRot c = (1-ty)*a + ty*b;
+	Point2f cn((1-tx)*A1->center.x + tx*B2->center.x,(1-ty)*A1->center.y + ty*B2->center.y);
+	Mat rotMatrix = getRotationMatrix2D(cn,c[2],1.0f);
+	rotMatrix.at<double>(0,2)+=c[0];
+	rotMatrix.at<double>(1,2)+=c[1];
+	double * m = (double*)rotMatrix.data;
+	Point2f source(
+		m[0]*pos.x + m[1]*pos.y + m[2],
+		m[3]*pos.x + m[4]*pos.y + m[5]
+		);
+
+	Point2f trans(source-pos);
+	return Vec3f(disp*trans.x,disp*trans.y,c[2]);
+
+}
+
+// return local flow of the given flow segment
+TransRot CCFlow::transrotation(cv:: Point3f position) {
+	// make sure we are esponsible
+	CCFlow* r=responsibleFlow(position);
+	if (this!=r) return r->transrotation(position);
+
+	Point2f pos(position.x,position.y);
+	int depth = position.z;
+
+	// we are responsible
+	// adjust position for correct scale (even if the flow hasnt bee calculatd to that scale)
+	int disp=1;
+	for (int t=mydepth; t<depth; t++) {
+		pos = pos * 0.5;
+		disp *=2;
+	}
+	Mat rotMatrix = getRotationMatrix2D(center,rotation,1.0f);
+	rotMatrix.at<double>(0,2)+=translation[0];
+	rotMatrix.at<double>(1,2)+=translation[1];
+	double * m = (double*)rotMatrix.data;
+	Point2f source(
+		m[0]*pos.x + m[1]*pos.y + m[2],
+		m[3]*pos.x + m[4]*pos.y + m[5]
+		);
+
+	Point2f trans(source-pos);
+	return Vec3f(disp*trans.x,disp*trans.y,rotation);
 }
 
 

@@ -48,7 +48,7 @@ struct pios_overo_cfg {
 
 struct pios_overo_dev {
 	const struct pios_overo_cfg * cfg;
-	void (*callback) (uint8_t, uint8_t);
+	void (*callback) (uint32_t);
 	uint32_t new_tx_buffer;
 	uint32_t new_rx_buffer;
 };

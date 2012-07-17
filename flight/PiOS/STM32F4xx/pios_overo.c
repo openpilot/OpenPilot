@@ -251,34 +251,55 @@ void PIOS_OVERO_NSS_IRQHandler()
 	   DMA_GetCurrDataCounter(overo_dev->cfg->dma.rx.channel))
 		error_counter++;
 
-	// Activate the new buffer
-	DMA_MemoryTargetConfig(overo_dev->cfg->dma.tx.channel, overo_dev->new_tx_buffer, DMA_Memory_0);
-	DMA_MemoryTargetConfig(overo_dev->cfg->dma.rx.channel, overo_dev->new_rx_buffer, DMA_Memory_0);
-
-	// Enable DMA, Slave first
-	DMA_SetCurrDataCounter(overo_dev->cfg->dma.tx.channel, PACKET_SIZE);
-	DMA_SetCurrDataCounter(overo_dev->cfg->dma.rx.channel, PACKET_SIZE);
-	
-	/* Reenable the SPI peripheral */
-	SPI_Cmd(overo_dev->cfg->regs, ENABLE);
+	/* Disable and initialize the SPI peripheral */
+	SPI_DeInit(overo_dev->cfg->regs);
+	SPI_Init(overo_dev->cfg->regs, (SPI_InitTypeDef*)&(overo_dev->cfg->init));
+	SPI_Cmd(overo_dev->cfg->regs, DISABLE);
 
 	/* Enable SPI interrupts to DMA */
-	SPI_I2S_DMACmd(overo_dev->cfg->regs, SPI_I2S_DMAReq_Tx, ENABLE);
-	SPI_I2S_DMACmd(overo_dev->cfg->regs, SPI_I2S_DMAReq_Rx, ENABLE);
+	SPI_I2S_DMACmd(overo_dev->cfg->regs, SPI_I2S_DMAReq_Tx | SPI_I2S_DMAReq_Rx, ENABLE);
 
+	/* Reinit the DMA channels */
+	DMA_InitTypeDef dma_init;
+
+	DMA_DeInit(overo_dev->cfg->dma.rx.channel);
+	dma_init = overo_dev->cfg->dma.rx.init;
+	if (overo_dev->new_rx_buffer) {
+		/* Enable memory addr. increment - bytes written into receive buffer */
+		dma_init.DMA_Memory0BaseAddr = (uint32_t) overo_dev->new_rx_buffer;
+		dma_init.DMA_MemoryInc = DMA_MemoryInc_Enable;
+		dma_init.DMA_BufferSize = PACKET_SIZE;
+	}
+	DMA_Init(overo_dev->cfg->dma.rx.channel, &(dma_init));
+
+	DMA_DeInit(overo_dev->cfg->dma.tx.channel);
+	dma_init = overo_dev->cfg->dma.tx.init;
+	if (overo_dev->new_tx_buffer) {
+		/* Enable memory addr. increment - bytes written into receive buffer */
+		dma_init.DMA_Memory0BaseAddr = (uint32_t) overo_dev->new_tx_buffer;
+		dma_init.DMA_MemoryInc = DMA_MemoryInc_Enable;
+		dma_init.DMA_BufferSize = PACKET_SIZE;
+	}
+	DMA_Init(overo_dev->cfg->dma.tx.channel, &(dma_init));
+	
+	/* Make sure to flush out the receive buffer */
+	(void)SPI_I2S_ReceiveData(overo_dev->cfg->regs);
+	
 	/* Enable the DMA endpoints for valid buffers */
 	if(overo_dev->new_rx_buffer)
 		DMA_Cmd(overo_dev->cfg->dma.rx.channel, ENABLE);
 	if(overo_dev->new_tx_buffer)
 		DMA_Cmd(overo_dev->cfg->dma.tx.channel, ENABLE);
 
+	/* Reenable the SPI peripheral */
+	SPI_Cmd(overo_dev->cfg->regs, ENABLE);
+	
 	/* Indicate these buffers have been used */
 	overo_dev->new_tx_buffer = 0;
 	overo_dev->new_rx_buffer = 0;
 
 	if (overo_dev->callback != NULL)
-		overo_dev->callback(true, true);
-
+		overo_dev->callback(error_counter);
 }
 
 #endif

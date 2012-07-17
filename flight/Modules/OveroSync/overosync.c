@@ -55,7 +55,7 @@ static bool overoEnabled;
 // Private functions
 static void overoSyncTask(void *parameters);
 static int32_t packData(uint8_t * data, int32_t length);
-static void transmitDataDone();
+static void transmitDataDone(uint32_t error_counter);
 static void registerObject(UAVObjHandle obj);
 
 struct dma_transaction {
@@ -75,6 +75,7 @@ struct overosync {
 	uint32_t failed_objects;
 	uint32_t received_objects;
 	uint32_t framesync_error;
+	uint32_t underrun_error;
 };
 
 struct overosync *overosync;
@@ -131,7 +132,7 @@ int32_t OveroSyncStart(void)
 	if(overosync == NULL)
 		return -1;
 
-	overosync->buffer_lock = xSemaphoreCreateMutex();
+		overosync->buffer_lock = xSemaphoreCreateMutex();
 	if(overosync->buffer_lock == NULL)
 		return -1;
 
@@ -218,6 +219,7 @@ static void overoSyncTask(void *parameters)
 				syncStats.DroppedUpdates = overosync->failed_objects;
 				syncStats.FramesyncErrors = overosync->framesync_error;
 				syncStats.Packets = overosync->packets;
+				syncStats.UnderrunErrors = overosync->underrun_error;
 				OveroSyncStatsSet(&syncStats);
 				overosync->failed_objects = 0;
 				overosync->sent_bytes = 0;
@@ -268,7 +270,7 @@ static int32_t packData(uint8_t * data, int32_t length)
 /**
  * Callback from the overo spi driver at the end of each packet
  */
-static void transmitDataDone()
+static void transmitDataDone(uint32_t error_counter)
 {
 	uint8_t *tx_buffer, *rx_buffer;
 
@@ -298,6 +300,7 @@ static void transmitDataDone()
 	memset(overosync->transactions[overosync->loading_transaction_id].tx_buffer, 0xff, 
 		   sizeof(overosync->transactions[overosync->loading_transaction_id].tx_buffer));
 	overosync->write_pointer = 0;
+	overosync->underrun_error = error_counter;
 }
 
 /**

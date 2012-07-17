@@ -54,7 +54,8 @@ struct pios_overo_dev {
 };
 
 extern int32_t PIOS_Overo_Init(const struct pios_overo_cfg * cfg);
-extern int32_t PIOS_Overo_SetNewBuffer(const uint8_t *send_buffer, uint8_t *receive_buffer, uint16_t len, void *callback);
+extern int32_t PIOS_Overo_SetCallback(void *callback);
+extern int32_t PIOS_Overo_SetNewBuffer(const uint8_t *send_buffer, uint8_t *receive_buffer, uint16_t len);
 
 #endif /* PIOS_OVERO_H */
 

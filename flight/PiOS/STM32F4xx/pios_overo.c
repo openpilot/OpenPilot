@@ -103,8 +103,6 @@ struct pios_overo_dev * overo_dev;
 */
 int32_t PIOS_Overo_Init(const struct pios_overo_cfg * cfg)
 {
-	uint32_t	init_ssel = 0;
-
 	PIOS_Assert(cfg);
 
 	overo_dev = (struct pios_overo_dev *) PIOS_OVERO_alloc();
@@ -122,27 +120,23 @@ int32_t PIOS_Overo_Init(const struct pios_overo_cfg * cfg)
 
 	/* only legal for single-slave config */
 	PIOS_Assert(overo_dev->cfg->slave_count == 1);
-	init_ssel = 1;
 	SPI_SSOutputCmd(overo_dev->cfg->regs, (overo_dev->cfg->init.SPI_Mode == SPI_Mode_Master) ? ENABLE : DISABLE);
 
 	/* Initialize the GPIO pins */
 	/* note __builtin_ctz() due to the difference between GPIO_PinX and GPIO_PinSourceX */
-	if (overo_dev->cfg->remap) {
-		GPIO_PinAFConfig(overo_dev->cfg->sclk.gpio,
-				__builtin_ctz(overo_dev->cfg->sclk.init.GPIO_Pin),
-				overo_dev->cfg->remap);
-		GPIO_PinAFConfig(overo_dev->cfg->mosi.gpio,
-				__builtin_ctz(overo_dev->cfg->mosi.init.GPIO_Pin),
-				overo_dev->cfg->remap);
-		GPIO_PinAFConfig(overo_dev->cfg->miso.gpio,
-				__builtin_ctz(overo_dev->cfg->miso.init.GPIO_Pin),
-				overo_dev->cfg->remap);
-		for (uint32_t i = 0; i < init_ssel; i++) {
-			GPIO_PinAFConfig(overo_dev->cfg->ssel[i].gpio,
-					__builtin_ctz(overo_dev->cfg->ssel[i].init.GPIO_Pin),
-					overo_dev->cfg->remap);
-		}
-	}
+	GPIO_PinAFConfig(overo_dev->cfg->sclk.gpio,
+					 __builtin_ctz(overo_dev->cfg->sclk.init.GPIO_Pin),
+					 overo_dev->cfg->remap);
+	GPIO_PinAFConfig(overo_dev->cfg->mosi.gpio,
+					 __builtin_ctz(overo_dev->cfg->mosi.init.GPIO_Pin),
+					 overo_dev->cfg->remap);
+	GPIO_PinAFConfig(overo_dev->cfg->miso.gpio,
+					 __builtin_ctz(overo_dev->cfg->miso.init.GPIO_Pin),
+					 overo_dev->cfg->remap);
+	GPIO_PinAFConfig(overo_dev->cfg->ssel[0].gpio,
+					 __builtin_ctz(overo_dev->cfg->ssel[0].init.GPIO_Pin),
+					 overo_dev->cfg->remap);
+
 	GPIO_Init(overo_dev->cfg->sclk.gpio, (GPIO_InitTypeDef*)&(overo_dev->cfg->sclk.init));
 	GPIO_Init(overo_dev->cfg->mosi.gpio, (GPIO_InitTypeDef*)&(overo_dev->cfg->mosi.init));
 	GPIO_Init(overo_dev->cfg->miso.gpio, (GPIO_InitTypeDef*)&(overo_dev->cfg->miso.init));
@@ -202,7 +196,7 @@ out_fail:
  * \return -1 if disabled SPI port selected
  * \return -3 if function has been called during an ongoing DMA transfer
  */
-int32_t PIOS_Overo_SetNewBuffer(const uint8_t *send_buffer, uint8_t *receive_buffer, uint16_t len, void *callback)
+int32_t PIOS_Overo_SetNewBuffer(const uint8_t *send_buffer, uint8_t *receive_buffer, uint16_t len)
 {
 	bool valid = PIOS_OVERO_validate(overo_dev);
 	PIOS_Assert(valid)
@@ -212,11 +206,17 @@ int32_t PIOS_Overo_SetNewBuffer(const uint8_t *send_buffer, uint8_t *receive_buf
 	overo_dev->new_tx_buffer = (uint32_t) send_buffer;
 	overo_dev->new_rx_buffer = (uint32_t) receive_buffer;
 
-	/* Set callback function */
-	overo_dev->callback = callback;
-
 	/* No error */
 	return overrun ? -1 : 0;
+}
+
+/**
+ * Set the callback function
+ */
+int32_t PIOS_Overo_SetCallback(void *callback)
+{
+	overo_dev->callback = callback;
+	return 0;
 }
 
 /**

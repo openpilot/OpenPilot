@@ -49,17 +49,12 @@ struct pios_overo_cfg {
 struct pios_overo_dev {
 	const struct pios_overo_cfg * cfg;
 	void (*callback) (uint8_t, uint8_t);
-	uint8_t tx_dummy_byte;
-	uint8_t rx_dummy_byte;
-#if defined(PIOS_INCLUDE_FREERTOS)
-	xSemaphoreHandle busy;
-#else
-	uint8_t busy;
-#endif
+	uint32_t new_tx_buffer;
+	uint32_t new_rx_buffer;
 };
 
-extern int32_t PIOS_OVERO_Init(uint32_t * overo_id, const struct pios_overo_cfg * cfg);
-extern int32_t PIOS_OVERO_SwapBuffer(uint32_t overo_id, const uint8_t *send_buffer, uint8_t *receive_buffer, uint16_t len, void *callback);
+extern int32_t PIOS_Overo_Init(const struct pios_overo_cfg * cfg);
+extern int32_t PIOS_Overo_SetNewBuffer(const uint8_t *send_buffer, uint8_t *receive_buffer, uint16_t len, void *callback);
 
 #endif /* PIOS_OVERO_H */
 

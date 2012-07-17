@@ -58,8 +58,6 @@ static int32_t packData(uint8_t * data, int32_t length);
 static int32_t transmitData();
 static void transmitDataDone(bool crc_ok, uint8_t crc_val);
 static void registerObject(UAVObjHandle obj);
-// External variables
-extern int32_t pios_spi_overo_id;
 
 struct dma_transaction {
 	uint8_t tx_buffer[OVEROSYNC_PACKET_SIZE] __attribute__ ((aligned(4)));
@@ -83,55 +81,6 @@ struct overosync {
 
 struct overosync *overosync;
 
-static void PIOS_OVERO_IRQHandler();
-
-static const struct pios_exti_cfg pios_exti_overo_cfg __exti_config = {
-	.vector = PIOS_OVERO_IRQHandler,
-	.line = EXTI_Line15,
-	.pin = {
-		.gpio = GPIOA,
-		.init = {
-			.GPIO_Pin = GPIO_Pin_15,
-			.GPIO_Speed = GPIO_Speed_100MHz,
-			.GPIO_Mode = GPIO_Mode_IN,
-			.GPIO_OType = GPIO_OType_OD,
-			.GPIO_PuPd = GPIO_PuPd_NOPULL,
-		},
-	},
-	.irq = {
-		.init = {
-			.NVIC_IRQChannel = EXTI15_10_IRQn,
-			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
-			.NVIC_IRQChannelSubPriority = 0,
-			.NVIC_IRQChannelCmd = ENABLE,
-		},
-	},
-	.exti = {
-		.init = {
-			.EXTI_Line = EXTI_Line15, // matches above GPIO pin
-			.EXTI_Mode = EXTI_Mode_Interrupt,
-			.EXTI_Trigger = EXTI_Trigger_Rising,
-			.EXTI_LineCmd = ENABLE,
-		},
-	},
-};
-
-/**
- * On the rising edge of NSS schedule a new transaction.  This cannot be
- * done by the DMA complete because there is 150 us between that and the
- * Overo deasserting the CS line.  We don't want to spin that long in an
- * isr
- */
-void PIOS_OVERO_IRQHandler()
-{
-	// transmitData must not block to get semaphore for when we get out of
-	// frame and transaction is still running here.  -1 indicates the transaction
-	// semaphore is blocked and we are still in a transaction, thus a framesync
-	// error occurred.  This shouldn't happen.  Race condition?
-	if(transmitData() == -1)
-		overosync->framesync_error++;
-}
-
 /**
  * Initialise the telemetry module
  * \return -1 if initialisation failed
@@ -139,8 +88,6 @@ void PIOS_OVERO_IRQHandler()
  */
 int32_t OveroSyncInitialize(void)
 {
-	if(pios_spi_overo_id == 0)
-		return -1;
 
 #ifdef MODULE_OVERO_BUILTIN
 	overoEnabled = true;
@@ -161,7 +108,6 @@ int32_t OveroSyncInitialize(void)
 	
 	OveroSyncStatsInitialize();
 
-	PIOS_EXTI_Init(&pios_exti_overo_cfg);
 	// Create object queues
 	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
 
@@ -183,9 +129,6 @@ int32_t OveroSyncStart(void)
 		return -1;
 	}
 	
-	if(pios_spi_overo_id == 0)
-		return -1;
-
 	overosync = (struct overosync *) pvPortMalloc(sizeof(*overosync));
 	if(overosync == NULL)
 		return -1;
@@ -302,8 +245,8 @@ static void transmitDataDone(bool crc_ok, uint8_t crc_val)
 	overosync->transaction_done = true;
 	
 	// Parse the data from overo
-	for (uint32_t i = 0; rx_buffer[0] != 0 && i < sizeof(rx_buffer) ; i++)
-		UAVTalkProcessInputStream(uavTalkCon, rx_buffer[i]);
+	//for (uint32_t i = 0; rx_buffer[0] != 0 && i < sizeof(rx_buffer) ; i++)
+	//	UAVTalkProcessInputStream(uavTalkCon, rx_buffer[i]);
 }
 
 /**
@@ -393,7 +336,7 @@ static int32_t transmitData()
 	xSemaphoreGiveFromISR(overosync->buffer_lock, &xHigherPriorityTaskWoken);
 	portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 
-	return PIOS_SPI_TransferBlock(pios_spi_overo_id, (uint8_t *) tx_buffer, (uint8_t *) rx_buffer, sizeof(overosync->transactions[overosync->active_transaction_id].tx_buffer), &transmitDataDone) == 0 ? 0 : -3;
+	return PIOS_Overo_SetNewBuffer((uint8_t *) tx_buffer, (uint8_t *) rx_buffer, sizeof(overosync->transactions[overosync->active_transaction_id].tx_buffer), &transmitDataDone) == 0 ? 0 : -3;
 }
 
 /**

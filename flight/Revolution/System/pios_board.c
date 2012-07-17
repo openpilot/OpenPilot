@@ -404,7 +404,7 @@ void PIOS_Board_Init(void) {
 	
 #if defined(PIOS_OVERO_SPI)
 	/* Set up the SPI interface to the gyro */
-	if (PIOS_SPI_Init(&pios_spi_overo_id, &pios_spi_overo_cfg)) {
+	if (PIOS_Overo_Init(&pios_overo_cfg)) {
 		PIOS_DEBUG_Assert(0);
 	}
 #endif

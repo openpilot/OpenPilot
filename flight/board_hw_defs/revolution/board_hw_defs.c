@@ -451,10 +451,7 @@ void PIOS_SPI_flash_irq_handler(void)
 /* SPI3 Interface
  *      - Used for flash communications
  */
-void PIOS_SPI_overo_irq_handler(void);
-void DMA1_Stream0_IRQHandler(void) __attribute__((alias("PIOS_SPI_overo_irq_handler")));
-void DMA1_Stream7_IRQHandler(void) __attribute__((alias("PIOS_SPI_overo_irq_handler")));
-static const struct pios_spi_cfg pios_spi_overo_cfg = {
+static const struct pios_overo_cfg pios_overo_cfg = {
 	.regs = SPI3,
 	.remap = GPIO_AF_SPI3,
 	.init = {
@@ -469,18 +466,7 @@ static const struct pios_spi_cfg pios_spi_overo_cfg = {
 		.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_2,
 	},
 	.use_crc = false,
-	.dma = {
-		.irq = {
-			// Note this is the stream ID that triggers interrupts (in this case RX)
-			.flags = (DMA_IT_TCIF0 | DMA_IT_TEIF0 | DMA_IT_HTIF0),
-			.init = {
-				.NVIC_IRQChannel = DMA1_Stream0_IRQn,
-				.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
-				.NVIC_IRQChannelSubPriority = 0,
-				.NVIC_IRQChannelCmd = ENABLE,
-			},
-		},
-		
+	.dma = {		
 		.rx = {
 			.channel = DMA1_Stream0,
 			.init = {
@@ -562,12 +548,6 @@ static const struct pios_spi_cfg pios_spi_overo_cfg = {
 	} },
 };
 
-uint32_t pios_spi_overo_id;
-void PIOS_SPI_overo_irq_handler(void)
-{
-	/* Call into the generic code to handle the IRQ for this specific device */
-	PIOS_SPI_IRQ_Handler(pios_spi_overo_id);
-}
 #else
 uint32_t pios_spi_overo_id = 0;
 #endif /* PIOS_OVERO_SPI */

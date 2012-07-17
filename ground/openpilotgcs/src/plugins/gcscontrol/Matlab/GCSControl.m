@@ -1,3 +1,22 @@
+% GCSCONTROL
+%  This class allows the user to send 4-axis stick commands to OpenPilot
+%  GCS.
+%
+% Create class by
+%    control = GCSControl
+%
+% Open connection by 
+%    control.connect('01.23.45.67', 89)
+% where the first value is the IP address of the computer running GCS and
+% the second value is the port on which GCS is listening.
+%
+% Send command by
+%    control.command(pitch, yaw, roll, throttle)
+% where all variables are between [-1,1]
+%
+% Close connection by
+%    control.close()
+
 classdef GCSControl < handle
     
     properties

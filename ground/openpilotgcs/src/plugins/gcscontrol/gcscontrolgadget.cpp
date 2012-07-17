@@ -169,7 +169,6 @@ void GCSControlGadget::sticksChangedLocally(double leftX, double leftY, double r
         newThrottle = leftY;
         break;
     }
-    newThrottle = (newThrottle + 1)/2.0;
 
     //check if buttons have control over this axis... if so don't update it
     int buttonRollControl=0;

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>828</width>
+    <width>839</width>
     <height>1007</height>
    </rect>
   </property>
@@ -28,10 +28,74 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0">
        <property name="margin">
-        <number>12</number>
+        <number>0</number>
        </property>
        <item>
         <widget class="QScrollArea" name="scrollArea">
+         <property name="palette">
+          <palette>
+           <active>
+            <colorrole role="Base">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>255</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Window">
+             <brush brushstyle="SolidPattern">
+              <color alpha="0">
+               <red>232</red>
+               <green>232</green>
+               <blue>232</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </active>
+           <inactive>
+            <colorrole role="Base">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>255</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Window">
+             <brush brushstyle="SolidPattern">
+              <color alpha="0">
+               <red>232</red>
+               <green>232</green>
+               <blue>232</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </inactive>
+           <disabled>
+            <colorrole role="Base">
+             <brush brushstyle="SolidPattern">
+              <color alpha="0">
+               <red>232</red>
+               <green>232</green>
+               <blue>232</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Window">
+             <brush brushstyle="SolidPattern">
+              <color alpha="0">
+               <red>232</red>
+               <green>232</green>
+               <blue>232</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </disabled>
+          </palette>
+         </property>
          <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
          </property>
@@ -43,8 +107,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>782</width>
-            <height>835</height>
+            <width>809</width>
+            <height>874</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_12">
@@ -77,7 +141,7 @@
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>40</width>
+                 <width>20</width>
                  <height>20</height>
                 </size>
                </property>
@@ -95,7 +159,7 @@
            <item>
             <widget class="QStackedWidget" name="airframesWidget">
              <property name="currentIndex">
-              <number>0</number>
+              <number>1</number>
              </property>
              <widget class="QWidget" name="fixedWing">
               <property name="enabled">
@@ -138,7 +202,7 @@
                      </property>
                      <property name="sizeHint" stdset="0">
                       <size>
-                       <width>40</width>
+                       <width>20</width>
                        <height>20</height>
                       </size>
                      </property>
@@ -642,9 +706,12 @@ margin:1px;</string>
                          <property name="orientation">
                           <enum>Qt::Horizontal</enum>
                          </property>
+                         <property name="sizeType">
+                          <enum>QSizePolicy::MinimumExpanding</enum>
+                         </property>
                          <property name="sizeHint" stdset="0">
                           <size>
-                           <width>40</width>
+                           <width>20</width>
                            <height>20</height>
                           </size>
                          </property>
@@ -888,8 +955,8 @@ margin:1px;</string>
                          </property>
                          <property name="minimumSize">
                           <size>
-                           <width>110</width>
-                           <height>110</height>
+                           <width>80</width>
+                           <height>80</height>
                           </size>
                          </property>
                          <property name="styleSheet">
@@ -912,9 +979,12 @@ margin:1px;</string>
                      <property name="orientation">
                       <enum>Qt::Horizontal</enum>
                      </property>
+                     <property name="sizeType">
+                      <enum>QSizePolicy::MinimumExpanding</enum>
+                     </property>
                      <property name="sizeHint" stdset="0">
                       <size>
-                       <width>40</width>
+                       <width>10</width>
                        <height>20</height>
                       </size>
                      </property>
@@ -922,6 +992,12 @@ margin:1px;</string>
                    </item>
                    <item>
                     <widget class="QGroupBox" name="groupBox_6">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
                      <property name="title">
                       <string>Throtte Curve</string>
                      </property>
@@ -952,8 +1028,8 @@ margin:1px;</string>
                         </property>
                         <property name="minimumSize">
                          <size>
-                          <width>120</width>
-                          <height>120</height>
+                          <width>80</width>
+                          <height>80</height>
                          </size>
                         </property>
                         <property name="styleSheet">
@@ -1339,9 +1415,12 @@ margin:1px;</string>
                      <property name="orientation">
                       <enum>Qt::Horizontal</enum>
                      </property>
+                     <property name="sizeType">
+                      <enum>QSizePolicy::MinimumExpanding</enum>
+                     </property>
                      <property name="sizeHint" stdset="0">
                       <size>
-                       <width>40</width>
+                       <width>20</width>
                        <height>20</height>
                       </size>
                      </property>
@@ -2513,17 +2592,75 @@ margin:1px;</string>
        <string>Advanced Settings</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_26">
-       <property name="leftMargin">
-        <number>12</number>
-       </property>
-       <property name="rightMargin">
-        <number>12</number>
-       </property>
-       <property name="bottomMargin">
-        <number>12</number>
+       <property name="margin">
+        <number>0</number>
        </property>
        <item>
         <widget class="QScrollArea" name="scrollArea_2">
+         <property name="palette">
+          <palette>
+           <active>
+            <colorrole role="Base">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>255</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Window">
+             <brush brushstyle="SolidPattern">
+              <color alpha="0">
+               <red>232</red>
+               <green>232</green>
+               <blue>232</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </active>
+           <inactive>
+            <colorrole role="Base">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>255</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Window">
+             <brush brushstyle="SolidPattern">
+              <color alpha="0">
+               <red>232</red>
+               <green>232</green>
+               <blue>232</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </inactive>
+           <disabled>
+            <colorrole role="Base">
+             <brush brushstyle="SolidPattern">
+              <color alpha="0">
+               <red>232</red>
+               <green>232</green>
+               <blue>232</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Window">
+             <brush brushstyle="SolidPattern">
+              <color alpha="0">
+               <red>232</red>
+               <green>232</green>
+               <blue>232</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </disabled>
+          </palette>
+         </property>
          <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
          </property>
@@ -2535,8 +2672,8 @@ margin:1px;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>249</width>
-            <height>303</height>
+            <width>809</width>
+            <height>874</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_25">
@@ -2883,9 +3020,12 @@ p, li { white-space: pre-wrap; }
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::MinimumExpanding</enum>
+          </property>
           <property name="sizeHint" stdset="0">
            <size>
-            <width>40</width>
+            <width>20</width>
             <height>20</height>
            </size>
           </property>

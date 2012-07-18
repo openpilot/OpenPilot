@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="autoFillBackground">
+   <bool>false</bool>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout_6">
    <property name="spacing">
     <number>12</number>
@@ -22,6 +25,9 @@
    </property>
    <item>
     <widget class="QTabWidget" name="tabWidget">
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
      <property name="currentIndex">
       <number>0</number>
      </property>
@@ -29,6 +35,9 @@
       <enum>Qt::ElideMiddle</enum>
      </property>
      <widget class="QWidget" name="CameraStabilization">
+      <property name="autoFillBackground">
+       <bool>false</bool>
+      </property>
       <attribute name="title">
        <string>Camera Stabilization</string>
       </attribute>
@@ -37,10 +46,74 @@
         <number>12</number>
        </property>
        <property name="margin">
-        <number>12</number>
+        <number>0</number>
        </property>
        <item>
         <widget class="QScrollArea" name="scrollArea">
+         <property name="palette">
+          <palette>
+           <active>
+            <colorrole role="Base">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>255</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Window">
+             <brush brushstyle="SolidPattern">
+              <color alpha="0">
+               <red>232</red>
+               <green>232</green>
+               <blue>232</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </active>
+           <inactive>
+            <colorrole role="Base">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>255</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Window">
+             <brush brushstyle="SolidPattern">
+              <color alpha="0">
+               <red>232</red>
+               <green>232</green>
+               <blue>232</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </inactive>
+           <disabled>
+            <colorrole role="Base">
+             <brush brushstyle="SolidPattern">
+              <color alpha="0">
+               <red>232</red>
+               <green>232</green>
+               <blue>232</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Window">
+             <brush brushstyle="SolidPattern">
+              <color alpha="0">
+               <red>232</red>
+               <green>232</green>
+               <blue>232</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </disabled>
+          </palette>
+         </property>
          <property name="autoFillBackground">
           <bool>false</bool>
          </property>
@@ -58,8 +131,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>766</width>
-            <height>622</height>
+            <width>790</width>
+            <height>646</height>
            </rect>
           </property>
           <property name="autoFillBackground">
@@ -764,6 +837,9 @@ value.</string>
    </item>
    <item>
     <widget class="QGroupBox" name="groupBox_3">
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
      <property name="title">
       <string>Messages</string>
      </property>
@@ -783,6 +859,9 @@ value.</string>
    </item>
    <item>
     <widget class="QGroupBox" name="groupBox_2">
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
      <property name="title">
       <string/>
      </property>

@@ -31,6 +31,8 @@
 #include <QtGui/QLabel>
 #include "manualcontrolcommand.h"
 
+#define UDP_PORT 2323
+
 class Ui_GCSControl;
 
 class GCSControlGadgetWidget : public QLabel
@@ -42,6 +44,8 @@ public:
     ~GCSControlGadgetWidget();
     void setGCSControl(bool newState);
     bool getGCSControl(void);
+    void setUDPControl(bool newState);
+    bool getUDPControl(void);
 
 signals:
     void sticksChanged(double leftX, double leftY, double rightX, double rightY);
@@ -59,6 +63,7 @@ protected slots:
     void toggleArmed(int state);
     void selectFlightMode(int state);
     void mccChanged(UAVObject *);
+    void toggleUDPControl(int state);
 
 private:
     Ui_GCSControl *m_gcscontrol;

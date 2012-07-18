@@ -34,6 +34,9 @@
 #include "sdlgamepad/sdlgamepad.h"
 #include <QTime>
 #include "gcscontrolplugin.h"
+#include <QUdpSocket>
+#include <QHostAddress>
+
 
 namespace Core {
 class IUAVGadget;
@@ -59,6 +62,7 @@ public:
 
 private:
     ManualControlCommand* getManualControlCommand();
+    double constrain(double value);
     QTime joystickTime;
     QWidget *m_widget;
     QList<int> m_context;
@@ -72,6 +76,8 @@ private:
     double bound(double input);
     double wrap(double input);
     bool channelReverse[8];
+    QUdpSocket *control_sock;
+
 
 signals:
     void sticksChangedRemotely(double leftX, double leftY, double rightX, double rightY);
@@ -79,6 +85,7 @@ signals:
 protected slots:
     void manualControlCommandUpdated(UAVObject *);
     void sticksChangedLocally(double leftX, double leftY, double rightX, double rightY);
+    void readUDPCommand();
 
     // signals from joystick
     void gamepads(quint8 count);

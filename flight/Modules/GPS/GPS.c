@@ -89,9 +89,6 @@ static char* gps_rx_buffer;
 
 static uint32_t timeOfLastCommandMs;
 static uint32_t timeOfLastUpdateMs;
-static uint32_t numUpdates;
-static uint32_t numChecksumErrors;
-static uint32_t numParsingErrors;
 
 // ****************
 /**
@@ -201,10 +198,6 @@ static void gpsTask(void *parameters)
 	uint8_t	gpsProtocol;
 
 	GPSSettingsDataProtocolGet(&gpsProtocol);
-
-	numUpdates = 0;
-	numChecksumErrors = 0;
-	numParsingErrors = 0;
 
 	timeOfLastUpdateMs = timeNowMs;
 	timeOfLastCommandMs = timeNowMs;

@@ -426,12 +426,15 @@ bool NMEA_update_position(char *nmea_sentence, GPSPositionData *GpsData)
 	if (!parser->handler(GpsData, &gpsDataUpdated, params, nbParams)) {
 		// Parse failed
 		DEBUG_MSG("PARSE FAILED (\"%s\")\n", params[0]);
+		if (gpsDataUpdated && (GpsData->Status == GPSPOSITION_STATUS_NOFIX)) {
+			GPSPositionSet(GpsData);
+		}
 		return false;
 	}
 
 
 	// All is fine :)  Update object if data has changed
-	if (gpsDataUpdated || (GpsData->Status == GPSPOSITION_STATUS_NOFIX)) {
+	if (gpsDataUpdated) {
 		#ifdef DEBUG_MGSID_IN
 			DEBUG_MSG("U");
 		#endif
@@ -469,6 +472,13 @@ static bool nmeaProcessGPGGA(GPSPositionData * GpsData, bool* gpsDataUpdated, ch
 
 	*gpsDataUpdated = true;
 
+	// check for invalid GPS fix
+	// do this first to make sure we get this information, even if later checks exit
+	// this function early
+	if (param[6][0] == '0') {
+		GpsData->Status = GPSPOSITION_STATUS_NOFIX; // treat invalid fix as NOFIX
+	}
+
 	// get latitude [DDMM.mmmmm] [N|S]
 	if (!NMEA_latlon_to_fixed_point(&GpsData->Latitude, param[2], param[3][0] == 'S')) {
 		return false;
@@ -479,12 +489,6 @@ static bool nmeaProcessGPGGA(GPSPositionData * GpsData, bool* gpsDataUpdated, ch
 		return false;
 	}
 
-
-	// check for invalid GPS fix
-	if (param[6][0] == '0') {
-		// return false;
-		GpsData->Status = GPSPOSITION_STATUS_NOFIX; // treat invalid fix as NOFIX
-	}
 	// get number of satellites used in GPS solution
 	GpsData->Satellites = atoi(param[7]);
 

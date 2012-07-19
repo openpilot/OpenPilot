@@ -44,8 +44,19 @@ static uint32_t gpsRxOverflow = 0;
 
 int parse_ubx_stream (uint8_t c, char *gps_rx_buffer, GPSPositionData *GpsData)
 {
-	enum proto_states {START,UBX_SY2,UBX_CLASS,UBX_ID,UBX_LEN1,
-		UBX_LEN2,UBX_PAYLOAD,UBX_CHK1,UBX_CHK2,FINISHED};
+	enum proto_states {
+		START,
+		UBX_SY2,
+		UBX_CLASS,
+		UBX_ID,
+		UBX_LEN1,
+		UBX_LEN2,
+		UBX_PAYLOAD,
+		UBX_CHK1,
+		UBX_CHK2,
+		FINISHED
+	};
+
 	static enum proto_states proto_state = START;
 	static uint8_t rx_count = 0;
 	struct UBXPacket *ubx = (struct UBXPacket *)gps_rx_buffer;
@@ -195,23 +206,6 @@ void parse_ubx_nav_posllh (struct UBX_NAV_POSLLH *posllh, GPSPositionData *GpsPo
 	}
 }
 
-void parse_ubx_nav_status (struct UBX_NAV_STATUS *status, GPSPositionData *GpsPosition)
-{
-#if 0 // we already get this info from NAV_SOL
-	if (check_msgtracker(status->iTOW, STATUS_RECEIVED)) {
-		switch (status->gpsFix)	{
-			case STATUS_GPSFIX_2DFIX:
-				GpsPosition->Status = GPSPOSITION_STATUS_FIX2D;
-				break;
-			case STATUS_GPSFIX_3DFIX:
-				GpsPosition->Status = GPSPOSITION_STATUS_FIX3D;
-				break;
-			default: GpsPosition->Status = GPSPOSITION_STATUS_NOFIX;
-		}
-	}
-#endif
-}
-
 void parse_ubx_nav_sol (struct UBX_NAV_SOL *sol, GPSPositionData *GpsPosition)
 {
 	if (check_msgtracker(sol->iTOW, SOL_RECEIVED)) {
@@ -318,9 +312,6 @@ uint32_t parse_ubx_message (struct UBXPacket *ubx, GPSPositionData *GpsPosition)
 			switch (ubx->header.id) {
 				case UBX_ID_POSLLH:
 					parse_ubx_nav_posllh (&ubx->payload.nav_posllh, GpsPosition);
-					break;
-				case UBX_ID_STATUS:
-					parse_ubx_nav_status (&ubx->payload.nav_status, GpsPosition);
 					break;
 				case UBX_ID_DOP:
 					parse_ubx_nav_dop (&ubx->payload.nav_dop, GpsPosition);

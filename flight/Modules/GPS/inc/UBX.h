@@ -32,6 +32,8 @@
 #define UBX_H
 #include "openpilot.h"
 #include "gpsposition.h"
+#include "gps.h"
+
 
 #define UBX_SYNC1						0xb5 // UBX protocol synchronization characters
 #define UBX_SYNC2						0x62
@@ -217,6 +219,6 @@ struct UBXPacket {
 
 bool checksum_ubx_message(struct UBXPacket *);
 uint32_t parse_ubx_message(struct UBXPacket *, GPSPositionData *);
-int  parse_ubx_stream(uint8_t, char *, GPSPositionData *);
+int  parse_ubx_stream(uint8_t, char *, GPSPositionData *, struct GPS_RX_STATS *);
 
 #endif /* UBX_H */

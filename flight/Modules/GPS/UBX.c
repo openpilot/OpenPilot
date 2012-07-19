@@ -36,13 +36,9 @@
 #include "UBX.h"
 #include "gps.h"
 
-static uint32_t gpsRxReceived = 0;
-static uint32_t gpsRxChkSumError = 0;
-static uint32_t gpsRxOverflow = 0;
-
 // parse incoming character stream for messages in UBX binary format
 
-int parse_ubx_stream (uint8_t c, char *gps_rx_buffer, GPSPositionData *GpsData)
+int parse_ubx_stream (uint8_t c, char *gps_rx_buffer, GPSPositionData *GpsData, struct GPS_RX_STATS *gpsRxStats)
 {
 	enum proto_states {
 		START,
@@ -87,7 +83,7 @@ int parse_ubx_stream (uint8_t c, char *gps_rx_buffer, GPSPositionData *GpsData)
 		case UBX_LEN2:
 			ubx->header.len += (c << 8);
 			if (ubx->header.len > sizeof(UBXPayload)) {
-				gpsRxOverflow++;
+				gpsRxStats->gpsRxOverflow++;
 				proto_state = START;
 			} else {
 				rx_count = 0;
@@ -100,7 +96,7 @@ int parse_ubx_stream (uint8_t c, char *gps_rx_buffer, GPSPositionData *GpsData)
 				if (++rx_count == ubx->header.len)
 					proto_state = UBX_CHK1;
 			} else {
-				gpsRxOverflow++;
+				gpsRxStats->gpsRxOverflow++;
 				proto_state = START;
 			}
 			break;
@@ -114,7 +110,7 @@ int parse_ubx_stream (uint8_t c, char *gps_rx_buffer, GPSPositionData *GpsData)
 				parse_ubx_message(ubx, GpsData);
 				proto_state = FINISHED;
 			} else {
-				gpsRxChkSumError++;
+				gpsRxStats->gpsRxChkSumError++;
 				proto_state = START;
 			}
 			break;
@@ -124,7 +120,7 @@ int parse_ubx_stream (uint8_t c, char *gps_rx_buffer, GPSPositionData *GpsData)
 	if (proto_state == START)
 		return PARSER_ERROR;	// parser couldn't use this byte
 	else if (proto_state == FINISHED) {
-		gpsRxReceived++;
+		gpsRxStats->gpsRxReceived++;
 		proto_state = START;
 		return PARSER_COMPLETE;	// message complete & processed
 	}

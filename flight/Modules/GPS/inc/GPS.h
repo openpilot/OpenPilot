@@ -45,6 +45,13 @@
 #define PARSER_INCOMPLETE	0 // parser needs more data to complete the message
 #define PARSER_COMPLETE	1 // parser has received a complete message and finished processing
 
+struct GPS_RX_STATS {
+	uint16_t gpsRxReceived;
+	uint16_t gpsRxChkSumError;
+	uint16_t gpsRxOverflow;
+	uint16_t gpsRxParserError;
+};
+
 int32_t GPSInitialize(void);
 
 #endif // GPS_H

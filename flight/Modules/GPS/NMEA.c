@@ -79,10 +79,6 @@ static bool nmeaProcessGPGSA(GPSPositionData * GpsData, bool* gpsDataUpdated, ch
 	static bool nmeaProcessGPGSV(GPSPositionData * GpsData, bool* gpsDataUpdated, char* param[], uint8_t nbParam);
 #endif //PIOS_GPS_MINIMAL
 
-static uint32_t numUpdates;
-static uint32_t numChecksumErrors;
-static uint32_t numParsingErrors;
-
 static struct nmea_parser nmea_parsers[] = {
 	{
 		.prefix = "GPGGA",
@@ -118,7 +114,7 @@ static struct nmea_parser nmea_parsers[] = {
 #endif //PIOS_GPS_MINIMAL
 };
 
-int parse_nmea_stream (uint8_t c, char *gps_rx_buffer, GPSPositionData *GpsData)
+int parse_nmea_stream (uint8_t c, char *gps_rx_buffer, GPSPositionData *GpsData, struct GPS_RX_STATS *gpsRxStats)
 {
 	static uint8_t rx_count = 0;
 	static bool start_flag = false;
@@ -139,7 +135,7 @@ int parse_nmea_stream (uint8_t c, char *gps_rx_buffer, GPSPositionData *GpsData)
 	{
 		// The buffer is already full and we haven't found a valid NMEA sentence.
 		// Flush the buffer and note the overflow event.
-//		gpsRxOverflow++;
+		gpsRxStats->gpsRxOverflow++;
 		start_flag = false;
 		found_cr = false;
 		rx_count = 0;
@@ -180,7 +176,7 @@ int parse_nmea_stream (uint8_t c, char *gps_rx_buffer, GPSPositionData *GpsData)
 		if (!NMEA_checksum(&gps_rx_buffer[1]))
 		{	// Invalid checksum.  May indicate dropped characters on Rx.
 			//PIOS_DEBUG_PinHigh(2);
-			++numChecksumErrors;
+			gpsRxStats->gpsRxChkSumError++;
 			//PIOS_DEBUG_PinLow(2);
 			return PARSER_ERROR;
 		}
@@ -188,11 +184,11 @@ int parse_nmea_stream (uint8_t c, char *gps_rx_buffer, GPSPositionData *GpsData)
 		{	// Valid checksum, use this packet to update the GPS position
 			if (!NMEA_update_position(&gps_rx_buffer[1], GpsData)) {
 				//PIOS_DEBUG_PinHigh(2);
-				++numParsingErrors;
+				gpsRxStats->gpsRxParserError++;
 				//PIOS_DEBUG_PinLow(2);
 			}
 			else
-				++numUpdates;
+				gpsRxStats->gpsRxReceived++;;
 
 			return PARSER_COMPLETE;
 		}

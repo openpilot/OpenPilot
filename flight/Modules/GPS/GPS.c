@@ -90,6 +90,8 @@ static char* gps_rx_buffer;
 static uint32_t timeOfLastCommandMs;
 static uint32_t timeOfLastUpdateMs;
 
+static struct GPS_RX_STATS gpsRxStats;
+
 // ****************
 /**
  * Initialise the gps module
@@ -215,12 +217,12 @@ static void gpsTask(void *parameters)
 			switch (gpsProtocol) {
 #if defined(PIOS_INCLUDE_GPS_NMEA_PARSER)
 				case GPSSETTINGS_DATAPROTOCOL_NMEA:
-					res = parse_nmea_stream (c,gps_rx_buffer, &gpsposition);
+					res = parse_nmea_stream (c,gps_rx_buffer, &gpsposition, &gpsRxStats);
 					break;
 #endif
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER)
 				case GPSSETTINGS_DATAPROTOCOL_UBX:
-					res = parse_ubx_stream (c,gps_rx_buffer, &gpsposition);
+					res = parse_ubx_stream (c,gps_rx_buffer, &gpsposition, &gpsRxStats);
 					break;
 #endif
 				default:

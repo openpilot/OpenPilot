@@ -67,7 +67,6 @@
 struct nmea_parser {
 	const char *prefix;
 	bool(*handler) (GPSPositionData * GpsData, bool* gpsDataUpdated, char* param[], uint8_t nbParam);
-	uint32_t cnt;
 };
 
 static bool nmeaProcessGPGGA(GPSPositionData * GpsData, bool* gpsDataUpdated, char* param[], uint8_t nbParam);
@@ -79,37 +78,31 @@ static bool nmeaProcessGPGSA(GPSPositionData * GpsData, bool* gpsDataUpdated, ch
 	static bool nmeaProcessGPGSV(GPSPositionData * GpsData, bool* gpsDataUpdated, char* param[], uint8_t nbParam);
 #endif //PIOS_GPS_MINIMAL
 
-static struct nmea_parser nmea_parsers[] = {
+const static struct nmea_parser nmea_parsers[] = {
 	{
 		.prefix = "GPGGA",
 		.handler = nmeaProcessGPGGA,
-		.cnt = 0,
 	},
 	{
 		.prefix = "GPVTG",
 		.handler = nmeaProcessGPVTG,
-		.cnt = 0,
 	},
 	{
 		.prefix = "GPGSA",
 		.handler = nmeaProcessGPGSA,
-		.cnt = 0,
 	},
 	{
 		.prefix = "GPRMC",
 		.handler = nmeaProcessGPRMC,
-		.cnt = 0,
 	},
 #if !defined(PIOS_GPS_MINIMAL)
 	{
 		.prefix = "GPZDA",
 		.handler = nmeaProcessGPZDA,
-		.cnt = 0,
 	},
 	{
 		.prefix = "GPGSV",
 		.handler = nmeaProcessGPGSV,
-		.cnt = 0,
 	},
 #endif //PIOS_GPS_MINIMAL
 };
@@ -196,14 +189,14 @@ int parse_nmea_stream (uint8_t c, char *gps_rx_buffer, GPSPositionData *GpsData,
 	return PARSER_INCOMPLETE;
 }
 
-static struct nmea_parser *NMEA_find_parser_by_prefix(const char *prefix)
+const static struct nmea_parser *NMEA_find_parser_by_prefix(const char *prefix)
 {
 	if (!prefix) {
 		return (NULL);
 	}
 
 	for (uint8_t i = 0; i < NELEMENTS(nmea_parsers); i++) {
-		struct nmea_parser *parser = &nmea_parsers[i];
+		const struct nmea_parser *parser = &nmea_parsers[i];
 
 		/* Use strcmp to check for exact equality over the entire prefix */
 		if (!strcmp(prefix, parser->prefix)) {
@@ -416,7 +409,7 @@ bool NMEA_update_position(char *nmea_sentence, GPSPositionData *GpsData)
 #endif
 
 	// The first parameter is the message name, lets see if we find a parser for it
-	struct nmea_parser *parser;
+	const struct nmea_parser *parser;
 	parser = NMEA_find_parser_by_prefix(params[0]);
 	if (!parser) {
 		// No parser found
@@ -424,9 +417,8 @@ bool NMEA_update_position(char *nmea_sentence, GPSPositionData *GpsData)
 		return false;
 	}
 
-	parser->cnt++;
 	#ifdef DEBUG_MGSID_IN
-		DEBUG_MSG("%s %d ", params[0], parser->cnt);
+		DEBUG_MSG("%s %d ", params[0]);
 	#endif
 	// Send the message to the parser and get it update the GpsData
 	bool gpsDataUpdated = false;

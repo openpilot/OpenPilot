@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>757</width>
+    <width>786</width>
     <height>993</height>
    </rect>
   </property>
@@ -493,8 +493,75 @@
        <property name="spacing">
         <number>12</number>
        </property>
+       <property name="margin">
+        <number>0</number>
+       </property>
        <item>
         <widget class="QScrollArea" name="scrollArea">
+         <property name="palette">
+          <palette>
+           <active>
+            <colorrole role="Base">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>255</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Window">
+             <brush brushstyle="SolidPattern">
+              <color alpha="0">
+               <red>240</red>
+               <green>240</green>
+               <blue>240</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </active>
+           <inactive>
+            <colorrole role="Base">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>255</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Window">
+             <brush brushstyle="SolidPattern">
+              <color alpha="0">
+               <red>240</red>
+               <green>240</green>
+               <blue>240</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </inactive>
+           <disabled>
+            <colorrole role="Base">
+             <brush brushstyle="SolidPattern">
+              <color alpha="0">
+               <red>240</red>
+               <green>240</green>
+               <blue>240</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Window">
+             <brush brushstyle="SolidPattern">
+              <color alpha="0">
+               <red>240</red>
+               <green>240</green>
+               <blue>240</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </disabled>
+          </palette>
+         </property>
          <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
          </property>
@@ -509,8 +576,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>703</width>
-            <height>832</height>
+            <width>756</width>
+            <height>856</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_8">
@@ -10574,8 +10641,75 @@ Attitude</string>
        <property name="spacing">
         <number>12</number>
        </property>
+       <property name="margin">
+        <number>0</number>
+       </property>
        <item>
         <widget class="QScrollArea" name="scrollArea_2">
+         <property name="palette">
+          <palette>
+           <active>
+            <colorrole role="Base">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>255</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Window">
+             <brush brushstyle="SolidPattern">
+              <color alpha="0">
+               <red>240</red>
+               <green>240</green>
+               <blue>240</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </active>
+           <inactive>
+            <colorrole role="Base">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>255</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Window">
+             <brush brushstyle="SolidPattern">
+              <color alpha="0">
+               <red>240</red>
+               <green>240</green>
+               <blue>240</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </inactive>
+           <disabled>
+            <colorrole role="Base">
+             <brush brushstyle="SolidPattern">
+              <color alpha="0">
+               <red>240</red>
+               <green>240</green>
+               <blue>240</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Window">
+             <brush brushstyle="SolidPattern">
+              <color alpha="0">
+               <red>240</red>
+               <green>240</green>
+               <blue>240</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </disabled>
+          </palette>
+         </property>
          <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
          </property>
@@ -10587,7 +10721,7 @@ Attitude</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>470</width>
+            <width>741</width>
             <height>923</height>
            </rect>
           </property>
@@ -23648,7 +23782,7 @@ border-radius: 5;</string>
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>75</height>
+       <height>79</height>
       </size>
      </property>
      <property name="maximumSize">
@@ -24199,7 +24333,7 @@ border-radius: 5;</string>
           </property>
           <property name="minimumSize">
            <size>
-            <width>150</width>
+            <width>300</width>
             <height>20</height>
            </size>
           </property>
@@ -24239,7 +24373,25 @@ border-radius: 5;</string>
 Useful if you have accidentally changed some settings.</string>
           </property>
           <property name="styleSheet">
-           <string notr="true"/>
+           <string notr="true">QPushButton {
+border: 1px outset #999;
+border-radius: 5;
+background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0.28 rgba(236, 236, 236, 255), stop:1 rgba(252, 252, 252, 255));
+}
+
+QPushButton:pressed {
+
+    border-style: inset;
+	background-color: qlineargradient(spread:pad, x1:0.502, y1:0.664864, x2:0.502, y2:0.034, stop:0.358209 rgba(250, 250, 250, 255), stop:0.626866 rgba(235, 235, 235, 255));
+
+}
+
+
+QPushButton:hover  {
+	border: 1px outset #999;	
+border-color: rgb(83, 83, 83);
+border-radius: 4;
+	}</string>
           </property>
           <property name="text">
            <string>Reload Board Data</string>
@@ -24270,7 +24422,25 @@ Useful if you have accidentally changed some settings.</string>
            <string>Send settings to the board but do not save to the non-volatile memory</string>
           </property>
           <property name="styleSheet">
-           <string notr="true"/>
+           <string notr="true">QPushButton {
+border: 1px outset #999;
+border-radius: 5;
+background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0.28 rgba(236, 236, 236, 255), stop:1 rgba(252, 252, 252, 255));
+}
+
+QPushButton:pressed {
+
+    border-style: inset;
+	background-color: qlineargradient(spread:pad, x1:0.502, y1:0.664864, x2:0.502, y2:0.034, stop:0.358209 rgba(250, 250, 250, 255), stop:0.626866 rgba(235, 235, 235, 255));
+
+}
+
+
+QPushButton:hover  {
+	border: 1px outset #999;	
+border-color: rgb(83, 83, 83);
+border-radius: 4;
+	}</string>
           </property>
           <property name="text">
            <string>Apply</string>
@@ -24300,7 +24470,25 @@ Useful if you have accidentally changed some settings.</string>
            <string>Send settings to the board and save to the non-volatile memory</string>
           </property>
           <property name="styleSheet">
-           <string notr="true"/>
+           <string notr="true">QPushButton {
+border: 1px outset #999;
+border-radius: 5;
+background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0.28 rgba(236, 236, 236, 255), stop:1 rgba(252, 252, 252, 255));
+}
+
+QPushButton:pressed {
+
+    border-style: inset;
+	background-color: qlineargradient(spread:pad, x1:0.502, y1:0.664864, x2:0.502, y2:0.034, stop:0.358209 rgba(250, 250, 250, 255), stop:0.626866 rgba(235, 235, 235, 255));
+
+}
+
+
+QPushButton:hover  {
+	border: 1px outset #999;	
+border-color: rgb(83, 83, 83);
+border-radius: 4;
+	}</string>
           </property>
           <property name="text">
            <string>Save</string>
@@ -24315,14 +24503,14 @@ Useful if you have accidentally changed some settings.</string>
         <item row="1" column="0">
          <widget class="QCheckBox" name="realTimeUpdates_6">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
           <property name="minimumSize">
            <size>
-            <width>300</width>
+            <width>136</width>
             <height>20</height>
            </size>
           </property>

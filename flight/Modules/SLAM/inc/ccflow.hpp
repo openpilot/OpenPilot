@@ -82,8 +82,10 @@ public:
 
 	// finds the mean square error between two templates of equal size of which one is transrotated
 	float correlate(cv::Mat reference, cv::Mat test, cv::Mat rotMatrix);
-
 	cv::Vec4f gradient(cv::Mat test, cv::Mat reference, TransRot position);
+	
+	cv::Vec4f correlateGradient(cv::Mat test, cv::Mat reference, TransRot position);
+
 
 	// properties
 	CCFlow *children[4]; // subcomponents

@@ -249,7 +249,7 @@ else
 CFLAGS += -Os
 endif
 
-
+CPPFLAGS += -O3
    
 # common architecture-specific flags from the device-specific library makefile
 CFLAGS += $(ARCHFLAGS)

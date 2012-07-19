@@ -80,7 +80,8 @@ void OpenCVslam::run() {
 	//VideoSource = NULL; //cvCaptureFromFile("test.avi");
 	VideoSource = cvCaptureFromFile("test.avi");
 	//VideoSource = cvCaptureFromCAM(0);
-	CvVideoWriter *VideoDest = cvCreateVideoWriter("output.avi",CV_FOURCC('F','M','P','4'),settings->FrameRate,cvSize(640,480),1);
+	//CvVideoWriter *VideoDest = cvCreateVideoWriter("output.avi",CV_FOURCC('F','M','P','4'),settings->FrameRate,cvSize(640,480),1);
+	CvVideoWriter *VideoDest = NULL;
 
 	if (VideoSource) {
 		cvSetCaptureProperty(VideoSource, CV_CAP_PROP_FRAME_WIDTH,  settings->FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_X]);

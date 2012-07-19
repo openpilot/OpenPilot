@@ -77,10 +77,10 @@ CCFlow::CCFlow(cv::RNG *rnginit, cv::Mat* last[], cv::Mat* current[], int pyrami
 	} else {
 		gradientMatch(tst,ref,20,tr,Vec3f(0.5,0.5,0.1));
 	}
-	if (worst-best < CC_QUALITYMARGIN && estTransrotation[2]<999 ) {
-		translation=Vec2f(estTransrotation[0],estTransrotation[1]);
-		rotation=estTransrotation[2];
-	}
+	//if (worst-best < CC_QUALITYMARGIN && estTransrotation[2]<999 ) {
+	//	translation=Vec2f(estTransrotation[0],estTransrotation[1]);
+	//	rotation=estTransrotation[2];
+	//}
 
 	center = Point2f(
 		border[0] + 0.5*(last[mydepth]->cols-(border[0]+border[2])),
@@ -487,7 +487,7 @@ void CCFlow::gradientMatch(cv::Mat test, cv::Mat reference, int maxcount,TransRo
 	//debug = debug.ones();
 	//fprintf(stderr,"initial, at %f %f %f\n",current[0],current[1],current[2]);
 	while (step[0]>1./8. && maxcount-->0) {
-		Vec4f grad = gradient(test,reference,current);
+		Vec4f grad = correlateGradient(test,reference,current);
 		//fprintf(stderr,"gradient is %f %f %f %f \n",grad[0],grad[1],grad[2],grad[3]);
 
 		Vec3f combined = Vec3f(prev[0]+grad[0],prev[1]+grad[1],prev[2]+grad[2]);
@@ -535,12 +535,14 @@ void CCFlow::gradientMatch(cv::Mat test, cv::Mat reference, int maxcount,TransRo
 }
 
 
+#define subresbits 5
+#define subres (1<<subresbits)
+#define rotationres (1.0/8.0)
 float CCFlow::correlate(cv::Mat reference, cv::Mat test, cv::Mat rotMatrix) {
 
 	double * m = (double*)rotMatrix.data;
 	float squareError=0;
 	int   pixels=0,missed=0;
-	#define subres 32
 
 //Mat debug=test.clone()*0;
 	for (int y=0;y<reference.rows;y++) {
@@ -548,7 +550,7 @@ float CCFlow::correlate(cv::Mat reference, cv::Mat test, cv::Mat rotMatrix) {
 			int tx = (float)(subres*(m[0]*(float)x + m[1]*(float)y + m[2]));
 			int ty = (float)(subres*(m[3]*(float)x + m[4]*(float)y + m[5]));
 			// check whether source pixel is within outer boundaries
-			if ((tx/subres)>=0-border[0] && (tx/subres)+1<test.cols+border[1] && (ty/subres)>=0-border[2] && (ty/subres)+1<test.rows+border[3]) {
+			if ((tx/subres)>=0-border[0] && (tx/subres)+1<test.cols+border[2] && (ty/subres)>=0-border[1] && (ty/subres)+1<test.rows+border[3]) {
 				pixels++;
 				Vec3i tmp = reference.at<Vec3b>(y,x);
 				Vec3i a1 = test.at<Vec3b>(ty/subres,tx/subres);
@@ -558,14 +560,14 @@ float CCFlow::correlate(cv::Mat reference, cv::Mat test, cv::Mat rotMatrix) {
 				Vec3i a = ((subres-1)-(tx%subres))*a1 + (tx%subres)*a2;
 				Vec3i b = ((subres-1)-(tx%subres))*b1 + (tx%subres)*b2;
 				Vec3i c = (((subres-1)-(ty%subres))*a + (ty%subres)*b);
-				c[0]>>=10;
-				c[1]>>=10;
-				c[2]>>=10;
+				c[0]>>=(2*subresbits);
+				c[1]>>=(2*subresbits);
+				c[2]>>=(2*subresbits);
 				tmp -= c;
 				//debug.at<Vec3b>(y,x) = Vec3b(tmp[0]*tmp[0],tmp[1]*tmp[1],tmp[2]*tmp[2]);
 				//debug.at<Vec3b>(y,x) = c;
 
-				squareError += tmp[0]*tmp[0] + tmp[1]+tmp[1] + tmp[2]*tmp[2];
+				squareError += tmp[0]*tmp[0] + tmp[1]*tmp[1] + tmp[2]*tmp[2];
 			} else {
 				missed++;
 				squareError += 32*32*3;
@@ -599,6 +601,119 @@ float CCFlow::correlate(cv::Mat reference, cv::Mat test, cv::Mat rotMatrix) {
 	return squareError/pixels;
 }
 
+cv::Vec4f CCFlow::correlateGradient(cv::Mat test, cv::Mat reference, TransRot position) {
+
+	Mat rotMatrix = getRotationMatrix2D(Point2f(test.cols/2.,test.rows/2.),position[2],1.0f);
+	rotMatrix.at<double>(0,2)+=position[0];
+	rotMatrix.at<double>(1,2)+=position[1];
+	Mat rotMatrix2 = getRotationMatrix2D(Point2f(test.cols/2.,test.rows/2.),position[2]+rotationres,1.0f);
+	rotMatrix2.at<double>(0,2)+=position[0];
+	rotMatrix2.at<double>(1,2)+=position[1];
+
+	double * m = (double*)rotMatrix.data;
+	double * m2 = (double*)rotMatrix2.data;
+	float squareError0=0;
+	float squareError1=0;
+	float squareError2=0;
+	float squareError3=0;
+	int   pixels=0,missed=0;
+
+//Mat debug=test.clone()*0;
+	const int xlimits0 = subres*-border[0];
+	const int xlimits1 = subres*(test.cols+border[2]);
+	const int ylimits0 = subres*-border[1];
+	const int ylimits1 = subres*(test.cols+border[3]);
+	for (int x=0;x<reference.cols;x++) {
+		for (int y=0;y<reference.rows;y++) {
+			const int tx0 = ((float)subres*(m[0]*(float)x + m[1]*(float)y + m[2]));
+			const int tx1 = tx0+1;
+			const int tx2 = tx0;
+			const int ty0 = ((float)subres*(m[3]*(float)x + m[4]*(float)y + m[5]));
+			const int ty1 = ty0;
+			const int ty2 = ty0+1;
+			const int tx3 = ((float)subres*(m2[0]*(float)x + m2[1]*(float)y + m2[2]));
+			const int ty3 = ((float)subres*(m2[3]*(float)x + m2[4]*(float)y + m2[5]));
+			// check whether source pixel is within outer boundaries
+			if ( tx0>=xlimits0 && tx1<xlimits1 && ty0>=ylimits0 && ty2<ylimits1
+			     && tx3>=xlimits0 && tx3<xlimits1 && ty3>=ylimits0 && ty3<ylimits1) {
+				pixels++;
+				Vec3i tmp = reference.at<Vec3b>(y,x);
+
+				// its such a shame that most of these will be identical almost all the time,
+				// but how could we check that fast? we will have to traverse pixel boundaries!
+				Vec3i a01 = test.at<Vec3b>(ty0/subres,tx0/subres);
+				Vec3i a02 = test.at<Vec3b>(ty0/subres,tx0/subres +1);
+				Vec3i b01 = test.at<Vec3b>(ty0/subres +1,tx0/subres);
+				Vec3i b02 = test.at<Vec3b>(ty0/subres +1,tx0/subres +1);
+				Vec3i a11 = test.at<Vec3b>(ty1/subres,tx1/subres);
+				Vec3i a12 = test.at<Vec3b>(ty1/subres,tx1/subres +1);
+				Vec3i b11 = test.at<Vec3b>(ty1/subres +1,tx1/subres);
+				Vec3i b12 = test.at<Vec3b>(ty1/subres +1,tx1/subres +1);
+				Vec3i a21 = test.at<Vec3b>(ty2/subres,tx2/subres);
+				Vec3i a22 = test.at<Vec3b>(ty2/subres,tx2/subres +1);
+				Vec3i b21 = test.at<Vec3b>(ty2/subres +1,tx2/subres);
+				Vec3i b22 = test.at<Vec3b>(ty2/subres +1,tx2/subres +1);
+				Vec3i a31 = test.at<Vec3b>(ty3/subres,tx3/subres);
+				Vec3i a32 = test.at<Vec3b>(ty3/subres,tx3/subres +1);
+				Vec3i b31 = test.at<Vec3b>(ty3/subres +1,tx3/subres);
+				Vec3i b32 = test.at<Vec3b>(ty3/subres +1,tx3/subres +1);
+
+				// these however will always differ
+				Vec3i a0 = ((subres-1)-(tx0%subres))*a01 + (tx0%subres)*a02;
+				Vec3i b0 = ((subres-1)-(tx0%subres))*b01 + (tx0%subres)*b02;
+				Vec3i c0 = (((subres-1)-(ty0%subres))*a0 + (ty0%subres)*b0);
+				Vec3i a1 = ((subres-1)-(tx1%subres))*a11 + (tx1%subres)*a12;
+				Vec3i b1 = ((subres-1)-(tx1%subres))*b11 + (tx1%subres)*b12;
+				Vec3i c1 = (((subres-1)-(ty0%subres))*a1 + (ty0%subres)*b1);
+				Vec3i a2 = ((subres-1)-(tx0%subres))*a21 + (tx0%subres)*a22;
+				Vec3i b2 = ((subres-1)-(tx0%subres))*b21 + (tx0%subres)*b22;
+				Vec3i c2 = (((subres-1)-(ty2%subres))*a2 + (ty2%subres)*b2);
+				Vec3i a3 = ((subres-1)-(tx3%subres))*a31 + (tx3%subres)*a32;
+				Vec3i b3 = ((subres-1)-(tx3%subres))*b31 + (tx3%subres)*b32;
+				Vec3i c3 = (((subres-1)-(ty3%subres))*a3 + (ty3%subres)*b3);
+				c0[0]>>=(2*subresbits);
+				c0[1]>>=(2*subresbits);
+				c0[2]>>=(2*subresbits);
+				c1[0]>>=(2*subresbits);
+				c1[1]>>=(2*subresbits);
+				c1[2]>>=(2*subresbits);
+				c2[0]>>=(2*subresbits);
+				c2[1]>>=(2*subresbits);
+				c2[2]>>=(2*subresbits);
+				c3[0]>>=(2*subresbits);
+				c3[1]>>=(2*subresbits);
+				c3[2]>>=(2*subresbits);
+
+				Vec3i diff0 = tmp - c0;
+				Vec3i diff1 = tmp - c1;
+				Vec3i diff2 = tmp - c2;
+				Vec3i diff3 = tmp - c3;
+				//debug.at<Vec3b>(y,x) = Vec3b(tmp[0]*tmp[0],tmp[1]*tmp[1],tmp[2]*tmp[2]);
+				//debug.at<Vec3b>(y,x) = c;
+
+				squareError0 += diff0[0]*diff0[0] + diff0[1]*diff0[1] + diff0[2]*diff0[2];
+				squareError1 += diff1[0]*diff1[0] + diff1[1]*diff1[1] + diff1[2]*diff1[2];
+				squareError2 += diff2[0]*diff2[0] + diff2[1]*diff2[1] + diff2[2]*diff2[2];
+				squareError3 += diff3[0]*diff3[0] + diff3[1]*diff3[1] + diff3[2]*diff3[2];
+			} else {
+				missed++;
+				squareError0 += 32*32*3;
+				squareError1 += 32*32*3;
+				squareError2 += 32*32*3;
+				squareError3 += 32*32*3;
+				//pixels++;
+			}
+		}
+	}
+	if (pixels<missed) return Vec4f(0,0,0,-1);
+
+	Vec3f se(squareError0-squareError1,squareError0-squareError2,squareError0-squareError3);
+	se *= (1./pixels);
+	Vec3f se2(se[0]*se[0],se[1]*se[1],se[2]*se[2]);
+	float len = sqrt(se2[0]+se2[1]+se2[2]);
+
+	return Vec4f(se[0]/len,se[1]/len,se[2]/len,squareError0/pixels);
+}
 
 
 

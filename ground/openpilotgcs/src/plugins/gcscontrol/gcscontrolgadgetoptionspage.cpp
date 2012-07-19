@@ -137,7 +137,7 @@ QWidget *GCSControlGadgetOptionsPage::createPage(QWidget *parent)
               options_page->buttonFunction4 << options_page->buttonFunction5 <<
               options_page->buttonFunction6 << options_page->buttonFunction7;
     QStringList buttonOptions;
-    buttonOptions <<"-" << "Roll" << "Pitch" << "Yaw" << "Throttle" << "Armed" << "GCS Control" ;
+    buttonOptions <<"-" << "Roll" << "Pitch" << "Yaw" << "Throttle" << "Armed" << "GCS Control"; //added UDP control to action list
     foreach (QComboBox* qb, buttonFunctionList) {
         qb->addItems(buttonOptions);
     }
@@ -186,6 +186,9 @@ QWidget *GCSControlGadgetOptionsPage::createPage(QWidget *parent)
     connect(buttonActionList.at(7),SIGNAL(currentIndexChanged(int)),this,SLOT(updateButtonAction_7()));
 
     //updateButtonFunction();
+
+    options_page->udp_host->setText(m_config->getUDPControlHost().toString());
+    options_page->udp_port->setText(QString::number(m_config->getUDPControlPort()));
 
 
     // Controls mode are from 1 to 4.
@@ -262,6 +265,9 @@ void GCSControlGadgetOptionsPage::apply()
    }
    m_config->setRPYTchannels(roll,pitch,yaw,throttle);
 
+   m_config->setUDPControlSettings(options_page->udp_port->text().toInt(),options_page->udp_host->text());
+
+
    int j;
    for (j=0;j<8;j++)
    {
@@ -270,6 +276,7 @@ void GCSControlGadgetOptionsPage::apply()
        m_config->setbuttonSettingsAmount(j,buttonValueList.at(j)->value());
        m_config->setChannelReverse(j,chRevList.at(j)->isChecked());
    }
+
 
 }
 
@@ -369,7 +376,7 @@ void GCSControlGadgetOptionsPage::updateButtonAction(int controlID)
         if (buttonActionList.at(i)->currentText().compare("Toggles")==0)
         {
             disconnect(buttonFunctionList.at(i),SIGNAL(currentIndexChanged(int)),this,SLOT(updateButtonFunction()));
-            buttonOptions <<"-" << "Armed" << "GCS Control" ;
+            buttonOptions <<"-" << "Armed" << "GCS Control" << "UDP Control";
             buttonFunctionList.at(i)->clear();
             buttonFunctionList.at(i)->insertItems(-1,buttonOptions);
 

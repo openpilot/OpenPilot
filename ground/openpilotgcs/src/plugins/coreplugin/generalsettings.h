@@ -61,7 +61,7 @@ public:
     bool useUDPMirror() const;
     void readSettings(QSettings* qs);
     void saveSettings(QSettings* qs);
-
+    bool useExpertMode() const;
 signals:
 
 private slots:
@@ -81,6 +81,7 @@ private:
     bool m_autoConnect;
     bool m_autoSelect;
     bool m_useUDPMirror;
+    bool m_useExpertMode;
     QPointer<QWidget> m_dialog;
     QList<QTextCodec *> m_codecs;
 

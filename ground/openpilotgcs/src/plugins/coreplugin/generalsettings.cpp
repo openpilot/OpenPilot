@@ -49,7 +49,8 @@ GeneralSettings::GeneralSettings():
     m_dialog(0),
     m_autoConnect(true),
     m_autoSelect(true),
-    m_useUDPMirror(false)
+    m_useUDPMirror(false),
+    m_useExpertMode(false)
 {
 }
 
@@ -117,6 +118,8 @@ QWidget *GeneralSettings::createPage(QWidget *parent)
     m_page->setupUi(w);
     m_page->labelUDP->setVisible(false);
     m_page->cbUseUDPMirror->setVisible(false);
+    m_page->labelExpert->setVisible(false);
+    m_page->cbExpertMode->setVisible(false);
 
     fillLanguageBox();
     connect(m_page->checkAutoConnect,SIGNAL(stateChanged(int)),this,SLOT(slotAutoConnect(int)));
@@ -124,6 +127,7 @@ QWidget *GeneralSettings::createPage(QWidget *parent)
     m_page->checkAutoConnect->setChecked(m_autoConnect);
     m_page->checkAutoSelect->setChecked(m_autoSelect);
     m_page->cbUseUDPMirror->setChecked(m_useUDPMirror);
+    m_page->cbExpertMode->setChecked(m_useExpertMode);
     m_page->colorButton->setColor(StyleHelper::baseColor());
 
     connect(m_page->resetButton, SIGNAL(clicked()),
@@ -141,6 +145,7 @@ void GeneralSettings::apply()
 
     m_saveSettingsOnExit = m_page->checkBoxSaveOnExit->isChecked();
     m_useUDPMirror=m_page->cbUseUDPMirror->isChecked();
+    m_useExpertMode=m_page->cbExpertMode->isChecked();
     m_autoConnect = m_page->checkAutoConnect->isChecked();
     m_autoSelect = m_page->checkAutoSelect->isChecked();
 }
@@ -158,6 +163,7 @@ void GeneralSettings::readSettings(QSettings* qs)
     m_autoConnect = qs->value(QLatin1String("AutoConnect"),m_autoConnect).toBool();
     m_autoSelect = qs->value(QLatin1String("AutoSelect"),m_autoSelect).toBool();
     m_useUDPMirror = qs->value(QLatin1String("UDPMirror"),m_useUDPMirror).toBool();
+    m_useExpertMode = qs->value(QLatin1String("ExpertMode"),m_useExpertMode).toBool();
     qs->endGroup();
 }
 
@@ -174,6 +180,7 @@ void GeneralSettings::saveSettings(QSettings* qs)
     qs->setValue(QLatin1String("AutoConnect"), m_autoConnect);
     qs->setValue(QLatin1String("AutoSelect"), m_autoSelect);
     qs->setValue(QLatin1String("UDPMirror"), m_useUDPMirror);
+    qs->setValue(QLatin1String("ExpertMode"), m_useExpertMode);
     qs->endGroup();
 }
 
@@ -244,6 +251,11 @@ bool GeneralSettings::useUDPMirror() const
     return m_useUDPMirror;
 }
 
+bool GeneralSettings::useExpertMode() const
+{
+    return m_useExpertMode;
+}
+
 void GeneralSettings::slotAutoConnect(int value)
 {
     if (value==Qt::Checked)
@@ -256,6 +268,8 @@ void GeneralSettings::showHidden()
 {
     m_page->labelUDP->setVisible(true);
     m_page->cbUseUDPMirror->setVisible(true);
+    m_page->labelExpert->setVisible(true);
+    m_page->cbExpertMode->setVisible(true);
 }
 
 globalSettingsWidget::globalSettingsWidget(QWidget *parent):QWidget(parent){}

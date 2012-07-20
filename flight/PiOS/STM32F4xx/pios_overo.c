@@ -146,6 +146,8 @@ void PIOS_OVERO_DMA_irq_handler(uint32_t overo_id)
 	struct pios_overo_dev * overo_dev = (struct pios_overo_dev *) overo_id;
 	PIOS_Assert(PIOS_OVERO_validate(overo_dev));
 	
+	DMA_ClearFlag(overo_dev->cfg->dma.tx.channel, overo_dev->cfg->dma.irq.flags);
+
 	overo_dev->writing_buffer = 1 - DMA_GetCurrentMemoryTarget(overo_dev->cfg->dma.tx.channel);
 
 	bool rx_need_yield;
@@ -281,6 +283,8 @@ int32_t PIOS_OVERO_Init(uint32_t * overo_id, const struct pios_overo_cfg * cfg)
 	DMA_Cmd(overo_dev->cfg->dma.tx.channel, ENABLE);
 	DMA_Cmd(overo_dev->cfg->dma.rx.channel, ENABLE);
 	
+	*overo_id = (uint32_t) overo_dev;
+
 	return(0);
 	
 out_fail:

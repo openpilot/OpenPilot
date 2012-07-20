@@ -186,7 +186,6 @@ static void overoSyncTask(void *parameters)
 				// Update stats.  This will trigger a local send event too
 				OveroSyncStatsData syncStats;
 				syncStats.Send = overosync->sent_bytes;
-				syncStats.Received = 0;
 				syncStats.Connected = syncStats.Send > 500 ? OVEROSYNCSTATS_CONNECTED_TRUE : OVEROSYNCSTATS_CONNECTED_FALSE;
 				syncStats.DroppedUpdates = overosync->failed_objects;
 				syncStats.Packets = PIOS_OVERO_GetPacketCount(pios_overo_id);
@@ -212,9 +211,9 @@ static int32_t packData(uint8_t * data, int32_t length)
 {
 	portTickType tickTime = xTaskGetTickCount();
 
-	if( PIOS_COM_SendBufferNonBlocking(pios_com_overo_id, (uint8_t *) &tickTime, sizeof(tickTime)) != 0)
+	if( PIOS_COM_SendBufferNonBlocking(pios_com_overo_id, (uint8_t *) &tickTime, sizeof(tickTime)) < 0)
 		goto fail;
-	if( PIOS_COM_SendBufferNonBlocking(pios_com_overo_id, data, length) != 0)
+	if( PIOS_COM_SendBufferNonBlocking(pios_com_overo_id, data, length) < 0)
 		goto fail;
 
 	overosync->sent_bytes += length + 4;

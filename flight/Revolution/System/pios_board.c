@@ -795,8 +795,8 @@ void PIOS_Board_Init(void) {
 			PIOS_Assert(rx_buffer);
 			PIOS_Assert(tx_buffer);
 			if (PIOS_COM_Init(&pios_com_overo_id, &pios_overo_com_driver, pios_overo_id,
-							  rx_buffer, PIOS_COM_TELEM_USB_RX_BUF_LEN,
-							  tx_buffer, PIOS_COM_TELEM_USB_TX_BUF_LEN)) {
+							  rx_buffer, PACKET_SIZE,
+							  tx_buffer, PACKET_SIZE)) {
 				PIOS_Assert(0);
 			}
 		}

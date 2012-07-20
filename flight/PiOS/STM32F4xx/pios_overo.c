@@ -171,14 +171,6 @@ void PIOS_OVERO_DMA_irq_handler(uint32_t overo_id)
 	// Load any pending bytes from TX fifo
 	PIOS_OVERO_WriteData(overo_dev);
 
-
-	/*if (overo_dev->tx_out_cb) {
-		bool tx_need_yield = false;			
-		(overo_dev->tx_out_cb)(overo_dev->tx_out_context, &overo_dev->tx_buffer[overo_dev->writing_buffer][0], PACKET_SIZE, NULL, &tx_need_yield);
-		if (tx_need_yield) {
-			vPortYieldFromISR();
-		}
-	}*/
 	overo_dev->packets++;
 }
 
@@ -191,6 +183,17 @@ int32_t PIOS_OVERO_GetPacketCount(uint32_t overo_id)
 	PIOS_Assert(PIOS_OVERO_validate(overo_dev));
 
 	return overo_dev->packets;
+}
+
+/**
+ * Debugging information to check how it is runnign
+ */
+int32_t PIOS_OVERO_GetWrittenBytes(uint32_t overo_id)
+{
+	struct pios_overo_dev * overo_dev = (struct pios_overo_dev *) overo_id;
+	PIOS_Assert(PIOS_OVERO_validate(overo_dev));
+	
+	return overo_dev->writing_offset;
 }
 
 /**

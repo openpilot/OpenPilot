@@ -38,6 +38,7 @@
   !define NSIS_DATA_TREE "."
   !define GCS_BUILD_TREE "..\..\build\ground\openpilotgcs"
   !define UAVO_SYNTH_TREE "..\..\build\uavobject-synthetics"
+  !define AEROSIMRC_TREE "..\..\build\ground\AeroSIM-RC"
 
   ; Default installation folder
   InstallDir "$PROGRAMFILES\OpenPilot"
@@ -161,7 +162,7 @@ Section "Core files" InSecCore
 SectionEnd
 
 ; Copy GCS plugins
-Section "Plugins" InSecPlugins
+Section "-Plugins" InSecPlugins
   SectionIn RO
   SetOutPath "$INSTDIR\lib\openpilotgcs\plugins"
   File /r "${GCS_BUILD_TREE}\lib\openpilotgcs\plugins\*.dll"
@@ -169,7 +170,7 @@ Section "Plugins" InSecPlugins
 SectionEnd
 
 ; Copy GCS resources
-Section "Resources" InSecResources
+Section "-Resources" InSecResources
   SetOutPath "$INSTDIR\share\openpilotgcs\diagrams"
   File /r "${GCS_BUILD_TREE}\share\openpilotgcs\diagrams\*"
   SetOutPath "$INSTDIR\share\openpilotgcs\dials"
@@ -183,14 +184,14 @@ Section "Resources" InSecResources
 SectionEnd
 
 ; Copy Notify plugin sound files
-Section "Sound files" InSecSounds
+Section "-Sound files" InSecSounds
   SetOutPath "$INSTDIR\share\openpilotgcs\sounds"
   File /r "${GCS_BUILD_TREE}\share\openpilotgcs\sounds\*"
 SectionEnd
 
 ; Copy localization files
 ; Disabled until GCS source is stable and properly localized
-Section "Localization" InSecLocalization
+Section "-Localization" InSecLocalization
   SetOutPath "$INSTDIR\share\openpilotgcs\translations"
 ; File /r "${GCS_BUILD_TREE}\share\openpilotgcs\translations\openpilotgcs_*.qm"
   File /r "${GCS_BUILD_TREE}\share\openpilotgcs\translations\qt_*.qm"
@@ -227,6 +228,12 @@ Section "CDC driver" InSecInstallDrivers
     File "/oname=dpinst.exe" "${NSIS_DATA_TREE}\redist\dpinst_x86.exe"
   ${EndIf}
   ExecWait '"$PLUGINSDIR\dpinst.exe" /lm /path "$INSTDIR\drivers"'
+SectionEnd
+
+; AeroSimRC plugin files
+Section "AeroSimRC plugin" InSecAeroSimRC
+  SetOutPath "$INSTDIR\misc\AeroSIM-RC"
+  File /r "${AEROSIMRC_TREE}\*"
 SectionEnd
 
 Section "Shortcuts" InSecShortcuts
@@ -277,6 +284,7 @@ SectionEnd
     !insertmacro MUI_DESCRIPTION_TEXT ${InSecUtilities} $(DESC_InSecUtilities)
     !insertmacro MUI_DESCRIPTION_TEXT ${InSecDrivers} $(DESC_InSecDrivers)
     !insertmacro MUI_DESCRIPTION_TEXT ${InSecInstallDrivers} $(DESC_InSecInstallDrivers)
+    !insertmacro MUI_DESCRIPTION_TEXT ${InSecAeroSimRC} $(DESC_InSecAeroSimRC)
     !insertmacro MUI_DESCRIPTION_TEXT ${InSecShortcuts} $(DESC_InSecShortcuts)
   !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
@@ -301,6 +309,7 @@ Section "un.OpenPilot GCS" UnSecProgram
   RMDir /r /rebootok "$INSTDIR\firmware"
   RMDir /r /rebootok "$INSTDIR\utilities"
   RMDir /r /rebootok "$INSTDIR\drivers"
+  RMDir /r /rebootok "$INSTDIR\misc"
   Delete /rebootok "$INSTDIR\HISTORY.txt"
   Delete /rebootok "$INSTDIR\Uninstall.exe"
 

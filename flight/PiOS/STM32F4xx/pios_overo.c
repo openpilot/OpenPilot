@@ -70,6 +70,8 @@ struct pios_overo_dev {
 	int8_t writing_buffer;
 	uint32_t writing_offset;
 	
+	uint32_t packets;
+	
 	uint8_t tx_buffer[2][PACKET_SIZE];
 	uint8_t rx_buffer[2][PACKET_SIZE];
 
@@ -164,6 +166,19 @@ void PIOS_OVERO_DMA_irq_handler(uint32_t overo_id)
 	
 	// Load any pending bytes from TX fifo
 	PIOS_OVERO_WriteData(overo_dev);
+	
+	overo_dev->packets++;
+}
+
+/**
+ * Debugging information to check how it is runnign
+ */
+int32_t PIOS_OVERO_GetPacketCount(uint32_t overo_id)
+{
+	struct pios_overo_dev * overo_dev = (struct pios_overo_dev *) overo_id;
+	PIOS_Assert(PIOS_OVERO_validate(overo_dev));
+
+	return overo_dev->packets;
 }
 
 /**

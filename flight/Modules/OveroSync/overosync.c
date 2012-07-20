@@ -55,27 +55,17 @@ static bool overoEnabled;
 // Private functions
 static void overoSyncTask(void *parameters);
 static int32_t packData(uint8_t * data, int32_t length);
-static void transmitDataDone(uint32_t error_counter);
 static void registerObject(UAVObjHandle obj);
 
-struct dma_transaction {
-	uint8_t tx_buffer[OVEROSYNC_PACKET_SIZE] __attribute__ ((aligned(4)));
-	uint8_t rx_buffer[OVEROSYNC_PACKET_SIZE] __attribute__ ((aligned(4)));
-};
+// External variables
+extern uint32_t pios_com_overo_id;
+extern uint32_t pios_overo_id;
 
 struct overosync {
-	struct dma_transaction transactions[2];
-	uint32_t active_transaction_id;
-	uint32_t loading_transaction_id;
-	xSemaphoreHandle buffer_lock;
-	uint32_t packets;
 	uint32_t sent_bytes;
-	uint32_t write_pointer;
 	uint32_t sent_objects;
 	uint32_t failed_objects;
 	uint32_t received_objects;
-	uint32_t framesync_error;
-	uint32_t underrun_error;
 };
 
 struct overosync *overosync;
@@ -132,16 +122,7 @@ int32_t OveroSyncStart(void)
 	if(overosync == NULL)
 		return -1;
 
-		overosync->buffer_lock = xSemaphoreCreateMutex();
-	if(overosync->buffer_lock == NULL)
-		return -1;
-
-	overosync->active_transaction_id = 0;
-	overosync->loading_transaction_id = 0;
-	overosync->write_pointer = 0;
 	overosync->sent_bytes = 0;
-	overosync->framesync_error = 0;
-	overosync->packets = 0;
 
 	// Process all registered objects and connect queue for updates
 	UAVObjIterate(&registerObject);
@@ -192,22 +173,13 @@ static void overoSyncTask(void *parameters)
 	portTickType lastUpdateTime = xTaskGetTickCount();
 	portTickType updateTime;
 
-	// Set the comms callback
-	PIOS_Overo_SetCallback(transmitDataDone);
-
 	// Loop forever
 	while (1) {
 		// Wait for queue message
 		if (xQueueReceive(queue, &ev, portMAX_DELAY) == pdTRUE) {
-		
-			// Check it will fit before packetizing
-			if ((overosync->write_pointer + UAVObjGetNumBytes(ev.obj) + 12) >=
-				sizeof(overosync->transactions[overosync->loading_transaction_id].tx_buffer)) {
-				overosync->failed_objects ++;
-			} else {
-				// Process event.  This calls transmitData
-				UAVTalkSendObject(uavTalkCon, ev.obj, ev.instId, false, 0);
-			}
+
+			// Process event.  This calls transmitData
+			UAVTalkSendObject(uavTalkCon, ev.obj, ev.instId, false, 0);
 
 			updateTime = xTaskGetTickCount();
 			if(((portTickType) (updateTime - lastUpdateTime)) > 1000) {
@@ -217,14 +189,14 @@ static void overoSyncTask(void *parameters)
 				syncStats.Received = 0;
 				syncStats.Connected = syncStats.Send > 500 ? OVEROSYNCSTATS_CONNECTED_TRUE : OVEROSYNCSTATS_CONNECTED_FALSE;
 				syncStats.DroppedUpdates = overosync->failed_objects;
-				syncStats.FramesyncErrors = overosync->framesync_error;
-				syncStats.Packets = overosync->packets;
-				syncStats.UnderrunErrors = overosync->underrun_error;
+				syncStats.Packets = PIOS_OVERO_GetPacketCount(pios_overo_id);
 				OveroSyncStatsSet(&syncStats);
 				overosync->failed_objects = 0;
 				overosync->sent_bytes = 0;
 				lastUpdateTime = updateTime;
 			}
+
+			// TODO: Check the receive buffer
 		}
 	}
 }
@@ -238,69 +210,20 @@ static void overoSyncTask(void *parameters)
  */
 static int32_t packData(uint8_t * data, int32_t length)
 {
-	uint8_t *tx_buffer;
-	
 	portTickType tickTime = xTaskGetTickCount();
 
-	// Get the lock for manipulating the buffer
-	xSemaphoreTake(overosync->buffer_lock, portMAX_DELAY);
+	if( PIOS_COM_SendBuffer(pios_com_overo_id, (uint8_t *) &tickTime, sizeof(tickTime)) != 0)
+		goto fail;
+	if( PIOS_COM_SendBuffer(pios_com_overo_id, data, length) != 0)
+		goto fail;
 
-	// Check this packet will fit
-	if ((overosync->write_pointer + length + sizeof(tickTime)) >
-		sizeof(overosync->transactions[overosync->loading_transaction_id].tx_buffer)) {
-		overosync->failed_objects ++;
-		xSemaphoreGive(overosync->buffer_lock);
-		return -1;
-	}
-	
-	// Get offset into buffer and copy contents
-	tx_buffer = overosync->transactions[overosync->loading_transaction_id].tx_buffer +
-	overosync->write_pointer;
-	memcpy(tx_buffer, &tickTime, sizeof(tickTime));
-	memcpy(tx_buffer + sizeof(tickTime),data,length);
-	overosync->write_pointer += length + sizeof(tickTime);
-	overosync->sent_bytes += length;
-	overosync->sent_objects++;
-	
-	xSemaphoreGive(overosync->buffer_lock);
-	
+	overosync->sent_bytes += length + 4;
+
 	return length;
-}
 
-/**
- * Callback from the overo spi driver at the end of each packet
- */
-static void transmitDataDone(uint32_t error_counter)
-{
-	uint8_t *tx_buffer, *rx_buffer;
-
-	// Get lock to manipulate buffers
-	if(xSemaphoreTake(overosync->buffer_lock, 0) == pdFALSE) {
-		return;
-	}
-
-	overosync->packets++;
-
-	// Swap buffers
-	overosync->active_transaction_id = overosync->loading_transaction_id;
-	overosync->loading_transaction_id = (overosync->loading_transaction_id + 1) % 
-		NELEMENTS(overosync->transactions);
-
-	// Release the buffer lock
-	xSemaphoreGive(overosync->buffer_lock);
-	
-	// Get the new buffers and configure the overo driver
-	tx_buffer = overosync->transactions[overosync->active_transaction_id].tx_buffer;
-	rx_buffer = overosync->transactions[overosync->active_transaction_id].rx_buffer;
-	
-	PIOS_Overo_SetNewBuffer((uint8_t *) tx_buffer, (uint8_t *) rx_buffer, 
-							sizeof(overosync->transactions[overosync->active_transaction_id].tx_buffer));	
-
-	// Prepare the new loading buffer
-	memset(overosync->transactions[overosync->loading_transaction_id].tx_buffer, 0xff, 
-		   sizeof(overosync->transactions[overosync->loading_transaction_id].tx_buffer));
-	overosync->write_pointer = 0;
-	overosync->underrun_error = error_counter;
+fail:
+	overosync->failed_objects++;
+	return -1;
 }
 
 /**

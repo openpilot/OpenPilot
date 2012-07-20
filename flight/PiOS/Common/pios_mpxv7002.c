@@ -76,10 +76,7 @@ void PIOS_MPXV7002_UpdateCalibration(uint16_t zeroPoint){
  */
 float PIOS_MPXV7002_ReadAirspeed(uint8_t airspeedADCPin)
 {
-
 	float sensorVal = PIOS_MPXV7002_Measure(airspeedADCPin);
-	if (sensorVal == 0) //As of June 20th, 2012, the ADC read module was written in such a way that it reset the value to 0 immediately after a read. In case someone else reads the ADC inadvertently, we prefer not to use a reading of 0
-		return -1;
 	
 	//Calculate dynamic pressure, as per docs
 	float Qc = 5.0f*(((sensorVal - calibrationOffset)/4096.0f*3.3f)/VCC - 0.5f);

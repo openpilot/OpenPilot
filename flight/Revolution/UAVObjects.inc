@@ -37,6 +37,7 @@ UAVOBJSRCFILENAMES += accels
 UAVOBJSRCFILENAMES += magnetometer
 UAVOBJSRCFILENAMES += baroaltitude
 UAVOBJSRCFILENAMES += baroairspeed
+UAVOBJSRCFILENAMES += airspeedsettings
 UAVOBJSRCFILENAMES += flightbatterysettings
 UAVOBJSRCFILENAMES += firmwareiapobj
 UAVOBJSRCFILENAMES += flightbatterystate

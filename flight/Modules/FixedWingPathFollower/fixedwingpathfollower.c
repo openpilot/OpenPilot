@@ -708,7 +708,7 @@ static void baroAirspeedUpdatedCb(UAVObjEvent * ev)
 	VelocityActualData velocityActual;
 
 	BaroAirspeedGet(&baroAirspeed);
-	if (baroAirspeed.Connected != BAROAIRSPEED_CONNECTED_TRUE && BaroAirspeedReadOnly()) {
+	if (baroAirspeed.BaroConnected != BAROAIRSPEED_BAROCONNECTED_TRUE && BaroAirspeedReadOnly()) {
 		baroAirspeedBias = 0;
 	} else {
 		VelocityActualGet(&velocityActual);

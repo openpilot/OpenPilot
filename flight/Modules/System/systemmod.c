@@ -219,6 +219,12 @@ static void objectUpdatedCb(UAVObjEvent * ev)
 		FlightStatusData flightStatus;
 		FlightStatusGet(&flightStatus);
 
+		// When this is called because of this method don't do anything
+		if (objper.Operation == OBJECTPERSISTENCE_OPERATION_ERROR ||
+			objper.Operation == OBJECTPERSISTENCE_OPERATION_COMPLETED) {
+			return;
+		}
+
 		// Execute action if disarmed
 		if(flightStatus.Armed != FLIGHTSTATUS_ARMED_DISARMED) {
 			retval = -1;

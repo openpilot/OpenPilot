@@ -414,9 +414,9 @@ void Widget::asMatrix2Quat(const QMatrix4x4 &m, QQuaternion &q)
     y = qSqrt(qMax(0.0, 1.0 - m(0, 0) + m(1, 1) - m(2, 2))) / 2.0;
     z = qSqrt(qMax(0.0, 1.0 - m(0, 0) - m(1, 1) + m(2, 2))) / 2.0;
 
-    x = _copysign(x, (m(1, 2) - m(2, 1)));
-    y = _copysign(y, (m(2, 0) - m(0, 2)));
-    z = _copysign(z, (m(0, 1) - m(1, 0)));
+    x = copysign(x, (m(1, 2) - m(2, 1)));
+    y = copysign(y, (m(2, 0) - m(0, 2)));
+    z = copysign(z, (m(0, 1) - m(1, 0)));
 
     q.setScalar(w);
     q.setX(x);
@@ -443,7 +443,7 @@ void Widget::asQuat2RPY(const QQuaternion &q, QVector3D &rpy)
         qreal R11 = qss - qxx + qyy - qzz;
 
         roll = 0.0;
-        pitch = _copysign(M_PI_2, test);
+        pitch = copysign(M_PI_2, test);
         yaw = qAtan2(-R10, R11);
     } else {
         qreal R12 = d2 * (q.y() * q.z() + q.scalar() * q.x());
@@ -469,7 +469,7 @@ void Widget::asMatrix2RPY(const QMatrix4x4 &m, QVector3D &rpy)
     if (qFabs(m(0, 2)) > 0.998) {
         // ~86.3°, gimbal lock
         roll  = 0.0;
-        pitch = _copysign(M_PI_2, -m(0, 2));
+        pitch = copysign(M_PI_2, -m(0, 2));
         yaw   = qAtan2(-m(1, 0), m(1, 1));
     } else {
         roll  = qAtan2(m(1, 2), m(2, 2));

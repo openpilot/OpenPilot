@@ -120,19 +120,19 @@ static void PIOS_OVERO_WriteData(struct pios_overo_dev *overo_dev)
 	// TODO: How do we protect against the DMA buffer swapping midway through adding data
 	// to this buffer.  If we were writing at the beginning it could cause a weird race.
 	if (overo_dev->tx_out_cb) {
-	
-		uint32_t max_bytes = PACKET_SIZE - overo_dev->writing_offset;
-		
+
+		int32_t max_bytes = PACKET_SIZE - overo_dev->writing_offset;
+
 		if (max_bytes > 0) {
-			bool tx_need_yield = false;
 			uint16_t bytes_added;
+			bool tx_need_yield = false;
 			uint8_t *writing_pointer = &overo_dev->tx_buffer[overo_dev->writing_buffer][overo_dev->writing_offset];
-		
+
 			bytes_added = (overo_dev->tx_out_cb)(overo_dev->tx_out_context, writing_pointer, max_bytes, NULL, &tx_need_yield);
+
 			if (tx_need_yield) {
 				vPortYieldFromISR();
 			}
-
 			overo_dev->writing_offset += bytes_added;
 		}
 	}
@@ -145,7 +145,8 @@ static void PIOS_OVERO_WriteData(struct pios_overo_dev *overo_dev)
 void PIOS_OVERO_DMA_irq_handler(uint32_t overo_id)
 {
 	struct pios_overo_dev * overo_dev = (struct pios_overo_dev *) overo_id;
-	PIOS_Assert(PIOS_OVERO_validate(overo_dev));
+	if(!PIOS_OVERO_validate(overo_dev))
+		return;
 	
 	DMA_ClearFlag(overo_dev->cfg->dma.tx.channel, overo_dev->cfg->dma.irq.flags);
 
@@ -326,7 +327,7 @@ static void PIOS_OVERO_TxStart(uint32_t overo_id, uint16_t tx_bytes_avail)
 	// DMA TX enable (enable IRQ) ?
 
 	// Load any pending bytes from TX fifo
-	//PIOS_OVERO_WriteData(overo_dev);	
+	PIOS_OVERO_WriteData(overo_dev);
 }
 
 static void PIOS_OVERO_RegisterRxCallback(uint32_t overo_id, pios_com_callback rx_in_cb, uint32_t context)

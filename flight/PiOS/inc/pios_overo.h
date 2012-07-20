@@ -46,16 +46,7 @@ struct pios_overo_cfg {
 	struct stm32_gpio ssel[];
 };
 
-struct pios_overo_dev {
-	const struct pios_overo_cfg * cfg;
-	void (*callback) (uint32_t);
-	uint32_t new_tx_buffer;
-	uint32_t new_rx_buffer;
-};
-
-extern int32_t PIOS_Overo_Init(const struct pios_overo_cfg * cfg);
-extern int32_t PIOS_Overo_SetCallback(void *callback);
-extern int32_t PIOS_Overo_SetNewBuffer(const uint8_t *send_buffer, uint8_t *receive_buffer, uint16_t len);
+extern int32_t PIOS_OVERO_Init(uint32_t * overo_id, const struct pios_overo_cfg * cfg);
 
 #endif /* PIOS_OVERO_H */
 

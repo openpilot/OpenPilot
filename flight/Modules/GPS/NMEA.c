@@ -421,6 +421,10 @@ bool NMEA_update_position(char *nmea_sentence, GPSPositionData *GpsData)
 		DEBUG_MSG("%s %d ", params[0]);
 	#endif
 	// Send the message to the parser and get it update the GpsData
+	// Information from various different NMEA messages are temporarily
+	// cumulated in the GpsData structure. An actual GPSPosition update
+	// is triggered by GGA messages only. This message type sets the
+	// gpsDataUpdated flag to request this.
 	bool gpsDataUpdated = false;
 
 	if (!parser->handler(GpsData, &gpsDataUpdated, params, nbParams)) {

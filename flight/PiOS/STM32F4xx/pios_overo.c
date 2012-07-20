@@ -150,8 +150,9 @@ void PIOS_OVERO_DMA_irq_handler(uint32_t overo_id)
 	DMA_ClearFlag(overo_dev->cfg->dma.tx.channel, overo_dev->cfg->dma.irq.flags);
 
 	overo_dev->writing_buffer = 1 - DMA_GetCurrentMemoryTarget(overo_dev->cfg->dma.tx.channel);
+	overo_dev->writing_offset = 0;
 
-	bool rx_need_yield;
+/*	bool rx_need_yield;
 	// Get data from the Rx buffer and add to the fifo
 	(void) (overo_dev->rx_in_cb)(overo_dev->rx_in_context, 
 								 &overo_dev->rx_buffer[overo_dev->writing_buffer][0], 
@@ -163,13 +164,21 @@ void PIOS_OVERO_DMA_irq_handler(uint32_t overo_id)
 
 	// Fill the buffer with known value to prevent rereading these bytes
 	memset(&overo_dev->rx_buffer[overo_dev->writing_buffer][0], 0xFF, PACKET_SIZE);
-
+*/
 	// Fill the buffer with known value to prevent resending any bytes
 	memset(&overo_dev->tx_buffer[overo_dev->writing_buffer][0], 0xFF, PACKET_SIZE);
 	
 	// Load any pending bytes from TX fifo
 	PIOS_OVERO_WriteData(overo_dev);
-	
+
+
+	/*if (overo_dev->tx_out_cb) {
+		bool tx_need_yield = false;			
+		(overo_dev->tx_out_cb)(overo_dev->tx_out_context, &overo_dev->tx_buffer[overo_dev->writing_buffer][0], PACKET_SIZE, NULL, &tx_need_yield);
+		if (tx_need_yield) {
+			vPortYieldFromISR();
+		}
+	}*/
 	overo_dev->packets++;
 }
 
@@ -314,7 +323,7 @@ static void PIOS_OVERO_TxStart(uint32_t overo_id, uint16_t tx_bytes_avail)
 	// DMA TX enable (enable IRQ) ?
 
 	// Load any pending bytes from TX fifo
-	PIOS_OVERO_WriteData(overo_dev);	
+	//PIOS_OVERO_WriteData(overo_dev);	
 }
 
 static void PIOS_OVERO_RegisterRxCallback(uint32_t overo_id, pios_com_callback rx_in_cb, uint32_t context)

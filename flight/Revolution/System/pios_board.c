@@ -789,7 +789,6 @@ void PIOS_Board_Init(void) {
 			if (PIOS_OVERO_Init(&pios_overo_id, &pios_overo_cfg)) {
 				PIOS_DEBUG_Assert(0);
 			}
-
 			const uint32_t PACKET_SIZE = 1024;
 			uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PACKET_SIZE);
 			uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PACKET_SIZE);

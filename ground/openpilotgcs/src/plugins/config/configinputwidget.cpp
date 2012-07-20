@@ -50,6 +50,7 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
     manualCommandObj = ManualControlCommand::GetInstance(getObjectManager());
     manualSettingsObj = ManualControlSettings::GetInstance(getObjectManager());
+    flightStatusObj = FlightStatus::GetInstance(getObjectManager());
     receiverActivityObj=ReceiverActivity::GetInstance(getObjectManager());
     m_config = new Ui_InputWidget();
     m_config->setupUi(this);
@@ -458,6 +459,9 @@ void ConfigInputWidget::wizardSetUpStep(enum wizardSteps step)
         break;
     case wizardIdentifyLimits:
     {
+        accessoryDesiredObj0 = AccessoryDesired::GetInstance(getObjectManager(),0);
+        accessoryDesiredObj1 = AccessoryDesired::GetInstance(getObjectManager(),1);
+        accessoryDesiredObj2 = AccessoryDesired::GetInstance(getObjectManager(),2);
         setTxMovement(nothing);
         m_config->wzText->setText(QString(tr("Please move all controls to their maximum extents on both directions and press next when ready")));
         fastMdata();
@@ -476,6 +480,8 @@ void ConfigInputWidget::wizardSetUpStep(enum wizardSteps step)
         }
         connect(manualCommandObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(identifyLimits()));
         connect(manualCommandObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(moveSticks()));
+        connect(flightStatusObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(moveSticks()));
+        connect(accessoryDesiredObj0, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(moveSticks()));
     }
         break;
     case wizardIdentifyInverted:
@@ -503,8 +509,10 @@ void ConfigInputWidget::wizardSetUpStep(enum wizardSteps step)
         fastMdata();
         break;
     case wizardFinish:
-        dimOtherControls(true);
+        dimOtherControls(false);
         connect(manualCommandObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(moveSticks()));
+        connect(flightStatusObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(moveSticks()));
+        connect(accessoryDesiredObj0, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(moveSticks()));
         m_config->wzText->setText(QString(tr("You have completed this wizard, please check below if the picture below mimics your sticks movement.\n"
                                              "This new settings aren't saved to the board yet, after pressing next you will go to the initial screen where you can do that.")));
         fastMdata();
@@ -572,6 +580,8 @@ void ConfigInputWidget::wizardTearDownStep(enum wizardSteps step)
     case wizardIdentifyLimits:
         disconnect(manualCommandObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(identifyLimits()));
         disconnect(manualCommandObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(moveSticks()));
+        disconnect(flightStatusObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(moveSticks()));
+        disconnect(accessoryDesiredObj0, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(moveSticks()));
         manualSettingsObj->setData(manualSettingsData);
         restoreMdata();
         setTxMovement(nothing);
@@ -595,6 +605,8 @@ void ConfigInputWidget::wizardTearDownStep(enum wizardSteps step)
         dimOtherControls(false);
         setTxMovement(nothing);
         disconnect(manualCommandObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(moveSticks()));
+        disconnect(flightStatusObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(moveSticks()));
+        disconnect(accessoryDesiredObj0, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(moveSticks()));
         restoreMdata();
         break;
     default:
@@ -1060,6 +1072,11 @@ void ConfigInputWidget::moveSticks()
 {
     QTransform trans;
     manualCommandData=manualCommandObj->getData();
+    flightStatusData=flightStatusObj->getData();
+    accessoryDesiredData0=accessoryDesiredObj0->getData();
+    accessoryDesiredData1=accessoryDesiredObj1->getData();
+    accessoryDesiredData2=accessoryDesiredObj2->getData();
+
     if(transmitterMode==mode2)
     {
         trans=m_txLeftStickOrig;
@@ -1074,6 +1091,24 @@ void ConfigInputWidget::moveSticks()
         trans=m_txLeftStickOrig;
         m_txLeftStick->setTransform(trans.translate(manualCommandData.Yaw*STICK_MAX_MOVE*10,manualCommandData.Pitch*STICK_MAX_MOVE*10),false);
     }
+    if(flightStatusData.FlightMode==manualSettingsData.FlightModePosition[0])
+    {
+        m_txFlightMode->setElementId("flightModeLeft");
+        m_txFlightMode->setTransform(m_txFlightModeLOrig,false);
+    }
+    else if (flightStatusData.FlightMode==manualSettingsData.FlightModePosition[1])
+    {
+        m_txFlightMode->setElementId("flightModeCenter");
+        m_txFlightMode->setTransform(m_txFlightModeCOrig,false);
+    }
+    else if (flightStatusData.FlightMode==manualSettingsData.FlightModePosition[2])
+    {
+        m_txFlightMode->setElementId("flightModeRight");
+        m_txFlightMode->setTransform(m_txFlightModeROrig,false);
+    }
+    m_txAccess0->setTransform(QTransform(m_txAccess0Orig).translate(accessoryDesiredData0.AccessoryVal*ACCESS_MAX_MOVE*10,0),false);
+    m_txAccess1->setTransform(QTransform(m_txAccess1Orig).translate(accessoryDesiredData1.AccessoryVal*ACCESS_MAX_MOVE*10,0),false);
+    m_txAccess2->setTransform(QTransform(m_txAccess2Orig).translate(accessoryDesiredData2.AccessoryVal*ACCESS_MAX_MOVE*10,0),false);
 }
 
 void ConfigInputWidget::dimOtherControls(bool value)

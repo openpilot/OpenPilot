@@ -212,11 +212,11 @@ static int32_t packData(uint8_t * data, int32_t length)
 {
 	portTickType tickTime = xTaskGetTickCount();
 
-	if( PIOS_COM_SendBuffer(pios_com_overo_id, (uint8_t *) &tickTime, sizeof(tickTime)) != 0)
+/*	if( PIOS_COM_SendBufferNonBlocking(pios_com_overo_id, (uint8_t *) &tickTime, sizeof(tickTime)) != 0)
 		goto fail;
-	if( PIOS_COM_SendBuffer(pios_com_overo_id, data, length) != 0)
+	if( PIOS_COM_SendBufferNonBlocking(pios_com_overo_id, data, length) != 0)
 		goto fail;
-
+*/
 	overosync->sent_bytes += length + 4;
 
 	return length;

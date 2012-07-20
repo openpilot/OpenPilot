@@ -106,6 +106,7 @@ static struct pios_overo_dev * PIOS_OVERO_alloc(void)
 	overo_dev->rx_in_context = 0;
 	overo_dev->tx_out_cb = 0;
 	overo_dev->tx_out_context = 0;
+	overo_dev->packets = 0;
 	overo_dev->magic = PIOS_OVERO_DEV_MAGIC;
 	return(overo_dev);
 }
@@ -263,12 +264,7 @@ int32_t PIOS_OVERO_Init(uint32_t * overo_id, const struct pios_overo_cfg * cfg)
 	SPI_DeInit(overo_dev->cfg->regs);
 	SPI_Init(overo_dev->cfg->regs, (SPI_InitTypeDef*)&(overo_dev->cfg->init));
 	
-	/* Configure CRC calculation */
-	if (overo_dev->cfg->use_crc) {
-		SPI_CalculateCRC(overo_dev->cfg->regs, ENABLE);
-	} else {
-		SPI_CalculateCRC(overo_dev->cfg->regs, DISABLE);
-	}
+	SPI_CalculateCRC(overo_dev->cfg->regs, DISABLE);
 	
 	/* Enable SPI */
 	SPI_Cmd(overo_dev->cfg->regs, ENABLE);

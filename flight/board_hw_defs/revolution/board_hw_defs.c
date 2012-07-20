@@ -455,6 +455,7 @@ void PIOS_SPI_flash_irq_handler(void)
  */
 #include <pios_overo_priv.h>
 void PIOS_OVERO_irq_handler(void);
+void DMA1_Streamr0_IRQHandler(void) __attribute__((alias("PIOS_OVERO_irq_handler")));
 void DMA1_Streamr7_IRQHandler(void) __attribute__((alias("PIOS_OVERO_irq_handler")));
 static const struct pios_overo_cfg pios_overo_cfg = {
 	.regs = SPI3,
@@ -474,7 +475,7 @@ static const struct pios_overo_cfg pios_overo_cfg = {
 	.dma = {		
                .irq = {
 			// Note this is the stream ID that triggers interrupts (in this case TX)
-			.flags = (DMA_IT_TCIF7 | DMA_IT_TEIF7), //DMA_IT_HTIF7),
+			.flags = (DMA_IT_TCIF0 | DMA_IT_TEIF0 | DMA_IT_TCIF7 | DMA_IT_TEIF7), //DMA_IT_HTIF7),
 			.init = {
 				.NVIC_IRQChannel = DMA1_Stream7_IRQn,
 				.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,

@@ -672,12 +672,15 @@ static void updatePathDesired(ManualControlCommandData * cmd, bool changed,bool 
 		pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
 		PathDesiredSet(&pathDesired);
 	} else {
+		
+/*Disable this section, until such time as proper discussion can be had about how to implement it for all types of crafts.		
 		PathDesiredData pathDesired;
 		PathDesiredGet(&pathDesired);
 		pathDesired.End[PATHDESIRED_END_NORTH] += dT * -cmd->Pitch;
 		pathDesired.End[PATHDESIRED_END_EAST] += dT * cmd->Roll;
 		pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
 		PathDesiredSet(&pathDesired);
+*/ 
 	}
 }
 

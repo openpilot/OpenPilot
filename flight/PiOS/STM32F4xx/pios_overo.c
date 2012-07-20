@@ -40,7 +40,7 @@
 
 #if defined(PIOS_INCLUDE_SPI)
 
-#include <pios_overo.h>
+#include <pios_overo_priv.h>
 
 #define PACKET_SIZE 1024
 
@@ -144,12 +144,17 @@ void PIOS_OVERO_DMA_irq_handler(uint32_t overo_id)
 	struct pios_overo_dev * overo_dev = (struct pios_overo_dev *) overo_id;
 	PIOS_Assert(PIOS_OVERO_validate(overo_dev));
 	
-	overo_dev->writing_memory = 1 - DMA_GetCurMemoryTarget(overo_dev->cfg->dma.tx.channel);
+	overo_dev->writing_buffer = 1 - DMA_GetCurrentMemoryTarget(overo_dev->cfg->dma.tx.channel);
 
+	bool rx_need_yield;
 	// Get data from the Rx buffer and add to the fifo
 	(void) (overo_dev->rx_in_cb)(overo_dev->rx_in_context, 
 								 &overo_dev->rx_buffer[overo_dev->writing_buffer][0], 
 								PACKET_SIZE, NULL, &rx_need_yield);
+
+	if(rx_need_yield) {
+		vPortYieldFromISR();
+	}
 
 	// Fill the buffer with known value to prevent rereading these bytes
 	memset(&overo_dev->rx_buffer[overo_dev->writing_buffer][0], 0xFF, PACKET_SIZE);
@@ -197,7 +202,7 @@ int32_t PIOS_OVERO_Init(uint32_t * overo_id, const struct pios_overo_cfg * cfg)
 	
 	/* only legal for single-slave config */
 	PIOS_Assert(overo_dev->cfg->slave_count == 1);
-	SPI_SSOutputCmd(overo_dev->cfg->regs, (overo_dev->cfg->init.SPI_Mode == SPI_Mode_Master) ? ENABLE : DISABLE);
+	SPI_SSOutputCmd(overo_dev->cfg->regs, DISABLE);
 	
 	/* Initialize the GPIO pins */
 	/* note __builtin_ctz() due to the difference between GPIO_PinX and GPIO_PinSourceX */
@@ -223,19 +228,19 @@ int32_t PIOS_OVERO_Init(uint32_t * overo_id, const struct pios_overo_cfg * cfg)
 
 	DMA_DeInit(overo_dev->cfg->dma.rx.channel);
 	dma_init = overo_dev->cfg->dma.rx.init;
-	dma_init.DMA_Memory0BaseAddr =  (uin32_t) overo_dev->rx_buffer[0];
+	dma_init.DMA_Memory0BaseAddr =  (uint32_t) overo_dev->rx_buffer[0];
 	dma_init.DMA_MemoryInc = DMA_MemoryInc_Enable;
 	dma_init.DMA_BufferSize = PACKET_SIZE;
 	DMA_Init(overo_dev->cfg->dma.rx.channel, &dma_init);
-	DMA_DoubleBufferModeConfig(overo_dev->cfg->dma.rx.channel, (uin32_t) overo_dev->rx_buffer[1], DMA_Memory_0);
+	DMA_DoubleBufferModeConfig(overo_dev->cfg->dma.rx.channel, (uint32_t) overo_dev->rx_buffer[1], DMA_Memory_0);
 	
 	DMA_DeInit(overo_dev->cfg->dma.tx.channel);
 	dma_init = overo_dev->cfg->dma.tx.init;
-	dma_init.DMA_Memory0BaseAddr =  (uin32_t) overo_dev->tx_buffer[0];
+	dma_init.DMA_Memory0BaseAddr =  (uint32_t) overo_dev->tx_buffer[0];
 	dma_init.DMA_MemoryInc = DMA_MemoryInc_Enable;
 	dma_init.DMA_BufferSize = PACKET_SIZE;
 	DMA_Init(overo_dev->cfg->dma.tx.channel, &dma_init);
-	DMA_DoubleBufferModeConfig(overo_dev->cfg->dma.tx.channel, (uin32_t) overo_dev->tx_buffer[1], DMA_Memory_0);
+	DMA_DoubleBufferModeConfig(overo_dev->cfg->dma.tx.channel, (uint32_t) overo_dev->tx_buffer[1], DMA_Memory_0);
 		
 	/* Initialize the SPI block */
 	SPI_DeInit(overo_dev->cfg->regs);

@@ -447,10 +447,15 @@ void PIOS_SPI_flash_irq_handler(void)
 }
 #endif /* PIOS_FLASH_ON_ACCEL */
 
+#endif /* PIOS_INCLUDE_SPI */
+
 #if defined(PIOS_OVERO_SPI)
 /* SPI3 Interface
  *      - Used for flash communications
  */
+#include <pios_overo_priv.h>
+void PIOS_OVERO_irq_handler(void);
+void DMA1_Streamr7_IRQHandler(void) __attribute__((alias("PIOS_OVERO_irq_handler")));
 static const struct pios_overo_cfg pios_overo_cfg = {
 	.regs = SPI3,
 	.remap = GPIO_AF_SPI3,
@@ -467,6 +472,17 @@ static const struct pios_overo_cfg pios_overo_cfg = {
 	},
 	.use_crc = false,
 	.dma = {		
+               .irq = {
+			// Note this is the stream ID that triggers interrupts (in this case TX)
+			.flags = (DMA_IT_TCIF7 | DMA_IT_TEIF7), //DMA_IT_HTIF7),
+			.init = {
+				.NVIC_IRQChannel = DMA1_Stream7_IRQn,
+				.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+				.NVIC_IRQChannelSubPriority = 0,
+				.NVIC_IRQChannelCmd = ENABLE,
+			},
+		},
+
 		.rx = {
 			.channel = DMA1_Stream0,
 			.init = {
@@ -477,13 +493,13 @@ static const struct pios_overo_cfg pios_overo_cfg = {
 				.DMA_MemoryInc          = DMA_MemoryInc_Enable,
 				.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte,
 				.DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte,
-				.DMA_Mode               = DMA_Mode_Normal,
+				.DMA_Mode               = DMA_Mode_Circular,
 				.DMA_Priority           = DMA_Priority_Medium,
 				//TODO: Enable FIFO
 				.DMA_FIFOMode           = DMA_FIFOMode_Disable,
-                .DMA_FIFOThreshold      = DMA_FIFOThreshold_Full,
-                .DMA_MemoryBurst        = DMA_MemoryBurst_Single,
-                .DMA_PeripheralBurst    = DMA_PeripheralBurst_Single,
+				.DMA_FIFOThreshold      = DMA_FIFOThreshold_Full,
+				.DMA_MemoryBurst        = DMA_MemoryBurst_Single,
+				.DMA_PeripheralBurst    = DMA_PeripheralBurst_Single,
 			},
 		},
 		.tx = {
@@ -496,12 +512,12 @@ static const struct pios_overo_cfg pios_overo_cfg = {
 				.DMA_MemoryInc          = DMA_MemoryInc_Enable,
 				.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte,
 				.DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte,
-				.DMA_Mode               = DMA_Mode_Normal,
+				.DMA_Mode               = DMA_Mode_Circular,
 				.DMA_Priority           = DMA_Priority_Medium,
 				.DMA_FIFOMode           = DMA_FIFOMode_Disable,
-                .DMA_FIFOThreshold      = DMA_FIFOThreshold_Full,
-                .DMA_MemoryBurst        = DMA_MemoryBurst_Single,
-                .DMA_PeripheralBurst    = DMA_PeripheralBurst_Single,
+				.DMA_FIFOThreshold      = DMA_FIFOThreshold_Full,
+				.DMA_MemoryBurst        = DMA_MemoryBurst_Single,
+				.DMA_PeripheralBurst    = DMA_PeripheralBurst_Single,
 			},
 		},
 	},
@@ -547,12 +563,17 @@ static const struct pios_overo_cfg pios_overo_cfg = {
 		},
 	} },
 };
-
+uint32_t pios_overo_id = 0;
+void PIOS_OVERO_irq_handler(void)
+{
+	/* Call into the generic code to handle the IRQ for this specific device */
+	PIOS_OVERO_DMA_irq_handler(pios_overo_id);
+}
 #else
-uint32_t pios_spi_overo_id = 0;
+
 #endif /* PIOS_OVERO_SPI */
 
-#endif /* PIOS_INCLUDE_SPI */
+
 
 
 

@@ -15,5 +15,6 @@
         <file>images/deviceID-0402.svg</file>
         <file>images/gcs-board-cc.png</file>
         <file>images/gcs-board-cc3d.png</file>
+        <file>images/pipx.png</file>
     </qresource>
 </RCC>

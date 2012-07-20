@@ -95,7 +95,7 @@ void deviceWidget::populate()
         devicePic.load("");//TODO
         break;
     case 0x0301:
-        devicePic.load("");//TODO
+        devicePic.load(":/uploader/images/pipx.png");
         break;
     case 0x0401:
         devicePic.load(":/uploader/images/gcs-board-cc.png");

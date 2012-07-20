@@ -251,6 +251,7 @@ int32_t PIOS_OVERO_Init(uint32_t * overo_id, const struct pios_overo_cfg * cfg)
 	dma_init.DMA_BufferSize = PACKET_SIZE;
 	DMA_Init(overo_dev->cfg->dma.rx.channel, &dma_init);
 	DMA_DoubleBufferModeConfig(overo_dev->cfg->dma.rx.channel, (uint32_t) overo_dev->rx_buffer[1], DMA_Memory_0);
+	DMA_DoubleBufferModeCmd(overo_dev->cfg->dma.rx.channel, ENABLE);
 	
 	DMA_DeInit(overo_dev->cfg->dma.tx.channel);
 	dma_init = overo_dev->cfg->dma.tx.init;
@@ -259,7 +260,12 @@ int32_t PIOS_OVERO_Init(uint32_t * overo_id, const struct pios_overo_cfg * cfg)
 	dma_init.DMA_BufferSize = PACKET_SIZE;
 	DMA_Init(overo_dev->cfg->dma.tx.channel, &dma_init);
 	DMA_DoubleBufferModeConfig(overo_dev->cfg->dma.tx.channel, (uint32_t) overo_dev->tx_buffer[1], DMA_Memory_0);
-		
+	DMA_DoubleBufferModeCmd(overo_dev->cfg->dma.tx.channel, ENABLE);
+
+	/* Set the packet size */
+	DMA_SetCurrDataCounter(overo_dev->cfg->dma.rx.channel, PACKET_SIZE);
+	DMA_SetCurrDataCounter(overo_dev->cfg->dma.tx.channel, PACKET_SIZE);
+
 	/* Initialize the SPI block */
 	SPI_DeInit(overo_dev->cfg->regs);
 	SPI_Init(overo_dev->cfg->regs, (SPI_InitTypeDef*)&(overo_dev->cfg->init));
@@ -271,9 +277,10 @@ int32_t PIOS_OVERO_Init(uint32_t * overo_id, const struct pios_overo_cfg * cfg)
 	
 	/* Enable SPI interrupts to DMA */
 	SPI_I2S_DMACmd(overo_dev->cfg->regs, SPI_I2S_DMAReq_Tx | SPI_I2S_DMAReq_Rx, ENABLE);
-		
+
 	/* Configure DMA interrupt */
 	NVIC_Init((NVIC_InitTypeDef*)&(overo_dev->cfg->dma.irq.init));
+	DMA_ITConfig(overo_dev->cfg->dma.tx.channel, DMA_IT_TC, ENABLE);
 
 	/* Enable the DMA channels */
 	DMA_Cmd(overo_dev->cfg->dma.tx.channel, ENABLE);

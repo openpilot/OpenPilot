@@ -216,8 +216,13 @@ static void objectUpdatedCb(UAVObjEvent * ev)
 		ObjectPersistenceGet(&objper);
 
 		int retval = 1;
-		// Execute action
-		if (objper.Operation == OBJECTPERSISTENCE_OPERATION_LOAD) {
+		FlightStatusData flightStatus;
+		FlightStatusGet(&flightStatus);
+
+		// Execute action if disarmed
+		if(flightStatus.Armed != FLIGHTSTATUS_ARMED_DISARMED) {
+			retval = -1;
+		} else if (objper.Operation == OBJECTPERSISTENCE_OPERATION_LOAD) {
 			if (objper.Selection == OBJECTPERSISTENCE_SELECTION_SINGLEOBJECT) {
 				// Get selected object
 				obj = UAVObjGetByID(objper.ObjectID);

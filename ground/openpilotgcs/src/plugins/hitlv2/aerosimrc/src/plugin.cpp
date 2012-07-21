@@ -40,7 +40,7 @@ QList<quint16> videoModes;
 QTime ledTimer;
 
 UdpSender *sndr;
-UdpReciever *rcvr;
+UdpReceiver *rcvr;
 
 const float RAD2DEG = (float)(180.0 / M_PI);
 const float DEG2RAD = (float)(M_PI / 180.0);
@@ -104,7 +104,7 @@ SIM_DLL_EXPORT void AeroSIMRC_Plugin_Init(pluginInit *p)
     sndr = new UdpSender(ini->getOutputMap(), ini->isFromTX());
     sndr->init(ini->remoteHost(), ini->remotePort());
 
-    rcvr = new UdpReciever(ini->getInputMap(), ini->isToRX());
+    rcvr = new UdpReceiver(ini->getInputMap(), ini->isToRX());
     rcvr->init(ini->localHost(), ini->localPort());
 
     // run thread

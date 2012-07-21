@@ -112,12 +112,12 @@ void UdpSender::sendDatagram(const simToPlugin *stp)
 
 //-----------------------------------------------------------------------------
 
-UdpReciever::UdpReciever(const QList<quint8> map,
+UdpReceiver::UdpReceiver(const QList<quint8> map,
                          bool isRX,
                          QObject *parent)
     : QThread(parent)
 {
-    qDebug() << this << "UdpReciever::UdpReciever thread:" << thread();
+    qDebug() << this << "UdpReceiver::UdpReceiver thread:" << thread();
 
     stopped = false;
     inSocket = NULL;
@@ -130,17 +130,17 @@ UdpReciever::UdpReciever(const QList<quint8> map,
     packetsRecived = 1;
 }
 
-UdpReciever::~UdpReciever()
+UdpReceiver::~UdpReceiver()
 {
-    qDebug() << this  << "UdpReciever::~UdpReciever";
+    qDebug() << this  << "UdpReceiver::~UdpReceiver";
     if (inSocket)
         delete inSocket;
 }
 
 // public
-void UdpReciever::init(const QString &localHost, quint16 localPort)
+void UdpReceiver::init(const QString &localHost, quint16 localPort)
 {
-    qDebug() << this << "UdpReciever::init";
+    qDebug() << this << "UdpReceiver::init";
 
     inSocket = new QUdpSocket();
     qDebug() << this << "inSocket constructed" << inSocket->thread();
@@ -148,21 +148,21 @@ void UdpReciever::init(const QString &localHost, quint16 localPort)
     inSocket->bind(QHostAddress(localHost), localPort);
 }
 
-void UdpReciever::run()
+void UdpReceiver::run()
 {
-    qDebug() << this << "UdpReciever::run start";
+    qDebug() << this << "UdpReceiver::run start";
     while (!stopped)
         onReadyRead();
-    qDebug() << this << "UdpReciever::run ended";
+    qDebug() << this << "UdpReceiver::run ended";
 }
 
-void UdpReciever::stop()
+void UdpReceiver::stop()
 {
-    qDebug() << this << "UdpReciever::stop";
+    qDebug() << this << "UdpReceiver::stop";
     stopped = true;
 }
 
-void UdpReciever::setChannels(pluginToSim *pts)
+void UdpReceiver::setChannels(pluginToSim *pts)
 {
     QMutexLocker locker(&mutex);
 
@@ -183,7 +183,7 @@ void UdpReciever::setChannels(pluginToSim *pts)
     }
 }
 
-void UdpReciever::getFlighStatus(quint8 &arm, quint8 &mod)
+void UdpReceiver::getFlighStatus(quint8 &arm, quint8 &mod)
 {
     QMutexLocker locker(&mutex);
 
@@ -192,7 +192,7 @@ void UdpReciever::getFlighStatus(quint8 &arm, quint8 &mod)
 }
 
 // private
-void UdpReciever::onReadyRead()
+void UdpReceiver::onReadyRead()
 {
     if (!inSocket->waitForReadyRead(8)) // 1/60fps ~= 16.7ms, 1/120fps ~= 8.3ms
         return;
@@ -209,7 +209,7 @@ void UdpReciever::onReadyRead()
     }
 }
 
-void UdpReciever::processDatagram(QByteArray &datagram)
+void UdpReceiver::processDatagram(QByteArray &datagram)
 {
     QDataStream stream(datagram);
     stream.setFloatingPointPrecision(QDataStream::SinglePrecision);

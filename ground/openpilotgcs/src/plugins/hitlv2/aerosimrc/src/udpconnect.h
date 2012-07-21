@@ -57,12 +57,12 @@ private:
 };
 
 
-class UdpReciever : public QThread
+class UdpReceiver : public QThread
 {
 //    Q_OBJECT
 public:
-    explicit UdpReciever(const QList<quint8> map, bool isRX, QObject *parent = 0);
-    ~UdpReciever();
+    explicit UdpReceiver(const QList<quint8> map, bool isRX, QObject *parent = 0);
+    ~UdpReceiver();
     void init(const QString &localHost, quint16 localPort);
     void run();
     void stop();

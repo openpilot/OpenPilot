@@ -510,7 +510,6 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	GPSPositionData gpsData;
 	GPSVelocityData gpsVelData;
 	GyrosBiasData gyrosBias;
-	HomeLocationData home;
 
 	static bool mag_updated = false;
 	static bool baro_updated;
@@ -572,7 +571,6 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	GPSPositionGet(&gpsData);
 	GPSVelocityGet(&gpsVelData);
 	GyrosBiasGet(&gyrosBias);
-	HomeLocationGet(&home);
 
 	// Discard mag if it has NAN (normally from bad calibration)
 	mag_updated &= (magData.x == magData.x && magData.y == magData.y && magData.z == magData.z);
@@ -637,7 +635,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 			INSSetGyroVar(revoCalibration.gyro_var);
 			INSSetBaroVar(revoCalibration.baro_var);
 
-			INSSetMagNorth(home.Be);
+			INSSetMagNorth(homeLocation.Be);
 
 			// Initialize the gyro bias from the settings
 			INSSetGyroBias(&gyrosBias.x);
@@ -758,7 +756,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	if(baro_updated)
 		sensors |= BARO_SENSOR;
 
-	INSSetMagNorth(home.Be);
+	INSSetMagNorth(homeLocation.Be);
 	
 	if (gps_updated && outdoor_mode)
 	{

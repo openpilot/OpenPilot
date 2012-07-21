@@ -379,9 +379,9 @@ static void SensorsTask(void *parameters)
 			// Apply bias correction to the gyros from the state estimator
 			GyrosBiasData gyrosBias;
 			GyrosBiasGet(&gyrosBias);
-			gyrosData.x += gyrosBias.x;
-			gyrosData.y += gyrosBias.y;
-			gyrosData.z += gyrosBias.z;
+			gyrosData.x -= gyrosBias.x;
+			gyrosData.y -= gyrosBias.y;
+			gyrosData.z -= gyrosBias.z;
 		}
 		GyrosSet(&gyrosData);
 		

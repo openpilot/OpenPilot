@@ -47,7 +47,7 @@
 // Debugging
 #ifdef ENABLE_DEBUG_MSG
 //#define DEBUG_MSG_IN			///< define to display the incoming NMEA messages
-//#define DEBUG_PARMS			///< define to display the incoming NMEA messages split into its parameters
+//#define DEBUG_PARAMS			///< define to display the incoming NMEA messages split into its parameters
 //#define DEBUG_MGSID_IN		///< define to display the the names of the incoming NMEA messages
 //#define NMEA_DEBUG_PKT		///< define to enable debug of all NMEA messages
 //#define NMEA_DEBUG_GGA		///< define to enable debug of GGA messages

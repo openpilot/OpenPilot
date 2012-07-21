@@ -99,6 +99,7 @@ static AttitudeSettingsData attitudeSettings;
 static HomeLocationData homeLocation;
 static RevoCalibrationData revoCalibration;
 static RevoSettingsData revoSettings;
+static bool gyroBiasSettingsUpdated = false;
 const uint32_t SENSOR_QUEUE_SIZE = 10;
 
 // Private functions
@@ -204,6 +205,8 @@ static void AttitudeTask(void *parameters)
 	// Force settings update to make sure rotation loaded
 	settingsUpdatedCb(AttitudeSettingsHandle());
 	settingsUpdatedCb(RevoSettingsHandle());
+	settingsUpdatedCb(RevoCalibrationHandle());
+	settingsUpdatedCb(HomeLocationHandle());
 
 	// Wait for all the sensors be to read
 	vTaskDelay(100);
@@ -834,35 +837,43 @@ static int32_t getNED(GPSPositionData * gpsPosition, float * NED)
 	return 0;
 }
 
-static void settingsUpdatedCb(UAVObjEvent * objEv) 
+static void settingsUpdatedCb(UAVObjEvent * ev) 
 {
-	float lat, alt;
+	// If the object updated was the ObjectPersistence execute requested action
+	if (ev->obj == RevoCalibrationHandle()) {
+		RevoCalibrationGet(&revoCalibration);
 
-	AttitudeSettingsGet(&attitudeSettings);
-	RevoCalibrationGet(&revoCalibration);
-	RevoSettingsGet(&revoSettings);
-	HomeLocationGet(&homeLocation);
+		/* When the revo calibration is updated, update the GyroBias object */
+		GyrosBiasData gyrosBias;
+		GyrosBiasGet(&gyrosBias);
+		gyrosBias.x = revoCalibration.gyro_bias[REVOCALIBRATION_GYRO_BIAS_X];
+		gyrosBias.y = revoCalibration.gyro_bias[REVOCALIBRATION_GYRO_BIAS_X];
+		gyrosBias.z = revoCalibration.gyro_bias[REVOCALIBRATION_GYRO_BIAS_X];
+		GyrosBiasSet(&gyrosBias);
 
-	GyrosBiasData gyrosBias;
-	GyrosBiasGet(&gyrosBias);
-	gyrosBias.x = attitudeSettings.GyroBias[ATTITUDESETTINGS_GYROBIAS_X] / 100.0f;
-	gyrosBias.y = attitudeSettings.GyroBias[ATTITUDESETTINGS_GYROBIAS_Y] / 100.0f;
-	gyrosBias.z = attitudeSettings.GyroBias[ATTITUDESETTINGS_GYROBIAS_Z] / 100.0f;
-	GyrosBiasSet(&gyrosBias);
+		gyroBiasSettingsUpdated = true;
 
-	// Compute matrix to convert deltaLLA to NED
-	lat = homeLocation.Latitude / 10.0e6f * DEG2RAD;
-	alt = homeLocation.Altitude;
+		// In case INS currently running
+		INSSetMagVar(revoCalibration.mag_var);
+		INSSetAccelVar(revoCalibration.accel_var);
+		INSSetGyroVar(revoCalibration.gyro_var);
+		INSSetBaroVar(revoCalibration.baro_var);
+	} else if (ev->obj == HomeLocationHandle()) {
+		HomeLocationGet(&homeLocation);
 
-	// In case INS currently running
-	INSSetMagVar(revoCalibration.mag_var);
-	INSSetAccelVar(revoCalibration.accel_var);
-	INSSetGyroVar(revoCalibration.gyro_var);
-	INSSetBaroVar(revoCalibration.baro_var);
+		// Compute matrix to convert deltaLLA to NED
+		float lat, alt;
+		lat = homeLocation.Latitude / 10.0e6f * DEG2RAD;
+		alt = homeLocation.Altitude;
 
-	T[0] = alt+6.378137E6f;
-	T[1] = cosf(lat)*(alt+6.378137E6f);
-	T[2] = -1.0f;
+		T[0] = alt+6.378137E6f;
+		T[1] = cosf(lat)*(alt+6.378137E6f);
+		T[2] = -1.0f;
+	} else if (ev->obj == AttitudeSettingsHandle()) {
+		AttitudeSettingsGet(&attitudeSettings);
+	} else if (ev->obj == RevoSettingsHandle()) {
+		RevoSettingsGet(&revoSettings);
+	}
 }
 /**
  * @}

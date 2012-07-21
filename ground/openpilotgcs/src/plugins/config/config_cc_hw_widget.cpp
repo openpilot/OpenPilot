@@ -35,11 +35,9 @@
 #include <QtGui/QPushButton>
 #include <QDesktopServices>
 #include <QUrl>
-
-////Added to allow expert mode
 #include <extensionsystem/pluginmanager.h>
 #include <coreplugin/generalsettings.h>
-////
+
 
 ConfigCCHWWidget::ConfigCCHWWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
@@ -48,12 +46,12 @@ ConfigCCHWWidget::ConfigCCHWWidget(QWidget *parent) : ConfigTaskWidget(parent)
 
     m_telemetry->label_2->setPixmap(QPixmap(":/configgadget/images/coptercontrol.svg"));
 
-////Added to allow expert mode
+
     ExtensionSystem::PluginManager *pm=ExtensionSystem::PluginManager::instance();
     Core::Internal::GeneralSettings * settings=pm->getObject<Core::Internal::GeneralSettings>();
     if(!settings->useExpertMode())
         m_telemetry->saveTelemetryToRAM->setVisible(false);
-//////////////////////////////////
+
 
     addApplySaveButtons(m_telemetry->saveTelemetryToRAM,m_telemetry->saveTelemetryToSD);
     addUAVObjectToWidgetRelation("HwSettings","CC_FlexiPort",m_telemetry->cbFlexi);

@@ -236,7 +236,7 @@ static void AttitudeTask(void *parameters)
 				ret_val = updateAttitudeINSGPS(first_run, false);
 				break;
 			default:
-				AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE,SYSTEMALARMS_ALARM_ERROR);
+				AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE,SYSTEMALARMS_ALARM_CRITICAL);
 				break;
 		}
 

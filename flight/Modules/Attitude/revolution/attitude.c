@@ -358,28 +358,30 @@ static int32_t updateAttitudeComplimentary(bool first_run)
 		float brot[3];
 		float Rbe[3][3];
 		MagnetometerData mag;
-		HomeLocationData home;
-
+		
 		Quaternion2R(q, Rbe);
 		MagnetometerGet(&mag);
-		HomeLocationGet(&home);
-		rot_mult(Rbe, home.Be, brot);
 
-		float mag_len = sqrtf(mag.x * mag.x + mag.y * mag.y + mag.z * mag.z);
-		mag.x /= mag_len;
-		mag.y /= mag_len;
-		mag.z /= mag_len;
+		// If the mag is producing bad data don't use it (normally bad calibration)
+		if  (mag.x == mag.x && mag.y == mag.y && mag.z == mag.z) {
+			rot_mult(Rbe, home.Be, brot);
 
-		float bmag = sqrtf(brot[0] * brot[0] + brot[1] * brot[1] + brot[2] * brot[2]);
-		brot[0] /= bmag;
-		brot[1] /= bmag;
-		brot[2] /= bmag;
+			float mag_len = sqrtf(mag.x * mag.x + mag.y * mag.y + mag.z * mag.z);
+			mag.x /= mag_len;
+			mag.y /= mag_len;
+			mag.z /= mag_len;
 
-		// Only compute if neither vector is null
-		if (bmag < 1 || mag_len < 1)
-			mag_err[0] = mag_err[1] = mag_err[2] = 0;
-		else
-			CrossProduct((const float *) &mag.x, (const float *) brot, mag_err);
+			float bmag = sqrtf(brot[0] * brot[0] + brot[1] * brot[1] + brot[2] * brot[2]);
+			brot[0] /= bmag;
+			brot[1] /= bmag;
+			brot[2] /= bmag;
+
+			// Only compute if neither vector is null
+			if (bmag < 1 || mag_len < 1)
+				mag_err[0] = mag_err[1] = mag_err[2] = 0;
+			else
+				CrossProduct((const float *) &mag.x, (const float *) brot, mag_err);
+		}
 	} else {
 		mag_err[0] = mag_err[1] = mag_err[2] = 0;
 	}
@@ -567,6 +569,9 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	GPSPositionGet(&gpsData);
 	GPSVelocityGet(&gpsVelData);
 	HomeLocationGet(&home);
+
+	// Discard mag if it has NAN (normally from bad calibration)
+	mag_updated &= (magData.x == magData.x && magData.y == magData.y && magData.z == magData.z);
 
 	// Have a minimum requirement for gps usage
 	gps_updated &= (gpsData.Satellites >= 7) && (gpsData.PDOP <= 4.0f) && (homeLocation.Set == HOMELOCATION_SET_TRUE);

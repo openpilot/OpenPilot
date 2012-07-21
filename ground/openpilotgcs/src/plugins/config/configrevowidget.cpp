@@ -740,15 +740,68 @@ void ConfigRevoWidget::computeScaleBias()
    revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Y] = -sign(S[1]) * b[1];
    revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Z] = -sign(S[2]) * b[2];
 
-   revoCalibration->setData(revoCalibrationData);
 
-   position = -1; //set to run again
 #ifdef SIX_POINT_CAL_ACCEL
-   m_ui->sixPointCalibInstructions->append("Computed accel and mag scale and bias...");
+   bool good_calibration = true;
+
+   // Check the mag calibration is good
+   good_calibration &= revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_X] ==
+           revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_X];
+   good_calibration &= revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_Y] ==
+           revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_Y];
+   good_calibration &= revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_Z] ==
+           revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_Z];
+   good_calibration &= revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_X] ==
+           revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_X];
+   good_calibration &= revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Y] ==
+           revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Y];
+   good_calibration &= revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Z] ==
+           revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Z];
+
+   // Check the accel calibration is good
+   good_calibration &= revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_X] ==
+           revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_X];
+   good_calibration &= revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_Y] ==
+           revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_Y];
+   good_calibration &= revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_Z] ==
+           revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_Z];
+   good_calibration &= revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_X] ==
+           revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_X];
+   good_calibration &= revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Y] ==
+           revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Y];
+   good_calibration &= revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Z] ==
+           revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Z];
+   if (good_calibration) {
+       revoCalibration->setData(revoCalibrationData);
+       m_ui->sixPointCalibInstructions->append("Computed accel and mag scale and bias...");
+   } else {
+       revoCalibrationData = revoCalibration->getData();
+       m_ui->sixPointCalibInstructions->append("Bad calibration. Please repeat.");
+   }
 #else
-   m_ui->sixPointCalibInstructions->append("Computed mag scale and bias...");
+   bool good_calibration = true;
+   good_calibration &= revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_X] ==
+           revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_X];
+   good_calibration &= revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_Y] ==
+           revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_Y];
+   good_calibration &= revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_Z] ==
+           revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_Z];
+   good_calibration &= revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_X] ==
+           revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_X];
+   good_calibration &= revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Y] ==
+           revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Y];
+   good_calibration &= revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Z] ==
+           revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Z];
+   if (good_calibration) {
+       revoCalibration->setData(revoCalibrationData);
+       m_ui->sixPointCalibInstructions->append("Computed mag scale and bias...");
+   } else {
+       revoCalibrationData = revoCalibration->getData();
+       m_ui->sixPointCalibInstructions->append("Bad calibration. Please repeat.");
+   }
 #endif
 
+   position = -1; //set to run again
 }
 
 /**

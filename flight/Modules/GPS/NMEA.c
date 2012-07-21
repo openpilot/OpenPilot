@@ -30,10 +30,14 @@
 
 #include "openpilot.h"
 #include "pios.h"
-#include "NMEA.h"
+
+#if defined(PIOS_INCLUDE_GPS_NMEA_PARSER)
+
 #include "gpsposition.h"
+#include "NMEA.h"
 #include "gpstime.h"
 #include "gpssatellites.h"
+#include "GPS.h"
 
 //#define ENABLE_DEBUG_MSG						///< define to enable debug-messages
 #define DEBUG_PORT		PIOS_COM_TELEM_RF		///< defines which serial port is ued for debug-messages
@@ -43,7 +47,7 @@
 // Debugging
 #ifdef ENABLE_DEBUG_MSG
 //#define DEBUG_MSG_IN			///< define to display the incoming NMEA messages
-//#define DEBUG_PARS			///< define to display the incoming NMEA messages split into its parameters
+//#define DEBUG_PARMS			///< define to display the incoming NMEA messages split into its parameters
 //#define DEBUG_MGSID_IN		///< define to display the the names of the incoming NMEA messages
 //#define NMEA_DEBUG_PKT		///< define to enable debug of all NMEA messages
 //#define NMEA_DEBUG_GGA		///< define to enable debug of GGA messages
@@ -63,7 +67,6 @@
 struct nmea_parser {
 	const char *prefix;
 	bool(*handler) (GPSPositionData * GpsData, bool* gpsDataUpdated, char* param[], uint8_t nbParam);
-	uint32_t cnt;
 };
 
 static bool nmeaProcessGPGGA(GPSPositionData * GpsData, bool* gpsDataUpdated, char* param[], uint8_t nbParam);
@@ -75,50 +78,125 @@ static bool nmeaProcessGPGSA(GPSPositionData * GpsData, bool* gpsDataUpdated, ch
 	static bool nmeaProcessGPGSV(GPSPositionData * GpsData, bool* gpsDataUpdated, char* param[], uint8_t nbParam);
 #endif //PIOS_GPS_MINIMAL
 
-
-static struct nmea_parser nmea_parsers[] = {
+const static struct nmea_parser nmea_parsers[] = {
 	{
 		.prefix = "GPGGA",
 		.handler = nmeaProcessGPGGA,
-		.cnt = 0,
 	},
 	{
 		.prefix = "GPVTG",
 		.handler = nmeaProcessGPVTG,
-		.cnt = 0,
 	},
 	{
 		.prefix = "GPGSA",
 		.handler = nmeaProcessGPGSA,
-		.cnt = 0,
 	},
 	{
 		.prefix = "GPRMC",
 		.handler = nmeaProcessGPRMC,
-		.cnt = 0,
 	},
 #if !defined(PIOS_GPS_MINIMAL)
 	{
 		.prefix = "GPZDA",
 		.handler = nmeaProcessGPZDA,
-		.cnt = 0,
 	},
 	{
 		.prefix = "GPGSV",
 		.handler = nmeaProcessGPGSV,
-		.cnt = 0,
 	},
 #endif //PIOS_GPS_MINIMAL
 };
 
-static struct nmea_parser *NMEA_find_parser_by_prefix(const char *prefix)
+int parse_nmea_stream (uint8_t c, char *gps_rx_buffer, GPSPositionData *GpsData, struct GPS_RX_STATS *gpsRxStats)
+{
+	static uint8_t rx_count = 0;
+	static bool start_flag = false;
+	static bool found_cr = false;
+
+	// detect start while acquiring stream
+	if (!start_flag && (c == '$')) // NMEA identifier found
+	{
+		start_flag = true;
+		found_cr = false;
+		rx_count = 0;
+	}
+	else
+	if (!start_flag)
+		return PARSER_ERROR;
+
+	if (rx_count >= NMEA_MAX_PACKET_LENGTH)
+	{
+		// The buffer is already full and we haven't found a valid NMEA sentence.
+		// Flush the buffer and note the overflow event.
+		gpsRxStats->gpsRxOverflow++;
+		start_flag = false;
+		found_cr = false;
+		rx_count = 0;
+		return PARSER_OVERRUN;
+	}
+	else
+	{
+		gps_rx_buffer[rx_count] = c;
+		rx_count++;
+	}
+
+	// look for ending '\r\n' sequence
+	if (!found_cr && (c == '\r') )
+		found_cr = true;
+	else
+	if (found_cr && (c != '\n') )
+		found_cr = false;  // false end flag
+	else
+	if (found_cr && (c == '\n') )
+	{
+		// The NMEA functions require a zero-terminated string
+		// As we detected \r\n, the string as for sure 2 bytes long, we will also strip the \r\n
+		gps_rx_buffer[rx_count-2] = 0;
+
+		// prepare to parse next sentence
+		start_flag = false;
+		found_cr = false;
+		rx_count = 0;
+		// Our rxBuffer must look like this now:
+		//   [0]           = '$'
+		//   ...           = zero or more bytes of sentence payload
+		//   [end_pos - 1] = '\r'
+		//   [end_pos]     = '\n'
+		//
+		// Prepare to consume the sentence from the buffer
+
+		// Validate the checksum over the sentence
+		if (!NMEA_checksum(&gps_rx_buffer[1]))
+		{	// Invalid checksum.  May indicate dropped characters on Rx.
+			//PIOS_DEBUG_PinHigh(2);
+			gpsRxStats->gpsRxChkSumError++;
+			//PIOS_DEBUG_PinLow(2);
+			return PARSER_ERROR;
+		}
+		else
+		{	// Valid checksum, use this packet to update the GPS position
+			if (!NMEA_update_position(&gps_rx_buffer[1], GpsData)) {
+				//PIOS_DEBUG_PinHigh(2);
+				gpsRxStats->gpsRxParserError++;
+				//PIOS_DEBUG_PinLow(2);
+			}
+			else
+				gpsRxStats->gpsRxReceived++;;
+
+			return PARSER_COMPLETE;
+		}
+	}
+	return PARSER_INCOMPLETE;
+}
+
+const static struct nmea_parser *NMEA_find_parser_by_prefix(const char *prefix)
 {
 	if (!prefix) {
 		return (NULL);
 	}
 
 	for (uint8_t i = 0; i < NELEMENTS(nmea_parsers); i++) {
-		struct nmea_parser *parser = &nmea_parsers[i];
+		const struct nmea_parser *parser = &nmea_parsers[i];
 
 		/* Use strcmp to check for exact equality over the entire prefix */
 		if (!strcmp(prefix, parser->prefix)) {
@@ -234,6 +312,10 @@ static bool NMEA_latlon_to_fixed_point(int32_t * latlon, char *nmea_latlon, bool
 	PIOS_DEBUG_Assert(nmea_latlon);
 	PIOS_DEBUG_Assert(latlon);
 
+	if (*nmea_latlon == '\0') { /* empty lat/lon field */
+		return false;
+	}
+
 	if (!NMEA_parse_real(&num_DDDMM, &num_m, &units, nmea_latlon)) {
 		return false;
 	}
@@ -285,7 +367,7 @@ static bool NMEA_latlon_to_fixed_point(int32_t * latlon, char *nmea_latlon, bool
  * \return true if the sentence was successfully parsed
  * \return false if any errors were encountered with the parsing
  */
-bool NMEA_update_position(char *nmea_sentence)
+bool NMEA_update_position(char *nmea_sentence, GPSPositionData *GpsData)
 {
 	char* p = nmea_sentence;
 	char* params[MAX_NB_PARAMS];
@@ -327,7 +409,7 @@ bool NMEA_update_position(char *nmea_sentence)
 #endif
 
 	// The first parameter is the message name, lets see if we find a parser for it
-	struct nmea_parser *parser;
+	const struct nmea_parser *parser;
 	parser = NMEA_find_parser_by_prefix(params[0]);
 	if (!parser) {
 		// No parser found
@@ -335,18 +417,22 @@ bool NMEA_update_position(char *nmea_sentence)
 		return false;
 	}
 
-	parser->cnt++;
 	#ifdef DEBUG_MGSID_IN
-		DEBUG_MSG("%s %d ", params[0], parser->cnt);
+		DEBUG_MSG("%s %d ", params[0]);
 	#endif
-	// Send the message to then parser and get it update the GpsData
-	GPSPositionData GpsData;
-	GPSPositionGet(&GpsData);
-	bool gpsDataUpdated;
+	// Send the message to the parser and get it update the GpsData
+	// Information from various different NMEA messages are temporarily
+	// cumulated in the GpsData structure. An actual GPSPosition update
+	// is triggered by GGA messages only. This message type sets the
+	// gpsDataUpdated flag to request this.
+	bool gpsDataUpdated = false;
 
-	if (!parser->handler(&GpsData, &gpsDataUpdated, params, nbParams)) {
+	if (!parser->handler(GpsData, &gpsDataUpdated, params, nbParams)) {
 		// Parse failed
 		DEBUG_MSG("PARSE FAILED (\"%s\")\n", params[0]);
+		if (gpsDataUpdated && (GpsData->Status == GPSPOSITION_STATUS_NOFIX)) {
+			GPSPositionSet(GpsData);
+		}
 		return false;
 	}
 
@@ -356,7 +442,7 @@ bool NMEA_update_position(char *nmea_sentence)
 		#ifdef DEBUG_MGSID_IN
 			DEBUG_MSG("U");
 		#endif
-		GPSPositionSet(&GpsData);
+		GPSPositionSet(GpsData);
 	}
 
 	#ifdef DEBUG_MGSID_IN
@@ -389,6 +475,13 @@ static bool nmeaProcessGPGGA(GPSPositionData * GpsData, bool* gpsDataUpdated, ch
 #endif
 
 	*gpsDataUpdated = true;
+
+	// check for invalid GPS fix
+	// do this first to make sure we get this information, even if later checks exit
+	// this function early
+	if (param[6][0] == '0') {
+		GpsData->Status = GPSPOSITION_STATUS_NOFIX; // treat invalid fix as NOFIX
+	}
 
 	// get latitude [DDMM.mmmmm] [N|S]
 	if (!NMEA_latlon_to_fixed_point(&GpsData->Latitude, param[2], param[3][0] == 'S')) {
@@ -431,7 +524,7 @@ static bool nmeaProcessGPRMC(GPSPositionData * GpsData, bool* gpsDataUpdated, ch
 	DEBUG_MSG(" DateOfFix=%s\n\n", param[9]);
 #endif
 
-	*gpsDataUpdated = true;
+	*gpsDataUpdated = false;
 
 #if !defined(PIOS_GPS_MINIMAL)
 	GPSTimeData gpst;
@@ -444,6 +537,11 @@ static bool nmeaProcessGPRMC(GPSPositionData * GpsData, bool* gpsDataUpdated, ch
 	gpst.Hour = (int)hms / 10000;
 #endif //PIOS_GPS_MINIMAL
 
+	// don't process void sentences
+	if (param[2][0] == 'V') {
+		return false;
+	}
+
 	// get latitude [DDMM.mmmmm] [N|S]
 	if (!NMEA_latlon_to_fixed_point(&GpsData->Latitude, param[3], param[4][0] == 'S')) {
 		return false;
@@ -455,7 +553,7 @@ static bool nmeaProcessGPRMC(GPSPositionData * GpsData, bool* gpsDataUpdated, ch
 	}
 
 	// get speed in knots
-	GpsData->Groundspeed = NMEA_real_to_float(param[7]) * 0.51444; // to m/s
+	GpsData->Groundspeed = NMEA_real_to_float(param[7]) * 0.51444f; // to m/s
 
 	// get True course
 	GpsData->Heading = NMEA_real_to_float(param[8]);
@@ -489,10 +587,10 @@ static bool nmeaProcessGPVTG(GPSPositionData * GpsData, bool* gpsDataUpdated, ch
 	DEBUG_MSG(" GroundSpeed=%s %s\n", param[5], param[6]);
 #endif
 
-	*gpsDataUpdated = true;
+	*gpsDataUpdated = false;
 
 	GpsData->Heading = NMEA_real_to_float(param[1]);
-	GpsData->Groundspeed = NMEA_real_to_float(param[5]) * 0.51444; // to m/s
+	GpsData->Groundspeed = NMEA_real_to_float(param[5]) * 0.51444f; // to m/s
 
 	return true;
 }
@@ -555,7 +653,7 @@ static bool nmeaProcessGPGSV(GPSPositionData * GpsData, bool* gpsDataUpdated, ch
 	uint8_t nbSentences = atoi(param[1]);
 	uint8_t currSentence = atoi(param[2]);
 
-	*gpsDataUpdated = true;
+	*gpsDataUpdated = false;
 
 	if (nbSentences < 1 || nbSentences > 8 || currSentence < 1 || currSentence > nbSentences)
 		return false;
@@ -639,7 +737,7 @@ static bool nmeaProcessGPGSA(GPSPositionData * GpsData, bool* gpsDataUpdated, ch
 	DEBUG_MSG(" VDOP=%s\n", param[17]);
 #endif
 
-	*gpsDataUpdated = true;
+	*gpsDataUpdated = false;
 
 	switch (atoi(param[2])) {
 	case 1:
@@ -669,3 +767,4 @@ static bool nmeaProcessGPGSA(GPSPositionData * GpsData, bool* gpsDataUpdated, ch
 	return true;
 }
 
+#endif // PIOS_INCLUDE_GPS_NMEA_PARSER

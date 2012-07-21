@@ -1,7 +1,7 @@
 <xml>
     <object name="RevoCalibration" singleinstance="true" settings="true">
         <description>Settings for the INS to control the algorithm and what is updated</description>
-        <field name="BiasCorrectedRaw" units="" type="enum" elements="1" options="TRUE,FALSE" defaultvalue="TRUE"/>
+	<field name="BiasCorrectedRaw" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="TRUE"/>
 
 	<!-- Sensor noises -->
         <field name="accel_bias" units="m/s" type="float" elementnames="X,Y,Z" defaultvalue="0,0,0"/>

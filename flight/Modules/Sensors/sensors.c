@@ -453,7 +453,7 @@ static void settingsUpdatedCb(UAVObjEvent * objEv) {
 
 	AttitudeSettingsData attitudeSettings;
 	AttitudeSettingsGet(&attitudeSettings);
-	bias_correct_gyro = (attitudeSettings.BiasCorrectGyro == ATTITUDESETTINGS_BIASCORRECTGYRO_TRUE);
+	bias_correct_gyro = (cal.BiasCorrectedRaw == REVOCALIBRATION_BIASCORRECTEDRAW_TRUE);
 
 	// Indicates not to expend cycles on rotation
 	if(attitudeSettings.BoardRotation[0] == 0 && attitudeSettings.BoardRotation[1] == 0 &&

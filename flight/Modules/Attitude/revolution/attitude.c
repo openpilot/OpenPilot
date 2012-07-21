@@ -203,10 +203,7 @@ static void AttitudeTask(void *parameters)
 	AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
 
 	// Force settings update to make sure rotation loaded
-	settingsUpdatedCb(AttitudeSettingsHandle());
-	settingsUpdatedCb(RevoSettingsHandle());
-	settingsUpdatedCb(RevoCalibrationHandle());
-	settingsUpdatedCb(HomeLocationHandle());
+	settingsUpdatedCb(NULL);
 
 	// Wait for all the sensors be to read
 	vTaskDelay(100);
@@ -857,16 +854,15 @@ static int32_t getNED(GPSPositionData * gpsPosition, float * NED)
 
 static void settingsUpdatedCb(UAVObjEvent * ev) 
 {
-	// If the object updated was the ObjectPersistence execute requested action
-	if (ev->obj == RevoCalibrationHandle()) {
+	if (ev == NULL || ev->obj == RevoCalibrationHandle()) {
 		RevoCalibrationGet(&revoCalibration);
-
+		
 		/* When the revo calibration is updated, update the GyroBias object */
 		GyrosBiasData gyrosBias;
 		GyrosBiasGet(&gyrosBias);
 		gyrosBias.x = revoCalibration.gyro_bias[REVOCALIBRATION_GYRO_BIAS_X];
-		gyrosBias.y = revoCalibration.gyro_bias[REVOCALIBRATION_GYRO_BIAS_X];
-		gyrosBias.z = revoCalibration.gyro_bias[REVOCALIBRATION_GYRO_BIAS_X];
+		gyrosBias.y = revoCalibration.gyro_bias[REVOCALIBRATION_GYRO_BIAS_Y];
+		gyrosBias.z = revoCalibration.gyro_bias[REVOCALIBRATION_GYRO_BIAS_Z];
 		GyrosBiasSet(&gyrosBias);
 
 		gyroBiasSettingsUpdated = true;
@@ -876,9 +872,9 @@ static void settingsUpdatedCb(UAVObjEvent * ev)
 		INSSetAccelVar(revoCalibration.accel_var);
 		INSSetGyroVar(revoCalibration.gyro_var);
 		INSSetBaroVar(revoCalibration.baro_var);
-	} else if (ev->obj == HomeLocationHandle()) {
+	}
+	if(ev == NULL || ev->obj == HomeLocationHandle()) {
 		HomeLocationGet(&homeLocation);
-
 		// Compute matrix to convert deltaLLA to NED
 		float lat, alt;
 		lat = homeLocation.Latitude / 10.0e6f * DEG2RAD;
@@ -887,11 +883,11 @@ static void settingsUpdatedCb(UAVObjEvent * ev)
 		T[0] = alt+6.378137E6f;
 		T[1] = cosf(lat)*(alt+6.378137E6f);
 		T[2] = -1.0f;
-	} else if (ev->obj == AttitudeSettingsHandle()) {
-		AttitudeSettingsGet(&attitudeSettings);
-	} else if (ev->obj == RevoSettingsHandle()) {
-		RevoSettingsGet(&revoSettings);
 	}
+	if (ev == NULL || ev->obj == AttitudeSettingsHandle())
+		AttitudeSettingsGet(&attitudeSettings);
+	if (ev == NULL || ev->obj == RevoSettingsHandle())
+		RevoSettingsGet(&revoSettings);
 }
 /**
  * @}

@@ -46,15 +46,20 @@
 #include "systemalarms.h"
 #include "systemsettings.h"
 #include "uavsettingsimportexport/uavsettingsimportexportfactory.h"
-
+#include <extensionsystem/pluginmanager.h>
+#include <coreplugin/generalsettings.h>
 
 ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(parent),wasItMe(false)
 {
     m_config = new Ui_OutputWidget();
     m_config->setupUi(this);
+    
+    ExtensionSystem::PluginManager *pm=ExtensionSystem::PluginManager::instance();
+    Core::Internal::GeneralSettings * settings=pm->getObject<Core::Internal::GeneralSettings>();
+    if(!settings->useExpertMode())
+        m_config->saveRCOutputToRAM->setVisible(false);
 
 
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
 
 
     UAVSettingsImportExportFactory * importexportplugin =  pm->getObject<UAVSettingsImportExportFactory>();

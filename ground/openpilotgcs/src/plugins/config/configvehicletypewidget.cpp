@@ -41,6 +41,9 @@
 #include "systemsettings.h"
 #include "mixersettings.h"
 #include "actuatorsettings.h"
+#include <extensionsystem/pluginmanager.h>
+#include <coreplugin/generalsettings.h>
+
 
 /**
   Helper delegate for the custom mixer editor table.
@@ -97,6 +100,11 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
 {
     m_aircraft = new Ui_AircraftWidget();
     m_aircraft->setupUi(this);
+    
+    ExtensionSystem::PluginManager *pm=ExtensionSystem::PluginManager::instance();
+    Core::Internal::GeneralSettings * settings=pm->getObject<Core::Internal::GeneralSettings>();
+    if(!settings->useExpertMode())
+        m_aircraft->saveAircraftToRAM->setVisible(false);
 
     addApplySaveButtons(m_aircraft->saveAircraftToRAM,m_aircraft->saveAircraftToSD);
 

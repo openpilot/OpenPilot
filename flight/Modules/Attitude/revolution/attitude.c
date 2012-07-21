@@ -601,7 +601,8 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 			INSSetBaroVar(revoCalibration.baro_var);
 
 			// Initialize the gyro bias from the settings
-			INSSetGyroBias(&gyrosBias.x);
+			float gyro_bias[3] = {-gyrosBias.x * F_PI / 180.0f, -gyrosBias.y * F_PI / 180.0f, -gyrosBias.z * F_PI / 180.0f};
+			INSSetGyroBias(gyro_bias);
 
 			xQueueReceive(magQueue, &ev, 100 / portTICK_RATE_MS);
 			MagnetometerGet(&magData);
@@ -635,7 +636,8 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 			INSSetMagNorth(homeLocation.Be);
 
 			// Initialize the gyro bias from the settings
-			INSSetGyroBias(&gyrosBias.x);
+			float gyro_bias[3] = {-gyrosBias.x * F_PI / 180.0f, -gyrosBias.y * F_PI / 180.0f, -gyrosBias.z * F_PI / 180.0f};
+			INSSetGyroBias(gyro_bias);
 
 			GPSPositionData gpsPosition;
 			GPSPositionGet(&gpsPosition);
@@ -708,7 +710,8 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	// If the gyro bias setting was updated we should reset
 	// the state estimate of the EKF
 	if(gyroBiasSettingsUpdated) {
-		INSSetGyroBias(&gyrosBias.x);
+		float gyro_bias[3] = {-gyrosBias.x * F_PI / 180.0f, -gyrosBias.y * F_PI / 180.0f, -gyrosBias.z * F_PI / 180.0f};
+		INSSetGyroBias(gyro_bias);
 		gyroBiasSettingsUpdated = false;
 	}
 
@@ -733,16 +736,6 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	attitude.q4 = Nav.q[3];
 	Quaternion2RPY(&attitude.q1,&attitude.Roll);
 	AttitudeActualSet(&attitude);
-
-	if (revoCalibration.BiasCorrectedRaw && !gyroBiasSettingsUpdated) {
-		// Copy the gyro bias into the UAVO except when it was updated
-		// from the settings during the calculation, then consume it
-		// next cycle
-		gyrosBias.x = -Nav.gyro_bias[0] * 180.0f / F_PI;
-		gyrosBias.y = -Nav.gyro_bias[1] * 180.0f / F_PI;
-		gyrosBias.z = -Nav.gyro_bias[2] * 180.0f / F_PI;
-		GyrosBiasSet(&gyrosBias);
-	}
 
 	// Advance the covariance estimate
 	INSCovariancePrediction(dT);
@@ -819,10 +812,15 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	velocityActual.East = Nav.Vel[1];
 	velocityActual.Down = Nav.Vel[2];
 	VelocityActualSet(&velocityActual);
-	
-	if(fabs(Nav.gyro_bias[0]) > 0.1f || fabs(Nav.gyro_bias[1]) > 0.1f || fabs(Nav.gyro_bias[2]) > 0.1f) {
-		float zeros[3] = {0.0f,0.0f,0.0f};
-		INSSetGyroBias(zeros);
+
+	if (revoCalibration.BiasCorrectedRaw == REVOCALIBRATION_BIASCORRECTEDRAW_TRUE && !gyroBiasSettingsUpdated) {
+		// Copy the gyro bias into the UAVO except when it was updated
+		// from the settings during the calculation, then consume it
+		// next cycle
+		gyrosBias.x = -Nav.gyro_bias[0] * 180.0f / F_PI;
+		gyrosBias.y = -Nav.gyro_bias[1] * 180.0f / F_PI;
+		gyrosBias.z = -Nav.gyro_bias[2] * 180.0f / F_PI;
+		GyrosBiasSet(&gyrosBias);
 	}
 
 	return 0;

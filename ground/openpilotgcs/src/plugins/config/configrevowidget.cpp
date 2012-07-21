@@ -942,15 +942,15 @@ void ConfigRevoWidget::doGetNoiseSample(UAVObject * obj)
         Q_ASSERT(revoCalibration);
         if(revoCalibration) {
             RevoCalibration::DataFields revoCalData = revoCalibration->getData();
-            revoCalData.accel_var[RevoCalibration::ACCEL_BIAS_X] = listVar(accel_accum_x);
-            revoCalData.accel_var[RevoCalibration::ACCEL_BIAS_Y] = listVar(accel_accum_y);
-            revoCalData.accel_var[RevoCalibration::ACCEL_BIAS_Z] = listVar(accel_accum_z);
-            revoCalData.gyro_var[RevoCalibration::GYRO_BIAS_X] = listVar(gyro_accum_x);
-            revoCalData.gyro_var[RevoCalibration::GYRO_BIAS_Y] = listVar(gyro_accum_y);
-            revoCalData.gyro_var[RevoCalibration::GYRO_BIAS_Z] = listVar(gyro_accum_z);
-            revoCalData.mag_var[RevoCalibration::MAG_BIAS_X] = listVar(mag_accum_x);
-            revoCalData.mag_var[RevoCalibration::MAG_BIAS_Y] = listVar(mag_accum_y);
-            revoCalData.mag_var[RevoCalibration::MAG_BIAS_Z] = listVar(mag_accum_z);
+            revoCalData.accel_var[RevoCalibration::ACCEL_VAR_X] = listVar(accel_accum_x);
+            revoCalData.accel_var[RevoCalibration::ACCEL_VAR_Y] = listVar(accel_accum_y);
+            revoCalData.accel_var[RevoCalibration::ACCEL_VAR_Z] = listVar(accel_accum_z);
+            revoCalData.gyro_var[RevoCalibration::GYRO_VAR_X] = listVar(gyro_accum_x);
+            revoCalData.gyro_var[RevoCalibration::GYRO_VAR_Y] = listVar(gyro_accum_y);
+            revoCalData.gyro_var[RevoCalibration::GYRO_VAR_Z] = listVar(gyro_accum_z);
+            revoCalData.mag_var[RevoCalibration::MAG_VAR_X] = listVar(mag_accum_x);
+            revoCalData.mag_var[RevoCalibration::MAG_VAR_Y] = listVar(mag_accum_y);
+            revoCalData.mag_var[RevoCalibration::MAG_VAR_Z] = listVar(mag_accum_z);
             revoCalibration->setData(revoCalData);
         }
     }

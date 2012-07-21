@@ -7,8 +7,20 @@
     <x>0</x>
     <y>0</y>
     <width>786</width>
-    <height>993</height>
+    <height>950</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>350</width>
+    <height>0</height>
+   </size>
   </property>
   <property name="palette">
    <palette>
@@ -450,7 +462,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -498,6 +510,18 @@
        </property>
        <item>
         <widget class="QScrollArea" name="scrollArea">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>50</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="palette">
           <palette>
            <active>
@@ -577,12 +601,12 @@
             <x>0</x>
             <y>0</y>
             <width>756</width>
-            <height>856</height>
+            <height>817</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_8">
            <property name="spacing">
-            <number>12</number>
+            <number>-1</number>
            </property>
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_8">
@@ -644,8 +668,11 @@
               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
              </property>
              <layout class="QGridLayout" name="gridLayout_16">
+              <property name="horizontalSpacing">
+               <number>-1</number>
+              </property>
               <item row="0" column="0">
-               <layout class="QHBoxLayout" name="horizontalLayout">
+               <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0">
                 <property name="spacing">
                  <number>4</number>
                 </property>
@@ -669,6 +696,22 @@
                  </widget>
                 </item>
                 <item>
+                 <spacer name="horizontalSpacer_3">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::MinimumExpanding</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
                  <widget class="QPushButton" name="pushButton_19">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -679,7 +722,7 @@
                   <property name="minimumSize">
                    <size>
                     <width>51</width>
-                    <height>28</height>
+                    <height>25</height>
                    </size>
                   </property>
                   <property name="maximumSize">
@@ -695,25 +738,7 @@
                    <bool>false</bool>
                   </property>
                   <property name="styleSheet">
-                   <string notr="true">QPushButton {
-border: 1px outset #999;
-border-radius: 5;
-background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0.28 rgba(236, 236, 236, 255), stop:1 rgba(252, 252, 252, 255));
-}
-
-QPushButton:pressed {
-
-    border-style: inset;
-	background-color: qlineargradient(spread:pad, x1:0.502, y1:0.664864, x2:0.502, y2:0.034, stop:0.358209 rgba(250, 250, 250, 255), stop:0.626866 rgba(235, 235, 235, 255));
-
-}
-
-
-QPushButton:hover  {
-	border: 1px outset #999;	
-border-color: rgb(83, 83, 83);
-border-radius: 4;
-	}</string>
+                   <string notr="true"/>
                   </property>
                   <property name="text">
                    <string>Wiki</string>
@@ -737,13 +762,13 @@ border-radius: 4;
                   <property name="minimumSize">
                    <size>
                     <width>81</width>
-                    <height>28</height>
+                    <height>25</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
-                    <width>81</width>
-                    <height>28</height>
+                    <width>16777215</width>
+                    <height>16777215</height>
                    </size>
                   </property>
                   <property name="toolTip">
@@ -753,25 +778,7 @@ border-radius: 4;
                    <bool>false</bool>
                   </property>
                   <property name="styleSheet">
-                   <string notr="true">QPushButton {
-border: 1px outset #999;
-border-radius: 5;
-background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0.28 rgba(236, 236, 236, 255), stop:1 rgba(252, 252, 252, 255));
-}
-
-QPushButton:pressed {
-
-    border-style: inset;
-	background-color: qlineargradient(spread:pad, x1:0.502, y1:0.664864, x2:0.502, y2:0.034, stop:0.358209 rgba(250, 250, 250, 255), stop:0.626866 rgba(235, 235, 235, 255));
-
-}
-
-
-QPushButton:hover  {
-	border: 1px outset #999;	
-border-color: rgb(83, 83, 83);
-border-radius: 4;
-	}</string>
+                   <string notr="true"/>
                   </property>
                   <property name="text">
                    <string>Default</string>
@@ -4109,7 +4116,7 @@ value as the Kp.</string>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_3">
               <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_2">
+               <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,0,0">
                 <property name="spacing">
                  <number>4</number>
                 </property>
@@ -4133,6 +4140,22 @@ value as the Kp.</string>
                  </widget>
                 </item>
                 <item>
+                 <spacer name="horizontalSpacer_4">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::MinimumExpanding</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
                  <widget class="QPushButton" name="pushButton_21">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -4143,32 +4166,14 @@ value as the Kp.</string>
                   <property name="minimumSize">
                    <size>
                     <width>51</width>
-                    <height>28</height>
+                    <height>25</height>
                    </size>
                   </property>
                   <property name="toolTip">
                    <string>Takes you to the online wiki page for Attitude settings</string>
                   </property>
                   <property name="styleSheet">
-                   <string notr="true">QPushButton {
-border: 1px outset #999;
-border-radius: 5;
-background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0.28 rgba(236, 236, 236, 255), stop:1 rgba(252, 252, 252, 255));
-}
-
-QPushButton:pressed {
-
-    border-style: inset;
-	background-color: qlineargradient(spread:pad, x1:0.502, y1:0.664864, x2:0.502, y2:0.034, stop:0.358209 rgba(250, 250, 250, 255), stop:0.626866 rgba(235, 235, 235, 255));
-
-}
-
-
-QPushButton:hover  {
-	border: 1px outset #999;	
-border-color: rgb(83, 83, 83);
-border-radius: 4;
-	}</string>
+                   <string notr="true"/>
                   </property>
                   <property name="text">
                    <string>Wiki</string>
@@ -4192,32 +4197,14 @@ border-radius: 4;
                   <property name="minimumSize">
                    <size>
                     <width>81</width>
-                    <height>28</height>
+                    <height>25</height>
                    </size>
                   </property>
                   <property name="toolTip">
                    <string>Reset all values to GCS defaults</string>
                   </property>
                   <property name="styleSheet">
-                   <string notr="true">QPushButton {
-border: 1px outset #999;
-border-radius: 5;
-background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0.28 rgba(236, 236, 236, 255), stop:1 rgba(252, 252, 252, 255));
-}
-
-QPushButton:pressed {
-
-    border-style: inset;
-	background-color: qlineargradient(spread:pad, x1:0.502, y1:0.664864, x2:0.502, y2:0.034, stop:0.358209 rgba(250, 250, 250, 255), stop:0.626866 rgba(235, 235, 235, 255));
-
-}
-
-
-QPushButton:hover  {
-	border: 1px outset #999;	
-border-color: rgb(83, 83, 83);
-border-radius: 4;
-	}</string>
+                   <string notr="true"/>
                   </property>
                   <property name="text">
                    <string>Default</string>
@@ -7493,7 +7480,7 @@ border-radius: 5;</string>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_4">
               <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_3">
+               <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0,0">
                 <property name="spacing">
                  <number>4</number>
                 </property>
@@ -7503,12 +7490,12 @@ border-radius: 5;</string>
                    <enum>Qt::Horizontal</enum>
                   </property>
                   <property name="sizeType">
-                   <enum>QSizePolicy::Expanding</enum>
+                   <enum>QSizePolicy::MinimumExpanding</enum>
                   </property>
                   <property name="sizeHint" stdset="0">
                    <size>
-                    <width>474</width>
-                    <height>13</height>
+                    <width>40</width>
+                    <height>20</height>
                    </size>
                   </property>
                  </spacer>
@@ -7524,32 +7511,14 @@ border-radius: 5;</string>
                   <property name="minimumSize">
                    <size>
                     <width>51</width>
-                    <height>28</height>
+                    <height>25</height>
                    </size>
                   </property>
                   <property name="toolTip">
                    <string>Takes you to the online wiki page for Stick settings</string>
                   </property>
                   <property name="styleSheet">
-                   <string notr="true">QPushButton {
-border: 1px outset #999;
-border-radius: 5;
-background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0.28 rgba(236, 236, 236, 255), stop:1 rgba(252, 252, 252, 255));
-}
-
-QPushButton:pressed {
-
-    border-style: inset;
-	background-color: qlineargradient(spread:pad, x1:0.502, y1:0.664864, x2:0.502, y2:0.034, stop:0.358209 rgba(250, 250, 250, 255), stop:0.626866 rgba(235, 235, 235, 255));
-
-}
-
-
-QPushButton:hover  {
-	border: 1px outset #999;	
-border-color: rgb(83, 83, 83);
-border-radius: 4;
-	}</string>
+                   <string notr="true"/>
                   </property>
                   <property name="text">
                    <string>Wiki</string>
@@ -7573,32 +7542,14 @@ border-radius: 4;
                   <property name="minimumSize">
                    <size>
                     <width>81</width>
-                    <height>28</height>
+                    <height>25</height>
                    </size>
                   </property>
                   <property name="toolTip">
                    <string>Reset all values to GCS defaults</string>
                   </property>
                   <property name="styleSheet">
-                   <string notr="true">QPushButton {
-border: 1px outset #999;
-border-radius: 5;
-background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0.28 rgba(236, 236, 236, 255), stop:1 rgba(252, 252, 252, 255));
-}
-
-QPushButton:pressed {
-
-    border-style: inset;
-	background-color: qlineargradient(spread:pad, x1:0.502, y1:0.664864, x2:0.502, y2:0.034, stop:0.358209 rgba(250, 250, 250, 255), stop:0.626866 rgba(235, 235, 235, 255));
-
-}
-
-
-QPushButton:hover  {
-	border: 1px outset #999;	
-border-color: rgb(83, 83, 83);
-border-radius: 4;
-	}</string>
+                   <string notr="true"/>
                   </property>
                   <property name="text">
                    <string>Default</string>
@@ -10612,6 +10563,78 @@ Attitude</string>
             </widget>
            </item>
            <item>
+            <widget class="QGroupBox" name="groupBox">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>80</height>
+              </size>
+             </property>
+             <property name="title">
+              <string/>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_11">
+              <item>
+               <widget class="QCheckBox" name="lowThrottleZeroIntegral_8">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>300</width>
+                  <height>20</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>When the throttle is low, zero the intergral term to prevent intergral wind-up</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true"/>
+                </property>
+                <property name="text">
+                 <string>Zero the integral when throttle is low</string>
+                </property>
+                <property name="objrelation" stdset="0">
+                 <stringlist>
+                  <string>objname:StabilizationSettings</string>
+                  <string>fieldname:LowThrottleZeroIntegral</string>
+                 </stringlist>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="realTimeUpdates_6">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>136</width>
+                  <height>20</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>If you check this, the GCS will udpate the stabilization factors
+automatically every 300ms, which will help for fast tuning.</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true"/>
+                </property>
+                <property name="text">
+                 <string>Update in real time</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
             <spacer name="verticalSpacer_10">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
@@ -10721,16 +10744,16 @@ Attitude</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>741</width>
-            <height>923</height>
+            <width>470</width>
+            <height>914</height>
            </rect>
           </property>
           <property name="autoFillBackground">
            <bool>true</bool>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_11">
+          <layout class="QVBoxLayout" name="verticalLayout_9">
            <property name="spacing">
-            <number>12</number>
+            <number>-1</number>
            </property>
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_11">
@@ -10776,13 +10799,13 @@ Attitude</string>
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>210</height>
+               <height>220</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
                <width>16777215</width>
-               <height>210</height>
+               <height>16777215</height>
               </size>
              </property>
              <property name="palette">
@@ -11312,7 +11335,7 @@ Attitude</string>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_4">
                 <property name="spacing">
-                 <number>-1</number>
+                 <number>4</number>
                 </property>
                 <item>
                  <widget class="QCheckBox" name="checkBox_3">
@@ -11325,6 +11348,19 @@ Attitude</string>
                  </widget>
                 </item>
                 <item>
+                 <spacer name="horizontalSpacer_6">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
                  <widget class="QPushButton" name="pushButton_4">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -11335,35 +11371,20 @@ Attitude</string>
                   <property name="minimumSize">
                    <size>
                     <width>81</width>
-                    <height>28</height>
+                    <height>25</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
-                    <width>81</width>
-                    <height>28</height>
+                    <width>16777215</width>
+                    <height>16777215</height>
                    </size>
                   </property>
+                  <property name="toolTip">
+                   <string>Reset all values to GCS defaults</string>
+                  </property>
                   <property name="styleSheet">
-                   <string notr="true">QPushButton {
-border: 1px outset #999;
-border-radius: 5;
-background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0.28 rgba(236, 236, 236, 255), stop:1 rgba(252, 252, 252, 255));
-}
-
-QPushButton:pressed {
-
-    border-style: inset;
-	background-color: qlineargradient(spread:pad, x1:0.502, y1:0.664864, x2:0.502, y2:0.034, stop:0.358209 rgba(250, 250, 250, 255), stop:0.626866 rgba(235, 235, 235, 255));
-
-}
-
-
-QPushButton:hover  {
-	border: 1px outset #999;	
-border-color: rgb(83, 83, 83);
-border-radius: 4;
-	}</string>
+                   <string notr="true"/>
                   </property>
                   <property name="text">
                    <string>Default</string>
@@ -14269,13 +14290,13 @@ value as the Kp.</string>
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>181</height>
+               <height>190</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
                <width>16777215</width>
-               <height>181</height>
+               <height>16777215</height>
               </size>
              </property>
              <property name="palette">
@@ -14821,6 +14842,19 @@ value as the Kp.</string>
                  </widget>
                 </item>
                 <item>
+                 <spacer name="horizontalSpacer_7">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
                  <widget class="QPushButton" name="pushButton_2">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -14831,38 +14865,20 @@ value as the Kp.</string>
                   <property name="minimumSize">
                    <size>
                     <width>81</width>
-                    <height>28</height>
+                    <height>25</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
-                    <width>81</width>
-                    <height>28</height>
+                    <width>16777215</width>
+                    <height>16777215</height>
                    </size>
                   </property>
                   <property name="toolTip">
                    <string>Reset all values to GCS defaults</string>
                   </property>
                   <property name="styleSheet">
-                   <string notr="true">QPushButton {
-border: 1px outset #999;
-border-radius: 5;
-background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0.28 rgba(236, 236, 236, 255), stop:1 rgba(252, 252, 252, 255));
-}
-
-QPushButton:pressed {
-
-    border-style: inset;
-	background-color: qlineargradient(spread:pad, x1:0.502, y1:0.664864, x2:0.502, y2:0.034, stop:0.358209 rgba(250, 250, 250, 255), stop:0.626866 rgba(235, 235, 235, 255));
-
-}
-
-
-QPushButton:hover  {
-	border: 1px outset #999;	
-border-color: rgb(83, 83, 83);
-border-radius: 4;
-	}</string>
+                   <string notr="true"/>
                   </property>
                   <property name="text">
                    <string>Default</string>
@@ -17579,7 +17595,7 @@ border-radius: 5;</string>
              <property name="maximumSize">
               <size>
                <width>16777215</width>
-               <height>211</height>
+               <height>16777215</height>
               </size>
              </property>
              <property name="palette">
@@ -18118,8 +18134,8 @@ border-radius: 5;</string>
                   </property>
                   <property name="sizeHint" stdset="0">
                    <size>
-                    <width>100</width>
-                    <height>10</height>
+                    <width>40</width>
+                    <height>20</height>
                    </size>
                   </property>
                  </spacer>
@@ -18135,38 +18151,20 @@ border-radius: 5;</string>
                   <property name="minimumSize">
                    <size>
                     <width>81</width>
-                    <height>28</height>
+                    <height>25</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
-                    <width>81</width>
-                    <height>28</height>
+                    <width>16777215</width>
+                    <height>16777215</height>
                    </size>
                   </property>
                   <property name="toolTip">
                    <string>Reset all values to GCS defaults</string>
                   </property>
                   <property name="styleSheet">
-                   <string notr="true">QPushButton {
-border: 1px outset #999;
-border-radius: 5;
-background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0.28 rgba(236, 236, 236, 255), stop:1 rgba(252, 252, 252, 255));
-}
-
-QPushButton:pressed {
-
-    border-style: inset;
-	background-color: qlineargradient(spread:pad, x1:0.502, y1:0.664864, x2:0.502, y2:0.034, stop:0.358209 rgba(250, 250, 250, 255), stop:0.626866 rgba(235, 235, 235, 255));
-
-}
-
-
-QPushButton:hover  {
-	border: 1px outset #999;	
-border-color: rgb(83, 83, 83);
-border-radius: 4;
-	}</string>
+                   <string notr="true"/>
                   </property>
                   <property name="text">
                    <string>Default</string>
@@ -20867,33 +20865,37 @@ rate(deg/s)</string>
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="label_45">
-             <property name="minimumSize">
-              <size>
-               <width>180</width>
-               <height>16</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>Sensor Tunning</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_41">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Fixed</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>10</height>
-              </size>
-             </property>
-            </spacer>
+            <layout class="QHBoxLayout" name="horizontalLayout_16">
+             <item>
+              <spacer name="horizontalSpacer_41">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>10</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_45">
+               <property name="minimumSize">
+                <size>
+                 <width>180</width>
+                 <height>16</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>Sensor Tunning</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </item>
            <item>
             <widget class="QGroupBox" name="RateStabilizationGroup_23">
@@ -20906,7 +20908,7 @@ rate(deg/s)</string>
              <property name="maximumSize">
               <size>
                <width>16777215</width>
-               <height>125</height>
+               <height>16777215</height>
               </size>
              </property>
              <property name="palette">
@@ -21449,7 +21451,7 @@ rate(deg/s)</string>
                   <property name="sizeHint" stdset="0">
                    <size>
                     <width>459</width>
-                    <height>10</height>
+                    <height>20</height>
                    </size>
                   </property>
                  </spacer>
@@ -21465,38 +21467,20 @@ rate(deg/s)</string>
                   <property name="minimumSize">
                    <size>
                     <width>81</width>
-                    <height>28</height>
+                    <height>25</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
-                    <width>81</width>
-                    <height>28</height>
+                    <width>16777215</width>
+                    <height>16777215</height>
                    </size>
                   </property>
                   <property name="toolTip">
                    <string>Reset all values to GCS defaults</string>
                   </property>
                   <property name="styleSheet">
-                   <string notr="true">QPushButton {
-border: 1px outset #999;
-border-radius: 5;
-background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0.28 rgba(236, 236, 236, 255), stop:1 rgba(252, 252, 252, 255));
-}
-
-QPushButton:pressed {
-
-    border-style: inset;
-	background-color: qlineargradient(spread:pad, x1:0.502, y1:0.664864, x2:0.502, y2:0.034, stop:0.358209 rgba(250, 250, 250, 255), stop:0.626866 rgba(235, 235, 235, 255));
-
-}
-
-
-QPushButton:hover  {
-	border: 1px outset #999;	
-border-color: rgb(83, 83, 83);
-border-radius: 4;
-	}</string>
+                   <string notr="true"/>
                   </property>
                   <property name="text">
                    <string>Default</string>
@@ -23774,7 +23758,7 @@ border-radius: 5;</string>
    <item>
     <widget class="QGroupBox" name="RateStabilizationGroup_21">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -23782,13 +23766,13 @@ border-radius: 5;</string>
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>79</height>
+       <height>75</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>79</height>
+       <height>75</height>
       </size>
      </property>
      <property name="palette">
@@ -24314,58 +24298,46 @@ border-radius: 5;</string>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_9">
+     <layout class="QHBoxLayout" name="horizontalLayout_15">
       <property name="spacing">
-       <number>12</number>
-      </property>
-      <property name="topMargin">
-       <number>12</number>
+       <number>4</number>
       </property>
       <item>
-       <layout class="QGridLayout" name="gridLayout_5">
-        <item row="0" column="0">
-         <widget class="QCheckBox" name="lowThrottleZeroIntegral_8">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_14">
+        <property name="spacing">
+         <number>4</number>
+        </property>
+        <item>
+         <widget class="QPushButton" name="stabilizationReloadBoardData_6">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
           <property name="minimumSize">
            <size>
-            <width>300</width>
-            <height>20</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>When the throttle is low, zero the intergral term to prevent intergral wind-up</string>
-          </property>
-          <property name="styleSheet">
-           <string notr="true"/>
-          </property>
-          <property name="text">
-           <string>Zero the integral when throttle is low</string>
-          </property>
-          <property name="objrelation" stdset="0">
-           <stringlist>
-            <string>objname:StabilizationSettings</string>
-            <string>fieldname:LowThrottleZeroIntegral</string>
-           </stringlist>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1" rowspan="2">
-         <widget class="QPushButton" name="stabilizationReloadBoardData_6">
-          <property name="minimumSize">
-           <size>
-            <width>130</width>
-            <height>28</height>
+            <width>140</width>
+            <height>25</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>130</width>
-            <height>28</height>
+            <width>16777215</width>
+            <height>16777215</height>
            </size>
           </property>
           <property name="toolTip">
@@ -24373,25 +24345,7 @@ border-radius: 5;</string>
 Useful if you have accidentally changed some settings.</string>
           </property>
           <property name="styleSheet">
-           <string notr="true">QPushButton {
-border: 1px outset #999;
-border-radius: 5;
-background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0.28 rgba(236, 236, 236, 255), stop:1 rgba(252, 252, 252, 255));
-}
-
-QPushButton:pressed {
-
-    border-style: inset;
-	background-color: qlineargradient(spread:pad, x1:0.502, y1:0.664864, x2:0.502, y2:0.034, stop:0.358209 rgba(250, 250, 250, 255), stop:0.626866 rgba(235, 235, 235, 255));
-
-}
-
-
-QPushButton:hover  {
-	border: 1px outset #999;	
-border-color: rgb(83, 83, 83);
-border-radius: 4;
-	}</string>
+           <string notr="true"/>
           </property>
           <property name="text">
            <string>Reload Board Data</string>
@@ -24404,43 +24358,25 @@ border-radius: 4;
           </property>
          </widget>
         </item>
-        <item row="0" column="2" rowspan="2">
+        <item>
          <widget class="QPushButton" name="saveStabilizationToRAM_6">
           <property name="minimumSize">
            <size>
             <width>60</width>
-            <height>28</height>
+            <height>25</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>60</width>
-            <height>28</height>
+            <width>16777215</width>
+            <height>16777215</height>
            </size>
           </property>
           <property name="toolTip">
            <string>Send settings to the board but do not save to the non-volatile memory</string>
           </property>
           <property name="styleSheet">
-           <string notr="true">QPushButton {
-border: 1px outset #999;
-border-radius: 5;
-background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0.28 rgba(236, 236, 236, 255), stop:1 rgba(252, 252, 252, 255));
-}
-
-QPushButton:pressed {
-
-    border-style: inset;
-	background-color: qlineargradient(spread:pad, x1:0.502, y1:0.664864, x2:0.502, y2:0.034, stop:0.358209 rgba(250, 250, 250, 255), stop:0.626866 rgba(235, 235, 235, 255));
-
-}
-
-
-QPushButton:hover  {
-	border: 1px outset #999;	
-border-color: rgb(83, 83, 83);
-border-radius: 4;
-	}</string>
+           <string notr="true"/>
           </property>
           <property name="text">
            <string>Apply</string>
@@ -24452,43 +24388,25 @@ border-radius: 4;
           </property>
          </widget>
         </item>
-        <item row="0" column="3" rowspan="2">
+        <item>
          <widget class="QPushButton" name="saveStabilizationToSD_6">
           <property name="minimumSize">
            <size>
             <width>60</width>
-            <height>28</height>
+            <height>25</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>60</width>
-            <height>28</height>
+            <width>16777215</width>
+            <height>16777215</height>
            </size>
           </property>
           <property name="toolTip">
            <string>Send settings to the board and save to the non-volatile memory</string>
           </property>
           <property name="styleSheet">
-           <string notr="true">QPushButton {
-border: 1px outset #999;
-border-radius: 5;
-background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0.28 rgba(236, 236, 236, 255), stop:1 rgba(252, 252, 252, 255));
-}
-
-QPushButton:pressed {
-
-    border-style: inset;
-	background-color: qlineargradient(spread:pad, x1:0.502, y1:0.664864, x2:0.502, y2:0.034, stop:0.358209 rgba(250, 250, 250, 255), stop:0.626866 rgba(235, 235, 235, 255));
-
-}
-
-
-QPushButton:hover  {
-	border: 1px outset #999;	
-border-color: rgb(83, 83, 83);
-border-radius: 4;
-	}</string>
+           <string notr="true"/>
           </property>
           <property name="text">
            <string>Save</string>
@@ -24497,32 +24415,6 @@ border-radius: 4;
            <stringlist>
             <string>button:save</string>
            </stringlist>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QCheckBox" name="realTimeUpdates_6">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>136</width>
-            <height>20</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>If you check this, the GCS will udpate the stabilization factors
-automatically every 300ms, which will help for fast tuning.</string>
-          </property>
-          <property name="styleSheet">
-           <string notr="true"/>
-          </property>
-          <property name="text">
-           <string>Update in real time</string>
           </property>
          </widget>
         </item>
@@ -24586,8 +24478,6 @@ automatically every 300ms, which will help for fast tuning.</string>
   <tabstop>spinBox_26</tabstop>
   <tabstop>horizontalSlider_96</tabstop>
   <tabstop>spinBox_27</tabstop>
-  <tabstop>lowThrottleZeroIntegral_8</tabstop>
-  <tabstop>realTimeUpdates_6</tabstop>
   <tabstop>stabilizationReloadBoardData_6</tabstop>
   <tabstop>saveStabilizationToRAM_6</tabstop>
   <tabstop>saveStabilizationToSD_6</tabstop>

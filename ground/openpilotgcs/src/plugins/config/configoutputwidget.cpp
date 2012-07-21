@@ -47,12 +47,15 @@
 #include "systemsettings.h"
 #include "uavsettingsimportexport/uavsettingsimportexportfactory.h"
 
+
 ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(parent),wasItMe(false)
 {
     m_config = new Ui_OutputWidget();
     m_config->setupUi(this);
 
+
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+
 
     UAVSettingsImportExportFactory * importexportplugin =  pm->getObject<UAVSettingsImportExportFactory>();
     connect(importexportplugin,SIGNAL(importAboutToBegin()),this,SLOT(stopTests()));

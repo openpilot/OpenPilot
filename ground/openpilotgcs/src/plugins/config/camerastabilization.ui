@@ -132,7 +132,7 @@
             <x>0</x>
             <y>0</y>
             <width>790</width>
-            <height>646</height>
+            <height>648</height>
            </rect>
           </property>
           <property name="autoFillBackground">
@@ -859,204 +859,148 @@ value.</string>
    </item>
    <item>
     <widget class="QGroupBox" name="groupBox_2">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>75</height>
+      </size>
+     </property>
      <property name="autoFillBackground">
       <bool>false</bool>
      </property>
      <property name="title">
       <string/>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_4">
-      <property name="margin">
-       <number>12</number>
-      </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>425</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="camerastabilizationHelp">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <kerning>true</kerning>
+         </font>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../coreplugin/core.qrc">
+          <normaloff>:/core/images/helpicon.svg</normaloff>:/core/images/helpicon.svg</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="shortcut">
+         <string>Ctrl+S</string>
+        </property>
+        <property name="default">
+         <bool>false</bool>
+        </property>
+        <property name="flat">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <property name="spacing">
+         <number>4</number>
+        </property>
         <item>
-         <layout class="QHBoxLayout" name="submitButtons">
-          <item>
-           <widget class="QFrame" name="frame">
-            <property name="frameShape">
-             <enum>QFrame::StyledPanel</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Raised</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
-           <widget class="QPushButton" name="camerastabilizationHelp">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>32</width>
-              <height>32</height>
-             </size>
-            </property>
-            <property name="font">
-             <font>
-              <kerning>true</kerning>
-             </font>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset resource="../coreplugin/core.qrc">
-              <normaloff>:/core/images/helpicon.svg</normaloff>:/core/images/helpicon.svg</iconset>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>32</width>
-              <height>32</height>
-             </size>
-            </property>
-            <property name="shortcut">
-             <string>Ctrl+S</string>
-            </property>
-            <property name="default">
-             <bool>false</bool>
-            </property>
-            <property name="flat">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="camerastabilizationResetToDefaults">
-            <property name="minimumSize">
-             <size>
-              <width>130</width>
-              <height>28</height>
-             </size>
-            </property>
-            <property name="toolTip">
-             <string>Load default CameraStabilization settings except output channels
+         <widget class="QPushButton" name="camerastabilizationResetToDefaults">
+          <property name="minimumSize">
+           <size>
+            <width>140</width>
+            <height>28</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>Load default CameraStabilization settings except output channels
 
 Loaded settings are not applied automatically. You have to click the
 Apply or Save button afterwards.</string>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QPushButton {
-border: 1px outset #999;
-border-radius: 5;
-background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0.28 rgba(236, 236, 236, 255), stop:1 rgba(252, 252, 252, 255));
-}
-
-QPushButton:pressed {
-
-    border-style: inset;
-	background-color: qlineargradient(spread:pad, x1:0.502, y1:0.664864, x2:0.502, y2:0.034, stop:0.358209 rgba(250, 250, 250, 255), stop:0.626866 rgba(235, 235, 235, 255));
-
-}
-
-
-QPushButton:hover  {
-	border: 1px outset #999;	
-border-color: rgb(83, 83, 83);
-border-radius: 4;
-	}</string>
-            </property>
-            <property name="text">
-             <string>Reset To Defaults</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="camerastabilizationSaveRAM">
-            <property name="minimumSize">
-             <size>
-              <width>60</width>
-              <height>28</height>
-             </size>
-            </property>
-            <property name="toolTip">
-             <string>Send settings to the board but do not save to the non-volatile memory</string>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QPushButton {
-border: 1px outset #999;
-border-radius: 5;
-background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0.28 rgba(236, 236, 236, 255), stop:1 rgba(252, 252, 252, 255));
-}
-
-QPushButton:pressed {
-
-    border-style: inset;
-	background-color: qlineargradient(spread:pad, x1:0.502, y1:0.664864, x2:0.502, y2:0.034, stop:0.358209 rgba(250, 250, 250, 255), stop:0.626866 rgba(235, 235, 235, 255));
-
-}
-
-
-QPushButton:hover  {
-	border: 1px outset #999;	
-border-color: rgb(83, 83, 83);
-border-radius: 4;
-	}</string>
-            </property>
-            <property name="text">
-             <string>Apply</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="camerastabilizationSaveSD">
-            <property name="minimumSize">
-             <size>
-              <width>60</width>
-              <height>28</height>
-             </size>
-            </property>
-            <property name="toolTip">
-             <string>Send settings to the board and save to the non-volatile memory</string>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QPushButton {
-border: 1px outset #999;
-border-radius: 5;
-background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0.28 rgba(236, 236, 236, 255), stop:1 rgba(252, 252, 252, 255));
-}
-
-QPushButton:pressed {
-
-    border-style: inset;
-	background-color: qlineargradient(spread:pad, x1:0.502, y1:0.664864, x2:0.502, y2:0.034, stop:0.358209 rgba(250, 250, 250, 255), stop:0.626866 rgba(235, 235, 235, 255));
-
-}
-
-
-QPushButton:hover  {
-	border: 1px outset #999;	
-border-color: rgb(83, 83, 83);
-border-radius: 4;
-	}</string>
-            </property>
-            <property name="text">
-             <string>Save</string>
-            </property>
-            <property name="checked">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-         </layout>
+          </property>
+          <property name="styleSheet">
+           <string notr="true"/>
+          </property>
+          <property name="text">
+           <string>Reset To Defaults</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="camerastabilizationSaveRAM">
+          <property name="minimumSize">
+           <size>
+            <width>78</width>
+            <height>28</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>Send settings to the board but do not save to the non-volatile memory</string>
+          </property>
+          <property name="styleSheet">
+           <string notr="true"/>
+          </property>
+          <property name="text">
+           <string>Apply</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="camerastabilizationSaveSD">
+          <property name="minimumSize">
+           <size>
+            <width>71</width>
+            <height>28</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>Send settings to the board and save to the non-volatile memory</string>
+          </property>
+          <property name="styleSheet">
+           <string notr="true"/>
+          </property>
+          <property name="text">
+           <string>Save</string>
+          </property>
+          <property name="checked">
+           <bool>false</bool>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>

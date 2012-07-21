@@ -41,11 +41,7 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     m_stabilization = new Ui_StabilizationWidget();
     m_stabilization->setupUi(this);
 
-    // To bring old style sheet back without adding it manually do this:
-    // Alternatively apply a global stylesheet to the QGroupBox
-    // setStyleSheet("QGroupBox {background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0 rgba(243, 243, 243, 255), stop:1 rgba(250, 250, 250, 255)); border: 1px outset #999; border-radius: 3; }");
-    //setStyleSheet("QPushButton {\nborder: 1px outset #999;\nborder-radius: 5;\nbackground-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0.28 rgba(236, 236, 236, 255), stop:1 rgba(252, 252, 252, 255));\n}\n\nQPushButton:pressed {\n\n    border-style: inset;\n	background-color: qlineargradient(spread:pad, x1:0.502, y1:0.664864, x2:0.502, y2:0.034, stop:0.358209 rgba(250, 250, 250, 255), stop:0.626866 rgba(235, 235, 235, 255));\n\n}\n\n\nQPushButton:hover  {\n	border: 1px outset #999;	\nborder-color: rgb(83, 83, 83);\nborder-radius: 4;\n}");
-    //setStyleSheet("background-color: rgb(230, 230, 230);");
+    
 
     autoLoadWidgets();
     realtimeUpdates=new QTimer(this);
@@ -65,20 +61,18 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     // This is needed because new style tries to compact things as much as possible in grid
     // and on OSX the widget sizes of PushButtons is reported incorrectly:
     // https://bugreports.qt-project.org/browse/QTBUG-14591
-    m_stabilization->saveStabilizationToRAM_6->setAttribute(Qt::WA_LayoutUsesWidgetRect);
-    m_stabilization->saveStabilizationToSD_6->setAttribute(Qt::WA_LayoutUsesWidgetRect);
-    m_stabilization->stabilizationReloadBoardData_6->setAttribute(Qt::WA_LayoutUsesWidgetRect);
-   // m_stabilization->saveStabilizationToRAM_7->setAttribute(Qt::WA_LayoutUsesWidgetRect);
-   // m_stabilization->saveStabilizationToSD_7->setAttribute(Qt::WA_LayoutUsesWidgetRect);
-    m_stabilization->pushButton_2->setAttribute(Qt::WA_LayoutUsesWidgetRect);
-    m_stabilization->pushButton_3->setAttribute(Qt::WA_LayoutUsesWidgetRect);
-    m_stabilization->pushButton_4->setAttribute(Qt::WA_LayoutUsesWidgetRect);
-    m_stabilization->pushButton_19->setAttribute(Qt::WA_LayoutUsesWidgetRect);
-    m_stabilization->pushButton_20->setAttribute(Qt::WA_LayoutUsesWidgetRect);
-    m_stabilization->pushButton_21->setAttribute(Qt::WA_LayoutUsesWidgetRect);
-    m_stabilization->pushButton_22->setAttribute(Qt::WA_LayoutUsesWidgetRect);
-    m_stabilization->pushButton_23->setAttribute(Qt::WA_LayoutUsesWidgetRect);
-    m_stabilization->pushButton_24->setAttribute(Qt::WA_LayoutUsesWidgetRect);
+//    m_stabilization->saveStabilizationToRAM_6->setAttribute(Qt::WA_LayoutUsesWidgetRect);
+//    m_stabilization->saveStabilizationToSD_6->setAttribute(Qt::WA_LayoutUsesWidgetRect);
+//    m_stabilization->stabilizationReloadBoardData_6->setAttribute(Qt::WA_LayoutUsesWidgetRect);
+//    m_stabilization->pushButton_2->setAttribute(Qt::WA_LayoutUsesWidgetRect);
+//    m_stabilization->pushButton_3->setAttribute(Qt::WA_LayoutUsesWidgetRect);
+//    m_stabilization->pushButton_4->setAttribute(Qt::WA_LayoutUsesWidgetRect);
+//    m_stabilization->pushButton_19->setAttribute(Qt::WA_LayoutUsesWidgetRect);
+//    m_stabilization->pushButton_20->setAttribute(Qt::WA_LayoutUsesWidgetRect);
+//    m_stabilization->pushButton_21->setAttribute(Qt::WA_LayoutUsesWidgetRect);
+//    m_stabilization->pushButton_22->setAttribute(Qt::WA_LayoutUsesWidgetRect);
+//    m_stabilization->pushButton_23->setAttribute(Qt::WA_LayoutUsesWidgetRect);
+//    m_stabilization->pushButton_24->setAttribute(Qt::WA_LayoutUsesWidgetRect);
 }
 
 
@@ -90,7 +84,6 @@ ConfigStabilizationWidget::~ConfigStabilizationWidget()
 void ConfigStabilizationWidget::realtimeUpdatesSlot(int value)
 {
     m_stabilization->realTimeUpdates_6->setCheckState((Qt::CheckState)value);
-    //m_stabilization->realTimeUpdates_7->setCheckState((Qt::CheckState)value);
     if(value==Qt::Checked && !realtimeUpdates->isActive())
         realtimeUpdates->start(300);
     else if(value==Qt::Unchecked)

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>866</width>
+    <width>811</width>
     <height>937</height>
    </rect>
   </property>
@@ -113,7 +113,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>836</width>
+            <width>781</width>
             <height>800</height>
            </rect>
           </property>
@@ -121,7 +121,7 @@
            <item>
             <widget class="QGroupBox" name="groupBox_2">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
@@ -146,7 +146,7 @@
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
-                  <width>25</width>
+                  <width>5</width>
                   <height>20</height>
                  </size>
                 </property>
@@ -230,7 +230,7 @@
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
-                  <width>25</width>
+                  <width>5</width>
                   <height>20</height>
                  </size>
                 </property>
@@ -663,7 +663,7 @@ margin:1px;</string>
                   </property>
                   <property name="minimumSize">
                    <size>
-                    <width>185</width>
+                    <width>45</width>
                     <height>0</height>
                    </size>
                   </property>
@@ -682,7 +682,7 @@ font:bold;
 margin:1px;</string>
                   </property>
                   <property name="text">
-                   <string>Neutral (slowest for motor)</string>
+                   <string>Neutral</string>
                   </property>
                   <property name="alignment">
                    <set>Qt::AlignCenter</set>
@@ -871,6 +871,42 @@ margin:1px;</string>
              </layout>
             </widget>
            </item>
+           <item>
+            <widget class="QGroupBox" name="groupBox_4">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>60</height>
+              </size>
+             </property>
+             <property name="title">
+              <string/>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_6">
+              <item>
+               <widget class="QCheckBox" name="channelOutTest">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>105</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>Move the servos using the sliders. Two important things:
+- Take extra care if the output is connected to an motor controller!
+- Will only work if the RC receiver is working (failsafe)</string>
+                </property>
+                <property name="text">
+                 <string>Test outputs</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
           </layout>
          </widget>
         </widget>
@@ -881,33 +917,27 @@ margin:1px;</string>
    </item>
    <item>
     <widget class="QGroupBox" name="groupBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>75</height>
+      </size>
+     </property>
      <property name="title">
       <string/>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <widget class="QCheckBox" name="channelOutTest">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>105</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Move the servos using the sliders. Two important things:
-- Take extra care if the output is connected to an motor controller!
-- Will only work if the RC receiver is working (failsafe)</string>
-          </property>
-          <property name="text">
-           <string>Test outputs</string>
-          </property>
-         </widget>
-        </item>
+        <property name="spacing">
+         <number>4</number>
+        </property>
         <item>
          <spacer name="horizontalSpacer">
           <property name="orientation">
@@ -972,25 +1002,7 @@ margin:1px;</string>
 Be sure to set the Neutral position on all sliders before sending!</string>
           </property>
           <property name="styleSheet">
-           <string notr="true">QPushButton {
-border: 1px outset #999;
-border-radius: 5;
-background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0.28 rgba(236, 236, 236, 255), stop:1 rgba(252, 252, 252, 255));
-}
-
-QPushButton:pressed {
-
-    border-style: inset;
-	background-color: qlineargradient(spread:pad, x1:0.502, y1:0.664864, x2:0.502, y2:0.034, stop:0.358209 rgba(250, 250, 250, 255), stop:0.626866 rgba(235, 235, 235, 255));
-
-}
-
-
-QPushButton:hover  {
-	border: 1px outset #999;	
-border-color: rgb(83, 83, 83);
-border-radius: 4;
-	}</string>
+           <string notr="true"/>
           </property>
           <property name="text">
            <string>Apply</string>
@@ -1010,25 +1022,7 @@ border-radius: 4;
 Applies and Saves all settings to SD</string>
           </property>
           <property name="styleSheet">
-           <string notr="true">QPushButton {
-border: 1px outset #999;
-border-radius: 5;
-background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0.28 rgba(236, 236, 236, 255), stop:1 rgba(252, 252, 252, 255));
-}
-
-QPushButton:pressed {
-
-    border-style: inset;
-	background-color: qlineargradient(spread:pad, x1:0.502, y1:0.664864, x2:0.502, y2:0.034, stop:0.358209 rgba(250, 250, 250, 255), stop:0.626866 rgba(235, 235, 235, 255));
-
-}
-
-
-QPushButton:hover  {
-	border: 1px outset #999;	
-border-color: rgb(83, 83, 83);
-border-radius: 4;
-	}</string>
+           <string notr="true"/>
           </property>
           <property name="text">
            <string>Save</string>
@@ -1043,7 +1037,6 @@ border-radius: 4;
   </layout>
  </widget>
  <tabstops>
-  <tabstop>channelOutTest</tabstop>
   <tabstop>saveRCOutputToRAM</tabstop>
   <tabstop>saveRCOutputToSD</tabstop>
  </tabstops>

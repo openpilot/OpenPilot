@@ -32,7 +32,7 @@
 #define UBX_H
 #include "openpilot.h"
 #include "gpsposition.h"
-#include "gps.h"
+#include "GPS.h"
 
 
 #define UBX_SYNC1						0xb5 // UBX protocol synchronization characters

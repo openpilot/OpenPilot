@@ -33,7 +33,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "gps.h"
+#include "GPS.h"
 
 #define NMEA_MAX_PACKET_LENGTH          96 // 82 max NMEA msg size plus 12 margin (because some vendors add custom crap) plus CR plus Linefeed
 

@@ -34,7 +34,7 @@
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER)
 
 #include "UBX.h"
-#include "gps.h"
+#include "GPS.h"
 
 // parse incoming character stream for messages in UBX binary format
 

@@ -1,6 +1,6 @@
 <xml>
     <object name="GPSVelocity" singleinstance="true" settings="false">
-        <description>Raw GPS data from @ref GPSModule.  Should only be used by @ref AHRSCommsModule.</description>
+        <description>Raw GPS data from @ref GPSModule.</description>
         <field name="North" units="m/s" type="float" elements="1"/>
         <field name="East" units="m/s" type="float" elements="1"/>
         <field name="Down" units="m/s" type="float" elements="1"/>

@@ -1,13 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       hitlv2configuration.h
+ * @file       udptestmain.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010-2012.
- * @addtogroup GCSPlugins GCS Plugins
+ * @addtogroup 3rdParty Third-party integration
  * @{
- * @addtogroup HITLPlugin HITLv2 Plugin
+ * @addtogroup AeroSimRC AeroSimRC proxy plugin
  * @{
- * @brief The Hardware In The Loop plugin version 2
+ * @brief AeroSimRC simulator to HITL proxy plugin test utility
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -25,37 +25,14 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef HITLV2CONFIGURATION_H
-#define HITLV2CONFIGURATION_H
+#include <QApplication>
+#include "udptestwidget.h"
 
-#include <coreplugin/iuavgadgetconfiguration.h>
-#include <QtGui/QColor>
-#include <QString>
-#include <simulatorv2.h>
-
-using namespace Core;
-
-class HITLConfiguration : public IUAVGadgetConfiguration
+int main(int argc, char *argv[])
 {
+    QApplication a(argc, argv);
+    Widget w;
+    w.show();
 
-    Q_OBJECT
-
-    Q_PROPERTY(SimulatorSettings settings READ Settings WRITE setSimulatorSettings)
-
-public:
-    explicit HITLConfiguration(QString classId, QSettings* qSettings = 0, QObject *parent = 0);
-
-    void saveConfig(QSettings* settings) const;
-    IUAVGadgetConfiguration *clone();
-
-    SimulatorSettings Settings() const { return settings; }
-
-public slots:
-    void setSimulatorSettings (const SimulatorSettings& params ) { settings = params; }
-
-
-private:
-    SimulatorSettings settings;
-};
-
-#endif // HITLV2CONFIGURATION_H
+    return a.exec();
+}

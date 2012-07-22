@@ -75,6 +75,10 @@
 #define PIOS_INCLUDE_COM_FLEXI
 
 #define PIOS_INCLUDE_GPS
+#define PIOS_INCLUDE_GPS_NMEA_PARSER
+#define PIOS_INCLUDE_GPS_UBX_PARSER
+#define PIOS_GPS_SETS_HOMELOCATION
+
 #define PIOS_OVERO_SPI
 /* Supported receiver interfaces */
 #define PIOS_INCLUDE_RCVR

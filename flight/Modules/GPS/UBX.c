@@ -249,7 +249,7 @@ void parse_ubx_nav_velned (struct UBX_NAV_VELNED *velned, GPSPositionData *GpsPo
 }
 
 #if !defined(PIOS_GPS_MINIMAL)
-void parse_ubx_nav_timeutc (UBX_NAV_TIMEUTC *timeutc)
+void parse_ubx_nav_timeutc (struct UBX_NAV_TIMEUTC *timeutc)
 {
 	if (!(timeutc->valid & TIMEUTC_VALIDUTC))
 		return;
@@ -268,7 +268,7 @@ void parse_ubx_nav_timeutc (UBX_NAV_TIMEUTC *timeutc)
 #endif
 
 #if !defined(PIOS_GPS_MINIMAL)
-void parse_ubx_nav_svinfo (UBX_NAV_SVINFO *svinfo)
+void parse_ubx_nav_svinfo (struct UBX_NAV_SVINFO *svinfo)
 {
 	uint8_t chan;
 	GPSSatellitesData svdata;

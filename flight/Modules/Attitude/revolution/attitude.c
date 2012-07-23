@@ -262,11 +262,13 @@ static int32_t updateAttitudeComplementary(bool first_run)
 
 	// Wait until the AttitudeRaw object is updated, if a timeout then go to failsafe
 	if ( xQueueReceive(gyroQueue, &ev, FAILSAFE_TIMEOUT_MS / portTICK_RATE_MS) != pdTRUE ||
-	     xQueueReceive(accelQueue, &ev, 1 / portTICK_RATE_MS) != pdTRUE )
+	     xQueueReceive(accelQueue, &ev, 1 / portTICK_RATE_MS) != pdTRUE ) // When one of these is updated so should the other
 	{
-		// When one of these is updated so should the other
-		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE,SYSTEMALARMS_ALARM_WARNING);
-		return -1;
+		// Do not set attitude timeout warnings in simulation mode
+		if (!AttitudeActualReadOnly()){
+			AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE,SYSTEMALARMS_ALARM_WARNING);
+			return -1;
+		}
 	}
 
 	AccelsGet(&accelsData);
@@ -527,10 +529,13 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 
 	// Wait until the gyro and accel object is updated, if a timeout then go to failsafe
 	if ( (xQueueReceive(gyroQueue, &ev, FAILSAFE_TIMEOUT_MS / portTICK_RATE_MS) != pdTRUE) ||
-		(xQueueReceive(accelQueue, &ev, 1 / portTICK_RATE_MS) != pdTRUE) )
+	     (xQueueReceive(accelQueue, &ev, 1 / portTICK_RATE_MS) != pdTRUE) )
 	{
-		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE,SYSTEMALARMS_ALARM_WARNING);
-		return -1;
+		// Do not set attitude timeout warnings in simulation mode
+		if (!AttitudeActualReadOnly()){
+			AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE,SYSTEMALARMS_ALARM_WARNING);
+			return -1;
+		}
 	}
 
 	if (inited) {

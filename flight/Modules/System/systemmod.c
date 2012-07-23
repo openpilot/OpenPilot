@@ -126,6 +126,8 @@ int32_t SystemModInitialize(void)
 	SystemModStart();
 
 	objectPersistenceQueue = xQueueCreate(1, sizeof(UAVObjEvent));
+	if (objectPersistenceQueue == NULL)
+		return -1;
 
 	return 0;
 }

@@ -1691,6 +1691,30 @@
         </data>
       </smooth>
     </PFDGadget>
+    <PfdQmlGadget>
+      <NoTerrain>
+        <configInfo>
+          <locked>false</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <terrainEnabled>false</terrainEnabled>
+          <qmlFile>%%DATAPATH%%pfd/default/Pfd.qml</qmlFile>
+          <earthFile>%%DATAPATH%%pfd/default/srtm.earth</earthFile>
+        </data>
+      </NoTerrain>
+      <Terrain>
+        <configInfo>
+          <locked>false</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <terrainEnabled>true</terrainEnabled>
+          <qmlFile>%%DATAPATH%%pfd/default/Pfd.qml</qmlFile>
+          <earthFile>%%DATAPATH%%pfd/default/srtm.earth</earthFile>
+        </data>
+      </Terrain>
+    </PfdQmlGadget>
     <QmlViewGadget>
       <default>
         <configInfo>

@@ -145,6 +145,22 @@ void UAVObject::setDescription(const QString& description)
     this->description = description;
 }
 
+/**
+ * Get the category of the object
+ */
+QString UAVObject::getCategory()
+{
+    return category;
+}
+
+/**
+ * Set the category of the object
+ */
+void UAVObject::setCategory(const QString& category)
+{
+    this->category = category;
+}
+
 
 /**
  * Get the total number of bytes of the object's data

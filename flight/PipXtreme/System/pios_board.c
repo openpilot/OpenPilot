@@ -33,26 +33,27 @@
 #include <pipxsettings.h>
 #include <board_hw_defs.c>
 
-#define PIOS_COM_SERIAL_RX_BUF_LEN 256
-#define PIOS_COM_SERIAL_TX_BUF_LEN 256
+#define PIOS_COM_SERIAL_RX_BUF_LEN 128
+#define PIOS_COM_SERIAL_TX_BUF_LEN 128
 
-#define PIOS_COM_FLEXI_RX_BUF_LEN 256
-#define PIOS_COM_FLEXI_TX_BUF_LEN 256
+#define PIOS_COM_FLEXI_RX_BUF_LEN 128
+#define PIOS_COM_FLEXI_TX_BUF_LEN 128
 
-#define PIOS_COM_TELEM_USB_RX_BUF_LEN 256
-#define PIOS_COM_TELEM_USB_TX_BUF_LEN 256
+#define PIOS_COM_TELEM_USB_RX_BUF_LEN 128
+#define PIOS_COM_TELEM_USB_TX_BUF_LEN 128
 
-#define PIOS_COM_VCP_USB_RX_BUF_LEN 256
-#define PIOS_COM_VCP_USB_TX_BUF_LEN 256
+#define PIOS_COM_VCP_USB_RX_BUF_LEN 128
+#define PIOS_COM_VCP_USB_TX_BUF_LEN 128
 
-#define PIOS_COM_RFM22B_RF_RX_BUF_LEN 256
-#define PIOS_COM_RFM22B_RF_TX_BUF_LEN 256
+#define PIOS_COM_RFM22B_RF_RX_BUF_LEN 128
+#define PIOS_COM_RFM22B_RF_TX_BUF_LEN 128
 
 uint32_t pios_com_telem_usb_id = 0;
 uint32_t pios_com_telemetry_id;
 uint32_t pios_com_flexi_id;
 uint32_t pios_com_vcp_id;
 uint32_t pios_com_uavtalk_com_id = 0;
+uint32_t pios_com_gcs_com_id = 0;
 uint32_t pios_com_trans_com_id = 0;
 uint32_t pios_com_debug_id = 0;
 uint32_t pios_com_rfm22b_id = 0;
@@ -96,7 +97,7 @@ void PIOS_Board_Init(void) {
 
 	PipXSettingsData pipxSettings;
 #if defined(PIOS_INCLUDE_FLASH_EEPROM)
-	PIOS_EEPROM_Init(&pios_eeprom_cfg);
+ 	PIOS_EEPROM_Init(&pios_eeprom_cfg);
 
 	/* Read the settings from flash. */
 	/* NOTE: We probably need to save/restore the objID here incase the object changed but the size doesn't */
@@ -129,20 +130,17 @@ void PIOS_Board_Init(void) {
 
 
 	/* Flags to determine if various USB interfaces are advertised */
-	bool usb_hid_present = false;
 	bool usb_cdc_present = false;
 
 #if defined(PIOS_INCLUDE_USB_CDC)
 	if (PIOS_USB_DESC_HID_CDC_Init()) {
 		PIOS_Assert(0);
 	}
-	usb_hid_present = true;
 	usb_cdc_present = true;
 #else
 	if (PIOS_USB_DESC_HID_ONLY_Init()) {
 		PIOS_Assert(0);
 	}
-	usb_hid_present = true;
 #endif
 
 	uint32_t pios_usb_id;
@@ -172,7 +170,7 @@ void PIOS_Board_Init(void) {
 											tx_buffer, PIOS_COM_VCP_USB_TX_BUF_LEN)) {
 			PIOS_Assert(0);
 		}
-		switch (pipxSettings.TelemetryConfig)
+		switch (pipxSettings.VCPConfig)
 		{
 		case PIPXSETTINGS_VCPCONFIG_SERIAL:
 			pios_com_trans_com_id = pios_com_vcp_id;
@@ -189,10 +187,6 @@ void PIOS_Board_Init(void) {
 #endif
 
 #if defined(PIOS_INCLUDE_USB_HID)
-
-	if (!usb_hid_present) {
-		PIOS_Assert(0);
-	}
 
 	/* Configure the usb HID port */
 #if defined(PIOS_INCLUDE_COM)
@@ -222,6 +216,7 @@ void PIOS_Board_Init(void) {
 	{
 	case PIPXSETTINGS_TELEMETRYCONFIG_SERIAL:
 	case PIPXSETTINGS_TELEMETRYCONFIG_UAVTALK:
+	case PIPXSETTINGS_TELEMETRYCONFIG_GCS:
 	case PIPXSETTINGS_TELEMETRYCONFIG_DEBUG:
 	{
 		uint32_t pios_usart1_id;
@@ -245,6 +240,9 @@ void PIOS_Board_Init(void) {
 		case PIPXSETTINGS_TELEMETRYCONFIG_UAVTALK:
 			pios_com_uavtalk_com_id = pios_com_telemetry_id;
 			break;
+		case PIPXSETTINGS_TELEMETRYCONFIG_GCS:
+			pios_com_gcs_com_id = pios_com_telemetry_id;
+			break;
 		case PIPXSETTINGS_TELEMETRYCONFIG_DEBUG:
 			pios_com_debug_id = pios_com_telemetry_id;
 			break;
@@ -260,6 +258,7 @@ void PIOS_Board_Init(void) {
 	{
 	case PIPXSETTINGS_FLEXICONFIG_SERIAL:
 	case PIPXSETTINGS_FLEXICONFIG_UAVTALK:
+	case PIPXSETTINGS_FLEXICONFIG_GCS:
 	case PIPXSETTINGS_FLEXICONFIG_DEBUG:
 	{
 		uint32_t pios_usart3_id;
@@ -282,6 +281,9 @@ void PIOS_Board_Init(void) {
 			break;
 		case PIPXSETTINGS_FLEXICONFIG_UAVTALK:
 			pios_com_uavtalk_com_id = pios_com_flexi_id;
+			break;
+		case PIPXSETTINGS_FLEXICONFIG_GCS:
+			pios_com_gcs_com_id = pios_com_flexi_id;
 			break;
 		case PIPXSETTINGS_FLEXICONFIG_DEBUG:
 			pios_com_debug_id = pios_com_flexi_id;

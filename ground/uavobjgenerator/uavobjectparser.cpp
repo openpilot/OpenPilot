@@ -34,7 +34,7 @@ UAVObjectParser::UAVObjectParser()
     fieldTypeStrXML << "int8" << "int16" << "int32" << "uint8"
         << "uint16" << "uint32" <<"float" << "enum";
 
-    updateModeStrXML << "periodic" << "onchange" << "throttled" << "manual";
+    updateModeStrXML << "manual" << "periodic" << "onchange" << "throttled";
 
     accessModeStr << "ACCESS_READWRITE" << "ACCESS_READONLY";
 
@@ -498,6 +498,13 @@ QString UAVObjectParser::processObjectAttributes(QDomNode& node, ObjectInfo* inf
 
     info->name = attr.nodeValue();
     info->namelc = attr.nodeValue().toLower();
+
+    // Get category attribute if present
+    attr = attributes.namedItem("category");
+    if ( !attr.isNull() )
+    {
+        info->category = attr.nodeValue();
+    }
 
     // Get singleinstance attribute
     attr = attributes.namedItem("singleinstance");

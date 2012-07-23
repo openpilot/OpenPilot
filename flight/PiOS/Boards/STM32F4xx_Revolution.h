@@ -217,8 +217,8 @@ extern uint32_t pios_com_vcp_id;
 //-------------------------
 // Receiver DSM input
 //-------------------------
-#define PIOS_DSM_MAX_DEVS			2
-#define PIOS_DSM_NUM_INPUTS			12
+#define PIOS_DSM_MAX_DEVS            2
+#define PIOS_DSM_NUM_INPUTS          12
 
 //-------------------------
 // Servo outputs
@@ -242,8 +242,8 @@ extern uint32_t pios_com_vcp_id;
 {                                                                                                   \
 	{GPIOC, GPIO_Pin_0,     ADC_Channel_10},                                                        \
 	{GPIOC, GPIO_Pin_1,     ADC_Channel_11},                                                        \
-	{NULL,  0,                      ADC_Channel_Vrefint},           /* Voltage reference */         \
-	{NULL,  0,                      ADC_Channel_TempSensor}         /* Temperature sensor */        \
+	{NULL,  0,              ADC_Channel_Vrefint},           /* Voltage reference */         \
+	{NULL,  0,              ADC_Channel_TempSensor}         /* Temperature sensor */        \
 }
 
 /* we have to do all this to satisfy the PIOS_ADC_MAX_SAMPLES define in pios_adc.h */

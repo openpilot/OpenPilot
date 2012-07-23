@@ -306,8 +306,8 @@ int32_t PIOS_ADC_PinGet(uint32_t pin)
 	
 	/* return accumulated result and clear accumulator */
 	result = accumulator[pin].accumulator / (accumulator[pin].count ?: 1);
-	accumulator[pin].accumulator = 0;
-	accumulator[pin].count = 0;
+	accumulator[pin].accumulator = result;
+	accumulator[pin].count = 1;
 
 	return result;
 #endif

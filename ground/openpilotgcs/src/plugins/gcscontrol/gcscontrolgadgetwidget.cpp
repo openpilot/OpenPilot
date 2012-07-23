@@ -34,6 +34,7 @@
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QPushButton>
 
+
 #include "uavobject.h"
 #include "uavobjectmanager.h"
 #include "manualcontrolcommand.h"
@@ -64,8 +65,13 @@ GCSControlGadgetWidget::GCSControlGadgetWidget(QWidget *parent) : QLabel(parent)
     connect(m_gcscontrol->checkBoxArmed, SIGNAL(stateChanged(int)), this, SLOT(toggleArmed(int)));
     connect(m_gcscontrol->comboBoxFlightMode, SIGNAL(currentIndexChanged(int)), this, SLOT(selectFlightMode(int)));
 
+    connect(m_gcscontrol->checkBoxUDPControl, SIGNAL(stateChanged(int)),this,SLOT(toggleUDPControl(int))); //UDP control checkbox
+
     // Connect object updated event from UAVObject to also update check boxes and dropdown
     connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(mccChanged(UAVObject*)));
+
+
+
 
     leftX = 0;
     leftY = 0;
@@ -122,11 +128,14 @@ void GCSControlGadgetWidget::toggleControl(int state)
         UAVObject::SetGcsTelemetryAcked(mdata, false);
         UAVObject::SetGcsTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_ONCHANGE);
         mdata.gcsTelemetryUpdatePeriod = 100;
+        m_gcscontrol->checkBoxUDPControl->setEnabled(true);
 
     }
     else
     {
         mdata = mccInitialData;
+        toggleUDPControl(false);
+        m_gcscontrol->checkBoxUDPControl->setEnabled(false);
     }
     obj->setMetadata(mdata);
 }
@@ -152,6 +161,16 @@ void GCSControlGadgetWidget::mccChanged(UAVObject * obj)
     m_gcscontrol->checkBoxArmed->setChecked(flightStatus->getField("Armed")->getValue() == "Armed");
 }
 
+void GCSControlGadgetWidget::toggleUDPControl(int state)
+{
+    if(state)
+    {
+        setUDPControl(true);
+    }else{
+        setUDPControl(false);
+    }
+}
+
 /*!
   \brief Called when the flight mode drop down is changed and sets the ManualControlCommand->FlightMode accordingly
   */
@@ -168,11 +187,21 @@ void GCSControlGadgetWidget::selectFlightMode(int state)
 void GCSControlGadgetWidget::setGCSControl(bool newState)
 {
     m_gcscontrol->checkBoxGcsControl->setChecked(newState);
-};
+}
 bool GCSControlGadgetWidget::getGCSControl(void)
 {
     return m_gcscontrol->checkBoxGcsControl->isChecked();
-};
+}
+
+void GCSControlGadgetWidget::setUDPControl(bool newState)
+{
+    m_gcscontrol->checkBoxUDPControl->setChecked(newState);
+}
+
+bool GCSControlGadgetWidget::getUDPControl(void)
+{
+    return m_gcscontrol->checkBoxUDPControl->isChecked();
+}
 
 
 /**

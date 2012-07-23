@@ -38,7 +38,7 @@ OUTDIR := $(TOP)/build/$(TARGET)
 
 # Set developer code and compile options
 # Set to YES for debugging
-DEBUG ?= NO
+DEBUG ?= YES
 
 # Set to YES when using Code Sourcery toolchain
 CODE_SOURCERY ?= NO

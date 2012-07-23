@@ -99,6 +99,8 @@
 #define PIOS_TELEM_PRIORITY_QUEUE       /* Enable a priority queue in telemetry */
 //#define PIOS_QUATERNION_STABILIZATION   /* Stabilization options */
 #define PIOS_GPS_SETS_HOMELOCATION      /* GPS options */
+#define PIOS_INCLUDE_GPS_NMEA_PARSER /* Include the NMEA protocol parser */
+#define PIOS_INCLUDE_GPS_UBX_PARSER  /* Include the UBX protocol parser */
 
 /* Alarm Thresholds */
 #define HEAP_LIMIT_WARNING       1000

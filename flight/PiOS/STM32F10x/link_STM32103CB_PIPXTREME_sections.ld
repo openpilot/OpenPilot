@@ -99,8 +99,8 @@ SECTIONS
     } > SRAM
 
     _eram = ORIGIN(SRAM) + LENGTH(SRAM) ;
-    _ebss = _eram;
-
+    _ebss = _eram ;
+    
     /* keep the heap section at the end of the SRAM
      * this will allow to claim the remaining bytes not used
      * at run time! (done by the reset vector).

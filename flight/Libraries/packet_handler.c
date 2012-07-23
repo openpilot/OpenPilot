@@ -169,16 +169,15 @@ PHPacketHandle PHGetTXPacket(PHInstHandle h)
 
 	// Lock
 	xSemaphoreTakeRecursive(data->lock, portMAX_DELAY);
-	PHPacketHandle p = data->tx_packets + data->tx_win_end;
 
-	// Is the window full?
-	uint8_t next_end = (data->tx_win_end + 1) % data->cfg.winSize;
-	if(next_end == data->tx_win_start)
-	{
-		xSemaphoreGiveRecursive(data->lock);
-		return NULL;
-	}
-	data->tx_win_end = next_end;
+	// Find a free packet.
+	PHPacketHandle p = NULL;
+	for (uint8_t i = 0; i < data->cfg.winSize; ++i)
+		if (data->tx_packets[i].header.type == PACKET_TYPE_NONE)
+		{
+			p = data->tx_packets + i;
+			break;
+		}
 
 	// Release lock
 	xSemaphoreGiveRecursive(data->lock);
@@ -224,17 +223,15 @@ PHPacketHandle PHGetRXPacket(PHInstHandle h)
 
 	// Lock
 	xSemaphoreTakeRecursive(data->lock, portMAX_DELAY);
-	PHPacketHandle p = data->rx_packets + data->rx_win_end;
 
-	// Is the window full?
-	uint8_t next_end = (data->rx_win_end + 1) % data->cfg.winSize;
-	if(next_end == data->rx_win_start)
-	{
-		// Release lock
-		xSemaphoreGiveRecursive(data->lock);
-		return NULL;
-	}
-	data->rx_win_end = next_end;
+	// Find a free packet.
+	PHPacketHandle p = NULL;
+	for (uint8_t i = 0; i < data->cfg.winSize; ++i)
+		if (data->rx_packets[i].header.type == PACKET_TYPE_NONE)
+		{
+			p = data->rx_packets + i;
+			break;
+		}
 
 	// Release lock
 	xSemaphoreGiveRecursive(data->lock);

@@ -31,17 +31,20 @@ UAVObjectBrowserConfiguration::UAVObjectBrowserConfiguration(QString classId, QS
     IUAVGadgetConfiguration(classId, parent),
     m_recentlyUpdatedColor(QColor(255, 230, 230)),
     m_manuallyChangedColor(QColor(230, 230, 255)),
-    m_recentlyUpdatedTimeout(500)
+    m_recentlyUpdatedTimeout(500),
+    m_onlyHilightChangedValues(false)
 {
     //if a saved configuration exists load it
     if(qSettings != 0) {
         QColor recent = qSettings->value("recentlyUpdatedColor").value<QColor>();
         QColor manual = qSettings->value("manuallyChangedColor").value<QColor>();
         int timeout = qSettings->value("recentlyUpdatedTimeout").toInt();
+        bool hilight = qSettings->value("onlyHilightChangedValues").toBool();
 
         m_recentlyUpdatedColor = recent;
         m_manuallyChangedColor = manual;
         m_recentlyUpdatedTimeout = timeout;
+        m_onlyHilightChangedValues = hilight;
     }
 }
 
@@ -51,6 +54,7 @@ IUAVGadgetConfiguration *UAVObjectBrowserConfiguration::clone()
     m->m_recentlyUpdatedColor = m_recentlyUpdatedColor;
     m->m_manuallyChangedColor = m_manuallyChangedColor;
     m->m_recentlyUpdatedTimeout = m_recentlyUpdatedTimeout;
+    m->m_onlyHilightChangedValues = m_onlyHilightChangedValues;
     return m;
 }
 
@@ -62,4 +66,5 @@ void UAVObjectBrowserConfiguration::saveConfig(QSettings* qSettings) const {
     qSettings->setValue("recentlyUpdatedColor", m_recentlyUpdatedColor);
     qSettings->setValue("manuallyChangedColor", m_manuallyChangedColor);
     qSettings->setValue("recentlyUpdatedTimeout", m_recentlyUpdatedTimeout);
+    qSettings->setValue("onlyHilightChangedValues", m_onlyHilightChangedValues);
 }

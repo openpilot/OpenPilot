@@ -31,6 +31,7 @@
 #include "treeitem.h"
 #include <QAbstractItemModel>
 #include <QtCore/QMap>
+#include <QtCore/QList>
 #include <QtGui/QColor>
 
 class TopTreeItem;
@@ -48,7 +49,7 @@ class UAVObjectTreeModel : public QAbstractItemModel
 {
 Q_OBJECT
 public:
-    explicit UAVObjectTreeModel(QObject *parent = 0);
+    explicit UAVObjectTreeModel(QObject *parent = 0, bool categorize=true);
     ~UAVObjectTreeModel();
 
     QVariant data(const QModelIndex &index, int role) const;
@@ -68,6 +69,9 @@ public:
         m_recentlyUpdatedTimeout = timeout;
         TreeItem::setHighlightTime(timeout);
     }
+    void setOnlyHilightChangedValues(bool hilight) {m_onlyHilightChangedValues = hilight; }
+
+    QList<QModelIndex> getMetaDataIndexes();
 
 signals:
 
@@ -79,17 +83,20 @@ private slots:
     void updateHighlight(TreeItem*);
 
 private:
+    void setupModelData(UAVObjectManager *objManager, bool categorize = true);
     QModelIndex index(TreeItem *item);
-    void addDataObject(UAVDataObject *obj);
-    void addMetaObject(UAVMetaObject *obj, TreeItem *parent);
+    void addDataObject(UAVDataObject *obj, bool categorize = true);
+    MetaObjectTreeItem *addMetaObject(UAVMetaObject *obj, TreeItem *parent);
     void addArrayField(UAVObjectField *field, TreeItem *parent);
-
     void addSingleField(int index, UAVObjectField *field, TreeItem *parent);
     void addInstance(UAVObject *obj, TreeItem *parent);
+
+    TreeItem *createCategoryItems(QStringList categoryPath, TreeItem *root);
+
     QString updateMode(quint8 updateMode);
-    void setupModelData(UAVObjectManager *objManager);
     ObjectTreeItem *findObjectTreeItem(UAVObject *obj);
     DataObjectTreeItem *findDataObjectTreeItem(UAVDataObject *obj);
+    MetaObjectTreeItem *findMetaObjectTreeItem(UAVMetaObject *obj);
 
     TreeItem *m_rootItem;
     TopTreeItem *m_settingsTree;
@@ -97,6 +104,7 @@ private:
     int m_recentlyUpdatedTimeout;
     QColor m_recentlyUpdatedColor;
     QColor m_manuallyChangedColor;
+    bool m_onlyHilightChangedValues;
 
     // Highlight manager to handle highlighting of tree items.
     HighLightManager *m_highlightManager;

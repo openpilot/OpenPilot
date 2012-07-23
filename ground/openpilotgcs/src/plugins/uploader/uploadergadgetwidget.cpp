@@ -213,7 +213,8 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
             m_config->haltButton->setEnabled(true);
             break;
         }
-        delay::msleep(600);
+        QTimer::singleShot(600, &m_eventloop, SLOT(quit()));
+        m_eventloop.exec();
         fwIAP->getField("Command")->setValue("2233");
         currentStep = IAP_STATE_STEP_2;
         log(QString("IAP Step 2"));
@@ -228,7 +229,8 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
             m_config->haltButton->setEnabled(true);
             break;
         }
-        delay::msleep(600);
+        QTimer::singleShot(600, &m_eventloop, SLOT(quit()));
+        m_eventloop.exec();
         fwIAP->getField("Command")->setValue("3344");
         currentStep = IAP_STEP_RESET;
         log(QString("IAP Step 3"));
@@ -250,8 +252,12 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
         QString dli = cm->getCurrentDevice().Name;
         QString dlj = cm->getCurrentDevice().devName;
         cm->disconnectDevice();
+        QTimer::singleShot(200, &m_eventloop, SLOT(quit()));
+        m_eventloop.exec();
         // Tell connections to stop their polling threads: otherwise it will mess up DFU
         cm->suspendPolling();
+        QTimer::singleShot(200, &m_eventloop, SLOT(quit()));
+        m_eventloop.exec();
         log("Board Halt");
         m_config->boardStatus->setText("Bootloader");
         if (dlj.startsWith("USB"))

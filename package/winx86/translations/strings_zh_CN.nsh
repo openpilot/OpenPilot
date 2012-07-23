@@ -31,6 +31,10 @@
   LangString DESC_InSecSounds ${LANG_TRADCHINESE} "地面站音频文件（用于对于特定事件的提醒）."
   LangString DESC_InSecLocalization ${LANG_TRADCHINESE} "地面站本土化（适用于它所支持的语言）."
   LangString DESC_InSecFirmware ${LANG_TRADCHINESE} "OpenPilot firmware binaries."
+  LangString DESC_InSecUtilities ${LANG_TRADCHINESE} "OpenPilot utilities (Matlab log parser)."
+  LangString DESC_InSecDrivers ${LANG_TRADCHINESE} "OpenPilot hardware driver files (optional OpenPilot CDC driver)."
+  LangString DESC_InSecInstallDrivers ${LANG_TRADCHINESE} "Optional OpenPilot CDC driver (virtual USB COM port)."
+  LangString DESC_InSecAeroSimRC ${LANG_TRADCHINESE} "AeroSimRC plugin files with sample configuration."
   LangString DESC_InSecShortcuts ${LANG_TRADCHINESE} "安装开始菜单的快捷方式."
 
 ;--------------------------------

@@ -1,5 +1,21 @@
 Short summary of changes.  For a complete list see the git log.
 
+2012-07-20
+AeroSimRC simulator plugin is now included into the Windows distribution
+(will be installed into .../OpenPilot/misc/AeroSIM-RC directory).  Still
+being an experimental development tool, it could be used to play with
+HITL version 2.  Other platforms include udp_test utility which can be
+used to check the connectivity with AeroSimRC plugin running on Windows
+machine.
+
+2012-07-10
+On Windows the installation mode was changed from per-user to per-machine
+(for all users) installation.  It is recommended to completely uninstall
+previous version before installing new one to remove per-user installed
+files.  Per-machine installation requires elevated (administrator) previleges
+during install.  But since the same rights are now required to install
+optional CDC driver (virtual communication port), it was deemed acceptable.
+
 2012-06-04
 AeroSimRC support merged into next
 

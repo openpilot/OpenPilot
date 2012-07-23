@@ -62,6 +62,9 @@
  #define STACK_SIZE_BYTES 600
 #elif defined (BARO_AIRSPEED_PRESENT)
  #define STACK_SIZE_BYTES 550
+#else
+ #define STACK_SIZE_BYTES 0
+ #define NO_AIRSPEED_SENSOR_PRESENT
 #endif
 
 
@@ -107,6 +110,10 @@ static void GPSVelocityUpdatedCb(UAVObjEvent * ev);
  */
 int32_t AirspeedStart()
 {	
+#if defined (NO_AIRSPEED_SENSOR_PRESENT)
+	return -1;
+#endif	
+	
 	//Check if module is enabled or not
 	if (airspeedEnabled == false) {
 		return -1;
@@ -115,7 +122,6 @@ int32_t AirspeedStart()
 	// Start main task
 	xTaskCreate(airspeedTask, (signed char *)"Airspeed", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
 	TaskMonitorAdd(TASKINFO_RUNNING_AIRSPEED, taskHandle);
-	
 	return 0;
 }
 
@@ -194,12 +200,12 @@ static void airspeedTask(void *parameters)
 	portTickType lastSysTime = xTaskGetTickCount();
 	while (1)
 	{
-		float airspeed_tas_baro=0;
-
 		// Update the airspeed object
 		BaroAirspeedGet(&airspeedData);
 		
 #ifdef BARO_AIRSPEED_PRESENT
+		float airspeed_tas_baro=0;
+		
 		if(airspeedSensorType!=AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_GPSONLY){
 			//Fetch calibrated airspeed from sensors
 			baro_airspeedGet(&airspeedData, &lastSysTime, airspeedSensorType, airspeedADCPin);

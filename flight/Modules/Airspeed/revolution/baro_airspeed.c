@@ -58,7 +58,9 @@
 
 // Private functions
 
+#if defined(PIOS_INCLUDE_ETASV3) || defined(PIOS_INCLUDE_MPXV7002) || defined (PIOS_INCLUDE_MPXV5004)
 static uint16_t calibrationCount=0;
+#endif
 
 void baro_airspeedGet(BaroAirspeedData *baroAirspeedData, portTickType *lastSysTime, uint8_t airspeedSensorType, int8_t airspeedADCPin){
 	

@@ -38,6 +38,7 @@
 #include "gpstime.h"
 #include "gpssatellites.h"
 #include "osdsettings.h"
+#include "baroaltitude.h"
 
 #include "fonts.h"
 #include "font12x18.h"
@@ -1643,13 +1644,14 @@ void drawAltitude(uint16_t x, uint16_t y, int16_t alt, uint8_t dir) {
  * @param       v                               value to display as an integer
  * @param       range                   range about value to display (+/- range/2 each direction)
  * @param       halign                  horizontal alignment: -1 = left, +1 = right.
+ * @param       x                       x displacement (typ. 0)
+ * @param       y                       y displacement (typ. half display height)
  * @param       height                  height of scale
- * @param       x                               x displacement (typ. 0)
- * @param       y                               y displacement (typ. half display height)
- * @param       mintick_step    how often a minor tick is shown
- * @param       majtick_step    how often a major tick is shown
+ * @param       mintick_step    		how often a minor tick is shown
+ * @param       majtick_step    		how often a major tick is shown
  * @param       mintick_len             minor tick length
  * @param       majtick_len             major tick length
+ * @param       boundtick_len           boundary tick length
  * @param       max_val                 maximum expected value (used to compute size of arrow ticker)
  * @param       flags                   special flags (see hud.h.)
  */
@@ -1673,6 +1675,7 @@ void hud_draw_vertical_scale(int v, int range, int halign, int x, int y, int hei
         }
         else if(halign == +1)
         {
+        		x=x-GRAPHICS_HDEADBAND;
                 majtick_start = GRAPHICS_WIDTH_REAL - x - 1;
                 majtick_end = GRAPHICS_WIDTH_REAL - x - majtick_len - 1;
                 mintick_start = GRAPHICS_WIDTH_REAL - x - 1;
@@ -2193,6 +2196,8 @@ void updateGraphics() {
 	GPSPositionGet(&gpsData);
 	HomeLocationData home;
 	HomeLocationGet(&home);
+	BaroAltitudeData baro;
+	BaroAltitudeGet(&baro);
 	
 	switch (OsdSettings.Screen) {
 		case 0: // Dave simple
@@ -2361,7 +2366,22 @@ void updateGraphics() {
 		break;
 		case 2:
 		{
-			draw_artificial_horizon(-attitude.Roll,attitude.Pitch,100,100,64);
+			int size=64;
+			int x=((GRAPHICS_RIGHT/2)-(size/2)),y=(GRAPHICS_BOTTOM-size-2);
+			draw_artificial_horizon(-attitude.Roll,attitude.Pitch,APPLY_HDEADBAND(x),APPLY_VDEADBAND(y),size);
+			hud_draw_vertical_scale((int)gpsData.Groundspeed, 20, +1, APPLY_HDEADBAND(GRAPHICS_RIGHT-(x-1)),
+					APPLY_VDEADBAND(y+(size/2)), size, 5, 10, 4, 7, 10, 100, HUD_VSCALE_FLAG_NO_NEGATIVE);
+			if(1)
+			{
+				hud_draw_vertical_scale((int)baro.Altitude, 50, -1, APPLY_HDEADBAND((x+size+1)),
+					APPLY_VDEADBAND(y+(size/2)), size, 10, 20, 4, 7, 10, 500, 0);
+			}
+			else
+			{
+				hud_draw_vertical_scale((int)gpsData.Altitude, 50, -1, APPLY_HDEADBAND((x+size+1)),
+					APPLY_VDEADBAND(y+(size/2)), size, 10, 20, 4, 7, 10, 500, 0);
+			}
+
 		}
 		break;
 		case 3:
@@ -2424,6 +2444,7 @@ int32_t osdgenInitialize(void)
 #endif
 #endif
 	OsdSettingsInitialize();
+	BaroAltitudeInitialize();
 
 	return 0;
 }

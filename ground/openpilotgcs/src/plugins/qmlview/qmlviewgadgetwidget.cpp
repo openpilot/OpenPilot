@@ -31,15 +31,11 @@
 #include "uavobjectmanager.h"
 #include "uavobject.h"
 
-#include <utils/stylehelper.h>
-#include <utils/cachedsvgitem.h>
-#include <iostream>
 #include <QDebug>
-#include <QPainter>
+#include <QSvgRenderer>
 #include <QtOpenGL/QGLWidget>
 #include <QtCore/qfileinfo.h>
 #include <QtCore/qdir.h>
-#include <cmath>
 
 #include <QtDeclarative/qdeclarativeengine.h>
 #include <QtDeclarative/qdeclarativecontext.h>
@@ -69,6 +65,8 @@ QmlViewGadgetWidget::QmlViewGadgetWidget(QWidget *parent) :
         else
             qWarning() << "Failed to load object" << objectName;
     }
+
+    engine()->rootContext()->setContextProperty("qmlWidget", this);
 }
 
 QmlViewGadgetWidget::~QmlViewGadgetWidget()
@@ -80,8 +78,12 @@ void QmlViewGadgetWidget::setQmlFile(QString fn)
     m_fn = fn;
 
     engine()->removeImageProvider("svg");
-    engine()->addImageProvider("svg",
-              new SvgImageProvider(fn));
+    SvgImageProvider *svgProvider = new SvgImageProvider(fn);
+    engine()->addImageProvider("svg", svgProvider);
+
+    //it's necessary to allow qml side to query svg element position
+    engine()->rootContext()->setContextProperty("svgRenderer", svgProvider);
+    engine()->setBaseUrl(QUrl::fromLocalFile(fn));
 
     qDebug() << Q_FUNC_INFO << fn;
     setSource(QUrl::fromLocalFile(fn));

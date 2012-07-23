@@ -79,6 +79,8 @@
 
 #define F_PI 3.141526535897932f
 #define DEG2RAD (F_PI/180.0f)
+#define T0 288.15f
+#define BARO_TEMPERATURE_OFFSET 5
 
 // Private types
 
@@ -211,12 +213,18 @@ static void airspeedTask(void *parameters)
 			baro_airspeedGet(&airspeedData, &lastSysTime, airspeedSensorType, airspeedADCPin);
 			
 			//Calculate true airspeed, not taking into account compressibility effects
-			#define T0 288.15f
 			float baroTemperature;
 			
 			BaroAltitudeTemperatureGet(&baroTemperature);
-			baroTemperature-=5; //Do this just because we suspect that the board heats up relative to its surroundings. THIS IS BAD(tm)
-			airspeed_tas_baro=airspeedData.CAS * sqrtf((baroTemperature+273.15)/T0) + airspeedErrInt * GPS_AIRSPEED_BIAS_KI;
+			baroTemperature-=BARO_TEMPERATURE_OFFSET; //Do this just because we suspect that the board heats up relative to its surroundings. THIS IS BAD(tm)
+ #ifdef GPS_AIRSPEED_PRESENT
+			//GPS present, so use baro sensor to filter TAS
+			airspeed_tas_baro=airspeedData.CalibratedAirspeed * sqrtf((baroTemperature+273.15)/T0) + airspeedErrInt * GPS_AIRSPEED_BIAS_KI;
+ #else
+			//No GPS, so TAS comes only from baro sensor
+			airspeedData.TrueAirspeed=airspeedData.CalibratedAirspeed * sqrtf((baroTemperature+273.15)/T0) + airspeedErrInt * GPS_AIRSPEED_BIAS_KI;
+ #endif			
+			
 		}
 		else
 #endif
@@ -266,6 +274,13 @@ static void airspeedTask(void *parameters)
 							
 				//There's already an airspeed sensor, so instead correct it for bias with P correction. The I correction happened earlier in the function.
 				airspeedData.TrueAirspeed = airspeed_tas_baro + airspeedErr * GPS_AIRSPEED_BIAS_KP;
+				
+				
+				/* Note: 
+				      This would be a good place to change the airspeed calibration, so that it matches the GPS computed values. However,
+				      this might be a bad idea, as their are two degrees of freedom here: temperature and sensor calibration. I don't 
+				      know how to control for temperature bias.
+				 */
 			}
 			else
  #endif
@@ -274,18 +289,22 @@ static void airspeedTask(void *parameters)
 				//case, filter the airspeed for smoother output
 				float alpha=gpsSamplePeriod_ms/(gpsSamplePeriod_ms + GPS_AIRSPEED_TIME_CONSTANT_MS); //Low pass filter.
 				airspeedData.TrueAirspeed=v_air_GPS*(alpha) + airspeedData.TrueAirspeed*(1.0f-alpha);
+				
+				//Calculate calibrated airspeed from GPS, since we're not getting it from a discrete airspeed sensor
+				float baroTemperature;
+				BaroAltitudeTemperatureGet(&baroTemperature);
+				baroTemperature-=BARO_TEMPERATURE_OFFSET; //Do this just because we suspect that the board heats up relative to its surroundings. THIS IS BAD(tm)
+				airspeedData.CalibratedAirspeed =airspeedData.TrueAirspeed / sqrtf((baroTemperature+273.15)/T0);
 			}			
 		}
+ #ifdef BARO_AIRSPEED_PRESENT
+		else if (airspeedData.BaroConnected==BAROAIRSPEED_BAROCONNECTED_TRUE){
+			//No GPS velocity estimate this loop, so filter data with baro airspeed
+			float alpha=gpsSamplePeriod_ms/(gpsSamplePeriod_ms + GPS_AIRSPEED_TIME_CONSTANT_MS); //Low pass filter.
+			airspeedData.TrueAirspeed=airspeedData.TrueAirspeed*(alpha) + airspeedData.TrueAirspeed*(1.0f-alpha);
+		}
+ #endif
 #endif
-		
-		//Legacy UAVO support, this needs to be removed in favor of using TAS and CAS, as appropriate.
-		if (airspeedData.BaroConnected==BAROAIRSPEED_BAROCONNECTED_FALSE){ //If we only have a GPS, use GPS data as airspeed...
-			airspeedData.Airspeed=airspeedData.TrueAirspeed;
-		}
-		else{                            //...otherwise, use the only baro airspeed because we still don't trust true airspeed calculations
-			airspeedData.Airspeed=airspeedData.CAS;
-		}
-			
 		//Set the UAVO
 		BaroAirspeedSet(&airspeedData);
 			

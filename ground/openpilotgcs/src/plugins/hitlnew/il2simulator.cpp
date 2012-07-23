@@ -273,7 +273,7 @@ void IL2Simulator::processUpdate(const QByteArray& inp)
     out.longitude = settings.longitude.toFloat() * 1e7;
     out.groundspeed = current.groundspeed;
 
-    out.airspeed = current.ias;
+    out.calibratedAirspeed = current.ias;
 
     out.dstN=current.Y;
     out.dstE=current.X;

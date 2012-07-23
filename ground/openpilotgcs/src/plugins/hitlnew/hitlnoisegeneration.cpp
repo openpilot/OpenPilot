@@ -72,6 +72,6 @@ Noise HitlNoiseGeneration::generateNoise(){
     noise.accelData.y=0;
     noise.accelData.z=0;
 
-    noise.baroAirspeed.Airspeed=0;
+    noise.baroAirspeed.CalibratedAirspeed=0;
 
 }

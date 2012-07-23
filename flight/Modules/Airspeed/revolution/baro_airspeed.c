@@ -151,10 +151,10 @@ void baro_airspeedGet(BaroAirspeedData *baroAirspeedData, portTickType *lastSysT
 		}
 		//Filter CAS
 		float alpha=SAMPLING_DELAY_MS_MPXV/(SAMPLING_DELAY_MS_MPXV + ANALOG_BARO_AIRSPEED_TIME_CONSTANT_MS); //Low pass filter.
-		float filteredAirspeed = calibratedAirspeed*(alpha) + baroAirspeedData->CAS*(1.0f-alpha);
+		float filteredAirspeed = calibratedAirspeed*(alpha) + baroAirspeedData->CalibratedAirspeed*(1.0f-alpha);
 		
 		//Set two values, one for the UAVO airspeed sensor reading, and the other for the GPS corrected one
-		baroAirspeedData->CAS = filteredAirspeed;
+		baroAirspeedData->CalibratedAirspeed = filteredAirspeed;
 #else
 		//Whoops, no sensor defined in pios_config.h. Revert to GPS.
 		baroAirspeedData->BaroConnected = BAROAIRSPEED_BAROCONNECTED_FALSE;
@@ -179,7 +179,7 @@ void baro_airspeedGet(BaroAirspeedData *baroAirspeedData, portTickType *lastSysT
 		baroAirspeedData->SensorValue = PIOS_ETASV3_ReadAirspeed();
 		if (baroAirspeedData->SensorValue==-1) {
 			baroAirspeedData->BaroConnected = BAROAIRSPEED_BAROCONNECTED_FALSE;
-			baroAirspeedData->Airspeed = 0;
+			baroAirspeedData->CalibratedAirspeed = 0;
 			BaroAirspeedSet(&baroAirspeedData);
 			return;
 		}
@@ -204,7 +204,7 @@ void baro_airspeedGet(BaroAirspeedData *baroAirspeedData, portTickType *lastSysT
 		float calibratedAirspeed = ETS_AIRSPEED_SCALE * sqrtf((float)abs(baroAirspeedData->SensorValue - airspeedSettingsData.ZeroPoint)); //Is this calibrated or indicated airspeed?
 		
 		baroAirspeedData->BaroConnected = BAROAIRSPEED_BAROCONNECTED_TRUE;
-		baroAirspeedData->CAS = calibratedAirspeed;
+		baroAirspeedData->CalibratedAirspeed = calibratedAirspeed;
 #else
 		//Whoops, no EagleTree sensor defined in pios_config.h. Declare it unconnected...
 		baroAirspeedData->BaroConnected = BAROAIRSPEED_BAROCONNECTED_FALSE;

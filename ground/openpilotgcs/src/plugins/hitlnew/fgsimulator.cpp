@@ -311,7 +311,7 @@ void FGSimulator::processUpdate(const QByteArray& inp)
     out.altitude = altitude;
     out.groundspeed = groundspeed;
 
-    out.airspeed = airspeed;
+    out.calibratedAirspeed = airspeed;
 
 
     // Update BaroAltitude object

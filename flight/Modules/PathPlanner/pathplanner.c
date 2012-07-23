@@ -485,7 +485,7 @@ static uint8_t conditionAboveSpeed() {
 		BaroAirspeedData baroAirspeed;
 		BaroAirspeedGet (&baroAirspeed);
 		if (baroAirspeed.BaroConnected == BAROAIRSPEED_BAROCONNECTED_TRUE) {
-			velocity = baroAirspeed.Airspeed;
+			velocity = baroAirspeed.TrueAirspeed;
 		}
 	}
 

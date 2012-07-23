@@ -138,6 +138,16 @@ int32_t GPSInitialize(void)
 		gpsEnabled = false;
 #endif
 
+#if defined(REVOLUTION)
+	// These objects MUST be initialized for Revolution
+	// because the rest of the system expects to just
+	// attach to their queues
+	GPSPositionInitialize();
+	GPSVelocityInitialize();
+	GPSTimeInitialize();
+	HomeLocationInitialize();
+#endif
+
 	if (gpsPort && gpsEnabled) {
 		GPSPositionInitialize();
 		GPSVelocityInitialize();

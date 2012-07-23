@@ -73,6 +73,7 @@
 static uint32_t idleCounter;
 static uint32_t idleCounterClear;
 static xTaskHandle systemTaskHandle;
+static xQueueHandle objectPersistenceQueue;
 static bool stackOverflow;
 static bool mallocFailed;
 
@@ -124,6 +125,8 @@ int32_t SystemModInitialize(void)
 
 	SystemModStart();
 
+	objectPersistenceQueue = xQueueCreate(1, sizeof(UAVObjEvent));
+
 	return 0;
 }
 
@@ -133,8 +136,6 @@ MODULE_INITCALL(SystemModInitialize, 0)
  */
 static void systemTask(void *parameters)
 {
-	portTickType lastSysTime;
-
 	/* create all modules thread */
 	MODULE_TASKCREATE_ALL;
 
@@ -154,10 +155,9 @@ static void systemTask(void *parameters)
 	// Initialize vars
 	idleCounter = 0;
 	idleCounterClear = 0;
-	lastSysTime = xTaskGetTickCount();
 
 	// Listen for SettingPersistance object updates, connect a callback function
-	ObjectPersistenceConnectCallback(&objectUpdatedCb);
+	ObjectPersistenceConnectQueue(objectPersistenceQueue);
 
 	// Main system loop
 	while (1) {
@@ -193,11 +193,14 @@ static void systemTask(void *parameters)
 		FlightStatusData flightStatus;
 		FlightStatusGet(&flightStatus);
 
-		// Wait until next period
-		if(flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED) {
-			vTaskDelayUntil(&lastSysTime, SYSTEM_UPDATE_PERIOD_MS / portTICK_RATE_MS / (LED_BLINK_RATE_HZ * 2) );
-		} else {
-			vTaskDelayUntil(&lastSysTime, SYSTEM_UPDATE_PERIOD_MS / portTICK_RATE_MS);
+		UAVObjEvent ev;
+		int delayTime = flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED ?
+			SYSTEM_UPDATE_PERIOD_MS / portTICK_RATE_MS / (LED_BLINK_RATE_HZ * 2) :
+			SYSTEM_UPDATE_PERIOD_MS / portTICK_RATE_MS;
+
+		if(xQueueReceive(objectPersistenceQueue, &ev, delayTime) == pdTRUE) {
+			// If object persistence is updated call the callback
+			objectUpdatedCb(&ev);
 		}
 	}
 }

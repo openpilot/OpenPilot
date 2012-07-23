@@ -89,7 +89,9 @@ static void WavPlayerTask(void *parameters)
 
 	timeOfLastUpdateMs = timeNowMs;
 	timeOfLastCommandMs = timeNowMs;
+#if defined(PIOS_INCLUDE_WAVE)
 	WavePlayer_Start();
+#endif
 	// Loop forever
 	while (1)
 	{

@@ -81,6 +81,7 @@ struct pios_overo_dev {
 	uint32_t tx_out_context;
 };
 
+#if defined(PIOS_INCLUDE_FREERTOS)
 //! Private methods
 static void PIOS_OVERO_WriteData(struct pios_overo_dev *overo_dev);
 static bool PIOS_OVERO_validate(struct pios_overo_dev * overo_dev);
@@ -90,10 +91,6 @@ static bool PIOS_OVERO_validate(struct pios_overo_dev * overo_dev)
 {
 	return (overo_dev->magic == PIOS_OVERO_DEV_MAGIC);
 }
-
-#if !defined(PIOS_INCLUDE_FREERTOS)
-#error Requires FreeRTOS
-#endif /* PIOS_INCLUDE_FREERTOS */
 
 static struct pios_overo_dev * PIOS_OVERO_alloc(void)
 {
@@ -359,6 +356,15 @@ static void PIOS_OVERO_RegisterTxCallback(uint32_t overo_id, pios_com_callback t
 	overo_dev->tx_out_context = context;
 	overo_dev->tx_out_cb = tx_out_cb;
 }
+
+#else
+
+static void PIOS_OVERO_RegisterTxCallback(uint32_t overo_id, pios_com_callback tx_out_cb, uint32_t context) {};
+static void PIOS_OVERO_RegisterRxCallback(uint32_t overo_id, pios_com_callback rx_in_cb, uint32_t context) {};
+static void PIOS_OVERO_TxStart(uint32_t overo_id, uint16_t tx_bytes_avail) {};
+static void PIOS_OVERO_RxStart(uint32_t overo_id, uint16_t rx_bytes_avail) {};
+
+#endif /* PIOS_INCLUDE_FREERTOS */
 
 #endif
 

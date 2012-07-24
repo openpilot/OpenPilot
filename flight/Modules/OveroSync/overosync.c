@@ -38,7 +38,7 @@
 
 // Private constants
 #define OVEROSYNC_PACKET_SIZE 1024
-#define MAX_QUEUE_SIZE   60
+#define MAX_QUEUE_SIZE   200
 #define STACK_SIZE_BYTES 512
 #define TASK_PRIORITY (tskIDLE_PRIORITY + 0)
 
@@ -88,6 +88,9 @@ int32_t OveroSyncInitialize(void)
 	
 	if (optionalModules[HWSETTINGS_OPTIONALMODULES_OVERO] == HWSETTINGS_OPTIONALMODULES_ENABLED) {
 		overoEnabled = true;
+	
+		// Create object queues
+		queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
 	} else {
 		overoEnabled = false;
 		return -1;
@@ -97,8 +100,6 @@ int32_t OveroSyncInitialize(void)
 	
 	OveroSyncStatsInitialize();
 
-	// Create object queues
-	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
 
 	// Initialise UAVTalk
 	uavTalkCon = UAVTalkInitialize(&packData);

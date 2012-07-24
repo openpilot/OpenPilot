@@ -123,11 +123,11 @@ int32_t SystemModInitialize(void)
 	WatchdogStatusInitialize();
 #endif
 
-	SystemModStart();
-
 	objectPersistenceQueue = xQueueCreate(1, sizeof(UAVObjEvent));
 	if (objectPersistenceQueue == NULL)
 		return -1;
+
+	SystemModStart();
 
 	return 0;
 }

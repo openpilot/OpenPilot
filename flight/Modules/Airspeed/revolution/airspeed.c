@@ -72,10 +72,10 @@
 
 #define SAMPLING_DELAY_MS_FALLTHROUGH  50     //Fallthrough update at 20Hz. The fallthrough runs faster than the GPS to ensure that we don't miss GPS updates because we're slightly out of sync
 
-#define GPS_AIRSPEED_BIAS_KP           0.01f   //Needs to be settable in a UAVO
-#define GPS_AIRSPEED_BIAS_KI           0.01f   //Needs to be settable in a UAVO
-//#define SAMPLING_DELAY_MS_GPS          100    //Needs to be settable in a UAVO
-#define GPS_AIRSPEED_TIME_CONSTANT_MS  500.0f //Needs to be settable in a UAVO
+#define GPS_AIRSPEED_BIAS_KP                   0.01f //Needs to be settable in a UAVO
+#define GPS_AIRSPEED_BIAS_KI                   0.01f //Needs to be settable in a UAVO
+#define GPS_AIRSPEED_TIME_CONSTANT_MS        500.0f  //Needs to be settable in a UAVO
+#define BARO_TRUEAIRSPEED_TIME_CONSTANT_S      1.0f  //Needs to be settable in a UAVO
 
 #define F_PI 3.141526535897932f
 #define DEG2RAD (F_PI/180.0f)
@@ -187,7 +187,8 @@ static void airspeedTask(void *parameters)
 	airspeedData.BaroConnected = BAROAIRSPEED_BAROCONNECTED_FALSE;
 	
 #ifdef BARO_AIRSPEED_PRESENT		
-	portTickType lastGPSTime= xTaskGetTickCount();
+	portTickType lastGPSTime = xTaskGetTickCount(); //Time since last GPS-derived airspeed calculation
+	portTickType lastLoopTime= xTaskGetTickCount(); //Time since last loop
 
 	float airspeedErrInt=0;
 #endif
@@ -243,8 +244,9 @@ static void airspeedTask(void *parameters)
 		//sensor or not. In the case we do, shoot for about once per second. Otherwise, consume GPS
 		//as quickly as possible.
  #ifdef BARO_AIRSPEED_PRESENT
-		float delT = (lastSysTime - lastGPSTime)/1000.0f;
-		if ( (delT > portTICK_RATE_MS	 || airspeedSensorType==AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_GPSONLY)
+		float delT = (lastSysTime - lastLoopTime)/(portTICK_RATE_MS*1000.0f);
+		lastLoopTime=lastSysTime;
+		if ( ((lastSysTime - lastGPSTime) > 1000*portTICK_RATE_MS || airspeedSensorType==AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_GPSONLY)
 				&& gpsNew) {
 			lastGPSTime=lastSysTime;
  #else
@@ -299,9 +301,9 @@ static void airspeedTask(void *parameters)
 		}
  #ifdef BARO_AIRSPEED_PRESENT
 		else if (airspeedData.BaroConnected==BAROAIRSPEED_BAROCONNECTED_TRUE){
-			//No GPS velocity estimate this loop, so filter data with baro airspeed
-			float alpha=gpsSamplePeriod_ms/(gpsSamplePeriod_ms + GPS_AIRSPEED_TIME_CONSTANT_MS); //Low pass filter.
-			airspeedData.TrueAirspeed=airspeedData.TrueAirspeed*(alpha) + airspeedData.TrueAirspeed*(1.0f-alpha);
+			//No GPS velocity estimate this loop, so filter true airspeed data with baro airspeed
+			float alpha=delT/(delT + BARO_TRUEAIRSPEED_TIME_CONSTANT_S); //Low pass filter.
+			airspeedData.TrueAirspeed=airspeed_tas_baro*(alpha) + airspeedData.TrueAirspeed*(1.0f-alpha);
 		}
  #endif
 #endif

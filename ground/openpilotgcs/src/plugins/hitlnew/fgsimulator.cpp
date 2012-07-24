@@ -117,7 +117,8 @@ bool FGSimulator::setupProcess()
                      "--altitude=3000 " +
                      "--vc=100 " +
                      "--log-level=alert " +
-                     "--generic=socket,out,20," + settings.hostAddress + "," + QString::number(settings.inPort) + ",udp,opfgprotocol");
+                     "--generic=socket,out,20," + settings.hostAddress + "," + QString::number(settings.inPort) + ",udp,opfgprotocol " +
+                     settings.additionalFlags);
 	if(!settings.manual)
 	{
             args.append(" --generic=socket,in,400," + settings.remoteHostAddress + "," + QString::number(settings.outPort) + ",udp,opfgprotocol");

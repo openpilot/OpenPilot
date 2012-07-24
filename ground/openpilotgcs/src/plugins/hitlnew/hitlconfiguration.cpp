@@ -41,6 +41,7 @@ HITLConfiguration::HITLConfiguration(QString classId, QSettings* qSettings, QObj
         settings.inPort = 0;
         settings.latitude = "";
         settings.longitude = "";
+        settings.additionalFlags = "";
 
         //if a saved configuration exists load it
         if(qSettings != 0) {
@@ -54,7 +55,8 @@ HITLConfiguration::HITLConfiguration(QString classId, QSettings* qSettings, QObj
                 settings.outPort = qSettings->value("outPort").toInt();
                 settings.inPort = qSettings->value("inPort").toInt();
                 settings.latitude = qSettings->value("latitude").toString();
-                settings.longitude = qSettings->value("longitude").toString();                
+                settings.longitude = qSettings->value("longitude").toString();
+                settings.additionalFlags = qSettings->value("additionalFlags").toString();
         }
 }
 
@@ -82,5 +84,6 @@ void HITLConfiguration::saveConfig(QSettings* qSettings) const {
     qSettings->setValue("inPort", settings.inPort);
     qSettings->setValue("latitude", settings.latitude);
     qSettings->setValue("longitude", settings.longitude);
+    qSettings->setValue("additionalFlags",settings.additionalFlags);
 }
 

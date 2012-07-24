@@ -106,6 +106,7 @@ typedef struct _CONNECTION
         bool startSim;
 	QString latitude;
 	QString longitude;
+    QString additionalFlags;
 } SimulatorSettings;
 
 class Simulator : public QObject

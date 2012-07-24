@@ -179,7 +179,7 @@ static void overoSyncTask(void *parameters)
 		if (xQueueReceive(queue, &ev, portMAX_DELAY) == pdTRUE) {
 
 			// Process event.  This calls transmitData
-			UAVTalkSendObject(uavTalkCon, ev.obj, ev.instId, false, 0);
+			UAVTalkSendObjectTimestamped(uavTalkCon, ev.obj, ev.instId, false, 0);
 			
 			updateTime = xTaskGetTickCount();
 			if(((portTickType) (updateTime - lastUpdateTime)) > 1000) {
@@ -209,14 +209,10 @@ static void overoSyncTask(void *parameters)
  */
 static int32_t packData(uint8_t * data, int32_t length)
 {
-	portTickType tickTime = xTaskGetTickCount();
-
-	if( PIOS_COM_SendBufferNonBlocking(pios_com_overo_id, (uint8_t *) &tickTime, sizeof(tickTime)) < 0)
-		goto fail;
 	if( PIOS_COM_SendBufferNonBlocking(pios_com_overo_id, data, length) < 0)
 		goto fail;
 
-	overosync->sent_bytes += length + 4;
+	overosync->sent_bytes += length;
 
 	return length;
 

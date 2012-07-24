@@ -324,7 +324,7 @@ static void PIOS_OVERO_TxStart(uint32_t overo_id, uint16_t tx_bytes_avail)
 	// DMA TX enable (enable IRQ) ?
 
 	// Load any pending bytes from TX fifo
-	PIOS_OVERO_WriteData(overo_dev);
+	//PIOS_OVERO_WriteData(overo_dev);
 }
 
 static void PIOS_OVERO_RegisterRxCallback(uint32_t overo_id, pios_com_callback rx_in_cb, uint32_t context)

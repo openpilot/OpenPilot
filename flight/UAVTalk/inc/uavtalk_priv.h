@@ -91,7 +91,7 @@ typedef struct {
 #define UAVTALK_WAITFOREVER     -1
 #define UAVTALK_NOWAIT          0
 #define UAVTALK_SYNC_VAL       0x3C
-#define UAVTALK_TYPE_MASK      0xF8
+#define UAVTALK_TYPE_MASK      0x78
 #define UAVTALK_TYPE_VER       0x20
 #define UAVTALK_TIMESTAMPED    0x80
 #define UAVTALK_TYPE_OBJ       (UAVTALK_TYPE_VER | 0x00)

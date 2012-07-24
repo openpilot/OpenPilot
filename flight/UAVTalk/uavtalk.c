@@ -390,6 +390,7 @@ UAVTalkRxState UAVTalkProcessInputStreamQuiet(UAVTalkConnection connectionHandle
 				{
 					iproc->length = UAVObjGetNumBytes(iproc->obj);
 					iproc->instanceLength = (UAVObjIsSingleInstance(iproc->obj) ? 0 : 2);
+					iproc->timestampLength = (iproc->type & UAVTALK_TIMESTAMPED) ? 2 : 0;
 				}
 				else
 				{
@@ -408,7 +409,7 @@ UAVTalkRxState UAVTalkProcessInputStreamQuiet(UAVTalkConnection connectionHandle
 			}
 			
 			// Check the lengths match
-			if ((iproc->rxPacketLength + iproc->instanceLength + iproc->length) != iproc->packet_size)
+			if ((iproc->rxPacketLength + iproc->instanceLength + iproc->timestampLength + iproc->length) != iproc->packet_size)
 			{   // packet error - mismatched packet size
 				connection->stats.rxErrors++;
 				iproc->state = UAVTALK_STATE_ERROR;

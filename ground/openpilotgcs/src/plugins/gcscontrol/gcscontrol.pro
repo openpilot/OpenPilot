@@ -2,6 +2,7 @@ TEMPLATE = lib
 TARGET = GCSControl 
 QT += svg
 QT += opengl
+QT += network
 
 include(../../openpilotgcsplugin.pri) 
 include(../../plugins/coreplugin/coreplugin.pri) 

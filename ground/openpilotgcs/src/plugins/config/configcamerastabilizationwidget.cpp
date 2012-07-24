@@ -33,12 +33,19 @@
 #include <QDebug>
 #include <QDesktopServices>
 #include <QUrl>
+#include <extensionsystem/pluginmanager.h>
+#include <coreplugin/generalsettings.h>
 
 ConfigCameraStabilizationWidget::ConfigCameraStabilizationWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
     // TODO: this widget should use the addUAVObjectToWidgetRelation()
     m_camerastabilization = new Ui_CameraStabilizationWidget();
     m_camerastabilization->setupUi(this);
+    
+    ExtensionSystem::PluginManager *pm=ExtensionSystem::PluginManager::instance();
+    Core::Internal::GeneralSettings * settings=pm->getObject<Core::Internal::GeneralSettings>();
+    if(!settings->useExpertMode())
+        m_camerastabilization->camerastabilizationSaveRAM->setVisible(false);
 
     QComboBox *outputs[3] = {
         m_camerastabilization->rollChannel,

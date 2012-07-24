@@ -41,6 +41,9 @@
 #include <utils/stylehelper.h>
 #include <QMessageBox>
 
+#include <extensionsystem/pluginmanager.h>
+#include <coreplugin/generalsettings.h>
+
 #define ACCESS_MIN_MOVE -3
 #define ACCESS_MAX_MOVE 3
 #define STICK_MIN_MOVE -8
@@ -54,7 +57,14 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
     receiverActivityObj=ReceiverActivity::GetInstance(getObjectManager());
     m_config = new Ui_InputWidget();
     m_config->setupUi(this);
+    
+    addApplySaveButtons(m_config->saveRCInputToRAM,m_config->saveRCInputToSD);
 
+    ExtensionSystem::PluginManager *pm=ExtensionSystem::PluginManager::instance();
+    Core::Internal::GeneralSettings * settings=pm->getObject<Core::Internal::GeneralSettings>();
+    if(!settings->useExpertMode())
+        m_config->saveRCInputToRAM->setVisible(false);
+    
     addApplySaveButtons(m_config->saveRCInputToRAM,m_config->saveRCInputToSD);
 
 	//Generate the rows of buttons in the input channel form GUI

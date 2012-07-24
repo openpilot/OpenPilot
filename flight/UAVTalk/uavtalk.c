@@ -190,6 +190,31 @@ int32_t UAVTalkSendObject(UAVTalkConnection connectionHandle, UAVObjHandle obj, 
 }
 
 /**
+ * Send the specified object through the telemetry link with a timestamp.
+ * \param[in] connection UAVTalkConnection to be used
+ * \param[in] obj Object to send
+ * \param[in] instId The instance ID or UAVOBJ_ALL_INSTANCES for all instances.
+ * \param[in] acked Selects if an ack is required (1:ack required, 0: ack not required)
+ * \param[in] timeoutMs Time to wait for the ack, when zero it will return immediately
+ * \return 0 Success
+ * \return -1 Failure
+ */
+int32_t UAVTalkSendObjectTimestamped(UAVTalkConnection connectionHandle, UAVObjHandle obj, uint16_t instId, uint8_t acked, int32_t timeoutMs)
+{
+	UAVTalkConnectionData *connection;
+    CHECKCONHANDLE(connectionHandle,connection,return -1);
+	// Send object
+	if (acked == 1)
+	{
+		return objectTransaction(connection, obj, instId, UAVTALK_TYPE_OBJ_ACK_TS, timeoutMs);
+	}
+	else
+	{
+		return objectTransaction(connection, obj, instId, UAVTALK_TYPE_OBJ_TS, timeoutMs);
+	}
+}
+
+/**
  * Execute the requested transaction on an object.
  * \param[in] connection UAVTalkConnection to be used
  * \param[in] obj Object
@@ -388,6 +413,12 @@ UAVTalkRxState UAVTalkProcessInputStreamQuiet(UAVTalkConnection connectionHandle
 			{
 				iproc->state = UAVTALK_STATE_INSTID;
 			}
+			// Check if this is a single instance and has a timestamp in it
+			else if ((iproc->obj != 0) && (iproc->type & UAVTALK_TIMESTAMPED))
+			{
+				iproc->timestamp = 0;
+				iproc->state = UAVTALK_STATE_TIMESTAMP;
+			}
 			else
 			{
 				// If there is a payload get it, otherwise receive checksum
@@ -412,14 +443,38 @@ UAVTalkRxState UAVTalkProcessInputStreamQuiet(UAVTalkConnection connectionHandle
 			
 			iproc->rxCount = 0;
 			
+			// If there is a timestamp, get it
+			if ((iproc->length > 0) && (iproc->type & UAVTALK_TIMESTAMPED))
+			{
+				iproc->timestamp = 0;
+				iproc->state = UAVTALK_STATE_TIMESTAMP;
+			}
 			// If there is a payload get it, otherwise receive checksum
-			if (iproc->length > 0)
+			else if (iproc->length > 0)
 				iproc->state = UAVTALK_STATE_DATA;
 			else
 				iproc->state = UAVTALK_STATE_CS;
 			
 			break;
-			
+
+		case UAVTALK_STATE_TIMESTAMP:
+			// update the CRC
+			iproc->cs = PIOS_CRC_updateByte(iproc->cs, rxbyte);
+
+			iproc->timestamp += rxbyte << (8*(iproc->rxCount++));
+
+			if (iproc->rxCount < 2)
+				break;
+
+			iproc->rxCount = 0;
+
+			// If there is a payload get it, otherwise receive checksum
+			if (iproc->length > 0)
+				iproc->state = UAVTALK_STATE_DATA;
+			else
+				iproc->state = UAVTALK_STATE_CS;
+			break;
+
 		case UAVTALK_STATE_DATA:
 			
 			// update the CRC
@@ -716,6 +771,15 @@ static int32_t sendSingleObject(UAVTalkConnectionData *connection, UAVObjHandle 
 		connection->txBuffer[8] = (uint8_t)(instId & 0xFF);
 		connection->txBuffer[9] = (uint8_t)((instId >> 8) & 0xFF);
 		dataOffset = 10;
+	}
+
+	// Add timestamp when the transaction type is appropriate
+	if (type & UAVTALK_TIMESTAMPED)
+	{
+		portTickType time = xTaskGetTickCount();
+		connection->txBuffer[dataOffset] = (uint8_t)(time & 0xFF);
+		connection->txBuffer[dataOffset + 1] = (uint8_t)((time >> 8) & 0xFF);
+		dataOffset += 2;
 	}
 	
 	// Determine data length

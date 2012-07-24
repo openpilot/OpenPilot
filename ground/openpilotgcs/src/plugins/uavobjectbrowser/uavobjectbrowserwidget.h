@@ -54,6 +54,7 @@ public:
 public slots:
     void showMetaData(bool show);
     void categorize(bool categorize);
+    void useScientificNotation(bool scientific);
 
 private slots:
     void sendUpdate();

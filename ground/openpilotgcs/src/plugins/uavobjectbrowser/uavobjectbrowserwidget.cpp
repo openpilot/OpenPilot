@@ -60,6 +60,7 @@ UAVObjectBrowserWidget::UAVObjectBrowserWidget(QWidget *parent) : QWidget(parent
     connect(m_browser->eraseSDButton, SIGNAL(clicked()), this, SLOT(eraseObject()));
     connect(m_browser->sendButton, SIGNAL(clicked()), this, SLOT(sendUpdate()));
     connect(m_browser->requestButton, SIGNAL(clicked()), this, SLOT(requestUpdate()));
+    connect(m_browser->scientificNotationCheckbox, SIGNAL(toggled(bool)), this, SLOT(useScientificNotation(bool)));
     enableSendRequest(false);
 }
 
@@ -85,11 +86,29 @@ void UAVObjectBrowserWidget::categorize(bool categorize)
     Q_ASSERT(objManager);
 
     UAVObjectTreeModel* tmpModel = m_model;
-    m_model = new UAVObjectTreeModel(0, categorize);
+    m_model = new UAVObjectTreeModel(0, categorize,m_browser->scientificNotationCheckbox->isChecked());
     m_model->setRecentlyUpdatedColor(m_recentlyUpdatedColor);
     m_model->setManuallyChangedColor(m_manuallyChangedColor);
     m_model->setRecentlyUpdatedTimeout(m_recentlyUpdatedTimeout);
     m_model->setOnlyHilightChangedValues(m_onlyHilightChangedValues);
+    m_browser->treeView->setModel(m_model);
+    showMetaData(m_browser->metaCheckBox->isChecked());
+
+    delete tmpModel;
+}
+
+void UAVObjectBrowserWidget::useScientificNotation(bool scientific)
+{
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    Q_ASSERT(pm);
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    Q_ASSERT(objManager);
+
+    UAVObjectTreeModel* tmpModel = m_model;
+    m_model = new UAVObjectTreeModel(0, m_browser->categorizeCheckbox->isChecked(),scientific);
+    m_model->setRecentlyUpdatedColor(m_recentlyUpdatedColor);
+    m_model->setManuallyChangedColor(m_manuallyChangedColor);
+    m_model->setRecentlyUpdatedTimeout(m_recentlyUpdatedTimeout);
     m_browser->treeView->setModel(m_model);
     showMetaData(m_browser->metaCheckBox->isChecked());
 

@@ -326,7 +326,7 @@ void PFDGadgetWidget::updateGroundspeed(UAVObject *object) {
   \brief Called by updates to @BaroAirspeed
   */
 void PFDGadgetWidget::updateAirspeed(UAVObject *object) {
-    UAVObjectField* airspeedField = object->getField("Airspeed");
+    UAVObjectField* airspeedField = object->getField("CalibratedAirspeed");
     if (airspeedField) {
         airspeedTarget = airspeedField->getDouble();
 

@@ -46,12 +46,12 @@ QT_END_NAMESPACE
 
 namespace Core {
 
-    class IConnection;
+class IConnection;
 
 namespace Internal {
-    class FancyTabWidget;
-    class FancyActionBar;
-    class MainWindow;
+class FancyTabWidget;
+class FancyActionBar;
+class MainWindow;
 } // namespace Internal
 
 
@@ -75,19 +75,28 @@ public:
     void init();
 
     QIODevice* getCurrentConnection() { return m_ioDev; }
-    devListItem getCurrentDevice() { return m_connectionDevice;}
+    devListItem getCurrentDevice() { return m_connectionDevice; }
+    devListItem findDevice(const QString &devName);
+
+    QLinkedList<devListItem> getAvailableDevices() { return m_devList; }
+
+    bool isConnected() { return m_ioDev != 0; }
+
+    bool connectDevice(devListItem device);
     bool disconnectDevice();
+
     void suspendPolling();
     void resumePolling();
 
 protected:
     void unregisterAll(IConnection *connection);
     void registerDevice(IConnection *conn, const QString &devN, const QString &name, const QString &disp);
-    devListItem findDevice(const QString &devName);
 
 signals:
     void deviceConnected(QIODevice *dev);
+    void deviceDisconnected();
     void deviceAboutToDisconnect();
+    void availableDevicesChanged(const QLinkedList<Core::devListItem> devices);
 
 private slots:
     void objectAdded(QObject *obj);
@@ -96,9 +105,9 @@ private slots:
     void onConnectPressed();
     void devChanged(IConnection *connection);
 
-//	void onConnectionClosed(QObject *obj);
-	void onConnectionDestroyed(QObject *obj);
-        void connectionsCallBack(); //used to call devChange after all the plugins are loaded
+    //	void onConnectionClosed(QObject *obj);
+    void onConnectionDestroyed(QObject *obj);
+    void connectionsCallBack(); //used to call devChange after all the plugins are loaded
 protected:
     QComboBox *m_availableDevList;
     QPushButton *m_connectBtn;
@@ -112,9 +121,8 @@ protected:
     QIODevice *m_ioDev;
 
 private:
-	bool connectDevice();
-        Internal::MainWindow *m_mainWindow;
-        QList <IConnection *> connectionBackup;
+    Internal::MainWindow *m_mainWindow;
+    QList <IConnection *> connectionBackup;
 
 };
 

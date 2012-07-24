@@ -60,6 +60,7 @@ UAVTalkRxState UAVTalkProcessInputStream(UAVTalkConnection connection, uint8_t r
 UAVTalkRxState UAVTalkProcessInputStreamQuiet(UAVTalkConnection connection, uint8_t rxbyte);
 void UAVTalkGetStats(UAVTalkConnection connection, UAVTalkStats *stats);
 void UAVTalkResetStats(UAVTalkConnection connection);
+void UAVTalkGetLastTimestamp(UAVTalkConnection connection, uint16_t *timestamp);
 
 #endif // UAVTALK_H
 /**

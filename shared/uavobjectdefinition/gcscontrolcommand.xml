@@ -1,0 +1,14 @@
+<xml>
+<object name="GCSControlCommand" singleinstance="true" settings="false">
+	<description>The output from the @ref GCSControlModule The link has been requantized to 1 byte per channel to reduce latency and allow for higher update rates</description>
+    <field name="Connected" units="" type="enum" elements="1" options="False,True"></field>
+	<field name="Throttle" units="%" type="uint8" elements="1"/>
+	<field name="Roll" units="%" type="uint8" elements="1"/>
+	<field name="Pitch" units="%" type="uint8" elements="1"/>
+	<field name="Yaw" units="%" type="uint8" elements="1"/>
+    <access gcs="readwrite" flight="readwrite"/>
+    <telemetrygcs acked="false" updatemode="manual" period="0"/>
+    <telemetryflight acked="false" updatemode="manual" period="0"/>
+    <logging updatemode="manual" period="0"/>
+</object>
+</xml>

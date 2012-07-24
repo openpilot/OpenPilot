@@ -127,9 +127,11 @@ static void PIOS_OVERO_WriteData(struct pios_overo_dev *overo_dev)
 
 			bytes_added = (overo_dev->tx_out_cb)(overo_dev->tx_out_context, writing_pointer, max_bytes, NULL, &tx_need_yield);
 
+#if OVERO_USES_BLOCKING_WRITE
 			if (tx_need_yield) {
 				vPortYieldFromISR();
 			}
+#endif
 			overo_dev->writing_offset += bytes_added;
 		}
 	}
@@ -324,7 +326,7 @@ static void PIOS_OVERO_TxStart(uint32_t overo_id, uint16_t tx_bytes_avail)
 	// DMA TX enable (enable IRQ) ?
 
 	// Load any pending bytes from TX fifo
-	//PIOS_OVERO_WriteData(overo_dev);
+	PIOS_OVERO_WriteData(overo_dev);
 }
 
 static void PIOS_OVERO_RegisterRxCallback(uint32_t overo_id, pios_com_callback rx_in_cb, uint32_t context)

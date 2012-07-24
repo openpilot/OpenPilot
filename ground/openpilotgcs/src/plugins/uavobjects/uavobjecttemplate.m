@@ -60,6 +60,7 @@ $(ALLOCATIONCODE)
 
 fid = fopen(logfile);
 correctMsgByte=hex2dec('20');
+correctTimestampedByte=hex2dec('A0');
 correctSyncByte=hex2dec('3C');
 unknownObjIDList=zeros(1,2);
 
@@ -83,13 +84,9 @@ while (1)
        		continue
     	end
     
-    	%% Process header if we are aligned
-	timestamp = typecast(uint8(prebuf(1:4)), 'uint32');
-	datasize = typecast(uint8(prebuf(5:12)), 'uint64');
-
 	% get msg type (quint8 1 byte ) should be 0x20, ignore the rest?
 	msgType = fread(fid, 1, 'uint8');
-	if msgType ~= correctMsgByte
+	if msgType ~= correctMsgByte && msgType ~= hex2dec('A0')
 		wrongMessageByte = wrongMessageByte + 1;	
 		continue
 	end
@@ -98,7 +95,15 @@ while (1)
 	msgSize = fread(fid, 1, 'uint16');
 	% get obj id (quint32 4 bytes)
 	objID = fread(fid, 1, 'uint32');
-	
+
+	if msgType == correctMsgByte
+		%% Process header if we are aligned
+		timestamp = typecast(uint8(prebuf(1:4)), 'uint32');
+		datasize = typecast(uint8(prebuf(5:12)), 'uint64');
+	elseif msgType == correctTimestampedByte
+		timestamp = fread(fid,1,'uint16');
+	end
+
 	if (isempty(objID)) 	%End of file
 		break;
 	end
@@ -153,8 +158,9 @@ $(SWITCHCODE)
 		fprintf([str1 str2 str3 str4 str5]);
 	end
 
-
-	prebuf = fread(fid, 12, 'uint8');
+	if msgType ~= correctTimestampedByte
+		prebuf = fread(fid, 12, 'uint8');
+	end
 end
 
 fprintf('%d records in %0.2f seconds.\n', ftell(fid), etime(clock,startTime));

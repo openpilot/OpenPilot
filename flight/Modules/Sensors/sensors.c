@@ -49,6 +49,7 @@
 #include "pios.h"
 #include "attitude.h"
 #include "magnetometer.h"
+#include "magbias.h"
 #include "accels.h"
 #include "gyros.h"
 #include "gyrosbias.h"
@@ -63,7 +64,7 @@
 #include <pios_board_info.h>
 
 // Private constants
-#define STACK_SIZE_BYTES 700
+#define STACK_SIZE_BYTES 1000
 #define TASK_PRIORITY (tskIDLE_PRIORITY+3)
 #define SENSOR_PERIOD 2
 
@@ -80,6 +81,7 @@ static bool baro_updated = false;
 static void SensorsTask(void *parameters);
 static void settingsUpdatedCb(UAVObjEvent * objEv);
 static void sensorsUpdatedCb(UAVObjEvent * objEv);
+static void magOffsetEstimation(MagnetometerData *mag);
 
 // These values are initialized by settings but can be updated by the attitude algorithm
 static bool bias_correct_gyro = true;
@@ -111,6 +113,7 @@ int32_t SensorsInitialize(void)
 	GyrosBiasInitialize();
 	AccelsInitialize();
 	MagnetometerInitialize();
+	MagBiasInitialize();
 	RevoCalibrationInitialize();
 	AttitudeSettingsInitialize();
 
@@ -407,6 +410,9 @@ static void SensorsTask(void *parameters)
 				mag.y = mags[1];
 				mag.z = mags[2];
 			}
+			
+			// Correct for mag bias and update
+			//magOffsetEstimation(&mag);
 			MagnetometerSet(&mag);
 			mag_update_time = PIOS_DELAY_GetRaw();
 		}
@@ -415,6 +421,58 @@ static void SensorsTask(void *parameters)
 		PIOS_WDG_UpdateFlag(PIOS_WDG_SENSORS);
 
 		lastSysTime = xTaskGetTickCount();
+	}
+}
+
+/**
+ * Perform an update of the @ref MagBias based on
+ * Magnetometer Offset Cancellation: Theory and Implementation, 
+ * revisited William Premerlani, October 14, 2011
+ */
+static void magOffsetEstimation(MagnetometerData *mag)
+{
+	// Constants, to possibly go into a UAVO
+	static const int UPDATE_INTERVAL = 10;
+	static const float MIN_NORM_DIFFERENCE = 5;
+	static const float CONVERGENCE_RATE = 1.0f;
+
+	static unsigned int call_count = 0;
+	static float B2[3] = {0, 0, 0};
+
+	call_count++;
+
+	MagBiasData magBias;
+	MagBiasGet(&magBias);
+
+	// Remove the current estimate of the bias
+	mag->x -= magBias.x;
+	mag->y -= magBias.y;
+	mag->z -= magBias.z;
+
+	// First call
+	if (B2[0] == 0 && B2[1] == 0 && B2[2] == 0) {
+		B2[0] = mag->x;
+		B2[1] = mag->y;
+		B2[2] = mag->z;
+		return;
+	}
+	if (call_count % UPDATE_INTERVAL == 0) {
+		float B1[3] = {mag->x, mag->y, mag->z};
+		float norm_diff = sqrtf(powf(B2[0] - B1[0],2) + powf(B2[1] - B1[1],2) + powf(B2[2] - B1[2],2));
+		if (norm_diff > MIN_NORM_DIFFERENCE) {
+			float norm_b1 = sqrtf(B1[0]*B1[0] + B1[1]*B1[1] + B1[2]*B1[2]);
+			float norm_b2 = sqrtf(B2[0]*B2[0] + B2[1]*B2[1] + B2[2]*B2[2]);
+			float scale = CONVERGENCE_RATE * (norm_b2 - norm_b1) / norm_diff;
+			float b_error[3] = {(B2[0] - B1[0]) * scale, (B2[1] - B1[1]) * scale, (B2[2] - B1[2]) * scale};
+
+			magBias.x += b_error[0];
+			magBias.y += b_error[1];
+			magBias.z += b_error[2];
+			MagBiasSet(&magBias);
+		}
+
+		// Store this value to compare against next update
+		B2[0] = B1[0]; B2[1] = B1[1]; B2[2] = B1[2];
 	}
 }
 

@@ -90,8 +90,7 @@ Simulator::~Simulator()
 	// NOTE: Does not currently work, may need to send control+c to through the terminal
 	if (simProcess != NULL)
 	{
-        qDebug() << "PID OF PROCESS: " << simProcess->pid() << endl;
-        connect(simProcess,SIGNAL(finished(int, QProcess::ExitStatus)),this,SLOT(onFinished(int, QProcess::ExitStatus)));
+        //connect(simProcess,SIGNAL(finished(int, QProcess::ExitStatus)),this,SLOT(onFinished(int, QProcess::ExitStatus)));
         simProcess->kill();
 		simProcess->disconnect();
 		if(simProcess->state() == QProcess::Running)

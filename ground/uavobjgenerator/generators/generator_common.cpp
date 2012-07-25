@@ -56,6 +56,8 @@ void replaceCommonTags(QString& out, ObjectInfo* info)
     out.replace(QString("$(NAMELC)"), info->namelc);
     // Replace $(DESCRIPTION) tag
     out.replace(QString("$(DESCRIPTION)"), info->description);
+    // Replace $(CATEGORY) tag
+    out.replace(QString("$(CATEGORY)"), info->category);
     // Replace $(NAMEUC) tag
     out.replace(QString("$(NAMEUC)"), info->name.toUpper());
     // Replace $(OBJID) tag

@@ -70,13 +70,15 @@
 #define PI_MOD(x) (fmodf(x + F_PI, F_PI * 2) - F_PI)
 // Private types
 
-// Private variables
-static xTaskHandle sensorsTaskHandle;
 
 // Private functions
 static void SensorsTask(void *parameters);
 static void settingsUpdatedCb(UAVObjEvent * objEv);
 static void magOffsetEstimation(MagnetometerData *mag);
+
+// Private variables
+static xTaskHandle sensorsTaskHandle;
+RevoCalibrationData cal;
 
 // These values are initialized by settings but can be updated by the attitude algorithm
 static bool bias_correct_gyro = true;
@@ -400,8 +402,10 @@ static void SensorsTask(void *parameters)
 				mag.z = mags[2];
 			}
 			
-			// Correct for mag bias and update
-			magOffsetEstimation(&mag);
+			// Correct for mag bias and update if the rate is non zero
+			if(cal.MagBiasNullingRate > 0)
+				magOffsetEstimation(&mag);
+
 			MagnetometerSet(&mag);
 			mag_update_time = PIOS_DELAY_GetRaw();
 		}
@@ -423,7 +427,6 @@ static void magOffsetEstimation(MagnetometerData *mag)
 	// Constants, to possibly go into a UAVO
 	static const int UPDATE_INTERVAL = 10;
 	static const float MIN_NORM_DIFFERENCE = 5;
-	static const float CONVERGENCE_RATE = 1.0f;
 
 	static unsigned int call_count = 0;
 	static float B2[3] = {0, 0, 0};
@@ -451,7 +454,7 @@ static void magOffsetEstimation(MagnetometerData *mag)
 		if (norm_diff > MIN_NORM_DIFFERENCE) {
 			float norm_b1 = sqrtf(B1[0]*B1[0] + B1[1]*B1[1] + B1[2]*B1[2]);
 			float norm_b2 = sqrtf(B2[0]*B2[0] + B2[1]*B2[1] + B2[2]*B2[2]);
-			float scale = CONVERGENCE_RATE * (norm_b2 - norm_b1) / norm_diff;
+			float scale = cal.MagBiasNullingRate * (norm_b2 - norm_b1) / norm_diff;
 			float b_error[3] = {(B2[0] - B1[0]) * scale, (B2[1] - B1[1]) * scale, (B2[2] - B1[2]) * scale};
 
 			magBias.x += b_error[0];
@@ -470,7 +473,6 @@ static void magOffsetEstimation(MagnetometerData *mag)
  * Locally cache some variables from the AtttitudeSettings object
  */
 static void settingsUpdatedCb(UAVObjEvent * objEv) {
-	RevoCalibrationData cal;
 	RevoCalibrationGet(&cal);
 	
 	mag_bias[0] = cal.mag_bias[REVOCALIBRATION_MAG_BIAS_X];
@@ -487,6 +489,15 @@ static void settingsUpdatedCb(UAVObjEvent * objEv) {
 	accel_scale[2] = cal.accel_scale[REVOCALIBRATION_ACCEL_SCALE_Z];
 	// Do not store gyros_bias here as that comes from the state estimator and should be
 	// used from GyroBias directly
+	
+	// Zero out any adaptive tracking
+	MagBiasData magBias;
+	MagBiasGet(&magBias);
+	magBias.x = 0;
+	magBias.y = 0;
+	magBias.z = 0;
+	MagBiasSet(&magBias);
+	
 
 	AttitudeSettingsData attitudeSettings;
 	AttitudeSettingsGet(&attitudeSettings);

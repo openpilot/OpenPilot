@@ -49,9 +49,9 @@
 #include "examplemodperiodic.h"
 #include "examplemodthread.h"
 
-void ExampleStart(void)
+void GCSControlStart(void)
 {
-	ExampleModPeriodicInitialize();
+	GCSControlCommandInitialize();
 	ExampleModThreadInitialize();
 }
 
@@ -59,4 +59,4 @@ void ExampleInitialize(void)
 {
 	ExampleModEventInitialize();
 }
-MODULE_INITCALL(ExampleInitialize, ExampleStart)
+MODULE_INITCALL(GCSControlInitialize, GCSControlStart)

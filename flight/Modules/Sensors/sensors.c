@@ -57,8 +57,6 @@
 #include "attitudesettings.h"
 #include "revocalibration.h"
 #include "flightstatus.h"
-#include "gpsposition.h"
-#include "baroaltitude.h"
 #include "CoordinateConversions.h"
 
 #include <pios_board_info.h>
@@ -74,13 +72,10 @@
 
 // Private variables
 static xTaskHandle sensorsTaskHandle;
-static bool gps_updated = false;
-static bool baro_updated = false;
 
 // Private functions
 static void SensorsTask(void *parameters);
 static void settingsUpdatedCb(UAVObjEvent * objEv);
-static void sensorsUpdatedCb(UAVObjEvent * objEv);
 static void magOffsetEstimation(MagnetometerData *mag);
 
 // These values are initialized by settings but can be updated by the attitude algorithm
@@ -207,12 +202,6 @@ static void SensorsTask(void *parameters)
 			PIOS_WDG_UpdateFlag(PIOS_WDG_SENSORS);
 			vTaskDelay(10);
 		}
-	}
-	
-	// If debugging connect callback
-	if(pios_com_aux_id != 0) {
-		BaroAltitudeConnectCallback(&sensorsUpdatedCb);
-		GPSPositionConnectCallback(&sensorsUpdatedCb);
 	}
 	
 	// Main task loop
@@ -474,17 +463,6 @@ static void magOffsetEstimation(MagnetometerData *mag)
 		// Store this value to compare against next update
 		B2[0] = B1[0]; B2[1] = B1[1]; B2[2] = B1[2];
 	}
-}
-
-/**
- * Indicate that these sensors have been updated
- */
-static void sensorsUpdatedCb(UAVObjEvent * objEv)
-{
-	if(objEv->obj == GPSPositionHandle())
-		gps_updated = true;
-	if(objEv->obj == BaroAltitudeHandle())
-		baro_updated = true;
 }
 
 /**

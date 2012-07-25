@@ -95,6 +95,7 @@ private:
     UAVObject::Metadata initialGyrosMdata;
     UAVObject::Metadata initialMagMdata;
     UAVObject::Metadata initialBaroMdata;
+    float initialMagCorrectionRate;
 
     int position;
 

@@ -401,7 +401,7 @@ static void SensorsTask(void *parameters)
 			}
 			
 			// Correct for mag bias and update
-			//magOffsetEstimation(&mag);
+			magOffsetEstimation(&mag);
 			MagnetometerSet(&mag);
 			mag_update_time = PIOS_DELAY_GetRaw();
 		}
@@ -457,6 +457,7 @@ static void magOffsetEstimation(MagnetometerData *mag)
 			magBias.x += b_error[0];
 			magBias.y += b_error[1];
 			magBias.z += b_error[2];
+			
 			MagBiasSet(&magBias);
 		}
 

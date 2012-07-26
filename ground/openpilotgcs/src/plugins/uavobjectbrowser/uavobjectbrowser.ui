@@ -17,12 +17,48 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QPushButton" name="requestButton">
+      <widget class="QToolButton" name="requestButton">
        <property name="toolTip">
-        <string>Request update</string>
+        <string>Request</string>
        </property>
        <property name="text">
-        <string>Request</string>
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="uavobjectbrowser.qrc">
+         <normaloff>:/uavobjectbrowser/images/down_alt.png</normaloff>:/uavobjectbrowser/images/down_alt.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="checkable">
+        <bool>false</bool>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="sendButton">
+       <property name="toolTip">
+        <string>Send</string>
+       </property>
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="uavobjectbrowser.qrc">
+         <normaloff>:/uavobjectbrowser/images/up_alt.png</normaloff>:/uavobjectbrowser/images/up_alt.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
        </property>
       </widget>
      </item>
@@ -43,32 +79,6 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="sendButton">
-       <property name="toolTip">
-        <string>Send update</string>
-       </property>
-       <property name="text">
-        <string>Send</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_7">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeType">
-        <enum>QSizePolicy::Preferred</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>5</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
       <widget class="Line" name="line">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
@@ -76,28 +86,62 @@
       </widget>
      </item>
      <item>
-      <spacer name="horizontalSpacer_4">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeType">
-        <enum>QSizePolicy::Preferred</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>5</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="saveSDButton">
+      <widget class="QToolButton" name="saveSDButton">
        <property name="toolTip">
-        <string>Save to SD Card</string>
+        <string>Save</string>
        </property>
        <property name="text">
-        <string>Save</string>
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="uavobjectbrowser.qrc">
+         <normaloff>:/uavobjectbrowser/images/remove.png</normaloff>:/uavobjectbrowser/images/remove.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="readSDButton">
+       <property name="toolTip">
+        <string>Load</string>
+       </property>
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="uavobjectbrowser.qrc">
+         <normaloff>:/uavobjectbrowser/images/install.png</normaloff>:/uavobjectbrowser/images/install.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="eraseSDButton">
+       <property name="toolTip">
+        <string>Erase</string>
+       </property>
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="uavobjectbrowser.qrc">
+         <normaloff>:/uavobjectbrowser/images/trash.png</normaloff>:/uavobjectbrowser/images/trash.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
        </property>
       </widget>
      </item>
@@ -112,58 +156,6 @@
        <property name="sizeHint" stdset="0">
         <size>
          <width>10</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="readSDButton">
-       <property name="toolTip">
-        <string>Load from SD Card</string>
-       </property>
-       <property name="text">
-        <string>Load</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeType">
-        <enum>QSizePolicy::Preferred</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>10</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="eraseSDButton">
-       <property name="toolTip">
-        <string>Erase from SD card</string>
-       </property>
-       <property name="text">
-        <string>Erase</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_6">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeType">
-        <enum>QSizePolicy::Preferred</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>5</width>
          <height>20</height>
         </size>
        </property>
@@ -193,35 +185,19 @@
       </spacer>
      </item>
      <item>
-      <widget class="QCheckBox" name="metaCheckBox">
-       <property name="toolTip">
-        <string>Show Meta Data</string>
-       </property>
+      <widget class="QToolButton" name="tbView">
        <property name="text">
-        <string>Show Meta Data</string>
+        <string>...</string>
        </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="categorizeCheckbox">
-       <property name="toolTip">
-        <string>Select to sort objects in to categories.</string>
+       <property name="icon">
+        <iconset resource="uavobjectbrowser.qrc">
+         <normaloff>:/uavobjectbrowser/images/1343241276_eye.png</normaloff>:/uavobjectbrowser/images/1343241276_eye.png</iconset>
        </property>
-       <property name="text">
-        <string>Categorize Objects</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="scientificNotationCheckbox">
-       <property name="toolTip">
-        <string>Use scientific editors</string>
-       </property>
-       <property name="text">
-        <string>Scientific</string>
+       <property name="iconSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
        </property>
       </widget>
      </item>
@@ -245,6 +221,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="uavobjectbrowser.qrc"/>
+ </resources>
  <connections/>
 </ui>

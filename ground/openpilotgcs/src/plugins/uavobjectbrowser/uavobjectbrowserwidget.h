@@ -36,7 +36,7 @@
 class QPushButton;
 class ObjectTreeItem;
 class Ui_UAVObjectBrowser;
-
+class Ui_viewoptions;
 
 class UAVObjectBrowserWidget : public QWidget
 {
@@ -63,11 +63,13 @@ private slots:
     void loadObject();
     void eraseObject();
     void currentChanged(const QModelIndex &current, const QModelIndex &previous);
-
+    void viewSlot();
 private:
     QPushButton *m_requestUpdate;
     QPushButton *m_sendUpdate;
     Ui_UAVObjectBrowser *m_browser;
+    Ui_viewoptions *m_viewoptions;
+    QDialog *m_viewoptionsDialog;
     UAVObjectTreeModel *m_model;
 
     int m_recentlyUpdatedTimeout;

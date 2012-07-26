@@ -66,12 +66,22 @@ UAVObjectBrowserWidget::UAVObjectBrowserWidget(QWidget *parent) : QWidget(parent
     connect(m_browser->requestButton, SIGNAL(clicked()), this, SLOT(requestUpdate()));
     connect(m_browser->tbView,SIGNAL(clicked()),this,SLOT(viewSlot()));
     connect(m_viewoptions->cbScientific, SIGNAL(toggled(bool)), this, SLOT(useScientificNotation(bool)));
+    connect(m_viewoptions->cbScientific, SIGNAL(toggled(bool)), this, SLOT(viewOptionsChangedSlot()));
+    connect(m_viewoptions->cbMetaData, SIGNAL(toggled(bool)), this, SLOT(viewOptionsChangedSlot()));
+    connect(m_viewoptions->cbCategorized, SIGNAL(toggled(bool)), this, SLOT(viewOptionsChangedSlot()));
     enableSendRequest(false);
 }
 
 UAVObjectBrowserWidget::~UAVObjectBrowserWidget()
 {
-   delete m_browser;
+    delete m_browser;
+}
+
+void UAVObjectBrowserWidget::setViewOptions(bool categorized, bool scientific, bool metadata)
+{
+    m_viewoptions->cbCategorized->setChecked(categorized);
+    m_viewoptions->cbMetaData->setChecked(metadata);
+    m_viewoptions->cbScientific->setChecked(scientific);
 }
 
 void UAVObjectBrowserWidget::showMetaData(bool show)
@@ -229,6 +239,11 @@ void UAVObjectBrowserWidget::viewSlot()
         m_viewoptionsDialog->move(pos);
         m_viewoptionsDialog->show();
     }
+}
+
+void UAVObjectBrowserWidget::viewOptionsChangedSlot()
+{
+    emit viewOptionsChanged(m_viewoptions->cbCategorized->isChecked(),m_viewoptions->cbScientific->isChecked(),m_viewoptions->cbMetaData->isChecked());
 }
 
 void UAVObjectBrowserWidget::enableSendRequest(bool enable)

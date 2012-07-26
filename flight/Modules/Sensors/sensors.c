@@ -425,13 +425,9 @@ static void SensorsTask(void *parameters)
 static void magOffsetEstimation(MagnetometerData *mag)
 {
 	// Constants, to possibly go into a UAVO
-	static const int UPDATE_INTERVAL = 10;
-	static const float MIN_NORM_DIFFERENCE = 5;
+	static const float MIN_NORM_DIFFERENCE = 50;
 
-	static unsigned int call_count = 0;
 	static float B2[3] = {0, 0, 0};
-
-	call_count++;
 
 	MagBiasData magBias;
 	MagBiasGet(&magBias);
@@ -448,21 +444,20 @@ static void magOffsetEstimation(MagnetometerData *mag)
 		B2[2] = mag->z;
 		return;
 	}
-	if (call_count % UPDATE_INTERVAL == 0) {
-		float B1[3] = {mag->x, mag->y, mag->z};
-		float norm_diff = sqrtf(powf(B2[0] - B1[0],2) + powf(B2[1] - B1[1],2) + powf(B2[2] - B1[2],2));
-		if (norm_diff > MIN_NORM_DIFFERENCE) {
-			float norm_b1 = sqrtf(B1[0]*B1[0] + B1[1]*B1[1] + B1[2]*B1[2]);
-			float norm_b2 = sqrtf(B2[0]*B2[0] + B2[1]*B2[1] + B2[2]*B2[2]);
-			float scale = cal.MagBiasNullingRate * (norm_b2 - norm_b1) / norm_diff;
-			float b_error[3] = {(B2[0] - B1[0]) * scale, (B2[1] - B1[1]) * scale, (B2[2] - B1[2]) * scale};
 
-			magBias.x += b_error[0];
-			magBias.y += b_error[1];
-			magBias.z += b_error[2];
-			
-			MagBiasSet(&magBias);
-		}
+	float B1[3] = {mag->x, mag->y, mag->z};
+	float norm_diff = sqrtf(powf(B2[0] - B1[0],2) + powf(B2[1] - B1[1],2) + powf(B2[2] - B1[2],2));
+	if (norm_diff > MIN_NORM_DIFFERENCE) {
+		float norm_b1 = sqrtf(B1[0]*B1[0] + B1[1]*B1[1] + B1[2]*B1[2]);
+		float norm_b2 = sqrtf(B2[0]*B2[0] + B2[1]*B2[1] + B2[2]*B2[2]);
+		float scale = cal.MagBiasNullingRate * (norm_b2 - norm_b1) / norm_diff;
+		float b_error[3] = {(B2[0] - B1[0]) * scale, (B2[1] - B1[1]) * scale, (B2[2] - B1[2]) * scale};
+
+		magBias.x += b_error[0];
+		magBias.y += b_error[1];
+		magBias.z += b_error[2];
+
+		MagBiasSet(&magBias);
 
 		// Store this value to compare against next update
 		B2[0] = B1[0]; B2[1] = B1[1]; B2[2] = B1[2];

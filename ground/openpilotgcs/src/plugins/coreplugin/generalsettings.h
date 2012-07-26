@@ -41,7 +41,7 @@ namespace Ui {
     class GeneralSettings;
 }
 
-class GeneralSettings : public IOptionsPage
+class CORE_EXPORT GeneralSettings : public IOptionsPage
 {
     Q_OBJECT
 

@@ -106,6 +106,7 @@ void HITLOptionsPage::apply()
 	settings.outPort = m_optionsPage->outputPort->text().toInt();
 	settings.longitude = m_optionsPage->longitude->text();
 	settings.latitude = m_optionsPage->latitude->text();
+    settings.additionalFlags = m_optionsPage->additionalFlags->text();
 
 	config->setSimulatorSettings(settings);
 }

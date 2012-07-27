@@ -99,14 +99,15 @@ typedef struct _CONNECTION
 	QString binPath;
 	QString dataPath;
 	QString hostAddress;
-        QString remoteHostAddress;
+	QString remoteHostAddress;
 	int outPort;
 	int inPort;
 	bool manual;
-        bool startSim;
+	bool startSim;
 	QString latitude;
 	QString longitude;
-} SimulatorSettings;
+    QString additionalFlags;
+}SimulatorSettings;
 
 class Simulator : public QObject
 {

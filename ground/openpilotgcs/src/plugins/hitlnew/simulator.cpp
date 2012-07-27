@@ -90,8 +90,8 @@ Simulator::~Simulator()
 	// NOTE: Does not currently work, may need to send control+c to through the terminal
 	if (simProcess != NULL)
 	{
-		//connect(simProcess,SIGNAL(finished(int, QProcess::ExitStatus)),this,SLOT(onFinished(int, QProcess::ExitStatus)));
-
+        //connect(simProcess,SIGNAL(finished(int, QProcess::ExitStatus)),this,SLOT(onFinished(int, QProcess::ExitStatus)));
+        simProcess->kill();
 		simProcess->disconnect();
 		if(simProcess->state() == QProcess::Running)
 			simProcess->kill();
@@ -154,7 +154,8 @@ void Simulator::onStart()
         emit processOutput("\nLocal interface: " + settings.hostAddress + "\n" + \
                            "Remote interface: " + settings.remoteHostAddress + "\n" + \
                            "inputPort: " + QString::number(settings.inPort) + "\n" + \
-                           "outputPort: " + QString::number(settings.outPort) + "\n");
+                           "outputPort: " + QString::number(settings.outPort) + "\n" \
+                           "Additional Flags: " + settings.additionalFlags + "\n");
 
         qxtLog->info("\nLocal interface: " + settings.hostAddress + "\n" + \
                      "Remote interface: " + settings.remoteHostAddress + "\n" + \

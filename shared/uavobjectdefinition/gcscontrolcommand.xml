@@ -1,7 +1,6 @@
 <xml>
     <object name="GCSControlCommand" singleinstance="true" settings="false">
         <description>The output from the @ref ManualControlModule which descodes the receiver inputs.  Overriden by GCS for fly-by-wire control.</description>
-        <field name="Connected" units="" type="enum" elements="1" options="False,True"/>
 	<field name="Throttle" units="Scalar (0 to 255)" type="uint8" elements="1"/>
 	<field name="Roll" units="Scalar (-127 to 127) -128 WILL BE READ AS -127" type="int8" elements="1"/>
         <field name="Pitch" units="Scalar (-127 to 127) -128 WILL BE READ AS -127" type="int8" elements="1"/>

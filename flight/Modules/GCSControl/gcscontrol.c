@@ -46,7 +46,11 @@
 
 #include "openpilot.h"
 #include "gcscontrol.h"
-#include "gcscontrolcommand.h"	// object the module will listen for updates (input)
+#include "gcscontrolcommand.h"
+#include "manualcontrolcommand.h"
+
+
+// object the module will listen for updates (input)
 
 // Private constants
 
@@ -56,6 +60,14 @@
 
 // Private functions
 static void ObjectUpdatedCb(UAVObjEvent * ev);
+
+int32_t GCSControlStart(void)
+{
+	GCSControlInitialize();
+	ManualControlCommandInitialize();
+	return 0;
+}
+
 
 /**
  * Initialise the module, called on startup.
@@ -68,6 +80,7 @@ int32_t GCSControlInitialize()
 
 	return 0;
 }
+MODULE_INITCALL(GCSControlInitialize, GCSControlStart)
 
 /**
  * This function is called each time ExampleObject1 is updated, this could be
@@ -81,42 +94,40 @@ int32_t GCSControlInitialize()
  */
 static void ObjectUpdatedCb(UAVObjEvent * ev)
 {
-	GCSControlCommand data1;
+	GCSControlCommandData control_input;
+	ManualControlCommandData control_output;
+	printf("hello\n");
 
-	int32_t step;
 
 	// Make sure that the object update is for ExampleObject1
 	// This is redundant in this case since this callback will
 	// only be called for a single object, it is however possible
 	// to use the same callback for multiple object updates.
-#if 0
-	if (ev->obj == ExampleObject1Handle()) {
-		// Update settings with latest value
-		ExampleSettingsGet(&settings);
+#if 1
+	if (ev->obj == GCSControlCommandHandle()) {
 
 		// Get the input object
-		ExampleObject1Get(&data1);
 
-		// Determine how to update the output object
-		if (settings.StepDirection == EXAMPLESETTINGS_STEPDIRECTION_UP) {
-			step = settings.StepSize;
-		} else {
-			step = -settings.StepSize;
+		ManualControlCommandGet(&control_output);
+
+		if(control_output.GCSControl)
+		{
+			GCSControlCommandGet(&control_input);
+			control_output.Throttle = (float)control_input.Throttle/255.0;
+			control_output.Yaw = (float)control_input.Yaw/127.0;
+			control_output.Pitch = (float)control_input.Pitch/127.0;
+			control_output.Roll = (float)control_input.Roll/127.0;
+			ManualControlCommandSet(&control_output);
 		}
 
 		// Update data
-		data2.Field1 = data1.Field1 + step;
-		data2.Field2 = data1.Field2 + step;
-		data2.Field3 = data1.Field3 + step;
-		data2.Field4[0] = data1.Field4[0] + step;
-		data2.Field4[1] = data1.Field4[1] + step;
 
 		// Update the ExampleObject2, after this function is called
 		// notifications to any other modules listening to that object
 		// will be sent and the GCS object will be updated through the
 		// telemetry link. All operations will take place asynchronously
 		// and the following call will return immediately.
-		ExampleObject2Set(&data2);
 	}
 #endif
 }
+

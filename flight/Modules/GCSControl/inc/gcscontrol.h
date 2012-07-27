@@ -26,6 +26,6 @@
 #ifndef EXAMPLEMODEVENT_H
 #define EXAMPLEMODEVENT_H
 
-int32_t ExampleModEventInitialize();
+int32_t GCSControlInitialize();
 
 #endif // EXAMPLEMODEVENT_H

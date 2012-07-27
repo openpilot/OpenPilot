@@ -62,16 +62,19 @@ endif
 FLASH_TOOL = OPENOCD
 
 # Optional module and driver defaults
-USE_CAMERASTAB ?= YES
+USE_CAMERASTAB ?= NO
 USE_COMUSBBRIDGE ?= YES
-USE_GPS ?= YES
-USE_TXPID ?= YES
-USE_I2C ?= NO
+USE_GPS ?= NO
+USE_TXPID ?= NO
+USE_I2C ?= YES
 USE_ALTITUDE ?= NO
 TEST_FAULTS ?= NO
+GCS_CONTROL ?= NO
 
 # List of optional modules to include
-OPTMODULES =
+ifeq ($(GCS_CONTROL), YES)
+OPTMODULES += GCSControl
+endif
 ifeq ($(USE_CAMERASTAB), YES)
 OPTMODULES += CameraStab
 endif
@@ -96,7 +99,9 @@ OPTMODULES += Fault
 endif
 
 # List of mandatory modules to include
-MODULES = Attitude Stabilization Actuator ManualControl FirmwareIAP
+MODULES = Attitude Stabilization Actuator FirmwareIAP
+MODULES += ManualControl
+
 # Telemetry must be last to grab the optional modules (why?)
 MODULES += Telemetry
 
@@ -209,6 +214,7 @@ SRC += $(OPUAVSYNTHDIR)/mixerstatus.c
 SRC += $(OPUAVSYNTHDIR)/ratedesired.c
 SRC += $(OPUAVSYNTHDIR)/baroaltitude.c
 SRC += $(OPUAVSYNTHDIR)/txpidsettings.c
+SRC += $(OPUAVSYNTHDIR)/gcscontrolcommand.c
 
 endif
 

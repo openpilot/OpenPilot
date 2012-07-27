@@ -178,8 +178,10 @@ static void manualControlTask(void *parameters)
 		vTaskDelayUntil(&lastSysTime, UPDATE_PERIOD_MS / portTICK_RATE_MS);
 		PIOS_WDG_UpdateFlag(PIOS_WDG_MANUAL);
 
-		// Read settings
+		// Read settings	FlightStatusInitialize();
+		StabilizationDesiredInitialize();
 		ManualControlSettingsGet(&settings);
+		ManualControlCommandGet(&cmd);
 
 		/* Update channel activity monitor */
 		if (flightStatus.Armed == ARM_STATE_DISARMED) {
@@ -193,19 +195,18 @@ static void manualControlTask(void *parameters)
 			lastActivityTime = lastSysTime;
 		}
 
-		if (ManualControlCommandReadOnly()) {
+		if (cmd.GCSControl) {
 			FlightTelemetryStatsData flightTelemStats;
 			FlightTelemetryStatsGet(&flightTelemStats);
 			if(flightTelemStats.Status != FLIGHTTELEMETRYSTATS_STATUS_CONNECTED) {
 				/* trying to fly via GCS and lost connection.  fall back to transmitter */
-				UAVObjMetadata metadata;
-				ManualControlCommandGetMetadata(&metadata);
-				UAVObjSetAccess(&metadata, ACCESS_READWRITE);
-				ManualControlCommandSetMetadata(&metadata);
+				cmd.GCSControl = FALSE;
 			}
 		}
 
-		if (!ManualControlCommandReadOnly()) {
+		//If we are not controlled by the GCS then read the inputs from the rc remote
+
+		if (!cmd.GCSControl) {
 
 			bool valid_input_detected = true;
 			
@@ -370,8 +371,6 @@ static void manualControlTask(void *parameters)
 			// Update cmd object
 			ManualControlCommandSet(&cmd);
 
-		} else {
-			ManualControlCommandGet(&cmd);	/* Under GCS control */
 		}
 
 		FlightStatusGet(&flightStatus);

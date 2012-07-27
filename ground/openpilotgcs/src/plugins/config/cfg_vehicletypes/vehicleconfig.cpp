@@ -105,7 +105,7 @@ void VehicleConfig::SetConfigData(GUIConfigDataUnion configData) {
         systemSettingsData.GUIConfigData[i] = configData.UAVObject[i];
 
     systemSettings->setData(systemSettingsData);
-    systemSettings->updated();
+    //systemSettings->updated();
 
     //emit ConfigurationChanged();
 }
@@ -180,7 +180,8 @@ void VehicleConfig::setMixerType(UAVDataObject* mixer, int channel, MixerTypeEle
             if (mixerType >= 0 && mixerType < mixerTypeDescriptions.count())
             {
                 field->setValue(mixerTypeDescriptions[mixerType]);
-                mixer->updated();
+               // mixer->updated();
+                qDebug()<<"updateMixer";
             }
         }
     }
@@ -228,7 +229,7 @@ void VehicleConfig::setMixerVectorValue(UAVDataObject* mixer, int channel, Mixer
 
         if (field) {
             field->setDouble(value, elementName);
-            mixer->updated();
+            //mixer->updated();
         }
     }
 }

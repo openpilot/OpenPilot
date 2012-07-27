@@ -186,6 +186,9 @@
      </item>
      <item>
       <widget class="QToolButton" name="tbView">
+       <property name="toolTip">
+        <string>View Options</string>
+       </property>
        <property name="text">
         <string>...</string>
        </property>

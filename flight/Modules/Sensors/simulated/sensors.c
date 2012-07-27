@@ -63,6 +63,7 @@
 #include "gpsvelocity.h"
 #include "homelocation.h"
 #include "magnetometer.h"
+#include "magbias.h"
 #include "ratedesired.h"
 #include "revocalibration.h"
 
@@ -86,6 +87,8 @@ static void simulateConstant();
 static void simulateModelAgnostic();
 static void simulateModelQuadcopter();
 static void simulateModelAirplane();
+
+static void magOffsetEstimation(MagnetometerData *mag);
 
 static float accel_bias[3];
 
@@ -114,6 +117,7 @@ int32_t SensorsInitialize(void)
 	GPSPositionInitialize();
 	GPSVelocityInitialize();
 	MagnetometerInitialize();
+	MagBiasInitialize();
 	RevoCalibrationInitialize();
 
 	return 0;
@@ -503,6 +507,10 @@ static void simulateModelQuadcopter()
 		mag.x = homeLocation.Be[0] * Rbe[0][0] + homeLocation.Be[1] * Rbe[0][1] + homeLocation.Be[2] * Rbe[0][2];
 		mag.y = homeLocation.Be[0] * Rbe[1][0] + homeLocation.Be[1] * Rbe[1][1] + homeLocation.Be[2] * Rbe[1][2];
 		mag.z = homeLocation.Be[0] * Rbe[2][0] + homeLocation.Be[1] * Rbe[2][1] + homeLocation.Be[2] * Rbe[2][2];
+
+		// Run the offset compensation algorithm from the firmware
+		magOffsetEstimation(&mag);
+
 		MagnetometerSet(&mag);
 		last_mag_time = PIOS_DELAY_GetRaw();
 	}
@@ -779,9 +787,10 @@ static void simulateModelAirplane()
 	static uint32_t last_mag_time = 0;
 	if(PIOS_DELAY_DiffuS(last_mag_time) / 1.0e6 > MAG_PERIOD) {
 		MagnetometerData mag;
-		mag.x = homeLocation.Be[0] * Rbe[0][0] + homeLocation.Be[1] * Rbe[0][1] + homeLocation.Be[2] * Rbe[0][2];
-		mag.y = homeLocation.Be[0] * Rbe[1][0] + homeLocation.Be[1] * Rbe[1][1] + homeLocation.Be[2] * Rbe[1][2];
-		mag.z = homeLocation.Be[0] * Rbe[2][0] + homeLocation.Be[1] * Rbe[2][1] + homeLocation.Be[2] * Rbe[2][2];
+		mag.x = 100+homeLocation.Be[0] * Rbe[0][0] + homeLocation.Be[1] * Rbe[0][1] + homeLocation.Be[2] * Rbe[0][2];
+		mag.y = 100+homeLocation.Be[0] * Rbe[1][0] + homeLocation.Be[1] * Rbe[1][1] + homeLocation.Be[2] * Rbe[1][2];
+		mag.z = 100+homeLocation.Be[0] * Rbe[2][0] + homeLocation.Be[1] * Rbe[2][1] + homeLocation.Be[2] * Rbe[2][2];
+		magOffsetEstimation(&mag);
 		MagnetometerSet(&mag);
 		last_mag_time = PIOS_DELAY_GetRaw();
 	}
@@ -816,6 +825,56 @@ static float rand_gauss (void) {
 		return 0.0;
 	else
 		return (v1*sqrt(-2.0 * log(s) / s));
+}
+
+/**
+ * Perform an update of the @ref MagBias based on
+ * Magnetometer Offset Cancellation: Theory and Implementation, 
+ * revisited William Premerlani, October 14, 2011
+ */
+static void magOffsetEstimation(MagnetometerData *mag)
+{
+	RevoCalibrationData cal;
+	RevoCalibrationGet(&cal);
+
+	// Constants, to possibly go into a UAVO
+	static const float MIN_NORM_DIFFERENCE = 50;
+
+	static float B2[3] = {0, 0, 0};
+
+	MagBiasData magBias;
+	MagBiasGet(&magBias);
+
+	// Remove the current estimate of the bias
+	mag->x -= magBias.x;
+	mag->y -= magBias.y;
+	mag->z -= magBias.z;
+
+	// First call
+	if (B2[0] == 0 && B2[1] == 0 && B2[2] == 0) {
+		B2[0] = mag->x;
+		B2[1] = mag->y;
+		B2[2] = mag->z;
+		return;
+	}
+
+	float B1[3] = {mag->x, mag->y, mag->z};
+	float norm_diff = sqrtf(powf(B2[0] - B1[0],2) + powf(B2[1] - B1[1],2) + powf(B2[2] - B1[2],2));
+	if (norm_diff > MIN_NORM_DIFFERENCE) {
+		float norm_b1 = sqrtf(B1[0]*B1[0] + B1[1]*B1[1] + B1[2]*B1[2]);
+		float norm_b2 = sqrtf(B2[0]*B2[0] + B2[1]*B2[1] + B2[2]*B2[2]);
+		float scale = cal.MagBiasNullingRate * (norm_b2 - norm_b1) / norm_diff;
+		float b_error[3] = {(B2[0] - B1[0]) * scale, (B2[1] - B1[1]) * scale, (B2[2] - B1[2]) * scale};
+
+		magBias.x += b_error[0];
+		magBias.y += b_error[1];
+		magBias.z += b_error[2];
+
+		MagBiasSet(&magBias);
+
+		// Store this value to compare against next update
+		B2[0] = B1[0]; B2[1] = B1[1]; B2[2] = B1[2];
+	}
 }
 
 /**

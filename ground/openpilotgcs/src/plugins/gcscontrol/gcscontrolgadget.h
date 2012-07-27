@@ -30,6 +30,7 @@
 
 #include <coreplugin/iuavgadget.h>
 #include "manualcontrolcommand.h"
+#include "gcscontrolcommand.h"
 #include "gcscontrolgadgetconfiguration.h"
 #include "sdlgamepad/sdlgamepad.h"
 #include <QTime>
@@ -62,6 +63,7 @@ public:
 
 private:
     ManualControlCommand* getManualControlCommand();
+    GCSControlCommand* getGCSControlCommand();
     double constrain(double value);
     QTime joystickTime;
     QWidget *m_widget;
@@ -75,6 +77,10 @@ private:
     buttonSettingsStruct buttonSettings[8];
     double bound(double input);
     double wrap(double input);
+    qint8 convertToSByte(double input);
+    quint8 convertToUByte(double input);
+    double convertUBToDouble(quint8 input);
+    double convertSBToDouble(qint8 input);
     bool channelReverse[8];
     QUdpSocket *control_sock;
 

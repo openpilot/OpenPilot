@@ -97,6 +97,12 @@ ManualControlCommand* GCSControlGadget::getManualControlCommand() {
     return dynamic_cast<ManualControlCommand*>( objManager->getObject(QString("ManualControlCommand")) );
 }
 
+GCSControlCommand* GCSControlGadget::getGCSControlCommand() {
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    return dynamic_cast<GCSControlCommand*>( objManager->getObject(QString("GCSControlCommand")) );
+}
+
 void GCSControlGadget::manualControlCommandUpdated(UAVObject * obj) {
     double roll = obj->getField("Roll")->getDouble();
     double pitch = obj->getField("Pitch")->getDouble();
@@ -127,11 +133,11 @@ void GCSControlGadget::manualControlCommandUpdated(UAVObject * obj) {
   Update the manual commands - maps depending on mode
   */
 void GCSControlGadget::sticksChangedLocally(double leftX, double leftY, double rightX, double rightY) {
-    ManualControlCommand * obj = getManualControlCommand();
-    double oldRoll = obj->getField("Roll")->getDouble();
-    double oldPitch = obj->getField("Pitch")->getDouble();
-    double oldYaw = obj->getField("Yaw")->getDouble();
-    double oldThrottle = obj->getField("Throttle")->getDouble();
+    GCSControlCommand * obj = getGCSControlCommand();
+    double oldRoll = convertSBToDouble(obj->getField("Roll")->getDouble());
+    double oldPitch = convertSBToDouble(obj->getField("Pitch")->getDouble());
+    double oldYaw = convertSBToDouble(obj->getField("Yaw")->getDouble());
+    double oldThrottle = convertUBToDouble(obj->getField("Throttle")->getDouble());
 
     double newRoll;
     double newPitch;
@@ -188,10 +194,10 @@ void GCSControlGadget::sticksChangedLocally(double leftX, double leftY, double r
         return;
 
     if((newThrottle != oldThrottle) || (newPitch != oldPitch) || (newYaw != oldYaw) || (newRoll != oldRoll)) {
-        if (buttonRollControl==0)obj->getField("Roll")->setDouble(newRoll);
-        if (buttonPitchControl==0)obj->getField("Pitch")->setDouble(newPitch);
-        if (buttonYawControl==0)obj->getField("Yaw")->setDouble(newYaw);
-        if (buttonThrottleControl==0)obj->getField("Throttle")->setDouble(newThrottle);
+        if (buttonRollControl==0)obj->getField("Roll")->setValue(convertToSByte(newRoll));
+        if (buttonPitchControl==0)obj->getField("Pitch")->setValue(convertToSByte(newPitch));
+        if (buttonYawControl==0)obj->getField("Yaw")->setValue(convertToSByte(newYaw));
+        if (buttonThrottleControl==0)obj->getField("Throttle")->setValue(convertToUByte(newThrottle));
         obj->updated();
     }
 }
@@ -251,23 +257,24 @@ void GCSControlGadget::readUDPCommand()
         }
         if(!badPack && ((GCSControlGadgetWidget *)m_widget)->getUDPControl())
         {
-             ManualControlCommand * obj = getManualControlCommand();
+             GCSControlCommand *obj = getGCSControlCommand();
+
              bool update = false;
 
              if(pitch != obj->getField("Pitch")->getDouble()){
-                 obj->getField("Pitch")->setDouble(constrain(pitch));
+                 obj->getField("Pitch")->setValue(convertToSByte(pitch));
                  update = true;
              }
              if(yaw != obj->getField("Yaw")->getDouble()){
-                 obj->getField("Yaw")->setDouble(constrain(yaw));
+                 obj->getField("Yaw")->setValue(convertToSByte(yaw));
                  update = true;
              }
              if(roll != obj->getField("Roll")->getDouble()){
-                 obj->getField("Roll")->setDouble(constrain(roll));
+                 obj->getField("Roll")->setValue(convertToSByte(roll));
                  update = true;
              }
              if(throttle != obj->getField("Throttle")->getDouble()){
-                obj->getField("Throttle")->setDouble(constrain(throttle));
+                obj->getField("Throttle")->setValue(convertToUByte(throttle));
                 update = true;
              }
              if(update)
@@ -296,7 +303,7 @@ void GCSControlGadget::buttonState(ButtonNumber number, bool pressed)
     {//this button is configured
         ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
         UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-        UAVDataObject* obj = dynamic_cast<UAVDataObject*>( objManager->getObject(QString("ManualControlCommand")) );
+        UAVDataObject* obj = dynamic_cast<UAVDataObject*>( objManager->getObject(QString("GCSControlCommand")) );
         bool currentCGSControl = ((GCSControlGadgetWidget *)m_widget)->getGCSControl();
         bool currentUDPControl = ((GCSControlGadgetWidget *)m_widget)->getUDPControl();
 
@@ -308,16 +315,16 @@ void GCSControlGadget::buttonState(ButtonNumber number, bool pressed)
                 switch (buttonSettings[number].FunctionID)
                 {
                 case 1://Roll
-                        obj->getField("Roll")->setValue(bound(obj->getField("Roll")->getValue().toDouble()+buttonSettings[number].Amount));
+                        obj->getField("Roll")->setValue(convertToSByte(obj->getField("Roll")->getValue().toDouble()+buttonSettings[number].Amount));
                     break;
                 case 2://Pitch
-                        obj->getField("Pitch")->setValue(bound(obj->getField("Pitch")->getValue().toDouble()+buttonSettings[number].Amount));
+                        obj->getField("Pitch")->setValue(convertToSByte(obj->getField("Pitch")->getValue().toDouble()+buttonSettings[number].Amount));
                      break;
                 case 3://Yaw
-                        obj->getField("Yaw")->setValue(wrap(obj->getField("Yaw")->getValue().toDouble()+buttonSettings[number].Amount));
+                        obj->getField("Yaw")->setValue(convertToSByte(obj->getField("Yaw")->getValue().toDouble()+buttonSettings[number].Amount));
                     break;
                 case 4://Throttle
-                        obj->getField("Throttle")->setValue(bound(obj->getField("Throttle")->getValue().toDouble()+buttonSettings[number].Amount));
+                        obj->getField("Throttle")->setValue(convertToUByte(obj->getField("Throttle")->getValue().toDouble()+buttonSettings[number].Amount));
                     break;
                 }
             }
@@ -328,16 +335,16 @@ void GCSControlGadget::buttonState(ButtonNumber number, bool pressed)
                 switch (buttonSettings[number].FunctionID)
                 {
                 case 1://Roll
-                        obj->getField("Roll")->setValue(bound(obj->getField("Roll")->getValue().toDouble()-buttonSettings[number].Amount));
+                        obj->getField("Roll")->setValue(convertToSByte(obj->getField("Roll")->getValue().toDouble()-buttonSettings[number].Amount));
                     break;
                 case 2://Pitch
-                        obj->getField("Pitch")->setValue(bound(obj->getField("Pitch")->getValue().toDouble()-buttonSettings[number].Amount));
+                        obj->getField("Pitch")->setValue(convertToSByte(obj->getField("Pitch")->getValue().toDouble()-buttonSettings[number].Amount));
                      break;
                 case 3://Yaw
-                        obj->getField("Yaw")->setValue(wrap(obj->getField("Yaw")->getValue().toDouble()-buttonSettings[number].Amount));
+                        obj->getField("Yaw")->setValue(convertToSByte(obj->getField("Yaw")->getValue().toDouble()-buttonSettings[number].Amount));
                     break;
                 case 4://Throttle
-                        obj->getField("Throttle")->setValue(bound(obj->getField("Throttle")->getValue().toDouble()-buttonSettings[number].Amount));
+                        obj->getField("Throttle")->setValue(convertToUByte(obj->getField("Throttle")->getValue().toDouble()-buttonSettings[number].Amount));
                     break;
                 }
             }
@@ -360,6 +367,7 @@ void GCSControlGadget::buttonState(ButtonNumber number, bool pressed)
                         {
                             obj->getField("Armed")->setValue("Armed");
                         }
+                        obj->updated();
                     }
                 break;
             case 2://GCS Control
@@ -432,9 +440,33 @@ void GCSControlGadget::axesValues(QListInt16 values)
 
 double GCSControlGadget::bound(double input)
 {
-    if (input > 1.0)return 1.0;
-    if (input <-1.0)return -1.0;
-    return input;
+   if (input > 1.0)return 1.0;
+   if (input <-1.0)return -1.0;
+   return input;
+}
+qint8 GCSControlGadget::convertToSByte(double input)
+{
+    qint8 output = (qint8)(input * 127);
+    if(output < -127)
+        output = -127;
+    if(output > 127)
+        output = 127;
+    return output;
+
+}
+
+quint8 GCSControlGadget::convertToUByte(double input)
+{
+    return (quint8)((input +1) * 127);
+}
+double GCSControlGadget::convertUBToDouble(quint8 input)
+{
+    return (double)((qint8)input - 127)/127.0;
+}
+
+double GCSControlGadget::convertSBToDouble(qint8 input)
+{
+    return ((double)input / 127);
 }
 
 double GCSControlGadget::wrap(double input)

@@ -123,12 +123,13 @@ void GCSControlGadgetWidget::toggleControl(int state)
     if (state)
     {
         mccInitialData = mdata;
-        UAVObject::SetFlightAccess(mdata, UAVObject::ACCESS_READONLY);
-        UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_ONCHANGE);
+     //   UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_ONCHANGE);
         UAVObject::SetGcsTelemetryAcked(mdata, false);
-        UAVObject::SetGcsTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_ONCHANGE);
+    //    UAVObject::SetGcsTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_ONCHANGE);
         mdata.gcsTelemetryUpdatePeriod = 100;
         m_gcscontrol->checkBoxUDPControl->setEnabled(true);
+        obj->getField("GCSControl")->setValue("True");
+
 
     }
     else
@@ -136,8 +137,10 @@ void GCSControlGadgetWidget::toggleControl(int state)
         mdata = mccInitialData;
         toggleUDPControl(false);
         m_gcscontrol->checkBoxUDPControl->setEnabled(false);
+        obj->getField("GCSControl")->setValue("False");
     }
     obj->setMetadata(mdata);
+    obj->updated();
 }
 
 void GCSControlGadgetWidget::toggleArmed(int state)

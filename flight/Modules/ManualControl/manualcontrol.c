@@ -47,6 +47,7 @@
 #include "altitudeholddesired.h"
 #include "positionactual.h"
 #include "baroaltitude.h"
+#include "gcscontrolcommand.h"
 
 // Private constants
 #if defined(PIOS_MANUAL_STACK_SIZE)
@@ -56,7 +57,7 @@
 #endif
 
 #define TASK_PRIORITY (tskIDLE_PRIORITY+4)
-#define UPDATE_PERIOD_MS 20
+#define UPDATE_PERIOD_MS 5
 #define THROTTLE_FAILSAFE -0.1f
 #define ARMED_TIME_MS      1000
 #define ARMED_THRESHOLD    0.50f
@@ -136,6 +137,7 @@ int32_t ManualControlInitialize()
 	StabilizationDesiredInitialize();
 	ReceiverActivityInitialize();
 	ManualControlSettingsInitialize();
+	GCSControlCommandInitialize();
 
 	return 0;
 }
@@ -372,7 +374,15 @@ static void manualControlTask(void *parameters)
 			ManualControlCommandSet(&cmd);
 
 		}
-
+		else{
+			GCSControlCommandData control_input;
+			GCSControlCommandGet(&control_input);
+			cmd.Throttle = (float)control_input.Throttle/255.0;
+			cmd.Yaw = (float)control_input.Yaw/127.0;
+			cmd.Pitch = (float)control_input.Pitch/127.0;
+			cmd.Roll = (float)control_input.Roll/127.0;
+			ManualControlCommandSet(&cmd);
+		}
 		FlightStatusGet(&flightStatus);
 
 		// Depending on the mode update the Stabilization or Actuator objects

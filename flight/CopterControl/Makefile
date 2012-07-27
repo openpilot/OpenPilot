@@ -69,12 +69,8 @@ USE_TXPID ?= NO
 USE_I2C ?= YES
 USE_ALTITUDE ?= NO
 TEST_FAULTS ?= NO
-GCS_CONTROL ?= NO
 
 # List of optional modules to include
-ifeq ($(GCS_CONTROL), YES)
-OPTMODULES += GCSControl
-endif
 ifeq ($(USE_CAMERASTAB), YES)
 OPTMODULES += CameraStab
 endif

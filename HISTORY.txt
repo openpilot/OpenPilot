@@ -1,5 +1,21 @@
-Short summary of changes.  For a complete list see the git log.
-
+﻿Short summary of changes.  For a complete list see the git log.
+2012-07-27
+Added the ability to load stylesheets from external file according to operating system:
+macos.qss, linux.qss, windows.qss
+Files should be placed inside the app folder.
+2012-07-27
+Several UI changes. 
+MixerCurveWidget refactoring, now as a simple and advanced view.
+2012-07-27
+Added “advanced mode” option to general settings. Right now it only shows the hidden apply buttons.
+To enable go to tools->options->General and click one of the checkboxes to give focus to the form,
+then press F7
+2012-07-27
+Made the flight mode switch and accessory pots move according to user input on the input wizard.
+2012-07-27
+Changed the board pictures on the uploader widget
+2012-07-27
+Add more verbose debug output on the UAVOBJECTS saving code.
 2012-07-10
 On Windows the installation mode was changed from per-user to per-machine
 (for all users) installation.  It is recommended to completely uninstall

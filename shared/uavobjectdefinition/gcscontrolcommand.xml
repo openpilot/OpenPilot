@@ -1,14 +1,14 @@
 <xml>
-<object name="GCSControlCommand" singleinstance="true" settings="false">
-	<description>The output from the @ref GCSControlModule The link has been requantized to 1 byte per channel to reduce latency and allow for higher update rates</description>
-    <field name="Connected" units="" type="enum" elements="1" options="False,True"></field>
-	<field name="Throttle" units="%" type="uint8" elements="1"/>
-	<field name="Roll" units="%" type="uint8" elements="1"/>
-	<field name="Pitch" units="%" type="uint8" elements="1"/>
-	<field name="Yaw" units="%" type="uint8" elements="1"/>
-    <access gcs="readwrite" flight="readwrite"/>
-    <telemetrygcs acked="false" updatemode="manual" period="0"/>
-    <telemetryflight acked="false" updatemode="manual" period="0"/>
-    <logging updatemode="manual" period="0"/>
-</object>
+    <object name="GCSControlCommand" singleinstance="true" settings="false">
+        <description>The output from the @ref ManualControlModule which descodes the receiver inputs.  Overriden by GCS for fly-by-wire control.</description>
+        <field name="Connected" units="" type="enum" elements="1" options="False,True"/>
+	<field name="Throttle" units="Scalar (0 to 255)" type="uint8" elements="1"/>
+	<field name="Roll" units="Scalar (-127 to 127) 128 WILL BE READ AS 127" type="int8" elements="1"/>
+        <field name="Pitch" units="Scalar (-127 to 127) 128 WILL BE READ AS 127" type="int8" elements="1"/>
+        <field name="Yaw" units="Scalar (-127 to 127) 128 WILL BE READ AS 127" type="int8" elements="1"/>
+        <access gcs="readwrite" flight="readonly"/>
+        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetryflight acked="false" updatemode="manual" period="0"/>
+        <logging updatemode="manual" period="0"/>
+    </object>
 </xml>

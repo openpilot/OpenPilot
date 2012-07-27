@@ -45,10 +45,8 @@
  */
 
 #include "openpilot.h"
-#include "examplemodevent.h"
-#include "exampleobject1.h"	// object the module will listen for updates (input)
-#include "exampleobject2.h"	// object the module will update (output)
-#include "examplesettings.h"	// object holding module settings (input)
+#include "gcscontrol.h"
+#include "gcscontrolcommand.h"	// object the module will listen for updates (input)
 
 // Private constants
 
@@ -63,10 +61,10 @@ static void ObjectUpdatedCb(UAVObjEvent * ev);
  * Initialise the module, called on startup.
  * \returns 0 on success or -1 if initialisation failed
  */
-int32_t ExampleModEventInitialize()
+int32_t GCSControlInitialize()
 {
 	// Listen for ExampleObject1 updates, connect a callback function
-	ExampleObject1ConnectCallback(&ObjectUpdatedCb);
+	GCSControlCommandConnectCallback(&ObjectUpdatedCb);
 
 	return 0;
 }
@@ -83,15 +81,15 @@ int32_t ExampleModEventInitialize()
  */
 static void ObjectUpdatedCb(UAVObjEvent * ev)
 {
-	ExampleSettingsData settings;
-	ExampleObject1Data data1;
-	ExampleObject2Data data2;
+	GCSControlCommand data1;
+
 	int32_t step;
 
 	// Make sure that the object update is for ExampleObject1
 	// This is redundant in this case since this callback will
 	// only be called for a single object, it is however possible
 	// to use the same callback for multiple object updates.
+#if 0
 	if (ev->obj == ExampleObject1Handle()) {
 		// Update settings with latest value
 		ExampleSettingsGet(&settings);
@@ -120,4 +118,5 @@ static void ObjectUpdatedCb(UAVObjEvent * ev)
 		// and the following call will return immediately.
 		ExampleObject2Set(&data2);
 	}
+#endif
 }

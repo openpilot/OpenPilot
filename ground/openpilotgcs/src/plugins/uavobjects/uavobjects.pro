@@ -83,7 +83,9 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/cameradesired.h \
     $$UAVOBJECT_SYNTHETICS/faultsettings.h \
     $$UAVOBJECT_SYNTHETICS/pipxsettings.h \
-    $$UAVOBJECT_SYNTHETICS/pipxstatus.h
+    $$UAVOBJECT_SYNTHETICS/pipxstatus.h \
+    $$UAVOBJECT_SYNTHETICS/gcscontrolcommand.h 
+    
 
 SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/baroaltitude.cpp \
@@ -146,4 +148,5 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/cameradesired.cpp \
     $$UAVOBJECT_SYNTHETICS/faultsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/pipxsettings.cpp \
-    $$UAVOBJECT_SYNTHETICS/pipxstatus.cpp
+    $$UAVOBJECT_SYNTHETICS/pipxstatus.cpp \
+    $$UAVOBJECT_SYNTHETICS/gcscontrolcommand.cpp

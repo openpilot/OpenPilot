@@ -95,13 +95,14 @@ void VehicleConfig::SetConfigData(GUIConfigDataUnion configData) {
     Q_ASSERT(systemSettings);
     SystemSettings::DataFields systemSettingsData = systemSettings->getData();
 
+    UAVObjectField* guiConfig = systemSettings->getField("GUIConfigData");
+    Q_ASSERT(guiConfig);
+    if(!guiConfig)
+        return;
+
     // copy parameter configData -> systemsettings
     for (i = 0; i < (int)(SystemSettings::GUICONFIGDATA_NUMELEM); i++)
-        systemSettingsData.GUIConfigData[i] = configData.UAVObject[i];
-
-    systemSettings->setData(systemSettingsData);
-
-    //emit ConfigurationChanged();
+        guiConfig->setValue(configData.UAVObject[i], i);
 }
 
 void VehicleConfig::ResetActuators(GUIConfigDataUnion* configData)

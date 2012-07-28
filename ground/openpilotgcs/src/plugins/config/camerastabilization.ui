@@ -131,8 +131,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>790</width>
-            <height>648</height>
+            <width>792</width>
+            <height>630</height>
            </rect>
           </property>
           <property name="autoFillBackground">
@@ -176,7 +176,7 @@
               <item>
                <widget class="QLabel" name="label_7">
                 <property name="text">
-                 <string>After enabling the module, you must power cycle before using and configuring.</string>
+                 <string>After configuring you must power cycle your board before using and configuring</string>
                 </property>
                </widget>
               </item>

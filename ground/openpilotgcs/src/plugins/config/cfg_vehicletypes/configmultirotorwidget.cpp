@@ -42,9 +42,6 @@
 #include "actuatorsettings.h"
 #include "actuatorcommand.h"
 
-//#define  Pi 3.14159265358979323846
-
-
 /**
  Constructor
  */
@@ -776,8 +773,6 @@ void ConfigMultiRotorWidget::setupMotors(QList<QString> motorList)
 
         index = mmList.takeFirst()->currentIndex();
 
-        //qDebug()<<QString("Setup motor: %0 = %1").arg(motor).arg(index);
-
         if (motor == QString("VTOLMotorN"))
             configData.multi.VTOLMotorN = index;
         else if (motor == QString("VTOLMotorNE"))
@@ -948,16 +943,6 @@ bool ConfigMultiRotorWidget::setupHexa(bool pLayout)
  */
 bool ConfigMultiRotorWidget::setupMultiRotorMixer(double mixerFactors[8][3])
 {
-    qDebug()<<"Mixer factors";
-    qDebug()<<mixerFactors[0][0]<<" "<<mixerFactors[0][1]<<" "<<mixerFactors[0][2];
-    qDebug()<<mixerFactors[1][0]<<" "<<mixerFactors[1][1]<<" "<<mixerFactors[1][2];
-    qDebug()<<mixerFactors[2][0]<<" "<<mixerFactors[2][1]<<" "<<mixerFactors[2][2];
-    qDebug()<<mixerFactors[3][0]<<" "<<mixerFactors[3][1]<<" "<<mixerFactors[3][2];
-    qDebug()<<mixerFactors[4][0]<<" "<<mixerFactors[4][1]<<" "<<mixerFactors[4][2];
-    qDebug()<<mixerFactors[5][0]<<" "<<mixerFactors[5][1]<<" "<<mixerFactors[5][2];
-    qDebug()<<mixerFactors[6][0]<<" "<<mixerFactors[6][1]<<" "<<mixerFactors[6][2];
-    qDebug()<<mixerFactors[7][0]<<" "<<mixerFactors[7][1]<<" "<<mixerFactors[7][2];
-
     QList<QComboBox*> mmList;
     mmList << m_aircraft->multiMotorChannelBox1 << m_aircraft->multiMotorChannelBox2 << m_aircraft->multiMotorChannelBox3
            << m_aircraft->multiMotorChannelBox4 << m_aircraft->multiMotorChannelBox5 << m_aircraft->multiMotorChannelBox6
@@ -977,7 +962,6 @@ bool ConfigMultiRotorWidget::setupMultiRotorMixer(double mixerFactors[8][3])
     double pFactor = (double)m_aircraft->mrPitchMixLevel->value()/100;
     double rFactor = (double)m_aircraft->mrRollMixLevel->value()/100;
     double yFactor = (double)m_aircraft->mrYawMixLevel->value()/100;
-    qDebug()<<QString("pFactor=%0 rFactor=%1 yFactor=%2").arg(pFactor).arg(rFactor).arg(yFactor);
     for (int i=0 ; i<8; i++) {
         if(mmList.at(i)->isEnabled())
         {
@@ -987,7 +971,6 @@ bool ConfigMultiRotorWidget::setupMultiRotorMixer(double mixerFactors[8][3])
                                rFactor*mixerFactors[i][1], yFactor*mixerFactors[i][2]);
         }
     }
-    //    obj->updated();
     return true;
 }
 

@@ -44,11 +44,6 @@ VehicleConfig::VehicleConfig(QWidget *parent) : ConfigTaskWidget(parent)
         channelNames << QString("Channel%1").arg(i+1);
     }
 
-//    typedef enum { MIXERTYPE_DISABLED=0, MIXERTYPE_MOTOR=1, MIXERTYPE_SERVO=2,
-    //MIXERTYPE_CAMERAROLL=3, MIXERTYPE_CAMERAPITCH=4, MIXERTYPE_CAMERAYAW=5,
-    //MIXERTYPE_ACCESSORY0=6, MIXERTYPE_ACCESSORY1=7, MIXERTYPE_ACCESSORY2=8,
-    //MIXERTYPE_ACCESSORY3=9, MIXERTYPE_ACCESSORY4=10, MIXERTYPE_ACCESSORY5=11 } MixerTypeElem;
-
     mixerTypeDescriptions << "Disabled" << "Motor" << "Servo" << "CameraRoll" << "CameraPitch"
                           << "CameraYaw" << "Accessory0" << "Accessory1" << "Accessory2"
                           << "Accessory3" << "Accessory4" << "Accessory5";
@@ -169,8 +164,6 @@ void VehicleConfig::setMixerType(UAVDataObject* mixer, int channel, MixerTypeEle
 {
     Q_ASSERT(mixer);
 
-    qDebug() << QString("setMixerType channel %0, type %1").arg(channel).arg(mixerType);
-
     if (channel >= 0 && channel < mixerTypes.count()) {
         UAVObjectField *field = mixer->getField(mixerTypes.at(channel));
         Q_ASSERT(field);
@@ -217,8 +210,6 @@ double VehicleConfig::getMixerVectorValue(UAVDataObject* mixer, int channel, Mix
 void VehicleConfig::setMixerVectorValue(UAVDataObject* mixer, int channel, MixerVectorElem elementName, double value)
 {
     Q_ASSERT(mixer);
-
-    qDebug() << QString("setMixerVectorValue channel %0, name %1, value %2").arg(channel).arg(elementName).arg(value);
 
     if (channel >= 0 && channel < mixerVectors.count()) {
         UAVObjectField *field = mixer->getField(mixerVectors.at(channel));

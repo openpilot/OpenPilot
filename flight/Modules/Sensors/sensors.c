@@ -48,7 +48,9 @@
 
 #include "pios.h"
 #include "attitude.h"
+#include "homelocation.h"
 #include "magnetometer.h"
+#include "magbias.h"
 #include "accels.h"
 #include "gyros.h"
 #include "gyrosbias.h"
@@ -56,14 +58,12 @@
 #include "attitudesettings.h"
 #include "revocalibration.h"
 #include "flightstatus.h"
-#include "gpsposition.h"
-#include "baroaltitude.h"
 #include "CoordinateConversions.h"
 
 #include <pios_board_info.h>
 
 // Private constants
-#define STACK_SIZE_BYTES 700
+#define STACK_SIZE_BYTES 1000
 #define TASK_PRIORITY (tskIDLE_PRIORITY+3)
 #define SENSOR_PERIOD 2
 
@@ -71,15 +71,15 @@
 #define PI_MOD(x) (fmodf(x + F_PI, F_PI * 2) - F_PI)
 // Private types
 
-// Private variables
-static xTaskHandle sensorsTaskHandle;
-static bool gps_updated = false;
-static bool baro_updated = false;
 
 // Private functions
 static void SensorsTask(void *parameters);
 static void settingsUpdatedCb(UAVObjEvent * objEv);
-static void sensorsUpdatedCb(UAVObjEvent * objEv);
+static void magOffsetEstimation(MagnetometerData *mag);
+
+// Private variables
+static xTaskHandle sensorsTaskHandle;
+RevoCalibrationData cal;
 
 // These values are initialized by settings but can be updated by the attitude algorithm
 static bool bias_correct_gyro = true;
@@ -111,6 +111,7 @@ int32_t SensorsInitialize(void)
 	GyrosBiasInitialize();
 	AccelsInitialize();
 	MagnetometerInitialize();
+	MagBiasInitialize();
 	RevoCalibrationInitialize();
 	AttitudeSettingsInitialize();
 
@@ -204,12 +205,6 @@ static void SensorsTask(void *parameters)
 			PIOS_WDG_UpdateFlag(PIOS_WDG_SENSORS);
 			vTaskDelay(10);
 		}
-	}
-	
-	// If debugging connect callback
-	if(pios_com_aux_id != 0) {
-		BaroAltitudeConnectCallback(&sensorsUpdatedCb);
-		GPSPositionConnectCallback(&sensorsUpdatedCb);
 	}
 	
 	// Main task loop
@@ -407,6 +402,11 @@ static void SensorsTask(void *parameters)
 				mag.y = mags[1];
 				mag.z = mags[2];
 			}
+			
+			// Correct for mag bias and update if the rate is non zero
+			if(cal.MagBiasNullingRate > 0)
+				magOffsetEstimation(&mag);
+
 			MagnetometerSet(&mag);
 			mag_update_time = PIOS_DELAY_GetRaw();
 		}
@@ -419,21 +419,108 @@ static void SensorsTask(void *parameters)
 }
 
 /**
- * Indicate that these sensors have been updated
+ * Perform an update of the @ref MagBias based on
+ * Magnetometer Offset Cancellation: Theory and Implementation, 
+ * revisited William Premerlani, October 14, 2011
  */
-static void sensorsUpdatedCb(UAVObjEvent * objEv)
+static void magOffsetEstimation(MagnetometerData *mag)
 {
-	if(objEv->obj == GPSPositionHandle())
-		gps_updated = true;
-	if(objEv->obj == BaroAltitudeHandle())
-		baro_updated = true;
+#if 0
+	// Constants, to possibly go into a UAVO
+	static const float MIN_NORM_DIFFERENCE = 50;
+
+	static float B2[3] = {0, 0, 0};
+
+	MagBiasData magBias;
+	MagBiasGet(&magBias);
+
+	// Remove the current estimate of the bias
+	mag->x -= magBias.x;
+	mag->y -= magBias.y;
+	mag->z -= magBias.z;
+
+	// First call
+	if (B2[0] == 0 && B2[1] == 0 && B2[2] == 0) {
+		B2[0] = mag->x;
+		B2[1] = mag->y;
+		B2[2] = mag->z;
+		return;
+	}
+
+	float B1[3] = {mag->x, mag->y, mag->z};
+	float norm_diff = sqrtf(powf(B2[0] - B1[0],2) + powf(B2[1] - B1[1],2) + powf(B2[2] - B1[2],2));
+	if (norm_diff > MIN_NORM_DIFFERENCE) {
+		float norm_b1 = sqrtf(B1[0]*B1[0] + B1[1]*B1[1] + B1[2]*B1[2]);
+		float norm_b2 = sqrtf(B2[0]*B2[0] + B2[1]*B2[1] + B2[2]*B2[2]);
+		float scale = cal.MagBiasNullingRate * (norm_b2 - norm_b1) / norm_diff;
+		float b_error[3] = {(B2[0] - B1[0]) * scale, (B2[1] - B1[1]) * scale, (B2[2] - B1[2]) * scale};
+
+		magBias.x += b_error[0];
+		magBias.y += b_error[1];
+		magBias.z += b_error[2];
+
+		MagBiasSet(&magBias);
+
+		// Store this value to compare against next update
+		B2[0] = B1[0]; B2[1] = B1[1]; B2[2] = B1[2];
+	}
+#else
+	MagBiasData magBias;
+	MagBiasGet(&magBias);
+	
+	// Remove the current estimate of the bias
+	mag->x -= magBias.x;
+	mag->y -= magBias.y;
+	mag->z -= magBias.z;
+	
+	HomeLocationData homeLocation;
+	HomeLocationGet(&homeLocation);
+	
+	AttitudeActualData attitude;
+	AttitudeActualGet(&attitude);
+	
+	const float Rxy = sqrtf(homeLocation.Be[0]*homeLocation.Be[0] + homeLocation.Be[1]*homeLocation.Be[1]);
+	const float Rz = homeLocation.Be[2];
+	
+	const float rate = cal.MagBiasNullingRate;
+	float R[3][3];
+	float B_e[3];
+	float xy[2];
+	float delta[3];
+	
+	// Get the rotation matrix
+	Quaternion2R(&attitude.q1, R);
+	
+	// Rotate the mag into the NED frame
+	B_e[0] = R[0][0] * mag->x + R[1][0] * mag->y + R[2][0] * mag->z;
+	B_e[1] = R[0][1] * mag->x + R[1][1] * mag->y + R[2][1] * mag->z;
+	B_e[2] = R[0][2] * mag->x + R[1][2] * mag->y + R[2][2] * mag->z;
+	
+	float cy = cosf(attitude.Yaw * M_PI / 180.0f);
+	float sy = sinf(attitude.Yaw * M_PI / 180.0f);
+	
+	xy[0] =  cy * B_e[0] + sy * B_e[1];
+	xy[1] = -sy * B_e[0] + cy * B_e[1];
+	
+	float xy_norm = sqrtf(xy[0]*xy[0] + xy[1]*xy[1]);
+	
+	delta[0] = -rate * (xy[0] / xy_norm * Rxy - xy[0]);
+	delta[1] = -rate * (xy[1] / xy_norm * Rxy - xy[1]);
+	delta[2] = -rate * (Rz - B_e[2]);
+	
+	if (delta[0] == delta[0] && delta[1] == delta[1] && delta[2] == delta[2]) {		
+		magBias.x += delta[0];
+		magBias.y += delta[1];
+		magBias.z += delta[2];
+		MagBiasSet(&magBias);
+	}
+#endif
 }
 
 /**
  * Locally cache some variables from the AtttitudeSettings object
  */
 static void settingsUpdatedCb(UAVObjEvent * objEv) {
-	RevoCalibrationData cal;
 	RevoCalibrationGet(&cal);
 	
 	mag_bias[0] = cal.mag_bias[REVOCALIBRATION_MAG_BIAS_X];
@@ -450,6 +537,15 @@ static void settingsUpdatedCb(UAVObjEvent * objEv) {
 	accel_scale[2] = cal.accel_scale[REVOCALIBRATION_ACCEL_SCALE_Z];
 	// Do not store gyros_bias here as that comes from the state estimator and should be
 	// used from GyroBias directly
+	
+	// Zero out any adaptive tracking
+	MagBiasData magBias;
+	MagBiasGet(&magBias);
+	magBias.x = 0;
+	magBias.y = 0;
+	magBias.z = 0;
+	MagBiasSet(&magBias);
+	
 
 	AttitudeSettingsData attitudeSettings;
 	AttitudeSettingsGet(&attitudeSettings);

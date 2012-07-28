@@ -35,6 +35,7 @@ UAVOBJSRCFILENAMES += gyros
 UAVOBJSRCFILENAMES += gyrosbias
 UAVOBJSRCFILENAMES += accels
 UAVOBJSRCFILENAMES += magnetometer
+UAVOBJSRCFILENAMES += magbias
 UAVOBJSRCFILENAMES += baroaltitude
 UAVOBJSRCFILENAMES += baroairspeed
 UAVOBJSRCFILENAMES += fixedwingpathfollowersettings

@@ -535,6 +535,10 @@ void ConfigRevoWidget::doStartSixPointCalibration()
     revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Y] = 0;
     revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Z] = 0;
 
+    // Disable adaptive mag nulling
+    initialMagCorrectionRate = revoCalibrationData.MagBiasNullingRate;
+    revoCalibrationData.MagBiasNullingRate = 0;
+
     revoCalibration->setData(revoCalibrationData);
 
     Thread::usleep(100000);
@@ -740,6 +744,8 @@ void ConfigRevoWidget::computeScaleBias()
    revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Y] = -sign(S[1]) * b[1];
    revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Z] = -sign(S[2]) * b[2];
 
+   // Restore the previous setting
+   revoCalibrationData.MagBiasNullingRate = initialMagCorrectionRate;
 
 #ifdef SIX_POINT_CAL_ACCEL
    bool good_calibration = true;

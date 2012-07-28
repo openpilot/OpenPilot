@@ -75,14 +75,15 @@ startTime=clock;
 while (1)
 	if (feof(fid)); break; end
 
+	try
 	%% Read message header
 	% get sync field (0x3C, 1 byte)
 	sync = fread(fid, 1, 'uint8');
 	if sync ~= correctSyncByte
-        	prebuf = [prebuf(2:end); sync];
-		wrongSyncByte = wrongSyncByte + 1;	
-       		continue
-    	end
+		prebuf = [prebuf(2:end); sync];
+		wrongSyncByte = wrongSyncByte + 1;
+		continue
+	end
     
 	% get msg type (quint8 1 byte ) should be 0x20, ignore the rest?
 	msgType = fread(fid, 1, 'uint8');
@@ -109,7 +110,7 @@ while (1)
 	end
 	
 	%% Read object
-	try
+
 	switch objID
 $(SWITCHCODE)
 		otherwise

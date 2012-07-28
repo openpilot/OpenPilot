@@ -105,7 +105,6 @@ void VehicleConfig::SetConfigData(GUIConfigDataUnion configData) {
         systemSettingsData.GUIConfigData[i] = configData.UAVObject[i];
 
     systemSettings->setData(systemSettingsData);
-    systemSettings->updated();
 
     //emit ConfigurationChanged();
 }

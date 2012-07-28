@@ -333,8 +333,11 @@ int32_t PIOS_Flash_Jedec_EraseChip()
 	while(PIOS_Flash_Jedec_Busy() != 0) {
 #if defined(FLASH_FREERTOS)
 		vTaskDelay(1);
-#endif
+		if ((i++) % 100 == 0)
+#else
 		if ((i++) % 10000 == 0)
+#endif
+
 			PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
 	
 }

@@ -2,13 +2,13 @@
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
  * @{ 
- * @addtogroup AirspeedModule Airspeed Module
+ * @addtogroup GPSModule GPS Module
  * @brief Calculate airspeed as a function of the difference between sequential GPS velocity and attitude measurements
  * @{ 
  *
  * @file       gps_airspeed.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
- * @brief      Airspeed module, reads temperature and pressure from BMP085
+ * @brief      GPS airspeed module
  *
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -31,8 +31,10 @@
 #ifndef GPS_AIRSPEED_H
 #define GPS_AIRSPEED_H
 
-void gps_airspeedInitialize();
-void gps_airspeedGet(float *v_air_GPS);
+#include "gpsvelocity.h"
+
+void gps_airspeed_update(const GPSVelocityData *gpsVelData);
+void gps_airspeed_initialize(void);
 
 #endif // GPS_AIRSPEED_H
 

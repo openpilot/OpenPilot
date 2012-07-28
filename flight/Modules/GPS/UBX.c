@@ -35,6 +35,8 @@
 
 #include "UBX.h"
 #include "GPS.h"
+#include "gps_airspeed.h"
+
 static bool checksum_ubx_message(const struct UBXPacket *);
 static uint32_t parse_ubx_message(const struct UBXPacket *, GPSPositionData *);
 
@@ -246,6 +248,9 @@ static void parse_ubx_nav_velned (const struct UBX_NAV_VELNED *velned, GPSPositi
 			GPSVelocitySet(&GpsVelocity);
 			GpsPosition->Groundspeed = (float)velned->gSpeed * 0.01f;
 			GpsPosition->Heading = (float)velned->heading * 1.0e-5f;
+#if defined(PIOS_GPS_PROVIDES_AIRSPEED)
+			gps_airspeed_update(&GpsVelocity);
+#endif
 		}
 	}
 }

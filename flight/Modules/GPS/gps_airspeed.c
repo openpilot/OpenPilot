@@ -32,11 +32,9 @@
 
 #include "openpilot.h"
 #include "gps_airspeed.h"
-#include "gpsvelocity.h"
+#include "gpsairspeed.h"
 #include "attitudeactual.h"
 #include "CoordinateConversions.h"
-
-
 
 // Private constants
 #define GPS_AIRSPEED_BIAS_KP           0.1f   //Needs to be settable in a UAVO
@@ -60,34 +58,41 @@ static struct GPSGlobals *gps;
 
 // Private functions
 
+static void compute_rbe(float Rbe[3][3])
+{
+	AttitudeActualData attData;
+	AttitudeActualGet(&attData);
+
+	float q[4] = {
+		attData.q1,
+		attData.q2,
+		attData.q3,
+		attData.q4
+	};
+
+	//Calculate rotation matrix
+	Quaternion2R(q, Rbe);
+}
+
+
 /*
  * Initialize function loads first data sets, and allocates memory for structure.
  */
-void gps_airspeedInitialize()
+void gps_airspeed_initialize(void)
 {
 	//This method saves memory in case we don't use the GPS module.
-	gps=(struct GPSGlobals *)pvPortMalloc(sizeof(struct GPSGlobals));
-	
-	//GPS airspeed calculation variables
-	GPSVelocityData gpsVelData;
-	GPSVelocityGet(&gpsVelData);
-	
-	gps->gpsVelOld_N=gpsVelData.North;
-	gps->gpsVelOld_E=gpsVelData.East;
-	gps->gpsVelOld_D=gpsVelData.Down;
-	
-	AttitudeActualData attData;
-	AttitudeActualGet(&attData);
-	
+	gps = (struct GPSGlobals *)pvPortMalloc(sizeof(struct GPSGlobals));
+
+	gps->gpsVelOld_N = 0;
+	gps->gpsVelOld_E = 0;
+	gps->gpsVelOld_D = 0;
+
 	float Rbe[3][3];
-	float q[4] ={attData.q1, attData.q2, attData.q3, attData.q4};
-	
-	//Calculate rotation matrix
-	Quaternion2R(q, Rbe);
-	
-	gps->RbeCol1_old[0]=Rbe[0][0];
-	gps->RbeCol1_old[1]=Rbe[0][1];
-	gps->RbeCol1_old[2]=Rbe[0][2];
+	compute_rbe(Rbe);
+
+	gps->RbeCol1_old[0] = Rbe[0][0];
+	gps->RbeCol1_old[1] = Rbe[0][1];
+	gps->RbeCol1_old[2] = Rbe[0][2];
 }
 
 /*
@@ -99,51 +104,47 @@ void gps_airspeedInitialize()
  *  where "f" is the fuselage vector in earth coordinates.
  *  We then solve for |V| = |V_gps_2-V_gps_1|/ |f_2 - f1|.
  */
-void gps_airspeedGet(float *v_air_GPS)
+void gps_airspeed_update(const GPSVelocityData *gpsVelData)
 {	
 	float Rbe[3][3];
-	
-	{ //Scoping to save memory. We really just need Rbe.
-		AttitudeActualData attData;
-		AttitudeActualGet(&attData);
-		
-		float q[4] ={attData.q1, attData.q2, attData.q3, attData.q4};
-		
-		//Calculate rotation matrix
-		Quaternion2R(q, Rbe);
-	}
-	
+	compute_rbe(Rbe);
+
 	//Calculate the cos(angle) between the two fuselage basis vectors
-	float cosDiff=(Rbe[0][0]*gps->RbeCol1_old[0]) + (Rbe[0][1]*gps->RbeCol1_old[1]) + (Rbe[0][2]*gps->RbeCol1_old[2]);
-	
+	float cosDiff = (Rbe[0][0] * gps->RbeCol1_old[0]) + 
+			(Rbe[0][1] * gps->RbeCol1_old[1]) +
+			(Rbe[0][2] * gps->RbeCol1_old[2]);
+
 	//If there's more than a 5 degree difference between two fuselage measurements, then we have sufficient delta to continue.
-	if (fabs(cosDiff) < cos(5.0f*DEG2RAD)) {
+	if (fabs(cosDiff) < cos(5.0f * DEG2RAD)) {
+		float gps_airspeed;
+
 		GPSVelocityData gpsVelData;
 		GPSVelocityGet(&gpsVelData);
-		
+
 		//Calculate the norm^2 of the difference between the two GPS vectors
-		float normDiffGPS2 = powf(gpsVelData.North-gps->gpsVelOld_N,2.0f) + powf(gpsVelData.East-gps->gpsVelOld_E,2.0f) + powf(gpsVelData.Down-gps->gpsVelOld_D,2.0f);
+		float normDiffGPS2 = powf(gpsVelData.North - gps->gpsVelOld_N, 2.0f) +
+			             powf(gpsVelData.East  - gps->gpsVelOld_E, 2.0f) +
+			             powf(gpsVelData.Down  - gps->gpsVelOld_D, 2.0f);
 
 		//Calculate the norm^2 of the difference between the two fuselage vectors
-		float normDiffAttitude2=powf(Rbe[0][0]-gps->RbeCol1_old[0],2.0f) + powf(Rbe[0][1]-gps->RbeCol1_old[1],2.0f) + powf(Rbe[0][2]-gps->RbeCol1_old[2],2.0f);
-		
-		//Airspeed magnitude is the ratio between the two difference norms
-		*v_air_GPS = sqrtf(normDiffGPS2/normDiffAttitude2);
-		
-		//Save old variables for next pass
-		gps->gpsVelOld_N=gpsVelData.North;
-		gps->gpsVelOld_E=gpsVelData.East;
-		gps->gpsVelOld_D=gpsVelData.Down;
-		
-		gps->RbeCol1_old[0]=Rbe[0][0];
-		gps->RbeCol1_old[1]=Rbe[0][1];
-		gps->RbeCol1_old[2]=Rbe[0][2];
-	}
-	else {
-		
-	}
+		float normDiffAttitude2 = powf(Rbe[0][0] - gps->RbeCol1_old[0], 2.0f) +
+			                  powf(Rbe[0][1] - gps->RbeCol1_old[1], 2.0f) +
+			                  powf(Rbe[0][2] - gps->RbeCol1_old[2], 2.0f);
 
-	
+		//Airspeed magnitude is the ratio between the two difference norms
+		gps_airspeed = sqrtf(normDiffGPS2 / normDiffAttitude2);
+
+		//Save old variables for next pass
+		gps->gpsVelOld_N = gpsVelData.North;
+		gps->gpsVelOld_E = gpsVelData.East;
+		gps->gpsVelOld_D = gpsVelData.Down;
+
+		gps->RbeCol1_old[0] = Rbe[0][0];
+		gps->RbeCol1_old[1] = Rbe[0][1];
+		gps->RbeCol1_old[2] = Rbe[0][2];
+
+		GPSAirspeedGPSAirspeedSet(&gps_airspeed);
+	}
 }
 
 

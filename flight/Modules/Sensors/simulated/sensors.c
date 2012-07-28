@@ -66,6 +66,7 @@
 #include "magbias.h"
 #include "ratedesired.h"
 #include "revocalibration.h"
+#include "systemsettings.h"
 
 #include "CoordinateConversions.h"
 
@@ -160,13 +161,32 @@ static void SensorsTask(void *parameters)
 //	homeLocation.Set = HOMELOCATION_SET_TRUE;
 //	HomeLocationSet(&homeLocation);
 
-	sensor_sim_type = MODEL_AIRPLANE;
 
 	// Main task loop
 	lastSysTime = xTaskGetTickCount();
 	uint32_t last_time = PIOS_DELAY_GetRaw();
 	while (1) {
 		PIOS_WDG_UpdateFlag(PIOS_WDG_SENSORS);
+
+		SystemSettingsData systemSettings;
+		SystemSettingsGet(&systemSettings);
+
+		switch(systemSettings.AirframeType) {
+			case SYSTEMSETTINGS_AIRFRAMETYPE_FIXEDWING:
+			case SYSTEMSETTINGS_AIRFRAMETYPE_FIXEDWINGELEVON:
+			case SYSTEMSETTINGS_AIRFRAMETYPE_FIXEDWINGVTAIL:
+				sensor_sim_type = MODEL_AIRPLANE;
+				break;
+			case SYSTEMSETTINGS_AIRFRAMETYPE_QUADX:
+			case SYSTEMSETTINGS_AIRFRAMETYPE_QUADP:
+			case SYSTEMSETTINGS_AIRFRAMETYPE_VTOL:
+			case SYSTEMSETTINGS_AIRFRAMETYPE_HEXA:
+			case SYSTEMSETTINGS_AIRFRAMETYPE_OCTO:
+				sensor_sim_type = MODEL_QUADCOPTER;
+				break;
+			default:
+				sensor_sim_type = MODEL_AGNOSTIC;
+		}
 		
 		static int i;
 		i++;

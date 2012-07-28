@@ -784,6 +784,9 @@ void ConfigTaskWidget::defaultButtonClicked()
  */
 void ConfigTaskWidget::reloadButtonClicked()
 {
+    QPushButton * button=qobject_cast<QPushButton*>(sender());
+    if(button)
+        button->setEnabled(false);
     int group=sender()->property("group").toInt();
     QList<objectToWidget*> * list=defaultReloadGroups.value(group,NULL);
     if(!list)
@@ -793,10 +796,19 @@ void ConfigTaskWidget::reloadButtonClicked()
     QEventLoop * eventLoop=new QEventLoop(this);
     connect(timeOut, SIGNAL(timeout()),eventLoop,SLOT(quit()));
     connect(objper, SIGNAL(objectUpdated(UAVObject*)), eventLoop, SLOT(quit()));
+
+    QList<temphelper> temp;
     foreach(objectToWidget * oTw,*list)
     {
         if (oTw->object != NULL)
         {
+            temphelper value;
+            value.objid=oTw->object->getObjID();
+            value.objinstid=oTw->object->getInstID();
+            if(temp.contains(value))
+                continue;
+            else
+                temp.append(value);
             ObjectPersistence::DataFields data;
             data.Operation = ObjectPersistence::OPERATION_LOAD;
             data.Selection = ObjectPersistence::SELECTION_SINGLEOBJECT;
@@ -824,6 +836,8 @@ void ConfigTaskWidget::reloadButtonClicked()
         delete timeOut;
         timeOut=NULL;
     }
+    if(button)
+        button->setEnabled(true);
 }
 
 /**

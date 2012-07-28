@@ -14,8 +14,6 @@ include(../libs/utils/utils.pri)
 LIBS *= -l$$qtLibraryName(ExtensionSystem) -l$$qtLibraryName(Aggregation)
 
 win32 {
-#    CONFIG(debug, debug|release):LIBS *= -lExtensionSystemd -lAggregationd  -lQExtSerialPortd
-#    else:LIBS *= -lExtensionSystem -lAggregation -lQExtSerialPort
     RC_FILE = openpilotgcs.rc
     target.path = /bin
     INSTALLS += target
@@ -32,3 +30,8 @@ win32 {
 }
 
 OTHER_FILES += openpilotgcs.rc
+
+style_copy.commands += $(COPY_FILE) $$targetPath(\"$$GCS_SOURCE_TREE/src/app/stylesheets/*.qss\") $$targetPath(\"$$GCS_APP_PATH\") $$addNewline()
+style_copy.target = FORCE
+QMAKE_EXTRA_TARGETS += style_copy
+

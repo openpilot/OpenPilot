@@ -86,6 +86,7 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
     addUAVObjectToWidgetRelation("ManualControlSettings", "Deadband", m_config->deadband, 0, 0.01f);
 
     connect(m_config->configurationWizard,SIGNAL(clicked()),this,SLOT(goToWizard()));
+    connect(m_config->stackedWidget,SIGNAL(currentChanged(int)),this,SLOT(disableWizardButton(int)));
     connect(m_config->runCalibration,SIGNAL(toggled(bool)),this, SLOT(simpleCalibration(bool)));
 
     connect(m_config->wzNext,SIGNAL(clicked()),this,SLOT(wzNext()));
@@ -303,6 +304,14 @@ void ConfigInputWidget::goToWizard()
     m_config->graphicsView->fitInView(m_txBackground, Qt::KeepAspectRatio );
 }
 
+void ConfigInputWidget::disableWizardButton(int value)
+{
+    if(value!=0)
+        m_config->configurationWizard->setVisible(false);
+    else
+        m_config->configurationWizard->setVisible(true);
+}
+
 void ConfigInputWidget::wzCancel()
 {
     dimOtherControls(false);
@@ -404,6 +413,12 @@ void ConfigInputWidget::wizardSetUpStep(enum wizardSteps step)
 {
     switch(step) {
     case wizardWelcome:
+        foreach(QPointer<QWidget> wd,extraWidgets)
+        {
+            if(!wd.isNull())
+                delete wd;
+        }
+        extraWidgets.clear();
         m_config->graphicsView->setVisible(false);
         setTxMovement(nothing);
         manualSettingsData=manualSettingsObj->getData();

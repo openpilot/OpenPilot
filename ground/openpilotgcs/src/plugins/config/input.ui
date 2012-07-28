@@ -107,41 +107,12 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>663</width>
-            <height>745</height>
+            <width>671</width>
+            <height>755</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout">
            <item row="1" column="0">
-            <widget class="QGroupBox" name="groupBox_4">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="title">
-              <string/>
-             </property>
-             <layout class="QVBoxLayout" name="verticalLayout_3">
-              <item>
-               <widget class="QPushButton" name="configurationWizard">
-                <property name="text">
-                 <string>Start Configuration Wizard</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="runCalibration">
-                <property name="text">
-                 <string>Run Calibration</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item row="2" column="0">
             <widget class="QGroupBox" name="groupBox_5">
              <property name="title">
               <string/>
@@ -154,6 +125,20 @@
                 </property>
                 <widget class="QWidget" name="advancedPage">
                  <layout class="QVBoxLayout" name="verticalLayout_4">
+                  <item>
+                   <widget class="QPushButton" name="configurationWizard">
+                    <property name="text">
+                     <string>Start Configuration Wizard</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QCheckBox" name="runCalibration">
+                    <property name="text">
+                     <string>Run Calibration</string>
+                    </property>
+                   </widget>
+                  </item>
                   <item>
                    <layout class="QVBoxLayout" name="channelSettings"/>
                   </item>
@@ -388,8 +373,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>648</width>
-            <height>776</height>
+            <width>508</width>
+            <height>770</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_7">
@@ -923,8 +908,8 @@ margin:1px;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>663</width>
-            <height>745</height>
+            <width>550</width>
+            <height>147</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">

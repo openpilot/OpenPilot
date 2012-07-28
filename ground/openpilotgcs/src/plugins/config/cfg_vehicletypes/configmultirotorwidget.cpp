@@ -330,7 +330,7 @@ QString ConfigMultiRotorWidget::updateConfigObjectsFromWidgets()
             {  0,    0,  0}
         };
         setupMultiRotorMixer(mixer);
-        m_aircraft->mrStatusLabel->setText("SUCCESS: Mixer Saved OK");
+        m_aircraft->mrStatusLabel->setText(tr("Configuration OK"));
 
     } else if (m_aircraft->multirotorFrameType->currentText() == "Octocopter") {
         airframeType = "Octo";
@@ -356,7 +356,7 @@ QString ConfigMultiRotorWidget::updateConfigObjectsFromWidgets()
             {  1,  1,  1}
         };
         setupMultiRotorMixer(mixer);
-        m_aircraft->mrStatusLabel->setText("SUCCESS: Mixer Saved OK");
+        m_aircraft->mrStatusLabel->setText(tr("Configuration OK"));
 
     } else if (m_aircraft->multirotorFrameType->currentText() == "Octocopter V") {
         airframeType = "OctoV";
@@ -382,7 +382,7 @@ QString ConfigMultiRotorWidget::updateConfigObjectsFromWidgets()
             {  0.33,  1,  1}
         };
         setupMultiRotorMixer(mixer);
-        m_aircraft->mrStatusLabel->setText("SUCCESS: Mixer Saved OK");
+        m_aircraft->mrStatusLabel->setText(tr("Configuration OK"));
 
     } else if (m_aircraft->multirotorFrameType->currentText() == "Octo Coax +") {
         airframeType = "OctoCoaxP";
@@ -407,7 +407,7 @@ QString ConfigMultiRotorWidget::updateConfigObjectsFromWidgets()
             {  0,  1,  1}
         };
         setupMultiRotorMixer(mixer);
-        m_aircraft->mrStatusLabel->setText("SUCCESS: Mixer Saved OK");
+        m_aircraft->mrStatusLabel->setText(tr("Configuration OK"));
 
     } else if (m_aircraft->multirotorFrameType->currentText() == "Octo Coax X") {
         airframeType = "OctoCoaxX";
@@ -432,7 +432,7 @@ QString ConfigMultiRotorWidget::updateConfigObjectsFromWidgets()
             { -1,  1,  1}
         };
         setupMultiRotorMixer(mixer);
-        m_aircraft->mrStatusLabel->setText("SUCCESS: Mixer Saved OK");
+        m_aircraft->mrStatusLabel->setText(tr("Configuration OK"));
 
     } else if (m_aircraft->multirotorFrameType->currentText() == "Tricopter Y") {
         airframeType = "Tri";
@@ -443,7 +443,7 @@ QString ConfigMultiRotorWidget::updateConfigObjectsFromWidgets()
 
         }
         if (m_aircraft->triYawChannelBox->currentText() == "None") {
-            m_aircraft->mrStatusLabel->setText("<font color='red'>Error: Assign a Yaw channel</font>");
+            m_aircraft->mrStatusLabel->setText(tr("<font color='red'>Error: Assign a Yaw channel</font>"));
             return airframeType;
         }
         motorList << "VTOLMotorNW" << "VTOLMotorNE" << "VTOLMotorS" << "" << "" << "" << "" << "" << "VTOLYaw";
@@ -471,7 +471,7 @@ QString ConfigMultiRotorWidget::updateConfigObjectsFromWidgets()
             setMixerVectorValue(mixerObj, channel, VehicleConfig::MIXERVECTOR_YAW, 127);
         }
 
-        m_aircraft->mrStatusLabel->setText("SUCCESS: Mixer Saved OK");
+        m_aircraft->mrStatusLabel->setText(tr("Configuration OK"));
 
     }
 
@@ -861,7 +861,7 @@ bool ConfigMultiRotorWidget::setupQuad(bool pLayout)
     } else {
         setupMultiRotorMixer(xMixer);
     }
-    m_aircraft->mrStatusLabel->setText("SUCCESS: Mixer Saved OK");
+    m_aircraft->mrStatusLabel->setText(tr("Configuration OK"));
     return true;
 }
 
@@ -933,7 +933,7 @@ bool ConfigMultiRotorWidget::setupHexa(bool pLayout)
     } else {
         setupMultiRotorMixer(xMixer);
     }
-    m_aircraft->mrStatusLabel->setText("SUCCESS: Mixer Saved OK");
+    m_aircraft->mrStatusLabel->setText(tr("Configuration OK"));
     return true;
 }
 
@@ -1003,7 +1003,7 @@ bool ConfigMultiRotorWidget::throwConfigError(int numMotors)
 
 
     if (error){
-        m_aircraft->mrStatusLabel->setText(QString("<font color='red'>ERROR: Assign all %1 motor channels</font>").arg(numMotors));
+        m_aircraft->mrStatusLabel->setText(QString(tr("<font color='red'>ERROR: Assign all %1 motor channels</font>")).arg(numMotors));
     }
     return error;
 }

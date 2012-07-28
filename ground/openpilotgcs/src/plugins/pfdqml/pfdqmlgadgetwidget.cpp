@@ -32,7 +32,8 @@
 #include <QtDeclarative/qdeclarativeengine.h>
 
 PfdQmlGadgetWidget::PfdQmlGadgetWidget(QWidget *parent) :
-    QDeclarativeView(parent)
+    QDeclarativeView(parent),
+    m_terrainEnabled(false)
 {
     setMinimumSize(64,64);
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);

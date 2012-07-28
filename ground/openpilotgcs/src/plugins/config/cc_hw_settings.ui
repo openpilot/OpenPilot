@@ -341,7 +341,7 @@
       </size>
      </property>
      <property name="title">
-      <string>Problems</string>
+      <string>Messages</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <item>

@@ -2,21 +2,11 @@
   <General>
     <AutoConnect>true</AutoConnect>
     <AutoSelect>true</AutoSelect>
-    <LastPreferenceCategory>LineardialGadget</LastPreferenceCategory>
-    <LastPreferencePage>Mainboard CPU</LastPreferencePage>
+    <ExpertMode>false</ExpertMode>
+    <OverrideLanguage>en_AU</OverrideLanguage>
     <SaveSettingsOnExit>true</SaveSettingsOnExit>
-    <SettingsWindowHeight>476</SettingsWindowHeight>
-    <SettingsWindowWidth>697</SettingsWindowWidth>
+    <UDPMirror>false</UDPMirror>
   </General>
-  <IPconnection>
-    <Current>
-      <arr_1>
-        <Port>1</Port>
-        <UseTCP>0</UseTCP>
-      </arr_1>
-      <size>1</size>
-    </Current>
-  </IPconnection>
   <KeyBindings>
     <size>0</size>
   </KeyBindings>
@@ -33,9 +23,39 @@
     <Mode5>87</Mode5>
     <Welcome>100</Welcome>
   </ModePriorities>
-  <SerialConnection>
-    <speed>57600</speed>
-  </SerialConnection>
+  <Plugins>
+    <SoundNotifyPlugin>
+      <configInfo>
+        <locked>false</locked>
+        <version>1.0.0</version>
+      </configInfo>
+      <data>
+        <Current>
+          <arr_1>
+            <CurrentLanguage></CurrentLanguage>
+            <DataObject></DataObject>
+            <ExpireTimeout>0</ExpireTimeout>
+            <Mute>false</Mute>
+            <ObjectField></ObjectField>
+            <RangeLimit>0</RangeLimit>
+            <Repeat>0</Repeat>
+            <SayOrder>0</SayOrder>
+            <Sound1></Sound1>
+            <Sound2></Sound2>
+            <Sound3></Sound3>
+            <SoundCollectionPath></SoundCollectionPath>
+            <Value1></Value1>
+            <Value2>0</Value2>
+          </arr_1>
+          <size>1</size>
+        </Current>
+        <EnableSound>false</EnableSound>
+        <listNotifies>
+          <size>0</size>
+        </listNotifies>
+      </data>
+    </SoundNotifyPlugin>
+  </Plugins>
   <UAVGadgetConfigurations>
     <ConfigGadget>
       <default>
@@ -858,6 +878,7 @@
           <channel5Reverse>false</channel5Reverse>
           <channel6Reverse>false</channel6Reverse>
           <channel7Reverse>false</channel7Reverse>
+          <controlPortUDP>0</controlPortUDP>
           <controlsMode>2</controlsMode>
           <pitchChannel>1</pitchChannel>
           <rollChannel>0</rollChannel>
@@ -1712,7 +1733,6 @@
         <data>
           <LoggingEnabled>false</LoggingEnabled>
           <LoggingNewFileOnConnect>false</LoggingNewFileOnConnect>
-          <LoggingPath></LoggingPath>
           <configurationStreamVersion>1000</configurationStreamVersion>
           <dataSize>60</dataSize>
           <plotCurve0>
@@ -1758,7 +1778,6 @@
         <data>
           <LoggingEnabled>false</LoggingEnabled>
           <LoggingNewFileOnConnect>false</LoggingNewFileOnConnect>
-          <LoggingPath></LoggingPath>
           <configurationStreamVersion>1000</configurationStreamVersion>
           <dataSize>20</dataSize>
           <plotCurve0>
@@ -1814,7 +1833,6 @@
         <data>
           <LoggingEnabled>false</LoggingEnabled>
           <LoggingNewFileOnConnect>false</LoggingNewFileOnConnect>
-          <LoggingPath></LoggingPath>
           <configurationStreamVersion>1000</configurationStreamVersion>
           <dataSize>60</dataSize>
           <plotCurve0>
@@ -1860,7 +1878,6 @@
         <data>
           <LoggingEnabled>false</LoggingEnabled>
           <LoggingNewFileOnConnect>false</LoggingNewFileOnConnect>
-          <LoggingPath></LoggingPath>
           <configurationStreamVersion>1000</configurationStreamVersion>
           <dataSize>60</dataSize>
           <plotCurve0>
@@ -1886,7 +1903,6 @@
         <data>
           <LoggingEnabled>false</LoggingEnabled>
           <LoggingNewFileOnConnect>false</LoggingNewFileOnConnect>
-          <LoggingPath></LoggingPath>
           <configurationStreamVersion>1000</configurationStreamVersion>
           <dataSize>40</dataSize>
           <plotCurve0>
@@ -1982,7 +1998,6 @@
         <data>
           <LoggingEnabled>false</LoggingEnabled>
           <LoggingNewFileOnConnect>false</LoggingNewFileOnConnect>
-          <LoggingPath></LoggingPath>
           <configurationStreamVersion>1000</configurationStreamVersion>
           <dataSize>60</dataSize>
           <plotCurve0>
@@ -2028,7 +2043,6 @@
         <data>
           <LoggingEnabled>false</LoggingEnabled>
           <LoggingNewFileOnConnect>false</LoggingNewFileOnConnect>
-          <LoggingPath></LoggingPath>
           <configurationStreamVersion>1000</configurationStreamVersion>
           <dataSize>60</dataSize>
           <plotCurve0>
@@ -2074,7 +2088,6 @@
         <data>
           <LoggingEnabled>false</LoggingEnabled>
           <LoggingNewFileOnConnect>false</LoggingNewFileOnConnect>
-          <LoggingPath></LoggingPath>
           <configurationStreamVersion>1000</configurationStreamVersion>
           <dataSize>60</dataSize>
           <plotCurve0>
@@ -2120,7 +2133,6 @@
         <data>
           <LoggingEnabled>false</LoggingEnabled>
           <LoggingNewFileOnConnect>false</LoggingNewFileOnConnect>
-          <LoggingPath></LoggingPath>
           <configurationStreamVersion>1000</configurationStreamVersion>
           <dataSize>240</dataSize>
           <plotCurve0>
@@ -2256,7 +2268,6 @@
         <data>
           <LoggingEnabled>false</LoggingEnabled>
           <LoggingNewFileOnConnect>false</LoggingNewFileOnConnect>
-          <LoggingPath></LoggingPath>
           <configurationStreamVersion>1000</configurationStreamVersion>
           <dataSize>20</dataSize>
           <plotCurve0>
@@ -2302,7 +2313,6 @@
         <data>
           <LoggingEnabled>false</LoggingEnabled>
           <LoggingNewFileOnConnect>false</LoggingNewFileOnConnect>
-          <LoggingPath></LoggingPath>
           <configurationStreamVersion>1000</configurationStreamVersion>
           <dataSize>240</dataSize>
           <plotCurve0>
@@ -2317,9 +2327,6 @@
           </plotCurve0>
           <plotCurve1>
             <color>0</color>
-            <mathFunction></mathFunction>
-            <uavField></uavField>
-            <uavObject></uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
             <yMinimum>0</yMinimum>
@@ -2349,9 +2356,13 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
+          <CategorizedView>false</CategorizedView>
+          <ScientificView>false</ScientificView>
           <manuallyChangedColor>#5baa56</manuallyChangedColor>
+          <onlyHilightChangedValues>false</onlyHilightChangedValues>
           <recentlyUpdatedColor>#ff7957</recentlyUpdatedColor>
           <recentlyUpdatedTimeout>500</recentlyUpdatedTimeout>
+          <showMetaData>false</showMetaData>
         </data>
       </default>
     </UAVObjectBrowser>
@@ -2631,59 +2642,11 @@
     <Mode2>
       <showToolbars>false</showToolbars>
       <splitter>
-        <side0>
-          <side0>
-            <classId>ConfigGadget</classId>
-            <gadget>
-              <activeConfiguration>default</activeConfiguration>
-            </gadget>
-            <type>uavGadget</type>
-          </side0>
-          <side1>
-            <side0>
-              <classId>LineardialGadget</classId>
-              <gadget>
-                <activeConfiguration>Telemetry RX Rate Horizontal</activeConfiguration>
-              </gadget>
-              <type>uavGadget</type>
-            </side0>
-            <side1>
-              <classId>LineardialGadget</classId>
-              <gadget>
-                <activeConfiguration>Telemetry TX Rate Horizontal</activeConfiguration>
-              </gadget>
-              <type>uavGadget</type>
-            </side1>
-            <splitterOrientation>1</splitterOrientation>
-            <splitterSizes>@Variant(AAAACQAAAAA=)</splitterSizes>
-            <type>splitter</type>
-          </side1>
-          <splitterOrientation>2</splitterOrientation>
-          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAACNQAAAAIAAABC)</splitterSizes>
-          <type>splitter</type>
-        </side0>
-        <side1>
-          <side0>
-            <classId>UAVObjectBrowser</classId>
-            <gadget>
-              <activeConfiguration>default</activeConfiguration>
-            </gadget>
-            <type>uavGadget</type>
-          </side0>
-          <side1>
-            <classId>GCSControlGadget</classId>
-            <gadget>
-              <activeConfiguration>MS Sidewinder</activeConfiguration>
-            </gadget>
-            <type>uavGadget</type>
-          </side1>
-          <splitterOrientation>2</splitterOrientation>
-          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAABqgAAAAIAAAFi)</splitterSizes>
-          <type>splitter</type>
-        </side1>
-        <splitterOrientation>1</splitterOrientation>
-        <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAC3gAAAAIAAAJ3)</splitterSizes>
-        <type>splitter</type>
+        <classId>ConfigGadget</classId>
+        <gadget>
+          <activeConfiguration>default</activeConfiguration>
+        </gadget>
+        <type>uavGadget</type>
       </splitter>
       <version>UAVGadgetManagerV1</version>
     </Mode2>

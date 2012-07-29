@@ -1,0 +1,10 @@
+<xml>
+    <object name="RelayTuningSettings" singleinstance="true" settings="true">
+        <description>Setting to run a relay tuning algorithm</description>
+	<field name="Amplitude" units="" type="float" elements="1" defaultvalue="0.05"/>
+	<access gcs="readwrite" flight="readwrite"/>
+	<telemetrygcs acked="true" updatemode="onchange" period="0"/>
+	<telemetryflight acked="true" updatemode="onchange" period="0"/>
+	<logging updatemode="manual" period="0"/>
+    </object>
+</xml>

@@ -971,6 +971,9 @@ margin:1px;</string>
             <height>32</height>
            </size>
           </property>
+          <property name="toolTip">
+           <string>Takes you to the wiki page</string>
+          </property>
           <property name="text">
            <string/>
           </property>

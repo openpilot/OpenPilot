@@ -36,6 +36,7 @@
 #include "stabilizationsettings.h"
 #include "actuatordesired.h"
 #include "ratedesired.h"
+#include "relaytuningsettings.h"
 #include "stabilizationdesired.h"
 #include "attitudeactual.h"
 #include "gyros.h"
@@ -231,6 +232,7 @@ static void stabilizationTask(void* parameters)
 		{
 			switch(stabDesired.StabilizationMode[i])
 			{
+				case STABILIZATIONDESIRED_STABILIZATIONMODE_RELAY:
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_RATE:
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_VIRTUALBAR:
 					rateDesiredAxis[i] = attitudeDesiredAxis[i];
@@ -317,6 +319,16 @@ static void stabilizationTask(void* parameters)
 		{
 			switch(stabDesired.StabilizationMode[i])
 			{
+				case STABILIZATIONDESIRED_STABILIZATIONMODE_RELAY:
+				{
+					RelayTuningSettingsData relay;
+					RelayTuningSettingsGet(&relay);
+					float error = rateDesiredAxis[i] - gyro_filtered[i];
+					float command = error > 0 ? relay.Amplitude : -relay.Amplitude;
+					actuatorDesiredAxis[i] = bound(command);
+					break;
+					break;
+				}
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_RATE:
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE:
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK:

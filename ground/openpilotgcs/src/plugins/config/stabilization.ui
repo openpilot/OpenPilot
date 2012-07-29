@@ -613,7 +613,7 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>200</height>
+               <height>195</height>
               </size>
              </property>
              <property name="maximumSize">
@@ -3916,7 +3916,7 @@ border-radius: 5;</string>
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>200</height>
+               <height>195</height>
               </size>
              </property>
              <property name="maximumSize">
@@ -6861,7 +6861,7 @@ automatically every 300ms, which will help for fast tuning.</string>
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>230</height>
+               <height>225</height>
               </size>
              </property>
              <property name="maximumSize">
@@ -10553,8 +10553,8 @@ Attitude</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>470</width>
-            <height>745</height>
+            <width>756</width>
+            <height>819</height>
            </rect>
           </property>
           <property name="autoFillBackground">
@@ -10572,7 +10572,7 @@ Attitude</string>
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>220</height>
+               <height>230</height>
               </size>
              </property>
              <property name="maximumSize">
@@ -14030,7 +14030,7 @@ value as the Kp.</string>
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>190</height>
+               <height>200</height>
               </size>
              </property>
              <property name="maximumSize">
@@ -17296,7 +17296,7 @@ border-radius: 5;</string>
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>211</height>
+               <height>230</height>
               </size>
              </property>
              <property name="maximumSize">

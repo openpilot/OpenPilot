@@ -126,6 +126,8 @@ static void pathPlannerTask(void *parameters)
 			continue;
 		}
 		
+		// This method determines if we have achieved the goal of the active
+		// waypoint
 		checkTerminationCondition();
 
 		if(pathplanner_active == false) {
@@ -313,30 +315,35 @@ static void createPathBox()
 	waypoint.Velocity[0] = 2; // Since for now this isn't directional just set a mag
 	waypoint.Action = WAYPOINT_ACTION_PATHTONEXT;
 
-	waypoint.Position[0] = 5;
-	waypoint.Position[1] = 5;
+	waypoint.Position[0] = 0;
+	waypoint.Position[1] = 0;
 	waypoint.Position[2] = -10;
 	WaypointInstSet(0, &waypoint);
 
-	waypoint.Position[0] = -5;
+	waypoint.Position[0] = 5;
 	waypoint.Position[1] = 5;
+	waypoint.Position[2] = -10;
 	WaypointInstSet(1, &waypoint);
 
 	waypoint.Position[0] = -5;
-	waypoint.Position[1] = -5;
+	waypoint.Position[1] = 5;
 	WaypointInstSet(2, &waypoint);
 
-	waypoint.Position[0] = 5;
+	waypoint.Position[0] = -5;
 	waypoint.Position[1] = -5;
 	WaypointInstSet(3, &waypoint);
 
 	waypoint.Position[0] = 5;
-	waypoint.Position[1] = 5;
+	waypoint.Position[1] = -5;
 	WaypointInstSet(4, &waypoint);
+
+	waypoint.Position[0] = 5;
+	waypoint.Position[1] = 5;
+	WaypointInstSet(5, &waypoint);
 
 	waypoint.Position[0] = 0;
 	waypoint.Position[1] = 0;
-	WaypointInstSet(5, &waypoint);
+	WaypointInstSet(6, &waypoint);
 }
 
 static void createPathLogo()

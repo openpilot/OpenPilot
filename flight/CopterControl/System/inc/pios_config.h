@@ -80,6 +80,8 @@
 #define PIOS_INCLUDE_FLASH
 #define PIOS_INCLUDE_MPU6000
 #define PIOS_MPU6000_ACCEL
+// Force the main port to always be telemetry port
+#define PIOS_FORCE_MAIN_TELEMETRY
 
 /* A really shitty setting saving implementation */
 #define PIOS_INCLUDE_FLASH_SECTOR_SETTINGS

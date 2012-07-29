@@ -369,7 +369,10 @@ void PIOS_Board_Init(void) {
 	HwSettingsDSMxBindGet(&hwsettings_DSMxBind);
 	uint8_t hwsettings_cc_mainport;
 	HwSettingsCC_MainPortGet(&hwsettings_cc_mainport);
-
+#if defined(PIOS_FORCE_MAIN_TELEMETRY)
+	hwsettings_cc_mainport = HWSETTINGS_CC_MAINPORT_TELEMETRY;
+#endif
+	
 	switch (hwsettings_cc_mainport) {
 	case HWSETTINGS_CC_MAINPORT_DISABLED:
 		break;

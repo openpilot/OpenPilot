@@ -25,7 +25,12 @@ PfdQmlGadgetConfiguration::PfdQmlGadgetConfiguration(QString classId, QSettings 
     IUAVGadgetConfiguration(classId, parent),
     m_qmlFile("Unknown"),
     m_earthFile("Unknown"),
-    m_terrainEnabled(true)
+    m_terrainEnabled(true),
+    m_actualPositionUsed(false),
+    m_latitude(0),
+    m_longitude(0),
+    m_altitude(0),
+    m_cacheOnly(false)
 {
     //if a saved configuration exists load it
     if(qSettings != 0) {
@@ -36,6 +41,11 @@ PfdQmlGadgetConfiguration::PfdQmlGadgetConfiguration(QString classId, QSettings 
         m_earthFile=Utils::PathUtils().InsertDataPath(m_earthFile);
 
         m_terrainEnabled = qSettings->value("terrainEnabled").toBool();
+        m_actualPositionUsed = qSettings->value("actualPositionUsed").toBool();
+        m_latitude = qSettings->value("latitude").toDouble();
+        m_longitude = qSettings->value("longitude").toDouble();
+        m_altitude = qSettings->value("altitude").toDouble();
+        m_cacheOnly = qSettings->value("cacheOnly").toBool();
     }
 }
 
@@ -49,6 +59,11 @@ IUAVGadgetConfiguration *PfdQmlGadgetConfiguration::clone()
     m->m_qmlFile = m_qmlFile;
     m->m_earthFile = m_earthFile;
     m->m_terrainEnabled = m_terrainEnabled;
+    m->m_actualPositionUsed = m_actualPositionUsed;
+    m->m_latitude = m_latitude;
+    m->m_longitude = m_longitude;
+    m->m_altitude = m_altitude;
+    m->m_cacheOnly = m_cacheOnly;
 
     return m;
 }
@@ -64,4 +79,9 @@ void PfdQmlGadgetConfiguration::saveConfig(QSettings* qSettings) const {
     qSettings->setValue("earthFile", earthFile);
 
     qSettings->setValue("terrainEnabled", m_terrainEnabled);
+    qSettings->setValue("actualPositionUsed", m_actualPositionUsed);
+    qSettings->setValue("latitude", m_latitude);
+    qSettings->setValue("longitude", m_longitude);
+    qSettings->setValue("altitude", m_altitude);
+    qSettings->setValue("cacheOnly", m_cacheOnly);
 }

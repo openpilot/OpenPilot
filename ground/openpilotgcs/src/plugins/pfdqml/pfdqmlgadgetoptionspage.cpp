@@ -35,10 +35,9 @@ PfdQmlGadgetOptionsPage::PfdQmlGadgetOptionsPage(PfdQmlGadgetConfiguration *conf
 //creates options page widget (uses the UI file)
 QWidget *PfdQmlGadgetOptionsPage::createPage(QWidget *parent)
 {
-
     options_page = new Ui::PfdQmlGadgetOptionsPage();
     //main widget
-    QWidget *optionsPageWidget = new QWidget;
+    QWidget *optionsPageWidget = new QWidget(parent);
     //main layout
     options_page->setupUi(optionsPageWidget);
 
@@ -56,6 +55,13 @@ QWidget *PfdQmlGadgetOptionsPage::createPage(QWidget *parent)
 
     options_page->showTerrain->setChecked(m_config->terrainEnabled());
 
+    options_page->useActualLocation->setChecked(m_config->actualPositionUsed());
+    options_page->usePredefinedLocation->setChecked(!m_config->actualPositionUsed());
+    options_page->latitude->setText(QString::number(m_config->latitude()));
+    options_page->longitude->setText(QString::number(m_config->longitude()));
+    options_page->altitude->setText(QString::number(m_config->altitude()));
+    options_page->useOnlyCache->setChecked(m_config->cacheOnly());
+
     return optionsPageWidget;
 }
 
@@ -70,6 +76,12 @@ void PfdQmlGadgetOptionsPage::apply()
     m_config->setQmlFile(options_page->qmlSourceFile->path());
     m_config->setEarthFile(options_page->earthFile->path());
     m_config->setTerrainEnabled(options_page->showTerrain->isChecked());
+
+    m_config->setActualPositionUsed(options_page->useActualLocation->isChecked());
+    m_config->setLatitude(options_page->latitude->text().toDouble());
+    m_config->setLongitude(options_page->longitude->text().toDouble());
+    m_config->setAltitude(options_page->altitude->text().toDouble());
+    m_config->setCacheOnly(options_page->useOnlyCache->isChecked());
 }
 
 void PfdQmlGadgetOptionsPage::finish()

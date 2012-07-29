@@ -41,4 +41,17 @@ void PfdQmlGadget::loadConfiguration(IUAVGadgetConfiguration* config)
     m_widget->setQmlFile(m->qmlFile());
     m_widget->setEarthFile(m->earthFile());
     m_widget->setTerrainEnabled(m->terrainEnabled());
+    m_widget->setActualPositionUsed(m->actualPositionUsed());
+    m_widget->setLatitude(m->latitude());
+    m_widget->setLongitude(m->longitude());
+    m_widget->setAltitude(m->altitude());
+
+    //setting OSGEARTH_CACHE_ONLY seems to work the most reliably
+    //between osgEarth versions I tried
+    if (m->cacheOnly()) {
+        qputenv("OSGEARTH_CACHE_ONLY", "true");
+    } else {
+        //how portable it is?
+        unsetenv("OSGEARTH_CACHE_ONLY");
+    }
 }

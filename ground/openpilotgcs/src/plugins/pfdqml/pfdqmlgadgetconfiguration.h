@@ -30,11 +30,20 @@ public:
     void setQmlFile(const QString &fileName) { m_qmlFile=fileName; }
     void setEarthFile(const QString &fileName) { m_earthFile=fileName; }
     void setTerrainEnabled(bool flag) { m_terrainEnabled = flag; }
+    void setActualPositionUsed(bool flag) { m_actualPositionUsed = flag; }
+    void setLatitude(double value) { m_latitude = value; }
+    void setLongitude(double value) { m_longitude = value; }
+    void setAltitude(double value) { m_altitude = value; }
+    void setCacheOnly(bool flag) { m_cacheOnly = flag; }
 
-    //get dial configuration functions
     QString qmlFile() const { return m_qmlFile; }
     QString earthFile() const { return m_earthFile; }
     bool terrainEnabled() const { return m_terrainEnabled; }
+    bool actualPositionUsed() const { return m_actualPositionUsed; }
+    double latitude() const { return m_latitude; }
+    double longitude() const { return m_longitude; }
+    double altitude() const { return m_altitude; }
+    bool cacheOnly() const { return m_cacheOnly; }
 
     void saveConfig(QSettings* settings) const;
     IUAVGadgetConfiguration *clone();
@@ -43,6 +52,11 @@ private:
     QString m_qmlFile; // The name of the dial's SVG source file
     QString m_earthFile; // The name of osgearth terrain file
     bool m_terrainEnabled;
+    bool m_actualPositionUsed;
+    double m_latitude;
+    double m_longitude;
+    double m_altitude;
+    bool m_cacheOnly;
 };
 
 #endif // PfdQmlGADGETCONFIGURATION_H

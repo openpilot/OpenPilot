@@ -1698,9 +1698,14 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
+          <actualPositionUsed>false</actualPositionUsed>
+          <altitude>2000</altitude>
+          <cacheOnly>false</cacheOnly>
+          <earthFile>%%DATAPATH%%pfd/pfd/default/readymap.earth</earthFile>
+          <latitude>46.671478</latitude>
+          <longitude>10.158932</longitude>
+          <qmlFile>%%DATAPATH%%pfd/pfd/default/Pfd.qml</qmlFile>
           <terrainEnabled>false</terrainEnabled>
-          <qmlFile>%%DATAPATH%%pfd/default/Pfd.qml</qmlFile>
-          <earthFile>%%DATAPATH%%pfd/default/srtm.earth</earthFile>
         </data>
       </NoTerrain>
       <Terrain>
@@ -1709,9 +1714,14 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
+          <actualPositionUsed>false</actualPositionUsed>
+          <altitude>2000</altitude>
+          <cacheOnly>false</cacheOnly>
+          <earthFile>%%DATAPATH%%pfd/pfd/default/readymap.earth</earthFile>
+          <latitude>46.671478</latitude>
+          <longitude>10.158932</longitude>
+          <qmlFile>%%DATAPATH%%pfd/pfd/default/Pfd.qml</qmlFile>
           <terrainEnabled>true</terrainEnabled>
-          <qmlFile>%%DATAPATH%%pfd/default/Pfd.qml</qmlFile>
-          <earthFile>%%DATAPATH%%pfd/default/srtm.earth</earthFile>
         </data>
       </Terrain>
     </PfdQmlGadget>

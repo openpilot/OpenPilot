@@ -1,7 +1,6 @@
 import Qt 4.7
 import "."
 import org.OpenPilot 1.0
-//import "/home/dima/work/RC/OsgEarthQml-build-desktop-Qt_4_8_1_in_PATH__System__Debug"
 
 Rectangle {
     color: "#666666"
@@ -23,6 +22,27 @@ Rectangle {
             anchors.centerIn: parent
             clip: true
 
+            OsgEarth {
+                id: earthView
+
+                anchors.fill: parent
+                sceneFile: qmlWidget.earthFile
+                visible: qmlWidget.terrainEnabled
+
+                fieldOfView: 90
+
+                yaw: AttitudeActual.Yaw
+                pitch: AttitudeActual.Pitch
+                roll: AttitudeActual.Roll
+
+                latitude: qmlWidget.actualPositionUsed ?
+                              GPSPosition.Latitude/10000000.0 : qmlWidget.latitude
+                longitude: qmlWidget.actualPositionUsed ?
+                               GPSPosition.Longitude/10000000.0 : qmlWidget.longitude
+                altitude: qmlWidget.actualPositionUsed ?
+                              GPSPosition.Altitude : qmlWidget.altitude
+            }
+
             Image {
                 id: world
                 source: "image://svg/pfd.svg!world"
@@ -42,26 +62,6 @@ Rectangle {
                         origin.y : world.parent.height/2
                     }
                 ]
-            }
-
-            OsgEarth {
-                id: earthView
-
-                anchors.fill: parent
-                sceneFile: qmlWidget.earthFile
-                visible: qmlWidget.terrainEnabled
-
-                fieldOfView: 90
-
-                yaw: AttitudeActual.Yaw
-                pitch: AttitudeActual.Pitch
-                roll: AttitudeActual.Roll
-
-
-                latitude: -27.935474
-                longitude: 153.187147
-                altitude: 3000
-                //altitude: PositionActual.Down
             }
 
             Image {

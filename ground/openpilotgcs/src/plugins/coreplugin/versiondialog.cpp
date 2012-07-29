@@ -76,7 +76,7 @@ VersionDialog::VersionDialog(QWidget *parent)
         "<br/>"
         "%8"
         "<br/>"
-        "Copyright 2008-%6 %7. All rights reserved.<br/>"
+        "Copyright 2010-%6 %7. All rights reserved.<br/>"
         "<br/>"
          "<small>This program is free software; you can redistribute it and/or modify<br/>"
          "it under the terms of the GNU General Public License as published by<br/>"

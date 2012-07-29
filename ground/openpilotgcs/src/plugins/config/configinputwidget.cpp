@@ -290,7 +290,7 @@ void ConfigInputWidget::resizeEvent(QResizeEvent *event)
 void ConfigInputWidget::openHelp()
 {
 
-    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/Input+Configuration", QUrl::StrictMode) );
+    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/x/04Cf", QUrl::StrictMode) );
 }
 void ConfigInputWidget::goToWizard()
 {

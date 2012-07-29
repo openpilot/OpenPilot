@@ -752,7 +752,7 @@ void ConfigVehicleTypeWidget::updateObjectsFromWidgets()
 void ConfigVehicleTypeWidget::openHelp()
 {
 
-    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/Airframe+configuration", QUrl::StrictMode) );
+    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/x/44Cf", QUrl::StrictMode) );
 }
 
 /**

@@ -40,7 +40,7 @@ ConfigTxPIDWidget::ConfigTxPIDWidget(QWidget *parent) : ConfigTaskWidget(parent)
     Core::Internal::GeneralSettings * settings=pm->getObject<Core::Internal::GeneralSettings>();
     if(!settings->useExpertMode())
         m_txpid->Apply->setVisible(false);
-
+    autoLoadWidgets();
     addApplySaveButtons(m_txpid->Apply, m_txpid->Save);
 
     // Cannot use addUAVObjectToWidgetRelation() for OptionaModules enum because

@@ -169,7 +169,7 @@ void ConfigCCAttitudeWidget::startAccelCalibration() {
 void ConfigCCAttitudeWidget::openHelp()
 {
 
-    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/CopterControl+Attitude+Configuration", QUrl::StrictMode) );
+    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/x/44Cf", QUrl::StrictMode) );
 }
 
 void ConfigCCAttitudeWidget::enableControls(bool enable)

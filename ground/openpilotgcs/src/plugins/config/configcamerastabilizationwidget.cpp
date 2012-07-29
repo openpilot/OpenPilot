@@ -95,7 +95,7 @@ ConfigCameraStabilizationWidget::ConfigCameraStabilizationWidget(QWidget *parent
     connect(m_camerastabilization->camerastabilizationResetToDefaults, SIGNAL(clicked()), this, SLOT(resetToDefaults()));
     connect(m_camerastabilization->camerastabilizationSaveRAM, SIGNAL(clicked()), this, SLOT(applySettings()));
     connect(m_camerastabilization->camerastabilizationSaveSD, SIGNAL(clicked()), this, SLOT(saveSettings()));
-    connect(m_camerastabilization->camerastabilizationHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
+    autoLoadWidgets();
 
     disableMouseWheelEvents();
 }
@@ -331,11 +331,6 @@ void ConfigCameraStabilizationWidget::resetToDefaults()
     CameraStabSettings cameraStabDefaults;
     CameraStabSettings::DataFields defaults = cameraStabDefaults.getData();
     refreshUIValues(defaults);
-}
-
-void ConfigCameraStabilizationWidget::openHelp()
-{
-    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/Camera+Stabilization+Configuration", QUrl::StrictMode) );
 }
 
 void ConfigCameraStabilizationWidget::enableControls(bool enable)

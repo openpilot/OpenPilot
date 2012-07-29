@@ -131,8 +131,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>790</width>
-            <height>644</height>
+            <width>792</width>
+            <height>630</height>
            </rect>
           </property>
           <property name="autoFillBackground">
@@ -1015,6 +1015,12 @@ value.</string>
         </property>
         <property name="flat">
          <bool>true</bool>
+        </property>
+        <property name="objrelation" stdset="0">
+         <stringlist>
+          <string>button:help</string>
+          <string>url:http://wiki.openpilot.org/x/cACrAQ</string>
+         </stringlist>
         </property>
        </widget>
       </item>

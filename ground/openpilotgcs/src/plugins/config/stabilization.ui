@@ -639,7 +639,7 @@
                <number>6</number>
               </property>
               <item row="0" column="0">
-               <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0">
+               <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0">
                 <property name="spacing">
                  <number>4</number>
                 </property>
@@ -677,46 +677,6 @@
                    </size>
                   </property>
                  </spacer>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="pushButton_19">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>51</width>
-                    <height>25</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>16777215</width>
-                    <height>16777215</height>
-                   </size>
-                  </property>
-                  <property name="toolTip">
-                   <string>Takes you to the online wiki page for Rate settings</string>
-                  </property>
-                  <property name="autoFillBackground">
-                   <bool>false</bool>
-                  </property>
-                  <property name="styleSheet">
-                   <string notr="true"/>
-                  </property>
-                  <property name="text">
-                   <string>Wiki</string>
-                  </property>
-                  <property name="objrelation" stdset="0">
-                   <stringlist>
-                    <string>button:help</string>
-                    <string>url:http://wiki.openpilot.org/display/Doc/Stabilization+panel</string>
-                   </stringlist>
-                  </property>
-                 </widget>
                 </item>
                 <item>
                  <widget class="QPushButton" name="pushButton_20">
@@ -4050,7 +4010,7 @@ value as the Kp.</string>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_3">
               <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,0,0">
+               <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,0">
                 <property name="spacing">
                  <number>4</number>
                 </property>
@@ -4088,37 +4048,6 @@ value as the Kp.</string>
                    </size>
                   </property>
                  </spacer>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="pushButton_21">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>51</width>
-                    <height>25</height>
-                   </size>
-                  </property>
-                  <property name="toolTip">
-                   <string>Takes you to the online wiki page for Attitude settings</string>
-                  </property>
-                  <property name="styleSheet">
-                   <string notr="true"/>
-                  </property>
-                  <property name="text">
-                   <string>Wiki</string>
-                  </property>
-                  <property name="objrelation" stdset="0">
-                   <stringlist>
-                    <string>button:help</string>
-                    <string>url:http://wiki.openpilot.org/display/Doc/Stabilization+panel</string>
-                   </stringlist>
-                  </property>
-                 </widget>
                 </item>
                 <item>
                  <widget class="QPushButton" name="pushButton_22">
@@ -7381,7 +7310,7 @@ border-radius: 5;</string>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_4">
               <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0,0">
+               <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0">
                 <property name="spacing">
                  <number>4</number>
                 </property>
@@ -7400,37 +7329,6 @@ border-radius: 5;</string>
                    </size>
                   </property>
                  </spacer>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="pushButton_23">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>51</width>
-                    <height>25</height>
-                   </size>
-                  </property>
-                  <property name="toolTip">
-                   <string>Takes you to the online wiki page for Stick settings</string>
-                  </property>
-                  <property name="styleSheet">
-                   <string notr="true"/>
-                  </property>
-                  <property name="text">
-                   <string>Wiki</string>
-                  </property>
-                  <property name="objrelation" stdset="0">
-                   <stringlist>
-                    <string>button:help</string>
-                    <string>url:http://wiki.openpilot.org/display/Doc/Stabilization+panel</string>
-                   </stringlist>
-                  </property>
-                 </widget>
                 </item>
                 <item>
                  <widget class="QPushButton" name="pushButton_24">
@@ -24090,6 +23988,32 @@ border-radius: 5;</string>
          <number>4</number>
         </property>
         <item>
+         <widget class="QPushButton" name="pushButton">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="../coreplugin/core.qrc">
+            <normaloff>:/core/images/helpicon.svg</normaloff>:/core/images/helpicon.svg</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="flat">
+           <bool>true</bool>
+          </property>
+          <property name="objrelation" stdset="0">
+           <stringlist>
+            <string>button:help</string>
+            <string>url:http://wiki.openpilot.org/x/DAO9</string>
+           </stringlist>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QPushButton" name="stabilizationReloadBoardData_6">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -24198,7 +24122,6 @@ Useful if you have accidentally changed some settings.</string>
  <tabstops>
   <tabstop>scrollArea</tabstop>
   <tabstop>checkBox_7</tabstop>
-  <tabstop>pushButton_19</tabstop>
   <tabstop>pushButton_20</tabstop>
   <tabstop>horizontalSlider_76</tabstop>
   <tabstop>spinBox_7</tabstop>
@@ -24213,7 +24136,6 @@ Useful if you have accidentally changed some settings.</string>
   <tabstop>horizontalSlider_81</tabstop>
   <tabstop>spinBox_10</tabstop>
   <tabstop>checkBox_8</tabstop>
-  <tabstop>pushButton_21</tabstop>
   <tabstop>pushButton_22</tabstop>
   <tabstop>horizontalSlider_82</tabstop>
   <tabstop>spinBox_13</tabstop>
@@ -24227,7 +24149,6 @@ Useful if you have accidentally changed some settings.</string>
   <tabstop>spinBox_19</tabstop>
   <tabstop>horizontalSlider_87</tabstop>
   <tabstop>spinBox_20</tabstop>
-  <tabstop>pushButton_23</tabstop>
   <tabstop>pushButton_24</tabstop>
   <tabstop>horizontalSlider_88</tabstop>
   <tabstop>spinBox_16</tabstop>
@@ -24291,6 +24212,8 @@ Useful if you have accidentally changed some settings.</string>
   <tabstop>AccelKp</tabstop>
   <tabstop>AccelKi</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../coreplugin/core.qrc"/>
+ </resources>
  <connections/>
 </ui>

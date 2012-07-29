@@ -87,6 +87,32 @@
            </spacer>
           </item>
           <item>
+           <widget class="QPushButton" name="pushButton">
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="../coreplugin/core.qrc">
+              <normaloff>:/core/images/helpicon.svg</normaloff>:/core/images/helpicon.svg</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>32</width>
+              <height>32</height>
+             </size>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+            <property name="objrelation" stdset="0">
+             <stringlist>
+              <string>button:help</string>
+              <string>url:http://wiki.openpilot.org/x/dACrAQ</string>
+             </stringlist>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="Apply">
             <property name="toolTip">
              <string>Send settings to the board but do not save to the non-volatile memory</string>
@@ -1752,6 +1778,8 @@
   <tabstop>Apply</tabstop>
   <tabstop>Save</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../coreplugin/core.qrc"/>
+ </resources>
  <connections/>
 </ui>

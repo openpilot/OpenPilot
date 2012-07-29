@@ -15,12 +15,6 @@ SIM_DIR    = $$GCS_BUILD_TREE/../AeroSIM-RC
 PLUGIN_DIR = $$SIM_DIR/Plugin/CopterControl
 DLLDESTDIR = $$PLUGIN_DIR
 
-# Don't depend on MSVRT*.dll
-win32-msvc* {
-    QMAKE_CXXFLAGS_RELEASE -= -MD
-    QMAKE_CXXFLAGS_MT_DLL += -MT
-}
-
 HEADERS = \
     aerosimrcdatastruct.h \
     enums.h \

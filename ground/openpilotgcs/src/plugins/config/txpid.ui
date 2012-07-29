@@ -14,9 +14,6 @@
    <string>TxPID</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
-   <property name="spacing">
-    <number>12</number>
-   </property>
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
@@ -111,7 +108,7 @@
             <x>0</x>
             <y>0</y>
             <width>678</width>
-            <height>683</height>
+            <height>678</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -144,7 +141,7 @@ Up to 3 separate PID options (or option pairs) can be selected and updated.</str
               <item>
                <widget class="QLabel" name="label_7">
                 <property name="text">
-                 <string>After enabling the module, you must power cycle before using and configuring.</string>
+                 <string>After enabling you must power cycle your board before using and configuring</string>
                 </property>
                </widget>
               </item>
@@ -689,6 +686,41 @@ margin:1px;</string>
          </spacer>
         </item>
         <item>
+         <widget class="QPushButton" name="pushButton">
+          <property name="maximumSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>Takes you to the wiki page</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="../coreplugin/core.qrc">
+            <normaloff>:/core/images/helpicon.svg</normaloff>:/core/images/helpicon.svg</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="flat">
+           <bool>true</bool>
+          </property>
+          <property name="objRelation" stdset="0">
+           <stringlist>
+            <string>button:help</string>
+            <string>url:http://wiki.openpilot.org/display/Doc/TxPID+Module</string>
+           </stringlist>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QPushButton" name="Apply">
           <property name="minimumSize">
            <size>
@@ -756,6 +788,8 @@ margin:1px;</string>
   <tabstop>ThrottleMax</tabstop>
   <tabstop>UpdateMode</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../coreplugin/core.qrc"/>
+ </resources>
  <connections/>
 </ui>

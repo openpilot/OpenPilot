@@ -38,6 +38,8 @@
 
 #include <QtCore/qtimer.h>
 
+#include "utils/pathutils.h"
+
 OsgEarthItem::OsgEarthItem(QDeclarativeItem *parent):
     QDeclarativeItem(parent),
     m_fbo(0),
@@ -289,6 +291,20 @@ void OsgEarthItem::initScene()
     }
 
     m_model = osgDB::readNodeFile(sceneFile.toStdString());
+
+    //setup caching
+    osgEarth::MapNode *mapNode = osgEarth::MapNode::findMapNode(m_model.get());
+    if (mapNode) {
+        osgEarth::TMSCacheOptions cacheOptions;
+        //cacheOptions.cacheOnly() = true;
+        QString cacheDir = Utils::PathUtils().GetStoragePath()+QLatin1String("osgEarth_cache");
+        cacheOptions.setPath(cacheDir.toStdString());
+        osgEarth::Cache *cache= new osgEarth::TMSCache(cacheOptions);
+
+        mapNode->getMap()->setCache(cache);
+    } else {
+        qWarning() << Q_FUNC_INFO << sceneFile << " doesn't look like an osgEarth file";
+    }
 
     m_gw = new osgViewer::GraphicsWindowEmbedded(0,0,w,h);
 

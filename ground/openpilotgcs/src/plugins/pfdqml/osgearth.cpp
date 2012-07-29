@@ -17,6 +17,7 @@
 #include "osgearth.h"
 
 #include <QtCore/qfileinfo.h>
+#include <QtCore/qthread.h>
 #include <QtDeclarative/qdeclarative.h>
 #include <QtDeclarative/qdeclarativeview.h>
 #include <QtDeclarative/qdeclarativeengine.h>
@@ -42,7 +43,8 @@
 
 OsgEarthItem::OsgEarthItem(QDeclarativeItem *parent):
     QDeclarativeItem(parent),
-    m_fbo(0),
+    m_renderer(0),
+    m_rendererThread(0),
     m_currentSize(640, 480),
     m_roll(0.0),
     m_pitch(0.0),
@@ -51,8 +53,7 @@ OsgEarthItem::OsgEarthItem(QDeclarativeItem *parent):
     m_longitude(153.0),
     m_altitude(400.0),
     m_fieldOfView(90.0),
-    m_sceneFile(QLatin1String("/usr/share/osgearth/maps/srtm.earth")),
-    m_cameraDirty(false)
+    m_sceneFile(QLatin1String("/usr/share/osgearth/maps/srtm.earth"))
 {
     setSize(m_currentSize);
     setFlag(ItemHasNoContents, false);
@@ -60,6 +61,31 @@ OsgEarthItem::OsgEarthItem(QDeclarativeItem *parent):
 
 OsgEarthItem::~OsgEarthItem()
 {
+    if (m_renderer) {
+        m_rendererThread->exit();
+        //wait up to 10 seconds for renderer thread to exit
+        m_rendererThread->wait(10*1000);
+
+        delete m_renderer;
+        delete m_rendererThread;
+    }
+}
+
+QString OsgEarthItem::resolvedSceneFile() const
+{
+    QString sceneFile = m_sceneFile;
+
+    //try to resolve the relative scene file name:
+    if (!QFileInfo(sceneFile).exists()) {
+        QDeclarativeView *view = qobject_cast<QDeclarativeView*>(scene()->views().first());
+
+        if (view) {
+            QUrl baseUrl = view->engine()->baseUrl();
+            sceneFile = baseUrl.resolved(sceneFile).toLocalFile();
+        }
+    }
+
+    return sceneFile;
 }
 
 void OsgEarthItem::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry)
@@ -95,107 +121,43 @@ void OsgEarthItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *styl
     Q_UNUSED(style);
     QGLWidget *glWidget = qobject_cast<QGLWidget*>(widget);
 
-    if (!m_glWidget) {
-        //make a shared gl widget to avoid
-        //osg rendering to mess with qpainter state
-        m_glWidget = new QGLWidget(widget, glWidget);
-        m_glWidget.data()->setAttribute(Qt::WA_PaintOutsidePaintEvent);
-    }
+    if (!m_renderer) {
+        m_renderer = new OsgEarthItemRenderer(this, glWidget);
+        connect(m_renderer, SIGNAL(frameReady()),
+                this, SLOT(updateView()), Qt::QueuedConnection);
 
-    if (!m_viewer.get())
-        QMetaObject::invokeMethod(this, "initScene", Qt::QueuedConnection);
+        m_rendererThread = new QThread(this);
+        m_renderer->moveToThread(m_rendererThread);
+        m_rendererThread->start();
 
-    if (glWidget && m_fbo)
-        glWidget->drawTexture(boundingRect(), m_fbo->texture());
-}
-
-void OsgEarthItem::markCameraDirty()
-{
-    m_cameraDirty = true;
-    QMetaObject::invokeMethod(this, "updateFBO", Qt::QueuedConnection);
-}
-
-void OsgEarthItem::updateFBO()
-{
-    if (!m_cameraDirty || !m_viewer.get() || m_glWidget.isNull())
+        QMetaObject::invokeMethod(m_renderer, "initScene", Qt::QueuedConnection);
         return;
-
-    m_cameraDirty = false;
-    m_glWidget.data()->makeCurrent();
-
-    if (m_fbo && m_fbo->size() != m_currentSize) {
-        delete m_fbo;
-        m_fbo = 0;
     }
 
-    if (!m_fbo) {
-        m_fbo = new QGLFramebufferObject(m_currentSize, QGLFramebufferObject::CombinedDepthStencil);
-        QPainter p(m_fbo);
-        p.fillRect(0,0,m_currentSize.width(), m_currentSize.height(), Qt::gray);
-    }
+    QGLFramebufferObject *fbo = m_renderer->lastFrame();
 
-    //To find a camera view matrix, find placer matrixes for two points
-    //onr at requested coords and another latitude shifted by 0.01 deg
-    osgEarth::Util::ObjectPlacer placer(m_viewer->getSceneData());
+    if (glWidget && fbo)
+        glWidget->drawTexture(boundingRect(), fbo->texture());
+}
 
-    osg::Matrixd positionMatrix;
-    placer.createPlacerMatrix(m_latitude, m_longitude, m_altitude, positionMatrix);
-    osg::Matrixd positionMatrix2;
-    placer.createPlacerMatrix(m_latitude+0.01, m_longitude, m_altitude, positionMatrix2);
-
-    osg::Vec3d eye(0.0f, 0.0f, 0.0f);
-    osg::Vec3d viewVector(0.0f, 0.0f, 0.0f);
-    osg::Vec3d upVector(0.0f, 0.0f, 1.0f);
-
-    eye = positionMatrix.preMult(eye);
-    upVector = positionMatrix.preMult(upVector);
-    upVector.normalize();
-    viewVector = positionMatrix2.preMult(viewVector) - eye;
-    viewVector.normalize();
-    viewVector *= 10.0;
-
-    //TODO: clarify the correct rotation order,
-    //currently assuming yaw, pitch, roll
-    osg::Quat q;
-    q.makeRotate(-m_yaw*M_PI/180.0, upVector);
-    upVector = q * upVector;
-    viewVector = q * viewVector;
-
-    osg::Vec3d side = viewVector ^ upVector;
-    q.makeRotate(m_pitch*M_PI/180.0, side);
-    upVector = q * upVector;
-    viewVector = q * viewVector;
-
-    q.makeRotate(m_roll*M_PI/180.0, viewVector);
-    upVector = q * upVector;
-    viewVector = q * viewVector;
-
-    osg::Vec3d center = eye + viewVector;
-
-//    qDebug() << "e " << eye.x() << eye.y() << eye.z();
-//    qDebug() << "c " << center.x() << center.y() << center.z();
-//    qDebug() << "up" << upVector.x() << upVector.y() << upVector.z();
-
-    m_viewer->getCamera()->setViewMatrixAsLookAt(osg::Vec3d(eye.x(), eye.y(), eye.z()),
-                                                 osg::Vec3d(center.x(), center.y(), center.z()),
-                                                 osg::Vec3d(upVector.x(), upVector.y(), upVector.z()));
-
-    {
-        QPainter fboPainter(m_fbo);
-        fboPainter.beginNativePainting();
-        m_viewer->frame();
-        fboPainter.endNativePainting();
-    }
-    m_glWidget.data()->doneCurrent();
-
+void OsgEarthItem::updateView()
+{
     update();
+}
+
+void OsgEarthItem::updateFrame()
+{
+    if (m_renderer) {
+        m_renderer->markDirty();
+        QMetaObject::invokeMethod(m_renderer, "updateFrame", Qt::QueuedConnection);
+    }
 }
 
 void OsgEarthItem::setRoll(qreal arg)
 {
     if (!qFuzzyCompare(m_roll, arg)) {
         m_roll = arg;
-        markCameraDirty();
+        updateFrame();
         emit rollChanged(arg);
     }
 }
@@ -204,7 +166,7 @@ void OsgEarthItem::setPitch(qreal arg)
 {
     if (!qFuzzyCompare(m_pitch, arg)) {
         m_pitch = arg;
-        markCameraDirty();
+        updateFrame();
         emit pitchChanged(arg);
     }
 }
@@ -213,7 +175,7 @@ void OsgEarthItem::setYaw(qreal arg)
 {
     if (!qFuzzyCompare(m_yaw, arg)) {
         m_yaw = arg;
-        markCameraDirty();
+        updateFrame();
         emit yawChanged(arg);
     }
 }
@@ -250,14 +212,15 @@ void OsgEarthItem::setFieldOfView(qreal arg)
         m_fieldOfView = arg;
         emit fieldOfViewChanged(arg);
 
-        if (m_viewer.get()) {
+        //it should be a queued call to OsgEarthItemRenderer instead
+        /*if (m_viewer.get()) {
             m_viewer->getCamera()->setProjectionMatrixAsPerspective(
                         m_fieldOfView,
                         qreal(m_currentSize.width())/m_currentSize.height(),
                         1.0f, 10000.0f);
-        }
+        }*/
 
-        markCameraDirty();
+        updateFrame();
     }
 }
 
@@ -269,27 +232,51 @@ void OsgEarthItem::setSceneFile(QString arg)
     }
 }
 
-
-void OsgEarthItem::initScene()
+OsgEarthItemRenderer::OsgEarthItemRenderer(OsgEarthItem *item, QGLWidget *glWidget) :
+    QObject(0),
+    m_item(item),
+    m_lastFboNumber(0),
+    m_currentSize(640, 480),
+    m_cameraDirty(false)
 {
-    if (m_viewer.get())
-        return;
+    //make a shared gl widget to avoid
+    //osg rendering to mess with qpainter state
+    //this runs in the main thread
+    m_glWidget = new QGLWidget(0, glWidget);
+    m_glWidget.data()->setAttribute(Qt::WA_PaintOutsidePaintEvent);
+
+    for (int i=0; i<FboCount; i++) {
+        m_fbo[i] = new QGLFramebufferObject(m_currentSize, QGLFramebufferObject::CombinedDepthStencil);
+        QPainter p(m_fbo[i]);
+        p.fillRect(0,0,m_currentSize.width(), m_currentSize.height(), Qt::gray);
+    }
+}
+
+OsgEarthItemRenderer::~OsgEarthItemRenderer()
+{
+    m_glWidget.data()->makeCurrent();
+    for (int i=0; i<FboCount; i++) {
+        delete m_fbo[i];
+        m_fbo[i] = 0;
+    }
+    m_glWidget.data()->doneCurrent();
+
+    delete m_glWidget.data();
+}
+
+QGLFramebufferObject *OsgEarthItemRenderer::lastFrame()
+{
+    return m_fbo[m_lastFboNumber];
+}
+
+void OsgEarthItemRenderer::initScene()
+{
+    Q_ASSERT(!m_viewer.get());
 
     int w = m_currentSize.width();
     int h = m_currentSize.height();
 
-    QString sceneFile = m_sceneFile;
-
-    //try to resolve the relative scene file name:
-    if (!QFileInfo(sceneFile).exists()) {
-        QDeclarativeView *view = qobject_cast<QDeclarativeView*>(scene()->views().first());
-
-        if (view) {
-            QUrl baseUrl = view->engine()->baseUrl();
-            sceneFile = baseUrl.resolved(sceneFile).toLocalFile();
-        }
-    }
-
+    QString sceneFile = m_item->resolvedSceneFile();
     m_model = osgDB::readNodeFile(sceneFile.toStdString());
 
     //setup caching
@@ -320,8 +307,76 @@ void OsgEarthItem::initScene()
 
     // configure the near/far so we don't clip things that are up close
     camera->setNearFarRatio(0.00002);
-    camera->setProjectionMatrixAsPerspective(m_fieldOfView, qreal(w)/h, 1.0f, 10000.0f);
+    camera->setProjectionMatrixAsPerspective(m_item->fieldOfView(), qreal(w)/h, 1.0f, 10000.0f);
 
-    markCameraDirty();
+    updateFrame();
 }
 
+void OsgEarthItemRenderer::updateFrame()
+{
+    if (!m_cameraDirty || !m_viewer.get() || m_glWidget.isNull())
+        return;
+
+    m_glWidget.data()->makeCurrent();
+
+    //To find a camera view matrix, find placer matrixes for two points
+    //onr at requested coords and another latitude shifted by 0.01 deg
+    osgEarth::Util::ObjectPlacer placer(m_viewer->getSceneData());
+
+    m_cameraDirty = false;
+
+    osg::Matrixd positionMatrix;
+    placer.createPlacerMatrix(m_item->latitude(), m_item->longitude(), m_item->altitude(), positionMatrix);
+    osg::Matrixd positionMatrix2;
+    placer.createPlacerMatrix(m_item->latitude()+0.01, m_item->longitude(), m_item->altitude(), positionMatrix2);
+
+    osg::Vec3d eye(0.0f, 0.0f, 0.0f);
+    osg::Vec3d viewVector(0.0f, 0.0f, 0.0f);
+    osg::Vec3d upVector(0.0f, 0.0f, 1.0f);
+
+    eye = positionMatrix.preMult(eye);
+    upVector = positionMatrix.preMult(upVector);
+    upVector.normalize();
+    viewVector = positionMatrix2.preMult(viewVector) - eye;
+    viewVector.normalize();
+    viewVector *= 10.0;
+
+    //TODO: clarify the correct rotation order,
+    //currently assuming yaw, pitch, roll
+    osg::Quat q;
+    q.makeRotate(-m_item->yaw()*M_PI/180.0, upVector);
+    upVector = q * upVector;
+    viewVector = q * viewVector;
+
+    osg::Vec3d side = viewVector ^ upVector;
+    q.makeRotate(m_item->pitch()*M_PI/180.0, side);
+    upVector = q * upVector;
+    viewVector = q * viewVector;
+
+    q.makeRotate(m_item->roll()*M_PI/180.0, viewVector);
+    upVector = q * upVector;
+    viewVector = q * viewVector;
+
+    osg::Vec3d center = eye + viewVector;
+
+//    qDebug() << "e " << eye.x() << eye.y() << eye.z();
+//    qDebug() << "c " << center.x() << center.y() << center.z();
+//    qDebug() << "up" << upVector.x() << upVector.y() << upVector.z();
+
+    m_viewer->getCamera()->setViewMatrixAsLookAt(osg::Vec3d(eye.x(), eye.y(), eye.z()),
+                                                 osg::Vec3d(center.x(), center.y(), center.z()),
+                                                 osg::Vec3d(upVector.x(), upVector.y(), upVector.z()));
+
+    {
+        QGLFramebufferObject *fbo = m_fbo[(m_lastFboNumber + 1) % FboCount];
+        QPainter fboPainter(fbo);
+        fboPainter.beginNativePainting();
+        m_viewer->frame();
+        fboPainter.endNativePainting();
+    }
+    m_glWidget.data()->doneCurrent();
+
+    m_lastFboNumber = (m_lastFboNumber + 1) % FboCount;
+
+    emit frameReady();
+}

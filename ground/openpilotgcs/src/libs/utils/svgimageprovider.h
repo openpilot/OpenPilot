@@ -33,7 +33,7 @@
 #include <QSvgRenderer>
 #include <QMap>
 
-class SvgImageProvider : public QObject, public QDeclarativeImageProvider
+class Q_DECL_EXPORT SvgImageProvider : public QObject, public QDeclarativeImageProvider
 {
     Q_OBJECT
 public:

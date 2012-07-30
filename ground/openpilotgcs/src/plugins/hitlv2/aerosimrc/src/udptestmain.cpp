@@ -1,16 +1,13 @@
 /**
  ******************************************************************************
- * @addtogroup OpenPilotModules OpenPilot Modules
- * @{
- * @addtogroup GSPModule GPS Module
- * @brief Process GPS information
- * @{
  *
- * @file       NMEA.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      GPS module, handles GPS and NMEA stream
- * @see        The GNU Public License (GPL) Version 3
- *
+ * @file       udptestmain.cpp
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010-2012.
+ * @addtogroup 3rdParty Third-party integration
+ * @{
+ * @addtogroup AeroSimRC AeroSimRC proxy plugin
+ * @{
+ * @brief AeroSimRC simulator to HITL proxy plugin test utility
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -28,15 +25,14 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef NMEA_H
-#define NMEA_H
+#include <QApplication>
+#include "udptestwidget.h"
 
-#include <stdbool.h>
-#include <stdint.h>
+int main(int argc, char *argv[])
+{
+    QApplication a(argc, argv);
+    Widget w;
+    w.show();
 
-#define NMEA_MAX_PACKET_LENGTH          96
-
-extern bool NMEA_update_position(char *nmea_sentence);
-extern bool NMEA_checksum(char *nmea_sentence);
-
-#endif /* NMEA_H */
+    return a.exec();
+}

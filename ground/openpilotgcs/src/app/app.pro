@@ -29,10 +29,13 @@ win32 {
 
 OTHER_FILES += openpilotgcs.rc
 
-PLATFORMS = windows macos linux
+STYLESHEETS = windows.qss \
+            macos.qss \
+            linux.qss
 
-for(platform, PLATFORMS) {
-    style_copy.commands += $(COPY_FILE) $$targetPath(\"$$GCS_SOURCE_TREE/src/app/stylesheets/$$platform.qss\") $$targetPath(\"$$GCS_APP_PATH\") $$addNewline()
+for(qss, STYLESHEETS) {
+    style_copy.commands += $(COPY_FILE) $$targetPath(\"$$GCS_SOURCE_TREE/src/app/stylesheets/$$qss\") $$targetPath(\"$$GCS_APP_PATH/$$qss\") $$addNewline()
+}
 
 style_copy.target = FORCE
 QMAKE_EXTRA_TARGETS += style_copy

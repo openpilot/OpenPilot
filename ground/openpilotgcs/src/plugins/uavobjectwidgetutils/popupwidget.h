@@ -37,6 +37,8 @@ private:
     QWidget*        m_widget;
     QWidget*        m_widgetParent;
     QPushButton*    m_closeButton;
+    int             m_widgetWidth;
+    int             m_widgetHeight;
 };
 
 #endif // POPUPWIDGET_H

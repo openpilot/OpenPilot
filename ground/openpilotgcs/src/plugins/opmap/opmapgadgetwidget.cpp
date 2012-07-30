@@ -48,6 +48,7 @@
 
 #include "positionactual.h"
 #include "homelocation.h"
+#include "gpsposition.h"
 
 #define allow_manual_home_location_move
 
@@ -662,15 +663,17 @@ void OPMapGadgetWidget::updatePosition()
 	uav_pos = internals::PointLatLng(uav_latitude, uav_longitude);
 
 	// *************
-	// get the current GPS details
+    // get current GPS position
+    ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager* objManager = pm->getObject<UAVObjectManager>();
 
-	// get current GPS position
-	if (!getGPSPosition(gps_latitude, gps_longitude, gps_altitude))
-		return;
+    GPSPosition *gpsPositionData = GPSPosition::GetInstance(objManager);
 
 	// get current GPS heading
-//	gps_heading = getGPS_Heading();
-	gps_heading = 0;
+    gps_heading = gpsPositionData->getData().Heading;
+    gps_latitude = gpsPositionData->getData().Latitude;
+    gps_longitude = gpsPositionData->getData().Longitude;
+    gps_altitude = gpsPositionData->getData().Altitude;
 
 	gps_pos = internals::PointLatLng(gps_latitude, gps_longitude);
 
@@ -698,7 +701,7 @@ void OPMapGadgetWidget::updatePosition()
 	m_map->GPS->SetUAVPos(gps_pos, gps_altitude); // set the maps GPS position
 	m_map->GPS->SetUAVHeading(gps_heading);       // set the maps GPS heading
 
-	// *************
+    // *************
 }
 
 /**
@@ -2387,25 +2390,8 @@ double OPMapGadgetWidget::getUAV_Yaw()
 	return yaw;
 }
 
-bool OPMapGadgetWidget::getGPSPosition(double &latitude, double &longitude, double &altitude)
-{
-	double LLA[3];
-
-	if (!obum)
-		return false;
-
-	if (obum->getGPSPosition(LLA) < 0)
-		return false;	// error
-
-	latitude = LLA[0];
-	longitude = LLA[1];
-	altitude = LLA[2];
-
-    return true;
-}
 
 // *************************************************************************************
-
 void OPMapGadgetWidget::setMapFollowingMode()
 {
     if (!m_widget || !m_map)

@@ -350,7 +350,6 @@ private:
     internals::PointLatLng destPoint(internals::PointLatLng source, double bear, double dist);
 
 	bool getUAVPosition(double &latitude, double &longitude, double &altitude);
-	bool getGPSPosition(double &latitude, double &longitude, double &altitude);
     double getUAV_Yaw();
 
     void setMapFollowingMode();

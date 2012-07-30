@@ -63,6 +63,7 @@ private slots:
 	void pair2Toggled(bool checked);
 	void pair3Toggled(bool checked);
 	void pair4Toggled(bool checked);
+	void pairBToggled(bool checked);
 };
 
 #endif // CONFIGTXPIDWIDGET_H

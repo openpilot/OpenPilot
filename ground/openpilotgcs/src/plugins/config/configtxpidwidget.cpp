@@ -28,12 +28,19 @@
 #include "configtxpidwidget.h"
 #include "txpidsettings.h"
 #include "hwsettings.h"
+#include <extensionsystem/pluginmanager.h>
+#include <coreplugin/generalsettings.h>
 
 ConfigTxPIDWidget::ConfigTxPIDWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
     m_txpid = new Ui_TxPIDWidget();
     m_txpid->setupUi(this);
-
+    
+    ExtensionSystem::PluginManager *pm=ExtensionSystem::PluginManager::instance();
+    Core::Internal::GeneralSettings * settings=pm->getObject<Core::Internal::GeneralSettings>();
+    if(!settings->useExpertMode())
+        m_txpid->Apply->setVisible(false);
+    autoLoadWidgets();
     addApplySaveButtons(m_txpid->Apply, m_txpid->Save);
 
     // Cannot use addUAVObjectToWidgetRelation() for OptionaModules enum because

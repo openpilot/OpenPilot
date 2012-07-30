@@ -1,3 +1,4 @@
+QT += network
 TEMPLATE = lib
 TARGET = UAVTalk
 include(../../openpilotgcsplugin.pri)

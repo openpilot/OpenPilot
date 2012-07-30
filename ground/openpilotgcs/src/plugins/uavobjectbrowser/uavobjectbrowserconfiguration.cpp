@@ -31,8 +31,11 @@ UAVObjectBrowserConfiguration::UAVObjectBrowserConfiguration(QString classId, QS
     IUAVGadgetConfiguration(classId, parent),
     m_recentlyUpdatedColor(QColor(255, 230, 230)),
     m_manuallyChangedColor(QColor(230, 230, 255)),
+    m_onlyHilightChangedValues(false),
     m_recentlyUpdatedTimeout(500),
-    m_onlyHilightChangedValues(false)
+    m_useCategorizedView(false),
+    m_useScientificView(false),
+    m_showMetaData(false)
 {
     //if a saved configuration exists load it
     if(qSettings != 0) {
@@ -41,6 +44,9 @@ UAVObjectBrowserConfiguration::UAVObjectBrowserConfiguration(QString classId, QS
         int timeout = qSettings->value("recentlyUpdatedTimeout").toInt();
         bool hilight = qSettings->value("onlyHilightChangedValues").toBool();
 
+        m_useCategorizedView = qSettings->value("CategorizedView").toBool();
+        m_useScientificView = qSettings->value("ScientificView").toBool();
+        m_showMetaData = qSettings->value("showMetaData").toBool();
         m_recentlyUpdatedColor = recent;
         m_manuallyChangedColor = manual;
         m_recentlyUpdatedTimeout = timeout;
@@ -55,6 +61,9 @@ IUAVGadgetConfiguration *UAVObjectBrowserConfiguration::clone()
     m->m_manuallyChangedColor = m_manuallyChangedColor;
     m->m_recentlyUpdatedTimeout = m_recentlyUpdatedTimeout;
     m->m_onlyHilightChangedValues = m_onlyHilightChangedValues;
+    m->m_useCategorizedView = m_useCategorizedView;
+    m->m_useScientificView = m_useScientificView;
+    m->m_showMetaData = m_showMetaData;
     return m;
 }
 
@@ -67,4 +76,7 @@ void UAVObjectBrowserConfiguration::saveConfig(QSettings* qSettings) const {
     qSettings->setValue("manuallyChangedColor", m_manuallyChangedColor);
     qSettings->setValue("recentlyUpdatedTimeout", m_recentlyUpdatedTimeout);
     qSettings->setValue("onlyHilightChangedValues", m_onlyHilightChangedValues);
+    qSettings->setValue("CategorizedView", m_useCategorizedView);
+    qSettings->setValue("ScientificView", m_useScientificView);
+    qSettings->setValue("showMetaData", m_showMetaData);
 }

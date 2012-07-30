@@ -48,8 +48,6 @@
 #define QINT32MAX std::numeric_limits<qint32>::max()
 #define QUINT32MAX std::numeric_limits<qint32>::max()
 
-//#define USE_SCIENTIFIC_NOTATION
-
 class FieldTreeItem : public TreeItem
 {
 Q_OBJECT
@@ -214,10 +212,10 @@ class FloatFieldTreeItem : public FieldTreeItem
 {
 Q_OBJECT
 public:
-    FloatFieldTreeItem(UAVObjectField *field, int index, const QList<QVariant> &data, TreeItem *parent = 0) :
-            FieldTreeItem(index, data, parent), m_field(field) { }
-    FloatFieldTreeItem(UAVObjectField *field, int index, const QVariant &data, TreeItem *parent = 0) :
-            FieldTreeItem(index, data, parent), m_field(field) { }
+    FloatFieldTreeItem(UAVObjectField *field, int index, const QList<QVariant> &data, bool scientific = false, TreeItem *parent = 0) :
+        FieldTreeItem(index, data, parent), m_field(field), m_useScientificNotation(scientific){}
+    FloatFieldTreeItem(UAVObjectField *field, int index, const QVariant &data, bool scientific = false, TreeItem *parent = 0) :
+            FieldTreeItem(index, data, parent), m_field(field), m_useScientificNotation(scientific) { }
     void setData(QVariant value, int column) {
         setChanged(m_field->getValue(m_index) != value);
         TreeItem::setData(value, column);
@@ -233,39 +231,49 @@ public:
             setHighlight(true);
         }
     }
+
     QWidget *createEditor(QWidget *parent) {
-		#ifdef USE_SCIENTIFIC_NOTATION
-			QScienceSpinBox *editor = new QScienceSpinBox(parent);
-			editor->setDecimals(6);
-		#else
+        if(m_useScientificNotation) {
+            QScienceSpinBox *editor = new QScienceSpinBox(parent);
+            editor->setDecimals(6);
+            editor->setMinimum(-std::numeric_limits<float>::max());
+            editor->setMaximum(std::numeric_limits<float>::max());
+            return editor;
+        } else {
 			QDoubleSpinBox *editor = new QDoubleSpinBox(parent);
 			editor->setDecimals(8);
-		#endif
-        editor->setMinimum(-std::numeric_limits<float>::max());
-        editor->setMaximum(std::numeric_limits<float>::max());
-        return editor;
+            editor->setMinimum(-std::numeric_limits<float>::max());
+            editor->setMaximum(std::numeric_limits<float>::max());
+            return editor;
+        }
     }
 
     QVariant getEditorValue(QWidget *editor) {
-		#ifdef USE_SCIENTIFIC_NOTATION
-			QScienceSpinBox *spinBox = static_cast<QScienceSpinBox*>(editor);
-		#else
-			QDoubleSpinBox *spinBox = static_cast<QDoubleSpinBox*>(editor);
-		#endif
-		spinBox->interpretText();
-        return spinBox->value();
+        if(m_useScientificNotation) {
+            QScienceSpinBox *spinBox = static_cast<QScienceSpinBox*>(editor);
+            spinBox->interpretText();
+            return spinBox->value();
+        } else {
+            QDoubleSpinBox *spinBox = static_cast<QDoubleSpinBox*>(editor);
+            spinBox->interpretText();
+            return spinBox->value();
+        }
     }
 
     void setEditorValue(QWidget *editor, QVariant value) {
-		#ifdef USE_SCIENTIFIC_NOTATION
-			QScienceSpinBox *spinBox = static_cast<QScienceSpinBox*>(editor);
-		#else
-			QDoubleSpinBox *spinBox = static_cast<QDoubleSpinBox*>(editor);
-		#endif
-		spinBox->setValue(value.toDouble());
+
+        if(m_useScientificNotation) {
+            QScienceSpinBox *spinBox = static_cast<QScienceSpinBox*>(editor);
+            spinBox->setValue(value.toDouble());
+        } else {
+            QDoubleSpinBox *spinBox = static_cast<QDoubleSpinBox*>(editor);
+            spinBox->setValue(value.toDouble());
+        }
     }
 private:
     UAVObjectField *m_field;
+    bool m_useScientificNotation;
+
 };
 
 #endif // FIELDTREEITEM_H

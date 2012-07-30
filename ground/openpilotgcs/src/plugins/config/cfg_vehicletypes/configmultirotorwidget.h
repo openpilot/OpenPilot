@@ -65,7 +65,8 @@ private:
     void setupQuadMotor(int channel, double roll, double pitch, double yaw);
 
     virtual void ResetActuators(GUIConfigDataUnion* configData);
-    virtual QStringList getChannelDescriptions();
+    static QStringList getChannelDescriptions();
+    static const QString CHANNELBOXNAME;
 
 private slots:
     virtual void setupUI(QString airframeType);

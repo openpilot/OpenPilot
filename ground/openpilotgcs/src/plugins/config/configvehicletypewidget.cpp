@@ -41,6 +41,9 @@
 #include "systemsettings.h"
 #include "mixersettings.h"
 #include "actuatorsettings.h"
+#include <extensionsystem/pluginmanager.h>
+#include <coreplugin/generalsettings.h>
+
 
 /**
   Helper delegate for the custom mixer editor table.
@@ -97,6 +100,11 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
 {
     m_aircraft = new Ui_AircraftWidget();
     m_aircraft->setupUi(this);
+    
+    ExtensionSystem::PluginManager *pm=ExtensionSystem::PluginManager::instance();
+    Core::Internal::GeneralSettings * settings=pm->getObject<Core::Internal::GeneralSettings>();
+    if(!settings->useExpertMode())
+        m_aircraft->saveAircraftToRAM->setVisible(false);
 
     addApplySaveButtons(m_aircraft->saveAircraftToRAM,m_aircraft->saveAircraftToSD);
 
@@ -109,7 +117,7 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
 
     //Generate lists of mixerTypeNames, mixerVectorNames, channelNames
     channelNames << "None";
-    for (int i = 0; i < ActuatorSettings::CHANNELADDR_NUMELEM; i++) {
+    for (int i = 0; i < (int)ActuatorSettings::CHANNELADDR_NUMELEM; i++) {
 
         mixerTypes << QString("Mixer%1Type").arg(i+1);
         mixerVectors << QString("Mixer%1Vector").arg(i+1);
@@ -164,14 +172,14 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     UAVObjectField* field = obj->getField(QString("Mixer1Type"));
     QStringList list = field->getOptions();
-    for (int i=0;i<8;i++) {
+    for (int i=0; i<(int)(VehicleConfig::CHANNEL_NUMELEM); i++) {
         QComboBox* qb = new QComboBox(m_aircraft->customMixerTable);
         qb->addItems(list);
         m_aircraft->customMixerTable->setCellWidget(0,i,qb);
     }
 
     SpinBoxDelegate *sbd = new SpinBoxDelegate();
-    for (int i=1;i<8; i++) {
+    for (int i=1; i<(int)(VehicleConfig::CHANNEL_NUMELEM); i++) {
         m_aircraft->customMixerTable->setItemDelegateForRow(i, sbd);
     }
 
@@ -193,9 +201,6 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
     m_heli = m_aircraft->widget_3;
     m_heli->setupUI(QString("HeliCP"));
 
-    // initialize the ui to show the mixersettings tab
-    //mdl m_aircraft->tabWidget->setCurrentIndex(0);
-
 	//Connect aircraft type selection dropbox to callback function
     connect(m_aircraft->aircraftType, SIGNAL(currentIndexChanged(int)), this, SLOT(switchAirframeType(int)));
 	
@@ -204,25 +209,6 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
     connect(m_aircraft->multirotorFrameType, SIGNAL(currentIndexChanged(QString)), this, SLOT(setupAirframeUI(QString)));
     connect(m_aircraft->groundVehicleType, SIGNAL(currentIndexChanged(QString)), this, SLOT(setupAirframeUI(QString)));
     //mdl connect(m_heli->m_ccpm->ccpmType, SIGNAL(currentIndexChanged(QString)), this, SLOT(setupAirframeUI(QString)));
-
-	//Connect throttle curve reset pushbuttons to reset functions
-    connect(m_aircraft->fwThrottleReset, SIGNAL(clicked()), this, SLOT(resetFwMixer()));
-    connect(m_aircraft->mrThrottleCurveReset, SIGNAL(clicked()), this, SLOT(resetMrMixer()));
-    connect(m_aircraft->gvThrottleCurve1Reset, SIGNAL(clicked()), this, SLOT(resetGvFrontMixer()));	
-    connect(m_aircraft->gvThrottleCurve2Reset, SIGNAL(clicked()), this, SLOT(resetGvRearMixer()));	
-    connect(m_aircraft->customReset1, SIGNAL(clicked()), this, SLOT(resetCt1Mixer()));
-    connect(m_aircraft->customReset2, SIGNAL(clicked()), this, SLOT(resetCt2Mixer()));
-
-	//Connect throttle curve manipulation points to output text
-    connect(m_aircraft->fixedWingThrottle, SIGNAL(curveUpdated(QList<double>,double)), this, SLOT(updateFwThrottleCurveValue(QList<double>,double)));
-    connect(m_aircraft->multiThrottleCurve, SIGNAL(curveUpdated(QList<double>,double)), this, SLOT(updateMrThrottleCurveValue(QList<double>,double)));
-    connect(m_aircraft->groundVehicleThrottle1, SIGNAL(curveUpdated(QList<double>,double)), this, SLOT(updateGvThrottle1CurveValue(QList<double>,double)));
-    connect(m_aircraft->groundVehicleThrottle2, SIGNAL(curveUpdated(QList<double>,double)), this, SLOT(updateGvThrottle2CurveValue(QList<double>,double)));
-    connect(m_aircraft->customThrottle1Curve, SIGNAL(curveUpdated(QList<double>,double)), this, SLOT(updateCustomThrottle1CurveValue(QList<double>,double)));
-    connect(m_aircraft->customThrottle2Curve, SIGNAL(curveUpdated(QList<double>,double)), this, SLOT(updateCustomThrottle2CurveValue(QList<double>,double)));
-
-//    connect(m_aircraft->fwAileron1Channel, SIGNAL(currentIndexChanged(int)), this, SLOT(toggleAileron2(int)));
-//    connect(m_aircraft->fwElevator1Channel, SIGNAL(currentIndexChanged(int)), this, SLOT(toggleElevator2(int)));
 
     //Connect the three feed forward test checkboxes
     connect(m_aircraft->ffTestBox1, SIGNAL(clicked(bool)), this, SLOT(enableFFTest()));
@@ -273,16 +259,14 @@ QStringList ConfigVehicleTypeWidget::getChannelDescriptions()
         case SystemSettings::AIRFRAMETYPE_FIXEDWINGELEVON:
         case SystemSettings::AIRFRAMETYPE_FIXEDWINGVTAIL:
         {
-            QPointer<ConfigFixedWingWidget> fixedwing = new ConfigFixedWingWidget();
-            channelDesc = fixedwing->getChannelDescriptions();
+            channelDesc = ConfigFixedWingWidget::getChannelDescriptions();
         }
         break;
 
         // helicp
         case SystemSettings::AIRFRAMETYPE_HELICP:
         {
-            QPointer<ConfigCcpmWidget> heli = new ConfigCcpmWidget();
-            channelDesc = heli->getChannelDescriptions();
+            channelDesc = ConfigCcpmWidget::getChannelDescriptions();
         }
         break;
 
@@ -299,8 +283,7 @@ QStringList ConfigVehicleTypeWidget::getChannelDescriptions()
         case SystemSettings::AIRFRAMETYPE_HEXACOAX:
         case SystemSettings::AIRFRAMETYPE_HEXA:
         {
-            QPointer<ConfigMultiRotorWidget> multi = new ConfigMultiRotorWidget();
-            channelDesc = multi->getChannelDescriptions();
+            channelDesc = ConfigMultiRotorWidget::getChannelDescriptions();
         }
         break;
 
@@ -309,8 +292,7 @@ QStringList ConfigVehicleTypeWidget::getChannelDescriptions()
         case SystemSettings::AIRFRAMETYPE_GROUNDVEHICLEDIFFERENTIAL:
         case SystemSettings::AIRFRAMETYPE_GROUNDVEHICLEMOTORCYCLE:
         {
-            QPointer<ConfigGroundVehicleWidget> ground = new ConfigGroundVehicleWidget();
-            channelDesc = ground->getChannelDescriptions();
+            channelDesc = ConfigGroundVehicleWidget::getChannelDescriptions();
         }
         break;
 
@@ -341,9 +323,9 @@ void ConfigVehicleTypeWidget::switchAirframeType(int index)
     m_aircraft->quadShape->fitInView(quad, Qt::KeepAspectRatio);
     if (m_aircraft->aircraftType->findText("Custom")) {
         m_aircraft->customMixerTable->resizeColumnsToContents();
-        for (int i=0;i<8;i++) {
+        for (int i=0;i<(int)(VehicleConfig::CHANNEL_NUMELEM);i++) {
             m_aircraft->customMixerTable->setColumnWidth(i,(m_aircraft->customMixerTable->width()-
-                                                            m_aircraft->customMixerTable->verticalHeader()->width())/8);
+                                                            m_aircraft->customMixerTable->verticalHeader()->width())/10);
         }
     }
 }
@@ -360,9 +342,9 @@ void ConfigVehicleTypeWidget::showEvent(QShowEvent *event)
     // the result is usually a ahrsbargraph that is way too small.
     m_aircraft->quadShape->fitInView(quad, Qt::KeepAspectRatio);
     m_aircraft->customMixerTable->resizeColumnsToContents();
-    for (int i=0;i<8;i++) {
+    for (int i=0;i<(int)(VehicleConfig::CHANNEL_NUMELEM);i++) {
         m_aircraft->customMixerTable->setColumnWidth(i,(m_aircraft->customMixerTable->width()-
-                                                        m_aircraft->customMixerTable->verticalHeader()->width())/8);
+                                                        m_aircraft->customMixerTable->verticalHeader()->width())/ 10);
     }
 }
 
@@ -375,9 +357,9 @@ void ConfigVehicleTypeWidget::resizeEvent(QResizeEvent* event)
     m_aircraft->quadShape->fitInView(quad, Qt::KeepAspectRatio);
     // Make the custom table columns autostretch:
     m_aircraft->customMixerTable->resizeColumnsToContents();
-    for (int i=0;i<8;i++) {
+    for (int i=0;i<(int)(VehicleConfig::CHANNEL_NUMELEM);i++) {
         m_aircraft->customMixerTable->setColumnWidth(i,(m_aircraft->customMixerTable->width()-
-                                                        m_aircraft->customMixerTable->verticalHeader()->width())/8);
+                                                        m_aircraft->customMixerTable->verticalHeader()->width())/ 10);
     }
 
 }
@@ -477,132 +459,6 @@ void ConfigVehicleTypeWidget::enableFFTest()
         }
     }
 }
-
-
-/**
-  Resets Fixed wing throttle mixer
-  */
-void ConfigVehicleTypeWidget::resetFwMixer()
-{
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-    UAVObjectField* field = obj->getField(QString("ThrottleCurve1"));
-    resetMixer(m_aircraft->fixedWingThrottle, field->getNumElements(),1);
-}
-
-/**
-  Resets Multirotor throttle mixer
-  */
-void ConfigVehicleTypeWidget::resetMrMixer()
-{
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-    UAVObjectField* field = obj->getField(QString("ThrottleCurve1"));
-    resetMixer(m_aircraft->multiThrottleCurve, field->getNumElements(),0.9);
-}
-
-/**
- Resets Ground vehicle front throttle mixer
- */
-void ConfigVehicleTypeWidget::resetGvFrontMixer()
-{
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-    UAVObjectField* field = obj->getField(QString("ThrottleCurve1"));
-    resetMixer(m_aircraft->groundVehicleThrottle1, field->getNumElements(),1);
-}
-
-/**
- Resets Ground vehicle rear throttle mixer
- */
-void ConfigVehicleTypeWidget::resetGvRearMixer()
-{
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-    UAVObjectField* field = obj->getField(QString("ThrottleCurve2"));
-    resetMixer(m_aircraft->groundVehicleThrottle2, field->getNumElements(),1);
-}
-
-/**
-  Resets Custom throttle 1 mixer
-  */
-void ConfigVehicleTypeWidget::resetCt1Mixer()
-{
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-    UAVObjectField* field = obj->getField(QString("ThrottleCurve1"));
-    resetMixer(m_aircraft->customThrottle1Curve, field->getNumElements(),1);
-}
-
-/**
-  Resets Custom throttle 2 mixer
-  */
-void ConfigVehicleTypeWidget::resetCt2Mixer()
-{
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-    UAVObjectField* field = obj->getField(QString("ThrottleCurve2"));
-    resetMixer(m_aircraft->customThrottle2Curve, field->getNumElements(),1);
-}
-
-
-/**
-  Resets a mixer curve
-  */
-void ConfigVehicleTypeWidget::resetMixer(MixerCurveWidget *mixer, int numElements, double maxvalue)
-{
-    // Setup all Throttle1 curves for all types of airframes
-    mixer->initLinearCurve((quint32)numElements,maxvalue);
-}
-
-/**
-  Updates the currently moved fixed wing throttle curve item value
-  */
-void ConfigVehicleTypeWidget::updateFwThrottleCurveValue(QList<double> list, double value)
-{
-    Q_UNUSED(list);
-    m_aircraft->fwThrottleCurveItemValue->setText(QString().sprintf("Val: %.2f",value));
-}
-
-/**
-  Updates the currently moved multi-rotor throttle curve item value
-  */
-void ConfigVehicleTypeWidget::updateMrThrottleCurveValue(QList<double> list, double value)
-{
-    Q_UNUSED(list);
-    m_aircraft->mrThrottleCurveItemValue->setText(QString().sprintf("Val: %.2f",value));
-}
-
-/**
- Updates the moved ground vehicle front throttle curve item value
- */
-void ConfigVehicleTypeWidget::updateGvThrottle1CurveValue(QList<double> list, double value)
-{
-    Q_UNUSED(list);
-    m_aircraft->gvThrottleCurve1ItemValue->setText(QString().sprintf("Val: %.2f",value));
-}
-
-/**
- Updates the moved ground vehicle rear throttle curve item value
- */
-void ConfigVehicleTypeWidget::updateGvThrottle2CurveValue(QList<double> list, double value)
-{
-    Q_UNUSED(list);
-    m_aircraft->gvThrottleCurve2ItemValue->setText(QString().sprintf("Val: %.2f",value));
-}
-
-/**
-  Updates the currently moved custom throttle curve item value (Custom throttle 1)
-  */
-void ConfigVehicleTypeWidget::updateCustomThrottle1CurveValue(QList<double> list, double value)
-{
-    Q_UNUSED(list);
-    m_aircraft->customThrottleCurve1Value->setText(QString().sprintf("Val: %.2f",value));
-}
-
-/**
-  Updates the currently moved custom throttle curve item value (Custom throttle 2)
-  */
-void ConfigVehicleTypeWidget::updateCustomThrottle2CurveValue(QList<double> list, double value)
-{
-    Q_UNUSED(list);
-    m_aircraft->customThrottleCurve2Value->setText(QString().sprintf("Val: %.2f",value));
-}
-
 
 /**************************
   * Aircraft settings
@@ -763,30 +619,34 @@ void ConfigVehicleTypeWidget::updateCustomAirframeUI()
 
     // is at least one of the curve values != 0?
     if (vconfig->isValidThrottleCurve(&curveValues)) {
-        // yes, use the curve we just read from mixersettings
-        m_aircraft->customThrottle1Curve->setMin(vconfig->getCurveMin(&curveValues));
-        m_aircraft->customThrottle1Curve->setMax(vconfig->getCurveMax(&curveValues));
         m_aircraft->customThrottle1Curve->initCurve(&curveValues);
     }
     else {
         // no, init a straight curve
-        m_aircraft->customThrottle1Curve->initLinearCurve(curveValues.count(),(double)1);
+        m_aircraft->customThrottle1Curve->initLinearCurve(curveValues.count(), 1.0);
     }
 
-    // Setup all Throttle2 curves for all types of airframes //AT THIS MOMENT, THAT MEANS ONLY GROUND VEHICLES
+    if (MixerSettings* mxr = qobject_cast<MixerSettings *>(mixer)) {
+        MixerSettings::DataFields mixerSettingsData = mxr->getData();
+        if (mixerSettingsData.Curve2Source == MixerSettings::CURVE2SOURCE_THROTTLE)
+            m_aircraft->customThrottle2Curve->setMixerType(MixerCurve::MIXERCURVE_THROTTLE);
+        else {
+            m_aircraft->customThrottle2Curve->setMixerType(MixerCurve::MIXERCURVE_PITCH);
+        }
+    }
+
+    // Setup all Throttle2 curves for all types of airframes
     vconfig->getThrottleCurve(mixer, VehicleConfig::MIXER_THROTTLECURVE2, &curveValues);
 
     if (vconfig->isValidThrottleCurve(&curveValues)) {
-        m_aircraft->customThrottle2Curve->setMin(vconfig->getCurveMin(&curveValues));
-        m_aircraft->customThrottle2Curve->setMax(vconfig->getCurveMax(&curveValues));
         m_aircraft->customThrottle2Curve->initCurve(&curveValues);
     }
     else {
-        m_aircraft->customThrottle2Curve->initLinearCurve(curveValues.count(),(double)1);
+        m_aircraft->customThrottle2Curve->initLinearCurve(curveValues.count(), 1.0, m_aircraft->customThrottle2Curve->getMin());
     }
 
     // Update the mixer table:
-    for (int channel=0; channel<8; channel++) {
+    for (int channel=0; channel<(int)(VehicleConfig::CHANNEL_NUMELEM); channel++) {
         UAVObjectField* field = mixer->getField(mixerTypes.at(channel));
         if (field)
         {
@@ -856,7 +716,7 @@ void ConfigVehicleTypeWidget::updateObjectsFromWidgets()
         vconfig->setThrottleCurve(mixer, VehicleConfig::MIXER_THROTTLECURVE2, m_aircraft->customThrottle2Curve->getCurve());
 
         // Update the table:
-        for (int channel=0; channel<8; channel++) {
+        for (int channel=0; channel<(int)(VehicleConfig::CHANNEL_NUMELEM); channel++) {
             QComboBox* q = (QComboBox*)m_aircraft->customMixerTable->cellWidget(0,channel);
 
             vconfig->setMixerType(mixer,channel,
@@ -892,7 +752,7 @@ void ConfigVehicleTypeWidget::updateObjectsFromWidgets()
 void ConfigVehicleTypeWidget::openHelp()
 {
 
-    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/Airframe+configuration", QUrl::StrictMode) );
+    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/x/44Cf", QUrl::StrictMode) );
 }
 
 /**
@@ -912,13 +772,13 @@ void ConfigVehicleTypeWidget::setComboCurrentIndex(QComboBox* box, int index)
 void ConfigVehicleTypeWidget::addToDirtyMonitor()
 {
     addWidget(m_aircraft->customMixerTable);
-    addWidget(m_aircraft->customThrottle1Curve);
-    addWidget(m_aircraft->customThrottle2Curve);
-    addWidget(m_aircraft->multiThrottleCurve);
-    addWidget(m_aircraft->fixedWingThrottle);
+    addWidget(m_aircraft->customThrottle1Curve->getCurveWidget());
+    addWidget(m_aircraft->customThrottle2Curve->getCurveWidget());
+    addWidget(m_aircraft->multiThrottleCurve->getCurveWidget());
+    addWidget(m_aircraft->fixedWingThrottle->getCurveWidget());
     addWidget(m_aircraft->fixedWingType);
-    addWidget(m_aircraft->groundVehicleThrottle1);
-    addWidget(m_aircraft->groundVehicleThrottle2);
+    addWidget(m_aircraft->groundVehicleThrottle1->getCurveWidget());
+    addWidget(m_aircraft->groundVehicleThrottle2->getCurveWidget());
     addWidget(m_aircraft->groundVehicleType);
     addWidget(m_aircraft->feedForwardSlider);
     addWidget(m_aircraft->accelTime);
@@ -976,15 +836,8 @@ void ConfigVehicleTypeWidget::addToDirtyMonitor()
     addWidget(m_heli->m_ccpm->ccpmRollScaleBox);
     addWidget(m_heli->m_ccpm->SwashLvlPositionSlider);
     addWidget(m_heli->m_ccpm->SwashLvlPositionSpinBox);
-    addWidget(m_heli->m_ccpm->CurveType);
-    addWidget(m_heli->m_ccpm->NumCurvePoints);
-    addWidget(m_heli->m_ccpm->CurveValue1);
-    addWidget(m_heli->m_ccpm->CurveValue2);
-    addWidget(m_heli->m_ccpm->CurveValue3);
-    addWidget(m_heli->m_ccpm->CurveToGenerate);
-    addWidget(m_heli->m_ccpm->CurveSettings);
-    addWidget(m_heli->m_ccpm->ThrottleCurve);
-    addWidget(m_heli->m_ccpm->PitchCurve);
+    addWidget(m_heli->m_ccpm->ThrottleCurve->getCurveWidget());
+    addWidget(m_heli->m_ccpm->PitchCurve->getCurveWidget());
     addWidget(m_heli->m_ccpm->ccpmAdvancedSettingsTable);
 }
 

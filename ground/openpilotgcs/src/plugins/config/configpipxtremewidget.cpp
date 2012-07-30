@@ -52,7 +52,7 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
 	} else {
 		qDebug() << "Error: Object is unknown (PipXSettings).";
 	}
-
+    autoLoadWidgets();
 	addApplySaveButtons(m_pipx->Apply, m_pipx->Save);
 
 	addUAVObjectToWidgetRelation("PipXSettings", "TelemetryConfig", m_pipx->TelemPortConfig);
@@ -71,6 +71,8 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
 	addUAVObjectToWidgetRelation("PipXStatus", "MinFrequency", m_pipx->MinFrequency);
 	addUAVObjectToWidgetRelation("PipXStatus", "MaxFrequency", m_pipx->MaxFrequency);
 	addUAVObjectToWidgetRelation("PipXStatus", "FrequencyStepSize", m_pipx->FrequencyStepSize);
+	addUAVObjectToWidgetRelation("PipXStatus", "FrequencyBand", m_pipx->FreqBand);
+	addUAVObjectToWidgetRelation("PipXStatus", "RSSI", m_pipx->RSSI);
 	addUAVObjectToWidgetRelation("PipXStatus", "AFC", m_pipx->RxAFC);
 	addUAVObjectToWidgetRelation("PipXStatus", "Retries", m_pipx->Retries);
 	addUAVObjectToWidgetRelation("PipXStatus", "Errors", m_pipx->Errors);
@@ -81,6 +83,7 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
 	addUAVObjectToWidgetRelation("PipXStatus", "TXRate", m_pipx->TXRate);
 
 	// Connect to the pair ID radio buttons.
+	connect(m_pipx->PairSelectB, SIGNAL(toggled(bool)), this, SLOT(pairBToggled(bool)));
 	connect(m_pipx->PairSelect1, SIGNAL(toggled(bool)), this, SLOT(pair1Toggled(bool)));
 	connect(m_pipx->PairSelect2, SIGNAL(toggled(bool)), this, SLOT(pair2Toggled(bool)));
 	connect(m_pipx->PairSelect3, SIGNAL(toggled(bool)), this, SLOT(pair3Toggled(bool)));
@@ -89,6 +92,7 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
 	//Add scroll bar when necessary
 	QScrollArea *scroll = new QScrollArea;
 	scroll->setWidget(m_pipx->frame_3);
+	scroll->setWidgetResizable(true);
 	m_pipx->verticalLayout_3->addWidget(scroll);
 
 	// Request and update of the setting object.
@@ -148,7 +152,7 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
 	PipXSettings *pipxSettings = PipXSettings::GetInstance(getObjectManager());
 	quint32 pairID = 0;
 	if (pipxSettings)
-		pipxSettings->getPairID();
+		pairID = pipxSettings->getPairID();
 
 	// Update the detected devices.
 	UAVObjectField* pairIdField = object->getField("PairIDs");
@@ -245,6 +249,9 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
 		qDebug() << "PipXtremeGadgetWidget: Count not read DeviceID field.";
 	}
 
+	// Update the PairID field
+	m_pipx->PairID->setText(QString::number(pairID, 16).toUpper());
+
  	// Update the link state
  	UAVObjectField* linkField = object->getField("LinkState");
  	if (linkField) {
@@ -284,9 +291,16 @@ void ConfigPipXtremeWidget::pairIDToggled(bool checked, quint8 idx)
 
 		if (pipxStatus && pipxSettings)
 		{
-			quint32 pairID = pipxStatus->getPairIDs(idx);
-			if (pairID)
-				pipxSettings->setPairID(pairID);
+			if (idx == 4)
+			{
+				pipxSettings->setPairID(0);
+			}
+			else
+			{
+				quint32 pairID = pipxStatus->getPairIDs(idx);
+				if (pairID)
+					pipxSettings->setPairID(pairID);
+			}
 		}
 	}
 }
@@ -309,6 +323,11 @@ void ConfigPipXtremeWidget::pair3Toggled(bool checked)
 void ConfigPipXtremeWidget::pair4Toggled(bool checked)
 {
 	pairIDToggled(checked, 3);
+}
+
+void ConfigPipXtremeWidget::pairBToggled(bool checked)
+{
+	pairIDToggled(checked, 4);
 }
 
 /**

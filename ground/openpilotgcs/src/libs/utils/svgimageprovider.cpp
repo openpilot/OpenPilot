@@ -31,6 +31,7 @@
 #include <QUrl>
 
 SvgImageProvider::SvgImageProvider(const QString &basePath):
+    QObject(),
     QDeclarativeImageProvider(QDeclarativeImageProvider::Image),
     m_basePath(basePath)
 {
@@ -39,6 +40,30 @@ SvgImageProvider::SvgImageProvider(const QString &basePath):
 SvgImageProvider::~SvgImageProvider()
 {
     qDeleteAll(m_renderers);
+}
+
+QSvgRenderer *SvgImageProvider::loadRenderer(const QString &svgFile)
+{
+    QSvgRenderer *renderer = m_renderers.value(svgFile);
+    if (!renderer) {
+        renderer = new QSvgRenderer(svgFile);
+
+        QString fn = QUrl::fromLocalFile(m_basePath).resolved(svgFile).toLocalFile();
+
+        //convert path to be relative to base
+        if (!renderer->isValid())
+            renderer->load(fn);
+
+        if (!renderer->isValid()) {
+            qWarning() << "Failed to load svg file:" << svgFile << fn;
+            delete renderer;
+            return 0;
+        }
+
+        m_renderers.insert(svgFile, renderer);
+    }
+
+    return renderer;
 }
 
 /**
@@ -58,23 +83,9 @@ QImage SvgImageProvider::requestImage(const QString &id, QSize *size, const QSiz
     if (size)
         *size = QSize();
 
-    QSvgRenderer *renderer = m_renderers.value(svgFile);
-    if (!renderer) {
-        renderer = new QSvgRenderer(svgFile);
-
-        QString fn = QUrl::fromLocalFile(m_basePath).resolved(svgFile).toLocalFile();
-
-        //convert path to be relative to base
-        if (!renderer->isValid())
-            renderer->load(fn);
-
-        if (!renderer->isValid()) {
-            qWarning() << "Failed to load svg file:" << svgFile << fn;
-            return QImage();
-        }
-
-        m_renderers.insert(svgFile, renderer);
-    }
+    QSvgRenderer *renderer = loadRenderer(svgFile);
+    if (!renderer)
+        return QImage();
 
     qreal xScale = 1.0;
     qreal yScale = 1.0;
@@ -127,4 +138,33 @@ QImage SvgImageProvider::requestImage(const QString &id, QSize *size, const QSiz
 QPixmap SvgImageProvider::requestPixmap(const QString &id, QSize *size, const QSize &requestedSize)
 {
     return QPixmap::fromImage(requestImage(id, size, requestedSize));
+}
+
+/*!
+  \fn SvgImageProvider::scaledElementBounds(const QString &svgFile, const QString &element)
+
+  Returns the bound of \a element in logical coordinates,
+  scalled to the default size of svg document (so the bounds of whole doc would be (0,0,1,1) ).
+*/
+QRectF SvgImageProvider::scaledElementBounds(const QString &svgFile, const QString &elementName)
+{
+    QSvgRenderer *renderer = loadRenderer(svgFile);
+
+    if (!renderer)
+        return QRectF();
+
+    if (!renderer->elementExists(elementName)) {
+        qWarning() << "invalid element:" << elementName << "of" << svgFile;
+        return QRectF();
+    }
+
+    QRectF elementBounds = renderer->boundsOnElement(elementName);
+    QMatrix matrix = renderer->matrixForElement(elementName);
+    elementBounds = matrix.mapRect(elementBounds);
+
+    QSize docSize = renderer->defaultSize();
+    return QRectF(elementBounds.x()/docSize.width(),
+                  elementBounds.y()/docSize.height(),
+                  elementBounds.width()/docSize.width(),
+                  elementBounds.height()/docSize.height());
 }

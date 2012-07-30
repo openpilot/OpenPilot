@@ -29,6 +29,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 #include <QStyleOption>
+#include <QColor>
 #include <QDebug>
 
 #include "mixercurveline.h"
@@ -42,7 +43,18 @@ Node::Node(MixerCurveWidget *graphWidget)
     setFlag(ItemSendsGeometryChanges);
     setCacheMode(DeviceCoordinateCache);
     setZValue(-1);
+    cmdActive = false;
     vertical = false;
+    cmdNode = false;
+    cmdToggle = true;    
+    drawNode = true;
+    drawText = true;
+
+    posColor0 = "#1c870b";  //greenish?
+    posColor1 = "#116703";  //greenish?
+    negColor0 = "#aa0000";  //red
+    negColor1 = "#aa0000";  //red
+
 }
 
 void Node::addEdge(Edge *edge)
@@ -59,46 +71,72 @@ QList<Edge *> Node::edges() const
 
 QRectF Node::boundingRect() const
 {
-    qreal adjust = 2;
-    return QRectF(-12 - adjust, -12 - adjust,
-                  28 + adjust, 28 + adjust);
+    return cmdNode ? QRectF(-4, -4, 15, 10) : QRectF(-13, -13, 26, 26);
 }
 
 QPainterPath Node::shape() const
 {
     QPainterPath path;
-    path.addEllipse(-12, -12, 25, 25);
+    path.addEllipse(boundingRect());
     return path;
 }
 
 void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *)
 {
-    /*
-    painter->setPen(Qt::NoPen);
-    painter->setBrush(Qt::darkGray);
-    painter->drawEllipse(-7, -7, 20, 20);
-    */
+    QString text = cmdNode ? cmdText : QString().sprintf("%.2f", value());
 
-    QRadialGradient gradient(-3, -3, 10);
-    if (option->state & QStyle::State_Sunken) {
-        gradient.setCenter(3, 3);
-        gradient.setFocalPoint(3, 3);
-        gradient.setColorAt(1, QColor("#1c870b").light(120));
-        gradient.setColorAt(0, QColor("#116703").light(120));
-    } else {
-        gradient.setColorAt(0, "#1c870b");
-        gradient.setColorAt(1, "#116703");
+    if (drawNode) {
+        QRadialGradient gradient(-3, -3, 10);
+        if (option->state & QStyle::State_Sunken) {
+            gradient.setCenter(3, 3);
+            gradient.setFocalPoint(3, 3);
+
+            gradient.setColorAt(1, Qt::darkBlue);
+            gradient.setColorAt(0, Qt::darkBlue);
+        } else {
+            if (cmdNode) {
+                gradient.setColorAt(0, cmdActive ? posColor0 : negColor0);
+                gradient.setColorAt(1, cmdActive ? posColor1 : negColor1);
+            }
+            else {
+                if (value() < 0) {
+                    gradient.setColorAt(0, negColor0);
+                    gradient.setColorAt(1, negColor1);
+                }
+                else {
+                    gradient.setColorAt(0, posColor0);
+                    gradient.setColorAt(1, posColor1);
+                }
+            }
+        }
+        painter->setBrush(gradient);
+        painter->setPen(QPen(Qt::black, 0));
+        painter->drawEllipse(boundingRect());
+
+        if (!image.isNull())
+            painter->drawImage(boundingRect().adjusted(1,1,-1,-1), image);
     }
-    painter->setBrush(gradient);
-    painter->setPen(QPen(Qt::black, 0));
-    painter->drawEllipse(-12, -12, 25, 25);
 
-    painter->setPen(QPen(Qt::white, 0));
-    painter->drawText(-10, 3, QString().sprintf("%.2f", value()));
+    if (drawText) {
+        painter->setPen(QPen(drawNode ? Qt::white : Qt::black, 0));
+        if (cmdNode) {
+            painter->drawText(0,4,text);
+        }
+        else {
+            painter->drawText( (value() < 0) ? -13 : -11, 4, text);
+        }
+    }
 }
 
 void Node::verticalMove(bool flag){
     vertical = flag;
+}
+
+void Node::commandNode(bool enable){
+    cmdNode = enable;
+}
+void Node::commandText(QString text){
+    cmdText = text;
 }
 
 double Node::value() {
@@ -149,6 +187,10 @@ QVariant Node::itemChange(GraphicsItemChange change, const QVariant &val)
 
 void Node::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
+    if (cmdNode) {
+        graph->cmdActivated(this);
+        //return;
+    }
     update();
     QGraphicsItem::mousePressEvent(event);
 }

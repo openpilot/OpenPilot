@@ -67,7 +67,6 @@ private:
     void updateCustomAirframeUI();
     void addToDirtyMonitor();
     void resetField(UAVObjectField * field);
-    void resetMixer (MixerCurveWidget *mixer, int numElements, double maxvalue);
 
     //void setMixerChannel(int channelNumber, bool channelIsMotor, QList<double> vector);
 
@@ -93,18 +92,7 @@ private slots:
     void toggleElevator2(int index);
     void toggleRudder2(int index);
     void switchAirframeType(int index);
-    void resetFwMixer();
-    void resetMrMixer();
-    void resetGvFrontMixer();
-    void resetGvRearMixer();
-    void resetCt1Mixer();
-    void resetCt2Mixer();
-    void updateFwThrottleCurveValue(QList<double> list, double value);
-    void updateMrThrottleCurveValue(QList<double> list, double value);
-    void updateGvThrottle1CurveValue(QList<double> list, double value);
-    void updateGvThrottle2CurveValue(QList<double> list, double value);
-    void updateCustomThrottle1CurveValue(QList<double> list, double value);
-    void updateCustomThrottle2CurveValue(QList<double> list, double value);
+
     void enableFFTest();
     void openHelp();
 

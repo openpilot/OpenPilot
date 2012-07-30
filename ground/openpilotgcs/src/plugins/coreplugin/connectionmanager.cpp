@@ -81,7 +81,7 @@ ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow, QTabWidge
     //    modeStack->insertCornerWidget(modeStack->cornerWidgetCount()-1, this);
     modeStack->setCornerWidget(this, Qt::TopRightCorner);
 
-	QObject::connect(m_connectBtn, SIGNAL(pressed()), this, SLOT(onConnectPressed()));
+    QObject::connect(m_connectBtn, SIGNAL(clicked()), this, SLOT(onConnectClicked()));
 }
 
 ConnectionManager::~ConnectionManager()
@@ -224,9 +224,9 @@ void ConnectionManager::onConnectionDestroyed(QObject *obj)	// Pip
 }
 
 /**
-*   Slot called when the user pressed the connect/disconnect button
+*   Slot called when the user clicks the connect/disconnect button
 */
-void ConnectionManager::onConnectPressed()
+void ConnectionManager::onConnectClicked()
 {
     // Check if we have a ioDev already created:
     if (!m_ioDev)

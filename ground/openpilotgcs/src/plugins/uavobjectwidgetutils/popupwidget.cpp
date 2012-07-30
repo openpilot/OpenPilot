@@ -37,6 +37,9 @@ void PopupWidget::setWidget(QWidget* widget)
     m_widget = widget;
     m_widgetParent = widget->parentWidget();
 
+    m_widgetWidth = m_widget->width();
+    m_widgetHeight = m_widget->height();
+
     m_layout->addWidget(m_widget);
 }
 
@@ -59,6 +62,7 @@ void PopupWidget::closePopup()
     if (m_widget && m_widgetParent) {
         if(QGroupBox * w =qobject_cast<QGroupBox *>(m_widgetParent))
         {
+            m_widget->resize(m_widgetWidth, m_widgetHeight);
             w->layout()->addWidget(m_widget);
         }
     }

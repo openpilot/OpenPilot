@@ -48,14 +48,70 @@ endif
 
 FLASH_TOOL = OPENOCD
 
+# Optional module and driver defaults
+USE_CAMERASTAB ?= YES
+USE_COMUSBBRIDGE ?= NO
+USE_GPS ?= YES
+USE_TXPID ?= NO
+USE_I2C ?= NO
+USE_ALTITUDE ?= NO
+TEST_FAULTS ?= NO
+USE_MAGBARO ?= NO
+USE_OVEROSYNC ?= YES
+USE_BATTERY ?= YES
+USE_VTOLPATHFOLLOWER ?= YES
+USE_FIXEDWINGPATHFOLLOWER ?= YES
+
+# List of optional modules to include
+OPTMODULES =
+ifeq ($(USE_CAMERASTAB), YES)
+OPTMODULES += CameraStab
+endif
+ifeq ($(USE_COMUSBBRIDGE), YES)
+OPTMODULES += ComUsbBridge
+endif
+ifeq ($(USE_GPS), YES)
+OPTMODULES += GPS
+endif
+ifeq ($(USE_TXPID), YES)
+OPTMODULES += TxPID
+endif
+ifeq ($(USE_ALTITUDE), YES)
+ifeq ($(USE_I2C), YES)
+OPTMODULES += Altitude
+else
+$(error "Altitude module (USE_ALTITUDE=YES) requires i2c (USE_I2C=YES)")
+endif
+endif
+ifeq ($(TEST_FAULTS), YES)
+OPTMODULES += Fault
+endif
+ifeq ($(USE_MAGBARO), YES)
+ifeq ($(USE_I2C), YES)
+OPTMODULES += Extensions/MagBaro
+else
+$(error "MagBaro module (USE_MAGBARO=YES) requires i2c (USE_I2C=YES)")
+endif
+endif
+ifeq ($(USE_OVEROSYNC), YES)
+OPTMODULES += OveroSync
+endif
+ifeq ($(USE_BATTERY), YES)
+OPTMODULES += Battery
+endif
+ifeq ($(USE_VTOLPATHFOLLOWER), YES)
+OPTMODULES += VtolPathFollower
+endif
+ifeq ($(USE_FIXEDWINGPATHFOLLOWER), YES)
+OPTMODULES += FixedWingPathFollower
+endif
+
+
 # List of modules to include
 MODULES = Sensors Attitude/revolution ManualControl Stabilization Actuator
-MODULES += Battery
-MODULES += Altitude/revolution  GPS FirmwareIAP
+MODULES += Altitude/revolution FirmwareIAP
 MODULES += Airspeed/revolution
-MODULES += AltitudeHold VtolPathFollower FixedWingPathFollower PathPlanner
-MODULES += CameraStab
-MODULES += OveroSync
+MODULES += AltitudeHold PathPlanner
 MODULES += Telemetry
 PYMODULES = 
 #FlightPlan
@@ -119,6 +175,7 @@ PYSRC += ${foreach MOD, ${PYMODULES}, ${wildcard ${OPMODULEDIR}/${MOD}/*.c}}
 SRC += $(PYSRC)
 
 ## MODULES
+SRC += ${foreach MOD, ${OPTMODULES}, ${wildcard ${OPMODULEDIR}/${MOD}/*.c}}
 SRC += ${foreach MOD, ${MODULES}, ${wildcard ${OPMODULEDIR}/${MOD}/*.c}}
 ## OPENPILOT CORE:
 SRC += ${OPMODULEDIR}/System/systemmod.c
@@ -227,7 +284,7 @@ ${OUTDIR}/pmlib_img.c ${OUTDIR}/pmlib_nat.c ${OUTDIR}/pmlibusr_img.c ${OUTDIR}/p
 	@$(PYTHON) $(PYMITETOOLS)/pmImgCreator.py -f $(PYMITEPLAT)/pmfeatures.py -c -s --memspace=flash -o $(OUTDIR)/pmlib_img.c --native-file=$(OUTDIR)/pmlib_nat.c $(PYMITELIB)/list.py $(PYMITELIB)/dict.py $(PYMITELIB)/__bi.py $(PYMITELIB)/sys.py $(PYMITELIB)/string.py $(wildcard $(FLIGHTPLANLIB)/*.py)
 	@$(PYTHON) $(PYMITETOOLS)/pmGenPmFeatures.py $(PYMITEPLAT)/pmfeatures.py > $(OUTDIR)/pmfeatures.h
 	@$(PYTHON) $(PYMITETOOLS)/pmImgCreator.py -f $(PYMITEPLAT)/pmfeatures.py -c -u -o $(OUTDIR)/pmlibusr_img.c --native-file=$(OUTDIR)/pmlibusr_nat.c $(FLIGHTPLANS)/test.py
-EXTRAINCDIRS += ${foreach MOD, ${MODULES} ${PYMODULES}, $(OPMODULEDIR)/${MOD}/inc} ${OPMODULEDIR}/System/inc
+EXTRAINCDIRS += ${foreach MOD, ${OPTMODULES} ${MODULES} ${PYMODULES}, $(OPMODULEDIR)/${MOD}/inc} ${OPMODULEDIR}/System/inc
 
 # List any extra directories to look for library files here.
 # Also add directories where the linker should search for
@@ -287,6 +344,9 @@ CDEFS += -DHSE_VALUE=$(OSCILLATOR_FREQ)
 CDEFS += -DSYSCLK_FREQ=$(SYSCLK_FREQ)
 CDEFS += -DUSE_STDPERIPH_DRIVER
 CDEFS += -DUSE_$(BOARD)
+
+# Declare all non-optional modules as built-in to force inclusion
+CDEFS += $(foreach MOD, $(notdir $(MODULES)), -DMODULE_$(MOD)_BUILTIN)
 
 # Place project-specific -D and/or -U options for
 # Assembler with preprocessor here.

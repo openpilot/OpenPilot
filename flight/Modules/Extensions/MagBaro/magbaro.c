@@ -75,7 +75,7 @@ int32_t MagBaroStart()
 	if (magbaroEnabled) {
 		// Start main task
 		xTaskCreate(magbaroTask, (signed char *)"MagBaro", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
-		TaskMonitorAdd(TASKINFO_RUNNING_MAGBARO, taskHandle);
+		//TaskMonitorAdd(TASKINFO_RUNNING_MAGBARO, taskHandle);
 		return 0;
 	}
 	return -1;

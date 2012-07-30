@@ -93,7 +93,7 @@ private slots:
     void objectAdded(QObject *obj);
     void aboutToRemoveObject(QObject *obj);
 
-    void onConnectPressed();
+    void onConnectClicked();
     void devChanged(IConnection *connection);
 
 //	void onConnectionClosed(QObject *obj);

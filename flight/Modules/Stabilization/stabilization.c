@@ -91,6 +91,9 @@ pid_type pids[PID_MAX];
 int8_t vbar_gyros_suppress;
 bool vbar_piro_comp = false;
 
+// TODO: Move this to flash
+static float sin_lookup[360];
+
 // Private functions
 static void stabilizationTask(void* parameters);
 static float ApplyPid(pid_type * pid, const float err, float dT);
@@ -106,6 +109,9 @@ int32_t StabilizationStart()
 	// Initialize variables
 	// Create object queue
 	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
+
+	for(uint32_t i = 0; i < 360; i++)
+		sin_lookup[i] = sinf((float)i * 2 * M_PI / 360.0f);
 
 	// Listen for updates.
 	//	AttitudeActualConnectQueue(queue);
@@ -316,6 +322,8 @@ static void stabilizationTask(void* parameters)
 #if defined(DIAGNOSTICS)
 		RateDesiredSet(&rateDesired);
 #endif
+		
+		static bool rateRelayRunning[3] = {false, false, false};
 		ActuatorDesiredGet(&actuatorDesired);
 		//Calculate desired command
 		for(uint32_t i = 0; i < MAX_AXES; i++)
@@ -338,7 +346,7 @@ static void stabilizationTask(void* parameters)
 					static portTickType lastLowTime;
 					portTickType thisTime = xTaskGetTickCount();
 
-					static float accum_cos, accum_sin;
+					static float accum_sin, accum_cos;
 					static uint32_t accumulated = 0;
 
 					const uint16_t DEGLITCH_TIME = 20; // ms
@@ -352,22 +360,30 @@ static void stabilizationTask(void* parameters)
 					// Project the error onto a sine and cosine of the same frequency
 					// to accumulate the average amplitude
 					float dT = thisTime - lastHighTime;
-					float phase = dT * 2 * M_PI / relay.Period[i];
-					accum_cos += cosf(phase) * error;
-					accum_sin += sinf(phase) * error;
+					uint32_t phase = 360 * dT / relay.Period[i];
+					if(phase >= 360)
+						phase = 1;
+					accum_sin += sin_lookup[phase] * error;
+					accum_cos += sin_lookup[(phase + 90) % 360] * error;
 					accumulated ++;
 
 					// Make susre we've had enough time since last transition then check for a change in the output
 					bool hysteresis = (high ? (thisTime - lastHighTime) : (thisTime - lastLowTime)) > DEGLITCH_TIME;
 					if ( !high && hysteresis && error > 0 ){ /* RISE DETECTED */
-						float this_amplitude = 2 * sqrtf(accum_cos*accum_cos + accum_sin*accum_sin) / accumulated;
+						float this_amplitude = 2 * sqrtf(accum_sin*accum_sin + accum_cos*accum_cos) / accumulated;
 						accumulated = 0;
-						accum_cos = 0;
 						accum_sin = 0;
+						accum_cos = 0;
 
-						// Low pass filter each amplitude and period
-						relay.Amplitude[i] = relay.Amplitude[i] * AMPLITUDE_ALPHA + this_amplitude * (1 - AMPLITUDE_ALPHA);
-						relay.Period[i] = relay.Period[i] * PERIOD_ALPHA + dT * (1 - PERIOD_ALPHA);
+						if(rateRelayRunning[i] == false) {
+							rateRelayRunning[i] = true;
+							relay.Period[i] = 200;
+							relay.Amplitude[i] = 0;
+						} else {
+							// Low pass filter each amplitude and period
+							relay.Amplitude[i] = relay.Amplitude[i] * AMPLITUDE_ALPHA + this_amplitude * (1 - AMPLITUDE_ALPHA);
+							relay.Period[i] = relay.Period[i] * PERIOD_ALPHA + dT * (1 - PERIOD_ALPHA);
+						}
 						lastHighTime = thisTime;
 						high = true;
 						RelayTuningSet(&relay);
@@ -383,12 +399,14 @@ static void stabilizationTask(void* parameters)
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK:
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_WEAKLEVELING:
 				{
+					rateRelayRunning[i] = false;
 					float command = ApplyPid(&pids[PID_RATE_ROLL + i],  rateDesiredAxis[i] - gyro_filtered[i], dT);
 					actuatorDesiredAxis[i] = bound(command);
 					break;
 				}
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_VIRTUALBAR:
 				{
+					rateRelayRunning[i] = false;
 					// Track the angle of the virtual flybar which includes a slow decay
 					vbar_integral[i] = vbar_integral[i] * vbar_decay + gyro_filtered[i] * dT;
 					if (vbar_integral[i] > settings.VbarMaxAngle)
@@ -410,6 +428,7 @@ static void stabilizationTask(void* parameters)
 					break;
 				}
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_NONE:
+					rateRelayRunning[i] = false;
 					switch (i)
 				{
 					case ROLL:

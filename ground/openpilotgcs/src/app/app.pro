@@ -5,9 +5,7 @@ TEMPLATE = app
 TARGET = $$GCS_APP_TARGET
 DESTDIR = $$GCS_APP_PATH
 QT += xml
-
 SOURCES += main.cpp
-
 include(../rpath.pri)
 include(../libs/utils/utils.pri)
 
@@ -31,7 +29,11 @@ win32 {
 
 OTHER_FILES += openpilotgcs.rc
 
-style_copy.commands += $(COPY_FILE) $$targetPath(\"$$GCS_SOURCE_TREE/src/app/stylesheets/*.qss\") $$targetPath(\"$$GCS_APP_PATH\") $$addNewline()
+PLATFORMS = windows macos linux
+
+for(platform, PLATFORMS) {
+    style_copy.commands += $(COPY_FILE) $$targetPath(\"$$GCS_SOURCE_TREE/src/app/stylesheets/$$platform.qss\") $$targetPath(\"$$GCS_APP_PATH\") $$addNewline()
+
 style_copy.target = FORCE
 QMAKE_EXTRA_TARGETS += style_copy
 

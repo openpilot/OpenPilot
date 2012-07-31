@@ -78,6 +78,7 @@ bool ControllerPage::isComplete() const
 bool ControllerPage::validatePage()
 {
     getWizard()->setControllerType((SetupWizard::CONTROLLER_TYPE)ui->boardTypeCombo->itemData(ui->boardTypeCombo->currentIndex()).toInt());
+    getWizard()->setControllerSelectionMode(ui->manualCB->isChecked() ? SetupWizard::CONTROLLER_SELECTION_MANUAL : SetupWizard::CONTROLLER_SELECTION_AUTOMATIC);
     return true;
 }
 
@@ -115,13 +116,13 @@ void ControllerPage::setupDeviceList()
 void ControllerPage::setupBoardTypes()
 {
     QVariant v(0);
-    ui->boardTypeCombo->addItem("<Unknown>", SetupWizard::CONTROLLER_UNKNOWN);
-    ui->boardTypeCombo->addItem("OpenPilot CopterControl (CC)", SetupWizard::CONTROLLER_CC);
-    ui->boardTypeCombo->addItem("OpenPilot CopterControl (CC3D)", SetupWizard::CONTROLLER_CC3D);
-    ui->boardTypeCombo->addItem("OpenPilot Revolution", SetupWizard::CONTROLLER_REVO);
-    ui->boardTypeCombo->model()->setData(ui->boardTypeCombo->model()->index(ui->boardTypeCombo->count() - 1, 0), v, Qt::UserRole - 1);
-    ui->boardTypeCombo->addItem("OP PipX Modem", SetupWizard::CONTROLLER_PIPX);
-    ui->boardTypeCombo->model()->setData(ui->boardTypeCombo->model()->index(ui->boardTypeCombo->count() - 1, 0), v, Qt::UserRole - 1);
+    ui->boardTypeCombo->addItem(tr("<Unknown>"), SetupWizard::CONTROLLER_UNKNOWN);
+    ui->boardTypeCombo->addItem(tr("OpenPilot CopterControl"), SetupWizard::CONTROLLER_CC);
+    ui->boardTypeCombo->addItem(tr("OpenPilot CopterControl 3D"), SetupWizard::CONTROLLER_CC3D);
+    ui->boardTypeCombo->addItem(tr("OpenPilot Revolution"), SetupWizard::CONTROLLER_REVO);
+    //ui->boardTypeCombo->model()->setData(ui->boardTypeCombo->model()->index(ui->boardTypeCombo->count() - 1, 0), v, Qt::UserRole - 1);
+    ui->boardTypeCombo->addItem(tr("OpenPilot PipX Radio Modem"), SetupWizard::CONTROLLER_PIPX);
+    //ui->boardTypeCombo->model()->setData(ui->boardTypeCombo->model()->index(ui->boardTypeCombo->count() - 1, 0), v, Qt::UserRole - 1);
 }
 
 void ControllerPage::setControllerType(SetupWizard::CONTROLLER_TYPE type)
@@ -201,12 +202,12 @@ void ControllerPage::identificationModeChanged()
         ui->boardTypeCombo->setEnabled(true);
         ui->connectButton->setEnabled(false);
         ui->boardTypeCombo->setCurrentIndex(1);
-        ui->boardTypeCombo->model()->setData(ui->boardTypeCombo->model()->index(0, 0), QVariant(0), Qt::UserRole - 1);
+        //ui->boardTypeCombo->model()->setData(ui->boardTypeCombo->model()->index(0, 0), QVariant(0), Qt::UserRole - 1);
     }
     else {
         ui->connectButton->setEnabled(ui->deviceCombo->count() > 0);
         ui->deviceCombo->setEnabled(!m_connectionManager->isConnected());
-        ui->boardTypeCombo->model()->setData(ui->boardTypeCombo->model()->index(0, 0), QVariant(1), Qt::UserRole - 1);
+        //ui->boardTypeCombo->model()->setData(ui->boardTypeCombo->model()->index(0, 0), QVariant(1), Qt::UserRole - 1);
         ui->boardTypeCombo->setCurrentIndex(0);
         ui->boardTypeCombo->setEnabled(false);
     }

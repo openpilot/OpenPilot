@@ -10,22 +10,7 @@ inputChannelForm::inputChannelForm(QWidget *parent,bool showlegend) :
 {
     ui->setupUi(this);
     
-    //The first time through the loop, keep the legend. All other times, delete it.
-    if(!showlegend)
-    {
-        layout()->removeWidget(ui->legend0);
-        layout()->removeWidget(ui->legend1);
-        layout()->removeWidget(ui->legend2);
-        layout()->removeWidget(ui->legend3);
-        layout()->removeWidget(ui->legend4);
-        layout()->removeWidget(ui->legend5);
-        delete ui->legend0;
-        delete ui->legend1;
-        delete ui->legend2;
-        delete ui->legend3;
-        delete ui->legend4;
-        delete ui->legend5;
-    }
+
 
     connect(ui->channelMin,SIGNAL(valueChanged(int)),this,SLOT(minMaxUpdated()));
     connect(ui->channelMax,SIGNAL(valueChanged(int)),this,SLOT(minMaxUpdated()));

@@ -52,6 +52,7 @@ void PfdQmlGadget::loadConfiguration(IUAVGadgetConfiguration* config)
         qputenv("OSGEARTH_CACHE_ONLY", "true");
     } else {
         //how portable it is?
-        unsetenv("OSGEARTH_CACHE_ONLY");
+        //unsetenv("OSGEARTH_CACHE_ONLY");
+        qputenv("OSGEARTH_CACHE_ONLY", "false");
     }
 }

@@ -70,6 +70,16 @@ public:
         QList<shadow *> shadowsList;
     };
 
+    struct temphelper
+    {
+        quint32 objid;
+        quint32 objinstid;
+        bool operator==(const temphelper& lhs)
+        {
+            return (lhs.objid==this->objid && lhs.objinstid==this->objinstid);
+        }
+    };
+
     enum buttonTypeEnum {none,save_button,apply_button,reload_button,default_button,help_button};
     struct uiRelationAutomation
     {

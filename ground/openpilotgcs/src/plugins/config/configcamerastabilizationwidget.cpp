@@ -33,12 +33,19 @@
 #include <QDebug>
 #include <QDesktopServices>
 #include <QUrl>
+#include <extensionsystem/pluginmanager.h>
+#include <coreplugin/generalsettings.h>
 
 ConfigCameraStabilizationWidget::ConfigCameraStabilizationWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
     // TODO: this widget should use the addUAVObjectToWidgetRelation()
     m_camerastabilization = new Ui_CameraStabilizationWidget();
     m_camerastabilization->setupUi(this);
+    
+    ExtensionSystem::PluginManager *pm=ExtensionSystem::PluginManager::instance();
+    Core::Internal::GeneralSettings * settings=pm->getObject<Core::Internal::GeneralSettings>();
+    if(!settings->useExpertMode())
+        m_camerastabilization->camerastabilizationSaveRAM->setVisible(false);
 
     QComboBox *outputs[3] = {
         m_camerastabilization->rollChannel,
@@ -88,7 +95,7 @@ ConfigCameraStabilizationWidget::ConfigCameraStabilizationWidget(QWidget *parent
     connect(m_camerastabilization->camerastabilizationResetToDefaults, SIGNAL(clicked()), this, SLOT(resetToDefaults()));
     connect(m_camerastabilization->camerastabilizationSaveRAM, SIGNAL(clicked()), this, SLOT(applySettings()));
     connect(m_camerastabilization->camerastabilizationSaveSD, SIGNAL(clicked()), this, SLOT(saveSettings()));
-    connect(m_camerastabilization->camerastabilizationHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
+    autoLoadWidgets();
 
     disableMouseWheelEvents();
 }
@@ -324,11 +331,6 @@ void ConfigCameraStabilizationWidget::resetToDefaults()
     CameraStabSettings cameraStabDefaults;
     CameraStabSettings::DataFields defaults = cameraStabDefaults.getData();
     refreshUIValues(defaults);
-}
-
-void ConfigCameraStabilizationWidget::openHelp()
-{
-    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/Camera+Stabilization+Configuration", QUrl::StrictMode) );
 }
 
 void ConfigCameraStabilizationWidget::enableControls(bool enable)

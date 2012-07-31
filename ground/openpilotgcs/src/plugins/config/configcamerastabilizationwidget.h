@@ -47,7 +47,6 @@ private:
     void refreshUIValues(CameraStabSettings::DataFields &cameraStabData);
 
 private slots:
-    void openHelp();
     void resetToDefaults();
     void applySettings();
     void saveSettings();

@@ -29,6 +29,7 @@
 #include "browseritemdelegate.h"
 #include "treeitem.h"
 #include "ui_uavobjectbrowser.h"
+#include "ui_viewoptions.h"
 #include "uavobjectmanager.h"
 #include <QStringList>
 #include <QtGui/QHBoxLayout>
@@ -42,6 +43,9 @@
 UAVObjectBrowserWidget::UAVObjectBrowserWidget(QWidget *parent) : QWidget(parent)
 {
     m_browser = new Ui_UAVObjectBrowser();
+    m_viewoptions = new Ui_viewoptions();
+    m_viewoptionsDialog = new QDialog(this);
+    m_viewoptions->setupUi(m_viewoptionsDialog);
     m_browser->setupUi(this);
     m_model = new UAVObjectTreeModel();
     m_browser->treeView->setModel(m_model);
@@ -51,21 +55,33 @@ UAVObjectBrowserWidget::UAVObjectBrowserWidget(QWidget *parent) : QWidget(parent
     m_browser->treeView->setItemDelegate(m_delegate);
     m_browser->treeView->setEditTriggers(QAbstractItemView::AllEditTriggers);
     m_browser->treeView->setSelectionBehavior(QAbstractItemView::SelectItems);
-    showMetaData(m_browser->metaCheckBox->isChecked());
+    showMetaData(m_viewoptions->cbMetaData->isChecked());
     connect(m_browser->treeView->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), this, SLOT(currentChanged(QModelIndex,QModelIndex)));
-    connect(m_browser->metaCheckBox, SIGNAL(toggled(bool)), this, SLOT(showMetaData(bool)));
-    connect(m_browser->categorizeCheckbox, SIGNAL(toggled(bool)), this, SLOT(categorize(bool)));
+    connect(m_viewoptions->cbMetaData, SIGNAL(toggled(bool)), this, SLOT(showMetaData(bool)));
+    connect(m_viewoptions->cbCategorized, SIGNAL(toggled(bool)), this, SLOT(categorize(bool)));
     connect(m_browser->saveSDButton, SIGNAL(clicked()), this, SLOT(saveObject()));
     connect(m_browser->readSDButton, SIGNAL(clicked()), this, SLOT(loadObject()));
     connect(m_browser->eraseSDButton, SIGNAL(clicked()), this, SLOT(eraseObject()));
     connect(m_browser->sendButton, SIGNAL(clicked()), this, SLOT(sendUpdate()));
     connect(m_browser->requestButton, SIGNAL(clicked()), this, SLOT(requestUpdate()));
+    connect(m_browser->tbView,SIGNAL(clicked()),this,SLOT(viewSlot()));
+    connect(m_viewoptions->cbScientific, SIGNAL(toggled(bool)), this, SLOT(useScientificNotation(bool)));
+    connect(m_viewoptions->cbScientific, SIGNAL(toggled(bool)), this, SLOT(viewOptionsChangedSlot()));
+    connect(m_viewoptions->cbMetaData, SIGNAL(toggled(bool)), this, SLOT(viewOptionsChangedSlot()));
+    connect(m_viewoptions->cbCategorized, SIGNAL(toggled(bool)), this, SLOT(viewOptionsChangedSlot()));
     enableSendRequest(false);
 }
 
 UAVObjectBrowserWidget::~UAVObjectBrowserWidget()
 {
-   delete m_browser;
+    delete m_browser;
+}
+
+void UAVObjectBrowserWidget::setViewOptions(bool categorized, bool scientific, bool metadata)
+{
+    m_viewoptions->cbCategorized->setChecked(categorized);
+    m_viewoptions->cbMetaData->setChecked(metadata);
+    m_viewoptions->cbScientific->setChecked(scientific);
 }
 
 void UAVObjectBrowserWidget::showMetaData(bool show)
@@ -85,13 +101,31 @@ void UAVObjectBrowserWidget::categorize(bool categorize)
     Q_ASSERT(objManager);
 
     UAVObjectTreeModel* tmpModel = m_model;
-    m_model = new UAVObjectTreeModel(0, categorize);
+    m_model = new UAVObjectTreeModel(0, categorize,m_viewoptions->cbScientific->isChecked());
     m_model->setRecentlyUpdatedColor(m_recentlyUpdatedColor);
     m_model->setManuallyChangedColor(m_manuallyChangedColor);
     m_model->setRecentlyUpdatedTimeout(m_recentlyUpdatedTimeout);
     m_model->setOnlyHilightChangedValues(m_onlyHilightChangedValues);
     m_browser->treeView->setModel(m_model);
-    showMetaData(m_browser->metaCheckBox->isChecked());
+    showMetaData(m_viewoptions->cbMetaData->isChecked());
+
+    delete tmpModel;
+}
+
+void UAVObjectBrowserWidget::useScientificNotation(bool scientific)
+{
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    Q_ASSERT(pm);
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    Q_ASSERT(objManager);
+
+    UAVObjectTreeModel* tmpModel = m_model;
+    m_model = new UAVObjectTreeModel(0, m_viewoptions->cbCategorized,scientific);
+    m_model->setRecentlyUpdatedColor(m_recentlyUpdatedColor);
+    m_model->setManuallyChangedColor(m_manuallyChangedColor);
+    m_model->setRecentlyUpdatedTimeout(m_recentlyUpdatedTimeout);
+    m_browser->treeView->setModel(m_model);
+    showMetaData(m_viewoptions->cbMetaData->isChecked());
 
     delete tmpModel;
 }
@@ -192,6 +226,24 @@ void UAVObjectBrowserWidget::currentChanged(const QModelIndex &current, const QM
     if (top || (data && !data->object()))
         enable = false;
     enableSendRequest(enable);
+}
+
+void UAVObjectBrowserWidget::viewSlot()
+{
+    if(m_viewoptionsDialog->isVisible())
+        m_viewoptionsDialog->setVisible(false);
+    else
+    {
+        QPoint pos=QCursor::pos();
+        pos.setX(pos.x()-m_viewoptionsDialog->width());
+        m_viewoptionsDialog->move(pos);
+        m_viewoptionsDialog->show();
+    }
+}
+
+void UAVObjectBrowserWidget::viewOptionsChangedSlot()
+{
+    emit viewOptionsChanged(m_viewoptions->cbCategorized->isChecked(),m_viewoptions->cbScientific->isChecked(),m_viewoptions->cbMetaData->isChecked());
 }
 
 void UAVObjectBrowserWidget::enableSendRequest(bool enable)

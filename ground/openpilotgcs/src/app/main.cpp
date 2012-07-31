@@ -229,6 +229,30 @@ static void overrideSettings(QSettings &settings, int argc, char **argv){
     settings.sync();
 }
 
+static inline void loadStyleSheet() {
+    /* Let's use QFile and point to a resource... */
+#ifdef Q_OS_MAC
+    QFile data(QCoreApplication::applicationDirPath()+"/macos.qss");
+#elif defined(Q_OS_LINUX)
+    QFile data(QCoreApplication::applicationDirPath()+"/linux.qss");
+#else
+    QFile data(QCoreApplication::applicationDirPath()+"/windows.qss");
+#endif
+    QString style;
+    /* ...to open the file */
+    if(data.open(QFile::ReadOnly)) {
+        /* QTextStream... */
+        QTextStream styleIn(&data);
+        /* ...read file to a string. */
+        style = styleIn.readAll();
+        data.close();
+        /* We'll use qApp macro to get the QApplication pointer
+         * and set the style sheet application wide. */
+        qApp->setStyleSheet(style);
+        qDebug()<<"Loaded stylesheet:"<<style;
+    }
+}
+
 int main(int argc, char **argv)
 {
 #ifdef Q_OS_MAC
@@ -337,12 +361,12 @@ int main(int argc, char **argv)
         printHelp(QFileInfo(app.applicationFilePath()).baseName(), pluginManager);
         return 0;
     }
-
     const bool isFirstInstance = !app.isRunning();
     if (!isFirstInstance && foundAppOptions.contains(QLatin1String(CLIENT_OPTION)))
         return sendArguments(app, pluginManager.arguments()) ? 0 : -1;
 
     pluginManager.loadPlugins();
+    loadStyleSheet();
     if (coreplugin->hasError()) {
         displayError(msgCoreLoadFailure(coreplugin->errorString()));
         return 1;

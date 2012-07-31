@@ -35,6 +35,7 @@
 #include <QSemaphore>
 #include "uavobjectmanager.h"
 #include "uavtalk_global.h"
+#include <QtNetwork/QUdpSocket>
 
 class UAVTALK_EXPORT UAVTalk: public QObject
 {
@@ -65,6 +66,7 @@ signals:
 
 private slots:
     void processInputStream(void);
+    void dummyUDPRead();
 
 private:
 
@@ -122,6 +124,11 @@ private:
     RxStateType rxState;
     ComStats stats;
 
+    bool useUDPMirror;
+    QUdpSocket * udpSocketTx;
+    QUdpSocket * udpSocketRx;
+    QByteArray rxDataArray;
+
     // Methods
     bool objectTransaction(UAVObject* obj, quint8 type, bool allInstances);
     bool processInputByte(quint8 rxbyte);
@@ -134,7 +141,6 @@ private:
     bool transmitSingleObject(UAVObject* obj, quint8 type, bool allInstances);
     quint8 updateCRC(quint8 crc, const quint8 data);
     quint8 updateCRC(quint8 crc, const quint8* data, qint32 length);
-
 };
 
 #endif // UAVTALK_H

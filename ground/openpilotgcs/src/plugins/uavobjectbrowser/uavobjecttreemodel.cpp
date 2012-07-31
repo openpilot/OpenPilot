@@ -38,8 +38,9 @@
 #include <QtCore/QSignalMapper>
 #include <QtCore/QDebug>
 
-UAVObjectTreeModel::UAVObjectTreeModel(QObject *parent, bool categorize) :
+UAVObjectTreeModel::UAVObjectTreeModel(QObject *parent, bool categorize, bool useScientificNotation) :
         QAbstractItemModel(parent),
+        m_useScientificFloatNotation(useScientificNotation),
         m_recentlyUpdatedTimeout(500), // ms
         m_recentlyUpdatedColor(QColor(255, 230, 230)),
         m_manuallyChangedColor(QColor(230, 230, 255))
@@ -227,7 +228,7 @@ void UAVObjectTreeModel::addSingleField(int index, UAVObjectField *field, TreeIt
     case UAVObjectField::FLOAT32:
         data.append(field->getValue(index));
         data.append(field->getUnits());
-        item = new FloatFieldTreeItem(field, index, data);
+        item = new FloatFieldTreeItem(field, index, data, m_useScientificFloatNotation);
         break;
     default:
         Q_ASSERT(false);

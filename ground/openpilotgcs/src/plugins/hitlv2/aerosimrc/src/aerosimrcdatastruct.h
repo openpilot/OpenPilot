@@ -38,13 +38,7 @@ const quint16 DBG_BUFFER_MAX_SIZE = 4096;
 #define OBSOLETE_MIT_CHECKBOX   (1 << 1)
 #define OBSOLETE_MIT_SEPARATOR  (1 << 7)
 
-#if defined(Q_CC_MSVC)
-#define PACK_STRUCT
-#define MAX_PATH 260
-#pragma pack (push, r1, 1)
-#elif defined(Q_CC_GNU)
 #define PACK_STRUCT __attribute__((packed))
-#endif
 
 struct simToPlugin
 {
@@ -207,9 +201,6 @@ struct pluginInit
     const char *strOutputFolder;
 } PACK_STRUCT ;     // normal - 144, packed - 144 OK (3.81 & 3.83 & 3.90)
 
-#ifdef Q_CC_MSVC
-#pragma pack (pop, r1)
-#endif
 #undef PACK_STRUCT
 
 #endif // AEROSIMRCDATASTRUCT_H

@@ -1,6 +1,8 @@
 <xml>
     <object name="RelayTuningSettings" singleinstance="true" settings="true">
         <description>Setting to run a relay tuning algorithm</description>
+	<field name="RateGain" units="" type="float" elements="1" defaultvalue="0.5"/>
+	<field name="AttitudeGain" units="" type="float" elements="1" defaultvalue="0.5"/>
 	<field name="Amplitude" units="" type="float" elements="1" defaultvalue="0.05"/>
 	<access gcs="readwrite" flight="readwrite"/>
 	<telemetrygcs acked="true" updatemode="onchange" period="0"/>

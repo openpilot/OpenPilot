@@ -22,10 +22,4 @@ ConfigAutotuneWidget::ConfigAutotuneWidget(QWidget *parent) :
     disableMouseWheelEvents();
 }
 
-ConfigAutotuneWidget::~ConfigAutotuneWidget()
-{
-    // Do nothing
-}
-
-
 

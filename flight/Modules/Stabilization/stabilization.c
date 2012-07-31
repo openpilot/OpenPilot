@@ -241,7 +241,6 @@ static void stabilizationTask(void* parameters)
 		{
 			switch(stabDesired.StabilizationMode[i])
 			{
-				case STABILIZATIONDESIRED_STABILIZATIONMODE_RELAY:
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_RATE:
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_VIRTUALBAR:
 					rateDesiredAxis[i] = attitudeDesiredAxis[i];
@@ -267,6 +266,7 @@ static void stabilizationTask(void* parameters)
 					axis_lock_accum[i] = 0;
 					break;
 				}
+				case STABILIZATIONDESIRED_STABILIZATIONMODE_RELAY:
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE:
 					rateDesiredAxis[i] = ApplyPid(&pids[PID_ROLL + i], local_error[i], dT);
 					

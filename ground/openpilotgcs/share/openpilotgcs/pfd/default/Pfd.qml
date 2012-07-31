@@ -1,6 +1,5 @@
 import Qt 4.7
 import "."
-import org.OpenPilot 1.0
 
 Rectangle {
     color: "#666666"
@@ -22,46 +21,10 @@ Rectangle {
             anchors.centerIn: parent
             clip: true
 
-            OsgEarth {
-                id: earthView
-
+            Loader {
+                id: worldLoader
                 anchors.fill: parent
-                sceneFile: qmlWidget.earthFile
-                visible: qmlWidget.terrainEnabled
-
-                fieldOfView: 90
-
-                yaw: AttitudeActual.Yaw
-                pitch: AttitudeActual.Pitch
-                roll: AttitudeActual.Roll
-
-                latitude: qmlWidget.actualPositionUsed ?
-                              GPSPosition.Latitude/10000000.0 : qmlWidget.latitude
-                longitude: qmlWidget.actualPositionUsed ?
-                               GPSPosition.Longitude/10000000.0 : qmlWidget.longitude
-                altitude: qmlWidget.actualPositionUsed ?
-                              GPSPosition.Altitude : qmlWidget.altitude
-            }
-
-            Image {
-                id: world
-                source: "image://svg/pfd.svg!world"
-                sourceSize: background.sourceSize
-                smooth: true
-                visible: !qmlWidget.terrainEnabled
-
-                transform: [
-                    Translate {
-                        id: pitchTranslate
-                        x: (world.parent.width - world.width)/2
-                        y: (world.parent.height - world.height)/2 + AttitudeActual.Pitch*world.parent.height/94
-                    },
-                    Rotation {
-                        angle: -AttitudeActual.Roll
-                        origin.x : world.parent.width/2
-                        origin.y : world.parent.height/2
-                    }
-                ]
+                source: qmlWidget.terrainEnabled ? "PfdTerrainView.qml" : "PfdWorldView.qml"
             }
 
             Image {

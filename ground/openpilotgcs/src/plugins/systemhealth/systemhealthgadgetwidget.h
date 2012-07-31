@@ -69,5 +69,8 @@ private:
                    // Simple flag to skip rendering if the
    bool fgenabled; // layer does not exist.
 
+   void showAlarmDescriptionForItemId(const QString itemId, const QPoint& location);
+   void showAllAlarmDescriptions(const QPoint &location);
+
 };
 #endif /* SYSTEMHEALTHGADGETWIDGET_H_ */

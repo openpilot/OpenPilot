@@ -31,6 +31,10 @@
   LangString DESC_InSecSounds ${LANG_SPANISH} "Archivos de sonido del GCS (usados para los eventos y notificaciones audibles)."
   LangString DESC_InSecLocalization ${LANG_SPANISH} "Localización GCS (idiomas soportados)."
   LangString DESC_InSecFirmware ${LANG_SPANISH} "OpenPilot firmware binaries."
+  LangString DESC_InSecUtilities ${LANG_SPANISH} "OpenPilot utilities (Matlab log parser)."
+  LangString DESC_InSecDrivers ${LANG_SPANISH} "OpenPilot hardware driver files (optional OpenPilot CDC driver)."
+  LangString DESC_InSecInstallDrivers ${LANG_SPANISH} "Optional OpenPilot CDC driver (virtual USB COM port)."
+  LangString DESC_InSecAeroSimRC ${LANG_SPANISH} "AeroSimRC plugin files with sample configuration."
   LangString DESC_InSecShortcuts ${LANG_SPANISH} "Instalar accesos directos de la aplicación (menú inicio y escritorio)."
 
 ;--------------------------------

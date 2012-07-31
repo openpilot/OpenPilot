@@ -9,9 +9,7 @@ equals(copydata, 1) {
     win32:CONFIG(release, debug|release) {
 
         # copy Qt DLLs and phonon4
-        QT_DLLS = libgcc_s_dw2-1.dll \
-                  mingwm10.dll \
-                  phonon4.dll \
+        QT_DLLS = phonon4.dll \
                   QtCore4.dll \
                   QtGui4.dll \
                   QtNetwork4.dll \
@@ -25,6 +23,13 @@ equals(copydata, 1) {
                   QtScript4.dll
         for(dll, QT_DLLS) {
             data_copy.commands += $(COPY_FILE) $$targetPath(\"$$[QT_INSTALL_BINS]/$$dll\") $$targetPath(\"$$GCS_APP_PATH/$$dll\") $$addNewline()
+        }
+
+        # copy MinGW DLLs
+        MINGW_DLLS = libgcc_s_dw2-1.dll \
+                     mingwm10.dll
+        for(dll, MINGW_DLLS) {
+            data_copy.commands += $(COPY_FILE) $$targetPath(\"$$[QT_INSTALL_BINS]/../../../../../mingw/bin/$$dll\") $$targetPath(\"$$GCS_APP_PATH/$$dll\") $$addNewline()
         }
 
         # copy iconengines

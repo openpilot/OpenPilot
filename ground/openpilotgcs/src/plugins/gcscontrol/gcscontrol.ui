@@ -42,7 +42,20 @@
       </widget>
      </item>
      <item>
+      <widget class="QCheckBox" name="checkBoxUDPControl">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>UDP Control</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QCheckBox" name="checkBoxArmed">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
        <property name="text">
         <string>Armed</string>
        </property>

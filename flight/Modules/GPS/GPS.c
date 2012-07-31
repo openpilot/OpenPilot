@@ -33,17 +33,18 @@
 #include "openpilot.h"
 #include "GPS.h"
 
-#include <stdbool.h>
-
-#include "NMEA.h"
-
 #include "gpsposition.h"
 #include "homelocation.h"
 #include "gpstime.h"
 #include "gpssatellites.h"
+#include "gpsvelocity.h"
+#include "gpssettings.h"
 #include "WorldMagModel.h"
 #include "CoordinateConversions.h"
 #include "hwsettings.h"
+
+#include "NMEA.h"
+#include "UBX.h"
 
 
 // ****************
@@ -61,16 +62,18 @@ static float GravityAccel(float latitude, float longitude, float altitude);
 // Private constants
 
 #define GPS_TIMEOUT_MS                  500
-#define NMEA_MAX_PACKET_LENGTH          96 // 82 max NMEA msg size plus 12 margin (because some vendors add custom crap) plus CR plus Linefeed
-// same as in COM buffer
 
 
 #ifdef PIOS_GPS_SETS_HOMELOCATION
 // Unfortunately need a good size stack for the WMM calculation
-	#define STACK_SIZE_BYTES            800
+	#define STACK_SIZE_BYTES            750
+#else
+#if defined(PIOS_GPS_MINIMAL)
+	#define STACK_SIZE_BYTES            500
 #else
 	#define STACK_SIZE_BYTES            650
-#endif
+#endif // PIOS_GPS_MINIMAL
+#endif // PIOS_GPS_SETS_HOMELOCATION
 
 #define TASK_PRIORITY                   (tskIDLE_PRIORITY + 1)
 
@@ -86,9 +89,8 @@ static char* gps_rx_buffer;
 
 static uint32_t timeOfLastCommandMs;
 static uint32_t timeOfLastUpdateMs;
-static uint32_t numUpdates;
-static uint32_t numChecksumErrors;
-static uint32_t numParsingErrors;
+
+static struct GPS_RX_STATS gpsRxStats;
 
 // ****************
 /**
@@ -120,6 +122,7 @@ int32_t GPSStart(void)
 int32_t GPSInitialize(void)
 {
 	gpsPort = PIOS_COM_GPS;
+	uint8_t	gpsProtocol;
 
 #ifdef MODULE_GPS_BUILTIN
 	gpsEnabled = true;
@@ -137,6 +140,7 @@ int32_t GPSInitialize(void)
 
 	if (gpsPort && gpsEnabled) {
 		GPSPositionInitialize();
+		GPSVelocityInitialize();
 #if !defined(PIOS_GPS_MINIMAL)
 		GPSTimeInitialize();
 		GPSSatellitesInitialize();
@@ -145,8 +149,21 @@ int32_t GPSInitialize(void)
 		HomeLocationInitialize();
 #endif
 		updateSettings();
+	}
 
-		gps_rx_buffer = pvPortMalloc(NMEA_MAX_PACKET_LENGTH);
+	if (gpsPort && gpsEnabled) {
+		GPSSettingsInitialize();
+		GPSSettingsDataProtocolGet(&gpsProtocol);
+		switch (gpsProtocol) {
+			case GPSSETTINGS_DATAPROTOCOL_NMEA:
+				gps_rx_buffer = pvPortMalloc(NMEA_MAX_PACKET_LENGTH);
+				break;
+			case GPSSETTINGS_DATAPROTOCOL_UBX:
+				gps_rx_buffer = pvPortMalloc(sizeof(struct UBXPacket));
+				break;
+			default:
+				gps_rx_buffer = NULL;
+		}
 		PIOS_Assert(gps_rx_buffer);
 
 		return 0;
@@ -165,140 +182,75 @@ MODULE_INITCALL(GPSInitialize, GPSStart)
 static void gpsTask(void *parameters)
 {
 	portTickType xDelay = 100 / portTICK_RATE_MS;
-	uint32_t timeNowMs = xTaskGetTickCount() * portTICK_RATE_MS;;
-	GPSPositionData GpsData;
-	
-	uint8_t rx_count = 0;
-	bool start_flag = false;
-	bool found_cr = false;
-	int32_t gpsRxOverflow = 0;
-	
-	numUpdates = 0;
-	numChecksumErrors = 0;
-	numParsingErrors = 0;
+	uint32_t timeNowMs = xTaskGetTickCount() * portTICK_RATE_MS;
+
+	GPSPositionData gpsposition;
+	uint8_t	gpsProtocol;
+
+	GPSSettingsDataProtocolGet(&gpsProtocol);
 
 	timeOfLastUpdateMs = timeNowMs;
 	timeOfLastCommandMs = timeNowMs;
 
+	GPSPositionGet(&gpsposition);
 	// Loop forever
 	while (1)
 	{
 		uint8_t c;
-		// NMEA or SINGLE-SENTENCE GPS mode
 
 		// This blocks the task until there is something on the buffer
 		while (PIOS_COM_ReceiveBuffer(gpsPort, &c, 1, xDelay) > 0)
 		{
-		
-			// detect start while acquiring stream
-			if (!start_flag && (c == '$'))
-			{
-				start_flag = true;
-				found_cr = false;
-				rx_count = 0;
+			int res;
+			switch (gpsProtocol) {
+#if defined(PIOS_INCLUDE_GPS_NMEA_PARSER)
+				case GPSSETTINGS_DATAPROTOCOL_NMEA:
+					res = parse_nmea_stream (c,gps_rx_buffer, &gpsposition, &gpsRxStats);
+					break;
+#endif
+#if defined(PIOS_INCLUDE_GPS_UBX_PARSER)
+				case GPSSETTINGS_DATAPROTOCOL_UBX:
+					res = parse_ubx_stream (c,gps_rx_buffer, &gpsposition, &gpsRxStats);
+					break;
+#endif
+				default:
+					res = NO_PARSER; // this should not happen
+					break;
 			}
-			else
-			if (!start_flag)
-				continue;
-		
-			if (rx_count >= NMEA_MAX_PACKET_LENGTH)
-			{
-				// The buffer is already full and we haven't found a valid NMEA sentence.
-				// Flush the buffer and note the overflow event.
-				gpsRxOverflow++;
-				start_flag = false;
-				found_cr = false;
-				rx_count = 0;
-			}
-			else
-			{
-				gps_rx_buffer[rx_count] = c;
-				rx_count++;
-			}
-		
-			// look for ending '\r\n' sequence
-			if (!found_cr && (c == '\r') )
-				found_cr = true;
-			else
-			if (found_cr && (c != '\n') )
-				found_cr = false;  // false end flag
-			else
-			if (found_cr && (c == '\n') )
-			{
-				// The NMEA functions require a zero-terminated string
-				// As we detected \r\n, the string as for sure 2 bytes long, we will also strip the \r\n
-				gps_rx_buffer[rx_count-2] = 0;
 
-				// prepare to parse next sentence
-				start_flag = false;
-				found_cr = false;
-				rx_count = 0;
-				// Our rxBuffer must look like this now:
-				//   [0]           = '$'
-				//   ...           = zero or more bytes of sentence payload
-				//   [end_pos - 1] = '\r'
-				//   [end_pos]     = '\n'
-				//
-				// Prepare to consume the sentence from the buffer
-			
-				// Validate the checksum over the sentence
-				if (!NMEA_checksum(&gps_rx_buffer[1]))
-				{	// Invalid checksum.  May indicate dropped characters on Rx.
-					//PIOS_DEBUG_PinHigh(2);
-					++numChecksumErrors;
-					//PIOS_DEBUG_PinLow(2);
-				}
-				else
-				{	// Valid checksum, use this packet to update the GPS position
-					if (!NMEA_update_position(&gps_rx_buffer[1])) {
-						//PIOS_DEBUG_PinHigh(2);
-						++numParsingErrors;
-						//PIOS_DEBUG_PinLow(2);
-					}
-					else
-						++numUpdates;
-
-					timeNowMs = xTaskGetTickCount() * portTICK_RATE_MS;
-					timeOfLastUpdateMs = timeNowMs;
-					timeOfLastCommandMs = timeNowMs;
-				}
+			if (res == PARSER_COMPLETE) {
+				timeNowMs = xTaskGetTickCount() * portTICK_RATE_MS;
+				timeOfLastUpdateMs = timeNowMs;
+				timeOfLastCommandMs = timeNowMs;
 			}
 		}
 
 		// Check for GPS timeout
 		timeNowMs = xTaskGetTickCount() * portTICK_RATE_MS;
-		if ((timeNowMs - timeOfLastUpdateMs) >= GPS_TIMEOUT_MS)
-		{	// we have not received any valid GPS sentences for a while.
+		if ((timeNowMs - timeOfLastUpdateMs) >= GPS_TIMEOUT_MS) {
+			// we have not received any valid GPS sentences for a while.
 			// either the GPS is not plugged in or a hardware problem or the GPS has locked up.
-
-			GPSPositionGet(&GpsData);
-			GpsData.Status = GPSPOSITION_STATUS_NOGPS;
-			GPSPositionSet(&GpsData);
+			uint8_t status = GPSPOSITION_STATUS_NOGPS;
+			GPSPositionStatusSet(&status);
 			AlarmsSet(SYSTEMALARMS_ALARM_GPS, SYSTEMALARMS_ALARM_ERROR);
-
-		}
-		else
-		{	// we appear to be receiving GPS sentences OK, we've had an update
-
-			GPSPositionGet(&GpsData);
-
-#ifdef PIOS_GPS_SETS_HOMELOCATION
-			HomeLocationData home;
-			HomeLocationGet(&home);
-
-			if ((GpsData.Status == GPSPOSITION_STATUS_FIX3D) && (home.Set == HOMELOCATION_SET_FALSE))
-				setHomeLocation(&GpsData);
-#endif
-
+		} else {
+			// we appear to be receiving GPS sentences OK, we've had an update
 			//criteria for GPS-OK taken from this post...
 			//http://forums.openpilot.org/topic/1523-professors-insgps-in-svn/page__view__findpost__p__5220
-			if ((GpsData.PDOP < 3.5) && (GpsData.Satellites >= 7))
+			if ((gpsposition.PDOP < 3.5) && (gpsposition.Satellites >= 7) &&
+					(gpsposition.Status == GPSPOSITION_STATUS_FIX3D)) {
 				AlarmsClear(SYSTEMALARMS_ALARM_GPS);
-			else
-			if (GpsData.Status == GPSPOSITION_STATUS_FIX3D)
-				AlarmsSet(SYSTEMALARMS_ALARM_GPS, SYSTEMALARMS_ALARM_WARNING);
-			else
-				AlarmsSet(SYSTEMALARMS_ALARM_GPS, SYSTEMALARMS_ALARM_CRITICAL);
+#ifdef PIOS_GPS_SETS_HOMELOCATION
+				HomeLocationData home;
+				HomeLocationGet(&home);
+
+				if (home.Set == HOMELOCATION_SET_FALSE)
+					setHomeLocation(&gpsposition);
+#endif
+			} else if (gpsposition.Status == GPSPOSITION_STATUS_FIX3D)
+						AlarmsSet(SYSTEMALARMS_ALARM_GPS, SYSTEMALARMS_ALARM_WARNING);
+					else
+						AlarmsSet(SYSTEMALARMS_ALARM_GPS, SYSTEMALARMS_ALARM_CRITICAL);
 		}
 
 	}
@@ -338,14 +290,6 @@ static void setHomeLocation(GPSPositionData * gpsData)
 
 		// Compute home ECEF coordinates and the rotation matrix into NED
 		double LLA[3] = { ((double)home.Latitude) / 10e6, ((double)home.Longitude) / 10e6, ((double)home.Altitude) };
-		double ECEF[3];
-		RneFromLLA(LLA, (float (*)[3])home.RNE);
-		LLA2ECEF(LLA, ECEF);
-		// TODO: Currently UAVTalk only supports float but these conversions use double
-		// need to find out if they require that precision and if so extend UAVTAlk
-		home.ECEF[0] = (int32_t) (ECEF[0] * 100);
-		home.ECEF[1] = (int32_t) (ECEF[1] * 100);
-		home.ECEF[2] = (int32_t) (ECEF[2] * 100);
 
 		// Compute magnetic flux direction at home location
 		if (WMM_GetMagVector(LLA[0], LLA[1], LLA[2], gps.Month, gps.Day, gps.Year, &home.Be[0]) >= 0)

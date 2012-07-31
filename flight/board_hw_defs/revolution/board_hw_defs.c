@@ -1313,13 +1313,14 @@ void PIOS_RTC_IRQ_Handler (void)
 
 #include "pios_tim_priv.h"
 
-static const TIM_TimeBaseInitTypeDef tim_3_5_time_base = {
+static const TIM_TimeBaseInitTypeDef tim_2_3_5_time_base = {
 	.TIM_Prescaler = (PIOS_PERIPHERAL_APB1_CLOCK / 1000000) - 1,
 	.TIM_ClockDivision = TIM_CKD_DIV1,
 	.TIM_CounterMode = TIM_CounterMode_Up,
 	.TIM_Period = ((1000000 / PIOS_SERVO_UPDATE_HZ) - 1),
 	.TIM_RepetitionCounter = 0x0000,
 };
+
 static const TIM_TimeBaseInitTypeDef tim_9_10_11_time_base = {
 	.TIM_Prescaler = (PIOS_PERIPHERAL_APB2_CLOCK / 1000000) - 1,
 	.TIM_ClockDivision = TIM_CKD_DIV1,
@@ -1328,9 +1329,43 @@ static const TIM_TimeBaseInitTypeDef tim_9_10_11_time_base = {
 	.TIM_RepetitionCounter = 0x0000,
 };
 
+// Set up timers that only have inputs on APB2
+static const TIM_TimeBaseInitTypeDef tim_1_time_base = {
+	.TIM_Prescaler = (PIOS_PERIPHERAL_APB2_CLOCK / 1000000) - 1,
+	.TIM_ClockDivision = TIM_CKD_DIV1,
+	.TIM_CounterMode = TIM_CounterMode_Up,
+	.TIM_Period = 0xFFFF,
+	.TIM_RepetitionCounter = 0x0000,
+};
+
+// Set up timers that only have inputs on APB2
+static const TIM_TimeBaseInitTypeDef tim_4_time_base = {
+	.TIM_Prescaler = (PIOS_PERIPHERAL_APB1_CLOCK / 1000000) - 1,
+	.TIM_ClockDivision = TIM_CKD_DIV1,
+	.TIM_CounterMode = TIM_CounterMode_Up,
+	.TIM_Period = 0xFFFF,
+	.TIM_RepetitionCounter = 0x0000,
+};
+
+
+
+static const struct pios_tim_clock_cfg tim_2_cfg = {
+	.timer = TIM2,
+	.time_base_init = &tim_2_3_5_time_base,
+	.irq = {
+		.init = {
+			.NVIC_IRQChannel                   = TIM2_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
+			.NVIC_IRQChannelSubPriority        = 0,
+			.NVIC_IRQChannelCmd                = ENABLE,
+		},
+	},
+};
+
+
 static const struct pios_tim_clock_cfg tim_3_cfg = {
 	.timer = TIM3,
-	.time_base_init = &tim_3_5_time_base,
+	.time_base_init = &tim_2_3_5_time_base,
 	.irq = {
 		.init = {
 			.NVIC_IRQChannel                   = TIM3_IRQn,
@@ -1341,9 +1376,10 @@ static const struct pios_tim_clock_cfg tim_3_cfg = {
 	},
 };
 
+
 static const struct pios_tim_clock_cfg tim_5_cfg = {
 	.timer = TIM5,
-	.time_base_init = &tim_3_5_time_base,
+	.time_base_init = &tim_2_3_5_time_base,
 	.irq = {
 		.init = {
 			.NVIC_IRQChannel                   = TIM5_IRQn,
@@ -1391,23 +1427,6 @@ static const struct pios_tim_clock_cfg tim_11_cfg = {
 			.NVIC_IRQChannelCmd                = ENABLE,
 		},
 	},
-};
-
-// Set up timers that only have inputs on APB2
-static const TIM_TimeBaseInitTypeDef tim_1_time_base = {
-	.TIM_Prescaler = (PIOS_PERIPHERAL_APB2_CLOCK / 1000000) - 1,
-	.TIM_ClockDivision = TIM_CKD_DIV1,
-	.TIM_CounterMode = TIM_CounterMode_Up,
-	.TIM_Period = 0xFFFF,
-	.TIM_RepetitionCounter = 0x0000,
-};
-// Set up timers that only have inputs on APB2
-static const TIM_TimeBaseInitTypeDef tim_4_time_base = {
-	.TIM_Prescaler = (PIOS_PERIPHERAL_APB1_CLOCK / 1000000) - 1,
-	.TIM_ClockDivision = TIM_CKD_DIV1,
-	.TIM_CounterMode = TIM_CounterMode_Up,
-	.TIM_Period = 0xFFFF,
-	.TIM_RepetitionCounter = 0x0000,
 };
 
 static const struct pios_tim_clock_cfg tim_1_cfg = {
@@ -1566,6 +1585,40 @@ static const struct pios_tim_channel pios_tim_servoport_all_pins[] = {
 				.GPIO_PuPd  = GPIO_PuPd_UP
 			},
 			.pin_source = GPIO_PinSource1,
+		},
+		.remap = GPIO_AF_TIM3,
+	},
+	// PB3 - TIM2 CH2 LED1 Ok
+	{
+		.timer = TIM2,
+		.timer_chan = TIM_Channel_2,
+		.pin = {
+			.gpio = GPIOB,
+			.init = {
+				.GPIO_Pin = GPIO_Pin_3,
+				.GPIO_Speed = GPIO_Speed_2MHz,
+				.GPIO_Mode  = GPIO_Mode_AF,
+				.GPIO_OType = GPIO_OType_PP,
+				.GPIO_PuPd  = GPIO_PuPd_UP
+			},
+			.pin_source = GPIO_PinSource3,
+		},
+		.remap = GPIO_AF_TIM2,
+	},
+	// led PB4 - TIM3 CH1 LED2
+	{
+		.timer = TIM3,
+		.timer_chan = TIM_Channel_1,
+		.pin = {
+			.gpio = GPIOB,
+			.init = {
+				.GPIO_Pin = GPIO_Pin_4,
+				.GPIO_Speed = GPIO_Speed_2MHz,
+				.GPIO_Mode  = GPIO_Mode_AF,
+				.GPIO_OType = GPIO_OType_PP,
+				.GPIO_PuPd  = GPIO_PuPd_UP
+			},
+			.pin_source = GPIO_PinSource4,
 		},
 		.remap = GPIO_AF_TIM3,
 	},

@@ -62,6 +62,11 @@ QWidget *PfdQmlGadgetOptionsPage::createPage(QWidget *parent)
     options_page->altitude->setText(QString::number(m_config->altitude()));
     options_page->useOnlyCache->setChecked(m_config->cacheOnly());
 
+#ifndef USE_OSG
+    options_page->showTerrain->setChecked(false);
+    options_page->showTerrain->setVisible(false);
+#endif
+
     return optionsPageWidget;
 }
 

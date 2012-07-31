@@ -68,6 +68,7 @@ USE_GPS ?= YES
 USE_TXPID ?= YES
 USE_I2C ?= NO
 USE_ALTITUDE ?= NO
+USE_AUTOTUNE ?= NO
 TEST_FAULTS ?= NO
 
 # List of optional modules to include
@@ -93,6 +94,9 @@ endif
 endif
 ifeq ($(TEST_FAULTS), YES)
 OPTMODULES += Fault
+endif
+ifeq ($(USE_AUTOTUNE), YES)
+OPTMODULES += Autotune
 endif
 
 # List of mandatory modules to include
@@ -204,6 +208,8 @@ SRC += $(OPUAVSYNTHDIR)/gpssettings.c
 SRC += $(OPUAVSYNTHDIR)/hwsettings.c
 SRC += $(OPUAVSYNTHDIR)/gcsreceiver.c
 SRC += $(OPUAVSYNTHDIR)/receiveractivity.c
+SRC += $(OPUAVSYNTHDIR)/relaytuningsettings.c
+SRC += $(OPUAVSYNTHDIR)/relaytuning.c
 SRC += $(OPUAVSYNTHDIR)/taskinfo.c
 SRC += $(OPUAVSYNTHDIR)/mixerstatus.c
 SRC += $(OPUAVSYNTHDIR)/ratedesired.c

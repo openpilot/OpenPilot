@@ -371,6 +371,8 @@ static void stabilizationTask(void* parameters)
 					bool hysteresis = (high ? (thisTime - lastHighTime) : (thisTime - lastLowTime)) > DEGLITCH_TIME;
 					if ( !high && hysteresis && error > 0 ){ /* RISE DETECTED */
 						float this_amplitude = 2 * sqrtf(accum_sin*accum_sin + accum_cos*accum_cos) / accumulated;
+						float this_gain = this_amplitude / relaySettings.Amplitude;
+
 						accumulated = 0;
 						accum_sin = 0;
 						accum_cos = 0;
@@ -378,10 +380,10 @@ static void stabilizationTask(void* parameters)
 						if(rateRelayRunning[i] == false) {
 							rateRelayRunning[i] = true;
 							relay.Period[i] = 200;
-							relay.Amplitude[i] = 0;
+							relay.Gain[i] = 0;
 						} else {
 							// Low pass filter each amplitude and period
-							relay.Amplitude[i] = relay.Amplitude[i] * AMPLITUDE_ALPHA + this_amplitude * (1 - AMPLITUDE_ALPHA);
+							relay.Gain[i] = relay.Gain[i] * AMPLITUDE_ALPHA + this_gain * (1 - AMPLITUDE_ALPHA);
 							relay.Period[i] = relay.Period[i] * PERIOD_ALPHA + dT * (1 - PERIOD_ALPHA);
 						}
 						lastHighTime = thisTime;

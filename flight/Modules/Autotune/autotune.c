@@ -254,16 +254,13 @@ static void update_stabilization_settings()
 	const float gain_ratio_p = 1.0f / 5.0f;
 	const float zero_ratio_p = 1.0f / 5.0f;
 
-	float input = relaySettings.Amplitude * 4.0f / M_PI;      // amplitude of input (fundamental component of fourier series for the square wave)
-
 	// For now just run over roll and pitch
 	for (uint i = 0; i < 2; i++) {
-		float output = relayTuning.Amplitude[i];               // amplitude of sinusoidal oscillation in output
 		float wu = 1000.0f * 2 * M_PI / relayTuning.Period[i]; // ultimate freq = output osc freq (rad/s)
 
 		float wc = wu * gain_ratio_r;      // target openloop crossover frequency (rad/s)
 		float zc = wc * zero_ratio_r;      // controller zero location (rad/s)
-		float kpu = input / output;        // ultimate gain, i.e. the proportional gain for instablity
+		float kpu = 4.0f / M_PI / relayTuning.Gain[i];  // ultimate gain, i.e. the proportional gain for instablity
 		float kp = kpu * gain_ratio_r;     // proportional gain
 		float ki = zc * kp;                // integral gain
 

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>443</width>
-    <height>560</height>
+    <height>575</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,68 +26,52 @@
     <string>Tuning Aggressiveness</string>
    </property>
    <layout class="QGridLayout" name="gridLayout_2">
-    <item row="1" column="0">
+    <item row="0" column="0">
      <widget class="QLabel" name="label">
       <property name="text">
        <string>Rate Tuning:</string>
       </property>
      </widget>
     </item>
-    <item row="1" column="1">
-     <widget class="QSlider" name="rateTuning">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="objrelation" stdset="0">
-       <stringlist>
-        <string>obj1name:RelayTuningSettings</string>
-        <string>fieldname:RateGain</string>
-        <string>scale:0.01</string>
-        <string>haslimits:yes</string>
-       </stringlist>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="0">
+    <item row="1" column="0">
      <widget class="QLabel" name="label_2">
       <property name="text">
        <string>Attitude Tuning:</string>
       </property>
      </widget>
     </item>
-    <item row="2" column="1">
-     <widget class="QSlider" name="attitudeTuning">
+    <item row="0" column="1">
+     <widget class="QSlider" name="rateTuning">
+      <property name="maximum">
+       <number>100</number>
+      </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
       <property name="objrelation" stdset="0">
        <stringlist>
-        <string>obj1name:RelayTuningSettings</string>
-        <string>fieldname:AttitudeGain</string>
-        <string>elemescale:0.01</string>
-        <string>haslimits:yes</string>
+        <string>objname:RelayTuningSettings</string>
+        <string>fieldname:RateGain</string>
+        <string>scale:0.01</string>
+        <string>haslimits:no</string>
        </stringlist>
       </property>
      </widget>
     </item>
-    <item row="0" column="0">
-     <widget class="QLabel" name="label_21">
-      <property name="text">
-       <string>StepSize</string>
+    <item row="1" column="1">
+     <widget class="QSlider" name="attitudeTuning">
+      <property name="maximum">
+       <number>100</number>
       </property>
-     </widget>
-    </item>
-    <item row="0" column="1">
-     <widget class="QSlider" name="stepSizeSlider">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
       <property name="objrelation" stdset="0">
        <stringlist>
-        <string>obj1name:RelatyTuningSettings</string>
-        <string>fieldname:Amplitude</string>
+        <string>objname:RelayTuningSettings</string>
+        <string>fieldname:AttitudeGain</string>
         <string>scale:0.01</string>
-        <string>haslimits:yes</string>
+        <string>haslimits:no</string>
        </stringlist>
       </property>
      </widget>
@@ -232,12 +216,32 @@
       <property name="text">
        <string>0</string>
       </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+      <property name="objrelation" stdset="0">
+       <stringlist>
+        <string>objname:RelayTuning</string>
+        <string>fieldname:Period</string>
+        <string>element:Roll</string>
+       </stringlist>
+      </property>
      </widget>
     </item>
     <item row="1" column="2">
-     <widget class="QLabel" name="measuredRollAmplitude">
+     <widget class="QLabel" name="measuredRollGain">
       <property name="text">
        <string>0</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+      <property name="objrelation" stdset="0">
+       <stringlist>
+        <string>objname:RelayTuning</string>
+        <string>fieldname:Gain</string>
+        <string>element:Roll</string>
+       </stringlist>
       </property>
      </widget>
     </item>
@@ -251,7 +255,7 @@
     <item row="0" column="2">
      <widget class="QLabel" name="label_7">
       <property name="text">
-       <string>Amplitude (deg/s)</string>
+       <string>Gain (deg/s) / output</string>
       </property>
      </widget>
     </item>
@@ -267,12 +271,32 @@
       <property name="text">
        <string>0</string>
       </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+      <property name="objrelation" stdset="0">
+       <stringlist>
+        <string>objname:RelayTuning</string>
+        <string>fieldname:Period</string>
+        <string>element:Pitch</string>
+       </stringlist>
+      </property>
      </widget>
     </item>
     <item row="2" column="2">
-     <widget class="QLabel" name="measuredPitchPeriod_2">
+     <widget class="QLabel" name="measuredPitchGain">
       <property name="text">
        <string>0</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+      <property name="objrelation" stdset="0">
+       <stringlist>
+        <string>objname:RelayTuning</string>
+        <string>fieldname:Gain</string>
+        <string>element:Pitch</string>
+       </stringlist>
       </property>
      </widget>
     </item>
@@ -989,14 +1013,69 @@ will alter thingsfor the next autotuning flight</string>
   <widget class="QPushButton" name="useComputedValues">
    <property name="geometry">
     <rect>
-     <x>270</x>
+     <x>250</x>
      <y>380</y>
-     <width>161</width>
-     <height>24</height>
+     <width>171</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton {
+border: 1px outset #999;
+border-radius: 5;
+background-color: qlineargradient(spread:pad, x1:0.507, y1:0.869318, x2:0.507, y2:0.0965909, stop:0.28 rgba(236, 236, 236, 255), stop:1 rgba(252, 252, 252, 255));
+}
+
+QPushButton:pressed {
+
+    border-style: inset;
+	background-color: qlineargradient(spread:pad, x1:0.502, y1:0.664864, x2:0.502, y2:0.034, stop:0.358209 rgba(250, 250, 250, 255), stop:0.626866 rgba(235, 235, 235, 255));
+
+}
+
+
+QPushButton:hover  {
+	border: 1px outset #999;	
+border-color: rgb(83, 83, 83);
+border-radius: 4;
+	}</string>
+   </property>
+   <property name="text">
+    <string>Apply Computed Values</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_21">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>410</y>
+     <width>104</width>
+     <height>20</height>
     </rect>
    </property>
    <property name="text">
-    <string>Use Computed Values</string>
+    <string>Step Size</string>
+   </property>
+  </widget>
+  <widget class="QSlider" name="stepSizeSlider">
+   <property name="geometry">
+    <rect>
+     <x>149</x>
+     <y>410</y>
+     <width>266</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="objrelation" stdset="0">
+    <stringlist>
+     <string>objname:RelayTuningSettings</string>
+     <string>fieldname:Amplitude</string>
+     <string>scale:0.01</string>
+     <string>haslimits:no</string>
+    </stringlist>
    </property>
   </widget>
  </widget>

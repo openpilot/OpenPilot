@@ -46,10 +46,15 @@ public:
 
 private:
     Ui_AutotuneWidget *m_autotune;
+    StabilizationSettings::DataFields stabSettings;
+
 signals:
 
 public slots:
 
+private slots:
+    void recomputeStabilization();
+    void saveStabilization();
 };
 
 #endif // CONFIGAUTOTUNE_H

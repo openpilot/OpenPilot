@@ -50,6 +50,7 @@
 
 #include "pios.h"
 #include "flightstatus.h"
+#include "hwsettings.h"
 #include "manualcontrolcommand.h"
 #include "manualcontrolsettings.h"
 #include "relaytuning.h"
@@ -67,6 +68,7 @@ enum AUTOTUNE_STATE {AT_INIT, AT_START, AT_ROLL, AT_PITCH, AT_FINISHED, AT_SET};
 
 // Private variables
 static xTaskHandle taskHandle;
+static bool autotuneEnabled;
 
 // Private functions
 static void AutotuneTask(void *parameters);
@@ -79,6 +81,19 @@ static void update_stabilization_settings();
 int32_t AutotuneInitialize(void)
 {
 	// Create a queue, connect to manual control command and flightstatus
+#ifdef MODULE_AUTOTUNE_BUILTIN
+	autotuneEnabled = true;
+#else
+	HwSettingsInitialize();
+	uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
+
+	HwSettingsOptionalModulesGet(optionalModules);
+
+	if (optionalModules[HWSETTINGS_OPTIONALMODULES_AUTOTUNE] == HWSETTINGS_OPTIONALMODULES_ENABLED)
+		autotuneEnabled = true;
+	else
+		autotuneEnabled = false;
+#endif
 
 	return 0;
 }
@@ -89,13 +104,13 @@ int32_t AutotuneInitialize(void)
  */
 int32_t AutotuneStart(void)
 {
-	
-	// Start main task
-	xTaskCreate(AutotuneTask, (signed char *)"Autotune", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
+	// Start main task if it is enabled
+	if(autotuneEnabled) {
+		xTaskCreate(AutotuneTask, (signed char *)"Autotune", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
 
-	//TaskMonitorAdd(TASKINFO_RUNNING_ATTITUDE, taskHandle);
-	//PIOS_WDG_RegisterFlag(PIOS_WDG_ATTITUDE);
-	
+		TaskMonitorAdd(TASKINFO_RUNNING_AUTOTUNE, taskHandle);
+		PIOS_WDG_RegisterFlag(PIOS_WDG_AUTOTUNE);
+	}
 	return 0;
 }
 
@@ -113,6 +128,8 @@ static void AutotuneTask(void *parameters)
 	portTickType lastUpdateTime = xTaskGetTickCount();
 
 	while(1) {
+
+		PIOS_WDG_UpdateFlag(PIOS_WDG_AUTOTUNE);
 		// TODO:
 		// 1. get from queue
 		// 2. based on whether it is flightstatus or manualcontrol

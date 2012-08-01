@@ -144,7 +144,12 @@ static void AutotuneTask(void *parameters)
 		ManualControlCommandData manualControl;
 		ManualControlCommandGet(&manualControl);
 
-		if (0) { // rate mode
+		RelayTuningSettingsData relaySettings;
+		RelayTuningSettingsGet(&relaySettings);
+
+		bool rate = relaySettings.Mode == RELAYTUNINGSETTINGS_MODE_RATE;
+
+		if (rate) { // rate mode
 			stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_ROLL]  = STABILIZATIONDESIRED_STABILIZATIONMODE_RATE;
 			stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_PITCH] = STABILIZATIONDESIRED_STABILIZATIONMODE_RATE;
 
@@ -188,7 +193,8 @@ static void AutotuneTask(void *parameters)
 				diffTime = xTaskGetTickCount() - lastUpdateTime;
 
 				// Run relay mode on the roll axis for the measurement time
-				stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_ROLL] = STABILIZATIONDESIRED_STABILIZATIONMODE_RELAY;
+				stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_ROLL] = rate ? STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYRATE :
+					STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYATTITUDE;
 				if (diffTime > MEAURE_TIME) { // Move on to next state
 					state = AT_PITCH;
 					lastUpdateTime = xTaskGetTickCount();
@@ -200,7 +206,8 @@ static void AutotuneTask(void *parameters)
 				diffTime = xTaskGetTickCount() - lastUpdateTime;
 
 				// Run relay mode on the pitch axis for the measurement time
-				stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_PITCH] = STABILIZATIONDESIRED_STABILIZATIONMODE_RELAY;
+				stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_PITCH] = rate ? STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYRATE :
+					STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYATTITUDE;
 				if (diffTime > MEAURE_TIME) { // Move on to next state
 					state = AT_FINISHED;
 					lastUpdateTime = xTaskGetTickCount();

@@ -135,7 +135,8 @@ void ConfigCCAttitudeWidget::timeout() {
 
 void ConfigCCAttitudeWidget::startAccelCalibration() {
     QMutexLocker locker(&startStop);
-
+    //need to apply so board rotation values don't get overwriten when calibrating
+    apply();
     updates = 0;
     x_accum.clear();
     y_accum.clear();

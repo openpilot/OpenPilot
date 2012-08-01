@@ -2453,9 +2453,9 @@
               <type>splitter</type>
             </side0>
             <side1>
-              <classId>PFDGadget</classId>
+              <classId>PfdQmlGadget</classId>
               <gadget>
-                <activeConfiguration>raw</activeConfiguration>
+                <activeConfiguration>NoTerrain</activeConfiguration>
               </gadget>
               <type>uavGadget</type>
             </side1>

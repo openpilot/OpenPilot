@@ -92,7 +92,7 @@ int8_t vbar_gyros_suppress;
 bool vbar_piro_comp = false;
 
 // TODO: Move this to flash
-static float sin_lookup[360];
+static float sin_lookup[180];
 
 // Private functions
 static void stabilizationTask(void* parameters);
@@ -100,6 +100,15 @@ static float ApplyPid(pid_type * pid, const float err, float dT);
 static float bound(float val, float range);
 static void ZeroPids(void);
 static void SettingsUpdatedCb(UAVObjEvent * ev);
+
+//! Uses the lookup table to calculate sine (angle is in degrees)
+static float sin_l(int angle) {
+	angle = angle % 360;
+	if (angle > 180)
+		return - sin_lookup[angle-180];
+	else
+		return sin_lookup[angle];
+}
 
 /**
  * Module initialization
@@ -110,7 +119,7 @@ int32_t StabilizationStart()
 	// Create object queue
 	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
 
-	for(uint32_t i = 0; i < 360; i++)
+	for(uint32_t i = 0; i < 180; i++)
 		sin_lookup[i] = sinf((float)i * 2 * M_PI / 360.0f);
 
 	// Listen for updates.
@@ -409,8 +418,8 @@ static void stabilizationTask(void* parameters)
 					uint32_t phase = 360 * dT / relay.Period[i];
 					if(phase >= 360)
 						phase = 1;
-					accum_sin += sin_lookup[phase] * error;
-					accum_cos += sin_lookup[(phase + 90) % 360] * error;
+					accum_sin += sin_l(phase) * error;
+					accum_cos += sin_l(phase + 90) * error;
 					accumulated ++;
 
 					// Make susre we've had enough time since last transition then check for a change in the output
@@ -491,8 +500,8 @@ static void stabilizationTask(void* parameters)
 					uint32_t phase = 360 * dT / relay.Period[i];
 					if(phase >= 360)
 						phase = 1;
-					accum_sin += sin_lookup[phase] * error;
-					accum_cos += sin_lookup[(phase + 90) % 360] * error;
+					accum_sin += sin_l(phase) * error;
+					accum_cos += sin_l(phase + 90) * error;
 					accumulated ++;
 
 					// Make susre we've had enough time since last transition then check for a change in the output

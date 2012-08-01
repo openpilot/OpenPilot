@@ -26,6 +26,8 @@
 */
 #include "../internals/pureprojection.h"
 #include "uavitem.h"
+const qreal Pi = 3.14;
+
 namespace mapcontrol
 {
     UAVItem::UAVItem(MapGraphicItem* map,OPMapWidget* parent,QString uavPic):map(map),mapwidget(parent),showtrail(true),showtrailline(true),trailtime(5),traildistance(50),autosetreached(true)
@@ -55,7 +57,35 @@ namespace mapcontrol
     {
         Q_UNUSED(option);
         Q_UNUSED(widget);
+        QLineF line(0,0,1.0,1.0);
+        QPen myPen;
+        QColor myColor(Qt::red);
+        painter->setPen(myPen);
+        line.setP1(QPointF(0,0));
+        line.setLength(60.0);
+        line.setAngle(90.0);
+        myPen.setColor(myColor);
+        qreal arrowSize = 10;
+        painter->setPen(myPen);
+        painter->setBrush(myColor);
+
+        double angle = ::acos(line.dx() / line.length());
+        if (line.dy() <= 0)
+            angle = (Pi * 2) - angle;
+
+        QPointF arrowP1 = line.pointAt(1) + QPointF(sin(angle + Pi / 3) * arrowSize,
+                                                      cos(angle + Pi / 3) * arrowSize);
+        QPointF arrowP2 = line.pointAt(1) + QPointF(sin(angle + Pi - Pi / 3) * arrowSize,
+                                                      cos(angle + Pi - Pi / 3) * arrowSize);
+        arrowHead.clear();
+        arrowHead << line.pointAt(1) << arrowP1 << arrowP2;
+        painter->drawPolygon(arrowHead);
+        painter->setPen(myPen);
+        painter->drawLine(line);
         painter->drawPixmap(-pic.width()/2,-pic.height()/2,pic);
+        qreal rot=this->rotation();
+        painter->rotate(-1*rot);
+        painter->drawText(QPointF(10,10),"KENZ");
     }
 
     QRectF UAVItem::boundingRect()const

@@ -195,7 +195,7 @@ namespace mapcontrol
         void SetUavPic(QString UAVPic);
     private:
         MapGraphicItem* map;
-
+        QPolygonF arrowHead;
         int altitude;
         UAVMapFollowType::Types mapfollowtype;
         UAVTrailType::Types trailtype;

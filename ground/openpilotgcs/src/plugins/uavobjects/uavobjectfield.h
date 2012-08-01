@@ -48,6 +48,7 @@ public:
     {
         LimitType type;
         QList<QVariant> values;
+        int board;
     } LimitStruct;
 
     UAVObjectField(const QString& name, const QString& units, FieldType type, quint32 numElements, const QStringList& options,const QString& limits=QString());
@@ -74,9 +75,9 @@ public:
     bool isText();
     QString toString();
 
-    bool isWithinLimits(QVariant var, quint32 index);
-    QVariant getMaxLimit(quint32 index);
-    QVariant getMinLimit(quint32 index);
+    bool isWithinLimits(QVariant var, quint32 index, int board=0);
+    QVariant getMaxLimit(quint32 index, int board=0);
+    QVariant getMinLimit(quint32 index, int board=0);
 signals:
     void fieldUpdated(UAVObjectField* field);
 

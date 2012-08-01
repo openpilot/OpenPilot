@@ -113,12 +113,22 @@ void UAVObjectField::limitsInitialize(const QString &limits)
     quint32 index=0;
     foreach (QString str, stringPerElement) {
         QString _str=str.trimmed();
+        if(_str.isEmpty())
+            continue;
         QStringList valuesPerElement=_str.split(":");
         LimitStruct lstruc;
         bool b1=valuesPerElement.at(0).startsWith("%");
         bool b2=(int)(index)<(int)numElements;
-        if(b1 && b2)
+        bool b3=valuesPerElement.at(0).size()==3;
+        bool auxb;
+        valuesPerElement.at(0).mid(1,4).toInt(&auxb,16);
+        bool b4=((valuesPerElement.at(0).size())==7 && auxb);
+        if(b1 && b2 && (b3 || b4))
         {
+            if(b4)
+                lstruc.board=valuesPerElement.at(0).mid(1,4).toInt(&auxb,16);
+            else
+                lstruc.board=0;
             if(valuesPerElement.at(0).right(2)=="EQ")
                 lstruc.type=EQUAL;
             else if(valuesPerElement.at(0).right(2)=="NE")
@@ -140,7 +150,7 @@ void UAVObjectField::limitsInitialize(const QString &limits)
                 case UINT8:
                 case UINT16:
                 case UINT32:
-		case BITFIELD:
+                case BITFIELD:
                     lstruc.values.append((quint32)value.toULong());
                     break;
                 case INT8:
@@ -170,14 +180,18 @@ void UAVObjectField::limitsInitialize(const QString &limits)
                 qDebug()<<"limits parsing failed (property doesn't start with %) on UAVObjectField"<<name;
             else if(!b2)
                 qDebug()<<"limits parsing failed (index>numelements) on UAVObjectField"<<name<<"index"<<index<<"numElements"<<numElements;
+            else if(!b3 || !b4 )
+                qDebug()<<"limits parsing failed limit not starting with %XX or %YYYYXX where XX is the limit type and YYYY is the board type on UAVObjectField"<<name;
         }
     }
 }
-bool UAVObjectField::isWithinLimits(QVariant var,quint32 index)
+bool UAVObjectField::isWithinLimits(QVariant var,quint32 index, int board)
 {
     if(!elementLimits.keys().contains(index))
         return true;
     LimitStruct struc=elementLimits.value(index);
+    if((struc.board!=board) && board!=0 && struc.board!=0)
+        return true;
     switch(struc.type)
     {
     case EQUAL:
@@ -384,11 +398,13 @@ bool UAVObjectField::isWithinLimits(QVariant var,quint32 index)
     return true;
 }
 
-QVariant UAVObjectField::getMaxLimit(quint32 index)
+QVariant UAVObjectField::getMaxLimit(quint32 index,int board)
 {
     if(!elementLimits.keys().contains(index))
         return QVariant();
     LimitStruct struc=elementLimits.value(index);
+    if((struc.board!=board) && board!=0 && struc.board!=0)
+        return QVariant();
     switch(struc.type)
     {
     case EQUAL:
@@ -409,11 +425,13 @@ QVariant UAVObjectField::getMaxLimit(quint32 index)
     }
      return QVariant();
 }
-QVariant UAVObjectField::getMinLimit(quint32 index)
+QVariant UAVObjectField::getMinLimit(quint32 index, int board)
 {
     if(!elementLimits.keys().contains(index))
         return QVariant();
     LimitStruct struc=elementLimits.value(index);
+    if((struc.board!=board) && board!=0 && struc.board!=0)
+        return QVariant();
     switch(struc.type)
     {
     case EQUAL:

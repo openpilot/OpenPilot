@@ -245,7 +245,7 @@ static void stabilizationTask(void* parameters)
 		for(uint8_t i=0; i< MAX_AXES; i++)
 		{
 			// Check whether this axis mode needs to be reinitialized
-			bool reinit = (stabDesired.StabilizationMode[i] == previous_mode[i]);
+			bool reinit = (stabDesired.StabilizationMode[i] != previous_mode[i]);
 			previous_mode[i] = stabDesired.StabilizationMode[i];
 
 			// Apply the selected control law

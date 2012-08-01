@@ -45,6 +45,9 @@
 #include "manualcontrol.h" // Just to get a macro
 #include "CoordinateConversions.h"
 
+// Includes for various stabilization algorithms
+#include "relay_tuning.h"
+
 // Private constants
 #define MAX_QUEUE_SIZE 1
 
@@ -91,24 +94,12 @@ pid_type pids[PID_MAX];
 int8_t vbar_gyros_suppress;
 bool vbar_piro_comp = false;
 
-// TODO: Move this to flash
-static float sin_lookup[180];
-
 // Private functions
 static void stabilizationTask(void* parameters);
 static float ApplyPid(pid_type * pid, const float err, float dT);
 static float bound(float val, float range);
 static void ZeroPids(void);
 static void SettingsUpdatedCb(UAVObjEvent * ev);
-
-//! Uses the lookup table to calculate sine (angle is in degrees)
-static float sin_l(int angle) {
-	angle = angle % 360;
-	if (angle > 180)
-		return - sin_lookup[angle-180];
-	else
-		return sin_lookup[angle];
-}
 
 /**
  * Module initialization
@@ -119,8 +110,8 @@ int32_t StabilizationStart()
 	// Create object queue
 	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
 
-	for(uint32_t i = 0; i < 180; i++)
-		sin_lookup[i] = sinf((float)i * 2 * M_PI / 360.0f);
+	// This prepares this optional algorithm
+	stabilization_relay_init();
 
 	// Listen for updates.
 	//	AttitudeActualConnectQueue(queue);
@@ -366,171 +357,28 @@ static void stabilizationTask(void* parameters)
 
 					break;
 
+				case STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYRATE:
+					// Store to rate desired variable for storing to UAVO
+					rateDesiredAxis[i] = bound(attitudeDesiredAxis[i], settings.ManualRate[i]);
+
+					// Run the relay controller which also estimates the oscillation parameters
+					stabilization_relay_rate(rateDesiredAxis[i] - gyro_filtered[i], &actuatorDesiredAxis[i], i, reinit);
+					actuatorDesiredAxis[i] = bound(actuatorDesiredAxis[i],1.0);
+
+					break;
+
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYATTITUDE:
-				{
-					RelayTuningData relay;
-					RelayTuningGet(&relay);
-
-					static bool rateRelayRunning[MAX_AXES];
-
-					// On first run initialize estimates to something reasonable
-					if(reinit) {
+					if(reinit)
 						pids[PID_ROLL + i].iAccumulator = 0;
-						rateRelayRunning[i] = false;
-						relay.Period[i] = 200;
-						relay.Gain[i] = 0;
-					}
-					// Replace the rate PID with a relay to measure the critical properties of this axis
-					// i.e. period and gain
 
-					// Compute the outer loop
+					// Compute the outer loop like attitude mode
 					rateDesiredAxis[i] = ApplyPid(&pids[PID_ROLL + i], local_error[i], dT);
 					rateDesiredAxis[i] = bound(rateDesiredAxis[i], settings.MaximumRate[i]);
 
-					// Store to rate desired variable for storing to UAVO
-					rateDesiredAxis[i] = bound(attitudeDesiredAxis[i], settings.ManualRate[i]);
+					// Run the relay controller which also estimates the oscillation parameters
+					stabilization_relay_rate(rateDesiredAxis[i] - gyro_filtered[i], &actuatorDesiredAxis[i], i, reinit);
+					actuatorDesiredAxis[i] = bound(actuatorDesiredAxis[i],1.0);
 
-					RelayTuningSettingsData relaySettings;
-					RelayTuningSettingsGet(&relaySettings);
-					float error = rateDesiredAxis[i] - gyro_filtered[i];
-					float command = error > 0 ? relaySettings.Amplitude : -relaySettings.Amplitude;
-					actuatorDesiredAxis[i] = bound(command,1.0f);
-
-					static bool high = false;
-					static portTickType lastHighTime;
-					static portTickType lastLowTime;
-					portTickType thisTime = xTaskGetTickCount();
-
-					static float accum_sin, accum_cos;
-					static uint32_t accumulated = 0;
-
-					const uint16_t DEGLITCH_TIME = 20; // ms
-					const float AMPLITUDE_ALPHA = 0.95;
-					const float PERIOD_ALPHA = 0.95;
-
-					// Make sure the period can't go below limit
-					if (relay.Period[i] < DEGLITCH_TIME)
-						relay.Period[i] = DEGLITCH_TIME;
-
-					// Project the error onto a sine and cosine of the same frequency
-					// to accumulate the average amplitude
-					float dT = thisTime - lastHighTime;
-					uint32_t phase = 360 * dT / relay.Period[i];
-					if(phase >= 360)
-						phase = 1;
-					accum_sin += sin_l(phase) * error;
-					accum_cos += sin_l(phase + 90) * error;
-					accumulated ++;
-
-					// Make susre we've had enough time since last transition then check for a change in the output
-					bool hysteresis = (high ? (thisTime - lastHighTime) : (thisTime - lastLowTime)) > DEGLITCH_TIME;
-					if ( !high && hysteresis && error > 0 ){ /* RISE DETECTED */
-						float this_amplitude = 2 * sqrtf(accum_sin*accum_sin + accum_cos*accum_cos) / accumulated;
-						float this_gain = this_amplitude / relaySettings.Amplitude;
-
-						accumulated = 0;
-						accum_sin = 0;
-						accum_cos = 0;
-
-						if(rateRelayRunning[i] == false) {
-							rateRelayRunning[i] = true;
-							relay.Period[i] = 200;
-							relay.Gain[i] = 0;
-						} else {
-							// Low pass filter each amplitude and period
-							relay.Gain[i] = relay.Gain[i] * AMPLITUDE_ALPHA + this_gain * (1 - AMPLITUDE_ALPHA);
-							relay.Period[i] = relay.Period[i] * PERIOD_ALPHA + dT * (1 - PERIOD_ALPHA);
-						}
-						lastHighTime = thisTime;
-						high = true;
-						RelayTuningSet(&relay);
-					} else if ( high && hysteresis && error < 0 ) { /* FALL DETECTED */
-						lastLowTime = thisTime;
-						high = false;
-					}
-
-					break;
-				}
-				case STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYRATE:
-				{
-					RelayTuningData relay;
-					RelayTuningGet(&relay);
-
-					static bool rateRelayRunning[MAX_AXES];
-
-					// On first run initialize estimates to something reasonable
-					if(reinit) {
-						pids[PID_ROLL + i].iAccumulator = 0;
-						rateRelayRunning[i] = false;
-						relay.Period[i] = 200;
-						relay.Gain[i] = 0;
-					}
-
-					// Replace the rate PID with a relay to measure the critical properties of this axis
-					// i.e. period and gain
-
-					// Store to rate desired variable for storing to UAVO
-					rateDesiredAxis[i] = bound(attitudeDesiredAxis[i], settings.ManualRate[i]);
-
-					RelayTuningSettingsData relaySettings;
-					RelayTuningSettingsGet(&relaySettings);
-					float error = rateDesiredAxis[i] - gyro_filtered[i];
-					float command = error > 0 ? relaySettings.Amplitude : -relaySettings.Amplitude;
-					actuatorDesiredAxis[i] = bound(command,1.0);
-
-					static bool high = false;
-					static portTickType lastHighTime;
-					static portTickType lastLowTime;
-					portTickType thisTime = xTaskGetTickCount();
-
-					static float accum_sin, accum_cos;
-					static uint32_t accumulated = 0;
-
-					const uint16_t DEGLITCH_TIME = 20; // ms
-					const float AMPLITUDE_ALPHA = 0.95;
-					const float PERIOD_ALPHA = 0.95;
-
-					// Make sure the period can't go below limit
-					if (relay.Period[i] < DEGLITCH_TIME)
-						relay.Period[i] = DEGLITCH_TIME;
-
-					// Project the error onto a sine and cosine of the same frequency
-					// to accumulate the average amplitude
-					float dT = thisTime - lastHighTime;
-					uint32_t phase = 360 * dT / relay.Period[i];
-					if(phase >= 360)
-						phase = 1;
-					accum_sin += sin_l(phase) * error;
-					accum_cos += sin_l(phase + 90) * error;
-					accumulated ++;
-
-					// Make susre we've had enough time since last transition then check for a change in the output
-					bool hysteresis = (high ? (thisTime - lastHighTime) : (thisTime - lastLowTime)) > DEGLITCH_TIME;
-					if ( !high && hysteresis && error > 0 ){ /* RISE DETECTED */
-						float this_amplitude = 2 * sqrtf(accum_sin*accum_sin + accum_cos*accum_cos) / accumulated;
-						float this_gain = this_amplitude / relaySettings.Amplitude;
-
-						accumulated = 0;
-						accum_sin = 0;
-						accum_cos = 0;
-
-						if(rateRelayRunning[i] == false) {
-							rateRelayRunning[i] = true;
-							relay.Period[i] = 200;
-							relay.Gain[i] = 0;
-						} else {
-							// Low pass filter each amplitude and period
-							relay.Gain[i] = relay.Gain[i] * AMPLITUDE_ALPHA + this_gain * (1 - AMPLITUDE_ALPHA);
-							relay.Period[i] = relay.Period[i] * PERIOD_ALPHA + dT * (1 - PERIOD_ALPHA);
-						}
-						lastHighTime = thisTime;
-						high = true;
-						RelayTuningSet(&relay);
-					} else if ( high && hysteresis && error < 0 ) { /* FALL DETECTED */
-						lastLowTime = thisTime;
-						high = false;
-					}
-				}
 					break;
 
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_NONE:

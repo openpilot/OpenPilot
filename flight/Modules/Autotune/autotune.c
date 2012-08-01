@@ -288,7 +288,19 @@ static void update_stabilization_settings()
 				break;
 		}
 	}
-	StabilizationSettingsSet(&stabSettings);
+	switch(relaySettings.Behavior) {
+		case RELAYTUNINGSETTINGS_BEHAVIOR_MEASURE:
+			// Just measure, don't update the stab settings
+			break;
+		case RELAYTUNINGSETTINGS_BEHAVIOR_COMPUTE:
+			StabilizationSettingsSet(&stabSettings);
+			break;
+		case RELAYTUNINGSETTINGS_BEHAVIOR_SAVE:
+			StabilizationSettingsSet(&stabSettings);
+			UAVObjSave(StabilizationSettingsHandle(), 0);
+			break;
+	}
+	
 }
 
 /**

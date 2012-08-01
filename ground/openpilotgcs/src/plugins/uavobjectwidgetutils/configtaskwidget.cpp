@@ -224,6 +224,11 @@ void ConfigTaskWidget::onAutopilotDisconnect()
     invalidateObjects();
 }
 
+void ConfigTaskWidget::forceConnectedState()
+{
+    isConnected=true;
+}
+
 void ConfigTaskWidget::onAutopilotConnect()
 {
     invalidateObjects();

@@ -1,7 +1,6 @@
 <xml>
     <object name="RelayTuning" singleinstance="true" settings="false">
         <description>The input to the relay tuning.</description>
-	<field name="Value" units="deg/s" type="float" elements="1"/>
 	<field name="Period" units="ms" type="float" elementnames="Roll,Pitch,Yaw"/>
 	<field name="Amplitude" units="deg/s" type="float" elementnames="Roll,Pitch,Yaw"/>
         <access gcs="readwrite" flight="readwrite"/>

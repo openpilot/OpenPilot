@@ -32,9 +32,13 @@ Rectangle {
                 source: "image://svg/pfd.svg!rollscale"
                 sourceSize: background.sourceSize
                 smooth: true
-
-                transformOrigin: Item.Center
-                rotation: -AttitudeActual.Roll
+		anchors.centerIn: parent
+                 //rotate it around the center of scene
+		transform: Rotation {
+		angle: -AttitudeActual.Roll
+		origin.x : sceneItem.width/2 - x
+		origin.y : sceneItem.height/2 - y
+		}
             }
 
             Image {

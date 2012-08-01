@@ -1,13 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       hitlwidget.cpp
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @file       hitlv2widget.cpp
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010-2012.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
- * @addtogroup HITLPlugin HITL Plugin
+ * @addtogroup HITLPlugin HITLv2 Plugin
  * @{
- * @brief The Hardware In The Loop plugin
+ * @brief The Hardware In The Loop plugin version 2
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -24,6 +24,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+
 #include "hitlv2widget.h"
 #include "ui_hitlv2widget.h"
 #include <QDebug>

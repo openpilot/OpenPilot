@@ -1,13 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       hitlv2configuration.h
+ * @file       plugin.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010-2012.
- * @addtogroup GCSPlugins GCS Plugins
+ * @addtogroup 3rdParty Third-party integration
  * @{
- * @addtogroup HITLPlugin HITLv2 Plugin
+ * @addtogroup AeroSimRC AeroSimRC proxy plugin
  * @{
- * @brief The Hardware In The Loop plugin version 2
+ * @brief AeroSimRC simulator to HITL proxy plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -25,37 +25,29 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef HITLV2CONFIGURATION_H
-#define HITLV2CONFIGURATION_H
+#ifndef PLUGIN_H
+#define PLUGIN_H
 
-#include <coreplugin/iuavgadgetconfiguration.h>
-#include <QtGui/QColor>
-#include <QString>
-#include <simulatorv2.h>
+#include <QtCore>
+#include <QTime>
+#include <QList>
+#include "aerosimrcdatastruct.h"
 
-using namespace Core;
+#define SIM_DLL_EXPORT extern "C" __declspec(dllexport)
 
-class HITLConfiguration : public IUAVGadgetConfiguration
-{
+SIM_DLL_EXPORT void AeroSIMRC_Plugin_ReportStructSizes(
+    quint32 *sizeSimToPlugin,
+    quint32 *sizePluginToSim,
+    quint32 *sizePluginInit
+);
 
-    Q_OBJECT
+SIM_DLL_EXPORT void AeroSIMRC_Plugin_Init(
+    pluginInit *p
+);
 
-    Q_PROPERTY(SimulatorSettings settings READ Settings WRITE setSimulatorSettings)
+SIM_DLL_EXPORT void AeroSIMRC_Plugin_Run(
+    const simToPlugin *stp,
+    pluginToSim *pts
+);
 
-public:
-    explicit HITLConfiguration(QString classId, QSettings* qSettings = 0, QObject *parent = 0);
-
-    void saveConfig(QSettings* settings) const;
-    IUAVGadgetConfiguration *clone();
-
-    SimulatorSettings Settings() const { return settings; }
-
-public slots:
-    void setSimulatorSettings (const SimulatorSettings& params ) { settings = params; }
-
-
-private:
-    SimulatorSettings settings;
-};
-
-#endif // HITLV2CONFIGURATION_H
+#endif // PLUGIN_H

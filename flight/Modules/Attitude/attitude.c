@@ -375,6 +375,10 @@ static int32_t updateSensorsCC3D(AccelsData * accelsData, GyrosData * gyrosData)
 	if(xQueueReceive(queue, (void *) &mpu6000_data, SENSOR_PERIOD) == errQUEUE_EMPTY)
 		return -1;	// Error, no data
 
+	// Do not read raw sensor data in simulation mode
+	if (GyrosReadOnly() || AccelsReadOnly())
+		return 0;
+
 	gyros[0] = -mpu6000_data.gyro_y * PIOS_MPU6000_GetScale();
 	gyros[1] = -mpu6000_data.gyro_x * PIOS_MPU6000_GetScale();
 	gyros[2] = -mpu6000_data.gyro_z * PIOS_MPU6000_GetScale();

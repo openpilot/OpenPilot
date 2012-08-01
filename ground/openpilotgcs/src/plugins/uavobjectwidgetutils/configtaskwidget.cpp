@@ -227,6 +227,7 @@ void ConfigTaskWidget::onAutopilotDisconnect()
 void ConfigTaskWidget::forceConnectedState()
 {
     isConnected=true;
+    setDirty(false);
 }
 
 void ConfigTaskWidget::onAutopilotConnect()

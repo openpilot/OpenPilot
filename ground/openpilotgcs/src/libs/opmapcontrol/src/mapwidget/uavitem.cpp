@@ -26,12 +26,13 @@
 */
 #include "../internals/pureprojection.h"
 #include "uavitem.h"
+
 const qreal Pi = 3.14;
 
 namespace mapcontrol
 {
     UAVItem::UAVItem(MapGraphicItem* map,OPMapWidget* parent,QString uavPic):map(map),mapwidget(parent),showtrail(true),showtrailline(true),trailtime(5),traildistance(50),autosetreached(true)
-    ,autosetdistance(100)
+    ,autosetdistance(100),altitude(0)
     {
         pic.load(uavPic);
         this->setFlag(QGraphicsItem::ItemIsMovable,true);
@@ -57,18 +58,35 @@ namespace mapcontrol
     {
         Q_UNUSED(option);
         Q_UNUSED(widget);
-        QLineF line(0,0,1.0,1.0);
+
+
         QPen myPen;
-        QColor myColor(Qt::red);
-        painter->setPen(myPen);
-        line.setP1(QPointF(0,0));
-        line.setLength(60.0);
-        line.setAngle(90.0);
-        myPen.setColor(myColor);
+
+        //Turn on anti-aliasing so the fonts don't look terrible
+        painter->setRenderHint(QPainter::Antialiasing, true);
+
         qreal arrowSize = 10;
+
+        //Set pen attributes
+        QColor myColor(Qt::red);
+        myPen.setWidth(3);
+        myPen.setColor(myColor);
         painter->setPen(myPen);
+
+        //Set brush attributes
         painter->setBrush(myColor);
 
+        //Create line from (0,0), to (1,1). Later, we'll scale and rotate it
+        QLineF line(0,0,1.0,1.0);
+
+        //Set the starting point to (0,0)
+        line.setP1(QPointF(0,0));
+
+        //Set angle and length
+        line.setLength(60.0);
+        line.setAngle(90.0);
+
+        //Form arrowhead
         double angle = ::acos(line.dx() / line.length());
         if (line.dy() <= 0)
             angle = (Pi * 2) - angle;
@@ -77,21 +95,125 @@ namespace mapcontrol
                                                       cos(angle + Pi / 3) * arrowSize);
         QPointF arrowP2 = line.pointAt(1) + QPointF(sin(angle + Pi - Pi / 3) * arrowSize,
                                                       cos(angle + Pi - Pi / 3) * arrowSize);
+
+        //Generate arrowhead
         arrowHead.clear();
         arrowHead << line.pointAt(1) << arrowP1 << arrowP2;
         painter->drawPolygon(arrowHead);
         painter->setPen(myPen);
         painter->drawLine(line);
+
+        //*********** Create trend arc
+        float radius;
+
+        float spanAngle = yawRate_dps * 3; //Forecast 3 seconds into the future
+
+        float meters2pixels=5; //This should be a function of the zoom level, and not a fixed constant
+        radius=fabs((groundspeed_kph/3.6)/(yawRate_dps*Pi/180))*meters2pixels; //Calculate radius in [m], and then convert to Px.
+//        qDebug()<< "Radius:" << radius;
+//        qDebug()<< "Span angle:" << spanAngle;
+
+        //Set trend arc's color
+        myPen.setColor(Qt::magenta);
+        painter->setPen(myPen);
+
+        //Draw arc. Qt is incomprehensibly limited in that it does not let you set a radius and two points,
+        //so instead it's a hackish approach requiring a rectangle and a span angle
+        if (spanAngle > 0){
+            QRectF rect(0, -radius, radius*2, radius*2);
+            painter->drawArc(rect, 180*16, -spanAngle*16);
+        }
+        else{
+            QRectF rect(-2*radius, -radius, radius*2, radius*2);
+            painter->drawArc(rect, 0*16, -spanAngle*16);
+        }
+
+        //HUH? What does this do?
         painter->drawPixmap(-pic.width()/2,-pic.height()/2,pic);
+
+        //***** Text info overlay. The font is a "glow" font, so that it's easier to use on the map
+
+        //Rotate the text back to vertical
         qreal rot=this->rotation();
         painter->rotate(-1*rot);
-        painter->drawText(QPointF(10,10),"KENZ");
+
+        //Define font
+        QFont borderfont( "Arial", 14, QFont::Normal, false );
+
+        //Top left corner of text
+        int textAnchorX = 20;
+        int textAnchorY = 20;
+
+        //Create text lines
+        QString uavoInfoStrLine1, uavoInfoStrLine2;
+        QString uavoInfoStrLine3;
+        QString uavoInfoStrLine4;
+
+        //For whatever reason, Qt does not let QPainterPath have text wrapping. So each line of
+        //text has to be added to a different line.
+        uavoInfoStrLine1.append(QString("CAS: %1 kph").arg(CAS_mps));
+        uavoInfoStrLine2.append(QString("Groundspeed: %1 kph").arg(groundspeed_kph));
+        uavoInfoStrLine3.append(QString("Lat-Lon: %1, %2").arg(coord.Lat()).arg(coord.Lng()));
+        uavoInfoStrLine4.append(QString("Altitude: %1 m").arg(this->altitude));
+
+        //Add the lines of text to the path
+        //NOTE: We must use QPainterPath for the outlined text font. QPaint does not support this.
+        QPainterPath path;
+        path.addText(textAnchorX, textAnchorY+16*0, borderfont, uavoInfoStrLine1);
+        path.addText(textAnchorX, textAnchorY+16*1, borderfont, uavoInfoStrLine2);
+        path.addText(textAnchorX, textAnchorY+16*2, borderfont, uavoInfoStrLine3);
+        path.addText(textAnchorX, textAnchorY+16*3, borderfont, uavoInfoStrLine4);
+
+        //First pass is the outline...
+        myPen.setWidth(4);
+        myPen.setColor(Qt::black);
+        painter->setPen(myPen);
+        painter->setBrush(Qt::black);
+        painter->drawPath(path);
+
+        //...second pass is the inlay
+        myPen.setWidth(1);
+        myPen.setColor(Qt::white);
+        painter->setBrush(Qt::white);
+        painter->setPen(myPen);
+        painter->drawPath(path);
+
     }
 
     QRectF UAVItem::boundingRect()const
     {
         return QRectF(-pic.width()/2,-pic.height()/2,pic.width(),pic.height());
     }
+
+    void UAVItem::SetNED(double NED[3]){
+        this->NED[0] = NED[0];
+        this->NED[1] = NED[1];
+        this->NED[2] = NED[2];
+    }
+
+    void UAVItem::SetYawRate(double yawRate_dps){
+        this->yawRate_dps=yawRate_dps;
+
+        //There is a minimum arc distance under which Qt no longer draws an arc. At this low a turning rate,
+        //all curves look straight, so the user won't notice the difference. Moreover, our sensors aren't
+        //accurate enough to reliably describe this low a yaw rate.
+        if (fabs(this->yawRate_dps) < 5e-1){ //This number is really the smallest we can go. Any smaller, and it might have problems if we forecast a shorter distance into the future
+            this->yawRate_dps=5e-1;
+        }
+
+    }
+
+    void UAVItem::SetCAS(double CAS_mps){
+        this->CAS_mps=CAS_mps;
+    }
+
+    void UAVItem::SetGroundspeed(double vNED[3]){
+        this->vNED[0] = vNED[0];
+        this->vNED[1] = vNED[1];
+        this->vNED[2] = vNED[2];
+        groundspeed_kph=sqrt(vNED[0]*vNED[0] + vNED[1]*vNED[1] + vNED[2]*vNED[2])*3.6;
+    }
+
 
     void UAVItem::SetUAVPos(const internals::PointLatLng &position, const int &altitude)
     {

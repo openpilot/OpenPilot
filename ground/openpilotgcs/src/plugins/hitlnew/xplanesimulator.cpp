@@ -390,9 +390,10 @@ void XplaneSimulator::processUpdate(const QByteArray& dataBuf)
                 //attRaw->setData(rawData);
 		Gyros::DataFields gyroData;
                 memset(&gyroData, 0, sizeof(Gyros::DataFields));
-		gyroData.x = rollRate;
-		gyroData.y = pitchRate;
-		gyroData.z = yawRate;
+#define Pi 3.141529654
+        gyroData.x = rollRate*180/Pi;
+        gyroData.y = pitchRate*180/Pi;
+        gyroData.z = yawRate*180/Pi;
 		gyros->setData(gyroData);
 
 		Accels::DataFields accelData;
@@ -420,7 +421,7 @@ void TraceBuf(const char* buf,int len)
 		{
 			if(i>0)
 			{
-				qDebug() << str;
+//				qDebug() << str;
 				str.clear();
 				reminder=false;
 			}
@@ -429,6 +430,7 @@ void TraceBuf(const char* buf,int len)
 		str+=QString(" 0x%1").arg((quint8)buf[i],2,16,QLatin1Char('0'));
 	}
 
-	if(reminder)
-		qDebug() << str;
+    if(reminder){
+//		qDebug() << str;
+    }
 }

@@ -44,10 +44,18 @@
 #include "utils/homelocationutil.h"
 #include "utils/worldmagmodel.h"
 
+#include "../uavobjectwidgetutils/configtaskwidget.h"
+#include "extensionsystem/pluginmanager.h"
 #include "uavtalk/telemetrymanager.h"
+#include "uavobject.h"
+#include "uavobjectmanager.h"
 
 #include "positionactual.h"
 #include "homelocation.h"
+#include "gpsposition.h"
+#include "gyros.h"
+#include "positionactual.h"
+#include "velocityactual.h"
 #define allow_manual_home_location_move
 
 // *************************************************************************************
@@ -110,6 +118,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 		obm = pm->getObject<UAVObjectManager>();
 		obum = pm->getObject<UAVObjectUtilManager>();
 	}
+
 
 	// **************
     // get current location
@@ -204,6 +213,9 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 	m_map->SetCurrentPosition(m_home_position.coord);         // set the map position
 	m_map->Home->SetCoord(m_home_position.coord);             // set the HOME position
 	m_map->UAV->SetUAVPos(m_home_position.coord, 0.0);        // set the UAV position
+
+
+
     if(m_map->GPS)
         m_map->GPS->SetUAVPos(m_home_position.coord, 0.0);        // set the UAV position
 
@@ -558,19 +570,45 @@ void OPMapGadgetWidget::updatePosition()
 	uav_pos = internals::PointLatLng(uav_latitude, uav_longitude);
 
 	// *************
-	// get the current GPS details
+    // get the current GPS position and heading
+    GPSPosition *gpsPositionObj = GPSPosition::GetInstance(obm);
+    Q_ASSERT(gpsPositionObj);
 
-	// get current GPS position
-	if (!getGPSPosition(gps_latitude, gps_longitude, gps_altitude))
-		return;
+    GPSPosition::DataFields gpsPositionData = gpsPositionObj->getData();
 
-	// get current GPS heading
-//	gps_heading = getGPS_Heading();
-	gps_heading = 0;
+    gps_heading = gpsPositionData.Heading;
+    gps_latitude = gpsPositionData.Latitude;
+    gps_longitude = gpsPositionData.Longitude;
+    gps_altitude = gpsPositionData.Altitude;
+
+    qDebug() << "Lon: " << gps_longitude/1e7;
 
 	gps_pos = internals::PointLatLng(gps_latitude, gps_longitude);
 
-	// *************
+    //**********************
+    // get the current position and heading estimates
+    PositionActual *positionActualObj = PositionActual::GetInstance(obm);
+    VelocityActual *velocityActualObj = VelocityActual::GetInstance(obm);
+    Gyros *gyrosObj = Gyros::GetInstance(obm);
+
+    Q_ASSERT(positionActualObj);
+    Q_ASSERT(velocityActualObj);
+    Q_ASSERT(gyrosObj);
+
+    PositionActual::DataFields positionActualData = positionActualObj->getData();
+    VelocityActual::DataFields velocityActualData = velocityActualObj->getData();
+    Gyros::DataFields gyrosData = gyrosObj->getData();
+
+    double NED[3]={positionActualData.North, positionActualData.East, positionActualData.Down};
+    double vNED[3]={velocityActualData.North, velocityActualData.East, velocityActualData.Down};
+
+    //Set the position and heading estimates in the painter module
+    m_map->UAV->SetNED(NED);
+    m_map->UAV->SetCAS(-1); //THIS NEEDS TO BECOME AIRSPEED, ONCE WE SETTLE ON A UAVO
+    m_map->UAV->SetGroundspeed(vNED);
+    m_map->UAV->SetYawRate(gyrosData.z); //Not correct, but I'm being lazy right now.
+
+    // *************
 	// display the UAV position
 
     QString str =

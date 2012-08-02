@@ -57,6 +57,31 @@ namespace mapcontrol
                 enum { Type = UserType + 2 };
         UAVItem(MapGraphicItem* map,OPMapWidget* parent, QString uavPic=QString::fromUtf8(":/uavs/images/mapquad.png"));
         ~UAVItem();
+
+        /**
+        * @brief Sets the UAV NED position
+        *
+        * @param NED
+        */
+        void SetNED(double NED[3]);
+        /**
+        * @brief Sets the UAV groundspeed
+        *
+        * @param NED
+        */
+        void SetGroundspeed(double vNED[3]);
+        /**
+        * @brief Sets the UAV Calibrated Airspeed
+        *
+        * @param NED
+        */
+        void SetCAS(double CAS);
+        /**
+        * @brief Sets the UAV yaw rate
+        *
+        * @param NED
+        */
+        void SetYawRate(double yawRate_dps);
         /**
         * @brief Sets the UAV position
         *
@@ -201,6 +226,11 @@ namespace mapcontrol
         UAVTrailType::Types trailtype;
         internals::PointLatLng coord;
         internals::PointLatLng lastcoord;
+        double NED[3];
+        double vNED[3];
+        double CAS_mps;
+        double groundspeed_kph;
+        double yawRate_dps;
         QPixmap pic;
         core::Point localposition;
         OPMapWidget* mapwidget;

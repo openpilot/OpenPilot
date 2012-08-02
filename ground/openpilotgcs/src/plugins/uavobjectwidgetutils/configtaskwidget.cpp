@@ -230,6 +230,7 @@ void ConfigTaskWidget::onAutopilotConnect()
     if (utilMngr)
         currentBoard = utilMngr->getBoardModel();//TODO REMEMBER TO ADD THIS TO FORCE CONNECTED FUNC ON CC3D_RELEASE
     invalidateObjects();
+
     dirty=false;
     isConnected=true;
     foreach(objectToWidget * ow,objOfInterest)

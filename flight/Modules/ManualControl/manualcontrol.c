@@ -388,6 +388,10 @@ static void manualControlTask(void *parameters)
 			case FLIGHTMODE_STABILIZED:
 				updateStabilizationDesired(&cmd, &settings);
 				break;
+			case FLIGHTMODE_TUNING:
+				// Tuning takes settings directly from manualcontrolcommand.  No need to
+				// call anything else.  This just avoids errors.
+				break;
 			case FLIGHTMODE_GUIDANCE:
 				switch(flightStatus.FlightMode) {
 					case FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD:

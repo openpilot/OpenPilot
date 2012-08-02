@@ -2426,36 +2426,24 @@
                   <type>uavGadget</type>
                 </side0>
                 <side1>
-                  <side0>
-                    <classId>LineardialGadget</classId>
-                    <gadget>
-                      <activeConfiguration>Flight mode</activeConfiguration>
-                    </gadget>
-                    <type>uavGadget</type>
-                  </side0>
-                  <side1>
-                    <classId>LineardialGadget</classId>
-                    <gadget>
-                      <activeConfiguration>GPS Sats</activeConfiguration>
-                    </gadget>
-                    <type>uavGadget</type>
-                  </side1>
-                  <splitterOrientation>1</splitterOrientation>
-                  <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAAoAAAAAIAAACk)</splitterSizes>
-                  <type>splitter</type>
+                  <classId>LineardialGadget</classId>
+                  <gadget>
+                    <activeConfiguration>Flight mode</activeConfiguration>
+                  </gadget>
+                  <type>uavGadget</type>
                 </side1>
                 <splitterOrientation>1</splitterOrientation>
-                <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAAmQAAAAIAAAFC)</splitterSizes>
+                <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAAsQAAAAIAAAEV)</splitterSizes>
                 <type>splitter</type>
               </side1>
               <splitterOrientation>1</splitterOrientation>
-              <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAAmQAAAAIAAAHc)</splitterSizes>
+              <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAArgAAAAIAAAHH)</splitterSizes>
               <type>splitter</type>
             </side0>
             <side1>
-              <classId>PfdQmlGadget</classId>
+              <classId>PFDGadget</classId>
               <gadget>
-                <activeConfiguration>NoTerrain</activeConfiguration>
+                <activeConfiguration>raw</activeConfiguration>
               </gadget>
               <type>uavGadget</type>
             </side1>

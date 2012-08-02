@@ -69,7 +69,7 @@ help:
 	@echo
 	@echo "   [Tool Installers]"
 	@echo "     qt_sdk_install       - Install the QT v4.7.3 tools"
-	@echo "     arm_sdk_install      - Install the Code Sourcery ARM gcc toolchain"
+	@echo "     arm_sdk_install      - Install the GNU ARM gcc toolchain"
 	@echo "     openocd_install      - Install the OpenOCD JTAG daemon"
 	@echo "     stm32flash_install   - Install the stm32flash tool for unbricking boards"
 	@echo "     dfuutil_install      - Install the dfu-util tool for unbricking F4-based boards"
@@ -189,10 +189,10 @@ qt_sdk_clean:
 	$(V1) [ ! -d "$(QT_SDK_DIR)" ] || $(RM) -rf $(QT_SDK_DIR)
 
 # Set up ARM (STM32) SDK
-ARM_SDK_DIR := $(TOOLS_DIR)/arm-2011.03
+ARM_SDK_DIR := $(TOOLS_DIR)/gcc-arm-none-eabi-4_6-2012q1
 
 .PHONY: arm_sdk_install
-arm_sdk_install: ARM_SDK_URL  := https://sourcery.mentor.com/sgpp/lite/arm/portal/package8736/public/arm-none-eabi/arm-2011.03-42-arm-none-eabi-i686-pc-linux-gnu.tar.bz2
+arm_sdk_install: ARM_SDK_URL  := https://launchpad.net/gcc-arm-embedded/4.6/4.6-2012-q1-update/+download/gcc-arm-none-eabi-4_6-2012q1-20120316.tar.bz2
 arm_sdk_install: ARM_SDK_FILE := $(notdir $(ARM_SDK_URL))
 # order-only prereq on directory existance:
 arm_sdk_install: | $(DL_DIR) $(TOOLS_DIR)
@@ -654,7 +654,15 @@ all_$(1)_clean: $$(addsuffix _clean, $$(filter bu_$(1), $$(BU_TARGETS)))
 all_$(1)_clean: $$(addsuffix _clean, $$(filter ef_$(1), $$(EF_TARGETS)))
 endef
 
-ALL_BOARDS := coptercontrol pipxtreme revolution simposix
+ALL_BOARDS := coptercontrol pipxtreme revolution simposix osd
+ALL_BOARDS_BU := coptercontrol pipxtreme simposix
+
+# SimPosix only builds on Linux so drop it from the list for
+# all other platforms.
+ifneq ($(UNAME), Linux)
+ALL_BOARDS  := $(filter-out simposix, $(ALL_BOARDS))
+ALL_BOARDS_BU  := $(filter-out simposix, $(ALL_BOARDS_BU))
+endif
 
 # SimPosix only builds on Linux so drop it from the list for
 # all other platforms.
@@ -667,6 +675,7 @@ coptercontrol_friendly := CopterControl
 pipxtreme_friendly     := PipXtreme
 revolution_friendly    := Revolution
 simposix_friendly      := SimPosix
+osd_friendly           := OSD
 
 # Short hames of each board (used to display board name in parallel builds)
 coptercontrol_short    := 'cc  '
@@ -674,12 +683,6 @@ pipxtreme_short        := 'pipx'
 revolution_short       := 'revo'
 simposix_short         := 'posx'
 osd_short              := 'osd '
-#
-# SimPosix only builds on Linux so drop it from the list for
-# all other platforms.
-ifneq ($(UNAME), Linux)
-ALL_BOARDS  := $(filter-out simposix, $(ALL_BOARDS))
-endif
 
 # Short hames of each board (used to display board name in parallel builds)
 coptercontrol_short    := 'cc  '
@@ -691,12 +694,12 @@ osd_short              := 'osd '
 # Start out assuming that we'll build fw, bl and bu for all boards
 FW_BOARDS  := $(ALL_BOARDS)
 BL_BOARDS  := $(ALL_BOARDS)
-BU_BOARDS  := $(ALL_BOARDS)
+BU_BOARDS  := $(ALL_BOARDS_BU)
 EF_BOARDS  := $(ALL_BOARDS)
 
 # FIXME: The BU image doesn't work for F4 boards so we need to
 #        filter them out to prevent errors.
-BU_BOARDS  := $(filter-out revolution, $(BU_BOARDS))
+BU_BOARDS  := $(filter-out revolution osd, $(BU_BOARDS))
 
 # SimPosix doesn't have a BL, BU or EF target so we need to
 # filter them out to prevent errors on the all_flight target.

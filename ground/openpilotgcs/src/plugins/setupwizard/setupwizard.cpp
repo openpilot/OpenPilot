@@ -41,14 +41,12 @@
 #include "pages/flashpage.h"
 #include "pages/notyetimplementedpage.h"
 
-SetupWizard::SetupWizard(QWidget *parent) : QWizard(parent)
+SetupWizard::SetupWizard(QWidget *parent) : QWizard(parent),
+    m_controllerSelectionMode(CONTROLLER_SELECTION_UNKNOWN), m_controllerType(CONTROLLER_UNKNOWN),
+    m_vehicleType(VEHICLE_UNKNOWN), m_inputType(INPUT_UNKNOWN), m_escType(ESC_UNKNOWN),
+    m_levellingPerformed(false), m_connectionManager(0)
 {
     setWindowTitle("OpenPilot Setup Wizard");
-    m_controllerSelectionMode = CONTROLLER_SELECTION_UNKNOWN;
-    m_controllerType = CONTROLLER_UNKNOWN;
-    m_vehicleType = VEHICLE_UNKNOWN;
-    m_escType = ESC_UNKNOWN;
-    m_inputType = INPUT_UNKNOWN;
     createPages();
 }
 
@@ -185,6 +183,16 @@ QString SetupWizard::getSummaryText()
         default:
             summary.append(tr("Unknown"));
     }
+
+    summary.append('\n');
+    summary.append(tr("Accel & Gyro bias calibrated: "));
+    if (isLevellingPerformed()) {
+        summary.append(tr("Yes"));
+    }
+    else {
+        summary.append(tr("No"));
+    }
+
     return summary;
 }
 

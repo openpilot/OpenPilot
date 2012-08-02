@@ -29,6 +29,9 @@
 #define SETUPWIZARD_H
 
 #include <QWizard>
+#include "levellingutil.h"
+#include <coreplugin/icore.h>
+#include <coreplugin/connectionmanager.h>
 
 class SetupWizard : public QWizard
 {
@@ -61,7 +64,20 @@ public:
     void setESCType(SetupWizard::ESC_TYPE type) { m_escType = type; }
     SetupWizard::ESC_TYPE getESCType() const { return m_escType; }
 
+    void setLevellingBias(accelGyroBias bias) { m_levellingBias = bias; m_levellingPerformed = true; }
+    bool isLevellingPerformed() { return m_levellingPerformed; }
+    accelGyroBias getLevellingBias() const { return m_levellingBias; }
+
+
     QString getSummaryText();
+
+    Core::ConnectionManager* getConnectionManager() {
+        if (!m_connectionManager) {
+            m_connectionManager = Core::ICore::instance()->connectionManager();
+            Q_ASSERT(m_connectionManager);
+        }
+        return m_connectionManager;
+    }
 
 private:
     enum {PAGE_START, PAGE_CONTROLLER, PAGE_VEHICLES, PAGE_MULTI, PAGE_FIXEDWING,
@@ -74,6 +90,11 @@ private:
     VEHICLE_TYPE m_vehicleType;
     INPUT_TYPE m_inputType;
     ESC_TYPE m_escType;
+    bool m_levellingPerformed;
+    accelGyroBias m_levellingBias;
+
+    Core::ConnectionManager *m_connectionManager;
+
 };
 
 #endif // SETUPWIZARD_H

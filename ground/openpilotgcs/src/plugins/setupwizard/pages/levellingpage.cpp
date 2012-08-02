@@ -25,24 +25,96 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#include <QMessageBox>
 #include "levellingpage.h"
 #include "ui_levellingpage.h"
 #include "setupwizard.h"
 
 LevellingPage::LevellingPage(SetupWizard *wizard, QWidget *parent) :
-        AbstractWizardPage(wizard, parent),
-
-    ui(new Ui::LevellingPage)
+    AbstractWizardPage(wizard, parent),
+    ui(new Ui::LevellingPage),  m_levellingUtil(0)
 {
     ui->setupUi(this);
+    connect(ui->levelButton, SIGNAL(clicked()), this, SLOT(performLevelling()));
 }
 
 LevellingPage::~LevellingPage()
 {
+    if(m_levellingUtil) {
+        delete m_levellingUtil;
+    }
     delete ui;
 }
 
 bool LevellingPage::validatePage()
 {
     return true;
+}
+
+bool LevellingPage::isComplete()
+{
+    return getWizard()->isLevellingPerformed();
+}
+
+void LevellingPage::performLevelling()
+{
+    if(!getWizard()->getConnectionManager()->isConnected()) {
+        QMessageBox msgBox;
+        msgBox.setText(tr("An OpenPilot controller must be connected to your computer to perform bias calculations.\nPlease connect your OpenPilot controller to continue."));
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setDefaultButton(QMessageBox::Ok);
+        msgBox.exec();
+        return;
+    }
+
+    if(!m_levellingUtil)
+    {
+        ui->levelButton->setEnabled(false);
+
+        // Measure every 100ms * 100times = 10s
+        m_levellingUtil = new LevellingUtil(BIAS_CYCLES, BIAS_PERIOD);
+        connect(m_levellingUtil, SIGNAL(progress(long,long)), this, SLOT(levellingProgress(long,long)));
+        connect(m_levellingUtil, SIGNAL(done(accelGyroBias)), this, SLOT(levellingDone(accelGyroBias)));
+        connect(m_levellingUtil, SIGNAL(timeout(QString)), this, SLOT(levellingTimeout(QString)));
+    }
+    m_levellingUtil->start();
+}
+
+void LevellingPage::levellingProgress(long current, long total)
+{
+    if(!ui->levellinProgressBar->maximum() != (int)total) {
+        ui->levellinProgressBar->setMaximum((int)total);
+    }
+    if(ui->levellinProgressBar->value() != (int)current) {
+        ui->levellinProgressBar->setValue((int)current);
+    }
+}
+
+void LevellingPage::levellingDone(accelGyroBias bias)
+{
+    stopLevelling();
+    getWizard()->setLevellingBias(bias);
+    emit completeChanged();
+}
+
+void LevellingPage::levellingTimeout(QString message)
+{
+    stopLevelling();
+
+    QMessageBox msgBox;
+    msgBox.setText(message);
+    msgBox.setStandardButtons(QMessageBox::Ok);
+    msgBox.setDefaultButton(QMessageBox::Ok);
+    msgBox.exec();
+}
+
+void LevellingPage::stopLevelling()
+{
+    if(m_levellingUtil)
+    {
+        disconnect(m_levellingUtil, SIGNAL(progress(long,long)), this, SLOT(levellingProgress(long,long)));
+        disconnect(m_levellingUtil, SIGNAL(done(accelGyroBias)), this, SLOT(levellingDone(accelGyroBias)));
+        disconnect(m_levellingUtil, SIGNAL(timeout(QString)), this, SLOT(levellingTimeout(QString)));
+        ui->levelButton->setEnabled(true);
+    }
 }

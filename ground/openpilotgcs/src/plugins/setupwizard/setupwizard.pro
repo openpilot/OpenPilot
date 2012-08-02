@@ -23,7 +23,8 @@ HEADERS += setupwizardplugin.h \
     pages/inputpage.h \
     pages/summarypage.h \
     pages/flashpage.h \
-    pages/levellingpage.h
+    pages/levellingpage.h \
+    levellingutil.h
 
 SOURCES += setupwizardplugin.cpp \
     setupwizard.cpp \
@@ -41,7 +42,8 @@ SOURCES += setupwizardplugin.cpp \
     pages/inputpage.cpp \
     pages/summarypage.cpp \
     pages/flashpage.cpp \
-    pages/levellingpage.cpp
+    pages/levellingpage.cpp \
+    levellingutil.cpp
 
 OTHER_FILES += SetupWizard.pluginspec
 

@@ -29,6 +29,7 @@
 #define LEVELLINGPAGE_H
 
 #include "abstractwizardpage.h"
+#include "levellingutil.h"
 
 namespace Ui {
 class LevellingPage;
@@ -42,9 +43,22 @@ public:
     explicit LevellingPage(SetupWizard *wizard, QWidget *parent = 0);
     ~LevellingPage();
     bool validatePage();
+    bool isComplete();
+
+private slots:
+    void performLevelling();
+    void levellingProgress(long current, long total);
+    void levellingDone(accelGyroBias bias);
+    void levellingTimeout(QString message);
 
 private:
+    static const int BIAS_CYCLES = 100;
+    static const int BIAS_PERIOD = 100;
+
     Ui::LevellingPage *ui;
+    LevellingUtil *m_levellingUtil;
+
+    void stopLevelling();
 };
 
 #endif // LEVELLINGPAGE_H

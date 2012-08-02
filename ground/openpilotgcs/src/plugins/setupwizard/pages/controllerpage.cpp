@@ -38,7 +38,7 @@ ControllerPage::ControllerPage(SetupWizard *wizard, QWidget *parent) :
 {
     ui->setupUi(this);
 
-    m_connectionManager = Core::ICore::instance()->connectionManager();
+    m_connectionManager = getWizard()->getConnectionManager();
     Q_ASSERT(m_connectionManager);
     connect(m_connectionManager, SIGNAL(availableDevicesChanged(QLinkedList<Core::devListItem>)), this, SLOT(devicesChanged(QLinkedList<Core::devListItem>)));
 

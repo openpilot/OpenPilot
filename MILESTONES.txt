@@ -147,6 +147,7 @@ C: Sergey Solodennikov (alconaft43)
 D: August 2011
 V: http://www.youtube.com/watch?v=8SrfIS7OkB4
 
+
 M: First CopterControl Return to Base Fixed Wing
 C: Eric Price (Corvus Corax)
 D: August 2011
@@ -157,13 +158,23 @@ C: Anders Johansson (dezent)
 D: November 2011
 V: http://www.youtube.com/watch?v=Xfas2TUhOPw
 
-M: First OpenPilot over 1km FixedWing navigation flight
+M: First CopterControl over 1km FixedWing navigation flight
 C: Eric Price (Corvus Corax)
 D: December 2011
 V: http://www.youtube.com/watch?v=nWNWuUiUTNg
+ 
+M: First successful flight using the GCS only and no RC TX
+C: 
+D: 
+V: 
+
+M: First successful flight using just a mobile phone
+C: Jose (please complete details), demoed in Portugal
+D: 
+V: 
 
 
-M: First Altitude Hold using Sonar
+M: First Revo Altitude Hold using Sonar
 C: 
 D: 
 V: 
@@ -178,17 +189,45 @@ C:
 D: 
 V: 
 
+M: First Revo Navigated flight on a FixedWing
+C: It got done somewhere along the line, likely Corvus.
 
-An incomplete list of some future Milestones is below:
+M: First Revo Navigated flight on a MultiRotor
+C: It got done somewhere along the line, James or Sami
 
-* First Helicopter flight with OpenPilot Pro
-* First fixed wing navigation flight on CopterControl 
-* First successful flight using the GCS only and no RC TX
-* First use of Magic Waypoint
-* First Flybarless Helicopter flight with OpenPilot Pro
-* First fixed wing navigation flight 
-* First Multirotor navigation flight
-* First Helicopter navigation flight
-* First over 5km navigation flight
-* First "Follow Me" navigation flight
-* First Channel Crossing with OpenPilot
+M: First Revo Navigated flight on a Heli
+C:
+D:
+V:
+
+M: First Revo 1km Navigated flight on a MultiRotor
+C:
+D:
+V:
+
+M: First Revo 5km Navigated flight on a MultiRotor
+C:
+D:
+V:
+
+M: First Revo 5km Navigated flight on a FixedWing
+C:
+D:
+V:
+
+M: First Revo 1km Navigated flight on a Heli
+C:
+D:
+V:
+
+M: First Revo 5km Navigated flight on a Heli
+C:
+D:
+V:
+
+M: First use of the Magic Waypoint feature
+C:
+D:
+V:
+
+

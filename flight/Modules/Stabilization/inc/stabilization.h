@@ -33,6 +33,8 @@
 #ifndef STABILIZATION_H
 #define STABILIZATION_H
 
+enum {ROLL,PITCH,YAW,MAX_AXES};
+
 int32_t StabilizationInitialize();
 
 #endif // STABILIZATION_H

@@ -27,7 +27,8 @@ public class UAVMetaObject extends UAVObject {
 		modesBitField.add("FlightUpdateOnChange");
 		modesBitField.add("GCSUpdatePeriodic");
 		modesBitField.add("GCSUpdateOnChange");
-
+		
+		List<UAVObjectField> fields = new ArrayList<UAVObjectField>();
 		fields.add( new UAVObjectField("Modes", "", UAVObjectField.FieldType.BITFIELD, 1, modesBitField) );
 	    fields.add( new UAVObjectField("Flight Telemetry Update Period", "ms", UAVObjectField.FieldType.UINT16, 1, null) );
 	    fields.add( new UAVObjectField("GCS Telemetry Update Period", "ms", UAVObjectField.FieldType.UINT16, 1, null) );

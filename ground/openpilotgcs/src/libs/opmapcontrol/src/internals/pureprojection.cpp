@@ -103,6 +103,9 @@ Point PureProjection::FromLatLngToPixel(const PointLatLng &p,const int &zoom)
 
          return ret;
       }
+      /*
+       * Returns the conversion from pixels to meters
+       */
       double PureProjection::GetGroundResolution(const int &zoom,const double &latitude)
       {
           return (cos(latitude * (PI / 180)) * 2 * PI * Axis()) / GetTileMatrixSizePixel(zoom).Width();

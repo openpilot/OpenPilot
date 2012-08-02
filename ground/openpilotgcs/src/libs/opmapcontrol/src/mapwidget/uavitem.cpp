@@ -74,7 +74,7 @@ namespace mapcontrol
         painter->setPen(myPen);
 
         //Set brush attributes
-        painter->setBrush(myColor);
+//        painter->setBrush(myColor);
 
         //Create line from (0,0), to (1,1). Later, we'll scale and rotate it
         QLineF line(0,0,1.0,1.0);
@@ -104,12 +104,20 @@ namespace mapcontrol
         painter->drawLine(line);
 
         //*********** Create trend arc
-        float radius;
+        double radius;
+        double spanAngle = yawRate_dps * 5; //Forecast 5 seconds into the future
 
-        float spanAngle = yawRate_dps * 3; //Forecast 3 seconds into the future
 
-        float meters2pixels=5; //This should be a function of the zoom level, and not a fixed constant
-        radius=fabs((groundspeed_kph/3.6)/(yawRate_dps*Pi/180))*meters2pixels; //Calculate radius in [m], and then convert to Px.
+        //Find the scale factor between meters and pixels
+        double pixels2meters = map->Projection()->GetGroundResolution(map->ZoomTotal(),coord.Lat());
+        float meters2pixels=1.0 / pixels2meters;
+
+        //Calculate radius in [m], and then convert to pixels in local frame (not the same frame as is displayed on the map widget)
+        double groundspeed_mps=groundspeed_kph/3.6;
+        radius=fabs(groundspeed_mps/(yawRate_dps*Pi/180))*meters2pixels;
+
+        qDebug() << "Scale: " <<  meters2pixels;
+        qDebug() << "Zoom: " <<  map->ZoomTotal();
 //        qDebug()<< "Radius:" << radius;
 //        qDebug()<< "Span angle:" << spanAngle;
 
@@ -130,6 +138,28 @@ namespace mapcontrol
 
         //HUH? What does this do?
         painter->drawPixmap(-pic.width()/2,-pic.height()/2,pic);
+
+
+        //*********** Create time rings
+        myPen.setWidth(2);
+
+        double alpha= .1;
+        groundspeed_mps_filt= (1-alpha)*groundspeed_mps_filt + alpha*groundspeed_mps;
+
+        double ringTime=10*pow(2,17-map->ZoomTotal());
+
+        myPen.setColor(QColor(0, 0, 0, 100));
+        painter->setPen(myPen);
+        painter->drawEllipse(QPointF(0,0),groundspeed_mps_filt*ringTime*1*meters2pixels,groundspeed_mps_filt*ringTime*1*meters2pixels);
+
+        myPen.setColor(QColor(0, 0, 0, 110));
+        painter->setPen(myPen);
+        painter->drawEllipse(QPointF(0,0),groundspeed_mps_filt*ringTime*2*meters2pixels,groundspeed_mps_filt*ringTime*2*meters2pixels);
+
+        myPen.setColor(QColor(0, 0, 0, 120));
+        painter->setPen(myPen);
+        painter->drawEllipse(QPointF(0,0),groundspeed_mps_filt*ringTime*4*meters2pixels,groundspeed_mps_filt*ringTime*4*meters2pixels);
+
 
         //***** Text info overlay. The font is a "glow" font, so that it's easier to use on the map
 
@@ -157,7 +187,7 @@ namespace mapcontrol
         uavoInfoStrLine4.append(QString("North-East: %1 m, %2 m").arg(NED[0], 0, 'f',1).arg(NED[1], 0, 'f',1));
         uavoInfoStrLine5.append(QString("Altitude: %1 m").arg(-NED[2], 0, 'f',1));
 
-        //Add the lines of text to the path
+        //Add the uavo info text to the path
         //NOTE: We must use QPainterPath for the outlined text font. QPaint does not support this.
         QPainterPath path;
         path.addText(textAnchorX, textAnchorY+16*0, borderfont, uavoInfoStrLine1);
@@ -166,7 +196,22 @@ namespace mapcontrol
         path.addText(textAnchorX, textAnchorY+16*3, borderfont, uavoInfoStrLine4);
         path.addText(textAnchorX, textAnchorY+16*4, borderfont, uavoInfoStrLine5);
 
-        //First pass is the outline...
+        //Add text for time rings. Always add the left side...
+        path.addText(-(groundspeed_mps_filt*ringTime*1*meters2pixels+10), 0, borderfont, QString("%1 s").arg(ringTime,0,'f',0));
+        path.addText(-(groundspeed_mps_filt*ringTime*2*meters2pixels+10), 0, borderfont, QString("%1 s").arg(ringTime*2,0,'f',0));
+        path.addText(-(groundspeed_mps_filt*ringTime*4*meters2pixels+10), 0, borderfont, QString("%1 s").arg(ringTime*4,0,'f',0));
+        //... and add the right side, only if it doesn't interfere with the uav info text
+        if(groundspeed_mps_filt*ringTime*4*meters2pixels > 200){
+            if(groundspeed_mps_filt*ringTime*2*meters2pixels > 200){
+                if(groundspeed_mps_filt*ringTime*1*meters2pixels > 200){
+                    path.addText(groundspeed_mps_filt*ringTime*1*meters2pixels-8, 0, borderfont, QString("%1 s").arg(ringTime,0,'f',0));
+                }
+                path.addText(groundspeed_mps_filt*ringTime*2*meters2pixels-8, 0, borderfont, QString("%1 s").arg(ringTime*2,0,'f',0));
+            }
+            path.addText(groundspeed_mps_filt*ringTime*4*meters2pixels-8, 0, borderfont, QString("%1 s").arg(ringTime*4,0,'f',0));
+        }
+
+        //Now draw the text. First pass is the outline...
         myPen.setWidth(4);
         myPen.setColor(Qt::black);
         painter->setPen(myPen);

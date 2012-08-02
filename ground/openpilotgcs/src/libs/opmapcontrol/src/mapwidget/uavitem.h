@@ -245,6 +245,7 @@ namespace mapcontrol
         bool autosetreached;
         double Distance3D(internals::PointLatLng const& coord, int const& altitude);
         double autosetdistance;
+        double groundspeed_mps_filt;
       //  QRectF rect;
 
     public slots:

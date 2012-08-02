@@ -28,6 +28,7 @@
 #include "uavitem.h"
 
 const qreal Pi = 3.14;
+static double groundspeed_mps_filt;
 
 namespace mapcontrol
 {
@@ -123,8 +124,8 @@ namespace mapcontrol
         double groundspeed_mps=groundspeed_kph/3.6;
         radius=fabs(groundspeed_mps/(yawRate_dps*Pi/180))*meters2pixels;
 
-        qDebug() << "Scale: " <<  meters2pixels;
-        qDebug() << "Zoom: " <<  map->ZoomTotal();
+//        qDebug() << "Scale: " <<  meters2pixels;
+//        qDebug() << "Zoom: " <<  map->ZoomTotal();
 //        qDebug()<< "Radius:" << radius;
 //        qDebug()<< "Span angle:" << spanAngle;
 
@@ -144,14 +145,12 @@ namespace mapcontrol
         }
 
         //*********** Create time rings
-        double ringTime=0;
+        double ringTime=10*pow(2,17-map->ZoomTotal()); //Basic ring is 10 seconds wide at zoom level 17
+
+        double alpha= .05;
+        groundspeed_mps_filt= (1-alpha)*groundspeed_mps_filt + alpha*groundspeed_mps;
         if(groundspeed_mps > 0){ //Don't clutter the display with rings that are only one pixel wide
             myPen.setWidth(2);
-
-            double alpha= .1;
-            groundspeed_mps_filt= (1-alpha)*groundspeed_mps_filt + alpha*groundspeed_mps;
-
-            ringTime=10*pow(2,17-map->ZoomTotal());
 
             myPen.setColor(QColor(0, 0, 0, 100));
             painter->setPen(myPen);

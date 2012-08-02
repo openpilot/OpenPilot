@@ -32,7 +32,7 @@ const qreal Pi = 3.14;
 namespace mapcontrol
 {
     UAVItem::UAVItem(MapGraphicItem* map,OPMapWidget* parent,QString uavPic):map(map),mapwidget(parent),showtrail(true),showtrailline(true),trailtime(5),traildistance(50),autosetreached(true)
-    ,autosetdistance(100),altitude(0)
+      ,autosetdistance(100),altitude(0),showUAVInfo(false)
     {
         pic.load(uavPic);
         this->setFlag(QGraphicsItem::ItemIsMovable,true);
@@ -59,6 +59,13 @@ namespace mapcontrol
         Q_UNUSED(option);
         Q_UNUSED(widget);
 
+
+        //Draw plane
+        painter->drawPixmap(-pic.width()/2,-pic.height()/2,pic);
+
+        //Return if context menu switch for UAV info is off
+        if(!showUAVInfo)
+            return;
 
         QPen myPen;
 
@@ -136,30 +143,28 @@ namespace mapcontrol
             painter->drawArc(rect, 0*16, -spanAngle*16);
         }
 
-        //HUH? What does this do?
-        painter->drawPixmap(-pic.width()/2,-pic.height()/2,pic);
-
-
         //*********** Create time rings
-        myPen.setWidth(2);
+        double ringTime=0;
+        if(groundspeed_mps > 0){ //Don't clutter the display with rings that are only one pixel wide
+            myPen.setWidth(2);
 
-        double alpha= .1;
-        groundspeed_mps_filt= (1-alpha)*groundspeed_mps_filt + alpha*groundspeed_mps;
+            double alpha= .1;
+            groundspeed_mps_filt= (1-alpha)*groundspeed_mps_filt + alpha*groundspeed_mps;
 
-        double ringTime=10*pow(2,17-map->ZoomTotal());
+            ringTime=10*pow(2,17-map->ZoomTotal());
 
-        myPen.setColor(QColor(0, 0, 0, 100));
-        painter->setPen(myPen);
-        painter->drawEllipse(QPointF(0,0),groundspeed_mps_filt*ringTime*1*meters2pixels,groundspeed_mps_filt*ringTime*1*meters2pixels);
+            myPen.setColor(QColor(0, 0, 0, 100));
+            painter->setPen(myPen);
+            painter->drawEllipse(QPointF(0,0),groundspeed_mps_filt*ringTime*1*meters2pixels,groundspeed_mps_filt*ringTime*1*meters2pixels);
 
-        myPen.setColor(QColor(0, 0, 0, 110));
-        painter->setPen(myPen);
-        painter->drawEllipse(QPointF(0,0),groundspeed_mps_filt*ringTime*2*meters2pixels,groundspeed_mps_filt*ringTime*2*meters2pixels);
+            myPen.setColor(QColor(0, 0, 0, 110));
+            painter->setPen(myPen);
+            painter->drawEllipse(QPointF(0,0),groundspeed_mps_filt*ringTime*2*meters2pixels,groundspeed_mps_filt*ringTime*2*meters2pixels);
 
-        myPen.setColor(QColor(0, 0, 0, 120));
-        painter->setPen(myPen);
-        painter->drawEllipse(QPointF(0,0),groundspeed_mps_filt*ringTime*4*meters2pixels,groundspeed_mps_filt*ringTime*4*meters2pixels);
-
+            myPen.setColor(QColor(0, 0, 0, 120));
+            painter->setPen(myPen);
+            painter->drawEllipse(QPointF(0,0),groundspeed_mps_filt*ringTime*4*meters2pixels,groundspeed_mps_filt*ringTime*4*meters2pixels);
+        }
 
         //***** Text info overlay. The font is a "glow" font, so that it's easier to use on the map
 
@@ -196,19 +201,22 @@ namespace mapcontrol
         path.addText(textAnchorX, textAnchorY+16*3, borderfont, uavoInfoStrLine4);
         path.addText(textAnchorX, textAnchorY+16*4, borderfont, uavoInfoStrLine5);
 
-        //Add text for time rings. Always add the left side...
-        path.addText(-(groundspeed_mps_filt*ringTime*1*meters2pixels+10), 0, borderfont, QString("%1 s").arg(ringTime,0,'f',0));
-        path.addText(-(groundspeed_mps_filt*ringTime*2*meters2pixels+10), 0, borderfont, QString("%1 s").arg(ringTime*2,0,'f',0));
-        path.addText(-(groundspeed_mps_filt*ringTime*4*meters2pixels+10), 0, borderfont, QString("%1 s").arg(ringTime*4,0,'f',0));
-        //... and add the right side, only if it doesn't interfere with the uav info text
-        if(groundspeed_mps_filt*ringTime*4*meters2pixels > 200){
-            if(groundspeed_mps_filt*ringTime*2*meters2pixels > 200){
-                if(groundspeed_mps_filt*ringTime*1*meters2pixels > 200){
-                    path.addText(groundspeed_mps_filt*ringTime*1*meters2pixels-8, 0, borderfont, QString("%1 s").arg(ringTime,0,'f',0));
+        //Add text for time rings.
+        if(groundspeed_mps > 0){
+            //Always add the left side...
+            path.addText(-(groundspeed_mps_filt*ringTime*1*meters2pixels+10), 0, borderfont, QString("%1 s").arg(ringTime,0,'f',0));
+            path.addText(-(groundspeed_mps_filt*ringTime*2*meters2pixels+10), 0, borderfont, QString("%1 s").arg(ringTime*2,0,'f',0));
+            path.addText(-(groundspeed_mps_filt*ringTime*4*meters2pixels+10), 0, borderfont, QString("%1 s").arg(ringTime*4,0,'f',0));
+            //... and add the right side, only if it doesn't interfere with the uav info text
+            if(groundspeed_mps_filt*ringTime*4*meters2pixels > 200){
+                if(groundspeed_mps_filt*ringTime*2*meters2pixels > 200){
+                    if(groundspeed_mps_filt*ringTime*1*meters2pixels > 200){
+                        path.addText(groundspeed_mps_filt*ringTime*1*meters2pixels-8, 0, borderfont, QString("%1 s").arg(ringTime,0,'f',0));
+                    }
+                    path.addText(groundspeed_mps_filt*ringTime*2*meters2pixels-8, 0, borderfont, QString("%1 s").arg(ringTime*2,0,'f',0));
                 }
-                path.addText(groundspeed_mps_filt*ringTime*2*meters2pixels-8, 0, borderfont, QString("%1 s").arg(ringTime*2,0,'f',0));
+                path.addText(groundspeed_mps_filt*ringTime*4*meters2pixels-8, 0, borderfont, QString("%1 s").arg(ringTime*4,0,'f',0));
             }
-            path.addText(groundspeed_mps_filt*ringTime*4*meters2pixels-8, 0, borderfont, QString("%1 s").arg(ringTime*4,0,'f',0));
         }
 
         //Now draw the text. First pass is the outline...
@@ -414,4 +422,10 @@ namespace mapcontrol
     {
         pic.load(":/uavs/images/"+UAVPic);
     }
+
+    void UAVItem::SetShowUAVInfo(bool const& value)
+    {
+        showUAVInfo=value;
+    }
+
 }

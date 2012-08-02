@@ -44,8 +44,6 @@
 #include "utils/homelocationutil.h"
 #include "utils/worldmagmodel.h"
 
-#include "../uavobjectwidgetutils/configtaskwidget.h"
-#include "extensionsystem/pluginmanager.h"
 #include "uavtalk/telemetrymanager.h"
 #include "uavobject.h"
 #include "uavobjectmanager.h"
@@ -56,6 +54,7 @@
 #include "gyros.h"
 #include "positionactual.h"
 #include "velocityactual.h"
+
 #define allow_manual_home_location_move
 
 // *************************************************************************************
@@ -118,7 +117,6 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 		obm = pm->getObject<UAVObjectManager>();
 		obum = pm->getObject<UAVObjectUtilManager>();
 	}
-
 
 	// **************
     // get current location
@@ -214,10 +212,8 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 	m_map->Home->SetCoord(m_home_position.coord);             // set the HOME position
 	m_map->UAV->SetUAVPos(m_home_position.coord, 0.0);        // set the UAV position
 
-
-
     if(m_map->GPS)
-        m_map->GPS->SetUAVPos(m_home_position.coord, 0.0);        // set the UAV position
+        m_map->GPS->SetUAVPos(m_home_position.coord, 0.0);        // set the GPS position
 
     model=new flightDataModel(this);
     table=new pathPlanner();
@@ -426,6 +422,8 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
     contextMenu.addAction(showCompassAct);
 
     contextMenu.addAction(showDiagnostics);
+
+    contextMenu.addAction(showUAVInfo);
 
     contextMenu.addSeparator()->setText(tr("Zoom"));
 
@@ -1247,6 +1245,12 @@ void OPMapGadgetWidget::createActions()
     showDiagnostics->setChecked(false);
     connect(showDiagnostics, SIGNAL(toggled(bool)), this, SLOT(onShowDiagnostics_toggled(bool)));
 
+    showUAVInfo = new QAction(tr("Show UAV Info"), this);
+    showUAVInfo->setStatusTip(tr("Show/Hide the UAV info"));
+    showUAVInfo->setCheckable(true);
+    showUAVInfo->setChecked(false);
+    connect(showUAVInfo, SIGNAL(toggled(bool)), this, SLOT(onShowUAVInfo_toggled(bool)));
+
     showHomeAct = new QAction(tr("Show Home"), this);
     showHomeAct->setStatusTip(tr("Show/Hide the Home location"));
     showHomeAct->setCheckable(true);
@@ -1539,10 +1543,18 @@ void OPMapGadgetWidget::onShowCompassAct_toggled(bool show)
 
 void OPMapGadgetWidget::onShowDiagnostics_toggled(bool show)
 {
-	if (!m_widget || !m_map)
+    if (!m_widget || !m_map)
 		return;
 
     m_map->SetShowDiagnostics(show);
+}
+
+void OPMapGadgetWidget::onShowUAVInfo_toggled(bool show)
+{
+    if (!m_widget || !m_map)
+        return;
+
+    m_map->UAV->SetShowUAVInfo(show);
 }
 
 void OPMapGadgetWidget::onShowHomeAct_toggled(bool show)

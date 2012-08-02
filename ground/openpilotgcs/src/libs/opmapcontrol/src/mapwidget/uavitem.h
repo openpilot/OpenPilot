@@ -218,6 +218,8 @@ namespace mapcontrol
         int type() const;
 
         void SetUavPic(QString UAVPic);
+        void SetShowUAVInfo(bool const& value);
+
     private:
         MapGraphicItem* map;
         QPolygonF arrowHead;
@@ -246,6 +248,7 @@ namespace mapcontrol
         double Distance3D(internals::PointLatLng const& coord, int const& altitude);
         double autosetdistance;
         double groundspeed_mps_filt;
+        bool showUAVInfo;
       //  QRectF rect;
 
     public slots:

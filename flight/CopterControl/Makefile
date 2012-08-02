@@ -68,7 +68,7 @@ USE_GPS ?= YES
 USE_TXPID ?= YES
 USE_I2C ?= NO
 USE_ALTITUDE ?= NO
-USE_AUTOTUNE ?= NO
+USE_AUTOTUNE ?= YES
 TEST_FAULTS ?= NO
 
 # List of optional modules to include

@@ -7,7 +7,7 @@ import java.util.List;
 
 public class UAVObjectField {
 	
-    public enum FieldType { INT8, INT16, INT32, UINT8, UINT16, UINT32, FLOAT32, ENUM, STRING };
+    public enum FieldType { INT8, INT16, INT32, UINT8, UINT16, UINT32, FLOAT32, ENUM, BITFIELD, STRING };
 
     public UAVObjectField(String name, String units, FieldType type, int numElements, List<String> options) {
         List<String> elementNames = new ArrayList<String>();
@@ -56,6 +56,8 @@ public class UAVObjectField {
                 return "float32";
             case ENUM:
                 return "enum";
+            case BITFIELD:
+            	return "bitfield";
             case STRING:
                 return "string";
             default:
@@ -144,6 +146,11 @@ public class UAVObjectField {
                 for (int index = 0; index < numElements; ++index)
                 	dataOut.put((Byte) l.get(index));
                 break;
+            case BITFIELD:
+            	for (int index = 0; index < numElements; ++index) {
+            		Integer val = (Integer) getValue(index);
+            		dataOut.put(val.byteValue());
+            	}
             case STRING:
             	// TODO: Implement strings
             	throw new Error("Strings not yet implemented");
@@ -224,6 +231,16 @@ public class UAVObjectField {
             	}
                 break;
             }
+            case BITFIELD:
+            {
+            	List<Short> l = (List<Short>) this.data;
+            	for (int index = 0 ; index < numElements; ++index) {
+            		int signedval = (int) dataIn.get();  // this sign extends it
+            		int unsignedval = signedval & 0xff;    // drop sign extension
+            		l.set(index, (short) unsignedval);
+            	}
+                break;
+            }
             case ENUM:
             {
         		List<Byte> l = (List<Byte>) this.data;
@@ -275,6 +292,9 @@ public class UAVObjectField {
 
                 return options.get(val);
             }
+            case BITFIELD:
+            	return ((List<Short>) data).get(index).intValue();
+
             case STRING:
             {
             	//throw new Exception("Shit I should do this");
@@ -354,6 +374,12 @@ public class UAVObjectField {
     			l.set(index, val);
     			break;
     		}
+    		case BITFIELD:
+    		{
+    			List<Short> l = (List<Short>) this.data;
+    			l.set(index, bound(data).shortValue());
+    			break;
+    		}
     		case STRING: 
     		{
     			//throw new Exception("Sorry I haven't implemented strings yet");
@@ -404,6 +430,8 @@ public class UAVObjectField {
                 return true;
             case ENUM:
                 return false;
+            case BITFIELD:
+                return true;
             case STRING:
                 return false;
             default:
@@ -430,6 +458,8 @@ public class UAVObjectField {
                 return false;
             case ENUM:
                 return true;
+            case BITFIELD:
+                return false;
             case STRING:
                 return true;
             default:
@@ -493,6 +523,12 @@ public class UAVObjectField {
             		((ArrayList<Float>) data).add((float) 0);
             	}
                 break;
+            case BITFIELD:
+            	((ArrayList<Short>) data).clear();
+            	for(int index = 0; index < numElements; ++index) {
+            		((ArrayList<Short>) data).add((short) 0);
+            	}
+                break;
             case ENUM:
             	((ArrayList<Byte>) data).clear();
             	for(int index = 0; index < numElements; ++index) {
@@ -547,6 +583,10 @@ public class UAVObjectField {
                 break;
             case ENUM:
             	data = (Object) new ArrayList<Byte>(this.numElements);
+                numBytesPerElement = 1;
+                break;
+            case BITFIELD:
+            	data = (Object) new ArrayList<Short>(this.numElements);
                 numBytesPerElement = 1;
                 break;
             case STRING:
@@ -613,6 +653,12 @@ public class UAVObjectField {
     			return (long) 0;
     		if(num > 4294967295L)
     			return 4294967295L;
+    		return num;
+    	case BITFIELD:
+    		if(num < 0)
+    			return (long) 0;
+    		if(num > 255)
+    			return (long) 255;
     		return num;
     	}
     	

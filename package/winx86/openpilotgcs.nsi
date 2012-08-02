@@ -1,7 +1,7 @@
 ﻿#
 # Project: OpenPilot
 # NSIS configuration file for OpenPilot GCS
-# The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2010-2011.
+# The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2010-2012.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,13 +21,14 @@
 # This script requires Unicode NSIS 2.46 or higher:
 # http://www.scratchpaper.com/
 
-# Features:
-#  - Installs to the user local appdata path, no admin rights required.
-#
 # TODO:
-#  - optionally install for all users (to Program Files with admin rights on Vista/7).
 #  - install only built/used modules, not a whole directory.
 #  - remove only installed files, not a whole directory.
+
+;--------------------------------
+; Includes
+
+!include "x64.nsh"
 
 ;--------------------------------
 ; Paths
@@ -36,12 +37,14 @@
   !define PROJECT_ROOT   "..\.."
   !define NSIS_DATA_TREE "."
   !define GCS_BUILD_TREE "..\..\build\ground\openpilotgcs"
+  !define UAVO_SYNTH_TREE "..\..\build\uavobject-synthetics"
+  !define AEROSIMRC_TREE "..\..\build\ground\AeroSIM-RC"
 
   ; Default installation folder
-  InstallDir "$LOCALAPPDATA\OpenPilot"
+  InstallDir "$PROGRAMFILES\OpenPilot"
 
   ; Get installation folder from registry if available
-  InstallDirRegKey HKCU "Software\OpenPilot" "Install Location"
+  InstallDirRegKey HKLM "Software\OpenPilot" "Install Location"
 
 ;--------------------------------
 ; Version information
@@ -82,7 +85,7 @@
   XPStyle on
 
   ; Request application privileges for Windows Vista/7
-  RequestExecutionLevel user
+  RequestExecutionLevel admin
 
   ; Compression level
   SetCompressor /solid lzma
@@ -90,7 +93,7 @@
 ;--------------------------------
 ; Branding
 
-  BrandingText "© 2010-2011 The OpenPilot Team, http://www.openpilot.org"
+  BrandingText "© 2010-2012 The OpenPilot Team, http://www.openpilot.org"
 
   !define MUI_ICON "${NSIS_DATA_TREE}\resources\openpilot.ico"
   !define MUI_HEADERIMAGE
@@ -113,6 +116,7 @@
 ;--------------------------------
 ; Settings for MUI_PAGE_FINISH
   !define MUI_FINISHPAGE_RUN
+  !define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\HISTORY.txt"
   !define MUI_FINISHPAGE_RUN_FUNCTION "RunApplication"
 
 ;--------------------------------
@@ -148,6 +152,7 @@
 ;--------------------------------
 ; Installer sections
 
+; Copy GCS core files
 Section "Core files" InSecCore
   SectionIn RO
   SetOutPath "$INSTDIR\bin"
@@ -156,14 +161,16 @@ Section "Core files" InSecCore
   File "${PROJECT_ROOT}\HISTORY.txt"
 SectionEnd
 
-Section "Plugins" InSecPlugins
+; Copy GCS plugins
+Section "-Plugins" InSecPlugins
   SectionIn RO
   SetOutPath "$INSTDIR\lib\openpilotgcs\plugins"
   File /r "${GCS_BUILD_TREE}\lib\openpilotgcs\plugins\*.dll"
   File /r "${GCS_BUILD_TREE}\lib\openpilotgcs\plugins\*.pluginspec"
 SectionEnd
 
-Section "Resources" InSecResources
+; Copy GCS resources
+Section "-Resources" InSecResources
   SetOutPath "$INSTDIR\share\openpilotgcs\diagrams"
   File /r "${GCS_BUILD_TREE}\share\openpilotgcs\diagrams\*"
   SetOutPath "$INSTDIR\share\openpilotgcs\dials"
@@ -176,22 +183,57 @@ Section "Resources" InSecResources
   File /r "${GCS_BUILD_TREE}\share\openpilotgcs\pfd\*"
 SectionEnd
 
-Section "Sound files" InSecSounds
+; Copy Notify plugin sound files
+Section "-Sound files" InSecSounds
   SetOutPath "$INSTDIR\share\openpilotgcs\sounds"
   File /r "${GCS_BUILD_TREE}\share\openpilotgcs\sounds\*"
 SectionEnd
 
-Section "Localization" InSecLocalization
+; Copy localization files
+; Disabled until GCS source is stable and properly localized
+Section "-Localization" InSecLocalization
   SetOutPath "$INSTDIR\share\openpilotgcs\translations"
 ; File /r "${GCS_BUILD_TREE}\share\openpilotgcs\translations\openpilotgcs_*.qm"
   File /r "${GCS_BUILD_TREE}\share\openpilotgcs\translations\qt_*.qm"
 SectionEnd
 
+; Copy firmware files
 Section "Firmware" InSecFirmware
 ; SetOutPath "$INSTDIR\firmware\${FIRMWARE_DIR}"
 ; File /r "${PACKAGE_DIR}\${FIRMWARE_DIR}\*"
   SetOutPath "$INSTDIR\firmware"
-  File /r "${PACKAGE_DIR}\${FIRMWARE_DIR}\fw_coptercontrol-${PACKAGE_LBL}.opfw"
+  File "${PACKAGE_DIR}\${FIRMWARE_DIR}\fw_coptercontrol-${PACKAGE_LBL}.opfw"
+  File "${PACKAGE_DIR}\${FIRMWARE_DIR}\fw_pipxtreme-${PACKAGE_LBL}.opfw"
+SectionEnd
+
+; Copy utility files
+Section "-Utilities" InSecUtilities
+  SetOutPath "$INSTDIR\utilities"
+  File "/oname=OPLogConvert-${PACKAGE_LBL}.m" "${UAVO_SYNTH_TREE}\matlab\OPLogConvert.m"
+SectionEnd
+
+; Copy driver files
+Section "-Drivers" InSecDrivers
+  SetOutPath "$INSTDIR\drivers"
+  File "${PROJECT_ROOT}\flight\Project\Windows USB\OpenPilot-CDC.inf"
+SectionEnd
+
+; Preinstall OpenPilot CDC driver
+Section "CDC driver" InSecInstallDrivers
+  InitPluginsDir
+  SetOutPath "$PLUGINSDIR"
+  ${If} ${RunningX64}
+    File "/oname=dpinst.exe" "${NSIS_DATA_TREE}\redist\dpinst_x64.exe"
+  ${Else}
+    File "/oname=dpinst.exe" "${NSIS_DATA_TREE}\redist\dpinst_x86.exe"
+  ${EndIf}
+  ExecWait '"$PLUGINSDIR\dpinst.exe" /lm /path "$INSTDIR\drivers"'
+SectionEnd
+
+; AeroSimRC plugin files
+Section "AeroSimRC plugin" InSecAeroSimRC
+  SetOutPath "$INSTDIR\misc\AeroSIM-RC"
+  File /r "${AEROSIMRC_TREE}\*"
 SectionEnd
 
 Section "Shortcuts" InSecShortcuts
@@ -200,6 +242,8 @@ Section "Shortcuts" InSecShortcuts
   CreateDirectory "$SMPROGRAMS\OpenPilot"
   CreateShortCut "$SMPROGRAMS\OpenPilot\OpenPilot GCS.lnk" "$INSTDIR\bin\openpilotgcs.exe" \
 	"" "$INSTDIR\bin\openpilotgcs.exe" 0 "" "" "${PRODUCT_NAME} ${PRODUCT_VERSION}. ${BUILD_DESCRIPTION}"
+  CreateShortCut "$SMPROGRAMS\OpenPilot\OpenPilot GCS (clean configuration).lnk" "$INSTDIR\bin\openpilotgcs.exe" \
+	"-clean-config" "$INSTDIR\bin\openpilotgcs.exe" 0 "" "" "${PRODUCT_NAME} ${PRODUCT_VERSION}. ${BUILD_DESCRIPTION}"
   CreateShortCut "$SMPROGRAMS\OpenPilot\OpenPilot ChangeLog.lnk" "$INSTDIR\HISTORY.txt" \
 	"" "$INSTDIR\bin\openpilotgcs.exe" 0
   CreateShortCut "$SMPROGRAMS\OpenPilot\OpenPilot Website.lnk" "http://www.openpilot.org" \
@@ -237,6 +281,10 @@ SectionEnd
     !insertmacro MUI_DESCRIPTION_TEXT ${InSecSounds} $(DESC_InSecSounds)
     !insertmacro MUI_DESCRIPTION_TEXT ${InSecLocalization} $(DESC_InSecLocalization)
     !insertmacro MUI_DESCRIPTION_TEXT ${InSecFirmware} $(DESC_InSecFirmware)
+    !insertmacro MUI_DESCRIPTION_TEXT ${InSecUtilities} $(DESC_InSecUtilities)
+    !insertmacro MUI_DESCRIPTION_TEXT ${InSecDrivers} $(DESC_InSecDrivers)
+    !insertmacro MUI_DESCRIPTION_TEXT ${InSecInstallDrivers} $(DESC_InSecInstallDrivers)
+    !insertmacro MUI_DESCRIPTION_TEXT ${InSecAeroSimRC} $(DESC_InSecAeroSimRC)
     !insertmacro MUI_DESCRIPTION_TEXT ${InSecShortcuts} $(DESC_InSecShortcuts)
   !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
@@ -245,6 +293,7 @@ SectionEnd
 
 Function .onInit
 
+  SetShellVarContext all
   !insertmacro MUI_LANGDLL_DISPLAY
 
 FunctionEnd
@@ -258,6 +307,9 @@ Section "un.OpenPilot GCS" UnSecProgram
   RMDir /r /rebootok "$INSTDIR\lib"
   RMDir /r /rebootok "$INSTDIR\share"
   RMDir /r /rebootok "$INSTDIR\firmware"
+  RMDir /r /rebootok "$INSTDIR\utilities"
+  RMDir /r /rebootok "$INSTDIR\drivers"
+  RMDir /r /rebootok "$INSTDIR\misc"
   Delete /rebootok "$INSTDIR\HISTORY.txt"
   Delete /rebootok "$INSTDIR\Uninstall.exe"
 
@@ -304,6 +356,7 @@ SectionEnd
 
 Function un.onInit
 
+  SetShellVarContext all
   !insertmacro MUI_UNGETLANGUAGE
 
 FunctionEnd

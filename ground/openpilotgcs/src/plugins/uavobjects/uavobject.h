@@ -59,10 +59,10 @@ public:
      * Object update mode
      */
     typedef enum {
-            UPDATEMODE_PERIODIC = 0, /** Automatically update object at periodic intervals */
-            UPDATEMODE_ONCHANGE = 1, /** Only update object when its data changes */
-            UPDATEMODE_THROTTLED = 2, /** Object is updated on change, but not more often than the interval time */
-            UPDATEMODE_MANUAL = 3  /** Manually update object, by calling the updated() function */
+            UPDATEMODE_MANUAL = 0,  /** Manually update object, by calling the updated() function */
+            UPDATEMODE_PERIODIC = 1, /** Automatically update object at periodic intervals */
+            UPDATEMODE_ONCHANGE = 2, /** Only update object when its data changes */
+            UPDATEMODE_THROTTLED = 3 /** Object is updated on change, but not more often than the interval time */
     } UpdateMode;
 
     /**
@@ -103,6 +103,7 @@ public:
     quint32 getInstID();
     bool isSingleInstance();
     QString getName();
+    QString getCategory();
     QString getDescription();
     quint32 getNumBytes(); 
     qint32 pack(quint8* dataOut);
@@ -163,6 +164,7 @@ protected:
     bool isSingleInst;
     QString name;
     QString description;
+    QString category;
     quint32 numBytes;
     QMutex* mutex;
     quint8* data;
@@ -170,6 +172,7 @@ protected:
 
     void initializeFields(QList<UAVObjectField*>& fields, quint8* data, quint32 numBytes);
     void setDescription(const QString& description);
+    void setCategory(const QString& category);
 };
 
 #endif // UAVOBJECT_H

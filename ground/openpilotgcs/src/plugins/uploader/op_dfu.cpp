@@ -90,6 +90,8 @@ DFUObject::DFUObject(bool _debug,bool _use_serial,QString portname):
         if (devices.length()==1  && hidHandle.open(1,devices.first().vendorID,devices.first().productID,0,0)==1) {
            qDebug()<<"OP_DFU detected first time";
            mready=true;
+           QTimer::singleShot(200,&m_eventloop, SLOT(quit()));
+           m_eventloop.exec();
         } else {
             // Wait for the board to appear on the USB bus:
             USBSignalFilter filter(0x20a0,-1,-1,USBMonitor::Bootloader);
@@ -107,6 +109,8 @@ DFUObject::DFUObject(bool _debug,bool _use_serial,QString portname):
                 if (devices.length()==1) {
                    if(hidHandle.open(1,devices.first().vendorID,devices.first().productID,0,0)==1)
                     {
+                       QTimer::singleShot(200,&m_eventloop, SLOT(quit()));
+                        m_eventloop.exec();
                         qDebug()<<"OP_DFU detected after delay";
                         mready=true;
                         break;

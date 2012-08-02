@@ -40,7 +40,6 @@
 #include <manualcontrolsettings.h>
 #include <gcsreceiver.h>
 
-
 /* Private macro -------------------------------------------------------------*/
 #define countof(a)   (sizeof(a) / sizeof(*(a)))
 
@@ -81,135 +80,6 @@ void PIOS_ADC_DMC_irq_handler(void)
 }
 
 #endif
-
-/* Private define ------------------------------------------------------------*/
-#define DAC_DHR12R2_ADDRESS    0x40007414
-#define DAC_DHR8R1_ADDRESS     0x40007410
-
-
-/* Private variables ---------------------------------------------------------*/
-DAC_InitTypeDef  DAC_InitStructure;
-
-const uint16_t Sine12bit[32] = {
-                      2047, 2447, 2831, 3185, 3498, 3750, 3939, 4056, 4095, 4056,
-                      3939, 3750, 3495, 3185, 2831, 2447, 2047, 1647, 1263, 909,
-                      599, 344, 155, 38, 0, 38, 155, 344, 599, 909, 1263, 1647};
-
-
-const uint8_t Escalator8bit[6] = {0x0, 0x33, 0x66, 0x99, 0xCC, 0xFF};
-
-
-/**
-  * @brief  TIM6 Configuration
-  * @note   TIM6 configuration is based on CPU @168MHz and APB1 @42MHz
-  * @note   TIM6 Update event occurs each 37.5MHz/256 = 16.406 KHz
-  * @param  None
-  * @retval None
-  */
-void TIM6_Config(void)
-{
-	TIM_TimeBaseInitTypeDef    TIM_TimeBaseStructure;
-	/* TIM6 Periph clock enable */
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM6, ENABLE);
-
-	/* Time base configuration */
-	TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
-	TIM_TimeBaseStructure.TIM_Period = 27;
-	TIM_TimeBaseStructure.TIM_Prescaler = 0;
-	TIM_TimeBaseStructure.TIM_ClockDivision = 0;
-	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
-	TIM_TimeBaseInit(TIM6, &TIM_TimeBaseStructure);
-
-	/* TIM6 TRGO selection */
-	TIM_SelectOutputTrigger(TIM6, TIM_TRGOSource_Update);
-
-	/* TIM6 enable counter */
-	TIM_Cmd(TIM6, ENABLE);
-}
-
-
-/**
-  * @brief  DAC  Channel2 SineWave Configuration
-  * @param  None
-  * @retval None
-  */
-void DAC_Ch2_SineWaveConfig(void)
-{
-	DMA_InitTypeDef DMA_InitStructure;
-
-	/* DAC channel2 Configuration */
-	DAC_InitStructure.DAC_Trigger = DAC_Trigger_T6_TRGO;
-	DAC_InitStructure.DAC_WaveGeneration = DAC_WaveGeneration_None;
-	DAC_InitStructure.DAC_OutputBuffer = DAC_OutputBuffer_Enable;
-	DAC_Init(DAC_Channel_2, &DAC_InitStructure);
-
-	/* DMA1_Stream5 channel7 configuration **************************************/
-	DMA_DeInit(DMA1_Stream6);
-	DMA_InitStructure.DMA_Channel = DMA_Channel_7;
-	DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)(uint32_t)&DAC->DHR12R2;
-	DMA_InitStructure.DMA_Memory0BaseAddr = (uint32_t)&Sine12bit;
-	DMA_InitStructure.DMA_DIR = DMA_DIR_MemoryToPeripheral;
-	DMA_InitStructure.DMA_BufferSize = 32;
-	DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
-	DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
-	DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord;
-	DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord;
-	DMA_InitStructure.DMA_Mode = DMA_Mode_Circular;
-	DMA_InitStructure.DMA_Priority = DMA_Priority_High;
-	DMA_InitStructure.DMA_FIFOMode = DMA_FIFOMode_Disable;
-	DMA_InitStructure.DMA_FIFOThreshold = DMA_FIFOThreshold_HalfFull;
-	DMA_InitStructure.DMA_MemoryBurst = DMA_MemoryBurst_Single;
-	DMA_InitStructure.DMA_PeripheralBurst = DMA_PeripheralBurst_Single;
-	DMA_Init(DMA1_Stream6, &DMA_InitStructure);
-
-	/* Enable DMA1_Stream5 */
-	DMA_Cmd(DMA1_Stream6, ENABLE);
-
-	/* Enable DAC Channel2 */
-	DAC_Cmd(DAC_Channel_2, ENABLE);
-
-	/* Enable DMA for DAC Channel2 */
-	DAC_DMACmd(DAC_Channel_2, ENABLE);
-}
-
-void DAC_Ch1_SineWaveConfig(void)
-{
-	DMA_InitTypeDef DMA_InitStructure;
-
-	/* DAC channel2 Configuration */
-	DAC_InitStructure.DAC_Trigger = DAC_Trigger_T6_TRGO;
-	DAC_InitStructure.DAC_WaveGeneration = DAC_WaveGeneration_None;
-	DAC_InitStructure.DAC_OutputBuffer = DAC_OutputBuffer_Enable;
-	DAC_Init(DAC_Channel_1, &DAC_InitStructure);
-
-	/* DMA1_Stream5 channel7 configuration **************************************/
-	DMA_DeInit(DMA1_Stream5);
-	DMA_InitStructure.DMA_Channel = DMA_Channel_7;
-	DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)(uint32_t)&DAC->DHR12R1;
-	DMA_InitStructure.DMA_Memory0BaseAddr = (uint32_t)&Sine12bit;
-	DMA_InitStructure.DMA_DIR = DMA_DIR_MemoryToPeripheral;
-	DMA_InitStructure.DMA_BufferSize = 32;
-	DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
-	DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
-	DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord;
-	DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord;
-	DMA_InitStructure.DMA_Mode = DMA_Mode_Circular;
-	DMA_InitStructure.DMA_Priority = DMA_Priority_High;
-	DMA_InitStructure.DMA_FIFOMode = DMA_FIFOMode_Disable;
-	DMA_InitStructure.DMA_FIFOThreshold = DMA_FIFOThreshold_HalfFull;
-	DMA_InitStructure.DMA_MemoryBurst = DMA_MemoryBurst_Single;
-	DMA_InitStructure.DMA_PeripheralBurst = DMA_PeripheralBurst_Single;
-	DMA_Init(DMA1_Stream5, &DMA_InitStructure);
-
-	/* Enable DMA1_Stream5 */
-	DMA_Cmd(DMA1_Stream5, ENABLE);
-
-	/* Enable DAC Channel2 */
-	DAC_Cmd(DAC_Channel_1, ENABLE);
-
-	/* Enable DMA for DAC Channel2 */
-	DAC_DMACmd(DAC_Channel_1, ENABLE);
-}
 
 
 static void Clock(uint32_t spektrum_id);
@@ -278,10 +148,22 @@ void PIOS_Board_Init(void) {
 
 	PIOS_LED_Init(&pios_led_cfg);
 
+#if defined(PIOS_INCLUDE_SPI)
+	/* Set up the SPI interface to the SD card */
+	if (PIOS_SPI_Init(&pios_spi_sdcard_id, &pios_spi_sdcard_cfg)) {
+		PIOS_Assert(0);
+	}
+
+	/* Enable and mount the SDCard */
+	PIOS_SDCARD_Init(pios_spi_sdcard_id);
+	PIOS_SDCARD_MountFS(0);
+#endif /* PIOS_INCLUDE_SPI */
+
 	/* Initialize UAVObject libraries */
 	EventDispatcherInitialize();
 	UAVObjInitialize();
 
+	HwSettingsInitialize();
 
 	/* Initialize the alarms library */
 	AlarmsInitialize();
@@ -495,25 +377,60 @@ void PIOS_Board_Init(void) {
 #endif	/* PIOS_INCLUDE_COM */
 
 
-#if 1
-	/* Preconfiguration before using DAC----------------------------------------*/
-	GPIO_InitTypeDef GPIO_InitStructure;
+	/* Configure FlexiPort */
 
-	/* DAC Periph clock enable */
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_DAC, ENABLE);
+/*	uint8_t hwsettings_rv_flexiport;
+	HwSettingsRV_FlexiPortGet(&hwsettings_rv_flexiport);
 
-	/* DAC channel 1 & 2 (DAC_OUT1 = PA.4)(DAC_OUT2 = PA.5) configuration */
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AN;
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-	GPIO_Init(GPIOA, &GPIO_InitStructure);
+	switch (hwsettings_rv_flexiport) {
+		case HWSETTINGS_RV_FLEXIPORT_DISABLED:
+			break;
+		case HWSETTINGS_RV_FLEXIPORT_I2C:*/
+#if defined(PIOS_INCLUDE_I2C)
+		{
+			if (PIOS_I2C_Init(&pios_i2c_flexiport_adapter_id, &pios_i2c_flexiport_adapter_cfg)) {
+				PIOS_Assert(0);
+			}
+		}
+#endif	/* PIOS_INCLUDE_I2C */
+/*			break;
 
-	/* TIM6 Configuration ------------------------------------------------------*/
-	TIM6_Config();
+		case HWSETTINGS_RV_FLEXIPORT_DSM2:
+		case HWSETTINGS_RV_FLEXIPORT_DSMX10BIT:
+		case HWSETTINGS_RV_FLEXIPORT_DSMX11BIT:
+		{
+			enum pios_dsm_proto proto;
+			switch (hwsettings_rv_flexiport) {
+				case HWSETTINGS_RV_FLEXIPORT_DSM2:
+					proto = PIOS_DSM_PROTO_DSM2;
+					break;
+				case HWSETTINGS_RV_FLEXIPORT_DSMX10BIT:
+					proto = PIOS_DSM_PROTO_DSMX10BIT;
+					break;
+				case HWSETTINGS_RV_FLEXIPORT_DSMX11BIT:
+					proto = PIOS_DSM_PROTO_DSMX11BIT;
+					break;
+				default:
+					PIOS_Assert(0);
+					break;
+			}
+			//TODO: Define the various Channelgroup for Revo dsm inputs and handle here
+			PIOS_Board_configure_dsm(&pios_usart_dsm_flexi_cfg, &pios_dsm_flexi_cfg,
+											 &pios_usart_com_driver, &proto, MANUALCONTROLSETTINGS_CHANNELGROUPS_DSMMAINPORT,&hwsettings_DSMxBind);
+		}
+			break;
+		case HWSETTINGS_RV_FLEXIPORT_COMAUX:
+			PIOS_Board_configure_com(&pios_usart_flexi_cfg, PIOS_COM_AUX_RX_BUF_LEN, PIOS_COM_AUX_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_aux_id);
+			break;
+		case HWSETTINGS_RV_FLEXIPORT_COMBRIDGE:
+			PIOS_Board_configure_com(&pios_usart_flexi_cfg, PIOS_COM_BRIDGE_RX_BUF_LEN, PIOS_COM_BRIDGE_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_bridge_id);
+			break;
+	}*/
+		/* hwsettings_rv_flexiport */
 
-	DAC_DeInit();
-	DAC_Ch1_SineWaveConfig();
-	//DAC_Ch2_SineWaveConfig();
+
+#if defined(PIOS_INCLUDE_WAVE)
+	PIOS_WavPlay_Init(&pios_dac_cfg);
 #endif
 
 	// ADC system

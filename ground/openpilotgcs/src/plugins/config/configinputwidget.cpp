@@ -85,6 +85,10 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
     addUAVObjectToWidgetRelation("ManualControlSettings","FlightModePosition",m_config->fmsModePos1,0);
     addUAVObjectToWidgetRelation("ManualControlSettings","FlightModePosition",m_config->fmsModePos2,1);
     addUAVObjectToWidgetRelation("ManualControlSettings","FlightModePosition",m_config->fmsModePos3,2);
+    addUAVObjectToWidgetRelation("ManualControlSettings","FlightModePosition",m_config->fmsModePos4,3);
+    addUAVObjectToWidgetRelation("ManualControlSettings","FlightModePosition",m_config->fmsModePos5,4);
+    addUAVObjectToWidgetRelation("ManualControlSettings","FlightModePosition",m_config->fmsModePos6,5);
+    addUAVObjectToWidgetRelation("ManualControlSettings","FlightModeNumber",m_config->fmsPosNum);
 
     addUAVObjectToWidgetRelation("ManualControlSettings","Stabilization1Settings",m_config->fmsSsPos1Roll,"Roll");
     addUAVObjectToWidgetRelation("ManualControlSettings","Stabilization2Settings",m_config->fmsSsPos2Roll,"Roll");
@@ -99,6 +103,7 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
     addUAVObjectToWidgetRelation("ManualControlSettings","Arming",m_config->armControl);
     addUAVObjectToWidgetRelation("ManualControlSettings","ArmedTimeout",m_config->armTimeout,0,1000);
     connect( ManualControlCommand::GetInstance(getObjectManager()),SIGNAL(objectUpdated(UAVObject*)),this,SLOT(moveFMSlider()));
+    connect( ManualControlSettings::GetInstance(getObjectManager()),SIGNAL(objectUpdated(UAVObject*)),this,SLOT(updatePositionSlider()));
     enableControls(false);
 
     populateWidgets();
@@ -632,7 +637,8 @@ void ConfigInputWidget::setChannel(int newChan)
         m_config->wzText->setText(QString(tr("Please move each control once at a time according to the instructions and picture below.\n\n"
                                  "Move the %1 stick")).arg(manualSettingsObj->getField("ChannelGroups")->getElementNames().at(newChan)));
 
-    if(manualSettingsObj->getField("ChannelGroups")->getElementNames().at(newChan).contains("Accessory")) {
+    if(manualSettingsObj->getField("ChannelGroups")->getElementNames().at(newChan).contains("Accessory") ||
+       manualSettingsObj->getField("ChannelGroups")->getElementNames().at(newChan).contains("FlightMode")) {
         m_config->wzNext->setEnabled(true);
         m_config->wzText->setText(m_config->wzText->text() + tr(" or click next to skip this channel."));
     } else
@@ -1113,10 +1119,11 @@ void ConfigInputWidget::invertControls()
     }
     manualSettingsObj->setData(manualSettingsData);
 }
+
 void ConfigInputWidget::moveFMSlider()
 {
     ManualControlSettings::DataFields manualSettingsDataPriv = manualSettingsObj->getData();
-    ManualControlCommand::DataFields manualCommandDataPriv=manualCommandObj->getData();
+    ManualControlCommand::DataFields manualCommandDataPriv = manualCommandObj->getData();
 
     float valueScaled;
     int chMin = manualSettingsDataPriv.ChannelMin[ManualControlSettings::CHANNELMIN_FLIGHTMODE];
@@ -1139,12 +1146,72 @@ void ConfigInputWidget::moveFMSlider()
             valueScaled = 0;
     }
 
-    if(valueScaled < -(1.0 / 3.0))
-        m_config->fmsSlider->setValue(-100);
-    else if (valueScaled > (1.0/3.0))
-        m_config->fmsSlider->setValue(100);
+    // Bound and scale FlightMode from [-1..+1] to [0..1] range
+    if (valueScaled < -1.0)
+        valueScaled = -1.0;
     else
-        m_config->fmsSlider->setValue(0);
+    if (valueScaled >  1.0)
+        valueScaled =  1.0;
+
+    // Convert flightMode value into the switch position in the range [0..N-1]
+    // This uses the same optimized computation as flight code to be consistent
+    uint8_t pos = ((int16_t)(valueScaled * 256) + 256) * manualSettingsDataPriv.FlightModeNumber >> 9;
+    if (pos >= manualSettingsDataPriv.FlightModeNumber)
+        pos = manualSettingsDataPriv.FlightModeNumber - 1;
+    m_config->fmsSlider->setValue(pos);
+}
+
+void ConfigInputWidget::updatePositionSlider()
+{
+    ManualControlSettings::DataFields manualSettingsDataPriv = manualSettingsObj->getData();
+
+    switch(manualSettingsDataPriv.FlightModeNumber) {
+    default:
+    case 6:
+        m_config->fmsModePos6->setEnabled(true);
+	// pass through
+    case 5:
+        m_config->fmsModePos5->setEnabled(true);
+	// pass through
+    case 4:
+        m_config->fmsModePos4->setEnabled(true);
+	// pass through
+    case 3:
+        m_config->fmsModePos3->setEnabled(true);
+	// pass through
+    case 2:
+        m_config->fmsModePos2->setEnabled(true);
+	// pass through
+    case 1:
+        m_config->fmsModePos1->setEnabled(true);
+	// pass through
+    case 0:
+	break;
+    }
+
+    switch(manualSettingsDataPriv.FlightModeNumber) {
+    case 0:
+        m_config->fmsModePos1->setEnabled(false);
+	// pass through
+    case 1:
+        m_config->fmsModePos2->setEnabled(false);
+	// pass through
+    case 2:
+        m_config->fmsModePos3->setEnabled(false);
+	// pass through
+    case 3:
+        m_config->fmsModePos4->setEnabled(false);
+	// pass through
+    case 4:
+        m_config->fmsModePos5->setEnabled(false);
+	// pass through
+    case 5:
+        m_config->fmsModePos6->setEnabled(false);
+	// pass through
+    case 6:
+    default:
+	break;
+    }
 }
 
 void ConfigInputWidget::updateCalibration()

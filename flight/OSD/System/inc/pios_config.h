@@ -35,12 +35,12 @@
 /* Enable/Disable PiOS Modules */
 #define PIOS_INCLUDE_ADC
 #define PIOS_INCLUDE_DELAY
-//#define PIOS_INCLUDE_I2C
+#define PIOS_INCLUDE_I2C
 #define PIOS_INCLUDE_IRQ
 #define PIOS_INCLUDE_LED
 #define PIOS_INCLUDE_IAP
 //#define PIOS_INCLUDE_SERVO
-//#define PIOS_INCLUDE_SPI
+#define PIOS_INCLUDE_SPI
 #define PIOS_INCLUDE_SYS
 #define PIOS_INCLUDE_USART
 //#define PIOS_INCLUDE_GPIO
@@ -57,7 +57,10 @@
 #define PIOS_INCLUDE_COM_AUX
 #define PIOS_INCLUDE_GPS
 //#define PIOS_OVERO_SPI
-
+#define PIOS_INCLUDE_BMP085
+#define PIOS_INCLUDE_HMC5883
+#define PIOS_INCLUDE_SDCARD
+//#define PIOS_INCLUDE_WAVE
 /* Supported receiver interfaces */
 //#define PIOS_INCLUDE_RCVR
 //#define PIOS_INCLUDE_DSM
@@ -75,6 +78,8 @@
 #define PIOS_TELEM_PRIORITY_QUEUE       /* Enable a priority queue in telemetry */
 #define PIOS_QUATERNION_STABILIZATION   /* Stabilization options */
 #define PIOS_GPS_SETS_HOMELOCATION      /* GPS options */
+#define PIOS_INCLUDE_GPS_NMEA_PARSER /* Include the NMEA protocol parser */
+#define PIOS_INCLUDE_GPS_UBX_PARSER  /* Include the UBX protocol parser */
 
 /* Alarm Thresholds */
 #define HEAP_LIMIT_WARNING		4000
@@ -86,5 +91,6 @@
 
 // This actually needs calibrating
 #define IDLE_COUNTS_PER_SEC_AT_NO_LOAD (8379692)
+#define LOG_FILENAME 			"PIOS.LOG"
 
 #endif /* PIOS_CONFIG_H */

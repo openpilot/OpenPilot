@@ -8,26 +8,26 @@
  * @{
  * @addtogroup UAVObjectsPlugin UAVObjects Plugin
  * @{
- *   
- * @note       Object definition file: $(XMLFILE). 
+ *
+ * @note       Object definition file: $(XMLFILE).
  *             This is an automatically generated file.
  *             DO NOT modify manually.
  *
  * @brief      The UAVUObjects GCS plugin
  *****************************************************************************/
-/* 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "$(NAMELC).h"
@@ -35,6 +35,7 @@
 
 const QString $(NAME)::NAME = QString("$(NAME)");
 const QString $(NAME)::DESCRIPTION = QString("$(DESCRIPTION)");
+const QString $(NAME)::CATEGORY = QString("$(CATEGORY)");
 
 /**
  * Constructor
@@ -50,6 +51,9 @@ $(FIELDSINIT)
     setDefaultFieldValues();
     // Set the object description
     setDescription(DESCRIPTION);
+
+    // Set the Category of this object type
+    setCategory(CATEGORY);
 
     connect(this, SIGNAL(objectUpdated(UAVObject*)),
             SLOT(emitNotifications()));

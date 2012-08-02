@@ -26,6 +26,7 @@ OTHER_FILES += UAVObjects.pluginspec
 HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/baroaltitude.h \
     $$UAVOBJECT_SYNTHETICS/baroairspeed.h \
+    $$UAVOBJECT_SYNTHETICS/airspeedsettings.h \
     $$UAVOBJECT_SYNTHETICS/attitudeactual.h \
     $$UAVOBJECT_SYNTHETICS/attitudesimulated.h \
     $$UAVOBJECT_SYNTHETICS/altholdsmoothed.h \
@@ -55,6 +56,7 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/gpsposition.h \
     $$UAVOBJECT_SYNTHETICS/gpstime.h \
     $$UAVOBJECT_SYNTHETICS/gpssatellites.h \
+    $$UAVOBJECT_SYNTHETICS/gpssettings.h \
     $$UAVOBJECT_SYNTHETICS/pathaction.h \
     $$UAVOBJECT_SYNTHETICS/pathdesired.h \
     $$UAVOBJECT_SYNTHETICS/pathplannersettings.h \
@@ -99,6 +101,7 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
 SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/baroaltitude.cpp \
     $$UAVOBJECT_SYNTHETICS/baroairspeed.cpp \
+    $$UAVOBJECT_SYNTHETICS/airspeedsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/attitudeactual.cpp \
     $$UAVOBJECT_SYNTHETICS/attitudesimulated.cpp \
     $$UAVOBJECT_SYNTHETICS/altholdsmoothed.cpp \
@@ -128,6 +131,7 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/gpsposition.cpp \
     $$UAVOBJECT_SYNTHETICS/gpstime.cpp \
     $$UAVOBJECT_SYNTHETICS/gpssatellites.cpp \
+    $$UAVOBJECT_SYNTHETICS/gpssettings.cpp \
     $$UAVOBJECT_SYNTHETICS/pathaction.cpp \
     $$UAVOBJECT_SYNTHETICS/pathdesired.cpp \
     $$UAVOBJECT_SYNTHETICS/pathplannersettings.cpp \

@@ -414,7 +414,7 @@ void Simulator::updateUAVOs(Output2OP out){
     // Update BaroAirspeed object
     BaroAirspeed::DataFields baroAirspeedData;
     memset(&baroAirspeedData, 0, sizeof(BaroAirspeed::DataFields));
-    baroAirspeedData.Airspeed = out.airspeed + noise.baroAirspeed.Airspeed;
+    baroAirspeedData.CalibratedAirspeed = out.calibratedAirspeed + noise.baroAirspeed.CalibratedAirspeed;
     baroAirspeed->setData(baroAirspeedData);
 
     //Update gyroscope sensor data

@@ -59,11 +59,14 @@
 /* Select the sensors to include */
 #define PIOS_INCLUDE_BMA180
 #define PIOS_INCLUDE_HMC5883
+#define PIOS_HMC5883_HAS_GPIOS
 #define PIOS_INCLUDE_MPU6000
 #define PIOS_MPU6000_ACCEL
 #define PIOS_INCLUDE_L3GD20
 #define PIOS_INCLUDE_MS5611
 #define PIOS_INCLUDE_ETASV3
+#define PIOS_INCLUDE_MPXV5004
+#define PIOS_INCLUDE_MPXV7002
 //#define PIOS_INCLUDE_HCSR04
 #define PIOS_FLASH_ON_ACCEL /* true for second revo */
 #define FLASH_FREERTOS
@@ -97,14 +100,16 @@
 #define PIOS_TELEM_PRIORITY_QUEUE       /* Enable a priority queue in telemetry */
 //#define PIOS_QUATERNION_STABILIZATION   /* Stabilization options */
 #define PIOS_GPS_SETS_HOMELOCATION      /* GPS options */
+#define PIOS_INCLUDE_GPS_NMEA_PARSER /* Include the NMEA protocol parser */
+#define PIOS_INCLUDE_GPS_UBX_PARSER  /* Include the UBX protocol parser */
 
 /* Alarm Thresholds */
-#define HEAP_LIMIT_WARNING		1000
-#define HEAP_LIMIT_CRITICAL		500
-#define IRQSTACK_LIMIT_WARNING		150
-#define IRQSTACK_LIMIT_CRITICAL		80
-#define CPULOAD_LIMIT_WARNING		80
-#define CPULOAD_LIMIT_CRITICAL		95
+#define HEAP_LIMIT_WARNING       1000
+#define HEAP_LIMIT_CRITICAL       500
+#define IRQSTACK_LIMIT_WARNING    150
+#define IRQSTACK_LIMIT_CRITICAL    80
+#define CPULOAD_LIMIT_WARNING      80
+#define CPULOAD_LIMIT_CRITICAL     95
 
 // This actually needs calibrating
 #define IDLE_COUNTS_PER_SEC_AT_NO_LOAD (8379692)

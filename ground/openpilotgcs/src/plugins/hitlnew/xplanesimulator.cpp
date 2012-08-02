@@ -301,7 +301,7 @@ void XplaneSimulator::processUpdate(const QByteArray& dataBuf)
         out.altitude = altitude;
         out.groundspeed = groundspeed_ktgs*1.15*1.6089/3.6; //Convert from [kts] to [m/s]
 
-        out.airspeed = airspeed_keas*1.15*1.6089/3.6;  //Convert from [kts] to [m/s]
+        out.calibratedAirspeed = airspeed_keas*1.15*1.6089/3.6;  //Convert from [kts] to [m/s]
 
         // Update BaroAltitude object
         out.temperature = temperature;

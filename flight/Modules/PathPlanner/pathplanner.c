@@ -484,8 +484,8 @@ static uint8_t conditionAboveSpeed() {
 	if (pathAction.ConditionParameters[1]>0.5f) {
 		BaroAirspeedData baroAirspeed;
 		BaroAirspeedGet (&baroAirspeed);
-		if (baroAirspeed.Connected == BAROAIRSPEED_CONNECTED_TRUE) {
-			velocity = baroAirspeed.Airspeed;
+		if (baroAirspeed.BaroConnected == BAROAIRSPEED_BAROCONNECTED_TRUE) {
+			velocity = baroAirspeed.TrueAirspeed;
 		}
 	}
 

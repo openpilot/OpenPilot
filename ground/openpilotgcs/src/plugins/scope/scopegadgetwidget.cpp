@@ -51,6 +51,7 @@
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QPushButton>
 #include <QMutexLocker>
+#include <QWheelEvent>
 
 //using namespace Core;
 
@@ -65,8 +66,8 @@ ScopeGadgetWidget::ScopeGadgetWidget(QWidget *parent) : QwtPlot(parent)
     replotTimer = new QTimer(this);
     connect(replotTimer, SIGNAL(timeout()), this, SLOT(replotNewData()));
 
-    // Listen to telemetry connection/disconnection events, no point
-    // running the scopes if we are not connected and not replaying logs
+    // Listen to telemetry connection/disconnection events, no point in
+    // running the scopes if we are not connected and not replaying logs.
     // Also listen to disconnect actions from the user
     Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
     connect(cm, SIGNAL(deviceAboutToDisconnect()), this, SLOT(stopPlotting()));
@@ -124,13 +125,18 @@ void ScopeGadgetWidget::mouseReleaseEvent(QMouseEvent *e)
 
 void ScopeGadgetWidget::mouseDoubleClickEvent(QMouseEvent *e)
 {
-	mutex.lock();
-		if (legend())
-			deleteLegend();
-		else
-			addLegend();
-	mutex.unlock();
-	update();
+    //On double-click, toggle legend
+    mutex.lock();
+    if (legend())
+        deleteLegend();
+    else
+        addLegend();
+    mutex.unlock();
+
+    //On double-click, reset plot zoom
+    setAxisAutoScale(QwtPlot::yLeft, true);
+
+    update();
 
 	QwtPlot::mouseDoubleClickEvent(e);
 }
@@ -142,6 +148,33 @@ void ScopeGadgetWidget::mouseMoveEvent(QMouseEvent *e)
 
 void ScopeGadgetWidget::wheelEvent(QWheelEvent *e)
 {
+    //Change zoom on scroll wheel event
+    QwtInterval yInterval=axisInterval(QwtPlot::yLeft);
+    if (yInterval.minValue() != yInterval.maxValue()) //Make sure that the two values are never the same. Sometimes axisInterval returns (0,0)
+    {
+        //Determine what y value to zoom about. NOTE, this approach has a bug that the in that
+        //the value returned by Qt includes the legend, whereas the value transformed by Qwt
+        //does *not*. Thus, when zooming with a legend, there will always be a small bias error.
+        //In practice, this seems not to be a UI problem.
+        QPoint mouse_pos=e->pos(); //Get the mouse coordinate in the frame
+        double zoomLine=invTransform(QwtPlot::yLeft, mouse_pos.y()); //Transform the y mouse coordinate into a frame value.
+
+        double zoomScale=1.1; //THIS IS AN ARBITRARY CONSTANT, AND PERHAPS SHOULD BE IN A DEFINE INSTEAD OF BURIED HERE
+
+        mutex.lock(); //DOES THIS mutex.lock NEED TO BE HERE? I DON'T KNOW, I JUST COPIED IT FROM THE ABOVE CODE
+        // Set the scale
+        if (e->delta()<0){
+            setAxisScale(QwtPlot::yLeft,
+                         (yInterval.minValue()-zoomLine)*zoomScale+zoomLine,
+                         (yInterval.maxValue()-zoomLine)*zoomScale+zoomLine );
+        }
+        else{
+            setAxisScale(QwtPlot::yLeft,
+                         (yInterval.minValue()-zoomLine)/zoomScale+zoomLine,
+                         (yInterval.maxValue()-zoomLine)/zoomScale+zoomLine );
+        }
+        mutex.unlock();
+    }
     QwtPlot::wheelEvent(e);
 }
 
@@ -203,17 +236,17 @@ void ScopeGadgetWidget::addLegend()
 //	legend->setFrameStyle(QFrame::Box | QFrame::Sunken);
 //	insertLegend(legend, QwtPlot::BottomLegend);
 
-        // Update the checked/unchecked state of the legend items
-        // -> this is necessary when hiding a legend where some plots are
-        //    not visible, and the un-hiding it.
-        foreach (QwtPlotItem *item, this->itemList()) {
-            bool on = item->isVisible();
-            QWidget *w = legend->find(item);
-            if ( w && w->inherits("QwtLegendItem") )
-                ((QwtLegendItem *)w)->setChecked(!on);
-        }
+    // Update the checked/unchecked state of the legend items
+    // -> this is necessary when hiding a legend where some plots are
+    //    not visible, and the un-hiding it.
+    foreach (QwtPlotItem *item, this->itemList()) {
+        bool on = item->isVisible();
+        QWidget *w = legend->find(item);
+        if ( w && w->inherits("QwtLegendItem") )
+            ((QwtLegendItem *)w)->setChecked(!on);
+    }
 
-	connect(this, SIGNAL(legendChecked(QwtPlotItem *, bool)), this, SLOT(showCurve(QwtPlotItem *, bool)));
+    connect(this, SIGNAL(legendChecked(QwtPlotItem *, bool)), this, SLOT(showCurve(QwtPlotItem *, bool)));
 }
 
 void ScopeGadgetWidget::preparePlot(PlotType plotType)
@@ -234,27 +267,27 @@ void ScopeGadgetWidget::preparePlot(PlotType plotType)
 //	setPalette(pal);
 
 //    setCanvasBackground(Utils::StyleHelper::baseColor());
-	setCanvasBackground(QColor(64, 64, 64));
+    setCanvasBackground(QColor(64, 64, 64));
 
     //Add grid lines
     QwtPlotGrid *grid = new QwtPlotGrid;
-	grid->setMajPen(QPen(Qt::gray, 0, Qt::DashLine));
-	grid->setMinPen(QPen(Qt::lightGray, 0, Qt::DotLine));
-	grid->setPen(QPen(Qt::darkGray, 1, Qt::DotLine));
-	grid->attach(this);
+    grid->setMajPen(QPen(Qt::gray, 0, Qt::DashLine));
+    grid->setMinPen(QPen(Qt::lightGray, 0, Qt::DotLine));
+    grid->setPen(QPen(Qt::darkGray, 1, Qt::DotLine));
+    grid->attach(this);
 
-	// Add the legend
-	addLegend();
+    // Add the legend
+    addLegend();
 
     // Only start the timer if we are already connected
     Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
-	if (cm->getCurrentConnection() && replotTimer)
-	{
-		if (!replotTimer->isActive())
-			replotTimer->start(m_refreshInterval);
-		else
-			replotTimer->setInterval(m_refreshInterval);
-	}
+    if (cm->getCurrentConnection() && replotTimer)
+    {
+        if (!replotTimer->isActive())
+            replotTimer->start(m_refreshInterval);
+        else
+            replotTimer->setInterval(m_refreshInterval);
+    }
 }
 
 void ScopeGadgetWidget::showCurve(QwtPlotItem *item, bool on)
@@ -389,7 +422,7 @@ void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavFieldSubField
     }
     UAVObjectField* field = obj->getField(plotData->uavField);
     if(!field) {
-        qDebug() << "Field " << plotData->uavField << " of object " << plotData->uavObject << " is missing";
+        qDebug() << "In scope gadget, in fields loaded from GCS config file, field" << plotData->uavField << " of object " << plotData->uavObject << " is missing";
         return;
     }
     QString units = field->getUnits();
@@ -412,7 +445,7 @@ void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavFieldSubField
     //Keep the curve details for later
     m_curvesData.insert(curveNameScaled, plotData);
 
-    //Link to the signal of new data only if this UAVObject has not been to connected yet
+    //Link to the new signal data only if this UAVObject has not been connected yet
     if (!m_connectedUAVObjects.contains(obj->getName())) {
         m_connectedUAVObjects.append(obj->getName());
         connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(uavObjectReceived(UAVObject*)));
@@ -470,6 +503,7 @@ void ScopeGadgetWidget::replotNewData()
 	replot();
 }
 
+/*
 void ScopeGadgetWidget::setupExamplePlot()
 {
     preparePlot(SequentialPlot);
@@ -514,6 +548,7 @@ void ScopeGadgetWidget::setupExamplePlot()
 		replot();
 	mutex.unlock();
 }
+*/
 
 void ScopeGadgetWidget::clearCurvePlots()
 {

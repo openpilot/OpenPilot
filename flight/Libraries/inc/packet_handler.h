@@ -106,7 +106,7 @@ void PHRegisterStatusHandler(PHInstHandle h, PHStatusHandler f);
 void PHRegisterPPMHandler(PHInstHandle h, PHPPMHandler f);
 uint32_t PHConnect(PHInstHandle h, uint32_t dest_id);
 PHPacketHandle PHGetRXPacket(PHInstHandle h);
-void PHReleaseTXPacket(PHInstHandle h, PHPacketHandle p);
+void PHReleaseRXPacket(PHInstHandle h, PHPacketHandle p);
 PHPacketHandle PHGetTXPacket(PHInstHandle h);
 void PHReleaseTXPacket(PHInstHandle h, PHPacketHandle p);
 uint8_t PHTransmitPacket(PHInstHandle h, PHPacketHandle p);

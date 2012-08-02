@@ -118,7 +118,7 @@ struct Output2OP{
     float altitude;
     float heading;
     float groundspeed; //[m/s]
-    float airspeed;    //[m/s]
+    float calibratedAirspeed;    //[m/s]
     float pitch;
     float roll;
     float pressure;

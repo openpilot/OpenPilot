@@ -37,8 +37,9 @@ void replaceCommonTags(QString& out, ObjectInfo* info)
 {
 
     QStringList updateModeStr,accessModeStr;
-    updateModeStr << "UPDATEMODE_PERIODIC" << "UPDATEMODE_ONCHANGE"
-                  << "UPDATEMODE_THROTTLED" << "UPDATEMODE_MANUAL";
+    updateModeStr << "UPDATEMODE_MANUAL" << "UPDATEMODE_PERIODIC"
+                  << "UPDATEMODE_ONCHANGE"
+                  << "UPDATEMODE_THROTTLED";
 
     accessModeStr << "ACCESS_READWRITE" << "ACCESS_READONLY";
 
@@ -55,6 +56,8 @@ void replaceCommonTags(QString& out, ObjectInfo* info)
     out.replace(QString("$(NAMELC)"), info->namelc);
     // Replace $(DESCRIPTION) tag
     out.replace(QString("$(DESCRIPTION)"), info->description);
+    // Replace $(CATEGORY) tag
+    out.replace(QString("$(CATEGORY)"), info->category);
     // Replace $(NAMEUC) tag
     out.replace(QString("$(NAMEUC)"), info->name.toUpper());
     // Replace $(OBJID) tag

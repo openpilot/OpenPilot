@@ -31,6 +31,7 @@
  */
 
 #include "openpilot.h"
+#include "hwsettings.h"
 #include "overosync.h"
 #include "overosyncstats.h"
 #include "systemstats.h"
@@ -49,6 +50,7 @@ static UAVTalkConnection uavTalkCon;
 static xTaskHandle overoSyncTaskHandle;
 volatile bool buffer_swap_failed;
 volatile uint32_t buffer_swap_timeval;
+static bool overoEnabled;
 
 // Private functions
 static void overoSyncTask(void *parameters);
@@ -140,6 +142,23 @@ int32_t OveroSyncInitialize(void)
 {
 	if(pios_spi_overo_id == 0)
 		return -1;
+
+#ifdef MODULE_OVERO_BUILTIN
+	overoEnabled = true;
+#else
+	
+	HwSettingsInitialize();
+	uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
+	HwSettingsOptionalModulesGet(optionalModules);
+	
+	if (optionalModules[HWSETTINGS_OPTIONALMODULES_OVERO] == HWSETTINGS_OPTIONALMODULES_ENABLED) {
+		overoEnabled = true;
+	} else {
+		overoEnabled = false;
+		return -1;
+	}
+#endif
+	
 	
 	OveroSyncStatsInitialize();
 
@@ -160,6 +179,11 @@ int32_t OveroSyncInitialize(void)
  */
 int32_t OveroSyncStart(void)
 {
+	//Check if module is enabled or not
+	if (overoEnabled == false) {
+		return -1;
+	}
+	
 	if(pios_spi_overo_id == 0)
 		return -1;
 

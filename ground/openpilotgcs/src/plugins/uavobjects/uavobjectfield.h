@@ -92,7 +92,7 @@ protected:
     quint32 offset;
     quint8* data;
     UAVObject* obj;
-    QMap<quint32,LimitStruct> elementLimits;
+    QMap<quint32, QList<LimitStruct> > elementLimits;
     void clear();
     void constructorInitialize(const QString& name, const QString& units, FieldType type, const QStringList& elementNames, const QStringList& options, const QString &limits);
     void limitsInitialize(const QString &limits);

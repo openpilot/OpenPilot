@@ -110,9 +110,6 @@ int32_t StabilizationStart()
 	// Create object queue
 	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
 
-	// This prepares this optional algorithm
-	stabilization_relay_init();
-
 	// Listen for updates.
 	//	AttitudeActualConnectQueue(queue);
 	GyrosConnectQueue(queue);

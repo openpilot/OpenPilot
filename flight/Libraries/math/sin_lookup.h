@@ -1,16 +1,13 @@
 /**
  ******************************************************************************
- * @addtogroup OpenPilotModules OpenPilot Modules
+ * @addtogroup OpenPilot Math Utilities
  * @{
- * @addtogroup StabilizationModule Stabilization Module
- * @brief Relay tuning controller
- * @note This object updates the @ref ActuatorDesired "Actuator Desired" based on the
- * PID loops on the @ref AttitudeDesired "Attitude Desired" and @ref AttitudeActual "Attitude Actual"
+ * @addtogroup Sine and cosine methods that use a cached lookup table
  * @{
  *
- * @file       relay_tuning.h
+ * @file       sin_lookup.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
- * @brief      Attitude stabilization module.
+ * @brief      Sine lookup table from flash with 1 degree resolution
  *
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -31,9 +28,12 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef RELAY_TUNING_H
-#define RELAY_TUNING_H
+#ifndef SIN_LOOKUP_H
+#define SIN_LOOKUP_H
 
-int stabilization_relay_rate(float err, float *output, int axis, bool reinit);
+float sin_lookup_deg(float angle);
+float cos_lookup_deg(float angle);
+float sin_lookup_rad(float angle);
+float cos_lookup_rad(float angle);
 
 #endif

@@ -322,19 +322,6 @@ static void stabilizationTask(void* parameters)
 
 					break;
 				}
-				case STABILIZATIONDESIRED_STABILIZATIONMODE_RELAY:
-				case STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE:
-					rateDesiredAxis[i] = ApplyPid(&pids[PID_ROLL + i], local_error[i], dT);
-					
-					if(rateDesiredAxis[i] > settings.MaximumRate[i])
-						rateDesiredAxis[i] = settings.MaximumRate[i];
-					else if(rateDesiredAxis[i] < -settings.MaximumRate[i])
-						rateDesiredAxis[i] = -settings.MaximumRate[i];
-					
-					
-					axis_lock_accum[i] = 0;
-					break;
-
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK:
 					if (reinit)
 						pids[PID_RATE_ROLL + i].iAccumulator = 0;

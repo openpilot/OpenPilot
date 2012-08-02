@@ -120,17 +120,10 @@ public abstract class UAVObject {
 	 * Object update mode
 	 */
 	public enum UpdateMode {
-		UPDATEMODE_PERIODIC, /**
-		 * Automatically update object at periodic
-		 * intervals
-		 */
+		UPDATEMODE_MANUAL,   /** Manually update object, by calling the updated() function */
+		UPDATEMODE_PERIODIC, /** Automatically update object at periodic intervals */
 		UPDATEMODE_ONCHANGE, /** Only update object when its data changes */
-		UPDATEMODE_MANUAL, /**
-		 * Manually update object, by calling the updated()
-		 * function
-		 */
-		UPDATEMODE_NEVER
-		/** Object is never updated */
+		UPDATEMODE_THROTTLED /** Object is updated on change, but not more often than the interval time */
 	};
 
 	/**
@@ -140,47 +133,32 @@ public abstract class UAVObject {
 		ACCESS_READWRITE, ACCESS_READONLY
 	};
 
-	/**
-	 * Access mode
-	 */
-	public enum Acked {
-		FALSE, TRUE
-	};
-
 	public final class Metadata {
-		public AccessMode flightAccess;
 		/**
-		 * Defines the access level for the local flight transactions (readonly
-		 * and readwrite)
+		 * Object metadata, each object has a meta object that holds its metadata. The metadata define
+		 * properties for each object and can be used by multiple modules (e.g. telemetry and logger)
+		 *
+		 * The object metadata flags are packed into a single 16 bit integer.
+		 * The bits in the flag field are defined as:
+		 *
+		 *   Bit(s)  Name                       Meaning
+		 *   ------  ----                       -------
+		 *      0    access                     Defines the access level for the local transactions (readonly=0 and readwrite=1)
+		 *      1    gcsAccess                  Defines the access level for the local GCS transactions (readonly=0 and readwrite=1), not used in the flight s/w
+		 *      2    telemetryAcked             Defines if an ack is required for the transactions of this object (1:acked, 0:not acked)
+		 *      3    gcsTelemetryAcked          Defines if an ack is required for the transactions of this object (1:acked, 0:not acked)
+		 *    4-5    telemetryUpdateMode        Update mode used by the telemetry module (UAVObjUpdateMode)
+		 *    6-7    gcsTelemetryUpdateMode     Update mode used by the GCS (UAVObjUpdateMode)
 		 */
-		public AccessMode gcsAccess;
-		/**
-		 * Defines the access level for the local GCS transactions (readonly and
-		 * readwrite)
-		 */
-		public Acked flightTelemetryAcked;
-		/**
-		 * Defines if an ack is required for the transactions of this object
-		 * (1:acked, 0:not acked)
-		 */
-		public UpdateMode flightTelemetryUpdateMode;
-		/** Update mode used by the autopilot (UpdateMode) */
+		public int flags; /** Defines flags for update and logging modes and whether an update should be ACK'd (bits defined above) */
+
+		/** Update period used by the telemetry module (only if telemetry mode is PERIODIC) */
 		public int flightTelemetryUpdatePeriod;
-		/**
-		 * Update period used by the autopilot (only if telemetry mode is
-		 * PERIODIC)
-		 */
-		public Acked gcsTelemetryAcked;
-		/**
-		 * Defines if an ack is required for the transactions of this object
-		 * (1:acked, 0:not acked)
-		 */
-		public UpdateMode gcsTelemetryUpdateMode;
-		/** Update mode used by the GCS (UpdateMode) */
-		public int gcsTelemetryUpdatePeriod;
+		
 		/** Update period used by the GCS (only if telemetry mode is PERIODIC) */
-		public UpdateMode loggingUpdateMode;
-		/** Update mode used by the logging module (UpdateMode) */
+		public int gcsTelemetryUpdatePeriod;
+		
+		/** Update period used by the GCS (only if telemetry mode is PERIODIC) */
 		public int loggingUpdatePeriod;
 		/**
 		 * Update period used by the logging module (only if logging mode is

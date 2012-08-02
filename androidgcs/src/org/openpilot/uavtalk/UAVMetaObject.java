@@ -13,43 +13,25 @@ public class UAVMetaObject extends UAVObject {
 		
 		ownMetadata = new Metadata();
 
-		ownMetadata.flightAccess = UAVObject.AccessMode.ACCESS_READWRITE;
-		ownMetadata.gcsAccess = UAVObject.AccessMode.ACCESS_READWRITE;
-		ownMetadata.flightTelemetryAcked = UAVObject.Acked.TRUE;
-		ownMetadata.flightTelemetryUpdateMode = UAVObject.UpdateMode.UPDATEMODE_ONCHANGE;
-		ownMetadata.flightTelemetryUpdatePeriod = 0;
-		ownMetadata.gcsTelemetryAcked = UAVObject.Acked.TRUE;
-		ownMetadata.gcsTelemetryUpdateMode = UAVObject.UpdateMode.UPDATEMODE_ONCHANGE;
+		ownMetadata.flags = 0; // TODO: Fix flags
 		ownMetadata.gcsTelemetryUpdatePeriod = 0;
-		ownMetadata.loggingUpdateMode = UAVObject.UpdateMode.UPDATEMODE_ONCHANGE;
 		ownMetadata.loggingUpdatePeriod = 0;
 
-		// Setup fields
-		List<String> boolEnum = new ArrayList<String>();
-		boolEnum.add("False");
-		boolEnum.add("True");
 
-		List<String> updateModeEnum = new ArrayList<String>();
-		updateModeEnum.add("Periodic");
-		updateModeEnum.add("On Change");
-		updateModeEnum.add("Manual");
-		updateModeEnum.add("Never");
+		List<String> modesBitField = new ArrayList<String>();
+		modesBitField.add("FlightReadOnly");
+		modesBitField.add("GCSReadOnly");
+		modesBitField.add("FlightTelemetryAcked");
+		modesBitField.add("GCSTelemetryAcked");
+		modesBitField.add("FlightUpdatePeriodic");
+		modesBitField.add("FlightUpdateOnChange");
+		modesBitField.add("GCSUpdatePeriodic");
+		modesBitField.add("GCSUpdateOnChange");
 
-		List<String> accessModeEnum = new ArrayList<String>();	    
-		accessModeEnum.add("Read/Write");
-		accessModeEnum.add("Read Only");
-
-		List<UAVObjectField> fields = new ArrayList<UAVObjectField>();    
-		fields.add( new UAVObjectField("Flight Access Mode", "", UAVObjectField.FieldType.ENUM, 1, accessModeEnum) );
-		fields.add( new UAVObjectField("GCS Access Mode", "", UAVObjectField.FieldType.ENUM, 1, accessModeEnum) );
-		fields.add( new UAVObjectField("Flight Telemetry Acked", "", UAVObjectField.FieldType.ENUM, 1, boolEnum) );
-		fields.add( new UAVObjectField("Flight Telemetry Update Mode", "", UAVObjectField.FieldType.ENUM, 1, updateModeEnum) );
-		fields.add( new UAVObjectField("Flight Telemetry Update Period", "", UAVObjectField.FieldType.UINT32, 1, null) );
-		fields.add( new UAVObjectField("GCS Telemetry Acked", "", UAVObjectField.FieldType.ENUM, 1, boolEnum) );
-		fields.add( new UAVObjectField("GCS Telemetry Update Mode", "", UAVObjectField.FieldType.ENUM, 1, updateModeEnum) );
-		fields.add( new UAVObjectField("GCS Telemetry Update Period", "", UAVObjectField.FieldType.UINT32, 1, null ) );
-		fields.add( new UAVObjectField("Logging Update Mode", "", UAVObjectField.FieldType.ENUM, 1, updateModeEnum) );
-		fields.add( new UAVObjectField("Logging Update Period", "", UAVObjectField.FieldType.UINT32, 1, null ) );
+		fields.add( new UAVObjectField("Modes", "", UAVObjectField.FieldType.BITFIELD, 1, modesBitField) );
+	    fields.add( new UAVObjectField("Flight Telemetry Update Period", "ms", UAVObjectField.FieldType.UINT16, 1, null) );
+	    fields.add( new UAVObjectField("GCS Telemetry Update Period", "ms", UAVObjectField.FieldType.UINT16, 1, null) );
+	    fields.add( new UAVObjectField("Logging Update Period", "ms", UAVObjectField.FieldType.UINT16, 1, null) );
 
 		int numBytes = 0;
 		ListIterator<UAVObjectField> li = fields.listIterator();

@@ -51,6 +51,7 @@ public:
 signals:
     void connected();
     void disconnected();
+    void telemetryUpdated(double txRate, double rxRate);
 
 public slots:
     void transactionCompleted(UAVObject* obj, bool success);

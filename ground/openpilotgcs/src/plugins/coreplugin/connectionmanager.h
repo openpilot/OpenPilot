@@ -32,6 +32,8 @@
 #include <QWidget>
 #include "mainwindow.h"
 #include "generalsettings.h"
+#include "telemetrymonitorwidget.h"
+
 #include <QtCore/QVector>
 #include <QtCore/QIODevice>
 #include <QtCore/QLinkedList>
@@ -63,7 +65,6 @@ struct devListItem
     QString displayName;
 };
 
-
 class CORE_EXPORT ConnectionManager : public QWidget
 {
     Q_OBJECT
@@ -89,6 +90,9 @@ signals:
     void deviceConnected(QIODevice *dev);
     void deviceAboutToDisconnect();
 
+public slots:
+    void telemetryUpdated(double txRate, double rxRate);
+
 private slots:
     void objectAdded(QObject *obj);
     void aboutToRemoveObject(QObject *obj);
@@ -104,6 +108,9 @@ protected:
     QPushButton *m_connectBtn;
     QLinkedList<devListItem> m_devList;
     QList<IConnection*> m_connectionsList;
+
+    //tx/rx telemetry monitor
+    TelemetryMonitorWidget* m_monitor;
 
     //currently connected connection plugin
     devListItem m_connectionDevice;

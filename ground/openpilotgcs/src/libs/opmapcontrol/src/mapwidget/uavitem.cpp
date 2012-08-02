@@ -146,15 +146,16 @@ namespace mapcontrol
 
         //Create text lines
         QString uavoInfoStrLine1, uavoInfoStrLine2;
-        QString uavoInfoStrLine3;
-        QString uavoInfoStrLine4;
+        QString uavoInfoStrLine3, uavoInfoStrLine4;
+        QString uavoInfoStrLine5;
 
         //For whatever reason, Qt does not let QPainterPath have text wrapping. So each line of
         //text has to be added to a different line.
         uavoInfoStrLine1.append(QString("CAS: %1 kph").arg(CAS_mps));
-        uavoInfoStrLine2.append(QString("Groundspeed: %1 kph").arg(groundspeed_kph));
-        uavoInfoStrLine3.append(QString("Lat-Lon: %1, %2").arg(coord.Lat()).arg(coord.Lng()));
-        uavoInfoStrLine4.append(QString("Altitude: %1 m").arg(this->altitude));
+        uavoInfoStrLine2.append(QString("Groundspeed: %1 kph").arg(groundspeed_kph, 0, 'f',1));
+        uavoInfoStrLine3.append(QString("Lat-Lon: %1, %2").arg(coord.Lat(), 0, 'f',7).arg(coord.Lng(), 0, 'f',7));
+        uavoInfoStrLine4.append(QString("North-East: %1 m, %2 m").arg(NED[0], 0, 'f',1).arg(NED[1], 0, 'f',1));
+        uavoInfoStrLine5.append(QString("Altitude: %1 m").arg(-NED[2], 0, 'f',1));
 
         //Add the lines of text to the path
         //NOTE: We must use QPainterPath for the outlined text font. QPaint does not support this.
@@ -163,6 +164,7 @@ namespace mapcontrol
         path.addText(textAnchorX, textAnchorY+16*1, borderfont, uavoInfoStrLine2);
         path.addText(textAnchorX, textAnchorY+16*2, borderfont, uavoInfoStrLine3);
         path.addText(textAnchorX, textAnchorY+16*3, borderfont, uavoInfoStrLine4);
+        path.addText(textAnchorX, textAnchorY+16*4, borderfont, uavoInfoStrLine5);
 
         //First pass is the outline...
         myPen.setWidth(4);

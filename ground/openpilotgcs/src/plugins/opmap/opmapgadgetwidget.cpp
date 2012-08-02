@@ -581,8 +581,6 @@ void OPMapGadgetWidget::updatePosition()
     gps_longitude = gpsPositionData.Longitude;
     gps_altitude = gpsPositionData.Altitude;
 
-    qDebug() << "Lon: " << gps_longitude/1e7;
-
 	gps_pos = internals::PointLatLng(gps_latitude, gps_longitude);
 
     //**********************

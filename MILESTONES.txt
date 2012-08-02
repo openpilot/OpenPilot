@@ -230,4 +230,33 @@ C:
 D:
 V:
 
+M: First Auto landing on a fixed Wing using CC
+C:
+D:
+V:
+
+M: First Auto landing on a fixed Wing using Revo
+C:
+D:
+V:
+
+M: First Auto take-off on a MultiRotor using Revo
+C:
+D:
+V:
+
+M: First Auto landing on a MultiRotor using Revo
+C:
+D:
+V:
+
+M: First Auto take-off on a Heli using Revo
+C:
+D:
+V:
+
+M: First Auto landing on a Heli using Revo
+C:
+D:
+V:
 

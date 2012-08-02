@@ -10,8 +10,6 @@ import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.openpilot.uavtalk.UAVObject.Acked;
-
 import android.util.Log;
 
 public class Telemetry {
@@ -20,7 +18,7 @@ public class Telemetry {
 	public static int LOGLEVEL = 0;
 	public static boolean WARN = LOGLEVEL > 1;
 	public static boolean DEBUG = LOGLEVEL > 0;
-
+	
     public class TelemetryStats {
         public int txBytes;
         public int rxBytes;
@@ -50,7 +48,7 @@ public class Telemetry {
         boolean allInstances;
         boolean objRequest;
         int retriesRemaining;
-        Acked acked;
+        boolean acked;
     } ;
     
     /**
@@ -249,7 +247,7 @@ public class Telemetry {
 
         // Setup object depending on update mode
         int eventMask;
-        if ( metadata.gcsTelemetryUpdateMode == UAVObject.UpdateMode.UPDATEMODE_PERIODIC )
+        if ( metadata.GetGcsTelemetryUpdateMode() == UAVObject.UpdateMode.UPDATEMODE_PERIODIC )
         {
             // Set update period
             setUpdatePeriod(obj, metadata.gcsTelemetryUpdatePeriod);
@@ -260,7 +258,7 @@ public class Telemetry {
 
             connectToObjectInstances(obj, eventMask);
         }
-        else if ( metadata.gcsTelemetryUpdateMode == UAVObject.UpdateMode.UPDATEMODE_ONCHANGE )
+        else if ( metadata.GetGcsTelemetryUpdateMode() == UAVObject.UpdateMode.UPDATEMODE_ONCHANGE )
         {
             // Set update period
             setUpdatePeriod(obj, 0);
@@ -271,7 +269,11 @@ public class Telemetry {
 
             connectToObjectInstances(obj, eventMask);
         }
-        else if ( metadata.gcsTelemetryUpdateMode == UAVObject.UpdateMode.UPDATEMODE_MANUAL )
+        else if ( metadata.GetGcsTelemetryUpdateMode() == UAVObject.UpdateMode.UPDATEMODE_THROTTLED )
+        {
+        	// TODO
+        }
+        else if ( metadata.GetGcsTelemetryUpdateMode() == UAVObject.UpdateMode.UPDATEMODE_MANUAL )
         {
             // Set update period
             setUpdatePeriod(obj, 0);
@@ -281,13 +283,6 @@ public class Telemetry {
                 eventMask |= EV_UNPACKED; // we also need to act on remote updates (unpack events)
 
             connectToObjectInstances(obj, eventMask);
-        }
-        else if ( metadata.gcsTelemetryUpdateMode == UAVObject.UpdateMode.UPDATEMODE_NEVER )
-        {
-            // Set update period
-            setUpdatePeriod(obj, 0);
-            // Disconnect from object
-            connectToObjectInstances(obj, 0);
         }
     }
 
@@ -360,10 +355,10 @@ public class Telemetry {
             }
             else
             {
-                utalk.sendObject(transInfo.obj, transInfo.acked == Acked.TRUE, transInfo.allInstances);
+                utalk.sendObject(transInfo.obj, transInfo.acked, transInfo.allInstances);
             }
             // Start timer if a response is expected
-            if ( transInfo.objRequest || transInfo.acked == Acked.TRUE )
+            if ( transInfo.objRequest || transInfo.acked )
             {
             	transTimerSetPeriod(REQ_TIMEOUT_MS);
             }
@@ -476,7 +471,7 @@ public class Telemetry {
             transInfo.obj = objInfo.obj;
             transInfo.allInstances = objInfo.allInstances;
             transInfo.retriesRemaining = MAX_RETRIES;
-            transInfo.acked = metadata.gcsTelemetryAcked;
+            transInfo.acked = metadata.GetGcsTelemetryAcked();
             if ( objInfo.event == EV_UPDATED || objInfo.event == EV_UPDATED_MANUAL )
             {
                 transInfo.objRequest = false;

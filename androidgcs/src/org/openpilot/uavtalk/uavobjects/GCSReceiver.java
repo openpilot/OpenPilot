@@ -58,6 +58,8 @@ public class GCSReceiver extends UAVDataObject {
 		ChannelElemNames.add("3");
 		ChannelElemNames.add("4");
 		ChannelElemNames.add("5");
+		ChannelElemNames.add("6");
+		ChannelElemNames.add("7");
 		fields.add( new UAVObjectField("Channel", "us", UAVObjectField.FieldType.UINT16, ChannelElemNames, null) );
 
 
@@ -83,18 +85,17 @@ public class GCSReceiver extends UAVDataObject {
 	 */
 	public Metadata getDefaultMetadata() {
 		UAVObject.Metadata metadata = new UAVObject.Metadata();
-		metadata.gcsAccess = UAVObject.AccessMode.ACCESS_READWRITE;
-		metadata.gcsTelemetryAcked = UAVObject.Acked.FALSE;
-		metadata.gcsTelemetryUpdateMode = UAVObject.UpdateMode.UPDATEMODE_ONCHANGE;
-		metadata.gcsTelemetryUpdatePeriod = 0;
-
-		metadata.flightAccess = UAVObject.AccessMode.ACCESS_READONLY;
-		metadata.flightTelemetryAcked = UAVObject.Acked.FALSE;
-		metadata.flightTelemetryUpdateMode = UAVObject.UpdateMode.UPDATEMODE_NEVER;
-		metadata.flightTelemetryUpdatePeriod = 0;
-
-		metadata.loggingUpdateMode = UAVObject.UpdateMode.UPDATEMODE_NEVER;
-		metadata.loggingUpdatePeriod = 0;
+    	metadata.flags =
+		    UAVObject.Metadata.AccessModeNum(UAVObject.AccessMode.ACCESS_READWRITE) << UAVOBJ_ACCESS_SHIFT |
+		    UAVObject.Metadata.AccessModeNum(UAVObject.AccessMode.ACCESS_READWRITE) << UAVOBJ_GCS_ACCESS_SHIFT |
+		    0 << UAVOBJ_TELEMETRY_ACKED_SHIFT |
+		    0 << UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT |
+		    UAVObject.Metadata.UpdateModeNum(UAVObject.UpdateMode.UPDATEMODE_ONCHANGE) << UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT |
+		    UAVObject.Metadata.UpdateModeNum(UAVObject.UpdateMode.UPDATEMODE_ONCHANGE) << UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT;
+    	metadata.flightTelemetryUpdatePeriod = 0;
+    	metadata.gcsTelemetryUpdatePeriod = 0;
+    	metadata.loggingUpdatePeriod = 0;
+ 
 		return metadata;
 	}
 
@@ -133,7 +134,7 @@ public class GCSReceiver extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0xCC7E2BBC;
+	protected static final int OBJID = 0xCC7E1470;
 	protected static final String NAME = "GCSReceiver";
 	protected static String DESCRIPTION = "A receiver channel group carried over the telemetry link.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

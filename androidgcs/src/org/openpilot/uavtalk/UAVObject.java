@@ -133,7 +133,15 @@ public abstract class UAVObject {
 		ACCESS_READWRITE, ACCESS_READONLY
 	};
 
-	public final class Metadata {
+	public final static int UAVOBJ_ACCESS_SHIFT = 0;
+	public final static int UAVOBJ_GCS_ACCESS_SHIFT = 1;
+	public final static int UAVOBJ_TELEMETRY_ACKED_SHIFT = 2;
+	public final static int UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT = 3;
+	public final static int UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT = 4;
+	public final static int UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT = 6;
+	public final static int UAVOBJ_UPDATE_MODE_MASK = 0x3;
+
+	public final static class Metadata {
 		/**
 		 * Object metadata, each object has a meta object that holds its metadata. The metadata define
 		 * properties for each object and can be used by multiple modules (e.g. telemetry and logger)
@@ -164,6 +172,190 @@ public abstract class UAVObject {
 		 * Update period used by the logging module (only if logging mode is
 		 * PERIODIC)
 		 */
+
+		/**
+		 * @brief Helper method for metadata accessors
+		 * @param var The starting value
+		 * @param shift The offset of these bits
+		 * @param value The new value
+		 * @param mask The mask of these bits
+		 * @return
+		 */
+		private void SET_BITS(int shift, int value, int mask) {
+			this.flags = (this.flags & ~(mask << shift)) |	(value << shift);
+		}
+		
+		/**
+		 * Get the UAVObject metadata access member
+		 * \return the access type
+		 */
+		public AccessMode GetFlightAccess()
+		{
+			return AccessModeEnum((this.flags >> UAVOBJ_ACCESS_SHIFT) & 1);
+		}
+
+		/**
+		 * Set the UAVObject metadata access member
+		 * \param[in] mode The access mode
+		 */
+		public void SetFlightAccess(Metadata metadata, AccessMode mode)
+		{
+			// Need to convert java enums which have no numeric value to bits
+			SET_BITS(UAVOBJ_ACCESS_SHIFT, AccessModeNum(mode), 1);
+		}
+
+		/**
+		 * Get the UAVObject metadata GCS access member
+		 * \return the GCS access type
+		 */
+		public AccessMode GetGcsAccess()
+		{			
+			return AccessModeEnum((this.flags >> UAVOBJ_GCS_ACCESS_SHIFT) & 1);
+		}
+
+		/**
+		 * Set the UAVObject metadata GCS access member
+		 * \param[in] mode The access mode
+		 */
+		public void SetGcsAccess(Metadata metadata, AccessMode mode) {
+			// Need to convert java enums which have no numeric value to bits
+			SET_BITS(UAVOBJ_GCS_ACCESS_SHIFT, AccessModeNum(mode), 1);
+		}
+
+		/**
+		 * Get the UAVObject metadata telemetry acked member
+		 * \return the telemetry acked boolean
+		 */
+		public boolean GetFlightTelemetryAcked() {
+			return (((this.flags >> UAVOBJ_TELEMETRY_ACKED_SHIFT) & 1) == 1);
+		}
+
+		/**
+		 * Set the UAVObject metadata telemetry acked member
+		 * \param[in] val The telemetry acked boolean
+		 */
+		public void SetFlightTelemetryAcked(boolean val) {
+			SET_BITS(UAVOBJ_TELEMETRY_ACKED_SHIFT, val ? 1 : 0, 1);
+		}
+
+		/**
+		 * Get the UAVObject metadata GCS telemetry acked member
+		 * \return the telemetry acked boolean
+		 */
+		public boolean GetGcsTelemetryAcked() {
+			return ((this.flags >> UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT) & 1) == 1;
+		}
+
+		/**
+		 * Set the UAVObject metadata GCS telemetry acked member
+		 * \param[in] val The GCS telemetry acked boolean
+		 */
+		public void SetGcsTelemetryAcked(boolean val) {
+			SET_BITS(UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT, val ? 1 : 0, 1);
+		}
+
+		/**
+		 * Maps from the bitfield number to the symbolic java enumeration
+		 * @param num The value in the bitfield after shifting
+		 * @return The update mode
+		 */
+		public static AccessMode AccessModeEnum(int num) {
+			switch(num) {
+			case 0:
+				return AccessMode.ACCESS_READONLY;
+			case 1:
+				return AccessMode.ACCESS_READWRITE;
+			}
+			return AccessMode.ACCESS_READONLY;
+		}
+
+		/**
+		 * Maps from the java symbolic enumeration of update mode to the bitfield value
+		 * @param e The update mode
+		 * @return The numeric value to use on the wire
+		 */
+		public static int AccessModeNum(AccessMode e) {
+			switch(e) {
+			case ACCESS_READONLY:
+				return 0;
+			case ACCESS_READWRITE:
+				return 1;
+			}
+			return 0;
+		}
+
+		/**
+		 * Maps from the bitfield number to the symbolic java enumeration
+		 * @param num The value in the bitfield after shifting
+		 * @return The update mode
+		 */
+		public static UpdateMode UpdateModeEnum(int num) {
+			switch(num) {
+			case 0:
+				return UpdateMode.UPDATEMODE_MANUAL;
+			case 1:
+				return UpdateMode.UPDATEMODE_PERIODIC;
+			case 2:
+				return UpdateMode.UPDATEMODE_ONCHANGE;
+			default:
+				return UpdateMode.UPDATEMODE_THROTTLED;
+			}
+		}
+
+		/**
+		 * Maps from the java symbolic enumeration of update mode to the bitfield value
+		 * @param e The update mode
+		 * @return The numeric value to use on the wire
+		 */
+		public static int UpdateModeNum(UpdateMode e) {
+			switch(e) {
+			case UPDATEMODE_MANUAL:
+				return 0;
+			case UPDATEMODE_PERIODIC:
+				return 1;
+			case UPDATEMODE_ONCHANGE:
+				return 2;
+			case UPDATEMODE_THROTTLED:
+				return 3;
+			}
+			return 0;
+		}
+
+		/**
+		 * Get the UAVObject metadata telemetry update mode
+		 * \return the telemetry update mode
+		 */
+		public UpdateMode GetFlightTelemetryUpdateMode() {
+			return UpdateModeEnum((this.flags >> UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT) & UAVOBJ_UPDATE_MODE_MASK);
+		}
+
+		/**
+		 * Set the UAVObject metadata telemetry update mode member
+		 * \param[in] metadata The metadata object
+		 * \param[in] val The telemetry update mode
+		 */
+		public void SetFlightTelemetryUpdateMode(UpdateMode val) {
+			SET_BITS(UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT, UpdateModeNum(val), UAVOBJ_UPDATE_MODE_MASK);
+		}
+
+		/**
+		 * Get the UAVObject metadata GCS telemetry update mode
+		 * \param[in] metadata The metadata object
+		 * \return the GCS telemetry update mode
+		 */
+		public UpdateMode GetGcsTelemetryUpdateMode() {
+			return UpdateModeEnum((this.flags >> UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT) & UAVOBJ_UPDATE_MODE_MASK);
+		}
+
+		/**
+		 * Set the UAVObject metadata GCS telemetry update mode member
+		 * \param[in] metadata The metadata object
+		 * \param[in] val The GCS telemetry update mode
+		 */
+		public void SetGcsTelemetryUpdateMode(UpdateMode val) {
+			SET_BITS(UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT, UpdateModeNum(val), UAVOBJ_UPDATE_MODE_MASK);
+		}
+
 	};
 
 	public UAVObject(int objID, Boolean isSingleInst, String name) {

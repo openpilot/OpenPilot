@@ -59,6 +59,10 @@ public class FlightBatteryState extends UAVDataObject {
 		CurrentElemNames.add("0");
 		fields.add( new UAVObjectField("Current", "A", UAVObjectField.FieldType.FLOAT32, CurrentElemNames, null) );
 
+		List<String> BoardSupplyVoltageElemNames = new ArrayList<String>();
+		BoardSupplyVoltageElemNames.add("0");
+		fields.add( new UAVObjectField("BoardSupplyVoltage", "V", UAVObjectField.FieldType.FLOAT32, BoardSupplyVoltageElemNames, null) );
+
 		List<String> PeakCurrentElemNames = new ArrayList<String>();
 		PeakCurrentElemNames.add("0");
 		fields.add( new UAVObjectField("PeakCurrent", "A", UAVObjectField.FieldType.FLOAT32, PeakCurrentElemNames, null) );
@@ -98,18 +102,17 @@ public class FlightBatteryState extends UAVDataObject {
 	 */
 	public Metadata getDefaultMetadata() {
 		UAVObject.Metadata metadata = new UAVObject.Metadata();
-		metadata.gcsAccess = UAVObject.AccessMode.ACCESS_READONLY;
-		metadata.gcsTelemetryAcked = UAVObject.Acked.FALSE;
-		metadata.gcsTelemetryUpdateMode = UAVObject.UpdateMode.UPDATEMODE_MANUAL;
-		metadata.gcsTelemetryUpdatePeriod = 0;
-
-		metadata.flightAccess = UAVObject.AccessMode.ACCESS_READWRITE;
-		metadata.flightTelemetryAcked = UAVObject.Acked.FALSE;
-		metadata.flightTelemetryUpdateMode = UAVObject.UpdateMode.UPDATEMODE_PERIODIC;
-		metadata.flightTelemetryUpdatePeriod = 1000;
-
-		metadata.loggingUpdateMode = UAVObject.UpdateMode.UPDATEMODE_NEVER;
-		metadata.loggingUpdatePeriod = 0;
+    	metadata.flags =
+		    UAVObject.Metadata.AccessModeNum(UAVObject.AccessMode.ACCESS_READWRITE) << UAVOBJ_ACCESS_SHIFT |
+		    UAVObject.Metadata.AccessModeNum(UAVObject.AccessMode.ACCESS_READONLY) << UAVOBJ_GCS_ACCESS_SHIFT |
+		    0 << UAVOBJ_TELEMETRY_ACKED_SHIFT |
+		    0 << UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT |
+		    UAVObject.Metadata.UpdateModeNum(UAVObject.UpdateMode.UPDATEMODE_PERIODIC) << UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT |
+		    UAVObject.Metadata.UpdateModeNum(UAVObject.UpdateMode.UPDATEMODE_MANUAL) << UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT;
+    	metadata.flightTelemetryUpdatePeriod = 1000;
+    	metadata.gcsTelemetryUpdatePeriod = 0;
+    	metadata.loggingUpdatePeriod = 0;
+ 
 		return metadata;
 	}
 
@@ -122,6 +125,7 @@ public class FlightBatteryState extends UAVDataObject {
 	{
 		getField("Voltage").setValue(0);
 		getField("Current").setValue(0);
+		getField("BoardSupplyVoltage").setValue(0);
 		getField("PeakCurrent").setValue(0);
 		getField("AvgCurrent").setValue(0);
 		getField("ConsumedEnergy").setValue(0);
@@ -154,7 +158,7 @@ public class FlightBatteryState extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0x8C0D756;
+	protected static final int OBJID = 0xD2083596;
 	protected static final String NAME = "FlightBatteryState";
 	protected static String DESCRIPTION = "Battery status information.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

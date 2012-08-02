@@ -314,7 +314,7 @@ public class UAVObjectField {
     	// Get metadata
     	UAVObject.Metadata mdata = obj.getMetadata();
     	// Update value if the access mode permits
-    	if ( mdata.gcsAccess == UAVObject.AccessMode.ACCESS_READWRITE )
+    	if ( mdata.GetGcsAccess() == UAVObject.AccessMode.ACCESS_READWRITE )
     	{
     		switch (type)
     		{

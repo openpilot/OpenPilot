@@ -54,6 +54,8 @@ public class SystemSettings extends UAVDataObject {
 		List<String> GUIConfigDataElemNames = new ArrayList<String>();
 		GUIConfigDataElemNames.add("0");
 		GUIConfigDataElemNames.add("1");
+		GUIConfigDataElemNames.add("2");
+		GUIConfigDataElemNames.add("3");
 		fields.add( new UAVObjectField("GUIConfigData", "bits", UAVObjectField.FieldType.UINT32, GUIConfigDataElemNames, null) );
 
 		List<String> AirframeTypeElemNames = new ArrayList<String>();
@@ -75,6 +77,9 @@ public class SystemSettings extends UAVDataObject {
 		AirframeTypeEnumOptions.add("OctoCoaxX");
 		AirframeTypeEnumOptions.add("HexaCoax");
 		AirframeTypeEnumOptions.add("Tri");
+		AirframeTypeEnumOptions.add("GroundVehicleCar");
+		AirframeTypeEnumOptions.add("GroundVehicleDifferential");
+		AirframeTypeEnumOptions.add("GroundVehicleMotorcycle");
 		fields.add( new UAVObjectField("AirframeType", "", UAVObjectField.FieldType.ENUM, AirframeTypeElemNames, AirframeTypeEnumOptions) );
 
 
@@ -100,18 +105,17 @@ public class SystemSettings extends UAVDataObject {
 	 */
 	public Metadata getDefaultMetadata() {
 		UAVObject.Metadata metadata = new UAVObject.Metadata();
-		metadata.gcsAccess = UAVObject.AccessMode.ACCESS_READWRITE;
-		metadata.gcsTelemetryAcked = UAVObject.Acked.TRUE;
-		metadata.gcsTelemetryUpdateMode = UAVObject.UpdateMode.UPDATEMODE_ONCHANGE;
-		metadata.gcsTelemetryUpdatePeriod = 0;
-
-		metadata.flightAccess = UAVObject.AccessMode.ACCESS_READWRITE;
-		metadata.flightTelemetryAcked = UAVObject.Acked.TRUE;
-		metadata.flightTelemetryUpdateMode = UAVObject.UpdateMode.UPDATEMODE_ONCHANGE;
-		metadata.flightTelemetryUpdatePeriod = 0;
-
-		metadata.loggingUpdateMode = UAVObject.UpdateMode.UPDATEMODE_NEVER;
-		metadata.loggingUpdatePeriod = 0;
+    	metadata.flags =
+		    UAVObject.Metadata.AccessModeNum(UAVObject.AccessMode.ACCESS_READWRITE) << UAVOBJ_ACCESS_SHIFT |
+		    UAVObject.Metadata.AccessModeNum(UAVObject.AccessMode.ACCESS_READWRITE) << UAVOBJ_GCS_ACCESS_SHIFT |
+		    1 << UAVOBJ_TELEMETRY_ACKED_SHIFT |
+		    1 << UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT |
+		    UAVObject.Metadata.UpdateModeNum(UAVObject.UpdateMode.UPDATEMODE_ONCHANGE) << UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT |
+		    UAVObject.Metadata.UpdateModeNum(UAVObject.UpdateMode.UPDATEMODE_ONCHANGE) << UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT;
+    	metadata.flightTelemetryUpdatePeriod = 0;
+    	metadata.gcsTelemetryUpdatePeriod = 0;
+    	metadata.loggingUpdatePeriod = 0;
+ 
 		return metadata;
 	}
 
@@ -124,7 +128,9 @@ public class SystemSettings extends UAVDataObject {
 	{
 		getField("GUIConfigData").setValue(0,0);
 		getField("GUIConfigData").setValue(0,1);
-		getField("AirframeType").setValue("FixedWing");
+		getField("GUIConfigData").setValue(0,2);
+		getField("GUIConfigData").setValue(0,3);
+		getField("AirframeType").setValue("QuadX");
 
 	}
 
@@ -153,7 +159,7 @@ public class SystemSettings extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0x30BD5D7C;
+	protected static final int OBJID = 0xC72A326E;
 	protected static final String NAME = "SystemSettings";
 	protected static String DESCRIPTION = "Select airframe type.  Currently used by @ref ActuatorModule to choose mixing from @ref ActuatorDesired to @ref ActuatorCommand";
 	protected static final boolean ISSINGLEINST = 1 == 1;

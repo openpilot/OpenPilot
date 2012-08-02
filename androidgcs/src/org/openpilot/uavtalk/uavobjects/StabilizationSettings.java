@@ -102,6 +102,31 @@ public class StabilizationSettings extends UAVDataObject {
 		YawPIElemNames.add("ILimit");
 		fields.add( new UAVObjectField("YawPI", "", UAVObjectField.FieldType.FLOAT32, YawPIElemNames, null) );
 
+		List<String> VbarSensitivityElemNames = new ArrayList<String>();
+		VbarSensitivityElemNames.add("Roll");
+		VbarSensitivityElemNames.add("Pitch");
+		VbarSensitivityElemNames.add("Yaw");
+		fields.add( new UAVObjectField("VbarSensitivity", "frac", UAVObjectField.FieldType.FLOAT32, VbarSensitivityElemNames, null) );
+
+		List<String> VbarRollPIElemNames = new ArrayList<String>();
+		VbarRollPIElemNames.add("Kp");
+		VbarRollPIElemNames.add("Ki");
+		fields.add( new UAVObjectField("VbarRollPI", "1/(deg/s)", UAVObjectField.FieldType.FLOAT32, VbarRollPIElemNames, null) );
+
+		List<String> VbarPitchPIElemNames = new ArrayList<String>();
+		VbarPitchPIElemNames.add("Kp");
+		VbarPitchPIElemNames.add("Ki");
+		fields.add( new UAVObjectField("VbarPitchPI", "1/(deg/s)", UAVObjectField.FieldType.FLOAT32, VbarPitchPIElemNames, null) );
+
+		List<String> VbarYawPIElemNames = new ArrayList<String>();
+		VbarYawPIElemNames.add("Kp");
+		VbarYawPIElemNames.add("Ki");
+		fields.add( new UAVObjectField("VbarYawPI", "1/(deg/s)", UAVObjectField.FieldType.FLOAT32, VbarYawPIElemNames, null) );
+
+		List<String> VbarTauElemNames = new ArrayList<String>();
+		VbarTauElemNames.add("0");
+		fields.add( new UAVObjectField("VbarTau", "sec", UAVObjectField.FieldType.FLOAT32, VbarTauElemNames, null) );
+
 		List<String> GyroTauElemNames = new ArrayList<String>();
 		GyroTauElemNames.add("0");
 		fields.add( new UAVObjectField("GyroTau", "", UAVObjectField.FieldType.FLOAT32, GyroTauElemNames, null) );
@@ -121,6 +146,21 @@ public class StabilizationSettings extends UAVDataObject {
 		List<String> YawMaxElemNames = new ArrayList<String>();
 		YawMaxElemNames.add("0");
 		fields.add( new UAVObjectField("YawMax", "degrees", UAVObjectField.FieldType.UINT8, YawMaxElemNames, null) );
+
+		List<String> VbarGyroSuppressElemNames = new ArrayList<String>();
+		VbarGyroSuppressElemNames.add("0");
+		fields.add( new UAVObjectField("VbarGyroSuppress", "%", UAVObjectField.FieldType.INT8, VbarGyroSuppressElemNames, null) );
+
+		List<String> VbarPiroCompElemNames = new ArrayList<String>();
+		VbarPiroCompElemNames.add("0");
+		List<String> VbarPiroCompEnumOptions = new ArrayList<String>();
+		VbarPiroCompEnumOptions.add("FALSE");
+		VbarPiroCompEnumOptions.add("TRUE");
+		fields.add( new UAVObjectField("VbarPiroComp", "", UAVObjectField.FieldType.ENUM, VbarPiroCompElemNames, VbarPiroCompEnumOptions) );
+
+		List<String> VbarMaxAngleElemNames = new ArrayList<String>();
+		VbarMaxAngleElemNames.add("0");
+		fields.add( new UAVObjectField("VbarMaxAngle", "deg", UAVObjectField.FieldType.UINT8, VbarMaxAngleElemNames, null) );
 
 		List<String> MaxAxisLockElemNames = new ArrayList<String>();
 		MaxAxisLockElemNames.add("0");
@@ -164,18 +204,17 @@ public class StabilizationSettings extends UAVDataObject {
 	 */
 	public Metadata getDefaultMetadata() {
 		UAVObject.Metadata metadata = new UAVObject.Metadata();
-		metadata.gcsAccess = UAVObject.AccessMode.ACCESS_READWRITE;
-		metadata.gcsTelemetryAcked = UAVObject.Acked.TRUE;
-		metadata.gcsTelemetryUpdateMode = UAVObject.UpdateMode.UPDATEMODE_ONCHANGE;
-		metadata.gcsTelemetryUpdatePeriod = 0;
-
-		metadata.flightAccess = UAVObject.AccessMode.ACCESS_READWRITE;
-		metadata.flightTelemetryAcked = UAVObject.Acked.TRUE;
-		metadata.flightTelemetryUpdateMode = UAVObject.UpdateMode.UPDATEMODE_ONCHANGE;
-		metadata.flightTelemetryUpdatePeriod = 0;
-
-		metadata.loggingUpdateMode = UAVObject.UpdateMode.UPDATEMODE_NEVER;
-		metadata.loggingUpdatePeriod = 0;
+    	metadata.flags =
+		    UAVObject.Metadata.AccessModeNum(UAVObject.AccessMode.ACCESS_READWRITE) << UAVOBJ_ACCESS_SHIFT |
+		    UAVObject.Metadata.AccessModeNum(UAVObject.AccessMode.ACCESS_READWRITE) << UAVOBJ_GCS_ACCESS_SHIFT |
+		    1 << UAVOBJ_TELEMETRY_ACKED_SHIFT |
+		    1 << UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT |
+		    UAVObject.Metadata.UpdateModeNum(UAVObject.UpdateMode.UPDATEMODE_ONCHANGE) << UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT |
+		    UAVObject.Metadata.UpdateModeNum(UAVObject.UpdateMode.UPDATEMODE_ONCHANGE) << UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT;
+    	metadata.flightTelemetryUpdatePeriod = 0;
+    	metadata.gcsTelemetryUpdatePeriod = 0;
+    	metadata.loggingUpdatePeriod = 0;
+ 
 		return metadata;
 	}
 
@@ -213,11 +252,24 @@ public class StabilizationSettings extends UAVDataObject {
 		getField("YawPI").setValue(2,0);
 		getField("YawPI").setValue(0,1);
 		getField("YawPI").setValue(50,2);
+		getField("VbarSensitivity").setValue(0.5,0);
+		getField("VbarSensitivity").setValue(0.5,1);
+		getField("VbarSensitivity").setValue(0.5,2);
+		getField("VbarRollPI").setValue(0.005,0);
+		getField("VbarRollPI").setValue(0.002,1);
+		getField("VbarPitchPI").setValue(0.005,0);
+		getField("VbarPitchPI").setValue(0.002,1);
+		getField("VbarYawPI").setValue(0.005,0);
+		getField("VbarYawPI").setValue(0.002,1);
+		getField("VbarTau").setValue(0.5);
 		getField("GyroTau").setValue(0.005);
 		getField("WeakLevelingKp").setValue(0.1);
 		getField("RollMax").setValue(55);
 		getField("PitchMax").setValue(55);
 		getField("YawMax").setValue(35);
+		getField("VbarGyroSuppress").setValue(30);
+		getField("VbarPiroComp").setValue("FALSE");
+		getField("VbarMaxAngle").setValue(10);
 		getField("MaxAxisLock").setValue(15);
 		getField("MaxAxisLockRate").setValue(2);
 		getField("MaxWeakLevelingRate").setValue(5);
@@ -250,7 +302,7 @@ public class StabilizationSettings extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0x5F78C51E;
+	protected static final int OBJID = 0xBBC337D4;
 	protected static final String NAME = "StabilizationSettings";
 	protected static String DESCRIPTION = "PID settings used by the Stabilization module to combine the @ref AttitudeActual and @ref AttitudeDesired to compute @ref ActuatorDesired";
 	protected static final boolean ISSINGLEINST = 1 == 1;

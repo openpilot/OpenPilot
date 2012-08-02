@@ -51,6 +51,10 @@ public class ManualControlSettings extends UAVDataObject {
 		List<UAVObjectField> fields = new ArrayList<UAVObjectField>();
 		
 
+		List<String> DeadbandElemNames = new ArrayList<String>();
+		DeadbandElemNames.add("0");
+		fields.add( new UAVObjectField("Deadband", "%", UAVObjectField.FieldType.FLOAT32, DeadbandElemNames, null) );
+
 		List<String> ChannelMinElemNames = new ArrayList<String>();
 		ChannelMinElemNames.add("Throttle");
 		ChannelMinElemNames.add("Roll");
@@ -146,6 +150,7 @@ public class ManualControlSettings extends UAVDataObject {
 		Stabilization1SettingsEnumOptions.add("Attitude");
 		Stabilization1SettingsEnumOptions.add("AxisLock");
 		Stabilization1SettingsEnumOptions.add("WeakLeveling");
+		Stabilization1SettingsEnumOptions.add("VirtualBar");
 		fields.add( new UAVObjectField("Stabilization1Settings", "", UAVObjectField.FieldType.ENUM, Stabilization1SettingsElemNames, Stabilization1SettingsEnumOptions) );
 
 		List<String> Stabilization2SettingsElemNames = new ArrayList<String>();
@@ -158,6 +163,7 @@ public class ManualControlSettings extends UAVDataObject {
 		Stabilization2SettingsEnumOptions.add("Attitude");
 		Stabilization2SettingsEnumOptions.add("AxisLock");
 		Stabilization2SettingsEnumOptions.add("WeakLeveling");
+		Stabilization2SettingsEnumOptions.add("VirtualBar");
 		fields.add( new UAVObjectField("Stabilization2Settings", "", UAVObjectField.FieldType.ENUM, Stabilization2SettingsElemNames, Stabilization2SettingsEnumOptions) );
 
 		List<String> Stabilization3SettingsElemNames = new ArrayList<String>();
@@ -170,6 +176,7 @@ public class ManualControlSettings extends UAVDataObject {
 		Stabilization3SettingsEnumOptions.add("Attitude");
 		Stabilization3SettingsEnumOptions.add("AxisLock");
 		Stabilization3SettingsEnumOptions.add("WeakLeveling");
+		Stabilization3SettingsEnumOptions.add("VirtualBar");
 		fields.add( new UAVObjectField("Stabilization3Settings", "", UAVObjectField.FieldType.ENUM, Stabilization3SettingsElemNames, Stabilization3SettingsEnumOptions) );
 
 		List<String> FlightModePositionElemNames = new ArrayList<String>();
@@ -185,7 +192,20 @@ public class ManualControlSettings extends UAVDataObject {
 		FlightModePositionEnumOptions.add("VelocityControl");
 		FlightModePositionEnumOptions.add("PositionHold");
 		FlightModePositionEnumOptions.add("PathPlanner");
+		FlightModePositionEnumOptions.add("RTH");
+		FlightModePositionEnumOptions.add("Land");
 		fields.add( new UAVObjectField("FlightModePosition", "", UAVObjectField.FieldType.ENUM, FlightModePositionElemNames, FlightModePositionEnumOptions) );
+
+		List<String> FlightModeNumberElemNames = new ArrayList<String>();
+		FlightModeNumberElemNames.add("0");
+		fields.add( new UAVObjectField("FlightModeNumber", "", UAVObjectField.FieldType.UINT8, FlightModeNumberElemNames, null) );
+
+		List<String> FailsafeBehaviorElemNames = new ArrayList<String>();
+		FailsafeBehaviorElemNames.add("0");
+		List<String> FailsafeBehaviorEnumOptions = new ArrayList<String>();
+		FailsafeBehaviorEnumOptions.add("None");
+		FailsafeBehaviorEnumOptions.add("RTH");
+		fields.add( new UAVObjectField("FailsafeBehavior", "", UAVObjectField.FieldType.ENUM, FailsafeBehaviorElemNames, FailsafeBehaviorEnumOptions) );
 
 
 		// Compute the number of bytes for this object
@@ -210,18 +230,17 @@ public class ManualControlSettings extends UAVDataObject {
 	 */
 	public Metadata getDefaultMetadata() {
 		UAVObject.Metadata metadata = new UAVObject.Metadata();
-		metadata.gcsAccess = UAVObject.AccessMode.ACCESS_READWRITE;
-		metadata.gcsTelemetryAcked = UAVObject.Acked.TRUE;
-		metadata.gcsTelemetryUpdateMode = UAVObject.UpdateMode.UPDATEMODE_ONCHANGE;
-		metadata.gcsTelemetryUpdatePeriod = 0;
-
-		metadata.flightAccess = UAVObject.AccessMode.ACCESS_READWRITE;
-		metadata.flightTelemetryAcked = UAVObject.Acked.TRUE;
-		metadata.flightTelemetryUpdateMode = UAVObject.UpdateMode.UPDATEMODE_ONCHANGE;
-		metadata.flightTelemetryUpdatePeriod = 0;
-
-		metadata.loggingUpdateMode = UAVObject.UpdateMode.UPDATEMODE_NEVER;
-		metadata.loggingUpdatePeriod = 0;
+    	metadata.flags =
+		    UAVObject.Metadata.AccessModeNum(UAVObject.AccessMode.ACCESS_READWRITE) << UAVOBJ_ACCESS_SHIFT |
+		    UAVObject.Metadata.AccessModeNum(UAVObject.AccessMode.ACCESS_READWRITE) << UAVOBJ_GCS_ACCESS_SHIFT |
+		    1 << UAVOBJ_TELEMETRY_ACKED_SHIFT |
+		    1 << UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT |
+		    UAVObject.Metadata.UpdateModeNum(UAVObject.UpdateMode.UPDATEMODE_ONCHANGE) << UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT |
+		    UAVObject.Metadata.UpdateModeNum(UAVObject.UpdateMode.UPDATEMODE_ONCHANGE) << UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT;
+    	metadata.flightTelemetryUpdatePeriod = 0;
+    	metadata.gcsTelemetryUpdatePeriod = 0;
+    	metadata.loggingUpdatePeriod = 0;
+ 
 		return metadata;
 	}
 
@@ -232,6 +251,7 @@ public class ManualControlSettings extends UAVDataObject {
 	 */
 	public void setDefaultFieldValues()
 	{
+		getField("Deadband").setValue(0);
 		getField("ChannelMin").setValue(1000,0);
 		getField("ChannelMin").setValue(1000,1);
 		getField("ChannelMin").setValue(1000,2);
@@ -291,6 +311,8 @@ public class ManualControlSettings extends UAVDataObject {
 		getField("FlightModePosition").setValue("Manual",0);
 		getField("FlightModePosition").setValue("Stabilized1",1);
 		getField("FlightModePosition").setValue("Stabilized2",2);
+		getField("FlightModeNumber").setValue(3);
+		getField("FailsafeBehavior").setValue("None");
 
 	}
 
@@ -319,7 +341,7 @@ public class ManualControlSettings extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0x59C4551C;
+	protected static final int OBJID = 0x6C188320;
 	protected static final String NAME = "ManualControlSettings";
 	protected static String DESCRIPTION = "Settings to indicate how to decode receiver input by @ref ManualControlModule.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

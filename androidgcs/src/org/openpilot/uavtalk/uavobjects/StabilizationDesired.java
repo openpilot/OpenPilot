@@ -77,6 +77,7 @@ public class StabilizationDesired extends UAVDataObject {
 		StabilizationModeEnumOptions.add("Attitude");
 		StabilizationModeEnumOptions.add("AxisLock");
 		StabilizationModeEnumOptions.add("WeakLeveling");
+		StabilizationModeEnumOptions.add("VirtualBar");
 		fields.add( new UAVObjectField("StabilizationMode", "", UAVObjectField.FieldType.ENUM, StabilizationModeElemNames, StabilizationModeEnumOptions) );
 
 
@@ -102,18 +103,17 @@ public class StabilizationDesired extends UAVDataObject {
 	 */
 	public Metadata getDefaultMetadata() {
 		UAVObject.Metadata metadata = new UAVObject.Metadata();
-		metadata.gcsAccess = UAVObject.AccessMode.ACCESS_READWRITE;
-		metadata.gcsTelemetryAcked = UAVObject.Acked.FALSE;
-		metadata.gcsTelemetryUpdateMode = UAVObject.UpdateMode.UPDATEMODE_MANUAL;
-		metadata.gcsTelemetryUpdatePeriod = 0;
-
-		metadata.flightAccess = UAVObject.AccessMode.ACCESS_READWRITE;
-		metadata.flightTelemetryAcked = UAVObject.Acked.FALSE;
-		metadata.flightTelemetryUpdateMode = UAVObject.UpdateMode.UPDATEMODE_PERIODIC;
-		metadata.flightTelemetryUpdatePeriod = 1000;
-
-		metadata.loggingUpdateMode = UAVObject.UpdateMode.UPDATEMODE_NEVER;
-		metadata.loggingUpdatePeriod = 0;
+    	metadata.flags =
+		    UAVObject.Metadata.AccessModeNum(UAVObject.AccessMode.ACCESS_READWRITE) << UAVOBJ_ACCESS_SHIFT |
+		    UAVObject.Metadata.AccessModeNum(UAVObject.AccessMode.ACCESS_READWRITE) << UAVOBJ_GCS_ACCESS_SHIFT |
+		    0 << UAVOBJ_TELEMETRY_ACKED_SHIFT |
+		    0 << UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT |
+		    UAVObject.Metadata.UpdateModeNum(UAVObject.UpdateMode.UPDATEMODE_PERIODIC) << UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT |
+		    UAVObject.Metadata.UpdateModeNum(UAVObject.UpdateMode.UPDATEMODE_MANUAL) << UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT;
+    	metadata.flightTelemetryUpdatePeriod = 1000;
+    	metadata.gcsTelemetryUpdatePeriod = 0;
+    	metadata.loggingUpdatePeriod = 0;
+ 
 		return metadata;
 	}
 
@@ -152,7 +152,7 @@ public class StabilizationDesired extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0xDB8FFC3C;
+	protected static final int OBJID = 0xDE1EAAD6;
 	protected static final String NAME = "StabilizationDesired";
 	protected static String DESCRIPTION = "The desired attitude that @ref StabilizationModule will try and achieve if FlightMode is Stabilized.  Comes from @ref ManaulControlModule.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

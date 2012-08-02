@@ -62,11 +62,12 @@ public class TaskInfo extends UAVDataObject {
 		StackRemainingElemNames.add("GPS");
 		StackRemainingElemNames.add("ManualControl");
 		StackRemainingElemNames.add("Altitude");
+		StackRemainingElemNames.add("Airspeed");
 		StackRemainingElemNames.add("Stabilization");
 		StackRemainingElemNames.add("AltitudeHold");
-		StackRemainingElemNames.add("Guidance");
-		StackRemainingElemNames.add("FlightPlan");
 		StackRemainingElemNames.add("PathPlanner");
+		StackRemainingElemNames.add("PathFollower");
+		StackRemainingElemNames.add("FlightPlan");
 		StackRemainingElemNames.add("Com2UsbBridge");
 		StackRemainingElemNames.add("Usb2ComBridge");
 		StackRemainingElemNames.add("OveroSync");
@@ -83,11 +84,12 @@ public class TaskInfo extends UAVDataObject {
 		RunningElemNames.add("GPS");
 		RunningElemNames.add("ManualControl");
 		RunningElemNames.add("Altitude");
+		RunningElemNames.add("Airspeed");
 		RunningElemNames.add("Stabilization");
 		RunningElemNames.add("AltitudeHold");
-		RunningElemNames.add("Guidance");
-		RunningElemNames.add("FlightPlan");
 		RunningElemNames.add("PathPlanner");
+		RunningElemNames.add("PathFollower");
+		RunningElemNames.add("FlightPlan");
 		RunningElemNames.add("Com2UsbBridge");
 		RunningElemNames.add("Usb2ComBridge");
 		RunningElemNames.add("OveroSync");
@@ -107,11 +109,12 @@ public class TaskInfo extends UAVDataObject {
 		RunningTimeElemNames.add("GPS");
 		RunningTimeElemNames.add("ManualControl");
 		RunningTimeElemNames.add("Altitude");
+		RunningTimeElemNames.add("Airspeed");
 		RunningTimeElemNames.add("Stabilization");
 		RunningTimeElemNames.add("AltitudeHold");
-		RunningTimeElemNames.add("Guidance");
-		RunningTimeElemNames.add("FlightPlan");
 		RunningTimeElemNames.add("PathPlanner");
+		RunningTimeElemNames.add("PathFollower");
+		RunningTimeElemNames.add("FlightPlan");
 		RunningTimeElemNames.add("Com2UsbBridge");
 		RunningTimeElemNames.add("Usb2ComBridge");
 		RunningTimeElemNames.add("OveroSync");
@@ -140,18 +143,17 @@ public class TaskInfo extends UAVDataObject {
 	 */
 	public Metadata getDefaultMetadata() {
 		UAVObject.Metadata metadata = new UAVObject.Metadata();
-		metadata.gcsAccess = UAVObject.AccessMode.ACCESS_READWRITE;
-		metadata.gcsTelemetryAcked = UAVObject.Acked.TRUE;
-		metadata.gcsTelemetryUpdateMode = UAVObject.UpdateMode.UPDATEMODE_ONCHANGE;
-		metadata.gcsTelemetryUpdatePeriod = 0;
-
-		metadata.flightAccess = UAVObject.AccessMode.ACCESS_READWRITE;
-		metadata.flightTelemetryAcked = UAVObject.Acked.TRUE;
-		metadata.flightTelemetryUpdateMode = UAVObject.UpdateMode.UPDATEMODE_PERIODIC;
-		metadata.flightTelemetryUpdatePeriod = 10000;
-
-		metadata.loggingUpdateMode = UAVObject.UpdateMode.UPDATEMODE_PERIODIC;
-		metadata.loggingUpdatePeriod = 1000;
+    	metadata.flags =
+		    UAVObject.Metadata.AccessModeNum(UAVObject.AccessMode.ACCESS_READWRITE) << UAVOBJ_ACCESS_SHIFT |
+		    UAVObject.Metadata.AccessModeNum(UAVObject.AccessMode.ACCESS_READWRITE) << UAVOBJ_GCS_ACCESS_SHIFT |
+		    1 << UAVOBJ_TELEMETRY_ACKED_SHIFT |
+		    1 << UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT |
+		    UAVObject.Metadata.UpdateModeNum(UAVObject.UpdateMode.UPDATEMODE_PERIODIC) << UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT |
+		    UAVObject.Metadata.UpdateModeNum(UAVObject.UpdateMode.UPDATEMODE_ONCHANGE) << UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT;
+    	metadata.flightTelemetryUpdatePeriod = 10000;
+    	metadata.gcsTelemetryUpdatePeriod = 0;
+    	metadata.loggingUpdatePeriod = 1000;
+ 
 		return metadata;
 	}
 
@@ -190,7 +192,7 @@ public class TaskInfo extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0x498F54BA;
+	protected static final int OBJID = 0xB81CD2AE;
 	protected static final String NAME = "TaskInfo";
 	protected static String DESCRIPTION = "Task information";
 	protected static final boolean ISSINGLEINST = 1 == 1;

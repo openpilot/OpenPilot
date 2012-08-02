@@ -76,27 +76,24 @@ public class TelemetryMonitor extends Observable{
 	    	List <UAVObject> instList = objListIterator.next();
 	        UAVObject obj = instList.get(0);
 	        UAVObject.Metadata mdata = obj.getMetadata();
-	        if ( mdata.gcsTelemetryUpdateMode != UAVObject.UpdateMode.UPDATEMODE_NEVER )
+	        if ( obj.isMetadata() )
 	        {
-	            if ( obj.isMetadata() )
-	            {
-	                queue.add(obj);
-	            }
-	            else /* Data object */
-	            {
-	            	UAVDataObject dobj = (UAVDataObject) obj;
-	                if ( dobj.isSettings() )
-	                {
-	                    queue.add(obj);
-	                }
-	                else
-	                {
-	                    if ( mdata.flightTelemetryUpdateMode == UAVObject.UpdateMode.UPDATEMODE_ONCHANGE )
-	                    {
-	                        queue.add(obj);
-	                    }
-	                }
-	            }
+	        	queue.add(obj);
+	        }
+	        else /* Data object */
+	        {
+	        	UAVDataObject dobj = (UAVDataObject) obj;
+	        	if ( dobj.isSettings() )
+	        	{
+	        		queue.add(obj);
+	        	}
+	        	else
+	        	{
+	        		if ( mdata.GetFlightTelemetryUpdateMode() == UAVObject.UpdateMode.UPDATEMODE_ONCHANGE )
+	        		{
+	        			queue.add(obj);
+	        		}
+	        	}
 	        }
 	    }
 	    // Start retrieving

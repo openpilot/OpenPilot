@@ -56,7 +56,6 @@ public class SystemAlarms extends UAVDataObject {
 		AlarmElemNames.add("StackOverflow");
 		AlarmElemNames.add("CPUOverload");
 		AlarmElemNames.add("EventSystem");
-		AlarmElemNames.add("SDCard");
 		AlarmElemNames.add("Telemetry");
 		AlarmElemNames.add("ManualControl");
 		AlarmElemNames.add("Actuator");
@@ -64,12 +63,12 @@ public class SystemAlarms extends UAVDataObject {
 		AlarmElemNames.add("Sensors");
 		AlarmElemNames.add("Stabilization");
 		AlarmElemNames.add("Guidance");
-		AlarmElemNames.add("AHRSComms");
 		AlarmElemNames.add("Battery");
 		AlarmElemNames.add("FlightTime");
 		AlarmElemNames.add("I2C");
 		AlarmElemNames.add("GPS");
 		AlarmElemNames.add("BootFault");
+		AlarmElemNames.add("Power");
 		List<String> AlarmEnumOptions = new ArrayList<String>();
 		AlarmEnumOptions.add("Uninitialised");
 		AlarmEnumOptions.add("OK");
@@ -101,18 +100,17 @@ public class SystemAlarms extends UAVDataObject {
 	 */
 	public Metadata getDefaultMetadata() {
 		UAVObject.Metadata metadata = new UAVObject.Metadata();
-		metadata.gcsAccess = UAVObject.AccessMode.ACCESS_READWRITE;
-		metadata.gcsTelemetryAcked = UAVObject.Acked.TRUE;
-		metadata.gcsTelemetryUpdateMode = UAVObject.UpdateMode.UPDATEMODE_ONCHANGE;
-		metadata.gcsTelemetryUpdatePeriod = 0;
-
-		metadata.flightAccess = UAVObject.AccessMode.ACCESS_READWRITE;
-		metadata.flightTelemetryAcked = UAVObject.Acked.TRUE;
-		metadata.flightTelemetryUpdateMode = UAVObject.UpdateMode.UPDATEMODE_ONCHANGE;
-		metadata.flightTelemetryUpdatePeriod = 0;
-
-		metadata.loggingUpdateMode = UAVObject.UpdateMode.UPDATEMODE_PERIODIC;
-		metadata.loggingUpdatePeriod = 1000;
+    	metadata.flags =
+		    UAVObject.Metadata.AccessModeNum(UAVObject.AccessMode.ACCESS_READWRITE) << UAVOBJ_ACCESS_SHIFT |
+		    UAVObject.Metadata.AccessModeNum(UAVObject.AccessMode.ACCESS_READWRITE) << UAVOBJ_GCS_ACCESS_SHIFT |
+		    1 << UAVOBJ_TELEMETRY_ACKED_SHIFT |
+		    1 << UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT |
+		    UAVObject.Metadata.UpdateModeNum(UAVObject.UpdateMode.UPDATEMODE_ONCHANGE) << UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT |
+		    UAVObject.Metadata.UpdateModeNum(UAVObject.UpdateMode.UPDATEMODE_ONCHANGE) << UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT;
+    	metadata.flightTelemetryUpdatePeriod = 0;
+    	metadata.gcsTelemetryUpdatePeriod = 0;
+    	metadata.loggingUpdatePeriod = 1000;
+ 
 		return metadata;
 	}
 
@@ -140,7 +138,6 @@ public class SystemAlarms extends UAVDataObject {
 		getField("Alarm").setValue("Uninitialised",14);
 		getField("Alarm").setValue("Uninitialised",15);
 		getField("Alarm").setValue("Uninitialised",16);
-		getField("Alarm").setValue("Uninitialised",17);
 
 	}
 
@@ -169,7 +166,7 @@ public class SystemAlarms extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0x9C7CBFE;
+	protected static final int OBJID = 0x737ADCF2;
 	protected static final String NAME = "SystemAlarms";
 	protected static String DESCRIPTION = "Alarms from OpenPilot to indicate failure conditions or warnings.  Set by various modules.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

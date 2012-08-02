@@ -190,14 +190,6 @@ public class HwSettings extends UAVDataObject {
 		ComUsbBridgeSpeedEnumOptions.add("115200");
 		fields.add( new UAVObjectField("ComUsbBridgeSpeed", "bps", UAVObjectField.FieldType.ENUM, ComUsbBridgeSpeedElemNames, ComUsbBridgeSpeedEnumOptions) );
 
-		List<String> USB_DeviceTypeElemNames = new ArrayList<String>();
-		USB_DeviceTypeElemNames.add("0");
-		List<String> USB_DeviceTypeEnumOptions = new ArrayList<String>();
-		USB_DeviceTypeEnumOptions.add("HID-only");
-		USB_DeviceTypeEnumOptions.add("HID+VCP");
-		USB_DeviceTypeEnumOptions.add("VCP-only");
-		fields.add( new UAVObjectField("USB_DeviceType", "descriptor", UAVObjectField.FieldType.ENUM, USB_DeviceTypeElemNames, USB_DeviceTypeEnumOptions) );
-
 		List<String> USB_HIDPortElemNames = new ArrayList<String>();
 		USB_HIDPortElemNames.add("0");
 		List<String> USB_HIDPortEnumOptions = new ArrayList<String>();
@@ -219,7 +211,12 @@ public class HwSettings extends UAVDataObject {
 		OptionalModulesElemNames.add("ComUsbBridge");
 		OptionalModulesElemNames.add("Fault");
 		OptionalModulesElemNames.add("Altitude");
+		OptionalModulesElemNames.add("Airspeed");
 		OptionalModulesElemNames.add("TxPID");
+		OptionalModulesElemNames.add("VtolPathFollower");
+		OptionalModulesElemNames.add("FixedWingPathFollower");
+		OptionalModulesElemNames.add("Battery");
+		OptionalModulesElemNames.add("Overo");
 		List<String> OptionalModulesEnumOptions = new ArrayList<String>();
 		OptionalModulesEnumOptions.add("Disabled");
 		OptionalModulesEnumOptions.add("Enabled");
@@ -252,18 +249,17 @@ public class HwSettings extends UAVDataObject {
 	 */
 	public Metadata getDefaultMetadata() {
 		UAVObject.Metadata metadata = new UAVObject.Metadata();
-		metadata.gcsAccess = UAVObject.AccessMode.ACCESS_READWRITE;
-		metadata.gcsTelemetryAcked = UAVObject.Acked.TRUE;
-		metadata.gcsTelemetryUpdateMode = UAVObject.UpdateMode.UPDATEMODE_ONCHANGE;
-		metadata.gcsTelemetryUpdatePeriod = 0;
-
-		metadata.flightAccess = UAVObject.AccessMode.ACCESS_READWRITE;
-		metadata.flightTelemetryAcked = UAVObject.Acked.TRUE;
-		metadata.flightTelemetryUpdateMode = UAVObject.UpdateMode.UPDATEMODE_ONCHANGE;
-		metadata.flightTelemetryUpdatePeriod = 0;
-
-		metadata.loggingUpdateMode = UAVObject.UpdateMode.UPDATEMODE_NEVER;
-		metadata.loggingUpdatePeriod = 0;
+    	metadata.flags =
+		    UAVObject.Metadata.AccessModeNum(UAVObject.AccessMode.ACCESS_READWRITE) << UAVOBJ_ACCESS_SHIFT |
+		    UAVObject.Metadata.AccessModeNum(UAVObject.AccessMode.ACCESS_READWRITE) << UAVOBJ_GCS_ACCESS_SHIFT |
+		    1 << UAVOBJ_TELEMETRY_ACKED_SHIFT |
+		    1 << UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT |
+		    UAVObject.Metadata.UpdateModeNum(UAVObject.UpdateMode.UPDATEMODE_ONCHANGE) << UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT |
+		    UAVObject.Metadata.UpdateModeNum(UAVObject.UpdateMode.UPDATEMODE_ONCHANGE) << UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT;
+    	metadata.flightTelemetryUpdatePeriod = 0;
+    	metadata.gcsTelemetryUpdatePeriod = 0;
+    	metadata.loggingUpdatePeriod = 0;
+ 
 		return metadata;
 	}
 
@@ -286,7 +282,6 @@ public class HwSettings extends UAVDataObject {
 		getField("TelemetrySpeed").setValue("57600");
 		getField("GPSSpeed").setValue("57600");
 		getField("ComUsbBridgeSpeed").setValue("57600");
-		getField("USB_DeviceType").setValue("HID-only");
 		getField("USB_HIDPort").setValue("USBTelemetry");
 		getField("USB_VCPPort").setValue("Disabled");
 		getField("OptionalModules").setValue("Disabled",0);
@@ -295,6 +290,11 @@ public class HwSettings extends UAVDataObject {
 		getField("OptionalModules").setValue("Disabled",3);
 		getField("OptionalModules").setValue("Disabled",4);
 		getField("OptionalModules").setValue("Disabled",5);
+		getField("OptionalModules").setValue("Disabled",6);
+		getField("OptionalModules").setValue("Disabled",7);
+		getField("OptionalModules").setValue("Disabled",8);
+		getField("OptionalModules").setValue("Disabled",9);
+		getField("OptionalModules").setValue("Disabled",10);
 		getField("DSMxBind").setValue(0);
 
 	}
@@ -324,7 +324,7 @@ public class HwSettings extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0x4730375C;
+	protected static final int OBJID = 0x5D950E50;
 	protected static final String NAME = "HwSettings";
 	protected static String DESCRIPTION = "Selection of optional hardware configurations.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

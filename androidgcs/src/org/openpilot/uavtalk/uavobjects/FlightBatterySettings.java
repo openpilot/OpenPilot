@@ -80,9 +80,12 @@ public class FlightBatterySettings extends UAVDataObject {
 		fields.add( new UAVObjectField("NbCells", "", UAVObjectField.FieldType.UINT8, NbCellsElemNames, null) );
 
 		List<String> SensorTypeElemNames = new ArrayList<String>();
-		SensorTypeElemNames.add("0");
+		SensorTypeElemNames.add("BatteryCurrent");
+		SensorTypeElemNames.add("BatteryVoltage");
+		SensorTypeElemNames.add("BoardVoltage");
 		List<String> SensorTypeEnumOptions = new ArrayList<String>();
-		SensorTypeEnumOptions.add("None");
+		SensorTypeEnumOptions.add("Disabled");
+		SensorTypeEnumOptions.add("Enabled");
 		fields.add( new UAVObjectField("SensorType", "", UAVObjectField.FieldType.ENUM, SensorTypeElemNames, SensorTypeEnumOptions) );
 
 
@@ -108,18 +111,17 @@ public class FlightBatterySettings extends UAVDataObject {
 	 */
 	public Metadata getDefaultMetadata() {
 		UAVObject.Metadata metadata = new UAVObject.Metadata();
-		metadata.gcsAccess = UAVObject.AccessMode.ACCESS_READWRITE;
-		metadata.gcsTelemetryAcked = UAVObject.Acked.TRUE;
-		metadata.gcsTelemetryUpdateMode = UAVObject.UpdateMode.UPDATEMODE_ONCHANGE;
-		metadata.gcsTelemetryUpdatePeriod = 0;
-
-		metadata.flightAccess = UAVObject.AccessMode.ACCESS_READWRITE;
-		metadata.flightTelemetryAcked = UAVObject.Acked.TRUE;
-		metadata.flightTelemetryUpdateMode = UAVObject.UpdateMode.UPDATEMODE_ONCHANGE;
-		metadata.flightTelemetryUpdatePeriod = 0;
-
-		metadata.loggingUpdateMode = UAVObject.UpdateMode.UPDATEMODE_NEVER;
-		metadata.loggingUpdatePeriod = 0;
+    	metadata.flags =
+		    UAVObject.Metadata.AccessModeNum(UAVObject.AccessMode.ACCESS_READWRITE) << UAVOBJ_ACCESS_SHIFT |
+		    UAVObject.Metadata.AccessModeNum(UAVObject.AccessMode.ACCESS_READWRITE) << UAVOBJ_GCS_ACCESS_SHIFT |
+		    1 << UAVOBJ_TELEMETRY_ACKED_SHIFT |
+		    1 << UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT |
+		    UAVObject.Metadata.UpdateModeNum(UAVObject.UpdateMode.UPDATEMODE_ONCHANGE) << UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT |
+		    UAVObject.Metadata.UpdateModeNum(UAVObject.UpdateMode.UPDATEMODE_ONCHANGE) << UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT;
+    	metadata.flightTelemetryUpdatePeriod = 0;
+    	metadata.gcsTelemetryUpdatePeriod = 0;
+    	metadata.loggingUpdatePeriod = 0;
+ 
 		return metadata;
 	}
 
@@ -137,7 +139,9 @@ public class FlightBatterySettings extends UAVDataObject {
 		getField("SensorCalibrations").setValue(1,1);
 		getField("Type").setValue("LiPo");
 		getField("NbCells").setValue(3);
-		getField("SensorType").setValue("None");
+		getField("SensorType").setValue("Disabled",0);
+		getField("SensorType").setValue("Disabled",1);
+		getField("SensorType").setValue("Disabled",2);
 
 	}
 
@@ -166,7 +170,7 @@ public class FlightBatterySettings extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final int OBJID = 0xF172BB18;
+	protected static final int OBJID = 0x94AC6AD2;
 	protected static final String NAME = "FlightBatterySettings";
 	protected static String DESCRIPTION = "Flight Battery configuration.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

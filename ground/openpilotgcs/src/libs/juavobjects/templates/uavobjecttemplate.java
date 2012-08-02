@@ -74,18 +74,17 @@ $(FIELDSINIT)
 	 */
 	public Metadata getDefaultMetadata() {
 		UAVObject.Metadata metadata = new UAVObject.Metadata();
-		metadata.gcsAccess = UAVObject.AccessMode.$(GCSACCESS);
-		metadata.gcsTelemetryAcked = UAVObject.Acked.$(GCSTELEM_ACKEDTF);
-		metadata.gcsTelemetryUpdateMode = UAVObject.UpdateMode.$(GCSTELEM_UPDATEMODE);
-		metadata.gcsTelemetryUpdatePeriod = $(GCSTELEM_UPDATEPERIOD);
-
-		metadata.flightAccess = UAVObject.AccessMode.$(FLIGHTACCESS);
-		metadata.flightTelemetryAcked = UAVObject.Acked.$(FLIGHTTELEM_ACKEDTF);
-		metadata.flightTelemetryUpdateMode = UAVObject.UpdateMode.$(FLIGHTTELEM_UPDATEMODE);
-		metadata.flightTelemetryUpdatePeriod = $(FLIGHTTELEM_UPDATEPERIOD);
-
-		metadata.loggingUpdateMode = UAVObject.UpdateMode.$(LOGGING_UPDATEMODE);
-		metadata.loggingUpdatePeriod = $(LOGGING_UPDATEPERIOD);
+    	metadata.flags =
+		    UAVObject.Metadata.AccessModeNum(UAVObject.AccessMode.$(FLIGHTACCESS)) << UAVOBJ_ACCESS_SHIFT |
+		    UAVObject.Metadata.AccessModeNum(UAVObject.AccessMode.$(GCSACCESS)) << UAVOBJ_GCS_ACCESS_SHIFT |
+		    $(FLIGHTTELEM_ACKED) << UAVOBJ_TELEMETRY_ACKED_SHIFT |
+		    $(GCSTELEM_ACKED) << UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT |
+		    UAVObject.Metadata.UpdateModeNum(UAVObject.UpdateMode.$(FLIGHTTELEM_UPDATEMODE)) << UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT |
+		    UAVObject.Metadata.UpdateModeNum(UAVObject.UpdateMode.$(GCSTELEM_UPDATEMODE)) << UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT;
+    	metadata.flightTelemetryUpdatePeriod = $(FLIGHTTELEM_UPDATEPERIOD);
+    	metadata.gcsTelemetryUpdatePeriod = $(GCSTELEM_UPDATEPERIOD);
+    	metadata.loggingUpdatePeriod = $(LOGGING_UPDATEPERIOD);
+ 
 		return metadata;
 	}
 

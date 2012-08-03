@@ -62,5 +62,6 @@
         <file>OpenPilotGCS.xml</file>
         <file>images/helpicon.svg</file>
         <file>images/cpu.png</file>
+        <file>images/tx-rx.svg</file>
     </qresource>
 </RCC>

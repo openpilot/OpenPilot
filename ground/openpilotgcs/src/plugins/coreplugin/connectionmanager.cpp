@@ -31,9 +31,9 @@
 #include <aggregation/aggregate.h>
 #include <coreplugin/iconnection.h>
 #include <extensionsystem/pluginmanager.h>
-
 #include "qextserialport/src/qextserialenumerator.h"
 #include "qextserialport/src/qextserialport.h"
+
 #include <QDebug>
 #include <QLabel>
 #include <QHBoxLayout>
@@ -59,6 +59,10 @@ ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow, QTabWidge
     QHBoxLayout *layout = new QHBoxLayout;
     layout->setSpacing(5);
     layout->setContentsMargins(5,5,5,5);
+
+    m_monitor = new TelemetryMonitorWidget(this);
+    layout->addWidget(m_monitor);
+
     layout->addWidget(new QLabel(tr("Connections:")));
 
     m_availableDevList = new QComboBox;
@@ -140,6 +144,10 @@ bool ConnectionManager::connectDevice()
     emit deviceConnected(m_ioDev);
     m_connectBtn->setText("Disconnect");
     m_availableDevList->setEnabled(false);
+
+    // tell the monitor we're connected
+    m_monitor->connect();
+
     return true;
 }
 
@@ -167,6 +175,9 @@ bool ConnectionManager::disconnectDevice()
     } catch (...) {	// handle exception
         qDebug() << "Exception: m_connectionDevice.connection->closeDevice(" << m_connectionDevice.devName << ")";
     }
+
+    //tell the monitor we're disconnected
+    m_monitor->disconnect();
 
     m_connectionDevice.connection = NULL;
     m_ioDev = NULL;
@@ -237,6 +248,14 @@ void ConnectionManager::onConnectClicked()
     {	// disconnecting
         disconnectDevice();
     }
+}
+
+/**
+*   Slot called when the telemetry rates are updated
+*/
+void ConnectionManager::telemetryUpdated(double txRate, double rxRate)
+{
+    m_monitor->updateTelemetry(txRate, rxRate);
 }
 
 /**

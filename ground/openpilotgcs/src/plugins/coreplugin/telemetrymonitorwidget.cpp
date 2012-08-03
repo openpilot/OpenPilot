@@ -12,6 +12,7 @@ TelemetryMonitorWidget::TelemetryMonitorWidget(QWidget *parent) : QGraphicsView(
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setAlignment(Qt::AlignCenter);
     setFrameStyle(QFrame::NoFrame);
     setStyleSheet("background:transparent;");
     setAttribute(Qt::WA_TranslucentBackground);

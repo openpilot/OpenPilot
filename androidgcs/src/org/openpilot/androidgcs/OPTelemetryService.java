@@ -72,8 +72,14 @@ public class OPTelemetryService extends Service {
 				break;
 			case MSG_CONNECT:	
 				terminate = false;
+				int connection_type;
 				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(OPTelemetryService.this);
-				int connection_type = Integer.decode(prefs.getString("connection_type", ""));
+				try {
+					connection_type = Integer.decode(prefs.getString("connection_type", ""));
+				} catch (NumberFormatException e) {
+					connection_type = 0;
+				}
+
 				switch(connection_type) {
 				case 0: // No connection
 					return;

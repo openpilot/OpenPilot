@@ -42,7 +42,7 @@ DEB_PACKAGE_NAME	:= openpilot_$(VERSION_FULL)_$(DEB_PLATFORM)
 
 linux_deb_package: deb_build gcs
 	@echo $@ starting
-	cd .. && dpkg-buildpackage -b
+	cd .. && dpkg-buildpackage -b -us -uc
 	$(V1)mv $(ROOT_DIR)/../$(DEB_PACKAGE_NAME).deb $(BUILD_DIR)
 	$(V1)mv $(ROOT_DIR)/../$(DEB_PACKAGE_NAME).changes $(BUILD_DIR)
 	$(V1)rm -rf $(DEB_BUILD_DIR)

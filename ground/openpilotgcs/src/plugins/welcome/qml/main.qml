@@ -61,8 +61,8 @@ Rectangle {
                 }
 
                 WelcomePageButton {
-                    baseIconName: "planner"
-                    label: "Flight Planner"
+                    baseIconName: "system"
+                    label: "System"
                     onClicked: welcomePlugin.openPage("System")
                 }
 

@@ -1690,10 +1690,10 @@
           <actualPositionUsed>false</actualPositionUsed>
           <altitude>2000</altitude>
           <cacheOnly>false</cacheOnly>
-          <earthFile>%%DATAPATH%%pfd/pfd/default/readymap.earth</earthFile>
+          <earthFile>%%DATAPATH%%pfd/default/readymap.earth</earthFile>
           <latitude>46.671478</latitude>
           <longitude>10.158932</longitude>
-          <qmlFile>%%DATAPATH%%pfd/pfd/default/Pfd.qml</qmlFile>
+          <qmlFile>%%DATAPATH%%pfd/default/Pfd.qml</qmlFile>
           <terrainEnabled>false</terrainEnabled>
         </data>
       </NoTerrain>
@@ -1706,10 +1706,10 @@
           <actualPositionUsed>false</actualPositionUsed>
           <altitude>2000</altitude>
           <cacheOnly>false</cacheOnly>
-          <earthFile>%%DATAPATH%%pfd/pfd/default/readymap.earth</earthFile>
+          <earthFile>%%DATAPATH%%pfd/default/readymap.earth</earthFile>
           <latitude>46.671478</latitude>
           <longitude>10.158932</longitude>
-          <qmlFile>%%DATAPATH%%pfd/pfd/default/Pfd.qml</qmlFile>
+          <qmlFile>%%DATAPATH%%pfd/default/Pfd.qml</qmlFile>
           <terrainEnabled>true</terrainEnabled>
         </data>
       </Terrain>
@@ -2701,10 +2701,10 @@
     <Icon1>:\core\images\ah.png</Icon1>
     <Icon10>:/core/images/openpilot_logo_64.png</Icon10>
     <Icon2>:/core/images/config.png</Icon2>
-    <Icon3>:/core/images/cpu.png</Icon3>
+    <Icon3>:/core/images/cog.png</Icon3>
     <Icon4>:/core/images/scopes.png</Icon4>
     <Icon5>:/core/images/joystick.png</Icon5>
-    <Icon6>:/core/images/cog.png</Icon6>
+    <Icon6>:/core/images/cpu.png</Icon6>
     <Icon7>:/core/images/openpilot_logo_64.png</Icon7>
     <Icon8>:/core/images/openpilot_logo_64.png</Icon8>
     <Icon9>:/core/images/openpilot_logo_64.png</Icon9>

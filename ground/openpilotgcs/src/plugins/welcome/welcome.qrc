@@ -22,5 +22,7 @@
         <file>qml/images/planner-off.png</file>
         <file>qml/images/scopes-on.png</file>
         <file>qml/images/scopes-off.png</file>
+        <file>qml/images/system-on.png</file>
+        <file>qml/images/system-off.png</file>
     </qresource>
 </RCC>

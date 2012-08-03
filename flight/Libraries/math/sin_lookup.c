@@ -97,6 +97,9 @@ int sin_lookup_initalize()
 */
 float sin_lookup_deg(float angle)
 {
+	if (sin_table == NULL)
+		return 0;
+
 	int i_ang = ((int32_t) angle) % 360;
 	if (i_ang > 180)      // for 180 to 270 deg
 		return -sin_table[i_ang - 180];

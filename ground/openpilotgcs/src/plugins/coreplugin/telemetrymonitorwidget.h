@@ -38,8 +38,8 @@ protected:
 
 private:
    QGraphicsSvgItem *graph;
-   QGraphicsTextItem *txSpeed;
-   QGraphicsTextItem *rxSpeed;
+   QPointer<QGraphicsTextItem> txSpeed;
+   QPointer<QGraphicsTextItem> rxSpeed;
    QList<QGraphicsSvgItem*> txNodes;
    QList<QGraphicsSvgItem*> rxNodes;
 

@@ -125,25 +125,30 @@ void TelemetryMonitorWidget::showTelemetry()
     else
         this->setToolTip(QString("Disconnected"));
 
-    QGraphicsItem* txNode;
-    QGraphicsItem* rxNode;
+    int i;
+    int nodeMargin = 8;
+    int leftMargin = 60;
+    QGraphicsItem* node;
 
-    for (int i=0; i < NODE_NUMELEM; i++) {
-        txNode = txNodes.at(i);
-        txNode->setPos((i*(txNode->boundingRect().width() + 8)) + 60, (txNode->boundingRect().height()/2) - 2);
-        txNode->setVisible(connected && i < txIndex);
-        txNode->update();
-
-        rxNode = rxNodes.at(i);
-        rxNode->setPos((i*(rxNode->boundingRect().width() + 8)) + 60, (rxNode->boundingRect().height()*2) - 2);
-        rxNode->setVisible(connected && i < rxIndex);
-        rxNode->update();
+    for (i=0; i < txNodes.count(); i++) {
+        node = txNodes.at(i);
+        node->setPos((i*(node->boundingRect().width() + nodeMargin)) + leftMargin, (node->boundingRect().height()/2) - 2);
+        node->setVisible(connected && i < txIndex);
+        node->update();
     }
 
-    txSpeed->setPos(graph->boundingRect().right() - 110, txNodes.at(0)->pos().y() - 10);
+    for (i=0; i < rxNodes.count(); i++) {
+        node = rxNodes.at(i);
+        node->setPos((i*(node->boundingRect().width() + nodeMargin)) + leftMargin, (node->boundingRect().height()*2) - 2);
+        node->setVisible(connected && i < rxIndex);
+        node->update();
+    }
+
+    QRectF rect = graph->boundingRect();
+    txSpeed->setPos(rect.right() - 110, rect.top());
     txSpeed->setPlainText(QString("%0").arg(connected ? txValue : 0.0));
 
-    rxSpeed->setPos(graph->boundingRect().right() - 110, rxNodes.at(0)->pos().y() - 10);
+    rxSpeed->setPos(rect.right() - 110, rect.top() + (rect.height() / 2));
     rxSpeed->setPlainText(QString("%0").arg(connected ? rxValue : 0.0));
 
     update();

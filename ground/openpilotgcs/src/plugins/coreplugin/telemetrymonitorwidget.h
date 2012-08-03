@@ -21,7 +21,7 @@ public:
     double getMax() { return maxValue; }
 
     //number of tx/rx nodes in the graph
-    static const int NODE_NUMELEM = 12;
+    static const int NODE_NUMELEM = 7;
 
 signals:
     
@@ -38,6 +38,8 @@ protected:
 
 private:
    QGraphicsSvgItem *graph;
+   QGraphicsTextItem *txSpeed;
+   QGraphicsTextItem *rxSpeed;
    QList<QGraphicsSvgItem*> txNodes;
    QList<QGraphicsSvgItem*> rxNodes;
 

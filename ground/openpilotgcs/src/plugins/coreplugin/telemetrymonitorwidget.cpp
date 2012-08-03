@@ -2,19 +2,20 @@
 
 #include <QObject>
 #include <QtGui>
+#include <QtGui/QFont>
 #include <QDebug>
 
 TelemetryMonitorWidget::TelemetryMonitorWidget(QWidget *parent) : QGraphicsView(parent)
 {
-    setMinimumSize(160,60);
-    setMaximumSize(160,60);
+    setMinimumSize(160,80);
+    setMaximumSize(160,80);
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setFrameStyle(QFrame::NoFrame);
     setBackgroundBrush(Qt::transparent);
 
-    QGraphicsScene *scene = new QGraphicsScene(0,0,160,60, this);
+    QGraphicsScene *scene = new QGraphicsScene(0,0,160,80, this);
     scene->setBackgroundBrush(Qt::transparent);
 
     QSvgRenderer *renderer = new QSvgRenderer();
@@ -47,6 +48,19 @@ TelemetryMonitorWidget::TelemetryMonitorWidget(QWidget *parent) : QGraphicsView(
         }
 
         scene->addItem(graph);
+
+        txSpeed = new QGraphicsTextItem();
+        txSpeed->setDefaultTextColor(Qt::white);
+        txSpeed->setFont(QFont("Helvetica",22,2));
+        txSpeed->setParentItem(graph);
+        scene->addItem(txSpeed);
+
+        rxSpeed = new QGraphicsTextItem();
+        rxSpeed->setDefaultTextColor(Qt::white);
+        rxSpeed->setFont(QFont("Helvetica",22,2));
+        rxSpeed->setParentItem(graph);
+        scene->addItem(rxSpeed);
+
         scene->setSceneRect(graph->boundingRect());
         setScene(scene);
     }
@@ -116,15 +130,22 @@ void TelemetryMonitorWidget::showTelemetry()
 
     for (int i=0; i < NODE_NUMELEM; i++) {
         txNode = txNodes.at(i);
-        txNode->setPos((i*(txNode->boundingRect().width() + 8)) + 8, (txNode->boundingRect().height()/2) - 2);
+        txNode->setPos((i*(txNode->boundingRect().width() + 8)) + 60, (txNode->boundingRect().height()/2) - 2);
         txNode->setVisible(connected && i < txIndex);
         txNode->update();
 
         rxNode = rxNodes.at(i);
-        rxNode->setPos((i*(rxNode->boundingRect().width() + 8)) + 8, (rxNode->boundingRect().height()*2) - 2);
+        rxNode->setPos((i*(rxNode->boundingRect().width() + 8)) + 60, (rxNode->boundingRect().height()*2) - 2);
         rxNode->setVisible(connected && i < rxIndex);
         rxNode->update();
     }
+
+    txSpeed->setPos(graph->boundingRect().right() - 100, txNodes.at(0)->pos().y() - 10);
+    txSpeed->setPlainText(QString("%0").arg(txValue));
+
+    rxSpeed->setPos(graph->boundingRect().right() - 100, rxNodes.at(0)->pos().y() - 10);
+    rxSpeed->setPlainText(QString("%0").arg(rxValue));
+
     update();
 }
 
@@ -139,7 +160,7 @@ void TelemetryMonitorWidget::resizeEvent(QResizeEvent* event)
 {
     Q_UNUSED(event);
 
-    graph->setPos(0,-90);
+    graph->setPos(0,-100);
     fitInView(graph, Qt::KeepAspectRatio);
 }
 

@@ -51,16 +51,18 @@ bool LevellingPage::validatePage()
     return true;
 }
 
-bool LevellingPage::isComplete()
+bool LevellingPage::isComplete() const
 {
-    return getWizard()->isLevellingPerformed();
+    return const_cast<LevellingPage *>(this)->getWizard()->isLevellingPerformed() &&
+            ui->levelButton->isEnabled();
 }
 
 void LevellingPage::performLevelling()
 {
     if(!getWizard()->getConnectionManager()->isConnected()) {
         QMessageBox msgBox;
-        msgBox.setText(tr("An OpenPilot controller must be connected to your computer to perform bias calculations.\nPlease connect your OpenPilot controller to continue."));
+        msgBox.setText(tr("An OpenPilot controller must be connected to your computer to perform bias "
+                          "calculations.\nPlease connect your OpenPilot controller to continue."));
         msgBox.setStandardButtons(QMessageBox::Ok);
         msgBox.setDefaultButton(QMessageBox::Ok);
         msgBox.exec();
@@ -69,14 +71,14 @@ void LevellingPage::performLevelling()
 
     if(!m_levellingUtil)
     {
-        ui->levelButton->setEnabled(false);
-
         // Measure every 100ms * 100times = 10s
         m_levellingUtil = new LevellingUtil(BIAS_CYCLES, BIAS_PERIOD);
-        connect(m_levellingUtil, SIGNAL(progress(long,long)), this, SLOT(levellingProgress(long,long)));
-        connect(m_levellingUtil, SIGNAL(done(accelGyroBias)), this, SLOT(levellingDone(accelGyroBias)));
-        connect(m_levellingUtil, SIGNAL(timeout(QString)), this, SLOT(levellingTimeout(QString)));
     }
+    connect(m_levellingUtil, SIGNAL(progress(long,long)), this, SLOT(levellingProgress(long,long)));
+    connect(m_levellingUtil, SIGNAL(done(accelGyroBias)), this, SLOT(levellingDone(accelGyroBias)));
+    connect(m_levellingUtil, SIGNAL(timeout(QString)), this, SLOT(levellingTimeout(QString)));
+    ui->levelButton->setEnabled(false);
+    emit completeChanged();
     m_levellingUtil->start();
 }
 

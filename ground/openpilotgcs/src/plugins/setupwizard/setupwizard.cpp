@@ -172,7 +172,7 @@ QString SetupWizard::getSummaryText()
 
     summary.append('\n');
     summary.append(tr("ESC type: "));
-    switch (getInputType())
+    switch (getESCType())
     {
         case ESC_DEFAULT:
             summary.append(tr("Default ESC (50 Hz)"));

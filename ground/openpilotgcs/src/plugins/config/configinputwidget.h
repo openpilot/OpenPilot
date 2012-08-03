@@ -57,7 +57,7 @@ public:
         enum txMovements{moveLeftVerticalStick,moveRightVerticalStick,moveLeftHorizontalStick,moveRightHorizontalStick,moveAccess0,moveAccess1,moveAccess2,moveFlightMode,centerAll,moveAll,nothing};
         enum txMovementType{vertical,horizontal,jump,mix};
         enum txType {acro, heli};
-public slots:
+        void startInputWizard() { goToWizard(); }
 
 private:
         bool growing;
@@ -133,6 +133,7 @@ private:
 
         void wizardSetUpStep(enum wizardSteps);
         void wizardTearDownStep(enum wizardSteps);
+
 private slots:
         void wzNext();
         void wzBack();
@@ -150,11 +151,10 @@ private slots:
         void invertControls();
         void simpleCalibration(bool state);
         void updateCalibration();
+
 protected:
         void resizeEvent(QResizeEvent *event);
         virtual void enableControls(bool enable);
-
-
 };
 
 #endif

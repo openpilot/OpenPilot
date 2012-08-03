@@ -25,14 +25,14 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "configgadgetfactory.h"
-#include "configgadgetwidget.h"
 #include "configgadget.h"
 #include "configgadgetconfiguration.h"
 #include "configgadgetoptionspage.h"
 #include <coreplugin/iuavgadget.h>
 
 ConfigGadgetFactory::ConfigGadgetFactory(QObject *parent) :
-        IUAVGadgetFactory(QString("ConfigGadget"), tr("Config Gadget"), parent)
+    IUAVGadgetFactory(QString("ConfigGadget"), tr("Config Gadget"), parent),
+    gadgetWidget(0)
 {
 }
 
@@ -42,7 +42,7 @@ ConfigGadgetFactory::~ConfigGadgetFactory()
 
 Core::IUAVGadget* ConfigGadgetFactory::createGadget(QWidget *parent)
 {
-    ConfigGadgetWidget* gadgetWidget = new ConfigGadgetWidget(parent);
+    gadgetWidget = new ConfigGadgetWidget(parent);
     return new ConfigGadget(QString("ConfigGadget"), gadgetWidget, parent);
 }
 
@@ -54,4 +54,9 @@ IUAVGadgetConfiguration *ConfigGadgetFactory::createConfiguration(QSettings* qSe
 IOptionsPage *ConfigGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
 {
     return new ConfigGadgetOptionsPage(qobject_cast<ConfigGadgetConfiguration*>(config));
+}
+
+void ConfigGadgetFactory::startInputWizard()
+{
+    gadgetWidget->startInputWizard();
 }

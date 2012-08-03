@@ -26,16 +26,32 @@
  */
 #include "endpage.h"
 #include "ui_endpage.h"
+#include <coreplugin/modemanager.h>
+#include <extensionsystem/pluginmanager.h>
+#include <configgadgetfactory.h>
 
 EndPage::EndPage(SetupWizard *wizard, QWidget *parent) :
     AbstractWizardPage(wizard, parent),
     ui(new Ui::EndPage)
 {
-    setFinalPage(true);
     ui->setupUi(this);
+    setFinalPage(true);
+    connect(ui->inputWizardButton, SIGNAL(clicked()), this, SLOT(openInputWizard()));
 }
 
 EndPage::~EndPage()
 {
     delete ui;
+}
+
+void EndPage::openInputWizard()
+{
+    Core::ModeManager::instance()->activateModeByWorkspaceName("Configuration");
+
+    getWizard()->close();
+
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    ConfigGadgetFactory* configGadgetFactory = pm->getObject<ConfigGadgetFactory>();
+    Q_ASSERT(configGadgetFactory);
+    configGadgetFactory->startInputWizard();
 }

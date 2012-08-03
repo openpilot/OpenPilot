@@ -6,7 +6,8 @@ QT += svg
 include(../../openpilotgcsplugin.pri) 
 include(../../plugins/coreplugin/coreplugin.pri) 
 include(../../plugins/uavobjectutil/uavobjectutil.pri)
- 
+include(../../plugins/config/config.pri)
+
 HEADERS += setupwizardplugin.h \ 
     setupwizard.h \
     pages/startpage.h \

@@ -43,7 +43,7 @@ public:
     explicit LevellingPage(SetupWizard *wizard, QWidget *parent = 0);
     ~LevellingPage();
     bool validatePage();
-    bool isComplete();
+    bool isComplete() const;
 
 private slots:
     void performLevelling();

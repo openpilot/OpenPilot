@@ -42,6 +42,9 @@ public:
     explicit EndPage(SetupWizard *wizard, QWidget *parent = 0);
     ~EndPage();
     
+private slots:
+    void openInputWizard();
+
 private:
     Ui::EndPage *ui;
 };

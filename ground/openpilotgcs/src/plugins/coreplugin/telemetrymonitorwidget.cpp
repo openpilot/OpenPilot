@@ -140,11 +140,11 @@ void TelemetryMonitorWidget::showTelemetry()
         rxNode->update();
     }
 
-    txSpeed->setPos(graph->boundingRect().right() - 100, txNodes.at(0)->pos().y() - 10);
-    txSpeed->setPlainText(QString("%0").arg(txValue));
+    txSpeed->setPos(graph->boundingRect().right() - 110, txNodes.at(0)->pos().y() - 10);
+    txSpeed->setPlainText(QString("%0").arg(connected ? txValue : 0.0));
 
-    rxSpeed->setPos(graph->boundingRect().right() - 100, rxNodes.at(0)->pos().y() - 10);
-    rxSpeed->setPlainText(QString("%0").arg(rxValue));
+    rxSpeed->setPos(graph->boundingRect().right() - 110, rxNodes.at(0)->pos().y() - 10);
+    rxSpeed->setPlainText(QString("%0").arg(connected ? rxValue : 0.0));
 
     update();
 }

@@ -101,11 +101,11 @@ int stabilization_relay_rate(float error, float *output, int axis, bool reinit)
 	// Project the error onto a sine and cosine of the same frequency
 	// to accumulate the average amplitude
 	int32_t dT = thisTime - lastHighTime;
-	int32_t phase = (360 * dT) / relay.Period[axis];
+	float phase = ((float)360 * (float)dT) / relay.Period[axis];
 	if(phase >= 360)
 		phase = 0;
 	accum_sin += sin_lookup_deg(phase) * error;
-	accum_cos += cos_lookup_deg(phase) * error;
+	accum_cos += sin_lookup_deg(phase + 90) * error;
 	accumulated ++;
 
 	// Make sure we've had enough time since last transition then check for a change in the output

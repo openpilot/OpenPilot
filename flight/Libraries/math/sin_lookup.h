@@ -31,6 +31,7 @@
 #ifndef SIN_LOOKUP_H
 #define SIN_LOOKUP_H
 
+int sin_lookup_initalize();
 float sin_lookup_deg(float angle);
 float cos_lookup_deg(float angle);
 float sin_lookup_rad(float angle);

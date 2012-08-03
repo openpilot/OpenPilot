@@ -47,6 +47,7 @@
 // Math libraries
 #include "CoordinateConversions.h"
 #include "pid.h"
+#include "sin_lookup.h"
 
 // Includes for various stabilization algorithms
 #include "relay_tuning.h"
@@ -117,12 +118,15 @@ int32_t StabilizationInitialize()
 	// Initialize variables
 	StabilizationSettingsInitialize();
 	ActuatorDesiredInitialize();
-	RelayTuningSettingsInitialize();
-	RelayTuningInitialize();
 #if defined(DIAGNOSTICS)
 	RateDesiredInitialize();
 #endif
-	
+
+	// Code required for relay tuning
+	sin_lookup_initalize();
+	RelayTuningSettingsInitialize();
+	RelayTuningInitialize();
+
 	return 0;
 }
 

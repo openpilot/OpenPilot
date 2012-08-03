@@ -28,8 +28,13 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#include "openpilot.h"
 #include "math.h"
+#include "stdbool.h"
 #include "stdint.h"
+
+#ifdef FLASH_TABLE
+ /** Version of the code which precomputes the lookup table in flash **/
 
  // This is a precomputed sin lookup table over 90 degrees that
  const float sin_table[] = {
@@ -43,6 +48,11 @@
  	0.939693f,0.945519f,0.951057f,0.956305f,0.961262f,0.965926f,0.970296f,0.974370f,0.978148f,0.981627f,
  	0.984808f,0.987688f,0.990268f,0.992546f,0.994522f,0.996195f,0.997564f,0.998630f,0.999391f,0.999848f
  };
+
+int sin_lookup_initalize()
+{
+	return 0;
+}
 
 /**
  * Use the lookup table to return sine(angle) where angle is in radians
@@ -65,6 +75,46 @@ float sin_lookup_deg(float angle)
 
 	return 0;
 }
+
+#else
+/** Version of the code which allocates the lookup table in heap **/
+
+const int SIN_RESOLUTION = 180;
+
+static float *sin_table;
+int sin_lookup_initalize()
+{
+	// Previously initialized
+	if (sin_table)
+		return 0;
+
+	sin_table = (float *) pvPortMalloc(sizeof(float) * SIN_RESOLUTION);
+	if (sin_table == NULL)
+		return -1;
+
+	for(uint32_t i = 0; i < 180; i++)
+		sin_table[i] = sinf((float)i * 2 * M_PI / 360.0f);
+
+	return 0;
+}
+
+
+ 
+/**
+ * Uses the lookup table to calculate sine (angle is in degrees)
+ * @param[in] angle in degrees
+ * @returns sin(angle)
+ */
+float sin_lookup_deg(float angle) {
+	int i_ang = ((int32_t)angle) % 360;
+	if (i_ang > 180)
+		return - sin_table[i_ang-180];
+	else
+	return sin_table[i_ang];
+}
+
+#endif
+
 
 /**
  * Get cos(angle) using the sine lookup table

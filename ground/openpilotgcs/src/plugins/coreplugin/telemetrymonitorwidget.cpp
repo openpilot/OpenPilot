@@ -7,16 +7,17 @@
 
 TelemetryMonitorWidget::TelemetryMonitorWidget(QWidget *parent) : QGraphicsView(parent)
 {
-    setMinimumSize(160,80);
-    setMaximumSize(160,80);
+    setMinimumSize(180,100);
+    setMaximumSize(180,100);
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setFrameStyle(QFrame::NoFrame);
-    setBackgroundBrush(Qt::transparent);
+    setStyleSheet("background:transparent;");
+    setAttribute(Qt::WA_TranslucentBackground);
+    setWindowFlags(Qt::FramelessWindowHint);
 
-    QGraphicsScene *scene = new QGraphicsScene(0,0,160,80, this);
-    scene->setBackgroundBrush(Qt::transparent);
+    QGraphicsScene *scene = new QGraphicsScene(0,0,180,100, this);
 
     QSvgRenderer *renderer = new QSvgRenderer();
     if (renderer->load(QString(":/core/images/tx-rx.svg"))) {
@@ -146,10 +147,12 @@ void TelemetryMonitorWidget::showTelemetry()
 
     QRectF rect = graph->boundingRect();
     txSpeed->setPos(rect.right() - 110, rect.top());
-    txSpeed->setPlainText(QString("%0").arg(connected ? txValue : 0.0));
+    txSpeed->setPlainText(QString("%0").arg(txValue));
+    txSpeed->setVisible(connected);
 
     rxSpeed->setPos(rect.right() - 110, rect.top() + (rect.height() / 2));
-    rxSpeed->setPlainText(QString("%0").arg(connected ? rxValue : 0.0));
+    rxSpeed->setPlainText(QString("%0").arg(rxValue));
+    rxSpeed->setVisible(connected);
 
     update();
 }
@@ -165,7 +168,7 @@ void TelemetryMonitorWidget::resizeEvent(QResizeEvent* event)
 {
     Q_UNUSED(event);
 
-    graph->setPos(0,-100);
+    graph->setPos(0,-130);
     fitInView(graph, Qt::KeepAspectRatio);
 }
 

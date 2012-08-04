@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.openpilot.uavtalk.UAVObjectManager;
 import org.openpilot.uavtalk.UAVTalk;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -14,16 +15,18 @@ import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
-public class BluetoothUAVTalk {
+@TargetApi(10) public class BluetoothUAVTalk {
 	private final String TAG = "BluetoothUAVTalk";
 	public static int LOGLEVEL = 2;
 	public static boolean WARN = LOGLEVEL > 1;
 	public static boolean DEBUG = LOGLEVEL > 0;
 	
 	// Temporarily define fixed device name
-	public final static String DEVICE_NAME = "RN42-222D";
+	private String device_name = "RN42-222D";
 	private final static UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 	
 	private BluetoothAdapter mBluetoothAdapter;
@@ -32,8 +35,12 @@ public class BluetoothUAVTalk {
 	private UAVTalk uavTalk;
 	private boolean connected; 
 	
-	public BluetoothUAVTalk(Context caller, String deviceName) {
-        if (DEBUG) Log.d(TAG, "Trying to open UAVTalk with " + deviceName);
+	public BluetoothUAVTalk(Context caller) {
+		
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(caller);
+		device_name = prefs.getString("bluetooth_mac","");
+
+        if (DEBUG) Log.d(TAG, "Trying to open UAVTalk with " + device_name);
 
         connected = false;
         device = null;
@@ -93,7 +100,7 @@ public class BluetoothUAVTalk {
 		        // Add the name and address to an array adapter to show in a ListView
 		        //mArrayAdapter.add(device.getName() + "\n" + device.getAddress());
 		    	Log.d(TAG, "Paired device: " + device.getName());
-		    	if(device.getName().compareTo(DEVICE_NAME) == 0) {
+		    	if(device.getName().compareTo(device_name) == 0) {
 		    		this.device = device;
 		    		return;
 		    	}

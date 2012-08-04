@@ -20,7 +20,7 @@ public class TcpUAVTalk {
 	
 	// Temporarily define fixed device name
 	private String ip_address = "1";
-	public final static int PORT = 9001;
+	private int port = 9001;
 	
 	private UAVTalk uavTalk;
 	private boolean connected; 
@@ -28,8 +28,12 @@ public class TcpUAVTalk {
 	public TcpUAVTalk(Context caller) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(caller);
 		ip_address = prefs.getString("ip_address","127.0.0.1");
+		try {
+			port = Integer.decode(prefs.getString("port", ""));
+		} catch (NumberFormatException e) {
+		}
 
-        if (DEBUG) Log.d(TAG, "Trying to open UAVTalk with " + ip_address);
+		if (DEBUG) Log.d(TAG, "Trying to open UAVTalk with " + ip_address);
 
         connected = false;         
     }
@@ -52,7 +56,7 @@ public class TcpUAVTalk {
 	
  
 	private boolean openTelemetryTcp(UAVObjectManager objMngr) {
-		Log.d(TAG, "Opening connection to " + ip_address + " at address " + PORT);
+		Log.d(TAG, "Opening connection to " + ip_address + " at address " + port);
 		
 		InetAddress serverAddr = null;
 		try {
@@ -65,7 +69,7 @@ public class TcpUAVTalk {
 		
 		Socket socket = null;
 		try {
-			socket = new Socket(serverAddr,PORT);
+			socket = new Socket(serverAddr,port);
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();

@@ -8,6 +8,8 @@ import org.openpilot.uavtalk.UAVObjectManager;
 import org.openpilot.uavtalk.UAVTalk;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 public class TcpUAVTalk {
@@ -17,14 +19,17 @@ public class TcpUAVTalk {
 	public static boolean DEBUG = LOGLEVEL > 0;
 	
 	// Temporarily define fixed device name
-	public final static String IP_ADDRESS = "10.21.18.120";
+	private String ip_address = "1";
 	public final static int PORT = 9001;
 	
 	private UAVTalk uavTalk;
 	private boolean connected; 
 	
 	public TcpUAVTalk(Context caller) {
-        if (DEBUG) Log.d(TAG, "Trying to open UAVTalk with " + IP_ADDRESS);
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(caller);
+		ip_address = prefs.getString("ip_address","127.0.0.1");
+
+        if (DEBUG) Log.d(TAG, "Trying to open UAVTalk with " + ip_address);
 
         connected = false;         
     }
@@ -47,11 +52,11 @@ public class TcpUAVTalk {
 	
  
 	private boolean openTelemetryTcp(UAVObjectManager objMngr) {
-		Log.d(TAG, "Opening conncetion to " + IP_ADDRESS + " at address " + PORT);
+		Log.d(TAG, "Opening connection to " + ip_address + " at address " + PORT);
 		
 		InetAddress serverAddr = null;
 		try {
-			serverAddr = InetAddress.getByName(IP_ADDRESS);
+			serverAddr = InetAddress.getByName(ip_address);
 		} catch (UnknownHostException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();

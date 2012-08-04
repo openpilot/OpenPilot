@@ -10,6 +10,6 @@
 		<EditTextPreference android:name="ip_address"
 			android:summary="Enter a TCP/IP address here"
 			android:defaultValue="192.168.0.1" android:title="IP address:"
-			android:key="editTextPref" />
+			android:key="ip_address" />
 	</PreferenceCategory>
 </PreferenceScreen>

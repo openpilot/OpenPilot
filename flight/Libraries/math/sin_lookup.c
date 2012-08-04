@@ -33,7 +33,7 @@
 #include "stdbool.h"
 #include "stdint.h"
 
-//#define FLASH_TABLE
+#define FLASH_TABLE
 #ifdef FLASH_TABLE
  /** Version of the code which precomputes the lookup table in flash **/
 

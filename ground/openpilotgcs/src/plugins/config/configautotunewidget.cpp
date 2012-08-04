@@ -31,7 +31,7 @@ ConfigAutotuneWidget::ConfigAutotuneWidget(QWidget *parent) :
     RelayTuning *relayTuning = RelayTuning::GetInstance(getObjectManager());
     Q_ASSERT(relayTuning);
     if(relayTuning)
-        connect(relayTuning, SIGNAL(updateRequested(UAVObject*)), this, SLOT(recomputeStabilization()));
+        connect(relayTuning, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(recomputeStabilization()));
 
     // Connect the apply button for the stabilization settings
     connect(m_autotune->useComputedValues, SIGNAL(pressed()), this, SLOT(saveStabilization()));

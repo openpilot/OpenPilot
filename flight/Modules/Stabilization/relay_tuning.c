@@ -33,38 +33,9 @@
 
 #include "openpilot.h"
 #include "stabilization.h"
-#include "stabilizationsettings.h"
-#include "actuatordesired.h"
-#include "ratedesired.h"
 #include "relaytuning.h"
 #include "relaytuningsettings.h"
-#include "stabilizationdesired.h"
-#include "attitudeactual.h"
-#include "gyros.h"
-#include "flightstatus.h"
-#include "manualcontrol.h" // Just to get a macro
-#include "CoordinateConversions.h"
-
-//! Private variables
-static float *sin_lookup; // TODO: Move this to flash
-static const int SIN_RESOLUTION = 180;
-
-//! Private methods
-static float sin_l(int angle);
-
-#define MAX_AXES 3
-
-int stabilization_relay_init()
-{
-	sin_lookup = (float *) pvPortMalloc(sizeof(float) * SIN_RESOLUTION);
-	if (sin_lookup == NULL)
-		return -1;
-
-	for(uint32_t i = 0; i < 180; i++)
-		sin_lookup[i] = sinf((float)i * 2 * M_PI / 360.0f);
-
-	return 0;
-}
+#include "sin_lookup.h"
 
 /**
  * Apply a step function for the stabilization controller and monitor the 
@@ -125,12 +96,12 @@ int stabilization_relay_rate(float error, float *output, int axis, bool reinit)
 
 	// Project the error onto a sine and cosine of the same frequency
 	// to accumulate the average amplitude
-	int dT = thisTime - lastHighTime;
-	uint32_t phase = 360 * dT / relay.Period[axis];
+	int32_t dT = thisTime - lastHighTime;
+	float phase = ((float)360 * (float)dT) / relay.Period[axis];
 	if(phase >= 360)
-		phase = 1;
-	accum_sin += sin_l(phase) * error;
-	accum_cos += sin_l(phase + 90) * error;
+		phase = 0;
+	accum_sin += sin_lookup_deg(phase) * error;
+	accum_cos += cos_lookup_deg(phase) * error;
 	accumulated ++;
 
 	// Make sure we've had enough time since last transition then check for a change in the output
@@ -161,19 +132,5 @@ int stabilization_relay_rate(float error, float *output, int axis, bool reinit)
 	}
 
 	return 0;
-}
-
-
-/**
- * Uses the lookup table to calculate sine (angle is in degrees)
- * @param[in] angle in degrees
- * @returns sin(angle)
- */
-static float sin_l(int angle) {
-	angle = angle % 360;
-	if (angle > 180)
-		return - sin_lookup[angle-180];
-	else
-		return sin_lookup[angle];
 }
 

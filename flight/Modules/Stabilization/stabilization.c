@@ -43,7 +43,15 @@
 #include "gyros.h"
 #include "flightstatus.h"
 #include "manualcontrol.h" // Just to get a macro
+
+// Math libraries
 #include "CoordinateConversions.h"
+#include "pid.h"
+#include "sin_lookup.h"
+
+// Includes for various stabilization algorithms
+#include "relay_tuning.h"
+#include "virtualflybar.h"
 
 // Includes for various stabilization algorithms
 #include "relay_tuning.h"
@@ -60,43 +68,24 @@
 #define TASK_PRIORITY (tskIDLE_PRIORITY+4)
 #define FAILSAFE_TIMEOUT_MS 30
 
-enum {PID_RATE_ROLL, PID_RATE_PITCH, PID_RATE_YAW, PID_ROLL, PID_PITCH, PID_YAW, PID_VBAR_ROLL, PID_VBAR_PITCH, PID_VBAR_YAW, PID_MAX};
-
-enum {ROLL,PITCH,YAW,MAX_AXES};
-
-
-// Private types
-typedef struct {
-	float p;
-	float i;
-	float d;
-	float iLim;
-	float iAccumulator;
-	float lastErr;
-} pid_type;
+enum {PID_RATE_ROLL, PID_RATE_PITCH, PID_RATE_YAW, PID_ROLL, PID_PITCH, PID_YAW, PID_MAX};
 
 // Private variables
 static xTaskHandle taskHandle;
 static StabilizationSettingsData settings;
 static xQueueHandle queue;
 float gyro_alpha = 0;
-float gyro_filtered[3] = {0,0,0};
 float axis_lock_accum[3] = {0,0,0};
-float vbar_sensitivity[3] = {1, 1, 1};
 uint8_t max_axis_lock = 0;
 uint8_t max_axislock_rate = 0;
 float weak_leveling_kp = 0;
 uint8_t weak_leveling_max = 0;
 bool lowThrottleZeroIntegral;
-float vbar_integral[3] = {0, 0, 0};
 float vbar_decay = 0.991f;
-pid_type pids[PID_MAX];
-int8_t vbar_gyros_suppress;
-bool vbar_piro_comp = false;
+struct pid pids[PID_MAX];
 
 // Private functions
 static void stabilizationTask(void* parameters);
-static float ApplyPid(pid_type * pid, const float err, float dT);
 static float bound(float val, float range);
 static void ZeroPids(void);
 static void SettingsUpdatedCb(UAVObjEvent * ev);
@@ -109,9 +98,6 @@ int32_t StabilizationStart()
 	// Initialize variables
 	// Create object queue
 	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
-
-	// This prepares this optional algorithm
-	stabilization_relay_init();
 
 	// Listen for updates.
 	//	AttitudeActualConnectQueue(queue);
@@ -140,7 +126,11 @@ int32_t StabilizationInitialize()
 #if defined(DIAGNOSTICS)
 	RateDesiredInitialize();
 #endif
-	
+	// Code required for relay tuning
+	sin_lookup_initalize();
+	RelayTuningSettingsInitialize();
+	RelayTuningInitialize();
+
 	return 0;
 }
 
@@ -227,6 +217,7 @@ static void stabilizationTask(void* parameters)
 		local_error[2] = fmodf(local_error[2] + 180, 360) - 180;
 #endif
 
+		float gyro_filtered[3];
 		gyro_filtered[0] = gyro_filtered[0] * gyro_alpha + gyrosData.x * (1 - gyro_alpha);
 		gyro_filtered[1] = gyro_filtered[1] * gyro_alpha + gyrosData.y * (1 - gyro_alpha);
 		gyro_filtered[2] = gyro_filtered[2] * gyro_alpha + gyrosData.z * (1 - gyro_alpha);
@@ -259,7 +250,7 @@ static void stabilizationTask(void* parameters)
 					rateDesiredAxis[i] = bound(attitudeDesiredAxis[i], settings.ManualRate[i]);
 
 					// Compute the inner loop
-					actuatorDesiredAxis[i] = ApplyPid(&pids[PID_RATE_ROLL + i],  rateDesiredAxis[i] - gyro_filtered[i], dT);
+					actuatorDesiredAxis[i] = pid_apply(&pids[PID_RATE_ROLL + i],  rateDesiredAxis[i] - gyro_filtered[i], dT);
 					actuatorDesiredAxis[i] = bound(actuatorDesiredAxis[i],1.0f);
 
 					break;
@@ -271,42 +262,25 @@ static void stabilizationTask(void* parameters)
 					}
 
 					// Compute the outer loop
-					rateDesiredAxis[i] = ApplyPid(&pids[PID_ROLL + i], local_error[i], dT);
+					rateDesiredAxis[i] = pid_apply(&pids[PID_ROLL + i], local_error[i], dT);
 					rateDesiredAxis[i] = bound(rateDesiredAxis[i], settings.MaximumRate[i]);
 
 					// Compute the inner loop
-					actuatorDesiredAxis[i] = ApplyPid(&pids[PID_RATE_ROLL + i],  rateDesiredAxis[i] - gyro_filtered[i], dT);
+					actuatorDesiredAxis[i] = pid_apply(&pids[PID_RATE_ROLL + i],  rateDesiredAxis[i] - gyro_filtered[i], dT);
 					actuatorDesiredAxis[i] = bound(actuatorDesiredAxis[i],1.0f);
 
 					break;
 
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_VIRTUALBAR:
-				{
-					if(reinit)
-						vbar_integral[i] = 0;
 
+					// Store for debugging output
 					rateDesiredAxis[i] = attitudeDesiredAxis[i];
 
-					// Track the angle of the virtual flybar which includes a slow decay
-					vbar_integral[i] = vbar_integral[i] * vbar_decay + gyro_filtered[i] * dT;
-					vbar_integral[i] = bound(vbar_integral[i], settings.VbarMaxAngle);
-
-					// Command signal can indicate how much to disregard the gyro feedback (fast flips)
-					float gyro_gain = 1.0f;
-					if (vbar_gyros_suppress > 0) {
-						gyro_gain = (1.0f - fabs(rateDesiredAxis[i]) * vbar_gyros_suppress / 100.0f);
-						gyro_gain = (gyro_gain < 0) ? 0 : gyro_gain;
-					}
-
-					// Command signal is composed of stick input added to the gyro and virtual flybar
-					actuatorDesiredAxis[i] = rateDesiredAxis[i] * vbar_sensitivity[i] - 
-					gyro_gain * (vbar_integral[i] * pids[PID_VBAR_ROLL + i].i +
-								 gyro_filtered[i] * pids[PID_VBAR_ROLL + i].p);
-
-					actuatorDesiredAxis[i] = bound(actuatorDesiredAxis[i],1.0f);
+					// Run a virtual flybar stabilization algorithm on this axis
+					stabilization_virtual_flybar(gyro_filtered[i], rateDesiredAxis[i], &actuatorDesiredAxis[i], dT, reinit, i, &settings);
 
 					break;
-				}
+
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_WEAKLEVELING:
 				{
 					if (reinit)
@@ -317,7 +291,7 @@ static void stabilizationTask(void* parameters)
 
 					// Compute desired rate as input biased towards leveling
 					rateDesiredAxis[i] = attitudeDesiredAxis[i] + weak_leveling;
-					actuatorDesiredAxis[i] = ApplyPid(&pids[PID_RATE_ROLL + i],  rateDesiredAxis[i] - gyro_filtered[i], dT);
+					actuatorDesiredAxis[i] = pid_apply(&pids[PID_RATE_ROLL + i],  rateDesiredAxis[i] - gyro_filtered[i], dT);
 					actuatorDesiredAxis[i] = bound(actuatorDesiredAxis[i],1.0f);
 
 					break;
@@ -335,12 +309,12 @@ static void stabilizationTask(void* parameters)
 						// For weaker commands or no command simply attitude lock (almost) on no gyro change
 						axis_lock_accum[i] += (attitudeDesiredAxis[i] - gyro_filtered[i]) * dT;
 						axis_lock_accum[i] = bound(axis_lock_accum[i], max_axis_lock);
-						rateDesiredAxis[i] = ApplyPid(&pids[PID_ROLL + i], axis_lock_accum[i], dT);
+						rateDesiredAxis[i] = pid_apply(&pids[PID_ROLL + i], axis_lock_accum[i], dT);
 					}
 
 					rateDesiredAxis[i] = bound(rateDesiredAxis[i], settings.MaximumRate[i]);
 
-					actuatorDesiredAxis[i] = ApplyPid(&pids[PID_RATE_ROLL + i],  rateDesiredAxis[i] - gyro_filtered[i], dT);
+					actuatorDesiredAxis[i] = pid_apply(&pids[PID_RATE_ROLL + i],  rateDesiredAxis[i] - gyro_filtered[i], dT);
 					actuatorDesiredAxis[i] = bound(actuatorDesiredAxis[i],1.0f);
 
 					break;
@@ -360,7 +334,7 @@ static void stabilizationTask(void* parameters)
 						pids[PID_ROLL + i].iAccumulator = 0;
 
 					// Compute the outer loop like attitude mode
-					rateDesiredAxis[i] = ApplyPid(&pids[PID_ROLL + i], local_error[i], dT);
+					rateDesiredAxis[i] = pid_apply(&pids[PID_ROLL + i], local_error[i], dT);
 					rateDesiredAxis[i] = bound(rateDesiredAxis[i], settings.MaximumRate[i]);
 
 					// Run the relay controller which also estimates the oscillation parameters
@@ -378,19 +352,8 @@ static void stabilizationTask(void* parameters)
 			}
 		}
 
-		// Piro compensation rotates the virtual flybar by yaw step to keep it
-		// rotated to external world
-		if (vbar_piro_comp) {
-			const float F_PI = 3.14159f;
-			float cy = cosf(gyro_filtered[2] / 180.0f * F_PI * dT);
-			float sy = sinf(gyro_filtered[2] / 180.0f * F_PI * dT);
-
-			float vbar_pitch = cy * vbar_integral[1] - sy * vbar_integral[0];
-			float vbar_roll = sy * vbar_integral[1] + cy * vbar_integral[0];
-
-			vbar_integral[1] = vbar_pitch;
-			vbar_integral[0] = vbar_roll;
-		}
+		if (settings.VbarPiroComp == STABILIZATIONSETTINGS_VBARPIROCOMP_TRUE)
+			stabilization_virtual_flybar_pirocomp(gyro_filtered[2], dT);
 
 #if defined(DIAGNOSTICS)
 		RateDesiredSet(&rateDesired);
@@ -425,33 +388,15 @@ static void stabilizationTask(void* parameters)
 	}
 }
 
-/**
- * Update one of the PID structures with the input error and timestep
- * @param pid Pointer to the PID structure
- * @param[in] err The error on for this controller
- * @param[in] dT The time step since the last update
- */
-float ApplyPid(pid_type * pid, const float err, float dT)
-{
-	float diff = (err - pid->lastErr);
-	pid->lastErr = err;
-	
-	// Scale up accumulator by 1000 while computing to avoid losing precision
-	pid->iAccumulator += err * (pid->i * dT * 1000.0f);
-	pid->iAccumulator = bound(pid->iAccumulator, pid->iLim * 1000.0f);
-	return ((err * pid->p) + pid->iAccumulator / 1000.0f + (diff * pid->d / dT));
-}
-
 
 /**
  * Clear the accumulators and derivatives for all the axes
  */
 static void ZeroPids(void)
 {
-	for(int8_t ct = 0; ct < PID_MAX; ct++) {
-		pids[ct].iAccumulator = 0.0f;
-		pids[ct].lastErr = 0.0f;
-	}
+	for(uint32_t i = 0; i < PID_MAX; i++)
+		pid_zero(&pids[i]);
+
 	for(uint8_t i = 0; i < 3; i++)
 		axis_lock_accum[i] = 0.0f;
 }
@@ -475,54 +420,37 @@ static void SettingsUpdatedCb(UAVObjEvent * ev)
 	StabilizationSettingsGet(&settings);
 	
 	// Set the roll rate PID constants
-	pids[PID_RATE_ROLL].p = settings.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KP];
-	pids[PID_RATE_ROLL].i = settings.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KI];
-	pids[PID_RATE_ROLL].d = settings.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KD];
-	pids[PID_RATE_ROLL].iLim = settings.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_ILIMIT];
+	pid_configure(&pids[PID_RATE_ROLL], settings.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KP], 
+		settings.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KI],
+		pids[PID_RATE_ROLL].d = settings.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KD],
+		pids[PID_RATE_ROLL].iLim = settings.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_ILIMIT]);
 	
 	// Set the pitch rate PID constants
-	pids[PID_RATE_PITCH].p = settings.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KP];
-	pids[PID_RATE_PITCH].i = settings.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KI];
-	pids[PID_RATE_PITCH].d = settings.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KD];
-	pids[PID_RATE_PITCH].iLim = settings.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_ILIMIT];
+	pid_configure(&pids[PID_RATE_PITCH], settings.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KP], 
+		pids[PID_RATE_PITCH].i = settings.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KI],
+		pids[PID_RATE_PITCH].d = settings.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KD],
+		pids[PID_RATE_PITCH].iLim = settings.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_ILIMIT]);
 	
 	// Set the yaw rate PID constants
-	pids[PID_RATE_YAW].p = settings.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_KP];
-	pids[PID_RATE_YAW].i = settings.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_KI];
-	pids[PID_RATE_YAW].d = settings.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_KD];
-	pids[PID_RATE_YAW].iLim = settings.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_ILIMIT];
+	pid_configure(&pids[PID_RATE_YAW], settings.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_KP],
+		pids[PID_RATE_YAW].i = settings.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_KI],
+		pids[PID_RATE_YAW].d = settings.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_KD],
+		pids[PID_RATE_YAW].iLim = settings.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_ILIMIT]);
 	
 	// Set the roll attitude PI constants
-	pids[PID_ROLL].p = settings.RollPI[STABILIZATIONSETTINGS_ROLLPI_KP];
-	pids[PID_ROLL].i = settings.RollPI[STABILIZATIONSETTINGS_ROLLPI_KI];
-	pids[PID_ROLL].iLim = settings.RollPI[STABILIZATIONSETTINGS_ROLLPI_ILIMIT];
+	pid_configure(&pids[PID_ROLL], settings.RollPI[STABILIZATIONSETTINGS_ROLLPI_KP],
+		settings.RollPI[STABILIZATIONSETTINGS_ROLLPI_KI], 0,
+		pids[PID_ROLL].iLim = settings.RollPI[STABILIZATIONSETTINGS_ROLLPI_ILIMIT]);
 	
 	// Set the pitch attitude PI constants
-	pids[PID_PITCH].p = settings.PitchPI[STABILIZATIONSETTINGS_PITCHPI_KP];
-	pids[PID_PITCH].i = settings.PitchPI[STABILIZATIONSETTINGS_PITCHPI_KI];
-	pids[PID_PITCH].iLim = settings.PitchPI[STABILIZATIONSETTINGS_PITCHPI_ILIMIT];
+	pid_configure(&pids[PID_PITCH], settings.PitchPI[STABILIZATIONSETTINGS_PITCHPI_KP],
+		pids[PID_PITCH].i = settings.PitchPI[STABILIZATIONSETTINGS_PITCHPI_KI], 0,
+		settings.PitchPI[STABILIZATIONSETTINGS_PITCHPI_ILIMIT]);
 	
 	// Set the yaw attitude PI constants
-	pids[PID_YAW].p = settings.YawPI[STABILIZATIONSETTINGS_YAWPI_KP];
-	pids[PID_YAW].i = settings.YawPI[STABILIZATIONSETTINGS_YAWPI_KI];
-	pids[PID_YAW].iLim = settings.YawPI[STABILIZATIONSETTINGS_YAWPI_ILIMIT];
-	
-	// Set the roll attitude PI constants
-	pids[PID_VBAR_ROLL].p = settings.VbarRollPI[STABILIZATIONSETTINGS_VBARROLLPI_KP];
-	pids[PID_VBAR_ROLL].i = settings.VbarRollPI[STABILIZATIONSETTINGS_VBARROLLPI_KI];
-	
-	// Set the pitch attitude PI constants
-	pids[PID_VBAR_PITCH].p = settings.VbarPitchPI[STABILIZATIONSETTINGS_VBARPITCHPI_KP];
-	pids[PID_VBAR_PITCH].i = settings.VbarPitchPI[STABILIZATIONSETTINGS_VBARPITCHPI_KI];
-	
-	// Set the yaw attitude PI constants
-	pids[PID_VBAR_YAW].p = settings.VbarYawPI[STABILIZATIONSETTINGS_VBARYAWPI_KP];
-	pids[PID_VBAR_YAW].i = settings.VbarYawPI[STABILIZATIONSETTINGS_VBARYAWPI_KI];
-	
-	// Need to store the vbar sensitivity
-	vbar_sensitivity[0] = settings.VbarSensitivity[0];
-	vbar_sensitivity[1] = settings.VbarSensitivity[1];
-	vbar_sensitivity[2] = settings.VbarSensitivity[2];
+	pid_configure(&pids[PID_YAW], settings.YawPI[STABILIZATIONSETTINGS_YAWPI_KP],
+		settings.YawPI[STABILIZATIONSETTINGS_YAWPI_KI], 0,
+		settings.YawPI[STABILIZATIONSETTINGS_YAWPI_ILIMIT]);
 	
 	// Maximum deviation to accumulate for axis lock
 	max_axis_lock = settings.MaxAxisLock;
@@ -548,8 +476,6 @@ static void SettingsUpdatedCb(UAVObjEvent * ev)
 	
 	// Compute time constant for vbar decay term based on a tau
 	vbar_decay = expf(-fakeDt / settings.VbarTau);
-	vbar_gyros_suppress = settings.VbarGyroSuppress;
-	vbar_piro_comp = settings.VbarPiroComp == STABILIZATIONSETTINGS_VBARPIROCOMP_TRUE;
 }
 
 

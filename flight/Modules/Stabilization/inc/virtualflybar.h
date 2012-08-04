@@ -3,12 +3,11 @@
  * @addtogroup OpenPilotModules OpenPilot Modules
  * @{
  * @addtogroup StabilizationModule Stabilization Module
- * @brief Relay tuning controller
- * @note This object updates the @ref ActuatorDesired "Actuator Desired" based on the
- * PID loops on the @ref AttitudeDesired "Attitude Desired" and @ref AttitudeActual "Attitude Actual"
+ * @brief Virtual flybar mode
+ * @note This file implements the logic for a virtual flybar
  * @{
  *
- * @file       relay_tuning.h
+ * @file       virtualflybar.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @brief      Attitude stabilization module.
  *
@@ -31,9 +30,13 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef RELAY_TUNING_H
-#define RELAY_TUNING_H
+ #ifndef VIRTUALFLYBAR_H
+ #define VIRTUALFLYBAR_H
 
-int stabilization_relay_rate(float err, float *output, int axis, bool reinit);
+#include "openpilot.h"
+#include "stabilizationsettings.h"
 
-#endif
+int stabilization_virtual_flybar(float gyro, float command, float *output, float dT, bool reinit, uint32_t axis, StabilizationSettingsData *settings);
+int stabilization_virtual_flybar_pirocomp(float z_gyro, float dT);
+
+ #endif /* VIRTUALFLYBAR_H */

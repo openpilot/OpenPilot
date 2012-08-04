@@ -1,16 +1,13 @@
 /**
  ******************************************************************************
- * @addtogroup OpenPilotModules OpenPilot Modules
+ * @addtogroup OpenPilot Math Utilities
  * @{
- * @addtogroup StabilizationModule Stabilization Module
- * @brief Relay tuning controller
- * @note This object updates the @ref ActuatorDesired "Actuator Desired" based on the
- * PID loops on the @ref AttitudeDesired "Attitude Desired" and @ref AttitudeActual "Attitude Actual"
+ * @addtogroup Sine and cosine methods that use a cached lookup table
  * @{
  *
- * @file       relay_tuning.h
+ * @file       pid.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
- * @brief      Attitude stabilization module.
+ * @brief      Methods to work with PID structure
  *
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -31,9 +28,22 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef RELAY_TUNING_H
-#define RELAY_TUNING_H
+#ifndef PID_H
+#define PID_H
 
-int stabilization_relay_rate(float err, float *output, int axis, bool reinit);
+//! 
+struct pid {
+	float p;
+	float i;
+	float d;
+	float iLim;
+	float iAccumulator;
+	float lastErr;
+};
 
-#endif
+//! Methods to use the pid structures
+float pid_apply(struct pid *pid, const float err, float dT);
+void pid_zero(struct pid *pid);
+void pid_configure(struct pid *pid, float p, float i, float d, float iLim);
+
+#endif /* PID_H */

@@ -277,7 +277,7 @@ public class OPTelemetryService extends Service {
 
 			Looper.prepare();						
 
-			BluetoothUAVTalk bt = new BluetoothUAVTalk(OPTelemetryService.this, BluetoothUAVTalk.DEVICE_NAME);
+			BluetoothUAVTalk bt = new BluetoothUAVTalk(OPTelemetryService.this);
 			for( int i = 0; i < 10; i++ ) {
 				if (DEBUG) Log.d(TAG, "Attempting Bluetooth Connection");
 

@@ -621,6 +621,12 @@ void PIOS_Board_Init(void) {
 
 	switch (hwsettings_rcvrport) {
 	case HWSETTINGS_CC_RCVRPORT_DISABLED:
+#if defined(PIOS_INCLUDE_HCSR04)
+		{
+			uint32_t pios_hcsr04_id;
+			PIOS_HCSR04_Init(&pios_hcsr04_id, &pios_hcsr04_cfg);
+		}
+#endif
 		break;
 	case HWSETTINGS_CC_RCVRPORT_PWM:
 #if defined(PIOS_INCLUDE_PWM)

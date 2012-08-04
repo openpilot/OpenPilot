@@ -32,7 +32,6 @@
 #define PIOS_HCSR04_H
 
 /* Public Functions */
-extern void PIOS_HCSR04_Init(void);
 extern int32_t PIOS_HCSR04_Get(void);
 extern int32_t PIOS_HCSR04_Completed(void);
 extern void PIOS_HCSR04_Trigger(void);

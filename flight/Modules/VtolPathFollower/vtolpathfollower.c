@@ -62,6 +62,7 @@
 #include "vtolpathfollowersettings.h"
 #include "nedaccel.h"
 #include "nedposition.h"
+#include "cameradesired.h"
 #include "stabilizationdesired.h"
 #include "stabilizationsettings.h"
 #include "systemsettings.h"
@@ -74,6 +75,7 @@
 #define STACK_SIZE_BYTES 1548
 #define TASK_PRIORITY (tskIDLE_PRIORITY+2)
 #define F_PI 3.14159265358979323846f
+#define RAD2DEG(rad) ((rad)*(180.0f/F_PI))
 
 // Private types
 
@@ -86,6 +88,7 @@ static VtolPathFollowerSettingsData guidanceSettings;
 static void vtolPathFollowerTask(void *parameters);
 static void SettingsUpdatedCb(UAVObjEvent * ev);
 static void updateNedAccel();
+static void updatePOIBearing();
 static void updatePathVelocity();
 static void updateEndpointVelocity();
 static void updateVtolDesiredAttitude();
@@ -122,6 +125,7 @@ int32_t VtolPathFollowerInitialize()
 		NedAccelInitialize();
 		PathDesiredInitialize();
 		VelocityDesiredInitialize();
+		CameraDesiredInitialize();
 		vtolpathfollower_enabled = true;
 	} else {
 		vtolpathfollower_enabled = false;
@@ -206,6 +210,7 @@ static void vtolPathFollowerTask(void *parameters)
 				if (pathDesired.Mode == PATHDESIRED_MODE_ENDPOINT) {
 					updateEndpointVelocity();
 					updateVtolDesiredAttitude();
+					updatePOIBearing();
 				} else {
 					AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_ERROR);
 				}
@@ -240,6 +245,56 @@ static void vtolPathFollowerTask(void *parameters)
 		}
 	}
 }
+
+/**
+ * Compute bearing and elevation between current position and POI
+ */
+static void updatePOIBearing()
+{
+	PositionActualData positionActual;
+	PositionActualGet(&positionActual);
+	CameraDesiredData cameraDesired;
+	CameraDesiredGet(&cameraDesired);
+	StabilizationDesiredData stabDesired;
+	StabilizationDesiredGet(&stabDesired);
+	//use poi here
+	//HomeLocationData poi;
+	//HomeLocationGet (&poi);
+
+	float poi[3];
+	poi[0]=0;
+	poi[1]=0;
+	poi[2]=0;
+	float dLoc[3];
+	float yaw=0;
+	float elevation=0;
+
+	dLoc[0]=positionActual.North-poi[0];
+	dLoc[1]=positionActual.East-poi[1];
+	dLoc[2]=positionActual.Down-poi[2];
+
+	if(dLoc[1]<0)
+		yaw=RAD2DEG(atan2f(dLoc[1],dLoc[0]))+180;
+	else
+		yaw=RAD2DEG(atan2f(dLoc[1],dLoc[0]))-180;
+
+	// distance
+	float distance = sqrtf(powf(dLoc[0],2)+powf(dLoc[1],2));
+
+	//not above
+	if(distance!=0) {
+		//You can feed this into camerastabilization
+		elevation=RAD2DEG(atan2f(dLoc[2],distance));
+	}
+	stabDesired.Yaw=yaw;
+	stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+	cameraDesired.Yaw=yaw;
+	cameraDesired.Pitch=elevation;
+
+	CameraDesiredSet(&cameraDesired);
+	StabilizationDesiredSet(&stabDesired);
+}
+
 
 /**
  * Compute desired velocity from the current position and path
@@ -502,7 +557,7 @@ static void updateVtolDesiredAttitude()
 	
 	stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_ROLL] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
 	stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_PITCH] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
-	stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW] = STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK;
+	stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
 	
 	StabilizationDesiredSet(&stabDesired);
 }

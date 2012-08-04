@@ -312,7 +312,7 @@ static void stabilizationTask(void* parameters)
 						rateDesiredAxis[i] = pid_apply(&pids[PID_ROLL + i], axis_lock_accum[i], dT);
 					}
 
-					rateDesiredAxis[i] = bound(rateDesiredAxis[i], settings.MaximumRate[i]);
+					rateDesiredAxis[i] = bound(rateDesiredAxis[i], settings.ManualRate[i]);
 
 					actuatorDesiredAxis[i] = pid_apply(&pids[PID_RATE_ROLL + i],  rateDesiredAxis[i] - gyro_filtered[i], dT);
 					actuatorDesiredAxis[i] = bound(actuatorDesiredAxis[i],1.0f);

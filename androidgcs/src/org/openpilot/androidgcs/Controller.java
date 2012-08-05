@@ -51,7 +51,7 @@ public class Controller extends ObjectManagerActivity {
 	void onOPConnected() {
 		Log.d(TAG, "onOPConnected()");
 		
-		// Subsribe to updates from ManualControlCommand and show the values for crude feedback
+		// Subscribe to updates from ManualControlCommand and show the values for crude feedback
 		UAVDataObject manualControl = (UAVDataObject) objMngr.getObject("ManualControlCommand");
 		if(manualControl != null) {
 			manualControl.addUpdatedObserver(updatedObserver);
@@ -63,9 +63,7 @@ public class Controller extends ObjectManagerActivity {
 			public void run() {
 				uavobjHandler.post(new Runnable() {
 					@Override
-					public void run() {
-						//DualJoystickView joystick = (DualJoystickView) findViewById(R.id.dualjoystickView);
-						
+					public void run() {						
 						UAVObject gcsReceiver = objMngr.getObject("GCSReceiver");
 						if (gcsReceiver == null) {
 							Log.e(TAG, "No GCS Receiver object found");

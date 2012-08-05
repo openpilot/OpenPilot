@@ -7,7 +7,6 @@ import org.openpilot.uavtalk.UAVObject;
 import org.openpilot.uavtalk.UAVObjectField;
 
 import android.os.Bundle;
-import android.widget.Toast;
 
 public class ObjectEditor extends ObjectManagerActivity {
 
@@ -18,21 +17,28 @@ public class ObjectEditor extends ObjectManagerActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.object_edit);
+		setContentView(R.layout.object_editor);
 
-		System.out.println("Started. Intent:" + getIntent());
+		// TODO: Figure out why this line is required so it doesn't
+		// have to be set programmatically
+		setTheme(android.R.style.Theme_Holo);
+		
 	    Bundle extras = getIntent().getExtras();
 	    if(extras != null){
 	    	objectName = extras.getString("org.openpilot.androidgcs.ObjectName");
 	        objectID = extras.getInt("org.openpilot.androidgcs.ObjectId");
 	        instID = extras.getInt("org.openpilot.androidgcs.InstId");
-	    }	    	    
+	        
+	        setTitle(objectName);
+	    }
+	    
 	}	
 	
 	public void onOPConnected() {
 		UAVObject obj = objMngr.getObject(objectID, instID);
-		Toast.makeText(getApplicationContext(), obj.toString(), Toast.LENGTH_SHORT);
-		
+		if (obj == null)
+			return;
+
 		ObjectEditView editView = (ObjectEditView) findViewById(R.id.object_edit_view);
 		editView.setName(obj.getName());
 		

@@ -12,7 +12,7 @@ import android.util.Log;
 public class UAVTalk extends Observable {
 
 	static final String TAG = "UAVTalk";
-	public static int LOGLEVEL = -1;
+	public static int LOGLEVEL = 0;
 	public static boolean WARN = LOGLEVEL > 1;
 	public static boolean DEBUG = LOGLEVEL > 0;
 
@@ -349,7 +349,7 @@ public class UAVTalk extends Observable {
 			{
 				UAVObject rxObj = objMngr.getObject(rxObjId);
 				if (rxObj == null) {
-					Log.d(TAG, "Unknown ID: " + rxObjId);
+					if (DEBUG) Log.d(TAG, "Unknown ID: " + rxObjId);
 					stats.rxErrors++;
 					rxState = RxStateType.STATE_SYNC;
 					break;

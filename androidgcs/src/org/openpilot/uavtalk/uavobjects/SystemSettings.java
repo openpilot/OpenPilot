@@ -139,7 +139,7 @@ public class SystemSettings extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			SystemSettings obj = new SystemSettings();
@@ -153,13 +153,13 @@ public class SystemSettings extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public SystemSettings GetInstance(UAVObjectManager objMngr, int instID)
+	public SystemSettings GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (SystemSettings)(objMngr.getObject(SystemSettings.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0xC72A326E;
+	protected static final long OBJID = 0xC72A326E;
 	protected static final String NAME = "SystemSettings";
 	protected static String DESCRIPTION = "Select airframe type.  Currently used by @ref ActuatorModule to choose mixing from @ref ActuatorDesired to @ref ActuatorCommand";
 	protected static final boolean ISSINGLEINST = 1 == 1;

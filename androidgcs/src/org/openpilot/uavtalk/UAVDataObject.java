@@ -9,7 +9,7 @@ public abstract class UAVDataObject extends UAVObject {
 	 * @param isSet
 	 * @param name
 	 */
-	public UAVDataObject(int objID, Boolean isSingleInst, Boolean isSet, String name) {
+	public UAVDataObject(long objID, Boolean isSingleInst, Boolean isSet, String name) {
 		super(objID, isSingleInst, name);
 		mobj = null;
 		this.isSet = isSet;
@@ -17,7 +17,7 @@ public abstract class UAVDataObject extends UAVObject {
 	/**
 	 * Initialize instance ID and assign a metaobject
 	 */
-	public void initialize(int instID, UAVMetaObject mobj)
+	public void initialize(long instID, UAVMetaObject mobj)
 	{
 	    //QMutexLocker locker(mutex);
 	    this.mobj = mobj;
@@ -77,7 +77,7 @@ public abstract class UAVDataObject extends UAVObject {
 	}
 	    
     // TODO: Make abstract
-    public UAVDataObject clone(int instID) {
+    public UAVDataObject clone(long instID) {
 		return (UAVDataObject) super.clone();
     }
     

@@ -132,7 +132,7 @@ public class ObjectPersistence extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			ObjectPersistence obj = new ObjectPersistence();
@@ -146,13 +146,13 @@ public class ObjectPersistence extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public ObjectPersistence GetInstance(UAVObjectManager objMngr, int instID)
+	public ObjectPersistence GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (ObjectPersistence)(objMngr.getObject(ObjectPersistence.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0x99C63292;
+	protected static final long OBJID = 0x99C63292;
 	protected static final String NAME = "ObjectPersistence";
 	protected static String DESCRIPTION = "Someone who knows please enter this";
 	protected static final boolean ISSINGLEINST = 1 == 1;

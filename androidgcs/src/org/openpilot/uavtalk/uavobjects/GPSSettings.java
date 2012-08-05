@@ -111,7 +111,7 @@ public class GPSSettings extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			GPSSettings obj = new GPSSettings();
@@ -125,13 +125,13 @@ public class GPSSettings extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public GPSSettings GetInstance(UAVObjectManager objMngr, int instID)
+	public GPSSettings GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (GPSSettings)(objMngr.getObject(GPSSettings.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0xAC5F6370;
+	protected static final long OBJID = 0xAC5F6370;
 	protected static final String NAME = "GPSSettings";
 	protected static String DESCRIPTION = "Settings for the GPS";
 	protected static final boolean ISSINGLEINST = 1 == 1;

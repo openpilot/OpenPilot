@@ -143,7 +143,7 @@ public class AttitudeSimulated extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			AttitudeSimulated obj = new AttitudeSimulated();
@@ -157,13 +157,13 @@ public class AttitudeSimulated extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public AttitudeSimulated GetInstance(UAVObjectManager objMngr, int instID)
+	public AttitudeSimulated GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (AttitudeSimulated)(objMngr.getObject(AttitudeSimulated.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0x9266CE74;
+	protected static final long OBJID = 0x9266CE74;
 	protected static final String NAME = "AttitudeSimulated";
 	protected static String DESCRIPTION = "The simulated Attitude estimation from @ref Sensors.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

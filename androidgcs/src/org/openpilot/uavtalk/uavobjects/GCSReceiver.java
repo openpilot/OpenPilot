@@ -114,7 +114,7 @@ public class GCSReceiver extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			GCSReceiver obj = new GCSReceiver();
@@ -128,13 +128,13 @@ public class GCSReceiver extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public GCSReceiver GetInstance(UAVObjectManager objMngr, int instID)
+	public GCSReceiver GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (GCSReceiver)(objMngr.getObject(GCSReceiver.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0xCC7E1470;
+	protected static final long OBJID = 0xCC7E1470;
 	protected static final String NAME = "GCSReceiver";
 	protected static String DESCRIPTION = "A receiver channel group carried over the telemetry link.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

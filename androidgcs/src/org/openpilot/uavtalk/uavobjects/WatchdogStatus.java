@@ -111,7 +111,7 @@ public class WatchdogStatus extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			WatchdogStatus obj = new WatchdogStatus();
@@ -125,13 +125,13 @@ public class WatchdogStatus extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public WatchdogStatus GetInstance(UAVObjectManager objMngr, int instID)
+	public WatchdogStatus GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (WatchdogStatus)(objMngr.getObject(WatchdogStatus.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0xA207FA7C;
+	protected static final long OBJID = 0xA207FA7C;
 	protected static final String NAME = "WatchdogStatus";
 	protected static String DESCRIPTION = "For monitoring the flags in the watchdog and especially the bootup flags";
 	protected static final boolean ISSINGLEINST = 1 == 1;

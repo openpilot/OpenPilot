@@ -108,7 +108,7 @@ public class FlightPlanSettings extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			FlightPlanSettings obj = new FlightPlanSettings();
@@ -122,13 +122,13 @@ public class FlightPlanSettings extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public FlightPlanSettings GetInstance(UAVObjectManager objMngr, int instID)
+	public FlightPlanSettings GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (FlightPlanSettings)(objMngr.getObject(FlightPlanSettings.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0x92E9FF76;
+	protected static final long OBJID = 0x92E9FF76;
 	protected static final String NAME = "FlightPlanSettings";
 	protected static String DESCRIPTION = "Settings for the flight plan module, control the execution of the script";
 	protected static final boolean ISSINGLEINST = 1 == 1;

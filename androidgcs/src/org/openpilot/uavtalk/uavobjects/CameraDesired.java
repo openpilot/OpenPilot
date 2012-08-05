@@ -115,7 +115,7 @@ public class CameraDesired extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			CameraDesired obj = new CameraDesired();
@@ -129,13 +129,13 @@ public class CameraDesired extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public CameraDesired GetInstance(UAVObjectManager objMngr, int instID)
+	public CameraDesired GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (CameraDesired)(objMngr.getObject(CameraDesired.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0x531F544E;
+	protected static final long OBJID = 0x531F544E;
 	protected static final String NAME = "CameraDesired";
 	protected static String DESCRIPTION = "Desired camera outputs.  Comes from @ref CameraStabilization module.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

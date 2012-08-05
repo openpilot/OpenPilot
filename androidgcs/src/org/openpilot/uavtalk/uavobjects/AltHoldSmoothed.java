@@ -115,7 +115,7 @@ public class AltHoldSmoothed extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			AltHoldSmoothed obj = new AltHoldSmoothed();
@@ -129,13 +129,13 @@ public class AltHoldSmoothed extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public AltHoldSmoothed GetInstance(UAVObjectManager objMngr, int instID)
+	public AltHoldSmoothed GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (AltHoldSmoothed)(objMngr.getObject(AltHoldSmoothed.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0x2BC6B9D2;
+	protected static final long OBJID = 0x2BC6B9D2;
 	protected static final String NAME = "AltHoldSmoothed";
 	protected static String DESCRIPTION = "The output on the kalman filter on altitude.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

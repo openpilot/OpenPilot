@@ -282,7 +282,7 @@ public class StabilizationSettings extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			StabilizationSettings obj = new StabilizationSettings();
@@ -296,13 +296,13 @@ public class StabilizationSettings extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public StabilizationSettings GetInstance(UAVObjectManager objMngr, int instID)
+	public StabilizationSettings GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (StabilizationSettings)(objMngr.getObject(StabilizationSettings.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0xBBC337D4;
+	protected static final long OBJID = 0xBBC337D4;
 	protected static final String NAME = "StabilizationSettings";
 	protected static String DESCRIPTION = "PID settings used by the Stabilization module to combine the @ref AttitudeActual and @ref AttitudeDesired to compute @ref ActuatorDesired";
 	protected static final boolean ISSINGLEINST = 1 == 1;

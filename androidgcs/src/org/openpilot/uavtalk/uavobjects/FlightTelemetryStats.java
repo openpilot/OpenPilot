@@ -132,7 +132,7 @@ public class FlightTelemetryStats extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			FlightTelemetryStats obj = new FlightTelemetryStats();
@@ -146,13 +146,13 @@ public class FlightTelemetryStats extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public FlightTelemetryStats GetInstance(UAVObjectManager objMngr, int instID)
+	public FlightTelemetryStats GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (FlightTelemetryStats)(objMngr.getObject(FlightTelemetryStats.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0x2F7E2902;
+	protected static final long OBJID = 0x2F7E2902;
 	protected static final String NAME = "FlightTelemetryStats";
 	protected static String DESCRIPTION = "Maintains the telemetry statistics from the OpenPilot flight computer.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

@@ -146,7 +146,7 @@ public class SystemAlarms extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			SystemAlarms obj = new SystemAlarms();
@@ -160,13 +160,13 @@ public class SystemAlarms extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public SystemAlarms GetInstance(UAVObjectManager objMngr, int instID)
+	public SystemAlarms GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (SystemAlarms)(objMngr.getObject(SystemAlarms.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0x737ADCF2;
+	protected static final long OBJID = 0x737ADCF2;
 	protected static final String NAME = "SystemAlarms";
 	protected static String DESCRIPTION = "Alarms from OpenPilot to indicate failure conditions or warnings.  Set by various modules.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

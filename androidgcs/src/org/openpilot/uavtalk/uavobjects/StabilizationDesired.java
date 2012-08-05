@@ -132,7 +132,7 @@ public class StabilizationDesired extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			StabilizationDesired obj = new StabilizationDesired();
@@ -146,13 +146,13 @@ public class StabilizationDesired extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public StabilizationDesired GetInstance(UAVObjectManager objMngr, int instID)
+	public StabilizationDesired GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (StabilizationDesired)(objMngr.getObject(StabilizationDesired.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0xDE1EAAD6;
+	protected static final long OBJID = 0xDE1EAAD6;
 	protected static final String NAME = "StabilizationDesired";
 	protected static String DESCRIPTION = "The desired attitude that @ref StabilizationModule will try and achieve if FlightMode is Stabilized.  Comes from @ref ManaulControlModule.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

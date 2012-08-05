@@ -142,7 +142,7 @@ public class ManualControlCommand extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			ManualControlCommand obj = new ManualControlCommand();
@@ -156,13 +156,13 @@ public class ManualControlCommand extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public ManualControlCommand GetInstance(UAVObjectManager objMngr, int instID)
+	public ManualControlCommand GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (ManualControlCommand)(objMngr.getObject(ManualControlCommand.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0x1E82C2D2;
+	protected static final long OBJID = 0x1E82C2D2;
 	protected static final String NAME = "ManualControlCommand";
 	protected static String DESCRIPTION = "The output from the @ref ManualControlModule which descodes the receiver inputs.  Overriden by GCS for fly-by-wire control.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

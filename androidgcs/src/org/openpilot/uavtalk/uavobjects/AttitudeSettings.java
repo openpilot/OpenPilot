@@ -175,7 +175,7 @@ public class AttitudeSettings extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			AttitudeSettings obj = new AttitudeSettings();
@@ -189,13 +189,13 @@ public class AttitudeSettings extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public AttitudeSettings GetInstance(UAVObjectManager objMngr, int instID)
+	public AttitudeSettings GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (AttitudeSettings)(objMngr.getObject(AttitudeSettings.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0xC307BC4A;
+	protected static final long OBJID = 0xC307BC4A;
 	protected static final String NAME = "AttitudeSettings";
 	protected static String DESCRIPTION = "Settings for the @ref Attitude module used on CopterControl";
 	protected static final boolean ISSINGLEINST = 1 == 1;

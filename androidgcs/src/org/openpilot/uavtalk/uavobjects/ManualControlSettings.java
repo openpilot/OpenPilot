@@ -321,7 +321,7 @@ public class ManualControlSettings extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			ManualControlSettings obj = new ManualControlSettings();
@@ -335,13 +335,13 @@ public class ManualControlSettings extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public ManualControlSettings GetInstance(UAVObjectManager objMngr, int instID)
+	public ManualControlSettings GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (ManualControlSettings)(objMngr.getObject(ManualControlSettings.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0x6C188320;
+	protected static final long OBJID = 0x6C188320;
 	protected static final String NAME = "ManualControlSettings";
 	protected static String DESCRIPTION = "Settings to indicate how to decode receiver input by @ref ManualControlModule.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

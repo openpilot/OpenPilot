@@ -119,7 +119,7 @@ public class AltitudeHoldDesired extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			AltitudeHoldDesired obj = new AltitudeHoldDesired();
@@ -133,13 +133,13 @@ public class AltitudeHoldDesired extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public AltitudeHoldDesired GetInstance(UAVObjectManager objMngr, int instID)
+	public AltitudeHoldDesired GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (AltitudeHoldDesired)(objMngr.getObject(AltitudeHoldDesired.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0x495BAD6E;
+	protected static final long OBJID = 0x495BAD6E;
 	protected static final String NAME = "AltitudeHoldDesired";
 	protected static String DESCRIPTION = "Holds the desired altitude (from manual control) as well as the desired attitude to pass through";
 	protected static final boolean ISSINGLEINST = 1 == 1;

@@ -152,7 +152,7 @@ public class GPSPosition extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			GPSPosition obj = new GPSPosition();
@@ -166,13 +166,13 @@ public class GPSPosition extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public GPSPosition GetInstance(UAVObjectManager objMngr, int instID)
+	public GPSPosition GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (GPSPosition)(objMngr.getObject(GPSPosition.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0xE2A323B6;
+	protected static final long OBJID = 0xE2A323B6;
 	protected static final String NAME = "GPSPosition";
 	protected static String DESCRIPTION = "Raw GPS data from @ref GPSModule.  Should only be used by @ref AHRSCommsModule.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

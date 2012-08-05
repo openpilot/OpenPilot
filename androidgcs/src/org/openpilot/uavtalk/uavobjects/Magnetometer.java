@@ -115,7 +115,7 @@ public class Magnetometer extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			Magnetometer obj = new Magnetometer();
@@ -129,13 +129,13 @@ public class Magnetometer extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public Magnetometer GetInstance(UAVObjectManager objMngr, int instID)
+	public Magnetometer GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (Magnetometer)(objMngr.getObject(Magnetometer.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0x813B55DE;
+	protected static final long OBJID = 0x813B55DE;
 	protected static final String NAME = "Magnetometer";
 	protected static String DESCRIPTION = "The mag data.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

@@ -183,7 +183,7 @@ public class GPSSatellites extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			GPSSatellites obj = new GPSSatellites();
@@ -197,13 +197,13 @@ public class GPSSatellites extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public GPSSatellites GetInstance(UAVObjectManager objMngr, int instID)
+	public GPSSatellites GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (GPSSatellites)(objMngr.getObject(GPSSatellites.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0x920D998;
+	protected static final long OBJID = 0x920D998;
 	protected static final String NAME = "GPSSatellites";
 	protected static String DESCRIPTION = "Contains information about the GPS satellites in view from @ref GPSModule.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

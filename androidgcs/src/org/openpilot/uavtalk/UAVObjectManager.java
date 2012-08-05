@@ -95,8 +95,8 @@ public class UAVObjectManager {
 				// If the instance ID is specified and not at the default value (0) then we need to make sure
 				// that there are no gaps in the instance list. If gaps are found then then additional instances
 				// will be created.
-				for(int instID = instList.size(); instID < obj.getInstID(); instID++) {
-					UAVDataObject newObj = obj.clone(instID);
+				for(long instId = instList.size(); instId < obj.getInstID(); instId++) {
+					UAVDataObject newObj = obj.clone(instId);
 					newObj.initialize(mobj);
 					instList.add(newObj);
 					newInstance.event(newObj);
@@ -116,7 +116,7 @@ public class UAVObjectManager {
 
 				// Check if there are any gaps between the requested instance ID and the ones in the list,
 				// if any then create the missing instances.
-				for (int instId = instList.size(); instId < obj.getInstID(); ++instId)
+				for (long instId = instList.size(); instId < obj.getInstID(); ++instId)
 				{
 					UAVDataObject cobj = obj.clone(instId);
 					cobj.initialize(mobj);
@@ -247,7 +247,7 @@ public class UAVObjectManager {
 	 * Get a specific object given its name and instance ID
 	 * @returns The object is found or NULL if not
 	 */
-	public UAVObject getObject(String name, int instId)
+	public UAVObject getObject(String name, long instId)
 	{
 		return getObject(name, 0, instId);
 	}
@@ -257,7 +257,7 @@ public class UAVObjectManager {
 	 * @param objId the object id
 	 * @returns The object is found or NULL if not
 	 */
-	public UAVObject getObject(int objId) 
+	public UAVObject getObject(long objId) 
 	{
 		return getObject(null, objId, 0);
 	}
@@ -266,7 +266,7 @@ public class UAVObjectManager {
 	 * Get a specific object given its object and instance ID
 	 * @returns The object is found or NULL if not
 	 */
-	public UAVObject getObject(int objId, int instId)
+	public UAVObject getObject(long objId, long instId)
 	{
 		return getObject(null, objId, instId);
 	}
@@ -274,7 +274,7 @@ public class UAVObjectManager {
 	/**
 	 * Helper function for the public getObject() functions.
 	 */
-	public synchronized UAVObject getObject(String name, int objId, int instId)
+	public synchronized UAVObject getObject(String name, long objId, long instId)
 	{
 		// Check if this object type is already in the list
 		ListIterator<List<UAVObject>> objIter = objects.listIterator();
@@ -308,7 +308,7 @@ public class UAVObjectManager {
 	/**
 	 * Get all the instances of the object specified by its ID
 	 */
-	public List<UAVObject> getObjectInstances(int objId)
+	public List<UAVObject> getObjectInstances(long objId)
 	{
 		return getObjectInstances(null, objId);
 	}
@@ -316,7 +316,7 @@ public class UAVObjectManager {
 	/**
 	 * Helper function for the public getObjectInstances()
 	 */
-	public synchronized List<UAVObject> getObjectInstances(String name, int objId)
+	public synchronized List<UAVObject> getObjectInstances(String name, long objId)
 	{
 		// Check if this object type is already in the list
 		ListIterator<List<UAVObject>> objIter = objects.listIterator();
@@ -343,7 +343,7 @@ public class UAVObjectManager {
 	/**
 	 * Get the number of instances for an object given its ID
 	 */
-	public int getNumInstances(int objId)
+	public int getNumInstances(long objId)
 	{
 		return getNumInstances(null, objId);
 	}
@@ -351,7 +351,7 @@ public class UAVObjectManager {
 	/**
 	 * Helper function for public getNumInstances
 	 */
-	public int getNumInstances(String name, int objId)
+	public int getNumInstances(String name, long objId)
 	{
 		return getObjectInstances(name,objId).size();
 	}

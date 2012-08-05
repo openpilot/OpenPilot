@@ -134,7 +134,7 @@ public class OveroSyncStats extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			OveroSyncStats obj = new OveroSyncStats();
@@ -148,13 +148,13 @@ public class OveroSyncStats extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public OveroSyncStats GetInstance(UAVObjectManager objMngr, int instID)
+	public OveroSyncStats GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (OveroSyncStats)(objMngr.getObject(OveroSyncStats.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0xD2085FAC;
+	protected static final long OBJID = 0xD2085FAC;
 	protected static final String NAME = "OveroSyncStats";
 	protected static String DESCRIPTION = "Maintains statistics on transfer rate to and from over";
 	protected static final boolean ISSINGLEINST = 1 == 1;

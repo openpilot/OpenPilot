@@ -150,7 +150,7 @@ public class FlightBatterySettings extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			FlightBatterySettings obj = new FlightBatterySettings();
@@ -164,13 +164,13 @@ public class FlightBatterySettings extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public FlightBatterySettings GetInstance(UAVObjectManager objMngr, int instID)
+	public FlightBatterySettings GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (FlightBatterySettings)(objMngr.getObject(FlightBatterySettings.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0x94AC6AD2;
+	protected static final long OBJID = 0x94AC6AD2;
 	protected static final String NAME = "FlightBatterySettings";
 	protected static String DESCRIPTION = "Flight Battery configuration.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

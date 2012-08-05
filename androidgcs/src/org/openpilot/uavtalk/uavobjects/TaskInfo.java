@@ -172,7 +172,7 @@ public class TaskInfo extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			TaskInfo obj = new TaskInfo();
@@ -186,13 +186,13 @@ public class TaskInfo extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public TaskInfo GetInstance(UAVObjectManager objMngr, int instID)
+	public TaskInfo GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (TaskInfo)(objMngr.getObject(TaskInfo.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0xB81CD2AE;
+	protected static final long OBJID = 0xB81CD2AE;
 	protected static final String NAME = "TaskInfo";
 	protected static String DESCRIPTION = "Task information";
 	protected static final boolean ISSINGLEINST = 1 == 1;

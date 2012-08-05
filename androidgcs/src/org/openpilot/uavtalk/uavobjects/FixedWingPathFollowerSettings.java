@@ -208,7 +208,7 @@ public class FixedWingPathFollowerSettings extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			FixedWingPathFollowerSettings obj = new FixedWingPathFollowerSettings();
@@ -222,13 +222,13 @@ public class FixedWingPathFollowerSettings extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public FixedWingPathFollowerSettings GetInstance(UAVObjectManager objMngr, int instID)
+	public FixedWingPathFollowerSettings GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (FixedWingPathFollowerSettings)(objMngr.getObject(FixedWingPathFollowerSettings.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0x8A3F1E02;
+	protected static final long OBJID = 0x8A3F1E02;
 	protected static final String NAME = "FixedWingPathFollowerSettings";
 	protected static String DESCRIPTION = "Settings for the @ref FixedWingPathFollowerModule";
 	protected static final boolean ISSINGLEINST = 1 == 1;

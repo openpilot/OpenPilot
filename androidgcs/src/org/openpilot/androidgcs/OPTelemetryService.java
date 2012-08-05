@@ -97,7 +97,7 @@ public class OPTelemetryService extends Service {
 				activeTelem.start();
 				break;
 			case MSG_DISCONNECT:
-				Toast.makeText(getApplicationContext(), "Disconnct", Toast.LENGTH_SHORT).show();
+				Toast.makeText(getApplicationContext(), "Disconnect requested", Toast.LENGTH_SHORT).show();
 				terminate = true;
 				try {
 					activeTelem.join();

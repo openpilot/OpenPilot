@@ -33,6 +33,14 @@ public class HomePage extends ObjectManagerActivity {
 				startActivity(new Intent(HomePage.this, UAVLocation.class));	
 			}			
 		});
+
+		Button controller = (Button) findViewById(R.id.launch_controller);
+		controller.setOnClickListener(new OnClickListener() {
+			public void onClick(View arg0) {
+				startActivity(new Intent(HomePage.this, Controller.class));	
+			}			
+		});
+
 	}
 
 }

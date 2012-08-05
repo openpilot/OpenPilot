@@ -2,6 +2,56 @@
 <RelativeLayout   xmlns:android="http://schemas.android.com/apk/res/android"
   android:layout_width="match_parent"
   android:layout_height="match_parent">
-    <Spinner android:layout_alignParentTop="true" android:layout_height="wrap_content" android:layout_width="match_parent" android:id="@+id/object_list_filter"></Spinner>
-    <ListView android:id="@+id/object_list" android:layout_height="wrap_content" android:layout_width="match_parent" android:layout_below="@+id/spinner1" android:layout_alignLeft="@+id/spinner1" android:layout_alignRight="@+id/spinner1"></ListView>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="5dp"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <CheckBox
+                android:id="@+id/settingsCheck"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="Settings" />
+
+            <CheckBox
+                android:id="@+id/dataCheck"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="Data" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <ListView
+                android:id="@+id/object_list"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" >
+            </ListView>
+
+            <TextView
+                android:id="@+id/object_information"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text=""
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
 </RelativeLayout>

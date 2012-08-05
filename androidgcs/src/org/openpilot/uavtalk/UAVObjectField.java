@@ -469,7 +469,11 @@ public class UAVObjectField {
     
 	public String toString() {
         String sout = new String();
-        sout += name + ": " + data.toString() + " (" + units + ")\n";
+    	sout += name + ": " + getValue().toString();
+    	if (units.length() > 0) 
+    		sout += " (" + units + ")\n";
+    	else
+    		sout += "\n";
         return sout;    	
     }
 

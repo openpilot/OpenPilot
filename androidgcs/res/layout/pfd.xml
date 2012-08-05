@@ -1,8 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  android:layout_width="match_parent"
-  android:layout_height="match_parent">
-    <org.openpilot.androidgcs.CompassView android:id="@+id/compass_view" android:layout_height="wrap_content" android:layout_width="wrap_content"></org.openpilot.androidgcs.CompassView>
-    <org.openpilot.androidgcs.AttitudeView android:id="@+id/attitude_view" android:layout_height="fill_parent" android:layout_width="fill_parent"></org.openpilot.androidgcs.AttitudeView>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <org.openpilot.androidgcs.CompassView
+            android:id="@+id/compass_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <org.openpilot.androidgcs.AttitudeView
+            android:id="@+id/attitude_view"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent" />
+
+    </LinearLayout>
+
+    <com.MobileAnarchy.Android.Widgets.Joystick.DualJoystickView
+        android:id="@+id/dualjoystickView"
+        android:layout_width="fill_parent"
+        android:layout_height="175dip"
+        android:layout_marginTop="5dip" >
+    </com.MobileAnarchy.Android.Widgets.Joystick.DualJoystickView>
+
 </LinearLayout>

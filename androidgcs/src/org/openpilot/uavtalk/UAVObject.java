@@ -52,6 +52,11 @@ public abstract class UAVObject {
 	}
 	
 	private CallbackListener updatedListeners = new CallbackListener(this);
+	public void removeUpdatedObserver(Observer o) {
+		synchronized(updatedListeners) {
+			updatedListeners.deleteObserver(o);
+		}
+	}
 	public void addUpdatedObserver(Observer o) {
 		synchronized(updatedListeners) {
 			updatedListeners.addObserver(o);
@@ -730,14 +735,14 @@ public abstract class UAVObject {
 	 */
 	@Override
 	public String toString() {
-		return toStringBrief() + toStringData();
+		return toStringBrief(); // + toStringData();
 	}
 
 	/**
 	 * Return a string with the object information (only the header)
 	 */
 	public String toStringBrief() {
-		return getName() + " (" + Integer.toHexString(getObjID()) + " " + Integer.toHexString(getInstID()) + " " + getNumBytes() + ")\n";
+		return getName(); // + " (" + Integer.toHexString(getObjID()) + " " + Integer.toHexString(getInstID()) + " " + getNumBytes() + ")\n";
 	}
 
 	/**

@@ -125,6 +125,7 @@ public class ObjectBrowser extends ObjectManagerActivity implements OnSharedPref
 
 				selected_index = position;
 				allObjects.get(position).addUpdatedObserver(updatedObserver);
+				allObjects.get(position).updateRequested();
 				updateObject();
 			}
 		});

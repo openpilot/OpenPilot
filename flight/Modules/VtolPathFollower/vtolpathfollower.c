@@ -62,13 +62,18 @@
 #include "vtolpathfollowersettings.h"
 #include "nedaccel.h"
 #include "nedposition.h"
-#include "cameradesired.h"
 #include "stabilizationdesired.h"
 #include "stabilizationsettings.h"
 #include "systemsettings.h"
 #include "velocitydesired.h"
 #include "velocityactual.h"
 #include "CoordinateConversions.h"
+
+#include "cameradesired.h"
+#include "poilearnsettings.h"
+#include "poilocation.h"
+#include "accessorydesired.h"
+
 
 // Private constants
 #define MAX_QUEUE_SIZE 4
@@ -94,6 +99,7 @@ static void updateEndpointVelocity();
 static void updateVtolDesiredAttitude();
 static float bound(float val, float min, float max);
 static bool vtolpathfollower_enabled;
+static void accessoryUpdated(UAVObjEvent* ev);
 
 /**
  * Initialise the module, called on startup
@@ -126,6 +132,9 @@ int32_t VtolPathFollowerInitialize()
 		PathDesiredInitialize();
 		VelocityDesiredInitialize();
 		CameraDesiredInitialize();
+		AccessoryDesiredInitialize();
+		PoiLearnSettingsInitialize();
+		PoiLocationInitialize();
 		vtolpathfollower_enabled = true;
 	} else {
 		vtolpathfollower_enabled = false;
@@ -157,6 +166,7 @@ static void vtolPathFollowerTask(void *parameters)
 	
 	VtolPathFollowerSettingsConnectCallback(SettingsUpdatedCb);
 	PathDesiredConnectCallback(SettingsUpdatedCb);
+	AccessoryDesiredConnectCallback(accessoryUpdated);
 	
 	VtolPathFollowerSettingsGet(&guidanceSettings);
 	PathDesiredGet(&pathDesired);
@@ -257,21 +267,19 @@ static void updatePOIBearing()
 	CameraDesiredGet(&cameraDesired);
 	StabilizationDesiredData stabDesired;
 	StabilizationDesiredGet(&stabDesired);
+	PoiLocationData poi;
+	PoiLocationGet(&poi);
 	//use poi here
 	//HomeLocationData poi;
 	//HomeLocationGet (&poi);
 
-	float poi[3];
-	poi[0]=0;
-	poi[1]=0;
-	poi[2]=0;
 	float dLoc[3];
 	float yaw=0;
 	float elevation=0;
 
-	dLoc[0]=positionActual.North-poi[0];
-	dLoc[1]=positionActual.East-poi[1];
-	dLoc[2]=positionActual.Down-poi[2];
+	dLoc[0]=positionActual.North-poi.North;
+	dLoc[1]=positionActual.East-poi.East;
+	dLoc[2]=positionActual.Down-poi.Down;
 
 	if(dLoc[1]<0)
 		yaw=RAD2DEG(atan2f(dLoc[1],dLoc[0]))+180;
@@ -619,5 +627,30 @@ static void SettingsUpdatedCb(UAVObjEvent * ev)
 {
 	VtolPathFollowerSettingsGet(&guidanceSettings);
 	PathDesiredGet(&pathDesired);
+}
+
+static void accessoryUpdated(UAVObjEvent* ev)
+{
+	if (ev->obj != AccessoryDesiredHandle())
+		return;
+
+	PositionActualData positionActual;
+	PositionActualGet(&positionActual);
+	AccessoryDesiredData accessory;
+	PoiLearnSettingsData poiLearn;
+	PoiLearnSettingsGet(&poiLearn);
+	PoiLocationData poi;
+	PoiLocationGet(&poi);
+	if (poiLearn.Input != POILEARNSETTINGS_INPUT_NONE) {
+		if (AccessoryDesiredInstGet(poiLearn.Input - POILEARNSETTINGS_INPUT_ACCESSORY0, &accessory) == 0) {
+			if(accessory.AccessoryVal<-0.5f)
+			{
+				poi.North=positionActual.North;
+				poi.East=positionActual.East;
+				poi.Down=positionActual.Down;
+				PoiLocationSet(&poi);
+			}
+		}
+	}
 }
 

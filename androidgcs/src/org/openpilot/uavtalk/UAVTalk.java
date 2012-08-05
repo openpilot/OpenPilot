@@ -686,7 +686,7 @@ public class UAVTalk extends Observable {
 		bbuf
 				.putShort((short) (length + 2 /* SYNC, Type */+ 2 /* Size */+ 4 /* ObjID */+ (obj
 						.isSingleInstance() ? 0 : 2)));
-		bbuf.putInt(obj.getObjID());
+		bbuf.putInt((int)obj.getObjID());
 
 		// Setup instance ID if one is required
 		if (!obj.isSingleInstance()) {

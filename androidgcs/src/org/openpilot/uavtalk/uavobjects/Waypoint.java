@@ -128,7 +128,7 @@ public class Waypoint extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			Waypoint obj = new Waypoint();
@@ -142,13 +142,13 @@ public class Waypoint extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public Waypoint GetInstance(UAVObjectManager objMngr, int instID)
+	public Waypoint GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (Waypoint)(objMngr.getObject(Waypoint.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0x338C5F90;
+	protected static final long OBJID = 0x338C5F90;
 	protected static final String NAME = "Waypoint";
 	protected static String DESCRIPTION = "A waypoint the aircraft can try and hit.  Used by the @ref PathPlanner module";
 	protected static final boolean ISSINGLEINST = 0 == 1;

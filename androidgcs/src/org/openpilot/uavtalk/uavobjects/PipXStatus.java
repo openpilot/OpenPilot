@@ -270,7 +270,7 @@ public class PipXStatus extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			PipXStatus obj = new PipXStatus();
@@ -284,13 +284,13 @@ public class PipXStatus extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public PipXStatus GetInstance(UAVObjectManager objMngr, int instID)
+	public PipXStatus GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (PipXStatus)(objMngr.getObject(PipXStatus.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0x3FC68A86;
+	protected static final long OBJID = 0x3FC68A86;
 	protected static final String NAME = "PipXStatus";
 	protected static String DESCRIPTION = "PipXtreme device status.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

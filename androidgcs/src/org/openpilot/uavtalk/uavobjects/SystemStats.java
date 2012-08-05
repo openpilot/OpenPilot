@@ -135,7 +135,7 @@ public class SystemStats extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			SystemStats obj = new SystemStats();
@@ -149,13 +149,13 @@ public class SystemStats extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public SystemStats GetInstance(UAVObjectManager objMngr, int instID)
+	public SystemStats GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (SystemStats)(objMngr.getObject(SystemStats.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0x364D1406;
+	protected static final long OBJID = 0x364D1406;
 	protected static final String NAME = "SystemStats";
 	protected static String DESCRIPTION = "CPU and memory usage from OpenPilot computer. ";
 	protected static final boolean ISSINGLEINST = 1 == 1;

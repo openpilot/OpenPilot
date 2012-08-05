@@ -115,7 +115,7 @@ public class NEDPosition extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			NEDPosition obj = new NEDPosition();
@@ -129,13 +129,13 @@ public class NEDPosition extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public NEDPosition GetInstance(UAVObjectManager objMngr, int instID)
+	public NEDPosition GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (NEDPosition)(objMngr.getObject(NEDPosition.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0x1FB15A00;
+	protected static final long OBJID = 0x1FB15A00;
 	protected static final String NAME = "NEDPosition";
 	protected static String DESCRIPTION = "Contains the current position relative to @ref HomeLocation";
 	protected static final boolean ISSINGLEINST = 1 == 1;

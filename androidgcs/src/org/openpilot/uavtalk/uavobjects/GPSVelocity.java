@@ -115,7 +115,7 @@ public class GPSVelocity extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			GPSVelocity obj = new GPSVelocity();
@@ -129,13 +129,13 @@ public class GPSVelocity extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public GPSVelocity GetInstance(UAVObjectManager objMngr, int instID)
+	public GPSVelocity GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (GPSVelocity)(objMngr.getObject(GPSVelocity.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0x8245DC80;
+	protected static final long OBJID = 0x8245DC80;
 	protected static final String NAME = "GPSVelocity";
 	protected static String DESCRIPTION = "Raw GPS data from @ref GPSModule.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

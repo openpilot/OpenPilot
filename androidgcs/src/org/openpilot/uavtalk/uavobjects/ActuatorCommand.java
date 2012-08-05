@@ -128,7 +128,7 @@ public class ActuatorCommand extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			ActuatorCommand obj = new ActuatorCommand();
@@ -142,13 +142,13 @@ public class ActuatorCommand extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public ActuatorCommand GetInstance(UAVObjectManager objMngr, int instID)
+	public ActuatorCommand GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (ActuatorCommand)(objMngr.getObject(ActuatorCommand.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0x5324CB8;
+	protected static final long OBJID = 0x5324CB8;
 	protected static final String NAME = "ActuatorCommand";
 	protected static String DESCRIPTION = "Contains the pulse duration sent to each of the channels.  Set by @ref ActuatorModule";
 	protected static final boolean ISSINGLEINST = 1 == 1;

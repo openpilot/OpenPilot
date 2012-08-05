@@ -115,7 +115,7 @@ public class NedAccel extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			NedAccel obj = new NedAccel();
@@ -129,13 +129,13 @@ public class NedAccel extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public NedAccel GetInstance(UAVObjectManager objMngr, int instID)
+	public NedAccel GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (NedAccel)(objMngr.getObject(NedAccel.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0x7C7F5BC0;
+	protected static final long OBJID = 0x7C7F5BC0;
 	protected static final String NAME = "NedAccel";
 	protected static String DESCRIPTION = "The projection of acceleration in the NED reference frame used by @ref Guidance.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

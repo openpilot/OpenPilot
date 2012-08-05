@@ -115,7 +115,7 @@ public class FaultSettings extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			FaultSettings obj = new FaultSettings();
@@ -129,13 +129,13 @@ public class FaultSettings extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public FaultSettings GetInstance(UAVObjectManager objMngr, int instID)
+	public FaultSettings GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (FaultSettings)(objMngr.getObject(FaultSettings.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0x2778BA3C;
+	protected static final long OBJID = 0x2778BA3C;
 	protected static final String NAME = "FaultSettings";
 	protected static String DESCRIPTION = "Allows testers to simulate various fault scenarios.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

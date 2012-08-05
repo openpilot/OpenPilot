@@ -140,7 +140,7 @@ public class HomeLocation extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			HomeLocation obj = new HomeLocation();
@@ -154,13 +154,13 @@ public class HomeLocation extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public HomeLocation GetInstance(UAVObjectManager objMngr, int instID)
+	public HomeLocation GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (HomeLocation)(objMngr.getObject(HomeLocation.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0x6185DC6E;
+	protected static final long OBJID = 0x6185DC6E;
 	protected static final String NAME = "HomeLocation";
 	protected static String DESCRIPTION = "HomeLocation setting which contains the constants to tranlate from longitutde and latitude to NED reference frame.  Automatically set by @ref GPSModule after acquiring a 3D lock.  Used by @ref AHRSCommsModule.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

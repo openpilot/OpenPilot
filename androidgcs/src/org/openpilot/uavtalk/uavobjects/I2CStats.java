@@ -206,7 +206,7 @@ public class I2CStats extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			I2CStats obj = new I2CStats();
@@ -220,13 +220,13 @@ public class I2CStats extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public I2CStats GetInstance(UAVObjectManager objMngr, int instID)
+	public I2CStats GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (I2CStats)(objMngr.getObject(I2CStats.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0xB714823E;
+	protected static final long OBJID = 0xB714823E;
 	protected static final String NAME = "I2CStats";
 	protected static String DESCRIPTION = "Tracks statistics on the I2C bus.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

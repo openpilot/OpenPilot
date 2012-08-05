@@ -119,7 +119,7 @@ public class Gyros extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			Gyros obj = new Gyros();
@@ -133,13 +133,13 @@ public class Gyros extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public Gyros GetInstance(UAVObjectManager objMngr, int instID)
+	public Gyros GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (Gyros)(objMngr.getObject(Gyros.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0x4228AF6;
+	protected static final long OBJID = 0x4228AF6;
 	protected static final String NAME = "Gyros";
 	protected static String DESCRIPTION = "The gyro data.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

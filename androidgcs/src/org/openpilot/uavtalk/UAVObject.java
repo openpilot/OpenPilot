@@ -363,7 +363,7 @@ public abstract class UAVObject {
 
 	};
 
-	public UAVObject(int objID, Boolean isSingleInst, String name) {
+	public UAVObject(long objID, Boolean isSingleInst, String name) {
 		this.objID = objID;
 		this.instID = 0;
 		this.isSingleInst = isSingleInst;
@@ -371,7 +371,7 @@ public abstract class UAVObject {
 		// this.mutex = new QMutex(QMutex::Recursive);
 	};
 
-	public synchronized void initialize(int instID) {
+	public synchronized void initialize(long instID) {
 		this.instID = instID;
 	}
 
@@ -402,14 +402,14 @@ public abstract class UAVObject {
 	/**
 	 * Get the object ID
 	 */
-	public int getObjID() {
+	public long getObjID() {
 		return objID;
 	}
 
 	/**
 	 * Get the instance ID
 	 */
-	public int getInstID() {
+	public long getInstID() {
 		return instID;
 	}
 
@@ -794,8 +794,8 @@ public abstract class UAVObject {
 	/**
 	 * Private data for the object, common to all
 	 */
-	protected int objID;
-	protected int instID;
+	protected long objID;
+	protected long instID;
 	protected boolean isSingleInst;
 	protected String name;
 	protected String description;

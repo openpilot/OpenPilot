@@ -7,7 +7,7 @@ import java.util.ListIterator;
 
 public class UAVMetaObject extends UAVObject {
 
-	public UAVMetaObject(int objID, String name, UAVDataObject parent) throws Exception {
+	public UAVMetaObject(long objID, String name, UAVDataObject parent) throws Exception {
 		super(objID, true, name);
 		this.parent = parent;
 		

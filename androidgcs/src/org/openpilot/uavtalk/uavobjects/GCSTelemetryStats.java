@@ -132,7 +132,7 @@ public class GCSTelemetryStats extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			GCSTelemetryStats obj = new GCSTelemetryStats();
@@ -146,13 +146,13 @@ public class GCSTelemetryStats extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public GCSTelemetryStats GetInstance(UAVObjectManager objMngr, int instID)
+	public GCSTelemetryStats GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (GCSTelemetryStats)(objMngr.getObject(GCSTelemetryStats.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0xABC72744;
+	protected static final long OBJID = 0xABC72744;
 	protected static final String NAME = "GCSTelemetryStats";
 	protected static String DESCRIPTION = "The telemetry statistics from the ground computer";
 	protected static final boolean ISSINGLEINST = 1 == 1;

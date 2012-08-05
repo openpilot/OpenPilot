@@ -103,7 +103,7 @@ $(INITFIELDS)
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			$(NAME) obj = new $(NAME)();
@@ -117,13 +117,13 @@ $(INITFIELDS)
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public $(NAME) GetInstance(UAVObjectManager objMngr, int instID)
+	public $(NAME) GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return ($(NAME))(objMngr.getObject($(NAME).OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = $(OBJIDHEX);
+	protected static final long OBJID = $(OBJIDHEX);
 	protected static final String NAME = "$(NAME)";
 	protected static String DESCRIPTION = "$(DESCRIPTION)";
 	protected static final boolean ISSINGLEINST = $(ISSINGLEINST) == 1;

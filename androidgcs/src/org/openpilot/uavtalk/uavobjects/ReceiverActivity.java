@@ -121,7 +121,7 @@ public class ReceiverActivity extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			ReceiverActivity obj = new ReceiverActivity();
@@ -135,13 +135,13 @@ public class ReceiverActivity extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public ReceiverActivity GetInstance(UAVObjectManager objMngr, int instID)
+	public ReceiverActivity GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (ReceiverActivity)(objMngr.getObject(ReceiverActivity.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0x1E7C53DA;
+	protected static final long OBJID = 0x1E7C53DA;
 	protected static final String NAME = "ReceiverActivity";
 	protected static String DESCRIPTION = "Monitors which receiver channels have been active within the last second.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

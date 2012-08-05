@@ -131,7 +131,7 @@ public class AttitudeActual extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			AttitudeActual obj = new AttitudeActual();
@@ -145,13 +145,13 @@ public class AttitudeActual extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public AttitudeActual GetInstance(UAVObjectManager objMngr, int instID)
+	public AttitudeActual GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (AttitudeActual)(objMngr.getObject(AttitudeActual.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0x33DAD5E6;
+	protected static final long OBJID = 0x33DAD5E6;
 	protected static final String NAME = "AttitudeActual";
 	protected static String DESCRIPTION = "The updated Attitude estimation from @ref AHRSCommsModule.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

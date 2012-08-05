@@ -112,7 +112,7 @@ public class OveroSyncSettings extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			OveroSyncSettings obj = new OveroSyncSettings();
@@ -126,13 +126,13 @@ public class OveroSyncSettings extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public OveroSyncSettings GetInstance(UAVObjectManager objMngr, int instID)
+	public OveroSyncSettings GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (OveroSyncSettings)(objMngr.getObject(OveroSyncSettings.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0xA1ABC278;
+	protected static final long OBJID = 0xA1ABC278;
 	protected static final String NAME = "OveroSyncSettings";
 	protected static String DESCRIPTION = "Settings to control the behavior of the overo sync module";
 	protected static final boolean ISSINGLEINST = 1 == 1;

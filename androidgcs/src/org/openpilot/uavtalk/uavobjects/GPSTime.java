@@ -127,7 +127,7 @@ public class GPSTime extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			GPSTime obj = new GPSTime();
@@ -141,13 +141,13 @@ public class GPSTime extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public GPSTime GetInstance(UAVObjectManager objMngr, int instID)
+	public GPSTime GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (GPSTime)(objMngr.getObject(GPSTime.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0xD4478084;
+	protected static final long OBJID = 0xD4478084;
 	protected static final String NAME = "GPSTime";
 	protected static String DESCRIPTION = "Contains the GPS time from @ref GPSModule.  Required to compute the world magnetic model correctly when setting the home location.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

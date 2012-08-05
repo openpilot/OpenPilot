@@ -122,7 +122,7 @@ public class BaroAirspeed extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			BaroAirspeed obj = new BaroAirspeed();
@@ -136,13 +136,13 @@ public class BaroAirspeed extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public BaroAirspeed GetInstance(UAVObjectManager objMngr, int instID)
+	public BaroAirspeed GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (BaroAirspeed)(objMngr.getObject(BaroAirspeed.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0x169EA4A;
+	protected static final long OBJID = 0x169EA4A;
 	protected static final String NAME = "BaroAirspeed";
 	protected static String DESCRIPTION = "The raw data from the dynamic pressure sensor with pressure, temperature and airspeed.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

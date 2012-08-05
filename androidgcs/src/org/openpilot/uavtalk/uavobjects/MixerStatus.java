@@ -143,7 +143,7 @@ public class MixerStatus extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			MixerStatus obj = new MixerStatus();
@@ -157,13 +157,13 @@ public class MixerStatus extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public MixerStatus GetInstance(UAVObjectManager objMngr, int instID)
+	public MixerStatus GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (MixerStatus)(objMngr.getObject(MixerStatus.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0x124E28A;
+	protected static final long OBJID = 0x124E28A;
 	protected static final String NAME = "MixerStatus";
 	protected static String DESCRIPTION = "Status for the matrix mixer showing the output of each mixer after all scaling";
 	protected static final boolean ISSINGLEINST = 1 == 1;

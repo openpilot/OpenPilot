@@ -115,7 +115,7 @@ public class VelocityActual extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			VelocityActual obj = new VelocityActual();
@@ -129,13 +129,13 @@ public class VelocityActual extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public VelocityActual GetInstance(UAVObjectManager objMngr, int instID)
+	public VelocityActual GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (VelocityActual)(objMngr.getObject(VelocityActual.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0x5A08F61A;
+	protected static final long OBJID = 0x5A08F61A;
 	protected static final String NAME = "VelocityActual";
 	protected static String DESCRIPTION = "Updated by @ref AHRSCommsModule and used within @ref GuidanceModule for velocity control";
 	protected static final boolean ISSINGLEINST = 1 == 1;

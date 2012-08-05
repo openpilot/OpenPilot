@@ -304,7 +304,7 @@ public class HwSettings extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			HwSettings obj = new HwSettings();
@@ -318,13 +318,13 @@ public class HwSettings extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public HwSettings GetInstance(UAVObjectManager objMngr, int instID)
+	public HwSettings GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (HwSettings)(objMngr.getObject(HwSettings.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0x5D950E50;
+	protected static final long OBJID = 0x5D950E50;
 	protected static final String NAME = "HwSettings";
 	protected static String DESCRIPTION = "Selection of optional hardware configurations.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

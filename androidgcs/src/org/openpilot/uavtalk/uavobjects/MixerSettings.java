@@ -476,7 +476,7 @@ public class MixerSettings extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			MixerSettings obj = new MixerSettings();
@@ -490,13 +490,13 @@ public class MixerSettings extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public MixerSettings GetInstance(UAVObjectManager objMngr, int instID)
+	public MixerSettings GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (MixerSettings)(objMngr.getObject(MixerSettings.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0x5D16D6C4;
+	protected static final long OBJID = 0x5D16D6C4;
 	protected static final String NAME = "MixerSettings";
 	protected static String DESCRIPTION = "Settings for the @ref ActuatorModule that controls the channel assignments for the mixer based on AircraftType";
 	protected static final boolean ISSINGLEINST = 1 == 1;

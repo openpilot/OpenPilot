@@ -126,7 +126,7 @@ public class FlightStatus extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			FlightStatus obj = new FlightStatus();
@@ -140,13 +140,13 @@ public class FlightStatus extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public FlightStatus GetInstance(UAVObjectManager objMngr, int instID)
+	public FlightStatus GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (FlightStatus)(objMngr.getObject(FlightStatus.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0x884FEF66;
+	protected static final long OBJID = 0x884FEF66;
 	protected static final String NAME = "FlightStatus";
 	protected static String DESCRIPTION = "Contains major flight status information for other modules.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

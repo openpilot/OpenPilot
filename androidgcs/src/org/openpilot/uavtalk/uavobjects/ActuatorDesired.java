@@ -127,7 +127,7 @@ public class ActuatorDesired extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			ActuatorDesired obj = new ActuatorDesired();
@@ -141,13 +141,13 @@ public class ActuatorDesired extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public ActuatorDesired GetInstance(UAVObjectManager objMngr, int instID)
+	public ActuatorDesired GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (ActuatorDesired)(objMngr.getObject(ActuatorDesired.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0xCA4BC4A4;
+	protected static final long OBJID = 0xCA4BC4A4;
 	protected static final String NAME = "ActuatorDesired";
 	protected static String DESCRIPTION = "Desired raw, pitch and yaw actuator settings.  Comes from either @ref StabilizationModule or @ref ManualControlModule depending on FlightMode.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

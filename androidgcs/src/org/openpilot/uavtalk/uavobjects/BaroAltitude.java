@@ -115,7 +115,7 @@ public class BaroAltitude extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			BaroAltitude obj = new BaroAltitude();
@@ -129,13 +129,13 @@ public class BaroAltitude extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public BaroAltitude GetInstance(UAVObjectManager objMngr, int instID)
+	public BaroAltitude GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (BaroAltitude)(objMngr.getObject(BaroAltitude.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0x99622E6A;
+	protected static final long OBJID = 0x99622E6A;
 	protected static final String NAME = "BaroAltitude";
 	protected static String DESCRIPTION = "The raw data from the barometric sensor with pressure, temperature and altitude estimate.";
 	protected static final boolean ISSINGLEINST = 1 == 1;

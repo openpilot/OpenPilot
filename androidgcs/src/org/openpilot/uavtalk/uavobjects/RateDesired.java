@@ -115,7 +115,7 @@ public class RateDesired extends UAVDataObject {
 	 * Do not use this function directly to create new instances, the
 	 * UAVObjectManager should be used instead.
 	 */
-	public UAVDataObject clone(int instID) {
+	public UAVDataObject clone(long instID) {
 		// TODO: Need to get specific instance to clone
 		try {
 			RateDesired obj = new RateDesired();
@@ -129,13 +129,13 @@ public class RateDesired extends UAVDataObject {
 	/**
 	 * Static function to retrieve an instance of the object.
 	 */
-	public RateDesired GetInstance(UAVObjectManager objMngr, int instID)
+	public RateDesired GetInstance(UAVObjectManager objMngr, long instID)
 	{
 	    return (RateDesired)(objMngr.getObject(RateDesired.OBJID, instID));
 	}
 
 	// Constants
-	protected static final int OBJID = 0xCE8C826;
+	protected static final long OBJID = 0xCE8C826;
 	protected static final String NAME = "RateDesired";
 	protected static String DESCRIPTION = "Status for the matrix mixer showing the output of each mixer after all scaling";
 	protected static final boolean ISSINGLEINST = 1 == 1;

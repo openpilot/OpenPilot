@@ -238,7 +238,7 @@ public class RevoCalibration extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0xA2A63C7C;
+	protected static final long OBJID = 0xA2A63C7Cl;
 	protected static final String NAME = "RevoCalibration";
 	protected static String DESCRIPTION = "Settings for the INS to control the algorithm and what is updated";
 	protected static final boolean ISSINGLEINST = 1 > 0;

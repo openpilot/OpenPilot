@@ -135,7 +135,7 @@ public class VelocityDesired extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0x9E946992;
+	protected static final long OBJID = 0x9E946992l;
 	protected static final String NAME = "VelocityDesired";
 	protected static String DESCRIPTION = "Used within @ref GuidanceModule to communicate between the task computing the desired velocity and the PID loop to achieve it (running at different rates).";
 	protected static final boolean ISSINGLEINST = 1 > 0;

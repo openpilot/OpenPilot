@@ -152,7 +152,7 @@ public class ObjectPersistence extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0x99C63292;
+	protected static final long OBJID = 0x99C63292l;
 	protected static final String NAME = "ObjectPersistence";
 	protected static String DESCRIPTION = "Someone who knows please enter this";
 	protected static final boolean ISSINGLEINST = 1 > 0;

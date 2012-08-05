@@ -123,7 +123,7 @@ $(INITFIELDS)
 	}
 
 	// Constants
-	protected static final long OBJID = $(OBJIDHEX);
+	protected static final long OBJID = $(OBJIDHEX)l;
 	protected static final String NAME = "$(NAME)";
 	protected static String DESCRIPTION = "$(DESCRIPTION)";
 	protected static final boolean ISSINGLEINST = $(ISSINGLEINST) > 0;

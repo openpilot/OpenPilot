@@ -153,7 +153,7 @@ public class FixedWingPathFollowerStatus extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0xA0D6F6D4;
+	protected static final long OBJID = 0xA0D6F6D4l;
 	protected static final String NAME = "FixedWingPathFollowerStatus";
 	protected static String DESCRIPTION = "Object Storing Debugging Information on PID internals";
 	protected static final boolean ISSINGLEINST = 1 > 0;

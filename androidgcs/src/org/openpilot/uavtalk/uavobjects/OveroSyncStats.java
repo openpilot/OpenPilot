@@ -154,7 +154,7 @@ public class OveroSyncStats extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0xD2085FAC;
+	protected static final long OBJID = 0xD2085FACl;
 	protected static final String NAME = "OveroSyncStats";
 	protected static String DESCRIPTION = "Maintains statistics on transfer rate to and from over";
 	protected static final boolean ISSINGLEINST = 1 > 0;

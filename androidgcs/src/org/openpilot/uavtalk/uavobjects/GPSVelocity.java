@@ -135,7 +135,7 @@ public class GPSVelocity extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0x8245DC80;
+	protected static final long OBJID = 0x8245DC80l;
 	protected static final String NAME = "GPSVelocity";
 	protected static String DESCRIPTION = "Raw GPS data from @ref GPSModule.";
 	protected static final boolean ISSINGLEINST = 1 > 0;

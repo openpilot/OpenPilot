@@ -135,7 +135,7 @@ public class MagBias extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0x5043E510;
+	protected static final long OBJID = 0x5043E510l;
 	protected static final String NAME = "MagBias";
 	protected static String DESCRIPTION = "The gyro data.";
 	protected static final boolean ISSINGLEINST = 1 > 0;

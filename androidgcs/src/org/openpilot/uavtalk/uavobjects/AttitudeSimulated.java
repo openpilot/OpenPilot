@@ -163,7 +163,7 @@ public class AttitudeSimulated extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0x9266CE74;
+	protected static final long OBJID = 0x9266CE74l;
 	protected static final String NAME = "AttitudeSimulated";
 	protected static String DESCRIPTION = "The simulated Attitude estimation from @ref Sensors.";
 	protected static final boolean ISSINGLEINST = 1 > 0;

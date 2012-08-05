@@ -140,7 +140,7 @@ public class PathPlannerSettings extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0x290E45DA;
+	protected static final long OBJID = 0x290E45DAl;
 	protected static final String NAME = "PathPlannerSettings";
 	protected static String DESCRIPTION = "Settings for the @ref PathPlanner Module";
 	protected static final boolean ISSINGLEINST = 1 > 0;

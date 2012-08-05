@@ -135,7 +135,7 @@ public class AltHoldSmoothed extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0x2BC6B9D2;
+	protected static final long OBJID = 0x2BC6B9D2l;
 	protected static final String NAME = "AltHoldSmoothed";
 	protected static String DESCRIPTION = "The output on the kalman filter on altitude.";
 	protected static final boolean ISSINGLEINST = 1 > 0;

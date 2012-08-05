@@ -193,7 +193,7 @@ public class CameraStabSettings extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0x3B95DDBA;
+	protected static final long OBJID = 0x3B95DDBAl;
 	protected static final String NAME = "CameraStabSettings";
 	protected static String DESCRIPTION = "Settings for the @ref CameraStab mmodule";
 	protected static final boolean ISSINGLEINST = 1 > 0;

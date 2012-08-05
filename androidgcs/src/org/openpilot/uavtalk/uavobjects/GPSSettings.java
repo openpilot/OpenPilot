@@ -131,7 +131,7 @@ public class GPSSettings extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0xAC5F6370;
+	protected static final long OBJID = 0xAC5F6370l;
 	protected static final String NAME = "GPSSettings";
 	protected static String DESCRIPTION = "Settings for the GPS";
 	protected static final boolean ISSINGLEINST = 1 > 0;

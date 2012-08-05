@@ -262,7 +262,7 @@ public class ActuatorSettings extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0x7D555646;
+	protected static final long OBJID = 0x7D555646l;
 	protected static final String NAME = "ActuatorSettings";
 	protected static String DESCRIPTION = "Settings for the @ref ActuatorModule that controls the channel assignments for the mixer based on AircraftType";
 	protected static final boolean ISSINGLEINST = 1 > 0;

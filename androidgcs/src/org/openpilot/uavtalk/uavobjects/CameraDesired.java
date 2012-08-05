@@ -135,7 +135,7 @@ public class CameraDesired extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0x531F544E;
+	protected static final long OBJID = 0x531F544El;
 	protected static final String NAME = "CameraDesired";
 	protected static String DESCRIPTION = "Desired camera outputs.  Comes from @ref CameraStabilization module.";
 	protected static final boolean ISSINGLEINST = 1 > 0;

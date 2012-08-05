@@ -16,9 +16,9 @@ public class Telemetry {
 	
 	private final String TAG = "Telemetry";
 	public static int LOGLEVEL = 0;
-	public static boolean WARN = LOGLEVEL > 1;
+	public static boolean WARN = LOGLEVEL > 2;
+	public static boolean ERROR = LOGLEVEL > 1;
 	public static boolean DEBUG = LOGLEVEL > 0;
-	
     public class TelemetryStats {
         public int txBytes;
         public int rxBytes;
@@ -305,7 +305,7 @@ public class Telemetry {
             processObjectQueue();
         } else
         {
-        	Log.e(TAG,"Error: received a transaction completed when did not expect it.");
+        	if (ERROR) Log.e(TAG,"Error: received a transaction completed when did not expect it.");
         }
     }
 
@@ -369,7 +369,7 @@ public class Telemetry {
             }
         } else
         {
-        	Log.e(TAG,"Error: inside of processObjectTransaction with no transPending");
+        	if (ERROR) Log.e(TAG,"Error: inside of processObjectTransaction with no transPending");
         }
     }
 
@@ -429,7 +429,7 @@ public class Telemetry {
         // Don nothing if a transaction is already in progress (should not happen)
         if (transPending)
         {
-        	Log.e(TAG,"Dequeue while a transaction pending");
+        	if (ERROR) Log.e(TAG,"Dequeue while a transaction pending");
             return;
         }
 

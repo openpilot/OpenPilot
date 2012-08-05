@@ -113,7 +113,7 @@ public abstract class UAVObject {
 			updateRequestedListeners.addObserver(o);
 		}
 	}
-	void updateRequested() {
+	public void updateRequested() {
 		synchronized(updateRequestedListeners) {
 			updateRequestedListeners.event();
 		}

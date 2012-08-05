@@ -457,8 +457,6 @@ public class Telemetry {
             if ( objInfo.obj.getObjID() != objMngr.getObject("GCSTelemetryStats").getObjID() )
             {
             	if (DEBUG) Log.d(TAG,"transactionCompleted(false) due to receiving object not GCSTelemetryStats while not connected.");
-            	System.out.println(gcsStatsObj.toString());
-            	System.out.println(objInfo.obj.toString());
                 objInfo.obj.transactionCompleted(false);
                 return;
             }

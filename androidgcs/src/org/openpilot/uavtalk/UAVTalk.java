@@ -182,22 +182,15 @@ public class UAVTalk extends Observable {
 		try {
 			// inStream.wait();
 			val = inStream.read();
-		} /*
-		 * catch (InterruptedException e) { // TODO Auto-generated catch
-		 * block System.out.println("Connection was aborted\n");
-		 * e.printStackTrace(); break; }
-		 */catch (IOException e) {
-			 // TODO Auto-generated catch block
-			 System.out.println("Error reading from stream\n");
-			 e.printStackTrace();
-			 return false;
-		 }
-		 if (val == -1) {
-			 System.out.println("End of stream, terminating processInputStream thread");
-			 return false;
-		 }
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+		if (val == -1) {
+			return false;
+		}
 
-		 //System.out.println("Received byte " + val + " in state + " + rxState);
 		 processInputByte(val);
 		 return true;
 	}

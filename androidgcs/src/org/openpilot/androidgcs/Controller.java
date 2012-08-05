@@ -10,6 +10,7 @@ import org.openpilot.uavtalk.UAVObject;
 import org.openpilot.uavtalk.UAVObjectField;
 
 import com.MobileAnarchy.Android.Widgets.Joystick.DualJoystickView;
+import com.MobileAnarchy.Android.Widgets.Joystick.JoystickMovedListener;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,6 +20,8 @@ import android.widget.Toast;
 
 public class Controller extends ObjectManagerActivity {
 	private final String TAG = "Controller";
+
+	private final boolean DEBUG = false;
 
 	private final int THROTTLE_CHANNEL = 0;
 	private final int ROLL_CHANNEL = 1;
@@ -33,6 +36,7 @@ public class Controller extends ObjectManagerActivity {
 	
 	private double throttle = 0.1, roll = 0.1, pitch = -0.1, yaw = 0;
 	private boolean updated;
+	private boolean leftJoystickHeld, rightJoystickHeld;
 	
 	Timer sendTimer = new Timer();
 	
@@ -59,32 +63,58 @@ public class Controller extends ObjectManagerActivity {
 		
 		activateGcsReceiver();
 		
+		DualJoystickView joystick = (DualJoystickView) findViewById(R.id.dualjoystickView);
+
+		// Hardcode a Mode 1 listener for now
+		joystick.setOnJostickMovedListener(new JoystickMovedListener() {
+			public void OnMoved(int pan, int tilt) {
+				pitch = -(double) tilt / 10.0;
+				yaw = (double) pan / 10.0;
+				updated = true;
+				leftJoystickHeld = true;
+			}
+			public void OnReleased() { leftJoystickHeld = false; }
+			@Override
+			public void OnReturnedToCenter() { }
+		}, new JoystickMovedListener() {
+			public void OnMoved(int pan, int tilt) {
+				throttle = (double) (tilt + 10) / 20.0;
+				roll = (double) pan / 10.0;
+				updated = true;
+				rightJoystickHeld = true;
+			}
+			public void OnReleased() { rightJoystickHeld = false; }
+			@Override
+			public void OnReturnedToCenter() { }
+		}) ;
 		TimerTask controllerTask = new TimerTask() {
 			public void run() {
 				uavobjHandler.post(new Runnable() {
 					@Override
-					public void run() {						
-						UAVObject gcsReceiver = objMngr.getObject("GCSReceiver");
-						if (gcsReceiver == null) {
-							Log.e(TAG, "No GCS Receiver object found");
-							return;
+					public void run() {
+						if (leftJoystickHeld && rightJoystickHeld) {
+							UAVObject gcsReceiver = objMngr.getObject("GCSReceiver");
+							if (gcsReceiver == null) {
+								Log.e(TAG, "No GCS Receiver object found");
+								return;
+							}
+
+							UAVObjectField channels = gcsReceiver.getField("Channel");
+							if(channels == null) {
+								Log.e(TAG, "GCS Receiver object ill formatted");
+								return;
+							}
+
+							channels.setValue(scaleChannel(throttle, CHANNEL_NEUTRAL_THROTTLE), THROTTLE_CHANNEL);
+							channels.setValue(scaleChannel(roll, CHANNEL_NEUTRAL), ROLL_CHANNEL);
+							channels.setValue(scaleChannel(pitch, CHANNEL_NEUTRAL), PITCH_CHANNEL);
+							channels.setValue(scaleChannel(yaw, CHANNEL_NEUTRAL), YAW_CHANNEL);
+							channels.setValue(scaleChannel(0, CHANNEL_NEUTRAL), FLIGHTMODE_CHANNEL);
+
+							gcsReceiver.updated();
+
+							if (DEBUG) Log.d(TAG, "Send update" + gcsReceiver.toStringData());
 						}
-						
-						UAVObjectField channels = gcsReceiver.getField("Channel");
-						if(channels == null) {
-							Log.e(TAG, "GCS Receiver object ill formatted");
-							return;
-						}
-						
-						channels.setValue(scaleChannel(throttle, CHANNEL_NEUTRAL_THROTTLE), THROTTLE_CHANNEL);
-						channels.setValue(scaleChannel(roll, CHANNEL_NEUTRAL), ROLL_CHANNEL);
-						channels.setValue(scaleChannel(pitch, CHANNEL_NEUTRAL), PITCH_CHANNEL);
-						channels.setValue(scaleChannel(yaw, CHANNEL_NEUTRAL), YAW_CHANNEL);
-						channels.setValue(scaleChannel(0, CHANNEL_NEUTRAL), FLIGHTMODE_CHANNEL);
-						
-						gcsReceiver.updated();
-						
-						Log.d(TAG, "Send update");
 						updated = false;
 					}
 				});

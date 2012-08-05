@@ -135,7 +135,6 @@ public class OPTelemetryService extends Service {
 	
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(OPTelemetryService.this);
 		if(prefs.getBoolean("autoconnect", false)) {
-			Toast.makeText(getApplicationContext(), "Should auto connect", Toast.LENGTH_SHORT).show();
 			Message msg = mServiceHandler.obtainMessage();
 			msg.arg1 = MSG_CONNECT;
 			msg.arg2 = 0;

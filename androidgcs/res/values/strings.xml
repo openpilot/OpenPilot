@@ -2,6 +2,7 @@
 <resources>
 	<string name="app_name">OpenPilot GCS Home</string>
 	<string name="object_browser_name">Browser</string>
+	<string name="controller_name">Controller</string>
 	<string name="pfd_name">PFD</string>
 	<string name="location_name">Map</string>
 	<string name="logger_name">Logging</string>
@@ -25,6 +26,5 @@
 	<string name="update_button">Update</string>
 	<string name="save_button">Save</string>
 	<string name="send_button">Send</string>
-	<string name="controller_name">Controller</string>
 	<string name="manual_control_values_">Manual control values:</string>
 </resources>

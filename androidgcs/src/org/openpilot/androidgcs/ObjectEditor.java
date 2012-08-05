@@ -7,13 +7,21 @@ import org.openpilot.uavtalk.UAVObject;
 import org.openpilot.uavtalk.UAVObjectField;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.Toast;
 
 public class ObjectEditor extends ObjectManagerActivity {
 
+	static final String TAG = "ObjectEditor"; 
 	String objectName;
-	int objectID;
-	int instID;
-	
+	long objectID;
+	long instID;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -98,6 +106,7 @@ public class ObjectEditor extends ObjectManagerActivity {
 		if (obj == null)
 			return false;
 
+		Log.d(TAG, "Updating object id " + obj.getObjID());
 		ObjectEditView editView = (ObjectEditView) findViewById(R.id.object_edit_view);
 
 		int field_idx = 0;

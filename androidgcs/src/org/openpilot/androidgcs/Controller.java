@@ -11,6 +11,7 @@ import org.openpilot.uavtalk.UAVObjectField;
 
 import com.MobileAnarchy.Android.Widgets.Joystick.DualJoystickView;
 import com.MobileAnarchy.Android.Widgets.Joystick.JoystickMovedListener;
+import com.MobileAnarchy.Android.Widgets.Joystick.JoystickView;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -50,6 +51,18 @@ public class Controller extends ObjectManagerActivity {
 			manualView.setText("Hello");
 	}
 
+	Observer settingsUpdated = new Observer() {
+		@Override
+		public void update(Observable observable, Object data) {
+			// Once we have updated settings we can active the GCS receiver mode
+			Log.d(TAG,"Got update from settings");
+			activateGcsReceiver();
+			UAVDataObject manualControlSettings = (UAVDataObject) objMngr.getObject("ManualControlSettings");
+			if(manualControlSettings != null) {
+				manualControlSettings.removeUpdatedObserver(this);
+			}
+		}
+	};
 	
 	@Override
 	void onOPConnected() {
@@ -60,16 +73,25 @@ public class Controller extends ObjectManagerActivity {
 		if(manualControl != null) {
 			manualControl.addUpdatedObserver(updatedObserver);
 		}
-		
-		activateGcsReceiver();
-		
-		DualJoystickView joystick = (DualJoystickView) findViewById(R.id.dualjoystickView);
 
+		
+		UAVDataObject manualControlSettings = (UAVDataObject) objMngr.getObject("ManualControlSettings");
+		if(manualControlSettings != null) {
+			Log.d(TAG, "Requested settings update");
+			manualControlSettings.addUpdatedObserver(updatedObserver);
+			manualControlSettings.updateRequested();
+		}		
+		
+		final double MOVEMENT_RANGE = 50.0;
+		DualJoystickView joystick = (DualJoystickView) findViewById(R.id.dualjoystickView);
+		joystick.setMovementConstraint(JoystickView.CONSTRAIN_BOX);
+		joystick.setMovementRange((int)MOVEMENT_RANGE, (int)MOVEMENT_RANGE);
+		
 		// Hardcode a Mode 1 listener for now
 		joystick.setOnJostickMovedListener(new JoystickMovedListener() {
 			public void OnMoved(int pan, int tilt) {
-				pitch = -(double) tilt / 10.0;
-				yaw = (double) pan / 10.0;
+				pitch = (double) tilt / MOVEMENT_RANGE;
+				yaw = (double) pan / MOVEMENT_RANGE;
 				updated = true;
 				leftJoystickHeld = true;
 			}
@@ -78,8 +100,11 @@ public class Controller extends ObjectManagerActivity {
 			public void OnReturnedToCenter() { }
 		}, new JoystickMovedListener() {
 			public void OnMoved(int pan, int tilt) {
-				throttle = (double) (tilt + 10) / 20.0;
-				roll = (double) pan / 10.0;
+				throttle = (double) (-tilt + (MOVEMENT_RANGE -5)) / (MOVEMENT_RANGE - 5);
+				throttle *= 0.5;
+				if (throttle < 0)
+					throttle = -1;
+				roll = (double) pan / MOVEMENT_RANGE;
 				updated = true;
 				rightJoystickHeld = true;
 			}
@@ -120,7 +145,7 @@ public class Controller extends ObjectManagerActivity {
 				});
 			}
 		};
-		sendTimer.schedule(controllerTask, 500, 50);
+		sendTimer.schedule(controllerTask, 500, 100);
 	}
 
 	/**
@@ -155,6 +180,7 @@ public class Controller extends ObjectManagerActivity {
 	 */
 	private void activateGcsReceiver() {
 		UAVObject manualControlSettings = objMngr.getObject("ManualControlSettings");
+		
 		if (manualControlSettings == null) {
 			Toast.makeText(this, "Failed to get manual control settings", Toast.LENGTH_SHORT).show();
 			return;

@@ -159,7 +159,7 @@ public class TelemetryMonitor extends Observable{
 //	    objPending = null;
 	    
 	    if(!success) {
-	    	Log.e(TAG, "Transaction failed: " + obj.getName() + " sending again.");
+	    	//Log.e(TAG, "Transaction failed: " + obj.getName() + " sending again.");
 	    	return;
 	    }
 	    

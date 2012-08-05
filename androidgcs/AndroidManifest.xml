@@ -23,7 +23,7 @@
 
 		<activity android:name="ObjectBrowser" android:label="@string/object_browser_name" />
 		<activity android:name="PFD" android:label="PFD" />
-		<activity android:name="Controller" android:label="@string/object_browser_name" />
+		<activity android:name="Controller" android:label="@string/controller_name" />
 		<activity android:name="Preferences" android:label="@string/preference_title" />
 		<activity android:name="UAVLocation" android:label="@string/location_name"/>
 		<activity android:name="ObjectEditor" android:label="ObjectEditor"

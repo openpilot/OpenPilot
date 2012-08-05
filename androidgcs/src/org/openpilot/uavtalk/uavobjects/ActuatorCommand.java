@@ -148,7 +148,7 @@ public class ActuatorCommand extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0x5324CB8;
+	protected static final long OBJID = 0x5324CB8l;
 	protected static final String NAME = "ActuatorCommand";
 	protected static String DESCRIPTION = "Contains the pulse duration sent to each of the channels.  Set by @ref ActuatorModule";
 	protected static final boolean ISSINGLEINST = 1 > 0;

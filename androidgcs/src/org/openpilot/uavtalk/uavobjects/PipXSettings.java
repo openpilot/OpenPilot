@@ -315,7 +315,7 @@ public class PipXSettings extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0xBA192BCA;
+	protected static final long OBJID = 0xBA192BCAl;
 	protected static final String NAME = "PipXSettings";
 	protected static String DESCRIPTION = "PipXtreme configurations options.";
 	protected static final boolean ISSINGLEINST = 1 > 0;

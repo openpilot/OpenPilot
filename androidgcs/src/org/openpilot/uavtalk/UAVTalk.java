@@ -12,7 +12,7 @@ import android.util.Log;
 public class UAVTalk extends Observable {
 
 	static final String TAG = "UAVTalk";
-	public static int LOGLEVEL = 0;
+	public static int LOGLEVEL = -1;
 	public static boolean WARN = LOGLEVEL > 1;
 	public static boolean DEBUG = LOGLEVEL > 0;
 
@@ -107,8 +107,8 @@ public class UAVTalk extends Observable {
 	ByteBuffer rxTmpBuffer /* 4 */;
 	ByteBuffer rxBuffer;
 	int rxType;
-	int rxObjId;
-	int rxInstId;
+	long rxObjId;
+	long rxInstId;
 	int rxLength;
 	int rxPacketLength;
 
@@ -343,9 +343,13 @@ public class UAVTalk extends Observable {
 
 			// Search for object, if not found reset state machine
 			rxObjId = rxTmpBuffer.getInt(0);
+			// Because java treats ints as only signed we need to do this manually
+			if (rxObjId < 0) 
+				rxObjId = 0x100000000l + rxObjId;
 			{
 				UAVObject rxObj = objMngr.getObject(rxObjId);
 				if (rxObj == null) {
+					Log.d(TAG, "Unknown ID: " + rxObjId);
 					stats.rxErrors++;
 					rxState = RxStateType.STATE_SYNC;
 					break;
@@ -475,8 +479,10 @@ public class UAVTalk extends Observable {
 	 * for all instances. \param[in] data Data buffer \param[in] length Buffer
 	 * length \return Success (true), Failure (false)
 	 */
-	public boolean receiveObject(int type, int objId, int instId,
+	public boolean receiveObject(int type, long objId, long instId,
 			ByteBuffer data) {
+		
+		if (DEBUG) Log.d(TAG, "Received object ID: " + objId);
 		assert (objMngr != null);
 
 		UAVObject obj = null;
@@ -559,7 +565,7 @@ public class UAVTalk extends Observable {
 	 * Update the data of an object from a byte array (unpack). If the object
 	 * instance could not be found in the list, then a new one is created.
 	 */
-	public synchronized UAVObject updateObject(int objId, int instId,
+	public synchronized UAVObject updateObject(long objId, long instId,
 			ByteBuffer data) {
 		assert (objMngr != null);
 

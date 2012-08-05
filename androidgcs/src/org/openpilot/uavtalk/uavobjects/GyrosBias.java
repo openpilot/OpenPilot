@@ -135,7 +135,7 @@ public class GyrosBias extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0xE4B6F980;
+	protected static final long OBJID = 0xE4B6F980l;
 	protected static final String NAME = "GyrosBias";
 	protected static String DESCRIPTION = "The gyro data.";
 	protected static final boolean ISSINGLEINST = 1 > 0;

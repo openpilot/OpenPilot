@@ -203,7 +203,7 @@ public class GPSSatellites extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0x920D998;
+	protected static final long OBJID = 0x920D998l;
 	protected static final String NAME = "GPSSatellites";
 	protected static String DESCRIPTION = "Contains information about the GPS satellites in view from @ref GPSModule.";
 	protected static final boolean ISSINGLEINST = 1 > 0;

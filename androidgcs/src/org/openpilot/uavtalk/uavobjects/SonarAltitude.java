@@ -127,7 +127,7 @@ public class SonarAltitude extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0x6C5A0CBC;
+	protected static final long OBJID = 0x6C5A0CBCl;
 	protected static final String NAME = "SonarAltitude";
 	protected static String DESCRIPTION = "The raw data from the ultrasound sonar sensor with altitude estimate.";
 	protected static final boolean ISSINGLEINST = 1 > 0;

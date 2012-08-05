@@ -139,7 +139,7 @@ public class Gyros extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0x4228AF6;
+	protected static final long OBJID = 0x4228AF6l;
 	protected static final String NAME = "Gyros";
 	protected static String DESCRIPTION = "The gyro data.";
 	protected static final boolean ISSINGLEINST = 1 > 0;

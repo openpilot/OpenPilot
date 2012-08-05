@@ -152,7 +152,7 @@ public class GCSTelemetryStats extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0xABC72744;
+	protected static final long OBJID = 0xABC72744l;
 	protected static final String NAME = "GCSTelemetryStats";
 	protected static String DESCRIPTION = "The telemetry statistics from the ground computer";
 	protected static final boolean ISSINGLEINST = 1 > 0;

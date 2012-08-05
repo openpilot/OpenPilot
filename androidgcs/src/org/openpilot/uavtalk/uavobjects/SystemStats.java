@@ -155,7 +155,7 @@ public class SystemStats extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0x364D1406;
+	protected static final long OBJID = 0x364D1406l;
 	protected static final String NAME = "SystemStats";
 	protected static String DESCRIPTION = "CPU and memory usage from OpenPilot computer. ";
 	protected static final boolean ISSINGLEINST = 1 > 0;

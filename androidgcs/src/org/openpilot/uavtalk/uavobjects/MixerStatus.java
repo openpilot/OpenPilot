@@ -163,7 +163,7 @@ public class MixerStatus extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0x124E28A;
+	protected static final long OBJID = 0x124E28Al;
 	protected static final String NAME = "MixerStatus";
 	protected static String DESCRIPTION = "Status for the matrix mixer showing the output of each mixer after all scaling";
 	protected static final boolean ISSINGLEINST = 1 > 0;

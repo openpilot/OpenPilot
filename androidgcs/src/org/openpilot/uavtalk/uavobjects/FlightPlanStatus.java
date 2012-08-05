@@ -172,7 +172,7 @@ public class FlightPlanStatus extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0x2206EE46;
+	protected static final long OBJID = 0x2206EE46l;
 	protected static final String NAME = "FlightPlanStatus";
 	protected static String DESCRIPTION = "Status of the flight plan script";
 	protected static final boolean ISSINGLEINST = 1 > 0;

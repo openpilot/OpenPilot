@@ -192,7 +192,7 @@ public class TaskInfo extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0xB81CD2AE;
+	protected static final long OBJID = 0xB81CD2AEl;
 	protected static final String NAME = "TaskInfo";
 	protected static String DESCRIPTION = "Task information";
 	protected static final boolean ISSINGLEINST = 1 > 0;

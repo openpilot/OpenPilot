@@ -135,7 +135,7 @@ public class BaroAltitude extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0x99622E6A;
+	protected static final long OBJID = 0x99622E6Al;
 	protected static final String NAME = "BaroAltitude";
 	protected static String DESCRIPTION = "The raw data from the barometric sensor with pressure, temperature and altitude estimate.";
 	protected static final boolean ISSINGLEINST = 1 > 0;

@@ -214,7 +214,7 @@ public class TxPIDSettings extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0x42B2D2AE;
+	protected static final long OBJID = 0x42B2D2AEl;
 	protected static final String NAME = "TxPIDSettings";
 	protected static String DESCRIPTION = "Settings used by @ref TxPID optional module to tune PID settings using R/C transmitter";
 	protected static final boolean ISSINGLEINST = 1 > 0;

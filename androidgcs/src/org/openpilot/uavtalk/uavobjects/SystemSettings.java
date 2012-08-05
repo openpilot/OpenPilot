@@ -159,7 +159,7 @@ public class SystemSettings extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0xC72A326E;
+	protected static final long OBJID = 0xC72A326El;
 	protected static final String NAME = "SystemSettings";
 	protected static String DESCRIPTION = "Select airframe type.  Currently used by @ref ActuatorModule to choose mixing from @ref ActuatorDesired to @ref ActuatorCommand";
 	protected static final boolean ISSINGLEINST = 1 > 0;

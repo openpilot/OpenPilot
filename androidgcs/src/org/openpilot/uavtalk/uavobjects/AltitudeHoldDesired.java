@@ -139,7 +139,7 @@ public class AltitudeHoldDesired extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0x495BAD6E;
+	protected static final long OBJID = 0x495BAD6El;
 	protected static final String NAME = "AltitudeHoldDesired";
 	protected static String DESCRIPTION = "Holds the desired altitude (from manual control) as well as the desired attitude to pass through";
 	protected static final boolean ISSINGLEINST = 1 > 0;

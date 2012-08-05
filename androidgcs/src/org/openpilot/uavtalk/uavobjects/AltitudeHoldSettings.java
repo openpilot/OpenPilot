@@ -158,7 +158,7 @@ public class AltitudeHoldSettings extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0xFEC55B42;
+	protected static final long OBJID = 0xFEC55B42l;
 	protected static final String NAME = "AltitudeHoldSettings";
 	protected static String DESCRIPTION = "Settings for the @ref AltitudeHold module";
 	protected static final boolean ISSINGLEINST = 1 > 0;

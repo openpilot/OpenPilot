@@ -160,7 +160,7 @@ public class HomeLocation extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0x6185DC6E;
+	protected static final long OBJID = 0x6185DC6El;
 	protected static final String NAME = "HomeLocation";
 	protected static String DESCRIPTION = "HomeLocation setting which contains the constants to tranlate from longitutde and latitude to NED reference frame.  Automatically set by @ref GPSModule after acquiring a 3D lock.  Used by @ref AHRSCommsModule.";
 	protected static final boolean ISSINGLEINST = 1 > 0;

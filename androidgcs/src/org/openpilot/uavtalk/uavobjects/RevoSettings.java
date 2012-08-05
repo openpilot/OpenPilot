@@ -132,7 +132,7 @@ public class RevoSettings extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0xE2DA70EA;
+	protected static final long OBJID = 0xE2DA70EAl;
 	protected static final String NAME = "RevoSettings";
 	protected static String DESCRIPTION = "Settings for the revo to control the algorithm and what is updated";
 	protected static final boolean ISSINGLEINST = 1 > 0;

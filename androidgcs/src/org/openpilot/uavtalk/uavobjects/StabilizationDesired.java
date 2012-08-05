@@ -152,7 +152,7 @@ public class StabilizationDesired extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0xDE1EAAD6;
+	protected static final long OBJID = 0xDE1EAAD6l;
 	protected static final String NAME = "StabilizationDesired";
 	protected static String DESCRIPTION = "The desired attitude that @ref StabilizationModule will try and achieve if FlightMode is Stabilized.  Comes from @ref ManaulControlModule.";
 	protected static final boolean ISSINGLEINST = 1 > 0;

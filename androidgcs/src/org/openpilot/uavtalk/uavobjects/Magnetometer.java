@@ -135,7 +135,7 @@ public class Magnetometer extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0x813B55DE;
+	protected static final long OBJID = 0x813B55DEl;
 	protected static final String NAME = "Magnetometer";
 	protected static String DESCRIPTION = "The mag data.";
 	protected static final boolean ISSINGLEINST = 1 > 0;

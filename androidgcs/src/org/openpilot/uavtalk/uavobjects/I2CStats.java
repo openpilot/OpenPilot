@@ -226,7 +226,7 @@ public class I2CStats extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0xB714823E;
+	protected static final long OBJID = 0xB714823El;
 	protected static final String NAME = "I2CStats";
 	protected static String DESCRIPTION = "Tracks statistics on the I2C bus.";
 	protected static final boolean ISSINGLEINST = 1 > 0;

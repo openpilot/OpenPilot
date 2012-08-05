@@ -151,7 +151,7 @@ public class AttitudeActual extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0x33DAD5E6;
+	protected static final long OBJID = 0x33DAD5E6l;
 	protected static final String NAME = "AttitudeActual";
 	protected static String DESCRIPTION = "The updated Attitude estimation from @ref AHRSCommsModule.";
 	protected static final boolean ISSINGLEINST = 1 > 0;

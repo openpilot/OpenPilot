@@ -148,7 +148,7 @@ public class Waypoint extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0x338C5F90;
+	protected static final long OBJID = 0x338C5F90l;
 	protected static final String NAME = "Waypoint";
 	protected static String DESCRIPTION = "A waypoint the aircraft can try and hit.  Used by the @ref PathPlanner module";
 	protected static final boolean ISSINGLEINST = 0 > 0;

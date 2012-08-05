@@ -302,7 +302,7 @@ public class StabilizationSettings extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0xBBC337D4;
+	protected static final long OBJID = 0xBBC337D4l;
 	protected static final String NAME = "StabilizationSettings";
 	protected static String DESCRIPTION = "PID settings used by the Stabilization module to combine the @ref AttitudeActual and @ref AttitudeDesired to compute @ref ActuatorDesired";
 	protected static final boolean ISSINGLEINST = 1 > 0;

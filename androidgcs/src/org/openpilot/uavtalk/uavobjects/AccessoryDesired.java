@@ -130,8 +130,8 @@ public class AccessoryDesired extends UAVDataObject {
 	protected static final long OBJID = 0xC409985A;
 	protected static final String NAME = "AccessoryDesired";
 	protected static String DESCRIPTION = "Desired Auxillary actuator settings.  Comes from @ref ManualControlModule.";
-	protected static final boolean ISSINGLEINST = 0 == 1;
-	protected static final boolean ISSETTINGS = 0 == 1;
+	protected static final boolean ISSINGLEINST = 0 > 0;
+	protected static final boolean ISSETTINGS = 0 > 0;
 	protected static int NUMBYTES = 0;
 
 

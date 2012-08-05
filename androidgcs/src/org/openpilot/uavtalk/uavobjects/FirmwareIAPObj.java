@@ -204,8 +204,8 @@ public class FirmwareIAPObj extends UAVDataObject {
 	protected static final long OBJID = 0x3CCDFB68;
 	protected static final String NAME = "FirmwareIAPObj";
 	protected static String DESCRIPTION = "Queries board for SN, model, revision, and sends reset command";
-	protected static final boolean ISSINGLEINST = 1 == 1;
-	protected static final boolean ISSETTINGS = 0 == 1;
+	protected static final boolean ISSINGLEINST = 1 > 0;
+	protected static final boolean ISSETTINGS = 0 > 0;
 	protected static int NUMBYTES = 0;
 
 

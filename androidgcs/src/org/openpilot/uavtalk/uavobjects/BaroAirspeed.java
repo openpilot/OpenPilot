@@ -145,8 +145,8 @@ public class BaroAirspeed extends UAVDataObject {
 	protected static final long OBJID = 0x169EA4A;
 	protected static final String NAME = "BaroAirspeed";
 	protected static String DESCRIPTION = "The raw data from the dynamic pressure sensor with pressure, temperature and airspeed.";
-	protected static final boolean ISSINGLEINST = 1 == 1;
-	protected static final boolean ISSETTINGS = 0 == 1;
+	protected static final boolean ISSINGLEINST = 1 > 0;
+	protected static final boolean ISSETTINGS = 0 > 0;
 	protected static int NUMBYTES = 0;
 
 

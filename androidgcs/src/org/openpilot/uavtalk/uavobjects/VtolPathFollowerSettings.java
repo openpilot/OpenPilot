@@ -224,8 +224,8 @@ public class VtolPathFollowerSettings extends UAVDataObject {
 	protected static final long OBJID = 0x973991F6;
 	protected static final String NAME = "VtolPathFollowerSettings";
 	protected static String DESCRIPTION = "Settings for the @ref VtolPathFollower module";
-	protected static final boolean ISSINGLEINST = 1 == 1;
-	protected static final boolean ISSETTINGS = 1 == 1;
+	protected static final boolean ISSINGLEINST = 1 > 0;
+	protected static final boolean ISSETTINGS = 1 > 0;
 	protected static int NUMBYTES = 0;
 
 

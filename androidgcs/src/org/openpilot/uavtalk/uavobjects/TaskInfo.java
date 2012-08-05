@@ -195,8 +195,8 @@ public class TaskInfo extends UAVDataObject {
 	protected static final long OBJID = 0xB81CD2AE;
 	protected static final String NAME = "TaskInfo";
 	protected static String DESCRIPTION = "Task information";
-	protected static final boolean ISSINGLEINST = 1 == 1;
-	protected static final boolean ISSETTINGS = 0 == 1;
+	protected static final boolean ISSINGLEINST = 1 > 0;
+	protected static final boolean ISSETTINGS = 0 > 0;
 	protected static int NUMBYTES = 0;
 
 

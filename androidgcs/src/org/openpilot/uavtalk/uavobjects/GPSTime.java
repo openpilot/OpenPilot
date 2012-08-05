@@ -150,8 +150,8 @@ public class GPSTime extends UAVDataObject {
 	protected static final long OBJID = 0xD4478084;
 	protected static final String NAME = "GPSTime";
 	protected static String DESCRIPTION = "Contains the GPS time from @ref GPSModule.  Required to compute the world magnetic model correctly when setting the home location.";
-	protected static final boolean ISSINGLEINST = 1 == 1;
-	protected static final boolean ISSETTINGS = 0 == 1;
+	protected static final boolean ISSINGLEINST = 1 > 0;
+	protected static final boolean ISSETTINGS = 0 > 0;
 	protected static int NUMBYTES = 0;
 
 

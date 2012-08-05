@@ -154,8 +154,8 @@ public class PathDesired extends UAVDataObject {
 	protected static final long OBJID = 0x5A4DC71A;
 	protected static final String NAME = "PathDesired";
 	protected static String DESCRIPTION = "The endpoint or path the craft is trying to achieve.  Can come from @ref ManualControl or @ref PathPlanner ";
-	protected static final boolean ISSINGLEINST = 1 == 1;
-	protected static final boolean ISSETTINGS = 0 == 1;
+	protected static final boolean ISSINGLEINST = 1 > 0;
+	protected static final boolean ISSETTINGS = 0 > 0;
 	protected static int NUMBYTES = 0;
 
 

@@ -126,8 +126,8 @@ $(INITFIELDS)
 	protected static final long OBJID = $(OBJIDHEX);
 	protected static final String NAME = "$(NAME)";
 	protected static String DESCRIPTION = "$(DESCRIPTION)";
-	protected static final boolean ISSINGLEINST = $(ISSINGLEINST) == 1;
-	protected static final boolean ISSETTINGS = $(ISSETTINGS) == 1;
+	protected static final boolean ISSINGLEINST = $(ISSINGLEINST) > 0;
+	protected static final boolean ISSETTINGS = $(ISSETTINGS) > 0;
 	protected static int NUMBYTES = 0;
 
 

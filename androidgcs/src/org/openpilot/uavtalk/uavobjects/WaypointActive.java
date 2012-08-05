@@ -130,8 +130,8 @@ public class WaypointActive extends UAVDataObject {
 	protected static final long OBJID = 0x1EA5B192;
 	protected static final String NAME = "WaypointActive";
 	protected static String DESCRIPTION = "Indicates the currently active waypoint";
-	protected static final boolean ISSINGLEINST = 1 == 1;
-	protected static final boolean ISSETTINGS = 0 == 1;
+	protected static final boolean ISSINGLEINST = 1 > 0;
+	protected static final boolean ISSETTINGS = 0 > 0;
 	protected static int NUMBYTES = 0;
 
 

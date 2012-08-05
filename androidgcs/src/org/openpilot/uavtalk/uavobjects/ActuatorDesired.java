@@ -150,8 +150,8 @@ public class ActuatorDesired extends UAVDataObject {
 	protected static final long OBJID = 0xCA4BC4A4;
 	protected static final String NAME = "ActuatorDesired";
 	protected static String DESCRIPTION = "Desired raw, pitch and yaw actuator settings.  Comes from either @ref StabilizationModule or @ref ManualControlModule depending on FlightMode.";
-	protected static final boolean ISSINGLEINST = 1 == 1;
-	protected static final boolean ISSETTINGS = 0 == 1;
+	protected static final boolean ISSINGLEINST = 1 > 0;
+	protected static final boolean ISSETTINGS = 0 > 0;
 	protected static int NUMBYTES = 0;
 
 

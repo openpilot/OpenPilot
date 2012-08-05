@@ -344,8 +344,8 @@ public class ManualControlSettings extends UAVDataObject {
 	protected static final long OBJID = 0x6C188320;
 	protected static final String NAME = "ManualControlSettings";
 	protected static String DESCRIPTION = "Settings to indicate how to decode receiver input by @ref ManualControlModule.";
-	protected static final boolean ISSINGLEINST = 1 == 1;
-	protected static final boolean ISSETTINGS = 1 == 1;
+	protected static final boolean ISSINGLEINST = 1 > 0;
+	protected static final boolean ISSETTINGS = 1 > 0;
 	protected static int NUMBYTES = 0;
 
 

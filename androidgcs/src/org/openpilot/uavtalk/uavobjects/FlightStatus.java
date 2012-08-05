@@ -149,8 +149,8 @@ public class FlightStatus extends UAVDataObject {
 	protected static final long OBJID = 0x884FEF66;
 	protected static final String NAME = "FlightStatus";
 	protected static String DESCRIPTION = "Contains major flight status information for other modules.";
-	protected static final boolean ISSINGLEINST = 1 == 1;
-	protected static final boolean ISSETTINGS = 0 == 1;
+	protected static final boolean ISSINGLEINST = 1 > 0;
+	protected static final boolean ISSETTINGS = 0 > 0;
 	protected static int NUMBYTES = 0;
 
 

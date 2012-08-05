@@ -137,8 +137,8 @@ public class GCSReceiver extends UAVDataObject {
 	protected static final long OBJID = 0xCC7E1470;
 	protected static final String NAME = "GCSReceiver";
 	protected static String DESCRIPTION = "A receiver channel group carried over the telemetry link.";
-	protected static final boolean ISSINGLEINST = 1 == 1;
-	protected static final boolean ISSETTINGS = 0 == 1;
+	protected static final boolean ISSINGLEINST = 1 > 0;
+	protected static final boolean ISSETTINGS = 0 > 0;
 	protected static int NUMBYTES = 0;
 
 

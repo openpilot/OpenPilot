@@ -173,8 +173,8 @@ public class FlightBatterySettings extends UAVDataObject {
 	protected static final long OBJID = 0x94AC6AD2;
 	protected static final String NAME = "FlightBatterySettings";
 	protected static String DESCRIPTION = "Flight Battery configuration.";
-	protected static final boolean ISSINGLEINST = 1 == 1;
-	protected static final boolean ISSETTINGS = 1 == 1;
+	protected static final boolean ISSINGLEINST = 1 > 0;
+	protected static final boolean ISSETTINGS = 1 > 0;
 	protected static int NUMBYTES = 0;
 
 

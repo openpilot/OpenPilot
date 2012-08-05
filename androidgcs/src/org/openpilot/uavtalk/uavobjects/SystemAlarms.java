@@ -169,8 +169,8 @@ public class SystemAlarms extends UAVDataObject {
 	protected static final long OBJID = 0x737ADCF2;
 	protected static final String NAME = "SystemAlarms";
 	protected static String DESCRIPTION = "Alarms from OpenPilot to indicate failure conditions or warnings.  Set by various modules.";
-	protected static final boolean ISSINGLEINST = 1 == 1;
-	protected static final boolean ISSETTINGS = 0 == 1;
+	protected static final boolean ISSINGLEINST = 1 > 0;
+	protected static final boolean ISSETTINGS = 0 > 0;
 	protected static int NUMBYTES = 0;
 
 

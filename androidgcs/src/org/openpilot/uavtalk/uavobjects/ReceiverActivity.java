@@ -144,8 +144,8 @@ public class ReceiverActivity extends UAVDataObject {
 	protected static final long OBJID = 0x1E7C53DA;
 	protected static final String NAME = "ReceiverActivity";
 	protected static String DESCRIPTION = "Monitors which receiver channels have been active within the last second.";
-	protected static final boolean ISSINGLEINST = 1 == 1;
-	protected static final boolean ISSETTINGS = 0 == 1;
+	protected static final boolean ISSINGLEINST = 1 > 0;
+	protected static final boolean ISSETTINGS = 0 > 0;
 	protected static int NUMBYTES = 0;
 
 

@@ -10,14 +10,9 @@ import org.openpilot.uavtalk.UAVObjectManager;
 import org.openpilot.uavtalk.UAVTalk;
 import org.openpilot.uavtalk.uavobjects.UAVObjectsInitialize;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -47,6 +42,7 @@ public class OPTelemetryService extends Service {
 	// Variables for local message handler thread
 	private Looper mServiceLooper;
 	private ServiceHandler mServiceHandler;
+	private static HandlerThread thread;
 
 	// Message ids
 	static final int MSG_START        = 0;
@@ -117,9 +113,9 @@ public class OPTelemetryService extends Service {
 				stopSelf();
 
 				break;
-			case MSG_TOAST:
-				Toast.makeText(OPTelemetryService.this, (String) msg.obj, Toast.LENGTH_SHORT);
-				break;
+            case MSG_TOAST:
+            	Toast.makeText(OPTelemetryService.this, (String) msg.obj, Toast.LENGTH_SHORT).show();
+            	break;
 			default:
 				System.out.println(msg.toString());
 				throw new Error("Invalid message");
@@ -130,8 +126,7 @@ public class OPTelemetryService extends Service {
 	public void startup() {
 		Toast.makeText(getApplicationContext(), "Telemetry service starting", Toast.LENGTH_SHORT).show();
 		
-		HandlerThread thread = new HandlerThread("TelemetryServiceHandler",
-				Process.THREAD_PRIORITY_BACKGROUND);
+		thread = new HandlerThread("TelemetryServiceHandler", Process.THREAD_PRIORITY_BACKGROUND);
 		thread.start();
 
 		// Get the HandlerThread's Looper and use it for our Handler 
@@ -139,8 +134,8 @@ public class OPTelemetryService extends Service {
 		mServiceHandler = new ServiceHandler(mServiceLooper);
 	
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(OPTelemetryService.this);
-		if(prefs.getBoolean("autoconnect", false) || true) {
-			Toast.makeText(getApplicationContext(), "Should auto connect", Toast.LENGTH_SHORT);
+		if(prefs.getBoolean("autoconnect", false)) {
+			Toast.makeText(getApplicationContext(), "Should auto connect", Toast.LENGTH_SHORT).show();
 			Message msg = mServiceHandler.obtainMessage();
 			msg.arg1 = MSG_CONNECT;
 			msg.arg2 = 0;
@@ -177,7 +172,7 @@ public class OPTelemetryService extends Service {
 			return (TelemTask) activeTelem;
 		}
 		public void openConnection() {
-			Toast.makeText(getApplicationContext(), "Requested open connection", Toast.LENGTH_SHORT);
+			Toast.makeText(getApplicationContext(), "Requested open connection", Toast.LENGTH_SHORT).show();
 			Message msg = mServiceHandler.obtainMessage();
 			msg.arg1 = MSG_CONNECT;
 			mServiceHandler.sendMessage(msg);
@@ -296,9 +291,10 @@ public class OPTelemetryService extends Service {
 				}
 			}
 			if( ! bt.getConnected() ) {
+				toastMessage("BT connection failed");
 				return;
 			}
-
+			toastMessage("BT Connected");
 
 			if (DEBUG) Log.d(TAG, "Connected via bluetooth");
 
@@ -352,8 +348,8 @@ public class OPTelemetryService extends Service {
 
 				tcp.connect(objMngr);
 
-				if (DEBUG) Log.d(TAG, "Done attempting connection");
 				if( tcp.getConnected() )
+					
 					break;
 
 				try {
@@ -364,10 +360,11 @@ public class OPTelemetryService extends Service {
 					return;
 				}
 			}
-			if( ! tcp.getConnected() ) {
+			if( ! tcp.getConnected() || terminate ) {
+				toastMessage("TCP connection failed");
 				return;
 			}
-
+			toastMessage("TCP Connected");
 
 			if (DEBUG) Log.d(TAG, "Connected via network");
 
@@ -395,20 +392,4 @@ public class OPTelemetryService extends Service {
 		}
 
 	};
-
-	void postNotification(int id, String message) {
-		String ns = Context.NOTIFICATION_SERVICE;
-		NotificationManager mNManager = (NotificationManager) getSystemService(ns);
-		final Notification msg = new Notification(R.drawable.icon, message, System.currentTimeMillis());
-
-		Context context = getApplicationContext(); 
-		CharSequence contentTitle = "OpenPilot";
-		CharSequence contentText = message; 
-		Intent msgIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://forums.openpilot.org"));
-		PendingIntent intent = PendingIntent.getActivity(this, 0, msgIntent, Intent.FLAG_ACTIVITY_NEW_TASK);		
-
-		msg.setLatestEventInfo(context, contentTitle, contentText, intent);
-
-		mNManager.notify(id, msg);
-	}
 }

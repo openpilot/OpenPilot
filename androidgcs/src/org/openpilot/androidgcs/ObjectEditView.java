@@ -19,7 +19,7 @@ import android.widget.TextView;
 public class ObjectEditView extends GridLayout {
 
 	String objectName;
-	List<View> fields;
+	public List<View> fields;
 
 	public ObjectEditView(Context context) {
 		super(context);		

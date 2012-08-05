@@ -14,19 +14,18 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
 import org.openpilot.uavtalk.UAVDataObject;
-import org.openpilot.uavtalk.UAVObject;
 
 public class ObjectBrowser extends ObjectManagerActivity implements OnSharedPreferenceChangeListener {
 
@@ -61,7 +60,6 @@ public class ObjectBrowser extends ObjectManagerActivity implements OnSharedPref
 
 	@Override
 	void onOPConnected() {
-		Toast.makeText(this,"Telemetry estabilished",Toast.LENGTH_SHORT);
 		Log.d(TAG, "onOPConnected()");
 		
 		OnCheckedChangeListener checkListener = new OnCheckedChangeListener() {
@@ -75,6 +73,19 @@ public class ObjectBrowser extends ObjectManagerActivity implements OnSharedPref
 		((CheckBox) findViewById(R.id.dataCheck)).setOnCheckedChangeListener(checkListener);
 		((CheckBox) findViewById(R.id.settingsCheck)).setOnCheckedChangeListener(checkListener);
 		
+		((Button) findViewById(R.id.editButton)).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (selected_index > 0) {
+					Intent intent = new Intent(ObjectBrowser.this, ObjectEditor.class);
+					intent.putExtra("org.openpilot.androidgcs.ObjectName", allObjects.get(selected_index).getName());
+					intent.putExtra("org.openpilot.androidgcs.ObjectId", allObjects.get(selected_index).getObjID());
+					intent.putExtra("org.openpilot.androidgcs.InstId", allObjects.get(selected_index).getInstID());
+					startActivity(intent);
+				}
+			}
+		});
+
 		updateList();
 	}
 

@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  android:layout_width="match_parent"
-  android:layout_height="match_parent">
-	<org.openpilot.androidgcs.ObjectEditView android:layout_height="wrap_content" android:text="ObjectEditor: " android:id="@+id/object_edit_view" android:layout_alignParentTop="true" android:layout_width="wrap_content" android:layout_centerHorizontal="true" android:textStyle="bold"></org.openpilot.androidgcs.ObjectEditView>
-	<Button android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_alignParentBottom="true" android:id="@+id/object_edit_send_button" android:text="@string/send_button"></Button>
-	<Button android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/object_edit_save_button" android:text="@string/save_button" android:layout_toRightOf="@+id/object_edit_send_button" android:layout_alignTop="@+id/object_edit_send_button" android:layout_alignBottom="@+id/object_edit_send_button"></Button>
-</RelativeLayout>

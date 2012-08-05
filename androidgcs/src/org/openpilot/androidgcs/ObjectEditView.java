@@ -2,20 +2,23 @@ package org.openpilot.androidgcs;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 
 import org.openpilot.uavtalk.UAVObjectField;
 
 import android.content.Context;
+import android.text.InputType;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.GridLayout;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
-public class ObjectEditView extends LinearLayout {
+public class ObjectEditView extends GridLayout {
 
-	TextView objectName;
+	String objectName;
 	List<View> fields;
 
 	public ObjectEditView(Context context) {
@@ -36,79 +39,63 @@ public class ObjectEditView extends LinearLayout {
 	public void initObjectEditView() {
 		// Set orientation of layout to vertical 
 		setOrientation(LinearLayout.VERTICAL);
-
-		objectName = new TextView(getContext());
-		objectName.setText("");
-		objectName.setTextSize(14);
-
-		// Lay them out in the compound control. 
-		int lHeight = LayoutParams.WRAP_CONTENT; 
-		int lWidth = LayoutParams.FILL_PARENT;
-		addView(objectName, new LinearLayout.LayoutParams(lWidth, lHeight));
-
+		setColumnCount(2);
 		fields = new ArrayList<View>();
 	}
 
 	public void setName(String name) {
-		objectName.setText(name);
+		objectName = name;
 	}
 
 	public void addField(UAVObjectField field) {
-		if(field.getNumElements() == 1) {
-			FieldValue fieldView = new FieldValue(getContext());
-			fieldView.setName(field.getName());
-			if(field.isNumeric()) {
-				fieldView.setValue(new Double(field.getDouble()).toString());
-			} else {
-				fieldView.setValue(field.getValue().toString());
-			}
-			fields.add(fieldView);
-			addView(fieldView, new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.FILL_PARENT));
-		} 
-		else {
-			ListIterator<String> names = field.getElementNames().listIterator();
-			int i = 0;
-			while(names.hasNext()) {
-				FieldValue fieldView = new FieldValue(getContext());
-				fieldView.setName(field.getName() + "-" + names.next());
-				if(field.isNumeric()) {
-					fieldView.setValue(new Double(field.getDouble(i)).toString());
-				} else {
-					fieldView.setValue(field.getValue(i).toString());
-				}
-				i++;
-				fields.add(fieldView);
-				addView(fieldView, new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.FILL_PARENT));
-
-			}
-		}
+		for (int i = 0; i < field.getNumElements(); i++)
+			addRow(getContext(), field, i);
 	}
-
-	public class FieldValue extends LinearLayout {
-
-		TextView fieldName;
-		EditText fieldValue;
-
-		public FieldValue(Context context) {
-			super(context);
-			setOrientation(LinearLayout.HORIZONTAL);
-
-			fieldName = new TextView(getContext());
-			fieldValue = new EditText(getContext());
-
-			// Lay them out in the compound control.
-			addView(fieldName, new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.FILL_PARENT));
-			fieldValue.setWidth(300);
-			addView(fieldValue, new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+	
+	
+	public void addRow(Context context, UAVObjectField field, int idx) {
+		int row = getRowCount();
+		
+		TextView fieldName = new TextView(context);
+		if(field.getNumElements() == 1) {
+			fieldName.setText(field.getName());
+		} else {
+			fieldName.setText(field.getName() + "-" + field.getElementNames().get(idx));
 		}
+		addView(fieldName, new GridLayout.LayoutParams(spec(row), spec(0)));
 
-		public void setName(String name) {
-			fieldName.setText(name);
+		View fieldValue = null;
+		switch(field.getType()) 
+		{
+		case FLOAT32:
+			fieldValue = new EditText(context);
+			((EditText)fieldValue).setText(field.getValue(idx).toString());
+			((EditText)fieldValue).setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+			break;
+		case INT8:
+		case INT16:
+		case INT32:
+			fieldValue = new EditText(context);
+			((EditText)fieldValue).setText(field.getValue(idx).toString());
+			((EditText)fieldValue).setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED);
+			break;
+		case UINT8:
+		case UINT16:
+		case UINT32:
+			fieldValue = new EditText(context);
+			((EditText)fieldValue).setText(field.getValue(idx).toString());
+			((EditText)fieldValue).setInputType(InputType.TYPE_CLASS_NUMBER);
+			break;
+		case ENUM:
+			fieldValue = new Spinner(context);
+			ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item);
+			adapter.addAll(field.getOptions());
+			((Spinner) fieldValue).setAdapter(adapter);
+			break;
 		}
-
-		public void setValue(String value) {
-			fieldValue.setText(value);
-		}		
+		
+		addView(fieldValue, new GridLayout.LayoutParams(spec(row), spec(1)));
+		fields.add(fieldValue);
 	}
 
 }

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>792</width>
-    <height>828</height>
+    <width>727</width>
+    <height>704</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -594,8 +594,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>762</width>
-            <height>727</height>
+            <width>697</width>
+            <height>603</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_12" stretch="0,0,0,0,0">
@@ -627,6 +627,9 @@
              </property>
              <property name="alignment">
               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+             </property>
+             <property name="flat">
+              <bool>false</bool>
              </property>
              <layout class="QGridLayout" name="gridLayout_19">
               <property name="horizontalSpacing">
@@ -6926,8 +6929,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>762</width>
-            <height>727</height>
+            <width>697</width>
+            <height>603</height>
            </rect>
           </property>
           <property name="autoFillBackground">
@@ -8709,7 +8712,7 @@ value as the Kp.</string>
                    </property>
                    <property name="minimumSize">
                     <size>
-                     <width>0</width>
+                     <width>85</width>
                      <height>22</height>
                     </size>
                    </property>
@@ -9963,7 +9966,7 @@ border-radius: 5;</string>
                    </property>
                    <property name="minimumSize">
                     <size>
-                     <width>0</width>
+                     <width>85</width>
                      <height>22</height>
                     </size>
                    </property>
@@ -10106,7 +10109,7 @@ value as the Kp.</string>
                    </property>
                    <property name="minimumSize">
                     <size>
-                     <width>0</width>
+                     <width>85</width>
                      <height>22</height>
                     </size>
                    </property>
@@ -16704,8 +16707,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>762</width>
-            <height>727</height>
+            <width>682</width>
+            <height>697</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_9">
@@ -19863,7 +19866,7 @@ border-radius: 5;</string>
               </size>
              </property>
              <property name="title">
-              <string>Ilimits</string>
+              <string>Integral Limits</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_9">
               <property name="horizontalSpacing">

@@ -497,8 +497,9 @@ public class JoystickView extends View {
 					public void run() {
 						touchX += intervalsX;
 						touchY += intervalsY;
-						
-						reportOnMoved();
+	
+						// No longer reportOnMoved() in this method because we only
+						// want to receive inputs from the user
 						invalidate();
 						
 						if (moveListener != null && j == numberOfFrames - 1) {

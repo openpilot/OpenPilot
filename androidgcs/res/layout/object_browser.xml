@@ -47,9 +47,9 @@
                 android:id="@+id/object_list"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:drawSelectorOnTop="true" 
-                android:choiceMode="singleChoice"/>
+                android:layout_weight="2"
+                android:choiceMode="singleChoice"
+                android:drawSelectorOnTop="true" />
             
             <View
                 android:layout_width="1dip"

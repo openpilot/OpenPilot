@@ -26,6 +26,7 @@ import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
 import org.openpilot.uavtalk.UAVDataObject;
+import org.openpilot.uavtalk.UAVObject;
 
 public class ObjectBrowser extends ObjectManagerActivity implements OnSharedPreferenceChangeListener {
 
@@ -82,6 +83,24 @@ public class ObjectBrowser extends ObjectManagerActivity implements OnSharedPref
 					intent.putExtra("org.openpilot.androidgcs.ObjectId", allObjects.get(selected_index).getObjID());
 					intent.putExtra("org.openpilot.androidgcs.InstId", allObjects.get(selected_index).getInstID());
 					startActivity(intent);
+				}
+			}
+		});
+		
+		((Button) findViewById(R.id.object_load_button)).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				UAVObject objPer = objMngr.getObject("ObjectPersistence");
+
+				if (selected_index > 0 && objPer != null) {
+					objPer.getField("Operation").setValue("Load");
+					objPer.getField("Selection").setValue("SingleObject");
+					Log.d(TAG,"Loading with object id: " + allObjects.get(selected_index).getObjID());
+					objPer.getField("ObjectID").setValue(allObjects.get(selected_index).getObjID());
+					objPer.getField("InstanceID").setValue(0);
+					objPer.updated();
+					
+					allObjects.get(selected_index).updateRequested();
 				}
 			}
 		});

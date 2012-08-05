@@ -8019,6 +8019,9 @@ border-radius: 5;</string>
                    <property name="styleSheet">
                     <string notr="true"/>
                    </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
                    <property name="decimals">
                     <number>6</number>
                    </property>
@@ -8636,6 +8639,9 @@ value as the Kp.</string>
                    <property name="styleSheet">
                     <string notr="true"/>
                    </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
                    <property name="decimals">
                     <number>5</number>
                    </property>
@@ -8683,6 +8689,9 @@ value as the Kp.</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                    </property>
                    <property name="decimals">
                     <number>5</number>
@@ -8734,6 +8743,9 @@ You can usually go for higher values for Yaw factors.</string>
                    <property name="styleSheet">
                     <string notr="true"/>
                    </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
                    <property name="decimals">
                     <number>5</number>
                    </property>
@@ -8780,6 +8792,9 @@ You can usually go for higher values for Yaw factors.</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                    </property>
                    <property name="decimals">
                     <number>6</number>
@@ -9986,6 +10001,9 @@ Then lower the value by 20% or so.</string>
                    <property name="styleSheet">
                     <string notr="true"/>
                    </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
                    <property name="decimals">
                     <number>5</number>
                    </property>
@@ -10049,6 +10067,9 @@ value as the Kp.</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                    </property>
                    <property name="decimals">
                     <number>5</number>
@@ -10129,6 +10150,9 @@ Then lower the value by 20% or so.</string>
                    <property name="styleSheet">
                     <string notr="true"/>
                    </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
                    <property name="decimals">
                     <number>5</number>
                    </property>
@@ -10175,6 +10199,9 @@ Then lower the value by 20% or so.</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                    </property>
                    <property name="decimals">
                     <number>6</number>
@@ -12992,6 +13019,9 @@ border-radius: 5;</string>
                    <property name="styleSheet">
                     <string notr="true"/>
                    </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
                    <property name="decimals">
                     <number>3</number>
                    </property>
@@ -13035,6 +13065,9 @@ border-radius: 5;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                    </property>
                    <property name="decimals">
                     <number>3</number>
@@ -13082,6 +13115,9 @@ border-radius: 5;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                    </property>
                    <property name="decimals">
                     <number>3</number>
@@ -13165,6 +13201,9 @@ border-radius: 5;</string>
                    <property name="styleSheet">
                     <string notr="true"/>
                    </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
                    <property name="decimals">
                     <number>3</number>
                    </property>
@@ -13224,6 +13263,9 @@ border-radius: 5;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                    </property>
                    <property name="decimals">
                     <number>3</number>
@@ -13287,6 +13329,9 @@ border-radius: 5;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                    </property>
                    <property name="decimals">
                     <number>3</number>
@@ -14384,6 +14429,9 @@ border-radius: 5;</string>
                    <property name="styleSheet">
                     <string notr="true"/>
                    </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
                    <property name="decimals">
                     <number>0</number>
                    </property>
@@ -14464,6 +14512,9 @@ border-radius: 5;</string>
                    <property name="styleSheet">
                     <string notr="true"/>
                    </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
                    <property name="decimals">
                     <number>0</number>
                    </property>
@@ -14530,6 +14581,9 @@ border-radius: 5;</string>
                    <property name="styleSheet">
                     <string notr="true"/>
                    </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
                    <property name="decimals">
                     <number>0</number>
                    </property>
@@ -14580,6 +14634,9 @@ border-radius: 5;</string>
                    <property name="styleSheet">
                     <string notr="true"/>
                    </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
                    <property name="decimals">
                     <number>0</number>
                    </property>
@@ -14625,6 +14682,9 @@ border-radius: 5;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                    </property>
                    <property name="decimals">
                     <number>0</number>
@@ -15830,6 +15890,9 @@ border-radius: 5;</string>
                    <property name="styleSheet">
                     <string notr="true"/>
                    </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
                    <property name="decimals">
                     <number>0</number>
                    </property>
@@ -16446,6 +16509,9 @@ border-radius: 5;</string>
                    <property name="styleSheet">
                     <string notr="true"/>
                    </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
                    <property name="decimals">
                     <number>0</number>
                    </property>
@@ -16496,6 +16562,12 @@ border-radius: 5;</string>
                    <property name="styleSheet">
                     <string notr="true"/>
                    </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                   <property name="buttonSymbols">
+                    <enum>QAbstractSpinBox::UpDownArrows</enum>
+                   </property>
                    <property name="decimals">
                     <number>0</number>
                    </property>
@@ -16544,6 +16616,9 @@ border-radius: 5;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                    </property>
                    <property name="decimals">
                     <number>0</number>
@@ -18173,6 +18248,9 @@ border-radius: 5;</string>
                    <property name="styleSheet">
                     <string notr="true"/>
                    </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
                    <property name="decimals">
                     <number>2</number>
                    </property>
@@ -18237,6 +18315,9 @@ border-radius: 5;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                    </property>
                    <property name="decimals">
                     <number>0</number>
@@ -19741,6 +19822,9 @@ border-radius: 5;</string>
                    <property name="styleSheet">
                     <string notr="true"/>
                    </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
                    <property name="decimals">
                     <number>0</number>
                    </property>
@@ -19808,6 +19892,9 @@ border-radius: 5;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                    </property>
                    <property name="decimals">
                     <number>0</number>
@@ -20193,6 +20280,9 @@ border-radius: 5;</string>
                    <property name="styleSheet">
                     <string notr="true"/>
                    </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
                    <property name="decimals">
                     <number>4</number>
                    </property>
@@ -20242,6 +20332,9 @@ border-radius: 5;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                    </property>
                    <property name="decimals">
                     <number>4</number>
@@ -21393,6 +21486,9 @@ border-radius: 5;</string>
                    <property name="styleSheet">
                     <string notr="true"/>
                    </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
                    <property name="decimals">
                     <number>2</number>
                    </property>
@@ -21467,6 +21563,9 @@ border-radius: 5;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                    </property>
                    <property name="decimals">
                     <number>2</number>
@@ -21574,6 +21673,9 @@ border-radius: 5;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                    </property>
                    <property name="decimals">
                     <number>2</number>
@@ -22184,6 +22286,9 @@ border-radius: 5;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                    </property>
                    <property name="decimals">
                     <number>4</number>
@@ -23342,6 +23447,9 @@ border-radius: 5;</string>
                    <property name="styleSheet">
                     <string notr="true"/>
                    </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
                    <property name="decimals">
                     <number>3</number>
                    </property>
@@ -24491,6 +24599,9 @@ border-radius: 5;</string>
                    <property name="styleSheet">
                     <string notr="true"/>
                    </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
                    <property name="decimals">
                     <number>3</number>
                    </property>
@@ -25102,6 +25213,9 @@ border-radius: 5;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                    </property>
                    <property name="decimals">
                     <number>5</number>

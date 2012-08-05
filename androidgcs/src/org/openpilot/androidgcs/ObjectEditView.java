@@ -91,6 +91,7 @@ public class ObjectEditView extends GridLayout {
 			ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item);
 			adapter.addAll(field.getOptions());
 			((Spinner) fieldValue).setAdapter(adapter);
+			((Spinner) fieldValue).setSelection((int) field.getDouble(idx));
 			break;
 		}
 		

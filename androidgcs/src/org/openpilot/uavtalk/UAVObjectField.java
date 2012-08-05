@@ -390,7 +390,14 @@ public class UAVObjectField {
     }
     
     public double getDouble() { return getDouble(0); };
-    public double getDouble(int index) {
+    @SuppressWarnings("unchecked")
+	public double getDouble(int index) {
+    	switch (type) {
+    	case ENUM:
+    		return ((List<Byte>)data).get(index);
+    	default:
+    		break;
+    	}
     	return ((Number) getValue(index)).doubleValue();
     }
     

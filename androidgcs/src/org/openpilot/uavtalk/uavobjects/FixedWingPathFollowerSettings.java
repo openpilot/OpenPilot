@@ -231,8 +231,8 @@ public class FixedWingPathFollowerSettings extends UAVDataObject {
 	protected static final long OBJID = 0x8A3F1E02;
 	protected static final String NAME = "FixedWingPathFollowerSettings";
 	protected static String DESCRIPTION = "Settings for the @ref FixedWingPathFollowerModule";
-	protected static final boolean ISSINGLEINST = 1 == 1;
-	protected static final boolean ISSETTINGS = 1 == 1;
+	protected static final boolean ISSINGLEINST = 1 > 0;
+	protected static final boolean ISSETTINGS = 1 > 0;
 	protected static int NUMBYTES = 0;
 
 

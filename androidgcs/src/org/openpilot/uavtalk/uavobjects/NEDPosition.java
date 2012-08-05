@@ -138,8 +138,8 @@ public class NEDPosition extends UAVDataObject {
 	protected static final long OBJID = 0x1FB15A00;
 	protected static final String NAME = "NEDPosition";
 	protected static String DESCRIPTION = "Contains the current position relative to @ref HomeLocation";
-	protected static final boolean ISSINGLEINST = 1 == 1;
-	protected static final boolean ISSETTINGS = 0 == 1;
+	protected static final boolean ISSINGLEINST = 1 > 0;
+	protected static final boolean ISSETTINGS = 0 > 0;
 	protected static int NUMBYTES = 0;
 
 

@@ -165,8 +165,8 @@ public class ManualControlCommand extends UAVDataObject {
 	protected static final long OBJID = 0x1E82C2D2;
 	protected static final String NAME = "ManualControlCommand";
 	protected static String DESCRIPTION = "The output from the @ref ManualControlModule which descodes the receiver inputs.  Overriden by GCS for fly-by-wire control.";
-	protected static final boolean ISSINGLEINST = 1 == 1;
-	protected static final boolean ISSETTINGS = 0 == 1;
+	protected static final boolean ISSINGLEINST = 1 > 0;
+	protected static final boolean ISSETTINGS = 0 > 0;
 	protected static int NUMBYTES = 0;
 
 

@@ -131,8 +131,8 @@ public class FlightPlanSettings extends UAVDataObject {
 	protected static final long OBJID = 0x92E9FF76;
 	protected static final String NAME = "FlightPlanSettings";
 	protected static String DESCRIPTION = "Settings for the flight plan module, control the execution of the script";
-	protected static final boolean ISSINGLEINST = 1 == 1;
-	protected static final boolean ISSETTINGS = 1 == 1;
+	protected static final boolean ISSINGLEINST = 1 > 0;
+	protected static final boolean ISSETTINGS = 1 > 0;
 	protected static int NUMBYTES = 0;
 
 

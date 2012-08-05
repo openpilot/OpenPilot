@@ -198,8 +198,8 @@ public class AttitudeSettings extends UAVDataObject {
 	protected static final long OBJID = 0xC307BC4A;
 	protected static final String NAME = "AttitudeSettings";
 	protected static String DESCRIPTION = "Settings for the @ref Attitude module used on CopterControl";
-	protected static final boolean ISSINGLEINST = 1 == 1;
-	protected static final boolean ISSETTINGS = 1 == 1;
+	protected static final boolean ISSINGLEINST = 1 > 0;
+	protected static final boolean ISSETTINGS = 1 > 0;
 	protected static int NUMBYTES = 0;
 
 

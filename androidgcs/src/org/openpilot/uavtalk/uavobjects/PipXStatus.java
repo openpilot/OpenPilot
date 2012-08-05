@@ -293,8 +293,8 @@ public class PipXStatus extends UAVDataObject {
 	protected static final long OBJID = 0x3FC68A86;
 	protected static final String NAME = "PipXStatus";
 	protected static String DESCRIPTION = "PipXtreme device status.";
-	protected static final boolean ISSINGLEINST = 1 == 1;
-	protected static final boolean ISSETTINGS = 0 == 1;
+	protected static final boolean ISSINGLEINST = 1 > 0;
+	protected static final boolean ISSETTINGS = 0 > 0;
 	protected static int NUMBYTES = 0;
 
 

@@ -138,8 +138,8 @@ public class FaultSettings extends UAVDataObject {
 	protected static final long OBJID = 0x2778BA3C;
 	protected static final String NAME = "FaultSettings";
 	protected static String DESCRIPTION = "Allows testers to simulate various fault scenarios.";
-	protected static final boolean ISSINGLEINST = 1 == 1;
-	protected static final boolean ISSETTINGS = 1 == 1;
+	protected static final boolean ISSINGLEINST = 1 > 0;
+	protected static final boolean ISSETTINGS = 1 > 0;
 	protected static int NUMBYTES = 0;
 
 

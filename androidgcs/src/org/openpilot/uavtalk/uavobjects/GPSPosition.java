@@ -175,8 +175,8 @@ public class GPSPosition extends UAVDataObject {
 	protected static final long OBJID = 0xE2A323B6;
 	protected static final String NAME = "GPSPosition";
 	protected static String DESCRIPTION = "Raw GPS data from @ref GPSModule.  Should only be used by @ref AHRSCommsModule.";
-	protected static final boolean ISSINGLEINST = 1 == 1;
-	protected static final boolean ISSETTINGS = 0 == 1;
+	protected static final boolean ISSINGLEINST = 1 > 0;
+	protected static final boolean ISSETTINGS = 0 > 0;
 	protected static int NUMBYTES = 0;
 
 

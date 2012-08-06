@@ -50,6 +50,7 @@ private slots:
     void startButtonClicked();
     void stopButtonClicked();
 	void buttonClearLogClicked();
+    void onProcessOutput(QString text);
     void onAutopilotConnect();
     void onAutopilotDisconnect();
 	void onSimulatorConnect();
@@ -64,8 +65,8 @@ private:
 	QString strAutopilotDisconnected;
 	QString strSimulatorDisconnected;
 	QString strAutopilotConnected;
-	QString strSimulatorConnected;
-
+    QString strStyleEnable;
+    QString strStyleDisable;
 };
 
 #endif /* HITLWIDGET_H */

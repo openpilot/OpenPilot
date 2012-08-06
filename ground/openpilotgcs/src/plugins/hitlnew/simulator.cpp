@@ -40,6 +40,7 @@ const float Simulator::KT2MPS = 0.514444444;
 const float Simulator::INHG2KPA = 3.386;
 const float Simulator::FPS2CMPS = 30.48;
 const float Simulator::DEG2RAD = (M_PI/180.0);
+const float Simulator::RAD2DEG = (180.0/M_PI);
 
 
 Simulator::Simulator(const SimulatorSettings& params) :

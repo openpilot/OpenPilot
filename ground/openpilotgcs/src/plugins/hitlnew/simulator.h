@@ -32,22 +32,30 @@
 #include <QUdpSocket>
 #include <QTimer>
 #include <QProcess>
+#include <qmath.h>
+
 #include "qscopedpointer.h"
 #include "uavtalk/telemetrymanager.h"
 #include "uavobjectmanager.h"
-#include "actuatordesired.h"
-#include "manualcontrolcommand.h"
-// #include "altitudeactual.h"
-#include "positionactual.h"
-#include "velocityactual.h"
-#include "baroaltitude.h"
-#include "attitudeactual.h"
-#include "gpsposition.h"
-#include "homelocation.h"
+
 #include "accels.h"
-#include "gyros.h"
+#include "actuatordesired.h"
+#include "actuatorcommand.h"
+#include "attitudeactual.h"
+#include "attitudesettings.h"
+#include "baroaltitude.h"
+#include "baroairspeed.h"
+#include "gcsreceiver.h"
 #include "gcstelemetrystats.h"
+#include "gpsposition.h"
+#include "gpsvelocity.h"
+#include "gyros.h"
 #include "flightstatus.h"
+#include "homelocation.h"
+#include "manualcontrolcommand.h"
+#include "positionactual.h"
+#include "sonaraltitude.h"
+#include "velocityactual.h"
 
 #include "utils/coordinateconversions.h"
 
@@ -95,18 +103,45 @@
 
 typedef struct _CONNECTION
 {
-	QString simulatorId;
-	QString binPath;
-	QString dataPath;
-	QString hostAddress;
-        QString remoteHostAddress;
-	int outPort;
-	int inPort;
-	bool manual;
-        bool startSim;
-	QString latitude;
-	QString longitude;
+    QString simulatorId;
+    QString binPath;
+    QString dataPath;
+    QString hostAddress;
+    QString remoteHostAddress;
+    int outPort;
+    int inPort;
+    bool manual;
+    bool startSim;
+    QString latitude;
+    QString longitude;
 } SimulatorSettings;
+
+
+struct Output2OP{
+    float latitude;
+    float longitude;
+    float altitude;
+    float heading;
+    float groundspeed; //[m/s]
+    float calibratedAirspeed;    //[m/s]
+    float pitch;
+    float roll;
+    float pressure;
+    float temperature;
+    float velNorth;   //[m/s]
+    float velEast;    //[m/s]
+    float velDown;    //[m/s]
+    float dstN;       //[m]
+    float dstE;       //[m]
+    float dstD;       //[m]
+    float accX;       //[m/s^2]
+    float accY;       //[m/s^2]
+    float accZ;       //[m/s^2]
+    float rollRate;     //[deg/s]
+    float pitchRate;     //[deg/s]
+    float yawRate;     //[deg/s]
+};
+
 
 class Simulator : public QObject
 {
@@ -158,36 +193,41 @@ private slots:
 	virtual void processUpdate(const QByteArray& data) = 0;
 
 protected:
-        static const float GEE;
-        static const float FT2M;
-        static const float KT2MPS;
-        static const float INHG2KPA;
-        static const float FPS2CMPS;
-        static const float DEG2RAD;
 
-        QProcess* simProcess;
-	QTime* time;
-	QUdpSocket* inSocket;//(new QUdpSocket());
-	QUdpSocket* outSocket;
+    static const float GEE;
+    static const float FT2M;
+    static const float KT2MPS;
+    static const float INHG2KPA;
+    static const float FPS2CMPS;
+    static const float DEG2RAD;
+    static const float RAD2DEG;
 
-	ActuatorDesired* actDesired;
-        ManualControlCommand* manCtrlCommand;
-        FlightStatus* flightStatus;
-        BaroAltitude* altActual;
-	AttitudeActual* attActual;
-	VelocityActual* velActual;
-	PositionActual* posActual;
-	HomeLocation* posHome;
-	Accels* accels;
-	Gyros*  gyros;
-        GPSPosition* gpsPos;
-	GCSTelemetryStats* telStats;
+    QProcess* simProcess;
+    QTime* time;
+    QUdpSocket* inSocket;//(new QUdpSocket());
+    QUdpSocket* outSocket;
 
-	SimulatorSettings settings;
+    ActuatorCommand* actCommand;
+    ActuatorDesired* actDesired;
+    ManualControlCommand* manCtrlCommand;
+    FlightStatus* flightStatus;
+    BaroAltitude* baroAlt;
+    BaroAirspeed* baroAirspeed;
+    AttitudeActual* attActual;
+    VelocityActual* velActual;
+    GPSPosition* gpsPos;
+    GPSVelocity* gpsVel;
+    PositionActual* posActual;
+    HomeLocation* posHome;
+    Accels* accels;
+    Gyros*  gyros;
+    GCSTelemetryStats* telStats;
 
-	FLIGHT_PARAM current;
-	FLIGHT_PARAM old;
-	QMutex lock;
+    SimulatorSettings settings;
+
+    FLIGHT_PARAM current;
+    FLIGHT_PARAM old;
+    QMutex lock;
 
 private:
 

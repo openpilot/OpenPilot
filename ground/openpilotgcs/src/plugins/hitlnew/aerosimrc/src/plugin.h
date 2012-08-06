@@ -1,13 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       hitl.cpp
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @addtogroup GCSPlugins GCS Plugins
+ * @file       plugin.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010-2012.
+ * @addtogroup 3rdParty Third-party integration
  * @{
- * @addtogroup HITLPlugin HITL Plugin
+ * @addtogroup AeroSimRC AeroSimRC proxy plugin
  * @{
- * @brief The Hardware In The Loop plugin 
+ * @brief AeroSimRC simulator to HITL proxy plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -24,28 +24,30 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#include "hitlgadget.h"
-#include "hitlwidget.h"
-#include "hitlconfiguration.h"
-#include "simulator.h"
 
-HITLGadget::HITLGadget(QString classId, HITLWidget *widget, QWidget *parent) :
-        IUAVGadget(classId, parent),
-        m_widget(widget)
-{
-	connect(this,SIGNAL(changeConfiguration(void)),m_widget,SLOT(stopButtonClicked(void)));
-}
+#ifndef PLUGIN_H
+#define PLUGIN_H
 
-HITLGadget::~HITLGadget()
-{
-    delete m_widget;
-}
+#include <QtCore>
+#include <QTime>
+#include <QList>
+#include "aerosimrcdatastruct.h"
 
-void HITLGadget::loadConfiguration(IUAVGadgetConfiguration* config)
-{
-    HITLConfiguration *m = qobject_cast<HITLConfiguration*>(config);
-    // IL2 <-- Is this still necessary? [KDS]
-	emit changeConfiguration();
-	m_widget->setSettingParameters(m->Settings());
-}
+#define SIM_DLL_EXPORT extern "C" __declspec(dllexport)
 
+SIM_DLL_EXPORT void AeroSIMRC_Plugin_ReportStructSizes(
+    quint32 *sizeSimToPlugin,
+    quint32 *sizePluginToSim,
+    quint32 *sizePluginInit
+);
+
+SIM_DLL_EXPORT void AeroSIMRC_Plugin_Init(
+    pluginInit *p
+);
+
+SIM_DLL_EXPORT void AeroSIMRC_Plugin_Run(
+    const simToPlugin *stp,
+    pluginToSim *pts
+);
+
+#endif // PLUGIN_H

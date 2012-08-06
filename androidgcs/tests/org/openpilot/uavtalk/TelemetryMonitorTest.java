@@ -3,17 +3,9 @@ package org.openpilot.uavtalk;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.nio.ByteBuffer;
-import java.util.Observable;
-import java.util.Observer;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openpilot.uavtalk.uavobjects.UAVObjectsInitialize;
 import org.openpilot.uavtalk.UAVTalk;
@@ -53,6 +45,7 @@ public class TelemetryMonitorTest {
 		inputStream.start();
 		
 		Telemetry tel = new Telemetry(talk, objMngr);
+		@SuppressWarnings("unused")
 		TelemetryMonitor mon = new TelemetryMonitor(objMngr,tel);
 		
 		Thread.sleep(10000);

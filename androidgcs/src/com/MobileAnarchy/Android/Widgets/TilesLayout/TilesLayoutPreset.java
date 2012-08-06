@@ -13,14 +13,12 @@ public class TilesLayoutPreset {
 	// =========================================
 
 	private List<TilePosition> _positions;
-	private String _presetName;
 
 	// =========================================
 	// Constructors
 	// =========================================
 
 	public TilesLayoutPreset(String name) {
-		_presetName = name;
 		_positions = new LinkedList<TilePosition>();
 	}
 	

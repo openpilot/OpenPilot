@@ -4,8 +4,8 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.os.Handler;
 import android.util.AttributeSet;
+import android.util.FloatMath;
 import android.util.Log;
 import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
@@ -70,8 +70,8 @@ public class JoystickView extends View {
 	private int cX, cY;
 
 	//Size of the view in view coordinates
-	private int dimX, dimY;
-
+	private int dimX;
+	
 	//Cartesian coordinates of last touch point - joystick center is (0,0)
 	private int cartX, cartY;
 	
@@ -242,8 +242,6 @@ public class JoystickView extends View {
 		int d = Math.min(getMeasuredWidth(), getMeasuredHeight());
 
 		dimX = d;
-		dimY = d;
-
 		cX = d / 2;
 		cY = d / 2;
 		
@@ -315,7 +313,7 @@ public class JoystickView extends View {
 	private void constrainCircle() {
 		float diffX = touchX;
 		float diffY = touchY;
-		double radial = Math.sqrt((diffX*diffX) + (diffY*diffY));
+		double radial = FloatMath.sqrt((diffX*diffX) + (diffY*diffY));
 		if ( radial > movementRadius ) {
 			touchX = (int)((diffX / radial) * movementRadius);
 			touchY = (int)((diffY / radial) * movementRadius);

@@ -3,10 +3,7 @@ package com.MobileAnarchy.Android.Widgets.TilesLayout;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.R;
 import android.content.Context;
-import android.graphics.Color;
-import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
@@ -108,7 +105,7 @@ public class TilesLayout extends FrameLayout {
 
 	private void Init(AttributeSet attrs) {
 		animatedTransitionDuration = 750;
-		tileBackgroundResourceId = R.drawable.edit_text;
+		tileBackgroundResourceId = android.R.drawable.edit_text;
 		tiles = new ArrayList<SingleTileLayout>();
 	}
 	

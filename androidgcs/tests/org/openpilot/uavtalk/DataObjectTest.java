@@ -10,8 +10,6 @@ import org.junit.Test;
 import org.openpilot.uavtalk.uavobjects.ActuatorCommand;
 import org.openpilot.uavtalk.uavobjects.UAVObjectsInitialize;
 
-import android.database.Observable;
-
 public class DataObjectTest {
 
  boolean succeed = false;

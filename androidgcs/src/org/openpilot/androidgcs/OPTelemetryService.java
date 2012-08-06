@@ -228,7 +228,14 @@ public class OPTelemetryService extends Service {
 			UAVDataObject attitudeActual = (UAVDataObject) objMngr.getObject("AttitudeActual");
 			UAVDataObject homeLocation = (UAVDataObject) objMngr.getObject("HomeLocation");
 			UAVDataObject positionActual = (UAVDataObject) objMngr.getObject("PositionActual");
-
+			UAVDataObject systemAlarms = (UAVDataObject) objMngr.getObject("SystemAlarms");
+			
+			systemAlarms.getField("Alarm").setValue("Warning",0);
+			systemAlarms.getField("Alarm").setValue("OK",1);
+			systemAlarms.getField("Alarm").setValue("Critical",2);
+			systemAlarms.getField("Alarm").setValue("Error",3);
+			systemAlarms.updated();
+			
 			homeLocation.getField("Latitude").setDouble(379420315);
 			homeLocation.getField("Longitude").setDouble(-88330078);
 			homeLocation.getField("Be").setDouble(26702.78710938,0);
@@ -250,6 +257,7 @@ public class OPTelemetryService extends Service {
 				roll = (roll + 10) % 180;
 				pitch = (pitch + 10) % 180;
 				yaw = (yaw + 10) % 360;
+				
 				systemStats.updated();
 				attitudeActual.updated();
 				positionActual.updated();

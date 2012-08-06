@@ -16,6 +16,7 @@ import com.google.android.maps.MapController;
 import com.google.android.maps.MapView; 
 import com.google.android.maps.Overlay;
 import com.google.android.maps.Projection;
+import com.google.android.maps.MyLocationOverlay;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -23,6 +24,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
@@ -69,6 +72,12 @@ public class UAVLocation extends MapActivity
 		List<Overlay> overlays = mapView.getOverlays();
 		UAVOverlay myOverlay = new UAVOverlay(); 
 		overlays.add(myOverlay); 
+		
+		MyLocationOverlay myLocationOverlay = new MyLocationOverlay(this, mapView);
+		myLocationOverlay.enableMyLocation();
+		myLocationOverlay.enableCompass();
+		overlays.add(myLocationOverlay);
+	    
 		mapView.postInvalidate();
 
 		// ObjectManager related stuff (can't inherit standard class)
@@ -110,12 +119,15 @@ public class UAVLocation extends MapActivity
 	}
 
 	public class UAVOverlay extends Overlay {
+		Bitmap homeSymbol = BitmapFactory.decodeResource(getResources(), R.drawable.ic_home);
+		Bitmap uavSymbol = BitmapFactory.decodeResource(getResources(), R.drawable.ic_uav);
 		@Override 
 		public void draw(Canvas canvas, MapView mapView, boolean shadow) {
 			
 			Projection projection = mapView.getProjection();
 			
-			if (shadow == false) { 
+			if (shadow == false) {
+
 				Point myPoint = new Point(); 
 				projection.toPixels(uavLocation, myPoint);
 				
@@ -125,15 +137,12 @@ public class UAVLocation extends MapActivity
 				paint.setARGB(250, 255, 0, 0); 
 				paint.setAntiAlias(true); 
 				paint.setFakeBoldText(true);
-				
-				// Create the circle 
-				int rad = 5; 
-				RectF oval = new RectF(myPoint.x-rad, myPoint.y-rad, myPoint.x+rad, myPoint.y+rad);
-				
+								
 				// Draw on the canvas 
-				canvas.drawOval(oval, paint); 
-				canvas.drawText("UAV", myPoint.x+rad, myPoint.y, paint);								
-
+				canvas.drawBitmap(uavSymbol, myPoint.x - uavSymbol.getWidth() / 2, 
+						myPoint.y - uavSymbol.getHeight() / 2, paint);
+				canvas.drawText("UAV", myPoint.x+uavSymbol.getWidth() / 2, myPoint.y, paint);								
+				
 				//// Draw Home
 				myPoint = new Point();
 				projection.toPixels(homeLocation, myPoint);
@@ -143,13 +152,9 @@ public class UAVLocation extends MapActivity
 				paint.setAntiAlias(true); 
 				paint.setFakeBoldText(true);
 				
-				// Create the circle 
-				rad = 5; 
-				oval = new RectF(myPoint.x-rad, myPoint.y-rad, myPoint.x+rad, myPoint.y+rad);
-				
-				// Draw on the canvas 
-				canvas.drawOval(oval, paint); 
-				canvas.drawText("Home", myPoint.x+rad, myPoint.y, paint);								
+				canvas.drawBitmap(homeSymbol, myPoint.x - homeSymbol.getWidth() / 2, 
+						myPoint.y - homeSymbol.getHeight() / 2, paint);
+				canvas.drawText("Home", myPoint.x+homeSymbol.getWidth(), myPoint.y, paint);								
 
 			} 
 		}
@@ -178,8 +183,7 @@ public class UAVLocation extends MapActivity
 					System.out.println("HomeLocation: " + homeLocation.toString());
 				}				
 			});
-		// Hacky - trigger an update
-		obj.updated();
+		obj.updateRequested();
 		
 		obj = objMngr.getObject("PositionActual");
 		if(obj != null)
@@ -188,9 +192,10 @@ public class UAVLocation extends MapActivity
 					UAVDataObject obj = (UAVDataObject) data;
 					Double north = obj.getField("North").getDouble();
 					Double east = obj.getField("East").getDouble();
-					// TODO: Correct convertion from NED to LLA.  This is erroneous conversion from cm to deg
-					uavLocation = new GeoPoint((int) (homeLocation.getLatitudeE6() + north / 100 * 1e6 / 78847),
-							(int) (homeLocation.getLongitudeE6() + east / 100 * 1e6 / 78847));
+
+					// TODO: Correct convertion from NED to LLA.  This is erroneous conversion from m to deg
+					uavLocation = new GeoPoint((int) (homeLocation.getLatitudeE6() + (20+north) * 1e6 / 78847),
+							(int) (homeLocation.getLongitudeE6() + east* 1e6 / 78847));
 					runOnUiThread(new Runnable() {
 						public void run() {
 							mapView.invalidate();
@@ -248,7 +253,7 @@ public class UAVLocation extends MapActivity
 			if (DEBUG) Log.d(TAG,"Service bound");
 			mBound = true;
 			binder = (LocalBinder) service;
-			
+
 			if(binder.isConnected()) {
 				TelemTask task;
 				if((task = binder.getTelemTask(0)) != null) {

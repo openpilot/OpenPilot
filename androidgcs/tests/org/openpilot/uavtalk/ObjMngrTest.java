@@ -1,7 +1,5 @@
 package org.openpilot.uavtalk;
 
-import static org.junit.Assert.*;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openpilot.uavtalk.uavobjects.UAVObjectsInitialize;

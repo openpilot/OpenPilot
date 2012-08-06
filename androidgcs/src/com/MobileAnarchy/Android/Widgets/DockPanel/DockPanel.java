@@ -82,16 +82,16 @@ public class DockPanel extends LinearLayout {
 		if (position == DockPosition.LEFT || position == DockPosition.RIGHT) {
 			handleContainer.setLayoutParams(new LayoutParams(
 					android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
-					android.view.ViewGroup.LayoutParams.FILL_PARENT, 1));
+					android.view.ViewGroup.LayoutParams.MATCH_PARENT, 1));
 			contentPlaceHolder.setLayoutParams(new LayoutParams(
 					android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
-					android.view.ViewGroup.LayoutParams.FILL_PARENT, 1));
+					android.view.ViewGroup.LayoutParams.MATCH_PARENT, 1));
 		} else {
 			handleContainer.setLayoutParams(new LayoutParams(
-					android.view.ViewGroup.LayoutParams.FILL_PARENT,
+					android.view.ViewGroup.LayoutParams.MATCH_PARENT,
 					android.view.ViewGroup.LayoutParams.WRAP_CONTENT, 1));
 			contentPlaceHolder.setLayoutParams(new LayoutParams(
-					android.view.ViewGroup.LayoutParams.FILL_PARENT,
+					android.view.ViewGroup.LayoutParams.MATCH_PARENT,
 					android.view.ViewGroup.LayoutParams.WRAP_CONTENT, 1));
 		}
 

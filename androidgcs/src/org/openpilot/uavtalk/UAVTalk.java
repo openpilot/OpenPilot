@@ -18,8 +18,6 @@ public class UAVTalk extends Observable {
 
 	private Thread inputProcessingThread = null;
 	
-	private boolean streamFailed = false;
-
 	/**
 	 * A reference to the thread for processing the incoming stream.  Currently this method is ONLY
 	 * used for unit testing

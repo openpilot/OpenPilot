@@ -41,6 +41,13 @@ public class HomePage extends ObjectManagerActivity {
 			}			
 		});
 
+		Button logger = (Button) findViewById(R.id.launch_logger);
+		logger.setOnClickListener(new OnClickListener() {
+			public void onClick(View arg0) {
+				startActivity(new Intent(HomePage.this, Logger.class));	
+			}
+		});
+
 	}
 
 }

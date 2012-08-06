@@ -1,7 +1,13 @@
 package org.openpilot.androidgcs;
 
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Observable;
+import java.util.Observer;
+
 import org.openpilot.androidgcs.OPTelemetryService.LocalBinder;
 import org.openpilot.androidgcs.OPTelemetryService.TelemTask;
+import org.openpilot.uavtalk.UAVObject;
 import org.openpilot.uavtalk.UAVObjectManager;
 
 import android.app.Activity;
@@ -12,6 +18,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.Menu;
@@ -24,11 +31,15 @@ public abstract class ObjectManagerActivity extends Activity {
 	private static int LOGLEVEL = 0;
 //	private static boolean WARN = LOGLEVEL > 1;
 	private static boolean DEBUG = LOGLEVEL > 0;
-
+	
+	//! Object manager, populated by parent for the children to use
 	UAVObjectManager objMngr;
-    boolean mBound = false;
-    boolean mConnected = false;
-    LocalBinder binder;
+	//! Indicates if the activity is bound to the service
+	boolean mBound = false;
+	//! Indicates if telemetry is connected
+	boolean mConnected = false;
+	//! The binder to access the telemetry task, and thus the object manager
+	LocalBinder binder;
     
 
 	/** Called when the activity is first created. */
@@ -42,7 +53,6 @@ public abstract class ObjectManagerActivity extends Activity {
 				Log.d(TAG, "Received intent");
 				TelemTask task;
 				if(intent.getAction().compareTo(OPTelemetryService.INTENT_ACTION_CONNECTED) == 0) {
-					
 					if(binder  == null)
 						return;
 					if((task = binder.getTelemTask(0)) == null)
@@ -67,10 +77,57 @@ public abstract class ObjectManagerActivity extends Activity {
 		registerReceiver(connectedReceiver, filter);
 	}
 	
+	/**
+	 * Called whenever any objects subscribed to via registerObjects 
+	 */
+	protected void objectUpdated(UAVObject obj) {
+		
+	}
+	
+	/**
+	 * A message handler and a custom Observer to use it which calls
+	 * objectUpdated with the right object type
+	 */
+	final Handler uavobjHandler = new Handler(); 	
+	private class UpdatedObserver implements Observer  {
+		UAVObject obj;
+		UpdatedObserver(UAVObject obj) { this.obj = obj; };
+		public void update(Observable observable, Object data) {
+			uavobjHandler.post(new Runnable() {
+				@Override
+				public void run() { objectUpdated(obj); }
+			});
+		}
+	};
+
+	/**
+	 * Register an activity to receive updates from this object
+	 * 
+	 * the objectUpdated() method will be called in the original UI thread
+	 */
+	protected void registerObjectUpdates(UAVObject object) {
+		object.addUpdatedObserver(new UpdatedObserver(object));
+	}
+	protected void registerObjectUpdates(List<List<UAVObject>> objects) {
+		ListIterator<List<UAVObject>> li = objects.listIterator();
+		while(li.hasNext()) {
+			ListIterator<UAVObject> li2 = li.next().listIterator();
+			while(li2.hasNext())
+				registerObjectUpdates(li2.next());
+		}
+	}
+	
+	/**
+	 * Called when either the telemetry establishes a connection or
+	 * if it already has on creation of this activity
+	 */
 	void onOPConnected() {
 		
 	}
 	
+	/**
+	 * Called when telemetry drops the connection
+	 */
 	void onOPDisconnected() {
 		
 	}

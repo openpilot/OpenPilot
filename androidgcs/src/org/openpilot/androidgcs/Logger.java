@@ -12,6 +12,7 @@ import org.openpilot.uavtalk.UAVTalk;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.widget.TextView;
 
 
 public class Logger extends ObjectManagerActivity {
@@ -25,6 +26,9 @@ public class Logger extends ObjectManagerActivity {
 	private boolean logging;
 	private FileOutputStream fileStream;
 	private UAVTalk uavTalk;
+	
+	private int writtenBytes;
+	private int writtenObjects;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -48,6 +52,8 @@ public class Logger extends ObjectManagerActivity {
 				fileStream = new FileOutputStream(file);
 				uavTalk = new UAVTalk(null, fileStream, objMngr);
 				logging = true;
+				writtenBytes = 0;
+				writtenObjects = 0;
 			} else {
 				Log.e(TAG, "Unwriteable address");
 			}
@@ -124,6 +130,12 @@ public class Logger extends ObjectManagerActivity {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			
+			writtenBytes += obj.getNumBytes();
+			writtenObjects ++;
+
+			((TextView) findViewById(R.id.logger_number_of_bytes)).setText(Integer.valueOf(writtenBytes).toString());
+			((TextView) findViewById(R.id.logger_number_of_objects)).setText(Integer.valueOf(writtenObjects).toString());			
 		}
 	}
 }

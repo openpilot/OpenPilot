@@ -1,5 +1,6 @@
 package org.openpilot.androidgcs;
 
+import java.io.IOException;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -99,6 +100,7 @@ public class OPTelemetryService extends Service {
 			case MSG_DISCONNECT:
 				Toast.makeText(getApplicationContext(), "Disconnect requested", Toast.LENGTH_SHORT).show();
 				terminate = true;
+				activeTelem.interrupt();
 				try {
 					activeTelem.join();
 				} catch (InterruptedException e) {
@@ -123,6 +125,10 @@ public class OPTelemetryService extends Service {
 		}
 	};
 
+	/**
+	 * Called when the service starts.  It creates a thread to handle messages (e.g. connect and disconnect)
+	 * and based on the stored preference will send itself a connect signal if needed.
+	 */
 	public void startup() {
 		Toast.makeText(getApplicationContext(), "Telemetry service starting", Toast.LENGTH_SHORT).show();
 		
@@ -139,7 +145,7 @@ public class OPTelemetryService extends Service {
 			msg.arg1 = MSG_CONNECT;
 			msg.arg2 = 0;
 			mServiceHandler.sendMessage(msg);
-		}				
+		}
 
 	}
 	
@@ -193,6 +199,9 @@ public class OPTelemetryService extends Service {
 		mServiceHandler.sendMessage(msg);
 	}
 
+	/**
+	 * This is used by other processes to get a handle to the object manager
+	 */
 	public interface TelemTask {
 		public UAVObjectManager getObjectManager();
 	};
@@ -314,8 +323,14 @@ public class OPTelemetryService extends Service {
 
 			if (DEBUG) Log.d(TAG, "Entering UAVTalk processing loop");
 			while( !terminate ) {
-				if( !uavTalk.processInputStream() )
+				try {
+					if( !uavTalk.processInputStream() )
+						break;
+				} catch (IOException e) {
+					// This occurs when they communication stream fails
+					toastMessage("Connection dropped");
 					break;
+				}
 			}
 			if (DEBUG) Log.d(TAG, "UAVTalk stream disconnected");
 		}
@@ -339,7 +354,7 @@ public class OPTelemetryService extends Service {
 		public void run() {			
 			if (DEBUG) Log.d(TAG, "Telemetry Thread started");
 
-			Looper.prepare();						
+			Looper.prepare();
 
 			TcpUAVTalk tcp = new TcpUAVTalk(OPTelemetryService.this);
 			for( int i = 0; i < 10; i++ ) {
@@ -376,18 +391,36 @@ public class OPTelemetryService extends Service {
 					if(mon.getConnected() /*&& mon.getObjectsUpdated()*/) {
 						Intent intent = new Intent();
 						intent.setAction(INTENT_ACTION_CONNECTED);
-						sendBroadcast(intent,null);					
+						sendBroadcast(intent,null);
 					}
-				}				
+				}	
 			});
 
 
 			if (DEBUG) Log.d(TAG, "Entering UAVTalk processing loop");
 			while( !terminate ) {
-				if( !uavTalk.processInputStream() )
+				try {
+					if( !uavTalk.processInputStream() )
+						break;
+				} catch (IOException e) {
+					e.printStackTrace();
+					toastMessage("TCP Stream interrupted");
 					break;
+				}
 			}
+			Looper.myLooper().quit();
+			
+			// Shut down all the attached
+			mon.stopMonitor();
+			mon = null;
+			tel.stopTelemetry();
+			tel = null;
+			
+			// Finally close the stream if it is still open
+			tcp.disconnect();
+			
 			if (DEBUG) Log.d(TAG, "UAVTalk stream disconnected");
+			toastMessage("TCP Thread finished");
 		}
 
 	};

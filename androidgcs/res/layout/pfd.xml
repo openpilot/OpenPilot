@@ -3,28 +3,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
+    
+    <org.openpilot.androidgcs.CompassView
+        android:id="@+id/compass_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-
-        <org.openpilot.androidgcs.CompassView
-            android:id="@+id/compass_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <org.openpilot.androidgcs.AttitudeView
-            android:id="@+id/attitude_view"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent" />
-
-    </LinearLayout>
-
-    <com.MobileAnarchy.Android.Widgets.Joystick.DualJoystickView
-        android:id="@+id/dualjoystickView"
+    <org.openpilot.androidgcs.AttitudeView
+        android:id="@+id/attitude_view"
         android:layout_width="fill_parent"
-        android:layout_height="175dip"
-        android:layout_marginTop="5dip" >
-    </com.MobileAnarchy.Android.Widgets.Joystick.DualJoystickView>
-
+        android:layout_height="fill_parent" />
 </LinearLayout>

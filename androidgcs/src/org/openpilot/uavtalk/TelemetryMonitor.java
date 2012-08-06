@@ -210,6 +210,7 @@ public class TelemetryMonitor extends Observable{
 	    }
 	}
 
+	private long lastStatsTime;
 	/**
 	 * Called periodically to update the statistics and connection status.
 	 * @throws IOException 
@@ -219,19 +220,24 @@ public class TelemetryMonitor extends Observable{
 	    // Get telemetry stats
 		if (DEBUG) Log.d(TAG, "processStatsUpdates()");
 	    Telemetry.TelemetryStats telStats = tel.getStats();
-	    tel.resetStats();
 
 	    if (DEBUG) Log.d(TAG, "processStatsUpdates() - stats reset");
 	    
+	    // Need to compute time because this update is not regular enough
+	    float dT = (float) (System.currentTimeMillis() - lastStatsTime) / 1000.0f;
+	    lastStatsTime = System.currentTimeMillis();
+
 	    // Update stats object 
-	    gcsStatsObj.getField("RxDataRate").setDouble( (float)telStats.rxBytes / ((float)currentPeriod/1000.0) );
-	    gcsStatsObj.getField("TxDataRate").setDouble( (float)telStats.txBytes / ((float)currentPeriod/1000.0) );
+	    gcsStatsObj.getField("RxDataRate").setDouble( (float)telStats.rxBytes / dT );
+	    gcsStatsObj.getField("TxDataRate").setDouble( (float)telStats.txBytes / dT );
 	    UAVObjectField field = gcsStatsObj.getField("RxFailures");
 	    field.setDouble(field.getDouble() + telStats.rxErrors);
 	    field = gcsStatsObj.getField("TxFailures");
 	    field.setDouble(field.getDouble() + telStats.txErrors);
 	    field = gcsStatsObj.getField("TxRetries");
 	    field.setDouble(field.getDouble() + telStats.txRetries);
+
+	    tel.resetStats();
 
 	    if (DEBUG) Log.d(TAG, "processStatsUpdates() - stats updated");
 	    

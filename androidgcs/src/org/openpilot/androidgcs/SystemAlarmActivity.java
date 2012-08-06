@@ -20,8 +20,14 @@ public class SystemAlarmActivity extends ObjectManagerActivity {
 		UAVObjectField a = obj.getField("Alarm");
 		List<String> names = a.getElementNames();
 		String contents = new String();
-		for (int i = 0; i < names.size(); i++) {
-			contents += names.get(i) + " : " + a.getValue(i).toString() + "\n";
+		List <String> options = a.getOptions();
+		
+		// Rank the alarms by order of severity, skip uninitialized
+		for (int j = options.size() - 1; j > 0; j--) {
+			for (int i = 0; i < names.size(); i++) {
+				if(a.getDouble(i) == j)
+					contents += names.get(i) + " : " + a.getValue(i).toString() + "\n";
+			}
 		}
 		alarms.setText(contents);
 	}

@@ -5,6 +5,8 @@
 	<com.google.android.maps.MapView
 		android:id="@+id/map_view" android:layout_width="fill_parent"
 		android:layout_height="fill_parent" android:enabled="true"
-		android:clickable="true" android:apiKey="0wrDHCybTiyzQZNBmbMVW9UU-8kzQfF7Ar1KhNw" />
+		android:clickable="true" android:apiKey="0ugzv7PkCKSo8cNXxn9A251sxOfROBdjHG0eQEw" />
+	<!--  Note: If you are testing this you will need to use a debugging api key -->
+	<!-- https://developers.google.com/maps/documentation/android/mapkey -->
 </LinearLayout>
 		

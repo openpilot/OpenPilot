@@ -123,12 +123,12 @@ public class AltitudeHoldSettings extends UAVDataObject {
 	 */
 	public void setDefaultFieldValues()
 	{
-		getField("Kp").setValue(0.03);
-		getField("Ki").setValue(0);
-		getField("Kd").setValue(0.03);
-		getField("Ka").setValue(0.005);
-		getField("PressureNoise").setValue(0.4);
-		getField("AccelNoise").setValue(5);
+		getField("Kp").setValue(0.025);
+		getField("Ki").setValue(0.025);
+		getField("Kd").setValue(0.25);
+		getField("Ka").setValue(0);
+		getField("PressureNoise").setValue(0.01);
+		getField("AccelNoise").setValue(10);
 		getField("AccelDrift").setValue(0.001);
 
 	}

@@ -80,12 +80,9 @@ public class FlightBatterySettings extends UAVDataObject {
 		fields.add( new UAVObjectField("NbCells", "", UAVObjectField.FieldType.UINT8, NbCellsElemNames, null) );
 
 		List<String> SensorTypeElemNames = new ArrayList<String>();
-		SensorTypeElemNames.add("BatteryCurrent");
-		SensorTypeElemNames.add("BatteryVoltage");
-		SensorTypeElemNames.add("BoardVoltage");
+		SensorTypeElemNames.add("0");
 		List<String> SensorTypeEnumOptions = new ArrayList<String>();
-		SensorTypeEnumOptions.add("Disabled");
-		SensorTypeEnumOptions.add("Enabled");
+		SensorTypeEnumOptions.add("None");
 		fields.add( new UAVObjectField("SensorType", "", UAVObjectField.FieldType.ENUM, SensorTypeElemNames, SensorTypeEnumOptions) );
 
 
@@ -139,9 +136,7 @@ public class FlightBatterySettings extends UAVDataObject {
 		getField("SensorCalibrations").setValue(1,1);
 		getField("Type").setValue("LiPo");
 		getField("NbCells").setValue(3);
-		getField("SensorType").setValue("Disabled",0);
-		getField("SensorType").setValue("Disabled",1);
-		getField("SensorType").setValue("Disabled",2);
+		getField("SensorType").setValue("None");
 
 	}
 
@@ -170,7 +165,7 @@ public class FlightBatterySettings extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0x94AC6AD2l;
+	protected static final long OBJID = 0xF172BB18l;
 	protected static final String NAME = "FlightBatterySettings";
 	protected static String DESCRIPTION = "Flight Battery configuration.";
 	protected static final boolean ISSINGLEINST = 1 > 0;

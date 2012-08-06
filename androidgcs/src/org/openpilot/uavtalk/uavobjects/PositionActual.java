@@ -92,9 +92,9 @@ public class PositionActual extends UAVDataObject {
 		    0 << UAVOBJ_TELEMETRY_ACKED_SHIFT |
 		    0 << UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT |
 		    UAVObject.Metadata.UpdateModeNum(UAVObject.UpdateMode.UPDATEMODE_PERIODIC) << UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT |
-		    UAVObject.Metadata.UpdateModeNum(UAVObject.UpdateMode.UPDATEMODE_PERIODIC) << UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT;
+		    UAVObject.Metadata.UpdateModeNum(UAVObject.UpdateMode.UPDATEMODE_MANUAL) << UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT;
     	metadata.flightTelemetryUpdatePeriod = 1000;
-    	metadata.gcsTelemetryUpdatePeriod = 1000;
+    	metadata.gcsTelemetryUpdatePeriod = 0;
     	metadata.loggingUpdatePeriod = 1000;
  
 		return metadata;

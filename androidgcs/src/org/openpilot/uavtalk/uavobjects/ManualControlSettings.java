@@ -179,10 +179,17 @@ public class ManualControlSettings extends UAVDataObject {
 		Stabilization3SettingsEnumOptions.add("VirtualBar");
 		fields.add( new UAVObjectField("Stabilization3Settings", "", UAVObjectField.FieldType.ENUM, Stabilization3SettingsElemNames, Stabilization3SettingsEnumOptions) );
 
+		List<String> FlightModeNumberElemNames = new ArrayList<String>();
+		FlightModeNumberElemNames.add("0");
+		fields.add( new UAVObjectField("FlightModeNumber", "", UAVObjectField.FieldType.UINT8, FlightModeNumberElemNames, null) );
+
 		List<String> FlightModePositionElemNames = new ArrayList<String>();
 		FlightModePositionElemNames.add("0");
 		FlightModePositionElemNames.add("1");
 		FlightModePositionElemNames.add("2");
+		FlightModePositionElemNames.add("3");
+		FlightModePositionElemNames.add("4");
+		FlightModePositionElemNames.add("5");
 		List<String> FlightModePositionEnumOptions = new ArrayList<String>();
 		FlightModePositionEnumOptions.add("Manual");
 		FlightModePositionEnumOptions.add("Stabilized1");
@@ -191,21 +198,7 @@ public class ManualControlSettings extends UAVDataObject {
 		FlightModePositionEnumOptions.add("AltitudeHold");
 		FlightModePositionEnumOptions.add("VelocityControl");
 		FlightModePositionEnumOptions.add("PositionHold");
-		FlightModePositionEnumOptions.add("PathPlanner");
-		FlightModePositionEnumOptions.add("RTH");
-		FlightModePositionEnumOptions.add("Land");
 		fields.add( new UAVObjectField("FlightModePosition", "", UAVObjectField.FieldType.ENUM, FlightModePositionElemNames, FlightModePositionEnumOptions) );
-
-		List<String> FlightModeNumberElemNames = new ArrayList<String>();
-		FlightModeNumberElemNames.add("0");
-		fields.add( new UAVObjectField("FlightModeNumber", "", UAVObjectField.FieldType.UINT8, FlightModeNumberElemNames, null) );
-
-		List<String> FailsafeBehaviorElemNames = new ArrayList<String>();
-		FailsafeBehaviorElemNames.add("0");
-		List<String> FailsafeBehaviorEnumOptions = new ArrayList<String>();
-		FailsafeBehaviorEnumOptions.add("None");
-		FailsafeBehaviorEnumOptions.add("RTH");
-		fields.add( new UAVObjectField("FailsafeBehavior", "", UAVObjectField.FieldType.ENUM, FailsafeBehaviorElemNames, FailsafeBehaviorEnumOptions) );
 
 
 		// Compute the number of bytes for this object
@@ -308,11 +301,13 @@ public class ManualControlSettings extends UAVDataObject {
 		getField("Stabilization3Settings").setValue("Attitude",0);
 		getField("Stabilization3Settings").setValue("Attitude",1);
 		getField("Stabilization3Settings").setValue("Rate",2);
+		getField("FlightModeNumber").setValue(3);
 		getField("FlightModePosition").setValue("Manual",0);
 		getField("FlightModePosition").setValue("Stabilized1",1);
 		getField("FlightModePosition").setValue("Stabilized2",2);
-		getField("FlightModeNumber").setValue(3);
-		getField("FailsafeBehavior").setValue("None");
+		getField("FlightModePosition").setValue("Stabilized3",3);
+		getField("FlightModePosition").setValue("AltitudeHold",4);
+		getField("FlightModePosition").setValue("PositionHold",5);
 
 	}
 
@@ -341,7 +336,7 @@ public class ManualControlSettings extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0x6C188320l;
+	protected static final long OBJID = 0x7672339El;
 	protected static final String NAME = "ManualControlSettings";
 	protected static String DESCRIPTION = "Settings to indicate how to decode receiver input by @ref ManualControlModule.";
 	protected static final boolean ISSINGLEINST = 1 > 0;

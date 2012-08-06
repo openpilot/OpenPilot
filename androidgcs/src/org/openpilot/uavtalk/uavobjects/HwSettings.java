@@ -211,12 +211,7 @@ public class HwSettings extends UAVDataObject {
 		OptionalModulesElemNames.add("ComUsbBridge");
 		OptionalModulesElemNames.add("Fault");
 		OptionalModulesElemNames.add("Altitude");
-		OptionalModulesElemNames.add("Airspeed");
 		OptionalModulesElemNames.add("TxPID");
-		OptionalModulesElemNames.add("VtolPathFollower");
-		OptionalModulesElemNames.add("FixedWingPathFollower");
-		OptionalModulesElemNames.add("Battery");
-		OptionalModulesElemNames.add("Overo");
 		List<String> OptionalModulesEnumOptions = new ArrayList<String>();
 		OptionalModulesEnumOptions.add("Disabled");
 		OptionalModulesEnumOptions.add("Enabled");
@@ -290,11 +285,6 @@ public class HwSettings extends UAVDataObject {
 		getField("OptionalModules").setValue("Disabled",3);
 		getField("OptionalModules").setValue("Disabled",4);
 		getField("OptionalModules").setValue("Disabled",5);
-		getField("OptionalModules").setValue("Disabled",6);
-		getField("OptionalModules").setValue("Disabled",7);
-		getField("OptionalModules").setValue("Disabled",8);
-		getField("OptionalModules").setValue("Disabled",9);
-		getField("OptionalModules").setValue("Disabled",10);
 		getField("DSMxBind").setValue(0);
 
 	}
@@ -324,7 +314,7 @@ public class HwSettings extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0x5D950E50l;
+	protected static final long OBJID = 0x9408E9F0l;
 	protected static final String NAME = "HwSettings";
 	protected static String DESCRIPTION = "Selection of optional hardware configurations.";
 	protected static final boolean ISSINGLEINST = 1 > 0;

@@ -157,7 +157,7 @@ public class FirmwareIAPObj extends UAVDataObject {
 		    UAVObject.Metadata.AccessModeNum(UAVObject.AccessMode.ACCESS_READWRITE) << UAVOBJ_GCS_ACCESS_SHIFT |
 		    1 << UAVOBJ_TELEMETRY_ACKED_SHIFT |
 		    1 << UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT |
-		    UAVObject.Metadata.UpdateModeNum(UAVObject.UpdateMode.UPDATEMODE_MANUAL) << UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT |
+		    UAVObject.Metadata.UpdateModeNum(UAVObject.UpdateMode.UPDATEMODE_ONCHANGE) << UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT |
 		    UAVObject.Metadata.UpdateModeNum(UAVObject.UpdateMode.UPDATEMODE_MANUAL) << UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT;
     	metadata.flightTelemetryUpdatePeriod = 0;
     	metadata.gcsTelemetryUpdatePeriod = 0;

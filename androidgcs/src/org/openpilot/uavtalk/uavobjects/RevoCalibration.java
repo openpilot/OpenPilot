@@ -111,24 +111,11 @@ public class RevoCalibration extends UAVDataObject {
 		mag_varElemNames.add("Z");
 		fields.add( new UAVObjectField("mag_var", "mGau^2", UAVObjectField.FieldType.FLOAT32, mag_varElemNames, null) );
 
-		List<String> gps_varElemNames = new ArrayList<String>();
-		gps_varElemNames.add("Pos");
-		gps_varElemNames.add("Vel");
-		fields.add( new UAVObjectField("gps_var", "m^2", UAVObjectField.FieldType.FLOAT32, gps_varElemNames, null) );
-
-		List<String> baro_varElemNames = new ArrayList<String>();
-		baro_varElemNames.add("0");
-		fields.add( new UAVObjectField("baro_var", "m^2", UAVObjectField.FieldType.FLOAT32, baro_varElemNames, null) );
-
-		List<String> MagBiasNullingRateElemNames = new ArrayList<String>();
-		MagBiasNullingRateElemNames.add("0");
-		fields.add( new UAVObjectField("MagBiasNullingRate", "", UAVObjectField.FieldType.FLOAT32, MagBiasNullingRateElemNames, null) );
-
 		List<String> BiasCorrectedRawElemNames = new ArrayList<String>();
 		BiasCorrectedRawElemNames.add("0");
 		List<String> BiasCorrectedRawEnumOptions = new ArrayList<String>();
-		BiasCorrectedRawEnumOptions.add("FALSE");
 		BiasCorrectedRawEnumOptions.add("TRUE");
+		BiasCorrectedRawEnumOptions.add("FALSE");
 		fields.add( new UAVObjectField("BiasCorrectedRaw", "", UAVObjectField.FieldType.ENUM, BiasCorrectedRawElemNames, BiasCorrectedRawEnumOptions) );
 
 
@@ -181,18 +168,18 @@ public class RevoCalibration extends UAVDataObject {
 		getField("accel_scale").setValue(1,0);
 		getField("accel_scale").setValue(1,1);
 		getField("accel_scale").setValue(1,2);
-		getField("accel_var").setValue(0.01,0);
-		getField("accel_var").setValue(0.01,1);
-		getField("accel_var").setValue(0.01,2);
+		getField("accel_var").setValue(1,0);
+		getField("accel_var").setValue(1,1);
+		getField("accel_var").setValue(1,2);
 		getField("gyro_bias").setValue(0,0);
 		getField("gyro_bias").setValue(0,1);
 		getField("gyro_bias").setValue(0,2);
 		getField("gyro_scale").setValue(1,0);
 		getField("gyro_scale").setValue(1,1);
 		getField("gyro_scale").setValue(1,2);
-		getField("gyro_var").setValue(0.01,0);
-		getField("gyro_var").setValue(0.01,1);
-		getField("gyro_var").setValue(0.01,2);
+		getField("gyro_var").setValue(1,0);
+		getField("gyro_var").setValue(1,1);
+		getField("gyro_var").setValue(1,2);
 		getField("gyro_tempcoeff").setValue(1,0);
 		getField("gyro_tempcoeff").setValue(1,1);
 		getField("gyro_tempcoeff").setValue(1,2);
@@ -202,13 +189,9 @@ public class RevoCalibration extends UAVDataObject {
 		getField("mag_scale").setValue(1,0);
 		getField("mag_scale").setValue(1,1);
 		getField("mag_scale").setValue(1,2);
-		getField("mag_var").setValue(0.01,0);
-		getField("mag_var").setValue(0.01,1);
-		getField("mag_var").setValue(10,2);
-		getField("gps_var").setValue(1,0);
-		getField("gps_var").setValue(1,1);
-		getField("baro_var").setValue(1);
-		getField("MagBiasNullingRate").setValue(0);
+		getField("mag_var").setValue(50,0);
+		getField("mag_var").setValue(50,1);
+		getField("mag_var").setValue(50,2);
 		getField("BiasCorrectedRaw").setValue("TRUE");
 
 	}
@@ -238,7 +221,7 @@ public class RevoCalibration extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0xA2A63C7Cl;
+	protected static final long OBJID = 0xC26D37B2l;
 	protected static final String NAME = "RevoCalibration";
 	protected static String DESCRIPTION = "Settings for the INS to control the algorithm and what is updated";
 	protected static final boolean ISSINGLEINST = 1 > 0;

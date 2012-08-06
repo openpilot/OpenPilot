@@ -44,15 +44,11 @@ public class UAVObjectsInitialize {
 			objMngr.registerObject( new AltitudeHoldSettings() );
 			objMngr.registerObject( new AttitudeActual() );
 			objMngr.registerObject( new AttitudeSettings() );
-			objMngr.registerObject( new AttitudeSimulated() );
-			objMngr.registerObject( new BaroAirspeed() );
 			objMngr.registerObject( new BaroAltitude() );
 			objMngr.registerObject( new CameraDesired() );
 			objMngr.registerObject( new CameraStabSettings() );
 			objMngr.registerObject( new FaultSettings() );
 			objMngr.registerObject( new FirmwareIAPObj() );
-			objMngr.registerObject( new FixedWingPathFollowerSettings() );
-			objMngr.registerObject( new FixedWingPathFollowerStatus() );
 			objMngr.registerObject( new FlightBatterySettings() );
 			objMngr.registerObject( new FlightBatteryState() );
 			objMngr.registerObject( new FlightPlanControl() );
@@ -72,26 +68,20 @@ public class UAVObjectsInitialize {
 			objMngr.registerObject( new HomeLocation() );
 			objMngr.registerObject( new HwSettings() );
 			objMngr.registerObject( new I2CStats() );
-			objMngr.registerObject( new MagBias() );
 			objMngr.registerObject( new Magnetometer() );
 			objMngr.registerObject( new ManualControlCommand() );
 			objMngr.registerObject( new ManualControlSettings() );
 			objMngr.registerObject( new MixerSettings() );
 			objMngr.registerObject( new MixerStatus() );
 			objMngr.registerObject( new NedAccel() );
-			objMngr.registerObject( new NEDPosition() );
 			objMngr.registerObject( new ObjectPersistence() );
-			objMngr.registerObject( new OveroSyncSettings() );
 			objMngr.registerObject( new OveroSyncStats() );
-			objMngr.registerObject( new PathDesired() );
-			objMngr.registerObject( new PathPlannerSettings() );
 			objMngr.registerObject( new PipXSettings() );
 			objMngr.registerObject( new PipXStatus() );
 			objMngr.registerObject( new PositionActual() );
 			objMngr.registerObject( new RateDesired() );
 			objMngr.registerObject( new ReceiverActivity() );
 			objMngr.registerObject( new RevoCalibration() );
-			objMngr.registerObject( new RevoSettings() );
 			objMngr.registerObject( new SonarAltitude() );
 			objMngr.registerObject( new StabilizationDesired() );
 			objMngr.registerObject( new StabilizationSettings() );
@@ -102,10 +92,7 @@ public class UAVObjectsInitialize {
 			objMngr.registerObject( new TxPIDSettings() );
 			objMngr.registerObject( new VelocityActual() );
 			objMngr.registerObject( new VelocityDesired() );
-			objMngr.registerObject( new VtolPathFollowerSettings() );
 			objMngr.registerObject( new WatchdogStatus() );
-			objMngr.registerObject( new Waypoint() );
-			objMngr.registerObject( new WaypointActive() );
 	
 		} catch (Exception e) {
 			e.printStackTrace();

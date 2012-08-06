@@ -59,10 +59,6 @@ public class FlightBatteryState extends UAVDataObject {
 		CurrentElemNames.add("0");
 		fields.add( new UAVObjectField("Current", "A", UAVObjectField.FieldType.FLOAT32, CurrentElemNames, null) );
 
-		List<String> BoardSupplyVoltageElemNames = new ArrayList<String>();
-		BoardSupplyVoltageElemNames.add("0");
-		fields.add( new UAVObjectField("BoardSupplyVoltage", "V", UAVObjectField.FieldType.FLOAT32, BoardSupplyVoltageElemNames, null) );
-
 		List<String> PeakCurrentElemNames = new ArrayList<String>();
 		PeakCurrentElemNames.add("0");
 		fields.add( new UAVObjectField("PeakCurrent", "A", UAVObjectField.FieldType.FLOAT32, PeakCurrentElemNames, null) );
@@ -125,7 +121,6 @@ public class FlightBatteryState extends UAVDataObject {
 	{
 		getField("Voltage").setValue(0);
 		getField("Current").setValue(0);
-		getField("BoardSupplyVoltage").setValue(0);
 		getField("PeakCurrent").setValue(0);
 		getField("AvgCurrent").setValue(0);
 		getField("ConsumedEnergy").setValue(0);
@@ -158,7 +153,7 @@ public class FlightBatteryState extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0xD2083596l;
+	protected static final long OBJID = 0x8C0D756l;
 	protected static final String NAME = "FlightBatteryState";
 	protected static String DESCRIPTION = "Battery status information.";
 	protected static final boolean ISSINGLEINST = 1 > 0;

@@ -62,11 +62,9 @@ public class TaskInfo extends UAVDataObject {
 		StackRemainingElemNames.add("GPS");
 		StackRemainingElemNames.add("ManualControl");
 		StackRemainingElemNames.add("Altitude");
-		StackRemainingElemNames.add("Airspeed");
 		StackRemainingElemNames.add("Stabilization");
 		StackRemainingElemNames.add("AltitudeHold");
-		StackRemainingElemNames.add("PathPlanner");
-		StackRemainingElemNames.add("PathFollower");
+		StackRemainingElemNames.add("Guidance");
 		StackRemainingElemNames.add("FlightPlan");
 		StackRemainingElemNames.add("Com2UsbBridge");
 		StackRemainingElemNames.add("Usb2ComBridge");
@@ -84,11 +82,9 @@ public class TaskInfo extends UAVDataObject {
 		RunningElemNames.add("GPS");
 		RunningElemNames.add("ManualControl");
 		RunningElemNames.add("Altitude");
-		RunningElemNames.add("Airspeed");
 		RunningElemNames.add("Stabilization");
 		RunningElemNames.add("AltitudeHold");
-		RunningElemNames.add("PathPlanner");
-		RunningElemNames.add("PathFollower");
+		RunningElemNames.add("Guidance");
 		RunningElemNames.add("FlightPlan");
 		RunningElemNames.add("Com2UsbBridge");
 		RunningElemNames.add("Usb2ComBridge");
@@ -109,11 +105,9 @@ public class TaskInfo extends UAVDataObject {
 		RunningTimeElemNames.add("GPS");
 		RunningTimeElemNames.add("ManualControl");
 		RunningTimeElemNames.add("Altitude");
-		RunningTimeElemNames.add("Airspeed");
 		RunningTimeElemNames.add("Stabilization");
 		RunningTimeElemNames.add("AltitudeHold");
-		RunningTimeElemNames.add("PathPlanner");
-		RunningTimeElemNames.add("PathFollower");
+		RunningTimeElemNames.add("Guidance");
 		RunningTimeElemNames.add("FlightPlan");
 		RunningTimeElemNames.add("Com2UsbBridge");
 		RunningTimeElemNames.add("Usb2ComBridge");
@@ -192,7 +186,7 @@ public class TaskInfo extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0xB81CD2AEl;
+	protected static final long OBJID = 0x51172B8Al;
 	protected static final String NAME = "TaskInfo";
 	protected static String DESCRIPTION = "Task information";
 	protected static final boolean ISSINGLEINST = 1 > 0;

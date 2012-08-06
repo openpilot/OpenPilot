@@ -77,6 +77,8 @@ public class Logger extends ObjectManagerActivity {
 	
 	@Override
 	void onOPConnected() {
+		super.onOPConnected();
+		
 		if (DEBUG) Log.d(TAG, "onOPConnected()");
 		onStartLogging();
 		registerObjectUpdates(objMngr.getObjects());

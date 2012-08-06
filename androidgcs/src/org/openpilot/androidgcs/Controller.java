@@ -66,8 +66,8 @@ public class Controller extends ObjectManagerActivity {
 	
 	@Override
 	void onOPConnected() {
-		Log.d(TAG, "onOPConnected()");
-		
+		super.onOPConnected();
+
 		// Subscribe to updates from ManualControlCommand and show the values for crude feedback
 		UAVDataObject manualControl = (UAVDataObject) objMngr.getObject("ManualControlCommand");
 		if(manualControl != null) {

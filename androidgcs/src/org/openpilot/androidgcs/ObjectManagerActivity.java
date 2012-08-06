@@ -217,7 +217,7 @@ public abstract class ObjectManagerActivity extends Activity {
 	public void onStop() {
 		super.onStop();
 		unbindService(mConnection);
-		unregisterReceiver(connectedReceiver);
+		//unregisterReceiver(connectedReceiver);
 	}
 
 	public void onBind() {

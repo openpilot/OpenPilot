@@ -92,10 +92,9 @@ public class Controller extends ObjectManagerActivity {
 			public void OnMoved(int pan, int tilt) {
 				pitch = (double) tilt / MOVEMENT_RANGE;
 				yaw = (double) pan / MOVEMENT_RANGE;
-				updated = true;
 				leftJoystickHeld = true;
 			}
-			public void OnReleased() { leftJoystickHeld = false; }
+			public void OnReleased() { leftJoystickHeld = false; throttle = -1; updated = true; }
 			@Override
 			public void OnReturnedToCenter() { }
 		}, new JoystickMovedListener() {
@@ -105,10 +104,9 @@ public class Controller extends ObjectManagerActivity {
 				if (throttle < 0)
 					throttle = -1;
 				roll = (double) pan / MOVEMENT_RANGE;
-				updated = true;
 				rightJoystickHeld = true;
 			}
-			public void OnReleased() { rightJoystickHeld = false; }
+			public void OnReleased() { rightJoystickHeld = false; throttle = -1; updated = true; }
 			@Override
 			public void OnReturnedToCenter() { }
 		}) ;
@@ -117,7 +115,7 @@ public class Controller extends ObjectManagerActivity {
 				uavobjHandler.post(new Runnable() {
 					@Override
 					public void run() {
-						if (leftJoystickHeld && rightJoystickHeld) {
+						if ((leftJoystickHeld && rightJoystickHeld) || updated) {
 							UAVObject gcsReceiver = objMngr.getObject("GCSReceiver");
 							if (gcsReceiver == null) {
 								Log.e(TAG, "No GCS Receiver object found");
@@ -137,6 +135,8 @@ public class Controller extends ObjectManagerActivity {
 							channels.setValue(scaleChannel(0, CHANNEL_NEUTRAL), FLIGHTMODE_CHANNEL);
 
 							gcsReceiver.updated();
+
+							updated = false;
 
 							if (DEBUG) Log.d(TAG, "Send update" + gcsReceiver.toStringData());
 						}

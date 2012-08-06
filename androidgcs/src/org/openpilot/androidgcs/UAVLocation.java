@@ -29,7 +29,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
-import android.graphics.RectF;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -189,13 +188,7 @@ public class UAVLocation extends MapActivity
 		if(obj != null)
 			obj.addUpdatedObserver(new Observer() {
 				public void update(Observable observable, Object data) {
-					UAVDataObject obj = (UAVDataObject) data;
-					Double north = obj.getField("North").getDouble();
-					Double east = obj.getField("East").getDouble();
-
-					// TODO: Correct convertion from NED to LLA.  This is erroneous conversion from m to deg
-					uavLocation = new GeoPoint((int) (homeLocation.getLatitudeE6() + (20+north) * 1e6 / 78847),
-							(int) (homeLocation.getLongitudeE6() + east* 1e6 / 78847));
+					uavLocation = getUavLocation();
 					runOnUiThread(new Runnable() {
 						public void run() {
 							mapView.invalidate();
@@ -204,6 +197,37 @@ public class UAVLocation extends MapActivity
 				}				
 			});
 
+	}
+
+	private GeoPoint getUavLocation() {
+		UAVObject pos = (UAVObject) objMngr.getObject("PositionActual");
+		if (pos == null)
+			return new GeoPoint(0,0);
+		
+		UAVObject home = (UAVObject) objMngr.getObject("HomeLocation");
+		if (home == null) 
+			return new GeoPoint(0,0);
+		
+		double lat, lon, alt;
+		lat = home.getField("Latitude").getDouble() / 10.0e6;
+		lon = home.getField("Longitude").getDouble() / 10.0e6;
+		alt = home.getField("Altitude").getDouble();
+
+		// Get the home coordinates
+		double T0, T1;
+		T0 = alt+6.378137E6;
+		T1 = Math.cos(lat * Math.PI / 180.0)*(alt+6.378137E6);
+		
+		// Get the NED coordinates
+		double NED0, NED1;
+		NED0 = pos.getField("North").getDouble();
+		NED1 = pos.getField("East").getDouble();
+		
+		// Compute the LLA coordinates
+		lat = lat + (NED0 / T0) * 180.0 / Math.PI;
+		lon = lon + (NED1 / T1) * 180.0 / Math.PI;
+
+		return new GeoPoint((int) (lat * 1e6), (int) (lon * 1e6));
 	}
 	
 	void onOPDisconnected() {

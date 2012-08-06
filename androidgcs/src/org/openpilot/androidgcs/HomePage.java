@@ -48,6 +48,12 @@ public class HomePage extends ObjectManagerActivity {
 			}
 		});
 
+		Button alarms = (Button) findViewById(R.id.launch_alarms);
+		alarms.setOnClickListener(new OnClickListener() {
+			public void onClick(View arg0) {
+				startActivity(new Intent(HomePage.this, SystemAlarmActivity.class));	
+			}
+		});
 	}
 
 }

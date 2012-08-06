@@ -99,8 +99,9 @@ import android.util.Log;
 		    for (BluetoothDevice device : pairedDevices) {
 		        // Add the name and address to an array adapter to show in a ListView
 		        //mArrayAdapter.add(device.getName() + "\n" + device.getAddress());
-		    	Log.d(TAG, "Paired device: " + device.getName());
-		    	if(device.getName().compareTo(device_name) == 0) {
+		    	Log.d(TAG, "Paired device: " + device.getAddress() + " compared to " + device_name);
+		    	if(device.getAddress().compareTo(device_name) == 0) {
+		    		Log.d(TAG, "Found device: " + device.getName());
 		    		this.device = device;
 		    		return;
 		    	}
@@ -110,7 +111,7 @@ import android.util.Log;
     }
 
 	private boolean openTelemetryBluetooth(UAVObjectManager objMngr) {
-		Log.d(TAG, "Opening conncetion to " + device.getName());
+		Log.d(TAG, "Opening connection to " + device.getName());
 		socket = null;
 		connected = false;
 		try {

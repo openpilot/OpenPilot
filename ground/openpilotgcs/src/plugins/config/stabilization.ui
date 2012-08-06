@@ -25749,8 +25749,10 @@ Useful if you have accidentally changed some settings.</string>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <tabstops>
-  <tabstop>scrollArea</tabstop>
-  <tabstop>checkBox_7</tabstop>
+  <tabstop>stabilizationReloadBoardData_6</tabstop>
+  <tabstop>saveStabilizationToRAM_6</tabstop>
+  <tabstop>saveStabilizationToSD_6</tabstop>
+  <tabstop>pushButton_23</tabstop>
   <tabstop>pushButton_20</tabstop>
   <tabstop>horizontalSlider_76</tabstop>
   <tabstop>spinBox_7</tabstop>
@@ -25764,7 +25766,6 @@ Useful if you have accidentally changed some settings.</string>
   <tabstop>spinBox_9</tabstop>
   <tabstop>horizontalSlider_81</tabstop>
   <tabstop>spinBox_10</tabstop>
-  <tabstop>checkBox_8</tabstop>
   <tabstop>pushButton_22</tabstop>
   <tabstop>horizontalSlider_82</tabstop>
   <tabstop>spinBox_13</tabstop>
@@ -25778,11 +25779,9 @@ Useful if you have accidentally changed some settings.</string>
   <tabstop>spinBox_19</tabstop>
   <tabstop>horizontalSlider_87</tabstop>
   <tabstop>spinBox_20</tabstop>
-  <tabstop>stabilizationReloadBoardData_6</tabstop>
-  <tabstop>saveStabilizationToRAM_6</tabstop>
-  <tabstop>saveStabilizationToSD_6</tabstop>
-  <tabstop>scrollArea_2</tabstop>
-  <tabstop>checkBox_3</tabstop>
+  <tabstop>lowThrottleZeroIntegral_8</tabstop>
+  <tabstop>checkBox_7</tabstop>
+  <tabstop>checkBox_8</tabstop>
   <tabstop>pushButton_4</tabstop>
   <tabstop>RateRollKp_2</tabstop>
   <tabstop>RatePitchKp</tabstop>
@@ -25793,7 +25792,7 @@ Useful if you have accidentally changed some settings.</string>
   <tabstop>RollRateKd</tabstop>
   <tabstop>PitchRateKd</tabstop>
   <tabstop>YawRateKd</tabstop>
-  <tabstop>checkBox_2</tabstop>
+  <tabstop>scrollArea</tabstop>
   <tabstop>pushButton_2</tabstop>
   <tabstop>AttitudeRollKp</tabstop>
   <tabstop>AttitudePitchKp_2</tabstop>
@@ -25811,6 +25810,28 @@ Useful if you have accidentally changed some settings.</string>
   <tabstop>rateRollILimit_3</tabstop>
   <tabstop>ratePitchILimit_4</tabstop>
   <tabstop>rateYawILimit_3</tabstop>
+  <tabstop>checkBox_3</tabstop>
+  <tabstop>checkBox_2</tabstop>
+  <tabstop>pushButton_6</tabstop>
+  <tabstop>WeakLevelingKp</tabstop>
+  <tabstop>WeakLevelingRate</tabstop>
+  <tabstop>MaAxisLock</tabstop>
+  <tabstop>MaxAxisLockRate</tabstop>
+  <tabstop>pushButton_9</tabstop>
+  <tabstop>RateRollILimit_2</tabstop>
+  <tabstop>RatePitchILimit</tabstop>
+  <tabstop>RateYawILimit</tabstop>
+  <tabstop>AttitudeRollILimit</tabstop>
+  <tabstop>AttitudePitchILimit_2</tabstop>
+  <tabstop>AttitudeYawILimit</tabstop>
+  <tabstop>pushButton_5</tabstop>
+  <tabstop>GyroTau</tabstop>
+  <tabstop>AccelKp</tabstop>
+  <tabstop>AccelKi</tabstop>
+  <tabstop>realTimeUpdates_6</tabstop>
+  <tabstop>scrollArea_3</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>scrollArea_2</tabstop>
  </tabstops>
  <resources>
   <include location="../coreplugin/core.qrc"/>

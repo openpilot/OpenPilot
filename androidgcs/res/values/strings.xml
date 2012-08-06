@@ -30,4 +30,6 @@
 	<string name="number_of_objects">Number of objects</string>
 	<string name="number_of_bytes">Number of bytes</string>
 	<string name="alarms">Alarms</string>
+	<string name="txrate">TxRate: </string>
+	<string name="rxrate">RxRate: </string>
 </resources>

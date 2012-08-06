@@ -24,6 +24,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 public abstract class ObjectManagerActivity extends Activity {
 
@@ -42,7 +43,9 @@ public abstract class ObjectManagerActivity extends Activity {
 	LocalBinder binder;
 	//! Store the broadcast receiver to unregister it
 	BroadcastReceiver connectedReceiver;
-
+	//! Indicate if this activity has already connected it's telemetry callbacks
+	private boolean telemetryStatsConnected = false;
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -118,19 +121,60 @@ public abstract class ObjectManagerActivity extends Activity {
 		}
 	}
 	
+	private void updateStats() {
+		UAVObject stats = objMngr.getObject("GCSTelemetryStats");
+		TextView rxRate = (TextView) findViewById(R.id.telemetry_stats_rx_rate);
+		TextView txRate = (TextView) findViewById(R.id.telemetry_stats_tx_rate);
+		if (rxRate != null)
+			rxRate.setText(Integer.valueOf((int) stats.getField("RxDataRate").getDouble()).toString());
+		if (rxRate != null)
+			txRate.setText(Integer.valueOf((int) stats.getField("TxDataRate").getDouble()).toString());
+
+	}
+	
+	final Observer telemetryObserver = new Observer() {
+		public void update(Observable observable, Object data) {
+			uavobjHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					updateStats();
+				}
+			});
+		}
+	};
+	
 	/**
 	 * Called when either the telemetry establishes a connection or
 	 * if it already has on creation of this activity
+	 * 
+	 * This should be called by all inherited classes if they want the telemetry bar etc
 	 */
 	void onOPConnected() {
+		if ( telemetryStatsConnected )
+			return;
 		
+		// We are not using the objectUpdated mechanism in place so that all the children
+		// don't have to sort through the messages.
+		UAVObject stats = objMngr.getObject("GCSTelemetryStats");
+		if (stats == null)
+			return;
+		
+		stats.addUpdatedObserver(telemetryObserver);
+		telemetryStatsConnected = true;
+		updateStats();
 	}
 	
 	/**
 	 * Called when telemetry drops the connection
+	 * 
+	 * This should be called by all inherited classes if they want the telemetry bar etc
 	 */
 	void onOPDisconnected() {
-		
+		// Indicate no connection
+		TextView rxRate = (TextView) findViewById(R.id.telemetry_stats_rx_rate);
+		TextView txRate = (TextView) findViewById(R.id.telemetry_stats_tx_rate);
+		rxRate.setText("");
+		txRate.setText("");
 	}
 	
 	@Override
@@ -154,6 +198,7 @@ public abstract class ObjectManagerActivity extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.status_menu, menu);
 		inflater.inflate(R.menu.options_menu, menu);
 		return true;
 	}

@@ -53,14 +53,15 @@ public class ObjectBrowser extends ObjectManagerActivity implements OnSharedPref
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
 		setContentView(R.layout.object_browser);		
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		prefs.registerOnSharedPreferenceChangeListener(this);
+		super.onCreate(savedInstanceState);
 	}
 
 	@Override
 	void onOPConnected() {
+		super.onOPConnected();
 		Log.d(TAG, "onOPConnected()");
 		
 		OnCheckedChangeListener checkListener = new OnCheckedChangeListener() {

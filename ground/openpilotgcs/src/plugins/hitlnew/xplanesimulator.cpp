@@ -117,59 +117,59 @@ void XplaneSimulator::transmitUpdate()
 
 	// 11th data settings (flight con: ail/elv/rud)
 	buf.clear();
-        code = 11;
-        //quint8 header[] = "DATA";
-        /*
-        stream << *((quint32*)header) <<
-                  (quint8)0x30 <<
-                  code <<
-                  *((quint32*)&elevator) <<
-                  *((quint32*)&ailerons) <<
-                  *((quint32*)&rudder)   <<
-                  none <<
-                  *((quint32*)&ailerons) <<
-                  none <<
-                  none  <<
-                  none;
-                  */
-        buf.append("DATA0");
-        buf.append(reinterpret_cast<const char*>(&code), sizeof(code));
-        buf.append(reinterpret_cast<const char*>(&elevator), sizeof(elevator));
-        buf.append(reinterpret_cast<const char*>(&ailerons), sizeof(ailerons));
-        buf.append(reinterpret_cast<const char*>(&rudder), sizeof(rudder));
-        buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
-        buf.append(reinterpret_cast<const char*>(&rudder), sizeof(rudder));
-        buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
-        buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
-        buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
-        TraceBuf(buf.data(),41);
+    code = 11;
+    //quint8 header[] = "DATA";
+    /*
+    stream << *((quint32*)header) <<
+              (quint8)0x30 <<
+              code <<
+              *((quint32*)&elevator) <<
+              *((quint32*)&ailerons) <<
+              *((quint32*)&rudder)   <<
+              none <<
+              *((quint32*)&ailerons) <<
+              none <<
+              none  <<
+              none;
+              */
+    buf.append("DATA0");
+    buf.append(reinterpret_cast<const char*>(&code), sizeof(code));
+    buf.append(reinterpret_cast<const char*>(&elevator), sizeof(elevator));
+    buf.append(reinterpret_cast<const char*>(&ailerons), sizeof(ailerons));
+    buf.append(reinterpret_cast<const char*>(&rudder), sizeof(rudder));
+    buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
+    buf.append(reinterpret_cast<const char*>(&rudder), sizeof(rudder));
+    buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
+    buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
+    buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
+//    TraceBuf(buf.data(),41);
 
-        if(outSocket->writeDatagram(buf, QHostAddress(settings.remoteHostAddress), settings.outPort) == -1)
-        {
-            emit processOutput("Error sending UDP packet to XPlane: " + outSocket->errorString() + "\n");
-        }
-        //outSocket->write(buf);
+    if(outSocket->writeDatagram(buf, QHostAddress(settings.remoteAddress), settings.outPort) == -1)
+    {
+        emit processOutput("Error sending UDP packet to XPlane: " + outSocket->errorString() + "\n");
+    }
+    //outSocket->write(buf);
 
-	// 25th data settings (throttle command)
-	buf.clear();
-	code = 25;
-        //stream << *((quint32*)header) << (quint8)0x30 << code << *((quint32*)&throttle) << none  << none
-        //		<< none  << none  << none << none  << none;
-        buf.append("DATA0");
-        buf.append(reinterpret_cast<const char*>(&code), sizeof(code));
-        buf.append(reinterpret_cast<const char*>(&throttle), sizeof(throttle));
-        buf.append(reinterpret_cast<const char*>(&throttle), sizeof(throttle));
-        buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
-        buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
-        buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
-        buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
-        buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
-        buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
+    // 25th data settings (throttle command)
+    buf.clear();
+    code = 25;
+    //stream << *((quint32*)header) << (quint8)0x30 << code << *((quint32*)&throttle) << none  << none
+    //		<< none  << none  << none << none  << none;
+    buf.append("DATA0");
+    buf.append(reinterpret_cast<const char*>(&code), sizeof(code));
+    buf.append(reinterpret_cast<const char*>(&throttle), sizeof(throttle));
+    buf.append(reinterpret_cast<const char*>(&throttle), sizeof(throttle));
+    buf.append(reinterpret_cast<const char*>(&throttle), sizeof(throttle));
+    buf.append(reinterpret_cast<const char*>(&throttle), sizeof(throttle));
+    buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
+    buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
+    buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
+    buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
 
-        if(outSocket->writeDatagram(buf, QHostAddress(settings.remoteHostAddress), settings.outPort) == -1)
-        {
-            emit processOutput("Error sending UDP packet to XPlane: " + outSocket->errorString() + "\n");
-        }
+    if(outSocket->writeDatagram(buf, QHostAddress(settings.remoteAddress), settings.outPort) == -1)
+    {
+        emit processOutput("Error sending UDP packet to XPlane: " + outSocket->errorString() + "\n");
+    }
 
         //outSocket->write(buf);
 

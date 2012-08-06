@@ -67,47 +67,49 @@ QWidget *HITLOptionsPage::createPage(QWidget *parent)
 	m_optionsPage->dataPath->setPromptDialogTitle(tr("Choose flight simulator data directory"));
 
     // Restore the contents from the settings:
-	foreach(SimulatorCreator* creator, HITLPlugin::typeSimulators)
-	{
-		QString id = config->Settings().simulatorId;
-		if(creator->ClassId() == id)
-			m_optionsPage->chooseFlightSimulator->setCurrentIndex(HITLPlugin::typeSimulators.indexOf(creator));
-	}
+    foreach(SimulatorCreator* creator, HITLPlugin::typeSimulators)
+    {
+        QString id = config->Settings().simulatorId;
+        if(creator->ClassId() == id)
+            m_optionsPage->chooseFlightSimulator->setCurrentIndex(HITLPlugin::typeSimulators.indexOf(creator));
+    }
 
-	m_optionsPage->executablePath->setPath(config->Settings().binPath);
-	m_optionsPage->dataPath->setPath(config->Settings().dataPath);
-	m_optionsPage->manualControl->setChecked(config->Settings().manual);
-        m_optionsPage->startSim->setChecked(config->Settings().startSim);
+    m_optionsPage->executablePath->setPath(config->Settings().binPath);
+    m_optionsPage->dataPath->setPath(config->Settings().dataPath);
+    m_optionsPage->manualControl->setChecked(config->Settings().manualControl);
+    m_optionsPage->startSim->setChecked(config->Settings().startSim);
+    m_optionsPage->noiseCheckBox->setChecked(config->Settings().addNoise);
 
-        m_optionsPage->hostAddress->setText(config->Settings().hostAddress);
-        m_optionsPage->remoteHostAddress->setText(config->Settings().remoteHostAddress);
-	m_optionsPage->outputPort->setText(QString::number(config->Settings().outPort));
-	m_optionsPage->inputPort->setText(QString::number(config->Settings().inPort));
-	m_optionsPage->latitude->setText(config->Settings().latitude);
-	m_optionsPage->longitude->setText(config->Settings().longitude);
+    m_optionsPage->hostAddress->setText(config->Settings().hostAddress);
+    m_optionsPage->remoteAddress->setText(config->Settings().remoteAddress);
+    m_optionsPage->outputPort->setText(QString::number(config->Settings().outPort));
+    m_optionsPage->inputPort->setText(QString::number(config->Settings().inPort));
+    m_optionsPage->latitude->setText(config->Settings().latitude);
+    m_optionsPage->longitude->setText(config->Settings().longitude);
 
     return optionsPageWidget;
 }
 
 void HITLOptionsPage::apply()
 {
-	SimulatorSettings settings;
-	int i = m_optionsPage->chooseFlightSimulator->currentIndex();
+    SimulatorSettings settings;
+    int i = m_optionsPage->chooseFlightSimulator->currentIndex();
 
-	settings.simulatorId = m_optionsPage->chooseFlightSimulator->itemData(i).toString();
-	settings.binPath = m_optionsPage->executablePath->path();
-	settings.dataPath = m_optionsPage->dataPath->path();
-	settings.manual = m_optionsPage->manualControl->isChecked();
-        settings.startSim = m_optionsPage->startSim->isChecked();
-	settings.hostAddress = m_optionsPage->hostAddress->text();
-        settings.remoteHostAddress = m_optionsPage->remoteHostAddress->text();
+    settings.simulatorId = m_optionsPage->chooseFlightSimulator->itemData(i).toString();
+    settings.binPath = m_optionsPage->executablePath->path();
+    settings.dataPath = m_optionsPage->dataPath->path();
+    settings.manualControl = m_optionsPage->manualControl->isChecked();
+    settings.startSim = m_optionsPage->startSim->isChecked();
+    settings.addNoise = m_optionsPage->noiseCheckBox->isChecked();
+    settings.hostAddress = m_optionsPage->hostAddress->text();
+    settings.remoteAddress = m_optionsPage->remoteAddress->text();
 
-	settings.inPort = m_optionsPage->inputPort->text().toInt();
-	settings.outPort = m_optionsPage->outputPort->text().toInt();
-	settings.longitude = m_optionsPage->longitude->text();
-	settings.latitude = m_optionsPage->latitude->text();
+    settings.inPort = m_optionsPage->inputPort->text().toInt();
+    settings.outPort = m_optionsPage->outputPort->text().toInt();
+    settings.longitude = m_optionsPage->longitude->text();
+    settings.latitude = m_optionsPage->latitude->text();
 
-	config->setSimulatorSettings(settings);
+    config->setSimulatorSettings(settings);
 }
 
 void HITLOptionsPage::finish()

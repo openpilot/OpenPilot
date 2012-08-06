@@ -90,7 +90,7 @@ void AeroSimRCSimulator::transmitUpdate()
     stream << armed << mode;            // flight status
     stream << udpCounterASrecv;         // packet counter
 
-    if (outSocket->writeDatagram(data, QHostAddress(settings.remoteHostAddress), settings.outPort) == -1) {
+    if (outSocket->writeDatagram(data, QHostAddress(settings.remoteAddress), settings.outPort) == -1) {
         qDebug() << "write failed: " << outSocket->errorString();
     }
 
@@ -125,7 +125,7 @@ void AeroSimRCSimulator::processUpdate(const QByteArray &data)
         return;
     }
 
-    float   timeStep,
+    float   delT,
             homeX, homeY, homeZ,
             WpHX, WpHY, WpLat, WpLon,
             posX, posY, posZ,   // world
@@ -138,7 +138,7 @@ void AeroSimRCSimulator::processUpdate(const QByteArray &data)
             rx, ry, rz, fx, fy, fz, ux, uy, uz, // matrix
             ch[8];
 
-    stream >> timeStep;
+    stream >> delT;
     stream >> homeX >> homeY >> homeZ;
     stream >> WpHX >> WpHY >> WpLat >> WpLon;
     stream >> posX >> posY >> posZ;
@@ -156,294 +156,50 @@ void AeroSimRCSimulator::processUpdate(const QByteArray &data)
     memset(&out, 0, sizeof(Output2OP));
 
 
-//    struct Output2OP{
-//        float latitude;
-//        float longitude;
-//        float altitude;
-//        float heading;
-//        float groundspeed; //[m/s]
-//        float calibratedAirspeed;    //[m/s]
-//        float pitch;
-//        float roll;
-//        float pressure;
-//        float temperature;
-//        float velNorth;   //[m/s]
-//        float velEast;    //[m/s]
-//        float velDown;    //[m/s]
-//        float dstN;       //[m]
-//        float dstE;       //[m]
-//        float dstD;       //[m]
-//        float accX;       //[m/s^2]
-//        float accY;       //[m/s^2]
-//        float accZ;       //[m/s^2]
-//        float rollRate;
-//        float pitchRate;
-//        float yawRate;
-//    };
+    out.delT=delT;
+    /**********************************************************************************************/
+    QMatrix4x4 mat;
+    mat = QMatrix4x4( fy,  fx, -fz,  0.0,           // model matrix
+                      ry,  rx, -rz,  0.0,           // (X,Y,Z) -> (+Y,+X,-Z)
+                     -uy, -ux,  uz,  0.0,
+                     0.0, 0.0, 0.0,  1.0);
+    mat.optimize();
+
+    QQuaternion quat;                               // model quat
+    asMatrix2Quat(mat, quat);
+
+    // rotate gravity
+    /*************************************************************************************/
+    QVector3D acc = QVector3D(accY, accX, -accZ);   // accel (X,Y,Z) -> (+Y,+X,-Z)
+    QVector3D gee = QVector3D(0.0, 0.0, -GEE);
+    QQuaternion qWorld = quat.conjugate();
+    gee = qWorld.rotatedVector(gee);
+    acc += gee;
+
+    out.rollRate = angY * RAD2DEG;       // gyros (X,Y,Z) -> (+Y,+X,-Z)
+    out.pitchRate = angX * RAD2DEG;
+    out.yawRate = angZ * -RAD2DEG;
+
+    out.accX = acc.x();
+    out.accY = acc.y();
+    out.accZ = acc.z();
+
+    /*************************************************************************************/
+    QVector3D rpy;          // model roll, pitch, yaw
+    asMatrix2RPY(mat, rpy);
+
+    out.roll  = rpy.x();
+    out.pitch = rpy.y();
+    out.heading = rpy.z();
 
 
     /**********************************************************************************************/
-    QTime currentTime = QTime::currentTime();
-    /**********************************************************************************************/
-//    static bool firstRun = true;
-//    if (settings.homeLocation) {
-//        if (firstRun) {
-//            HomeLocation::DataFields homeData;
-//            homeData = posHome->getData();
+    out.altitude = posZ;
+    out.heading = yaw * RAD2DEG;
+    out.latitude = lat * 10e6;
+    out.longitude = lon * 10e6;
+    out.groundspeed = qSqrt(velX * velX + velY * velY);
 
-//            homeData.Latitude = WpLat * 10e6;
-//            homeData.Longitude = WpLon * 10e6;
-//            homeData.Altitude = homeZ;
-//            homeData.Set = HomeLocation::SET_TRUE;
-
-//            posHome->setData(homeData);
-
-//            firstRun = false;
-//        }
-//        if (settings.homeLocRate > 0) {
-//            static QTime homeLocTime = currentTime;
-//            if (homeLocTime.secsTo(currentTime) >= settings.homeLocRate) {
-//                firstRun = true;
-//                homeLocTime = currentTime;
-//            }
-//        }
-//    }
-    /**********************************************************************************************/
-//    if (settings.attRaw || settings.attActual) {
-        QMatrix4x4 mat;
-        mat = QMatrix4x4( fy,  fx, -fz,  0.0,           // model matrix
-                          ry,  rx, -rz,  0.0,           // (X,Y,Z) -> (+Y,+X,-Z)
-                         -uy, -ux,  uz,  0.0,
-                         0.0, 0.0, 0.0,  1.0);
-        mat.optimize();
-
-        QQuaternion quat;                               // model quat
-        asMatrix2Quat(mat, quat);
-
-        // rotate gravity
-        QVector3D acc = QVector3D(accY, accX, -accZ);   // accel (X,Y,Z) -> (+Y,+X,-Z)
-        QVector3D gee = QVector3D(0.0, 0.0, -GEE);
-        QQuaternion qWorld = quat.conjugate();
-        gee = qWorld.rotatedVector(gee);
-        acc += gee;
-
-        /*************************************************************************************/
-//        if (settings.attRaw) {
-            out.rollRate = angY * RAD2DEG;       // gyros (X,Y,Z) -> (+Y,+X,-Z)
-            out.pitchRate = angX * RAD2DEG;
-            out.yawRate = angZ * -RAD2DEG;
-
-            out.accX = acc.x();
-            out.accY = acc.y();
-            out.accZ = acc.z();
-//        }
-        /*************************************************************************************/
-        QVector3D rpy;          // model roll, pitch, yaw
-        asMatrix2RPY(mat, rpy);
-
-        out.roll  = rpy.x();
-        out.pitch = rpy.y();
-        out.heading = rpy.z();
-
-//        if (settings.attActHW) {
-//            // do nothing
-//            /*****************************************/
-//        } else if (settings.attActSim) {
-//            // take all data from simulator
-//            AttitudeActual::DataFields attActData;
-//            attActData = attActual->getData();
-
-
-//            attActData.Roll  = rpy.x();
-//            attActData.Pitch = rpy.y();
-//            attActData.Yaw   = rpy.z();
-//            attActData.q1 = quat.scalar();
-//            attActData.q2 = quat.x();
-//            attActData.q3 = quat.y();
-//            attActData.q4 = quat.z();
-
-//            attActual->setData(attActData);
-//            /*****************************************/
-//        } else if (settings.attActCalc) {
-//            // calculate RPY with code from Attitude module
-//            AttitudeActual::DataFields attActData;
-//            attActData = attActual->getData();
-
-//            static float q[4] = {1, 0, 0, 0};
-//            static float gyro_correct_int2 = 0;
-
-//            float dT = timeStep;
-
-//            AttitudeSettings::DataFields attSettData = attSettings->getData();
-//            float accelKp = attSettData.AccelKp * 0.1666666666666667;
-//            float accelKi = attSettData.AccelKp * 0.1666666666666667;
-//            float yawBiasRate = attSettData.YawBiasRate;
-
-//            // calibrate sensors on arming
-//            if (flightStatus->getData().Armed == FlightStatus::ARMED_ARMING) {
-//                accelKp = 2.0;
-//                accelKi = 0.9;
-//            }
-
-//            float gyro[3] = {angY * RAD2DEG, angX * RAD2DEG, angZ * -RAD2DEG};
-//            float attRawAcc[3] = {acc.x(), acc.y(), acc.z()};
-
-//            // code from Attitude module begin ///////////////////////////////
-//            float *accels = attRawAcc;
-//            float grot[3];
-//            float accel_err[3];
-
-//            // Rotate gravity to body frame and cross with accels
-//            grot[0] = -(2 * (q[1] * q[3] - q[0] * q[2]));
-//            grot[1] = -(2 * (q[2] * q[3] + q[0] * q[1]));
-//            grot[2] = -(q[0] * q[0] - q[1]*q[1] - q[2]*q[2] + q[3]*q[3]);
-
-//            // CrossProduct
-//            {
-//                accel_err[0] = accels[1]*grot[2] - grot[1]*accels[2];
-//                accel_err[1] = grot[0]*accels[2] - accels[0]*grot[2];
-//                accel_err[2] = accels[0]*grot[1] - grot[0]*accels[1];
-//            }
-
-//            // Account for accel magnitude
-//            float accel_mag = sqrt(accels[0] * accels[0] + accels[1] * accels[1] + accels[2] * accels[2]);
-//            accel_err[0] /= accel_mag;
-//            accel_err[1] /= accel_mag;
-//            accel_err[2] /= accel_mag;
-
-//            // Accumulate integral of error.  Scale here so that units are (deg/s) but Ki has units of s
-//            gyro_correct_int2 += -gyro[2] * yawBiasRate;
-
-//            // Correct rates based on error, integral component dealt with in updateSensors
-//            gyro[0] += accel_err[0] * accelKp / dT;
-//            gyro[1] += accel_err[1] * accelKp / dT;
-//            gyro[2] += accel_err[2] * accelKp / dT + gyro_correct_int2;
-
-//            // Work out time derivative from INSAlgo writeup
-//            // Also accounts for the fact that gyros are in deg/s
-//            float qdot[4];
-//            qdot[0] = (-q[1] * gyro[0] - q[2] * gyro[1] - q[3] * gyro[2]) * dT * M_PI / 180 / 2;
-//            qdot[1] = (+q[0] * gyro[0] - q[3] * gyro[1] + q[2] * gyro[2]) * dT * M_PI / 180 / 2;
-//            qdot[2] = (+q[3] * gyro[0] + q[0] * gyro[1] - q[1] * gyro[2]) * dT * M_PI / 180 / 2;
-//            qdot[3] = (-q[2] * gyro[0] + q[1] * gyro[1] + q[0] * gyro[2]) * dT * M_PI / 180 / 2;
-
-//            // Take a time step
-//            q[0] += qdot[0];
-//            q[1] += qdot[1];
-//            q[2] += qdot[2];
-//            q[3] += qdot[3];
-
-//            if(q[0] < 0) {
-//                q[0] = -q[0];
-//                q[1] = -q[1];
-//                q[2] = -q[2];
-//                q[3] = -q[3];
-//            }
-
-//            // Renomalize
-//            float qmag = sqrt((q[0] * q[0]) + (q[1] * q[1]) + (q[2] * q[2]) + (q[3] * q[3]));
-//            q[0] /= qmag;
-//            q[1] /= qmag;
-//            q[2] /= qmag;
-//            q[3] /= qmag;
-
-//            // If quaternion has become inappropriately short or is nan reinit.
-//            // THIS SHOULD NEVER ACTUALLY HAPPEN
-//            if((fabs(qmag) < 1e-3) || (qmag != qmag)) {
-//                q[0] = 1;
-//                q[1] = 0;
-//                q[2] = 0;
-//                q[3] = 0;
-//            }
-
-//            float rpy2[3];
-//            // Quaternion2RPY
-//            {
-//                float q0s, q1s, q2s, q3s;
-//                q0s = q[0] * q[0];
-//                q1s = q[1] * q[1];
-//                q2s = q[2] * q[2];
-//                q3s = q[3] * q[3];
-
-//                float R13, R11, R12, R23, R33;
-//                R13 = 2 * (q[1] * q[3] - q[0] * q[2]);
-//                R11 = q0s + q1s - q2s - q3s;
-//                R12 = 2 * (q[1] * q[2] + q[0] * q[3]);
-//                R23 = 2 * (q[2] * q[3] + q[0] * q[1]);
-//                R33 = q0s - q1s - q2s + q3s;
-
-//                rpy2[1] = RAD2DEG * asinf(-R13);    // pitch always between -pi/2 to pi/2
-//                rpy2[2] = RAD2DEG * atan2f(R12, R11);
-//                rpy2[0] = RAD2DEG * atan2f(R23, R33);
-//            }
-
-//            attActData.Roll  = rpy2[0];
-//            attActData.Pitch = rpy2[1];
-//            attActData.Yaw   = rpy2[2];
-//            attActData.q1 = q[0];
-//            attActData.q2 = q[1];
-//            attActData.q3 = q[2];
-//            attActData.q4 = q[3];
-//            attActual->setData(attActData);
-//            /*****************************************/
-//        }
-//    }
-    /**********************************************************************************************/
-//    if (settings.gcsReciever) {
-//        static QTime gcsRcvrTime = currentTime;
-//        if (!settings.manualOutput || gcsRcvrTime.msecsTo(currentTime) >= settings.outputRate) {
-//            GCSReceiver::DataFields gcsRcvrData;
-//            gcsRcvrData = gcsReceiver->getData();
-
-//            for (int i = 0; i < 8; ++i)
-//                gcsRcvrData.Channel[i] = 1500 + (ch[i] * 500);
-
-//            gcsReceiver->setData(gcsRcvrData);
-//            if (settings.manualOutput)
-//                gcsRcvrTime = currentTime;
-//        }
-//    } else if (settings.manualControl) {
-//        // not implemented yet
-//    }
-    /**********************************************************************************************/
-//    if (settings.gpsPosition) {
-        static QTime gpsPosTime = currentTime;
-//        if (gpsPosTime.msecsTo(currentTime) >= settings.gpsPosRate) {
-            out.altitude = posZ;
-            out.heading = yaw * RAD2DEG;
-            out.latitude = lat * 10e6;
-            out.longitude = lon * 10e6;
-            out.groundspeed = qSqrt(velX * velX + velY * velY);
-//            gpsPosData.GeoidSeparation = 0.0;
-//            gpsPosData.Satellites = 8;
-//            gpsPosData.PDOP = 3.0;
-//            gpsPosData.Status = GPSPosition::STATUS_FIX3D;
-
-//            gpsPosition->setData(gpsPosData);
-//            gpsPosTime = currentTime;
-//        }
-//    }
-    /**********************************************************************************************/
-//    if (settings.sonarAltitude) {
-//        static QTime sonarAltTime = currentTime;
-//        if (sonarAltTime.msecsTo(currentTime) >= settings.sonarAltRate) {
-//            SonarAltitude::DataFields sonarAltData;
-//            sonarAltData = sonarAlt->getData();
-
-//            float sAlt = settings.sonarMaxAlt;
-//            // 0.35 rad ~= 20 degree
-//            if ((agl < (sAlt * 2.0)) && (roll < 0.35) && (pitch < 0.35)) {
-//                float x = agl * qTan(roll);
-//                float y = agl * qTan(pitch);
-//                float h = qSqrt(x*x + y*y + agl*agl);
-//                sAlt = qMin(h, sAlt);
-//            }
-
-//            sonarAltData.Altitude = sAlt;
-//            sonarAlt->setData(sonarAltData);
-//            sonarAltTime = currentTime;
-//        }
-//    }
     /**********************************************************************************************/
     out.dstN = posY * 100;
     out.dstE = posX * 100;
@@ -452,6 +208,9 @@ void AeroSimRCSimulator::processUpdate(const QByteArray &data)
     out.velDown = velY * 100;
     out.velEast = velX * 100;
     out.velDown = velZ * 100; //WHY ISN'T THIS `-velZ`???
+
+    updateUAVOs(out);
+
 
 #ifdef DBG_TIMERS
     static int cntRX = 0;

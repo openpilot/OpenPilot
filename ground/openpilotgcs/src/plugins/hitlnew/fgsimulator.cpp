@@ -98,44 +98,44 @@ bool FGSimulator::setupProcess()
 	QString cmdShell("bash");
 #endif
 
-	// Start shell (Note: Could not start FG directly on Windows, only through terminal!)
-	simProcess->start(cmdShell);
-	if (simProcess->waitForStarted() == false)
-	{
-		emit processOutput("Error:" + simProcess->errorString());
-		return false;
-	}
+    // Start shell (Note: Could not start FG directly on Windows, only through terminal!)
+    simProcess->start(cmdShell);
+    if (simProcess->waitForStarted() == false)
+    {
+        emit processOutput("Error:" + simProcess->errorString());
+        return false;
+    }
 
-	// Setup arguments
-	// Note: The input generic protocol is set to update at a much higher rate than the actual updates are sent by the GCS.
-	// If this is not done then a lag will be introduced by FlightGear, likelly because the receive socket buffer builds up during startup.
-        QString args("--fg-root=\"" + settings.dataPath + "\" " +
-                     "--timeofday=noon " +
-                     "--httpd=5400 " +
-                     "--enable-hud " +
-                     "--in-air " +
-                     "--altitude=3000 " +
-                     "--vc=100 " +
-                     "--log-level=alert " +
-                     "--generic=socket,out,20," + settings.hostAddress + "," + QString::number(settings.inPort) + ",udp,opfgprotocol");
-	if(!settings.manual)
-	{
-            args.append(" --generic=socket,in,400," + settings.remoteHostAddress + "," + QString::number(settings.outPort) + ",udp,opfgprotocol");
-	}
+    // Setup arguments
+    // Note: The input generic protocol is set to update at a much higher rate than the actual updates are sent by the GCS.
+    // If this is not done then a lag will be introduced by FlightGear, likelly because the receive socket buffer builds up during startup.
+    QString args("--fg-root=\"" + settings.dataPath + "\" " +
+                 "--timeofday=noon " +
+                 "--httpd=5400 " +
+                 "--enable-hud " +
+                 "--in-air " +
+                 "--altitude=3000 " +
+                 "--vc=100 " +
+                 "--log-level=alert " +
+                 "--generic=socket,out,20," + settings.hostAddress + "," + QString::number(settings.inPort) + ",udp,opfgprotocol");
+    if(!settings.manualControl)
+    {
+        args.append(" --generic=socket,in,400," + settings.remoteAddress + "," + QString::number(settings.outPort) + ",udp,opfgprotocol");
+    }
 
-        // Start FlightGear - only if checkbox is selected in HITL options page
-        if (settings.startSim)
-        {
-            QString cmd("\"" + settings.binPath + "\" " + args + "\n");
-            simProcess->write(cmd.toAscii());
-        }
-        else
-        {
-            emit processOutput("Start Flightgear from the command line with the following arguments: \n\n" + args + "\n\n" +
-                               "You can optionally run Flightgear from a networked computer.\n" +
-                               "Make sure the computer running Flightgear can can ping your local interface adapter. ie." + settings.hostAddress + "\n"
-                               "Remote computer must have the correct OpenPilot protocol installed.");
-        }
+    // Start FlightGear - only if checkbox is selected in HITL options page
+    if (settings.startSim)
+    {
+        QString cmd("\"" + settings.binPath + "\" " + args + "\n");
+        simProcess->write(cmd.toAscii());
+    }
+    else
+    {
+        emit processOutput("Start Flightgear from the command line with the following arguments: \n\n" + args + "\n\n" +
+                           "You can optionally run Flightgear from a networked computer.\n" +
+                           "Make sure the computer running Flightgear can can ping your local interface adapter. ie." + settings.hostAddress + "\n"
+                           "Remote computer must have the correct OpenPilot protocol installed.");
+    }
 
         udpCounterGCSsend = 0;
 
@@ -207,7 +207,7 @@ void FGSimulator::transmitUpdate()
 
 	QByteArray data = cmd.toAscii();
 
-        if(outSocket->writeDatagram(data, QHostAddress(settings.remoteHostAddress), settings.outPort) == -1)
+        if(outSocket->writeDatagram(data, QHostAddress(settings.remoteAddress), settings.outPort) == -1)
         {
             emit processOutput("Error sending UDP packet to FG: " + outSocket->errorString() + "\n");
         }
@@ -219,7 +219,7 @@ void FGSimulator::transmitUpdate()
         // V2.0 does not currently work with --generic-protocol
     }
     
-    if(!settings.manual)
+    if(!settings.manualControl)
     {
         actData.Roll = ailerons;
         actData.Pitch = -elevator;

@@ -1,5 +1,6 @@
 package org.openpilot.uavtalk;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
@@ -50,7 +51,14 @@ public class TelemetryMonitor extends Observable{
 
 	    flightStatsObj.addUpdatedObserver(new Observer() {
 			public void update(Observable observable, Object data) {
-				flightStatsUpdated((UAVObject) data);
+				try {
+					flightStatsUpdated((UAVObject) data);
+				} catch (IOException e) {
+					// The UAVTalk stream was broken, disconnect this signal
+					// TODO: Should this actually be disconnected.  Do we create a new TelemetryMonitor for this
+					// or fix the stream?
+					flightStatsObj.removeUpdatedObserver(this);
+				}
 			}	    	
 	    });
 
@@ -60,8 +68,9 @@ public class TelemetryMonitor extends Observable{
 
 	/**
 	 * Initiate object retrieval, initialize queue with objects to be retrieved.
+	 * @throws IOException 
 	 */
-	public synchronized void startRetrievingObjects()
+	public synchronized void startRetrievingObjects() throws IOException
 	{
 		if (DEBUG) Log.d(TAG, "Start retrieving objects");
 		
@@ -112,8 +121,9 @@ public class TelemetryMonitor extends Observable{
 
 	/**
 	 * Retrieve the next object in the queue
+	 * @throws IOException 
 	 */
-	public synchronized void retrieveNextObject()
+	public synchronized void retrieveNextObject() throws IOException
 	{
 	    // If queue is empty return
 	    if ( queue.isEmpty() )
@@ -133,11 +143,18 @@ public class TelemetryMonitor extends Observable{
 	    	    
 	    if (DEBUG) Log.d(TAG, "Retrieving object: " + obj.getName()) ;
 	    // Connect to object
+	    
+	    // TODO: Does this need to stay here permanently?  This appears to be used for setup mainly
 	    obj.addTransactionCompleted(new Observer() {
 			public void update(Observable observable, Object data) {
 				UAVObject.TransactionResult result = (UAVObject.TransactionResult) data;
 				if (DEBUG) Log.d(TAG,"Got transaction completed event from " + result.obj.getName() + " status: " + result.success);
-				transactionCompleted(result.obj, result.success);
+				try {
+					transactionCompleted(result.obj, result.success);
+				} catch (IOException e) {
+					// When the telemetry stream is broken disconnect these updates
+					observable.deleteObserver(this);
+				}
 			}	    	
 	    });
 
@@ -148,8 +165,9 @@ public class TelemetryMonitor extends Observable{
 
 	/**
 	 * Called by the retrieved object when a transaction is completed.
+	 * @throws IOException 
 	 */
-	public synchronized void transactionCompleted(UAVObject obj, boolean success)
+	public synchronized void transactionCompleted(UAVObject obj, boolean success) throws IOException
 	{
 	    //QMutexLocker locker(mutex);
 	    // Disconnect from sending object
@@ -176,8 +194,9 @@ public class TelemetryMonitor extends Observable{
 
 	/**
 	 * Called each time the flight stats object is updated by the autopilot
+	 * @throws IOException 
 	 */
-	public synchronized void flightStatsUpdated(UAVObject obj)
+	public synchronized void flightStatsUpdated(UAVObject obj) throws IOException
 	{
 	    // Force update if not yet connected
 	    gcsStatsObj = objMngr.getObject("GCSTelemetryStats");
@@ -193,8 +212,9 @@ public class TelemetryMonitor extends Observable{
 
 	/**
 	 * Called periodically to update the statistics and connection status.
+	 * @throws IOException 
 	 */
-	public synchronized void processStatsUpdates()
+	public synchronized void processStatsUpdates() throws IOException
 	{
 	    // Get telemetry stats
 		if (DEBUG) Log.d(TAG, "processStatsUpdates()");
@@ -313,9 +333,20 @@ public class TelemetryMonitor extends Observable{
 	    periodicTask.scheduleAtFixedRate(new TimerTask() {
 			@Override
 			public void run() {
-				processStatsUpdates();				
+				try {
+					processStatsUpdates();
+				} catch (IOException e) {
+					// Once the stream has died stop trying to process these updates
+					periodicTask.cancel();
+				}				
 			}	    	
 	    }, currentPeriod, currentPeriod);
+	}
+	
+	public void stopMonitor()
+	{
+		periodicTask.cancel();
+		periodicTask = null;
 	}
 
 }

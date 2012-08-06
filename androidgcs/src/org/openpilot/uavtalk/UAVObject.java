@@ -45,6 +45,11 @@ public abstract class UAVObject {
 			transactionCompletedListeners.addObserver(o);
 		}
 	}
+	public void removeTransactionCompleted(Observer o) {
+		synchronized(transactionCompletedListeners) {
+			transactionCompletedListeners.deleteObserver(o);
+		}
+	}
 	void transactionCompleted(boolean status) {
 		synchronized(transactionCompletedListeners) {
 			transactionCompletedListeners.event(new TransactionResult(this,status));

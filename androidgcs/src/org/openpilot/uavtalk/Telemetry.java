@@ -1,5 +1,6 @@
 package org.openpilot.uavtalk;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -88,7 +89,12 @@ public class Telemetry {
         // Listen to transaction completions
         utalk.addObserver(new Observer() {
 			public void update(Observable observable, Object data) {
-				transactionCompleted((UAVObject) data);				
+				try {
+					transactionCompleted((UAVObject) data);
+				} catch (IOException e) {
+					// Disconnect when stream fails
+					observable.deleteObserver(this);
+				}				
 			}        	
         });
         
@@ -117,18 +123,35 @@ public class Telemetry {
         transTimerTask = new TimerTask() {
 			@Override
 			public void run() {
-				transactionTimeout();
+				try {
+					transactionTimeout();
+				} catch (IOException e) {
+					cancel();
+				}
 			}        	
         };
         transTimer.schedule(transTimerTask, periodMs, periodMs);
     }
     
     synchronized void updateTimerSetPeriod(int periodMs) {
+    	if (updateTimer != null) {
+    		updateTimer.cancel();
+    		updateTimer = null;
+    	}
+    	if (updateTimerTask != null) {
+    		updateTimerTask.cancel();
+    		updateTimerTask = null;
+    	}
         updateTimer = new Timer();
         updateTimerTask = new TimerTask() {
 			@Override
 			public void run() {
-				processPeriodicUpdates();
+				try {
+					processPeriodicUpdates();
+				} catch (IOException e) {
+					updateTimerTask.cancel();
+					updateTimer.cancel();
+				}
 			}        	
         };
         updateTimer.schedule(updateTimerTask, periodMs, periodMs);
@@ -206,7 +229,12 @@ public class Telemetry {
             {
             	obj.addUnpackedObserver(new Observer() {
 					public void update(Observable observable, Object data) {
-	            		objectUnpacked( (UAVObject) data);
+	            		try {
+							objectUnpacked( (UAVObject) data);
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 	            	}            		
             	});
             }
@@ -214,7 +242,12 @@ public class Telemetry {
             {
             	obj.addUpdatedAutoObserver(new Observer() {
 					public void update(Observable observable, Object data) {
-						objectUpdatedAuto( (UAVObject) data);
+						try {
+							objectUpdatedAuto( (UAVObject) data);
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 	            	}            		            		
             	});
             }
@@ -222,7 +255,12 @@ public class Telemetry {
             {
             	obj.addUpdatedManualObserver(new Observer() {
 					public void update(Observable observable, Object data) {
-						objectUpdatedManual( (UAVObject) data);
+						try {
+							objectUpdatedManual( (UAVObject) data);
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 	            	}            		            		
             	});
             }
@@ -230,7 +268,12 @@ public class Telemetry {
             {
             	obj.addUpdateRequestedObserver(new Observer() {
 					public void update(Observable observable, Object data) {
-						updateRequested( (UAVObject) data);
+						try {
+							updateRequested( (UAVObject) data);
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 	            	}            		
             	});
             }
@@ -288,8 +331,9 @@ public class Telemetry {
 
     /**
      * Called when a transaction is successfully completed (uavtalk event)
+     * @throws IOException 
      */
-    private synchronized void transactionCompleted(UAVObject obj)
+    private synchronized void transactionCompleted(UAVObject obj) throws IOException
     {
     	if (DEBUG) Log.d(TAG,"UAVTalk transactionCompleted");
         // Check if there is a pending transaction and the objects match
@@ -311,8 +355,9 @@ public class Telemetry {
 
     /**
      * Called when a transaction is not completed within the timeout period (timer event)
+     * @throws IOException 
      */
-    private synchronized void transactionTimeout()
+    private synchronized void transactionTimeout() throws IOException
     {
     	if (DEBUG) Log.d(TAG,"Telemetry: transaction timeout.");
         transTimer.cancel();
@@ -342,8 +387,9 @@ public class Telemetry {
 
     /**
      * Start an object transaction with UAVTalk, all information is stored in transInfo
+     * @throws IOException 
      */
-    private synchronized void processObjectTransaction()
+    private synchronized void processObjectTransaction() throws IOException
     {
         if (transPending)
         {
@@ -375,8 +421,9 @@ public class Telemetry {
 
     /**
      * Process the event received from an object
+     * @throws IOException 
      */
-    private synchronized void processObjectUpdates(UAVObject obj, int event, boolean allInstances, boolean priority)
+    private synchronized void processObjectUpdates(UAVObject obj, int event, boolean allInstances, boolean priority) throws IOException
     {
         // Push event into queue
     	if (DEBUG) Log.d(TAG, "Push event into queue for obj " + obj.getName() + " event " + event);
@@ -397,6 +444,7 @@ public class Telemetry {
                 ++txErrors;
                 obj.transactionCompleted(false);
                 Log.w(TAG,"Telemetry: priority event queue is full, event lost " + obj.getName());
+               new Exception().printStackTrace();
             }
         }
         else
@@ -421,8 +469,9 @@ public class Telemetry {
 
     /**
      * Process events from the object queue
+     * @throws IOException 
      */
-    private synchronized void processObjectQueue()
+    private synchronized void processObjectQueue() throws IOException
     {
       	if (DEBUG) Log.d(TAG, "Process object queue - Depth " + objQueue.size() + " priority " + objPriorityQueue.size());
 
@@ -505,8 +554,9 @@ public class Telemetry {
     /**
      * Check is any objects are pending for periodic updates
      * TODO: Clean-up
+     * @throws IOException 
      */
-    private synchronized void processPeriodicUpdates()
+    private synchronized void processPeriodicUpdates() throws IOException
     {
     	
     	if (DEBUG) Log.d(TAG, "processPeriodicUpdates()");
@@ -590,22 +640,22 @@ public class Telemetry {
         txRetries = 0;
     }
 
-    private synchronized void objectUpdatedAuto(UAVObject obj)
+    private synchronized void objectUpdatedAuto(UAVObject obj) throws IOException
     {
         processObjectUpdates(obj, EV_UPDATED, false, true);
     }
 
-    private synchronized void objectUpdatedManual(UAVObject obj)
+    private synchronized void objectUpdatedManual(UAVObject obj) throws IOException
     {
         processObjectUpdates(obj, EV_UPDATED_MANUAL, false, true);
     }
 
-    private synchronized void objectUnpacked(UAVObject obj)
+    private synchronized void objectUnpacked(UAVObject obj) throws IOException
     {
         processObjectUpdates(obj, EV_UNPACKED, false, true);
     }
 
-    public synchronized void updateRequested(UAVObject obj)
+    public synchronized void updateRequested(UAVObject obj) throws IOException
     {
         processObjectUpdates(obj, EV_UPDATE_REQ, false, true);
     }
@@ -620,6 +670,25 @@ public class Telemetry {
         registerObject(obj);
     }
     
+    /**
+     * Stop all the telemetry timers
+     */
+    public void stopTelemetry()
+    {
+    	if (updateTimerTask != null)
+    		updateTimerTask.cancel();
+    	updateTimerTask = null;
+    	if (updateTimer != null)
+    		updateTimer.cancel();
+    	updateTimer = null;
+    	if (transTimerTask != null)
+    		transTimerTask.cancel();
+    	transTimerTask = null;
+    	if (transTimer != null)
+    		transTimer.cancel();
+    	transTimer = null;
+    }
+
 	/**
 	 * Private variables
 	 */

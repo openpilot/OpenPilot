@@ -165,12 +165,16 @@ public abstract class ObjectManagerActivity extends Activity {
 		bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 	}
 	
+	/**
+	 * When stopping disconnect form the service and the broadcast receiver
+	 */
 	@Override
 	public void onStop() {
 		super.onStop();
 		unbindService(mConnection);
 		unregisterReceiver(connectedReceiver);
 	}
+
 	public void onBind() {
 		
 	}

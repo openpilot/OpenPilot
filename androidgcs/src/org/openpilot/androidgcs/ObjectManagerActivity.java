@@ -40,14 +40,15 @@ public abstract class ObjectManagerActivity extends Activity {
 	boolean mConnected = false;
 	//! The binder to access the telemetry task, and thus the object manager
 	LocalBinder binder;
-    
+	//! Store the broadcast receiver to unregister it
+	BroadcastReceiver connectedReceiver;
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		BroadcastReceiver connectedReceiver = new BroadcastReceiver() {
+		connectedReceiver = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				Log.d(TAG, "Received intent");
@@ -164,6 +165,12 @@ public abstract class ObjectManagerActivity extends Activity {
 		bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 	}
 	
+	@Override
+	public void onStop() {
+		super.onStop();
+		unbindService(mConnection);
+		unregisterReceiver(connectedReceiver);
+	}
 	public void onBind() {
 		
 	}

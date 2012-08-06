@@ -90,7 +90,7 @@ public class TalkTest {
 	}
 
 	@Test
-	public void testSendObjectRequest() {
+	public void testSendObjectRequest() throws IOException {
 		ByteArrayInputStream is = new ByteArrayInputStream(new byte[0], 0, 0);
 		ByteArrayOutputStream os = new ByteArrayOutputStream(100);
 		

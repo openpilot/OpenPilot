@@ -17,11 +17,12 @@ public class UAVTalk extends Observable {
 	public static boolean DEBUG = LOGLEVEL > 0;
 
 	private Thread inputProcessingThread = null;
+	
+	private boolean streamFailed = false;
 
 	/**
-	 * A reference to the thread for processing the incoming stream
-	 * 
-	 * @return
+	 * A reference to the thread for processing the incoming stream.  Currently this method is ONLY
+	 * used for unit testing
 	 */
 	public Thread getInputProcessThread() {
 		if (inputProcessingThread == null)
@@ -29,8 +30,13 @@ public class UAVTalk extends Observable {
 			inputProcessingThread = new Thread() {
 				public void run() {
 					while(true) {
-						if( !processInputStream() )
-							break;
+						try {
+							if( !processInputStream() )
+								break;
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					}
 				}
 			};
@@ -175,18 +181,14 @@ public class UAVTalk extends Observable {
 
 	/**
 	 * Process any data in the queue
+	 * @throws IOException 
 	 */
-	public boolean processInputStream() {
+	public boolean processInputStream() throws IOException {
 		int val;
 
-		try {
-			// inStream.wait();
-			val = inStream.read();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return false;
-		}
+		//inStream.wait();
+		val = inStream.read();
+
 		if (val == -1) {
 			return false;
 		}
@@ -201,8 +203,9 @@ public class UAVTalk extends Observable {
 	 * would have been updated by the GCS. \param[in] obj Object to update
 	 * \param[in] allInstances If set true then all instances will be updated
 	 * \return Success (true), Failure (false)
+	 * @throws IOException 
 	 */
-	public boolean sendObjectRequest(UAVObject obj, boolean allInstances) {
+	public boolean sendObjectRequest(UAVObject obj, boolean allInstances) throws IOException {
 		// QMutexLocker locker(mutex);
 		return objectTransaction(obj, TYPE_OBJ_REQ, allInstances);
 	}
@@ -212,9 +215,10 @@ public class UAVTalk extends Observable {
 	 * Object to send \param[in] acked Selects if an ack is required \param[in]
 	 * allInstances If set true then all instances will be updated \return
 	 * Success (true), Failure (false)
+	 * @throws IOException 
 	 */
 	public synchronized boolean sendObject(UAVObject obj, boolean acked,
-			boolean allInstances) {
+			boolean allInstances) throws IOException {
 		if (acked) {
 			return objectTransaction(obj, TYPE_OBJ_ACK, allInstances);
 		} else {
@@ -235,9 +239,10 @@ public class UAVTalk extends Observable {
 	 * request object update TYPE_OBJ_ACK: send object with an ack \param[in]
 	 * allInstances If set true then all instances will be updated \return
 	 * Success (true), Failure (false)
+	 * @throws IOException 
 	 */
 	public boolean objectTransaction(UAVObject obj, int type,
-			boolean allInstances) {
+			boolean allInstances) throws IOException {
 		// Send object depending on if a response is needed
 		if (type == TYPE_OBJ_ACK || type == TYPE_OBJ_REQ) {
 			if (transmitObject(obj, type, allInstances)) {
@@ -257,8 +262,9 @@ public class UAVTalk extends Observable {
 	/**
 	 * Process an byte from the telemetry stream. \param[in] rxbyte Received
 	 * byte \return Success (true), Failure (false)
+	 * @throws IOException 
 	 */
-	public synchronized boolean processInputByte(int rxbyte) {
+	public synchronized boolean processInputByte(int rxbyte) throws IOException {
 		assert (objMngr != null);
 
 		// Update stats
@@ -471,9 +477,10 @@ public class UAVTalk extends Observable {
 	 * received object \param[in] instId The instance ID of UAVOBJ_ALL_INSTANCES
 	 * for all instances. \param[in] data Data buffer \param[in] length Buffer
 	 * length \return Success (true), Failure (false)
+	 * @throws IOException 
 	 */
 	public boolean receiveObject(int type, long objId, long instId,
-			ByteBuffer data) {
+			ByteBuffer data) throws IOException {
 		
 		if (DEBUG) Log.d(TAG, "Received object ID: " + objId);
 		assert (objMngr != null);
@@ -622,8 +629,9 @@ public class UAVTalk extends Observable {
 	 * @param[in] type Transaction type 
 	 * @param[in] allInstances True is all instances of the object are to be sent 
 	 * @return Success (true), Failure (false)
+	 * @throws IOException 
 	 */
-	public synchronized boolean transmitObject(UAVObject obj, int type, boolean allInstances) {
+	public synchronized boolean transmitObject(UAVObject obj, int type, boolean allInstances) throws IOException {
 		// If all instances are requested on a single instance object it is an
 		// error
 		if (allInstances && obj.isSingleInstance()) {
@@ -658,12 +666,13 @@ public class UAVTalk extends Observable {
 	}
 
 	/**
-	 * Send an object through the telemetry link. \param[in] obj Object handle
-	 * to send \param[in] type Transaction type \return Success (true), Failure
-	 * (false)
+	 * Send an object through the telemetry link.
+	 * @throws IOException 
+	 * @param[in] obj Object handle to send
+	 * @param[in] type Transaction type \return Success (true), Failure (false)
 	 */
 	public synchronized boolean transmitSingleObject(UAVObject obj, int type,
-			boolean allInstances) {
+			boolean allInstances) throws IOException {
 		int length;
 		int allInstId = ALL_INSTANCES;
 
@@ -682,8 +691,7 @@ public class UAVTalk extends Observable {
 		// Setup type and object id fields
 		bbuf.put((byte) (SYNC_VAL & 0xff));
 		bbuf.put((byte) (type & 0xff));
-		bbuf
-				.putShort((short) (length + 2 /* SYNC, Type */+ 2 /* Size */+ 4 /* ObjID */+ (obj
+		bbuf.putShort((short) (length + 2 /* SYNC, Type */+ 2 /* Size */+ 4 /* ObjID */+ (obj
 						.isSingleInstance() ? 0 : 2)));
 		bbuf.putInt((int)obj.getObjID());
 
@@ -714,31 +722,12 @@ public class UAVTalk extends Observable {
 		// Calculate checksum
 		bbuf.put((byte) (updateCRC(0, bbuf.array(), bbuf.position()) & 0xff));
 
-		try {
-			int packlen = bbuf.position();
-			bbuf.position(0);
-			byte[] dst = new byte[packlen];
-			bbuf.get(dst, 0, packlen);
-			outStream.write(dst);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return false;
-		}
+		int packlen = bbuf.position();
+		bbuf.position(0);
+		byte[] dst = new byte[packlen];
+		bbuf.get(dst, 0, packlen);
+		outStream.write(dst);
 
-		// //TODO: Need to use a different outStream type and check that the
-		// backlog isn't more than TX_BUFFER_SIZE
-		// // Send buffer, check that the transmit backlog does not grow above
-		// limit
-		// if ( io->bytesToWrite() < TX_BUFFER_SIZE )
-		// {
-		// io->write((const char*)txBuffer, dataOffset+length+CHECKSUM_LENGTH);
-		// }
-		// else
-		// {
-		// ++stats.txErrors;
-		// return false;
-		// }
 
 		// Update stats
 		++stats.txObjects;

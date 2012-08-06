@@ -24,13 +24,19 @@ public class TcpUAVTalk {
 	
 	private UAVTalk uavTalk;
 	private boolean connected; 
+	private Socket socket;
 	
+	/**
+	 * Construct a TcpUAVTalk object attached to the OPTelemetryService.  Gets the 
+	 * connection settings from the preferences.
+	 */
 	public TcpUAVTalk(Context caller) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(caller);
 		ip_address = prefs.getString("ip_address","127.0.0.1");
 		try {
 			port = Integer.decode(prefs.getString("port", ""));
 		} catch (NumberFormatException e) {
+			//TODO: Handle this exception
 		}
 
 		if (DEBUG) Log.d(TAG, "Trying to open UAVTalk with " + ip_address);
@@ -38,12 +44,26 @@ public class TcpUAVTalk {
         connected = false;         
     }
 	
+	/**
+	 * Connect a TCP object to an object manager.  Returns true if already
+	 * connected, otherwise returns true if managed a successful socket.
+	 */
 	public boolean connect(UAVObjectManager objMngr) {
 		if( getConnected() ) 
 			return true;
 		if( !openTelemetryTcp(objMngr) )
 			return false;
 		return true;		
+	}
+	
+	public void disconnect() {
+		try {
+			socket.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		socket = null;
 	}
 
 	public boolean getConnected() {
@@ -54,7 +74,10 @@ public class TcpUAVTalk {
 		return uavTalk;
 	}
 	
- 
+	/**
+	 * Opens a TCP socket to the address determined on construction.  If successful
+	 * creates a UAVTalk stream connection this socket to the passed in object manager
+	 */
 	private boolean openTelemetryTcp(UAVObjectManager objMngr) {
 		Log.d(TAG, "Opening connection to " + ip_address + " at address " + port);
 		
@@ -66,13 +89,11 @@ public class TcpUAVTalk {
 			e1.printStackTrace();
 			return false;
 		}
-		
-		Socket socket = null;
+
+		socket = null;
 		try {
 			socket = new Socket(serverAddr,port);
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
 			return false;
 		}
 

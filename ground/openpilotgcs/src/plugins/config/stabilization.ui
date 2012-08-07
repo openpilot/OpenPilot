@@ -25570,7 +25570,7 @@ automatically every 300ms, which will help for fast tuning.</string>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>269</width>
+          <width>450</width>
           <height>20</height>
          </size>
         </property>

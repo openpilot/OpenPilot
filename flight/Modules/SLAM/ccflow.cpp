@@ -72,6 +72,9 @@ CCFlow::CCFlow(cv::RNG *rnginit, cv::Mat* last[], cv::Mat* current[], int pyrami
 	//fullMatch(tst,ref,1.0/16.0,Vec3f(0,0,0),Vec3f(10,10,10));
 	//gradientMatch(tst,ref,Vec3f(0,0,0),Vec3f(10,10,10));
 	iterations=0;
+	if (depth==3 && border[0]==(current[mydepth]->cols)/2 && border[1]==(current[mydepth]->rows)/2) {
+		//fullMatch(tst,ref,1./32.,tr,Vec3f(10,10,0));
+	}
 	if (depth==0) {
 		gradientMatch(tst,ref,50,tr,Vec3f(1,1,1));
 	} else {
@@ -180,7 +183,8 @@ CCFlow* CCFlow::responsibleFlow(cv:: Point3f position) {
 	}
 }
 
-TransRot CCFlow::transrotationSmoothed(cv:: Point3f position) {
+//TransRot CCFlow::transrotationSmoothed(cv:: Point3f position) {
+cv::Vec4f CCFlow::transrotationSmoothed(cv:: Point3f position) {
 	CCFlow* ref = responsibleFlow(position);
 	Point2f pos(position.x,position.y);
 	int depth = position.z;
@@ -205,6 +209,15 @@ TransRot CCFlow::transrotationSmoothed(cv:: Point3f position) {
 	TransRot a = (1-tx)*TransRot(A1->translation[0],A1->translation[1],A1->rotation) + tx*TransRot(A2->translation[0],A2->translation[1],A2->rotation);
 	TransRot b = (1-tx)*TransRot(B1->translation[0],B1->translation[1],B1->rotation) + tx*TransRot(B2->translation[0],B2->translation[1],B2->rotation);
 	TransRot c = (1-ty)*a + ty*b;
+	//float qa = (1-tx)*(A1->worst-A1->best) + tx*(A2->worst-A2->best);
+	//float qb = (1-tx)*(B1->worst-B1->best) + tx*(B2->worst-B2->best);
+	float qa = (1-tx)*(A1->quality) + tx*(A2->quality);
+	float qb = (1-tx)*(B1->quality) + tx*(B2->quality);
+	//float qa = (1-tx)*(A1->worst) + tx*(A2->worst);
+	//float qb = (1-tx)*(B1->worst) + tx*(B2->worst);
+	//float qa = (1-tx)*(A1->best) + tx*(A2->best);
+	//float qb = (1-tx)*(B1->best) + tx*(B2->best);
+	float qc = (1-ty)*qa + ty*qb;
 	Point2f cn((1-tx)*A1->center.x + tx*B2->center.x,(1-ty)*A1->center.y + ty*B2->center.y);
 	Mat rotMatrix = getRotationMatrix2D(cn,c[2],1.0f);
 	rotMatrix.at<double>(0,2)+=c[0];
@@ -216,7 +229,7 @@ TransRot CCFlow::transrotationSmoothed(cv:: Point3f position) {
 		);
 
 	Point2f trans(source-pos);
-	return Vec3f(disp*trans.x,disp*trans.y,c[2]);
+	return Vec4f(disp*trans.x,disp*trans.y,c[2],qc);
 
 }
 
@@ -407,9 +420,9 @@ void CCFlow::fullMatch(cv::Mat test, cv::Mat reference, float resolution, TransR
 			float tx=x*resolution-initialRange[0];
 			float ty=y*resolution-initialRange[1];
 
-			Mat rotMatrix = getRotationMatrix2D(Point2f(test.cols/2.,test.rows/2.),0,1.0f);
-			rotMatrix.at<double>(0,2)+=tx;
-			rotMatrix.at<double>(1,2)+=ty;
+			Mat rotMatrix = getRotationMatrix2D(Point2f(test.cols/2.,test.rows/2.),initial[2],1.0f);
+			rotMatrix.at<double>(0,2)+=tx+initial[0];
+			rotMatrix.at<double>(1,2)+=ty+initial[1];
 
 			float squareError = correlate(reference,test,rotMatrix);
 			if (squareError>worstMatchScore) worstMatchScore=squareError;
@@ -432,7 +445,7 @@ void CCFlow::fullMatch(cv::Mat test, cv::Mat reference, float resolution, TransR
 	pyrUp (debug,debug);
 	pyrUp (debug,debug);
 	imshow("debug2",debug);
-	normalize(results,debug,0,200,NORM_MINMAX);
+	normalize(results,debug,0,10,NORM_MINMAX);
 	for (int x=8;x<debug.cols;x+=16) {
 		for (int y=8;y<debug.rows;y+=16) {
 			Point gradient(results.at<float>(y,x+1)-results.at<float>(y,x-1),results.at<float>(y+1,x)-results.at<float>(y-1,x));
@@ -440,7 +453,7 @@ void CCFlow::fullMatch(cv::Mat test, cv::Mat reference, float resolution, TransR
 		}
 	}
 	imshow("debug3",debug);
-	waitKey(1);
+	waitKey(1000);
 	//#endif
 
 }
@@ -481,6 +494,8 @@ void CCFlow::gradientMatch(cv::Mat test, cv::Mat reference, int maxcount,TransRo
 	TransRot last = current;
 	TransRot bestMatch = current;
 	TransRot step = initialRange;
+	float improvement = 0;
+	float distance = 0;
 	Vec4f prev=Vec4f(0,0,0,bestMatchScore);
 
 	//Mat debug=Mat::ones(20*16,20*16,CV_32FC1);
@@ -504,8 +519,17 @@ void CCFlow::gradientMatch(cv::Mat test, cv::Mat reference, int maxcount,TransRo
 			current[2] += rng->gaussian(initialRange[2]);
 			step = initialRange;
 			prev=Vec4f(0,0,0,bestMatchScore);
+			distance = 0;
+			improvement = 0;
 			//fprintf(stderr,"failure, now at %f %f %f\n",current[0],current[1],current[2]);
 		} else {
+			if (prev[3]<100000000) {
+				improvement += (prev[3]-grad[3]);
+				distance += sqrt(
+					(grad[0]-prev[0])*(grad[0]-prev[0]) +
+					(grad[1]-prev[1])*(grad[1]-prev[1]) +
+					(grad[2]-prev[2])*(grad[2]-prev[2]));
+			}
 			combined *= 1.0/length(combined); // normalize
 
 			float success = (grad[0]*prev[0]+grad[1]*prev[1]+grad[2]*prev[2]); // dot product
@@ -532,6 +556,7 @@ void CCFlow::gradientMatch(cv::Mat test, cv::Mat reference, int maxcount,TransRo
 	rotation = bestMatch[2];
 	best = bestMatchScore;
 	worst = worstMatchScore;
+	quality = improvement/distance;
 }
 
 
@@ -570,6 +595,7 @@ float CCFlow::correlate(cv::Mat reference, cv::Mat test, cv::Mat rotMatrix) {
 				squareError += tmp[0]*tmp[0] + tmp[1]*tmp[1] + tmp[2]*tmp[2];
 			} else {
 				missed++;
+				fprintf(stderr,"!");
 				squareError += 32*32*3;
 				//pixels++;
 			}
@@ -712,7 +738,8 @@ cv::Vec4f CCFlow::correlateGradient(cv::Mat test, cv::Mat reference, TransRot po
 	Vec3f se2(se[0]*se[0],se[1]*se[1],se[2]*se[2]);
 	float len = sqrt(se2[0]+se2[1]+se2[2]);
 
-	return Vec4f(se[0]/len,se[1]/len,se[2]/len,squareError0/pixels);
+	//return Vec4f(se[0]/len,se[1]/len,se[2]/len,squareError0/pixels);
+	return Vec4f(se[0]/len,se[1]/len,se[2]/len,len);
 }
 
 

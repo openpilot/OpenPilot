@@ -246,10 +246,10 @@ CFLAGS += -O0
 CFLAGS += -DGENERAL_COV
 CFLAGS += -finstrument-functions -ffixed-r10
 else
-CFLAGS += -Os
+CFLAGS += -O3
 endif
 
-CPPFLAGS += -O3
+CPPFLAGS += -O3 -march=core2
    
 # common architecture-specific flags from the device-specific library makefile
 CFLAGS += $(ARCHFLAGS)

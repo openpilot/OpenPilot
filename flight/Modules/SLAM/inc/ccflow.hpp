@@ -68,7 +68,7 @@ public:
 	TransRot transrotation(cv:: Point3f position);
 	TransRot transrotation(cv:: Point2f position);
 	CCFlow* responsibleFlow(cv:: Point3f position);
-	TransRot transrotationSmoothed(cv:: Point3f position);
+	cv::Vec4f transrotationSmoothed(cv:: Point3f position);
 
 	// finds the best transrotation between two templates of equal size via particle filter approach
 	void particleMatch(cv::Mat test, cv::Mat reference, int particleNum, int generations, int stepFactor, TransRot initial, TransRot initialRange);
@@ -94,6 +94,7 @@ public:
 	float rotation;
 	float best;
 	float worst;
+	float quality;
 	int iterations;
 private:
 	cv::Vec4i border;

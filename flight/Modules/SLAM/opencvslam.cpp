@@ -59,11 +59,19 @@ void OpenCVslam::shrinkAndEnhance(const Mat& src, Mat& dst) {
 	// -3 4 14 4 -3
 	// or with double laplace
 	// -7 4 22 4 -7
+	/*
 	PyrDownEnhanced enhanced;
+	if (src.cols>320) {
 	//enhanced.pyrDownEnhanced(src,dst,-3,4,14);
 	//enhanced.pyrDownEnhanced(src,dst,-4,4,16);
 	//enhanced.pyrDownEnhanced(src,dst,-5,4,18);
+	//enhanced.pyrDownEnhanced(src,dst,1,4,6);
+	enhanced.pyrDownEnhanced(src,dst,-2,4,12);
+	}
+	else {
 	enhanced.pyrDownEnhanced(src,dst,1,4,6);
+	}*/
+	pyrDown(src,dst);
 	
 }
 
@@ -231,7 +239,7 @@ void OpenCVslam::run() {
 			if (lastFlow) delete lastFlow;
 			lastFlow = currentFlow;
 			//currentFlow = new CCFlow(&rng, last,current,5,Vec3f(0,0,1000),lastFlow);
-			currentFlow = new CCFlow(&rng, last,current,4,Vec3f(0,0,1000),lastFlow);
+			currentFlow = new CCFlow(&rng, last,current,3,Vec3f(0,0,1000),lastFlow);
 			iterations += currentFlow->iterations;
 			//fprintf(stderr,"rotation: %f degrees,\tx: %f\ty: %f\t  %f > %f\t checks: %i avg: %f\n",currentFlow->rotation,currentFlow->translation[0],currentFlow->translation[1],currentFlow->best,currentFlow->worst, currentFlow->iterations, (float)iterations/frame);
 			//vPortEnterCritical();
@@ -282,10 +290,23 @@ void OpenCVslam::run() {
 				int div=Mat(currentFrame).rows/2;
 				for (int y = 8; y<Mat(currentFrame).rows; y+=16 ) {
 					for (int x = 8; x<Mat(currentFrame).cols; x+=16 ) {
-						TransRot bla = currentFlow->transrotationSmoothed(Point3f(x,y,5));
-						cvLine(lastFrame,cvPoint(x,y),cvPoint(x+bla[0],y+bla[1]),CV_RGB(0,255,0),1,8,0);
+						Vec4f bla = currentFlow->transrotationSmoothed(Point3f(x,y,5));
+						float q=bla[3];
+						float red=-q*1024;
+						float green=q*1024;
+						float blue=128+q*64;
+						if (red<0) red=0;
+						if (red>255) red=255;
+						if (green<0) green=0;
+						if (green>255) green=255;
+						if (blue<0) blue=0;
+						if (blue>255) blue=255;
+						cvLine(lastFrame,cvPoint(x,y),cvPoint(x+bla[0],y+bla[1]),CV_RGB(red,green,blue),1,8,0);
 					}
 				}
+				fprintf(stderr,"overall quality: %f\n",currentFlow->quality);
+				fprintf(stderr,"best: %f\n",currentFlow->best);
+				fprintf(stderr,"worst %f\n",currentFlow->worst);
 			}
 
 			//IplImage xflow = flow;

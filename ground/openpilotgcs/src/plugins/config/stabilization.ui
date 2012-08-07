@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>942</width>
-    <height>703</height>
+    <width>864</width>
+    <height>635</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -453,6 +453,9 @@
    <bool>false</bool>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <property name="spacing">
+    <number>12</number>
+   </property>
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="sizePolicy">
@@ -594,8 +597,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>912</width>
-            <height>602</height>
+            <width>834</width>
+            <height>532</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_12" stretch="0,0,0,0,0">
@@ -6929,8 +6932,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>912</width>
-            <height>602</height>
+            <width>819</width>
+            <height>579</height>
            </rect>
           </property>
           <property name="autoFillBackground">
@@ -16782,8 +16785,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>912</width>
-            <height>602</height>
+            <width>830</width>
+            <height>543</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_9">
@@ -25592,8 +25595,8 @@ automatically every 300ms, which will help for fast tuning.</string>
         </property>
         <property name="maximumSize">
          <size>
-          <width>32</width>
-          <height>32</height>
+          <width>25</width>
+          <height>26</height>
          </size>
         </property>
         <property name="toolTip">
@@ -25629,7 +25632,7 @@ automatically every 300ms, which will help for fast tuning.</string>
       <item>
        <widget class="QPushButton" name="stabilizationReloadBoardData_6">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -25637,7 +25640,7 @@ automatically every 300ms, which will help for fast tuning.</string>
         <property name="minimumSize">
          <size>
           <width>140</width>
-          <height>16</height>
+          <height>32</height>
          </size>
         </property>
         <property name="maximumSize">
@@ -25680,8 +25683,8 @@ Useful if you have accidentally changed some settings.</string>
         </property>
         <property name="minimumSize">
          <size>
-          <width>60</width>
-          <height>16</height>
+          <width>78</width>
+          <height>32</height>
          </size>
         </property>
         <property name="maximumSize">
@@ -25716,8 +25719,8 @@ Useful if you have accidentally changed some settings.</string>
         </property>
         <property name="minimumSize">
          <size>
-          <width>60</width>
-          <height>16</height>
+          <width>71</width>
+          <height>32</height>
          </size>
         </property>
         <property name="maximumSize">

@@ -10,13 +10,16 @@
     <height>845</height>
    </rect>
   </property>
+  <property name="contextMenuPolicy">
+   <enum>Qt::DefaultContextMenu</enum>
+  </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <property name="autoFillBackground">
    <bool>false</bool>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_6">
+  <layout class="QVBoxLayout" name="verticalLayout_6" stretch="0,0,0">
    <property name="spacing">
     <number>12</number>
    </property>
@@ -967,8 +970,8 @@ value.</string>
         </property>
         <property name="maximumSize">
          <size>
-          <width>25</width>
-          <height>25</height>
+          <width>32</width>
+          <height>26</height>
          </size>
         </property>
         <property name="font">

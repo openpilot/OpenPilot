@@ -1,3 +1,29 @@
+/**
+ ******************************************************************************
+ * @file       UAVTalk.java
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @brief      The protocol layer implementation of UAVTalk.  Serializes objects
+ *             for transmission (which is done in the object itself which is aware
+ *             of byte packing) wraps that in the UAVTalk packet.  Parses UAVTalk
+ *             packets and updates the UAVObjectManager.
+ * @see        The GNU Public License (GPL) Version 3
+ *
+ *****************************************************************************/
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
 package org.openpilot.uavtalk;
 
 import java.io.IOException;
@@ -17,7 +43,7 @@ public class UAVTalk extends Observable {
 	public static boolean DEBUG = LOGLEVEL > 0;
 
 	private Thread inputProcessingThread = null;
-	
+
 	/**
 	 * A reference to the thread for processing the incoming stream.  Currently this method is ONLY
 	 * used for unit testing
@@ -26,6 +52,7 @@ public class UAVTalk extends Observable {
 		if (inputProcessingThread == null)
 
 			inputProcessingThread = new Thread() {
+				@Override
 				public void run() {
 					while(true) {
 						try {
@@ -179,7 +206,7 @@ public class UAVTalk extends Observable {
 
 	/**
 	 * Process any data in the queue
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public boolean processInputStream() throws IOException {
 		int val;
@@ -195,13 +222,13 @@ public class UAVTalk extends Observable {
 		 return true;
 	}
 
-	
+
 	/**
 	 * Request an update for the specified object, on success the object data
 	 * would have been updated by the GCS. \param[in] obj Object to update
 	 * \param[in] allInstances If set true then all instances will be updated
 	 * \return Success (true), Failure (false)
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public boolean sendObjectRequest(UAVObject obj, boolean allInstances) throws IOException {
 		// QMutexLocker locker(mutex);
@@ -213,7 +240,7 @@ public class UAVTalk extends Observable {
 	 * Object to send \param[in] acked Selects if an ack is required \param[in]
 	 * allInstances If set true then all instances will be updated \return
 	 * Success (true), Failure (false)
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public synchronized boolean sendObject(UAVObject obj, boolean acked,
 			boolean allInstances) throws IOException {
@@ -237,7 +264,7 @@ public class UAVTalk extends Observable {
 	 * request object update TYPE_OBJ_ACK: send object with an ack \param[in]
 	 * allInstances If set true then all instances will be updated \return
 	 * Success (true), Failure (false)
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public boolean objectTransaction(UAVObject obj, int type,
 			boolean allInstances) throws IOException {
@@ -260,7 +287,7 @@ public class UAVTalk extends Observable {
 	/**
 	 * Process an byte from the telemetry stream. \param[in] rxbyte Received
 	 * byte \return Success (true), Failure (false)
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public synchronized boolean processInputByte(int rxbyte) throws IOException {
 		assert (objMngr != null);
@@ -341,7 +368,7 @@ public class UAVTalk extends Observable {
 			// Search for object, if not found reset state machine
 			rxObjId = rxTmpBuffer.getInt(0);
 			// Because java treats ints as only signed we need to do this manually
-			if (rxObjId < 0) 
+			if (rxObjId < 0)
 				rxObjId = 0x100000000l + rxObjId;
 			{
 				UAVObject rxObj = objMngr.getObject(rxObjId);
@@ -475,11 +502,11 @@ public class UAVTalk extends Observable {
 	 * received object \param[in] instId The instance ID of UAVOBJ_ALL_INSTANCES
 	 * for all instances. \param[in] data Data buffer \param[in] length Buffer
 	 * length \return Success (true), Failure (false)
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public boolean receiveObject(int type, long objId, long instId,
 			ByteBuffer data) throws IOException {
-		
+
 		if (DEBUG) Log.d(TAG, "Received object ID: " + objId);
 		assert (objMngr != null);
 
@@ -622,12 +649,12 @@ public class UAVTalk extends Observable {
 	}
 
 	/**
-	 * Send an object through the telemetry link. 
+	 * Send an object through the telemetry link.
 	 * @param[in] obj Object to send
-	 * @param[in] type Transaction type 
-	 * @param[in] allInstances True is all instances of the object are to be sent 
+	 * @param[in] type Transaction type
+	 * @param[in] allInstances True is all instances of the object are to be sent
 	 * @return Success (true), Failure (false)
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public synchronized boolean transmitObject(UAVObject obj, int type, boolean allInstances) throws IOException {
 		// If all instances are requested on a single instance object it is an
@@ -665,7 +692,7 @@ public class UAVTalk extends Observable {
 
 	/**
 	 * Send an object through the telemetry link.
-	 * @throws IOException 
+	 * @throws IOException
 	 * @param[in] obj Object handle to send
 	 * @param[in] type Transaction type \return Success (true), Failure (false)
 	 */
@@ -738,11 +765,11 @@ public class UAVTalk extends Observable {
 
 	/**
 	 * Update the crc value with new data.
-	 * 
+	 *
 	 * Generated by pycrc v0.7.5, http://www.tty1.net/pycrc/ using the
 	 * configuration: Width = 8 Poly = 0x07 XorIn = 0x00 ReflectIn = False
 	 * XorOut = 0x00 ReflectOut = False Algorithm = table-driven
-	 * 
+	 *
 	 * \param crc The current crc value. \param data Pointer to a buffer of \a
 	 * data_len bytes. \param length Number of bytes in the \a data buffer.
 	 * \return The updated crc value.
@@ -753,7 +780,7 @@ public class UAVTalk extends Observable {
 
 	int updateCRC(int crc, byte[] data, int length) {
 		for (int i = 0; i < length; i++)
-			crc = updateCRC(crc, (int) data[i]);
+			crc = updateCRC(crc, data[i]);
 		return crc;
 	}
 

@@ -1,17 +1,11 @@
 package org.openpilot.androidgcs;
 
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Observable;
-import java.util.Observer;
-
 import org.openpilot.uavtalk.UAVObject;
 import org.openpilot.uavtalk.UAVObjectManager;
 
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 
 public class ObjectManagerFragment extends Fragment {
@@ -40,63 +34,43 @@ public class ObjectManagerFragment extends Fragment {
         super.onAttach(activity);
         if (DEBUG) Log.d(TAG,"onAttach");
         
-        ((ObjectManagerActivity)activity).addOnConnectionListenerFragment(this);
+        ObjectManagerActivity castActivity = null;
+        try {
+        	castActivity = (ObjectManagerActivity)activity;
+        } catch (ClassCastException e) {
+        	throw new android.app.Fragment.InstantiationException(
+        			"Attaching a ObjectManagerFragment to an activity failed because the parent activity is not a ObjectManagerActivity",
+        			e);
+        }
+        castActivity.addOnConnectionListenerFragment(this);
     }
     
+    
 	// The below methods should all be called by the parent activity at the appropriate times
-	void onOPConnected(UAVObjectManager objMngr) {
+    protected void onOPConnected(UAVObjectManager objMngr) {
 		this.objMngr = objMngr;
 		if (DEBUG) Log.d(TAG,"onOPConnected");
 	}
 	
-	void onOPDisconnected() {
+	protected void onOPDisconnected() {
 		objMngr = null;
 		if (DEBUG) Log.d(TAG,"onOPDisconnected");
 	}
 		
-	public void onBind() {
-		
-	}
-
-	
 	/**
 	 * Called whenever any objects subscribed to via registerObjects 
 	 */
 	protected void objectUpdated(UAVObject obj) {
 		
-	}
-	
-	/**
-	 * A message handler and a custom Observer to use it which calls
-	 * objectUpdated with the right object type
-	 */
-	final Handler uavobjHandler = new Handler(); 	
-	private class UpdatedObserver implements Observer  {
-		UAVObject obj;
-		UpdatedObserver(UAVObject obj) { this.obj = obj; };
-		public void update(Observable observable, Object data) {
-			uavobjHandler.post(new Runnable() {
-				@Override
-				public void run() { objectUpdated(obj); }
-			});
-		}
-	};
+	}	
 
 	/**
-	 * Register an activity to receive updates from this object
-	 * 
-	 * the objectUpdated() method will be called in the original UI thread
+	 * Register on the activities object monitor handler so that updates
+	 * occur within that UI thread.  No need to maintain a handler for
+	 * each fragment.
 	 */
 	protected void registerObjectUpdates(UAVObject object) {
-		object.addUpdatedObserver(new UpdatedObserver(object));
-	}
-	protected void registerObjectUpdates(List<List<UAVObject>> objects) {
-		ListIterator<List<UAVObject>> li = objects.listIterator();
-		while(li.hasNext()) {
-			ListIterator<UAVObject> li2 = li.next().listIterator();
-			while(li2.hasNext())
-				registerObjectUpdates(li2.next());
-		}
+		((ObjectManagerActivity) getActivity()).registerObjectUpdates(object, this);
 	}
 	
 }

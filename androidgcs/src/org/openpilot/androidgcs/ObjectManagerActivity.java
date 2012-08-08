@@ -32,7 +32,7 @@ public abstract class ObjectManagerActivity extends Activity {
 	private static int LOGLEVEL = 1;
 //	private static boolean WARN = LOGLEVEL > 1;
 	private static boolean DEBUG = LOGLEVEL > 0;
-	
+
 	//! Object manager, populated by parent for the children to use
 	UAVObjectManager objMngr;
 	//! Indicates if the activity is bound to the service
@@ -45,12 +45,12 @@ public abstract class ObjectManagerActivity extends Activity {
 	BroadcastReceiver connectedReceiver;
 	//! Indicate if this activity has already connected it's telemetry callbacks
 	private boolean telemetryStatsConnected = false;
-	
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		connectedReceiver = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context context, Intent intent) {
@@ -71,31 +71,32 @@ public abstract class ObjectManagerActivity extends Activity {
 					onOPDisconnected();
 					Log.d(TAG, "Disonnected()");
 				}
-			}			
+			}
 		};
-		
+
 		IntentFilter filter = new IntentFilter();
 		filter.addCategory(OPTelemetryService.INTENT_CATEGORY_GCS);
 		filter.addAction(OPTelemetryService.INTENT_ACTION_CONNECTED);
 		filter.addAction(OPTelemetryService.INTENT_ACTION_DISCONNECTED);
 		registerReceiver(connectedReceiver, filter);
 	}
-	
+
 	/**
-	 * Called whenever any objects subscribed to via registerObjects 
+	 * Called whenever any objects subscribed to via registerObjects
 	 */
 	protected void objectUpdated(UAVObject obj) {
-		
+
 	}
-	
+
 	/**
 	 * A message handler and a custom Observer to use it which calls
 	 * objectUpdated with the right object type
 	 */
-	final Handler uavobjHandler = new Handler(); 	
-	private class UpdatedObserver implements Observer  {
+	final Handler uavobjHandler = new Handler();
+	private class ActivityUpdatedObserver implements Observer  {
 		UAVObject obj;
-		UpdatedObserver(UAVObject obj) { this.obj = obj; };
+		ActivityUpdatedObserver(UAVObject obj) { this.obj = obj; };
+		@Override
 		public void update(Observable observable, Object data) {
 			uavobjHandler.post(new Runnable() {
 				@Override
@@ -103,14 +104,33 @@ public abstract class ObjectManagerActivity extends Activity {
 			});
 		}
 	};
+	private class FragmentUpdatedObserver implements Observer  {
+		UAVObject obj;
+		ObjectManagerFragment frag;
+		FragmentUpdatedObserver(UAVObject obj, ObjectManagerFragment frag) {
+			this.obj = obj;
+			this.frag = frag;
+		};
+		@Override
+		public void update(Observable observable, Object data) {
+			uavobjHandler.post(new Runnable() {
+				@Override
+				public void run() { frag.objectUpdated(obj); }
+			});
+		}
+	};
+
 
 	/**
 	 * Register an activity to receive updates from this object
-	 * 
+	 *
 	 * the objectUpdated() method will be called in the original UI thread
 	 */
 	protected void registerObjectUpdates(UAVObject object) {
-		object.addUpdatedObserver(new UpdatedObserver(object));
+		object.addUpdatedObserver(new ActivityUpdatedObserver(object));
+	}
+	protected void registerObjectUpdates(UAVObject object, ObjectManagerFragment frag) {
+		object.addUpdatedObserver(new FragmentUpdatedObserver(object, frag));
 	}
 	protected void registerObjectUpdates(List<List<UAVObject>> objects) {
 		ListIterator<List<UAVObject>> li = objects.listIterator();
@@ -120,7 +140,7 @@ public abstract class ObjectManagerActivity extends Activity {
 				registerObjectUpdates(li2.next());
 		}
 	}
-	
+
 	private void updateStats() {
 		UAVObject stats = objMngr.getObject("GCSTelemetryStats");
 		TextView rxRate = (TextView) findViewById(R.id.telemetry_stats_rx_rate);
@@ -131,8 +151,9 @@ public abstract class ObjectManagerActivity extends Activity {
 			txRate.setText(Integer.valueOf((int) stats.getField("TxDataRate").getDouble()).toString());
 
 	}
-	
+
 	final Observer telemetryObserver = new Observer() {
+		@Override
 		public void update(Observable observable, Object data) {
 			uavobjHandler.post(new Runnable() {
 				@Override
@@ -142,34 +163,34 @@ public abstract class ObjectManagerActivity extends Activity {
 			});
 		}
 	};
-	
+
 	/**
 	 * Called when either the telemetry establishes a connection or
 	 * if it already has on creation of this activity
-	 * 
+	 *
 	 * This should be called by all inherited classes if they want the telemetry bar etc
 	 */
 	void onOPConnected() {
 		if ( telemetryStatsConnected )
 			return;
-		
+
 		// We are not using the objectUpdated mechanism in place so that all the children
 		// don't have to sort through the messages.
 		UAVObject stats = objMngr.getObject("GCSTelemetryStats");
 		if (stats == null)
 			return;
-		
+
 		stats.addUpdatedObserver(telemetryObserver);
 		telemetryStatsConnected = true;
 		updateStats();
-		
-		if (DEBUG) Log.d(TAG, "Notifying listeners about connection.  There are " + connectionListeners.countObservers());		
+
+		if (DEBUG) Log.d(TAG, "Notifying listeners about connection.  There are " + connectionListeners.countObservers());
 		connectionListeners.connected();
 	}
-	
+
 	/**
 	 * Called when telemetry drops the connection
-	 * 
+	 *
 	 * This should be called by all inherited classes if they want the telemetry bar etc
 	 */
 	void onOPDisconnected() {
@@ -178,11 +199,11 @@ public abstract class ObjectManagerActivity extends Activity {
 		TextView txRate = (TextView) findViewById(R.id.telemetry_stats_tx_rate);
 		rxRate.setText("");
 		txRate.setText("");
-		
+
 		// Providing a null update triggers a disconnect on fragments
 		connectionListeners.disconnected();
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch(item.getItemId()) {
@@ -215,7 +236,7 @@ public abstract class ObjectManagerActivity extends Activity {
 		Intent intent = new Intent(this, OPTelemetryService.class);
 		bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 	}
-	
+
 	/**
 	 * When stopping disconnect form the service and the broadcast receiver
 	 */
@@ -227,9 +248,9 @@ public abstract class ObjectManagerActivity extends Activity {
 	}
 
 	public void onBind() {
-		
+
 	}
-	
+
 
 	/**
 	 * Callbacks so ObjectManagerFragments get the onOPConnected and onOPDisconnected signals
@@ -248,9 +269,9 @@ public abstract class ObjectManagerActivity extends Activity {
 			}
 		}
 	};
-	private ConnectionObserver connectionListeners = new ConnectionObserver();
+	private final ConnectionObserver connectionListeners = new ConnectionObserver();
 	public class OnConnectionListener implements Observer {
-		
+
 		// Local reference of the fragment to notify, store in constructor
 		ObjectManagerFragment fragment;
 		OnConnectionListener(ObjectManagerFragment fragment) { this.fragment = fragment; };
@@ -264,7 +285,7 @@ public abstract class ObjectManagerActivity extends Activity {
 			else
 				fragment.onOPConnected(objMngr);
 		}
-		
+
 	} ;
 	void addOnConnectionListenerFragment(ObjectManagerFragment frag) {
 		connectionListeners.addObserver(new OnConnectionListener(frag));
@@ -275,13 +296,14 @@ public abstract class ObjectManagerActivity extends Activity {
 
 
 	/** Defines callbacks for service binding, passed to bindService() */
-	private ServiceConnection mConnection = new ServiceConnection() {
+	private final ServiceConnection mConnection = new ServiceConnection() {
+		@Override
 		public void onServiceConnected(ComponentName arg0, IBinder service) {
-			// We've bound to LocalService, cast the IBinder and attempt to open a connection			
+			// We've bound to LocalService, cast the IBinder and attempt to open a connection
 			if (DEBUG) Log.d(TAG,"Service bound");
 			mBound = true;
 			binder = (LocalBinder) service;
-			
+
 			if(binder.isConnected()) {
 				TelemTask task;
 				if((task = binder.getTelemTask(0)) != null) {
@@ -289,10 +311,11 @@ public abstract class ObjectManagerActivity extends Activity {
 					mConnected = true;
 					onOPConnected();
 				}
-			
+
 			}
 		}
 
+		@Override
 		public void onServiceDisconnected(ComponentName name) {
 			mBound = false;
 			binder = null;

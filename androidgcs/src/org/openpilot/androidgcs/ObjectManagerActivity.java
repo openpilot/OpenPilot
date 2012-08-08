@@ -59,7 +59,7 @@ import android.widget.TextView;
 public abstract class ObjectManagerActivity extends Activity {
 
 	private final String TAG = "ObjectManagerActivity";
-	private static int LOGLEVEL = 1;
+	private static int LOGLEVEL = 0;
 //	private static boolean WARN = LOGLEVEL > 1;
 	private static boolean DEBUG = LOGLEVEL > 0;
 

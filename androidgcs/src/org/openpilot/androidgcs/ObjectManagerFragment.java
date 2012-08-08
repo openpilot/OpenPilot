@@ -37,9 +37,9 @@ import android.util.Log;
 public class ObjectManagerFragment extends Fragment {
 
 	private static final String TAG = ObjectManagerFragment.class.getSimpleName();
-	private static int LOGLEVEL = 1;
+	private static final int LOGLEVEL = 0;
 //	private static boolean WARN = LOGLEVEL > 1;
-	private static boolean DEBUG = LOGLEVEL > 0;
+	private static final boolean DEBUG = LOGLEVEL > 0;
 
 	UAVObjectManager objMngr;
 

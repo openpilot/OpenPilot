@@ -39,6 +39,9 @@ import android.widget.TextView;
 public class SystemAlarmsFragment extends ObjectManagerFragment {
 
 	private static final String TAG = SystemAlarmsFragment.class.getSimpleName();
+	private static final int LOGLEVEL = 0;
+	// private static boolean WARN = LOGLEVEL > 1;
+	private static final boolean DEBUG = LOGLEVEL > 0;
 
 	//@Override
     @Override
@@ -51,7 +54,8 @@ public class SystemAlarmsFragment extends ObjectManagerFragment {
     @Override
 	public void onOPConnected(UAVObjectManager objMngr) {
     	super.onOPConnected(objMngr);
-    	Log.d(TAG,"On connected");
+		if (DEBUG)
+			Log.d(TAG, "On connected");
 
     	UAVObject obj = objMngr.getObject("SystemAlarms");
 		if (obj != null)
@@ -64,7 +68,8 @@ public class SystemAlarmsFragment extends ObjectManagerFragment {
 	 */
     @Override
 	protected void objectUpdated(UAVObject obj) {
-    	Log.d(TAG, "Updated");
+		if (DEBUG)
+			Log.d(TAG, "Updated");
 		if (obj.getName().compareTo("SystemAlarms") == 0) {
 			TextView alarms = (TextView) getActivity().findViewById(R.id.system_alarms_fragment_field);
 			UAVObjectField a = obj.getField("Alarm");

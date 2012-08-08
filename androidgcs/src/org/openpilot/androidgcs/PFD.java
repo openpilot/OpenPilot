@@ -52,13 +52,14 @@ public class PFD extends ObjectManagerActivity {
 		pitch = obj.getField("Pitch").getDouble();
 		roll = obj.getField("Roll").getDouble();
 
-		CompassView compass = (CompassView) findViewById(R.id.compass_view);
-		compass.setBearing((int) heading);
-		compass.invalidate();
+		/*
+		 * CompassView compass = (CompassView) findViewById(R.id.compass_view);
+		 * compass.setBearing((int) heading); compass.invalidate();
+		 */
 
 		AttitudeView attitude = (AttitudeView) findViewById(R.id.attitude_view);
-		attitude.setRoll(roll / 180 * Math.PI);
-		attitude.setPitch(pitch / 180 * Math.PI);
+		attitude.setRoll(roll);
+		attitude.setPitch(pitch);
 		attitude.invalidate();
 	}
 

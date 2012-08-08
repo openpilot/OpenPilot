@@ -24,14 +24,15 @@
 package org.openpilot.androidgcs;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.View;
 
 public class AttitudeView extends View {
 
+	private Paint markerPaint;
 	public AttitudeView(Context context) {
 		super(context);
 		initAttitudeView();
@@ -49,16 +50,10 @@ public class AttitudeView extends View {
 
 	protected void initAttitudeView() {
 		setFocusable(true);
-
-		circlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-		circlePaint.setColor(getResources().getColor(R.color.background_color));
-		circlePaint.setStrokeWidth(1);
-		circlePaint.setStyle(Paint.Style.FILL_AND_STROKE);
-		Resources r = this.getResources();
-		textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-		textPaint.setColor(r.getColor(R.color.text_color));
 		markerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-		markerPaint.setColor(r.getColor(R.color.marker_color));
+		markerPaint.setColor(getContext().getResources().getColor(
+				R.color.marker_color));
+
 	}
 
 	@Override protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -85,28 +80,40 @@ public class AttitudeView extends View {
 		return result;
 	}
 
-	private double roll;
+	private float roll;
 	public void setRoll(double roll) {
-		this.roll = roll;
-	}
-	private double pitch;
-	public void setPitch(double d) {
-		this.pitch = d;
+		this.roll = (float) roll;
+		postInvalidate();
 	}
 
-	// Drawing related code
-	private Paint markerPaint;
-	private Paint textPaint;
-	private Paint circlePaint;
+	private float pitch;
+	public void setPitch(double d) {
+		this.pitch = (float) d;
+		postInvalidate();
+	}
 
 	@Override
 	protected void onDraw(Canvas canvas) {
-		int px = getMeasuredWidth() / 2;
-		int py = getMeasuredHeight() /2 ;
-		int radius = Math.min(px, py);
 
-		canvas.drawLine(px,py, (int) (px+radius * Math.cos(roll)), (int) (py + radius * Math.sin(roll)), markerPaint);
-		canvas.drawLine(px,py, (int) (px+radius * Math.cos(pitch)), (int) (py + radius * Math.sin(pitch)), markerPaint);
+		final int PX = getMeasuredWidth() / 2;
+		final int PY = getMeasuredHeight() / 2;
+
+		// TODO: Figure out why these magic numbers are needed to center it
+		final int WIDTH = 600;
+		final int HEIGHT = 600;
+		final int DEG_TO_PX = 10; // Magic number for how to scale pitch
+
+		canvas.save(0);
+		canvas.rotate(-roll, PX, PY);
+		canvas.translate(0, pitch * DEG_TO_PX);
+		Drawable horizon = getContext().getResources().getDrawable(
+				R.drawable.im_pfd_horizon);
+		// This puts the image at the center of the PFD canvas (after it was
+		// translated)
+		horizon.setBounds(-(WIDTH - PX) / 2, -(HEIGHT - PY) / 2, WIDTH, HEIGHT);
+		horizon.draw(canvas);
+		canvas.restore();
+
 	}
 
 }

@@ -161,7 +161,9 @@ public abstract class ObjectManagerActivity extends Activity {
 	protected void registerObjectUpdates(UAVObject object) {
 		object.addUpdatedObserver(new ActivityUpdatedObserver(object));
 	}
-	protected void registerObjectUpdates(UAVObject object, ObjectManagerFragment frag) {
+
+	public void registerObjectUpdates(UAVObject object,
+			ObjectManagerFragment frag) {
 		object.addUpdatedObserver(new FragmentUpdatedObserver(object, frag));
 	}
 	protected void registerObjectUpdates(List<List<UAVObject>> objects) {
@@ -326,7 +328,8 @@ public abstract class ObjectManagerActivity extends Activity {
 		}
 
 	} ;
-	void addOnConnectionListenerFragment(ObjectManagerFragment frag) {
+
+	public void addOnConnectionListenerFragment(ObjectManagerFragment frag) {
 		connectionListeners.addObserver(new OnConnectionListener(frag));
 		if (DEBUG) Log.d(TAG, "Connecting " + frag + " there are now " + connectionListeners.countObservers());
 		if (mConnected)

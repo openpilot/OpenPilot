@@ -24,8 +24,9 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.openpilot.androidgcs;
+package org.openpilot.androidgcs.fragments;
 
+import org.openpilot.androidgcs.ObjectManagerActivity;
 import org.openpilot.uavtalk.UAVObject;
 import org.openpilot.uavtalk.UAVObjectManager;
 
@@ -74,12 +75,12 @@ public class ObjectManagerFragment extends Fragment {
 
 
 	// The below methods should all be called by the parent activity at the appropriate times
-    protected void onOPConnected(UAVObjectManager objMngr) {
+	public void onOPConnected(UAVObjectManager objMngr) {
 		this.objMngr = objMngr;
 		if (DEBUG) Log.d(TAG,"onOPConnected");
 	}
 
-	protected void onOPDisconnected() {
+	public void onOPDisconnected() {
 		objMngr = null;
 		if (DEBUG) Log.d(TAG,"onOPDisconnected");
 	}
@@ -87,7 +88,7 @@ public class ObjectManagerFragment extends Fragment {
 	/**
 	 * Called whenever any objects subscribed to via registerObjects
 	 */
-	protected void objectUpdated(UAVObject obj) {
+	public void objectUpdated(UAVObject obj) {
 
 	}
 

@@ -21,10 +21,11 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package org.openpilot.androidgcs;
+package org.openpilot.androidgcs.fragments;
 
 import java.util.List;
 
+import org.openpilot.androidgcs.R;
 import org.openpilot.uavtalk.UAVObject;
 import org.openpilot.uavtalk.UAVObjectField;
 import org.openpilot.uavtalk.UAVObjectManager;
@@ -67,7 +68,7 @@ public class SystemAlarmsFragment extends ObjectManagerFragment {
 	 * Called whenever any objects subscribed to via registerObjects
 	 */
     @Override
-	protected void objectUpdated(UAVObject obj) {
+	public void objectUpdated(UAVObject obj) {
 		if (DEBUG)
 			Log.d(TAG, "Updated");
 		if (obj.getName().compareTo("SystemAlarms") == 0) {

@@ -22,11 +22,14 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-package org.openpilot.androidgcs;
+package org.openpilot.androidgcs.fragments;
 
+import org.openpilot.androidgcs.AttitudeView;
+import org.openpilot.androidgcs.R;
 import org.openpilot.uavtalk.UAVObject;
 import org.openpilot.uavtalk.UAVObjectManager;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -65,18 +68,25 @@ public class PFD extends ObjectManagerFragment {
 	 * Called whenever any objects subscribed to via registerObjects
 	 */
 	@Override
-	protected void objectUpdated(UAVObject obj) {
+	public void objectUpdated(UAVObject obj) {
 		if (DEBUG)
 			Log.d(TAG, "Updated");
 
 		double pitch = obj.getField("Pitch").getDouble();
 		double roll = obj.getField("Roll").getDouble();
 
-		AttitudeView attitude = (AttitudeView) getActivity().findViewById(
-				R.id.attitude_view);
-		attitude.setRoll(roll);
-		attitude.setPitch(pitch);
-		attitude.invalidate();
+		// TODO: These checks, while sensible, are necessary because the
+		// callbacks aren't
+		// removed when we switch to different activities sharing this fragment
+		Activity parent = getActivity();
+		AttitudeView attitude = null;
+		if (parent != null)
+			attitude = (AttitudeView) parent.findViewById(R.id.attitude_view);
+		if (attitude != null) {
+			attitude.setRoll(roll);
+			attitude.setPitch(pitch);
+			attitude.invalidate();
+		}
 
 	}
 

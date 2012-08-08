@@ -74,7 +74,6 @@ private:
 
     bool playNotification(NotificationItem* notification);
     void checkNotificationRule(NotificationItem* notification, UAVObject* object);
-    void readConfig_0_0_0();
 
 private slots:
 
@@ -90,10 +89,6 @@ private slots:
 
 private:
     bool enableSound;
-    QList< QList<Phonon::MediaSource>* > lstMediaSource;
-    QStringList mediaSource;
-    QMultiMap<QString, PhononObject> mapMediaObjects;
-    QSettings* settings;
 
     QList<UAVDataObject*> lstNotifiedUAVObjects;
     QList<NotificationItem*> _notificationList;

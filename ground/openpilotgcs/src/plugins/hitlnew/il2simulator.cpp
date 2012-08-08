@@ -333,7 +333,7 @@ void IL2Simulator::processUpdate(const QByteArray& inp)
         NED[0] = current.Y;
         NED[1] = current.X;
         NED[2] = -current.Z;
-        Utils::CoordinateConversions().GetLLA(ECEF,NED,LLA);
+        Utils::CoordinateConversions().NED2LLA_HomeECEF(ECEF,NED,LLA);
         gpsData.Latitude = LLA[0] * 10e6;
         gpsData.Longitude = LLA[1] * 10e6;
         gpsData.Satellites = 7;

@@ -83,6 +83,14 @@ public class HomePage extends ObjectManagerActivity {
 				startActivity(new Intent(HomePage.this, SystemAlarmActivity.class));
 			}
 		});
+
+		Button tester = (Button) findViewById(R.id.launch_tester);
+		tester.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				startActivity(new Intent(HomePage.this, FragmentTester.class));
+			}
+		});
 	}
 
 }

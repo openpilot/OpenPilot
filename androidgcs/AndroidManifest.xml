@@ -33,6 +33,7 @@
 			android:theme="@android:style/Theme.Dialog" />
 		<activity android:name="Logger" android:label="Logger"
 		    android:theme="@android:style/Theme.Dialog" />
+		<activity android:name="FragmentTester" android:label="FragmentTester" />
 
 		<receiver android:name="TelemetryWidget">
 			<intent-filter>

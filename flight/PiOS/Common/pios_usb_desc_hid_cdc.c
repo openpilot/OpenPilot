@@ -51,7 +51,7 @@ static const struct usb_device_desc device_desc = {
 	.bNumConfigurations = 1,
 };
 
-static const uint8_t hid_report_desc[127] = {
+static const uint8_t hid_report_desc[133] = {
 	HID_GLOBAL_ITEM_2 (HID_TAG_GLOBAL_USAGE_PAGE),
 	0x9C, 0xFF,		/* Usage Page 0xFF9C (Vendor Defined) */
 	HID_LOCAL_ITEM_1  (HID_TAG_LOCAL_USAGE),
@@ -119,8 +119,8 @@ static const uint8_t hid_report_desc[127] = {
 	0x31, 0x00, 0x01, 0x00,	/* Usage ID 0x00010031 (Generic Desktop: Y) */
 	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_LOGICAL_MIN),
 	0x00,			/* Values range from min = 0x00 */
-	HID_GLOBAL_ITEM_2 (HID_TAG_GLOBAL_LOGICAL_MAX),
-	0xFF, 0xFF,		/* Values range to max = 0xFFFF */
+	HID_GLOBAL_ITEM_4 (HID_TAG_GLOBAL_LOGICAL_MAX),
+	0xFF, 0xFF, 0x00, 0x00,	/* Values range to max = 0x0000FFFF */
 	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_REPORT_SIZE),
 	0x10,			/* 16 bits wide */
 	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_REPORT_CNT),
@@ -138,8 +138,8 @@ static const uint8_t hid_report_desc[127] = {
 	0x33, 0x00, 0x01, 0x00,	/* Usage ID 0x00010031 (Generic Desktop: Rx) */
 	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_LOGICAL_MIN),
 	0x00,			/* Values range from min = 0x00 */
-	HID_GLOBAL_ITEM_2 (HID_TAG_GLOBAL_LOGICAL_MAX),
-	0xFF, 0xFF,		/* Values range to max = 0xFFFF */
+	HID_GLOBAL_ITEM_4 (HID_TAG_GLOBAL_LOGICAL_MAX),
+	0xFF, 0xFF, 0x00, 0x00,	/* Values range to max = 0x0000FFFF */
 	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_REPORT_SIZE),
 	0x10,			/* 16 bits wide */
 	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_REPORT_CNT),
@@ -161,8 +161,8 @@ static const uint8_t hid_report_desc[127] = {
 	0x37, 0x00, 0x01, 0x00,	/* Usage ID 0x00010037 (Generic Desktop: Dial) */
 	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_LOGICAL_MIN),
 	0x00,			/* Values range from min = 0x00 */
-	HID_GLOBAL_ITEM_2 (HID_TAG_GLOBAL_LOGICAL_MAX),
-	0xFF, 0xFF,		/* Values range to max = 0xFFFF */
+	HID_GLOBAL_ITEM_4 (HID_TAG_GLOBAL_LOGICAL_MAX),
+	0xFF, 0xFF, 0x00, 0x00,	/* Values range to max = 0x0000FFFF */
 	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_REPORT_SIZE),
 	0x10,			/* 16 bits wide */
 	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_REPORT_CNT),
@@ -174,7 +174,7 @@ static const uint8_t hid_report_desc[127] = {
 
 	HID_MAIN_ITEM_0 (HID_TAG_MAIN_ENDCOLLECTION),
 
-/* 127 bytes to here */
+/* 133 bytes to here */
 };
 
 struct usb_config_hid_cdc {

@@ -1,3 +1,32 @@
+/**
+ ******************************************************************************
+ * @file       ObjectManagerActivity.java
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @brief      Base object for all activies that use the UAVObjectManager.
+ *             This class takes care of binding to the service and getting the
+ *             object manager as well as setting up callbacks to the objects of
+ *             interest that run on the UI thread.
+ *             Implements a new Android lifecycle: onOPConnected() / onOPDisconnected()
+ *             which indicates when a valid telemetry is established as well as a
+ *             valid object manager handle.
+ * @see        The GNU Public License (GPL) Version 3
+ *
+ *****************************************************************************/
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
 package org.openpilot.androidgcs;
 
 import java.util.List;

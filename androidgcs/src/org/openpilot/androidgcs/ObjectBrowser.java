@@ -1,3 +1,27 @@
+/**
+ ******************************************************************************
+ * @file       ObjectBrowser.java
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @brief      A simple object browser for UAVOs that allows viewing, editing,
+ *             loading and saving.
+ * @see        The GNU Public License (GPL) Version 3
+ *
+ *****************************************************************************/
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
 package org.openpilot.androidgcs;
 
 import java.util.ArrayList;
@@ -5,6 +29,9 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Observable;
 import java.util.Observer;
+
+import org.openpilot.uavtalk.UAVDataObject;
+import org.openpilot.uavtalk.UAVObject;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,6 +43,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -23,10 +51,6 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.AdapterView.OnItemClickListener;
-
-import org.openpilot.uavtalk.UAVDataObject;
-import org.openpilot.uavtalk.UAVObject;
 
 public class ObjectBrowser extends ObjectManagerActivity implements OnSharedPreferenceChangeListener {
 
@@ -36,24 +60,26 @@ public class ObjectBrowser extends ObjectManagerActivity implements OnSharedPref
 	SharedPreferences prefs;
 	ArrayAdapter<UAVDataObject> adapter;
 	List<UAVDataObject> allObjects;
-	
-	final Handler uavobjHandler = new Handler(); 
+
+	final Handler uavobjHandler = new Handler();
 	final Runnable updateText = new Runnable() {
+		@Override
 		public void run() {
 			updateObject();
 		}
 	};
-	
+
 	private final Observer updatedObserver = new Observer() {
+		@Override
 		public void update(Observable observable, Object data) {
 			uavobjHandler.post(updateText);
-		}				
+		}
 	};
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		setContentView(R.layout.object_browser);		
+		setContentView(R.layout.object_browser);
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		prefs.registerOnSharedPreferenceChangeListener(this);
 		super.onCreate(savedInstanceState);
@@ -63,7 +89,7 @@ public class ObjectBrowser extends ObjectManagerActivity implements OnSharedPref
 	void onOPConnected() {
 		super.onOPConnected();
 		Log.d(TAG, "onOPConnected()");
-		
+
 		OnCheckedChangeListener checkListener = new OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView,
@@ -71,10 +97,10 @@ public class ObjectBrowser extends ObjectManagerActivity implements OnSharedPref
 				updateList();
 			}
 		};
-		
+
 		((CheckBox) findViewById(R.id.dataCheck)).setOnCheckedChangeListener(checkListener);
 		((CheckBox) findViewById(R.id.settingsCheck)).setOnCheckedChangeListener(checkListener);
-		
+
 		((Button) findViewById(R.id.editButton)).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -87,7 +113,7 @@ public class ObjectBrowser extends ObjectManagerActivity implements OnSharedPref
 				}
 			}
 		});
-		
+
 		((Button) findViewById(R.id.object_load_button)).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -100,7 +126,7 @@ public class ObjectBrowser extends ObjectManagerActivity implements OnSharedPref
 					objPer.getField("ObjectID").setValue(allObjects.get(selected_index).getObjID());
 					objPer.getField("InstanceID").setValue(0);
 					objPer.updated();
-					
+
 					allObjects.get(selected_index).updateRequested();
 				}
 			}
@@ -137,6 +163,7 @@ public class ObjectBrowser extends ObjectManagerActivity implements OnSharedPref
 		objects.setAdapter(adapter);
 
 		objects.setOnItemClickListener(new OnItemClickListener() {
+			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 
@@ -149,9 +176,9 @@ public class ObjectBrowser extends ObjectManagerActivity implements OnSharedPref
 				updateObject();
 			}
 		});
-		
+
 	}
-	
+
 	private void updateObject() {
 		//adapter.notifyDataSetChanged();
 		TextView text = (TextView) findViewById(R.id.object_information);
@@ -161,6 +188,7 @@ public class ObjectBrowser extends ObjectManagerActivity implements OnSharedPref
 			Log.d(TAG,"Update called but invalid index: " + selected_index);
 	}
 
+	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
 			String key) {
 		// TODO Auto-generated method stub

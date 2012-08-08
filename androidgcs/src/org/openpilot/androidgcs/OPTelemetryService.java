@@ -1,3 +1,29 @@
+/**
+ ******************************************************************************
+ * @file       OPTelemetryService.java
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @brief      Provides UAVTalk telemetry over multiple physical links.  The
+ *             details of each of these are in their respective connection
+ *             classes.  This mostly creates those threads based on the selected
+ *             preferences.
+ * @see        The GNU Public License (GPL) Version 3
+ *
+ *****************************************************************************/
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
 package org.openpilot.androidgcs;
 
 import java.io.IOException;
@@ -67,7 +93,7 @@ public class OPTelemetryService extends Service {
 			case MSG_START:
 				stopSelf(msg.arg2);
 				break;
-			case MSG_CONNECT:	
+			case MSG_CONNECT:
 				terminate = false;
 				int connection_type;
 				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(OPTelemetryService.this);
@@ -111,7 +137,7 @@ public class OPTelemetryService extends Service {
 				Intent intent = new Intent();
 				intent.setAction(INTENT_ACTION_DISCONNECTED);
 				sendBroadcast(intent,null);
-				
+
 				stopSelf();
 
 				break;
@@ -131,14 +157,14 @@ public class OPTelemetryService extends Service {
 	 */
 	public void startup() {
 		Toast.makeText(getApplicationContext(), "Telemetry service starting", Toast.LENGTH_SHORT).show();
-		
+
 		thread = new HandlerThread("TelemetryServiceHandler", Process.THREAD_PRIORITY_BACKGROUND);
 		thread.start();
 
-		// Get the HandlerThread's Looper and use it for our Handler 
+		// Get the HandlerThread's Looper and use it for our Handler
 		mServiceLooper = thread.getLooper();
 		mServiceHandler = new ServiceHandler(mServiceLooper);
-	
+
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(OPTelemetryService.this);
 		if(prefs.getBoolean("autoconnect", false)) {
 			Message msg = mServiceHandler.obtainMessage();
@@ -148,7 +174,7 @@ public class OPTelemetryService extends Service {
 		}
 
 	}
-	
+
 	@Override
 	public void onCreate() {
 		startup();
@@ -157,19 +183,19 @@ public class OPTelemetryService extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		// Currently only using as bound service
-		
+
 		// If we get killed, after returning from here, restart
 		return START_STICKY;
 	}
 
 	@Override
-	public IBinder onBind(Intent intent) {		
+	public IBinder onBind(Intent intent) {
 		return mBinder;
 	}
 
 	@Override
 	public void onDestroy() {
-		Toast.makeText(this, "Telemetry service done", Toast.LENGTH_SHORT).show(); 
+		Toast.makeText(this, "Telemetry service done", Toast.LENGTH_SHORT).show();
 	}
 
 	public class LocalBinder extends Binder {
@@ -206,9 +232,10 @@ public class OPTelemetryService extends Service {
 		public UAVObjectManager getObjectManager();
 	};
 
-	// Fake class for testing, simply emits periodic updates on 
+	// Fake class for testing, simply emits periodic updates on
 	private class FakeTelemetryThread extends Thread implements TelemTask  {
-		private UAVObjectManager objMngr;
+		private final UAVObjectManager objMngr;
+		@Override
 		public UAVObjectManager getObjectManager() { return objMngr; };
 
 		FakeTelemetryThread() {
@@ -216,6 +243,7 @@ public class OPTelemetryService extends Service {
 			UAVObjectsInitialize.register(objMngr);
 		}
 
+		@Override
 		public void run() {
 			System.out.println("Running fake thread");
 
@@ -229,22 +257,22 @@ public class OPTelemetryService extends Service {
 			UAVDataObject homeLocation = (UAVDataObject) objMngr.getObject("HomeLocation");
 			UAVDataObject positionActual = (UAVDataObject) objMngr.getObject("PositionActual");
 			UAVDataObject systemAlarms = (UAVDataObject) objMngr.getObject("SystemAlarms");
-			
+
 			systemAlarms.getField("Alarm").setValue("Warning",0);
 			systemAlarms.getField("Alarm").setValue("OK",1);
 			systemAlarms.getField("Alarm").setValue("Critical",2);
 			systemAlarms.getField("Alarm").setValue("Error",3);
 			systemAlarms.updated();
-			
+
 			homeLocation.getField("Latitude").setDouble(379420315);
 			homeLocation.getField("Longitude").setDouble(-88330078);
 			homeLocation.getField("Be").setDouble(26702.78710938,0);
 			homeLocation.getField("Be").setDouble(-1468.33605957,1);
 			homeLocation.getField("Be").setDouble(34181.78515625,2);
-			
-			
+
+
 			double roll = 0;
-			double pitch = 0; 
+			double pitch = 0;
 			double yaw = 0;
 			double north = 0;
 			double east = 0;
@@ -257,7 +285,7 @@ public class OPTelemetryService extends Service {
 				roll = (roll + 10) % 180;
 				pitch = (pitch + 10) % 180;
 				yaw = (yaw + 10) % 360;
-				
+
 				systemStats.updated();
 				attitudeActual.updated();
 				positionActual.updated();
@@ -269,13 +297,14 @@ public class OPTelemetryService extends Service {
 			}
 		}
 	}
-	private class BTTelemetryThread extends Thread implements TelemTask { 
+	private class BTTelemetryThread extends Thread implements TelemTask {
 
-		private UAVObjectManager objMngr;
+		private final UAVObjectManager objMngr;
 		private UAVTalk uavTalk;
 		private Telemetry tel;
 		private TelemetryMonitor mon;
 
+		@Override
 		public UAVObjectManager getObjectManager() { return objMngr; };
 
 		BTTelemetryThread() {
@@ -283,10 +312,11 @@ public class OPTelemetryService extends Service {
 			UAVObjectsInitialize.register(objMngr);
 		}
 
-		public void run() {			
+		@Override
+		public void run() {
 			if (DEBUG) Log.d(TAG, "Telemetry Thread started");
 
-			Looper.prepare();						
+			Looper.prepare();
 
 			BluetoothUAVTalk bt = new BluetoothUAVTalk(OPTelemetryService.this);
 			for( int i = 0; i < 10; i++ ) {
@@ -318,14 +348,15 @@ public class OPTelemetryService extends Service {
 			tel = new Telemetry(uavTalk, objMngr);
 			mon = new TelemetryMonitor(objMngr,tel);
 			mon.addObserver(new Observer() {
+				@Override
 				public void update(Observable arg0, Object arg1) {
 					System.out.println("Mon updated. Connected: " + mon.getConnected() + " objects updated: " + mon.getObjectsUpdated());
 					if(mon.getConnected() /*&& mon.getObjectsUpdated()*/) {
 						Intent intent = new Intent();
 						intent.setAction(INTENT_ACTION_CONNECTED);
-						sendBroadcast(intent,null);					
+						sendBroadcast(intent,null);
 					}
-				}				
+				}
 			});
 
 
@@ -345,13 +376,14 @@ public class OPTelemetryService extends Service {
 
 	};
 
-	private class TcpTelemetryThread extends Thread implements TelemTask { 
+	private class TcpTelemetryThread extends Thread implements TelemTask {
 
-		private UAVObjectManager objMngr;
+		private final UAVObjectManager objMngr;
 		private UAVTalk uavTalk;
 		private Telemetry tel;
 		private TelemetryMonitor mon;
 
+		@Override
 		public UAVObjectManager getObjectManager() { return objMngr; };
 
 		TcpTelemetryThread() {
@@ -359,7 +391,8 @@ public class OPTelemetryService extends Service {
 			UAVObjectsInitialize.register(objMngr);
 		}
 
-		public void run() {			
+		@Override
+		public void run() {
 			if (DEBUG) Log.d(TAG, "Telemetry Thread started");
 
 			Looper.prepare();
@@ -371,7 +404,7 @@ public class OPTelemetryService extends Service {
 				tcp.connect(objMngr);
 
 				if( tcp.getConnected() )
-					
+
 					break;
 
 				try {
@@ -394,6 +427,7 @@ public class OPTelemetryService extends Service {
 			tel = new Telemetry(uavTalk, objMngr);
 			mon = new TelemetryMonitor(objMngr,tel);
 			mon.addObserver(new Observer() {
+				@Override
 				public void update(Observable arg0, Object arg1) {
 					System.out.println("Mon updated. Connected: " + mon.getConnected() + " objects updated: " + mon.getObjectsUpdated());
 					if(mon.getConnected() /*&& mon.getObjectsUpdated()*/) {
@@ -401,7 +435,7 @@ public class OPTelemetryService extends Service {
 						intent.setAction(INTENT_ACTION_CONNECTED);
 						sendBroadcast(intent,null);
 					}
-				}	
+				}
 			});
 
 
@@ -417,16 +451,16 @@ public class OPTelemetryService extends Service {
 				}
 			}
 			Looper.myLooper().quit();
-			
+
 			// Shut down all the attached
 			mon.stopMonitor();
 			mon = null;
 			tel.stopTelemetry();
 			tel = null;
-			
+
 			// Finally close the stream if it is still open
 			tcp.disconnect();
-			
+
 			if (DEBUG) Log.d(TAG, "UAVTalk stream disconnected");
 			toastMessage("TCP Thread finished");
 		}

@@ -1,3 +1,29 @@
+/**
+ ******************************************************************************
+ * @file       ObjectManagerFragment.java
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @brief      Base class for all fragments that use the UAVObjectManager.  This
+ *             supports all the extensions the ObjectManagerActivity does, namely
+ *             access to the UAVObjectManager and callbacks in the UI thread for
+ *             object updates.
+ * @see        The GNU Public License (GPL) Version 3
+ *
+ *****************************************************************************/
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
 package org.openpilot.androidgcs;
 
 import org.openpilot.uavtalk.UAVObject;
@@ -9,12 +35,12 @@ import android.os.Bundle;
 import android.util.Log;
 
 public class ObjectManagerFragment extends Fragment {
-	
+
 	private static final String TAG = ObjectManagerFragment.class.getSimpleName();
 	private static int LOGLEVEL = 1;
 //	private static boolean WARN = LOGLEVEL > 1;
 	private static boolean DEBUG = LOGLEVEL > 0;
-    
+
 	UAVObjectManager objMngr;
 
 	/** Called when the activity is first created. */
@@ -25,15 +51,16 @@ public class ObjectManagerFragment extends Fragment {
 		// For an activity this registers against the telemetry service intents.  Fragments must be notified by their
 		// parent activity
 	}
-    
+
 	/**
 	 * Attach to the parent activity so it can notify us when the connection
 	 * changed
 	 */
-    public void onAttach(Activity activity) {
+    @Override
+	public void onAttach(Activity activity) {
         super.onAttach(activity);
         if (DEBUG) Log.d(TAG,"onAttach");
-        
+
         ObjectManagerActivity castActivity = null;
         try {
         	castActivity = (ObjectManagerActivity)activity;
@@ -44,25 +71,25 @@ public class ObjectManagerFragment extends Fragment {
         }
         castActivity.addOnConnectionListenerFragment(this);
     }
-    
-    
+
+
 	// The below methods should all be called by the parent activity at the appropriate times
     protected void onOPConnected(UAVObjectManager objMngr) {
 		this.objMngr = objMngr;
 		if (DEBUG) Log.d(TAG,"onOPConnected");
 	}
-	
+
 	protected void onOPDisconnected() {
 		objMngr = null;
 		if (DEBUG) Log.d(TAG,"onOPDisconnected");
 	}
-		
+
 	/**
-	 * Called whenever any objects subscribed to via registerObjects 
+	 * Called whenever any objects subscribed to via registerObjects
 	 */
 	protected void objectUpdated(UAVObject obj) {
-		
-	}	
+
+	}
 
 	/**
 	 * Register on the activities object monitor handler so that updates
@@ -72,5 +99,5 @@ public class ObjectManagerFragment extends Fragment {
 	protected void registerObjectUpdates(UAVObject object) {
 		((ObjectManagerActivity) getActivity()).registerObjectUpdates(object, this);
 	}
-	
+
 }

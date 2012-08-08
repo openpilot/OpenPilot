@@ -1,3 +1,27 @@
+/**
+ ******************************************************************************
+ * @file       BluetoothUAVTalk.java
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @brief      Telemetry over bluetooth.
+ * @see        The GNU Public License (GPL) Version 3
+ *
+ *****************************************************************************/
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
+
 package org.openpilot.androidgcs;
 
 import java.io.IOException;
@@ -24,19 +48,19 @@ import android.util.Log;
 	public static int LOGLEVEL = 2;
 	public static boolean WARN = LOGLEVEL > 1;
 	public static boolean DEBUG = LOGLEVEL > 0;
-	
+
 	// Temporarily define fixed device name
 	private String device_name = "RN42-222D";
 	private final static UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-	
+
 	private BluetoothAdapter mBluetoothAdapter;
 	private BluetoothSocket socket;
 	private BluetoothDevice device;
 	private UAVTalk uavTalk;
-	private boolean connected; 
-	
+	private boolean connected;
+
 	public BluetoothUAVTalk(Context caller) {
-		
+
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(caller);
 		device_name = prefs.getString("bluetooth_mac","");
 
@@ -44,52 +68,52 @@ import android.util.Log;
 
         connected = false;
         device = null;
-        
+
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
             // Device does not support Bluetooth
         	Log.e(TAG, "Device does not support Bluetooth");
         	return;
         }
-        
+
         if (!mBluetoothAdapter.isEnabled()) {
         	// Enable bluetooth if it isn't already
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             caller.sendOrderedBroadcast(enableBtIntent, "android.permission.BLUETOOTH_ADMIN", new BroadcastReceiver() {
 				@Override
 				public void onReceive(Context context, Intent intent) {
-					Log.e(TAG,"Received " + context + intent);		
+					Log.e(TAG,"Received " + context + intent);
 					//TODO: some logic here to see if it worked
 					queryDevices();
-				}            	
+				}
             }, null, Activity.RESULT_OK, null, null);
         } else {
         	queryDevices();
-        }        		
+        }
     }
-	
+
 	public boolean connect(UAVObjectManager objMngr) {
-		if( getConnected() ) 
+		if( getConnected() )
 			return true;
 		if( !getFoundDevice() )
-			return false;		
+			return false;
 		if( !openTelemetryBluetooth(objMngr) )
 			return false;
-		return true;		
+		return true;
 	}
 
 	public boolean getConnected() {
 		return connected;
 	}
-    
+
 	public boolean getFoundDevice() {
 		return (device != null);
 	}
-	
+
 	public UAVTalk getUavtalk() {
 		return uavTalk;
 	}
-	
+
     private void queryDevices() {
     	Log.d(TAG, "Searching for devices");
 		Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
@@ -107,7 +131,7 @@ import android.util.Log;
 		    	}
 		    }
 		}
-    	
+
     }
 
 	private boolean openTelemetryBluetooth(UAVObjectManager objMngr) {
@@ -119,11 +143,11 @@ import android.util.Log;
 		} catch (IOException e) {
 			Log.e(TAG,"Unable to create Rfcomm socket");
 			return false;
-			//e.printStackTrace();			
+			//e.printStackTrace();
 		}
-		
+
 		mBluetoothAdapter.cancelDiscovery();
-		
+
 		try {
 			socket.connect();
 		}
@@ -138,7 +162,7 @@ import android.util.Log;
 		}
 
 		connected = true;
-		
+
 		try {
 			uavTalk = new UAVTalk(socket.getInputStream(), socket.getOutputStream(), objMngr);
 		} catch (IOException e) {
@@ -147,7 +171,7 @@ import android.util.Log;
 			//e.printStackTrace();
 			return false;
 		}
-				
+
 		return true;
 	}
 

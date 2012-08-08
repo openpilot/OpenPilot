@@ -130,6 +130,7 @@ public:
     void setOutOfLimitsStyle(QString style){outOfLimitsStyle=style;}
     void addHelpButton(QPushButton * button,QString url);
     void forceShadowUpdates();
+    void forceConnectedState();
 public slots:
     void onAutopilotDisconnect();
     void onAutopilotConnect();

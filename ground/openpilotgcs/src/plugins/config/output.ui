@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>811</width>
-    <height>937</height>
+    <height>895</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -114,7 +114,7 @@
             <x>0</x>
             <y>0</y>
             <width>781</width>
-            <height>800</height>
+            <height>788</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -129,13 +129,19 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>78</height>
+               <height>60</height>
               </size>
              </property>
              <property name="title">
               <string/>
              </property>
              <layout class="QGridLayout" name="gridLayout">
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
               <item row="0" column="0">
                <spacer name="horizontalSpacer_3">
                 <property name="orientation">
@@ -926,113 +932,115 @@ margin:1px;</string>
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>75</height>
+       <height>45</height>
       </size>
      </property>
      <property name="title">
       <string/>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="spacing">
+       <number>4</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <property name="spacing">
-         <number>4</number>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
-        <item>
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QPushButton" name="outputHelp">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>32</width>
-            <height>32</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>32</width>
-            <height>32</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Takes you to the wiki page</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="icon">
-           <iconset resource="../coreplugin/core.qrc">
-            <normaloff>:/core/images/helpicon.svg</normaloff>:/core/images/helpicon.svg</iconset>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>32</width>
-            <height>32</height>
-           </size>
-          </property>
-          <property name="flat">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="saveRCOutputToRAM">
-          <property name="minimumSize">
-           <size>
-            <width>60</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Send to OpenPilot but don't write in SD.
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>592</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="outputHelp">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>25</width>
+          <height>26</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>25</width>
+          <height>26</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>Takes you to the wiki page</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../coreplugin/core.qrc">
+          <normaloff>:/core/images/helpicon.svg</normaloff>:/core/images/helpicon.svg</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>25</width>
+          <height>25</height>
+         </size>
+        </property>
+        <property name="flat">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="saveRCOutputToRAM">
+        <property name="minimumSize">
+         <size>
+          <width>60</width>
+          <height>28</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>Send to OpenPilot but don't write in SD.
 Be sure to set the Neutral position on all sliders before sending!</string>
-          </property>
-          <property name="styleSheet">
-           <string notr="true"/>
-          </property>
-          <property name="text">
-           <string>Apply</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="saveRCOutputToSD">
-          <property name="minimumSize">
-           <size>
-            <width>60</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Be sure to set the Neutral position on all sliders before sending!
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string>Apply</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="saveRCOutputToSD">
+        <property name="minimumSize">
+         <size>
+          <width>60</width>
+          <height>28</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>Be sure to set the Neutral position on all sliders before sending!
 Applies and Saves all settings to SD</string>
-          </property>
-          <property name="styleSheet">
-           <string notr="true"/>
-          </property>
-          <property name="text">
-           <string>Save</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string>Save</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

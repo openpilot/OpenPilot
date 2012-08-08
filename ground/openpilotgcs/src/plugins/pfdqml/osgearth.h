@@ -24,6 +24,7 @@
 
 class QGLFramebufferObject;
 class QGLWidget;
+class OsgEarthItemRenderer;
 
 class OsgEarthItem : public QDeclarativeItem
 {
@@ -46,6 +47,7 @@ public:
     ~OsgEarthItem();
 
     QString sceneFile() const { return m_sceneFile; }
+    QString resolvedSceneFile() const;
     qreal fieldOfView() const { return m_fieldOfView; }
 
     qreal roll() const { return m_roll; }
@@ -61,6 +63,7 @@ protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *style, QWidget *widget);
 
 public slots:
+    void updateView();
     void setSceneFile(QString arg);
     void setFieldOfView(qreal arg);
 
@@ -85,16 +88,12 @@ signals:
     void fieldOfViewChanged(qreal arg);
 
 private slots:
-    void markCameraDirty();
-    void updateFBO();
-    void initScene();
+    void updateFrame();
 
 private:
-    osg::ref_ptr<osgViewer::Viewer> m_viewer;
-    osg::ref_ptr<osgViewer::GraphicsWindowEmbedded> m_gw;
-    osg::ref_ptr<osg::Node> m_model;
-    QWeakPointer<QGLWidget> m_glWidget;
-    QGLFramebufferObject *m_fbo;
+    OsgEarthItemRenderer *m_renderer;
+    QThread *m_rendererThread;
+
     QSize m_currentSize;
 
     qreal m_roll;
@@ -107,6 +106,42 @@ private:
 
     qreal m_fieldOfView;
     QString m_sceneFile;
+
+};
+
+class OsgEarthItemRenderer : public QObject
+{
+    Q_OBJECT
+public:
+    OsgEarthItemRenderer(OsgEarthItem *item, QGLWidget *glWidget);
+    ~OsgEarthItemRenderer();
+
+    QGLFramebufferObject *lastFrame();
+    void markDirty() { m_cameraDirty = true; }
+
+public slots:
+    void initScene();
+    void updateFrame();
+
+signals:
+    void frameReady();
+
+private slots:
+    void updateFBO();
+
+private:
+    enum { FboCount = 3 };
+    OsgEarthItem *m_item;
+
+    osg::ref_ptr<osgViewer::Viewer> m_viewer;
+    osg::ref_ptr<osgViewer::GraphicsWindowEmbedded> m_gw;
+    osg::ref_ptr<osg::Node> m_model;
+    QWeakPointer<QGLWidget> m_glWidget;
+
+    QGLFramebufferObject* m_fbo[FboCount];
+    int m_lastFboNumber;
+
+    QSize m_currentSize;
 
     bool m_cameraDirty;
 };

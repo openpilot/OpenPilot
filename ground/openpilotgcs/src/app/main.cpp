@@ -262,7 +262,9 @@ int main(int argc, char **argv)
     rl.rlim_cur = rl.rlim_max;
     setrlimit(RLIMIT_NOFILE, &rl);
 #endif
-
+#ifdef Q_OS_LINUX
+    QApplication::setAttribute(Qt::AA_X11InitThreads, true);
+#endif
     QApplication::setGraphicsSystem("raster");
 
     SharedTools::QtSingleApplication app((QLatin1String(appNameC)), argc, argv);

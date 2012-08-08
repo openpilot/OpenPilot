@@ -9,11 +9,6 @@ include(../../openpilotgcsplugin.pri)
 include(../../plugins/coreplugin/coreplugin.pri)
 include(pfdqml_dependencies.pri)
 
-
-contains(DEFINES,USE_OSG){
-LIBS += -losg -losgUtil -losgViewer -losgQt -losgDB -lOpenThreads -losgGA
-LIBS += -losgEarth -losgEarthFeatures -losgEarthUtil
-}
 HEADERS += \
     pfdqmlplugin.h \
     pfdqmlgadget.h \
@@ -21,10 +16,7 @@ HEADERS += \
     pfdqmlgadgetfactory.h \
     pfdqmlgadgetconfiguration.h \
     pfdqmlgadgetoptionspage.h
-contains(DEFINES,USE_OSG){
-    \
-    osgearth.h
-}
+
 SOURCES += \
     pfdqmlplugin.cpp \
     pfdqmlgadget.cpp \
@@ -32,9 +24,14 @@ SOURCES += \
     pfdqmlgadgetwidget.cpp \
     pfdqmlgadgetconfiguration.cpp \
     pfdqmlgadgetoptionspage.cpp
-contains(DEFINES,USE_OSG){
- \
-    osgearth.cpp
+
+
+contains(DEFINES,USE_OSG) {
+    LIBS += -losg -losgUtil -losgViewer -losgQt -losgDB -lOpenThreads -losgGA
+    LIBS += -losgEarth -losgEarthFeatures -losgEarthUtil
+
+    HEADERS += osgearth.h
+    SOURCES += osgearth.cpp
 }
 
 OTHER_FILES += PfdQml.pluginspec

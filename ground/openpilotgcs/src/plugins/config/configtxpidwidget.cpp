@@ -71,6 +71,8 @@ ConfigTxPIDWidget::ConfigTxPIDWidget(QWidget *parent) : ConfigTaskWidget(parent)
 
     addUAVObjectToWidgetRelation("TxPIDSettings", "UpdateMode", m_txpid->UpdateMode);
 
+    addWidget(m_txpid->TxPIDEnable);
+
     enableControls(false);
     populateWidgets();
     refreshWidgetsValues();

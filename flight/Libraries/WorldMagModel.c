@@ -242,7 +242,7 @@ int WMM_GetMagVector(float Lat, float Lon, float AltEllipsoid, uint16_t Month, u
     {
         CoordGeodetic->lambda = Lon;
         CoordGeodetic->phi = Lat;
-        CoordGeodetic->HeightAboveEllipsoid = AltEllipsoid;
+        CoordGeodetic->HeightAboveEllipsoid = AltEllipsoid/1000.0; // convert to km
 
         // Convert from geodeitic to Spherical Equations: 17-18, WMM Technical report
         if (WMM_GeodeticToSpherical(CoordGeodetic, CoordSpherical) < 0)

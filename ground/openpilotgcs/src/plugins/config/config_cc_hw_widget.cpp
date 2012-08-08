@@ -86,6 +86,7 @@ ConfigCCHWWidget::ConfigCCHWWidget(QWidget *parent) : ConfigTaskWidget(parent)
     enableControls(false);
     populateWidgets();
     refreshWidgetsValues();
+    forceConnectedState();
 }
 
 ConfigCCHWWidget::~ConfigCCHWWidget()

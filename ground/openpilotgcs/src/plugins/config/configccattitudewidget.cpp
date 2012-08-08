@@ -43,6 +43,7 @@ ConfigCCAttitudeWidget::ConfigCCAttitudeWidget(QWidget *parent) :
         ui(new Ui_ccattitude)
 {
     ui->setupUi(this);
+    forceConnectedState(); //dynamic widgets don't recieve the connected signal
     connect(ui->zeroBias,SIGNAL(clicked()),this,SLOT(startAccelCalibration()));
 
     ExtensionSystem::PluginManager *pm=ExtensionSystem::PluginManager::instance();
@@ -113,6 +114,7 @@ void ConfigCCAttitudeWidget::accelsUpdated(UAVObject * obj) {
         attitudeSettingsData.GyroBias[2] = -z_gyro_bias;
         attitudeSettingsData.BiasCorrectGyro = AttitudeSettings::BIASCORRECTGYRO_TRUE;
         AttitudeSettings::GetInstance(getObjectManager())->setData(attitudeSettingsData);
+        this->setDirty(true);
     } else {
 	// Possible to get here if weird threading stuff happens.  Just ignore updates.
 	qDebug("Unexpected accel update received.");
@@ -135,7 +137,8 @@ void ConfigCCAttitudeWidget::timeout() {
 
 void ConfigCCAttitudeWidget::startAccelCalibration() {
     QMutexLocker locker(&startStop);
-
+    //need to apply so board rotation values don't get overwriten when calibrating
+    apply();
     updates = 0;
     x_accum.clear();
     y_accum.clear();

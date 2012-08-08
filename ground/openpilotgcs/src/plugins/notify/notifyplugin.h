@@ -101,7 +101,6 @@ private:
     PhononObject phonon;
     NotifyPluginOptionsPage* mop;
     TelemetryManager* telMngr;
-    QMutex _mutex;
 }; 
 
 #endif // SOUNDNOTIFYPLUGIN_H

@@ -206,7 +206,9 @@ void SoundNotifyPlugin::connectNotifications()
             if (!lstNotifiedUAVObjects.contains(obj)) {
                 lstNotifiedUAVObjects.append(obj);
 
-                connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(on_arrived_Notification(UAVObject*)));
+                connect(obj, SIGNAL(objectUpdated(UAVObject*)),
+                        this, SLOT(on_arrived_Notification(UAVObject*)),
+                        Qt::QueuedConnection);
             }
         } else {
             qNotifyDebug() << "Error: Object is unknown (" << notify->getDataObject() << ").";
@@ -297,8 +299,6 @@ void SoundNotifyPlugin::on_expiredTimer_Notification()
         return;
     notification->stopExpireTimer();
 
-    volatile QMutexLocker lock(&_mutex);
-
     if (!_pendingNotifications.isEmpty()) {
         qNotifyDebug() << QString("expireTimer: %1% | %2 | %3").arg(notification->getDataObject())
                                                         .arg(notification->getObjectField())
@@ -327,7 +327,6 @@ void SoundNotifyPlugin::stateChanged(Phonon::State newstate, Phonon::State oldst
     {
         qNotifyDebug() << "New State: " << QVariant(newstate).toString();
 
-        volatile QMutexLocker lock(&_mutex);
         // assignment to NULL needed to detect that palying is finished
         // it's useful in repeat timer handler, where we can detect
         // that notification has not overlap with itself
@@ -442,7 +441,6 @@ void SoundNotifyPlugin::checkNotificationRule(NotificationItem* notification, UA
     }
     if(notification->retryValue() == NotificationItem::repeatOncePerUpdate && notification->getCurrentUpdatePlayed())
         return;
-    volatile QMutexLocker lock(&_mutex);
 
     if (!playNotification(notification)) {
         if (!_pendingNotifications.contains(notification)

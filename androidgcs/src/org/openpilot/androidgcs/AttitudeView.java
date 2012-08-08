@@ -83,13 +83,11 @@ public class AttitudeView extends View {
 	private float roll;
 	public void setRoll(double roll) {
 		this.roll = (float) roll;
-		postInvalidate();
 	}
 
 	private float pitch;
 	public void setPitch(double d) {
 		this.pitch = (float) d;
-		postInvalidate();
 	}
 
 	@Override

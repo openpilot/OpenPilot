@@ -2,8 +2,9 @@
  ******************************************************************************
  * @file       PFD.java
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
- * @brief      Shows the PFD activity.
+ * @brief      The PFD display fragment
  * @see        The GNU Public License (GPL) Version 3
+ *
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -24,58 +25,59 @@
 package org.openpilot.androidgcs;
 
 import org.openpilot.uavtalk.UAVObject;
+import org.openpilot.uavtalk.UAVObjectManager;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
-public class PFD extends ObjectManagerActivity {
+public class PFD extends ObjectManagerFragment {
 
-	final long MIN_UPDATE_PERIOD = 50;
-	long lastUpdateMs;
-	double heading;
-	double roll;
-	double pitch;
+	private static final String TAG = ObjectManagerFragment.class
+			.getSimpleName();
+	private static final int LOGLEVEL = 0;
+	// private static boolean WARN = LOGLEVEL > 1;
+	private static final boolean DEBUG = LOGLEVEL > 0;
 
-	/**
-	 * Update the UI whenever the attitude is updated
-	 */
+	// @Override
 	@Override
-	protected void objectUpdated(UAVObject obj) {
-		// Throttle the UI redraws.  Eventually this should maybe come from a periodic task
-		if ((System.currentTimeMillis() - lastUpdateMs) < MIN_UPDATE_PERIOD)
-			return;
-		if (obj.getName().compareTo("AttitudeActual") != 0)
-			return;
-
-		lastUpdateMs = System.currentTimeMillis();
-
-		heading = obj.getField("Yaw").getDouble();
-		pitch = obj.getField("Pitch").getDouble();
-		roll = obj.getField("Roll").getDouble();
-
-		/*
-		 * CompassView compass = (CompassView) findViewById(R.id.compass_view);
-		 * compass.setBearing((int) heading); compass.invalidate();
-		 */
-
-		AttitudeView attitude = (AttitudeView) findViewById(R.id.attitude_view);
-		attitude.setRoll(roll);
-		attitude.setPitch(pitch);
-		attitude.invalidate();
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		// Inflate the layout for this fragment
+		return inflater.inflate(R.layout.pfd, container, false);
 	}
 
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.pfd);
-	}
+	public void onOPConnected(UAVObjectManager objMngr) {
+		super.onOPConnected(objMngr);
+		if (DEBUG)
+			Log.d(TAG, "On connected");
 
-	@Override
-	void onOPConnected() {
-		super.onOPConnected();
-
-		// Connect the update method to AttitudeActual
 		UAVObject obj = objMngr.getObject("AttitudeActual");
 		if (obj != null)
 			registerObjectUpdates(obj);
+		objectUpdated(obj);
 	}
+
+	/**
+	 * Called whenever any objects subscribed to via registerObjects
+	 */
+	@Override
+	protected void objectUpdated(UAVObject obj) {
+		if (DEBUG)
+			Log.d(TAG, "Updated");
+
+		double pitch = obj.getField("Pitch").getDouble();
+		double roll = obj.getField("Roll").getDouble();
+
+		AttitudeView attitude = (AttitudeView) getActivity().findViewById(
+				R.id.attitude_view);
+		attitude.setRoll(roll);
+		attitude.setPitch(pitch);
+		attitude.invalidate();
+
+	}
+
 }

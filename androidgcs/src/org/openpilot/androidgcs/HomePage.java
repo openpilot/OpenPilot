@@ -48,7 +48,7 @@ public class HomePage extends ObjectManagerActivity {
 		pfd.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				startActivity(new Intent(HomePage.this, PFD.class));
+				startActivity(new Intent(HomePage.this, PfdActivity.class));
 			}
 		});
 

@@ -1,3 +1,26 @@
+/**
+ ******************************************************************************
+ * @file       Telemetry.java
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @brief      Implementation of all the UAVObjectFields.
+ * @see        The GNU Public License (GPL) Version 3
+ *
+ *****************************************************************************/
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
 package org.openpilot.uavtalk;
 
 import java.nio.ByteBuffer;
@@ -6,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UAVObjectField {
-	
+
     public enum FieldType { INT8, INT16, INT32, UINT8, UINT16, UINT32, FLOAT32, ENUM, BITFIELD, STRING };
 
     public UAVObjectField(String name, String units, FieldType type, int numElements, List<String> options) {
@@ -17,26 +40,26 @@ public class UAVObjectField {
             elementNames.add(String.valueOf(n));
         }
         // Initialize
-        constructorInitialize(name, units, type, elementNames, options);    	
+        constructorInitialize(name, units, type, elementNames, options);
     }
-    
+
     public UAVObjectField(String name, String units, FieldType type, List<String>  elementNames, List<String>  options) {
     	 constructorInitialize(name, units, type, elementNames, options);
     }
-    
+
     public void initialize(UAVObject obj){
          this.obj = obj;
-        //clear();    	
+        //clear();
 	}
-    
+
     public UAVObject getObject() {
     	return obj;
     }
-    
+
     public FieldType getType() {
     	return type;
     }
-    
+
     public String getTypeAsString() {
         switch (type)
         {
@@ -62,31 +85,31 @@ public class UAVObjectField {
                 return "string";
             default:
                 return "";
-        }    	
+        }
     }
-    
+
     public String getName() {
     	return name;
     }
-    
+
     public String getUnits() {
     	return units;
     }
-    
+
     public int getNumElements() {
     	return numElements;
     }
-    
+
     public List<String> getElementNames() {
-    	return elementNames;	
+    	return elementNames;
     }
-    
+
     public List<String> getOptions() {
     	return options;
     }
-    
+
     /**
-     * This function copies this field from the internal storage of the parent object 
+     * This function copies this field from the internal storage of the parent object
      * to a new ByteBuffer for UAVTalk.  It also converts from the java standard (big endian)
      * to the arm/uavtalk standard (little endian)
      * @param dataOut
@@ -98,7 +121,7 @@ public class UAVObjectField {
     	dataOut.order(ByteOrder.LITTLE_ENDIAN);
         switch (type)
         {
-            case INT8:  
+            case INT8:
             	for (int index = 0; index < numElements; ++index) {
             		Integer val = (Integer) getValue(index);
             		dataOut.put(val.byteValue());
@@ -116,7 +139,7 @@ public class UAVObjectField {
                 	dataOut.putInt(val);
                 }
                 break;
-            case UINT8: 
+            case UINT8:
             	// TODO: Deal properly with unsigned
             	for (int index = 0; index < numElements; ++index) {
             		Integer val = (Integer) getValue(index);
@@ -144,7 +167,7 @@ public class UAVObjectField {
             case ENUM:
             	List<Byte> l = (List<Byte>) data;
                 for (int index = 0; index < numElements; ++index)
-                	dataOut.put((Byte) l.get(index));
+                	dataOut.put(l.get(index));
                 break;
             case BITFIELD:
             	for (int index = 0; index < numElements; ++index) {
@@ -156,9 +179,9 @@ public class UAVObjectField {
             	throw new Error("Strings not yet implemented");
         }
         // Done
-        return getNumBytes();    	
+        return getNumBytes();
     }
-    
+
     @SuppressWarnings("unchecked")
 	public synchronized int unpack(ByteBuffer dataIn) {
         // Unpack each element from input buffer
@@ -196,7 +219,7 @@ public class UAVObjectField {
             {
             	List<Short> l = (List<Short>) this.data;
             	for (int index = 0 ; index < numElements; ++index) {
-            		int signedval = (int) dataIn.get();  // this sign extends it
+            		int signedval = dataIn.get();  // this sign extends it
             		int unsignedval = signedval & 0xff;    // drop sign extension
             		l.set(index, (short) unsignedval);
             	}
@@ -206,7 +229,7 @@ public class UAVObjectField {
             {
             	List<Integer> l = (List<Integer>) this.data;
             	for (int index = 0 ; index < numElements; ++index) {
-            		int signedval = (int) dataIn.getShort();  // this sign extends it
+            		int signedval = dataIn.getShort();  // this sign extends it
             		int unsignedval = signedval & 0xffff;    // drop sign extension
             		l.set(index, unsignedval);
             	}
@@ -216,7 +239,7 @@ public class UAVObjectField {
             {
             	List<Long> l = (List<Long>) this.data;
             	for (int index = 0 ; index < numElements; ++index) {
-            		long signedval = (long) dataIn.getInt();  // this sign extends it
+            		long signedval = dataIn.getInt();  // this sign extends it
             		long unsignedval = signedval & 0xffffffffL;    // drop sign extension
             		l.set(index, unsignedval);
             	}
@@ -235,7 +258,7 @@ public class UAVObjectField {
             {
             	List<Short> l = (List<Short>) this.data;
             	for (int index = 0 ; index < numElements; ++index) {
-            		int signedval = (int) dataIn.get();  // this sign extends it
+            		int signedval = dataIn.get();  // this sign extends it
             		int unsignedval = signedval & 0xff;    // drop sign extension
             		l.set(index, (short) unsignedval);
             	}
@@ -254,9 +277,9 @@ public class UAVObjectField {
             	//throw new Exception("Strings not handled");
         }
         // Done
-        return getNumBytes();    	
+        return getNumBytes();
     }
-    
+
     public Object getValue()  { return getValue(0); };
     @SuppressWarnings("unchecked")
 	public synchronized Object getValue(int index)  {
@@ -265,7 +288,7 @@ public class UAVObjectField {
         {
             return null;
         }
-        
+
         switch (type)
         {
             case INT8:
@@ -287,7 +310,7 @@ public class UAVObjectField {
             	List<Byte> l = (List<Byte>) data;
             	Byte val = l.get(index);
 
-                //if(val >= options.size() || val < 0) 
+                //if(val >= options.size() || val < 0)
                 //	throw new Exception("Invalid value for" + name);
 
                 return options.get(val);
@@ -301,10 +324,10 @@ public class UAVObjectField {
             }
         }
         // If this point is reached then we got an invalid type
-        return null;    
+        return null;
     }
-    
-    public void setValue(Object data) { setValue(data,0); }    
+
+    public void setValue(Object data) { setValue(data,0); }
     @SuppressWarnings("unchecked")
 	public synchronized void setValue(Object data, int index) {
     	// Check that index is not out of bounds
@@ -361,15 +384,15 @@ public class UAVObjectField {
     			break;
     		}
     		case ENUM:
-    		{    			
+    		{
     			byte val;
     			try {
     				// Test if numeric constant passed in
     				val = ((Number) data).byteValue();
     			} catch (Exception e) {
-    				val = (byte) options.indexOf((String) data);
+    				val = (byte) options.indexOf(data);
     			}
-    			//if(val < 0) throw new Exception("Enumerated value not found");    	            	
+    			//if(val < 0) throw new Exception("Enumerated value not found");
     			List<Byte> l = (List<Byte>) this.data;
     			l.set(index, val);
     			break;
@@ -380,7 +403,7 @@ public class UAVObjectField {
     			l.set(index, bound(data).shortValue());
     			break;
     		}
-    		case STRING: 
+    		case STRING:
     		{
     			//throw new Exception("Sorry I haven't implemented strings yet");
     		}
@@ -388,7 +411,7 @@ public class UAVObjectField {
     		//obj.updated();
     	}
     }
-    
+
     public double getDouble() { return getDouble(0); };
     @SuppressWarnings("unchecked")
 	public double getDouble(int index) {
@@ -400,24 +423,24 @@ public class UAVObjectField {
     	}
     	return ((Number) getValue(index)).doubleValue();
     }
-    
+
     public void setDouble(double value) { setDouble(value, 0); };
     public void setDouble(double value, int index) {
     	setValue(value, index);
     }
-    
+
     public int getDataOffset() {
-    	return offset; 
+    	return offset;
     }
-    
+
     public int getNumBytes() {
         return numBytesPerElement * numElements;
     }
-    
+
     public int getNumBytesElement() {
     	return numBytesPerElement;
     }
-    
+
     public boolean isNumeric() {
         switch (type)
         {
@@ -443,9 +466,9 @@ public class UAVObjectField {
                 return false;
             default:
                 return false;
-        }    	
+        }
     }
-    
+
     public boolean isText() {
         switch (type)
         {
@@ -471,9 +494,10 @@ public class UAVObjectField {
                 return true;
             default:
                 return false;
-        }    	
+        }
     }
-    
+
+	@Override
 	public String toString() {
         String sout = new String();
         sout += name + ": ";
@@ -484,15 +508,15 @@ public class UAVObjectField {
         	else
         		sout += " ";
         }
-    	if (units.length() > 0) 
+    	if (units.length() > 0)
     		sout += " (" + units + ")\n";
     	else
     		sout += "\n";
-        return sout;    	
+        return sout;
     }
 
     void fieldUpdated(UAVObjectField field) {
-    	
+
     }
 
     @SuppressWarnings("unchecked")
@@ -555,7 +579,7 @@ public class UAVObjectField {
                 break;
         }
     }
-    
+
     public synchronized void constructorInitialize(String name, String units, FieldType type, List<String> elementNames, List<String> options) {
         // Copy params
         this.name = name;
@@ -572,43 +596,43 @@ public class UAVObjectField {
         switch (type)
         {
             case INT8:
-            	data = (Object) new ArrayList<Byte>(this.numElements);
+            	data = new ArrayList<Byte>(this.numElements);
                 numBytesPerElement = 1;
                 break;
             case INT16:
-            	data = (Object) new ArrayList<Short>(this.numElements);
+            	data = new ArrayList<Short>(this.numElements);
                 numBytesPerElement = 2;
                 break;
             case INT32:
-            	data = (Object) new ArrayList<Integer>(this.numElements);
+            	data = new ArrayList<Integer>(this.numElements);
                 numBytesPerElement = 4;
                 break;
             case UINT8:
-            	data = (Object) new ArrayList<Short>(this.numElements);
+            	data = new ArrayList<Short>(this.numElements);
                 numBytesPerElement = 1;
                 break;
             case UINT16:
-            	data = (Object) new ArrayList<Integer>(this.numElements);
+            	data = new ArrayList<Integer>(this.numElements);
                 numBytesPerElement = 2;
                 break;
             case UINT32:
-            	data = (Object) new ArrayList<Long>(this.numElements);
+            	data = new ArrayList<Long>(this.numElements);
                 numBytesPerElement = 4;
                 break;
             case FLOAT32:
-            	data = (Object) new ArrayList<Float>(this.numElements);
+            	data = new ArrayList<Float>(this.numElements);
                 numBytesPerElement = 4;
                 break;
             case ENUM:
-            	data = (Object) new ArrayList<Byte>(this.numElements);
+            	data = new ArrayList<Byte>(this.numElements);
                 numBytesPerElement = 1;
                 break;
             case BITFIELD:
-            	data = (Object) new ArrayList<Short>(this.numElements);
+            	data = new ArrayList<Short>(this.numElements);
                 numBytesPerElement = 1;
                 break;
             case STRING:
-            	data = (Object) new ArrayList<String>(this.numElements);
+            	data = new ArrayList<String>(this.numElements);
                 numBytesPerElement = 1;
                 break;
             default:
@@ -616,7 +640,7 @@ public class UAVObjectField {
         }
         clear();
     }
-    
+
     /**
      * For numerical types bounds the data appropriately
      * @param val Can be any object, for numerical tries to cast to Number
@@ -624,7 +648,7 @@ public class UAVObjectField {
      * @note This is mostly needed because java has no unsigned integer
      */
     protected Long bound (Object val) {
-    	
+
     	switch(type) {
     	case ENUM:
     	case STRING:
@@ -679,15 +703,15 @@ public class UAVObjectField {
     			return (long) 255;
     		return num;
     	}
-    	
+
     	return num;
     }
-    
+
     @Override
     public UAVObjectField clone()
     {
-    	UAVObjectField newField = new UAVObjectField(new String(name), new String(units), type, 
-    			new ArrayList<String>(elementNames), 
+    	UAVObjectField newField = new UAVObjectField(new String(name), new String(units), type,
+    			new ArrayList<String>(elementNames),
     			new ArrayList<String>(options));
     	newField.initialize(obj);
     	newField.data = data;

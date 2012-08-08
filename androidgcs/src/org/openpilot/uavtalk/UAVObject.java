@@ -1,17 +1,40 @@
+/**
+ ******************************************************************************
+ * @file       UAVObject.java
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @brief      Base object for UAVDataObject and UAVMetaObject.
+ * @see        The GNU Public License (GPL) Version 3
+ *
+ *****************************************************************************/
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
 package org.openpilot.uavtalk;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Observer;
 import java.util.Observable;
+import java.util.Observer;
 
 public abstract class UAVObject {
-	
-	public class CallbackListener extends Observable {		
-		private UAVObject parent;
-		
+
+	public class CallbackListener extends Observable {
+		private final UAVObject parent;
+
 		public CallbackListener(UAVObject parent) {
 			this.parent = parent;
 		}
@@ -29,7 +52,7 @@ public abstract class UAVObject {
 			}
 		}
 	}
-	
+
 	public class TransactionResult {
 		public UAVObject obj;
 		public boolean success;
@@ -38,8 +61,8 @@ public abstract class UAVObject {
 			this.success = success;
 		}
 	}
-	
-	private CallbackListener transactionCompletedListeners = new CallbackListener(this);
+
+	private final CallbackListener transactionCompletedListeners = new CallbackListener(this);
 	public void addTransactionCompleted(Observer o) {
 		synchronized(transactionCompletedListeners) {
 			transactionCompletedListeners.addObserver(o);
@@ -55,8 +78,8 @@ public abstract class UAVObject {
 			transactionCompletedListeners.event(new TransactionResult(this,status));
 		}
 	}
-	
-	private CallbackListener updatedListeners = new CallbackListener(this);
+
+	private final CallbackListener updatedListeners = new CallbackListener(this);
 	public void removeUpdatedObserver(Observer o) {
 		synchronized(updatedListeners) {
 			updatedListeners.deleteObserver(o);
@@ -75,8 +98,8 @@ public abstract class UAVObject {
 			updatedManual();
 	}
 	public void updated() { updated(true); };
-	
-	private CallbackListener unpackedListeners = new CallbackListener(this);
+
+	private final CallbackListener unpackedListeners = new CallbackListener(this);
 	public void addUnpackedObserver(Observer o) {
 		synchronized(unpackedListeners) {
 			unpackedListeners.addObserver(o);
@@ -88,7 +111,7 @@ public abstract class UAVObject {
 		}
 	}
 
-	private CallbackListener updatedAutoListeners = new CallbackListener(this);
+	private final CallbackListener updatedAutoListeners = new CallbackListener(this);
 	public void addUpdatedAutoObserver(Observer o) {
 		synchronized(updatedAutoListeners) {
 			updatedAutoListeners.addObserver(o);
@@ -100,7 +123,7 @@ public abstract class UAVObject {
 		}
 	}
 
-	private CallbackListener updatedManualListeners = new CallbackListener(this);
+	private final CallbackListener updatedManualListeners = new CallbackListener(this);
 	public void addUpdatedManualObserver(Observer o) {
 		synchronized(updatedManualListeners) {
 			updatedManualListeners.addObserver(o);
@@ -112,7 +135,7 @@ public abstract class UAVObject {
 		}
 	}
 
-	private CallbackListener updateRequestedListeners = new CallbackListener(this);
+	private final CallbackListener updateRequestedListeners = new CallbackListener(this);
 	public void addUpdateRequestedObserver(Observer o) {
 		synchronized(updateRequestedListeners) {
 			updateRequestedListeners.addObserver(o);
@@ -125,7 +148,7 @@ public abstract class UAVObject {
 	}
 
 	public abstract boolean isMetadata();
-	
+
 	/**
 	 * Object update mode
 	 */
@@ -172,10 +195,10 @@ public abstract class UAVObject {
 
 		/** Update period used by the telemetry module (only if telemetry mode is PERIODIC) */
 		public int flightTelemetryUpdatePeriod;
-		
+
 		/** Update period used by the GCS (only if telemetry mode is PERIODIC) */
 		public int gcsTelemetryUpdatePeriod;
-		
+
 		/** Update period used by the GCS (only if telemetry mode is PERIODIC) */
 		public int loggingUpdatePeriod;
 		/**
@@ -194,7 +217,7 @@ public abstract class UAVObject {
 		private void SET_BITS(int shift, int value, int mask) {
 			this.flags = (this.flags & ~(mask << shift)) |	(value << shift);
 		}
-		
+
 		/**
 		 * Get the UAVObject metadata access member
 		 * \return the access type
@@ -219,7 +242,7 @@ public abstract class UAVObject {
 		 * \return the GCS access type
 		 */
 		public AccessMode GetGcsAccess()
-		{			
+		{
 			return AccessModeEnum((this.flags >> UAVOBJ_GCS_ACCESS_SHIFT) & 1);
 		}
 
@@ -382,7 +405,7 @@ public abstract class UAVObject {
 
 	/**
 	 * Initialize objects' data fields
-	 * 
+	 *
 	 * @param fields
 	 *            List of fields held by the object
 	 * @param data
@@ -434,7 +457,7 @@ public abstract class UAVObject {
 
 	/**
 	 * Get the description of the object
-	 * 
+	 *
 	 * @return The description of the object
 	 */
 	public String getDescription() {
@@ -443,7 +466,7 @@ public abstract class UAVObject {
 
 	/**
 	 * Set the description of the object
-	 * 
+	 *
 	 * @param The
 	 *            description of the object
 	 * @return
@@ -525,7 +548,7 @@ public abstract class UAVObject {
 
 	/**
 	 * Get a specific field
-	 * 
+	 *
 	 * @throws Exception
 	 * @returns The field or NULL if not found
 	 */
@@ -543,7 +566,7 @@ public abstract class UAVObject {
 
 	/**
 	 * Pack the object data into a byte array
-	 * 
+	 *
 	 * @param dataOut
 	 *            ByteBuffer to receive the data.
 	 * @throws Exception
@@ -565,7 +588,7 @@ public abstract class UAVObject {
 
 	/**
 	 * Unpack the object data from a byte array
-	 * 
+	 *
 	 * @param dataIn
 	 *            The ByteBuffer to pull data from
 	 * @throws Exception
@@ -582,11 +605,11 @@ public abstract class UAVObject {
 			UAVObjectField field = li.next();
 			numBytes += field.unpack(dataIn);
 		}
-		
+
 		// Trigger all the listeners for the unpack event
 		unpacked();
 		updated(false);
-		
+
 		return numBytes;
 	}
 
@@ -774,6 +797,7 @@ public abstract class UAVObject {
 	/**
 	 * Java specific functions
 	 */
+	@Override
 	public synchronized UAVObject clone() {
 		UAVObject newObj = clone();
 		List<UAVObjectField> newFields = new ArrayList<UAVObjectField>();

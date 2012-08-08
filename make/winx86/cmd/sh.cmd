@@ -54,12 +54,8 @@ set NOT_FOUND=
 set PATH_DIRS=
 
 call :which MSYSGIT       "%ProgramFiles%\Git\bin"       git.exe
-rem These two lines for qt-sdk-win-opensource-2010.05.exe:
-call :which QTMINGW       "C:\Qt\2010.05\mingw\bin"      mingw32-make.exe
-call :which QTSDK         "C:\Qt\2010.05\qt\bin"         qmake.exe
-rem These two lines for Qt_SDK_Win_offline_v1_1_1_en.exe:
-rem call :which QTMINGW       "C:\QtSDK\mingw\bin"           mingw32-make.exe
-rem call :which QTSDK         "C:\QtSDK\Desktop\Qt\4.7.3\mingw\bin" qmake.exe
+call :which QTMINGW       "C:\QtSDK\mingw\bin"                  mingw32-make.exe
+call :which QTSDK         "C:\QtSDK\Desktop\Qt\4.8.1\mingw\bin" qmake.exe
 call :which CODESOURCERY  "%ProgramFiles%\CodeSourcery\Sourcery G++ Lite\bin" cs-make.exe
 call :which PYTHON        "C:\Python27"                  python.exe
 call :which UNSIS         "%ProgramFiles%\NSIS\Unicode"  makensis.exe

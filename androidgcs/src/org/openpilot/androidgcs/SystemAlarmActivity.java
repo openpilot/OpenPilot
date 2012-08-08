@@ -1,51 +1,37 @@
+/**
+ ******************************************************************************
+ * @file       SystemAlarmActivity.java
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @brief      An activity that displays the SystemAlarmsFragment.
+ * @see        The GNU Public License (GPL) Version 3
+ *****************************************************************************/
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
+
 package org.openpilot.androidgcs;
 
-import java.util.List;
-
-import org.openpilot.uavtalk.UAVObject;
-import org.openpilot.uavtalk.UAVObjectField;
-
 import android.os.Bundle;
-import android.widget.TextView;
 
+/**
+ * All the work for this activity is performed by it's fragment
+ */
 public class SystemAlarmActivity extends ObjectManagerActivity {
-	/**
-	 * Update the UI whenever the attitude is updated
-	 */
-	protected void objectUpdated(UAVObject obj) {
-		if (obj.getName().compareTo("SystemAlarms") != 0)
-			return;
-
-		TextView alarms = (TextView) findViewById(R.id.system_alarms_status);
-		UAVObjectField a = obj.getField("Alarm");
-		List<String> names = a.getElementNames();
-		String contents = new String();
-		List <String> options = a.getOptions();
-		
-		// Rank the alarms by order of severity, skip uninitialized
-		for (int j = options.size() - 1; j > 0; j--) {
-			for (int i = 0; i < names.size(); i++) {
-				if(a.getDouble(i) == j)
-					contents += names.get(i) + " : " + a.getValue(i).toString() + "\n";
-			}
-		}
-		alarms.setText(contents);
-	}
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.system_alarms);
-	}	
-
-	@Override
-	void onOPConnected() {
-		super.onOPConnected();
-		
-		// Connect the update method to AttitudeActual
-		UAVObject obj = objMngr.getObject("SystemAlarms");
-		if (obj != null)
-			registerObjectUpdates(obj);
-		objectUpdated(obj);
-	}			
+	}
 }

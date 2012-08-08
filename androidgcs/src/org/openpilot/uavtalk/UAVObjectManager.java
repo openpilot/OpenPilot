@@ -1,3 +1,28 @@
+/**
+ ******************************************************************************
+ * @file       UAVObjectManager.java
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @brief      Critical class.  This is the data store for all UAVOs.  Allows
+ *             other objects to access and change this data.  Takes care of
+ *             propagating changes to the UAV.
+ * @see        The GNU Public License (GPL) Version 3
+ *
+ *****************************************************************************/
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
 package org.openpilot.uavtalk;
 
 import java.util.ArrayList;
@@ -8,19 +33,19 @@ import java.util.Observer;
 
 public class UAVObjectManager {
 
-	public class CallbackListener extends Observable {		
+	public class CallbackListener extends Observable {
 		public void event (UAVObject obj) {
 			setChanged();
 			notifyObservers(obj);
 		}
 	}
-	private CallbackListener newInstance = new CallbackListener();
+	private final CallbackListener newInstance = new CallbackListener();
 	public void addNewInstanceObserver(Observer o) {
 		synchronized(newInstance) {
 			newInstance.addObserver(o);
 		}
 	}
-	private CallbackListener newObject = new CallbackListener();
+	private final CallbackListener newObject = new CallbackListener();
 	public void addNewObjectObserver(Observer o) {
 		synchronized(newObject) {
 			newObject.addObserver(o);
@@ -29,7 +54,7 @@ public class UAVObjectManager {
 	private final int MAX_INSTANCES = 10;
 
 	// Use array list to store objects since rarely added or deleted
-	private List<List<UAVObject>> objects = new ArrayList<List<UAVObject>>();  
+	private final List<List<UAVObject>> objects = new ArrayList<List<UAVObject>>();
 
 	public UAVObjectManager()
 	{
@@ -41,7 +66,7 @@ public class UAVObjectManager {
 	 * A new instance can be created directly by instantiating a new object or by calling clone() of
 	 * an existing object. The object will be registered and will be properly initialized so that it can accept
 	 * updates.
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public synchronized boolean registerObject(UAVDataObject obj) throws Exception
 	{
@@ -61,7 +86,7 @@ public class UAVObjectManager {
 				}
 				// The object type has alredy been added, so now we need to initialize the new instance with the appropriate id
 				// There is a single metaobject for all object instances of this type, so no need to create a new one
-				// Get object type metaobject from existing instance				
+				// Get object type metaobject from existing instance
 				UAVDataObject refObj = (UAVDataObject) instList.get(0);
 				if (refObj == null)
 				{
@@ -74,7 +99,7 @@ public class UAVObjectManager {
 					return false;
 				}
 
-				// If InstID is zero then we find the next open instId and create it 
+				// If InstID is zero then we find the next open instId and create it
 				if (obj.getInstID() == 0)
 				{
 					// Assign the next available ID and initialize the object instance the nadd
@@ -183,13 +208,13 @@ public class UAVObjectManager {
 			// If no instances skip
 			if(instList.size() == 0)
 				continue;
-			
+
 			// If meta data skip
 			if(instList.get(0).isMetadata())
 				continue;
-			
-			List<UAVDataObject> newInstList = new ArrayList<UAVDataObject>();			
-			ListIterator<UAVObject> instIt = instList.listIterator();			
+
+			List<UAVDataObject> newInstList = new ArrayList<UAVDataObject>();
+			ListIterator<UAVObject> instIt = instList.listIterator();
 			while(instIt.hasNext()) {
 				newInstList.add((UAVDataObject) instIt.next());
 			}
@@ -216,13 +241,13 @@ public class UAVObjectManager {
 			// If no instances skip
 			if(instList.size() == 0)
 				continue;
-			
+
 			// If meta data skip
 			if(!instList.get(0).isMetadata())
 				continue;
-			
-			List<UAVMetaObject> newInstList = new ArrayList<UAVMetaObject>();			
-			ListIterator<UAVObject> instIt = instList.listIterator();			
+
+			List<UAVMetaObject> newInstList = new ArrayList<UAVMetaObject>();
+			ListIterator<UAVObject> instIt = instList.listIterator();
 			while(instIt.hasNext()) {
 				newInstList.add((UAVMetaObject) instIt.next());
 			}
@@ -232,17 +257,17 @@ public class UAVObjectManager {
 		return mObjects;
 	}
 
-	
+
 	/**
 	 * Returns a specific object by name only, returns instance ID zero
 	 * @param name The object name
 	 * @return The object or null if not found
 	 */
-	public UAVObject getObject(String name) 
+	public UAVObject getObject(String name)
 	{
 		return getObject(name, 0, 0);
 	}
-	
+
 	/**
 	 * Get a specific object given its name and instance ID
 	 * @returns The object is found or NULL if not
@@ -257,11 +282,11 @@ public class UAVObjectManager {
 	 * @param objId the object id
 	 * @returns The object is found or NULL if not
 	 */
-	public UAVObject getObject(long objId) 
+	public UAVObject getObject(long objId)
 	{
 		return getObject(null, objId, 0);
 	}
-	
+
 	/**
 	 * Get a specific object given its object and instance ID
 	 * @returns The object is found or NULL if not
@@ -293,7 +318,7 @@ public class UAVObjectManager {
 				}
 			}
 		}
-		
+
 		return null;
 	}
 
@@ -327,8 +352,8 @@ public class UAVObjectManager {
 					return instList;
 				}
 			}
-		}			
-		
+		}
+
 		return null;
 	}
 

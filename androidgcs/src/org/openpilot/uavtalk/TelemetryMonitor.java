@@ -1,3 +1,28 @@
+/**
+ ******************************************************************************
+ * @file       TelemetryMonitor.java
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @brief      High level monitoring of telemetry to handle connection and
+ *             disconnection and then signal the rest of the application.
+ *             This also makes sure to fetch all objects on initial connection.
+ * @see        The GNU Public License (GPL) Version 3
+ *
+ *****************************************************************************/
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
 package org.openpilot.uavtalk;
 
 import java.io.IOException;
@@ -22,22 +47,22 @@ public class TelemetryMonitor extends Observable{
     static final int STATS_CONNECT_PERIOD_MS = 1000;
     static final int CONNECTION_TIMEOUT_MS = 8000;
 
-	private UAVObjectManager objMngr;
-	private Telemetry tel;
+	private final UAVObjectManager objMngr;
+	private final Telemetry tel;
 //	private UAVObject objPending;
 	private UAVObject gcsStatsObj;
 	private UAVObject flightStatsObj;
 	private Timer periodicTask;
 	private int currentPeriod;
 	private long lastUpdateTime;
-	private List<UAVObject> queue;
-	
+	private final List<UAVObject> queue;
+
 	private boolean connected = false;
 	private boolean objects_updated = false;
-	
+
 	public boolean getConnected() { return connected; };
 	public boolean getObjectsUpdated() { return objects_updated; };
-	
+
 	public TelemetryMonitor(UAVObjectManager objMngr, Telemetry tel)
 	{
 	    this.objMngr = objMngr;
@@ -50,6 +75,7 @@ public class TelemetryMonitor extends Observable{
 	    flightStatsObj = objMngr.getObject("FlightTelemetryStats");
 
 	    flightStatsObj.addUpdatedObserver(new Observer() {
+			@Override
 			public void update(Observable observable, Object data) {
 				try {
 					flightStatsUpdated((UAVObject) data);
@@ -59,7 +85,7 @@ public class TelemetryMonitor extends Observable{
 					// or fix the stream?
 					flightStatsObj.removeUpdatedObserver(this);
 				}
-			}	    	
+			}
 	    });
 
 	    // Start update timer
@@ -68,17 +94,17 @@ public class TelemetryMonitor extends Observable{
 
 	/**
 	 * Initiate object retrieval, initialize queue with objects to be retrieved.
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public synchronized void startRetrievingObjects() throws IOException
 	{
 		if (DEBUG) Log.d(TAG, "Start retrieving objects");
-		
+
 	    // Clear object queue
 	    queue.clear();
 	    // Get all objects, add metaobjects, settings and data objects with OnChange update mode to the queue
 	    List< List<UAVObject> > objs = objMngr.getObjects();
-	    
+
 	    ListIterator<List<UAVObject>> objListIterator = objs.listIterator();
 	    while( objListIterator.hasNext() )
 	    {
@@ -121,7 +147,7 @@ public class TelemetryMonitor extends Observable{
 
 	/**
 	 * Retrieve the next object in the queue
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public synchronized void retrieveNextObject() throws IOException
 	{
@@ -136,16 +162,17 @@ public class TelemetryMonitor extends Observable{
 	    }
 	    // Get next object from the queue
 	    UAVObject obj = queue.remove(0);
-	    
+
 	    if(obj == null) {
 	    	throw new Error("Got null object forom transaction queue");
 	    }
-	    	    
+
 	    if (DEBUG) Log.d(TAG, "Retrieving object: " + obj.getName()) ;
 	    // Connect to object
-	    
+
 	    // TODO: Does this need to stay here permanently?  This appears to be used for setup mainly
 	    obj.addTransactionCompleted(new Observer() {
+			@Override
 			public void update(Observable observable, Object data) {
 				UAVObject.TransactionResult result = (UAVObject.TransactionResult) data;
 				if (DEBUG) Log.d(TAG,"Got transaction completed event from " + result.obj.getName() + " status: " + result.success);
@@ -155,7 +182,7 @@ public class TelemetryMonitor extends Observable{
 					// When the telemetry stream is broken disconnect these updates
 					observable.deleteObserver(this);
 				}
-			}	    	
+			}
 	    });
 
 	    // Request update
@@ -165,7 +192,7 @@ public class TelemetryMonitor extends Observable{
 
 	/**
 	 * Called by the retrieved object when a transaction is completed.
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public synchronized void transactionCompleted(UAVObject obj, boolean success) throws IOException
 	{
@@ -175,12 +202,12 @@ public class TelemetryMonitor extends Observable{
 		// TODO: Need to be able to disconnect signals
 	    //obj->disconnect(this);
 //	    objPending = null;
-	    
+
 	    if(!success) {
 	    	//Log.e(TAG, "Transaction failed: " + obj.getName() + " sending again.");
 	    	return;
 	    }
-	    
+
 	    // Process next object if telemetry is still available
 	    if ( ((String) gcsStatsObj.getField("Status").getValue()).compareTo("Connected") == 0 )
 	    {
@@ -194,7 +221,7 @@ public class TelemetryMonitor extends Observable{
 
 	/**
 	 * Called each time the flight stats object is updated by the autopilot
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public synchronized void flightStatsUpdated(UAVObject obj) throws IOException
 	{
@@ -213,7 +240,7 @@ public class TelemetryMonitor extends Observable{
 	private long lastStatsTime;
 	/**
 	 * Called periodically to update the statistics and connection status.
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public synchronized void processStatsUpdates() throws IOException
 	{
@@ -222,14 +249,14 @@ public class TelemetryMonitor extends Observable{
 	    Telemetry.TelemetryStats telStats = tel.getStats();
 
 	    if (DEBUG) Log.d(TAG, "processStatsUpdates() - stats reset");
-	    
+
 	    // Need to compute time because this update is not regular enough
-	    float dT = (float) (System.currentTimeMillis() - lastStatsTime) / 1000.0f;
+	    float dT = (System.currentTimeMillis() - lastStatsTime) / 1000.0f;
 	    lastStatsTime = System.currentTimeMillis();
 
-	    // Update stats object 
-	    gcsStatsObj.getField("RxDataRate").setDouble( (float)telStats.rxBytes / dT );
-	    gcsStatsObj.getField("TxDataRate").setDouble( (float)telStats.txBytes / dT );
+	    // Update stats object
+	    gcsStatsObj.getField("RxDataRate").setDouble( telStats.rxBytes / dT );
+	    gcsStatsObj.getField("TxDataRate").setDouble( telStats.txBytes / dT );
 	    UAVObjectField field = gcsStatsObj.getField("RxFailures");
 	    field.setDouble(field.getDouble() + telStats.rxErrors);
 	    field = gcsStatsObj.getField("TxFailures");
@@ -240,7 +267,7 @@ public class TelemetryMonitor extends Observable{
 	    tel.resetStats();
 
 	    if (DEBUG) Log.d(TAG, "processStatsUpdates() - stats updated");
-	    
+
 	    // Check for a connection timeout
 	    boolean connectionTimeout;
 	    if ( telStats.rxObjects > 0 )
@@ -266,7 +293,7 @@ public class TelemetryMonitor extends Observable{
 	    }
 	    UAVObjectField statusField = gcsStatsObj.getField("Status");
 	    String oldStatus = new String((String) statusField.getValue());
-	    
+
 	    if (DEBUG) Log.d(TAG,"GCS: " + statusField.getValue() + " Flight: " + flightStatsObj.getField("Status").getValue());
 
 	    if ( oldStatus.compareTo("Disconnected") == 0 )
@@ -294,11 +321,11 @@ public class TelemetryMonitor extends Observable{
 
 	    // Force telemetry update if not yet connected
 	    boolean gcsStatusChanged = !oldStatus.equals(statusField.getValue());
-	    
+
 	    boolean gcsConnected = statusField.getValue().equals("Connected");
 	    boolean gcsDisconnected = statusField.getValue().equals("Disconnected");
 	    boolean flightConnected = flightStatsObj.getField("Status").equals("Connected");
-	    
+
 	    if (  !gcsConnected || !flightConnected )
 	    {
 	    	if (DEBUG) Log.d(TAG,"Sending gcs status");
@@ -323,7 +350,7 @@ public class TelemetryMonitor extends Observable{
 	    	objects_updated = false;
 	        setChanged();
 	    }
-	    
+
 	    if (DEBUG) Log.d(TAG, "processStatsUpdates() - before notify");
         notifyObservers();
         if (DEBUG) Log.d(TAG, "processStatsUpdates() - after notify");
@@ -344,11 +371,11 @@ public class TelemetryMonitor extends Observable{
 				} catch (IOException e) {
 					// Once the stream has died stop trying to process these updates
 					periodicTask.cancel();
-				}				
-			}	    	
+				}
+			}
 	    }, currentPeriod, currentPeriod);
 	}
-	
+
 	public void stopMonitor()
 	{
 		periodicTask.cancel();

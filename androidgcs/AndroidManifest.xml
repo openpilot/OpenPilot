@@ -24,7 +24,7 @@
 		</activity>
 
 		<activity android:name="ObjectBrowser" android:label="@string/object_browser_name" />
-		<activity android:name="PFD" android:label="PFD" />
+		<activity android:name="PfdActivity" android:label="PFD" />
 		<activity android:name="Controller" android:label="@string/controller_name" />
 		<activity android:name="Preferences" android:label="@string/preference_title" />
 		<activity android:name="UAVLocation" android:label="@string/location_name" />
@@ -46,6 +46,6 @@
 				android:resource="@xml/telemetry_widget_info" />
 		</receiver>
 
-		<service android:name=".OPTelemetryService"></service>
+		<service android:name="org.openpilot.androidgcs.telemetry.OPTelemetryService"></service>
 	</application>
 </manifest>

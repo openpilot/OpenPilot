@@ -158,7 +158,7 @@ namespace Utils {
     {
         double Lat = LLA[0];
         double Lon = LLA[1];
-        double AltEllipsoid = LLA[2];
+        double AltEllipsoid = LLA[2]/1000.0; // convert to km
 
         // ***********
         // range check supplied params

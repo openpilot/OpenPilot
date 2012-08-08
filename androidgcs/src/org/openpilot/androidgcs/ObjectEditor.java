@@ -1,3 +1,26 @@
+/**
+ ******************************************************************************
+ * @file       ObjectEditor.java
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @brief      A popup dialog for editing the contents of a UAVO.
+ * @see        The GNU Public License (GPL) Version 3
+ *
+ *****************************************************************************/
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
 package org.openpilot.androidgcs;
 
 import java.util.List;
@@ -17,7 +40,7 @@ import android.widget.Toast;
 
 public class ObjectEditor extends ObjectManagerActivity {
 
-	static final String TAG = "ObjectEditor"; 
+	static final String TAG = "ObjectEditor";
 	String objectName;
 	long objectID;
 	long instID;
@@ -58,6 +81,7 @@ public class ObjectEditor extends ObjectManagerActivity {
 		});
 	}
 
+	@Override
 	public void onOPConnected() {
 		UAVObject obj = objMngr.getObject(objectID, instID);
 		if (obj == null) {
@@ -86,15 +110,15 @@ public class ObjectEditor extends ObjectManagerActivity {
 			Toast.makeText(this, "Save failed", Toast.LENGTH_LONG).show();
 			return;
 		}
-		
-		long thisId = objectID < 0 ? ((Long) 0x100000000l) + objectID : objectID; 
+
+		long thisId = objectID < 0 ? 0x100000000l + objectID : objectID;
 		objPer.getField("Operation").setValue("Save");
 		objPer.getField("Selection").setValue("SingleObject");
 		Log.d(TAG,"Saving with object id: " + objectID + " swapped to " + thisId);
 		objPer.getField("ObjectID").setValue(thisId);
 		objPer.getField("InstanceID").setValue(instID);
 		objPer.updated();
-		
+
 		Toast.makeText(this, "Save succeeded", Toast.LENGTH_LONG).show();
 	}
 
@@ -125,7 +149,7 @@ public class ObjectEditor extends ObjectManagerActivity {
 				default:
 					String val = ((EditText) editView.fields.get(field_idx)).getText().toString();
 					Double num = Double.parseDouble(val);
-					
+
 					Log.e(TAG, "Updating field: " + field.getName() + " value: " + num);
 					field.setValue(num, i);
 					break;

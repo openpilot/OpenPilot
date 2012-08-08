@@ -27,8 +27,9 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-import org.openpilot.androidgcs.OPTelemetryService.LocalBinder;
-import org.openpilot.androidgcs.OPTelemetryService.TelemTask;
+import org.openpilot.androidgcs.telemetry.OPTelemetryService;
+import org.openpilot.androidgcs.telemetry.OPTelemetryService.LocalBinder;
+import org.openpilot.androidgcs.telemetry.OPTelemetryService.TelemTask;
 import org.openpilot.uavtalk.UAVDataObject;
 import org.openpilot.uavtalk.UAVObject;
 import org.openpilot.uavtalk.UAVObjectManager;
@@ -72,7 +73,7 @@ public class UAVLocation extends MapActivity
 	UAVObjectManager objMngr;
     boolean mBound = false;
     boolean mConnected = false;
-    LocalBinder binder;
+	org.openpilot.androidgcs.telemetry.OPTelemetryService.LocalBinder binder;
 
     GeoPoint homeLocation;
     GeoPoint uavLocation;

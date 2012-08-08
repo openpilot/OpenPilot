@@ -34,8 +34,9 @@ import java.util.ListIterator;
 import java.util.Observable;
 import java.util.Observer;
 
-import org.openpilot.androidgcs.OPTelemetryService.LocalBinder;
-import org.openpilot.androidgcs.OPTelemetryService.TelemTask;
+import org.openpilot.androidgcs.telemetry.OPTelemetryService;
+import org.openpilot.androidgcs.telemetry.OPTelemetryService.LocalBinder;
+import org.openpilot.androidgcs.telemetry.OPTelemetryService.TelemTask;
 import org.openpilot.uavtalk.UAVObject;
 import org.openpilot.uavtalk.UAVObjectManager;
 

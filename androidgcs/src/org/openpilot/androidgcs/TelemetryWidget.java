@@ -22,6 +22,8 @@
  */
 package org.openpilot.androidgcs;
 
+import org.openpilot.androidgcs.telemetry.OPTelemetryService;
+
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;

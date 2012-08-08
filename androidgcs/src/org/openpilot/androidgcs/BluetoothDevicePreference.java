@@ -39,14 +39,21 @@ public class BluetoothDevicePreference extends ListPreference {
         super(context, attrs);
 
         BluetoothAdapter bta = BluetoothAdapter.getDefaultAdapter();
+		if (bta == null)
+			return; // BT not supported
         Set<BluetoothDevice> pairedDevices = bta.getBondedDevices();
         CharSequence[] entries = new CharSequence[pairedDevices.size()];
         CharSequence[] entryValues = new CharSequence[pairedDevices.size()];
-        int i = 0;
-        for (BluetoothDevice dev : pairedDevices) {
-            entries[i] = dev.getName();
-            entryValues[i] = dev.getAddress();
-            i++;
+		if (pairedDevices.size() == 0) {
+			entries[0] = "No Devices";
+			entryValues[0] = "";
+		} else {
+			int i = 0;
+			for (BluetoothDevice dev : pairedDevices) {
+				entries[i] = dev.getName();
+				entryValues[i] = dev.getAddress();
+				i++;
+			}
         }
         setEntries(entries);
         setEntryValues(entryValues);

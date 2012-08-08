@@ -51,7 +51,7 @@ static const struct usb_device_desc device_desc = {
 	.bNumConfigurations = 1,
 };
 
-static const uint8_t hid_report_desc[133] = {
+static const uint8_t hid_report_desc[127] = {
 	HID_GLOBAL_ITEM_2 (HID_TAG_GLOBAL_USAGE_PAGE),
 	0x9C, 0xFF,		/* Usage Page 0xFF9C (Vendor Defined) */
 	HID_LOCAL_ITEM_1  (HID_TAG_LOCAL_USAGE),
@@ -108,11 +108,9 @@ static const uint8_t hid_report_desc[133] = {
 	0x00,			/* Physical */
 	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_REPORT_ID),
 	0x03,			/* OpenPilot Emulated joystick */
-	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_USAGE_PAGE),
 
 	/* X + Y controls */
 
-	0x02,			/* Usage ID 0x0002 (Simulation Control */
 	HID_LOCAL_ITEM_4  (HID_TAG_LOCAL_USAGE),
 	0x30, 0x00, 0x01, 0x00,	/* Usage ID 0x00010030 (Generic Desktop: X) */
 	HID_LOCAL_ITEM_4  (HID_TAG_LOCAL_USAGE),
@@ -130,8 +128,6 @@ static const uint8_t hid_report_desc[133] = {
 
 	/* Y + Rx controls */
 
-	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_USAGE_PAGE),
-	0x02,			/* Usage ID 0x0002 (Simulation Control */
 	HID_LOCAL_ITEM_4  (HID_TAG_LOCAL_USAGE),
 	0x32, 0x00, 0x01, 0x00,	/* Usage ID 0x00010032 (Generic Desktop: Z) */
 	HID_LOCAL_ITEM_4  (HID_TAG_LOCAL_USAGE),
@@ -149,8 +145,6 @@ static const uint8_t hid_report_desc[133] = {
 
 	/* Ry, Rz, Slider + Dial controls */
 
-	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_USAGE_PAGE),
-	0x02,			/* Usage ID 0x0002 (Simulation Control */
 	HID_LOCAL_ITEM_4  (HID_TAG_LOCAL_USAGE),
 	0x34, 0x00, 0x01, 0x00,	/* Usage ID 0x00010034 (Generic Desktop: Ry) */
 	HID_LOCAL_ITEM_4  (HID_TAG_LOCAL_USAGE),
@@ -174,7 +168,7 @@ static const uint8_t hid_report_desc[133] = {
 
 	HID_MAIN_ITEM_0 (HID_TAG_MAIN_ENDCOLLECTION),
 
-/* 133 bytes to here */
+/* 127 bytes to here */
 };
 
 struct usb_config_hid_cdc {

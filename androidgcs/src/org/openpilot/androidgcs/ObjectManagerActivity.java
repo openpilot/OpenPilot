@@ -34,6 +34,7 @@ import java.util.ListIterator;
 import java.util.Observable;
 import java.util.Observer;
 
+import org.openpilot.androidgcs.fragments.ObjectManagerFragment;
 import org.openpilot.androidgcs.telemetry.OPTelemetryService;
 import org.openpilot.androidgcs.telemetry.OPTelemetryService.LocalBinder;
 import org.openpilot.androidgcs.telemetry.OPTelemetryService.TelemTask;
@@ -84,7 +85,8 @@ public abstract class ObjectManagerActivity extends Activity {
 		connectedReceiver = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context context, Intent intent) {
-				Log.d(TAG, "Received intent");
+				if (DEBUG)
+					Log.d(TAG, "Received intent");
 				TelemTask task;
 				if(intent.getAction().compareTo(OPTelemetryService.INTENT_ACTION_CONNECTED) == 0) {
 					if(binder  == null)
@@ -236,6 +238,10 @@ public abstract class ObjectManagerActivity extends Activity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		if (!mBound || binder == null) {
+			Log.e(TAG, "Unable to connect to service");
+			return super.onOptionsItemSelected(item);
+		}
 		switch(item.getItemId()) {
 		case R.id.menu_connect:
 			binder.openConnection();
@@ -263,7 +269,10 @@ public abstract class ObjectManagerActivity extends Activity {
 	@Override
 	public void onStart() {
 		super.onStart();
-		Intent intent = new Intent(this, OPTelemetryService.class);
+		Intent intent = new Intent(getApplicationContext(),
+				org.openpilot.androidgcs.telemetry.OPTelemetryService.class);
+		if (DEBUG)
+			Log.d(TAG, "Attempting to bind: " + intent);
 		bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 	}
 

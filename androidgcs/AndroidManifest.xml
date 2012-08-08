@@ -46,6 +46,6 @@
 				android:resource="@xml/telemetry_widget_info" />
 		</receiver>
 
-		<service android:name=".OPTelemetryService"></service>
+		<service android:name="org.openpilot.androidgcs.telemetry.OPTelemetryService"></service>
 	</application>
 </manifest>

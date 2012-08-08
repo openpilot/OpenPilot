@@ -54,7 +54,7 @@ import android.widget.Toast;
 public class OPTelemetryService extends Service {
 
 	// Logging settings
-	private final String TAG = "OPTelemetryService";
+	private final String TAG = OPTelemetryService.class.getSimpleName();
 	public static int LOGLEVEL = 0;
 	public static boolean WARN = LOGLEVEL > 1;
 	public static boolean DEBUG = LOGLEVEL > 0;
@@ -89,6 +89,8 @@ public class OPTelemetryService extends Service {
 		}
 		@Override
 		public void handleMessage(Message msg) {
+			if (DEBUG)
+				Log.d(TAG, "handleMessage: " + msg);
 			switch(msg.arg1) {
 			case MSG_START:
 				stopSelf(msg.arg2);
@@ -158,6 +160,9 @@ public class OPTelemetryService extends Service {
 	public void startup() {
 		Toast.makeText(getApplicationContext(), "Telemetry service starting", Toast.LENGTH_SHORT).show();
 
+		if (DEBUG)
+			Log.d(TAG, "startup()");
+
 		thread = new HandlerThread("TelemetryServiceHandler", Process.THREAD_PRIORITY_BACKGROUND);
 		thread.start();
 
@@ -177,19 +182,24 @@ public class OPTelemetryService extends Service {
 
 	@Override
 	public void onCreate() {
+		if (DEBUG)
+			Log.d(TAG, "Telemetry service created");
 		startup();
 	}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		// Currently only using as bound service
-
+		if (DEBUG)
+			Log.d(TAG, "onStartCommand()");
 		// If we get killed, after returning from here, restart
 		return START_STICKY;
 	}
 
 	@Override
 	public IBinder onBind(Intent intent) {
+		if (DEBUG)
+			Log.d(TAG, "onBind()");
 		return mBinder;
 	}
 

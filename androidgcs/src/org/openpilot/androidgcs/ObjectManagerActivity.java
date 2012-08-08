@@ -29,7 +29,7 @@ import android.widget.TextView;
 public abstract class ObjectManagerActivity extends Activity {
 
 	private final String TAG = "ObjectManagerActivity";
-	private static int LOGLEVEL = 0;
+	private static int LOGLEVEL = 1;
 //	private static boolean WARN = LOGLEVEL > 1;
 	private static boolean DEBUG = LOGLEVEL > 0;
 	
@@ -162,6 +162,9 @@ public abstract class ObjectManagerActivity extends Activity {
 		stats.addUpdatedObserver(telemetryObserver);
 		telemetryStatsConnected = true;
 		updateStats();
+		
+		if (DEBUG) Log.d(TAG, "Notifying listeners about connection.  There are " + connectionListeners.countObservers());		
+		connectionListeners.connected();
 	}
 	
 	/**
@@ -175,6 +178,9 @@ public abstract class ObjectManagerActivity extends Activity {
 		TextView txRate = (TextView) findViewById(R.id.telemetry_stats_tx_rate);
 		rxRate.setText("");
 		txRate.setText("");
+		
+		// Providing a null update triggers a disconnect on fragments
+		connectionListeners.disconnected();
 	}
 	
 	@Override
@@ -223,6 +229,50 @@ public abstract class ObjectManagerActivity extends Activity {
 	public void onBind() {
 		
 	}
+	
+
+	/**
+	 * Callbacks so ObjectManagerFragments get the onOPConnected and onOPDisconnected signals
+	 */
+	class ConnectionObserver extends Observable  {
+		public void disconnected() {
+			synchronized(this) {
+				setChanged();
+				notifyObservers();
+			}
+		}
+		public void connected() {
+			synchronized(this) {
+				setChanged();
+				notifyObservers(objMngr);
+			}
+		}
+	};
+	private ConnectionObserver connectionListeners = new ConnectionObserver();
+	public class OnConnectionListener implements Observer {
+		
+		// Local reference of the fragment to notify, store in constructor
+		ObjectManagerFragment fragment;
+		OnConnectionListener(ObjectManagerFragment fragment) { this.fragment = fragment; };
+
+		// Whenever the observer is updated either conenct or disconnect based on the data
+		@Override
+		public void update(Observable observable, Object data) {
+			Log.d(TAG, "onConnectionListener called");
+			if (data == null)
+				fragment.onOPDisconnected();
+			else
+				fragment.onOPConnected(objMngr);
+		}
+		
+	} ;
+	void addOnConnectionListenerFragment(ObjectManagerFragment frag) {
+		connectionListeners.addObserver(new OnConnectionListener(frag));
+		if (DEBUG) Log.d(TAG, "Connecting " + frag + " there are now " + connectionListeners.countObservers());
+		if (mConnected)
+			frag.onOPConnected(objMngr);
+	}
+
 
 	/** Defines callbacks for service binding, passed to bindService() */
 	private ServiceConnection mConnection = new ServiceConnection() {

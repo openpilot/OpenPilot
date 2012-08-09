@@ -58,10 +58,10 @@ ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow, QTabWidge
 
     QHBoxLayout *layout = new QHBoxLayout;
     layout->setSpacing(5);
-    layout->setContentsMargins(5,5,5,5);
+    layout->setContentsMargins(5,2,5,2);
 
     m_monitor = new TelemetryMonitorWidget(this);
-    layout->addWidget(m_monitor);
+    layout->addWidget(m_monitor, Qt::AlignHCenter);
 
     layout->addWidget(new QLabel(tr("Connections:")));
 

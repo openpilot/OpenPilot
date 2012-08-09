@@ -40,7 +40,7 @@ DialGadgetWidget::DialGadgetWidget(QWidget *parent) : QGraphicsView(parent)
     setMinimumSize(64,64);
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     setScene(new QGraphicsScene(this));
-    setRenderHints(QPainter::Antialiasing);
+    setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
 
     m_renderer = new QSvgRenderer();
 

@@ -6,8 +6,8 @@
     <LastPreferenceCategory>Notify Plugin</LastPreferenceCategory>
     <LastPreferencePage>settings</LastPreferencePage>
     <SaveSettingsOnExit>true</SaveSettingsOnExit>
-    <SettingsWindowHeight>476</SettingsWindowHeight>
-    <SettingsWindowWidth>697</SettingsWindowWidth>
+    <SettingsWindowHeight>600</SettingsWindowHeight>
+    <SettingsWindowWidth>800</SettingsWindowWidth>
     <UDPMirror>false</UDPMirror>
   </General>
   <IPconnection>

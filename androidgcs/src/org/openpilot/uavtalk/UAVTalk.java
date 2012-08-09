@@ -33,14 +33,17 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Observable;
 
+import junit.framework.Assert;
 import android.util.Log;
 
 public class UAVTalk extends Observable {
 
 	static final String TAG = "UAVTalk";
 	public static int LOGLEVEL = 0;
-	public static boolean WARN = LOGLEVEL > 1;
-	public static boolean DEBUG = LOGLEVEL > 0;
+	public static boolean VERBOSE = LOGLEVEL > 3;
+	public static boolean WARN = LOGLEVEL > 2;
+	public static boolean DEBUG = LOGLEVEL > 1;
+	public static boolean ERROR = LOGLEVEL > 0;
 
 	private Thread inputProcessingThread = null;
 
@@ -102,12 +105,13 @@ public class UAVTalk extends Observable {
 		STATE_SYNC, STATE_TYPE, STATE_SIZE, STATE_OBJID, STATE_INSTID, STATE_DATA, STATE_CS
 	};
 
-	static final int TYPE_MASK = 0xFC;
+	static final int TYPE_MASK = 0xF8;
 	static final int TYPE_VER = 0x20;
 	static final int TYPE_OBJ = (TYPE_VER | 0x00);
 	static final int TYPE_OBJ_REQ = (TYPE_VER | 0x01);
 	static final int TYPE_OBJ_ACK = (TYPE_VER | 0x02);
 	static final int TYPE_ACK = (TYPE_VER | 0x03);
+	static final int TYPE_NACK = (TYPE_VER | 0x04);
 
 	static final int MIN_HEADER_LENGTH = 8; // sync(1), type (1), size(2),
 											// object ID(4)
@@ -271,6 +275,8 @@ public class UAVTalk extends Observable {
 		// Send object depending on if a response is needed
 		if (type == TYPE_OBJ_ACK || type == TYPE_OBJ_REQ) {
 			if (transmitObject(obj, type, allInstances)) {
+				if(type == TYPE_OBJ_REQ)
+					if (ERROR) Log.e(TAG, "Sending obj req");
 				respObj = obj;
 				respAllInstances = allInstances;
 				return true;
@@ -290,7 +296,7 @@ public class UAVTalk extends Observable {
 	 * @throws IOException
 	 */
 	public synchronized boolean processInputByte(int rxbyte) throws IOException {
-		assert (objMngr != null);
+		Assert.assertNotNull(objMngr);
 
 		// Update stats
 		stats.rxBytes++;
@@ -318,12 +324,13 @@ public class UAVTalk extends Observable {
 			rxCS = updateCRC(rxCS, rxbyte);
 
 			if ((rxbyte & TYPE_MASK) != TYPE_VER) {
+				Log.e(TAG, "Unknown UAVTalk type:" + rxbyte);
 				rxState = RxStateType.STATE_SYNC;
 				break;
 			}
 
 			rxType = rxbyte;
-
+			if (VERBOSE) Log.v(TAG, "Received packet type: " + rxType);
 			packetSize = 0;
 
 			rxState = RxStateType.STATE_SIZE;
@@ -380,7 +387,7 @@ public class UAVTalk extends Observable {
 				}
 
 				// Determine data length
-				if (rxType == TYPE_OBJ_REQ || rxType == TYPE_ACK)
+				if (rxType == TYPE_OBJ_REQ || rxType == TYPE_ACK || rxType == TYPE_NACK)
 					rxLength = 0;
 				else
 					rxLength = rxObj.getNumBytes();
@@ -565,6 +572,24 @@ public class UAVTalk extends Observable {
 				error = true;
 			}
 			break;
+	    case TYPE_NACK:
+        	if (DEBUG) Log.d(TAG, "Received NAK: " + objId + " " + objMngr.getObject(objId).getName());
+        	// All instances, not allowed for NACK messages
+	        if (!allInstances)
+	        {
+	            // Get object
+	            obj = objMngr.getObject(objId, instId);
+	            // Check if object exists:
+	            if (obj != null)
+	            {
+	                updateNack(obj);
+	            }
+	            else
+	            {
+	             error = true;
+	            }
+	        }
+	        break;
 		case TYPE_ACK:
 			// All instances, not allowed for ACK messages
 			if (!allInstances) {
@@ -639,12 +664,31 @@ public class UAVTalk extends Observable {
 	/**
 	 * Check if a transaction is pending and if yes complete it.
 	 */
+	void updateNack(UAVObject obj)
+	{
+		if (DEBUG) Log.d(TAG, "NACK received: " + obj.getName());
+		Assert.assertNotNull(obj);
+	    //obj.transactionCompleted(false);
+		if (respObj != null && respObj.getObjID() == obj.getObjID() &&
+				(respObj.getInstID() == obj.getInstID() || respAllInstances)) {
+			if (transactionListener != null)
+				transactionListener.TransactionFailed(obj);
+		}
+	}
+
+	/**
+	 * Check if a transaction is pending and if yes complete it.
+	 */
 	synchronized void updateAck(UAVObject obj) {
+		if (DEBUG) Log.d(TAG, "ACK received: " + obj.getName());
+		Assert.assertNotNull(obj);
 		if (respObj != null && respObj.getObjID() == obj.getObjID()
 				&& (respObj.getInstID() == obj.getInstID() || respAllInstances)) {
-			respObj = null;
+			if (transactionListener != null)
+				transactionListener.TransactionSucceeded(obj);
+			/*respObj = null;
 			setChanged();
-			notifyObservers(obj);
+			notifyObservers(obj);*/
 		}
 	}
 
@@ -783,5 +827,15 @@ public class UAVTalk extends Observable {
 			crc = updateCRC(crc, data[i]);
 		return crc;
 	}
+
+	private OnTransactionCompletedListener transactionListener = null;
+	abstract class OnTransactionCompletedListener {
+    	abstract void TransactionSucceeded(UAVObject data);
+    	abstract void TransactionFailed(UAVObject data);
+    };
+    void setOnTransactionCompletedListener(OnTransactionCompletedListener onTransactionListener) {
+    	this.transactionListener = onTransactionListener;
+    }
+
 
 }

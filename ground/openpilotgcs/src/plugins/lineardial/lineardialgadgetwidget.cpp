@@ -36,7 +36,7 @@ LineardialGadgetWidget::LineardialGadgetWidget(QWidget *parent) : QGraphicsView(
     setMinimumSize(32,32);
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     setScene(new QGraphicsScene(this));
-    setRenderHints(QPainter::Antialiasing);
+    setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
     m_renderer = new QSvgRenderer();
     verticalDial = false;
 

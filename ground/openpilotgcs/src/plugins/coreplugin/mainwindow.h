@@ -170,6 +170,7 @@ private:
     void registerDefaultContainers();
     void registerDefaultActions();
     void createWorkspaces(QSettings* qs, bool diffOnly = false);
+    void loadStyleSheet(QString name);
 
     CoreImpl *m_coreImpl;
     UniqueIDManager *m_uniqueIDManager;

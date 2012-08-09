@@ -10,6 +10,15 @@
     <Details>Default configuration built to work on all screen sizes</Details>
     <StyleSheet>default</StyleSheet>
   </General>
+  <IPconnection>
+    <Current>
+      <arr_1>
+        <Port>1</Port>
+        <UseTCP>0</UseTCP>
+      </arr_1>
+      <size>1</size>
+    </Current>
+  </IPconnection>
   <KeyBindings>
     <size>0</size>
   </KeyBindings>
@@ -27,6 +36,58 @@
     <Mode6>86</Mode6>
     <Welcome>100</Welcome>
   </ModePriorities>
+  <Plugins>
+    <SoundNotifyPlugin>
+      <configInfo>
+        <locked>false</locked>
+        <version>1.0.0</version>
+      </configInfo>
+      <data>
+        <Current>
+          <arr_1>
+            <CurrentLanguage>default</CurrentLanguage>
+            <DataObject>FlightStatus</DataObject>
+            <ExpireTimeout>0</ExpireTimeout>
+            <Mute>false</Mute>
+            <ObjectField>Armed</ObjectField>
+            <RangeLimit>0</RangeLimit>
+            <Repeat>0</Repeat>
+            <SayOrder>0</SayOrder>
+            <Sound1>armed</Sound1>
+            <Sound2></Sound2>
+            <Sound3></Sound3>
+            <SoundCollectionPath>%%DATAPATH%%sounds</SoundCollectionPath>
+            <Value1>Armed</Value1>
+            <Value2>0</Value2>
+          </arr_1>
+          <size>1</size>
+        </Current>
+        <EnableSound>true</EnableSound>
+        <listNotifies>
+          <arr_1>
+            <CurrentLanguage>default</CurrentLanguage>
+            <DataObject>FlightStatus</DataObject>
+            <ExpireTimeout>15</ExpireTimeout>
+            <Mute>false</Mute>
+            <ObjectField>Armed</ObjectField>
+            <RangeLimit>0</RangeLimit>
+            <Repeat>0</Repeat>
+            <SayOrder>0</SayOrder>
+            <Sound1>armed</Sound1>
+            <Sound2></Sound2>
+            <Sound3></Sound3>
+            <SoundCollectionPath>%%DATAPATH%%sounds</SoundCollectionPath>
+            <Value1>Armed</Value1>
+            <Value2>0</Value2>
+          </arr_1>
+          <size>1</size>
+        </listNotifies>
+      </data>
+    </SoundNotifyPlugin>
+  </Plugins>
+  <SerialConnection>
+    <speed>57600</speed>
+  </SerialConnection>
   <UAVGadgetConfigurations>
     <ConfigGadget>
       <default>
@@ -1694,8 +1755,8 @@
           <altitude>2000</altitude>
           <cacheOnly>false</cacheOnly>
           <earthFile>%%DATAPATH%%pfd/default/readymap.earth</earthFile>
-          <latitude>46.671478</latitude>
-          <longitude>10.158932</longitude>
+          <latitude>46.6715</latitude>
+          <longitude>10.1589</longitude>
           <qmlFile>%%DATAPATH%%pfd/default/Pfd.qml</qmlFile>
           <terrainEnabled>false</terrainEnabled>
         </data>
@@ -1710,10 +1771,10 @@
           <altitude>2000</altitude>
           <cacheOnly>false</cacheOnly>
           <earthFile>%%DATAPATH%%pfd/default/readymap.earth</earthFile>
-          <latitude>46.671478</latitude>
-          <longitude>10.158932</longitude>
+          <latitude>46.6715</latitude>
+          <longitude>10.1589</longitude>
           <qmlFile>%%DATAPATH%%pfd/default/Pfd.qml</qmlFile>
-          <terrainEnabled>true</terrainEnabled>
+          <terrainEnabled>false</terrainEnabled>
         </data>
       </Terrain>
     </PfdQmlGadget>
@@ -1738,7 +1799,6 @@
         <data>
           <LoggingEnabled>false</LoggingEnabled>
           <LoggingNewFileOnConnect>false</LoggingNewFileOnConnect>
-          <LoggingPath></LoggingPath>
           <configurationStreamVersion>1000</configurationStreamVersion>
           <dataSize>60</dataSize>
           <plotCurve0>
@@ -1784,7 +1844,6 @@
         <data>
           <LoggingEnabled>false</LoggingEnabled>
           <LoggingNewFileOnConnect>false</LoggingNewFileOnConnect>
-          <LoggingPath></LoggingPath>
           <configurationStreamVersion>1000</configurationStreamVersion>
           <dataSize>20</dataSize>
           <plotCurve0>
@@ -1840,7 +1899,6 @@
         <data>
           <LoggingEnabled>false</LoggingEnabled>
           <LoggingNewFileOnConnect>false</LoggingNewFileOnConnect>
-          <LoggingPath></LoggingPath>
           <configurationStreamVersion>1000</configurationStreamVersion>
           <dataSize>60</dataSize>
           <plotCurve0>
@@ -1886,7 +1944,6 @@
         <data>
           <LoggingEnabled>false</LoggingEnabled>
           <LoggingNewFileOnConnect>false</LoggingNewFileOnConnect>
-          <LoggingPath></LoggingPath>
           <configurationStreamVersion>1000</configurationStreamVersion>
           <dataSize>60</dataSize>
           <plotCurve0>
@@ -1912,7 +1969,6 @@
         <data>
           <LoggingEnabled>false</LoggingEnabled>
           <LoggingNewFileOnConnect>false</LoggingNewFileOnConnect>
-          <LoggingPath></LoggingPath>
           <configurationStreamVersion>1000</configurationStreamVersion>
           <dataSize>40</dataSize>
           <plotCurve0>
@@ -2008,7 +2064,6 @@
         <data>
           <LoggingEnabled>false</LoggingEnabled>
           <LoggingNewFileOnConnect>false</LoggingNewFileOnConnect>
-          <LoggingPath></LoggingPath>
           <configurationStreamVersion>1000</configurationStreamVersion>
           <dataSize>60</dataSize>
           <plotCurve0>
@@ -2054,7 +2109,6 @@
         <data>
           <LoggingEnabled>false</LoggingEnabled>
           <LoggingNewFileOnConnect>false</LoggingNewFileOnConnect>
-          <LoggingPath></LoggingPath>
           <configurationStreamVersion>1000</configurationStreamVersion>
           <dataSize>60</dataSize>
           <plotCurve0>
@@ -2100,7 +2154,6 @@
         <data>
           <LoggingEnabled>false</LoggingEnabled>
           <LoggingNewFileOnConnect>false</LoggingNewFileOnConnect>
-          <LoggingPath></LoggingPath>
           <configurationStreamVersion>1000</configurationStreamVersion>
           <dataSize>60</dataSize>
           <plotCurve0>
@@ -2146,7 +2199,6 @@
         <data>
           <LoggingEnabled>false</LoggingEnabled>
           <LoggingNewFileOnConnect>false</LoggingNewFileOnConnect>
-          <LoggingPath></LoggingPath>
           <configurationStreamVersion>1000</configurationStreamVersion>
           <dataSize>240</dataSize>
           <plotCurve0>
@@ -2282,7 +2334,6 @@
         <data>
           <LoggingEnabled>false</LoggingEnabled>
           <LoggingNewFileOnConnect>false</LoggingNewFileOnConnect>
-          <LoggingPath></LoggingPath>
           <configurationStreamVersion>1000</configurationStreamVersion>
           <dataSize>20</dataSize>
           <plotCurve0>
@@ -2328,7 +2379,6 @@
         <data>
           <LoggingEnabled>false</LoggingEnabled>
           <LoggingNewFileOnConnect>false</LoggingNewFileOnConnect>
-          <LoggingPath></LoggingPath>
           <configurationStreamVersion>1000</configurationStreamVersion>
           <dataSize>240</dataSize>
           <plotCurve0>
@@ -2343,9 +2393,6 @@
           </plotCurve0>
           <plotCurve1>
             <color>0</color>
-            <mathFunction></mathFunction>
-            <uavField></uavField>
-            <uavObject></uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
             <yMinimum>0</yMinimum>

@@ -134,16 +134,30 @@ void gps_airspeed_update(const GPSVelocityData *gpsVelData)
 		//Airspeed magnitude is the ratio between the two difference norms
 		gps_airspeed = sqrtf(normDiffGPS2 / normDiffAttitude2);
 
-		//Save old variables for next pass
-		gps->gpsVelOld_N = gpsVelData.North;
-		gps->gpsVelOld_E = gpsVelData.East;
-		gps->gpsVelOld_D = gpsVelData.Down;
+		//Check to see if gps airspeed estimate is reasonable (remember, it can only be positive, so only need to check upper limit)
+		if (gps_airspeed < 300) { //NEED TO SATURATE, BUT NOT VERY GOOD TO SATURATE LIKE THIS. PROBABLY SHOULD THROW OUT ANY READINGS THAT ARE TOO FAR OUTSIDE THE CURRENT SPEED
+			//Save old variables for next pass
+			gps->gpsVelOld_N = gpsVelData.North;
+			gps->gpsVelOld_E = gpsVelData.East;
+			gps->gpsVelOld_D = gpsVelData.Down;
+			
+			gps->RbeCol1_old[0] = Rbe[0][0];
+			gps->RbeCol1_old[1] = Rbe[0][1];
+			gps->RbeCol1_old[2] = Rbe[0][2];
+			
+			const float alpha = .1;
+			float gps_airspeed_old;
+			GPSAirspeedGPSAirspeedGet(&gps_airspeed_old);			
+			
+			gps_airspeed=gps_airspeed*alpha + (1-alpha)*gps_airspeed_old;
+			
+			GPSAirspeedGPSAirspeedSet(&gps_airspeed);
+		}
+		else {
+			GPSAirspeedGPSAirspeedGet(&gps_airspeed);
+			GPSAirspeedGPSAirspeedSet(&gps_airspeed);
+		}
 
-		gps->RbeCol1_old[0] = Rbe[0][0];
-		gps->RbeCol1_old[1] = Rbe[0][1];
-		gps->RbeCol1_old[2] = Rbe[0][2];
-
-		GPSAirspeedGPSAirspeedSet(&gps_airspeed);
 	}
 }
 

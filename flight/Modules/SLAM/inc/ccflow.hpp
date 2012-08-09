@@ -49,7 +49,8 @@
 
 #define CC_BORDERWIDTH 1
 
-#define CC_QUALITYMARGIN 100
+//#define CC_QUALITYMARGIN 100
+#define CC_QUALITYMARGIN 0.8
 
 typedef cv::Vec3f TransRot;
 
@@ -60,7 +61,7 @@ public:
 	
 	// methods
 	CCFlow(cv::RNG *rnginit, cv::Mat* last[], cv::Mat* current[], int pyramidDepth,
-		TransRot estTransrotation=cv::Vec3f(0,0,1000), CCFlow* oldflow=NULL, cv::Vec4s borders=cv::Vec4s(CC_BORDERWIDTH,CC_BORDERWIDTH,CC_BORDERWIDTH,CC_BORDERWIDTH),int depth=0);
+		TransRot estTransrotation=cv::Vec3f(0,0,1000), CCFlow* oldflow=NULL, cv::Vec4s borders=cv::Vec4s(CC_BORDERWIDTH,CC_BORDERWIDTH,CC_BORDERWIDTH,CC_BORDERWIDTH),int depth=0, float parentQuality=CC_QUALITYMARGIN*2);
 	
 	~CCFlow();
 

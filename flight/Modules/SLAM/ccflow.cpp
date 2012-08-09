@@ -36,7 +36,7 @@ using namespace cv;
 
 
 
-CCFlow::CCFlow(cv::RNG *rnginit, cv::Mat* last[], cv::Mat* current[], int pyramidDepth, TransRot estTransrotation, CCFlow* oldflow, cv::Vec4s borders, int depth) {
+CCFlow::CCFlow(cv::RNG *rnginit, cv::Mat* last[], cv::Mat* current[], int pyramidDepth, TransRot estTransrotation, CCFlow* oldflow, cv::Vec4s borders, int depth, float parentQuality) {
 
 	rng = rnginit;
 	border = borders;
@@ -47,8 +47,8 @@ CCFlow::CCFlow(cv::RNG *rnginit, cv::Mat* last[], cv::Mat* current[], int pyrami
 	// initialize transrotation
 	if (estTransrotation[2] < 999) {
 		tr = estTransrotation;
-	} else if (oldflow) {
-		tr = oldflow->transrotation();
+	//} else if (oldflow) {
+	//	tr = oldflow->transrotation();
 	} else {
 		tr = Vec3f(0,0,0);
 	}
@@ -80,10 +80,11 @@ CCFlow::CCFlow(cv::RNG *rnginit, cv::Mat* last[], cv::Mat* current[], int pyrami
 	} else {
 		gradientMatch(tst,ref,20,tr,Vec3f(0.5,0.5,0.1));
 	}
-	//if (worst-best < CC_QUALITYMARGIN && estTransrotation[2]<999 ) {
-	//	translation=Vec2f(estTransrotation[0],estTransrotation[1]);
-	//	rotation=estTransrotation[2];
-	//}
+	if (fabs(quality)<fabs(parentQuality)/2. && fabs(quality)<CC_QUALITYMARGIN) {
+		translation=Vec2f(tr[0],tr[1]);
+		rotation=tr[2];
+		quality=parentQuality/2.;
+	}
 
 	center = Point2f(
 		border[0] + 0.5*(last[mydepth]->cols-(border[0]+border[2])),
@@ -119,13 +120,13 @@ CCFlow::CCFlow(cv::RNG *rnginit, cv::Mat* last[], cv::Mat* current[], int pyrami
 		};
 
 		children[0] = new CCFlow( rnginit, last, current, maxdepth, shift[0], oldflow?oldflow->children[0]:NULL,
-					Vec4s( corners[0].x, corners[0].y, last[mydepth+1]->cols - newcenter.x, last[mydepth+1]->rows - newcenter.y ), mydepth+1);
+					Vec4s( corners[0].x, corners[0].y, last[mydepth+1]->cols - newcenter.x, last[mydepth+1]->rows - newcenter.y ), mydepth+1, quality);
 		children[1] = new CCFlow( rnginit, last, current, maxdepth, shift[1], oldflow?oldflow->children[1]:NULL,
-					Vec4s( newcenter.x,     corners[1].y, last[mydepth+1]->cols - corners[1].x, last[mydepth+1]->rows - newcenter.y ), mydepth+1);
+					Vec4s( newcenter.x,     corners[1].y, last[mydepth+1]->cols - corners[1].x, last[mydepth+1]->rows - newcenter.y ), mydepth+1, quality);
 		children[2] = new CCFlow( rnginit, last, current, maxdepth, shift[2], oldflow?oldflow->children[2]:NULL,
-					Vec4s( corners[2].x, newcenter.y, last[mydepth+1]->cols - newcenter.x, last[mydepth+1]->rows - corners[2].y ), mydepth+1);
+					Vec4s( corners[2].x, newcenter.y, last[mydepth+1]->cols - newcenter.x, last[mydepth+1]->rows - corners[2].y ), mydepth+1, quality);
 		children[3] = new CCFlow( rnginit, last, current, maxdepth, shift[3], oldflow?oldflow->children[3]:NULL,
-					Vec4s( newcenter.x,     newcenter.y, last[mydepth+1]->cols - corners[3].x, last[mydepth+1]->rows - corners[3].y ), mydepth+1);
+					Vec4s( newcenter.x,     newcenter.y, last[mydepth+1]->cols - corners[3].x, last[mydepth+1]->rows - corners[3].y ), mydepth+1, quality);
 
 
 	} else {

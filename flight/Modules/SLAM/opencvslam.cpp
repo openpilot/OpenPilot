@@ -98,8 +98,9 @@ void OpenCVslam::run() {
 		currentFrame = cvRetrieveFrame(VideoSource, 0);
 	}
 
-	Mat flow; // = Mat(480,640,CV_32FC1);
-	Mat cflow;
+	//Mat flow; // = Mat(480,640,CV_32FC1);
+	//Mat cflow;
+	Mat depthmap=Mat::zeros(120,160,CV_32FC1);
 
 
 	//pyrDown(Mat(currentFrame),current);
@@ -252,6 +253,45 @@ void OpenCVslam::run() {
 			//sflow[2]=sflow[1];
 			//merge(sflow,3,cflow);
 			//fprintf(stderr,".");
+			Mat newdepthmap(120,160,CV_32FC1);
+			Mat cdepthmap(120,160,CV_32FC1);
+			float max=0;
+			float min=1000;
+			for (int x=0;x<160;x++) {
+				for ( int y=0;y<120;y++) {
+					Vec4f local = currentFlow->transrotationSmoothed(Point3f(x*4.,y*4.,5));
+					Vec3f reference = currentFlow->transrotation(Point3f(x/8.,y/8.,0));
+					Vec2f difference(local[0]-reference[0],local[1]-reference[1]);
+					//Vec2f difference(reference[0],reference[1]);
+
+					float length = sqrt(difference[0]*difference[0]+ difference[1]*difference[1]);
+
+					int refcordx=x+local[0]/4.;
+					int refcordy=y+local[1]/4.;
+					if (refcordx<0) refcordx=0;
+					if (refcordx>160-1) refcordx=160-1;
+					if (refcordy<0) refcordy=0;
+					if (refcordy>120-1) refcordy=120-1;
+					newdepthmap.at<float>(y,x)=depthmap.at<float>(refcordy,refcordx);
+					cdepthmap.at<float>(y,x)=length;
+					if (length<min) min=length;
+					if (length>max) max=length;
+				}
+			}
+			float scale=1./(max-min);
+			for (int x=0;x<160;x++) {
+				for ( int y=0;y<120;y++) {
+					Vec4f local = currentFlow->transrotationSmoothed(Point3f(x*4.,y*4.,5));
+					float length = scale*(cdepthmap.at<float>(y,x)-min);
+					float factor = 1/(sqrt(1.+(fabs(local[3]))));
+					float v=factor*newdepthmap.at<float>(y,x) + (1.-factor)*length;
+					if (v<0) v=0;
+					if (v>1) v=1;
+					depthmap.at<float>(y,x)=v;
+				}
+			}
+			imshow("debug2",depthmap);
+			
 		}
 		vPortExitCritical();
 		if (lastFrame) {

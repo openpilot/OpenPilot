@@ -140,14 +140,15 @@ public class OPTelemetryService extends Service {
 		case MSG_DISCONNECT:
 			Toast.makeText(getApplicationContext(), "Disconnect requested", Toast.LENGTH_SHORT).show();
 			terminate = true;
-			activeTelem.interrupt();
-			try {
-				activeTelem.join();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+			if (activeTelem != null) {
+				activeTelem.interrupt();
+				try {
+					activeTelem.join();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				activeTelem = null;
 			}
-			activeTelem = null;
-
 			Intent intent = new Intent();
 			intent.setAction(INTENT_ACTION_DISCONNECTED);
 			sendBroadcast(intent,null);

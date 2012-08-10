@@ -1,6 +1,7 @@
 package org.openpilot.androidgcs;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -57,73 +58,85 @@ public class OPTelemetryService extends Service {
 
 	private final IBinder mBinder = new LocalBinder();
 
-	private final class ServiceHandler extends Handler {
-		public ServiceHandler(Looper looper) {
-			super(looper);
-		}
-		@Override
-		public void handleMessage(Message msg) {
-			switch(msg.arg1) {
-			case MSG_START:
-				stopSelf(msg.arg2);
-				break;
-			case MSG_CONNECT:	
-				terminate = false;
-				int connection_type;
-				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(OPTelemetryService.this);
-				try {
-					connection_type = Integer.decode(prefs.getString("connection_type", ""));
-				} catch (NumberFormatException e) {
-					connection_type = 0;
-				}
+	static class ServiceHandler extends Handler {
+	    private final WeakReference<OPTelemetryService> mService;
 
-				switch(connection_type) {
-				case 0: // No connection
-					return;
-				case 1:
-					Toast.makeText(getApplicationContext(), "Attempting fake connection", Toast.LENGTH_SHORT).show();
-					activeTelem = new FakeTelemetryThread();
-					break;
-				case 2:
-					Toast.makeText(getApplicationContext(), "Attempting BT connection", Toast.LENGTH_SHORT).show();
-					activeTelem = new BTTelemetryThread();
-					break;
-				case 3:
-					Toast.makeText(getApplicationContext(), "Attempting TCP connection", Toast.LENGTH_SHORT).show();
-					activeTelem = new TcpTelemetryThread();
-					break;
-				default:
-					throw new Error("Unsupported");
-				}
-				activeTelem.start();
-				break;
-			case MSG_DISCONNECT:
-				Toast.makeText(getApplicationContext(), "Disconnect requested", Toast.LENGTH_SHORT).show();
-				terminate = true;
-				activeTelem.interrupt();
-				try {
-					activeTelem.join();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				activeTelem = null;
+	    ServiceHandler(OPTelemetryService service, Looper looper) {
+	    	super(looper);
+	        mService = new WeakReference<OPTelemetryService>(service);
+	    }
 
-				Intent intent = new Intent();
-				intent.setAction(INTENT_ACTION_DISCONNECTED);
-				sendBroadcast(intent,null);
-				
-				stopSelf();
+	    @Override
+	    public void handleMessage(Message msg)
+	    {
+	    	OPTelemetryService service = mService.get();
+	         if (service != null) {
+	              service.handleMessage(msg);
+	         }
+	    }
+	}
 
-				break;
-            case MSG_TOAST:
-            	Toast.makeText(OPTelemetryService.this, (String) msg.obj, Toast.LENGTH_SHORT).show();
-            	break;
-			default:
-				System.out.println(msg.toString());
-				throw new Error("Invalid message");
+	void handleMessage(Message msg) {
+		switch(msg.arg1) {
+		case MSG_START:
+			stopSelf(msg.arg2);
+			break;
+		case MSG_CONNECT:
+			terminate = false;
+			int connection_type;
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(OPTelemetryService.this);
+			try {
+				connection_type = Integer.decode(prefs.getString("connection_type", ""));
+			} catch (NumberFormatException e) {
+				connection_type = 0;
 			}
+
+			switch(connection_type) {
+			case 0: // No connection
+				return;
+			case 1:
+				Toast.makeText(getApplicationContext(), "Attempting fake connection", Toast.LENGTH_SHORT).show();
+				activeTelem = new FakeTelemetryThread();
+				break;
+			case 2:
+				Toast.makeText(getApplicationContext(), "Attempting BT connection", Toast.LENGTH_SHORT).show();
+				activeTelem = new BTTelemetryThread();
+				break;
+			case 3:
+				Toast.makeText(getApplicationContext(), "Attempting TCP connection", Toast.LENGTH_SHORT).show();
+				activeTelem = new TcpTelemetryThread();
+				break;
+			default:
+				throw new Error("Unsupported");
+			}
+			activeTelem.start();
+			break;
+		case MSG_DISCONNECT:
+			Toast.makeText(getApplicationContext(), "Disconnect requested", Toast.LENGTH_SHORT).show();
+			terminate = true;
+			activeTelem.interrupt();
+			try {
+				activeTelem.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			activeTelem = null;
+
+			Intent intent = new Intent();
+			intent.setAction(INTENT_ACTION_DISCONNECTED);
+			sendBroadcast(intent,null);
+
+			stopSelf();
+
+			break;
+		case MSG_TOAST:
+			Toast.makeText(this, (String) msg.obj, Toast.LENGTH_SHORT).show();
+			break;
+		default:
+			System.out.println(msg.toString());
+			throw new Error("Invalid message");
 		}
-	};
+	}
 
 	/**
 	 * Called when the service starts.  It creates a thread to handle messages (e.g. connect and disconnect)
@@ -131,14 +144,14 @@ public class OPTelemetryService extends Service {
 	 */
 	public void startup() {
 		Toast.makeText(getApplicationContext(), "Telemetry service starting", Toast.LENGTH_SHORT).show();
-		
+
 		thread = new HandlerThread("TelemetryServiceHandler", Process.THREAD_PRIORITY_BACKGROUND);
 		thread.start();
 
-		// Get the HandlerThread's Looper and use it for our Handler 
+		// Get the HandlerThread's Looper and use it for our Handler
 		mServiceLooper = thread.getLooper();
-		mServiceHandler = new ServiceHandler(mServiceLooper);
-	
+		mServiceHandler = new ServiceHandler(this, mServiceLooper);
+
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(OPTelemetryService.this);
 		if(prefs.getBoolean("autoconnect", false)) {
 			Message msg = mServiceHandler.obtainMessage();
@@ -148,7 +161,7 @@ public class OPTelemetryService extends Service {
 		}
 
 	}
-	
+
 	@Override
 	public void onCreate() {
 		startup();
@@ -157,19 +170,19 @@ public class OPTelemetryService extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		// Currently only using as bound service
-		
+
 		// If we get killed, after returning from here, restart
 		return START_STICKY;
 	}
 
 	@Override
-	public IBinder onBind(Intent intent) {		
+	public IBinder onBind(Intent intent) {
 		return mBinder;
 	}
 
 	@Override
 	public void onDestroy() {
-		Toast.makeText(this, "Telemetry service done", Toast.LENGTH_SHORT).show(); 
+		Toast.makeText(this, "Telemetry service done", Toast.LENGTH_SHORT).show();
 	}
 
 	public class LocalBinder extends Binder {
@@ -206,9 +219,10 @@ public class OPTelemetryService extends Service {
 		public UAVObjectManager getObjectManager();
 	};
 
-	// Fake class for testing, simply emits periodic updates on 
+	// Fake class for testing, simply emits periodic updates on
 	private class FakeTelemetryThread extends Thread implements TelemTask  {
-		private UAVObjectManager objMngr;
+		private final UAVObjectManager objMngr;
+		@Override
 		public UAVObjectManager getObjectManager() { return objMngr; };
 
 		FakeTelemetryThread() {
@@ -216,6 +230,7 @@ public class OPTelemetryService extends Service {
 			UAVObjectsInitialize.register(objMngr);
 		}
 
+		@Override
 		public void run() {
 			System.out.println("Running fake thread");
 
@@ -229,22 +244,22 @@ public class OPTelemetryService extends Service {
 			UAVDataObject homeLocation = (UAVDataObject) objMngr.getObject("HomeLocation");
 			UAVDataObject positionActual = (UAVDataObject) objMngr.getObject("PositionActual");
 			UAVDataObject systemAlarms = (UAVDataObject) objMngr.getObject("SystemAlarms");
-			
+
 			systemAlarms.getField("Alarm").setValue("Warning",0);
 			systemAlarms.getField("Alarm").setValue("OK",1);
 			systemAlarms.getField("Alarm").setValue("Critical",2);
 			systemAlarms.getField("Alarm").setValue("Error",3);
 			systemAlarms.updated();
-			
+
 			homeLocation.getField("Latitude").setDouble(379420315);
 			homeLocation.getField("Longitude").setDouble(-88330078);
 			homeLocation.getField("Be").setDouble(26702.78710938,0);
 			homeLocation.getField("Be").setDouble(-1468.33605957,1);
 			homeLocation.getField("Be").setDouble(34181.78515625,2);
-			
-			
+
+
 			double roll = 0;
-			double pitch = 0; 
+			double pitch = 0;
 			double yaw = 0;
 			double north = 0;
 			double east = 0;
@@ -257,7 +272,7 @@ public class OPTelemetryService extends Service {
 				roll = (roll + 10) % 180;
 				pitch = (pitch + 10) % 180;
 				yaw = (yaw + 10) % 360;
-				
+
 				systemStats.updated();
 				attitudeActual.updated();
 				positionActual.updated();
@@ -269,13 +284,14 @@ public class OPTelemetryService extends Service {
 			}
 		}
 	}
-	private class BTTelemetryThread extends Thread implements TelemTask { 
+	private class BTTelemetryThread extends Thread implements TelemTask {
 
-		private UAVObjectManager objMngr;
+		private final UAVObjectManager objMngr;
 		private UAVTalk uavTalk;
 		private Telemetry tel;
 		private TelemetryMonitor mon;
 
+		@Override
 		public UAVObjectManager getObjectManager() { return objMngr; };
 
 		BTTelemetryThread() {
@@ -283,10 +299,11 @@ public class OPTelemetryService extends Service {
 			UAVObjectsInitialize.register(objMngr);
 		}
 
-		public void run() {			
+		@Override
+		public void run() {
 			if (DEBUG) Log.d(TAG, "Telemetry Thread started");
 
-			Looper.prepare();						
+			Looper.prepare();
 
 			BluetoothUAVTalk bt = new BluetoothUAVTalk(OPTelemetryService.this);
 			for( int i = 0; i < 10; i++ ) {
@@ -318,14 +335,15 @@ public class OPTelemetryService extends Service {
 			tel = new Telemetry(uavTalk, objMngr);
 			mon = new TelemetryMonitor(objMngr,tel);
 			mon.addObserver(new Observer() {
+				@Override
 				public void update(Observable arg0, Object arg1) {
-					System.out.println("Mon updated. Connected: " + mon.getConnected() + " objects updated: " + mon.getObjectsUpdated());
+					if (DEBUG) Log.d(TAG, "Mon updated. Connected: " + mon.getConnected() + " objects updated: " + mon.getObjectsUpdated());
 					if(mon.getConnected() /*&& mon.getObjectsUpdated()*/) {
 						Intent intent = new Intent();
 						intent.setAction(INTENT_ACTION_CONNECTED);
-						sendBroadcast(intent,null);					
+						sendBroadcast(intent,null);
 					}
-				}				
+				}
 			});
 
 
@@ -345,13 +363,14 @@ public class OPTelemetryService extends Service {
 
 	};
 
-	private class TcpTelemetryThread extends Thread implements TelemTask { 
+	private class TcpTelemetryThread extends Thread implements TelemTask {
 
-		private UAVObjectManager objMngr;
+		private final UAVObjectManager objMngr;
 		private UAVTalk uavTalk;
 		private Telemetry tel;
 		private TelemetryMonitor mon;
 
+		@Override
 		public UAVObjectManager getObjectManager() { return objMngr; };
 
 		TcpTelemetryThread() {
@@ -359,7 +378,8 @@ public class OPTelemetryService extends Service {
 			UAVObjectsInitialize.register(objMngr);
 		}
 
-		public void run() {			
+		@Override
+		public void run() {
 			if (DEBUG) Log.d(TAG, "Telemetry Thread started");
 
 			Looper.prepare();
@@ -371,7 +391,7 @@ public class OPTelemetryService extends Service {
 				tcp.connect(objMngr);
 
 				if( tcp.getConnected() )
-					
+
 					break;
 
 				try {
@@ -394,14 +414,15 @@ public class OPTelemetryService extends Service {
 			tel = new Telemetry(uavTalk, objMngr);
 			mon = new TelemetryMonitor(objMngr,tel);
 			mon.addObserver(new Observer() {
+				@Override
 				public void update(Observable arg0, Object arg1) {
-					System.out.println("Mon updated. Connected: " + mon.getConnected() + " objects updated: " + mon.getObjectsUpdated());
-					if(mon.getConnected() /*&& mon.getObjectsUpdated()*/) {
+					if (DEBUG) Log.d(TAG, "Mon updated. Connected: " + mon.getConnected() + " objects updated: " + mon.getObjectsUpdated());
+					if(mon.getConnected()) {
 						Intent intent = new Intent();
 						intent.setAction(INTENT_ACTION_CONNECTED);
 						sendBroadcast(intent,null);
 					}
-				}	
+				}
 			});
 
 
@@ -417,16 +438,16 @@ public class OPTelemetryService extends Service {
 				}
 			}
 			Looper.myLooper().quit();
-			
+
 			// Shut down all the attached
 			mon.stopMonitor();
 			mon = null;
 			tel.stopTelemetry();
 			tel = null;
-			
+
 			// Finally close the stream if it is still open
 			tcp.disconnect();
-			
+
 			if (DEBUG) Log.d(TAG, "UAVTalk stream disconnected");
 			toastMessage("TCP Thread finished");
 		}

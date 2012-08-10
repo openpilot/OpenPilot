@@ -81,36 +81,6 @@ public abstract class ObjectManagerActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		connectedReceiver = new BroadcastReceiver() {
-			@Override
-			public void onReceive(Context context, Intent intent) {
-				if (DEBUG)
-					Log.d(TAG, "Received intent");
-				TelemTask task;
-				if(intent.getAction().compareTo(OPTelemetryService.INTENT_ACTION_CONNECTED) == 0) {
-					if(binder  == null)
-						return;
-					if((task = binder.getTelemTask(0)) == null)
-						return;
-					objMngr = task.getObjectManager();
-					mConnected = true;
-					onOPConnected();
-					Log.d(TAG, "Connected()");
-				} else if (intent.getAction().compareTo(OPTelemetryService.INTENT_ACTION_DISCONNECTED) == 0) {
-					objMngr = null;
-					mConnected = false;
-					onOPDisconnected();
-					Log.d(TAG, "Disonnected()");
-				}
-			}
-		};
-
-		IntentFilter filter = new IntentFilter();
-		filter.addCategory(OPTelemetryService.INTENT_CATEGORY_GCS);
-		filter.addAction(OPTelemetryService.INTENT_ACTION_CONNECTED);
-		filter.addAction(OPTelemetryService.INTENT_ACTION_DISCONNECTED);
-		registerReceiver(connectedReceiver, filter);
 	}
 
 	/**
@@ -271,11 +241,47 @@ public abstract class ObjectManagerActivity extends Activity {
 	@Override
 	public void onStart() {
 		super.onStart();
+		if (DEBUG) Log.d(TAG, "onStart()");
+		// Register a receiver to get connected/disconnected signals from the telemetry
+		// service
+		connectedReceiver = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				if (DEBUG)
+					Log.d(TAG, "Received intent");
+				TelemTask task;
+				if(intent.getAction().compareTo(OPTelemetryService.INTENT_ACTION_CONNECTED) == 0) {
+					if(binder  == null)
+						return;
+					if((task = binder.getTelemTask(0)) == null)
+						return;
+					objMngr = task.getObjectManager();
+					mConnected = true;
+					onOPConnected();
+					Log.d(TAG, "Connected()");
+				} else if (intent.getAction().compareTo(OPTelemetryService.INTENT_ACTION_DISCONNECTED) == 0) {
+					objMngr = null;
+					mConnected = false;
+					onOPDisconnected();
+					Log.d(TAG, "Disonnected()");
+				}
+			}
+		};
+
+		// Set up the filters
+		IntentFilter filter = new IntentFilter();
+		filter.addCategory(OPTelemetryService.INTENT_CATEGORY_GCS);
+		filter.addAction(OPTelemetryService.INTENT_ACTION_CONNECTED);
+		filter.addAction(OPTelemetryService.INTENT_ACTION_DISCONNECTED);
+		registerReceiver(connectedReceiver, filter);
+
+		// Bind to the telemetry service (which will start it)
 		Intent intent = new Intent(getApplicationContext(),
 				org.openpilot.androidgcs.telemetry.OPTelemetryService.class);
 		if (DEBUG)
 			Log.d(TAG, "Attempting to bind: " + intent);
 		bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+
 	}
 
 	/**
@@ -284,8 +290,10 @@ public abstract class ObjectManagerActivity extends Activity {
 	@Override
 	public void onStop() {
 		super.onStop();
+		if (DEBUG) Log.d(TAG, "onStop()");
 		unbindService(mConnection);
-		//unregisterReceiver(connectedReceiver);
+		unregisterReceiver(connectedReceiver);
+		connectedReceiver = null;
 	}
 
 	public void onBind() {

@@ -150,8 +150,6 @@ public class OPTelemetryService extends Service {
 				activeTelem = null;
 			}
 			Intent intent = new Intent();
-
-			Intent intent = new Intent();
 			intent.setAction(INTENT_ACTION_DISCONNECTED);
 			sendBroadcast(intent,null);
 

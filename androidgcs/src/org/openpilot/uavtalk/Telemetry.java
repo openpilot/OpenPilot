@@ -118,7 +118,7 @@ public class Telemetry {
 			@Override
 			void TransactionSucceeded(UAVObject data) {
 	        	try {
-					transactionCompleted(data);
+					transactionCompleted(data, true);
 				} catch (IOException e) {
 					// Disconnect when stream fails
 					utalk.setOnTransactionCompletedListener(null);
@@ -127,8 +127,8 @@ public class Telemetry {
 			@Override
 			void TransactionFailed(UAVObject data) {
 	        	try {
-	        		Log.d(TAG, "TransactionFailed(" + data.getName() + ")");
-					transactionCompleted(data);
+	        		if (DEBUG) Log.d(TAG, "TransactionFailed(" + data.getName() + ")");
+					transactionCompleted(data, false);
 				} catch (IOException e) {
 					// Disconnect when stream fails
 					utalk.setOnTransactionCompletedListener(null);
@@ -376,7 +376,7 @@ public class Telemetry {
      * Called when a transaction is successfully completed (uavtalk event)
      * @throws IOException
      */
-    private synchronized void transactionCompleted(UAVObject obj) throws IOException
+    private synchronized void transactionCompleted(UAVObject obj, boolean result) throws IOException
     {
     	if (DEBUG) Log.d(TAG,"UAVTalk transactionCompleted");
         // Check if there is a pending transaction and the objects match
@@ -386,8 +386,9 @@ public class Telemetry {
             // Complete transaction
         	transTimer.cancel();
             transPending = false;
-            // Send signal
-            obj.transactionCompleted(true);
+
+            //Send signal
+            obj.transactionCompleted(result);
             // Process new object updates from queue
             processObjectQueue();
         } else
@@ -416,13 +417,9 @@ public class Telemetry {
             }
             else
             {
-                // Terminate transaction
-                utalk.cancelTransaction();
-                transPending = false;
-                // Send signal
-                transInfo.obj.transactionCompleted(false);
-                // Process new object updates from queue
-                processObjectQueue();
+                // Terminate transaction.  This triggers UAVTalk to send a transaction
+            	// failed signal which will make the next queue entry be processed
+                //utalk.cancelPendingTransaction();
                 ++txErrors;
             }
         }

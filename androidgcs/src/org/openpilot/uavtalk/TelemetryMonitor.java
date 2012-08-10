@@ -39,9 +39,10 @@ import android.util.Log;
 public class TelemetryMonitor extends Observable {
 
 	private static final String TAG = "TelemetryMonitor";
-	public static int LOGLEVEL = 0;
-	public static boolean WARN = LOGLEVEL > 1;
-	public static boolean DEBUG = LOGLEVEL > 0;
+	public static final int LOGLEVEL = 0;
+	public static boolean DEBUG = LOGLEVEL > 2;
+	public static final boolean WARN = LOGLEVEL > 1;
+	public static final boolean ERROR = LOGLEVEL > 0;
 
 	static final int STATS_UPDATE_PERIOD_MS = 4000;
 	static final int STATS_CONNECT_PERIOD_MS = 1000;
@@ -208,7 +209,7 @@ public class TelemetryMonitor extends Observable {
 		if (!success) {
 			// Right now success = false means received a NAK so don't
 			// re-attempt
-			Log.e(TAG, "Transaction failed.");
+			if (ERROR) Log.e(TAG, "Transaction failed.");
 		}
 
 		// Process next object if telemetry is still available

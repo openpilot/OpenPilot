@@ -26,7 +26,6 @@ package org.openpilot.uavtalk;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -41,10 +40,10 @@ import android.util.Log;
 public class Telemetry {
 
 	private final String TAG = "Telemetry";
-	public static int LOGLEVEL = 3;
+	public static int LOGLEVEL = 1;
 	public static boolean WARN = LOGLEVEL > 2;
-	public static boolean ERROR = LOGLEVEL > 1;
-	public static boolean DEBUG = LOGLEVEL > 0;
+	public static boolean DEBUG = LOGLEVEL > 1;
+	public static boolean ERROR = LOGLEVEL > 0;
     public class TelemetryStats {
         public int txBytes;
         public int rxBytes;
@@ -68,8 +67,15 @@ public class Telemetry {
         int event;
         boolean allInstances;
 
-        boolean equals(ObjectQueueInfo e) {
-			return (e.obj.getObjID() == obj.getObjID() &&  e.event == event && e.allInstances == allInstances) || true;
+        @Override
+		public boolean equals(Object e) {
+        	try {
+        		ObjectQueueInfo o = (ObjectQueueInfo) e;
+        		return o.obj.getObjID() == obj.getObjID() &&  o.event == event && o.allInstances == allInstances;
+        	} catch (Exception err) {
+
+        	};
+        	return false;
         }
     };
 
@@ -133,6 +139,7 @@ public class Telemetry {
 			void TransactionFailed(UAVObject data) {
 	        	try {
 	        		if (DEBUG) Log.d(TAG, "TransactionFailed(" + data.getName() + ")");
+
 					transactionCompleted(data, false);
 				} catch (IOException e) {
 					// Disconnect when stream fails
@@ -259,7 +266,7 @@ public class Telemetry {
 		@Override
 		public void update(Observable observable, Object data) {
     		try {
-				processObjectUpdates((UAVObject) data, EV_UNPACKED, false, true);
+    			enqueueObjectUpdates((UAVObject) data, EV_UNPACKED, false, true);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -271,7 +278,7 @@ public class Telemetry {
 		@Override
 		public void update(Observable observable, Object data) {
 			try {
-				processObjectUpdates((UAVObject) data, EV_UPDATED, false, true);
+				enqueueObjectUpdates((UAVObject) data, EV_UPDATED, false, true);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -283,7 +290,7 @@ public class Telemetry {
 		@Override
 		public void update(Observable observable, Object data) {
 			try {
-				processObjectUpdates((UAVObject) data, EV_UPDATED_MANUAL, false, true);
+				enqueueObjectUpdates((UAVObject) data, EV_UPDATED_MANUAL, false, true);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -295,7 +302,7 @@ public class Telemetry {
 		@Override
 		public void update(Observable observable, Object data) {
 			try {
-				processObjectUpdates((UAVObject) data, EV_UPDATE_REQ, false, true);
+				enqueueObjectUpdates((UAVObject) data, EV_UPDATE_REQ, false, true);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -404,6 +411,7 @@ public class Telemetry {
         } else
         {
         	if (ERROR) Log.e(TAG,"Error: received a transaction completed when did not expect it.");
+        	transPending = false;
         }
     }
 
@@ -427,9 +435,13 @@ public class Telemetry {
             }
             else
             {
+            	if (ERROR) Log.e(TAG, "Transaction failed for: " + transInfo.obj.getName());
+
                 // Terminate transaction.  This triggers UAVTalk to send a transaction
             	// failed signal which will make the next queue entry be processed
-                //utalk.cancelPendingTransaction();
+            	// Note this is UAVTalk listener TransactionFailed function and not the
+            	// object specific transaction failed.
+                utalk.cancelPendingTransaction(transInfo.obj);
                 ++txErrors;
             }
         }
@@ -470,10 +482,10 @@ public class Telemetry {
     }
 
     /**
-     * Process the event received from an object
-     * @throws IOException
+     * Enqueue the event received from an object.  This is the main method that handles all the callbacks
+     * from UAVObjects (due to updates, or update requests)
      */
-    private void processObjectUpdates(UAVObject obj, int event, boolean allInstances, boolean priority) throws IOException
+    private synchronized void enqueueObjectUpdates(UAVObject obj, int event, boolean allInstances, boolean priority) throws IOException
     {
         // Push event into queue
     	if (DEBUG) Log.d(TAG, "Push event into queue for obj " + obj.getName() + " event " + event);
@@ -485,17 +497,8 @@ public class Telemetry {
         objInfo.allInstances = allInstances;
         if (priority)
         {
-        	Iterator <ObjectQueueInfo> it = objPriorityQueue.iterator();
-        	boolean found = false;
-        	while(it.hasNext()) {
-    			ObjectQueueInfo test = it.next();
-    			if (test.obj.getObjID() == obj.getObjID())
-    				found = true;
-        	}
-        	found= false;
-        	if(found) {
-        		Log.w(TAG, "Identical event already in transaction queue: " + objInfo);
-        	} else {
+        	// Only enqueue if an identical transaction does not already exist
+        	if(!objPriorityQueue.contains(objInfo)) {
         		if ( objPriorityQueue.size() < MAX_QUEUE_SIZE )
         		{
         			objPriorityQueue.add(objInfo);
@@ -510,9 +513,8 @@ public class Telemetry {
         }
         else
         {
-        	if(objQueue.contains(objInfo)) {
-        		Log.w(TAG, "Identical event already in queue: " + objInfo);
-        	} else {
+        	// Only enqueue if an identical transaction does not already exist
+        	if(!objQueue.contains(objInfo)) {
         		if ( objQueue.size() < MAX_QUEUE_SIZE )
         		{
         			objQueue.add(objInfo);
@@ -543,7 +545,7 @@ public class Telemetry {
         // Don nothing if a transaction is already in progress (should not happen)
         if (transPending)
         {
-        	if (ERROR) Log.e(TAG,"Dequeue while a transaction pending");
+        	if (WARN) Log.e(TAG,"Dequeue while a transaction pending");
             return;
         }
 
@@ -611,7 +613,7 @@ public class Telemetry {
         // we do not have additional objects still in the queue,
         // so we have to reschedule queue processing to make sure they are not
         // stuck:
-        if ( objInfo.event == EV_UNPACKED )
+        if ( objInfo.event == EV_UNPACKED && !transPending)
             processObjectQueue();
 
     }
@@ -651,7 +653,7 @@ public class Telemetry {
                     objinfo.timeToNextUpdateMs = objinfo.updatePeriodMs - offset;
                     // Send object
                     startTime = System.currentTimeMillis();
-                    processObjectUpdates(objinfo.obj, EV_UPDATED_MANUAL, true, false);
+                    enqueueObjectUpdates(objinfo.obj, EV_UPDATED_MANUAL, true, false);
                     elapsedMs = (int) (System.currentTimeMillis() - startTime);
                     // Update timeToNextUpdateMs with the elapsed delay of sending the object;
                     timeToNextUpdateMs += elapsedMs;

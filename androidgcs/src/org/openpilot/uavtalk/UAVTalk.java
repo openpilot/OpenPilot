@@ -38,7 +38,7 @@ import android.util.Log;
 public class UAVTalk {
 
 	static final String TAG = "UAVTalk";
-	public static int LOGLEVEL = 0;
+	public static int LOGLEVEL = 1;
 	public static boolean VERBOSE = LOGLEVEL > 3;
 	public static boolean WARN = LOGLEVEL > 2;
 	public static boolean DEBUG = LOGLEVEL > 1;

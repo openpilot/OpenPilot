@@ -32,11 +32,11 @@ package org.openpilot.androidgcs;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
 
+import org.junit.Assert;
 import org.openpilot.androidgcs.fragments.ObjectManagerFragment;
 import org.openpilot.androidgcs.telemetry.OPTelemetryService;
 import org.openpilot.androidgcs.telemetry.OPTelemetryService.LocalBinder;
@@ -79,7 +79,8 @@ public abstract class ObjectManagerActivity extends Activity {
 	BroadcastReceiver connectedReceiver;
 	//! Indicate if this activity has already connected it's telemetry callbacks
 	private boolean telemetryStatsConnected = false;
-
+	//! Maintain a list of all the UAVObject listeners for this activity
+	private HashMap<Observer, UAVObject> listeners;
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -88,82 +89,10 @@ public abstract class ObjectManagerActivity extends Activity {
 
 	/**
 	 * Called whenever any objects subscribed to via registerObjects
+	 * whenever this Activity is not paused
 	 */
 	protected void objectUpdated(UAVObject obj) {
 
-	}
-
-	/**
-	 * A message handler and a custom Observer to use it which calls
-	 * objectUpdated with the right object type
-	 */
-	final Handler uavobjHandler = new Handler();
-	private class ActivityUpdatedObserver implements Observer  {
-		UAVObject obj;
-		ActivityUpdatedObserver(UAVObject obj) { this.obj = obj; };
-		@Override
-		public void update(Observable observable, Object data) {
-			uavobjHandler.post(new Runnable() {
-				@Override
-				public void run() { objectUpdated(obj); }
-			});
-		}
-	};
-	private class FragmentUpdatedObserver implements Observer  {
-		UAVObject obj;
-		ObjectManagerFragment frag;
-		FragmentUpdatedObserver(UAVObject obj, ObjectManagerFragment frag) {
-			this.obj = obj;
-			this.frag = frag;
-		};
-		@Override
-		public void update(Observable observable, Object data) {
-			uavobjHandler.post(new Runnable() {
-				@Override
-				public void run() { frag.objectUpdated(obj); }
-			});
-		}
-	};
-
-
-	/**
-	 * Register an activity to receive updates from this object
-	 *
-	 * the objectUpdated() method will be called in the original UI thread
-	 */
-	HashMap<Observer, UAVObject> listeners = new HashMap<Observer,UAVObject>();
-	protected void registerObjectUpdates(UAVObject object) {
-		Observer o = new ActivityUpdatedObserver(object);
-		object.addUpdatedObserver(o);
-		listeners.put(o,  object);
-	}
-	/**
-	 * Unregister all the objects connected to this activity
-	 */
-	protected void unregisterObjectUpdates()
-	{
-		Set<Observer> s = listeners.keySet();
-		Iterator<Observer> i = s.iterator();
-		while (i.hasNext()) {
-			Observer o = i.next();
-			UAVObject obj = listeners.get(o);
-			obj.removeUpdatedObserver(o);
-		}
-		listeners.clear();
-	}
-	public void registerObjectUpdates(UAVObject object,
-			ObjectManagerFragment frag) {
-		Observer o = new FragmentUpdatedObserver(object, frag);
-		object.addUpdatedObserver(o);
-		listeners.put(o, object);
-	}
-	protected void registerObjectUpdates(List<List<UAVObject>> objects) {
-		ListIterator<List<UAVObject>> li = objects.listIterator();
-		while(li.hasNext()) {
-			ListIterator<UAVObject> li2 = li.next().listIterator();
-			while(li2.hasNext())
-				registerObjectUpdates(li2.next());
-		}
 	}
 
 	private void updateStats() {
@@ -199,14 +128,21 @@ public abstract class ObjectManagerActivity extends Activity {
 		if ( telemetryStatsConnected )
 			return;
 
+		// Create a map for all the object updates register for this activity.  If anyone
+		// tries to register an object update before this a null exception will occur
+		listeners = new HashMap<Observer,UAVObject>();
+
 		// We are not using the objectUpdated mechanism in place so that all the children
 		// don't have to sort through the messages.
-		UAVObject stats = objMngr.getObject("GCSTelemetryStats");
-		if (stats == null)
-			return;
 
-		stats.addUpdatedObserver(telemetryObserver);
-		telemetryStatsConnected = true;
+		if (!telemetryStatsConnected) {
+			UAVObject stats = objMngr.getObject("GCSTelemetryStats");
+			if (stats == null)
+				return;
+
+			stats.addUpdatedObserver(telemetryObserver);
+			telemetryStatsConnected = true;
+		}
 		updateStats();
 
 		if (DEBUG) Log.d(TAG, "Notifying listeners about connection.  There are " + connectionListeners.countObservers());
@@ -228,44 +164,62 @@ public abstract class ObjectManagerActivity extends Activity {
 		// Providing a null update triggers a disconnect on fragments
 		connectionListeners.disconnected();
 
+		if (objMngr == null) {
+			Log.d(TAG, "onOPDisconnected(): Object manager already went away");
+			return;
+		}
+
+		if (telemetryStatsConnected) {
+			UAVObject stats = objMngr.getObject("GCSTelemetryStats");
+			if (stats != null) {
+				stats.removeUpdatedObserver(telemetryObserver);
+			}
+			telemetryStatsConnected = false;
+		}
+
 		// Disconnect from any UAVO updates
-		unregisterObjectUpdates();
+		if (DEBUG) Log.d(TAG, "onOpDisconnected(): Pausing the listeners and deleting the list");
+		pauseObjectUpdates();
+		listeners = null;
+	}
+
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+
+		if (mConnected && !telemetryStatsConnected) {
+			UAVObject stats = objMngr.getObject("GCSTelemetryStats");
+			if (stats == null)
+				return;
+
+			stats.addUpdatedObserver(telemetryObserver);
+			telemetryStatsConnected = true;
+		}
+
+		resumeObjectUpdates();
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		if (!mBound || binder == null) {
-			Log.e(TAG, "Unable to connect to service");
-			return super.onOptionsItemSelected(item);
-		}
-		switch(item.getItemId()) {
-		case R.id.menu_connect:
-			binder.openConnection();
-			return true;
-		case R.id.menu_disconnect:
-			binder.stopConnection();
-			return true;
-		case R.id.menu_settings:
-			startActivity(new Intent(this, Preferences.class));
-			return true;
-		default:
-			return super.onOptionsItemSelected(item);
+	protected void onPause() {
+		super.onPause();
+
+		if (telemetryStatsConnected) {
+			UAVObject stats = objMngr.getObject("GCSTelemetryStats");
+			Assert.assertNotNull(stats); // Should not be null if we connected
+
+			stats.removeUpdatedObserver(telemetryObserver);
+			telemetryStatsConnected = false;
 		}
 
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.status_menu, menu);
-		inflater.inflate(R.menu.options_menu, menu);
-		return true;
+		pauseObjectUpdates();
 	}
 
 	@Override
 	public void onStart() {
 		super.onStart();
 		if (DEBUG) Log.d(TAG, "onStart()");
+
 		// Register a receiver to get connected/disconnected signals from the telemetry
 		// service
 		connectedReceiver = new BroadcastReceiver() {
@@ -284,9 +238,9 @@ public abstract class ObjectManagerActivity extends Activity {
 					onOPConnected();
 					Log.d(TAG, "Connected()");
 				} else if (intent.getAction().compareTo(OPTelemetryService.INTENT_ACTION_DISCONNECTED) == 0) {
+					onOPDisconnected();
 					objMngr = null;
 					mConnected = false;
-					onOPDisconnected();
 					Log.d(TAG, "Disonnected()");
 				}
 			}
@@ -320,13 +274,131 @@ public abstract class ObjectManagerActivity extends Activity {
 		connectedReceiver = null;
 
 		// Disconnect from any UAVO updates
-		unregisterObjectUpdates();
+		if (DEBUG) Log.d(TAG, "onStop(): Pausing the listeners and deleting the list");
+		pauseObjectUpdates();
+		listeners = null;
 	}
 
-	public void onBind() {
+	/*********** This provides the object update messaging service ************/
+
+	/**
+	 * A message handler and a custom Observer to use it which calls
+	 * objectUpdated with the right object type
+	 */
+	final Handler uavobjHandler = new Handler();
+	private class ActivityUpdatedObserver implements Observer  {
+		UAVObject obj;
+		ActivityUpdatedObserver(UAVObject obj) { this.obj = obj; };
+		@Override
+		public void update(Observable observable, Object data) {
+			uavobjHandler.post(new Runnable() {
+				@Override
+				public void run() { objectUpdated(obj); }
+			});
+		}
+	};
+	private class FragmentUpdatedObserver implements Observer  {
+		UAVObject obj;
+		ObjectManagerFragment frag;
+		FragmentUpdatedObserver(UAVObject obj, ObjectManagerFragment frag) {
+			this.obj = obj;
+			this.frag = frag;
+		};
+		@Override
+		public void update(Observable observable, Object data) {
+			uavobjHandler.post(new Runnable() {
+				@Override
+				public void run() { frag.objectUpdated(obj); }
+			});
+		}
+	};
+
+	/**
+	 * Unregister all the objects connected to this activity
+	 */
+	private boolean paused = false;
+
+	/**
+	 * When an activity is paused, disconnect from all
+	 * updates to ensure we don't draw to an invalid view
+	 */
+	protected void pauseObjectUpdates()
+	{
+		// When listeners is null then a pause occurred after
+		// disconnecting from the service
+		if (listeners == null)
+			return;
+
+		Set<Observer> s = listeners.keySet();
+		Iterator<Observer> i = s.iterator();
+		while (i.hasNext()) {
+			Observer o = i.next();
+			UAVObject obj = listeners.get(o);
+			obj.removeUpdatedObserver(o);
+		}
+		paused = true;
 
 	}
 
+	/**
+	 * When an activity is resumed, reconnect all now the view
+	 * is valid again
+	 */
+	protected void resumeObjectUpdates()
+	{
+		// When listeners is null this is the resume at the beginning
+		// before connecting to the telemetry service
+		if(listeners == null)
+			return;
+
+		Set<Observer> s = listeners.keySet();
+		Iterator<Observer> i = s.iterator();
+		while (i.hasNext()) {
+			Observer o = i.next();
+			UAVObject obj = listeners.get(o);
+			obj.addUpdatedObserver(o);
+		}
+		paused = false;
+	}
+
+	/**
+	 * Register to listen to a single object from a fragment
+	 * @param object The object to listen to updates from
+	 * @param frag The fragment who should be notified
+ 	 * the objectUpdated() method will be called in the original UI thread
+	 */
+	public void registerObjectUpdates(UAVObject object,
+			ObjectManagerFragment frag) {
+		Observer o = new FragmentUpdatedObserver(object, frag);
+		listeners.put(o, object);
+		if (!paused)
+			object.addUpdatedObserver(o);
+	}
+
+	/**
+	 * Register an activity to receive updates from this object
+	 * @param object The object the activity should listen to updates from
+ 	 * the objectUpdated() method will be called in the original UI thread
+	 */
+	protected void registerObjectUpdates(UAVObject object) {
+		Observer o = new ActivityUpdatedObserver(object);
+		listeners.put(o,  object);
+		if (!paused)
+			object.addUpdatedObserver(o);
+	}
+
+	/**
+	 * Helper method to register array of objects
+	 */
+	protected void registerObjectUpdates(List<List<UAVObject>> objects) {
+		for (int i = 0; i < objects.size(); i++) {
+			List<UAVObject> inner = objects.get(i);
+			for (int j = 0; j < inner.size(); j++)
+				registerObjectUpdates(inner.get(j));
+		}
+	}
+
+	/*********** Deals with fragments listening for connections ***************/
 
 	/**
 	 * Callbacks so ObjectManagerFragments get the onOPConnected and onOPDisconnected signals
@@ -363,7 +435,6 @@ public abstract class ObjectManagerActivity extends Activity {
 		}
 
 	} ;
-
 	public void addOnConnectionListenerFragment(ObjectManagerFragment frag) {
 		connectionListeners.addObserver(new OnConnectionListener(frag));
 		if (DEBUG) Log.d(TAG, "Connecting " + frag + " there are now " + connectionListeners.countObservers());
@@ -371,6 +442,8 @@ public abstract class ObjectManagerActivity extends Activity {
 			frag.onOPConnected(objMngr);
 	}
 
+
+	/*********** Deals with (dis)connection to telemetry service ***************/
 
 	/** Defines callbacks for service binding, passed to bindService() */
 	private final ServiceConnection mConnection = new ServiceConnection() {
@@ -394,13 +467,45 @@ public abstract class ObjectManagerActivity extends Activity {
 
 		@Override
 		public void onServiceDisconnected(ComponentName name) {
+			onOPDisconnected();
 			mBound = false;
 			binder = null;
 			mConnected = false;
 			objMngr = null;
 			objMngr = null;
 			mConnected = false;
-			onOPDisconnected();
 		}
 	};
+
+	/************* Deals with menus *****************/
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		if (!mBound || binder == null) {
+			Log.e(TAG, "Unable to connect to service");
+			return super.onOptionsItemSelected(item);
+		}
+		switch(item.getItemId()) {
+		case R.id.menu_connect:
+			binder.openConnection();
+			return true;
+		case R.id.menu_disconnect:
+			binder.stopConnection();
+			return true;
+		case R.id.menu_settings:
+			startActivity(new Intent(this, Preferences.class));
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.status_menu, menu);
+		inflater.inflate(R.menu.options_menu, menu);
+		return true;
+	}
+
 }

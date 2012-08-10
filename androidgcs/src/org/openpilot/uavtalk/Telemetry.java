@@ -26,6 +26,7 @@ package org.openpilot.uavtalk;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -40,7 +41,7 @@ import android.util.Log;
 public class Telemetry {
 
 	private final String TAG = "Telemetry";
-	public static int LOGLEVEL = 0;
+	public static int LOGLEVEL = 3;
 	public static boolean WARN = LOGLEVEL > 2;
 	public static boolean ERROR = LOGLEVEL > 1;
 	public static boolean DEBUG = LOGLEVEL > 0;
@@ -66,6 +67,10 @@ public class Telemetry {
         UAVObject obj;
         int event;
         boolean allInstances;
+
+        boolean equals(ObjectQueueInfo e) {
+			return (e.obj.getObjID() == obj.getObjID() &&  e.event == event && e.allInstances == allInstances) || true;
+        }
     };
 
     class ObjectTransactionInfo {
@@ -112,9 +117,9 @@ public class Telemetry {
         	}
         });
 
-        // Listen to transaction completions
-        this.utalk.setOnTransactionCompletedListener(
-        		this.utalk.new OnTransactionCompletedListener() {
+        // Listen to transaction completions from uavtalk
+        utalk.setOnTransactionCompletedListener(
+        		utalk.new OnTransactionCompletedListener() {
 			@Override
 			void TransactionSucceeded(UAVObject data) {
 	        	try {
@@ -250,6 +255,54 @@ public class Telemetry {
         }
     }
 
+    final Observer unpackedObserver = new Observer() {
+		@Override
+		public void update(Observable observable, Object data) {
+    		try {
+				processObjectUpdates((UAVObject) data, EV_UNPACKED, false, true);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+	};
+
+	final Observer updatedAutoObserver = new Observer() {
+		@Override
+		public void update(Observable observable, Object data) {
+			try {
+				processObjectUpdates((UAVObject) data, EV_UPDATED, false, true);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+	};
+
+	final Observer updatedManualObserver = new Observer() {
+		@Override
+		public void update(Observable observable, Object data) {
+			try {
+				processObjectUpdates((UAVObject) data, EV_UPDATED_MANUAL, false, true);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+	};
+
+	final Observer updatedRequestedObserver = new Observer() {
+		@Override
+		public void update(Observable observable, Object data) {
+			try {
+				processObjectUpdates((UAVObject) data, EV_UPDATE_REQ, false, true);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+	};
+
     /**
      * Connect to all instances of an object depending on the event mask specified
      */
@@ -260,65 +313,25 @@ public class Telemetry {
         while(li.hasNext())
         {
         	obj = li.next();
-            //TODO: Disconnect all
-            // obj.disconnect(this);
+            // TODO: Disconnect all previous observers from telemetry.  This is imortant as this can
+        	// be called multiple times
 
             // Connect only the selected events
             if ( (eventMask&EV_UNPACKED) != 0)
             {
-            	obj.addUnpackedObserver(new Observer() {
-					@Override
-					public void update(Observable observable, Object data) {
-	            		try {
-							objectUnpacked( (UAVObject) data);
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-	            	}
-            	});
+            	obj.addUnpackedObserver(unpackedObserver);
             }
             if ( (eventMask&EV_UPDATED) != 0)
             {
-            	obj.addUpdatedAutoObserver(new Observer() {
-					@Override
-					public void update(Observable observable, Object data) {
-						try {
-							objectUpdatedAuto( (UAVObject) data);
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-	            	}
-            	});
+            	obj.addUpdatedAutoObserver(updatedAutoObserver);
             }
             if ( (eventMask&EV_UPDATED_MANUAL) != 0)
             {
-            	obj.addUpdatedManualObserver(new Observer() {
-					@Override
-					public void update(Observable observable, Object data) {
-						try {
-							objectUpdatedManual( (UAVObject) data);
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-	            	}
-            	});
+            	obj.addUpdatedManualObserver(updatedManualObserver);
             }
             if ( (eventMask&EV_UPDATE_REQ) != 0)
             {
-            	obj.addUpdateRequestedObserver(new Observer() {
-					@Override
-					public void update(Observable observable, Object data) {
-						try {
-							updateRequested( (UAVObject) data);
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-	            	}
-            	});
+            	obj.addUpdateRequestedObserver(updatedRequestedObserver);
             }
         }
     }
@@ -463,7 +476,7 @@ public class Telemetry {
      * Process the event received from an object
      * @throws IOException
      */
-    private synchronized void processObjectUpdates(UAVObject obj, int event, boolean allInstances, boolean priority) throws IOException
+    private void processObjectUpdates(UAVObject obj, int event, boolean allInstances, boolean priority) throws IOException
     {
         // Push event into queue
     	if (DEBUG) Log.d(TAG, "Push event into queue for obj " + obj.getName() + " event " + event);
@@ -475,28 +488,44 @@ public class Telemetry {
         objInfo.allInstances = allInstances;
         if (priority)
         {
-            if ( objPriorityQueue.size() < MAX_QUEUE_SIZE )
-            {
-                objPriorityQueue.add(objInfo);
-            }
-            else
-            {
-                ++txErrors;
-                obj.transactionCompleted(false);
-                Log.w(TAG,"Telemetry: priority event queue is full, event lost " + obj.getName());
-            }
+        	Iterator <ObjectQueueInfo> it = objPriorityQueue.iterator();
+        	boolean found = false;
+        	while(it.hasNext()) {
+    			ObjectQueueInfo test = it.next();
+    			if (test.obj.getObjID() == obj.getObjID())
+    				found = true;
+        	}
+        	found= false;
+        	if(found) {
+        		Log.w(TAG, "Identical event already in transaction queue: " + objInfo);
+        	} else {
+        		if ( objPriorityQueue.size() < MAX_QUEUE_SIZE )
+        		{
+        			objPriorityQueue.add(objInfo);
+        		}
+        		else
+        		{
+        			++txErrors;
+        			obj.transactionCompleted(false);
+        			Log.w(TAG,"Telemetry: priority event queue is full, event lost " + obj.getName());
+        		}
+        	}
         }
         else
         {
-            if ( objQueue.size() < MAX_QUEUE_SIZE )
-            {
-                objQueue.add(objInfo);
-            }
-            else
-            {
-                ++txErrors;
-                obj.transactionCompleted(false);
-            }
+        	if(objQueue.contains(objInfo)) {
+        		Log.w(TAG, "Identical event already in queue: " + objInfo);
+        	} else {
+        		if ( objQueue.size() < MAX_QUEUE_SIZE )
+        		{
+        			objQueue.add(objInfo);
+        		}
+        		else
+        		{
+        			++txErrors;
+        			obj.transactionCompleted(false);
+        		}
+        	}
         }
 
         // If there is no transaction in progress then process event
@@ -679,25 +708,6 @@ public class Telemetry {
         txRetries = 0;
     }
 
-    private synchronized void objectUpdatedAuto(UAVObject obj) throws IOException
-    {
-        processObjectUpdates(obj, EV_UPDATED, false, true);
-    }
-
-    private synchronized void objectUpdatedManual(UAVObject obj) throws IOException
-    {
-        processObjectUpdates(obj, EV_UPDATED_MANUAL, false, true);
-    }
-
-    private synchronized void objectUnpacked(UAVObject obj) throws IOException
-    {
-        processObjectUpdates(obj, EV_UNPACKED, false, true);
-    }
-
-    public synchronized void updateRequested(UAVObject obj) throws IOException
-    {
-        processObjectUpdates(obj, EV_UPDATE_REQ, false, true);
-    }
 
     private void newObject(UAVObject obj)
     {

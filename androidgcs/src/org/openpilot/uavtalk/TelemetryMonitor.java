@@ -193,7 +193,7 @@ public class TelemetryMonitor extends Observable {
 		});
 
 		// Request update
-		tel.updateRequested(obj);
+		obj.updateRequested();
 	}
 
 	/**

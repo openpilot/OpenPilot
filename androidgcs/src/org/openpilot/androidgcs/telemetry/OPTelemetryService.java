@@ -27,6 +27,7 @@
 package org.openpilot.androidgcs.telemetry;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -83,75 +84,85 @@ public class OPTelemetryService extends Service {
 
 	private final IBinder mBinder = new LocalBinder();
 
-	private final class ServiceHandler extends Handler {
-		public ServiceHandler(Looper looper) {
-			super(looper);
-		}
-		@Override
-		public void handleMessage(Message msg) {
-			if (DEBUG)
-				Log.d(TAG, "handleMessage: " + msg);
-			switch(msg.arg1) {
-			case MSG_START:
-				stopSelf(msg.arg2);
-				break;
-			case MSG_CONNECT:
-				terminate = false;
-				int connection_type;
-				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(OPTelemetryService.this);
-				try {
-					connection_type = Integer.decode(prefs.getString("connection_type", ""));
-				} catch (NumberFormatException e) {
-					connection_type = 0;
-				}
+	static class ServiceHandler extends Handler {
+	    private final WeakReference<OPTelemetryService> mService;
 
-				switch(connection_type) {
-				case 0: // No connection
-					return;
-				case 1:
-					Toast.makeText(getApplicationContext(), "Attempting fake connection", Toast.LENGTH_SHORT).show();
-					activeTelem = new FakeTelemetryThread();
-					break;
-				case 2:
-					Toast.makeText(getApplicationContext(), "Attempting BT connection", Toast.LENGTH_SHORT).show();
-					activeTelem = new BTTelemetryThread();
-					break;
-				case 3:
-					Toast.makeText(getApplicationContext(), "Attempting TCP connection", Toast.LENGTH_SHORT).show();
-					activeTelem = new TcpTelemetryThread();
-					break;
-				default:
-					throw new Error("Unsupported");
-				}
-				activeTelem.start();
-				break;
-			case MSG_DISCONNECT:
-				Toast.makeText(getApplicationContext(), "Disconnect requested", Toast.LENGTH_SHORT).show();
-				terminate = true;
-				activeTelem.interrupt();
-				try {
-					activeTelem.join();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				activeTelem = null;
+	    ServiceHandler(OPTelemetryService service, Looper looper) {
+	    	super(looper);
+	        mService = new WeakReference<OPTelemetryService>(service);
+	    }
 
-				Intent intent = new Intent();
-				intent.setAction(INTENT_ACTION_DISCONNECTED);
-				sendBroadcast(intent,null);
+	    @Override
+	    public void handleMessage(Message msg)
+	    {
+	    	OPTelemetryService service = mService.get();
+	         if (service != null) {
+	              service.handleMessage(msg);
+	         }
+	    }
+	}
 
-				stopSelf();
-
-				break;
-            case MSG_TOAST:
-            	Toast.makeText(OPTelemetryService.this, (String) msg.obj, Toast.LENGTH_SHORT).show();
-            	break;
-			default:
-				System.out.println(msg.toString());
-				throw new Error("Invalid message");
+	void handleMessage(Message msg) {
+		switch(msg.arg1) {
+		case MSG_START:
+			stopSelf(msg.arg2);
+			break;
+		case MSG_CONNECT:
+			terminate = false;
+			int connection_type;
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(OPTelemetryService.this);
+			try {
+				connection_type = Integer.decode(prefs.getString("connection_type", ""));
+			} catch (NumberFormatException e) {
+				connection_type = 0;
 			}
+
+			switch(connection_type) {
+			case 0: // No connection
+				return;
+			case 1:
+				Toast.makeText(getApplicationContext(), "Attempting fake connection", Toast.LENGTH_SHORT).show();
+				activeTelem = new FakeTelemetryThread();
+				break;
+			case 2:
+				Toast.makeText(getApplicationContext(), "Attempting BT connection", Toast.LENGTH_SHORT).show();
+				activeTelem = new BTTelemetryThread();
+				break;
+			case 3:
+				Toast.makeText(getApplicationContext(), "Attempting TCP connection", Toast.LENGTH_SHORT).show();
+				activeTelem = new TcpTelemetryThread();
+				break;
+			default:
+				throw new Error("Unsupported");
+			}
+			activeTelem.start();
+			break;
+		case MSG_DISCONNECT:
+			Toast.makeText(getApplicationContext(), "Disconnect requested", Toast.LENGTH_SHORT).show();
+			terminate = true;
+			activeTelem.interrupt();
+			try {
+				activeTelem.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			activeTelem = null;
+
+			Intent intent = new Intent();
+			intent.setAction(INTENT_ACTION_DISCONNECTED);
+			sendBroadcast(intent,null);
+
+			stopSelf();
+
+			break;
+		case MSG_TOAST:
+			Toast.makeText(this, (String) msg.obj, Toast.LENGTH_SHORT).show();
+			break;
+		default:
+			System.out.println(msg.toString());
+			throw new Error("Invalid message");
 		}
-	};
+	}
 
 	/**
 	 * Called when the service starts.  It creates a thread to handle messages (e.g. connect and disconnect)
@@ -160,15 +171,12 @@ public class OPTelemetryService extends Service {
 	public void startup() {
 		Toast.makeText(getApplicationContext(), "Telemetry service starting", Toast.LENGTH_SHORT).show();
 
-		if (DEBUG)
-			Log.d(TAG, "startup()");
-
 		thread = new HandlerThread("TelemetryServiceHandler", Process.THREAD_PRIORITY_BACKGROUND);
 		thread.start();
 
 		// Get the HandlerThread's Looper and use it for our Handler
 		mServiceLooper = thread.getLooper();
-		mServiceHandler = new ServiceHandler(mServiceLooper);
+		mServiceHandler = new ServiceHandler(this, mServiceLooper);
 
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(OPTelemetryService.this);
 		if(prefs.getBoolean("autoconnect", false)) {
@@ -190,16 +198,13 @@ public class OPTelemetryService extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		// Currently only using as bound service
-		if (DEBUG)
-			Log.d(TAG, "onStartCommand()");
+
 		// If we get killed, after returning from here, restart
 		return START_STICKY;
 	}
 
 	@Override
 	public IBinder onBind(Intent intent) {
-		if (DEBUG)
-			Log.d(TAG, "onBind()");
 		return mBinder;
 	}
 
@@ -360,7 +365,7 @@ public class OPTelemetryService extends Service {
 			mon.addObserver(new Observer() {
 				@Override
 				public void update(Observable arg0, Object arg1) {
-					System.out.println("Mon updated. Connected: " + mon.getConnected() + " objects updated: " + mon.getObjectsUpdated());
+					if (DEBUG) Log.d(TAG, "Mon updated. Connected: " + mon.getConnected() + " objects updated: " + mon.getObjectsUpdated());
 					if(mon.getConnected() /*&& mon.getObjectsUpdated()*/) {
 						Intent intent = new Intent();
 						intent.setAction(INTENT_ACTION_CONNECTED);
@@ -439,8 +444,8 @@ public class OPTelemetryService extends Service {
 			mon.addObserver(new Observer() {
 				@Override
 				public void update(Observable arg0, Object arg1) {
-					System.out.println("Mon updated. Connected: " + mon.getConnected() + " objects updated: " + mon.getObjectsUpdated());
-					if(mon.getConnected() /*&& mon.getObjectsUpdated()*/) {
+					if (DEBUG) Log.d(TAG, "Mon updated. Connected: " + mon.getConnected() + " objects updated: " + mon.getObjectsUpdated());
+					if(mon.getConnected()) {
 						Intent intent = new Intent();
 						intent.setAction(INTENT_ACTION_CONNECTED);
 						sendBroadcast(intent,null);

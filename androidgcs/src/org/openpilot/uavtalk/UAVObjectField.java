@@ -174,9 +174,10 @@ public class UAVObjectField {
             		Integer val = (Integer) getValue(index);
             		dataOut.put(val.byteValue());
             	}
+            	break;
             case STRING:
             	// TODO: Implement strings
-            	throw new Error("Strings not yet implemented");
+            	throw new Error("Strings not yet implemented.  Field name: " + getName());
         }
         // Done
         return getNumBytes();

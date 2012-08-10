@@ -87,9 +87,9 @@ public class Telemetry {
     /**
      * Constructor
      */
-    public Telemetry(UAVTalk utalk, UAVObjectManager objMngr)
+    public Telemetry(UAVTalk utalkIn, UAVObjectManager objMngr)
     {
-        this.utalk = utalk;
+        this.utalk = utalkIn;
         this.objMngr = objMngr;
 
         // Process all objects in the list
@@ -113,16 +113,28 @@ public class Telemetry {
         });
 
         // Listen to transaction completions
-        utalk.addObserver(new Observer() {
+        this.utalk.setOnTransactionCompletedListener(
+        		this.utalk.new OnTransactionCompletedListener() {
 			@Override
-			public void update(Observable observable, Object data) {
-				try {
-					transactionCompleted((UAVObject) data);
+			void TransactionSucceeded(UAVObject data) {
+	        	try {
+					transactionCompleted(data);
 				} catch (IOException e) {
 					// Disconnect when stream fails
-					observable.deleteObserver(this);
+					utalk.setOnTransactionCompletedListener(null);
 				}
-			}
+	        }
+			@Override
+			void TransactionFailed(UAVObject data) {
+	        	try {
+	        		Log.d(TAG, "TransactionFailed(" + data.getName() + ")");
+					transactionCompleted(data);
+				} catch (IOException e) {
+					// Disconnect when stream fails
+					utalk.setOnTransactionCompletedListener(null);
+				}
+	        }
+
         });
 
         // Get GCS stats object
@@ -475,7 +487,6 @@ public class Telemetry {
                 ++txErrors;
                 obj.transactionCompleted(false);
                 Log.w(TAG,"Telemetry: priority event queue is full, event lost " + obj.getName());
-               new Exception().printStackTrace();
             }
         }
         else

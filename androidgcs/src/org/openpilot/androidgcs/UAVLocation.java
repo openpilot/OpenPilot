@@ -23,14 +23,18 @@
 
 package org.openpilot.androidgcs;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Set;
 
+import org.openpilot.androidgcs.fragments.ObjectManagerFragment;
 import org.openpilot.androidgcs.telemetry.OPTelemetryService;
 import org.openpilot.androidgcs.telemetry.OPTelemetryService.LocalBinder;
 import org.openpilot.androidgcs.telemetry.OPTelemetryService.TelemTask;
-import org.openpilot.uavtalk.UAVDataObject;
 import org.openpilot.uavtalk.UAVObject;
 import org.openpilot.uavtalk.UAVObjectManager;
 
@@ -46,6 +50,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.Menu;
@@ -73,6 +78,7 @@ public class UAVLocation extends MapActivity
 	UAVObjectManager objMngr;
     boolean mBound = false;
     boolean mConnected = false;
+    BroadcastReceiver connectedReceiver;
 	org.openpilot.androidgcs.telemetry.OPTelemetryService.LocalBinder binder;
 
     GeoPoint homeLocation;
@@ -103,36 +109,6 @@ public class UAVLocation extends MapActivity
 
 		mapView.postInvalidate();
 
-		// ObjectManager related stuff (can't inherit standard class)
-		BroadcastReceiver connectedReceiver = new BroadcastReceiver() {
-			@Override
-			public void onReceive(Context context, Intent intent) {
-				Log.d(TAG, "Received intent");
-				TelemTask task;
-				if(intent.getAction().compareTo(OPTelemetryService.INTENT_ACTION_CONNECTED) == 0) {
-
-					if(binder  == null)
-						return;
-					if((task = binder.getTelemTask(0)) == null)
-						return;
-					objMngr = task.getObjectManager();
-					mConnected = true;
-					onOPConnected();
-					Log.d(TAG, "Connected()");
-				} else if (intent.getAction().compareTo(OPTelemetryService.INTENT_ACTION_DISCONNECTED) == 0) {
-					objMngr = null;
-					mConnected = false;
-					onOPDisconnected();
-					Log.d(TAG, "Disonnected()");
-				}
-			}
-		};
-
-		IntentFilter filter = new IntentFilter();
-		filter.addCategory(OPTelemetryService.INTENT_CATEGORY_GCS);
-		filter.addAction(OPTelemetryService.INTENT_ACTION_CONNECTED);
-		filter.addAction(OPTelemetryService.INTENT_ACTION_DISCONNECTED);
-		registerReceiver(connectedReceiver, filter);
 	}
 
 	//@Override
@@ -192,40 +168,10 @@ public class UAVLocation extends MapActivity
 
 	void onOPConnected() {
 		UAVObject obj = objMngr.getObject("HomeLocation");
-		if(obj != null)
-			obj.addUpdatedObserver(new Observer() {
-				@Override
-				public void update(Observable observable, Object data) {
-					UAVDataObject obj = (UAVDataObject) data;
-					Double lat = obj.getField("Latitude").getDouble() / 10;
-					Double lon = obj.getField("Longitude").getDouble() / 10;
-					homeLocation = new GeoPoint(lat.intValue(), lon.intValue());
-					runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							mapController.setCenter(homeLocation);
-						}
-					});
-					System.out.println("HomeLocation: " + homeLocation.toString());
-				}
-			});
-		obj.updateRequested();
+		registerObjectUpdates(obj);
 
 		obj = objMngr.getObject("PositionActual");
-		if(obj != null)
-			obj.addUpdatedObserver(new Observer() {
-				@Override
-				public void update(Observable observable, Object data) {
-					uavLocation = getUavLocation();
-					runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							mapView.invalidate();
-						}
-					});
-				}
-			});
-
+		registerObjectUpdates(obj);
 	}
 
 	private GeoPoint getUavLocation() {
@@ -260,7 +206,7 @@ public class UAVLocation extends MapActivity
 	}
 
 	void onOPDisconnected() {
-
+		unregisterObjectUpdates();
 	}
 
 	@Override
@@ -291,8 +237,54 @@ public class UAVLocation extends MapActivity
 	@Override
 	public void onStart() {
 		super.onStart();
+		// ObjectManager related stuff (can't inherit standard class)
+		connectedReceiver = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				Log.d(TAG, "Received intent");
+				TelemTask task;
+				if(intent.getAction().compareTo(OPTelemetryService.INTENT_ACTION_CONNECTED) == 0) {
+
+					if(binder  == null)
+						return;
+					if((task = binder.getTelemTask(0)) == null)
+						return;
+					objMngr = task.getObjectManager();
+					mConnected = true;
+					onOPConnected();
+					Log.d(TAG, "Connected()");
+				} else if (intent.getAction().compareTo(OPTelemetryService.INTENT_ACTION_DISCONNECTED) == 0) {
+					objMngr = null;
+					mConnected = false;
+					onOPDisconnected();
+					Log.d(TAG, "Disonnected()");
+				}
+			}
+		};
+
+		IntentFilter filter = new IntentFilter();
+		filter.addCategory(OPTelemetryService.INTENT_CATEGORY_GCS);
+		filter.addAction(OPTelemetryService.INTENT_ACTION_CONNECTED);
+		filter.addAction(OPTelemetryService.INTENT_ACTION_DISCONNECTED);
+		registerReceiver(connectedReceiver, filter);
+
 		Intent intent = new Intent(this, OPTelemetryService.class);
 		bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+	}
+
+	/**
+	 * When stopping disconnect form the service and the broadcast receiver
+	 */
+	@Override
+	public void onStop() {
+		super.onStop();
+		if (DEBUG) Log.d(TAG, "onStop()");
+		unbindService(mConnection);
+		unregisterReceiver(connectedReceiver);
+		connectedReceiver = null;
+
+		// TODO: The register and unregister probably should move to onPause / onResume
+		unregisterObjectUpdates();
 	}
 
 	public void onBind() {
@@ -330,4 +322,96 @@ public class UAVLocation extends MapActivity
 			onOPDisconnected();
 		}
 	};
+
+/******* STRAIGHT COPY PASTE FROM ObjectManagerActivity *************/
+	/**
+	 * Called whenever any objects subscribed to via registerObjects
+	 */
+	protected void objectUpdated(UAVObject obj) {
+		if (obj == null)
+			return;
+		if (obj.getName().compareTo("HomeLocation") == 0) {
+			Double lat = obj.getField("Latitude").getDouble() / 10;
+			Double lon = obj.getField("Longitude").getDouble() / 10;
+			homeLocation = new GeoPoint(lat.intValue(), lon.intValue());
+			mapController.setCenter(homeLocation);
+		} else if (obj.getName().compareTo("PositionActual") == 0) {
+			uavLocation = getUavLocation();
+			mapView.invalidate();
+		}
+	}
+
+	/**
+	 * A message handler and a custom Observer to use it which calls
+	 * objectUpdated with the right object type
+	 */
+	final Handler uavobjHandler = new Handler();
+	private class ActivityUpdatedObserver implements Observer  {
+		UAVObject obj;
+		ActivityUpdatedObserver(UAVObject obj) { this.obj = obj; };
+		@Override
+		public void update(Observable observable, Object data) {
+			uavobjHandler.post(new Runnable() {
+				@Override
+				public void run() { objectUpdated(obj); }
+			});
+		}
+	};
+	private class FragmentUpdatedObserver implements Observer  {
+		UAVObject obj;
+		ObjectManagerFragment frag;
+		FragmentUpdatedObserver(UAVObject obj, ObjectManagerFragment frag) {
+			this.obj = obj;
+			this.frag = frag;
+		};
+		@Override
+		public void update(Observable observable, Object data) {
+			uavobjHandler.post(new Runnable() {
+				@Override
+				public void run() { frag.objectUpdated(obj); }
+			});
+		}
+	};
+
+
+	/**
+	 * Register an activity to receive updates from this object
+	 *
+	 * the objectUpdated() method will be called in the original UI thread
+	 */
+	HashMap<Observer, UAVObject> listeners = new HashMap<Observer,UAVObject>();
+	protected void registerObjectUpdates(UAVObject object) {
+		Observer o = new ActivityUpdatedObserver(object);
+		object.addUpdatedObserver(o);
+		listeners.put(o,  object);
+	}
+	/**
+	 * Unregister all the objects connected to this activity
+	 */
+	protected void unregisterObjectUpdates()
+	{
+		Set<Observer> s = listeners.keySet();
+		Iterator<Observer> i = s.iterator();
+		while (i.hasNext()) {
+			Observer o = i.next();
+			UAVObject obj = listeners.get(o);
+			obj.removeUpdatedObserver(o);
+		}
+		listeners.clear();
+	}
+	public void registerObjectUpdates(UAVObject object,
+			ObjectManagerFragment frag) {
+		Observer o = new FragmentUpdatedObserver(object, frag);
+		object.addUpdatedObserver(o);
+		listeners.put(o, object);
+	}
+	protected void registerObjectUpdates(List<List<UAVObject>> objects) {
+		ListIterator<List<UAVObject>> li = objects.listIterator();
+		while(li.hasNext()) {
+			ListIterator<UAVObject> li2 = li.next().listIterator();
+			while(li2.hasNext())
+				registerObjectUpdates(li2.next());
+		}
+	}
+
 }

@@ -313,26 +313,23 @@ public class Telemetry {
         while(li.hasNext())
         {
         	obj = li.next();
-            // TODO: Disconnect all previous observers from telemetry.  This is imortant as this can
+
+            // Disconnect all previous observers from telemetry.  This is imortant as this can
         	// be called multiple times
+        	obj.removeUnpackedObserver(unpackedObserver);
+        	obj.removeUpdatedAutoObserver(updatedAutoObserver);
+        	obj.removeUpdatedManualObserver(updatedManualObserver);
+        	obj.removeUpdateRequestedObserver(updatedRequestedObserver);
 
             // Connect only the selected events
             if ( (eventMask&EV_UNPACKED) != 0)
-            {
             	obj.addUnpackedObserver(unpackedObserver);
-            }
             if ( (eventMask&EV_UPDATED) != 0)
-            {
             	obj.addUpdatedAutoObserver(updatedAutoObserver);
-            }
             if ( (eventMask&EV_UPDATED_MANUAL) != 0)
-            {
             	obj.addUpdatedManualObserver(updatedManualObserver);
-            }
             if ( (eventMask&EV_UPDATE_REQ) != 0)
-            {
             	obj.addUpdateRequestedObserver(updatedRequestedObserver);
-            }
         }
     }
 

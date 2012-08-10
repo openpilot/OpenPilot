@@ -158,8 +158,8 @@ public class TelemetryMonitor extends Observable {
 			if (DEBUG)
 				Log.d(TAG, "All objects retrieved: Connected Successfully");
 			objects_updated = true;
-			setChanged();
-			notifyObservers();
+			//setChanged();
+			//notifyObservers();
 			return;
 		}
 		// Get next object from the queue

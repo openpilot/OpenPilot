@@ -31,12 +31,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Observable;
 
 import junit.framework.Assert;
 import android.util.Log;
 
-public class UAVTalk extends Observable {
+public class UAVTalk {
 
 	static final String TAG = "UAVTalk";
 	public static int LOGLEVEL = 0;
@@ -673,6 +672,7 @@ public class UAVTalk extends Observable {
 				(respObj.getInstID() == obj.getInstID() || respAllInstances)) {
 			if (transactionListener != null)
 				transactionListener.TransactionFailed(obj);
+			respObj = null;
 		}
 	}
 
@@ -686,9 +686,7 @@ public class UAVTalk extends Observable {
 				&& (respObj.getInstID() == obj.getInstID() || respAllInstances)) {
 			if (transactionListener != null)
 				transactionListener.TransactionSucceeded(obj);
-			/*respObj = null;
-			setChanged();
-			notifyObservers(obj);*/
+			respObj = null;
 		}
 	}
 

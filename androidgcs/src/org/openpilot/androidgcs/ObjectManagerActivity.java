@@ -29,10 +29,13 @@
  */
 package org.openpilot.androidgcs;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Set;
 
 import org.openpilot.androidgcs.fragments.ObjectManagerFragment;
 import org.openpilot.androidgcs.telemetry.OPTelemetryService;
@@ -128,13 +131,31 @@ public abstract class ObjectManagerActivity extends Activity {
 	 *
 	 * the objectUpdated() method will be called in the original UI thread
 	 */
+	HashMap<Observer, UAVObject> listeners = new HashMap<Observer,UAVObject>();
 	protected void registerObjectUpdates(UAVObject object) {
-		object.addUpdatedObserver(new ActivityUpdatedObserver(object));
+		Observer o = new ActivityUpdatedObserver(object);
+		object.addUpdatedObserver(o);
+		listeners.put(o,  object);
 	}
-
+	/**
+	 * Unregister all the objects connected to this activity
+	 */
+	protected void unregisterObjectUpdates()
+	{
+		Set<Observer> s = listeners.keySet();
+		Iterator<Observer> i = s.iterator();
+		while (i.hasNext()) {
+			Observer o = i.next();
+			UAVObject obj = listeners.get(o);
+			obj.removeUpdatedObserver(o);
+		}
+		listeners.clear();
+	}
 	public void registerObjectUpdates(UAVObject object,
 			ObjectManagerFragment frag) {
-		object.addUpdatedObserver(new FragmentUpdatedObserver(object, frag));
+		Observer o = new FragmentUpdatedObserver(object, frag);
+		object.addUpdatedObserver(o);
+		listeners.put(o, object);
 	}
 	protected void registerObjectUpdates(List<List<UAVObject>> objects) {
 		ListIterator<List<UAVObject>> li = objects.listIterator();
@@ -206,6 +227,9 @@ public abstract class ObjectManagerActivity extends Activity {
 
 		// Providing a null update triggers a disconnect on fragments
 		connectionListeners.disconnected();
+
+		// Disconnect from any UAVO updates
+		unregisterObjectUpdates();
 	}
 
 	@Override
@@ -294,6 +318,9 @@ public abstract class ObjectManagerActivity extends Activity {
 		unbindService(mConnection);
 		unregisterReceiver(connectedReceiver);
 		connectedReceiver = null;
+
+		// Disconnect from any UAVO updates
+		unregisterObjectUpdates();
 	}
 
 	public void onBind() {

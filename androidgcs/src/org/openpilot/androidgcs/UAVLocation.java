@@ -73,6 +73,7 @@ public class UAVLocation extends MapActivity
 	UAVObjectManager objMngr;
     boolean mBound = false;
     boolean mConnected = false;
+    BroadcastReceiver connectedReceiver;
 	org.openpilot.androidgcs.telemetry.OPTelemetryService.LocalBinder binder;
 
     GeoPoint homeLocation;
@@ -103,36 +104,6 @@ public class UAVLocation extends MapActivity
 
 		mapView.postInvalidate();
 
-		// ObjectManager related stuff (can't inherit standard class)
-		BroadcastReceiver connectedReceiver = new BroadcastReceiver() {
-			@Override
-			public void onReceive(Context context, Intent intent) {
-				Log.d(TAG, "Received intent");
-				TelemTask task;
-				if(intent.getAction().compareTo(OPTelemetryService.INTENT_ACTION_CONNECTED) == 0) {
-
-					if(binder  == null)
-						return;
-					if((task = binder.getTelemTask(0)) == null)
-						return;
-					objMngr = task.getObjectManager();
-					mConnected = true;
-					onOPConnected();
-					Log.d(TAG, "Connected()");
-				} else if (intent.getAction().compareTo(OPTelemetryService.INTENT_ACTION_DISCONNECTED) == 0) {
-					objMngr = null;
-					mConnected = false;
-					onOPDisconnected();
-					Log.d(TAG, "Disonnected()");
-				}
-			}
-		};
-
-		IntentFilter filter = new IntentFilter();
-		filter.addCategory(OPTelemetryService.INTENT_CATEGORY_GCS);
-		filter.addAction(OPTelemetryService.INTENT_ACTION_CONNECTED);
-		filter.addAction(OPTelemetryService.INTENT_ACTION_DISCONNECTED);
-		registerReceiver(connectedReceiver, filter);
 	}
 
 	//@Override
@@ -291,8 +262,51 @@ public class UAVLocation extends MapActivity
 	@Override
 	public void onStart() {
 		super.onStart();
+		// ObjectManager related stuff (can't inherit standard class)
+		connectedReceiver = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				Log.d(TAG, "Received intent");
+				TelemTask task;
+				if(intent.getAction().compareTo(OPTelemetryService.INTENT_ACTION_CONNECTED) == 0) {
+
+					if(binder  == null)
+						return;
+					if((task = binder.getTelemTask(0)) == null)
+						return;
+					objMngr = task.getObjectManager();
+					mConnected = true;
+					onOPConnected();
+					Log.d(TAG, "Connected()");
+				} else if (intent.getAction().compareTo(OPTelemetryService.INTENT_ACTION_DISCONNECTED) == 0) {
+					objMngr = null;
+					mConnected = false;
+					onOPDisconnected();
+					Log.d(TAG, "Disonnected()");
+				}
+			}
+		};
+
+		IntentFilter filter = new IntentFilter();
+		filter.addCategory(OPTelemetryService.INTENT_CATEGORY_GCS);
+		filter.addAction(OPTelemetryService.INTENT_ACTION_CONNECTED);
+		filter.addAction(OPTelemetryService.INTENT_ACTION_DISCONNECTED);
+		registerReceiver(connectedReceiver, filter);
+
 		Intent intent = new Intent(this, OPTelemetryService.class);
 		bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+	}
+
+	/**
+	 * When stopping disconnect form the service and the broadcast receiver
+	 */
+	@Override
+	public void onStop() {
+		super.onStop();
+		if (DEBUG) Log.d(TAG, "onStop()");
+		unbindService(mConnection);
+		unregisterReceiver(connectedReceiver);
+		connectedReceiver = null;
 	}
 
 	public void onBind() {

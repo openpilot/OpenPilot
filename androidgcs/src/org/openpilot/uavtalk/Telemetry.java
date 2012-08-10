@@ -487,7 +487,6 @@ public class Telemetry {
                 ++txErrors;
                 obj.transactionCompleted(false);
                 Log.w(TAG,"Telemetry: priority event queue is full, event lost " + obj.getName());
-               new Exception().printStackTrace();
             }
         }
         else

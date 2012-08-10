@@ -307,11 +307,11 @@ void MainWindow::loadStyleSheet(QString name) {
     directory.cd("openpilotgcs");
     directory.cd("stylesheets");
 #ifdef Q_OS_MAC
-    QFile data(directory.absolutePath()+"/"+name+"_macos.qss");
+    QFile data(directory.absolutePath()+QDir::separator()+name+"_macos.qss");
 #elif defined(Q_OS_LINUX)
-    QFile data(directory.absolutePath()+"/"+name+"_linux.qss");
+    QFile data(directory.absolutePath()+QDir::separator()+name+"_linux.qss");
 #else
-    QFile data(directory.absolutePath()+"/"+name+"_windows.qss");
+    QFile data(directory.absolutePath()+QDir::separator()+name+"_windows.qss");
 #endif
     QString style;
     /* ...to open the file */
@@ -327,7 +327,7 @@ void MainWindow::loadStyleSheet(QString name) {
         qDebug()<<"Loaded stylesheet:"<<style;
     }
     else
-        qDebug()<<"Failed to openstylesheet file"<<directory.absolutePath();
+        qDebug()<<"Failed to openstylesheet file"<<directory.absolutePath()<<name;
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -1236,7 +1236,11 @@ void MainWindow::saveSettings(QSettings* qs)
 
     m_actionManager->saveSettings(qs);
     m_generalSettings->saveSettings(qs);
-
+    qs->beginGroup("General");
+    qs->setValue("Description",m_settings->value("Description","None"));
+    qs->setValue("Details",m_settings->value("Details","None"));
+    qs->setValue("StyleSheet",m_settings->value("StyleSheet","default"));
+    qs->endGroup();
 }
 
 void MainWindow::readSettings(IConfigurablePlugin* plugin, QSettings* qs)

@@ -5,11 +5,13 @@
         <item>Fake</item>
         <item>Bluetooth</item>
         <item>Network</item>
+        <item>HID</item>
     </string-array>
     <string-array name="connectTypeValues">
         <item>0</item>
         <item>1</item>
         <item>2</item>
         <item>3</item>
-    </string-array>
+        <item>4</item>
+   </string-array>
 </resources>

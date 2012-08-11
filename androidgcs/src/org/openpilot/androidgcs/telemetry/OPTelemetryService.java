@@ -56,9 +56,9 @@ public class OPTelemetryService extends Service {
 
 	// Logging settings
 	private final String TAG = OPTelemetryService.class.getSimpleName();
-	public static int LOGLEVEL = 0;
-	public static boolean WARN = LOGLEVEL > 1;
-	public static boolean DEBUG = LOGLEVEL > 0;
+	public static int LOGLEVEL = 2;
+	public static boolean DEBUG = LOGLEVEL > 1;
+	public static boolean WARN = LOGLEVEL > 0;
 
 	// Intent category
 	public final static String INTENT_CATEGORY_GCS        = "org.openpilot.intent.category.GCS";
@@ -131,6 +131,10 @@ public class OPTelemetryService extends Service {
 			case 3:
 				Toast.makeText(getApplicationContext(), "Attempting TCP connection", Toast.LENGTH_SHORT).show();
 				activeTelem = new TcpTelemetryThread();
+				break;
+			case 4:
+				Toast.makeText(getApplicationContext(), "Attempting USB HID connection", Toast.LENGTH_SHORT).show();
+				activeTelem = new HidTelemetryThread();
 				break;
 			default:
 				throw new Error("Unsupported");
@@ -476,6 +480,120 @@ public class OPTelemetryService extends Service {
 
 			// Finally close the stream if it is still open
 			tcp.disconnect();
+
+			if (DEBUG) Log.d(TAG, "UAVTalk stream disconnected");
+			toastMessage("TCP Thread finished");
+		}
+
+	};
+
+	private class HidTelemetryThread extends Thread implements TelemTask {
+
+		private final UAVObjectManager objMngr;
+		private UAVTalk uavTalk;
+		private Telemetry tel;
+		private TelemetryMonitor mon;
+
+		@Override
+		public UAVObjectManager getObjectManager() { return objMngr; };
+
+		HidTelemetryThread() {
+			objMngr = new UAVObjectManager();
+			UAVObjectsInitialize.register(objMngr);
+		}
+
+		@Override
+		public void run() {
+			if (DEBUG) Log.d(TAG, "HID Telemetry Thread started");
+
+			Looper.prepare();
+
+			final HidUAVTalk hid = new HidUAVTalk(OPTelemetryService.this);
+			hid.connect(objMngr);
+
+			try {
+				Thread.sleep(200);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			if( !hid.getConnected() ) {
+				toastMessage("HID connection failed");
+				return;
+			}
+
+			hid.readData();
+			hid.readData();
+			hid.readData();
+			hid.readData();
+
+			uavTalk = hid.getUavtalk();
+			tel = new Telemetry(uavTalk, objMngr);
+			mon = new TelemetryMonitor(objMngr,tel);
+			mon.addObserver(new Observer() {
+				@Override
+				public void update(Observable arg0, Object arg1) {
+					if (DEBUG) Log.d(TAG, "Mon updated. Connected: " + mon.getConnected() + " objects updated: " + mon.getObjectsUpdated());
+					if(mon.getConnected()) {
+						Intent intent = new Intent();
+						intent.setAction(INTENT_ACTION_CONNECTED);
+						sendBroadcast(intent,null);
+					}
+				}
+			});
+
+			// Read data from HID and push it ont the UAVTalk input stream
+			Thread t = new Thread(this) {
+				@Override
+				public void run() {
+					while(!terminate) {
+						hid.readData();
+					}
+				}
+			};
+			t.start();
+
+			// Process any bytes that have been pushed onto the UAVTalk stream
+			if (DEBUG) Log.d(TAG, "Entering UAVTalk processing loop");
+			while( !terminate ) {
+				try {
+					if( !uavTalk.processInputStream() )
+						break;
+				} catch (IOException e) {
+					e.printStackTrace();
+					toastMessage("TCP Stream interrupted");
+					break;
+				}
+			}
+
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+
+			Looper.myLooper().quit();
+
+			// Stop the HID reading loop
+			t.interrupt();
+			try {
+				t.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
+			hid.disconnect();
+
+			// Shut down all the attached
+			mon.stopMonitor();
+			mon = null;
+			tel.stopTelemetry();
+			tel = null;
+
+			// Finally close the stream if it is still open
+			hid.disconnect();
 
 			if (DEBUG) Log.d(TAG, "UAVTalk stream disconnected");
 			toastMessage("TCP Thread finished");

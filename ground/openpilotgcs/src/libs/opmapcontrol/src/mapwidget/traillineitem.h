@@ -44,8 +44,6 @@ namespace mapcontrol
                 enum { Type = UserType + 7 };
         TrailLineItem(internals::PointLatLng const& coord1,internals::PointLatLng const& coord2, QBrush color, QGraphicsItem* parent);
         int type() const;
-      //  void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-       //             QWidget *widget);
         internals::PointLatLng coord1;
         internals::PointLatLng coord2;
     private:

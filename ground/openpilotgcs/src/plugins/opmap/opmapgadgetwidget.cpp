@@ -1572,7 +1572,8 @@ void OPMapGadgetWidget::onShowUAVAct_toggled(bool show)
 		return;
 
     m_map->UAV->setVisible(show);
-    m_map->GPS->setVisible(show);
+    if(m_map->GPS)
+        m_map->GPS->setVisible(show);
 }
 
 void OPMapGadgetWidget::onShowTrailAct_toggled(bool show)
@@ -1581,7 +1582,8 @@ void OPMapGadgetWidget::onShowTrailAct_toggled(bool show)
 		return;
 
     m_map->UAV->SetShowTrail(show);
-    m_map->GPS->SetShowTrail(show);
+    if(m_map->GPS)
+        m_map->GPS->SetShowTrail(show);
 }
 
 void OPMapGadgetWidget::onShowTrailLineAct_toggled(bool show)
@@ -1590,7 +1592,8 @@ void OPMapGadgetWidget::onShowTrailLineAct_toggled(bool show)
 		return;
 
     m_map->UAV->SetShowTrailLine(show);
-    m_map->GPS->SetShowTrailLine(show);
+    if(m_map->GPS)
+        m_map->GPS->SetShowTrailLine(show);
 }
 
 void OPMapGadgetWidget::onMapModeActGroup_triggered(QAction *action)
@@ -2044,8 +2047,6 @@ bool OPMapGadgetWidget::getUAVPosition(double &latitude, double &longitude, doub
     latitude = LLA[0];
     longitude = LLA[1];
     altitude = LLA[2];
-
-    qDebug()<<  " " << latitude << " " << longitude << " " << altitude;
 
     if (latitude != latitude) latitude = 0; // nan detection
     else if (latitude >  90) latitude =  90;

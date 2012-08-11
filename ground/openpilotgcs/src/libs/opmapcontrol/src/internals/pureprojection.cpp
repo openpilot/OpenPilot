@@ -221,10 +221,10 @@ Point PureProjection::FromLatLngToPixel(const PointLatLng &p,const int &zoom)
     double PureProjection::courseBetweenLatLng(PointLatLng const& p1,PointLatLng const& p2)
     {
 
-        double lon1=p1.Lng()* (M_PI / 180);;
-        double lat1=p1.Lat()* (M_PI / 180);;
-        double lon2=p2.Lng()* (M_PI / 180);;
-        double lat2=p2.Lat()* (M_PI / 180);;
+        double lon1=p1.Lng()* (M_PI / 180);
+        double lat1=p1.Lat()* (M_PI / 180);
+        double lon2=p2.Lng()* (M_PI / 180);
+        double lat2=p2.Lat()* (M_PI / 180);
 
         return 2*M_PI-myfmod(atan2(sin(lon1-lon2)*cos(lat2),
                        cos(lat1)*sin(lat2)-sin(lat1)*cos(lat2)*cos(lon1-lon2)), 2*M_PI);

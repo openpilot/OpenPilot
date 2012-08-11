@@ -27,7 +27,6 @@
 #include "waypointcircle.h"
 #include <math.h>
 #include "homeitem.h"
-const qreal Pi = 3.14;
 
 namespace mapcontrol
 {
@@ -71,17 +70,17 @@ void WayPointCircle::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     painter->setBrush(myColor);
     double angle =0;
     if(!myClockWise)
-        angle+=Pi;
+        angle+=M_PI;
 
-        QPointF arrowP1 = p1 + QPointF(sin(angle + Pi / 3) * arrowSize,
-                                        cos(angle + Pi / 3) * arrowSize);
-        QPointF arrowP2 = p1 + QPointF(sin(angle + Pi - Pi / 3) * arrowSize,
-                                        cos(angle + Pi - Pi / 3) * arrowSize);
+        QPointF arrowP1 = p1 + QPointF(sin(angle + M_PI / 3) * arrowSize,
+                                        cos(angle + M_PI / 3) * arrowSize);
+        QPointF arrowP2 = p1 + QPointF(sin(angle + M_PI - M_PI / 3) * arrowSize,
+                                        cos(angle + M_PI - M_PI / 3) * arrowSize);
 
-        QPointF arrowP21 = p2 + QPointF(sin(angle + Pi + Pi / 3) * arrowSize,
-                                        cos(angle + Pi + Pi / 3) * arrowSize);
-        QPointF arrowP22 = p2 + QPointF(sin(angle + Pi + Pi - Pi / 3) * arrowSize,
-                                        cos(angle + Pi + Pi - Pi / 3) * arrowSize);
+        QPointF arrowP21 = p2 + QPointF(sin(angle + M_PI + M_PI / 3) * arrowSize,
+                                        cos(angle + M_PI + M_PI / 3) * arrowSize);
+        QPointF arrowP22 = p2 + QPointF(sin(angle + M_PI + M_PI - M_PI / 3) * arrowSize,
+                                        cos(angle + M_PI + M_PI - M_PI / 3) * arrowSize);
 
         arrowHead.clear();
         arrowHead << p1 << arrowP1 << arrowP2;

@@ -33,7 +33,8 @@
 namespace mapcontrol
 {
 
-    OPMapWidget::OPMapWidget(QWidget *parent, Configuration *config):QGraphicsView(parent),configuration(config),UAV(0),GPS(0),Home(0),followmouse(true),compass(0),showuav(false),showhome(false),showDiag(false),diagGraphItem(0),diagTimer(0)
+    OPMapWidget::OPMapWidget(QWidget *parent, Configuration *config):QGraphicsView(parent),configuration(config),UAV(0),GPS(0),Home(0)
+      ,followmouse(true),compass(0),showuav(false),showhome(false),showDiag(false),diagGraphItem(0),diagTimer(0),overlayOpacity(1)
     {
         setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         core=new internals::Core;
@@ -59,7 +60,6 @@ namespace mapcontrol
         SetShowDiagnostics(showDiag);
         this->setMouseTracking(followmouse);
         SetShowCompass(true);
-        overlayOpacity=1;
 
     }
     void OPMapWidget::SetShowDiagnostics(bool const& value)
@@ -111,7 +111,7 @@ namespace mapcontrol
         if(!from|!to)
             return NULL;
         WayPointLine* ret= new WayPointLine(from,to,map,color);
-        setOverlayOpacity(overlayOpacity);
+        ret->setOpacity(overlayOpacity);
         return ret;
     }
     WayPointLine * OPMapWidget::WPLineCreate(HomeItem *from, WayPointItem *to,QColor color)
@@ -119,7 +119,7 @@ namespace mapcontrol
         if(!from|!to)
             return NULL;
         WayPointLine* ret= new WayPointLine(from,to,map,color);
-        setOverlayOpacity(overlayOpacity);
+        ret->setOpacity(overlayOpacity);
         return ret;
     }
     WayPointCircle * OPMapWidget::WPCircleCreate(WayPointItem *center, WayPointItem *radius, bool clockwise,QColor color)
@@ -127,7 +127,7 @@ namespace mapcontrol
         if(!center|!radius)
             return NULL;
         WayPointCircle* ret= new WayPointCircle(center,radius,clockwise,map,color);
-        setOverlayOpacity(overlayOpacity);
+        ret->setOpacity(overlayOpacity);
         return ret;
     }
 
@@ -136,7 +136,7 @@ namespace mapcontrol
         if(!center|!radius)
             return NULL;
         WayPointCircle* ret= new WayPointCircle(center,radius,clockwise,map,color);
-        setOverlayOpacity(overlayOpacity);
+        ret->setOpacity(overlayOpacity);
         return ret;
     }
     void OPMapWidget::SetShowUAV(const bool &value)
@@ -147,14 +147,14 @@ namespace mapcontrol
             UAV->setParentItem(map);
             connect(this,SIGNAL(UAVLeftSafetyBouble(internals::PointLatLng)),UAV,SIGNAL(UAVLeftSafetyBouble(internals::PointLatLng)));
             connect(this,SIGNAL(UAVReachedWayPoint(int,WayPointItem*)),UAV,SIGNAL(UAVReachedWayPoint(int,WayPointItem*)));
-            setOverlayOpacity(overlayOpacity);
+            UAV->setOpacity(overlayOpacity);
         }
         else if(!value)
         {
             if(UAV!=0)
             {
                 delete UAV;
-                UAV=0;
+                UAV=NULL;
             }
 
         }
@@ -186,14 +186,20 @@ namespace mapcontrol
     }
     OPMapWidget::~OPMapWidget()
     {
-        delete UAV;
-        delete Home;
-        delete map;
-        delete core;
-        delete configuration;
+        if(UAV)
+            delete UAV;
+        if(Home)
+            delete Home;
+        if(map)
+            delete map;
+        if(core)
+            delete core;
+        if(configuration)
+            delete configuration;
         foreach(QGraphicsItem* i,this->items())
         {
-            delete i;
+            if(i)
+                delete i;
         }
     }
     void OPMapWidget::closeEvent(QCloseEvent *event)

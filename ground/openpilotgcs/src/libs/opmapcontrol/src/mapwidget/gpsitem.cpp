@@ -37,9 +37,9 @@ namespace mapcontrol
         localposition=map->FromLatLngToLocal(mapwidget->CurrentPosition());
         this->setPos(localposition.X(),localposition.Y());
         this->setZValue(4);
-        trail=new QGraphicsItemGroup();
+        trail=new QGraphicsItemGroup(this);
         trail->setParentItem(map);
-        trailLine=new QGraphicsItemGroup();
+        trailLine=new QGraphicsItemGroup(this);
         trailLine->setParentItem(map);
         this->setFlag(QGraphicsItem::ItemIgnoresTransformations,true);
         mapfollowtype=UAVMapFollowType::None;
@@ -48,16 +48,14 @@ namespace mapcontrol
     }
     GPSItem::~GPSItem()
     {
-        delete trail;
+
     }
 
     void GPSItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
     {
         Q_UNUSED(option);
         Q_UNUSED(widget);
-       // painter->rotate(-90);
         painter->drawPixmap(-pic.width()/2,-pic.height()/2,pic);
-       //   painter->drawRect(QRectF(-pic.width()/2,-pic.height()/2,pic.width()-1,pic.height()-1));
     }
     QRectF GPSItem::boundingRect()const
     {
@@ -97,48 +95,6 @@ namespace mapcontrol
             coord=position;
             this->altitude=altitude;
             RefreshPos();
-            /*if(mapfollowtype==UAVMapFollowType::CenterAndRotateMap||mapfollowtype==UAVMapFollowType::CenterMap)
-            {
-                mapwidget->SetCurrentPosition(coord);
-            }*/
-            this->update();
-            /*if(autosetreached)
-            {
-                foreach(QGraphicsItem* i,map->childItems())
-                {
-                    WayPointItem* wp=qgraphicsitem_cast<WayPointItem*>(i);
-                    if(wp)
-                    {
-                        if(Distance3D(wp->Coord(),wp->Altitude())<autosetdistance)
-                        {
-                            wp->SetReached(true);
-                            emit UAVReachedWayPoint(wp->Number(),wp);
-                        }
-                    }
-                }
-            }
-            if(mapwidget->Home!=0)
-            {
-                //verify if the UAV is inside the safety bouble
-                if(Distance3D(mapwidget->Home->Coord(),mapwidget->Home->Altitude())>mapwidget->Home->SafeArea())
-                {
-                    if(mapwidget->Home->safe!=false)
-                    {
-                        mapwidget->Home->safe=false;
-                        mapwidget->Home->update();
-                        emit UAVLeftSafetyBouble(this->coord);
-                    }
-                }
-                else
-                {
-                    if(mapwidget->Home->safe!=true)
-                    {
-                        mapwidget->Home->safe=true;
-                        mapwidget->Home->update();
-                    }
-                }
-
-            }*/
         }
     }
 

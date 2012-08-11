@@ -26,8 +26,8 @@
 */
 #include "../internals/pureprojection.h"
 #include "uavitem.h"
+#include <math.h>
 
-const qreal Pi = 3.14;
 static double groundspeed_mps_filt;
 
 namespace mapcontrol
@@ -41,9 +41,9 @@ namespace mapcontrol
         localposition=map->FromLatLngToLocal(mapwidget->CurrentPosition());
         this->setPos(localposition.X(),localposition.Y());
         this->setZValue(4);
-        trail=new QGraphicsItemGroup();
+        trail=new QGraphicsItemGroup(this);
         trail->setParentItem(map);
-        trailLine=new QGraphicsItemGroup();
+        trailLine=new QGraphicsItemGroup(this);
         trailLine->setParentItem(map);
         this->setFlag(QGraphicsItem::ItemIgnoresTransformations,true);
         mapfollowtype=UAVMapFollowType::None;
@@ -52,7 +52,7 @@ namespace mapcontrol
     }
     UAVItem::~UAVItem()
     {
-        delete trail;
+
     }
 
     void UAVItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -97,12 +97,12 @@ namespace mapcontrol
         //Form arrowhead
         double angle = ::acos(line.dx() / line.length());
         if (line.dy() <= 0)
-            angle = (Pi * 2) - angle;
+            angle = (M_PI * 2) - angle;
 
-        QPointF arrowP1 = line.pointAt(1) + QPointF(sin(angle + Pi / 3) * arrowSize,
-                                                      cos(angle + Pi / 3) * arrowSize);
-        QPointF arrowP2 = line.pointAt(1) + QPointF(sin(angle + Pi - Pi / 3) * arrowSize,
-                                                      cos(angle + Pi - Pi / 3) * arrowSize);
+        QPointF arrowP1 = line.pointAt(1) + QPointF(sin(angle + M_PI / 3) * arrowSize,
+                                                      cos(angle + M_PI / 3) * arrowSize);
+        QPointF arrowP2 = line.pointAt(1) + QPointF(sin(angle + M_PI - M_PI / 3) * arrowSize,
+                                                      cos(angle + M_PI - M_PI / 3) * arrowSize);
 
         //Generate arrowhead
         arrowHead.clear();
@@ -122,7 +122,7 @@ namespace mapcontrol
 
         //Calculate radius in [m], and then convert to pixels in local frame (not the same frame as is displayed on the map widget)
         double groundspeed_mps=groundspeed_kph/3.6;
-        radius=fabs(groundspeed_mps/(yawRate_dps*Pi/180))*meters2pixels;
+        radius=fabs(groundspeed_mps/(yawRate_dps*M_PI/180))*meters2pixels;
 
 //        qDebug() << "Scale: " <<  meters2pixels;
 //        qDebug() << "Zoom: " <<  map->ZoomTotal();

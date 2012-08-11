@@ -27,7 +27,6 @@
 #include "waypointline.h"
 #include <math.h>
 #include "homeitem.h"
-const qreal Pi = 3.14;
 
 namespace mapcontrol
 {
@@ -83,12 +82,12 @@ void WayPointLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
 
     double angle = ::acos(line().dx() / line().length());
     if (line().dy() >= 0)
-        angle = (Pi * 2) - angle;
+        angle = (M_PI * 2) - angle;
 
-        QPointF arrowP1 = line().pointAt(0.5) + QPointF(sin(angle + Pi / 3) * arrowSize,
-                                        cos(angle + Pi / 3) * arrowSize);
-        QPointF arrowP2 = line().pointAt(0.5) + QPointF(sin(angle + Pi - Pi / 3) * arrowSize,
-                                        cos(angle + Pi - Pi / 3) * arrowSize);
+        QPointF arrowP1 = line().pointAt(0.5) + QPointF(sin(angle + M_PI / 3) * arrowSize,
+                                        cos(angle + M_PI / 3) * arrowSize);
+        QPointF arrowP2 = line().pointAt(0.5) + QPointF(sin(angle + M_PI - M_PI / 3) * arrowSize,
+                                        cos(angle + M_PI - M_PI / 3) * arrowSize);
         arrowHead.clear();
         arrowHead << line().pointAt(0.5) << arrowP1 << arrowP2;
         painter->drawPolygon(arrowHead);

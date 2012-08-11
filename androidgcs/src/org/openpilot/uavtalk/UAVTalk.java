@@ -38,7 +38,7 @@ import android.util.Log;
 public class UAVTalk {
 
 	static final String TAG = "UAVTalk";
-	public static int LOGLEVEL = 4;
+	public static int LOGLEVEL = 0;
 	public static boolean VERBOSE = LOGLEVEL > 3;
 	public static boolean WARN = LOGLEVEL > 2;
 	public static boolean DEBUG = LOGLEVEL > 1;
@@ -227,6 +227,8 @@ public class UAVTalk {
 		//inStream.wait();
 		val = inStream.read();
 
+		if (VERBOSE) Log.v(TAG, "Read: " + val);
+
 		if (val == -1) {
 			return false;
 		}
@@ -357,7 +359,7 @@ public class UAVTalk {
 				rxCS = updateCRC(rxCS, rxbyte);
 
 				if ((rxbyte & TYPE_MASK) != TYPE_VER) {
-					Log.e(TAG, "Unknown UAVTalk type:" + rxbyte);
+					if (ERROR) Log.e(TAG, "Unknown UAVTalk type:" + rxbyte);
 					rxState = RxStateType.STATE_SYNC;
 					break;
 				}

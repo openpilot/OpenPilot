@@ -193,6 +193,7 @@ namespace internals {
         bool isStarted(){return started;}
 
         diagnostics GetDiagnostics();
+
     signals:
         void OnCurrentPositionChanged(internals::PointLatLng point);
         void OnTileLoadComplete();
@@ -206,7 +207,7 @@ namespace internals {
 
     private:
 
-
+        void keepInBounds();
         PointLatLng currentPosition;
         core::Point currentPositionPixel;
         core::Point renderOffset;

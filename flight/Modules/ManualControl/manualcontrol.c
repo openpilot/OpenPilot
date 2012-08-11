@@ -376,8 +376,10 @@ static void manualControlTask(void *parameters)
 #if defined(PIOS_INCLUDE_USB_RCTX)
 			if (pios_usb_rctx_id) {
 				PIOS_USB_RCTX_Update(pios_usb_rctx_id,
-						scaledChannel,
-						NELEMENTS(scaledChannel));
+						cmd.Channel,
+						settings.ChannelMin,
+						settings.ChannelMax,
+						NELEMENTS(cmd.Channel));
 			}
 #endif	/* PIOS_INCLUDE_USB_RCTX */
 

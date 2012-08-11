@@ -160,7 +160,7 @@ static void PIOS_USB_RCTX_EP_IN_Callback(void)
 	PIOS_USB_RCTX_SendReport(usb_rctx_dev);
 }
 
-void PIOS_USB_RCTX_Update(uint32_t usbrctx_id, const float channels[], uint8_t num_channels)
+void PIOS_USB_RCTX_Update(uint32_t usbrctx_id, const uint16_t channel[], const int16_t channel_min[], const int16_t channel_max[], uint8_t num_channels)
 {
 	struct pios_usb_rctx_dev * usb_rctx_dev = (struct pios_usb_rctx_dev *)usbrctx_id;
 
@@ -174,11 +174,30 @@ void PIOS_USB_RCTX_Update(uint32_t usbrctx_id, const float channels[], uint8_t n
 	for (uint8_t i = 0; 
 	     i < PIOS_USB_RCTX_NUM_CHANNELS && i < num_channels;
 	     i++) {
-		/* 
-		 * Scaled channels range from -1 to +1.  
-		 * Move them to the USB HID range of 0 to 65535. 
-		 */
-		usb_rctx_dev->report.vals[i] = (uint16_t) (32767.0f + (channels[i] * 32767.0f));
+		int16_t min = channel_min[i];
+		int16_t max = channel_max[i];
+		uint16_t val = channel[i];
+
+		if (channel_min[i] > channel_max[i]) {
+			/* This channel is reversed, flip min and max */
+			min = channel_max[i];
+			max = channel_min[i];
+
+			/* and flip val to be an offset from the lower end of the range */
+			val = channel_min[i] - channel[i] + channel_max[i];
+		}
+
+		/* Scale channel linearly between min and max */
+		if (min == max) {
+			val = 0;
+		} else {
+			if (val < min) val = min;
+			if (val > max) val = max;
+
+			val = (val - min) * (65535 / (max - min));
+		}
+
+		usb_rctx_dev->report.vals[i] = val;
 	}
 
 	if (GetEPTxStatus(usb_rctx_dev->cfg->data_tx_ep) == EP_TX_VALID) {

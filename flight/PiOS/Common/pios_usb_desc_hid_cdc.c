@@ -51,7 +51,7 @@ static const struct usb_device_desc device_desc = {
 	.bNumConfigurations = 1,
 };
 
-static const uint8_t hid_report_desc[103] = {
+static const uint8_t hid_report_desc[89] = {
 	HID_GLOBAL_ITEM_2 (HID_TAG_GLOBAL_USAGE_PAGE),
 	0x9C, 0xFF,		/* Usage Page 0xFF9C (Vendor Defined) */
 	HID_LOCAL_ITEM_1  (HID_TAG_LOCAL_USAGE),
@@ -102,6 +102,11 @@ static const uint8_t hid_report_desc[103] = {
 	HID_LOCAL_ITEM_1  (HID_TAG_LOCAL_USAGE),
 	0x04,			/* Usage ID 0x0004 (Joystick) */
 
+	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_LOGICAL_MIN),
+	0x00,			/* Values range from min = 0x00 */
+	HID_GLOBAL_ITEM_4 (HID_TAG_GLOBAL_LOGICAL_MAX),
+	0xFF, 0xFF, 0x00, 0x00,	/* Values range to max = 0x0000FFFF */
+
 	HID_MAIN_ITEM_1   (HID_TAG_MAIN_COLLECTION),
 	0x01,			/* Application */
 	HID_MAIN_ITEM_1   (HID_TAG_MAIN_COLLECTION),
@@ -115,10 +120,6 @@ static const uint8_t hid_report_desc[103] = {
 	0x30,			/* Usage ID 0x00010030 (Generic Desktop: X) */
 	HID_LOCAL_ITEM_1  (HID_TAG_LOCAL_USAGE),
 	0x31,			/* Usage ID 0x00010031 (Generic Desktop: Y) */
-	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_LOGICAL_MIN),
-	0x00,			/* Values range from min = 0x00 */
-	HID_GLOBAL_ITEM_4 (HID_TAG_GLOBAL_LOGICAL_MAX),
-	0xFF, 0xFF, 0x00, 0x00,	/* Values range to max = 0x0000FFFF */
 	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_REPORT_SIZE),
 	0x10,			/* 16 bits wide */
 	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_REPORT_CNT),
@@ -132,10 +133,6 @@ static const uint8_t hid_report_desc[103] = {
 	0x32,			/* Usage ID 0x00010032 (Generic Desktop: Z) */
 	HID_LOCAL_ITEM_1  (HID_TAG_LOCAL_USAGE),
 	0x33,			/* Usage ID 0x00010031 (Generic Desktop: Rx) */
-	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_LOGICAL_MIN),
-	0x00,			/* Values range from min = 0x00 */
-	HID_GLOBAL_ITEM_4 (HID_TAG_GLOBAL_LOGICAL_MAX),
-	0xFF, 0xFF, 0x00, 0x00,	/* Values range to max = 0x0000FFFF */
 	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_REPORT_SIZE),
 	0x10,			/* 16 bits wide */
 	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_REPORT_CNT),
@@ -153,10 +150,6 @@ static const uint8_t hid_report_desc[103] = {
 	0x36,			/* Usage ID 0x00010036 (Generic Desktop: Slider) */
 	HID_LOCAL_ITEM_1  (HID_TAG_LOCAL_USAGE),
 	0x37,			/* Usage ID 0x00010037 (Generic Desktop: Dial) */
-	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_LOGICAL_MIN),
-	0x00,			/* Values range from min = 0x00 */
-	HID_GLOBAL_ITEM_4 (HID_TAG_GLOBAL_LOGICAL_MAX),
-	0xFF, 0xFF, 0x00, 0x00,	/* Values range to max = 0x0000FFFF */
 	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_REPORT_SIZE),
 	0x10,			/* 16 bits wide */
 	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_REPORT_CNT),
@@ -168,7 +161,7 @@ static const uint8_t hid_report_desc[103] = {
 
 	HID_MAIN_ITEM_0 (HID_TAG_MAIN_ENDCOLLECTION),
 
-/* 103 bytes to here */
+/* 89 bytes to here */
 };
 
 struct usb_config_hid_cdc {

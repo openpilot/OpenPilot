@@ -2017,54 +2017,43 @@ internals::PointLatLng OPMapGadgetWidget::destPoint(internals::PointLatLng sourc
 
 bool OPMapGadgetWidget::getUAVPosition(double &latitude, double &longitude, double &altitude)
 {
-    double BaseECEF[3];
     double NED[3];
     double LLA[3];
-    UAVObject *obj;
+    double homeLLA[3];
 
-	if (!obm)
-		return false;
+    Q_ASSERT(obm != NULL);
 
-	obj = dynamic_cast<UAVDataObject*>(obm->getObject(QString("HomeLocation")));
-    if (!obj) return false;
-    BaseECEF[0] = obj->getField(QString("ECEF"))->getDouble(0) / 100;
-    BaseECEF[1] = obj->getField(QString("ECEF"))->getDouble(1) / 100;
-    BaseECEF[2] = obj->getField(QString("ECEF"))->getDouble(2) / 100;
+    HomeLocation *homeLocation = HomeLocation::GetInstance(obm);
+    Q_ASSERT(homeLocation != NULL);
+    HomeLocation::DataFields homeLocationData = homeLocation->getData();
 
-	obj = dynamic_cast<UAVDataObject*>(obm->getObject(QString("PositionActual")));
-    if (!obj) return false;
-    NED[0] = obj->getField(QString("North"))->getDouble() / 100;
-    NED[1] = obj->getField(QString("East"))->getDouble() / 100;
-    NED[2] = obj->getField(QString("Down"))->getDouble() / 100;
+    homeLLA[0] = homeLocationData.Latitude / 1e7;
+    homeLLA[1] = homeLocationData.Longitude / 1e7;
+    homeLLA[2] = homeLocationData.Altitude;
 
-//    obj = dynamic_cast<UAVDataObject*>(om->getObject(QString("PositionDesired")));
+    PositionActual *positionActual = PositionActual::GetInstance(obm);
+    Q_ASSERT(positionActual != NULL);
+    PositionActual::DataFields positionActualData = positionActual->getData();
 
-//    obj = dynamic_cast<UAVDataObject*>(objManager->getObject("VelocityActual"));      // air speed
+    NED[0] = positionActualData.North;
+    NED[1] = positionActualData.East;
+    NED[2] = positionActualData.Down;
 
-    Utils::CoordinateConversions().GetLLA(BaseECEF, NED, LLA);
+    Utils::CoordinateConversions().NED2LLA_HomeLLA(homeLLA, NED, LLA);
 
     latitude = LLA[0];
     longitude = LLA[1];
     altitude = LLA[2];
 
+    qDebug()<<  " " << latitude << " " << longitude << " " << altitude;
+
     if (latitude != latitude) latitude = 0; // nan detection
-//    if (isNan(latitude)) latitude = 0; // nan detection
-    else
-//    if (!isFinite(latitude)) latitude = 0;
-//    else
-    if (latitude >  90) latitude =  90;
-    else
-    if (latitude < -90) latitude = -90;
+    else if (latitude >  90) latitude =  90;
+    else if (latitude < -90) latitude = -90;
 
     if (longitude != longitude) longitude = 0; // nan detection
-    else
-//    if (longitude > std::numeric_limits<double>::max()) longitude = 0;  // +infinite
-//    else
-//    if (longitude < -std::numeric_limits<double>::max()) longitude = 0;  // -infinite
-//    else
-    if (longitude >  180) longitude =  180;
-    else
-    if (longitude < -180) longitude = -180;
+    else if (longitude >  180) longitude =  180;
+    else if (longitude < -180) longitude = -180;
 
     if (altitude != altitude) altitude = 0; // nan detection
 

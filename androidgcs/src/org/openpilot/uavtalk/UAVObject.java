@@ -105,6 +105,11 @@ public abstract class UAVObject {
 			unpackedListeners.addObserver(o);
 		}
 	}
+	public void removeUnpackedObserver(Observer o) {
+		synchronized(unpackedListeners) {
+			unpackedListeners.deleteObserver(o);
+		}
+	}
 	void unpacked() {
 		synchronized(unpackedListeners) {
 			unpackedListeners.event();
@@ -115,6 +120,11 @@ public abstract class UAVObject {
 	public void addUpdatedAutoObserver(Observer o) {
 		synchronized(updatedAutoListeners) {
 			updatedAutoListeners.addObserver(o);
+		}
+	}
+	public void removeUpdatedAutoObserver(Observer o) {
+		synchronized(updatedAutoListeners) {
+			updatedAutoListeners.deleteObserver(o);
 		}
 	}
 	void updatedAuto() {
@@ -129,6 +139,11 @@ public abstract class UAVObject {
 			updatedManualListeners.addObserver(o);
 		}
 	}
+	public void removeUpdatedManualObserver(Observer o) {
+		synchronized(updatedManualListeners) {
+			updatedManualListeners.deleteObserver(o);
+		}
+	}
 	void updatedManual() {
 		synchronized(updatedManualListeners) {
 			updatedManualListeners.event();
@@ -139,6 +154,11 @@ public abstract class UAVObject {
 	public void addUpdateRequestedObserver(Observer o) {
 		synchronized(updateRequestedListeners) {
 			updateRequestedListeners.addObserver(o);
+		}
+	}
+	public void removeUpdateRequestedObserver(Observer o) {
+		synchronized(updateRequestedListeners) {
+			updateRequestedListeners.deleteObserver(o);
 		}
 	}
 	public void updateRequested() {

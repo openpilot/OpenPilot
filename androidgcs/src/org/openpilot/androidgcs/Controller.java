@@ -35,7 +35,6 @@ import org.openpilot.uavtalk.UAVObject;
 import org.openpilot.uavtalk.UAVObjectField;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -72,8 +71,6 @@ public class Controller extends ObjectManagerActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.controller);
 		TextView manualView = (TextView) findViewById(R.id.manualControlValues);
-		if(manualView != null)
-			manualView.setText("Hello");
 	}
 
 	Observer settingsUpdated = new Observer() {
@@ -93,19 +90,16 @@ public class Controller extends ObjectManagerActivity {
 	void onOPConnected() {
 		super.onOPConnected();
 
+		Log.d(TAG, "onOPConnected()");
+
 		// Subscribe to updates from ManualControlCommand and show the values for crude feedback
 		UAVDataObject manualControl = (UAVDataObject) objMngr.getObject("ManualControlCommand");
-		if(manualControl != null) {
-			manualControl.addUpdatedObserver(updatedObserver);
-		}
+		registerObjectUpdates(manualControl);
 
-
-		UAVDataObject manualControlSettings = (UAVDataObject) objMngr.getObject("ManualControlSettings");
-		if(manualControlSettings != null) {
-			Log.d(TAG, "Requested settings update");
-			manualControlSettings.addUpdatedObserver(updatedObserver);
-			manualControlSettings.updateRequested();
-		}
+		// Request a one time update before configuring for GCS control mode
+		UAVDataObject manualSettings = (UAVDataObject) objMngr.getObject("ManualControlSettings");
+		manualSettings.addUpdatedObserver(settingsUpdated);
+		manualSettings.updateRequested();
 
 		final double MOVEMENT_RANGE = 50.0;
 		DualJoystickView joystick = (DualJoystickView) findViewById(R.id.dualjoystickView);
@@ -138,7 +132,9 @@ public class Controller extends ObjectManagerActivity {
 			public void OnReleased() { rightJoystickHeld = false; throttle = -1; updated = true; }
 			@Override
 			public void OnReturnedToCenter() { }
-		}) ;
+		});
+
+		//! This timer task actually periodically sends updates to the UAV
 		TimerTask controllerTask = new TimerTask() {
 			@Override
 			public void run() {
@@ -175,36 +171,19 @@ public class Controller extends ObjectManagerActivity {
 				});
 			}
 		};
-		sendTimer.schedule(controllerTask, 500, 100);
+		sendTimer.schedule(controllerTask, 500, 10);
 	}
-
-	/**
-	 * The callbacks from the UAVOs must run in the correct thread to update the
-	 * UI.  This is what using a runnable does.
-	 */
-	final Handler uavobjHandler = new Handler();
-	final Runnable updateText = new Runnable() {
-		@Override
-		public void run() {
-			updateManualControl();
-		}
-	};
-
-	private final Observer updatedObserver = new Observer() {
-		@Override
-		public void update(Observable observable, Object data) {
-			uavobjHandler.post(updateText);
-		}
-	};
 
 	/**
 	 * Show the string description of manual control command
 	 */
-	private void updateManualControl() {
-		UAVDataObject manualControl = (UAVDataObject) objMngr.getObject("ManualControlCommand");
-		TextView manualView = (TextView) findViewById(R.id.manualControlValues);
-		if (manualView != null && manualControl != null)
-			manualView.setText(manualControl.toStringData());
+	@Override
+	protected void objectUpdated(UAVObject obj) {
+		if (obj.getName().compareTo("ManualControlCommand") == 0) {
+			TextView manualView = (TextView) findViewById(R.id.manualControlValues);
+			if (manualView != null)
+				manualView.setText(obj.toStringData());
+		}
 	}
 
 	/**

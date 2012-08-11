@@ -40,10 +40,10 @@ import android.util.Log;
 public class Telemetry {
 
 	private final String TAG = "Telemetry";
-	public static int LOGLEVEL = 0;
+	public static int LOGLEVEL = 1;
 	public static boolean WARN = LOGLEVEL > 2;
-	public static boolean ERROR = LOGLEVEL > 1;
-	public static boolean DEBUG = LOGLEVEL > 0;
+	public static boolean DEBUG = LOGLEVEL > 1;
+	public static boolean ERROR = LOGLEVEL > 0;
     public class TelemetryStats {
         public int txBytes;
         public int rxBytes;
@@ -66,6 +66,17 @@ public class Telemetry {
         UAVObject obj;
         int event;
         boolean allInstances;
+
+        @Override
+		public boolean equals(Object e) {
+        	try {
+        		ObjectQueueInfo o = (ObjectQueueInfo) e;
+        		return o.obj.getObjID() == obj.getObjID() &&  o.event == event && o.allInstances == allInstances;
+        	} catch (Exception err) {
+
+        	};
+        	return false;
+        }
     };
 
     class ObjectTransactionInfo {
@@ -112,13 +123,13 @@ public class Telemetry {
         	}
         });
 
-        // Listen to transaction completions
-        this.utalk.setOnTransactionCompletedListener(
-        		this.utalk.new OnTransactionCompletedListener() {
+        // Listen to transaction completions from uavtalk
+        utalk.setOnTransactionCompletedListener(
+        		utalk.new OnTransactionCompletedListener() {
 			@Override
 			void TransactionSucceeded(UAVObject data) {
 	        	try {
-					transactionCompleted(data);
+					transactionCompleted(data, true);
 				} catch (IOException e) {
 					// Disconnect when stream fails
 					utalk.setOnTransactionCompletedListener(null);
@@ -127,8 +138,9 @@ public class Telemetry {
 			@Override
 			void TransactionFailed(UAVObject data) {
 	        	try {
-	        		Log.d(TAG, "TransactionFailed(" + data.getName() + ")");
-					transactionCompleted(data);
+	        		if (DEBUG) Log.d(TAG, "TransactionFailed(" + data.getName() + ")");
+
+					transactionCompleted(data, false);
 				} catch (IOException e) {
 					// Disconnect when stream fails
 					utalk.setOnTransactionCompletedListener(null);
@@ -250,6 +262,54 @@ public class Telemetry {
         }
     }
 
+    final Observer unpackedObserver = new Observer() {
+		@Override
+		public void update(Observable observable, Object data) {
+    		try {
+    			enqueueObjectUpdates((UAVObject) data, EV_UNPACKED, false, true);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+	};
+
+	final Observer updatedAutoObserver = new Observer() {
+		@Override
+		public void update(Observable observable, Object data) {
+			try {
+				enqueueObjectUpdates((UAVObject) data, EV_UPDATED, false, true);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+	};
+
+	final Observer updatedManualObserver = new Observer() {
+		@Override
+		public void update(Observable observable, Object data) {
+			try {
+				enqueueObjectUpdates((UAVObject) data, EV_UPDATED_MANUAL, false, true);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+	};
+
+	final Observer updatedRequestedObserver = new Observer() {
+		@Override
+		public void update(Observable observable, Object data) {
+			try {
+				enqueueObjectUpdates((UAVObject) data, EV_UPDATE_REQ, false, true);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+	};
+
     /**
      * Connect to all instances of an object depending on the event mask specified
      */
@@ -260,66 +320,23 @@ public class Telemetry {
         while(li.hasNext())
         {
         	obj = li.next();
-            //TODO: Disconnect all
-            // obj.disconnect(this);
+
+            // Disconnect all previous observers from telemetry.  This is imortant as this can
+        	// be called multiple times
+        	obj.removeUnpackedObserver(unpackedObserver);
+        	obj.removeUpdatedAutoObserver(updatedAutoObserver);
+        	obj.removeUpdatedManualObserver(updatedManualObserver);
+        	obj.removeUpdateRequestedObserver(updatedRequestedObserver);
 
             // Connect only the selected events
             if ( (eventMask&EV_UNPACKED) != 0)
-            {
-            	obj.addUnpackedObserver(new Observer() {
-					@Override
-					public void update(Observable observable, Object data) {
-	            		try {
-							objectUnpacked( (UAVObject) data);
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-	            	}
-            	});
-            }
+            	obj.addUnpackedObserver(unpackedObserver);
             if ( (eventMask&EV_UPDATED) != 0)
-            {
-            	obj.addUpdatedAutoObserver(new Observer() {
-					@Override
-					public void update(Observable observable, Object data) {
-						try {
-							objectUpdatedAuto( (UAVObject) data);
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-	            	}
-            	});
-            }
+            	obj.addUpdatedAutoObserver(updatedAutoObserver);
             if ( (eventMask&EV_UPDATED_MANUAL) != 0)
-            {
-            	obj.addUpdatedManualObserver(new Observer() {
-					@Override
-					public void update(Observable observable, Object data) {
-						try {
-							objectUpdatedManual( (UAVObject) data);
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-	            	}
-            	});
-            }
+            	obj.addUpdatedManualObserver(updatedManualObserver);
             if ( (eventMask&EV_UPDATE_REQ) != 0)
-            {
-            	obj.addUpdateRequestedObserver(new Observer() {
-					@Override
-					public void update(Observable observable, Object data) {
-						try {
-							updateRequested( (UAVObject) data);
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-	            	}
-            	});
-            }
+            	obj.addUpdateRequestedObserver(updatedRequestedObserver);
         }
     }
 
@@ -376,7 +393,7 @@ public class Telemetry {
      * Called when a transaction is successfully completed (uavtalk event)
      * @throws IOException
      */
-    private synchronized void transactionCompleted(UAVObject obj) throws IOException
+    private synchronized void transactionCompleted(UAVObject obj, boolean result) throws IOException
     {
     	if (DEBUG) Log.d(TAG,"UAVTalk transactionCompleted");
         // Check if there is a pending transaction and the objects match
@@ -386,13 +403,15 @@ public class Telemetry {
             // Complete transaction
         	transTimer.cancel();
             transPending = false;
-            // Send signal
-            obj.transactionCompleted(true);
+
+            //Send signal
+            obj.transactionCompleted(result);
             // Process new object updates from queue
             processObjectQueue();
         } else
         {
         	if (ERROR) Log.e(TAG,"Error: received a transaction completed when did not expect it.");
+        	transPending = false;
         }
     }
 
@@ -416,13 +435,13 @@ public class Telemetry {
             }
             else
             {
-                // Terminate transaction
-                utalk.cancelTransaction();
-                transPending = false;
-                // Send signal
-                transInfo.obj.transactionCompleted(false);
-                // Process new object updates from queue
-                processObjectQueue();
+            	if (ERROR) Log.e(TAG, "Transaction failed for: " + transInfo.obj.getName());
+
+                // Terminate transaction.  This triggers UAVTalk to send a transaction
+            	// failed signal which will make the next queue entry be processed
+            	// Note this is UAVTalk listener TransactionFailed function and not the
+            	// object specific transaction failed.
+                utalk.cancelPendingTransaction(transInfo.obj);
                 ++txErrors;
             }
         }
@@ -463,10 +482,10 @@ public class Telemetry {
     }
 
     /**
-     * Process the event received from an object
-     * @throws IOException
+     * Enqueue the event received from an object.  This is the main method that handles all the callbacks
+     * from UAVObjects (due to updates, or update requests)
      */
-    private synchronized void processObjectUpdates(UAVObject obj, int event, boolean allInstances, boolean priority) throws IOException
+    private synchronized void enqueueObjectUpdates(UAVObject obj, int event, boolean allInstances, boolean priority) throws IOException
     {
         // Push event into queue
     	if (DEBUG) Log.d(TAG, "Push event into queue for obj " + obj.getName() + " event " + event);
@@ -478,28 +497,34 @@ public class Telemetry {
         objInfo.allInstances = allInstances;
         if (priority)
         {
-            if ( objPriorityQueue.size() < MAX_QUEUE_SIZE )
-            {
-                objPriorityQueue.add(objInfo);
-            }
-            else
-            {
-                ++txErrors;
-                obj.transactionCompleted(false);
-                Log.w(TAG,"Telemetry: priority event queue is full, event lost " + obj.getName());
-            }
+        	// Only enqueue if an identical transaction does not already exist
+        	if(!objPriorityQueue.contains(objInfo)) {
+        		if ( objPriorityQueue.size() < MAX_QUEUE_SIZE )
+        		{
+        			objPriorityQueue.add(objInfo);
+        		}
+        		else
+        		{
+        			++txErrors;
+        			obj.transactionCompleted(false);
+        			Log.w(TAG,"Telemetry: priority event queue is full, event lost " + obj.getName());
+        		}
+        	}
         }
         else
         {
-            if ( objQueue.size() < MAX_QUEUE_SIZE )
-            {
-                objQueue.add(objInfo);
-            }
-            else
-            {
-                ++txErrors;
-                obj.transactionCompleted(false);
-            }
+        	// Only enqueue if an identical transaction does not already exist
+        	if(!objQueue.contains(objInfo)) {
+        		if ( objQueue.size() < MAX_QUEUE_SIZE )
+        		{
+        			objQueue.add(objInfo);
+        		}
+        		else
+        		{
+        			++txErrors;
+        			obj.transactionCompleted(false);
+        		}
+        	}
         }
 
         // If there is no transaction in progress then process event
@@ -520,7 +545,7 @@ public class Telemetry {
         // Don nothing if a transaction is already in progress (should not happen)
         if (transPending)
         {
-        	if (ERROR) Log.e(TAG,"Dequeue while a transaction pending");
+        	if (WARN) Log.e(TAG,"Dequeue while a transaction pending");
             return;
         }
 
@@ -588,7 +613,7 @@ public class Telemetry {
         // we do not have additional objects still in the queue,
         // so we have to reschedule queue processing to make sure they are not
         // stuck:
-        if ( objInfo.event == EV_UNPACKED )
+        if ( objInfo.event == EV_UNPACKED && !transPending)
             processObjectQueue();
 
     }
@@ -628,7 +653,7 @@ public class Telemetry {
                     objinfo.timeToNextUpdateMs = objinfo.updatePeriodMs - offset;
                     // Send object
                     startTime = System.currentTimeMillis();
-                    processObjectUpdates(objinfo.obj, EV_UPDATED_MANUAL, true, false);
+                    enqueueObjectUpdates(objinfo.obj, EV_UPDATED_MANUAL, true, false);
                     elapsedMs = (int) (System.currentTimeMillis() - startTime);
                     // Update timeToNextUpdateMs with the elapsed delay of sending the object;
                     timeToNextUpdateMs += elapsedMs;
@@ -682,25 +707,6 @@ public class Telemetry {
         txRetries = 0;
     }
 
-    private synchronized void objectUpdatedAuto(UAVObject obj) throws IOException
-    {
-        processObjectUpdates(obj, EV_UPDATED, false, true);
-    }
-
-    private synchronized void objectUpdatedManual(UAVObject obj) throws IOException
-    {
-        processObjectUpdates(obj, EV_UPDATED_MANUAL, false, true);
-    }
-
-    private synchronized void objectUnpacked(UAVObject obj) throws IOException
-    {
-        processObjectUpdates(obj, EV_UNPACKED, false, true);
-    }
-
-    public synchronized void updateRequested(UAVObject obj) throws IOException
-    {
-        processObjectUpdates(obj, EV_UPDATE_REQ, false, true);
-    }
 
     private void newObject(UAVObject obj)
     {

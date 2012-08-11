@@ -39,13 +39,16 @@ import android.util.Log;
 public class TelemetryMonitor extends Observable {
 
 	private static final String TAG = "TelemetryMonitor";
-	public static int LOGLEVEL = 0;
-	public static boolean WARN = LOGLEVEL > 1;
-	public static boolean DEBUG = LOGLEVEL > 0;
+	public static final int LOGLEVEL = 0;
+	public static boolean DEBUG = LOGLEVEL > 2;
+	public static final boolean WARN = LOGLEVEL > 1;
+	public static final boolean ERROR = LOGLEVEL > 0;
 
 	static final int STATS_UPDATE_PERIOD_MS = 4000;
 	static final int STATS_CONNECT_PERIOD_MS = 1000;
 	static final int CONNECTION_TIMEOUT_MS = 8000;
+
+	private final boolean HANDSHAKE_IS_CONNECTED = false;
 
 	private final UAVObjectManager objMngr;
 	private final Telemetry tel;
@@ -146,6 +149,20 @@ public class TelemetryMonitor extends Observable {
 		queue.clear();
 	}
 
+	final Observer transactionObserver = new Observer() {
+		@Override
+		public void update(Observable observable, Object data) {
+			try {
+				UAVObject.TransactionResult result = (UAVObject.TransactionResult) data;
+				transactionCompleted(result.obj, result.success);
+			} catch (IOException e) {
+				// When the telemetry stream is broken disconnect these
+				// updates
+				observable.deleteObserver(this);
+			}
+		}
+	};
+
 	/**
 	 * Retrieve the next object in the queue
 	 *
@@ -154,11 +171,12 @@ public class TelemetryMonitor extends Observable {
 	public synchronized void retrieveNextObject() throws IOException {
 		// If queue is empty return
 		if (queue.isEmpty()) {
-			if (DEBUG)
-				Log.d(TAG, "All objects retrieved: Connected Successfully");
+			if (DEBUG || true) Log.d(TAG, "All objects retrieved: Connected Successfully");
 			objects_updated = true;
-			setChanged();
-			notifyObservers();
+			if (!HANDSHAKE_IS_CONNECTED) {
+				setChanged();
+				notifyObservers();
+			}
 			return;
 		}
 		// Get next object from the queue
@@ -173,26 +191,10 @@ public class TelemetryMonitor extends Observable {
 
 		// TODO: Does this need to stay here permanently? This appears to be
 		// used for setup mainly
-		obj.addTransactionCompleted(new Observer() {
-			@Override
-			public void update(Observable observable, Object data) {
-				UAVObject.TransactionResult result = (UAVObject.TransactionResult) data;
-				if (DEBUG)
-					Log.d(TAG, "Got transaction completed event from "
-							+ result.obj.getName() + " status: "
-							+ result.success);
-				try {
-					transactionCompleted(result.obj, result.success);
-				} catch (IOException e) {
-					// When the telemetry stream is broken disconnect these
-					// updates
-					observable.deleteObserver(this);
-				}
-			}
-		});
+		obj.addTransactionCompleted(transactionObserver);
 
 		// Request update
-		tel.updateRequested(obj);
+		obj.updateRequested();
 	}
 
 	/**
@@ -205,15 +207,17 @@ public class TelemetryMonitor extends Observable {
 		if (DEBUG)
 			Log.d(TAG, "transactionCompleted.  Status: " + success);
 
+		// Remove the listener for the event that just finished
+		obj.removeTransactionCompleted(transactionObserver);
+
 		if (!success) {
 			// Right now success = false means received a NAK so don't
 			// re-attempt
-			Log.e(TAG, "Transaction failed.");
+			if (ERROR) Log.e(TAG, "Transaction failed.");
 		}
 
 		// Process next object if telemetry is still available
-		if (((String) gcsStatsObj.getField("Status").getValue())
-				.compareTo("Connected") == 0) {
+		if (((String) gcsStatsObj.getField("Status").getValue()).compareTo("Connected") == 0) {
 			retrieveNextObject();
 		} else {
 			stopRetrievingObjects();
@@ -347,7 +351,7 @@ public class TelemetryMonitor extends Observable {
 			connected = true;
 			objects_updated = false;
 			startRetrievingObjects();
-			setChanged();
+			if (HANDSHAKE_IS_CONNECTED) setChanged(); // Enabling this line makes the opConnected signal occur whenever we get a handshake
 		}
 		if (gcsDisconnected && gcsStatusChanged) {
 			if (DEBUG)

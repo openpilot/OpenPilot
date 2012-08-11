@@ -11,12 +11,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import junit.framework.Assert;
-
-import org.openpilot.uavtalk.UAVObjectManager;
-import org.openpilot.uavtalk.UAVTalk;
-
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -30,20 +25,12 @@ import android.hardware.usb.UsbManager;
 import android.hardware.usb.UsbRequest;
 import android.util.Log;
 
-public class HidUAVTalk {
+public class HidUAVTalk extends TelemetryTask {
 
 	private static final String TAG = HidUAVTalk.class.getSimpleName();
 	public static int LOGLEVEL = 0;
 	public static boolean WARN = LOGLEVEL > 1;
 	public static boolean DEBUG = LOGLEVEL > 0;
-
-	Service hostDisplayActivity;
-
-	private boolean connected;
-
-	private UAVTalk uavTalk;
-
-	private UAVObjectManager objMngr;
 
 	//! USB constants
 	static final int OPENPILOT_VENDOR_ID = 0x20A0;
@@ -56,51 +43,57 @@ public class HidUAVTalk {
 	static final int USB_PRODUCT_ID_OSD            = 0x4194;
 	static final int USB_PRODUCT_ID_SPARE          = 0x4195;
 
-	public HidUAVTalk(Service service) {
-		hostDisplayActivity = service;
+	private static final String ACTION_USB_PERMISSION = "com.access.device.USB_PERMISSION";
+
+	UsbDevice currentDevice;
+
+	public HidUAVTalk(OPTelemetryService service) {
+		super(service);
 	}
 
-	public boolean getConnected() {
-		return connected;
-	}
-
-	public UAVTalk getUavtalk() {
-		return uavTalk;
-	}
-
-	/**
-	 * Opens a TCP socket to the address determined on construction.  If successful
-	 * creates a UAVTalk stream connection this socket to the passed in object manager
-	 */
-	public boolean openTelemetryHid(UAVObjectManager objMngr) {
-		uavTalk = new UAVTalk(inStream, outStream, objMngr);
-		this.objMngr = objMngr;
-		return true;
-	}
-
+	@Override
 	public void disconnect() {
+
 		CleanUpAndClose();
 		//hostDisplayActivity.unregisterReceiver(usbReceiver);
-		//hostDisplayActivity.unregisterReceiver(usbPermissionReceiver);
-		inStream.stop();
-		outStream.stop();
+		telemService.unregisterReceiver(usbPermissionReceiver);
+		((TalkInputStream)inStream).stop();
+		((TalkOutputStream)outStream).stop();
+
+		super.disconnect();
+
+		try {
+			readThread.join();
+			writeThread.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		if (readRequest != null) {
+			readRequest.cancel();
+			readRequest.close();
+			readRequest = null;
+		}
+
+		if (writeRequest != null) {
+			writeRequest.cancel();
+			writeRequest.close();
+			writeRequest = null;
+		}
+
 	}
 
-	public boolean connect(UAVObjectManager objMngr) {
+	@Override
+	boolean attemptConnection() {
 		if (DEBUG) Log.d(TAG, "connect()");
 
 		// Register to get permission requested dialog
-		usbManager = (UsbManager) hostDisplayActivity.getSystemService(Context.USB_SERVICE);
-		permissionIntent = PendingIntent.getBroadcast(hostDisplayActivity, 0, new Intent(ACTION_USB_PERMISSION), 0);
+		usbManager = (UsbManager) telemService.getSystemService(Context.USB_SERVICE);
+		permissionIntent = PendingIntent.getBroadcast(telemService, 0, new Intent(ACTION_USB_PERMISSION), 0);
 		permissionFilter = new IntentFilter(ACTION_USB_PERMISSION);
-		hostDisplayActivity.registerReceiver(usbPermissionReceiver, permissionFilter);
+		telemService.registerReceiver(usbPermissionReceiver, permissionFilter);
 
-		// Register to get notified on device attached
-		/*deviceAttachedFilter = new IntentFilter();
-		deviceAttachedFilter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
-		deviceAttachedFilter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
-		hostDisplayActivity.registerReceiver(usbReceiver, deviceAttachedFilter);*/
-
+		// Go through all the devices plugged in
 		HashMap<String, UsbDevice> deviceList = usbManager.getDeviceList();
 		if (DEBUG) Log.d(TAG, "Found " + deviceList.size() + " devices");
 		Iterator<UsbDevice> deviceIterator = deviceList.values().iterator();
@@ -108,32 +101,12 @@ public class HidUAVTalk {
 			UsbDevice dev = deviceIterator.next();
 			if (DEBUG) Log.d(TAG, "Testing device: " + dev);
 			usbManager.requestPermission(dev, permissionIntent);
-			//ConnectToDeviceInterface(dev);
 		}
 
 		if (DEBUG) Log.d(TAG, "Registered the deviceAttachedFilter");
 
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		if( !openTelemetryHid(objMngr) )
-			return false;
-
-		return connected;
-
+		return deviceList.size() > 0;
 	}
-
-	public HidUAVTalk(OPTelemetryService opTelemetryService) {
-		this.hostDisplayActivity = opTelemetryService;
-	}
-
-	private static final String ACTION_USB_PERMISSION = "com.access.device.USB_PERMISSION";
-
-	UsbDevice currentDevice;
 
 	/*
 	 * Receives a requested broadcast from the operating system.
@@ -172,9 +145,6 @@ public class HidUAVTalk {
 							{
 								if (DEBUG) Log.d(TAG, "Unable to connect to device");
 							}
-							sendEnabledMessage();
-							// TODO: Create a listener to receive messages from the host
-
 						}
 					}
 					else
@@ -224,12 +194,8 @@ public class HidUAVTalk {
 				}
 			}
 		}
-
-		private void sendEnabledMessage() {
-			// TODO Auto-generated method stub
-
-		};
 	};
+
 	private UsbEndpoint usbEndpointRead;
 
 	private UsbEndpoint usbEndpointWrite;
@@ -245,11 +211,6 @@ public class HidUAVTalk {
 	private IntentFilter deviceAttachedFilter;
 
 	private IntentFilter permissionFilter;
-
-	protected void sendEnabledMessage() {
-		// TODO Auto-generated method stub
-
-	}
 
 	protected void CleanUpAndClose() {
 		if (UsingSingleInterface) {
@@ -372,12 +333,53 @@ public class HidUAVTalk {
 		}
 
 		connectedDevice = connectDevice;
-		connected = true;
 		if (DEBUG) Log.d(TAG, "Opened endpoints");
+
+		// Create the USB requests
+		readRequest = new UsbRequest();
+		readRequest.initialize(connectionRead, usbEndpointRead);
+
+		writeRequest = new UsbRequest();
+		writeRequest.initialize(connectionWrite, usbEndpointWrite);
+
+
+		handler.post(new Runnable() {
+			@Override
+			public void run() {
+				inStream = new TalkInputStream();
+				outStream = new TalkOutputStream();
+				attemptSucceeded();
+			}
+		});
+
+		readThread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				while (!shutdown) {
+					readData();
+					sendData();
+				}
+			}
+
+		});
+		readThread.start();
+
+		writeThread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				while (!shutdown) {
+					sendData();
+				}
+			}
+
+		});
+		//writeThread.start();
 
 		return true;
 	}
 
+	Thread readThread;
+	Thread writeThread;
 	private int byteToInt(byte b) { return b & 0x000000ff; }
 
 	private class TalkInputStream extends InputStream {
@@ -409,7 +411,6 @@ public class HidUAVTalk {
 			data.put(b);
 		}
 	};
-	private final TalkInputStream inStream = new TalkInputStream();
 
 	private class ByteFifo {
 
@@ -479,11 +480,6 @@ public class HidUAVTalk {
 		int bufferDataLength = usbEndpointRead.getMaxPacketSize();
 		ByteBuffer buffer = ByteBuffer.allocate(bufferDataLength + 1);
 
-		if(readRequest == null) {
-			readRequest = new UsbRequest();
-			readRequest.initialize(connectionRead, usbEndpointRead);
-		}
-
         // queue a request on the interrupt endpoint
         if(!readRequest.queue(buffer, bufferDataLength)) {
         	if (DEBUG) Log.d(TAG, "Failed to queue request");
@@ -511,16 +507,11 @@ public class HidUAVTalk {
         		buffer.position(2);
         		buffer.get(dst, 0, dataSize);
         		if (DEBUG) Log.d(TAG, "Entered read");
-        		inStream.write(dst);
+        		((TalkInputStream)inStream).write(dst);
         		if (DEBUG) Log.d(TAG, "Got read: " + dataSize + " bytes");
         	}
         } else
         	return 0;
-
-        if(false) {
-        	readRequest.cancel();
-        	readRequest.close();
-        }
 
         return dataSize;
 	}
@@ -600,30 +591,32 @@ public class HidUAVTalk {
 				// Remove that data from the write buffer
 				data.compact();
 				writePosition -= size;
+				if (DEBUG) Log.d(TAG, "packetizeData(): size="+size);
 			}
 			WriteToDevice(packet);
 		}
 
 	};
-	private final TalkOutputStream outStream = new TalkOutputStream();
 	private static final int MAX_HID_PACKET_SIZE = 64;
 
 	/**
 	 * Send a packet or wait for data to be available
 	 */
-	public void send() {
-		synchronized(outStream.data){
-			if (outStream.writePosition > 0)
-				outStream.packetizeData();
+	public void sendData() {
+		TalkOutputStream o = (TalkOutputStream) outStream;
+		synchronized(o.data){
+			if (o.writePosition > 0)
+				o.packetizeData();
 			else {
-				outStream.data.notify();
-				outStream.packetizeData();
+				o.data.notify();
+				o.packetizeData();
 			}
 		}
 	}
 
 	UsbRequest writeRequest = null;
 	boolean WriteToDevice(ByteBuffer DataToSend) {
+		if (DEBUG) Log.d(TAG, "Writing to device()");
 
 		//The report must be formatted correctly for the device being connected to. On some devices, this requires that a specific value must be the first byte in the report. This can be followed by the length of the data in the report. This format is determined by the device, and isn't specified here.
 
@@ -708,4 +701,5 @@ public class HidUAVTalk {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
 }

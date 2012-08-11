@@ -10,6 +10,8 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import junit.framework.Assert;
+
 import org.openpilot.uavtalk.UAVObjectManager;
 import org.openpilot.uavtalk.UAVTalk;
 
@@ -31,10 +33,9 @@ import android.util.Log;
 public class HidUAVTalk {
 
 	private static final String TAG = HidUAVTalk.class.getSimpleName();
-	public static int LOGLEVEL = 2;
-	public static boolean DEBUG = LOGLEVEL > 1;
-	public static boolean WARN = LOGLEVEL > 0;
-
+	public static int LOGLEVEL = 0;
+	public static boolean WARN = LOGLEVEL > 1;
+	public static boolean DEBUG = LOGLEVEL > 0;
 
 	Service hostDisplayActivity;
 
@@ -377,44 +378,24 @@ public class HidUAVTalk {
 		return true;
 	}
 
+	private int byteToInt(byte b) { return b & 0x000000ff; }
+
 	private class TalkInputStream extends InputStream {
-		ByteBuffer data = null;
+
+		ByteFifo data = new ByteFifo();
 		boolean stopped = false;
-		private static final int SIZE = 1024;
-		int readPosition = 0;
+
 		TalkInputStream() {
-			data = ByteBuffer.allocate(SIZE);
-			data.limit(SIZE);
-			data.clear();
 		}
 
 		@Override
-		public int read() throws IOException {
-			while(!stopped) {
-				synchronized(data) {
-					if(data.capacity() > readPosition)
-						return data.get(readPosition++);
-					else
-						try {
-							data.wait(50);
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-				}
+		public int read() {
+			try {
+				return data.getByteBlocking();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
-			throw new IOException();
-		}
-
-		void compress() {
-			if (readPosition > (data.capacity() * 3.0 / 4.0)) {
-				synchronized(data) {
-					data.position(readPosition);
-					data.compact();
-					readPosition = 0;
-					if (DEBUG) Log.d(TAG, "Compact() Capacity: " + data.capacity() + " Position: " + data.position() + " Available: " + data.remaining() + " Limit: " + data.limit());
-				}
-			}
+			return -1;
 		}
 
 		public void stop() {
@@ -422,42 +403,89 @@ public class HidUAVTalk {
 		}
 
 		public void put(byte b) {
-			synchronized(data) {
-				if(data.hasRemaining()) {
-					data.compact();
-					data.put(b);
-					data.notify();
-				}
-			}
 		}
 
 		public void write(byte[] b) {
-			synchronized(data) {
-				int available = data.remaining();
-				if(available >= b.length) {
-					if (DEBUG) Log.d(TAG, "Size: " + b.length + " Capacity: " + data.capacity() + " Position: " + data.position() + " Available: " + available + " Limit: " + data.limit());
-					//data.compact();
-					data.put(b);
-					data.notify();
-				}
-			}
+			data.put(b);
 		}
 	};
 	private final TalkInputStream inStream = new TalkInputStream();
+
+	private class ByteFifo {
+
+		//! The maximum size of the fifo
+		private final int MAX_SIZE = 1024;
+		//! The number of bytes in the buffer
+		private int size = 0;
+		//! Internal buffer
+		private final ByteBuffer buf;
+
+		ByteFifo() {
+			buf = ByteBuffer.allocate(MAX_SIZE);
+			size = 0;
+		}
+
+		public boolean put(byte[] dat) {
+			if ((size + dat.length) > MAX_SIZE)
+				return false;
+
+			// Place data at the end of the buffer
+			synchronized(buf) {
+				buf.position(size);
+				buf.put(dat);
+				size = size + dat.length;
+				buf.notify();
+			}
+			return true;
+		}
+
+		public byte[] get(int size) throws InterruptedException {
+			size = Math.min(size, this.size);
+			if (size > 0) {
+				synchronized(buf) {
+					byte[] dst = new byte[size];
+					buf.position(0);
+					buf.get(dst,0,size);
+					buf.compact();
+					this.size = this.size - size;
+					Assert.assertEquals(this.size, buf.position());
+
+					buf.wait();
+				}
+			}
+			return new byte[0];
+		}
+
+		public int getByteBlocking() throws InterruptedException {
+			synchronized(buf) {
+				if (size == 0)
+					buf.wait();
+				int val = byteToInt(buf.get(0));
+				buf.position(1);
+				buf.compact();
+				size--;
+
+				return val;
+			}
+		}
+	}
 
 	/**
 	 * Gets a report from HID, extract the meaningful data and push
 	 * it to the input stream
 	 */
+	UsbRequest readRequest = null;
 	public int readData() {
 		int bufferDataLength = usbEndpointRead.getMaxPacketSize();
 		ByteBuffer buffer = ByteBuffer.allocate(bufferDataLength + 1);
-		UsbRequest request = new UsbRequest();
-		request.initialize(connectionRead, usbEndpointRead);
 
+		if(readRequest == null) {
+			readRequest = new UsbRequest();
+			readRequest.initialize(connectionRead, usbEndpointRead);
+		}
 
         // queue a request on the interrupt endpoint
-        if(!request.queue(buffer, bufferDataLength)) {
+        if(!readRequest.queue(buffer, bufferDataLength)) {
         	if (DEBUG) Log.d(TAG, "Failed to queue request");
         	return 0;
         }
@@ -466,7 +494,7 @@ public class HidUAVTalk {
 
         int dataSize;
         // wait for status event
-        if (connectionRead.requestWait() == request) {
+        if (connectionRead.requestWait() == readRequest) {
         	// Packet format:
         	// 0: Report ID (1)
         	// 1: Number of valid bytes
@@ -482,21 +510,30 @@ public class HidUAVTalk {
         		byte[] dst = new byte[dataSize];
         		buffer.position(2);
         		buffer.get(dst, 0, dataSize);
+        		if (DEBUG) Log.d(TAG, "Entered read");
         		inStream.write(dst);
         		if (DEBUG) Log.d(TAG, "Got read: " + dataSize + " bytes");
         	}
         } else
         	return 0;
 
+        if(false) {
+        	readRequest.cancel();
+        	readRequest.close();
+        }
+
         return dataSize;
 	}
 
 	private class TalkOutputStream extends OutputStream {
-		ByteBuffer data = ByteBuffer.allocate(128);
+		ByteBuffer data = ByteBuffer.allocate(1024);
 		boolean stopped = false;
+		int writePosition = 0;
 
 		public int read() throws IOException {
-			if (stopped)
+			if (!stopped)
+
+
 				while(!stopped) {
 					synchronized(data) {
 						if(data.hasRemaining())
@@ -523,6 +560,7 @@ public class HidUAVTalk {
 			if (stopped)
 				throw new IOException();
 			synchronized(data) {
+
 				data.put((byte) oneByte);
 				data.notify();
 			}
@@ -534,37 +572,88 @@ public class HidUAVTalk {
 				throw new IOException();
 
 			synchronized(data) {
-				//data.put(b);
+				// Move the cursor to the end of the byte array to append
+				data.position(writePosition);
+				if (b.length < data.remaining()) {
+					data.put(b);
+					writePosition = data.position();
+				}
 				data.notify();
 			}
 		}
+
+		public void packetizeData() {
+			ByteBuffer packet;
+			synchronized(data) {
+				// Determine how much data to put in the packet
+				int size = Math.min(writePosition, MAX_HID_PACKET_SIZE - 2);
+				if (size <= 0)
+					return;
+
+				// Format into a HID packet
+				packet = ByteBuffer.allocate(MAX_HID_PACKET_SIZE);
+				packet.put(0,(byte) 2);             // Report ID
+				packet.put(1,(byte) size);          // The number of bytes of data
+				data.position(0);
+				data.get(packet.array(), 2, size);  // Copy data into the other array
+
+				// Remove that data from the write buffer
+				data.compact();
+				writePosition -= size;
+			}
+			WriteToDevice(packet);
+		}
+
 	};
 	private final TalkOutputStream outStream = new TalkOutputStream();
+	private static final int MAX_HID_PACKET_SIZE = 64;
 
+	/**
+	 * Send a packet or wait for data to be available
+	 */
+	public void send() {
+		synchronized(outStream.data){
+			if (outStream.writePosition > 0)
+				outStream.packetizeData();
+			else {
+				outStream.data.notify();
+				outStream.packetizeData();
+			}
+		}
+	}
+
+	UsbRequest writeRequest = null;
 	boolean WriteToDevice(ByteBuffer DataToSend) {
 
 		//The report must be formatted correctly for the device being connected to. On some devices, this requires that a specific value must be the first byte in the report. This can be followed by the length of the data in the report. This format is determined by the device, and isn't specified here.
 
 		int bufferDataLength = usbEndpointWrite.getMaxPacketSize();
 		ByteBuffer buffer = ByteBuffer.allocate(bufferDataLength + 1);
-		UsbRequest request = new UsbRequest();
+
+		if(writeRequest == null) {
+			writeRequest = new UsbRequest();
+			writeRequest.initialize(connectionWrite, usbEndpointWrite);
+		}
 
 		buffer.put(DataToSend);
 
-		request.initialize(connectionWrite, usbEndpointWrite);
-		request.queue(buffer, bufferDataLength);
+		writeRequest.queue(buffer, bufferDataLength);
 		try
 		{
-			if (request.equals(connectionWrite.requestWait()))
-			{
+			if (writeRequest.equals(connectionWrite.requestWait()))
 				return true;
-			}
 		}
 		catch (Exception ex)
 		{
 			// An exception has occured
 			return false;
 		}
+
+		if (false) {
+			writeRequest.cancel();
+			writeRequest.close();
+		}
+
 		return false;
 	}
 

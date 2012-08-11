@@ -523,11 +523,6 @@ public class OPTelemetryService extends Service {
 				return;
 			}
 
-			hid.readData();
-			hid.readData();
-			hid.readData();
-			hid.readData();
-
 			uavTalk = hid.getUavtalk();
 			tel = new Telemetry(uavTalk, objMngr);
 			mon = new TelemetryMonitor(objMngr,tel);
@@ -549,10 +544,29 @@ public class OPTelemetryService extends Service {
 				public void run() {
 					while(!terminate) {
 						hid.readData();
+						hid.send();
 					}
+					Log.e(TAG, "TERMINATED");
 				}
 			};
 			t.start();
+
+			// Read data from HID and push it ont the UAVTalk input stream
+			Thread t2 = new Thread(this) {
+				@Override
+				public void run() {
+					while(!terminate) {
+						hid.send();
+						try {
+							sleep(100);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				}
+			};
+			//t2.start();
 
 			// Process any bytes that have been pushed onto the UAVTalk stream
 			if (DEBUG) Log.d(TAG, "Entering UAVTalk processing loop");
@@ -583,6 +597,8 @@ public class OPTelemetryService extends Service {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+
+
 
 			hid.disconnect();
 

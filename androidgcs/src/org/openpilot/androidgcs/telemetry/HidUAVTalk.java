@@ -28,9 +28,10 @@ import android.util.Log;
 public class HidUAVTalk extends TelemetryTask {
 
 	private static final String TAG = HidUAVTalk.class.getSimpleName();
-	public static int LOGLEVEL = 2;
-	public static boolean WARN = LOGLEVEL > 1;
-	public static boolean DEBUG = LOGLEVEL > 0;
+	public static final int LOGLEVEL = 2;
+	public static final boolean DEBUG = LOGLEVEL > 2;
+	public static final boolean WARN = LOGLEVEL > 1;
+	public static final boolean ERROR = LOGLEVEL > 0;
 
 	//! USB constants
 	private static final int MAX_HID_PACKET_SIZE = 64;
@@ -46,19 +47,14 @@ public class HidUAVTalk extends TelemetryTask {
 
 	private static final String ACTION_USB_PERMISSION = "com.access.device.USB_PERMISSION";
 
-	//! Define whether to use a single interface for reading and writing
-	private final boolean UsingSingleInterface = true;
-
 	private UsbDevice currentDevice;
 	private UsbEndpoint usbEndpointRead;
 	private UsbEndpoint usbEndpointWrite;
 	private UsbManager usbManager;
 	private PendingIntent permissionIntent;
-	private UsbDeviceConnection connectionRead;
-	private UsbDeviceConnection connectionWrite;
+	private UsbDeviceConnection usbDeviceConnection;
 	private IntentFilter permissionFilter;
-	private UsbInterface usbInterfaceRead = null;
-	private UsbInterface usbInterfaceWrite = null;
+	private UsbInterface usbInterface = null;
 	private TalkInputStream inTalkStream;
 	private TalkOutputStream outTalkStream;
 	private UsbRequest writeRequest = null;
@@ -218,19 +214,9 @@ public class HidUAVTalk extends TelemetryTask {
 
 
 	protected void CleanUpAndClose() {
-		if (UsingSingleInterface) {
-			if(connectionRead != null && usbInterfaceRead != null)
-				connectionRead.releaseInterface(usbInterfaceRead);
-			usbInterfaceRead = null;
-		}
-	else {
-		if(connectionRead != null && usbInterfaceRead != null)
-			connectionRead.releaseInterface(usbInterfaceRead);
-		if(connectionWrite != null && usbInterfaceWrite != null)
-			connectionWrite.releaseInterface(usbInterfaceWrite);
-		usbInterfaceWrite = null;
-		usbInterfaceRead = null;
-		}
+		if(usbDeviceConnection != null && usbInterface != null)
+			usbDeviceConnection.releaseInterface(usbInterface);
+		usbInterface = null;
 	}
 
 	//Validating the Connected Device - Before asking for permission to connect to the device, it is essential that you ensure that this is a device that you support or expect to connect to. This can be done by validating the devices Vendor ID and Product ID.
@@ -258,87 +244,54 @@ public class HidUAVTalk extends TelemetryTask {
 		UsbEndpoint ep1 = null;
 		UsbEndpoint ep2 = null;
 
-
-		if (UsingSingleInterface)
+		// Using the same interface for reading and writing
+		usbInterface = connectDevice.getInterface(0x2);
+		if (usbInterface.getEndpointCount() == 2)
 		{
-			// Using the same interface for reading and writing
-			usbInterfaceRead = connectDevice.getInterface(0x2);
-			usbInterfaceWrite = usbInterfaceRead;
-			if (usbInterfaceRead.getEndpointCount() == 2)
-			{
-				ep1 = usbInterfaceRead.getEndpoint(0);
-				ep2 = usbInterfaceRead.getEndpoint(1);
-			}
+			ep1 = usbInterface.getEndpoint(0);
+			ep2 = usbInterface.getEndpoint(1);
 		}
-		else        // if (!UsingSingleInterface)
-		{
-			usbInterfaceRead = connectDevice.getInterface(0x01);
-			usbInterfaceWrite = connectDevice.getInterface(0x02);
-			if ((usbInterfaceRead.getEndpointCount() == 1) && (usbInterfaceWrite.getEndpointCount() == 1))
-			{
-				ep1 = usbInterfaceRead.getEndpoint(0);
-				ep2 = usbInterfaceWrite.getEndpoint(0);
-			}
-		}
-
 
 		if ((ep1 == null) || (ep2 == null))
 		{
-			if (DEBUG) Log.d(TAG, "Null endpoints");
+			if (ERROR) Log.e(TAG, "Null endpoints");
 			return false;
 		}
 
 		// Determine which endpoint is the read, and which is the write
-
 		if (ep1.getType() == UsbConstants.USB_ENDPOINT_XFER_INT)
 		{
 			if (ep1.getDirection() == UsbConstants.USB_DIR_IN)
-			{
 				usbEndpointRead = ep1;
-			}
 			else if (ep1.getDirection() == UsbConstants.USB_DIR_OUT)
-			{
 				usbEndpointWrite = ep1;
-			}
 		}
 		if (ep2.getType() == UsbConstants.USB_ENDPOINT_XFER_INT)
 		{
 			if (ep2.getDirection() == UsbConstants.USB_DIR_IN)
-			{
 				usbEndpointRead = ep2;
-			}
 			else if (ep2.getDirection() == UsbConstants.USB_DIR_OUT)
-			{
 				usbEndpointWrite = ep2;
-			}
 		}
 		if ((usbEndpointRead == null) || (usbEndpointWrite == null))
 		{
-			if (DEBUG) Log.d(TAG, "Endpoints wrong way around");
+			if (ERROR) Log.e(TAG, "Could not find write and read endpoint");
 			return false;
 		}
-		connectionRead = usbManager.openDevice(connectDevice);
-		connectionRead.claimInterface(usbInterfaceRead, true);
 
+		// Claim the interface
+		usbDeviceConnection = usbManager.openDevice(connectDevice);
+		usbDeviceConnection.claimInterface(usbInterface, true);
 
-		if (UsingSingleInterface)
-		{
-			connectionWrite = connectionRead;
-		}
-		else // if (!UsingSingleInterface)
-		{
-			connectionWrite = usbManager.openDevice(connectDevice);
-			connectionWrite.claimInterface(usbInterfaceWrite, true);
-		}
 
 		if (DEBUG) Log.d(TAG, "Opened endpoints");
 
 		// Create the USB requests
 		readRequest = new UsbRequest();
-		readRequest.initialize(connectionRead, usbEndpointRead);
+		readRequest.initialize(usbDeviceConnection, usbEndpointRead);
 
 		writeRequest = new UsbRequest();
-		writeRequest.initialize(connectionWrite, usbEndpointWrite);
+		writeRequest.initialize(usbDeviceConnection, usbEndpointWrite);
 
 		inTalkStream = new TalkInputStream();
 		outTalkStream = new TalkOutputStream();
@@ -393,7 +346,7 @@ public class HidUAVTalk extends TelemetryTask {
 
         int dataSize;
         // wait for status event
-        if (connectionRead.requestWait() == readRequest) {
+        if (usbDeviceConnection.requestWait() == readRequest) {
         	// Packet format:
         	// 0: Report ID (1)
         	// 1: Number of valid bytes
@@ -435,7 +388,7 @@ public class HidUAVTalk extends TelemetryTask {
 				writeRequest.queue(packet, bufferDataLength);
 				try
 				{
-					if (!writeRequest.equals(connectionWrite.requestWait()))
+					if (!writeRequest.equals(usbDeviceConnection.requestWait()))
 						Log.e(TAG, "writeRequest failed");
 				}
 				catch (Exception ex)

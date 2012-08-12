@@ -26,7 +26,6 @@ package org.openpilot.uavtalk;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Observable;
@@ -34,6 +33,7 @@ import java.util.Observer;
 import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import android.util.Log;
 
@@ -485,7 +485,7 @@ public class Telemetry {
      * Enqueue the event received from an object.  This is the main method that handles all the callbacks
      * from UAVObjects (due to updates, or update requests)
      */
-    private synchronized void enqueueObjectUpdates(UAVObject obj, int event, boolean allInstances, boolean priority) throws IOException
+    private void enqueueObjectUpdates(UAVObject obj, int event, boolean allInstances, boolean priority) throws IOException
     {
         // Push event into queue
     	if (DEBUG) Log.d(TAG, "Push event into queue for obj " + obj.getName() + " event " + event);
@@ -538,7 +538,7 @@ public class Telemetry {
      * Process events from the object queue
      * @throws IOException
      */
-    private synchronized void processObjectQueue() throws IOException
+    private void processObjectQueue() throws IOException
     {
       	if (DEBUG) Log.d(TAG, "Process object queue - Depth " + objQueue.size() + " priority " + objPriorityQueue.size());
 
@@ -744,8 +744,8 @@ public class Telemetry {
     private final UAVTalk utalk;
     private UAVObject gcsStatsObj;
     private final List<ObjectTimeInfo> objList = new ArrayList<ObjectTimeInfo>();
-    private final Queue<ObjectQueueInfo> objQueue = new LinkedList<ObjectQueueInfo>();
-    private final Queue<ObjectQueueInfo> objPriorityQueue = new LinkedList<ObjectQueueInfo>();
+    private final Queue<ObjectQueueInfo> objQueue = new ConcurrentLinkedQueue<ObjectQueueInfo>();
+    private final Queue<ObjectQueueInfo> objPriorityQueue = new ConcurrentLinkedQueue<ObjectQueueInfo>();
     private final ObjectTransactionInfo transInfo = new ObjectTransactionInfo();
     private boolean transPending;
 

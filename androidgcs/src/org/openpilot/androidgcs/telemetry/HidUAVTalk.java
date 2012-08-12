@@ -500,7 +500,7 @@ public class HidUAVTalk extends TelemetryTask {
         	//Assert.assertEquals(1, buffer.get()); // Report ID
         	//Assert.assertTrue(dataSize < buffer.capacity());
 
-        	if (buffer.get(0) != 1 || buffer.get(1) < 0 || buffer.get(2) > (buffer.capacity() - 2)) {
+        	if (buffer.get(0) != 1 || buffer.get(1) < 0 || buffer.get(1) > (buffer.capacity() - 2)) {
         		if (DEBUG) Log.d(TAG, "Badly formatted HID packet");
         	} else {
         		byte[] dst = new byte[dataSize];

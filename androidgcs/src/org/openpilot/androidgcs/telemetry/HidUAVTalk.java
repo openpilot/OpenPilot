@@ -312,7 +312,7 @@ public class HidUAVTalk extends TelemetryTask {
 			public void run() {
 
 				// Enqueue the first read
-				readData();
+				queueRead();
 
 				while (!shutdown) {
 					// If there are no request
@@ -325,9 +325,8 @@ public class HidUAVTalk extends TelemetryTask {
 					} else if (returned == writeRequest) {
 						if (DEBUG) Log.d(TAG, "Received write completed request");
 						writePending = false;
+						sendData();
 					}
-
-					sendData();
 				}
 			}
 
@@ -351,63 +350,79 @@ public class HidUAVTalk extends TelemetryTask {
 	 * it to the input stream
 	 */
 	ByteBuffer readBuffer = ByteBuffer.allocate(MAX_HID_PACKET_SIZE);
-	private void queueRead() {
-        if(!readRequest.queue(readBuffer, MAX_HID_PACKET_SIZE)) {
-        	if (ERROR) Log.e(TAG, "Failed to queue request");
-        } else
-        	readPending = true;
-	}
-	public void readData() {
 
-		if (!readPending) {
-			queueRead();
-		} else { // We just received a read
+	/**
+	 * Schedules a USB read
+	 */
+	private void queueRead() {
+		synchronized(readRequest) {
+			if(!readRequest.queue(readBuffer, MAX_HID_PACKET_SIZE)) {
+				if (ERROR) Log.e(TAG, "Failed to queue request");
+			} else
+				readPending = true;
+		}
+	}
+
+	/**
+	 * Reads data from the last USB transaction and schedules another read
+	 */
+	public void readData() {
+		synchronized(readRequest) {
+
+			if (!readPending) {
+				if (ERROR) Log.e(TAG, "Tried to read read while a transaction was not pending");
+				return;
+			}
+
+			// We just received a read
 			readPending = false;
 			// Packet format:
-        	// 0: Report ID (1)
-        	// 1: Number of valid bytes
-        	// 2:63: Data
+			// 0: Report ID (1)
+			// 1: Number of valid bytes
+			// 2:63: Data
 
-        	int dataSize = readBuffer.get(1);    // Data size
-        	//Assert.assertEquals(1, buffer.get()); // Report ID
-        	//Assert.assertTrue(dataSize < buffer.capacity());
+			int dataSize = readBuffer.get(1);    // Data size
+			//Assert.assertEquals(1, buffer.get()); // Report ID
+			//Assert.assertTrue(dataSize < buffer.capacity());
 
-        	if (readBuffer.get(0) != 1 || readBuffer.get(1) < 0 || readBuffer.get(1) > (readBuffer.capacity() - 2)) {
-        		if (ERROR) Log.e(TAG, "Badly formatted HID packet");
-        	} else {
-        		byte[] dst = new byte[dataSize];
-        		readBuffer.position(2);
-        		readBuffer.get(dst, 0, dataSize);
-        		if (DEBUG) Log.d(TAG, "Entered read");
-        		inTalkStream.write(dst);
-        		if (DEBUG) Log.d(TAG, "Got read: " + dataSize + " bytes");
-        	}
+			if (readBuffer.get(0) != 1 || readBuffer.get(1) < 0 || readBuffer.get(1) > (readBuffer.capacity() - 2)) {
+				if (ERROR) Log.e(TAG, "Badly formatted HID packet");
+			} else {
+				byte[] dst = new byte[dataSize];
+				readBuffer.position(2);
+				readBuffer.get(dst, 0, dataSize);
+				if (DEBUG) Log.d(TAG, "Entered read");
+				inTalkStream.write(dst);
+				if (DEBUG) Log.d(TAG, "Got read: " + dataSize + " bytes");
+			}
 
-        	// Queue another read
-        	queueRead();
-        }
+			// Queue another read
+			queueRead();
+
+		}
 	}
 
 	/**
 	 * Send a packet if data is available
 	 */
 	public void sendData() {
+		synchronized(writeRequest) {
+			// Don't try and send data till previous request completes
+			if (writePending)
+				return;
 
-		// Don't try and send data till previous request completes
-		if (writePending)
-			return;
+			ByteBuffer packet = outTalkStream.getHIDpacket();
+			if (packet != null) {
+				if (DEBUG) Log.d(TAG, "Writing to device()");
 
-		ByteBuffer packet = outTalkStream.getHIDpacket();
-		if (packet != null) {
-			if (DEBUG) Log.d(TAG, "Writing to device()");
+				int bufferDataLength = usbEndpointWrite.getMaxPacketSize();
+				Assert.assertTrue(packet.capacity() <= bufferDataLength);
 
-			int bufferDataLength = usbEndpointWrite.getMaxPacketSize();
-			Assert.assertTrue(packet.capacity() <= bufferDataLength);
-
-			if(writeRequest.queue(packet, bufferDataLength))
-				writePending = true;
-			else if (ERROR)
-				Log.e(TAG, "Write queuing failed");
+				if(writeRequest.queue(packet, bufferDataLength))
+					writePending = true;
+				else if (ERROR)
+					Log.e(TAG, "Write queuing failed");
+			}
 		}
 	}
 
@@ -446,6 +461,9 @@ public class HidUAVTalk extends TelemetryTask {
 				data.put((byte) oneByte);
 				data.notify();
 			}
+
+			// If there is not a write request queued, add one
+			sendData();
 		}
 
 		@Override
@@ -457,6 +475,8 @@ public class HidUAVTalk extends TelemetryTask {
 				data.put(b);
 				data.notify();
 			}
+
+			sendData();
 		}
 
 	};

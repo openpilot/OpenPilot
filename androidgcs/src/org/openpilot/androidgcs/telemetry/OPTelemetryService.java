@@ -248,7 +248,9 @@ public class OPTelemetryService extends Service {
 
 	public class LocalBinder extends Binder {
 		public TelemTask getTelemTask(int id) {
-			return telemTask.getTelemTaskIface();
+			if (telemTask != null)
+				return telemTask.getTelemTaskIface();
+			return null;
 		}
 		public void openConnection() {
 			Toast.makeText(getApplicationContext(), "Requested open connection", Toast.LENGTH_SHORT).show();

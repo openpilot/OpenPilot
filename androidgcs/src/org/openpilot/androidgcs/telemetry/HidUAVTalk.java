@@ -28,7 +28,7 @@ import android.util.Log;
 public class HidUAVTalk extends TelemetryTask {
 
 	private static final String TAG = HidUAVTalk.class.getSimpleName();
-	public static int LOGLEVEL = 0;
+	public static int LOGLEVEL = 2;
 	public static boolean WARN = LOGLEVEL > 1;
 	public static boolean DEBUG = LOGLEVEL > 0;
 
@@ -46,7 +46,24 @@ public class HidUAVTalk extends TelemetryTask {
 
 	private static final String ACTION_USB_PERMISSION = "com.access.device.USB_PERMISSION";
 
-	UsbDevice currentDevice;
+	//! Define whether to use a single interface for reading and writing
+	private final boolean UsingSingleInterface = true;
+
+	private UsbDevice currentDevice;
+	private UsbEndpoint usbEndpointRead;
+	private UsbEndpoint usbEndpointWrite;
+	private UsbManager usbManager;
+	private PendingIntent permissionIntent;
+	private UsbDeviceConnection connectionRead;
+	private UsbDeviceConnection connectionWrite;
+	private IntentFilter permissionFilter;
+	private UsbInterface usbInterfaceRead = null;
+	private UsbInterface usbInterfaceWrite = null;
+	private TalkInputStream inTalkStream;
+	private TalkOutputStream outTalkStream;
+	private UsbRequest writeRequest = null;
+	private UsbRequest readRequest = null;
+	private Thread readWriteThread;
 
 	public HidUAVTalk(OPTelemetryService service) {
 		super(service);
@@ -199,19 +216,6 @@ public class HidUAVTalk extends TelemetryTask {
 		}
 	}; */
 
-	private UsbEndpoint usbEndpointRead;
-
-	private UsbEndpoint usbEndpointWrite;
-
-	private UsbManager usbManager;
-
-	private PendingIntent permissionIntent;
-
-	private UsbDeviceConnection connectionRead;
-
-	private UsbDeviceConnection connectionWrite;
-
-	private IntentFilter permissionFilter;
 
 	protected void CleanUpAndClose() {
 		if (UsingSingleInterface) {
@@ -243,14 +247,6 @@ public class HidUAVTalk extends TelemetryTask {
 		else
 			return false;
 	}
-
-	private UsbInterface usbInterfaceRead = null;
-	private UsbInterface usbInterfaceWrite = null;
-	private final boolean UsingSingleInterface = true;
-
-	private TalkInputStream inTalkStream;
-	private TalkOutputStream outTalkStream;
-	UsbRequest writeRequest = null;
 
 	boolean ConnectToDeviceInterface(UsbDevice connectDevice) {
 		// Connecting to the Device - If you are reading and writing, then the device
@@ -370,7 +366,6 @@ public class HidUAVTalk extends TelemetryTask {
 		return true;
 	}
 
-	Thread readWriteThread;
 
 	void displayBuffer(String msg, byte[] buf) {
 		msg += " (";
@@ -384,7 +379,6 @@ public class HidUAVTalk extends TelemetryTask {
 	 * Gets a report from HID, extract the meaningful data and push
 	 * it to the input stream
 	 */
-	UsbRequest readRequest = null;
 	public int readData() {
 		int bufferDataLength = usbEndpointRead.getMaxPacketSize();
 		ByteBuffer buffer = ByteBuffer.allocate(bufferDataLength + 1);

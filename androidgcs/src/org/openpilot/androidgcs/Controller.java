@@ -78,11 +78,11 @@ public class Controller extends ObjectManagerActivity {
 		public void update(Observable observable, Object data) {
 			// Once we have updated settings we can active the GCS receiver mode
 			Log.d(TAG,"Got update from settings");
-			activateGcsReceiver();
 			UAVDataObject manualControlSettings = (UAVDataObject) objMngr.getObject("ManualControlSettings");
 			if(manualControlSettings != null) {
 				manualControlSettings.removeUpdatedObserver(this);
 			}
+			activateGcsReceiver();
 		}
 	};
 

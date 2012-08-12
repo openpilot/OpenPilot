@@ -28,7 +28,7 @@ import android.util.Log;
 public class HidUAVTalk extends TelemetryTask {
 
 	private static final String TAG = HidUAVTalk.class.getSimpleName();
-	public static final int LOGLEVEL = 2;
+	public static final int LOGLEVEL = 0;
 	public static final boolean DEBUG = LOGLEVEL > 2;
 	public static final boolean WARN = LOGLEVEL > 1;
 	public static final boolean ERROR = LOGLEVEL > 0;
@@ -60,6 +60,9 @@ public class HidUAVTalk extends TelemetryTask {
 	private UsbRequest writeRequest = null;
 	private UsbRequest readRequest = null;
 	private Thread readWriteThread;
+
+	private boolean readPending = false;
+	private boolean writePending = false;
 
 	public HidUAVTalk(OPTelemetryService service) {
 		super(service);
@@ -307,8 +310,23 @@ public class HidUAVTalk extends TelemetryTask {
 		readWriteThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
+
+				// Enqueue the first read
+				readData();
+
 				while (!shutdown) {
-					readData();
+					// If there are no request
+
+					// Enqueue requests appropriately first
+					UsbRequest returned = usbDeviceConnection.requestWait();
+					if (returned == readRequest) {
+						if (DEBUG) Log.d(TAG, "Received read request");
+						readData();
+					} else if (returned == writeRequest) {
+						if (DEBUG) Log.d(TAG, "Received write completed request");
+						writePending = false;
+					}
+
 					sendData();
 				}
 			}
@@ -332,70 +350,65 @@ public class HidUAVTalk extends TelemetryTask {
 	 * Gets a report from HID, extract the meaningful data and push
 	 * it to the input stream
 	 */
-	public int readData() {
-		int bufferDataLength = usbEndpointRead.getMaxPacketSize();
-		ByteBuffer buffer = ByteBuffer.allocate(bufferDataLength + 1);
+	ByteBuffer readBuffer = ByteBuffer.allocate(MAX_HID_PACKET_SIZE);
+	private void queueRead() {
+        if(!readRequest.queue(readBuffer, MAX_HID_PACKET_SIZE)) {
+        	if (ERROR) Log.e(TAG, "Failed to queue request");
+        } else
+        	readPending = true;
+	}
+	public void readData() {
 
-        // queue a request on the interrupt endpoint
-        if(!readRequest.queue(buffer, bufferDataLength)) {
-        	if (DEBUG) Log.d(TAG, "Failed to queue request");
-        	return 0;
-        }
-
-        if (DEBUG) Log.d(TAG, "Request queued");
-
-        int dataSize;
-        // wait for status event
-        if (usbDeviceConnection.requestWait() == readRequest) {
-        	// Packet format:
+		if (!readPending) {
+			queueRead();
+		} else { // We just received a read
+			readPending = false;
+			// Packet format:
         	// 0: Report ID (1)
         	// 1: Number of valid bytes
         	// 2:63: Data
 
-        	dataSize = buffer.get(1);    // Data size
+        	int dataSize = readBuffer.get(1);    // Data size
         	//Assert.assertEquals(1, buffer.get()); // Report ID
         	//Assert.assertTrue(dataSize < buffer.capacity());
 
-        	if (buffer.get(0) != 1 || buffer.get(1) < 0 || buffer.get(1) > (buffer.capacity() - 2)) {
-        		if (DEBUG) Log.d(TAG, "Badly formatted HID packet");
+        	if (readBuffer.get(0) != 1 || readBuffer.get(1) < 0 || readBuffer.get(1) > (readBuffer.capacity() - 2)) {
+        		if (ERROR) Log.e(TAG, "Badly formatted HID packet");
         	} else {
         		byte[] dst = new byte[dataSize];
-        		buffer.position(2);
-        		buffer.get(dst, 0, dataSize);
+        		readBuffer.position(2);
+        		readBuffer.get(dst, 0, dataSize);
         		if (DEBUG) Log.d(TAG, "Entered read");
         		inTalkStream.write(dst);
         		if (DEBUG) Log.d(TAG, "Got read: " + dataSize + " bytes");
         	}
-        } else
-        	return 0;
 
-        return dataSize;
+        	// Queue another read
+        	queueRead();
+        }
 	}
 
 	/**
 	 * Send a packet if data is available
 	 */
 	public void sendData() {
-		ByteBuffer packet = null;
-		do { // Send all the data available to prevent sending backlog
-			packet = outTalkStream.getHIDpacket();
-			if (packet != null) {
-				if (DEBUG) Log.d(TAG, "Writing to device()");
 
-				int bufferDataLength = usbEndpointWrite.getMaxPacketSize();
-				Assert.assertTrue(packet.capacity() <= bufferDataLength);
+		// Don't try and send data till previous request completes
+		if (writePending)
+			return;
 
-				writeRequest.queue(packet, bufferDataLength);
-				try
-				{
-					if (!writeRequest.equals(usbDeviceConnection.requestWait()))
-						Log.e(TAG, "writeRequest failed");
-				}
-				catch (Exception ex)
-				{
-				}
-			}
-		} while (packet != null);
+		ByteBuffer packet = outTalkStream.getHIDpacket();
+		if (packet != null) {
+			if (DEBUG) Log.d(TAG, "Writing to device()");
+
+			int bufferDataLength = usbEndpointWrite.getMaxPacketSize();
+			Assert.assertTrue(packet.capacity() <= bufferDataLength);
+
+			if(writeRequest.queue(packet, bufferDataLength))
+				writePending = true;
+			else if (ERROR)
+				Log.e(TAG, "Write queuing failed");
+		}
 	}
 
 	/*********** Helper classes for telemetry streams ************/

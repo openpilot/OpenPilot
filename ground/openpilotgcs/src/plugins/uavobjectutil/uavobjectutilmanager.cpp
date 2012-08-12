@@ -247,14 +247,6 @@ FirmwareIAPObj::DataFields UAVObjectUtilManager::getFirmwareIap()
     if (!firmwareIap)
         return dummy;
 
-    // The code below will ask for the object update and wait for the updated to be received,
-    // or the timeout of the timer, set to 1 second.
-    QEventLoop loop;
-    connect(firmwareIap, SIGNAL(objectUpdated(UAVObject*)), &loop, SLOT(quit()));
-    QTimer::singleShot(1000, &loop, SLOT(quit())); // Create a timeout
-    firmwareIap->requestUpdate();
-    loop.exec();
-
     return firmwareIap->getData();
 }
 

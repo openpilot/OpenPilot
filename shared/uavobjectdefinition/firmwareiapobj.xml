@@ -10,7 +10,7 @@
         <field name="crc" units="" type="uint32" elements="1"/> 
         <access gcs="readwrite" flight="readwrite"/> 
         <telemetrygcs acked="true" updatemode="manual" period="0"/> 
-        <telemetryflight acked="true" updatemode="manual" period="0"/> 
+        <telemetryflight acked="true" updatemode="onchange" period="0"/> 
         <logging updatemode="manual" period="0"/> 
 </object> 
 </xml> 

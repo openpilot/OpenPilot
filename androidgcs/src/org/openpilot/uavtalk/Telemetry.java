@@ -551,17 +551,22 @@ public class Telemetry {
 
         // Get object information from queue (first the priority and then the regular queue)
         ObjectQueueInfo objInfo;
-        if ( !objPriorityQueue.isEmpty() )
-        {
-            objInfo = objPriorityQueue.remove();
-        }
-        else if ( !objQueue.isEmpty() )
-        {
-            objInfo = objQueue.remove();
-        }
-        else
-        {
-            return;
+        synchronized (objPriorityQueue) {
+        	if ( !objPriorityQueue.isEmpty() )
+        	{
+        		objInfo = objPriorityQueue.remove();
+        	} else {
+        		synchronized (objQueue) {
+        			if ( !objQueue.isEmpty() )
+        	        {
+        	            objInfo = objQueue.remove();
+        	        }
+        	        else
+        	        {
+        	            return;
+        	        }
+        		}
+        	}
         }
 
         // Check if a connection has been established, only process GCSTelemetryStats updates

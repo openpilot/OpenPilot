@@ -541,11 +541,6 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 		gps_vel_updated = 0;
 	}
 
-	mag_updated |= (xQueueReceive(magQueue, &ev, 0 / portTICK_RATE_MS) == pdTRUE) && homeLocation.Set == HOMELOCATION_SET_TRUE;
-	baro_updated |= xQueueReceive(baroQueue, &ev, 0 / portTICK_RATE_MS) == pdTRUE;
-	gps_updated |= (xQueueReceive(gpsQueue, &ev, 0 / portTICK_RATE_MS) == pdTRUE) && outdoor_mode;
-	gps_vel_updated |= (xQueueReceive(gpsVelQueue, &ev, 0 / portTICK_RATE_MS) == pdTRUE) && outdoor_mode;
-
 	if (first_run) {
 		inited = false;
 		init_stage = 0;
@@ -559,7 +554,12 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 
 		return 0;
 	}
-	
+
+	mag_updated |= (xQueueReceive(magQueue, &ev, 0 / portTICK_RATE_MS) == pdTRUE);
+	baro_updated |= xQueueReceive(baroQueue, &ev, 0 / portTICK_RATE_MS) == pdTRUE;
+	gps_updated |= (xQueueReceive(gpsQueue, &ev, 0 / portTICK_RATE_MS) == pdTRUE) && outdoor_mode;
+	gps_vel_updated |= (xQueueReceive(gpsVelQueue, &ev, 0 / portTICK_RATE_MS) == pdTRUE) && outdoor_mode;
+
 	// Get most recent data
 	GyrosGet(&gyrosData);
 	AccelsGet(&accelsData);
@@ -571,6 +571,9 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 
 	// Discard mag if it has NAN (normally from bad calibration)
 	mag_updated &= (magData.x == magData.x && magData.y == magData.y && magData.z == magData.z);
+	// Don't require HomeLocation.Set to be true but at least require a mag configuration (allows easily
+	// switching between indoor and outdoor mode with Set = false)
+	mag_updated &= (homeLocation.Be[0] != 0 || homeLocation.Be[1] != 0 || homeLocation.Be[2]);
 
 	// Have a minimum requirement for gps usage
 	gps_updated &= (gpsData.Satellites >= 7) && (gpsData.PDOP <= 4.0f) && (homeLocation.Set == HOMELOCATION_SET_TRUE);

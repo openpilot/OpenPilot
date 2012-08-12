@@ -28,10 +28,11 @@
 #include "uavitem.h"
 #include <math.h>
 
-static double groundspeed_mps_filt;
-
 namespace mapcontrol
 {
+
+    double UAVItem::groundspeed_mps_filt = 0;
+
     UAVItem::UAVItem(MapGraphicItem* map,OPMapWidget* parent,QString uavPic):map(map),mapwidget(parent),showtrail(true),showtrailline(true),trailtime(5),traildistance(50),autosetreached(true)
       ,autosetdistance(100),altitude(0),showUAVInfo(false)
     {
@@ -59,7 +60,6 @@ namespace mapcontrol
     {
         Q_UNUSED(option);
         Q_UNUSED(widget);
-
 
         //Draw plane
         painter->drawPixmap(-pic.width()/2,-pic.height()/2,pic);

@@ -248,7 +248,7 @@ namespace mapcontrol
         double Distance3D(internals::PointLatLng const& coord, int const& altitude);
         double autosetdistance;
         bool showUAVInfo;
-      //  QRectF rect;
+        static double groundspeed_mps_filt;
 
     public slots:
 

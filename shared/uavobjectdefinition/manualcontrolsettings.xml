@@ -23,7 +23,6 @@
         <field name="Stabilization3Settings" units="" type="enum" elementnames="Roll,Pitch,Yaw" options="None,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar" defaultvalue="Attitude,Attitude,Rate"/>
 
 	<!-- Note these options values should be identical to those defined in FlightMode -->
-        <field name="FlightModePosition" units="" type="enum" elements="3" options="Manual,Stabilized1,Stabilized2,Stabilized3,AltitudeHold,VelocityControl,PositionHold,PathPlanner,RTH,Land" defaultvalue="Manual,Stabilized1,Stabilized2"/>
         <field name="FlightModeNumber" units="" type="uint8" elements="1" defaultvalue="3"/>
         <field name="FlightModePosition" units="" type="enum" elements="6" options="Manual,Stabilized1,Stabilized2,Stabilized3,AltitudeHold,VelocityControl,PositionHold,PathPlanner,RTH,Land" defaultvalue="Manual,Stabilized1,Stabilized2,Stabilized3,Stabilized1,Stabilized2" limits="%0401NE:AltitudeHold:VelocityControl:PositionHold;%0402NE:AltitudeHold:VelocityControl:PositionHold,%0401NE:AltitudeHold:VelocityControl:PositionHold;%0402NE:AltitudeHold:VelocityControl:PositionHold,%0401NE:AltitudeHold:VelocityControl:PositionHold;%0402NE:AltitudeHold:VelocityControl:PositionHold,%0401NE:AltitudeHold:VelocityControl:PositionHold;%0402NE:AltitudeHold:VelocityControl:PositionHold,%0401NE:AltitudeHold:VelocityControl:PositionHold;%0402NE:AltitudeHold:VelocityControl:PositionHold,%0401NE:AltitudeHold:VelocityControl:PositionHold;%0402NE:AltitudeHold:VelocityControl:PositionHold"/>
 

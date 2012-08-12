@@ -75,7 +75,11 @@ plugin_modelview.depends = plugin_coreplugin
 plugin_modelview.depends += plugin_uavobjects
 SUBDIRS += plugin_modelview
 
-!contains(QT_VERSION, ^4\\.8\\..*) {
+
+#Qt 4.8.0 / phonon may crash on Mac, fixed in Qt 4.8.1, QTBUG-23128
+macx:contains(QT_VERSION, ^4\\.8\\.0): CONFIG += disable_notify_plugin
+
+!disable_notify_plugin {
 #Notify gadget
 plugin_notify.subdir = notify
 plugin_notify.depends = plugin_coreplugin

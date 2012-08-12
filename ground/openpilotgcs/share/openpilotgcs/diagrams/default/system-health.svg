@@ -1386,26 +1386,6 @@
        style="fill:#cf0e0e;fill-opacity:1;stroke:#ffffff;stroke-width:0.29055119;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline" />
   </g>
   <g
-     style="display:inline"
-     inkscape:label="SDCard-OK"
-     id="layer1"
-     inkscape:groupmode="layer" />
-  <g
-     style="display:inline"
-     inkscape:label="SDCard-Warning"
-     id="layer6"
-     inkscape:groupmode="layer" />
-  <g
-     style="display:inline"
-     inkscape:label="SDCard-Error"
-     id="layer11"
-     inkscape:groupmode="layer" />
-  <g
-     style="display:inline"
-     inkscape:label="SDCard-Critical"
-     id="layer20"
-     inkscape:groupmode="layer" />
-  <g
      style="display:none"
      inkscape:label="Memory-OK"
      id="layer9"

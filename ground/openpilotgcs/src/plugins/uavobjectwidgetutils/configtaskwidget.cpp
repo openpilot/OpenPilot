@@ -37,6 +37,7 @@ ConfigTaskWidget::ConfigTaskWidget(QWidget *parent) : QWidget(parent),isConnecte
     pm = ExtensionSystem::PluginManager::instance();
     objManager = pm->getObject<UAVObjectManager>();
     TelemetryManager* telMngr = pm->getObject<TelemetryManager>();
+    utilMngr = pm->getObject<UAVObjectUtilManager>();
     connect(telMngr, SIGNAL(connected()), this, SLOT(onAutopilotConnect()));
     connect(telMngr, SIGNAL(disconnected()), this, SLOT(onAutopilotDisconnect()));
     connect(telMngr, SIGNAL(connected()), this, SIGNAL(autoPilotConnected()));
@@ -232,9 +233,15 @@ void ConfigTaskWidget::forceConnectedState()
 
 void ConfigTaskWidget::onAutopilotConnect()
 {
+    if (utilMngr)
+        currentBoard = utilMngr->getBoardModel();//TODO REMEMBER TO ADD THIS TO FORCE CONNECTED FUNC ON CC3D_RELEASE
     invalidateObjects();
     dirty=false;
     isConnected=true;
+    foreach(objectToWidget * ow,objOfInterest)
+    {
+        loadWidgetLimits(ow->widget,ow->field,ow->index,ow->isLimited,ow->scale);
+    }
     enableControls(true);
     refreshWidgetsValues();
 }
@@ -1077,7 +1084,7 @@ void ConfigTaskWidget::checkWidgetsLimits(QWidget * widget,UAVObjectField * fiel
 {
     if(!hasLimits)
         return;
-    if(!field->isWithinLimits(value,index))
+    if(!field->isWithinLimits(value,index,currentBoard))
     {
         if(!widget->property("styleBackup").isValid())
             widget->setProperty("styleBackup",widget->styleSheet());
@@ -1151,7 +1158,7 @@ void ConfigTaskWidget::loadWidgetLimits(QWidget * widget,UAVObjectField * field,
         {
             foreach(QString str,option)
             {
-                if(field->isWithinLimits(str,index))
+                if(field->isWithinLimits(str,index,currentBoard))
                     cb->addItem(str);
             }
         }
@@ -1164,33 +1171,33 @@ void ConfigTaskWidget::loadWidgetLimits(QWidget * widget,UAVObjectField * field,
     {
         if(field->getMaxLimit(index).isValid())
         {
-            cb->setMaximum((double)(field->getMaxLimit(index).toDouble()/scale));
+            cb->setMaximum((double)(field->getMaxLimit(index,currentBoard).toDouble()/scale));
         }
-        if(field->getMinLimit(index).isValid())
+        if(field->getMinLimit(index,currentBoard).isValid())
         {
-            cb->setMinimum((double)(field->getMinLimit(index).toDouble()/scale));
+            cb->setMinimum((double)(field->getMinLimit(index,currentBoard).toDouble()/scale));
         }
     }
     else if(QSpinBox * cb=qobject_cast<QSpinBox *>(widget))
     {
-        if(field->getMaxLimit(index).isValid())
+        if(field->getMaxLimit(index,currentBoard).isValid())
         {
-            cb->setMaximum((int)qRound(field->getMaxLimit(index).toDouble()/scale));
+            cb->setMaximum((int)qRound(field->getMaxLimit(index,currentBoard).toDouble()/scale));
         }
-        if(field->getMinLimit(index).isValid())
+        if(field->getMinLimit(index,currentBoard).isValid())
         {
-            cb->setMinimum((int)qRound(field->getMinLimit(index).toDouble()/scale));
+            cb->setMinimum((int)qRound(field->getMinLimit(index,currentBoard).toDouble()/scale));
         }
     }
     else if(QSlider * cb=qobject_cast<QSlider *>(widget))
     {
-        if(field->getMaxLimit(index).isValid())
+        if(field->getMaxLimit(index,currentBoard).isValid())
         {
-            cb->setMaximum((int)qRound(field->getMaxLimit(index).toDouble()/scale));
+            cb->setMaximum((int)qRound(field->getMaxLimit(index,currentBoard).toDouble()/scale));
         }
-        if(field->getMinLimit(index).isValid())
+        if(field->getMinLimit(index,currentBoard).isValid())
         {
-            cb->setMinimum((int)(field->getMinLimit(index).toDouble()/scale));
+            cb->setMinimum((int)(field->getMinLimit(index,currentBoard).toDouble()/scale));
         }
     }
 }

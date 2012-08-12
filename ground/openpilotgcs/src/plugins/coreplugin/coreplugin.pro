@@ -63,7 +63,8 @@ SOURCES += mainwindow.cpp \
     workspacesettings.cpp \
     uavconfiginfo.cpp \
     authorsdialog.cpp \
-    telemetrymonitorwidget.cpp
+    telemetrymonitorwidget.cpp \
+    dialogs/importsettings.cpp
 HEADERS += mainwindow.h \
     tabpositionindicator.h \
     fancyactionbar.h \
@@ -124,12 +125,14 @@ HEADERS += mainwindow.h \
     uavconfiginfo.h \
     authorsdialog.h \
     iconfigurableplugin.h \
-    telemetrymonitorwidget.h
+    telemetrymonitorwidget.h \
+    dialogs/importsettings.h
 FORMS += dialogs/settingsdialog.ui \
     dialogs/shortcutsettings.ui \
     generalsettings.ui \
     uavgadgetoptionspage.ui \
-    workspacesettings.ui
+    workspacesettings.ui \
+    dialogs/importsettings.ui
 RESOURCES += core.qrc \
     fancyactionbar.qrc
 unix:!macx { 

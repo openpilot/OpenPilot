@@ -686,14 +686,11 @@ public class UAVTalk {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			// System.out.println("Unpacking new object");
 			if (DEBUG) Log.d(TAG, "Unpacking new object");
 			instobj.unpack(data);
 			return instobj;
 		} else {
 			// Unpack data into object instance
-			// System.out.println("Unpacking existing object: " +
-			// data.position() + " / " + data.capacity() );
 			if (DEBUG) Log.d(TAG, "Unpacking existing object: " + obj.getName());
 			obj.unpack(data);
 			return obj;

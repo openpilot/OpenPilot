@@ -157,7 +157,7 @@ public abstract class TelemetryTask implements Runnable {
 	 * to read from the input stream.
 	 */
 	private void startInputProcessing() {
-		new Thread(new processUavTalk()).start();
+		new Thread(new processUavTalk(), "Process UAV talk").start();
 	}
 
 	//! Runnable to process input stream

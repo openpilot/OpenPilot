@@ -132,12 +132,12 @@ public class OPTelemetryService extends Service {
 			case 3:
 				Toast.makeText(getApplicationContext(), "Attempting TCP connection", Toast.LENGTH_SHORT).show();
 				telemTask = new TcpUAVTalk(this);
-				activeTelem = new Thread(telemTask);
+				activeTelem = new Thread(telemTask, "Tcp telemetry thread");
 				break;
 			case 4:
 				Toast.makeText(getApplicationContext(), "Attempting USB HID connection", Toast.LENGTH_SHORT).show();
 				telemTask = new HidUAVTalk(this);
-				activeTelem = new Thread(telemTask);
+				activeTelem = new Thread(telemTask, "Hid telemetry thread");
 				break;
 			default:
 				throw new Error("Unsupported");

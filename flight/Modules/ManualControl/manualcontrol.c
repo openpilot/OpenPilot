@@ -724,6 +724,7 @@ static void updatePathDesired(ManualControlCommandData * cmd, bool changed)
 	static portTickType lastSysTime;
 	portTickType thisSysTime;
 	float dT;
+	const bool TRANSMITTER_MODE_POSITION = false;
 
 	thisSysTime = xTaskGetTickCount();
 	dT = (thisSysTime - lastSysTime) / portTICK_RATE_MS / 1000.0f;
@@ -741,7 +742,7 @@ static void updatePathDesired(ManualControlCommandData * cmd, bool changed)
 		pathDesired.End[PATHDESIRED_END_DOWN] = positionActual.Down;
 		pathDesired.Mode = PATHDESIRED_MODE_ENDPOINT;
 		PathDesiredSet(&pathDesired);
-	} else {
+	} else if (TRANSMITTER_MODE_POSITION) {
 		PathDesiredData pathDesired;
 		PathDesiredGet(&pathDesired);
 		pathDesired.End[PATHDESIRED_END_NORTH] += dT * -cmd->Pitch;

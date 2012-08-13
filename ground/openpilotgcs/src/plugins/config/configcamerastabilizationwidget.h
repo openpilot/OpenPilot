@@ -41,14 +41,11 @@ class ConfigCameraStabilizationWidget: public ConfigTaskWidget
 public:
     ConfigCameraStabilizationWidget(QWidget *parent = 0);
     ~ConfigCameraStabilizationWidget();
+
 private:
     Ui_CameraStabilizationWidget *m_camerastabilization;
-    virtual void enableControls(bool enable);
-    void refreshUIValues(CameraStabSettings::DataFields &cameraStabData);
 
 private slots:
-    void openHelp();
-    void resetToDefaults();
     void applySettings();
     void saveSettings();
     void refreshValues();

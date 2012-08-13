@@ -1,3 +1,16 @@
 <RCC>
-    <qresource prefix="/images"/>
+    <qresource prefix="/setupwizard">
+        <file>resources/bttn-heli-down.png</file>
+        <file>resources/bttn-heli-over.png</file>
+        <file>resources/bttn-heli-up.png</file>
+        <file>resources/bttn-land-down.png</file>
+        <file>resources/bttn-land-over.png</file>
+        <file>resources/bttn-land-up.png</file>
+        <file>resources/bttn-multi-down.png</file>
+        <file>resources/bttn-multi-over.png</file>
+        <file>resources/bttn-multi-up.png</file>
+        <file>resources/bttn-plane-down.png</file>
+        <file>resources/bttn-plane-over.png</file>
+        <file>resources/bttn-plane-up.png</file>
+    </qresource>
 </RCC>

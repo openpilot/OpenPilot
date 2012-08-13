@@ -61,20 +61,39 @@ p, li { white-space: pre-wrap; }
    <property name="alignment">
     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
    </property>
-   <widget class="QPushButton" name="multirotorButton">
+   <widget class="QToolButton" name="multirotorButton">
     <property name="geometry">
      <rect>
       <x>50</x>
       <y>40</y>
       <width>100</width>
-      <height>100</height>
+      <height>120</height>
      </rect>
     </property>
     <property name="toolTip">
      <string>Tricopter, Quadcopter, Hexacopter, Octocopter</string>
     </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QToolButton { border: none }</string>
+    </property>
     <property name="text">
      <string>Multirotor</string>
+    </property>
+    <property name="icon">
+     <iconset resource="../wizardResources.qrc">
+      <normaloff>:/setupwizard/resources/bttn-multi-up.png</normaloff>
+      <normalon>:/setupwizard/resources/bttn-multi-down.png</normalon>
+      <activeoff>:/setupwizard/resources/bttn-multi-down.png</activeoff>
+      <activeon>:/setupwizard/resources/bttn-multi-down.png</activeon>:/setupwizard/resources/bttn-multi-up.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>100</width>
+      <height>100</height>
+     </size>
     </property>
     <property name="checkable">
      <bool>true</bool>
@@ -85,46 +104,87 @@ p, li { white-space: pre-wrap; }
     <property name="autoExclusive">
      <bool>true</bool>
     </property>
-    <property name="flat">
-     <bool>false</bool>
+    <property name="toolButtonStyle">
+     <enum>Qt::ToolButtonTextUnderIcon</enum>
+    </property>
+    <property name="autoRaise">
+     <bool>true</bool>
     </property>
    </widget>
-   <widget class="QPushButton" name="fixedwingButton">
+   <widget class="QToolButton" name="fixedwingButton">
     <property name="geometry">
      <rect>
       <x>170</x>
       <y>40</y>
       <width>100</width>
-      <height>100</height>
+      <height>120</height>
      </rect>
     </property>
     <property name="toolTip">
      <string>Airplane, Sloper, Jet</string>
     </property>
+    <property name="styleSheet">
+     <string notr="true">QToolButton { border: none }</string>
+    </property>
     <property name="text">
      <string>Fixed wing</string>
+    </property>
+    <property name="icon">
+     <iconset resource="../wizardResources.qrc">
+      <normaloff>:/setupwizard/resources/bttn-plane-up.png</normaloff>
+      <normalon>:/setupwizard/resources/bttn-plane-down.png</normalon>
+      <activeoff>:/setupwizard/resources/bttn-plane-down.png</activeoff>
+      <activeon>:/setupwizard/resources/bttn-plane-down.png</activeon>:/setupwizard/resources/bttn-plane-up.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>100</width>
+      <height>100</height>
+     </size>
     </property>
     <property name="checkable">
      <bool>true</bool>
     </property>
+    <property name="checked">
+     <bool>false</bool>
+    </property>
     <property name="autoExclusive">
      <bool>true</bool>
     </property>
-    <property name="flat">
-     <bool>false</bool>
+    <property name="toolButtonStyle">
+     <enum>Qt::ToolButtonTextUnderIcon</enum>
+    </property>
+    <property name="autoRaise">
+     <bool>true</bool>
     </property>
    </widget>
-   <widget class="QPushButton" name="heliButton">
+   <widget class="QToolButton" name="heliButton">
     <property name="geometry">
      <rect>
       <x>290</x>
       <y>40</y>
       <width>100</width>
-      <height>100</height>
+      <height>120</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QToolButton { border: none }</string>
     </property>
     <property name="text">
      <string>Helicopter</string>
+    </property>
+    <property name="icon">
+     <iconset resource="../wizardResources.qrc">
+      <normaloff>:/setupwizard/resources/bttn-heli-up.png</normaloff>
+      <normalon>:/setupwizard/resources/bttn-heli-down.png</normalon>
+      <activeoff>:/setupwizard/resources/bttn-heli-down.png</activeoff>
+      <activeon>:/setupwizard/resources/bttn-heli-down.png</activeon>:/setupwizard/resources/bttn-heli-up.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>100</width>
+      <height>100</height>
+     </size>
     </property>
     <property name="checkable">
      <bool>true</bool>
@@ -132,24 +192,43 @@ p, li { white-space: pre-wrap; }
     <property name="autoExclusive">
      <bool>true</bool>
     </property>
-    <property name="flat">
-     <bool>false</bool>
+    <property name="toolButtonStyle">
+     <enum>Qt::ToolButtonTextUnderIcon</enum>
+    </property>
+    <property name="autoRaise">
+     <bool>true</bool>
     </property>
    </widget>
-   <widget class="QPushButton" name="surfaceButton">
+   <widget class="QToolButton" name="surfaceButton">
     <property name="geometry">
      <rect>
       <x>410</x>
       <y>40</y>
       <width>100</width>
-      <height>100</height>
+      <height>120</height>
      </rect>
     </property>
     <property name="toolTip">
      <string>Car, Boat, U-Boat</string>
     </property>
+    <property name="styleSheet">
+     <string notr="true">QToolButton { border: none }</string>
+    </property>
     <property name="text">
      <string>Surface</string>
+    </property>
+    <property name="icon">
+     <iconset resource="../wizardResources.qrc">
+      <normaloff>:/setupwizard/resources/bttn-land-up.png</normaloff>
+      <normalon>:/setupwizard/resources/bttn-land-down.png</normalon>
+      <activeoff>:/setupwizard/resources/bttn-land-down.png</activeoff>
+      <activeon>:/setupwizard/resources/bttn-land-down.png</activeon>:/setupwizard/resources/bttn-land-up.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>100</width>
+      <height>100</height>
+     </size>
     </property>
     <property name="checkable">
      <bool>true</bool>
@@ -157,12 +236,17 @@ p, li { white-space: pre-wrap; }
     <property name="autoExclusive">
      <bool>true</bool>
     </property>
-    <property name="flat">
-     <bool>false</bool>
+    <property name="toolButtonStyle">
+     <enum>Qt::ToolButtonTextUnderIcon</enum>
+    </property>
+    <property name="autoRaise">
+     <bool>true</bool>
     </property>
    </widget>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="../wizardResources.qrc"/>
+ </resources>
  <connections/>
 </ui>

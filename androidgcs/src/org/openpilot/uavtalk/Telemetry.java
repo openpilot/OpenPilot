@@ -343,7 +343,7 @@ public class Telemetry {
     /**
      * Update an object based on its metadata properties
      */
-    private synchronized void updateObject(UAVObject obj)
+    private void updateObject(UAVObject obj)
     {
         // Get metadata
         UAVObject.Metadata metadata = obj.getMetadata();
@@ -393,7 +393,7 @@ public class Telemetry {
      * Called when a transaction is successfully completed (uavtalk event)
      * @throws IOException
      */
-    private synchronized void transactionCompleted(UAVObject obj, boolean result) throws IOException
+    private void transactionCompleted(UAVObject obj, boolean result) throws IOException
     {
     	if (DEBUG) Log.d(TAG,"UAVTalk transactionCompleted");
         // Check if there is a pending transaction and the objects match
@@ -401,8 +401,11 @@ public class Telemetry {
         {
         	if (DEBUG) Log.d(TAG,"Telemetry: transaction completed for " + obj.getName());
             // Complete transaction
-        	transTimer.cancel();
-            transPending = false;
+
+        	synchronized(transTimer) {
+        		transTimer.cancel();
+        		transPending = false;
+        	}
 
             //Send signal
             obj.transactionCompleted(result);
@@ -419,39 +422,41 @@ public class Telemetry {
      * Called when a transaction is not completed within the timeout period (timer event)
      * @throws IOException
      */
-    private synchronized void transactionTimeout() throws IOException
+    private void transactionTimeout() throws IOException
     {
     	if (DEBUG) Log.d(TAG,"Telemetry: transaction timeout.");
-        transTimer.cancel();
-        // Proceed only if there is a pending transaction
-        if ( transPending )
-        {
-            // Check if more retries are pending
-            if (transInfo.retriesRemaining > 0)
-            {
-                --transInfo.retriesRemaining;
-                processObjectTransaction();
-                ++txRetries;
-            }
-            else
-            {
-            	if (ERROR) Log.e(TAG, "Transaction failed for: " + transInfo.obj.getName());
+    	synchronized(transTimer) {
+    		transTimer.cancel();
+    		// Proceed only if there is a pending transaction
+    		if ( transPending )
+    		{
+    			// Check if more retries are pending
+    			if (transInfo.retriesRemaining > 0)
+    			{
+    				--transInfo.retriesRemaining;
+    				processObjectTransaction();
+    				++txRetries;
+    			}
+    			else
+    			{
+    				if (ERROR) Log.e(TAG, "Transaction failed for: " + transInfo.obj.getName());
 
-                // Terminate transaction.  This triggers UAVTalk to send a transaction
-            	// failed signal which will make the next queue entry be processed
-            	// Note this is UAVTalk listener TransactionFailed function and not the
-            	// object specific transaction failed.
-                utalk.cancelPendingTransaction(transInfo.obj);
-                ++txErrors;
-            }
-        }
+    				// Terminate transaction.  This triggers UAVTalk to send a transaction
+    				// failed signal which will make the next queue entry be processed
+    				// Note this is UAVTalk listener TransactionFailed function and not the
+    				// object specific transaction failed.
+    				utalk.cancelPendingTransaction(transInfo.obj);
+    				++txErrors;
+    			}
+    		}
+    	}
     }
 
     /**
      * Start an object transaction with UAVTalk, all information is stored in transInfo
      * @throws IOException
      */
-    private synchronized void processObjectTransaction() throws IOException
+    private void processObjectTransaction() throws IOException
     {
         if (transPending)
         {
@@ -472,8 +477,10 @@ public class Telemetry {
             }
             else
             {
-            	transTimer.cancel();
-                transPending = false;
+            	synchronized(transTimer) {
+            		transTimer.cancel();
+            		transPending = false;
+            	}
             }
         } else
         {
@@ -628,11 +635,12 @@ public class Telemetry {
      * TODO: Clean-up
      * @throws IOException
      */
-    private synchronized void processPeriodicUpdates() throws IOException
+    private void processPeriodicUpdates() throws IOException
     {
 
     	if (DEBUG) Log.d(TAG, "processPeriodicUpdates()");
         // Stop timer
+
     	updateTimer.cancel();
 
         // Iterate through each object and update its timer, if zero then transmit object.
@@ -705,7 +713,7 @@ public class Telemetry {
         return stats;
     }
 
-    public synchronized void resetStats()
+    public void resetStats()
     {
         utalk.resetStats();
         txErrors = 0;

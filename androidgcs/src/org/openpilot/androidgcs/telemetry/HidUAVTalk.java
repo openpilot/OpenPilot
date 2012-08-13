@@ -64,6 +64,7 @@ public class HidUAVTalk extends TelemetryTask {
 
 	private boolean readPending = false;
 	private boolean writePending = false;
+	private IntentFilter deviceAttachedFilter;
 
 	public HidUAVTalk(OPTelemetryService service) {
 		super(service);
@@ -73,7 +74,7 @@ public class HidUAVTalk extends TelemetryTask {
 	public void disconnect() {
 
 		CleanUpAndClose();
-		//hostDisplayActivity.unregisterReceiver(usbReceiver);
+		telemService.unregisterReceiver(usbReceiver);
 		telemService.unregisterReceiver(usbPermissionReceiver);
 
 		super.disconnect();
@@ -109,6 +110,11 @@ public class HidUAVTalk extends TelemetryTask {
 		permissionIntent = PendingIntent.getBroadcast(telemService, 0, new Intent(ACTION_USB_PERMISSION), 0);
 		permissionFilter = new IntentFilter(ACTION_USB_PERMISSION);
 		telemService.registerReceiver(usbPermissionReceiver, permissionFilter);
+
+		deviceAttachedFilter = new IntentFilter();
+		//deviceAttachedFilter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
+		deviceAttachedFilter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
+		telemService.registerReceiver(usbReceiver, deviceAttachedFilter);
 
 		// Go through all the devices plugged in
 		HashMap<String, UsbDevice> deviceList = usbManager.getDeviceList();
@@ -176,7 +182,6 @@ public class HidUAVTalk extends TelemetryTask {
 		}
 	};
 
-	/* TODO: Detect dettached events and close the connection
 	private final BroadcastReceiver usbReceiver = new BroadcastReceiver()
 	{
 		@Override
@@ -195,8 +200,10 @@ public class HidUAVTalk extends TelemetryTask {
 				{
 					if (device.equals(currentDevice))
 					{
+						if (DEBUG) Log.d(TAG, "Matching device disconnected");
+
 						// call your method that cleans up and closes communication with the device
-						CleanUpAndClose();
+						disconnect();
 					}
 				}
 			}
@@ -213,7 +220,7 @@ public class HidUAVTalk extends TelemetryTask {
 				}
 			}
 		}
-	}; */
+	};
 
 
 	protected void CleanUpAndClose() {
@@ -314,8 +321,10 @@ public class HidUAVTalk extends TelemetryTask {
 					if (returned == readRequest) {
 						if (DEBUG) Log.d(TAG, "Received read request");
 						readData();
-					} else
+					} else {
 						Log.e(TAG, "Received unknown USB response");
+						break;
+					}
 				}
 			}
 
@@ -328,7 +337,8 @@ public class HidUAVTalk extends TelemetryTask {
 				if (DEBUG) Log.d(TAG, "Starting HID write thread");
 				while(!shutdown) {
 					try {
-						sendDataSynchronous();
+						if (sendDataSynchronous() == false)
+							break;
 					} catch (InterruptedException e) {
 						break;
 					}
@@ -436,15 +446,18 @@ public class HidUAVTalk extends TelemetryTask {
 	 * Send a packet if data is available
 	 * @throws InterruptedException
 	 */
-	public void sendDataSynchronous() throws InterruptedException {
+	public boolean sendDataSynchronous() throws InterruptedException {
 
 		ByteBuffer packet = outTalkStream.getHIDpacketBlocking();
 		if (packet != null) {
 			if (DEBUG) Log.d(TAG, "sendDataSynchronous() Writing to device()");
 
-			if (usbDeviceConnection.bulkTransfer(usbEndpointWrite, packet.array(), MAX_HID_PACKET_SIZE, 1000) < 0)
-				Log.e(TAG, "Failed to perform bult write");
+			if (usbDeviceConnection.bulkTransfer(usbEndpointWrite, packet.array(), MAX_HID_PACKET_SIZE, 1000) < 0) {
+				Log.e(TAG, "Failed to perform bulk write");
+				return false;
+			}
 		}
+		return true;
 	}
 
 	/*********** Helper classes for telemetry streams ************/

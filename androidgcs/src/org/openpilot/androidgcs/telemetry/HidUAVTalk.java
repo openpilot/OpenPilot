@@ -112,7 +112,7 @@ public class HidUAVTalk extends TelemetryTask {
 		telemService.registerReceiver(usbPermissionReceiver, permissionFilter);
 
 		deviceAttachedFilter = new IntentFilter();
-		//deviceAttachedFilter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
+		deviceAttachedFilter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
 		deviceAttachedFilter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
 		telemService.registerReceiver(usbReceiver, deviceAttachedFilter);
 
@@ -200,8 +200,8 @@ public class HidUAVTalk extends TelemetryTask {
 				{
 					if (device.equals(currentDevice))
 					{
+						telemService.toastMessage("Device unplugged while in use");
 						if (DEBUG) Log.d(TAG, "Matching device disconnected");
-
 						// call your method that cleans up and closes communication with the device
 						disconnect();
 					}
@@ -347,6 +347,8 @@ public class HidUAVTalk extends TelemetryTask {
 			}
 		}, "HID Write");
 		writeThread.start();
+
+		telemService.toastMessage("HID Device Opened");
 
 		return true;
 	}

@@ -34,6 +34,8 @@ import java.util.Observer;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.openpilot.androidgcs.telemetry.OPTelemetryService;
+
 import android.util.Log;
 
 public class TelemetryMonitor extends Observable {
@@ -60,6 +62,7 @@ public class TelemetryMonitor extends Observable {
 	private long lastUpdateTime;
 	private final List<UAVObject> queue;
 
+	private OPTelemetryService telemService;
 	private boolean connected = false;
 	private boolean objects_updated = false;
 
@@ -70,6 +73,11 @@ public class TelemetryMonitor extends Observable {
 	public boolean getObjectsUpdated() {
 		return objects_updated;
 	};
+
+	public TelemetryMonitor(UAVObjectManager objMngr, Telemetry tel, OPTelemetryService s) {
+		this(objMngr, tel);
+		telemService = s;
+	}
 
 	public TelemetryMonitor(UAVObjectManager objMngr, Telemetry tel) {
 		this.objMngr = objMngr;
@@ -171,7 +179,9 @@ public class TelemetryMonitor extends Observable {
 	public synchronized void retrieveNextObject() throws IOException {
 		// If queue is empty return
 		if (queue.isEmpty()) {
-			if (DEBUG || true) Log.d(TAG, "All objects retrieved: Connected Successfully");
+			if (telemService != null)
+				telemService.toastMessage("Connected");
+			if (DEBUG) Log.d(TAG, "All objects retrieved: Connected Successfully");
 			objects_updated = true;
 			if (!HANDSHAKE_IS_CONNECTED) {
 				setChanged();

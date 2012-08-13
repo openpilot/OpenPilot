@@ -35,9 +35,17 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import junit.framework.Assert;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 public class Telemetry {
+	/**
+	 * Telemetry provides a messaging handler to handle all the object updates and transfer
+	 * requests.  This handler can either be attached to a new loop attached to the thread
+	 * started by the telemetry service.
+	 */
 
 	private final String TAG = "Telemetry";
 	public static int LOGLEVEL = 1;
@@ -98,10 +106,13 @@ public class Telemetry {
     /**
      * Constructor
      */
-    public Telemetry(UAVTalk utalkIn, UAVObjectManager objMngr)
+    public Telemetry(UAVTalk utalkIn, UAVObjectManager objMngr, Looper l)
     {
         this.utalk = utalkIn;
         this.objMngr = objMngr;
+
+        // Create a handler for object messages
+        handler = new ObjectUpdateHandler(l);
 
         // Process all objects in the list
         List< List<UAVObject> > objs = objMngr.getObjects();
@@ -265,48 +276,28 @@ public class Telemetry {
     final Observer unpackedObserver = new Observer() {
 		@Override
 		public void update(Observable observable, Object data) {
-    		try {
-    			enqueueObjectUpdates((UAVObject) data, EV_UNPACKED, false, true);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			handler.unpacked((UAVObject) data);
     	}
 	};
 
 	final Observer updatedAutoObserver = new Observer() {
 		@Override
 		public void update(Observable observable, Object data) {
-			try {
-				enqueueObjectUpdates((UAVObject) data, EV_UPDATED, false, true);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			handler.updatedAuto((UAVObject) data);
     	}
 	};
 
 	final Observer updatedManualObserver = new Observer() {
 		@Override
 		public void update(Observable observable, Object data) {
-			try {
-				enqueueObjectUpdates((UAVObject) data, EV_UPDATED_MANUAL, false, true);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			handler.updatedManual((UAVObject) data);
     	}
 	};
 
 	final Observer updatedRequestedObserver = new Observer() {
 		@Override
 		public void update(Observable observable, Object data) {
-			try {
-				enqueueObjectUpdates((UAVObject) data, EV_UPDATE_REQ, false, true);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			handler.updateRequested((UAVObject) data);
     	}
 	};
 
@@ -489,59 +480,6 @@ public class Telemetry {
     }
 
     /**
-     * Enqueue the event received from an object.  This is the main method that handles all the callbacks
-     * from UAVObjects (due to updates, or update requests)
-     */
-    private void enqueueObjectUpdates(UAVObject obj, int event, boolean allInstances, boolean priority) throws IOException
-    {
-        // Push event into queue
-    	if (DEBUG) Log.d(TAG, "Push event into queue for obj " + obj.getName() + " event " + event);
-    	if(event == 8 && obj.getName().compareTo("GCSTelemetryStats") == 0)
-    		Thread.dumpStack();
-        ObjectQueueInfo objInfo = new ObjectQueueInfo();
-        objInfo.obj = obj;
-        objInfo.event = event;
-        objInfo.allInstances = allInstances;
-        if (priority)
-        {
-        	// Only enqueue if an identical transaction does not already exist
-        	if(!objPriorityQueue.contains(objInfo)) {
-        		if ( objPriorityQueue.size() < MAX_QUEUE_SIZE )
-        		{
-        			objPriorityQueue.add(objInfo);
-        		}
-        		else
-        		{
-        			++txErrors;
-        			obj.transactionCompleted(false);
-        			Log.w(TAG,"Telemetry: priority event queue is full, event lost " + obj.getName());
-        		}
-        	}
-        }
-        else
-        {
-        	// Only enqueue if an identical transaction does not already exist
-        	if(!objQueue.contains(objInfo)) {
-        		if ( objQueue.size() < MAX_QUEUE_SIZE )
-        		{
-        			objQueue.add(objInfo);
-        		}
-        		else
-        		{
-        			++txErrors;
-        			obj.transactionCompleted(false);
-        		}
-        	}
-        }
-
-        // If there is no transaction in progress then process event
-        if (!transPending)
-        {
-            processObjectQueue();
-        }
-    }
-
-    /**
      * Process events from the object queue
      * @throws IOException
      */
@@ -666,7 +604,8 @@ public class Telemetry {
                     objinfo.timeToNextUpdateMs = objinfo.updatePeriodMs - offset;
                     // Send object
                     startTime = System.currentTimeMillis();
-                    enqueueObjectUpdates(objinfo.obj, EV_UPDATED_MANUAL, true, false);
+                    handler.updatedManual(objinfo.obj);
+                    //enqueueObjectUpdates(objinfo.obj, EV_UPDATED_MANUAL, true, false);
                     elapsedMs = (int) (System.currentTimeMillis() - startTime);
                     // Update timeToNextUpdateMs with the elapsed delay of sending the object;
                     timeToNextUpdateMs += elapsedMs;
@@ -780,6 +719,147 @@ public class Telemetry {
     private static final int MIN_UPDATE_PERIOD_MS = 1;
     private static final int MAX_QUEUE_SIZE = 20;
 
+    private final ObjectUpdateHandler handler;
 
+    public class ObjectUpdateHandler extends Handler {
 
+    	//! This can only be created while attaching to a particular looper
+    	ObjectUpdateHandler(Looper l) {
+    		super(l);
+    	}
+
+        //! Generic enqueue
+        void enqueueObjectUpdates(UAVObject obj, int event, boolean allInstances, boolean priority) {
+
+        	if (DEBUG) Log.d(TAG, "Enqueing update " + obj.getName() + " event " + event);
+
+        	ObjectQueueInfo objInfo = new ObjectQueueInfo();
+            objInfo.obj = obj;
+            objInfo.event = event;
+            objInfo.allInstances = allInstances;
+
+            post(new ObjectRunnable(objInfo));
+        }
+
+    	//! Enqueue an unpacked event
+    	void unpacked(UAVObject obj) {
+    		enqueueObjectUpdates(obj, EV_UNPACKED, false, true);
+		}
+
+    	//! Enqueue an updated auto event
+    	void updatedAuto(UAVObject obj) {
+    		enqueueObjectUpdates(obj,EV_UPDATED, false, true);
+    	}
+
+    	//! Enqueue an updated manual event
+    	void updatedManual(UAVObject obj) {
+    		enqueueObjectUpdates(obj, EV_UPDATE_REQ, false, true);
+    	}
+
+    	//! Enqueue an update requested event
+    	void updateRequested(UAVObject obj) {
+    		enqueueObjectUpdates(obj, EV_UPDATE_REQ, false, true);
+    	}
+
+    }
+
+    class ObjectRunnable implements Runnable {
+
+    	//! Transaction information to perform
+    	private final ObjectQueueInfo objInfo;
+//    	private final ObjectTransactionInfo transInfo = new ObjectTransactionInfo();
+
+    	ObjectRunnable(ObjectQueueInfo info) {
+    		Assert.assertNotNull(info);
+    		objInfo = info;
+    	}
+
+    	//! Perform the transaction on the looper thread
+    	@Override
+		public void run () {
+    		Log.d(TAG,"object transaction running");
+    		// 1. Check GCS is connected, throw this out if not
+    		// 2. Set up a transaction which includes multiple retries, whether to wait for ack etc
+    		// 3. Send UAVTalk message
+    		// 4. Based on transaction type either wait for update or end
+
+    		// 1. Check if a connection has been established, only process GCSTelemetryStats updates
+            // (used to establish the connection)
+            gcsStatsObj = objMngr.getObject("GCSTelemetryStats");
+            if ( ((String) gcsStatsObj.getField("Status").getValue()).compareTo("Connected") != 0 )
+            {
+                if ( objInfo.obj.getObjID() != objMngr.getObject("GCSTelemetryStats").getObjID() )
+                {
+                	if (DEBUG) Log.d(TAG,"transactionCompleted(false) due to receiving object not GCSTelemetryStats while not connected.");
+                    objInfo.obj.transactionCompleted(false);
+                    return;
+                }
+            }
+
+            Log.e(TAG, "A");
+            // 2. Setup transaction (skip if unpack event)
+            if ( objInfo.event != EV_UNPACKED )
+            {
+                Log.e(TAG, "A1");
+                UAVObject.Metadata metadata = objInfo.obj.getMetadata();
+                transInfo.obj = objInfo.obj;
+                transInfo.allInstances = objInfo.allInstances;
+                transInfo.retriesRemaining = MAX_RETRIES;
+                transInfo.acked = metadata.GetGcsTelemetryAcked();
+                if ( objInfo.event == EV_UPDATED || objInfo.event == EV_UPDATED_MANUAL )
+                {
+                    transInfo.objRequest = false;
+                }
+                else if ( objInfo.event == EV_UPDATE_REQ )
+                {
+                    transInfo.objRequest = true;
+                }
+                // Start transaction
+                transPending = true;
+            }
+            Log.e(TAG, "B");
+            // If this is a metaobject then make necessary telemetry updates (this is why we catch unpack)
+            if (objInfo.obj.isMetadata())
+            {
+            	UAVMetaObject metaobj = (UAVMetaObject) objInfo.obj;
+                updateObject( metaobj.getParentObject() );
+            }
+            Log.e(TAG, "C");
+            // 3. Execute transaction
+            if (transPending)
+            {
+                Log.e(TAG, "D");
+            	try {
+            		if (DEBUG || true) Log.d(TAG, "Process Object transaction for " + transInfo.obj.getName());
+            		// Initiate transaction
+            		if (transInfo.objRequest)
+            		{
+            			utalk.sendObjectRequest(transInfo.obj, transInfo.allInstances);
+            		}
+            		else
+            		{
+            			Log.d(TAG, "Sending object");
+            			utalk.sendObject(transInfo.obj, transInfo.acked, transInfo.allInstances);
+            		}
+
+            		// TODO: Block if request expected (??)
+            		if ( transInfo.objRequest || transInfo.acked )
+            		{
+            			transTimerSetPeriod(REQ_TIMEOUT_MS);
+            		}
+            		else
+            		{
+            			synchronized(transTimer) {
+            				transTimer.cancel();
+            				transPending = false;
+            			}
+            		}
+            	} catch (IOException e) {
+            		// TODO Auto-generated catch block
+            		Log.e(TAG, "E");
+            		e.printStackTrace();
+            	}
+            }
+    	}
+    }
 }

@@ -272,10 +272,17 @@ void MainWindow::extensionsInitialized()
     if ( ! qs->allKeys().count() ){
         importSettings * dialog=new importSettings(this);
         QDir directory(QCoreApplication::applicationDirPath());
+#ifdef Q_OS_MAC
+        directory.cdUp();
+        directory.cd("Resources");
+#else
         directory.cdUp();
         directory.cd("share");
         directory.cd("openpilotgcs");
+#endif
         directory.cd("default_configurations");
+
+        qDebug() << "Looking for default config files in: " + directory.absolutePath();
         dialog->loadFiles(directory.absolutePath());
         dialog->exec();
         settings=new QSettings(dialog->choosenConfig(), XmlConfig::XmlSettingsFormat);

@@ -105,7 +105,7 @@ public abstract class TelemetryTask implements Runnable {
 		// Create the required telemetry objects attached to this
 		// data stream
 		uavTalk = new UAVTalk(inStream, outStream, objMngr);
-		tel = new Telemetry(uavTalk, objMngr);
+		tel = new Telemetry(uavTalk, objMngr, Looper.myLooper());
 		mon = new TelemetryMonitor(objMngr,tel, telemService);
 
 		// Create an observer to notify system of connection

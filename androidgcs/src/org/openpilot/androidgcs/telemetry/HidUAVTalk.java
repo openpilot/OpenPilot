@@ -28,7 +28,7 @@ import android.util.Log;
 public class HidUAVTalk extends TelemetryTask {
 
 	private static final String TAG = HidUAVTalk.class.getSimpleName();
-	public static final int LOGLEVEL = 0;
+	public static final int LOGLEVEL = 1;
 	public static final boolean DEBUG = LOGLEVEL > 2;
 	public static final boolean WARN = LOGLEVEL > 1;
 	public static final boolean ERROR = LOGLEVEL > 0;
@@ -57,9 +57,10 @@ public class HidUAVTalk extends TelemetryTask {
 	private UsbInterface usbInterface = null;
 	private TalkInputStream inTalkStream;
 	private TalkOutputStream outTalkStream;
-	private UsbRequest writeRequest = null;
+	private final UsbRequest writeRequest = null;
 	private UsbRequest readRequest = null;
-	private Thread readWriteThread;
+	private Thread readThread;
+	private Thread writeThread;
 
 	private boolean readPending = false;
 	private boolean writePending = false;
@@ -78,9 +79,15 @@ public class HidUAVTalk extends TelemetryTask {
 		super.disconnect();
 
 		try {
-			if(readWriteThread != null) {
-				readWriteThread.join();
-				readWriteThread = null;
+			if(readThread != null) {
+				readThread.interrupt(); // Make sure not blocking for data
+				readThread.join();
+				readThread = null;
+			}
+			if(writeThread != null) {
+				writeThread.interrupt();
+				writeThread.join();
+				writeThread = null;
 			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -91,13 +98,6 @@ public class HidUAVTalk extends TelemetryTask {
 			readRequest.close();
 			readRequest = null;
 		}
-
-		if (writeRequest != null) {
-			writeRequest.cancel();
-			writeRequest.close();
-			writeRequest = null;
-		}
-
 	}
 
 	@Override
@@ -293,9 +293,6 @@ public class HidUAVTalk extends TelemetryTask {
 		readRequest = new UsbRequest();
 		readRequest.initialize(usbDeviceConnection, usbEndpointRead);
 
-		writeRequest = new UsbRequest();
-		writeRequest.initialize(usbDeviceConnection, usbEndpointWrite);
-
 		inTalkStream = new TalkInputStream();
 		outTalkStream = new TalkOutputStream();
 		inStream = inTalkStream;
@@ -307,31 +304,39 @@ public class HidUAVTalk extends TelemetryTask {
 			}
 		});
 
-		readWriteThread = new Thread(new Runnable() {
+		readThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
-
 				// Enqueue the first read
 				queueRead();
-
 				while (!shutdown) {
-					// If there are no request
-
-					// Enqueue requests appropriately first
 					UsbRequest returned = usbDeviceConnection.requestWait();
 					if (returned == readRequest) {
 						if (DEBUG) Log.d(TAG, "Received read request");
 						readData();
-					} else if (returned == writeRequest) {
-						if (DEBUG) Log.d(TAG, "Received write completed request");
-						writePending = false;
-						sendData();
-					}
+					} else
+						Log.e(TAG, "Received unknown USB response");
 				}
 			}
 
-		}, "HID Read Write");
-		readWriteThread.start();
+		}, "HID Read");
+		readThread.start();
+
+		writeThread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				if (DEBUG) Log.d(TAG, "Starting HID write thread");
+				while(!shutdown) {
+					try {
+						sendDataSynchronous();
+					} catch (InterruptedException e) {
+						break;
+					}
+				}
+				if (DEBUG) Log.d(TAG, "Ending HID write thread");
+			}
+		}, "HID Write");
+		writeThread.start();
 
 		return true;
 	}
@@ -402,6 +407,7 @@ public class HidUAVTalk extends TelemetryTask {
 		}
 	}
 
+
 	/**
 	 * Send a packet if data is available
 	 */
@@ -426,6 +432,21 @@ public class HidUAVTalk extends TelemetryTask {
 		}
 	}
 
+	/**
+	 * Send a packet if data is available
+	 * @throws InterruptedException
+	 */
+	public void sendDataSynchronous() throws InterruptedException {
+
+		ByteBuffer packet = outTalkStream.getHIDpacketBlocking();
+		if (packet != null) {
+			if (DEBUG) Log.d(TAG, "sendDataSynchronous() Writing to device()");
+
+			if (usbDeviceConnection.bulkTransfer(usbEndpointWrite, packet.array(), MAX_HID_PACKET_SIZE, 1000) < 0)
+				Log.e(TAG, "Failed to perform bult write");
+		}
+	}
+
 	/*********** Helper classes for telemetry streams ************/
 
 	class TalkOutputStream extends OutputStream {
@@ -433,6 +454,20 @@ public class HidUAVTalk extends TelemetryTask {
 		// and  ByteFifo.put(byte [])
 		ByteFifo data = new ByteFifo();
 
+		/**
+		 * Blocks until data is available and then returns a properly formatted HID packet
+		 */
+		public ByteBuffer getHIDpacketBlocking() throws InterruptedException {
+			synchronized(data) {
+				if (data.remaining() == 0)
+					data.wait();
+				return getHIDpacket();
+			}
+		}
+
+		/**
+		 * Gets data from the ByteFifo in a properly formatted HID packet
+		 */
 		public ByteBuffer getHIDpacket() {
 			ByteBuffer packet = null;
 			synchronized(data) {
@@ -461,9 +496,6 @@ public class HidUAVTalk extends TelemetryTask {
 				data.put((byte) oneByte);
 				data.notify();
 			}
-
-			// If there is not a write request queued, add one
-			sendData();
 		}
 
 		@Override
@@ -475,8 +507,6 @@ public class HidUAVTalk extends TelemetryTask {
 				data.put(b);
 				data.notify();
 			}
-
-			sendData();
 		}
 
 	};

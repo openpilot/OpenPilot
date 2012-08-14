@@ -48,6 +48,12 @@ const struct pios_rcvr_driver pios_ppm_rcvr_driver = {
 #define PIOS_PPM_IN_MIN_CHANNEL_PULSE_US	750	// microseconds
 #define PIOS_PPM_IN_MAX_CHANNEL_PULSE_US	2250   // microseconds
 
+#define PIOS_PPM_OUT_MAX_CHANNELS			7
+#define PIOS_PPM_OUT_FRAME_PERIOD_US          20000                      // microseconds
+#define PIOS_PPM_OUT_HIGH_PULSE_US            300                        // microseconds
+#define PIOS_PPM_OUT_MIN_CHANNEL_PULSE_US     200                        // microseconds
+#define PIOS_PPM_OUT_MAX_CHANNEL_PULSE_US     2200                       // microseconds
+
 /* Local Variables */
 static TIM_ICInitTypeDef TIM_ICInitStructure;
 
@@ -77,6 +83,24 @@ struct pios_ppm_dev {
 	bool Fresh;
 };
 
+struct pios_ppm_out_dev {
+	const struct pios_ppm_out_cfg * cfg;
+
+	uint8_t inverted;
+	uint32_t Channel[1];//only 1 ppm out?
+	uint32_t triggering_period;
+	uint32_t end_period;
+	int8_t NumChannels;
+	uint8_t NumChannelCounter;
+	uint32_t ChannelValue[PIOS_PPM_OUT_MAX_CHANNELS];
+
+	uint8_t supv_timer;
+	bool Tracking;
+	bool Fresh;
+};
+
+static struct pios_ppm_out_dev * servo_cfg;
+
 static bool PIOS_PPM_validate(struct pios_ppm_dev * ppm_dev)
 {
 	return (ppm_dev->magic == PIOS_PPM_DEV_MAGIC);
@@ -91,6 +115,16 @@ static struct pios_ppm_dev * PIOS_PPM_alloc(void)
 	if (!ppm_dev) return(NULL);
 
 	ppm_dev->magic = PIOS_PPM_DEV_MAGIC;
+	return(ppm_dev);
+}
+static struct pios_ppm_out_dev * PIOS_PPM_OUT_alloc(void)
+{
+	struct pios_ppm_out_dev * ppm_dev;
+
+	ppm_dev = (struct pios_ppm_out_dev *)pvPortMalloc(sizeof(*ppm_dev));
+	if (!ppm_dev) return(NULL);
+
+	//ppm_dev->magic = PIOS_PPM_DEV_MAGIC;
 	return(ppm_dev);
 }
 #else
@@ -109,6 +143,21 @@ static struct pios_ppm_dev * PIOS_PPM_alloc(void)
 
 	return (ppm_dev);
 }
+static struct pios_ppm_out_dev pios_ppm_out_devs[PIOS_PPM_MAX_DEVS];
+static uint8_t pios_ppm_out_num_devs;
+static struct pios_ppm_out_dev * PIOS_PPM_alloc(void)
+{
+	struct pios_ppm_out_dev * ppm_dev;
+
+	if (pios_ppm_out_num_devs >= PIOS_PPM_OUT_MAX_CHANNELS) {
+		return (NULL);
+	}
+
+	ppm_dev = &pios_ppm_out_devs[pios_ppm_out_num_devs++];
+	//ppm_dev->magic = PIOS_PPM_DEV_MAGIC;
+
+	return (ppm_dev);
+}
 #endif
 
 static void PIOS_PPM_tim_overflow_cb (uint32_t id, uint32_t context, uint8_t channel, uint16_t count);
@@ -116,6 +165,13 @@ static void PIOS_PPM_tim_edge_cb (uint32_t id, uint32_t context, uint8_t channel
 const static struct pios_tim_callbacks tim_callbacks = {
 	.overflow = PIOS_PPM_tim_overflow_cb,
 	.edge     = PIOS_PPM_tim_edge_cb,
+};
+
+static void PIOS_PPM_OUT_tim_overflow_cb (uint32_t id, uint32_t context, uint8_t channel, uint16_t count);
+static void PIOS_PPM_OUT_tim_edge_cb (uint32_t tim_id, uint32_t context, uint8_t chan_idx, uint16_t count);
+const static struct pios_tim_callbacks tim_out_callbacks = {
+	.overflow = NULL,
+	.edge     = PIOS_PPM_OUT_tim_edge_cb,
 };
 
 extern int32_t PIOS_PPM_Init(uint32_t * ppm_id, const struct pios_ppm_cfg * cfg)
@@ -347,6 +403,171 @@ static void PIOS_PPM_Supervisor(uint32_t ppm_id) {
 	}
 
 	ppm_dev->Fresh = FALSE;
+}
+
+int32_t PIOS_PPM_Out_Init(uint32_t * ppm_id, const struct pios_ppm_out_cfg * cfg)
+{
+	PIOS_DEBUG_Assert(ppm_id);
+		PIOS_DEBUG_Assert(cfg);
+
+		struct pios_ppm_out_dev * ppm_dev;
+
+		ppm_dev = (struct pios_ppm_out_dev *) PIOS_PPM_OUT_alloc();
+		if (!ppm_dev) goto out_fail;
+
+		/* Store away the requested configuration */
+		servo_cfg = ppm_dev;
+
+		/* Bind the configuration to the device instance */
+		ppm_dev->cfg = cfg;
+
+		/* Set up the state variables */
+		ppm_dev->inverted=0;
+		//	uint32_t Channel[1];//only 1 ppm out?
+		ppm_dev->triggering_period=PIOS_PPM_OUT_HIGH_PULSE_US;
+		ppm_dev->end_period=7000;
+		ppm_dev->NumChannels=PIOS_PPM_OUT_MAX_CHANNELS;
+		ppm_dev->NumChannelCounter=0;
+		//ppm_dev->Fresh = FALSE;
+
+		for (uint8_t i = 0; i < PIOS_PPM_OUT_MAX_CHANNELS; i++) {
+			// Flush counter variables
+			ppm_dev->ChannelValue[i] = 500+(200*i);
+
+		}
+		ppm_dev->ChannelValue[6]=7000;
+
+		uint32_t tim_id;
+		if (PIOS_TIM_InitChannels(&tim_id, cfg->channels, cfg->num_channels, &tim_out_callbacks, (uint32_t)ppm_dev)) {
+			return -1;
+		}
+
+		/* Configure the channels to be in output compare mode */
+		for (uint8_t i = 0; i < cfg->num_channels; i++) {
+			const struct pios_tim_channel * chan = &cfg->channels[i];
+
+			/* Set up for output compare function */
+			switch(chan->timer_chan) {
+				case TIM_Channel_1:
+					TIM_OC1Init(chan->timer, &cfg->tim_oc_init);
+					TIM_OC1PreloadConfig(chan->timer, TIM_OCPreload_Enable);
+					break;
+				case TIM_Channel_2:
+					TIM_OC2Init(chan->timer, &cfg->tim_oc_init);
+					TIM_OC2PreloadConfig(chan->timer, TIM_OCPreload_Enable);
+					break;
+				case TIM_Channel_3:
+					TIM_OC3Init(chan->timer, &cfg->tim_oc_init);
+					TIM_OC3PreloadConfig(chan->timer, TIM_OCPreload_Enable);
+					break;
+				case TIM_Channel_4:
+					TIM_OC4Init(chan->timer, &cfg->tim_oc_init);
+					TIM_OC4PreloadConfig(chan->timer, TIM_OCPreload_Enable);
+					break;
+			}
+			switch (chan->timer_chan) {
+				case TIM_Channel_1:
+					TIM_ITConfig(chan->timer, TIM_IT_CC1 | TIM_IT_Update, ENABLE);
+					break;
+				case TIM_Channel_2:
+					TIM_ITConfig(chan->timer, TIM_IT_CC2 | TIM_IT_Update, ENABLE);
+					break;
+				case TIM_Channel_3:
+					TIM_ITConfig(chan->timer, TIM_IT_CC3 | TIM_IT_Update, ENABLE);
+					break;
+				case TIM_Channel_4:
+					TIM_ITConfig(chan->timer, TIM_IT_CC4 | TIM_IT_Update, ENABLE);
+					break;
+			}
+
+			TIM_ARRPreloadConfig(chan->timer, ENABLE);
+			TIM_CtrlPWMOutputs(chan->timer, ENABLE);
+			TIM_Cmd(chan->timer, ENABLE);
+		}
+
+		TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure = cfg->tim_base_init;
+		TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
+		TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
+		TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1;
+		TIM_TimeBaseStructure.TIM_Period = ((1000000 / 100) - 1);
+		const struct pios_tim_channel * chan = &cfg->channels[0];//bouhhhhhhhhhhhhhhhhh!!!!!!!!!!!!!!!
+		TIM_TimeBaseInit(chan->timer, &TIM_TimeBaseStructure);
+
+		for (uint8_t i = 0; i < cfg->num_channels; i++) {
+			const struct pios_tim_channel * chan = &cfg->channels[i];
+			switch(chan->timer_chan) {
+				case TIM_Channel_1:
+					TIM_SetCompare1(chan->timer, ppm_dev->triggering_period);
+					break;
+				case TIM_Channel_2:
+					TIM_SetCompare2(chan->timer, ppm_dev->triggering_period);
+					break;
+				case TIM_Channel_3:
+					TIM_SetCompare3(chan->timer, ppm_dev->triggering_period);
+					break;
+				case TIM_Channel_4:
+					TIM_SetCompare4(chan->timer, ppm_dev->triggering_period);
+					break;
+			}
+		}
+	return(0);
+
+out_fail:
+	return(-1);
+}
+
+void PIOS_PPM_OUT_Set(uint8_t servo, uint16_t position)
+{
+	// Make sure servo exists
+	if (!servo_cfg || servo >= servo_cfg->NumChannels-1) {
+		return;
+	}
+
+	/* Update the position */
+	servo_cfg->ChannelValue[servo]=position;
+}
+
+static void PIOS_PPM_OUT_tim_overflow_cb (uint32_t tim_id, uint32_t context, uint8_t channel, uint16_t count)
+{
+	/*struct pios_ppm_out_dev * ppm_dev = (struct pios_ppm_out_dev *)context;
+
+		if(ppm_dev->NumChannelCounter>=6)
+			{
+			ppm_dev->NumChannelCounter=0;
+		}
+		else
+		{
+			ppm_dev->NumChannelCounter++;
+		}
+		for (uint8_t i = 0; i < ppm_dev->cfg->num_channels; i++) {
+			const struct pios_tim_channel * chan = &ppm_dev->cfg->channels[i];
+			TIM_SetAutoreload(chan->timer, ppm_dev->ChannelValue[ppm_dev->NumChannelCounter] - 1);              // channel pulse width
+		}*/
+		return;
+}
+
+static void PIOS_PPM_OUT_tim_edge_cb (uint32_t tim_id, uint32_t context, uint8_t chan_idx, uint16_t count)
+{
+	struct pios_ppm_out_dev * ppm_dev = (struct pios_ppm_out_dev *)context;
+
+	if(ppm_dev->NumChannelCounter>=6)
+	{
+		ppm_dev->end_period=PIOS_PPM_OUT_FRAME_PERIOD_US;
+		for (uint8_t i = 0; i < ppm_dev->NumChannels-1; i++) {
+			ppm_dev->end_period-=ppm_dev->ChannelValue[i];
+		}
+		ppm_dev->ChannelValue[ppm_dev->NumChannels-1]=ppm_dev->end_period;
+		ppm_dev->NumChannelCounter=0;
+	}
+	else
+	{
+		ppm_dev->NumChannelCounter++;
+	}
+	for (uint8_t i = 0; i < ppm_dev->cfg->num_channels; i++) {
+		const struct pios_tim_channel * chan = &ppm_dev->cfg->channels[i];
+		TIM_SetAutoreload(chan->timer, ppm_dev->ChannelValue[ppm_dev->NumChannelCounter] - 1);              // channel pulse width
+	}
+	return;
 }
 
 #endif

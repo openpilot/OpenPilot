@@ -575,7 +575,10 @@ static void change_update_rate()
 	// save the new rates 
 	ActuatorSettingsChannelUpdateFreqGet(ChannelUpdateFreq);
 	memcpy(lastChannelUpdateFreq, ChannelUpdateFreq, sizeof(int16_t) * ACTUATORSETTINGS_CHANNELUPDATEFREQ_NUMELEM);
+#if defined(PIOS_INCLUDE_PPM_OUT)
+#else
 	PIOS_Servo_SetHz(&ChannelUpdateFreq[0], ACTUATORSETTINGS_CHANNELUPDATEFREQ_NUMELEM);
+#endif
 }
 
 #if defined(ARCH_POSIX) || defined(ARCH_WIN32)
@@ -636,7 +639,11 @@ static bool set_channel(uint8_t mixer_channel, uint16_t value) {
 			return true;
 		}
 		case ACTUATORSETTINGS_CHANNELTYPE_PWM:
+#if defined(PIOS_INCLUDE_PPM_OUT)
+			PIOS_PPM_OUT_Set(settings.ChannelAddr[mixer_channel], value);
+#else
 			PIOS_Servo_Set(settings.ChannelAddr[mixer_channel], value);
+#endif
 			return true;
 #if defined(PIOS_INCLUDE_I2C_ESC)
 		case ACTUATORSETTINGS_CHANNELTYPE_MK:

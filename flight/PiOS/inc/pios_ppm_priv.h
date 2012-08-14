@@ -40,9 +40,20 @@ struct pios_ppm_cfg {
 	uint8_t num_channels;
 };
 
+struct pios_ppm_out_cfg {
+	TIM_TimeBaseInitTypeDef tim_base_init;
+	TIM_OCInitTypeDef tim_oc_init;
+	GPIO_InitTypeDef gpio_init;
+	uint32_t remap;
+	const struct pios_tim_channel * channels;
+	uint8_t num_channels;
+};
+
 extern const struct pios_rcvr_driver pios_ppm_rcvr_driver;
 
 extern int32_t PIOS_PPM_Init(uint32_t * ppm_id, const struct pios_ppm_cfg * cfg);
+extern int32_t PIOS_PPM_Out_Init(uint32_t * ppm_id, const struct pios_ppm_out_cfg * cfg);
+extern void PIOS_PPM_OUT_Set(uint8_t servo, uint16_t position);
 
 #endif /* PIOS_PPM_PRIV_H */
 

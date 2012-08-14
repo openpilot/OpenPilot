@@ -672,7 +672,11 @@ void PIOS_Board_Init(void) {
 		case HWSETTINGS_CC_RCVRPORT_DISABLED:
 		case HWSETTINGS_CC_RCVRPORT_PWM:
 		case HWSETTINGS_CC_RCVRPORT_PPM:
+#if defined(PIOS_INCLUDE_PPM_OUT)
+			PIOS_PPM_Out_Init(&pios_ppm_out_id,&pios_ppm_out_cfg);
+#else
 			PIOS_Servo_Init(&pios_servo_cfg);
+#endif
 			break;
 		case HWSETTINGS_CC_RCVRPORT_PPMOUTPUTS:
 		case HWSETTINGS_CC_RCVRPORT_OUTPUTS:

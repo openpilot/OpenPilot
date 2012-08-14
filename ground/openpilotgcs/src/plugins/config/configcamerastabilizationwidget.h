@@ -44,15 +44,8 @@ public:
 
 private:
     Ui_CameraStabilizationWidget *m_camerastabilization;
-
-private slots:
-    void applySettings();
-    void saveSettings();
-    void refreshValues();
-
-protected:
-    void connectUpdates();
-    void disconnectUpdates();
+    void refreshWidgetsValues(UAVObject *obj);
+    void updateObjectsFromWidgets();
 };
 
 #endif // CONFIGCAMERASTABILIZATIONWIDGET_H

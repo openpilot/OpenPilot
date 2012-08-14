@@ -940,29 +940,9 @@ value.</string>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton">
-         <property name="toolTip">
-          <string>Reloads current data from board into GCS.
-Useful if you have accidentally changed some settings.
-
-Loaded settings are not applied automatically. You have to click the
-Apply or Save button afterwards.</string>
-         </property>
-         <property name="text">
-          <string>Reload Board Data</string>
-         </property>
-         <property name="objrelation" stdset="0">
-          <stringlist>
-           <string>button:reload</string>
-           <string>buttongroup:1</string>
-          </stringlist>
-         </property>
-        </widget>
-       </item>
-       <item>
         <widget class="QPushButton" name="camerastabilizationResetToDefaults">
          <property name="toolTip">
-          <string>Load default CameraStabilization settings except output channels
+          <string>Load default CameraStabilization settings except output channels into GCS.
 
 Loaded settings are not applied automatically. You have to click the
 Apply or Save button afterwards.</string>
@@ -973,6 +953,27 @@ Apply or Save button afterwards.</string>
          <property name="objrelation" stdset="0">
           <stringlist>
            <string>button:default</string>
+           <string>buttongroup:1</string>
+          </stringlist>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton">
+         <property name="toolTip">
+          <string>Reloads saved CameraStabilization settings  except output channels
+from board into GCS. Useful if you have accidentally changed some
+settings.
+
+Loaded settings are not applied automatically. You have to click the
+Apply or Save button afterwards.</string>
+         </property>
+         <property name="text">
+          <string>Reload Board Data</string>
+         </property>
+         <property name="objrelation" stdset="0">
+          <stringlist>
+           <string>button:reload</string>
            <string>buttongroup:1</string>
           </stringlist>
          </property>
@@ -1042,7 +1043,6 @@ Apply or Save button afterwards.</string>
   <tabstop>yawResponseTime</tabstop>
   <tabstop>MaxAxisLockRate</tabstop>
   <tabstop>camerastabilizationHelp</tabstop>
-  <tabstop>camerastabilizationResetToDefaults</tabstop>
   <tabstop>camerastabilizationSaveRAM</tabstop>
   <tabstop>camerastabilizationSaveSD</tabstop>
   <tabstop>scrollArea</tabstop>

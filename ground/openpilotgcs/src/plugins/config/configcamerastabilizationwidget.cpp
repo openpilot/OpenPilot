@@ -30,32 +30,41 @@
 #include "mixersettings.h"
 #include "actuatorcommand.h"
 
-#include <QDebug>
-#include <QDesktopServices>
-#include <QUrl>
-
 ConfigCameraStabilizationWidget::ConfigCameraStabilizationWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
     m_camerastabilization = new Ui_CameraStabilizationWidget();
     m_camerastabilization->setupUi(this);
 
-    // These comboboxes require special processing
-    QComboBox *outputs[3] = {
+    // These widgets don't have direct relation to UAVObjects
+    // and need special processing
+    QComboBox *outputs[] = {
         m_camerastabilization->rollChannel,
         m_camerastabilization->pitchChannel,
         m_camerastabilization->yawChannel,
     };
+    const int NUM_OUTPUTS = sizeof(outputs) / sizeof(outputs[0]);
 
-    for (int i = 0; i < 3; i++) {
+    // Populate widgets with channel numbers
+    for (int i = 0; i < NUM_OUTPUTS; i++) {
         outputs[i]->clear();
         outputs[i]->addItem("None");
         for (quint32 j = 0; j < ActuatorCommand::CHANNEL_NUMELEM; j++)
             outputs[i]->addItem(QString("Channel %1").arg(j+1));
     }
 
+    // Load UAVObjects to widget relations from UI file
+    // using objrelation dynamic property
     autoLoadWidgets();
-    populateWidgets();
-    refreshWidgetsValues();
+
+    // Add some widgets and UAVObjects to track widget dirty state
+    // and monitor UAVObject changes in addition to autoloaded ones
+    addWidget(m_camerastabilization->enableCameraStabilization);
+    addWidget(m_camerastabilization->rollChannel);
+    addWidget(m_camerastabilization->pitchChannel);
+    addWidget(m_camerastabilization->yawChannel);
+    addUAVObject("HwSettings");
+    addUAVObject("MixerSettings");
+
     disableMouseWheelEvents();
 }
 
@@ -64,50 +73,32 @@ ConfigCameraStabilizationWidget::~ConfigCameraStabilizationWidget()
    // Do nothing
 }
 
-void ConfigCameraStabilizationWidget::connectUpdates()
+/*
+ * This overridden function refreshes widgets which have no direct relation
+ * to any of UAVObjects. It saves their dirty state first because update comes
+ * from UAVObjects, and then restores it. Aftewards it calls base class
+ * function to take care of other widgets which were dynamically added.
+ */
+void ConfigCameraStabilizationWidget::refreshWidgetsValues(UAVObject *obj)
 {
-    // Now connect the widget to the StabilizationSettings object
-    connect(MixerSettings::GetInstance(getObjectManager()), SIGNAL(objectUpdated(UAVObject *)), this, SLOT(refreshValues()));
-    // TODO: This will need to support both CC and OP later
-    connect(HwSettings::GetInstance(getObjectManager()), SIGNAL(objectUpdated(UAVObject *)), this, SLOT(refreshValues()));
-}
+    bool dirty = isDirty();
 
-void ConfigCameraStabilizationWidget::disconnectUpdates()
-{
-    // Now connect the widget to the StabilizationSettings object
-    disconnect(MixerSettings::GetInstance(getObjectManager()), SIGNAL(objectUpdated(UAVObject *)), this, SLOT(refreshValues()));
-    // TODO: This will need to support both CC and OP later
-    disconnect(HwSettings::GetInstance(getObjectManager()), SIGNAL(objectUpdated(UAVObject *)), this, SLOT(refreshValues()));
-}
-
-/**
-  * @brief Populate the gui settings into the appropriate
-  * UAV structures
-  */
-void ConfigCameraStabilizationWidget::applySettings()
-{
-    // Enable or disable the settings
+    // Set module enable checkbox from OptionalModules UAVObject item.
+    // It needs special processing because ConfigTaskWidget uses TRUE/FALSE
+    // for QCheckBox, but OptionalModules uses Enabled/Disabled enum values.
     HwSettings *hwSettings = HwSettings::GetInstance(getObjectManager());
     HwSettings::DataFields hwSettingsData = hwSettings->getData();
-    hwSettingsData.OptionalModules[HwSettings::OPTIONALMODULES_CAMERASTAB] =
-            m_camerastabilization->enableCameraStabilization->isChecked() ?
-                HwSettings::OPTIONALMODULES_ENABLED :
-                HwSettings::OPTIONALMODULES_DISABLED;
 
-    // Update the mixer settings
+    m_camerastabilization->enableCameraStabilization->setChecked(
+        hwSettingsData.OptionalModules[HwSettings::OPTIONALMODULES_CAMERASTAB] == HwSettings::OPTIONALMODULES_ENABLED);
+
+    // Load mixer outputs which are mapped to camera controls
     MixerSettings *mixerSettings = MixerSettings::GetInstance(getObjectManager());
     MixerSettings::DataFields mixerSettingsData = mixerSettings->getData();
-    const int NUM_MIXERS = 10;
-
-    QComboBox *outputs[3] = {
-        m_camerastabilization->rollChannel,
-        m_camerastabilization->pitchChannel,
-        m_camerastabilization->yawChannel,
-    };
 
     // TODO: Need to reformat object so types are an
     // array themselves.  This gets really awkward
-    quint8 * mixerTypes[NUM_MIXERS] = {
+    quint8 *mixerTypes[] = {
         &mixerSettingsData.Mixer1Type,
         &mixerSettingsData.Mixer2Type,
         &mixerSettingsData.Mixer3Type,
@@ -119,18 +110,83 @@ void ConfigCameraStabilizationWidget::applySettings()
         &mixerSettingsData.Mixer9Type,
         &mixerSettingsData.Mixer10Type,
     };
+    const int NUM_MIXERS = sizeof(mixerTypes) / sizeof(mixerTypes[0]);
+
+    QComboBox *outputs[] = {
+        m_camerastabilization->rollChannel,
+        m_camerastabilization->pitchChannel,
+        m_camerastabilization->yawChannel
+    };
+    const int NUM_OUTPUTS = sizeof(outputs) / sizeof(outputs[0]);
+
+    for (int i = 0; i < NUM_OUTPUTS; i++) {
+        // Default to none if not found.
+        // Then search for any mixer channels set to this
+        outputs[i]->setCurrentIndex(0);
+        for (int j = 0; j < NUM_MIXERS; j++)
+            if (*mixerTypes[j] == (MixerSettings::MIXER1TYPE_CAMERAROLL + i) &&
+                    outputs[i]->currentIndex() != (j + 1))
+                outputs[i]->setCurrentIndex(j + 1);
+    }
+
+    setDirty(dirty);
+
+    ConfigTaskWidget::refreshWidgetsValues(obj);
+}
+
+/*
+ * This overridden function updates UAVObjects which have no direct relation
+ * to any of widgets. Aftewards it calls base class function to take care of
+ * other object to widget relations which were dynamically added.
+ */
+void ConfigCameraStabilizationWidget::updateObjectsFromWidgets()
+{
+    // Save state of the module enable checkbox first
+    HwSettings *hwSettings = HwSettings::GetInstance(getObjectManager());
+    HwSettings::DataFields hwSettingsData = hwSettings->getData();
+    hwSettingsData.OptionalModules[HwSettings::OPTIONALMODULES_CAMERASTAB] =
+        m_camerastabilization->enableCameraStabilization->isChecked() ?
+            HwSettings::OPTIONALMODULES_ENABLED : HwSettings::OPTIONALMODULES_DISABLED;
+    hwSettings->setData(hwSettingsData);
+
+    // Update mixer channels which were mapped to camera outputs in case they are
+    // not used for other function yet
+    MixerSettings *mixerSettings = MixerSettings::GetInstance(getObjectManager());
+    MixerSettings::DataFields mixerSettingsData = mixerSettings->getData();
+
+    // TODO: Need to reformat object so types are an
+    // array themselves.  This gets really awkward
+    quint8 *mixerTypes[] = {
+        &mixerSettingsData.Mixer1Type,
+        &mixerSettingsData.Mixer2Type,
+        &mixerSettingsData.Mixer3Type,
+        &mixerSettingsData.Mixer4Type,
+        &mixerSettingsData.Mixer5Type,
+        &mixerSettingsData.Mixer6Type,
+        &mixerSettingsData.Mixer7Type,
+        &mixerSettingsData.Mixer8Type,
+        &mixerSettingsData.Mixer9Type,
+        &mixerSettingsData.Mixer10Type,
+    };
+    const int NUM_MIXERS = sizeof(mixerTypes) / sizeof(mixerTypes[0]);
+
+    QComboBox *outputs[] = {
+        m_camerastabilization->rollChannel,
+        m_camerastabilization->pitchChannel,
+        m_camerastabilization->yawChannel
+    };
+    const int NUM_OUTPUTS = sizeof(outputs) / sizeof(outputs[0]);
 
     m_camerastabilization->message->setText("");
-    for (int i = 0; i < 3; i++)
-    {
+    for (int i = 0; i < NUM_OUTPUTS; i++) {
         // Channel 1 is second entry, so becomes zero
         int mixerNum = outputs[i]->currentIndex() - 1;
 
-        if ( mixerNum >= 0 && // Short circuit in case of none
-             *mixerTypes[mixerNum] != MixerSettings::MIXER1TYPE_DISABLED &&
-             (*mixerTypes[mixerNum] != MixerSettings::MIXER1TYPE_CAMERAROLL + i) ) {
-            // If the mixer channel already to something that isn't what we are
-            // about to set it to reset to none
+        if ((mixerNum >= 0) && // Short circuit in case of none
+            (*mixerTypes[mixerNum] != MixerSettings::MIXER1TYPE_DISABLED) &&
+            (*mixerTypes[mixerNum] != MixerSettings::MIXER1TYPE_CAMERAROLL + i) ) {
+            // If the mixer channel already mapped to something, it should not be
+            // used for camera output, we reset it to none
             outputs[i]->setCurrentIndex(0);
             m_camerastabilization->message->setText("One of the channels is already assigned, reverted to none");
         } else {
@@ -141,77 +197,13 @@ void ConfigCameraStabilizationWidget::applySettings()
 
             // If this channel is assigned to one of the outputs that is not disabled
             // set it
-            if(mixerNum >= 0 && mixerNum < NUM_MIXERS)
+            if ((mixerNum >= 0) && (mixerNum < NUM_MIXERS))
                 *mixerTypes[mixerNum] = MixerSettings::MIXER1TYPE_CAMERAROLL + i;
         }
     }
-
-    // Because multiple objects are updated, and all of them trigger the callback
-    // they must be done together (if update one then load settings from second
-    // the first update would wipe the UI controls).  However to be extra cautious
-    // I'm also disabling updates during the setting to the UAVObjects
-    disconnectUpdates();
-    hwSettings->setData(hwSettingsData);
     mixerSettings->setData(mixerSettingsData);
-    connectUpdates();
-}
 
-/**
-  * Push settings into UAV objects then save them
-  */
-void ConfigCameraStabilizationWidget::saveSettings()
-{
-    applySettings();
-    UAVObject *obj = HwSettings::GetInstance(getObjectManager());
-    saveObjectToSD(obj);
-    obj = MixerSettings::GetInstance(getObjectManager());
-    saveObjectToSD(obj);
-    obj = CameraStabSettings::GetInstance(getObjectManager());
-    saveObjectToSD(obj);
-}
-
-void ConfigCameraStabilizationWidget::refreshValues()
-{
-    HwSettings *hwSettings = HwSettings::GetInstance(getObjectManager());
-    HwSettings::DataFields hwSettingsData = hwSettings->getData();
-    m_camerastabilization->enableCameraStabilization->setChecked(
-                hwSettingsData.OptionalModules[HwSettings::OPTIONALMODULES_CAMERASTAB] ==
-                HwSettings::OPTIONALMODULES_ENABLED);
-
-    MixerSettings *mixerSettings = MixerSettings::GetInstance(getObjectManager());
-    MixerSettings::DataFields mixerSettingsData = mixerSettings->getData();
-    const int NUM_MIXERS = 10;
-    QComboBox *outputs[3] = {
-        m_camerastabilization->rollChannel,
-        m_camerastabilization->pitchChannel,
-        m_camerastabilization->yawChannel
-    };
-
-    // TODO: Need to reformat object so types are an
-    // array themselves.  This gets really awkward
-    quint8 * mixerTypes[NUM_MIXERS] = {
-        &mixerSettingsData.Mixer1Type,
-        &mixerSettingsData.Mixer2Type,
-        &mixerSettingsData.Mixer3Type,
-        &mixerSettingsData.Mixer4Type,
-        &mixerSettingsData.Mixer5Type,
-        &mixerSettingsData.Mixer6Type,
-        &mixerSettingsData.Mixer7Type,
-        &mixerSettingsData.Mixer8Type,
-        &mixerSettingsData.Mixer9Type,
-        &mixerSettingsData.Mixer10Type,
-    };
-
-    for (int i = 0; i < 3; i++)
-    {
-        // Default to none if not found.  Then search for any mixer channels set to
-        // this
-        outputs[i]->setCurrentIndex(0);
-        for (int j = 0; j < NUM_MIXERS; j++)
-            if (*mixerTypes[j] == (MixerSettings::MIXER1TYPE_CAMERAROLL + i) &&
-                    outputs[i]->currentIndex() != (j + 1))
-                outputs[i]->setCurrentIndex(j + 1);
-    }
+    ConfigTaskWidget::updateObjectsFromWidgets();
 }
 
 /**

@@ -698,10 +698,12 @@ void ConfigTaskWidget::autoLoadWidgets()
     forceShadowUpdates();
     foreach(objectToWidget * ow,objOfInterest)
     {
-        qDebug()<<"Master:"<<ow->widget->objectName();
+        if(ow->widget)
+            qDebug()<<"Master:"<<ow->widget->objectName();
         foreach(shadow * sh,ow->shadowsList)
         {
-            qDebug()<<"Child"<<sh->widget->objectName();
+            if(sh->widget)
+                qDebug()<<"Child"<<sh->widget->objectName();
         }
     }
 }

@@ -217,7 +217,21 @@ void ConfigCameraStabilizationWidget::updateObjectsFromWidgets()
 }
 void ConfigCameraStabilizationWidget::defaultRequestedSlot(int group)
 {
+    HwSettings *hwSettings = HwSettings::GetInstance(getObjectManager());
+    HwSettings *hwSettingsDefault=(HwSettings*)hwSettings->dirtyClone();
+    HwSettings::DataFields hwSettingsData = hwSettingsDefault->getData();
+    m_camerastabilization->enableCameraStabilization->setChecked(
+        hwSettingsData.OptionalModules[HwSettings::OPTIONALMODULES_CAMERASTAB] == HwSettings::OPTIONALMODULES_ENABLED);
+    QComboBox *outputs[] = {
+        m_camerastabilization->rollChannel,
+        m_camerastabilization->pitchChannel,
+        m_camerastabilization->yawChannel,
+    };
+    const int NUM_OUTPUTS = sizeof(outputs) / sizeof(outputs[0]);
 
+    for (int i = 0; i < NUM_OUTPUTS; i++) {
+        outputs[i]->setCurrentIndex(0);
+    }
 }
 
 /**

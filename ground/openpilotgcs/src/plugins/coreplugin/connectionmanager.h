@@ -91,6 +91,8 @@ signals:
     void deviceAboutToDisconnect();
 
 public slots:
+    void telemetryConnected();
+    void telemetryDisconnected();
     void telemetryUpdated(double txRate, double rxRate);
 
 private slots:
@@ -102,7 +104,10 @@ private slots:
 
 //	void onConnectionClosed(QObject *obj);
 	void onConnectionDestroyed(QObject *obj);
-        void connectionsCallBack(); //used to call devChange after all the plugins are loaded
+    void connectionsCallBack(); //used to call devChange after all the plugins are loaded
+    void reconnectSlot();
+    void reconnectCheckSlot();
+
 protected:
     QComboBox *m_availableDevList;
     QPushButton *m_connectBtn;
@@ -110,7 +115,7 @@ protected:
     QList<IConnection*> m_connectionsList;
 
     //tx/rx telemetry monitor
-    TelemetryMonitorWidget* m_monitor;
+    TelemetryMonitorWidget* m_monitorWidget;
 
     //currently connected connection plugin
     devListItem m_connectionDevice;
@@ -120,8 +125,10 @@ protected:
 
 private:
 	bool connectDevice();
-        Internal::MainWindow *m_mainWindow;
-        QList <IConnection *> connectionBackup;
+    Internal::MainWindow *m_mainWindow;
+    QList <IConnection *> connectionBackup;
+    QTimer *reconnect;
+    QTimer *reconnectCheck;
 
 };
 

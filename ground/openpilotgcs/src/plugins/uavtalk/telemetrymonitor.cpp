@@ -56,6 +56,8 @@ TelemetryMonitor::TelemetryMonitor(UAVObjectManager* objMngr, Telemetry* tel)
     statsTimer->start(STATS_CONNECT_PERIOD_MS);
 
     Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
+    connect(this,SIGNAL(connected()),cm,SLOT(telemetryConnected()));
+    connect(this,SIGNAL(disconnected()),cm,SLOT(telemetryDisconnected()));
     connect(this,SIGNAL(telemetryUpdated(double,double)),cm,SLOT(telemetryUpdated(double,double)));
 }
 

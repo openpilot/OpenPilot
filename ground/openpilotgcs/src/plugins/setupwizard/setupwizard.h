@@ -32,6 +32,8 @@
 #include "levellingutil.h"
 #include <coreplugin/icore.h>
 #include <coreplugin/connectionmanager.h>
+#include "uavobjectmanager.h"
+
 
 class SetupWizard : public QWizard
 {
@@ -43,9 +45,10 @@ public:
     enum CONTROLLER_SELECTION_MODE {CONTROLLER_SELECTION_AUTOMATIC, CONTROLLER_SELECTION_MANUAL, CONTROLLER_SELECTION_UNKNOWN};
     enum CONTROLLER_TYPE {CONTROLLER_UNKNOWN, CONTROLLER_CC, CONTROLLER_CC3D, CONTROLLER_REVO, CONTROLLER_PIPX};
     enum VEHICLE_TYPE {VEHICLE_UNKNOWN, VEHICLE_MULTI, VEHICLE_FIXEDWING, VEHICLE_HELI, VEHICLE_SURFACE};
-    enum MULTI_ROTOR_SUB_TYPE {MULTI_ROTOR_UNKNOWN, MULTI_ROTOR_TRI_Y, MULTI_ROTOR_QUAD_X, MULTI_ROTOR_QUAD_PLUS,
+    enum VEHICLE_SUB_TYPE {MULTI_ROTOR_UNKNOWN, MULTI_ROTOR_TRI_Y, MULTI_ROTOR_QUAD_X, MULTI_ROTOR_QUAD_PLUS,
                                MULTI_ROTOR_HEXA, MULTI_ROTOR_HEXA_H, MULTI_ROTOR_HEXA_COAX_Y, MULTI_ROTOR_OCTO,
-                               MULTI_ROTOR_OCTO_V, MULTI_ROTOR_OCTO_COAX_X, MULTI_ROTOR_OCTO_COAX_PLUS};
+                               MULTI_ROTOR_OCTO_V, MULTI_ROTOR_OCTO_COAX_X, MULTI_ROTOR_OCTO_COAX_PLUS, FIXED_WING_AILERON,
+                               FIXED_WING_VTAIL, HELI_CCPM};
     enum ESC_TYPE {ESC_DEFAULT, ESC_RAPID, ESC_UNKNOWN};
     enum INPUT_TYPE {INPUT_PWM, INPUT_PPM, INPUT_SBUS, INPUT_DSM, INPUT_UNKNOWN};
 
@@ -57,6 +60,9 @@ public:
 
     void setVehicleType(SetupWizard::VEHICLE_TYPE type) { m_vehicleType = type; }
     SetupWizard::VEHICLE_TYPE getVehicleType() const { return m_vehicleType; }
+
+    void setVehicleSubType(SetupWizard::VEHICLE_SUB_TYPE type) { m_vehicleSubType = type; }
+    SetupWizard::VEHICLE_SUB_TYPE getVehicleSubType() const { return m_vehicleSubType; }
 
     void setInputType(SetupWizard::INPUT_TYPE type) { m_inputType = type; }
     SetupWizard::INPUT_TYPE getInputType() const { return m_inputType; }
@@ -78,8 +84,14 @@ public:
         }
         return m_connectionManager;
     }
+public slots:
+    void exportConfiguration();
+    void writeConfiguration();
 
 private:
+    static const qint16 DEFAULT_ESC_FREQUENCE = 50;
+    static const qint16 RAPID_ESC_FREQUENCE = 50;
+
     enum {PAGE_START, PAGE_CONTROLLER, PAGE_VEHICLES, PAGE_MULTI, PAGE_FIXEDWING,
           PAGE_HELI, PAGE_SURFACE, PAGE_INPUT, PAGE_OUTPUT, PAGE_LEVELLING,
           PAGE_FLASH, PAGE_SUMMARY, PAGE_NOTYETIMPLEMENTED, PAGE_END};
@@ -88,6 +100,7 @@ private:
     CONTROLLER_SELECTION_MODE m_controllerSelectionMode;
     CONTROLLER_TYPE m_controllerType;
     VEHICLE_TYPE m_vehicleType;
+    VEHICLE_SUB_TYPE m_vehicleSubType;
     INPUT_TYPE m_inputType;
     ESC_TYPE m_escType;
     bool m_levellingPerformed;
@@ -95,6 +108,18 @@ private:
 
     Core::ConnectionManager *m_connectionManager;
 
+    UAVObjectManager *getUAVObjectManager();
+
+    void applyConfiguration();
+    void applyHardwareConfiguration(UAVObjectManager *uavoMgr);
+    void applyVehicleConfiguration(UAVObjectManager *uavoMgr);
+    void applyOutputConfiguration(UAVObjectManager *uavoMgr);
+    void applyLevellingConfiguration(UAVObjectManager *uavoMgr);
+
+    void setupTriCopter(UAVObjectManager *uavoMgr);
+    void setupQuadCopter(UAVObjectManager *uavoMgr);
+    void setupHexaCopter(UAVObjectManager *uavoMgr);
+    void setupOctoCopter(UAVObjectManager *uavoMgr);
 };
 
 #endif // SETUPWIZARD_H

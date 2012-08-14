@@ -46,11 +46,14 @@ public:
     ~MultiPage();
 
     void initializePage();
+    bool validatePage();
+
     
 private:
     Ui::MultiPage *ui;
     void setupMultiTypesCombo();
     QGraphicsSvgItem *multiPic;
+    void updateAvailableTypes();
 
 private slots:
     void updateImageAndDescription();

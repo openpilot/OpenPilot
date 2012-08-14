@@ -40,6 +40,11 @@
 #include "pages/summarypage.h"
 #include "pages/flashpage.h"
 #include "pages/notyetimplementedpage.h"
+#include "extensionsystem/pluginmanager.h"
+#include "hwsettings.h"
+#include "actuatorsettings.h"
+#include "attitudesettings.h"
+
 
 SetupWizard::SetupWizard(QWidget *parent) : QWizard(parent),
     m_controllerSelectionMode(CONTROLLER_SELECTION_UNKNOWN), m_controllerType(CONTROLLER_UNKNOWN),
@@ -47,6 +52,7 @@ SetupWizard::SetupWizard(QWidget *parent) : QWizard(parent),
     m_levellingPerformed(false), m_connectionManager(0)
 {
     setWindowTitle("OpenPilot Setup Wizard");
+    setOption(QWizard::IndependentPages, false);
     createPages();
 }
 
@@ -60,7 +66,7 @@ int SetupWizard::nextId() const
             {
                 case CONTROLLER_CC:
                 case CONTROLLER_CC3D:
-                    return PAGE_VEHICLES;
+                    return PAGE_INPUT;
                 case CONTROLLER_REVO:
                 case CONTROLLER_PIPX:
                 default:
@@ -83,9 +89,9 @@ int SetupWizard::nextId() const
             }
         }
         case PAGE_MULTI:
-            return PAGE_INPUT;
-        case PAGE_INPUT:
             return PAGE_OUTPUT;
+        case PAGE_INPUT:
+            return PAGE_VEHICLES;
         case PAGE_OUTPUT:
         {
             if(getControllerSelectionMode() == CONTROLLER_SELECTION_AUTOMATIC) {
@@ -194,6 +200,197 @@ QString SetupWizard::getSummaryText()
     }
 
     return summary;
+}
+
+void SetupWizard::applyConfiguration()
+{
+    UAVObjectManager* uavoMgr = getUAVObjectManager();
+    applyHardwareConfiguration(uavoMgr);
+    applyVehicleConfiguration(uavoMgr);
+    applyOutputConfiguration(uavoMgr);
+    applyLevellingConfiguration(uavoMgr);
+}
+
+UAVObjectManager* SetupWizard::getUAVObjectManager()
+{
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager * uavObjectManager = pm->getObject<UAVObjectManager>();
+    Q_ASSERT(uavObjectManager);
+    return uavObjectManager;
+}
+
+void SetupWizard::applyHardwareConfiguration(UAVObjectManager* uavoMgr)
+{
+    HwSettings* hwSettings = HwSettings::GetInstance(uavoMgr);
+
+    switch(getControllerType())
+    {
+        case CONTROLLER_CC:
+        case CONTROLLER_CC3D:
+            // Reset all ports
+            hwSettings->setCC_RcvrPort(HwSettings::CC_RCVRPORT_DISABLED);
+            hwSettings->setCC_FlexiPort(HwSettings::CC_FLEXIPORT_DISABLED);
+            hwSettings->setCC_MainPort(HwSettings::CC_MAINPORT_DISABLED);
+            switch(getInputType())
+            {
+                case INPUT_PWM:
+                    hwSettings->setCC_RcvrPort(HwSettings::CC_RCVRPORT_PWM);
+                    break;
+                case INPUT_PPM:
+                    hwSettings->setCC_RcvrPort(HwSettings::CC_RCVRPORT_PPM);
+                    break;
+                case INPUT_SBUS:
+                    hwSettings->setCC_MainPort(HwSettings::CC_MAINPORT_SBUS);
+                    break;
+                case INPUT_DSM:
+                    // TODO: Handle all of the DSM types ?? Which is most common?
+                    hwSettings->setCC_MainPort(HwSettings::CC_MAINPORT_DSM2);
+                    break;
+            }
+            break;
+        case CONTROLLER_REVO:
+            // TODO: Implement Revo settings
+            break;
+    }
+}
+
+void SetupWizard::applyVehicleConfiguration(UAVObjectManager *uavoMgr)
+{
+
+    switch(getVehicleType())
+    {
+        case VEHICLE_MULTI:
+        {
+            switch(getVehicleSubType())
+            {
+                case SetupWizard::MULTI_ROTOR_TRI_Y:
+                    setupTriCopter(uavoMgr);
+                    break;
+                case SetupWizard::MULTI_ROTOR_QUAD_X:
+                case SetupWizard::MULTI_ROTOR_QUAD_PLUS:
+                    setupQuadCopter(uavoMgr);
+                    break;
+                case SetupWizard::MULTI_ROTOR_HEXA:
+                case SetupWizard::MULTI_ROTOR_HEXA_COAX_Y:
+                case SetupWizard::MULTI_ROTOR_HEXA_H:
+                    setupHexaCopter(uavoMgr);
+                    break;
+                case SetupWizard::MULTI_ROTOR_OCTO:
+                case SetupWizard::MULTI_ROTOR_OCTO_COAX_X:
+                case SetupWizard::MULTI_ROTOR_OCTO_COAX_PLUS:
+                case SetupWizard::MULTI_ROTOR_OCTO_V:
+                    setupOctoCopter(uavoMgr);
+                    break;
+            }
+            break;
+        }
+        case VEHICLE_FIXEDWING:
+        case VEHICLE_HELI:
+        case VEHICLE_SURFACE:
+            // TODO: Implement settings for other vehicle types?
+            break;
+    }
+}
+
+void SetupWizard::applyOutputConfiguration(UAVObjectManager *uavoMgr)
+{
+    ActuatorSettings* actSettings = ActuatorSettings::GetInstance(uavoMgr);
+    switch(getVehicleType())
+    {
+        case VEHICLE_MULTI:
+        {
+            actSettings->setChannelUpdateFreq(0, DEFAULT_ESC_FREQUENCE);
+            actSettings->setChannelUpdateFreq(1, DEFAULT_ESC_FREQUENCE);
+            actSettings->setChannelUpdateFreq(2, DEFAULT_ESC_FREQUENCE);
+            actSettings->setChannelUpdateFreq(3, DEFAULT_ESC_FREQUENCE);
+
+            qint16 updateFrequence = DEFAULT_ESC_FREQUENCE;
+            switch(getESCType())
+            {
+                case ESC_DEFAULT:
+                    updateFrequence = DEFAULT_ESC_FREQUENCE;
+                    break;
+                case ESC_RAPID:
+                    updateFrequence = RAPID_ESC_FREQUENCE;
+                    break;
+            }
+
+            switch(getVehicleSubType())
+            {
+                case SetupWizard::MULTI_ROTOR_TRI_Y:
+                    actSettings->setChannelUpdateFreq(0, updateFrequence);
+                    break;
+                case SetupWizard::MULTI_ROTOR_QUAD_X:
+                case SetupWizard::MULTI_ROTOR_QUAD_PLUS:
+                    actSettings->setChannelUpdateFreq(0, updateFrequence);
+                    actSettings->setChannelUpdateFreq(1, updateFrequence);
+                    break;
+                case SetupWizard::MULTI_ROTOR_HEXA:
+                case SetupWizard::MULTI_ROTOR_HEXA_COAX_Y:
+                case SetupWizard::MULTI_ROTOR_HEXA_H:
+                case SetupWizard::MULTI_ROTOR_OCTO:
+                case SetupWizard::MULTI_ROTOR_OCTO_COAX_X:
+                case SetupWizard::MULTI_ROTOR_OCTO_COAX_PLUS:
+                case SetupWizard::MULTI_ROTOR_OCTO_V:
+                    actSettings->setChannelUpdateFreq(0, updateFrequence);
+                    actSettings->setChannelUpdateFreq(1, updateFrequence);
+                    actSettings->setChannelUpdateFreq(2, updateFrequence);
+                    actSettings->setChannelUpdateFreq(3, updateFrequence);
+                    break;
+            }
+            break;
+        }
+        case VEHICLE_FIXEDWING:
+        case VEHICLE_HELI:
+        case VEHICLE_SURFACE:
+            // TODO: Implement settings for other vehicle types?
+            break;
+    }
+}
+
+void SetupWizard::applyLevellingConfiguration(UAVObjectManager *uavoMgr)
+{
+    if(isLevellingPerformed())
+    {
+        accelGyroBias bias = getLevellingBias();
+        AttitudeSettings::DataFields attitudeSettingsData = AttitudeSettings::GetInstance(uavoMgr)->getData();
+        attitudeSettingsData.AccelBias[0] += bias.m_accelerometerXBias;
+        attitudeSettingsData.AccelBias[1] += bias.m_accelerometerYBias;
+        attitudeSettingsData.AccelBias[2] += bias.m_accelerometerZBias;
+        attitudeSettingsData.GyroBias[0] = -bias.m_gyroXBias;
+        attitudeSettingsData.GyroBias[1] = -bias.m_gyroYBias;
+        attitudeSettingsData.GyroBias[2] = -bias.m_gyroZBias;
+        AttitudeSettings::GetInstance(uavoMgr)->setData(attitudeSettingsData);
+    }
+}
+
+void SetupWizard::setupTriCopter(UAVObjectManager *uavoMgr)
+{
+
+}
+
+void SetupWizard::setupQuadCopter(UAVObjectManager *uavoMgr)
+{
+}
+
+void SetupWizard::setupHexaCopter(UAVObjectManager *uavoMgr)
+{
+}
+
+void SetupWizard::setupOctoCopter(UAVObjectManager *uavoMgr)
+{
+}
+
+void SetupWizard::exportConfiguration()
+{
+    applyConfiguration();
+    // Call export configuration function...
+}
+
+void SetupWizard::writeConfiguration()
+{
+    applyConfiguration();
+    // Call Save UAVOs to controller
 }
 
 void SetupWizard::createPages()

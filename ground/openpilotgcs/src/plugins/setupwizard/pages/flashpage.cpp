@@ -35,6 +35,7 @@ FlashPage::FlashPage(SetupWizard *wizard, QWidget *parent) :
     ui(new Ui::FlashPage)
 {
     ui->setupUi(this);
+    connect(ui->applyButton, SIGNAL(clicked()), wizard, SLOT(writeConfiguration()));
 }
 
 FlashPage::~FlashPage()

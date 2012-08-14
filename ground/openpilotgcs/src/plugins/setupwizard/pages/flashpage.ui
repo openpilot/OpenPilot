@@ -45,9 +45,9 @@ p, li { white-space: pre-wrap; }
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>240</y>
+     <y>230</y>
      <width>561</width>
-     <height>141</height>
+     <height>151</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -62,6 +62,19 @@ p, li { white-space: pre-wrap; }
    <property name="alignment">
     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
    </property>
+   <widget class="QPushButton" name="applyButton">
+    <property name="geometry">
+     <rect>
+      <x>440</x>
+      <y>30</y>
+      <width>100</width>
+      <height>100</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Apply</string>
+    </property>
+   </widget>
   </widget>
  </widget>
  <resources/>

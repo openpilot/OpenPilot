@@ -57,7 +57,14 @@ MultiPage::~MultiPage()
 
 void MultiPage::initializePage()
 {
+    updateAvailableTypes();
     updateImageAndDescription();
+}
+
+bool MultiPage::validatePage()
+{
+    SetupWizard::VEHICLE_SUB_TYPE type = (SetupWizard::VEHICLE_SUB_TYPE) ui->typeCombo->itemData(ui->typeCombo->currentIndex()).toInt();
+    getWizard()->setVehicleSubType(type);
 }
 
 void MultiPage::setupMultiTypesCombo()
@@ -66,7 +73,7 @@ void MultiPage::setupMultiTypesCombo()
     ui->typeCombo->addItem("Quadcopter X", SetupWizard::MULTI_ROTOR_QUAD_X);
     ui->typeCombo->addItem("Quadcopter +", SetupWizard::MULTI_ROTOR_QUAD_PLUS);
     ui->typeCombo->addItem("Hexacopter", SetupWizard::MULTI_ROTOR_HEXA);
-    ui->typeCombo->addItem("Hexacopter Coax", SetupWizard::MULTI_ROTOR_HEXA_COAX_Y);
+    ui->typeCombo->addItem("Hexacopter Coax (Y6)", SetupWizard::MULTI_ROTOR_HEXA_COAX_Y);
     ui->typeCombo->addItem("Hexacopter H", SetupWizard::MULTI_ROTOR_HEXA_H);
     ui->typeCombo->addItem("Octocopter", SetupWizard::MULTI_ROTOR_OCTO);
     ui->typeCombo->addItem("Octocopter Coax X", SetupWizard::MULTI_ROTOR_OCTO_COAX_X);
@@ -74,9 +81,18 @@ void MultiPage::setupMultiTypesCombo()
     ui->typeCombo->addItem("Octocopter V", SetupWizard::MULTI_ROTOR_OCTO_V);
 }
 
+void MultiPage::updateAvailableTypes()
+{
+    QVariant enable = (getWizard()->getInputType() == SetupWizard::INPUT_PWM) ? QVariant(0) : QVariant(1 | 32);
+    ui->typeCombo->model()->setData(ui->typeCombo->model()->index(6, 0), enable, Qt::UserRole - 1);
+    ui->typeCombo->model()->setData(ui->typeCombo->model()->index(7, 0), enable, Qt::UserRole - 1);
+    ui->typeCombo->model()->setData(ui->typeCombo->model()->index(8, 0), enable, Qt::UserRole - 1);
+    ui->typeCombo->model()->setData(ui->typeCombo->model()->index(9, 0), enable, Qt::UserRole - 1);
+}
+
 void MultiPage::updateImageAndDescription()
 {
-    SetupWizard::MULTI_ROTOR_SUB_TYPE type = (SetupWizard::MULTI_ROTOR_SUB_TYPE) ui->typeCombo->itemData(ui->typeCombo->currentIndex()).toInt();
+    SetupWizard::VEHICLE_SUB_TYPE type = (SetupWizard::VEHICLE_SUB_TYPE) ui->typeCombo->itemData(ui->typeCombo->currentIndex()).toInt();
     QString elementId = "";
     QString description = "Descriptive text with information about ";
     description.append(ui->typeCombo->currentText());

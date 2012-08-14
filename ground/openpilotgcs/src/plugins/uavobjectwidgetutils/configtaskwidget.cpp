@@ -783,12 +783,14 @@ void ConfigTaskWidget::defaultButtonClicked()
  */
 void ConfigTaskWidget::reloadButtonClicked()
 {
+    if(timeOut)
+        return;
     int group=sender()->property("group").toInt();
     QList<objectToWidget*> * list=defaultReloadGroups.value(group,NULL);
     if(!list)
         return;
     ObjectPersistence* objper = dynamic_cast<ObjectPersistence*>( getObjectManager()->getObject(ObjectPersistence::NAME) );
-    QTimer * timeOut=new QTimer(this);
+    timeOut=new QTimer(this);
     QEventLoop * eventLoop=new QEventLoop(this);
     connect(timeOut, SIGNAL(timeout()),eventLoop,SLOT(quit()));
     connect(objper, SIGNAL(objectUpdated(UAVObject*)), eventLoop, SLOT(quit()));

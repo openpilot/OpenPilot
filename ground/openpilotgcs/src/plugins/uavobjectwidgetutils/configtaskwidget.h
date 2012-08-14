@@ -166,6 +166,7 @@ private:
     void disconnectWidgetUpdatesToSlot(QWidget *widget, const char *function);
     void loadWidgetLimits(QWidget *widget, UAVObjectField *field, int index, bool hasLimits, double sclale);
     QString outOfLimitsStyle;
+    QTimer * timeOut;
 protected slots:
     virtual void disableObjUpdates();
     virtual void enableObjUpdates();

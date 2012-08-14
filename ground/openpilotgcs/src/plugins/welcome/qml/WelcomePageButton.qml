@@ -3,7 +3,7 @@ import QtQuick 1.1
 
 Item {
     id: welcomeButton
-    width: 116
+    width: Math.max(116, icon.width)
     height: 116
 
     property string baseIconName
@@ -28,6 +28,7 @@ Item {
         id: labelImage
         source: "images/button-label.png"
         opacity: 0
+        visible: labelText.text.length > 0 //don't show label bg without text
 
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: hoveredIcon.top

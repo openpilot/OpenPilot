@@ -24,5 +24,9 @@
         <file>qml/images/scopes-off.png</file>
         <file>qml/images/system-on.png</file>
         <file>qml/images/system-off.png</file>
+        <file>qml/images/bttn-txwizard-on.png</file>
+        <file>qml/images/bttn-txwizard-off.png</file>
+        <file>qml/images/bttn-vehwizard-on.png</file>
+        <file>qml/images/bttn-vehwizard-off.png</file>
     </qresource>
 </RCC>

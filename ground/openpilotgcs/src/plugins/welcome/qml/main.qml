@@ -25,6 +25,28 @@ Rectangle {
     }
 
     Column {
+        id: wizarButtonsColumn
+
+        anchors {
+            top: parent.top
+            right: parent.right
+            margins: 8
+        }
+        spacing: 8
+
+        WelcomePageButton {
+            baseIconName: "bttn-vehwizard"
+            onClicked: welcomePlugin.openPage("VehWizard")
+        }
+
+        WelcomePageButton {
+            baseIconName: "bttn-txwizard"
+            onClicked: welcomePlugin.openPage("TxWizard")
+        }
+    }
+
+
+    Column {
         anchors.horizontalCenter: parent.horizontalCenter
         // distribute a vertical space between the icons blocks an community widget as:
         // top - 48% - Icons - 27% - CommunityWidget - 25% - bottom

@@ -139,6 +139,7 @@ signals:
     void autoPilotConnected();
     //fired when the autopilot disconnects
     void autoPilotDisconnected();
+    void defaultRequested(int group);
 private slots:
     void objectUpdated(UAVObject*);
     void defaultButtonClicked();
@@ -165,7 +166,6 @@ private:
     void disconnectWidgetUpdatesToSlot(QWidget *widget, const char *function);
     void loadWidgetLimits(QWidget *widget, UAVObjectField *field, int index, bool hasLimits, double sclale);
     QString outOfLimitsStyle;
-    QTimer * timeOut;
 protected slots:
     virtual void disableObjUpdates();
     virtual void enableObjUpdates();

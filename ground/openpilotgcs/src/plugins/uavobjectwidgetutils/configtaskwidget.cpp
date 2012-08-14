@@ -32,7 +32,7 @@
 /**
  * Constructor
  */
-ConfigTaskWidget::ConfigTaskWidget(QWidget *parent) : QWidget(parent),isConnected(false),smartsave(NULL),dirty(false),outOfLimitsStyle("background-color: rgb(255, 0, 0);"),timeOut(NULL),allowWidgetUpdates(true)
+ConfigTaskWidget::ConfigTaskWidget(QWidget *parent) : QWidget(parent),isConnected(false),smartsave(NULL),dirty(false),outOfLimitsStyle("background-color: rgb(255, 0, 0);"),allowWidgetUpdates(true)
 {
     pm = ExtensionSystem::PluginManager::instance();
     objManager = pm->getObject<UAVObjectManager>();
@@ -175,10 +175,6 @@ ConfigTaskWidget::~ConfigTaskWidget()
     {
         if(oTw)
             delete oTw;
-    }
-    if(timeOut)
-    {
-        delete timeOut;
     }
 }
 
@@ -772,6 +768,7 @@ void ConfigTaskWidget::addReloadButton(QPushButton *button, int buttonGroup)
 void ConfigTaskWidget::defaultButtonClicked()
 {
     int group=sender()->property("group").toInt();
+    emit defaultRequested(group);
     QList<objectToWidget*> * list=defaultReloadGroups.value(group);
     foreach(objectToWidget * oTw,*list)
     {
@@ -791,7 +788,7 @@ void ConfigTaskWidget::reloadButtonClicked()
     if(!list)
         return;
     ObjectPersistence* objper = dynamic_cast<ObjectPersistence*>( getObjectManager()->getObject(ObjectPersistence::NAME) );
-    timeOut=new QTimer(this);
+    QTimer * timeOut=new QTimer(this);
     QEventLoop * eventLoop=new QEventLoop(this);
     connect(timeOut, SIGNAL(timeout()),eventLoop,SLOT(quit()));
     connect(objper, SIGNAL(objectUpdated(UAVObject*)), eventLoop, SLOT(quit()));

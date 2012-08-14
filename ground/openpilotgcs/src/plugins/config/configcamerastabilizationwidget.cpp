@@ -66,6 +66,7 @@ ConfigCameraStabilizationWidget::ConfigCameraStabilizationWidget(QWidget *parent
     addUAVObject("MixerSettings");
 
     disableMouseWheelEvents();
+    connect(this,SIGNAL(defaultRequested(int)),this,SLOT(defaultRequestedSlot(int)));
 }
 
 ConfigCameraStabilizationWidget::~ConfigCameraStabilizationWidget()
@@ -213,6 +214,10 @@ void ConfigCameraStabilizationWidget::updateObjectsFromWidgets()
     mixerSettings->setData(mixerSettingsData);
 
     ConfigTaskWidget::updateObjectsFromWidgets();
+}
+void ConfigCameraStabilizationWidget::defaultRequestedSlot(int group)
+{
+
 }
 
 /**

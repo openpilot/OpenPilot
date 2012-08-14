@@ -178,29 +178,38 @@ void ConfigCameraStabilizationWidget::updateObjectsFromWidgets()
     const int NUM_OUTPUTS = sizeof(outputs) / sizeof(outputs[0]);
 
     m_camerastabilization->message->setText("");
-    for (int i = 0; i < NUM_OUTPUTS; i++) {
-        // Channel 1 is second entry, so becomes zero
-        int mixerNum = outputs[i]->currentIndex() - 1;
+    bool widgetUpdated;
+    do {
+        widgetUpdated = false;
 
-        if ((mixerNum >= 0) && // Short circuit in case of none
-            (*mixerTypes[mixerNum] != MixerSettings::MIXER1TYPE_DISABLED) &&
-            (*mixerTypes[mixerNum] != MixerSettings::MIXER1TYPE_CAMERAROLL + i) ) {
-            // If the mixer channel already mapped to something, it should not be
-            // used for camera output, we reset it to none
-            outputs[i]->setCurrentIndex(0);
-            m_camerastabilization->message->setText("One of the channels is already assigned, reverted to none");
-        } else {
-            // Make sure no other channels have this output set
-            for (int j = 0; j < NUM_MIXERS; j++)
-                if (*mixerTypes[j] == (MixerSettings::MIXER1TYPE_CAMERAROLL + i))
-                    *mixerTypes[j] = MixerSettings::MIXER1TYPE_DISABLED;
+        for (int i = 0; i < NUM_OUTPUTS; i++) {
+            // Channel 1 is second entry, so becomes zero
+            int mixerNum = outputs[i]->currentIndex() - 1;
 
-            // If this channel is assigned to one of the outputs that is not disabled
-            // set it
-            if ((mixerNum >= 0) && (mixerNum < NUM_MIXERS))
-                *mixerTypes[mixerNum] = MixerSettings::MIXER1TYPE_CAMERAROLL + i;
+            if ((mixerNum >= 0) && // Short circuit in case of none
+                (*mixerTypes[mixerNum] != MixerSettings::MIXER1TYPE_DISABLED) &&
+                (*mixerTypes[mixerNum] != MixerSettings::MIXER1TYPE_CAMERAROLL + i) ) {
+                // If the mixer channel already mapped to something, it should not be
+                // used for camera output, we reset it to none
+                outputs[i]->setCurrentIndex(0);
+                m_camerastabilization->message->setText("One of the channels is already assigned, reverted to none");
+
+                // Loop again or we may have inconsistent widget and UAVObject
+                widgetUpdated = true;
+            } else {
+                // Make sure no other channels have this output set
+                for (int j = 0; j < NUM_MIXERS; j++)
+                    if (*mixerTypes[j] == (MixerSettings::MIXER1TYPE_CAMERAROLL + i))
+                        *mixerTypes[j] = MixerSettings::MIXER1TYPE_DISABLED;
+
+                // If this channel is assigned to one of the outputs that is not disabled
+                // set it
+                if ((mixerNum >= 0) && (mixerNum < NUM_MIXERS))
+                    *mixerTypes[mixerNum] = MixerSettings::MIXER1TYPE_CAMERAROLL + i;
+            }
         }
-    }
+    } while(widgetUpdated);
+
     mixerSettings->setData(mixerSettingsData);
 
     ConfigTaskWidget::updateObjectsFromWidgets();

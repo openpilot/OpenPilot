@@ -280,6 +280,9 @@ static void eventTask()
 	int32_t delayMs;
 	EventCallbackInfo evInfo;
 
+	/* Must do this in task context to ensure that TaskMonitor has already finished its init */
+	TaskMonitorAdd(TASKINFO_RUNNING_EVENTDISPATCHER, eventTaskHandle);
+
 	// Initialize time
 	timeToNextUpdateMs = xTaskGetTickCount()*portTICK_RATE_MS;
 

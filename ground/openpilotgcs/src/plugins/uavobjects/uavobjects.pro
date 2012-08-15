@@ -83,6 +83,10 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/txpidsettings.h \
     $$UAVOBJECT_SYNTHETICS/cameradesired.h \
     $$UAVOBJECT_SYNTHETICS/faultsettings.h \
+    $$UAVOBJECT_SYNTHETICS/fixedwingpathfollowersettings.h \
+    $$UAVOBJECT_SYNTHETICS/fixedwingpathfollowerstatus.h \
+    $$UAVOBJECT_SYNTHETICS/pathstatus.h \
+    $$UAVOBJECT_SYNTHETICS/pathdesired.h \
     $$UAVOBJECT_SYNTHETICS/pipxsettings.h \
     $$UAVOBJECT_SYNTHETICS/pipxstatus.h
 
@@ -147,5 +151,9 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/txpidsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/cameradesired.cpp \
     $$UAVOBJECT_SYNTHETICS/faultsettings.cpp \
+    $$UAVOBJECT_SYNTHETICS/fixedwingpathfollowersettings.cpp \
+    $$UAVOBJECT_SYNTHETICS/fixedwingpathfollowerstatus.cpp \
+    $$UAVOBJECT_SYNTHETICS/pathstatus.cpp \
+    $$UAVOBJECT_SYNTHETICS/pathdesired.cpp \
     $$UAVOBJECT_SYNTHETICS/pipxsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/pipxstatus.cpp

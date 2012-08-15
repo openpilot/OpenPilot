@@ -147,15 +147,15 @@ void gps_airspeed_update(const GPSVelocityData *gpsVelData)
 			
 			const float alpha = .1;
 			float gps_airspeed_old;
-			GPSAirspeedGPSAirspeedGet(&gps_airspeed_old);			
+			GPSAirspeedTrueAirspeedGet(&gps_airspeed_old);			
 			
 			gps_airspeed=gps_airspeed*alpha + (1-alpha)*gps_airspeed_old;
 			
-			GPSAirspeedGPSAirspeedSet(&gps_airspeed);
+			GPSAirspeedTrueAirspeedSet(&gps_airspeed);
 		}
 		else {
-			GPSAirspeedGPSAirspeedGet(&gps_airspeed);
-			GPSAirspeedGPSAirspeedSet(&gps_airspeed);
+			GPSAirspeedTrueAirspeedGet(&gps_airspeed);
+			GPSAirspeedTrueAirspeedSet(&gps_airspeed);
 		}
 
 	}

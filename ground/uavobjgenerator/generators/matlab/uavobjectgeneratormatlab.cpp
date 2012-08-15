@@ -31,7 +31,9 @@ using namespace std;
 bool UAVObjectGeneratorMatlab::generate(UAVObjectParser* parser,QString templatepath,QString outputpath) {
 
     fieldTypeStrMatlab << "int8" << "int16" << "int32"
-        << "uint8" << "uint16" << "uint32" << "float32" << "uint8";
+        << "uint8" << "uint16" << "uint32" << "single" << "uint8";
+    fieldSizeStrMatlab << "1" << "2" << "4"
+        << "1" << "2" << "4" << "4" << "1";
 
     QDir matlabTemplatePath = QDir( templatepath + QString("ground/openpilotgcs/src/plugins/uavobjects"));
     QDir matlabOutputPath = QDir( outputpath + QString("matlab") );
@@ -46,7 +48,8 @@ bool UAVObjectGeneratorMatlab::generate(UAVObjectParser* parser,QString template
 
     for (int objidx = 0; objidx < parser->getNumObjects(); ++objidx) {
         ObjectInfo* info=parser->getObjectByIndex(objidx);
-        process_object(info);
+        int numBytes=parser->getNumBytes(objidx);
+        process_object(info, numBytes);
     }
 
     matlabCodeTemplate.replace( QString("$(ALLOCATIONCODE)"), matlabAllocationCode);
@@ -68,7 +71,7 @@ bool UAVObjectGeneratorMatlab::generate(UAVObjectParser* parser,QString template
 /**
  * Generate the matlab object files
  */
-bool UAVObjectGeneratorMatlab::process_object(ObjectInfo* info)
+bool UAVObjectGeneratorMatlab::process_object(ObjectInfo* info, int numBytes)
 {
     if (info == NULL)
         return false;
@@ -82,12 +85,15 @@ bool UAVObjectGeneratorMatlab::process_object(ObjectInfo* info)
     QString functionCall(functionName + "(fid, timestamp, checkCRC, ");
     QString objectID(QString().setNum(info->id));
     QString isSingleInst = boolTo01String( info->isSingleInst );
+    QString numBytesString=QString("%1").arg(numBytes);
 
 	
 	//===================================================================//
     // Generate allocation code (will replace the $(ALLOCATIONCODE) tag) //
 	//===================================================================//
 	//    matlabSwitchCode.append("\t\tcase " + objectID + "\n");
+
+
     matlabAllocationCode.append("\n\t" + tableIdxName + " = 0;\n");
 	QString type;
 	QString allocfields;
@@ -121,6 +127,9 @@ bool UAVObjectGeneratorMatlab::process_object(ObjectInfo* info)
     }
     matlabAllocationCode.append(allocfields);
     matlabAllocationCode.append("\t" + objectTableName.toUpper() + "_OBJID=" + objectID + ";\n");
+    matlabAllocationCode.append("\t" + objectTableName.toUpper() + "_NUMBYTES=" + numBytesString + ";\n");
+    matlabAllocationCode.append("\t" + objectName + "FidIdx = [];\n");
+
 
 
     //==============================================================//
@@ -130,8 +139,8 @@ bool UAVObjectGeneratorMatlab::process_object(ObjectInfo* info)
 
 	
     matlabSwitchCode.append("\t\tcase " + objectTableName.toUpper() + "_OBJID\n");
-//	matlabSwitchCode.append("\t\t\t" + objectTableName + "(" + tableIdxName +") = " + functionCall + ";\n");
-	matlabSwitchCode.append("\t\t\t" + tableIdxName + " = " + tableIdxName +" + 1;\n");
+    matlabSwitchCode.append("\t\t\t" + tableIdxName + " = " + tableIdxName +" + 1;\n");
+    if(0){
 	matlabSwitchCode.append("\t\t\t" + objectTableName + "= " + functionCall + objectTableName + ", " + tableIdxName + ");\n");
     matlabSwitchCode.append("\t\t\tif " + tableIdxName + " >= length(" + objectTableName +".timestamp) %Check to see if pre-allocated memory is exhausted\n");
     matlabSwitchCode.append("\t\t\t\tFieldNames= fieldnames(" + objectTableName +");\n");
@@ -139,12 +148,22 @@ bool UAVObjectGeneratorMatlab::process_object(ObjectInfo* info)
     matlabSwitchCode.append("\t\t\t\t\t" + objectTableName + ".(FieldNames{i})(:," + tableIdxName + "*2+1) = 0;\n");
     matlabSwitchCode.append("\t\t\t\tend\n");
     matlabSwitchCode.append("\t\t\tend\n");
+} else{
+        matlabSwitchCode.append("\t\t\t" + objectTableName + "FidIdx(" + tableIdxName + ") = bufferIdx; %#ok<*AGROW>\n");
+        matlabSwitchCode.append("\t\t\tbufferIdx=bufferIdx + " +  objectTableName.toUpper() + "_NUMBYTES+1; %+1 is for CRC\n");
+        if(!info->isSingleInst){
+            matlabSwitchCode.append("\t\t\tbufferIdx = bufferIdx + 2; %An extra two bytes for the instance ID\n");
+        }
+        matlabSwitchCode.append("\t\t\tif " + tableIdxName + " >= length(" + objectTableName +"FidIdx) %Check to see if pre-allocated memory is exhausted\n");
+        matlabSwitchCode.append("\t\t\t\t" + objectTableName + "FidIdx(" + tableIdxName + "*2) = 0;\n");
+        matlabSwitchCode.append("\t\t\tend\n");
+    }
 	
 	
-    //============================================================//
-    // Generate 'Cleanup:' code (will replace the $(CLEANUP) tag) //
-    //============================================================//
-    matlabCleanupCode.append(objectTableName + "=PruneStructOfArrays(" + objectTableName + "," + tableIdxName +");\n" );
+//    //============================================================//
+//    // Generate 'Cleanup:' code (will replace the $(CLEANUP) tag) //
+//    //============================================================//
+    matlabCleanupCode.append(objectTableName + "FidIdx =" + objectTableName + "FidIdx(1:" + tableIdxName +");\n" );
 
 	
     //========================================================================//
@@ -163,51 +182,98 @@ bool UAVObjectGeneratorMatlab::process_object(ObjectInfo* info)
     // Generate functions code (will replace the $(FUNCTIONSCODE) tag) //
 	//=================================================================//
     //Generate function description comment
-    matlabFunctionsCode.append("%%\n% " + objectName + " read function\n");
-	
-    matlabFunctionsCode.append("function [" + objectName + "] = " + functionCall + objectTableName + ", " + tableIdxName + ")" + "\n");
+    if(0){
+        matlabFunctionsCode.append("%%\n% " + objectName + " read function\n");
 
-    
-    matlabFunctionsCode.append("\t" + objectName + ".timestamp(" + tableIdxName + ")= timestamp;\n");
-    matlabFunctionsCode.append("\tif " + isSingleInst + "\n");
-    matlabFunctionsCode.append("\t\theaderSize = 8;\n");
-    matlabFunctionsCode.append("\telse\n");
-    matlabFunctionsCode.append("\t\t" + objectName + ".instanceID(" + tableIdxName + ") = (fread(fid, 1, 'uint16'));\n");
-    matlabFunctionsCode.append("\t\theaderSize = 10;\n");
-    matlabFunctionsCode.append("\tend\n\n");
+        matlabFunctionsCode.append("function [" + objectName + "] = " + functionCall + objectTableName + ", " + tableIdxName + ")" + "\n");
 
-    // Generate functions code, actual fields of the object
-    QString funcfields;
 
-    matlabFunctionsCode.append("\tstartPos = ftell(fid) - headerSize;\n");    
+        matlabFunctionsCode.append("\t" + objectName + ".timestamp(" + tableIdxName + ")= timestamp;\n");
+        matlabFunctionsCode.append("\tif " + isSingleInst + "\n");
+        matlabFunctionsCode.append("\t\theaderSize = 8;\n");
+        matlabFunctionsCode.append("\telse\n");
+        matlabFunctionsCode.append("\t\t" + objectName + ".instanceID(" + tableIdxName + ") = (fread(fid, 1, 'uint16'));\n");
+        matlabFunctionsCode.append("\t\theaderSize = 10;\n");
+        matlabFunctionsCode.append("\tend\n\n");
 
-    for (int n = 0; n < info->fields.length(); ++n) {
-        // Determine type
-        type = fieldTypeStrMatlab[info->fields[n]->type];
-        // Append field
-        if ( info->fields[n]->numElements > 1 )
-            funcfields.append("\t" + objectName + "." + info->fields[n]->name + "(:," + tableIdxName + ") = double(fread(fid, " + QString::number(info->fields[n]->numElements, 10) + ", '" + type + "'));\n");
-        else
-            funcfields.append("\t" + objectName + "." + info->fields[n]->name + "(" + tableIdxName + ") = double(fread(fid, 1, '" + type + "'));\n");
+        // Generate functions code, actual fields of the object
+        QString funcfields;
+
+        matlabFunctionsCode.append("\tstartPos = ftell(fid) - headerSize;\n");
+
+        for (int n = 0; n < info->fields.length(); ++n) {
+            // Determine type
+            type = fieldTypeStrMatlab[info->fields[n]->type];
+            // Append field
+            if ( info->fields[n]->numElements > 1 )
+                funcfields.append("\t" + objectName + "." + info->fields[n]->name + "(:," + tableIdxName + ") = double(fread(fid, " + QString::number(info->fields[n]->numElements, 10) + ", '" + type + "'));\n");
+            else
+                funcfields.append("\t" + objectName + "." + info->fields[n]->name + "(" + tableIdxName + ") = double(fread(fid, 1, '" + type + "'));\n");
+        }
+        matlabFunctionsCode.append(funcfields);
+
+        matlabFunctionsCode.append("\tobjLen = ftell(fid) - startPos;\n");
+    //    matlabFunctionsCode.append(QString("\tobjLen - %1 -headerSize\n").arg(numBytes));
+
+        matlabFunctionsCode.append("\t% read CRC\n");
+        matlabFunctionsCode.append("\tcrc_read = fread(fid, 1, '*uint8');\n");
+
+        matlabFunctionsCode.append("\tif checkCRC\n");
+        matlabFunctionsCode.append("\t\tfseek(fid, startPos, 'bof');\n");
+        matlabFunctionsCode.append("\t\tcrc_calc = compute_crc(uint8(fread(fid,objLen,'uint8')));\n");
+        matlabFunctionsCode.append("\t\tfread(fid,1,'uint8');\n");
+        matlabFunctionsCode.append("\t\tif (crc_calc ~= crc_read)\n");
+        matlabFunctionsCode.append("\t\t\tdisp('CRC Error')\n");
+        matlabFunctionsCode.append("\t\t\t" + tableIdxName + " = " + tableIdxName + " - 1;\n");
+        matlabFunctionsCode.append("\t\tend\n");
+        matlabFunctionsCode.append("\tend\n");
+
+        matlabFunctionsCode.append("\n\n");
     }
-    matlabFunctionsCode.append(funcfields);
+    else{
+        matlabFunctionsCode.append("% " + objectName + " typecasting\n");
+        QString funcfields;
 
-    matlabFunctionsCode.append("\tobjLen = ftell(fid) - startPos;\n");
+        //Add timestamp
+        funcfields.append("\t" + objectName + ".timestamp = " +
+                          "double(typecast(buffer(mcolon(" + objectName + "FidIdx "
+                          "- 20, " + objectName + "FidIdx + 4-1 -20)), 'uint32'))';\n");
 
-    matlabFunctionsCode.append("\t% read CRC\n");
-    matlabFunctionsCode.append("\tcrc_read = fread(fid, 1, '*uint8');\n");
+        int currentIdx=0;
 
-    matlabFunctionsCode.append("\tif checkCRC\n");
-    matlabFunctionsCode.append("\t\tfseek(fid, startPos, 'bof');\n");
-    matlabFunctionsCode.append("\t\tcrc_calc = compute_crc(uint8(fread(fid,objLen,'uint8')));\n");
-    matlabFunctionsCode.append("\t\tfread(fid,1,'uint8');\n");
-    matlabFunctionsCode.append("\t\tif (crc_calc ~= crc_read)\n");    
-    matlabFunctionsCode.append("\t\t\tdisp('CRC Error')\n");
-    matlabFunctionsCode.append("\t\t\t" + tableIdxName + " = " + tableIdxName + " - 1;\n");
-    matlabFunctionsCode.append("\t\tend\n");
-    matlabFunctionsCode.append("\tend\n");
+        //Add instance, if necessary
+        if(!info->isSingleInst){
+            funcfields.append("\t" + objectName + ".instanceID = " +
+                              "double(typecast(buffer(mcolon(" + objectName + "FidIdx "
+                              ", " + objectName + "FidIdx + 2-1)), 'uint16'))';\n");
+            currentIdx+=2;
+        }
 
-    matlabFunctionsCode.append("\n\n");
+        for (int n = 0; n < info->fields.length(); ++n) {
+            // Determine type
+            type = fieldTypeStrMatlab[info->fields[n]->type];
+
+            //Determine variable length
+            QString size = fieldSizeStrMatlab[info->fields[n]->type];
+            // Append field
+            if ( info->fields[n]->numElements > 1 ){
+                funcfields.append("\t" + objectName + "." + info->fields[n]->name + " = " +
+                                  "reshape(double(typecast(buffer(mcolon(" + objectName + "FidIdx + " + QString("%1").arg(currentIdx) +
+                                  ", " + objectName + "FidIdx + " + QString("%1").arg(currentIdx + size.toInt()*info->fields[n]->numElements - 1) + ")), '" + type + "')), "+ QString::number(info->fields[n]->numElements, 10) + ", [] );\n");
+            }
+            else{
+                funcfields.append("\t" + objectName + "." + info->fields[n]->name + " = " +
+                                  "double(typecast(buffer(mcolon(" + objectName + "FidIdx + " + QString("%1").arg(currentIdx) +
+                                  ", " + objectName + "FidIdx + " + QString("%1").arg(currentIdx + size.toInt() - 1) + ")), '" + type + "'))';\n");
+            }
+            currentIdx+=size.toInt()*info->fields[n]->numElements;
+        }
+        matlabFunctionsCode.append(funcfields);
+        matlabFunctionsCode.append("\n");
+
+    }
+
+//    ActuatorSettings.ChannelUpdateFreq(:,actuatorsettingsIdx) = double(fread(fid, 4, 'uint16'));
 
     return true;
 }

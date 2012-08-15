@@ -45,7 +45,6 @@
 #include "actuatorsettings.h"
 #include "attitudesettings.h"
 
-
 SetupWizard::SetupWizard(QWidget *parent) : QWizard(parent),
     m_controllerSelectionMode(CONTROLLER_SELECTION_UNKNOWN), m_controllerType(CONTROLLER_UNKNOWN),
     m_vehicleType(VEHICLE_UNKNOWN), m_inputType(INPUT_UNKNOWN), m_escType(ESC_UNKNOWN),
@@ -222,29 +221,29 @@ UAVObjectManager* SetupWizard::getUAVObjectManager()
 void SetupWizard::applyHardwareConfiguration(UAVObjectManager* uavoMgr)
 {
     HwSettings* hwSettings = HwSettings::GetInstance(uavoMgr);
-
+    HwSettings::DataFields data = hwSettings->getData();
     switch(getControllerType())
     {
         case CONTROLLER_CC:
         case CONTROLLER_CC3D:
             // Reset all ports
-            hwSettings->setCC_RcvrPort(HwSettings::CC_RCVRPORT_DISABLED);
-            hwSettings->setCC_FlexiPort(HwSettings::CC_FLEXIPORT_DISABLED);
-            hwSettings->setCC_MainPort(HwSettings::CC_MAINPORT_DISABLED);
+            data.CC_RcvrPort = HwSettings::CC_RCVRPORT_DISABLED;
+            data.CC_FlexiPort = HwSettings::CC_FLEXIPORT_DISABLED;
+            data.CC_MainPort = HwSettings::CC_MAINPORT_DISABLED;
             switch(getInputType())
             {
                 case INPUT_PWM:
-                    hwSettings->setCC_RcvrPort(HwSettings::CC_RCVRPORT_PWM);
+                    data.CC_RcvrPort = HwSettings::CC_RCVRPORT_PWM;
                     break;
                 case INPUT_PPM:
-                    hwSettings->setCC_RcvrPort(HwSettings::CC_RCVRPORT_PPM);
+                    data.CC_RcvrPort = HwSettings::CC_RCVRPORT_PPM;
                     break;
                 case INPUT_SBUS:
-                    hwSettings->setCC_MainPort(HwSettings::CC_MAINPORT_SBUS);
+                    data.CC_MainPort = HwSettings::CC_MAINPORT_SBUS;
                     break;
                 case INPUT_DSM:
                     // TODO: Handle all of the DSM types ?? Which is most common?
-                    hwSettings->setCC_MainPort(HwSettings::CC_MAINPORT_DSM2);
+                    data.CC_MainPort = HwSettings::CC_MAINPORT_DSM2;
                     break;
             }
             break;
@@ -252,6 +251,7 @@ void SetupWizard::applyHardwareConfiguration(UAVObjectManager* uavoMgr)
             // TODO: Implement Revo settings
             break;
     }
+    hwSettings->setData(data);
 }
 
 void SetupWizard::applyVehicleConfiguration(UAVObjectManager *uavoMgr)
@@ -261,6 +261,8 @@ void SetupWizard::applyVehicleConfiguration(UAVObjectManager *uavoMgr)
     {
         case VEHICLE_MULTI:
         {
+            resetVehicleConfig(uavoMgr);
+
             switch(getVehicleSubType())
             {
                 case SetupWizard::MULTI_ROTOR_TRI_Y:
@@ -299,10 +301,12 @@ void SetupWizard::applyOutputConfiguration(UAVObjectManager *uavoMgr)
     {
         case VEHICLE_MULTI:
         {
-            actSettings->setChannelUpdateFreq(0, DEFAULT_ESC_FREQUENCE);
-            actSettings->setChannelUpdateFreq(1, DEFAULT_ESC_FREQUENCE);
-            actSettings->setChannelUpdateFreq(2, DEFAULT_ESC_FREQUENCE);
-            actSettings->setChannelUpdateFreq(3, DEFAULT_ESC_FREQUENCE);
+            ActuatorSettings::DataFields data = actSettings->getData();
+
+            data.ChannelUpdateFreq[0] = DEFAULT_ESC_FREQUENCE;
+            data.ChannelUpdateFreq[1] = DEFAULT_ESC_FREQUENCE;
+            data.ChannelUpdateFreq[3] = DEFAULT_ESC_FREQUENCE;
+            data.ChannelUpdateFreq[4] = DEFAULT_ESC_FREQUENCE;
 
             qint16 updateFrequence = DEFAULT_ESC_FREQUENCE;
             switch(getESCType())
@@ -318,12 +322,12 @@ void SetupWizard::applyOutputConfiguration(UAVObjectManager *uavoMgr)
             switch(getVehicleSubType())
             {
                 case SetupWizard::MULTI_ROTOR_TRI_Y:
-                    actSettings->setChannelUpdateFreq(0, updateFrequence);
+                    data.ChannelUpdateFreq[0] = updateFrequence;
                     break;
                 case SetupWizard::MULTI_ROTOR_QUAD_X:
                 case SetupWizard::MULTI_ROTOR_QUAD_PLUS:
-                    actSettings->setChannelUpdateFreq(0, updateFrequence);
-                    actSettings->setChannelUpdateFreq(1, updateFrequence);
+                    data.ChannelUpdateFreq[0] = updateFrequence;
+                    data.ChannelUpdateFreq[1] = updateFrequence;
                     break;
                 case SetupWizard::MULTI_ROTOR_HEXA:
                 case SetupWizard::MULTI_ROTOR_HEXA_COAX_Y:
@@ -332,12 +336,13 @@ void SetupWizard::applyOutputConfiguration(UAVObjectManager *uavoMgr)
                 case SetupWizard::MULTI_ROTOR_OCTO_COAX_X:
                 case SetupWizard::MULTI_ROTOR_OCTO_COAX_PLUS:
                 case SetupWizard::MULTI_ROTOR_OCTO_V:
-                    actSettings->setChannelUpdateFreq(0, updateFrequence);
-                    actSettings->setChannelUpdateFreq(1, updateFrequence);
-                    actSettings->setChannelUpdateFreq(2, updateFrequence);
-                    actSettings->setChannelUpdateFreq(3, updateFrequence);
+                    data.ChannelUpdateFreq[0] = updateFrequence;
+                    data.ChannelUpdateFreq[1] = updateFrequence;
+                    data.ChannelUpdateFreq[3] = updateFrequence;
+                    data.ChannelUpdateFreq[4] = updateFrequence;
                     break;
             }
+            actSettings->setData(data);
             break;
         }
         case VEHICLE_FIXEDWING:
@@ -364,8 +369,46 @@ void SetupWizard::applyLevellingConfiguration(UAVObjectManager *uavoMgr)
     }
 }
 
+
+void SetupWizard::resetVehicleConfig(UAVObjectManager *uavoMgr)
+{
+    // Reset all mixers
+    MixerSettings* mSettings = MixerSettings::GetInstance(uavoMgr);
+
+    QString mixerTypePattern = "Mixer%1Type";
+    QString mixerVectorPattern = "Mixer%1Vector";
+    for(int i = 1; i <= 10; i++) {
+        UAVObjectField *field = mSettings->getField(mixerTypePattern.arg(i));
+        Q_ASSERT(field);
+        field->setValue(field->getOptions().at(0));
+
+        field = mSettings->getField(mixerVectorPattern.arg(i));
+        Q_ASSERT(field);
+        for(int i = 0; i < field->getNumElements(); i++){
+            field->setValue(0, i);
+        }
+    }
+    mSettings->setData(mSettings->getData());
+
+}
+
+
 void SetupWizard::setupTriCopter(UAVObjectManager *uavoMgr)
 {
+    // Typical vehicle setup
+    // 1. Setup and apply mixer
+    // 2. Setup GUI data
+
+    double mixer [8][3] = {
+        {  0.5,  1,  0},
+        {  0.5, -1,  0},
+        { -1,    0,  0},
+        {  0,    0,  0},
+        {  0,    0,  0},
+        {  0,    0,  0},
+        {  0,    0,  0},
+        {  0,    0,  0}
+    };
 
 }
 

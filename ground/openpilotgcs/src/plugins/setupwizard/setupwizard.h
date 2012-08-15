@@ -33,6 +33,7 @@
 #include <coreplugin/icore.h>
 #include <coreplugin/connectionmanager.h>
 #include "uavobjectmanager.h"
+#include "mixersettings.h"
 
 
 class SetupWizard : public QWizard
@@ -90,7 +91,7 @@ public slots:
 
 private:
     static const qint16 DEFAULT_ESC_FREQUENCE = 50;
-    static const qint16 RAPID_ESC_FREQUENCE = 50;
+    static const qint16 RAPID_ESC_FREQUENCE = 400;
 
     enum {PAGE_START, PAGE_CONTROLLER, PAGE_VEHICLES, PAGE_MULTI, PAGE_FIXEDWING,
           PAGE_HELI, PAGE_SURFACE, PAGE_INPUT, PAGE_OUTPUT, PAGE_LEVELLING,
@@ -115,6 +116,9 @@ private:
     void applyVehicleConfiguration(UAVObjectManager *uavoMgr);
     void applyOutputConfiguration(UAVObjectManager *uavoMgr);
     void applyLevellingConfiguration(UAVObjectManager *uavoMgr);
+
+    void resetVehicleConfig(UAVObjectManager *uavoMgr);
+    void resetMixerVectors(MixerSettings::DataFields data, qint8 channelIndex);
 
     void setupTriCopter(UAVObjectManager *uavoMgr);
     void setupQuadCopter(UAVObjectManager *uavoMgr);

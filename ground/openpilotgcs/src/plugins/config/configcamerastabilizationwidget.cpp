@@ -65,8 +65,10 @@ ConfigCameraStabilizationWidget::ConfigCameraStabilizationWidget(QWidget *parent
     addUAVObject("HwSettings");
     addUAVObject("MixerSettings");
 
+    // To set special widgets to defaults when requested
+    connect(this, SIGNAL(defaultRequested(int)), this, SLOT(defaultRequestedSlot(int)));
+
     disableMouseWheelEvents();
-    connect(this,SIGNAL(defaultRequested(int)),this,SLOT(defaultRequestedSlot(int)));
 }
 
 ConfigCameraStabilizationWidget::~ConfigCameraStabilizationWidget()
@@ -215,13 +217,21 @@ void ConfigCameraStabilizationWidget::updateObjectsFromWidgets()
 
     ConfigTaskWidget::updateObjectsFromWidgets();
 }
+
+/*
+ * This slot function is called when "Default" button is clicked.
+ * All special widgets which belong to the group passed should be set here.
+ */
 void ConfigCameraStabilizationWidget::defaultRequestedSlot(int group)
 {
+    Q_UNUSED(group);
+
     HwSettings *hwSettings = HwSettings::GetInstance(getObjectManager());
     HwSettings *hwSettingsDefault=(HwSettings*)hwSettings->dirtyClone();
     HwSettings::DataFields hwSettingsData = hwSettingsDefault->getData();
     m_camerastabilization->enableCameraStabilization->setChecked(
         hwSettingsData.OptionalModules[HwSettings::OPTIONALMODULES_CAMERASTAB] == HwSettings::OPTIONALMODULES_ENABLED);
+
     QComboBox *outputs[] = {
         m_camerastabilization->rollChannel,
         m_camerastabilization->pitchChannel,

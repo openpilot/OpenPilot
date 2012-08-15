@@ -57,9 +57,9 @@ void ConfigTaskWidget::addWidget(QWidget * widget)
  * Add an object to the management system
  * @param objectName name of the object to add to the management system
  */
-void ConfigTaskWidget::addUAVObject(QString objectName)
+void ConfigTaskWidget::addUAVObject(QString objectName,QList<int> * reloadGroups)
 {
-    addUAVObjectToWidgetRelation(objectName,"",NULL);
+    addUAVObjectToWidgetRelation(objectName,"",NULL,0,1,false,reloadGroups);
 }
 /**
  * Add an UAVObject field to widget relation to the management system
@@ -148,7 +148,21 @@ void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString fiel
     }
     if(widget==NULL)
     {
-        // do nothing
+        if(defaultReloadGroups && obj)
+        {
+            foreach(int i,*defaultReloadGroups)
+            {
+                if(this->defaultReloadGroups.contains(i))
+                {
+                    this->defaultReloadGroups.value(i)->append(ow);
+                }
+                else
+                {
+                    this->defaultReloadGroups.insert(i,new QList<objectToWidget*>());
+                    this->defaultReloadGroups.value(i)->append(ow);
+                }
+            }
+        }
     }
     else
     {
@@ -537,7 +551,7 @@ bool ConfigTaskWidget::addShadowWidget(QString object, QString field, QWidget *w
 {
     foreach(objectToWidget * oTw,objOfInterest)
     {
-        if(!oTw->object || !oTw->widget)
+        if(!oTw->object || !oTw->widget || !oTw->field)
             continue;
         if(oTw->object->getName()==object && oTw->field->getName()==field && oTw->index==index && oTw->object->getInstID()==instID)
         {
@@ -772,7 +786,7 @@ void ConfigTaskWidget::defaultButtonClicked()
     QList<objectToWidget*> * list=defaultReloadGroups.value(group);
     foreach(objectToWidget * oTw,*list)
     {
-        if(!oTw->object)
+        if(!oTw->object || !oTw->field)
             continue;
         UAVDataObject * temp=((UAVDataObject*)oTw->object)->dirtyClone();
         setWidgetFromField(oTw->widget,temp->getField(oTw->field->getName()),oTw->index,oTw->scale,oTw->isLimited);
@@ -810,7 +824,8 @@ void ConfigTaskWidget::reloadButtonClicked()
             if(timeOut->isActive())
             {
                 oTw->object->requestUpdate();
-                setWidgetFromField(oTw->widget,oTw->field,oTw->index,oTw->scale,oTw->isLimited);
+                if(oTw->widget)
+                    setWidgetFromField(oTw->widget,oTw->field,oTw->index,oTw->scale,oTw->isLimited);
             }
             timeOut->stop();
         }

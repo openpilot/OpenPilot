@@ -93,7 +93,7 @@ public:
     UAVObjectManager* getObjectManager();
     static double listMean(QList<double> list);
 
-    void addUAVObject(QString objectName);
+    void addUAVObject(QString objectName, QList<int> *reloadGroups=NULL);
     void addWidget(QWidget * widget);
 
     void addUAVObjectToWidgetRelation(QString object,QString field,QWidget * widget,int index=0,double scale=1,bool isLimited=false,QList<int>* defaultReloadGroups=0,quint32 instID=0);

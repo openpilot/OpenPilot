@@ -56,14 +56,16 @@ ConfigCameraStabilizationWidget::ConfigCameraStabilizationWidget(QWidget *parent
     // using objrelation dynamic property
     autoLoadWidgets();
 
+    QList<int> reloadGroups;
+    reloadGroups<<1;
     // Add some widgets and UAVObjects to track widget dirty state
     // and monitor UAVObject changes in addition to autoloaded ones
     addWidget(m_camerastabilization->enableCameraStabilization);
     addWidget(m_camerastabilization->rollChannel);
     addWidget(m_camerastabilization->pitchChannel);
     addWidget(m_camerastabilization->yawChannel);
-    addUAVObject("HwSettings");
-    addUAVObject("MixerSettings");
+    addUAVObject("HwSettings",&reloadGroups);
+    addUAVObject("MixerSettings",&reloadGroups);
 
     // To set special widgets to defaults when requested
     connect(this, SIGNAL(defaultRequested(int)), this, SLOT(defaultRequestedSlot(int)));

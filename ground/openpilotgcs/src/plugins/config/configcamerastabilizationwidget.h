@@ -46,6 +46,7 @@ private:
     Ui_CameraStabilizationWidget *m_camerastabilization;
     void refreshWidgetsValues(UAVObject *obj);
     void updateObjectsFromWidgets();
+
 private slots:
     void defaultRequestedSlot(int group);
 };

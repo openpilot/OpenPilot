@@ -30,8 +30,10 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import junit.framework.Assert;
 import android.os.Handler;
@@ -487,14 +489,22 @@ public class Telemetry {
 	private static final int MAX_UPDATE_PERIOD_MS = 1000;
 	private static final int MIN_UPDATE_PERIOD_MS = 1;
 
-	private final ObjectUpdateHandler handler;
+	static private ObjectUpdateHandler handler;
 
+	//! Accessor for the object updated handler
+	ObjectUpdateHandler getHandler() { return handler; }
+
+	/**
+	 * Handler which posts all the messages for individual object updates
+	 */
 	public class ObjectUpdateHandler extends Handler {
 
 		// ! This can only be created while attaching to a particular looper
 		ObjectUpdateHandler(Looper l) {
 			super(l);
 		}
+
+		Queue<ObjectQueueInfo> objQueue = new ConcurrentLinkedQueue<ObjectQueueInfo>();
 
 		// ! Generic enqueue
 		void enqueueObjectUpdates(UAVObject obj, int event,
@@ -507,7 +517,26 @@ public class Telemetry {
 			objInfo.event = event;
 			objInfo.allInstances = allInstances;
 
-			post(new ObjectRunnable(objInfo));
+			// For now maintain a list of objects in the queue so we don't add duplicates
+			// later we should make the runnables static to each class so we can use removeCallback
+			synchronized(objQueue) {
+				if (objQueue.contains(objInfo)) {
+					if (WARN) Log.w(TAG, "Found previously scheduled queue element: " + objInfo.obj.getName());
+				} else {
+					objQueue.add(objInfo);
+					post(new ObjectRunnable(objInfo));
+				}
+			}
+		}
+
+		public boolean removeActivatedQueue(ObjectQueueInfo objInfo) {
+			synchronized(objQueue) {
+				if (objQueue.remove(objInfo)) {
+					if (WARN) Log.w(TAG, "Unable to find queue element to remove");
+					return false;
+				}
+			}
+			return true;
 		}
 
 		// ! Enqueue an unpacked event
@@ -592,13 +621,13 @@ public class Telemetry {
 				}
 
 				// Determine if this will schedule a new transaction
-				newTransactionPending = !(newTrans.objRequest || newTrans.acked);
+				newTransactionPending = (newTrans.objRequest || newTrans.acked);
 
 				synchronized (transInfo) {
 
 					// If there is a transaction pending and this would set up a new one reschedule it
 					if (transPending && newTransactionPending) {
-						if (WARN) Log.w(TAG, "Postponing transaction for" + newTrans.obj.getName());
+						if (WARN) Log.w(TAG, "Postponing transaction for" + newTrans.obj.getName() + " existing transaction for " + transInfo.obj.getName());
 						handler.postDelayed(this, 100);
 						return;
 					}
@@ -609,11 +638,14 @@ public class Telemetry {
 
 					if (DEBUG) Log.d(TAG, "Process Object transaction for " + transInfo.obj.getName());
 
+					// Remove this one from the list of pending transactions
+					handler.removeActivatedQueue(objInfo);
+
 					try {
 
 						// 3. Execute transaction by sending the appropriate UAVTalk command
 						if (transInfo.objRequest) {
-							if (DEBUG) Log.d(TAG, "Sending object request" + transInfo.obj.getName());
+							if (DEBUG) Log.d(TAG, "Sending object request " + transInfo.obj.getName());
 							utalk.sendObjectRequest(transInfo.obj, transInfo.allInstances);
 						} else {
 							if (DEBUG) Log.d(TAG, "Sending object " + transInfo.obj.getName());

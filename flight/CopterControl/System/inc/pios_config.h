@@ -60,6 +60,7 @@
 #define PIOS_GPS_MINIMAL
 #define PIOS_INCLUDE_GPS_NMEA_PARSER /* Include the NMEA protocol parser */
 #define PIOS_INCLUDE_GPS_UBX_PARSER  /* Include the UBX protocol parser */
+#define PIOS_GPS_PROVIDES_AIRSPEED
 #define PIOS_INCLUDE_SERVO
 #define PIOS_INCLUDE_SPI
 #define PIOS_INCLUDE_SYS

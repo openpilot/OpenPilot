@@ -6,14 +6,17 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>867</width>
-    <height>598</height>
+    <width>920</width>
+    <height>626</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_10">
+   <property name="bottomMargin">
+    <number>12</number>
+   </property>
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
@@ -28,7 +31,7 @@
         <number>12</number>
        </property>
        <property name="topMargin">
-        <number>0</number>
+        <number>12</number>
        </property>
        <property name="rightMargin">
         <number>12</number>
@@ -128,8 +131,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>813</width>
-            <height>491</height>
+            <width>866</width>
+            <height>507</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout">
@@ -2745,8 +2748,8 @@ margin:1px;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>813</width>
-            <height>455</height>
+            <width>866</width>
+            <height>483</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_18">
@@ -3191,15 +3194,15 @@ p, li { white-space: pre-wrap; }
  </widget>
  <customwidgets>
   <customwidget>
-   <class>ConfigCcpmWidget</class>
-   <extends>QWidget</extends>
-   <header>cfg_vehicletypes/configccpmwidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>MixerCurve</class>
    <extends>QWidget</extends>
    <header location="global">mixercurve.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ConfigCcpmWidget</class>
+   <extends>QWidget</extends>
+   <header>cfg_vehicletypes/configccpmwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

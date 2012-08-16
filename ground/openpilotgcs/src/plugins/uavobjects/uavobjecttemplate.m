@@ -55,7 +55,7 @@ if ~strcmpi(outputType,'mat') && ~strcmpi(outputType,'csv')
 	error('Incorrect file format specified. Second argument must be ''mat'' or ''csv''.');
 end
 
-$(ALLOCATIONCODE)
+$(INSTANTIATIONCODE)
 
 
 fid = fopen(logfile);
@@ -182,10 +182,12 @@ $(CLEANUPCODE)
 
 
 %% Perform typecasting on vectors
-$(FUNCTIONSCODE)
+$(ALLOCATIONCODE)
 
+%% Save data to file
 if strcmpi(outputType,'mat')
-	matfile = strrep(logfile,'opl','mat');
+	[path, name]=fileparts(logfile);
+	matfile = fullfile(path,[name '.mat']);
 	save(matfile $(SAVEOBJECTSCODE));
 else
 $(EXPORTCSVCODE)

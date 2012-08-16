@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       outputpage.cpp
+ * @file       vehicleconfigurationsource.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @addtogroup
  * @{
- * @addtogroup OutputPage
+ * @addtogroup VehicleConfigurationSource
  * @{
  * @brief
  *****************************************************************************/
@@ -25,31 +25,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "outputpage.h"
-#include "ui_outputpage.h"
-#include "setupwizard.h"
+#include "vehicleconfigurationsource.h"
 
-OutputPage::OutputPage(SetupWizard *wizard, QWidget *parent) :
-        AbstractWizardPage(wizard, parent),
-
-    ui(new Ui::OutputPage)
+VehicleConfigurationSource::VehicleConfigurationSource()
 {
-    ui->setupUi(this);
-}
-
-OutputPage::~OutputPage()
-{
-    delete ui;
-}
-
-bool OutputPage::validatePage()
-{
-    if(ui->rapidESCButton->isChecked()) {
-        getWizard()->setESCType(SetupWizard::ESC_RAPID);
-    }
-    else {
-        getWizard()->setESCType(SetupWizard::ESC_LEGACY);
-    }
-
-    return true;
 }

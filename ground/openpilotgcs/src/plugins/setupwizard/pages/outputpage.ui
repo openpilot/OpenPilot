@@ -64,7 +64,7 @@ p, li { white-space: pre-wrap; }
    <widget class="QPushButton" name="defaultESCButton">
     <property name="geometry">
      <rect>
-      <x>50</x>
+      <x>160</x>
       <y>40</y>
       <width>100</width>
       <height>100</height>
@@ -74,14 +74,14 @@ p, li { white-space: pre-wrap; }
      <string>Tricopter, Quadcopter, Hexacopter, Octocopter</string>
     </property>
     <property name="text">
-     <string>Default ESC
+     <string>Legacy ESC
 50 Hz</string>
     </property>
     <property name="checkable">
      <bool>true</bool>
     </property>
     <property name="checked">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
     <property name="autoExclusive">
      <bool>true</bool>
@@ -93,7 +93,7 @@ p, li { white-space: pre-wrap; }
    <widget class="QPushButton" name="rapidESCButton">
     <property name="geometry">
      <rect>
-      <x>170</x>
+      <x>30</x>
       <y>40</y>
       <width>100</width>
       <height>100</height>
@@ -107,6 +107,9 @@ p, li { white-space: pre-wrap; }
 400 Hz</string>
     </property>
     <property name="checkable">
+     <bool>true</bool>
+    </property>
+    <property name="checked">
      <bool>true</bool>
     </property>
     <property name="autoExclusive">

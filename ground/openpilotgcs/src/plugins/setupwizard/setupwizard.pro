@@ -25,7 +25,9 @@ HEADERS += setupwizardplugin.h \
     pages/summarypage.h \
     pages/flashpage.h \
     pages/levellingpage.h \
-    levellingutil.h
+    levellingutil.h \
+    vehicleconfigurationsource.h \
+    vehicleconfigurationhelper.h
 
 SOURCES += setupwizardplugin.cpp \
     setupwizard.cpp \
@@ -44,7 +46,9 @@ SOURCES += setupwizardplugin.cpp \
     pages/summarypage.cpp \
     pages/flashpage.cpp \
     pages/levellingpage.cpp \
-    levellingutil.cpp
+    levellingutil.cpp \
+    vehicleconfigurationsource.cpp \
+    vehicleconfigurationhelper.cpp
 
 OTHER_FILES += SetupWizard.pluginspec
 

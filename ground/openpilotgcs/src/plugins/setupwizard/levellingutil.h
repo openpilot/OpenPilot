@@ -33,16 +33,7 @@
 #include <QMutex>
 
 #include "uavobject.h"
-
-struct accelGyroBias {
-    float m_accelerometerXBias;
-    float m_accelerometerYBias;
-    float m_accelerometerZBias;
-
-    float m_gyroXBias;
-    float m_gyroYBias;
-    float m_gyroZBias;
-};
+#include "vehicleconfigurationsource.h"
 
 class LevellingUtil : public QObject
 {

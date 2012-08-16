@@ -32,26 +32,16 @@
 #include "levellingutil.h"
 #include <coreplugin/icore.h>
 #include <coreplugin/connectionmanager.h>
-#include "uavobjectmanager.h"
-#include "mixersettings.h"
+#include "vehicleconfigurationsource.h"
 
 
-class SetupWizard : public QWizard
+class SetupWizard : public QWizard, public VehicleConfigurationSource
 {
     Q_OBJECT
 
 public:
     SetupWizard(QWidget *parent = 0);
     int nextId() const;
-    enum CONTROLLER_SELECTION_MODE {CONTROLLER_SELECTION_AUTOMATIC, CONTROLLER_SELECTION_MANUAL, CONTROLLER_SELECTION_UNKNOWN};
-    enum CONTROLLER_TYPE {CONTROLLER_UNKNOWN, CONTROLLER_CC, CONTROLLER_CC3D, CONTROLLER_REVO, CONTROLLER_PIPX};
-    enum VEHICLE_TYPE {VEHICLE_UNKNOWN, VEHICLE_MULTI, VEHICLE_FIXEDWING, VEHICLE_HELI, VEHICLE_SURFACE};
-    enum VEHICLE_SUB_TYPE {MULTI_ROTOR_UNKNOWN, MULTI_ROTOR_TRI_Y, MULTI_ROTOR_QUAD_X, MULTI_ROTOR_QUAD_PLUS,
-                               MULTI_ROTOR_HEXA, MULTI_ROTOR_HEXA_H, MULTI_ROTOR_HEXA_COAX_Y, MULTI_ROTOR_OCTO,
-                               MULTI_ROTOR_OCTO_V, MULTI_ROTOR_OCTO_COAX_X, MULTI_ROTOR_OCTO_COAX_PLUS, FIXED_WING_AILERON,
-                               FIXED_WING_VTAIL, HELI_CCPM};
-    enum ESC_TYPE {ESC_DEFAULT, ESC_RAPID, ESC_UNKNOWN};
-    enum INPUT_TYPE {INPUT_PWM, INPUT_PPM, INPUT_SBUS, INPUT_DSM, INPUT_UNKNOWN};
 
     void setControllerSelectionMode(SetupWizard::CONTROLLER_SELECTION_MODE mode) { m_controllerSelectionMode = mode; }
     SetupWizard::CONTROLLER_SELECTION_MODE getControllerSelectionMode() const { return m_controllerSelectionMode; }
@@ -86,13 +76,9 @@ public:
         return m_connectionManager;
     }
 public slots:
-    void exportConfiguration();
     void writeConfiguration();
 
 private:
-    static const qint16 DEFAULT_ESC_FREQUENCE = 50;
-    static const qint16 RAPID_ESC_FREQUENCE = 400;
-
     enum {PAGE_START, PAGE_CONTROLLER, PAGE_VEHICLES, PAGE_MULTI, PAGE_FIXEDWING,
           PAGE_HELI, PAGE_SURFACE, PAGE_INPUT, PAGE_OUTPUT, PAGE_LEVELLING,
           PAGE_FLASH, PAGE_SUMMARY, PAGE_NOTYETIMPLEMENTED, PAGE_END};
@@ -108,22 +94,6 @@ private:
     accelGyroBias m_levellingBias;
 
     Core::ConnectionManager *m_connectionManager;
-
-    UAVObjectManager *getUAVObjectManager();
-
-    void applyConfiguration();
-    void applyHardwareConfiguration(UAVObjectManager *uavoMgr);
-    void applyVehicleConfiguration(UAVObjectManager *uavoMgr);
-    void applyOutputConfiguration(UAVObjectManager *uavoMgr);
-    void applyLevellingConfiguration(UAVObjectManager *uavoMgr);
-
-    void resetVehicleConfig(UAVObjectManager *uavoMgr);
-    void resetMixerVectors(MixerSettings::DataFields data, qint8 channelIndex);
-
-    void setupTriCopter(UAVObjectManager *uavoMgr);
-    void setupQuadCopter(UAVObjectManager *uavoMgr);
-    void setupHexaCopter(UAVObjectManager *uavoMgr);
-    void setupOctoCopter(UAVObjectManager *uavoMgr);
 };
 
 #endif // SETUPWIZARD_H

@@ -41,6 +41,7 @@
 #include <QtGui/QComboBox>
 
 #include "core_global.h"
+#include <QTimer>
 
 QT_BEGIN_NAMESPACE
 class QTabWidget;

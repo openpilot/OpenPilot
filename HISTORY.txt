@@ -22,6 +22,10 @@ Changed the board pictures on the uploader widget
 2012-07-27
 Add more verbose debug output on the UAVOBJECTS saving code.
 
+2012-08-11
+CopterControl can now emulate an 8-channel USB HID joystick.  Primarily,
+this lets you use any RC transmitter with flight simulators on your PC.
+
 2012-07-20
 AeroSimRC simulator plugin is now included into the Windows distribution
 (will be installed into .../OpenPilot/misc/AeroSIM-RC directory).  Still

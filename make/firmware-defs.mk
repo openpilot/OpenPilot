@@ -210,7 +210,8 @@ endef
 # $(1) = Name of binary image to write
 # $(2) = Base of flash region to write/wipe
 # $(3) = Size of flash region to write/wipe
-# $(4) = OpenOCD configuration file to use
+# $(4) = OpenOCD JTAG interface configuration file to use
+# $(5) = OpenOCD configuration file to use
 define JTAG_TEMPLATE
 # ---------------------------------------------------------------------------
 # Options for OpenOCD flash-programming
@@ -223,7 +224,7 @@ OOCD_EXE ?= openocd
 OOCD_JTAG_SETUP  = -d0
 # interface and board/target settings (using the OOCD target-library here)
 OOCD_JTAG_SETUP += -s $(TOP)/flight/Project/OpenOCD
-OOCD_JTAG_SETUP += -f foss-jtag.revb.cfg -f $(4)
+OOCD_JTAG_SETUP += -f $(4) -f $(5)
 
 # initialize
 OOCD_BOARD_RESET = -c init

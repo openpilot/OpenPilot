@@ -2159,7 +2159,7 @@
           <plotCurve0>
             <color>4294901760</color>
             <mathFunction>None</mathFunction>
-            <uavField>X</uavField>
+            <uavField>x</uavField>
             <uavObject>Magnetometer</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
@@ -2169,7 +2169,7 @@
           <plotCurve1>
             <color>4283782655</color>
             <mathFunction>None</mathFunction>
-            <uavField>Y</uavField>
+            <uavField>y</uavField>
             <uavObject>Magnetometer</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
@@ -2179,7 +2179,7 @@
           <plotCurve2>
             <color>4283804160</color>
             <mathFunction>None</mathFunction>
-            <uavField>Z</uavField>
+            <uavField>z</uavField>
             <uavObject>Magnetometer</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>

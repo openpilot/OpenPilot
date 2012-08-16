@@ -51,7 +51,7 @@ static const struct usb_device_desc device_desc = {
 	.bNumConfigurations = 1,
 };
 
-static const uint8_t hid_report_desc[36] = {
+static const uint8_t hid_report_desc[89] = {
 	HID_GLOBAL_ITEM_2 (HID_TAG_GLOBAL_USAGE_PAGE),
 	0x9C, 0xFF,		/* Usage Page 0xFF9C (Vendor Defined) */
 	HID_LOCAL_ITEM_1  (HID_TAG_LOCAL_USAGE),
@@ -93,6 +93,75 @@ static const uint8_t hid_report_desc[36] = {
 	0x82,			/* Volatile, Variable */
 
 	HID_MAIN_ITEM_0 (HID_TAG_MAIN_ENDCOLLECTION),
+
+/* 36 bytes to here */
+
+	/* Emulate a Joystick */
+	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_USAGE_PAGE),
+	0x01,	      /* Usage Page 0x01 (Generic Desktop Controls) */
+	HID_LOCAL_ITEM_1  (HID_TAG_LOCAL_USAGE),
+	0x04,			/* Usage ID 0x0004 (Joystick) */
+
+	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_LOGICAL_MIN),
+	0x00,			/* Values range from min = 0x00 */
+	HID_GLOBAL_ITEM_4 (HID_TAG_GLOBAL_LOGICAL_MAX),
+	0xFF, 0xFF, 0x00, 0x00,	/* Values range to max = 0x0000FFFF */
+
+	HID_MAIN_ITEM_1   (HID_TAG_MAIN_COLLECTION),
+	0x01,			/* Application */
+	HID_MAIN_ITEM_1   (HID_TAG_MAIN_COLLECTION),
+	0x00,			/* Physical */
+	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_REPORT_ID),
+	0x03,			/* OpenPilot Emulated joystick */
+
+	/* X + Y controls */
+
+	HID_LOCAL_ITEM_1  (HID_TAG_LOCAL_USAGE),
+	0x30,			/* Usage ID 0x00010030 (Generic Desktop: X) */
+	HID_LOCAL_ITEM_1  (HID_TAG_LOCAL_USAGE),
+	0x31,			/* Usage ID 0x00010031 (Generic Desktop: Y) */
+	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_REPORT_SIZE),
+	0x10,			/* 16 bits wide */
+	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_REPORT_CNT),
+	2,
+	HID_MAIN_ITEM_1 (HID_TAG_MAIN_INPUT),
+	0x82,			/* Data, Var, Abs, Vol */
+
+	/* Y + Rx controls */
+
+	HID_LOCAL_ITEM_1  (HID_TAG_LOCAL_USAGE),
+	0x32,			/* Usage ID 0x00010032 (Generic Desktop: Z) */
+	HID_LOCAL_ITEM_1  (HID_TAG_LOCAL_USAGE),
+	0x33,			/* Usage ID 0x00010031 (Generic Desktop: Rx) */
+	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_REPORT_SIZE),
+	0x10,			/* 16 bits wide */
+	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_REPORT_CNT),
+	2,
+	HID_MAIN_ITEM_1 (HID_TAG_MAIN_INPUT),
+	0x82,			/* Data, Var, Abs, Vol */
+
+	/* Ry, Rz, Slider + Dial controls */
+
+	HID_LOCAL_ITEM_1  (HID_TAG_LOCAL_USAGE),
+	0x34,			/* Usage ID 0x00010034 (Generic Desktop: Ry) */
+	HID_LOCAL_ITEM_1  (HID_TAG_LOCAL_USAGE),
+	0x35,			/* Usage ID 0x00010035 (Generic Desktop: Rz) */
+	HID_LOCAL_ITEM_1  (HID_TAG_LOCAL_USAGE),
+	0x36,			/* Usage ID 0x00010036 (Generic Desktop: Slider) */
+	HID_LOCAL_ITEM_1  (HID_TAG_LOCAL_USAGE),
+	0x37,			/* Usage ID 0x00010037 (Generic Desktop: Dial) */
+	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_REPORT_SIZE),
+	0x10,			/* 16 bits wide */
+	HID_GLOBAL_ITEM_1 (HID_TAG_GLOBAL_REPORT_CNT),
+	4,
+	HID_MAIN_ITEM_1 (HID_TAG_MAIN_INPUT),
+	0x82,			/* Data, Var, Abs, Vol */
+
+	HID_MAIN_ITEM_0 (HID_TAG_MAIN_ENDCOLLECTION),
+
+	HID_MAIN_ITEM_0 (HID_TAG_MAIN_ENDCOLLECTION),
+
+/* 89 bytes to here */
 };
 
 struct usb_config_hid_cdc {

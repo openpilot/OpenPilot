@@ -26,16 +26,10 @@
  */
 package org.openpilot.androidgcs.telemetry;
 
-import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.util.Observable;
-import java.util.Observer;
 
-import org.openpilot.uavtalk.Telemetry;
-import org.openpilot.uavtalk.TelemetryMonitor;
 import org.openpilot.uavtalk.UAVDataObject;
 import org.openpilot.uavtalk.UAVObjectManager;
-import org.openpilot.uavtalk.UAVTalk;
 import org.openpilot.uavtalk.uavobjects.UAVObjectsInitialize;
 
 import android.app.Service;
@@ -127,7 +121,7 @@ public class OPTelemetryService extends Service {
 				break;
 			case 2:
 				Toast.makeText(getApplicationContext(), "Attempting BT connection", Toast.LENGTH_SHORT).show();
-				activeTelem = new BTTelemetryThread();
+				//activeTelem = new BTTelemetryThread();
 				break;
 			case 3:
 				Toast.makeText(getApplicationContext(), "Attempting TCP connection", Toast.LENGTH_SHORT).show();
@@ -347,6 +341,8 @@ public class OPTelemetryService extends Service {
 			}
 		}
 	}
+
+	/*
 	private class BTTelemetryThread extends Thread implements TelemTask {
 
 		private final UAVObjectManager objMngr;
@@ -401,7 +397,7 @@ public class OPTelemetryService extends Service {
 				@Override
 				public void update(Observable arg0, Object arg1) {
 					if (DEBUG) Log.d(TAG, "Mon updated. Connected: " + mon.getConnected() + " objects updated: " + mon.getObjectsUpdated());
-					if(mon.getConnected() /*&& mon.getObjectsUpdated()*/) {
+					if(mon.getConnected() ) {
 						Intent intent = new Intent();
 						intent.setAction(INTENT_ACTION_CONNECTED);
 						sendBroadcast(intent,null);
@@ -423,6 +419,5 @@ public class OPTelemetryService extends Service {
 			}
 			if (DEBUG) Log.d(TAG, "UAVTalk stream disconnected");
 		}
-
-	};
+	};*/
 }

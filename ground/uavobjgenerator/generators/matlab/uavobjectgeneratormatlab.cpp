@@ -85,29 +85,29 @@ bool UAVObjectGeneratorMatlab::process_object(ObjectInfo* info, int numBytes)
     QString numBytesString=QString("%1").arg(numBytes);
 
 
-	//===================================================================//
-    // Generate allocation code (will replace the $(ALLOCATIONCODE) tag) //
-	//===================================================================//
+    //=========================================================================//
+    // Generate instantiation code (will replace the $(INSTANTIATIONCODE) tag) //
+    //=========================================================================//
     QString type;
-    QString allocfields;
+    QString instantiationFields;
 
     matlabInstantiationCode.append("\n\t" + tableIdxName + " = 0;\n");
     matlabInstantiationCode.append("\t" + objectTableName + "=struct('timestamp', 0");
     if (!info->isSingleInst) {
-        allocfields.append(",...\n\t\t 'instanceID', 0");
+        instantiationFields.append(",...\n\t\t 'instanceID', 0");
     }
     for (int n = 0; n < info->fields.length(); ++n) {
         // Determine type
         type = fieldTypeStrMatlab[info->fields[n]->type];
         // Append field
         if ( info->fields[n]->numElements > 1 )
-            allocfields.append(",...\n\t\t '" + info->fields[n]->name + "', zeros(" + QString::number(info->fields[n]->numElements, 10) + ",1)");
+            instantiationFields.append(",...\n\t\t '" + info->fields[n]->name + "', zeros(" + QString::number(info->fields[n]->numElements, 10) + ",1)");
         else
-            allocfields.append(",...\n\t\t '" + info->fields[n]->name + "', 0");
+            instantiationFields.append(",...\n\t\t '" + info->fields[n]->name + "', 0");
     }
-    allocfields.append(");\n");
+    instantiationFields.append(");\n");
 
-    matlabInstantiationCode.append(allocfields);
+    matlabInstantiationCode.append(instantiationFields);
     matlabInstantiationCode.append("\t" + objectTableName.toUpper() + "_OBJID=" + objectID + ";\n");
     matlabInstantiationCode.append("\t" + objectTableName.toUpper() + "_NUMBYTES=" + numBytesString + ";\n");
     matlabInstantiationCode.append("\t" + objectName + "FidIdx = [];\n");

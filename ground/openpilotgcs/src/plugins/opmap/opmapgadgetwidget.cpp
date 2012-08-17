@@ -52,6 +52,7 @@
 #include "homelocation.h"
 #include "gpsposition.h"
 #include "gyros.h"
+#include "attitudeactual.h"
 #include "positionactual.h"
 #include "velocityactual.h"
 
@@ -583,6 +584,7 @@ void OPMapGadgetWidget::updatePosition()
 
     //**********************
     // get the current position and heading estimates
+    AttitudeActual *attitudeActualObj = AttitudeActual::GetInstance(obm);
     PositionActual *positionActualObj = PositionActual::GetInstance(obm);
     VelocityActual *velocityActualObj = VelocityActual::GetInstance(obm);
     Gyros *gyrosObj = Gyros::GetInstance(obm);
@@ -591,6 +593,7 @@ void OPMapGadgetWidget::updatePosition()
     Q_ASSERT(velocityActualObj);
     Q_ASSERT(gyrosObj);
 
+    AttitudeActual::DataFields attitudeActualData = attitudeActualObj->getData();
     PositionActual::DataFields positionActualData = positionActualObj->getData();
     VelocityActual::DataFields velocityActualData = velocityActualObj->getData();
     Gyros::DataFields gyrosData = gyrosObj->getData();
@@ -602,7 +605,12 @@ void OPMapGadgetWidget::updatePosition()
     m_map->UAV->SetNED(NED);
     m_map->UAV->SetCAS(-1); //THIS NEEDS TO BECOME AIRSPEED, ONCE WE SETTLE ON A UAVO
     m_map->UAV->SetGroundspeed(vNED);
-    m_map->UAV->SetYawRate(gyrosData.z); //Not correct, but I'm being lazy right now.
+
+    //Convert angular velocities into a rotationg rate around the world-frame yaw axis. This is found by simply taking the dot product of the angular Euler-rate matrix with the angular rates.
+    float psiRate_dps=0*gyrosData.z + sin(attitudeActualData.Roll*deg_to_rad)/cos(attitudeActualData.Pitch*deg_to_rad)*gyrosData.y + cos(attitudeActualData.Roll*deg_to_rad)/cos(attitudeActualData.Pitch*deg_to_rad)*gyrosData.z;
+
+    //Set the angular rate in the painter module
+    m_map->UAV->SetYawRate(psiRate_dps); //Not correct, but I'm being lazy right now.
 
     // *************
 	// display the UAV position

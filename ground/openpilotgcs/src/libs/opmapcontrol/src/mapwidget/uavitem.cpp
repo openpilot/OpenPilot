@@ -50,6 +50,7 @@ namespace mapcontrol
         mapfollowtype=UAVMapFollowType::None;
         trailtype=UAVTrailType::ByDistance;
         timer.start();
+//        setCacheMode(QGraphicsItem::ItemCoordinateCache);
     }
     UAVItem::~UAVItem()
     {
@@ -233,15 +234,23 @@ namespace mapcontrol
 
 
         //Last thing to do: set bound rectangle as function of largest object
-        boundingRectSize=groundspeed_mps_filt*ringTime*4*meters2pixels+10; //Largest object is currently the biggest ring + a little bit of margin for the text
+        boundingRectSize=groundspeed_mps_filt*ringTime*4*meters2pixels+20; //Largest object is currently the biggest ring + a little bit of margin for the text
     }
 
     QRectF UAVItem::boundingRect()const
     {
-        if(showUAVInfo || showJustChanged)
-            return QRectF(-boundingRectSize,-boundingRectSize,2*boundingRectSize,2*boundingRectSize);
-        else
+        if(showUAVInfo || showJustChanged){
+            if (boundingRectSize < 220){
+                //In case the bounding rectangle isn't big enough to get the whole of the UAV Info graphic
+                return QRectF(-boundingRectSize,-80,boundingRectSize+220,180);
+            }
+            else{
+                return QRectF(-boundingRectSize,-boundingRectSize,2*boundingRectSize,2*boundingRectSize);
+            }
+        }
+        else{
             return QRectF(-pic.width()/2,-pic.height()/2,pic.width(),pic.height());
+        }
     }
 
     void UAVItem::SetNED(double NED[3]){

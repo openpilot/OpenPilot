@@ -50,7 +50,6 @@ namespace mapcontrol
         mapfollowtype=UAVMapFollowType::None;
         trailtype=UAVTrailType::ByDistance;
         timer.start();
-//        setCacheMode(QGraphicsItem::ItemCoordinateCache);
     }
     UAVItem::~UAVItem()
     {

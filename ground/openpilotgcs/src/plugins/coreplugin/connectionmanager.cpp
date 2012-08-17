@@ -262,6 +262,9 @@ void ConnectionManager::telemetryConnected()
 {
     qDebug() << "TelemetryMonitor: connected";
 
+    if(reconnectCheck->isActive())
+        reconnectCheck->stop();
+
     //tell the monitor we're connected
     m_monitorWidget->connect();
 }
@@ -272,6 +275,13 @@ void ConnectionManager::telemetryConnected()
 void ConnectionManager::telemetryDisconnected()
 {
     qDebug() << "TelemetryMonitor: disconnected";
+
+    if (m_ioDev){
+        if(m_connectionDevice.connection->shortName()=="Serial") {
+            if(!reconnect->isActive())
+                reconnect->start(1000);
+        }
+    }
 
     //tell the monitor we're disconnected
     m_monitorWidget->disconnect();

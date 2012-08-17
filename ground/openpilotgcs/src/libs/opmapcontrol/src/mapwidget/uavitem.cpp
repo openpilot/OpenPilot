@@ -34,7 +34,7 @@ namespace mapcontrol
     double UAVItem::groundspeed_mps_filt = 0;
 
     UAVItem::UAVItem(MapGraphicItem* map,OPMapWidget* parent,QString uavPic):map(map),mapwidget(parent),showtrail(true),showtrailline(true),trailtime(5),traildistance(50),autosetreached(true)
-      ,autosetdistance(100),altitude(0),showUAVInfo(false)
+      ,autosetdistance(100),altitude(0),showUAVInfo(false),showJustChanged(false)
     {
         pic.load(uavPic);
         this->setFlag(QGraphicsItem::ItemIsMovable,true);
@@ -65,8 +65,10 @@ namespace mapcontrol
         painter->drawPixmap(-pic.width()/2,-pic.height()/2,pic);
 
         //Return if context menu switch for UAV info is off
-        if(!showUAVInfo)
+        if(!showUAVInfo){
+            showJustChanged=false;
             return;
+        }
 
         QPen myPen;
 
@@ -80,9 +82,6 @@ namespace mapcontrol
         myPen.setWidth(3);
         myPen.setColor(myColor);
         painter->setPen(myPen);
-
-        //Set brush attributes
-//        painter->setBrush(myColor);
 
         //Create line from (0,0), to (1,1). Later, we'll scale and rotate it
         QLineF line(0,0,1.0,1.0);
@@ -232,11 +231,17 @@ namespace mapcontrol
         painter->setPen(myPen);
         painter->drawPath(path);
 
+
+        //Last thing to do: set bound rectangle as function of largest object
+        boundingRectSize=groundspeed_mps_filt*ringTime*4*meters2pixels+10; //Largest object is currently the biggest ring + a little bit of margin for the text
     }
 
     QRectF UAVItem::boundingRect()const
     {
-        return QRectF(-pic.width()/2,-pic.height()/2,pic.width(),pic.height());
+        if(showUAVInfo || showJustChanged)
+            return QRectF(-boundingRectSize,-boundingRectSize,2*boundingRectSize,2*boundingRectSize);
+        else
+            return QRectF(-pic.width()/2,-pic.height()/2,pic.width(),pic.height());
     }
 
     void UAVItem::SetNED(double NED[3]){
@@ -425,6 +430,8 @@ namespace mapcontrol
     void UAVItem::SetShowUAVInfo(bool const& value)
     {
         showUAVInfo=value;
+        showJustChanged=true;
+        update();
     }
 
 }

@@ -1555,7 +1555,6 @@ void OPMapGadgetWidget::onShowUAVInfo_toggled(bool show)
         return;
 
     m_map->UAV->SetShowUAVInfo(show);
-    update();
 }
 
 void OPMapGadgetWidget::onShowHomeAct_toggled(bool show)

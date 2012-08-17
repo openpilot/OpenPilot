@@ -39,6 +39,7 @@ namespace mapcontrol
         this->setZValue(4);
         coord=internals::PointLatLng(50,50);
         RefreshToolTip();
+        setCacheMode(QGraphicsItem::DeviceCoordinateCache);
     }
 
     void HomeItem::RefreshToolTip()

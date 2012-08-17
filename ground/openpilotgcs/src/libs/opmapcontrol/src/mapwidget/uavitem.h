@@ -249,6 +249,8 @@ namespace mapcontrol
         double autosetdistance;
         bool showUAVInfo;
         static double groundspeed_mps_filt;
+        float boundingRectSize;
+        bool showJustChanged;
 
     public slots:
 

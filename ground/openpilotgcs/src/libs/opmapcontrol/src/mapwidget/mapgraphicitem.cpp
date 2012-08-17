@@ -44,6 +44,8 @@ namespace mapcontrol
         connect(core,SIGNAL(OnNeedInvalidation()),this,SLOT(Core_OnNeedInvalidation()));
         connect(core,SIGNAL(OnMapDrag()),this,SLOT(ChildPosRefresh()));
         connect(core,SIGNAL(OnMapZoomChanged()),this,SLOT(ChildPosRefresh()));
+        setCacheMode(QGraphicsItem::ItemCoordinateCache);
+
         //resize();
         setCacheMode(QGraphicsItem::ItemCoordinateCache);
     }

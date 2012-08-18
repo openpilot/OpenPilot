@@ -221,8 +221,11 @@ namespace mapcontrol
         void SetShowUAVInfo(bool const& value);
 
     private:
+        void generateArrowhead();
+
         MapGraphicItem* map;
         QPolygonF arrowHead;
+        QLineF arrowShaft;
         int altitude;
         UAVMapFollowType::Types mapfollowtype;
         UAVTrailType::Types trailtype;
@@ -251,6 +254,11 @@ namespace mapcontrol
         static double groundspeed_mps_filt;
         float boundingRectSize;
         bool showJustChanged;
+
+        bool refreshPaint_flag;
+
+        QPainterPath path;
+
 
     public slots:
 

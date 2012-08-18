@@ -146,9 +146,7 @@ namespace mapcontrol
         //*********** Create time rings
         double ringTime=10*pow(2,17-map->ZoomTotal()); //Basic ring is 10 seconds wide at zoom level 17
 
-        double alpha= .05;
-        groundspeed_mps_filt= (1-alpha)*groundspeed_mps_filt + alpha*groundspeed_mps;
-        if(groundspeed_mps > 0){ //Don't clutter the display with rings that are only one pixel wide
+        if(groundspeed_mps_filt > 0){ //Don't clutter the display with rings that are only one pixel wide
             myPen.setWidth(2);
 
             myPen.setColor(QColor(0, 0, 0, 100));
@@ -274,11 +272,26 @@ namespace mapcontrol
         this->CAS_mps=CAS_mps;
     }
 
-    void UAVItem::SetGroundspeed(double vNED[3]){
+    void UAVItem::SetGroundspeed(double vNED[3], int m_maxUpdateRate_ms){
         this->vNED[0] = vNED[0];
         this->vNED[1] = vNED[1];
         this->vNED[2] = vNED[2];
         groundspeed_kph=sqrt(vNED[0]*vNED[0] + vNED[1]*vNED[1] + vNED[2]*vNED[2])*3.6;
+
+        //On the first pass, set the filtered speed to the reported speed.
+        static bool firstGroundspeed=true;
+        if (firstGroundspeed){
+            groundspeed_mps_filt=groundspeed_kph/3.6;
+            firstGroundspeed=false;
+        }
+        else{
+            int riseTime_ms=1000;
+            double alpha= m_maxUpdateRate_ms/(double)(m_maxUpdateRate_ms+riseTime_ms);
+            groundspeed_mps_filt= alpha*groundspeed_mps_filt + (1-alpha)*(groundspeed_kph/3.6);
+         }
+
+
+        refreshPaint_flag=true;
     }
 
 

@@ -69,7 +69,7 @@ namespace mapcontrol
         *
         * @param NED
         */
-        void SetGroundspeed(double vNED[3]);
+        void SetGroundspeed(double vNED[3], int m_maxUpdateRate);
         /**
         * @brief Sets the UAV Calibrated Airspeed
         *

@@ -604,7 +604,7 @@ void OPMapGadgetWidget::updatePosition()
     //Set the position and heading estimates in the painter module
     m_map->UAV->SetNED(NED);
     m_map->UAV->SetCAS(-1); //THIS NEEDS TO BECOME AIRSPEED, ONCE WE SETTLE ON A UAVO
-    m_map->UAV->SetGroundspeed(vNED);
+    m_map->UAV->SetGroundspeed(vNED, m_maxUpdateRate);
 
     //Convert angular velocities into a rotationg rate around the world-frame yaw axis. This is found by simply taking the dot product of the angular Euler-rate matrix with the angular rates.
     float psiRate_dps=0*gyrosData.z + sin(attitudeActualData.Roll*deg_to_rad)/cos(attitudeActualData.Pitch*deg_to_rad)*gyrosData.y + cos(attitudeActualData.Roll*deg_to_rad)/cos(attitudeActualData.Pitch*deg_to_rad)*gyrosData.z;

@@ -2,7 +2,7 @@
  ******************************************************************************
  *
  * @file       configcamerastabilizationwidget.cpp
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2011.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2011-2012.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup ConfigPlugin Config Plugin
@@ -56,16 +56,21 @@ ConfigCameraStabilizationWidget::ConfigCameraStabilizationWidget(QWidget *parent
     // using objrelation dynamic property
     autoLoadWidgets();
 
-    QList<int> reloadGroups;
-    reloadGroups<<1;
-    // Add some widgets and UAVObjects to track widget dirty state
-    // and monitor UAVObject changes in addition to autoloaded ones
+    // Add some widgets to track their UI dirty state and handle smartsave
     addWidget(m_camerastabilization->enableCameraStabilization);
     addWidget(m_camerastabilization->rollChannel);
     addWidget(m_camerastabilization->pitchChannel);
     addWidget(m_camerastabilization->yawChannel);
-    addUAVObject("HwSettings",&reloadGroups);
-    addUAVObject("MixerSettings",&reloadGroups);
+
+    // Add some UAVObjects to monitor their changes in addition to autoloaded ones.
+    // Note also that we want to reload some UAVObjects by "Reload" button and have
+    // to pass corresponding reload group numbers (defined also in objrelation property)
+    // to the montitor. We don't reload HwSettings (module enable state) but reload
+    // output channels.
+    QList<int> reloadGroups;
+    reloadGroups << 1;
+    addUAVObject("HwSettings");
+    addUAVObject("MixerSettings", &reloadGroups);
 
     // To set special widgets to defaults when requested
     connect(this, SIGNAL(defaultRequested(int)), this, SLOT(defaultRequestedSlot(int)));
@@ -228,12 +233,19 @@ void ConfigCameraStabilizationWidget::defaultRequestedSlot(int group)
 {
     Q_UNUSED(group);
 
-    HwSettings *hwSettings = HwSettings::GetInstance(getObjectManager());
-    HwSettings *hwSettingsDefault=(HwSettings*)hwSettings->dirtyClone();
-    HwSettings::DataFields hwSettingsData = hwSettingsDefault->getData();
-    m_camerastabilization->enableCameraStabilization->setChecked(
-        hwSettingsData.OptionalModules[HwSettings::OPTIONALMODULES_CAMERASTAB] == HwSettings::OPTIONALMODULES_ENABLED);
+    // Here is the example of how to reset the state of QCheckBox. It is
+    // commented out because we normally don't want to reset the module
+    // enable state to default "disabled" (or we don't care about values at all).
+    // But if you want, you could use the dirtyClone() function to get default
+    // values of an object and then use them to set a widget state.
+    //
+    //HwSettings *hwSettings = HwSettings::GetInstance(getObjectManager());
+    //HwSettings *hwSettingsDefault=(HwSettings*)hwSettings->dirtyClone();
+    //HwSettings::DataFields hwSettingsData = hwSettingsDefault->getData();
+    //m_camerastabilization->enableCameraStabilization->setChecked(
+    //    hwSettingsData.OptionalModules[HwSettings::OPTIONALMODULES_CAMERASTAB] == HwSettings::OPTIONALMODULES_ENABLED);
 
+    // For outputs we set them all to none, so don't use any UAVObject to get defaults
     QComboBox *outputs[] = {
         m_camerastabilization->rollChannel,
         m_camerastabilization->pitchChannel,

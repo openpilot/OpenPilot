@@ -32,7 +32,7 @@
 /**
  * Constructor
  */
-ConfigTaskWidget::ConfigTaskWidget(QWidget *parent) : QWidget(parent),isConnected(false),allowWidgetUpdates(true),smartsave(NULL),dirty(false),outOfLimitsStyle("background-color: rgb(255, 0, 0);"),timeOut(NULL)
+ConfigTaskWidget::ConfigTaskWidget(QWidget *parent) : QWidget(parent),isConnected(false),smartsave(NULL),dirty(false),outOfLimitsStyle("background-color: rgb(255, 0, 0);"),timeOut(NULL),allowWidgetUpdates(true)
 {
     pm = ExtensionSystem::PluginManager::instance();
     objManager = pm->getObject<UAVObjectManager>();

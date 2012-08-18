@@ -117,7 +117,7 @@ void TelemetryParser::updateSats( UAVObject* object1) {
     UAVObjectField* azimuth = object1->getField(QString("Azimuth"));
     UAVObjectField* snr = object1->getField(QString("SNR"));
 
-    for (unsigned int i=0;i< prn->getNumElements();i++) {
+    for (int i=0;i< prn->getNumElements();i++) {
         emit satellite(i,prn->getValue(i).toInt(),elevation->getValue(i).toInt(),
                        azimuth->getValue(i).toInt(), snr->getValue(i).toInt());
     }

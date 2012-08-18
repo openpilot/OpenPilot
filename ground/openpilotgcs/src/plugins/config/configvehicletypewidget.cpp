@@ -109,7 +109,7 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
 
     //Generate lists of mixerTypeNames, mixerVectorNames, channelNames
     channelNames << "None";
-    for (unsigned int i = 0; i < ActuatorSettings::CHANNELADDR_NUMELEM; i++) {
+    for (int i = 0; i < ActuatorSettings::CHANNELADDR_NUMELEM; i++) {
 
         mixerTypes << QString("Mixer%1Type").arg(i+1);
         mixerVectors << QString("Mixer%1Vector").arg(i+1);

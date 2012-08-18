@@ -169,7 +169,6 @@ bool flightDataModel::setColumnByIndex(pathPlanData  *row,const int index,const 
     default:
         return false;
     }
-    return false;
 }
 QVariant flightDataModel::getColumnByIndex(const pathPlanData *row,const int index) const
 {

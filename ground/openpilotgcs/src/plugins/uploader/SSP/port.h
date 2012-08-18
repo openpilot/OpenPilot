@@ -43,7 +43,7 @@ public:
     uint8_t 	maxRetryCount;					// max. times to try to transmit the 'send' packet
     uint16_t 	max_retry;                             	// Maximum number of retrys for a single transmit.
     int32_t 	timeoutLen;						// how long to wait for each retry to succeed
-    uint32_t		timeout;						// current timeout. when 'time' reaches this point we have timed out
+    int32_t		timeout;						// current timeout. when 'time' reaches this point we have timed out
     uint8_t 	txSeqNo; 						// current 'send' packet sequence number
     uint16_t 	rxBufPos;						//  current buffer position in the receive packet
     uint16_t	rxBufLen;						// number of 'data' bytes in the buffer

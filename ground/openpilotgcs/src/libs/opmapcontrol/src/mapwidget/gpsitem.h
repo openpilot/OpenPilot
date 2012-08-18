@@ -222,6 +222,8 @@ namespace mapcontrol
     signals:
         void UAVReachedWayPoint(int const& waypointnumber,WayPointItem* waypoint);
         void UAVLeftSafetyBouble(internals::PointLatLng const& position);
+        void setChildPosition();
+        void setChildLine();
     };
 }
 #endif // GPSITEM_H

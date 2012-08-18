@@ -297,9 +297,15 @@ namespace mapcontrol
             {
                 if(timer.elapsed()>trailtime*1000)
                 {
-                    trail->addToGroup(new TrailItem(position,altitude,Qt::red,this));
+                    TrailItem * ob=new TrailItem(position,altitude,Qt::green,map);
+                    trail->addToGroup(ob);
+                    connect(this,SIGNAL(setChildPosition()),ob,SLOT(setPosSLOT()));
                     if(!lasttrailline.IsEmpty())
-                        trailLine->addToGroup((new TrailLineItem(lasttrailline,position,Qt::red,map)));
+                    {
+                        TrailLineItem * obj=new TrailLineItem(lasttrailline,position,Qt::red,map);
+                        trailLine->addToGroup(obj);
+                        connect(this,SIGNAL(setChildLine()),obj,SLOT(setLineSlot()));
+                    }
                     lasttrailline=position;
                     timer.restart();
                 }
@@ -309,9 +315,15 @@ namespace mapcontrol
             {
                 if(qAbs(internals::PureProjection::DistanceBetweenLatLng(lastcoord,position)*1000)>traildistance)
                 {
-                    trail->addToGroup(new TrailItem(position,altitude,Qt::red,this));
+                    TrailItem * ob=new TrailItem(position,altitude,Qt::green,map);
+                    trail->addToGroup(ob);
+                    connect(this,SIGNAL(setChildPosition()),ob,SLOT(setPosSLOT()));
                     if(!lasttrailline.IsEmpty())
-                        trailLine->addToGroup((new TrailLineItem(lasttrailline,position,Qt::red,map)));
+                    {
+                        TrailLineItem * obj=new TrailLineItem(lasttrailline,position,Qt::red,map);
+                        trailLine->addToGroup(obj);
+                        connect(this,SIGNAL(setChildLine()),obj,SLOT(setLineSlot()));
+                    }
                     lasttrailline=position;
                     lastcoord=position;
                 }
@@ -395,19 +407,8 @@ namespace mapcontrol
     {
         localposition=map->FromLatLngToLocal(coord);
         this->setPos(localposition.X(),localposition.Y());
-        foreach(QGraphicsItem* i,trail->childItems())
-        {
-            TrailItem* w=qgraphicsitem_cast<TrailItem*>(i);
-            if(w)
-                w->setPos(map->FromLatLngToLocal(w->coord).X(),map->FromLatLngToLocal(w->coord).Y());
-        }
-        foreach(QGraphicsItem* i,trailLine->childItems())
-        {
-            TrailLineItem* ww=qgraphicsitem_cast<TrailLineItem*>(i);
-            if(ww)
-                ww->setLine(map->FromLatLngToLocal(ww->coord1).X(),map->FromLatLngToLocal(ww->coord1).Y(),map->FromLatLngToLocal(ww->coord2).X(),map->FromLatLngToLocal(ww->coord2).Y());
-        }
-
+        emit setChildPosition();
+        emit setChildLine();
         refreshPaint_flag=true;
     }
 

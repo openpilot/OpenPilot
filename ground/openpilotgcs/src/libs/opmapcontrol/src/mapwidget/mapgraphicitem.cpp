@@ -98,8 +98,7 @@ namespace mapcontrol
         QSize size=boundingRect().size().toSize();
         size.setWidth(size.width()*2*zoomdiff);
         size.setHeight(size.height()*2*zoomdiff);
-        temp=QImage(size,
-                               QImage::Format_ARGB32_Premultiplied);
+        temp=QImage(size,QImage::Format_ARGB32_Premultiplied);
         temp.fill(0);
         QPainter imagePainter(&temp);
         imagePainter.translate(-boundingRect().topLeft());

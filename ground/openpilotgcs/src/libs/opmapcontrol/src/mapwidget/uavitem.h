@@ -223,6 +223,7 @@ namespace mapcontrol
         void generateArrowhead();
 
         MapGraphicItem* map;
+        OPMapWidget* mapwidget;
         QPolygonF arrowHead;
         QLineF arrowShaft;
         int altitude;
@@ -237,7 +238,6 @@ namespace mapcontrol
         double yawRate_dps;
         QPixmap pic;
         core::Point localposition;
-        OPMapWidget* mapwidget;
         QGraphicsItemGroup* trail;
         QGraphicsItemGroup * trailLine;
         internals::PointLatLng lasttrailline;
@@ -265,6 +265,8 @@ namespace mapcontrol
     signals:
         void UAVReachedWayPoint(int const& waypointnumber,WayPointItem* waypoint);
         void UAVLeftSafetyBouble(internals::PointLatLng const& position);
+        void setChildPosition();
+        void setChildLine();
     };
 }
 #endif // UAVITEM_H

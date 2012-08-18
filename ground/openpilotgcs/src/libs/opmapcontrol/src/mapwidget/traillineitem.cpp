@@ -28,9 +28,8 @@
 
 namespace mapcontrol
 {
-    TrailLineItem::TrailLineItem(internals::PointLatLng const& coord1,internals::PointLatLng const& coord2, QBrush color, QGraphicsItem* parent):QGraphicsLineItem(parent),coord1(coord1),coord2(coord2)
+TrailLineItem::TrailLineItem(internals::PointLatLng const& coord1,internals::PointLatLng const& coord2, QBrush color, MapGraphicItem * map):QGraphicsLineItem(map),coord1(coord1),coord2(coord2),m_brush(color),m_map(map)
     {
-        m_brush=color;
         QPen pen;
         pen.setBrush(m_brush);
         pen.setWidth(1);
@@ -42,5 +41,8 @@ namespace mapcontrol
         return Type;
     }
 
-
+    void TrailLineItem::setLineSlot()
+    {
+        setLine(m_map->FromLatLngToLocal(this->coord1).X(),m_map->FromLatLngToLocal(this->coord1).Y(),m_map->FromLatLngToLocal(this->coord2).X(),m_map->FromLatLngToLocal(this->coord2).Y());
+    }
 }

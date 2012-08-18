@@ -27,7 +27,8 @@
 #include "homeitem.h"
 namespace mapcontrol
 {
-    HomeItem::HomeItem(MapGraphicItem* map,OPMapWidget* parent):safe(true),map(map),mapwidget(parent),showsafearea(true),safearea(1000),altitude(0),isDragging(false)
+    HomeItem::HomeItem(MapGraphicItem* map,OPMapWidget* parent):safe(true),map(map),mapwidget(parent),
+        showsafearea(true),safearea(1000),altitude(0),isDragging(false),toggleRefresh(true)
     {
         pic.load(QString::fromUtf8(":/markers/images/home2.svg"));
         pic=pic.scaled(30,30,Qt::IgnoreAspectRatio);
@@ -68,7 +69,7 @@ namespace mapcontrol
     }
     QRectF HomeItem::boundingRect()const
     {
-        if(pic.width()>localsafearea*2)
+        if(pic.width()>localsafearea*2 && !toggleRefresh)
             return QRectF(-pic.width()/2,-pic.height()/2,pic.width(),pic.height());
         else
             return QRectF(-localsafearea,-localsafearea,localsafearea*2,localsafearea*2);
@@ -89,6 +90,9 @@ namespace mapcontrol
             localsafearea=safearea/map->Projection()->GetGroundResolution(map->ZoomTotal(),coord.Lat());
 
         RefreshToolTip();
+
+        this->update();
+        toggleRefresh=false;
 
     }
 

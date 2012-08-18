@@ -104,7 +104,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 
     m_map_mode = Normal_MapMode;
 
-	m_maxUpdateRate = max_update_rate_list[4];	// 2 seconds
+    m_maxUpdateRate = max_update_rate_list[4];	// 2 seconds //SHOULDN'T THIS BE LOADED FROM THE USER PREFERENCES?
 
 	m_telemetry_connected = false;
 
@@ -166,8 +166,9 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_map->SetShowHome(true);					    // display the HOME position on the map
     m_map->SetShowUAV(true);					    // display the UAV position on the map
 
-	m_map->Home->SetSafeArea(safe_area_radius_list[0]);                         // set radius (meters)
-    m_map->Home->SetShowSafeArea(true);                                         // show the safe area
+    m_map->Home->SetSafeArea(safe_area_radius_list[0]);                         // set radius (meters) //SHOULDN'T THE DEFAULT BE USER DEFINED?
+    m_map->Home->SetShowSafeArea(true);                                         // show the safe area  //SHOULDN'T THE DEFAULT BE USER DEFINED?
+    m_map->Home->SetToggleRefresh(true);
 
     if(m_map->Home)
         connect(m_map->Home,SIGNAL(homedoubleclick(HomeItem*)),this,SLOT(onHomeDoubleClick(HomeItem*)));
@@ -540,8 +541,8 @@ void OPMapGadgetWidget::closeEvent(QCloseEvent *event)
 // timer signals
 
 /**
-  Updates the UAV position on the map. It is called every 200ms
-  by a timer.
+  Updates the UAV position on the map. It is called at a user-defined frequency,
+  as set inside the map widget.
 */
 void OPMapGadgetWidget::updatePosition()
 {
@@ -1875,6 +1876,7 @@ void OPMapGadgetWidget::onShowSafeAreaAct_toggled(bool show)
         return;
 
     m_map->Home->SetShowSafeArea(show);             // show the safe area
+    m_map->Home->SetToggleRefresh(true);
     m_map->Home->RefreshPos();
 }
 

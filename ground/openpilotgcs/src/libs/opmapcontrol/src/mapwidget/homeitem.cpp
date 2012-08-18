@@ -32,8 +32,8 @@ namespace mapcontrol
         pic.load(QString::fromUtf8(":/markers/images/home2.svg"));
         pic=pic.scaled(30,30,Qt::IgnoreAspectRatio);
         this->setFlag(QGraphicsItem::ItemIgnoresTransformations,true);
-        this->setFlag(QGraphicsItem::ItemIsMovable,true);
-        this->setFlag(QGraphicsItem::ItemIsSelectable,true);
+        this->setFlag(QGraphicsItem::ItemIsMovable,false);
+        this->setFlag(QGraphicsItem::ItemIsSelectable,false);
         localposition=map->FromLatLngToLocal(mapwidget->CurrentPosition());
         this->setPos(localposition.X(),localposition.Y());
         this->setZValue(4);

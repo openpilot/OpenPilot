@@ -37,8 +37,8 @@ namespace mapcontrol
       ,autosetdistance(100),altitude(0),showUAVInfo(false),showJustChanged(false)
     {
         pic.load(uavPic);
-        this->setFlag(QGraphicsItem::ItemIsMovable,true);
-        this->setFlag(QGraphicsItem::ItemIsSelectable,true);
+        this->setFlag(QGraphicsItem::ItemIsMovable,false);
+        this->setFlag(QGraphicsItem::ItemIsSelectable,false);
         localposition=map->FromLatLngToLocal(mapwidget->CurrentPosition());
         this->setPos(localposition.X(),localposition.Y());
         this->setZValue(4);

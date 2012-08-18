@@ -44,6 +44,7 @@ WayPointLine::WayPointLine(WayPointItem *from, WayPointItem *to, MapGraphicItem 
         this->setZValue(9);
     else if(myColor==Qt::red)
         this->setZValue(8);
+    connect(map,SIGNAL(childSetOpacity(qreal)),this,SLOT(setOpacitySlot(qreal)));
 }
 
 WayPointLine::WayPointLine(HomeItem *from, WayPointItem *to, MapGraphicItem *map, QColor color):source(from),
@@ -59,6 +60,7 @@ WayPointLine::WayPointLine(HomeItem *from, WayPointItem *to, MapGraphicItem *map
         this->setZValue(9);
     else if(myColor==Qt::red)
         this->setZValue(8);
+    connect(map,SIGNAL(childSetOpacity(qreal)),this,SLOT(setOpacitySlot(qreal)));
 }
 int WayPointLine::type() const
 {
@@ -110,6 +112,11 @@ void WayPointLine::refreshLocations()
 void WayPointLine::waypointdeleted()
 {
     this->deleteLater();
+}
+
+void WayPointLine::setOpacitySlot(qreal opacity)
+{
+    setOpacity(opacity);
 }
 
 }

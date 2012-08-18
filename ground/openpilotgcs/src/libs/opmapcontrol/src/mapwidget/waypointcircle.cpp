@@ -38,6 +38,7 @@ WayPointCircle::WayPointCircle(WayPointItem *center, WayPointItem *radius,bool c
     connect(center,SIGNAL(aboutToBeDeleted(WayPointItem*)),this,SLOT(waypointdeleted()));
     connect(radius,SIGNAL(aboutToBeDeleted(WayPointItem*)),this,SLOT(waypointdeleted()));
     refreshLocations();
+    connect(map,SIGNAL(childSetOpacity(qreal)),this,SLOT(setOpacitySlot(qreal)));
 
 }
 
@@ -48,6 +49,7 @@ WayPointCircle::WayPointCircle(HomeItem *radius, WayPointItem *center, bool cloc
     connect(center,SIGNAL(localPositionChanged(QPointF)),this,SLOT(refreshLocations()));
     connect(center,SIGNAL(aboutToBeDeleted(WayPointItem*)),this,SLOT(waypointdeleted()));
     refreshLocations();
+    connect(map,SIGNAL(childSetOpacity(qreal)),this,SLOT(setOpacitySlot(qreal)));
 }
 
 int WayPointCircle::type() const
@@ -104,6 +106,11 @@ void WayPointCircle::refreshLocations()
 void WayPointCircle::waypointdeleted()
 {
     this->deleteLater();
+}
+
+void WayPointCircle::setOpacitySlot(qreal opacity)
+{
+    setOpacity(opacity);
 }
 
 }

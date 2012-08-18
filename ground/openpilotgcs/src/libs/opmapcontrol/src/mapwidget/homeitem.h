@@ -47,7 +47,6 @@ namespace mapcontrol
                     QWidget *widget);
         QRectF boundingRect() const;
         int type() const;
-        void RefreshPos();
         bool ShowSafeArea()const{return showsafearea;}
         void SetShowSafeArea(bool const& value){showsafearea=value;}
         int SafeArea()const{return safearea;}
@@ -76,7 +75,8 @@ namespace mapcontrol
         void mouseReleaseEvent ( QGraphicsSceneMouseEvent * event );
         void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
     public slots:
-
+        void RefreshPos();
+        void setOpacitySlot(qreal opacity);
     signals:
         void homePositionChanged(internals::PointLatLng coord,float);
         void homedoubleclick(HomeItem* waypoint);

@@ -156,7 +156,6 @@ public:
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                 QWidget *widget);
-    void RefreshPos();
     void RefreshToolTip();
     QPixmap picture;
     QString customString(){return myCustomString;}
@@ -217,6 +216,8 @@ public slots:
     void WPInserted(int const& number,WayPointItem* waypoint);
 
     void onHomePositionChanged(internals::PointLatLng,float altitude);
+    void RefreshPos();
+    void setOpacitySlot(qreal opacity);
 signals:
     /**
     * @brief fires when this WayPoint number changes (not fired if due to a auto-renumbering)

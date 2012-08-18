@@ -40,6 +40,8 @@ namespace mapcontrol
         coord=internals::PointLatLng(50,50);
         RefreshToolTip();
         setCacheMode(QGraphicsItem::DeviceCoordinateCache);
+        connect(map,SIGNAL(childRefreshPosition()),this,SLOT(RefreshPos()));
+        connect(map,SIGNAL(childSetOpacity(qreal)),this,SLOT(setOpacitySlot(qreal)));
     }
 
     void HomeItem::RefreshToolTip()
@@ -90,6 +92,11 @@ namespace mapcontrol
 
         RefreshToolTip();
 
+    }
+
+    void HomeItem::setOpacitySlot(qreal opacity)
+    {
+        setOpacity(opacity);
     }
 
     void HomeItem::mousePressEvent(QGraphicsSceneMouseEvent *event)

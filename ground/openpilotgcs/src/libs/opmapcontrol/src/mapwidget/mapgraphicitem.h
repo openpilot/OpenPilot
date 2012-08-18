@@ -200,7 +200,7 @@ namespace mapcontrol
         void SetMapType(MapType::Types const& value){core->SetMapType(value);}
     private slots:
         void Core_OnNeedInvalidation();
-        void ChildPosRefresh();
+        void childPosRefresh();
     public slots:
         /**
         * @brief To be called when the scene size changes
@@ -216,6 +216,8 @@ namespace mapcontrol
         */
         void wpdoubleclicked(WayPointItem * wp);
         void zoomChanged(double zoomtotal,double zoomreal,double zoomdigi);
+        void childRefreshPosition();
+        void childSetOpacity(qreal value);
     };
 }
 #endif // MAPGRAPHICITEM_H

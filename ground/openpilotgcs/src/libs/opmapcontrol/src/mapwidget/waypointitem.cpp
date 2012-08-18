@@ -60,6 +60,8 @@ WayPointItem::WayPointItem(const internals::PointLatLng &coord,int const& altitu
         }
         connect(this,SIGNAL(waypointdoubleclick(WayPointItem*)),map,SIGNAL(wpdoubleclicked(WayPointItem*)));
         emit manualCoordChange(this);
+        connect(map,SIGNAL(childRefreshPosition()),this,SLOT(RefreshPos()));
+        connect(map,SIGNAL(childSetOpacity(qreal)),this,SLOT(setOpacitySlot(qreal)));
 }
 
 WayPointItem::WayPointItem(MapGraphicItem *map, bool magicwaypoint):reached(false),description(""),shownumber(true),isDragging(false),altitude(0),map(map)
@@ -105,6 +107,8 @@ WayPointItem::WayPointItem(MapGraphicItem *map, bool magicwaypoint):reached(fals
     }
     connect(this,SIGNAL(waypointdoubleclick(WayPointItem*)),map,SIGNAL(wpdoubleclicked(WayPointItem*)));
     emit manualCoordChange(this);
+    connect(map,SIGNAL(childRefreshPosition()),this,SLOT(RefreshPos()));
+    connect(map,SIGNAL(childSetOpacity(qreal)),this,SLOT(setOpacitySlot(qreal)));
 }
     WayPointItem::WayPointItem(const internals::PointLatLng &coord,int const& altitude, const QString &description, MapGraphicItem *map,wptype type):coord(coord),reached(false),description(description),shownumber(true),isDragging(false),altitude(altitude),map(map),myType(type)
     {
@@ -136,6 +140,8 @@ WayPointItem::WayPointItem(MapGraphicItem *map, bool magicwaypoint):reached(fals
         }
         connect(this,SIGNAL(waypointdoubleclick(WayPointItem*)),map,SIGNAL(wpdoubleclicked(WayPointItem*)));
         emit manualCoordChange(this);
+        connect(map,SIGNAL(childRefreshPosition()),this,SLOT(RefreshPos()));
+        connect(map,SIGNAL(childSetOpacity(qreal)),this,SLOT(setOpacitySlot(qreal)));
     }
 
     WayPointItem::WayPointItem(const distBearingAltitude &relativeCoordenate, const QString &description, MapGraphicItem *map):relativeCoord(relativeCoordenate),reached(false),description(description),shownumber(true),isDragging(false),map(map)
@@ -169,6 +175,8 @@ WayPointItem::WayPointItem(MapGraphicItem *map, bool magicwaypoint):reached(fals
         RefreshPos();
         connect(this,SIGNAL(waypointdoubleclick(WayPointItem*)),map,SIGNAL(wpdoubleclicked(WayPointItem*)));
         emit manualCoordChange(this);
+        connect(map,SIGNAL(childRefreshPosition()),this,SLOT(RefreshPos()));
+        connect(map,SIGNAL(childSetOpacity(qreal)),this,SLOT(setOpacitySlot(qreal)));
     }
 
     void WayPointItem::setWPType(wptype type)
@@ -454,6 +462,11 @@ WayPointItem::WayPointItem(MapGraphicItem *map, bool magicwaypoint):reached(fals
         core::Point point=map->FromLatLngToLocal(coord);
         this->setPos(point.X(),point.Y());
         emit localPositionChanged(this->pos(),this);
+    }
+
+    void WayPointItem::setOpacitySlot(qreal opacity)
+    {
+        setOpacity(opacity);
     }
     void WayPointItem::RefreshToolTip()
     {

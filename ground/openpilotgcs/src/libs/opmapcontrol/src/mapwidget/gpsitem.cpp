@@ -45,6 +45,8 @@ namespace mapcontrol
         mapfollowtype=UAVMapFollowType::None;
         trailtype=UAVTrailType::ByDistance;
         timer.start();
+        connect(map,SIGNAL(childRefreshPosition()),this,SLOT(RefreshPos()));
+        connect(map,SIGNAL(childSetOpacity(qreal)),this,SLOT(setOpacitySlot(qreal)));
     }
     GPSItem::~GPSItem()
     {
@@ -138,6 +140,11 @@ namespace mapcontrol
                 ww->setLine(map->FromLatLngToLocal(ww->coord1).X(),map->FromLatLngToLocal(ww->coord1).Y(),map->FromLatLngToLocal(ww->coord2).X(),map->FromLatLngToLocal(ww->coord2).Y());
         }
 
+    }
+
+    void GPSItem::setOpacitySlot(qreal opacity)
+    {
+        setOpacity(opacity);
     }
     void GPSItem::SetTrailType(const UAVTrailType::Types &value)
     {

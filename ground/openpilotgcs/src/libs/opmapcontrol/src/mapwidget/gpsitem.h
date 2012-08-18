@@ -103,7 +103,6 @@ namespace mapcontrol
 
         void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                     QWidget *widget);
-        void RefreshPos();
         QRectF boundingRect() const;
         /**
         * @brief Sets the trail time to be used if TrailType is ByTimeElapsed
@@ -218,7 +217,8 @@ namespace mapcontrol
       //  QRectF rect;
 
     public slots:
-
+        void RefreshPos();
+        void setOpacitySlot(qreal opacity);
     signals:
         void UAVReachedWayPoint(int const& waypointnumber,WayPointItem* waypoint);
         void UAVLeftSafetyBouble(internals::PointLatLng const& position);

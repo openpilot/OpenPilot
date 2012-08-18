@@ -50,6 +50,9 @@ namespace mapcontrol
         mapfollowtype=UAVMapFollowType::None;
         trailtype=UAVTrailType::ByDistance;
         timer.start();
+        setCacheMode(QGraphicsItem::DeviceCoordinateCache);
+        connect(map,SIGNAL(childRefreshPosition()),this,SLOT(RefreshPos()));
+        connect(map,SIGNAL(childSetOpacity(qreal)),this,SLOT(setOpacitySlot(qreal)));
     }
     UAVItem::~UAVItem()
     {
@@ -233,6 +236,7 @@ namespace mapcontrol
 
 
         //Last thing to do: set bound rectangle as function of largest object
+        prepareGeometryChange();
         boundingRectSize=groundspeed_mps_filt*ringTime*4*meters2pixels+20; //Largest object is currently the biggest ring + a little bit of margin for the text
     }
 
@@ -400,6 +404,11 @@ namespace mapcontrol
                 ww->setLine(map->FromLatLngToLocal(ww->coord1).X(),map->FromLatLngToLocal(ww->coord1).Y(),map->FromLatLngToLocal(ww->coord2).X(),map->FromLatLngToLocal(ww->coord2).Y());
         }
 
+    }
+
+    void UAVItem::setOpacitySlot(qreal opacity)
+    {
+        this->setOpacity(opacity);
     }
     void UAVItem::SetTrailType(const UAVTrailType::Types &value)
     {

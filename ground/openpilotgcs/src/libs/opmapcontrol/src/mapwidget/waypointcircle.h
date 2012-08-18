@@ -62,6 +62,7 @@ protected:
 public slots:
     void refreshLocations();
     void waypointdeleted();
+    void setOpacitySlot(qreal opacity);
 };
 }
 

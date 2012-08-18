@@ -42,8 +42,8 @@ namespace mapcontrol
         this->SetZoom(2);
         this->setFlag(ItemIsFocusable);
         connect(core,SIGNAL(OnNeedInvalidation()),this,SLOT(Core_OnNeedInvalidation()));
-        connect(core,SIGNAL(OnMapDrag()),this,SLOT(ChildPosRefresh()));
-        connect(core,SIGNAL(OnMapZoomChanged()),this,SLOT(ChildPosRefresh()));
+        connect(core,SIGNAL(OnMapDrag()),this,SLOT(childPosRefresh()));
+        connect(core,SIGNAL(OnMapZoomChanged()),this,SLOT(childPosRefresh()));
         setCacheMode(QGraphicsItem::ItemCoordinateCache);
 
         //resize();
@@ -82,64 +82,15 @@ namespace mapcontrol
     void MapGraphicItem::Core_OnNeedInvalidation()
     {
         this->update();
-        foreach(QGraphicsItem* i,this->childItems())
-        {
-            WayPointItem* w=qgraphicsitem_cast<WayPointItem*>(i);
-            if(w)
-                w->RefreshPos();
-            UAVItem* ww=qgraphicsitem_cast<UAVItem*>(i);
-            if(ww)
-                ww->RefreshPos();
-            HomeItem* www=qgraphicsitem_cast<HomeItem*>(i);
-            if(www)
-                www->RefreshPos();
-            GPSItem* wwww=qgraphicsitem_cast<GPSItem*>(i);
-            if(wwww)
-                wwww->RefreshPos();
-        }
+        emit childRefreshPosition();
     }
-    void MapGraphicItem::ChildPosRefresh()
+    void MapGraphicItem::childPosRefresh()
     {
-        foreach(QGraphicsItem* i,this->childItems())
-        {
-            WayPointItem* w=qgraphicsitem_cast<WayPointItem*>(i);
-            if(w)
-                w->RefreshPos();
-            UAVItem* ww=qgraphicsitem_cast<UAVItem*>(i);
-            if(ww)
-                ww->RefreshPos();
-            HomeItem* www=qgraphicsitem_cast<HomeItem*>(i);
-            if(www)
-                www->RefreshPos();
-            GPSItem* wwww=qgraphicsitem_cast<GPSItem*>(i);
-            if(wwww)
-                wwww->RefreshPos();
-        }
+        emit childRefreshPosition();
     }
     void MapGraphicItem::setOverlayOpacity(qreal value)
     {
-        foreach(QGraphicsItem* i,this->childItems())
-        {
-            WayPointItem* w=qgraphicsitem_cast<WayPointItem*>(i);
-            if(w)
-                w->setOpacity(value);
-            UAVItem* ww=qgraphicsitem_cast<UAVItem*>(i);
-            if(ww)
-                ww->setOpacity(value);
-            HomeItem* www=qgraphicsitem_cast<HomeItem*>(i);
-            if(www)
-                www->setOpacity(value);
-            GPSItem* wwww=qgraphicsitem_cast<GPSItem*>(i);
-            if(wwww)
-                wwww->setOpacity(value);
-            WayPointLine* wwwww=qgraphicsitem_cast<WayPointLine*>(i);
-            if(wwwww)
-                wwwww->setOpacity(value);
-            WayPointCircle* wwwwww=qgraphicsitem_cast<WayPointCircle*>(i);
-            if(wwwwww)
-                wwwwww->setOpacity(value);
-
-        }
+        emit childSetOpacity(value);
     }
     void MapGraphicItem::ConstructLastImage(int const& zoomdiff)
     {

@@ -73,7 +73,7 @@ void IPConnection::onOpenDevice(QString HostName, int Port, bool UseTCP)
 {
     QAbstractSocket *ipSocket;
     const int Timeout = 5 * 1000;
-    int state;
+//    int state;
 
     ipConMutex.lock();
     if (UseTCP) {

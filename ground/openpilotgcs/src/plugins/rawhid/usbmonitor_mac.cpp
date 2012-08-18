@@ -45,8 +45,8 @@ static bool HID_GetStrProperty(IOHIDDeviceRef dev, CFStringRef property, QString
   */
 USBMonitor::USBMonitor(QObject *parent): QThread(parent) {
     hid_manager=NULL;
-    CFMutableDictionaryRef dict;
-    CFNumberRef num;
+//    CFMutableDictionaryRef dict;
+//    CFNumberRef num;
     IOReturn ret;
 
     m_instance = this;
@@ -131,7 +131,7 @@ void USBMonitor::attach_callback(void *context, IOReturn r, void *hid_mgr, IOHID
 {
     bool got_properties = true;
 
-    CFTypeRef prop;
+//    CFTypeRef prop;
     USBPortInfo deviceInfo;
 
     deviceInfo.dev_handle = dev;

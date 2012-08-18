@@ -69,7 +69,7 @@ namespace mapcontrol
         *
         * @param NED
         */
-        void SetGroundspeed(double vNED[3]);
+        void SetGroundspeed(double vNED[3], int m_maxUpdateRate);
         /**
         * @brief Sets the UAV Calibrated Airspeed
         *
@@ -220,8 +220,12 @@ namespace mapcontrol
         void SetShowUAVInfo(bool const& value);
 
     private:
+        void generateArrowhead();
+
         MapGraphicItem* map;
+        OPMapWidget* mapwidget;
         QPolygonF arrowHead;
+        QLineF arrowShaft;
         int altitude;
         UAVMapFollowType::Types mapfollowtype;
         UAVTrailType::Types trailtype;
@@ -234,7 +238,6 @@ namespace mapcontrol
         double yawRate_dps;
         QPixmap pic;
         core::Point localposition;
-        OPMapWidget* mapwidget;
         QGraphicsItemGroup* trail;
         QGraphicsItemGroup * trailLine;
         internals::PointLatLng lasttrailline;
@@ -250,6 +253,11 @@ namespace mapcontrol
         static double groundspeed_mps_filt;
         float boundingRectSize;
         bool showJustChanged;
+
+        bool refreshPaint_flag;
+
+        QPainterPath path;
+
 
     public slots:
         void RefreshPos();

@@ -49,6 +49,7 @@ namespace mapcontrol
         int type() const;
         bool ShowSafeArea()const{return showsafearea;}
         void SetShowSafeArea(bool const& value){showsafearea=value;}
+        void SetToggleRefresh(bool const& value){toggleRefresh=value;}
         int SafeArea()const{return safearea;}
         void SetSafeArea(int const& value){safearea=value;}
         bool safe;
@@ -65,6 +66,7 @@ namespace mapcontrol
         core::Point localposition;
         internals::PointLatLng coord;
         bool showsafearea;
+        bool toggleRefresh;
         int safearea;
         int localsafearea;
         float altitude;

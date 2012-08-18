@@ -33,12 +33,13 @@ namespace mapcontrol
 
     double UAVItem::groundspeed_mps_filt = 0;
 
-    UAVItem::UAVItem(MapGraphicItem* map,OPMapWidget* parent,QString uavPic):map(map),mapwidget(parent),showtrail(true),showtrailline(true),trailtime(5),traildistance(50),autosetreached(true)
-      ,autosetdistance(100),altitude(0),showUAVInfo(false),showJustChanged(false)
+    UAVItem::UAVItem(MapGraphicItem* map,OPMapWidget* parent,QString uavPic):map(map),mapwidget(parent)
+      ,altitude(0),showtrail(true),showtrailline(true),trailtime(5),traildistance(50),autosetreached(true)
+      ,autosetdistance(100),showUAVInfo(false),showJustChanged(false),refreshPaint_flag(true)
     {
         pic.load(uavPic);
-        this->setFlag(QGraphicsItem::ItemIsMovable,true);
-        this->setFlag(QGraphicsItem::ItemIsSelectable,true);
+        this->setFlag(QGraphicsItem::ItemIsMovable,false);
+        this->setFlag(QGraphicsItem::ItemIsSelectable,false);
         localposition=map->FromLatLngToLocal(mapwidget->CurrentPosition());
         this->setPos(localposition.X(),localposition.Y());
         this->setZValue(4);
@@ -50,6 +51,8 @@ namespace mapcontrol
         mapfollowtype=UAVMapFollowType::None;
         trailtype=UAVTrailType::ByDistance;
         timer.start();
+
+        generateArrowhead();
         setCacheMode(QGraphicsItem::DeviceCoordinateCache);
         connect(map,SIGNAL(childRefreshPosition()),this,SLOT(RefreshPos()));
         connect(map,SIGNAL(childSetOpacity(qreal)),this,SLOT(setOpacitySlot(qreal)));
@@ -67,7 +70,7 @@ namespace mapcontrol
         //Draw plane
         painter->drawPixmap(-pic.width()/2,-pic.height()/2,pic);
 
-        //Return if context menu switch for UAV info is off
+        //Return if UAV Info context menu is turned off
         if(!showUAVInfo){
             showJustChanged=false;
             return;
@@ -78,40 +81,14 @@ namespace mapcontrol
         //Turn on anti-aliasing so the fonts don't look terrible
         painter->setRenderHint(QPainter::Antialiasing, true);
 
-        qreal arrowSize = 10;
-
         //Set pen attributes
         QColor myColor(Qt::red);
         myPen.setWidth(3);
         myPen.setColor(myColor);
         painter->setPen(myPen);
-
-        //Create line from (0,0), to (1,1). Later, we'll scale and rotate it
-        QLineF line(0,0,1.0,1.0);
-
-        //Set the starting point to (0,0)
-        line.setP1(QPointF(0,0));
-
-        //Set angle and length
-        line.setLength(60.0);
-        line.setAngle(90.0);
-
-        //Form arrowhead
-        double angle = ::acos(line.dx() / line.length());
-        if (line.dy() <= 0)
-            angle = (M_PI * 2) - angle;
-
-        QPointF arrowP1 = line.pointAt(1) + QPointF(sin(angle + M_PI / 3) * arrowSize,
-                                                      cos(angle + M_PI / 3) * arrowSize);
-        QPointF arrowP2 = line.pointAt(1) + QPointF(sin(angle + M_PI - M_PI / 3) * arrowSize,
-                                                      cos(angle + M_PI - M_PI / 3) * arrowSize);
-
-        //Generate arrowhead
-        arrowHead.clear();
-        arrowHead << line.pointAt(1) << arrowP1 << arrowP2;
         painter->drawPolygon(arrowHead);
         painter->setPen(myPen);
-        painter->drawLine(line);
+        painter->drawLine(arrowShaft);
 
         //*********** Create trend arc
         double radius;
@@ -149,9 +126,7 @@ namespace mapcontrol
         //*********** Create time rings
         double ringTime=10*pow(2,17-map->ZoomTotal()); //Basic ring is 10 seconds wide at zoom level 17
 
-        double alpha= .05;
-        groundspeed_mps_filt= (1-alpha)*groundspeed_mps_filt + alpha*groundspeed_mps;
-        if(groundspeed_mps > 0){ //Don't clutter the display with rings that are only one pixel wide
+        if(groundspeed_mps_filt > 0){ //Don't clutter the display with rings that are only one pixel wide
             myPen.setWidth(2);
 
             myPen.setColor(QColor(0, 0, 0, 100));
@@ -169,56 +144,66 @@ namespace mapcontrol
 
         //***** Text info overlay. The font is a "glow" font, so that it's easier to use on the map
 
+        if (refreshPaint_flag==true){
+
+            //Define font
+            QFont borderfont( "Arial", 14, QFont::Normal, false );
+
+            //Top left corner of text
+            int textAnchorX = 20;
+            int textAnchorY = 20;
+
+            //Create text lines
+            QString uavoInfoStrLine1, uavoInfoStrLine2;
+            QString uavoInfoStrLine3, uavoInfoStrLine4;
+            QString uavoInfoStrLine5;
+
+            //For whatever reason, Qt does not let QPainterPath have text wrapping. So each line of
+            //text has to be added to a different line.
+            uavoInfoStrLine1.append(QString("CAS: %1 kph").arg(CAS_mps));
+            uavoInfoStrLine2.append(QString("Groundspeed: %1 kph").arg(groundspeed_kph, 0, 'f',1));
+            uavoInfoStrLine3.append(QString("Lat-Lon: %1, %2").arg(coord.Lat(), 0, 'f',7).arg(coord.Lng(), 0, 'f',7));
+            uavoInfoStrLine4.append(QString("North-East: %1 m, %2 m").arg(NED[0], 0, 'f',1).arg(NED[1], 0, 'f',1));
+            uavoInfoStrLine5.append(QString("Altitude: %1 m").arg(-NED[2], 0, 'f',1));
+
+            //Add the uavo info text to the path
+            //NOTE: We must use QPainterPath for the outlined text font. QPaint does not support this.
+            path = QPainterPath();
+
+            path.addText(textAnchorX, textAnchorY+16*0, borderfont, uavoInfoStrLine1);
+            path.addText(textAnchorX, textAnchorY+16*1, borderfont, uavoInfoStrLine2);
+            path.addText(textAnchorX, textAnchorY+16*2, borderfont, uavoInfoStrLine3);
+            path.addText(textAnchorX, textAnchorY+16*3, borderfont, uavoInfoStrLine4);
+            path.addText(textAnchorX, textAnchorY+16*4, borderfont, uavoInfoStrLine5);
+
+            //Add text for time rings.
+            if(groundspeed_mps > 0){
+                //Always add the left side...
+                path.addText(-(groundspeed_mps_filt*ringTime*1*meters2pixels+10), 0, borderfont, QString("%1 s").arg(ringTime,0,'f',0));
+                path.addText(-(groundspeed_mps_filt*ringTime*2*meters2pixels+10), 0, borderfont, QString("%1 s").arg(ringTime*2,0,'f',0));
+                path.addText(-(groundspeed_mps_filt*ringTime*4*meters2pixels+10), 0, borderfont, QString("%1 s").arg(ringTime*4,0,'f',0));
+                //... and add the right side, only if it doesn't interfere with the uav info text
+                if(groundspeed_mps_filt*ringTime*4*meters2pixels > 200){
+                    if(groundspeed_mps_filt*ringTime*2*meters2pixels > 200){
+                        if(groundspeed_mps_filt*ringTime*1*meters2pixels > 200){
+                            path.addText(groundspeed_mps_filt*ringTime*1*meters2pixels-8, 0, borderfont, QString("%1 s").arg(ringTime,0,'f',0));
+                        }
+                        path.addText(groundspeed_mps_filt*ringTime*2*meters2pixels-8, 0, borderfont, QString("%1 s").arg(ringTime*2,0,'f',0));
+                    }
+                    path.addText(groundspeed_mps_filt*ringTime*4*meters2pixels-8, 0, borderfont, QString("%1 s").arg(ringTime*4,0,'f',0));
+                }
+            }
+
+            //Last thing to do: set bound rectangle as function of largest object
+            boundingRectSize=groundspeed_mps_filt*ringTime*4*meters2pixels+20; //Largest object is currently the biggest ring + a little bit of margin for the text
+
+            refreshPaint_flag=false;
+        }
+
         //Rotate the text back to vertical
         qreal rot=this->rotation();
         painter->rotate(-1*rot);
 
-        //Define font
-        QFont borderfont( "Arial", 14, QFont::Normal, false );
-
-        //Top left corner of text
-        int textAnchorX = 20;
-        int textAnchorY = 20;
-
-        //Create text lines
-        QString uavoInfoStrLine1, uavoInfoStrLine2;
-        QString uavoInfoStrLine3, uavoInfoStrLine4;
-        QString uavoInfoStrLine5;
-
-        //For whatever reason, Qt does not let QPainterPath have text wrapping. So each line of
-        //text has to be added to a different line.
-        uavoInfoStrLine1.append(QString("CAS: %1 kph").arg(CAS_mps));
-        uavoInfoStrLine2.append(QString("Groundspeed: %1 kph").arg(groundspeed_kph, 0, 'f',1));
-        uavoInfoStrLine3.append(QString("Lat-Lon: %1, %2").arg(coord.Lat(), 0, 'f',7).arg(coord.Lng(), 0, 'f',7));
-        uavoInfoStrLine4.append(QString("North-East: %1 m, %2 m").arg(NED[0], 0, 'f',1).arg(NED[1], 0, 'f',1));
-        uavoInfoStrLine5.append(QString("Altitude: %1 m").arg(-NED[2], 0, 'f',1));
-
-        //Add the uavo info text to the path
-        //NOTE: We must use QPainterPath for the outlined text font. QPaint does not support this.
-        QPainterPath path;
-        path.addText(textAnchorX, textAnchorY+16*0, borderfont, uavoInfoStrLine1);
-        path.addText(textAnchorX, textAnchorY+16*1, borderfont, uavoInfoStrLine2);
-        path.addText(textAnchorX, textAnchorY+16*2, borderfont, uavoInfoStrLine3);
-        path.addText(textAnchorX, textAnchorY+16*3, borderfont, uavoInfoStrLine4);
-        path.addText(textAnchorX, textAnchorY+16*4, borderfont, uavoInfoStrLine5);
-
-        //Add text for time rings.
-        if(groundspeed_mps > 0){
-            //Always add the left side...
-            path.addText(-(groundspeed_mps_filt*ringTime*1*meters2pixels+10), 0, borderfont, QString("%1 s").arg(ringTime,0,'f',0));
-            path.addText(-(groundspeed_mps_filt*ringTime*2*meters2pixels+10), 0, borderfont, QString("%1 s").arg(ringTime*2,0,'f',0));
-            path.addText(-(groundspeed_mps_filt*ringTime*4*meters2pixels+10), 0, borderfont, QString("%1 s").arg(ringTime*4,0,'f',0));
-            //... and add the right side, only if it doesn't interfere with the uav info text
-            if(groundspeed_mps_filt*ringTime*4*meters2pixels > 200){
-                if(groundspeed_mps_filt*ringTime*2*meters2pixels > 200){
-                    if(groundspeed_mps_filt*ringTime*1*meters2pixels > 200){
-                        path.addText(groundspeed_mps_filt*ringTime*1*meters2pixels-8, 0, borderfont, QString("%1 s").arg(ringTime,0,'f',0));
-                    }
-                    path.addText(groundspeed_mps_filt*ringTime*2*meters2pixels-8, 0, borderfont, QString("%1 s").arg(ringTime*2,0,'f',0));
-                }
-                path.addText(groundspeed_mps_filt*ringTime*4*meters2pixels-8, 0, borderfont, QString("%1 s").arg(ringTime*4,0,'f',0));
-            }
-        }
 
         //Now draw the text. First pass is the outline...
         myPen.setWidth(4);
@@ -234,10 +219,6 @@ namespace mapcontrol
         painter->setPen(myPen);
         painter->drawPath(path);
 
-
-        //Last thing to do: set bound rectangle as function of largest object
-        prepareGeometryChange();
-        boundingRectSize=groundspeed_mps_filt*ringTime*4*meters2pixels+20; //Largest object is currently the biggest ring + a little bit of margin for the text
     }
 
     QRectF UAVItem::boundingRect()const
@@ -260,6 +241,8 @@ namespace mapcontrol
         this->NED[0] = NED[0];
         this->NED[1] = NED[1];
         this->NED[2] = NED[2];
+
+        refreshPaint_flag=true;
     }
 
     void UAVItem::SetYawRate(double yawRate_dps){
@@ -272,17 +255,35 @@ namespace mapcontrol
             this->yawRate_dps=5e-1;
         }
 
+        refreshPaint_flag=true;
     }
 
     void UAVItem::SetCAS(double CAS_mps){
         this->CAS_mps=CAS_mps;
+
+        refreshPaint_flag=true;
     }
 
-    void UAVItem::SetGroundspeed(double vNED[3]){
+    void UAVItem::SetGroundspeed(double vNED[3], int m_maxUpdateRate_ms){
         this->vNED[0] = vNED[0];
         this->vNED[1] = vNED[1];
         this->vNED[2] = vNED[2];
         groundspeed_kph=sqrt(vNED[0]*vNED[0] + vNED[1]*vNED[1] + vNED[2]*vNED[2])*3.6;
+
+        //On the first pass, set the filtered speed to the reported speed.
+        static bool firstGroundspeed=true;
+        if (firstGroundspeed){
+            groundspeed_mps_filt=groundspeed_kph/3.6;
+            firstGroundspeed=false;
+        }
+        else{
+            int riseTime_ms=1000;
+            double alpha= m_maxUpdateRate_ms/(double)(m_maxUpdateRate_ms+riseTime_ms);
+            groundspeed_mps_filt= alpha*groundspeed_mps_filt + (1-alpha)*(groundspeed_kph/3.6);
+         }
+
+
+        refreshPaint_flag=true;
     }
 
 
@@ -362,6 +363,8 @@ namespace mapcontrol
 
             }
         }
+
+        refreshPaint_flag=true;
     }
 
     /**
@@ -378,6 +381,8 @@ namespace mapcontrol
             if (this->rotation() != value)
                 this->setRotation(value);
         }
+
+        refreshPaint_flag=true;
     }
 
 
@@ -404,6 +409,7 @@ namespace mapcontrol
                 ww->setLine(map->FromLatLngToLocal(ww->coord1).X(),map->FromLatLngToLocal(ww->coord1).Y(),map->FromLatLngToLocal(ww->coord2).X(),map->FromLatLngToLocal(ww->coord2).Y());
         }
 
+        refreshPaint_flag=true;
     }
 
     void UAVItem::setOpacitySlot(qreal opacity)
@@ -451,4 +457,32 @@ namespace mapcontrol
         update();
     }
 
+    void UAVItem::generateArrowhead(){
+        qreal arrowSize = 10;
+
+        //Create line from (0,0), to (1,1). Later, we'll scale and rotate it
+        arrowShaft=QLineF(0,0,1.0,1.0);
+
+        //Set the starting point to (0,0)
+        arrowShaft.setP1(QPointF(0,0));
+
+        //Set angle and length
+        arrowShaft.setLength(60.0);
+        arrowShaft.setAngle(90.0);
+
+        //Form arrowhead
+        double angle = ::acos(arrowShaft.dx() / arrowShaft.length());
+        if (arrowShaft.dy() <= 0)
+            angle = (M_PI * 2) - angle;
+
+        QPointF arrowP1 = arrowShaft.pointAt(1) + QPointF(sin(angle + M_PI / 3) * arrowSize,
+                                                      cos(angle + M_PI / 3) * arrowSize);
+        QPointF arrowP2 = arrowShaft.pointAt(1) + QPointF(sin(angle + M_PI - M_PI / 3) * arrowSize,
+                                                      cos(angle + M_PI - M_PI / 3) * arrowSize);
+
+        //Assemble arrowhead
+        arrowHead.clear();
+        arrowHead << arrowShaft.pointAt(1) << arrowP1 << arrowP2;
+
+    }
 }

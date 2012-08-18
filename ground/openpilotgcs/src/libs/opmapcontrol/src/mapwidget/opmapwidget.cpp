@@ -34,7 +34,7 @@ namespace mapcontrol
 {
 
     OPMapWidget::OPMapWidget(QWidget *parent, Configuration *config):QGraphicsView(parent),configuration(config),UAV(0),GPS(0),Home(0)
-      ,followmouse(true),compass(0),showuav(false),showhome(false),showDiag(false),diagGraphItem(0),diagTimer(0),overlayOpacity(1)
+      ,followmouse(true),compass(0),showuav(false),showhome(false),diagTimer(0),diagGraphItem(0),showDiag(false),overlayOpacity(1)
     {
         setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         core=new internals::Core;
@@ -392,7 +392,7 @@ namespace mapcontrol
     }
     void OPMapWidget::WPDeleteAll()
     {
-        int x=0;
+//        int x=0;
         foreach(QGraphicsItem* i,map->childItems())
         {
             WayPointItem* w=qgraphicsitem_cast<WayPointItem*>(i);
@@ -419,7 +419,9 @@ namespace mapcontrol
                 }
             }
         }
+        return false;
     }
+
     void OPMapWidget::deleteAllOverlays()
     {
         foreach(QGraphicsItem* i,map->childItems())

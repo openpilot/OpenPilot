@@ -971,7 +971,7 @@ bool ConfigMultiRotorWidget::setupMultiRotorMixer(double mixerFactors[8][3])
     Q_ASSERT(mixer);
 
     //disable all
-    for (int channel=0; channel<VehicleConfig::CHANNEL_NUMELEM; channel++)
+    for (unsigned int channel=0; channel<VehicleConfig::CHANNEL_NUMELEM; channel++)
     {
         setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_DISABLED);
         resetMixerVector(mixer, channel);

@@ -315,7 +315,7 @@ int pjrc_rawhid::send(int num, void *buf, int len, int timeout)
 
 QString pjrc_rawhid::getserial(int num) {
     hid_t *hid;
-    char buf[128];
+//    char buf[128];
 
     hid = get_hid(num);
 

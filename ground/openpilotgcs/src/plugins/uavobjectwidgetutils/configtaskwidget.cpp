@@ -61,6 +61,15 @@ void ConfigTaskWidget::addUAVObject(QString objectName,QList<int> * reloadGroups
 {
     addUAVObjectToWidgetRelation(objectName,"",NULL,0,1,false,reloadGroups);
 }
+
+void ConfigTaskWidget::addUAVObject(UAVObject *objectName, QList<int> *reloadGroups)
+{
+    QString objstr;
+    if(objectName)
+        objstr=objectName->getName();
+    addUAVObject(objstr, reloadGroups);
+
+}
 /**
  * Add an UAVObject field to widget relation to the management system
  * @param object name of the object to add
@@ -77,6 +86,17 @@ void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString fiel
     _field = obj->getField(QString(field));
     Q_ASSERT(_field);
     addUAVObjectToWidgetRelation(object,field,widget,_field->getElementNames().indexOf(index));
+}
+
+void ConfigTaskWidget::addUAVObjectToWidgetRelation(UAVObject *obj, UAVObjectField * field, QWidget *widget, QString index)
+{
+    QString objstr;
+    QString fieldstr;
+    if(obj)
+        objstr=obj->getName();
+    if(field)
+        fieldstr=field->getName();
+    addUAVObjectToWidgetRelation(objstr, fieldstr, widget, index);
 }
 /**
  * Add a UAVObject field to widget relation to the management system
@@ -103,6 +123,28 @@ void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString fiel
     }
     addUAVObjectToWidgetRelation(object, field, widget,index,scale,isLimited,defaultReloadGroups,instID);
 }
+
+void ConfigTaskWidget::addUAVObjectToWidgetRelation(UAVObject *obj, UAVObjectField *field, QWidget *widget, QString element, double scale, bool isLimited, QList<int> *defaultReloadGroups, quint32 instID)
+{
+    QString objstr;
+    QString fieldstr;
+    if(obj)
+        objstr=obj->getName();
+    if(field)
+        fieldstr=field->getName();
+    addUAVObjectToWidgetRelation(objstr, fieldstr, widget, element, scale, isLimited, defaultReloadGroups, instID);
+}
+void ConfigTaskWidget::addUAVObjectToWidgetRelation(UAVObject * obj,UAVObjectField * field, QWidget * widget, int index,double scale,bool isLimited,QList<int>* defaultReloadGroups, quint32 instID)
+{
+    QString objstr;
+    QString fieldstr;
+    if(obj)
+        objstr=obj->getName();
+    if(field)
+        fieldstr=field->getName();
+    addUAVObjectToWidgetRelation(objstr,fieldstr,widget,index,scale,isLimited,defaultReloadGroups,instID);
+}
+
 /**
  * Add an UAVObject field to widget relation to the management system
  * @param object name of the object to add

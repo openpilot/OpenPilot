@@ -94,11 +94,18 @@ public:
     static double listMean(QList<double> list);
 
     void addUAVObject(QString objectName, QList<int> *reloadGroups=NULL);
+    void addUAVObject(UAVObject * objectName, QList<int> *reloadGroups=NULL);
+
     void addWidget(QWidget * widget);
 
     void addUAVObjectToWidgetRelation(QString object,QString field,QWidget * widget,int index=0,double scale=1,bool isLimited=false,QList<int>* defaultReloadGroups=0,quint32 instID=0);
+    void addUAVObjectToWidgetRelation(UAVObject *obj, UAVObjectField * field, QWidget *widget, int index=0, double scale=1, bool isLimited=false, QList<int> *defaultReloadGroups=0, quint32 instID=0);
+
     void addUAVObjectToWidgetRelation(QString object,QString field,QWidget * widget,QString element,double scale,bool isLimited=false,QList<int>* defaultReloadGroups=0,quint32 instID=0);
+    void addUAVObjectToWidgetRelation(UAVObject *obj, UAVObjectField * field,QWidget * widget,QString element,double scale,bool isLimited=false,QList<int>* defaultReloadGroups=0,quint32 instID=0);
+
     void addUAVObjectToWidgetRelation(QString object, QString field, QWidget *widget, QString index);
+    void addUAVObjectToWidgetRelation(UAVObject *obj, UAVObjectField * field, QWidget *widget, QString index);
 
     //BUTTONS//
     void addApplySaveButtons(QPushButton * update,QPushButton * save);

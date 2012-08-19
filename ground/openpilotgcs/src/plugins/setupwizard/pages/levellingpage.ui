@@ -47,8 +47,8 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>20</x>
      <y>250</y>
-     <width>561</width>
-     <height>131</height>
+     <width>560</width>
+     <height>130</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -68,7 +68,7 @@ p, li { white-space: pre-wrap; }
      <rect>
       <x>20</x>
       <y>90</y>
-      <width>531</width>
+      <width>530</width>
       <height>23</height>
      </rect>
     </property>
@@ -79,9 +79,9 @@ p, li { white-space: pre-wrap; }
    <widget class="QPushButton" name="levelButton">
     <property name="geometry">
      <rect>
-      <x>414</x>
+      <x>415</x>
       <y>40</y>
-      <width>101</width>
+      <width>100</width>
       <height>23</height>
      </rect>
     </property>

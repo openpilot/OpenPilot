@@ -44,7 +44,7 @@
 #include "vehicleconfigurationhelper.h"
 
 SetupWizard::SetupWizard(QWidget *parent) : QWizard(parent), VehicleConfigurationSource(),
-    m_controllerSelectionMode(CONTROLLER_SELECTION_UNKNOWN), m_controllerType(CONTROLLER_UNKNOWN),
+    m_controllerType(CONTROLLER_UNKNOWN),
     m_vehicleType(VEHICLE_UNKNOWN), m_inputType(INPUT_UNKNOWN), m_escType(ESC_UNKNOWN),
     m_levellingPerformed(false), m_connectionManager(0)
 {
@@ -90,13 +90,7 @@ int SetupWizard::nextId() const
         case PAGE_INPUT:
             return PAGE_VEHICLES;
         case PAGE_OUTPUT:
-        {
-            if(getControllerSelectionMode() == CONTROLLER_SELECTION_AUTOMATIC) {
-                return PAGE_LEVELLING;
-            } else {
-                return PAGE_SUMMARY;
-            }
-        }
+            return PAGE_LEVELLING;
         case PAGE_LEVELLING:
             return PAGE_SUMMARY;
         case PAGE_SUMMARY:
@@ -139,6 +133,46 @@ QString SetupWizard::getSummaryText()
     {
         case VEHICLE_MULTI:
             summary.append(tr("Multirotor"));
+
+            summary.append('\n');
+            summary.append(tr("Vehicle sub type: "));
+            switch (getVehicleSubType())
+            {
+                case SetupWizard::MULTI_ROTOR_TRI_Y:
+                    summary.append(tr("Tricopter"));
+                    break;
+                case SetupWizard::MULTI_ROTOR_QUAD_X:
+                    summary.append(tr("Quadcopter X"));
+                    break;
+                case SetupWizard::MULTI_ROTOR_QUAD_PLUS:
+                    summary.append(tr("Quadcopter +"));
+                    break;
+                case SetupWizard::MULTI_ROTOR_HEXA:
+                    summary.append(tr("Hexacopter"));
+                    break;
+                case SetupWizard::MULTI_ROTOR_HEXA_COAX_Y:
+                    summary.append(tr("Hexacopter Coax (Y6)"));
+                    break;
+                case SetupWizard::MULTI_ROTOR_HEXA_H:
+                    summary.append(tr("Hexacopter H"));
+                    break;
+                case SetupWizard::MULTI_ROTOR_OCTO:
+                    summary.append(tr("Octocopter"));
+                    break;
+                case SetupWizard::MULTI_ROTOR_OCTO_COAX_X:
+                    summary.append(tr("Octocopter Coax X"));
+                    break;
+                case SetupWizard::MULTI_ROTOR_OCTO_COAX_PLUS:
+                    summary.append(tr("Octocopter Coax +"));
+                    break;
+                case SetupWizard::MULTI_ROTOR_OCTO_V:
+                    summary.append(tr("Octocopter V"));
+                    break;
+                default:
+                    summary.append(tr("Unknown"));
+                    break;
+            }
+
             break;
         case VEHICLE_FIXEDWING:
             summary.append(tr("Fixed wing"));
@@ -197,13 +231,6 @@ QString SetupWizard::getSummaryText()
     }
 
     return summary;
-}
-
-void SetupWizard::writeConfiguration()
-{
-    VehicleConfigurationHelper *helper = new VehicleConfigurationHelper(this);
-    Q_ASSERT(helper);
-    helper->setupVehicle();
 }
 
 void SetupWizard::createPages()

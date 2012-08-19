@@ -28,8 +28,12 @@
 #ifndef VEHICLECONFIGURATIONHELPER_H
 #define VEHICLECONFIGURATIONHELPER_H
 
+#include <QList>
+#include <QPair>
 #include "vehicleconfigurationsource.h"
 #include "uavobjectmanager.h"
+#include "systemsettings.h"
+#include "cfg_vehicletypes/vehicleconfig.h"
 
 struct channelSettings {
     int type;
@@ -49,23 +53,51 @@ struct mixerSettings {
     channelSettings channels[10];
 };
 
-class VehicleConfigurationHelper
+class VehicleConfigurationHelper : public QObject
 {
+    Q_OBJECT
+
 public:
     VehicleConfigurationHelper(VehicleConfigurationSource* configSource);
-    void setupVehicle();
+    bool setupVehicle();
+
+signals:
+    void saveProgress(int total, int current, QString description);
+
 private:
     static const qint16 LEGACY_ESC_FREQUENCE = 50;
     static const qint16 RAPID_ESC_FREQUENCE = 400;
 
+    static const int MIXER_TYPE_DISABLED = 0;
+    static const int MIXER_TYPE_MOTOR = 1;
+    static const int MIXER_TYPE_SERVO = 2;
+
+    static const int PROGRESS_STEPS = 8;
+
     VehicleConfigurationSource *m_configSource;
     UAVObjectManager *m_uavoManager;
+
+    QList<QPair<UAVDataObject*, QString>* > m_modifiedObjects;
+    void addModifiedObject(UAVDataObject* object, QString description);
+    void clearModifiedObjects();
 
     void applyHardwareConfiguration();
     void applyVehicleConfiguration();
     void applyOutputConfiguration();
     void applyFlighModeConfiguration();
     void applyLevellingConfiguration();
+
+    void applyMixerConfiguration(mixerSettings mixer);
+
+    GUIConfigDataUnion getGUIConfigData();
+    void applyMultiGUISettings(SystemSettings::AirframeTypeOptions airframe, GUIConfigDataUnion guiConfig);
+
+    bool saveChangesToController();
+    QEventLoop m_eventLoop;
+    bool m_transactionOK;
+    bool m_transactionTimeout;
+    int m_currentTransactionObjectID;
+    int m_progress;
 
     void resetVehicleConfig();
     void resetGUIData();
@@ -74,6 +106,12 @@ private:
     void setupQuadCopter();
     void setupHexaCopter();
     void setupOctoCopter();
+
+private slots:
+    void uAVOTransactionCompleted(UAVObject* object, bool success);
+    void uAVOTransactionCompleted(int oid, bool success);
+    void saveChangesTimeout();
+
 
 };
 

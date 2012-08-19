@@ -45,7 +45,6 @@ ControllerPage::ControllerPage(SetupWizard *wizard, QWidget *parent) :
     connect(m_connectionManager, SIGNAL(deviceConnected(QIODevice*)), this, SLOT(connectionStatusChanged()));
     connect(m_connectionManager, SIGNAL(deviceDisconnected()), this, SLOT(connectionStatusChanged()));
 
-    connect(ui->manualCB, SIGNAL(toggled(bool)), this, SLOT(identificationModeChanged()));
     connect(ui->connectButton, SIGNAL(clicked()), this, SLOT(connectDisconnect()));
 
     setupBoardTypes();
@@ -71,14 +70,12 @@ void ControllerPage::initializePage()
 
 bool ControllerPage::isComplete() const
 {
-    return (ui->manualCB->isChecked() && ui->boardTypeCombo->currentIndex() > 0) ||
-            (!ui->manualCB->isChecked() && m_connectionManager->isConnected() && ui->boardTypeCombo->currentIndex() > 0);
+    return m_connectionManager->isConnected() && ui->boardTypeCombo->currentIndex() > 0;
 }
 
 bool ControllerPage::validatePage()
 {
     getWizard()->setControllerType((SetupWizard::CONTROLLER_TYPE)ui->boardTypeCombo->itemData(ui->boardTypeCombo->currentIndex()).toInt());
-    getWizard()->setControllerSelectionMode(ui->manualCB->isChecked() ? SetupWizard::CONTROLLER_SELECTION_MANUAL : SetupWizard::CONTROLLER_SELECTION_AUTOMATIC);
     return true;
 }
 
@@ -172,7 +169,6 @@ void ControllerPage::connectionStatusChanged()
         ui->deviceCombo->setEnabled(false);
         ui->connectButton->setText(tr("Disconnect"));
         ui->boardTypeCombo->setEnabled(false);
-        ui->manualCB->setEnabled(false);
         QString connectedDeviceName = m_connectionManager->getCurrentDevice().devName;
         for(int i = 0; i < ui->deviceCombo->count(); ++i) {
             if(connectedDeviceName == ui->deviceCombo->itemData(i, Qt::ToolTipRole).toString()) {
@@ -188,28 +184,8 @@ void ControllerPage::connectionStatusChanged()
         ui->deviceCombo->setEnabled(true);
         ui->connectButton->setText(tr("Connect"));
         ui->boardTypeCombo->setEnabled(false);
-        ui->manualCB->setEnabled(true);
         ui->boardTypeCombo->model()->setData(ui->boardTypeCombo->model()->index(0, 0), QVariant(0), Qt::UserRole - 1);
         setControllerType(SetupWizard::CONTROLLER_UNKNOWN);
-    }
-    emit completeChanged();
-}
-
-void ControllerPage::identificationModeChanged()
-{
-    if(ui->manualCB->isChecked()) {
-        ui->deviceCombo->setEnabled(false);
-        ui->boardTypeCombo->setEnabled(true);
-        ui->connectButton->setEnabled(false);
-        ui->boardTypeCombo->setCurrentIndex(1);
-        //ui->boardTypeCombo->model()->setData(ui->boardTypeCombo->model()->index(0, 0), QVariant(0), Qt::UserRole - 1);
-    }
-    else {
-        ui->connectButton->setEnabled(ui->deviceCombo->count() > 0);
-        ui->deviceCombo->setEnabled(!m_connectionManager->isConnected());
-        //ui->boardTypeCombo->model()->setData(ui->boardTypeCombo->model()->index(0, 0), QVariant(1), Qt::UserRole - 1);
-        ui->boardTypeCombo->setCurrentIndex(0);
-        ui->boardTypeCombo->setEnabled(false);
     }
     emit completeChanged();
 }

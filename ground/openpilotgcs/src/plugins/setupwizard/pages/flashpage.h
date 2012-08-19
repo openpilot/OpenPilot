@@ -42,9 +42,15 @@ public:
     explicit FlashPage(SetupWizard *wizard, QWidget *parent = 0);
     ~FlashPage();
     bool validatePage();
+    bool isComplete() const;
 
-private:
+private:    
     Ui::FlashPage *ui;
+    bool m_successfulWrite;
+
+private slots:
+    void writeToController();
+    void saveProgress(int total, int current, QString description);
 };
 
 #endif // FLASHPAGE_H

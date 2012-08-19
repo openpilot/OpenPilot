@@ -43,9 +43,6 @@ public:
     SetupWizard(QWidget *parent = 0);
     int nextId() const;
 
-    void setControllerSelectionMode(SetupWizard::CONTROLLER_SELECTION_MODE mode) { m_controllerSelectionMode = mode; }
-    SetupWizard::CONTROLLER_SELECTION_MODE getControllerSelectionMode() const { return m_controllerSelectionMode; }
-
     void setControllerType(SetupWizard::CONTROLLER_TYPE type) { m_controllerType = type; }
     SetupWizard::CONTROLLER_TYPE getControllerType() const { return m_controllerType; }
 
@@ -75,8 +72,6 @@ public:
         }
         return m_connectionManager;
     }
-public slots:
-    void writeConfiguration();
 
 private:
     enum {PAGE_START, PAGE_CONTROLLER, PAGE_VEHICLES, PAGE_MULTI, PAGE_FIXEDWING,
@@ -84,7 +79,6 @@ private:
           PAGE_FLASH, PAGE_SUMMARY, PAGE_NOTYETIMPLEMENTED, PAGE_END};
     void createPages();
 
-    CONTROLLER_SELECTION_MODE m_controllerSelectionMode;
     CONTROLLER_TYPE m_controllerType;
     VEHICLE_TYPE m_vehicleType;
     VEHICLE_SUB_TYPE m_vehicleSubType;

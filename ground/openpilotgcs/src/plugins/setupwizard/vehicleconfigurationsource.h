@@ -45,7 +45,6 @@ class VehicleConfigurationSource
 public:
     VehicleConfigurationSource();
 
-    enum CONTROLLER_SELECTION_MODE {CONTROLLER_SELECTION_AUTOMATIC, CONTROLLER_SELECTION_MANUAL, CONTROLLER_SELECTION_UNKNOWN};
     enum CONTROLLER_TYPE {CONTROLLER_UNKNOWN, CONTROLLER_CC, CONTROLLER_CC3D, CONTROLLER_REVO, CONTROLLER_PIPX};
     enum VEHICLE_TYPE {VEHICLE_UNKNOWN, VEHICLE_MULTI, VEHICLE_FIXEDWING, VEHICLE_HELI, VEHICLE_SURFACE};
     enum VEHICLE_SUB_TYPE {MULTI_ROTOR_UNKNOWN, MULTI_ROTOR_TRI_Y, MULTI_ROTOR_QUAD_X, MULTI_ROTOR_QUAD_PLUS,
@@ -55,7 +54,6 @@ public:
     enum ESC_TYPE {ESC_RAPID, ESC_LEGACY, ESC_UNKNOWN};
     enum INPUT_TYPE {INPUT_PWM, INPUT_PPM, INPUT_SBUS, INPUT_DSM, INPUT_UNKNOWN};
 
-    virtual VehicleConfigurationSource::CONTROLLER_SELECTION_MODE getControllerSelectionMode() const = 0;
     virtual VehicleConfigurationSource::CONTROLLER_TYPE getControllerType() const = 0;
     virtual VehicleConfigurationSource::VEHICLE_TYPE getVehicleType() const = 0;
     virtual VehicleConfigurationSource::VEHICLE_SUB_TYPE getVehicleSubType() const = 0;

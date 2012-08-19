@@ -84,7 +84,7 @@ void LevellingPage::performLevelling()
 
 void LevellingPage::levellingProgress(long current, long total)
 {
-    if(!ui->levellinProgressBar->maximum() != (int)total) {
+    if(ui->levellinProgressBar->maximum() != (int)total) {
         ui->levellinProgressBar->setMaximum((int)total);
     }
     if(ui->levellinProgressBar->value() != (int)current) {

@@ -28,14 +28,14 @@
 #include "flashpage.h"
 #include "ui_flashpage.h"
 #include "setupwizard.h"
+#include "vehicleconfigurationhelper.h"
 
 FlashPage::FlashPage(SetupWizard *wizard, QWidget *parent) :
         AbstractWizardPage(wizard, parent),
-
-    ui(new Ui::FlashPage)
+    ui(new Ui::FlashPage), m_successfulWrite(false)
 {
     ui->setupUi(this);
-    connect(ui->applyButton, SIGNAL(clicked()), wizard, SLOT(writeConfiguration()));
+    connect(ui->saveButton, SIGNAL(clicked()), this, SLOT(writeToController()));
 }
 
 FlashPage::~FlashPage()
@@ -46,4 +46,34 @@ FlashPage::~FlashPage()
 bool FlashPage::validatePage()
 {    
     return true;
+}
+
+bool FlashPage::isComplete() const
+{
+    return m_successfulWrite;
+}
+
+void FlashPage::writeToController()
+{
+    ui->saveButton->setEnabled(false);
+    VehicleConfigurationHelper helper(getWizard());
+    connect(&helper, SIGNAL(saveProgress(int, int, QString)),this, SLOT(saveProgress(int, int, QString)));
+    m_successfulWrite = helper.setupVehicle();
+    disconnect(&helper, SIGNAL(saveProgress(int, int, QString)),this, SLOT(saveProgress(int, int, QString)));
+    emit completeChanged();
+    ui->saveProgressLabel->setText(QString("<font color='%1'>%2</font>").arg(m_successfulWrite ? "green" : "red", ui->saveProgressLabel->text()));
+    ui->saveButton->setEnabled(true);
+}
+
+void FlashPage::saveProgress(int total, int current, QString description)
+{
+    if(ui->saveProgressBar->maximum() != total) {
+        ui->saveProgressBar->setMaximum(total);
+    }
+    if(ui->saveProgressBar->value() != current) {
+        ui->saveProgressBar->setValue(current);
+    }
+    if(ui->saveProgressLabel->text() != description) {
+        ui->saveProgressLabel->setText(description);
+    }
 }

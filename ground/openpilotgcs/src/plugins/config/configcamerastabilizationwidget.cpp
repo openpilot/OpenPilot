@@ -153,11 +153,9 @@ void ConfigCameraStabilizationWidget::updateObjectsFromWidgets()
 {
     // Save state of the module enable checkbox first
     HwSettings *hwSettings = HwSettings::GetInstance(getObjectManager());
-    HwSettings::DataFields hwSettingsData = hwSettings->getData();
-    hwSettingsData.OptionalModules[HwSettings::OPTIONALMODULES_CAMERASTAB] =
-        m_camerastabilization->enableCameraStabilization->isChecked() ?
+    quint8 value = m_camerastabilization->enableCameraStabilization->isChecked() ?
             HwSettings::OPTIONALMODULES_ENABLED : HwSettings::OPTIONALMODULES_DISABLED;
-    hwSettings->setData(hwSettingsData);
+    hwSettings->setOptionalModules(HwSettings::OPTIONALMODULES_CAMERASTAB,value);
 
     // Update mixer channels which were mapped to camera outputs in case they are
     // not used for other function yet

@@ -218,10 +218,9 @@ namespace mapcontrol
 
         void SetUavPic(QString UAVPic);
         void SetShowUAVInfo(bool const& value);
-
+        void updateTextOverlay();
     private:
         void generateArrowhead();
-
         MapGraphicItem* map;
         OPMapWidget* mapwidget;
         QPolygonF arrowHead;
@@ -235,7 +234,13 @@ namespace mapcontrol
         double vNED[3];
         double CAS_mps;
         double groundspeed_kph;
+        double groundspeed_mps;
         double yawRate_dps;
+        double trendRadius;
+        double trendSpanAngle;
+        float meters2pixels;
+        double precalcRings;
+        double ringTime;
         QPixmap pic;
         core::Point localposition;
         QGraphicsItemGroup* trail;
@@ -256,12 +261,12 @@ namespace mapcontrol
 
         bool refreshPaint_flag;
 
-        QPainterPath path;
-
+        QPainterPath textPath;
 
     public slots:
         void RefreshPos();
         void setOpacitySlot(qreal opacity);
+        void zoomChangedSlot();
     signals:
         void UAVReachedWayPoint(int const& waypointnumber,WayPointItem* waypoint);
         void UAVLeftSafetyBouble(internals::PointLatLng const& position);

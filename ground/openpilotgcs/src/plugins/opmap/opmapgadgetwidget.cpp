@@ -213,7 +213,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 	m_map->SetCurrentPosition(m_home_position.coord);         // set the map position
 	m_map->Home->SetCoord(m_home_position.coord);             // set the HOME position
 	m_map->UAV->SetUAVPos(m_home_position.coord, 0.0);        // set the UAV position
-
+    m_map->UAV->update();
     if(m_map->GPS)
         m_map->GPS->SetUAVPos(m_home_position.coord, 0.0);        // set the GPS position
 #ifdef USE_PATHPLANNER
@@ -638,7 +638,8 @@ void OPMapGadgetWidget::updatePosition()
         m_map->GPS->SetUAVPos(gps_pos, gps_altitude); // set the maps GPS position
         m_map->GPS->SetUAVHeading(gps_heading);       // set the maps GPS heading
     }
-
+    m_map->UAV->updateTextOverlay();
+    m_map->UAV->update();
 	// *************
 }
 

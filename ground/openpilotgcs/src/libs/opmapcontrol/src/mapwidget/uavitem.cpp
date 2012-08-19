@@ -34,7 +34,7 @@ namespace mapcontrol
     double UAVItem::groundspeed_mps_filt = 0;
 
     UAVItem::UAVItem(MapGraphicItem* map,OPMapWidget* parent,QString uavPic):map(map),mapwidget(parent),showtrail(true),showtrailline(true),trailtime(5),traildistance(50),autosetreached(true)
-      ,autosetdistance(100),altitude(0),showUAVInfo(false),showJustChanged(false)
+      ,autosetdistance(100),altitude(0),showUAVInfo(false)
     {
         pic.load(uavPic);
         this->setFlag(QGraphicsItem::ItemIsMovable,false);
@@ -47,14 +47,17 @@ namespace mapcontrol
         trailLine=new QGraphicsItemGroup(this);
         trailLine->setParentItem(map);
         this->setFlag(QGraphicsItem::ItemIgnoresTransformations,true);
+        setCacheMode(QGraphicsItem::ItemCoordinateCache);
         mapfollowtype=UAVMapFollowType::None;
         trailtype=UAVTrailType::ByDistance;
         timer.start();
-
         generateArrowhead();
+        double pixels2meters = map->Projection()->GetGroundResolution(map->ZoomTotal(),coord.Lat());
+        meters2pixels=1.0 / pixels2meters;
         setCacheMode(QGraphicsItem::DeviceCoordinateCache);
         connect(map,SIGNAL(childRefreshPosition()),this,SLOT(RefreshPos()));
         connect(map,SIGNAL(childSetOpacity(qreal)),this,SLOT(setOpacitySlot(qreal)));
+        connect(map,SIGNAL(zoomChanged(double,double,double)),this,SLOT(zoomChangedSlot()));
     }
     UAVItem::~UAVItem()
     {
@@ -71,7 +74,6 @@ namespace mapcontrol
 
         //Return if UAV Info context menu is turned off
         if(!showUAVInfo){
-            showJustChanged=false;
             return;
         }
 
@@ -89,140 +91,99 @@ namespace mapcontrol
         painter->setPen(myPen);
         painter->drawLine(arrowShaft);
 
-        //*********** Create trend arc
-        double radius;
-        double spanAngle = yawRate_dps * 5; //Forecast 5 seconds into the future
-
-
-        //Find the scale factor between meters and pixels
-        double pixels2meters = map->Projection()->GetGroundResolution(map->ZoomTotal(),coord.Lat());
-        float meters2pixels=1.0 / pixels2meters;
-
-        //Calculate radius in [m], and then convert to pixels in local frame (not the same frame as is displayed on the map widget)
-        double groundspeed_mps=groundspeed_kph/3.6;
-        radius=fabs(groundspeed_mps/(yawRate_dps*M_PI/180))*meters2pixels;
-
-//        qDebug() << "Scale: " <<  meters2pixels;
-//        qDebug() << "Zoom: " <<  map->ZoomTotal();
-//        qDebug()<< "Radius:" << radius;
-//        qDebug()<< "Span angle:" << spanAngle;
-
         //Set trend arc's color
         myPen.setColor(Qt::magenta);
         painter->setPen(myPen);
 
-        //Draw arc. Qt is incomprehensibly limited in that it does not let you set a radius and two points,
-        //so instead it's a hackish approach requiring a rectangle and a span angle
-        if (spanAngle > 0){
-            QRectF rect(0, -radius, radius*2, radius*2);
-            painter->drawArc(rect, 180*16, -spanAngle*16);
+        if (trendSpanAngle > 0){
+            QRectF rect(0, -trendRadius, trendRadius*2, trendRadius*2);
+            painter->drawArc(rect, 180*16, -trendSpanAngle*16);
         }
         else{
-            QRectF rect(-2*radius, -radius, radius*2, radius*2);
-            painter->drawArc(rect, 0*16, -spanAngle*16);
+            QRectF rect(-2*trendRadius, -trendRadius, trendRadius*2, trendRadius*2);
+            painter->drawArc(rect, 0*16, -trendSpanAngle*16);
         }
 
         //*********** Create time rings
-        double ringTime=10*pow(2,17-map->ZoomTotal()); //Basic ring is 10 seconds wide at zoom level 17
-
         if(groundspeed_mps_filt > 0){ //Don't clutter the display with rings that are only one pixel wide
             myPen.setWidth(2);
 
             myPen.setColor(QColor(0, 0, 0, 100));
             painter->setPen(myPen);
-            painter->drawEllipse(QPointF(0,0),groundspeed_mps_filt*ringTime*1*meters2pixels,groundspeed_mps_filt*ringTime*1*meters2pixels);
+            painter->drawEllipse(QPointF(0,0),precalcRings,precalcRings);
 
             myPen.setColor(QColor(0, 0, 0, 110));
             painter->setPen(myPen);
-            painter->drawEllipse(QPointF(0,0),groundspeed_mps_filt*ringTime*2*meters2pixels,groundspeed_mps_filt*ringTime*2*meters2pixels);
+            painter->drawEllipse(QPointF(0,0),precalcRings*2,precalcRings*2);
 
             myPen.setColor(QColor(0, 0, 0, 120));
             painter->setPen(myPen);
-            painter->drawEllipse(QPointF(0,0),groundspeed_mps_filt*ringTime*4*meters2pixels,groundspeed_mps_filt*ringTime*4*meters2pixels);
+            painter->drawEllipse(QPointF(0,0),precalcRings*4,precalcRings*4);
         }
-
-        //***** Text info overlay. The font is a "glow" font, so that it's easier to use on the map
-
-        if (refreshPaint_flag==true){
-
-            //Define font
-            QFont borderfont( "Arial", 14, QFont::Normal, false );
-
-            //Top left corner of text
-            int textAnchorX = 20;
-            int textAnchorY = 20;
-
-            //Create text lines
-            QString uavoInfoStrLine1, uavoInfoStrLine2;
-            QString uavoInfoStrLine3, uavoInfoStrLine4;
-            QString uavoInfoStrLine5;
-
-            //For whatever reason, Qt does not let QPainterPath have text wrapping. So each line of
-            //text has to be added to a different line.
-            uavoInfoStrLine1.append(QString("CAS: %1 kph").arg(CAS_mps));
-            uavoInfoStrLine2.append(QString("Groundspeed: %1 kph").arg(groundspeed_kph, 0, 'f',1));
-            uavoInfoStrLine3.append(QString("Lat-Lon: %1, %2").arg(coord.Lat(), 0, 'f',7).arg(coord.Lng(), 0, 'f',7));
-            uavoInfoStrLine4.append(QString("North-East: %1 m, %2 m").arg(NED[0], 0, 'f',1).arg(NED[1], 0, 'f',1));
-            uavoInfoStrLine5.append(QString("Altitude: %1 m").arg(-NED[2], 0, 'f',1));
-
-            //Add the uavo info text to the path
-            //NOTE: We must use QPainterPath for the outlined text font. QPaint does not support this.
-            path = QPainterPath();
-
-            path.addText(textAnchorX, textAnchorY+16*0, borderfont, uavoInfoStrLine1);
-            path.addText(textAnchorX, textAnchorY+16*1, borderfont, uavoInfoStrLine2);
-            path.addText(textAnchorX, textAnchorY+16*2, borderfont, uavoInfoStrLine3);
-            path.addText(textAnchorX, textAnchorY+16*3, borderfont, uavoInfoStrLine4);
-            path.addText(textAnchorX, textAnchorY+16*4, borderfont, uavoInfoStrLine5);
-
-            //Add text for time rings.
-            if(groundspeed_mps > 0){
-                //Always add the left side...
-                path.addText(-(groundspeed_mps_filt*ringTime*1*meters2pixels+10), 0, borderfont, QString("%1 s").arg(ringTime,0,'f',0));
-                path.addText(-(groundspeed_mps_filt*ringTime*2*meters2pixels+10), 0, borderfont, QString("%1 s").arg(ringTime*2,0,'f',0));
-                path.addText(-(groundspeed_mps_filt*ringTime*4*meters2pixels+10), 0, borderfont, QString("%1 s").arg(ringTime*4,0,'f',0));
-                //... and add the right side, only if it doesn't interfere with the uav info text
-                if(groundspeed_mps_filt*ringTime*4*meters2pixels > 200){
-                    if(groundspeed_mps_filt*ringTime*2*meters2pixels > 200){
-                        if(groundspeed_mps_filt*ringTime*1*meters2pixels > 200){
-                            path.addText(groundspeed_mps_filt*ringTime*1*meters2pixels-8, 0, borderfont, QString("%1 s").arg(ringTime,0,'f',0));
-                        }
-                        path.addText(groundspeed_mps_filt*ringTime*2*meters2pixels-8, 0, borderfont, QString("%1 s").arg(ringTime*2,0,'f',0));
-                    }
-                    path.addText(groundspeed_mps_filt*ringTime*4*meters2pixels-8, 0, borderfont, QString("%1 s").arg(ringTime*4,0,'f',0));
-                }
-            }
-
-            //Last thing to do: set bound rectangle as function of largest object
-            boundingRectSize=groundspeed_mps_filt*ringTime*4*meters2pixels+20; //Largest object is currently the biggest ring + a little bit of margin for the text
-
-            refreshPaint_flag=false;
-        }
-
         //Rotate the text back to vertical
         qreal rot=this->rotation();
         painter->rotate(-1*rot);
 
-
-        //Now draw the text. First pass is the outline...
-        myPen.setWidth(4);
-        myPen.setColor(Qt::black);
-        painter->setPen(myPen);
-        painter->setBrush(Qt::black);
-        painter->drawPath(path);
-
-        //...second pass is the inlay
         myPen.setWidth(1);
         myPen.setColor(Qt::white);
         painter->setBrush(Qt::white);
         painter->setPen(myPen);
-        painter->drawPath(path);
+        painter->drawPath(textPath);
+    }
 
+    void UAVItem::updateTextOverlay()
+    {
+        QPainterPath temp;
+        if(!showUAVInfo)
+        {
+            temp.swap(textPath);
+            return;
+        }
+
+        QFont borderfont( "Arial", 14, QFont::Normal, false );
+
+        //Top left corner of text
+        int textAnchorX = 20;
+        int textAnchorY = 20;
+
+        QString uavoInfoStrLine1, uavoInfoStrLine2;
+        QString uavoInfoStrLine3, uavoInfoStrLine4;
+        QString uavoInfoStrLine5;
+
+        uavoInfoStrLine1.append(QString("CAS: %1 kph").arg(CAS_mps));
+        uavoInfoStrLine2.append(QString("Groundspeed: %1 kph").arg(groundspeed_kph, 0, 'f',1));
+        uavoInfoStrLine3.append(QString("Lat-Lon: %1, %2").arg(coord.Lat(), 0, 'f',7).arg(coord.Lng(), 0, 'f',7));
+        uavoInfoStrLine4.append(QString("North-East: %1 m, %2 m").arg(NED[0], 0, 'f',1).arg(NED[1], 0, 'f',1));
+        uavoInfoStrLine5.append(QString("Altitude: %1 m").arg(-NED[2], 0, 'f',1));
+        temp.addText(textAnchorX, textAnchorY+16*0, borderfont, uavoInfoStrLine1);
+        temp.addText(textAnchorX, textAnchorY+16*1, borderfont, uavoInfoStrLine2);
+        temp.addText(textAnchorX, textAnchorY+16*2, borderfont, uavoInfoStrLine3);
+        temp.addText(textAnchorX, textAnchorY+16*3, borderfont, uavoInfoStrLine4);
+        temp.addText(textAnchorX, textAnchorY+16*4, borderfont, uavoInfoStrLine5);
+
+        //Add text for time rings.
+        if(groundspeed_mps > 0){
+            //Always add the left side...
+            temp.addText(-(groundspeed_mps_filt*ringTime*1*meters2pixels+10), 0, borderfont, QString("%1 s").arg(ringTime,0,'f',0));
+            temp.addText(-(groundspeed_mps_filt*ringTime*2*meters2pixels+10), 0, borderfont, QString("%1 s").arg(ringTime*2,0,'f',0));
+            temp.addText(-(groundspeed_mps_filt*ringTime*4*meters2pixels+10), 0, borderfont, QString("%1 s").arg(ringTime*4,0,'f',0));
+            //... and add the right side, only if it doesn't interfere with the uav info text
+            if(groundspeed_mps_filt*ringTime*4*meters2pixels > 200){
+                if(groundspeed_mps_filt*ringTime*2*meters2pixels > 200){
+                    if(groundspeed_mps_filt*ringTime*1*meters2pixels > 200){
+                        temp.addText(groundspeed_mps_filt*ringTime*1*meters2pixels-8, 0, borderfont, QString("%1 s").arg(ringTime,0,'f',0));
+                    }
+                    temp.addText(groundspeed_mps_filt*ringTime*2*meters2pixels-8, 0, borderfont, QString("%1 s").arg(ringTime*2,0,'f',0));
+                }
+                temp.addText(groundspeed_mps_filt*ringTime*4*meters2pixels-8, 0, borderfont, QString("%1 s").arg(ringTime*4,0,'f',0));
+            }
+        }
+        temp.swap(textPath);
     }
 
     QRectF UAVItem::boundingRect()const
     {
-        if(showUAVInfo || showJustChanged){
+        if(showUAVInfo){
             if (boundingRectSize < 220){
                 //In case the bounding rectangle isn't big enough to get the whole of the UAV Info graphic
                 return QRectF(-boundingRectSize,-80,boundingRectSize+220,180);
@@ -240,27 +201,24 @@ namespace mapcontrol
         this->NED[0] = NED[0];
         this->NED[1] = NED[1];
         this->NED[2] = NED[2];
-
-        refreshPaint_flag=true;
     }
 
     void UAVItem::SetYawRate(double yawRate_dps){
         this->yawRate_dps=yawRate_dps;
 
-        //There is a minimum arc distance under which Qt no longer draws an arc. At this low a turning rate,
-        //all curves look straight, so the user won't notice the difference. Moreover, our sensors aren't
-        //accurate enough to reliably describe this low a yaw rate.
         if (fabs(this->yawRate_dps) < 5e-1){ //This number is really the smallest we can go. Any smaller, and it might have problems if we forecast a shorter distance into the future
             this->yawRate_dps=5e-1;
         }
 
-        refreshPaint_flag=true;
+        //*********** Create trend arc
+        trendSpanAngle = this->yawRate_dps * 5; //Forecast 5 seconds into the future
+
+        //Calculate radius in [m], and then convert to pixels in local frame (not the same frame as is displayed on the map widget)
+        trendRadius=fabs(groundspeed_mps/(this->yawRate_dps*M_PI/180))*meters2pixels;
     }
 
     void UAVItem::SetCAS(double CAS_mps){
         this->CAS_mps=CAS_mps;
-
-        refreshPaint_flag=true;
     }
 
     void UAVItem::SetGroundspeed(double vNED[3], int m_maxUpdateRate_ms){
@@ -268,7 +226,7 @@ namespace mapcontrol
         this->vNED[1] = vNED[1];
         this->vNED[2] = vNED[2];
         groundspeed_kph=sqrt(vNED[0]*vNED[0] + vNED[1]*vNED[1] + vNED[2]*vNED[2])*3.6;
-
+        groundspeed_mps=groundspeed_kph/3.6;
         //On the first pass, set the filtered speed to the reported speed.
         static bool firstGroundspeed=true;
         if (firstGroundspeed){
@@ -280,9 +238,10 @@ namespace mapcontrol
             double alpha= m_maxUpdateRate_ms/(double)(m_maxUpdateRate_ms+riseTime_ms);
             groundspeed_mps_filt= alpha*groundspeed_mps_filt + (1-alpha)*(groundspeed_kph/3.6);
          }
-
-
-        refreshPaint_flag=true;
+        ringTime=10*pow(2,17-map->ZoomTotal()); //Basic ring is 10 seconds wide at zoom level 17
+        precalcRings=groundspeed_mps_filt*ringTime*meters2pixels;
+        boundingRectSize=groundspeed_mps_filt*ringTime*4*meters2pixels+20;
+        prepareGeometryChange();
     }
 
 
@@ -335,7 +294,6 @@ namespace mapcontrol
             {
                 mapwidget->SetCurrentPosition(coord);
             }
-            this->update();
             if(autosetreached)
             {
                 foreach(QGraphicsItem* i,map->childItems())
@@ -374,8 +332,6 @@ namespace mapcontrol
 
             }
         }
-
-        refreshPaint_flag=true;
     }
 
     /**
@@ -392,8 +348,6 @@ namespace mapcontrol
             if (this->rotation() != value)
                 this->setRotation(value);
         }
-
-        refreshPaint_flag=true;
     }
 
 
@@ -409,12 +363,22 @@ namespace mapcontrol
         this->setPos(localposition.X(),localposition.Y());
         emit setChildPosition();
         emit setChildLine();
-        refreshPaint_flag=true;
+        updateTextOverlay();
     }
 
     void UAVItem::setOpacitySlot(qreal opacity)
     {
         this->setOpacity(opacity);
+    }
+
+    void UAVItem::zoomChangedSlot()
+    {
+        double pixels2meters = map->Projection()->GetGroundResolution(map->ZoomTotal(),coord.Lat());
+        meters2pixels=1.0 / pixels2meters;
+        boundingRectSize=groundspeed_mps_filt*ringTime*4*meters2pixels+20;
+        prepareGeometryChange();
+        updateTextOverlay();
+        update();
     }
     void UAVItem::SetTrailType(const UAVTrailType::Types &value)
     {

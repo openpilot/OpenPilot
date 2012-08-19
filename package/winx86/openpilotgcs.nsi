@@ -171,6 +171,8 @@ SectionEnd
 
 ; Copy GCS resources
 Section "-Resources" InSecResources
+  SetOutPath "$INSTDIR\share\openpilotgcs\default_configurations"
+  File /r "${GCS_BUILD_TREE}\share\openpilotgcs\default_configurations\*"
   SetOutPath "$INSTDIR\share\openpilotgcs\diagrams"
   File /r "${GCS_BUILD_TREE}\share\openpilotgcs\diagrams\*"
   SetOutPath "$INSTDIR\share\openpilotgcs\dials"

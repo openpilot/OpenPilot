@@ -109,7 +109,7 @@ OsgViewerWidget::OsgViewerWidget(QWidget *parent) : QWidget(parent)
     setAttribute(Qt::WA_PaintOnScreen, true);
 
     osg::Group* root = new osg::Group;
-    osg::Node* earth = osgDB::readNodeFile("/Users/jcotton81/Documents/Programming/osgearth/tests/boston.earth");
+    osg::Node* earth = osgDB::readNodeFile("/Users/Cotton/Programming/osg/osgearth/tests/boston.earth");
     mapNode = osgEarth::MapNode::findMapNode( earth );
     if (!mapNode)
     {
@@ -225,10 +225,10 @@ osg::Node* OsgViewerWidget::createAirplane()
     case SystemSettings::AIRFRAMETYPE_FIXEDWING:
     case SystemSettings::AIRFRAMETYPE_FIXEDWINGELEVON:
     case  SystemSettings::AIRFRAMETYPE_FIXEDWINGVTAIL:
-        uav = osgDB::readNodeFile("/Users/jcotton81/Documents/Programming/OpenPilot/artwork/3D Model/planes/Easystar/easystar.3ds");
+        uav = osgDB::readNodeFile("/Users/Cotton/Programming/OpenPilot/artwork/3D Model/planes/Easystar/easystar.3ds");
         break;
     default:
-        uav = osgDB::readNodeFile("/Users/jcotton81/Documents/Programming/OpenPilot/artwork/3D Model/multi/joes_cnc/J14-QT_+.3DS");
+        uav = osgDB::readNodeFile("/Users/Cotton/Programming/OpenPilot/artwork/3D Model/multi/joes_cnc/J14-QT_+.3DS");
     }
 
     if(uav) {

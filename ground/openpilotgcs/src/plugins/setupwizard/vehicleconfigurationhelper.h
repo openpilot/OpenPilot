@@ -72,7 +72,7 @@ private:
     static const int MIXER_TYPE_MOTOR = 1;
     static const int MIXER_TYPE_SERVO = 2;
 
-    static const int PROGRESS_STEPS = 8;
+    static const int PROGRESS_STEPS = 9;
 
     VehicleConfigurationSource *m_configSource;
     UAVObjectManager *m_uavoManager;

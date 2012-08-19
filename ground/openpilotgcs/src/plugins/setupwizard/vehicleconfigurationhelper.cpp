@@ -32,6 +32,7 @@
 #include "attitudesettings.h"
 #include "mixersettings.h"
 #include "systemsettings.h"
+#import "manualcontrolsettings.h"
 
 VehicleConfigurationHelper::VehicleConfigurationHelper(VehicleConfigurationSource *configSource)
     : m_configSource(configSource), m_uavoManager(0),
@@ -122,7 +123,7 @@ void VehicleConfigurationHelper::applyHardwareConfiguration()
         default:
             break;
     }
-    //hwSettings->setData(data);
+    hwSettings->setData(data);
     addModifiedObject(hwSettings, tr("Writing hardware settings"));
 }
 
@@ -181,6 +182,7 @@ void VehicleConfigurationHelper::applyOutputConfiguration()
             data.ChannelUpdateFreq[1] = LEGACY_ESC_FREQUENCE;
             data.ChannelUpdateFreq[3] = LEGACY_ESC_FREQUENCE;
             data.ChannelUpdateFreq[4] = LEGACY_ESC_FREQUENCE;
+            data.MotorsSpinWhileArmed = ActuatorSettings::MOTORSSPINWHILEARMED_FALSE;
 
             qint16 updateFrequence = LEGACY_ESC_FREQUENCE;
             switch(m_configSource->getESCType())
@@ -220,7 +222,7 @@ void VehicleConfigurationHelper::applyOutputConfiguration()
                 default:
                     break;
             }
-            //actSettings->setData(data);
+            actSettings->setData(data);
             addModifiedObject(actSettings, tr("Writing output rate settings"));
             break;
         }
@@ -236,6 +238,28 @@ void VehicleConfigurationHelper::applyOutputConfiguration()
 
 void VehicleConfigurationHelper::applyFlighModeConfiguration()
 {
+    ManualControlSettings* controlSettings = ManualControlSettings::GetInstance(m_uavoManager);
+    Q_ASSERT(controlSettings);
+
+    ManualControlSettings::DataFields data = controlSettings->getData();
+    data.Stabilization1Settings[0] = ManualControlSettings::STABILIZATION1SETTINGS_ATTITUDE;
+    data.Stabilization1Settings[1] = ManualControlSettings::STABILIZATION1SETTINGS_ATTITUDE;
+    data.Stabilization1Settings[2] = ManualControlSettings::STABILIZATION1SETTINGS_AXISLOCK;
+    data.Stabilization2Settings[0] = ManualControlSettings::STABILIZATION2SETTINGS_ATTITUDE;
+    data.Stabilization2Settings[1] = ManualControlSettings::STABILIZATION2SETTINGS_ATTITUDE;
+    data.Stabilization2Settings[2] = ManualControlSettings::STABILIZATION2SETTINGS_RATE;
+    data.Stabilization3Settings[0] = ManualControlSettings::STABILIZATION3SETTINGS_RATE;
+    data.Stabilization3Settings[1] = ManualControlSettings::STABILIZATION3SETTINGS_RATE;
+    data.Stabilization3Settings[2] = ManualControlSettings::STABILIZATION3SETTINGS_RATE;
+    data.FlightModeNumber = 3;
+    data.FlightModePosition[0] = ManualControlSettings::FLIGHTMODEPOSITION_STABILIZED1;
+    data.FlightModePosition[1] = ManualControlSettings::FLIGHTMODEPOSITION_STABILIZED1;
+    data.FlightModePosition[2] = ManualControlSettings::FLIGHTMODEPOSITION_STABILIZED1;
+    data.FlightModePosition[3] = ManualControlSettings::FLIGHTMODEPOSITION_STABILIZED1;
+    data.FlightModePosition[4] = ManualControlSettings::FLIGHTMODEPOSITION_STABILIZED1;
+    data.FlightModePosition[5] = ManualControlSettings::FLIGHTMODEPOSITION_STABILIZED1;
+    controlSettings->setData(data);
+    addModifiedObject(controlSettings, tr("Writing flight mode settings"));
 }
 
 void VehicleConfigurationHelper::applyLevellingConfiguration()
@@ -254,7 +278,7 @@ void VehicleConfigurationHelper::applyLevellingConfiguration()
         data.GyroBias[1] = -bias.m_gyroYBias;
         data.GyroBias[2] = -bias.m_gyroZBias;
 
-        //AttitudeSettings::GetInstance(m_uavoManager)->setData(data);
+        attitudeSettings->setData(data);
         addModifiedObject(attitudeSettings, tr("Writing levelling bias settings"));
     }
 }
@@ -263,6 +287,7 @@ void VehicleConfigurationHelper::applyMixerConfiguration(mixerSettings mixer)
 {
     // Set all mixer data
     MixerSettings* mSettings = MixerSettings::GetInstance(m_uavoManager);
+    Q_ASSERT(mSettings);
 
     // Set Mixer types and values
     QString mixerTypePattern = "Mixer%1Type";
@@ -467,7 +492,7 @@ void VehicleConfigurationHelper::resetGUIData()
     for(quint32 i = 0; i < SystemSettings::GUICONFIGDATA_NUMELEM; i++) {
         data.GUIConfigData[i] = 0;
     }
-    //sSettings->setData(data);
+    sSettings->setData(data);
     addModifiedObject(sSettings, tr("Preparing vehicle settings"));
 }
 

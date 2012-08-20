@@ -225,7 +225,6 @@ void ConfigGadgetWidget::updatePipXStatus(UAVObject *)
         qDebug()<<"ConfigGadgetWidget onPipxtremeConnect";
         QWidget *qwd = new ConfigPipXtremeWidget(this);
         ftw->insertTab(ConfigGadgetWidget::pipxtreme, qwd, QIcon(":/configgadget/images/PipXtreme.png"), QString("PipXtreme"));
-        ftw->setCurrentIndex(ConfigGadgetWidget::pipxtreme);
         pipxConnected = true;
     }
 }

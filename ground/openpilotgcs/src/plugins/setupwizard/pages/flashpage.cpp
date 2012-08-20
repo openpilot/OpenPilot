@@ -25,6 +25,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#include <QMessageBox>
 #include "flashpage.h"
 #include "ui_flashpage.h"
 #include "setupwizard.h"
@@ -55,14 +56,28 @@ bool FlashPage::isComplete() const
 
 void FlashPage::writeToController()
 {
+    if(!getWizard()->getConnectionManager()->isConnected()) {
+        QMessageBox msgBox;
+        msgBox.setText(tr("An OpenPilot controller must be connected to your computer to save the "
+                          "configuration.\nPlease connect your OpenPilot controller to your computer and try again."));
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setDefaultButton(QMessageBox::Ok);
+        msgBox.exec();
+        return;
+    }
+
     ui->saveButton->setEnabled(false);
+    getWizard()->button(QWizard::CancelButton)->setEnabled(false);
+    getWizard()->button(QWizard::BackButton)->setEnabled(false);
     VehicleConfigurationHelper helper(getWizard());
     connect(&helper, SIGNAL(saveProgress(int, int, QString)),this, SLOT(saveProgress(int, int, QString)));
     m_successfulWrite = helper.setupVehicle();
     disconnect(&helper, SIGNAL(saveProgress(int, int, QString)),this, SLOT(saveProgress(int, int, QString)));
-    emit completeChanged();
     ui->saveProgressLabel->setText(QString("<font color='%1'>%2</font>").arg(m_successfulWrite ? "green" : "red", ui->saveProgressLabel->text()));
     ui->saveButton->setEnabled(true);
+    getWizard()->button(QWizard::CancelButton)->setEnabled(true);
+    getWizard()->button(QWizard::BackButton)->setEnabled(true);
+    emit completeChanged();
 }
 
 void FlashPage::saveProgress(int total, int current, QString description)

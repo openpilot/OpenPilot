@@ -107,7 +107,7 @@ int SetupWizard::nextId() const
 QString SetupWizard::getSummaryText()
 {
     QString summary = "";
-    summary.append(tr("Controller type: "));
+    summary.append("<b>").append(tr("Controller type: ")).append("</b>");
     switch(getControllerType())
     {
         case CONTROLLER_CC:
@@ -127,15 +127,15 @@ QString SetupWizard::getSummaryText()
             break;
     }
 
-    summary.append('\n');
-    summary.append(tr("Vehicle type: "));
+    summary.append("<br>");
+    summary.append("<b>").append(tr("Vehicle type: ")).append("</b>");
     switch (getVehicleType())
     {
         case VEHICLE_MULTI:
             summary.append(tr("Multirotor"));
 
-            summary.append('\n');
-            summary.append(tr("Vehicle sub type: "));
+            summary.append("<br>");
+            summary.append("<b>").append(tr("Vehicle sub type: ")).append("</b>");
             switch (getVehicleSubType())
             {
                 case SetupWizard::MULTI_ROTOR_TRI_Y:
@@ -187,8 +187,8 @@ QString SetupWizard::getSummaryText()
             summary.append(tr("Unknown"));
     }
 
-    summary.append('\n');
-    summary.append(tr("Input type: "));
+    summary.append("<br>");
+    summary.append("<b>").append(tr("Input type: ")).append("</b>");
     switch (getInputType())
     {
         case INPUT_PWM:
@@ -207,8 +207,8 @@ QString SetupWizard::getSummaryText()
             summary.append(tr("Unknown"));
     }
 
-    summary.append('\n');
-    summary.append(tr("ESC type: "));
+    summary.append("<br>");
+    summary.append("<b>").append(tr("ESC type: ")).append("</b>");
     switch (getESCType())
     {
         case ESC_LEGACY:
@@ -221,8 +221,8 @@ QString SetupWizard::getSummaryText()
             summary.append(tr("Unknown"));
     }
 
-    summary.append('\n');
-    summary.append(tr("Accel & Gyro bias calibrated: "));
+    summary.append("<br>");
+    summary.append("<b>").append(tr("Accel & Gyro bias calibrated: ")).append("</b>");
     if (isLevellingPerformed()) {
         summary.append(tr("Yes"));
     }

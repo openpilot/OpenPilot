@@ -62,7 +62,7 @@ void LevellingPage::performLevelling()
     if(!getWizard()->getConnectionManager()->isConnected()) {
         QMessageBox msgBox;
         msgBox.setText(tr("An OpenPilot controller must be connected to your computer to perform bias "
-                          "calculations.\nPlease connect your OpenPilot controller to continue."));
+                          "calculations.\nPlease connect your OpenPilot controller to your computer and try again."));
         msgBox.setStandardButtons(QMessageBox::Ok);
         msgBox.setDefaultButton(QMessageBox::Ok);
         msgBox.exec();
@@ -74,11 +74,15 @@ void LevellingPage::performLevelling()
         // Measure every 100ms * 100times = 10s
         m_levellingUtil = new LevellingUtil(BIAS_CYCLES, BIAS_PERIOD);
     }
+    emit completeChanged();
+
     connect(m_levellingUtil, SIGNAL(progress(long,long)), this, SLOT(levellingProgress(long,long)));
     connect(m_levellingUtil, SIGNAL(done(accelGyroBias)), this, SLOT(levellingDone(accelGyroBias)));
     connect(m_levellingUtil, SIGNAL(timeout(QString)), this, SLOT(levellingTimeout(QString)));
+    getWizard()->button(QWizard::CancelButton)->setEnabled(false);
+    getWizard()->button(QWizard::BackButton)->setEnabled(false);
     ui->levelButton->setEnabled(false);
-    emit completeChanged();
+
     m_levellingUtil->start();
 }
 
@@ -118,5 +122,7 @@ void LevellingPage::stopLevelling()
         disconnect(m_levellingUtil, SIGNAL(done(accelGyroBias)), this, SLOT(levellingDone(accelGyroBias)));
         disconnect(m_levellingUtil, SIGNAL(timeout(QString)), this, SLOT(levellingTimeout(QString)));
         ui->levelButton->setEnabled(true);
+        getWizard()->button(QWizard::CancelButton)->setEnabled(true);
+        getWizard()->button(QWizard::BackButton)->setEnabled(true);
     }
 }

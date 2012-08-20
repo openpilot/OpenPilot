@@ -30,6 +30,7 @@
 
 #include <QtSvg/QGraphicsSvgItem>
 #include <QtSvg/QSvgRenderer>
+#include <QList>
 
 #include "abstractwizardpage.h"
 
@@ -54,6 +55,7 @@ private:
     void setupMultiTypesCombo();
     QGraphicsSvgItem *multiPic;
     void updateAvailableTypes();
+    QList<QString> m_descriptions;
 
 private slots:
     void updateImageAndDescription();

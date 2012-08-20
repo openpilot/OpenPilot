@@ -96,7 +96,10 @@ void VehicleConfigurationHelper::applyHardwareConfiguration()
         case VehicleConfigurationSource::CONTROLLER_CC3D:
             // Reset all ports
             data.CC_RcvrPort = HwSettings::CC_RCVRPORT_DISABLED;
-            data.CC_FlexiPort = HwSettings::CC_FLEXIPORT_DISABLED;
+
+            //Default flexiport to be active telemetry link
+            data.CC_FlexiPort = HwSettings::CC_FLEXIPORT_TELEMETRY;
+
             data.CC_MainPort = HwSettings::CC_MAINPORT_DISABLED;
             switch(m_configSource->getInputType())
             {
@@ -500,10 +503,13 @@ void VehicleConfigurationHelper::resetGUIData()
 void VehicleConfigurationHelper::setupTriCopter()
 {
     // Typical vehicle setup
-    // 1. Setup and apply mixer
+    // 1. Setup mixer data
     // 2. Setup GUI data
+    // 3. Apply changes
 
     mixerSettings mixer;
+    GUIConfigDataUnion guiSettings = getGUIConfigData();
+
     mixer.channels[0].type = MIXER_TYPE_MOTOR;
     mixer.channels[0].throttle1 = 100;
     mixer.channels[0].throttle2 = 0;
@@ -532,15 +538,12 @@ void VehicleConfigurationHelper::setupTriCopter()
     mixer.channels[3].pitch = 0;
     mixer.channels[3].yaw = 100;
 
-    applyMixerConfiguration(mixer);
-
-    GUIConfigDataUnion guiSettings = getGUIConfigData();
-
     guiSettings.multi.VTOLMotorNW = 1;
     guiSettings.multi.VTOLMotorNE = 2;
     guiSettings.multi.VTOLMotorS = 3;
     guiSettings.multi.TRIYaw = 4;
 
+    applyMixerConfiguration(mixer);
     applyMultiGUISettings(SystemSettings::AIRFRAMETYPE_TRI, guiSettings);
 }
 
@@ -646,13 +649,476 @@ void VehicleConfigurationHelper::setupQuadCopter()
     }
     applyMixerConfiguration(mixer);
     applyMultiGUISettings(frame, guiSettings);
-
 }
 
 void VehicleConfigurationHelper::setupHexaCopter()
 {
+    mixerSettings mixer;
+    GUIConfigDataUnion guiSettings = getGUIConfigData();
+    SystemSettings::AirframeTypeOptions frame;
+
+    switch(m_configSource->getVehicleSubType())
+    {
+        case VehicleConfigurationSource::MULTI_ROTOR_HEXA: {
+            frame = SystemSettings::AIRFRAMETYPE_HEXA;
+
+            mixer.channels[0].type = MIXER_TYPE_MOTOR;
+            mixer.channels[0].throttle1 = 100;
+            mixer.channels[0].throttle2 = 0;
+            mixer.channels[0].roll = 0;
+            mixer.channels[0].pitch = 33;
+            mixer.channels[0].yaw = -33;
+
+            mixer.channels[1].type = MIXER_TYPE_MOTOR;
+            mixer.channels[1].throttle1 = 100;
+            mixer.channels[1].throttle2 = 0;
+            mixer.channels[1].roll = -50;
+            mixer.channels[1].pitch = 33;
+            mixer.channels[1].yaw = 33;
+
+            mixer.channels[2].type = MIXER_TYPE_MOTOR;
+            mixer.channels[2].throttle1 = 100;
+            mixer.channels[2].throttle2 = 0;
+            mixer.channels[2].roll = -50;
+            mixer.channels[2].pitch = -33;
+            mixer.channels[2].yaw = -33;
+
+            mixer.channels[3].type = MIXER_TYPE_MOTOR;
+            mixer.channels[3].throttle1 = 100;
+            mixer.channels[3].throttle2 = 0;
+            mixer.channels[3].roll = 0;
+            mixer.channels[3].pitch = -33;
+            mixer.channels[3].yaw = 33;
+
+            mixer.channels[4].type = MIXER_TYPE_MOTOR;
+            mixer.channels[4].throttle1 = 100;
+            mixer.channels[4].throttle2 = 0;
+            mixer.channels[4].roll = 50;
+            mixer.channels[4].pitch = -33;
+            mixer.channels[4].yaw = -33;
+
+            mixer.channels[5].type = MIXER_TYPE_MOTOR;
+            mixer.channels[5].throttle1 = 100;
+            mixer.channels[5].throttle2 = 0;
+            mixer.channels[5].roll = 50;
+            mixer.channels[5].pitch = 33;
+            mixer.channels[5].yaw = 33;
+
+            guiSettings.multi.VTOLMotorN = 1;
+            guiSettings.multi.VTOLMotorNE = 2;
+            guiSettings.multi.VTOLMotorSE = 3;
+            guiSettings.multi.VTOLMotorS = 4;
+            guiSettings.multi.VTOLMotorSW = 5;
+            guiSettings.multi.VTOLMotorNW = 6;
+
+            break;
+        }
+        case VehicleConfigurationSource::MULTI_ROTOR_HEXA_COAX_Y: {
+            frame = SystemSettings::AIRFRAMETYPE_HEXACOAX;
+
+            mixer.channels[0].type = MIXER_TYPE_MOTOR;
+            mixer.channels[0].throttle1 = 100;
+            mixer.channels[0].throttle2 = 0;
+            mixer.channels[0].roll = 100;
+            mixer.channels[0].pitch = 25;
+            mixer.channels[0].yaw = -66;
+
+            mixer.channels[1].type = MIXER_TYPE_MOTOR;
+            mixer.channels[1].throttle1 = 100;
+            mixer.channels[1].throttle2 = 0;
+            mixer.channels[1].roll = 100;
+            mixer.channels[1].pitch = 25;
+            mixer.channels[1].yaw = 66;
+
+            mixer.channels[2].type = MIXER_TYPE_MOTOR;
+            mixer.channels[2].throttle1 = 100;
+            mixer.channels[2].throttle2 = 0;
+            mixer.channels[2].roll = -100;
+            mixer.channels[2].pitch = 25;
+            mixer.channels[2].yaw = -66;
+
+            mixer.channels[3].type = MIXER_TYPE_MOTOR;
+            mixer.channels[3].throttle1 = 100;
+            mixer.channels[3].throttle2 = 0;
+            mixer.channels[3].roll = -100;
+            mixer.channels[3].pitch = 25;
+            mixer.channels[3].yaw = 66;
+
+            mixer.channels[4].type = MIXER_TYPE_MOTOR;
+            mixer.channels[4].throttle1 = 100;
+            mixer.channels[4].throttle2 = 0;
+            mixer.channels[4].roll = 0;
+            mixer.channels[4].pitch = -50;
+            mixer.channels[4].yaw = -66;
+
+            mixer.channels[5].type = MIXER_TYPE_MOTOR;
+            mixer.channels[5].throttle1 = 100;
+            mixer.channels[5].throttle2 = 0;
+            mixer.channels[5].roll = 0;
+            mixer.channels[5].pitch = -50;
+            mixer.channels[5].yaw = 66;
+
+            guiSettings.multi.VTOLMotorNW = 1;
+            guiSettings.multi.VTOLMotorW = 2;
+            guiSettings.multi.VTOLMotorNE = 3;
+            guiSettings.multi.VTOLMotorE = 4;
+            guiSettings.multi.VTOLMotorS = 5;
+            guiSettings.multi.VTOLMotorSE = 6;
+
+            break;
+        }
+        case VehicleConfigurationSource::MULTI_ROTOR_HEXA_H: {
+            frame = SystemSettings::AIRFRAMETYPE_HEXAX;
+
+            mixer.channels[0].type = MIXER_TYPE_MOTOR;
+            mixer.channels[0].throttle1 = 100;
+            mixer.channels[0].throttle2 = 0;
+            mixer.channels[0].roll = -33;
+            mixer.channels[0].pitch = 50;
+            mixer.channels[0].yaw = -33;
+
+            mixer.channels[1].type = MIXER_TYPE_MOTOR;
+            mixer.channels[1].throttle1 = 100;
+            mixer.channels[1].throttle2 = 0;
+            mixer.channels[1].roll = -33;
+            mixer.channels[1].pitch = 0;
+            mixer.channels[1].yaw = 33;
+
+            mixer.channels[2].type = MIXER_TYPE_MOTOR;
+            mixer.channels[2].throttle1 = 100;
+            mixer.channels[2].throttle2 = 0;
+            mixer.channels[2].roll = -33;
+            mixer.channels[2].pitch = -50;
+            mixer.channels[2].yaw = -33;
+
+            mixer.channels[3].type = MIXER_TYPE_MOTOR;
+            mixer.channels[3].throttle1 = 100;
+            mixer.channels[3].throttle2 = 0;
+            mixer.channels[3].roll = -33;
+            mixer.channels[3].pitch = -50;
+            mixer.channels[3].yaw = 33;
+
+            mixer.channels[4].type = MIXER_TYPE_MOTOR;
+            mixer.channels[4].throttle1 = 100;
+            mixer.channels[4].throttle2 = 0;
+            mixer.channels[4].roll = 33;
+            mixer.channels[4].pitch = 0;
+            mixer.channels[4].yaw = -33;
+
+            mixer.channels[5].type = MIXER_TYPE_MOTOR;
+            mixer.channels[5].throttle1 = 100;
+            mixer.channels[5].throttle2 = 0;
+            mixer.channels[5].roll = 33;
+            mixer.channels[5].pitch = 50;
+            mixer.channels[5].yaw = -33;
+
+            guiSettings.multi.VTOLMotorNE = 1;
+            guiSettings.multi.VTOLMotorE = 2;
+            guiSettings.multi.VTOLMotorSE = 3;
+            guiSettings.multi.VTOLMotorSW = 4;
+            guiSettings.multi.VTOLMotorW = 5;
+            guiSettings.multi.VTOLMotorNW = 6;
+
+            break;
+        }
+        default:
+            break;
+    }
+    applyMixerConfiguration(mixer);
+    applyMultiGUISettings(frame, guiSettings);
 }
 
 void VehicleConfigurationHelper::setupOctoCopter()
 {
+    mixerSettings mixer;
+    GUIConfigDataUnion guiSettings = getGUIConfigData();
+    SystemSettings::AirframeTypeOptions frame;
+
+    switch(m_configSource->getVehicleSubType())
+    {
+        case VehicleConfigurationSource::MULTI_ROTOR_OCTO: {
+            frame = SystemSettings::AIRFRAMETYPE_OCTO;
+
+            mixer.channels[0].type = MIXER_TYPE_MOTOR;
+            mixer.channels[0].throttle1 = 100;
+            mixer.channels[0].throttle2 = 0;
+            mixer.channels[0].roll = 0;
+            mixer.channels[0].pitch = 33;
+            mixer.channels[0].yaw = -25;
+
+            mixer.channels[1].type = MIXER_TYPE_MOTOR;
+            mixer.channels[1].throttle1 = 100;
+            mixer.channels[1].throttle2 = 0;
+            mixer.channels[1].roll = -33;
+            mixer.channels[1].pitch = 33;
+            mixer.channels[1].yaw = 25;
+
+            mixer.channels[2].type = MIXER_TYPE_MOTOR;
+            mixer.channels[2].throttle1 = 100;
+            mixer.channels[2].throttle2 = 0;
+            mixer.channels[2].roll = -33;
+            mixer.channels[2].pitch = 0;
+            mixer.channels[2].yaw = -25;
+
+            mixer.channels[3].type = MIXER_TYPE_MOTOR;
+            mixer.channels[3].throttle1 = 100;
+            mixer.channels[3].throttle2 = 0;
+            mixer.channels[3].roll = -33;
+            mixer.channels[3].pitch = -33;
+            mixer.channels[3].yaw = 25;
+
+            mixer.channels[4].type = MIXER_TYPE_MOTOR;
+            mixer.channels[4].throttle1 = 100;
+            mixer.channels[4].throttle2 = 0;
+            mixer.channels[4].roll = 0;
+            mixer.channels[4].pitch = -33;
+            mixer.channels[4].yaw = -25;
+
+            mixer.channels[5].type = MIXER_TYPE_MOTOR;
+            mixer.channels[5].throttle1 = 100;
+            mixer.channels[5].throttle2 = 0;
+            mixer.channels[5].roll = 33;
+            mixer.channels[5].pitch = -33;
+            mixer.channels[5].yaw = 25;
+
+            mixer.channels[6].type = MIXER_TYPE_MOTOR;
+            mixer.channels[6].throttle1 = 100;
+            mixer.channels[6].throttle2 = 0;
+            mixer.channels[6].roll = 33;
+            mixer.channels[6].pitch = 0;
+            mixer.channels[6].yaw = -25;
+
+            mixer.channels[7].type = MIXER_TYPE_MOTOR;
+            mixer.channels[7].throttle1 = 100;
+            mixer.channels[7].throttle2 = 0;
+            mixer.channels[7].roll = 33;
+            mixer.channels[7].pitch = 33;
+            mixer.channels[7].yaw = 25;
+
+            guiSettings.multi.VTOLMotorN = 1;
+            guiSettings.multi.VTOLMotorNE = 2;
+            guiSettings.multi.VTOLMotorE = 3;
+            guiSettings.multi.VTOLMotorSE = 4;
+            guiSettings.multi.VTOLMotorS = 5;
+            guiSettings.multi.VTOLMotorSW = 6;
+            guiSettings.multi.VTOLMotorW = 7;
+            guiSettings.multi.VTOLMotorNW = 8;
+
+            break;
+        }
+        case VehicleConfigurationSource::MULTI_ROTOR_OCTO_COAX_X: {
+            frame = SystemSettings::AIRFRAMETYPE_OCTOCOAXX;
+
+            mixer.channels[0].type = MIXER_TYPE_MOTOR;
+            mixer.channels[0].throttle1 = 100;
+            mixer.channels[0].throttle2 = 0;
+            mixer.channels[0].roll = 50;
+            mixer.channels[0].pitch = 50;
+            mixer.channels[0].yaw = -50;
+
+            mixer.channels[1].type = MIXER_TYPE_MOTOR;
+            mixer.channels[1].throttle1 = 100;
+            mixer.channels[1].throttle2 = 0;
+            mixer.channels[1].roll = 50;
+            mixer.channels[1].pitch = 50;
+            mixer.channels[1].yaw = 50;
+
+            mixer.channels[2].type = MIXER_TYPE_MOTOR;
+            mixer.channels[2].throttle1 = 100;
+            mixer.channels[2].throttle2 = 0;
+            mixer.channels[2].roll = -50;
+            mixer.channels[2].pitch = 50;
+            mixer.channels[2].yaw = -50;
+
+            mixer.channels[3].type = MIXER_TYPE_MOTOR;
+            mixer.channels[3].throttle1 = 100;
+            mixer.channels[3].throttle2 = 0;
+            mixer.channels[3].roll = -50;
+            mixer.channels[3].pitch = 50;
+            mixer.channels[3].yaw = 50;
+
+            mixer.channels[4].type = MIXER_TYPE_MOTOR;
+            mixer.channels[4].throttle1 = 100;
+            mixer.channels[4].throttle2 = 0;
+            mixer.channels[4].roll = -50;
+            mixer.channels[4].pitch = -50;
+            mixer.channels[4].yaw = -50;
+
+            mixer.channels[5].type = MIXER_TYPE_MOTOR;
+            mixer.channels[5].throttle1 = 100;
+            mixer.channels[5].throttle2 = 0;
+            mixer.channels[5].roll = -50;
+            mixer.channels[5].pitch = -50;
+            mixer.channels[5].yaw = 50;
+
+            mixer.channels[6].type = MIXER_TYPE_MOTOR;
+            mixer.channels[6].throttle1 = 100;
+            mixer.channels[6].throttle2 = 0;
+            mixer.channels[6].roll = 50;
+            mixer.channels[6].pitch = -50;
+            mixer.channels[6].yaw = -50;
+
+            mixer.channels[7].type = MIXER_TYPE_MOTOR;
+            mixer.channels[7].throttle1 = 100;
+            mixer.channels[7].throttle2 = 0;
+            mixer.channels[7].roll = 50;
+            mixer.channels[7].pitch = -50;
+            mixer.channels[7].yaw = 50;
+
+            guiSettings.multi.VTOLMotorNW = 1;
+            guiSettings.multi.VTOLMotorN = 2;
+            guiSettings.multi.VTOLMotorNE = 3;
+            guiSettings.multi.VTOLMotorE = 4;
+            guiSettings.multi.VTOLMotorSE = 5;
+            guiSettings.multi.VTOLMotorS = 6;
+            guiSettings.multi.VTOLMotorSW = 7;
+            guiSettings.multi.VTOLMotorW = 8;
+
+            break;
+        }
+        case VehicleConfigurationSource::MULTI_ROTOR_OCTO_COAX_PLUS: {
+            frame = SystemSettings::AIRFRAMETYPE_OCTOCOAXP;
+
+            mixer.channels[0].type = MIXER_TYPE_MOTOR;
+            mixer.channels[0].throttle1 = 100;
+            mixer.channels[0].throttle2 = 0;
+            mixer.channels[0].roll = 0;
+            mixer.channels[0].pitch = 100;
+            mixer.channels[0].yaw = -50;
+
+            mixer.channels[1].type = MIXER_TYPE_MOTOR;
+            mixer.channels[1].throttle1 = 100;
+            mixer.channels[1].throttle2 = 0;
+            mixer.channels[1].roll = 0;
+            mixer.channels[1].pitch = 100;
+            mixer.channels[1].yaw = 50;
+
+            mixer.channels[2].type = MIXER_TYPE_MOTOR;
+            mixer.channels[2].throttle1 = 100;
+            mixer.channels[2].throttle2 = 0;
+            mixer.channels[2].roll = -100;
+            mixer.channels[2].pitch = 0;
+            mixer.channels[2].yaw = -50;
+
+            mixer.channels[3].type = MIXER_TYPE_MOTOR;
+            mixer.channels[3].throttle1 = 100;
+            mixer.channels[3].throttle2 = 0;
+            mixer.channels[3].roll = -100;
+            mixer.channels[3].pitch = 0;
+            mixer.channels[3].yaw = 50;
+
+            mixer.channels[4].type = MIXER_TYPE_MOTOR;
+            mixer.channels[4].throttle1 = 100;
+            mixer.channels[4].throttle2 = 0;
+            mixer.channels[4].roll = 0;
+            mixer.channels[4].pitch = -100;
+            mixer.channels[4].yaw = -50;
+
+            mixer.channels[5].type = MIXER_TYPE_MOTOR;
+            mixer.channels[5].throttle1 = 100;
+            mixer.channels[5].throttle2 = 0;
+            mixer.channels[5].roll = 0;
+            mixer.channels[5].pitch = -100;
+            mixer.channels[5].yaw = 50;
+
+            mixer.channels[6].type = MIXER_TYPE_MOTOR;
+            mixer.channels[6].throttle1 = 100;
+            mixer.channels[6].throttle2 = 0;
+            mixer.channels[6].roll = 100;
+            mixer.channels[6].pitch = 0;
+            mixer.channels[6].yaw = -50;
+
+            mixer.channels[7].type = MIXER_TYPE_MOTOR;
+            mixer.channels[7].throttle1 = 100;
+            mixer.channels[7].throttle2 = 0;
+            mixer.channels[7].roll = 100;
+            mixer.channels[7].pitch = 0;
+            mixer.channels[7].yaw = 50;
+
+            guiSettings.multi.VTOLMotorN = 1;
+            guiSettings.multi.VTOLMotorNE = 2;
+            guiSettings.multi.VTOLMotorE = 3;
+            guiSettings.multi.VTOLMotorSE = 4;
+            guiSettings.multi.VTOLMotorS = 5;
+            guiSettings.multi.VTOLMotorSW = 6;
+            guiSettings.multi.VTOLMotorW = 7;
+            guiSettings.multi.VTOLMotorNW = 8;
+
+            break;
+        }
+        case VehicleConfigurationSource::MULTI_ROTOR_OCTO_V: {
+            frame = SystemSettings::AIRFRAMETYPE_OCTOV;
+            mixer.channels[0].type = MIXER_TYPE_MOTOR;
+            mixer.channels[0].throttle1 = 100;
+            mixer.channels[0].throttle2 = 0;
+            mixer.channels[0].roll = -25;
+            mixer.channels[0].pitch = 8;
+            mixer.channels[0].yaw = -25;
+
+            mixer.channels[1].type = MIXER_TYPE_MOTOR;
+            mixer.channels[1].throttle1 = 100;
+            mixer.channels[1].throttle2 = 0;
+            mixer.channels[1].roll = -25;
+            mixer.channels[1].pitch = 25;
+            mixer.channels[1].yaw = 25;
+
+            mixer.channels[2].type = MIXER_TYPE_MOTOR;
+            mixer.channels[2].throttle1 = 100;
+            mixer.channels[2].throttle2 = 0;
+            mixer.channels[2].roll = -25;
+            mixer.channels[2].pitch = -25;
+            mixer.channels[2].yaw = -25;
+
+            mixer.channels[3].type = MIXER_TYPE_MOTOR;
+            mixer.channels[3].throttle1 = 100;
+            mixer.channels[3].throttle2 = 0;
+            mixer.channels[3].roll = -25;
+            mixer.channels[3].pitch = -8;
+            mixer.channels[3].yaw = 25;
+
+            mixer.channels[4].type = MIXER_TYPE_MOTOR;
+            mixer.channels[4].throttle1 = 100;
+            mixer.channels[4].throttle2 = 0;
+            mixer.channels[4].roll = 25;
+            mixer.channels[4].pitch = -8;
+            mixer.channels[4].yaw = -25;
+
+            mixer.channels[5].type = MIXER_TYPE_MOTOR;
+            mixer.channels[5].throttle1 = 100;
+            mixer.channels[5].throttle2 = 0;
+            mixer.channels[5].roll = 25;
+            mixer.channels[5].pitch = -25;
+            mixer.channels[5].yaw = 25;
+
+            mixer.channels[6].type = MIXER_TYPE_MOTOR;
+            mixer.channels[6].throttle1 = 100;
+            mixer.channels[6].throttle2 = 0;
+            mixer.channels[6].roll = 25;
+            mixer.channels[6].pitch = 25;
+            mixer.channels[6].yaw = -25;
+
+            mixer.channels[7].type = MIXER_TYPE_MOTOR;
+            mixer.channels[7].throttle1 = 100;
+            mixer.channels[7].throttle2 = 0;
+            mixer.channels[7].roll = 25;
+            mixer.channels[7].pitch = 8;
+            mixer.channels[7].yaw = 25;
+
+            guiSettings.multi.VTOLMotorN = 1;
+            guiSettings.multi.VTOLMotorNE = 2;
+            guiSettings.multi.VTOLMotorE = 3;
+            guiSettings.multi.VTOLMotorSE = 4;
+            guiSettings.multi.VTOLMotorS = 5;
+            guiSettings.multi.VTOLMotorSW = 6;
+            guiSettings.multi.VTOLMotorW = 7;
+            guiSettings.multi.VTOLMotorNW = 8;
+
+            break;
+        }
+        default:
+            break;
+    }
+
+    applyMixerConfiguration(mixer);
+    applyMultiGUISettings(frame, guiSettings);
 }

@@ -69,16 +69,42 @@ bool MultiPage::validatePage()
 
 void MultiPage::setupMultiTypesCombo()
 {
-    ui->typeCombo->addItem("Tricopter", SetupWizard::MULTI_ROTOR_TRI_Y);
-    ui->typeCombo->addItem("Quadcopter X", SetupWizard::MULTI_ROTOR_QUAD_X);
-    ui->typeCombo->addItem("Quadcopter +", SetupWizard::MULTI_ROTOR_QUAD_PLUS);
-    ui->typeCombo->addItem("Hexacopter", SetupWizard::MULTI_ROTOR_HEXA);
-    ui->typeCombo->addItem("Hexacopter Coax (Y6)", SetupWizard::MULTI_ROTOR_HEXA_COAX_Y);
-    ui->typeCombo->addItem("Hexacopter H", SetupWizard::MULTI_ROTOR_HEXA_H);
-    ui->typeCombo->addItem("Octocopter", SetupWizard::MULTI_ROTOR_OCTO);
-    ui->typeCombo->addItem("Octocopter Coax X", SetupWizard::MULTI_ROTOR_OCTO_COAX_X);
-    ui->typeCombo->addItem("Octocopter Coax +", SetupWizard::MULTI_ROTOR_OCTO_COAX_PLUS);
-    ui->typeCombo->addItem("Octocopter V", SetupWizard::MULTI_ROTOR_OCTO_V);
+    ui->typeCombo->addItem(tr("Tricopter"), SetupWizard::MULTI_ROTOR_TRI_Y);
+    m_descriptions << tr("The Tricopter uses three motors and one servo. The servo is used to give yaw authority to the aft motor. "
+                         "The fore motors are rotating in opposite directions. The Tricopter is known for its sweeping yaw movement and "
+                         "it is very well suited for FPV since the front rotors are spread wide apart.");
+
+    ui->typeCombo->addItem(tr("Quadcopter X"), SetupWizard::MULTI_ROTOR_QUAD_X);
+    m_descriptions << tr("The X Quadcopter uses four motors and is the most common multi rotor configuration. Two of the motors rotates clockwise "
+                         "and two counter clockwise. The motors positioned diagonal of each other rotates in the same direction. "
+                         "This setup is perfect for sport flying and is also commonly used for FPV platforms.");
+
+    ui->typeCombo->addItem(tr("Quadcopter +"), SetupWizard::MULTI_ROTOR_QUAD_PLUS);
+    m_descriptions << tr("The Plus(+) Quadcopter uses four motors and is similar to the X Quadcopter but the forward direction is offset by 45 degrees. "
+                         "The motors fore and aft rotates in one direction and the motors steerboard and port rotates in the other. "
+                         "This setup was one of the first to be used and is still used for sport flying. This configuration is not that well suited "
+                         "for FPV since the fore rotor tend to be in the way of the camera.");
+
+    ui->typeCombo->addItem(tr("Hexacopter"), SetupWizard::MULTI_ROTOR_HEXA);
+    m_descriptions << tr("Hexacopter");
+
+    ui->typeCombo->addItem(tr("Hexacopter Coax (Y6)"), SetupWizard::MULTI_ROTOR_HEXA_COAX_Y);
+    m_descriptions << tr("Hexacopter Coax (Y6)");
+
+    ui->typeCombo->addItem(tr("Hexacopter H"), SetupWizard::MULTI_ROTOR_HEXA_H);
+    m_descriptions << tr("Hexacopter H");
+
+    ui->typeCombo->addItem(tr("Octocopter"), SetupWizard::MULTI_ROTOR_OCTO);
+    m_descriptions << tr("Octocopter");
+
+    ui->typeCombo->addItem(tr("Octocopter Coax X"), SetupWizard::MULTI_ROTOR_OCTO_COAX_X);
+    m_descriptions << tr("Octocopter Coax X");
+
+    ui->typeCombo->addItem(tr("Octocopter Coax +"), SetupWizard::MULTI_ROTOR_OCTO_COAX_PLUS);
+    m_descriptions << tr("Octocopter Coax +");
+
+    ui->typeCombo->addItem(tr("Octocopter V"), SetupWizard::MULTI_ROTOR_OCTO_V);
+    m_descriptions << tr("Octocopter V");
 }
 
 void MultiPage::updateAvailableTypes()
@@ -94,9 +120,7 @@ void MultiPage::updateImageAndDescription()
 {
     SetupWizard::VEHICLE_SUB_TYPE type = (SetupWizard::VEHICLE_SUB_TYPE) ui->typeCombo->itemData(ui->typeCombo->currentIndex()).toInt();
     QString elementId = "";
-    QString description = "Descriptive text with information about ";
-    description.append(ui->typeCombo->currentText());
-    description.append(" multirotors.");
+    QString description = m_descriptions.at(ui->typeCombo->currentIndex());
     switch(type)
     {
         case SetupWizard::MULTI_ROTOR_TRI_Y:

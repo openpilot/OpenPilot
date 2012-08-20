@@ -32,7 +32,7 @@
 #include "flightdatamodel.h"
 
 
-class mapDataDelegate : public QItemDelegate
+class MapDataDelegate : public QItemDelegate
  {
         Q_OBJECT
 
@@ -47,7 +47,7 @@ class mapDataDelegate : public QItemDelegate
                    COMMAND_ONCONDITIONJUMPWAYPOINT=2, COMMAND_ONNOTCONDITIONJUMPWAYPOINT=3,
                    COMMAND_IFCONDITIONJUMPWAYPOINTELSENEXTWAYPOINT=4 } CommandOptions;
 
-     mapDataDelegate(QObject *parent = 0);
+     MapDataDelegate(QObject *parent = 0);
 
      QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option,
                            const QModelIndex &index) const;

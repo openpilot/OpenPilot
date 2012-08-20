@@ -2,7 +2,7 @@
 ******************************************************************************
 *
 * @file       mapgraphicitem.cpp
-* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
 * @brief      The main graphicsItem used on the widget, contains the map and map logic
 * @see        The GNU Public License (GPL) Version 3
 * @defgroup   OPMapWidget

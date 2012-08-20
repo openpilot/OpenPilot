@@ -82,18 +82,18 @@ modelMapProxy::overlayType modelMapProxy::overlayTranslate(int type)
 {
     switch(type)
     {
-    case mapDataDelegate::MODE_FLYENDPOINT:
-    case mapDataDelegate::MODE_FLYVECTOR:
-    case mapDataDelegate::MODE_DRIVEENDPOINT:
-    case mapDataDelegate::MODE_DRIVEVECTOR:
+    case MapDataDelegate::MODE_FLYENDPOINT:
+    case MapDataDelegate::MODE_FLYVECTOR:
+    case MapDataDelegate::MODE_DRIVEENDPOINT:
+    case MapDataDelegate::MODE_DRIVEVECTOR:
        return OVERLAY_LINE;
         break;
-    case mapDataDelegate::MODE_FLYCIRCLERIGHT:
-    case mapDataDelegate::MODE_DRIVECIRCLERIGHT:
+    case MapDataDelegate::MODE_FLYCIRCLERIGHT:
+    case MapDataDelegate::MODE_DRIVECIRCLERIGHT:
         return OVERLAY_CIRCLE_RIGHT;
          break;
-    case mapDataDelegate::MODE_FLYCIRCLELEFT:
-    case mapDataDelegate::MODE_DRIVECIRCLELEFT:
+    case MapDataDelegate::MODE_FLYCIRCLELEFT:
+    case MapDataDelegate::MODE_DRIVECIRCLELEFT:
         return OVERLAY_CIRCLE_LEFT;
         break;
     default:
@@ -167,23 +167,23 @@ void modelMapProxy::refreshOverlays()
         createOverlay(wp_current,findWayPointNumber(wp_error),wp_error_overlay,Qt::red);
         switch(model->data(model->index(x,flightDataModel::COMMAND)).toInt())
         {
-        case mapDataDelegate::COMMAND_ONCONDITIONNEXTWAYPOINT:
+        case MapDataDelegate::COMMAND_ONCONDITIONNEXTWAYPOINT:
             wp_next=findWayPointNumber(x+1);
             createOverlay(wp_current,wp_next,wp_next_overlay,Qt::green);
             break;
-        case mapDataDelegate::COMMAND_ONCONDITIONJUMPWAYPOINT:
+        case MapDataDelegate::COMMAND_ONCONDITIONJUMPWAYPOINT:
             wp_next=findWayPointNumber(wp_jump);
             createOverlay(wp_current,wp_next,wp_jump_overlay,Qt::green);
             break;
-        case mapDataDelegate::COMMAND_ONNOTCONDITIONJUMPWAYPOINT:
+        case MapDataDelegate::COMMAND_ONNOTCONDITIONJUMPWAYPOINT:
             wp_next=findWayPointNumber(wp_jump);
             createOverlay(wp_current,wp_next,wp_jump_overlay,Qt::yellow);
             break;
-        case mapDataDelegate::COMMAND_ONNOTCONDITIONNEXTWAYPOINT:
+        case MapDataDelegate::COMMAND_ONNOTCONDITIONNEXTWAYPOINT:
             wp_next=findWayPointNumber(x+1);
             createOverlay(wp_current,wp_next,wp_next_overlay,Qt::yellow);
             break;
-        case mapDataDelegate::COMMAND_IFCONDITIONJUMPWAYPOINTELSENEXTWAYPOINT:
+        case MapDataDelegate::COMMAND_IFCONDITIONJUMPWAYPOINTELSENEXTWAYPOINT:
             wp_next=findWayPointNumber(wp_jump);
             createOverlay(wp_current,wp_next,wp_jump_overlay,Qt::green);
             wp_next=findWayPointNumber(x+1);

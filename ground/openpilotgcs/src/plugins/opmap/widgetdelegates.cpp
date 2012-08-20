@@ -28,7 +28,7 @@
 #include <QComboBox>
 #include <QRadioButton>
 #include <QDebug>
-QWidget *mapDataDelegate::createEditor(QWidget *parent,
+QWidget *MapDataDelegate::createEditor(QWidget *parent,
                                         const QStyleOptionViewItem & option,
                                         const QModelIndex & index) const
 {
@@ -38,18 +38,18 @@ QWidget *mapDataDelegate::createEditor(QWidget *parent,
     {
     case flightDataModel::MODE:
         box=new QComboBox(parent);
-        mapDataDelegate::loadComboBox(box,flightDataModel::MODE);
+        MapDataDelegate::loadComboBox(box,flightDataModel::MODE);
         return box;
         break;
     case flightDataModel::CONDITION:
         box=new QComboBox(parent);
-        mapDataDelegate::loadComboBox(box,flightDataModel::CONDITION);
+        MapDataDelegate::loadComboBox(box,flightDataModel::CONDITION);
         return box;
         break;
 
     case flightDataModel::COMMAND:
         box=new QComboBox(parent);
-        mapDataDelegate::loadComboBox(box,flightDataModel::COMMAND);
+        MapDataDelegate::loadComboBox(box,flightDataModel::COMMAND);
         return box;
         break;
     default:
@@ -61,7 +61,7 @@ QWidget *mapDataDelegate::createEditor(QWidget *parent,
     return editor;
 }
 
-void mapDataDelegate::setEditorData(QWidget *editor,
+void MapDataDelegate::setEditorData(QWidget *editor,
                                      const QModelIndex &index) const
 {
     if(!index.isValid())
@@ -78,7 +78,7 @@ void mapDataDelegate::setEditorData(QWidget *editor,
         QItemDelegate::setEditorData(editor, index);
 }
 
-void mapDataDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
+void MapDataDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
                                     const QModelIndex &index) const
 {
     QString className=editor->metaObject()->className();
@@ -91,13 +91,13 @@ void mapDataDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
         QItemDelegate::setModelData(editor,model,index);
 }
 
-void mapDataDelegate::updateEditorGeometry(QWidget *editor,
+void MapDataDelegate::updateEditorGeometry(QWidget *editor,
                                             const QStyleOptionViewItem &option, const QModelIndex &/* index */) const
 {
     editor->setGeometry(option.rect);
 }
 
-void mapDataDelegate::loadComboBox(QComboBox *combo, flightDataModel::pathPlanDataEnum type)
+void MapDataDelegate::loadComboBox(QComboBox *combo, flightDataModel::pathPlanDataEnum type)
 {
     switch(type)
     {
@@ -138,6 +138,6 @@ void mapDataDelegate::loadComboBox(QComboBox *combo, flightDataModel::pathPlanDa
     }
 }
 
-mapDataDelegate::mapDataDelegate(QObject *parent):QItemDelegate(parent)
+MapDataDelegate::MapDataDelegate(QObject *parent):QItemDelegate(parent)
 {
 }

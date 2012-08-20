@@ -50,7 +50,7 @@ void pathPlanner::setModel(flightDataModel *model,QItemSelectionModel *selection
     ui->tableView->setModel(model);
     ui->tableView->setSelectionModel(selection);
     ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
-    ui->tableView->setItemDelegate(new mapDataDelegate(this));
+    ui->tableView->setItemDelegate(new MapDataDelegate(this));
     connect(model,SIGNAL(rowsInserted(const QModelIndex&,int,int)),this,SLOT(rowsInserted(const QModelIndex&,int,int)));
     wid=new opmap_edit_waypoint_dialog(NULL,model,selection);
     ui->tableView->resizeColumnsToContents();

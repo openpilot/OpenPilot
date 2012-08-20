@@ -42,12 +42,12 @@ opmap_edit_waypoint_dialog::opmap_edit_waypoint_dialog(QWidget *parent,QAbstract
     connect(ui->cbCondition,SIGNAL(currentIndexChanged(int)),this,SLOT(setupConditionWidgets()));
     connect(ui->pushButtonApply,SIGNAL(clicked()),this,SLOT(pushButtonApply_clicked()));
     connect(ui->pushButtonCancel,SIGNAL(clicked()),this,SLOT(pushButtonCancel_clicked()));
-    mapDataDelegate::loadComboBox(ui->cbMode,flightDataModel::MODE);
-    mapDataDelegate::loadComboBox(ui->cbCondition,flightDataModel::CONDITION);
-    mapDataDelegate::loadComboBox(ui->cbCommand,flightDataModel::COMMAND);
+    MapDataDelegate::loadComboBox(ui->cbMode,flightDataModel::MODE);
+    MapDataDelegate::loadComboBox(ui->cbCondition,flightDataModel::CONDITION);
+    MapDataDelegate::loadComboBox(ui->cbCommand,flightDataModel::COMMAND);
     mapper = new QDataWidgetMapper(this);
 
-    mapper->setItemDelegate(new mapDataDelegate(this));
+    mapper->setItemDelegate(new MapDataDelegate(this));
     connect(mapper,SIGNAL(currentIndexChanged(int)),this,SLOT(currentIndexChanged(int)));
     mapper->setModel(model);
     mapper->setSubmitPolicy(QDataWidgetMapper::ManualSubmit);
@@ -101,18 +101,18 @@ void opmap_edit_waypoint_dialog::on_pushButtonOK_clicked()
 
 void opmap_edit_waypoint_dialog::setupModeWidgets()
 {
-    mapDataDelegate::ModeOptions mode=(mapDataDelegate::ModeOptions)ui->cbMode->itemData(ui->cbMode->currentIndex()).toInt();
+    MapDataDelegate::ModeOptions mode=(MapDataDelegate::ModeOptions)ui->cbMode->itemData(ui->cbMode->currentIndex()).toInt();
     switch(mode)
     {
-    case mapDataDelegate::MODE_FLYENDPOINT:
-    case mapDataDelegate::MODE_FLYVECTOR:
-    case mapDataDelegate::MODE_FLYCIRCLERIGHT:
-    case mapDataDelegate::MODE_FLYCIRCLELEFT:
-    case mapDataDelegate::MODE_DRIVEENDPOINT:
-    case mapDataDelegate::MODE_DRIVEVECTOR:
-    case mapDataDelegate::MODE_DRIVECIRCLELEFT:
-    case mapDataDelegate::MODE_DRIVECIRCLERIGHT:
-    case mapDataDelegate::MODE_DISARMALARM:
+    case MapDataDelegate::MODE_FLYENDPOINT:
+    case MapDataDelegate::MODE_FLYVECTOR:
+    case MapDataDelegate::MODE_FLYCIRCLERIGHT:
+    case MapDataDelegate::MODE_FLYCIRCLELEFT:
+    case MapDataDelegate::MODE_DRIVEENDPOINT:
+    case MapDataDelegate::MODE_DRIVEVECTOR:
+    case MapDataDelegate::MODE_DRIVECIRCLELEFT:
+    case MapDataDelegate::MODE_DRIVECIRCLERIGHT:
+    case MapDataDelegate::MODE_DISARMALARM:
         ui->modeParam1->setVisible(false);
         ui->modeParam2->setVisible(false);
         ui->modeParam3->setVisible(false);
@@ -122,7 +122,7 @@ void opmap_edit_waypoint_dialog::setupModeWidgets()
         ui->dsb_modeParam3->setVisible(false);
         ui->dsb_modeParam4->setVisible(false);
         break;
-    case mapDataDelegate::MODE_FIXEDATTITUDE:
+    case MapDataDelegate::MODE_FIXEDATTITUDE:
         ui->modeParam1->setText("pitch");
         ui->modeParam2->setText("roll");
         ui->modeParam3->setText("yaw");
@@ -136,7 +136,7 @@ void opmap_edit_waypoint_dialog::setupModeWidgets()
         ui->dsb_modeParam3->setVisible(true);
         ui->dsb_modeParam4->setVisible(true);
         break;
-    case mapDataDelegate::MODE_SETACCESSORY:
+    case MapDataDelegate::MODE_SETACCESSORY:
         ui->modeParam1->setText("Acc.channel");
         ui->modeParam2->setText("Value");
         ui->modeParam1->setVisible(true);
@@ -152,12 +152,12 @@ void opmap_edit_waypoint_dialog::setupModeWidgets()
 }
 void opmap_edit_waypoint_dialog::setupConditionWidgets()
 {
-    mapDataDelegate::EndConditionOptions mode=(mapDataDelegate::EndConditionOptions)ui->cbCondition->itemData(ui->cbCondition->currentIndex()).toInt();
+    MapDataDelegate::EndConditionOptions mode=(MapDataDelegate::EndConditionOptions)ui->cbCondition->itemData(ui->cbCondition->currentIndex()).toInt();
     switch(mode)
     {
-    case mapDataDelegate::ENDCONDITION_NONE:
-    case mapDataDelegate::ENDCONDITION_IMMEDIATE:
-    case mapDataDelegate::ENDCONDITION_PYTHONSCRIPT:
+    case MapDataDelegate::ENDCONDITION_NONE:
+    case MapDataDelegate::ENDCONDITION_IMMEDIATE:
+    case MapDataDelegate::ENDCONDITION_PYTHONSCRIPT:
         ui->condParam1->setVisible(false);
         ui->condParam2->setVisible(false);
         ui->condParam3->setVisible(false);
@@ -167,7 +167,7 @@ void opmap_edit_waypoint_dialog::setupConditionWidgets()
         ui->dsb_condParam3->setVisible(false);
         ui->dsb_condParam4->setVisible(false);
         break;
-    case mapDataDelegate::ENDCONDITION_TIMEOUT:
+    case MapDataDelegate::ENDCONDITION_TIMEOUT:
         ui->condParam1->setVisible(true);
         ui->condParam2->setVisible(false);
         ui->condParam3->setVisible(false);
@@ -178,7 +178,7 @@ void opmap_edit_waypoint_dialog::setupConditionWidgets()
         ui->dsb_condParam4->setVisible(false);
         ui->condParam1->setText("Timeout(ms)");
         break;
-    case mapDataDelegate::ENDCONDITION_DISTANCETOTARGET:
+    case MapDataDelegate::ENDCONDITION_DISTANCETOTARGET:
         ui->condParam1->setVisible(true);
         ui->condParam2->setVisible(true);
         ui->condParam3->setVisible(false);
@@ -190,7 +190,7 @@ void opmap_edit_waypoint_dialog::setupConditionWidgets()
         ui->condParam1->setText("Distance(m)");
         ui->condParam2->setText("Flag(0=2D,1=3D)");//FIXME
         break;
-    case mapDataDelegate::ENDCONDITION_LEGREMAINING:
+    case MapDataDelegate::ENDCONDITION_LEGREMAINING:
         ui->condParam1->setVisible(true);
         ui->condParam2->setVisible(false);
         ui->condParam3->setVisible(false);
@@ -201,7 +201,7 @@ void opmap_edit_waypoint_dialog::setupConditionWidgets()
         ui->dsb_condParam4->setVisible(false);
         ui->condParam1->setText("Relative Distance(0=complete,1=just starting)");
         break;
-    case mapDataDelegate::ENDCONDITION_ABOVEALTITUDE:
+    case MapDataDelegate::ENDCONDITION_ABOVEALTITUDE:
         ui->condParam1->setVisible(true);
         ui->condParam2->setVisible(false);
         ui->condParam3->setVisible(false);
@@ -212,7 +212,7 @@ void opmap_edit_waypoint_dialog::setupConditionWidgets()
         ui->dsb_condParam4->setVisible(false);
         ui->condParam1->setText("Altitude in meters (negative)");
         break;
-    case mapDataDelegate::ENDCONDITION_POINTINGTOWARDSNEXT:
+    case MapDataDelegate::ENDCONDITION_POINTINGTOWARDSNEXT:
         ui->condParam1->setVisible(true);
         ui->condParam2->setVisible(false);
         ui->condParam3->setVisible(false);

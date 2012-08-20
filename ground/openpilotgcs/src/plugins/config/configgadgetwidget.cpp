@@ -226,17 +226,15 @@ void ConfigGadgetWidget::tabAboutToChange(int i,bool * proceed)
   */
 void ConfigGadgetWidget::updatePipXStatus(UAVObject *object)
 {
-
-	// Restart the disconnection timer.
-	pipxTimeout->start(5000);
-	if (!pipxConnected)
-	{
-		qDebug()<<"ConfigGadgetWidget onPipxtremeConnect";
-		QWidget *qwd = new ConfigPipXtremeWidget(this);
-		ftw->insertTab(ConfigGadgetWidget::pipxtreme, qwd, QIcon(":/configgadget/images/PipXtreme.png"), QString("PipXtreme"));
-		ftw->setCurrentIndex(ConfigGadgetWidget::pipxtreme);
-		pipxConnected = true;
-	}
+    // Restart the disconnection timer.
+    pipxTimeout->start(5000);
+    if (!pipxConnected)
+    {
+        qDebug()<<"ConfigGadgetWidget onPipxtremeConnect";
+        QWidget *qwd = new ConfigPipXtremeWidget(this);
+        ftw->insertTab(ConfigGadgetWidget::pipxtreme, qwd, QIcon(":/configgadget/images/PipXtreme.png"), QString("PipXtreme"));
+        pipxConnected = true;
+    }
 }
 
 void ConfigGadgetWidget::onPipxtremeDisconnect() {

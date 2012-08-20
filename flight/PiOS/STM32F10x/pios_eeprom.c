@@ -37,7 +37,7 @@
 #include <pios_eeprom.h>
 
 static struct pios_eeprom_cfg config;
-
+void PIOS_EEPROM_CRC_Ini();
 /**
  * Initialize the flash eeprom device
  * \param cfg     The configuration structure.
@@ -57,7 +57,7 @@ int32_t PIOS_EEPROM_Save(uint8_t *data, uint32_t len)
 {
 
 	// We need to write 32 bit words, so extend the length to be an even multiple of 4 bytes,
-	// and include 4 bytes for the 32 bit CRC.
+	// and include 4 bytes for the 32 bit CR--C.
 	uint32_t nwords = (len / 4) + 1 + (len % 4 ? 1 : 0);
 	uint32_t size = nwords * 4;
 
@@ -65,9 +65,14 @@ int32_t PIOS_EEPROM_Save(uint8_t *data, uint32_t len)
 	if (size > config.max_size)
 		return -1;
 
-	// Calculate a 32 bit CRC of the data.
-	uint32_t crc = PIOS_CRC32_updateCRC(0xffffffff, data, len);
+	// Calculate a 32 bit CRC of the flash data.
+	PIOS_EEPROM_CRC_Ini();
+	CRC_ResetDR();
 
+	// do the CRC calculation from the flash to be sure that it's correctly 32bit aligned/padded
+	// while preventing copying to an additional memory buffer.
+	CRC_CalcBlockCRC((uint32_t*)(config.base_address), nwords -1);
+	uint32_t crc = CRC_GetCRC();
 	// Unlock the Flash Program Erase controller
 	FLASH_Unlock();
 
@@ -89,14 +94,15 @@ int32_t PIOS_EEPROM_Save(uint8_t *data, uint32_t len)
 	// write 4 bytes at a time into program flash area (emulated EEPROM area)
 	uint8_t *p1 = data;
 	uint32_t *p3 = (uint32_t *)config.base_address;
+	// reset the CRC peripheral to calculate the new data CRC
+	CRC_ResetDR();
 	for (int32_t i = 0; i < size; p3++)
 	{
 		uint32_t value = 0;
 
 		if (i == (size - 4))
 		{
-			// write the CRC.
-			value = crc;
+			value = CRC_GetCRC();
 			i += 4;
 		}
 		else
@@ -107,6 +113,8 @@ int32_t PIOS_EEPROM_Save(uint8_t *data, uint32_t len)
 			if (i < len) value |= (uint32_t)*p1++ << 24; else value |= 0xff000000; i++;
 		}
 
+		//Calculate the CRC using the 32bit aligned/padded values
+		CRC_CalcCRC(value);
 		// write a 32-bit value
 		fs = FLASH_ProgramWord((uint32_t)p3, value);
 		if (fs != FLASH_COMPLETE)
@@ -146,10 +154,19 @@ int32_t PIOS_EEPROM_Load(uint8_t *data, uint32_t len)
 	// Read the CRC.
 	uint32_t crc_flash = *((uint32_t*)(config.base_address + size - 4));
 
-	// Calculate a 32 bit CRC of the data.
-	uint32_t crc = PIOS_CRC32_updateCRC(0xffffffff, data, len);
+	// Calculate a 32 bit CRC of the flash data.
+	PIOS_EEPROM_CRC_Ini();
+	CRC_ResetDR();
+	CRC_CalcBlockCRC((uint32_t*)(config.base_address), nwords -1);
+	uint32_t crc = CRC_GetCRC();
+
 	if(crc != crc_flash)
 		return -2;
 
 	return 0;
+}
+
+void PIOS_EEPROM_CRC_Ini()
+{
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_CRC, ENABLE);
 }

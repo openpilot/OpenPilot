@@ -2,7 +2,7 @@
 ******************************************************************************
 *
 * @file       waypointcircle.h
-* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
 * @brief      A graphicsItem representing a circle connecting 2 waypoints
 * @see        The GNU Public License (GPL) Version 3
 * @defgroup   OPMapWidget

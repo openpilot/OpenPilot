@@ -2,7 +2,7 @@
  ******************************************************************************
  *
  * @file       modelmapproxy.cpp
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup OPMapPlugin OpenPilot Map Plugin

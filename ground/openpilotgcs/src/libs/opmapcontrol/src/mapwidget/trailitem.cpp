@@ -2,7 +2,7 @@
 ******************************************************************************
 *
 * @file       trailitem.cpp
-* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
 * @brief      A graphicsItem representing a trail point
 * @see        The GNU Public License (GPL) Version 3
 * @defgroup   OPMapWidget

@@ -795,6 +795,8 @@ static void radioStatusTask(void *parameters)
 
 		// Update the status
 		pipxStatus.DeviceID = PIOS_RFM22B_DeviceID(pios_rfm22b_id);
+		pipxStatus.AFC = PIOS_RFM22B_AFC(pios_rfm22b_id);
+		pipxStatus.AGC = PIOS_RFM22B_AGC(pios_rfm22b_id);
 		pipxStatus.Retries = data->comTxRetries;
 		pipxStatus.Errors = data->packetErrors;
 		pipxStatus.UAVTalkErrors = data->UAVTalkErrors;

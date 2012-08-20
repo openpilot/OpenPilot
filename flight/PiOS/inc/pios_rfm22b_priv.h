@@ -612,6 +612,7 @@ void rfm22_setRxMode(uint8_t mode, bool multi_packet_mode);
 int8_t rfm22_getRSSI(void);
 
 int8_t rfm22_receivedRSSI(void);
+uint8_t rfm22_receivedAGC(void);
 int32_t rfm22_receivedAFCHz(void);
 uint16_t rfm22_receivedLength(void);
 uint8_t * rfm22_receivedPointer(void);

@@ -381,6 +381,8 @@ volatile int8_t	rx_packet_start_rssi_dBm;							//
 volatile int8_t	rx_packet_start_afc_Hz;								//
 volatile int8_t	rx_packet_rssi_dBm;									// the received packet signal strength
 volatile int8_t	rx_packet_afc_Hz;									// the receive packet frequency offset
+volatile uint8_t	tx_packet_agc_gain;					// the received packet agc gain
+
 
 int					lookup_index;
 int					ss_lookup_index;
@@ -531,6 +533,16 @@ uint32_t PIOS_RFM22B_DeviceID(uint32_t rfm22b_id)
 int8_t PIOS_RFM22B_RSSI(uint32_t rfm22b_id)
 {
 	return rfm22_receivedRSSI();
+}
+
+uint8_t PIOS_RFM22B_AGC(uint32_t rfm22b_id)
+{
+	return rfm22_receivedAGC();
+}
+
+int32_t PIOS_RFM22B_AFC(uint32_t rfm22b_id)
+{
+	return rfm22_receivedAFCHz();
 }
 
 int16_t PIOS_RFM22B_Resets(uint32_t rfm22b_id)
@@ -1402,6 +1414,13 @@ void rfm22_processRxInt(void)
 		// convert the afc value to Hz
 		afc_correction_Hz = (int32_t)(frequency_step_size * afc_correction + 0.5f);
 
+		uint8_t agc_tmp = (uint8_t)rfm22_read(RFM22_agc_override1);
+		// bit 5: 1 if lna=25dB, 0 if lna=5dB
+		tx_packet_agc_gain = (agc_tmp && 0x10) == 0 ? 5 : 25;
+		agc_tmp &=0x0f;
+		// bits 0:3 is pga gain in 3dB increments
+		tx_packet_agc_gain += agc_tmp * 3;
+		
 		// remember the rssi for this packet
 		rx_packet_start_rssi_dBm = rssi_dBm;
 		// remember the afc value for this packet
@@ -1693,6 +1712,16 @@ int32_t rfm22_receivedAFCHz(void)
 		return 0;
 	else
 		return rx_packet_afc_Hz;
+}
+
+uint8_t rfm22_receivedAGC(void)
+{	// return the packets AGC provided total gain
+	if(!initialized)
+		return 0;
+	else {
+		return tx_packet_agc_gain;
+	}
+
 }
 
 // ************************************

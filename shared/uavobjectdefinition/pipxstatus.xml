@@ -23,7 +23,7 @@
 		<field name="LinkState" units="function" type="enum" elements="1" options="Disconnected,Connecting,Connected" defaultvalue="Disconnected"/>
 		<field name="PairIDs" units="" type="uint32" elements="4" defaultvalue="0"/>
 		<field name="PairSignalStrengths" units="dBm" type="int8" elements="4" defaultvalue="-127"/>
-
+		<field name="AGC" units="dB" type="uint8" elements="1" defaultvalue="0"/>
 		<access gcs="readonly" flight="readwrite"/>
 		<telemetrygcs acked="false" updatemode="manual" period="0"/>
 		<telemetryflight acked="false" updatemode="manual" period="0"/>

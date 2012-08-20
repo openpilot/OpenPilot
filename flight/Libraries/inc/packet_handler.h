@@ -59,6 +59,7 @@ typedef struct {
 	uint8_t data_size;
 	uint8_t tx_seq;
 	uint8_t rx_seq;
+	int8_t rssi;
 } PHPacketHeader;
 
 #define PH_MAX_DATA (PIOS_PH_MAX_PACKET - sizeof(PHPacketHeader) - RS_ECC_NPARITY)

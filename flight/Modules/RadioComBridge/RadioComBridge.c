@@ -137,6 +137,8 @@ typedef struct {
 	// The RSSI of the last packet received.
 	int8_t RSSI;
 
+	// The RSSI seen by the sender of the last packet received.
+	int8_t PeerRSSI;
 	// Thread parameters.
 	UAVTalkComTaskParams uavtalk_params;
 	UAVTalkComTaskParams gcs_uavtalk_params;
@@ -270,6 +272,7 @@ static int32_t RadioComBridgeInitialize(void)
 	data->UAVTalkErrors = 0;
 	data->packetErrors = 0;
 	data->RSSI = -127;
+	data->PeerRSSI = -127;
 
 	// Register the callbacks with the packet handler
 	PHRegisterOutputStream(pios_packet_handler, transmitPacket);
@@ -390,6 +393,7 @@ static void UAVTalkRecvTask(void *parameters)
 			p->header.type = PACKET_TYPE_DATA;
 			p->data[0] = rx_byte;
 			p->header.data_size = 1;
+			p->header.rssi = data->RSSI;
 			continue;
 		}
 
@@ -582,6 +586,8 @@ static void radioReceiveTask(void *parameters)
 
 		// Verify that the packet is valid and pass it on.
 		if(PHVerifyPacket(pios_packet_handler, p, rx_bytes) > 0) {
+			if(p->header.type==PACKET_TYPE_DATA || p->header.type==PACKET_TYPE_STATUS)
+				data->PeerRSSI = p->header.rssi;
 			UAVObjEvent ev;
 			ev.obj = (UAVObjHandle)p;
 			ev.event = EV_PACKET_RECEIVED;
@@ -725,6 +731,7 @@ static void transparentCommTask(void * parameters)
 			//p->header.type = PACKET_TYPE_ACKED_DATA;
 			p->header.type = PACKET_TYPE_DATA;
 			p->header.data_size = 0;
+			p->header.rssi = data->RSSI;
 		}
 
 		// Receive data from the com port
@@ -799,6 +806,7 @@ static void radioStatusTask(void *parameters)
 		data->rxBytes = 0;
 		pipxStatus.LinkState = PIPXSTATUS_LINKSTATE_DISCONNECTED;
 		pipxStatus.RSSI = data->RSSI;
+		pipxStatus.PeerRSSI = data->PeerRSSI;
 		LINK_LED_OFF;
 
 		// Update the potential pairing contacts

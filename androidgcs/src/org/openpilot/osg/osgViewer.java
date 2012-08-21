@@ -1,24 +1,21 @@
 package org.openpilot.osg;
 
+import org.openpilot.androidgcs.R;
+
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -75,39 +72,13 @@ public class osgViewer extends Activity implements View.OnTouchListener, View.On
 	        	uiLightChangeButton.setOnClickListener(uiListenerChangeLight);
 
 	    //Creating Toasts
-       	msgUiNavPrincipal = Toast.makeText(getApplicationContext(), R.string.uiToastNavPrincipal, Toast.LENGTH_SHORT);
-       	msgUiNavSecondary = Toast.makeText(getApplicationContext(), R.string.uiToastNavSecond, Toast.LENGTH_SHORT);
-       	msgUiLightOn  = Toast.makeText(getApplicationContext(), R.string.uiToastLightOn, Toast.LENGTH_SHORT);
-       	msgUiLightOff  = Toast.makeText(getApplicationContext(), R.string.uiToastLightOff, Toast.LENGTH_SHORT);
+       	msgUiNavPrincipal = Toast.makeText(getApplicationContext(), "toast1", Toast.LENGTH_SHORT);
+       	msgUiNavSecondary = Toast.makeText(getApplicationContext(), "toast2", Toast.LENGTH_SHORT);
+       	msgUiLightOn  = Toast.makeText(getApplicationContext(), "toast3", Toast.LENGTH_SHORT);
+       	msgUiLightOff  = Toast.makeText(getApplicationContext(), "toast4", Toast.LENGTH_SHORT);
 
-       	//Creating Dialogs
+       	//osgNativeLib.loadObject(address.getText().toString());
 
-       	LayoutInflater factory = LayoutInflater.from(getApplicationContext());
-		final View textEntryView = factory.inflate(R.layout.dialog_text_entry, null);
-		AlertDialog.Builder loadLayerDialogBuilder = new AlertDialog.Builder(this);
-		loadLayerDialogBuilder.setIcon(R.drawable.web_browser);
-		loadLayerDialogBuilder.setTitle(R.string.uiDialogTextAddress);
-		loadLayerDialogBuilder.setView(textEntryView);
-		loadLayerDialogBuilder.setPositiveButton(R.string.uiDialogOk, new DialogInterface.OnClickListener() {
-
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				// TODO Auto-generated method stub
-				EditText address;
-				address = (EditText) textEntryView.findViewById(R.id.uiEditTextInput);
-				osgNativeLib.loadObject(address.getText().toString());
-			}
-		});
-		loadLayerDialogBuilder.setNegativeButton(R.string.uiDialogCancel, new DialogInterface.OnClickListener() {
-
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				// TODO Auto-generated method stub
-
-			}
-		});
-
-		loadLayerAddress = loadLayerDialogBuilder.create();
     }
     @Override protected void onPause() {
         super.onPause();
@@ -323,57 +294,14 @@ public class osgViewer extends Activity implements View.OnTouchListener, View.On
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.appmenu, menu);
+//        inflater.inflate(R.menu.appmenu, menu);
         return super.onCreateOptionsMenu(menu);
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
-        case R.id.menuLoadObject:
-        	Log.d(TAG,"Load Object");
-        	loadLayerAddress.show();
-            return true;
-        case R.id.menuCleanScene:
-        	Log.d(TAG,"Clean Scene");
-        	osgNativeLib.clearContents();
-            return true;
-        case R.id.menuDeleteObject:
-        	Log.d(TAG,"Delete a object");
-        	String vNames[] = osgNativeLib.getObjectNames();
-
-        	//Remove Layer Dialog
-    		AlertDialog.Builder removeLayerDialogBuilder = new AlertDialog.Builder(this);
-    		removeLayerDialogBuilder.setTitle(R.string.uiDialogTextChoseRemove);
-    		removeLayerDialogBuilder.setItems(vNames, new DialogInterface.OnClickListener() {
-
-    			@Override
-    			public void onClick(DialogInterface dialog, int witch) {
-    				// TODO Auto-generated method stub
-    				osgNativeLib.unLoadObject(witch);
-    			}
-    		});
-    		removeLayerDialog = removeLayerDialogBuilder.create();
-
-    		if(vNames.length > 0)
-    			removeLayerDialog.show();
-
-            return true;
-        case R.id.menuChangeBackground:
-        	Log.d(TAG,"Change background color");
-        	int[] test = new int [3];
-        	test = osgNativeLib.getClearColor();
-        	backgroundColor = Color.rgb(test[0], test[1], test[2]);
-
-        	ColorPickerDialog colorDialog;
-        	new ColorPickerDialog(this, this, backgroundColor).show();
-            return true;
-        case R.id.menuShowKeyboard:
-        	Log.d(TAG,"Keyboard");
-        	InputMethodManager mgr= (InputMethodManager)this.getSystemService(Context.INPUT_METHOD_SERVICE);
-    		mgr.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0);
-            return true;
-        default:
+          default:
             return super.onOptionsItemSelected(item);
         }
     }

@@ -5,9 +5,11 @@
         <file>qml/SitesPanel.qml</file>
         <file>qml/WelcomePageButton.qml</file>
         <file>qml/NewsPanel.qml</file>
+        <file>qml/ScrollDecorator.qml</file>
         <file>qml/images/welcome-news-bg.png</file>
         <file>qml/images/welcome-op-logo.png</file>
         <file>qml/images/button-label.png</file>
+        <file>qml/images/button-label-bottom.png</file>
         <file>qml/images/welcome-op-bg.png</file>
         <file>qml/images/welcome-bg.png</file>
         <file>qml/images/flightdata-on.png</file>
@@ -24,5 +26,9 @@
         <file>qml/images/scopes-off.png</file>
         <file>qml/images/system-on.png</file>
         <file>qml/images/system-off.png</file>
+        <file>qml/images/bttn-txwizard-on.png</file>
+        <file>qml/images/bttn-txwizard-off.png</file>
+        <file>qml/images/bttn-vehwizard-on.png</file>
+        <file>qml/images/bttn-vehwizard-off.png</file>
     </qresource>
 </RCC>

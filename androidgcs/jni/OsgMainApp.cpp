@@ -43,10 +43,13 @@ void OsgMainApp::loadModels(){
 
             // Woohoo leaky code.  This no longer works for multiple models
             uavAttitudeAndScale = new osg::MatrixTransform();
-            uavAttitudeAndScale->setMatrix(osg::Matrixd::scale(0.2e0,0.2e0,0.2e0));
+
+            // Set the rotation to normal
+            float q[4] = {1.0, 0, 0, 0};
+            setQuat(q);
 
             osg::MatrixTransform *rotateModelNED = new osg::MatrixTransform();
-            rotateModelNED->setMatrix(osg::Matrixd::scale(0.05e0,0.05e0,0.05e0) * osg::Matrixd::rotate(M_PI, osg::Vec3d(0,0,1)));
+            rotateModelNED->setMatrix(osg::Matrixd::rotate(M_PI, osg::Vec3d(0,0,1)));
             rotateModelNED->addChild( loadedModel );
 
             uavAttitudeAndScale->addChild( rotateModelNED );

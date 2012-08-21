@@ -2,7 +2,7 @@
 ******************************************************************************
 *
 * @file       lks94projection.cpp
-* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
 * @brief      
 * @see        The GNU Public License (GPL) Version 3
 * @defgroup   OPMapWidget
@@ -614,6 +614,9 @@ double LKS94Projection::GetTileMatrixResolution(int const& zoom)
 
     return ret;
 }
+/*
+ * Returns the conversion from pixels to meters
+ */
 double LKS94Projection::GetGroundResolution(int const& zoom, double const& latitude)
 {
     Q_UNUSED(zoom);

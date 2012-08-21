@@ -2,7 +2,7 @@
 ******************************************************************************
 *
 * @file       core.cpp
-* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
 * @brief      
 * @see        The GNU Public License (GPL) Version 3
 * @defgroup   OPMapWidget
@@ -251,6 +251,7 @@ namespace internals {
                 Matrix.Clear();
                 GoToCurrentPositionOnZoom();
                 UpdateBounds();
+                keepInBounds();
                 emit OnMapDrag();
                 emit OnMapZoomChanged();
                 emit OnNeedInvalidation();
@@ -572,7 +573,7 @@ namespace internals {
     {
         renderOffset.SetX(pt.X() - dragPoint.X());
         renderOffset.SetY(pt.Y() - dragPoint.Y());
-
+        keepInBounds();
         UpdateCenterTileXYLocation();
 
         if(centerTileXYLocation != centerTileXYLocationLast)
@@ -691,5 +692,19 @@ namespace internals {
         pxRes100km =  (int) (100000.0 / rez); // 100km
         pxRes1000km = (int) (1000000.0 / rez); // 1000km
         pxRes5000km = (int) (5000000.0 / rez); // 5000km
+    }
+    void Core::keepInBounds()
+    {
+        if(renderOffset.X()>0)
+            renderOffset.SetX(0);
+        if(renderOffset.Y()>0)
+            renderOffset.SetY(0);
+        int maxDragY=GetCurrentRegion().Height()-GettileRect().Height()*(maxOfTiles.Height()-minOfTiles.Height()+1);
+        int maxDragX=GetCurrentRegion().Width()-GettileRect().Width()*(maxOfTiles.Width()-minOfTiles.Width()+1);
+
+        if(maxDragY>renderOffset.Y())
+            renderOffset.SetY(maxDragY);
+        if(maxDragX>renderOffset.X())
+            renderOffset.SetX(maxDragX);
     }
 }

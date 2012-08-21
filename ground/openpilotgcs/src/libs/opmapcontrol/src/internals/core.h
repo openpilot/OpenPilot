@@ -2,7 +2,7 @@
 ******************************************************************************
 *
 * @file       core.h
-* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
 * @brief      
 * @see        The GNU Public License (GPL) Version 3
 * @defgroup   OPMapWidget
@@ -193,6 +193,7 @@ namespace internals {
         bool isStarted(){return started;}
 
         diagnostics GetDiagnostics();
+
     signals:
         void OnCurrentPositionChanged(internals::PointLatLng point);
         void OnTileLoadComplete();
@@ -206,7 +207,7 @@ namespace internals {
 
     private:
 
-
+        void keepInBounds();
         PointLatLng currentPosition;
         core::Point currentPositionPixel;
         core::Point renderOffset;

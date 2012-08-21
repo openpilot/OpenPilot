@@ -151,11 +151,13 @@ void ConfigCameraStabilizationWidget::refreshWidgetsValues(UAVObject *obj)
  */
 void ConfigCameraStabilizationWidget::updateObjectsFromWidgets()
 {
-    // Save state of the module enable checkbox first
-    HwSettings *hwSettings = HwSettings::GetInstance(getObjectManager());
-    quint8 value = m_camerastabilization->enableCameraStabilization->isChecked() ?
+    // Save state of the module enable checkbox first.
+    // Do not use setData() member on whole object, if possible, since it triggers
+    // unnessesary UAVObect update.
+    quint8 enableModule = m_camerastabilization->enableCameraStabilization->isChecked() ?
             HwSettings::OPTIONALMODULES_ENABLED : HwSettings::OPTIONALMODULES_DISABLED;
-    hwSettings->setOptionalModules(HwSettings::OPTIONALMODULES_CAMERASTAB,value);
+    HwSettings *hwSettings = HwSettings::GetInstance(getObjectManager());
+    hwSettings->setOptionalModules(HwSettings::OPTIONALMODULES_CAMERASTAB, enableModule);
 
     // Update mixer channels which were mapped to camera outputs in case they are
     // not used for other function yet
@@ -218,6 +220,8 @@ void ConfigCameraStabilizationWidget::updateObjectsFromWidgets()
         }
     } while(widgetUpdated);
 
+    // FIXME: Should not use setData() to prevent double updates.
+    // It should be refactored after the reformatting of MixerSettings UAVObject.
     mixerSettings->setData(mixerSettingsData);
 
     ConfigTaskWidget::updateObjectsFromWidgets();

@@ -3,6 +3,7 @@ package org.openpilot.androidgcs;
 import org.openpilot.osg.ColorPickerDialog;
 import org.openpilot.osg.EGLview;
 import org.openpilot.osg.osgNativeLib;
+import org.openpilot.uavtalk.UAVObject;
 
 import android.app.AlertDialog;
 import android.graphics.Color;
@@ -22,6 +23,12 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 public class OsgViewer extends ObjectManagerActivity implements View.OnTouchListener, View.OnKeyListener, ColorPickerDialog.OnColorChangeListener {
+	private static final String TAG = OsgViewer.class.getSimpleName();
+	private static final int LOGLEVEL = 2;
+//	private static boolean WARN = LOGLEVEL > 1;
+	private static final boolean DEBUG = LOGLEVEL > 0;
+
+
 	enum moveTypes { NONE , DRAG, MDRAG, ZOOM ,ACTUALIZE}
 	enum navType { PRINCIPAL , SECONDARY }
 	enum lightType { ON , OFF }
@@ -38,7 +45,6 @@ public class OsgViewer extends ObjectManagerActivity implements View.OnTouchList
 
 	int backgroundColor;
 
-	private static final String TAG = "OSG Activity";
 	//Ui elements
     EGLview mView;
     Button uiCenterViewButton;
@@ -341,5 +347,19 @@ public class OsgViewer extends ObjectManagerActivity implements View.OnTouchList
         float y = event.getY(0) - event.getY(1);
         return (float)(Math.sqrt(x * x + y * y));
      }
+
+	// The below methods should all be called by the parent activity at the appropriate times
+	@Override
+	public void onOPConnected() {
+		super.onOPConnected();
+
+		registerObjectUpdates(objMngr.getObject("AttitudeActual"));
+	}
+
+	@Override
+	protected void objectUpdated(UAVObject obj) {
+		if (DEBUG) Log.d(TAG, "Object updated: " + obj.getName());
+	}
+
 
 }

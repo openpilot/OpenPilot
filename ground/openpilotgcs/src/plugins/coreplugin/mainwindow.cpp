@@ -269,26 +269,52 @@ void MainWindow::extensionsInitialized()
 
     QSettings* qs = m_settings;
     QSettings * settings;
+    QString commandLine;
     if ( ! qs->allKeys().count() ){
-        importSettings * dialog=new importSettings(this);
+        foreach(QString str,qApp->arguments())
+        {
+            if(str.contains("config"))
+            {
+                qDebug()<<"ass";
+                commandLine=str.split("=").at(1);
+                qDebug()<<commandLine;
+            }
+        }
         QDir directory(QCoreApplication::applicationDirPath());
 #ifdef Q_OS_MAC
-        directory.cdUp();
-        directory.cd("Resources");
+            directory.cdUp();
+            directory.cd("Resources");
 #else
-        directory.cdUp();
-        directory.cd("share");
-        directory.cd("openpilotgcs");
+            directory.cdUp();
+            directory.cd("share");
+            directory.cd("openpilotgcs");
 #endif
-        directory.cd("default_configurations");
+            directory.cd("default_configurations");
 
-        qDebug() << "Looking for default config files in: " + directory.absolutePath();
-        dialog->loadFiles(directory.absolutePath());
-        dialog->exec();
-        settings=new QSettings(dialog->choosenConfig(), XmlConfig::XmlSettingsFormat);
+            qDebug() << "Looking for default config files in: " + directory.absolutePath();
+        bool showDialog=true;
+        QString filename;
+        if(!commandLine.isEmpty())
+        {
+            if(QFile::exists(directory.absolutePath()+QDir::separator()+commandLine))
+            {
+                filename=directory.absolutePath()+QDir::separator()+commandLine;
+                qDebug()<<"Load configuration from command line";
+                settings=new QSettings(filename, XmlConfig::XmlSettingsFormat);
+                showDialog=false;
+            }
+        }
+        if(showDialog)
+        {
+            importSettings * dialog=new importSettings(this);
+            dialog->loadFiles(directory.absolutePath());
+            dialog->exec();
+            filename=dialog->choosenConfig();
+            settings=new QSettings(filename, XmlConfig::XmlSettingsFormat);
+            delete dialog;
+        }
         qs=settings;
-        qDebug() << "Load default config from resource "<<dialog->choosenConfig();
-        delete dialog;
+        qDebug() << "Load default config from resource "<<filename;
     }
     qs->beginGroup("General");
     loadStyleSheet(qs->value("StyleSheet","none").toString());

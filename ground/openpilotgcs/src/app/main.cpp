@@ -59,8 +59,8 @@ static const char *fixedOptionsC =
 "    -client             Attempt to connect to already running instance\n"
 "    -clean-config       Delete all existing configuration settings\n"
 "    -exit-after-config  Exit GCS after manipulating configuration settings\n"
-"    -D key=value        Override configuration settings e.g: -D General/OverrideLanguage=de\n";
-
+"    -D key=value        Override configuration settings e.g: -D General/OverrideLanguage=de\n"
+"    -config=value       Default configuration file to load if settings file is empty\n";
 static const char *HELP_OPTION1 = "-h";
 static const char *HELP_OPTION2 = "-help";
 static const char *HELP_OPTION3 = "/h";

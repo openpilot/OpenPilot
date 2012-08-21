@@ -162,6 +162,7 @@ void smartSaveButton::setObjects(QList<UAVDataObject *> list)
 
 void smartSaveButton::addObject(UAVDataObject * obj)
 {
+    Q_ASSERT(obj);
     if(!objects.contains(obj))
         objects.append(obj);
 }

@@ -33,6 +33,7 @@
 #include "mixersettings.h"
 #include "systemsettings.h"
 #import "manualcontrolsettings.h"
+#import "stabilizationsettings.h"
 
 VehicleConfigurationHelper::VehicleConfigurationHelper(VehicleConfigurationSource *configSource)
     : m_configSource(configSource), m_uavoManager(0),
@@ -61,6 +62,7 @@ bool VehicleConfigurationHelper::setupVehicle()
     applyOutputConfiguration();
     applyFlighModeConfiguration();
     applyLevellingConfiguration();
+    applyStabilizationConfiguration();
 
     bool result = saveChangesToController();
     if(result) {
@@ -282,8 +284,19 @@ void VehicleConfigurationHelper::applyLevellingConfiguration()
         data.GyroBias[2] = -bias.m_gyroZBias;
 
         attitudeSettings->setData(data);
-        addModifiedObject(attitudeSettings, tr("Writing levelling bias settings"));
+        addModifiedObject(attitudeSettings, tr("Writing gyro and accelerometer bias settings"));
     }
+}
+
+void VehicleConfigurationHelper::applyStabilizationConfiguration()
+{
+    StabilizationSettings *stabSettings = StabilizationSettings::GetInstance(m_uavoManager);
+    Q_ASSERT(stabSettings);
+    StabilizationSettings::DataFields data = stabSettings->getData();
+
+    StabilizationSettings defaultSettings;
+    stabSettings->setData(defaultSettings.getData());
+    addModifiedObject(stabSettings, tr("Writing stabilization settings"));
 }
 
 void VehicleConfigurationHelper::applyMixerConfiguration(mixerSettings mixer)

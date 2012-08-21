@@ -72,7 +72,7 @@ private:
     static const int MIXER_TYPE_MOTOR = 1;
     static const int MIXER_TYPE_SERVO = 2;
 
-    static const int PROGRESS_STEPS = 9;
+    static const int PROGRESS_STEPS = 10;
 
     VehicleConfigurationSource *m_configSource;
     UAVObjectManager *m_uavoManager;
@@ -86,6 +86,7 @@ private:
     void applyOutputConfiguration();
     void applyFlighModeConfiguration();
     void applyLevellingConfiguration();
+    void applyStabilizationConfiguration();
 
     void applyMixerConfiguration(mixerSettings mixer);
 

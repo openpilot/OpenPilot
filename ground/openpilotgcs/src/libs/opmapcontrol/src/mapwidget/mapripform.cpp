@@ -2,7 +2,7 @@
 ******************************************************************************
 *
 * @file       mapripform.cpp
-* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
 * @brief      Form to be used with the MapRipper class
 * @see        The GNU Public License (GPL) Version 3
 * @defgroup   OPMapWidget
@@ -33,6 +33,7 @@ MapRipForm::MapRipForm(QWidget *parent) :
     ui(new Ui::MapRipForm)
 {
     ui->setupUi(this);
+    connect(ui->cancelButton,SIGNAL(clicked()),this,SIGNAL(cancelRequest()));
 }
 
 MapRipForm::~MapRipForm()

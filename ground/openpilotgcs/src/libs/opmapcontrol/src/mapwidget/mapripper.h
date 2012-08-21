@@ -2,7 +2,7 @@
 ******************************************************************************
 *
 * @file       mapripper.h
-* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
 * @brief      A class that allows ripping of a selection of the map
 * @see        The GNU Public License (GPL) Version 3
 * @defgroup   OPMapWidget
@@ -50,6 +50,8 @@ namespace mapcontrol
         MapRipForm * progressForm;
         int maxzoom;
         internals::Core * core;
+        bool yesToAll;
+        QMutex mutex;
 
     signals:
         void percentageChanged(int const& perc);
@@ -58,6 +60,7 @@ namespace mapcontrol
 
 
     public slots:
+        void stopFetching();
         void finish();
     };
 }

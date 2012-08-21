@@ -46,7 +46,7 @@ public:
     void addEdge(Edge *edge);
     QList<Edge *> edges() const;
 
-    enum { Type = UserType + 1 };
+    enum { Type = UserType + 10 };
     int type() const { return Type; }
 
     void setName(QString name) { cmdName = name; }

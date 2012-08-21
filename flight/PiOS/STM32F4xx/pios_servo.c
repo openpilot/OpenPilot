@@ -87,7 +87,7 @@ int32_t PIOS_Servo_Init(const struct pios_servo_cfg * cfg)
 * \param[in] array of rates in Hz
 * \param[in] maximum number of banks
 */
-void PIOS_Servo_SetHz(uint16_t * speeds, uint8_t banks)
+void PIOS_Servo_SetHz(const uint16_t * speeds, uint8_t banks)
 {
 	if (!servo_cfg) {
 		return;

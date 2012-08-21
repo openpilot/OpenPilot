@@ -1,8 +1,8 @@
 /**
  ******************************************************************************
  *
- * @file       opmap_edit_waypoint_dialog.cpp
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @file       opmap_edit_waypoint_dialog.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup OPMapPlugin OpenPilot Map Plugin
@@ -29,18 +29,19 @@
 #define OPMAP_EDIT_WAYPOINT_DIALOG_H
 
 #include <QDialog>
-
+#include <QDataWidgetMapper>
 #include "opmapcontrol/opmapcontrol.h"
-
+#include "flightdatamodel.h"
 namespace Ui {
     class opmap_edit_waypoint_dialog;
 }
+using namespace mapcontrol;
 
-class opmap_edit_waypoint_dialog : public QDialog
+class opmap_edit_waypoint_dialog : public QWidget
 {
     Q_OBJECT
 public:
-    opmap_edit_waypoint_dialog(QWidget *parent = 0);
+    opmap_edit_waypoint_dialog(QWidget *parent,QAbstractItemModel * model,QItemSelectionModel * selection);
     ~opmap_edit_waypoint_dialog();
 
     /**
@@ -50,29 +51,24 @@ public:
     */
     void editWaypoint(mapcontrol::WayPointItem *waypoint_item);
 
-protected:
-    void changeEvent(QEvent *e);
-
 private:
     Ui::opmap_edit_waypoint_dialog *ui;
-
-    int original_number;
-    bool original_locked;
-    internals::PointLatLng original_coord;
-    double original_altitude;
-    QString original_description;
-
-    mapcontrol::WayPointItem *waypoint_item;
-
-    int saveSettings();
-
+    QDataWidgetMapper *mapper;
+    QAbstractItemModel * model;
+    QItemSelectionModel * itemSelection;
 private slots:
 
 private slots:
-    void on_pushButtonCancel_clicked();
-    void on_pushButtonRevert_clicked();
-    void on_pushButtonApply_clicked();
+    void currentIndexChanged(int index);
+    void setupModeWidgets();
+    void setupConditionWidgets();
+    void pushButtonCancel_clicked();
     void on_pushButtonOK_clicked();
+    void pushButtonApply_clicked();
+    void on_pushButton_clicked();
+    void on_pushButton_2_clicked();
+    void enableEditWidgets(bool);
+    void currentRowChanged(QModelIndex,QModelIndex);
 };
 
 #endif // OPMAP_EDIT_WAYPOINT_DIALOG_H

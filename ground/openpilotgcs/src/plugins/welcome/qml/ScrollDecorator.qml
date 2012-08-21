@@ -6,8 +6,11 @@ Rectangle {
     property Flickable flickableItem: null
 
     Loader {
+        id: scrollLoader
         sourceComponent: scrollDecorator.flickableItem ? scrollBar : undefined
     }
+
+    Component.onDestruction: scrollLoader.sourceComponent = undefined
 
     Component {
         id: scrollBar

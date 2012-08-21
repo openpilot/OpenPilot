@@ -358,7 +358,15 @@ public class OsgViewer extends ObjectManagerActivity implements View.OnTouchList
 
 	@Override
 	protected void objectUpdated(UAVObject obj) {
-		if (DEBUG) Log.d(TAG, "Object updated: " + obj.getName());
+		float q[] = new float[4];
+
+		q[0] = (float) obj.getField("q1").getDouble();
+		q[1] = (float) obj.getField("q2").getDouble();
+		q[2] = (float) obj.getField("q3").getDouble();
+		q[3] = (float) obj.getField("q4").getDouble();
+		if (DEBUG) Log.d(TAG, "Attitude: " + q[0] + " " + q[1] + " " + q[2] + " " + q[3]);
+
+		osgNativeLib.setQuat(q[0], q[1], q[2], q[3]);
 	}
 
 

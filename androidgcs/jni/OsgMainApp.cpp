@@ -236,5 +236,10 @@ void OsgMainApp::setQuat(float *q){
     quat.makeRotate(angle, osg::Vec3d(axis[1],axis[0],-axis[2]));
     osg::Matrixd rot = osg::Matrixd::rotate(quat);
 
-    uavAttitudeAndScale->setMatrix(rot);
+    if (uavAttitudeAndScale) {
+    	osg::notify(osg::ALWAYS)<<"Setting attitude"<<std::endl;
+    	uavAttitudeAndScale->setMatrix(rot);
+    } else {
+    	osg::notify(osg::ALWAYS)<<"Pointer missing"<<std::endl;
+    }
 }

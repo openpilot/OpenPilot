@@ -88,7 +88,10 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/pathstatus.h \
     $$UAVOBJECT_SYNTHETICS/pathdesired.h \
     $$UAVOBJECT_SYNTHETICS/pipxsettings.h \
-    $$UAVOBJECT_SYNTHETICS/pipxstatus.h
+    $$UAVOBJECT_SYNTHETICS/pipxstatus.h \
+    $$UAVOBJECT_SYNTHETICS/waypoint.h \
+    $$UAVOBJECT_SYNTHETICS/waypointactive.h \
+    $$UAVOBJECT_SYNTHETICS/pathaction.h
 
 SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/baroaltitude.cpp \
@@ -156,4 +159,7 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/pathstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/pathdesired.cpp \
     $$UAVOBJECT_SYNTHETICS/pipxsettings.cpp \
-    $$UAVOBJECT_SYNTHETICS/pipxstatus.cpp
+    $$UAVOBJECT_SYNTHETICS/pipxstatus.cpp \
+    $$UAVOBJECT_SYNTHETICS/waypoint.cpp \
+    $$UAVOBJECT_SYNTHETICS/waypointactive.cpp \
+    $$UAVOBJECT_SYNTHETICS/pathaction.cpp

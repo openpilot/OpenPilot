@@ -2,7 +2,7 @@
 ******************************************************************************
 *
 * @file       uavitem.h
-* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
 * @brief      A graphicsItem representing a WayPoint
 * @see        The GNU Public License (GPL) Version 3
 * @defgroup   OPMapWidget
@@ -57,6 +57,31 @@ namespace mapcontrol
                 enum { Type = UserType + 2 };
         UAVItem(MapGraphicItem* map,OPMapWidget* parent, QString uavPic=QString::fromUtf8(":/uavs/images/mapquad.png"));
         ~UAVItem();
+
+        /**
+        * @brief Sets the UAV NED position
+        *
+        * @param NED
+        */
+        void SetNED(double NED[3]);
+        /**
+        * @brief Sets the UAV groundspeed
+        *
+        * @param NED
+        */
+        void SetGroundspeed(double vNED[3], int m_maxUpdateRate);
+        /**
+        * @brief Sets the UAV Calibrated Airspeed
+        *
+        * @param NED
+        */
+        void SetCAS(double CAS);
+        /**
+        * @brief Sets the UAV yaw rate
+        *
+        * @param NED
+        */
+        void SetYawRate(double yawRate_dps);
         /**
         * @brief Sets the UAV position
         *
@@ -103,7 +128,6 @@ namespace mapcontrol
 
         void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                     QWidget *widget);
-        void RefreshPos();
         QRectF boundingRect() const;
         /**
         * @brief Sets the trail time to be used if TrailType is ByTimeElapsed
@@ -193,17 +217,32 @@ namespace mapcontrol
         int type() const;
 
         void SetUavPic(QString UAVPic);
+        void SetShowUAVInfo(bool const& value);
+        void updateTextOverlay();
     private:
+        void generateArrowhead();
         MapGraphicItem* map;
-
+        OPMapWidget* mapwidget;
+        QPolygonF arrowHead;
+        QLineF arrowShaft;
         int altitude;
         UAVMapFollowType::Types mapfollowtype;
         UAVTrailType::Types trailtype;
         internals::PointLatLng coord;
         internals::PointLatLng lastcoord;
+        double NED[3];
+        double vNED[3];
+        double CAS_mps;
+        double groundspeed_kph;
+        double groundspeed_mps;
+        double yawRate_dps;
+        double trendRadius;
+        double trendSpanAngle;
+        float meters2pixels;
+        double precalcRings;
+        double ringTime;
         QPixmap pic;
         core::Point localposition;
-        OPMapWidget* mapwidget;
         QGraphicsItemGroup* trail;
         QGraphicsItemGroup * trailLine;
         internals::PointLatLng lasttrailline;
@@ -215,13 +254,24 @@ namespace mapcontrol
         bool autosetreached;
         double Distance3D(internals::PointLatLng const& coord, int const& altitude);
         double autosetdistance;
-      //  QRectF rect;
+        bool showUAVInfo;
+        static double groundspeed_mps_filt;
+        float boundingRectSize;
+        bool showJustChanged;
+
+        bool refreshPaint_flag;
+
+        QPainterPath textPath;
 
     public slots:
-
+        void RefreshPos();
+        void setOpacitySlot(qreal opacity);
+        void zoomChangedSlot();
     signals:
         void UAVReachedWayPoint(int const& waypointnumber,WayPointItem* waypoint);
         void UAVLeftSafetyBouble(internals::PointLatLng const& position);
+        void setChildPosition();
+        void setChildLine();
     };
 }
 #endif // UAVITEM_H

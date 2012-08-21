@@ -1,0 +1,30 @@
+<xml>
+    <object name="PathAction" singleinstance="false" settings="false">
+        <description>A waypoint command the pathplanner is to use at a certain waypoint</description>
+	<field name="Mode" units="" type="enum" elements="1" options="FlyEndpoint,FlyVector,FlyCircleRight,FlyCircleLeft,
+		DriveEndpoint,DriveVector,DriveCircleLeft,DriveCircleRight,
+		FixedAttitude,
+		SetAccessory,
+		DisarmAlarm" default="Endpoint" />
+	<field name="ModeParameters" units="" type="float" elements="4" default="0"/>
+
+	<field name="EndCondition" units="" type="enum" elements="1" options="None,TimeOut,
+		DistanceToTarget,LegRemaining,
+		AboveAltitude,
+		PointingTowardsNext,
+		PythonScript,
+		Immediate" default="None" />
+	<field name="ConditionParameters" units="" type="float" elements="4" default="0"/>
+
+	<field name="Command" units="" type="enum" elements="1" options="OnConditionNextWaypoint,OnNotConditionNextWaypoint,
+	OnConditionJumpWaypoint,OnNotConditionJumpWaypoint,
+	IfConditionJumpWaypointElseNextWaypoint" default="OnConditionNextWaypoint" />
+	<field name="JumpDestination" units="waypoint" type="uint8" elements="1" default="0"/>
+	<field name="ErrorDestination" units="waypoint" type="uint8" elements="1" default="0"/>
+
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetryflight acked="false" updatemode="periodic" period="4000"/>
+        <logging updatemode="periodic" period="1000"/>
+    </object>
+</xml>

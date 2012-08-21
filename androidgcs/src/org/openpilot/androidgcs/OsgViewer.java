@@ -1,8 +1,9 @@
-package org.openpilot.osg;
+package org.openpilot.androidgcs;
 
-import org.openpilot.androidgcs.R;
+import org.openpilot.osg.ColorPickerDialog;
+import org.openpilot.osg.EGLview;
+import org.openpilot.osg.osgNativeLib;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.graphics.Color;
 import android.graphics.PointF;
@@ -20,7 +21,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-public class osgViewer extends Activity implements View.OnTouchListener, View.OnKeyListener, ColorPickerDialog.OnColorChangeListener {
+public class OsgViewer extends ObjectManagerActivity implements View.OnTouchListener, View.OnKeyListener, ColorPickerDialog.OnColorChangeListener {
 	enum moveTypes { NONE , DRAG, MDRAG, ZOOM ,ACTUALIZE}
 	enum navType { PRINCIPAL , SECONDARY }
 	enum lightType { ON , OFF }

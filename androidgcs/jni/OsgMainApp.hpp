@@ -23,6 +23,7 @@
 #include <osg/Depth>
 #include <osg/Program>
 #include <osg/Shader>
+#include <osg/MatrixTransform>
 #include <osg/Node>
 #include <osg/Notify>
 //osgText
@@ -178,7 +179,8 @@ public:
     osg::Vec4f getClearColor();
 
     //Manipulating the view
-    void setRPY(float x, float y, float z);
+    void setQuat(float *q);
+    osg::MatrixTransform *uavAttitudeAndScale;
 };
 
 

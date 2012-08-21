@@ -1,5 +1,5 @@
 #include "OsgMainApp.hpp"
-
+#include <osg/Quat>
 
 OsgMainApp::OsgMainApp(){
 
@@ -41,7 +41,17 @@ void OsgMainApp::loadModels(){
 
             loadedModel->getOrCreateStateSet()->setAttribute ( prog );
 
-            _root->addChild(loadedModel);
+            // Woohoo leaky code.  This no longer works for multiple models
+            uavAttitudeAndScale = new osg::MatrixTransform();
+            uavAttitudeAndScale->setMatrix(osg::Matrixd::scale(0.2e0,0.2e0,0.2e0));
+
+            osg::MatrixTransform *rotateModelNED = new osg::MatrixTransform();
+            rotateModelNED->setMatrix(osg::Matrixd::scale(0.05e0,0.05e0,0.05e0) * osg::Matrixd::rotate(M_PI, osg::Vec3d(0,0,1)));
+            rotateModelNED->addChild( loadedModel );
+
+            uavAttitudeAndScale->addChild( rotateModelNED );
+
+            _root->addChild(uavAttitudeAndScale);
         }
     }
 
@@ -216,5 +226,15 @@ osg::Vec4f OsgMainApp::getClearColor(){
     return _viewer->getCamera()->getClearColor();
 }
 
-void OsgMainApp::setRPY(float x, float y, float z){
+void OsgMainApp::setQuat(float *q){
+    osg::Quat quat(q[1], q[2], q[3], q[0]);
+
+    // Have to rotate the axes from OP NED frame to OSG frame (X east, Y north, Z down)
+    double angle;
+    osg::Vec3d axis;
+    quat.getRotate(angle,axis);
+    quat.makeRotate(angle, osg::Vec3d(axis[1],axis[0],-axis[2]));
+    osg::Matrixd rot = osg::Matrixd::rotate(quat);
+
+    uavAttitudeAndScale->setMatrix(rot);
 }

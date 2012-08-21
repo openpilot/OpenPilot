@@ -83,6 +83,15 @@ public class HomePage extends ObjectManagerActivity {
 				startActivity(new Intent(HomePage.this, SystemAlarmActivity.class));
 			}
 		});
+
+		Button osgViewer = (Button) findViewById(R.id.launch_osgViewer);
+		osgViewer.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				startActivity(new Intent(HomePage.this, OsgViewer.class));
+			}
+		});
+
 	}
 
 }

@@ -31,7 +31,7 @@
 #define PIOS_SERVO_H
 
 /* Public Functions */
-extern void PIOS_Servo_SetHz(uint16_t * update_rates, uint8_t channels);
+extern void PIOS_Servo_SetHz(const uint16_t * update_rates, uint8_t banks);
 extern void PIOS_Servo_Set(uint8_t Servo, uint16_t Position);
 
 #endif /* PIOS_SERVO_H */

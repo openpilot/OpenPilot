@@ -31,9 +31,6 @@
 #include <QWidget>
 #include <QUdpSocket>
 #include <QTime>
-#if defined(Q_CC_MSVC)
-#define _USE_MATH_DEFINES
-#endif
 #include <qmath.h>
 #include <QVector3D>
 #include <QMatrix4x4>

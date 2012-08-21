@@ -15,12 +15,6 @@ SIM_DIR    = $$GCS_BUILD_TREE/../AeroSIM-RC
 PLUGIN_DIR = $$SIM_DIR/Plugin/CopterControl
 DLLDESTDIR = $$PLUGIN_DIR
 
-# Don't depend on MSVRT*.dll
-win32-msvc* {
-    QMAKE_CXXFLAGS_RELEASE -= -MD
-    QMAKE_CXXFLAGS_MT_DLL += -MT
-}
-
 HEADERS = \
     aerosimrcdatastruct.h \
     enums.h \
@@ -57,12 +51,18 @@ equals(copydata, 1) {
 
         # Qt DLLs
         QT_DLLS = \
-                  libgcc_s_dw2-1.dll \
-                  mingwm10.dll \
                   QtCore4.dll \
                   QtNetwork4.dll
         for(dll, QT_DLLS) {
             data_copy.commands += $(COPY_FILE) $$targetPath(\"$$[QT_INSTALL_BINS]/$$dll\") $$targetPath(\"$$SIM_DIR/$$dll\") $$addNewline()
+        }
+
+        # MinGW DLLs
+        MINGW_DLLS = \
+                     libgcc_s_dw2-1.dll \
+                     mingwm10.dll
+        for(dll, MINGW_DLLS) {
+            data_copy.commands += $(COPY_FILE) $$targetPath(\"$$[QT_INSTALL_BINS]/../../../../../mingw/bin/$$dll\") $$targetPath(\"$$SIM_DIR/$$dll\") $$addNewline()
         }
 
         data_copy.target = FORCE

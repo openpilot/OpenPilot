@@ -48,6 +48,7 @@ public:
     {
         LimitType type;
         QList<QVariant> values;
+        int board;
     } LimitStruct;
 
     UAVObjectField(const QString& name, const QString& units, FieldType type, quint32 numElements, const QStringList& options,const QString& limits=QString());
@@ -74,9 +75,9 @@ public:
     bool isText();
     QString toString();
 
-    bool isWithinLimits(QVariant var, quint32 index);
-    QVariant getMaxLimit(quint32 index);
-    QVariant getMinLimit(quint32 index);
+    bool isWithinLimits(QVariant var, quint32 index, int board=0);
+    QVariant getMaxLimit(quint32 index, int board=0);
+    QVariant getMinLimit(quint32 index, int board=0);
 signals:
     void fieldUpdated(UAVObjectField* field);
 
@@ -91,7 +92,7 @@ protected:
     quint32 offset;
     quint8* data;
     UAVObject* obj;
-    QMap<quint32,LimitStruct> elementLimits;
+    QMap<quint32, QList<LimitStruct> > elementLimits;
     void clear();
     void constructorInitialize(const QString& name, const QString& units, FieldType type, const QStringList& elementNames, const QStringList& options, const QString &limits);
     void limitsInitialize(const QString &limits);

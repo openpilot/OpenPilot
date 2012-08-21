@@ -67,6 +67,8 @@ uint32_t pios_com_vcp_id;
 uint32_t pios_com_gps_id;
 uint32_t pios_com_bridge_id;
 
+uint32_t pios_usb_rctx_id;
+
 /**
  * Configuration for MPU6000 chip
  */
@@ -357,6 +359,15 @@ void PIOS_Board_Init(void) {
 			}
 		}
 #endif	/* PIOS_INCLUDE_COM */
+		break;
+	case HWSETTINGS_USB_HIDPORT_RCTRANSMITTER:
+#if defined(PIOS_INCLUDE_USB_RCTX)
+		{
+			if (PIOS_USB_RCTX_Init(&pios_usb_rctx_id, &pios_usb_rctx_cfg, pios_usb_id)) {
+				PIOS_Assert(0);
+			}
+		}
+#endif	/* PIOS_INCLUDE_USB_RCTX */
 		break;
 	}
 

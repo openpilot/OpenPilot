@@ -40,7 +40,7 @@
 #include "attitudeactual.h"
 #include "gyros.h"
 #include "flightstatus.h"
-#include "manualcontrol.h" // Just to get a macro
+#include "manualcontrol.h" // Just to get the PARSE_FLIGHT_MODE macro
 #include "CoordinateConversions.h"
 
 // Private constants
@@ -222,7 +222,7 @@ static void stabilizationTask(void* parameters)
 		gyro_filtered[1] = gyro_filtered[1] * gyro_alpha + gyrosData.y * (1 - gyro_alpha);
 		gyro_filtered[2] = gyro_filtered[2] * gyro_alpha + gyrosData.z * (1 - gyro_alpha);
 
-		float *attitudeDesiredAxis = &stabDesired.Roll;
+		float *stabDesiredAxis = &stabDesired.Roll;
 		float *actuatorDesiredAxis = &actuatorDesired.Roll;
 		float *rateDesiredAxis = &rateDesired.Roll;
 
@@ -233,7 +233,7 @@ static void stabilizationTask(void* parameters)
 			{
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_RATE:
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_VIRTUALBAR:
-					rateDesiredAxis[i] = attitudeDesiredAxis[i];
+					rateDesiredAxis[i] = stabDesiredAxis[i];
 
 					// Zero attitude and axis lock accumulators
 					pids[PID_ROLL + i].iAccumulator = 0;
@@ -249,7 +249,7 @@ static void stabilizationTask(void* parameters)
 					if(weak_leveling < -weak_leveling_max)
 						weak_leveling = -weak_leveling_max;
 
-					rateDesiredAxis[i] = attitudeDesiredAxis[i] + weak_leveling;
+					rateDesiredAxis[i] = stabDesiredAxis[i] + weak_leveling;
 
 					// Zero attitude and axis lock accumulators
 					pids[PID_ROLL + i].iAccumulator = 0;
@@ -269,13 +269,13 @@ static void stabilizationTask(void* parameters)
 					break;
 
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK:
-					if(fabs(attitudeDesiredAxis[i]) > max_axislock_rate) {
+					if(fabs(stabDesiredAxis[i]) > max_axislock_rate) {
 						// While getting strong commands act like rate mode
-						rateDesiredAxis[i] = attitudeDesiredAxis[i];
+						rateDesiredAxis[i] = stabDesiredAxis[i];
 						axis_lock_accum[i] = 0;
 					} else {
 						// For weaker commands or no command simply attitude lock (almost) on no gyro change
-						axis_lock_accum[i] += (attitudeDesiredAxis[i] - gyro_filtered[i]) * dT;
+						axis_lock_accum[i] += (stabDesiredAxis[i] - gyro_filtered[i]) * dT;
 						if(axis_lock_accum[i] > max_axis_lock)
 							axis_lock_accum[i] = max_axis_lock;
 						else if(axis_lock_accum[i] < -max_axis_lock)
@@ -352,20 +352,20 @@ static void stabilizationTask(void* parameters)
 					switch (i)
 				{
 					case ROLL:
-						actuatorDesiredAxis[i] = bound(attitudeDesiredAxis[i]);
-						shouldUpdate = 1;
+						actuatorDesiredAxis[i] = bound(stabDesiredAxis[i]);
+//						shouldUpdate = 1;
 						pids[PID_RATE_ROLL].iAccumulator = 0;
 						pids[PID_ROLL].iAccumulator = 0;
 						break;
 					case PITCH:
-						actuatorDesiredAxis[i] = bound(attitudeDesiredAxis[i]);
-						shouldUpdate = 1;
+						actuatorDesiredAxis[i] = bound(stabDesiredAxis[i]);
+//						shouldUpdate = 1;
 						pids[PID_RATE_PITCH].iAccumulator = 0;
 						pids[PID_PITCH].iAccumulator = 0;
 						break;
 					case YAW:
-						actuatorDesiredAxis[i] = bound(attitudeDesiredAxis[i]);
-						shouldUpdate = 1;
+						actuatorDesiredAxis[i] = bound(stabDesiredAxis[i]);
+//						shouldUpdate = 1;
 						pids[PID_RATE_YAW].iAccumulator = 0;
 						pids[PID_YAW].iAccumulator = 0;
 						break;

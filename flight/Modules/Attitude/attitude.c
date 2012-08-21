@@ -58,20 +58,33 @@
 #include "manualcontrolcommand.h"
 #include "CoordinateConversions.h"
 #include <pios_board_info.h>
+
+#include "positionactual.h"
+#include "velocityactual.h"
+#include "gpsposition.h"
+#include "gpsvelocity.h"
+#include "hwsettings.h"
+#include "homelocation.h"
+
  
 // Private constants
-#define STACK_SIZE_BYTES 540
+#define STACK_SIZE_BYTES 600
 #define TASK_PRIORITY (tskIDLE_PRIORITY+3)
 
 #define SENSOR_PERIOD 4
 #define UPDATE_RATE  25.0f
 #define GYRO_NEUTRAL 1665
+#define DEG2RAD          (3.141592654f/180.0f)
 
 #define PI_MOD(x) (fmod(x + M_PI, M_PI * 2) - M_PI)
 // Private types
 
 // Private variables
 static xTaskHandle taskHandle;
+
+static bool gpsNew_flag;
+static HomeLocationData homeLocation;
+
 
 // Private functions
 static void AttitudeTask(void *parameters);
@@ -83,6 +96,12 @@ static int32_t updateSensors(AccelsData *, GyrosData *);
 static int32_t updateSensorsCC3D(AccelsData * accelsData, GyrosData * gyrosData);
 static void updateAttitude(AccelsData *, GyrosData *);
 static void settingsUpdatedCb(UAVObjEvent * objEv);
+
+
+static int32_t LLA2NED(int32_t LL[2], float altitude, float geoidSeparation, float * NED);
+static void HomeLocationUpdatedCb(UAVObjEvent * objEv);
+static void GPSPositionUpdatedCb(UAVObjEvent * objEv);
+
 
 static float accelKi = 0;
 static float accelKp = 0;
@@ -131,6 +150,14 @@ int32_t AttitudeInitialize(void)
 	AccelsInitialize();
 	GyrosInitialize();
 	
+	PositionActualInitialize();
+	VelocityActualInitialize();
+	GPSPositionInitialize();
+	GPSVelocityInitialize();
+	HomeLocationInitialize();
+
+	gpsNew_flag=false;
+	
 	// Initialize quaternion
 	AttitudeActualData attitude;
 	AttitudeActualGet(&attitude);
@@ -156,6 +183,10 @@ int32_t AttitudeInitialize(void)
 	trim_requested = false;
 	
 	AttitudeSettingsConnectCallback(&settingsUpdatedCb);
+	
+	HomeLocationConnectCallback(&HomeLocationUpdatedCb);
+	GPSPositionConnectCallback(&GPSPositionUpdatedCb);
+
 	
 	return 0;
 }
@@ -203,6 +234,7 @@ static void AttitudeTask(void *parameters)
 	}
 	// Force settings update to make sure rotation loaded
 	settingsUpdatedCb(AttitudeSettingsHandle());
+	HomeLocationUpdatedCb(HomeLocationHandle());
 	
 	// Main task loop
 	while (1) {
@@ -251,6 +283,106 @@ static void AttitudeTask(void *parameters)
 
 			AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
 		}
+		
+		
+		/*=========================*/
+		
+		if( gpsNew_flag == true){
+			
+			uint8_t gpsStatus;
+			GPSPositionStatusGet(&gpsStatus);
+			if (gpsStatus == GPSPOSITION_STATUS_FIX3D) {
+				//Load UAVOs
+				GPSVelocityData gpsVelocityData;
+				GPSVelocityGet(&gpsVelocityData);
+				
+				PositionActualData positionActualData;
+				VelocityActualData velocityActualData;
+				
+				PositionActualGet(&positionActualData);
+				VelocityActualGet(&velocityActualData);
+				
+				//Get NED coordinates
+				float NED[3];
+				
+				int32_t LL_int[2];
+				int32_t tmpVal;
+				GPSPositionLatitudeGet(&tmpVal);
+				LL_int[0]=tmpVal;
+				GPSPositionLongitudeGet(&tmpVal);
+				LL_int[1]=tmpVal;
+				
+				float altitude;
+				GPSPositionAltitudeGet(&altitude);
+				
+				float geoidSeparation;
+				GPSPositionGeoidSeparationGet(&geoidSeparation);
+				
+				LLA2NED(LL_int, altitude, geoidSeparation, NED);
+				
+				//Calculate filter coefficients
+				float dT=.100;
+				float tauPosNorthEast=0.3;
+				float tauPosDown=0.5;
+				float tauVelNorthEast=0.3;
+				float tauVelDown=0.5;
+				float alphaPosNorthEast=dT/(dT + tauPosNorthEast);
+				float alphaPosDown=dT/(dT + tauPosDown);
+				float alphaVelNorthEast=dT/(dT + tauVelNorthEast);
+				float alphaVelDown=dT/(dT + tauVelDown);
+				
+				//Low pass filter for velocity
+				velocityActualData.North=(1-alphaVelNorthEast)*velocityActualData.North + alphaVelNorthEast*gpsVelocityData.North;
+				velocityActualData.East= (1-alphaVelNorthEast)*velocityActualData.East + alphaVelNorthEast*gpsVelocityData.East;
+				velocityActualData.Down= (1-alphaVelDown)*velocityActualData.Down + alphaVelDown*gpsVelocityData.Down;
+				
+				//Complementary filter for position
+				positionActualData.North=(1-alphaPosNorthEast)*(positionActualData.North+(velocityActualData.North*dT)) + alphaPosNorthEast*NED[0];
+				positionActualData.East= (1-alphaPosNorthEast)*(positionActualData.East+(velocityActualData.East*dT)) + alphaPosNorthEast*NED[1];
+				positionActualData.Down= (1-alphaPosDown)*(positionActualData.Down+(velocityActualData.Down*dT)) + alphaPosDown*NED[2];
+
+				//Very slowly use GPS heading data to converge. This is a poor way of doing things, but will work in the short term for testing.
+				if (fabs(velocityActualData.North) > 4 || fabs(velocityActualData.East) > 4){
+					float heading;
+					
+					GPSPositionHeadingGet(&heading);
+					if (heading > 180.0f)
+						heading-=2.0f*360.0f;
+					
+					AttitudeActualData attitudeActual;
+					AttitudeActualGet(&attitudeActual);
+
+					while(heading-attitudeActual.Yaw < -180.0f){
+						heading+=360.0f;
+					}
+					while(heading-attitudeActual.Yaw > 180.0f){
+						heading-=360.0f;
+					}
+					
+					attitudeActual.Yaw=.997f*attitudeActual.Yaw+0.003f*heading;
+					
+					// Convert into quaternions degrees (makes assumptions about RPY order)
+					RPY2Quaternion(&attitudeActual.Roll, &attitudeActual.q1);
+					
+					//BOOOOOOOOOOOOOOO----------VVVVVVVVVV
+					
+					if (!AttitudeActualReadOnly()){
+						AttitudeActualSet(&attitudeActual);
+					}
+				}
+				
+				
+				// Do not update position and velocity estimates when in simulation mode
+				if (!PositionActualReadOnly()){
+					PositionActualSet(&positionActualData);
+					VelocityActualSet(&velocityActualData);
+				}
+			}
+			
+			gpsNew_flag=false;
+		}
+		
+ 
 	}
 }
 
@@ -574,6 +706,53 @@ static void settingsUpdatedCb(UAVObjEvent * objEv) {
 	} else
 		trim_requested = false;
 }
+
+
+/**
+ * @brief Convert the GPS LLA position into NED coordinates
+ * @note this method uses a taylor expansion around the home coordinates
+ * to convert to NED which allows it to be done with all floating
+ * calculations
+ * @param[in] Current GPS coordinates, (Lat, Lon, Alt)
+ * @param[out] NED frame coordinates
+ * @returns 0 for success, -1 for failure
+ */
+float T[3];
+
+static int32_t LLA2NED(int32_t LL[2], float altitude, float geoidSeparation, float * NED)
+{
+	float dL[3] = {(LL[0] - homeLocation.Latitude) / 10.0e6f * DEG2RAD,
+		(LL[1] - homeLocation.Longitude) / 10.0e6f * DEG2RAD,
+		(altitude + geoidSeparation - homeLocation.Altitude)};
+	
+	NED[0] = T[0] * dL[0];
+	NED[1] = T[1] * dL[1];
+	NED[2] = T[2] * dL[2];
+	
+	return 0;
+}
+
+static void GPSPositionUpdatedCb(UAVObjEvent * objEv) 
+{
+	gpsNew_flag=true;	
+}
+
+static void HomeLocationUpdatedCb(UAVObjEvent * objEv) 
+{
+	float lat, alt;
+	
+	HomeLocationGet(&homeLocation);
+	
+	// Compute vector for converting deltaLLA to NED
+	lat = homeLocation.Latitude / 10.0e6f * DEG2RAD;
+	alt = homeLocation.Altitude;
+	
+	T[0] = alt+6.378137E6f;
+	T[1] = cosf(lat)*(alt+6.378137E6f);
+	T[2] = -1.0f;
+}
+
+
 /**
  * @}
  * @}

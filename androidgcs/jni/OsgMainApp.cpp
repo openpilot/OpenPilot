@@ -215,3 +215,6 @@ osg::Vec4f OsgMainApp::getClearColor(){
     osg::notify(osg::ALWAYS)<<"Getting Clear Color"<<std::endl;
     return _viewer->getCamera()->getClearColor();
 }
+
+void OsgMainApp::setRPY(float x, float y, float z){
+}

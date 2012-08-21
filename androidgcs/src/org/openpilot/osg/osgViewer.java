@@ -81,8 +81,6 @@ public class osgViewer extends Activity implements View.OnTouchListener, View.On
        	String address = Environment.getExternalStorageDirectory().getPath() + "/Models/cow.osg";
        	Log.d(TAG, "Address: " + address);
        	osgNativeLib.loadObject(address);
-       	//address.getText().toString());
-
     }
     @Override protected void onPause() {
         super.onPause();

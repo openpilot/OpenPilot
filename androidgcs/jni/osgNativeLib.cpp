@@ -22,6 +22,7 @@ extern "C" {
     JNIEXPORT void JNICALL Java_org_openpilot_osg_osgNativeLib_loadObject(JNIEnv * env, jobject obj, jstring address);
     JNIEXPORT void JNICALL Java_org_openpilot_osg_osgNativeLib_unLoadObject(JNIEnv * env, jobject obj, jint number);
     JNIEXPORT jobjectArray JNICALL Java_org_openpilot_osg_osgNativeLib_getObjectNames(JNIEnv * env, jobject obj);
+    JNIEXPORT void JNICALL Java_org_openpilot_osg_osgNativeLib_setRPY(JNIEnv * env, jobject obj, jfloat roll, jfloat pitch, jfloat yaw);
 };
 
 JNIEXPORT void JNICALL Java_org_openpilot_osg_osgNativeLib_init(JNIEnv * env, jobject obj, jint width, jint height){
@@ -110,4 +111,8 @@ JNIEXPORT jobjectArray JNICALL Java_org_openpilot_osg_osgNativeLib_getObjectName
     }
 
     return fileNames;
+}
+
+JNIEXPORT void JNICALL Java_org_openpilot_osg_osgNativeLib_setRPY(JNIEnv * env, jobject obj, jfloat roll, jfloat pitch, jfloat yaw){
+	mainApp.setRPY(roll,pitch,yaw);
 }

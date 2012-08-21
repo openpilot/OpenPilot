@@ -176,6 +176,9 @@ public:
 
     void setClearColor(osg::Vec4f color);
     osg::Vec4f getClearColor();
+
+    //Manipulating the view
+    void setRPY(float x, float y, float z);
 };
 
 

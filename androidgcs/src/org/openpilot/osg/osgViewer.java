@@ -7,6 +7,7 @@ import android.app.AlertDialog;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -77,7 +78,10 @@ public class osgViewer extends Activity implements View.OnTouchListener, View.On
        	msgUiLightOn  = Toast.makeText(getApplicationContext(), "toast3", Toast.LENGTH_SHORT);
        	msgUiLightOff  = Toast.makeText(getApplicationContext(), "toast4", Toast.LENGTH_SHORT);
 
-       	//osgNativeLib.loadObject(address.getText().toString());
+       	String address = Environment.getExternalStorageDirectory().getPath() + "/Models/cow.osg";
+       	Log.d(TAG, "Address: " + address);
+       	osgNativeLib.loadObject(address);
+       	//address.getText().toString());
 
     }
     @Override protected void onPause() {

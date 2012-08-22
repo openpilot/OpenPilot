@@ -127,7 +127,7 @@ int32_t StabilizationInitialize()
 	// Initialize variables
 	StabilizationSettingsInitialize();
 	ActuatorDesiredInitialize();
-#if defined(DIAGNOSTICS)
+#if defined(RATEDESIRED_DIAGNOSTICS)
 	RateDesiredInitialize();
 #endif
 
@@ -176,7 +176,7 @@ static void stabilizationTask(void* parameters)
 		AttitudeActualGet(&attitudeActual);
 		GyrosGet(&gyrosData);
 
-#if defined(DIAGNOSTICS)
+#if defined(RATEDESIRED_DIAGNOSTICS)
 		RateDesiredGet(&rateDesired);
 #endif
 
@@ -308,7 +308,7 @@ static void stabilizationTask(void* parameters)
 		}
 
 		uint8_t shouldUpdate = 1;
-#if defined(DIAGNOSTICS)
+#if defined(RATEDESIRED_DIAGNOSTICS)
 		RateDesiredSet(&rateDesired);
 #endif
 		ActuatorDesiredGet(&actuatorDesired);

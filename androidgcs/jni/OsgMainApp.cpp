@@ -112,8 +112,7 @@ void OsgMainApp::initOsgWindow(int x,int y,int width,int height){
     _notifyHandler = new OsgAndroidNotifyHandler();
     _notifyHandler->setTag("Osg Viewer");
     osg::setNotifyHandler(_notifyHandler);
-
-    osg::notify(osg::ALWAYS)<<"Testing"<<std::endl;
+    osg::setNotifyLevel(osg::DEBUG_INFO);
 
     _viewer = new osgViewer::Viewer();
     _viewer->setUpViewerAsEmbeddedInWindow(x, y, width, height);

@@ -4,7 +4,7 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE    := osgNativeLib
 ### Main Install dir
-OSG_ANDROID_DIR	        := ../../osg_android/osg
+OSG_ANDROID_DIR	        := ../../osg_android_git/osg-install
 LIBDIR 			:= $(OSG_ANDROID_DIR)/obj/local/armeabi
 
 ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
@@ -28,6 +28,7 @@ LOCAL_LDFLAGS   := -L $(LIBDIR) \
 -losgdb_osgterrain \
 -losgdb_osg \
 -losgdb_ive \
+-losgdb_3ds \
 -losgdb_deprecated_osgviewer \
 -losgdb_deprecated_osgvolume \
 -losgdb_deprecated_osgtext \

@@ -24,6 +24,15 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+
+/*
+ * IMPORTANT: This module is meant to be a reference implementation which
+ * demostrates the use of ConfigTaskWidget API for widgets which are not directly
+ * related to UAVObjects. It contains a lot of comments including some commented
+ * out code samples. Please DO NOT COPY/PASTE them into any other module based
+ * on this.
+ */
+
 #include "configcamerastabilizationwidget.h"
 #include "camerastabsettings.h"
 #include "hwsettings.h"

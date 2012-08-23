@@ -18,7 +18,7 @@ LOCAL_C_INCLUDES:= $(OSG_ANDROID_DIR)/include
 LOCAL_CFLAGS    := -Werror -fno-short-enums
 LOCAL_CPPFLAGS  := -DOSG_LIBRARY_STATIC 
 
-LOCAL_LDLIBS    := -llog -lGLESv2 -ldl -lz -lgnustl_static
+LOCAL_LDLIBS    := -llog -lGLESv2 -ldl -lz -lgnustl_static -ljpeg -lpng
 LOCAL_SRC_FILES := osgNativeLib.cpp OsgMainApp.cpp OsgAndroidNotifyHandler.cpp
 LOCAL_LDFLAGS   := -L $(LIBDIR) \
 -losgdb_dds \
@@ -29,6 +29,8 @@ LOCAL_LDFLAGS   := -L $(LIBDIR) \
 -losgdb_osg \
 -losgdb_ive \
 -losgdb_3ds \
+-losgdb_jpeg \
+-losgdb_png \
 -losgdb_deprecated_osgviewer \
 -losgdb_deprecated_osgvolume \
 -losgdb_deprecated_osgtext \

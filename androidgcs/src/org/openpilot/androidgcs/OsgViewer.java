@@ -85,7 +85,7 @@ public class OsgViewer extends ObjectManagerActivity implements View.OnTouchList
        	msgUiLightOn  = Toast.makeText(getApplicationContext(), "toast3", Toast.LENGTH_SHORT);
        	msgUiLightOff  = Toast.makeText(getApplicationContext(), "toast4", Toast.LENGTH_SHORT);
 
-       	String address = Environment.getExternalStorageDirectory().getPath() + "/Models/quad.osg";
+       	String address = Environment.getExternalStorageDirectory().getPath() + "/Models/J14-QT_X.3DS"; //quad.osg";
        	Log.d(TAG, "Address: " + address);
        	osgNativeLib.loadObject(address);
     }

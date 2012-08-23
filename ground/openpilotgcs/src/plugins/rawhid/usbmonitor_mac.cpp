@@ -117,6 +117,10 @@ void USBMonitor::removeDevice(IOHIDDeviceRef dev) {
   */
 void USBMonitor::detach_callback(void *context, IOReturn r, void *hid_mgr, IOHIDDeviceRef dev)
 {
+    Q_UNUSED(context);
+    Q_UNUSED(r);
+    Q_UNUSED(hid_mgr);
+
     qDebug() << "USBMonitor: Device detached event";
     instance()->removeDevice(dev);
 }
@@ -129,6 +133,10 @@ void USBMonitor::addDevice(USBPortInfo info) {
 
 void USBMonitor::attach_callback(void *context, IOReturn r, void *hid_mgr, IOHIDDeviceRef dev)
 {
+    Q_UNUSED(context);
+    Q_UNUSED(r);
+    Q_UNUSED(hid_mgr);
+
     bool got_properties = true;
 
 //    CFTypeRef prop;

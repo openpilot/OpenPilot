@@ -177,6 +177,8 @@ QList <Core::IConnection::device> IPconnectionConnection::availableDevices()
 
 QIODevice *IPconnectionConnection::openDevice(const QString &deviceName)
 {
+    Q_UNUSED(deviceName);
+
     QString HostName;
     int Port;
     bool UseTCP;
@@ -211,6 +213,8 @@ QIODevice *IPconnectionConnection::openDevice(const QString &deviceName)
 
 void IPconnectionConnection::closeDevice(const QString &deviceName)
 {
+    Q_UNUSED(deviceName);
+
     if (ipSocket){
         ipConMutex.lock();
         emit CloseSocket(ipSocket);

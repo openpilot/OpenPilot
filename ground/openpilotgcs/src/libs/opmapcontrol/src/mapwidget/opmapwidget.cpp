@@ -392,7 +392,6 @@ namespace mapcontrol
     }
     void OPMapWidget::WPDeleteAll()
     {
-//        int x=0;
         foreach(QGraphicsItem* i,map->childItems())
         {
             WayPointItem* w=qgraphicsitem_cast<WayPointItem*>(i);

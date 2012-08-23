@@ -291,7 +291,7 @@ bool ConfigFixedWingWidget::setupFrameFixedWing(QString airframeType)
 
     int channel;
     //disable all
-    for (channel=0; (unsigned int) channel<VehicleConfig::CHANNEL_NUMELEM; channel++)
+    for (channel=0; (unsigned int) channel < VehicleConfig::CHANNEL_NUMELEM; channel++)
     {
         setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_DISABLED);
         resetMixerVector(mixer, channel);
@@ -371,7 +371,7 @@ bool ConfigFixedWingWidget::setupFrameElevon(QString airframeType)
     int channel;
     double value;
     //disable all
-    for (channel=0; (unsigned int) channel<VehicleConfig::CHANNEL_NUMELEM; channel++)
+    for (channel=0; (unsigned int) channel < VehicleConfig::CHANNEL_NUMELEM; channel++)
     {
         setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_DISABLED);
         resetMixerVector(mixer, channel);
@@ -449,7 +449,7 @@ bool ConfigFixedWingWidget::setupFrameVtail(QString airframeType)
     int channel;
     double value;
     //disable all
-    for (channel=0; (unsigned int) channel<VehicleConfig::CHANNEL_NUMELEM; channel++)
+    for (channel=0; (unsigned int) channel < VehicleConfig::CHANNEL_NUMELEM; channel++)
     {
         setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_DISABLED);
         resetMixerVector(mixer, channel);

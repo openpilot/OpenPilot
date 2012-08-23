@@ -1,8 +1,8 @@
 TEMPLATE = lib
-TARGET = HITLNEW
+TARGET = HITL
 QT += network
 include(../../openpilotgcsplugin.pri)
-include(hitlnew_dependencies.pri)
+include(hitl_dependencies.pri)
 HEADERS += hitlplugin.h \
     hitlwidget.h \
     hitloptionspage.h \
@@ -27,7 +27,7 @@ SOURCES += hitlplugin.cpp \
     fgsimulator.cpp \
     il2simulator.cpp \
     xplanesimulator.cpp
-OTHER_FILES += hitlnew.pluginspec
+OTHER_FILES += hitl.pluginspec
 FORMS += hitloptionspage.ui \
     hitlwidget.ui
 RESOURCES += hitlresources.qrc

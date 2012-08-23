@@ -38,10 +38,10 @@ ConfigTaskWidget::ConfigTaskWidget(QWidget *parent) : QWidget(parent),isConnecte
     objManager = pm->getObject<UAVObjectManager>();
     TelemetryManager* telMngr = pm->getObject<TelemetryManager>();
     utilMngr = pm->getObject<UAVObjectUtilManager>();
-    connect(telMngr, SIGNAL(connected()), this, SLOT(onAutopilotConnect()));
-    connect(telMngr, SIGNAL(disconnected()), this, SLOT(onAutopilotDisconnect()));
-    connect(telMngr, SIGNAL(connected()), this, SIGNAL(autoPilotConnected()));
-    connect(telMngr, SIGNAL(disconnected()), this, SIGNAL(autoPilotDisconnected()));
+    connect(telMngr, SIGNAL(connected()), this, SLOT(onAutopilotConnect()),Qt::UniqueConnection);
+    connect(telMngr, SIGNAL(disconnected()), this, SLOT(onAutopilotDisconnect()),Qt::UniqueConnection);
+    connect(telMngr, SIGNAL(connected()), this, SIGNAL(autoPilotConnected()),Qt::UniqueConnection);
+    connect(telMngr, SIGNAL(disconnected()), this, SIGNAL(autoPilotDisconnected()),Qt::UniqueConnection);
     UAVSettingsImportExportFactory * importexportplugin =  pm->getObject<UAVSettingsImportExportFactory>();
     connect(importexportplugin,SIGNAL(importAboutToBegin()),this,SLOT(invalidateObjects()));
 }
@@ -285,15 +285,16 @@ void ConfigTaskWidget::forceConnectedState()//dynamic widgets don't recieve the 
 
 void ConfigTaskWidget::onAutopilotConnect()
 {
+    qDebug()<<"OnAutopilotConnect:"<<this->metaObject()->className();
     if (utilMngr)
         currentBoard = utilMngr->getBoardModel();//TODO REMEMBER TO ADD THIS TO FORCE CONNECTED FUNC ON CC3D_RELEASE
     invalidateObjects();
-    dirty=false;
     isConnected=true;
     foreach(objectToWidget * ow,objOfInterest)
     {
         loadWidgetLimits(ow->widget,ow->field,ow->index,ow->isLimited,ow->scale);
     }
+    setDirty(false);
     enableControls(true);
     refreshWidgetsValues();
 }
@@ -342,6 +343,7 @@ void ConfigTaskWidget::refreshWidgetsValues(UAVObject * obj)
 
     }
     setDirty(dirtyBack);
+
 }
 /**
  * SLOT function used to update the uavobject fields from widgets with relation to

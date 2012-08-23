@@ -27,7 +27,8 @@ HEADERS += setupwizardplugin.h \
     pages/levellingpage.h \
     levellingutil.h \
     vehicleconfigurationsource.h \
-    vehicleconfigurationhelper.h
+    vehicleconfigurationhelper.h \
+    connectiondiagram.h
 
 SOURCES += setupwizardplugin.cpp \
     setupwizard.cpp \
@@ -48,7 +49,8 @@ SOURCES += setupwizardplugin.cpp \
     pages/levellingpage.cpp \
     levellingutil.cpp \
     vehicleconfigurationsource.cpp \
-    vehicleconfigurationhelper.cpp
+    vehicleconfigurationhelper.cpp \
+    connectiondiagram.cpp
 
 OTHER_FILES += SetupWizard.pluginspec
 
@@ -66,7 +68,8 @@ FORMS += \
     pages/inputpage.ui \
     pages/summarypage.ui \
     pages/flashpage.ui \
-    pages/levellingpage.ui
+    pages/levellingpage.ui \
+    connectiondiagram.ui
 
 RESOURCES += \
     wizardResources.qrc

@@ -29,6 +29,7 @@
 #include <coreplugin/modemanager.h>
 #include <extensionsystem/pluginmanager.h>
 #include <configgadgetfactory.h>
+#include <QMessageBox>
 
 EndPage::EndPage(SetupWizard *wizard, QWidget *parent) :
     AbstractWizardPage(wizard, parent),
@@ -46,12 +47,19 @@ EndPage::~EndPage()
 
 void EndPage::openInputWizard()
 {
-    Core::ModeManager::instance()->activateModeByWorkspaceName("Configuration");
-
-    getWizard()->close();
-
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     ConfigGadgetFactory* configGadgetFactory = pm->getObject<ConfigGadgetFactory>();
-    Q_ASSERT(configGadgetFactory);
-    configGadgetFactory->startInputWizard();
+
+    if(configGadgetFactory) {
+        Core::ModeManager::instance()->activateModeByWorkspaceName("Configuration");
+        getWizard()->close();
+        configGadgetFactory->startInputWizard();
+    }
+    else {
+        QMessageBox msgBox;
+        msgBox.setText(tr("Unable to open Input Wizard since the Config Plugin is not\nloaded in the current workspace."));
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setDefaultButton(QMessageBox::Ok);
+        msgBox.exec();
+    }
 }

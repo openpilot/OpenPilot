@@ -58,5 +58,8 @@ IOptionsPage *ConfigGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *co
 
 void ConfigGadgetFactory::startInputWizard()
 {
-    gadgetWidget->startInputWizard();
+    if(gadgetWidget)
+    {
+        gadgetWidget->startInputWizard();
+    }
 }

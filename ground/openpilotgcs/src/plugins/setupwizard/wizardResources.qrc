@@ -12,5 +12,17 @@
         <file>resources/bttn-plane-down.png</file>
         <file>resources/bttn-plane-over.png</file>
         <file>resources/bttn-plane-up.png</file>
+        <file>resources/bttn-ESC-down.png</file>
+        <file>resources/bttn-ESC-up.png</file>
+        <file>resources/bttn-ppm-down.png</file>
+        <file>resources/bttn-ppm-up.png</file>
+        <file>resources/bttn-pwm-down.png</file>
+        <file>resources/bttn-pwm-up.png</file>
+        <file>resources/bttn-rapid-down.png</file>
+        <file>resources/bttn-rapid-up.png</file>
+        <file>resources/bttn-sat-down.png</file>
+        <file>resources/bttn-sat-up.png</file>
+        <file>resources/bttn-sbus-down.png</file>
+        <file>resources/bttn-sbus-up.png</file>
     </qresource>
 </RCC>

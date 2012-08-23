@@ -44,9 +44,9 @@ p, li { white-space: pre-wrap; }
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>220</y>
+     <y>200</y>
      <width>561</width>
-     <height>160</height>
+     <height>181</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -61,22 +61,36 @@ p, li { white-space: pre-wrap; }
    <property name="alignment">
     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
    </property>
-   <widget class="QPushButton" name="pwmButton">
+   <widget class="QToolButton" name="pwmButton">
     <property name="geometry">
      <rect>
       <x>50</x>
       <y>40</y>
       <width>100</width>
-      <height>100</height>
+      <height>120</height>
      </rect>
     </property>
     <property name="toolTip">
      <string>Tricopter, Quadcopter, Hexacopter, Octocopter</string>
     </property>
+    <property name="styleSheet">
+     <string notr="true">QToolButton { border: none }</string>
+    </property>
     <property name="text">
-     <string>PWM
-One cable
-per channel</string>
+     <string>PWM</string>
+    </property>
+    <property name="icon">
+     <iconset resource="../wizardResources.qrc">
+      <normaloff>:/setupwizard/resources/bttn-pwm-up.png</normaloff>
+      <normalon>:/setupwizard/resources/bttn-pwm-down.png</normalon>
+      <activeoff>:/setupwizard/resources/bttn-pwm-down.png</activeoff>
+      <activeon>:/setupwizard/resources/bttn-pwm-down.png</activeon>:/setupwizard/resources/bttn-pwm-up.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>100</width>
+      <height>100</height>
+     </size>
     </property>
     <property name="checkable">
      <bool>true</bool>
@@ -87,26 +101,43 @@ per channel</string>
     <property name="autoExclusive">
      <bool>true</bool>
     </property>
-    <property name="flat">
-     <bool>false</bool>
+    <property name="toolButtonStyle">
+     <enum>Qt::ToolButtonTextUnderIcon</enum>
+    </property>
+    <property name="autoRaise">
+     <bool>true</bool>
     </property>
    </widget>
-   <widget class="QPushButton" name="ppmButton">
+   <widget class="QToolButton" name="ppmButton">
     <property name="geometry">
      <rect>
       <x>170</x>
       <y>40</y>
       <width>100</width>
-      <height>100</height>
+      <height>120</height>
      </rect>
     </property>
     <property name="toolTip">
      <string>Airplane, Sloper, Jet</string>
     </property>
+    <property name="styleSheet">
+     <string notr="true">QToolButton { border: none }</string>
+    </property>
     <property name="text">
-     <string>PPM
-One cable
-for all channels</string>
+     <string>PPM</string>
+    </property>
+    <property name="icon">
+     <iconset resource="../wizardResources.qrc">
+      <normaloff>:/setupwizard/resources/bttn-ppm-up.png</normaloff>
+      <normalon>:/setupwizard/resources/bttn-ppm-down.png</normalon>
+      <activeoff>:/setupwizard/resources/bttn-ppm-down.png</activeoff>
+      <activeon>:/setupwizard/resources/bttn-ppm-down.png</activeon>:/setupwizard/resources/bttn-ppm-up.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>100</width>
+      <height>100</height>
+     </size>
     </property>
     <property name="checkable">
      <bool>true</bool>
@@ -114,25 +145,43 @@ for all channels</string>
     <property name="autoExclusive">
      <bool>true</bool>
     </property>
-    <property name="flat">
-     <bool>false</bool>
+    <property name="toolButtonStyle">
+     <enum>Qt::ToolButtonTextUnderIcon</enum>
+    </property>
+    <property name="autoRaise">
+     <bool>true</bool>
     </property>
    </widget>
-   <widget class="QPushButton" name="sbusButton">
+   <widget class="QToolButton" name="sbusButton">
     <property name="geometry">
      <rect>
       <x>290</x>
       <y>40</y>
       <width>100</width>
-      <height>100</height>
+      <height>120</height>
      </rect>
     </property>
     <property name="toolTip">
      <string>Airplane, Sloper, Jet</string>
     </property>
+    <property name="styleSheet">
+     <string notr="true">QToolButton { border: none }</string>
+    </property>
     <property name="text">
-     <string>Futaba
-S.Bus</string>
+     <string>Futaba</string>
+    </property>
+    <property name="icon">
+     <iconset resource="../wizardResources.qrc">
+      <normaloff>:/setupwizard/resources/bttn-sbus-up.png</normaloff>
+      <normalon>:/setupwizard/resources/bttn-sbus-down.png</normalon>
+      <activeoff>:/setupwizard/resources/bttn-sbus-down.png</activeoff>
+      <activeon>:/setupwizard/resources/bttn-sbus-down.png</activeon>:/setupwizard/resources/bttn-sbus-up.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>100</width>
+      <height>100</height>
+     </size>
     </property>
     <property name="checkable">
      <bool>true</bool>
@@ -140,25 +189,43 @@ S.Bus</string>
     <property name="autoExclusive">
      <bool>true</bool>
     </property>
-    <property name="flat">
-     <bool>false</bool>
+    <property name="toolButtonStyle">
+     <enum>Qt::ToolButtonTextUnderIcon</enum>
+    </property>
+    <property name="autoRaise">
+     <bool>true</bool>
     </property>
    </widget>
-   <widget class="QPushButton" name="spectrumButton">
+   <widget class="QToolButton" name="spectrumButton">
     <property name="geometry">
      <rect>
       <x>410</x>
       <y>40</y>
       <width>100</width>
-      <height>100</height>
+      <height>120</height>
      </rect>
     </property>
     <property name="toolTip">
      <string>Airplane, Sloper, Jet</string>
     </property>
+    <property name="styleSheet">
+     <string notr="true">QToolButton { border: none }</string>
+    </property>
     <property name="text">
-     <string>Spectrum
-Satellite</string>
+     <string>Spectrum</string>
+    </property>
+    <property name="icon">
+     <iconset resource="../wizardResources.qrc">
+      <normaloff>:/setupwizard/resources/bttn-sat-up.png</normaloff>
+      <normalon>:/setupwizard/resources/bttn-sat-down.png</normalon>
+      <activeoff>:/setupwizard/resources/bttn-sat-down.png</activeoff>
+      <activeon>:/setupwizard/resources/bttn-sat-down.png</activeon>:/setupwizard/resources/bttn-sat-up.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>100</width>
+      <height>100</height>
+     </size>
     </property>
     <property name="checkable">
      <bool>true</bool>
@@ -166,12 +233,17 @@ Satellite</string>
     <property name="autoExclusive">
      <bool>true</bool>
     </property>
-    <property name="flat">
-     <bool>false</bool>
+    <property name="toolButtonStyle">
+     <enum>Qt::ToolButtonTextUnderIcon</enum>
+    </property>
+    <property name="autoRaise">
+     <bool>true</bool>
     </property>
    </widget>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="../wizardResources.qrc"/>
+ </resources>
  <connections/>
 </ui>

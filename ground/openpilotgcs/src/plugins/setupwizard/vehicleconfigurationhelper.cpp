@@ -32,8 +32,8 @@
 #include "attitudesettings.h"
 #include "mixersettings.h"
 #include "systemsettings.h"
-#import "manualcontrolsettings.h"
-#import "stabilizationsettings.h"
+#include "manualcontrolsettings.h"
+#include "stabilizationsettings.h"
 
 VehicleConfigurationHelper::VehicleConfigurationHelper(VehicleConfigurationSource *configSource)
     : m_configSource(configSource), m_uavoManager(0),

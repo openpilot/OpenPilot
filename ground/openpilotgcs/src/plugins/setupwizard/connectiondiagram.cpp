@@ -25,14 +25,34 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#include <QDebug>
+#include <QFile>
 #include "connectiondiagram.h"
 #include "ui_connectiondiagram.h"
 
-ConnectionDiagram::ConnectionDiagram(QWidget *parent) :
-    QDialog(parent),
+ConnectionDiagram::ConnectionDiagram(QWidget *parent, VehicleConfigurationSource* configSource) :
+    QDialog(parent), m_configSource(configSource),
     ui(new Ui::ConnectionDiagram)
 {
+    setWindowTitle(tr("Connection Diagram"));
     ui->setupUi(this);
+
+    QGraphicsScene *scene = new QGraphicsScene(this);
+    ui->connectionDiagram->setScene(scene);
+    ui->connectionDiagram->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+    m_renderer = new QSvgRenderer();
+    if (m_renderer->load(QString(":/setupwizard/resources/connection-diagrams.svg")) && m_renderer->isValid())
+    {
+        scene->clear();
+        QGraphicsSvgItem* ccPic = new QGraphicsSvgItem();
+        ccPic->setSharedRenderer(m_renderer);
+        ccPic->setElementId("cc");
+        scene->addItem(ccPic);
+        qDebug() << "Scene complete";
+
+        //ui->connectionDiagram->setSceneRect(ccPic->boundingRect());
+        //ui->connectionDiagram->fitInView(ccPic, Qt::KeepAspectRatio);
+    }
 }
 
 ConnectionDiagram::~ConnectionDiagram()

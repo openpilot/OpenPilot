@@ -48,8 +48,9 @@ SetupWizard::SetupWizard(QWidget *parent) : QWizard(parent), VehicleConfiguratio
     m_vehicleType(VEHICLE_UNKNOWN), m_inputType(INPUT_UNKNOWN), m_escType(ESC_UNKNOWN),
     m_levellingPerformed(false), m_connectionManager(0)
 {
-    setWindowTitle("OpenPilot Setup Wizard");
+    setWindowTitle(tr("OpenPilot Setup Wizard"));
     setOption(QWizard::IndependentPages, false);
+    setFixedSize(640, 530);
     createPages();
 }
 

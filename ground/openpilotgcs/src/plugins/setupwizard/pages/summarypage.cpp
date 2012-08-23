@@ -28,12 +28,14 @@
 #include "summarypage.h"
 #include "ui_summarypage.h"
 #include "setupwizard.h"
+#include "connectiondiagram.h"
 
 SummaryPage::SummaryPage(SetupWizard *wizard, QWidget *parent) :
         AbstractWizardPage(wizard, parent),
     ui(new Ui::SummaryPage)
 {
     ui->setupUi(this);
+    connect(ui->illustrationButton, SIGNAL(clicked()), this, SLOT(showDiagram()));
 }
 
 SummaryPage::~SummaryPage()
@@ -49,4 +51,10 @@ bool SummaryPage::validatePage()
 void SummaryPage::initializePage()
 {
     ui->configurationSummary->setText(getWizard()->getSummaryText());
+}
+
+void SummaryPage::showDiagram()
+{
+    ConnectionDiagram diagram(this, getWizard());
+    diagram.exec();
 }

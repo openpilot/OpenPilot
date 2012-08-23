@@ -46,6 +46,9 @@ public:
 
 private:
     Ui::SummaryPage *ui;
+
+private slots:
+    void showDiagram();
 };
 
 #endif // SUMMARYPAGE_H

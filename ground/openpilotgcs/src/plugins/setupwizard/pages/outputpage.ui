@@ -40,121 +40,109 @@ p, li { white-space: pre-wrap; }
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QGroupBox" name="groupBox">
+  <widget class="QToolButton" name="rapidESCButton">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>200</y>
-     <width>561</width>
-     <height>181</height>
+     <x>320</x>
+     <y>250</y>
+     <width>200</width>
+     <height>120</height>
     </rect>
    </property>
-   <property name="sizePolicy">
-    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-     <horstretch>0</horstretch>
-     <verstretch>0</verstretch>
-    </sizepolicy>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
    </property>
-   <property name="title">
-    <string>Supported speed controller types</string>
+   <property name="toolTip">
+    <string>Airplane, Sloper, Jet</string>
    </property>
-   <property name="alignment">
-    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+   <property name="styleSheet">
+    <string notr="true">QToolButton { border: none }</string>
    </property>
-   <widget class="QToolButton" name="defaultESCButton">
-    <property name="geometry">
-     <rect>
-      <x>300</x>
-      <y>40</y>
-      <width>200</width>
-      <height>120</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>Tricopter, Quadcopter, Hexacopter, Octocopter</string>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">QToolButton { border: none }</string>
-    </property>
-    <property name="text">
-     <string>Standard ESC</string>
-    </property>
-    <property name="icon">
-     <iconset resource="../wizardResources.qrc">
-      <normaloff>:/setupwizard/resources/bttn-ESC-up.png</normaloff>
-      <normalon>:/setupwizard/resources/bttn-ESC-down.png</normalon>
-      <activeoff>:/setupwizard/resources/bttn-ESC-down.png</activeoff>
-      <activeon>:/setupwizard/resources/bttn-ESC-down.png</activeon>:/setupwizard/resources/bttn-ESC-up.png</iconset>
-    </property>
-    <property name="iconSize">
-     <size>
-      <width>200</width>
-      <height>100</height>
-     </size>
-    </property>
-    <property name="checkable">
-     <bool>true</bool>
-    </property>
-    <property name="checked">
-     <bool>false</bool>
-    </property>
-    <property name="autoExclusive">
-     <bool>true</bool>
-    </property>
-    <property name="toolButtonStyle">
-     <enum>Qt::ToolButtonTextUnderIcon</enum>
-    </property>
-    <property name="autoRaise">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QToolButton" name="rapidESCButton">
-    <property name="geometry">
-     <rect>
-      <x>60</x>
-      <y>40</y>
-      <width>200</width>
-      <height>120</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>Airplane, Sloper, Jet</string>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">QToolButton { border: none }</string>
-    </property>
-    <property name="text">
-     <string>Rapid ESC</string>
-    </property>
-    <property name="icon">
-     <iconset resource="../wizardResources.qrc">
-      <normaloff>:/setupwizard/resources/bttn-rapid-up.png</normaloff>
-      <normalon>:/setupwizard/resources/bttn-rapid-down.png</normalon>
-      <activeoff>:/setupwizard/resources/bttn-rapid-down.png</activeoff>
-      <activeon>:/setupwizard/resources/bttn-rapid-down.png</activeon>:/setupwizard/resources/bttn-rapid-up.png</iconset>
-    </property>
-    <property name="iconSize">
-     <size>
-      <width>200</width>
-      <height>100</height>
-     </size>
-    </property>
-    <property name="checkable">
-     <bool>true</bool>
-    </property>
-    <property name="checked">
-     <bool>true</bool>
-    </property>
-    <property name="autoExclusive">
-     <bool>true</bool>
-    </property>
-    <property name="toolButtonStyle">
-     <enum>Qt::ToolButtonTextUnderIcon</enum>
-    </property>
-    <property name="autoRaise">
-     <bool>true</bool>
-    </property>
-   </widget>
+   <property name="text">
+    <string>Rapid ESC</string>
+   </property>
+   <property name="icon">
+    <iconset resource="../wizardResources.qrc">
+     <normaloff>:/setupwizard/resources/bttn-rapid-up.png</normaloff>
+     <normalon>:/setupwizard/resources/bttn-rapid-down.png</normalon>
+     <activeoff>:/setupwizard/resources/bttn-rapid-down.png</activeoff>
+     <activeon>:/setupwizard/resources/bttn-rapid-down.png</activeon>:/setupwizard/resources/bttn-rapid-up.png</iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>200</width>
+     <height>100</height>
+    </size>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="autoExclusive">
+    <bool>true</bool>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextUnderIcon</enum>
+   </property>
+   <property name="autoRaise">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QToolButton" name="defaultESCButton">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>250</y>
+     <width>200</width>
+     <height>120</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+   <property name="toolTip">
+    <string>Tricopter, Quadcopter, Hexacopter, Octocopter</string>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QToolButton { border: none }</string>
+   </property>
+   <property name="text">
+    <string>Standard ESC</string>
+   </property>
+   <property name="icon">
+    <iconset resource="../wizardResources.qrc">
+     <normaloff>:/setupwizard/resources/bttn-ESC-up.png</normaloff>
+     <normalon>:/setupwizard/resources/bttn-ESC-down.png</normalon>
+     <activeoff>:/setupwizard/resources/bttn-ESC-down.png</activeoff>
+     <activeon>:/setupwizard/resources/bttn-ESC-down.png</activeon>:/setupwizard/resources/bttn-ESC-up.png</iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>200</width>
+     <height>100</height>
+    </size>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="autoExclusive">
+    <bool>true</bool>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextUnderIcon</enum>
+   </property>
+   <property name="autoRaise">
+    <bool>true</bool>
+   </property>
   </widget>
  </widget>
  <resources>

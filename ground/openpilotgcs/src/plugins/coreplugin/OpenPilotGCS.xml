@@ -905,13 +905,32 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
+          <addNoise>false</addNoise>
+          <attActCalc>false</attActCalc>
+          <attActHW>true</attActHW>
+          <attActSim>true</attActSim>
+          <attActualEnabled>false</attActualEnabled>
+          <attRawEnabled>false</attRawEnabled>
+          <attRawRate>20</attRawRate>
+          <baroAltRate>50</baroAltRate>
+          <baroAltitudeEnabled>false</baroAltitudeEnabled>
           <binPath>\usr\games\fgfs</binPath>
           <dataPath>\usr\share\games\FlightGear</dataPath>
+          <gcsReciever>true</gcsReciever>
+          <gpsPosRate>100</gpsPosRate>
+          <gpsPositionEnabled>false</gpsPositionEnabled>
+          <groundTruthEnabled>true</groundTruthEnabled>
+          <groundTruthRate>100</groundTruthRate>
           <hostAddress>127.0.0.1</hostAddress>
           <inPort>9009</inPort>
-          <manual>false</manual>
+          <inputCommand>true</inputCommand>
+          <latitude></latitude>
+          <longitude></longitude>
+          <manualControl>false</manualControl>
+          <manualOutput>false</manualOutput>
+          <minOutputPeriod>100</minOutputPeriod>
           <outPort>9010</outPort>
-          <remoteHostAddress>127.0.0.1</remoteHostAddress>
+          <remoteAddress>127.0.0.1</remoteAddress>
           <simulatorId>FG</simulatorId>
           <startSim>true</startSim>
         </data>
@@ -922,13 +941,32 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
+          <addNoise>false</addNoise>
+          <attActCalc>false</attActCalc>
+          <attActHW>true</attActHW>
+          <attActSim>true</attActSim>
+          <attActualEnabled>false</attActualEnabled>
+          <attRawEnabled>false</attRawEnabled>
+          <attRawRate>20</attRawRate>
+          <baroAltRate>50</baroAltRate>
+          <baroAltitudeEnabled>false</baroAltitudeEnabled>
           <binPath>\home\lafargue\X-Plane 9\X-Plane-i686</binPath>
           <dataPath>\usr\share\games\FlightGear</dataPath>
-          <hostAddress>127.0.0.3</hostAddress>
+          <gcsReciever>true</gcsReciever>
+          <gpsPosRate>100</gpsPosRate>
+          <gpsPositionEnabled>false</gpsPositionEnabled>
+          <groundTruthEnabled>true</groundTruthEnabled>
+          <groundTruthRate>100</groundTruthRate>
+          <hostAddress>0.0.0.0</hostAddress>
           <inPort>6756</inPort>
-          <manual>false</manual>
+          <inputCommand>true</inputCommand>
+          <latitude></latitude>
+          <longitude></longitude>
+          <manualControl>false</manualControl>
+          <manualOutput>false</manualOutput>
+          <minOutputPeriod>100</minOutputPeriod>
           <outPort>49000</outPort>
-          <remoteHostAddress>127.0.0.1</remoteHostAddress>
+          <remoteAddress>127.0.0.1</remoteAddress>
           <simulatorId>X-Plane</simulatorId>
           <startSim>false</startSim>
         </data>

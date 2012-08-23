@@ -39,18 +39,18 @@
 #include "uavobjectmanager.h"
 
 #include "accels.h"
-#include "actuatordesired.h"
 #include "actuatorcommand.h"
+#include "actuatordesired.h"
 #include "attitudeactual.h"
 #include "attitudesettings.h"
-#include "baroaltitude.h"
 #include "baroairspeed.h"
+#include "baroaltitude.h"
+#include "flightstatus.h"
 #include "gcsreceiver.h"
 #include "gcstelemetrystats.h"
 #include "gpsposition.h"
 #include "gpsvelocity.h"
 #include "gyros.h"
-#include "flightstatus.h"
 #include "homelocation.h"
 #include "manualcontrolcommand.h"
 #include "positionactual.h"
@@ -62,42 +62,43 @@
 /**
  * just imagine this was a class without methods and all public properties
  */
-	typedef struct _FLIGHT_PARAM {
+typedef struct _FLIGHT_PARAM {
 
-	// time
-	float T;
-	float dT;
-	unsigned int i;
+    // time
+    float T;
+    float dT;
+    unsigned int i;
 
-	// speed (relative)
-	float ias;
-	float tas;
-	float groundspeed;
+    // speed (relative)
+    float ias;
+    float cas;
+    float tas;
+    float groundspeed;
 
-	// position (absolute)
-	float X;
-	float Y;
-	float Z;
+    // position (absolute)
+    float X;
+    float Y;
+    float Z;
 
-	// speed (absolute)
-	float dX;
-	float dY;
-	float dZ;
+    // speed (absolute)
+    float dX;
+    float dY;
+    float dZ;
 
-	// acceleration (absolute)
-	float ddX;
-	float ddY;
-	float ddZ;
+    // acceleration (absolute)
+    float ddX;
+    float ddY;
+    float ddZ;
 
-	//angle
-	float azimuth;
-	float pitch;
-	float roll;
-	
-	//rotation speed
-	float dAzimuth;
-	float dPitch;
-	float dRoll;
+    //angle
+    float azimuth;
+    float pitch;
+    float roll;
+
+    //rotation speed
+    float dAzimuth;
+    float dPitch;
+    float dRoll;
 
 } FLIGHT_PARAM;
 
@@ -111,37 +112,34 @@ typedef struct _CONNECTION
     int outPort;
     int inPort;
     bool startSim;
+    bool addNoise;
     QString latitude;
     QString longitude;
 
+//    bool homeLocation;
 
-
-    //Added by Hhrrrr
-    bool homeLocation;
-    quint16 homeLocRate;
-
-    bool attRaw;
+    bool attRawEnabled;
     quint8 attRawRate;
 
-    bool attActual;
+    bool attActualEnabled;
     bool attActHW;
     bool attActSim;
     bool attActCalc;
 
-    bool sonarAltitude;
-    float sonarMaxAlt;
-    quint16 sonarAltRate;
+    bool baroAltitudeEnabled;
+    quint16 baroAltRate;
 
-    bool groundTruth;
-    bool gpsPosition;
+    bool groundTruthEnabled;
+    quint16 groundTruthRate;
+
+    bool gpsPositionEnabled;
     quint16 gpsPosRate;
 
     bool inputCommand;
     bool gcsReciever;
     bool manualControl;
     bool manualOutput;
-    quint8 outputRate;
-
+    quint16 minOutputPeriod;
 
 } SimulatorSettings;
 
@@ -195,9 +193,10 @@ public:
 	static void setStarted(bool val) { isStarted = val; }
 	static QStringList& Instances() { return Simulator::instances; }
 	static void setInstance(const QString& str) { Simulator::instances.append(str); }
+    virtual void setupUdpPorts(const QString& host, int inPort, int outPort) { Q_UNUSED(host) Q_UNUSED(inPort) Q_UNUSED(outPort)}
 
-	virtual void stopProcess() {}
-        virtual void setupUdpPorts(const QString& host, int inPort, int outPort) { Q_UNUSED(host) Q_UNUSED(inPort) Q_UNUSED(outPort)}
+    void resetInitialHomePosition();
+    void updateUAVOs(Output2OP out);
 
 signals:
 	void autopilotConnected();
@@ -223,7 +222,6 @@ private slots:
 	virtual void processUpdate(const QByteArray& data) = 0;
 
 protected:
-
     static const float GEE;
     static const float FT2M;
     static const float KT2MPS;
@@ -261,21 +259,31 @@ protected:
     QMutex lock;
 
 private:
+    bool once;
+    float initN;
+    float initE;
+    float initD;
 
-	int updatePeriod;
-	int simTimeout;
-	volatile bool autopilotConnectionStatus;
-	volatile bool simConnectionStatus;
-	QTimer* txTimer;
-	QTimer* simTimer;
-	QString name;
-	QString simulatorId;
-	volatile static bool isStarted;
-	static QStringList instances;
-	//QList<QScopedPointer<UAVDataObject> > requiredUAVObjects;
-	void setupOutputObject(UAVObject* obj, int updatePeriod);
-	void setupInputObject(UAVObject* obj, int updatePeriod);
-	void setupObjects();
+    int updatePeriod;
+    int simTimeout;
+    volatile bool autopilotConnectionStatus;
+    volatile bool simConnectionStatus;
+    QTimer* txTimer;
+    QTimer* simTimer;
+
+    QTime attRawTime;
+    QTime gpsPosTime;
+    QTime groundTruthTime;
+    QTime baroAltTime;
+
+    QString name;
+    QString simulatorId;
+    volatile static bool isStarted;
+    static QStringList instances;
+    //QList<QScopedPointer<UAVDataObject> > requiredUAVObjects;
+    void setupOutputObject(UAVObject* obj, quint32 updatePeriod);
+    void setupInputObject(UAVObject* obj, quint32 updatePeriod);
+    void setupObjects();
 };
 
 

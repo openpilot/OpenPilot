@@ -332,13 +332,13 @@ void FGSimulator::processUpdate(const QByteArray& inp)
 	positionActualData.Down = altitude ; //Multiply by 1 because positionActual expects input in meters.
         posActual->setData(positionActualData);
 
-	// Update AltitudeActual object
-        BaroAltitude::DataFields altActualData;
-        memset(&altActualData, 0, sizeof(BaroAltitude::DataFields));
-        altActualData.Altitude = altitudeAGL;
-	altActualData.Temperature = temperature;
-	altActualData.Pressure = pressure;
-	altActual->setData(altActualData);
+    // Update AltitudeActual object
+    BaroAltitude::DataFields baroAltData;
+    memset(&baroAltData, 0, sizeof(BaroAltitude::DataFields));
+    baroAltData.Altitude = altitudeAGL;
+    baroAltData.Temperature = temperature;
+    baroAltData.Pressure = pressure;
+    baroAlt->setData(baroAltData);
 
 	// Update attActual object
 	AttitudeActual::DataFields attActualData;

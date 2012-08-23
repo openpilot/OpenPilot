@@ -45,6 +45,8 @@ HITLOptionsPage::HITLOptionsPage(HITLConfiguration *conf, QObject *parent) :
 
 QWidget *HITLOptionsPage::createPage(QWidget *parent)
 {
+    Q_UNUSED(parent);
+
     // Create page
     m_optionsPage = new Ui::HITLOptionsPage();
     QWidget* optionsPageWidget = new QWidget;
@@ -87,6 +89,22 @@ QWidget *HITLOptionsPage::createPage(QWidget *parent)
     m_optionsPage->latitude->setText(config->Settings().latitude);
     m_optionsPage->longitude->setText(config->Settings().longitude);
 
+    m_optionsPage->groundTruthCheckbox->setChecked(config->Settings().groundTruthEnabled);
+    m_optionsPage->gpsPositionCheckbox->setChecked(config->Settings().gpsPositionEnabled);
+    m_optionsPage->attActualCheckbox->setChecked(config->Settings().attActualEnabled);
+    m_optionsPage->attRawCheckbox->setChecked(config->Settings().attRawEnabled);
+
+    m_optionsPage->attRawRateSpinbox->setValue(config->Settings().attRawRate);
+    m_optionsPage->gpsPosRateSpinbox->setValue(config->Settings().gpsPosRate);
+    m_optionsPage->groundTruthRateSpinbox->setValue(config->Settings().groundTruthRate);
+//    m_optionsPage->attActualRate->setValue(config->Settings().attActualRate);
+
+    m_optionsPage->baroAltitudeCheckbox->setChecked(config->Settings().baroAltitudeEnabled);
+    m_optionsPage->baroAltRateSpinbox->setValue(config->Settings().baroAltRate);
+
+    m_optionsPage->minOutputPeriodSpinbox->setValue(config->Settings().minOutputPeriod);
+
+
     return optionsPageWidget;
 }
 
@@ -108,6 +126,25 @@ void HITLOptionsPage::apply()
     settings.outPort = m_optionsPage->outputPort->text().toInt();
     settings.longitude = m_optionsPage->longitude->text();
     settings.latitude = m_optionsPage->latitude->text();
+
+    settings.addNoise = m_optionsPage->noiseCheckBox->isChecked();
+
+    settings.attRawEnabled = m_optionsPage->attRawCheckbox->isChecked();
+    settings.attRawRate = m_optionsPage->attRawRateSpinbox->value();
+
+    settings.attActualEnabled = m_optionsPage->attActualCheckbox->isChecked();
+
+    settings.gpsPositionEnabled = m_optionsPage->gpsPositionCheckbox->isChecked();
+    settings.gpsPosRate = m_optionsPage->gpsPosRateSpinbox->value();
+
+    settings.groundTruthEnabled = m_optionsPage->groundTruthCheckbox->isChecked();
+    settings.groundTruthRate = m_optionsPage->groundTruthRateSpinbox->value();
+
+    settings.baroAltitudeEnabled = m_optionsPage->baroAltitudeCheckbox->isChecked();
+    settings.baroAltRate = m_optionsPage->baroAltRateSpinbox->value();
+
+    settings.minOutputPeriod = m_optionsPage->minOutputPeriodSpinbox->value();
+
 
     config->setSimulatorSettings(settings);
 }

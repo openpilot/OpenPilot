@@ -321,13 +321,13 @@ void XplaneSimulator::processUpdate(const QByteArray& dataBuf)
                 }
 
 
-		// Update AltitudeActual object
-		BaroAltitude::DataFields altActualData;
-		memset(&altActualData, 0, sizeof(BaroAltitude::DataFields));
-		altActualData.Altitude = altitude;
-                altActualData.Temperature = temperature;
-		altActualData.Pressure = pressure;
-		altActual->setData(altActualData);
+        // Update AltitudeActual object
+        BaroAltitude::DataFields baroAltData;
+        memset(&baroAltData, 0, sizeof(BaroAltitude::DataFields));
+        baroAltData.Altitude = altitude;
+        baroAltData.Temperature = temperature;
+        baroAltData.Pressure = pressure;
+        baroAlt->setData(baroAltData);
 
 		// Update attActual object
 		AttitudeActual::DataFields attActualData;
@@ -406,7 +406,7 @@ void XplaneSimulator::processUpdate(const QByteArray& dataBuf)
 	}
 	// issue manual update
 	//attActual->updated();
-	//altActual->updated();
+    //baroAlt->updated();
 	//posActual->updated();
 }
 

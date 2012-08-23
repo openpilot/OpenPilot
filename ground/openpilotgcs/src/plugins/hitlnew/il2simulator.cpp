@@ -237,11 +237,11 @@ void IL2Simulator::processUpdate(const QByteArray& inp)
         current.dPitch   = (angleDifference(current.pitch,old.pitch)/current.dT     + TURN_FILTER * (old.dPitch))   / (TURN_FILTER+1);
         current.dRoll    = (angleDifference(current.roll,old.roll)/current.dT       + TURN_FILTER * (old.dRoll))    / (TURN_FILTER+1);
         // Update AltitudeActual object
-        BaroAltitude::DataFields altActualData;
-        memset(&altActualData, 0, sizeof(BaroAltitude::DataFields));
-        altActualData.Altitude = current.Z;
-        altActualData.Temperature = TEMP_GROUND + (current.Z * TEMP_LAPSE_RATE) - 273.0;
-        altActualData.Pressure = PRESSURE(current.Z)/1000.0; // kpa
+        BaroAltitude::DataFields baroAltData;
+        memset(&baroAltData, 0, sizeof(BaroAltitude::DataFields));
+        baroAltData.Altitude = current.Z;
+        baroAltData.Temperature = TEMP_GROUND + (current.Z * TEMP_LAPSE_RATE) - 273.0;
+        baroAltData.Pressure = PRESSURE(current.Z)/1000.0; // kpa
 
         // Update attActual object
         AttitudeActual::DataFields attActualData;
@@ -351,8 +351,8 @@ void IL2Simulator::processUpdate(const QByteArray& inp)
 	//velActual->updated();
 	posActual->setData(posData);
 	//posActual->updated();
-	altActual->setData(altActualData);
-	//altActual->updated();
+    baroAlt->setData(baroAltData);
+    //baroAlt->updated();
 	gpsPos->setData(gpsData);
 	//gpsPos->updated();
 	posHome->setData(homeData);

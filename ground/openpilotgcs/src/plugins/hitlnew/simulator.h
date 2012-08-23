@@ -173,53 +173,55 @@ struct Output2OP{
 
 class Simulator : public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	Simulator(const SimulatorSettings& params);
-	virtual ~Simulator();
+    Simulator(const SimulatorSettings& params);
+    virtual ~Simulator();
 
-	bool isAutopilotConnected() const { return autopilotConnectionStatus; }
-	bool isSimulatorConnected() const { return simConnectionStatus; }
-	QString Name() const { return name; }
-	void setName(QString str) { name = str; }
+    bool isAutopilotConnected() const { return autopilotConnectionStatus; }
+    bool isSimulatorConnected() const { return simConnectionStatus; }
+    QString Name() const { return name; }
+    void setName(QString str) { name = str; }
 
-	QString SimulatorId() const { return simulatorId; }
-	void setSimulatorId(QString str) { simulatorId = str; }
+    QString SimulatorId() const { return simulatorId; }
+    void setSimulatorId(QString str) { simulatorId = str; }
 
 
 
-	static bool IsStarted() { return isStarted; }
-	static void setStarted(bool val) { isStarted = val; }
-	static QStringList& Instances() { return Simulator::instances; }
-	static void setInstance(const QString& str) { Simulator::instances.append(str); }
+    static bool IsStarted() { return isStarted; }
+    static void setStarted(bool val) { isStarted = val; }
+    static QStringList& Instances() { return Simulator::instances; }
+    static void setInstance(const QString& str) { Simulator::instances.append(str); }
+
+    virtual void stopProcess() {}
     virtual void setupUdpPorts(const QString& host, int inPort, int outPort) { Q_UNUSED(host) Q_UNUSED(inPort) Q_UNUSED(outPort)}
 
     void resetInitialHomePosition();
     void updateUAVOs(Output2OP out);
 
 signals:
-	void autopilotConnected();
-	void autopilotDisconnected();
-	void simulatorConnected();
-	void simulatorDisconnected();
-	void processOutput(QString str);
-	void deleteSimProcess();
-	void myStart();
+    void autopilotConnected();
+    void autopilotDisconnected();
+    void simulatorConnected();
+    void simulatorDisconnected();
+    void processOutput(QString str);
+    void deleteSimProcess();
+    void myStart();
 public slots:
-	Q_INVOKABLE virtual bool setupProcess() { return true;}
+    Q_INVOKABLE virtual bool setupProcess() { return true;}
 private slots:
-	 void onStart();
-	//void transmitUpdate();
-	void receiveUpdate();
-	void onAutopilotConnect();
-	void onAutopilotDisconnect();
-	void onSimulatorConnectionTimeout();
-	void telStatsUpdated(UAVObject* obj);
-	Q_INVOKABLE void onDeleteSimulator(void);
+    void onStart();
+    //void transmitUpdate();
+    void receiveUpdate();
+    void onAutopilotConnect();
+    void onAutopilotDisconnect();
+    void onSimulatorConnectionTimeout();
+    void telStatsUpdated(UAVObject* obj);
+    Q_INVOKABLE void onDeleteSimulator(void);
 
-	virtual void transmitUpdate() = 0;
-	virtual void processUpdate(const QByteArray& data) = 0;
+    virtual void transmitUpdate() = 0;
+    virtual void processUpdate(const QByteArray& data) = 0;
 
 protected:
     static const float GEE;
@@ -291,20 +293,20 @@ private:
 class SimulatorCreator
 {
 public:
-	SimulatorCreator(QString id, QString descr) :
-		classId(id),
-		description(descr)
-	{}
-	virtual ~SimulatorCreator() {}
+    SimulatorCreator(QString id, QString descr) :
+        classId(id),
+        description(descr)
+    {}
+    virtual ~SimulatorCreator() {}
 
-	QString ClassId() const {return classId;}
-	QString Description() const {return description;}
+    QString ClassId() const {return classId;}
+    QString Description() const {return description;}
 
-	virtual Simulator* createSimulator(const SimulatorSettings& params) = 0;
+    virtual Simulator* createSimulator(const SimulatorSettings& params) = 0;
 
 private:
-	QString classId;
-	QString description;
+    QString classId;
+    QString description;
 };
 
 #endif // ISIMULATOR_H

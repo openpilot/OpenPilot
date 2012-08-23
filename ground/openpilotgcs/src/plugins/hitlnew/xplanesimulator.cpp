@@ -78,9 +78,11 @@ XplaneSimulator::~XplaneSimulator()
 
 void XplaneSimulator::setupUdpPorts(const QString& host, int inPort, int outPort)
 {
-	inSocket->bind(QHostAddress(host), inPort);
-        //outSocket->bind(QHostAddress(host), outPort);
-        once = false;
+    Q_UNUSED(outPort);
+
+    inSocket->bind(QHostAddress(host), inPort);
+    //outSocket->bind(QHostAddress(host), outPort);
+    once = false;
 
 }
 

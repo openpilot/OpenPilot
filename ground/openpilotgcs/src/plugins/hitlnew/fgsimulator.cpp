@@ -63,6 +63,8 @@ FGSimulator::~FGSimulator()
 
 void FGSimulator::setupUdpPorts(const QString& host, int inPort, int outPort)
 {
+    Q_UNUSED(outPort);
+
     if(inSocket->bind(QHostAddress(host), inPort))
         emit processOutput("Successfully bound to address " + host + " on port " + QString::number(inPort) + "\n");
     else

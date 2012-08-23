@@ -96,10 +96,11 @@ IL2Simulator::~IL2Simulator()
 
 void IL2Simulator::setupUdpPorts(const QString& host, int inPort, int outPort)
 {
-        inSocket->connectToHost(host,inPort); // IL2
-        if(!inSocket->waitForConnected())
-                qxtLog->error(Name() + " cann't connect to UDP Port: " + QString::number(inPort));
+    Q_UNUSED(outPort);
 
+    inSocket->connectToHost(host,inPort); // IL2
+    if(!inSocket->waitForConnected())
+        qxtLog->error(Name() + " cann't connect to UDP Port: " + QString::number(inPort));
 }
 
 void IL2Simulator::transmitUpdate()

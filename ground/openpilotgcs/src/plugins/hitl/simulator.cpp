@@ -132,6 +132,7 @@ void Simulator::onStart()
     ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager* objManager = pm->getObject<UAVObjectManager>();
     actDesired = ActuatorDesired::GetInstance(objManager);
+    actCommand = ActuatorCommand::GetInstance(objManager);
     manCtrlCommand = ManualControlCommand::GetInstance(objManager);
     flightStatus = FlightStatus::GetInstance(objManager);
     posHome = HomeLocation::GetInstance(objManager);
@@ -230,18 +231,43 @@ void Simulator::receiveUpdate()
 void Simulator::setupObjects()
 {
     setupInputObject(actDesired, settings.minOutputPeriod);
+
+/*    if (settings.gcsReciever) {
+        setupInputObject(actCommand, settings.outputRate);
+        setupOutputObject(gcsReceiver);
+    } else if (settings.manualControl) {
+//        setupInputObject(actDesired);
+//        setupInputObject(camDesired);
+//        setupInputObject(acsDesired);
+//        setupOutputObject(manCtrlCommand);
+        qDebug() << "ManualControlCommand not implemented yet";
+    }
+*/
+    setupOutputObject(posHome, 10000);
     setupOutputObject(baroAlt, 250);
+
+    if (settings.gpsPositionEnabled)
+        setupOutputObject(gpsPos, settings.gpsPosRate);
+
+    if (settings.groundTruthEnabled){
+        setupOutputObject(posActual, settings.groundTruthRate);
+        setupOutputObject(velActual, settings.groundTruthRate);
+    }
+
+    if (settings.attRawEnabled) {
+        setupOutputObject(accels, settings.attRawRate);
+        setupOutputObject(gyros, settings.attRawRate);
+    }
+
+    if (settings.attActualEnabled  && settings.attActHW) {
+        setupOutputObject(accels, settings.attRawRate);
+        setupOutputObject(gyros, settings.attRawRate);
+    }
+
+    if (settings.attActualEnabled && !settings.attActHW)
         setupOutputObject(attActual, 10);
-        //setupOutputObject(attActual, 100);
-        setupOutputObject(gpsPos, 250);
-        setupOutputObject(posActual, 250);
-        setupOutputObject(velActual, 250);
-        setupOutputObject(posHome, 1000);
-        setupOutputObject(accels, 10);
-        setupOutputObject(gyros, 10);
-        //setupOutputObject(attRaw, 100);
-
-
+    else
+        setupWatchedObject(attActual, 100);
 
 }
 
@@ -266,6 +292,25 @@ void Simulator::setupInputObject(UAVObject* obj, quint32 updatePeriod)
         UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_ONCHANGE);
         mdata.flightTelemetryUpdatePeriod = 0;
     }
+
+    obj->setMetadata(mdata);
+}
+
+
+void Simulator::setupWatchedObject(UAVObject *obj, quint32 updatePeriod)
+{
+    UAVObject::Metadata mdata;
+    mdata = obj->getDefaultMetadata();
+
+    UAVObject::SetGcsAccess(mdata, UAVObject::ACCESS_READONLY);
+    UAVObject::SetGcsTelemetryAcked(mdata, false);
+    UAVObject::SetGcsTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_MANUAL);
+    mdata.gcsTelemetryUpdatePeriod = 0;
+
+    UAVObject::SetFlightAccess(mdata, UAVObject::ACCESS_READWRITE);
+    UAVObject::SetFlightTelemetryAcked(mdata, false);
+    UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
+    mdata.flightTelemetryUpdatePeriod = updatePeriod;
 
     obj->setMetadata(mdata);
 }

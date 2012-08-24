@@ -66,9 +66,7 @@ p, li { white-space: pre-wrap; }
    <property name="icon">
     <iconset resource="../wizardResources.qrc">
      <normaloff>:/setupwizard/resources/bttn-sat-up.png</normaloff>
-     <normalon>:/setupwizard/resources/bttn-sat-down.png</normalon>
-     <activeoff>:/setupwizard/resources/bttn-sat-down.png</activeoff>
-     <activeon>:/setupwizard/resources/bttn-sat-down.png</activeon>:/setupwizard/resources/bttn-sat-up.png</iconset>
+     <normalon>:/setupwizard/resources/bttn-sat-down.png</normalon>:/setupwizard/resources/bttn-sat-up.png</iconset>
    </property>
    <property name="iconSize">
     <size>
@@ -115,9 +113,7 @@ p, li { white-space: pre-wrap; }
    <property name="icon">
     <iconset resource="../wizardResources.qrc">
      <normaloff>:/setupwizard/resources/bttn-pwm-up.png</normaloff>
-     <normalon>:/setupwizard/resources/bttn-pwm-down.png</normalon>
-     <activeoff>:/setupwizard/resources/bttn-pwm-down.png</activeoff>
-     <activeon>:/setupwizard/resources/bttn-pwm-down.png</activeon>:/setupwizard/resources/bttn-pwm-up.png</iconset>
+     <normalon>:/setupwizard/resources/bttn-pwm-down.png</normalon>:/setupwizard/resources/bttn-pwm-up.png</iconset>
    </property>
    <property name="iconSize">
     <size>
@@ -167,9 +163,7 @@ p, li { white-space: pre-wrap; }
    <property name="icon">
     <iconset resource="../wizardResources.qrc">
      <normaloff>:/setupwizard/resources/bttn-ppm-up.png</normaloff>
-     <normalon>:/setupwizard/resources/bttn-ppm-down.png</normalon>
-     <activeoff>:/setupwizard/resources/bttn-ppm-down.png</activeoff>
-     <activeon>:/setupwizard/resources/bttn-ppm-down.png</activeon>:/setupwizard/resources/bttn-ppm-up.png</iconset>
+     <normalon>:/setupwizard/resources/bttn-ppm-down.png</normalon>:/setupwizard/resources/bttn-ppm-up.png</iconset>
    </property>
    <property name="iconSize">
     <size>
@@ -216,9 +210,7 @@ p, li { white-space: pre-wrap; }
    <property name="icon">
     <iconset resource="../wizardResources.qrc">
      <normaloff>:/setupwizard/resources/bttn-sbus-up.png</normaloff>
-     <normalon>:/setupwizard/resources/bttn-sbus-down.png</normalon>
-     <activeoff>:/setupwizard/resources/bttn-sbus-down.png</activeoff>
-     <activeon>:/setupwizard/resources/bttn-sbus-down.png</activeon>:/setupwizard/resources/bttn-sbus-up.png</iconset>
+     <normalon>:/setupwizard/resources/bttn-sbus-down.png</normalon>:/setupwizard/resources/bttn-sbus-up.png</iconset>
    </property>
    <property name="iconSize">
     <size>

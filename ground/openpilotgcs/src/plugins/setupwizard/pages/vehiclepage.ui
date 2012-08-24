@@ -66,9 +66,7 @@ p, li { white-space: pre-wrap; }
    <property name="icon">
     <iconset resource="../wizardResources.qrc">
      <normaloff>:/setupwizard/resources/bttn-land-up.png</normaloff>
-     <normalon>:/setupwizard/resources/bttn-land-down.png</normalon>
-     <activeoff>:/setupwizard/resources/bttn-land-down.png</activeoff>
-     <activeon>:/setupwizard/resources/bttn-land-down.png</activeon>:/setupwizard/resources/bttn-land-up.png</iconset>
+     <normalon>:/setupwizard/resources/bttn-land-down.png</normalon>:/setupwizard/resources/bttn-land-up.png</iconset>
    </property>
    <property name="iconSize">
     <size>
@@ -118,9 +116,7 @@ p, li { white-space: pre-wrap; }
    <property name="icon">
     <iconset resource="../wizardResources.qrc">
      <normaloff>:/setupwizard/resources/bttn-multi-up.png</normaloff>
-     <normalon>:/setupwizard/resources/bttn-multi-down.png</normalon>
-     <activeoff>:/setupwizard/resources/bttn-multi-down.png</activeoff>
-     <activeon>:/setupwizard/resources/bttn-multi-down.png</activeon>:/setupwizard/resources/bttn-multi-up.png</iconset>
+     <normalon>:/setupwizard/resources/bttn-multi-down.png</normalon>:/setupwizard/resources/bttn-multi-up.png</iconset>
    </property>
    <property name="iconSize">
     <size>
@@ -170,9 +166,7 @@ p, li { white-space: pre-wrap; }
    <property name="icon">
     <iconset resource="../wizardResources.qrc">
      <normaloff>:/setupwizard/resources/bttn-plane-up.png</normaloff>
-     <normalon>:/setupwizard/resources/bttn-plane-down.png</normalon>
-     <activeoff>:/setupwizard/resources/bttn-plane-down.png</activeoff>
-     <activeon>:/setupwizard/resources/bttn-plane-down.png</activeon>:/setupwizard/resources/bttn-plane-up.png</iconset>
+     <normalon>:/setupwizard/resources/bttn-plane-down.png</normalon>:/setupwizard/resources/bttn-plane-up.png</iconset>
    </property>
    <property name="iconSize">
     <size>
@@ -219,9 +213,7 @@ p, li { white-space: pre-wrap; }
    <property name="icon">
     <iconset resource="../wizardResources.qrc">
      <normaloff>:/setupwizard/resources/bttn-heli-up.png</normaloff>
-     <normalon>:/setupwizard/resources/bttn-heli-down.png</normalon>
-     <activeoff>:/setupwizard/resources/bttn-heli-down.png</activeoff>
-     <activeon>:/setupwizard/resources/bttn-heli-down.png</activeon>:/setupwizard/resources/bttn-heli-up.png</iconset>
+     <normalon>:/setupwizard/resources/bttn-heli-down.png</normalon>:/setupwizard/resources/bttn-heli-up.png</iconset>
    </property>
    <property name="iconSize">
     <size>

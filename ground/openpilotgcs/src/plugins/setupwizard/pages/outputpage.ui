@@ -61,14 +61,12 @@ p, li { white-space: pre-wrap; }
     <string notr="true">QToolButton { border: none }</string>
    </property>
    <property name="text">
-    <string>Rapid ESC</string>
+    <string>Turbo PWM</string>
    </property>
    <property name="icon">
     <iconset resource="../wizardResources.qrc">
-     <normaloff>:/setupwizard/resources/bttn-rapid-up.png</normaloff>
-     <normalon>:/setupwizard/resources/bttn-rapid-down.png</normalon>
-     <activeoff>:/setupwizard/resources/bttn-rapid-down.png</activeoff>
-     <activeon>:/setupwizard/resources/bttn-rapid-down.png</activeon>:/setupwizard/resources/bttn-rapid-up.png</iconset>
+     <normaloff>:/setupwizard/resources/bttn-turbo-down.png</normaloff>
+     <normalon>:/setupwizard/resources/bttn-turbo-up.png</normalon>:/setupwizard/resources/bttn-turbo-down.png</iconset>
    </property>
    <property name="iconSize">
     <size>
@@ -118,9 +116,7 @@ p, li { white-space: pre-wrap; }
    <property name="icon">
     <iconset resource="../wizardResources.qrc">
      <normaloff>:/setupwizard/resources/bttn-ESC-up.png</normaloff>
-     <normalon>:/setupwizard/resources/bttn-ESC-down.png</normalon>
-     <activeoff>:/setupwizard/resources/bttn-ESC-down.png</activeoff>
-     <activeon>:/setupwizard/resources/bttn-ESC-down.png</activeon>:/setupwizard/resources/bttn-ESC-up.png</iconset>
+     <normalon>:/setupwizard/resources/bttn-ESC-down.png</normalon>:/setupwizard/resources/bttn-ESC-up.png</iconset>
    </property>
    <property name="iconSize">
     <size>

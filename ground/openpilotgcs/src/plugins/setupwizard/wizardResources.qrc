@@ -18,8 +18,6 @@
         <file>resources/bttn-ppm-up.png</file>
         <file>resources/bttn-pwm-down.png</file>
         <file>resources/bttn-pwm-up.png</file>
-        <file>resources/bttn-rapid-down.png</file>
-        <file>resources/bttn-rapid-up.png</file>
         <file>resources/bttn-sat-down.png</file>
         <file>resources/bttn-sat-up.png</file>
         <file>resources/bttn-sbus-down.png</file>
@@ -27,5 +25,9 @@
         <file>resources/bttn-txwizard-off.png</file>
         <file>resources/bttn-txwizard-on.png</file>
         <file>resources/connection-diagrams.svg</file>
+        <file>resources/bttn-calculate-down.png</file>
+        <file>resources/bttn-calculate-up.png</file>
+        <file>resources/bttn-turbo-down.png</file>
+        <file>resources/bttn-turbo-up.png</file>
     </qresource>
 </RCC>

@@ -644,43 +644,43 @@ static void updateStabilizationDesired(ManualControlCommandData * cmd, ManualCon
  */
 static void updatePathDesired(ManualControlCommandData * cmd, bool flightModeChanged, bool home)
 {
-#define BESTCLIMBRATESPEED 10	//[m/s] //BOOO! Bad way to do this.	
-
-	if (home && flightModeChanged) {
-		// Simple Return To Home mode - climb 10 meters and fly to home position
-		PositionActualData positionActual;
-		PositionActualGet(&positionActual);
-		
-		PathDesiredData pathDesired;
-		PathDesiredGet(&pathDesired);
-		pathDesired.Start[PATHDESIRED_START_NORTH] = positionActual.North;
-		pathDesired.Start[PATHDESIRED_START_EAST] = positionActual.East;
-		pathDesired.Start[PATHDESIRED_START_DOWN] = positionActual.Down;
-		pathDesired.End[PATHDESIRED_END_NORTH] = 0;
-		pathDesired.End[PATHDESIRED_END_EAST] = 0;
-		pathDesired.End[PATHDESIRED_END_DOWN] = positionActual.Down - 10;
-		pathDesired.StartingVelocity=BESTCLIMBRATESPEED;
-		pathDesired.EndingVelocity=BESTCLIMBRATESPEED;
-		pathDesired.Mode = PATHDESIRED_MODE_FLYVECTOR;
-		PathDesiredSet(&pathDesired);
-	} else if(flightModeChanged) {
-		// Simple position hold - stay at present altitude and position
-		PositionActualData positionActual;
-		PositionActualGet(&positionActual);
-		
-		PathDesiredData pathDesired;
-		PathDesiredGet(&pathDesired);
-		pathDesired.Start[PATHDESIRED_START_NORTH] = positionActual.North-1; //Offset by one so that the two points don't perfectly coincide
-		pathDesired.Start[PATHDESIRED_START_EAST] = positionActual.East;
-		pathDesired.Start[PATHDESIRED_START_DOWN] = positionActual.Down;
-		pathDesired.End[PATHDESIRED_END_NORTH] = positionActual.North;
-		pathDesired.End[PATHDESIRED_END_EAST] = positionActual.East;
-		pathDesired.End[PATHDESIRED_END_DOWN] = positionActual.Down;
-		pathDesired.StartingVelocity=BESTCLIMBRATESPEED;
-		pathDesired.EndingVelocity=BESTCLIMBRATESPEED;
-		pathDesired.Mode = PATHDESIRED_MODE_FLYVECTOR;
-		PathDesiredSet(&pathDesired);
-	}
+//#define BESTCLIMBRATESPEED 10	//[m/s] //BOOO! Bad way to do this.	
+//
+//	if (home && flightModeChanged) {
+//		// Simple Return To Home mode - climb 10 meters and fly to home position
+//		PositionActualData positionActual;
+//		PositionActualGet(&positionActual);
+//		
+//		PathDesiredData pathDesired;
+//		PathDesiredGet(&pathDesired);
+//		pathDesired.Start[PATHDESIRED_START_NORTH] = positionActual.North;
+//		pathDesired.Start[PATHDESIRED_START_EAST] = positionActual.East;
+//		pathDesired.Start[PATHDESIRED_START_DOWN] = positionActual.Down;
+//		pathDesired.End[PATHDESIRED_END_NORTH] = 0;
+//		pathDesired.End[PATHDESIRED_END_EAST] = 0;
+//		pathDesired.End[PATHDESIRED_END_DOWN] = positionActual.Down - 10;
+//		pathDesired.StartingVelocity=BESTCLIMBRATESPEED;
+//		pathDesired.EndingVelocity=BESTCLIMBRATESPEED;
+//		pathDesired.Mode = PATHDESIRED_MODE_FLYVECTOR;
+//		PathDesiredSet(&pathDesired);
+//	} else if(flightModeChanged) {
+//		// Simple position hold - stay at present altitude and position
+//		PositionActualData positionActual;
+//		PositionActualGet(&positionActual);
+//		
+//		PathDesiredData pathDesired;
+//		PathDesiredGet(&pathDesired);
+//		pathDesired.Start[PATHDESIRED_START_NORTH] = positionActual.North-1; //Offset by one so that the two points don't perfectly coincide
+//		pathDesired.Start[PATHDESIRED_START_EAST] = positionActual.East;
+//		pathDesired.Start[PATHDESIRED_START_DOWN] = positionActual.Down;
+//		pathDesired.End[PATHDESIRED_END_NORTH] = positionActual.North;
+//		pathDesired.End[PATHDESIRED_END_EAST] = positionActual.East;
+//		pathDesired.End[PATHDESIRED_END_DOWN] = positionActual.Down;
+//		pathDesired.StartingVelocity=BESTCLIMBRATESPEED;
+//		pathDesired.EndingVelocity=BESTCLIMBRATESPEED;
+//		pathDesired.Mode = PATHDESIRED_MODE_FLYVECTOR;
+//		PathDesiredSet(&pathDesired);
+//	}
 }
 
 

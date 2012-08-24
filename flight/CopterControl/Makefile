@@ -38,11 +38,11 @@ OUTDIR := $(TOP)/build/$(TARGET)
 DEBUG ?= NO
 
 # Include objects that are just nice information to show
-STACK_DIAGNOSTICS ?= NO
+STACK_DIAGNOSTICS ?= YES
 MIXERSTATUS_DIAGNOSTICS ?= NO
 RATEDESIRED_DIAGNOSTICS ?= NO
 I2C_WDG_STATS_DIAGNOSTICS ?= NO
-DIAG_TASKS ?= NO
+DIAG_TASKS ?= YES
 
 
 # Set to YES to build a FW version that will erase all flash memory
@@ -102,6 +102,7 @@ endif
 # List of mandatory modules to include
 MODULES = Attitude Stabilization Actuator ManualControl FirmwareIAP
 MODULES += FixedWingPathFollower
+# MODULES += FixedWingPathFollower/coptercontrol
 # Telemetry must be last to grab the optional modules (why?)
 MODULES += Telemetry
 

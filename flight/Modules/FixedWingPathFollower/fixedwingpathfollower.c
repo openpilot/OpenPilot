@@ -68,7 +68,7 @@
 #define GEE 9.805f
 #define CRITICAL_ERROR_THRESHOLD_MS 5000 //Time in [ms] before an error becomes a critical error
 
-#define UPDATEPERIOD_MS 100 
+#define UPDATEPERIOD_MS 50
 
 // Private types
 static struct Integral {
@@ -84,13 +84,14 @@ static struct Integral {
 static xTaskHandle pathfollowerTaskHandle;
 static uint8_t flightMode=FLIGHTSTATUS_FLIGHTMODE_MANUAL;
 static bool followerEnabled = false;
+static bool flightStatusUpdate = false;
 
 
 // Private functions
 static void pathfollowerTask(void *parameters);
 //static void FixedWingPathFollowerParamsUpdatedCb(UAVObjEvent * ev);
-//static void FlightStatusUpdatedCb(UAVObjEvent * ev);
-static uint8_t updateFixedDesiredAttitude(PathDesiredData pathDesiredMode, FixedWingPathFollowerSettingsData fixedwingpathfollowerSettings);
+static void FlightStatusUpdatedCb(UAVObjEvent * ev);
+static uint8_t updateFixedDesiredAttitude(FixedWingPathFollowerSettingsData fixedwingpathfollowerSettings);
 //static void updateSteadyStateAttitude();
 static float bound(float val, float min, float max);
 static float followStraightLine(float r[3], float q[3], float p[3], float heading, float chi_inf, float k_path, float k_psi_int, float delT);
@@ -135,7 +136,7 @@ int32_t FixedWingPathFollowerInitialize()
 		return -1; //HUH??? RETURNING -1 STILL LEADS TO THE MODULE BEING ACTIVATED
 	}	
 	
-	if (optionalModules[HWSETTINGS_OPTIONALMODULES_RETURNTOHOME] == HWSETTINGS_OPTIONALMODULES_ENABLED) {
+	if (optionalModules[HWSETTINGS_OPTIONALMODULES_FIXEDWINGPATHFOLLOWER] == HWSETTINGS_OPTIONALMODULES_ENABLED) {
 		FixedWingPathFollowerSettingsInitialize();
 //		FixedWingPathFollowerStatusInitialize();
 		GPSAirspeedInitialize();
@@ -143,6 +144,8 @@ int32_t FixedWingPathFollowerInitialize()
 		
 		integral = (struct Integral *) pvPortMalloc(sizeof(struct Integral));
 		memset(integral, 0, sizeof(struct Integral));
+		
+		FlightStatusConnectCallback(FlightStatusUpdatedCb);
 		
 		followerEnabled=true;
 		return 0;
@@ -161,7 +164,6 @@ static void pathfollowerTask(void *parameters)
 {
 	portTickType lastUpdateTime;
 	FixedWingPathFollowerSettingsData fixedwingpathfollowerSettings;
-	PathDesiredData pathDesired;
 	
 //	FlightStatusConnectCallback(FlightStatusUpdatedCb);
 //	FixedWingPathFollowerSettingsConnectCallback(FixedWingPathFollowerParamsUpdatedCb);
@@ -174,18 +176,19 @@ static void pathfollowerTask(void *parameters)
 		// 1. Must have FixedWing type airframe
 		// 2. Flight mode is PositionHold or ReturnToHome
 		
-		FixedWingPathFollowerSettingsGet(&fixedwingpathfollowerSettings);
-		PathDesiredGet(&pathDesired); //IT WOULD BE NICE NOT TO DO THIS EVERY LOOP.
+		FixedWingPathFollowerSettingsGet(&fixedwingpathfollowerSettings);  //IT WOULD BE NICE NOT TO DO THIS EVERY LOOP.
 		
 		// Continue collecting data if not enough time
 		vTaskDelayUntil(&lastUpdateTime, fixedwingpathfollowerSettings.UpdatePeriod / portTICK_RATE_MS);
 
 		// Check flightmode
-		FlightStatusFlightModeGet(&flightMode);
+		if (flightStatusUpdate) {
+			FlightStatusFlightModeGet(&flightMode);
+		}
 		switch(flightMode) {
-			case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
 			case FLIGHTSTATUS_FLIGHTMODE_RETURNTOHOME:
-				updateFixedDesiredAttitude(pathDesired, fixedwingpathfollowerSettings);
+			case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
+				updateFixedDesiredAttitude(fixedwingpathfollowerSettings);
 				break;
 			default:
 				// Be cleaner and reset integrals
@@ -224,7 +227,7 @@ static void pathfollowerTask(void *parameters)
  * NED frame as the feedback term and then compares the 
  * @ref VelocityActual against the @ref VelocityDesired
  */
-static uint8_t updateFixedDesiredAttitude(PathDesiredData pathDesired, FixedWingPathFollowerSettingsData fixedwingpathfollowerSettings)
+static uint8_t updateFixedDesiredAttitude(FixedWingPathFollowerSettingsData fixedwingpathfollowerSettings)
 {
 	float dT = UPDATEPERIOD_MS / 1000.0f; //Convert from [ms] to [s]
 
@@ -250,6 +253,41 @@ static uint8_t updateFixedDesiredAttitude(PathDesiredData pathDesired, FixedWing
 	PositionActualData positionActual;
 	PositionActualGet(&positionActual);
 
+	PathDesiredData pathDesired;
+	PathDesiredGet(&pathDesired);
+	
+	if (flightStatusUpdate) {
+		if (flightMode == FLIGHTSTATUS_FLIGHTMODE_RETURNTOHOME) {
+			// Simple Return To Home mode - climb 10 meters and fly to home position
+			
+			pathDesired.Start[PATHDESIRED_START_NORTH] = positionActual.North;
+			pathDesired.Start[PATHDESIRED_START_EAST] = positionActual.East;
+			pathDesired.Start[PATHDESIRED_START_DOWN] = positionActual.Down;
+			pathDesired.End[PATHDESIRED_END_NORTH] = 0;
+			pathDesired.End[PATHDESIRED_END_EAST] = 0;
+			pathDesired.End[PATHDESIRED_END_DOWN] = positionActual.Down - 10;
+			pathDesired.StartingVelocity=fixedwingpathfollowerSettings.BestClimbRateSpeed;
+			pathDesired.EndingVelocity=fixedwingpathfollowerSettings.BestClimbRateSpeed;
+			pathDesired.Mode = PATHDESIRED_MODE_FLYVECTOR;
+		} else{
+			// Simple position hold - stay at present altitude and position
+			
+			pathDesired.Start[PATHDESIRED_START_NORTH] = positionActual.North-1; //Offset by one so that the two points don't perfectly coincide
+			pathDesired.Start[PATHDESIRED_START_EAST] = positionActual.East;
+			pathDesired.Start[PATHDESIRED_START_DOWN] = positionActual.Down;
+			pathDesired.End[PATHDESIRED_END_NORTH] = positionActual.North;
+			pathDesired.End[PATHDESIRED_END_EAST] = positionActual.East;
+			pathDesired.End[PATHDESIRED_END_DOWN] = positionActual.Down;
+			pathDesired.StartingVelocity=fixedwingpathfollowerSettings.BestClimbRateSpeed;
+			pathDesired.EndingVelocity=fixedwingpathfollowerSettings.BestClimbRateSpeed;
+			pathDesired.Mode = PATHDESIRED_MODE_FLYVECTOR;
+		}
+		PathDesiredSet(&pathDesired);
+		
+		flightStatusUpdate= false;
+	}
+	
+	
 	/**
 	 * Compute speed error (required for throttle and pitch)
 	 */
@@ -549,6 +587,8 @@ static float bound(float val, float min, float max)
 //	pathLength=sqrtf(r[0]*r[0]+r[1]*r[1]);
 //	
 //}
-//
-//static void FlightStatusUpdatedCb(UAVObjEvent * ev){
-//}
+
+//Triggered by changes in FlightStatus
+static void FlightStatusUpdatedCb(UAVObjEvent * ev){
+	flightStatusUpdate = true;
+}

@@ -222,6 +222,7 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
     addToDirtyMonitor();
 
     disableMouseWheelEvents();
+    m_aircraft->quadShape->fitInView(quad, Qt::KeepAspectRatio);
 }
 
 

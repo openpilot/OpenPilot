@@ -285,7 +285,6 @@ void ConfigTaskWidget::forceConnectedState()//dynamic widgets don't recieve the 
 
 void ConfigTaskWidget::onAutopilotConnect()
 {
-    qDebug()<<"OnAutopilotConnect:"<<this->metaObject()->className();
     if (utilMngr)
         currentBoard = utilMngr->getBoardModel();//TODO REMEMBER TO ADD THIS TO FORCE CONNECTED FUNC ON CC3D_RELEASE
     invalidateObjects();

@@ -384,12 +384,12 @@ static uint8_t updateFixedDesiredAttitude(FixedWingPathFollowerSettingsData fixe
 	float *r = pathDesired.Start;
 	float q[3] = {pathDesired.End[0]-pathDesired.Start[0], pathDesired.End[1]-pathDesired.Start[1], pathDesired.End[2]-pathDesired.Start[2]};
 	
+	float k_path  = fixedwingpathfollowerSettings.VectorFollowingGain; //SHOULD BE DIVIDED BY THE DESIRED AIRSPEED OR TRUE AIRSPEED, WHICHEVER IS HIGHER
+	float k_orbit = fixedwingpathfollowerSettings.OrbitFollowingGain; //SHOULD BE DIVIDED BY THE DESIRED AIRSPEED OR TRUE AIRSPEED, WHICHEVER IS HIGHER
+	float k_psi_int = fixedwingpathfollowerSettings.FollowerIntegralGain; //PROBABLY ALSO IS AIRSPEED DEPENDENT
 //========================================
 	//SHOULD NOT BE HARD CODED
-	float k_path  = 0.05f; //SHOULD BE DIVIDED BY THE DESIRED AIRSPEED OR TRUE AIRSPEED, WHICHEVER IS HIGHER
-	float k_orbit = 0.05f; //SHOULD BE DIVIDED BY THE DESIRED AIRSPEED OR TRUE AIRSPEED, WHICHEVER IS HIGHER
 	
-	float k_psi_int = 0.0002f;
 	bool direction;
 	
 	float chi_inf=F_PI/4.0f; //THIS NEEDS TO BE A FUNCTION OF HOW LONG OUR PATH IS.
@@ -465,7 +465,7 @@ static uint8_t updateFixedDesiredAttitude(FixedWingPathFollowerSettingsData fixe
 				rollFF=ROLL_FOR_HOLDING_CIRCLE*DEG2RAD; 
 			}
 			
-			headingCommand_R=followOrbit(c, rho, direction, p, headingActual_R, k_orbit, k_psi_int*0, dT);
+			headingCommand_R=followOrbit(c, rho, direction, p, headingActual_R, k_orbit, k_psi_int, dT);
 			break;
 		case LINE:
 			rollFF=0;
@@ -542,6 +542,10 @@ float followOrbit(float c[3], float rho, bool direction, float p[3], float psi, 
 	float pncn=p[0]-c[0];
 	float pece=p[1]-c[1];
 	float d=sqrtf(pncn*pncn + pece*pece);
+	float err_orbit=d-rho;
+	integral->circleError+=err_orbit*delT;
+
+	
 	float phi=atan2f(pece, pncn);
 	while(phi-psi < -F_PI){
 		phi=phi+2.0f*F_PI;
@@ -550,8 +554,6 @@ float followOrbit(float c[3], float rho, bool direction, float p[3], float psi, 
 		phi=phi-2.0f*F_PI;
 	}
 	
-	float err_orbit=d-rho;
-	integral->circleError+=err_orbit*delT;
 	
 	float psi_command= direction==true? 
 		phi+(F_PI/2.0f + atanf(k_orbit*err_orbit) + k_psi_int*integral->circleError):

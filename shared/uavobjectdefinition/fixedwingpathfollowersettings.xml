@@ -16,9 +16,6 @@
         <field name="VerticalVelMax" units="m/s" type="float" elements="1" defaultvalue="10"/>
                 <!-- maximum allowed climb or sink rate in guided flight-->
 
-        <field name="HeadingFeedForward" units="s" type="float" elements="1" defaultvalue="3.0"/>
-                <!-- how many seconds to plan the flight vector ahead when initiating necessary heading changes - increase for planes with sluggish response -->
-
         <field name="HorizontalPosP" units="(m/s)/m" type="float" elements="1" defaultvalue="0.05"/>
                 <!-- proportional coefficient for correction vector in path vector field to get back on course - reduce for fast planes to prevent course oscillations -->
         <field name="VerticalPosP" units="(m/s)/m" type="float" elements="1" defaultvalue="0.05"/>
@@ -28,7 +25,7 @@
         <field name="HeadingPI" units="deg/deg" type="float" elements="3" elementnames="Kp,Ki,ILimit" defaultvalue="0.6, 0, 0"/>
                 <!-- coefficients for desired bank angle in relation to ground heading error - this controls heading -->
 
-        <field name="AirspeedPI" units="deg / (m/s^2)" type="float" elements="3" elementnames="Kp,Ki,ILimit" defaultvalue="3, 1, 10"/>
+        <field name="AirspeedPI" units="deg / (m/s^2)" type="float" elements="3" elementnames="Kp,Ki,ILimit" defaultvalue=".5, .5, 10"/>
                 <!-- coefficients for desired pitch
                      in relation to acceleration error -->
         <field name="VerticalToPitchCrossFeed" units="deg / ((m/s)/(m/s))" type="float" elementnames="Kp,Max" defaultvalue="5, 10"/>
@@ -49,7 +46,7 @@
         <field name="ThrottleLimit" units="" type="float" elements="3" elementnames="Min,Neutral,Max" defaultvalue="0.0,0.5,1.0" />
                 <!-- minimum and maximum allowed throttle and setpoint for cruise speed -->
 
-        <field name="UpdatePeriod" units="ms" type="int32" elements="1" defaultvalue="100"/>
+        <field name="UpdatePeriod" units="ms" type="int16" elements="1" defaultvalue="100"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

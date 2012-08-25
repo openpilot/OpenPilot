@@ -28,9 +28,10 @@ import android.util.Log;
 public class HidUAVTalk extends TelemetryTask {
 
 	private static final String TAG = HidUAVTalk.class.getSimpleName();
-	public static int LOGLEVEL = 0;
-	public static boolean WARN = LOGLEVEL > 1;
-	public static boolean DEBUG = LOGLEVEL > 0;
+	public static final int LOGLEVEL = 1;
+	public static final boolean DEBUG = LOGLEVEL > 2;
+	public static final boolean WARN = LOGLEVEL > 1;
+	public static final boolean ERROR = LOGLEVEL > 0;
 
 	//! USB constants
 	private static final int MAX_HID_PACKET_SIZE = 64;
@@ -46,7 +47,24 @@ public class HidUAVTalk extends TelemetryTask {
 
 	private static final String ACTION_USB_PERMISSION = "com.access.device.USB_PERMISSION";
 
-	UsbDevice currentDevice;
+	private UsbDevice currentDevice;
+	private UsbEndpoint usbEndpointRead;
+	private UsbEndpoint usbEndpointWrite;
+	private UsbManager usbManager;
+	private PendingIntent permissionIntent;
+	private UsbDeviceConnection usbDeviceConnection;
+	private IntentFilter permissionFilter;
+	private UsbInterface usbInterface = null;
+	private TalkInputStream inTalkStream;
+	private TalkOutputStream outTalkStream;
+	private final UsbRequest writeRequest = null;
+	private UsbRequest readRequest = null;
+	private Thread readThread;
+	private Thread writeThread;
+
+	private boolean readPending = false;
+	private boolean writePending = false;
+	private IntentFilter deviceAttachedFilter;
 
 	public HidUAVTalk(OPTelemetryService service) {
 		super(service);
@@ -56,15 +74,21 @@ public class HidUAVTalk extends TelemetryTask {
 	public void disconnect() {
 
 		CleanUpAndClose();
-		//hostDisplayActivity.unregisterReceiver(usbReceiver);
+		telemService.unregisterReceiver(usbReceiver);
 		telemService.unregisterReceiver(usbPermissionReceiver);
 
 		super.disconnect();
 
 		try {
-			if(readWriteThread != null) {
-				readWriteThread.join();
-				readWriteThread = null;
+			if(readThread != null) {
+				readThread.interrupt(); // Make sure not blocking for data
+				readThread.join();
+				readThread = null;
+			}
+			if(writeThread != null) {
+				writeThread.interrupt();
+				writeThread.join();
+				writeThread = null;
 			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -75,13 +99,6 @@ public class HidUAVTalk extends TelemetryTask {
 			readRequest.close();
 			readRequest = null;
 		}
-
-		if (writeRequest != null) {
-			writeRequest.cancel();
-			writeRequest.close();
-			writeRequest = null;
-		}
-
 	}
 
 	@Override
@@ -93,6 +110,11 @@ public class HidUAVTalk extends TelemetryTask {
 		permissionIntent = PendingIntent.getBroadcast(telemService, 0, new Intent(ACTION_USB_PERMISSION), 0);
 		permissionFilter = new IntentFilter(ACTION_USB_PERMISSION);
 		telemService.registerReceiver(usbPermissionReceiver, permissionFilter);
+
+		deviceAttachedFilter = new IntentFilter();
+		deviceAttachedFilter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
+		deviceAttachedFilter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
+		telemService.registerReceiver(usbReceiver, deviceAttachedFilter);
 
 		// Go through all the devices plugged in
 		HashMap<String, UsbDevice> deviceList = usbManager.getDeviceList();
@@ -160,7 +182,6 @@ public class HidUAVTalk extends TelemetryTask {
 		}
 	};
 
-	/* TODO: Detect dettached events and close the connection
 	private final BroadcastReceiver usbReceiver = new BroadcastReceiver()
 	{
 		@Override
@@ -179,8 +200,10 @@ public class HidUAVTalk extends TelemetryTask {
 				{
 					if (device.equals(currentDevice))
 					{
+						telemService.toastMessage("Device unplugged while in use");
+						if (DEBUG) Log.d(TAG, "Matching device disconnected");
 						// call your method that cleans up and closes communication with the device
-						CleanUpAndClose();
+						disconnect();
 					}
 				}
 			}
@@ -197,36 +220,13 @@ public class HidUAVTalk extends TelemetryTask {
 				}
 			}
 		}
-	}; */
+	};
 
-	private UsbEndpoint usbEndpointRead;
-
-	private UsbEndpoint usbEndpointWrite;
-
-	private UsbManager usbManager;
-
-	private PendingIntent permissionIntent;
-
-	private UsbDeviceConnection connectionRead;
-
-	private UsbDeviceConnection connectionWrite;
-
-	private IntentFilter permissionFilter;
 
 	protected void CleanUpAndClose() {
-		if (UsingSingleInterface) {
-			if(connectionRead != null && usbInterfaceRead != null)
-				connectionRead.releaseInterface(usbInterfaceRead);
-			usbInterfaceRead = null;
-		}
-	else {
-		if(connectionRead != null && usbInterfaceRead != null)
-			connectionRead.releaseInterface(usbInterfaceRead);
-		if(connectionWrite != null && usbInterfaceWrite != null)
-			connectionWrite.releaseInterface(usbInterfaceWrite);
-		usbInterfaceWrite = null;
-		usbInterfaceRead = null;
-		}
+		if(usbDeviceConnection != null && usbInterface != null)
+			usbDeviceConnection.releaseInterface(usbInterface);
+		usbInterface = null;
 	}
 
 	//Validating the Connected Device - Before asking for permission to connect to the device, it is essential that you ensure that this is a device that you support or expect to connect to. This can be done by validating the devices Vendor ID and Product ID.
@@ -244,14 +244,6 @@ public class HidUAVTalk extends TelemetryTask {
 			return false;
 	}
 
-	private UsbInterface usbInterfaceRead = null;
-	private UsbInterface usbInterfaceWrite = null;
-	private final boolean UsingSingleInterface = true;
-
-	private TalkInputStream inTalkStream;
-	private TalkOutputStream outTalkStream;
-	UsbRequest writeRequest = null;
-
 	boolean ConnectToDeviceInterface(UsbDevice connectDevice) {
 		// Connecting to the Device - If you are reading and writing, then the device
 		// can either have two end points on a single interface, or two interfaces
@@ -262,87 +254,51 @@ public class HidUAVTalk extends TelemetryTask {
 		UsbEndpoint ep1 = null;
 		UsbEndpoint ep2 = null;
 
-
-		if (UsingSingleInterface)
+		// Using the same interface for reading and writing
+		usbInterface = connectDevice.getInterface(0x2);
+		if (usbInterface.getEndpointCount() == 2)
 		{
-			// Using the same interface for reading and writing
-			usbInterfaceRead = connectDevice.getInterface(0x2);
-			usbInterfaceWrite = usbInterfaceRead;
-			if (usbInterfaceRead.getEndpointCount() == 2)
-			{
-				ep1 = usbInterfaceRead.getEndpoint(0);
-				ep2 = usbInterfaceRead.getEndpoint(1);
-			}
+			ep1 = usbInterface.getEndpoint(0);
+			ep2 = usbInterface.getEndpoint(1);
 		}
-		else        // if (!UsingSingleInterface)
-		{
-			usbInterfaceRead = connectDevice.getInterface(0x01);
-			usbInterfaceWrite = connectDevice.getInterface(0x02);
-			if ((usbInterfaceRead.getEndpointCount() == 1) && (usbInterfaceWrite.getEndpointCount() == 1))
-			{
-				ep1 = usbInterfaceRead.getEndpoint(0);
-				ep2 = usbInterfaceWrite.getEndpoint(0);
-			}
-		}
-
 
 		if ((ep1 == null) || (ep2 == null))
 		{
-			if (DEBUG) Log.d(TAG, "Null endpoints");
+			if (ERROR) Log.e(TAG, "Null endpoints");
 			return false;
 		}
 
 		// Determine which endpoint is the read, and which is the write
-
 		if (ep1.getType() == UsbConstants.USB_ENDPOINT_XFER_INT)
 		{
 			if (ep1.getDirection() == UsbConstants.USB_DIR_IN)
-			{
 				usbEndpointRead = ep1;
-			}
 			else if (ep1.getDirection() == UsbConstants.USB_DIR_OUT)
-			{
 				usbEndpointWrite = ep1;
-			}
 		}
 		if (ep2.getType() == UsbConstants.USB_ENDPOINT_XFER_INT)
 		{
 			if (ep2.getDirection() == UsbConstants.USB_DIR_IN)
-			{
 				usbEndpointRead = ep2;
-			}
 			else if (ep2.getDirection() == UsbConstants.USB_DIR_OUT)
-			{
 				usbEndpointWrite = ep2;
-			}
 		}
 		if ((usbEndpointRead == null) || (usbEndpointWrite == null))
 		{
-			if (DEBUG) Log.d(TAG, "Endpoints wrong way around");
+			if (ERROR) Log.e(TAG, "Could not find write and read endpoint");
 			return false;
 		}
-		connectionRead = usbManager.openDevice(connectDevice);
-		connectionRead.claimInterface(usbInterfaceRead, true);
 
+		// Claim the interface
+		usbDeviceConnection = usbManager.openDevice(connectDevice);
+		usbDeviceConnection.claimInterface(usbInterface, true);
 
-		if (UsingSingleInterface)
-		{
-			connectionWrite = connectionRead;
-		}
-		else // if (!UsingSingleInterface)
-		{
-			connectionWrite = usbManager.openDevice(connectDevice);
-			connectionWrite.claimInterface(usbInterfaceWrite, true);
-		}
 
 		if (DEBUG) Log.d(TAG, "Opened endpoints");
 
 		// Create the USB requests
 		readRequest = new UsbRequest();
-		readRequest.initialize(connectionRead, usbEndpointRead);
-
-		writeRequest = new UsbRequest();
-		writeRequest.initialize(connectionWrite, usbEndpointWrite);
+		readRequest.initialize(usbDeviceConnection, usbEndpointRead);
 
 		inTalkStream = new TalkInputStream();
 		outTalkStream = new TalkOutputStream();
@@ -355,22 +311,48 @@ public class HidUAVTalk extends TelemetryTask {
 			}
 		});
 
-		readWriteThread = new Thread(new Runnable() {
+		readThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
+				// Enqueue the first read
+				queueRead();
 				while (!shutdown) {
-					readData();
-					sendData();
+					UsbRequest returned = usbDeviceConnection.requestWait();
+					if (returned == readRequest) {
+						if (DEBUG) Log.d(TAG, "Received read request");
+						readData();
+					} else {
+						Log.e(TAG, "Received unknown USB response");
+						break;
+					}
 				}
 			}
 
-		}, "HID Read Write");
-		readWriteThread.start();
+		}, "HID Read");
+		readThread.start();
+
+		writeThread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				if (DEBUG) Log.d(TAG, "Starting HID write thread");
+				while(!shutdown) {
+					try {
+						if (sendDataSynchronous() == false)
+							break;
+					} catch (InterruptedException e) {
+						break;
+					}
+				}
+				if (DEBUG) Log.d(TAG, "Ending HID write thread");
+			}
+		}, "HID Write");
+		writeThread.start();
+
+		telemService.toastMessage("HID Device Opened");
 
 		return true;
 	}
 
-	Thread readWriteThread;
 
 	void displayBuffer(String msg, byte[] buf) {
 		msg += " (";
@@ -384,71 +366,100 @@ public class HidUAVTalk extends TelemetryTask {
 	 * Gets a report from HID, extract the meaningful data and push
 	 * it to the input stream
 	 */
-	UsbRequest readRequest = null;
-	public int readData() {
-		int bufferDataLength = usbEndpointRead.getMaxPacketSize();
-		ByteBuffer buffer = ByteBuffer.allocate(bufferDataLength + 1);
+	ByteBuffer readBuffer = ByteBuffer.allocate(MAX_HID_PACKET_SIZE);
 
-        // queue a request on the interrupt endpoint
-        if(!readRequest.queue(buffer, bufferDataLength)) {
-        	if (DEBUG) Log.d(TAG, "Failed to queue request");
-        	return 0;
-        }
-
-        if (DEBUG) Log.d(TAG, "Request queued");
-
-        int dataSize;
-        // wait for status event
-        if (connectionRead.requestWait() == readRequest) {
-        	// Packet format:
-        	// 0: Report ID (1)
-        	// 1: Number of valid bytes
-        	// 2:63: Data
-
-        	dataSize = buffer.get(1);    // Data size
-        	//Assert.assertEquals(1, buffer.get()); // Report ID
-        	//Assert.assertTrue(dataSize < buffer.capacity());
-
-        	if (buffer.get(0) != 1 || buffer.get(1) < 0 || buffer.get(1) > (buffer.capacity() - 2)) {
-        		if (DEBUG) Log.d(TAG, "Badly formatted HID packet");
-        	} else {
-        		byte[] dst = new byte[dataSize];
-        		buffer.position(2);
-        		buffer.get(dst, 0, dataSize);
-        		if (DEBUG) Log.d(TAG, "Entered read");
-        		inTalkStream.write(dst);
-        		if (DEBUG) Log.d(TAG, "Got read: " + dataSize + " bytes");
-        	}
-        } else
-        	return 0;
-
-        return dataSize;
+	/**
+	 * Schedules a USB read
+	 */
+	private void queueRead() {
+		synchronized(readRequest) {
+			if(!readRequest.queue(readBuffer, MAX_HID_PACKET_SIZE)) {
+				if (ERROR) Log.e(TAG, "Failed to queue request");
+			} else
+				readPending = true;
+		}
 	}
+
+	/**
+	 * Reads data from the last USB transaction and schedules another read
+	 */
+	public void readData() {
+		synchronized(readRequest) {
+
+			if (!readPending) {
+				if (ERROR) Log.e(TAG, "Tried to read read while a transaction was not pending");
+				return;
+			}
+
+			// We just received a read
+			readPending = false;
+			// Packet format:
+			// 0: Report ID (1)
+			// 1: Number of valid bytes
+			// 2:63: Data
+
+			int dataSize = readBuffer.get(1);    // Data size
+			//Assert.assertEquals(1, buffer.get()); // Report ID
+			//Assert.assertTrue(dataSize < buffer.capacity());
+
+			if (readBuffer.get(0) != 1 || readBuffer.get(1) < 0 || readBuffer.get(1) > (readBuffer.capacity() - 2)) {
+				if (ERROR) Log.e(TAG, "Badly formatted HID packet");
+			} else {
+				byte[] dst = new byte[dataSize];
+				readBuffer.position(2);
+				readBuffer.get(dst, 0, dataSize);
+				if (DEBUG) Log.d(TAG, "Entered read");
+				inTalkStream.write(dst);
+				if (DEBUG) Log.d(TAG, "Got read: " + dataSize + " bytes");
+			}
+
+			// Queue another read
+			queueRead();
+
+		}
+	}
+
 
 	/**
 	 * Send a packet if data is available
 	 */
 	public void sendData() {
-		ByteBuffer packet = null;
-		do { // Send all the data available to prevent sending backlog
-			packet = outTalkStream.getHIDpacket();
+		synchronized(writeRequest) {
+			// Don't try and send data till previous request completes
+			if (writePending)
+				return;
+
+			ByteBuffer packet = outTalkStream.getHIDpacket();
 			if (packet != null) {
 				if (DEBUG) Log.d(TAG, "Writing to device()");
 
 				int bufferDataLength = usbEndpointWrite.getMaxPacketSize();
 				Assert.assertTrue(packet.capacity() <= bufferDataLength);
 
-				writeRequest.queue(packet, bufferDataLength);
-				try
-				{
-					if (!writeRequest.equals(connectionWrite.requestWait()))
-						Log.e(TAG, "writeRequest failed");
-				}
-				catch (Exception ex)
-				{
-				}
+				if(writeRequest.queue(packet, bufferDataLength))
+					writePending = true;
+				else if (ERROR)
+					Log.e(TAG, "Write queuing failed");
 			}
-		} while (packet != null);
+		}
+	}
+
+	/**
+	 * Send a packet if data is available
+	 * @throws InterruptedException
+	 */
+	public boolean sendDataSynchronous() throws InterruptedException {
+
+		ByteBuffer packet = outTalkStream.getHIDpacketBlocking();
+		if (packet != null) {
+			if (DEBUG) Log.d(TAG, "sendDataSynchronous() Writing to device()");
+
+			if (usbDeviceConnection.bulkTransfer(usbEndpointWrite, packet.array(), MAX_HID_PACKET_SIZE, 1000) < 0) {
+				Log.e(TAG, "Failed to perform bulk write");
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/*********** Helper classes for telemetry streams ************/
@@ -458,6 +469,20 @@ public class HidUAVTalk extends TelemetryTask {
 		// and  ByteFifo.put(byte [])
 		ByteFifo data = new ByteFifo();
 
+		/**
+		 * Blocks until data is available and then returns a properly formatted HID packet
+		 */
+		public ByteBuffer getHIDpacketBlocking() throws InterruptedException {
+			synchronized(data) {
+				if (data.remaining() == 0)
+					data.wait();
+				return getHIDpacket();
+			}
+		}
+
+		/**
+		 * Gets data from the ByteFifo in a properly formatted HID packet
+		 */
 		public ByteBuffer getHIDpacket() {
 			ByteBuffer packet = null;
 			synchronized(data) {

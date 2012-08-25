@@ -86,11 +86,11 @@ void PIOS_ADC_DMC_irq_handler(void)
 #include "pios_hmc5883.h"
 static const struct pios_exti_cfg pios_exti_hmc5883_cfg __exti_config = {
 	.vector = PIOS_HMC5883_IRQHandler,
-	.line = EXTI_Line5,
+	.line = EXTI_Line7,
 	.pin = {
 		.gpio = GPIOB,
 		.init = {
-			.GPIO_Pin = GPIO_Pin_5,
+			.GPIO_Pin = GPIO_Pin_7,
 			.GPIO_Speed = GPIO_Speed_100MHz,
 			.GPIO_Mode = GPIO_Mode_IN,
 			.GPIO_OType = GPIO_OType_OD,
@@ -107,7 +107,7 @@ static const struct pios_exti_cfg pios_exti_hmc5883_cfg __exti_config = {
 	},
 	.exti = {
 		.init = {
-			.EXTI_Line = EXTI_Line5, // matches above GPIO pin
+			.EXTI_Line = EXTI_Line7, // matches above GPIO pin
 			.EXTI_Mode = EXTI_Mode_Interrupt,
 			.EXTI_Trigger = EXTI_Trigger_Rising,
 			.EXTI_LineCmd = ENABLE,
@@ -135,13 +135,14 @@ static const struct pios_ms5611_cfg pios_ms5611_cfg = {
 };
 #endif /* PIOS_INCLUDE_MS5611 */
 
+
 /**
- * Configuration for the BMA180 chip
+ * Configuration for the MPU6000 chip
  */
-#if defined(PIOS_INCLUDE_BMA180)
-#include "pios_bma180.h"
-static const struct pios_exti_cfg pios_exti_bma180_cfg __exti_config = {
-	.vector = PIOS_BMA180_IRQHandler,
+#if defined(PIOS_INCLUDE_MPU6000)
+#include "pios_mpu6000.h"
+static const struct pios_exti_cfg pios_exti_mpu6000_cfg __exti_config = {
+	.vector = PIOS_MPU6000_IRQHandler,
 	.line = EXTI_Line4,
 	.pin = {
 		.gpio = GPIOC,
@@ -156,48 +157,6 @@ static const struct pios_exti_cfg pios_exti_bma180_cfg __exti_config = {
 	.irq = {
 		.init = {
 			.NVIC_IRQChannel = EXTI4_IRQn,
-			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
-			.NVIC_IRQChannelSubPriority = 0,
-			.NVIC_IRQChannelCmd = ENABLE,
-		},
-	},
-	.exti = {
-		.init = {
-			.EXTI_Line = EXTI_Line4, // matches above GPIO pin
-			.EXTI_Mode = EXTI_Mode_Interrupt,
-			.EXTI_Trigger = EXTI_Trigger_Rising,
-			.EXTI_LineCmd = ENABLE,
-		},
-	},
-};
-static const struct pios_bma180_cfg pios_bma180_cfg = {
-	.exti_cfg = &pios_exti_bma180_cfg,
-	.bandwidth = BMA_BW_600HZ,
-	.range = BMA_RANGE_8G,
-};
-#endif /* PIOS_INCLUDE_BMA180 */
-
-/**
- * Configuration for the MPU6000 chip
- */
-#if defined(PIOS_INCLUDE_MPU6000)
-#include "pios_mpu6000.h"
-static const struct pios_exti_cfg pios_exti_mpu6000_cfg __exti_config = {
-	.vector = PIOS_MPU6000_IRQHandler,
-	.line = EXTI_Line8,
-	.pin = {
-		.gpio = GPIOD,
-		.init = {
-			.GPIO_Pin = GPIO_Pin_8,
-			.GPIO_Speed = GPIO_Speed_100MHz,
-			.GPIO_Mode = GPIO_Mode_IN,
-			.GPIO_OType = GPIO_OType_OD,
-			.GPIO_PuPd = GPIO_PuPd_NOPULL,
-		},
-	},
-	.irq = {
-		.init = {
-			.NVIC_IRQChannel = EXTI9_5_IRQn,
 			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
 			.NVIC_IRQChannelSubPriority = 0,
 			.NVIC_IRQChannelCmd = ENABLE,
@@ -205,7 +164,7 @@ static const struct pios_exti_cfg pios_exti_mpu6000_cfg __exti_config = {
 	},
 	.exti = {
 		.init = {
-			.EXTI_Line = EXTI_Line8, // matches above GPIO pin
+			.EXTI_Line = EXTI_Line4, // matches above GPIO pin
 			.EXTI_Mode = EXTI_Mode_Interrupt,
 			.EXTI_Trigger = EXTI_Trigger_Rising,
 			.EXTI_LineCmd = ENABLE,
@@ -227,49 +186,6 @@ static const struct pios_mpu6000_cfg pios_mpu6000_cfg = {
 	.filter = PIOS_MPU6000_LOWPASS_256_HZ
 };
 #endif /* PIOS_INCLUDE_MPU6000 */
-
-/**
- * Configuration for L3GD20 chip
- */
-#if defined(PIOS_INCLUDE_L3GD20)
-#include "pios_l3gd20.h"
-static const struct pios_exti_cfg pios_exti_l3gd20_cfg __exti_config = {
-	.vector = PIOS_L3GD20_IRQHandler,
-	.line = EXTI_Line8,
-	.pin = {
-		.gpio = GPIOD,
-		.init = {
-			.GPIO_Pin = GPIO_Pin_8,
-			.GPIO_Speed = GPIO_Speed_100MHz,
-			.GPIO_Mode = GPIO_Mode_IN,
-			.GPIO_OType = GPIO_OType_OD,
-			.GPIO_PuPd = GPIO_PuPd_NOPULL,
-		},
-	},
-	.irq = {
-		.init = {
-			.NVIC_IRQChannel = EXTI9_5_IRQn,
-			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
-			.NVIC_IRQChannelSubPriority = 0,
-			.NVIC_IRQChannelCmd = ENABLE,
-		},
-	},
-	.exti = {
-		.init = {
-			.EXTI_Line = EXTI_Line8, // matches above GPIO pin
-			.EXTI_Mode = EXTI_Mode_Interrupt,
-			.EXTI_Trigger = EXTI_Trigger_Rising,
-			.EXTI_LineCmd = ENABLE,
-		},
-	},
-};
-
-static const struct pios_l3gd20_cfg pios_l3gd20_cfg = {
-	.exti_cfg = &pios_exti_l3gd20_cfg,
-	.range = PIOS_L3GD20_SCALE_500_DEG,
-};
-#endif /* PIOS_INCLUDE_L3GD20 */
-
 
 static const struct flashfs_cfg flashfs_m25p_cfg = {
 	.table_magic = 0x85FB3D35,

@@ -91,10 +91,8 @@ typedef struct {
 	UAVTalkConnection GCSUAVTalkCon;
 
 	// Queue handles.
-	xQueueHandle radioPacketQueue;
 	xQueueHandle gcsEventQueue;
 	xQueueHandle uavtalkEventQueue;
-	xQueueHandle ppmOutQueue;
 
 	// Error statistics.
 	uint32_t comTxErrors;
@@ -221,15 +219,12 @@ static int32_t RadioComBridgeInitialize(void)
 		data->UAVTalkCon = 0;
 
 	// Initialize the queues.
-	data->ppmOutQueue = 0;
-	data->radioPacketQueue = xQueueCreate(PACKET_QUEUE_SIZE, sizeof(UAVObjEvent));
 	data->gcsEventQueue = xQueueCreate(PACKET_QUEUE_SIZE, sizeof(UAVObjEvent));
 	if (PIOS_COM_UAVTALK)
 		data->uavtalkEventQueue = xQueueCreate(PACKET_QUEUE_SIZE, sizeof(UAVObjEvent));
 	else
 	{
 		data->uavtalkEventQueue = 0;
-		data->ppmOutQueue = data->radioPacketQueue;
 	}
 
 	// Initialize the statistics.
@@ -637,7 +632,7 @@ static void transparentCommTask(void * parameters)
 			if (send_packet)
 			{
 				// Queue the packet for transmission.
-				queueEvent(data->radioPacketQueue, (void*)p, 0, EV_TRANSMIT_PACKET);
+				PHTransmitPacket(PIOS_PACKET_HANDLER, p);
 
 				// Reset the timeout
 				timeout = MAX_PORT_DELAY;
@@ -675,14 +670,8 @@ static void ppmInputTask(void *parameters)
 		// Send the PPM packet if it's valid
 		if (valid_input_detected)
 		{
-			if (data->ppmOutQueue)
-			{
-				ppm_packet.header.destination_id = data->destination_id;
-				ppm_packet.header.type = PACKET_TYPE_PPM;
-				ppm_packet.header.data_size = PH_PPM_DATA_SIZE(&ppm_packet);
-				queueEvent(data->ppmOutQueue, (void*)pph, 0, EV_TRANSMIT_PACKET);
-			}
-			else
+			// Set the GCSReceiver UAVO if we're connected to the FC.
+			if (data->UAVTalkCon)
 			{
 				GCSReceiverData rcvr;
 
@@ -692,6 +681,14 @@ static void ppmInputTask(void *parameters)
 
 				// Set the GCSReceiverData object.
 				GCSReceiverSet(&rcvr);
+			}
+			else
+			{
+				// Otherwise, send a PPM packet over the radio link.
+				ppm_packet.header.destination_id = data->destination_id;
+				ppm_packet.header.type = PACKET_TYPE_PPM;
+				ppm_packet.header.data_size = PH_PPM_DATA_SIZE(&ppm_packet);
+				PHTransmitPacket(PIOS_PACKET_HANDLER, pph);
 			}
 		}
 

@@ -570,7 +570,15 @@ int32_t UAVTalkSendAck(UAVTalkConnection connectionHandle, UAVObjHandle obj, uin
 	UAVTalkConnectionData *connection;
 	CHECKCONHANDLE(connectionHandle,connection,return -1);
 
-	return sendObject(connection, obj, instId, UAVTALK_TYPE_ACK);
+	// Lock
+	xSemaphoreTakeRecursive(connection->lock, portMAX_DELAY);
+
+	int32_t ret = sendObject(connection, obj, instId, UAVTALK_TYPE_ACK);
+	
+	// Release lock
+	xSemaphoreGiveRecursive(connection->lock);
+
+	return ret;
 }
 
 /**
@@ -585,7 +593,47 @@ int32_t UAVTalkSendNack(UAVTalkConnection connectionHandle, uint32_t objId)
 	UAVTalkConnectionData *connection;
 	CHECKCONHANDLE(connectionHandle,connection,return -1);
 
-	return sendNack(connection, objId);
+	// Lock
+	xSemaphoreTakeRecursive(connection->lock, portMAX_DELAY);
+
+	int32_t ret = sendNack(connection, objId);
+	
+	// Release lock
+	xSemaphoreGiveRecursive(connection->lock);
+
+	return ret;
+}
+
+/**
+ * Send a buffer containing a UAVTalk message through the telemetry link.
+ * This function locks the connection prior to sending.
+ * \param[in] connection UAVTalkConnection to be used
+ * \param[in] buf The data buffer containing the UAVTalk message
+ * \param[in] len The number of bytes to send from the data buffer
+ * \return 0 Success
+ * \return -1 Failure
+ */
+int32_t UAVTalkSendBuf(UAVTalkConnection connectionHandle, uint8_t *buf, uint16_t len)
+{
+	UAVTalkConnectionData *connection;
+	CHECKCONHANDLE(connectionHandle,connection, return -1);
+
+	// Lock
+	xSemaphoreTakeRecursive(connection->lock, portMAX_DELAY);
+
+	// Output the buffer
+	int32_t rc = (*connection->outStream)(buf, len);
+
+	// Update stats
+	connection->stats.txBytes += len;
+
+	// Release lock
+	xSemaphoreGiveRecursive(connection->lock);
+
+	// Done
+	if (rc != len)
+		return -1;
+	return 0;
 }
 
 /**

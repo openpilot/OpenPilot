@@ -32,6 +32,9 @@
 
 #include <stdbool.h>
 
+#define DEBUG_LEVEL 2
+#define DEBUG_PRINTF(level, ...) {if(level <= DEBUG_LEVEL && pios_com_aux_id > 0) { PIOS_COM_SendFormattedStringNonBlocking(pios_com_aux_id, __VA_ARGS__); }}
+
 //------------------------
 // Timers and Channels Used
 //------------------------
@@ -133,6 +136,26 @@ extern uint32_t pios_com_vcp_id;
 #define PIOS_COM_BRIDGE                 (pios_com_bridge_id)
 #define PIOS_COM_VCP                    (pios_com_vcp_id)
 #define PIOS_COM_DEBUG                  PIOS_COM_AUX
+#if defined(PIOS_INCLUDE_RFM22B)
+#define PIOS_COM_RFM22B_RF_RX_BUF_LEN 512
+#define PIOS_COM_RFM22B_RF_TX_BUF_LEN 512
+extern uint32_t pios_com_rfm22b_id;
+#define PIOS_COM_RADIO                  (pios_com_rfm22b_id)
+extern uint32_t pios_spi_rfm22b_id;
+#define PIOS_RFM22_SPI_PORT             (pios_spi_rfm22b_id)
+#endif /* PIOS_INCLUDE_RFM22B */
+
+//-------------------------
+// Packet Handler
+//-------------------------
+#if defined(PIOS_INCLUDE_PACKET_HANDLER)
+extern uint32_t pios_packet_handler;
+#define PIOS_PACKET_HANDLER (pios_packet_handler)
+#define PIOS_PH_MAX_PACKET 255
+#define PIOS_PH_WIN_SIZE 3
+#define PIOS_PH_MAX_CONNECTIONS 1
+#define RS_ECC_NPARITY 4
+#endif /* PIOS_INCLUDE_PACKET_HANDLER */
 
 //------------------------
 // TELEMETRY 
@@ -262,6 +285,16 @@ extern uint32_t pios_com_vcp_id;
 #define PIOS_USB_MAX_DEVS                       1
 #define PIOS_USB_ENABLED                        1 /* Should remove all references to this */
 #define PIOS_USB_HID_MAX_DEVS                   1
+
+
+//-------------------------
+// RFM22
+//-------------------------
+#if defined(PIOS_INCLUDE_RFM22B)
+extern uint32_t pios_rfm22b_id;
+#define RFM22_EXT_INT_USE
+
+#endif /* PIOS_INCLUDE_RFM22B */
 
 #endif /* STM3210E_INS_H_ */
 /**

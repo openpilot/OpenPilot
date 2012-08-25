@@ -302,12 +302,12 @@ static void SensorsTask(void *parameters)
 				
 				while(xQueueReceive(queue, (void *) &mpu6000_data, gyro_samples == 0 ? 10 : 0) != errQUEUE_EMPTY)
 				{
-					gyro_accum[0] += mpu6000_data.gyro_x;
-					gyro_accum[1] += mpu6000_data.gyro_y;
+					gyro_accum[0] += -mpu6000_data.gyro_x;
+					gyro_accum[1] += -mpu6000_data.gyro_y;
 					gyro_accum[2] += mpu6000_data.gyro_z;
 
-					accel_accum[0] += mpu6000_data.accel_x;
-					accel_accum[1] += mpu6000_data.accel_y;
+					accel_accum[0] += -mpu6000_data.accel_x;
+					accel_accum[1] += -mpu6000_data.accel_y;
 					accel_accum[2] += mpu6000_data.accel_z;
 
 					gyro_samples ++;

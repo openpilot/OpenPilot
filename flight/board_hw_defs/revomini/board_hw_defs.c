@@ -364,7 +364,7 @@ static const struct pios_usart_cfg pios_usart_main_cfg = {
 		},
 	},
 };
-
+#endif /* PIOS_INCLUDE_COM_TELEM */
 
 
 #ifdef PIOS_INCLUDE_COM_FLEXI
@@ -414,6 +414,8 @@ static const struct pios_usart_cfg pios_usart_flexi_cfg = {
 };
 
 #endif /* PIOS_INCLUDE_COM_FLEXI */
+
+#ifdef PIOS_INCLUDE_DSM
 
 #include "pios_dsm_priv.h"
 static const struct pios_usart_cfg pios_usart_dsm_flexi_cfg = {
@@ -1067,9 +1069,9 @@ static const struct pios_usb_cfg pios_usb_main_cfg = {
 		},
 	},
 	.vsense = {
-		.gpio = GPIOD,
+		.gpio = GPIOB,
 		.init = {
-			.GPIO_Pin   = GPIO_Pin_11,
+			.GPIO_Pin   = GPIO_Pin_13,
 			.GPIO_Speed = GPIO_Speed_25MHz,
 			.GPIO_Mode  = GPIO_Mode_IN,
 			.GPIO_OType = GPIO_OType_OD,

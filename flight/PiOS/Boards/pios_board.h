@@ -13,6 +13,8 @@
 #include "STM32F2xx_INS.h"
 #elif USE_STM32F4xx_OP
 #include "STM32F4xx_Revolution.h"
+#elif USE_STM32F4xx_RM
+#include "STM32F4xx_RevoMini.h"
 #else
 #error Board definition has not been provided.
 #endif

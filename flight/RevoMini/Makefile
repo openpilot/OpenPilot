@@ -1,10 +1,10 @@
 #####
-# Project: OpenPilot INS
+# Project: OpenPilot RevoMini
 #
 #
-# Makefile for OpenPilot INS project
+# Makefile for OpenPilot RevoMini project
 #
-# The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2009.
+# The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2012.
 #
 #
 # This program is free software; you can redistribute it and/or modify
@@ -58,6 +58,7 @@ MODULES += GPS FirmwareIAP
 #MODULES += Airspeed/revolution
 #MODULES += AltitudeHold VtolPathFollower FixedWingPathFollower PathPlanner
 #MODULES += CameraStab
+MODULES += Radio
 MODULES += Telemetry
 PYMODULES = 
 #FlightPlan
@@ -74,6 +75,8 @@ PIOSINC = $(PIOS)/inc
 OPMODULEDIR = ../Modules
 FLIGHTLIB = ../Libraries
 FLIGHTLIBINC = ../Libraries/inc
+RSCODE = $(FLIGHTLIB)/rscode
+RSCODEINC = $(FLIGHTLIB)/rscode
 PIOSSTM32F4XX = $(PIOS)/STM32F4xx
 PIOSCOMMON = $(PIOS)/Common
 PIOSBOARDS = $(PIOS)/Boards
@@ -85,8 +88,6 @@ STMSPDSRCDIR = $(STMSPDDIR)/src
 STMSPDINCDIR = $(STMSPDDIR)/inc
 OPUAVOBJ = ../UAVObjects
 OPUAVOBJINC = $(OPUAVOBJ)/inc
-BOOT = ../Bootloaders/INS
-BOOTINC = $(BOOT)/inc
 PYMITE = $(FLIGHTLIB)/PyMite
 PYMITELIB = $(PYMITE)/lib
 PYMITEPLAT = $(PYMITE)/platform/openpilot
@@ -144,6 +145,13 @@ SRC += $(FLIGHTLIB)/WorldMagModel.c
 SRC += $(FLIGHTLIB)/insgps13state.c
 SRC += $(FLIGHTLIB)/taskmonitor.c
 
+## For RFM22b
+SRC += $(FLIGHTLIB)/packet_handler.c
+SRC += $(RSCODE)/berlekamp.c
+SRC += $(RSCODE)/crcgen.c
+SRC += $(RSCODE)/galois.c
+SRC += $(RSCODE)/rs.c
+
 ## PIOS Hardware (STM32F4xx)
 include $(PIOS)/STM32F4xx/library.mk
 
@@ -157,6 +165,7 @@ SRC += $(PIOSCOMMON)/pios_hmc5883.c
 SRC += $(PIOSCOMMON)/pios_ms5611.c
 SRC += $(PIOSCOMMON)/pios_crc.c
 SRC += $(PIOSCOMMON)/pios_com.c
+SRC += $(PIOSCOMMON)/pios_rfm22b.c
 SRC += $(PIOSCOMMON)/pios_rcvr.c
 SRC += $(PIOSCOMMON)/pios_flash_jedec.c
 SRC += $(PIOSCOMMON)/pios_flashfs_objlist.c
@@ -205,6 +214,7 @@ EXTRAINCDIRS  += $(OPUAVOBJ)
 EXTRAINCDIRS  += $(OPUAVOBJINC)
 EXTRAINCDIRS  += $(UAVOBJSYNTHDIR)
 EXTRAINCDIRS  += $(FLIGHTLIBINC)
+EXTRAINCDIRS  += $(RSCODEINC)
 EXTRAINCDIRS  += $(PIOSSTM32F4XX)
 EXTRAINCDIRS  += $(PIOSCOMMON)
 EXTRAINCDIRS  += $(PIOSBOARDS)

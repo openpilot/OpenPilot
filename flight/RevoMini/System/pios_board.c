@@ -292,8 +292,6 @@ static void PIOS_Board_configure_dsm(const struct pios_usart_cfg *pios_usart_dsm
 
 void PIOS_Board_Init(void) {
 
-	const struct pios_board_info * bdinfo = &pios_board_info_blob;	
-	
 	/* Delay system */
 	PIOS_DELAY_Init();
 

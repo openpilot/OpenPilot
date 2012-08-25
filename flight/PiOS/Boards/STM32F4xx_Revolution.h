@@ -28,7 +28,6 @@
 
 
 #ifndef STM3210E_INS_H_
-#define STM3210E_INS_H_
 
 #include <stdbool.h>
 

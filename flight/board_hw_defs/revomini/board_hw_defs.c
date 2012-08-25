@@ -314,6 +314,54 @@ void PIOS_SPI_telem_flash_irq_handler(void)
 	PIOS_SPI_IRQ_Handler(pios_spi_telem_flash_id);
 }
 
+
+#if defined(PIOS_INCLUDE_RFM22B)
+#include <pios_rfm22b_priv.h>
+
+static const struct pios_exti_cfg pios_exti_rfm22b_cfg __exti_config = {
+	.vector = PIOS_RFM22_EXT_Int,
+	.line = EXTI_Line0,
+	.pin = {
+		.gpio = GPIOD,
+		.init = {
+			.GPIO_Pin = GPIO_Pin_0,
+			.GPIO_Speed = GPIO_Speed_100MHz,
+			.GPIO_Mode = GPIO_Mode_IN,
+			.GPIO_OType = GPIO_OType_OD,
+			.GPIO_PuPd = GPIO_PuPd_NOPULL,
+		},
+	},
+	.irq = {
+		.init = {
+			.NVIC_IRQChannel = EXTI0_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
+			.NVIC_IRQChannelSubPriority = 0,
+			.NVIC_IRQChannelCmd = ENABLE,
+		},
+	},
+	.exti = {
+		.init = {
+			.EXTI_Line = EXTI_Line0, // matches above GPIO pin
+			.EXTI_Mode = EXTI_Mode_Interrupt,
+			.EXTI_Trigger = EXTI_Trigger_Falling,
+			.EXTI_LineCmd = ENABLE,
+		},
+	},
+};
+
+struct pios_rfm22b_cfg pios_rfm22b_cfg = {
+	.spi_cfg = &pios_spi_telem_flash_cfg,
+	.exti_cfg = &pios_exti_rfm22b_cfg,
+	.frequencyHz = 434000000,
+	.minFrequencyHz = 434000000 - 2000000,
+	.maxFrequencyHz = 434000000 + 2000000,
+	.RFXtalCap = 0x7f,
+	.maxRFBandwidth = 128000,
+	.maxTxPower = RFM22_tx_pwr_txpow_7, // +20dBm .. 100mW
+};
+
+#endif /* PIOS_INCLUDE_RFM22B */
+
 #endif /* PIOS_INCLUDE_SPI */
 
 #include <pios_usart_priv.h>
@@ -331,8 +379,7 @@ static const struct pios_usart_cfg pios_usart_main_cfg = {
 		.USART_WordLength = USART_WordLength_8b,
 		.USART_Parity = USART_Parity_No,
 		.USART_StopBits = USART_StopBits_1,
-		.USART_HardwareFlowControl =
-		USART_HardwareFlowControl_None,
+		.USART_HardwareFlowControl = USART_HardwareFlowControl_None,
 		.USART_Mode = USART_Mode_Rx | USART_Mode_Tx,
 	},
 	.irq = {

@@ -33,7 +33,7 @@ It is expected that you have the following tools installed into the listed
 locations (but any other locations are fine as well):
 
  - Python            in C:\Python27
- - QtSDK             in C:\Qt\2010.05 or C:\QtSDK (depending on SDK version)
+ - QtSDK             in C:\QtSDK (depending on SDK version)
  - CodeSourcery G++  in %ProgramFiles%\CodeSourcery\Sourcery G++ Lite
  - msysGit           in %ProgramFiles%\Git
  - Unicode NSIS      in %ProgramFiles%\NSIS\Unicode
@@ -190,8 +190,8 @@ This set of scripts uses the MSYS package included into the msysGit
 distribution and MinGW make included into the QtSDK package.
 
 The sh.cmd, shell_script.reg and this README.txt files were written
-by Oleg Semyonov (os-openpilot-org@os-propo.info) for the OpenPilot
-project and are licensed under CC-BY-SA terms:
+by Oleg Semyonov (os@openpilot.org) for the OpenPilot project and
+are licensed under CC-BY-SA terms:
 
     http://creativecommons.org/licenses/by-sa/3.0/
 

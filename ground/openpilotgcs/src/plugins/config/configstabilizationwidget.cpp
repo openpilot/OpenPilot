@@ -135,6 +135,14 @@ void ConfigStabilizationWidget::processLinkedWidgets(QWidget * widget)
         {
             m_stabilization->RateRollILimit_2->setValue(m_stabilization->RatePitchILimit->value());
         }
+        else if(widget== m_stabilization->RollRateKd)
+        {
+            m_stabilization->PitchRateKd->setValue(m_stabilization->RollRateKd->value());
+        }
+        else if(widget== m_stabilization->PitchRateKd)
+        {
+            m_stabilization->RollRateKd->setValue(m_stabilization->PitchRateKd->value());
+        }
     }
     if(m_stabilization->checkBox_8->checkState()==Qt::Checked)
     {

@@ -46,13 +46,6 @@
 #define UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT 6
 #define UAVOBJ_UPDATE_MODE_MASK 0x3
 
-
-// FIXME: All this typedef for SDCARD needs to be abstracted away
-#if !defined(PIOS_INCLUDE_SDCARD)
-typedef struct {} FILEINFO;
-#endif
-
-
 typedef void* UAVObjHandle;
 
 /**
@@ -164,8 +157,10 @@ int32_t UAVObjPack(UAVObjHandle obj_handle, uint16_t instId, uint8_t* dataOut);
 int32_t UAVObjSave(UAVObjHandle obj_handle, uint16_t instId);
 int32_t UAVObjLoad(UAVObjHandle obj_handle, uint16_t instId);
 int32_t UAVObjDelete(UAVObjHandle obj_handle, uint16_t instId);
+#if defined(PIOS_INCLUDE_SDCARD)
 int32_t UAVObjSaveToFile(UAVObjHandle obj_handle, uint16_t instId, FILEINFO* file);
 UAVObjHandle UAVObjLoadFromFile(FILEINFO* file);
+#endif
 int32_t UAVObjSaveSettings();
 int32_t UAVObjLoadSettings();
 int32_t UAVObjDeleteSettings();

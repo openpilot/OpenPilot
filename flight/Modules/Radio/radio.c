@@ -139,6 +139,11 @@ static int32_t RadioStart(void)
 	xTaskCreate(radioStatusTask, (signed char *)"RadioStatus", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->radioStatusTaskHandle));
 	xTaskCreate(sendPacketTask, (signed char *)"SendPacket", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->sendPacketTaskHandle));
 
+	// Install the monitors
+	TaskMonitorAdd(TASKINFO_RUNNING_MODEMRX, data->radioReceiveTaskHandle);
+	TaskMonitorAdd(TASKINFO_RUNNING_MODEMTX, data->sendPacketTaskHandle);
+	TaskMonitorAdd(TASKINFO_RUNNING_MODEMSTAT, data->radioStatusTaskHandle);
+
 	// Register the watchdog timers.
 #ifdef PIOS_WDG_RADIORECEIVE
 	PIOS_WDG_RegisterFlag(PIOS_WDG_RADIORECEIVE);

@@ -53,7 +53,6 @@ int stabilization_relay_rate(float error, float *output, int axis, bool reinit)
 	RelayTuningData relay;
 	RelayTuningGet(&relay);
 
-	static bool high = false;
 	static portTickType lastHighTime;
 	static portTickType lastLowTime;
 
@@ -67,6 +66,10 @@ int stabilization_relay_rate(float error, float *output, int axis, bool reinit)
 	portTickType thisTime = xTaskGetTickCount();
 
 	static bool rateRelayRunning[MAX_AXES];
+
+	// This indicates the current estimate of the smoothed error.  So when it is high
+	// we are waiting for it to go low.
+	static bool high = false;
 
 	// On first run initialize estimates to something reasonable
 	if(reinit) {
@@ -109,8 +112,11 @@ int stabilization_relay_rate(float error, float *output, int axis, bool reinit)
 	accumulated ++;
 
 	// Make sure we've had enough time since last transition then check for a change in the output
-	bool hysteresis = (high ? (thisTime - lastHighTime) : (thisTime - lastLowTime)) > DEGLITCH_TIME;
-	if ( !high && hysteresis && error > 0 ){ /* RISE DETECTED */
+	bool time_hysteresis = (high ? (thisTime - lastHighTime) : (thisTime - lastLowTime)) > DEGLITCH_TIME;
+
+	if ( !high && time_hysteresis && error > relaySettings.HysteresisThresh ){
+		/* POSITIVE CROSSING DETECTED */
+
 		float this_amplitude = 2 * sqrtf(accum_sin*accum_sin + accum_cos*accum_cos) / accumulated;
 		float this_gain = this_amplitude / relaySettings.Amplitude;
 
@@ -130,9 +136,13 @@ int stabilization_relay_rate(float error, float *output, int axis, bool reinit)
 		lastHighTime = thisTime;
 		high = true;
 		RelayTuningSet(&relay);
-	} else if ( high && hysteresis && error < 0 ) { /* FALL DETECTED */
+
+	} else if ( high && time_hysteresis && error < -relaySettings.HysteresisThresh ) {
+		/* FALLING CROSSING DETECTED */
+
 		lastLowTime = thisTime;
 		high = false;
+
 	}
 
 	return 0;

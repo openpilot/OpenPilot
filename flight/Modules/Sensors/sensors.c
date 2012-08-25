@@ -225,8 +225,6 @@ static void SensorsTask(void *parameters)
 			AlarmsClear(SYSTEMALARMS_ALARM_SENSORS);
 		}
 
-		int32_t read_good;
-		int32_t count;
 
 		for (int i = 0; i < 3; i++) {
 			accel_accum[i] = 0;
@@ -243,6 +241,9 @@ static void SensorsTask(void *parameters)
 #if defined(PIOS_INCLUDE_BMA180)
 			{
 				struct pios_bma180_data accel;
+				
+				int32_t read_good;
+				int32_t count;
 				
 				count = 0;
 				while((read_good = PIOS_BMA180_ReadFifo(&accel)) != 0 && !error)

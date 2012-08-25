@@ -307,9 +307,11 @@ void PIOS_Board_Init(void) {
 		PIOS_DEBUG_Assert(0);
 	}
 
+#if defined(PIOS_INCLUDE_FLASH)
 	/* Connect flash to the approrpiate interface and configure it */
-	PIOS_Flash_Jedec_Init(pios_spi_telem_flash_id, 0, &flash_m25p_cfg);
+	PIOS_Flash_Jedec_Init(pios_spi_telem_flash_id, 1, &flash_m25p_cfg);
 	PIOS_FLASHFS_Init(&flashfs_m25p_cfg);
+#endif
 
 	/* Initialize UAVObject libraries */
 	EventDispatcherInitialize();

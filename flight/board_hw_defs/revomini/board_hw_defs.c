@@ -285,16 +285,8 @@ static const struct pios_spi_cfg pios_spi_telem_flash_cfg = {
 			.GPIO_PuPd = GPIO_PuPd_NOPULL
 		},
 	},
-	.slave_count = 1,
-	.ssel = { { // Flash
-		.gpio = GPIOB,
-		.init = {
-			.GPIO_Pin = GPIO_Pin_3,
-			.GPIO_Speed = GPIO_Speed_50MHz,
-			.GPIO_Mode  = GPIO_Mode_OUT,
-			.GPIO_OType = GPIO_OType_PP,
-			.GPIO_PuPd = GPIO_PuPd_UP
-		} },
+	.slave_count = 2,
+	.ssel = { 
 		{      // RFM22b
 		.gpio = GPIOA,
 		.init = {
@@ -303,7 +295,16 @@ static const struct pios_spi_cfg pios_spi_telem_flash_cfg = {
 			.GPIO_Mode  = GPIO_Mode_OUT,
 			.GPIO_OType = GPIO_OType_PP,
 			.GPIO_PuPd = GPIO_PuPd_UP
-		} },		
+		} },
+		{ // Flash
+		.gpio = GPIOB,
+		.init = {
+			.GPIO_Pin = GPIO_Pin_3,
+			.GPIO_Speed = GPIO_Speed_50MHz,
+			.GPIO_Mode  = GPIO_Mode_OUT,
+			.GPIO_OType = GPIO_OType_PP,
+			.GPIO_PuPd = GPIO_PuPd_UP
+		} },
 	},
 };
 

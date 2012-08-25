@@ -533,7 +533,7 @@ void PIOS_Board_Init(void) {
 	uint8_t hwsettings_DSMxBind;
 	HwSettingsDSMxBindGet(&hwsettings_DSMxBind);
 	
-	/* Configure Telemetry port */
+	/* Configure main USART port */
 	uint8_t hwsettings_rv_telemetryport;
 	HwSettingsRV_TelemetryPortGet(&hwsettings_rv_telemetryport);
 
@@ -541,149 +541,18 @@ void PIOS_Board_Init(void) {
 		case HWSETTINGS_RV_TELEMETRYPORT_DISABLED:
 			break;
 		case HWSETTINGS_RV_TELEMETRYPORT_TELEMETRY:
-			PIOS_Board_configure_com(&pios_usart_telem_cfg, PIOS_COM_TELEM_RF_RX_BUF_LEN, PIOS_COM_TELEM_RF_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_telem_rf_id);
+			PIOS_Board_configure_com(&pios_usart_main_cfg, PIOS_COM_TELEM_RF_RX_BUF_LEN, PIOS_COM_TELEM_RF_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_telem_rf_id);
 			break;
 		case HWSETTINGS_RV_TELEMETRYPORT_COMAUX:
-			PIOS_Board_configure_com(&pios_usart_telem_cfg, PIOS_COM_AUX_RX_BUF_LEN, PIOS_COM_AUX_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_aux_id);
+			PIOS_Board_configure_com(&pios_usart_main_cfg, PIOS_COM_AUX_RX_BUF_LEN, PIOS_COM_AUX_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_aux_id);
 			break;
 		case HWSETTINGS_RV_TELEMETRYPORT_COMBRIDGE:
-			PIOS_Board_configure_com(&pios_usart_telem_cfg, PIOS_COM_BRIDGE_RX_BUF_LEN, PIOS_COM_BRIDGE_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_bridge_id);
+			PIOS_Board_configure_com(&pios_usart_main_cfg, PIOS_COM_BRIDGE_RX_BUF_LEN, PIOS_COM_BRIDGE_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_bridge_id);
 			break;
 			
 	} /* 	hwsettings_rv_telemetryport */
 
-	/* Configure GPS port */
-	uint8_t hwsettings_rv_gpsport;
-	HwSettingsRV_GPSPortGet(&hwsettings_rv_gpsport);
-	switch (hwsettings_rv_gpsport){
-		case HWSETTINGS_RV_GPSPORT_DISABLED:
-			break;
-			
-		case HWSETTINGS_RV_GPSPORT_TELEMETRY:
-			PIOS_Board_configure_com(&pios_usart_gps_cfg, PIOS_COM_TELEM_RF_RX_BUF_LEN, PIOS_COM_TELEM_RF_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_telem_rf_id);
-			break;
-			
-		case HWSETTINGS_RV_GPSPORT_GPS:
-			PIOS_Board_configure_com(&pios_usart_gps_cfg, PIOS_COM_GPS_RX_BUF_LEN, -1,  &pios_usart_com_driver, &pios_com_gps_id);
-			break;
-		
-		case HWSETTINGS_RV_GPSPORT_COMAUX:
-			PIOS_Board_configure_com(&pios_usart_gps_cfg, PIOS_COM_AUX_RX_BUF_LEN, PIOS_COM_AUX_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_aux_id);
-			break;
-			
-		case HWSETTINGS_RV_GPSPORT_COMBRIDGE:
-			PIOS_Board_configure_com(&pios_usart_gps_cfg, PIOS_COM_BRIDGE_RX_BUF_LEN, PIOS_COM_BRIDGE_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_bridge_id);
-			break;
-	}/* hwsettings_rv_gpsport */
-
-	/* Configure AUXPort */
-	uint8_t hwsettings_rv_auxport;
-	HwSettingsRV_AuxPortGet(&hwsettings_rv_auxport);
-
-	switch (hwsettings_rv_auxport) {
-		case HWSETTINGS_RV_AUXPORT_DISABLED:
-			break;
-			
-		case HWSETTINGS_RV_AUXPORT_TELEMETRY:
-			PIOS_Board_configure_com(&pios_usart_aux_cfg, PIOS_COM_TELEM_RF_RX_BUF_LEN, PIOS_COM_TELEM_RF_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_telem_rf_id);
-			break;
-			
-		case HWSETTINGS_RV_AUXPORT_DSM2:
-		case HWSETTINGS_RV_AUXPORT_DSMX10BIT:
-		case HWSETTINGS_RV_AUXPORT_DSMX11BIT:
-		{
-			enum pios_dsm_proto proto;
-			switch (hwsettings_rv_auxport) {
-				case HWSETTINGS_RV_AUXPORT_DSM2:
-					proto = PIOS_DSM_PROTO_DSM2;
-					break;
-				case HWSETTINGS_RV_AUXPORT_DSMX10BIT:
-					proto = PIOS_DSM_PROTO_DSMX10BIT;
-					break;
-				case HWSETTINGS_RV_AUXPORT_DSMX11BIT:
-					proto = PIOS_DSM_PROTO_DSMX11BIT;
-					break;
-				default:
-					PIOS_Assert(0);
-					break;
-			}
-			//TODO: Define the various Channelgroup for Revo dsm inputs and handle here
-			PIOS_Board_configure_dsm(&pios_usart_dsm_aux_cfg, &pios_dsm_aux_cfg, 
-											 &pios_usart_com_driver, &proto, MANUALCONTROLSETTINGS_CHANNELGROUPS_DSMMAINPORT,&hwsettings_DSMxBind);
-		}
-			break;
-		case HWSETTINGS_RV_AUXPORT_COMAUX:
-			PIOS_Board_configure_com(&pios_usart_aux_cfg, PIOS_COM_AUX_RX_BUF_LEN, PIOS_COM_AUX_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_aux_id);
-			break;
-		case HWSETTINGS_RV_AUXPORT_COMBRIDGE:
-			PIOS_Board_configure_com(&pios_usart_aux_cfg, PIOS_COM_BRIDGE_RX_BUF_LEN, PIOS_COM_BRIDGE_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_bridge_id);
-			break;
-	} /* hwsettings_rv_auxport */
-	/* Configure AUXSbusPort */
-	//TODO: ensure that the serial invertion pin is setted correctly
-	uint8_t hwsettings_rv_auxsbusport;
-	HwSettingsRV_AuxSBusPortGet(&hwsettings_rv_auxsbusport);
-	
-	switch (hwsettings_rv_auxsbusport) {
-		case HWSETTINGS_RV_AUXSBUSPORT_DISABLED:
-			break;
-		case HWSETTINGS_RV_AUXSBUSPORT_SBUS:
-#ifdef PIOS_INCLUDE_SBUS
-		{
-			uint32_t pios_usart_sbus_id;
-			if (PIOS_USART_Init(&pios_usart_sbus_id, &pios_usart_sbus_auxsbus_cfg)) {
-				PIOS_Assert(0);
-			}
-			
-			uint32_t pios_sbus_id;
-			if (PIOS_SBus_Init(&pios_sbus_id, &pios_sbus_cfg, &pios_usart_com_driver, pios_usart_sbus_id)) {
-				PIOS_Assert(0);
-			}
-			
-			uint32_t pios_sbus_rcvr_id;
-			if (PIOS_RCVR_Init(&pios_sbus_rcvr_id, &pios_sbus_rcvr_driver, pios_sbus_id)) {
-				PIOS_Assert(0);
-			}
-			pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_SBUS] = pios_sbus_rcvr_id;
-			
-		}
-#endif /* PIOS_INCLUDE_SBUS */
-			break;
-
-		case HWSETTINGS_RV_AUXSBUSPORT_DSM2:
-		case HWSETTINGS_RV_AUXSBUSPORT_DSMX10BIT:
-		case HWSETTINGS_RV_AUXSBUSPORT_DSMX11BIT:
-		{
-			enum pios_dsm_proto proto;
-			switch (hwsettings_rv_auxsbusport) {
-				case HWSETTINGS_RV_AUXSBUSPORT_DSM2:
-					proto = PIOS_DSM_PROTO_DSM2;
-					break;
-				case HWSETTINGS_RV_AUXSBUSPORT_DSMX10BIT:
-					proto = PIOS_DSM_PROTO_DSMX10BIT;
-					break;
-				case HWSETTINGS_RV_AUXSBUSPORT_DSMX11BIT:
-					proto = PIOS_DSM_PROTO_DSMX11BIT;
-					break;
-				default:
-					PIOS_Assert(0);
-					break;
-			}
-			//TODO: Define the various Channelgroup for Revo dsm inputs and handle here
-			PIOS_Board_configure_dsm(&pios_usart_dsm_auxsbus_cfg, &pios_dsm_auxsbus_cfg, 
-											 &pios_usart_com_driver, &proto, MANUALCONTROLSETTINGS_CHANNELGROUPS_DSMMAINPORT,&hwsettings_DSMxBind);
-		}
-			break;
-		case HWSETTINGS_RV_AUXSBUSPORT_COMAUX:
-			PIOS_Board_configure_com(&pios_usart_auxsbus_cfg, PIOS_COM_AUX_RX_BUF_LEN, PIOS_COM_AUX_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_aux_id);
-			break;
-		case HWSETTINGS_RV_AUXSBUSPORT_COMBRIDGE:
-			PIOS_Board_configure_com(&pios_usart_auxsbus_cfg, PIOS_COM_BRIDGE_RX_BUF_LEN, PIOS_COM_BRIDGE_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_bridge_id);
-			break;
-	} /* hwsettings_rv_auxport */
-	
 	/* Configure FlexiPort */
-
 	uint8_t hwsettings_rv_flexiport;
 	HwSettingsRV_FlexiPortGet(&hwsettings_rv_flexiport);
 	
@@ -805,11 +674,7 @@ void PIOS_Board_Init(void) {
 	PIOS_DEBUG_Init(&pios_tim_servo_all_channels, NELEMENTS(pios_tim_servo_all_channels));
 #endif
 	
-	if (PIOS_I2C_Init(&pios_i2c_mag_adapter_id, &pios_i2c_mag_adapter_cfg)) {
-		PIOS_DEBUG_Assert(0);
-	}
-
-	if (PIOS_I2C_Init(&pios_i2c_pressure_adapter_id, &pios_i2c_pressure_adapter_cfg)) {
+	if (PIOS_I2C_Init(&pios_i2c_mag_pressure_adapter_id, &pios_i2c_mag_pressure_adapter_cfg)) {
 		PIOS_DEBUG_Assert(0);
 	}
 	
@@ -824,7 +689,7 @@ void PIOS_Board_Init(void) {
 #endif
 	
 #if defined(PIOS_INCLUDE_MS5611)
-	PIOS_MS5611_Init(&pios_ms5611_cfg, pios_i2c_pressure_adapter_id);
+	PIOS_MS5611_Init(&pios_ms5611_cfg, pios_i2c_mag_pressure_adapter_id);
 #endif
 
 #if defined(PIOS_INCLUDE_MPU6000)

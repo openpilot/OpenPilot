@@ -63,6 +63,8 @@ MODULES += Telemetry
 PYMODULES = 
 #FlightPlan
 
+CFLAGS += -DRADIO_BUILTIN
+
 # Paths
 OPSYSTEM = ./System
 OPSYSTEMINC = $(OPSYSTEM)/inc

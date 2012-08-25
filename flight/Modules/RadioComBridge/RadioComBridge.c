@@ -55,8 +55,8 @@
 #define BRIDGE_BUF_LEN 512
 #define MAX_RETRIES 2
 #define RETRY_TIMEOUT_MS 20
-#define STATS_UPDATE_PERIOD_MS 500
-#define RADIOSTATS_UPDATE_PERIOD_MS 250
+#define STATS_UPDATE_PERIOD_MS 1000
+#define RADIOSTATS_UPDATE_PERIOD_MS 500
 #define MAX_LOST_CONTACT_TIME 4
 #define PACKET_QUEUE_SIZE 10
 #define MAX_PORT_DELAY 200
@@ -664,27 +664,35 @@ static void ppmInputTask(void *parameters)
 #endif /* PIOS_INCLUDE_WDG */
 
 		// Read the receiver.
+		bool valid_input_detected = false;
 		for (uint8_t i = 1; i <= PIOS_PPM_NUM_INPUTS; ++i)
+		{
 			ppm_packet.channels[i - 1] = PIOS_RCVR_Read(PIOS_PPM_RECEIVER, i);
-
-		// Send the PPM packet
-		if (data->ppmOutQueue)
-		{
-			ppm_packet.header.destination_id = data->destination_id;
-			ppm_packet.header.type = PACKET_TYPE_PPM;
-			ppm_packet.header.data_size = PH_PPM_DATA_SIZE(&ppm_packet);
-			queueEvent(data->ppmOutQueue, (void*)pph, 0, EV_TRANSMIT_PACKET);
+			if(ppm_packet.channels[i - 1] != PIOS_RCVR_TIMEOUT)
+				valid_input_detected = true;
 		}
-		else
+
+		// Send the PPM packet if it's valid
+		if (valid_input_detected)
 		{
-			GCSReceiverData rcvr;
+			if (data->ppmOutQueue)
+			{
+				ppm_packet.header.destination_id = data->destination_id;
+				ppm_packet.header.type = PACKET_TYPE_PPM;
+				ppm_packet.header.data_size = PH_PPM_DATA_SIZE(&ppm_packet);
+				queueEvent(data->ppmOutQueue, (void*)pph, 0, EV_TRANSMIT_PACKET);
+			}
+			else
+			{
+				GCSReceiverData rcvr;
 
-			// Copy the receiver channels into the GCSReceiver object.
-			for (uint8_t i = 0; i < GCSRECEIVER_CHANNEL_NUMELEM; ++i)
-				rcvr.Channel[i] = ppm_packet.channels[i];
+				// Copy the receiver channels into the GCSReceiver object.
+				for (uint8_t i = 0; i < GCSRECEIVER_CHANNEL_NUMELEM; ++i)
+					rcvr.Channel[i] = ppm_packet.channels[i];
 
-			// Set the GCSReceiverData object.
-			GCSReceiverSet(&rcvr);
+				// Set the GCSReceiverData object.
+				GCSReceiverSet(&rcvr);
+			}
 		}
 
 		// Delay until the next update period.

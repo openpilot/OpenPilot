@@ -33,6 +33,8 @@
 
 /* Global Types */
 struct pios_rfm22b_cfg {
+	const struct pios_spi_cfg * spi_cfg; /* Pointer to SPI interface configuration */
+	const struct pios_exti_cfg * exti_cfg; /* Pointer to the EXTI configuration */
 	uint32_t frequencyHz;
 	uint32_t minFrequencyHz;
 	uint32_t maxFrequencyHz;

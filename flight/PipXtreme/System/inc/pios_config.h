@@ -61,6 +61,8 @@
 #define PIOS_INCLUDE_WDG
 #define PIOS_INCLUDE_BL_HELPER
 #define PIOS_INCLUDE_FLASH_EEPROM
+#define PIOS_INCLUDE_RFM22B
+#define PIOS_INCLUDE_PACKET_HANDLER
 
 /* Defaults for Logging */
 #define LOG_FILENAME 			"PIOS.LOG"
@@ -95,6 +97,9 @@
 
 /* PIOS Initcall infrastructure */
 #define PIOS_INCLUDE_INITCALL
+
+/* Always include the radio module */
+#define RADIO_BUILTIN
 
 #endif /* PIOS_CONFIG_H */
 /**

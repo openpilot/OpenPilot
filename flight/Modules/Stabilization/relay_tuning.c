@@ -93,7 +93,7 @@ int stabilization_relay_rate(float error, float *output, int axis, bool reinit)
 	RelayTuningSettingsGet(&relaySettings);
 
 	// Compute output, simple threshold on error
-	*output = error > 0 ? relaySettings.Amplitude : -relaySettings.Amplitude;
+	*output = high ? relaySettings.Amplitude : -relaySettings.Amplitude;
 
 	/**** The code below here is to estimate the properties of the oscillation ****/
 

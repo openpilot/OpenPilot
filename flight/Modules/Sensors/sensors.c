@@ -47,7 +47,6 @@
  */
 
 #include "pios.h"
-#include "attitude.h"
 #include "homelocation.h"
 #include "magnetometer.h"
 #include "magbias.h"

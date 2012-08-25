@@ -49,12 +49,15 @@ endif
 FLASH_TOOL = OPENOCD
 
 # List of modules to include
-MODULES = Sensors Attitude/revolution ManualControl Stabilization Actuator
-MODULES += Battery
-MODULES += Altitude/revolution  GPS FirmwareIAP
-MODULES += Airspeed/revolution
-MODULES += AltitudeHold VtolPathFollower FixedWingPathFollower PathPlanner
-MODULES += CameraStab
+MODULES = Sensors
+#MODULES += Attitude/revolution 
+#MODULES += ManualControl Stabilization Actuator
+#MODULES += Battery
+MODULES += Altitude/revolution
+MODULES += GPS FirmwareIAP
+#MODULES += Airspeed/revolution
+#MODULES += AltitudeHold VtolPathFollower FixedWingPathFollower PathPlanner
+#MODULES += CameraStab
 MODULES += Telemetry
 PYMODULES = 
 #FlightPlan

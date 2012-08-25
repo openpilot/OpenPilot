@@ -57,15 +57,12 @@
 #define PIOS_INCLUDE_WDG
 
 /* Select the sensors to include */
-#define PIOS_INCLUDE_BMA180
 #define PIOS_INCLUDE_HMC5883
 #define PIOS_INCLUDE_MPU6000
 #define PIOS_MPU6000_ACCEL
-#define PIOS_INCLUDE_L3GD20
 #define PIOS_INCLUDE_MS5611
 #define PIOS_INCLUDE_ETASV3
 //#define PIOS_INCLUDE_HCSR04
-#define PIOS_FLASH_ON_ACCEL /* true for second revo */
 #define FLASH_FREERTOS
 /* Com systems to include */
 #define PIOS_INCLUDE_COM
@@ -79,7 +76,6 @@
 #define PIOS_INCLUDE_GPS_UBX_PARSER
 #define PIOS_GPS_SETS_HOMELOCATION
 
-#define PIOS_OVERO_SPI
 /* Supported receiver interfaces */
 #define PIOS_INCLUDE_RCVR
 #define PIOS_INCLUDE_DSM

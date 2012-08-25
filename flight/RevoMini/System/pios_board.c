@@ -383,24 +383,18 @@ void PIOS_Board_Init(void) {
 
 	PIOS_LED_Init(&pios_led_cfg);
 
-	/* Set up the SPI interface to the accelerometer*/
-	if (PIOS_SPI_Init(&pios_spi_accel_id, &pios_spi_accel_cfg)) {
-		PIOS_DEBUG_Assert(0);
-	}
-	
-	/* Set up the SPI interface to the gyro */
+	/* Set up the SPI interface to the gyro/acelerometer */
 	if (PIOS_SPI_Init(&pios_spi_gyro_id, &pios_spi_gyro_cfg)) {
 		PIOS_DEBUG_Assert(0);
 	}
-#if !defined(PIOS_FLASH_ON_ACCEL)
-	/* Set up the SPI interface to the flash */
-	if (PIOS_SPI_Init(&pios_spi_flash_id, &pios_spi_flash_cfg)) {
+	
+	/* Set up the SPI interface to the flash and rfm22b */
+	if (PIOS_SPI_Init(&pios_spi_telem_flash_id, &pios_spi_telem_flash_cfg)) {
 		PIOS_DEBUG_Assert(0);
 	}
-	PIOS_Flash_Jedec_Init(pios_spi_flash_id, 0, &flash_m25p_cfg);
-#else
-	PIOS_Flash_Jedec_Init(pios_spi_accel_id, 1, &flash_m25p_cfg);
-#endif
+
+	/* Connect flash to the approrpiate interface and configure it */
+	PIOS_Flash_Jedec_Init(pios_spi_telem_flash_id, 0, &flash_m25p_cfg);
 	PIOS_FLASHFS_Init(&flashfs_m25p_cfg);
 
 	/* Initialize UAVObject libraries */
@@ -780,29 +774,6 @@ void PIOS_Board_Init(void) {
 			break;
 	}
 
-#if defined(PIOS_OVERO_SPI)
-	/* Set up the SPI based PIOS_COM interface to the overo */
-	{
-		HwSettingsData hwSettings;
-		HwSettingsGet(&hwSettings);
-		if(hwSettings.OptionalModules[HWSETTINGS_OPTIONALMODULES_OVERO] == HWSETTINGS_OPTIONALMODULES_ENABLED) {
-			if (PIOS_OVERO_Init(&pios_overo_id, &pios_overo_cfg)) {
-				PIOS_DEBUG_Assert(0);
-			}
-			const uint32_t PACKET_SIZE = 1024;
-			uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PACKET_SIZE);
-			uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PACKET_SIZE);
-			PIOS_Assert(rx_buffer);
-			PIOS_Assert(tx_buffer);
-			if (PIOS_COM_Init(&pios_com_overo_id, &pios_overo_com_driver, pios_overo_id,
-							  rx_buffer, PACKET_SIZE,
-							  tx_buffer, PACKET_SIZE)) {
-				PIOS_Assert(0);
-			}
-		}
-	}
-
-#endif
 
 #if defined(PIOS_INCLUDE_GCSRCVR)
 	GCSReceiverInitialize();
@@ -856,25 +827,9 @@ void PIOS_Board_Init(void) {
 	PIOS_MS5611_Init(&pios_ms5611_cfg, pios_i2c_pressure_adapter_id);
 #endif
 
-	switch(bdinfo->board_rev) {
-		case 0x01:
-#if defined(PIOS_INCLUDE_L3GD20)
-			PIOS_L3GD20_Init(pios_spi_gyro_id, 0, &pios_l3gd20_cfg);
-			PIOS_Assert(PIOS_L3GD20_Test() == 0);
-#endif
-#if defined(PIOS_INCLUDE_BMA180)
-			PIOS_BMA180_Init(pios_spi_accel_id, 0, &pios_bma180_cfg);
-			PIOS_Assert(PIOS_BMA180_Test() == 0);
-#endif
-			break;
-		case 0x02:
 #if defined(PIOS_INCLUDE_MPU6000)
-			PIOS_MPU6000_Init(pios_spi_gyro_id,0, &pios_mpu6000_cfg);
+	PIOS_MPU6000_Init(pios_spi_gyro_id,0, &pios_mpu6000_cfg);
 #endif
-			break;
-		default:
-			PIOS_DEBUG_Assert(0);
-	}
 
 }
 

@@ -55,7 +55,6 @@ MODULES += Altitude/revolution  GPS FirmwareIAP
 MODULES += Airspeed/revolution
 MODULES += AltitudeHold VtolPathFollower FixedWingPathFollower PathPlanner
 MODULES += CameraStab
-MODULES += OveroSync
 MODULES += Telemetry
 PYMODULES = 
 #FlightPlan

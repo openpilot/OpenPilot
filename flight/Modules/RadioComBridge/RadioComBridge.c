@@ -245,7 +245,7 @@ static int32_t RadioComBridgeInitialize(void)
 	// Initialize the UAVTalk comm parameters.
 	data->gcs_uavtalk_params.isGCS = true;
 	data->gcs_uavtalk_params.UAVTalkCon = data->GCSUAVTalkCon;
-	data->gcs_uavtalk_params.sendQueue = data->UAVTalkCon;
+	data->gcs_uavtalk_params.sendQueue = data->uavtalkEventQueue;
 	data->gcs_uavtalk_params.recvQueue = data->gcsEventQueue;
 	data->gcs_uavtalk_params.wdg = PIOS_WDG_COMGCS;
 	data->gcs_uavtalk_params.comPort = PIOS_COM_GCS;
@@ -253,7 +253,7 @@ static int32_t RadioComBridgeInitialize(void)
 	{
 		data->uavtalk_params.isGCS = false;
 		data->uavtalk_params.UAVTalkCon = data->UAVTalkCon;
-		data->uavtalk_params.sendQueue = data->GCSUAVTalkCon;
+		data->uavtalk_params.sendQueue = data->gcsEventQueue;
 		data->uavtalk_params.recvQueue = data->uavtalkEventQueue;
 		data->uavtalk_params.wdg = PIOS_WDG_COMUAVTALK;
 		data->uavtalk_params.comPort = PIOS_COM_UAVTALK;

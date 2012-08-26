@@ -725,8 +725,7 @@ uint8_t rfm22_read(uint8_t addr)
 
 uint32_t rfm32_errors;
 uint32_t rfm32_irqs_processed;
-uint32_t rfm32_irqs_processedv2;
-volatile bool pending;
+
 void PIOS_RFM22_EXT_Int(void)
 {
 	bool valid = PIOS_RFM22B_validate(g_rfm22b_dev);
@@ -740,8 +739,6 @@ void PIOS_RFM22_EXT_Int(void)
 		}
 		portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
 	}
-
-	pending = true;
 }
 
 void PIOS_RFM22_processPendingISR(uint32_t wait_ms)
@@ -752,12 +749,6 @@ void PIOS_RFM22_processPendingISR(uint32_t wait_ms)
 	if ( xSemaphoreTake(g_rfm22b_dev->isrPending,  wait_ms / portTICK_RATE_MS) == pdTRUE ) {
 		rfm32_irqs_processed++;
 		rfm22_processInt();
-	}
-
-	if (pending) {
-		rfm32_irqs_processedv2++;
-		rfm22_processInt();	
-		pending = false;
 	}
 }
 

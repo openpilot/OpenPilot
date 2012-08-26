@@ -315,13 +315,15 @@ static void radioReceiveTask(void *parameters)
 		PIOS_WDG_UpdateFlag(PIOS_WDG_RADIORECEIVE);
 #endif /* PIOS_INCLUDE_WDG */
 
+		PIOS_RFM22_processPendingISR(5);
+
 		// Get a RX packet from the packet handler if required.
 		if (p == NULL)
 			p = PHGetRXPacket(pios_packet_handler);
 
 		if(p == NULL) {
 			// Wait a bit for a packet to come available.
-			PIOS_RFM22_processPendingISR(5);
+			vTaskDelay(5);
 			continue;
 		}
 
@@ -522,8 +524,8 @@ static void radioStatusTask(void *parameters)
 			}
 		}
 
-		// Delay until the next update period.
-		vTaskDelay(STATS_UPDATE_PERIOD_MS / portTICK_RATE_MS);
+		for(int i = 0; i < 20; i++)
+			PIOS_RFM22_processPendingISR(5);
 	}
 }
 

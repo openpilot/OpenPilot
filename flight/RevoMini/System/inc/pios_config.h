@@ -60,7 +60,8 @@
 #define PIOS_INCLUDE_RFM22B
 #define PIOS_INCLUDE_PACKET_HANDLER
 #define RFM22_EXT_INT_USE
-
+#define RADIO_BUILTIN
+ 
 /* Select the sensors to include */
 #define PIOS_INCLUDE_HMC5883
 #define PIOS_INCLUDE_MPU6000

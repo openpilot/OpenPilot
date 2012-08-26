@@ -86,7 +86,7 @@ static const struct pios_spi_cfg pios_spi_rfm22b_cfg =
 		.SPI_CRCPolynomial = 0,
 		.SPI_CPOL = SPI_CPOL_Low,
 		.SPI_CPHA = SPI_CPHA_1Edge,
-		.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_256,		// slowest SCLK
+		.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_16,		// slowest SCLK
 	},
 	.use_crc = FALSE,
 

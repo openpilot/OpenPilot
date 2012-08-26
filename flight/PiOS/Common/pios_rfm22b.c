@@ -1768,17 +1768,6 @@ int rfm22_resetModule(uint8_t mode, uint32_t min_frequency_hz, uint32_t max_freq
 	exec_using_spi = true;
 
 	// ****************
-	// setup the SPI port
-
-	// set SPI port SCLK frequency .. 4.5MHz
-	PIOS_SPI_SetClockSpeed(PIOS_RFM22_SPI_PORT, PIOS_SPI_PRESCALER_16);
-	// set SPI port SCLK frequency .. 2.25MHz
-	//		PIOS_SPI_SetClockSpeed(PIOS_RFM22_SPI_PORT, PIOS_SPI_PRESCALER_32);
-
-	// set SPI port SCLK frequency .. 285kHz .. purely for hardware fault finding
-	//		PIOS_SPI_SetClockSpeed(PIOS_RFM22_SPI_PORT, PIOS_SPI_PRESCALER_256);
-
-	// ****************
 	// software reset the RF chip .. following procedure according to Si4x3x Errata (rev. B)
 
 	rfm22_write(RFM22_op_and_func_ctrl1, RFM22_opfc1_swres);			// software reset the radio

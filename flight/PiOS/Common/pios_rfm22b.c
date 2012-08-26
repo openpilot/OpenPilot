@@ -162,6 +162,9 @@ struct pios_rfm22b_dev {
 
 	uint32_t deviceID;
 
+	// ISR pending
+	xSemaphoreHandle isrPending;
+
 	// The COM callback functions.
 	pios_com_callback rx_in_cb;
 	uint32_t rx_in_context;
@@ -277,7 +280,7 @@ const uint8_t ss_reg_71[] = {  0x2B, 0x23}; // rfm22_modulation_mode_control2
 volatile bool		initialized = false;
 
 #if defined(RFM22_EXT_INT_USE)
-volatile bool		exec_using_spi;					// set this if you want to access the SPI bus outside of the interrupt
+volatile bool		exec_using_spi;					    // set this if you want to access the SPI bus outside of the interrupt
 #endif
 
 uint8_t				device_type;						// the RF chips device ID number
@@ -397,6 +400,8 @@ static struct pios_rfm22b_dev * PIOS_RFM22B_alloc(void)
 }
 #endif
 
+static struct pios_rfm22b_dev * g_rfm22b_dev;
+
 /**
  * Initialise an RFM22B device
  */
@@ -414,6 +419,10 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, const struct pios_rfm22b_cfg *cfg)
 	rfm22b_dev->cfg = *cfg;
 
 	*rfm22b_id = (uint32_t)rfm22b_dev;
+	g_rfm22b_dev = rfm22b_dev;
+
+	// Create a semaphore to know if an ISR needs responding to
+	vSemaphoreCreateBinary( rfm22b_dev->isrPending );
 
 	// Initialize the TX pre-buffer pointer.
 	tx_pre_buffer_size = 0;
@@ -719,13 +728,43 @@ uint8_t rfm22_read(uint8_t addr)
 // ************************************
 // external interrupt
 
-
+uint32_t rfm32_errors;
+uint32_t rfm32_irqs_processed;
+uint32_t rfm32_irqs_processedv2;
+volatile bool pending;
 void PIOS_RFM22_EXT_Int(void)
 {
-	if (!exec_using_spi)
-		rfm22_processInt();
+	bool valid = PIOS_RFM22B_validate(g_rfm22b_dev);
+	PIOS_Assert(valid);
+
+	portBASE_TYPE pxHigherPriorityTaskWoken;
+	if (!exec_using_spi) {
+		if (xSemaphoreGiveFromISR(g_rfm22b_dev->isrPending, &pxHigherPriorityTaskWoken) != pdTRUE) {
+			// Something went fairly seriously wrong
+			rfm32_errors++;
+		}
+		portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
+	}
+
+	pending = true;
 }
 
+void PIOS_RFM22_processPendingISR(uint32_t wait_ms)
+{
+	bool valid = PIOS_RFM22B_validate(g_rfm22b_dev);
+	PIOS_Assert(valid);
+
+	if ( xSemaphoreTake(g_rfm22b_dev->isrPending,  wait_ms / portTICK_RATE_MS) == pdTRUE ) {
+		rfm32_irqs_processed++;
+		rfm22_processInt();
+	}
+
+	if (pending) {
+		rfm32_irqs_processedv2++;
+		rfm22_processInt();	
+		pending = false;
+	}
+}
 
 // ************************************
 // set/get the current tx power setting

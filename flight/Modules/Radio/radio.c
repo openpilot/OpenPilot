@@ -321,7 +321,7 @@ static void radioReceiveTask(void *parameters)
 
 		if(p == NULL) {
 			// Wait a bit for a packet to come available.
-			vTaskDelay(5);
+			PIOS_RFM22_processPendingISR(5);
 			continue;
 		}
 

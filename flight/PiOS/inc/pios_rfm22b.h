@@ -48,6 +48,7 @@ extern int32_t PIOS_RFM22B_Init(uint32_t *rfb22b_id, const struct pios_rfm22b_cf
 extern uint32_t PIOS_RFM22B_DeviceID(uint32_t rfb22b_id);
 extern int8_t PIOS_RFM22B_RSSI(uint32_t rfm22b_id);
 extern int16_t PIOS_RFM22B_Resets(uint32_t rfm22b_id);
+extern void PIOS_RFM22_processPendingISR(uint32_t wait_ms);
 
 #endif /* PIOS_RFM22B_H */
 

@@ -523,25 +523,6 @@ void UploaderGadgetWidget::systemRescue()
         m_config->rescueButton->setEnabled(true);
         return;
     }
-    if ((dfu->GetBoardType(0) != eBoardRevo) && (eBoardCC != dfu->GetBoardType(0)) && (QMessageBox::question(this,tr("OpenPilot Uploader"),tr("If you want to search for other boards connect power now and press Yes"),QMessageBox::Yes,QMessageBox::No)==QMessageBox::Yes))
-    {
-        log("\nWaiting...");
-        QTimer::singleShot(3000, &m_eventloop, SLOT(quit()));
-        m_eventloop.exec();
-        log("Detecting second board...");
-        repaint();
-        if(!dfu->findDevices())
-        {
-            // We will only end up here in case somehow all the boards
-            // disappeared, including the one we detected earlier.
-            log("Could not detect any board, aborting!");
-            delete dfu;
-            dfu = NULL;
-            cm->resumePolling();
-            m_config->rescueButton->setEnabled(true);
-            return;
-        }
-    }
     log(QString("Found ") + QString::number(dfu->numberOfDevices) + QString(" device(s)."));
     if (dfu->numberOfDevices > 5) {
         log("Inconsistent number of devices, aborting!");

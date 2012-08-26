@@ -180,6 +180,7 @@ ConfigTaskWidget::~ConfigTaskWidget()
     if(timeOut)
     {
         delete timeOut;
+        timeOut = NULL;
     }
 }
 

@@ -642,21 +642,33 @@ static void PIOS_RFM22B_Supervisor(uint32_t rfm22b_id)
 // ************************************
 // SPI read/write
 
+static void rfm22_claimBus()
+{
+	// chip select line LOW
+	PIOS_SPI_ClaimBus(PIOS_RFM22_SPI_PORT);
+	PIOS_SPI_RC_PinSet(PIOS_RFM22_SPI_PORT, 0, 0);
+}
+
+static void rfm22_releaseBus()
+{
+	// chip select line HIGH
+	PIOS_SPI_RC_PinSet(PIOS_RFM22_SPI_PORT, 0, 1);
+	PIOS_SPI_ReleaseBus(PIOS_RFM22_SPI_PORT);
+}
+
 void rfm22_startBurstWrite(uint8_t addr)
 {
 	// wait 1us .. so we don't toggle the CS line to quickly
 	PIOS_DELAY_WaituS(1);
 
-	// chip select line LOW
-	PIOS_SPI_RC_PinSet(PIOS_RFM22_SPI_PORT, 0, 0);
+	rfm22_claimBus();
 
 	PIOS_SPI_TransferByte(PIOS_RFM22_SPI_PORT, 0x80 | addr);
 }
 
 void rfm22_endBurstWrite(void)
 {
-	// chip select line HIGH
-	PIOS_SPI_RC_PinSet(PIOS_RFM22_SPI_PORT, 0, 1);
+	rfm22_releaseBus();
 }
 
 void rfm22_write(uint8_t addr, uint8_t data)
@@ -664,14 +676,12 @@ void rfm22_write(uint8_t addr, uint8_t data)
 	// wait 1us .. so we don't toggle the CS line to quickly
 	PIOS_DELAY_WaituS(1);
 
-	// chip select line LOW
-	PIOS_SPI_RC_PinSet(PIOS_RFM22_SPI_PORT, 0, 0);
+	rfm22_claimBus();
 
 	PIOS_SPI_TransferByte(PIOS_RFM22_SPI_PORT, 0x80 | addr);
 	PIOS_SPI_TransferByte(PIOS_RFM22_SPI_PORT, data);
 
-	// chip select line HIGH
-	PIOS_SPI_RC_PinSet(PIOS_RFM22_SPI_PORT, 0, 1);
+	rfm22_releaseBus();
 }
 
 void rfm22_startBurstRead(uint8_t addr)
@@ -679,16 +689,14 @@ void rfm22_startBurstRead(uint8_t addr)
 	// wait 1us .. so we don't toggle the CS line to quickly
 	PIOS_DELAY_WaituS(1);
 
-	// chip select line LOW
-	PIOS_SPI_RC_PinSet(PIOS_RFM22_SPI_PORT, 0, 0);
+	rfm22_claimBus();
 
 	PIOS_SPI_TransferByte(PIOS_RFM22_SPI_PORT, addr & 0x7f);
 }
 
 void rfm22_endBurstRead(void)
 {
-	// chip select line HIGH
-	PIOS_SPI_RC_PinSet(PIOS_RFM22_SPI_PORT, 0, 1);
+	rfm22_releaseBus();
 }
 
 uint8_t rfm22_read(uint8_t addr)
@@ -698,14 +706,12 @@ uint8_t rfm22_read(uint8_t addr)
 	// wait 1us .. so we don't toggle the CS line to quickly
 	PIOS_DELAY_WaituS(1);
 
-	// chip select line LOW
-	PIOS_SPI_RC_PinSet(PIOS_RFM22_SPI_PORT, 0, 0);
+	rfm22_claimBus();
 
 	PIOS_SPI_TransferByte(PIOS_RFM22_SPI_PORT, addr & 0x7f);
 	rdata = PIOS_SPI_TransferByte(PIOS_RFM22_SPI_PORT, 0xff);
 
-	// chip select line HIGH
-	PIOS_SPI_RC_PinSet(PIOS_RFM22_SPI_PORT, 0, 1);
+	rfm22_releaseBus();
 
 	return rdata;
 }
@@ -1763,9 +1769,6 @@ int rfm22_resetModule(uint8_t mode, uint32_t min_frequency_hz, uint32_t max_freq
 
 	// ****************
 	// setup the SPI port
-
-	// chip select line HIGH
-	PIOS_SPI_RC_PinSet(PIOS_RFM22_SPI_PORT, 0, 1);
 
 	// set SPI port SCLK frequency .. 4.5MHz
 	PIOS_SPI_SetClockSpeed(PIOS_RFM22_SPI_PORT, PIOS_SPI_PRESCALER_16);

@@ -443,11 +443,6 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, const struct pios_rfm22b_cfg *cfg)
 	rfm22b_dev->supv_timer = PIOS_RFM22B_SUPERVISOR_TIMEOUT;
 	rfm22b_dev->resets = 0;
 
-	// Initialize our SPI interface
-	if (PIOS_SPI_Init(&PIOS_RFM22_SPI_PORT, cfg->spi_cfg)) {
-		PIOS_Assert(0);
-	}
-
 	// Initialize the external interrupt.
 	PIOS_EXTI_Init(cfg->exti_cfg);
 

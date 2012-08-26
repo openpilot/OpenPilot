@@ -202,7 +202,7 @@ static const struct pios_spi_cfg pios_spi_telem_flash_cfg = {
 		.SPI_CRCPolynomial     = 7,
 		.SPI_CPOL              = SPI_CPOL_Low,
 		.SPI_CPHA              = SPI_CPHA_1Edge,
-		.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_256,
+		.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_8,
 	},
 	.use_crc = false,
 	.dma = {

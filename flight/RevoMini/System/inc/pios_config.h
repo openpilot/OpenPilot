@@ -58,7 +58,6 @@
 
 /* Variables related to the RFM22B functionality */
 #define PIOS_INCLUDE_RFM22B
-#define PIOS_INCLUDE_PACKET_HANDLER
 #define RFM22_EXT_INT_USE
 #define RADIO_BUILTIN
  

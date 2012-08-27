@@ -70,7 +70,6 @@ public class Controller extends ObjectManagerActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.controller);
-		TextView manualView = (TextView) findViewById(R.id.manualControlValues);
 	}
 
 	Observer settingsUpdated = new Observer() {

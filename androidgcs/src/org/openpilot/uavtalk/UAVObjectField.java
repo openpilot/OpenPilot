@@ -578,6 +578,12 @@ public class UAVObjectField {
             		((ArrayList<Byte>) data).add((byte) 0);
             	}
                 break;
+            case STRING:
+            	((ArrayList<Byte>) data).clear();
+            	for(int index = 0; index < numElements; ++index) {
+            		((ArrayList<Byte>) data).add((byte) 0);
+            	}
+                break;
         }
     }
 
@@ -633,7 +639,7 @@ public class UAVObjectField {
                 numBytesPerElement = 1;
                 break;
             case STRING:
-            	data = new ArrayList<String>(this.numElements);
+            	data = new ArrayList<Byte>(this.numElements);
                 numBytesPerElement = 1;
                 break;
             default:
@@ -650,15 +656,9 @@ public class UAVObjectField {
      */
     protected Long bound (Object val) {
 
-    	switch(type) {
-    	case ENUM:
-    	case STRING:
-    		return 0L;
-    	case FLOAT32:
-    		return ((Number) val).longValue();
-    	}
-
-    	long num = ((Number) val).longValue();
+    	long num = 0;
+    	if (isNumeric())
+    		num = ((Number) val).longValue();
 
     	switch(type) {
     	case INT8:
@@ -703,6 +703,11 @@ public class UAVObjectField {
     		if(num > 255)
     			return (long) 255;
     		return num;
+    	case FLOAT32:
+    		return ((Number) val).longValue();
+    	case ENUM:
+    	case STRING:
+    		return 0L;
     	}
 
     	return num;

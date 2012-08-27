@@ -128,24 +128,32 @@ public class AttitudeView extends View {
 	@Override
 	protected void onDraw(Canvas canvas) {
 
-		final int PX = getMeasuredWidth() / 2;
-		final int PY = getMeasuredHeight() / 2;
+		final int PX = getMeasuredWidth();
+		final int PY = getMeasuredHeight();
 
-		// TODO: Figure out why these magic numbers are needed to center it
-		final int WIDTH = 600;
-		final int HEIGHT = 600;
-		final int DEG_TO_PX = 10; // Magic number for how to scale pitch
+		// Want 60 deg to move the horizon all the way off the screen
+		final int DEG_TO_PX = (PY/2) / 60; // Magic number for how to scale pitch
 
-		canvas.save(0);
-		canvas.rotate(-roll, PX, PY);
+		canvas.save();
+		canvas.rotate(-roll, PX / 2, PY / 2);
 		canvas.translate(0, pitch * DEG_TO_PX);
 		Drawable horizon = getContext().getResources().getDrawable(
 				R.drawable.im_pfd_horizon);
+
 		// This puts the image at the center of the PFD canvas (after it was
 		// translated)
-		horizon.setBounds(-(WIDTH - PX) / 2, -(HEIGHT - PY) / 2, WIDTH, HEIGHT);
+		double margin = 0.5;
+		horizon.setBounds( (int) (-margin * PX), (int) (-margin * PY), (int) ((1 + margin) * PX), (int) ((1+margin) *PY));
 		horizon.draw(canvas);
 		canvas.restore();
+
+		canvas.drawLine(0, 0, PX, 0, markerPaint);
+		canvas.drawLine(0, 0, 0, PY, markerPaint);
+		canvas.drawLine(PX, 0, PX, PY, markerPaint);
+		canvas.drawLine(0, PY, PX, PY, markerPaint);
+
+		canvas.drawLine(0,PY/2,PX,PY/2,markerPaint);
+		canvas.drawLine(PX/2,0,PX/2,PY,markerPaint);
 
 	}
 

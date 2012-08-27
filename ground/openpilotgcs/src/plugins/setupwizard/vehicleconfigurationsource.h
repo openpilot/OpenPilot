@@ -60,11 +60,13 @@ public:
     virtual VehicleConfigurationSource::INPUT_TYPE getInputType() const = 0;
     virtual VehicleConfigurationSource::ESC_TYPE getESCType() const = 0;
 
-    virtual bool isLevellingPerformed() = 0;
+    virtual bool isLevellingPerformed() const = 0;
     virtual accelGyroBias getLevellingBias() const = 0;
 
-    virtual QString getSummaryText() = 0;
+    virtual bool isMotorCalibrationPerformed() const = 0;
+    virtual QList<quint16> getActuatorNeutralSettings() const = 0;
 
+    virtual QString getSummaryText() = 0;
 };
 
 #endif // VEHICLECONFIGURATIONSOURCE_H

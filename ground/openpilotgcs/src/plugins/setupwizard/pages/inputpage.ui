@@ -55,7 +55,7 @@ p, li { white-space: pre-wrap; }
     </font>
    </property>
    <property name="toolTip">
-    <string>Airplane, Sloper, Jet</string>
+    <string>Spectrum Satellite</string>
    </property>
    <property name="styleSheet">
     <string notr="true">QToolButton { border: none }</string>
@@ -102,7 +102,7 @@ p, li { white-space: pre-wrap; }
     </font>
    </property>
    <property name="toolTip">
-    <string>Tricopter, Quadcopter, Hexacopter, Octocopter</string>
+    <string>PWM - One cable per channel</string>
    </property>
    <property name="styleSheet">
     <string notr="true">QToolButton { border: none }</string>
@@ -152,7 +152,7 @@ p, li { white-space: pre-wrap; }
     </font>
    </property>
    <property name="toolTip">
-    <string>Airplane, Sloper, Jet</string>
+    <string>PPM - One cable for all channels</string>
    </property>
    <property name="styleSheet">
     <string notr="true">QToolButton { border: none }</string>
@@ -199,7 +199,7 @@ p, li { white-space: pre-wrap; }
     </font>
    </property>
    <property name="toolTip">
-    <string>Airplane, Sloper, Jet</string>
+    <string>Futaba S-BUS</string>
    </property>
    <property name="styleSheet">
     <string notr="true">QToolButton { border: none }</string>

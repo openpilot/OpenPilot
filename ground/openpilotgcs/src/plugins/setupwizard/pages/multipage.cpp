@@ -65,6 +65,7 @@ bool MultiPage::validatePage()
 {
     SetupWizard::VEHICLE_SUB_TYPE type = (SetupWizard::VEHICLE_SUB_TYPE) ui->typeCombo->itemData(ui->typeCombo->currentIndex()).toInt();
     getWizard()->setVehicleSubType(type);
+    return true;
 }
 
 void MultiPage::setupMultiTypesCombo()
@@ -94,6 +95,8 @@ void MultiPage::setupMultiTypesCombo()
     ui->typeCombo->addItem(tr("Hexacopter H"), SetupWizard::MULTI_ROTOR_HEXA_H);
     m_descriptions << tr("Hexacopter H");
 
+    // Fredrik Arvidsson(m_thread) 2012-08-26 Disable Octos until further notice
+    /*
     ui->typeCombo->addItem(tr("Octocopter"), SetupWizard::MULTI_ROTOR_OCTO);
     m_descriptions << tr("Octocopter");
 
@@ -105,15 +108,18 @@ void MultiPage::setupMultiTypesCombo()
 
     ui->typeCombo->addItem(tr("Octocopter V"), SetupWizard::MULTI_ROTOR_OCTO_V);
     m_descriptions << tr("Octocopter V");
+    */
 }
 
 void MultiPage::updateAvailableTypes()
 {
+    /*
     QVariant enable = (getWizard()->getInputType() == SetupWizard::INPUT_PWM) ? QVariant(0) : QVariant(1 | 32);
     ui->typeCombo->model()->setData(ui->typeCombo->model()->index(6, 0), enable, Qt::UserRole - 1);
     ui->typeCombo->model()->setData(ui->typeCombo->model()->index(7, 0), enable, Qt::UserRole - 1);
     ui->typeCombo->model()->setData(ui->typeCombo->model()->index(8, 0), enable, Qt::UserRole - 1);
     ui->typeCombo->model()->setData(ui->typeCombo->model()->index(9, 0), enable, Qt::UserRole - 1);
+    */
 }
 
 void MultiPage::updateImageAndDescription()

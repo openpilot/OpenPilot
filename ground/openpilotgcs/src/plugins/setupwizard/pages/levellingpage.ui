@@ -49,6 +49,9 @@ p, li { white-space: pre-wrap; }
      <height>70</height>
     </rect>
    </property>
+   <property name="toolTip">
+    <string>Calculate gyro and accelerometer bias</string>
+   </property>
    <property name="styleSheet">
     <string notr="true">QToolButton { border: none }</string>
    </property>

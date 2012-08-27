@@ -53,8 +53,14 @@ private:
     VehicleConfigurationSource *m_configSource;
 
     QSvgRenderer *m_renderer;
-    QHash<QString, QGraphicsSvgItem> m_vehicleImageMap;
-    QHash<QString, QGraphicsSvgItem> m_receiverImageMap;
+    QGraphicsSvgItem* m_background;
+
+    void setupGraphicsScene();
+    void setupGraphicsSceneItems(QGraphicsScene *scene, QList<QString> elementsToShow);
+protected:
+    void resizeEvent(QResizeEvent *event);
+    void showEvent(QShowEvent *event);
+
 };
 
 #endif // CONNECTIONDIAGRAM_H

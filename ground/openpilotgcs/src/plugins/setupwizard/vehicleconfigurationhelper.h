@@ -68,6 +68,9 @@ private:
     static const qint16 LEGACY_ESC_FREQUENCE = 50;
     static const qint16 RAPID_ESC_FREQUENCE = 400;
 
+    static const qint16 ACTUATOR_MIN = 1000;
+    static const qint16 ACTUATOR_MAX = 2000;
+
     static const int MIXER_TYPE_DISABLED = 0;
     static const int MIXER_TYPE_MOTOR = 1;
     static const int MIXER_TYPE_SERVO = 2;
@@ -83,7 +86,7 @@ private:
 
     void applyHardwareConfiguration();
     void applyVehicleConfiguration();
-    void applyOutputConfiguration();
+    void applyActuatorConfiguration();
     void applyFlighModeConfiguration();
     void applyLevellingConfiguration();
     void applyStabilizationConfiguration();

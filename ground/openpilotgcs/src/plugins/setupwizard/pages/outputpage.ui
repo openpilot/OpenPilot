@@ -55,7 +55,7 @@ p, li { white-space: pre-wrap; }
     </font>
    </property>
    <property name="toolTip">
-    <string>Airplane, Sloper, Jet</string>
+    <string>Turbo PWM ESC 400Hz</string>
    </property>
    <property name="styleSheet">
     <string notr="true">QToolButton { border: none }</string>
@@ -65,8 +65,8 @@ p, li { white-space: pre-wrap; }
    </property>
    <property name="icon">
     <iconset resource="../wizardResources.qrc">
-     <normaloff>:/setupwizard/resources/bttn-turbo-down.png</normaloff>
-     <normalon>:/setupwizard/resources/bttn-turbo-up.png</normalon>:/setupwizard/resources/bttn-turbo-down.png</iconset>
+     <normaloff>:/setupwizard/resources/bttn-turbo-up.png</normaloff>
+     <normalon>:/setupwizard/resources/bttn-turbo-down.png</normalon>:/setupwizard/resources/bttn-turbo-up.png</iconset>
    </property>
    <property name="iconSize">
     <size>
@@ -105,7 +105,7 @@ p, li { white-space: pre-wrap; }
     </font>
    </property>
    <property name="toolTip">
-    <string>Tricopter, Quadcopter, Hexacopter, Octocopter</string>
+    <string>Standard ESC 50Hz</string>
    </property>
    <property name="styleSheet">
     <string notr="true">QToolButton { border: none }</string>

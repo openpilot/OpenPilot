@@ -59,9 +59,12 @@ public:
     SetupWizard::ESC_TYPE getESCType() const { return m_escType; }
 
     void setLevellingBias(accelGyroBias bias) { m_levellingBias = bias; m_levellingPerformed = true; }
-    bool isLevellingPerformed() { return m_levellingPerformed; }
+    bool isLevellingPerformed() const { return m_levellingPerformed; }
     accelGyroBias getLevellingBias() const { return m_levellingBias; }
 
+    void setActuatorNeutralSettings(QList<quint16> neutralSettings) { m_actuatorNeutralConfig = neutralSettings; }
+    bool isMotorCalibrationPerformed() const { return m_motorCalibrationPerformed; }
+    QList<quint16> getActuatorNeutralSettings() const { return m_actuatorNeutralConfig; }
 
     QString getSummaryText();
 
@@ -86,6 +89,9 @@ private:
     ESC_TYPE m_escType;
     bool m_levellingPerformed;
     accelGyroBias m_levellingBias;
+
+    bool m_motorCalibrationPerformed;
+    QList<quint16> m_actuatorNeutralConfig;
 
     Core::ConnectionManager *m_connectionManager;
 };

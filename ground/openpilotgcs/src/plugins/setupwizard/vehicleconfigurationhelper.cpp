@@ -59,7 +59,7 @@ bool VehicleConfigurationHelper::setupVehicle()
 
     applyHardwareConfiguration();
     applyVehicleConfiguration();
-    applyOutputConfiguration();
+    applyActuatorConfiguration();
     applyFlighModeConfiguration();
     applyLevellingConfiguration();
     applyStabilizationConfiguration();
@@ -174,7 +174,7 @@ void VehicleConfigurationHelper::applyVehicleConfiguration()
     }
 }
 
-void VehicleConfigurationHelper::applyOutputConfiguration()
+void VehicleConfigurationHelper::applyActuatorConfiguration()
 {
     ActuatorSettings* actSettings = ActuatorSettings::GetInstance(m_uavoManager);
     switch(m_configSource->getVehicleType())
@@ -183,10 +183,19 @@ void VehicleConfigurationHelper::applyOutputConfiguration()
         {
             ActuatorSettings::DataFields data = actSettings->getData();
 
-            data.ChannelUpdateFreq[0] = LEGACY_ESC_FREQUENCE;
-            data.ChannelUpdateFreq[1] = LEGACY_ESC_FREQUENCE;
-            data.ChannelUpdateFreq[3] = LEGACY_ESC_FREQUENCE;
-            data.ChannelUpdateFreq[4] = LEGACY_ESC_FREQUENCE;
+
+            for(quint16 i = 0; i < ActuatorSettings::CHANNELUPDATEFREQ_NUMELEM; i++) {
+                data.ChannelUpdateFreq[i] = LEGACY_ESC_FREQUENCE;
+            }
+
+            for(quint16 i = 0; i < ActuatorSettings::CHANNELMAX_NUMELEM; i++) {
+                data.ChannelType[i] = ActuatorSettings::CHANNELTYPE_PWM;
+                data.ChannelAddr[i] = i;
+                data.ChannelMin[i] = ACTUATOR_MIN;
+                data.ChannelNeutral[i] = ACTUATOR_MIN;
+                data.ChannelMax[i] = ACTUATOR_MAX;
+            }
+
             data.MotorsSpinWhileArmed = ActuatorSettings::MOTORSSPINWHILEARMED_FALSE;
 
             qint16 updateFrequence = LEGACY_ESC_FREQUENCE;

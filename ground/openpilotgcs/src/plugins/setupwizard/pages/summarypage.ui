@@ -51,7 +51,7 @@ p, li { white-space: pre-wrap; }
     </rect>
    </property>
    <property name="toolTip">
-    <string>Tricopter, Quadcopter, Hexacopter, Octocopter</string>
+    <string>Show connection diagram for configuration</string>
    </property>
    <property name="text">
     <string>Hardware

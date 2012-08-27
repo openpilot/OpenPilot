@@ -69,6 +69,10 @@ void LevellingPage::performLevelling()
         return;
     }
 
+    getWizard()->button(QWizard::CancelButton)->setEnabled(false);
+    getWizard()->button(QWizard::BackButton)->setEnabled(false);
+    ui->levelButton->setEnabled(false);
+
     if(!m_levellingUtil)
     {
         // Measure every 100ms * 100times = 10s
@@ -79,9 +83,6 @@ void LevellingPage::performLevelling()
     connect(m_levellingUtil, SIGNAL(progress(long,long)), this, SLOT(levellingProgress(long,long)));
     connect(m_levellingUtil, SIGNAL(done(accelGyroBias)), this, SLOT(levellingDone(accelGyroBias)));
     connect(m_levellingUtil, SIGNAL(timeout(QString)), this, SLOT(levellingTimeout(QString)));
-    getWizard()->button(QWizard::CancelButton)->setEnabled(false);
-    getWizard()->button(QWizard::BackButton)->setEnabled(false);
-    ui->levelButton->setEnabled(false);
 
     m_levellingUtil->start();
 }

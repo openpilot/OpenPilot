@@ -10,11 +10,9 @@ import android.graphics.Color;
 import android.graphics.PointF;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.FloatMath;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -79,12 +77,6 @@ public class OsgViewer extends ObjectManagerActivity implements View.OnTouchList
 	        uiLightChangeButton = (Button) findViewById(R.id.uiButtonLight);
 	        	uiLightChangeButton.setOnClickListener(uiListenerChangeLight);
 
-	    //Creating Toasts
-       	msgUiNavPrincipal = Toast.makeText(getApplicationContext(), "toast1", Toast.LENGTH_SHORT);
-       	msgUiNavSecondary = Toast.makeText(getApplicationContext(), "toast2", Toast.LENGTH_SHORT);
-       	msgUiLightOn  = Toast.makeText(getApplicationContext(), "toast3", Toast.LENGTH_SHORT);
-       	msgUiLightOff  = Toast.makeText(getApplicationContext(), "toast4", Toast.LENGTH_SHORT);
-
        	String address = Environment.getExternalStorageDirectory().getPath() + "/Models/J14-QT_X.3DS"; //quad.osg";
        	Log.d(TAG, "Address: " + address);
        	osgNativeLib.loadObject(address);
@@ -135,7 +127,6 @@ public class OsgViewer extends ObjectManagerActivity implements View.OnTouchList
 
     	//dumpEvent(event);
 
-    	long time_arrival = event.getEventTime();
     	int n_points = event.getPointerCount();
     	int action = event.getAction() & MotionEvent.ACTION_MASK;
 
@@ -204,6 +195,8 @@ public class OsgViewer extends ObjectManagerActivity implements View.OnTouchList
     				else
     					osgNativeLib.mouseButtonReleaseEvent(event.getX(0), event.getY(0), 1);
     				break;
+				default:
+					break;
     			}
     			mode = moveTypes.ZOOM;
     			distanceOrigin = sqrDistance(event);
@@ -299,53 +292,10 @@ public class OsgViewer extends ObjectManagerActivity implements View.OnTouchList
     	osgNativeLib.setClearColor(red,green,blue);
 	}
 
-    //Android Life Cycle Menu
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-//        inflater.inflate(R.menu.appmenu, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
-        switch (item.getItemId()) {
-          default:
-            return super.onOptionsItemSelected(item);
-        }
-    }
-
-    //Utilities
-    /** Show an event in the LogCat view, for debugging */
-    private void dumpEvent(MotionEvent event) {
-       String names[] = { "DOWN", "UP", "MOVE", "CANCEL", "OUTSIDE",
-             "POINTER_DOWN", "POINTER_UP", "7?", "8?", "9?" };
-       StringBuilder sb = new StringBuilder();
-       int action = event.getAction();
-       int actionCode = action & MotionEvent.ACTION_MASK;
-       sb.append("event ACTION_").append(names[actionCode]);
-       if (actionCode == MotionEvent.ACTION_POINTER_DOWN
-             || actionCode == MotionEvent.ACTION_POINTER_UP) {
-          sb.append("(pid ").append(
-                action >> MotionEvent.ACTION_POINTER_ID_SHIFT);
-          sb.append(")");
-       }
-       sb.append("[");
-       for (int i = 0; i < event.getPointerCount(); i++) {
-          sb.append("#").append(i);
-          sb.append("(pid ").append(event.getPointerId(i));
-          sb.append(")=").append((int) event.getX(i));
-          sb.append(",").append((int) event.getY(i));
-          if (i + 1 < event.getPointerCount())
-             sb.append(";");
-       }
-       sb.append("]");
-       //Log.d(TAG, sb.toString());
-    }
     private float sqrDistance(MotionEvent event) {
         float x = event.getX(0) - event.getX(1);
         float y = event.getY(0) - event.getY(1);
-        return (float)(Math.sqrt(x * x + y * y));
+        return (float)(FloatMath.sqrt(x * x + y * y));
      }
 
 	// The below methods should all be called by the parent activity at the appropriate times

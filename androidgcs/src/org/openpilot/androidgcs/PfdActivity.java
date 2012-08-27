@@ -28,7 +28,6 @@ import org.openpilot.androidgcs.fragments.PFD;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AbsListView;
 import android.widget.LinearLayout;
 
 public class PfdActivity extends ObjectManagerActivity {
@@ -44,8 +43,8 @@ public class PfdActivity extends ObjectManagerActivity {
 
 		layout.setOrientation(LinearLayout.HORIZONTAL);
 		layout.setLayoutParams(new LinearLayout.LayoutParams(
-				AbsListView.LayoutParams.MATCH_PARENT,
-				AbsListView.LayoutParams.MATCH_PARENT));
+				LinearLayout.LayoutParams.WRAP_CONTENT,
+				LinearLayout.LayoutParams.WRAP_CONTENT));
 		layout.setId(0x101);
 		{
 			FragmentTransaction fragmentTransaction = getFragmentManager()

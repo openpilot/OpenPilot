@@ -259,7 +259,7 @@ public class OPTelemetryService extends Service {
 			mServiceHandler.sendMessage(msg);
 		}
 		public boolean isConnected() {
-			return activeTelem != null;
+			return (activeTelem != null) && (telemTask != null) && (telemTask.getConnected());
 		}
 	};
 

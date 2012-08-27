@@ -22,22 +22,22 @@ public class ObjectEditView extends GridLayout {
 	public List<View> fields;
 
 	public ObjectEditView(Context context) {
-		super(context);		
+		super(context);
 		initObjectEditView();
 	}
 
-	public ObjectEditView(Context context, AttributeSet ats, int defaultStyle) { 
+	public ObjectEditView(Context context, AttributeSet ats, int defaultStyle) {
 		super(context, ats);
 		initObjectEditView();
 	}
 
-	public ObjectEditView(Context context, AttributeSet ats) { 
+	public ObjectEditView(Context context, AttributeSet ats) {
 		super(context, ats);
 		initObjectEditView();
 	}
 
 	public void initObjectEditView() {
-		// Set orientation of layout to vertical 
+		// Set orientation of layout to vertical
 		setOrientation(LinearLayout.VERTICAL);
 		setColumnCount(2);
 		fields = new ArrayList<View>();
@@ -51,11 +51,11 @@ public class ObjectEditView extends GridLayout {
 		for (int i = 0; i < field.getNumElements(); i++)
 			addRow(getContext(), field, i);
 	}
-	
-	
+
+
 	public void addRow(Context context, UAVObjectField field, int idx) {
 		int row = getRowCount();
-		
+
 		TextView fieldName = new TextView(context);
 		if(field.getNumElements() == 1) {
 			fieldName.setText(field.getName());
@@ -65,7 +65,7 @@ public class ObjectEditView extends GridLayout {
 		addView(fieldName, new GridLayout.LayoutParams(spec(row), spec(0)));
 
 		View fieldValue = null;
-		switch(field.getType()) 
+		switch(field.getType())
 		{
 		case FLOAT32:
 			fieldValue = new EditText(context);
@@ -93,8 +93,16 @@ public class ObjectEditView extends GridLayout {
 			((Spinner) fieldValue).setAdapter(adapter);
 			((Spinner) fieldValue).setSelection((int) field.getDouble(idx));
 			break;
+		case BITFIELD:
+			fieldValue = new EditText(context);
+			((EditText)fieldValue).setText(field.getValue(idx).toString());
+			((EditText)fieldValue).setInputType(InputType.TYPE_CLASS_NUMBER);
+			break;
+		case STRING:
+			fieldValue = new EditText(context);
+			((EditText)fieldValue).setText(field.getValue(idx).toString());
 		}
-		
+
 		addView(fieldValue, new GridLayout.LayoutParams(spec(row), spec(1)));
 		fields.add(fieldValue);
 	}

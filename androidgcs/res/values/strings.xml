@@ -33,4 +33,5 @@
 	<string name="txrate">TxRate: </string>
 	<string name="rxrate">RxRate: </string>
 	<string name="tester">Tester</string>
+	<string name="_3dview">3DView</string>
 </resources>

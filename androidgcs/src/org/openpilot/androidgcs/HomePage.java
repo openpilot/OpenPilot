@@ -83,6 +83,15 @@ public class HomePage extends ObjectManagerActivity {
 				startActivity(new Intent(HomePage.this, SystemAlarmActivity.class));
 			}
 		});
+
+		Button tuning = (Button) findViewById(R.id.launch_tuning);
+		tuning.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				startActivity(new Intent(HomePage.this, TuningActivity.class));
+			}
+		});
+
 	}
 
 }

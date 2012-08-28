@@ -68,6 +68,9 @@ public abstract class TelemetryTask implements Runnable {
 	//! The telemetry monitor which takes care of high level connects / disconnects
 	private TelemetryMonitor mon;
 
+	//! Thread to process the input stream
+	Thread inputProcessThread;
+
 	//! Flag to indicate a shut down was requested.  Derived classes should take care to respect this.
 	boolean shutdown;
 
@@ -146,6 +149,14 @@ public abstract class TelemetryTask implements Runnable {
 			}
 		});
 
+		if (inputProcessThread != null) {
+			inputProcessThread.interrupt();
+			try {
+				inputProcessThread.join();
+			} catch (InterruptedException e) {
+			}
+		}
+
 		// TODO: Make sure the input and output stream is closed
 
 		// TODO: Make sure any threads for input and output are closed
@@ -157,7 +168,8 @@ public abstract class TelemetryTask implements Runnable {
 	 * to read from the input stream.
 	 */
 	private void startInputProcessing() {
-		new Thread(new processUavTalk(), "Process UAV talk").start();
+		inputProcessThread = new Thread(new processUavTalk(), "Process UAV talk");
+		inputProcessThread.start();
 	}
 
 	//! Runnable to process input stream

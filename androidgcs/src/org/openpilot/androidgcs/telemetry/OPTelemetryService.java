@@ -227,7 +227,7 @@ public class OPTelemetryService extends Service {
 	public void onDestroy() {
 
 		if (telemTask != null) {
-			Log.d(TAG, "onDestory() shutting down telemetry task");
+			Log.d(TAG, "onDestroy() shutting down telemetry task");
 			telemTask.disconnect();
 			telemTask = null;
 

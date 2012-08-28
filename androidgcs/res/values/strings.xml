@@ -33,4 +33,6 @@
 	<string name="txrate">TxRate: </string>
 	<string name="rxrate">RxRate: </string>
 	<string name="tuning">Tuning</string>
+	<string name="apply">Apply</string>
+	<string name="save">Save</string>
 </resources>

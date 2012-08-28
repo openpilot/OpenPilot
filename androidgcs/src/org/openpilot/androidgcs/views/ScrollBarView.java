@@ -1,6 +1,9 @@
 package org.openpilot.androidgcs.views;
 
+import org.openpilot.androidgcs.R;
+
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.EditText;
@@ -17,6 +20,7 @@ public class ScrollBarView extends GridLayout {
 	private final EditText edit;
 	private final SeekBar bar;
 	private double value;
+	private String name;
 
 	private final double SCALE = 1000000;
 
@@ -29,7 +33,8 @@ public class ScrollBarView extends GridLayout {
 		setColumnCount(2);
 
 		lbl = new TextView(context);
-		lbl.setText("Roll Rate Kp:");
+		TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.setting_attributes, 0, 0);
+		lbl.setText(ta.getString(R.styleable.setting_attributes_setting_name));
 		addView(lbl, new GridLayout.LayoutParams(spec(0), spec(0)));
 
 		edit = new EditText(context);
@@ -47,8 +52,14 @@ public class ScrollBarView extends GridLayout {
 	public void setValue(double val)
 	{
 		value = val;
-		edit.setText(Double.toString(val));
-		bar.setProgress((int) (SCALE * val));
+		edit.setText(Double.toString(value));
+		bar.setProgress((int) (SCALE * value));
+	}
+
+	public void setName(String n)
+	{
+		name = n;
+		lbl.setText(name);
 	}
 
 	@Override

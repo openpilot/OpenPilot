@@ -28,10 +28,6 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
 
-import org.openpilot.uavtalk.UAVObjectManager;
-import org.openpilot.uavtalk.UAVTalk;
-
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -43,11 +39,13 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-@TargetApi(10) public class BluetoothUAVTalk {
+public class BluetoothUAVTalk extends TelemetryTask {
+
 	private final String TAG = "BluetoothUAVTalk";
-	public static int LOGLEVEL = 2;
-	public static boolean WARN = LOGLEVEL > 1;
-	public static boolean DEBUG = LOGLEVEL > 0;
+	public static final int LOGLEVEL = 4;
+	public static final boolean DEBUG = LOGLEVEL > 2;
+	public static final boolean WARN = LOGLEVEL > 1;
+	public static final boolean ERROR = LOGLEVEL > 0;
 
 	// Temporarily define fixed device name
 	private String device_name = "RN42-222D";
@@ -56,30 +54,35 @@ import android.util.Log;
 	private BluetoothAdapter mBluetoothAdapter;
 	private BluetoothSocket socket;
 	private BluetoothDevice device;
-	private UAVTalk uavTalk;
-	private boolean connected;
 
-	public BluetoothUAVTalk(Context caller) {
+	public BluetoothUAVTalk(OPTelemetryService caller) {
+		super(caller);
+	}
 
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(caller);
+	@Override
+	boolean attemptConnection() {
+
+		if( getConnected() )
+			return true;
+
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(telemService);
 		device_name = prefs.getString("bluetooth_mac","");
 
         if (DEBUG) Log.d(TAG, "Trying to open UAVTalk with " + device_name);
 
-        connected = false;
         device = null;
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
             // Device does not support Bluetooth
         	Log.e(TAG, "Device does not support Bluetooth");
-        	return;
+        	return false;
         }
 
         if (!mBluetoothAdapter.isEnabled()) {
         	// Enable bluetooth if it isn't already
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            caller.sendOrderedBroadcast(enableBtIntent, "android.permission.BLUETOOTH_ADMIN", new BroadcastReceiver() {
+            telemService.sendOrderedBroadcast(enableBtIntent, "android.permission.BLUETOOTH_ADMIN", new BroadcastReceiver() {
 				@Override
 				public void onReceive(Context context, Intent intent) {
 					Log.e(TAG,"Received " + context + intent);
@@ -90,60 +93,60 @@ import android.util.Log;
         } else {
         	queryDevices();
         }
-    }
 
-	public boolean connect(UAVObjectManager objMngr) {
-		if( getConnected() )
-			return true;
-		if( !getFoundDevice() )
-			return false;
-		if( !openTelemetryBluetooth(objMngr) )
-			return false;
 		return true;
 	}
 
-	public boolean getConnected() {
-		return connected;
+	@Override
+	public void disconnect() {
+		super.disconnect();
+		if(socket != null) {
+			try {
+				socket.close();
+			} catch (IOException e) {
+				if (ERROR) Log.e(TAG, "Unable to close BT socket");
+			}
+			socket = null;
+		}
 	}
 
 	public boolean getFoundDevice() {
 		return (device != null);
 	}
 
-	public UAVTalk getUavtalk() {
-		return uavTalk;
-	}
 
     private void queryDevices() {
-    	Log.d(TAG, "Searching for devices");
+    	if (DEBUG) Log.d(TAG, "Searching for devices matching the selected preference");
+
 		Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
 		// If there are paired devices
 		if (pairedDevices.size() > 0) {
 		    // Loop through paired devices
 		    for (BluetoothDevice device : pairedDevices) {
-		        // Add the name and address to an array adapter to show in a ListView
-		        //mArrayAdapter.add(device.getName() + "\n" + device.getAddress());
-		    	Log.d(TAG, "Paired device: " + device.getAddress() + " compared to " + device_name);
+
 		    	if(device.getAddress().compareTo(device_name) == 0) {
-		    		Log.d(TAG, "Found device: " + device.getName());
+		    		if (DEBUG) Log.d(TAG, "Found selected device: " + device.getName());
 		    		this.device = device;
+
+		    		openTelemetryBluetooth();
 		    		return;
 		    	}
 		    }
 		}
 
+		attemptedFailed();
     }
 
-	private boolean openTelemetryBluetooth(UAVObjectManager objMngr) {
-		Log.d(TAG, "Opening connection to " + device.getName());
+	private boolean openTelemetryBluetooth() {
+		if (DEBUG) Log.d(TAG, "Opening connection to " + device.getName());
+
 		socket = null;
-		connected = false;
+
 		try {
 			socket = device.createInsecureRfcommSocketToServiceRecord(MY_UUID);
 		} catch (IOException e) {
-			Log.e(TAG,"Unable to create Rfcomm socket");
+			if (ERROR) Log.e(TAG,"Unable to create Rfcomm socket");
 			return false;
-			//e.printStackTrace();
 		}
 
 		mBluetoothAdapter.cancelDiscovery();
@@ -152,25 +155,39 @@ import android.util.Log;
 			socket.connect();
 		}
 		catch (IOException e) {
-			Log.e(TAG,"Unable to connect to requested device", e);
+			if (ERROR) Log.e(TAG,"Unable to connect to requested device", e);
             try {
                 socket.close();
             } catch (IOException e2) {
-                Log.e(TAG, "unable to close() socket during connection failure", e2);
+                if (ERROR) Log.e(TAG, "unable to close() socket during connection failure", e2);
             }
+
+            attemptedFailed();
 			return false;
 		}
-
-		connected = true;
 
 		try {
-			uavTalk = new UAVTalk(socket.getInputStream(), socket.getOutputStream(), objMngr);
+			inStream = socket.getInputStream();
+			outStream = socket.getOutputStream();
 		} catch (IOException e) {
-			Log.e(TAG,"Error starting UAVTalk");
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
+			try {
+				socket.close();
+			} catch (IOException e2) {
+
+			}
+            attemptedFailed();
 			return false;
 		}
+
+		telemService.toastMessage("Bluetooth device connected");
+
+		// Post message to call attempt succeeded on the parent class
+		handler.post(new Runnable() {
+			@Override
+			public void run() {
+				BluetoothUAVTalk.this.attemptSucceeded();
+			}
+		});
 
 		return true;
 	}

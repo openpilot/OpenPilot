@@ -56,29 +56,64 @@ public class AttitudeView extends View {
 
 	}
 
-	@Override protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		int measuredWidth = measure(widthMeasureSpec);
-		int measuredHeight = measure(heightMeasureSpec);
-		int d = Math.min(measuredWidth, measuredHeight);
-		setMeasuredDimension(d/2, d/2);
-	}
+    /**
+     * @see android.view.View#measure(int, int)
+     */
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        setMeasuredDimension(measureWidth(widthMeasureSpec),
+                measureHeight(heightMeasureSpec));
+    }
 
-	private int measure(int measureSpec) {
-		int result = 0;
-		// Decode the measurement specifications.
 
-		int specMode = MeasureSpec.getMode(measureSpec);
-		int specSize = MeasureSpec.getSize(measureSpec);
+    /**
+     * Determines the height of this view
+     * @param measureSpec A measureSpec packed into an int
+     * @return The height of the view, honoring constraints from measureSpec
+     */
+    private int measureHeight(int measureSpec) {
+        int result = 0;
+        int specMode = MeasureSpec.getMode(measureSpec);
+        int specSize = MeasureSpec.getSize(measureSpec);
 
-		if (specMode == MeasureSpec.UNSPECIFIED) { // Return a default size of 200 if no bounds are specified.
-			result = 200;
-		} else {
-			// As you want to fill the available space
-			// always return the full available bounds.
-			result = specSize;
-		}
-		return result;
-	}
+        if (specMode == MeasureSpec.EXACTLY) {
+            // We were told how big to be
+            result = specSize;
+        } else {
+            // Measure the text (beware: ascent is a negative number)
+            result = 600;
+            if (specMode == MeasureSpec.AT_MOST) {
+                // Respect AT_MOST value if that was what is called for by measureSpec
+                result = Math.min(result, specSize);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Determines the width of this view
+     * @param measureSpec A measureSpec packed into an int
+     * @return The width of the view, honoring constraints from measureSpec
+     */
+    private int measureWidth(int measureSpec) {
+        int result = 0;
+        int specMode = MeasureSpec.getMode(measureSpec);
+        int specSize = MeasureSpec.getSize(measureSpec);
+
+        if (specMode == MeasureSpec.EXACTLY) {
+            // We were told how big to be
+            result = specSize;
+        } else {
+            // Measure the text
+            result = 800;
+            if (specMode == MeasureSpec.AT_MOST) {
+                // Respect AT_MOST value if that was what is called for by measureSpec
+                result = Math.min(result, specSize);
+            }
+        }
+
+        return result;
+    }
 
 	private float roll;
 	public void setRoll(double roll) {

@@ -28,7 +28,8 @@ HEADERS += setupwizardplugin.h \
     levellingutil.h \
     vehicleconfigurationsource.h \
     vehicleconfigurationhelper.h \
-    connectiondiagram.h
+    connectiondiagram.h \
+    pages/outputcalibrationpage.h
 
 SOURCES += setupwizardplugin.cpp \
     setupwizard.cpp \
@@ -50,7 +51,8 @@ SOURCES += setupwizardplugin.cpp \
     levellingutil.cpp \
     vehicleconfigurationsource.cpp \
     vehicleconfigurationhelper.cpp \
-    connectiondiagram.cpp
+    connectiondiagram.cpp \
+    pages/outputcalibrationpage.cpp
 
 OTHER_FILES += SetupWizard.pluginspec
 
@@ -69,7 +71,8 @@ FORMS += \
     pages/summarypage.ui \
     pages/flashpage.ui \
     pages/levellingpage.ui \
-    connectiondiagram.ui
+    connectiondiagram.ui \
+    pages/outputcalibrationpage.ui
 
 RESOURCES += \
     wizardResources.qrc

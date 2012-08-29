@@ -1,2 +1,32 @@
 MyListWidget {font-size: 11px;}
 Utils--StyledBar { background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(200, 200, 200, 255));}
+
+ 
+
+
+
+
+
+	QGroupBox 	{
+		border: 1px solid gray;
+		border-radius: 5px;
+		margin-top: 1ex; /* leave space at the top for the title */
+		font-size: 11px;
+		font-weight: bold;
+		}
+
+	QGroupBox::title {
+		subcontrol-origin: margin;
+		subcontrol-position: top left; /* position at the top center */
+		padding: 0 3px;
+		
+		}
+
+	QTabWidget::pane { /* The tab widget frame */	
+		margin: 1px,1px,1px,1px;
+		border: 2px solid rgb(196,196,196);
+		border-radius: 5px;
+		padding: 0px;
+		} 
+
+

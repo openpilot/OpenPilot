@@ -20,37 +20,43 @@
                 android:id="@+id/rollRateKp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                setting_attributes:setting_name="Roll Rate Kp" />
+                setting_attributes:setting_name="Roll Rate Kp"
+                setting_attributes:max_value="0.01" />
 
             <org.openpilot.androidgcs.views.ScrollBarView
                 android:id="@+id/pitchRateKp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                setting_attributes:setting_name="Pitch Rate Kp" />
+                setting_attributes:setting_name="Pitch Rate Kp"
+                setting_attributes:max_value="0.01" />
 
             <org.openpilot.androidgcs.views.ScrollBarView
                 android:id="@+id/rollRateKi"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                setting_attributes:setting_name="Roll Rate Ki" />
+                setting_attributes:setting_name="Roll Rate Ki"
+                setting_attributes:max_value="0.05" />
 
             <org.openpilot.androidgcs.views.ScrollBarView
                 android:id="@+id/pitchRateKi"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                setting_attributes:setting_name="Pitch Rate Ki" />
+                setting_attributes:setting_name="Pitch Rate Ki"
+                setting_attributes:max_value="0.05" />
 
             <org.openpilot.androidgcs.views.ScrollBarView
                 android:id="@+id/rollKp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                setting_attributes:setting_name="Roll Kp" />
+                setting_attributes:setting_name="Roll Kp"
+                setting_attributes:max_value="5" />
 
             <org.openpilot.androidgcs.views.ScrollBarView
                 android:id="@+id/pitchKp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                setting_attributes:setting_name="Pitch Kp" />
+                setting_attributes:setting_name="Pitch Kp"
+                setting_attributes:max_value="5" />
         </LinearLayout>
     </ScrollView>
 

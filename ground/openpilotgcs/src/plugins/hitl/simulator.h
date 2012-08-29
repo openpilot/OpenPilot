@@ -136,7 +136,7 @@ typedef struct _CONNECTION
     quint16 gpsPosRate;
 
     bool inputCommand;
-    bool gcsReciever;
+    bool gcsReceiver;
     bool manualControl;
     bool manualOutput;
     quint16 minOutputPeriod;

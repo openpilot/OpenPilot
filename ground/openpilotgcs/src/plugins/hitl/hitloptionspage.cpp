@@ -78,7 +78,10 @@ QWidget *HITLOptionsPage::createPage(QWidget *parent)
 
     m_optionsPage->executablePath->setPath(config->Settings().binPath);
     m_optionsPage->dataPath->setPath(config->Settings().dataPath);
-    m_optionsPage->manualControl->setChecked(config->Settings().manualControl);
+
+    m_optionsPage->manualControlRadioButton->setChecked(config->Settings().manualControl);
+    m_optionsPage->gcsReceiverRadioButton->setChecked(config->Settings().gcsReceiver);
+
     m_optionsPage->startSim->setChecked(config->Settings().startSim);
     m_optionsPage->noiseCheckBox->setChecked(config->Settings().addNoise);
 
@@ -105,6 +108,7 @@ QWidget *HITLOptionsPage::createPage(QWidget *parent)
     m_optionsPage->minOutputPeriodSpinbox->setValue(config->Settings().minOutputPeriod);
 
 
+
     return optionsPageWidget;
 }
 
@@ -116,7 +120,6 @@ void HITLOptionsPage::apply()
     settings.simulatorId = m_optionsPage->chooseFlightSimulator->itemData(i).toString();
     settings.binPath = m_optionsPage->executablePath->path();
     settings.dataPath = m_optionsPage->dataPath->path();
-    settings.manualControl = m_optionsPage->manualControl->isChecked();
     settings.startSim = m_optionsPage->startSim->isChecked();
     settings.addNoise = m_optionsPage->noiseCheckBox->isChecked();
     settings.hostAddress = m_optionsPage->hostAddress->text();
@@ -145,6 +148,8 @@ void HITLOptionsPage::apply()
 
     settings.minOutputPeriod = m_optionsPage->minOutputPeriodSpinbox->value();
 
+    settings.manualControl = m_optionsPage->manualControlRadioButton->isChecked();
+    settings.gcsReceiver = m_optionsPage->gcsReceiverRadioButton->isChecked();
 
     config->setSimulatorSettings(settings);
 }

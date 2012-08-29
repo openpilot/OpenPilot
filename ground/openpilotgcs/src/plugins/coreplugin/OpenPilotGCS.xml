@@ -916,7 +916,7 @@
           <baroAltitudeEnabled>false</baroAltitudeEnabled>
           <binPath>\home\lafargue\X-Plane 9\X-Plane-i686</binPath>
           <dataPath>\usr\share\games\FlightGear</dataPath>
-          <gcsReciever>true</gcsReciever>
+          <gcsReceiver>true</gcsReceiver>
           <gpsPosRate>100</gpsPosRate>
           <gpsPositionEnabled>false</gpsPositionEnabled>
           <groundTruthEnabled>true</groundTruthEnabled>
@@ -952,7 +952,7 @@
           <baroAltitudeEnabled>false</baroAltitudeEnabled>
           <binPath>\usr\games\fgfs</binPath>
           <dataPath>\usr\share\games\FlightGear</dataPath>
-          <gcsReciever>true</gcsReciever>
+          <gcsReceiver>true</gcsReceiver>
           <gpsPosRate>100</gpsPosRate>
           <gpsPositionEnabled>false</gpsPositionEnabled>
           <groundTruthEnabled>true</groundTruthEnabled>
@@ -988,7 +988,7 @@
           <baroAltitudeEnabled>false</baroAltitudeEnabled>
           <binPath>\home\lafargue\X-Plane 9\X-Plane-i686</binPath>
           <dataPath>\usr\share\games\FlightGear</dataPath>
-          <gcsReciever>true</gcsReciever>
+          <gcsReceiver>true</gcsReceiver>
           <gpsPosRate>100</gpsPosRate>
           <gpsPositionEnabled>false</gpsPositionEnabled>
           <groundTruthEnabled>true</groundTruthEnabled>

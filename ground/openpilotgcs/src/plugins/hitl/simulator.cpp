@@ -565,7 +565,7 @@ void Simulator::updateUAVOs(Output2OP out){
     }
 
 
-    if (settings.gcsReciever) {
+    if (settings.gcsReceiver) {
 //        static QTime gcsRcvrTime = currentTime;
 //        if (!settings.manualOutput || gcsRcvrTime.msecsTo(currentTime) >= settings.outputRate) {
 //            GCSReceiver::DataFields gcsRcvrData;

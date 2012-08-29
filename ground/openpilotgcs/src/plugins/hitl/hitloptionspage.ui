@@ -529,7 +529,7 @@
              <item>
               <widget class="QLabel" name="label_8">
                <property name="text">
-                <string>Refresh rate</string>
+                <string>Refresh rate:</string>
                </property>
               </widget>
              </item>
@@ -685,7 +685,7 @@
              <item>
               <widget class="QLabel" name="label_7">
                <property name="text">
-                <string>Refresh rate</string>
+                <string>Refresh rate:</string>
                </property>
               </widget>
              </item>
@@ -750,7 +750,7 @@
                 <bool>true</bool>
                </property>
                <property name="text">
-                <string>Refresh rate</string>
+                <string>Refresh rate:</string>
                </property>
               </widget>
              </item>
@@ -867,7 +867,7 @@
                <item row="0" column="0">
                 <widget class="QLabel" name="label_11">
                  <property name="text">
-                  <string>Range detectioon</string>
+                  <string>Range detection:</string>
                  </property>
                 </widget>
                </item>
@@ -890,7 +890,7 @@
                <item row="1" column="0">
                 <widget class="QLabel" name="label_12">
                  <property name="text">
-                  <string>Refresh rate</string>
+                  <string>Refresh rate:</string>
                  </property>
                 </widget>
                </item>
@@ -927,7 +927,7 @@
              <bool>true</bool>
             </property>
             <property name="title">
-             <string>Map command from simulator</string>
+             <string>Map command...</string>
             </property>
             <property name="flat">
              <bool>true</bool>
@@ -936,7 +936,7 @@
              <bool>true</bool>
             </property>
             <property name="checked">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_5">
              <property name="spacing">
@@ -952,7 +952,7 @@
               <number>0</number>
              </property>
              <item>
-              <widget class="QRadioButton" name="gcsReciever">
+              <widget class="QRadioButton" name="gcsReceiverRadioButton">
                <property name="font">
                 <font>
                  <weight>75</weight>
@@ -960,7 +960,7 @@
                 </font>
                </property>
                <property name="text">
-                <string>to GCSReciver</string>
+                <string>from simulator to hardware (via GCSReceiver)</string>
                </property>
                <property name="checked">
                 <bool>true</bool>
@@ -968,12 +968,12 @@
               </widget>
              </item>
              <item>
-              <widget class="QRadioButton" name="manualControl">
+              <widget class="QRadioButton" name="manualControlRadioButton">
                <property name="enabled">
-                <bool>false</bool>
+                <bool>true</bool>
                </property>
                <property name="text">
-                <string>to ManualCtrl (not implemented)</string>
+                <string>from hardware to simulator (via ManualCtrl)</string>
                </property>
               </widget>
              </item>
@@ -991,7 +991,7 @@
                <bool>true</bool>
               </property>
               <property name="text">
-               <string>Maximum output rate</string>
+               <string>Maximum GCS to hardware output rate:</string>
               </property>
              </widget>
             </item>
@@ -1001,7 +1001,7 @@
                <bool>true</bool>
               </property>
               <property name="toolTip">
-               <string>0 - update once, or every N seconds</string>
+               <string>Set the maximum rate at which GCS sends simulator data to the hardware</string>
               </property>
               <property name="suffix">
                <string>ms</string>

@@ -60,7 +60,7 @@ HITLConfiguration::HITLConfiguration(QString classId, QSettings* qSettings, QObj
     settings.groundTruthRate    = 100;
 
     settings.inputCommand       = false;
-    settings.gcsReciever        = false;
+    settings.gcsReceiver        = false;
     settings.manualControl      = false;
     settings.manualOutput       = false;
     settings.minOutputPeriod    = 100;
@@ -100,7 +100,7 @@ HITLConfiguration::HITLConfiguration(QString classId, QSettings* qSettings, QObj
         settings.groundTruthRate    = qSettings->value("groundTruthRate").toInt();
 
         settings.inputCommand       = qSettings->value("inputCommand").toBool();
-        settings.gcsReciever        = qSettings->value("gcsReciever").toBool();
+        settings.gcsReceiver        = qSettings->value("gcsReceiver").toBool();
         settings.manualControl      = qSettings->value("manualControl").toBool();
         settings.manualOutput       = qSettings->value("manualOutput").toBool();
         settings.minOutputPeriod         = qSettings->value("minOutputPeriod").toInt();
@@ -148,7 +148,7 @@ void HITLConfiguration::saveConfig(QSettings* qSettings) const {
     qSettings->setValue("groundTruthEnabled", settings.groundTruthEnabled);
     qSettings->setValue("groundTruthRate", settings.groundTruthRate);
     qSettings->setValue("inputCommand", settings.inputCommand);
-    qSettings->setValue("gcsReciever", settings.gcsReciever);
+    qSettings->setValue("gcsReceiver", settings.gcsReceiver);
     qSettings->setValue("manualControl", settings.manualControl);
     qSettings->setValue("manualOutput", settings.manualOutput);
     qSettings->setValue("minOutputPeriod", settings.minOutputPeriod);

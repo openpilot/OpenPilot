@@ -79,8 +79,8 @@ QWidget *HITLOptionsPage::createPage(QWidget *parent)
     m_optionsPage->executablePath->setPath(config->Settings().binPath);
     m_optionsPage->dataPath->setPath(config->Settings().dataPath);
 
-    m_optionsPage->manualControlRadioButton->setChecked(config->Settings().manualControl);
-    m_optionsPage->gcsReceiverRadioButton->setChecked(config->Settings().gcsReceiver);
+    m_optionsPage->manualControlRadioButton->setChecked(config->Settings().manualControlEnabled);
+    m_optionsPage->gcsReceiverRadioButton->setChecked(config->Settings().gcsReceiverEnabled);
 
     m_optionsPage->startSim->setChecked(config->Settings().startSim);
     m_optionsPage->noiseCheckBox->setChecked(config->Settings().addNoise);
@@ -153,8 +153,9 @@ void HITLOptionsPage::apply()
 
     settings.minOutputPeriod = m_optionsPage->minOutputPeriodSpinbox->value();
 
-    settings.manualControl = m_optionsPage->manualControlRadioButton->isChecked();
-    settings.gcsReceiver = m_optionsPage->gcsReceiverRadioButton->isChecked();
+    settings.manualControlEnabled = m_optionsPage->manualControlRadioButton->isChecked();
+    settings.gcsReceiverEnabled = m_optionsPage->gcsReceiverRadioButton->isChecked();
+
     settings.attActHW = m_optionsPage->attActHW->isChecked();
     settings.attActSim = m_optionsPage->attActSim->isChecked();
     settings.attActCalc = m_optionsPage->attActCalc->isChecked();

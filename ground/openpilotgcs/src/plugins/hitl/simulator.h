@@ -136,23 +136,22 @@ typedef struct _CONNECTION
     quint16 gpsPosRate;
 
     bool inputCommand;
-    bool gcsReceiver;
-    bool manualControl;
-    bool manualOutput;
+    bool gcsReceiverEnabled;
+    bool manualControlEnabled;
     quint16 minOutputPeriod;
 
 } SimulatorSettings;
 
 
-struct Output2OP{
+struct Output2Hardware{
     float latitude;
     float longitude;
     float altitude;
     float heading;
     float groundspeed; //[m/s]
     float calibratedAirspeed;    //[m/s]
-    float pitch;
     float roll;
+    float pitch;
     float pressure;
     float temperature;
     float velNorth;   //[m/s]
@@ -168,8 +167,27 @@ struct Output2OP{
     float pitchRate;     //[deg/s]
     float yawRate;     //[deg/s]
     float delT;
+
+    float rc_channel[GCSReceiver::CHANNEL_NUMELEM]; //Elements in rc_channel are between -1 and 1
+
+
+    float rollDesired;
+    float pitchDesired;
+    float yawDesired;
+    float throttleDesired;
 };
 
+//struct Output2Simulator{
+//    float roll;
+//    float pitch;
+//    float yaw;
+//    float throttle;
+
+//    float ailerons;
+//    float rudder;
+//    float elevator;
+//    float motor;
+//};
 
 class Simulator : public QObject
 {
@@ -198,7 +216,7 @@ public:
     virtual void setupUdpPorts(const QString& host, int inPort, int outPort) { Q_UNUSED(host) Q_UNUSED(inPort) Q_UNUSED(outPort)}
 
     void resetInitialHomePosition();
-    void updateUAVOs(Output2OP out);
+    void updateUAVOs(Output2Hardware out);
 
 signals:
     void autopilotConnected();
@@ -253,6 +271,7 @@ protected:
     Accels* accels;
     Gyros*  gyros;
     GCSTelemetryStats* telStats;
+    GCSReceiver* gcsReceiver;
 
     SimulatorSettings settings;
 
@@ -277,6 +296,7 @@ private:
     QTime gpsPosTime;
     QTime groundTruthTime;
     QTime baroAltTime;
+    QTime gcsRcvrTime;
 
     QString name;
     QString simulatorId;

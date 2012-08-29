@@ -60,6 +60,8 @@ FGSimulator::~FGSimulator()
 
 void FGSimulator::setupUdpPorts(const QString& host, int inPort, int outPort)
 {
+    Q_UNUSED(outPort);
+
     if(inSocket->bind(QHostAddress(host), inPort))
         emit processOutput("Successfully bound to address " + host + " on port " + QString::number(inPort) + "\n");
     else
@@ -115,7 +117,7 @@ bool FGSimulator::setupProcess()
                  "--vc=100 " +
                  "--log-level=alert " +
                  "--generic=socket,out,20," + settings.hostAddress + "," + QString::number(settings.inPort) + ",udp,opfgprotocol");
-    if(!settings.manualControl)
+    if(settings.manualControlEnabled) // <--[BCH] What does this do? Why does it depend on ManualControl?
     {
         args.append(" --generic=socket,in,400," + settings.remoteAddress + "," + QString::number(settings.outPort) + ",udp,opfgprotocol");
     }
@@ -216,7 +218,7 @@ void FGSimulator::transmitUpdate()
         // V2.0 does not currently work with --generic-protocol
     }
     
-    if(!settings.manualControl)
+    if(settings.manualControlEnabled)
     {
         actData.Roll = ailerons;
         actData.Pitch = -elevator;
@@ -291,8 +293,8 @@ void FGSimulator::processUpdate(const QByteArray& inp)
     ///////
     // Output formatting
     ///////
-    Output2OP out;
-    memset(&out, 0, sizeof(Output2OP));
+    Output2Hardware out;
+    memset(&out, 0, sizeof(Output2Hardware));
 
     float NED[3];
     // convert from cm back to meters

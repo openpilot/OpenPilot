@@ -589,13 +589,6 @@
               <number>0</number>
              </property>
              <item>
-              <widget class="QRadioButton" name="attActHW">
-               <property name="text">
-                <string>send simulated inertial data to board</string>
-               </property>
-              </widget>
-             </item>
-             <item>
               <widget class="QRadioButton" name="attActSim">
                <property name="font">
                 <font>
@@ -611,6 +604,13 @@
                </property>
                <property name="checked">
                 <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="attActHW">
+               <property name="text">
+                <string>send simulated inertial data to board</string>
                </property>
               </widget>
              </item>
@@ -927,7 +927,7 @@
              <bool>true</bool>
             </property>
             <property name="title">
-             <string>Map command...</string>
+             <string>Map transmitter commands...</string>
             </property>
             <property name="flat">
              <bool>true</bool>
@@ -952,15 +952,19 @@
               <number>0</number>
              </property>
              <item>
-              <widget class="QRadioButton" name="gcsReceiverRadioButton">
+              <widget class="QRadioButton" name="manualControlRadioButton">
+               <property name="enabled">
+                <bool>true</bool>
+               </property>
                <property name="font">
                 <font>
+                 <pointsize>14</pointsize>
                  <weight>75</weight>
                  <bold>true</bold>
                 </font>
                </property>
                <property name="text">
-                <string>from simulator to hardware (via GCSReceiver)</string>
+                <string>from hardware to simulator (via ManualCtrl)</string>
                </property>
                <property name="checked">
                 <bool>true</bool>
@@ -968,12 +972,12 @@
               </widget>
              </item>
              <item>
-              <widget class="QRadioButton" name="manualControlRadioButton">
-               <property name="enabled">
-                <bool>true</bool>
-               </property>
+              <widget class="QRadioButton" name="gcsReceiverRadioButton">
                <property name="text">
-                <string>from hardware to simulator (via ManualCtrl)</string>
+                <string>from simulator to hardware (via GCSReceiver)</string>
+               </property>
+               <property name="checked">
+                <bool>false</bool>
                </property>
               </widget>
              </item>
@@ -986,10 +990,7 @@
              <number>6</number>
             </property>
             <item>
-             <widget class="QCheckBox" name="manualOutput">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
+             <widget class="QLabel" name="label_3">
               <property name="text">
                <string>Maximum GCS to hardware output rate:</string>
               </property>

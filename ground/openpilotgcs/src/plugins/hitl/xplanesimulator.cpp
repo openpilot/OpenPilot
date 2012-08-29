@@ -99,29 +99,30 @@ bool XplaneSimulator::setupProcess()
  */
 void XplaneSimulator::transmitUpdate()
 {
-    //Read ActuatorDesired from autopilot
-    ActuatorDesired::DataFields actData = actDesired->getData();
-    float ailerons = actData.Roll;
-    float elevator = actData.Pitch;
-    float rudder = actData.Yaw;
-    float throttle = actData.Throttle > 0? actData.Throttle : 0;
-    float none = -999;
-    //quint32 none = *((quint32*)&tmp); // get float as 4 bytes
-
-    quint32 code;
-    QByteArray buf;
-    QDataStream stream(&buf,QIODevice::ReadWrite);
-
-    // !!! LAN byte order - Big Endian
+    if (settings.manualControlEnabled) {
+        //Read ActuatorDesired from autopilot
+        ActuatorDesired::DataFields actData = actDesired->getData();
+        float ailerons = actData.Roll;
+        float elevator = actData.Pitch;
+        float rudder = actData.Yaw;
+        float throttle = actData.Throttle > 0? actData.Throttle : 0;
+        float none = -999;
+        //quint32 none = *((quint32*)&tmp); // get float as 4 bytes
+        
+        quint32 code;
+        QByteArray buf;
+        QDataStream stream(&buf,QIODevice::ReadWrite);
+        
+        // !!! LAN byte order - Big Endian
 #if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
-    stream.setByteOrder(QDataStream::LittleEndian);
+        stream.setByteOrder(QDataStream::LittleEndian);
 #endif
-
-    // 11th data settings (flight con: ail/elv/rud)
-    buf.clear();
-    code = 11;
-    //quint8 header[] = "DATA";
-    /*
+        
+        // 11th data settings (flight con: ail/elv/rud)
+        buf.clear();
+        code = 11;
+        //quint8 header[] = "DATA";
+        /*
         stream << *((quint32*)header) <<
                   (quint8)0x30 <<
                   code <<
@@ -134,57 +135,58 @@ void XplaneSimulator::transmitUpdate()
                   none  <<
                   none;
                   */
-    buf.append("DATA0");
-    buf.append(reinterpret_cast<const char*>(&code), sizeof(code));
-    buf.append(reinterpret_cast<const char*>(&elevator), sizeof(elevator));
-    buf.append(reinterpret_cast<const char*>(&ailerons), sizeof(ailerons));
-    buf.append(reinterpret_cast<const char*>(&rudder), sizeof(rudder));
-    buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
-    buf.append(reinterpret_cast<const char*>(&rudder), sizeof(rudder));
-    buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
-    buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
-    buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
-//    TraceBuf(buf.data(),41);
-
-    if(outSocket->writeDatagram(buf, QHostAddress(settings.remoteAddress), settings.outPort) == -1)
-    {
-        emit processOutput("Error sending UDP packet to XPlane: " + outSocket->errorString() + "\n");
-    }
-    //outSocket->write(buf);
-
-    // 25th data settings (throttle command)
-    buf.clear();
-    code = 25;
-    //stream << *((quint32*)header) << (quint8)0x30 << code << *((quint32*)&throttle) << none  << none
-    //		<< none  << none  << none << none  << none;
-    buf.append("DATA0");
-    buf.append(reinterpret_cast<const char*>(&code), sizeof(code));
-    buf.append(reinterpret_cast<const char*>(&throttle), sizeof(throttle));
-    buf.append(reinterpret_cast<const char*>(&throttle), sizeof(throttle));
-    buf.append(reinterpret_cast<const char*>(&throttle), sizeof(throttle));
-    buf.append(reinterpret_cast<const char*>(&throttle), sizeof(throttle));
-    buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
-    buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
-    buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
-    buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
-
-    if(outSocket->writeDatagram(buf, QHostAddress(settings.remoteAddress), settings.outPort) == -1)
-    {
-        emit processOutput("Error sending UDP packet to XPlane: " + outSocket->errorString() + "\n");
-    }
-
-    //outSocket->write(buf);
-
-
-
-    /** !!! this settings was given from ardupilot X-Plane.pl, I comment them
+        buf.append("DATA0");
+        buf.append(reinterpret_cast<const char*>(&code), sizeof(code));
+        buf.append(reinterpret_cast<const char*>(&elevator), sizeof(elevator));
+        buf.append(reinterpret_cast<const char*>(&ailerons), sizeof(ailerons));
+        buf.append(reinterpret_cast<const char*>(&rudder), sizeof(rudder));
+        buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
+        buf.append(reinterpret_cast<const char*>(&rudder), sizeof(rudder));
+        buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
+        buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
+        buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
+//        TraceBuf(buf.data(),41);
+        
+        if(outSocket->writeDatagram(buf, QHostAddress(settings.remoteAddress), settings.outPort) == -1)
+        {
+            emit processOutput("Error sending UDP packet to XPlane: " + outSocket->errorString() + "\n");
+        }
+        //outSocket->write(buf);
+        
+        // 25th data settings (throttle command)
+        buf.clear();
+        code = 25;
+        //stream << *((quint32*)header) << (quint8)0x30 << code << *((quint32*)&throttle) << none  << none
+        //		<< none  << none  << none << none  << none;
+        buf.append("DATA0");
+        buf.append(reinterpret_cast<const char*>(&code), sizeof(code));
+        buf.append(reinterpret_cast<const char*>(&throttle), sizeof(throttle));
+        buf.append(reinterpret_cast<const char*>(&throttle), sizeof(throttle));
+        buf.append(reinterpret_cast<const char*>(&throttle), sizeof(throttle));
+        buf.append(reinterpret_cast<const char*>(&throttle), sizeof(throttle));
+        buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
+        buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
+        buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
+        buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
+        
+        if(outSocket->writeDatagram(buf, QHostAddress(settings.remoteAddress), settings.outPort) == -1)
+        {
+            emit processOutput("Error sending UDP packet to XPlane: " + outSocket->errorString() + "\n");
+        }
+        
+        //outSocket->write(buf);
+        
+        
+        
+        /** !!! this settings was given from ardupilot X-Plane.pl, I comment them
        but if it needed comment should be removed !!!
-
+       
     // 8th data settings (joystick 1 ail/elv/rud)
     stream << "DATA0" << quint32(11) << elevator << ailerons << rudder
             << float(-999) << float(-999) << float(-999) << float(-999) << float(-999);
     outSocket->write(buf);
     */
+    }
 
 }
 
@@ -294,8 +296,8 @@ void XplaneSimulator::processUpdate(const QByteArray& dataBuf)
         ///////
         // Output formatting
         ///////
-        Output2OP out;
-        memset(&out, 0, sizeof(Output2OP));
+        Output2Hardware out;
+        memset(&out, 0, sizeof(Output2Hardware));
 
         // Update GPS Position objects
         out.latitude = latitude * 1e7;
@@ -354,7 +356,7 @@ void TraceBuf(const char* buf,int len)
 		{
 			if(i>0)
 			{
-//				qDebug() << str;
+                qDebug() << str;
 				str.clear();
 				reminder=false;
 			}
@@ -364,6 +366,6 @@ void TraceBuf(const char* buf,int len)
 	}
 
     if(reminder){
-//		qDebug() << str;
+        qDebug() << str;
     }
 }

@@ -66,6 +66,9 @@ Simulator::Simulator(const SimulatorSettings& params) :
     QTime currentTime=QTime::currentTime();
     gpsPosTime = currentTime;
     groundTruthTime = currentTime;
+    gcsRcvrTime = currentTime;
+    attRawTime = currentTime;
+    baroAltTime = currentTime;
 
 }
 
@@ -134,6 +137,7 @@ void Simulator::onStart()
     actDesired = ActuatorDesired::GetInstance(objManager);
     actCommand = ActuatorCommand::GetInstance(objManager);
     manCtrlCommand = ManualControlCommand::GetInstance(objManager);
+    gcsReceiver= GCSReceiver::GetInstance(objManager);
     flightStatus = FlightStatus::GetInstance(objManager);
     posHome = HomeLocation::GetInstance(objManager);
     velActual = VelocityActual::GetInstance(objManager);
@@ -230,19 +234,14 @@ void Simulator::receiveUpdate()
 
 void Simulator::setupObjects()
 {
-    setupInputObject(actDesired, settings.minOutputPeriod);
 
-/*    if (settings.gcsReciever) {
-        setupInputObject(actCommand, settings.outputRate);
-        setupOutputObject(gcsReceiver);
-    } else if (settings.manualControl) {
-//        setupInputObject(actDesired);
-//        setupInputObject(camDesired);
-//        setupInputObject(acsDesired);
-//        setupOutputObject(manCtrlCommand);
-        qDebug() << "ManualControlCommand not implemented yet";
+    if (settings.gcsReceiverEnabled) {
+        setupInputObject(actCommand, settings.minOutputPeriod); //Input to the simulator
+        setupOutputObject(gcsReceiver, settings.minOutputPeriod);
+    } else if (settings.manualControlEnabled) {
+        setupInputObject(actDesired, settings.minOutputPeriod); //Input to the simulator
     }
-*/
+
     setupOutputObject(posHome, 10000);
     setupOutputObject(baroAlt, 250);
 
@@ -285,13 +284,8 @@ void Simulator::setupInputObject(UAVObject* obj, quint32 updatePeriod)
     UAVObject::SetFlightAccess(mdata, UAVObject::ACCESS_READWRITE);
     UAVObject::SetFlightTelemetryAcked(mdata, false);
 
-    if (settings.manualOutput) {
-        UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
-        mdata.flightTelemetryUpdatePeriod = updatePeriod;
-    } else {
-        UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_ONCHANGE);
-        mdata.flightTelemetryUpdatePeriod = 0;
-    }
+    UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
+    mdata.flightTelemetryUpdatePeriod = updatePeriod;
 
     obj->setMetadata(mdata);
 }
@@ -320,12 +314,15 @@ void Simulator::setupOutputObject(UAVObject* obj, quint32 updatePeriod)
 {
 	UAVObject::Metadata mdata;
 	mdata = obj->getDefaultMetadata();
-	UAVObject::SetFlightAccess(mdata, UAVObject::ACCESS_READONLY);
-	UAVObject::SetGcsAccess(mdata, UAVObject::ACCESS_READWRITE);
-	UAVObject::SetFlightTelemetryUpdateMode(mdata,UAVObject::UPDATEMODE_MANUAL);
-	UAVObject::SetGcsTelemetryAcked(mdata, false);
+
+    UAVObject::SetGcsAccess(mdata, UAVObject::ACCESS_READWRITE);
+    UAVObject::SetGcsTelemetryAcked(mdata, false);
 	UAVObject::SetGcsTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
-	mdata.gcsTelemetryUpdatePeriod = updatePeriod;
+    mdata.gcsTelemetryUpdatePeriod = updatePeriod;
+
+    UAVObject::SetFlightAccess(mdata, UAVObject::ACCESS_READONLY);
+    UAVObject::SetFlightTelemetryUpdateMode(mdata,UAVObject::UPDATEMODE_MANUAL);
+
 	obj->setMetadata(mdata);
 }
 
@@ -373,7 +370,7 @@ void Simulator::resetInitialHomePosition(){
 }
 
 
-void Simulator::updateUAVOs(Output2OP out){
+void Simulator::updateUAVOs(Output2Hardware out){
 
     QTime currentTime = QTime::currentTime();
 
@@ -569,23 +566,22 @@ void Simulator::updateUAVOs(Output2OP out){
         /*****************************************/
     }
 
+    if (settings.gcsReceiverEnabled) {
+        if (gcsRcvrTime.msecsTo(currentTime) >= settings.minOutputPeriod) {
+            GCSReceiver::DataFields gcsRcvrData;
+            memset(&gcsRcvrData, 0, sizeof(GCSReceiver::DataFields));
 
-    if (settings.gcsReceiver) {
-//        static QTime gcsRcvrTime = currentTime;
-//        if (!settings.manualOutput || gcsRcvrTime.msecsTo(currentTime) >= settings.outputRate) {
-//            GCSReceiver::DataFields gcsRcvrData;
-//            gcsRcvrData = gcsReceiver->getData();
+            for (quint16 i = 0; i < GCSReceiver::CHANNEL_NUMELEM; i++){
+                gcsRcvrData.Channel[i] = 1500 + (out.rc_channel[i]*500); //Elements in rc_channel are between -1 and 1
+            }
 
-//            for (int i = 0; i < 8; ++i)
-//                gcsRcvrData.Channel[i] = 1500 + (ch[i] * 500);
+            gcsReceiver->setData(gcsRcvrData);
 
-//            gcsReceiver->setData(gcsRcvrData);
-//            if (settings.manualOutput)
-//                gcsRcvrTime = currentTime;
-//        }
-    } else if (settings.manualControl) {
-        // not implemented yet
+            gcsRcvrTime.addMSecs(settings.minOutputPeriod);
+
+        }
     }
+
 
     if (settings.gpsPositionEnabled) {
         if (gpsPosTime.msecsTo(currentTime) >= settings.gpsPosRate) {

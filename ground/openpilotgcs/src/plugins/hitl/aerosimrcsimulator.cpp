@@ -125,6 +125,7 @@ void AeroSimRCSimulator::processUpdate(const QByteArray &data)
         return;
     }
 
+#define AEROSIM_RCCHANNEL_NUMELEM 8
     float   delT,
             homeX, homeY, homeZ,
             WpHX, WpHY, WpLat, WpLon,
@@ -136,7 +137,7 @@ void AeroSimRCSimulator::processUpdate(const QByteArray &data)
             yaw, pitch, roll,   // model
             volt, curr,
             rx, ry, rz, fx, fy, fz, ux, uy, uz, // matrix
-            ch[8];
+            ch[AEROSIM_RCCHANNEL_NUMELEM];
 
     stream >> delT;
     stream >> homeX >> homeY >> homeZ;
@@ -152,11 +153,17 @@ void AeroSimRCSimulator::processUpdate(const QByteArray &data)
     stream >> ch[0] >> ch[1] >> ch[2] >> ch[3] >> ch[4] >> ch[5] >> ch[6] >> ch[7];
     stream >> udpCounterASrecv;
 
-    Output2OP out;
-    memset(&out, 0, sizeof(Output2OP));
+    Output2Hardware out;
+    memset(&out, 0, sizeof(Output2Hardware));
 
 
     out.delT=delT;
+
+    /*************************************************************************************/
+    for (int i=0; i< AEROSIM_RCCHANNEL_NUMELEM; i++){
+        out.rc_channel[i]=ch[i]; //Elements in rc_channel are between -1 and 1
+    }
+
     /**********************************************************************************************/
     QMatrix4x4 mat;
     mat = QMatrix4x4( fy,  fx, -fz,  0.0,           // model matrix
@@ -168,8 +175,8 @@ void AeroSimRCSimulator::processUpdate(const QByteArray &data)
     QQuaternion quat;                               // model quat
     asMatrix2Quat(mat, quat);
 
-    // rotate gravity
     /*************************************************************************************/
+    // rotate gravity
     QVector3D acc = QVector3D(accY, accX, -accZ);   // accel (X,Y,Z) -> (+Y,+X,-Z)
     QVector3D gee = QVector3D(0.0, 0.0, -GEE);
     QQuaternion qWorld = quat.conjugate();

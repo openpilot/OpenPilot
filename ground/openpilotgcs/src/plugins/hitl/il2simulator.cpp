@@ -241,8 +241,8 @@ void IL2Simulator::processUpdate(const QByteArray& inp)
     ///////
     // Output formatting
     ///////
-    Output2OP out;
-    memset(&out, 0, sizeof(Output2OP));
+    Output2Hardware out;
+    memset(&out, 0, sizeof(Output2Hardware));
 
     // Compute rotation matrix, for later calculations
     float Rbe[3][3];
@@ -254,24 +254,19 @@ void IL2Simulator::processUpdate(const QByteArray& inp)
     Utils::CoordinateConversions().RPY2Quaternion(rpy,quat);
     Utils::CoordinateConversions().Quaternion2R(quat,Rbe);
 
-    //Calculate ECEF
-    double RNE[9];
-    double ECEF[3];
-    double LLA[3];
-    LLA[0]=settings.latitude.toFloat();
-    LLA[1]=settings.longitude.toFloat();
-    LLA[2]=0;
-    Utils::CoordinateConversions().RneFromLLA(LLA,(double (*)[3])RNE);
-    Utils::CoordinateConversions().LLA2ECEF(LLA,ECEF);
-
     // Update GPS Position objects
+    double HomeLLA[3];
+    double LLA[3];
     double NED[3];
+    HomeLLA[0]=settings.latitude.toFloat();
+    HomeLLA[1]=settings.longitude.toFloat();
+    HomeLLA[2]=0;
     NED[0] = current.Y;
     NED[1] = current.X;
     NED[2] = -current.Z;
-    Utils::CoordinateConversions().NED2LLA_HomeECEF(ECEF,NED,LLA);
-    out.latitude = settings.latitude.toFloat() * 1e7;
-    out.longitude = settings.longitude.toFloat() * 1e7;
+    Utils::CoordinateConversions().NED2LLA_HomeLLA(HomeLLA,NED,LLA);
+    out.latitude = LLA[0] * 1e7;
+    out.longitude = LLA[1] * 1e7;
     out.groundspeed = current.groundspeed;
 
     out.calibratedAirspeed = current.ias;

@@ -35,7 +35,7 @@ HITLConfiguration::HITLConfiguration(QString classId, QSettings* qSettings, QObj
     settings.simulatorId = "";
     settings.binPath = "";
     settings.dataPath = "";
-    settings.manualControl = false;
+    settings.manualControlEnabled = true;
     settings.startSim = false;
     settings.addNoise = false;
     settings.hostAddress = "127.0.0.1";
@@ -45,65 +45,63 @@ HITLConfiguration::HITLConfiguration(QString classId, QSettings* qSettings, QObj
     settings.latitude = "";
     settings.longitude = "";
 
-    settings.attRawEnabled      = false;
-    settings.attRawRate         = 20;
+    settings.attRawEnabled       = false;
+    settings.attRawRate          = 20;
 
-    settings.attActualEnabled   = true;
-    settings.attActHW           = false;
-    settings.attActSim          = true;
-    settings.attActCalc         = false;
+    settings.attActualEnabled    = true;
+    settings.attActHW            = false;
+    settings.attActSim           = true;
+    settings.attActCalc          = false;
 
-    settings.gpsPositionEnabled = false;
-    settings.gpsPosRate         = 100;
+    settings.gpsPositionEnabled  = false;
+    settings.gpsPosRate          = 100;
 
-    settings.groundTruthEnabled = false;
-    settings.groundTruthRate    = 100;
+    settings.groundTruthEnabled  = false;
+    settings.groundTruthRate     = 100;
 
-    settings.inputCommand       = false;
-    settings.gcsReceiver        = false;
-    settings.manualControl      = false;
-    settings.manualOutput       = false;
-    settings.minOutputPeriod    = 100;
+    settings.inputCommand        = false;
+    settings.gcsReceiverEnabled  = false;
+    settings.manualControlEnabled= false;
+    settings.minOutputPeriod     = 100;
 
 
     // if a saved configuration exists load it, and overwrite defaults
     if (qSettings != 0) {
-        settings.simulatorId        = qSettings->value("simulatorId").toString();
-        settings.hostAddress        = qSettings->value("hostAddress").toString();
-        settings.inPort             = qSettings->value("inPort").toInt();
-        settings.remoteAddress      = qSettings->value("remoteAddress").toString();
-        settings.outPort            = qSettings->value("outPort").toInt();
+        settings.simulatorId         = qSettings->value("simulatorId").toString();
+        settings.hostAddress         = qSettings->value("hostAddress").toString();
+        settings.inPort              = qSettings->value("inPort").toInt();
+        settings.remoteAddress       = qSettings->value("remoteAddress").toString();
+        settings.outPort             = qSettings->value("outPort").toInt();
 
-        settings.binPath            = qSettings->value("binPath").toString();
-        settings.dataPath           = qSettings->value("dataPath").toString();
+        settings.binPath             = qSettings->value("binPath").toString();
+        settings.dataPath            = qSettings->value("dataPath").toString();
 
-        settings.latitude           = qSettings->value("latitude").toString();
-        settings.longitude          = qSettings->value("longitude").toString();
-        settings.startSim           = qSettings->value("startSim").toBool();
-        settings.addNoise           = qSettings->value("noiseCheckBox").toBool();
+        settings.latitude            = qSettings->value("latitude").toString();
+        settings.longitude           = qSettings->value("longitude").toString();
+        settings.startSim            = qSettings->value("startSim").toBool();
+        settings.addNoise            = qSettings->value("noiseCheckBox").toBool();
 
-        settings.attRawEnabled      = qSettings->value("attRawEnabled").toBool();
-        settings.attRawRate         = qSettings->value("attRawRate").toInt();
+        settings.attRawEnabled       = qSettings->value("attRawEnabled").toBool();
+        settings.attRawRate          = qSettings->value("attRawRate").toInt();
 
-        settings.attActualEnabled   = qSettings->value("attActualEnabled").toBool();
-        settings.attActHW           = qSettings->value("attActHW").toBool();
-        settings.attActSim          = qSettings->value("attActSim").toBool();
-        settings.attActCalc         = qSettings->value("attActCalc").toBool();
+        settings.attActualEnabled    = qSettings->value("attActualEnabled").toBool();
+        settings.attActHW            = qSettings->value("attActHW").toBool();
+        settings.attActSim           = qSettings->value("attActSim").toBool();
+        settings.attActCalc          = qSettings->value("attActCalc").toBool();
 
-        settings.baroAltitudeEnabled= qSettings->value("baroAltitudeEnabled").toBool();
-        settings.baroAltRate        = qSettings->value("baroAltRate").toInt();
+        settings.baroAltitudeEnabled = qSettings->value("baroAltitudeEnabled").toBool();
+        settings.baroAltRate         = qSettings->value("baroAltRate").toInt();
 
-        settings.gpsPositionEnabled = qSettings->value("gpsPositionEnabled").toBool();
-        settings.gpsPosRate         = qSettings->value("gpsPosRate").toInt();
+        settings.gpsPositionEnabled  = qSettings->value("gpsPositionEnabled").toBool();
+        settings.gpsPosRate          = qSettings->value("gpsPosRate").toInt();
 
-        settings.groundTruthEnabled = qSettings->value("groundTruthEnabled").toBool();
-        settings.groundTruthRate    = qSettings->value("groundTruthRate").toInt();
+        settings.groundTruthEnabled  = qSettings->value("groundTruthEnabled").toBool();
+        settings.groundTruthRate     = qSettings->value("groundTruthRate").toInt();
 
-        settings.inputCommand       = qSettings->value("inputCommand").toBool();
-        settings.gcsReceiver        = qSettings->value("gcsReceiver").toBool();
-        settings.manualControl      = qSettings->value("manualControl").toBool();
-        settings.manualOutput       = qSettings->value("manualOutput").toBool();
-        settings.minOutputPeriod         = qSettings->value("minOutputPeriod").toInt();
+        settings.inputCommand        = qSettings->value("inputCommand").toBool();
+        settings.gcsReceiverEnabled  = qSettings->value("gcsReceiverEnabled").toBool();
+        settings.manualControlEnabled= qSettings->value("manualControlEnabled").toBool();
+        settings.minOutputPeriod     = qSettings->value("minOutputPeriod").toInt();
     }
 }
 
@@ -133,7 +131,9 @@ void HITLConfiguration::saveConfig(QSettings* qSettings) const {
     qSettings->setValue("longitude", settings.longitude);
     qSettings->setValue("addNoise", settings.addNoise);
     qSettings->setValue("startSim", settings.startSim);
-    qSettings->setValue("manualControl", settings.manualControl);
+
+    qSettings->setValue("gcsReceiverEnabled", settings.gcsReceiverEnabled);
+    qSettings->setValue("manualControlEnabled", settings.manualControlEnabled);
 
     qSettings->setValue("attRawEnabled", settings.attRawEnabled);
     qSettings->setValue("attRawRate", settings.attRawRate);
@@ -148,9 +148,6 @@ void HITLConfiguration::saveConfig(QSettings* qSettings) const {
     qSettings->setValue("groundTruthEnabled", settings.groundTruthEnabled);
     qSettings->setValue("groundTruthRate", settings.groundTruthRate);
     qSettings->setValue("inputCommand", settings.inputCommand);
-    qSettings->setValue("gcsReceiver", settings.gcsReceiver);
-    qSettings->setValue("manualControl", settings.manualControl);
-    qSettings->setValue("manualOutput", settings.manualOutput);
     qSettings->setValue("minOutputPeriod", settings.minOutputPeriod);
 
 

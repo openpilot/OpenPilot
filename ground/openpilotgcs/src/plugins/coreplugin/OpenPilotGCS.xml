@@ -916,7 +916,7 @@
           <baroAltitudeEnabled>false</baroAltitudeEnabled>
           <binPath>\home\lafargue\X-Plane 9\X-Plane-i686</binPath>
           <dataPath>\usr\share\games\FlightGear</dataPath>
-          <gcsReceiver>true</gcsReceiver>
+          <gcsReceiverEnabled>true</gcsReceiverEnabled>
           <gpsPosRate>100</gpsPosRate>
           <gpsPositionEnabled>false</gpsPositionEnabled>
           <groundTruthEnabled>true</groundTruthEnabled>
@@ -926,7 +926,7 @@
           <inputCommand>true</inputCommand>
           <latitude></latitude>
           <longitude></longitude>
-          <manualControl>false</manualControl>
+          <manualControlEnabled>false</manualControlEnabled>
           <manualOutput>false</manualOutput>
           <minOutputPeriod>100</minOutputPeriod>
           <outPort>49000</outPort>
@@ -952,7 +952,7 @@
           <baroAltitudeEnabled>false</baroAltitudeEnabled>
           <binPath>\usr\games\fgfs</binPath>
           <dataPath>\usr\share\games\FlightGear</dataPath>
-          <gcsReceiver>true</gcsReceiver>
+          <gcsReceiverEnabled>false</gcsReceiverEnabled>
           <gpsPosRate>100</gpsPosRate>
           <gpsPositionEnabled>false</gpsPositionEnabled>
           <groundTruthEnabled>true</groundTruthEnabled>
@@ -962,7 +962,7 @@
           <inputCommand>true</inputCommand>
           <latitude></latitude>
           <longitude></longitude>
-          <manualControl>false</manualControl>
+          <manualControlEnabled>true</manualControlEnabled>
           <manualOutput>false</manualOutput>
           <minOutputPeriod>100</minOutputPeriod>
           <outPort>9010</outPort>
@@ -988,7 +988,7 @@
           <baroAltitudeEnabled>false</baroAltitudeEnabled>
           <binPath>\home\lafargue\X-Plane 9\X-Plane-i686</binPath>
           <dataPath>\usr\share\games\FlightGear</dataPath>
-          <gcsReceiver>true</gcsReceiver>
+          <gcsReceiverEnabled>false</gcsReceiverEnabled>
           <gpsPosRate>100</gpsPosRate>
           <gpsPositionEnabled>false</gpsPositionEnabled>
           <groundTruthEnabled>true</groundTruthEnabled>
@@ -998,7 +998,7 @@
           <inputCommand>true</inputCommand>
           <latitude></latitude>
           <longitude></longitude>
-          <manualControl>false</manualControl>
+          <manualControlEnabled>true</manualControlEnabled>
           <manualOutput>false</manualOutput>
           <minOutputPeriod>100</minOutputPeriod>
           <outPort>49000</outPort>

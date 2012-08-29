@@ -368,6 +368,11 @@ void Simulator::telStatsUpdated(UAVObject* obj)
 }
 
 
+void Simulator::resetInitialHomePosition(){
+    once=false;
+}
+
+
 void Simulator::updateUAVOs(Output2OP out){
 
     QTime currentTime = QTime::currentTime();

@@ -7,7 +7,7 @@
  * @{
  * @addtogroup HITLPlugin HITL Plugin
  * @{
- * @brief The Hardware In The Loop plugin 
+ * @brief The Hardware In The Loop plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -34,9 +34,6 @@
 #define M_PI           3.14159265358979323846
 #endif
 
-
-
-
 //FGSimulator::FGSimulator(QString hostAddr, int outPort, int inPort, bool manual, QString binPath, QString dataPath) :
 //		Simulator(hostAddr, outPort, inPort,  manual, binPath, dataPath),
 //		fgProcess(NULL)
@@ -50,7 +47,7 @@
 //}
 
 FGSimulator::FGSimulator(const SimulatorSettings& params) :
-		Simulator(params)
+    Simulator(params)
 {
     udpCounterFGrecv = 0;
     udpCounterGCSsend = 0;
@@ -58,13 +55,11 @@ FGSimulator::FGSimulator(const SimulatorSettings& params) :
 
 FGSimulator::~FGSimulator()
 {
-	disconnect(simProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(processReadyRead()));
+    disconnect(simProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(processReadyRead()));
 }
 
 void FGSimulator::setupUdpPorts(const QString& host, int inPort, int outPort)
 {
-    Q_UNUSED(outPort);
-
     if(inSocket->bind(QHostAddress(host), inPort))
         emit processOutput("Successfully bound to address " + host + " on port " + QString::number(inPort) + "\n");
     else
@@ -73,31 +68,31 @@ void FGSimulator::setupUdpPorts(const QString& host, int inPort, int outPort)
 
 bool FGSimulator::setupProcess()
 {
-	QMutexLocker locker(&lock);
+    QMutexLocker locker(&lock);
 
-	// Copy FlightGear generic protocol configuration file to the FG protocol directory
-	// NOTE: Not working on Windows 7, if FG is installed in the "Program Files",
-	// likelly due to permissions. The file should be manually copied to data/Protocol/opfgprotocol.xml
-//	QFile xmlFile(":/flightgear/genericprotocol/opfgprotocol.xml");
-//	xmlFile.open(QIODevice::ReadOnly | QIODevice::Text);
-//	QString xml = xmlFile.readAll();
-//	xmlFile.close();
-//	QFile xmlFileOut(pathData + "/Protocol/opfgprotocol.xml");
-//	xmlFileOut.open(QIODevice::WriteOnly | QIODevice::Text);
-//	xmlFileOut.write(xml.toAscii());
-//	xmlFileOut.close();
+    // Copy FlightGear generic protocol configuration file to the FG protocol directory
+    // NOTE: Not working on Windows 7, if FG is installed in the "Program Files",
+    // likelly due to permissions. The file should be manually copied to data/Protocol/opfgprotocol.xml
+    //	QFile xmlFile(":/flightgear/genericprotocol/opfgprotocol.xml");
+    //	xmlFile.open(QIODevice::ReadOnly | QIODevice::Text);
+    //	QString xml = xmlFile.readAll();
+    //	xmlFile.close();
+    //	QFile xmlFileOut(pathData + "/Protocol/opfgprotocol.xml");
+    //	xmlFileOut.open(QIODevice::WriteOnly | QIODevice::Text);
+    //	xmlFileOut.write(xml.toAscii());
+    //	xmlFileOut.close();
 
-	Qt::HANDLE mainThread = QThread::currentThreadId();
-	qDebug() << "setupProcess Thread: "<< mainThread;
+    Qt::HANDLE mainThread = QThread::currentThreadId();
+    qDebug() << "setupProcess Thread: "<< mainThread;
 
-	simProcess = new QProcess();
-	simProcess->setReadChannelMode(QProcess::MergedChannels);
-	connect(simProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(processReadyRead()));
-	// Note: Only tested on windows 7
+    simProcess = new QProcess();
+    simProcess->setReadChannelMode(QProcess::MergedChannels);
+    connect(simProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(processReadyRead()));
+    // Note: Only tested on windows 7
 #if defined(Q_WS_WIN)
-	QString cmdShell("c:/windows/system32/cmd.exe");
+    QString cmdShell("c:/windows/system32/cmd.exe");
 #else
-	QString cmdShell("bash");
+    QString cmdShell("bash");
 #endif
 
     // Start shell (Note: Could not start FG directly on Windows, only through terminal!)
@@ -139,19 +134,19 @@ bool FGSimulator::setupProcess()
                            "Remote computer must have the correct OpenPilot protocol installed.");
     }
 
-        udpCounterGCSsend = 0;
+    udpCounterGCSsend = 0;
 
-	return true;
+    return true;
 }
 
 void FGSimulator::processReadyRead()
 {
-	QByteArray bytes = simProcess->readAllStandardOutput();
-	QString str(bytes);
-	if ( !str.contains("Error reading data") ) // ignore error
-	{
-		emit processOutput(str);
-	}
+    QByteArray bytes = simProcess->readAllStandardOutput();
+    QString str(bytes);
+    if ( !str.contains("Error reading data") ) // ignore error
+    {
+        emit processOutput(str);
+    }
 }
 
 void FGSimulator::transmitUpdate()
@@ -178,7 +173,7 @@ void FGSimulator::transmitUpdate()
     }
     else
     {
-         // Read ActuatorDesired from autopilot
+        // Read ActuatorDesired from autopilot
         actData = actDesired->getData();
 
         ailerons = actData.Roll;
@@ -195,19 +190,19 @@ void FGSimulator::transmitUpdate()
         udpCounterGCSsend = 0;
     
     if((udpCounterGCSsend < allowableDifference) || (udpCounterFGrecv==0) ) //FG udp queue is not delayed
-    {       
+    {
         udpCounterGCSsend++;
 
-	// Send update to FlightGear
-	QString cmd;
+        // Send update to FlightGear
+        QString cmd;
         cmd = QString("%1,%2,%3,%4,%5\n")
-              .arg(ailerons) //ailerons
-              .arg(elevator) //elevator
-              .arg(rudder) //rudder
-              .arg(throttle) //throttle
-              .arg(udpCounterGCSsend); //UDP packet counter delay
+                .arg(ailerons) //ailerons
+                .arg(elevator) //elevator
+                .arg(rudder) //rudder
+                .arg(throttle) //throttle
+                .arg(udpCounterGCSsend); //UDP packet counter delay
 
-	QByteArray data = cmd.toAscii();
+        QByteArray data = cmd.toAscii();
 
         if(outSocket->writeDatagram(data, QHostAddress(settings.remoteAddress), settings.outPort) == -1)
         {
@@ -237,169 +232,116 @@ void FGSimulator::transmitUpdate()
 void FGSimulator::processUpdate(const QByteArray& inp)
 {
     //TODO: this does not use the FLIGHT_PARAM structure, it should!
-        static char once=0;
-	// Split
-	QString data(inp);
-	QStringList fields = data.split(",");
-	// Get xRate (deg/s)
-//        float xRate = fields[0].toFloat() * 180.0/M_PI;
-	// Get yRate (deg/s)
-//        float yRate = fields[1].toFloat() * 180.0/M_PI;
-	// Get zRate (deg/s)
-//        float zRate = fields[2].toFloat() * 180.0/M_PI;
-	// Get xAccel (m/s^2)
-//        float xAccel = fields[3].toFloat() * FT2M;
-	// Get yAccel (m/s^2)
-//        float yAccel = fields[4].toFloat() * FT2M;
-	// Get xAccel (m/s^2)
-//        float zAccel = fields[5].toFloat() * FT2M;
-	// Get pitch (deg)
-	float pitch = fields[6].toFloat();
-	// Get pitchRate (deg/s)
-        float pitchRate = fields[7].toFloat();
-	// Get roll (deg)
-	float roll = fields[8].toFloat();
-	// Get rollRate (deg/s)
-        float rollRate = fields[9].toFloat();
-	// Get yaw (deg)
-	float yaw = fields[10].toFloat();
-	// Get yawRate (deg/s)
-        float yawRate = fields[11].toFloat();
-	// Get latitude (deg)
-	float latitude = fields[12].toFloat();
-	// Get longitude (deg)
-	float longitude = fields[13].toFloat();
-	// Get heading (deg)
-	float heading = fields[14].toFloat();
-	// Get altitude (m)
-	float altitude = fields[15].toFloat() * FT2M;
-	// Get altitudeAGL (m)
-	float altitudeAGL = fields[16].toFloat() * FT2M;
-	// Get groundspeed (m/s)
-	float groundspeed = fields[17].toFloat() * KT2MPS;
-	// Get airspeed (m/s)
-//	float airspeed = fields[18].toFloat() * KT2MPS;
-	// Get temperature (degC)
-	float temperature = fields[19].toFloat();
-	// Get pressure (kpa)
-	float pressure = fields[20].toFloat() * INHG2KPA;
-	// Get VelocityActual Down (cm/s)
-        float velocityActualDown = - fields[21].toFloat() * FPS2CMPS;
-	// Get VelocityActual East (cm/s)
-	float velocityActualEast = fields[22].toFloat() * FPS2CMPS;	
-	// Get VelocityActual Down (cm/s)
-	float velocityActualNorth = fields[23].toFloat() * FPS2CMPS;
+    // Split
+    QString data(inp);
+    QStringList fields = data.split(",");
+    // Get xRate (deg/s)
+    //        float xRate = fields[0].toFloat() * 180.0/M_PI;
+    // Get yRate (deg/s)
+    //        float yRate = fields[1].toFloat() * 180.0/M_PI;
+    // Get zRate (deg/s)
+    //        float zRate = fields[2].toFloat() * 180.0/M_PI;
+    // Get xAccel (m/s^2)
+    float xAccel = fields[3].toFloat() * FT2M;
+    // Get yAccel (m/s^2)
+    float yAccel = fields[4].toFloat() * FT2M;
+    // Get xAccel (m/s^2)
+    float zAccel = fields[5].toFloat() * FT2M;
+    // Get pitch (deg)
+    float pitch = fields[6].toFloat();
+    // Get pitchRate (deg/s)
+    float pitchRate = fields[7].toFloat();
+    // Get roll (deg)
+    float roll = fields[8].toFloat();
+    // Get rollRate (deg/s)
+    float rollRate = fields[9].toFloat();
+    // Get yaw (deg)
+    float yaw = fields[10].toFloat();
+    // Get yawRate (deg/s)
+    float yawRate = fields[11].toFloat();
+    // Get latitude (deg)
+    float latitude = fields[12].toFloat();
+    // Get longitude (deg)
+    float longitude = fields[13].toFloat();
+    // Get heading (deg)
+    float heading = fields[14].toFloat();
+    // Get altitude (m)
+    float altitude = fields[15].toFloat() * FT2M;
+    // Get altitudeAGL (m)
+    float altitudeAGL = fields[16].toFloat() * FT2M;
+    // Get groundspeed (m/s)
+    float groundspeed = fields[17].toFloat() * KT2MPS;
+    // Get airspeed (m/s)
+    float airspeed = fields[18].toFloat() * KT2MPS;
+    // Get temperature (degC)
+    float temperature = fields[19].toFloat();
+    // Get pressure (kpa)
+    float pressure = fields[20].toFloat() * INHG2KPA;
+    // Get VelocityActual Down (cm/s)
+    float velocityActualDown = - fields[21].toFloat() * FPS2CMPS;
+    // Get VelocityActual East (cm/s)
+    float velocityActualEast = fields[22].toFloat() * FPS2CMPS;
+    // Get VelocityActual Down (cm/s)
+    float velocityActualNorth = fields[23].toFloat() * FPS2CMPS;
 
-        // Get UDP packets received by FG
-        int n = fields[24].toInt();
-        udpCounterFGrecv = n;
+    // Get UDP packets received by FG
+    int n = fields[24].toInt();
+    udpCounterFGrecv = n;
 
-        //run once
-        HomeLocation::DataFields homeData = posHome->getData();
-        if(!once)
-        {
-            memset(&homeData, 0, sizeof(HomeLocation::DataFields));
-            // Update homelocation
-            homeData.Latitude = latitude * 10e6;
-            homeData.Longitude = longitude * 10e6;
-            homeData.Altitude = 0;
-            double LLA[3];
-            LLA[0]=latitude;
-            LLA[1]=longitude;
-            LLA[2]=0;
-            double ECEF[3];
-            double RNE[9];
-            Utils::CoordinateConversions().RneFromLLA(LLA,(double (*)[3])RNE);
-            Utils::CoordinateConversions().LLA2ECEF(LLA,ECEF);
-            homeData.Be[0]=0;
-            homeData.Be[1]=0;
-            homeData.Be[2]=0;
-            posHome->setData(homeData);
-            once=1;
-        }
-	
-	// Update VelocityActual.{Nort,East,Down}
-	VelocityActual::DataFields velocityActualData;
-	memset(&velocityActualData, 0, sizeof(VelocityActual::DataFields));
-	velocityActualData.North = velocityActualNorth;
-	velocityActualData.East = velocityActualEast;
-	velocityActualData.Down = velocityActualDown;
-	velActual->setData(velocityActualData);
-	
-	// Update PositionActual.{Nort,East,Down}
-	PositionActual::DataFields positionActualData;
-	memset(&positionActualData, 0, sizeof(PositionActual::DataFields));
-        positionActualData.North = 0; //Currently hardcoded as there is no way of setting up a reference point to calculate distance
-	positionActualData.East = 0; //Currently hardcoded as there is no way of setting up a reference point to calculate distance
-	positionActualData.Down = altitude ; //Multiply by 1 because positionActual expects input in meters.
-        posActual->setData(positionActualData);
+    ///////
+    // Output formatting
+    ///////
+    Output2OP out;
+    memset(&out, 0, sizeof(Output2OP));
 
-    // Update AltitudeActual object
-    BaroAltitude::DataFields baroAltData;
-    memset(&baroAltData, 0, sizeof(BaroAltitude::DataFields));
-    baroAltData.Altitude = altitudeAGL;
-    baroAltData.Temperature = temperature;
-    baroAltData.Pressure = pressure;
-    baroAlt->setData(baroAltData);
+    float NED[3];
+    // convert from cm back to meters
 
-	// Update attActual object
-	AttitudeActual::DataFields attActualData;
-        memset(&attActualData, 0, sizeof(AttitudeActual::DataFields));
-	attActualData.Roll = roll;
-	attActualData.Pitch = pitch;
-	attActualData.Yaw = yaw;
-	attActualData.q1 = 0;
-	attActualData.q2 = 0;
-	attActualData.q3 = 0;
-	attActualData.q4 = 0;
-	attActual->setData(attActualData);
+    double LLA[3] = {latitude, longitude, altitude};
+    double ECEF[3];
+    double RNE[9];
+    Utils::CoordinateConversions().RneFromLLA(LLA,(double (*)[3])RNE);
+    Utils::CoordinateConversions().LLA2ECEF(LLA,ECEF);
+    Utils::CoordinateConversions().LLA2Base(LLA, ECEF, (float (*)[3]) RNE, NED);
 
-	// Update gps objects
-        GPSPosition::DataFields gpsData;
-        memset(&gpsData, 0, sizeof(GPSPosition::DataFields));
-        gpsData.Altitude = altitude;
-        gpsData.Heading = heading;
-	gpsData.Groundspeed = groundspeed;
-        gpsData.Latitude = latitude*1e7;
-        gpsData.Longitude = longitude*1e7;
-	gpsData.Satellites = 10;
-        gpsData.Status = GPSPosition::STATUS_FIX3D;
-        gpsPos->setData(gpsData);
 
-        float NED[3];
-        // convert from cm back to meters
+    // Update GPS Position objects
+    out.latitude = latitude * 1e7;
+    out.longitude = longitude * 1e7;
+    out.altitude = altitude;
+    out.groundspeed = groundspeed;
 
-        double hLLA[3] = {(double) homeData.Latitude / 1e7, (double) homeData.Longitude / 1e7, (double) (homeData.Altitude)};
-            double ECEF[3];
-            double RNE[9];
-            Utils::CoordinateConversions().RneFromLLA(hLLA,(double (*)[3])RNE);
-            Utils::CoordinateConversions().LLA2ECEF(hLLA,ECEF);
-                Utils::CoordinateConversions().LLA2Base(hLLA, ECEF, (float (*)[3]) RNE, NED);
+    out.calibratedAirspeed = airspeed;
 
-        positionActualData.North = NED[0]; //Currently hardcoded as there is no way of setting up a reference point to calculate distance
-        positionActualData.East = NED[1]; //Currently hardcoded as there is no way of setting up a reference point to calculate distance
-        positionActualData.Down = NED[2]; //Multiply by 1 because positionActual expects input in meters.
-        posActual->setData(positionActualData);
 
-        // Update AttitudeRaw object (filtered gyros only for now)
-        //AttitudeRaw::DataFields rawData;
-        //AttitudeRaw::DataFields rawData;
-        Gyros::DataFields gyroData;
-        Accels::DataFields accelData;
-        memset(&gyroData, 0, sizeof(Gyros::DataFields));
-        memset(&accelData, 0, sizeof(Accels::DataFields));
-        gyroData = gyros->getData();
-        accelData = accels->getData();
-        //rawData.gyros[0] = rollRate;
-        //rawData.gyros[1] = cos(DEG2RAD * roll) * pitchRate + sin(DEG2RAD * roll) * yawRate;
-        //rawData.gyros[2] = cos(DEG2RAD * roll) * yawRate - sin(DEG2RAD * roll) * pitchRate;
-        //rawData.gyros[1] = pitchRate;
-        //rawData.gyros[2] = yawRate;
-	gyroData.x = rollRate;
-	gyroData.y = pitchRate;
-	gyroData.z = yawRate;
-	// TODO: Accels are still missing!!!!
-        gyros->setData(gyroData);
-        // attRaw->updated();
+    // Update BaroAltitude object
+    out.temperature = temperature;
+    out.pressure = pressure;
+
+    // Update attActual object
+    out.roll = roll;       //roll;
+    out.pitch = pitch;     // pitch
+    out.heading = yaw; // yaw
+
+    out.dstN= NED[0];
+    out.dstE= NED[1];
+    out.dstD= NED[2];
+
+    // Update VelocityActual.{North,East,Down}
+    out.velNorth = velocityActualNorth;
+    out.velEast = velocityActualEast;
+    out.velDown = velocityActualDown;
+
+    //Update gyroscope sensor data
+    out.rollRate = rollRate;
+    out.pitchRate = pitchRate;
+    out.yawRate = yawRate;
+
+    //Update accelerometer sensor data
+    out.accX = xAccel;
+    out.accY = yAccel;
+    out.accZ = -zAccel;
+
+    updateUAVOs(out);
 }
 

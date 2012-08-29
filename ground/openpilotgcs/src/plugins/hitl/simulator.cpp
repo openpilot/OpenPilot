@@ -577,7 +577,7 @@ void Simulator::updateUAVOs(Output2Hardware out){
 
             gcsReceiver->setData(gcsRcvrData);
 
-            gcsRcvrTime.addMSecs(settings.minOutputPeriod);
+            gcsRcvrTime=gcsRcvrTime.addMSecs(settings.minOutputPeriod);
 
         }
     }
@@ -585,6 +585,7 @@ void Simulator::updateUAVOs(Output2Hardware out){
 
     if (settings.gpsPositionEnabled) {
         if (gpsPosTime.msecsTo(currentTime) >= settings.gpsPosRate) {
+            qDebug()<< " GPS time:" << gpsPosTime << ", currentTime: " << currentTime  << ", difference: "  << gpsPosTime.msecsTo(currentTime);
             // Update GPS Position objects
             GPSPosition::DataFields gpsPosData;
             memset(&gpsPosData, 0, sizeof(GPSPosition::DataFields));
@@ -610,7 +611,7 @@ void Simulator::updateUAVOs(Output2Hardware out){
 
             gpsVel->setData(gpsVelData);
 
-            gpsPosTime.addMSecs(settings.gpsPosRate);
+            gpsPosTime=gpsPosTime.addMSecs(settings.gpsPosRate);
         }
     }
 
@@ -632,7 +633,7 @@ void Simulator::updateUAVOs(Output2Hardware out){
             positionActualData.Down = (out.dstD/*-initD*/) + noise.positionActualData.Down;
             posActual->setData(positionActualData);
 
-            groundTruthTime.addMSecs(settings.groundTruthRate);
+            groundTruthTime=groundTruthTime.addMSecs(settings.groundTruthRate);
         }
     }
 
@@ -694,7 +695,7 @@ void Simulator::updateUAVOs(Output2Hardware out){
             accelData.z = out.accZ + noise.accelData.z;
             accels->setData(accelData);
 
-            attRawTime.addMSecs(settings.attRawRate);
+            attRawTime=attRawTime.addMSecs(settings.attRawRate);
         }
     }
 }

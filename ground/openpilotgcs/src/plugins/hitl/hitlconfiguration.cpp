@@ -64,22 +64,29 @@ HITLConfiguration::HITLConfiguration(QString classId, QSettings* qSettings, QObj
     settings.manualControlEnabled= false;
     settings.minOutputPeriod     = 100;
 
+    settings.airspeedActualEnabled= false;
+    settings.airspeedActualRate  = 100;
+
 
     // if a saved configuration exists load it, and overwrite defaults
     if (qSettings != 0) {
-        settings.simulatorId         = qSettings->value("simulatorId").toString();
-        settings.hostAddress         = qSettings->value("hostAddress").toString();
-        settings.inPort              = qSettings->value("inPort").toInt();
-        settings.remoteAddress       = qSettings->value("remoteAddress").toString();
-        settings.outPort             = qSettings->value("outPort").toInt();
 
+        settings.simulatorId         = qSettings->value("simulatorId").toString();
         settings.binPath             = qSettings->value("binPath").toString();
         settings.dataPath            = qSettings->value("dataPath").toString();
+
+        settings.hostAddress         = qSettings->value("hostAddress").toString();
+        settings.remoteAddress       = qSettings->value("remoteAddress").toString();
+        settings.outPort             = qSettings->value("outPort").toInt();
+        settings.inPort              = qSettings->value("inPort").toInt();
 
         settings.latitude            = qSettings->value("latitude").toString();
         settings.longitude           = qSettings->value("longitude").toString();
         settings.startSim            = qSettings->value("startSim").toBool();
         settings.addNoise            = qSettings->value("noiseCheckBox").toBool();
+
+        settings.gcsReceiverEnabled  = qSettings->value("gcsReceiverEnabled").toBool();
+        settings.manualControlEnabled= qSettings->value("manualControlEnabled").toBool();
 
         settings.attRawEnabled       = qSettings->value("attRawEnabled").toBool();
         settings.attRawRate          = qSettings->value("attRawRate").toInt();
@@ -99,9 +106,10 @@ HITLConfiguration::HITLConfiguration(QString classId, QSettings* qSettings, QObj
         settings.groundTruthRate     = qSettings->value("groundTruthRate").toInt();
 
         settings.inputCommand        = qSettings->value("inputCommand").toBool();
-        settings.gcsReceiverEnabled  = qSettings->value("gcsReceiverEnabled").toBool();
-        settings.manualControlEnabled= qSettings->value("manualControlEnabled").toBool();
         settings.minOutputPeriod     = qSettings->value("minOutputPeriod").toInt();
+
+        settings.airspeedActualEnabled=qSettings->value("airspeedActualEnabled").toBool();
+        settings.airspeedActualRate  = qSettings->value("airspeedActualRate").toInt();
     }
 }
 
@@ -150,6 +158,7 @@ void HITLConfiguration::saveConfig(QSettings* qSettings) const {
     qSettings->setValue("inputCommand", settings.inputCommand);
     qSettings->setValue("minOutputPeriod", settings.minOutputPeriod);
 
-
+    qSettings->setValue("airspeedActualEnabled", settings.airspeedActualEnabled);
+    qSettings->setValue("airspeedActualRate", settings.airspeedActualRate);
 }
 

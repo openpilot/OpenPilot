@@ -43,7 +43,7 @@
 #include "actuatordesired.h"
 #include "attitudeactual.h"
 #include "attitudesettings.h"
-#include "baroairspeed.h"
+#include "airspeedactual.h"
 #include "baroaltitude.h"
 #include "flightstatus.h"
 #include "gcsreceiver.h"
@@ -139,6 +139,9 @@ typedef struct _CONNECTION
     bool gcsReceiverEnabled;
     bool manualControlEnabled;
     quint16 minOutputPeriod;
+
+    bool airspeedActualEnabled;
+    quint16 airspeedActualRate;
 
 } SimulatorSettings;
 
@@ -260,7 +263,7 @@ protected:
     ManualControlCommand* manCtrlCommand;
     FlightStatus* flightStatus;
     BaroAltitude* baroAlt;
-    BaroAirspeed* baroAirspeed;
+    AirspeedActual* airspeedActual;
     AttitudeActual* attActual;
     AttitudeSettings* attSettings;
     VelocityActual* velActual;
@@ -297,6 +300,7 @@ private:
     QTime groundTruthTime;
     QTime baroAltTime;
     QTime gcsRcvrTime;
+    QTime airspeedActualTime;
 
     QString name;
     QString simulatorId;

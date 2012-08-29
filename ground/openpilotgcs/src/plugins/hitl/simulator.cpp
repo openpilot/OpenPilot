@@ -69,6 +69,7 @@ Simulator::Simulator(const SimulatorSettings& params) :
     gcsRcvrTime = currentTime;
     attRawTime = currentTime;
     baroAltTime = currentTime;
+    airspeedActualTime=currentTime;
 
 }
 
@@ -143,7 +144,7 @@ void Simulator::onStart()
     velActual = VelocityActual::GetInstance(objManager);
     posActual = PositionActual::GetInstance(objManager);
     baroAlt = BaroAltitude::GetInstance(objManager);
-    baroAirspeed = BaroAirspeed::GetInstance(objManager);
+    airspeedActual = AirspeedActual::GetInstance(objManager);
     attActual = AttitudeActual::GetInstance(objManager);
     attSettings = AttitudeSettings::GetInstance(objManager);
     accels = Accels::GetInstance(objManager);
@@ -266,6 +267,9 @@ void Simulator::setupObjects()
         setupOutputObject(attActual, 20); //Hardcoded? Bleh.
     else
         setupWatchedObject(attActual, 100); //Hardcoded? Bleh.
+
+    if(settings.airspeedActualEnabled)
+        setupOutputObject(airspeedActual, settings.airspeedActualRate);
 
     if(settings.baroAltitudeEnabled)
         setupOutputObject(baroAlt, settings.baroAltRate);
@@ -671,6 +675,18 @@ void Simulator::updateUAVOs(Output2Hardware out){
         baroAlt->setData(baroAltData);
 
         baroAltTime=baroAltTime.addMSecs(settings.baroAltRate);
+        }
+    }
+
+    // Update AirspeedActual object
+    if (settings.airspeedActualEnabled){
+        if (airspeedActualTime.msecsTo(currentTime) >= settings.airspeedActualRate) {
+        AirspeedActual::DataFields airspeedActualData;
+        memset(&airspeedActualData, 0, sizeof(AirspeedActual::DataFields));
+        airspeedActualData.CalibratedAirspeed = out.calibratedAirspeed + noise.airspeedActual.CalibratedAirspeed;
+        airspeedActual->setData(airspeedActualData);
+
+        airspeedActualTime=airspeedActualTime.addMSecs(settings.airspeedActualRate);
         }
     }
 

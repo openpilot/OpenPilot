@@ -40,7 +40,7 @@ struct Noise{
     Accels::DataFields accelData;
     AttitudeActual::DataFields attActualData;
     BaroAltitude::DataFields baroAltData;
-    BaroAirspeed::DataFields baroAirspeed;
+    AirspeedActual::DataFields airspeedActual;
     GPSPosition::DataFields gpsPosData;
     GPSVelocity::DataFields gpsVelData;
     Gyros::DataFields gyroData;

@@ -154,7 +154,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="layoutWidget">
+     <widget class="QWidget" name="layoutWidget1">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -830,6 +830,50 @@
            <number>0</number>
           </property>
           <item>
+           <widget class="QGroupBox" name="airspeedActualCheckbox">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="title">
+             <string>AirspeedActual</string>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_9">
+             <item>
+              <widget class="QLabel" name="label_15">
+               <property name="text">
+                <string>Refresh rate:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSpinBox" name="airspeedRateSpinbox">
+               <property name="toolTip">
+                <string>0 - update once, or every N seconds</string>
+               </property>
+               <property name="suffix">
+                <string>ms</string>
+               </property>
+               <property name="maximum">
+                <number>5000</number>
+               </property>
+               <property name="value">
+                <number>100</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
            <widget class="QGroupBox" name="baroAltitudeCheckbox">
             <property name="enabled">
              <bool>false</bool>
@@ -912,7 +956,7 @@
                   <number>10</number>
                  </property>
                  <property name="value">
-                  <number>50</number>
+                  <number>250</number>
                  </property>
                 </widget>
                </item>

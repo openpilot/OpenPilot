@@ -113,6 +113,8 @@ QWidget *HITLOptionsPage::createPage(QWidget *parent)
     m_optionsPage->attActCalc->setChecked(config->Settings().attActCalc);
     m_optionsPage->attActSim->setChecked(config->Settings().attActSim);
 
+    m_optionsPage->airspeedActualCheckbox->setChecked(config->Settings().airspeedActualEnabled);
+    m_optionsPage->airspeedRateSpinbox->setValue(config->Settings().airspeedActualRate);
 
     return optionsPageWidget;
 }
@@ -160,6 +162,10 @@ void HITLOptionsPage::apply()
     settings.attActSim = m_optionsPage->attActSim->isChecked();
     settings.attActCalc = m_optionsPage->attActCalc->isChecked();
 
+    settings.airspeedActualEnabled=m_optionsPage->airspeedActualCheckbox->isChecked();
+    settings.airspeedActualRate=m_optionsPage->airspeedRateSpinbox->value();
+
+    //Write settings to file
     config->setSimulatorSettings(settings);
 }
 

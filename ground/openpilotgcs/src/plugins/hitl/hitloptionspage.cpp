@@ -97,6 +97,8 @@ QWidget *HITLOptionsPage::createPage(QWidget *parent)
     m_optionsPage->attActualCheckbox->setChecked(config->Settings().attActualEnabled);
     m_optionsPage->attRawCheckbox->setChecked(config->Settings().attRawEnabled);
 
+
+
     m_optionsPage->attRawRateSpinbox->setValue(config->Settings().attRawRate);
     m_optionsPage->gpsPosRateSpinbox->setValue(config->Settings().gpsPosRate);
     m_optionsPage->groundTruthRateSpinbox->setValue(config->Settings().groundTruthRate);
@@ -107,6 +109,9 @@ QWidget *HITLOptionsPage::createPage(QWidget *parent)
 
     m_optionsPage->minOutputPeriodSpinbox->setValue(config->Settings().minOutputPeriod);
 
+    m_optionsPage->attActHW->setChecked(config->Settings().attActHW);
+    m_optionsPage->attActCalc->setChecked(config->Settings().attActCalc);
+    m_optionsPage->attActSim->setChecked(config->Settings().attActSim);
 
 
     return optionsPageWidget;
@@ -150,6 +155,9 @@ void HITLOptionsPage::apply()
 
     settings.manualControl = m_optionsPage->manualControlRadioButton->isChecked();
     settings.gcsReceiver = m_optionsPage->gcsReceiverRadioButton->isChecked();
+    settings.attActHW = m_optionsPage->attActHW->isChecked();
+    settings.attActSim = m_optionsPage->attActSim->isChecked();
+    settings.attActCalc = m_optionsPage->attActCalc->isChecked();
 
     config->setSimulatorSettings(settings);
 }

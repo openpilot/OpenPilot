@@ -1,6 +1,7 @@
 package org.openpilot.androidgcs.views;
 
 import org.openpilot.androidgcs.R;
+import org.openpilot.androidgcs.util.ObjectFieldMappable;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -12,7 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-public class ScrollBarView extends GridLayout {
+public class ScrollBarView extends GridLayout implements ObjectFieldMappable {
 
 	private final static String TAG = ScrollBarView.class.getSimpleName();
 
@@ -49,13 +50,6 @@ public class ScrollBarView extends GridLayout {
 		setValue(0.0035);
 	}
 
-	public void setValue(double val)
-	{
-		value = val;
-		edit.setText(Double.toString(value));
-		bar.setProgress((int) (SCALE * value));
-	}
-
 	public void setName(String n)
 	{
 		name = n;
@@ -74,5 +68,17 @@ public class ScrollBarView extends GridLayout {
 		// Force the label to half the page width
 		param = lbl.getLayoutParams();
 		param.width = getMeasuredWidth() / 2;
+	}
+
+	@Override
+	public double getValue() {
+		return value;
+	}
+
+	@Override
+	public void setValue(double val) {
+		value = val;
+		edit.setText(Double.toString(value));
+		bar.setProgress((int) (SCALE * value));
 	}
 }

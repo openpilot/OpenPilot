@@ -242,8 +242,7 @@ void Simulator::setupObjects()
         setupInputObject(actDesired, settings.minOutputPeriod); //Input to the simulator
     }
 
-    setupOutputObject(posHome, 10000);
-    setupOutputObject(baroAlt, 250);
+    setupOutputObject(posHome, 10000); //Hardcoded? Bleh.
 
     if (settings.gpsPositionEnabled)
         setupOutputObject(gpsPos, settings.gpsPosRate);
@@ -264,9 +263,12 @@ void Simulator::setupObjects()
     }
 
     if (settings.attActualEnabled && !settings.attActHW)
-        setupOutputObject(attActual, 20);
+        setupOutputObject(attActual, 20); //Hardcoded? Bleh.
     else
-        setupWatchedObject(attActual, 100);
+        setupWatchedObject(attActual, 100); //Hardcoded? Bleh.
+
+    if(settings.baroAltitudeEnabled)
+        setupOutputObject(baroAlt, settings.baroAltRate);
 
 }
 
@@ -668,11 +670,7 @@ void Simulator::updateUAVOs(Output2Hardware out){
         baroAltData.Pressure = out.pressure + noise.baroAltData.Pressure;
         baroAlt->setData(baroAltData);
 
-        // Update BaroAirspeed object
-        BaroAirspeed::DataFields baroAirspeedData;
-        memset(&baroAirspeedData, 0, sizeof(BaroAirspeed::DataFields));
-        baroAirspeedData.CalibratedAirspeed = out.calibratedAirspeed + noise.baroAirspeed.CalibratedAirspeed;
-        baroAirspeed->setData(baroAirspeedData);
+        baroAltTime=baroAltTime.addMSecs(settings.baroAltRate);
         }
     }
 

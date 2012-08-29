@@ -264,7 +264,7 @@ void Simulator::setupObjects()
     }
 
     if (settings.attActualEnabled && !settings.attActHW)
-        setupOutputObject(attActual, 10);
+        setupOutputObject(attActual, 20);
     else
         setupWatchedObject(attActual, 100);
 
@@ -323,7 +323,7 @@ void Simulator::setupOutputObject(UAVObject* obj, quint32 updatePeriod)
     UAVObject::SetFlightAccess(mdata, UAVObject::ACCESS_READONLY);
     UAVObject::SetFlightTelemetryUpdateMode(mdata,UAVObject::UPDATEMODE_MANUAL);
 
-	obj->setMetadata(mdata);
+    obj->setMetadata(mdata);
 }
 
 void Simulator::onAutopilotConnect()

@@ -928,7 +928,7 @@
           <longitude></longitude>
           <manualControlEnabled>false</manualControlEnabled>
           <manualOutput>false</manualOutput>
-          <minOutputPeriod>100</minOutputPeriod>
+          <minOutputPeriod>40</minOutputPeriod>
           <outPort>49000</outPort>
           <remoteAddress>127.0.0.1</remoteAddress>
           <simulatorId>ASimRC</simulatorId>
@@ -964,7 +964,7 @@
           <longitude></longitude>
           <manualControlEnabled>true</manualControlEnabled>
           <manualOutput>false</manualOutput>
-          <minOutputPeriod>100</minOutputPeriod>
+          <minOutputPeriod>40</minOutputPeriod>
           <outPort>9010</outPort>
           <remoteAddress>127.0.0.1</remoteAddress>
           <simulatorId>FG</simulatorId>
@@ -1000,7 +1000,7 @@
           <longitude></longitude>
           <manualControlEnabled>true</manualControlEnabled>
           <manualOutput>false</manualOutput>
-          <minOutputPeriod>100</minOutputPeriod>
+          <minOutputPeriod>40</minOutputPeriod>
           <outPort>49000</outPort>
           <remoteAddress>127.0.0.1</remoteAddress>
           <simulatorId>X-Plane</simulatorId>

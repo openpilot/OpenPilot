@@ -45,6 +45,7 @@ import android.widget.Button;
 public class SmartSave {
 
 	private final static String TAG = SmartSave.class.getSimpleName();
+	private final static boolean DEBUG = false;
 
 	//! Create a smart save button attached to the object manager and an apply and ave button
 	public SmartSave(UAVObjectManager objMngr, UAVObject obj, Button saveButton, Button applyButton) {
@@ -102,6 +103,8 @@ public class SmartSave {
 
 	//! Update the settings in the UI from the mappings
 	public void refreshSettingsDisplay() {
+		if (DEBUG) Log.d(TAG, "Refreshing display");
+
 		Set<ObjectFieldMappable> keys = controlFieldMapping.keySet();
 		Iterator<ObjectFieldMappable> iter = keys.iterator();
 		while(iter.hasNext()) {
@@ -135,10 +138,12 @@ public class SmartSave {
 		persistence.addUpdatedObserver(ObjectPersistenceUpdated);
 
 		// 3. Send save operation
-		obj.getField("ObjectID").setValue(obj.getObjID());
-		obj.getField("Operation").setValue("Save");
-		obj.getField("Selection").setValue("SingleObject");
-		obj.updated();
+		Long objId = obj.getObjID();
+		if (DEBUG) Log.d(TAG, "Saving object ID: " + objId);
+		persistence.getField("ObjectID").setValue(objId);
+		persistence.getField("Operation").setValue("Save");
+		persistence.getField("Selection").setValue("SingleObject");
+		persistence.updated();
 
 		return true;
 	}
@@ -196,6 +201,8 @@ public class SmartSave {
 
 		//! Get the value from the UAVO field
 		double getValue(UAVObject obj) {
+			double val = obj.getField(fieldName).getDouble(fieldIndex);
+			if (DEBUG) Log.d(TAG, "Getting value from: " + fieldName + " " + val);
 			return obj.getField(fieldName).getDouble(fieldIndex);
 		}
 
@@ -210,7 +217,7 @@ public class SmartSave {
 	private final Observer ApplyCompleted = new Observer() {
 		@Override
 		public void update(Observable observable, Object data) {
-			Log.d(TAG, "Apply called");
+			if (DEBUG) Log.d(TAG, "Apply called");
 		}
 	};
 
@@ -218,7 +225,7 @@ public class SmartSave {
 	private final Observer ObjectUpdated = new Observer() {
 		@Override
 		public void update(Observable observable, Object data) {
-			Log.d(TAG, "Object updated");
+			if (DEBUG) Log.d(TAG, "Object updated");
 			refreshSettingsDisplay();
 		}
 	};
@@ -227,7 +234,7 @@ public class SmartSave {
 	private final Observer ObjectPersistenceUpdated = new Observer() {
 		@Override
 		public void update(Observable observable, Object data) {
-			Log.d(TAG, "Object persistence updated");
+			if (DEBUG) Log.d(TAG, "Object persistence updated");
 		}
 	};
 
@@ -245,6 +252,5 @@ public class SmartSave {
 
 	//! Handle to the UAVO this class works with
 	private final UAVObject obj;
-
 
 }

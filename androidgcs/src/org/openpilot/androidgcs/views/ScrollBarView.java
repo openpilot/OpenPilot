@@ -91,6 +91,7 @@ public class ScrollBarView extends GridLayout implements ObjectFieldMappable {
 
 		setPadding(5,5,5,5);
 
+		setMinimumWidth(300);
 		setValue(0.0035);
 	}
 

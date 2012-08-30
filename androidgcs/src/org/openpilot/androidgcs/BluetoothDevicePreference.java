@@ -44,10 +44,7 @@ public class BluetoothDevicePreference extends ListPreference {
         Set<BluetoothDevice> pairedDevices = bta.getBondedDevices();
         CharSequence[] entries = new CharSequence[pairedDevices.size()];
         CharSequence[] entryValues = new CharSequence[pairedDevices.size()];
-		if (pairedDevices.size() == 0) {
-			entries[0] = "No Devices";
-			entryValues[0] = "";
-		} else {
+		if (pairedDevices.size() > 0) {
 			int i = 0;
 			for (BluetoothDevice dev : pairedDevices) {
 				entries[i] = dev.getName();

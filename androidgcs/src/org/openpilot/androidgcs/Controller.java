@@ -34,7 +34,9 @@ import org.openpilot.uavtalk.UAVDataObject;
 import org.openpilot.uavtalk.UAVObject;
 import org.openpilot.uavtalk.UAVObjectField;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -76,7 +78,7 @@ public class Controller extends ObjectManagerActivity {
 		@Override
 		public void update(Observable observable, Object data) {
 			// Once we have updated settings we can active the GCS receiver mode
-			Log.d(TAG,"Got update from settings");
+			if (DEBUG) Log.d(TAG,"Got update from settings");
 			UAVDataObject manualControlSettings = (UAVDataObject) objMngr.getObject("ManualControlSettings");
 			if(manualControlSettings != null) {
 				manualControlSettings.removeUpdatedObserver(this);
@@ -89,7 +91,27 @@ public class Controller extends ObjectManagerActivity {
 	void onOPConnected() {
 		super.onOPConnected();
 
-		Log.d(TAG, "onOPConnected()");
+		if (DEBUG) Log.d(TAG, "onOPConnected()");
+
+		DualJoystickView joystick = (DualJoystickView) findViewById(R.id.dualjoystickView);
+		joystick.setMovementConstraint(JoystickView.CONSTRAIN_BOX);
+		joystick.setMovementRange((int)MOVEMENT_RANGE, (int)MOVEMENT_RANGE);
+
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		int mode = Integer.decode(prefs.getString("controller_type", "1"));
+		switch(mode) {
+		case 1:
+			if (DEBUG) Log.d(TAG, "Mode1 connected");
+			joystick.setOnJostickMovedListener(mode1_left, mode1_right);
+			break;
+		case 2:
+			if (DEBUG) Log.d(TAG, "Mode2 connected");
+			joystick.setOnJostickMovedListener(mode2_left, mode2_right);
+			break;
+		default:
+			Log.e(TAG, "Unknown controller type");
+			return;
+		}
 
 		// Subscribe to updates from ManualControlCommand and show the values for crude feedback
 		UAVDataObject manualControl = (UAVDataObject) objMngr.getObject("ManualControlCommand");
@@ -99,39 +121,6 @@ public class Controller extends ObjectManagerActivity {
 		UAVDataObject manualSettings = (UAVDataObject) objMngr.getObject("ManualControlSettings");
 		manualSettings.addUpdatedObserver(settingsUpdated);
 		manualSettings.updateRequested();
-
-		final double MOVEMENT_RANGE = 50.0;
-		DualJoystickView joystick = (DualJoystickView) findViewById(R.id.dualjoystickView);
-		joystick.setMovementConstraint(JoystickView.CONSTRAIN_BOX);
-		joystick.setMovementRange((int)MOVEMENT_RANGE, (int)MOVEMENT_RANGE);
-
-		// Hardcode a Mode 1 listener for now
-		joystick.setOnJostickMovedListener(new JoystickMovedListener() {
-			@Override
-			public void OnMoved(int pan, int tilt) {
-				pitch = tilt / MOVEMENT_RANGE;
-				yaw = pan / MOVEMENT_RANGE;
-				leftJoystickHeld = true;
-			}
-			@Override
-			public void OnReleased() { leftJoystickHeld = false; throttle = -1; updated = true; }
-			@Override
-			public void OnReturnedToCenter() { }
-		}, new JoystickMovedListener() {
-			@Override
-			public void OnMoved(int pan, int tilt) {
-				throttle = (-tilt + (MOVEMENT_RANGE -5)) / (MOVEMENT_RANGE - 5);
-				throttle *= 0.5;
-				if (throttle < 0)
-					throttle = -1;
-				roll = pan / MOVEMENT_RANGE;
-				rightJoystickHeld = true;
-			}
-			@Override
-			public void OnReleased() { rightJoystickHeld = false; throttle = -1; updated = true; }
-			@Override
-			public void OnReturnedToCenter() { }
-		});
 
 		//! This timer task actually periodically sends updates to the UAV
 		TimerTask controllerTask = new TimerTask() {
@@ -247,5 +236,65 @@ public class Controller extends ObjectManagerActivity {
 			return (float) (neutral + (CHANNEL_MAX - neutral) * in);
 		return (float) (neutral + (neutral - CHANNEL_MIN) * in);
 	}
+
+	private final JoystickMovedListener mode1_left = new JoystickMovedListener() {
+		@Override
+		public void OnMoved(int pan, int tilt) {
+			pitch = tilt / MOVEMENT_RANGE;
+			yaw = pan / MOVEMENT_RANGE;
+			leftJoystickHeld = true;
+		}
+		@Override
+		public void OnReleased() { leftJoystickHeld = false; throttle = -1; updated = true; }
+		@Override
+		public void OnReturnedToCenter() { }
+	};
+
+	private final JoystickMovedListener mode1_right = new JoystickMovedListener() {
+		@Override
+		public void OnMoved(int pan, int tilt) {
+			throttle = (-tilt + (MOVEMENT_RANGE -5)) / (MOVEMENT_RANGE - 5);
+			throttle *= 0.5;
+			if (throttle < 0)
+				throttle = -1;
+			roll = pan / MOVEMENT_RANGE;
+			rightJoystickHeld = true;
+		}
+		@Override
+		public void OnReleased() { rightJoystickHeld = false; throttle = -1; updated = true; }
+		@Override
+		public void OnReturnedToCenter() { }
+	};
+
+	private final JoystickMovedListener mode2_left = new JoystickMovedListener() {
+		@Override
+		public void OnMoved(int pan, int tilt) {
+			throttle = (-tilt + (MOVEMENT_RANGE -5)) / (MOVEMENT_RANGE - 5);
+			throttle *= 0.5;
+			if (throttle < 0)
+				throttle = -1;
+			yaw = pan / MOVEMENT_RANGE;
+			leftJoystickHeld = true;
+		}
+		@Override
+		public void OnReleased() { leftJoystickHeld = false; throttle = -1; updated = true; }
+		@Override
+		public void OnReturnedToCenter() { }
+	};
+
+	private final JoystickMovedListener mode2_right = new JoystickMovedListener() {
+		@Override
+		public void OnMoved(int pan, int tilt) {
+			pitch = tilt / MOVEMENT_RANGE;
+			roll = pan / MOVEMENT_RANGE;
+			rightJoystickHeld = true;
+		}
+		@Override
+		public void OnReleased() { rightJoystickHeld = false; throttle = -1; updated = true; }
+		@Override
+		public void OnReturnedToCenter() { }
+	};
+
+	final double MOVEMENT_RANGE = 50.0;
 
 }

@@ -14,4 +14,12 @@
         <item>3</item>
         <item>4</item>
    </string-array>
+    <string-array name="controllerTypeArray">
+        <item>Mode 1</item>
+        <item>Mode 2</item>
+   </string-array>
+    <string-array name="controllerTypeValues">
+        <item>1</item>
+        <item>2</item>
+   </string-array>
 </resources>

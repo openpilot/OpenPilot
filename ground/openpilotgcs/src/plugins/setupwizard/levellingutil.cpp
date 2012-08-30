@@ -33,8 +33,16 @@
 #include "gyros.h"
 
 
-LevellingUtil::LevellingUtil(long measurementCount, long measurementPeriod) : QObject(),
-    m_isMeasuring(false), m_measurementCount(measurementCount), m_measurementPeriod(measurementPeriod)
+LevellingUtil::LevellingUtil(long measurementCount, long measurementRate) : QObject(),
+    m_isMeasuring(false), m_accelMeasurementCount(measurementCount), m_gyroMeasurementCount(measurementCount),
+    m_accelMeasurementRate(measurementRate), m_gyroMeasurementRate(measurementRate)
+{
+}
+
+LevellingUtil::LevellingUtil(long accelMeasurementCount, long accelMeasurementRate,
+                             long gyroMeasurementCount, long gyroMeasurementRate) : QObject(),
+    m_isMeasuring(false), m_accelMeasurementCount(accelMeasurementCount), m_gyroMeasurementCount(gyroMeasurementCount),
+    m_accelMeasurementRate(accelMeasurementRate), m_gyroMeasurementRate(gyroMeasurementRate)
 {
 }
 
@@ -45,7 +53,8 @@ void LevellingUtil::start()
 
         // Set up timeout timer
         connect(&m_timeoutTimer, SIGNAL(timeout()), this, SLOT(timeout()));
-        m_timeoutTimer.start(m_measurementCount * m_measurementPeriod * 2);
+        //Set timeout to max time of measurement + 10 secs
+        m_timeoutTimer.start(std::max(m_accelMeasurementCount * m_accelMeasurementRate, m_gyroMeasurementCount * m_gyroMeasurementRate) + 10000);
     }
 }
 
@@ -56,14 +65,37 @@ void LevellingUtil::abort()
     }
 }
 
-void LevellingUtil::measurementsUpdated(UAVObject *obj)
+void LevellingUtil::gyroMeasurementsUpdated(UAVObject *obj)
 {
     QMutexLocker locker(&m_measurementMutex);
 
-    m_receivedUpdates++;
-    emit progress(m_receivedUpdates, m_measurementCount);
+    if(m_receivedGyroUpdates < m_gyroMeasurementCount) {
+        ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+        UAVObjectManager * uavObjectManager = pm->getObject<UAVObjectManager>();
+        Q_ASSERT(uavObjectManager);
 
-    if(m_receivedUpdates < m_measurementCount) {
+        Gyros * gyros = Gyros::GetInstance(uavObjectManager);
+        Gyros::DataFields gyrosData = gyros->getData();
+
+        m_gyroX += gyrosData.x;
+        m_gyroY += gyrosData.y;
+        m_gyroZ += gyrosData.z;
+
+        m_receivedGyroUpdates++;
+        emit progress(m_receivedGyroUpdates + m_receivedAccelUpdates, m_gyroMeasurementCount + m_accelMeasurementCount);
+    }
+    else if (m_receivedAccelUpdates >= m_accelMeasurementCount &&
+             m_receivedGyroUpdates >= m_gyroMeasurementCount && m_isMeasuring) {
+        stopMeasurement();
+        emit done(calculateLevellingData());
+    }
+}
+
+void LevellingUtil::accelMeasurementsUpdated(UAVObject *obj)
+{
+    QMutexLocker locker(&m_measurementMutex);
+
+    if(m_receivedAccelUpdates < m_accelMeasurementCount) {
         ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
         UAVObjectManager * uavObjectManager = pm->getObject<UAVObjectManager>();
         Q_ASSERT(uavObjectManager);
@@ -71,18 +103,15 @@ void LevellingUtil::measurementsUpdated(UAVObject *obj)
         Accels * accels = Accels::GetInstance(uavObjectManager);
         Accels::DataFields accelsData = accels->getData();
 
-        m_accelerometerX.append(accelsData.x);
-        m_accelerometerY.append(accelsData.y);
-        m_accelerometerZ.append(accelsData.z);
+        m_accelerometerX += accelsData.x;
+        m_accelerometerY += accelsData.y;
+        m_accelerometerZ += accelsData.z;
 
-        Gyros * gyros = Gyros::GetInstance(uavObjectManager);
-        Gyros::DataFields gyrosData = gyros->getData();
-
-        m_gyroX.append(gyrosData.x);
-        m_gyroY.append(gyrosData.y);
-        m_gyroZ.append(gyrosData.z);
+        m_receivedAccelUpdates++;
+        emit progress(m_receivedGyroUpdates + m_receivedAccelUpdates, m_gyroMeasurementCount + m_accelMeasurementCount);
     }
-    else if (m_receivedUpdates >= m_measurementCount) {
+    else if (m_receivedAccelUpdates >= m_accelMeasurementCount &&
+             m_receivedGyroUpdates >= m_gyroMeasurementCount && m_isMeasuring) {
         stopMeasurement();
         emit done(calculateLevellingData());
     }
@@ -103,13 +132,15 @@ void LevellingUtil::startMeasurement()
     m_isMeasuring = true;
 
     // Reset variables
-    m_receivedUpdates = 0;
-    m_accelerometerX.clear();
-    m_accelerometerY.clear();
-    m_accelerometerZ.clear();
-    m_gyroX.clear();
-    m_gyroY.clear();
-    m_gyroZ.clear();
+    m_receivedAccelUpdates = 0;
+    m_accelerometerX = 0;
+    m_accelerometerY = 0;
+    m_accelerometerZ = 0;
+
+    m_receivedGyroUpdates = 0;
+    m_gyroX = 0;
+    m_gyroY = 0;
+    m_gyroZ = 0;
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager * uavObjectManager = pm->getObject<UAVObjectManager>();
@@ -120,15 +151,26 @@ void LevellingUtil::startMeasurement()
     attitudeSettingsData.BiasCorrectGyro = AttitudeSettings::BIASCORRECTGYRO_FALSE;
     AttitudeSettings::GetInstance(uavObjectManager)->setData(attitudeSettingsData);
 
-    // Set up to receive updates
+    // Set up to receive updates for accels
     UAVDataObject *uavObject = Accels::GetInstance(uavObjectManager);
-    connect(uavObject, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(measurementsUpdated(UAVObject*)));
+    connect(uavObject, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(accelMeasurementsUpdated(UAVObject*)));
 
-    // Set update period
-    m_previousMetaData = uavObject->getMetadata();
-    UAVObject::Metadata newMetaData = m_previousMetaData;
+    // Set update period for accels
+    m_previousAccelMetaData = uavObject->getMetadata();
+    UAVObject::Metadata newMetaData = m_previousAccelMetaData;
     UAVObject::SetFlightTelemetryUpdateMode(newMetaData, UAVObject::UPDATEMODE_PERIODIC);
-    newMetaData.flightTelemetryUpdatePeriod = m_measurementPeriod;
+    newMetaData.flightTelemetryUpdatePeriod = m_accelMeasurementRate;
+    uavObject->setMetadata(newMetaData);
+
+    // Set up to receive updates from gyros
+    uavObject = Gyros::GetInstance(uavObjectManager);
+    connect(uavObject, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(gyroMeasurementsUpdated(UAVObject*)));
+
+    // Set update period for gyros
+    m_previousGyroMetaData = uavObject->getMetadata();
+    newMetaData = m_previousGyroMetaData;
+    UAVObject::SetFlightTelemetryUpdateMode(newMetaData, UAVObject::UPDATEMODE_PERIODIC);
+    newMetaData.flightTelemetryUpdatePeriod = m_gyroMeasurementRate;
     uavObject->setMetadata(newMetaData);
 }
 
@@ -144,10 +186,15 @@ void LevellingUtil::stopMeasurement()
     UAVObjectManager * uavObjectManager = pm->getObject<UAVObjectManager>();
     Q_ASSERT(uavObjectManager);
 
-    // Stop listening for updates
+    // Stop listening for updates from accels
     UAVDataObject *uavObject = Accels::GetInstance(uavObjectManager);
-    disconnect(uavObject, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(measurementsUpdated(UAVObject*)));
-    uavObject->setMetadata(m_previousMetaData);
+    disconnect(uavObject, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(accelMeasurementsUpdated(UAVObject*)));
+    uavObject->setMetadata(m_previousAccelMetaData);
+
+    // Stop listening for updates from gyros
+    uavObject = Gyros::GetInstance(uavObjectManager);
+    disconnect(uavObject, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(gyroMeasurementsUpdated(UAVObject*)));
+    uavObject->setMetadata(m_previousGyroMetaData);
 
     // Enable gyro bias correction again
     AttitudeSettings::DataFields attitudeSettingsData = AttitudeSettings::GetInstance(uavObjectManager)->getData();
@@ -158,22 +205,13 @@ void LevellingUtil::stopMeasurement()
 accelGyroBias LevellingUtil::calculateLevellingData()
 {
     accelGyroBias bias;
-    bias.m_accelerometerXBias = listMean(m_accelerometerX) / ACCELERATION_SCALE;
-    bias.m_accelerometerYBias = listMean(m_accelerometerY) / ACCELERATION_SCALE;
-    bias.m_accelerometerZBias = (listMean(m_accelerometerZ) + G) / ACCELERATION_SCALE;
+    bias.m_accelerometerXBias = m_accelerometerX / (double)m_receivedAccelUpdates / ACCELERATION_SCALE;
+    bias.m_accelerometerYBias = m_accelerometerY / (double)m_receivedAccelUpdates / ACCELERATION_SCALE;
+    bias.m_accelerometerZBias = (m_accelerometerZ / (double)m_receivedAccelUpdates + G) / ACCELERATION_SCALE;
 
-    bias.m_gyroXBias = listMean(m_gyroX) * 100.0f;
-    bias.m_gyroYBias = listMean(m_gyroY) * 100.0f;
-    bias.m_gyroZBias = listMean(m_gyroZ) * 100.0f;
+    bias.m_gyroXBias = m_gyroX / (double)m_receivedGyroUpdates * 100.0;
+    bias.m_gyroYBias = m_gyroY / (double)m_receivedGyroUpdates * 100.0;
+    bias.m_gyroZBias = m_gyroZ / (double)m_receivedGyroUpdates * 100.0;
     return bias;
-}
-
-double LevellingUtil::listMean(QList<double> list)
-{
-    double accum = 0;
-    for(int i = 0; i < list.size(); i++) {
-        accum += list.at(i);
-    }
-    return accum / list.size();
 }
 

@@ -70,7 +70,8 @@ void ConnectionDiagram::setupGraphicsScene()
         m_background->setSharedRenderer(m_renderer);
         m_background->setElementId("background");
         m_background->setVisible(true);
-        m_background->setFlags(QGraphicsItem::ItemClipsChildrenToShape | QGraphicsItem::ItemClipsToShape);
+        m_background->setFlags(QGraphicsItem::ItemClipsToShape);
+        m_background->setZValue(-1);
         scene->addItem(m_background);
 
         QList<QString> elementsToShow;
@@ -123,7 +124,7 @@ void ConnectionDiagram::setupGraphicsScene()
         switch (m_configSource->getInputType())
         {
             case VehicleConfigurationSource::INPUT_PWM:
-                elementsToShow << "pwm" << "receiver" ;
+                elementsToShow << "receiver" << "pwm" ;
                 break;
             case VehicleConfigurationSource::INPUT_PPM:
                 elementsToShow << "receiver" << "ppm";
@@ -149,12 +150,14 @@ void ConnectionDiagram::setupGraphicsScene()
 
 void ConnectionDiagram::setupGraphicsSceneItems(QGraphicsScene *scene, QList<QString> elementsToShow)
 {
+    qreal z = 0;
     foreach(QString elementId, elementsToShow) {
         if(m_renderer->elementExists(elementId)) {
             QGraphicsSvgItem* element = new QGraphicsSvgItem();
             element->setSharedRenderer(m_renderer);
             element->setElementId(elementId);
             element->setVisible(true);
+            element->setZValue(z++);
             scene->addItem(element);
 
             QMatrix matrix = m_renderer->matrixForElement(elementId);

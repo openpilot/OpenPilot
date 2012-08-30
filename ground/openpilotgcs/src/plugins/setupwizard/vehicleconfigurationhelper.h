@@ -69,6 +69,7 @@ private:
     static const qint16 RAPID_ESC_FREQUENCE = 400;
 
     static const qint16 ACTUATOR_MIN = 1000;
+    static const qint16 ACTUATOR_NEUTRAL = 1000;
     static const qint16 ACTUATOR_MAX = 2000;
 
     static const int MIXER_TYPE_DISABLED = 0;

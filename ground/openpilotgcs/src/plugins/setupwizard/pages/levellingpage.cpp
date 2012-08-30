@@ -26,6 +26,7 @@
  */
 
 #include <QMessageBox>
+#include <QDebug>
 #include "levellingpage.h"
 #include "ui_levellingpage.h"
 #include "setupwizard.h"
@@ -75,8 +76,7 @@ void LevellingPage::performLevelling()
 
     if(!m_levellingUtil)
     {
-        // Measure every 100ms * 100times = 10s
-        m_levellingUtil = new LevellingUtil(BIAS_CYCLES, BIAS_PERIOD);
+        m_levellingUtil = new LevellingUtil(BIAS_CYCLES, BIAS_RATE);
     }
     emit completeChanged();
 

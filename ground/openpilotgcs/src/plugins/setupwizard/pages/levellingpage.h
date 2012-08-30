@@ -52,8 +52,8 @@ private slots:
     void levellingTimeout(QString message);
 
 private:
-    static const int BIAS_CYCLES = 100;
-    static const int BIAS_PERIOD = 100;
+    static const int BIAS_CYCLES = 200;
+    static const int BIAS_RATE = 30;
 
     Ui::LevellingPage *ui;
     LevellingUtil *m_levellingUtil;

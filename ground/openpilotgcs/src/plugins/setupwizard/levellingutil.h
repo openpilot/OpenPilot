@@ -39,8 +39,10 @@ class LevellingUtil : public QObject
 {
     Q_OBJECT
 public:
-    explicit LevellingUtil(long measurementCount, long measurementPeriod);
-        
+    explicit LevellingUtil(long measurementCount, long measurementRate);
+    explicit LevellingUtil(long accelMeasurementCount, long accelMeasurementRate,
+                           long gyroMeasurementCount, long gyroMeasurementRate);
+
 signals:
     void progress(long current, long total);
     void done(accelGyroBias measuredBias);
@@ -51,7 +53,8 @@ public slots:
     void abort();
 
 private slots:
-    void measurementsUpdated(UAVObject * obj);
+    void gyroMeasurementsUpdated(UAVObject * obj);
+    void accelMeasurementsUpdated(UAVObject * obj);
     void timeout();
 
 private:
@@ -62,25 +65,28 @@ private:
     QTimer m_timeoutTimer;
 
     bool m_isMeasuring;
-    long m_receivedUpdates;
+    long m_receivedAccelUpdates;
+    long m_receivedGyroUpdates;
 
-    long m_measurementCount;
-    long m_measurementPeriod;
+    long m_accelMeasurementCount;
+    long m_gyroMeasurementCount;
+    long m_accelMeasurementRate;
+    long m_gyroMeasurementRate;
 
-    UAVObject::Metadata m_previousMetaData;
+    UAVObject::Metadata m_previousGyroMetaData;
+    UAVObject::Metadata m_previousAccelMetaData;
 
-    QList<double> m_accelerometerX;
-    QList<double> m_accelerometerY;
-    QList<double> m_accelerometerZ;
-    QList<double> m_gyroX;
-    QList<double> m_gyroY;
-    QList<double> m_gyroZ;
+    double m_accelerometerX;
+    double m_accelerometerY;
+    double m_accelerometerZ;
+    double m_gyroX;
+    double m_gyroY;
+    double m_gyroZ;
 
     void stop();
     void startMeasurement();
     void stopMeasurement();
     accelGyroBias calculateLevellingData();
-    double listMean(QList<double> list);
 };
 
 #endif // LEVELLINGUTIL_H

@@ -192,7 +192,7 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
                 data.ChannelType[i] = ActuatorSettings::CHANNELTYPE_PWM;
                 data.ChannelAddr[i] = i;
                 data.ChannelMin[i] = ACTUATOR_MIN;
-                data.ChannelNeutral[i] = ACTUATOR_MIN;
+                data.ChannelNeutral[i] = ACTUATOR_NEUTRAL;
                 data.ChannelMax[i] = ACTUATOR_MAX;
             }
 

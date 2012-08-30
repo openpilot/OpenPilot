@@ -35,4 +35,8 @@
 	<string name="tuning">Tuning</string>
 	<string name="apply">Apply</string>
 	<string name="save">Save</string>
+	<string name="settings">Settings</string>
+	<string name="data">Data</string>
+	<string name="edit">Edit</string>
+	<string name="load">Load</string>
 </resources>

@@ -164,13 +164,13 @@ void ConfigCCAttitudeWidget::startAccelCalibration() {
     initialAccelsMdata = accels->getMetadata();
     UAVObject::Metadata accelsMdata = initialAccelsMdata;
     UAVObject::SetFlightTelemetryUpdateMode(accelsMdata, UAVObject::UPDATEMODE_PERIODIC);
-    accelsMdata.flightTelemetryUpdatePeriod = 100;
+    accelsMdata.flightTelemetryUpdatePeriod = 30;
     accels->setMetadata(accelsMdata);
 
     initialGyrosMdata = gyros->getMetadata();
     UAVObject::Metadata gyrosMdata = initialGyrosMdata;
     UAVObject::SetFlightTelemetryUpdateMode(gyrosMdata, UAVObject::UPDATEMODE_PERIODIC);
-    gyrosMdata.flightTelemetryUpdatePeriod = 10;
+    gyrosMdata.flightTelemetryUpdatePeriod = 30;
     gyros->setMetadata(gyrosMdata);
 
 }

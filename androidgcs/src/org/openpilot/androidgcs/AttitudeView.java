@@ -81,7 +81,7 @@ public class AttitudeView extends View {
             result = specSize;
         } else {
             // Measure the text (beware: ascent is a negative number)
-            result = 600;
+            result = 1600;
             if (specMode == MeasureSpec.AT_MOST) {
                 // Respect AT_MOST value if that was what is called for by measureSpec
                 result = Math.min(result, specSize);
@@ -136,25 +136,35 @@ public class AttitudeView extends View {
 
 		canvas.save();
 		canvas.rotate(-roll, PX / 2, PY / 2);
+		canvas.save();
+
 		canvas.translate(0, pitch * DEG_TO_PX);
 		Drawable horizon = getContext().getResources().getDrawable(
 				R.drawable.im_pfd_horizon);
+		Drawable reticule = getContext().getResources().getDrawable(
+				R.drawable.im_pfd_reticule);
+		Drawable fixed = getContext().getResources().getDrawable(
+				R.drawable.im_pfd_fixed);
+
+		// Starting with a square image, want to size it equally
+		double margin = 0.2;
+		int screenSize = Math.min(PX, PY);
+		int imageHalfSize = (int) ((screenSize + screenSize * margin) / 2);
 
 		// This puts the image at the center of the PFD canvas (after it was
 		// translated)
-		double margin = 0.5;
-		horizon.setBounds( (int) (-margin * PX), (int) (-margin * PY), (int) ((1 + margin) * PX), (int) ((1+margin) *PY));
+		horizon.setBounds( PX/2 - imageHalfSize, PY/2 - imageHalfSize, PX/2 + imageHalfSize, PY/2 + imageHalfSize);
 		horizon.draw(canvas);
 		canvas.restore();
 
-		canvas.drawLine(0, 0, PX, 0, markerPaint);
-		canvas.drawLine(0, 0, 0, PY, markerPaint);
-		canvas.drawLine(PX, 0, PX, PY, markerPaint);
-		canvas.drawLine(0, PY, PX, PY, markerPaint);
+		// Draw the overlay that only rolls
+		reticule.setBounds( PX/2 - imageHalfSize, PY/2 - imageHalfSize, PX/2 + imageHalfSize, PY/2 + imageHalfSize);
+		reticule.draw(canvas);
+		canvas.restore();
 
-		canvas.drawLine(0,PY/2,PX,PY/2,markerPaint);
-		canvas.drawLine(PX/2,0,PX/2,PY,markerPaint);
-
-	}
+		// Draw the overlay that never moves
+		fixed.setBounds( PX/2 - imageHalfSize, PY/2 - imageHalfSize, PX/2 + imageHalfSize, PY/2 + imageHalfSize);
+		fixed.draw(canvas);
+}
 
 }

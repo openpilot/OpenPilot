@@ -471,6 +471,11 @@ void PIOS_Board_Init(void) {
 			
 	} /* 	hwsettings_rv_telemetryport */
 
+	if (hwsettings_mainport != HWSETTINGS_CC_MAINPORT_SBUS) {
+		GPIO_Init(pios_sbus_cfg.inv.gpio, &pios_sbus_cfg.inv.init);
+		GPIO_WriteBit(pios_sbus_cfg.inv.gpio, pios_sbus_cfg.inv.init.GPIO_Pin, pios_sbus_cfg.gpio_inv_disable);
+	}
+
 	/* Configure FlexiPort */
 	uint8_t hwsettings_flexiport;
 	HwSettingsCC_FlexiPortGet(&hwsettings_flexiport);

@@ -414,12 +414,11 @@ static const struct pios_usart_cfg pios_usart_main_cfg = {
 };
 #endif /* PIOS_INCLUDE_COM_TELEM */
 
+#include <pios_sbus_priv.h>
 #if defined(PIOS_INCLUDE_SBUS)
 /*
  * S.Bus USART
  */
-#include <pios_sbus_priv.h>
-
 static const struct pios_usart_cfg pios_usart_sbus_main_cfg = {
 	.regs = USART1,
 	.init = {
@@ -456,22 +455,25 @@ static const struct pios_usart_cfg pios_usart_sbus_main_cfg = {
 	},
 };
 
+#endif	/* PIOS_INCLUDE_SBUS */
+
+// Need this defined regardless to be able to turn it off
 static const struct pios_sbus_cfg pios_sbus_cfg = {
 	/* Inverter configuration */
 	.inv = {
 		.gpio = GPIOC,
 		.init = {
-			.GPIO_Pin = GPIO_Pin_0,
-			.GPIO_Mode = GPIO_Mode_Out_PP,
+			.GPIO_Pin   = GPIO_Pin_0,
 			.GPIO_Speed = GPIO_Speed_2MHz,
+			.GPIO_Mode  = GPIO_Mode_OUT,
+			.GPIO_OType = GPIO_OType_PP,
+			.GPIO_PuPd  = GPIO_PuPd_UP
 		},
 	},
-	.gpio_clk_func = RCC_APB2PeriphClockCmd,
-	.gpio_clk_periph = RCC_APB2Periph_GPIOC,
 	.gpio_inv_enable = Bit_SET,
+	.gpio_inv_disable = Bit_RESET,
 };
 
-#endif	/* PIOS_INCLUDE_SBUS */
 
 #ifdef PIOS_INCLUDE_COM_FLEXI
 /*

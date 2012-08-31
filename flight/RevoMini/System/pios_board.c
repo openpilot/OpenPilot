@@ -450,19 +450,22 @@ void PIOS_Board_Init(void) {
 	HwSettingsDSMxBindGet(&hwsettings_DSMxBind);
 	
 	/* Configure main USART port */
-	uint8_t hwsettings_rv_telemetryport;
-	HwSettingsRV_TelemetryPortGet(&hwsettings_rv_telemetryport);
-
-	switch (hwsettings_rv_telemetryport){
-		case HWSETTINGS_RV_TELEMETRYPORT_DISABLED:
+	uint8_t hwsettings_mainport;
+	HwSettingsCC_MainPortGet(&hwsettings_mainport);
+	// Disable, Telemetry, GPS, S.Bus, DSM (2,X10,X11), ComAux, ComBridge
+	switch (hwsettings_mainport){
+		case HWSETTINGS_CC_MAINPORT_DISABLED:
 			break;
-		case HWSETTINGS_RV_TELEMETRYPORT_TELEMETRY:
+		case HWSETTINGS_CC_MAINPORT_TELEMETRY:
 			PIOS_Board_configure_com(&pios_usart_main_cfg, PIOS_COM_TELEM_RF_RX_BUF_LEN, PIOS_COM_TELEM_RF_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_telem_rf_id);
 			break;
-		case HWSETTINGS_RV_TELEMETRYPORT_COMAUX:
+		case HWSETTINGS_CC_MAINPORT_GPS:
+			PIOS_Board_configure_com(&pios_usart_main_cfg, PIOS_COM_GPS_RX_BUF_LEN, 0, &pios_usart_com_driver, &pios_com_gps_id);
+			break;
+		case HWSETTINGS_CC_MAINPORT_COMAUX:
 			PIOS_Board_configure_com(&pios_usart_main_cfg, PIOS_COM_AUX_RX_BUF_LEN, PIOS_COM_AUX_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_aux_id);
 			break;
-		case HWSETTINGS_RV_TELEMETRYPORT_COMBRIDGE:
+		case HWSETTINGS_CC_MAINPORT_COMBRIDGE:
 			PIOS_Board_configure_com(&pios_usart_main_cfg, PIOS_COM_BRIDGE_RX_BUF_LEN, PIOS_COM_BRIDGE_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_bridge_id);
 			break;
 			

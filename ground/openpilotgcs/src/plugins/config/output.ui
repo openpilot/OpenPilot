@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>811</width>
+    <width>698</width>
     <height>754</height>
    </rect>
   </property>
@@ -125,7 +125,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>781</width>
+            <width>668</width>
             <height>642</height>
            </rect>
           </property>
@@ -528,6 +528,9 @@ Leave at 50Hz for fixed wing.</string>
              <layout class="QVBoxLayout" name="verticalLayout">
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_3">
+                <property name="spacing">
+                 <number>10</number>
+                </property>
                 <item>
                  <spacer name="horizontalSpacer_6">
                   <property name="orientation">
@@ -547,14 +550,14 @@ Leave at 50Hz for fixed wing.</string>
                 <item>
                  <widget class="QLabel" name="legend6">
                   <property name="sizePolicy">
-                   <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                   <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
                   <property name="minimumSize">
                    <size>
-                    <width>22</width>
+                    <width>20</width>
                     <height>0</height>
                    </size>
                   </property>
@@ -596,7 +599,7 @@ margin:1px;</string>
                   </property>
                   <property name="sizeHint" stdset="0">
                    <size>
-                    <width>1</width>
+                    <width>5</width>
                     <height>20</height>
                    </size>
                   </property>
@@ -605,14 +608,14 @@ margin:1px;</string>
                 <item>
                  <widget class="QLabel" name="legend0">
                   <property name="sizePolicy">
-                   <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                   <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
                   <property name="minimumSize">
                    <size>
-                    <width>104</width>
+                    <width>90</width>
                     <height>0</height>
                    </size>
                   </property>
@@ -639,16 +642,32 @@ margin:1px;</string>
                  </widget>
                 </item>
                 <item>
+                 <spacer name="horizontalSpacer_8">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::Fixed</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>12</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
                  <widget class="QLabel" name="legend1">
                   <property name="sizePolicy">
-                   <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                   <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
                   <property name="minimumSize">
                    <size>
-                    <width>61</width>
+                    <width>60</width>
                     <height>0</height>
                    </size>
                   </property>
@@ -675,16 +694,32 @@ margin:1px;</string>
                  </widget>
                 </item>
                 <item>
+                 <spacer name="horizontalSpacer_9">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::Minimum</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>0</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
                  <widget class="QLabel" name="legend2">
                   <property name="sizePolicy">
-                   <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
                   <property name="minimumSize">
                    <size>
-                    <width>45</width>
+                    <width>20</width>
                     <height>0</height>
                    </size>
                   </property>
@@ -720,7 +755,7 @@ margin:1px;</string>
                   </property>
                   <property name="sizeHint" stdset="0">
                    <size>
-                    <width>40</width>
+                    <width>45</width>
                     <height>20</height>
                    </size>
                   </property>
@@ -729,14 +764,14 @@ margin:1px;</string>
                 <item>
                  <widget class="QLabel" name="legend3">
                   <property name="sizePolicy">
-                   <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                   <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
                   <property name="minimumSize">
                    <size>
-                    <width>50</width>
+                    <width>55</width>
                     <height>0</height>
                    </size>
                   </property>
@@ -765,14 +800,14 @@ margin:1px;</string>
                 <item>
                  <widget class="QLabel" name="legend4">
                   <property name="sizePolicy">
-                   <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                   <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
                   <property name="minimumSize">
                    <size>
-                    <width>40</width>
+                    <width>20</width>
                     <height>0</height>
                    </size>
                   </property>
@@ -801,14 +836,14 @@ margin:1px;</string>
                 <item>
                  <widget class="QLabel" name="legend5">
                   <property name="sizePolicy">
-                   <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                   <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
                   <property name="minimumSize">
                    <size>
-                    <width>40</width>
+                    <width>20</width>
                     <height>0</height>
                    </size>
                   </property>
@@ -833,6 +868,22 @@ margin:1px;</string>
                    <set>Qt::AlignCenter</set>
                   </property>
                  </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_10">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::Minimum</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>18</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
                 </item>
                </layout>
               </item>

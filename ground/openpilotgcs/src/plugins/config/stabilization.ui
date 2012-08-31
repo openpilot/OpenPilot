@@ -621,13 +621,13 @@
             <number>24</number>
            </property>
            <property name="leftMargin">
-            <number>11</number>
+            <number>12</number>
            </property>
            <property name="topMargin">
             <number>0</number>
            </property>
            <property name="rightMargin">
-            <number>11</number>
+            <number>12</number>
            </property>
            <property name="bottomMargin">
             <number>0</number>
@@ -6971,8 +6971,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>948</width>
-            <height>713</height>
+            <width>567</width>
+            <height>650</height>
            </rect>
           </property>
           <property name="autoFillBackground">
@@ -16849,8 +16849,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>948</width>
-            <height>713</height>
+            <width>818</width>
+            <height>599</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_9">

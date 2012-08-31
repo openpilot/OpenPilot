@@ -462,7 +462,33 @@ void PIOS_Board_Init(void) {
 		case HWSETTINGS_CC_MAINPORT_GPS:
 			PIOS_Board_configure_com(&pios_usart_main_cfg, PIOS_COM_GPS_RX_BUF_LEN, -1, &pios_usart_com_driver, &pios_com_gps_id);
 			break;
-		case HWSETTINGS_CC_MAINPORT_COMAUX:
+		case HWSETTINGS_CC_MAINPORT_SBUS:
+			// TODO
+			break;
+		case HWSETTINGS_CC_MAINPORT_DSM2:
+		case HWSETTINGS_CC_MAINPORT_DSMX10BIT:
+		case HWSETTINGS_CC_MAINPORT_DSMX11BIT:
+		{
+			enum pios_dsm_proto proto;
+			switch (hwsettings_mainport) {
+				case HWSETTINGS_CC_MAINPORT_DSM2:
+					proto = PIOS_DSM_PROTO_DSM2;
+					break;
+				case HWSETTINGS_CC_MAINPORT_DSMX10BIT:
+					proto = PIOS_DSM_PROTO_DSMX10BIT;
+					break;
+				case HWSETTINGS_CC_MAINPORT_DSMX11BIT:
+					proto = PIOS_DSM_PROTO_DSMX11BIT;
+					break;
+				default:
+					PIOS_Assert(0);
+					break;
+			}
+			//TODO: Define the various Channelgroup for Revo dsm inputs and handle here
+			PIOS_Board_configure_dsm(&pios_usart_dsm_main_cfg, &pios_dsm_main_cfg, 
+											 &pios_usart_com_driver, &proto, MANUALCONTROLSETTINGS_CHANNELGROUPS_DSMMAINPORT,&hwsettings_DSMxBind);
+		}
+			break;		case HWSETTINGS_CC_MAINPORT_COMAUX:
 			PIOS_Board_configure_com(&pios_usart_main_cfg, PIOS_COM_AUX_RX_BUF_LEN, PIOS_COM_AUX_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_aux_id);
 			break;
 		case HWSETTINGS_CC_MAINPORT_COMBRIDGE:
@@ -502,13 +528,13 @@ void PIOS_Board_Init(void) {
 		{
 			enum pios_dsm_proto proto;
 			switch (hwsettings_flexiport) {
-				case HWSETTINGS_RV_FLEXIPORT_DSM2:
+				case HWSETTINGS_CC_FLEXIPORT_DSM2:
 					proto = PIOS_DSM_PROTO_DSM2;
 					break;
-				case HWSETTINGS_RV_FLEXIPORT_DSMX10BIT:
+				case HWSETTINGS_CC_FLEXIPORT_DSMX10BIT:
 					proto = PIOS_DSM_PROTO_DSMX10BIT;
 					break;
-				case HWSETTINGS_RV_FLEXIPORT_DSMX11BIT:
+				case HWSETTINGS_CC_FLEXIPORT_DSMX11BIT:
 					proto = PIOS_DSM_PROTO_DSMX11BIT;
 					break;
 				default:

@@ -484,6 +484,10 @@ void PIOS_Board_Init(void) {
 					PIOS_Assert(0);
 					break;
 			}
+
+			// Force binding to zero on the main port
+			hwsettings_DSMxBind = 0;
+
 			//TODO: Define the various Channelgroup for Revo dsm inputs and handle here
 			PIOS_Board_configure_dsm(&pios_usart_dsm_main_cfg, &pios_dsm_main_cfg, 
 											 &pios_usart_com_driver, &proto, MANUALCONTROLSETTINGS_CHANNELGROUPS_DSMMAINPORT,&hwsettings_DSMxBind);

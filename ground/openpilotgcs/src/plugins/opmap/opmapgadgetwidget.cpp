@@ -267,6 +267,11 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_statusUpdateTimer->start();
 
     m_map->setFocus();
+
+    // Create the path compiler and connect the signals to it
+    pathCompiler = new PathCompiler(this);
+    connect(pathCompiler, SIGNAL(visualizationChanged(QList<PathCompiler::waypoint>)),
+                                 this, SLOT(doVisualizationChanged(QList<PathCompiler::waypoint>)));
 }
 
 // destructor
@@ -476,13 +481,10 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
 
         contextMenu.addSeparator()->setText(tr("Waypoints"));
 
-        contextMenu.addAction(wayPointEditorAct);
         contextMenu.addAction(addWayPointAct);
 
         if (m_mouse_waypoint)
         {	// we have a waypoint under the mouse
-            contextMenu.addAction(editWayPointAct);
-
             lockWayPointAct->setChecked(waypoint_locked);
             contextMenu.addAction(lockWayPointAct);
 
@@ -1295,11 +1297,6 @@ void OPMapGadgetWidget::createActions()
     followUAVheadingAct->setChecked(false);
     connect(followUAVheadingAct, SIGNAL(toggled(bool)), this, SLOT(onFollowUAVheadingAct_toggled(bool)));
 
-    addWayPointAct = new QAction(tr("&Add waypoint"), this);
-    addWayPointAct->setShortcut(tr("Ctrl+A"));
-    addWayPointAct->setStatusTip(tr("Add waypoint"));
-    connect(addWayPointAct, SIGNAL(triggered()), this, SLOT(onAddWayPointAct_triggered()));
-
     overlayOpacityActGroup = new QActionGroup(this);
     connect(overlayOpacityActGroup, SIGNAL(triggered(QAction *)), this, SLOT(onOverlayOpacityActGroup_triggered(QAction *)));
     overlayOpacityAct.clear();
@@ -1443,71 +1440,30 @@ void OPMapGadgetWidget::createActions()
         uavTrailDistanceAct.append(uavTrailDistance_act);
     }
 
-//    // GPS trail
-//    // TODO: Delete this action ?
-//    showGPSAct = new QAction(tr("Show GPS"), this);
-//    showGPSAct->setStatusTip(tr("Show/Hide the GPS"));
-//    showGPSAct->setCheckable(true);
-//    showGPSAct->setChecked(false);
-//    connect(showGPSAct, SIGNAL(toggled(bool)), this, SLOT(onShowGPSAct_toggled(bool)));
+    //GPS trail
+    showGPSAct = new QAction(tr("Show GPS"), this);
+    showGPSAct->setStatusTip(tr("Show/Hide the GPS"));
+    showGPSAct->setCheckable(true);
+    showGPSAct->setChecked(false);
+    connect(showGPSAct, SIGNAL(toggled(bool)), this, SLOT(onShowGPSAct_toggled(bool)));
 
-//    gpsTrailTypeActGroup = new QActionGroup(this);
-//    connect(gpsTrailTypeActGroup, SIGNAL(triggered(QAction *)), this, SLOT(onGPStrailTypeActGroup_triggered(QAction *)));
-//    gpsTrailTypeAct.clear();
-//    QStringList gps_trail_type_list = mapcontrol::Helper::UAVTrailTypes();
-//    for (int i = 0; i < gps_trail_type_list.count(); i++)
-//    {
-//        mapcontrol::UAVTrailType::Types gps_trail_type = mapcontrol::Helper::UAVTrailTypeFromString(gps_trail_type_list[i]);
-//        QAction *gpsTrailType_act = new QAction(mapcontrol::Helper::StrFromUAVTrailType(gps_trail_type), gpsTrailTypeActGroup);
-//        gpsTrailType_act->setCheckable(true);
-//        gpsTrailType_act->setChecked(gps_trail_type == m_map->GPS->GetTrailType());
-//        gpsTrailType_act->setData(i);
-//        gpsTrailTypeAct.append(gpsTrailType_act);
-//    }
+    /** Actions for way points **/
+    addWayPointAct = new QAction(tr("&Add waypoint"), this);
+    addWayPointAct->setShortcut(tr("Ctrl+A"));
+    addWayPointAct->setStatusTip(tr("Add waypoint"));
+    connect(addWayPointAct, SIGNAL(triggered()), this, SLOT(onAddWayPointAct_triggered()));
 
-//    showGPStrailAct = new QAction(tr("Show Trail dots"), this);
-//    showGPStrailAct->setStatusTip(tr("Show/Hide the Trail dots"));
-//    showGPStrailAct->setCheckable(true);
-//    showGPStrailAct->setChecked(false);
-//    connect(showGPStrailAct, SIGNAL(toggled(bool)), this, SLOT(onShowGPStrailAct_toggled(bool)));
+    clearWayPointsAct = new QAction(tr("&Clear waypoints"), this);
+    clearWayPointsAct->setStatusTip(tr("Clear all the waypoints"));
+    connect(clearWayPointsAct, SIGNAL(triggered()),this, SLOT(onClearWayPointsAct_triggered()));
 
-//    showGPStrailLineAct = new QAction(tr("Show Trail lines"), this);
-//    showGPStrailLineAct->setStatusTip(tr("Show/Hide the Trail lines"));
-//    showGPStrailLineAct->setCheckable(true);
-//    showGPStrailLineAct->setChecked(true);
-//    connect(showGPStrailLineAct, SIGNAL(toggled(bool)), this, SLOT(onShowGPStrailLineAct_toggled(bool)));
+    deleteWayPointAct = new QAction(tr("&Del waypoint"), this);
+    deleteWayPointAct->setStatusTip(tr("Delete this waypoint"));
+    connect(deleteWayPointAct, SIGNAL(triggered()), this, SLOT(onDeleteWayPointAct_triggered()));
 
-//    clearGPStrailAct = new QAction(tr("Clear GPS trail"), this);
-//    clearGPStrailAct->setStatusTip(tr("Clear the GPS trail"));
-//    connect(clearGPStrailAct, SIGNAL(triggered()), this, SLOT(onClearGPStrailAct_triggered()));
-
-//    gpsTrailTimeActGroup = new QActionGroup(this);
-//    connect(gpsTrailTimeActGroup, SIGNAL(triggered(QAction *)), this, SLOT(onGPStrailTimeActGroup_triggered(QAction *)));
-//    gpsTrailTimeAct.clear();
-//    list_size = sizeof(uav_trail_time_list) / sizeof(uav_trail_time_list[0]);
-//    for (int i = 0; i < list_size; i++)
-//    {
-//        int gps_trail_time = uav_trail_time_list[i];
-//        QAction *gpsTrailTime_act = new QAction(QString::number(gps_trail_time) + " sec", gpsTrailTimeActGroup);
-//        gpsTrailTime_act->setCheckable(true);
-//        gpsTrailTime_act->setChecked(gps_trail_time == m_map->GPS->TrailTime());
-//        gpsTrailTime_act->setData(gps_trail_time);
-//        gpsTrailTimeAct.append(gpsTrailTime_act);
-//    }
-
-//    gpsTrailDistanceActGroup = new QActionGroup(this);
-//    connect(gpsTrailDistanceActGroup, SIGNAL(triggered(QAction *)), this, SLOT(onGPStrailDistanceActGroup_triggered(QAction *)));
-//    gpsTrailDistanceAct.clear();
-//    list_size = sizeof(uav_trail_distance_list) / sizeof(uav_trail_distance_list[0]);
-//    for (int i = 0; i < list_size; i++)
-//    {
-//        int gps_trail_distance = uav_trail_distance_list[i];
-//        QAction *gpsTrailDistance_act = new QAction(QString::number(gps_trail_distance) + " meters", gpsTrailDistanceActGroup);
-//        gpsTrailDistance_act->setCheckable(true);
-//        gpsTrailDistance_act->setChecked(gps_trail_distance == m_map->GPS->TrailDistance());
-//        gpsTrailDistance_act->setData(gps_trail_distance);
-//        gpsTrailDistanceAct.append(gpsTrailDistance_act);
-//    }
+    lockWayPointAct = new QAction(tr("&Lock waypoints"), this);
+    lockWayPointAct->setStatusTip(tr("Lock a waypoint location"));
+    connect(lockWayPointAct, SIGNAL(triggered()), this, SLOT(onLockWayPointAct_triggered()));
 }
 
 void OPMapGadgetWidget::onReloadAct_triggered()

@@ -275,13 +275,14 @@ private:
     QAction *goUAVAct;
     QAction *followUAVpositionAct;
     QAction *followUAVheadingAct;
-    QAction *wayPointEditorAct;
+    QAction *homeMagicWaypointAct;
+
+    // Waypoint actions
     QAction *addWayPointAct;
     QAction *editWayPointAct;
     QAction *lockWayPointAct;
     QAction *deleteWayPointAct;
     QAction *clearWayPointsAct;
-    QAction *homeMagicWaypointAct;
 
     QAction *showSafeAreaAct;
     QAction *changeDefaultLocalAndZoom;

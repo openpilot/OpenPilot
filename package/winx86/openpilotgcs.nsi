@@ -338,7 +338,7 @@ SectionEnd
 Section /o "un.Configuration" UnSecConfig
   ; Remove configuration
   Delete /rebootok "$APPDATA\OpenPilot\OpenPilotGCS.db"
-  Delete /rebootok "$APPDATA\OpenPilot\OpenPilotGCS.ini"
+  Delete /rebootok "$APPDATA\OpenPilot\OpenPilotGCS.xml"
 SectionEnd
 
 Section "-un.Profile" UnSecProfile

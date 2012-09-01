@@ -59,7 +59,6 @@
 /* Variables related to the RFM22B functionality */
 #define PIOS_INCLUDE_RFM22B
 #define RFM22_EXT_INT_USE
-#define RADIO_BUILTIN
  
 /* Select the sensors to include */
 #define PIOS_INCLUDE_HMC5883

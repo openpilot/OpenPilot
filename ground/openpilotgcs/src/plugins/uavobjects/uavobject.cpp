@@ -486,6 +486,14 @@ void UAVObject::emitTransactionCompleted(bool success)
 }
 
 /**
+ * Emit the newInstance event
+ */
+void UAVObject::emitNewInstance(UAVObject * obj)
+{
+    emit newInstance(obj);
+}
+
+/**
  * Initialize a UAVObjMetadata object.
  * \param[in] metadata The metadata object
  */

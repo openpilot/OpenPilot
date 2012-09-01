@@ -2,7 +2,7 @@
 ******************************************************************************
 *
 * @file       waypointitem.h
-* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
 * @brief      A graphicsItem representing a WayPoint
 * @see        The GNU Public License (GPL) Version 3
 * @defgroup   OPMapWidget
@@ -33,8 +33,19 @@
 #include "../internals/pointlatlng.h"
 #include "mapgraphicitem.h"
 #include <QObject>
+#include <QPoint>
+
 namespace mapcontrol
 {
+struct distBearingAltitude
+{
+    double distance;
+    double bearing;
+    float altitudeRelative;
+    double bearingToDegrees(){return bearing*180/M_PI;}
+    void setBearingFromDegrees(double degrees){bearing=degrees*M_PI/180;}
+};
+class HomeItem;
 /**
 * @brief A QGraphicsItem representing a WayPoint
 *
@@ -46,15 +57,17 @@ class WayPointItem:public QObject,public QGraphicsItem
     Q_INTERFACES(QGraphicsItem)
 public:
     enum { Type = UserType + 1 };
+    enum wptype {absolute,relative};
     /**
     * @brief Constructer
     *
     * @param coord coordinates in LatLng of the Waypoint
     * @param altitude altitude of the WayPoint
     * @param map pointer to map to use
-    * @return 
+    * @return
     */
-    WayPointItem(internals::PointLatLng const& coord,int const& altitude,MapGraphicItem* map);
+    WayPointItem(internals::PointLatLng const& coord,int const& altitude,MapGraphicItem* map,wptype type=absolute);
+    WayPointItem(MapGraphicItem* map,bool magicwaypoint);
     /**
     * @brief Constructer
     *
@@ -64,7 +77,9 @@ public:
     * @param map pointer to map to use
     * @return
     */
-    WayPointItem(internals::PointLatLng const& coord,int const& altitude,QString const& description,MapGraphicItem* map);
+    WayPointItem(internals::PointLatLng const& coord,int const& altitude,QString const& description,MapGraphicItem* map,wptype type=absolute);
+    WayPointItem(distBearingAltitude const& relativeCoord,QString const& description,MapGraphicItem* map);
+
     /**
     * @brief Returns the WayPoint description
     *
@@ -94,6 +109,7 @@ public:
     *
     */
     int Number(){return number;}
+    int numberAdjusted(){return number+1;}
     /**
     * @brief Sets WayPoint number
     *
@@ -127,45 +143,54 @@ public:
     *
     * @return int
     */
-    int Altitude(){return altitude;}
+    float Altitude(){return altitude;}
     /**
     * @brief Sets the WayPoint Altitude
     *
     * @param value
     */
-    void SetAltitude(int const& value);
+    void SetAltitude(const float &value);
+    void setRelativeCoord(distBearingAltitude value);
+    distBearingAltitude getRelativeCoord(){return relativeCoord;}
     int type() const;
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                 QWidget *widget);
-    void RefreshPos();
     void RefreshToolTip();
     QPixmap picture;
+    QString customString(){return myCustomString;}
+    void setCustomString(QString arg){myCustomString=arg;}
+    void setFlag(GraphicsItemFlag flag, bool enabled);
 ~WayPointItem();
 
     static int snumber;
+    void setWPType(wptype type);
+    wptype WPType(){return myType;}
 protected:
     void mouseMoveEvent ( QGraphicsSceneMouseEvent * event );
     void mousePressEvent ( QGraphicsSceneMouseEvent * event );
     void mouseReleaseEvent ( QGraphicsSceneMouseEvent * event );
-
-
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
 private:
     internals::PointLatLng coord;//coordinates of this WayPoint
+    distBearingAltitude relativeCoord;
     bool reached;
     QString description;
     bool shownumber;
     bool isDragging;
-    int altitude;
+    float altitude;
     MapGraphicItem* map;
     int number;
-
+    bool isMagic;
 
     QGraphicsSimpleTextItem* text;
     QGraphicsRectItem* textBG;
     QGraphicsSimpleTextItem* numberI;
     QGraphicsRectItem* numberIBG;
     QTransform transf;
+    HomeItem * myHome;
+    wptype myType;
+    QString myCustomString;
 
 public slots:
     /**
@@ -173,7 +198,7 @@ public slots:
     *
     * @param number number of the WayPoint that was deleted
     */
-    void WPDeleted(int const& number);
+    void WPDeleted(int const& number,WayPointItem *waypoint);
     /**
     * @brief Called when a WayPoint is renumbered
     *
@@ -189,6 +214,10 @@ public slots:
     * @param waypoint  a pointer to the WayPoint inserted
     */
     void WPInserted(int const& number,WayPointItem* waypoint);
+
+    void onHomePositionChanged(internals::PointLatLng,float altitude);
+    void RefreshPos();
+    void setOpacitySlot(qreal opacity);
 signals:
     /**
     * @brief fires when this WayPoint number changes (not fired if due to a auto-renumbering)
@@ -204,7 +233,6 @@ signals:
     *
     * @param waypoint a pointer to this WayPoint
     */
-    void WPValuesChanged(WayPointItem* waypoint);
 
     /**
     * @brief Fired when the waypoint is dropped somewhere
@@ -213,6 +241,11 @@ signals:
     */
     void WPDropped(WayPointItem* waypoint);
 
+    void WPValuesChanged(WayPointItem* waypoint);
+    void waypointdoubleclick(WayPointItem* waypoint);
+    void localPositionChanged(QPointF point,WayPointItem* waypoint);
+    void manualCoordChange(WayPointItem *);
+    void aboutToBeDeleted(WayPointItem *);
 };
 }
 #endif // WAYPOINTITEM_H

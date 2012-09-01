@@ -2,7 +2,7 @@
 ******************************************************************************
 *
 * @file       mapgraphicitem.cpp
-* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
 * @brief      The main graphicsItem used on the widget, contains the map and map logic
 * @see        The GNU Public License (GPL) Version 3
 * @defgroup   OPMapWidget
@@ -42,10 +42,11 @@ namespace mapcontrol
         this->SetZoom(2);
         this->setFlag(ItemIsFocusable);
         connect(core,SIGNAL(OnNeedInvalidation()),this,SLOT(Core_OnNeedInvalidation()));
-        connect(core,SIGNAL(OnMapDrag()),this,SLOT(ChildPosRefresh()));
-        connect(core,SIGNAL(OnMapZoomChanged()),this,SLOT(ChildPosRefresh()));
-        //resize();
+        connect(core,SIGNAL(OnMapDrag()),this,SLOT(childPosRefresh()));
+        connect(core,SIGNAL(OnMapZoomChanged()),this,SLOT(childPosRefresh()));
+        setCacheMode(QGraphicsItem::ItemCoordinateCache);
     }
+
     void MapGraphicItem::start()
     {
         core->StartSystem();
@@ -78,39 +79,15 @@ namespace mapcontrol
     void MapGraphicItem::Core_OnNeedInvalidation()
     {
         this->update();
-        foreach(QGraphicsItem* i,this->childItems())
-        {
-            WayPointItem* w=qgraphicsitem_cast<WayPointItem*>(i);
-            if(w)
-                w->RefreshPos();
-            UAVItem* ww=qgraphicsitem_cast<UAVItem*>(i);
-            if(ww)
-                ww->RefreshPos();
-            HomeItem* www=qgraphicsitem_cast<HomeItem*>(i);
-            if(www)
-                www->RefreshPos();
-            GPSItem* wwww=qgraphicsitem_cast<GPSItem*>(i);
-            if(wwww)
-                wwww->RefreshPos();
-        }
+        emit childRefreshPosition();
     }
-    void MapGraphicItem::ChildPosRefresh()
+    void MapGraphicItem::childPosRefresh()
     {
-        foreach(QGraphicsItem* i,this->childItems())
-        {
-            WayPointItem* w=qgraphicsitem_cast<WayPointItem*>(i);
-            if(w)
-                w->RefreshPos();
-            UAVItem* ww=qgraphicsitem_cast<UAVItem*>(i);
-            if(ww)
-                ww->RefreshPos();
-            HomeItem* www=qgraphicsitem_cast<HomeItem*>(i);
-            if(www)
-                www->RefreshPos();
-            GPSItem* wwww=qgraphicsitem_cast<GPSItem*>(i);
-            if(wwww)
-                wwww->RefreshPos();
-        }
+        emit childRefreshPosition();
+    }
+    void MapGraphicItem::setOverlayOpacity(qreal value)
+    {
+        emit childSetOpacity(value);
     }
     void MapGraphicItem::ConstructLastImage(int const& zoomdiff)
     {
@@ -118,8 +95,7 @@ namespace mapcontrol
         QSize size=boundingRect().size().toSize();
         size.setWidth(size.width()*2*zoomdiff);
         size.setHeight(size.height()*2*zoomdiff);
-        temp=QImage(size,
-                               QImage::Format_ARGB32_Premultiplied);
+        temp=QImage(size,QImage::Format_ARGB32_Premultiplied);
         temp.fill(0);
         QPainter imagePainter(&temp);
         imagePainter.translate(-boundingRect().topLeft());
@@ -216,7 +192,6 @@ namespace mapcontrol
     }
     void MapGraphicItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     {
-
         if(!IsMouseOverMarker())
         {
             if(event->button() == config->DragButton && CanDragMap()&& !((event->modifiers()==Qt::ShiftModifier)||(event->modifiers()==Qt::ControlModifier)))
@@ -267,6 +242,7 @@ namespace mapcontrol
                 if(!selectedArea.IsEmpty() && event->modifiers() == Qt::ShiftModifier)
                 {
                        SetZoomToFitRect(SelectedArea());
+                       selectedArea=internals::RectLatLng::Empty;
                 }
             }
 
@@ -276,6 +252,9 @@ namespace mapcontrol
     {
         if(event->modifiers()&(Qt::ShiftModifier|Qt::ControlModifier))
             this->setCursor(Qt::CrossCursor);
+        if(event->key()==Qt::Key_Escape)
+            selectedArea=internals::RectLatLng::Empty;
+        QGraphicsItem::keyPressEvent(event);
     }
     void MapGraphicItem::keyReleaseEvent(QKeyEvent *event)
     {
@@ -388,7 +367,6 @@ namespace mapcontrol
                                             found = true;
                                         {
                                             painter->drawPixmap(core->tileRect.X(),core->tileRect.Y(), core->tileRect.Width(), core->tileRect.Height(),PureImageProxy::FromStream(img));
-                                           // qDebug()<<"tile:"<<core->tileRect.X()<<core->tileRect.Y();
                                         }
                                     }
                                 }
@@ -402,7 +380,6 @@ namespace mapcontrol
                                     painter->setFont(config->MissingDataFont);
                                     painter->setPen(Qt::red);
                                     painter->drawText(QRectF(core->tileRect.X(), core->tileRect.Y(), core->tileRect.Width(), core->tileRect.Height()),Qt::AlignCenter,(core->GettilePoint() == core->GetcenterTileXYLocation()? "CENTER: " :"TILE: ")+core->GettilePoint().ToString());
-                                    //qDebug()<<"ShowTileGridLine:"<<core->GettilePoint().ToString()<<"=="<<core->GetcenterTileXYLocation().ToString();
                                 }
                             }
 
@@ -509,7 +486,6 @@ namespace mapcontrol
                 float scaleValue = zoomDigi+remainder + 1;
                 {
                     MapRenderTransform = scaleValue;
-                  //  qDebug()<<"scale="<<scaleValue<<"zoomdigi:"<<ZoomDigi()<<"integer:"<<integer;
                 }
                 if(integer>MaxZoom())
                     integer=MaxZoom();

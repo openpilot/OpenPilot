@@ -2,7 +2,7 @@
 ******************************************************************************
 *
 * @file       mapripper.cpp
-* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
 * @brief      A class that allows ripping of a selection of the map
 * @see        The GNU Public License (GPL) Version 3
 * @defgroup   OPMapWidget
@@ -49,7 +49,11 @@ MapRipper::MapRipper(internals::Core * core, const internals::RectLatLng & rect)
             emit numberOfTilesChanged(0,0);
         }
         else
-            QMessageBox::information(new QWidget(),"No valid selection","Please select the area of the map to rip with Mouse+Control key");
+#ifdef Q_OS_DARWIN
+            QMessageBox::information(new QWidget(),"No valid selection","This pre-caches map data.\n\nPlease first select the area of the map to rip with <COMMAND>+Left mouse click");
+#else
+            QMessageBox::information(new QWidget(),"No valid selection","This pre-caches map data.\n\nPlease first select the area of the map to rip with <CTRL>+Left mouse click");
+#endif
     }
 void MapRipper::finish()
 {

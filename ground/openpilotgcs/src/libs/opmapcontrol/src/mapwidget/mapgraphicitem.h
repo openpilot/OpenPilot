@@ -2,7 +2,7 @@
 ******************************************************************************
 *
 * @file       mapgraphicitem.h
-* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
 * @brief      The main graphicsItem used on the widget, contains the map and map logic
 * @see        The GNU Public License (GPL) Version 3
 * @defgroup   OPMapWidget
@@ -40,8 +40,10 @@
 #include <QObject>
 #include "waypointitem.h"
 //#include "uavitem.h"
+
 namespace mapcontrol
 {
+    class WayPointItem;
     class OPMapWidget;
     /**
     * @brief The main graphicsItem used on the widget, contains the map and map logic
@@ -92,7 +94,6 @@ namespace mapcontrol
         bool IsDragging()const{return core->IsDragging();}
 
         QImage lastimage;
-//        QPainter* imagePainter;
         core::Point lastimagepoint;
         void paintImage(QPainter* painter);
         void ConstructLastImage(int const& zoomdiff);
@@ -100,7 +101,7 @@ namespace mapcontrol
         double Zoom();
         double ZoomDigi();
         double ZoomTotal();
-
+        void setOverlayOpacity(qreal value);
     protected:
         void mouseMoveEvent ( QGraphicsSceneMouseEvent * event );
         void mousePressEvent ( QGraphicsSceneMouseEvent * event );
@@ -199,7 +200,7 @@ namespace mapcontrol
         void SetMapType(MapType::Types const& value){core->SetMapType(value);}
     private slots:
         void Core_OnNeedInvalidation();
-        void ChildPosRefresh();
+        void childPosRefresh();
     public slots:
         /**
         * @brief To be called when the scene size changes
@@ -213,7 +214,10 @@ namespace mapcontrol
         *
         * @param zoom
         */
+        void wpdoubleclicked(WayPointItem * wp);
         void zoomChanged(double zoomtotal,double zoomreal,double zoomdigi);
+        void childRefreshPosition();
+        void childSetOpacity(qreal value);
     };
 }
 #endif // MAPGRAPHICITEM_H

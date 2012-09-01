@@ -32,7 +32,7 @@
 
 /* Public Functions */
 extern void PIOS_Servo_Init(void);
-extern void PIOS_Servo_SetHz(uint16_t * speeds, uint8_t num_banks);
+extern void PIOS_Servo_SetHz(const uint16_t * speeds, uint8_t num_banks);
 extern void PIOS_Servo_Set(uint8_t Servo, uint16_t Position);
 
 #endif /* PIOS_SERVO_H */

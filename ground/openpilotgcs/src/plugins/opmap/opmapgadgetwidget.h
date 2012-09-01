@@ -2,7 +2,7 @@
  ******************************************************************************
  *
  * @file       opmapgadgetwidget.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup OPMapPlugin OpenPilot Map Plugin
@@ -30,6 +30,12 @@
 
 // ******************************************************
 
+
+#include "flightdatamodel.h"
+#include "pathplanner.h"
+#include "modelmapproxy.h"
+#include "modeluavoproxy.h"
+
 #include <QtGui/QWidget>
 #include <QtGui/QMenu>
 #include <QStringList>
@@ -41,7 +47,6 @@
 
 #include "opmapcontrol/opmapcontrol.h"
 
-#include "opmap_overlay_widget.h"
 #include "opmap_zoom_slider_widget.h"
 #include "opmap_statusbar_widget.h"
 
@@ -52,6 +57,10 @@
 #include "uavobjectmanager.h"
 #include "uavobject.h"
 #include "objectpersistence.h"
+#include <QItemSelectionModel>
+#include "opmap_edit_waypoint_dialog.h"
+
+#include "homeeditor.h"
 
 #include <pathcompiler.h>
 // ******************************************************
@@ -71,18 +80,6 @@ typedef struct t_home
     double altitude;
     bool locked;
 } t_home;
-
-// local waypoint list item structure
-typedef struct t_waypoint
-{
-    mapcontrol::WayPointItem *map_wp_item;
-    internals::PointLatLng coord;
-    double altitude;
-    QString description;
-    bool locked;
-    int time_seconds;
-    int hold_time_seconds;
-} t_waypoint;
 
 // ******************************************************
 
@@ -105,7 +102,7 @@ public:
     * @param
     */
     void setHome(QPointF pos);
-    void setHome(internals::PointLatLng pos_lat_lon);
+    void setHome(internals::PointLatLng pos_lat_lon, double altitude);
     void goHome();
     void setZoom(int zoom);
     void setPosition(QPointF pos);
@@ -116,8 +113,13 @@ public:
     void setUseMemoryCache(bool useMemoryCache);
     void setCacheLocation(QString cacheLocation);
     void setMapMode(opMapModeType mode);
-    void SetUavPic(QString UAVPic);
+	void SetUavPic(QString UAVPic);
     void setMaxUpdateRate(int update_rate);
+    void setHomePosition(QPointF pos);
+    void setOverlayOpacity(qreal value);
+signals:
+    void defaultLocationAndZoomChanged(double lng,double lat,double zoom);
+    void overlayOpacityChanged(qreal);
 
 public slots:
     void homePositionUpdated(UAVObject *);
@@ -126,11 +128,10 @@ public slots:
 
 protected:
     void resizeEvent(QResizeEvent *event);
-    void mouseMoveEvent(QMouseEvent *event);
     void contextMenuEvent(QContextMenuEvent *event);
-    void keyPressEvent(QKeyEvent* event);
-
+    void closeEvent(QCloseEvent *);
 private slots:
+    void wpDoubleClickEvent(WayPointItem *wp);
     void updatePosition();
 
     void updateMousePos();
@@ -143,26 +144,17 @@ private slots:
     *
     * Some are currently disabled for the v1.0 plugin version.
     */
-    //    void comboBoxFindPlace_returnPressed();
-    //    void on_toolButtonFindPlace_clicked();
     void on_toolButtonZoomM_clicked();
     void on_toolButtonZoomP_clicked();
     void on_toolButtonMapHome_clicked();
     void on_toolButtonMapUAV_clicked();
     void on_toolButtonMapUAVheading_clicked();
     void on_horizontalSliderZoom_sliderMoved(int position);
-    //    void on_toolButtonAddWaypoint_clicked();
-    //    void on_treeViewWaypoints_clicked(QModelIndex index);
-    //    void on_toolButtonHome_clicked();
-    //    void on_toolButtonNextWaypoint_clicked();
-    //    void on_toolButtonPrevWaypoint_clicked();
-    //    void on_toolButtonHoldPosition_clicked();
-    //    void on_toolButtonGo_clicked();
     void on_toolButtonMagicWaypointMapMode_clicked();
     void on_toolButtonNormalMapMode_clicked();
     void on_toolButtonHomeWaypoint_clicked();
     void on_toolButtonMoveToWP_clicked();
-
+    void onLockWayPointAct_triggered();
     /**
     * @brief signals received from the map object
     */
@@ -170,21 +162,15 @@ private slots:
     void OnCurrentPositionChanged(internals::PointLatLng point);
     void OnTileLoadComplete();
     void OnTileLoadStart();
-    void OnMapDrag();
-    void OnMapZoomChanged();
-    void OnMapTypeChanged(MapType::Types type);
-    void OnEmptyTileError(int zoom, core::Point pos);
     void OnTilesStillToLoad(int number);
 
-    /**
-      * Unused for now, hooks for future waypoint support
-      */
-    void WPDropped(WayPointItem *waypoint);
-    void WPNumberChanged(int const& oldnumber,int const& newnumber, WayPointItem* waypoint);
-    void WPValuesChanged(WayPointItem* waypoint);
-    void WPInserted(int const& number, WayPointItem* waypoint);
-    void WPDeleted(int const& number);
+    /**** Methods related to the path compiler ****/
+
+    //! Called whenever a waypoint is moved
     void doVisualizationChanged(QList<PathCompiler::waypoint>);
+    void onWPDragged(WayPointItem *waypoint);
+    void onDeleteWayPointAct_triggered();
+    void onClearWayPointsAct_triggered();
 
     /**
     * @brief mouse right click context menu signals
@@ -194,9 +180,9 @@ private slots:
     void onCopyMouseLatLonToClipAct_triggered();
     void onCopyMouseLatToClipAct_triggered();
     void onCopyMouseLonToClipAct_triggered();
-    //    void onFindPlaceAct_triggered();
     void onShowCompassAct_toggled(bool show);
     void onShowDiagnostics_toggled(bool show);
+    void onShowUAVInfo_toggled(bool show);
     void onShowHomeAct_toggled(bool show);
     void onGoZoomInAct_triggered();
     void onGoZoomOutAct_triggered();
@@ -206,26 +192,20 @@ private slots:
     void onGoUAVAct_triggered();
     void onFollowUAVpositionAct_toggled(bool checked);
     void onFollowUAVheadingAct_toggled(bool checked);
-    //void onOpenWayPointEditorAct_triggered();
     void onAddWayPointAct_triggered();
     void onEditWayPointAct_triggered();
-    void onLockWayPointAct_triggered();
-    void onDeleteWayPointAct_triggered();
-    void onClearWayPointsAct_triggered();
     void onMapModeActGroup_triggered(QAction *action);
     void onZoomActGroup_triggered(QAction *action);
     void onHomeMagicWaypointAct_triggered();
     void onShowSafeAreaAct_toggled(bool show);
     void onSafeAreaActGroup_triggered(QAction *action);
-    void onMaxUpdateRateActGroup_triggered(QAction *action);
 
     /*UAV*/
-    void onShowTrailAct_toggled(bool show);
     void onShowTrailLineAct_toggled(bool);
     void onShowUAVAct_toggled(bool show);
-    void onShowUAVtrailLineAct_toggled(bool show);
     void onShowUAVtrailAct_toggled(bool show);
     void onClearUAVtrailAct_triggered();
+
     void onUAVtrailTimeActGroup_triggered(QAction *action);
     void onUAVtrailDistanceActGroup_triggered(QAction *action);
     void onUAVtrailTypeActGroup_triggered(QAction *action);
@@ -239,74 +219,53 @@ private slots:
     void onGPStrailDistanceActGroup_triggered(QAction *action);
     void onGPStrailTypeActGroup_triggered(QAction *action);
 
-
+    void onMaxUpdateRateActGroup_triggered(QAction *action);
+    void onChangeDefaultLocalAndZoom();
+    void onHomeDoubleClick(HomeItem*);
+    void onOverlayOpacityActGroup_triggered(QAction *action);
 private:
-
-    // *****
-
-    int m_min_zoom;
-    int m_max_zoom;
-
+	int m_min_zoom;
+	int m_max_zoom;
     double m_heading;	// uav heading
-
-    internals::PointLatLng m_mouse_lat_lon;
-    internals::PointLatLng m_context_menu_lat_lon;
-
-    int m_prev_tile_number;
-
+	internals::PointLatLng m_mouse_lat_lon;
+	internals::PointLatLng m_context_menu_lat_lon;
+	int m_prev_tile_number;
     opMapModeType m_map_mode;
-
-    int m_maxUpdateRate;
-
-    t_home m_home_position;
-
-    t_waypoint m_magic_waypoint;
-
+	int m_maxUpdateRate;
+	t_home m_home_position;
     QStringList findPlaceWordList;
-    QCompleter *findPlaceCompleter;
 
+    QCompleter *findPlaceCompleter;
     QTimer *m_updateTimer;
     QTimer *m_statusUpdateTimer;
-
     Ui::OPMap_Widget *m_widget;
-
     mapcontrol::OPMapWidget *m_map;
 
     ExtensionSystem::PluginManager *pm;
-    UAVObjectManager *obm;
-    UAVObjectUtilManager *obum;
-
-    //opmap_waypointeditor_dialog waypoint_editor_dialog;
-
-    //opmap_edit_waypoint_dialog waypoint_edit_dialog;
+	UAVObjectManager *obm;
+	UAVObjectUtilManager *obum;
 
     QStandardItemModel wayPoint_treeView_model;
-
     mapcontrol::WayPointItem *m_mouse_waypoint;
 
     PathCompiler *pathCompiler;
-    QList<t_waypoint *> m_waypoint_list;
 
     QMutex m_waypoint_list_mutex;
 
     QMutex m_map_mutex;
 
-    bool m_telemetry_connected;
-
-    // *****
-
-    void createActions();
+	bool m_telemetry_connected;
 
     QAction *closeAct1;
     QAction *closeAct2;
     QAction *reloadAct;
     QAction *ripAct;
-    QAction *copyMouseLatLonToClipAct;
+	QAction *copyMouseLatLonToClipAct;
     QAction *copyMouseLatToClipAct;
     QAction *copyMouseLonToClipAct;
-    QAction *findPlaceAct;
     QAction *showCompassAct;
     QAction *showDiagnostics;
+    QAction *showUAVInfo;
     QAction *showHomeAct;
     QAction *zoomInAct;
     QAction *zoomOutAct;
@@ -316,15 +275,17 @@ private:
     QAction *goUAVAct;
     QAction *followUAVpositionAct;
     QAction *followUAVheadingAct;
-    QAction *wayPointEditorAct;
+    QAction *homeMagicWaypointAct;
+
+    // Waypoint actions
     QAction *addWayPointAct;
     QAction *editWayPointAct;
     QAction *lockWayPointAct;
     QAction *deleteWayPointAct;
     QAction *clearWayPointsAct;
-    QAction *homeMagicWaypointAct;
 
     QAction *showSafeAreaAct;
+    QAction *changeDefaultLocalAndZoom;
     QActionGroup *safeAreaActGroup;
     QList<QAction *> safeAreaAct;
 
@@ -357,23 +318,20 @@ private:
     QList<QAction *> mapModeAct;
 
     QActionGroup *zoomActGroup;
+    QActionGroup *overlayOpacityActGroup;
     QList<QAction *> zoomAct;
+    QList<QAction *> overlayOpacityAct;
 
     QActionGroup *maxUpdateRateActGroup;
     QList<QAction *> maxUpdateRateAct;
 
     // *****
 
-    void homeMagicWaypoint();
-
+    void createActions();
+	void homeMagicWaypoint();
     void moveToMagicWaypointPosition();
-
-    void loadComboBoxLines(QComboBox *comboBox, QString filename);
-    void saveComboBoxLines(QComboBox *comboBox, QString filename);
-
     void hideMagicWaypointControls();
     void showMagicWaypointControls();
-
     void keepMagicWaypointWithInSafeArea();
 
     double distance(internals::PointLatLng from, internals::PointLatLng to);
@@ -386,7 +344,10 @@ private:
 
     void setMapFollowingMode();
 
-    bool setHomeLocationObject();
+	bool setHomeLocationObject();
+    QMenu contextMenu;
+    internals::PointLatLng lastLatLngMouse;
+    WayPointItem * magicWayPoint;
 };
 
 #endif /* OPMAP_GADGETWIDGET_H_ */

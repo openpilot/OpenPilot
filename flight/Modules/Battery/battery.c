@@ -55,9 +55,6 @@
 // Configuration
 //
 #define SAMPLE_PERIOD_MS		500
-#define BATTERY_BOARD_VOLTAGE_WARNING 4.5
-#define BATTERY_BOARD_VOLTAGE_CRITICAL 3.5
-#define BATTERY_BOARD_VOLTAGE_ERROR 1.0
 // Private types
 
 // Private variables
@@ -104,9 +101,6 @@ MODULE_INITCALL(BatteryInitialize, 0)
 static void onTimer(UAVObjEvent* ev)
 {
 	static FlightBatteryStateData flightBatteryData;
-	static bool BoardPowerWarning= false;
-	// prevent that the initial ramp up of the power supply rail is identified as a power failure.
-	static bool BoardPowerOk = false;
 	FlightBatterySettingsData batterySettings;
 
 	FlightBatterySettingsGet(&batterySettings);
@@ -114,17 +108,11 @@ static void onTimer(UAVObjEvent* ev)
 	static float dT = SAMPLE_PERIOD_MS / 1000.0;
 	float energyRemaining;
 
-	if(HAS_SENSOR(FLIGHTBATTERYSETTINGS_SENSORTYPE_BOARDVOLTAGE) )
-		flightBatteryData.BoardSupplyVoltage=((float)PIOS_ADC_PinGet(4)) * PIOS_ADC_VOLTAGE_SCALE * 6.1;
-	else
-		flightBatteryData.BoardSupplyVoltage = -1;
-
 	//calculate the battery parameters
 	if(HAS_SENSOR(FLIGHTBATTERYSETTINGS_SENSORTYPE_BATTERYVOLTAGE) )
 		flightBatteryData.Voltage = ((float)PIOS_ADC_PinGet(0)) * PIOS_ADC_VOLTAGE_SCALE * batterySettings.SensorCalibrations[FLIGHTBATTERYSETTINGS_SENSORCALIBRATIONS_VOLTAGEFACTOR]; //in Volts
 	else 
 		flightBatteryData.Voltage = -1;
-
 	
 	if(HAS_SENSOR(FLIGHTBATTERYSETTINGS_SENSORTYPE_BATTERYCURRENT))
 	{
@@ -188,38 +176,6 @@ static void onTimer(UAVObjEvent* ev)
 		}
 	}
 	
-	if(HAS_SENSOR(FLIGHTBATTERYSETTINGS_SENSORTYPE_BOARDVOLTAGE) )
-	{
-		// power ia disconnected from the board (it is powered by usb)
-		if(flightBatteryData.BoardSupplyVoltage!= -1 && flightBatteryData.BoardSupplyVoltage < BATTERY_BOARD_VOLTAGE_ERROR)
-		{
-			AlarmsSet(SYSTEMALARMS_ALARM_POWER, SYSTEMALARMS_ALARM_ERROR);
-			BoardPowerWarning=false;
-			BoardPowerOk = false;
-		}
-		else 
-		{
-			if(BoardPowerOk && flightBatteryData.BoardSupplyVoltage < BATTERY_BOARD_VOLTAGE_CRITICAL)
-			{
-				AlarmsSet(SYSTEMALARMS_ALARM_POWER, SYSTEMALARMS_ALARM_CRITICAL);
-				BoardPowerWarning=true;
-			}
-			else if (BoardPowerOk && flightBatteryData.BoardSupplyVoltage < BATTERY_BOARD_VOLTAGE_WARNING)
-			{
-				AlarmsSet(SYSTEMALARMS_ALARM_POWER, SYSTEMALARMS_ALARM_WARNING);
-				BoardPowerWarning=true;
-			}
-			else 
-			{
-				// if there was any previous warning/critical condition, notify the problem leaving the warning
-				if(BoardPowerWarning)
-					AlarmsSet(SYSTEMALARMS_ALARM_POWER, SYSTEMALARMS_ALARM_WARNING);
-				else
-					AlarmsClear(SYSTEMALARMS_ALARM_POWER);
-				BoardPowerOk |= flightBatteryData.BoardSupplyVoltage > BATTERY_BOARD_VOLTAGE_WARNING;
-			}
-		}		
-	}		
 	FlightBatteryStateSet(&flightBatteryData);
 }
 

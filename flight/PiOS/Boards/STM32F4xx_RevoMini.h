@@ -259,12 +259,12 @@ extern uint32_t pios_packet_handler;
 // PIOS_ADC_PinGet(4) = VREF
 // PIOS_ADC_PinGet(5) = Temperature sensor
 //-------------------------
-#define PIOS_DMA_PIN_CONFIG                                                                         \
-{                                                                                                   \
-	{GPIOC, GPIO_Pin_0,     ADC_Channel_10},                                                        \
-	{GPIOC, GPIO_Pin_1,     ADC_Channel_11},                                                        \
-	{NULL,  0,                      ADC_Channel_Vrefint},           /* Voltage reference */         \
-	{NULL,  0,                      ADC_Channel_TempSensor},         /* Temperature sensor */        \
+#define PIOS_DMA_PIN_CONFIG                                                                 \
+{                                                                                           \
+	{GPIOC, GPIO_Pin_1,     ADC_Channel_11},                                                \
+	{GPIOC, GPIO_Pin_2,     ADC_Channel_12},                                                \
+	{NULL,  0,              ADC_Channel_Vrefint},           /* Voltage reference */         \
+	{NULL,  0,              ADC_Channel_TempSensor},        /* Temperature sensor */        \
 	{GPIOC, GPIO_Pin_2,     ADC_Channel_12}  \
 }
 

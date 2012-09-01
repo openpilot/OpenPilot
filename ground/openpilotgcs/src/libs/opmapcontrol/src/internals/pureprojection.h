@@ -2,7 +2,7 @@
 ******************************************************************************
 *
 * @file       pureprojection.h
-* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
 * @brief      
 * @see        The GNU Public License (GPL) Version 3
 * @defgroup   OPMapWidget
@@ -33,7 +33,7 @@
 #include "pointlatlng.h"
 #include "cmath"
 #include "rectlatlng.h"
-
+#include <QDebug>
 using namespace core;
 
 namespace internals
@@ -81,6 +81,9 @@ public:
     void FromCartesianTGeodetic(const double &X,const double &Y,const double &Z,  double &Lat,  double &Lng);
     static double DistanceBetweenLatLng(PointLatLng const& p1,PointLatLng const& p2);
 
+    PointLatLng translate(PointLatLng p1, double distance, double bearing);
+    double courseBetweenLatLng(const PointLatLng &p1, const PointLatLng &p2);
+    void offSetFromLatLngs(PointLatLng p1, PointLatLng p2, double &dX, double &dY);
 protected:
    
     static const double PI;
@@ -103,7 +106,8 @@ protected:
     static double e3fn(const double &x);
     static double mlfn(const double &e0,const double &e1,const double &e2,const double &e3,const double &phi);
     static qlonglong GetUTMzone(const double &lon);
-
+private:
+    double myfmod(double x, double y);
 };
 }
 

@@ -12,6 +12,9 @@
         <file>images/mapquad.png</file>
         <file>images/dragons1.jpg</file>
         <file>images/dragons2.jpeg</file>
+        <file>images/waypoint_marker1.png</file>
+        <file>images/waypoint_marker2.png</file>
+        <file>images/waypoint_marker3.png</file>
     </qresource>
     <qresource prefix="/uavs">
         <file>images/airplanepip.png</file>

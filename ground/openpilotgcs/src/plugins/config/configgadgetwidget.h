@@ -34,11 +34,9 @@
 #include "objectpersistence.h"
 #include <QtGui/QWidget>
 #include <QList>
-//#include <QtWebKit/QWebView>
 #include <QTextBrowser>
 #include "utils/pathutils.h"
 #include <QMessageBox>
-//#include "fancytabwidget.h"
 #include "utils/mytabbedstackwidget.h"
 #include "../uavobjectwidgetutils/configtaskwidget.h"
 

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>810</width>
+    <width>856</width>
     <height>633</height>
    </rect>
   </property>
@@ -122,7 +122,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>756</width>
+            <width>802</width>
             <height>509</height>
            </rect>
           </property>
@@ -888,7 +888,6 @@ margin:1px;</string>
                     <property name="styleSheet">
                      <string notr="true">background:transparent</string>
                     </property>
-                    <zorder>groupBox</zorder>
                    </widget>
                   </item>
                  </layout>
@@ -1436,7 +1435,7 @@ font: bold 12px;
 margin:1px;</string>
                     </property>
                     <property name="text">
-                     <string>Tricopter Yaw Motor Direction</string>
+                     <string>Multirotor Yaw Direction</string>
                     </property>
                     <property name="alignment">
                      <set>Qt::AlignCenter</set>
@@ -1484,7 +1483,7 @@ font: bold 12px;
 margin:1px;</string>
                     </property>
                     <property name="text">
-                     <string>Tricopter Yaw Motor channel:</string>
+                     <string>Tricopter Yaw Motor channel</string>
                     </property>
                     <property name="alignment">
                      <set>Qt::AlignCenter</set>
@@ -2796,7 +2795,7 @@ margin:1px;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>756</width>
+            <width>802</width>
             <height>509</height>
            </rect>
           </property>
@@ -3063,7 +3062,6 @@ In 'units per second', a sound default is 1000.</string>
              <zorder>maxAccelSlider</zorder>
              <zorder>label_37</zorder>
              <zorder>feedForwardSliderValue</zorder>
-             <zorder></zorder>
              <zorder>label_20</zorder>
             </widget>
            </item>

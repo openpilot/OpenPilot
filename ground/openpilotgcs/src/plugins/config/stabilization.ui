@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>978</width>
-    <height>837</height>
+    <width>967</width>
+    <height>639</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -612,8 +612,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>948</width>
-            <height>720</height>
+            <width>937</width>
+            <height>522</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_12" stretch="0,0,0,0,0">
@@ -6971,7 +6971,7 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>567</width>
+            <width>922</width>
             <height>650</height>
            </rect>
           </property>
@@ -6981,6 +6981,12 @@ border-radius: 5;</string>
           <layout class="QVBoxLayout" name="verticalLayout_16">
            <property name="spacing">
             <number>24</number>
+           </property>
+           <property name="leftMargin">
+            <number>12</number>
+           </property>
+           <property name="rightMargin">
+            <number>12</number>
            </property>
            <item>
             <widget class="QGroupBox" name="RateStabilizationGroup_8">
@@ -16849,13 +16855,19 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>818</width>
+            <width>922</width>
             <height>599</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_9">
            <property name="spacing">
             <number>24</number>
+           </property>
+           <property name="leftMargin">
+            <number>12</number>
+           </property>
+           <property name="rightMargin">
+            <number>12</number>
            </property>
            <item>
             <widget class="QGroupBox" name="groupBox_4">
@@ -19779,7 +19791,7 @@ border-radius: 5;</string>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_8" columnstretch="0,0,1,0,1,0,1,0">
                  <property name="leftMargin">
-                  <number>0</number>
+                  <number>12</number>
                  </property>
                  <item row="1" column="4">
                   <widget class="QDoubleSpinBox" name="RatePitchILimit">
@@ -22939,7 +22951,7 @@ border-radius: 5;</string>
                    </property>
                    <property name="sizeHint" stdset="0">
                     <size>
-                     <width>91</width>
+                     <width>102</width>
                      <height>20</height>
                     </size>
                    </property>

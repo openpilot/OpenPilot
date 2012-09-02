@@ -364,6 +364,7 @@ enum usb_op_board_ids {
 	USB_OP_BOARD_ID_PIPXTREME      = 3,
 	USB_OP_BOARD_ID_COPTERCONTROL  = 4,
 	USB_OP_BOARD_ID_REVOLUTION     = 5,
+	USB_OP_BOARD_ID_OSD     	   = 6,
 } __attribute__((packed));
 
 enum usb_op_board_modes {

@@ -1540,15 +1540,28 @@ static void rfm22_processInt(void)
 	// Reset the supervisor timer.
 	rfm22b_dev_g->supv_timer = PIOS_RFM22B_SUPERVISOR_TIMEOUT;
 
-	// read interrupt status registers - clears the interrupt line
-	int_status1 = rfm22_read(RFM22_interrupt_status1);
-	int_status2 = rfm22_read(RFM22_interrupt_status2);
+	// 1. Read the interrupt statuses with burst read
+	rfm22_claimBus();  // Set RC and the semaphore
+	uint8_t write_buf[3] = {RFM22_interrupt_status1 & 0x7f, 0xFF, 0xFF};
+	uint8_t read_buf[3];
+	PIOS_SPI_TransferBlock(PIOS_RFM22_SPI_PORT, write_buf, read_buf, sizeof(write_buf), NULL);
+	PIOS_SPI_RC_PinSet(PIOS_RFM22_SPI_PORT, 0, 1);
+	int_status1 = read_buf[1];
+	int_status2 = read_buf[2];
+	
+	// Device status
+	write_buf[0] = RFM22_device_status & 0x7f;
+	PIOS_SPI_RC_PinSet(PIOS_RFM22_SPI_PORT, 0, 0);
+	PIOS_SPI_TransferBlock(PIOS_RFM22_SPI_PORT, write_buf, read_buf, 2, NULL);
+	PIOS_SPI_RC_PinSet(PIOS_RFM22_SPI_PORT, 0, 1);	
+	device_status = read_buf[1];
 
-	// read device status register
-	device_status = rfm22_read(RFM22_device_status);
-
-	// read ezmac status register
-	ezmac_status = rfm22_read(RFM22_ezmac_status);
+	// EzMAC status
+	write_buf[0] = RFM22_ezmac_status & 0x7f;
+	PIOS_SPI_RC_PinSet(PIOS_RFM22_SPI_PORT, 0, 0);
+	PIOS_SPI_TransferBlock(PIOS_RFM22_SPI_PORT, write_buf, read_buf, 2, NULL);
+	ezmac_status = read_buf[1];
+	rfm22_releaseBus();
 
 	// Read the RSSI if we're in RX mode
 	if (rf_mode != TX_DATA_MODE && rf_mode != TX_STREAM_MODE &&

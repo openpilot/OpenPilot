@@ -32,13 +32,13 @@ Rectangle {
                 source: "image://svg/pfd.svg!rollscale"
                 sourceSize: background.sourceSize
                 smooth: true
-		anchors.centerIn: parent
-                 //rotate it around the center of scene
-		transform: Rotation {
-		angle: -AttitudeActual.Roll
-		origin.x : sceneItem.width/2 - x
-		origin.y : sceneItem.height/2 - y
-		}
+                anchors.centerIn: parent
+                //rotate it around the center of scene
+                transform: Rotation {
+                    angle: -AttitudeActual.Roll
+                    origin.x : sceneItem.width/2 - x
+                    origin.y : sceneItem.height/2 - y
+                }
             }
 
             Image {
@@ -74,6 +74,11 @@ Rectangle {
             }
 
             AltitudeScale {
+                anchors.fill: parent
+                sourceSize: background.sourceSize
+            }
+
+            VsiScale {
                 anchors.fill: parent
                 sourceSize: background.sourceSize
             }

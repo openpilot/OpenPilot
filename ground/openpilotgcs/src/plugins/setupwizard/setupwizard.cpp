@@ -39,6 +39,7 @@
 #include "pages/levellingpage.h"
 #include "pages/summarypage.h"
 #include "pages/flashpage.h"
+#include "pages/outputcalibrationpage.h"
 #include "pages/notyetimplementedpage.h"
 #include "extensionsystem/pluginmanager.h"
 #include "vehicleconfigurationhelper.h"
@@ -91,11 +92,13 @@ int SetupWizard::nextId() const
         case PAGE_INPUT:
             return PAGE_VEHICLES;
         case PAGE_OUTPUT:
-            return PAGE_LEVELLING;
-        case PAGE_LEVELLING:
             return PAGE_SUMMARY;
-        case PAGE_SUMMARY:
+        case PAGE_LEVELLING:
+            return PAGE_CALIBRATION;
+        case PAGE_CALIBRATION:
             return PAGE_FLASH;
+        case PAGE_SUMMARY:
+            return PAGE_LEVELLING;
         case PAGE_FLASH:
             return PAGE_END;
         case PAGE_NOTYETIMPLEMENTED:
@@ -222,15 +225,6 @@ QString SetupWizard::getSummaryText()
             summary.append(tr("Unknown"));
     }
 
-    summary.append("<br>");
-    summary.append("<b>").append(tr("Accel & Gyro bias calibrated: ")).append("</b>");
-    if (isLevellingPerformed()) {
-        summary.append(tr("Yes"));
-    }
-    else {
-        summary.append(tr("No"));
-    }
-
     return summary;
 }
 
@@ -246,6 +240,7 @@ void SetupWizard::createPages()
     setPage(PAGE_INPUT, new InputPage(this));
     setPage(PAGE_OUTPUT, new OutputPage(this));
     setPage(PAGE_LEVELLING, new LevellingPage(this));
+    setPage(PAGE_CALIBRATION, new OutputCalibrationPage(this));
     setPage(PAGE_SUMMARY, new SummaryPage(this));
     setPage(PAGE_FLASH, new FlashPage(this));
     setPage(PAGE_NOTYETIMPLEMENTED, new NotYetImplementedPage(this));

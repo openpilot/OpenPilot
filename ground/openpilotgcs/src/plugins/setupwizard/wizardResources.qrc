@@ -29,5 +29,6 @@
         <file>resources/bttn-calculate-up.png</file>
         <file>resources/bttn-turbo-down.png</file>
         <file>resources/bttn-turbo-up.png</file>
+        <file>resources/multirotor-shapes.svg</file>
     </qresource>
 </RCC>

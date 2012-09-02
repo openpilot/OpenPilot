@@ -57,20 +57,20 @@ void ConnectionDiagram::showEvent(QShowEvent * event)
 
 void ConnectionDiagram::setupGraphicsScene()
 {
-    QGraphicsScene *scene = new QGraphicsScene(this);
-    ui->connectionDiagram->setScene(scene);
-    ui->connectionDiagram->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
     m_renderer = new QSvgRenderer();
     if (QFile::exists(QString(":/setupwizard/resources/connection-diagrams.svg")) &&
             m_renderer->load(QString(":/setupwizard/resources/connection-diagrams.svg")) &&
             m_renderer->isValid())
     {
-        scene->clear();
+        QGraphicsScene *scene = new QGraphicsScene(this);
+        ui->connectionDiagram->setScene(scene);
+        //ui->connectionDiagram->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+
         m_background = new QGraphicsSvgItem();
         m_background->setSharedRenderer(m_renderer);
         m_background->setElementId("background");
-        m_background->setVisible(true);
-        m_background->setFlags(QGraphicsItem::ItemClipsToShape);
+        m_background->setOpacity(0);
+        //m_background->setFlags(QGraphicsItem::ItemClipsToShape);
         m_background->setZValue(-1);
         scene->addItem(m_background);
 
@@ -124,10 +124,10 @@ void ConnectionDiagram::setupGraphicsScene()
         switch (m_configSource->getInputType())
         {
             case VehicleConfigurationSource::INPUT_PWM:
-                elementsToShow << "receiver" << "pwm" ;
+                elementsToShow << "pwm" ;
                 break;
             case VehicleConfigurationSource::INPUT_PPM:
-                elementsToShow << "receiver" << "ppm";
+                elementsToShow << "ppm";
                 break;
             case VehicleConfigurationSource::INPUT_SBUS:
                 elementsToShow << "sbus";
@@ -151,23 +151,28 @@ void ConnectionDiagram::setupGraphicsScene()
 void ConnectionDiagram::setupGraphicsSceneItems(QGraphicsScene *scene, QList<QString> elementsToShow)
 {
     qreal z = 0;
+    QRectF backgBounds = m_renderer->boundsOnElement("background");
+
     foreach(QString elementId, elementsToShow) {
         if(m_renderer->elementExists(elementId)) {
             QGraphicsSvgItem* element = new QGraphicsSvgItem();
             element->setSharedRenderer(m_renderer);
             element->setElementId(elementId);
-            element->setVisible(true);
             element->setZValue(z++);
-            scene->addItem(element);
+            element->setOpacity(1.0);
 
             QMatrix matrix = m_renderer->matrixForElement(elementId);
             QRectF orig = matrix.mapRect(m_renderer->boundsOnElement(elementId));
             element->setPos(orig.x(),orig.y());
+
+            //QRectF orig = m_renderer->boundsOnElement(elementId);
+            //element->setPos(orig.x() - backgBounds.x(), orig.y() - backgBounds.y());
+
+            scene->addItem(element);
             qDebug() << "Adding " << elementId << " to scene at " << element->pos();
         }
-        else
-        {
-            qDebug() << "Element " << elementId << " not found in renderer!";
+        else {
+            qDebug() << "Element with id: " << elementId << " not found.";
         }
     }
 }

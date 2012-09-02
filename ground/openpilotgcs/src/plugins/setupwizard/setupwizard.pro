@@ -29,7 +29,8 @@ HEADERS += setupwizardplugin.h \
     vehicleconfigurationsource.h \
     vehicleconfigurationhelper.h \
     connectiondiagram.h \
-    pages/outputcalibrationpage.h
+    pages/outputcalibrationpage.h \
+    outputcalibrationutil.h
 
 SOURCES += setupwizardplugin.cpp \
     setupwizard.cpp \
@@ -52,7 +53,8 @@ SOURCES += setupwizardplugin.cpp \
     vehicleconfigurationsource.cpp \
     vehicleconfigurationhelper.cpp \
     connectiondiagram.cpp \
-    pages/outputcalibrationpage.cpp
+    pages/outputcalibrationpage.cpp \
+    outputcalibrationutil.cpp
 
 OTHER_FILES += SetupWizard.pluginspec
 

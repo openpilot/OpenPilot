@@ -1151,9 +1151,6 @@ uint8_t rfm22_txStart()
 
 	exec_using_spi = true;
 
-	// Disable interrrupts.
-	PIOS_IRQ_Disable();
-
 	// Initialize the supervisor timer.
 	rfm22b_dev_g->supv_timer = PIOS_RFM22B_SUPERVISOR_TIMEOUT;
 
@@ -1199,10 +1196,14 @@ uint8_t rfm22_txStart()
 	rfm22_write(RFM22_transmit_packet_length, tx_data_wr);
 
 	// add some data
-	rfm22_startBurstWrite(RFM22_fifo_access);
-	for (uint16_t i = 0; (tx_data_rd < tx_data_wr) && (i < FIFO_SIZE); ++tx_data_rd, ++i)
-		rfm22_burstWrite(tx_buffer[tx_data_rd]);
-	rfm22_endBurstWrite();
+	rfm22_claimBus();
+	PIOS_SPI_TransferByte(PIOS_RFM22_SPI_PORT, RFM22_fifo_access | 0x80);
+	int bytes_to_write = (tx_data_wr - tx_data_rd);
+	bytes_to_write = (bytes_to_write > FIFO_SIZE) ? FIFO_SIZE:  bytes_to_write;
+	PIOS_SPI_TransferBlock(PIOS_RFM22_SPI_PORT, &tx_buffer[tx_data_rd], NULL, bytes_to_write, NULL);
+	tx_data_rd += bytes_to_write;
+	rfm22_releaseBus();
+
 
 	// *******************
 
@@ -1216,9 +1217,6 @@ uint8_t rfm22_txStart()
 
 	// enable the transmitter
 	rfm22_write(RFM22_op_and_func_ctrl1, RFM22_opfc1_pllon | RFM22_opfc1_txon);
-
-	// Re-ensable interrrupts.
-	PIOS_IRQ_Enable();
 
 	TX_LED_ON;
 
@@ -1506,10 +1504,13 @@ void rfm22_processTxInt(void)
 	{
 		// top-up the rf chips TX FIFO buffer
 		uint16_t max_bytes = FIFO_SIZE - TX_FIFO_LO_WATERMARK - 1;
-		rfm22_startBurstWrite(RFM22_fifo_access);
-		for (uint16_t i = 0; (tx_data_rd < tx_data_wr) && (i < max_bytes); ++i, ++tx_data_rd)
-			rfm22_burstWrite(tx_buffer[tx_data_rd]);
-		rfm22_endBurstWrite();
+		rfm22_claimBus();
+		PIOS_SPI_TransferByte(PIOS_RFM22_SPI_PORT, RFM22_fifo_access | 0x80);
+		int bytes_to_write = (tx_data_wr - tx_data_rd);
+		bytes_to_write = (bytes_to_write > max_bytes) ? max_bytes:  bytes_to_write;
+		PIOS_SPI_TransferBlock(PIOS_RFM22_SPI_PORT, &tx_buffer[tx_data_rd], NULL, bytes_to_write, NULL);
+		tx_data_rd += bytes_to_write;
+		rfm22_releaseBus();
 	}
 
 	// Packet has been sent

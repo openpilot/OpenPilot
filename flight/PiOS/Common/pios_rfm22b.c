@@ -74,8 +74,6 @@
 
 #define TX_TEST_MODE_TIMELIMIT_MS		30000	// TX test modes time limit (in ms)
 
-//#define TX_PREAMBLE_NIBBLES				8		// 7 to 511 (number of nibbles)
-//#define RX_PREAMBLE_NIBBLES				5		// 5 to 31 (number of nibbles)
 #define TX_PREAMBLE_NIBBLES				12		// 7 to 511 (number of nibbles)
 #define RX_PREAMBLE_NIBBLES				6		// 5 to 31 (number of nibbles)
 
@@ -177,6 +175,23 @@ struct pios_rfm22b_dev {
 };
 
 uint32_t random32 = 0x459ab8d8;
+
+// Must ensure these prefilled arrays match the define sizes
+static const uint8_t FULL_PREAMBLE[FIFO_SIZE] = 
+	{PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,
+	PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,
+	PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,
+	PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,
+	PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,
+	PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,
+	PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,
+	PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,
+	PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,
+	PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,
+	PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,
+	PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,
+	PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE}; // 64 bytes
+static const uint8_t HEADER[(TX_PREAMBLE_NIBBLES + 1)/2 + 2] = {PREAMBLE_BYTE, PREAMBLE_BYTE, PREAMBLE_BYTE, PREAMBLE_BYTE,PREAMBLE_BYTE, PREAMBLE_BYTE, SYNC_BYTE_1, SYNC_BYTE_2};
 
 /* Local function forwared declarations */
 static void PIOS_RFM22B_Supervisor(uint32_t ppm_id);
@@ -688,6 +703,18 @@ void rfm22_write(uint8_t addr, uint8_t data)
 	rfm22_releaseBus();
 }
 
+/**
+ * Write a byte to a register without claiming the bus.  Also
+ * toggle the NSS line
+ */
+static void rfm22_write_noclaim(uint8_t addr, uint8_t data)
+{
+	uint8_t buf[2] = {addr | 0x80, data};
+	PIOS_SPI_RC_PinSet(PIOS_RFM22_SPI_PORT, 0, 0);
+	PIOS_SPI_TransferBlock(PIOS_RFM22_SPI_PORT, buf, NULL, 2, NULL);
+	PIOS_SPI_RC_PinSet(PIOS_RFM22_SPI_PORT, 0, 1);
+}
+
 void rfm22_startBurstRead(uint8_t addr)
 {
 	// wait 1us .. so we don't toggle the CS line to quickly
@@ -703,6 +730,7 @@ void rfm22_endBurstRead(void)
 	rfm22_releaseBus();
 }
 
+//! Read a byte from tan address and claim/release the semaphore
 uint8_t rfm22_read(uint8_t addr)
 {
 	uint8_t rdata;
@@ -718,6 +746,20 @@ uint8_t rfm22_read(uint8_t addr)
 	rfm22_releaseBus();
 
 	return rdata;
+}
+
+/**
+ * Read a byte from a register without claiming the bus.  Also
+ * toggle the NSS line
+ */
+static uint8_t rfm22_read_noclaim(uint8_t addr)
+{
+	uint8_t buf[2] = {addr | 0x80, 0xFF};
+	uint8_t read[2];
+	PIOS_SPI_RC_PinSet(PIOS_RFM22_SPI_PORT, 0, 0);
+	PIOS_SPI_TransferBlock(PIOS_RFM22_SPI_PORT, buf, read, 2, NULL);
+	PIOS_SPI_RC_PinSet(PIOS_RFM22_SPI_PORT, 0, 1);
+	return read[1];
 }
 
 // ************************************
@@ -1123,23 +1165,6 @@ void rfm22_setRxMode(uint8_t mode, bool multi_packet_mode)
 
 // ************************************
 
-uint16_t rfm22_addHeader()
-{
-	uint16_t i = 0;
-
-	for (uint16_t j = (TX_PREAMBLE_NIBBLES + 1) / 2; j > 0; j--)
-	{
-		rfm22_burstWrite(PREAMBLE_BYTE);
-		i++;
-	}
-	rfm22_burstWrite(SYNC_BYTE_1); i++;
-	rfm22_burstWrite(SYNC_BYTE_2); i++;
-
-	return i;
-}
-
-// ************************************
-
 uint8_t rfm22_txStart()
 {
 	if((tx_pre_buffer_size == 0) || (exec_using_spi == true))
@@ -1230,39 +1255,40 @@ static void rfm22_setTxMode(uint8_t mode)
 	if (mode != TX_DATA_MODE && mode != TX_STREAM_MODE && mode != TX_CARRIER_MODE && mode != TX_PN_MODE)
 		return;		// invalid mode
 
-	exec_using_spi = true;
+	rfm22_claimBus();
 
-	// disable interrupts
-	rfm22_write(RFM22_interrupt_enable1, 0x00);
-	rfm22_write(RFM22_interrupt_enable2, 0x00);
+	// Disaable interrupts (IE1, IE2 = 0)
+	uint8_t out_buf[3] = {RFM22_interrupt_enable1 | 0x80, 0x00, 0x00};
+	PIOS_SPI_TransferBlock(PIOS_RFM22_SPI_PORT, out_buf, NULL, sizeof(out_buf), NULL);
+	PIOS_SPI_RC_PinSet(PIOS_RFM22_SPI_PORT, 0, 1);
 
 	// TUNE mode
-	rfm22_write(RFM22_op_and_func_ctrl1, RFM22_opfc1_pllon);
+	rfm22_write_noclaim(RFM22_op_and_func_ctrl1,RFM22_opfc1_pllon);
 
 	RX_LED_OFF;
 
-	// set the tx power
-	rfm22_write(RFM22_tx_power, RFM22_tx_pwr_papeaken | RFM22_tx_pwr_papeaklvl_1 |
+	// Set the tx power
+	rfm22_write_noclaim(RFM22_tx_power,RFM22_tx_pwr_papeaken | RFM22_tx_pwr_papeaklvl_1 |
 		    RFM22_tx_pwr_papeaklvl_0 | RFM22_tx_pwr_lna_sw | tx_power);
 
-	uint8_t fd_bit = rfm22_read(RFM22_modulation_mode_control2) & RFM22_mmc2_fd;
+	uint8_t fd_bit = rfm22_read_noclaim(RFM22_modulation_mode_control2) & RFM22_mmc2_fd;
 	if (mode == TX_CARRIER_MODE)
 		// blank carrier mode -  for testing
-		rfm22_write(RFM22_modulation_mode_control2, fd_bit | RFM22_mmc2_dtmod_pn9 |
+		rfm22_write_noclaim(RFM22_modulation_mode_control2, fd_bit | RFM22_mmc2_dtmod_pn9 |
 								RFM22_mmc2_modtyp_none);	// FIFO mode, Blank carrier
 	else if (mode == TX_PN_MODE)
 		// psuedo random data carrier mode - for testing
-		rfm22_write(RFM22_modulation_mode_control2, fd_bit | RFM22_mmc2_dtmod_pn9 |
+		rfm22_write_noclaim(RFM22_modulation_mode_control2, fd_bit | RFM22_mmc2_dtmod_pn9 |
 								RFM22_mmc2_modtyp_gfsk);	// FIFO mode, PN9 carrier
 	else
 		// data transmission
 		// FIFO mode, GFSK modulation
-		rfm22_write(RFM22_modulation_mode_control2, fd_bit | RFM22_mmc2_dtmod_fifo |
+		rfm22_write_noclaim(RFM22_modulation_mode_control2, fd_bit | RFM22_mmc2_dtmod_fifo |
 								RFM22_mmc2_modtyp_gfsk);
 
 	// clear FIFOs
-	rfm22_write(RFM22_op_and_func_ctrl2, RFM22_opfc2_ffclrrx | RFM22_opfc2_ffclrtx);
-	rfm22_write(RFM22_op_and_func_ctrl2, 0x00);
+	rfm22_write_noclaim(RFM22_op_and_func_ctrl2, RFM22_opfc2_ffclrrx | RFM22_opfc2_ffclrtx);
+	rfm22_write_noclaim(RFM22_op_and_func_ctrl2, 0x00);
 
 	// add some data to the chips TX FIFO before enabling the transmitter
 	{
@@ -1271,30 +1297,26 @@ static void rfm22_setTxMode(uint8_t mode)
 
 		if (mode == TX_DATA_MODE)
 			// set the total number of data bytes we are going to transmit
-			rfm22_write(RFM22_transmit_packet_length, wr);
+			rfm22_write_noclaim(RFM22_transmit_packet_length, wr);
 
-		uint16_t max_bytes = FIFO_SIZE - 1;
 		uint16_t i = 0;
-		rfm22_startBurstWrite(RFM22_fifo_access);
+		PIOS_SPI_RC_PinSet(PIOS_RFM22_SPI_PORT, 0, 0);
+		PIOS_SPI_TransferByte(PIOS_RFM22_SPI_PORT, 0x80 | RFM22_fifo_access); // Initiate burst write
 		if (mode == TX_STREAM_MODE)	{
-			if (rd >= wr)	{
-				// no data to send - yet .. just send preamble pattern
-				while (true) {
-					rfm22_burstWrite(PREAMBLE_BYTE);
-					if (++i >= max_bytes) break;
-				}
-			}	else	// add the RF heaader
-				i += rfm22_addHeader();
+			if (rd >= wr)
+				i += PIOS_SPI_TransferBlock(PIOS_RFM22_SPI_PORT, FULL_PREAMBLE, NULL, sizeof(FULL_PREAMBLE), NULL);
+			 else	// add the RF heaader
+				i += PIOS_SPI_TransferBlock(PIOS_RFM22_SPI_PORT, HEADER, NULL, sizeof(HEADER), NULL);
 		}
 
-		// add some data
-		for (uint16_t j = wr - rd; j > 0; j--) {
-			rfm22_burstWrite(tx_buffer[rd++]);
-			if (++i >= max_bytes)
-				break;
-		}
+		// Send data if there is any and there is space in the buffer available
+		// Bytes available to send minus how many we have sent
+		int32_t bytes_to_send = wr - rd; 
+		bytes_to_send = ((bytes_to_send + i)> FIFO_SIZE) ? (FIFO_SIZE - i) : bytes_to_send;
+		if (bytes_to_send > 0)
+			rd += PIOS_SPI_TransferBlock(PIOS_RFM22_SPI_PORT, &tx_buffer[rd], NULL, bytes_to_send, NULL);
 
-		rfm22_endBurstWrite();
+		PIOS_SPI_RC_PinSet(PIOS_RFM22_SPI_PORT, 0, 1);
 
 		tx_data_rd = rd;
 	}
@@ -1306,22 +1328,18 @@ static void rfm22_setTxMode(uint8_t mode)
 
 	// enable TX interrupts
 	//	rfm22_write(RFM22_interrupt_enable1, RFM22_ie1_enpksent | RFM22_ie1_entxffaem | RFM22_ie1_enfferr);
-	rfm22_write(RFM22_interrupt_enable1, RFM22_ie1_enpksent | RFM22_ie1_entxffaem);
+	rfm22_write_noclaim(RFM22_interrupt_enable1, RFM22_ie1_enpksent | RFM22_ie1_entxffaem);
 
 	// read interrupt status - clear interrupts
-	rfm22_read(RFM22_interrupt_status1);
-	rfm22_read(RFM22_interrupt_status2);
+	rfm22_read_noclaim(RFM22_interrupt_status1);
+	rfm22_read_noclaim(RFM22_interrupt_status2);
 
 	// enable the transmitter
 	//	rfm22_write(RFM22_op_and_func_ctrl1, RFM22_opfc1_xton | RFM22_opfc1_txon);
-	rfm22_write(RFM22_op_and_func_ctrl1, RFM22_opfc1_pllon | RFM22_opfc1_txon);
+	rfm22_write_noclaim(RFM22_op_and_func_ctrl1, RFM22_opfc1_pllon | RFM22_opfc1_txon);
 
+	rfm22_releaseBus();
 	TX_LED_ON;
-
-	// *******************
-
-	exec_using_spi = false;
-
 }
 
 // ************************************

@@ -64,10 +64,16 @@ ground/uavobjgenerator/uavobjgenerator.pro.user
 ground/uavobjects/uavobjects.pro.user
 ground/ground.pro.user
 
-# Ignore GNU global tags files
 GPATH
 GRTAGS
 GSYMS
 GTAGS
+
+plane
+quad
+
+# Ignore auto generated java files
+androidgcs/bin/
+androidgcs/gen/
 /.cproject
 /.project

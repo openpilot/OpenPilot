@@ -1,0 +1,669 @@
+ #####
+ # Project: Revolution
+ #
+ #
+ # Makefile for OpenPilot project build PiOS and the AP.
+ #
+ # The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2012.
+ #
+ # 
+ # This program is free software; you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+ # the Free Software Foundation; either version 3 of the License, or
+ # (at your option) any later version.
+ #
+ # This program is distributed in the hope that it will be useful, but
+ # WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ # or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ # for more details.
+ #
+ # You should have received a copy of the GNU General Public License along
+ # with this program; if not, write to the Free Software Foundation, Inc.,
+ # 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ #####
+
+
+# Set developer code and compile options
+# Set to YES to compile for debugging
+DEBUG ?= YES
+
+# Set to YES to use the Servo output pins for debugging via scope or logic analyser
+ENABLE_DEBUG_PINS ?= NO
+
+# Set to Yes to enable the AUX UART which is mapped on the S1 (Tx) and S2 (Rx) servo outputs
+ENABLE_AUX_UART ?= NO
+
+#
+USE_BOOTLOADER ?= NO
+
+
+# Set to YES when using Code Sourcery toolchain
+CODE_SOURCERY ?= NO
+
+# Remove command is different for Code Sourcery on Windows
+REMOVE_CMD ?= rm
+
+FLASH_TOOL = OPENOCD
+
+# YES enables -mthumb option to flags for source-files listed
+# in SRC and CPPSRC
+USE_THUMB_MODE = YES
+
+# List of modules to include
+MODULES +=  Actuator ManualControl Stabilization 
+MODULES += AltitudeHold VtolPathFollower FixedWingPathFollower PathPlanner
+MODULES += Attitude/revolution
+#MODULES += OveroSync/simulated
+
+# To run simulation instead of connect to SITL
+MODULES += Sensors/simulated
+
+MODULES += Telemetry
+
+# MCU name, submodel and board
+# - MCU used for compiler-option (-mtune)
+# - MODEL used for linker-script name (-T) and passed as define
+# - BOARD just passed as define (optional)
+MCU      = i686
+#CHIP     = STM32F103RET
+#BOARD    = STM3210E_OP
+MODEL	 = HD
+ifeq ($(USE_BOOTLOADER), YES)
+BOOT_MODEL    = $(MODEL)_BL
+
+else
+BOOT_MODEL    = $(MODEL)_NB
+endif
+
+# Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
+OUTDIR = ../../build/sim_osx
+
+# Target file name (without extension).
+TARGET = Revolution
+
+# Paths
+OPSYSTEM = ./System
+OPSYSTEMINC = $(OPSYSTEM)/inc
+OPUAVTALK = ../UAVTalk
+OPUAVTALKINC = $(OPUAVTALK)/inc
+OPUAVOBJ = ../UAVObjects
+OPUAVOBJINC = $(OPUAVOBJ)/inc
+OPTESTS  = ./Tests
+OPMODULEDIR = ../Modules
+FLIGHTLIB = ../Libraries
+FLIGHTLIBINC = $(FLIGHTLIB)/inc
+PIOS = ../PiOS.osx
+PIOSINC = $(PIOS)/inc
+PIOSPOSIX = $(PIOS)/osx
+APPLIBDIR = $(PIOSPOSIX)/Libraries
+RTOSDIR = $(APPLIBDIR)/FreeRTOS
+RTOSSRCDIR = $(RTOSDIR)/Source
+RTOSINCDIR = $(RTOSSRCDIR)/include
+DOXYGENDIR = ../Doc/Doxygen
+PYMITE = $(FLIGHTLIB)/PyMite
+PYMITELIB = $(PYMITE)/lib
+PYMITEPLAT = $(PYMITE)/platform/openpilot_sitl
+PYMITETOOLS = $(PYMITE)/tools
+PYMITEVM = $(PYMITE)/vm
+PYMITEINC = $(PYMITEVM)
+PYMITEINC += $(PYMITEPLAT)
+PYMITEINC += $(OUTDIR)
+FLIGHTPLANLIB = $(OPMODULEDIR)/FlightPlan/lib
+FLIGHTPLANS = $(OPMODULEDIR)/FlightPlan/flightplans
+
+UAVOBJSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
+UAVOBJPYTHONSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/python
+
+# List C source files here. (C dependencies are automatically generated.)
+# use file-extension c for "c-only"-files
+
+MODNAMES = $(notdir ${MODULES})
+
+ifndef TESTAPP
+
+## PyMite files
+SRC += $(OUTDIR)/pmlib_img.c
+SRC += $(OUTDIR)/pmlib_nat.c
+SRC += $(OUTDIR)/pmlibusr_img.c
+SRC += $(OUTDIR)/pmlibusr_nat.c
+SRC += $(wildcard ${PYMITEVM}/*.c)
+SRC += $(wildcard ${PYMITEPLAT}/*.c)
+
+## MODULES
+SRC += ${foreach MOD, ${MODULES}, ${wildcard ${OPMODULEDIR}/${MOD}/*.c}}
+SRC += ${OUTDIR}/InitMods.c
+## OPENPILOT CORE:
+SRC += ${OPMODULEDIR}/System/systemmod.c
+SRC += $(OPSYSTEM)/revolution.c
+SRC += $(OPSYSTEM)/pios_board_sim.c
+SRC += $(OPSYSTEM)/alarms.c
+SRC += $(OPUAVTALK)/uavtalk.c
+SRC += $(OPUAVOBJ)/uavobjectmanager.c
+SRC += $(OPUAVOBJ)/eventdispatcher.c
+SRC += $(UAVOBJSYNTHDIR)/uavobjectsinit.c
+else
+## TESTCODE
+SRC += $(OPTESTS)/test_common.c
+SRC += $(OPTESTS)/$(TESTAPP).c
+endif
+
+
+
+## UAVOBJECTS
+ifndef TESTAPP
+#include $(UAVOBJSYNTHDIR)/Makefile.inc
+include ./UAVObjects.inc
+
+UAVOBJSRCFILENAMES += attitudesimulated
+UAVOBJSRC = $(foreach UAVOBJSRCFILE,$(UAVOBJSRCFILENAMES),$(UAVOBJSYNTHDIR)/$(UAVOBJSRCFILE).c )
+UAVOBJDEFINE = $(foreach UAVOBJSRCFILE,$(UAVOBJSRCFILENAMES),-DUAVOBJ_INIT_$(UAVOBJSRCFILE) )
+
+SRC += $(UAVOBJSRC)
+CFLAGS_UAVOBJECTS = $(UAVOBJDEFINE)
+endif
+
+## PIOS Hardware (posix)
+SRC += $(PIOSPOSIX)/pios_crc.c
+SRC += $(PIOSPOSIX)/pios_sys.c
+SRC += $(PIOSPOSIX)/pios_led.c
+SRC += $(PIOSPOSIX)/pios_irq.c
+SRC += $(PIOSPOSIX)/pios_delay.c
+SRC += $(PIOSPOSIX)/pios_sdcard.c
+SRC += $(PIOSPOSIX)/pios_udp.c
+SRC += $(PIOSPOSIX)/pios_tcp.c
+SRC += $(PIOSPOSIX)/pios_com.c
+SRC += $(PIOSPOSIX)/pios_servo.c
+SRC += $(PIOSPOSIX)/pios_wdg.c
+SRC += $(PIOSPOSIX)/pios_debug.c
+
+SRC += $(PIOSPOSIX)/pios_rcvr.c
+SRC += $(PIOSPOSIX)/pios_gcsrcvr.c
+
+## Libraries for flight calculations
+SRC += $(FLIGHTLIB)/fifo_buffer.c
+SRC += $(FLIGHTLIB)/WorldMagModel.c
+SRC += $(FLIGHTLIB)/CoordinateConversions.c
+SRC += $(FLIGHTLIB)/paths.c
+SRC += $(FLIGHTLIB)/insgps13state.c
+SRC += $(FLIGHTLIB)/taskmonitor.c
+
+## RTOS and RTOS Portable 
+SRC += $(RTOSSRCDIR)/list.c
+SRC += $(RTOSSRCDIR)/queue.c
+UNAME := $(shell uname)
+SRC += $(RTOSSRCDIR)/task.c
+SRC += $(RTOSSRCDIR)/timers.c
+SRC += $(RTOSSRCDIR)/portable/GCC/Posix/port.c
+SRC += $(RTOSSRCDIR)/portable/MemMang/heap_3.c
+
+
+
+# List C source files here which must be compiled in ARM-Mode (no -mthumb).
+# use file-extension c for "c-only"-files
+## just for testing, timer.c could be compiled in thumb-mode too
+SRCARM =
+
+# List C++ source files here.
+# use file-extension .cpp for C++-files (not .C)
+CPPSRC =
+
+# List C++ source files here which must be compiled in ARM-Mode.
+# use file-extension .cpp for C++-files (not .C)
+#CPPSRCARM = $(TARGET).cpp
+CPPSRCARM =
+
+
+# List any extra directories to look for include files here.
+#    Each directory must be seperated by a space.
+EXTRAINCDIRS  =  $(OPSYSTEM)
+EXTRAINCDIRS  += $(OPSYSTEMINC)
+EXTRAINCDIRS  += $(OPUAVTALK)
+EXTRAINCDIRS  += $(OPUAVTALKINC)
+EXTRAINCDIRS  += $(OPUAVOBJ)
+EXTRAINCDIRS  += $(OPUAVOBJINC)
+EXTRAINCDIRS  += $(UAVOBJSYNTHDIR)
+EXTRAINCDIRS  += $(PIOS)
+EXTRAINCDIRS  += $(PIOSINC)
+EXTRAINCDIRS  += $(FLIGHTLIBINC)
+EXTRAINCDIRS  += $(PIOSPOSIX)
+EXTRAINCDIRS  += $(RTOSINCDIR)
+EXTRAINCDIRS  += $(APPLIBDIR)
+EXTRAINCDIRS  += $(RTOSSRCDIR)/portable/GCC/Posix
+EXTRAINCDIRS  += $(PYMITEINC)
+
+EXTRAINCDIRS += ${foreach MOD, ${MODULES}, $(OPMODULEDIR)/${MOD}/inc} ${OPMODULEDIR}/System/inc
+
+
+# List any extra directories to look for library files here.
+# Also add directories where the linker should search for
+# includes from linker-script to the list
+#     Each directory must be seperated by a space.
+EXTRA_LIBDIRS =
+
+# Extra Libraries
+#    Each library-name must be seperated by a space.
+#    i.e. to link with libxyz.a, libabc.a and libefsl.a:
+#    EXTRA_LIBS = xyz abc efsl
+# for newlib-lpc (file: libnewlibc-lpc.a):
+#    EXTRA_LIBS = newlib-lpc
+EXTRA_LIBS =
+
+# Path to Linker-Scripts
+LINKERSCRIPTPATH = $(PIOSSTM32F10X)
+
+# Optimization level, can be [0, 1, 2, 3, s].
+# 0 = turn off optimization. s = optimize for size.
+# (Note: 3 is not always the best optimization level. See avr-libc FAQ.)
+
+ifeq ($(DEBUG),YES)
+OPT = 0
+else
+OPT = s
+endif
+
+# Output format. (can be ihex or binary or both)
+#  binary to create a load-image in raw-binary format i.e. for SAM-BA,
+#  ihex to create a load-image in Intel hex format
+#LOADFORMAT = ihex
+#LOADFORMAT = binary
+LOADFORMAT = both
+
+# Debugging format.
+#DEBUGF = dwarf-2
+
+# Place project-specific -D (define) and/or
+# -U options for C here.
+ifeq ($(ENABLE_DEBUG_PINS), YES)
+CDEFS += -DPIOS_ENABLE_DEBUG_PINS
+endif
+ifeq ($(ENABLE_AUX_UART), YES)
+CDEFS += -DPIOS_ENABLE_AUX_UART
+endif
+ifeq ($(USE_BOOTLOADER), YES)
+CDEFS += -DUSE_BOOTLOADER
+endif
+
+# Compiler flag to set the C Standard level.
+# c89   - "ANSI" C
+# gnu89 - c89 plus GCC extensions
+# c99   - ISO C99 standard (not yet fully implemented)
+# gnu99 - c99 plus GCC extensions
+CSTANDARD = -std=gnu99
+
+#-----
+
+# Compiler flags.
+
+#  -g*:          generate debugging information
+#  -O*:          optimization level
+#  -f...:        tuning, see GCC manual and avr-libc documentation
+#  -Wall...:     warning level
+#  -Wa,...:      tell GCC to pass this to the assembler.
+#    -adhlns...: create assembler listing
+#
+# Flags for C and C++ (arm-elf-gcc/arm-elf-g++)
+
+ifeq ($(DEBUG),YES)
+CFLAGS = -g$(DEBUGF) -DDEBUG
+endif
+
+CFLAGS += -DDIAGNOSTICS
+CFLAGS += -DDIAG_TASKS
+
+CFLAGS += $(CFLAGS_UAVOBJECTS)
+CFLAGS += -DARCH_POSIX
+CFLAGS += -O$(OPT)
+CFLAGS += -mtune=$(MCU)
+CFLAGS += $(CDEFS)
+CFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS)) -I.
+
+#CFLAGS += ARCH=arm 
+#CROSS_COMPILE=/usr/local/android-ndk-r5/toolchains/arm-linux-androideabi-4.4.3/prebuilt/darwin-x86/bin/arm-linux-androideabi-
+
+CFLAGS += -fomit-frame-pointer
+ifeq ($(CODE_SOURCERY), YES)
+CFLAGS += -fpromote-loop-indices
+endif
+
+CFLAGS += -Wall
+CFLAGS += -Werror
+# Compiler flags to generate dependency files:
+CFLAGS += -MD -MP -MF $(OUTDIR)/dep/$(@F).d
+
+# flags only for C
+#CONLYFLAGS += -Wnested-externs
+CONLYFLAGS += $(CSTANDARD)
+
+# Assembler flags.
+#  -Wa,...:    tell GCC to pass this to the assembler.
+#  -ahlns:     create listing
+ASFLAGS  = -mtune=$(MCU) -I. -x assembler-with-cpp
+ASFLAGS += $(ADEFS)
+ASFLAGS += -Wa,-adhlns=$(addprefix $(OUTDIR)/, $(notdir $(addsuffix .lst, $(basename $<))))
+ASFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS))
+
+MATH_LIB = -lm
+
+# Linker flags.
+#  -Wl,...:     tell GCC to pass this to linker.
+#    -Map:      create map file
+#    --cref:    add cross reference to  map file
+LDFLAGS += -lpthread 
+LDFLAGS += $(patsubst %,-L%,$(EXTRA_LIBDIRS))
+LDFLAGS += -lc
+LDFLAGS += $(patsubst %,-l%,$(EXTRA_LIBS))
+LDFLAGS += $(MATH_LIB)
+LDFLAGS += -lc -lgcc
+
+# To include simulation model
+LDFLAGS += -L$(OUTDIR) 
+#LDFLAGS += -lsimmodel
+
+
+# Define programs and commands.
+CC      = $(TCHAIN_PREFIX)gcc
+CPP     = $(TCHAIN_PREFIX)g++
+AR      = $(TCHAIN_PREFIX)ar
+OBJCOPY = $(TCHAIN_PREFIX)objcopy
+OBJDUMP = $(TCHAIN_PREFIX)objdump
+SIZE    = $(TCHAIN_PREFIX)size
+NM      = $(TCHAIN_PREFIX)nm
+REMOVE  = $(REMOVE_CMD) -f
+PYTHON  = python
+###SHELL   = sh
+###COPY    = cp
+
+
+
+# Define Messages
+# English
+MSG_ERRORS_NONE = Errors: none
+MSG_BEGIN = ${quote}-------- begin (mode: $(RUN_MODE)) --------${quote}
+MSG_END = ${quote}--------  end  --------${quote}
+MSG_MODINIT = ${quote}**** Generating ModInit.c${quote}
+MSG_SIZE_BEFORE = ${quote}Size before:${quote}
+MSG_SIZE_AFTER = ${quote}Size after build:${quote}
+MSG_LOAD_FILE = ${quote}Creating load file:${quote}
+MSG_EXTENDED_LISTING = ${quote}Creating Extended Listing/Disassembly:${quote}
+MSG_SYMBOL_TABLE = ${quote}Creating Symbol Table:${quote}
+MSG_LINKING = ${quote}**** Linking :${quote}
+MSG_COMPILING = ${quote}**** Compiling C :${quote}
+MSG_COMPILING_ARM = ${quote}**** Compiling C (ARM-only):${quote}
+MSG_COMPILINGCPP = ${quote}Compiling C++ :${quote}
+MSG_COMPILINGCPP_ARM = ${quote}Compiling C++ (ARM-only):${quote}
+MSG_ASSEMBLING = ${quote}**** Assembling:${quote}
+MSG_ASSEMBLING_ARM = ${quote}****Assembling (ARM-only):${quote}
+MSG_CLEANING = ${quote}Cleaning project:${quote}
+MSG_FORMATERROR = ${quote}Can not handle output-format${quote}
+MSG_ASMFROMC = ${quote}Creating asm-File from C-Source:${quote}
+MSG_ASMFROMC_ARM = ${quote}Creating asm-File from C-Source (ARM-only):${quote}
+MSG_PYMITEINIT = ${quote}**** Generating PyMite intermediate code${quote}
+
+# List of all source files.
+ALLSRC     = $(ASRCARM) $(ASRC) $(SRCARM) $(SRC) $(CPPSRCARM) $(CPPSRC)
+# List of all source files without directory and file-extension.
+ALLSRCBASE = $(notdir $(basename $(ALLSRC)))
+
+# Define all object files.
+ALLOBJ     = $(addprefix $(OUTDIR)/, $(addsuffix .o, $(ALLSRCBASE)))
+
+# Define all listing files (used for make clean).
+LSTFILES   = $(addprefix $(OUTDIR)/, $(addsuffix .lst, $(ALLSRCBASE)))
+# Define all depedency-files (used for make clean).
+DEPFILES   = $(addprefix $(OUTDIR)/dep/, $(addsuffix .o.d, $(ALLSRCBASE)))
+
+elf: $(OUTDIR)/$(TARGET).elf
+lss: $(OUTDIR)/$(TARGET).lss
+sym: $(OUTDIR)/$(TARGET).sym
+hex: $(OUTDIR)/$(TARGET).hex
+bin: $(OUTDIR)/$(TARGET).bin
+
+# Default target.
+#all: begin gccversion sizebefore build sizeafter finished end
+#all: begin gencode gccversion build sizeafter finished end
+all: elf
+
+ifeq ($(LOADFORMAT),ihex)
+build: elf hex lss sym
+else
+ifeq ($(LOADFORMAT),binary)
+build: elf bin lss sym
+else
+ifeq ($(LOADFORMAT),both)
+build: elf hex bin lss sym
+else
+$(error "$(MSG_FORMATERROR) $(FORMAT)")
+endif
+endif
+endif
+
+# Test if quotes are needed for the echo-command
+result = ${shell echo "test"}
+ifeq (${result}, test)
+	quote = '
+else
+	quote =
+endif
+
+# Generate intermediate code
+gencode: ${OUTDIR}/InitMods.c ${OUTDIR}/pmlib_img.c ${OUTDIR}/pmlib_nat.c ${OUTDIR}/pmlibusr_img.c ${OUTDIR}/pmlibusr_nat.c ${OUTDIR}/pmfeatures.h 
+
+getmodname = $(firstword $(subst /, ,$1))
+
+MOD_GEN := $(foreach MOD,$(MODULES),$(call getmodname,$(MOD)))
+
+# Generate code for module initialization
+${OUTDIR}/InitMods.c: Makefile.osx
+	echo ${MOD_GEN}
+	@echo ${MSG_MODINIT}
+	@echo ${quote}// Autogenerated file${quote} > ${OUTDIR}/InitMods.c
+	@echo ${quote}${foreach MOD, ${MOD_GEN}, extern unsigned int ${MOD}Initialize(void);}${quote}  >> ${OUTDIR}/InitMods.c
+	@echo ${quote}${foreach MOD, ${MOD_GEN}, extern unsigned int ${MOD}Start(void);}${quote}  >> ${OUTDIR}/InitMods.c
+	@echo ${quote}void InitModules() {${quote} >> ${OUTDIR}/InitMods.c
+	@echo ${quote}${foreach MOD, ${MOD_GEN}, ${MOD}Initialize();}${quote}  >> ${OUTDIR}/InitMods.c
+	@echo ${quote}}${quote} >> ${OUTDIR}/InitMods.c
+	@echo ${quote}void StartModules() {${quote} >> ${OUTDIR}/InitMods.c
+	@echo ${quote}${foreach MOD, ${MOD_GEN}, ${MOD}Start();}${quote}  >> ${OUTDIR}/InitMods.c
+	@echo ${quote}}${quote} >> ${OUTDIR}/InitMods.c
+
+# Generate code for PyMite
+${OUTDIR}/pmlib_img.c ${OUTDIR}/pmlib_nat.c ${OUTDIR}/pmlibusr_img.c ${OUTDIR}/pmlibusr_nat.c ${OUTDIR}/pmfeatures.h: $(wildcard ${PYMITELIB}/*.py) $(wildcard ${PYMITEPLAT}/*.py) $(wildcard ${FLIGHTPLANLIB}/*.py) $(wildcard ${FLIGHTPLANS}/*.py) $(wildcard $(UAVOBJPYTHONSYNTHDIR)/*.py)
+	@echo ${MSG_PYMITEINIT}
+	@$(PYTHON) $(PYMITETOOLS)/pmImgCreator.py -f $(PYMITEPLAT)/pmfeatures.py -c -s --memspace=flash -o $(OUTDIR)/pmlib_img.c --native-file=$(OUTDIR)/pmlib_nat.c $(PYMITELIB)/list.py $(PYMITELIB)/dict.py $(PYMITELIB)/__bi.py $(PYMITELIB)/sys.py $(PYMITELIB)/string.py $(wildcard $(FLIGHTPLANLIB)/*.py) $(wildcard $(UAVOBJPYTHONSYNTHDIR)/*.py)
+	@$(PYTHON) $(PYMITETOOLS)/pmGenPmFeatures.py $(PYMITEPLAT)/pmfeatures.py > $(OUTDIR)/pmfeatures.h
+	@$(PYTHON) $(PYMITETOOLS)/pmImgCreator.py -f $(PYMITEPLAT)/pmfeatures.py -c -u -o $(OUTDIR)/pmlibusr_img.c --native-file=$(OUTDIR)/pmlibusr_nat.c $(FLIGHTPLANS)/test.py
+
+# Eye candy.
+begin:
+##	@echo
+	@echo $(MSG_BEGIN)
+
+finished:
+##	@echo $(MSG_ERRORS_NONE)
+
+end:
+	@echo $(MSG_END)
+##	@echo
+
+# Display sizes of sections.
+ELFSIZE = $(SIZE) -A  $(OUTDIR)/$(TARGET).elf
+##ELFSIZE = $(SIZE) --format=Berkeley --common $(OUTDIR)/$(TARGET).elf
+sizebefore:
+#	@if [ -f  $(OUTDIR)/$(TARGET).elf ]; then echo; echo $(MSG_SIZE_BEFORE); $(ELFSIZE); echo; fi
+
+sizeafter:
+#	@if [ -f  $(OUTDIR)/$(TARGET).elf ]; then echo; echo $(MSG_SIZE_AFTER); $(ELFSIZE); echo; fi
+	@echo $(MSG_SIZE_AFTER)
+	$(ELFSIZE)
+
+# Display compiler version information.
+gccversion :
+	@$(CC) --version
+#	@echo $(ALLOBJ)
+
+# Program the device.
+ifeq ($(USE_BOOTLOADER), YES)
+# Program the device with OP Upload Tool".
+program: $(OUTDIR)/$(TARGET).bin
+	@echo ${quote}Programming with OP Upload Tool${quote}
+	../../ground/src/experimental/upload-build-desktop/debug/OPUploadTool -d 0 -p $(OUTDIR)/$(TARGET).bin
+else
+ifeq ($(FLASH_TOOL),OPENOCD)
+# Program the device with Dominic Rath's OPENOCD in "batch-mode", needs cfg and "reset-script".
+program: $(OUTDIR)/$(TARGET).elf
+	@echo ${quote}Programming with OPENOCD${quote}
+	$(OOCD_EXE) $(OOCD_CL)
+endif
+endif
+
+# Create final output file (.hex) from ELF output file.
+%.hex: %.elf
+##	@echo
+	@echo $(MSG_LOAD_FILE) $@
+	$(OBJCOPY) -O ihex $< $@
+
+# Create final output file (.bin) from ELF output file.
+%.bin: %.elf
+##	@echo
+	@echo $(MSG_LOAD_FILE) $@
+	$(OBJCOPY) -O binary $< $@
+
+# Create extended listing file/disassambly from ELF output file.
+# using objdump testing: option -C
+%.lss: %.elf
+##	@echo
+	@echo $(MSG_EXTENDED_LISTING) $@
+	$(OBJDUMP) -h -S -C -r $< > $@
+#	$(OBJDUMP) -x -S $< > $@
+
+# Create a symbol table from ELF output file.
+%.sym: %.elf
+##	@echo
+	@echo $(MSG_SYMBOL_TABLE) $@
+	$(NM) -n $< > $@
+
+# Link: create ELF output file from object files.
+.SECONDARY : $(TARGET).elf
+.PRECIOUS : $(ALLOBJ)
+%.elf:  $(ALLOBJ)
+	@echo $(MSG_LINKING) $@
+# use $(CC) for C-only projects or $(CPP) for C++-projects:
+	$(CC) $(THUMB) $(CFLAGS) $(ALLOBJ) --output $@ $(LDFLAGS)
+#	$(CPP) $(THUMB) $(CFLAGS) $(ALLOBJ) --output $@ $(LDFLAGS)
+
+ 
+# Assemble: create object files from assembler source files.
+define ASSEMBLE_TEMPLATE
+$(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
+##	@echo
+	@echo $(MSG_ASSEMBLING) $$<  to  $$@
+	$(CC) -c $(THUMB) $$(ASFLAGS) $$< -o $$@
+endef
+$(foreach src, $(ASRC), $(eval $(call ASSEMBLE_TEMPLATE, $(src))))
+
+# Assemble: create object files from assembler source files. ARM-only
+define ASSEMBLE_ARM_TEMPLATE
+$(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
+##	@echo
+	@echo $(MSG_ASSEMBLING_ARM) $$<  to  $$@
+	$(CC) -c $$(ASFLAGS) $$< -o $$@
+endef
+$(foreach src, $(ASRCARM), $(eval $(call ASSEMBLE_ARM_TEMPLATE, $(src))))
+
+
+# Compile: create object files from C source files.
+define COMPILE_C_TEMPLATE
+$(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
+##	@echo
+	@echo $(MSG_COMPILING) $$<  to  $$@
+	$(CC) -c $(THUMB) $$(CFLAGS) $$(CONLYFLAGS) $$< -o $$@
+endef
+$(foreach src, $(SRC), $(eval $(call COMPILE_C_TEMPLATE, $(src))))
+
+# Compile: create object files from C source files. ARM-only
+define COMPILE_C_ARM_TEMPLATE
+$(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
+##	@echo
+	@echo $(MSG_COMPILING_ARM) $$<  to  $$@
+	$(CC) -c $$(CFLAGS) $$(CONLYFLAGS) $$< -o $$@
+endef
+$(foreach src, $(SRCARM), $(eval $(call COMPILE_C_ARM_TEMPLATE, $(src))))
+
+
+# Compile: create object files from C++ source files.
+define COMPILE_CPP_TEMPLATE
+$(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
+##	@echo
+	@echo $(MSG_COMPILINGCPP) $$<  to  $$@
+	$(CC) -c $(THUMB) $$(CFLAGS) $$(CPPFLAGS) $$< -o $$@
+endef
+$(foreach src, $(CPPSRC), $(eval $(call COMPILE_CPP_TEMPLATE, $(src))))
+
+# Compile: create object files from C++ source files. ARM-only
+define COMPILE_CPP_ARM_TEMPLATE
+$(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
+##	@echo
+	@echo $(MSG_COMPILINGCPP_ARM) $$<  to  $$@
+	$(CC) -c $$(CFLAGS) $$(CPPFLAGS) $$< -o $$@
+endef
+$(foreach src, $(CPPSRCARM), $(eval $(call COMPILE_CPP_ARM_TEMPLATE, $(src))))
+
+
+# Compile: create assembler files from C source files. ARM/Thumb
+$(SRC:.c=.s) : %.s : %.c
+	@echo $(MSG_ASMFROMC) $< to $@
+	$(CC) $(THUMB) -S $(CFLAGS) $(CONLYFLAGS) $< -o $@
+
+# Compile: create assembler files from C source files. ARM only
+$(SRCARM:.c=.s) : %.s : %.c
+	@echo $(MSG_ASMFROMC_ARM) $< to $@
+	$(CC) -S $(CFLAGS) $(CONLYFLAGS) $< -o $@
+
+# Generate Doxygen documents
+docs:
+	doxygen  $(DOXYGENDIR)/doxygen.cfg
+
+# Target: clean project.
+clean: begin clean_list finished end
+
+clean_list :
+##	@echo
+	@echo $(MSG_CLEANING)
+	$(REMOVE) $(OUTDIR)/$(TARGET).map
+	$(REMOVE) $(OUTDIR)/$(TARGET).elf
+	$(REMOVE) $(OUTDIR)/$(TARGET).hex
+	$(REMOVE) $(OUTDIR)/$(TARGET).bin
+	$(REMOVE) $(OUTDIR)/$(TARGET).sym
+	$(REMOVE) $(OUTDIR)/$(TARGET).lss
+	$(REMOVE) $(wildcard $(OUTDIR)/*.c)
+	$(REMOVE) $(wildcard $(OUTDIR)/*.h)
+	$(REMOVE) $(ALLOBJ)
+	$(REMOVE) $(LSTFILES)
+	$(REMOVE) $(DEPFILES)
+	$(REMOVE) $(SRC:.c=.s)
+	$(REMOVE) $(SRCARM:.c=.s)
+	$(REMOVE) $(CPPSRC:.cpp=.s)
+	$(REMOVE) $(CPPSRCARM:.cpp=.s)
+
+
+# Create output files directory
+# all known MS Windows OS define the ComSpec environment variable
+ifdef ComSpec
+$(shell md $(OUTDIR) 2>NUL)
+else
+$(shell mkdir $(OUTDIR) 2>/dev/null)
+endif
+
+# Include the dependency files.
+ifdef ComSpec
+-include $(shell md $(OUTDIR)\dep 2>NUL) $(wildcard $(OUTDIR)/dep/*)
+else
+-include $(shell mkdir $(OUTDIR) 2>/dev/null) $(shell mkdir $(OUTDIR)/dep 2>/dev/null) $(wildcard $(OUTDIR)/dep/*)
+endif
+
+
+
+# Listing of phony targets.
+.PHONY : all begin finish end sizebefore sizeafter gccversion \
+build elf hex bin lss sym clean clean_list program gencode
+

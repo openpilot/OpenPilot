@@ -1175,16 +1175,17 @@ uint8_t rfm22_txStart()
 	}
 
 	exec_using_spi = true;
-	rfm22_claimBus();
 
 	// Initialize the supervisor timer.
 	rfm22b_dev_g->supv_timer = PIOS_RFM22B_SUPERVISOR_TIMEOUT;
 
 	// disable interrupts
-	rfm22_write_noclaim(RFM22_interrupt_enable1, 0x00);
-	rfm22_write_noclaim(RFM22_interrupt_enable2, 0x00);
+	rfm22_write(RFM22_interrupt_enable1, 0x00);
+	rfm22_write(RFM22_interrupt_enable2, 0x00);
+
 	// TUNE mode
-	rfm22_write_noclaim(RFM22_op_and_func_ctrl1, RFM22_opfc1_pllon);
+	rfm22_write(RFM22_op_and_func_ctrl1, RFM22_opfc1_pllon);
+
 	// Queue the data up for sending
 	memcpy(tx_buffer, tx_pre_buffer, tx_pre_buffer_size);
 	tx_data_rd = 0;
@@ -1195,35 +1196,41 @@ uint8_t rfm22_txStart()
 
 	// Set the destination address in the transmit header.
 	// The destination address is the first 4 bytes of the message.
-	// TODO: Block transfer
-	rfm22_write_noclaim(RFM22_transmit_header0, tx_buffer[0]);
-	rfm22_write_noclaim(RFM22_transmit_header1, tx_buffer[1]);
-	rfm22_write_noclaim(RFM22_transmit_header2, tx_buffer[2]);
-	rfm22_write_noclaim(RFM22_transmit_header3, tx_buffer[3]);
+	rfm22_write(RFM22_transmit_header0, tx_buffer[0]);
+	rfm22_write(RFM22_transmit_header1, tx_buffer[1]);
+	rfm22_write(RFM22_transmit_header2, tx_buffer[2]);
+	rfm22_write(RFM22_transmit_header3, tx_buffer[3]);
 
 	// FIFO mode, GFSK modulation
-	uint8_t fd_bit = rfm22_read_noclaim(RFM22_modulation_mode_control2) & RFM22_mmc2_fd;
-	rfm22_write_noclaim(RFM22_modulation_mode_control2, fd_bit | RFM22_mmc2_dtmod_fifo |
+	uint8_t fd_bit = rfm22_read(RFM22_modulation_mode_control2) & RFM22_mmc2_fd;
+	rfm22_write(RFM22_modulation_mode_control2, fd_bit | RFM22_mmc2_dtmod_fifo |
 		    RFM22_mmc2_modtyp_gfsk);
 
-
-	// Set the tx power
-	// TODO: Only set the power when it changes and remove this
-	rfm22_write_noclaim(RFM22_tx_power, RFM22_tx_pwr_papeaken | RFM22_tx_pwr_papeaklvl_1 |
+	// set the tx power
+	rfm22_write(RFM22_tx_power, RFM22_tx_pwr_papeaken | RFM22_tx_pwr_papeaklvl_1 |
 		    RFM22_tx_pwr_papeaklvl_0 | RFM22_tx_pwr_lna_sw | tx_power);
 
 	// clear FIFOs
-	rfm22_write_noclaim(RFM22_op_and_func_ctrl2, RFM22_opfc2_ffclrrx | RFM22_opfc2_ffclrtx);
-	rfm22_write_noclaim(RFM22_op_and_func_ctrl2, 0x00);
+	rfm22_write(RFM22_op_and_func_ctrl2, RFM22_opfc2_ffclrrx | RFM22_opfc2_ffclrtx);
+	rfm22_write(RFM22_op_and_func_ctrl2, 0x00);
 
+	// *******************
 	// add some data to the chips TX FIFO before enabling the transmitter
+
+	// set the total number of data bytes we are going to transmit
+	rfm22_write(RFM22_transmit_packet_length, tx_data_wr);
+
+	// add some data
+	rfm22_claimBus();
+	PIOS_SPI_TransferByte(PIOS_RFM22_SPI_PORT, RFM22_fifo_access | 0x80);
 	int bytes_to_write = (tx_data_wr - tx_data_rd);
 	bytes_to_write = (bytes_to_write > FIFO_SIZE) ? FIFO_SIZE:  bytes_to_write;
-	rfm22_write_noclaim(RFM22_transmit_packet_length, bytes_to_write);
-	PIOS_SPI_RC_PinSet(PIOS_RFM22_SPI_PORT, 0, 0);
-	PIOS_SPI_TransferByte(PIOS_RFM22_SPI_PORT, RFM22_fifo_access | 0x80);
-	tx_data_rd +=PIOS_SPI_TransferBlock(PIOS_RFM22_SPI_PORT, &tx_buffer[tx_data_rd], NULL, bytes_to_write, NULL);
-	PIOS_SPI_RC_PinSet(PIOS_RFM22_SPI_PORT, 0, 1);
+	PIOS_SPI_TransferBlock(PIOS_RFM22_SPI_PORT, &tx_buffer[tx_data_rd], NULL, bytes_to_write, NULL);
+	tx_data_rd += bytes_to_write;
+	rfm22_releaseBus();
+
+
+	// *******************
 
 	// reset the timer
 	rfm22_int_timer = 0;
@@ -1231,15 +1238,14 @@ uint8_t rfm22_txStart()
 	rf_mode = TX_DATA_MODE;
 
 	// enable TX interrupts
-	rfm22_write_noclaim(RFM22_interrupt_enable1, RFM22_ie1_enpksent | RFM22_ie1_entxffaem);
+	rfm22_write(RFM22_interrupt_enable1, RFM22_ie1_enpksent | RFM22_ie1_entxffaem);
+
 	// enable the transmitter
-	rfm22_write_noclaim(RFM22_op_and_func_ctrl1, RFM22_opfc1_pllon | RFM22_opfc1_txon);
+	rfm22_write(RFM22_op_and_func_ctrl1, RFM22_opfc1_pllon | RFM22_opfc1_txon);
 
 	TX_LED_ON;
 
-	rfm22_releaseBus();
 	exec_using_spi = false;
-
 	return 1;
 }
 
@@ -1333,7 +1339,6 @@ static void rfm22_setTxMode(uint8_t mode)
 	rfm22_write_noclaim(RFM22_op_and_func_ctrl1, RFM22_opfc1_pllon | RFM22_opfc1_txon);
 
 	rfm22_releaseBus();
-
 	TX_LED_ON;
 }
 

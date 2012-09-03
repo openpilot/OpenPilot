@@ -35,14 +35,15 @@ public:
     bool generate(UAVObjectParser* gen,QString templatepath,QString outputpath);
 
 private:
-    bool process_object(ObjectInfo* info);
-    QString matlabAllocationCode;
+    bool process_object(ObjectInfo* info, int numBytes);
+    QString matlabInstantiationCode;
     QString matlabSwitchCode;
     QString matlabCleanupCode;
+    QString matlabAllocationCode;
     QString matlabSaveObjectsCode;
     QString matlabExportCsvCode;
-    QString matlabFunctionsCode;
     QStringList fieldTypeStrMatlab;
+    QStringList fieldSizeStrMatlab;
 
 };
 

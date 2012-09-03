@@ -33,6 +33,7 @@
 #include <coreplugin/icore.h>
 #include <coreplugin/connectionmanager.h>
 #include "vehicleconfigurationsource.h"
+#include "vehicleconfigurationhelper.h"
 
 
 class SetupWizard : public QWizard, public VehicleConfigurationSource
@@ -62,9 +63,9 @@ public:
     bool isLevellingPerformed() const { return m_levellingPerformed; }
     accelGyroBias getLevellingBias() const { return m_levellingBias; }
 
-    void setActuatorNeutralSettings(QList<quint16> neutralSettings) { m_actuatorNeutralConfig = neutralSettings; }
+    void setActuatorSettings(actuatorSettings neutralSettings) { m_actuatorNeutralConfig = neutralSettings; }
     bool isMotorCalibrationPerformed() const { return m_motorCalibrationPerformed; }
-    QList<quint16> getActuatorNeutralSettings() const { return m_actuatorNeutralConfig; }
+    actuatorSettings getActuatorSettings() const { return m_actuatorNeutralConfig; }
 
     QString getSummaryText();
 
@@ -87,11 +88,12 @@ private:
     VEHICLE_SUB_TYPE m_vehicleSubType;
     INPUT_TYPE m_inputType;
     ESC_TYPE m_escType;
+
     bool m_levellingPerformed;
     accelGyroBias m_levellingBias;
 
     bool m_motorCalibrationPerformed;
-    QList<quint16> m_actuatorNeutralConfig;
+    actuatorSettings m_actuatorNeutralConfig;
 
     Core::ConnectionManager *m_connectionManager;
 };

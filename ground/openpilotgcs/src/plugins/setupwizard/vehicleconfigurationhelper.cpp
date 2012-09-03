@@ -35,6 +35,9 @@
 #include "manualcontrolsettings.h"
 #include "stabilizationsettings.h"
 
+const qint16 VehicleConfigurationHelper::LEGACY_ESC_FREQUENCE = 50;
+const qint16 VehicleConfigurationHelper::RAPID_ESC_FREQUENCE = 400;
+
 VehicleConfigurationHelper::VehicleConfigurationHelper(VehicleConfigurationSource *configSource)
     : m_configSource(configSource), m_uavoManager(0),
       m_transactionOK(false), m_transactionTimeout(false), m_currentTransactionObjectID(-1),
@@ -177,30 +180,27 @@ void VehicleConfigurationHelper::applyVehicleConfiguration()
 void VehicleConfigurationHelper::applyActuatorConfiguration()
 {
     ActuatorSettings* actSettings = ActuatorSettings::GetInstance(m_uavoManager);
-    switch(m_configSource->getVehicleType())
-    {
-        case VehicleConfigurationSource::VEHICLE_MULTI:
-        {
+    switch(m_configSource->getVehicleType()) {
+        case VehicleConfigurationSource::VEHICLE_MULTI: {
             ActuatorSettings::DataFields data = actSettings->getData();
 
+            actuatorSettings actuatorSettings = m_configSource->getActuatorSettings();
+            for(quint16 i = 0; i < ActuatorSettings::CHANNELMAX_NUMELEM; i++) {
+                data.ChannelType[i] = ActuatorSettings::CHANNELTYPE_PWM;
+                data.ChannelAddr[i] = i;
+                data.ChannelMin[i] = actuatorSettings.channels[i].channelMin;
+                data.ChannelNeutral[i] = actuatorSettings.channels[i].channelNeutral;
+                data.ChannelMax[i] = actuatorSettings.channels[i].channelMax;
+            }
+
+            data.MotorsSpinWhileArmed = ActuatorSettings::MOTORSSPINWHILEARMED_FALSE;
 
             for(quint16 i = 0; i < ActuatorSettings::CHANNELUPDATEFREQ_NUMELEM; i++) {
                 data.ChannelUpdateFreq[i] = LEGACY_ESC_FREQUENCE;
             }
 
-            for(quint16 i = 0; i < ActuatorSettings::CHANNELMAX_NUMELEM; i++) {
-                data.ChannelType[i] = ActuatorSettings::CHANNELTYPE_PWM;
-                data.ChannelAddr[i] = i;
-                data.ChannelMin[i] = ACTUATOR_MIN;
-                data.ChannelNeutral[i] = ACTUATOR_NEUTRAL;
-                data.ChannelMax[i] = ACTUATOR_MAX;
-            }
-
-            data.MotorsSpinWhileArmed = ActuatorSettings::MOTORSSPINWHILEARMED_FALSE;
-
             qint16 updateFrequence = LEGACY_ESC_FREQUENCE;
-            switch(m_configSource->getESCType())
-            {
+            switch(m_configSource->getESCType()) {
                 case VehicleConfigurationSource::ESC_LEGACY:
                     updateFrequence = LEGACY_ESC_FREQUENCE;
                     break;
@@ -211,8 +211,7 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
                     break;
             }
 
-            switch(m_configSource->getVehicleSubType())
-            {
+            switch(m_configSource->getVehicleSubType()) {
                 case VehicleConfigurationSource::MULTI_ROTOR_TRI_Y:
                     data.ChannelUpdateFreq[0] = updateFrequence;
                     break;

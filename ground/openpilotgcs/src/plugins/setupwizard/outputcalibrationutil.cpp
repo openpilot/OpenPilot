@@ -28,6 +28,9 @@
 #include "outputcalibrationutil.h"
 #include "actuatorcommand.h"
 #include "extensionsystem/pluginmanager.h"
+#include "vehicleconfigurationhelper.h"
+
+const quint16 OutputCalibrationUtil::UPDATE_CHANNEL_MAPPING[10] = {1, 1, 1, 2, 3, 4, 3, 3, 4, 4};
 
 OutputCalibrationUtil::OutputCalibrationUtil(QObject *parent) :
     QObject(parent), m_outputChannel(0)
@@ -37,21 +40,39 @@ OutputCalibrationUtil::OutputCalibrationUtil(QObject *parent) :
     Q_ASSERT(m_uavObjectManager);
 }
 
-void OutputCalibrationUtil::startChannelOutput(quint16 channel)
+void OutputCalibrationUtil::startChannelOutput(quint16 escUpdateRate, quint16 channel)
 {
     if(m_outputChannel == 0 && channel > 0 && channel <= ActuatorCommand::CHANNEL_NUMELEM)
     {
+        //Set actuator settings for channel
+        ActuatorSettings *actuatorSettings = ActuatorSettings::GetInstance(m_uavObjectManager);
+        Q_ASSERT(actuatorSettings);
+        ActuatorSettings::DataFields data = actuatorSettings->getData();
+        m_savedActuatorSettingData = data;
+
+        quint16 actuatorChannel = channel - 1;
+        data.ChannelType[actuatorChannel] = ActuatorSettings::CHANNELTYPE_PWM;
+        data.ChannelAddr[actuatorChannel] = actuatorChannel;
+        data.ChannelMin[actuatorChannel] = 1000;
+        data.ChannelNeutral[actuatorChannel] = 1000;
+        data.ChannelMax[actuatorChannel] = 2000;
+
+        data.ChannelUpdateFreq[UPDATE_CHANNEL_MAPPING[actuatorChannel]] = escUpdateRate;
+
+        actuatorSettings->setData(data);
+
         ActuatorCommand *actuatorCommand = ActuatorCommand::GetInstance(m_uavObjectManager);
         Q_ASSERT(actuatorCommand);
         UAVObject::Metadata metaData = actuatorCommand->getMetadata();
+        m_savedActuatorCommandMetadata = metaData;
 
-        m_savedActuatorMetadata = metaData;
+        //Enable actuator control from GCS...
+        //Store current metadata for later restore
         UAVObject::SetFlightAccess(metaData, UAVObject::ACCESS_READONLY);
         UAVObject::SetFlightTelemetryUpdateMode(metaData, UAVObject::UPDATEMODE_ONCHANGE);
         UAVObject::SetGcsTelemetryAcked(metaData, false);
         UAVObject::SetGcsTelemetryUpdateMode(metaData, UAVObject::UPDATEMODE_ONCHANGE);
         metaData.gcsTelemetryUpdatePeriod = 100;
-
         actuatorCommand->setMetadata(metaData);
         actuatorCommand->updated();
 
@@ -65,14 +86,16 @@ void OutputCalibrationUtil::stopChannelOutput()
     if(m_outputChannel > 0)
     {
         //Stop output...
+        // Restore metadata to what it was before
         ActuatorCommand *actuatorCommand = ActuatorCommand::GetInstance(m_uavObjectManager);
         Q_ASSERT(actuatorCommand);
-        UAVObject::Metadata metaData = actuatorCommand->getMetadata();
-
-        // Restore metadata to what it was before
-        metaData = m_savedActuatorMetadata;
-        actuatorCommand->setMetadata(metaData);
+        actuatorCommand->setMetadata(m_savedActuatorCommandMetadata);
         actuatorCommand->updated();
+
+        ActuatorSettings *actuatorSettings = ActuatorSettings::GetInstance(m_uavObjectManager);
+        Q_ASSERT(actuatorSettings);
+        actuatorSettings->setData(m_savedActuatorSettingData);
+        actuatorSettings->updated();
 
         m_outputChannel = 0;
     }

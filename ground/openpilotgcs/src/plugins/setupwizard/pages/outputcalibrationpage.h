@@ -32,6 +32,7 @@
 #include "abstractwizardpage.h"
 #include "setupwizard.h"
 #include "outputcalibrationutil.h"
+#include "vehicleconfigurationhelper.h"
 
 namespace Ui {
 class OutputCalibrationPage;
@@ -73,6 +74,11 @@ private:
     void setupVehicleHighlightedPart();
     void setWizardPage();
 
+    quint16 getEscUpdateRate(){ return getWizard()->getESCType() == VehicleConfigurationSource::ESC_RAPID ?
+                    VehicleConfigurationHelper::RAPID_ESC_FREQUENCE : VehicleConfigurationHelper::LEGACY_ESC_FREQUENCE; }
+
+    quint16 getServoUpdateRate(){ return VehicleConfigurationHelper::LEGACY_ESC_FREQUENCE; }
+
     Ui::OutputCalibrationPage *ui;
     QSvgRenderer *m_vehicleRenderer;
     QGraphicsScene *m_vehicleScene;
@@ -84,6 +90,7 @@ private:
     QList<QGraphicsSvgItem*> m_vehicleItems;
     QList<quint16> m_vehicleHighlightElementIndexes;
     QList<quint16> m_wizardIndexes;
+    QList<quint16> m_channelUpdateRates;
 
     OutputCalibrationUtil *m_calibrationUtil;
 

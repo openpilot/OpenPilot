@@ -67,31 +67,43 @@ void OutputCalibrationPage::setupVehicle()
             m_wizardIndexes << 0 << 1 << 2 << 1 << 2 << 1 << 2 << 3 << 4;
             m_vehicleElementIds << "tri" << "tri-frame" << "tri-m1" << "tri-m2" << "tri-m3" << "tri-s1";
             m_vehicleHighlightElementIndexes << 0 << 1 << 1 << 2 << 2 << 3 << 3 << 4 << 4;
+            m_channelUpdateRates << getEscUpdateRate() << getEscUpdateRate() << getEscUpdateRate() << getServoUpdateRate();
             break;
         case SetupWizard::MULTI_ROTOR_QUAD_X:
             m_wizardIndexes << 0 << 1 << 2 << 1 << 2 << 1 << 2 << 1 << 2;
             m_vehicleElementIds << "quad-x" << "quad-x-frame" << "quad-x-m1" << "quad-x-m2" << "quad-x-m3" << "quad-x-m4";
             m_vehicleHighlightElementIndexes << 0 << 1 << 1 << 2 << 2 << 3 << 3 << 4 << 4;
+            m_channelUpdateRates << getEscUpdateRate() << getEscUpdateRate() << getEscUpdateRate() << getEscUpdateRate();
             break;
         case SetupWizard::MULTI_ROTOR_QUAD_PLUS:
             m_wizardIndexes << 0 << 1 << 2 << 1 << 2 << 1 << 2 << 1 << 2;
             m_vehicleElementIds << "quad-p" << "quad-p-frame" << "quad-p-m1" << "quad-p-m2" << "quad-p-m3" << "quad-p-m4";
             m_vehicleHighlightElementIndexes << 0 << 1 << 1 << 2 << 2 << 3 << 3 << 4 << 4;
+            m_channelUpdateRates << getEscUpdateRate() << getEscUpdateRate() << getEscUpdateRate() << getEscUpdateRate();
             break;
         case SetupWizard::MULTI_ROTOR_HEXA:
             m_wizardIndexes << 0 << 1 << 2 << 1 << 2 << 1 << 2 << 1 << 2 << 1 << 2 << 1 << 2;
-            m_vehicleElementIds << "hexa" << "hexa-frame" << "hexa-m1" << "hexa-m2" << "hexa-m3" << "hexa-m4" << "hexa-m5" << "hexa-m6";
+            m_vehicleElementIds << "hexa" << "hexa-frame" << "hexa-m1" << "hexa-m2" << "hexa-m3" << "hexa-m4"
+                                << "hexa-m5" << "hexa-m6";
             m_vehicleHighlightElementIndexes << 0 << 1 << 1 << 2 << 2 << 3 << 3 << 4 << 4 << 5 << 5 << 6 << 6;
+            m_channelUpdateRates << getEscUpdateRate() << getEscUpdateRate() << getEscUpdateRate() << getEscUpdateRate()
+                                 << getEscUpdateRate() << getEscUpdateRate();
             break;
         case SetupWizard::MULTI_ROTOR_HEXA_COAX_Y:
             m_wizardIndexes << 0 << 1 << 2 << 1 << 2 << 1 << 2 << 1 << 2 << 1 << 2 << 1 << 2;
-            m_vehicleElementIds << "hexa-y6" << "hexa-y6-frame" << "hexa-y6-m1" << "hexa-y6-m2" << "hexa-y6-m3" << "hexa-y6-m4" << "hexa-y6-m5" << "hexa-y6-m6";
+            m_vehicleElementIds << "hexa-y6" << "hexa-y6-frame" << "hexa-y6-m1" << "hexa-y6-m2" << "hexa-y6-m3" << "hexa-y6-m4"
+                                << "hexa-y6-m5" << "hexa-y6-m6";
             m_vehicleHighlightElementIndexes << 0 << 1 << 1 << 2 << 2 << 3 << 3 << 4 << 4 << 5 << 5 << 6 << 6;
+            m_channelUpdateRates << getEscUpdateRate() << getEscUpdateRate() << getEscUpdateRate() << getEscUpdateRate()
+                                 << getEscUpdateRate() << getEscUpdateRate();
             break;
         case SetupWizard::MULTI_ROTOR_HEXA_H:
             m_wizardIndexes << 0 << 1 << 2 << 1 << 2 << 1 << 2 << 1 << 2 << 1 << 2 << 1 << 2;
-            m_vehicleElementIds << "hexa-h" << "hexa-h-frame" << "hexa-h-m1" << "hexa-h-m2" << "hexa-h-m3" << "hexa-h-m4" << "hexa-h-m5" << "hexa-h-m6";
+            m_vehicleElementIds << "hexa-h" << "hexa-h-frame" << "hexa-h-m1" << "hexa-h-m2" << "hexa-h-m3" << "hexa-h-m4"
+                                << "hexa-h-m5" << "hexa-h-m6";
             m_vehicleHighlightElementIndexes << 0 << 1 << 1 << 2 << 2 << 3 << 3 << 4 << 4 << 5 << 5 << 6 << 6;
+            m_channelUpdateRates << getEscUpdateRate() << getEscUpdateRate() << getEscUpdateRate() << getEscUpdateRate()
+                                 << getEscUpdateRate() << getEscUpdateRate();
             break;
         default:
             break;
@@ -188,7 +200,8 @@ void OutputCalibrationPage::on_backPageButton_clicked()
 void OutputCalibrationPage::on_motorNeutralButton_toggled(bool checked)
 {
     if(checked) {
-        m_calibrationUtil->startChannelOutput(m_vehicleHighlightElementIndexes[m_currentWizardIndex]);
+        quint16 channel =  m_vehicleHighlightElementIndexes[m_currentWizardIndex];
+        m_calibrationUtil->startChannelOutput(m_channelUpdateRates[channel], channel);
         m_calibrationUtil->setChannelOutputValue(ui->motorNeutralSlider->value());
     }
     else {

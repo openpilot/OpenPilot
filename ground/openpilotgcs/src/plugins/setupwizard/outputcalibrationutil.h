@@ -31,6 +31,7 @@
 #include <QObject>
 #include "uavobject.h"
 #include "uavobjectmanager.h"
+#include "vehicleconfigurationsource.h"
 
 
 class OutputCalibrationUtil : public QObject
@@ -42,16 +43,20 @@ public:
 signals:
     
 public slots:
-    void startChannelOutput(quint16 channel);
+    void startChannelOutput(quint16 escUpdateRate, quint16 channel);
     void stopChannelOutput();
 
     void setChannelOutputValue(quint16 value);
 
 private:
+    static const quint16 UPDATE_CHANNEL_MAPPING[10];
+
+    VehicleConfigurationSource *m_configSource;
+    actuatorSettings *m_actuatorSettings;
     quint16 m_outputChannel;
-    UAVObject::Metadata m_savedActuatorMetadata;
+    UAVObject::Metadata m_savedActuatorCommandMetadata;
+    ActuatorSettings::DataFields m_savedActuatorSettingData;
     UAVObjectManager *m_uavObjectManager;
-    
 };
 
 #endif // OUTPUTCALIBRATIONUTIL_H

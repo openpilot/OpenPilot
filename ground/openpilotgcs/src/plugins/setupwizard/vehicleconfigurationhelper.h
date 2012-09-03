@@ -34,8 +34,9 @@
 #include "uavobjectmanager.h"
 #include "systemsettings.h"
 #include "cfg_vehicletypes/vehicleconfig.h"
+#include "actuatorsettings.h"
 
-struct channelSettings {
+struct mixerChannelSettings {
     int type;
     int throttle1;
     int throttle2;
@@ -43,14 +44,14 @@ struct channelSettings {
     int pitch;
     int yaw;
 
-    channelSettings() : type(), throttle1(), throttle2(), roll(), pitch(), yaw() {}
+    mixerChannelSettings() : type(), throttle1(), throttle2(), roll(), pitch(), yaw() {}
 
-    channelSettings(int t, int th1, int th2, int r, int p, int y)
+    mixerChannelSettings(int t, int th1, int th2, int r, int p, int y)
         : type(t), throttle1(th1), throttle2(th2), roll(r), pitch(p), yaw(y) {}
 };
 
 struct mixerSettings {
-    channelSettings channels[10];
+    mixerChannelSettings channels[10];
 };
 
 class VehicleConfigurationHelper : public QObject
@@ -60,13 +61,13 @@ class VehicleConfigurationHelper : public QObject
 public:
     VehicleConfigurationHelper(VehicleConfigurationSource* configSource);
     bool setupVehicle();
+    static const qint16 LEGACY_ESC_FREQUENCE;
+    static const qint16 RAPID_ESC_FREQUENCE;
 
 signals:
     void saveProgress(int total, int current, QString description);
 
 private:
-    static const qint16 LEGACY_ESC_FREQUENCE = 50;
-    static const qint16 RAPID_ESC_FREQUENCE = 400;
 
     static const qint16 ACTUATOR_MIN = 1000;
     static const qint16 ACTUATOR_NEUTRAL = 1000;

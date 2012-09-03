@@ -29,6 +29,7 @@
 #define VEHICLECONFIGURATIONSOURCE_H
 
 #include <QString>
+#include "actuatorsettings.h"
 
 struct accelGyroBias {
     float m_accelerometerXBias;
@@ -38,6 +39,16 @@ struct accelGyroBias {
     float m_gyroXBias;
     float m_gyroYBias;
     float m_gyroZBias;
+};
+
+struct actuatorChannelSettings {
+    qint16 channelMax;
+    qint16 channelNeutral;
+    qint16 channelMin;
+};
+
+struct actuatorSettings {
+    actuatorChannelSettings channels[ActuatorSettings::CHANNELADDR_NUMELEM];
 };
 
 class VehicleConfigurationSource
@@ -64,7 +75,7 @@ public:
     virtual accelGyroBias getLevellingBias() const = 0;
 
     virtual bool isMotorCalibrationPerformed() const = 0;
-    virtual QList<quint16> getActuatorNeutralSettings() const = 0;
+    virtual actuatorSettings getActuatorSettings() const = 0;
 
     virtual QString getSummaryText() = 0;
 };

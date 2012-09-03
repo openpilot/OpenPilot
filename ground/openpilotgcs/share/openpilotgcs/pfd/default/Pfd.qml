@@ -63,8 +63,8 @@ Rectangle {
                     sourceSize: background.sourceSize
 
                     anchors.centerIn: parent
-                    //the band is 540 degrees wide
-                    anchors.horizontalCenterOffset: -1*AttitudeActual.Yaw/540*width
+                    //the band is 540 degrees wide, AttitudeActual.Yaw is converted to -180..180 range
+                    anchors.horizontalCenterOffset: -1*((AttitudeActual.Yaw+180+720) % 360 - 180)/540*width
                 }
             }
 

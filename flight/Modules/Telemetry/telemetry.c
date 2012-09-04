@@ -381,7 +381,7 @@ static int32_t transmitData(uint8_t * data, int32_t length)
 #ifdef PIOS_PACKET_HANDLER
 	if (PIOS_PACKET_HANDLER)
 		if (PHTransmitData(PIOS_PACKET_HANDLER, data, length))
-			return 0;
+			return length;
 #endif
 	return -1;
 }

@@ -89,6 +89,7 @@ bool UAVObjectManager::registerObject(UAVDataObject* obj)
                     UAVDataObject* cobj = obj->clone(instidx);
                     cobj->initialize(mobj);
                     objects[objidx].append(cobj);
+                    getObject(cobj->getObjID())->emitNewInstance(cobj);
                     emit newInstance(cobj);
                 }
                 // Finally, initialize the actual object instance
@@ -105,6 +106,7 @@ bool UAVObjectManager::registerObject(UAVDataObject* obj)
             }
             // Add the actual object instance in the list
             objects[objidx].append(obj);
+            getObject(obj->getObjID())->emitNewInstance(obj);
             emit newInstance(obj);
             return true;
         }

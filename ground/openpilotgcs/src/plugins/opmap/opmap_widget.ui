@@ -49,7 +49,7 @@
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>16777215</height>
+       <height>40</height>
       </size>
      </property>
      <property name="contextMenuPolicy">
@@ -358,6 +358,32 @@ border-radius: 2px;
          </widget>
         </item>
         <item>
+         <widget class="QLabel" name="label_2">
+          <property name="font">
+           <font>
+            <pointsize>8</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Go To Place:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="leFind"/>
+        </item>
+        <item>
+         <widget class="QToolButton" name="tbFind">
+          <property name="text">
+           <string>...</string>
+          </property>
+          <property name="icon">
+           <iconset resource="opmap.qrc">
+            <normaloff>:/opmap/images/waypoint.png</normaloff>:/opmap/images/waypoint.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item>
          <spacer name="horizontalSpacer_4">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -369,6 +395,18 @@ border-radius: 2px;
            </size>
           </property>
          </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="font">
+           <font>
+            <pointsize>8</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="Line" name="lineWaypoint">

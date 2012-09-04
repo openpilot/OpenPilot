@@ -37,6 +37,7 @@ ConfigTaskWidget::ConfigTaskWidget(QWidget *parent) : QWidget(parent),isConnecte
     pm = ExtensionSystem::PluginManager::instance();
     objManager = pm->getObject<UAVObjectManager>();
     TelemetryManager* telMngr = pm->getObject<TelemetryManager>();
+    utilMngr = pm->getObject<UAVObjectUtilManager>();
     connect(telMngr, SIGNAL(connected()), this, SLOT(onAutopilotConnect()));
     connect(telMngr, SIGNAL(disconnected()), this, SLOT(onAutopilotDisconnect()));
     connect(telMngr, SIGNAL(connected()), this, SIGNAL(autoPilotConnected()));
@@ -57,9 +58,18 @@ void ConfigTaskWidget::addWidget(QWidget * widget)
  * Add an object to the management system
  * @param objectName name of the object to add to the management system
  */
-void ConfigTaskWidget::addUAVObject(QString objectName)
+void ConfigTaskWidget::addUAVObject(QString objectName,QList<int> * reloadGroups)
 {
-    addUAVObjectToWidgetRelation(objectName,"",NULL);
+    addUAVObjectToWidgetRelation(objectName,"",NULL,0,1,false,reloadGroups);
+}
+
+void ConfigTaskWidget::addUAVObject(UAVObject *objectName, QList<int> *reloadGroups)
+{
+    QString objstr;
+    if(objectName)
+        objstr=objectName->getName();
+    addUAVObject(objstr, reloadGroups);
+
 }
 /**
  * Add an UAVObject field to widget relation to the management system
@@ -77,6 +87,17 @@ void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString fiel
     _field = obj->getField(QString(field));
     Q_ASSERT(_field);
     addUAVObjectToWidgetRelation(object,field,widget,_field->getElementNames().indexOf(index));
+}
+
+void ConfigTaskWidget::addUAVObjectToWidgetRelation(UAVObject *obj, UAVObjectField * field, QWidget *widget, QString index)
+{
+    QString objstr;
+    QString fieldstr;
+    if(obj)
+        objstr=obj->getName();
+    if(field)
+        fieldstr=field->getName();
+    addUAVObjectToWidgetRelation(objstr, fieldstr, widget, index);
 }
 /**
  * Add a UAVObject field to widget relation to the management system
@@ -103,6 +124,28 @@ void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString fiel
     }
     addUAVObjectToWidgetRelation(object, field, widget,index,scale,isLimited,defaultReloadGroups,instID);
 }
+
+void ConfigTaskWidget::addUAVObjectToWidgetRelation(UAVObject *obj, UAVObjectField *field, QWidget *widget, QString element, double scale, bool isLimited, QList<int> *defaultReloadGroups, quint32 instID)
+{
+    QString objstr;
+    QString fieldstr;
+    if(obj)
+        objstr=obj->getName();
+    if(field)
+        fieldstr=field->getName();
+    addUAVObjectToWidgetRelation(objstr, fieldstr, widget, element, scale, isLimited, defaultReloadGroups, instID);
+}
+void ConfigTaskWidget::addUAVObjectToWidgetRelation(UAVObject * obj,UAVObjectField * field, QWidget * widget, int index,double scale,bool isLimited,QList<int>* defaultReloadGroups, quint32 instID)
+{
+    QString objstr;
+    QString fieldstr;
+    if(obj)
+        objstr=obj->getName();
+    if(field)
+        fieldstr=field->getName();
+    addUAVObjectToWidgetRelation(objstr,fieldstr,widget,index,scale,isLimited,defaultReloadGroups,instID);
+}
+
 /**
  * Add an UAVObject field to widget relation to the management system
  * @param object name of the object to add
@@ -148,7 +191,21 @@ void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString fiel
     }
     if(widget==NULL)
     {
-        // do nothing
+        if(defaultReloadGroups && obj)
+        {
+            foreach(int i,*defaultReloadGroups)
+            {
+                if(this->defaultReloadGroups.contains(i))
+                {
+                    this->defaultReloadGroups.value(i)->append(ow);
+                }
+                else
+                {
+                    this->defaultReloadGroups.insert(i,new QList<objectToWidget*>());
+                    this->defaultReloadGroups.value(i)->append(ow);
+                }
+            }
+        }
     }
     else
     {
@@ -175,10 +232,6 @@ ConfigTaskWidget::~ConfigTaskWidget()
     {
         if(oTw)
             delete oTw;
-    }
-    if(timeOut)
-    {
-        delete timeOut;
     }
 }
 
@@ -226,9 +279,15 @@ void ConfigTaskWidget::onAutopilotDisconnect()
 
 void ConfigTaskWidget::onAutopilotConnect()
 {
+    if (utilMngr)
+        currentBoard = utilMngr->getBoardModel();//TODO REMEMBER TO ADD THIS TO FORCE CONNECTED FUNC ON CC3D_RELEASE
     invalidateObjects();
     dirty=false;
     isConnected=true;
+    foreach(objectToWidget * ow,objOfInterest)
+    {
+        loadWidgetLimits(ow->widget,ow->field,ow->index,ow->isLimited,ow->scale);
+    }
     enableControls(true);
     refreshWidgetsValues();
 }
@@ -541,7 +600,7 @@ bool ConfigTaskWidget::addShadowWidget(QString object, QString field, QWidget *w
 {
     foreach(objectToWidget * oTw,objOfInterest)
     {
-        if(!oTw->object || !oTw->widget)
+        if(!oTw->object || !oTw->widget || !oTw->field)
             continue;
         if(oTw->object->getName()==object && oTw->field->getName()==field && oTw->index==index && oTw->object->getInstID()==instID)
         {
@@ -698,10 +757,12 @@ void ConfigTaskWidget::autoLoadWidgets()
     forceShadowUpdates();
     foreach(objectToWidget * ow,objOfInterest)
     {
-        qDebug()<<"Master:"<<ow->widget->objectName();
+        if(ow->widget)
+            qDebug()<<"Master:"<<ow->widget->objectName();
         foreach(shadow * sh,ow->shadowsList)
         {
-            qDebug()<<"Child"<<sh->widget->objectName();
+            if(sh->widget)
+                qDebug()<<"Child"<<sh->widget->objectName();
         }
     }
 }
@@ -770,10 +831,11 @@ void ConfigTaskWidget::addReloadButton(QPushButton *button, int buttonGroup)
 void ConfigTaskWidget::defaultButtonClicked()
 {
     int group=sender()->property("group").toInt();
+    emit defaultRequested(group);
     QList<objectToWidget*> * list=defaultReloadGroups.value(group);
     foreach(objectToWidget * oTw,*list)
     {
-        if(!oTw->object)
+        if(!oTw->object || !oTw->field)
             continue;
         UAVDataObject * temp=((UAVDataObject*)oTw->object)->dirtyClone();
         setWidgetFromField(oTw->widget,temp->getField(oTw->field->getName()),oTw->index,oTw->scale,oTw->isLimited);
@@ -784,6 +846,8 @@ void ConfigTaskWidget::defaultButtonClicked()
  */
 void ConfigTaskWidget::reloadButtonClicked()
 {
+    if(timeOut)
+        return;
     int group=sender()->property("group").toInt();
     QList<objectToWidget*> * list=defaultReloadGroups.value(group,NULL);
     if(!list)
@@ -809,7 +873,8 @@ void ConfigTaskWidget::reloadButtonClicked()
             if(timeOut->isActive())
             {
                 oTw->object->requestUpdate();
-                setWidgetFromField(oTw->widget,oTw->field,oTw->index,oTw->scale,oTw->isLimited);
+                if(oTw->widget)
+                    setWidgetFromField(oTw->widget,oTw->field,oTw->index,oTw->scale,oTw->isLimited);
             }
             timeOut->stop();
         }
@@ -1057,7 +1122,7 @@ void ConfigTaskWidget::checkWidgetsLimits(QWidget * widget,UAVObjectField * fiel
 {
     if(!hasLimits)
         return;
-    if(!field->isWithinLimits(value,index))
+    if(!field->isWithinLimits(value,index,currentBoard))
     {
         if(!widget->property("styleBackup").isValid())
             widget->setProperty("styleBackup",widget->styleSheet());
@@ -1131,7 +1196,7 @@ void ConfigTaskWidget::loadWidgetLimits(QWidget * widget,UAVObjectField * field,
         {
             foreach(QString str,option)
             {
-                if(field->isWithinLimits(str,index))
+                if(field->isWithinLimits(str,index,currentBoard))
                     cb->addItem(str);
             }
         }
@@ -1144,33 +1209,33 @@ void ConfigTaskWidget::loadWidgetLimits(QWidget * widget,UAVObjectField * field,
     {
         if(field->getMaxLimit(index).isValid())
         {
-            cb->setMaximum((double)(field->getMaxLimit(index).toDouble()/scale));
+            cb->setMaximum((double)(field->getMaxLimit(index,currentBoard).toDouble()/scale));
         }
-        if(field->getMinLimit(index).isValid())
+        if(field->getMinLimit(index,currentBoard).isValid())
         {
-            cb->setMinimum((double)(field->getMinLimit(index).toDouble()/scale));
+            cb->setMinimum((double)(field->getMinLimit(index,currentBoard).toDouble()/scale));
         }
     }
     else if(QSpinBox * cb=qobject_cast<QSpinBox *>(widget))
     {
-        if(field->getMaxLimit(index).isValid())
+        if(field->getMaxLimit(index,currentBoard).isValid())
         {
-            cb->setMaximum((int)qRound(field->getMaxLimit(index).toDouble()/scale));
+            cb->setMaximum((int)qRound(field->getMaxLimit(index,currentBoard).toDouble()/scale));
         }
-        if(field->getMinLimit(index).isValid())
+        if(field->getMinLimit(index,currentBoard).isValid())
         {
-            cb->setMinimum((int)qRound(field->getMinLimit(index).toDouble()/scale));
+            cb->setMinimum((int)qRound(field->getMinLimit(index,currentBoard).toDouble()/scale));
         }
     }
     else if(QSlider * cb=qobject_cast<QSlider *>(widget))
     {
-        if(field->getMaxLimit(index).isValid())
+        if(field->getMaxLimit(index,currentBoard).isValid())
         {
-            cb->setMaximum((int)qRound(field->getMaxLimit(index).toDouble()/scale));
+            cb->setMaximum((int)qRound(field->getMaxLimit(index,currentBoard).toDouble()/scale));
         }
-        if(field->getMinLimit(index).isValid())
+        if(field->getMinLimit(index,currentBoard).isValid())
         {
-            cb->setMinimum((int)(field->getMinLimit(index).toDouble()/scale));
+            cb->setMinimum((int)(field->getMinLimit(index,currentBoard).toDouble()/scale));
         }
     }
 }

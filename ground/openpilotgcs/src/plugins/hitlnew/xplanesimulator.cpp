@@ -210,9 +210,9 @@ void XplaneSimulator::processUpdate(const QByteArray& dataBuf)
         float accX = 0;
         float accY = 0;
         float accZ = 0;
-        float rollRate=0;
-        float pitchRate=0;
-        float yawRate=0;
+        float rollRate_rad=0;
+        float pitchRate_rad=0;
+        float yawRate_rad=0;
 
 	QString str;
 	QByteArray& buf = const_cast<QByteArray&>(dataBuf);
@@ -269,10 +269,10 @@ void XplaneSimulator::processUpdate(const QByteArray& dataBuf)
                             velZ = *((float*)(buf.data()+4*5));
                             break;
 
-                        case XplaneSimulator::AngularVelocities:
-                            pitchRate = *((float*)(buf.data()+4*1));
-                            rollRate = *((float*)(buf.data()+4*2));
-                            yawRate = *((float*)(buf.data()+4*3));
+                        case XplaneSimulator::AngularVelocities: //In [rad/s]
+                            pitchRate_rad = *((float*)(buf.data()+4*1));
+                            rollRate_rad = *((float*)(buf.data()+4*2));
+                            yawRate_rad = *((float*)(buf.data()+4*3));
                             break;
 
                         case XplaneSimulator::Gload:
@@ -380,8 +380,8 @@ void XplaneSimulator::processUpdate(const QByteArray& dataBuf)
                 //memset(&rawData, 0, sizeof(AttitudeRaw::DataFields));
                 //rawData = attRaw->getData();
                 //rawData.gyros[0] = rollRate;
-                //rawData.gyros_filtered[1] = cos(DEG2RAD * roll) * pitchRate + sin(DEG2RAD * roll) * yawRate;
-                //rawData.gyros_filtered[2] = cos(DEG2RAD * roll) * yawRate - sin(DEG2RAD * roll) * pitchRate;
+                //rawData.gyros_filtered[1] = cos(DEG2RAD * roll) * pitchRate_rad + sin(DEG2RAD * roll) * yawRate_rad;
+                //rawData.gyros_filtered[2] = cos(DEG2RAD * roll) * yawRate_rad - sin(DEG2RAD * roll) * pitchRate_rad;
                 //rawData.gyros[1] = pitchRate;
                 //rawData.gyros[2] = yawRate;
                 //rawData.accels[0] = accX;
@@ -390,9 +390,10 @@ void XplaneSimulator::processUpdate(const QByteArray& dataBuf)
                 //attRaw->setData(rawData);
 		Gyros::DataFields gyroData;
                 memset(&gyroData, 0, sizeof(Gyros::DataFields));
-		gyroData.x = rollRate;
-		gyroData.y = pitchRate;
-		gyroData.z = yawRate;
+#define Pi 3.141529654
+        gyroData.x = rollRate_rad*180/Pi;
+        gyroData.y = pitchRate_rad*180/Pi;
+        gyroData.z = yawRate_rad*180/Pi;
 		gyros->setData(gyroData);
 
 		Accels::DataFields accelData;
@@ -420,7 +421,7 @@ void TraceBuf(const char* buf,int len)
 		{
 			if(i>0)
 			{
-				qDebug() << str;
+//				qDebug() << str;
 				str.clear();
 				reminder=false;
 			}
@@ -429,6 +430,7 @@ void TraceBuf(const char* buf,int len)
 		str+=QString(" 0x%1").arg((quint8)buf[i],2,16,QLatin1Char('0'));
 	}
 
-	if(reminder)
-		qDebug() << str;
+    if(reminder){
+//		qDebug() << str;
+    }
 }

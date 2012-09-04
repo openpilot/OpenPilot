@@ -2,7 +2,7 @@
 ******************************************************************************
 *
 * @file       homeitem.h
-* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
 * @brief      A graphicsItem representing a WayPoint
 * @see        The GNU Public License (GPL) Version 3
 * @defgroup   OPMapWidget
@@ -47,31 +47,41 @@ namespace mapcontrol
                     QWidget *widget);
         QRectF boundingRect() const;
         int type() const;
-        void RefreshPos();
         bool ShowSafeArea()const{return showsafearea;}
         void SetShowSafeArea(bool const& value){showsafearea=value;}
+        void SetToggleRefresh(bool const& value){toggleRefresh=value;}
         int SafeArea()const{return safearea;}
         void SetSafeArea(int const& value){safearea=value;}
         bool safe;
-        void SetCoord(internals::PointLatLng const& value){coord=value;}
+        void SetCoord(internals::PointLatLng const& value){coord=value;emit homePositionChanged(value,Altitude());}
         internals::PointLatLng Coord()const{return coord;}
-        void SetAltitude(int const& value){altitude=value;}
-        int Altitude()const{return altitude;}
+        void SetAltitude(float const& value){altitude=value;emit homePositionChanged(Coord(),Altitude());}
+        float Altitude()const{return altitude;}
+        void RefreshToolTip();
     private:
+
         MapGraphicItem* map;
         OPMapWidget* mapwidget;
         QPixmap pic;
         core::Point localposition;
         internals::PointLatLng coord;
         bool showsafearea;
+        bool toggleRefresh;
         int safearea;
         int localsafearea;
-        int altitude;
-
+        float altitude;
+        bool isDragging;
+    protected:
+        void mouseMoveEvent ( QGraphicsSceneMouseEvent * event );
+        void mousePressEvent ( QGraphicsSceneMouseEvent * event );
+        void mouseReleaseEvent ( QGraphicsSceneMouseEvent * event );
+        void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
     public slots:
-
+        void RefreshPos();
+        void setOpacitySlot(qreal opacity);
     signals:
-
+        void homePositionChanged(internals::PointLatLng coord,float);
+        void homedoubleclick(HomeItem* waypoint);
     };
 }
 #endif // HOMEITEM_H

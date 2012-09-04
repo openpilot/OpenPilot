@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="setting_attributes">
+        <attr name="setting_name" format="string"/>
+        <attr name="max_value" format="float"/>
+    </declare-styleable>
+</resources>

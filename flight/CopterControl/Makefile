@@ -247,6 +247,7 @@ SRC += $(PIOSSTM32F10X)/pios_bl_helper.c
 SRC += $(PIOSSTM32F10X)/pios_usb.c
 SRC += $(PIOSSTM32F10X)/pios_usbhook.c
 SRC += $(PIOSSTM32F10X)/pios_usb_hid.c
+SRC += $(PIOSSTM32F10X)/pios_usb_rctx.c
 SRC += $(PIOSSTM32F10X)/pios_usb_cdc.c
 SRC += $(PIOSSTM32F10X)/pios_usb_hid_istr.c
 SRC += $(PIOSSTM32F10X)/pios_usb_hid_pwr.c
@@ -513,6 +514,7 @@ endif
 
 CFLAGS += -Wall
 CFLAGS += -Werror
+CFLAGS += -ffunction-sections -fdata-sections
 CFLAGS += -Wa,-adhlns=$(addprefix $(OUTDIR)/, $(notdir $(addsuffix .lst, $(basename $<))))
 # Compiler flags to generate dependency files:
 CFLAGS += -MD -MP -MF $(OUTDIR)/dep/$(@F).d

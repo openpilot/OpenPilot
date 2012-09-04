@@ -2,7 +2,7 @@
 ******************************************************************************
 *
 * @file       pureprojection.cpp
-* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
 * @brief      
 * @see        The GNU Public License (GPL) Version 3
 * @defgroup   OPMapWidget
@@ -103,6 +103,9 @@ Point PureProjection::FromLatLngToPixel(const PointLatLng &p,const int &zoom)
 
          return ret;
       }
+      /*
+       * Returns the conversion from pixels to meters
+       */
       double PureProjection::GetGroundResolution(const int &zoom,const double &latitude)
       {
           return (cos(latitude * (PI / 180)) * 2 * PI * Axis()) / GetTileMatrixSizePixel(zoom).Width();
@@ -215,6 +218,18 @@ Point PureProjection::FromLatLngToPixel(const PointLatLng &p,const int &zoom)
          Lat /= (PI / 180);
          Lng /= (PI / 180);
       }
+    double PureProjection::courseBetweenLatLng(PointLatLng const& p1,PointLatLng const& p2)
+    {
+
+        double lon1=p1.Lng()* (M_PI / 180);
+        double lat1=p1.Lat()* (M_PI / 180);
+        double lon2=p2.Lng()* (M_PI / 180);
+        double lat2=p2.Lat()* (M_PI / 180);
+
+        return 2*M_PI-myfmod(atan2(sin(lon1-lon2)*cos(lat2),
+                       cos(lat1)*sin(lat2)-sin(lat1)*cos(lat2)*cos(lon1-lon2)), 2*M_PI);
+    }
+
     double PureProjection::DistanceBetweenLatLng(PointLatLng const& p1,PointLatLng const& p2)
     {
          double R = 6371; // km
@@ -229,4 +244,34 @@ Point PureProjection::FromLatLngToPixel(const PointLatLng &p,const int &zoom)
          double d = R * c;
          return d;
     }
+
+    void PureProjection::offSetFromLatLngs(PointLatLng p1,PointLatLng p2,double &distance,double &bearing)
+    {
+        distance=DistanceBetweenLatLng(p1,p2)*1000;
+        bearing=courseBetweenLatLng(p1,p2);
+      }
+
+    double PureProjection::myfmod(double x,double y)
+    {
+        return x - y*floor(x/y);
+    }
+
+    PointLatLng PureProjection::translate(PointLatLng  p1,double distance,double bearing)
+    {
+        PointLatLng ret;
+        double d=distance;
+        double tc=bearing;
+        double lat1=p1.Lat()*M_PI/180;
+        double lon1=p1.Lng()*M_PI/180;
+        double R=6378137;
+        double lat2 = asin(sin(lat1)*cos(d/R) + cos(lat1)*sin(d/R)*cos(tc) );
+        double lon2 = lon1 + atan2(sin(tc)*sin(d/R)*cos(lat1),
+                             cos(d/R)-sin(lat1)*sin(lat2));
+        lat2=lat2*180/M_PI;
+        lon2=lon2*180/M_PI;
+        ret.SetLat(lat2);
+        ret.SetLng(lon2);
+        return ret;
+    }
+
 }

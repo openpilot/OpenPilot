@@ -48,6 +48,10 @@
 #include "positionactual.h"
 #include "baroaltitude.h"
 
+#if defined(PIOS_INCLUDE_USB_RCTX)
+#include "pios_usb_rctx.h"
+#endif	/* PIOS_INCLUDE_USB_RCTX */
+
 // Private constants
 #if defined(PIOS_MANUAL_STACK_SIZE)
 #define STACK_SIZE_BYTES PIOS_MANUAL_STACK_SIZE
@@ -369,6 +373,15 @@ static void manualControlTask(void *parameters)
 			
 			// Update cmd object
 			ManualControlCommandSet(&cmd);
+#if defined(PIOS_INCLUDE_USB_RCTX)
+			if (pios_usb_rctx_id) {
+				PIOS_USB_RCTX_Update(pios_usb_rctx_id,
+						cmd.Channel,
+						settings.ChannelMin,
+						settings.ChannelMax,
+						NELEMENTS(cmd.Channel));
+			}
+#endif	/* PIOS_INCLUDE_USB_RCTX */
 
 		} else {
 			ManualControlCommandGet(&cmd);	/* Under GCS control */

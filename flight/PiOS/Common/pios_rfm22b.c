@@ -1970,8 +1970,8 @@ int rfm22_resetModule(uint8_t mode, uint32_t min_frequency_hz, uint32_t max_freq
 
 	// choose the 3 GPIO pin functions
 	rfm22_write(RFM22_io_port_config, RFM22_io_port_default);								// GPIO port use default value
-	rfm22_write(RFM22_gpio0_config, RFM22_gpio0_config_drv3 | RFM22_gpio0_config_txstate);	// GPIO0 = TX State (to control RF Switch)
-	rfm22_write(RFM22_gpio1_config, RFM22_gpio1_config_drv3 | RFM22_gpio1_config_rxstate);	// GPIO1 = RX State (to control RF Switch)
+	rfm22_write(RFM22_gpio0_config, RFM22_gpio0_config_drv3 | RFM22_gpio0_config_rxstate);	// GPIO0 = TX State (to control RF Switch)
+	rfm22_write(RFM22_gpio1_config, RFM22_gpio1_config_drv3 | RFM22_gpio1_config_txstate);	// GPIO1 = RX State (to control RF Switch)
 	rfm22_write(RFM22_gpio2_config, RFM22_gpio2_config_drv3 | RFM22_gpio2_config_cca);		// GPIO2 = Clear Channel Assessment
 
 	// ****************

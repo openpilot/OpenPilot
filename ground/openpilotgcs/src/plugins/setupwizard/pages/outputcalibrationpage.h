@@ -73,6 +73,9 @@ private:
     void setupVehicleItems();
     void setupVehicleHighlightedPart();
     void setWizardPage();
+    void enableButtons(bool enable);
+    void onStartButtonToggle(bool checked, quint16 channel, quint16 &value, quint16 safeValue, QSlider *slider);
+    quint16 getCurrentChannel();
 
     quint16 getEscUpdateRate(){ return getWizard()->getESCType() == VehicleConfigurationSource::ESC_RAPID ?
                     VehicleConfigurationHelper::RAPID_ESC_FREQUENCE : VehicleConfigurationHelper::LEGACY_ESC_FREQUENCE; }
@@ -91,6 +94,8 @@ private:
     QList<quint16> m_vehicleHighlightElementIndexes;
     QList<quint16> m_wizardIndexes;
     QList<quint16> m_channelUpdateRates;
+
+    actuatorSettings m_actuatorSettings;
 
     OutputCalibrationUtil *m_calibrationUtil;
 

@@ -30,41 +30,58 @@
 #include "extensionsystem/pluginmanager.h"
 #include "vehicleconfigurationhelper.h"
 
-const quint16 OutputCalibrationUtil::UPDATE_CHANNEL_MAPPING[10] = {1, 1, 1, 2, 3, 4, 3, 3, 4, 4};
+const quint16 OutputCalibrationUtil::UPDATE_CHANNEL_MAPPING[10] = {0, 0, 0, 1, 2, 3, 2, 2, 3, 3};
 
 OutputCalibrationUtil::OutputCalibrationUtil(QObject *parent) :
-    QObject(parent), m_outputChannel(0)
+    QObject(parent), m_outputChannel(-1), m_safeValue(1000)
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     m_uavObjectManager = pm->getObject<UAVObjectManager>();
     Q_ASSERT(m_uavObjectManager);
 }
 
-void OutputCalibrationUtil::startChannelOutput(quint16 escUpdateRate, quint16 channel)
+OutputCalibrationUtil::~OutputCalibrationUtil()
 {
-    if(m_outputChannel == 0 && channel > 0 && channel <= ActuatorCommand::CHANNEL_NUMELEM)
+    stopChannelOutput();
+}
+
+void OutputCalibrationUtil::setupOutputRates(const QList<quint16> &outputRates)
+{
+    //Set actuator settings for channels
+    ActuatorSettings *actuatorSettings = ActuatorSettings::GetInstance(m_uavObjectManager);
+    Q_ASSERT(actuatorSettings);
+    ActuatorSettings::DataFields data = actuatorSettings->getData();
+
+    for(int i = 0; i < outputRates.size(); i++) {
+        data.ChannelType[i] = ActuatorSettings::CHANNELTYPE_PWM;
+        data.ChannelAddr[i] = i;
+        data.ChannelMin[i] = 1000;
+        data.ChannelNeutral[i] = 1000;
+        data.ChannelMax[i] = 2000;
+        data.ChannelUpdateFreq[UPDATE_CHANNEL_MAPPING[i]] = outputRates[i];
+    }
+
+    actuatorSettings->setData(data);
+    actuatorSettings->updated();
+}
+
+void OutputCalibrationUtil::startChannelOutput(quint16 channel, quint16 safeValue)
+{
+    if(m_outputChannel < 0 && channel >= 0 && channel < ActuatorCommand::CHANNEL_NUMELEM)
     {
-        //Set actuator settings for channel
-        ActuatorSettings *actuatorSettings = ActuatorSettings::GetInstance(m_uavObjectManager);
-        Q_ASSERT(actuatorSettings);
-        ActuatorSettings::DataFields data = actuatorSettings->getData();
-        m_savedActuatorSettingData = data;
+        //Start output...
+        m_outputChannel = channel;
+        m_safeValue = safeValue;
 
-        quint16 actuatorChannel = channel - 1;
-        data.ChannelType[actuatorChannel] = ActuatorSettings::CHANNELTYPE_PWM;
-        data.ChannelAddr[actuatorChannel] = actuatorChannel;
-        data.ChannelMin[actuatorChannel] = 1000;
-        data.ChannelNeutral[actuatorChannel] = 1000;
-        data.ChannelMax[actuatorChannel] = 2000;
-
-        data.ChannelUpdateFreq[UPDATE_CHANNEL_MAPPING[actuatorChannel]] = escUpdateRate;
-
-        actuatorSettings->setData(data);
+        qDebug() << "Starting output for channel " << m_outputChannel << "...";
 
         ActuatorCommand *actuatorCommand = ActuatorCommand::GetInstance(m_uavObjectManager);
         Q_ASSERT(actuatorCommand);
         UAVObject::Metadata metaData = actuatorCommand->getMetadata();
         m_savedActuatorCommandMetadata = metaData;
+
+        //Store current data for later restore
+        m_savedActuatorCommandData = actuatorCommand->getData();
 
         //Enable actuator control from GCS...
         //Store current metadata for later restore
@@ -73,43 +90,46 @@ void OutputCalibrationUtil::startChannelOutput(quint16 escUpdateRate, quint16 ch
         UAVObject::SetGcsTelemetryAcked(metaData, false);
         UAVObject::SetGcsTelemetryUpdateMode(metaData, UAVObject::UPDATEMODE_ONCHANGE);
         metaData.gcsTelemetryUpdatePeriod = 100;
+
+        //Apply changes
         actuatorCommand->setMetadata(metaData);
         actuatorCommand->updated();
 
-        //Start output...
-        m_outputChannel = channel;
+        qDebug() << "Output for channel " << m_outputChannel << " started.";
     }
 }
 
 void OutputCalibrationUtil::stopChannelOutput()
 {
-    if(m_outputChannel > 0)
+    if(m_outputChannel >= 0)
     {
+        qDebug() << "Stopping output for channel " << m_outputChannel << "...";
         //Stop output...
+        setChannelOutputValue(m_safeValue);
+
         // Restore metadata to what it was before
         ActuatorCommand *actuatorCommand = ActuatorCommand::GetInstance(m_uavObjectManager);
         Q_ASSERT(actuatorCommand);
+        actuatorCommand->setData(m_savedActuatorCommandData);
         actuatorCommand->setMetadata(m_savedActuatorCommandMetadata);
         actuatorCommand->updated();
 
-        ActuatorSettings *actuatorSettings = ActuatorSettings::GetInstance(m_uavObjectManager);
-        Q_ASSERT(actuatorSettings);
-        actuatorSettings->setData(m_savedActuatorSettingData);
-        actuatorSettings->updated();
+        qDebug() << "Output for channel " << m_outputChannel << " stopped.";
 
-        m_outputChannel = 0;
+        m_outputChannel = -1;
     }
 }
 
 void OutputCalibrationUtil::setChannelOutputValue(quint16 value)
 {
-    if(m_outputChannel > 0)
+    if(m_outputChannel >= 0)
     {
         //Set output value
+        qDebug() << "Setting output value for channel " << m_outputChannel << " to " << value << ".";
         ActuatorCommand *actuatorCommand = ActuatorCommand::GetInstance(m_uavObjectManager);
         Q_ASSERT(actuatorCommand);
         ActuatorCommand::DataFields data = actuatorCommand->getData();
-        data.Channel[m_outputChannel - 1] = value;
+        data.Channel[m_outputChannel] = value;
         actuatorCommand->setData(data);
     }
 }

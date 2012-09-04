@@ -42,9 +42,12 @@ struct accelGyroBias {
 };
 
 struct actuatorChannelSettings {
-    qint16 channelMax;
-    qint16 channelNeutral;
-    qint16 channelMin;
+    quint16 channelMin;
+    quint16 channelNeutral;
+    quint16 channelMax;
+
+    //Default values
+    actuatorChannelSettings(): channelMin(1000), channelNeutral(1080), channelMax(1800) {}
 };
 
 struct actuatorSettings {

@@ -36,7 +36,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="intro">
     <widget class="QLabel" name="label_3">
@@ -95,7 +95,7 @@
       <number>1000</number>
      </property>
      <property name="maximum">
-      <number>1400</number>
+      <number>1300</number>
      </property>
      <property name="singleStep">
       <number>10</number>
@@ -188,7 +188,7 @@
       </rect>
      </property>
      <property name="minimum">
-      <number>1600</number>
+      <number>1400</number>
      </property>
      <property name="maximum">
       <number>2000</number>
@@ -267,7 +267,7 @@
       <number>1500</number>
      </property>
      <property name="tracking">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -407,7 +407,7 @@
        <number>1500</number>
       </property>
       <property name="tracking">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -453,7 +453,7 @@
        <number>1500</number>
       </property>
       <property name="tracking">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>

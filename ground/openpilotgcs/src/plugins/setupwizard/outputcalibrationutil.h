@@ -29,9 +29,11 @@
 #define OUTPUTCALIBRATIONUTIL_H
 
 #include <QObject>
+#include <QList>
 #include "uavobject.h"
 #include "uavobjectmanager.h"
 #include "vehicleconfigurationsource.h"
+#include "actuatorcommand.h"
 
 
 class OutputCalibrationUtil : public QObject
@@ -39,23 +41,25 @@ class OutputCalibrationUtil : public QObject
     Q_OBJECT
 public:
     explicit OutputCalibrationUtil(QObject *parent = 0);
+    ~OutputCalibrationUtil();
     
 signals:
     
 public slots:
-    void startChannelOutput(quint16 escUpdateRate, quint16 channel);
+    void setupOutputRates(const QList<quint16> &outputRates);
+    void startChannelOutput(quint16 channel, quint16 safeValue);
     void stopChannelOutput();
 
     void setChannelOutputValue(quint16 value);
 
 private:
     static const quint16 UPDATE_CHANNEL_MAPPING[10];
-
     VehicleConfigurationSource *m_configSource;
     actuatorSettings *m_actuatorSettings;
-    quint16 m_outputChannel;
+    qint16 m_outputChannel;
+    quint16 m_safeValue;
     UAVObject::Metadata m_savedActuatorCommandMetadata;
-    ActuatorSettings::DataFields m_savedActuatorSettingData;
+    ActuatorCommand::DataFields m_savedActuatorCommandData;
     UAVObjectManager *m_uavObjectManager;
 };
 

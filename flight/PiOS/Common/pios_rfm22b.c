@@ -195,6 +195,14 @@ static const uint8_t FULL_PREAMBLE[FIFO_SIZE] =
 	PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,
 	PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE}; // 64 bytes
 static const uint8_t HEADER[(TX_PREAMBLE_NIBBLES + 1)/2 + 2] = {PREAMBLE_BYTE, PREAMBLE_BYTE, PREAMBLE_BYTE, PREAMBLE_BYTE,PREAMBLE_BYTE, PREAMBLE_BYTE, SYNC_BYTE_1, SYNC_BYTE_2};
+static const uint8_t OUT_FF[64] = {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
+	0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
+	0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
+	0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
+	0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
+	0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
+	0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
+	0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF};
 
 /* Local function forwared declarations */
 static void PIOS_RFM22B_Supervisor(uint32_t ppm_id);
@@ -203,12 +211,6 @@ static void rfm22_setTxMode(uint8_t mode);
 
 // SPI read/write functions
 static void rfm22_write(uint8_t addr, uint8_t data);
-static void rfm22_startBurstRead(uint8_t addr);
-inline uint8_t rfm22_burstRead(void)
-{
-	return PIOS_SPI_TransferByte(PIOS_RFM22_SPI_PORT, 0xff);
-}
-static void rfm22_endBurstRead(void);
 static uint8_t rfm22_read(uint8_t addr);
 uint8_t rfm22_txStart();
 
@@ -692,7 +694,11 @@ static void rfm22_releaseBus()
 		PIOS_SPI_ReleaseBus(g_rfm22b_dev->spi_id);
 }
 
-//!
+/**
+ * Claim the semaphore and write a byte to a register
+ * @param[in] addr The address to write to
+ * @param[in] data The datat to write to that address
+ */
 static void rfm22_write(uint8_t addr, uint8_t data)
 {
 	if(PIOS_RFM22B_validate(g_rfm22b_dev)) {
@@ -708,6 +714,8 @@ static void rfm22_write(uint8_t addr, uint8_t data)
 /**
  * Write a byte to a register without claiming the bus.  Also
  * toggle the NSS line
+ * @param[in] addr The address of the RFM22b register to write
+ * @param[in] data The data to write to that register
  */
 static void rfm22_write_noclaim(uint8_t addr, uint8_t data)
 {
@@ -720,29 +728,7 @@ static void rfm22_write_noclaim(uint8_t addr, uint8_t data)
 }
 
 /**
- * Start a burst read a byte from an RFM22b
- * @param[in] addr The address to read from
- * @return Returns the result of the register read
- */
-static void rfm22_startBurstRead(uint8_t addr)
-{
-	// wait 1us .. so we don't toggle the CS line to quickly
-	PIOS_DELAY_WaituS(1);
-	if(PIOS_RFM22B_validate(g_rfm22b_dev)) {
-		rfm22_claimBus();
-		rfm22_assertCs();
-		PIOS_SPI_TransferByte(g_rfm22b_dev->spi_id, addr & 0x7f);
-	}
-}
 
-//! Release the CS and bus
-static void rfm22_endBurstRead(void)
-{
-	rfm22_deassertCs();
-	rfm22_releaseBus();
-}
-
-/**
  * Read a byte from an RFM22b register
  * @param[in] addr The address to read from
  * @return Returns the result of the register read
@@ -1427,17 +1413,22 @@ void rfm22_processRxInt(void)
 			}
 
 			// Fetch the data from the RX FIFO
-			rfm22_startBurstRead(RFM22_fifo_access);
-			for (uint8_t i = 0; i < RX_FIFO_HI_WATERMARK; ++i)
-				rx_buffer[rx_buffer_wr++] = rfm22_burstRead();
-			rfm22_endBurstRead();
-		}
-		else
-		{	// just clear the RX FIFO
-			rfm22_startBurstRead(RFM22_fifo_access);
-			for (register uint16_t i = RX_FIFO_HI_WATERMARK; i > 0; i--)
-				rfm22_burstRead();	// read a byte from the rf modules RX FIFO buffer
-			rfm22_endBurstRead();
+			rfm22_claimBus();
+			rfm22_assertCs();
+			PIOS_SPI_TransferByte(rfm22b_dev_g->spi_id,RFM22_fifo_access & 0x7F);
+			rx_buffer_wr += (PIOS_SPI_TransferBlock(rfm22b_dev_g->spi_id,OUT_FF,
+				(uint8_t *) &rx_buffer[rx_buffer_wr],RX_FIFO_HI_WATERMARK,NULL) == 0) ?
+				RX_FIFO_HI_WATERMARK : 0;
+			rfm22_deassertCs();
+			rfm22_releaseBus();
+		} else {
+			// Clear the RX FIFO
+			rfm22_claimBus();
+			rfm22_assertCs();
+			PIOS_SPI_TransferByte(rfm22b_dev_g->spi_id,RFM22_fifo_access & 0x7F);
+			PIOS_SPI_TransferBlock(rfm22b_dev_g->spi_id,OUT_FF,NULL,RX_FIFO_HI_WATERMARK,NULL);
+			rfm22_deassertCs();
+			rfm22_releaseBus();
 		}
 	}
 
@@ -1454,18 +1445,23 @@ void rfm22_processRxInt(void)
 	{
 
 		// read the total length of the packet data
-		register uint16_t len = rfm22_read(RFM22_received_packet_length);
+		uint32_t len = rfm22_read(RFM22_received_packet_length);
 
 		// their must still be data in the RX FIFO we need to get
 		if (rx_buffer_wr < len)
 		{
+			int32_t bytes_to_read = len - rx_buffer_wr;
 			// Fetch the data from the RX FIFO
-			rfm22_startBurstRead(RFM22_fifo_access);
-			while (rx_buffer_wr < len)
-				rx_buffer[rx_buffer_wr++] = rfm22_burstRead();
-			rfm22_endBurstRead();
+			rfm22_claimBus();
+			rfm22_assertCs();
+			PIOS_SPI_TransferByte(rfm22b_dev_g->spi_id,RFM22_fifo_access & 0x7F);
+			rx_buffer_wr += (PIOS_SPI_TransferBlock(rfm22b_dev_g->spi_id,OUT_FF,
+				(uint8_t *) &rx_buffer[rx_buffer_wr],bytes_to_read,NULL) == 0) ?
+				bytes_to_read : 0;
+			rfm22_deassertCs();
+			rfm22_releaseBus();
 		}
-
+	
 		if (rx_buffer_wr != len)
 		{
 			// we have a packet length error .. discard the packet

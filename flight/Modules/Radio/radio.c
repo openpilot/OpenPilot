@@ -234,7 +234,7 @@ static int32_t RadioInitialize(void)
 
 	/* Initalize the RFM22B radio COM device. */
 	{
-		if (PIOS_RFM22B_Init(&pios_rfm22b_id, &pios_rfm22b_cfg)) {
+		if (PIOS_RFM22B_Init(&pios_rfm22b_id, PIOS_RFM22_SPI_PORT, pios_rfm22b_cfg.slave_num, &pios_rfm22b_cfg)) {
 			return -1;
 		}
 		uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_RFM22B_RF_RX_BUF_LEN);

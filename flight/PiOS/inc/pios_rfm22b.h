@@ -31,6 +31,8 @@
 #ifndef PIOS_RFM22B_H
 #define PIOS_RFM22B_H
 
+enum gpio_direction {GPIO0_TX_GPIO1_RX, GPIO0_RX_GPIO1_TX};
+
 /* Global Types */
 struct pios_rfm22b_cfg {
 	const struct pios_spi_cfg * spi_cfg; /* Pointer to SPI interface configuration */
@@ -41,6 +43,8 @@ struct pios_rfm22b_cfg {
 	uint8_t RFXtalCap;
 	uint32_t maxRFBandwidth;
 	uint8_t maxTxPower;
+	uint8_t slave_num;
+	enum gpio_direction gpio_direction;
 };
 
 /* Public Functions */

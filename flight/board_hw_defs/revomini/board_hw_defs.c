@@ -359,6 +359,8 @@ struct pios_rfm22b_cfg pios_rfm22b_cfg = {
 	.RFXtalCap = 0x7f,
 	.maxRFBandwidth = 128000,
 	.maxTxPower = RFM22_tx_pwr_txpow_7, // +20dBm .. 100mW
+	.slave_num = 0,
+	.gpio_direction = GPIO0_RX_GPIO1_TX,
 };
 
 #endif /* PIOS_INCLUDE_RFM22B */

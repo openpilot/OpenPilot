@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="app_name">OpenPilot GCS Home</string>
+	<string name="object_browser_name">Browser</string>
+	<string name="controller_name">Controller</string>
+	<string name="pfd_name">PFD</string>
+	<string name="location_name">Map</string>
+	<string name="logger_name">Logging</string>
+	
+	<string name="menu_item_settings">Settings</string>
+	<string name="menu_item_connect">Connect</string>
+	<string name="menu_item_disconnect">Disconnect</string>
+	
+	<string name="preference_title">Settings</string>
+	<string name="preference_checkbox_autoconnect">Automatically Connect</string>
+	<string name="preference_checkbox_connection_type">Connection Type</string>
+	<string name="preference_checkbox_bluetooth">Bluetooth</string>
+	<string name="preference_connection_method_summary">Select the connection method</string>
+	
+	<string name="compass_name">Compass</string>
+	<string name="cardinal_north">N</string>
+	<string name="cardinal_east">E</string>
+	<string name="cardinal_south">S</string>
+	<string name="cardinal_west">W</string>
+	<string name="connected">Connected</string>
+	<string name="update_button">Update</string>
+	<string name="save_button">Save</string>
+	<string name="send_button">Send</string>
+	<string name="manual_control_values_">Manual control values:</string>
+	<string name="number_of_objects">Number of objects</string>
+	<string name="number_of_bytes">Number of bytes</string>
+	<string name="alarms">Alarms</string>
+	<string name="txrate">TxRate: </string>
+	<string name="rxrate">RxRate: </string>
+	<string name="tuning">Tuning</string>
+	<string name="apply">Apply</string>
+	<string name="save">Save</string>
+	<string name="settings">Settings</string>
+	<string name="data">Data</string>
+	<string name="edit">Edit</string>
+	<string name="load">Load</string>
+</resources>

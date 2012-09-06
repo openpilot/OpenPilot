@@ -1,0 +1,83 @@
+!SESSION 2012-02-04 14:21:36.086 -----------------------------------------------
+eclipse.buildId=unknown
+java.version=1.6.0_29
+java.vendor=Apple Inc.
+BootLoader constants: OS=macosx, ARCH=x86_64, WS=cocoa, NL=en_US
+Framework arguments:  -product org.eclipse.epp.package.cpp.product -product org.eclipse.epp.package.cpp.product -product org.eclipse.epp.package.cpp.product -keyring /Users/jcotton81/.eclipse_keyring -showlocation
+Command-line arguments:  -os macosx -ws cocoa -arch x86_64 -product org.eclipse.epp.package.cpp.product -product org.eclipse.epp.package.cpp.product -data /Users/jcotton81/Documents/Programming/OpenPilot/androidgcs -product org.eclipse.epp.package.cpp.product -keyring /Users/jcotton81/.eclipse_keyring -showlocation
+
+!ENTRY org.eclipse.core.net 1 0 2012-02-04 14:21:41.864
+!MESSAGE System property http.nonProxyHosts has been set to local|*.local|169.254/16|*.169.254/16 by an external source. This value will be overwritten using the values from the preferences
+
+!ENTRY org.eclipse.ui.intro.universal 4 0 2012-02-04 14:21:44.892
+!MESSAGE /Users/jcotton81/Documents/Programming/eclipse/Eclipse.app/Contents/MacOS/introData.xml (No such file or directory)
+!STACK 0
+java.io.FileNotFoundException: /Users/jcotton81/Documents/Programming/eclipse/Eclipse.app/Contents/MacOS/introData.xml (No such file or directory)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(FileInputStream.java:120)
+	at java.io.FileInputStream.<init>(FileInputStream.java:79)
+	at sun.net.www.protocol.file.FileURLConnection.connect(FileURLConnection.java:70)
+	at sun.net.www.protocol.file.FileURLConnection.getInputStream(FileURLConnection.java:161)
+	at com.sun.org.apache.xerces.internal.impl.XMLEntityManager.setupCurrentEntity(XMLEntityManager.java:653)
+	at com.sun.org.apache.xerces.internal.impl.XMLVersionDetector.determineDocVersion(XMLVersionDetector.java:186)
+	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:772)
+	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:737)
+	at com.sun.org.apache.xerces.internal.parsers.XMLParser.parse(XMLParser.java:119)
+	at com.sun.org.apache.xerces.internal.parsers.DOMParser.parse(DOMParser.java:235)
+	at com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderImpl.parse(DocumentBuilderImpl.java:284)
+	at javax.xml.parsers.DocumentBuilder.parse(DocumentBuilder.java:180)
+	at org.eclipse.ui.internal.intro.universal.IntroData.parse(IntroData.java:159)
+	at org.eclipse.ui.internal.intro.universal.IntroData.initialize(IntroData.java:63)
+	at org.eclipse.ui.internal.intro.universal.IntroData.<init>(IntroData.java:47)
+	at org.eclipse.ui.internal.intro.universal.CustomizationContentsArea.loadData(CustomizationContentsArea.java:624)
+	at org.eclipse.ui.internal.intro.universal.CustomizationContentsArea.addPages(CustomizationContentsArea.java:489)
+	at org.eclipse.ui.internal.intro.universal.CustomizationContentsArea.createContents(CustomizationContentsArea.java:453)
+	at org.eclipse.ui.internal.intro.universal.CustomizationDialog.createDialogArea(CustomizationDialog.java:44)
+	at org.eclipse.jface.dialogs.Dialog.createContents(Dialog.java:760)
+	at org.eclipse.jface.window.Window.create(Window.java:431)
+	at org.eclipse.jface.dialogs.Dialog.create(Dialog.java:1089)
+	at org.eclipse.jface.window.Window.open(Window.java:790)
+	at org.eclipse.ui.internal.intro.universal.CustomizeAction.run(CustomizeAction.java:35)
+	at org.eclipse.ui.internal.intro.universal.CustomizeAction.run(CustomizeAction.java:29)
+	at org.eclipse.jface.action.Action.runWithEvent(Action.java:498)
+	at org.eclipse.jface.action.ActionContributionItem.handleWidgetSelection(ActionContributionItem.java:584)
+	at org.eclipse.jface.action.ActionContributionItem.access$2(ActionContributionItem.java:501)
+	at org.eclipse.jface.action.ActionContributionItem$6.handleEvent(ActionContributionItem.java:452)
+	at org.eclipse.swt.widgets.EventTable.sendEvent(EventTable.java:84)
+	at org.eclipse.swt.widgets.Display.sendEvent(Display.java:3543)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1250)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1273)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1258)
+	at org.eclipse.swt.widgets.Widget.notifyListeners(Widget.java:1079)
+	at org.eclipse.swt.widgets.Display.runDeferredEvents(Display.java:3441)
+	at org.eclipse.swt.widgets.Display.readAndDispatch(Display.java:3100)
+	at org.eclipse.ui.internal.Workbench.runEventLoop(Workbench.java:2405)
+	at org.eclipse.ui.internal.Workbench.runUI(Workbench.java:2369)
+	at org.eclipse.ui.internal.Workbench.access$4(Workbench.java:2221)
+	at org.eclipse.ui.internal.Workbench$5.run(Workbench.java:500)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:332)
+	at org.eclipse.ui.internal.Workbench.createAndRunWorkbench(Workbench.java:493)
+	at org.eclipse.ui.PlatformUI.createAndRunWorkbench(PlatformUI.java:149)
+	at org.eclipse.ui.internal.ide.application.IDEApplication.start(IDEApplication.java:113)
+	at org.eclipse.equinox.internal.app.EclipseAppHandle.run(EclipseAppHandle.java:194)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.runApplication(EclipseAppLauncher.java:110)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.start(EclipseAppLauncher.java:79)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:368)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:179)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+	at java.lang.reflect.Method.invoke(Method.java:597)
+	at org.eclipse.equinox.launcher.Main.invokeFramework(Main.java:559)
+	at org.eclipse.equinox.launcher.Main.basicRun(Main.java:514)
+	at org.eclipse.equinox.launcher.Main.run(Main.java:1311)
+!SESSION 2012-02-04 15:23:30.048 -----------------------------------------------
+eclipse.buildId=unknown
+java.version=1.6.0_29
+java.vendor=Apple Inc.
+BootLoader constants: OS=macosx, ARCH=x86_64, WS=cocoa, NL=en_US
+Framework arguments:  -product org.eclipse.epp.package.cpp.product -product org.eclipse.epp.package.cpp.product -product org.eclipse.epp.package.cpp.product -product org.eclipse.epp.package.cpp.product -product org.eclipse.epp.package.cpp.product -product org.eclipse.epp.package.cpp.product -keyring /Users/jcotton81/.eclipse_keyring -showlocation
+Command-line arguments:  -os macosx -ws cocoa -arch x86_64 -product org.eclipse.epp.package.cpp.product -product org.eclipse.epp.package.cpp.product -product org.eclipse.epp.package.cpp.product -product org.eclipse.epp.package.cpp.product -product org.eclipse.epp.package.cpp.product -data /Users/jcotton81/Documents/Programming/OpenPilot/androidgcs -product org.eclipse.epp.package.cpp.product -keyring /Users/jcotton81/.eclipse_keyring -showlocation
+
+!ENTRY org.eclipse.core.net 1 0 2012-02-04 15:23:34.575
+!MESSAGE System property http.nonProxyHosts has been set to local|*.local|169.254/16|*.169.254/16 by an external source. This value will be overwritten using the values from the preferences

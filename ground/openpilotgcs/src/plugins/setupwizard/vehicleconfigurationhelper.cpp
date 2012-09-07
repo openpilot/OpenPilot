@@ -49,15 +49,17 @@ VehicleConfigurationHelper::VehicleConfigurationHelper(VehicleConfigurationSourc
     Q_ASSERT(m_uavoManager);
 }
 
-bool VehicleConfigurationHelper::setupVehicle()
+bool VehicleConfigurationHelper::setupVehicle(bool save)
 {
     m_progress = 0;
-    clearModifiedObjects();
-    resetVehicleConfig();
-    resetGUIData();
-    if(!saveChangesToController())
-    {
-        return false;
+    if(save) {
+        clearModifiedObjects();
+        resetVehicleConfig();
+        resetGUIData();
+        if(!saveChangesToController())
+        {
+            return false;
+        }
     }
 
     applyHardwareConfiguration();
@@ -67,14 +69,17 @@ bool VehicleConfigurationHelper::setupVehicle()
     applyLevellingConfiguration();
     applyStabilizationConfiguration();
 
-    bool result = saveChangesToController();
-    if(result) {
-        emit saveProgress(PROGRESS_STEPS, ++m_progress, tr("Done!"));
+    if(save) {
+        bool result = saveChangesToController();
+        if(result) {
+            emit saveProgress(PROGRESS_STEPS, ++m_progress, tr("Done!"));
+        }
+        else {
+            emit saveProgress(PROGRESS_STEPS, ++m_progress, tr("Failed!"));
+        }
+        return result;
     }
-    else {
-        emit saveProgress(PROGRESS_STEPS, ++m_progress, tr("Failed!"));
-    }
-    return result;
+    return true;
 }
 
 void VehicleConfigurationHelper::addModifiedObject(UAVDataObject *object, QString description)

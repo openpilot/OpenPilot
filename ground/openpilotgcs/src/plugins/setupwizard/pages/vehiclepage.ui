@@ -41,6 +41,9 @@ p, li { white-space: pre-wrap; }
    </property>
   </widget>
   <widget class="QToolButton" name="surfaceButton">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>430</x>
@@ -141,6 +144,9 @@ p, li { white-space: pre-wrap; }
    </property>
   </widget>
   <widget class="QToolButton" name="fixedwingButton">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>190</x>
@@ -191,6 +197,9 @@ p, li { white-space: pre-wrap; }
    </property>
   </widget>
   <widget class="QToolButton" name="heliButton">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>310</x>

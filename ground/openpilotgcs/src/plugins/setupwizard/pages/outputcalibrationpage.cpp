@@ -27,6 +27,8 @@
 
 #include "outputcalibrationpage.h"
 #include "ui_outputcalibrationpage.h"
+#include "systemalarms.h"
+#include "uavobjectmanager.h"
 
 OutputCalibrationPage::OutputCalibrationPage(SetupWizard *wizard, QWidget *parent) :
     AbstractWizardPage(wizard, parent), ui(new Ui::OutputCalibrationPage), m_vehicleBoundsItem(0),
@@ -60,6 +62,7 @@ void OutputCalibrationPage::setupVehicle()
     m_vehicleHighlightElementIndexes.clear();
     m_currentWizardIndex = 0;
     m_vehicleScene->clear();
+    m_channelUpdateRates.clear();
     quint16 escUpdateRate = getEscUpdateRate();
     quint16 servoUpdateRate = getServoUpdateRate();
     switch(getWizard()->getVehicleSubType())
@@ -69,6 +72,8 @@ void OutputCalibrationPage::setupVehicle()
             m_vehicleElementIds << "tri" << "tri-frame" << "tri-m1" << "tri-m2" << "tri-m3" << "tri-s1";
             m_vehicleHighlightElementIndexes << 0 << 1 << 1 << 2 << 2 << 3 << 3 << 4 << 4;
             m_channelUpdateRates << escUpdateRate << escUpdateRate << escUpdateRate << servoUpdateRate;
+            m_actuatorSettings.channels[4].channelMin = 1500;
+            m_actuatorSettings.channels[4].channelMax = 1500;
             break;
         case SetupWizard::MULTI_ROTOR_QUAD_X:
             m_wizardIndexes << 0 << 1 << 2 << 1 << 2 << 1 << 2 << 1 << 2;
@@ -91,8 +96,8 @@ void OutputCalibrationPage::setupVehicle()
             break;
         case SetupWizard::MULTI_ROTOR_HEXA_COAX_Y:
             m_wizardIndexes << 0 << 1 << 2 << 1 << 2 << 1 << 2 << 1 << 2 << 1 << 2 << 1 << 2;
-            m_vehicleElementIds << "hexa-y6" << "hexa-y6-frame" << "hexa-y6-m1" << "hexa-y6-m2" << "hexa-y6-m3" << "hexa-y6-m4"
-                                << "hexa-y6-m5" << "hexa-y6-m6";
+            m_vehicleElementIds << "hexa-y6" << "hexa-y6-frame" << "hexa-y6-m2" << "hexa-y6-m1" << "hexa-y6-m4" << "hexa-y6-m3"
+                                << "hexa-y6-m6" << "hexa-y6-m5";
             m_vehicleHighlightElementIndexes << 0 << 1 << 1 << 2 << 2 << 3 << 3 << 4 << 4 << 5 << 5 << 6 << 6;
             m_channelUpdateRates << escUpdateRate << escUpdateRate << escUpdateRate << escUpdateRate << escUpdateRate << escUpdateRate;
             break;
@@ -106,6 +111,9 @@ void OutputCalibrationPage::setupVehicle()
         default:
             break;
     }
+
+    VehicleConfigurationHelper helper(getWizard());
+    helper.setupVehicle(false);
 
     if(m_calibrationUtil) {
         delete m_calibrationUtil;
@@ -136,6 +144,7 @@ void OutputCalibrationPage::setupVehicleItems()
         item->setElementId(m_vehicleElementIds[i]);
         item->setZValue(i);
         item->setOpacity(1.0);
+
         QRectF itemBounds = m_vehicleRenderer->boundsOnElement(m_vehicleElementIds[i]);
         item->setPos(itemBounds.x() - parentBounds.x(), itemBounds.y() - parentBounds.y());
 
@@ -234,27 +243,57 @@ void OutputCalibrationPage::on_motorNeutralButton_toggled(bool checked)
 {
     ui->motorNeutralButton->setText(checked ? tr("Stop") : tr("Start"));
     quint16 channel = getCurrentChannel();
-    onStartButtonToggle(checked, channel, m_actuatorSettings.channels[channel].channelNeutral, 1000,ui->motorNeutralSlider);
+    onStartButtonToggle(ui->motorNeutralButton, channel, m_actuatorSettings.channels[channel].channelNeutral, 1000, ui->motorNeutralSlider);
 }
 
-void OutputCalibrationPage::onStartButtonToggle(bool checked, quint16 channel, quint16 &value, quint16 safeValue, QSlider *slider) {
-    if(checked) {
-        enableButtons(false);
-        m_calibrationUtil->startChannelOutput(channel, safeValue);
-        slider->setValue(value);
-        m_calibrationUtil->setChannelOutputValue(slider->value());
+void OutputCalibrationPage::onStartButtonToggle(QAbstractButton *button, quint16 channel, quint16 value, quint16 safeValue, QSlider *slider) {
+    if(button->isChecked()) {
+        if(checkAlarms()) {
+            enableButtons(false);
+            m_calibrationUtil->startChannelOutput(channel, safeValue);
+            slider->setValue(value);
+            //m_calibrationUtil->setChannelOutputValue(value);
+        }
+        else {
+            button->setChecked(false);
+        }
     }
     else {
-        value = slider->value();
         m_calibrationUtil->stopChannelOutput();
         enableButtons(true);
     }
 }
 
+bool OutputCalibrationPage::checkAlarms()
+{
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *uavObjectManager = pm->getObject<UAVObjectManager>();
+    Q_ASSERT(uavObjectManager);
+    SystemAlarms * systemAlarmsObj = SystemAlarms::GetInstance(uavObjectManager);
+    SystemAlarms::DataFields systemAlarms = systemAlarmsObj->getData();
+
+    if(systemAlarms.Alarm[SystemAlarms::ALARM_ACTUATOR] != SystemAlarms::ALARM_OK) {
+        QMessageBox mbox;
+        mbox.setText(QString(tr("The actuator module is in an error state.\n\n"
+                                "This error can be caused by not having the board correctly connected or\n"
+                                "if the board is not sufficiently powered by an external power source like\n"
+                                "a battery. To use only USB as power source is not enough when the USB can't\n"
+                                "power external components like ESCs and servos.\n\n"
+                                "Please fix the error before continuing calibration.")));
+        mbox.setStandardButtons(QMessageBox::Ok);
+        mbox.setIcon(QMessageBox::Critical);
+        mbox.exec();
+        return false;
+    }
+    return true;
+}
+
 void OutputCalibrationPage::on_motorNeutralSlider_valueChanged(int value)
 {
     if(ui->motorNeutralButton->isChecked()) {
-        m_calibrationUtil->setChannelOutputValue(ui->motorNeutralSlider->value());
+        quint16 value = ui->motorNeutralSlider->value();
+        m_calibrationUtil->setChannelOutputValue(value);
+        m_actuatorSettings.channels[getCurrentChannel()].channelNeutral = value;
     }
 }
 
@@ -262,42 +301,73 @@ void OutputCalibrationPage::on_motorMaxButton_toggled(bool checked)
 {
     ui->motorNeutralButton->setText(checked ? tr("Stop") : tr("Start"));
     quint16 channel = getCurrentChannel();
-    onStartButtonToggle(checked, channel, m_actuatorSettings.channels[channel].channelMax, 1000, ui->motorMaxSlider);
+    onStartButtonToggle(ui->motorMaxButton, channel, m_actuatorSettings.channels[channel].channelMax, 1000, ui->motorMaxSlider);
 }
 
 void OutputCalibrationPage::on_motorMaxSlider_valueChanged(int position)
 {
     if(ui->motorMaxButton->isChecked()) {
-        m_calibrationUtil->setChannelOutputValue(ui->motorMaxSlider->value());
+        quint16 value = ui->motorMaxSlider->value();
+        m_calibrationUtil->setChannelOutputValue(value);
+        m_actuatorSettings.channels[getCurrentChannel()].channelMax = value;
     }
 }
 
 void OutputCalibrationPage::on_servoCenterButton_toggled(bool checked)
 {
-    ui->motorNeutralButton->setText(checked ? tr("Stop") : tr("Start"));
+    ui->servoCenterButton->setText(checked ? tr("Stop") : tr("Start"));
     quint16 channel = getCurrentChannel();
     m_actuatorSettings.channels[channel].channelNeutral = 1500;
-    onStartButtonToggle(checked, channel, m_actuatorSettings.channels[channel].channelNeutral, 1500, ui->servoCenterSlider);
+    onStartButtonToggle(ui->servoCenterButton, channel, m_actuatorSettings.channels[channel].channelNeutral, 1500, ui->servoCenterSlider);
 }
 
 void OutputCalibrationPage::on_servoCenterSlider_valueChanged(int position)
 {
     if(ui->servoCenterButton->isChecked()) {
-        m_calibrationUtil->setChannelOutputValue(ui->servoCenterSlider->value());
+        quint16 value = ui->servoCenterSlider->value();
+        m_calibrationUtil->setChannelOutputValue(value);
+        m_actuatorSettings.channels[getCurrentChannel()].channelNeutral = value;
     }
 }
 
 void OutputCalibrationPage::on_servoAngleButton_toggled(bool checked)
 {
-
+    ui->servoAngleButton->setText(checked ? tr("Stop") : tr("Start"));
+    quint16 channel = getCurrentChannel();
+    ui->servoMinAngleSlider->setValue(m_actuatorSettings.channels[channel].channelMax);
+    onStartButtonToggle(ui->servoAngleButton, channel, m_actuatorSettings.channels[channel].channelMin, 1500, ui->servoMinAngleSlider);
 }
 
 void OutputCalibrationPage::on_servoMaxAngleSlider_valueChanged(int position)
 {
-
+    if(ui->servoAngleButton->isChecked()) {
+        quint16 value = ui->servoMaxAngleSlider->value();
+        m_calibrationUtil->setChannelOutputValue(value);
+        m_actuatorSettings.channels[getCurrentChannel()].channelMax = value;
+    }
 }
 
 void OutputCalibrationPage::on_servoMinAngleSlider_valueChanged(int position)
 {
+    if(ui->servoAngleButton->isChecked()) {
+        quint16 value = ui->servoMinAngleSlider->value();
+        m_calibrationUtil->setChannelOutputValue(value);
+        m_actuatorSettings.channels[getCurrentChannel()].channelMin = value;
+    }
+}
 
+void OutputCalibrationPage::on_servoMaxAngleSliderRB_toggled(bool checked)
+{
+    if(ui->servoAngleButton->isChecked() && ui->servoMaxAngleSliderRB->isChecked())
+    {
+        m_calibrationUtil->setChannelOutputValue(ui->servoMaxAngleSlider->value());
+    }
+}
+
+void OutputCalibrationPage::on_servoMinAngleSliderRB_toggled(bool checked)
+{
+    if(ui->servoAngleButton->isChecked() && ui->servoMinAngleSliderRB->isChecked())
+    {
+        m_calibrationUtil->setChannelOutputValue(ui->servoMinAngleSlider->value());
+    }
 }

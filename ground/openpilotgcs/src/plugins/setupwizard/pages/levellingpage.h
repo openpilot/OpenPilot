@@ -59,6 +59,7 @@ private:
     LevellingUtil *m_levellingUtil;
 
     void stopLevelling();
+    void enableButtons(bool enable);
 };
 
 #endif // LEVELLINGPAGE_H

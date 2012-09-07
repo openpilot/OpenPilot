@@ -58,6 +58,14 @@ bool LevellingPage::isComplete() const
             ui->levelButton->isEnabled();
 }
 
+void LevellingPage::enableButtons(bool enable)
+{
+    ui->levelButton->setEnabled(enable);
+    getWizard()->button(QWizard::NextButton)->setEnabled(enable);
+    getWizard()->button(QWizard::CancelButton)->setEnabled(enable);
+    getWizard()->button(QWizard::BackButton)->setEnabled(enable);
+}
+
 void LevellingPage::performLevelling()
 {
     if(!getWizard()->getConnectionManager()->isConnected()) {
@@ -70,11 +78,7 @@ void LevellingPage::performLevelling()
         return;
     }
 
-    getWizard()->button(QWizard::BackButton)->setEnabled(false);
-    getWizard()->button(QWizard::NextButton)->setEnabled(false);
-    getWizard()->button(QWizard::CancelButton)->setEnabled(false);
-
-    ui->levelButton->setEnabled(false);
+    enableButtons(false);
 
     if(!m_levellingUtil)
     {
@@ -124,9 +128,6 @@ void LevellingPage::stopLevelling()
         disconnect(m_levellingUtil, SIGNAL(progress(long,long)), this, SLOT(levellingProgress(long,long)));
         disconnect(m_levellingUtil, SIGNAL(done(accelGyroBias)), this, SLOT(levellingDone(accelGyroBias)));
         disconnect(m_levellingUtil, SIGNAL(timeout(QString)), this, SLOT(levellingTimeout(QString)));
-        getWizard()->button(QWizard::BackButton)->setEnabled(true);
-        getWizard()->button(QWizard::NextButton)->setEnabled(true);
-        getWizard()->button(QWizard::CancelButton)->setEnabled(true);
-        ui->levelButton->setEnabled(true);
+        enableButtons(true);
     }
 }

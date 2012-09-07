@@ -46,9 +46,9 @@ p, li { white-space: pre-wrap; }
   <widget class="QToolButton" name="saveButton">
    <property name="geometry">
     <rect>
-     <x>200</x>
+     <x>225</x>
      <y>250</y>
-     <width>200</width>
+     <width>150</width>
      <height>70</height>
     </rect>
    </property>
@@ -60,6 +60,11 @@ p, li { white-space: pre-wrap; }
    </property>
    <property name="text">
     <string>Save</string>
+   </property>
+   <property name="icon">
+    <iconset resource="../wizardResources.qrc">
+     <normaloff>:/setupwizard/resources/bttn-save-up.png</normaloff>
+     <normalon>:/setupwizard/resources/bttn-save-down.png</normalon>:/setupwizard/resources/bttn-save-up.png</iconset>
    </property>
    <property name="iconSize">
     <size>
@@ -118,6 +123,8 @@ QProgressBar::chunk {
    </property>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="../wizardResources.qrc"/>
+ </resources>
  <connections/>
 </ui>

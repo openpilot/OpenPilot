@@ -54,7 +54,6 @@ public slots:
 
 private:
     static const quint16 UPDATE_CHANNEL_MAPPING[10];
-    VehicleConfigurationSource *m_configSource;
     actuatorSettings *m_actuatorSettings;
     qint16 m_outputChannel;
     quint16 m_safeValue;

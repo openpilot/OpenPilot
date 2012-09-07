@@ -43,7 +43,7 @@ p, li { white-space: pre-wrap; }
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QPushButton" name="illustrationButton">
+  <widget class="QToolButton" name="illustrationButton">
    <property name="geometry">
     <rect>
      <x>460</x>
@@ -55,10 +55,22 @@ p, li { white-space: pre-wrap; }
    <property name="toolTip">
     <string>Show connection diagram for configuration</string>
    </property>
+   <property name="styleSheet">
+    <string notr="true">QToolButton { border: none }</string>
+   </property>
    <property name="text">
-    <string>Hardware
-Configuration
-Illustration</string>
+    <string/>
+   </property>
+   <property name="icon">
+    <iconset resource="../wizardResources.qrc">
+     <normaloff>:/setupwizard/resources/bttn-illustration-up.png</normaloff>
+     <normalon>:/setupwizard/resources/bttn-illustration-down.png</normalon>:/setupwizard/resources/bttn-illustration-up.png</iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>100</width>
+     <height>100</height>
+    </size>
    </property>
    <property name="checkable">
     <bool>false</bool>
@@ -69,8 +81,8 @@ Illustration</string>
    <property name="autoExclusive">
     <bool>true</bool>
    </property>
-   <property name="flat">
-    <bool>false</bool>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonIconOnly</enum>
    </property>
   </widget>
   <widget class="QTextEdit" name="configurationSummary">
@@ -98,6 +110,8 @@ Illustration</string>
    </property>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="../wizardResources.qrc"/>
+ </resources>
  <connections/>
 </ui>

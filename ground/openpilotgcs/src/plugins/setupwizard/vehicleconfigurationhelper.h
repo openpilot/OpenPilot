@@ -60,7 +60,7 @@ class VehicleConfigurationHelper : public QObject
 
 public:
     VehicleConfigurationHelper(VehicleConfigurationSource* configSource);
-    bool setupVehicle();
+    bool setupVehicle(bool save = true);
     static const qint16 LEGACY_ESC_FREQUENCE;
     static const qint16 RAPID_ESC_FREQUENCE;
 

@@ -67,6 +67,10 @@ private slots:
     void on_servoMaxAngleSlider_valueChanged(int position);
     void on_servoMinAngleSlider_valueChanged(int position);
 
+    void on_servoMaxAngleSliderRB_toggled(bool checked);
+
+    void on_servoMinAngleSliderRB_toggled(bool checked);
+
 private:
     void setupVehicle();
     void startWizard();
@@ -74,7 +78,8 @@ private:
     void setupVehicleHighlightedPart();
     void setWizardPage();
     void enableButtons(bool enable);
-    void onStartButtonToggle(bool checked, quint16 channel, quint16 &value, quint16 safeValue, QSlider *slider);
+    void onStartButtonToggle(QAbstractButton *button, quint16 channel, quint16 value, quint16 safeValue, QSlider *slider);
+    bool checkAlarms();
     quint16 getCurrentChannel();
 
     quint16 getEscUpdateRate(){ return getWizard()->getESCType() == VehicleConfigurationSource::ESC_RAPID ?

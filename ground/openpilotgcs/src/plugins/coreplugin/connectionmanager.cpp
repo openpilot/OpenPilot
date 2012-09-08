@@ -193,8 +193,9 @@ void ConnectionManager::aboutToRemoveObject(QObject *obj)
     IConnection *connection = Aggregation::query<IConnection>(obj);
 	if (!connection) return;
 
-	if (m_connectionDevice.connection && m_connectionDevice.connection == connection)	// Pip
+    if (m_connectionDevice.connection && m_connectionDevice.connection == connection)
 	{	// we are currently using the one that is about to be removed
+        disconnectDevice();
 		m_connectionDevice.connection = NULL;
 		m_ioDev = NULL;
 	}
@@ -204,7 +205,7 @@ void ConnectionManager::aboutToRemoveObject(QObject *obj)
 }
 
 
-void ConnectionManager::onConnectionDestroyed(QObject *obj)	// Pip
+void ConnectionManager::onConnectionDestroyed(QObject *obj)
 {
     Q_UNUSED(obj)
     //onConnectionClosed(obj);
@@ -300,7 +301,7 @@ void ConnectionManager::updateConnectionList(IConnection *connection)
                     found = true;
 
             if (!found) {
-                if (m_connectionDevice.connection && m_connectionDevice.connection == connection)
+                if (m_connectionDevice.connection && m_connectionDevice.connection == connection && m_connectionDevice.device == iter->device)
                 {	// we are currently using the one we are about to erase
                     //onConnectionClosed(m_connectionDevice.connection);
                     disconnectDevice();

@@ -81,7 +81,7 @@ public:
     void resumePolling();
 
 protected:
-    void unregisterAll(IConnection *connection);
+    void updateConnectionList(IConnection *connection);
     void registerDevice(IConnection *conn, const QString &devN, const QString &name, const QString &disp);
     devListItem findDevice(const QString &devName);
 
@@ -96,7 +96,6 @@ private slots:
     void onConnectPressed();
     void devChanged(IConnection *connection);
 
-//	void onConnectionClosed(QObject *obj);
 	void onConnectionDestroyed(QObject *obj);
         void connectionsCallBack(); //used to call devChange after all the plugins are loaded
 protected:

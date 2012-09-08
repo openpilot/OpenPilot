@@ -289,10 +289,11 @@ void ConnectionManager::resumePolling()
 }
 
 /**
-*   Unregister all devices from one connection plugin
-*   \param[in] connection Connection type that you want to forget about :)
-*/
-void ConnectionManager::unregisterAll(IConnection *connection)
+ * Synchronize the list of connections displayed with those physically
+ * present
+ * @param[in] connection Connection type that you want to forget about :)
+ */
+void ConnectionManager::updateConnectionList(IConnection *connection)
 {
 	for (QLinkedList<devListItem>::iterator iter = m_devList.begin(); iter != m_devList.end(); )
 	{
@@ -309,6 +310,16 @@ void ConnectionManager::unregisterAll(IConnection *connection)
 		else
 			++iter;
 	}
+
+    //and add them back in the list
+    QList <IConnection::device> availableDev = connection->availableDevices();
+    foreach (IConnection::device dev, availableDev)
+    {
+        QString cbName = connection->shortName() + ": " + dev.name;
+        QString disp = connection->shortName() + " : " + dev.displayName;
+        registerDevice(connection,cbName,dev.name,disp);
+    }
+
 }
 
 /**
@@ -344,16 +355,7 @@ void ConnectionManager::devChanged(IConnection *connection)
     m_availableDevList->clear();
 
     //remove registered devices of this IConnection from the list
-    unregisterAll(connection);
-
-    //and add them back in the list
-    QList <IConnection::device> availableDev = connection->availableDevices();
-    foreach (IConnection::device dev, availableDev)
-    {
-        QString cbName = connection->shortName() + ": " + dev.name;
-        QString disp = connection->shortName() + " : " + dev.displayName;
-        registerDevice(connection,cbName,dev.name,disp);
-    }
+    updateConnectionList(connection);
 
     //add all the list again to the combobox
     foreach (devListItem d, m_devList)

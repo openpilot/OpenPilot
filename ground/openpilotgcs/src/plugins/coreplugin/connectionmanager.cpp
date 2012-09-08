@@ -44,25 +44,18 @@ namespace Core {
 
 
 ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow, QTabWidget *modeStack) :
-	QWidget(mainWindow),	// Pip
+    QWidget(mainWindow),
 	m_availableDevList(0),
     m_connectBtn(0),
     m_ioDev(NULL),	
 	m_mainWindow(mainWindow)
 {
- //   Q_UNUSED(mainWindow);
-
-/*    QVBoxLayout *top = new QVBoxLayout;
-    top->setSpacing(0);
-    top->setMargin(0);*/
-
     QHBoxLayout *layout = new QHBoxLayout;
     layout->setSpacing(5);
     layout->setContentsMargins(5,5,5,5);
     layout->addWidget(new QLabel(tr("Connections:")));
 
     m_availableDevList = new QComboBox;
-    //m_availableDevList->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     m_availableDevList->setMinimumWidth(100);
     m_availableDevList->setMaximumWidth(150);
     m_availableDevList->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -72,13 +65,8 @@ ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow, QTabWidge
     m_connectBtn->setEnabled(false);
     layout->addWidget(m_connectBtn);
 
-/*    Utils::StyledBar *bar = new Utils::StyledBar;
-    bar->setLayout(layout);
-
-    top->addWidget(bar);*/
     setLayout(layout);
 
-    //    modeStack->insertCornerWidget(modeStack->cornerWidgetCount()-1, this);
     modeStack->setCornerWidget(this, Qt::TopRightCorner);
 
 	QObject::connect(m_connectBtn, SIGNAL(pressed()), this, SLOT(onConnectPressed()));
@@ -86,8 +74,8 @@ ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow, QTabWidge
 
 ConnectionManager::~ConnectionManager()
 {
-	disconnectDevice();	// Pip
-	suspendPolling();	// Pip
+    disconnectDevice();
+    suspendPolling();
 }
 
 void ConnectionManager::init()

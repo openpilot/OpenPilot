@@ -96,7 +96,7 @@ static void updateNedAccel();
 static void updatePOIBearing();
 static void updatePathVelocity();
 static void updateEndpointVelocity();
-static void updateVtolDesiredAttitude();
+static void updateVtolDesiredAttitude(bool yaw_attitude);
 static float bound(float val, float min, float max);
 static bool vtolpathfollower_enabled;
 static void accessoryUpdated(UAVObjEvent* ev);
@@ -211,7 +211,7 @@ static void vtolPathFollowerTask(void *parameters)
 			case FLIGHTSTATUS_FLIGHTMODE_RTH:
 				if (pathDesired.Mode == PATHDESIRED_MODE_ENDPOINT) {
 					updateEndpointVelocity();
-					updateVtolDesiredAttitude();
+					updateVtolDesiredAttitude(false);
 				} else {
 					AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_ERROR);
 				}
@@ -219,8 +219,7 @@ static void vtolPathFollowerTask(void *parameters)
 			case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
 				if (pathDesired.Mode == PATHDESIRED_MODE_ENDPOINT) {
 					updateEndpointVelocity();
-					updateVtolDesiredAttitude();
-					updatePOIBearing();
+					updateVtolDesiredAttitude(false);
 				} else {
 					AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_ERROR);
 				}
@@ -228,13 +227,22 @@ static void vtolPathFollowerTask(void *parameters)
 			case FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER:
 				if (pathDesired.Mode == PATHDESIRED_MODE_ENDPOINT) {
 					updateEndpointVelocity();
-					updateVtolDesiredAttitude();
+					updateVtolDesiredAttitude(false);
 				} else if (pathDesired.Mode == PATHDESIRED_MODE_PATH) {
 					updatePathVelocity();
-					updateVtolDesiredAttitude();
+					updateVtolDesiredAttitude(false);
 				} else {
 					AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_ERROR);
 					break;
+				}
+				break;
+			case FLIGHTSTATUS_FLIGHTMODE_POI:
+				if (pathDesired.Mode == PATHDESIRED_MODE_ENDPOINT) {
+					updateEndpointVelocity();
+					updateVtolDesiredAttitude(true);
+					updatePOIBearing();
+				} else {
+					AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_ERROR);
 				}
 				break;
 			default:
@@ -446,7 +454,7 @@ void updateEndpointVelocity()
  * NED frame as the feedback term and then compares the 
  * @ref VelocityActual against the @ref VelocityDesired
  */
-static void updateVtolDesiredAttitude()
+static void updateVtolDesiredAttitude(bool yaw_attitude)
 {
 	float dT = guidanceSettings.UpdatePeriod / 1000.0f;
 
@@ -565,7 +573,10 @@ static void updateVtolDesiredAttitude()
 	
 	stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_ROLL] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
 	stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_PITCH] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
-	stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+	if(yaw_attitude)
+		stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+	else
+		stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW] = STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK;
 	
 	StabilizationDesiredSet(&stabDesired);
 }

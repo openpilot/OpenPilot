@@ -136,7 +136,7 @@ static int32_t RadioStart(void)
 
 	// Start the tasks.
 	xTaskCreate(radioReceiveTask, (signed char *)"RadioReceive", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->radioReceiveTaskHandle));
-	xTaskCreate(radioStatusTask, (signed char *)"RadioStatus", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->radioStatusTaskHandle));
+	xTaskCreate(radioStatusTask, (signed char *)"RadioStatus", STACK_SIZE_BYTES * 2, NULL, TASK_PRIORITY, &(data->radioStatusTaskHandle));
 	xTaskCreate(sendPacketTask, (signed char *)"SendPacket", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->sendPacketTaskHandle));
 
 	// Install the monitors

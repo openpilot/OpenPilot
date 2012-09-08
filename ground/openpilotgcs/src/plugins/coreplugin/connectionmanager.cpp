@@ -103,8 +103,6 @@ bool ConnectionManager::connectDevice()
 
     // check if opening the device worked
     if (!io_dev->isOpen()) {
-        qDebug() << "Error: io_dev->isOpen() returned FALSE .. could not open connection to " << connection_device.devName
-                 << ": " << io_dev->errorString();
         return false;
     }
 
@@ -145,7 +143,7 @@ bool ConnectionManager::disconnectDevice()
             m_connectionDevice.connection->closeDevice(m_connectionDevice.getConName());
         }
     } catch (...) {	// handle exception
-        qDebug() << "Exception: m_connectionDevice.connection->closeDevice(" << m_connectionDevice.devName << ")";
+        qDebug() << "Exception: m_connectionDevice.connection->closeDevice(" << m_connectionDevice.getConName() << ")";
     }
 
     m_connectionDevice.connection = NULL;
@@ -165,9 +163,6 @@ void ConnectionManager::objectAdded(QObject *obj)
     //Check if a plugin added a connection object to the pool
     IConnection *connection = Aggregation::query<IConnection>(obj);
     if (!connection) return;
-
-    //qDebug() << "Connection object registered:" << connection->connectionName();
-    //qDebug() << connection->availableDevices();
 
     //register devices and populate CB
     devChanged(connection);
@@ -200,7 +195,6 @@ void ConnectionManager::aboutToRemoveObject(QObject *obj)
 void ConnectionManager::onConnectionDestroyed(QObject *obj)
 {
     Q_UNUSED(obj)
-    //onConnectionClosed(obj);
     disconnectDevice();
 }
 

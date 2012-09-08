@@ -166,6 +166,10 @@ int pjrc_rawhid::open(int max, int vid, int pid, int usage_page, int usage)
     } else {
         IOHIDManagerSetDeviceMatching(hid_manager, NULL);
     }
+
+    // Set the run loop reference before configuring the attach callback
+    the_correct_runloop = CFRunLoopGetCurrent();
+
     // set up a callbacks for device attach & detach
     IOHIDManagerScheduleWithRunLoop(hid_manager, CFRunLoopGetCurrent(),
                                     kCFRunLoopDefaultMode);
@@ -179,8 +183,6 @@ int pjrc_rawhid::open(int max, int vid, int pid, int usage_page, int usage)
         CFRelease(hid_manager);
         return 0;
     }
-    // Set the run loop reference:
-    the_correct_runloop = CFRunLoopGetCurrent();
     printf("run loop\n");
     // let it do the callback for all devices
     while (CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0, true) == kCFRunLoopRunHandledSource) ;
@@ -379,7 +381,8 @@ static void input_callback(void *context, IOReturn ret, void *sender, IOHIDRepor
             hid->last_buffer->next = n;
             hid->last_buffer = n;
     }
-    //qDebug() << "Stop CFRunLoop from input_callback" << CFRunLoopGetCurrent();
+
+    Q_ASSERT(the_correct_runloop != NULL);
     CFRunLoopStop(the_correct_runloop);
 }
 

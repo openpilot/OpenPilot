@@ -5,29 +5,76 @@
         <field name="FeedForward" units="" type="float" elements="1" defaultvalue="0"/>
         <field name="AccelTime" units="ms" type="float" elements="1" defaultvalue="0"/>
         <field name="DecelTime" units="ms" type="float" elements="1" defaultvalue="0"/>
-	<field name="ThrottleCurve1" units="percent" type="float" elements="5" elementnames="0,25,50,75,100" defaultvalue="0,0,0,0,0"/>
-        <field name="Curve2Source" units="" type="enum" elements="1" options="Throttle,Roll,Pitch,Yaw,Collective,Accessory0,Accessory1,Accessory2,Accessory3,Accessory4,Accessory5" defaultvalue="Throttle"/>
-        <field name="ThrottleCurve2" units="percent" type="float" elements="5" elementnames="0,25,50,75,100" defaultvalue="0,0.25,0.5,0.75,1"/>
-        <field name="Mixer1Type" units="" type="enum" elements="1" options="Disabled,Motor,Servo,CameraRoll,CameraPitch,CameraYaw,Accessory0,Accessory1,Accessory2,Accessory3,Accessory4,Accessory5" defaultvalue="Disabled"/>
-        <field name="Mixer1Vector" units="" type="int8" elements="5" elementnames="ThrottleCurve1,ThrottleCurve2,Roll,Pitch,Yaw" defaultvalue="0"/>
-        <field name="Mixer2Type" units="" type="enum" elements="1" options="Disabled,Motor,Servo,CameraRoll,CameraPitch,CameraYaw,Accessory0,Accessory1,Accessory2,Accessory3,Accessory4,Accessory5" defaultvalue="Disabled"/>
-        <field name="Mixer2Vector" units="" type="int8" elements="5" elementnames="ThrottleCurve1,ThrottleCurve2,Roll,Pitch,Yaw" defaultvalue="0"/>
-        <field name="Mixer3Type" units="" type="enum" elements="1" options="Disabled,Motor,Servo,CameraRoll,CameraPitch,CameraYaw,Accessory0,Accessory1,Accessory2,Accessory3,Accessory4,Accessory5" defaultvalue="Disabled"/>
-        <field name="Mixer3Vector" units="" type="int8" elements="5" elementnames="ThrottleCurve1,ThrottleCurve2,Roll,Pitch,Yaw" defaultvalue="0"/>
-        <field name="Mixer4Type" units="" type="enum" elements="1" options="Disabled,Motor,Servo,CameraRoll,CameraPitch,CameraYaw,Accessory0,Accessory1,Accessory2,Accessory3,Accessory4,Accessory5" defaultvalue="Disabled"/>
-        <field name="Mixer4Vector" units="" type="int8" elements="5" elementnames="ThrottleCurve1,ThrottleCurve2,Roll,Pitch,Yaw" defaultvalue="0"/>
-        <field name="Mixer5Type" units="" type="enum" elements="1" options="Disabled,Motor,Servo,CameraRoll,CameraPitch,CameraYaw,Accessory0,Accessory1,Accessory2,Accessory3,Accessory4,Accessory5" defaultvalue="Disabled"/>
-        <field name="Mixer5Vector" units="" type="int8" elements="5" elementnames="ThrottleCurve1,ThrottleCurve2,Roll,Pitch,Yaw" defaultvalue="0"/>
-        <field name="Mixer6Type" units="" type="enum" elements="1" options="Disabled,Motor,Servo,CameraRoll,CameraPitch,CameraYaw,Accessory0,Accessory1,Accessory2,Accessory3,Accessory4,Accessory5" defaultvalue="Disabled"/>
-        <field name="Mixer6Vector" units="" type="int8" elements="5" elementnames="ThrottleCurve1,ThrottleCurve2,Roll,Pitch,Yaw" defaultvalue="0"/>
-        <field name="Mixer7Type" units="" type="enum" elements="1" options="Disabled,Motor,Servo,CameraRoll,CameraPitch,CameraYaw,Accessory0,Accessory1,Accessory2,Accessory3,Accessory4,Accessory5" defaultvalue="Disabled"/>
-        <field name="Mixer7Vector" units="" type="int8" elements="5" elementnames="ThrottleCurve1,ThrottleCurve2,Roll,Pitch,Yaw" defaultvalue="0"/>
-        <field name="Mixer8Type" units="" type="enum" elements="1" options="Disabled,Motor,Servo,CameraRoll,CameraPitch,CameraYaw,Accessory0,Accessory1,Accessory2,Accessory3,Accessory4,Accessory5" defaultvalue="Disabled"/>
-        <field name="Mixer8Vector" units="" type="int8" elements="5" elementnames="ThrottleCurve1,ThrottleCurve2,Roll,Pitch,Yaw" defaultvalue="0"/>
-        <field name="Mixer9Type" units="" type="enum" elements="1" options="Disabled,Motor,Servo,CameraRoll,CameraPitch,CameraYaw,Accessory0,Accessory1,Accessory2,Accessory3,Accessory4,Accessory5" defaultvalue="Disabled"/>
-        <field name="Mixer9Vector" units="" type="int8" elements="5" elementnames="ThrottleCurve1,ThrottleCurve2,Roll,Pitch,Yaw" defaultvalue="0"/>
-        <field name="Mixer10Type" units="" type="enum" elements="1" options="Disabled,Motor,Servo,CameraRoll,CameraPitch,CameraYaw,Accessory0,Accessory1,Accessory2,Accessory3,Accessory4,Accessory5" defaultvalue="Disabled"/>
-        <field name="Mixer10Vector" units="" type="int8" elements="5" elementnames="ThrottleCurve1,ThrottleCurve2,Roll,Pitch,Yaw" defaultvalue="0"/>
+	<field name="ThrottleCurve1" units="percent" type="float" elementnames="0,25,50,75,100" defaultvalue="0,0,0,0,0"/>
+        <field name="Curve2Source" units="" type="enum" elements="1" defaultvalue="Throttle">
+		<options>
+			<option>Throttle</option>
+		        <option>Roll</option>
+		        <option>Pitch</option>
+		        <option>Yaw</option>
+		        <option>Collective</option>
+		        <option>Accessory0</option>
+		        <option>Accessory1</option>
+		        <option>Accessory2</option>
+		        <option>Accessory3</option>
+		        <option>Accessory4</option>
+		        <option>Accessory5</option>
+		</options>
+	</field>
+        <field name="ThrottleCurve2" units="percent" type="float" elementnames="0,25,50,75,100" defaultvalue="0,0.25,0.5,0.75,1"/>
+	<field name="Mixer1Type" units="" type="enum" elements="1" defaultvalue="Disabled">
+		<options>
+			<option>Disabled</option>
+			<option>Motor</option>
+			<option>Servo</option>
+			<option>CameraRoll</option>
+			<option>CameraPitch</option>
+			<option>CameraYaw</option>
+			<option>Accessory0</option>
+			<option>Accessory1</option>
+			<option>Accessory2</option>
+			<option>Accessory3</option>
+			<option>Accessory4</option>
+			<option>Accessory5</option>
+		</options>
+	</field>
+	<field name="Mixer1Vector" units="" type="int8" defaultvalue="0">
+		<elementnames>
+			<elementname>ThrottleCurve1</elementname>
+			<elementname>ThrottleCurve2</elementname>
+			<elementname>Roll</elementname>
+			<elementname>Pitch</elementname>
+			<elementname>Yaw</elementname>
+		</elementnames>
+	</field>
+
+	<field name="Mixer2Type"   cloneof="Mixer1Type"/>
+	<field name="Mixer2Vector" cloneof="Mixer1Vector"/>
+
+	<field name="Mixer3Type"   cloneof="Mixer1Type"/>
+	<field name="Mixer3Vector" cloneof="Mixer1Vector"/>
+
+	<field name="Mixer4Type"   cloneof="Mixer1Type"/>
+	<field name="Mixer4Vector" cloneof="Mixer1Vector"/>
+
+	<field name="Mixer5Type"   cloneof="Mixer1Type"/>
+	<field name="Mixer5Vector" cloneof="Mixer1Vector"/>
+
+	<field name="Mixer6Type"   cloneof="Mixer1Type"/>
+	<field name="Mixer6Vector" cloneof="Mixer1Vector"/>
+
+	<field name="Mixer7Type"   cloneof="Mixer1Type"/>
+	<field name="Mixer7Vector" cloneof="Mixer1Vector"/>
+
+	<field name="Mixer8Type"   cloneof="Mixer1Type"/>
+	<field name="Mixer8Vector" cloneof="Mixer1Vector"/>
+
+	<field name="Mixer9Type"   cloneof="Mixer1Type"/>
+	<field name="Mixer9Vector" cloneof="Mixer1Vector"/>
+
+	<field name="Mixer10Type"   cloneof="Mixer1Type"/>
+	<field name="Mixer10Vector" cloneof="Mixer1Vector"/>
+
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

@@ -91,7 +91,7 @@ void ConnectionManager::init()
 */
 bool ConnectionManager::connectDevice()
 {
-    devListItem connection_device = findDevice(m_availableDevList->itemData(m_availableDevList->currentIndex(),Qt::ToolTipRole).toString());
+    DevListItem connection_device = findDevice(m_availableDevList->itemData(m_availableDevList->currentIndex(),Qt::ToolTipRole).toString());
     if (!connection_device.connection)
         return false;
 
@@ -217,9 +217,9 @@ void ConnectionManager::onConnectPressed()
 /**
 *   Find a device by its displayed (visible on screen) name
 */
-devListItem ConnectionManager::findDevice(const QString &devName)
+DevListItem ConnectionManager::findDevice(const QString &devName)
 {
-    foreach (devListItem d, m_devList)
+    foreach (DevListItem d, m_devList)
     {
         if (d.getConName() == devName)
             return d;
@@ -227,7 +227,7 @@ devListItem ConnectionManager::findDevice(const QString &devName)
 
     qDebug() << "findDevice: cannot find " << devName << " in device list";
 
-    devListItem d;
+    DevListItem d;
     d.connection = NULL;
     return d;
 }
@@ -276,21 +276,16 @@ void ConnectionManager::updateConnectionList(IConnection *connection)
     // available device list then remove them.  If they are connected, then
     // disconnect them.
 
-    for (QLinkedList<devListItem>::iterator iter = m_devList.begin(); iter != m_devList.end(); )
+    for (QLinkedList<DevListItem>::iterator iter = m_devList.begin(); iter != m_devList.end(); )
     {
         if (iter->connection == connection)
         {
             // See if device exists in the updated availability list
-            bool found = false;
-            foreach (IConnection::device dev, availableDev)
-                if (iter->device == dev) // TODO: Need some way of indicating a IOConnection::device matches a devListItem
-                    found = true;
-
+            bool found = availableDev.contains(iter->device);
             if (!found) {
+                // we are currently using the one we are about to erase
                 if (m_connectionDevice.connection && m_connectionDevice.connection == connection && m_connectionDevice.device == iter->device)
-                {	// we are currently using the one we are about to erase
                     disconnectDevice();
-                }
 
                 iter = m_devList.erase(iter);
             } else
@@ -307,7 +302,7 @@ void ConnectionManager::updateConnectionList(IConnection *connection)
     foreach (IConnection::device dev, availableDev)
     {
         bool found = false;
-        foreach (devListItem devList, m_devList)
+        foreach (DevListItem devList, m_devList)
             if (devList.device == dev)
                 found = true;
 
@@ -326,7 +321,7 @@ void ConnectionManager::updateConnectionList(IConnection *connection)
 */
 void ConnectionManager::registerDevice(IConnection *conn, IConnection::device device)
 {
-    devListItem d;
+    DevListItem d;
     d.connection = conn;
     d.device = device;
     m_devList.append(d);
@@ -364,7 +359,7 @@ void ConnectionManager::devChanged(IConnection *connection)
 void ConnectionManager::updateConnectionDropdown()
 {
     //add all the list again to the combobox
-    foreach (devListItem d, m_devList)
+    foreach (DevListItem d, m_devList)
     {
         m_availableDevList->addItem(d.getConName());
         m_availableDevList->setItemData(m_availableDevList->count()-1, d.getConName(), Qt::ToolTipRole);

@@ -56,7 +56,7 @@ namespace Internal {
 } // namespace Internal
 
 
-class devListItem
+class DevListItem
 {
 public:
     IConnection *connection;
@@ -66,6 +66,10 @@ public:
         if (connection == NULL)
             return "";
         return connection->shortName() + ": " + device.displayName;
+    }
+
+    bool operator==(const DevListItem &rhs) {
+        return connection == rhs.connection && device == rhs.device;
     }
 };
 
@@ -81,7 +85,7 @@ public:
     void init();
 
     QIODevice* getCurrentConnection() { return m_ioDev; }
-    devListItem getCurrentDevice() { return m_connectionDevice;}
+    DevListItem getCurrentDevice() { return m_connectionDevice;}
     bool disconnectDevice();
     void suspendPolling();
     void resumePolling();
@@ -90,7 +94,7 @@ protected:
     void updateConnectionList(IConnection *connection);
     void registerDevice(IConnection *conn, IConnection::device device);
     void updateConnectionDropdown();
-    devListItem findDevice(const QString &devName);
+    DevListItem findDevice(const QString &devName);
 
 signals:
     void deviceConnected(QIODevice *dev);
@@ -108,11 +112,11 @@ private slots:
 protected:
     QComboBox *m_availableDevList;
     QPushButton *m_connectBtn;
-    QLinkedList<devListItem> m_devList;
+    QLinkedList<DevListItem> m_devList;
     QList<IConnection*> m_connectionsList;
 
     //currently connected connection plugin
-    devListItem m_connectionDevice;
+    DevListItem m_connectionDevice;
 
     //currently connected QIODevice
     QIODevice *m_ioDev;

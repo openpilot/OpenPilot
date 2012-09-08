@@ -270,47 +270,39 @@ void ConnectionManager::resumePolling()
  */
 void ConnectionManager::updateConnectionList(IConnection *connection)
 {
+    // Get the updated list of devices
     QList <IConnection::device> availableDev = connection->availableDevices();
 
     // Go through the list of connections of that type.  If they are not in the
     // available device list then remove them.  If they are connected, then
     // disconnect them.
-
     for (QLinkedList<DevListItem>::iterator iter = m_devList.begin(); iter != m_devList.end(); )
     {
-        if (iter->connection == connection)
-        {
-            // See if device exists in the updated availability list
-            bool found = availableDev.contains(iter->device);
-            if (!found) {
-                // we are currently using the one we are about to erase
-                if (m_connectionDevice.connection && m_connectionDevice.connection == connection && m_connectionDevice.device == iter->device)
-                    disconnectDevice();
-
-                iter = m_devList.erase(iter);
-            } else
-                ++iter;
+        if (iter->connection != connection) {
+            ++iter;
+            continue;
         }
-        else
+
+        // See if device exists in the updated availability list
+        bool found = availableDev.contains(iter->device);
+        if (!found) {
+            // we are currently using the one we are about to erase
+            if (m_connectionDevice.connection && m_connectionDevice.connection == connection && m_connectionDevice.device == iter->device)
+                disconnectDevice();
+
+            iter = m_devList.erase(iter);
+        } else
             ++iter;
     }
 
-    // Go through the list of available devices.  If they are not present in the device list
-    // add them.
-
-    //and add them back in the list
+    // Add any back to list that don't exist
     foreach (IConnection::device dev, availableDev)
     {
-        bool found = false;
-        foreach (DevListItem devList, m_devList)
-            if (devList.device == dev)
-                found = true;
-
+        bool found = m_devList.contains(DevListItem(connection, dev));
         if (!found) {
             registerDevice(connection,dev);
         }
     }
-
 }
 
 /**
@@ -321,9 +313,7 @@ void ConnectionManager::updateConnectionList(IConnection *connection)
 */
 void ConnectionManager::registerDevice(IConnection *conn, IConnection::device device)
 {
-    DevListItem d;
-    d.connection = conn;
-    d.device = device;
+    DevListItem d(conn,device);
     m_devList.append(d);
 }
 

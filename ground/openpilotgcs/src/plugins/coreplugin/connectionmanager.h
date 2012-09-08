@@ -59,8 +59,10 @@ namespace Internal {
 class DevListItem
 {
 public:
-    IConnection *connection;
-    IConnection::device device;
+    DevListItem(IConnection *c, IConnection::device d) :
+        connection(c), device(d) { }
+
+    DevListItem() : connection(NULL) { }
 
     QString getConName() {
         if (connection == NULL)
@@ -71,6 +73,9 @@ public:
     bool operator==(const DevListItem &rhs) {
         return connection == rhs.connection && device == rhs.device;
     }
+
+    IConnection *connection;
+    IConnection::device device;
 };
 
 

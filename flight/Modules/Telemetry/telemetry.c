@@ -264,7 +264,7 @@ static void processObjEvent(UAVObjEvent * ev)
 			if (ev->event == EV_UPDATED || ev->event == EV_UPDATED_MANUAL || ((ev->event == EV_UPDATED_PERIODIC) && (updateMode != UPDATEMODE_THROTTLED))) {
 #ifdef PIOS_PACKET_HANDLER
 				// Don't send PipXStatus objects over the radio link.
-				if ((ev->obj == PipXStatusHandle()) && (getComPort() == 0) && PIOS_PACKET_HANDLER)
+				if (PIOS_PACKET_HANDLER && (ev->obj == PipXStatusHandle()) && (getComPort() == 0))
 					return;
 #endif
 				// Send update to GCS (with retries)

@@ -64,8 +64,13 @@ ConfigCCAttitudeWidget::~ConfigCCAttitudeWidget()
 }
 
 void ConfigCCAttitudeWidget::sensorsUpdated(UAVObject * obj) {
-    QMutexLocker locker(&startStop);
 
+    if (!timer.isActive()) { 
+	// ignore updates that come in after the timer has expired	
+	return; 
+    }
+
+    // update the progress indicator
     ui->zeroBiasProgress->setValue((float) qMin(accelUpdates,gyroUpdates) / NUM_SENSOR_UPDATES * 100);
 
     Accels * accels = Accels::GetInstance(getObjectManager());
@@ -83,7 +88,7 @@ void ConfigCCAttitudeWidget::sensorsUpdated(UAVObject * obj) {
         x_gyro_accum.append(gyrosData.x);
         y_gyro_accum.append(gyrosData.y);
         z_gyro_accum.append(gyrosData.z);
-    } else if ( accelUpdates >= NUM_SENSOR_UPDATES && gyroUpdates >= NUM_SENSOR_UPDATES) {
+    } else if ( accelUpdates >= NUM_SENSOR_UPDATES || gyroUpdates >= NUM_SENSOR_UPDATES) {
         timer.stop();
         disconnect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(sensorsUpdated(UAVObject*)));
         disconnect(&timer,SIGNAL(timeout()),this,SLOT(timeout()));
@@ -115,7 +120,6 @@ void ConfigCCAttitudeWidget::sensorsUpdated(UAVObject * obj) {
 }
 
 void ConfigCCAttitudeWidget::timeout() {
-    QMutexLocker locker(&startStop);
     UAVDataObject * obj = Accels::GetInstance(getObjectManager());
     disconnect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(sensorsUpdated(UAVObject*)));
     disconnect(&timer,SIGNAL(timeout()),this,SLOT(timeout()));
@@ -130,12 +134,11 @@ void ConfigCCAttitudeWidget::timeout() {
     msgBox.setStandardButtons(QMessageBox::Ok);
     msgBox.setDefaultButton(QMessageBox::Ok);
     msgBox.exec();
-
+    // reset progress indicator
+    ui->zeroBiasProgress->setValue(0);
 }
 
 void ConfigCCAttitudeWidget::startAccelCalibration() {
-    QMutexLocker locker(&startStop);
-
     accelUpdates = 0;
     gyroUpdates = 0;
     x_accum.clear();
@@ -156,10 +159,6 @@ void ConfigCCAttitudeWidget::startAccelCalibration() {
     connect(accels,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(sensorsUpdated(UAVObject*)));
     connect(gyros,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(sensorsUpdated(UAVObject*)));
 
-    // Set up timeout timer
-    timer.start(10000);
-    connect(&timer,SIGNAL(timeout()),this,SLOT(timeout()));
-
     // Speed up updates
     initialAccelsMdata = accels->getMetadata();
     UAVObject::Metadata accelsMdata = initialAccelsMdata;
@@ -173,11 +172,16 @@ void ConfigCCAttitudeWidget::startAccelCalibration() {
     gyrosMdata.flightTelemetryUpdatePeriod = 30;
     gyros->setMetadata(gyrosMdata);
 
+    // Set up timeout timer
+    timer.setSingleShot(true);
+    timer.start(5000 + (NUM_SENSOR_UPDATES * qMin(accelsMdata.flightTelemetryUpdatePeriod,
+                                                  gyrosMdata.flightTelemetryUpdatePeriod)));
+    connect(&timer,SIGNAL(timeout()),this,SLOT(timeout()));
+
 }
 
 void ConfigCCAttitudeWidget::openHelp()
 {
-
     QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/CopterControl+Attitude+Configuration", QUrl::StrictMode) );
 }
 
@@ -186,7 +190,6 @@ void ConfigCCAttitudeWidget::enableControls(bool enable)
     if(ui->zeroBias)
         ui->zeroBias->setEnabled(enable);
     ConfigTaskWidget::enableControls(enable);
-
 }
 
 void ConfigCCAttitudeWidget::updateObjectsFromWidgets()

@@ -296,7 +296,7 @@ void ConnectionManager::updateConnectionList(IConnection *connection)
             // See if device exists in the updated availability list
             bool found = false;
             foreach (IConnection::device dev, availableDev)
-                if (false) // TODO: Need some way of indicating a IOConnection::device matches a devListItem
+                if (iter->device == dev) // TODO: Need some way of indicating a IOConnection::device matches a devListItem
                     found = true;
 
             if (!found) {
@@ -307,7 +307,8 @@ void ConnectionManager::updateConnectionList(IConnection *connection)
                 }
 
                 iter = m_devList.erase(iter);
-            }
+            } else
+                ++iter;
 		}
 		else
 			++iter;
@@ -321,13 +322,11 @@ void ConnectionManager::updateConnectionList(IConnection *connection)
     {
         bool found = false;
         foreach (devListItem devList, m_devList)
-            if (false)
+            if (devList.device == dev)
                 found = true;
 
         if (!found) {
-            QString cbName = connection->shortName() + ": " + dev.name;
-            QString disp = connection->shortName() + " : " + dev.displayName;
-            registerDevice(connection,cbName,dev.name,disp);
+            registerDevice(connection,dev);
         }
     }
 
@@ -339,13 +338,14 @@ void ConnectionManager::updateConnectionList(IConnection *connection)
 *  @param disp is the name that is displayed in the dropdown menu
 *  @param name is the actual device name
 */
-void ConnectionManager::registerDevice(IConnection *conn, const QString &devN, const QString &name, const QString &disp)
+void ConnectionManager::registerDevice(IConnection *conn, IConnection::device device)
 {
     devListItem d;
     d.connection = conn;
-    d.devName = devN;
-    d.Name = name;
-    d.displayName=disp;
+    d.device = device;
+    d.devName = conn->shortName() + ": " + device.name;
+    d.Name = device.name;
+    d.displayName = conn->shortName() + " : " + device.displayName;
     m_devList.append(d);
 }
 

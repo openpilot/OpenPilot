@@ -32,6 +32,7 @@
 #include <QWidget>
 #include "mainwindow.h"
 #include "generalsettings.h"
+#include <coreplugin/iconnection.h>
 #include <QtCore/QVector>
 #include <QtCore/QIODevice>
 #include <QtCore/QLinkedList>
@@ -58,6 +59,7 @@ namespace Internal {
 struct devListItem
 {
     IConnection *connection;
+    IConnection::device device;
     QString devName;
     QString Name;
     QString displayName;
@@ -82,7 +84,7 @@ public:
 
 protected:
     void updateConnectionList(IConnection *connection);
-    void registerDevice(IConnection *conn, const QString &devN, const QString &name, const QString &disp);
+    void registerDevice(IConnection *conn, IConnection::device device);
     devListItem findDevice(const QString &devName);
 
 signals:

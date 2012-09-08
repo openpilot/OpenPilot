@@ -295,29 +295,52 @@ void ConnectionManager::resumePolling()
  */
 void ConnectionManager::updateConnectionList(IConnection *connection)
 {
-	for (QLinkedList<devListItem>::iterator iter = m_devList.begin(); iter != m_devList.end(); )
+    QList <IConnection::device> availableDev = connection->availableDevices();
+
+    // Go through the list of connections of that type.  If they are not in the
+    // available device list then remove them.  If they are connected, then
+    // disconnect them.
+
+    for (QLinkedList<devListItem>::iterator iter = m_devList.begin(); iter != m_devList.end(); )
 	{
 		if (iter->connection == connection)
 		{
-			if (m_connectionDevice.connection && m_connectionDevice.connection == connection)
-			{	// we are currently using the one we are about to erase
-                                //onConnectionClosed(m_connectionDevice.connection);
-                            disconnectDevice();
-			}
+            // See if device exists in the updated availability list
+            bool found = false;
+            foreach (IConnection::device dev, availableDev)
+                if (false) // TODO: Need some way of indicating a IOConnection::device matches a devListItem
+                    found = true;
 
-			iter = m_devList.erase(iter);
+            if (!found) {
+                if (m_connectionDevice.connection && m_connectionDevice.connection == connection)
+                {	// we are currently using the one we are about to erase
+                    //onConnectionClosed(m_connectionDevice.connection);
+                    disconnectDevice();
+                }
+
+                iter = m_devList.erase(iter);
+            }
 		}
 		else
 			++iter;
 	}
 
+    // Go through the list of available devices.  If they are not present in the device list
+    // add them.
+
     //and add them back in the list
-    QList <IConnection::device> availableDev = connection->availableDevices();
     foreach (IConnection::device dev, availableDev)
     {
-        QString cbName = connection->shortName() + ": " + dev.name;
-        QString disp = connection->shortName() + " : " + dev.displayName;
-        registerDevice(connection,cbName,dev.name,disp);
+        bool found = false;
+        foreach (devListItem devList, m_devList)
+            if (false)
+                found = true;
+
+        if (!found) {
+            QString cbName = connection->shortName() + ": " + dev.name;
+            QString disp = connection->shortName() + " : " + dev.displayName;
+            registerDevice(connection,cbName,dev.name,disp);
+        }
     }
 
 }

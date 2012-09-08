@@ -56,13 +56,17 @@ namespace Internal {
 } // namespace Internal
 
 
-struct devListItem
+class devListItem
 {
+public:
     IConnection *connection;
     IConnection::device device;
-    QString devName;
-    QString Name;
-    QString displayName;
+
+    QString getConName() {
+        if (connection == NULL)
+            return "";
+        return connection->shortName() + ": " + device.displayName;
+    }
 };
 
 
@@ -85,6 +89,7 @@ public:
 protected:
     void updateConnectionList(IConnection *connection);
     void registerDevice(IConnection *conn, IConnection::device device);
+    void updateConnectionDropdown();
     devListItem findDevice(const QString &devName);
 
 signals:

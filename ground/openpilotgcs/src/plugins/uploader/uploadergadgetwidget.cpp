@@ -249,8 +249,8 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
 
         // The board is now reset: we have to disconnect telemetry
         Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
-        QString dli = cm->getCurrentDevice().Name;
-        QString dlj = cm->getCurrentDevice().devName;
+        QString dli = cm->getCurrentDevice().getConName();
+        QString dlj = cm->getCurrentDevice().getConName();
         cm->disconnectDevice();
         QTimer::singleShot(200, &m_eventloop, SLOT(quit()));
         m_eventloop.exec();

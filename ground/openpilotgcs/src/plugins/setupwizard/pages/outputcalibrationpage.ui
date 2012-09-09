@@ -36,7 +36,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>5</number>
    </property>
    <widget class="QWidget" name="intro">
     <widget class="QLabel" name="label_3">
@@ -306,7 +306,7 @@
     </widget>
    </widget>
    <widget class="QWidget" name="servoMinMax">
-    <widget class="QPushButton" name="servoAngleButton">
+    <widget class="QPushButton" name="servoMinAngleButton">
      <property name="geometry">
       <rect>
        <x>90</x>
@@ -335,7 +335,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To save the servo and other hardware from damage we have to set the max and min angles for the servo. &lt;/p&gt;&lt;p&gt;To set the extreme angles for the servo, press the Start button below and select the top slider and slide it to the right until max angle is reached. Then select the lower slider and slide it left until the minimum angle is set.&lt;/p&gt;&lt;p&gt;When done press button again to stop.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To save the servo and other hardware from damage we have to set the max and min angles for the servo. &lt;/p&gt;&lt;p&gt;To set the minimum angle for the servo, press the Start button below and select the top slider and slide it to the left until min angle is reached.&lt;/p&gt;&lt;p&gt;When done press button again to stop.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -344,133 +344,137 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QWidget" name="sliderWidget" native="true">
+    <widget class="QSlider" name="servoMinAngleSlider">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>200</y>
+       <width>241</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="minimum">
+      <number>1000</number>
+     </property>
+     <property name="maximum">
+      <number>1500</number>
+     </property>
+     <property name="singleStep">
+      <number>10</number>
+     </property>
+     <property name="pageStep">
+      <number>20</number>
+     </property>
+     <property name="value">
+      <number>1500</number>
+     </property>
+     <property name="tracking">
+      <bool>true</bool>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="invertedAppearance">
+      <bool>false</bool>
+     </property>
+     <property name="invertedControls">
+      <bool>false</bool>
+     </property>
+     <property name="tickPosition">
+      <enum>QSlider::TicksBelow</enum>
+     </property>
+     <property name="tickInterval">
+      <number>40</number>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="page">
+    <widget class="QPushButton" name="servoMaxAngleButton">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>240</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Start</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QSlider" name="servoMaxAngleSlider">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>200</y>
+       <width>241</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="minimum">
+      <number>1500</number>
+     </property>
+     <property name="maximum">
+      <number>2000</number>
+     </property>
+     <property name="singleStep">
+      <number>10</number>
+     </property>
+     <property name="pageStep">
+      <number>20</number>
+     </property>
+     <property name="value">
+      <number>1500</number>
+     </property>
+     <property name="tracking">
+      <bool>true</bool>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="invertedAppearance">
+      <bool>false</bool>
+     </property>
+     <property name="invertedControls">
+      <bool>false</bool>
+     </property>
+     <property name="tickPosition">
+      <enum>QSlider::TicksBelow</enum>
+     </property>
+     <property name="tickInterval">
+      <number>40</number>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_8">
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>160</y>
+       <y>10</y>
        <width>261</width>
-       <height>80</height>
+       <height>151</height>
       </rect>
      </property>
-     <widget class="QRadioButton" name="servoMinAngleSliderRB">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>40</y>
-        <width>16</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QRadioButton" name="servoMaxAngleSliderRB">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>0</y>
-        <width>16</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="checked">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QSlider" name="servoMaxAngleSlider">
-      <property name="geometry">
-       <rect>
-        <x>39</x>
-        <y>0</y>
-        <width>211</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="minimum">
-       <number>1500</number>
-      </property>
-      <property name="maximum">
-       <number>2000</number>
-      </property>
-      <property name="singleStep">
-       <number>10</number>
-      </property>
-      <property name="pageStep">
-       <number>20</number>
-      </property>
-      <property name="value">
-       <number>1500</number>
-      </property>
-      <property name="tracking">
-       <bool>true</bool>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="invertedAppearance">
-       <bool>false</bool>
-      </property>
-      <property name="invertedControls">
-       <bool>false</bool>
-      </property>
-      <property name="tickPosition">
-       <enum>QSlider::TicksBelow</enum>
-      </property>
-      <property name="tickInterval">
-       <number>40</number>
-      </property>
-     </widget>
-     <widget class="QSlider" name="servoMinAngleSlider">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>39</x>
-        <y>40</y>
-        <width>211</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="minimum">
-       <number>1000</number>
-      </property>
-      <property name="maximum">
-       <number>1500</number>
-      </property>
-      <property name="singleStep">
-       <number>10</number>
-      </property>
-      <property name="pageStep">
-       <number>20</number>
-      </property>
-      <property name="value">
-       <number>1500</number>
-      </property>
-      <property name="tracking">
-       <bool>true</bool>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="invertedAppearance">
-       <bool>false</bool>
-      </property>
-      <property name="invertedControls">
-       <bool>false</bool>
-      </property>
-      <property name="tickPosition">
-       <enum>QSlider::TicksBelow</enum>
-      </property>
-      <property name="tickInterval">
-       <number>40</number>
-      </property>
-     </widget>
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To set the maximum angle for the servo, press the Start button below and select the top slider and slide it to the right until max angle is reached.&lt;/p&gt;&lt;p&gt;When done press button again to stop.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
     </widget>
    </widget>
   </widget>
@@ -530,38 +534,6 @@
  <resources/>
  <connections>
   <connection>
-   <sender>servoMaxAngleSliderRB</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>servoMaxAngleSlider</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>37</x>
-     <y>208</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>164</x>
-     <y>209</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>servoMinAngleSliderRB</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>servoMinAngleSlider</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>37</x>
-     <y>248</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>164</x>
-     <y>249</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>motorNeutralButton</sender>
    <signal>toggled(bool)</signal>
    <receiver>motorNeutralSlider</receiver>
@@ -610,9 +582,9 @@
    </hints>
   </connection>
   <connection>
-   <sender>servoAngleButton</sender>
+   <sender>servoMaxAngleButton</sender>
    <signal>toggled(bool)</signal>
-   <receiver>sliderWidget</receiver>
+   <receiver>servoMaxAngleSlider</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -621,7 +593,23 @@
     </hint>
     <hint type="destinationlabel">
      <x>150</x>
-     <y>239</y>
+     <y>249</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>servoMinAngleButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>servoMinAngleSlider</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>147</x>
+     <y>291</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>150</x>
+     <y>249</y>
     </hint>
    </hints>
   </connection>

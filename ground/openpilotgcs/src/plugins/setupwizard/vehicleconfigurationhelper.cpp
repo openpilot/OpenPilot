@@ -52,14 +52,12 @@ VehicleConfigurationHelper::VehicleConfigurationHelper(VehicleConfigurationSourc
 bool VehicleConfigurationHelper::setupVehicle(bool save)
 {
     m_progress = 0;
-    if(save) {
-        clearModifiedObjects();
-        resetVehicleConfig();
-        resetGUIData();
-        if(!saveChangesToController())
-        {
-            return false;
-        }
+    clearModifiedObjects();
+    resetVehicleConfig();
+    resetGUIData();
+    if(!saveChangesToController(save))
+    {
+        return false;
     }
 
     applyHardwareConfiguration();
@@ -68,18 +66,16 @@ bool VehicleConfigurationHelper::setupVehicle(bool save)
     applyFlighModeConfiguration();
     applyLevellingConfiguration();
     applyStabilizationConfiguration();
+    applyManualControlDefaults();
 
-    if(save) {
-        bool result = saveChangesToController();
-        if(result) {
-            emit saveProgress(PROGRESS_STEPS, ++m_progress, tr("Done!"));
-        }
-        else {
-            emit saveProgress(PROGRESS_STEPS, ++m_progress, tr("Failed!"));
-        }
-        return result;
+    bool result = saveChangesToController(save);
+    if(result) {
+        emit saveProgress(PROGRESS_STEPS, ++m_progress, tr("Done!"));
     }
-    return true;
+    else {
+        emit saveProgress(PROGRESS_STEPS, ++m_progress, tr("Failed!"));
+    }
+    return result;
 }
 
 void VehicleConfigurationHelper::addModifiedObject(UAVDataObject *object, QString description)
@@ -189,13 +185,13 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
         case VehicleConfigurationSource::VEHICLE_MULTI: {
             ActuatorSettings::DataFields data = actSettings->getData();
 
-            actuatorSettings actuatorSettings = m_configSource->getActuatorSettings();
+            QList<actuatorChannelSettings> actuatorSettings = m_configSource->getActuatorSettings();
             for(quint16 i = 0; i < ActuatorSettings::CHANNELMAX_NUMELEM; i++) {
                 data.ChannelType[i] = ActuatorSettings::CHANNELTYPE_PWM;
                 data.ChannelAddr[i] = i;
-                data.ChannelMin[i] = actuatorSettings.channels[i].channelMin;
-                data.ChannelNeutral[i] = actuatorSettings.channels[i].channelNeutral;
-                data.ChannelMax[i] = actuatorSettings.channels[i].channelMax;
+                data.ChannelMin[i] = actuatorSettings[i].channelMin;
+                data.ChannelNeutral[i] = actuatorSettings[i].channelNeutral;
+                data.ChannelMax[i] = actuatorSettings[i].channelMax;
             }
 
             data.MotorsSpinWhileArmed = ActuatorSettings::MOTORSSPINWHILEARMED_FALSE;
@@ -241,7 +237,7 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
                     break;
             }
             actSettings->setData(data);
-            addModifiedObject(actSettings, tr("Writing output rate settings"));
+            addModifiedObject(actSettings, tr("Writing actuator settings"));
             break;
         }
         case VehicleConfigurationSource::VEHICLE_FIXEDWING:
@@ -336,7 +332,7 @@ void VehicleConfigurationHelper::applyMixerConfiguration(mixerSettings mixer)
     }
 
     // Apply updates
-    //mSettings->setData(mSettings->getData());
+    mSettings->setData(mSettings->getData());
     addModifiedObject(mSettings, tr("Writing mixer settings"));
 
 }
@@ -356,7 +352,28 @@ void VehicleConfigurationHelper::applyMultiGUISettings(SystemSettings::AirframeT
     addModifiedObject(sSettings, tr("Writing vehicle settings"));
 }
 
-bool VehicleConfigurationHelper::saveChangesToController()
+void VehicleConfigurationHelper::applyManualControlDefaults()
+{
+    ManualControlSettings *mcSettings = ManualControlSettings::GetInstance(m_uavoManager);
+    Q_ASSERT(mcSettings);
+    ManualControlSettings::DataFields cData = mcSettings->getData();
+    cData.ChannelGroups[ManualControlSettings::CHANNELGROUPS_THROTTLE] = ManualControlSettings::CHANNELGROUPS_PWM;
+    cData.ChannelGroups[ManualControlSettings::CHANNELGROUPS_ROLL] = ManualControlSettings::CHANNELGROUPS_PWM;
+    cData.ChannelGroups[ManualControlSettings::CHANNELGROUPS_YAW] = ManualControlSettings::CHANNELGROUPS_PWM;
+    cData.ChannelGroups[ManualControlSettings::CHANNELGROUPS_PITCH] = ManualControlSettings::CHANNELGROUPS_PWM;
+    cData.ChannelGroups[ManualControlSettings::CHANNELGROUPS_FLIGHTMODE] = ManualControlSettings::CHANNELGROUPS_PWM;
+
+    cData.ChannelNumber[ManualControlSettings::CHANNELGROUPS_THROTTLE] = 1;
+    cData.ChannelNumber[ManualControlSettings::CHANNELGROUPS_ROLL] = 2;
+    cData.ChannelNumber[ManualControlSettings::CHANNELGROUPS_YAW] = 3;
+    cData.ChannelNumber[ManualControlSettings::CHANNELGROUPS_PITCH] = 4;
+    cData.ChannelNumber[ManualControlSettings::CHANNELGROUPS_FLIGHTMODE] = 5;
+
+    mcSettings->setData(cData);
+    addModifiedObject(mcSettings, tr("Writing manual control defaults"));
+}
+
+bool VehicleConfigurationHelper::saveChangesToController(bool save)
 {
     qDebug() << "Saving modified objects to controller. " << m_modifiedObjects.count() << " objects in found.";
     const int OUTER_TIMEOUT = 3000 * 20; // 10 seconds timeout for saving all objects
@@ -404,21 +421,23 @@ bool VehicleConfigurationHelper::saveChangesToController()
             disconnect(obj, SIGNAL(transactionCompleted(UAVObject* ,bool)), this, SLOT(uAVOTransactionCompleted(UAVObject*, bool)));
             if(m_transactionOK) {
                 qDebug() << "Object " << obj->getName() << " was successfully updated.";
-                m_transactionOK = false;
-                m_currentTransactionObjectID = obj->getObjID();
-                // Try to save until success or timeout
-                while(!m_transactionOK && !m_transactionTimeout) {
-                    // Allow the transaction to take some time
-                    innerTimeoutTimer.start(INNER_TIMEOUT);
+                if(save) {
+                    m_transactionOK = false;
+                    m_currentTransactionObjectID = obj->getObjID();
+                    // Try to save until success or timeout
+                    while(!m_transactionOK && !m_transactionTimeout) {
+                        // Allow the transaction to take some time
+                        innerTimeoutTimer.start(INNER_TIMEOUT);
 
-                    // Persist object in controller
-                    utilMngr->saveObjectToSD(obj);
-                    if(!m_transactionOK) {
-                        m_eventLoop.exec();
+                        // Persist object in controller
+                        utilMngr->saveObjectToSD(obj);
+                        if(!m_transactionOK) {
+                            m_eventLoop.exec();
+                        }
+                        innerTimeoutTimer.stop();
                     }
-                    innerTimeoutTimer.stop();
+                    m_currentTransactionObjectID = -1;
                 }
-                m_currentTransactionObjectID = -1;
             }
 
             if(!m_transactionOK) {
@@ -665,8 +684,8 @@ void VehicleConfigurationHelper::setupQuadCopter()
 
             guiSettings.multi.VTOLMotorNW = 1;
             guiSettings.multi.VTOLMotorNE = 2;
-            guiSettings.multi.VTOLMotorSW = 3;
-            guiSettings.multi.VTOLMotorSE = 4;
+            guiSettings.multi.VTOLMotorSE = 3;
+            guiSettings.multi.VTOLMotorSW = 4;
 
             break;
         }

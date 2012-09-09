@@ -50,9 +50,6 @@ struct actuatorChannelSettings {
     actuatorChannelSettings(): channelMin(1000), channelNeutral(1080), channelMax(1800) {}
 };
 
-struct actuatorSettings {
-    actuatorChannelSettings channels[ActuatorSettings::CHANNELADDR_NUMELEM];
-};
 
 class VehicleConfigurationSource
 {
@@ -78,7 +75,7 @@ public:
     virtual accelGyroBias getLevellingBias() const = 0;
 
     virtual bool isMotorCalibrationPerformed() const = 0;
-    virtual actuatorSettings getActuatorSettings() const = 0;
+    virtual QList<actuatorChannelSettings> getActuatorSettings() const = 0;
 
     virtual QString getSummaryText() = 0;
 };

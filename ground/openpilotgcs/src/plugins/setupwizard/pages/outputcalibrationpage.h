@@ -46,6 +46,7 @@ public:
     explicit OutputCalibrationPage(SetupWizard *wizard, QWidget *parent = 0);
     ~OutputCalibrationPage();
     void initializePage();
+    bool validatePage();
 
 protected:
     void showEvent(QShowEvent *event);
@@ -63,13 +64,11 @@ private slots:
     void on_servoCenterButton_toggled(bool checked);
     void on_servoCenterSlider_valueChanged(int position);
 
-    void on_servoAngleButton_toggled(bool checked);
-    void on_servoMaxAngleSlider_valueChanged(int position);
+    void on_servoMinAngleButton_toggled(bool checked);
     void on_servoMinAngleSlider_valueChanged(int position);
 
-    void on_servoMaxAngleSliderRB_toggled(bool checked);
-
-    void on_servoMinAngleSliderRB_toggled(bool checked);
+    void on_servoMaxAngleButton_toggled(bool checked);
+    void on_servoMaxAngleSlider_valueChanged(int position);
 
 private:
     void setupVehicle();
@@ -82,11 +81,6 @@ private:
     bool checkAlarms();
     quint16 getCurrentChannel();
 
-    quint16 getEscUpdateRate(){ return getWizard()->getESCType() == VehicleConfigurationSource::ESC_RAPID ?
-                    VehicleConfigurationHelper::RAPID_ESC_FREQUENCE : VehicleConfigurationHelper::LEGACY_ESC_FREQUENCE; }
-
-    quint16 getServoUpdateRate(){ return VehicleConfigurationHelper::LEGACY_ESC_FREQUENCE; }
-
     Ui::OutputCalibrationPage *ui;
     QSvgRenderer *m_vehicleRenderer;
     QGraphicsScene *m_vehicleScene;
@@ -97,10 +91,10 @@ private:
     QList<QString> m_vehicleElementIds;
     QList<QGraphicsSvgItem*> m_vehicleItems;
     QList<quint16> m_vehicleHighlightElementIndexes;
+    QList<quint16> m_channelIndex;
     QList<quint16> m_wizardIndexes;
-    QList<quint16> m_channelUpdateRates;
 
-    actuatorSettings m_actuatorSettings;
+    QList<actuatorChannelSettings> m_actuatorSettings;
 
     OutputCalibrationUtil *m_calibrationUtil;
 

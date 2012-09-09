@@ -31,8 +31,6 @@
 #include "vehicleconfigurationhelper.h"
 #include "manualcontrolsettings.h"
 
-const quint16 OutputCalibrationUtil::UPDATE_CHANNEL_MAPPING[10] = {0, 0, 0, 1, 2, 3, 2, 2, 3, 3};
-
 OutputCalibrationUtil::OutputCalibrationUtil(QObject *parent) :
     QObject(parent), m_outputChannel(-1), m_safeValue(1000)
 {
@@ -44,44 +42,6 @@ OutputCalibrationUtil::OutputCalibrationUtil(QObject *parent) :
 OutputCalibrationUtil::~OutputCalibrationUtil()
 {
     stopChannelOutput();
-}
-
-void OutputCalibrationUtil::setupOutputRates(const QList<quint16> &outputRates)
-{
-    //Set actuator settings for channels
-    ActuatorSettings *actuatorSettings = ActuatorSettings::GetInstance(m_uavObjectManager);
-    Q_ASSERT(actuatorSettings);
-    ActuatorSettings::DataFields aData = actuatorSettings->getData();
-
-    for(int i = 0; i < outputRates.size(); i++) {
-        aData.ChannelType[i] = ActuatorSettings::CHANNELTYPE_PWM;
-        aData.ChannelAddr[i] = i;
-        aData.ChannelMin[i] = 1000;
-        aData.ChannelNeutral[i] = 1000;
-        aData.ChannelMax[i] = 2000;
-        aData.ChannelUpdateFreq[UPDATE_CHANNEL_MAPPING[i]] = outputRates[i];
-    }
-
-    actuatorSettings->setData(aData);
-    actuatorSettings->updated();
-
-    ManualControlSettings *manualControlSettings = ManualControlSettings::GetInstance(m_uavObjectManager);
-    Q_ASSERT(manualControlSettings);
-    ManualControlSettings::DataFields cData = manualControlSettings->getData();
-    cData.ChannelGroups[ManualControlSettings::CHANNELGROUPS_THROTTLE] = ManualControlSettings::CHANNELGROUPS_PWM;
-    cData.ChannelGroups[ManualControlSettings::CHANNELGROUPS_ROLL] = ManualControlSettings::CHANNELGROUPS_PWM;
-    cData.ChannelGroups[ManualControlSettings::CHANNELGROUPS_YAW] = ManualControlSettings::CHANNELGROUPS_PWM;
-    cData.ChannelGroups[ManualControlSettings::CHANNELGROUPS_PITCH] = ManualControlSettings::CHANNELGROUPS_PWM;
-    cData.ChannelGroups[ManualControlSettings::CHANNELGROUPS_FLIGHTMODE] = ManualControlSettings::CHANNELGROUPS_PWM;
-
-    cData.ChannelNumber[ManualControlSettings::CHANNELGROUPS_THROTTLE] = 1;
-    cData.ChannelNumber[ManualControlSettings::CHANNELGROUPS_ROLL] = 2;
-    cData.ChannelNumber[ManualControlSettings::CHANNELGROUPS_YAW] = 3;
-    cData.ChannelNumber[ManualControlSettings::CHANNELGROUPS_PITCH] = 4;
-    cData.ChannelNumber[ManualControlSettings::CHANNELGROUPS_FLIGHTMODE] = 5;
-
-    manualControlSettings->setData(cData);
-    manualControlSettings->updated();
 }
 
 void OutputCalibrationUtil::startChannelOutput(quint16 channel, quint16 safeValue)

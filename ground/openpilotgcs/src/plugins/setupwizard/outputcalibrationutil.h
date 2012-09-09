@@ -46,15 +46,12 @@ public:
 signals:
     
 public slots:
-    void setupOutputRates(const QList<quint16> &outputRates);
     void startChannelOutput(quint16 channel, quint16 safeValue);
     void stopChannelOutput();
 
     void setChannelOutputValue(quint16 value);
 
 private:
-    static const quint16 UPDATE_CHANNEL_MAPPING[10];
-    actuatorSettings *m_actuatorSettings;
     qint16 m_outputChannel;
     quint16 m_safeValue;
     UAVObject::Metadata m_savedActuatorCommandMetadata;

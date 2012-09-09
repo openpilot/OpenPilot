@@ -68,16 +68,11 @@ signals:
     void saveProgress(int total, int current, QString description);
 
 private:
-
-    static const qint16 ACTUATOR_MIN = 1000;
-    static const qint16 ACTUATOR_NEUTRAL = 1000;
-    static const qint16 ACTUATOR_MAX = 2000;
-
     static const int MIXER_TYPE_DISABLED = 0;
     static const int MIXER_TYPE_MOTOR = 1;
     static const int MIXER_TYPE_SERVO = 2;
 
-    static const int PROGRESS_STEPS = 10;
+    static const int PROGRESS_STEPS = 11;
 
     VehicleConfigurationSource *m_configSource;
     UAVObjectManager *m_uavoManager;
@@ -92,13 +87,14 @@ private:
     void applyFlighModeConfiguration();
     void applyLevellingConfiguration();
     void applyStabilizationConfiguration();
+    void applyManualControlDefaults();
 
     void applyMixerConfiguration(mixerSettings mixer);
 
     GUIConfigDataUnion getGUIConfigData();
     void applyMultiGUISettings(SystemSettings::AirframeTypeOptions airframe, GUIConfigDataUnion guiConfig);
 
-    bool saveChangesToController();
+    bool saveChangesToController(bool save);
     QEventLoop m_eventLoop;
     bool m_transactionOK;
     bool m_transactionTimeout;

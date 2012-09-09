@@ -64,6 +64,7 @@ void LevellingPage::enableButtons(bool enable)
     getWizard()->button(QWizard::NextButton)->setEnabled(enable);
     getWizard()->button(QWizard::CancelButton)->setEnabled(enable);
     getWizard()->button(QWizard::BackButton)->setEnabled(enable);
+    QApplication::processEvents();
 }
 
 void LevellingPage::performLevelling()

@@ -43,6 +43,7 @@
 #include "pages/notyetimplementedpage.h"
 #include "extensionsystem/pluginmanager.h"
 #include "vehicleconfigurationhelper.h"
+#include "actuatorsettings.h"
 
 SetupWizard::SetupWizard(QWidget *parent) : QWizard(parent), VehicleConfigurationSource(),
     m_controllerType(CONTROLLER_UNKNOWN),
@@ -52,6 +53,10 @@ SetupWizard::SetupWizard(QWidget *parent) : QWizard(parent), VehicleConfiguratio
     setWindowTitle(tr("OpenPilot Setup Wizard"));
     setOption(QWizard::IndependentPages, false);
     setFixedSize(640, 530);
+    for(int i = 0; i < ActuatorSettings::CHANNELMAX_NUMELEM; i++)
+    {
+        m_actuatorSettings << actuatorChannelSettings();
+    }
     createPages();
 }
 

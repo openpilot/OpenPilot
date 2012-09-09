@@ -63,9 +63,9 @@ public:
     bool isLevellingPerformed() const { return m_levellingPerformed; }
     accelGyroBias getLevellingBias() const { return m_levellingBias; }
 
-    void setActuatorSettings(actuatorSettings neutralSettings) { m_actuatorNeutralConfig = neutralSettings; }
+    void setActuatorSettings(QList<actuatorChannelSettings> actuatorSettings) { m_actuatorSettings = actuatorSettings; }
     bool isMotorCalibrationPerformed() const { return m_motorCalibrationPerformed; }
-    actuatorSettings getActuatorSettings() const { return m_actuatorNeutralConfig; }
+    QList<actuatorChannelSettings> getActuatorSettings() const { return m_actuatorSettings; }
 
     QString getSummaryText();
 
@@ -93,7 +93,7 @@ private:
     accelGyroBias m_levellingBias;
 
     bool m_motorCalibrationPerformed;
-    actuatorSettings m_actuatorNeutralConfig;
+    QList<actuatorChannelSettings> m_actuatorSettings;
 
     Core::ConnectionManager *m_connectionManager;
 };

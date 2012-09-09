@@ -197,7 +197,7 @@ plugin_uavobjectutil.depends += plugin_uavobjects
 SUBDIRS += plugin_uavobjectutil
 
 # OSG Earth View plugin
-macx {
+OSG {
     plugin_osgearthview.subdir = osgearthview
     plugin_osgearthview.depends = plugin_coreplugin
     plugin_osgearthview.depends += plugin_uavobjects

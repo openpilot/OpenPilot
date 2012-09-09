@@ -145,12 +145,14 @@ private slots:
     void defaultButtonClicked();
     void reloadButtonClicked();
 private:
+    int currentBoard;
     bool isConnected;
     bool allowWidgetUpdates;
     QStringList objectsList;
     QList <objectToWidget*> objOfInterest;
     ExtensionSystem::PluginManager *pm;
     UAVObjectManager *objManager;
+    UAVObjectUtilManager* utilMngr;
     smartSaveButton *smartsave;
     QMap<UAVObject *,bool> objectUpdates;
     QMap<int,QList<objectToWidget*> *> defaultReloadGroups;

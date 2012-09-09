@@ -1284,6 +1284,16 @@ const struct pios_usb_hid_cfg pios_usb_hid_cfg = {
 
 #endif /* PIOS_INCLUDE_USB_HID */
 
+#if defined(PIOS_INCLUDE_USB_RCTX)
+#include <pios_usb_rctx_priv.h>
+
+const struct pios_usb_rctx_cfg pios_usb_rctx_cfg = {
+	.data_if = 2,
+	.data_tx_ep = 1,
+};
+
+#endif	/* PIOS_INCLUDE_USB_RCTX */
+
 #if defined(PIOS_INCLUDE_USB_CDC)
 #include <pios_usb_cdc_priv.h>
 

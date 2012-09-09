@@ -50,6 +50,10 @@
 #include "stabilizationdesired.h"
 #include "receiveractivity.h"
 
+#if defined(PIOS_INCLUDE_USB_RCTX)
+#include "pios_usb_rctx.h"
+#endif	/* PIOS_INCLUDE_USB_RCTX */
+
 // Private constants
 #if defined(PIOS_MANUAL_STACK_SIZE)
 #define STACK_SIZE_BYTES PIOS_MANUAL_STACK_SIZE
@@ -386,6 +390,15 @@ static void manualControlTask(void *parameters)
 			
 			// Update cmd object
 			ManualControlCommandSet(&cmd);
+#if defined(PIOS_INCLUDE_USB_RCTX)
+			if (pios_usb_rctx_id) {
+				PIOS_USB_RCTX_Update(pios_usb_rctx_id,
+						cmd.Channel,
+						settings.ChannelMin,
+						settings.ChannelMax,
+						NELEMENTS(cmd.Channel));
+			}
+#endif	/* PIOS_INCLUDE_USB_RCTX */
 
 		} else {
 			ManualControlCommandGet(&cmd);	/* Under GCS control */
@@ -725,6 +738,7 @@ static void updatePathDesired(ManualControlCommandData * cmd, bool changed)
 	static portTickType lastSysTime;
 	portTickType thisSysTime;
 	float dT;
+	const bool TRANSMITTER_MODE_POSITION = false;
 
 	thisSysTime = xTaskGetTickCount();
 	dT = (thisSysTime - lastSysTime) / portTICK_RATE_MS / 1000.0f;
@@ -742,7 +756,7 @@ static void updatePathDesired(ManualControlCommandData * cmd, bool changed)
 		pathDesired.End[PATHDESIRED_END_DOWN] = positionActual.Down;
 		pathDesired.Mode = PATHDESIRED_MODE_ENDPOINT;
 		PathDesiredSet(&pathDesired);
-	} else {
+	} else if (TRANSMITTER_MODE_POSITION) {
 		PathDesiredData pathDesired;
 		PathDesiredGet(&pathDesired);
 		pathDesired.End[PATHDESIRED_END_NORTH] += dT * -cmd->Pitch;

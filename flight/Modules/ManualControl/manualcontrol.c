@@ -422,6 +422,9 @@ static void manualControlTask(void *parameters)
 					case FLIGHTSTATUS_FLIGHTMODE_RTH:
 						setRTH(lastFlightMode != flightStatus.FlightMode);
 						break;
+					case FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER:
+						// No need to call anything.  This just avoids errors.
+						break;
 					default:
 						AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_CRITICAL);
 				}

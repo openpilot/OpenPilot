@@ -246,6 +246,7 @@ void ConnectionManager::suspendPolling()
 
     m_connectBtn->setEnabled(false);
     m_availableDevList->setEnabled(false);
+    polling = false;
 }
 
 /**
@@ -261,6 +262,7 @@ void ConnectionManager::resumePolling()
 
     m_connectBtn->setEnabled(true);
     m_availableDevList->setEnabled(true);
+    polling = true;
 }
 
 /**
@@ -357,8 +359,9 @@ void ConnectionManager::updateConnectionDropdown()
         {
             if(m_mainWindow->generalSettings()->autoConnect() || m_mainWindow->generalSettings()->autoSelect())
                 m_availableDevList->setCurrentIndex(m_availableDevList->count()-1);
-            if(m_mainWindow->generalSettings()->autoConnect())
+            if(m_mainWindow->generalSettings()->autoConnect() && polling)
             {
+                qDebug() << "Automatically opening device";
                 connectDevice();
                 qDebug()<<"ConnectionManager::devChanged autoconnected USB device";
             }

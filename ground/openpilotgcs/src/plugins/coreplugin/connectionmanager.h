@@ -113,7 +113,7 @@ private slots:
     void devChanged(IConnection *connection);
 
 	void onConnectionDestroyed(QObject *obj);
-        void connectionsCallBack(); //used to call devChange after all the plugins are loaded
+    void connectionsCallBack(); //used to call devChange after all the plugins are loaded
 protected:
     QComboBox *m_availableDevList;
     QPushButton *m_connectBtn;
@@ -128,8 +128,9 @@ protected:
 
 private:
 	bool connectDevice();
-        Internal::MainWindow *m_mainWindow;
-        QList <IConnection *> connectionBackup;
+    bool polling;
+    Internal::MainWindow *m_mainWindow;
+    QList <IConnection *> connectionBackup;
 
 };
 

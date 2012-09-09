@@ -117,7 +117,7 @@ pjrc_rawhid::~pjrc_rawhid()
 //
 int pjrc_rawhid::open(int max, int vid, int pid, int usage_page, int usage)
 {
-    static IOHIDManagerRef hid_manager=NULL;
+    IOHIDManagerRef hid_manager=NULL;
     CFMutableDictionaryRef dict;
     CFNumberRef num;
     IOReturn ret;
@@ -439,7 +439,7 @@ static void hid_close(hid_t *hid)
     IOHIDManagerRef hid_manager = IOHIDManagerCreate(kCFAllocatorDefault, kIOHIDOptionsTypeNone);
     IOHIDManagerRegisterDeviceMatchingCallback(hid_manager, NULL, NULL);
     IOHIDManagerRegisterDeviceRemovalCallback(hid_manager, NULL, NULL);
-    IOHIDDeviceUnscheduleFromRunLoop(hid->ref, CFRunLoopGetCurrent( ), kCFRunLoopDefaultMode);
+    IOHIDDeviceUnscheduleFromRunLoop(hid->ref, the_correct_runloop, kCFRunLoopDefaultMode);
     IOHIDDeviceClose(hid->ref, kIOHIDOptionsTypeNone);
     IOHIDManagerClose(hid_manager, 0);
     hid->ref = NULL;
@@ -463,7 +463,6 @@ static void attach_callback(void *context, IOReturn r, void *hid_mgr, IOHIDDevic
 {
     struct hid_struct *h;
 
-    printf("attach callback\n");
     if (IOHIDDeviceOpen(dev, kIOHIDOptionsTypeNone) != kIOReturnSuccess) return;
     h = (hid_t *)malloc(sizeof(hid_t));
     if (!h) return;

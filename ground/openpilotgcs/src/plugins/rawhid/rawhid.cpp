@@ -138,6 +138,7 @@ RawHIDReadThread::RawHIDReadThread(RawHID *hid)
     hidno(hid->m_deviceNo),
     m_running(true)
 {
+    hid->m_startedMutex->lock();
 }
 
 RawHIDReadThread::~RawHIDReadThread()
@@ -151,6 +152,7 @@ RawHIDReadThread::~RawHIDReadThread()
 void RawHIDReadThread::run()
 {
     qDebug() << "Read thread started";
+    m_running = m_hid->openDevice();
     while(m_running)
     {
         //here we use a temporary buffer so we don't need to lock
@@ -182,6 +184,7 @@ void RawHIDReadThread::run()
             m_running=false;
         }
     }
+    m_hid->closeDevice();
 }
 
 int RawHIDReadThread::getReadData(char *data, int size)
@@ -301,13 +304,29 @@ RawHID::RawHID(const QString &deviceName)
 {
 
     m_mutex = new QMutex(QMutex::Recursive);
+    m_startedMutex = new QMutex();
 
     // detect if the USB device is unplugged
     QObject::connect(&dev, SIGNAL(deviceUnplugged(int)), this, SLOT(onDeviceUnplugged(int)));
 
+    // Starting the read thread will lock the m_startexMutex until the
+    // device is opened
+    m_readThread = new RawHIDReadThread(this);
+    m_readThread->start();
+
+    m_startedMutex->lock();
+}
+
+/**
+ * @brief RawHID::openDevice This method opens the USB connection
+ * It is uses as a callback from the read thread so that the USB
+ * system code is registered in that thread instead of the calling
+ * thread (usually UI)
+ */
+bool RawHID::openDevice() {
     int opened = dev.open(USB_MAX_DEVICES, USBMonitor::idVendor_OpenPilot, -1, USB_USAGE_PAGE, USB_USAGE);
     for (int i =0; i< opened; i++) {
-        if (deviceName == dev.getserial(i))
+        if (serialNumber == dev.getserial(i))
             m_deviceNo = i;
         else
             dev.close(i);
@@ -316,27 +335,31 @@ RawHID::RawHID(const QString &deviceName)
     //didn't find the device we are trying to open (shouldnt happen)
     if (opened < 0)
     {
-        qDebug() << "Error: cannot open device " << deviceName;
-        return;
+        return false;
     }
 
-    //m_deviceNo = 0;
-    m_readThread = new RawHIDReadThread(this);
     m_writeThread = new RawHIDWriteThread(this);
-
-    m_readThread->start();
     m_writeThread->start();
+
+    m_startedMutex->unlock();
+
+    return true;
+}
+
+/**
+ * @brief RawHID::closeDevice This method closes the USB connection
+ * It is uses as a callback from the read thread so that the USB
+ * system code is unregistered from that thread\
+ */
+bool RawHID::closeDevice() {
+    dev.close(m_deviceNo);
 }
 
 RawHID::~RawHID()
 {
-	dev.close(m_deviceNo);
-
-	if (m_readThread)
-        delete m_readThread;
-
-	if (m_writeThread)
-        delete m_writeThread;
+    // If the read thread exists then the device is open
+    if (m_readThread)
+        close();
 }
 
 void RawHID::onDeviceUnplugged(int num)
@@ -345,7 +368,6 @@ void RawHID::onDeviceUnplugged(int num)
 		return;
 
 	// the USB device has been unplugged
-
 	close();
 }
 
@@ -372,13 +394,6 @@ void RawHID::close()
 
     m_mutex->lock();
 
-    if (m_readThread)
-    {
-        m_readThread->terminate();
-        delete m_readThread; // calls wait
-        m_readThread = NULL;
-    }
-
     if (m_writeThread)
     {
         m_writeThread->terminate();
@@ -386,7 +401,13 @@ void RawHID::close()
         m_writeThread = NULL;
     }
 
-    dev.close(m_deviceNo);
+
+    if (m_readThread)
+    {
+        m_readThread->terminate();
+        delete m_readThread; // calls wait
+        m_readThread = NULL;
+    }
 
     m_mutex->unlock();
 

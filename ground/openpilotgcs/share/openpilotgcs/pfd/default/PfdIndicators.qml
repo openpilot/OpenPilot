@@ -2,17 +2,17 @@ import Qt 4.7
 
 Item {
     id: sceneItem
-    property variant sourceSize
+    property variant sceneSize
 
     //telemetry status arrow
-    Image {
+    SvgElementImage {
         id: telemetry_status
-        source: "image://svg/pfd.svg!gcstelemetry-"+statusName
-        sourceSize: sceneItem.sourceSize
+        elementName: "gcstelemetry-"+statusName
+        sceneSize: sceneItem.sceneSize
 
         property string statusName : ["Disconnected","HandshakeReq","HandshakeAck","Connected"][GCSTelemetryStats.Status]
 
-        property variant scaledBounds: svgRenderer.scaledElementBounds("pfd.svg", "gcstelemetry-Disconnected")
+        scaledBounds: svgRenderer.scaledElementBounds("pfd.svg", "gcstelemetry-Disconnected")
         x: scaledBounds.x * sceneItem.width
         y: scaledBounds.y * sceneItem.height
         width: scaledBounds.width * sceneItem.width

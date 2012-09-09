@@ -2,26 +2,24 @@ import Qt 4.7
 
 Item {
     id: sceneItem
-    property variant sourceSize
+    property variant sceneSize
 
-    Image {
+    SvgElementImage {
         id: vsi_bg
-        source: "image://svg/pfd.svg!vsi-bg"
-        sourceSize: sceneItem.sourceSize
+        elementName: "vsi-bg"
+        sceneSize: sceneItem.sceneSize
         clip: true
-
-        property variant scaledBounds: svgRenderer.scaledElementBounds("pfd.svg", "vsi-bg")
 
         x: scaledBounds.x * sceneItem.width
         y: scaledBounds.y * sceneItem.height
         width: scaledBounds.width * sceneItem.width
         height: scaledBounds.height * sceneItem.height
 
-        Image {
+        SvgElementImage {
             id: vsi_bar
 
-            source: "image://svg/pfd.svg!vsi-bar"
-            sourceSize: sceneItem.sourceSize
+            elementName: "vsi-bar"
+            sceneSize: sceneItem.sceneSize
 
             //the scale in 1000 ft/min with height == 5200 ft/min
             height: (-VelocityActual.Down*3.28*60/1000)*(vsi_scale.height/5.2)
@@ -31,11 +29,11 @@ Item {
             anchors.left: parent.left
         }
 
-        Image {
+        SvgElementImage {
             id: vsi_scale
 
-            source: "image://svg/pfd.svg!vsi-scale"
-            sourceSize: sceneItem.sourceSize
+            elementName: "vsi-scale"
+            sceneSize: sceneItem.sceneSize
 
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
@@ -67,15 +65,13 @@ Item {
     }
 
 
-    Image {
+    SvgElementImage {
         id: vsi_window
         clip: true
         smooth: true
 
-        source: "image://svg/pfd.svg!vsi-window"
-        sourceSize: sceneItem.sourceSize
-
-        property variant scaledBounds: svgRenderer.scaledElementBounds("pfd.svg", "vsi-window")
+        elementName: "vsi-window"
+        sceneSize: sceneItem.sceneSize
 
         x: scaledBounds.x * sceneItem.width
         y: scaledBounds.y * sceneItem.height

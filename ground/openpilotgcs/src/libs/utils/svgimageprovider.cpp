@@ -92,9 +92,15 @@ QImage SvgImageProvider::requestImage(const QString &id, QSize *size, const QSiz
 
     QSize docSize = renderer->defaultSize();
 
-    if (!requestedSize.isEmpty() && !docSize.isEmpty()) {
-        xScale = qreal(requestedSize.width())/docSize.width();
-        yScale = qreal(requestedSize.height())/docSize.height();
+    if (!requestedSize.isEmpty()) {
+        if (!element.isEmpty()) {
+            QRectF elementBounds = renderer->boundsOnElement(element);
+            xScale = qreal(requestedSize.width())/elementBounds.width();
+            yScale = qreal(requestedSize.height())/elementBounds.height();
+        } else if (!docSize.isEmpty()) {
+            xScale = qreal(requestedSize.width())/docSize.width();
+            yScale = qreal(requestedSize.height())/docSize.height();
+        }
     }
 
     //keep the aspect ratio
@@ -114,10 +120,16 @@ QImage SvgImageProvider::requestImage(const QString &id, QSize *size, const QSiz
         QImage img(w, h, QImage::Format_ARGB32_Premultiplied);
         img.fill(0);
         QPainter p(&img);
-        renderer->render(&p, element);
+        p.setRenderHints(QPainter::TextAntialiasing |
+                         QPainter::Antialiasing |
+                         QPainter::SmoothPixmapTransform);
+
+        renderer->render(&p, element, QRectF(0, 0, w, h));
 
         if (size)
             *size = QSize(w, h);
+
+        //img.save(element+".png");
         return img;
     } else {
         //render the whole svg file
@@ -127,7 +139,12 @@ QImage SvgImageProvider::requestImage(const QString &id, QSize *size, const QSiz
         QImage img(w, h, QImage::Format_ARGB32_Premultiplied);
         img.fill(0);
         QPainter p(&img);
-        renderer->render(&p);
+        p.setRenderHints(QPainter::TextAntialiasing |
+                         QPainter::Antialiasing |
+                         QPainter::SmoothPixmapTransform);
+
+        p.scale(xScale, yScale);
+        renderer->render(&p, QRectF(QPointF(), QSizeF(docSize)));
 
         if (size)
             *size = QSize(w, h);

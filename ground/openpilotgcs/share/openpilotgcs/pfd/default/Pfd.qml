@@ -4,15 +4,13 @@ import "."
 Rectangle {
     color: "#666666"
 
-    Image {
+    SvgElementImage {
         id: background
-        source: "image://svg/pfd.svg!background"
-
+        elementName: "background"
         fillMode: Image.PreserveAspectFit
         anchors.fill: parent
 
-        sourceSize.width: width
-        sourceSize.height: height
+        sceneSize: Qt.size(width, height)
 
         Item {
             id: sceneItem
@@ -27,10 +25,11 @@ Rectangle {
                 source: qmlWidget.terrainEnabled ? "PfdTerrainView.qml" : "PfdWorldView.qml"
             }
 
-            Image {
+            SvgElementImage {
                 id: rollscale
-                source: "image://svg/pfd.svg!rollscale"
-                sourceSize: background.sourceSize
+                elementName: "rollscale"
+                sceneSize: background.sceneSize
+
                 smooth: true
                 anchors.centerIn: parent
                 //rotate it around the center of scene
@@ -41,26 +40,28 @@ Rectangle {
                 }
             }
 
-            Image {
+            SvgElementImage {
                 id: foreground
-                source: "image://svg/pfd.svg!foreground"
-                sourceSize: background.sourceSize
+                elementName: "foreground"
+                sceneSize: background.sceneSize
+
                 anchors.centerIn: parent
             }
 
-            Image {
+            SvgElementImage {
                 id: compass
-                source: "image://svg/pfd.svg!compass"
-                sourceSize: background.sourceSize
+                elementName: "compass"
+                sceneSize: background.sceneSize
+
                 clip: true
 
                 y: 12
                 anchors.horizontalCenter: parent.horizontalCenter
 
-                Image {
+                SvgElementImage {
                     id: compass_band
-                    source: "image://svg/pfd.svg!compass-band"
-                    sourceSize: background.sourceSize
+                    elementName: "compass-band"
+                    sceneSize: background.sceneSize
 
                     anchors.centerIn: parent
                     //the band is 540 degrees wide, AttitudeActual.Yaw is converted to -180..180 range
@@ -70,22 +71,22 @@ Rectangle {
 
             SpeedScale {
                 anchors.fill: parent
-                sourceSize: background.sourceSize
+                sceneSize: background.sceneSize
             }
 
             AltitudeScale {
                 anchors.fill: parent
-                sourceSize: background.sourceSize
+                sceneSize: background.sourceSize
             }
 
             VsiScale {
                 anchors.fill: parent
-                sourceSize: background.sourceSize
+                sceneSize: background.sourceSize
             }
 
             PfdIndicators {
                 anchors.fill: parent
-                sourceSize: background.sourceSize
+                sceneSize: background.sourceSize
             }
         }
     }

@@ -1,15 +1,13 @@
 import Qt 4.7
 
 Item {
-    //worldView should fill the source size of svg document
     id: worldView
 
-    Image {
+    SvgElementImage {
         id: world
-        source: "image://svg/pfd.svg!world"
-
-        sourceSize.width: worldView.width
-        sourceSize.height: worldView.height
+        elementName: "world"
+        //worldView is loaded with Loader, so background element is visible
+        sceneSize: background.sceneSize
 
         smooth: true
 

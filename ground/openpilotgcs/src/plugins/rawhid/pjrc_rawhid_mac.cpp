@@ -436,8 +436,12 @@ static void free_all_hid(void)
 static void hid_close(hid_t *hid)
 {
     if (!hid || !hid->open || !hid->ref) return;
+    IOHIDManagerRef hid_manager = IOHIDManagerCreate(kCFAllocatorDefault, kIOHIDOptionsTypeNone);
+    IOHIDManagerRegisterDeviceMatchingCallback(hid_manager, NULL, NULL);
+    IOHIDManagerRegisterDeviceRemovalCallback(hid_manager, NULL, NULL);
     IOHIDDeviceUnscheduleFromRunLoop(hid->ref, CFRunLoopGetCurrent( ), kCFRunLoopDefaultMode);
     IOHIDDeviceClose(hid->ref, kIOHIDOptionsTypeNone);
+    IOHIDManagerClose(hid_manager, 0);
     hid->ref = NULL;
 }
 

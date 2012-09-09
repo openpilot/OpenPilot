@@ -383,29 +383,29 @@ bool RawHID::open(OpenMode mode)
 
 void RawHID::close()
 {
-	emit aboutToClose();
+    emit aboutToClose();
 
-	m_mutex->lock();
+    m_mutex->lock();
 
-		if (m_readThread)
-		{
-			m_readThread->terminate();
-			delete m_readThread; // calls wait
-			m_readThread = NULL;
-		}
+    if (m_readThread)
+    {
+        m_readThread->terminate();
+        delete m_readThread; // calls wait
+        m_readThread = NULL;
+    }
 
-		if (m_writeThread)
-		{
-			m_writeThread->terminate();
-			delete m_writeThread;
-			m_writeThread = NULL;
-		}
+    if (m_writeThread)
+    {
+        m_writeThread->terminate();
+        delete m_writeThread;
+        m_writeThread = NULL;
+    }
 
-		dev.close(m_deviceNo);
+    dev.close(m_deviceNo);
 
-	m_mutex->unlock();
+    m_mutex->unlock();
 
-	emit closed();
+    emit closed();
 
     QIODevice::close();
 }

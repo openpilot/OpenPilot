@@ -69,18 +69,18 @@ static hid_t *last_hid = NULL;
 // Make sure we use the correct runloop
 CFRunLoopRef the_correct_runloop = NULL;
 struct hid_struct {
-        IOHIDDeviceRef ref;
-        int open;
-        uint8_t buffer[BUFFER_SIZE];
-        buffer_t *first_buffer;
-        buffer_t *last_buffer;
-        struct hid_struct *prev;
-        struct hid_struct *next;
+    IOHIDDeviceRef ref;
+    int open;
+    uint8_t buffer[BUFFER_SIZE];
+    buffer_t *first_buffer;
+    buffer_t *last_buffer;
+    struct hid_struct *prev;
+    struct hid_struct *next;
 };
 struct buffer_struct {
-        struct buffer_struct *next;
-        uint32_t len;
-        uint8_t buf[BUFFER_SIZE];
+    struct buffer_struct *next;
+    uint32_t len;
+    uint8_t buf[BUFFER_SIZE];
 };
 
 static void add_hid(hid_t *);

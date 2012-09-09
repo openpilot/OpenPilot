@@ -35,6 +35,23 @@ OutputChannelForm::OutputChannelForm(const int index, QWidget *parent, const boo
         m_inChannelTest(false)
 {
     ui.setupUi(this);
+    if(!showLegend)
+    {
+        // Remove legend
+        QGridLayout *grid_layout = dynamic_cast<QGridLayout*>(layout());
+        Q_ASSERT(grid_layout);
+        for (int col = 0; col < grid_layout->columnCount(); col++)
+        { // remove every item in first row
+            QLayoutItem *item = grid_layout->itemAtPosition(0, col);
+            if (!item) continue;
+            // get widget from layout item
+            QWidget *legend_widget = item->widget();
+            if (!legend_widget) continue;
+            // delete widget
+            grid_layout->removeWidget(legend_widget);
+            delete legend_widget;
+        }
+    }
 
     // The convention for OP is Channel 1 to Channel 10.
     ui.actuatorNumber->setText(QString("%1:").arg(m_index+1));

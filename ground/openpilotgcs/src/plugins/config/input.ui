@@ -6,14 +6,17 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>991</width>
-    <height>711</height>
+    <width>670</width>
+    <height>693</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="margin">
+    <number>12</number>
+   </property>
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
@@ -25,19 +28,10 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_11">
        <property name="spacing">
-        <number>24</number>
+        <number>6</number>
        </property>
-       <property name="leftMargin">
+       <property name="margin">
         <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>12</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>12</number>
        </property>
        <item>
         <widget class="QScrollArea" name="scrollArea">
@@ -116,19 +110,16 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>961</width>
-            <height>587</height>
+            <width>640</width>
+            <height>610</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout">
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
-            <number>0</number>
+           <property name="margin">
+            <number>12</number>
            </property>
            <property name="verticalSpacing">
-            <number>24</number>
+            <number>6</number>
            </property>
            <item row="1" column="0">
             <widget class="QGroupBox" name="groupBox_5">
@@ -136,7 +127,16 @@
               <string/>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_6">
-              <property name="margin">
+              <property name="leftMargin">
+               <number>12</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>12</number>
+              </property>
+              <property name="bottomMargin">
                <number>0</number>
               </property>
               <item>
@@ -146,6 +146,9 @@
                 </property>
                 <widget class="QWidget" name="advancedPage">
                  <layout class="QVBoxLayout" name="verticalLayout_3">
+                  <property name="margin">
+                   <number>12</number>
+                  </property>
                   <item>
                    <widget class="QPushButton" name="configurationWizard">
                     <property name="text">
@@ -155,517 +158,39 @@
                   </item>
                   <item>
                    <widget class="QCheckBox" name="runCalibration">
+                    <property name="enabled">
+                     <bool>true</bool>
+                    </property>
                     <property name="text">
                      <string>Run Calibration</string>
                     </property>
                    </widget>
                   </item>
                   <item>
-                   <layout class="QGridLayout" name="gridLayout_8" rowstretch="0,0" columnstretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0" rowminimumheight="0,0">
-                    <property name="leftMargin">
-                     <number>0</number>
+                   <spacer name="verticalSpacer_7">
+                    <property name="orientation">
+                     <enum>Qt::Vertical</enum>
                     </property>
-                    <property name="rightMargin">
-                     <number>8</number>
+                    <property name="sizeType">
+                     <enum>QSizePolicy::Fixed</enum>
                     </property>
-                    <property name="horizontalSpacing">
-                     <number>0</number>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>20</width>
+                      <height>12</height>
+                     </size>
                     </property>
-                    <property name="verticalSpacing">
-                     <number>-1</number>
-                    </property>
-                    <item row="1" column="0">
-                     <widget class="QLabel" name="legend0">
-                      <property name="enabled">
-                       <bool>true</bool>
-                      </property>
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="minimumSize">
-                       <size>
-                        <width>80</width>
-                        <height>26</height>
-                       </size>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <weight>75</weight>
-                        <italic>false</italic>
-                        <bold>true</bold>
-                       </font>
-                      </property>
-                      <property name="styleSheet">
-                       <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
-color: rgb(255, 255, 255);
-border-radius: 5;
-margin:5px;
-font:bold;</string>
-                      </property>
-                      <property name="text">
-                       <string>Function</string>
-                      </property>
-                      <property name="alignment">
-                       <set>Qt::AlignCenter</set>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="1" column="13">
-                     <widget class="QLabel" name="legend5_2">
-                      <property name="enabled">
-                       <bool>true</bool>
-                      </property>
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="minimumSize">
-                       <size>
-                        <width>48</width>
-                        <height>26</height>
-                       </size>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <weight>75</weight>
-                        <italic>false</italic>
-                        <bold>true</bold>
-                       </font>
-                      </property>
-                      <property name="styleSheet">
-                       <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
-color: rgb(255, 255, 255);
-border-radius: 5;
-margin:5px;
-font:bold;</string>
-                      </property>
-                      <property name="text">
-                       <string>Neut.</string>
-                      </property>
-                      <property name="alignment">
-                       <set>Qt::AlignCenter</set>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="1" column="2">
-                     <widget class="QLabel" name="legend1">
-                      <property name="enabled">
-                       <bool>true</bool>
-                      </property>
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="minimumSize">
-                       <size>
-                        <width>105</width>
-                        <height>26</height>
-                       </size>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <weight>75</weight>
-                        <italic>false</italic>
-                        <bold>true</bold>
-                       </font>
-                      </property>
-                      <property name="styleSheet">
-                       <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
-color: rgb(255, 255, 255);
-border-radius: 5;
-margin:5px;
-font:bold;</string>
-                      </property>
-                      <property name="text">
-                       <string>Type</string>
-                      </property>
-                      <property name="alignment">
-                       <set>Qt::AlignCenter</set>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="1" column="14">
-                     <spacer name="horizontalSpacer_13">
-                      <property name="minimumSize">
-                       <size>
-                        <width>0</width>
-                        <height>26</height>
-                       </size>
-                      </property>
-                      <property name="orientation">
-                       <enum>Qt::Horizontal</enum>
-                      </property>
-                      <property name="sizeType">
-                       <enum>QSizePolicy::Minimum</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>0</width>
-                        <height>20</height>
-                       </size>
-                      </property>
-                     </spacer>
-                    </item>
-                    <item row="1" column="8">
-                     <widget class="QLabel" name="legend4">
-                      <property name="enabled">
-                       <bool>true</bool>
-                      </property>
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="minimumSize">
-                       <size>
-                        <width>70</width>
-                        <height>26</height>
-                       </size>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <weight>75</weight>
-                        <italic>false</italic>
-                        <bold>true</bold>
-                       </font>
-                      </property>
-                      <property name="styleSheet">
-                       <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
-color: rgb(255, 255, 255);
-border-radius: 5;
-margin:5px;
-font:bold;</string>
-                      </property>
-                      <property name="text">
-                       <string>Neutral</string>
-                      </property>
-                      <property name="alignment">
-                       <set>Qt::AlignCenter</set>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="1" column="6">
-                     <widget class="QLabel" name="legend3">
-                      <property name="enabled">
-                       <bool>true</bool>
-                      </property>
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="minimumSize">
-                       <size>
-                        <width>53</width>
-                        <height>26</height>
-                       </size>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <weight>75</weight>
-                        <italic>false</italic>
-                        <bold>true</bold>
-                       </font>
-                      </property>
-                      <property name="styleSheet">
-                       <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
-color: rgb(255, 255, 255);
-border-radius: 5;
-margin:5px;
-font:bold;</string>
-                      </property>
-                      <property name="text">
-                       <string>Min</string>
-                      </property>
-                      <property name="alignment">
-                       <set>Qt::AlignCenter</set>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="1" column="1">
-                     <spacer name="horizontalSpacer_7">
-                      <property name="minimumSize">
-                       <size>
-                        <width>0</width>
-                        <height>26</height>
-                       </size>
-                      </property>
-                      <property name="orientation">
-                       <enum>Qt::Horizontal</enum>
-                      </property>
-                      <property name="sizeType">
-                       <enum>QSizePolicy::Fixed</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>12</width>
-                        <height>20</height>
-                       </size>
-                      </property>
-                     </spacer>
-                    </item>
-                    <item row="1" column="4">
-                     <widget class="QLabel" name="legend2">
-                      <property name="enabled">
-                       <bool>true</bool>
-                      </property>
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="minimumSize">
-                       <size>
-                        <width>95</width>
-                        <height>26</height>
-                       </size>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <weight>75</weight>
-                        <italic>false</italic>
-                        <bold>true</bold>
-                       </font>
-                      </property>
-                      <property name="styleSheet">
-                       <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
-color: rgb(255, 255, 255);
-border-radius: 5;
-margin:5px;
-font:bold;</string>
-                      </property>
-                      <property name="text">
-                       <string>Number</string>
-                      </property>
-                      <property name="alignment">
-                       <set>Qt::AlignCenter</set>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="1" column="5">
-                     <spacer name="horizontalSpacer_10">
-                      <property name="minimumSize">
-                       <size>
-                        <width>0</width>
-                        <height>26</height>
-                       </size>
-                      </property>
-                      <property name="orientation">
-                       <enum>Qt::Horizontal</enum>
-                      </property>
-                      <property name="sizeType">
-                       <enum>QSizePolicy::Fixed</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>12</width>
-                        <height>20</height>
-                       </size>
-                      </property>
-                     </spacer>
-                    </item>
-                    <item row="1" column="15">
-                     <widget class="QLabel" name="legend5_3">
-                      <property name="enabled">
-                       <bool>true</bool>
-                      </property>
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="minimumSize">
-                       <size>
-                        <width>42</width>
-                        <height>26</height>
-                       </size>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <weight>75</weight>
-                        <italic>false</italic>
-                        <bold>true</bold>
-                       </font>
-                      </property>
-                      <property name="styleSheet">
-                       <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
-color: rgb(255, 255, 255);
-border-radius: 5;
-margin:5px;
-font:bold;</string>
-                      </property>
-                      <property name="text">
-                       <string>Rev.</string>
-                      </property>
-                      <property name="alignment">
-                       <set>Qt::AlignCenter</set>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="1" column="9">
-                     <spacer name="horizontalSpacer_11">
-                      <property name="minimumSize">
-                       <size>
-                        <width>0</width>
-                        <height>26</height>
-                       </size>
-                      </property>
-                      <property name="orientation">
-                       <enum>Qt::Horizontal</enum>
-                      </property>
-                      <property name="sizeType">
-                       <enum>QSizePolicy::Fixed</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>5</width>
-                        <height>20</height>
-                       </size>
-                      </property>
-                     </spacer>
-                    </item>
-                    <item row="1" column="11">
-                     <widget class="QLabel" name="legend5">
-                      <property name="enabled">
-                       <bool>true</bool>
-                      </property>
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="minimumSize">
-                       <size>
-                        <width>55</width>
-                        <height>26</height>
-                       </size>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <weight>75</weight>
-                        <italic>false</italic>
-                        <bold>true</bold>
-                       </font>
-                      </property>
-                      <property name="styleSheet">
-                       <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
-color: rgb(255, 255, 255);
-border-radius: 5;
-margin:5px;
-font:bold;</string>
-                      </property>
-                      <property name="text">
-                       <string>Max</string>
-                      </property>
-                      <property name="alignment">
-                       <set>Qt::AlignCenter</set>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="1" column="7">
-                     <spacer name="horizontalSpacer_6">
-                      <property name="minimumSize">
-                       <size>
-                        <width>0</width>
-                        <height>26</height>
-                       </size>
-                      </property>
-                      <property name="orientation">
-                       <enum>Qt::Horizontal</enum>
-                      </property>
-                      <property name="sizeType">
-                       <enum>QSizePolicy::Fixed</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>9</width>
-                        <height>20</height>
-                       </size>
-                      </property>
-                     </spacer>
-                    </item>
-                    <item row="1" column="3">
-                     <spacer name="horizontalSpacer_9">
-                      <property name="minimumSize">
-                       <size>
-                        <width>0</width>
-                        <height>26</height>
-                       </size>
-                      </property>
-                      <property name="orientation">
-                       <enum>Qt::Horizontal</enum>
-                      </property>
-                      <property name="sizeType">
-                       <enum>QSizePolicy::Fixed</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>3</width>
-                        <height>20</height>
-                       </size>
-                      </property>
-                     </spacer>
-                    </item>
-                    <item row="1" column="12">
-                     <spacer name="horizontalSpacer_12">
-                      <property name="minimumSize">
-                       <size>
-                        <width>0</width>
-                        <height>26</height>
-                       </size>
-                      </property>
-                      <property name="orientation">
-                       <enum>Qt::Horizontal</enum>
-                      </property>
-                      <property name="sizeType">
-                       <enum>QSizePolicy::Fixed</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>3</width>
-                        <height>20</height>
-                       </size>
-                      </property>
-                     </spacer>
-                    </item>
-                    <item row="1" column="16">
-                     <spacer name="horizontalSpacer_14">
-                      <property name="minimumSize">
-                       <size>
-                        <width>0</width>
-                        <height>26</height>
-                       </size>
-                      </property>
-                      <property name="orientation">
-                       <enum>Qt::Horizontal</enum>
-                      </property>
-                      <property name="sizeType">
-                       <enum>QSizePolicy::Minimum</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>0</width>
-                        <height>20</height>
-                       </size>
-                      </property>
-                     </spacer>
-                    </item>
-                   </layout>
+                   </spacer>
                   </item>
                   <item>
-                   <layout class="QVBoxLayout" name="channelSettings"/>
+                   <layout class="QVBoxLayout" name="channelSettings">
+                    <property name="spacing">
+                     <number>0</number>
+                    </property>
+                    <property name="margin">
+                     <number>0</number>
+                    </property>
+                   </layout>
                   </item>
                   <item>
                    <spacer name="verticalSpacer_3">
@@ -756,6 +281,9 @@ font:bold;</string>
                 </widget>
                 <widget class="QWidget" name="wizard">
                  <layout class="QVBoxLayout" name="verticalLayout_5">
+                  <property name="margin">
+                   <number>12</number>
+                  </property>
                   <item>
                    <widget class="QLabel" name="wzText">
                     <property name="sizePolicy">
@@ -832,19 +360,10 @@ font:bold;</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_8">
        <property name="spacing">
-        <number>24</number>
+        <number>6</number>
        </property>
-       <property name="leftMargin">
+       <property name="margin">
         <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>12</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>12</number>
        </property>
        <item>
         <widget class="QScrollArea" name="scrollArea_3">
@@ -923,143 +442,269 @@ font:bold;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>961</width>
-            <height>587</height>
+            <width>640</width>
+            <height>610</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_7">
-           <property name="horizontalSpacing">
+           <property name="margin">
             <number>12</number>
            </property>
-           <property name="verticalSpacing">
-            <number>24</number>
+           <property name="spacing">
+            <number>6</number>
            </property>
            <item row="0" column="0">
             <widget class="QGroupBox" name="groupBox_2">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>195</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>195</height>
+              </size>
+             </property>
              <property name="title">
               <string>FlightMode Switch Positions</string>
              </property>
-             <layout class="QGridLayout" name="gridLayout_6">
-              <property name="verticalSpacing">
+             <layout class="QGridLayout" name="gridLayout_4" rowstretch="0,0,0" columnstretch="0,0,1,0,1,0">
+              <property name="margin">
                <number>12</number>
               </property>
-              <item row="0" column="0">
-               <layout class="QGridLayout" name="gridLayout_4" rowstretch="0">
-                <property name="topMargin">
-                 <number>16</number>
+              <item row="0" column="0" rowspan="3">
+               <layout class="QVBoxLayout" name="verticalLayout_9" stretch="0,0,0,0,0,0">
+                <item>
+                 <widget class="QLabel" name="label_pos1">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>16</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>16</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Pos. 1</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_pos2">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>16</width>
+                    <height>16</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>16</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Pos. 2</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_pos3">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>16</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>16</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Pos. 3</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_pos4">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>16</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>16</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Pos. 4</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_pos5">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>16</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>16</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Pos. 5</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_pos6">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>16</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>16</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Pos. 6</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item row="1" column="1">
+               <widget class="QSlider" name="fmsSlider">
+                <property name="enabled">
+                 <bool>false</bool>
                 </property>
-                <property name="bottomMargin">
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>140</height>
+                 </size>
+                </property>
+                <property name="focusPolicy">
+                 <enum>Qt::StrongFocus</enum>
+                </property>
+                <property name="toolTip">
+                 <string>This slider moves when you move the flight mode switch
+on your remote. It shows currently active flight mode.
+
+Setup the flight mode channel on the RC Input tab if you have not done so already.</string>
+                </property>
+                <property name="minimum">
+                 <number>0</number>
+                </property>
+                <property name="maximum">
+                 <number>5</number>
+                </property>
+                <property name="pageStep">
                  <number>10</number>
                 </property>
-                <item row="0" column="0">
-                 <layout class="QVBoxLayout" name="verticalLayout_9">
-                  <item>
-                   <widget class="QLabel" name="label_pos1">
-                    <property name="text">
-                     <string>Pos. 1</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLabel" name="label_pos2">
-                    <property name="text">
-                     <string>Pos. 2</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLabel" name="label_pos3">
-                    <property name="text">
-                     <string>Pos. 3</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLabel" name="label_pos4">
-                    <property name="text">
-                     <string>Pos. 4</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLabel" name="label_pos5">
-                    <property name="text">
-                     <string>Pos. 5</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLabel" name="label_pos6">
-                    <property name="text">
-                     <string>Pos. 6</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
+                <property name="value">
+                 <number>0</number>
+                </property>
+                <property name="sliderPosition">
+                 <number>0</number>
+                </property>
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="invertedAppearance">
+                 <bool>true</bool>
+                </property>
+                <property name="tickPosition">
+                 <enum>QSlider::TicksBelow</enum>
+                </property>
+                <property name="tickInterval">
+                 <number>1</number>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2" rowspan="3">
+               <layout class="QVBoxLayout" name="verticalLayout_10">
+                <item>
+                 <widget class="QComboBox" name="fmsModePos1">
+                  <property name="focusPolicy">
+                   <enum>Qt::StrongFocus</enum>
+                  </property>
+                  <property name="toolTip">
+                   <string>Select the stabilization mode on this position (manual/stabilized/auto)</string>
+                  </property>
+                 </widget>
                 </item>
-                <item row="0" column="2">
-                 <layout class="QVBoxLayout" name="verticalLayout_10">
-                  <item>
-                   <widget class="QComboBox" name="fmsModePos1">
-                    <property name="focusPolicy">
-                     <enum>Qt::StrongFocus</enum>
-                    </property>
-                    <property name="toolTip">
-                     <string>Select the stabilization mode on this position (manual/stabilized/auto)</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QComboBox" name="fmsModePos2">
-                    <property name="focusPolicy">
-                     <enum>Qt::StrongFocus</enum>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QComboBox" name="fmsModePos3">
-                    <property name="focusPolicy">
-                     <enum>Qt::StrongFocus</enum>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QComboBox" name="fmsModePos4">
-                    <property name="enabled">
-                     <bool>false</bool>
-                    </property>
-                    <property name="focusPolicy">
-                     <enum>Qt::StrongFocus</enum>
-                    </property>
-                    <property name="toolTip">
-                     <string>Select the stabilization mode on this position (manual/stabilized/auto)</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QComboBox" name="fmsModePos5">
-                    <property name="enabled">
-                     <bool>false</bool>
-                    </property>
-                    <property name="focusPolicy">
-                     <enum>Qt::StrongFocus</enum>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QComboBox" name="fmsModePos6">
-                    <property name="enabled">
-                     <bool>false</bool>
-                    </property>
-                    <property name="focusPolicy">
-                     <enum>Qt::StrongFocus</enum>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
+                <item>
+                 <widget class="QComboBox" name="fmsModePos2">
+                  <property name="focusPolicy">
+                   <enum>Qt::StrongFocus</enum>
+                  </property>
+                 </widget>
                 </item>
-                <item row="0" column="1">
-                 <widget class="QSlider" name="fmsSlider">
+                <item>
+                 <widget class="QComboBox" name="fmsModePos3">
+                  <property name="focusPolicy">
+                   <enum>Qt::StrongFocus</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="fmsModePos4">
                   <property name="enabled">
                    <bool>false</bool>
                   </property>
@@ -1067,43 +712,46 @@ font:bold;</string>
                    <enum>Qt::StrongFocus</enum>
                   </property>
                   <property name="toolTip">
-                   <string>This slider moves when you move the flight mode switch
-on your remote. It shows currently active flight mode.
-
-Setup the flight mode channel on the RC Input tab if you have not done so already.</string>
+                   <string>Select the stabilization mode on this position (manual/stabilized/auto)</string>
                   </property>
-                  <property name="minimum">
-                   <number>0</number>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="fmsModePos5">
+                  <property name="enabled">
+                   <bool>false</bool>
                   </property>
-                  <property name="maximum">
-                   <number>5</number>
+                  <property name="focusPolicy">
+                   <enum>Qt::StrongFocus</enum>
                   </property>
-                  <property name="pageStep">
-                   <number>10</number>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="fmsModePos6">
+                  <property name="enabled">
+                   <bool>false</bool>
                   </property>
-                  <property name="value">
-                   <number>0</number>
-                  </property>
-                  <property name="sliderPosition">
-                   <number>0</number>
-                  </property>
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="invertedAppearance">
-                   <bool>true</bool>
-                  </property>
-                  <property name="tickPosition">
-                   <enum>QSlider::TicksBelow</enum>
-                  </property>
-                  <property name="tickInterval">
-                   <number>1</number>
+                  <property name="focusPolicy">
+                   <enum>Qt::StrongFocus</enum>
                   </property>
                  </widget>
                 </item>
                </layout>
               </item>
-              <item row="0" column="2">
+              <item row="1" column="3">
+               <spacer name="horizontalSpacer_4">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item row="0" column="4" rowspan="3">
                <layout class="QGridLayout" name="gridLayout_5">
                 <item row="0" column="0">
                  <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -1157,13 +805,42 @@ channel value for each flight mode.</string>
                 </item>
                </layout>
               </item>
-              <item row="0" column="1">
-               <spacer name="horizontalSpacer_4">
+              <item row="2" column="1">
+               <spacer name="verticalSpacer_4">
                 <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
+                 <enum>Qt::Vertical</enum>
                 </property>
                 <property name="sizeType">
                  <enum>QSizePolicy::Fixed</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>0</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item row="0" column="1">
+               <spacer name="verticalSpacer_6">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Fixed</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>0</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item row="1" column="5">
+               <spacer name="horizontalSpacer_6">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
@@ -1381,19 +1058,10 @@ margin:1px;</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_12">
        <property name="spacing">
-        <number>24</number>
+        <number>6</number>
        </property>
-       <property name="leftMargin">
+       <property name="margin">
         <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>12</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>12</number>
        </property>
        <item>
         <widget class="QScrollArea" name="scrollArea_2">
@@ -1472,13 +1140,16 @@ margin:1px;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>961</width>
-            <height>587</height>
+            <width>640</width>
+            <height>610</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
            <property name="spacing">
-            <number>24</number>
+            <number>6</number>
+           </property>
+           <property name="margin">
+            <number>12</number>
            </property>
            <item>
             <widget class="QGroupBox" name="groupBox_6">
@@ -1486,6 +1157,18 @@ margin:1px;</string>
               <string>Arming Settings</string>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_7">
+              <property name="leftMargin">
+               <number>11</number>
+              </property>
+              <property name="topMargin">
+               <number>12</number>
+              </property>
+              <property name="rightMargin">
+               <number>12</number>
+              </property>
+              <property name="bottomMargin">
+               <number>12</number>
+              </property>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout">
                 <item>
@@ -1658,14 +1341,14 @@ margin:1px;</string>
       <widget class="QPushButton" name="saveRCInputToRAM">
        <property name="minimumSize">
         <size>
-         <width>60</width>
-         <height>32</height>
+         <width>0</width>
+         <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>16777215</width>
-         <height>32</height>
+         <height>16777215</height>
         </size>
        </property>
        <property name="toolTip">
@@ -1684,14 +1367,14 @@ Be sure to set the Neutral position on all sliders before sending!</string>
       <widget class="QPushButton" name="saveRCInputToSD">
        <property name="minimumSize">
         <size>
-         <width>60</width>
-         <height>32</height>
+         <width>0</width>
+         <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>16777215</width>
-         <height>32</height>
+         <height>16777215</height>
         </size>
        </property>
        <property name="toolTip">
@@ -1711,7 +1394,6 @@ Applies and Saves all settings to SD</string>
   </layout>
  </widget>
  <tabstops>
-  <tabstop>fmsSlider</tabstop>
   <tabstop>fmsSsPos1Roll</tabstop>
   <tabstop>fmsSsPos1Pitch</tabstop>
   <tabstop>fmsSsPos1Yaw</tabstop>

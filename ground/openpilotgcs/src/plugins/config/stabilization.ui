@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>967</width>
-    <height>639</height>
+    <width>965</width>
+    <height>797</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -454,7 +454,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <property name="spacing">
-    <number>16</number>
+    <number>6</number>
    </property>
    <property name="margin">
     <number>12</number>
@@ -506,31 +506,22 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout">
        <property name="spacing">
-        <number>12</number>
+        <number>6</number>
        </property>
-       <property name="leftMargin">
+       <property name="margin">
         <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>5</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>12</number>
        </property>
        <item>
         <widget class="QScrollArea" name="scrollArea">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
          <property name="minimumSize">
           <size>
-           <width>50</width>
+           <width>0</width>
            <height>0</height>
           </size>
          </property>
@@ -612,25 +603,25 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>937</width>
-            <height>522</height>
+            <width>935</width>
+            <height>714</height>
            </rect>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_12" stretch="0,0,0,0,0">
+          <layout class="QVBoxLayout" name="verticalLayout_12" stretch="0,0,0,0">
            <property name="spacing">
-            <number>24</number>
+            <number>12</number>
            </property>
            <property name="leftMargin">
             <number>12</number>
            </property>
            <property name="topMargin">
-            <number>0</number>
+            <number>5</number>
            </property>
            <property name="rightMargin">
             <number>12</number>
            </property>
            <property name="bottomMargin">
-            <number>0</number>
+            <number>12</number>
            </property>
            <item>
             <widget class="QGroupBox" name="RateStabilizationGroup_15">
@@ -662,8 +653,11 @@
               <bool>false</bool>
              </property>
              <layout class="QGridLayout" name="gridLayout_19">
+              <property name="margin">
+               <number>12</number>
+              </property>
               <property name="horizontalSpacing">
-               <number>4</number>
+               <number>6</number>
               </property>
               <item row="0" column="0">
                <widget class="QCheckBox" name="checkBox_7">
@@ -710,8 +704,8 @@
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>81</width>
-                  <height>25</height>
+                  <width>0</width>
+                  <height>0</height>
                  </size>
                 </property>
                 <property name="maximumSize">
@@ -4029,8 +4023,11 @@ value as the Kp.</string>
               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
              </property>
              <layout class="QGridLayout" name="gridLayout_20">
+              <property name="margin">
+               <number>12</number>
+              </property>
               <property name="horizontalSpacing">
-               <number>4</number>
+               <number>6</number>
               </property>
               <item row="0" column="0">
                <widget class="QCheckBox" name="checkBox_8">
@@ -4077,8 +4074,8 @@ value as the Kp.</string>
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>81</width>
-                  <height>25</height>
+                  <width>0</width>
+                  <height>0</height>
                  </size>
                 </property>
                 <property name="toolTip">
@@ -6785,22 +6782,6 @@ border-radius: 5;</string>
             </widget>
            </item>
            <item>
-            <spacer name="verticalSpacer_4">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Fixed</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>6</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
             <widget class="QGroupBox" name="groupBox">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -6821,6 +6802,9 @@ border-radius: 5;</string>
               <string>Integral</string>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_11">
+              <property name="margin">
+               <number>12</number>
+              </property>
               <item>
                <widget class="QCheckBox" name="lowThrottleZeroIntegral_8">
                 <property name="sizePolicy">
@@ -6860,6 +6844,9 @@ border-radius: 5;</string>
              <property name="orientation">
               <enum>Qt::Vertical</enum>
              </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Expanding</enum>
+             </property>
              <property name="sizeHint" stdset="0">
               <size>
                <width>20</width>
@@ -6880,19 +6867,10 @@ border-radius: 5;</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_10">
        <property name="spacing">
-        <number>12</number>
+        <number>6</number>
        </property>
-       <property name="leftMargin">
+       <property name="margin">
         <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>12</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>12</number>
        </property>
        <item>
         <widget class="QScrollArea" name="scrollArea_2">
@@ -6963,6 +6941,9 @@ border-radius: 5;</string>
          <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
          </property>
+         <property name="lineWidth">
+          <number>0</number>
+         </property>
          <property name="widgetResizable">
           <bool>true</bool>
          </property>
@@ -6971,8 +6952,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>922</width>
-            <height>650</height>
+            <width>935</width>
+            <height>714</height>
            </rect>
           </property>
           <property name="autoFillBackground">
@@ -6980,12 +6961,9 @@ border-radius: 5;</string>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_16">
            <property name="spacing">
-            <number>24</number>
+            <number>6</number>
            </property>
-           <property name="leftMargin">
-            <number>12</number>
-           </property>
-           <property name="rightMargin">
+           <property name="margin">
             <number>12</number>
            </property>
            <item>
@@ -7532,8 +7510,11 @@ border-radius: 5;</string>
               <bool>false</bool>
              </property>
              <layout class="QGridLayout" name="gridLayout_16">
+              <property name="margin">
+               <number>12</number>
+              </property>
               <property name="horizontalSpacing">
-               <number>4</number>
+               <number>6</number>
               </property>
               <item row="0" column="0">
                <widget class="QCheckBox" name="checkBox_3">
@@ -7568,8 +7549,8 @@ border-radius: 5;</string>
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>81</width>
-                  <height>25</height>
+                  <width>0</width>
+                  <height>0</height>
                  </size>
                 </property>
                 <property name="maximumSize">
@@ -8037,12 +8018,12 @@ border-radius: 5;</string>
                 <property name="flat">
                  <bool>true</bool>
                 </property>
-                <layout class="QGridLayout" name="gridLayout_3" columnstretch="0,0,1,0,1,0,1">
+                <layout class="QGridLayout" name="gridLayout_3" columnstretch="0,0,1,0,1,0,1,0">
                  <property name="leftMargin">
                   <number>0</number>
                  </property>
                  <property name="bottomMargin">
-                  <number>2</number>
+                  <number>9</number>
                  </property>
                  <item row="3" column="4">
                   <widget class="QDoubleSpinBox" name="PitchRateKd">
@@ -10083,7 +10064,7 @@ Then lower the value by 20% or so.</string>
                    </property>
                    <property name="sizeHint" stdset="0">
                     <size>
-                     <width>150</width>
+                     <width>140</width>
                      <height>13</height>
                     </size>
                    </property>
@@ -10284,6 +10265,19 @@ Then lower the value by 20% or so.</string>
                     <size>
                      <width>10</width>
                      <height>10</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item row="2" column="7">
+                  <spacer name="horizontalSpacer_21">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>20</width>
+                     <height>20</height>
                     </size>
                    </property>
                   </spacer>
@@ -10844,6 +10838,9 @@ Then lower the value by 20% or so.</string>
               <property name="horizontalSpacing">
                <number>4</number>
               </property>
+              <property name="margin">
+               <number>12</number>
+              </property>
               <item row="0" column="0">
                <widget class="QCheckBox" name="checkBox_2">
                 <property name="styleSheet">
@@ -10877,8 +10874,8 @@ Then lower the value by 20% or so.</string>
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>81</width>
-                  <height>25</height>
+                  <width>0</width>
+                  <height>0</height>
                  </size>
                 </property>
                 <property name="maximumSize">
@@ -11346,7 +11343,7 @@ Then lower the value by 20% or so.</string>
                 <property name="flat">
                  <bool>true</bool>
                 </property>
-                <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,0,1,0,1,0,1">
+                <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,0,1,0,1,0,1,0">
                  <property name="leftMargin">
                   <number>0</number>
                  </property>
@@ -11360,7 +11357,7 @@ Then lower the value by 20% or so.</string>
                    </property>
                    <property name="sizeHint" stdset="0">
                     <size>
-                     <width>150</width>
+                     <width>137</width>
                      <height>13</height>
                     </size>
                    </property>
@@ -13402,6 +13399,19 @@ border-radius: 5;</string>
                    </property>
                   </widget>
                  </item>
+                 <item row="1" column="7">
+                  <spacer name="horizontalSpacer_22">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>20</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
                 </layout>
                </widget>
               </item>
@@ -13949,8 +13959,11 @@ border-radius: 5;</string>
               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
              </property>
              <layout class="QGridLayout" name="gridLayout_18">
+              <property name="margin">
+               <number>12</number>
+              </property>
               <property name="horizontalSpacing">
-               <number>4</number>
+               <number>6</number>
               </property>
               <item row="0" column="0">
                <spacer name="horizontalSpacer_14">
@@ -13978,8 +13991,8 @@ border-radius: 5;</string>
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>81</width>
-                  <height>25</height>
+                  <width>0</width>
+                  <height>0</height>
                  </size>
                 </property>
                 <property name="maximumSize">
@@ -14447,7 +14460,7 @@ border-radius: 5;</string>
                 <property name="flat">
                  <bool>true</bool>
                 </property>
-                <layout class="QGridLayout" name="gridLayout_6" rowstretch="0,0,0,0" columnstretch="0,0,1,0,1,0,1">
+                <layout class="QGridLayout" name="gridLayout_6" rowstretch="0,0,0,0" columnstretch="0,0,1,0,1,0,1,0">
                  <property name="leftMargin">
                   <number>0</number>
                  </property>
@@ -16717,6 +16730,19 @@ border-radius: 5;</string>
                    </property>
                   </widget>
                  </item>
+                 <item row="1" column="7">
+                  <spacer name="horizontalSpacer_33">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>20</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
                 </layout>
                </widget>
               </item>
@@ -16756,24 +16782,21 @@ border-radius: 5;</string>
       </layout>
      </widget>
      <widget class="QWidget" name="Expert">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <attribute name="title">
        <string>Expert</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_4">
        <property name="spacing">
-        <number>12</number>
+        <number>6</number>
        </property>
-       <property name="leftMargin">
+       <property name="margin">
         <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>12</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>12</number>
        </property>
        <item>
         <widget class="QScrollArea" name="scrollArea_3">
@@ -16845,7 +16868,10 @@ border-radius: 5;</string>
           <enum>QFrame::NoFrame</enum>
          </property>
          <property name="frameShadow">
-          <enum>QFrame::Plain</enum>
+          <enum>QFrame::Sunken</enum>
+         </property>
+         <property name="lineWidth">
+          <number>0</number>
          </property>
          <property name="widgetResizable">
           <bool>true</bool>
@@ -16855,18 +16881,15 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>922</width>
-            <height>599</height>
+            <width>935</width>
+            <height>714</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_9">
            <property name="spacing">
-            <number>24</number>
+            <number>6</number>
            </property>
-           <property name="leftMargin">
-            <number>12</number>
-           </property>
-           <property name="rightMargin">
+           <property name="margin">
             <number>12</number>
            </property>
            <item>
@@ -16890,6 +16913,9 @@ border-radius: 5;</string>
               <string>Weak Leveling / Axis Lock</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_5">
+              <property name="margin">
+               <number>12</number>
+              </property>
               <item row="0" column="0">
                <spacer name="horizontalSpacer_13">
                 <property name="orientation">
@@ -16913,8 +16939,8 @@ border-radius: 5;</string>
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>81</width>
-                  <height>25</height>
+                  <width>0</width>
+                  <height>0</height>
                  </size>
                 </property>
                 <property name="maximumSize">
@@ -16943,17 +16969,11 @@ border-radius: 5;</string>
               </item>
               <item row="1" column="0" colspan="2">
                <widget class="QGroupBox" name="groupBox">
+                <property name="flat">
+                 <bool>true</bool>
+                </property>
                 <layout class="QGridLayout" name="gridLayout_4">
-                 <property name="leftMargin">
-                  <number>0</number>
-                 </property>
-                 <property name="topMargin">
-                  <number>12</number>
-                 </property>
-                 <property name="rightMargin">
-                  <number>12</number>
-                 </property>
-                 <property name="bottomMargin">
+                 <property name="margin">
                   <number>12</number>
                  </property>
                  <item row="0" column="1">
@@ -19495,8 +19515,11 @@ border-radius: 5;</string>
               <string>Integral Limits</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_9">
+              <property name="margin">
+               <number>12</number>
+              </property>
               <property name="horizontalSpacing">
-               <number>4</number>
+               <number>6</number>
               </property>
               <item row="0" column="0">
                <spacer name="horizontalSpacer_36">
@@ -19521,8 +19544,8 @@ border-radius: 5;</string>
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>81</width>
-                  <height>25</height>
+                  <width>0</width>
+                  <height>0</height>
                  </size>
                 </property>
                 <property name="maximumSize">
@@ -19787,10 +19810,10 @@ border-radius: 5;</string>
                  <string/>
                 </property>
                 <property name="flat">
-                 <bool>false</bool>
+                 <bool>true</bool>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_8" columnstretch="0,0,1,0,1,0,1,0">
-                 <property name="leftMargin">
+                 <property name="margin">
                   <number>12</number>
                  </property>
                  <item row="1" column="4">
@@ -22426,6 +22449,9 @@ border-radius: 5;</string>
               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
              </property>
              <layout class="QGridLayout" name="gridLayout">
+              <property name="margin">
+               <number>12</number>
+              </property>
               <item row="0" column="0">
                <spacer name="horizontalSpacer_40">
                 <property name="orientation">
@@ -22452,8 +22478,8 @@ border-radius: 5;</string>
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>81</width>
-                  <height>25</height>
+                  <width>0</width>
+                  <height>0</height>
                  </size>
                 </property>
                 <property name="maximumSize">
@@ -22925,9 +22951,12 @@ border-radius: 5;</string>
                  <string/>
                 </property>
                 <property name="flat">
-                 <bool>false</bool>
+                 <bool>true</bool>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_14" columnstretch="0,1,0,1,0,1,0">
+                 <property name="margin">
+                  <number>12</number>
+                 </property>
                  <item row="1" column="2">
                   <spacer name="horizontalSpacer_41">
                    <property name="orientation">
@@ -24941,14 +24970,14 @@ automatically every 300ms, which will help for fast tuning.</string>
        </property>
        <property name="minimumSize">
         <size>
-         <width>140</width>
-         <height>32</height>
+         <width>0</width>
+         <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>16777215</width>
-         <height>32</height>
+         <height>16777215</height>
         </size>
        </property>
        <property name="toolTip">
@@ -24985,14 +25014,14 @@ Useful if you have accidentally changed some settings.</string>
        </property>
        <property name="minimumSize">
         <size>
-         <width>78</width>
-         <height>32</height>
+         <width>0</width>
+         <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>16777215</width>
-         <height>32</height>
+         <height>16777215</height>
         </size>
        </property>
        <property name="toolTip">
@@ -25021,14 +25050,14 @@ Useful if you have accidentally changed some settings.</string>
        </property>
        <property name="minimumSize">
         <size>
-         <width>71</width>
-         <height>32</height>
+         <width>0</width>
+         <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>16777215</width>
-         <height>32</height>
+         <height>16777215</height>
         </size>
        </property>
        <property name="toolTip">

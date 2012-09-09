@@ -382,8 +382,8 @@ static void input_callback(void *context, IOReturn ret, void *sender, IOHIDRepor
             hid->last_buffer = n;
     }
 
-    Q_ASSERT(the_correct_runloop != NULL);
-    CFRunLoopStop(the_correct_runloop);
+    if (the_correct_runloop)
+        CFRunLoopStop(the_correct_runloop);
 }
 
 static void timeout_callback(CFRunLoopTimerRef timer, void *info)
@@ -437,9 +437,12 @@ static void hid_close(hid_t *hid)
 {
     if (!hid || !hid->open || !hid->ref) return;
     IOHIDManagerRef hid_manager = IOHIDManagerCreate(kCFAllocatorDefault, kIOHIDOptionsTypeNone);
+    if (the_correct_runloop)
+        IOHIDDeviceUnscheduleFromRunLoop(hid->ref, the_correct_runloop, kCFRunLoopDefaultMode);
+    the_correct_runloop = NULL;
+    IOHIDDeviceRegisterInputReportCallback(hid->ref, hid->buffer, sizeof(hid->buffer), NULL, hid);
     IOHIDManagerRegisterDeviceMatchingCallback(hid_manager, NULL, NULL);
     IOHIDManagerRegisterDeviceRemovalCallback(hid_manager, NULL, NULL);
-    IOHIDDeviceUnscheduleFromRunLoop(hid->ref, the_correct_runloop, kCFRunLoopDefaultMode);
     IOHIDDeviceClose(hid->ref, kIOHIDOptionsTypeNone);
     IOHIDManagerClose(hid_manager, 0);
     hid->ref = NULL;
@@ -457,6 +460,10 @@ static void detach_callback(void *context, IOReturn r, void *hid_mgr, IOHIDDevic
                     return;
             }
     }
+
+    hid_t *hid = get_hid(0);
+    if (hid)
+        hid_close(hid);
 }
 
 static void attach_callback(void *context, IOReturn r, void *hid_mgr, IOHIDDeviceRef dev)
@@ -467,6 +474,11 @@ static void attach_callback(void *context, IOReturn r, void *hid_mgr, IOHIDDevic
     h = (hid_t *)malloc(sizeof(hid_t));
     if (!h) return;
     memset(h, 0, sizeof(hid_t));
+
+    // Disconnect the attach callback since we don't want to automatically reconnect
+    IOHIDManagerRef hid_manager = IOHIDManagerCreate(kCFAllocatorDefault, kIOHIDOptionsTypeNone);
+    IOHIDManagerRegisterDeviceMatchingCallback(hid_manager, NULL, NULL);
+
     IOHIDDeviceScheduleWithRunLoop(dev, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
     IOHIDDeviceRegisterInputReportCallback(dev, h->buffer, sizeof(h->buffer), input_callback, h);
     h->ref = dev;

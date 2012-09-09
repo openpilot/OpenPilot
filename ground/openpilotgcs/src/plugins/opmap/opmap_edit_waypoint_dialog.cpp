@@ -287,5 +287,7 @@ void opmap_edit_waypoint_dialog::enableEditWidgets(bool value)
 
 void opmap_edit_waypoint_dialog::currentRowChanged(QModelIndex current, QModelIndex previous)
 {
+    Q_UNUSED(previous);
+
     mapper->setCurrentIndex(current.row());
 }

@@ -34,6 +34,8 @@ IPconnectionConfiguration::IPconnectionConfiguration(QString classId, QSettings*
     m_Port(1000),
     m_UseTCP(1)
 {
+    Q_UNUSED(qSettings);
+
     settings = Core::ICore::instance()->settings();
 }
 

@@ -457,7 +457,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
         default:
             rxState = STATE_SYNC;
             stats.rxErrors++;
-            UAVTALK_QXTLOG_DEBUG("UAVTalk: ???->Sync");
+            UAVTALK_QXTLOG_DEBUG("UAVTalk: \?\?\?->Sync"); //Use the escape character for '?' so that the tripgraph isn't triggered.
     }
 
     // Done

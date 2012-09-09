@@ -165,6 +165,8 @@ return s1.portName<s2.portName;
 //creates options page widget (uses the UI file)
 QWidget *GpsDisplayGadgetOptionsPage::createPage(QWidget *parent)
 {
+    Q_UNUSED(parent);
+
     options_page = new Ui::GpsDisplayGadgetOptionsPage();
     QWidget *optionsPageWidget = new QWidget;
     options_page->setupUi(optionsPageWidget);

@@ -28,7 +28,7 @@
 namespace mapcontrol
 {
     HomeItem::HomeItem(MapGraphicItem* map,OPMapWidget* parent):safe(true),map(map),mapwidget(parent),
-        showsafearea(true),safearea(1000),altitude(0),isDragging(false),toggleRefresh(true)
+        showsafearea(true),toggleRefresh(true),safearea(1000),altitude(0),isDragging(false)
     {
         pic.load(QString::fromUtf8(":/markers/images/home2.svg"));
         pic=pic.scaled(30,30,Qt::IgnoreAspectRatio);

@@ -60,6 +60,9 @@ int WayPointCircle::type() const
 
 void WayPointCircle::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
+
     QPointF p1;
     QPointF p2;
     p1=QPointF(line.p1().x(),line.p1().y()+line.length());

@@ -266,7 +266,9 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
   */
 void ConfigPipXtremeWidget::updateSettings(UAVObject *object)
 {
-	if (!settingsUpdated)
+    Q_UNUSED(object);
+
+    if (!settingsUpdated)
 	{
 		settingsUpdated = true;
 		enableControls(true);

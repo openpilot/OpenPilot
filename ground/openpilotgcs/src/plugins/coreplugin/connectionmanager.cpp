@@ -290,8 +290,9 @@ void ConnectionManager::updateConnectionList(IConnection *connection)
         bool found = availableDev.contains(iter->device);
         if (!found) {
             // we are currently using the one we are about to erase
-            if (m_connectionDevice.connection && m_connectionDevice.connection == connection && m_connectionDevice.device == iter->device)
+            if (m_connectionDevice.connection && m_connectionDevice.connection == connection && m_connectionDevice.device == iter->device) {
                 disconnectDevice();
+            }
 
             iter = m_devList.erase(iter);
         } else

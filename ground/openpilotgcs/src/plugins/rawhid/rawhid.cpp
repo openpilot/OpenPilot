@@ -151,7 +151,6 @@ RawHIDReadThread::~RawHIDReadThread()
 
 void RawHIDReadThread::run()
 {
-    qDebug() << "Read thread started";
     m_running = m_hid->openDevice();
     while(m_running)
     {
@@ -225,7 +224,6 @@ RawHIDWriteThread::~RawHIDWriteThread()
 
 void RawHIDWriteThread::run()
 {
-    qDebug() << "Write thread started";
     while(m_running)
     {
         char buffer[WRITE_SIZE] = {0};
@@ -390,26 +388,26 @@ bool RawHID::open(OpenMode mode)
 
 void RawHID::close()
 {
+    qDebug() << "RawHID::close()";
     emit aboutToClose();
-
-    m_mutex->lock();
-
     if (m_writeThread)
     {
+        qDebug() << "About to terminate write thread";
         m_writeThread->terminate();
         delete m_writeThread;
         m_writeThread = NULL;
+        qDebug() << "Write thread terminated";
     }
 
 
     if (m_readThread)
     {
+        qDebug() << "About to terminate read thread";
         m_readThread->terminate();
         delete m_readThread; // calls wait
         m_readThread = NULL;
+        qDebug() << "Read thread terminated";
     }
-
-    m_mutex->unlock();
 
     emit closed();
 

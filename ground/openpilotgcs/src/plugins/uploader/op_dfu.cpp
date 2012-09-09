@@ -106,17 +106,19 @@ DFUObject::DFUObject(bool _debug,bool _use_serial,QString portname):
                     QTimer::singleShot(2000,&m_eventloop, SLOT(quit()));
                 m_eventloop.exec();
                 devices = USBMonitor::instance()->availableDevices(0x20a0,-1,-1,USBMonitor::Bootloader);
+                qDebug() << "Devices length: " << devices.length();
                 if (devices.length()==1) {
-                   if(hidHandle.open(1,devices.first().vendorID,devices.first().productID,0,0)==1)
+                    qDebug() << "Opening device";
+                    if(hidHandle.open(1,devices.first().vendorID,devices.first().productID,0,0)==1)
                     {
-                       QTimer::singleShot(200,&m_eventloop, SLOT(quit()));
+                        QTimer::singleShot(200,&m_eventloop, SLOT(quit()));
                         m_eventloop.exec();
                         qDebug()<<"OP_DFU detected after delay";
                         mready=true;
+                        qDebug() << "Detected";
                         break;
                     }
-                }
-                else {
+                } else {
                     qDebug() << devices.length()  << " device(s) detected, don't know what to do!";
                     mready = false;
                 }
@@ -590,21 +592,16 @@ bool DFUObject::findDevices()
     buf[9] = 0;
 
     int result = sendData(buf, BUF_LEN);
-    //int result = hidHandle.send(0,buf, BUF_LEN, 5000);
-    if(result<1)
-    {
+    if (result < 1)
         return false;
-    }
+
     result = receiveData(buf,BUF_LEN);
-    //result = hidHandle.receive(0,buf,BUF_LEN,5000);
-    if(result<1)
-    {
+    if (result < 1)
         return false;
-    }
+
     numberOfDevices=buf[7];
     RWFlags=buf[8];
     RWFlags=RWFlags<<8 | buf[9];
-
 
     if(buf[1]==OP_DFU::Rep_Capabilities)
     {

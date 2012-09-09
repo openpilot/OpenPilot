@@ -37,6 +37,9 @@
 
 #if defined( Q_OS_MAC)
 
+#include <IOKit/IOKitLib.h>
+#include <IOKit/hid/IOHIDLib.h>
+#include <CoreFoundation/CFString.h>
 
 #elif defined(Q_OS_UNIX)
 //#elif defined(Q_OS_LINUX)
@@ -100,12 +103,8 @@ public:
     void close(int num);
     int send(int num, void *buf, int len, int timeout);
     QString getserial(int num);
-    void mytest(int num);
 signals:
-     void deviceUnplugged(int);//just to make pips changes compile
-#if defined( Q_OS_MAC)
-
-#endif
+     void deviceUnplugged(int);
 
 private:
 #if defined( Q_OS_MAC)
@@ -121,17 +120,19 @@ private:
      void dettach(IOHIDDeviceRef dev);
      void input(uint8_t *, CFIndex);
 
+     // Platform specific handles for the USB device
      IOHIDManagerRef hid_manager;
-     CFRunLoopRef the_correct_runloop;
      IOHIDDeviceRef dev;
+     CFRunLoopRef the_correct_runloop;
 
      static const int BUFFER_SIZE = 64;
      uint8_t buffer[BUFFER_SIZE];
-     int32_t buffer_count;
-     bool device_open;
      int attach_count;
+     int buffer_count;
+     bool device_open;
+     bool unplugged;
+
 #elif defined(Q_OS_UNIX)
-    //#elif defined(Q_OS_LINUX)
 
     hid_t *first_hid;
     hid_t *last_hid;

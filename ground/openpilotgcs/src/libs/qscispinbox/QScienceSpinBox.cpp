@@ -492,7 +492,7 @@ QString QScienceSpinBox::stripped(const QString &t, int *pos) const
 }
 
 // reimplemented function, copied from qspinbox.cpp
-static bool isIntermediateValueHelper(qint64 num, qint64 min, qint64 max, qint64 *match)
+bool QScienceSpinBox::isIntermediateValueHelper(qint64 num, qint64 min, qint64 max, qint64 *match)
 {
     QSBDEBUG("%lld %lld %lld", num, min, max);
 

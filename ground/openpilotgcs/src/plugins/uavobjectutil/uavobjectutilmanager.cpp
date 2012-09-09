@@ -268,7 +268,7 @@ QByteArray UAVObjectUtilManager::getBoardCPUSerial()
     QByteArray cpuSerial;
     FirmwareIAPObj::DataFields firmwareIapData = getFirmwareIap();
 
-    for (int i = 0; i < FirmwareIAPObj::CPUSERIAL_NUMELEM; i++)
+    for (unsigned int i = 0; i < FirmwareIAPObj::CPUSERIAL_NUMELEM; i++)
         cpuSerial.append(firmwareIapData.CPUSerial[i]);
 
     return cpuSerial;
@@ -288,7 +288,7 @@ QByteArray UAVObjectUtilManager::getBoardDescription()
     QByteArray ret;
     FirmwareIAPObj::DataFields firmwareIapData = getFirmwareIap();
 
-    for (int i = 0; i < FirmwareIAPObj::DESCRIPTION_NUMELEM; i++)
+    for (unsigned int i = 0; i < FirmwareIAPObj::DESCRIPTION_NUMELEM; i++)
         ret.append(firmwareIapData.Description[i]);
 
     return ret;

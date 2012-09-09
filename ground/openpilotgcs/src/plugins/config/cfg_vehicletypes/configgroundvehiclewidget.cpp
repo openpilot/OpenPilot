@@ -230,7 +230,7 @@ QString ConfigGroundVehicleWidget::updateConfigObjectsFromWidgets()
 void ConfigGroundVehicleWidget::refreshWidgetsValues(QString frameType)
 {
 	UAVDataObject*	obj;
-	UAVObjectField *field;
+//	UAVObjectField *field;
 	
     GUIConfigDataUnion config = GetConfigData();
 
@@ -298,7 +298,7 @@ bool ConfigGroundVehicleWidget::setupGroundVehicleMotorcycle(QString airframeTyp
 
     int channel;
     //disable all
-    for (channel=0; channel<(int)VehicleConfig::CHANNEL_NUMELEM; channel++) {
+    for (channel=0; (unsigned int) channel < VehicleConfig::CHANNEL_NUMELEM; channel++) {
         setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_DISABLED);
         resetMixerVector(mixer, channel);
     }
@@ -355,7 +355,7 @@ bool ConfigGroundVehicleWidget::setupGroundVehicleDifferential(QString airframeT
 
     int channel;
     //disable all
-    for (channel=0; channel<(int)VehicleConfig::CHANNEL_NUMELEM; channel++) {
+    for (channel=0; (unsigned int) channel < VehicleConfig::CHANNEL_NUMELEM; channel++) {
         setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_DISABLED);
         resetMixerVector(mixer, channel);
     }
@@ -410,7 +410,7 @@ bool ConfigGroundVehicleWidget::setupGroundVehicleCar(QString airframeType)
 
     int channel;
     //disable all
-    for (channel=0; channel<(int)VehicleConfig::CHANNEL_NUMELEM; channel++) {
+    for (channel=0; (unsigned int) channel < VehicleConfig::CHANNEL_NUMELEM; channel++) {
         setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_DISABLED);
         resetMixerVector(mixer, channel);
     }

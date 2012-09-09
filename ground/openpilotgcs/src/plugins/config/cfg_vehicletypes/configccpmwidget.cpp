@@ -206,6 +206,7 @@ ConfigCcpmWidget::~ConfigCcpmWidget()
 
 void ConfigCcpmWidget::setupUI(QString frameType)
 {
+    Q_UNUSED(frameType);
 }
 
 void ConfigCcpmWidget::ResetActuators(GUIConfigDataUnion* configData)

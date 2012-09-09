@@ -48,6 +48,7 @@ ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow, QTabWidge
     m_availableDevList(0),
     m_connectBtn(0),
     m_ioDev(NULL),
+    polling(true),
     m_mainWindow(mainWindow)
 {
     QHBoxLayout *layout = new QHBoxLayout;

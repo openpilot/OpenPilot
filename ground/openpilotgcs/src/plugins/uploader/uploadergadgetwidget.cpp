@@ -456,7 +456,7 @@ void UploaderGadgetWidget::systemRescue()
         delete dfu;
         dfu = NULL;
     }
-    // Avoid dumb users pressing Rescue twice. It can happen.
+    // Avoid users pressing Rescue twice.
     m_config->rescueButton->setEnabled(false);
 
     // Now we're good to go:

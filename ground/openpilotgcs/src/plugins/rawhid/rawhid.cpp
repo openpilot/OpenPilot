@@ -144,7 +144,7 @@ RawHIDReadThread::~RawHIDReadThread()
 {
     m_running = false;
     //wait for the thread to terminate
-    if(wait(1000) == false)
+    if(wait(10000) == false)
         qDebug() << "Cannot terminate RawHIDReadThread";
 }
 
@@ -216,7 +216,7 @@ RawHIDWriteThread::~RawHIDWriteThread()
 {
     m_running = false;
     //wait for the thread to terminate
-    if(wait(1000) == false)
+    if(wait(10000) == false)
         qDebug() << "Cannot terminate RawHIDReadThread";
 }
 

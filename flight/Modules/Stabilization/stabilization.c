@@ -68,6 +68,7 @@ typedef struct {
 	float iLim;
 	float iAccumulator;
 	float lastErr;
+	float lastDer;
 } pid_type;
 
 // Private variables
@@ -405,6 +406,7 @@ static void stabilizationTask(void* parameters)
 float ApplyPid(pid_type * pid, const float err, float dT)
 {
 	float diff = (err - pid->lastErr);
+	float dterm = 0;
 	pid->lastErr = err;
 
 	// Scale up accumulator by 1000 while computing to avoid losing precision
@@ -414,7 +416,16 @@ float ApplyPid(pid_type * pid, const float err, float dT)
 	} else if (pid->iAccumulator < -(pid->iLim * 1000.0f)) {
 		pid->iAccumulator = -pid->iLim * 1000.0f;
 	}
-	return ((err * pid->p) + pid->iAccumulator / 1000.0f + (diff * pid->d / dT));
+
+	// Calculate DT1 term, fixed T1 timeconstant
+	if(pid->d)
+	{
+		dterm = pid->lastDer + (( dT / ( dT + 7.9577e-3)) * ((diff * pid->d / dT) - pid->lastDer));
+		pid->lastDer = dterm;            //   ^ set constant to 1/(2*pi*f_cutoff)
+		                                 //   7.9577e-3  means 20 Hz f_cutoff
+	}
+
+	return ((err * pid->p) + pid->iAccumulator / 1000.0f + dterm);
 }
 
 
@@ -423,6 +434,7 @@ static void ZeroPids(void)
 	for(int8_t ct = 0; ct < PID_MAX; ct++) {
 		pids[ct].iAccumulator = 0.0f;
 		pids[ct].lastErr = 0.0f;
+		pids[ct].lastDer = 0.0f;
 	}
 	for(uint8_t i = 0; i < 3; i++)
 		axis_lock_accum[i] = 0.0f;

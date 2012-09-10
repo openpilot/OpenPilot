@@ -1588,7 +1588,7 @@ static const struct pios_tim_channel pios_tim_servoport_all_pins[] = {
 		},
 		.remap = GPIO_AF_TIM3,
 	},
-	// PB3 - TIM2 CH2 LED1 Ok
+	// PB3 - TIM2 CH2 LED1
 	{
 		.timer = TIM2,
 		.timer_chan = TIM_Channel_2,
@@ -1605,7 +1605,7 @@ static const struct pios_tim_channel pios_tim_servoport_all_pins[] = {
 		},
 		.remap = GPIO_AF_TIM2,
 	},
-	// led PB4 - TIM3 CH1 LED2
+	// PB4 - TIM3 CH1 LED2
 	{
 		.timer = TIM3,
 		.timer_chan = TIM_Channel_1,

@@ -565,28 +565,82 @@ static bool set_channel(uint8_t mixer_channel, uint16_t value, const ActuatorSet
 static bool set_channel(uint8_t mixer_channel, uint16_t value, const ActuatorSettingsData * actuatorSettings)
 {
 	switch(actuatorSettings->ChannelType[mixer_channel]) {
-		case ACTUATORSETTINGS_CHANNELTYPE_PWMALARMBUZZER: {
+		case ACTUATORSETTINGS_CHANNELTYPE_PWMALARMBUZZER: 
+                case ACTUATORSETTINGS_CHANNELTYPE_ARMINGLED:
+                case ACTUATORSETTINGS_CHANNELTYPE_INFOLED:
+                {
 			// This is for buzzers that take a PWM input
 
 			static uint32_t currBuzzTune = 0;
 			static uint32_t currBuzzTuneState;
-			uint32_t bewBuzzTune;
 
-			// Decide what tune to play
-			if (AlarmsGet(SYSTEMALARMS_ALARM_BATTERY) > SYSTEMALARMS_ALARM_WARNING) {
-				bewBuzzTune = 0b11110110110000;	// pause, short, short, short, long
-			} else if (AlarmsGet(SYSTEMALARMS_ALARM_GPS) >= SYSTEMALARMS_ALARM_WARNING) {
-				bewBuzzTune = 0x80000000;			// pause, short
-			} else {
-				bewBuzzTune = 0;
-			}
+                        static uint32_t currArmingTune = 0;
+			static uint32_t currArmingTuneState;
 
-			// Do we need to change tune?
-			if (bewBuzzTune != currBuzzTune) {
-				currBuzzTune = bewBuzzTune;
-				currBuzzTuneState = currBuzzTune;
-			}
+                        static uint32_t currInfoTune = 0;
+			static uint32_t currInfoTuneState;
 
+                        uint32_t newTune = 0;
+                        if(actuatorSettings->ChannelType[mixer_channel] == ACTUATORSETTINGS_CHANNELTYPE_PWMALARMBUZZER)
+                        {
+                            
+                            // Decide what tune to play
+                            if (AlarmsGet(SYSTEMALARMS_ALARM_BATTERY) > SYSTEMALARMS_ALARM_WARNING) {
+                                    newTune = 0b11110110110000;	// pause, short, short, short, long
+                            } else if (AlarmsGet(SYSTEMALARMS_ALARM_GPS) >= SYSTEMALARMS_ALARM_WARNING) {
+                                    newTune = 0x80000000;			// pause, short
+                            } else {
+                                    newTune = 0;
+                            }
+
+                            // Do we need to change tune?
+                            if (newTune != currBuzzTune) {
+                                    currBuzzTune = newTune;
+                                    currBuzzTuneState = currBuzzTune;
+                            }
+                        }
+                        else // ACTUATORSETTINGS_CHANNELTYPE_ARMINGLED || ACTUATORSETTINGS_CHANNELTYPE_INFOLED
+                        {
+                            uint8_t arming;
+                            FlightStatusArmedGet(&arming);
+                            //base idle tune  
+                            newTune =  0x80000000;      // 0b1000...
+                            
+                            // Merge the error pattern for InfoLed
+                            if(actuatorSettings->ChannelType[mixer_channel] == ACTUATORSETTINGS_CHANNELTYPE_INFOLED)
+                            {
+                                if (AlarmsGet(SYSTEMALARMS_ALARM_BATTERY) > SYSTEMALARMS_ALARM_WARNING) 
+                                {
+                                    newTune |= 0b00000000001111111011111110000000;
+                                }
+                                else if(AlarmsGet(SYSTEMALARMS_ALARM_GPS) >= SYSTEMALARMS_ALARM_WARNING) 
+                                {             
+                                    newTune |= 0b00000000000000110110110000000000;
+                                }
+                            }
+                            // fast double blink pattern if armed 
+                            if (arming == FLIGHTSTATUS_ARMED_ARMED) 
+                               newTune |= 0xA0000000;   // 0b101000... 
+
+                            // Do we need to change tune?
+                            if(actuatorSettings->ChannelType[mixer_channel] == ACTUATORSETTINGS_CHANNELTYPE_ARMINGLED)
+                            {
+                                if (newTune != currArmingTune) {
+                                    currArmingTune = newTune;
+                                    // note: those are both updated so that Info and Arming are in sync if used simultaneously
+                                    currArmingTuneState = currArmingTune;
+                                    currInfoTuneState = currInfoTune;
+                                }
+                            }
+                            else
+                            {
+                                if (newTune != currInfoTune) {
+                                    currInfoTune = newTune;
+                                    currArmingTuneState = currArmingTune;
+                                    currInfoTuneState = currInfoTune;
+                                }
+                            }
+                        }
 
 			// Play tune
 			bool buzzOn = false;
@@ -595,17 +649,30 @@ static bool set_channel(uint8_t mixer_channel, uint16_t value, const ActuatorSet
 			portTickType dT = 0;
 
 			// For now, only look at the battery alarm, because functions like AlarmsHasCritical() can block for some time; to be discussed
-			if (currBuzzTune) {
-				if(thisSysTime > lastSysTime)
-					dT = thisSysTime - lastSysTime;
-				buzzOn = (currBuzzTuneState&1);	// Buzz when the LS bit is 1
-				if (dT > 80) {
-					// Go to next bit in alarm_seq_state
-					currBuzzTuneState >>= 1;
-					if (currBuzzTuneState == 0)
-						currBuzzTuneState = currBuzzTune;	// All done, re-start the tune
-					lastSysTime = thisSysTime;
-				}
+			if (currBuzzTune||currArmingTune||currInfoTune) {
+                            if(thisSysTime > lastSysTime)
+                                dT = thisSysTime - lastSysTime;
+                            if(actuatorSettings->ChannelType[mixer_channel] == ACTUATORSETTINGS_CHANNELTYPE_PWMALARMBUZZER)
+                                buzzOn = (currBuzzTuneState&1);	// Buzz when the LS bit is 1
+                            else if(actuatorSettings->ChannelType[mixer_channel] == ACTUATORSETTINGS_CHANNELTYPE_ARMINGLED)
+                                buzzOn = (currArmingTuneState&1);	
+                            else if(actuatorSettings->ChannelType[mixer_channel] == ACTUATORSETTINGS_CHANNELTYPE_INFOLED)
+                                buzzOn = (currInfoTuneState&1);
+
+                            if (dT > 80) {
+                                    // Go to next bit in alarm_seq_state
+                                    currArmingTuneState >>=1;
+                                    currInfoTuneState >>= 1;
+                                    currBuzzTuneState >>= 1;
+
+                                    if (currBuzzTuneState == 0)
+                                            currBuzzTuneState = currBuzzTune;	// All done, re-start the tune
+                                    if (currArmingTuneState == 0)
+                                            currArmingTuneState = currArmingTune;
+                                    if (currInfoTuneState == 0)
+                                            currInfoTuneState = currInfoTune;	
+                                    lastSysTime = thisSysTime;
+                            }
 			}
 			PIOS_Servo_Set(actuatorSettings->ChannelAddr[mixer_channel],
 							buzzOn?actuatorSettings->ChannelMax[mixer_channel]:actuatorSettings->ChannelMin[mixer_channel]);

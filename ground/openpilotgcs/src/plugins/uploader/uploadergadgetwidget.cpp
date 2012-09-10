@@ -378,7 +378,8 @@ void UploaderGadgetWidget::systemSafeBoot()
 }
 
 /**
-  Tells the system to boot (from Bootloader state)
+  * Tells the system to boot (from Bootloader state)
+  * @param[in] safeboot Indicates whether the firmware should use the stock HWSettings
   */
 void UploaderGadgetWidget::commonSystemBoot(bool safeboot)
 {
@@ -547,6 +548,7 @@ void UploaderGadgetWidget::systemRescue()
     m_config->rescueButton->setEnabled(false);
     currentStep = IAP_STATE_BOOTLOADER; // So that we can boot from the GUI afterwards.
 }
+
 void UploaderGadgetWidget::perform()
 {
     if(m_progress->value()==19)

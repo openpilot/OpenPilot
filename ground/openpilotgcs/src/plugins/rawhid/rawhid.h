@@ -84,6 +84,7 @@ protected:
 
     int m_deviceNo;
     pjrc_rawhid dev;
+    bool device_open;
 
     RawHIDReadThread *m_readThread;
     RawHIDWriteThread *m_writeThread;

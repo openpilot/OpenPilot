@@ -92,6 +92,8 @@ int pjrc_rawhid::open(int max, int vid, int pid, int usage_page, int usage)
     Q_ASSERT(hid_manager == NULL);
     Q_ASSERT(device_open == false);
 
+    attach_count = 0;
+
     // Start the HID Manager
     hid_manager = IOHIDManagerCreate(kCFAllocatorDefault, kIOHIDOptionsTypeNone);
     if (hid_manager == NULL || CFGetTypeID(hid_manager) != IOHIDManagerGetTypeID()) {
@@ -163,12 +165,11 @@ int pjrc_rawhid::open(int max, int vid, int pid, int usage_page, int usage)
  */
 int pjrc_rawhid::receive(int, void *buf, int len, int timeout)
 {
-    m_readMutex->lock();
+    QMutexLocker locker(m_readMutex);
+    Q_UNUSED(locker);
 
-    if (!device_open) {
-        m_readMutex->unlock();
+    if (!device_open)
         return -1;
-    }
 
     // Pass information to the callback to stop this run loop and signal if a timeout occurred
     struct timeout_info info;
@@ -182,6 +183,8 @@ int pjrc_rawhid::receive(int, void *buf, int len, int timeout)
     CFRunLoopTimerRef timer;
     timer = CFRunLoopTimerCreate(NULL, CFAbsoluteTimeGetCurrent() + (double)timeout / 1000.0, 0, 0, 0, timeout_callback, &context);
     CFRunLoopAddTimer(CFRunLoopGetCurrent(), timer, kCFRunLoopDefaultMode);
+
+    received_runloop = CFRunLoopGetCurrent();
 
     // Run the CFRunLoop until either a timeout or data is available
     while(1) {
@@ -200,7 +203,7 @@ int pjrc_rawhid::receive(int, void *buf, int len, int timeout)
     CFRunLoopTimerInvalidate(timer);
     CFRelease(timer);
 
-    m_readMutex->unlock();
+    received_runloop = NULL;
 
     return len;
 }
@@ -240,7 +243,8 @@ int pjrc_rawhid::send(int, void *buf, int len, int timeout)
 {
     // This lock ensures that when closing we don't do it until the
     // write has terminated (and then the device_open flag is set to false)
-    m_writeMutex->lock();
+    QMutexLocker locker(m_writeMutex);
+    Q_UNUSED(locker);
 
     if(!device_open || unplugged) {
         return -1;
@@ -256,13 +260,17 @@ int pjrc_rawhid::send(int, void *buf, int len, int timeout)
     QTimer::singleShot(timeout, &el, SLOT(quit()));
     el.exec();
 
-    m_writeMutex->unlock();
-
     return sender.result;
 }
 
 //! Get the serial number for a HID device
 QString pjrc_rawhid::getserial(int num) {
+    QMutexLocker locker(m_readMutex);
+    Q_UNUSED(locker);
+
+    if (!device_open || unplugged)
+        return "";
+
     CFTypeRef serialnum = IOHIDDeviceGetProperty(dev, CFSTR(kIOHIDSerialNumberKey));
     if(serialnum && CFGetTypeID(serialnum) == CFStringGetTypeID())
     {
@@ -280,8 +288,7 @@ QString pjrc_rawhid::getserial(int num) {
 void pjrc_rawhid::close(int)
 {
     // Make sure any pending locks are done
-    m_writeMutex->lock();
-    m_readMutex->lock();
+    QMutexLocker lock(m_writeMutex);
 
     if (device_open) {
         device_open = false;
@@ -299,12 +306,6 @@ void pjrc_rawhid::close(int)
         dev = NULL;
         hid_manager = NULL;
     }
-
-    // Must unlock to prevent deadlock in any read/write threads which will then fail
-    // because device_open is false\
-    m_writeMutex->unlock();
-    m_readMutex->unlock();
-
 }
 
 /**
@@ -323,8 +324,8 @@ void pjrc_rawhid::input(uint8_t *data, CFIndex len)
     memcpy(buffer, &data[0], len);
     buffer_count = len;
 
-    if (the_correct_runloop)
-        CFRunLoopStop(the_correct_runloop);
+    if (received_runloop)
+        CFRunLoopStop(received_runloop);
 }
 
 //! Callback for the HID driver on an input report
@@ -376,6 +377,7 @@ void pjrc_rawhid::attach(IOHIDDeviceRef d)
 
     attach_count++;
     device_open = true;
+    unplugged = false;
 }
 
 //! Called from the USB system and forwarded to the instance (context)

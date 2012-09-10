@@ -307,8 +307,10 @@ RawHID::RawHID(const QString &deviceName)
     // detect if the USB device is unplugged
     QObject::connect(&dev, SIGNAL(deviceUnplugged(int)), this, SLOT(onDeviceUnplugged(int)));
 
+    m_writeThread = new RawHIDWriteThread(this);
+
     // Starting the read thread will lock the m_startexMutex until the
-    // device is opened
+    // device is opened (which happens in that thread).
     m_readThread = new RawHIDReadThread(this);
     m_readThread->start();
 
@@ -334,12 +336,12 @@ bool RawHID::openDevice() {
     m_startedMutex->unlock();
 
     //didn't find the device we are trying to open (shouldnt happen)
+    device_open = opened >= 0;
     if (opened < 0)
     {
         return false;
     }
 
-    m_writeThread = new RawHIDWriteThread(this);
     m_writeThread->start();
 
     return true;

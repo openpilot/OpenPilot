@@ -125,6 +125,7 @@ private:
      IOHIDManagerRef hid_manager;
      IOHIDDeviceRef dev;
      CFRunLoopRef the_correct_runloop;
+     CFRunLoopRef received_runloop;
 
      static const int BUFFER_SIZE = 64;
      uint8_t buffer[BUFFER_SIZE];

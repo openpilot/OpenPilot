@@ -87,11 +87,13 @@ DFUObject::DFUObject(bool _debug,bool _use_serial,QString portname):
         m_eventloop.exec();
         QList<USBPortInfo> devices;
         devices = USBMonitor::instance()->availableDevices(0x20a0,-1,-1,USBMonitor::Bootloader);
-        if (devices.length()==1  && hidHandle.open(1,devices.first().vendorID,devices.first().productID,0,0)==1) {
-           qDebug()<<"OP_DFU detected first time";
-           mready=true;
-           QTimer::singleShot(200,&m_eventloop, SLOT(quit()));
-           m_eventloop.exec();
+        if (devices.length()==1) {
+            if (hidHandle.open(1,devices.first().vendorID,devices.first().productID,0,0)==1) {
+                mready=true;
+                QTimer::singleShot(200,&m_eventloop, SLOT(quit()));
+                m_eventloop.exec();
+            } else
+                hidHandle.close(0);
         } else {
             // Wait for the board to appear on the USB bus:
             USBSignalFilter filter(0x20a0,-1,-1,USBMonitor::Bootloader);
@@ -117,7 +119,8 @@ DFUObject::DFUObject(bool _debug,bool _use_serial,QString portname):
                         mready=true;
                         qDebug() << "Detected";
                         break;
-                    }
+                    } else
+                        hidHandle.close(0);
                 } else {
                     qDebug() << devices.length()  << " device(s) detected, don't know what to do!";
                     mready = false;
@@ -173,7 +176,6 @@ bool DFUObject::enterDFU(int const &devNumber)
     buf[9] = 1;                //DFU Data3
 
     int result = sendData(buf, BUF_LEN);
-    // int result = hidHandle.send(0,buf, BUF_LEN, 500);
     if(result<1)
         return false;
     if(debug)
@@ -218,7 +220,6 @@ bool DFUObject::StartUpload(qint32 const & numberOfBytes, TransferTypes const & 
 
     int result = sendData(buf, BUF_LEN);
     delay::msleep(1000);
-    // int result = hidHandle.send(0,buf, BUF_LEN, 5000);
 
     if(debug)
         qDebug() << result << " bytes sent";
@@ -443,7 +444,6 @@ bool DFUObject::StartDownloadT(QByteArray *fw, qint32 const & numberOfBytes, Tra
     buf[9] = 1;                     //DFU Data3
 
     int result = sendData(buf, BUF_LEN);
-    //int result = hidHandle.send(0,buf, BUF_LEN, 500);
     if(debug)
         qDebug() << "StartDownload:"<<numberOfPackets<<"packets"<<" Last Packet Size="<<lastPacketCount<<" "<<result << " bytes sent";
     float percentage;
@@ -459,7 +459,6 @@ bool DFUObject::StartDownloadT(QByteArray *fw, qint32 const & numberOfBytes, Tra
         laspercentage=(int)percentage;
 
         result = receiveData(buf,BUF_LEN);
-        //result = hidHandle.receive(0,buf,BUF_LEN,5000);
         if(debug)
             qDebug() << result << " bytes received"<<" Count="<<x<<"-"<<(int)buf[2]<<";"<<(int)buf[3]<<";"<<(int)buf[4]<<";"<<(int)buf[5]<<" Data="<<(int)buf[6]<<";"<<(int)buf[7]<<";"<<(int)buf[8]<<";"<<(int)buf[9];
         if(x==numberOfPackets-1)
@@ -510,7 +509,6 @@ int DFUObject::AbortOperation(void)
     buf[9] = 0;
 
     return sendData(buf, BUF_LEN);
-    //return hidHandle.send(0,buf, BUF_LEN, 500);
 }
 
 /**
@@ -540,7 +538,6 @@ int DFUObject::JumpToApp(bool safeboot)
     }
 
     return sendData(buf, BUF_LEN);
-    //return hidHandle.send(0,buf, BUF_LEN, 500);
 }
 
 OP_DFU::Status DFUObject::StatusRequest()
@@ -558,11 +555,9 @@ OP_DFU::Status DFUObject::StatusRequest()
     buf[9] = 0;
 
     int result = sendData(buf, BUF_LEN);
-    //int result = hidHandle.send(0,buf, BUF_LEN, 10000);
     if(debug)
         qDebug() << "StatusRequest: " << result << " bytes sent";
     result = receiveData(buf,BUF_LEN);
-    // result = hidHandle.receive(0,buf,BUF_LEN,10000);
     if(debug)
         qDebug() << "StatusRequest: " << result << " bytes received";
     if(buf[1]==OP_DFU::Status_Rep)
@@ -623,9 +618,6 @@ bool DFUObject::findDevices()
             buf[9] = 0;
             int result = sendData(buf, BUF_LEN);
             result = receiveData(buf,BUF_LEN);
-            // int result = hidHandle.send(0,buf, BUF_LEN, 5000);
-            // result = hidHandle.receive(0,buf,BUF_LEN,5000);
-            //devices[x].ID=buf[9];
             devices[x].ID=buf[14];
             devices[x].ID=devices[x].ID<<8 | (quint8)buf[15];
             devices[x].BL_Version=buf[7];
@@ -681,8 +673,6 @@ bool DFUObject::EndOperation()
     buf[9] = 0;
 
     int result = sendData(buf, BUF_LEN);
-    // int result = hidHandle.send(0,buf, BUF_LEN, 5000);
-    // hidHandle.receive(0,buf,BUF_LEN,5000);
     if(debug)
         qDebug() << result << " bytes sent";
     if(result>0)

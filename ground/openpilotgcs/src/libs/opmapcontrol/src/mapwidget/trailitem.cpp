@@ -37,6 +37,9 @@ TrailItem::TrailItem(internals::PointLatLng const& coord,int const& altitude, QB
 
     void TrailItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
     {
+        Q_UNUSED(option);
+        Q_UNUSED(widget);
+
         painter->setBrush(m_brush);
         painter->drawEllipse(-2,-2,4,4);
     }

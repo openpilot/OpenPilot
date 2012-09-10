@@ -218,6 +218,8 @@ void ConfigGadgetWidget::tabAboutToChange(int i,bool * proceed)
   */
 void ConfigGadgetWidget::updatePipXStatus(UAVObject *)
 {
+    Q_UNUSED(object);
+
     // Restart the disconnection timer.
     pipxTimeout->start(5000);
     if (!pipxConnected)

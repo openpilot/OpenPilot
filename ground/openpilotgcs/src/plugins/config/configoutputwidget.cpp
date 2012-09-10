@@ -231,7 +231,7 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject * obj)
 {
     Q_UNUSED(obj);
 
-    bool dirty=isDirty();
+//    bool dirty=isDirty();
 
     // Get Actuator Settings
     ActuatorSettings *actuatorSettings = ActuatorSettings::GetInstance(getObjectManager());

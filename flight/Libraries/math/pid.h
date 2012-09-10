@@ -39,6 +39,7 @@ struct pid {
 	float iLim;
 	float iAccumulator;
 	float lastErr;
+	float lastDer;
 };
 
 //! Methods to use the pid structures

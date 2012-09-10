@@ -37,12 +37,21 @@ static float bound(float val, float range);
 float pid_apply(struct pid *pid, const float err, float dT)
 {
 	float diff = (err - pid->lastErr);
+	float dterm = 0;
 	pid->lastErr = err;
 	
 	// Scale up accumulator by 1000 while computing to avoid losing precision
 	pid->iAccumulator += err * (pid->i * dT * 1000.0f);
 	pid->iAccumulator = bound(pid->iAccumulator, pid->iLim * 1000.0f);
-	return ((err * pid->p) + pid->iAccumulator / 1000.0f + (diff * pid->d / dT));
+
+	// Calculate DT1 term, fixed T1 timeconstant
+	if(pid->d && dT)
+	{
+		dterm = pid->lastDer +  dT / ( dT + 7.9577e-3f) * ((diff * pid->d / dT) - pid->lastDer);
+		pid->lastDer = dterm;            //   ^ set constant to 1/(2*pi*f_cutoff)
+	}	                                 //   7.9577e-3  means 20 Hz f_cutoff
+ 
+	return ((err * pid->p) + pid->iAccumulator / 1000.0f + dterm);
 }
 
 /**
@@ -56,6 +65,7 @@ void pid_zero(struct pid *pid)
 
 	pid->iAccumulator = 0;
 	pid->lastErr = 0;
+	pid->lastDer = 0;
 }
 
 /**

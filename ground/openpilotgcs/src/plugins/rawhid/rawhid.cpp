@@ -330,6 +330,9 @@ bool RawHID::openDevice() {
             dev.close(i);
     }
 
+    // Now things are opened or not (from read thread) allow the constructor to complete
+    m_startedMutex->unlock();
+
     //didn't find the device we are trying to open (shouldnt happen)
     if (opened < 0)
     {
@@ -338,8 +341,6 @@ bool RawHID::openDevice() {
 
     m_writeThread = new RawHIDWriteThread(this);
     m_writeThread->start();
-
-    m_startedMutex->unlock();
 
     return true;
 }

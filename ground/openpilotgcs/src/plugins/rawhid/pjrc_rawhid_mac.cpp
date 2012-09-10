@@ -53,10 +53,25 @@ struct timeout_info {
 pjrc_rawhid::pjrc_rawhid() :
     device_open(false), hid_manager(NULL), buffer_count(0), unplugged(false)
 {
+    m_writeMutex = new QMutex();
+    m_readMutex = new QMutex();
 }
 
 pjrc_rawhid::~pjrc_rawhid()
 {
+    if (device_open) {
+        close(0);
+    }
+
+    if (m_writeMutex) {
+        delete m_writeMutex;
+        m_writeMutex = NULL;
+    }
+
+    if (m_readMutex) {
+        delete m_readMutex;
+        m_readMutex = NULL;
+    }
 }
 
 /**
@@ -73,9 +88,9 @@ int pjrc_rawhid::open(int max, int vid, int pid, int usage_page, int usage)
     CFMutableDictionaryRef dict;
     CFNumberRef num;
     IOReturn ret;
-    int count=0;
 
     Q_ASSERT(hid_manager == NULL);
+    Q_ASSERT(device_open == false);
 
     // Start the HID Manager
     hid_manager = IOHIDManagerCreate(kCFAllocatorDefault, kIOHIDOptionsTypeNone);
@@ -148,8 +163,12 @@ int pjrc_rawhid::open(int max, int vid, int pid, int usage_page, int usage)
  */
 int pjrc_rawhid::receive(int, void *buf, int len, int timeout)
 {
-    if (!device_open)
+    m_readMutex->lock();
+
+    if (!device_open) {
+        m_readMutex->unlock();
         return -1;
+    }
 
     // Pass information to the callback to stop this run loop and signal if a timeout occurred
     struct timeout_info info;
@@ -180,6 +199,8 @@ int pjrc_rawhid::receive(int, void *buf, int len, int timeout)
 
     CFRunLoopTimerInvalidate(timer);
     CFRelease(timer);
+
+    m_readMutex->unlock();
 
     return len;
 }
@@ -215,10 +236,16 @@ private:
  * @param[in] timeout = time to wait, in milliseconds
  * @returns number of bytes sent, or -1 on error
  */
-int pjrc_rawhid::send(int num, void *buf, int len, int timeout)
+int pjrc_rawhid::send(int, void *buf, int len, int timeout)
 {
-    if(!device_open)
+    // This lock ensures that when closing we don't do it until the
+    // write has terminated (and then the device_open flag is set to false)
+    m_writeMutex->lock();
+
+    if(!device_open || unplugged) {
         return -1;
+    }
+
     uint8_t *report_buf = (uint8_t *) malloc(len);
     memcpy(&report_buf[0], buf,len);
 
@@ -228,6 +255,8 @@ int pjrc_rawhid::send(int num, void *buf, int len, int timeout)
     sender.start();
     QTimer::singleShot(timeout, &el, SLOT(quit()));
     el.exec();
+
+    m_writeMutex->unlock();
 
     return sender.result;
 }
@@ -250,6 +279,10 @@ QString pjrc_rawhid::getserial(int num) {
 //! Close the HID device
 void pjrc_rawhid::close(int)
 {
+    // Make sure any pending locks are done
+    m_writeMutex->lock();
+    m_readMutex->lock();
+
     if (device_open) {
         device_open = false;
         CFRunLoopStop(the_correct_runloop);
@@ -266,6 +299,12 @@ void pjrc_rawhid::close(int)
         dev = NULL;
         hid_manager = NULL;
     }
+
+    // Must unlock to prevent deadlock in any read/write threads which will then fail
+    // because device_open is false\
+    m_writeMutex->unlock();
+    m_readMutex->unlock();
+
 }
 
 /**

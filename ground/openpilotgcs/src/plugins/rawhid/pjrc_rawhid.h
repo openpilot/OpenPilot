@@ -32,6 +32,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <QDebug>
+#include <QMutex>
 #include <QString>
 #include "rawhid_global.h"
 
@@ -132,6 +133,8 @@ private:
      bool device_open;
      bool unplugged;
 
+     QMutex *m_writeMutex;
+     QMutex *m_readMutex;
 #elif defined(Q_OS_UNIX)
 
     hid_t *first_hid;

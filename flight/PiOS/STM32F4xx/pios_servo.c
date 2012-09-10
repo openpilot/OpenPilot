@@ -100,7 +100,7 @@ void PIOS_Servo_SetHz(const uint16_t * speeds, uint8_t banks)
 
 	uint8_t set = 0;
 
-	for(uint8_t i = 0; (i < servo_cfg->num_channels) && (set < banks); i++) {
+	for(uint8_t i = 0; (i < servo_cfg->num_channels); i++) {
 		bool new = true;
 		const struct pios_tim_channel * chan = &servo_cfg->channels[i];
 
@@ -119,7 +119,11 @@ void PIOS_Servo_SetHz(const uint16_t * speeds, uint8_t banks)
 
 			TIM_TimeBaseStructure.TIM_Period = ((1000000 / speeds[set]) - 1);
 			TIM_TimeBaseInit(chan->timer, &TIM_TimeBaseStructure);
-			set++;
+                        
+                        // don't increment as this is the last speed value provided.
+                        // set all the remaining timers with the last speed value.
+                        if(set<banks-1)
+                            set++;
 		}
 	}
 }

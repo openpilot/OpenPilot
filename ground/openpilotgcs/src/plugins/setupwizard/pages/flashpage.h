@@ -44,9 +44,10 @@ public:
     bool validatePage();
     bool isComplete() const;
 
-private:    
+private:
     Ui::FlashPage *ui;
     bool m_successfulWrite;
+    void enableButtons(bool enable);
 
 private slots:
     void writeToController();

@@ -53,7 +53,7 @@ SetupWizard::SetupWizard(QWidget *parent) : QWizard(parent), VehicleConfiguratio
     setWindowTitle(tr("OpenPilot Setup Wizard"));
     setOption(QWizard::IndependentPages, false);
     setFixedSize(640, 530);
-    for(int i = 0; i < ActuatorSettings::CHANNELMAX_NUMELEM; i++)
+    for(quint16 i = 0; i < ActuatorSettings::CHANNELMAX_NUMELEM; i++)
     {
         m_actuatorSettings << actuatorChannelSettings();
     }

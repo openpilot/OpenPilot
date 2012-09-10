@@ -85,7 +85,6 @@ void LevellingPage::performLevelling()
     {
         m_levellingUtil = new LevellingUtil(BIAS_CYCLES, BIAS_RATE);
     }
-    emit completeChanged();
 
     connect(m_levellingUtil, SIGNAL(progress(long,long)), this, SLOT(levellingProgress(long,long)));
     connect(m_levellingUtil, SIGNAL(done(accelGyroBias)), this, SLOT(levellingDone(accelGyroBias)));

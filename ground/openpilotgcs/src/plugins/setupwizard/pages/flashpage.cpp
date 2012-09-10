@@ -66,18 +66,26 @@ void FlashPage::writeToController()
         return;
     }
 
-    ui->saveButton->setEnabled(false);
-    getWizard()->button(QWizard::CancelButton)->setEnabled(false);
-    setCommitPage(true);
+    enableButtons(false);
     VehicleConfigurationHelper helper(getWizard());
     connect(&helper, SIGNAL(saveProgress(int, int, QString)),this, SLOT(saveProgress(int, int, QString)));
+
     m_successfulWrite = helper.setupVehicle();
+
     disconnect(&helper, SIGNAL(saveProgress(int, int, QString)),this, SLOT(saveProgress(int, int, QString)));
     ui->saveProgressLabel->setText(QString("<font color='%1'>%2</font>").arg(m_successfulWrite ? "green" : "red", ui->saveProgressLabel->text()));
-    ui->saveButton->setEnabled(true);
-    getWizard()->button(QWizard::CancelButton)->setEnabled(true);
-    setCommitPage(false);
+    enableButtons(true);
+
     emit completeChanged();
+}
+
+void FlashPage::enableButtons(bool enable)
+{
+    ui->saveButton->setEnabled(enable);
+    getWizard()->button(QWizard::NextButton)->setEnabled(enable);
+    getWizard()->button(QWizard::CancelButton)->setEnabled(enable);
+    getWizard()->button(QWizard::BackButton)->setEnabled(enable);
+    QApplication::processEvents();
 }
 
 void FlashPage::saveProgress(int total, int current, QString description)

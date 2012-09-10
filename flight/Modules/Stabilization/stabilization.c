@@ -67,6 +67,7 @@
 
 enum {PID_RATE_ROLL, PID_RATE_PITCH, PID_RATE_YAW, PID_ROLL, PID_PITCH, PID_YAW, PID_MAX};
 
+
 // Private variables
 static xTaskHandle taskHandle;
 static StabilizationSettingsData settings;
@@ -390,6 +391,7 @@ static void ZeroPids(void)
 {
 	for(uint32_t i = 0; i < PID_MAX; i++)
 		pid_zero(&pids[i]);
+
 
 	for(uint8_t i = 0; i < 3; i++)
 		axis_lock_accum[i] = 0.0f;

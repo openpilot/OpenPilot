@@ -125,7 +125,6 @@ int pjrc_rawhid::open(int max, int vid, int pid, int usage_page, int usage)
     IOHIDManagerRegisterDeviceRemovalCallback(hid_manager, pjrc_rawhid::dettach_callback, this);
     ret = IOHIDManagerOpen(hid_manager, kIOHIDOptionsTypeNone);
     if (ret != kIOReturnSuccess) {
-        qDebug() << "Could not start IOHIDManager";
         IOHIDManagerUnscheduleFromRunLoop(hid_manager,
                                           CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
         CFRelease(hid_manager);
@@ -152,8 +151,6 @@ int pjrc_rawhid::receive(int, void *buf, int len, int timeout)
     if (!device_open)
         return -1;
 
-    qDebug() << "receiving";
-
     // Pass information to the callback to stop this run loop and signal if a timeout occurred
     struct timeout_info info;
     info.loopRef = CFRunLoopGetCurrent();;
@@ -161,8 +158,6 @@ int pjrc_rawhid::receive(int, void *buf, int len, int timeout)
     CFRunLoopTimerContext context;
     memset(&context, 0, sizeof(context));
     context.info = &info;
-
-    qDebug() << "sending context info" << context.info;
 
     // Set up the timer for the timeout
     CFRunLoopTimerRef timer;
@@ -177,7 +172,6 @@ int pjrc_rawhid::receive(int, void *buf, int len, int timeout)
             buffer_count = 0;
             break;
         } else if (info.timed_out) {
-            qDebug() << "timed out";
             len = 0;
             break;
         }
@@ -186,8 +180,6 @@ int pjrc_rawhid::receive(int, void *buf, int len, int timeout)
 
     CFRunLoopTimerInvalidate(timer);
     CFRelease(timer);
-
-    qDebug() << "received";
 
     return len;
 }
@@ -230,14 +222,12 @@ int pjrc_rawhid::send(int num, void *buf, int len, int timeout)
     uint8_t *report_buf = (uint8_t *) malloc(len);
     memcpy(&report_buf[0], buf,len);
 
-    qDebug() << "sending";
     QEventLoop el;
     Sender sender(dev, report_buf, len);
     connect(&sender, SIGNAL(finished()), &el, SLOT(quit()));
     sender.start();
     QTimer::singleShot(timeout, &el, SLOT(quit()));
     el.exec();
-    qDebug() << "sent";
 
     return sender.result;
 }
@@ -310,7 +300,6 @@ void pjrc_rawhid::input_callback(void *c, IOReturn ret, void *sender, IOHIDRepor
 //! Timeout used for the
 void pjrc_rawhid::timeout_callback(CFRunLoopTimerRef, void *i)
 {
-    qDebug() << "timeout_callback";
     struct timeout_info *info = (struct timeout_info *) i;
     info->timed_out = true;
     CFRunLoopStop(info->loopRef);

@@ -54,13 +54,17 @@ private:
 
     QSvgRenderer *m_renderer;
     QGraphicsSvgItem* m_background;
+    QGraphicsScene *m_scene;
 
     void setupGraphicsScene();
-    void setupGraphicsSceneItems(QGraphicsScene *scene, QList<QString> elementsToShow);
+    void setupGraphicsSceneItems(QList<QString> elementsToShow);
 protected:
     void resizeEvent(QResizeEvent *event);
     void showEvent(QShowEvent *event);
 
+private slots:
+
+    void on_saveButton_clicked();
 };
 
 #endif // CONNECTIONDIAGRAM_H

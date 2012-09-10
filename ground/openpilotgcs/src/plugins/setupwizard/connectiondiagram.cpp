@@ -27,6 +27,7 @@
 
 #include <QDebug>
 #include <QFile>
+#include <QFileDialog>
 #include "connectiondiagram.h"
 #include "ui_connectiondiagram.h"
 
@@ -62,8 +63,8 @@ void ConnectionDiagram::setupGraphicsScene()
             m_renderer->load(QString(":/setupwizard/resources/connection-diagrams.svg")) &&
             m_renderer->isValid())
     {
-        QGraphicsScene *scene = new QGraphicsScene(this);
-        ui->connectionDiagram->setScene(scene);
+        m_scene = new QGraphicsScene(this);
+        ui->connectionDiagram->setScene(m_scene);
         //ui->connectionDiagram->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
 
         m_background = new QGraphicsSvgItem();
@@ -72,7 +73,7 @@ void ConnectionDiagram::setupGraphicsScene()
         m_background->setOpacity(0);
         //m_background->setFlags(QGraphicsItem::ItemClipsToShape);
         m_background->setZValue(-1);
-        scene->addItem(m_background);
+        m_scene->addItem(m_background);
 
         QList<QString> elementsToShow;
 
@@ -139,7 +140,7 @@ void ConnectionDiagram::setupGraphicsScene()
                 break;
         }
 
-        setupGraphicsSceneItems(scene, elementsToShow);
+        setupGraphicsSceneItems(elementsToShow);
 
         ui->connectionDiagram->setSceneRect(m_background->boundingRect());
         ui->connectionDiagram->fitInView(m_background, Qt::KeepAspectRatio);
@@ -148,7 +149,7 @@ void ConnectionDiagram::setupGraphicsScene()
     }
 }
 
-void ConnectionDiagram::setupGraphicsSceneItems(QGraphicsScene *scene, QList<QString> elementsToShow)
+void ConnectionDiagram::setupGraphicsSceneItems(QList<QString> elementsToShow)
 {
     qreal z = 0;
     QRectF backgBounds = m_renderer->boundsOnElement("background");
@@ -168,7 +169,7 @@ void ConnectionDiagram::setupGraphicsSceneItems(QGraphicsScene *scene, QList<QSt
             //QRectF orig = m_renderer->boundsOnElement(elementId);
             //element->setPos(orig.x() - backgBounds.x(), orig.y() - backgBounds.y());
 
-            scene->addItem(element);
+            m_scene->addItem(element);
             qDebug() << "Adding " << elementId << " to scene at " << element->pos();
         }
         else {
@@ -177,4 +178,14 @@ void ConnectionDiagram::setupGraphicsSceneItems(QGraphicsScene *scene, QList<QSt
     }
 }
 
-
+void ConnectionDiagram::on_saveButton_clicked()
+{
+    QImage image(2200, 1100, QImage::Format_ARGB32);
+    image.fill(0);
+    QPainter painter(&image);
+    m_scene->render(&painter);
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"), "", tr("Images (*.png *.xpm *.jpg)"));
+    if(!fileName.isEmpty()) {
+        image.save(fileName);
+    }
+}

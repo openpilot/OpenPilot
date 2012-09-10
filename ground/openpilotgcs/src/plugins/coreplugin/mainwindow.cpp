@@ -273,7 +273,7 @@ void MainWindow::extensionsInitialized()
     if ( ! qs->allKeys().count() ){
         foreach(QString str,qApp->arguments())
         {
-            if(str.contains("config"))
+            if(str.contains("configfile"))
             {
                 qDebug()<<"ass";
                 commandLine=str.split("=").at(1);

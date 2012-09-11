@@ -448,6 +448,9 @@ static void SettingsUpdatedCb(UAVObjEvent * ev)
 		settings.YawPI[STABILIZATIONSETTINGS_YAWPI_KI], 0,
 		settings.YawPI[STABILIZATIONSETTINGS_YAWPI_ILIMIT]);
 	
+	// Set up the derivative term
+	pid_configure_derivative(settings.DerivativeCutoff, settings.DerivativeGamma);
+
 	// Maximum deviation to accumulate for axis lock
 	max_axis_lock = settings.MaxAxisLock;
 	max_axislock_rate = settings.MaxAxisLockRate;

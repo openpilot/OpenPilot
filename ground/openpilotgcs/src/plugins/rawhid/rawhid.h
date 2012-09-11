@@ -74,15 +74,23 @@ protected:
     virtual qint64 bytesAvailable() const;
     virtual qint64 bytesToWrite() const;
 
+    //! Callback from the read thread to open the device
+    bool openDevice();
+
+    //! Callback from teh read thread to close the device
+    bool closeDevice();
+
     QString serialNumber;
 
     int m_deviceNo;
     pjrc_rawhid dev;
+    bool device_open;
 
     RawHIDReadThread *m_readThread;
     RawHIDWriteThread *m_writeThread;
 
 	QMutex *m_mutex;
+    QMutex *m_startedMutex;
 };
 
 #endif // RAWHID_H

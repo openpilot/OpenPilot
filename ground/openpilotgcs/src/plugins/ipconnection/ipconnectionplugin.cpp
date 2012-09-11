@@ -174,7 +174,7 @@ QList <Core::IConnection::device> IPconnectionConnection::availableDevices()
     return list;
 }
 
-QIODevice *IPconnectionConnection::openDevice(const QString &deviceName)
+QIODevice *IPconnectionConnection::openDevice(const QString &)
 {
     Q_UNUSED(deviceName);
 
@@ -210,7 +210,7 @@ QIODevice *IPconnectionConnection::openDevice(const QString &deviceName)
     return ipSocket;
 }
 
-void IPconnectionConnection::closeDevice(const QString &deviceName)
+void IPconnectionConnection::closeDevice(const QString &)
 {
     Q_UNUSED(deviceName);
 

@@ -198,7 +198,6 @@ void OutputCalibrationPage::setWizardPage()
         }
     }
     setupVehicleHighlightedPart();
-    QApplication::processEvents();
 }
 
 void OutputCalibrationPage::initializePage()
@@ -316,7 +315,7 @@ void OutputCalibrationPage::on_motorNeutralSlider_valueChanged(int value)
 
 void OutputCalibrationPage::on_motorMaxButton_toggled(bool checked)
 {
-    ui->motorNeutralButton->setText(checked ? tr("Stop") : tr("Start"));
+    ui->motorMaxButton->setText(checked ? tr("Stop") : tr("Start"));
     quint16 channel = getCurrentChannel();
     onStartButtonToggle(ui->motorMaxButton, channel, m_actuatorSettings[channel].channelMax, 1000, ui->motorMaxSlider);
 }

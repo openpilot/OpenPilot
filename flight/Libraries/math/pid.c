@@ -39,17 +39,58 @@ static float bound(float val, float range);
 //! Store the shared time constant for the derivative cutoff.
 static float deriv_tau = 7.9577e-3f;
 
+//! Store the setpoint weight to apply for the derivative term
+static float deriv_gamma = 1.0;
+
+/**
+ * Update the PID computation
+ * @param[in] pid The PID struture which stores temporary information
+ * @param[in] err The error term
+ * @param[in] dT  The time step
+ * @returns Output the computed controller value
+ */
 float pid_apply(struct pid *pid, const float err, float dT)
-{
+{	
+	// Scale up accumulator by 1000 while computing to avoid losing precision
+	pid->iAccumulator += err * (pid->i * dT * 1000.0f);
+	pid->iAccumulator = bound(pid->iAccumulator, pid->iLim * 1000.0f);
+
+	// Calculate DT1 term
 	float diff = (err - pid->lastErr);
 	float dterm = 0;
 	pid->lastErr = err;
+	if(pid->d && dT)
+	{
+		dterm = pid->lastDer +  dT / ( dT + deriv_tau) * ((diff * pid->d / dT) - pid->lastDer);
+		pid->lastDer = dterm;            //   ^ set constant to 1/(2*pi*f_cutoff)
+	}	                                 //   7.9577e-3  means 20 Hz f_cutoff
+ 
+	return ((err * pid->p) + pid->iAccumulator / 1000.0f + dterm);
+}
+
+/**
+ * Update the PID computation with setpoint weighting on the derivative
+ * @param[in] pid The PID struture which stores temporary information
+ * @param[in] setpoint The setpoint to use
+ * @param[in] measured The measured value of output
+ * @param[in] dT  The time step
+ * @returns Output the computed controller value
+ *
+ * This version of apply uses setpoint weighting for the derivative component so the gain
+ * on the gyro derivative can be different than the gain on the setpoint derivative
+ */
+float pid_apply_setpoint(struct pid *pid, const float setpoint, const float measured, float dT)
+{
+	float err = setpoint - measured;
 	
 	// Scale up accumulator by 1000 while computing to avoid losing precision
 	pid->iAccumulator += err * (pid->i * dT * 1000.0f);
 	pid->iAccumulator = bound(pid->iAccumulator, pid->iLim * 1000.0f);
 
-	// Calculate DT1 term, fixed T1 timeconstant
+	// Calculate DT1 term,
+	float diff = ((deriv_gamma * setpoint - measured) - pid->lastErr);
+	float dterm = 0;
+	pid->lastErr = err;
 	if(pid->d && dT)
 	{
 		dterm = pid->lastDer +  dT / ( dT + deriv_tau) * ((diff * pid->d / dT) - pid->lastDer);
@@ -78,9 +119,10 @@ void pid_zero(struct pid *pid)
  * @param[in] cutoff The cutoff frequency (in Hz)
  * @param[in] gamma The gamma term for setpoint shaping (unsused now)
  */
-void pid_configure_derivative(float cutoff, float gamma)
+void pid_configure_derivative(float cutoff, float g)
 {
 	deriv_tau = 1.0f / (2 * F_PI * cutoff);
+	deriv_gamma = g;
 }
 
 /**

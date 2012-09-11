@@ -123,6 +123,13 @@ enum pios_mpu6000_accel_range {
 	PIOS_MPU6000_ACCEL_16G = 0x18
 };
 
+enum pios_mpu6000_orientation { // clockwise rotation from board forward
+	PIOS_MPU6000_TOP_0DEG    = 0x00,
+	PIOS_MPU6000_TOP_90DEG   = 0x01,
+	PIOS_MPU6000_TOP_180DEG  = 0x02,
+	PIOS_MPU6000_TOP_270DEG  = 0x03
+};
+
 struct pios_mpu6000_data {
 	int16_t gyro_x;
 	int16_t gyro_y;
@@ -147,6 +154,7 @@ struct pios_mpu6000_cfg {
 	enum pios_mpu6000_accel_range accel_range;
 	enum pios_mpu6000_range gyro_range;
 	enum pios_mpu6000_filter filter;
+	enum pios_mpu6000_orientation orientation;
 };
 
 /* Public Functions */

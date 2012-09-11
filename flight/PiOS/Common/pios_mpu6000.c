@@ -276,6 +276,7 @@ static int32_t PIOS_MPU6000_SetReg(uint8_t reg, uint8_t data)
  */
 int32_t PIOS_MPU6000_ReadGyros(struct pios_mpu6000_data * data)
 {
+	// THIS FUNCTION IS DEPRECATED AND DOES NOT PERFORM A ROTATION
 	uint8_t buf[7] = {PIOS_MPU6000_GYRO_X_OUT_MSB | 0x80, 0, 0, 0, 0, 0, 0};
 	uint8_t rec[7];
 	
@@ -451,19 +452,63 @@ void PIOS_MPU6000_IRQHandler(void)
 		PIOS_MPU6000_ReleaseBus();
 	}
 	
+	// Rotate the sensor to OP convention.  The datasheet defines X as towards the right
+	// and Y as forward.  OP convention transposes this.  Also the Z is defined negatively
+	// to our convention
 #if defined(PIOS_MPU6000_ACCEL)
-	data.accel_x = mpu6000_rec_buf[1] << 8 | mpu6000_rec_buf[2];
-	data.accel_y = mpu6000_rec_buf[3] << 8 | mpu6000_rec_buf[4];
-	data.accel_z = mpu6000_rec_buf[5] << 8 | mpu6000_rec_buf[6];
+	// Currently we only support rotations on top so switch X/Y accordingly
+	switch(dev->cfg->orientation) {
+		case PIOS_MPU6000_TOP_0DEG:
+			data.accel_y = mpu6000_rec_buf[1] << 8 | mpu6000_rec_buf[2];      // chip X
+			data.accel_x = mpu6000_rec_buf[3] << 8 | mpu6000_rec_buf[4];      // chip Y
+			data.gyro_y  = mpu6000_rec_buf[9] << 8  | mpu6000_rec_buf[10];    // chip X
+			data.gyro_x  = mpu6000_rec_buf[11] << 8 | mpu6000_rec_buf[12];    // chip Y
+			break;
+		case PIOS_MPU6000_TOP_90DEG:
+			data.accel_y = -(mpu6000_rec_buf[3] << 8 | mpu6000_rec_buf[4]);   // chip Y
+			data.accel_x = mpu6000_rec_buf[1] << 8 | mpu6000_rec_buf[2];      // chip X
+			data.gyro_y  = -(mpu6000_rec_buf[11] << 8 | mpu6000_rec_buf[12]); // chip Y
+			data.gyro_x  = mpu6000_rec_buf[9] << 8  | mpu6000_rec_buf[10];    // chip X
+			break;
+		case PIOS_MPU6000_TOP_180DEG:
+			data.accel_y = -(mpu6000_rec_buf[1] << 8 | mpu6000_rec_buf[2]);   // chip X
+			data.accel_x = -(mpu6000_rec_buf[3] << 8 | mpu6000_rec_buf[4]);   // chip Y
+			data.gyro_y  = -(mpu6000_rec_buf[9] << 8  | mpu6000_rec_buf[10]); // chip X
+			data.gyro_x  = -(mpu6000_rec_buf[11] << 8 | mpu6000_rec_buf[12]); // chip Y
+			break;
+		case PIOS_MPU6000_TOP_270DEG:
+			data.accel_y = mpu6000_rec_buf[3] << 8 | mpu6000_rec_buf[4];      // chip Y
+			data.accel_x = -(mpu6000_rec_buf[1] << 8 | mpu6000_rec_buf[2]);   // chip X
+			data.gyro_y  = mpu6000_rec_buf[11] << 8 | mpu6000_rec_buf[12];    // chip Y
+			data.gyro_x  = -(mpu6000_rec_buf[9] << 8  | mpu6000_rec_buf[10]); // chip X
+			break;
+	}
+	data.gyro_z  = -(mpu6000_rec_buf[13] << 8 | mpu6000_rec_buf[14]);
+	data.accel_z = -(mpu6000_rec_buf[5] << 8 | mpu6000_rec_buf[6]);
 	data.temperature = mpu6000_rec_buf[7] << 8 | mpu6000_rec_buf[8];
-	data.gyro_x  = mpu6000_rec_buf[9] << 8  | mpu6000_rec_buf[10];
-	data.gyro_y  = mpu6000_rec_buf[11] << 8 | mpu6000_rec_buf[12];
-	data.gyro_z  = mpu6000_rec_buf[13] << 8 | mpu6000_rec_buf[14];
 #else
-	data.temperature = mpu6000_rec_buf[1] << 8 | mpu6000_rec_buf[2];
 	data.gyro_x = mpu6000_rec_buf[3] << 8 | mpu6000_rec_buf[4];
 	data.gyro_y = mpu6000_rec_buf[5] << 8 | mpu6000_rec_buf[6];
-	data.gyro_z = mpu6000_rec_buf[7] << 8 | mpu6000_rec_buf[8];
+	switch(dev->cfg->orientation) {
+		case PIOS_MPU6000_TOP_0DEG:
+			data.gyro_y  = mpu6000_rec_buf[3] << 8 | mpu6000_rec_buf[4];
+			data.gyro_x  = mpu6000_rec_buf[5] << 8 | mpu6000_rec_buf[6];
+			break;
+		case PIOS_MPU6000_TOP_90DEG:
+			data.gyro_y  = -(mpu6000_rec_buf[5] << 8 | mpu6000_rec_buf[6]); // chip Y
+			data.gyro_x  = mpu6000_rec_buf[3] << 8 | mpu6000_rec_buf[4];    // chip X
+			break;
+		case PIOS_MPU6000_TOP_180DEG:
+			data.gyro_y  = -(mpu6000_rec_buf[3] << 8 | mpu6000_rec_buf[4]);
+			data.gyro_x  = -(mpu6000_rec_buf[5] << 8 | mpu6000_rec_buf[6]);
+			break;
+		case PIOS_MPU6000_TOP_270DEG:
+			data.gyro_y  = mpu6000_rec_buf[5] << 8 | mpu6000_rec_buf[6];    // chip Y
+			data.gyro_x  = -(mpu6000_rec_buf[3] << 8 | mpu6000_rec_buf[4]); // chip X
+			break;
+	}
+	data.gyro_z = -(mpu6000_rec_buf[7] << 8 | mpu6000_rec_buf[8]);
+	data.temperature = mpu6000_rec_buf[1] << 8 | mpu6000_rec_buf[2];
 #endif
 
 	xQueueSend(dev->queue, (void *) &data, 0);

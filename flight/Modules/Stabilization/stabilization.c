@@ -247,7 +247,7 @@ static void stabilizationTask(void* parameters)
 					rateDesiredAxis[i] = bound(attitudeDesiredAxis[i], settings.ManualRate[i]);
 
 					// Compute the inner loop
-					actuatorDesiredAxis[i] = pid_apply(&pids[PID_RATE_ROLL + i],  rateDesiredAxis[i] - gyro_filtered[i], dT);
+					actuatorDesiredAxis[i] = pid_apply_setpoint(&pids[PID_RATE_ROLL + i],  rateDesiredAxis[i],  gyro_filtered[i], dT);
 					actuatorDesiredAxis[i] = bound(actuatorDesiredAxis[i],1.0f);
 
 					break;
@@ -263,7 +263,7 @@ static void stabilizationTask(void* parameters)
 					rateDesiredAxis[i] = bound(rateDesiredAxis[i], settings.MaximumRate[i]);
 
 					// Compute the inner loop
-					actuatorDesiredAxis[i] = pid_apply(&pids[PID_RATE_ROLL + i],  rateDesiredAxis[i] - gyro_filtered[i], dT);
+					actuatorDesiredAxis[i] = pid_apply_setpoint(&pids[PID_RATE_ROLL + i],  rateDesiredAxis[i],  gyro_filtered[i], dT);
 					actuatorDesiredAxis[i] = bound(actuatorDesiredAxis[i],1.0f);
 
 					break;
@@ -287,7 +287,7 @@ static void stabilizationTask(void* parameters)
 
 					// Compute desired rate as input biased towards leveling
 					rateDesiredAxis[i] = attitudeDesiredAxis[i] + weak_leveling;
-					actuatorDesiredAxis[i] = pid_apply(&pids[PID_RATE_ROLL + i],  rateDesiredAxis[i] - gyro_filtered[i], dT);
+					actuatorDesiredAxis[i] = pid_apply_setpoint(&pids[PID_RATE_ROLL + i],  rateDesiredAxis[i],  gyro_filtered[i], dT);
 					actuatorDesiredAxis[i] = bound(actuatorDesiredAxis[i],1.0f);
 
 					break;
@@ -309,7 +309,7 @@ static void stabilizationTask(void* parameters)
 
 					rateDesiredAxis[i] = bound(rateDesiredAxis[i], settings.MaximumRate[i]);
 
-					actuatorDesiredAxis[i] = pid_apply(&pids[PID_RATE_ROLL + i],  rateDesiredAxis[i] - gyro_filtered[i], dT);
+					actuatorDesiredAxis[i] = pid_apply_setpoint(&pids[PID_RATE_ROLL + i],  rateDesiredAxis[i],  gyro_filtered[i], dT);
 					actuatorDesiredAxis[i] = bound(actuatorDesiredAxis[i],1.0f);
 
 					break;

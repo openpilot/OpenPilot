@@ -31,8 +31,13 @@
 #include "openpilot.h"
 #include "pid.h"
 
+#define F_PI ((float) M_PI)
+
 //! Private method
 static float bound(float val, float range);
+
+//! Store the shared time constant for the derivative cutoff.
+static float deriv_tau = 7.9577e-3f;
 
 float pid_apply(struct pid *pid, const float err, float dT)
 {
@@ -47,7 +52,7 @@ float pid_apply(struct pid *pid, const float err, float dT)
 	// Calculate DT1 term, fixed T1 timeconstant
 	if(pid->d && dT)
 	{
-		dterm = pid->lastDer +  dT / ( dT + 7.9577e-3f) * ((diff * pid->d / dT) - pid->lastDer);
+		dterm = pid->lastDer +  dT / ( dT + deriv_tau) * ((diff * pid->d / dT) - pid->lastDer);
 		pid->lastDer = dterm;            //   ^ set constant to 1/(2*pi*f_cutoff)
 	}	                                 //   7.9577e-3  means 20 Hz f_cutoff
  
@@ -66,6 +71,16 @@ void pid_zero(struct pid *pid)
 	pid->iAccumulator = 0;
 	pid->lastErr = 0;
 	pid->lastDer = 0;
+}
+
+/**
+ * @brief Configure the common terms that alter ther derivative
+ * @param[in] cutoff The cutoff frequency (in Hz)
+ * @param[in] gamma The gamma term for setpoint shaping (unsused now)
+ */
+void pid_configure_derivative(float cutoff, float gamma)
+{
+	deriv_tau = 1.0f / (2 * F_PI * cutoff);
 }
 
 /**

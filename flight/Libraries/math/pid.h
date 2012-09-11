@@ -46,5 +46,6 @@ struct pid {
 float pid_apply(struct pid *pid, const float err, float dT);
 void pid_zero(struct pid *pid);
 void pid_configure(struct pid *pid, float p, float i, float d, float iLim);
+void pid_configure_derivative(float cutoff, float gamma);
 
 #endif /* PID_H */

@@ -431,6 +431,9 @@ static void manualControlTask(void *parameters)
 					case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
 						updatePathDesired(&cmd, lastFlightMode != flightStatus.FlightMode);
 						break;
+					case FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER:
+						// Nothing to do
+						break;
 					case FLIGHTSTATUS_FLIGHTMODE_RTH:
 						setRTH(lastFlightMode != flightStatus.FlightMode);
 						break;

@@ -70,6 +70,7 @@ QSvgRenderer *SvgImageProvider::loadRenderer(const QString &svgFile)
    Supported id format: fileName[!elementName[?parameters]]
    where parameters may be:
    vslice=1:2;hslice=2:4 - use the 3rd horizontal slice of total 4 slices, slice numbering starts from 0
+   borders=1 - 1 pixel wide transparent border
 
    requestedSize is related to the whole element size, even if slice is requested.
 
@@ -101,6 +102,7 @@ QImage SvgImageProvider::requestImage(const QString &id, QSize *size, const QSiz
     int hSlice = 0;
     int vSlicesCount = 0;
     int vSlice = 0;
+    int border = 0;
     if (!parameters.isEmpty()) {
         QRegExp hSliceRx("hslice=(\\d+):(\\d+)");
         if (hSliceRx.indexIn(parameters) != -1) {
@@ -111,6 +113,10 @@ QImage SvgImageProvider::requestImage(const QString &id, QSize *size, const QSiz
         if (vSliceRx.indexIn(parameters) != -1) {
             vSlice = vSliceRx.cap(1).toInt();
             vSlicesCount = vSliceRx.cap(2).toInt();
+        }
+        QRegExp borderRx("border=(\\d+)");
+        if (borderRx.indexIn(parameters) != -1) {
+            border = borderRx.cap(1).toInt();
         }
     }
 
@@ -165,14 +171,14 @@ QImage SvgImageProvider::requestImage(const QString &id, QSize *size, const QSiz
             h = (h*(vSlice+1))/vSlicesCount - y;
         }
 
-        QImage img(w, h, QImage::Format_ARGB32_Premultiplied);
+        QImage img(w+border*2, h+border*2, QImage::Format_ARGB32_Premultiplied);
         img.fill(0);
         QPainter p(&img);
         p.setRenderHints(QPainter::TextAntialiasing |
                          QPainter::Antialiasing |
                          QPainter::SmoothPixmapTransform);
 
-        p.translate(-x,-y);
+        p.translate(-x+border,-y+border);
         renderer->render(&p, element, QRectF(0, 0, elementWidth, elementHeigh));
 
         if (size)

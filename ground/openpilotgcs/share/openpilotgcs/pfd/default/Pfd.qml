@@ -48,25 +48,9 @@ Rectangle {
                 anchors.centerIn: parent
             }
 
-            SvgElementImage {
-                id: compass
-                elementName: "compass"
+            Compass {
+                anchors.fill: parent
                 sceneSize: background.sceneSize
-
-                clip: true
-
-                y: 12
-                anchors.horizontalCenter: parent.horizontalCenter
-
-                SvgElementImage {
-                    id: compass_band
-                    elementName: "compass-band"
-                    sceneSize: background.sceneSize
-
-                    anchors.centerIn: parent
-                    //the band is 540 degrees wide, AttitudeActual.Yaw is converted to -180..180 range
-                    anchors.horizontalCenterOffset: -1*((AttitudeActual.Yaw+180+720) % 360 - 180)/540*width
-                }
             }
 
             SpeedScale {

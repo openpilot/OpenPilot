@@ -69,6 +69,8 @@ public class TaskInfo extends UAVDataObject {
 		StackRemainingElemNames.add("Com2UsbBridge");
 		StackRemainingElemNames.add("Usb2ComBridge");
 		StackRemainingElemNames.add("OveroSync");
+		StackRemainingElemNames.add("Autotune");
+		StackRemainingElemNames.add("EventDispatcher");
 		fields.add( new UAVObjectField("StackRemaining", "bytes", UAVObjectField.FieldType.UINT16, StackRemainingElemNames, null) );
 
 		List<String> RunningElemNames = new ArrayList<String>();
@@ -89,6 +91,8 @@ public class TaskInfo extends UAVDataObject {
 		RunningElemNames.add("Com2UsbBridge");
 		RunningElemNames.add("Usb2ComBridge");
 		RunningElemNames.add("OveroSync");
+		RunningElemNames.add("Autotune");
+		RunningElemNames.add("EventDispatcher");
 		List<String> RunningEnumOptions = new ArrayList<String>();
 		RunningEnumOptions.add("False");
 		RunningEnumOptions.add("True");
@@ -112,6 +116,8 @@ public class TaskInfo extends UAVDataObject {
 		RunningTimeElemNames.add("Com2UsbBridge");
 		RunningTimeElemNames.add("Usb2ComBridge");
 		RunningTimeElemNames.add("OveroSync");
+		RunningTimeElemNames.add("Autotune");
+		RunningTimeElemNames.add("EventDispatcher");
 		fields.add( new UAVObjectField("RunningTime", "%", UAVObjectField.FieldType.UINT8, RunningTimeElemNames, null) );
 
 
@@ -186,7 +192,7 @@ public class TaskInfo extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0x51172B8Al;
+	protected static final long OBJID = 0xB81CD2AEl;
 	protected static final String NAME = "TaskInfo";
 	protected static String DESCRIPTION = "Task information";
 	protected static final boolean ISSINGLEINST = 1 > 0;

@@ -63,6 +63,7 @@ public class UAVObjectsInitialize {
 			objMngr.registerObject( new GPSSettings() );
 			objMngr.registerObject( new GPSTime() );
 			objMngr.registerObject( new GPSVelocity() );
+			objMngr.registerObject( new GuidanceSettings() );
 			objMngr.registerObject( new Gyros() );
 			objMngr.registerObject( new GyrosBias() );
 			objMngr.registerObject( new HomeLocation() );
@@ -76,11 +77,15 @@ public class UAVObjectsInitialize {
 			objMngr.registerObject( new NedAccel() );
 			objMngr.registerObject( new ObjectPersistence() );
 			objMngr.registerObject( new OveroSyncStats() );
+			objMngr.registerObject( new PathAction() );
 			objMngr.registerObject( new PipXSettings() );
 			objMngr.registerObject( new PipXStatus() );
 			objMngr.registerObject( new PositionActual() );
+			objMngr.registerObject( new PositionDesired() );
 			objMngr.registerObject( new RateDesired() );
 			objMngr.registerObject( new ReceiverActivity() );
+			objMngr.registerObject( new RelayTuning() );
+			objMngr.registerObject( new RelayTuningSettings() );
 			objMngr.registerObject( new RevoCalibration() );
 			objMngr.registerObject( new SonarAltitude() );
 			objMngr.registerObject( new StabilizationDesired() );
@@ -93,6 +98,8 @@ public class UAVObjectsInitialize {
 			objMngr.registerObject( new VelocityActual() );
 			objMngr.registerObject( new VelocityDesired() );
 			objMngr.registerObject( new WatchdogStatus() );
+			objMngr.registerObject( new Waypoint() );
+			objMngr.registerObject( new WaypointActive() );
 	
 		} catch (Exception e) {
 			e.printStackTrace();

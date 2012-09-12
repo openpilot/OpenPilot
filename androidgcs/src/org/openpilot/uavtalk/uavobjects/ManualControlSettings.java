@@ -151,6 +151,8 @@ public class ManualControlSettings extends UAVDataObject {
 		Stabilization1SettingsEnumOptions.add("AxisLock");
 		Stabilization1SettingsEnumOptions.add("WeakLeveling");
 		Stabilization1SettingsEnumOptions.add("VirtualBar");
+		Stabilization1SettingsEnumOptions.add("RelayRate");
+		Stabilization1SettingsEnumOptions.add("RelayAttitude");
 		fields.add( new UAVObjectField("Stabilization1Settings", "", UAVObjectField.FieldType.ENUM, Stabilization1SettingsElemNames, Stabilization1SettingsEnumOptions) );
 
 		List<String> Stabilization2SettingsElemNames = new ArrayList<String>();
@@ -164,6 +166,8 @@ public class ManualControlSettings extends UAVDataObject {
 		Stabilization2SettingsEnumOptions.add("AxisLock");
 		Stabilization2SettingsEnumOptions.add("WeakLeveling");
 		Stabilization2SettingsEnumOptions.add("VirtualBar");
+		Stabilization2SettingsEnumOptions.add("RelayRate");
+		Stabilization2SettingsEnumOptions.add("RelayAttitude");
 		fields.add( new UAVObjectField("Stabilization2Settings", "", UAVObjectField.FieldType.ENUM, Stabilization2SettingsElemNames, Stabilization2SettingsEnumOptions) );
 
 		List<String> Stabilization3SettingsElemNames = new ArrayList<String>();
@@ -177,6 +181,8 @@ public class ManualControlSettings extends UAVDataObject {
 		Stabilization3SettingsEnumOptions.add("AxisLock");
 		Stabilization3SettingsEnumOptions.add("WeakLeveling");
 		Stabilization3SettingsEnumOptions.add("VirtualBar");
+		Stabilization3SettingsEnumOptions.add("RelayRate");
+		Stabilization3SettingsEnumOptions.add("RelayAttitude");
 		fields.add( new UAVObjectField("Stabilization3Settings", "", UAVObjectField.FieldType.ENUM, Stabilization3SettingsElemNames, Stabilization3SettingsEnumOptions) );
 
 		List<String> FlightModeNumberElemNames = new ArrayList<String>();
@@ -195,6 +201,7 @@ public class ManualControlSettings extends UAVDataObject {
 		FlightModePositionEnumOptions.add("Stabilized1");
 		FlightModePositionEnumOptions.add("Stabilized2");
 		FlightModePositionEnumOptions.add("Stabilized3");
+		FlightModePositionEnumOptions.add("Autotune");
 		FlightModePositionEnumOptions.add("AltitudeHold");
 		FlightModePositionEnumOptions.add("VelocityControl");
 		FlightModePositionEnumOptions.add("PositionHold");
@@ -306,8 +313,8 @@ public class ManualControlSettings extends UAVDataObject {
 		getField("FlightModePosition").setValue("Stabilized1",1);
 		getField("FlightModePosition").setValue("Stabilized2",2);
 		getField("FlightModePosition").setValue("Stabilized3",3);
-		getField("FlightModePosition").setValue("AltitudeHold",4);
-		getField("FlightModePosition").setValue("PositionHold",5);
+		getField("FlightModePosition").setValue("Stabilized1",4);
+		getField("FlightModePosition").setValue("Stabilized2",5);
 
 	}
 
@@ -336,7 +343,7 @@ public class ManualControlSettings extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0x7672339El;
+	protected static final long OBJID = 0xA240D466l;
 	protected static final String NAME = "ManualControlSettings";
 	protected static String DESCRIPTION = "Settings to indicate how to decode receiver input by @ref ManualControlModule.";
 	protected static final boolean ISSINGLEINST = 1 > 0;

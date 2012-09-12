@@ -131,6 +131,10 @@ public class StabilizationSettings extends UAVDataObject {
 		GyroTauElemNames.add("0");
 		fields.add( new UAVObjectField("GyroTau", "", UAVObjectField.FieldType.FLOAT32, GyroTauElemNames, null) );
 
+		List<String> DerivativeGammaElemNames = new ArrayList<String>();
+		DerivativeGammaElemNames.add("0");
+		fields.add( new UAVObjectField("DerivativeGamma", "", UAVObjectField.FieldType.FLOAT32, DerivativeGammaElemNames, null) );
+
 		List<String> WeakLevelingKpElemNames = new ArrayList<String>();
 		WeakLevelingKpElemNames.add("0");
 		fields.add( new UAVObjectField("WeakLevelingKp", "(deg/s)/deg", UAVObjectField.FieldType.FLOAT32, WeakLevelingKpElemNames, null) );
@@ -161,6 +165,10 @@ public class StabilizationSettings extends UAVDataObject {
 		List<String> VbarMaxAngleElemNames = new ArrayList<String>();
 		VbarMaxAngleElemNames.add("0");
 		fields.add( new UAVObjectField("VbarMaxAngle", "deg", UAVObjectField.FieldType.UINT8, VbarMaxAngleElemNames, null) );
+
+		List<String> DerivativeCutoffElemNames = new ArrayList<String>();
+		DerivativeCutoffElemNames.add("0");
+		fields.add( new UAVObjectField("DerivativeCutoff", "Hz", UAVObjectField.FieldType.UINT8, DerivativeCutoffElemNames, null) );
 
 		List<String> MaxAxisLockElemNames = new ArrayList<String>();
 		MaxAxisLockElemNames.add("0");
@@ -263,6 +271,7 @@ public class StabilizationSettings extends UAVDataObject {
 		getField("VbarYawPI").setValue(0.002,1);
 		getField("VbarTau").setValue(0.5);
 		getField("GyroTau").setValue(0.005);
+		getField("DerivativeGamma").setValue(1);
 		getField("WeakLevelingKp").setValue(0.1);
 		getField("RollMax").setValue(55);
 		getField("PitchMax").setValue(55);
@@ -270,6 +279,7 @@ public class StabilizationSettings extends UAVDataObject {
 		getField("VbarGyroSuppress").setValue(30);
 		getField("VbarPiroComp").setValue("FALSE");
 		getField("VbarMaxAngle").setValue(10);
+		getField("DerivativeCutoff").setValue(20);
 		getField("MaxAxisLock").setValue(15);
 		getField("MaxAxisLockRate").setValue(2);
 		getField("MaxWeakLevelingRate").setValue(5);
@@ -302,7 +312,7 @@ public class StabilizationSettings extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0xBBC337D4l;
+	protected static final long OBJID = 0x3D03DE86l;
 	protected static final String NAME = "StabilizationSettings";
 	protected static String DESCRIPTION = "PID settings used by the Stabilization module to combine the @ref AttitudeActual and @ref AttitudeDesired to compute @ref ActuatorDesired";
 	protected static final boolean ISSINGLEINST = 1 > 0;

@@ -102,7 +102,7 @@ public class GPSSettings extends UAVDataObject {
 	 */
 	public void setDefaultFieldValues()
 	{
-		getField("DataProtocol").setValue("NMEA");
+		getField("DataProtocol").setValue("UBX");
 
 	}
 

@@ -78,6 +78,8 @@ public class StabilizationDesired extends UAVDataObject {
 		StabilizationModeEnumOptions.add("AxisLock");
 		StabilizationModeEnumOptions.add("WeakLeveling");
 		StabilizationModeEnumOptions.add("VirtualBar");
+		StabilizationModeEnumOptions.add("RelayRate");
+		StabilizationModeEnumOptions.add("RelayAttitude");
 		fields.add( new UAVObjectField("StabilizationMode", "", UAVObjectField.FieldType.ENUM, StabilizationModeElemNames, StabilizationModeEnumOptions) );
 
 
@@ -152,7 +154,7 @@ public class StabilizationDesired extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0xDE1EAAD6l;
+	protected static final long OBJID = 0x4FDBFEEAl;
 	protected static final String NAME = "StabilizationDesired";
 	protected static String DESCRIPTION = "The desired attitude that @ref StabilizationModule will try and achieve if FlightMode is Stabilized.  Comes from @ref ManaulControlModule.";
 	protected static final boolean ISSINGLEINST = 1 > 0;

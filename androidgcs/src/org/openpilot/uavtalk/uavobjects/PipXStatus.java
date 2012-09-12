@@ -223,9 +223,9 @@ public class PipXStatus extends UAVDataObject {
 		    UAVObject.Metadata.AccessModeNum(UAVObject.AccessMode.ACCESS_READONLY) << UAVOBJ_GCS_ACCESS_SHIFT |
 		    0 << UAVOBJ_TELEMETRY_ACKED_SHIFT |
 		    0 << UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT |
-		    UAVObject.Metadata.UpdateModeNum(UAVObject.UpdateMode.UPDATEMODE_MANUAL) << UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT |
+		    UAVObject.Metadata.UpdateModeNum(UAVObject.UpdateMode.UPDATEMODE_PERIODIC) << UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT |
 		    UAVObject.Metadata.UpdateModeNum(UAVObject.UpdateMode.UPDATEMODE_MANUAL) << UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT;
-    	metadata.flightTelemetryUpdatePeriod = 0;
+    	metadata.flightTelemetryUpdatePeriod = 1000;
     	metadata.gcsTelemetryUpdatePeriod = 0;
     	metadata.loggingUpdatePeriod = 1000;
  

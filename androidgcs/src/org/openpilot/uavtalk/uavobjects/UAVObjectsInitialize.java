@@ -83,6 +83,7 @@ public class UAVObjectsInitialize {
 			objMngr.registerObject( new ObjectPersistence() );
 			objMngr.registerObject( new OveroSyncSettings() );
 			objMngr.registerObject( new OveroSyncStats() );
+			objMngr.registerObject( new PathAction() );
 			objMngr.registerObject( new PathDesired() );
 			objMngr.registerObject( new PathPlannerSettings() );
 			objMngr.registerObject( new PipXSettings() );
@@ -90,6 +91,8 @@ public class UAVObjectsInitialize {
 			objMngr.registerObject( new PositionActual() );
 			objMngr.registerObject( new RateDesired() );
 			objMngr.registerObject( new ReceiverActivity() );
+			objMngr.registerObject( new RelayTuning() );
+			objMngr.registerObject( new RelayTuningSettings() );
 			objMngr.registerObject( new RevoCalibration() );
 			objMngr.registerObject( new RevoSettings() );
 			objMngr.registerObject( new SonarAltitude() );

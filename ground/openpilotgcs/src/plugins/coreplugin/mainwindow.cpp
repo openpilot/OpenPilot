@@ -317,7 +317,10 @@ void MainWindow::extensionsInitialized()
         qDebug() << "Load default config from resource "<<filename;
     }
     qs->beginGroup("General");
-    loadStyleSheet(qs->value("StyleSheet","none").toString());
+    m_config_description=qs->value("Description","none").toString();
+    m_config_details=qs->value("Details","none").toString();
+    m_config_stylesheet=qs->value("StyleSheet","none").toString();
+    loadStyleSheet(m_config_stylesheet);
     qs->endGroup();
     m_uavGadgetInstanceManager = new UAVGadgetInstanceManager(this);
     m_uavGadgetInstanceManager->readSettings(qs);
@@ -1275,9 +1278,9 @@ void MainWindow::saveSettings(QSettings* qs)
     m_actionManager->saveSettings(qs);
     m_generalSettings->saveSettings(qs);
     qs->beginGroup("General");
-    qs->setValue("Description",m_settings->value("Description","None"));
-    qs->setValue("Details",m_settings->value("Details","None"));
-    qs->setValue("StyleSheet",m_settings->value("StyleSheet","default"));
+    qs->setValue("Description",m_config_description);
+    qs->setValue("Details",m_config_details);
+    qs->setValue("StyleSheet",m_config_stylesheet);
     qs->endGroup();
 }
 

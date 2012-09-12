@@ -84,7 +84,7 @@ public slots:
     void UpdateSettingsTable();
 
 private slots:
-    void CommandActivated(Node* node = 0);
+    void CommandActivated(MixerNode* node = 0);
     void SettingsTableChanged();
     void CurveTypeChanged();
     void CurveMinChanged(double value);

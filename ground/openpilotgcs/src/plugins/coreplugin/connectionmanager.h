@@ -103,8 +103,7 @@ private slots:
     void onConnectClicked();
     void devChanged(IConnection *connection);
 
-//	void onConnectionClosed(QObject *obj);
-	void onConnectionDestroyed(QObject *obj);
+    void onConnectionDestroyed(QObject *obj);
     void connectionsCallBack(); //used to call devChange after all the plugins are loaded
     void reconnectSlot();
     void reconnectCheckSlot();

@@ -31,6 +31,7 @@
 #include <QGraphicsItem>
 #include <QColor>
 #include <QList>
+#include <QFont>
 
 class Edge;
 class MixerCurveWidget;
@@ -38,11 +39,11 @@ QT_BEGIN_NAMESPACE
 class QGraphicsSceneMouseEvent;
 QT_END_NAMESPACE
 
-class Node : public QGraphicsItem
+class MixerNode : public QObject,public QGraphicsItem
 {
+    Q_OBJECT
 public:
-    Node(MixerCurveWidget *graphWidget);
-
+    MixerNode(MixerCurveWidget *graphWidget);
     void addEdge(Edge *edge);
     QList<Edge *> edges() const;
 

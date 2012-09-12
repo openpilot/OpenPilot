@@ -67,7 +67,7 @@ MixerCurve::MixerCurve(QWidget *parent) :
     connect(m_mixerUI->PopupCurve, SIGNAL(clicked()),this,SLOT(PopupCurve()));
     connect(m_mixerUI->GenerateCurve, SIGNAL(clicked()), this, SLOT(GenerateCurve()));
     connect(m_curve, SIGNAL(curveUpdated()), this, SLOT(UpdateSettingsTable()));
-    connect(m_curve, SIGNAL(commandActivated(Node*)),this, SLOT(CommandActivated(Node*)));
+    connect(m_curve, SIGNAL(commandActivated(MixerNode*)),this, SLOT(CommandActivated(MixerNode*)));
     connect(m_settings, SIGNAL(cellChanged(int,int)), this, SLOT(SettingsTableChanged()));
     connect(m_mixerUI->CurveMin, SIGNAL(valueChanged(double)), this, SLOT(CurveMinChanged(double)));
     connect(m_mixerUI->CurveMax, SIGNAL(valueChanged(double)), this, SLOT(CurveMaxChanged(double)));
@@ -370,7 +370,7 @@ void MixerCurve::SettingsTableChanged()
     m_curve->setCurve(&points);
 }
 
-void MixerCurve::CommandActivated(Node* node)
+void MixerCurve::CommandActivated(MixerNode* node)
 {
     QString name = (node) ? node->getName() : "Reset";
 

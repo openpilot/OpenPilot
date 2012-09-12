@@ -47,7 +47,6 @@
  */
 
 #include "pios.h"
-#include "attitude.h"
 #include "homelocation.h"
 #include "magnetometer.h"
 #include "magbias.h"
@@ -260,9 +259,9 @@ static void SensorsTask(void *parameters)
 				while(read_good == 0) {	
 					count++;
 					
-					accel_accum[0] += accel.x;
-					accel_accum[1] += accel.y;
-					accel_accum[2] += accel.z;
+					accel_accum[1] += accel.x;
+					accel_accum[0] += accel.y;
+					accel_accum[2] -= accel.z;
 					
 					read_good = PIOS_BMA180_ReadFifo(&accel);
 				}
@@ -285,9 +284,9 @@ static void SensorsTask(void *parameters)
 				}
 				
 				gyro_samples = 1;
-				gyro_accum[0] += gyro.gyro_x;
-				gyro_accum[1] += gyro.gyro_y;
-				gyro_accum[2] += gyro.gyro_z;
+				gyro_accum[1] += gyro.gyro_x;
+				gyro_accum[0] += gyro.gyro_y;
+				gyro_accum[2] -= gyro.gyro_z;
 				
 				gyro_scaling = PIOS_L3GD20_GetScale();
 
@@ -335,9 +334,9 @@ static void SensorsTask(void *parameters)
 		}
 
 		// Scale the accels
-		float accels[3] = {(float) accel_accum[1] / accel_samples, 
-		                   (float) accel_accum[0] / accel_samples,
-		                  -(float) accel_accum[2] / accel_samples};
+		float accels[3] = {(float) accel_accum[0] / accel_samples, 
+		                   (float) accel_accum[1] / accel_samples,
+		                   (float) accel_accum[2] / accel_samples};
 		float accels_out[3] = {accels[0] * accel_scaling * accel_scale[0] - accel_bias[0],
 		                       accels[1] * accel_scaling * accel_scale[1] - accel_bias[1],
 		                       accels[2] * accel_scaling * accel_scale[2] - accel_bias[2]};
@@ -354,9 +353,9 @@ static void SensorsTask(void *parameters)
 		AccelsSet(&accelsData);
 
 		// Scale the gyros
-		float gyros[3] = {(float) gyro_accum[1] / gyro_samples,
-		                  (float) gyro_accum[0] / gyro_samples,
-		                 -(float) gyro_accum[2] / gyro_samples};
+		float gyros[3] = {(float) gyro_accum[0] / gyro_samples,
+		                  (float) gyro_accum[1] / gyro_samples,
+		                  (float) gyro_accum[2] / gyro_samples};
 		float gyros_out[3] = {gyros[0] * gyro_scaling,
 		                      gyros[1] * gyro_scaling,
 		                      gyros[2] * gyro_scaling};

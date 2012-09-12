@@ -121,7 +121,8 @@ public class OPTelemetryService extends Service {
 				break;
 			case 2:
 				Toast.makeText(getApplicationContext(), "Attempting BT connection", Toast.LENGTH_SHORT).show();
-				//activeTelem = new BTTelemetryThread();
+				telemTask = new BluetoothUAVTalk(this);
+				activeTelem = new Thread(telemTask, "Bluetooth telemetry thread");
 				break;
 			case 3:
 				Toast.makeText(getApplicationContext(), "Attempting TCP connection", Toast.LENGTH_SHORT).show();
@@ -226,7 +227,7 @@ public class OPTelemetryService extends Service {
 	public void onDestroy() {
 
 		if (telemTask != null) {
-			Log.d(TAG, "onDestory() shutting down telemetry task");
+			Log.d(TAG, "onDestroy() shutting down telemetry task");
 			telemTask.disconnect();
 			telemTask = null;
 

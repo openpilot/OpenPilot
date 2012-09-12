@@ -73,7 +73,6 @@ void IPConnection::onOpenDevice(QString HostName, int Port, bool UseTCP)
 {
     QAbstractSocket *ipSocket;
     const int Timeout = 5 * 1000;
-    int state;
 
     ipConMutex.lock();
     if (UseTCP) {
@@ -175,7 +174,7 @@ QList <Core::IConnection::device> IPconnectionConnection::availableDevices()
     return list;
 }
 
-QIODevice *IPconnectionConnection::openDevice(const QString &deviceName)
+QIODevice *IPconnectionConnection::openDevice(const QString &)
 {
     QString HostName;
     int Port;
@@ -209,7 +208,7 @@ QIODevice *IPconnectionConnection::openDevice(const QString &deviceName)
     return ipSocket;
 }
 
-void IPconnectionConnection::closeDevice(const QString &deviceName)
+void IPconnectionConnection::closeDevice(const QString &)
 {
     if (ipSocket){
         ipConMutex.lock();

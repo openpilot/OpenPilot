@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignParentLeft="true"
+    android:layout_gravity="center_horizontal" >
+
+    <Button
+        android:id="@+id/launch_controller"
+        android:layout_width="132dp"
+        android:layout_height="wrap_content"
+        android:layout_column="3"
+        android:layout_gravity="right"
+        android:layout_row="1"
+        android:layout_rowSpan="4"
+        android:background="@android:color/transparent"
+        android:drawableTop="@drawable/ic_controller"
+        android:text="@string/controller_name" />
+
+    <Button
+        android:id="@+id/launch_object_browser"
+        android:layout_width="132dp"
+        android:layout_height="wrap_content"
+        android:layout_column="0"
+        android:layout_gravity="right|bottom"
+        android:layout_row="2"
+        android:layout_rowSpan="2"
+        android:background="@android:color/transparent"
+        android:drawableTop="@drawable/ic_browser"
+        android:text="@string/object_browser_name" />
+
+    <Button
+        android:id="@+id/launch_location"
+        android:layout_width="132dp"
+        android:layout_height="wrap_content"
+        android:layout_column="2"
+        android:layout_gravity="right|bottom"
+        android:layout_row="2"
+        android:layout_rowSpan="2"
+        android:background="@android:color/transparent"
+        android:drawableTop="@drawable/ic_map"
+        android:text="@string/location_name" />
+
+    <Button
+        android:id="@+id/launch_tuning"
+        android:layout_width="132dp"
+        android:layout_height="wrap_content"
+        android:layout_column="4"
+        android:layout_gravity="right|bottom"
+        android:layout_row="2"
+        android:layout_rowSpan="2"
+        android:background="@android:color/transparent"
+        android:drawableTop="@drawable/ic_tuning"
+        android:text="@string/tuning" />
+
+    <Button
+        android:id="@+id/launch_logger"
+        android:layout_width="132dp"
+        android:layout_height="wrap_content"
+        android:layout_column="3"
+        android:layout_gravity="left|bottom"
+        android:layout_row="3"
+        android:layout_rowSpan="3"
+        android:background="@android:color/transparent"
+        android:drawableTop="@drawable/ic_logging"
+        android:text="@string/logger_name" />
+
+    <Button
+        android:id="@+id/launch_alarms"
+        android:layout_width="132dp"
+        android:layout_height="wrap_content"
+        android:layout_column="0"
+        android:layout_gravity="left"
+        android:layout_row="5"
+        android:background="@android:color/transparent"
+        android:drawableTop="@drawable/ic_alarms"
+        android:text="@string/alarms" />
+
+    <Button
+        android:id="@+id/launch_pfd"
+        android:layout_width="132dp"
+        android:layout_height="wrap_content"
+        android:layout_column="2"
+        android:layout_gravity="left"
+        android:layout_row="5"
+        android:background="@android:color/transparent"
+        android:drawableTop="@drawable/ic_pfd"
+        android:text="@string/pfd_name" />
+
+    <Button
+	     android:id="@+id/launch_osgViewer"
+	     android:layout_width="132dp"
+	     android:layout_height="wrap_content"
+	     android:layout_column="0"
+	     android:layout_gravity="right"
+	     android:layout_row="9"
+	     android:background="@android:color/transparent"
+	     android:drawableTop="@drawable/ic_alarms"
+	     android:text="@string/_3dview" />
+    
+    <Button
+        android:id="@+id/launch_tester"
+        android:layout_width="132dp"
+        android:layout_height="wrap_content"
+        android:layout_column="2"
+        android:layout_row="9"
+        android:background="@android:color/transparent"
+        android:drawableTop="@drawable/ic_alarms"
+        android:text="@string/tester" />
+
+    <Space
+        android:layout_width="1dp"
+        android:layout_height="32dp"
+        android:layout_column="0"
+        android:layout_row="0" />
+
+    <Space
+        android:layout_width="1dp"
+        android:layout_height="47dp"
+        android:layout_column="0"
+        android:layout_row="4" />
+
+    <Space
+        android:layout_width="1dp"
+        android:layout_height="47dp"
+        android:layout_column="0"
+        android:layout_row="8" />
+    
+    <Space
+        android:layout_height="15dp"
+        android:layout_column="1" />
+
+    <Space
+        android:layout_width="100dp"
+        android:layout_height="2dp"
+        android:layout_row="6" />
+
+</GridLayout>

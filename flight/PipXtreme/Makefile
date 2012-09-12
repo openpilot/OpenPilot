@@ -66,7 +66,7 @@ FLASH_TOOL = OPENOCD
 
 # List of modules to include
 OPTMODULES = 
-MODULES = RadioComBridge
+MODULES = Radio RadioComBridge
 
 # Paths
 OPSYSTEM = ./System

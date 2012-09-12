@@ -51,13 +51,8 @@
 
 #if defined(PIOS_INCLUDE_RFM22B)
 
-#include <string.h>		// memmove
-
-#include <stm32f10x.h>
-#include <stopwatch.h>
-
+#include <pios_spi_priv.h>
 #include <packet_handler.h>
-
 #include <pios_rfm22b_priv.h>
 
 /* Local Defines */
@@ -79,8 +74,6 @@
 
 #define TX_TEST_MODE_TIMELIMIT_MS		30000	// TX test modes time limit (in ms)
 
-//#define TX_PREAMBLE_NIBBLES				8		// 7 to 511 (number of nibbles)
-//#define RX_PREAMBLE_NIBBLES				5		// 5 to 31 (number of nibbles)
 #define TX_PREAMBLE_NIBBLES				12		// 7 to 511 (number of nibbles)
 #define RX_PREAMBLE_NIBBLES				6		// 5 to 31 (number of nibbles)
 
@@ -135,6 +128,17 @@
 
 #define RFM22_DEFAULT_SS_RF_DATARATE       125			// 128bps
 
+#ifndef RX_LED_ON
+#define RX_LED_ON
+#define RX_LED_OFF
+#define TX_LED_ON
+#define TX_LED_OFF
+#define LINK_LED_ON
+#define LINK_LED_OFF
+#define USB_LED_ON
+#define USB_LED_OFF
+#endif
+
 // ************************************
 // Normal data streaming
 // GFSK modulation
@@ -154,7 +158,13 @@ struct pios_rfm22b_dev {
 	enum pios_rfm22b_dev_magic magic;
 	struct pios_rfm22b_cfg cfg;
 
+	uint32_t spi_id;
+	uint32_t slave_num;
+
 	uint32_t deviceID;
+
+	// ISR pending
+	xSemaphoreHandle isrPending;
 
 	// The COM callback functions.
 	pios_com_callback rx_in_cb;
@@ -169,27 +179,39 @@ struct pios_rfm22b_dev {
 
 uint32_t random32 = 0x459ab8d8;
 
+// Must ensure these prefilled arrays match the define sizes
+static const uint8_t FULL_PREAMBLE[FIFO_SIZE] = 
+	{PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,
+	PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,
+	PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,
+	PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,
+	PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,
+	PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,
+	PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,
+	PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,
+	PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,
+	PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,
+	PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,
+	PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,
+	PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE,PREAMBLE_BYTE}; // 64 bytes
+static const uint8_t HEADER[(TX_PREAMBLE_NIBBLES + 1)/2 + 2] = {PREAMBLE_BYTE, PREAMBLE_BYTE, PREAMBLE_BYTE, PREAMBLE_BYTE,PREAMBLE_BYTE, PREAMBLE_BYTE, SYNC_BYTE_1, SYNC_BYTE_2};
+static const uint8_t OUT_FF[64] = {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
+	0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
+	0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
+	0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
+	0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
+	0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
+	0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
+	0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF};
+
 /* Local function forwared declarations */
 static void PIOS_RFM22B_Supervisor(uint32_t ppm_id);
 static void rfm22_processInt(void);
-static void PIOS_RFM22_EXT_Int(void);
 static void rfm22_setTxMode(uint8_t mode);
 
 // SPI read/write functions
-void rfm22_startBurstWrite(uint8_t addr);
-inline void rfm22_burstWrite(uint8_t data)
-{
-	PIOS_SPI_TransferByte(RFM22_PIOS_SPI, data);
-}
-void rfm22_endBurstWrite(void);
-void rfm22_write(uint8_t addr, uint8_t data);
-void rfm22_startBurstRead(uint8_t addr);
-inline uint8_t rfm22_burstRead(void)
-{
-	return PIOS_SPI_TransferByte(RFM22_PIOS_SPI, 0xff);
-}
-void rfm22_endBurstRead(void);
-uint8_t rfm22_read(uint8_t addr);
+static void rfm22_write(uint8_t addr, uint8_t data);
+static uint8_t rfm22_read(uint8_t addr);
 uint8_t rfm22_txStart();
 
 /* Provide a COM driver */
@@ -206,35 +228,6 @@ const struct pios_com_driver pios_rfm22b_com_driver = {
 	.rx_start   = PIOS_RFM22B_RxStart,
 	.bind_tx_cb = PIOS_RFM22B_RegisterTxCallback,
 	.bind_rx_cb = PIOS_RFM22B_RegisterRxCallback,
-};
-
-// External interrupt configuration
-static const struct pios_exti_cfg pios_exti_rfm22b_cfg __exti_config = {
-	.vector = PIOS_RFM22_EXT_Int,
-	.line = PIOS_RFM22_EXTI_LINE,
-	.pin = {
-		.gpio = PIOS_RFM22_EXTI_GPIO_PORT,
-		.init = {
-			.GPIO_Pin = PIOS_RFM22_EXTI_GPIO_PIN,
-			.GPIO_Mode = GPIO_Mode_IN_FLOATING,
-		},
-	},
-	.irq = {
-		.init = {
-			.NVIC_IRQChannel = PIOS_RFM22_EXTI_IRQn,
-			.NVIC_IRQChannelPreemptionPriority = PIOS_RFM22_EXTI_PRIO,
-			.NVIC_IRQChannelSubPriority = 0,
-			.NVIC_IRQChannelCmd = ENABLE,
-		},
-	},
-	.exti = {
-		.init = {
-			.EXTI_Line = PIOS_RFM22_EXTI_LINE,
-			.EXTI_Mode = EXTI_Mode_Interrupt,
-			.EXTI_Trigger = EXTI_Trigger_Falling,
-			.EXTI_LineCmd = ENABLE,
-		},
-	},
 };
 
 // xtal 10 ppm, 434MHz
@@ -301,7 +294,7 @@ const uint8_t ss_reg_71[] = {  0x2B, 0x23}; // rfm22_modulation_mode_control2
 volatile bool		initialized = false;
 
 #if defined(RFM22_EXT_INT_USE)
-volatile bool		exec_using_spi;					// set this if you want to access the SPI bus outside of the interrupt
+volatile bool		exec_using_spi;					    // set this if you want to access the SPI bus outside of the interrupt
 #endif
 
 uint8_t				device_type;						// the RF chips device ID number
@@ -336,17 +329,6 @@ volatile int16_t	afc_correction;						// afc correction reading
 volatile int32_t	afc_correction_Hz;					// afc correction reading (in Hz)
 
 volatile int16_t	temperature_reg;					// the temperature sensor reading
-
-#if defined(RFM22_DEBUG)
-volatile uint8_t	prev_device_status;				// just for debugging
-volatile uint8_t	prev_int_status1;				//  "          "
-volatile uint8_t	prev_int_status2;				//  "          "
-volatile uint8_t	prev_ezmac_status;				//  "          "
-
-const char *debug_msg = "";
-const char *error_msg = "";
-static uint32_t debug_val = 0;
-#endif
 
 volatile uint8_t	osc_load_cap;						// xtal frequency calibration value
 
@@ -400,7 +382,7 @@ struct pios_rfm22b_dev * rfm22b_dev_g;
 
 static bool PIOS_RFM22B_validate(struct pios_rfm22b_dev * rfm22b_dev)
 {
-	return (rfm22b_dev->magic == PIOS_RFM22B_DEV_MAGIC);
+	return (rfm22b_dev != NULL && rfm22b_dev->magic == PIOS_RFM22B_DEV_MAGIC);
 }
 
 #if defined(PIOS_INCLUDE_FREERTOS)
@@ -409,6 +391,7 @@ static struct pios_rfm22b_dev * PIOS_RFM22B_alloc(void)
 	struct pios_rfm22b_dev * rfm22b_dev;
 
 	rfm22b_dev = (struct pios_rfm22b_dev *)pvPortMalloc(sizeof(*rfm22b_dev));
+	rfm22b_dev->spi_id = 0;
 	if (!rfm22b_dev) return(NULL);
 	rfm22b_dev_g = rfm22b_dev;
 
@@ -432,10 +415,12 @@ static struct pios_rfm22b_dev * PIOS_RFM22B_alloc(void)
 }
 #endif
 
+static struct pios_rfm22b_dev * g_rfm22b_dev =  NULL;
+
 /**
  * Initialise an RFM22B device
  */
-int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, const struct pios_rfm22b_cfg *cfg)
+int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_num, const struct pios_rfm22b_cfg *cfg)
 {
 	PIOS_DEBUG_Assert(rfm22b_id);
 	PIOS_DEBUG_Assert(cfg);
@@ -445,10 +430,18 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, const struct pios_rfm22b_cfg *cfg)
 	if (!rfm22b_dev)
 		return(-1);
 
+	// Store the SPI handle
+	rfm22b_dev->slave_num = slave_num;
+	rfm22b_dev->spi_id = spi_id;
+
 	// Bind the configuration to the device instance
 	rfm22b_dev->cfg = *cfg;
-  
+
 	*rfm22b_id = (uint32_t)rfm22b_dev;
+	g_rfm22b_dev = rfm22b_dev;
+
+	// Create a semaphore to know if an ISR needs responding to
+	vSemaphoreCreateBinary( rfm22b_dev->isrPending );
 
 	// Initialize the TX pre-buffer pointer.
 	tx_pre_buffer_size = 0;
@@ -468,6 +461,9 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, const struct pios_rfm22b_cfg *cfg)
 	// Initialize the supervisor timer.
 	rfm22b_dev->supv_timer = PIOS_RFM22B_SUPERVISOR_TIMEOUT;
 	rfm22b_dev->resets = 0;
+
+	// Initialize the external interrupt.
+	PIOS_EXTI_Init(cfg->exti_cfg);
 
 	// Initialize the radio device.
 	int initval = rfm22_init_normal(rfm22b_dev->deviceID, cfg->minFrequencyHz, cfg->maxFrequencyHz, 50000);
@@ -504,7 +500,7 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, const struct pios_rfm22b_cfg *cfg)
 
 	rfm22_setFreqCalibration(cfg->RFXtalCap);
 	rfm22_setNominalCarrierFrequency(cfg->frequencyHz);
-	rfm22_setDatarate(cfg->maxRFBandwidth, TRUE);
+	rfm22_setDatarate(cfg->maxRFBandwidth, true);
 	rfm22_setTxPower(cfg->maxTxPower);
 
 	DEBUG_PRINTF(2, "\n\r");
@@ -666,124 +662,139 @@ static void PIOS_RFM22B_Supervisor(uint32_t rfm22b_id)
 	}
 }
 
-static void rfm22_setDebug(const char* msg)
-{
-	debug_msg = msg;
-}
-
-static void rfm22_setError(const char* msg)
-{
-	error_msg = msg;
-}
-
 // ************************************
 // SPI read/write
 
-void rfm22_startBurstWrite(uint8_t addr)
+//! Assert the CS line
+static void rfm22_assertCs()
 {
-	// wait 1us .. so we don't toggle the CS line to quickly
 	PIOS_DELAY_WaituS(1);
-
-	// chip select line LOW
-	PIOS_SPI_RC_PinSet(RFM22_PIOS_SPI, 0, 0);
-
-	PIOS_SPI_TransferByte(RFM22_PIOS_SPI, 0x80 | addr);
+	if(PIOS_RFM22B_validate(g_rfm22b_dev) && g_rfm22b_dev->spi_id != 0)
+		PIOS_SPI_RC_PinSet(g_rfm22b_dev->spi_id, g_rfm22b_dev->slave_num, 0);
 }
 
-void rfm22_endBurstWrite(void)
+//! Deassert the CS line
+static void rfm22_deassertCs()
 {
-	// chip select line HIGH
-	PIOS_SPI_RC_PinSet(RFM22_PIOS_SPI, 0, 1);
+	if(PIOS_RFM22B_validate(g_rfm22b_dev) && g_rfm22b_dev->spi_id != 0)
+		PIOS_SPI_RC_PinSet(g_rfm22b_dev->spi_id, g_rfm22b_dev->slave_num, 1);
 }
 
-void rfm22_write(uint8_t addr, uint8_t data)
+//! Claim the SPI bus semaphore
+static void rfm22_claimBus()
 {
-	// wait 1us .. so we don't toggle the CS line to quickly
-	PIOS_DELAY_WaituS(1);
-
-	// chip select line LOW
-	PIOS_SPI_RC_PinSet(RFM22_PIOS_SPI, 0, 0);
-
-	PIOS_SPI_TransferByte(RFM22_PIOS_SPI, 0x80 | addr);
-	PIOS_SPI_TransferByte(RFM22_PIOS_SPI, data);
-
-	// chip select line HIGH
-	PIOS_SPI_RC_PinSet(RFM22_PIOS_SPI, 0, 1);
+	if(PIOS_RFM22B_validate(g_rfm22b_dev) && g_rfm22b_dev->spi_id != 0)
+		PIOS_SPI_ClaimBus(g_rfm22b_dev->spi_id);
 }
 
-void rfm22_startBurstRead(uint8_t addr)
+//! Release the SPI bus semaphore
+static void rfm22_releaseBus()
 {
-	// wait 1us .. so we don't toggle the CS line to quickly
-	PIOS_DELAY_WaituS(1);
-
-	// chip select line LOW
-	PIOS_SPI_RC_PinSet(RFM22_PIOS_SPI, 0, 0);
-
-	PIOS_SPI_TransferByte(RFM22_PIOS_SPI, addr & 0x7f);
+	if(PIOS_RFM22B_validate(g_rfm22b_dev) && g_rfm22b_dev->spi_id != 0)
+		PIOS_SPI_ReleaseBus(g_rfm22b_dev->spi_id);
 }
 
-void rfm22_endBurstRead(void)
+/**
+ * Claim the semaphore and write a byte to a register
+ * @param[in] addr The address to write to
+ * @param[in] data The datat to write to that address
+ */
+static void rfm22_write(uint8_t addr, uint8_t data)
 {
-	// chip select line HIGH
-	PIOS_SPI_RC_PinSet(RFM22_PIOS_SPI, 0, 1);
+	if(PIOS_RFM22B_validate(g_rfm22b_dev)) {
+		rfm22_claimBus();
+		rfm22_assertCs();
+		uint8_t buf[2] = {addr | 0x80, data};
+		PIOS_SPI_TransferBlock(g_rfm22b_dev->spi_id, buf, NULL, sizeof(buf), NULL);
+		rfm22_deassertCs();
+		rfm22_releaseBus();
+	}
 }
 
-uint8_t rfm22_read(uint8_t addr)
+/**
+ * Write a byte to a register without claiming the bus.  Also
+ * toggle the NSS line
+ * @param[in] addr The address of the RFM22b register to write
+ * @param[in] data The data to write to that register
+ */
+static void rfm22_write_noclaim(uint8_t addr, uint8_t data)
 {
-	uint8_t rdata;
+	uint8_t buf[2] = {addr | 0x80, data};
+	if(PIOS_RFM22B_validate(g_rfm22b_dev)) {
+		rfm22_assertCs();
+		PIOS_SPI_TransferBlock(g_rfm22b_dev->spi_id, buf, NULL, sizeof(buf), NULL);
+		rfm22_deassertCs();
+	}	
+}
 
-	// wait 1us .. so we don't toggle the CS line to quickly
-	PIOS_DELAY_WaituS(1);
+/**
 
-	// chip select line LOW
-	PIOS_SPI_RC_PinSet(RFM22_PIOS_SPI, 0, 0);
+ * Read a byte from an RFM22b register
+ * @param[in] addr The address to read from
+ * @return Returns the result of the register read
+ */
+static uint8_t rfm22_read(uint8_t addr)
+{
+	uint8_t in[2];	
+	uint8_t out[2] = {addr & 0x7f, 0xFF};
+	if(PIOS_RFM22B_validate(g_rfm22b_dev)) {
+		rfm22_claimBus();
+		rfm22_assertCs();
+		PIOS_SPI_TransferBlock(g_rfm22b_dev->spi_id, out, in, sizeof(out), NULL);
+		rfm22_deassertCs();
+		rfm22_releaseBus();
+	}
+	return in[1];
+}
 
-	PIOS_SPI_TransferByte(RFM22_PIOS_SPI, addr & 0x7f);
-	rdata = PIOS_SPI_TransferByte(RFM22_PIOS_SPI, 0xff);
-
-	// chip select line HIGH
-	PIOS_SPI_RC_PinSet(RFM22_PIOS_SPI, 0, 1);
-
-	return rdata;
+/**
+ * Read a byte from an RFM22b register without claiming the bus
+ * @param[in] addr The address to read from
+ * @return Returns the result of the register read
+ */
+static uint8_t rfm22_read_noclaim(uint8_t addr)
+{
+	uint8_t out[2] = {addr & 0x7F, 0xFF};
+	uint8_t in[2];
+	if (PIOS_RFM22B_validate(rfm22b_dev_g)) {
+		rfm22_assertCs();
+		PIOS_SPI_TransferBlock(g_rfm22b_dev->spi_id, out, in, sizeof(out), NULL);
+		rfm22_deassertCs();
+	}
+	return in[1];
 }
 
 // ************************************
 // external interrupt
 
+uint32_t rfm32_errors;
+uint32_t rfm32_irqs_processed;
 
-static void PIOS_RFM22_EXT_Int(void)
+void PIOS_RFM22_EXT_Int(void)
 {
-	rfm22_setDebug("Ext Int");
-	if (!exec_using_spi)
+	bool valid = PIOS_RFM22B_validate(g_rfm22b_dev);
+	PIOS_Assert(valid);
+
+	portBASE_TYPE pxHigherPriorityTaskWoken;
+	if (!exec_using_spi) {
+		if (xSemaphoreGiveFromISR(g_rfm22b_dev->isrPending, &pxHigherPriorityTaskWoken) != pdTRUE) {
+			// Something went fairly seriously wrong
+			rfm32_errors++;
+		}
+		portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
+	}
+}
+
+void PIOS_RFM22_processPendingISR(uint32_t wait_ms)
+{
+	bool valid = PIOS_RFM22B_validate(g_rfm22b_dev);
+	PIOS_Assert(valid);
+
+	if ( xSemaphoreTake(g_rfm22b_dev->isrPending,  wait_ms / portTICK_RATE_MS) == pdTRUE ) {
+		rfm32_irqs_processed++;
 		rfm22_processInt();
-	rfm22_setDebug("Ext Done");
+	}
 }
-
-void rfm22_disableExtInt(void)
-{
-#if defined(RFM22_EXT_INT_USE)
-	rfm22_setDebug("Disable Int");
-	// Configure the external interrupt
-	GPIO_EXTILineConfig(PIOS_RFM22_EXTI_PORT_SOURCE, PIOS_RFM22_EXTI_PIN_SOURCE);
-	EXTI_InitTypeDef EXTI_InitStructure = pios_exti_rfm22b_cfg.exti.init;
-	EXTI_InitStructure.EXTI_LineCmd = DISABLE;
-	EXTI_Init(&EXTI_InitStructure);
-
-	EXTI_ClearFlag(PIOS_RFM22_EXTI_LINE);
-	rfm22_setDebug("Disable Int done");
-#endif
-}
-
-void rfm22_enableExtInt(void)
-{
-#if defined(RFM22_EXT_INT_USE)
-	rfm22_setDebug("Ensable Int");
-	if (PIOS_EXTI_Init(&pios_exti_rfm22b_cfg))
-		PIOS_Assert(0);
-	rfm22_setDebug("Ensable Int done");
-#endif
-}
-
 
 // ************************************
 // set/get the current tx power setting
@@ -823,7 +834,7 @@ uint32_t rfm22_maxFrequency(void)
 void rfm22_setNominalCarrierFrequency(uint32_t frequency_hz)
 {
 
-	exec_using_spi = TRUE;
+	exec_using_spi = true;
 
 	// *******
 
@@ -869,7 +880,7 @@ void rfm22_setNominalCarrierFrequency(uint32_t frequency_hz)
 	//	DEBUG_PRINTF(2, "rf setFreq frequency_step_size: %0.2f\n\r", frequency_step_size);
 #endif
 
-	exec_using_spi = FALSE;
+	exec_using_spi = false;
 }
 
 uint32_t rfm22_getNominalCarrierFrequency(void)
@@ -914,7 +925,7 @@ uint32_t rfm22_freqHopSize(void)
 void rfm22_setDatarate(uint32_t datarate_bps, bool data_whitening)
 {
 
-	exec_using_spi = TRUE;
+	exec_using_spi = true;
 
 	lookup_index = 0;
 	while (lookup_index < (LOOKUP_SIZE - 1) && data_rate[lookup_index] < datarate_bps)
@@ -1046,7 +1057,7 @@ void rfm22_setDatarate(uint32_t datarate_bps, bool data_whitening)
 
 	// *******
 
-	exec_using_spi = FALSE;
+	exec_using_spi = false;
 }
 
 uint32_t rfm22_getDatarate(void)
@@ -1059,7 +1070,7 @@ uint32_t rfm22_getDatarate(void)
 void rfm22_setSSBandwidth(uint32_t bandwidth_index)
 {
 
-	exec_using_spi = TRUE;
+	exec_using_spi = true;
 
 	ss_lookup_index = bandwidth_index;
 
@@ -1095,14 +1106,14 @@ void rfm22_setSSBandwidth(uint32_t bandwidth_index)
 
 	// *******
 
-	exec_using_spi = FALSE;
+	exec_using_spi = false;
 }
 
 // ************************************
 
 void rfm22_setRxMode(uint8_t mode, bool multi_packet_mode)
 {
-	exec_using_spi = TRUE;
+	exec_using_spi = true;
 
 	// disable interrupts
 	rfm22_write(RFM22_interrupt_enable1, 0x00);
@@ -1151,41 +1162,21 @@ void rfm22_setRxMode(uint8_t mode, bool multi_packet_mode)
 	// enable the receiver
 	rfm22_write(RFM22_op_and_func_ctrl1, RFM22_opfc1_pllon | RFM22_opfc1_rxon);
 
-	exec_using_spi = FALSE;
-}
-
-// ************************************
-
-uint16_t rfm22_addHeader()
-{
-	uint16_t i = 0;
-
-	for (uint16_t j = (TX_PREAMBLE_NIBBLES + 1) / 2; j > 0; j--)
-	{
-		rfm22_burstWrite(PREAMBLE_BYTE);
-		i++;
-	}
-	rfm22_burstWrite(SYNC_BYTE_1); i++;
-	rfm22_burstWrite(SYNC_BYTE_2); i++;
-
-	return i;
+	exec_using_spi = false;
 }
 
 // ************************************
 
 uint8_t rfm22_txStart()
 {
-	if((tx_pre_buffer_size == 0) || (exec_using_spi == TRUE))
+	if((tx_pre_buffer_size == 0) || (exec_using_spi == true))
 	{
 		// Clear the TX buffer.
 		tx_data_rd = tx_data_wr = 0;
 		return 0;
 	}
 
-	exec_using_spi = TRUE;
-
-	// Disable interrrupts.
-	PIOS_IRQ_Disable();
+	exec_using_spi = true;
 
 	// Initialize the supervisor timer.
 	rfm22b_dev_g->supv_timer = PIOS_RFM22B_SUPERVISOR_TIMEOUT;
@@ -1232,10 +1223,15 @@ uint8_t rfm22_txStart()
 	rfm22_write(RFM22_transmit_packet_length, tx_data_wr);
 
 	// add some data
-	rfm22_startBurstWrite(RFM22_fifo_access);
-	for (uint16_t i = 0; (tx_data_rd < tx_data_wr) && (i < FIFO_SIZE); ++tx_data_rd, ++i)
-		rfm22_burstWrite(tx_buffer[tx_data_rd]);
-	rfm22_endBurstWrite();
+	rfm22_claimBus();
+	rfm22_assertCs();
+	PIOS_SPI_TransferByte(g_rfm22b_dev->spi_id, RFM22_fifo_access | 0x80);
+	int bytes_to_write = (tx_data_wr - tx_data_rd);
+	bytes_to_write = (bytes_to_write > FIFO_SIZE) ? FIFO_SIZE:  bytes_to_write;
+	PIOS_SPI_TransferBlock(g_rfm22b_dev->spi_id, &tx_buffer[tx_data_rd], NULL, bytes_to_write, NULL);
+	tx_data_rd += bytes_to_write;
+	rfm22_deassertCs();
+	rfm22_releaseBus();
 
 	// *******************
 
@@ -1250,55 +1246,53 @@ uint8_t rfm22_txStart()
 	// enable the transmitter
 	rfm22_write(RFM22_op_and_func_ctrl1, RFM22_opfc1_pllon | RFM22_opfc1_txon);
 
-	// Re-ensable interrrupts.
-	PIOS_IRQ_Enable();
-
 	TX_LED_ON;
 
-	exec_using_spi = FALSE;
+	exec_using_spi = false;
 	return 1;
 }
 
 
 static void rfm22_setTxMode(uint8_t mode)
 {
-	rfm22_setDebug("setTxMode");
 	if (mode != TX_DATA_MODE && mode != TX_STREAM_MODE && mode != TX_CARRIER_MODE && mode != TX_PN_MODE)
 		return;		// invalid mode
 
-	exec_using_spi = TRUE;
+	rfm22_claimBus();
+	rfm22_assertCs();
 
-	// disable interrupts
-	rfm22_write(RFM22_interrupt_enable1, 0x00);
-	rfm22_write(RFM22_interrupt_enable2, 0x00);
+	// Disaable interrupts (IE1, IE2 = 0)
+	uint8_t out_buf[3] = {RFM22_interrupt_enable1 | 0x80, 0x00, 0x00};
+	PIOS_SPI_TransferBlock(g_rfm22b_dev->spi_id, out_buf, NULL, sizeof(out_buf), NULL);
+	rfm22_deassertCs();
 
 	// TUNE mode
-	rfm22_write(RFM22_op_and_func_ctrl1, RFM22_opfc1_pllon);
+	rfm22_write_noclaim(RFM22_op_and_func_ctrl1,RFM22_opfc1_pllon);
 
 	RX_LED_OFF;
 
-	// set the tx power
-	rfm22_write(RFM22_tx_power, RFM22_tx_pwr_papeaken | RFM22_tx_pwr_papeaklvl_1 |
+	// Set the tx power
+	rfm22_write_noclaim(RFM22_tx_power,RFM22_tx_pwr_papeaken | RFM22_tx_pwr_papeaklvl_1 |
 		    RFM22_tx_pwr_papeaklvl_0 | RFM22_tx_pwr_lna_sw | tx_power);
 
-	uint8_t fd_bit = rfm22_read(RFM22_modulation_mode_control2) & RFM22_mmc2_fd;
+	uint8_t fd_bit = rfm22_read_noclaim(RFM22_modulation_mode_control2) & RFM22_mmc2_fd;
 	if (mode == TX_CARRIER_MODE)
 		// blank carrier mode -  for testing
-		rfm22_write(RFM22_modulation_mode_control2, fd_bit | RFM22_mmc2_dtmod_pn9 |
+		rfm22_write_noclaim(RFM22_modulation_mode_control2, fd_bit | RFM22_mmc2_dtmod_pn9 |
 								RFM22_mmc2_modtyp_none);	// FIFO mode, Blank carrier
 	else if (mode == TX_PN_MODE)
 		// psuedo random data carrier mode - for testing
-		rfm22_write(RFM22_modulation_mode_control2, fd_bit | RFM22_mmc2_dtmod_pn9 |
+		rfm22_write_noclaim(RFM22_modulation_mode_control2, fd_bit | RFM22_mmc2_dtmod_pn9 |
 								RFM22_mmc2_modtyp_gfsk);	// FIFO mode, PN9 carrier
 	else
 		// data transmission
 		// FIFO mode, GFSK modulation
-		rfm22_write(RFM22_modulation_mode_control2, fd_bit | RFM22_mmc2_dtmod_fifo |
+		rfm22_write_noclaim(RFM22_modulation_mode_control2, fd_bit | RFM22_mmc2_dtmod_fifo |
 								RFM22_mmc2_modtyp_gfsk);
 
 	// clear FIFOs
-	rfm22_write(RFM22_op_and_func_ctrl2, RFM22_opfc2_ffclrrx | RFM22_opfc2_ffclrtx);
-	rfm22_write(RFM22_op_and_func_ctrl2, 0x00);
+	rfm22_write_noclaim(RFM22_op_and_func_ctrl2, RFM22_opfc2_ffclrrx | RFM22_opfc2_ffclrtx);
+	rfm22_write_noclaim(RFM22_op_and_func_ctrl2, 0x00);
 
 	// add some data to the chips TX FIFO before enabling the transmitter
 	{
@@ -1307,30 +1301,26 @@ static void rfm22_setTxMode(uint8_t mode)
 
 		if (mode == TX_DATA_MODE)
 			// set the total number of data bytes we are going to transmit
-			rfm22_write(RFM22_transmit_packet_length, wr);
+			rfm22_write_noclaim(RFM22_transmit_packet_length, wr);
 
-		uint16_t max_bytes = FIFO_SIZE - 1;
 		uint16_t i = 0;
-		rfm22_startBurstWrite(RFM22_fifo_access);
+		rfm22_assertCs();
+		PIOS_SPI_TransferByte(g_rfm22b_dev->spi_id, 0x80 | RFM22_fifo_access); // Initiate burst write
 		if (mode == TX_STREAM_MODE)	{
-			if (rd >= wr)	{
-				// no data to send - yet .. just send preamble pattern
-				while (true) {
-					rfm22_burstWrite(PREAMBLE_BYTE);
-					if (++i >= max_bytes) break;
-				}
-			}	else	// add the RF heaader
-				i += rfm22_addHeader();
+			if (rd >= wr)
+				i += PIOS_SPI_TransferBlock(g_rfm22b_dev->spi_id, FULL_PREAMBLE, NULL, sizeof(FULL_PREAMBLE), NULL);
+			 else	// add the RF heaader
+				i += PIOS_SPI_TransferBlock(g_rfm22b_dev->spi_id, HEADER, NULL, sizeof(HEADER), NULL);
 		}
 
-		// add some data
-		for (uint16_t j = wr - rd; j > 0; j--) {
-			rfm22_burstWrite(tx_buffer[rd++]);
-			if (++i >= max_bytes)
-				break;
-		}
+		// Send data if there is any and there is space in the buffer available
+		// Bytes available to send minus how many we have sent
+		int32_t bytes_to_send = wr - rd; 
+		bytes_to_send = ((bytes_to_send + i)> FIFO_SIZE) ? (FIFO_SIZE - i) : bytes_to_send;
+		if (bytes_to_send > 0)
+			rd += PIOS_SPI_TransferBlock(g_rfm22b_dev->spi_id, &tx_buffer[rd], NULL, bytes_to_send, NULL);
 
-		rfm22_endBurstWrite();
+		rfm22_deassertCs();
 
 		tx_data_rd = rd;
 	}
@@ -1342,23 +1332,18 @@ static void rfm22_setTxMode(uint8_t mode)
 
 	// enable TX interrupts
 	//	rfm22_write(RFM22_interrupt_enable1, RFM22_ie1_enpksent | RFM22_ie1_entxffaem | RFM22_ie1_enfferr);
-	rfm22_write(RFM22_interrupt_enable1, RFM22_ie1_enpksent | RFM22_ie1_entxffaem);
+	rfm22_write_noclaim(RFM22_interrupt_enable1, RFM22_ie1_enpksent | RFM22_ie1_entxffaem);
 
 	// read interrupt status - clear interrupts
-	rfm22_read(RFM22_interrupt_status1);
-	rfm22_read(RFM22_interrupt_status2);
+	rfm22_read_noclaim(RFM22_interrupt_status1);
+	rfm22_read_noclaim(RFM22_interrupt_status2);
 
 	// enable the transmitter
 	//	rfm22_write(RFM22_op_and_func_ctrl1, RFM22_opfc1_xton | RFM22_opfc1_txon);
-	rfm22_write(RFM22_op_and_func_ctrl1, RFM22_opfc1_pllon | RFM22_opfc1_txon);
+	rfm22_write_noclaim(RFM22_op_and_func_ctrl1, RFM22_opfc1_pllon | RFM22_opfc1_txon);
 
+	rfm22_releaseBus();
 	TX_LED_ON;
-
-	// *******************
-
-	exec_using_spi = FALSE;
-
-	rfm22_setDebug("setTxMode end");
 }
 
 // ************************************
@@ -1368,12 +1353,10 @@ void rfm22_processRxInt(void)
 {
 	register uint8_t int_stat1 = int_status1;
 	register uint8_t int_stat2 = int_status2;
-	rfm22_setDebug("processRxInt");
 
 	// FIFO under/over flow error.  Restart RX mode.
 	if (device_status & (RFM22_ds_ffunfl | RFM22_ds_ffovfl))
 	{
-		rfm22_setError("R_UNDER/OVERRUN");
 		rfm22_setRxMode(RX_WAIT_PREAMBLE_MODE, false);
 		return;
 	}
@@ -1383,7 +1366,6 @@ void rfm22_processRxInt(void)
 	{
 		rf_mode = RX_WAIT_SYNC_MODE;
 		RX_LED_ON;
-		rfm22_setDebug("pream_det");
 	}
 
 	// Sync word detected
@@ -1391,7 +1373,6 @@ void rfm22_processRxInt(void)
 	{
 		rf_mode = RX_DATA_MODE;
 		RX_LED_ON;
-		rfm22_setDebug("sync_det");
 
 		// read the 10-bit signed afc correction value
 		// bits 9 to 2
@@ -1420,7 +1401,6 @@ void rfm22_processRxInt(void)
 			// The received packet is going to be larger than the specified length
 			if ((rx_buffer_wr + RX_FIFO_HI_WATERMARK) > len)
 			{
-				rfm22_setError("r_size_error1");
 				rfm22_setRxMode(RX_WAIT_PREAMBLE_MODE, false);
 				return;
 			}
@@ -1428,23 +1408,27 @@ void rfm22_processRxInt(void)
 			// Another packet length error.
 			if (((rx_buffer_wr + RX_FIFO_HI_WATERMARK) >= len) && !(int_stat1 & RFM22_is1_ipkvalid))
 			{
-				rfm22_setError("r_size_error2");
 				rfm22_setRxMode(RX_WAIT_PREAMBLE_MODE, false);
 				return;
 			}
 
 			// Fetch the data from the RX FIFO
-			rfm22_startBurstRead(RFM22_fifo_access);
-			for (uint8_t i = 0; i < RX_FIFO_HI_WATERMARK; ++i)
-				rx_buffer[rx_buffer_wr++] = rfm22_burstRead();
-			rfm22_endBurstRead();
-		}
-		else
-		{	// just clear the RX FIFO
-			rfm22_startBurstRead(RFM22_fifo_access);
-			for (register uint16_t i = RX_FIFO_HI_WATERMARK; i > 0; i--)
-				rfm22_burstRead();	// read a byte from the rf modules RX FIFO buffer
-			rfm22_endBurstRead();
+			rfm22_claimBus();
+			rfm22_assertCs();
+			PIOS_SPI_TransferByte(rfm22b_dev_g->spi_id,RFM22_fifo_access & 0x7F);
+			rx_buffer_wr += (PIOS_SPI_TransferBlock(rfm22b_dev_g->spi_id,OUT_FF,
+				(uint8_t *) &rx_buffer[rx_buffer_wr],RX_FIFO_HI_WATERMARK,NULL) == 0) ?
+				RX_FIFO_HI_WATERMARK : 0;
+			rfm22_deassertCs();
+			rfm22_releaseBus();
+		} else {
+			// Clear the RX FIFO
+			rfm22_claimBus();
+			rfm22_assertCs();
+			PIOS_SPI_TransferByte(rfm22b_dev_g->spi_id,RFM22_fifo_access & 0x7F);
+			PIOS_SPI_TransferBlock(rfm22b_dev_g->spi_id,OUT_FF,NULL,RX_FIFO_HI_WATERMARK,NULL);
+			rfm22_deassertCs();
+			rfm22_releaseBus();
 		}
 	}
 
@@ -1452,7 +1436,6 @@ void rfm22_processRxInt(void)
 	if (int_stat1 & RFM22_is1_icrerror)
 	{
 		rfm22_int_timer = 0;	// reset the timer
-		rfm22_setError("CRC_ERR");
 		rfm22_setRxMode(RX_WAIT_PREAMBLE_MODE, false);
 		return;
 	}
@@ -1462,29 +1445,31 @@ void rfm22_processRxInt(void)
 	{
 
 		// read the total length of the packet data
-		register uint16_t len = rfm22_read(RFM22_received_packet_length);
+		uint32_t len = rfm22_read(RFM22_received_packet_length);
 
 		// their must still be data in the RX FIFO we need to get
 		if (rx_buffer_wr < len)
 		{
+			int32_t bytes_to_read = len - rx_buffer_wr;
 			// Fetch the data from the RX FIFO
-			rfm22_startBurstRead(RFM22_fifo_access);
-			while (rx_buffer_wr < len)
-				rx_buffer[rx_buffer_wr++] = rfm22_burstRead();
-			rfm22_endBurstRead();
+			rfm22_claimBus();
+			rfm22_assertCs();
+			PIOS_SPI_TransferByte(rfm22b_dev_g->spi_id,RFM22_fifo_access & 0x7F);
+			rx_buffer_wr += (PIOS_SPI_TransferBlock(rfm22b_dev_g->spi_id,OUT_FF,
+				(uint8_t *) &rx_buffer[rx_buffer_wr],bytes_to_read,NULL) == 0) ?
+				bytes_to_read : 0;
+			rfm22_deassertCs();
+			rfm22_releaseBus();
 		}
-
+	
 		if (rx_buffer_wr != len)
 		{
 			// we have a packet length error .. discard the packet
-			rfm22_setError("r_pack_len_error");
-			debug_val = len;
 			rfm22_setRxMode(RX_WAIT_PREAMBLE_MODE, false);
 			return;
 		}
 
 		// we have a valid received packet
-		rfm22_setDebug("VALID_R_PACKET");
 
 		if (rx_buffer_wr > 0)
 		{
@@ -1507,12 +1492,10 @@ void rfm22_processRxInt(void)
 		if(!rfm22_txStart())
 		{
 			// Switch to RX mode
-			rfm22_setDebug(" Set RX");
 			rfm22_setRxMode(RX_WAIT_PREAMBLE_MODE, false);
 		}
 	}
 
-	rfm22_setDebug("processRxInt end");
 }
 
 void rfm22_processTxInt(void)
@@ -1525,7 +1508,6 @@ void rfm22_processTxInt(void)
 	// FIFO under/over flow error.  Back to RX mode.
 	if (device_status & (RFM22_ds_ffunfl | RFM22_ds_ffovfl))
 	{
-		rfm22_setError("T_UNDER/OVERRUN");
 		rfm22_setRxMode(RX_WAIT_PREAMBLE_MODE, false);
 		return;
 	}
@@ -1544,7 +1526,6 @@ void rfm22_processTxInt(void)
 		if (rfm22_int_timer >= 100)
 		{
 			rfm22_int_time_outs++;
-			rfm22_setError("T_TIMEOUT");
 			rfm22_setRxMode(RX_WAIT_PREAMBLE_MODE, false);				// back to rx mode
 			return;
 		}
@@ -1555,53 +1536,61 @@ void rfm22_processTxInt(void)
 	{
 		// top-up the rf chips TX FIFO buffer
 		uint16_t max_bytes = FIFO_SIZE - TX_FIFO_LO_WATERMARK - 1;
-		rfm22_startBurstWrite(RFM22_fifo_access);
-		for (uint16_t i = 0; (tx_data_rd < tx_data_wr) && (i < max_bytes); ++i, ++tx_data_rd)
-			rfm22_burstWrite(tx_buffer[tx_data_rd]);
-		rfm22_endBurstWrite();
+		rfm22_claimBus();
+		rfm22_assertCs();
+		PIOS_SPI_TransferByte(g_rfm22b_dev->spi_id, RFM22_fifo_access | 0x80);
+		int bytes_to_write = (tx_data_wr - tx_data_rd);
+		bytes_to_write = (bytes_to_write > max_bytes) ? max_bytes:  bytes_to_write;
+		PIOS_SPI_TransferBlock(g_rfm22b_dev->spi_id, &tx_buffer[tx_data_rd], NULL, bytes_to_write, NULL);
+		tx_data_rd += bytes_to_write;
+		rfm22_deassertCs();
+		rfm22_releaseBus();
 	}
 
 	// Packet has been sent
 	if (int_stat1 & RFM22_is1_ipksent)
 	{
-		rfm22_setDebug(" T_Sent");
 
 		// Send another packet if it's available.
 		if(!rfm22_txStart())
 		{
 			// Switch to RX mode
-			rfm22_setDebug(" Set RX");
 			rfm22_setRxMode(RX_WAIT_PREAMBLE_MODE, false);
 			return;
 		}
 	}
 
-	rfm22_setDebug("ProcessTxInt done");
 }
 
 static void rfm22_processInt(void)
 {
-	rfm22_setDebug("ProcessInt");
-	// this is called from the external interrupt handler
-
-	if (!initialized || power_on_reset)
-		// we haven't yet been initialized
+	// we haven't yet been initialized
+	if (!initialized || power_on_reset || !PIOS_RFM22B_validate(rfm22b_dev_g))
 		return;
 
-	exec_using_spi = TRUE;
+	exec_using_spi = true;
 
 	// Reset the supervisor timer.
 	rfm22b_dev_g->supv_timer = PIOS_RFM22B_SUPERVISOR_TIMEOUT;
 
-	// read interrupt status registers - clears the interrupt line
-	int_status1 = rfm22_read(RFM22_interrupt_status1);
-	int_status2 = rfm22_read(RFM22_interrupt_status2);
+	// 1. Read the interrupt statuses with burst read
+	rfm22_claimBus();  // Set RC and the semaphore
+	uint8_t write_buf[3] = {RFM22_interrupt_status1 & 0x7f, 0xFF, 0xFF};
+	uint8_t read_buf[3];
+	rfm22_assertCs();
+	PIOS_SPI_TransferBlock(g_rfm22b_dev->spi_id, write_buf, read_buf, sizeof(write_buf), NULL);
+	rfm22_deassertCs();
+	int_status1 = read_buf[1];
+	int_status2 = read_buf[2];
+	
+	// Device status
+	device_status = rfm22_read_noclaim(RFM22_device_status);
 
-	// read device status register
-	device_status = rfm22_read(RFM22_device_status);
+	// EzMAC status
+	ezmac_status = rfm22_read_noclaim(RFM22_ezmac_status);
 
-	// read ezmac status register
-	ezmac_status = rfm22_read(RFM22_ezmac_status);
+	// Release the bus
+	rfm22_releaseBus();
 
 	// Read the RSSI if we're in RX mode
 	if (rf_mode != TX_DATA_MODE && rf_mode != TX_STREAM_MODE &&
@@ -1619,9 +1608,8 @@ static void rfm22_processInt(void)
 	// the RF module has gone and done a reset - we need to re-initialize the rf module
 	if (int_status2 & RFM22_is2_ipor)
 	{
-		initialized = FALSE;
-		power_on_reset = TRUE;
-		rfm22_setError("Reset");
+		initialized = false;
+		power_on_reset = true;
 		// Need to do something here!
 		return;
 	}
@@ -1661,21 +1649,19 @@ static void rfm22_processInt(void)
 		break;
 	}
 
-	exec_using_spi = FALSE;
-
-	rfm22_setDebug("ProcessInt done");
+	exec_using_spi = false;
 }
 
 // ************************************
 
 int8_t rfm22_getRSSI(void)
 {
-	exec_using_spi = TRUE;
+	exec_using_spi = true;
 
 	rssi = rfm22_read(RFM22_rssi);			// read rx signal strength .. 45 = -100dBm, 205 = -20dBm
 	rssi_dBm = (int8_t)(rssi >> 1) - 122;	// convert to dBm
 
-	exec_using_spi = FALSE;
+	exec_using_spi = false;
 	return rssi_dBm;
 }
 
@@ -1757,32 +1743,32 @@ int8_t rfm22_currentMode(void)
 	return rf_mode;
 }
 
-// return TRUE if we are transmitting
+// return true if we are transmitting
 bool rfm22_transmitting(void)
 {
 	return (rf_mode == TX_DATA_MODE || rf_mode == TX_STREAM_MODE || rf_mode == TX_CARRIER_MODE || rf_mode == TX_PN_MODE);
 }
 
-// return TRUE if the channel is clear to transmit on
+// return true if the channel is clear to transmit on
 bool rfm22_channelIsClear(void)
 {
 	if (!initialized)
 		// we haven't yet been initialized
-		return FALSE;
+		return false;
 
 	if (rf_mode != RX_WAIT_PREAMBLE_MODE && rf_mode != RX_WAIT_SYNC_MODE)
 		// we are receiving something or we are transmitting or we are scanning the spectrum
-		return FALSE;
+		return false;
 
-	return TRUE;
+	return true;
 }
 
-// return TRUE if the transmiter is ready for use
+// return true if the transmiter is ready for use
 bool rfm22_txReady(void)
 {
 	if (!initialized)
 		// we haven't yet been initialized
-		return FALSE;
+		return false;
 
 	return (tx_data_rd == 0 && tx_data_wr == 0 && rf_mode != TX_DATA_MODE &&
 		rf_mode != TX_STREAM_MODE && rf_mode != TX_CARRIER_MODE && rf_mode != TX_PN_MODE &&
@@ -1807,11 +1793,11 @@ void rfm22_setFreqCalibration(uint8_t value)
 		tx_data_rd = tx_data_wr = 0;
 	}
 
-	exec_using_spi = TRUE;
+	exec_using_spi = true;
 
 	rfm22_write(RFM22_xtal_osc_load_cap, osc_load_cap);
 
-	exec_using_spi = FALSE;
+	exec_using_spi = false;
 
 	if (prev_rf_mode == TX_CARRIER_MODE || prev_rf_mode == TX_PN_MODE)
 		rfm22_setTxMode(prev_rf_mode);
@@ -1842,40 +1828,24 @@ int rfm22_resetModule(uint8_t mode, uint32_t min_frequency_hz, uint32_t max_freq
 {
 	initialized = false;
 
-#if defined(RFM22_EXT_INT_USE)
-	rfm22_disableExtInt();
-#endif
-
 	power_on_reset = false;
 
 	// ****************
 
-	exec_using_spi = TRUE;
-
-	// ****************
-	// setup the SPI port
-
-	// chip select line HIGH
-	PIOS_SPI_RC_PinSet(RFM22_PIOS_SPI, 0, 1);
-
-	// set SPI port SCLK frequency .. 4.5MHz
-	PIOS_SPI_SetClockSpeed(RFM22_PIOS_SPI, PIOS_SPI_PRESCALER_16);
-	// set SPI port SCLK frequency .. 2.25MHz
-	//		PIOS_SPI_SetClockSpeed(RFM22_PIOS_SPI, PIOS_SPI_PRESCALER_32);
-
-	// set SPI port SCLK frequency .. 285kHz .. purely for hardware fault finding
-	//		PIOS_SPI_SetClockSpeed(RFM22_PIOS_SPI, PIOS_SPI_PRESCALER_256);
+	exec_using_spi = true;
 
 	// ****************
 	// software reset the RF chip .. following procedure according to Si4x3x Errata (rev. B)
 
 	rfm22_write(RFM22_op_and_func_ctrl1, RFM22_opfc1_swres);			// software reset the radio
 
-	PIOS_DELAY_WaitmS(26);												// wait 26ms
+	// wait 26ms
+	PIOS_DELAY_WaitmS(26);
 
 	for (int i = 50; i > 0; i--)
 	{
-		PIOS_DELAY_WaitmS(1);											// wait 1ms
+		// wait 1ms
+		PIOS_DELAY_WaitmS(1);
 
 		// read the status registers
 		int_status1 = rfm22_read(RFM22_interrupt_status1);
@@ -1897,7 +1867,7 @@ int rfm22_resetModule(uint8_t mode, uint32_t min_frequency_hz, uint32_t max_freq
 
 	// ****************
 
-	exec_using_spi = FALSE;
+	exec_using_spi = false;
 
 	// ****************
 
@@ -2010,202 +1980,16 @@ int rfm22_resetModule(uint8_t mode, uint32_t min_frequency_hz, uint32_t max_freq
 
 	// choose the 3 GPIO pin functions
 	rfm22_write(RFM22_io_port_config, RFM22_io_port_default);								// GPIO port use default value
-	rfm22_write(RFM22_gpio0_config, RFM22_gpio0_config_drv3 | RFM22_gpio0_config_txstate);	// GPIO0 = TX State (to control RF Switch)
-	rfm22_write(RFM22_gpio1_config, RFM22_gpio1_config_drv3 | RFM22_gpio1_config_rxstate);	// GPIO1 = RX State (to control RF Switch)
+	if (rfm22b_dev_g->cfg.gpio_direction == GPIO0_TX_GPIO1_RX) {
+		rfm22_write(RFM22_gpio0_config, RFM22_gpio0_config_drv3 | RFM22_gpio0_config_txstate);	// GPIO0 = TX State (to control RF Switch)
+		rfm22_write(RFM22_gpio1_config, RFM22_gpio1_config_drv3 | RFM22_gpio1_config_rxstate);	// GPIO1 = RX State (to control RF Switch)
+	} else {
+		rfm22_write(RFM22_gpio0_config, RFM22_gpio0_config_drv3 | RFM22_gpio0_config_rxstate);	// GPIO0 = TX State (to control RF Switch)
+		rfm22_write(RFM22_gpio1_config, RFM22_gpio1_config_drv3 | RFM22_gpio1_config_txstate);	// GPIO1 = RX State (to control RF Switch)		
+	}
 	rfm22_write(RFM22_gpio2_config, RFM22_gpio2_config_drv3 | RFM22_gpio2_config_cca);		// GPIO2 = Clear Channel Assessment
 
 	// ****************
-
-	return 0;	// OK
-}
-
-// ************************************
-
-int rfm22_init_scan_spectrum(uint32_t min_frequency_hz, uint32_t max_frequency_hz)
-{
-#if defined(RFM22_DEBUG)
-	DEBUG_PRINTF(2, "\n\rRF init scan spectrum\n\r");
-#endif
-
-	int res = rfm22_resetModule(RX_SCAN_SPECTRUM, min_frequency_hz, max_frequency_hz);
-	if (res < 0)
-		return res;
-
-	//	rfm22_setSSBandwidth(0);
-	rfm22_setSSBandwidth(1);
-
-	// FIFO mode, GFSK modulation
-	uint8_t fd_bit = rfm22_read(RFM22_modulation_mode_control2) & RFM22_mmc2_fd;
-	rfm22_write(RFM22_modulation_mode_control2, RFM22_mmc2_trclk_clk_none | RFM22_mmc2_dtmod_fifo | fd_bit | RFM22_mmc2_modtyp_gfsk);
-
-	rfm22_write(RFM22_cpu_output_clk, RFM22_coc_1MHz);								// 1MHz clock output
-
-	rfm22_write(RFM22_rssi_threshold_clear_chan_indicator, 0);
-
-	rfm22_write(RFM22_preamble_detection_ctrl1, 31 << 3);					// 31-nibbles rx preamble detection
-
-	// avoid packet detection
-	rfm22_write(RFM22_data_access_control, RFM22_dac_enpacrx | RFM22_dac_encrc);
-	rfm22_write(RFM22_header_control1, 0x0f);
-	rfm22_write(RFM22_header_control2, 0x77);
-
-	rfm22_write(RFM22_sync_word3, SYNC_BYTE_1);
-	rfm22_write(RFM22_sync_word2, SYNC_BYTE_2);
-	rfm22_write(RFM22_sync_word1, SYNC_BYTE_3 ^ 0xff);
-	rfm22_write(RFM22_sync_word0, SYNC_BYTE_4 ^ 0xff);
-
-	// all the bits to be checked
-	rfm22_write(RFM22_header_enable3, 0xff);
-	rfm22_write(RFM22_header_enable2, 0xff);
-	rfm22_write(RFM22_header_enable1, 0xff);
-	rfm22_write(RFM22_header_enable0, 0xff);
-
-	// set frequency hopping channel step size (multiples of 10kHz)
-	//	rfm22_write(RFM22_frequency_hopping_step_size, 0);
-
-	// set our nominal carrier frequency
-	rfm22_setNominalCarrierFrequency(min_frequency_hz);
-
-	// set minimum tx power
-	rfm22_write(RFM22_tx_power, RFM22_tx_pwr_lna_sw | 0);
-
-	rfm22_write(RFM22_agc_override1, RFM22_agc_ovr1_sgi | RFM22_agc_ovr1_agcen);
-
-	//	rfm22_write(RFM22_vco_current_trimming, 0x7f);
-	//	rfm22_write(RFM22_vco_calibration_override, 0x40);
-	//	rfm22_write(RFM22_chargepump_current_trimming_override, 0x80);
-
-	// Enable RF module external interrupt
-	rfm22_enableExtInt();
-
-	rfm22_setRxMode(RX_SCAN_SPECTRUM, true);
-
-	initialized = true;
-
-	return 0;	// OK
-}
-
-// ************************************
-
-int rfm22_init_tx_stream(uint32_t min_frequency_hz, uint32_t max_frequency_hz)
-{
-#if defined(RFM22_DEBUG)
-	DEBUG_PRINTF(2, "\n\rRF init TX stream\n\r");
-#endif
-
-	int res = rfm22_resetModule(TX_STREAM_MODE, min_frequency_hz, max_frequency_hz);
-	if (res < 0)
-		return res;
-
-	frequency_hop_step_size_reg = 0;
-
-	// set the RF datarate
-	rfm22_setDatarate(RFM22_DEFAULT_RF_DATARATE, FALSE);
-
-	// FIFO mode, GFSK modulation
-	uint8_t fd_bit = rfm22_read(RFM22_modulation_mode_control2) & RFM22_mmc2_fd;
-	rfm22_write(RFM22_modulation_mode_control2, RFM22_mmc2_trclk_clk_none | RFM22_mmc2_dtmod_fifo | fd_bit | RFM22_mmc2_modtyp_gfsk);
-
-	// disable the internal Tx & Rx packet handlers (without CRC)
-	rfm22_write(RFM22_data_access_control, 0);
-
-	rfm22_write(RFM22_preamble_length, TX_PREAMBLE_NIBBLES);				// x-nibbles tx preamble
-	rfm22_write(RFM22_preamble_detection_ctrl1, RX_PREAMBLE_NIBBLES << 3);	// x-nibbles rx preamble detection
-
-	rfm22_write(RFM22_header_control1, RFM22_header_cntl1_bcen_none | RFM22_header_cntl1_hdch_none);	// header control - we are not using the header
-	rfm22_write(RFM22_header_control2, RFM22_header_cntl2_fixpklen | RFM22_header_cntl2_hdlen_none | RFM22_header_cntl2_synclen_32 | ((TX_PREAMBLE_NIBBLES >> 8) & 0x01));	// no header bytes, synchronization word length 3, 2 used, packet length not included in header (fixed packet length).
-
-	rfm22_write(RFM22_sync_word3, SYNC_BYTE_1);								// sync word
-	rfm22_write(RFM22_sync_word2, SYNC_BYTE_2);								//
-
-	//	rfm22_write(RFM22_modem_test, 0x01);
-
-	rfm22_write(RFM22_agc_override1, RFM22_agc_ovr1_agcen);
-	//	rfm22_write(RFM22_agc_override1, RFM22_agc_ovr1_sgi | RFM22_agc_ovr1_agcen);
-
-	rfm22_write(RFM22_frequency_hopping_step_size, frequency_hop_step_size_reg);	// set frequency hopping channel step size (multiples of 10kHz)
-
-	rfm22_setNominalCarrierFrequency((min_frequency_hz + max_frequency_hz) / 2);	// set our nominal carrier frequency
-
-	rfm22_write(RFM22_tx_power, RFM22_tx_pwr_papeaken | RFM22_tx_pwr_papeaklvl_0 | RFM22_tx_pwr_lna_sw | tx_power);	// set the tx power
-	//	rfm22_write(RFM22_tx_power, RFM22_tx_pwr_lna_sw | tx_power);	// set the tx power
-
-	//	rfm22_write(RFM22_vco_current_trimming, 0x7f);
-	//	rfm22_write(RFM22_vco_calibration_override, 0x40);
-	//	rfm22_write(RFM22_chargepump_current_trimming_override, 0x80);
-
-	rfm22_write(RFM22_tx_fifo_control1, TX_FIFO_HI_WATERMARK);				// TX FIFO Almost Full Threshold (0 - 63)
-	rfm22_write(RFM22_tx_fifo_control2, TX_FIFO_LO_WATERMARK);				// TX FIFO Almost Empty Threshold (0 - 63)
-
-	// Enable RF module external interrupt
-	rfm22_enableExtInt();
-
-	initialized = true;
-
-	return 0;	// OK
-}
-
-// ************************************
-
-int rfm22_init_rx_stream(uint32_t min_frequency_hz, uint32_t max_frequency_hz)
-{
-#if defined(RFM22_DEBUG)
-	DEBUG_PRINTF(2, "\n\rRF init RX stream\n\r");
-#endif
-
-	int res = rfm22_resetModule(RX_WAIT_PREAMBLE_MODE, min_frequency_hz, max_frequency_hz);
-	if (res < 0)
-		return res;
-
-	frequency_hop_step_size_reg = 0;
-
-	// set the RF datarate
-	rfm22_setDatarate(RFM22_DEFAULT_RF_DATARATE, FALSE);
-
-	// FIFO mode, GFSK modulation
-	uint8_t fd_bit = rfm22_read(RFM22_modulation_mode_control2) & RFM22_mmc2_fd;
-	rfm22_write(RFM22_modulation_mode_control2, RFM22_mmc2_trclk_clk_none | RFM22_mmc2_dtmod_fifo | fd_bit | RFM22_mmc2_modtyp_gfsk);
-
-	// disable the internal Tx & Rx packet handlers (without CRC)
-	rfm22_write(RFM22_data_access_control, 0);
-
-	rfm22_write(RFM22_preamble_length, TX_PREAMBLE_NIBBLES);				// x-nibbles tx preamble
-	rfm22_write(RFM22_preamble_detection_ctrl1, RX_PREAMBLE_NIBBLES << 3);	// x-nibbles rx preamble detection
-
-	rfm22_write(RFM22_header_control1, RFM22_header_cntl1_bcen_none | RFM22_header_cntl1_hdch_none);	// header control - we are not using the header
-	rfm22_write(RFM22_header_control2, RFM22_header_cntl2_fixpklen | RFM22_header_cntl2_hdlen_none | RFM22_header_cntl2_synclen_32 | ((TX_PREAMBLE_NIBBLES >> 8) & 0x01));	// no header bytes, synchronization word length 3, 2 used, packet length not included in header (fixed packet length).
-
-	rfm22_write(RFM22_sync_word3, SYNC_BYTE_1);								// sync word
-	rfm22_write(RFM22_sync_word2, SYNC_BYTE_2);								//
-
-	// no header bits to be checked
-	rfm22_write(RFM22_header_enable3, 0x00);
-	rfm22_write(RFM22_header_enable2, 0x00);
-	rfm22_write(RFM22_header_enable1, 0x00);
-	rfm22_write(RFM22_header_enable0, 0x00);
-
-	//	rfm22_write(RFM22_modem_test, 0x01);
-
-	rfm22_write(RFM22_agc_override1, RFM22_agc_ovr1_agcen);
-	//	rfm22_write(RFM22_agc_override1, RFM22_agc_ovr1_sgi | RFM22_agc_ovr1_agcen);
-
-	rfm22_write(RFM22_frequency_hopping_step_size, frequency_hop_step_size_reg);	// set frequency hopping channel step size (multiples of 10kHz)
-
-	rfm22_setNominalCarrierFrequency((min_frequency_hz + max_frequency_hz) / 2);	// set our nominal carrier frequency
-
-	//	rfm22_write(RFM22_vco_current_trimming, 0x7f);
-	//	rfm22_write(RFM22_vco_calibration_override, 0x40);
-	//	rfm22_write(RFM22_chargepump_current_trimming_override, 0x80);
-
-	// RX FIFO Almost Full Threshold (0 - 63)
-	rfm22_write(RFM22_rx_fifo_control, RX_FIFO_HI_WATERMARK);
-
-	// Enable RF module external interrupt
-	rfm22_enableExtInt();
-
-	rfm22_setRxMode(RX_WAIT_PREAMBLE_MODE, false);
-
-	initialized = true;
 
 	return 0;	// OK
 }
@@ -2225,7 +2009,7 @@ int rfm22_init_normal(uint32_t id, uint32_t min_frequency_hz, uint32_t max_frequ
 	frequency_hop_step_size_reg = freq_hop_step_size;
 
 	// set the RF datarate
-	rfm22_setDatarate(RFM22_DEFAULT_RF_DATARATE, TRUE);
+	rfm22_setDatarate(RFM22_DEFAULT_RF_DATARATE, true);
 
 	// FIFO mode, GFSK modulation
 	uint8_t fd_bit = rfm22_read(RFM22_modulation_mode_control2) & RFM22_mmc2_fd;
@@ -2321,9 +2105,6 @@ int rfm22_init_normal(uint32_t id, uint32_t min_frequency_hz, uint32_t max_frequ
 
 	// RX FIFO Almost Full Threshold (0 - 63)
 	rfm22_write(RFM22_rx_fifo_control, RX_FIFO_HI_WATERMARK);
-
-	// Enable RF module external interrupt
-	rfm22_enableExtInt();
 
 	rfm22_setRxMode(RX_WAIT_PREAMBLE_MODE, false);
 

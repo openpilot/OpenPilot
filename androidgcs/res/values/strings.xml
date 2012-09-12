@@ -34,4 +34,11 @@
 	<string name="rxrate">RxRate: </string>
 	<string name="tester">Tester</string>
 	<string name="_3dview">3DView</string>
+	<string name="tuning">Tuning</string>
+	<string name="apply">Apply</string>
+	<string name="save">Save</string>
+	<string name="settings">Settings</string>
+	<string name="data">Data</string>
+	<string name="edit">Edit</string>
+	<string name="load">Load</string>
 </resources>

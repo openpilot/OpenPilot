@@ -47,6 +47,8 @@ UploaderGadgetOptionsPage::UploaderGadgetOptionsPage(UploaderGadgetConfiguration
 //creates options page widget
 QWidget *UploaderGadgetOptionsPage::createPage(QWidget *parent)
 {
+    Q_UNUSED(parent);
+
     //main widget
     QWidget *widget = new QWidget;
 

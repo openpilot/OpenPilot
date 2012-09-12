@@ -196,6 +196,7 @@ int32_t PIOS_Flash_Jedec_Init(uint32_t spi_id, uint32_t slave_num, const struct 
  */
 int32_t PIOS_Flash_Jedec_StartTransaction()
 {
+	return 0;
 #if defined(FLASH_FREERTOS)
 	if(PIOS_Flash_Jedec_Validate(flash_dev) != 0)
 		return -1;
@@ -212,6 +213,7 @@ int32_t PIOS_Flash_Jedec_StartTransaction()
  */
 int32_t PIOS_Flash_Jedec_EndTransaction()
 {
+	return 0;
 #if defined(FLASH_FREERTOS)
 	if(PIOS_Flash_Jedec_Validate(flash_dev) != 0)
 		return -1;

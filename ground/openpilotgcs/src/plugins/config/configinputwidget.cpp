@@ -1268,7 +1268,7 @@ void ConfigInputWidget::simpleCalibration(bool enable)
 
         restoreMdata();
 
-        for (int i = 0; i < ManualControlCommand::CHANNEL_NUMELEM; i++)
+        for (unsigned int i = 0; i < ManualControlCommand::CHANNEL_NUMELEM; i++)
             manualSettingsData.ChannelNeutral[i] = manualCommandData.Channel[i];
 
         // Force flight mode neutral to middle

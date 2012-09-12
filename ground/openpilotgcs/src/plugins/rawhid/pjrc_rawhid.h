@@ -32,11 +32,15 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <QDebug>
+#include <QMutex>
 #include <QString>
 #include "rawhid_global.h"
 
 #if defined( Q_OS_MAC)
 
+#include <IOKit/IOKitLib.h>
+#include <IOKit/hid/IOHIDLib.h>
+#include <CoreFoundation/CFString.h>
 
 #elif defined(Q_OS_UNIX)
 //#elif defined(Q_OS_LINUX)
@@ -96,22 +100,43 @@ public:
     pjrc_rawhid();
     ~pjrc_rawhid();
     int open(int max, int vid, int pid, int usage_page, int usage);
-    int receive(int num, void *buf, int len, int timeout);
+    int receive(int, void *buf, int len, int timeout);
     void close(int num);
     int send(int num, void *buf, int len, int timeout);
     QString getserial(int num);
-    void mytest(int num);
 signals:
-     void deviceUnplugged(int);//just to make pips changes compile
-#if defined( Q_OS_MAC)
-
-#endif
+     void deviceUnplugged(int);
 
 private:
 #if defined( Q_OS_MAC)
 
+     // Static callbacks called by the HID system with handles to the PJRC object
+     static void attach_callback(void *, IOReturn, void *, IOHIDDeviceRef);
+     static void dettach_callback(void *, IOReturn, void *hid_mgr, IOHIDDeviceRef dev);
+     static void input_callback(void *, IOReturn, void *, IOHIDReportType, uint32_t, uint8_t *, CFIndex);
+     static void timeout_callback(CFRunLoopTimerRef, void *);
+
+     // Non static methods to call into
+     void attach(IOHIDDeviceRef dev);
+     void dettach(IOHIDDeviceRef dev);
+     void input(uint8_t *, CFIndex);
+
+     // Platform specific handles for the USB device
+     IOHIDManagerRef hid_manager;
+     IOHIDDeviceRef dev;
+     CFRunLoopRef the_correct_runloop;
+     CFRunLoopRef received_runloop;
+
+     static const int BUFFER_SIZE = 64;
+     uint8_t buffer[BUFFER_SIZE];
+     int attach_count;
+     int buffer_count;
+     bool device_open;
+     bool unplugged;
+
+     QMutex *m_writeMutex;
+     QMutex *m_readMutex;
 #elif defined(Q_OS_UNIX)
-    //#elif defined(Q_OS_LINUX)
 
     hid_t *first_hid;
     hid_t *last_hid;

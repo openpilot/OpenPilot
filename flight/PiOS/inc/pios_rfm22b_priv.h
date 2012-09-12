@@ -591,6 +591,8 @@ typedef bool ( *t_rfm22_RxDataCallback ) (void *data, uint8_t len);
 
 // ************************************
 
+void PIOS_RFM22_EXT_Int(void);
+
 uint32_t rfm22_minFrequency(void);
 uint32_t rfm22_maxFrequency(void);
 

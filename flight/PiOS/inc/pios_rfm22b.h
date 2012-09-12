@@ -31,21 +31,28 @@
 #ifndef PIOS_RFM22B_H
 #define PIOS_RFM22B_H
 
+enum gpio_direction {GPIO0_TX_GPIO1_RX, GPIO0_RX_GPIO1_TX};
+
 /* Global Types */
 struct pios_rfm22b_cfg {
+	const struct pios_spi_cfg * spi_cfg; /* Pointer to SPI interface configuration */
+	const struct pios_exti_cfg * exti_cfg; /* Pointer to the EXTI configuration */
 	uint32_t frequencyHz;
 	uint32_t minFrequencyHz;
 	uint32_t maxFrequencyHz;
 	uint8_t RFXtalCap;
 	uint32_t maxRFBandwidth;
 	uint8_t maxTxPower;
+	uint8_t slave_num;
+	enum gpio_direction gpio_direction;
 };
 
 /* Public Functions */
-extern int32_t PIOS_RFM22B_Init(uint32_t *rfb22b_id, const struct pios_rfm22b_cfg *cfg);
+extern int32_t PIOS_RFM22B_Init(uint32_t *rfb22b_id, uint32_t spi_id, uint32_t slave_num, const struct pios_rfm22b_cfg *cfg);
 extern uint32_t PIOS_RFM22B_DeviceID(uint32_t rfb22b_id);
 extern int8_t PIOS_RFM22B_RSSI(uint32_t rfm22b_id);
 extern int16_t PIOS_RFM22B_Resets(uint32_t rfm22b_id);
+extern void PIOS_RFM22_processPendingISR(uint32_t wait_ms);
 
 #endif /* PIOS_RFM22B_H */
 

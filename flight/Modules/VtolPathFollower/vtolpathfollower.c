@@ -238,6 +238,9 @@ static void vtolPathFollowerTask(void *parameters)
 
 				break;
 		}
+
+		AlarmsClear(SYSTEMALARMS_ALARM_GUIDANCE);
+
 	}
 }
 

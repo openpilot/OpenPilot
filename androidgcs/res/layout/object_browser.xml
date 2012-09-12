@@ -23,14 +23,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="true"
-                android:text="Settings" />
+                android:text="@string/settings" />
 
             <CheckBox
                 android:id="@+id/dataCheck"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="true"
-                android:text="Data" />
+                android:text="@string/data" />
 
         </LinearLayout>
         
@@ -56,7 +56,7 @@
                 android:layout_height="fill_parent"
                 android:background="#FFFFFFFF" />
 
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_weight="1"
@@ -66,40 +66,29 @@
                     android:id="@+id/object_information"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
                     android:layout_marginLeft="12dp"
                     android:layout_marginTop="12dp"
                     android:textAppearance="?android:attr/textAppearanceMedium" />
 
-                <Space
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                <Button
+                    android:id="@+id/editButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentRight="true"
+                    android:text="@string/edit" />
 
-                <Space
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                <Button
+                    android:id="@+id/object_load_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_toLeftOf="@+id/editButton"
+                    android:text="@string/load" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" >
+            </RelativeLayout>
 
-                    <Button
-                        android:id="@+id/object_load_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Load" />
-
-                    <Button
-                        android:id="@+id/editButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="right"
-                        android:layout_marginBottom="32dp"
-                        android:layout_marginRight="12dp"
-                        android:text="Edit" />
-
-                </LinearLayout>
-
-            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 

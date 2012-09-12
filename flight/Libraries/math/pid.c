@@ -88,9 +88,9 @@ float pid_apply_setpoint(struct pid *pid, const float setpoint, const float meas
 	pid->iAccumulator = bound(pid->iAccumulator, pid->iLim * 1000.0f);
 
 	// Calculate DT1 term,
-	float diff = ((deriv_gamma * setpoint - measured) - pid->lastErr);
 	float dterm = 0;
-	pid->lastErr = err;
+	float diff = ((deriv_gamma * setpoint - measured) - pid->lastErr);
+	pid->lastErr = (deriv_gamma * setpoint - measured);
 	if(pid->d && dT)
 	{
 		dterm = pid->lastDer +  dT / ( dT + deriv_tau) * ((diff * pid->d / dT) - pid->lastDer);

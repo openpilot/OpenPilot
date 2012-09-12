@@ -2,8 +2,9 @@
   <General>
     <AutoConnect>true</AutoConnect>
     <AutoSelect>true</AutoSelect>
-    <Description>None</Description>
-    <Details>None</Details>
+    <UDPMirror>false</UDPMirror>
+    <Description>Default configuration</Description>
+    <Details>Default configuration built to work on all screen sizes</Details>
     <ExpertMode>false</ExpertMode>
     <OverrideLanguage>en_AU</OverrideLanguage>
     <SaveSettingsOnExit>true</SaveSettingsOnExit>

@@ -56,7 +56,9 @@
 #include <pios_rfm22b_priv.h>
 
 /* Local Defines */
-#define STACK_SIZE_BYTES  200
+#define STACK_SIZE_BYTES 200
+#define TASK_PRIORITY (tskIDLE_PRIORITY + 2)
+#define ISR_TIMEOUT 5 // ms
 
 // RTC timer is running at 625Hz (1.6ms or 5 ticks == 8ms).
 // A 256 byte message at 56kbps should take less than 40ms
@@ -163,6 +165,9 @@ struct pios_rfm22b_dev {
 
 	uint32_t deviceID;
 
+	// The task handle
+	xTaskHandle taskHandle;
+
 	// ISR pending
 	xSemaphoreHandle isrPending;
 
@@ -175,6 +180,10 @@ struct pios_rfm22b_dev {
 	// The supervisor countdown timer.
 	uint16_t supv_timer;
 	uint16_t resets;
+
+	// Stats
+	uint32_t rfm32_errors;
+	uint32_t rfm32_irqs_processed;
 };
 
 uint32_t random32 = 0x459ab8d8;
@@ -206,6 +215,7 @@ static const uint8_t OUT_FF[64] = {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
 
 /* Local function forwared declarations */
 static void PIOS_RFM22B_Supervisor(uint32_t ppm_id);
+static void PIOS_RFM22B_Task(void *parameters);
 static void rfm22_processInt(void);
 static void rfm22_setTxMode(uint8_t mode);
 
@@ -509,6 +519,14 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
 	DEBUG_PRINTF(2, "RF frequency: %dHz\n\r", rfm22_getNominalCarrierFrequency());
 	DEBUG_PRINTF(2, "RF TX power: %d\n\r", rfm22_getTxPower());
 
+	// Register the watchdog timer for the radio driver task
+#ifdef PIOS_WDG_RFM22B
+	PIOS_WDG_RegisterFlag(PIOS_WDG_RFM22B);
+#endif /* PIOS_WDG_RFM22B */
+
+	// Start the driver task.  This task controls the radio state machine and removed all of the IO from the IRQ handler.
+	xTaskCreate(PIOS_RFM22B_Task, (signed char *)"PIOS_RFM22B_Task", STACK_SIZE_BYTES, (void*)rfm22b_dev, TASK_PRIORITY, &(rfm22b_dev->taskHandle));
+
 	// Setup a real-time clock callback to kickstart the radio if a transfer lock sup.
 	if (!PIOS_RTC_RegisterTickCallback(PIOS_RFM22B_Supervisor, *rfm22b_id)) {
 		PIOS_DEBUG_Assert(0);
@@ -543,6 +561,30 @@ static void PIOS_RFM22B_RxStart(uint32_t rfm22b_id, uint16_t rx_bytes_avail)
 	bool valid = PIOS_RFM22B_validate(rfm22b_dev);
 	PIOS_Assert(valid);
 
+}
+
+/**
+ * The task that controls the radio state machine.
+ */
+static void PIOS_RFM22B_Task(void *parameters)
+{
+	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)parameters;
+	bool valid = PIOS_RFM22B_validate(rfm22b_dev);
+	PIOS_Assert(valid);
+
+	while(1)
+	{
+#ifdef PIOS_WDG_RFM22B
+		// Update the watchdog timer
+		//PIOS_WDG_UpdateFlag(PIOS_WDG_RFM22B);
+#endif /* PIOS_WDG_RFM22B */
+
+		// Process any pending interrrupt
+		if ( xSemaphoreTake(g_rfm22b_dev->isrPending,  ISR_TIMEOUT / portTICK_RATE_MS) == pdTRUE ) {
+			rfm22b_dev->rfm32_irqs_processed++;
+			rfm22_processInt();
+		}
+	}
 }
 
 static void PIOS_RFM22B_TxStart(uint32_t rfm22b_id, uint16_t tx_bytes_avail)
@@ -767,9 +809,6 @@ static uint8_t rfm22_read_noclaim(uint8_t addr)
 // ************************************
 // external interrupt
 
-uint32_t rfm32_errors;
-uint32_t rfm32_irqs_processed;
-
 void PIOS_RFM22_EXT_Int(void)
 {
 	bool valid = PIOS_RFM22B_validate(g_rfm22b_dev);
@@ -779,20 +818,9 @@ void PIOS_RFM22_EXT_Int(void)
 	if (!exec_using_spi) {
 		if (xSemaphoreGiveFromISR(g_rfm22b_dev->isrPending, &pxHigherPriorityTaskWoken) != pdTRUE) {
 			// Something went fairly seriously wrong
-			rfm32_errors++;
+			g_rfm22b_dev->rfm32_errors++;
 		}
 		portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
-	}
-}
-
-void PIOS_RFM22_processPendingISR(uint32_t wait_ms)
-{
-	bool valid = PIOS_RFM22B_validate(g_rfm22b_dev);
-	PIOS_Assert(valid);
-
-	if ( xSemaphoreTake(g_rfm22b_dev->isrPending,  wait_ms / portTICK_RATE_MS) == pdTRUE ) {
-		rfm32_irqs_processed++;
-		rfm22_processInt();
 	}
 }
 

@@ -441,11 +441,9 @@ static void StatusHandler(PHStatusPacketHandle status, int8_t rssi, int8_t afc)
  */
 static void radioStatusTask(void *parameters)
 {
-	static	portTickType lastSysTime;
 	PHStatusPacket status_packet;
-	while (1) {
-		lastSysTime = xTaskGetTickCount();
 
+	while (1) {
 		PipXStatusData pipxStatus;
 		uint32_t pairID;
 
@@ -524,12 +522,7 @@ static void radioStatusTask(void *parameters)
 			}
 		}
 
-		portTickType timeSinceUpdate;
-		do {
-			PIOS_RFM22_processPendingISR(5);
-			timeSinceUpdate = xTaskGetTickCount() - lastSysTime;
-		}
-		while(timeSinceUpdate < STATS_UPDATE_PERIOD_MS / portTICK_RATE_MS);
+		vTaskDelay(STATS_UPDATE_PERIOD_MS / portTICK_RATE_MS);
 	}
 }
 

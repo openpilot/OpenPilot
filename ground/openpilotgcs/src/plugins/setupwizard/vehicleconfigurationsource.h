@@ -47,7 +47,7 @@ struct actuatorChannelSettings {
     quint16 channelMax;
 
     //Default values
-    actuatorChannelSettings(): channelMin(1000), channelNeutral(1080), channelMax(1800) {}
+    actuatorChannelSettings(): channelMin(1000), channelNeutral(1080), channelMax(1900) {}
 };
 
 

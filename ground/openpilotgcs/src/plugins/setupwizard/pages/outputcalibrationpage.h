@@ -58,9 +58,6 @@ private slots:
     void on_motorNeutralButton_toggled(bool checked);
     void on_motorNeutralSlider_valueChanged(int value);
 
-    void on_motorMaxButton_toggled(bool checked);
-    void on_motorMaxSlider_valueChanged(int position);
-
     void on_servoCenterButton_toggled(bool checked);
     void on_servoCenterSlider_valueChanged(int position);
 

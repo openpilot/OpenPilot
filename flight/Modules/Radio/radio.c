@@ -166,8 +166,10 @@ static int32_t RadioInitialize(void)
 	HwSettingsInitialize();
 	uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
 	HwSettingsOptionalModulesGet(optionalModules);
-	if (optionalModules[HWSETTINGS_OPTIONALMODULES_RADIO] != HWSETTINGS_OPTIONALMODULES_ENABLED)
+	if (optionalModules[HWSETTINGS_OPTIONALMODULES_RADIO] != HWSETTINGS_OPTIONALMODULES_ENABLED) {
+		pios_packet_handler = 0;
 		return -1;
+	}
 #endif
 
 	// Initalize out UAVOs

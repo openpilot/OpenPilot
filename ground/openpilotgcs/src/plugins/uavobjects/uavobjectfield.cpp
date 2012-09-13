@@ -121,16 +121,16 @@ void UAVObjectField::limitsInitialize(const QString &limits)
                 continue;
             QStringList valuesPerElement=_str.split(":");
             LimitStruct lstruc;
-            bool b1=valuesPerElement.at(0).startsWith("%");
-            bool b2=(int)(index)<(int)numElements;
-            bool b3=valuesPerElement.at(0).size()==3;
-            bool auxb;
-            valuesPerElement.at(0).mid(1,4).toInt(&auxb,16);
-            bool b4=((valuesPerElement.at(0).size())==7 && auxb);
-            if(b1 && b2 && (b3 || b4))
+            bool startFlag=valuesPerElement.at(0).startsWith("%");
+            bool maxIndexFlag=(int)(index)<(int)numElements;
+            bool elemNumberSizeFlag=valuesPerElement.at(0).size()==3;
+            bool aux;
+            valuesPerElement.at(0).mid(1,4).toInt(&aux,16);
+            bool b4=((valuesPerElement.at(0).size())==7 && aux);
+            if(startFlag && maxIndexFlag && (elemNumberSizeFlag || b4))
             {
                 if(b4)
-                    lstruc.board=valuesPerElement.at(0).mid(1,4).toInt(&auxb,16);
+                    lstruc.board=valuesPerElement.at(0).mid(1,4).toInt(&aux,16);
                 else
                     lstruc.board=0;
                 if(valuesPerElement.at(0).right(2)=="EQ")
@@ -179,11 +179,11 @@ void UAVObjectField::limitsInitialize(const QString &limits)
             }
             else
             {
-                if(!valuesPerElement.at(0).isEmpty() && !b1)
+                if(!valuesPerElement.at(0).isEmpty() && !startFlag)
                     qDebug()<<"limits parsing failed (property doesn't start with %) on UAVObjectField"<<name;
-                else if(!b2)
+                else if(!maxIndexFlag)
                     qDebug()<<"limits parsing failed (index>numelements) on UAVObjectField"<<name<<"index"<<index<<"numElements"<<numElements;
-                else if(!b3 || !b4 )
+                else if(!elemNumberSizeFlag || !b4 )
                     qDebug()<<"limits parsing failed limit not starting with %XX or %YYYYXX where XX is the limit type and YYYY is the board type on UAVObjectField"<<name;
             }
         }

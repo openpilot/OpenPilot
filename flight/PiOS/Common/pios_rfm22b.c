@@ -97,18 +97,6 @@
 #define SYNC_BYTE_4						0x59    //
 
 // ************************************
-// the default TX power level
-
-#define RFM22_DEFAULT_RF_POWER			RFM22_tx_pwr_txpow_0    // +1dBm ... 1.25mW
-//#define RFM22_DEFAULT_RF_POWER		RFM22_tx_pwr_txpow_1    // +2dBm ... 1.6mW
-//#define RFM22_DEFAULT_RF_POWER		RFM22_tx_pwr_txpow_2    // +5dBm ... 3.16mW
-//#define RFM22_DEFAULT_RF_POWER		RFM22_tx_pwr_txpow_3    // +8dBm ... 6.3mW
-//#define RFM22_DEFAULT_RF_POWER		RFM22_tx_pwr_txpow_4    // +11dBm .. 12.6mW
-//#define RFM22_DEFAULT_RF_POWER		RFM22_tx_pwr_txpow_5    // +14dBm .. 25mW
-//#define RFM22_DEFAULT_RF_POWER		RFM22_tx_pwr_txpow_6    // +17dBm .. 50mW
-//#define RFM22_DEFAULT_RF_POWER		RFM22_tx_pwr_txpow_7    // +20dBm .. 100mW
-
-// ************************************
 // the default RF datarate
 
 //#define RFM22_DEFAULT_RF_DATARATE       500          // 500 bits per sec
@@ -180,6 +168,9 @@ struct pios_rfm22b_dev {
 	// The supervisor countdown timer.
 	uint16_t supv_timer;
 	uint16_t resets;
+
+	// the transmit power to use for data transmissions
+	uint8_t	tx_power;
 
 	// Stats
 	uint32_t rfm32_errors;
@@ -345,8 +336,6 @@ volatile uint8_t	osc_load_cap;						// xtal frequency calibration value
 volatile uint8_t	rssi;								// the current RSSI (register value)
 volatile int8_t	rssi_dBm;							// dBm value
 
-// the transmit power to use for data transmissions
-uint8_t				tx_power;
 // the tx power register read back
 volatile uint8_t	tx_pwr;
 
@@ -456,6 +445,9 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
 	// Initialize the TX pre-buffer pointer.
 	tx_pre_buffer_size = 0;
 
+	// Initialize the max tx power level.
+	PIOS_RFM22B_SetTxPower(*rfm22b_id, cfg->maxTxPower);
+
 	// Create our (hopefully) unique 32 bit id from the processor serial number.
 	uint8_t crcs[] = { 0, 0, 0, 0 };
 	{
@@ -511,13 +503,12 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
 	rfm22_setFreqCalibration(cfg->RFXtalCap);
 	rfm22_setNominalCarrierFrequency(cfg->frequencyHz);
 	rfm22_setDatarate(cfg->maxRFBandwidth, true);
-	rfm22_setTxPower(cfg->maxTxPower);
 
 	DEBUG_PRINTF(2, "\n\r");
 	DEBUG_PRINTF(2, "RF device ID: %x\n\r", rfm22b_dev->deviceID);
 	DEBUG_PRINTF(2, "RF datarate: %dbps\n\r", rfm22_getDatarate());
 	DEBUG_PRINTF(2, "RF frequency: %dHz\n\r", rfm22_getNominalCarrierFrequency());
-	DEBUG_PRINTF(2, "RF TX power: %d\n\r", rfm22_getTxPower());
+	DEBUG_PRINTF(2, "RF TX power: %d\n\r", rfm22b_dev->tx_power);
 
 	// Register the watchdog timer for the radio driver task
 #ifdef PIOS_WDG_RFM22B
@@ -540,6 +531,26 @@ uint32_t PIOS_RFM22B_DeviceID(uint32_t rfm22b_id)
 	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
 
 	return rfm22b_dev->deviceID;
+}
+
+void PIOS_RFM22B_SetTxPower(uint32_t rfm22b_id, uint8_t tx_pwr)
+{
+	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
+	bool valid = PIOS_RFM22B_validate(rfm22b_dev);
+	PIOS_Assert(valid);
+
+	switch (tx_pwr)
+	{
+	case 0: rfm22b_dev->tx_power = RFM22_tx_pwr_txpow_0; break;    // +1dBm ... 1.25mW
+	case 1: rfm22b_dev->tx_power = RFM22_tx_pwr_txpow_1; break;    // +2dBm ... 1.6mW
+	case 2: rfm22b_dev->tx_power = RFM22_tx_pwr_txpow_2; break;    // +5dBm ... 3.16mW
+	case 3: rfm22b_dev->tx_power = RFM22_tx_pwr_txpow_3; break;    // +8dBm ... 6.3mW
+	case 4: rfm22b_dev->tx_power = RFM22_tx_pwr_txpow_4; break;    // +11dBm .. 12.6mW
+	case 5: rfm22b_dev->tx_power = RFM22_tx_pwr_txpow_5; break;    // +14dBm .. 25mW
+	case 6: rfm22b_dev->tx_power = RFM22_tx_pwr_txpow_6; break;    // +17dBm .. 50mW
+	case 7: rfm22b_dev->tx_power = RFM22_tx_pwr_txpow_7; break;    // +20dBm .. 100mW
+	default: break;
+	}
 }
 
 int8_t PIOS_RFM22B_RSSI(uint32_t rfm22b_id)
@@ -822,30 +833,6 @@ void PIOS_RFM22_EXT_Int(void)
 		}
 		portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
 	}
-}
-
-// ************************************
-// set/get the current tx power setting
-
-void rfm22_setTxPower(uint8_t tx_pwr)
-{
-	switch (tx_pwr)
-	{
-	case 0: tx_power = RFM22_tx_pwr_txpow_0; break;    // +1dBm ... 1.25mW
-	case 1: tx_power = RFM22_tx_pwr_txpow_1; break;    // +2dBm ... 1.6mW
-	case 2: tx_power = RFM22_tx_pwr_txpow_2; break;    // +5dBm ... 3.16mW
-	case 3: tx_power = RFM22_tx_pwr_txpow_3; break;    // +8dBm ... 6.3mW
-	case 4: tx_power = RFM22_tx_pwr_txpow_4; break;    // +11dBm .. 12.6mW
-	case 5: tx_power = RFM22_tx_pwr_txpow_5; break;    // +14dBm .. 25mW
-	case 6: tx_power = RFM22_tx_pwr_txpow_6; break;    // +17dBm .. 50mW
-	case 7: tx_power = RFM22_tx_pwr_txpow_7; break;    // +20dBm .. 100mW
-	default: break;
-	}
-}
-
-uint8_t rfm22_getTxPower(void)
-{
-	return tx_power;
 }
 
 // ************************************
@@ -1238,7 +1225,7 @@ uint8_t rfm22_txStart()
 
 	// set the tx power
 	rfm22_write(RFM22_tx_power, RFM22_tx_pwr_papeaken | RFM22_tx_pwr_papeaklvl_1 |
-		    RFM22_tx_pwr_papeaklvl_0 | RFM22_tx_pwr_lna_sw | tx_power);
+		    RFM22_tx_pwr_papeaklvl_0 | RFM22_tx_pwr_lna_sw | g_rfm22b_dev->tx_power);
 
 	// clear FIFOs
 	rfm22_write(RFM22_op_and_func_ctrl2, RFM22_opfc2_ffclrrx | RFM22_opfc2_ffclrtx);
@@ -1301,7 +1288,7 @@ static void rfm22_setTxMode(uint8_t mode)
 
 	// Set the tx power
 	rfm22_write_noclaim(RFM22_tx_power,RFM22_tx_pwr_papeaken | RFM22_tx_pwr_papeaklvl_1 |
-		    RFM22_tx_pwr_papeaklvl_0 | RFM22_tx_pwr_lna_sw | tx_power);
+		    RFM22_tx_pwr_papeaklvl_0 | RFM22_tx_pwr_lna_sw | g_rfm22b_dev->tx_power);
 
 	uint8_t fd_bit = rfm22_read_noclaim(RFM22_modulation_mode_control2) & RFM22_mmc2_fd;
 	if (mode == TX_CARRIER_MODE)
@@ -1933,9 +1920,6 @@ int rfm22_resetModule(uint8_t mode, uint32_t min_frequency_hz, uint32_t max_freq
 
 	temperature_reg = 0;
 
-	// set the TX power
-	tx_power = RFM22_DEFAULT_RF_POWER;
-
 	tx_pwr = 0;
 
 	// ****************
@@ -2123,7 +2107,7 @@ int rfm22_init_normal(uint32_t id, uint32_t min_frequency_hz, uint32_t max_frequ
 
 	// set the tx power
 	rfm22_write(RFM22_tx_power, RFM22_tx_pwr_papeaken | RFM22_tx_pwr_papeaklvl_0 |
-							RFM22_tx_pwr_lna_sw | tx_power);
+							RFM22_tx_pwr_lna_sw | g_rfm22b_dev->tx_power);
 
 	// TX FIFO Almost Full Threshold (0 - 63)
 	rfm22_write(RFM22_tx_fifo_control1, TX_FIFO_HI_WATERMARK);

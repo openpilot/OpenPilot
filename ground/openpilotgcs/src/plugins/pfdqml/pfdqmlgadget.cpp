@@ -38,6 +38,7 @@ PfdQmlGadget::~PfdQmlGadget()
 void PfdQmlGadget::loadConfiguration(IUAVGadgetConfiguration* config)
 {
     PfdQmlGadgetConfiguration *m = qobject_cast<PfdQmlGadgetConfiguration*>(config);
+    m_widget->setOpenGLEnabled(m->openGLEnabled());
     m_widget->setQmlFile(m->qmlFile());
     m_widget->setEarthFile(m->earthFile());
     m_widget->setTerrainEnabled(m->terrainEnabled());

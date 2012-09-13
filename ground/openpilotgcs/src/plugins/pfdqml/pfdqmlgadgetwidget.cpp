@@ -34,6 +34,7 @@
 
 PfdQmlGadgetWidget::PfdQmlGadgetWidget(QWidget *parent) :
     QDeclarativeView(parent),
+    m_openGLEnabled(false),
     m_terrainEnabled(false),
     m_actualPositionUsed(false),
     m_latitude(46.671478),
@@ -44,12 +45,15 @@ PfdQmlGadgetWidget::PfdQmlGadgetWidget(QWidget *parent) :
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     setResizeMode(SizeRootObjectToView);
 
-    setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
+    //setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
 
     QStringList objectsToExport;
     objectsToExport << "VelocityActual" <<
                        "PositionActual" <<
                        "AttitudeActual" <<
+                       "VelocityDesired" <<
+                       "PositionDesired" <<
+                       "AttitudeHoldDesired" <<
                        "GPSPosition" <<
                        "GCSTelemetryStats" <<
                        "FlightBatteryState";
@@ -106,9 +110,26 @@ void PfdQmlGadgetWidget::setEarthFile(QString arg)
 
 void PfdQmlGadgetWidget::setTerrainEnabled(bool arg)
 {
-    if (m_terrainEnabled != arg) {
-        m_terrainEnabled = arg;
-        emit terrainEnabledChanged(arg);
+    bool wasEnabled = terrainEnabled();
+    m_terrainEnabled = arg;
+
+    if (wasEnabled != terrainEnabled())
+        emit terrainEnabledChanged(terrainEnabled());
+}
+
+void PfdQmlGadgetWidget::setOpenGLEnabled(bool arg)
+{
+    if (m_openGLEnabled != arg) {
+        m_openGLEnabled = arg;
+
+        qDebug() << Q_FUNC_INFO << "Set OPENGL" << m_openGLEnabled;
+        if (m_openGLEnabled)
+            setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
+        else
+            setViewport(new QWidget);
+
+        //update terrainEnabled status with opengl status chaged
+        setTerrainEnabled(m_terrainEnabled);
     }
 }
 

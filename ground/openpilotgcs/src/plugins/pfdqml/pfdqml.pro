@@ -3,7 +3,9 @@ TARGET = PfdQml
 QT += svg
 QT += opengl
 QT += declarative
-#DEFINES += USE_OSG
+OSG {
+    DEFINES += USE_OSG
+}
 
 include(../../openpilotgcsplugin.pri)
 include(../../plugins/coreplugin/coreplugin.pri)

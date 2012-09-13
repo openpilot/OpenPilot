@@ -40,7 +40,7 @@ ControllerPage::ControllerPage(SetupWizard *wizard, QWidget *parent) :
 
     m_connectionManager = getWizard()->getConnectionManager();
     Q_ASSERT(m_connectionManager);
-    connect(m_connectionManager, SIGNAL(availableDevicesChanged(QLinkedList<Core::devListItem>)), this, SLOT(devicesChanged(QLinkedList<Core::devListItem>)));
+    connect(m_connectionManager, SIGNAL(availableDevicesChanged(QLinkedList<Core::DevListItem>)), this, SLOT(devicesChanged(QLinkedList<Core::DevListItem>)));
 
     connect(m_connectionManager, SIGNAL(deviceConnected(QIODevice*)), this, SLOT(connectionStatusChanged()));
     connect(m_connectionManager, SIGNAL(deviceDisconnected()), this, SLOT(connectionStatusChanged()));
@@ -132,7 +132,7 @@ void ControllerPage::setControllerType(SetupWizard::CONTROLLER_TYPE type)
     }
 }
 
-void ControllerPage::devicesChanged(QLinkedList<Core::devListItem> devices)
+void ControllerPage::devicesChanged(QLinkedList<Core::DevListItem> devices)
 {
     // Get the selected item before the update if any
     QString currSelectedDeviceName = ui->deviceCombo->currentIndex() != -1 ?
@@ -145,10 +145,10 @@ void ControllerPage::devicesChanged(QLinkedList<Core::devListItem> devices)
     int i = 0;
 
     // Loop and fill the combo with items from connectionmanager
-    foreach (Core::devListItem device, devices)
+    foreach (Core::DevListItem deviceItem, devices)
     {
-        ui->deviceCombo->addItem(device.displayName);
-        QString deviceName = (const QString)device.devName;
+        ui->deviceCombo->addItem(deviceItem.getConName());
+        QString deviceName = (const QString)deviceItem.getConName();
         ui->deviceCombo->setItemData(ui->deviceCombo->count() - 1, deviceName, Qt::ToolTipRole);
         if(currSelectedDeviceName != "" && currSelectedDeviceName == deviceName) {
             indexOfSelectedItem = i;
@@ -169,7 +169,7 @@ void ControllerPage::connectionStatusChanged()
         ui->deviceCombo->setEnabled(false);
         ui->connectButton->setText(tr("Disconnect"));
         ui->boardTypeCombo->setEnabled(false);
-        QString connectedDeviceName = m_connectionManager->getCurrentDevice().devName;
+        QString connectedDeviceName = m_connectionManager->getCurrentDevice().getConName();
         for(int i = 0; i < ui->deviceCombo->count(); ++i) {
             if(connectedDeviceName == ui->deviceCombo->itemData(i, Qt::ToolTipRole).toString()) {
                 ui->deviceCombo->setCurrentIndex(i);

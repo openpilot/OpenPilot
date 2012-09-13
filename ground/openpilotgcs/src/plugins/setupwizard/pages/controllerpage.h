@@ -58,7 +58,7 @@ private:
     Core::ConnectionManager *m_connectionManager;
 
 private slots:
-    void devicesChanged(QLinkedList<Core::devListItem> devices);
+    void devicesChanged(QLinkedList<Core::DevListItem> devices);
     void connectionStatusChanged();
     void connectDisconnect();
 };

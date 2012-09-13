@@ -32,6 +32,7 @@
 #include <QWidget>
 #include "mainwindow.h"
 #include "generalsettings.h"
+#include <coreplugin/iconnection.h>
 #include <QtCore/QVector>
 #include <QtCore/QIODevice>
 #include <QtCore/QLinkedList>
@@ -55,12 +56,26 @@ class MainWindow;
 } // namespace Internal
 
 
-struct devListItem
+class DevListItem
 {
+public:
+    DevListItem(IConnection *c, IConnection::device d) :
+        connection(c), device(d) { }
+
+    DevListItem() : connection(NULL) { }
+
+    QString getConName() {
+        if (connection == NULL)
+            return "";
+        return connection->shortName() + ": " + device.displayName;
+    }
+
+    bool operator==(const DevListItem &rhs) {
+        return connection == rhs.connection && device == rhs.device;
+    }
+
     IConnection *connection;
-    QString devName;
-    QString Name;
-    QString displayName;
+    IConnection::device device;
 };
 
 
@@ -75,28 +90,29 @@ public:
     void init();
 
     QIODevice* getCurrentConnection() { return m_ioDev; }
-    devListItem getCurrentDevice() { return m_connectionDevice; }
-    devListItem findDevice(const QString &devName);
+    DevListItem getCurrentDevice() { return m_connectionDevice; }
+    DevListItem findDevice(const QString &devName);
 
-    QLinkedList<devListItem> getAvailableDevices() { return m_devList; }
+    QLinkedList<DevListItem> getAvailableDevices() { return m_devList; }
 
     bool isConnected() { return m_ioDev != 0; }
 
-    bool connectDevice(devListItem device);
+    bool connectDevice(DevListItem device);
     bool disconnectDevice();
 
     void suspendPolling();
     void resumePolling();
 
 protected:
-    void unregisterAll(IConnection *connection);
-    void registerDevice(IConnection *conn, const QString &devN, const QString &name, const QString &disp);
+    void updateConnectionList(IConnection *connection);
+    void registerDevice(IConnection *conn, IConnection::device device);
+    void updateConnectionDropdown();
 
 signals:
-    void deviceConnected(QIODevice *dev);
+    void deviceConnected(QIODevice *device);
     void deviceDisconnected();
     void deviceAboutToDisconnect();
-    void availableDevicesChanged(const QLinkedList<Core::devListItem> devices);
+    void availableDevicesChanged(const QLinkedList<Core::DevListItem> devices);
 
 private slots:
     void objectAdded(QObject *obj);
@@ -105,22 +121,23 @@ private slots:
     void onConnectPressed();
     void devChanged(IConnection *connection);
 
-    //	void onConnectionClosed(QObject *obj);
-    void onConnectionDestroyed(QObject *obj);
+	void onConnectionDestroyed(QObject *obj);
     void connectionsCallBack(); //used to call devChange after all the plugins are loaded
 protected:
     QComboBox *m_availableDevList;
     QPushButton *m_connectBtn;
-    QLinkedList<devListItem> m_devList;
+    QLinkedList<DevListItem> m_devList;
     QList<IConnection*> m_connectionsList;
 
     //currently connected connection plugin
-    devListItem m_connectionDevice;
+    DevListItem m_connectionDevice;
 
     //currently connected QIODevice
     QIODevice *m_ioDev;
 
 private:
+	bool connectDevice();
+    bool polling;
     Internal::MainWindow *m_mainWindow;
     QList <IConnection *> connectionBackup;
 

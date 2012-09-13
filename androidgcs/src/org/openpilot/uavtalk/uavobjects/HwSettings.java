@@ -194,6 +194,7 @@ public class HwSettings extends UAVDataObject {
 		USB_HIDPortElemNames.add("0");
 		List<String> USB_HIDPortEnumOptions = new ArrayList<String>();
 		USB_HIDPortEnumOptions.add("USBTelemetry");
+		USB_HIDPortEnumOptions.add("RCTransmitter");
 		USB_HIDPortEnumOptions.add("Disabled");
 		fields.add( new UAVObjectField("USB_HIDPort", "function", UAVObjectField.FieldType.ENUM, USB_HIDPortElemNames, USB_HIDPortEnumOptions) );
 
@@ -212,6 +213,7 @@ public class HwSettings extends UAVDataObject {
 		OptionalModulesElemNames.add("Fault");
 		OptionalModulesElemNames.add("Altitude");
 		OptionalModulesElemNames.add("TxPID");
+		OptionalModulesElemNames.add("Autotune");
 		List<String> OptionalModulesEnumOptions = new ArrayList<String>();
 		OptionalModulesEnumOptions.add("Disabled");
 		OptionalModulesEnumOptions.add("Enabled");
@@ -266,7 +268,7 @@ public class HwSettings extends UAVDataObject {
 	public void setDefaultFieldValues()
 	{
 		getField("CC_RcvrPort").setValue("PWM");
-		getField("CC_MainPort").setValue("Disabled");
+		getField("CC_MainPort").setValue("Telemetry");
 		getField("CC_FlexiPort").setValue("Disabled");
 		getField("RV_RcvrPort").setValue("PWM");
 		getField("RV_AuxPort").setValue("Disabled");
@@ -285,6 +287,7 @@ public class HwSettings extends UAVDataObject {
 		getField("OptionalModules").setValue("Disabled",3);
 		getField("OptionalModules").setValue("Disabled",4);
 		getField("OptionalModules").setValue("Disabled",5);
+		getField("OptionalModules").setValue("Disabled",6);
 		getField("DSMxBind").setValue(0);
 
 	}
@@ -314,7 +317,7 @@ public class HwSettings extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0x9408E9F0l;
+	protected static final long OBJID = 0x428D4DCEl;
 	protected static final String NAME = "HwSettings";
 	protected static String DESCRIPTION = "Selection of optional hardware configurations.";
 	protected static final boolean ISSINGLEINST = 1 > 0;

@@ -56,7 +56,6 @@ public class SystemAlarms extends UAVDataObject {
 		AlarmElemNames.add("StackOverflow");
 		AlarmElemNames.add("CPUOverload");
 		AlarmElemNames.add("EventSystem");
-		AlarmElemNames.add("SDCard");
 		AlarmElemNames.add("Telemetry");
 		AlarmElemNames.add("ManualControl");
 		AlarmElemNames.add("Actuator");
@@ -64,7 +63,6 @@ public class SystemAlarms extends UAVDataObject {
 		AlarmElemNames.add("Sensors");
 		AlarmElemNames.add("Stabilization");
 		AlarmElemNames.add("Guidance");
-		AlarmElemNames.add("AHRSComms");
 		AlarmElemNames.add("Battery");
 		AlarmElemNames.add("FlightTime");
 		AlarmElemNames.add("I2C");
@@ -138,8 +136,6 @@ public class SystemAlarms extends UAVDataObject {
 		getField("Alarm").setValue("Uninitialised",13);
 		getField("Alarm").setValue("Uninitialised",14);
 		getField("Alarm").setValue("Uninitialised",15);
-		getField("Alarm").setValue("Uninitialised",16);
-		getField("Alarm").setValue("Uninitialised",17);
 
 	}
 
@@ -168,7 +164,7 @@ public class SystemAlarms extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0x9C7CBFEl;
+	protected static final long OBJID = 0x7BD9C77Al;
 	protected static final String NAME = "SystemAlarms";
 	protected static String DESCRIPTION = "Alarms from OpenPilot to indicate failure conditions or warnings.  Set by various modules.";
 	protected static final boolean ISSINGLEINST = 1 > 0;

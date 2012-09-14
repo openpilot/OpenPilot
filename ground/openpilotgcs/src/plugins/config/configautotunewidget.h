@@ -1,13 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       configccattitudewidget.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @file       configautotunewidget.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup ConfigPlugin Config Plugin
  * @{
- * @brief Configure the properties of the attitude module in CopterControl
+ * @brief The Configuration Gadget used to adjust or recalculate autotuning
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -24,52 +24,37 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef CCATTITUDEWIDGET_H
-#define CCATTITUDEWIDGET_H
+#ifndef CONFIGAUTOTUNE_H
+#define CONFIGAUTOTUNE_H
 
-#include "ui_ccattitude.h"
+#include "ui_autotune.h"
 #include "../uavobjectwidgetutils/configtaskwidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
+#include "stabilizationsettings.h"
+#include "relaytuningsettings.h"
+#include "relaytuning.h"
 #include <QtGui/QWidget>
 #include <QTimer>
 
-class Ui_Widget;
-
-class ConfigCCAttitudeWidget : public ConfigTaskWidget
+class ConfigAutotuneWidget : public ConfigTaskWidget
 {
     Q_OBJECT
-
 public:
-    explicit ConfigCCAttitudeWidget(QWidget *parent = 0);
-    ~ConfigCCAttitudeWidget();
-
-    virtual void updateObjectsFromWidgets();
-
-private slots:
-    void sensorsUpdated(UAVObject * obj);
-    void timeout();
-    void startAccelCalibration();
-    void openHelp();
+    explicit ConfigAutotuneWidget(QWidget *parent = 0);
 
 private:
-    Ui_ccattitude *ui;
-    QTimer timer;
-    UAVObject::Metadata initialAccelsMdata;
-    UAVObject::Metadata initialGyrosMdata;
+    Ui_AutotuneWidget *m_autotune;
+    StabilizationSettings::DataFields stabSettings;
 
-    int accelUpdates;
-    int gyroUpdates;
+signals:
 
-    QList<double> x_accum, y_accum, z_accum;
-    QList<double> x_gyro_accum, y_gyro_accum, z_gyro_accum;
+public slots:
 
-    static const int NUM_SENSOR_UPDATES = 300;
-    static const float ACCEL_SCALE = 0.004f * 9.81f;
-protected:
-    virtual void enableControls(bool enable);
-
+private slots:
+    void recomputeStabilization();
+    void saveStabilization();
 };
 
-#endif // CCATTITUDEWIDGET_H
+#endif // CONFIGAUTOTUNE_H

@@ -31,7 +31,6 @@
 #include "rawhid_global.h"
 #include "rawhid.h"
 #include "usbmonitor.h"
-#include "usbsignalfilter.h"
 #include "coreplugin/iconnection.h"
 #include <extensionsystem/iplugin.h>
 

@@ -250,6 +250,40 @@ def xtrim(string, suffix, length):
         assert n > 0, "length of truncated string+suffix exceeds maximum length"
         return ''.join([string[:n], '+', suffix])
 
+def GetHashofDirs(directory, verbose=0):
+  import hashlib, os
+  SHAhash = hashlib.sha1()
+  if not os.path.exists (directory):
+    return -1
+    
+  try:
+    for root, dirs, files in os.walk(directory):
+      for names in files:
+        if verbose == 1:
+          print 'Hashing', names
+        filepath = os.path.join(root,names)
+        try:
+          f1 = open(filepath, 'rb')
+        except:
+          # You can't open the file for some reason
+          f1.close()
+          continue
+
+	while 1:
+	  # Read file in as little chunks
+  	  buf = f1.read(4096)
+	  if not buf : break
+	  SHAhash.update(hashlib.sha1(buf).hexdigest())
+        f1.close()
+
+  except:
+    import traceback
+    # Print the stack traceback
+    traceback.print_exc()
+    return -2
+  hex_stream = lambda s:",".join(['0x'+hex(ord(c))[2:].zfill(2) for c in s])
+  return hex_stream(SHAhash.digest())
+
 def main():
     """This utility uses git repository in the current working directory
 or from the given path to extract some info about it and HEAD commit.
@@ -302,7 +336,8 @@ dependent targets.
                         help='board type, for example, 0x04 for CopterControl');
     parser.add_option('--revision', default = "",
                         help='board revision, for example, 0x01');
-
+    parser.add_option('--uavodir', default = "",
+                        help='uav object definition directory');
     (args, positional_args) = parser.parse_args()
     if len(positional_args) != 0:
         parser.error("incorrect number of arguments, try --help for help")
@@ -328,6 +363,7 @@ dependent targets.
         BOARD_TYPE = args.type,
         BOARD_REVISION = args.revision,
         SHA1 = sha1(args.image),
+	UAVOSHA1= GetHashofDirs(args.uavodir,0),
     )
 
     if args.info:

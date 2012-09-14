@@ -53,7 +53,8 @@ struct __attribute__((packed)) fw_version_info {
 	uint8_t board_revision;
 	uint8_t commit_tag_name[26];
 	uint8_t sha1sum[20];
-	uint8_t pad[40];
+	uint8_t uavosha1[20];
+	uint8_t pad[20];
 };
 
 const struct fw_version_info fw_version_blob __attribute__((used)) __attribute__((__section__(".fw_version_blob"))) = {
@@ -64,6 +65,7 @@ const struct fw_version_info fw_version_blob __attribute__((used)) __attribute__
 	.board_revision = ${BOARD_REVISION},
 	.commit_tag_name = "${FWTAG}",
 	.sha1sum = { ${SHA1} },
+	.uavosha1 = { ${UAVOSHA1} },
 }; 
 
 /**

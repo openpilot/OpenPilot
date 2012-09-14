@@ -71,18 +71,18 @@ bool MultiPage::validatePage()
 void MultiPage::setupMultiTypesCombo()
 {
     ui->typeCombo->addItem(tr("Tricopter"), SetupWizard::MULTI_ROTOR_TRI_Y);
-    m_descriptions << tr("The Tricopter uses three motors and one servo. The servo is used to give yaw authority to the aft motor. "
-                         "The fore motors are rotating in opposite directions. The Tricopter is known for its sweeping yaw movement and "
+    m_descriptions << tr("The Tricopter uses three motors and one servo. The servo is used to give yaw authority to the rear motor. "
+                         "The front motors are rotating in opposite directions. The Tricopter is known for its sweeping yaw movement and "
                          "it is very well suited for FPV since the front rotors are spread wide apart.");
 
     ui->typeCombo->addItem(tr("Quadcopter X"), SetupWizard::MULTI_ROTOR_QUAD_X);
-    m_descriptions << tr("The X Quadcopter uses four motors and is the most common multi rotor configuration. Two of the motors rotates clockwise "
-                         "and two counter clockwise. The motors positioned diagonal of each other rotates in the same direction. "
+    m_descriptions << tr("The X Quadcopter uses four motors and is the most common multi rotor configuration. Two of the motors rotate clockwise "
+                         "and two counter clockwise. The motors positioned diagonal to each other rotate in the same direction. "
                          "This setup is perfect for sport flying and is also commonly used for FPV platforms.");
 
     ui->typeCombo->addItem(tr("Quadcopter +"), SetupWizard::MULTI_ROTOR_QUAD_PLUS);
     m_descriptions << tr("The Plus(+) Quadcopter uses four motors and is similar to the X Quadcopter but the forward direction is offset by 45 degrees. "
-                         "The motors fore and aft rotates in one direction and the motors steerboard and port rotates in the other. "
+                         "The motors front and rear rotate in clockwise and the motors right and left rotate counter-clockwise. "
                          "This setup was one of the first to be used and is still used for sport flying. This configuration is not that well suited "
                          "for FPV since the fore rotor tend to be in the way of the camera.");
 

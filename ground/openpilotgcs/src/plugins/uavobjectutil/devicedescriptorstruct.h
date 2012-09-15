@@ -8,6 +8,7 @@ public:
        QString gitHash;
        QString gitDate;
        QString gitTag;
+       QString uavoHash;
        int boardType;
        int boardRevision;
        static QString idToBoardName(int id)

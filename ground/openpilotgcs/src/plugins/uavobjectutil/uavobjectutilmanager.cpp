@@ -641,7 +641,8 @@ bool UAVObjectUtilManager::descriptionToStructure(QByteArray desc, deviceDescrip
         *  26 bytes: commit tag if it is there, otherwise "Unreleased". Zero-padded
         *   ---- 40 bytes limit ---
         *  20 bytes: SHA1 sum of the firmware.
-        *  40 bytes: free for now.
+        *  20 bytes: SHA1 sum of the UAVO definition files.
+        *  20 bytes: free for now.
         */
 
        // Note: the ARM binary is big-endian:
@@ -667,6 +668,7 @@ bool UAVObjectUtilManager::descriptionToStructure(QByteArray desc, deviceDescrip
        struc->boardType = (int)targetPlatform.at(0);
        struc->boardRevision = (int)targetPlatform.at(1);
 
+       struc->uavoHash=desc.mid(46,20);
        return true;
    }
    return false;

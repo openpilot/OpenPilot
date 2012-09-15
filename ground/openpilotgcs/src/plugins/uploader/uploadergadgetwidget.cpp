@@ -651,16 +651,14 @@ void UploaderGadgetWidget::versionMatchCheck()
     UAVObjectUtilManager *utilMngr = pm->getObject<UAVObjectUtilManager>();
     deviceDescriptorStruct boardDescription = utilMngr->getBoardDescriptionStruct();
 
-    QString gcsDescription = QString::fromLatin1(Core::Constants::GCS_REVISION_STR);
-    QString gcsGitHash = gcsDescription.mid(gcsDescription.indexOf(":")+1, 8);
-    gcsGitHash.remove( QRegExp("^[0]*") );
-    QString gcsGitDate = gcsDescription.mid(gcsDescription.indexOf(" ")+1, 14);
-    QString gcsVersion = gcsGitDate + " (" + gcsGitHash + ")";
-    QString fwVersion = boardDescription.gitDate + " (" + boardDescription.gitHash + ")";
+    QString uavoHash = QString::fromLatin1(Core::Constants::UAVOSHA1_STR);
+    uavoHash.remove( QRegExp("^[0]*") );
+    QString gcsVersion = uavoHash;
+    QString fwVersion =  boardDescription.gitHash;
 
-    if (boardDescription.gitHash != gcsGitHash) {
+    if (boardDescription.uavoHash != uavoHash) {
         QString warning = QString(tr(
-            "GCS and firmware versions do not match which can cause configuration problems. "
+            "GCS and firmware versions of the UAV object set do not match which can cause configuration problems. "
             "GCS version: %1. Firmware version: %2.")).arg(gcsVersion).arg(fwVersion);
         msg->showMessage(warning);
     }

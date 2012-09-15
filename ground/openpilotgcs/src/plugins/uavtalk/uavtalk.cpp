@@ -27,7 +27,8 @@
 #include "uavtalk.h"
 #include <QtEndian>
 #include <QDebug>
-
+#include <extensionsystem/pluginmanager.h>
+#include <coreplugin/generalsettings.h>
 //#define UAVTALK_DEBUG
 #ifdef UAVTALK_DEBUG
   #include "qxtlogger.h"
@@ -75,6 +76,19 @@ UAVTalk::UAVTalk(QIODevice* iodev, UAVObjectManager* objMngr)
     memset(&stats, 0, sizeof(ComStats));
 
     connect(io, SIGNAL(readyRead()), this, SLOT(processInputStream()));
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    Core::Internal::GeneralSettings * settings=pm->getObject<Core::Internal::GeneralSettings>();
+    useUDPMirror=settings->useUDPMirror();
+    qDebug()<<"USE UDP:::::::::::."<<useUDPMirror;
+    if(useUDPMirror)
+    {
+        udpSocketTx=new QUdpSocket(this);
+        udpSocketRx=new QUdpSocket(this);
+        udpSocketTx->bind(9000);
+        udpSocketRx->connectToHost(QHostAddress::LocalHost,9000);
+        connect(udpSocketTx,SIGNAL(readyRead()),this,SLOT(dummyUDPRead()));
+        connect(udpSocketRx,SIGNAL(readyRead()),this,SLOT(dummyUDPRead()));
+    }
 }
 
 UAVTalk::~UAVTalk()
@@ -116,6 +130,17 @@ void UAVTalk::processInputStream()
             io->read((char*)&tmp, 1);
             processInputByte(tmp);
         }
+    }
+}
+
+void UAVTalk::dummyUDPRead()
+{
+    QUdpSocket *socket=qobject_cast<QUdpSocket*>(sender());
+    QByteArray junk;
+    while(socket->hasPendingDatagrams())
+    {
+        junk.resize(socket->pendingDatagramSize());
+        socket->readDatagram(junk.data(),junk.size());
     }
 }
 
@@ -219,6 +244,9 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
 
     rxPacketLength++;   // update packet byte count
 
+    if(useUDPMirror)
+        rxDataArray.append(rxbyte);
+
     // Receive state machine
     switch (rxState)
     {
@@ -234,6 +262,12 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
             rxCS = updateCRC(0, rxbyte);
 
             rxPacketLength = 1;
+
+            if(useUDPMirror)
+            {
+                rxDataArray.clear();
+                rxDataArray.append(rxbyte);
+            }
 
             rxState = STATE_TYPE;
             UAVTALK_QXTLOG_DEBUG("UAVTalk: Sync->Type");
@@ -446,6 +480,10 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
 
             mutex->lock();
                 receiveObject(rxType, rxObjId, rxInstId, rxBuffer, rxLength);
+                if(useUDPMirror)
+                {
+                    udpSocketTx->writeDatagram(rxDataArray,QHostAddress::LocalHost,udpSocketRx->localPort());
+                }
                 stats.rxObjectBytes += rxLength;
                 stats.rxObjects++;
             mutex->unlock();
@@ -476,7 +514,6 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
 bool UAVTalk::receiveObject(quint8 type, quint32 objId, quint16 instId, quint8* data, qint32 length)
 {
     Q_UNUSED(length);
-
     UAVObject* obj = NULL;
     bool error = false;
     bool allInstances =  (instId == ALL_INSTANCES);
@@ -742,6 +779,10 @@ bool UAVTalk::transmitNack(quint32 objId)
     if (io && io->isWritable() && io->bytesToWrite() < TX_BUFFER_SIZE )
     {
         io->write((const char*)txBuffer, dataOffset+CHECKSUM_LENGTH);
+        if(useUDPMirror)
+        {
+            udpSocketRx->writeDatagram((const char*)txBuffer,dataOffset+CHECKSUM_LENGTH,QHostAddress::LocalHost,udpSocketTx->localPort());
+        }
     }
     else
     {
@@ -832,6 +873,10 @@ bool UAVTalk::transmitSingleObject(UAVObject* obj, quint8 type, bool allInstance
     if (!io.isNull() && io->isWritable() && io->bytesToWrite() < TX_BUFFER_SIZE )
     {
         io->write((const char*)txBuffer, dataOffset+length+CHECKSUM_LENGTH);
+        if(useUDPMirror)
+        {
+            udpSocketRx->writeDatagram((const char*)txBuffer,dataOffset+length+CHECKSUM_LENGTH,QHostAddress::LocalHost,udpSocketTx->localPort());
+        }
     }
     else
     {

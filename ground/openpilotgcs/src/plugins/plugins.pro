@@ -75,7 +75,11 @@ plugin_modelview.depends = plugin_coreplugin
 plugin_modelview.depends += plugin_uavobjects
 SUBDIRS += plugin_modelview
 
-!contains(QT_VERSION, ^4\\.8\\..*) {
+
+#Qt 4.8.0 / phonon may crash on Mac, fixed in Qt 4.8.1, QTBUG-23128
+macx:contains(QT_VERSION, ^4\\.8\\.0): CONFIG += disable_notify_plugin
+
+!disable_notify_plugin {
 #Notify gadget
 plugin_notify.subdir = notify
 plugin_notify.depends = plugin_coreplugin
@@ -106,6 +110,7 @@ SUBDIRS += plugin_lineardial
 plugin_systemhealth.subdir = systemhealth
 plugin_systemhealth.depends = plugin_coreplugin
 plugin_systemhealth.depends += plugin_uavobjects
+plugin_systemhealth.depends += plugin_uavtalk
 SUBDIRS += plugin_systemhealth
 
 #Config gadget
@@ -128,7 +133,7 @@ plugin_pfd.depends = plugin_coreplugin
 plugin_pfd.depends += plugin_uavobjects
 SUBDIRS += plugin_pfd
 
-# Primary Flight Display (PFD) gadget
+# QML viewer gadget
 plugin_qmlview.subdir = qmlview
 plugin_qmlview.depends = plugin_coreplugin
 plugin_qmlview.depends += plugin_uavobjects
@@ -139,6 +144,12 @@ plugin_waypointeditor.subdir = waypointeditor
 plugin_waypointeditor.depends = plugin_coreplugin
 plugin_waypointeditor.depends += plugin_uavobjects
 SUBDIRS += plugin_waypointeditor
+
+# Primary Flight Display (PFD) gadget, QML version
+plugin_pfdqml.subdir = pfdqml
+plugin_pfdqml.depends = plugin_coreplugin
+plugin_pfdqml.depends += plugin_uavobjects
+SUBDIRS += plugin_pfdqml
 
 #IP connection plugin
 plugin_ipconnection.subdir = ipconnection

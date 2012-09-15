@@ -35,14 +35,22 @@
 #include <QUrl>
 #include "accels.h"
 #include "gyros.h"
+#include <extensionsystem/pluginmanager.h>
+#include <coreplugin/generalsettings.h>
 
 ConfigCCAttitudeWidget::ConfigCCAttitudeWidget(QWidget *parent) :
         ConfigTaskWidget(parent),
         ui(new Ui_ccattitude)
 {
     ui->setupUi(this);
+    forceConnectedState(); //dynamic widgets don't recieve the connected signal
     connect(ui->zeroBias,SIGNAL(clicked()),this,SLOT(startAccelCalibration()));
 
+    ExtensionSystem::PluginManager *pm=ExtensionSystem::PluginManager::instance();
+    Core::Internal::GeneralSettings * settings=pm->getObject<Core::Internal::GeneralSettings>();
+    if(!settings->useExpertMode())
+        ui->applyButton->setVisible(false);
+    
     addApplySaveButtons(ui->applyButton,ui->saveButton);
     addUAVObject("AttitudeSettings");
 
@@ -120,6 +128,7 @@ void ConfigCCAttitudeWidget::sensorsUpdated(UAVObject * obj) {
         attitudeSettingsData.GyroBias[2] = -z_gyro_bias;
         attitudeSettingsData.BiasCorrectGyro = AttitudeSettings::BIASCORRECTGYRO_TRUE;
         AttitudeSettings::GetInstance(getObjectManager())->setData(attitudeSettingsData);
+        this->setDirty(true);
 
         // reenable controls
         enableControls(true);
@@ -194,7 +203,8 @@ void ConfigCCAttitudeWidget::startAccelCalibration() {
 
 void ConfigCCAttitudeWidget::openHelp()
 {
-    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/CopterControl+Attitude+Configuration", QUrl::StrictMode) );
+
+    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/x/44Cf", QUrl::StrictMode) );
 }
 
 void ConfigCCAttitudeWidget::enableControls(bool enable)

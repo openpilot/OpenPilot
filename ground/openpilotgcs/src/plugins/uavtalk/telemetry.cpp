@@ -391,7 +391,6 @@ void Telemetry::processObjectQueue()
         QMap<quint32, ObjectTransactionInfo*>::iterator itr = transMap.find(objInfo.obj->getObjID());
         if ( itr != transMap.end() ) {
             qDebug() << "!!!!!! Making request for an object: " << objInfo.obj->getName() << " for which a request is already in progress!!!!!!";
-            return;
         }
         UAVObject::Metadata metadata = objInfo.obj->getMetadata();
         ObjectTransactionInfo *transInfo = new ObjectTransactionInfo(this);

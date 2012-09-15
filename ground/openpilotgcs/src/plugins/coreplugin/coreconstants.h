@@ -47,7 +47,7 @@ const char * const GCS_VERSION_CODENAME = "Pascal";
 
 const char * const GCS_VERSION_LONG      = GCS_VERSION;
 const char * const GCS_AUTHOR            = "OpenPilot Project";
-const char * const GCS_YEAR              = "2011";
+const char * const GCS_YEAR              = "2012";
 
 const char * const GCS_HELP              = "http://wiki.openpilot.org";
 #ifdef GCS_REVISION

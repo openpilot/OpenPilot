@@ -152,7 +152,7 @@ void UAVSettingsImportExportFactory::importUAVSettings()
 
     // We are now ok: setup the import summary dialog & update it as we
     // go along.
-    ImportSummaryDialog swui;
+    ImportSummaryDialog swui((QWidget*)Core::ICore::instance()->mainWindow());
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();

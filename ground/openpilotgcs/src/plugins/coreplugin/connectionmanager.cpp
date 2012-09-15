@@ -31,7 +31,6 @@
 #include <aggregation/aggregate.h>
 #include <coreplugin/iconnection.h>
 #include <extensionsystem/pluginmanager.h>
-
 #include "qextserialport/src/qextserialenumerator.h"
 #include "qextserialport/src/qextserialport.h"
 #include <QDebug>
@@ -53,7 +52,11 @@ ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow, QTabWidge
 {
     QHBoxLayout *layout = new QHBoxLayout;
     layout->setSpacing(5);
-    layout->setContentsMargins(5,5,5,5);
+    layout->setContentsMargins(5,2,5,2);
+
+    m_monitorWidget = new TelemetryMonitorWidget(this);
+    layout->addWidget(m_monitorWidget, Qt::AlignHCenter);
+
     layout->addWidget(new QLabel(tr("Connections:")));
 
     m_availableDevList = new QComboBox;
@@ -70,13 +73,21 @@ ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow, QTabWidge
 
     modeStack->setCornerWidget(this, Qt::TopRightCorner);
 
-    QObject::connect(m_connectBtn, SIGNAL(pressed()), this, SLOT(onConnectPressed()));
+    QObject::connect(m_connectBtn, SIGNAL(clicked()), this, SLOT(onConnectClicked()));
+
+    // setup our reconnect timers
+    reconnect = new QTimer(this);
+    reconnectCheck = new QTimer(this);
+    connect(reconnect,SIGNAL(timeout()),this,SLOT(reconnectSlot()));
+    connect(reconnectCheck,SIGNAL(timeout()),this,SLOT(reconnectCheckSlot()));
 }
 
 ConnectionManager::~ConnectionManager()
 {
     disconnectDevice();
     suspendPolling();
+    if (m_monitorWidget)
+        delete m_monitorWidget;
 }
 
 void ConnectionManager::init()
@@ -118,6 +129,10 @@ bool ConnectionManager::connectDevice()
     emit deviceConnected(m_ioDev);
     m_connectBtn->setText("Disconnect");
     m_availableDevList->setEnabled(false);
+
+    // tell the monitorwidget we're conneced
+    m_monitorWidget->connect();
+
     return true;
 }
 
@@ -127,6 +142,9 @@ bool ConnectionManager::connectDevice()
 */
 bool ConnectionManager::disconnectDevice()
 {
+    // tell the monitor widget we're disconnected
+    m_monitorWidget->disconnect();
+
     if (!m_ioDev) {
         // apparently we are already disconnected: this can
         // happen if a plugin tries to force a disconnect whereas
@@ -135,6 +153,12 @@ bool ConnectionManager::disconnectDevice()
     }
 
     // We are connected - disconnect from the device
+
+    // stop our timers
+    if(reconnect->isActive())
+        reconnect->stop();
+    if(reconnectCheck->isActive())
+        reconnectCheck->stop();
 
     // signal interested plugins that user is disconnecting his device
     emit deviceAboutToDisconnect();
@@ -200,9 +224,9 @@ void ConnectionManager::onConnectionDestroyed(QObject *obj)
 }
 
 /**
-*   Slot called when the user pressed the connect/disconnect button
+*   Slot called when the user clicks the connect/disconnect button
 */
-void ConnectionManager::onConnectPressed()
+void ConnectionManager::onConnectClicked()
 {
     // Check if we have a ioDev already created:
     if (!m_ioDev)
@@ -213,6 +237,67 @@ void ConnectionManager::onConnectPressed()
     {	// disconnecting
         disconnectDevice();
     }
+}
+
+/**
+*   Slot called when the telemetry is connected
+*/
+void ConnectionManager::telemetryConnected()
+{
+    qDebug() << "TelemetryMonitor: connected";
+
+    if(reconnectCheck->isActive())
+        reconnectCheck->stop();
+
+    //tell the monitor we're connected
+    m_monitorWidget->connect();
+}
+
+/**
+*   Slot called when the telemetry is disconnected
+*/
+void ConnectionManager::telemetryDisconnected()
+{
+    qDebug() << "TelemetryMonitor: disconnected";
+
+    if (m_ioDev){
+        if(m_connectionDevice.connection->shortName()=="Serial") {
+            if(!reconnect->isActive())
+                reconnect->start(1000);
+        }
+    }
+
+    //tell the monitor we're disconnected
+    m_monitorWidget->disconnect();
+}
+
+/**
+*   Slot called when the telemetry rates are updated
+*/
+void ConnectionManager::telemetryUpdated(double txRate, double rxRate)
+{
+    m_monitorWidget->updateTelemetry(txRate, rxRate);
+}
+
+void ConnectionManager::reconnectSlot()
+{
+    qDebug()<<"reconnect";
+    if(m_ioDev->isOpen())
+        m_ioDev->close();
+
+    if(m_ioDev->open(QIODevice::ReadWrite)) {
+        qDebug()<<"reconnect successfull";
+        reconnect->stop();
+        reconnectCheck->start(20000);
+    }
+    else
+        qDebug()<<"reconnect NOT successfull";
+}
+
+void ConnectionManager::reconnectCheckSlot()
+{
+    reconnectCheck->stop();
+    reconnect->start(1000);
 }
 
 /**

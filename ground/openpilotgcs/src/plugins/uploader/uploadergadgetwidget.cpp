@@ -668,5 +668,5 @@ void UploaderGadgetWidget::versionMatchCheck()
 void UploaderGadgetWidget::openHelp()
 {
 
-    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/Uploader+Plugin", QUrl::StrictMode) );
+    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/x/AoBZ", QUrl::StrictMode) );
 }

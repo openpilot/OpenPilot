@@ -14,8 +14,8 @@ HEADERS += \
     qmlviewgadgetwidget.h \
     qmlviewgadgetfactory.h \
     qmlviewgadgetconfiguration.h \
-    qmlviewgadgetoptionspage.h \
-    svgimageprovider.h
+    qmlviewgadgetoptionspage.h
+
 
 SOURCES += \
     qmlviewplugin.cpp \
@@ -23,8 +23,7 @@ SOURCES += \
     qmlviewgadgetfactory.cpp \
     qmlviewgadgetwidget.cpp \
     qmlviewgadgetconfiguration.cpp \
-    qmlviewgadgetoptionspage.cpp \
-    svgimageprovider.cpp
+    qmlviewgadgetoptionspage.cpp
 
 OTHER_FILES += QMLView.pluginspec
 

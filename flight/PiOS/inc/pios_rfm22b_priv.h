@@ -50,17 +50,6 @@ extern const struct pios_com_driver pios_rfm22b_com_driver;
 
 // ************************************
 
-enum {	RX_SCAN_SPECTRUM = 0,
-		RX_WAIT_PREAMBLE_MODE,
-		RX_WAIT_SYNC_MODE,
-		RX_DATA_MODE,
-		TX_DATA_MODE,
-		TX_STREAM_MODE,
-		TX_CARRIER_MODE,
-		TX_PN_MODE};
-
-// ************************************
-
 #define BIT0									(1u << 0)
 #define BIT1									(1u << 1)
 #define BIT2									(1u << 2)
@@ -608,8 +597,6 @@ uint32_t rfm22_freqHopSize(void);
 
 void rfm22_setDatarate(uint32_t datarate_bps, bool data_whitening);
 uint32_t rfm22_getDatarate(void);
-
-void rfm22_setRxMode(uint8_t mode, bool multi_packet_mode);
 
 int8_t rfm22_getRSSI(void);
 

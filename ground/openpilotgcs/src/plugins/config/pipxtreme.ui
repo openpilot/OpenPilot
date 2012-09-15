@@ -1612,7 +1612,7 @@
          <item row="15" column="0" colspan="2">
           <widget class="QGroupBox" name="groupBox_4">
            <property name="title">
-            <string>AES Encription</string>
+            <string>AES Encryption</string>
            </property>
            <layout class="QGridLayout" name="gridLayout_5">
             <item row="0" column="0" colspan="2">

@@ -74,6 +74,7 @@ void OutputCalibrationPage::setupVehicle()
             m_actuatorSettings[3].channelMin = 1500;
             m_actuatorSettings[3].channelNeutral = 1500;
             m_actuatorSettings[3].channelMax = 1500;
+            getWizard()->setActuatorSettings(m_actuatorSettings);
             break;
         case SetupWizard::MULTI_ROTOR_QUAD_X:
             m_wizardIndexes << 0 << 1 << 1 << 1 << 1;

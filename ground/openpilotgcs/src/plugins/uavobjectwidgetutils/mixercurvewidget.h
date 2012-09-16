@@ -28,6 +28,7 @@
 #ifndef MIXERCURVEWIDGET_H_
 #define MIXERCURVEWIDGET_H_
 
+#include <QObject>
 #include <QGraphicsView>
 #include <QtSvg/QSvgRenderer>
 #include <QtSvg/QGraphicsSvgItem>
@@ -43,6 +44,9 @@ class UAVOBJECTWIDGETUTILS_EXPORT MixerCurveWidget : public QGraphicsView
 public:
     MixerCurveWidget(QWidget *parent = 0);
    ~MixerCurveWidget();
+
+    friend class MixerCurve;
+
    void itemMoved(double itemValue); // Callback when a point is moved, to be updated
    void initCurve (const QList<double>* points);
    QList<double> getCurve();
@@ -54,28 +58,50 @@ public:
    double getMax();
    double setRange(double min, double max);
 
+
+   void cmdActivated(MixerNode* node);
+   void activateCommand(const QString& name);
+   bool isCommandActive(const QString& name);
+   void showCommand(const QString& name, bool show);
+   void showCommands(bool show);
+   MixerNode* getCmdNode(const QString& name);
+   void setCommandText(const QString& name, const QString& text);
+
    static const int NODE_NUMELEM = 5;
 
 signals:
-   void curveUpdated(const QList<double>* points, const double value);
+   void curveUpdated();
+   void curveMinChanged(double value);
+   void curveMaxChanged(double value);
+   void commandActivated(MixerNode* node);
 
 private slots:
 
 private:
    QGraphicsSvgItem *plot;
 
-   QList<Node*> nodePool;
+   QList<MixerNode*> nodePool;
+   QList<MixerNode*> cmdNodePool;
    QList<Edge*> edgePool;
-   QList<Node*> nodeList;
-   QList<double> points;
+   QList<MixerNode*> nodeList;
 
    double curveMin;
    double curveMax;
    bool   curveUpdating;
 
+   QString posColor0;
+   QString posColor1;
+   QString negColor0;
+   QString negColor1;
+
    void  initNodes(int numPoints);
-   Node* getNode(int index);
-   Edge* getEdge(int index, Node* sourceNode, Node* destNode);
+   MixerNode* getNode(int index);
+   MixerNode* getCommandNode(int index);
+   Edge* getEdge(int index, MixerNode* sourceNode, MixerNode* destNode);
+   void setPositiveColor(QString color0 = "#00ff00", QString color1 = "#00ff00");
+   void setNegativeColor(QString color0 = "#ff0000", QString color1 = "#ff0000");
+
+   void  resizeCommands();
 
 protected:
     void showEvent(QShowEvent *event);

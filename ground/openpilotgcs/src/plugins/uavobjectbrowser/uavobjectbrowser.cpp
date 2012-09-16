@@ -26,12 +26,13 @@
  */
 #include "uavobjectbrowser.h"
 #include "uavobjectbrowserwidget.h"
-#include "uavobjectbrowserconfiguration.h"
 
 UAVObjectBrowser::UAVObjectBrowser(QString classId, UAVObjectBrowserWidget *widget, QWidget *parent) :
         IUAVGadget(classId, parent),
-        m_widget(widget)
+        m_widget(widget),
+        m_config(NULL)
 {
+    connect(m_widget,SIGNAL(viewOptionsChanged(bool,bool,bool)),this,SLOT(viewOptionsChangedSlot(bool,bool,bool)));
 }
 
 UAVObjectBrowser::~UAVObjectBrowser()
@@ -42,9 +43,21 @@ UAVObjectBrowser::~UAVObjectBrowser()
 void UAVObjectBrowser::loadConfiguration(IUAVGadgetConfiguration* config)
 {
     UAVObjectBrowserConfiguration *m = qobject_cast<UAVObjectBrowserConfiguration*>(config);
+    m_config=m;
     m_widget->setRecentlyUpdatedColor(m->recentlyUpdatedColor());
     m_widget->setManuallyChangedColor(m->manuallyChangedColor());
     m_widget->setRecentlyUpdatedTimeout(m->recentlyUpdatedTimeout());
     m_widget->setOnlyHilightChangedValues(m->onlyHighlightChangedValues());
+    m_widget->setViewOptions(m->categorizedView(),m->scientificView(),m->showMetaData());
+}
+
+void UAVObjectBrowser::viewOptionsChangedSlot(bool categorized, bool scientific, bool metadata)
+{
+    if(m_config)
+    {
+        m_config->setCategorizedView(categorized);
+        m_config->setScientificView(scientific);
+        m_config->setShowMetaData(metadata);
+    }
 }
 

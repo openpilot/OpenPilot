@@ -72,6 +72,7 @@ void RawHIDConnection::onDeviceConnected()
   */
 void RawHIDConnection::onDeviceDisconnected()
 {
+    qDebug() << "onDeviceDisconnected()";
     if (enablePolling)
         emit availableDevChanged(this);
 }
@@ -110,15 +111,13 @@ QIODevice *RawHIDConnection::openDevice(const QString &deviceName)
 void RawHIDConnection::closeDevice(const QString &deviceName)
 {
     Q_UNUSED(deviceName);
-    //added by andrew...
 	if (RawHidHandle)
 	{
+        qDebug() << "Closing the device here";
         RawHidHandle->close();
-
 		delete RawHidHandle;
 		RawHidHandle = NULL;
     }
-    //end added by andrew
 }
 
 QString RawHIDConnection::connectionName()

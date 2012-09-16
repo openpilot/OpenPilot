@@ -171,6 +171,10 @@ SectionEnd
 
 ; Copy GCS resources
 Section "-Resources" InSecResources
+  SetOutPath "$INSTDIR\share\openpilotgcs\default_configurations"
+  File /r "${GCS_BUILD_TREE}\share\openpilotgcs\default_configurations\*"
+  SetOutPath "$INSTDIR\share\openpilotgcs\stylesheets"
+  File /r "${GCS_BUILD_TREE}\share\openpilotgcs\stylesheets\*"
   SetOutPath "$INSTDIR\share\openpilotgcs\diagrams"
   File /r "${GCS_BUILD_TREE}\share\openpilotgcs\diagrams\*"
   SetOutPath "$INSTDIR\share\openpilotgcs\dials"
@@ -334,7 +338,7 @@ SectionEnd
 Section /o "un.Configuration" UnSecConfig
   ; Remove configuration
   Delete /rebootok "$APPDATA\OpenPilot\OpenPilotGCS.db"
-  Delete /rebootok "$APPDATA\OpenPilot\OpenPilotGCS.ini"
+  Delete /rebootok "$APPDATA\OpenPilot\OpenPilotGCS.xml"
 SectionEnd
 
 Section "-un.Profile" UnSecProfile

@@ -186,8 +186,7 @@ QString ConfigFixedWingWidget::updateConfigObjectsFromWidgets()
     Q_ASSERT(mixer);
 
 	// Remove Feed Forward, it is pointless on a plane:
-    UAVObjectField* field = mixer->getField(QString("FeedForward"));
-	field->setDouble(0);
+    setMixerValue(mixer, "FeedForward", 0.0);
 	
     // Set the throttle curve
     setThrottleCurve(mixer,VehicleConfig::MIXER_THROTTLECURVE1, m_aircraft->fixedWingThrottle->getCurve());
@@ -291,7 +290,7 @@ bool ConfigFixedWingWidget::setupFrameFixedWing(QString airframeType)
 
     int channel;
     //disable all
-    for (channel=0; channel<VehicleConfig::CHANNEL_NUMELEM; channel++)
+    for (channel=0; (unsigned int) channel < VehicleConfig::CHANNEL_NUMELEM; channel++)
     {
         setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_DISABLED);
         resetMixerVector(mixer, channel);
@@ -371,7 +370,7 @@ bool ConfigFixedWingWidget::setupFrameElevon(QString airframeType)
     int channel;
     double value;
     //disable all
-    for (channel=0; channel<VehicleConfig::CHANNEL_NUMELEM; channel++)
+    for (channel=0; (unsigned int) channel < VehicleConfig::CHANNEL_NUMELEM; channel++)
     {
         setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_DISABLED);
         resetMixerVector(mixer, channel);
@@ -449,7 +448,7 @@ bool ConfigFixedWingWidget::setupFrameVtail(QString airframeType)
     int channel;
     double value;
     //disable all
-    for (channel=0; channel<VehicleConfig::CHANNEL_NUMELEM; channel++)
+    for (channel=0; (unsigned int) channel < VehicleConfig::CHANNEL_NUMELEM; channel++)
     {
         setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_DISABLED);
         resetMixerVector(mixer, channel);

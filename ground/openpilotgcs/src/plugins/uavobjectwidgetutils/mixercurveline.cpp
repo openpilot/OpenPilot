@@ -30,12 +30,10 @@
 #include "mixercurveline.h"
 #include "mixercurvepoint.h"
 
-#include <math.h>
+#include <qmath.h>
 
-static const double Pi = 3.14159265358979323846264338327950288419717;
-// static double TwoPi = 2.0 * Pi;
 
-Edge::Edge(Node *sourceNode, Node *destNode)
+Edge::Edge(MixerNode *sourceNode, MixerNode *destNode)
     : arrowSize(10)
 {
     setAcceptedMouseButtons(0);
@@ -50,23 +48,23 @@ Edge::~Edge()
 {
 }
 
-Node *Edge::sourceNode() const
+MixerNode *Edge::sourceNode() const
 {
     return source;
 }
 
-void Edge::setSourceNode(Node *node)
+void Edge::setSourceNode(MixerNode *node)
 {
     source = node;
     adjust();
 }
 
-Node *Edge::destNode() const
+MixerNode *Edge::destNode() const
 {
     return dest;
 }
 
-void Edge::setDestNode(Node *node)
+void Edge::setDestNode(MixerNode *node)
 {
     dest = node;
     adjust();
@@ -83,7 +81,7 @@ void Edge::adjust()
     prepareGeometryChange();
 
     if (length > qreal(20.)) {
-        QPointF edgeOffset((line.dx() * 10) / length, (line.dy() * 10) / length);
+        QPointF edgeOffset((line.dx() * 13) / length, (line.dy() * 13) / length);
         sourcePoint = line.p1() + edgeOffset;
         destPoint = line.p2() - edgeOffset;
     } else {

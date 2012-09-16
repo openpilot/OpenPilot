@@ -54,7 +54,7 @@ USE_THUMB_MODE = YES
 
 # List of modules to include
 MODULES +=  Actuator ManualControl Stabilization 
-MODULES += AltitudeHold VtolPathFollower PathPlanner
+MODULES += AltitudeHold VtolPathFollower FixedWingPathFollower PathPlanner
 MODULES += Attitude/revolution
 #MODULES += OveroSync/simulated
 
@@ -181,6 +181,7 @@ SRC += $(PIOSPOSIX)/pios_debug.c
 
 SRC += $(PIOSPOSIX)/pios_rcvr.c
 #SRC += $(PIOSPOSIX)/pios_sim.c
+SRC += $(PIOSPOSIX)/pios_gcsrcvr.c
 
 ## Libraries for flight calculations
 SRC += $(FLIGHTLIB)/fifo_buffer.c
@@ -319,6 +320,9 @@ CFLAGS += -O$(OPT)
 CFLAGS += -mtune=$(MCU)
 CFLAGS += $(CDEFS)
 CFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS)) -I.
+
+#CFLAGS += ARCH=arm 
+#CROSS_COMPILE=/usr/local/android-ndk-r5/toolchains/arm-linux-androideabi-4.4.3/prebuilt/darwin-x86/bin/arm-linux-androideabi-
 
 CFLAGS += -fomit-frame-pointer
 ifeq ($(CODE_SOURCERY), YES)

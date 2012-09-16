@@ -46,13 +46,21 @@
 #include "systemalarms.h"
 #include "systemsettings.h"
 #include "uavsettingsimportexport/uavsettingsimportexportfactory.h"
+#include <extensionsystem/pluginmanager.h>
+#include <coreplugin/generalsettings.h>
 
 ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(parent),wasItMe(false)
 {
     m_config = new Ui_OutputWidget();
     m_config->setupUi(this);
+    
+    ExtensionSystem::PluginManager *pm=ExtensionSystem::PluginManager::instance();
+    Core::Internal::GeneralSettings * settings=pm->getObject<Core::Internal::GeneralSettings>();
+    if(!settings->useExpertMode())
+        m_config->saveRCOutputToRAM->setVisible(false);
 
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+
+
 
     UAVSettingsImportExportFactory * importexportplugin =  pm->getObject<UAVSettingsImportExportFactory>();
     connect(importexportplugin,SIGNAL(importAboutToBegin()),this,SLOT(stopTests()));
@@ -231,8 +239,6 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject * obj)
 {
     Q_UNUSED(obj);
 
-    bool dirty=isDirty();
-
     // Get Actuator Settings
     ActuatorSettings *actuatorSettings = ActuatorSettings::GetInstance(getObjectManager());
     Q_ASSERT(actuatorSettings);
@@ -365,7 +371,7 @@ void ConfigOutputWidget::updateObjectsFromWidgets()
 void ConfigOutputWidget::openHelp()
 {
 
-    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/Output+Configuration", QUrl::StrictMode) );
+    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/x/WIGf", QUrl::StrictMode) );
 }
 
 void ConfigOutputWidget::stopTests()

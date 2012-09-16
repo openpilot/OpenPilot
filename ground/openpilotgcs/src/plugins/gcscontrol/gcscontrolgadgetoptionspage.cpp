@@ -71,6 +71,8 @@ void GCSControlGadgetOptionsPage::buttonState(ButtonNumber number, bool pressed)
 
 void GCSControlGadgetOptionsPage::gamepads(quint8 count)
 {
+    Q_UNUSED(count);
+
     /*options_page->AvailableControllerList->clear();
     for (int i=0;i<count;i++)
     {
@@ -105,6 +107,8 @@ void GCSControlGadgetOptionsPage::axesValues(QListInt16 values)
 //creates options page widget (uses the UI file)
 QWidget *GCSControlGadgetOptionsPage::createPage(QWidget *parent)
 {
+    Q_UNUSED(parent);
+
     int i;
     options_page = new Ui::GCSControlGadgetOptionsPage();
     QWidget *optionsPageWidget = new QWidget;

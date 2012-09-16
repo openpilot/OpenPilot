@@ -2,7 +2,8 @@
 import QtQuick 1.1
 
 Item {
-    width: background.sourceSize.width
+    property alias sourceSize: background.sourceSize
+    width: sourceSize.width
     height: 300
 
     BorderImage {

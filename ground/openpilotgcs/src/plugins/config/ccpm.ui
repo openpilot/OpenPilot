@@ -2770,537 +2770,13 @@ margin:1px;</string>
           <number>3</number>
          </property>
          <item row="0" column="0">
-          <layout class="QHBoxLayout" name="horizontalLayout_5">
-           <item>
-            <widget class="QComboBox" name="CurveType">
-             <property name="minimumSize">
-              <size>
-               <width>150</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="toolTip">
-              <string>Select aircraft type here</string>
-             </property>
-             <item>
-              <property name="text">
-               <string>Linear</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Flat</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Step</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Exp</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Log</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Custom</string>
-              </property>
-             </item>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QLabel" name="label_2">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Number of points</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QSpinBox" name="NumCurvePoints">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimum">
-              <number>2</number>
-             </property>
-             <property name="maximum">
-              <number>10</number>
-             </property>
-             <property name="value">
-              <number>5</number>
-             </property>
-            </widget>
-           </item>
-          </layout>
+          <layout class="QHBoxLayout" name="horizontalLayout_6"/>
          </item>
          <item row="1" column="0">
-          <layout class="QGridLayout" name="gridLayout_2">
-           <item row="0" column="0">
-            <widget class="QLabel" name="CurveLabel1">
-             <property name="styleSheet">
-              <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
-color: rgb(255, 255, 255);
-border-radius: 5;
-font: bold 12px;
-margin:1px;</string>
-             </property>
-             <property name="text">
-              <string>Min</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLabel" name="CurveLabel2">
-             <property name="styleSheet">
-              <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
-color: rgb(255, 255, 255);
-border-radius: 5;
-font: bold 12px;
-margin:1px;</string>
-             </property>
-             <property name="text">
-              <string>Max</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="2">
-            <widget class="QLabel" name="CurveLabel3">
-             <property name="styleSheet">
-              <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
-color: rgb(255, 255, 255);
-border-radius: 5;
-font: bold 12px;
-margin:1px;</string>
-             </property>
-             <property name="text">
-              <string>Step point</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QDoubleSpinBox" name="CurveValue1">
-             <property name="decimals">
-              <number>1</number>
-             </property>
-             <property name="maximum">
-              <double>10.000000000000000</double>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QDoubleSpinBox" name="CurveValue2">
-             <property name="decimals">
-              <number>1</number>
-             </property>
-             <property name="maximum">
-              <double>10.000000000000000</double>
-             </property>
-             <property name="value">
-              <double>1.000000000000000</double>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="2">
-            <widget class="QDoubleSpinBox" name="CurveValue3">
-             <property name="decimals">
-              <number>1</number>
-             </property>
-             <property name="maximum">
-              <double>100.000000000000000</double>
-             </property>
-             <property name="value">
-              <double>50.000000000000000</double>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item row="2" column="0">
-          <layout class="QHBoxLayout" name="horizontalLayout_6">
-           <item>
-            <widget class="QComboBox" name="CurveToGenerate">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>150</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="toolTip">
-              <string>Select aircraft type here</string>
-             </property>
-             <item>
-              <property name="text">
-               <string>Throttle</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Pitch</string>
-              </property>
-             </item>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="ccpmGenerateCurve">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>150</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="toolTip">
-              <string>Generate curves based on settings</string>
-             </property>
-             <property name="text">
-              <string>&lt;-- Generate Curve</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_6">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </item>
-         <item row="3" column="0">
           <layout class="QHBoxLayout" name="horizontalLayout_3">
            <property name="spacing">
             <number>3</number>
            </property>
-           <item>
-            <widget class="QTableWidget" name="CurveSettings">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Maximum" vsizetype="MinimumExpanding">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>250</width>
-               <height>200</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>250</width>
-               <height>273</height>
-              </size>
-             </property>
-             <property name="verticalScrollBarPolicy">
-              <enum>Qt::ScrollBarAsNeeded</enum>
-             </property>
-             <property name="horizontalScrollBarPolicy">
-              <enum>Qt::ScrollBarAsNeeded</enum>
-             </property>
-             <property name="autoScroll">
-              <bool>true</bool>
-             </property>
-             <property name="alternatingRowColors">
-              <bool>true</bool>
-             </property>
-             <property name="cornerButtonEnabled">
-              <bool>true</bool>
-             </property>
-             <attribute name="horizontalHeaderCascadingSectionResizes">
-              <bool>true</bool>
-             </attribute>
-             <attribute name="horizontalHeaderStretchLastSection">
-              <bool>true</bool>
-             </attribute>
-             <attribute name="verticalHeaderDefaultSectionSize">
-              <number>25</number>
-             </attribute>
-             <attribute name="verticalHeaderMinimumSectionSize">
-              <number>25</number>
-             </attribute>
-             <row>
-              <property name="text">
-               <string>0%</string>
-              </property>
-             </row>
-             <row>
-              <property name="text">
-               <string>25%</string>
-              </property>
-             </row>
-             <row>
-              <property name="text">
-               <string>50%</string>
-              </property>
-             </row>
-             <row>
-              <property name="text">
-               <string>75%</string>
-              </property>
-             </row>
-             <row>
-              <property name="text">
-               <string>100%</string>
-              </property>
-             </row>
-             <row>
-              <property name="text">
-               <string>none</string>
-              </property>
-             </row>
-             <row>
-              <property name="text">
-               <string>none</string>
-              </property>
-             </row>
-             <row>
-              <property name="text">
-               <string>none</string>
-              </property>
-             </row>
-             <row>
-              <property name="text">
-               <string>none</string>
-              </property>
-             </row>
-             <row>
-              <property name="text">
-               <string>none</string>
-              </property>
-             </row>
-             <column>
-              <property name="text">
-               <string>Throttle Curve</string>
-              </property>
-              <property name="textAlignment">
-               <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-              </property>
-             </column>
-             <column>
-              <property name="text">
-               <string>Blade Pitch Curve</string>
-              </property>
-              <property name="textAlignment">
-               <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-              </property>
-             </column>
-             <item row="0" column="0">
-              <property name="text">
-               <string>0.000</string>
-              </property>
-              <property name="textAlignment">
-               <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-              </property>
-             </item>
-             <item row="0" column="1">
-              <property name="text">
-               <string>0.000</string>
-              </property>
-              <property name="textAlignment">
-               <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-              </property>
-             </item>
-             <item row="1" column="0">
-              <property name="text">
-               <string>0.250</string>
-              </property>
-              <property name="textAlignment">
-               <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-              </property>
-             </item>
-             <item row="1" column="1">
-              <property name="text">
-               <string>0.250</string>
-              </property>
-              <property name="textAlignment">
-               <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-              </property>
-             </item>
-             <item row="2" column="0">
-              <property name="text">
-               <string>0.500</string>
-              </property>
-              <property name="textAlignment">
-               <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-              </property>
-             </item>
-             <item row="2" column="1">
-              <property name="text">
-               <string>0.500</string>
-              </property>
-              <property name="textAlignment">
-               <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-              </property>
-             </item>
-             <item row="3" column="0">
-              <property name="text">
-               <string>0.750</string>
-              </property>
-              <property name="textAlignment">
-               <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-              </property>
-             </item>
-             <item row="3" column="1">
-              <property name="text">
-               <string>0.750</string>
-              </property>
-              <property name="textAlignment">
-               <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-              </property>
-             </item>
-             <item row="4" column="0">
-              <property name="text">
-               <string>1.000</string>
-              </property>
-              <property name="textAlignment">
-               <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-              </property>
-             </item>
-             <item row="4" column="1">
-              <property name="text">
-               <string>1.000</string>
-              </property>
-              <property name="textAlignment">
-               <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-              </property>
-             </item>
-             <item row="5" column="0">
-              <property name="text">
-               <string>-</string>
-              </property>
-              <property name="textAlignment">
-               <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-              </property>
-             </item>
-             <item row="5" column="1">
-              <property name="text">
-               <string>-</string>
-              </property>
-              <property name="textAlignment">
-               <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-              </property>
-             </item>
-             <item row="6" column="0">
-              <property name="text">
-               <string>-</string>
-              </property>
-              <property name="textAlignment">
-               <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-              </property>
-             </item>
-             <item row="6" column="1">
-              <property name="text">
-               <string>-</string>
-              </property>
-              <property name="textAlignment">
-               <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-              </property>
-             </item>
-             <item row="7" column="0">
-              <property name="text">
-               <string>-</string>
-              </property>
-              <property name="textAlignment">
-               <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-              </property>
-             </item>
-             <item row="7" column="1">
-              <property name="text">
-               <string>-</string>
-              </property>
-              <property name="textAlignment">
-               <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-              </property>
-             </item>
-             <item row="8" column="0">
-              <property name="text">
-               <string>-</string>
-              </property>
-              <property name="textAlignment">
-               <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-              </property>
-             </item>
-             <item row="8" column="1">
-              <property name="text">
-               <string>-</string>
-              </property>
-              <property name="textAlignment">
-               <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-              </property>
-             </item>
-             <item row="9" column="0">
-              <property name="text">
-               <string>-</string>
-              </property>
-              <property name="textAlignment">
-               <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-              </property>
-             </item>
-             <item row="9" column="1">
-              <property name="text">
-               <string>-</string>
-              </property>
-              <property name="textAlignment">
-               <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-              </property>
-             </item>
-            </widget>
-           </item>
            <item>
             <widget class="QGroupBox" name="ThrottleCurveBox">
              <property name="sizePolicy">
@@ -3331,7 +2807,7 @@ margin:1px;</string>
               <enum>Qt::LeftToRight</enum>
              </property>
              <property name="title">
-              <string>Throttle Curve</string>
+              <string/>
              </property>
              <property name="alignment">
               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -3347,7 +2823,7 @@ margin:1px;</string>
                <number>0</number>
               </property>
               <item row="0" column="0">
-               <widget class="MixerCurveWidget" name="ThrottleCurve" native="true">
+               <widget class="MixerCurve" name="ThrottleCurve" native="true">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                   <horstretch>1</horstretch>
@@ -3410,7 +2886,7 @@ margin:1px;</string>
               </size>
              </property>
              <property name="title">
-              <string>Pitch Curve</string>
+              <string/>
              </property>
              <layout class="QGridLayout" name="gridLayout_5">
               <property name="margin">
@@ -3420,7 +2896,7 @@ margin:1px;</string>
                <number>0</number>
               </property>
               <item row="0" column="0">
-               <widget class="MixerCurveWidget" name="PitchCurve" native="true">
+               <widget class="MixerCurve" name="PitchCurve" native="true">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
                   <horstretch>1</horstretch>
@@ -3458,7 +2934,7 @@ margin:1px;</string>
            </item>
           </layout>
          </item>
-         <item row="4" column="0">
+         <item row="2" column="0">
           <spacer name="verticalSpacer_2">
            <property name="orientation">
             <enum>Qt::Vertical</enum>
@@ -3910,9 +3386,9 @@ margin:1px;</string>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>MixerCurveWidget</class>
+   <class>MixerCurve</class>
    <extends>QWidget</extends>
-   <header>mixercurvewidget.h</header>
+   <header location="global">mixercurve.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
@@ -3945,14 +3421,6 @@ margin:1px;</string>
   <tabstop>SwashLvlPositionSlider</tabstop>
   <tabstop>SwashLvlPositionSpinBox</tabstop>
   <tabstop>SwashLvlSwashplateImage</tabstop>
-  <tabstop>CurveType</tabstop>
-  <tabstop>NumCurvePoints</tabstop>
-  <tabstop>CurveValue1</tabstop>
-  <tabstop>CurveValue2</tabstop>
-  <tabstop>CurveValue3</tabstop>
-  <tabstop>CurveToGenerate</tabstop>
-  <tabstop>ccpmGenerateCurve</tabstop>
-  <tabstop>CurveSettings</tabstop>
   <tabstop>ccpmAdvancedSettingsTable</tabstop>
  </tabstops>
  <resources/>

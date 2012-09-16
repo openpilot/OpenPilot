@@ -30,6 +30,7 @@
 
 #include <coreplugin/iuavgadget.h>
 #include "uavobjectbrowserwidget.h"
+#include "uavobjectbrowserconfiguration.h"
 
 class IUAVGadget;
 class QWidget;
@@ -47,9 +48,11 @@ public:
 
     QWidget *widget() { return m_widget; }
     void loadConfiguration(IUAVGadgetConfiguration* config);
-
+private slots:
+    void viewOptionsChangedSlot(bool categorized,bool scientific,bool metadata);
 private:
     UAVObjectBrowserWidget *m_widget;
+    UAVObjectBrowserConfiguration *m_config;
 };
 
 

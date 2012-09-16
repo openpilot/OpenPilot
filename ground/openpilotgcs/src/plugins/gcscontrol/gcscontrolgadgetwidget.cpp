@@ -154,6 +154,8 @@ void GCSControlGadgetWidget::toggleArmed(int state)
 
 void GCSControlGadgetWidget::mccChanged(UAVObject * obj)
 {
+    Q_UNUSED(obj);
+
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
     UAVDataObject* flightStatus = dynamic_cast<UAVDataObject*>( objManager->getObject(QString("FlightStatus")) );

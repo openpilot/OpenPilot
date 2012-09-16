@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>pathPlannerUI</class>
+ <widget class="QWidget" name="pathPlannerUI">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>536</width>
+    <height>262</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>PathPlanner</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../coreplugin/core.qrc">
+    <normaloff>:/core/images/openpilot_logo_64.png</normaloff>:/core/images/openpilot_logo_64.png</iconset>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QToolButton" name="tbAdd">
+       <property name="toolTip">
+        <string>Add Leg</string>
+       </property>
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="opmap.qrc">
+         <normaloff>:/opmap/images/plus3.png</normaloff>:/opmap/images/plus3.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="tbDelete">
+       <property name="toolTip">
+        <string>Delete Leg</string>
+       </property>
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="opmap.qrc">
+         <normaloff>:/opmap/images/stopb.png</normaloff>:/opmap/images/stopb.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="tbInsert">
+       <property name="toolTip">
+        <string>Insert Leg</string>
+       </property>
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="opmap.qrc">
+         <normaloff>:/opmap/images/forward_alt.png</normaloff>:/opmap/images/forward_alt.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="tbReadFromFile">
+       <property name="toolTip">
+        <string>Read from file</string>
+       </property>
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="opmap.qrc">
+         <normaloff>:/opmap/images/unarchive.png</normaloff>:/opmap/images/unarchive.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="tbSaveToFile">
+       <property name="toolTip">
+        <string>Save to file</string>
+       </property>
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="opmap.qrc">
+         <normaloff>:/opmap/images/Ekisho Deep Ocean HD1.png</normaloff>:/opmap/images/Ekisho Deep Ocean HD1.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="tbSendToUAV">
+       <property name="toolTip">
+        <string>Send to UAV</string>
+       </property>
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="opmap.qrc">
+         <normaloff>:/opmap/images/up_alt.png</normaloff>:/opmap/images/up_alt.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="tbFetchFromUAV">
+       <property name="toolTip">
+        <string>Fetch from UAV</string>
+       </property>
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="opmap.qrc">
+         <normaloff>:/opmap/images/down_alt.png</normaloff>:/opmap/images/down_alt.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QToolButton" name="tbDetails">
+       <property name="toolTip">
+        <string>Open Details</string>
+       </property>
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="opmap.qrc">
+         <normaloff>:/opmap/images/star.png</normaloff>:/opmap/images/star.png</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QTableView" name="tableView">
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="../coreplugin/core.qrc"/>
+  <include location="opmap.qrc"/>
+ </resources>
+ <connections/>
+</ui>

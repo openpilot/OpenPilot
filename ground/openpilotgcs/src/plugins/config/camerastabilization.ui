@@ -27,8 +27,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>696</width>
-        <height>635</height>
+        <width>702</width>
+        <height>660</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -107,6 +107,16 @@ have to define channel output range using Output configuration tab.</string>
             <property name="value">
              <number>20</number>
             </property>
+            <property name="objrelation" stdset="0">
+             <stringlist>
+              <string>objname:CameraStabSettings</string>
+              <string>fieldname:OutputRange</string>
+              <string>element:Yaw</string>
+              <string>haslimits:no</string>
+              <string>scale:1</string>
+              <string>buttongroup:1</string>
+             </stringlist>
+            </property>
            </widget>
           </item>
           <item row="2" column="2">
@@ -126,6 +136,16 @@ have to define channel output range using Output configuration tab.</string>
             <property name="value">
              <number>20</number>
             </property>
+            <property name="objrelation" stdset="0">
+             <stringlist>
+              <string>objname:CameraStabSettings</string>
+              <string>fieldname:OutputRange</string>
+              <string>element:Pitch</string>
+              <string>haslimits:no</string>
+              <string>scale:1</string>
+              <string>buttongroup:1</string>
+             </stringlist>
+            </property>
            </widget>
           </item>
           <item row="2" column="1">
@@ -144,6 +164,16 @@ have to define channel output range using Output configuration tab.</string>
             </property>
             <property name="value">
              <number>20</number>
+            </property>
+            <property name="objrelation" stdset="0">
+             <stringlist>
+              <string>objname:CameraStabSettings</string>
+              <string>fieldname:OutputRange</string>
+              <string>element:Roll</string>
+              <string>haslimits:no</string>
+              <string>scale:1</string>
+              <string>buttongroup:1</string>
+             </stringlist>
             </property>
            </widget>
           </item>
@@ -339,6 +369,14 @@ margin:1px;</string>
 
 Don't forget to map this channel using Input configuration tab.</string>
             </property>
+            <property name="objrelation" stdset="0">
+             <stringlist>
+              <string>objname:CameraStabSettings</string>
+              <string>fieldname:Input</string>
+              <string>element:Yaw</string>
+              <string>buttongroup:1</string>
+             </stringlist>
+            </property>
             <item>
              <property name="text">
               <string>None</string>
@@ -356,6 +394,14 @@ Don't forget to map this channel using Input configuration tab.</string>
 
 Don't forget to map this channel using Input configuration tab.</string>
             </property>
+            <property name="objrelation" stdset="0">
+             <stringlist>
+              <string>objname:CameraStabSettings</string>
+              <string>fieldname:Input</string>
+              <string>element:Pitch</string>
+              <string>buttongroup:1</string>
+             </stringlist>
+            </property>
             <item>
              <property name="text">
               <string>None</string>
@@ -372,6 +418,14 @@ Don't forget to map this channel using Input configuration tab.</string>
              <string>Input channel to control camera roll
 
 Don't forget to map this channel using Input configuration tab.</string>
+            </property>
+            <property name="objrelation" stdset="0">
+             <stringlist>
+              <string>objname:CameraStabSettings</string>
+              <string>fieldname:Input</string>
+              <string>element:Roll</string>
+              <string>buttongroup:1</string>
+             </stringlist>
             </property>
             <item>
              <property name="text">
@@ -398,6 +452,14 @@ Don't forget to map this channel using Input configuration tab.</string>
 Attitude: camera tracks level for the axis. Input controls the deflection.
 AxisLock: camera remembers tracking attitude. Input controls the rate of deflection.</string>
             </property>
+            <property name="objrelation" stdset="0">
+             <stringlist>
+              <string>objname:CameraStabSettings</string>
+              <string>fieldname:StabilizationMode</string>
+              <string>element:Yaw</string>
+              <string>buttongroup:1</string>
+             </stringlist>
+            </property>
             <item>
              <property name="text">
               <string>Attitude</string>
@@ -419,6 +481,16 @@ AxisLock: camera remembers tracking attitude. Input controls the rate of deflect
             <property name="value">
              <number>20</number>
             </property>
+            <property name="objrelation" stdset="0">
+             <stringlist>
+              <string>objname:CameraStabSettings</string>
+              <string>fieldname:InputRange</string>
+              <string>element:Yaw</string>
+              <string>haslimits:no</string>
+              <string>scale:1</string>
+              <string>buttongroup:1</string>
+             </stringlist>
+            </property>
            </widget>
           </item>
           <item row="4" column="3">
@@ -434,6 +506,16 @@ AxisLock: camera remembers tracking attitude. Input controls the rate of deflect
             </property>
             <property name="value">
              <number>50</number>
+            </property>
+            <property name="objrelation" stdset="0">
+             <stringlist>
+              <string>objname:CameraStabSettings</string>
+              <string>fieldname:InputRate</string>
+              <string>element:Yaw</string>
+              <string>haslimits:no</string>
+              <string>scale:1</string>
+              <string>buttongroup:1</string>
+             </stringlist>
             </property>
            </widget>
           </item>
@@ -453,6 +535,16 @@ This option smoothes the stick input. Zero value disables LPF.</string>
             <property name="value">
              <number>150</number>
             </property>
+            <property name="objrelation" stdset="0">
+             <stringlist>
+              <string>objname:CameraStabSettings</string>
+              <string>fieldname:ResponseTime</string>
+              <string>element:Yaw</string>
+              <string>haslimits:no</string>
+              <string>scale:1</string>
+              <string>buttongroup:1</string>
+             </stringlist>
+            </property>
            </widget>
           </item>
           <item row="2" column="2">
@@ -465,6 +557,14 @@ This option smoothes the stick input. Zero value disables LPF.</string>
 
 Attitude: camera tracks level for the axis. Input controls the deflection.
 AxisLock: camera remembers tracking attitude. Input controls the rate of deflection.</string>
+            </property>
+            <property name="objrelation" stdset="0">
+             <stringlist>
+              <string>objname:CameraStabSettings</string>
+              <string>fieldname:StabilizationMode</string>
+              <string>element:Pitch</string>
+              <string>buttongroup:1</string>
+             </stringlist>
             </property>
             <item>
              <property name="text">
@@ -487,6 +587,16 @@ AxisLock: camera remembers tracking attitude. Input controls the rate of deflect
             <property name="value">
              <number>20</number>
             </property>
+            <property name="objrelation" stdset="0">
+             <stringlist>
+              <string>objname:CameraStabSettings</string>
+              <string>fieldname:InputRange</string>
+              <string>element:Pitch</string>
+              <string>haslimits:no</string>
+              <string>scale:1</string>
+              <string>buttongroup:1</string>
+             </stringlist>
+            </property>
            </widget>
           </item>
           <item row="4" column="2">
@@ -502,6 +612,16 @@ AxisLock: camera remembers tracking attitude. Input controls the rate of deflect
             </property>
             <property name="value">
              <number>50</number>
+            </property>
+            <property name="objrelation" stdset="0">
+             <stringlist>
+              <string>objname:CameraStabSettings</string>
+              <string>fieldname:InputRate</string>
+              <string>element:Pitch</string>
+              <string>haslimits:no</string>
+              <string>scale:1</string>
+              <string>buttongroup:1</string>
+             </stringlist>
             </property>
            </widget>
           </item>
@@ -521,6 +641,16 @@ This option smoothes the stick input. Zero value disables LPF.</string>
             <property name="value">
              <number>150</number>
             </property>
+            <property name="objrelation" stdset="0">
+             <stringlist>
+              <string>objname:CameraStabSettings</string>
+              <string>fieldname:ResponseTime</string>
+              <string>element:Pitch</string>
+              <string>haslimits:no</string>
+              <string>scale:1</string>
+              <string>buttongroup:1</string>
+             </stringlist>
+            </property>
            </widget>
           </item>
           <item row="2" column="1">
@@ -533,6 +663,14 @@ This option smoothes the stick input. Zero value disables LPF.</string>
 
 Attitude: camera tracks level for the axis. Input controls the deflection.
 AxisLock: camera remembers tracking attitude. Input controls the rate of deflection.</string>
+            </property>
+            <property name="objrelation" stdset="0">
+             <stringlist>
+              <string>objname:CameraStabSettings</string>
+              <string>fieldname:StabilizationMode</string>
+              <string>element:Roll</string>
+              <string>buttongroup:1</string>
+             </stringlist>
             </property>
             <item>
              <property name="text">
@@ -555,6 +693,16 @@ AxisLock: camera remembers tracking attitude. Input controls the rate of deflect
             <property name="value">
              <number>20</number>
             </property>
+            <property name="objrelation" stdset="0">
+             <stringlist>
+              <string>objname:CameraStabSettings</string>
+              <string>fieldname:InputRange</string>
+              <string>element:Roll</string>
+              <string>haslimits:no</string>
+              <string>scale:1</string>
+              <string>buttongroup:1</string>
+             </stringlist>
+            </property>
            </widget>
           </item>
           <item row="4" column="1">
@@ -570,6 +718,16 @@ AxisLock: camera remembers tracking attitude. Input controls the rate of deflect
             </property>
             <property name="value">
              <number>50</number>
+            </property>
+            <property name="objrelation" stdset="0">
+             <stringlist>
+              <string>objname:CameraStabSettings</string>
+              <string>fieldname:InputRate</string>
+              <string>element:Roll</string>
+              <string>haslimits:no</string>
+              <string>scale:1</string>
+              <string>buttongroup:1</string>
+             </stringlist>
             </property>
            </widget>
           </item>
@@ -588,6 +746,16 @@ This option smoothes the stick input. Zero value disables LPF.</string>
             </property>
             <property name="value">
              <number>150</number>
+            </property>
+            <property name="objrelation" stdset="0">
+             <stringlist>
+              <string>objname:CameraStabSettings</string>
+              <string>fieldname:ResponseTime</string>
+              <string>element:Roll</string>
+              <string>haslimits:no</string>
+              <string>scale:1</string>
+              <string>buttongroup:1</string>
+             </stringlist>
             </property>
            </widget>
           </item>
@@ -656,6 +824,15 @@ value.</string>
             </property>
             <property name="value">
              <double>1.000000000000000</double>
+            </property>
+            <property name="objrelation" stdset="0">
+             <stringlist>
+              <string>objname:CameraStabSettings</string>
+              <string>fieldname:MaxAxisLockRate</string>
+              <string>haslimits:no</string>
+              <string>scale:1</string>
+              <string>buttongroup:1</string>
+             </stringlist>
             </property>
            </widget>
           </item>
@@ -754,18 +931,51 @@ value.</string>
          <property name="flat">
           <bool>true</bool>
          </property>
+         <property name="objrelation" stdset="0">
+          <stringlist>
+           <string>button:help</string>
+           <string>url:http://wiki.openpilot.org/display/Doc/Camera+Stabilization+Configuration</string>
+          </stringlist>
+         </property>
         </widget>
        </item>
        <item>
         <widget class="QPushButton" name="camerastabilizationResetToDefaults">
          <property name="toolTip">
-          <string>Load default CameraStabilization settings except output channels
+          <string>Load default CameraStabilization settings except output channels into GCS.
 
 Loaded settings are not applied automatically. You have to click the
 Apply or Save button afterwards.</string>
          </property>
          <property name="text">
           <string>Reset To Defaults</string>
+         </property>
+         <property name="objrelation" stdset="0">
+          <stringlist>
+           <string>button:default</string>
+           <string>buttongroup:1</string>
+          </stringlist>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton">
+         <property name="toolTip">
+          <string>Reloads saved CameraStabilization settings  except output channels
+from board into GCS. Useful if you have accidentally changed some
+settings.
+
+Loaded settings are not applied automatically. You have to click the
+Apply or Save button afterwards.</string>
+         </property>
+         <property name="text">
+          <string>Reload Board Data</string>
+         </property>
+         <property name="objrelation" stdset="0">
+          <stringlist>
+           <string>button:reload</string>
+           <string>buttongroup:1</string>
+          </stringlist>
          </property>
         </widget>
        </item>
@@ -776,6 +986,11 @@ Apply or Save button afterwards.</string>
          </property>
          <property name="text">
           <string>Apply</string>
+         </property>
+         <property name="objrelation" stdset="0">
+          <stringlist>
+           <string>button:apply</string>
+          </stringlist>
          </property>
         </widget>
        </item>
@@ -789,6 +1004,11 @@ Apply or Save button afterwards.</string>
          </property>
          <property name="checked">
           <bool>false</bool>
+         </property>
+         <property name="objrelation" stdset="0">
+          <stringlist>
+           <string>button:save</string>
+          </stringlist>
          </property>
         </widget>
        </item>
@@ -823,7 +1043,6 @@ Apply or Save button afterwards.</string>
   <tabstop>yawResponseTime</tabstop>
   <tabstop>MaxAxisLockRate</tabstop>
   <tabstop>camerastabilizationHelp</tabstop>
-  <tabstop>camerastabilizationResetToDefaults</tabstop>
   <tabstop>camerastabilizationSaveRAM</tabstop>
   <tabstop>camerastabilizationSaveSD</tabstop>
   <tabstop>scrollArea</tabstop>

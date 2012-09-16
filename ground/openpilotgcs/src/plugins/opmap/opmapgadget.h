@@ -2,7 +2,7 @@
  ******************************************************************************
  *
  * @file       opmapgadget.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup OPMapPlugin OpenPilot Map Plugin
@@ -30,9 +30,9 @@
 
 #include <coreplugin/iuavgadget.h>
 #include "opmapgadgetwidget.h"
+#include "opmapgadgetconfiguration.h"
 
 class IUAVGadget;
-//class QList<int>;
 class QWidget;
 class QString;
 class OPMapGadgetWidget;
@@ -47,10 +47,13 @@ public:
     ~OPMapGadget();
 
     QWidget *widget() { return m_widget; }
-    void loadConfiguration(IUAVGadgetConfiguration* config);
-
+    void loadConfiguration(IUAVGadgetConfiguration* m_config);
 private:
     OPMapGadgetWidget *m_widget;
+    OPMapGadgetConfiguration *m_config;
+private slots:
+    void saveOpacity(qreal value);
+    void saveDefaultLocation(double lng, double lat, double zoom);
 };
 
 

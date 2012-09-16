@@ -49,7 +49,7 @@ public:
     virtual void updateObjectsFromWidgets();
 
 private slots:
-    void accelsUpdated(UAVObject * obj);
+    void sensorsUpdated(UAVObject * obj);
     void timeout();
     void startAccelCalibration();
     void openHelp();
@@ -58,14 +58,16 @@ private:
     QMutex startStop;
     Ui_ccattitude *ui;
     QTimer timer;
-    UAVObject::Metadata initialMdata;
+    UAVObject::Metadata initialAccelsMdata;
+    UAVObject::Metadata initialGyrosMdata;
 
-    int updates;
+    int accelUpdates;
+    int gyroUpdates;
 
     QList<double> x_accum, y_accum, z_accum;
     QList<double> x_gyro_accum, y_gyro_accum, z_gyro_accum;
 
-    static const int NUM_ACCEL_UPDATES = 60;
+    static const int NUM_SENSOR_UPDATES = 60;
     static const float ACCEL_SCALE = 0.004f * 9.81f;
 protected:
     virtual void enableControls(bool enable);

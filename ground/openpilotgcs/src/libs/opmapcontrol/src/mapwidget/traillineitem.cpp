@@ -2,7 +2,7 @@
 ******************************************************************************
 *
 * @file       trailitem.cpp
-* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
 * @brief      A graphicsItem representing a trail point
 * @see        The GNU Public License (GPL) Version 3
 * @defgroup   OPMapWidget
@@ -28,29 +28,21 @@
 
 namespace mapcontrol
 {
-    TrailLineItem::TrailLineItem(internals::PointLatLng const& coord1,internals::PointLatLng const& coord2, QBrush color, QGraphicsItem* parent):QGraphicsLineItem(parent),coord1(coord1),coord2(coord2)
+TrailLineItem::TrailLineItem(internals::PointLatLng const& coord1,internals::PointLatLng const& coord2, QBrush color, MapGraphicItem * map):QGraphicsLineItem(map),coord1(coord1),coord2(coord2),m_brush(color),m_map(map)
     {
-        m_brush=color;
         QPen pen;
         pen.setBrush(m_brush);
         pen.setWidth(1);
         this->setPen(pen);
     }
-/*
-    void TrailLineItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-    {
-      //  painter->drawRect(QRectF(-3,-3,6,6));
-        painter->setBrush(m_brush);
-        QPen pen;
-        pen.setBrush(m_brush);
-        pen.setWidth(2);
-        painter->drawLine(this->line().x1(),this->line().y1(),this->line().x2(),this->line().y2());
-    }
-*/
+
     int TrailLineItem::type()const
     {
         return Type;
     }
 
-
+    void TrailLineItem::setLineSlot()
+    {
+        setLine(m_map->FromLatLngToLocal(this->coord1).X(),m_map->FromLatLngToLocal(this->coord1).Y(),m_map->FromLatLngToLocal(this->coord2).X(),m_map->FromLatLngToLocal(this->coord2).Y());
+    }
 }

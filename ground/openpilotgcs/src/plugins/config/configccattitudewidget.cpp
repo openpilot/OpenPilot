@@ -63,29 +63,29 @@ ConfigCCAttitudeWidget::~ConfigCCAttitudeWidget()
     delete ui;
 }
 
-void ConfigCCAttitudeWidget::accelsUpdated(UAVObject * obj) {
+void ConfigCCAttitudeWidget::sensorsUpdated(UAVObject * obj) {
     QMutexLocker locker(&startStop);
 
-    ui->zeroBiasProgress->setValue((float) updates / NUM_ACCEL_UPDATES * 100);
+    ui->zeroBiasProgress->setValue((float) qMin(accelUpdates,gyroUpdates) / NUM_SENSOR_UPDATES * 100);
 
-    if(updates < NUM_ACCEL_UPDATES) {
-        updates++;
-        Accels * accels = Accels::GetInstance(getObjectManager());
+    Accels * accels = Accels::GetInstance(getObjectManager());
+    Gyros * gyros = Gyros::GetInstance(getObjectManager());
+
+    if(obj->getObjID() == Accels::OBJID && accelUpdates < NUM_SENSOR_UPDATES) {
+        accelUpdates++;
         Accels::DataFields accelsData = accels->getData();
         x_accum.append(accelsData.x);
         y_accum.append(accelsData.y);
         z_accum.append(accelsData.z);
-
-        Gyros * gyros = Gyros::GetInstance(getObjectManager());
+    } else if (obj->getObjID() == Gyros::OBJID && gyroUpdates < NUM_SENSOR_UPDATES) {
+        gyroUpdates++;
         Gyros::DataFields gyrosData = gyros->getData();
-
         x_gyro_accum.append(gyrosData.x);
         y_gyro_accum.append(gyrosData.y);
         z_gyro_accum.append(gyrosData.z);
-    } else if ( updates == NUM_ACCEL_UPDATES ) {
-	updates++;
+    } else if ( accelUpdates >= NUM_SENSOR_UPDATES && gyroUpdates >= NUM_SENSOR_UPDATES) {
         timer.stop();
-        disconnect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(accelsUpdated(UAVObject*)));
+        disconnect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(sensorsUpdated(UAVObject*)));
         disconnect(&timer,SIGNAL(timeout()),this,SLOT(timeout()));
 
         float x_bias = listMean(x_accum) / ACCEL_SCALE;
@@ -95,7 +95,8 @@ void ConfigCCAttitudeWidget::accelsUpdated(UAVObject * obj) {
         float x_gyro_bias = listMean(x_gyro_accum) * 100.0f;
         float y_gyro_bias = listMean(y_gyro_accum) * 100.0f;
         float z_gyro_bias = listMean(z_gyro_accum) * 100.0f;
-        obj->setMetadata(initialMdata);
+        accels->setMetadata(initialAccelsMdata);
+        gyros->setMetadata(initialGyrosMdata);
 
         AttitudeSettings::DataFields attitudeSettingsData = AttitudeSettings::GetInstance(getObjectManager())->getData();
         // We offset the gyro bias by current bias to help precision
@@ -108,16 +109,21 @@ void ConfigCCAttitudeWidget::accelsUpdated(UAVObject * obj) {
         attitudeSettingsData.BiasCorrectGyro = AttitudeSettings::BIASCORRECTGYRO_TRUE;
         AttitudeSettings::GetInstance(getObjectManager())->setData(attitudeSettingsData);
     } else {
-	// Possible to get here if weird threading stuff happens.  Just ignore updates.
-	qDebug("Unexpected accel update received.");
+        // Possible to get here if weird threading stuff happens.  Just ignore updates.
+        qDebug("Unexpected accel update received.");
     }
 }
 
 void ConfigCCAttitudeWidget::timeout() {
     QMutexLocker locker(&startStop);
     UAVDataObject * obj = Accels::GetInstance(getObjectManager());
-    disconnect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(accelsUpdated(UAVObject*)));
+    disconnect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(sensorsUpdated(UAVObject*)));
     disconnect(&timer,SIGNAL(timeout()),this,SLOT(timeout()));
+
+    Accels * accels = Accels::GetInstance(getObjectManager());
+    Gyros * gyros = Gyros::GetInstance(getObjectManager());
+    accels->setMetadata(initialAccelsMdata);
+    gyros->setMetadata(initialGyrosMdata);
 
     QMessageBox msgBox;
     msgBox.setText(tr("Calibration timed out before receiving required updates."));
@@ -130,7 +136,8 @@ void ConfigCCAttitudeWidget::timeout() {
 void ConfigCCAttitudeWidget::startAccelCalibration() {
     QMutexLocker locker(&startStop);
 
-    updates = 0;
+    accelUpdates = 0;
+    gyroUpdates = 0;
     x_accum.clear();
     y_accum.clear();
     z_accum.clear();
@@ -144,19 +151,27 @@ void ConfigCCAttitudeWidget::startAccelCalibration() {
     AttitudeSettings::GetInstance(getObjectManager())->setData(attitudeSettingsData);
 
     // Set up to receive updates
-    UAVDataObject * obj = Accels::GetInstance(getObjectManager());
-    connect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(accelsUpdated(UAVObject*)));
+    UAVDataObject * accels = Accels::GetInstance(getObjectManager());
+    UAVDataObject * gyros = Gyros::GetInstance(getObjectManager());
+    connect(accels,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(sensorsUpdated(UAVObject*)));
+    connect(gyros,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(sensorsUpdated(UAVObject*)));
 
     // Set up timeout timer
     timer.start(10000);
     connect(&timer,SIGNAL(timeout()),this,SLOT(timeout()));
 
     // Speed up updates
-    initialMdata = obj->getMetadata();
-    UAVObject::Metadata mdata = initialMdata;
-    UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
-    mdata.flightTelemetryUpdatePeriod = 100;
-    obj->setMetadata(mdata);
+    initialAccelsMdata = accels->getMetadata();
+    UAVObject::Metadata accelsMdata = initialAccelsMdata;
+    UAVObject::SetFlightTelemetryUpdateMode(accelsMdata, UAVObject::UPDATEMODE_PERIODIC);
+    accelsMdata.flightTelemetryUpdatePeriod = 100;
+    accels->setMetadata(accelsMdata);
+
+    initialGyrosMdata = gyros->getMetadata();
+    UAVObject::Metadata gyrosMdata = initialGyrosMdata;
+    UAVObject::SetFlightTelemetryUpdateMode(gyrosMdata, UAVObject::UPDATEMODE_PERIODIC);
+    gyrosMdata.flightTelemetryUpdatePeriod = 10;
+    gyros->setMetadata(gyrosMdata);
 
 }
 

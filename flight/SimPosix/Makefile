@@ -141,9 +141,6 @@ SRC += $(FLIGHTLIB)/paths.c
 SRC += $(MATHLIB)/sin_lookup.c
 SRC += $(MATHLIB)/pid.c
 
-SRC += $(MATHLIB)/sin_lookup.c
-SRC += $(MATHLIB)/pid.c
-
 ## PIOS Hardware (STM32F4xx)
 include $(PIOS)/posix/library.mk
 

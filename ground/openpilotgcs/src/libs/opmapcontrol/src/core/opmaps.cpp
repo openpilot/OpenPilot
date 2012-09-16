@@ -43,6 +43,8 @@ namespace core {
         LanguageStr=LanguageType().toShortString(Language);
         Cache::Instance();
 
+//        OPMaps::MemoryCache();
+
     }
 
 

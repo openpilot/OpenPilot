@@ -110,6 +110,7 @@ SUBDIRS += plugin_lineardial
 plugin_systemhealth.subdir = systemhealth
 plugin_systemhealth.depends = plugin_coreplugin
 plugin_systemhealth.depends += plugin_uavobjects
+plugin_systemhealth.depends += plugin_uavtalk
 SUBDIRS += plugin_systemhealth
 
 #Config gadget

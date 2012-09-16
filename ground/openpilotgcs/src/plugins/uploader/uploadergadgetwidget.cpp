@@ -249,8 +249,8 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
 
         // The board is now reset: we have to disconnect telemetry
         Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
-        QString dli = cm->getCurrentDevice().Name;
-        QString dlj = cm->getCurrentDevice().devName;
+        QString dli = cm->getCurrentDevice().getConName();
+        QString dlj = cm->getCurrentDevice().getConName();
         cm->disconnectDevice();
         QTimer::singleShot(200, &m_eventloop, SLOT(quit()));
         m_eventloop.exec();
@@ -378,7 +378,8 @@ void UploaderGadgetWidget::systemSafeBoot()
 }
 
 /**
-  Tells the system to boot (from Bootloader state)
+  * Tells the system to boot (from Bootloader state)
+  * @param[in] safeboot Indicates whether the firmware should use the stock HWSettings
   */
 void UploaderGadgetWidget::commonSystemBoot(bool safeboot)
 {
@@ -456,7 +457,7 @@ void UploaderGadgetWidget::systemRescue()
         delete dfu;
         dfu = NULL;
     }
-    // Avoid dumb users pressing Rescue twice. It can happen.
+    // Avoid users pressing Rescue twice.
     m_config->rescueButton->setEnabled(false);
 
     // Now we're good to go:
@@ -523,25 +524,6 @@ void UploaderGadgetWidget::systemRescue()
         m_config->rescueButton->setEnabled(true);
         return;
     }
-    if ((eBoardCC != dfu->GetBoardType(0)) && (QMessageBox::question(this,tr("OpenPilot Uploader"),tr("If you want to search for other boards connect power now and press Yes"),QMessageBox::Yes,QMessageBox::No)==QMessageBox::Yes))
-    {
-        log("\nWaiting...");
-        QTimer::singleShot(3000, &m_eventloop, SLOT(quit()));
-        m_eventloop.exec();
-        log("Detecting second board...");
-        repaint();
-        if(!dfu->findDevices())
-        {
-            // We will only end up here in case somehow all the boards
-            // disappeared, including the one we detected earlier.
-            log("Could not detect any board, aborting!");
-            delete dfu;
-            dfu = NULL;
-            cm->resumePolling();
-            m_config->rescueButton->setEnabled(true);
-            return;
-        }
-    }
     log(QString("Found ") + QString::number(dfu->numberOfDevices) + QString(" device(s)."));
     if (dfu->numberOfDevices > 5) {
         log("Inconsistent number of devices, aborting!");
@@ -566,6 +548,7 @@ void UploaderGadgetWidget::systemRescue()
     m_config->rescueButton->setEnabled(false);
     currentStep = IAP_STATE_BOOTLOADER; // So that we can boot from the GUI afterwards.
 }
+
 void UploaderGadgetWidget::perform()
 {
     if(m_progress->value()==19)

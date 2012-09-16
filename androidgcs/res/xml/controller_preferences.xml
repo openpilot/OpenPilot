@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    <PreferenceCategory android:title="Controller Settings">
+		<ListPreference android:title="Controller Mode"
+			android:key="controller_type" android:summary="Select whether you want the virtual controller to use mode 1 or mode 2 convention"
+			android:defaultValue="2" 
+			android:entries="@array/controllerTypeArray"
+			android:entryValues="@array/controllerTypeValues"/>
+	</PreferenceCategory>
+</PreferenceScreen>

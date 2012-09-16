@@ -346,7 +346,7 @@ void PIOS_Board_Init(void) {
 		pios_rfm22b_cfg.maxRFBandwidth = 128000;
 		break;
 	}
-	switch (pipxSettings.RFSpeed)
+	switch (pipxSettings.MaxRFPower)
 	{
 	case PIPXSETTINGS_MAXRFPOWER_125:
 		pios_rfm22b_cfg.maxTxPower = RFM22_tx_pwr_txpow_0;

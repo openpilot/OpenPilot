@@ -116,6 +116,8 @@ void MyTabbedStackWidget::showWidget(int index)
 
 void MyTabbedStackWidget::insertCornerWidget(int index, QWidget *widget)
 {
+    Q_UNUSED(index);
+
     widget->hide();
 }
 

@@ -36,7 +36,7 @@
 #include "mixercurvepoint.h"
 #include "mixercurvewidget.h"
 
-Node::Node(MixerCurveWidget *graphWidget)
+MixerNode::MixerNode(MixerCurveWidget *graphWidget)
     : graph(graphWidget)
 {
     setFlag(ItemIsMovable);
@@ -54,37 +54,36 @@ Node::Node(MixerCurveWidget *graphWidget)
     posColor1 = "#116703";  //greenish?
     negColor0 = "#aa0000";  //red
     negColor1 = "#aa0000";  //red
-
 }
 
-void Node::addEdge(Edge *edge)
+void MixerNode::addEdge(Edge *edge)
 {
     edgeList << edge;
     edge->adjust();
 }
 
-QList<Edge *> Node::edges() const
+QList<Edge *> MixerNode::edges() const
 {
     return edgeList;
 }
 
 
-QRectF Node::boundingRect() const
+QRectF MixerNode::boundingRect() const
 {
     return cmdNode ? QRectF(-4, -4, 15, 10) : QRectF(-13, -13, 26, 26);
 }
 
-QPainterPath Node::shape() const
+QPainterPath MixerNode::shape() const
 {
     QPainterPath path;
     path.addEllipse(boundingRect());
     return path;
 }
 
-void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *)
+void MixerNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *)
 {
     QString text = cmdNode ? cmdText : QString().sprintf("%.2f", value());
-
+    painter->setFont(graph->font());
     if (drawNode) {
         QRadialGradient gradient(-3, -3, 10);
         if (option->state & QStyle::State_Sunken) {
@@ -128,25 +127,25 @@ void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
     }
 }
 
-void Node::verticalMove(bool flag){
+void MixerNode::verticalMove(bool flag){
     vertical = flag;
 }
 
-void Node::commandNode(bool enable){
+void MixerNode::commandNode(bool enable){
     cmdNode = enable;
 }
-void Node::commandText(QString text){
+void MixerNode::commandText(QString text){
     cmdText = text;
 }
 
-double Node::value() {
+double MixerNode::value() {
     double h = graph->sceneRect().height();
     double ratio = (h - pos().y()) / h;
     return ((graph->getMax() - graph->getMin()) * ratio ) + graph->getMin();
 }
 
 
-QVariant Node::itemChange(GraphicsItemChange change, const QVariant &val)
+QVariant MixerNode::itemChange(GraphicsItemChange change, const QVariant &val)
 {
     QPointF newPos = val.toPointF();
     double h = graph->sceneRect().height();
@@ -185,7 +184,7 @@ QVariant Node::itemChange(GraphicsItemChange change, const QVariant &val)
     return QGraphicsItem::itemChange(change, val);
 }
 
-void Node::mousePressEvent(QGraphicsSceneMouseEvent *event)
+void MixerNode::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     if (cmdNode) {
         graph->cmdActivated(this);
@@ -195,7 +194,7 @@ void Node::mousePressEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsItem::mousePressEvent(event);
 }
 
-void Node::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+void MixerNode::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     update();
     QGraphicsItem::mouseReleaseEvent(event);

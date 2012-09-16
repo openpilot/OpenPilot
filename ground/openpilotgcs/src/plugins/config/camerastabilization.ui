@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>983</width>
-    <height>738</height>
+    <width>789</width>
+    <height>615</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,7 +15,10 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_5">
    <property name="spacing">
-    <number>-1</number>
+    <number>6</number>
+   </property>
+   <property name="margin">
+    <number>12</number>
    </property>
    <item>
     <widget class="QTabWidget" name="tabWidget">
@@ -27,16 +30,7 @@
        <string>Camera Stabilization</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>12</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
+       <property name="margin">
         <number>0</number>
        </property>
        <item>
@@ -52,13 +46,16 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>953</width>
-            <height>626</height>
+            <width>742</width>
+            <height>560</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout">
            <property name="spacing">
-            <number>24</number>
+            <number>6</number>
+           </property>
+           <property name="margin">
+            <number>12</number>
            </property>
            <item>
             <widget class="QGroupBox" name="groupBox_2">
@@ -1037,13 +1034,13 @@ value.</string>
        <property name="minimumSize">
         <size>
          <width>0</width>
-         <height>32</height>
+         <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>16777215</width>
-         <height>32</height>
+         <height>16777215</height>
         </size>
        </property>
        <property name="toolTip">
@@ -1068,13 +1065,13 @@ Apply or Save button afterwards.</string>
        <property name="minimumSize">
         <size>
          <width>0</width>
-         <height>32</height>
+         <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>16777215</width>
-         <height>32</height>
+         <height>16777215</height>
         </size>
        </property>
        <property name="toolTip">
@@ -1101,13 +1098,13 @@ Apply or Save button afterwards.</string>
        <property name="minimumSize">
         <size>
          <width>0</width>
-         <height>32</height>
+         <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>16777215</width>
-         <height>32</height>
+         <height>16777215</height>
         </size>
        </property>
        <property name="toolTip">
@@ -1128,13 +1125,13 @@ Apply or Save button afterwards.</string>
        <property name="minimumSize">
         <size>
          <width>0</width>
-         <height>32</height>
+         <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>16777215</width>
-         <height>32</height>
+         <height>16777215</height>
         </size>
        </property>
        <property name="toolTip">

@@ -2,23 +2,15 @@
   <General>
     <AutoConnect>true</AutoConnect>
     <AutoSelect>true</AutoSelect>
-    <ExpertMode>false</ExpertMode>
-    <OverrideLanguage>en_AU</OverrideLanguage>
-    <SaveSettingsOnExit>true</SaveSettingsOnExit>
     <UDPMirror>false</UDPMirror>
     <Description>Default configuration</Description>
     <Details>Default configuration built to work on all screen sizes</Details>
+    <ExpertMode>false</ExpertMode>
+    <OverrideLanguage>en_AU</OverrideLanguage>
+    <SaveSettingsOnExit>true</SaveSettingsOnExit>
     <StyleSheet>default</StyleSheet>
+    <UDPMirror>false</UDPMirror>
   </General>
-  <IPconnection>
-    <Current>
-      <arr_1>
-        <Port>1</Port>
-        <UseTCP>0</UseTCP>
-      </arr_1>
-      <size>1</size>
-    </Current>
-  </IPconnection>
   <KeyBindings>
     <size>0</size>
   </KeyBindings>
@@ -45,49 +37,30 @@
       <data>
         <Current>
           <arr_1>
-            <CurrentLanguage>default</CurrentLanguage>
-            <DataObject>FlightStatus</DataObject>
+            <CurrentLanguage></CurrentLanguage>
+            <DataObject></DataObject>
             <ExpireTimeout>0</ExpireTimeout>
             <Mute>false</Mute>
-            <ObjectField>Armed</ObjectField>
+            <ObjectField></ObjectField>
             <RangeLimit>0</RangeLimit>
             <Repeat>0</Repeat>
             <SayOrder>0</SayOrder>
-            <Sound1>armed</Sound1>
+            <Sound1></Sound1>
             <Sound2></Sound2>
             <Sound3></Sound3>
-            <SoundCollectionPath>%%DATAPATH%%sounds</SoundCollectionPath>
-            <Value1>Armed</Value1>
+            <SoundCollectionPath></SoundCollectionPath>
+            <Value1></Value1>
             <Value2>0</Value2>
           </arr_1>
           <size>1</size>
         </Current>
-        <EnableSound>true</EnableSound>
+        <EnableSound>false</EnableSound>
         <listNotifies>
-          <arr_1>
-            <CurrentLanguage>default</CurrentLanguage>
-            <DataObject>FlightStatus</DataObject>
-            <ExpireTimeout>15</ExpireTimeout>
-            <Mute>false</Mute>
-            <ObjectField>Armed</ObjectField>
-            <RangeLimit>0</RangeLimit>
-            <Repeat>0</Repeat>
-            <SayOrder>0</SayOrder>
-            <Sound1>armed</Sound1>
-            <Sound2></Sound2>
-            <Sound3></Sound3>
-            <SoundCollectionPath>%%DATAPATH%%sounds</SoundCollectionPath>
-            <Value1>Armed</Value1>
-            <Value2>0</Value2>
-          </arr_1>
-          <size>1</size>
+          <size>0</size>
         </listNotifies>
       </data>
     </SoundNotifyPlugin>
   </Plugins>
-  <SerialConnection>
-    <speed>57600</speed>
-  </SerialConnection>
   <UAVGadgetConfigurations>
     <ConfigGadget>
       <default>
@@ -1673,6 +1646,7 @@
           <defaultZoom>2</defaultZoom>
           <mapProvider>GoogleSatellite</mapProvider>
           <maxUpdateRate>2000</maxUpdateRate>
+          <overlayOpacity>1</overlayOpacity>
           <showTileGridLines>false</showTileGridLines>
           <uavSymbol>mapquad.png</uavSymbol>
           <useMemoryCache>true</useMemoryCache>
@@ -1692,6 +1666,7 @@
           <defaultZoom>2</defaultZoom>
           <mapProvider>GoogleMap</mapProvider>
           <maxUpdateRate>2000</maxUpdateRate>
+          <overlayOpacity>1</overlayOpacity>
           <showTileGridLines>false</showTileGridLines>
           <uavSymbol>airplanepip.png</uavSymbol>
           <useMemoryCache>true</useMemoryCache>
@@ -1711,6 +1686,7 @@
           <defaultZoom>2</defaultZoom>
           <mapProvider>GoogleMap</mapProvider>
           <maxUpdateRate>2000</maxUpdateRate>
+          <overlayOpacity>1</overlayOpacity>
           <showTileGridLines>false</showTileGridLines>
           <uavSymbol>mapquad.png</uavSymbol>
           <useMemoryCache>true</useMemoryCache>
@@ -2552,35 +2528,38 @@
       <showToolbars>false</showToolbars>
       <splitter>
         <side0>
+          <classId>UAVObjectBrowser</classId>
+          <gadget>
+            <activeConfiguration>default</activeConfiguration>
+          </gadget>
+          <type>uavGadget</type>
+        </side0>
+        <side1>
           <side0>
-            <classId>UAVObjectBrowser</classId>
-            <gadget>
-              <activeConfiguration>default</activeConfiguration>
-            </gadget>
-            <type>uavGadget</type>
+            <side0>
+              <classId>LoggingGadget</classId>
+              <type>uavGadget</type>
+            </side0>
+            <side1>
+              <classId>GpsDisplayGadget</classId>
+              <gadget>
+                <activeConfiguration>Flight GPS</activeConfiguration>
+              </gadget>
+              <type>uavGadget</type>
+            </side1>
+            <splitterOrientation>2</splitterOrientation>
+            <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAAcAAAAAIAAAHo)</splitterSizes>
+            <type>splitter</type>
           </side0>
           <side1>
             <classId>DebugGadget</classId>
             <type>uavGadget</type>
           </side1>
-          <splitterOrientation>1</splitterOrientation>
-          <splitterSizes>@Variant(AAAACQAAAAA=)</splitterSizes>
-          <type>splitter</type>
-        </side0>
-        <side1>
-          <side0>
-            <classId>EmptyGadget</classId>
-            <type>uavGadget</type>
-          </side0>
-          <side1>
-            <classId>EmptyGadget</classId>
-            <type>uavGadget</type>
-          </side1>
-          <splitterOrientation>1</splitterOrientation>
-          <splitterSizes>@Variant(AAAACQAAAAA=)</splitterSizes>
+          <splitterOrientation>2</splitterOrientation>
+          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAB3wAAAAIAAAEp)</splitterSizes>
           <type>splitter</type>
         </side1>
-        <splitterOrientation>2</splitterOrientation>
+        <splitterOrientation>1</splitterOrientation>
         <splitterSizes>@Variant(AAAACQAAAAIAAAACAAACJgAAAAIAAADo)</splitterSizes>
         <type>splitter</type>
       </splitter>
@@ -2610,26 +2589,17 @@
         </side0>
         <side1>
           <side0>
-            <side0>
-              <classId>ScopeGadget</classId>
-              <gadget>
-                <activeConfiguration>Attitude</activeConfiguration>
-              </gadget>
-              <type>uavGadget</type>
-            </side0>
-            <side1>
-              <classId>ScopeGadget</classId>
-              <gadget>
-                <activeConfiguration>Uptimes</activeConfiguration>
-              </gadget>
-              <type>uavGadget</type>
-            </side1>
-            <splitterOrientation>2</splitterOrientation>
-            <splitterSizes>@Variant(AAAACQAAAAIAAAACAAABhgAAAAIAAAEO)</splitterSizes>
-            <type>splitter</type>
+            <classId>ScopeGadget</classId>
+            <gadget>
+              <activeConfiguration>Attitude</activeConfiguration>
+            </gadget>
+            <type>uavGadget</type>
           </side0>
           <side1>
-            <classId>LoggingGadget</classId>
+            <classId>ScopeGadget</classId>
+            <gadget>
+              <activeConfiguration>Uptimes</activeConfiguration>
+            </gadget>
             <type>uavGadget</type>
           </side1>
           <splitterOrientation>2</splitterOrientation>

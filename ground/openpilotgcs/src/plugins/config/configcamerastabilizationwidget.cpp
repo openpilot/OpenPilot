@@ -24,6 +24,15 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+
+/*
+ * IMPORTANT: This module is meant to be a reference implementation which
+ * demostrates the use of ConfigTaskWidget API for widgets which are not directly
+ * related to UAVObjects. It contains a lot of comments including some commented
+ * out code samples. Please DO NOT COPY/PASTE them into any other module based
+ * on this.
+ */
+
 #include "configcamerastabilizationwidget.h"
 #include "camerastabsettings.h"
 #include "hwsettings.h"
@@ -163,11 +172,13 @@ void ConfigCameraStabilizationWidget::refreshWidgetsValues(UAVObject *obj)
  */
 void ConfigCameraStabilizationWidget::updateObjectsFromWidgets()
 {
-    // Save state of the module enable checkbox first
-    HwSettings *hwSettings = HwSettings::GetInstance(getObjectManager());
-    quint8 value = m_camerastabilization->enableCameraStabilization->isChecked() ?
+    // Save state of the module enable checkbox first.
+    // Do not use setData() member on whole object, if possible, since it triggers
+    // unnessesary UAVObect update.
+    quint8 enableModule = m_camerastabilization->enableCameraStabilization->isChecked() ?
             HwSettings::OPTIONALMODULES_ENABLED : HwSettings::OPTIONALMODULES_DISABLED;
-    hwSettings->setOptionalModules(HwSettings::OPTIONALMODULES_CAMERASTAB,value);
+    HwSettings *hwSettings = HwSettings::GetInstance(getObjectManager());
+    hwSettings->setOptionalModules(HwSettings::OPTIONALMODULES_CAMERASTAB, enableModule);
 
     // Update mixer channels which were mapped to camera outputs in case they are
     // not used for other function yet
@@ -230,6 +241,8 @@ void ConfigCameraStabilizationWidget::updateObjectsFromWidgets()
         }
     } while(widgetUpdated);
 
+    // FIXME: Should not use setData() to prevent double updates.
+    // It should be refactored after the reformatting of MixerSettings UAVObject.
     mixerSettings->setData(mixerSettingsData);
 
     ConfigTaskWidget::updateObjectsFromWidgets();

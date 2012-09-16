@@ -33,7 +33,6 @@
 #include <extensionsystem/pluginmanager.h>
 #include "qextserialport/src/qextserialenumerator.h"
 #include "qextserialport/src/qextserialport.h"
-
 #include <QDebug>
 #include <QLabel>
 #include <QHBoxLayout>
@@ -44,13 +43,13 @@ namespace Core {
 
 
 ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow, QTabWidget *modeStack) :
-	QWidget(mainWindow),	// Pip
-	m_availableDevList(0),
+    QWidget(mainWindow),
+    m_availableDevList(0),
     m_connectBtn(0),
-    m_ioDev(NULL),	
-	m_mainWindow(mainWindow)
+    m_ioDev(NULL),
+    polling(true),
+    m_mainWindow(mainWindow)
 {
-
     QHBoxLayout *layout = new QHBoxLayout;
     layout->setSpacing(5);
     layout->setContentsMargins(5,2,5,2);
@@ -61,7 +60,6 @@ ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow, QTabWidge
     layout->addWidget(new QLabel(tr("Connections:")));
 
     m_availableDevList = new QComboBox;
-    //m_availableDevList->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     m_availableDevList->setMinimumWidth(100);
     m_availableDevList->setMaximumWidth(150);
     m_availableDevList->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -86,9 +84,8 @@ ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow, QTabWidge
 
 ConnectionManager::~ConnectionManager()
 {
-	disconnectDevice();	// Pip
-	suspendPolling();	// Pip
-
+    disconnectDevice();
+    suspendPolling();
     if (m_monitorWidget)
         delete m_monitorWidget;
 }
@@ -97,8 +94,8 @@ void ConnectionManager::init()
 {
     //register to the plugin manager so we can receive
     //new connection object from plugins
-	QObject::connect(ExtensionSystem::PluginManager::instance(), SIGNAL(objectAdded(QObject*)), this, SLOT(objectAdded(QObject*)));
-	QObject::connect(ExtensionSystem::PluginManager::instance(), SIGNAL(aboutToRemoveObject(QObject*)), this, SLOT(aboutToRemoveObject(QObject*)));
+    QObject::connect(ExtensionSystem::PluginManager::instance(), SIGNAL(objectAdded(QObject*)), this, SLOT(objectAdded(QObject*)));
+    QObject::connect(ExtensionSystem::PluginManager::instance(), SIGNAL(aboutToRemoveObject(QObject*)), this, SLOT(aboutToRemoveObject(QObject*)));
 }
 
 /**
@@ -106,11 +103,11 @@ void ConnectionManager::init()
 */
 bool ConnectionManager::connectDevice()
 {
-    devListItem connection_device = findDevice(m_availableDevList->itemData(m_availableDevList->currentIndex(),Qt::ToolTipRole).toString());
+    DevListItem connection_device = findDevice(m_availableDevList->itemData(m_availableDevList->currentIndex(),Qt::ToolTipRole).toString());
     if (!connection_device.connection)
         return false;
 
-    QIODevice *io_dev = connection_device.connection->openDevice(connection_device.Name);
+    QIODevice *io_dev = connection_device.connection->openDevice(connection_device.device.name);
     if (!io_dev)
         return false;
 
@@ -118,17 +115,6 @@ bool ConnectionManager::connectDevice()
 
     // check if opening the device worked
     if (!io_dev->isOpen()) {
-        qDebug() << "Error: io_dev->isOpen() returned FALSE .. could not open connection to " << connection_device.devName
-                 << ": " << io_dev->errorString();
-
-        // close the device
-        // EDOUARD: why do we close if we could not open ???
-        try {
-            connection_device.connection->closeDevice(connection_device.devName);
-        }
-        catch (...) {	// handle exception
-            qDebug() << "Exception: connection_device.connection->closeDevice(" << connection_device.devName << ")";
-        }
         return false;
     }
 
@@ -178,10 +164,11 @@ bool ConnectionManager::disconnectDevice()
     emit deviceAboutToDisconnect();
 
     try {
-        if (m_connectionDevice.connection)
-            m_connectionDevice.connection->closeDevice(m_connectionDevice.devName);
+        if (m_connectionDevice.connection) {
+            m_connectionDevice.connection->closeDevice(m_connectionDevice.getConName());
+        }
     } catch (...) {	// handle exception
-        qDebug() << "Exception: m_connectionDevice.connection->closeDevice(" << m_connectionDevice.devName << ")";
+        qDebug() << "Exception: m_connectionDevice.connection->closeDevice(" << m_connectionDevice.getConName() << ")";
     }
 
     m_connectionDevice.connection = NULL;
@@ -200,10 +187,7 @@ void ConnectionManager::objectAdded(QObject *obj)
 {
     //Check if a plugin added a connection object to the pool
     IConnection *connection = Aggregation::query<IConnection>(obj);
-	if (!connection) return;
-
-    //qDebug() << "Connection object registered:" << connection->connectionName();
-    //qDebug() << connection->availableDevices();
+    if (!connection) return;
 
     //register devices and populate CB
     devChanged(connection);
@@ -212,30 +196,30 @@ void ConnectionManager::objectAdded(QObject *obj)
     // to do things
     m_connectionsList.append(connection);
 
-	QObject::connect(connection, SIGNAL(availableDevChanged(IConnection *)), this, SLOT(devChanged(IConnection *)));
+    QObject::connect(connection, SIGNAL(availableDevChanged(IConnection *)), this, SLOT(devChanged(IConnection *)));
 }
 
 void ConnectionManager::aboutToRemoveObject(QObject *obj)
 {
     //Check if a plugin added a connection object to the pool
     IConnection *connection = Aggregation::query<IConnection>(obj);
-	if (!connection) return;
+    if (!connection) return;
 
-	if (m_connectionDevice.connection && m_connectionDevice.connection == connection)	// Pip
-	{	// we are currently using the one that is about to be removed
-		m_connectionDevice.connection = NULL;
-		m_ioDev = NULL;
-	}
+    if (m_connectionDevice.connection && m_connectionDevice.connection == connection)
+    {	// we are currently using the one that is about to be removed
+        disconnectDevice();
+        m_connectionDevice.connection = NULL;
+        m_ioDev = NULL;
+    }
 
-	if (m_connectionsList.contains(connection))
-		m_connectionsList.removeAt(m_connectionsList.indexOf(connection));
+    if (m_connectionsList.contains(connection))
+        m_connectionsList.removeAt(m_connectionsList.indexOf(connection));
 }
 
 
-void ConnectionManager::onConnectionDestroyed(QObject *obj)	// Pip
+void ConnectionManager::onConnectionDestroyed(QObject *obj)
 {
     Q_UNUSED(obj)
-    //onConnectionClosed(obj);
     disconnectDevice();
 }
 
@@ -319,17 +303,17 @@ void ConnectionManager::reconnectCheckSlot()
 /**
 *   Find a device by its displayed (visible on screen) name
 */
-devListItem ConnectionManager::findDevice(const QString &devName)
+DevListItem ConnectionManager::findDevice(const QString &devName)
 {
-	foreach (devListItem d, m_devList)
+    foreach (DevListItem d, m_devList)
     {
-                if (d.devName == devName)
+        if (d.getConName() == devName)
             return d;
     }
 
     qDebug() << "findDevice: cannot find " << devName << " in device list";
 
-    devListItem d;
+    DevListItem d;
     d.connection = NULL;
     return d;
 }
@@ -341,13 +325,14 @@ devListItem ConnectionManager::findDevice(const QString &devName)
 */
 void ConnectionManager::suspendPolling()
 {
-	foreach (IConnection *cnx, m_connectionsList)
-	{
+    foreach (IConnection *cnx, m_connectionsList)
+    {
         cnx->suspendPolling();
     }
 
-	m_connectBtn->setEnabled(false);
-	m_availableDevList->setEnabled(false);
+    m_connectBtn->setEnabled(false);
+    m_availableDevList->setEnabled(false);
+    polling = false;
 }
 
 /**
@@ -356,36 +341,57 @@ void ConnectionManager::suspendPolling()
 */
 void ConnectionManager::resumePolling()
 {
-	foreach (IConnection *cnx, m_connectionsList)
-	{
+    foreach (IConnection *cnx, m_connectionsList)
+    {
         cnx->resumePolling();
     }
 
-	m_connectBtn->setEnabled(true);
-	m_availableDevList->setEnabled(true);
+    m_connectBtn->setEnabled(true);
+    m_availableDevList->setEnabled(true);
+    polling = true;
 }
 
 /**
-*   Unregister all devices from one connection plugin
-*   \param[in] connection Connection type that you want to forget about :)
-*/
-void ConnectionManager::unregisterAll(IConnection *connection)
+ * Synchronize the list of connections displayed with those physically
+ * present
+ * @param[in] connection Connection type that you want to forget about :)
+ */
+void ConnectionManager::updateConnectionList(IConnection *connection)
 {
-	for (QLinkedList<devListItem>::iterator iter = m_devList.begin(); iter != m_devList.end(); )
-	{
-		if (iter->connection == connection)
-		{
-			if (m_connectionDevice.connection && m_connectionDevice.connection == connection)
-			{	// we are currently using the one we are about to erase
-                                //onConnectionClosed(m_connectionDevice.connection);
-                            disconnectDevice();
-			}
+    // Get the updated list of devices
+    QList <IConnection::device> availableDev = connection->availableDevices();
 
-			iter = m_devList.erase(iter);
-		}
-		else
-			++iter;
-	}
+    // Go through the list of connections of that type.  If they are not in the
+    // available device list then remove them.  If they are connected, then
+    // disconnect them.
+    for (QLinkedList<DevListItem>::iterator iter = m_devList.begin(); iter != m_devList.end(); )
+    {
+        if (iter->connection != connection) {
+            ++iter;
+            continue;
+        }
+
+        // See if device exists in the updated availability list
+        bool found = availableDev.contains(iter->device);
+        if (!found) {
+            // we are currently using the one we are about to erase
+            if (m_connectionDevice.connection && m_connectionDevice.connection == connection && m_connectionDevice.device == iter->device) {
+                disconnectDevice();
+            }
+
+            iter = m_devList.erase(iter);
+        } else
+            ++iter;
+    }
+
+    // Add any back to list that don't exist
+    foreach (IConnection::device dev, availableDev)
+    {
+        bool found = m_devList.contains(DevListItem(connection, dev));
+        if (!found) {
+            registerDevice(connection,dev);
+        }
+    }
 }
 
 /**
@@ -394,13 +400,9 @@ void ConnectionManager::unregisterAll(IConnection *connection)
 *  @param disp is the name that is displayed in the dropdown menu
 *  @param name is the actual device name
 */
-void ConnectionManager::registerDevice(IConnection *conn, const QString &devN, const QString &name, const QString &disp)
+void ConnectionManager::registerDevice(IConnection *conn, IConnection::device device)
 {
-    devListItem d;
-    d.connection = conn;
-    d.devName = devN;
-    d.Name = name;
-    d.displayName=disp;
+    DevListItem d(conn,device);
     m_devList.append(d);
 }
 
@@ -421,41 +423,9 @@ void ConnectionManager::devChanged(IConnection *connection)
     m_availableDevList->clear();
 
     //remove registered devices of this IConnection from the list
-    unregisterAll(connection);
+    updateConnectionList(connection);
 
-    //and add them back in the list
-    QList <IConnection::device> availableDev = connection->availableDevices();
-    foreach (IConnection::device dev, availableDev)
-    {
-        QString cbName = connection->shortName() + ": " + dev.name;
-        QString disp = connection->shortName() + " : " + dev.displayName;
-        registerDevice(connection,cbName,dev.name,disp);
-    }
-
-    //add all the list again to the combobox
-    foreach (devListItem d, m_devList)
-    {
-        m_availableDevList->addItem(d.displayName);
-        m_availableDevList->setItemData(m_availableDevList->count()-1,(const QString)d.devName,Qt::ToolTipRole);
-        if(!m_ioDev && d.displayName.startsWith("USB"))
-        {
-            if(m_mainWindow->generalSettings()->autoConnect() || m_mainWindow->generalSettings()->autoSelect())
-                m_availableDevList->setCurrentIndex(m_availableDevList->count()-1);
-            if(m_mainWindow->generalSettings()->autoConnect())
-            {
-                connectDevice();
-                qDebug()<<"ConnectionManager::devChanged autoconnected USB device";
-            }
-        }
-    }
-    if(m_ioDev)//if a device is connected make it the one selected on the dropbox
-    {
-        for(int x=0;x<m_availableDevList->count();++x)
-        {
-            if(m_connectionDevice.devName==m_availableDevList->itemData(x,Qt::ToolTipRole).toString())
-                m_availableDevList->setCurrentIndex(x);
-        }
-    }
+    updateConnectionDropdown();
 
 
     //disable connection button if the liNameif (m_availableDevList->count() > 0)
@@ -465,6 +435,33 @@ void ConnectionManager::devChanged(IConnection *connection)
         m_connectBtn->setEnabled(false);
 }
 
+void ConnectionManager::updateConnectionDropdown()
+{
+    //add all the list again to the combobox
+    foreach (DevListItem d, m_devList)
+    {
+        m_availableDevList->addItem(d.getConName());
+        m_availableDevList->setItemData(m_availableDevList->count()-1, d.getConName(), Qt::ToolTipRole);
+        if(!m_ioDev && d.getConName().startsWith("USB"))
+        {
+            if(m_mainWindow->generalSettings()->autoConnect() || m_mainWindow->generalSettings()->autoSelect())
+                m_availableDevList->setCurrentIndex(m_availableDevList->count()-1);
+            if(m_mainWindow->generalSettings()->autoConnect() && polling)
+            {
+                qDebug() << "Automatically opening device";
+                connectDevice();
+                qDebug()<<"ConnectionManager::devChanged autoconnected USB device";
+            }
+        }
+    }
+    if(m_ioDev)//if a device is connected make it the one selected on the dropbox
+    {
+        for(int x=0;x<m_availableDevList->count();++x)
+        {
+            if(m_connectionDevice.getConName()==m_availableDevList->itemData(x,Qt::ToolTipRole).toString())
+                m_availableDevList->setCurrentIndex(x);
+        }
+    }
 }
 
 void Core::ConnectionManager::connectionsCallBack()
@@ -475,4 +472,6 @@ void Core::ConnectionManager::connectionsCallBack()
     }
     connectionBackup.clear();
     disconnect(ExtensionSystem::PluginManager::instance(),SIGNAL(pluginsLoadEnded()),this,SLOT(connectionsCallBack()));
+}
+
 } //namespace Core

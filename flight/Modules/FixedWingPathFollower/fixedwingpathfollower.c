@@ -399,7 +399,7 @@ static uint8_t updateFixedDesiredAttitude(FixedWingPathFollowerSettingsData fixe
 //========================================	
 	
 	float rho;
-	float rollFF;
+	//float rollFF;
 	float headingCommand_R;
 	
 	float pncn=p[0]-c[0];
@@ -456,19 +456,19 @@ static uint8_t updateFixedDesiredAttitude(FixedWingPathFollowerSettingsData fixe
 	switch (pathType){
 		case ORBIT:
 			if(pathDesired.Mode==PATHDESIRED_MODE_FLYCIRCLELEFT) {
-				rollFF=-ROLL_FOR_HOLDING_CIRCLE*DEG2RAD;
+//				rollFF=-ROLL_FOR_HOLDING_CIRCLE*DEG2RAD;
 				direction=false;
 			}
 			else {
 				//In the case where the direction is undefined, always fly in a clockwise fashion
 				direction=true;
-				rollFF=ROLL_FOR_HOLDING_CIRCLE*DEG2RAD; 
+//				rollFF=ROLL_FOR_HOLDING_CIRCLE*DEG2RAD; 
 			}
 			
 			headingCommand_R=followOrbit(c, rho, direction, p, headingActual_R, k_orbit, k_psi_int, dT);
 			break;
 		case LINE:
-			rollFF=0;
+//			rollFF=0;
 			headingCommand_R=followStraightLine(r, q, p, headingActual_R, chi_inf, k_path, k_psi_int, dT);
 			break;
 	}

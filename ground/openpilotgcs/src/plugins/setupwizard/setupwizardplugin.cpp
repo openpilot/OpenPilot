@@ -35,6 +35,7 @@
 #include <coreplugin/actionmanager/actionmanager.h>
 #include <coreplugin/icore.h>
 #include <QKeySequence>
+#include <coreplugin/modemanager.h>
 
 SetupWizardPlugin::SetupWizardPlugin()
 {
@@ -58,8 +59,10 @@ bool SetupWizardPlugin::initialize(const QStringList& args, QString *errMsg)
                                             "SetupWizardPlugin.ShowSetupWizard",
                                             QList<int>() <<
                                             Core::Constants::C_GLOBAL_ID);
-    cmd->setDefaultKeySequence(QKeySequence("Ctrl+W"));
-    cmd->action()->setText(tr("OpenPilot Setup Wizard"));
+    cmd->setDefaultKeySequence(QKeySequence("Ctrl+V"));
+    cmd->action()->setText(tr("Vehicle Setup Wizard"));
+
+    Core::ModeManager::instance()->addAction(cmd, 1);
 
     ac->menu()->addSeparator();
     ac->appendGroup("Wizard");

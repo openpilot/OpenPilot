@@ -50,6 +50,8 @@ public:
     IUAVGadget *createGadget(QWidget *parent);
     IUAVGadgetConfiguration *createConfiguration(QSettings* qSettings);
     IOptionsPage *createOptionsPage(IUAVGadgetConfiguration *config);
+
+public slots:
     void startInputWizard();
 
 private:

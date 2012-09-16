@@ -41,6 +41,7 @@
 #include "pages/flashpage.h"
 #include "pages/outputcalibrationpage.h"
 #include "pages/notyetimplementedpage.h"
+#include "pages/rebootpage.h"
 #include "extensionsystem/pluginmanager.h"
 #include "vehicleconfigurationhelper.h"
 #include "actuatorsettings.h"
@@ -105,6 +106,13 @@ int SetupWizard::nextId() const
         case PAGE_SUMMARY:
             return PAGE_LEVELLING;
         case PAGE_FLASH:
+            if(isRestartNeeded()) {
+                return PAGE_REBOOT;
+            }
+            else {
+                return PAGE_END;
+            }
+        case PAGE_REBOOT:
             return PAGE_END;
         case PAGE_NOTYETIMPLEMENTED:
             return PAGE_END;
@@ -251,6 +259,7 @@ void SetupWizard::createPages()
     setPage(PAGE_CALIBRATION, new OutputCalibrationPage(this));
     setPage(PAGE_SUMMARY, new SummaryPage(this));
     setPage(PAGE_FLASH, new FlashPage(this));
+    setPage(PAGE_REBOOT, new RebootPage(this));
     setPage(PAGE_NOTYETIMPLEMENTED, new NotYetImplementedPage(this));
     setPage(PAGE_END, new EndPage(this));
 

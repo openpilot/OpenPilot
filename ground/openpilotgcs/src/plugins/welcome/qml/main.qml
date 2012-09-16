@@ -36,12 +36,12 @@ Rectangle {
 
         WelcomePageButton {
             baseIconName: "bttn-vehwizard"
-            onClicked: welcomePlugin.openPage("VehWizard")
+            onClicked: welcomePlugin.triggerAction("SetupWizardPlugin.ShowSetupWizard")
         }
 
         WelcomePageButton {
             baseIconName: "bttn-txwizard"
-            onClicked: welcomePlugin.openPage("TxWizard")
+            onClicked: welcomePlugin.triggerAction("ConfigPlugin.ShowInputWizard")
         }
     }
 

@@ -29,6 +29,10 @@
 #include "configgadgetconfiguration.h"
 #include "configgadgetoptionspage.h"
 #include <coreplugin/iuavgadget.h>
+#include <coreplugin/coreconstants.h>
+#include <coreplugin/actionmanager/actionmanager.h>
+#include <coreplugin/icore.h>
+#include <coreplugin/modemanager.h>
 
 ConfigGadgetFactory::ConfigGadgetFactory(QObject *parent) :
     IUAVGadgetFactory(QString("ConfigGadget"), tr("Config Gadget"), parent),
@@ -43,6 +47,25 @@ ConfigGadgetFactory::~ConfigGadgetFactory()
 Core::IUAVGadget* ConfigGadgetFactory::createGadget(QWidget *parent)
 {
     gadgetWidget = new ConfigGadgetWidget(parent);
+
+    // Add Menu entry
+    Core::ActionManager* am = Core::ICore::instance()->actionManager();
+    Core::ActionContainer* ac = am->actionContainer(Core::Constants::M_TOOLS);
+
+    Core::Command* cmd = am->registerAction(new QAction(this),
+                                            "ConfigPlugin.ShowInputWizard",
+                                            QList<int>() <<
+                                            Core::Constants::C_GLOBAL_ID);
+    cmd->setDefaultKeySequence(QKeySequence("Ctrl+R"));
+    cmd->action()->setText(tr("Radio Setup Wizard"));
+
+    Core::ModeManager::instance()->addAction(cmd, 1);
+
+    ac->appendGroup("Wizard");
+    ac->addAction(cmd, "Wizard");
+
+    connect(cmd->action(), SIGNAL(triggered(bool)), this, SLOT(startInputWizard()));
+
     return new ConfigGadget(QString("ConfigGadget"), gadgetWidget, parent);
 }
 
@@ -60,6 +83,7 @@ void ConfigGadgetFactory::startInputWizard()
 {
     if(gadgetWidget)
     {
+        Core::ModeManager::instance()->activateModeByWorkspaceName("Configuration");
         gadgetWidget->startInputWizard();
     }
 }

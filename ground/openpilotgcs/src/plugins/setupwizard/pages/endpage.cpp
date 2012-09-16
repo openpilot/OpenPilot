@@ -51,7 +51,7 @@ void EndPage::openInputWizard()
     ConfigGadgetFactory* configGadgetFactory = pm->getObject<ConfigGadgetFactory>();
 
     if(configGadgetFactory) {
-        Core::ModeManager::instance()->activateModeByWorkspaceName("Configuration");
+        //Core::ModeManager::instance()->activateModeByWorkspaceName("Configuration");
         getWizard()->close();
         configGadgetFactory->startInputWizard();
     }

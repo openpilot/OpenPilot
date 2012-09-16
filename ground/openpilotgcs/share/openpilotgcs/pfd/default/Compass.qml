@@ -12,8 +12,8 @@ Item {
 
         clip: true
 
-        x: scaledBounds.x * sceneItem.width
-        y: scaledBounds.y * sceneItem.height
+        x: Math.floor(scaledBounds.x * sceneItem.width)
+        y: Math.floor(scaledBounds.y * sceneItem.height)
         //anchors.horizontalCenter: parent.horizontalCenter
 
         //split compass band to 8 parts to ensure it doesn't exceed the max texture size

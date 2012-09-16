@@ -13,10 +13,8 @@ Item {
         property string statusName : ["Disconnected","HandshakeReq","HandshakeAck","Connected"][GCSTelemetryStats.Status]
 
         scaledBounds: svgRenderer.scaledElementBounds("pfd.svg", "gcstelemetry-Disconnected")
-        x: scaledBounds.x * sceneItem.width
-        y: scaledBounds.y * sceneItem.height
-        width: scaledBounds.width * sceneItem.width
-        height: scaledBounds.height * sceneItem.height
+        x: Math.floor(scaledBounds.x * sceneItem.width)
+        y: Math.floor(scaledBounds.y * sceneItem.height)
     }
 
     //telemetry rate text
@@ -41,8 +39,8 @@ Item {
         visible: GPSPosition.Satellites > 0
 
         property variant scaledBounds: svgRenderer.scaledElementBounds("pfd.svg", "gps-txt")
-        x: scaledBounds.x * sceneItem.width
-        y: scaledBounds.y * sceneItem.height
+        x: Math.floor(scaledBounds.x * sceneItem.width)
+        y: Math.floor(scaledBounds.y * sceneItem.height)
     }
 
     Text {
@@ -63,8 +61,7 @@ Item {
         visible: FlightBatteryState.Voltage > 0 || FlightBatteryState.Current > 0
 
         property variant scaledBounds: svgRenderer.scaledElementBounds("pfd.svg", "battery-txt")
-        x: scaledBounds.x * sceneItem.width
-        y: scaledBounds.y * sceneItem.height
-
+        x: Math.floor(scaledBounds.x * sceneItem.width)
+        y: Math.floor(scaledBounds.y * sceneItem.height)
     }
 }

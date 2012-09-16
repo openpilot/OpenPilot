@@ -10,10 +10,8 @@ Item {
         sceneSize: sceneItem.sceneSize
         clip: true
 
-        x: scaledBounds.x * sceneItem.width
-        y: scaledBounds.y * sceneItem.height
-        width: scaledBounds.width * sceneItem.width
-        height: scaledBounds.height * sceneItem.height
+        x: Math.floor(scaledBounds.x * sceneItem.width)
+        y: Math.floor(scaledBounds.y * sceneItem.height)
 
         SvgElementImage {
             id: vsi_bar
@@ -73,9 +71,7 @@ Item {
         elementName: "vsi-window"
         sceneSize: sceneItem.sceneSize
 
-        x: scaledBounds.x * sceneItem.width
-        y: scaledBounds.y * sceneItem.height
-        width: scaledBounds.width * sceneItem.width
-        height: scaledBounds.height * sceneItem.height
+        x: Math.floor(scaledBounds.x * sceneItem.width)
+        y: Math.floor(scaledBounds.y * sceneItem.height)
     }
 }

@@ -8,8 +8,8 @@ Item {
         smooth: true
 
         property variant scaledBounds: svgRenderer.scaledElementBounds("pfd.svg", "world")
-        width: sceneItem.width*scaledBounds.width
-        height: sceneItem.height*scaledBounds.height
+        width: Math.round(sceneItem.width*scaledBounds.width/2)*2
+        height: Math.round(sceneItem.height*scaledBounds.height/2)*2
 
         gradient: Gradient {
             GradientStop { position: 0.3;    color: "#6589E2" }
@@ -21,8 +21,9 @@ Item {
         transform: [
             Translate {
                 id: pitchTranslate
-                x: (world.parent.width - world.width)/2
-                y: (world.parent.height - world.height)/2 + AttitudeActual.Pitch*world.parent.height/94
+                x: Math.round((world.parent.width - world.width)/2)
+                y: Math.round((world.parent.height - world.height)/2 +
+                              AttitudeActual.Pitch*world.parent.height/94)
             },
             Rotation {
                 angle: -AttitudeActual.Roll

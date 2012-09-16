@@ -28,18 +28,26 @@
 #ifndef SVGIMAGEPROVIDER_H_
 #define SVGIMAGEPROVIDER_H_
 
+#include <QObject>
 #include <QtDeclarative/qdeclarativeimageprovider.h>
 #include <QSvgRenderer>
 #include <QMap>
 
-class SvgImageProvider : public QDeclarativeImageProvider
+#include "utils_global.h"
+
+class QTCREATOR_UTILS_EXPORT SvgImageProvider : public QObject, public QDeclarativeImageProvider
 {
+    Q_OBJECT
 public:
     SvgImageProvider(const QString &basePath);
    ~SvgImageProvider();
 
+    QSvgRenderer *loadRenderer(const QString &svgFile);
+
     QImage requestImage(const QString &id, QSize *size, const QSize& requestedSize);
     QPixmap requestPixmap(const QString &id, QSize *size, const QSize& requestedSize);
+
+    Q_INVOKABLE QRectF scaledElementBounds(const QString &svgFile, const QString &elementName);
 
 private:
     QMap<QString, QSvgRenderer*> m_renderers;

@@ -48,7 +48,7 @@
 SetupWizard::SetupWizard(QWidget *parent) : QWizard(parent), VehicleConfigurationSource(),
     m_controllerType(CONTROLLER_UNKNOWN),
     m_vehicleType(VEHICLE_UNKNOWN), m_inputType(INPUT_UNKNOWN), m_escType(ESC_UNKNOWN),
-    m_levellingPerformed(false), m_connectionManager(0)
+    m_levellingPerformed(false), m_restartNeeded(false), m_connectionManager(0)
 {
     setWindowTitle(tr("OpenPilot Setup Wizard"));
     setOption(QWizard::IndependentPages, false);
@@ -210,7 +210,7 @@ QString SetupWizard::getSummaryText()
             summary.append(tr("Futaba S.Bus"));
             break;
         case INPUT_DSM:
-            summary.append(tr("Spectrum satellite"));
+            summary.append(tr("Spectrum satellite (DSM2)"));
             break;
         default:
             summary.append(tr("Unknown"));
@@ -230,6 +230,9 @@ QString SetupWizard::getSummaryText()
             summary.append(tr("Unknown"));
     }
 
+    summary.append("<br>");
+    summary.append("<b>").append(tr("Reboot required: ")).append("</b>");
+    summary.append(isRestartNeeded() ? tr("<font color='red'>Yes</font>") : tr("<font color='green'>No</font>"));
     return summary;
 }
 

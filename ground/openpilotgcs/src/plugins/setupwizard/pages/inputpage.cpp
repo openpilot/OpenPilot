@@ -28,6 +28,9 @@
 #include "inputpage.h"
 #include "ui_inputpage.h"
 #include "setupwizard.h"
+#include "extensionsystem/pluginmanager.h"
+#include "uavobjectmanager.h"
+#include "hwsettings.h"
 
 InputPage::InputPage(SetupWizard *wizard, QWidget *parent) :
         AbstractWizardPage(wizard, parent),
@@ -59,6 +62,30 @@ bool InputPage::validatePage()
     else {
         getWizard()->setInputType(SetupWizard::INPUT_PWM);
     }
+    getWizard()->setRestartNeeded(restartNeeded(getWizard()->getInputType()));
 
     return true;
+}
+
+bool InputPage::restartNeeded(VehicleConfigurationSource::INPUT_TYPE selectedType)
+{
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *uavoManager = pm->getObject<UAVObjectManager>();
+    Q_ASSERT(uavoManager);
+    HwSettings* hwSettings = HwSettings::GetInstance(uavoManager);
+    HwSettings::DataFields data = hwSettings->getData();
+    switch(selectedType)
+    {
+        case VehicleConfigurationSource::INPUT_PWM:
+            return data.CC_RcvrPort != HwSettings::CC_RCVRPORT_PWM;
+        case VehicleConfigurationSource::INPUT_PPM:
+            return data.CC_RcvrPort != HwSettings::CC_RCVRPORT_PPM;
+        case VehicleConfigurationSource::INPUT_SBUS:
+            return data.CC_MainPort != HwSettings::CC_MAINPORT_SBUS;
+        case VehicleConfigurationSource::INPUT_DSM:
+            // TODO: Handle all of the DSM types ?? Which is most common?
+            return data.CC_MainPort != HwSettings::CC_MAINPORT_DSM2;
+        default:
+            return true;
+    }
 }

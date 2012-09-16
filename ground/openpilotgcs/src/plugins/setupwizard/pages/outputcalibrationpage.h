@@ -76,6 +76,7 @@ private:
     void enableButtons(bool enable);
     void onStartButtonToggle(QAbstractButton *button, quint16 channel, quint16 value, quint16 safeValue, QSlider *slider);
     bool checkAlarms();
+    void debugLogChannelValues();
     quint16 getCurrentChannel();
 
     Ui::OutputCalibrationPage *ui;

@@ -5,7 +5,8 @@ QT += gui \
     network \
     xml \
     svg \
-    opengl
+    opengl \
+    declarative
 
 DEFINES += QTCREATOR_UTILS_LIB
 
@@ -51,7 +52,9 @@ SOURCES += reloadpromptutils.cpp \
     mytabbedstackwidget.cpp \
     mytabwidget.cpp \
     mylistwidget.cpp \
-    cachedsvgitem.cpp
+    cachedsvgitem.cpp \
+    svgimageprovider.cpp
+
 SOURCES += xmlconfig.cpp
 
 win32 {
@@ -106,7 +109,10 @@ HEADERS += utils_global.h \
     mytabbedstackwidget.h \
     mytabwidget.h \
     mylistwidget.h \
-    cachedsvgitem.h
+    cachedsvgitem.h \
+    svgimageprovider.h
+
+
 HEADERS += xmlconfig.h
 
 FORMS += filewizardpage.ui \

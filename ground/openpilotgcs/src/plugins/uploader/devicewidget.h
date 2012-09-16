@@ -64,7 +64,7 @@ private:
     DFUObject *m_dfu;
     QByteArray downloadedFirmware;
     QString filename;
-    QGraphicsSvgItem *devicePic;
+    QPixmap devicePic;
     QByteArray descriptionArray;
     void status(QString str, StatusIcon ic);
     bool populateBoardStructuredDescription(QByteArray arr);

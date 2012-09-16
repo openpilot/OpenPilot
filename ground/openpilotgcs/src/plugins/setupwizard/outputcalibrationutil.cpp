@@ -85,11 +85,12 @@ void OutputCalibrationUtil::stopChannelOutput()
         qDebug() << "Stopping output for channel " << m_outputChannel << "...";
         //Stop output...
         setChannelOutputValue(m_safeValue);
+        qDebug() << "Settings output for channel " << m_outputChannel << " to " << m_safeValue;
 
         // Restore metadata to what it was before
         ActuatorCommand *actuatorCommand = ActuatorCommand::GetInstance(m_uavObjectManager);
         Q_ASSERT(actuatorCommand);
-        actuatorCommand->setData(m_savedActuatorCommandData);
+        //actuatorCommand->setData(m_savedActuatorCommandData);
         actuatorCommand->setMetadata(m_savedActuatorCommandMetadata);
         actuatorCommand->updated();
 

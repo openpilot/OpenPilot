@@ -52,7 +52,7 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
 	} else {
 		qDebug() << "Error: Object is unknown (PipXSettings).";
 	}
-
+    autoLoadWidgets();
 	addApplySaveButtons(m_pipx->Apply, m_pipx->Save);
 
 	addUAVObjectToWidgetRelation("PipXSettings", "TelemetryConfig", m_pipx->TelemPortConfig);

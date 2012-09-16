@@ -32,6 +32,7 @@
 #include <QWidget>
 #include "mainwindow.h"
 #include "generalsettings.h"
+#include "telemetrymonitorwidget.h"
 #include <coreplugin/iconnection.h>
 #include <QtCore/QVector>
 #include <QtCore/QIODevice>
@@ -40,6 +41,7 @@
 #include <QtGui/QComboBox>
 
 #include "core_global.h"
+#include <QTimer>
 
 QT_BEGIN_NAMESPACE
 class QTabWidget;
@@ -47,12 +49,12 @@ QT_END_NAMESPACE
 
 namespace Core {
 
-class IConnection;
+    class IConnection;
 
 namespace Internal {
-class FancyTabWidget;
-class FancyActionBar;
-class MainWindow;
+    class FancyTabWidget;
+    class FancyActionBar;
+    class MainWindow;
 } // namespace Internal
 
 
@@ -99,7 +101,6 @@ public:
 
     bool connectDevice(DevListItem device);
     bool disconnectDevice();
-
     void suspendPolling();
     void resumePolling();
 
@@ -110,24 +111,35 @@ protected:
 
 signals:
     void deviceConnected(QIODevice *device);
-    void deviceDisconnected();
     void deviceAboutToDisconnect();
+    void deviceDisconnected();
     void availableDevicesChanged(const QLinkedList<Core::DevListItem> devices);
+
+public slots:
+    void telemetryConnected();
+    void telemetryDisconnected();
+    void telemetryUpdated(double txRate, double rxRate);
 
 private slots:
     void objectAdded(QObject *obj);
     void aboutToRemoveObject(QObject *obj);
 
-    void onConnectPressed();
+    void onConnectClicked();
     void devChanged(IConnection *connection);
 
-	void onConnectionDestroyed(QObject *obj);
+    void onConnectionDestroyed(QObject *obj);
     void connectionsCallBack(); //used to call devChange after all the plugins are loaded
+    void reconnectSlot();
+    void reconnectCheckSlot();
+
 protected:
     QComboBox *m_availableDevList;
     QPushButton *m_connectBtn;
     QLinkedList<DevListItem> m_devList;
     QList<IConnection*> m_connectionsList;
+
+    //tx/rx telemetry monitor
+    TelemetryMonitorWidget* m_monitorWidget;
 
     //currently connected connection plugin
     DevListItem m_connectionDevice;
@@ -140,6 +152,8 @@ private:
     bool polling;
     Internal::MainWindow *m_mainWindow;
     QList <IConnection *> connectionBackup;
+    QTimer *reconnect;
+    QTimer *reconnectCheck;
 
 };
 

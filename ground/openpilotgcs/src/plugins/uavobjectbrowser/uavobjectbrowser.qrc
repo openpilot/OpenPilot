@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/uavobjectbrowser">
+        <file>images/down_alt.png</file>
+        <file>images/install.png</file>
+        <file>images/remove.png</file>
+        <file>images/up_alt.png</file>
+        <file>images/trash.png</file>
+        <file>images/1343241276_eye.png</file>
+    </qresource>
+</RCC>

@@ -2,21 +2,15 @@
   <General>
     <AutoConnect>true</AutoConnect>
     <AutoSelect>true</AutoSelect>
-    <LastPreferenceCategory>LineardialGadget</LastPreferenceCategory>
-    <LastPreferencePage>Mainboard CPU</LastPreferencePage>
+    <UDPMirror>false</UDPMirror>
+    <Description>Default configuration</Description>
+    <Details>Default configuration built to work on all screen sizes</Details>
+    <ExpertMode>false</ExpertMode>
+    <OverrideLanguage>en_AU</OverrideLanguage>
     <SaveSettingsOnExit>true</SaveSettingsOnExit>
-    <SettingsWindowHeight>476</SettingsWindowHeight>
-    <SettingsWindowWidth>697</SettingsWindowWidth>
+    <StyleSheet>default</StyleSheet>
+    <UDPMirror>false</UDPMirror>
   </General>
-  <IPconnection>
-    <Current>
-      <arr_1>
-        <Port>1</Port>
-        <UseTCP>0</UseTCP>
-      </arr_1>
-      <size>1</size>
-    </Current>
-  </IPconnection>
   <KeyBindings>
     <size>0</size>
   </KeyBindings>
@@ -31,11 +25,42 @@
     <Mode3>89</Mode3>
     <Mode4>88</Mode4>
     <Mode5>87</Mode5>
+    <Mode6>86</Mode6>
     <Welcome>100</Welcome>
   </ModePriorities>
-  <SerialConnection>
-    <speed>57600</speed>
-  </SerialConnection>
+  <Plugins>
+    <SoundNotifyPlugin>
+      <configInfo>
+        <locked>false</locked>
+        <version>1.0.0</version>
+      </configInfo>
+      <data>
+        <Current>
+          <arr_1>
+            <CurrentLanguage></CurrentLanguage>
+            <DataObject></DataObject>
+            <ExpireTimeout>0</ExpireTimeout>
+            <Mute>false</Mute>
+            <ObjectField></ObjectField>
+            <RangeLimit>0</RangeLimit>
+            <Repeat>0</Repeat>
+            <SayOrder>0</SayOrder>
+            <Sound1></Sound1>
+            <Sound2></Sound2>
+            <Sound3></Sound3>
+            <SoundCollectionPath></SoundCollectionPath>
+            <Value1></Value1>
+            <Value2>0</Value2>
+          </arr_1>
+          <size>1</size>
+        </Current>
+        <EnableSound>false</EnableSound>
+        <listNotifies>
+          <size>0</size>
+        </listNotifies>
+      </data>
+    </SoundNotifyPlugin>
+  </Plugins>
   <UAVGadgetConfigurations>
     <ConfigGadget>
       <default>
@@ -858,6 +883,7 @@
           <channel5Reverse>false</channel5Reverse>
           <channel6Reverse>false</channel6Reverse>
           <channel7Reverse>false</channel7Reverse>
+          <controlPortUDP>0</controlPortUDP>
           <controlsMode>2</controlsMode>
           <pitchChannel>1</pitchChannel>
           <rollChannel>0</rollChannel>
@@ -1620,6 +1646,7 @@
           <defaultZoom>2</defaultZoom>
           <mapProvider>GoogleSatellite</mapProvider>
           <maxUpdateRate>2000</maxUpdateRate>
+          <overlayOpacity>1</overlayOpacity>
           <showTileGridLines>false</showTileGridLines>
           <uavSymbol>mapquad.png</uavSymbol>
           <useMemoryCache>true</useMemoryCache>
@@ -1639,6 +1666,7 @@
           <defaultZoom>2</defaultZoom>
           <mapProvider>GoogleMap</mapProvider>
           <maxUpdateRate>2000</maxUpdateRate>
+          <overlayOpacity>1</overlayOpacity>
           <showTileGridLines>false</showTileGridLines>
           <uavSymbol>airplanepip.png</uavSymbol>
           <useMemoryCache>true</useMemoryCache>
@@ -1658,6 +1686,7 @@
           <defaultZoom>2</defaultZoom>
           <mapProvider>GoogleMap</mapProvider>
           <maxUpdateRate>2000</maxUpdateRate>
+          <overlayOpacity>1</overlayOpacity>
           <showTileGridLines>false</showTileGridLines>
           <uavSymbol>mapquad.png</uavSymbol>
           <useMemoryCache>true</useMemoryCache>
@@ -1691,6 +1720,40 @@
         </data>
       </smooth>
     </PFDGadget>
+    <PfdQmlGadget>
+      <NoTerrain>
+        <configInfo>
+          <locked>false</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <actualPositionUsed>false</actualPositionUsed>
+          <altitude>2000</altitude>
+          <cacheOnly>false</cacheOnly>
+          <earthFile>%%DATAPATH%%pfd/default/readymap.earth</earthFile>
+          <latitude>46.6715</latitude>
+          <longitude>10.1589</longitude>
+          <qmlFile>%%DATAPATH%%pfd/default/Pfd.qml</qmlFile>
+          <terrainEnabled>false</terrainEnabled>
+        </data>
+      </NoTerrain>
+      <Terrain>
+        <configInfo>
+          <locked>false</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <actualPositionUsed>false</actualPositionUsed>
+          <altitude>2000</altitude>
+          <cacheOnly>false</cacheOnly>
+          <earthFile>%%DATAPATH%%pfd/default/readymap.earth</earthFile>
+          <latitude>46.6715</latitude>
+          <longitude>10.1589</longitude>
+          <qmlFile>%%DATAPATH%%pfd/default/Pfd.qml</qmlFile>
+          <terrainEnabled>false</terrainEnabled>
+        </data>
+      </Terrain>
+    </PfdQmlGadget>
     <QmlViewGadget>
       <default>
         <configInfo>
@@ -1712,7 +1775,6 @@
         <data>
           <LoggingEnabled>false</LoggingEnabled>
           <LoggingNewFileOnConnect>false</LoggingNewFileOnConnect>
-          <LoggingPath></LoggingPath>
           <configurationStreamVersion>1000</configurationStreamVersion>
           <dataSize>60</dataSize>
           <plotCurve0>
@@ -1758,7 +1820,6 @@
         <data>
           <LoggingEnabled>false</LoggingEnabled>
           <LoggingNewFileOnConnect>false</LoggingNewFileOnConnect>
-          <LoggingPath></LoggingPath>
           <configurationStreamVersion>1000</configurationStreamVersion>
           <dataSize>20</dataSize>
           <plotCurve0>
@@ -1814,7 +1875,6 @@
         <data>
           <LoggingEnabled>false</LoggingEnabled>
           <LoggingNewFileOnConnect>false</LoggingNewFileOnConnect>
-          <LoggingPath></LoggingPath>
           <configurationStreamVersion>1000</configurationStreamVersion>
           <dataSize>60</dataSize>
           <plotCurve0>
@@ -1860,7 +1920,6 @@
         <data>
           <LoggingEnabled>false</LoggingEnabled>
           <LoggingNewFileOnConnect>false</LoggingNewFileOnConnect>
-          <LoggingPath></LoggingPath>
           <configurationStreamVersion>1000</configurationStreamVersion>
           <dataSize>60</dataSize>
           <plotCurve0>
@@ -1886,7 +1945,6 @@
         <data>
           <LoggingEnabled>false</LoggingEnabled>
           <LoggingNewFileOnConnect>false</LoggingNewFileOnConnect>
-          <LoggingPath></LoggingPath>
           <configurationStreamVersion>1000</configurationStreamVersion>
           <dataSize>40</dataSize>
           <plotCurve0>
@@ -1982,7 +2040,6 @@
         <data>
           <LoggingEnabled>false</LoggingEnabled>
           <LoggingNewFileOnConnect>false</LoggingNewFileOnConnect>
-          <LoggingPath></LoggingPath>
           <configurationStreamVersion>1000</configurationStreamVersion>
           <dataSize>60</dataSize>
           <plotCurve0>
@@ -2028,7 +2085,6 @@
         <data>
           <LoggingEnabled>false</LoggingEnabled>
           <LoggingNewFileOnConnect>false</LoggingNewFileOnConnect>
-          <LoggingPath></LoggingPath>
           <configurationStreamVersion>1000</configurationStreamVersion>
           <dataSize>60</dataSize>
           <plotCurve0>
@@ -2074,7 +2130,6 @@
         <data>
           <LoggingEnabled>false</LoggingEnabled>
           <LoggingNewFileOnConnect>false</LoggingNewFileOnConnect>
-          <LoggingPath></LoggingPath>
           <configurationStreamVersion>1000</configurationStreamVersion>
           <dataSize>60</dataSize>
           <plotCurve0>
@@ -2120,7 +2175,6 @@
         <data>
           <LoggingEnabled>false</LoggingEnabled>
           <LoggingNewFileOnConnect>false</LoggingNewFileOnConnect>
-          <LoggingPath></LoggingPath>
           <configurationStreamVersion>1000</configurationStreamVersion>
           <dataSize>240</dataSize>
           <plotCurve0>
@@ -2256,7 +2310,6 @@
         <data>
           <LoggingEnabled>false</LoggingEnabled>
           <LoggingNewFileOnConnect>false</LoggingNewFileOnConnect>
-          <LoggingPath></LoggingPath>
           <configurationStreamVersion>1000</configurationStreamVersion>
           <dataSize>20</dataSize>
           <plotCurve0>
@@ -2302,7 +2355,6 @@
         <data>
           <LoggingEnabled>false</LoggingEnabled>
           <LoggingNewFileOnConnect>false</LoggingNewFileOnConnect>
-          <LoggingPath></LoggingPath>
           <configurationStreamVersion>1000</configurationStreamVersion>
           <dataSize>240</dataSize>
           <plotCurve0>
@@ -2317,9 +2369,6 @@
           </plotCurve0>
           <plotCurve1>
             <color>0</color>
-            <mathFunction></mathFunction>
-            <uavField></uavField>
-            <uavObject></uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
             <yMinimum>0</yMinimum>
@@ -2349,9 +2398,13 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
+          <CategorizedView>false</CategorizedView>
+          <ScientificView>false</ScientificView>
           <manuallyChangedColor>#5baa56</manuallyChangedColor>
+          <onlyHilightChangedValues>false</onlyHilightChangedValues>
           <recentlyUpdatedColor>#ff7957</recentlyUpdatedColor>
           <recentlyUpdatedTimeout>500</recentlyUpdatedTimeout>
+          <showMetaData>false</showMetaData>
         </data>
       </default>
     </UAVObjectBrowser>
@@ -2384,45 +2437,33 @@
           <side0>
             <side0>
               <side0>
-                <side0>
-                  <classId>LineardialGadget</classId>
-                  <gadget>
-                    <activeConfiguration>Flight Time</activeConfiguration>
-                  </gadget>
-                  <type>uavGadget</type>
-                </side0>
-                <side1>
-                  <classId>LineardialGadget</classId>
-                  <gadget>
-                    <activeConfiguration>GPS Sats</activeConfiguration>
-                  </gadget>
-                  <type>uavGadget</type>
-                </side1>
-                <splitterOrientation>2</splitterOrientation>
-                <splitterSizes>@Variant(AAAACQAAAAA=)</splitterSizes>
-                <type>splitter</type>
+                <classId>LineardialGadget</classId>
+                <gadget>
+                  <activeConfiguration>Flight Time</activeConfiguration>
+                </gadget>
+                <type>uavGadget</type>
               </side0>
               <side1>
                 <side0>
                   <classId>LineardialGadget</classId>
                   <gadget>
-                    <activeConfiguration>Flight mode</activeConfiguration>
+                    <activeConfiguration>Arm Status</activeConfiguration>
                   </gadget>
                   <type>uavGadget</type>
                 </side0>
                 <side1>
                   <classId>LineardialGadget</classId>
                   <gadget>
-                    <activeConfiguration>Arm Status</activeConfiguration>
+                    <activeConfiguration>Flight mode</activeConfiguration>
                   </gadget>
                   <type>uavGadget</type>
                 </side1>
-                <splitterOrientation>2</splitterOrientation>
-                <splitterSizes>@Variant(AAAACQAAAAA=)</splitterSizes>
+                <splitterOrientation>1</splitterOrientation>
+                <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAAsQAAAAIAAAEV)</splitterSizes>
                 <type>splitter</type>
               </side1>
-              <splitterOrientation>2</splitterOrientation>
-              <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAA1wAAAAIAAADt)</splitterSizes>
+              <splitterOrientation>1</splitterOrientation>
+              <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAArgAAAAIAAAHH)</splitterSizes>
               <type>splitter</type>
             </side0>
             <side1>
@@ -2432,8 +2473,8 @@
               </gadget>
               <type>uavGadget</type>
             </side1>
-            <splitterOrientation>1</splitterOrientation>
-            <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAAkAAAAAIAAAJg)</splitterSizes>
+            <splitterOrientation>2</splitterOrientation>
+            <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAAQAAAAAIAAAG4)</splitterSizes>
             <type>splitter</type>
           </side0>
           <side1>
@@ -2445,185 +2486,29 @@
               <type>uavGadget</type>
             </side0>
             <side1>
-              <side0>
-                <side0>
-                  <classId>SystemHealthGadget</classId>
-                  <gadget>
-                    <activeConfiguration>default</activeConfiguration>
-                  </gadget>
-                  <type>uavGadget</type>
-                </side0>
-                <side1>
-                  <classId>LineardialGadget</classId>
-                  <gadget>
-                    <activeConfiguration>Mainboard CPU</activeConfiguration>
-                  </gadget>
-                  <type>uavGadget</type>
-                </side1>
-                <splitterOrientation>1</splitterOrientation>
-                <splitterSizes>@Variant(AAAACQAAAAIAAAACAAABLwAAAAIAAACB)</splitterSizes>
-                <type>splitter</type>
-              </side0>
-              <side1>
-                <side0>
-                  <classId>LineardialGadget</classId>
-                  <gadget>
-                    <activeConfiguration>Telemetry RX Rate Horizontal</activeConfiguration>
-                  </gadget>
-                  <type>uavGadget</type>
-                </side0>
-                <side1>
-                  <classId>LineardialGadget</classId>
-                  <gadget>
-                    <activeConfiguration>Telemetry TX Rate Horizontal</activeConfiguration>
-                  </gadget>
-                  <type>uavGadget</type>
-                </side1>
-                <splitterOrientation>1</splitterOrientation>
-                <splitterSizes>@Variant(AAAACQAAAAA=)</splitterSizes>
-                <type>splitter</type>
-              </side1>
-              <splitterOrientation>2</splitterOrientation>
-              <splitterSizes>@Variant(AAAACQAAAAIAAAACAAABJQAAAAIAAABA)</splitterSizes>
-              <type>splitter</type>
+              <classId>SystemHealthGadget</classId>
+              <gadget>
+                <activeConfiguration>default</activeConfiguration>
+              </gadget>
+              <type>uavGadget</type>
             </side1>
             <splitterOrientation>1</splitterOrientation>
-            <splitterSizes>@Variant(AAAACQAAAAIAAAACAAABMAAAAAIAAAGx)</splitterSizes>
+            <splitterSizes>@Variant(AAAACQAAAAIAAAACAAABIAAAAAIAAAFV)</splitterSizes>
             <type>splitter</type>
           </side1>
           <splitterOrientation>2</splitterOrientation>
-          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAABxQAAAAIAAAFH)</splitterSizes>
+          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAB7wAAAAIAAAEf)</splitterSizes>
           <type>splitter</type>
         </side0>
         <side1>
-          <side0>
-            <classId>OPMapGadget</classId>
-            <gadget>
-              <activeConfiguration>Google Sat</activeConfiguration>
-            </gadget>
-            <type>uavGadget</type>
-          </side0>
-          <side1>
-            <side0>
-              <side0>
-                <side0>
-                  <side0>
-                    <classId>DialGadget</classId>
-                    <gadget>
-                      <activeConfiguration>Deluxe Groundspeed kph</activeConfiguration>
-                    </gadget>
-                    <type>uavGadget</type>
-                  </side0>
-                  <side1>
-                    <classId>DialGadget</classId>
-                    <gadget>
-                      <activeConfiguration>Deluxe Barometer</activeConfiguration>
-                    </gadget>
-                    <type>uavGadget</type>
-                  </side1>
-                  <splitterOrientation>2</splitterOrientation>
-                  <splitterSizes>@Variant(AAAACQAAAAA=)</splitterSizes>
-                  <type>splitter</type>
-                </side0>
-                <side1>
-                  <side0>
-                    <classId>DialGadget</classId>
-                    <gadget>
-                      <activeConfiguration>Deluxe Attitude</activeConfiguration>
-                    </gadget>
-                    <type>uavGadget</type>
-                  </side0>
-                  <side1>
-                    <classId>DialGadget</classId>
-                    <gadget>
-                      <activeConfiguration>Deluxe Compass</activeConfiguration>
-                    </gadget>
-                    <type>uavGadget</type>
-                  </side1>
-                  <splitterOrientation>2</splitterOrientation>
-                  <splitterSizes>@Variant(AAAACQAAAAA=)</splitterSizes>
-                  <type>splitter</type>
-                </side1>
-                <splitterOrientation>1</splitterOrientation>
-                <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAAgwAAAAIAAACK)</splitterSizes>
-                <type>splitter</type>
-              </side0>
-              <side1>
-                <side0>
-                  <classId>DialGadget</classId>
-                  <gadget>
-                    <activeConfiguration>Deluxe Baro Altimeter</activeConfiguration>
-                  </gadget>
-                  <type>uavGadget</type>
-                </side0>
-                <side1>
-                  <classId>DialGadget</classId>
-                  <gadget>
-                    <activeConfiguration>Deluxe Climbrate</activeConfiguration>
-                  </gadget>
-                  <type>uavGadget</type>
-                </side1>
-                <splitterOrientation>2</splitterOrientation>
-                <splitterSizes>@Variant(AAAACQAAAAA=)</splitterSizes>
-                <type>splitter</type>
-              </side1>
-              <splitterOrientation>1</splitterOrientation>
-              <splitterSizes>@Variant(AAAACQAAAAIAAAACAAABFQAAAAIAAACH)</splitterSizes>
-              <type>splitter</type>
-            </side0>
-            <side1>
-              <side0>
-                <classId>LineardialGadget</classId>
-                <gadget>
-                  <activeConfiguration>Throttle</activeConfiguration>
-                </gadget>
-                <type>uavGadget</type>
-              </side0>
-              <side1>
-                <side0>
-                  <classId>LineardialGadget</classId>
-                  <gadget>
-                    <activeConfiguration>Roll Desired</activeConfiguration>
-                  </gadget>
-                  <type>uavGadget</type>
-                </side0>
-                <side1>
-                  <side0>
-                    <classId>LineardialGadget</classId>
-                    <gadget>
-                      <activeConfiguration>Pitch Desired</activeConfiguration>
-                    </gadget>
-                    <type>uavGadget</type>
-                  </side0>
-                  <side1>
-                    <classId>LineardialGadget</classId>
-                    <gadget>
-                      <activeConfiguration>Yaw Desired</activeConfiguration>
-                    </gadget>
-                    <type>uavGadget</type>
-                  </side1>
-                  <splitterOrientation>1</splitterOrientation>
-                  <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAAQAAAAAIAAAE3)</splitterSizes>
-                  <type>splitter</type>
-                </side1>
-                <splitterOrientation>1</splitterOrientation>
-                <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAAQAAAAAIAAAF4)</splitterSizes>
-                <type>splitter</type>
-              </side1>
-              <splitterOrientation>1</splitterOrientation>
-              <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAAQAAAAAIAAAG5)</splitterSizes>
-              <type>splitter</type>
-            </side1>
-            <splitterOrientation>1</splitterOrientation>
-            <splitterSizes>@Variant(AAAACQAAAAIAAAACAAABuQAAAAIAAAED)</splitterSizes>
-            <type>splitter</type>
-          </side1>
-          <splitterOrientation>2</splitterOrientation>
-          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAB7AAAAAIAAAEg)</splitterSizes>
-          <type>splitter</type>
+          <classId>OPMapGadget</classId>
+          <gadget>
+            <activeConfiguration>Google Sat</activeConfiguration>
+          </gadget>
+          <type>uavGadget</type>
         </side1>
         <splitterOrientation>1</splitterOrientation>
-        <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAC4gAAAAIAAAK9)</splitterSizes>
+        <splitterSizes>@Variant(AAAACQAAAAIAAAACAAACdgAAAAIAAAMp)</splitterSizes>
         <type>splitter</type>
       </splitter>
       <version>UAVGadgetManagerV1</version>
@@ -2631,63 +2516,56 @@
     <Mode2>
       <showToolbars>false</showToolbars>
       <splitter>
-        <side0>
-          <side0>
-            <classId>ConfigGadget</classId>
-            <gadget>
-              <activeConfiguration>default</activeConfiguration>
-            </gadget>
-            <type>uavGadget</type>
-          </side0>
-          <side1>
-            <side0>
-              <classId>LineardialGadget</classId>
-              <gadget>
-                <activeConfiguration>Telemetry RX Rate Horizontal</activeConfiguration>
-              </gadget>
-              <type>uavGadget</type>
-            </side0>
-            <side1>
-              <classId>LineardialGadget</classId>
-              <gadget>
-                <activeConfiguration>Telemetry TX Rate Horizontal</activeConfiguration>
-              </gadget>
-              <type>uavGadget</type>
-            </side1>
-            <splitterOrientation>1</splitterOrientation>
-            <splitterSizes>@Variant(AAAACQAAAAA=)</splitterSizes>
-            <type>splitter</type>
-          </side1>
-          <splitterOrientation>2</splitterOrientation>
-          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAACNQAAAAIAAABC)</splitterSizes>
-          <type>splitter</type>
-        </side0>
-        <side1>
-          <side0>
-            <classId>UAVObjectBrowser</classId>
-            <gadget>
-              <activeConfiguration>default</activeConfiguration>
-            </gadget>
-            <type>uavGadget</type>
-          </side0>
-          <side1>
-            <classId>GCSControlGadget</classId>
-            <gadget>
-              <activeConfiguration>MS Sidewinder</activeConfiguration>
-            </gadget>
-            <type>uavGadget</type>
-          </side1>
-          <splitterOrientation>2</splitterOrientation>
-          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAABqgAAAAIAAAFi)</splitterSizes>
-          <type>splitter</type>
-        </side1>
-        <splitterOrientation>1</splitterOrientation>
-        <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAC3gAAAAIAAAJ3)</splitterSizes>
-        <type>splitter</type>
+        <classId>ConfigGadget</classId>
+        <gadget>
+          <activeConfiguration>default</activeConfiguration>
+        </gadget>
+        <type>uavGadget</type>
       </splitter>
       <version>UAVGadgetManagerV1</version>
     </Mode2>
     <Mode3>
+      <showToolbars>false</showToolbars>
+      <splitter>
+        <side0>
+          <classId>UAVObjectBrowser</classId>
+          <gadget>
+            <activeConfiguration>default</activeConfiguration>
+          </gadget>
+          <type>uavGadget</type>
+        </side0>
+        <side1>
+          <side0>
+            <side0>
+              <classId>LoggingGadget</classId>
+              <type>uavGadget</type>
+            </side0>
+            <side1>
+              <classId>GpsDisplayGadget</classId>
+              <gadget>
+                <activeConfiguration>Flight GPS</activeConfiguration>
+              </gadget>
+              <type>uavGadget</type>
+            </side1>
+            <splitterOrientation>2</splitterOrientation>
+            <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAAcAAAAAIAAAHo)</splitterSizes>
+            <type>splitter</type>
+          </side0>
+          <side1>
+            <classId>DebugGadget</classId>
+            <type>uavGadget</type>
+          </side1>
+          <splitterOrientation>2</splitterOrientation>
+          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAB3wAAAAIAAAEp)</splitterSizes>
+          <type>splitter</type>
+        </side1>
+        <splitterOrientation>1</splitterOrientation>
+        <splitterSizes>@Variant(AAAACQAAAAIAAAACAAACJgAAAAIAAADo)</splitterSizes>
+        <type>splitter</type>
+      </splitter>
+      <version>UAVGadgetManagerV1</version>
+    </Mode3>
+    <Mode4>
       <showToolbars>false</showToolbars>
       <splitter>
         <side0>
@@ -2711,26 +2589,17 @@
         </side0>
         <side1>
           <side0>
-            <side0>
-              <classId>ScopeGadget</classId>
-              <gadget>
-                <activeConfiguration>Attitude</activeConfiguration>
-              </gadget>
-              <type>uavGadget</type>
-            </side0>
-            <side1>
-              <classId>ScopeGadget</classId>
-              <gadget>
-                <activeConfiguration>Uptimes</activeConfiguration>
-              </gadget>
-              <type>uavGadget</type>
-            </side1>
-            <splitterOrientation>2</splitterOrientation>
-            <splitterSizes>@Variant(AAAACQAAAAIAAAACAAABhgAAAAIAAAEO)</splitterSizes>
-            <type>splitter</type>
+            <classId>ScopeGadget</classId>
+            <gadget>
+              <activeConfiguration>Attitude</activeConfiguration>
+            </gadget>
+            <type>uavGadget</type>
           </side0>
           <side1>
-            <classId>LoggingGadget</classId>
+            <classId>ScopeGadget</classId>
+            <gadget>
+              <activeConfiguration>Uptimes</activeConfiguration>
+            </gadget>
             <type>uavGadget</type>
           </side1>
           <splitterOrientation>2</splitterOrientation>
@@ -2742,8 +2611,8 @@
         <type>splitter</type>
       </splitter>
       <version>UAVGadgetManagerV1</version>
-    </Mode3>
-    <Mode4>
+    </Mode4>
+    <Mode5>
       <showToolbars>false</showToolbars>
       <splitter>
         <side0>
@@ -2755,66 +2624,39 @@
             <type>uavGadget</type>
           </side0>
           <side1>
-            <side0>
-              <classId>GCSControlGadget</classId>
-              <gadget>
-                <activeConfiguration>MS Sidewinder</activeConfiguration>
-              </gadget>
-              <type>uavGadget</type>
-            </side0>
-            <side1>
-              <side0>
-                <side0>
-                  <classId>LineardialGadget</classId>
-                  <gadget>
-                    <activeConfiguration>Pitch Desired</activeConfiguration>
-                  </gadget>
-                  <type>uavGadget</type>
-                </side0>
-                <side1>
-                  <classId>LineardialGadget</classId>
-                  <gadget>
-                    <activeConfiguration>PitchActual</activeConfiguration>
-                  </gadget>
-                  <type>uavGadget</type>
-                </side1>
-                <splitterOrientation>1</splitterOrientation>
-                <splitterSizes>@Variant(AAAACQAAAAA=)</splitterSizes>
-                <type>splitter</type>
-              </side0>
-              <side1>
-                <classId>LineardialGadget</classId>
-                <gadget>
-                  <activeConfiguration>Pitch</activeConfiguration>
-                </gadget>
-                <type>uavGadget</type>
-              </side1>
-              <splitterOrientation>1</splitterOrientation>
-              <splitterSizes>@Variant(AAAACQAAAAIAAAACAAABFAAAAAIAAABA)</splitterSizes>
-              <type>splitter</type>
-            </side1>
-            <splitterOrientation>1</splitterOrientation>
-            <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAB6AAAAAIAAADC)</splitterSizes>
-            <type>splitter</type>
+            <classId>HITLv2</classId>
+            <gadget>
+              <activeConfiguration>default</activeConfiguration>
+            </gadget>
+            <type>uavGadget</type>
           </side1>
-          <splitterOrientation>2</splitterOrientation>
-          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAABaQAAAAIAAAEO)</splitterSizes>
+          <splitterOrientation>1</splitterOrientation>
+          <splitterSizes>@Variant(AAAACQAAAAA=)</splitterSizes>
           <type>splitter</type>
         </side0>
         <side1>
-          <classId>UAVObjectBrowser</classId>
-          <gadget>
-            <activeConfiguration>default</activeConfiguration>
-          </gadget>
-          <type>uavGadget</type>
+          <side0>
+            <classId>EmptyGadget</classId>
+            <type>uavGadget</type>
+          </side0>
+          <side1>
+            <classId>GCSControlGadget</classId>
+            <gadget>
+              <activeConfiguration>MS Sidewinder</activeConfiguration>
+            </gadget>
+            <type>uavGadget</type>
+          </side1>
+          <splitterOrientation>1</splitterOrientation>
+          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAB6AAAAAIAAADC)</splitterSizes>
+          <type>splitter</type>
         </side1>
-        <splitterOrientation>1</splitterOrientation>
+        <splitterOrientation>2</splitterOrientation>
         <splitterSizes>@Variant(AAAACQAAAAIAAAACAAADDAAAAAIAAAJJ)</splitterSizes>
         <type>splitter</type>
       </splitter>
       <version>UAVGadgetManagerV1</version>
-    </Mode4>
-    <Mode5>
+    </Mode5>
+    <Mode6>
       <showToolbars>false</showToolbars>
       <splitter>
         <side0>
@@ -2827,16 +2669,16 @@
         <side1>
           <side0>
             <side0>
-              <classId>SystemHealthGadget</classId>
+              <classId>LineardialGadget</classId>
               <gadget>
-                <activeConfiguration>default</activeConfiguration>
+                <activeConfiguration>Flight Time</activeConfiguration>
               </gadget>
               <type>uavGadget</type>
             </side0>
             <side1>
-              <classId>PFDGadget</classId>
+              <classId>SystemHealthGadget</classId>
               <gadget>
-                <activeConfiguration>raw</activeConfiguration>
+                <activeConfiguration>default</activeConfiguration>
               </gadget>
               <type>uavGadget</type>
             </side1>
@@ -2845,44 +2687,44 @@
             <type>splitter</type>
           </side0>
           <side1>
-            <classId>ScopeGadget</classId>
+            <classId>PFDGadget</classId>
             <gadget>
-              <activeConfiguration>Uptimes</activeConfiguration>
+              <activeConfiguration>raw</activeConfiguration>
             </gadget>
             <type>uavGadget</type>
           </side1>
           <splitterOrientation>2</splitterOrientation>
-          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAABEgAAAAIAAAH6)</splitterSizes>
+          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAABLwAAAAIAAAHf)</splitterSizes>
           <type>splitter</type>
         </side1>
         <splitterOrientation>1</splitterOrientation>
-        <splitterSizes>@Variant(AAAACQAAAAA=)</splitterSizes>
+        <splitterSizes>@Variant(AAAACQAAAAIAAAACAAADVQAAAAIAAAJK)</splitterSizes>
         <type>splitter</type>
       </splitter>
       <version>UAVGadgetManagerV1</version>
-    </Mode5>
+    </Mode6>
   </UAVGadgetManager>
   <Workspace>
     <AllowTabBarMovement>false</AllowTabBarMovement>
     <Icon1>:\core\images\ah.png</Icon1>
     <Icon10>:/core/images/openpilot_logo_64.png</Icon10>
     <Icon2>:/core/images/config.png</Icon2>
-    <Icon3>:/core/images/scopes.png</Icon3>
-    <Icon4>:/core/images/joystick.png</Icon4>
-    <Icon5>:/core/images/cog.png</Icon5>
-    <Icon6>:/core/images/openpilot_logo_64.png</Icon6>
+    <Icon3>:/core/images/cog.png</Icon3>
+    <Icon4>:/core/images/scopes.png</Icon4>
+    <Icon5>:/core/images/joystick.png</Icon5>
+    <Icon6>:/core/images/cpu.png</Icon6>
     <Icon7>:/core/images/openpilot_logo_64.png</Icon7>
     <Icon8>:/core/images/openpilot_logo_64.png</Icon8>
     <Icon9>:/core/images/openpilot_logo_64.png</Icon9>
-    <NumberOfWorkspaces>5</NumberOfWorkspaces>
+    <NumberOfWorkspaces>6</NumberOfWorkspaces>
     <TabBarPlacementIndex>1</TabBarPlacementIndex>
     <Workspace1>Flight data</Workspace1>
     <Workspace10>Workspace10</Workspace10>
     <Workspace2>Configuration</Workspace2>
-    <Workspace3>Scopes</Workspace3>
-    <Workspace4>HITL</Workspace4>
-    <Workspace5>Firmware</Workspace5>
-    <Workspace6>Workspace6</Workspace6>
+    <Workspace3>System</Workspace3>
+    <Workspace4>Scopes</Workspace4>
+    <Workspace5>HITL</Workspace5>
+    <Workspace6>Firmware</Workspace6>
     <Workspace7>Workspace7</Workspace7>
     <Workspace8>Workspace8</Workspace8>
     <Workspace9>Workspace9</Workspace9>

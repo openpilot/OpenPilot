@@ -67,6 +67,9 @@ public:
     bool isMotorCalibrationPerformed() const { return m_motorCalibrationPerformed; }
     QList<actuatorChannelSettings> getActuatorSettings() const { return m_actuatorSettings; }
 
+    void setRestartNeeded(bool needed) { m_restartNeeded = needed; }
+    bool isRestartNeeded() const {return m_restartNeeded; }
+
     QString getSummaryText();
 
     Core::ConnectionManager* getConnectionManager() {
@@ -94,6 +97,8 @@ private:
 
     bool m_motorCalibrationPerformed;
     QList<actuatorChannelSettings> m_actuatorSettings;
+
+    bool m_restartNeeded;
 
     Core::ConnectionManager *m_connectionManager;
 };

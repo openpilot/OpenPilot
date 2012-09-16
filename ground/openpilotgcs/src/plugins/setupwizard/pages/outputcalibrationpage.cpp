@@ -71,8 +71,9 @@ void OutputCalibrationPage::setupVehicle()
             m_vehicleElementIds << "tri" << "tri-frame" << "tri-m1" << "tri-m2" << "tri-m3" << "tri-s1";
             m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4 << 4 << 4;
             m_channelIndex << 0 << 0 << 1 << 2 << 3 << 3 << 3;
-            m_actuatorSettings[4].channelMin = 1500;
-            m_actuatorSettings[4].channelMax = 1500;
+            m_actuatorSettings[3].channelMin = 1500;
+            m_actuatorSettings[3].channelNeutral = 1500;
+            m_actuatorSettings[3].channelMax = 1500;
             break;
         case SetupWizard::MULTI_ROTOR_QUAD_X:
             m_wizardIndexes << 0 << 1 << 1 << 1 << 1;
@@ -188,9 +189,11 @@ void OutputCalibrationPage::setWizardPage()
             ui->servoCenterSlider->setValue(m_actuatorSettings[currentChannel].channelNeutral);
         }
         else if(currentPageIndex == 3) {
+            ui->servoMinAngleSlider->setMaximum(m_actuatorSettings[currentChannel].channelNeutral);
             ui->servoMinAngleSlider->setValue(m_actuatorSettings[currentChannel].channelMin);
         }
         else if(currentPageIndex == 4) {
+            ui->servoMaxAngleSlider->setMinimum(m_actuatorSettings[currentChannel].channelNeutral);
             ui->servoMaxAngleSlider->setValue(m_actuatorSettings[currentChannel].channelMax);
         }
     }
@@ -274,6 +277,7 @@ void OutputCalibrationPage::onStartButtonToggle(QAbstractButton *button, quint16
         m_calibrationUtil->stopChannelOutput();
         enableButtons(true);
     }
+    debugLogChannelValues();
 }
 
 bool OutputCalibrationPage::checkAlarms()
@@ -301,12 +305,21 @@ bool OutputCalibrationPage::checkAlarms()
     return true;
 }
 
+void OutputCalibrationPage::debugLogChannelValues()
+{
+    quint16 channel = getCurrentChannel();
+    qDebug() << "ChannelMin    : " << m_actuatorSettings[channel].channelMin;
+    qDebug() << "ChannelNeutral: " << m_actuatorSettings[channel].channelNeutral;
+    qDebug() << "ChannelMax    : " << m_actuatorSettings[channel].channelMax;
+}
+
 void OutputCalibrationPage::on_motorNeutralSlider_valueChanged(int value)
 {
     if(ui->motorNeutralButton->isChecked()) {
         quint16 value = ui->motorNeutralSlider->value();
         m_calibrationUtil->setChannelOutputValue(value);
         m_actuatorSettings[getCurrentChannel()].channelNeutral = value;
+        debugLogChannelValues();
     }
 }
 
@@ -314,8 +327,8 @@ void OutputCalibrationPage::on_servoCenterButton_toggled(bool checked)
 {
     ui->servoCenterButton->setText(checked ? tr("Stop") : tr("Start"));
     quint16 channel = getCurrentChannel();
-    m_actuatorSettings[channel].channelNeutral = 1500;
-    onStartButtonToggle(ui->servoCenterButton, channel, m_actuatorSettings[channel].channelNeutral, 1500, ui->servoCenterSlider);
+    quint16 safeValue = m_actuatorSettings[channel].channelNeutral;
+    onStartButtonToggle(ui->servoCenterButton, channel, safeValue, safeValue, ui->servoCenterSlider);
 }
 
 void OutputCalibrationPage::on_servoCenterSlider_valueChanged(int position)
@@ -323,7 +336,17 @@ void OutputCalibrationPage::on_servoCenterSlider_valueChanged(int position)
     if(ui->servoCenterButton->isChecked()) {
         quint16 value = ui->servoCenterSlider->value();
         m_calibrationUtil->setChannelOutputValue(value);
-        m_actuatorSettings[getCurrentChannel()].channelNeutral = value;
+        quint16 channel = getCurrentChannel();
+        m_actuatorSettings[channel].channelNeutral = value;
+
+        //Adjust min and max
+        if(value < m_actuatorSettings[channel].channelMin) {
+            m_actuatorSettings[channel].channelMin = value;
+        }
+        if(value > m_actuatorSettings[channel].channelMax) {
+            m_actuatorSettings[channel].channelMax = value;
+        }
+        debugLogChannelValues();
     }
 }
 
@@ -331,26 +354,34 @@ void OutputCalibrationPage::on_servoMinAngleButton_toggled(bool checked)
 {
     ui->servoMinAngleButton->setText(checked ? tr("Stop") : tr("Start"));
     quint16 channel = getCurrentChannel();
-    onStartButtonToggle(ui->servoMinAngleButton, channel, m_actuatorSettings[channel].channelMin, 1500, ui->servoMinAngleSlider);
+    quint16 safeValue = m_actuatorSettings[channel].channelNeutral;
+    onStartButtonToggle(ui->servoMinAngleButton, channel, m_actuatorSettings[channel].channelMin, safeValue, ui->servoMinAngleSlider);
 }
 
 void OutputCalibrationPage::on_servoMinAngleSlider_valueChanged(int position)
 {
-    quint16 value = ui->servoMinAngleSlider->value();
-    m_calibrationUtil->setChannelOutputValue(value);
-    m_actuatorSettings[getCurrentChannel()].channelMin = value;
+    if(ui->servoMinAngleButton->isChecked()) {
+        quint16 value = ui->servoMinAngleSlider->value();
+        m_calibrationUtil->setChannelOutputValue(value);
+        m_actuatorSettings[getCurrentChannel()].channelMin = value;
+        debugLogChannelValues();
+    }
 }
 
 void OutputCalibrationPage::on_servoMaxAngleButton_toggled(bool checked)
 {
     ui->servoMaxAngleButton->setText(checked ? tr("Stop") : tr("Start"));
     quint16 channel = getCurrentChannel();
-    onStartButtonToggle(ui->servoMaxAngleButton, channel, m_actuatorSettings[channel].channelMax, 1500, ui->servoMaxAngleSlider);
+    quint16 safeValue = m_actuatorSettings[channel].channelNeutral;
+    onStartButtonToggle(ui->servoMaxAngleButton, channel, m_actuatorSettings[channel].channelMax, safeValue, ui->servoMaxAngleSlider);
 }
 
 void OutputCalibrationPage::on_servoMaxAngleSlider_valueChanged(int position)
 {
-    quint16 value = ui->servoMaxAngleSlider->value();
-    m_calibrationUtil->setChannelOutputValue(value);
-    m_actuatorSettings[getCurrentChannel()].channelMax = value;
+    if(ui->servoMaxAngleButton->isChecked()) {
+        quint16 value = ui->servoMaxAngleSlider->value();
+        m_calibrationUtil->setChannelOutputValue(value);
+        m_actuatorSettings[getCurrentChannel()].channelMax = value;
+        debugLogChannelValues();
+    }
 }

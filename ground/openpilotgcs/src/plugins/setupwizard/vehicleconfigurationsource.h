@@ -77,6 +77,8 @@ public:
     virtual bool isMotorCalibrationPerformed() const = 0;
     virtual QList<actuatorChannelSettings> getActuatorSettings() const = 0;
 
+    virtual bool isRestartNeeded() const = 0;
+
     virtual QString getSummaryText() = 0;
 };
 

@@ -438,7 +438,7 @@ void ConfigInputWidget::wizardSetUpStep(enum wizardSteps step)
         m_config->graphicsView->setVisible(true);
         m_config->graphicsView->fitInView(m_txBackground, Qt::KeepAspectRatio );
         setTxMovement(nothing);
-        m_config->wzText->setText(tr("Please choose your transmiter type.\n"
+        m_config->wzText->setText(tr("Please choose your transmitter type.\n"
                                      "Mode 1 means your throttle stick is on the right\n"
                                      "Mode 2 means your throttle stick is on the left\n"));
         m_config->wzBack->setEnabled(true);
@@ -454,7 +454,7 @@ void ConfigInputWidget::wizardSetUpStep(enum wizardSteps step)
         break;
     case wizardChooseType:
     {
-        m_config->wzText->setText(tr("Please choose your transmiter mode.\n"
+        m_config->wzText->setText(tr("Please choose your transmitter mode.\n"
                                      "Acro means normal transmitter\n"
                                      "Heli means there is a collective pitch and throttle input\n"
                                      "If you are using a heli transmitter please engage throttle hold now please.\n"));

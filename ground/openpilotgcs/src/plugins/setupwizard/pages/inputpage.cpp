@@ -57,7 +57,7 @@ bool InputPage::validatePage()
         getWizard()->setInputType(SetupWizard::INPUT_SBUS);
     }
     else if(ui->spectrumButton->isChecked()) {
-        getWizard()->setInputType(SetupWizard::INPUT_DSM);
+        getWizard()->setInputType(SetupWizard::INPUT_DSM2);
     }
     else {
         getWizard()->setInputType(SetupWizard::INPUT_PWM);
@@ -82,7 +82,7 @@ bool InputPage::restartNeeded(VehicleConfigurationSource::INPUT_TYPE selectedTyp
             return data.CC_RcvrPort != HwSettings::CC_RCVRPORT_PPM;
         case VehicleConfigurationSource::INPUT_SBUS:
             return data.CC_MainPort != HwSettings::CC_MAINPORT_SBUS;
-        case VehicleConfigurationSource::INPUT_DSM:
+        case VehicleConfigurationSource::INPUT_DSM2:
             // TODO: Handle all of the DSM types ?? Which is most common?
             return data.CC_MainPort != HwSettings::CC_MAINPORT_DSM2;
         default:

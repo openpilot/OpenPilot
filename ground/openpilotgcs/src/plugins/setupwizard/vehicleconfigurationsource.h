@@ -63,7 +63,7 @@ public:
                                MULTI_ROTOR_OCTO_V, MULTI_ROTOR_OCTO_COAX_X, MULTI_ROTOR_OCTO_COAX_PLUS, FIXED_WING_AILERON,
                                FIXED_WING_VTAIL, HELI_CCPM};
     enum ESC_TYPE {ESC_RAPID, ESC_LEGACY, ESC_UNKNOWN};
-    enum INPUT_TYPE {INPUT_PWM, INPUT_PPM, INPUT_SBUS, INPUT_DSM, INPUT_UNKNOWN};
+    enum INPUT_TYPE {INPUT_PWM, INPUT_PPM, INPUT_SBUS, INPUT_DSMX10, INPUT_DSMX11, INPUT_DSM2, INPUT_UNKNOWN};
 
     virtual VehicleConfigurationSource::CONTROLLER_TYPE getControllerType() const = 0;
     virtual VehicleConfigurationSource::VEHICLE_TYPE getVehicleType() const = 0;

@@ -118,8 +118,13 @@ void VehicleConfigurationHelper::applyHardwareConfiguration()
                 case VehicleConfigurationSource::INPUT_SBUS:
                     data.CC_MainPort = HwSettings::CC_MAINPORT_SBUS;
                     break;
-                case VehicleConfigurationSource::INPUT_DSM:
-                    // TODO: Handle all of the DSM types ?? Which is most common?
+                case VehicleConfigurationSource::INPUT_DSMX10:
+                    data.CC_MainPort = HwSettings::CC_MAINPORT_DSMX10BIT;
+                    break;
+                case VehicleConfigurationSource::INPUT_DSMX11:
+                    data.CC_MainPort = HwSettings::CC_MAINPORT_DSMX11BIT;
+                    break;
+                case VehicleConfigurationSource::INPUT_DSM2:
                     data.CC_MainPort = HwSettings::CC_MAINPORT_DSM2;
                     break;
                 default:
@@ -357,11 +362,33 @@ void VehicleConfigurationHelper::applyManualControlDefaults()
     ManualControlSettings *mcSettings = ManualControlSettings::GetInstance(m_uavoManager);
     Q_ASSERT(mcSettings);
     ManualControlSettings::DataFields cData = mcSettings->getData();
-    cData.ChannelGroups[ManualControlSettings::CHANNELGROUPS_THROTTLE] = ManualControlSettings::CHANNELGROUPS_PWM;
-    cData.ChannelGroups[ManualControlSettings::CHANNELGROUPS_ROLL] = ManualControlSettings::CHANNELGROUPS_PWM;
-    cData.ChannelGroups[ManualControlSettings::CHANNELGROUPS_YAW] = ManualControlSettings::CHANNELGROUPS_PWM;
-    cData.ChannelGroups[ManualControlSettings::CHANNELGROUPS_PITCH] = ManualControlSettings::CHANNELGROUPS_PWM;
-    cData.ChannelGroups[ManualControlSettings::CHANNELGROUPS_FLIGHTMODE] = ManualControlSettings::CHANNELGROUPS_PWM;
+
+    ManualControlSettings::ChannelGroupsOptions channelType = ManualControlSettings::CHANNELGROUPS_PWM;
+    switch(m_configSource->getInputType())
+    {
+        case VehicleConfigurationSource::INPUT_PWM:
+            channelType = ManualControlSettings::CHANNELGROUPS_PWM;
+            break;
+        case VehicleConfigurationSource::INPUT_PPM:
+            channelType = ManualControlSettings::CHANNELGROUPS_PPM;
+            break;
+        case VehicleConfigurationSource::INPUT_SBUS:
+            channelType = ManualControlSettings::CHANNELGROUPS_SBUS;
+            break;
+        case VehicleConfigurationSource::INPUT_DSMX10:
+        case VehicleConfigurationSource::INPUT_DSMX11:
+        case VehicleConfigurationSource::INPUT_DSM2:
+            channelType = ManualControlSettings::CHANNELGROUPS_DSMMAINPORT;
+            break;
+        default:
+            break;
+    }
+
+    cData.ChannelGroups[ManualControlSettings::CHANNELGROUPS_THROTTLE] = channelType;
+    cData.ChannelGroups[ManualControlSettings::CHANNELGROUPS_ROLL] = channelType;
+    cData.ChannelGroups[ManualControlSettings::CHANNELGROUPS_YAW] = channelType;
+    cData.ChannelGroups[ManualControlSettings::CHANNELGROUPS_PITCH] = channelType;
+    cData.ChannelGroups[ManualControlSettings::CHANNELGROUPS_FLIGHTMODE] = channelType;
 
     cData.ChannelNumber[ManualControlSettings::CHANNELGROUPS_THROTTLE] = 1;
     cData.ChannelNumber[ManualControlSettings::CHANNELGROUPS_ROLL] = 2;

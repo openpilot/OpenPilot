@@ -133,7 +133,9 @@ void ConnectionDiagram::setupGraphicsScene()
             case VehicleConfigurationSource::INPUT_SBUS:
                 elementsToShow << "sbus";
                 break;
-            case VehicleConfigurationSource::INPUT_DSM:
+            case VehicleConfigurationSource::INPUT_DSMX10:
+            case VehicleConfigurationSource::INPUT_DSMX11:
+            case VehicleConfigurationSource::INPUT_DSM2:
                 elementsToShow << "satellite";
                 break;
             default:

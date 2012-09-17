@@ -75,6 +75,8 @@ QPainterPath WayPointLine::shape() const
 }
 void WayPointLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
 
     QPen myPen = pen();
     myPen.setColor(myColor);

@@ -101,7 +101,7 @@
 then close the dialog.</string>
        </property>
        <property name="text">
-        <string>Save to Board Flash/SD</string>
+        <string>Save to Board Flash</string>
        </property>
       </widget>
      </item>

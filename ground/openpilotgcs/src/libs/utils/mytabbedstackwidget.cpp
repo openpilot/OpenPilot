@@ -79,7 +79,9 @@ void MyTabbedStackWidget::insertTab(const int index, QWidget *tab, const QIcon &
 
 void MyTabbedStackWidget::removeTab(int index)
 {
-    m_stackWidget->removeWidget(m_stackWidget->widget(index));
+    QWidget * wid=m_stackWidget->widget(index);
+    m_stackWidget->removeWidget(wid);
+    delete wid;
     QListWidgetItem *item = m_listWidget->item(index);
     m_listWidget->removeItemWidget(item);
     delete item;
@@ -114,6 +116,8 @@ void MyTabbedStackWidget::showWidget(int index)
 
 void MyTabbedStackWidget::insertCornerWidget(int index, QWidget *widget)
 {
+    Q_UNUSED(index);
+
     widget->hide();
 }
 

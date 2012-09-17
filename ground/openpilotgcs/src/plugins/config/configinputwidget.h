@@ -43,6 +43,9 @@
 #include <QGraphicsView>
 #include <QtSvg/QSvgRenderer>
 #include <QtSvg/QGraphicsSvgItem>
+#include "flightstatus.h"
+#include "accessorydesired.h"
+#include <QPointer>
 
 class Ui_InputWidget;
 
@@ -67,7 +70,7 @@ private:
         void setTxMovement(txMovements movement);
         Ui_InputWidget *m_config;
         wizardSteps wizardStep;
-        QList<QWidget*> extraWidgets;
+        QList<QPointer<QWidget> > extraWidgets;
         txMode transmitterMode;
         txType transmitterType;
         struct channelsStruct
@@ -91,6 +94,14 @@ private:
 
         ManualControlCommand * manualCommandObj;
         ManualControlCommand::DataFields manualCommandData;
+        FlightStatus * flightStatusObj;
+        FlightStatus::DataFields flightStatusData;
+        AccessoryDesired * accessoryDesiredObj0;
+        AccessoryDesired * accessoryDesiredObj1;
+        AccessoryDesired * accessoryDesiredObj2;
+        AccessoryDesired::DataFields accessoryDesiredData0;
+        AccessoryDesired::DataFields accessoryDesiredData1;
+        AccessoryDesired::DataFields accessoryDesiredData2;
         UAVObject::Metadata manualControlMdata;
         ManualControlSettings * manualSettingsObj;
         ManualControlSettings::DataFields manualSettingsData;
@@ -138,7 +149,7 @@ private slots:
         void wzBack();
         void wzCancel();
         void goToWizard();
-
+        void disableWizardButton(int);
         void openHelp();
         void identifyControls();
         void identifyLimits();

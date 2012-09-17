@@ -84,18 +84,8 @@
 #include <QtGui/QToolButton>
 #include <QtGui/QMessageBox>
 #include <QDesktopServices>
-
-/*
-#ifdef Q_OS_UNIX
-#include <signal.h>
-extern "C" void handleSigInt(int sig)
-{
-    Q_UNUSED(sig)
-    Core::ICore::instance()->exit();
-    qDebug() << "SIGINT caught. Shutting down.";
-}
-#endif
-*/
+#include "dialogs/importsettings.h"
+#include <QDir>
 
 using namespace Core;
 using namespace Core::Internal;
@@ -125,7 +115,6 @@ MainWindow::MainWindow() :
     m_modeManager(0),
     m_connectionManager(0),
     m_mimeDatabase(new MimeDatabase),
-//    m_rightPaneWidget(0),
     m_versionDialog(0),
     m_authorsDialog(0),
     m_activeContext(0),
@@ -197,12 +186,6 @@ MainWindow::MainWindow() :
     connect(m_workspaceSettings, SIGNAL(tabBarSettingsApplied(QTabWidget::TabPosition,bool)),
             this, SLOT(applyTabBarSettings(QTabWidget::TabPosition,bool)));
     connect(m_modeManager, SIGNAL(newModeOrder(QVector<IMode*>)), m_workspaceSettings, SLOT(newModeOrder(QVector<IMode*>)));
-
-//    setUnifiedTitleAndToolBarOnMac(true);
-#ifdef Q_OS_UNIX
-     //signal(SIGINT, handleSigInt);
-#endif
-
     statusBar()->setProperty("p_styled", true);
     setAcceptDrops(true);
     foreach (QString engine, qxtLog->allLoggerEngines())
@@ -254,9 +237,6 @@ MainWindow::~MainWindow()
     delete m_coreImpl;
     m_coreImpl = 0;
 
-//    delete m_rightPaneWidget;
-//    m_rightPaneWidget = 0;
-
     delete m_modeManager;
     m_modeManager = 0;
     delete m_mimeDatabase;
@@ -288,19 +268,60 @@ void MainWindow::extensionsInitialized()
 {
 
     QSettings* qs = m_settings;
-    QSettings defaultSettings(":/core/OpenPilotGCS.xml", XmlConfig::XmlSettingsFormat);
-//    QSettings defaultSettings(":/core/OpenPilotGCS.ini", QSettings::IniFormat);
-
+    QSettings * settings;
+    QString commandLine;
     if ( ! qs->allKeys().count() ){
-        QMessageBox msgBox;
-        msgBox.setText(tr("No configuration file could be found."));
-        msgBox.setInformativeText(tr("The default configuration will be loaded."));
-        msgBox.setStandardButtons(QMessageBox::Ok);
-        msgBox.exec();
-        qDebug() << "Load default config from resource /core/OpenPilotGCS.xml";
-        qs = &defaultSettings;
-    }
+        foreach(QString str,qApp->arguments())
+        {
+            if(str.contains("configfile"))
+            {
+                qDebug()<<"ass";
+                commandLine=str.split("=").at(1);
+                qDebug()<<commandLine;
+            }
+        }
+        QDir directory(QCoreApplication::applicationDirPath());
+#ifdef Q_OS_MAC
+            directory.cdUp();
+            directory.cd("Resources");
+#else
+            directory.cdUp();
+            directory.cd("share");
+            directory.cd("openpilotgcs");
+#endif
+            directory.cd("default_configurations");
 
+            qDebug() << "Looking for default config files in: " + directory.absolutePath();
+        bool showDialog=true;
+        QString filename;
+        if(!commandLine.isEmpty())
+        {
+            if(QFile::exists(directory.absolutePath()+QDir::separator()+commandLine))
+            {
+                filename=directory.absolutePath()+QDir::separator()+commandLine;
+                qDebug()<<"Load configuration from command line";
+                settings=new QSettings(filename, XmlConfig::XmlSettingsFormat);
+                showDialog=false;
+            }
+        }
+        if(showDialog)
+        {
+            importSettings * dialog=new importSettings(this);
+            dialog->loadFiles(directory.absolutePath());
+            dialog->exec();
+            filename=dialog->choosenConfig();
+            settings=new QSettings(filename, XmlConfig::XmlSettingsFormat);
+            delete dialog;
+        }
+        qs=settings;
+        qDebug() << "Load default config from resource "<<filename;
+    }
+    qs->beginGroup("General");
+    m_config_description=qs->value("Description","none").toString();
+    m_config_details=qs->value("Details","none").toString();
+    m_config_stylesheet=qs->value("StyleSheet","none").toString();
+    loadStyleSheet(m_config_stylesheet);
+    qs->endGroup();
     m_uavGadgetInstanceManager = new UAVGadgetInstanceManager(this);
     m_uavGadgetInstanceManager->readSettings(qs);
 
@@ -312,6 +333,42 @@ void MainWindow::extensionsInitialized()
     emit m_coreImpl->coreAboutToOpen();
     show();
     emit m_coreImpl->coreOpened();
+}
+
+void MainWindow::loadStyleSheet(QString name) {
+    /* Let's use QFile and point to a resource... */
+    QDir directory(QCoreApplication::applicationDirPath());
+#ifdef Q_OS_MAC
+    directory.cdUp();
+    directory.cd("Resources");
+#else
+    directory.cdUp();
+    directory.cd("share");
+    directory.cd("openpilotgcs");
+#endif
+    directory.cd("stylesheets");
+#ifdef Q_OS_MAC
+    QFile data(directory.absolutePath()+QDir::separator()+name+"_macos.qss");
+#elif defined(Q_OS_LINUX)
+    QFile data(directory.absolutePath()+QDir::separator()+name+"_linux.qss");
+#else
+    QFile data(directory.absolutePath()+QDir::separator()+name+"_windows.qss");
+#endif
+    QString style;
+    /* ...to open the file */
+    if(data.open(QFile::ReadOnly)) {
+        /* QTextStream... */
+        QTextStream styleIn(&data);
+        /* ...read file to a string. */
+        style = styleIn.readAll();
+        data.close();
+        /* We'll use qApp macro to get the QApplication pointer
+         * and set the style sheet application wide. */
+        qApp->setStyleSheet(style);
+        qDebug()<<"Loaded stylesheet:"<<style;
+    }
+    else
+        qDebug()<<"Failed to openstylesheet file"<<directory.absolutePath()<<name;
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -1220,7 +1277,11 @@ void MainWindow::saveSettings(QSettings* qs)
 
     m_actionManager->saveSettings(qs);
     m_generalSettings->saveSettings(qs);
-
+    qs->beginGroup("General");
+    qs->setValue("Description",m_config_description);
+    qs->setValue("Details",m_config_details);
+    qs->setValue("StyleSheet",m_config_stylesheet);
+    qs->endGroup();
 }
 
 void MainWindow::readSettings(IConfigurablePlugin* plugin, QSettings* qs)

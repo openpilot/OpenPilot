@@ -59,7 +59,8 @@
         <file>images/scopes.png</file>
         <file>images/world.png</file>
         <file>images/cog.png</file>
-        <file>OpenPilotGCS.xml</file>
         <file>images/helpicon.svg</file>
+        <file>images/cpu.png</file>
+        <file>images/tx-rx.svg</file>
     </qresource>
 </RCC>

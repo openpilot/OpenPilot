@@ -60,6 +60,8 @@ void modelMapProxy::WPValuesChanged(WayPointItem * wp)
 
 void modelMapProxy::currentRowChanged(QModelIndex current, QModelIndex previous)
 {
+    Q_UNUSED(previous);
+
     QList<WayPointItem*> list;
     WayPointItem * wp=findWayPointNumber(current.row());
     if(!wp)
@@ -202,6 +204,8 @@ WayPointItem * modelMapProxy::findWayPointNumber(int number)
 
 void modelMapProxy::rowsRemoved(const QModelIndex &parent, int first, int last)
 {
+    Q_UNUSED(parent);
+
     for(int x=last;x>first-1;x--)
     {
         myMap->WPDelete(x);
@@ -211,6 +215,8 @@ void modelMapProxy::rowsRemoved(const QModelIndex &parent, int first, int last)
 
 void modelMapProxy::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
 {
+    Q_UNUSED(bottomRight);
+
     WayPointItem * item=findWayPointNumber(topLeft.row());
     if(!item)
         return;

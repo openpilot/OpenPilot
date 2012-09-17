@@ -116,6 +116,7 @@ public:
     void setMaxUpdateRate(int update_rate);
     void setHomePosition(QPointF pos);
     void setOverlayOpacity(qreal value);
+    bool getGPSPosition(double &latitude, double &longitude, double &altitude);
 signals:
     void defaultLocationAndZoomChanged(double lng,double lat,double zoom);
     void overlayOpacityChanged(qreal);

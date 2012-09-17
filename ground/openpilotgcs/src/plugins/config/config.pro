@@ -36,7 +36,10 @@ HEADERS += configplugin.h \
     cfg_vehicletypes/configfixedwingwidget.h \
     cfg_vehicletypes/vehicleconfig.h \
     configrevowidget.h \
-    config_global.h
+    config_global.h \
+    mixercurve.h \
+    dblspindelegate.h \
+    configautotunewidget.h
 SOURCES += configplugin.cpp \
     configgadgetconfiguration.cpp \
     configgadgetwidget.cpp \
@@ -67,7 +70,10 @@ SOURCES += configplugin.cpp \
     cfg_vehicletypes/configfixedwingwidget.cpp \
     cfg_vehicletypes/configccpmwidget.cpp \
     outputchannelform.cpp \
-    cfg_vehicletypes/vehicleconfig.cpp
+    cfg_vehicletypes/vehicleconfig.cpp \
+    mixercurve.cpp \
+    dblspindelegate.cpp \
+    configautotunewidget.cpp
 FORMS += airframe.ui \
     cc_hw_settings.ui \
     pro_hw_settings.ui \
@@ -83,5 +89,14 @@ FORMS += airframe.ui \
     outputchannelform.ui \
     revosensors.ui \
     txpid.ui \
-    pipxtreme.ui
+    pipxtreme.ui \
+    mixercurve.ui \
+    autotune.ui
 RESOURCES += configgadget.qrc
+
+
+
+
+
+
+

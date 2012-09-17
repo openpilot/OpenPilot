@@ -1774,7 +1774,7 @@ void OPMapGadgetWidget::onAddWayPointAct_triggered(internals::PointLatLng coord)
 
     if (m_map_mode != Normal_MapMode)
         return;
-    float alt=15;
+
     mapProxy->createWayPoint(coord);
 }
 

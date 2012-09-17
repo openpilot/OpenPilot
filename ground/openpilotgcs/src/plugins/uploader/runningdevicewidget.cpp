@@ -101,7 +101,7 @@ void runningDeviceWidget::populate()
 
     QByteArray description = utilMngr->getBoardDescription();
     deviceDescriptorStruct devDesc;
-    if(UAVObjectUtilManager::descriptionToStructure(description,&devDesc))
+    if(UAVObjectUtilManager::descriptionToStructure(description,devDesc))
     {
         if(devDesc.gitTag.startsWith("release",Qt::CaseInsensitive))
         {

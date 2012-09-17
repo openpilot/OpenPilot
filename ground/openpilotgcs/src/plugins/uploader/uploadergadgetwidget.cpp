@@ -650,16 +650,35 @@ void UploaderGadgetWidget::versionMatchCheck()
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectUtilManager *utilMngr = pm->getObject<UAVObjectUtilManager>();
     deviceDescriptorStruct boardDescription = utilMngr->getBoardDescriptionStruct();
-
+    QByteArray uavoHashArray;
     QString uavoHash = QString::fromLatin1(Core::Constants::UAVOSHA1_STR);
-    uavoHash.remove( QRegExp("^[0]*") );
-    QString gcsVersion = uavoHash;
-    QString fwVersion =  boardDescription.gitHash;
+    uavoHash.chop(2);
+    uavoHash.remove(0,2);
+    uavoHash=uavoHash.trimmed();
+    bool ok;
+    foreach(QString str,uavoHash.split(","))
+    {
+        uavoHashArray.append(str.toInt(&ok,16));
+    }
 
-    if (boardDescription.uavoHash != uavoHash) {
+    QByteArray fwVersion;
+    fwVersion=boardDescription.uavoHash;
+    if (fwVersion != uavoHashArray) {
+        QString uavoHashStr;
+        QString fwVersionStr;
+        foreach(char i, fwVersion)
+        {
+            qDebug()<<i<<" "<<QString::number(i,16).right(2);
+            fwVersionStr.append(QString::number(i,16).right(2));
+        }
+        foreach(char i, uavoHashArray)
+        {
+            qDebug()<<i<<" "<<QString::number(i,16).right(2);
+            uavoHashStr.append(QString::number(i,16).right(2));
+        }
         QString warning = QString(tr(
             "GCS and firmware versions of the UAV object set do not match which can cause configuration problems. "
-            "GCS version: %1. Firmware version: %2.")).arg(gcsVersion).arg(fwVersion);
+            "GCS version: %1. Firmware version: %2.")).arg(uavoHashStr).arg(fwVersionStr);
         msg->showMessage(warning);
     }
   }

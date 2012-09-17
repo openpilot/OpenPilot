@@ -257,7 +257,12 @@ FirmwareIAPObj::DataFields UAVObjectUtilManager::getFirmwareIap()
 int UAVObjectUtilManager::getBoardModel()
 {
     FirmwareIAPObj::DataFields firmwareIapData = getFirmwareIap();
-    return (firmwareIapData.BoardType << 8) + firmwareIapData.BoardRevision;
+    qDebug()<<"Board type="<<firmwareIapData.BoardType;
+    qDebug()<<"Board revision="<<firmwareIapData.BoardRevision;
+    int ret=firmwareIapData.BoardType <<8;
+    ret = ret + firmwareIapData.BoardRevision;
+    qDebug()<<"Board info="<<ret;
+    return ret;
 }
 
 /**
@@ -625,11 +630,11 @@ int UAVObjectUtilManager::getTelemetrySerialPortSpeeds(QComboBox *comboBox)
 deviceDescriptorStruct UAVObjectUtilManager::getBoardDescriptionStruct()
 {
     deviceDescriptorStruct ret;
-    descriptionToStructure(getBoardDescription(),&ret);
+    descriptionToStructure(getBoardDescription(),ret);
     return ret;
 }
 
-bool UAVObjectUtilManager::descriptionToStructure(QByteArray desc, deviceDescriptorStruct *struc)
+bool UAVObjectUtilManager::descriptionToStructure(QByteArray desc, deviceDescriptorStruct & struc)
 {
    if (desc.startsWith("OpFw")) {
        /*
@@ -651,24 +656,26 @@ bool UAVObjectUtilManager::descriptionToStructure(QByteArray desc, deviceDescrip
            gitCommitHash = gitCommitHash << 8;
            gitCommitHash += desc.at(7-i) & 0xFF;
        }
-       struc->gitHash = QString::number(gitCommitHash, 16);
+       struc.gitHash = QString::number(gitCommitHash, 16);
 
        quint32 gitDate = desc.at(11) & 0xFF;
        for (int i = 1; i < 4; i++) {
            gitDate = gitDate << 8;
            gitDate += desc.at(11-i) & 0xFF;
        }
-       struc->gitDate = QDateTime::fromTime_t(gitDate).toUTC().toString("yyyyMMdd HH:mm");
+       struc.gitDate = QDateTime::fromTime_t(gitDate).toUTC().toString("yyyyMMdd HH:mm");
 
        QString gitTag = QString(desc.mid(14,26));
-       struc->gitTag = gitTag;
+       struc.gitTag = gitTag;
 
        // TODO: check platform compatibility
        QByteArray targetPlatform = desc.mid(12,2);
-       struc->boardType = (int)targetPlatform.at(0);
-       struc->boardRevision = (int)targetPlatform.at(1);
-
-       struc->uavoHash=desc.mid(46,20);
+       struc.boardType = (int)targetPlatform.at(0);
+       struc.boardRevision = (int)targetPlatform.at(1);
+       struc.fwHash.clear();
+       struc.fwHash=desc.mid(40,20);
+       struc.uavoHash.clear();
+       struc.uavoHash=desc.mid(60,20);
        return true;
    }
    return false;

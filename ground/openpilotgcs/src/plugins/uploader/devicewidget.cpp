@@ -154,7 +154,7 @@ void deviceWidget::freeze()
   */
 bool deviceWidget::populateBoardStructuredDescription(QByteArray desc)
 {
-    if(UAVObjectUtilManager::descriptionToStructure(desc,&onBoardDescription))
+    if(UAVObjectUtilManager::descriptionToStructure(desc,onBoardDescription))
     {
         myDevice->lblGitTag->setText(onBoardDescription.gitHash);
         myDevice->lblBuildDate->setText(onBoardDescription.gitDate.insert(4,"-").insert(7,"-"));
@@ -184,7 +184,7 @@ bool deviceWidget::populateBoardStructuredDescription(QByteArray desc)
 }
 bool deviceWidget::populateLoadedStructuredDescription(QByteArray desc)
 {
-    if(UAVObjectUtilManager::descriptionToStructure(desc,&LoadedDescription))
+    if(UAVObjectUtilManager::descriptionToStructure(desc,LoadedDescription))
     {
         myDevice->lblGitTagL->setText(LoadedDescription.gitHash);
         myDevice->lblBuildDateL->setText( LoadedDescription.gitDate.insert(4,"-").insert(7,"-"));

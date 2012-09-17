@@ -230,8 +230,8 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
                 case VehicleConfigurationSource::MULTI_ROTOR_OCTO_V:
                     data.ChannelUpdateFreq[0] = updateFrequence;
                     data.ChannelUpdateFreq[1] = updateFrequence;
+                    data.ChannelUpdateFreq[2] = updateFrequence;
                     data.ChannelUpdateFreq[3] = updateFrequence;
-                    data.ChannelUpdateFreq[4] = updateFrequence;
                     break;
                 default:
                     break;

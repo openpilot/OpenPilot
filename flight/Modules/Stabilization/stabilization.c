@@ -172,6 +172,7 @@ static void stabilizationTask(void* parameters)
 		StabilizationDesiredGet(&stabDesired);
 		AttitudeActualGet(&attitudeActual);
 		GyrosGet(&gyrosData);
+		
 #if defined(RATEDESIRED_DIAGNOSTICS)
 		RateDesiredGet(&rateDesired);
 #endif
@@ -319,25 +320,9 @@ static void stabilizationTask(void* parameters)
 					// Run the relay controller which also estimates the oscillation parameters
 					stabilization_relay_rate(rateDesiredAxis[i] - gyro_filtered[i], &actuatorDesiredAxis[i], i, reinit);
 					actuatorDesiredAxis[i] = bound(actuatorDesiredAxis[i],1.0);
-
-#if defined(RATEDESIRED_DIAGNOSTICS)
-		RateDesiredSet(&rateDesired);
-#endif
-		ActuatorDesiredGet(&actuatorDesired);
-		//Calculate desired command
-		for(uint32_t i = 0; i < MAX_AXES; i++)
-		{
-			switch(stabDesired.StabilizationMode[i])
-			{
-				case STABILIZATIONDESIRED_STABILIZATIONMODE_RATE:
-				case STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE:
-				case STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK:
-				case STABILIZATIONDESIRED_STABILIZATIONMODE_WEAKLEVELING:
-				{
-					float command = ApplyPid(&pids[PID_RATE_ROLL + i],  rateDesiredAxis[i] - gyro_filtered[i], dT);
-					actuatorDesiredAxis[i] = bound(command);
+					
 					break;
-				}
+					
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYATTITUDE:
 					if(reinit)
 						pids[PID_ROLL + i].iAccumulator = 0;
@@ -364,7 +349,7 @@ static void stabilizationTask(void* parameters)
 		if (settings.VbarPiroComp == STABILIZATIONSETTINGS_VBARPIROCOMP_TRUE)
 			stabilization_virtual_flybar_pirocomp(gyro_filtered[2], dT);
 
-#if defined(DIAGNOSTICS)
+#if defined(RATEDESIRED_DIAGNOSTICS)
 		RateDesiredSet(&rateDesired);
 #endif
 

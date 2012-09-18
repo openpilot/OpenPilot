@@ -24,27 +24,6 @@ Rectangle {
         smooth: true
     }
 
-    Column {
-        id: wizarButtonsColumn
-
-        anchors {
-            top: parent.top
-            right: parent.right
-            margins: 8
-        }
-        spacing: 8
-
-        WelcomePageButton {
-            baseIconName: "bttn-vehwizard"
-            onClicked: welcomePlugin.triggerAction("SetupWizardPlugin.ShowSetupWizard")
-        }
-
-        WelcomePageButton {
-            baseIconName: "bttn-txwizard"
-            onClicked: welcomePlugin.triggerAction("ConfigPlugin.ShowInputWizard")
-        }
-    }
-
 
     Column {
         id: buttonsGrid
@@ -58,8 +37,7 @@ Rectangle {
         Row {
             //if the buttons grid overlaps vertically with the wizard buttons,
             //move it left to use only the space left to wizard buttons
-            property real availableWidth: buttonsGrid.y > wizarButtonsColumn.y+wizarButtonsColumn.height ?
-                                           container.width : wizarButtonsColumn.x
+            property real availableWidth: container.width
             x: (availableWidth-width)/2
             spacing: 16
 
@@ -74,7 +52,7 @@ Rectangle {
 
             Grid {
                 id: buttons
-                columns: 3
+                columns: 4
                 spacing: 4
                 anchors.verticalCenter: parent.verticalCenter
 
@@ -97,6 +75,11 @@ Rectangle {
                 }
 
                 WelcomePageButton {
+                    baseIconName: "bttn-vehwizard"
+                    onClicked: welcomePlugin.triggerAction("SetupWizardPlugin.ShowSetupWizard")
+                }
+
+               WelcomePageButton {
                     baseIconName: "scopes"
                     label: "Scopes"
                     onClicked: welcomePlugin.openPage("Scopes")
@@ -113,6 +96,12 @@ Rectangle {
                     label: "Firmware"
                     onClicked: welcomePlugin.openPage("Firmware")
                 }
+
+                WelcomePageButton {
+                    baseIconName: "bttn-txwizard"
+                    onClicked: welcomePlugin.triggerAction("ConfigPlugin.ShowInputWizard")
+        }
+
             } //icons grid
         } // images row
 

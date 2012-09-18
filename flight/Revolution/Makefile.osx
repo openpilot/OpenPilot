@@ -92,6 +92,8 @@ OPTESTS  = ./Tests
 OPMODULEDIR = ../Modules
 FLIGHTLIB = ../Libraries
 FLIGHTLIBINC = $(FLIGHTLIB)/inc
+MATHLIB = ../Libraries/math
+MATHLIBINC = ../Libraries/math
 PIOS = ../PiOS.osx
 PIOSINC = $(PIOS)/inc
 PIOSPOSIX = $(PIOS)/osx
@@ -186,6 +188,9 @@ SRC += $(FLIGHTLIB)/CoordinateConversions.c
 SRC += $(FLIGHTLIB)/paths.c
 SRC += $(FLIGHTLIB)/insgps13state.c
 SRC += $(FLIGHTLIB)/taskmonitor.c
+SRC += $(MATHLIB)/pid.c
+SRC += $(MATHLIB)/sin_lookup.c
+
 
 ## RTOS and RTOS Portable 
 SRC += $(RTOSSRCDIR)/list.c
@@ -225,6 +230,8 @@ EXTRAINCDIRS  += $(UAVOBJSYNTHDIR)
 EXTRAINCDIRS  += $(PIOS)
 EXTRAINCDIRS  += $(PIOSINC)
 EXTRAINCDIRS  += $(FLIGHTLIBINC)
+EXTRAINCDIRS  += $(MATHLIBINC)
+EXTRAINCDIRS  += $(FLIGTH)
 EXTRAINCDIRS  += $(PIOSPOSIX)
 EXTRAINCDIRS  += $(RTOSINCDIR)
 EXTRAINCDIRS  += $(APPLIBDIR)

@@ -661,24 +661,30 @@ void UploaderGadgetWidget::versionMatchCheck()
         uavoHashArray.append(str.toInt(&ok,16));
     }
 
-    QByteArray fwVersion;
-    fwVersion=boardDescription.uavoHash;
+    QByteArray fwVersion=boardDescription.uavoHash;
     if (fwVersion != uavoHashArray) {
-        QString uavoHashStr;
-        QString fwVersionStr;
+
+        QString gcsDescription = QString::fromLatin1(Core::Constants::GCS_REVISION_STR);
+        QString gcsGitHash = gcsDescription.mid(gcsDescription.indexOf(":")+1, 8);
+        gcsGitHash.remove( QRegExp("^[0]*") );
+        QString gcsGitDate = gcsDescription.mid(gcsDescription.indexOf(" ")+1, 14);
+
+        QString gcsUavoHashStr;
+        QString fwUavoHashStr;
         foreach(char i, fwVersion)
         {
-            qDebug()<<i<<" "<<QString::number(i,16).right(2);
-            fwVersionStr.append(QString::number(i,16).right(2));
+            fwUavoHashStr.append(QString::number(i,16).right(2));
         }
         foreach(char i, uavoHashArray)
         {
-            qDebug()<<i<<" "<<QString::number(i,16).right(2);
-            uavoHashStr.append(QString::number(i,16).right(2));
+            gcsUavoHashStr.append(QString::number(i,16).right(2));
         }
+        QString gcsVersion = gcsGitDate + " (" + gcsGitHash + "-"+ gcsUavoHashStr.right(8) + ")";
+        QString fwVersion = boardDescription.gitDate + " (" + boardDescription.gitHash + "-" + fwUavoHashStr.right(8) + ")";
+
         QString warning = QString(tr(
-            "GCS and firmware versions of the UAV object set do not match which can cause configuration problems. "
-            "GCS version: %1. Firmware version: %2.")).arg(uavoHashStr).arg(fwVersionStr);
+            "GCS and firmware versions of the UAV objects set do not match which can cause configuration problems. "
+            "GCS version: %1. Firmware version: %2.")).arg(gcsVersion).arg(fwVersion);
         msg->showMessage(warning);
     }
   }

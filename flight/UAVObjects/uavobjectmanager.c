@@ -668,6 +668,7 @@ unlock_exit:
 	return rc;
 }
 
+#if defined(PIOS_INCLUDE_SDCARD)
 /**
  * Save the data of the specified object instance to the file system (SD card).
  * The object will be appended and the file will not be closed.
@@ -682,7 +683,6 @@ int32_t UAVObjSaveToFile(UAVObjHandle obj_handle, uint16_t instId,
 {
 	PIOS_Assert(obj_handle);
 
-#if defined(PIOS_INCLUDE_SDCARD)
 	uint32_t bytesWritten;
 	// Check for file system availability
 	if (PIOS_SDCARD_IsMounted() == 0) {
@@ -741,9 +741,9 @@ int32_t UAVObjSaveToFile(UAVObjHandle obj_handle, uint16_t instId,
 	}
 	// Done
 	xSemaphoreGiveRecursive(mutex);
-#endif /* PIOS_INCLUDE_SDCARD */
 	return 0;
 }
+#endif /* PIOS_INCLUDE_SDCARD */
 
 /**
  * Save the data of the specified object to the file system (SD card).
@@ -811,6 +811,7 @@ int32_t UAVObjSave(UAVObjHandle obj_handle, uint16_t instId)
 	return 0;
 }
 
+#if defined(PIOS_INCLUDE_SDCARD)
 /**
  * Load an object from the file system (SD card).
  * @param[in] file File to read from
@@ -818,7 +819,6 @@ int32_t UAVObjSave(UAVObjHandle obj_handle, uint16_t instId)
  */
 UAVObjHandle UAVObjLoadFromFile(FILEINFO * file)
 {
-#if defined(PIOS_INCLUDE_SDCARD)
 	uint32_t bytesRead;
 	struct UAVOBase *objEntry;
 	InstanceHandle instEntry;
@@ -898,10 +898,8 @@ UAVObjHandle UAVObjLoadFromFile(FILEINFO * file)
 	// Unlock
 	xSemaphoreGiveRecursive(mutex);
 	return obj_handle;
-#else /* PIOS_INCLUDE_SDCARD */
-	return NULL;
-#endif
 }
+#endif /* PIOS_INCLUDE_SDCARD */
 
 /**
  * Load an object from the file system (SD card).

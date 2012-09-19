@@ -388,6 +388,10 @@ void Telemetry::processObjectQueue()
     UAVObject::UpdateMode updateMode = UAVObject::GetGcsTelemetryUpdateMode(metadata);
     if ( ( objInfo.event != EV_UNPACKED ) && ( ( objInfo.event != EV_UPDATED_PERIODIC ) || ( updateMode != UAVObject::UPDATEMODE_THROTTLED ) ) )
     {
+        QMap<quint32, ObjectTransactionInfo*>::iterator itr = transMap.find(objInfo.obj->getObjID());
+        if ( itr != transMap.end() ) {
+            qDebug() << "!!!!!! Making request for an object: " << objInfo.obj->getName() << " for which a request is already in progress!!!!!!";
+        }
         UAVObject::Metadata metadata = objInfo.obj->getMetadata();
         ObjectTransactionInfo *transInfo = new ObjectTransactionInfo(this);
         transInfo->obj = objInfo.obj;

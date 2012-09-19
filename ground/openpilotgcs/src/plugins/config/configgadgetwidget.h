@@ -34,11 +34,9 @@
 #include "objectpersistence.h"
 #include <QtGui/QWidget>
 #include <QList>
-//#include <QtWebKit/QWebView>
 #include <QTextBrowser>
 #include "utils/pathutils.h"
 #include <QMessageBox>
-//#include "fancytabwidget.h"
 #include "utils/mytabbedstackwidget.h"
 #include "../uavobjectwidgetutils/configtaskwidget.h"
 
@@ -50,7 +48,7 @@ class ConfigGadgetWidget: public QWidget
 public:
     ConfigGadgetWidget(QWidget *parent = 0);
     ~ConfigGadgetWidget();
-    enum widgetTabs {hardware=0, aircraft, input, output, sensors, stabilization, camerastabilization, txpid, pipxtreme};
+    enum widgetTabs {hardware=0, aircraft, input, output, sensors, stabilization, camerastabilization, txpid, pipxtreme, autotune};
 
 public slots:
     void onAutopilotConnect();

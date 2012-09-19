@@ -2,7 +2,7 @@
  ******************************************************************************
  *
  * @file       opmapgadgetwidget.cpp
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup OPMapPlugin OpenPilot Map Plugin
@@ -38,9 +38,6 @@
 #include <QFile>
 #include <QDateTime>
 
-#include "homelocation.h"
-#include "positionactual.h"
-
 #include <math.h>
 
 #include "utils/stylehelper.h"
@@ -48,9 +45,16 @@
 #include "utils/worldmagmodel.h"
 
 #include "uavtalk/telemetrymanager.h"
+#include "uavobject.h"
+#include "uavobjectmanager.h"
 
 #include "positionactual.h"
 #include "homelocation.h"
+#include "gpsposition.h"
+#include "gyros.h"
+#include "attitudeactual.h"
+#include "positionactual.h"
+#include "velocityactual.h"
 
 #define allow_manual_home_location_move
 
@@ -100,7 +104,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 
     m_map_mode = Normal_MapMode;
 
-	m_maxUpdateRate = max_update_rate_list[4];	// 2 seconds
+    m_maxUpdateRate = max_update_rate_list[4];	// 2 seconds //SHOULDN'T THIS BE LOADED FROM THE USER PREFERENCES?
 
 	m_telemetry_connected = false;
 
@@ -135,17 +139,6 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 	m_home_position.locked = false;
 
     // **************
-    // default magic waypoint params
-
-	m_magic_waypoint.map_wp_item = NULL;
-	m_magic_waypoint.coord = m_home_position.coord;
-	m_magic_waypoint.altitude = altitude;
-	m_magic_waypoint.description = "Magic waypoint";
-	m_magic_waypoint.locked = false;
-	m_magic_waypoint.time_seconds = 0;
-	m_magic_waypoint.hold_time_seconds = 0;
-
-    // **************
     // create the widget that holds the user controls and the map
 
     m_widget = new Ui::OPMap_Widget();
@@ -173,21 +166,23 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_map->SetShowHome(true);					    // display the HOME position on the map
     m_map->SetShowUAV(true);					    // display the UAV position on the map
 
-	m_map->Home->SetSafeArea(safe_area_radius_list[0]);                         // set radius (meters)
-    m_map->Home->SetShowSafeArea(true);                                         // show the safe area
+    m_map->Home->SetSafeArea(safe_area_radius_list[0]);                         // set radius (meters) //SHOULDN'T THE DEFAULT BE USER DEFINED?
+    m_map->Home->SetShowSafeArea(true);                                         // show the safe area  //SHOULDN'T THE DEFAULT BE USER DEFINED?
+    m_map->Home->SetToggleRefresh(true);
 
+    if(m_map->Home)
+        connect(m_map->Home,SIGNAL(homedoubleclick(HomeItem*)),this,SLOT(onHomeDoubleClick(HomeItem*)));
     m_map->UAV->SetTrailTime(uav_trail_time_list[0]);                           // seconds
     m_map->UAV->SetTrailDistance(uav_trail_distance_list[1]);                   // meters
 
     m_map->UAV->SetTrailType(UAVTrailType::ByTimeElapsed);
-//  m_map->UAV->SetTrailType(UAVTrailType::ByDistance);
+    if(m_map->GPS)
+    {
+        m_map->GPS->SetTrailTime(uav_trail_time_list[0]);                           // seconds
+        m_map->GPS->SetTrailDistance(uav_trail_distance_list[1]);                   // meters
 
-    m_map->GPS->SetTrailTime(uav_trail_time_list[0]);                           // seconds
-    m_map->GPS->SetTrailDistance(uav_trail_distance_list[1]);                   // meters
-
-    m_map->GPS->SetTrailType(UAVTrailType::ByTimeElapsed);
-//  m_map->GPS->SetTrailType(UAVTrailType::ByDistance);
-
+        m_map->GPS->SetTrailType(UAVTrailType::ByTimeElapsed);
+    }
     // **************
 
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
@@ -198,81 +193,44 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     layout->addWidget(m_map);
     m_widget->mapWidget->setLayout(layout);
 
-    // **************
-    // set the user control options
-
-    // TODO: this switch does not make sense, does it??
-
-    switch (m_map_mode)
-    {
-        case Normal_MapMode:
             m_widget->toolButtonMagicWaypointMapMode->setChecked(false);
             m_widget->toolButtonNormalMapMode->setChecked(true);
             hideMagicWaypointControls();
-            break;
-
-        case MagicWaypoint_MapMode:
-            m_widget->toolButtonNormalMapMode->setChecked(false);
-            m_widget->toolButtonMagicWaypointMapMode->setChecked(true);
-            showMagicWaypointControls();
-            break;
-
-        default:
-            m_map_mode = Normal_MapMode;
-            m_widget->toolButtonMagicWaypointMapMode->setChecked(false);
-            m_widget->toolButtonNormalMapMode->setChecked(true);
-            hideMagicWaypointControls();
-            break;
-    }
 
     m_widget->labelUAVPos->setText("---");
     m_widget->labelMapPos->setText("---");
     m_widget->labelMousePos->setText("---");
     m_widget->labelMapZoom->setText("---");
 
-
-    // Splitter is not used at the moment:
-    // m_widget->splitter->setCollapsible(1, false);
-
-    // set the size of the collapsable widgets
-    //QList<int> m_SizeList;
-    //m_SizeList << 0 << 0 << 0;
-    //m_widget->splitter->setSizes(m_SizeList);
-
     m_widget->progressBarMap->setMaximum(1);
-
-/*
-    #if defined(Q_OS_MAC)
-    #elif defined(Q_OS_WIN)
-	m_widget->comboBoxFindPlace->clear();
-	loadComboBoxLines(m_widget->comboBoxFindPlace, QCoreApplication::applicationDirPath() + "/opmap_find_place_history.txt");
-	m_widget->comboBoxFindPlace->setCurrentIndex(-1);
-    #else
-    #endif
-*/
-
-
-    // **************
-    // map stuff
 
     connect(m_map, SIGNAL(zoomChanged(double, double, double)), this, SLOT(zoomChanged(double, double, double)));					// map zoom change signals
     connect(m_map, SIGNAL(OnCurrentPositionChanged(internals::PointLatLng)), this, SLOT(OnCurrentPositionChanged(internals::PointLatLng)));    // map poisition change signals
     connect(m_map, SIGNAL(OnTileLoadComplete()), this, SLOT(OnTileLoadComplete()));					// tile loading stop signals
     connect(m_map, SIGNAL(OnTileLoadStart()), this, SLOT(OnTileLoadStart()));					// tile loading start signals
-    connect(m_map, SIGNAL(OnMapDrag()), this, SLOT(OnMapDrag()));							// map drag signals
-    connect(m_map, SIGNAL(OnMapZoomChanged()), this, SLOT(OnMapZoomChanged()));					// map zoom changed
-    connect(m_map, SIGNAL(OnMapTypeChanged(MapType::Types)), this, SLOT(OnMapTypeChanged(MapType::Types)));		// map type changed
-    connect(m_map, SIGNAL(OnEmptyTileError(int, core::Point)), this, SLOT(OnEmptyTileError(int, core::Point)));	// tile error
     connect(m_map, SIGNAL(OnTilesStillToLoad(int)), this, SLOT(OnTilesStillToLoad(int)));				// tile loading signals
-    connect(m_map, SIGNAL(WPNumberChanged(int const&,int const&,WayPointItem*)), this, SLOT(WPNumberChanged(int const&,int const&,WayPointItem*)));
-    connect(m_map, SIGNAL(WPValuesChanged(WayPointItem*)), this, SLOT(WPValuesChanged(WayPointItem*)));
-    connect(m_map, SIGNAL(WPInserted(int const&, WayPointItem*)), this, SLOT(WPInserted(int const&, WayPointItem*)));
-    connect(m_map, SIGNAL(WPDeleted(int const&)), this, SLOT(WPDeleted(int const&)));
-
+    connect(m_map,SIGNAL(OnWayPointDoubleClicked(WayPointItem*)),this,SLOT(wpDoubleClickEvent(WayPointItem*)));
 	m_map->SetCurrentPosition(m_home_position.coord);         // set the map position
 	m_map->Home->SetCoord(m_home_position.coord);             // set the HOME position
 	m_map->UAV->SetUAVPos(m_home_position.coord, 0.0);        // set the UAV position
-	m_map->GPS->SetUAVPos(m_home_position.coord, 0.0);        // set the UAV position
+    m_map->UAV->update();
+    if(m_map->GPS)
+        m_map->GPS->SetUAVPos(m_home_position.coord, 0.0);        // set the GPS position
+#ifdef USE_PATHPLANNER
+    model=new flightDataModel(this);
+    table=new pathPlanner();
+    selectionModel=new QItemSelectionModel(model);
+    mapProxy=new modelMapProxy(this,m_map,model,selectionModel);
+    table->setModel(model,selectionModel);
+    waypoint_edit_dialog=new opmap_edit_waypoint_dialog(this,model,selectionModel);
+    UAVProxy=new modelUavoProxy(this,model);
+    connect(table,SIGNAL(sendPathPlanToUAV()),UAVProxy,SLOT(modelToObjects()));
+    connect(table,SIGNAL(receivePathPlanFromUAV()),UAVProxy,SLOT(objectsToModel()));
+#endif
+    magicWayPoint=m_map->magicWPCreate();
+    magicWayPoint->setVisible(false);
+
+    m_map->setOverlayOpacity(0.5);
 
     // **************
     // create various context menu (mouse right click menu) actions
@@ -313,10 +271,8 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 
     m_statusUpdateTimer = new QTimer();
 	m_statusUpdateTimer->setInterval(200);
-//	m_statusUpdateTimer->setInterval(m_maxUpdateRate);
 	connect(m_statusUpdateTimer, SIGNAL(timeout()), this, SLOT(updateMousePos()));
     m_statusUpdateTimer->start();
-
     // **************
 
     m_map->setFocus();
@@ -332,34 +288,23 @@ OPMapGadgetWidget::~OPMapGadgetWidget()
 		m_map->SetShowUAV(false);	//   "          "
 	}
 
-
-    // this destructor doesn't appear to be called at shutdown???
-
-//    #if defined(Q_OS_MAC)
-//    #elif defined(Q_OS_WIN)
-//	saveComboBoxLines(m_widget->comboBoxFindPlace, QCoreApplication::applicationDirPath() + "/opmap_find_place_history.txt");
-//    #else
-//    #endif
-
-    m_waypoint_list_mutex.lock();
-    foreach (t_waypoint *wp, m_waypoint_list)
-    {
-        if (!wp) continue;
-
-
-        // todo:
-
-
-        delete wp->map_wp_item;
-    }
-    m_waypoint_list_mutex.unlock();
-    m_waypoint_list.clear();
-
 	if (m_map)
 	{
 		delete m_map;
 		m_map = NULL;
 	}
+    if(!model.isNull())
+        delete model;
+    if(!table.isNull())
+        delete table;
+    if(!selectionModel.isNull())
+        delete selectionModel;
+    if(!mapProxy.isNull())
+        delete mapProxy;
+    if(!waypoint_edit_dialog.isNull())
+        delete waypoint_edit_dialog;
+    if(!UAVProxy.isNull())
+        delete UAVProxy;
 }
 
 // *************************************************************************************
@@ -367,25 +312,24 @@ OPMapGadgetWidget::~OPMapGadgetWidget()
 
 void OPMapGadgetWidget::resizeEvent(QResizeEvent *event)
 {
-    qDebug("opmap: resizeEvent");
-
     QWidget::resizeEvent(event);
 }
 
 void OPMapGadgetWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    qDebug("opmap: mouseMoveEvent");
-
     if (m_widget && m_map)
     {
     }
 
     if (event->buttons() & Qt::LeftButton)
     {
-//        QPoint pos = event->pos();
     }
-
     QWidget::mouseMoveEvent(event);
+}
+void OPMapGadgetWidget::wpDoubleClickEvent(WayPointItem  *wp)
+{
+        m_mouse_waypoint = wp;
+        onEditWayPointAct_triggered();
 }
 
 void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
@@ -393,22 +337,21 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
 
     QString s;
 
-	if (!m_widget || !m_map)
-		return;
+    if (!m_widget || !m_map)
+        return;
 
     if (event->reason() != QContextMenuEvent::Mouse)
         return;	// not a mouse click event
 
     // current mouse position
     QPoint p = m_map->mapFromGlobal(event->globalPos());
-	m_context_menu_lat_lon = m_map->GetFromLocalToLatLng(p);
-//    m_context_menu_lat_lon = m_map->currentMousePosition();
+    m_context_menu_lat_lon = m_map->GetFromLocalToLatLng(p);
 
     if (!m_map->contentsRect().contains(p))
         return;					    // the mouse click was not on the map
 
     // show the mouse position
-	s = QString::number(m_context_menu_lat_lon.Lat(), 'f', 7) + "  " + QString::number(m_context_menu_lat_lon.Lng(), 'f', 7);
+    s = QString::number(m_context_menu_lat_lon.Lat(), 'f', 7) + "  " + QString::number(m_context_menu_lat_lon.Lng(), 'f', 7);
     m_widget->labelMousePos->setText(s);
 
     // find out if we have a waypoint under the mouse cursor
@@ -423,22 +366,19 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
     // ****************
     // Dynamically create the popup menu
 
-    QMenu menu(this);
+    contextMenu.addAction(closeAct1);
+    contextMenu.addSeparator();
+    contextMenu.addAction(reloadAct);
+    contextMenu.addSeparator();
+    contextMenu.addAction(ripAct);
+    contextMenu.addSeparator();
 
-    menu.addAction(closeAct1);
+    QMenu maxUpdateRateSubMenu(tr("&Max Update Rate ") + "(" + QString::number(m_maxUpdateRate) + " ms)", this);
+    for (int i = 0; i < maxUpdateRateAct.count(); i++)
+        maxUpdateRateSubMenu.addAction(maxUpdateRateAct.at(i));
+    contextMenu.addMenu(&maxUpdateRateSubMenu);
 
-    menu.addSeparator();
-
-    menu.addAction(reloadAct);
-
-    menu.addSeparator();
-
-	QMenu maxUpdateRateSubMenu(tr("&Max Update Rate ") + "(" + QString::number(m_maxUpdateRate) + " ms)", this);
-	for (int i = 0; i < maxUpdateRateAct.count(); i++)
-		maxUpdateRateSubMenu.addAction(maxUpdateRateAct.at(i));
-	menu.addMenu(&maxUpdateRateSubMenu);
-
-	menu.addSeparator();
+    contextMenu.addSeparator();
 
     switch (m_map_mode)
     {
@@ -456,217 +396,154 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
     QMenu mapModeSubMenu(tr("Map mode") + s, this);
     for (int i = 0; i < mapModeAct.count(); i++)
         mapModeSubMenu.addAction(mapModeAct.at(i));
-    menu.addMenu(&mapModeSubMenu);
+    contextMenu.addMenu(&mapModeSubMenu);
 
-    menu.addSeparator();
+    contextMenu.addSeparator();
 
     QMenu copySubMenu(tr("Copy"), this);
     copySubMenu.addAction(copyMouseLatLonToClipAct);
     copySubMenu.addAction(copyMouseLatToClipAct);
     copySubMenu.addAction(copyMouseLonToClipAct);
-    menu.addMenu(&copySubMenu);
+    contextMenu.addMenu(&copySubMenu);
 
-    menu.addSeparator();
+    contextMenu.addSeparator();
+    contextMenu.addAction(changeDefaultLocalAndZoom);
+    contextMenu.addSeparator();
 
-    /*
-    menu.addAction(findPlaceAct);
-
-    menu.addSeparator();
-    */
-
-    menu.addAction(showSafeAreaAct);
+    QMenu safeArea("Safety Area definitions");
+   // menu.addAction(showSafeAreaAct);
     QMenu safeAreaSubMenu(tr("Safe Area Radius") + " (" + QString::number(m_map->Home->SafeArea()) + "m)", this);
     for (int i = 0; i < safeAreaAct.count(); i++)
         safeAreaSubMenu.addAction(safeAreaAct.at(i));
-    menu.addMenu(&safeAreaSubMenu);
+    safeArea.addMenu(&safeAreaSubMenu);
+    safeArea.addAction(showSafeAreaAct);
+    contextMenu.addMenu(&safeArea);
 
-    menu.addSeparator();
+    contextMenu.addSeparator();
 
-    menu.addAction(showCompassAct);
+    contextMenu.addAction(showCompassAct);
 
-    menu.addAction(showDiagnostics);
+    contextMenu.addAction(showDiagnostics);
 
-    menu.addSeparator()->setText(tr("Zoom"));
+    contextMenu.addAction(showUAVInfo);
 
-    menu.addAction(zoomInAct);
-    menu.addAction(zoomOutAct);
+    contextMenu.addSeparator()->setText(tr("Zoom"));
+
+    contextMenu.addAction(zoomInAct);
+    contextMenu.addAction(zoomOutAct);
 
     QMenu zoomSubMenu(tr("&Zoom ") + "(" + QString::number(m_map->ZoomTotal()) + ")", this);
     for (int i = 0; i < zoomAct.count(); i++)
         zoomSubMenu.addAction(zoomAct.at(i));
-    menu.addMenu(&zoomSubMenu);
+    contextMenu.addMenu(&zoomSubMenu);
 
-    menu.addSeparator();
+    contextMenu.addSeparator();
 
-    menu.addAction(goMouseClickAct);
+    contextMenu.addAction(goMouseClickAct);
 
-    menu.addSeparator()->setText(tr("HOME"));
+    contextMenu.addSeparator()->setText(tr("HOME"));
 
-    menu.addAction(setHomeAct);
-    menu.addAction(showHomeAct);
-    menu.addAction(goHomeAct);
+    contextMenu.addAction(setHomeAct);
+    contextMenu.addAction(showHomeAct);
+    contextMenu.addAction(goHomeAct);
 
     // ****
     // uav trails
-
-    menu.addSeparator()->setText(tr("UAV Trail"));
-
-    QMenu uavTrailSubMenu(tr("UAV Trail"), this);
-
+    QMenu uav_menu(tr("UAV"));
+    uav_menu.addSeparator()->setText(tr("UAV Trail"));
+    contextMenu.addMenu(&uav_menu);
     QMenu uavTrailTypeSubMenu(tr("UAV trail type") + " (" + mapcontrol::Helper::StrFromUAVTrailType(m_map->UAV->GetTrailType()) + ")", this);
     for (int i = 0; i < uavTrailTypeAct.count(); i++)
         uavTrailTypeSubMenu.addAction(uavTrailTypeAct.at(i));
-    uavTrailSubMenu.addMenu(&uavTrailTypeSubMenu);
+    uav_menu.addMenu(&uavTrailTypeSubMenu);
 
     QMenu uavTrailTimeSubMenu(tr("UAV trail time") + " (" + QString::number(m_map->UAV->TrailTime()) + " sec)", this);
     for (int i = 0; i < uavTrailTimeAct.count(); i++)
         uavTrailTimeSubMenu.addAction(uavTrailTimeAct.at(i));
-    uavTrailSubMenu.addMenu(&uavTrailTimeSubMenu);
+    uav_menu.addMenu(&uavTrailTimeSubMenu);
 
     QMenu uavTrailDistanceSubMenu(tr("UAV trail distance") + " (" + QString::number(m_map->UAV->TrailDistance()) + " meters)", this);
     for (int i = 0; i < uavTrailDistanceAct.count(); i++)
         uavTrailDistanceSubMenu.addAction(uavTrailDistanceAct.at(i));
-    uavTrailSubMenu.addMenu(&uavTrailDistanceSubMenu);
+    uav_menu.addMenu(&uavTrailDistanceSubMenu);
 
-    uavTrailSubMenu.addAction(showUAVtrailAct);
+    uav_menu.addAction(showTrailAct);
 
-    uavTrailSubMenu.addAction(showUAVtrailLineAct);
+    uav_menu.addAction(showTrailLineAct);
 
-    uavTrailSubMenu.addAction(clearUAVtrailAct);
-    menu.addMenu(&uavTrailSubMenu);
-
-    // gps trails
-
-    //menu.addSeparator()->setText(tr("GPS Trail"));
-
-    QMenu gpsTrailSubMenu(tr("GPS Trail"), this);
-
-    QMenu gpsTrailTypeSubMenu(tr("GPS trail type") + " (" + mapcontrol::Helper::StrFromUAVTrailType(m_map->GPS->GetTrailType()) + ")", this);
-    for (int i = 0; i < gpsTrailTypeAct.count(); i++)
-        gpsTrailTypeSubMenu.addAction(gpsTrailTypeAct.at(i));
-    gpsTrailSubMenu.addMenu(&gpsTrailTypeSubMenu);
-
-    QMenu gpsTrailTimeSubMenu(tr("GPS trail time") + " (" + QString::number(m_map->GPS->TrailTime()) + " sec)", this);
-    for (int i = 0; i < gpsTrailTimeAct.count(); i++)
-        gpsTrailTimeSubMenu.addAction(gpsTrailTimeAct.at(i));
-    gpsTrailSubMenu.addMenu(&gpsTrailTimeSubMenu);
-
-    QMenu gpsTrailDistanceSubMenu(tr("GPS trail distance") + " (" + QString::number(m_map->GPS->TrailDistance()) + " meters)", this);
-    for (int i = 0; i < gpsTrailDistanceAct.count(); i++)
-        gpsTrailDistanceSubMenu.addAction(gpsTrailDistanceAct.at(i));
-    gpsTrailSubMenu.addMenu(&gpsTrailDistanceSubMenu);
-
-    gpsTrailSubMenu.addAction(showGPStrailAct);
-
-    gpsTrailSubMenu.addAction(showGPStrailLineAct);
-
-    gpsTrailSubMenu.addAction(clearGPStrailAct);
-    menu.addMenu(&gpsTrailSubMenu);
+    uav_menu.addAction(clearUAVtrailAct);
 
     // ****
 
-    menu.addSeparator()->setText(tr("UAV"));
+    uav_menu.addSeparator()->setText(tr("UAV"));
 
-    menu.addAction(showUAVAct);
-    menu.addAction(showGPSAct);
-    menu.addAction(followUAVpositionAct);
-    menu.addAction(followUAVheadingAct);
-    menu.addAction(goUAVAct);
+    uav_menu.addAction(showUAVAct);
+    uav_menu.addAction(followUAVpositionAct);
+    uav_menu.addAction(followUAVheadingAct);
+    uav_menu.addAction(goUAVAct);
 
     // *********
-
+#ifdef USE_PATHPLANNER
     switch (m_map_mode)
     {
         case Normal_MapMode:
         // only show the waypoint stuff if not in 'magic waypoint' mode
-            /*
-            menu.addSeparator()->setText(tr("Waypoints"));
 
-            menu.addAction(wayPointEditorAct);
-            menu.addAction(addWayPointAct);
+            contextMenu.addSeparator()->setText(tr("Waypoints"));
+
+            contextMenu.addAction(wayPointEditorAct);
+            contextMenu.addAction(addWayPointActFromContextMenu);
 
             if (m_mouse_waypoint)
             {	// we have a waypoint under the mouse
-                menu.addAction(editWayPointAct);
+                contextMenu.addAction(editWayPointAct);
 
                 lockWayPointAct->setChecked(waypoint_locked);
-                menu.addAction(lockWayPointAct);
+                contextMenu.addAction(lockWayPointAct);
 
                 if (!waypoint_locked)
-                    menu.addAction(deleteWayPointAct);
+                    contextMenu.addAction(deleteWayPointAct);
             }
 
-            m_waypoint_list_mutex.lock();
-            if (m_waypoint_list.count() > 0)
-                menu.addAction(clearWayPointsAct);	// we have waypoints
-            m_waypoint_list_mutex.unlock();
-            */
+            if (m_map->WPPresent())
+                contextMenu.addAction(clearWayPointsAct);	// we have waypoints
 
             break;
 
         case MagicWaypoint_MapMode:
-            menu.addSeparator()->setText(tr("Waypoints"));
-            menu.addAction(homeMagicWaypointAct);
+            contextMenu.addSeparator()->setText(tr("Waypoints"));
+            contextMenu.addAction(homeMagicWaypointAct);
             break;
     }
-
+#endif
     // *********
 
-    menu.addSeparator();
+    QMenu overlaySubMenu(tr("&Overlay Opacity "),this);
+    for (int i = 0; i < overlayOpacityAct.count(); i++)
+        overlaySubMenu.addAction(overlayOpacityAct.at(i));
+    contextMenu.addMenu(&overlaySubMenu);
+    contextMenu.addSeparator();
 
-    menu.addAction(closeAct2);
+    contextMenu.addAction(closeAct2);
 
-    menu.exec(event->globalPos());  // popup the menu
+    contextMenu.exec(event->globalPos());  // popup the menu
 
     // ****************
 }
 
-void OPMapGadgetWidget::keyPressEvent(QKeyEvent* event)
+void OPMapGadgetWidget::closeEvent(QCloseEvent *event)
 {
-    qDebug() << "opmap: keyPressEvent, key =" << event->key() << endl;
-
-    switch (event->key())
-    {
-        case Qt::Key_Escape:
-            break;
-
-        case Qt::Key_F1:
-            break;
-
-        case Qt::Key_F2:
-            break;
-
-        case Qt::Key_Up:
-            break;
-
-        case Qt::Key_Down:
-            break;
-
-        case Qt::Key_Left:
-            break;
-
-        case Qt::Key_Right:
-            break;
-
-        case Qt::Key_PageUp:
-            break;
-
-        case Qt::Key_PageDown:
-            break;
-    }
+    table->close();
+    QWidget::closeEvent(event);
 }
 
 // *************************************************************************************
 // timer signals
 
 /**
-  Updates the UAV position on the map. It is called every 200ms
-  by a timer.
-
-  TODO: consider updating upon object update, not timer.
-
-  from Pip: No don't update on object update - had reports that peoples PC's can't cope with high update rates - have had to allow user to set map update from 100ms to 5 seconds (depending on their PC's graphics processing ability), so this needs to be kept on a timer.
-  */
+  Updates the UAV position on the map. It is called at a user-defined frequency,
+  as set inside the map widget.
+*/
 void OPMapGadgetWidget::updatePosition()
 {
 	double uav_latitude, uav_longitude, uav_altitude, uav_yaw;
@@ -679,10 +556,6 @@ void OPMapGadgetWidget::updatePosition()
 		return;
 
     QMutexLocker locker(&m_map_mutex);
-// Pip I'm sorry, I know this was here with a purpose vvv
-// from Pip: let you off :)
-	//if (!telemetry_connected)
-	//	return;
 
 	// *************
 	// get the current UAV details
@@ -697,19 +570,50 @@ void OPMapGadgetWidget::updatePosition()
 	uav_pos = internals::PointLatLng(uav_latitude, uav_longitude);
 
 	// *************
-	// get the current GPS details
+    // get the current GPS position and heading
+    GPSPosition *gpsPositionObj = GPSPosition::GetInstance(obm);
+    Q_ASSERT(gpsPositionObj);
 
-	// get current GPS position
-	if (!getGPSPosition(gps_latitude, gps_longitude, gps_altitude))
-		return;
+    GPSPosition::DataFields gpsPositionData = gpsPositionObj->getData();
 
-	// get current GPS heading
-//	gps_heading = getGPS_Heading();
-	gps_heading = 0;
+    gps_heading = gpsPositionData.Heading;
+    gps_latitude = gpsPositionData.Latitude;
+    gps_longitude = gpsPositionData.Longitude;
+    gps_altitude = gpsPositionData.Altitude;
 
 	gps_pos = internals::PointLatLng(gps_latitude, gps_longitude);
 
-	// *************
+    //**********************
+    // get the current position and heading estimates
+    AttitudeActual *attitudeActualObj = AttitudeActual::GetInstance(obm);
+    PositionActual *positionActualObj = PositionActual::GetInstance(obm);
+    VelocityActual *velocityActualObj = VelocityActual::GetInstance(obm);
+    Gyros *gyrosObj = Gyros::GetInstance(obm);
+
+    Q_ASSERT(positionActualObj);
+    Q_ASSERT(velocityActualObj);
+    Q_ASSERT(gyrosObj);
+
+    AttitudeActual::DataFields attitudeActualData = attitudeActualObj->getData();
+    PositionActual::DataFields positionActualData = positionActualObj->getData();
+    VelocityActual::DataFields velocityActualData = velocityActualObj->getData();
+    Gyros::DataFields gyrosData = gyrosObj->getData();
+
+    double NED[3]={positionActualData.North, positionActualData.East, positionActualData.Down};
+    double vNED[3]={velocityActualData.North, velocityActualData.East, velocityActualData.Down};
+
+    //Set the position and heading estimates in the painter module
+    m_map->UAV->SetNED(NED);
+    m_map->UAV->SetCAS(-1); //THIS NEEDS TO BECOME AIRSPEED, ONCE WE SETTLE ON A UAVO
+    m_map->UAV->SetGroundspeed(vNED, m_maxUpdateRate);
+
+    //Convert angular velocities into a rotationg rate around the world-frame yaw axis. This is found by simply taking the dot product of the angular Euler-rate matrix with the angular rates.
+    float psiRate_dps=0*gyrosData.z + sin(attitudeActualData.Roll*deg_to_rad)/cos(attitudeActualData.Pitch*deg_to_rad)*gyrosData.y + cos(attitudeActualData.Roll*deg_to_rad)/cos(attitudeActualData.Pitch*deg_to_rad)*gyrosData.z;
+
+    //Set the angular rate in the painter module
+    m_map->UAV->SetYawRate(psiRate_dps); //Not correct, but I'm being lazy right now.
+
+    // *************
 	// display the UAV position
 
     QString str =
@@ -729,10 +633,13 @@ void OPMapGadgetWidget::updatePosition()
 
 	// *************
 	// set the GPS icon position on the map
-
-	m_map->GPS->SetUAVPos(gps_pos, gps_altitude); // set the maps GPS position
-	m_map->GPS->SetUAVHeading(gps_heading);       // set the maps GPS heading
-
+    if(m_map->GPS)
+    {
+        m_map->GPS->SetUAVPos(gps_pos, gps_altitude); // set the maps GPS position
+        m_map->GPS->SetUAVHeading(gps_heading);       // set the maps GPS heading
+    }
+    m_map->UAV->updateTextOverlay();
+    m_map->UAV->update();
 	// *************
 }
 
@@ -749,7 +656,7 @@ void OPMapGadgetWidget::updateMousePos()
 
     QPoint p = m_map->mapFromGlobal(QCursor::pos());
     internals::PointLatLng lat_lon = m_map->GetFromLocalToLatLng(p);    // fetch the current lat/lon mouse position
-
+    lastLatLngMouse=lat_lon;
     if (!m_map->contentsRect().contains(p))
         return;					    // the mouse is not on the map
 
@@ -759,9 +666,6 @@ void OPMapGadgetWidget::updateMousePos()
 
     // find out if we are over the home position
     mapcontrol::HomeItem *home = qgraphicsitem_cast<mapcontrol::HomeItem *>(item);
-
-    // find out if we are over the UAV
-    mapcontrol::UAVItem *uav = qgraphicsitem_cast<mapcontrol::UAVItem *>(item);
 
     // find out if we have a waypoint under the mouse cursor
     mapcontrol::WayPointItem *wp = qgraphicsitem_cast<mapcontrol::WayPointItem *>(item);
@@ -776,7 +680,7 @@ void OPMapGadgetWidget::updateMousePos()
 	QString s = QString::number(m_mouse_lat_lon.Lat(), 'f', 7) + "  " + QString::number(m_mouse_lat_lon.Lng(), 'f', 7);
     if (wp)
     {
-        s += "  wp[" + QString::number(wp->Number()) + "]";
+        s += "  wp[" + QString::number(wp->numberAdjusted()) + "]";
 
         double dist = distance(home_lat_lon, wp->Coord());
         double bear = bearing(home_lat_lon, wp->Coord());
@@ -792,24 +696,6 @@ void OPMapGadgetWidget::updateMousePos()
 		double bear = bearing(home_lat_lon, m_mouse_lat_lon);
         s += "  " + QString::number(dist * 1000, 'f', 1) + "m";
         s += "  " + QString::number(bear, 'f', 1) + "deg";
-    }
-    else
-    if (uav)
-    {
-        s += "  uav";
-
-        double latitude;
-        double longitude;
-        double altitude;
-		if (getUAVPosition(latitude, longitude, altitude))  // get current UAV position
-        {
-            internals::PointLatLng uav_pos = internals::PointLatLng(latitude, longitude);
-
-//          double dist = distance(home_lat_lon, uav_pos);
-//          double bear = bearing(home_lat_lon, uav_pos);
-//          s += "  " + QString::number(dist * 1000, 'f', 1) + "m";
-//          s += "  " + QString::number(bear, 'f', 1) + "deg";
-        }
     }
     m_widget->labelMousePos->setText(s);
 }
@@ -840,11 +726,7 @@ void OPMapGadgetWidget::zoomChanged(double zoomt, double zoom, double zoomd)
 
 	int index0_zoom = i_zoom - m_min_zoom;			// zoom level starting at index level '0'
     if (index0_zoom < zoomAct.count())
-	zoomAct.at(index0_zoom)->setChecked(true);		// set the right-click context menu zoom level
-}
-
-void OPMapGadgetWidget::OnMapDrag()
-{
+    zoomAct.at(index0_zoom)->setChecked(true);		// set the right-click context menu zoom level
 }
 
 void OPMapGadgetWidget::OnCurrentPositionChanged(internals::PointLatLng point)
@@ -864,15 +746,10 @@ void OPMapGadgetWidget::OnTilesStillToLoad(int number)
 	if (!m_widget || !m_map)
 		return;
 
-//	if (prev_tile_number < number || m_widget->progressBarMap->maximum() < number)
-//	    m_widget->progressBarMap->setMaximum(number);
-
 	if (m_widget->progressBarMap->maximum() < number)
 	    m_widget->progressBarMap->setMaximum(number);
 
 	m_widget->progressBarMap->setValue(m_widget->progressBarMap->maximum() - number);	// update the progress bar
-
-//	m_widget->labelNumTilesToLoad->setText(QString::number(number));
 
 	m_prev_tile_number = number;
 }
@@ -884,7 +761,6 @@ void OPMapGadgetWidget::OnTileLoadStart()
 {
 	if (!m_widget || !m_map)
 		return;
-
     m_widget->progressBarMap->setVisible(true);
 }
 
@@ -901,84 +777,6 @@ void OPMapGadgetWidget::OnTileLoadComplete()
 
     m_widget->progressBarMap->setVisible(false);
 }
-
-void OPMapGadgetWidget::OnMapZoomChanged()
-{
-}
-
-void OPMapGadgetWidget::OnMapTypeChanged(MapType::Types type)
-{
-    Q_UNUSED(type);
-}
-
-void OPMapGadgetWidget::OnEmptyTileError(int zoom, core::Point pos)
-{
-    Q_UNUSED(zoom);
-    Q_UNUSED(pos);
-}
-
-void OPMapGadgetWidget::WPNumberChanged(int const &oldnumber, int const &newnumber, WayPointItem *waypoint)
-{
-    Q_UNUSED(oldnumber);
-    Q_UNUSED(newnumber);
-    Q_UNUSED(waypoint);
-}
-
-void OPMapGadgetWidget::WPValuesChanged(WayPointItem *waypoint)
-{
-//    qDebug("opmap: WPValuesChanged");
-
-    switch (m_map_mode)
-    {
-        case Normal_MapMode:
-            m_waypoint_list_mutex.lock();
-            foreach (t_waypoint *wp, m_waypoint_list)
-            {   // search for the waypoint in our own waypoint list and update it
-                if (!wp) continue;
-                if (!wp->map_wp_item) continue;
-                if (wp->map_wp_item != waypoint) continue;
-                // found the waypoint in our list
-                wp->coord = waypoint->Coord();
-                wp->altitude = waypoint->Altitude();
-                wp->description = waypoint->Description();
-                break;
-            }
-            m_waypoint_list_mutex.unlock();
-            break;
-
-        case MagicWaypoint_MapMode:
-            // update our copy of the magic waypoint
-			if (m_magic_waypoint.map_wp_item && m_magic_waypoint.map_wp_item == waypoint)
-            {
-				m_magic_waypoint.coord = waypoint->Coord();
-				m_magic_waypoint.altitude = waypoint->Altitude();
-				m_magic_waypoint.description = waypoint->Description();
-
-                // move the UAV to the magic waypoint position
-                // moveToMagicWaypointPosition();
-            }
-            break;
-    }
-
-}
-
-/**
-  TODO: slot to do something upon Waypoint insertion
-  */
-void OPMapGadgetWidget::WPInserted(int const &number, WayPointItem *waypoint)
-{
-    Q_UNUSED(number);
-    Q_UNUSED(waypoint);
-}
-
-/**
-  TODO: slot to do something upon Waypoint deletion
-  */
-void OPMapGadgetWidget::WPDeleted(int const &number)
-{
-    Q_UNUSED(number);
-}
-
 
 void OPMapGadgetWidget::on_toolButtonZoomP_clicked()
 {
@@ -1065,7 +863,7 @@ void OPMapGadgetWidget::onTelemetryConnect()
 	if (obum->getHomeLocation(set, LLA) < 0)
 		return;	// error
 
-	setHome(internals::PointLatLng(LLA[0], LLA[1]));
+    setHome(internals::PointLatLng(LLA[0], LLA[1]),LLA[2]);
 
     if (m_map)
 		m_map->SetCurrentPosition(m_home_position.coord);         // set the map position
@@ -1081,12 +879,14 @@ void OPMapGadgetWidget::onTelemetryDisconnect()
 // Updates the Home position icon whenever the HomePosition object is updated
 void OPMapGadgetWidget::homePositionUpdated(UAVObject *hp)
 {
-    if (!hp)
-        return;
+    Q_UNUSED(hp);
+    if (!obum) return;
+    bool set;
+    double LLA[3];
+    if (obum->getHomeLocation(set, LLA) < 0)
+        return;	// error
+    setHome(internals::PointLatLng(LLA[0], LLA[1]),LLA[2]);
 
-    double lat = hp->getField("Latitude")->getDouble() * 1e-7;
-    double lon = hp->getField("Longitude")->getDouble() * 1e-7;
-    setHome(internals::PointLatLng(lat, lon));
 }
 
 // *************************************************************************************
@@ -1113,13 +913,13 @@ void OPMapGadgetWidget::setHome(QPointF pos)
     else
     if (longitude < -180) longitude = -180;
 
-    setHome(internals::PointLatLng(latitude, longitude));
+    setHome(internals::PointLatLng(latitude, longitude),0);
 }
 
 /**
   Sets the home position on the map widget
   */
-void OPMapGadgetWidget::setHome(internals::PointLatLng pos_lat_lon)
+void OPMapGadgetWidget::setHome(internals::PointLatLng pos_lat_lon,double altitude)
 {
 	if (!m_widget || !m_map)
 		return;
@@ -1141,12 +941,14 @@ void OPMapGadgetWidget::setHome(internals::PointLatLng pos_lat_lon)
     if (longitude >  180) longitude =  180;
     else
     if (longitude < -180) longitude = -180;
+    else if(altitude != altitude) altitude=0;
 
     // *********
 
 	m_home_position.coord = internals::PointLatLng(latitude, longitude);
 
 	m_map->Home->SetCoord(m_home_position.coord);
+    m_map->Home->SetAltitude(altitude);
     m_map->Home->RefreshPos();
 
     // move the magic waypoint to keep it within the safe area boundry
@@ -1235,6 +1037,35 @@ void OPMapGadgetWidget::setZoom(int zoom)
 
     m_map->SetMouseWheelZoomType(zoom_type);
 }
+void OPMapGadgetWidget::setOverlayOpacity(qreal value)
+{
+    if (!m_widget || !m_map)
+        return;
+    m_map->setOverlayOpacity(value);
+    overlayOpacityAct.at(value*10)->setChecked(true);
+}
+
+void OPMapGadgetWidget::setHomePosition(QPointF pos)
+{
+    if (!m_widget || !m_map)
+        return;
+
+    double latitude = pos.y();
+    double longitude = pos.x();
+
+    if (latitude != latitude || longitude != longitude)
+        return; // nan prevention
+
+    if (latitude >  90) latitude =  90;
+    else
+    if (latitude < -90) latitude = -90;
+
+    if (longitude >  180) longitude =  180;
+    else
+    if (longitude < -180) longitude = -180;
+
+    m_map->Home->SetCoord(internals::PointLatLng(latitude, longitude));
+}
 
 void OPMapGadgetWidget::setPosition(QPointF pos)
 {
@@ -1307,21 +1138,12 @@ void OPMapGadgetWidget::setCacheLocation(QString cacheLocation)
 
     if (cacheLocation.isEmpty()) return;
 
-//    #if defined(Q_WS_WIN)
-//	if (!cacheLocation.endsWith('\\')) cacheLocation += '\\';
-//    #elif defined(Q_WS_X11)
-	if (!cacheLocation.endsWith(QDir::separator())) cacheLocation += QDir::separator();
-//    #elif defined(Q_WS_MAC)
-//	if (!cacheLocation.endsWith(QDir::separator())) cacheLocation += QDir::separator();
-//    #endif
+    if (!cacheLocation.endsWith(QDir::separator())) cacheLocation += QDir::separator();
 
     QDir dir;
     if (!dir.exists(cacheLocation))
         if (!dir.mkpath(cacheLocation))
             return;
-
-//    qDebug() << "opmap: map cache dir: " << cacheLocation;
-
     m_map->configuration->SetCacheLocation(cacheLocation);
 }
 
@@ -1359,32 +1181,8 @@ void OPMapGadgetWidget::setMapMode(opMapModeType mode)
 
             hideMagicWaypointControls();
 
-            // delete the magic waypoint from the map
-			if (m_magic_waypoint.map_wp_item)
-            {
-				m_magic_waypoint.coord = m_magic_waypoint.map_wp_item->Coord();
-				m_magic_waypoint.altitude = m_magic_waypoint.map_wp_item->Altitude();
-				m_magic_waypoint.description = m_magic_waypoint.map_wp_item->Description();
-				m_magic_waypoint.map_wp_item = NULL;
-            }
-            m_map->WPDeleteAll();
-
-            // restore the normal waypoints on the map
-            m_waypoint_list_mutex.lock();
-            foreach (t_waypoint *wp, m_waypoint_list)
-            {
-                if (!wp) continue;
-                wp->map_wp_item = m_map->WPCreate(wp->coord, wp->altitude, wp->description);
-                if (!wp->map_wp_item) continue;
-                wp->map_wp_item->setZValue(10 + wp->map_wp_item->Number());
-                wp->map_wp_item->setFlag(QGraphicsItem::ItemIsMovable, !wp->locked);
-                if (!wp->locked)
-                    wp->map_wp_item->picture.load(QString::fromUtf8(":/opmap/images/waypoint_marker1.png"));
-                else
-                    wp->map_wp_item->picture.load(QString::fromUtf8(":/opmap/images/waypoint_marker2.png"));
-                wp->map_wp_item->update();
-            }
-            m_waypoint_list_mutex.unlock();
+            magicWayPoint->setVisible(false);
+            m_map->WPSetVisibleAll(true);
 
             break;
 
@@ -1397,25 +1195,9 @@ void OPMapGadgetWidget::setMapMode(opMapModeType mode)
             showMagicWaypointControls();
 
             // delete the normal waypoints from the map
-            m_waypoint_list_mutex.lock();
-            foreach (t_waypoint *wp, m_waypoint_list)
-            {
-                if (!wp) continue;
-                if (!wp->map_wp_item) continue;
-                wp->coord = wp->map_wp_item->Coord();
-                wp->altitude = wp->map_wp_item->Altitude();
-                wp->description = wp->map_wp_item->Description();
-                wp->locked = (wp->map_wp_item->flags() & QGraphicsItem::ItemIsMovable) == 0;
-                wp->map_wp_item = NULL;
-            }
-            m_map->WPDeleteAll();
-            m_waypoint_list_mutex.unlock();
 
-            // restore the magic waypoint on the map
-			m_magic_waypoint.map_wp_item = m_map->WPCreate(m_magic_waypoint.coord, m_magic_waypoint.altitude, m_magic_waypoint.description);
-			m_magic_waypoint.map_wp_item->setZValue(10 + m_magic_waypoint.map_wp_item->Number());
-			m_magic_waypoint.map_wp_item->SetShowNumber(false);
-			m_magic_waypoint.map_wp_item->picture.load(QString::fromUtf8(":/opmap/images/waypoint_marker3.png"));
+            m_map->WPSetVisibleAll(false);
+            magicWayPoint->setVisible(true);
 
             break;
     }
@@ -1444,6 +1226,10 @@ void OPMapGadgetWidget::createActions()
     reloadAct->setShortcut(tr("F5"));
     reloadAct->setStatusTip(tr("Reload the map tiles"));
     connect(reloadAct, SIGNAL(triggered()), this, SLOT(onReloadAct_triggered()));
+    this->addAction(reloadAct);
+    ripAct = new QAction(tr("&Rip map"), this);
+    ripAct->setStatusTip(tr("Rip the map tiles"));
+    connect(ripAct, SIGNAL(triggered()), this, SLOT(onRipAct_triggered()));
 
     copyMouseLatLonToClipAct = new QAction(tr("Mouse latitude and longitude"), this);
     copyMouseLatLonToClipAct->setStatusTip(tr("Copy the mouse latitude and longitude to the clipboard"));
@@ -1457,13 +1243,6 @@ void OPMapGadgetWidget::createActions()
     copyMouseLonToClipAct->setStatusTip(tr("Copy the mouse longitude to the clipboard"));
     connect(copyMouseLonToClipAct, SIGNAL(triggered()), this, SLOT(onCopyMouseLonToClipAct_triggered()));
 
-    /*
-    findPlaceAct = new QAction(tr("&Find place"), this);
-    findPlaceAct->setShortcut(tr("Ctrl+F"));
-    findPlaceAct->setStatusTip(tr("Find a location"));
-    connect(findPlaceAct, SIGNAL(triggered()), this, SLOT(onFindPlaceAct_triggered()));
-    */
-
     showCompassAct = new QAction(tr("Show compass"), this);
     showCompassAct->setStatusTip(tr("Show/Hide the compass"));
     showCompassAct->setCheckable(true);
@@ -1476,21 +1255,39 @@ void OPMapGadgetWidget::createActions()
     showDiagnostics->setChecked(false);
     connect(showDiagnostics, SIGNAL(toggled(bool)), this, SLOT(onShowDiagnostics_toggled(bool)));
 
+    showUAVInfo = new QAction(tr("Show UAV Info"), this);
+    showUAVInfo->setStatusTip(tr("Show/Hide the UAV info"));
+    showUAVInfo->setCheckable(true);
+    showUAVInfo->setChecked(false);
+    connect(showUAVInfo, SIGNAL(toggled(bool)), this, SLOT(onShowUAVInfo_toggled(bool)));
+
     showHomeAct = new QAction(tr("Show Home"), this);
     showHomeAct->setStatusTip(tr("Show/Hide the Home location"));
     showHomeAct->setCheckable(true);
     showHomeAct->setChecked(true);
     connect(showHomeAct, SIGNAL(toggled(bool)), this, SLOT(onShowHomeAct_toggled(bool)));
 
+    showUAVAct = new QAction(tr("Show UAV"), this);
+    showUAVAct->setStatusTip(tr("Show/Hide the UAV"));
+    showUAVAct->setCheckable(true);
+    showUAVAct->setChecked(true);
+    connect(showUAVAct, SIGNAL(toggled(bool)), this, SLOT(onShowUAVAct_toggled(bool)));
+
+    changeDefaultLocalAndZoom = new QAction(tr("Set default zoom and location"), this);
+    changeDefaultLocalAndZoom->setStatusTip(tr("Changes the map default zoom and location to the current values"));
+    connect(changeDefaultLocalAndZoom, SIGNAL(triggered()), this, SLOT(onChangeDefaultLocalAndZoom()));
+
     zoomInAct = new QAction(tr("Zoom &In"), this);
     zoomInAct->setShortcut(Qt::Key_PageUp);
     zoomInAct->setStatusTip(tr("Zoom the map in"));
     connect(zoomInAct, SIGNAL(triggered()), this, SLOT(onGoZoomInAct_triggered()));
+    this->addAction(zoomInAct);
 
     zoomOutAct = new QAction(tr("Zoom &Out"), this);
     zoomOutAct->setShortcut(Qt::Key_PageDown);
     zoomOutAct->setStatusTip(tr("Zoom the map out"));
     connect(zoomOutAct, SIGNAL(triggered()), this, SLOT(onGoZoomOutAct_triggered()));
+    this->addAction(zoomOutAct);
 
     goMouseClickAct = new QAction(tr("Go to where you right clicked the mouse"), this);
     goMouseClickAct->setStatusTip(tr("Center the map onto where you right clicked the mouse"));
@@ -1531,17 +1328,22 @@ void OPMapGadgetWidget::createActions()
       TODO: Waypoint support is disabled for v1.0
       */
 
-    /*
+#ifdef USE_PATHPLANNER
     wayPointEditorAct = new QAction(tr("&Waypoint editor"), this);
     wayPointEditorAct->setShortcut(tr("Ctrl+W"));
     wayPointEditorAct->setStatusTip(tr("Open the waypoint editor"));
-    wayPointEditorAct->setEnabled(false);   // temporary
     connect(wayPointEditorAct, SIGNAL(triggered()), this, SLOT(onOpenWayPointEditorAct_triggered()));
 
-    addWayPointAct = new QAction(tr("&Add waypoint"), this);
-    addWayPointAct->setShortcut(tr("Ctrl+A"));
-    addWayPointAct->setStatusTip(tr("Add waypoint"));
-    connect(addWayPointAct, SIGNAL(triggered()), this, SLOT(onAddWayPointAct_triggered()));
+    addWayPointActFromContextMenu = new QAction(tr("&Add waypoint"), this);
+    addWayPointActFromContextMenu->setShortcut(tr("Ctrl+A"));
+    addWayPointActFromContextMenu->setStatusTip(tr("Add waypoint"));
+    connect(addWayPointActFromContextMenu, SIGNAL(triggered()), this, SLOT(onAddWayPointAct_triggeredFromContextMenu()));
+
+    addWayPointActFromThis = new QAction(tr("&Add waypoint"), this);
+    addWayPointActFromThis->setShortcut(tr("Ctrl+A"));
+    addWayPointActFromThis->setStatusTip(tr("Add waypoint"));
+    connect(addWayPointActFromThis, SIGNAL(triggered()), this, SLOT(onAddWayPointAct_triggeredFromThis()));
+    this->addAction(addWayPointActFromThis);
 
     editWayPointAct = new QAction(tr("&Edit waypoint"), this);
     editWayPointAct->setShortcut(tr("Ctrl+E"));
@@ -1563,7 +1365,17 @@ void OPMapGadgetWidget::createActions()
     clearWayPointsAct->setShortcut(tr("Ctrl+C"));
     clearWayPointsAct->setStatusTip(tr("Clear waypoints"));
     connect(clearWayPointsAct, SIGNAL(triggered()), this, SLOT(onClearWayPointsAct_triggered()));
-    */
+#endif
+    overlayOpacityActGroup = new QActionGroup(this);
+    connect(overlayOpacityActGroup, SIGNAL(triggered(QAction *)), this, SLOT(onOverlayOpacityActGroup_triggered(QAction *)));
+    overlayOpacityAct.clear();
+    for (int i = 0; i <= 10; i++)
+    {
+        QAction *overlayAct = new QAction(QString::number(i*10), overlayOpacityActGroup);
+        overlayAct->setCheckable(true);
+        overlayAct->setData(i*10);
+        overlayOpacityAct.append(overlayAct);
+    }
 
     homeMagicWaypointAct = new QAction(tr("Home magic waypoint"), this);
     homeMagicWaypointAct->setStatusTip(tr("Move the magic waypoint to the home position"));
@@ -1639,14 +1451,9 @@ void OPMapGadgetWidget::createActions()
 
     // *****
     // UAV trail
-    showUAVAct = new QAction(tr("Show UAV"), this);
-    showUAVAct->setStatusTip(tr("Show/Hide the UAV"));
-    showUAVAct->setCheckable(true);
-    showUAVAct->setChecked(true);
-    connect(showUAVAct, SIGNAL(toggled(bool)), this, SLOT(onShowUAVAct_toggled(bool)));
 
     uavTrailTypeActGroup = new QActionGroup(this);
-    connect(uavTrailTypeActGroup, SIGNAL(triggered(QAction *)), this, SLOT(onUAVtrailTypeActGroup_triggered(QAction *)));
+    connect(uavTrailTypeActGroup, SIGNAL(triggered(QAction *)), this, SLOT(onUAVTrailTypeActGroup_triggered(QAction *)));
     uavTrailTypeAct.clear();
     QStringList uav_trail_type_list = mapcontrol::Helper::UAVTrailTypes();
     for (int i = 0; i < uav_trail_type_list.count(); i++)
@@ -1659,24 +1466,24 @@ void OPMapGadgetWidget::createActions()
         uavTrailTypeAct.append(uavTrailType_act);
     }
 
-    showUAVtrailAct = new QAction(tr("Show Trail dots"), this);
-    showUAVtrailAct->setStatusTip(tr("Show/Hide the Trail dots"));
-    showUAVtrailAct->setCheckable(true);
-    showUAVtrailAct->setChecked(true);
-    connect(showUAVtrailAct, SIGNAL(toggled(bool)), this, SLOT(onShowUAVtrailAct_toggled(bool)));
+    showTrailAct = new QAction(tr("Show Trail dots"), this);
+    showTrailAct->setStatusTip(tr("Show/Hide the Trail dots"));
+    showTrailAct->setCheckable(true);
+    showTrailAct->setChecked(true);
+    connect(showTrailAct, SIGNAL(toggled(bool)), this, SLOT(onShowTrailAct_toggled(bool)));
 
-    showUAVtrailLineAct = new QAction(tr("Show Trail lines"), this);
-    showUAVtrailLineAct->setStatusTip(tr("Show/Hide the Trail lines"));
-    showUAVtrailLineAct->setCheckable(true);
-    showUAVtrailLineAct->setChecked(true);
-    connect(showUAVtrailLineAct, SIGNAL(toggled(bool)), this, SLOT(onShowUAVtrailLineAct_toggled(bool)));
+    showTrailLineAct = new QAction(tr("Show Trail lines"), this);
+    showTrailLineAct->setStatusTip(tr("Show/Hide the Trail lines"));
+    showTrailLineAct->setCheckable(true);
+    showTrailLineAct->setChecked(true);
+    connect(showTrailLineAct, SIGNAL(toggled(bool)), this, SLOT(onShowTrailLineAct_toggled(bool)));
 
     clearUAVtrailAct = new QAction(tr("Clear UAV trail"), this);
     clearUAVtrailAct->setStatusTip(tr("Clear the UAV trail"));
     connect(clearUAVtrailAct, SIGNAL(triggered()), this, SLOT(onClearUAVtrailAct_triggered()));
 
     uavTrailTimeActGroup = new QActionGroup(this);
-    connect(uavTrailTimeActGroup, SIGNAL(triggered(QAction *)), this, SLOT(onUAVtrailTimeActGroup_triggered(QAction *)));
+    connect(uavTrailTimeActGroup, SIGNAL(triggered(QAction *)), this, SLOT(onUAVTrailTimeActGroup_triggered(QAction *)));
     uavTrailTimeAct.clear();
 	list_size = sizeof(uav_trail_time_list) / sizeof(uav_trail_time_list[0]);
 	for (int i = 0; i < list_size; i++)
@@ -1690,7 +1497,7 @@ void OPMapGadgetWidget::createActions()
     }
 
     uavTrailDistanceActGroup = new QActionGroup(this);
-    connect(uavTrailDistanceActGroup, SIGNAL(triggered(QAction *)), this, SLOT(onUAVtrailDistanceActGroup_triggered(QAction *)));
+    connect(uavTrailDistanceActGroup, SIGNAL(triggered(QAction *)), this, SLOT(onUAVTrailDistanceActGroup_triggered(QAction *)));
     uavTrailDistanceAct.clear();
 	list_size = sizeof(uav_trail_distance_list) / sizeof(uav_trail_distance_list[0]);
 	for (int i = 0; i < list_size; i++)
@@ -1702,79 +1509,6 @@ void OPMapGadgetWidget::createActions()
         uavTrailDistance_act->setData(uav_trail_distance);
         uavTrailDistanceAct.append(uavTrailDistance_act);
     }
-
-    // *****
-
-    // *****
-    // GPS trail
-    showGPSAct = new QAction(tr("Show GPS"), this);
-    showGPSAct->setStatusTip(tr("Show/Hide the GPS"));
-    showGPSAct->setCheckable(true);
-    showGPSAct->setChecked(false);
-    connect(showGPSAct, SIGNAL(toggled(bool)), this, SLOT(onShowGPSAct_toggled(bool)));
-
-    gpsTrailTypeActGroup = new QActionGroup(this);
-    connect(gpsTrailTypeActGroup, SIGNAL(triggered(QAction *)), this, SLOT(onGPStrailTypeActGroup_triggered(QAction *)));
-    gpsTrailTypeAct.clear();
-    QStringList gps_trail_type_list = mapcontrol::Helper::UAVTrailTypes();
-    for (int i = 0; i < gps_trail_type_list.count(); i++)
-    {
-        mapcontrol::UAVTrailType::Types gps_trail_type = mapcontrol::Helper::UAVTrailTypeFromString(gps_trail_type_list[i]);
-        QAction *gpsTrailType_act = new QAction(mapcontrol::Helper::StrFromUAVTrailType(gps_trail_type), gpsTrailTypeActGroup);
-        gpsTrailType_act->setCheckable(true);
-        gpsTrailType_act->setChecked(gps_trail_type == m_map->GPS->GetTrailType());
-        gpsTrailType_act->setData(i);
-        gpsTrailTypeAct.append(gpsTrailType_act);
-    }
-
-    showGPStrailAct = new QAction(tr("Show Trail dots"), this);
-    showGPStrailAct->setStatusTip(tr("Show/Hide the Trail dots"));
-    showGPStrailAct->setCheckable(true);
-    showGPStrailAct->setChecked(false);
-    connect(showGPStrailAct, SIGNAL(toggled(bool)), this, SLOT(onShowGPStrailAct_toggled(bool)));
-
-    showGPStrailLineAct = new QAction(tr("Show Trail lines"), this);
-    showGPStrailLineAct->setStatusTip(tr("Show/Hide the Trail lines"));
-    showGPStrailLineAct->setCheckable(true);
-    showGPStrailLineAct->setChecked(true);
-    connect(showGPStrailLineAct, SIGNAL(toggled(bool)), this, SLOT(onShowGPStrailLineAct_toggled(bool)));
-
-    clearGPStrailAct = new QAction(tr("Clear GPS trail"), this);
-    clearGPStrailAct->setStatusTip(tr("Clear the GPS trail"));
-    connect(clearGPStrailAct, SIGNAL(triggered()), this, SLOT(onClearGPStrailAct_triggered()));
-
-    gpsTrailTimeActGroup = new QActionGroup(this);
-    connect(gpsTrailTimeActGroup, SIGNAL(triggered(QAction *)), this, SLOT(onGPStrailTimeActGroup_triggered(QAction *)));
-    gpsTrailTimeAct.clear();
-    list_size = sizeof(uav_trail_time_list) / sizeof(uav_trail_time_list[0]);
-    for (int i = 0; i < list_size; i++)
-    {
-        int gps_trail_time = uav_trail_time_list[i];
-        QAction *gpsTrailTime_act = new QAction(QString::number(gps_trail_time) + " sec", gpsTrailTimeActGroup);
-        gpsTrailTime_act->setCheckable(true);
-        gpsTrailTime_act->setChecked(gps_trail_time == m_map->GPS->TrailTime());
-        gpsTrailTime_act->setData(gps_trail_time);
-        gpsTrailTimeAct.append(gpsTrailTime_act);
-    }
-
-    gpsTrailDistanceActGroup = new QActionGroup(this);
-    connect(gpsTrailDistanceActGroup, SIGNAL(triggered(QAction *)), this, SLOT(onGPStrailDistanceActGroup_triggered(QAction *)));
-    gpsTrailDistanceAct.clear();
-    list_size = sizeof(uav_trail_distance_list) / sizeof(uav_trail_distance_list[0]);
-    for (int i = 0; i < list_size; i++)
-    {
-        int gps_trail_distance = uav_trail_distance_list[i];
-        QAction *gpsTrailDistance_act = new QAction(QString::number(gps_trail_distance) + " meters", gpsTrailDistanceActGroup);
-        gpsTrailDistance_act->setCheckable(true);
-        gpsTrailDistance_act->setChecked(gps_trail_distance == m_map->GPS->TrailDistance());
-        gpsTrailDistance_act->setData(gps_trail_distance);
-        gpsTrailDistanceAct.append(gpsTrailDistance_act);
-    }
-
-    // *****
-
-
-    // ***********************
 }
 
 void OPMapGadgetWidget::onReloadAct_triggered()
@@ -1783,6 +1517,11 @@ void OPMapGadgetWidget::onReloadAct_triggered()
 		return;
 
     m_map->ReloadMap();
+}
+
+void OPMapGadgetWidget::onRipAct_triggered()
+{
+    m_map->RipMap();
 }
 
 void OPMapGadgetWidget::onCopyMouseLatLonToClipAct_triggered()
@@ -1814,10 +1553,18 @@ void OPMapGadgetWidget::onShowCompassAct_toggled(bool show)
 
 void OPMapGadgetWidget::onShowDiagnostics_toggled(bool show)
 {
-	if (!m_widget || !m_map)
+    if (!m_widget || !m_map)
 		return;
 
     m_map->SetShowDiagnostics(show);
+}
+
+void OPMapGadgetWidget::onShowUAVInfo_toggled(bool show)
+{
+    if (!m_widget || !m_map)
+        return;
+
+    m_map->UAV->SetShowUAVInfo(show);
 }
 
 void OPMapGadgetWidget::onShowHomeAct_toggled(bool show)
@@ -1826,6 +1573,36 @@ void OPMapGadgetWidget::onShowHomeAct_toggled(bool show)
 		return;
 
     m_map->Home->setVisible(show);
+}
+
+void OPMapGadgetWidget::onShowUAVAct_toggled(bool show)
+{
+	if (!m_widget || !m_map)
+		return;
+
+    m_map->UAV->setVisible(show);
+    if(m_map->GPS)
+        m_map->GPS->setVisible(show);
+}
+
+void OPMapGadgetWidget::onShowTrailAct_toggled(bool show)
+{
+	if (!m_widget || !m_map)
+		return;
+
+    m_map->UAV->SetShowTrail(show);
+    if(m_map->GPS)
+        m_map->GPS->SetShowTrail(show);
+}
+
+void OPMapGadgetWidget::onShowTrailLineAct_toggled(bool show)
+{
+	if (!m_widget || !m_map)
+		return;
+
+    m_map->UAV->SetShowTrailLine(show);
+    if(m_map->GPS)
+        m_map->GPS->SetShowTrailLine(show);
 }
 
 void OPMapGadgetWidget::onMapModeActGroup_triggered(QAction *action)
@@ -1861,7 +1638,12 @@ void OPMapGadgetWidget::onMaxUpdateRateActGroup_triggered(QAction *action)
 	if (!m_widget || !m_map || !action)
 		return;
 
-	setMaxUpdateRate(action->data().toInt());
+    setMaxUpdateRate(action->data().toInt());
+}
+
+void OPMapGadgetWidget::onChangeDefaultLocalAndZoom()
+{
+    emit defaultLocationAndZoomChanged(m_map->CurrentPosition().Lng(),m_map->CurrentPosition().Lat(),m_map->ZoomTotal());
 }
 
 void OPMapGadgetWidget::onGoMouseClickAct_triggered()
@@ -1877,7 +1659,7 @@ void OPMapGadgetWidget::onSetHomeAct_triggered()
 	if (!m_widget || !m_map)
 		return;
 
-	setHome(m_context_menu_lat_lon);
+    setHome(m_context_menu_lat_lon,0);
 
     setHomeLocationObject();  // update the HomeLocation UAVObject
 }
@@ -1927,63 +1709,11 @@ void OPMapGadgetWidget::onFollowUAVheadingAct_toggled(bool checked)
 
     setMapFollowingMode();
 }
-/* UAV */
-void OPMapGadgetWidget::onShowUAVAct_toggled(bool show)
-{
-    if (!m_widget || !m_map)
-        return;
 
-    m_map->UAV->setVisible(show);
-}
-
-void OPMapGadgetWidget::onShowUAVtrailAct_toggled(bool show)
-{
-    if (!m_widget || !m_map)
-        return;
-
-    m_map->UAV->SetShowTrail(show);
-}
-
-void OPMapGadgetWidget::onShowUAVtrailLineAct_toggled(bool show)
-{
-    if (!m_widget || !m_map)
-        return;
-
-    m_map->UAV->SetShowTrailLine(show);
-}
-
-void OPMapGadgetWidget::onClearUAVtrailAct_triggered()
-{
-	if (!m_widget || !m_map)
-		return;
-
-    m_map->UAV->DeleteTrail();
-}
-
-void OPMapGadgetWidget::onUAVtrailTimeActGroup_triggered(QAction *action)
+void OPMapGadgetWidget::onUAVTrailTypeActGroup_triggered(QAction *action)
 {
 	if (!m_widget || !m_map || !action)
 		return;
-
-    int trail_time = (double)action->data().toInt();
-
-    m_map->UAV->SetTrailTime(trail_time);
-}
-
-void OPMapGadgetWidget::onUAVtrailDistanceActGroup_triggered(QAction *action)
-{
-	if (!m_widget || !m_map || !action)
-		return;
-
-    int trail_distance = action->data().toInt();
-
-    m_map->UAV->SetTrailDistance(trail_distance);
-}
-
-void OPMapGadgetWidget::onUAVtrailTypeActGroup_triggered(QAction *action)
-{
-    if (!m_widget || !m_map || !action)
-        return;
 
     int trail_type_idx = action->data().toInt();
 
@@ -1993,77 +1723,50 @@ void OPMapGadgetWidget::onUAVtrailTypeActGroup_triggered(QAction *action)
     m_map->UAV->SetTrailType(uav_trail_type);
 }
 
-/*GPS*/
-void OPMapGadgetWidget::onShowGPSAct_toggled(bool show)
+void OPMapGadgetWidget::onClearUAVtrailAct_triggered()
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
-    m_map->GPS->setVisible(show);
+    m_map->UAV->DeleteTrail();
+    if(m_map->GPS)
+        m_map->GPS->DeleteTrail();
 }
 
-void OPMapGadgetWidget::onShowGPStrailAct_toggled(bool show)
+void OPMapGadgetWidget::onUAVTrailTimeActGroup_triggered(QAction *action)
 {
-    if (!m_widget || !m_map)
-        return;
-
-    m_map->GPS->SetShowTrail(show);
-}
-
-void OPMapGadgetWidget::onShowGPStrailLineAct_toggled(bool show)
-{
-    if (!m_widget || !m_map)
-        return;
-
-    m_map->GPS->SetShowTrailLine(show);
-}
-
-void OPMapGadgetWidget::onClearGPStrailAct_triggered()
-{
-    if (!m_widget || !m_map)
-        return;
-
-    m_map->GPS->DeleteTrail();
-}
-
-void OPMapGadgetWidget::onGPStrailTimeActGroup_triggered(QAction *action)
-{
-    if (!m_widget || !m_map || !action)
-        return;
+	if (!m_widget || !m_map || !action)
+		return;
 
     int trail_time = (double)action->data().toInt();
 
-    m_map->GPS->SetTrailTime(trail_time);
+    m_map->UAV->SetTrailTime(trail_time);
 }
 
-void OPMapGadgetWidget::onGPStrailDistanceActGroup_triggered(QAction *action)
+void OPMapGadgetWidget::onUAVTrailDistanceActGroup_triggered(QAction *action)
 {
-    if (!m_widget || !m_map || !action)
-        return;
+	if (!m_widget || !m_map || !action)
+		return;
 
     int trail_distance = action->data().toInt();
 
-    m_map->GPS->SetTrailDistance(trail_distance);
+    m_map->UAV->SetTrailDistance(trail_distance);
 }
 
-void OPMapGadgetWidget::onGPStrailTypeActGroup_triggered(QAction *action)
+void OPMapGadgetWidget::onOpenWayPointEditorAct_triggered()
 {
-    if (!m_widget || !m_map || !action)
-        return;
-
-    int trail_type_idx = action->data().toInt();
-
-    QStringList uav_trail_type_list = mapcontrol::Helper::UAVTrailTypes();
-    mapcontrol::UAVTrailType::Types uav_trail_type = mapcontrol::Helper::UAVTrailTypeFromString(uav_trail_type_list[trail_type_idx]);
-
-    m_map->GPS->SetTrailType(uav_trail_type);
+    table->show();
+}
+void OPMapGadgetWidget::onAddWayPointAct_triggeredFromContextMenu()
+{
+    onAddWayPointAct_triggered(m_context_menu_lat_lon);
+}
+void OPMapGadgetWidget::onAddWayPointAct_triggeredFromThis()
+{
+    onAddWayPointAct_triggered(lastLatLngMouse);
 }
 
-/**
-  * TODO: unused for v1.0
-  **/
-/*
-void OPMapGadgetWidget::onAddWayPointAct_triggered()
+void OPMapGadgetWidget::onAddWayPointAct_triggered(internals::PointLatLng coord)
 {
 	if (!m_widget || !m_map)
 		return;
@@ -2071,38 +1774,9 @@ void OPMapGadgetWidget::onAddWayPointAct_triggered()
     if (m_map_mode != Normal_MapMode)
         return;
 
-    m_waypoint_list_mutex.lock();
-
-	// create a waypoint on the map at the last known mouse position
-    t_waypoint *wp = new t_waypoint;
-    wp->map_wp_item = NULL;
-    wp->coord = context_menu_lat_lon;
-    wp->altitude = 0;
-    wp->description = "";
-    wp->locked = false;
-    wp->time_seconds = 0;
-    wp->hold_time_seconds = 0;
-    wp->map_wp_item = m_map->WPCreate(wp->coord, wp->altitude, wp->description);
-
-    wp->map_wp_item->setZValue(10 + wp->map_wp_item->Number());
-
-    wp->map_wp_item->setFlag(QGraphicsItem::ItemIsMovable, !wp->locked);
-
-    if (wp->map_wp_item)
-    {
-        if (!wp->locked)
-            wp->map_wp_item->picture.load(QString::fromUtf8(":/opmap/images/waypoint_marker1.png"));
-        else
-            wp->map_wp_item->picture.load(QString::fromUtf8(":/opmap/images/waypoint_marker2.png"));
-        wp->map_wp_item->update();
-    }
-
-    // and remember it in our own local waypoint list
-    m_waypoint_list.append(wp);
-
-    m_waypoint_list_mutex.unlock();
+    mapProxy->createWayPoint(coord);
 }
-*/
+
 
 /**
   * Called when the user asks to edit a waypoint from the map
@@ -2110,7 +1784,7 @@ void OPMapGadgetWidget::onAddWayPointAct_triggered()
   * TODO: should open an interface to edit waypoint properties, or
   *       propagate the signal to a specific WP plugin (tbd).
   **/
-/*
+
 void OPMapGadgetWidget::onEditWayPointAct_triggered()
 {
 	if (!m_widget || !m_map)
@@ -2122,16 +1796,15 @@ void OPMapGadgetWidget::onEditWayPointAct_triggered()
     if (!m_mouse_waypoint)
         return;
 
-    //waypoint_edit_dialog.editWaypoint(m_mouse_waypoint);
-
+    waypoint_edit_dialog->editWaypoint(m_mouse_waypoint);
     m_mouse_waypoint = NULL;
 }
-*/
+
 
 /**
   * TODO: unused for v1.0
   */
-/*
+
 void OPMapGadgetWidget::onLockWayPointAct_triggered()
 {
     if (!m_widget || !m_map || !m_mouse_waypoint)
@@ -2151,12 +1824,7 @@ void OPMapGadgetWidget::onLockWayPointAct_triggered()
 
     m_mouse_waypoint = NULL;
 }
-*/
 
-/**
-  * TODO: unused for v1.0
-  */
-/*
 void OPMapGadgetWidget::onDeleteWayPointAct_triggered()
 {
     if (!m_widget || !m_map)
@@ -2168,77 +1836,34 @@ void OPMapGadgetWidget::onDeleteWayPointAct_triggered()
     if (!m_mouse_waypoint)
         return;
 
-    bool locked = (m_mouse_waypoint->flags() & QGraphicsItem::ItemIsMovable) == 0;
-
-    if (locked) return;	// waypoint is locked
-
-    QMutexLocker locker(&m_waypoint_list_mutex);
-
-    for (int i = 0; i < m_waypoint_list.count(); i++)
-    {
-        t_waypoint *wp = m_waypoint_list.at(i);
-        if (!wp) continue;
-        if (!wp->map_wp_item || wp->map_wp_item != m_mouse_waypoint) continue;
-
-        // delete the waypoint from the map
-        m_map->WPDelete(wp->map_wp_item);
-
-        // delete the waypoint from our local waypoint list
-        m_waypoint_list.removeAt(i);
-
-        delete wp;
-
-        break;
-    }
-//
-//    foreach (t_waypoint *wp, m_waypoint_list)
-//    {
-//        if (!wp) continue;
-//        if (!wp->map_wp_item || wp->map_wp_item != m_mouse_waypoint) continue;
-//
-//	    // delete the waypoint from the map
-//      m_map->WPDelete(wp->map_wp_item);
-//
-//	    // delete the waypoint from our local waypoint list
-//        m_waypoint_list.removeOne(wp);
-//
-//        delete wp;
-//
-//	    break;
-//	}
-
-    m_mouse_waypoint = NULL;
+    mapProxy->deleteWayPoint(m_mouse_waypoint->Number());
 }
-*/
 
-/**
-  * TODO: No Waypoint support in v1.0
-  */
-/*
 void OPMapGadgetWidget::onClearWayPointsAct_triggered()
 {
+
+    //First, ask to ensure this is what the user wants to do
+    QMessageBox msgBox;
+    msgBox.setText(tr("Are you sure you want to clear waypoints?"));
+    msgBox.setInformativeText(tr("All associated data will be lost."));
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    int ret = msgBox.exec();
+
+    if (ret == QMessageBox::No)
+    {
+        return;
+    }
+
     if (!m_widget || !m_map)
         return;
 
     if (m_map_mode != Normal_MapMode)
         return;
 
-    QMutexLocker locker(&m_waypoint_list_mutex);
+    mapProxy->deleteAll();
 
-	m_map->WPDeleteAll();
+ }
 
-    foreach (t_waypoint *wp, m_waypoint_list)
-    {
-        if (wp)
-        {
-            delete wp;
-            wp = NULL;
-        }
-    }
-
-    m_waypoint_list.clear();
-}
-*/
 
 void OPMapGadgetWidget::onHomeMagicWaypointAct_triggered()
 {
@@ -2252,6 +1877,7 @@ void OPMapGadgetWidget::onShowSafeAreaAct_toggled(bool show)
         return;
 
     m_map->Home->SetShowSafeArea(show);             // show the safe area
+    m_map->Home->SetToggleRefresh(true);
     m_map->Home->RefreshPos();
 }
 
@@ -2280,10 +1906,7 @@ void OPMapGadgetWidget::homeMagicWaypoint()
     if (m_map_mode != MagicWaypoint_MapMode)
         return;
 
-	m_magic_waypoint.coord = m_home_position.coord;
-
-	if (m_magic_waypoint.map_wp_item)
-		m_magic_waypoint.map_wp_item->SetCoord(m_magic_waypoint.coord);
+    magicWayPoint->SetCoord(m_home_position.coord);
 }
 
 // *************************************************************************************
@@ -2296,60 +1919,6 @@ void OPMapGadgetWidget::moveToMagicWaypointPosition()
 
     if (m_map_mode != MagicWaypoint_MapMode)
         return;
-
-//    internals::PointLatLng coord = magic_waypoint.coord;
-//    double altitude = magic_waypoint.altitude;
-
-
-    // ToDo:
-
-}
-
-// *************************************************************************************
-// temporary until an object is created for managing the save/restore
-
-// load the contents of a simple text file into a combobox
-void OPMapGadgetWidget::loadComboBoxLines(QComboBox *comboBox, QString filename)
-{
-    if (!comboBox) return;
-    if (filename.isNull() || filename.isEmpty()) return;
-
-    QFile file(filename);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        return;
-
-    QTextStream in(&file);
-
-    while (!in.atEnd())
-    {
-        QString line = in.readLine().simplified();
-        if (line.isNull() || line.isEmpty()) continue;
-        comboBox->addItem(line);
-    }
-
-    file.close();
-}
-
-// save a combobox text contents to a simple text file
-void OPMapGadgetWidget::saveComboBoxLines(QComboBox *comboBox, QString filename)
-{
-    if (!comboBox) return;
-    if (filename.isNull() || filename.isEmpty()) return;
-
-    QFile file(filename);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-        return;
-
-    QTextStream out(&file);
-
-    for (int i = 0; i < comboBox->count(); i++)
-    {
-        QString line = comboBox->itemText(i).simplified();
-        if (line.isNull() || line.isEmpty()) continue;
-        out << line << "\n";
-    }
-
-    file.close();
 }
 
 // *************************************************************************************
@@ -2381,25 +1950,20 @@ void OPMapGadgetWidget::keepMagicWaypointWithInSafeArea()
 {
 
     // calcute the bearing and distance from the home position to the magic waypoint
-	double dist = distance(m_home_position.coord, m_magic_waypoint.coord);
-	double bear = bearing(m_home_position.coord, m_magic_waypoint.coord);
+    double dist = distance(m_home_position.coord, magicWayPoint->Coord());
+    double bear = bearing(m_home_position.coord, magicWayPoint->Coord());
 
     // get the maximum safe distance - in kilometers
     double boundry_dist = (double)m_map->Home->SafeArea() / 1000;
 
-//    if (dist <= boundry_dist)
-//        return; // the magic waypoint is still within the safe area, don't move it
-
     if (dist > boundry_dist) dist = boundry_dist;
 
-    // move the magic waypoint
-
-	m_magic_waypoint.coord = destPoint(m_home_position.coord, bear, dist);
+    // move the magic waypoint;
 
     if (m_map_mode == MagicWaypoint_MapMode)
     {   // move the on-screen waypoint
-		if (m_magic_waypoint.map_wp_item)
-			m_magic_waypoint.map_wp_item->SetCoord(m_magic_waypoint.coord);
+        if (magicWayPoint)
+            magicWayPoint->SetCoord(destPoint(m_home_position.coord, bear, dist));
     }
 }
 
@@ -2413,22 +1977,6 @@ double OPMapGadgetWidget::distance(internals::PointLatLng from, internals::Point
 
     double lat2 = to.Lat() * deg_to_rad;
     double lon2 = to.Lng() * deg_to_rad;
-
-    // ***********************
-    // Haversine formula
-/*
-    double delta_lat = lat2 - lat1;
-    double delta_lon = lon2 - lon1;
-
-    double t1 = sin(delta_lat / 2);
-    double t2 = sin(delta_lon / 2);
-    double a = (t1 * t1) + cos(lat1) * cos(lat2) * (t2 * t2);
-    double c = 2 * atan2(sqrt(a), sqrt(1 - a));
-
-    return (earth_mean_radius * c);
-*/
-    // ***********************
-    // Spherical Law of Cosines
 
     return (acos(sin(lat1) * sin(lat2) + cos(lat1) * cos(lat2) * cos(lon2 - lon1)) * earth_mean_radius);
 
@@ -2485,7 +2033,6 @@ bool OPMapGadgetWidget::getUAVPosition(double &latitude, double &longitude, doub
     double NED[3];
     double LLA[3];
     double homeLLA[3];
-    UAVObject *obj;
 
     Q_ASSERT(obm != NULL);
 
@@ -2493,8 +2040,8 @@ bool OPMapGadgetWidget::getUAVPosition(double &latitude, double &longitude, doub
     Q_ASSERT(homeLocation != NULL);
     HomeLocation::DataFields homeLocationData = homeLocation->getData();
 
-    homeLLA[0] = homeLocationData.Latitude / 10e6;
-    homeLLA[1] = homeLocationData.Longitude / 10e6;
+    homeLLA[0] = homeLocationData.Latitude / 1e7;
+    homeLLA[1] = homeLocationData.Longitude / 1e7;
     homeLLA[2] = homeLocationData.Altitude;
 
     PositionActual *positionActual = PositionActual::GetInstance(obm);
@@ -2505,7 +2052,7 @@ bool OPMapGadgetWidget::getUAVPosition(double &latitude, double &longitude, doub
     NED[1] = positionActualData.East;
     NED[2] = positionActualData.Down;
 
-    Utils::CoordinateConversions().GetLLA(homeLLA, NED, LLA);
+    Utils::CoordinateConversions().NED2LLA_HomeLLA(homeLLA, NED, LLA);
 
     latitude = LLA[0];
     longitude = LLA[1];
@@ -2601,4 +2148,35 @@ bool OPMapGadgetWidget::setHomeLocationObject()
 void OPMapGadgetWidget::SetUavPic(QString UAVPic)
 {
     m_map->SetUavPic(UAVPic);
+}
+
+void OPMapGadgetWidget::on_tbFind_clicked()
+{
+    QPalette pal = m_widget->leFind->palette();
+
+    int result=m_map->SetCurrentPositionByKeywords(m_widget->leFind->text());
+    if(result==core::GeoCoderStatusCode::G_GEO_SUCCESS)
+    {
+        pal.setColor( m_widget->leFind->backgroundRole(), Qt::green);
+        m_widget->leFind->setPalette(pal);
+    }
+    else
+    {
+        pal.setColor( m_widget->leFind->backgroundRole(), Qt::red);
+        m_widget->leFind->setPalette(pal);
+    }
+}
+
+void OPMapGadgetWidget::onHomeDoubleClick(HomeItem *)
+{
+    new homeEditor(m_map->Home,this);
+}
+
+void OPMapGadgetWidget::onOverlayOpacityActGroup_triggered(QAction *action)
+{
+    if (!m_widget || !m_map || !action)
+        return;
+
+    m_map->setOverlayOpacity(action->data().toReal()/100);
+    emit overlayOpacityChanged(action->data().toReal()/100);
 }

@@ -802,6 +802,8 @@ qssp::qssp(port * info,bool debug):debug(debug)
 }
 void qssp::pfCallBack( uint8_t * buf, uint16_t size)
 {
+    Q_UNUSED(size);
+
      if (debug)
          qDebug()<<"receive callback"<<buf[0]<<buf[1]<<buf[2]<<buf[3]<<buf[4];
 }

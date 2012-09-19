@@ -2,7 +2,7 @@
  ******************************************************************************
  *
  * @file       opmapgadgetconfiguration.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup OPMapPlugin OpenPilot Map Plugin
@@ -48,6 +48,7 @@ Q_PROPERTY(bool useMemoryCache READ useMemoryCache WRITE setUseMemoryCache)
 Q_PROPERTY(QString cacheLocation READ cacheLocation WRITE setCacheLocation)
 Q_PROPERTY(QString uavSymbol READ uavSymbol WRITE setUavSymbol)
 Q_PROPERTY(int maxUpdateRate READ maxUpdateRate WRITE setMaxUpdateRate)
+Q_PROPERTY(qreal overlayOpacity READ opacity WRITE setOpacity)
 
 public:
     explicit OPMapGadgetConfiguration(QString classId, QSettings* qSettings = 0, QObject *parent = 0);
@@ -65,12 +66,14 @@ public:
     bool useMemoryCache() const { return m_useMemoryCache; }
     QString cacheLocation() const { return m_cacheLocation; }
     QString uavSymbol() const { return m_uavSymbol; }
-	int maxUpdateRate() const { return m_maxUpdateRate; }
-
+    int maxUpdateRate() const { return m_maxUpdateRate; }
+    qreal opacity() const { return m_opacity; }
+    void saveConfig() const;
 public slots:
     void setMapProvider(QString provider) { m_mapProvider = provider; }
     void setZoom(int zoom) { m_defaultZoom = zoom; }
     void setLatitude(double latitude) { m_defaultLatitude = latitude; }
+    void setOpacity(qreal value) { m_opacity = value; }
     void setLongitude(double longitude) { m_defaultLongitude = longitude; }
     void setUseOpenGL(bool useOpenGL) { m_useOpenGL = useOpenGL; }
     void setShowTileGridLines(bool showTileGridLines) { m_showTileGridLines = showTileGridLines; }
@@ -92,6 +95,8 @@ private:
     QString m_cacheLocation;
     QString m_uavSymbol;
 	int m_maxUpdateRate;
+    QSettings * m_settings;
+    qreal m_opacity;
 };
 
 #endif // OPMAP_GADGETCONFIGURATION_H

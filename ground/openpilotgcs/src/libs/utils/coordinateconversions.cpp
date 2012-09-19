@@ -121,15 +121,45 @@ int CoordinateConversions::ECEF2LLA(double ECEF[3], double LLA[3])
 }
 
 /**
-  * Get the current location in Longitude, Latitude Altitude (above WSG-48 ellipsoid)
-  * @param[in] BaseECEF the ECEF of the home location (in cm)
+  * Get the current location in Longitude, Latitude Altitude (above WSG-84 ellipsoid)
+  * @param[in] BaseECEF the ECEF of the home location (in m)
   * @param[in] NED the offset from the home location (in m)
-  * @param[out] position three element double for position in degrees and meters
+  * @param[out] position three element double for position in decimal degrees and altitude in meters
   * @returns
   *  @arg 0 success
   *  @arg -1 for failure
   */
-int CoordinateConversions::GetLLA(double homeLLA[3], double NED[3], double position[3])
+int CoordinateConversions::NED2LLA_HomeECEF(double BaseECEFm[3], double NED[3], double position[3])
+{
+    int i;
+    // stored value is in cm, convert to m
+    double BaseLLA[3];
+    double ECEF[3];
+    double Rne [3][3];
+
+    // Get LLA address to compute conversion matrix
+    ECEF2LLA(BaseECEFm, BaseLLA);
+    RneFromLLA(BaseLLA, Rne);
+
+    /* P = ECEF + Rne' * NED */
+    for(i = 0; i < 3; i++)
+        ECEF[i] = BaseECEFm[i] + Rne[0][i]*NED[0] + Rne[1][i]*NED[1] + Rne[2][i]*NED[2];
+
+    ECEF2LLA(ECEF,position);
+
+    return 0;
+}
+
+/**
+  * Get the current location in Longitude, Latitude, Altitude (above WSG-84 ellipsoid)
+  * @param[in] homeLLA the latitude, longitude, and altitude of the home location (in [m])
+  * @param[in] NED the offset from the home location (in [m])
+  * @param[out] position three element double for position in decimal degrees and altitude in meters
+  * @returns
+  *  @arg 0 success
+  *  @arg -1 for failure
+  */
+int CoordinateConversions::NED2LLA_HomeLLA(double homeLLA[3], double NED[3], double position[3])
 {
     double T[3];
     T[0] = homeLLA[2]+6.378137E6f * M_PI / 180.0;

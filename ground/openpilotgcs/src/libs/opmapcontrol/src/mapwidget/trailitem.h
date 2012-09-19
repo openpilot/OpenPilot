@@ -2,7 +2,7 @@
 ******************************************************************************
 *
 * @file       trailitem.h
-* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
 * @brief      A graphicsItem representing a WayPoint
 * @see        The GNU Public License (GPL) Version 3
 * @defgroup   OPMapWidget
@@ -32,6 +32,7 @@
 #include <QLabel>
 #include "../internals/pointlatlng.h"
 #include <QObject>
+#include "mapgraphicitem.h"
 
 namespace mapcontrol
 {
@@ -42,7 +43,7 @@ namespace mapcontrol
         Q_INTERFACES(QGraphicsItem)
     public:
                 enum { Type = UserType + 3 };
-        TrailItem(internals::PointLatLng const& coord,int const& altitude, QBrush color, QGraphicsItem* parent);
+        TrailItem(internals::PointLatLng const& coord,int const& altitude, QBrush color,MapGraphicItem * map);
         void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                     QWidget *widget);
         QRectF boundingRect() const;
@@ -50,10 +51,9 @@ namespace mapcontrol
         internals::PointLatLng coord;
     private:
         QBrush m_brush;
-
-
+        MapGraphicItem * m_map;
     public slots:
-
+        void setPosSLOT();
     signals:
 
     };

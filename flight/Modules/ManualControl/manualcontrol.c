@@ -49,6 +49,10 @@
 #include "stabilizationdesired.h"
 #include "receiveractivity.h"
 
+#if defined(PIOS_INCLUDE_USB_RCTX)
+#include "pios_usb_rctx.h"
+#endif	/* PIOS_INCLUDE_USB_RCTX */
+
 // Private constants
 #if defined(PIOS_MANUAL_STACK_SIZE)
 #define STACK_SIZE_BYTES PIOS_MANUAL_STACK_SIZE
@@ -371,6 +375,15 @@ static void manualControlTask(void *parameters)
 			
 			// Update cmd object
 			ManualControlCommandSet(&cmd);
+#if defined(PIOS_INCLUDE_USB_RCTX)
+			if (pios_usb_rctx_id) {
+				PIOS_USB_RCTX_Update(pios_usb_rctx_id,
+						cmd.Channel,
+						settings.ChannelMin,
+						settings.ChannelMax,
+						NELEMENTS(cmd.Channel));
+			}
+#endif	/* PIOS_INCLUDE_USB_RCTX */
 
 		} else {
 			ManualControlCommandGet(&cmd);	/* Under GCS control */
@@ -390,6 +403,10 @@ static void manualControlTask(void *parameters)
 				break;
 			case FLIGHTMODE_STABILIZED:
 				updateStabilizationDesired(&cmd, &settings);
+				break;
+			case FLIGHTMODE_TUNING:
+				// Tuning takes settings directly from manualcontrolcommand.  No need to
+				// call anything else.  This just avoids errors.
 				break;
 			case FLIGHTMODE_GUIDANCE:
 				switch(flightStatus.FlightMode) {
@@ -599,6 +616,8 @@ static void updateStabilizationDesired(ManualControlCommandData * cmd, ManualCon
 	     (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) ? cmd->Roll * stabSettings.RollMax :
 	     (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK) ? cmd->Roll * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_ROLL] :
 	     (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_VIRTUALBAR) ? cmd->Roll :
+	     (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYRATE) ? cmd->Roll * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_ROLL] :
+	     (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYATTITUDE) ? cmd->Roll * stabSettings.RollMax :
 	     0; // this is an invalid mode
 					      ;
 	stabilization.Pitch = (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_NONE) ? cmd->Pitch :
@@ -607,6 +626,8 @@ static void updateStabilizationDesired(ManualControlCommandData * cmd, ManualCon
 	     (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) ? cmd->Pitch * stabSettings.PitchMax :
 	     (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK) ? cmd->Pitch * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_PITCH] :
 	     (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_VIRTUALBAR) ? cmd->Pitch :
+	     (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYRATE) ? cmd->Pitch * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_PITCH] :
+	     (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYATTITUDE) ? cmd->Pitch * stabSettings.PitchMax :
 	     0; // this is an invalid mode
 
 	stabilization.Yaw = (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_NONE) ? cmd->Yaw :
@@ -615,6 +636,8 @@ static void updateStabilizationDesired(ManualControlCommandData * cmd, ManualCon
 	     (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) ? cmd->Yaw * stabSettings.YawMax :
 	     (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK) ? cmd->Yaw * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_YAW] :
 	     (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_VIRTUALBAR) ? cmd->Yaw :
+	     (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYRATE) ? cmd->Yaw * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_YAW] :
+	     (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYATTITUDE) ? cmd->Yaw * stabSettings.YawMax :
 	     0; // this is an invalid mode
 
 	stabilization.Throttle = (cmd->Throttle < 0) ? -1 : cmd->Throttle;

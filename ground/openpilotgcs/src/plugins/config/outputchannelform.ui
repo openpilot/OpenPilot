@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>813</width>
+    <width>825</width>
     <height>58</height>
    </rect>
   </property>
@@ -20,6 +20,9 @@
    <property name="bottomMargin">
     <number>1</number>
    </property>
+   <property name="horizontalSpacing">
+    <number>12</number>
+   </property>
    <item row="1" column="5">
     <widget class="QLabel" name="actuatorValue">
      <property name="sizePolicy">
@@ -27,6 +30,12 @@
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>25</height>
+      </size>
      </property>
      <property name="toolTip">
       <string>Current value of slider.</string>
@@ -39,10 +48,16 @@
    <item row="0" column="10">
     <widget class="QLabel" name="legend5">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>20</height>
+      </size>
      </property>
      <property name="font">
       <font>
@@ -77,7 +92,7 @@ margin:1px;</string>
      <property name="minimumSize">
       <size>
        <width>110</width>
-       <height>0</height>
+       <height>25</height>
       </size>
      </property>
      <property name="text">
@@ -91,10 +106,16 @@ margin:1px;</string>
    <item row="0" column="0">
     <widget class="QLabel" name="legend6">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>20</height>
+      </size>
      </property>
      <property name="font">
       <font>
@@ -135,7 +156,7 @@ margin:1px;</string>
      <property name="minimumSize">
       <size>
        <width>20</width>
-       <height>0</height>
+       <height>25</height>
       </size>
      </property>
      <property name="toolTip">
@@ -154,6 +175,12 @@ margin:1px;</string>
    </item>
    <item row="1" column="2">
     <widget class="QSpinBox" name="actuatorMin">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>25</height>
+      </size>
+     </property>
      <property name="focusPolicy">
       <enum>Qt::StrongFocus</enum>
      </property>
@@ -175,8 +202,8 @@ margin:1px;</string>
      </property>
      <property name="minimumSize">
       <size>
-       <width>40</width>
-       <height>0</height>
+       <width>45</width>
+       <height>25</height>
       </size>
      </property>
      <property name="focusPolicy">
@@ -190,10 +217,16 @@ margin:1px;</string>
    <item row="0" column="4">
     <widget class="QLabel" name="legend2">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>20</height>
+      </size>
      </property>
      <property name="font">
       <font>
@@ -220,10 +253,16 @@ margin:1px;</string>
    <item row="0" column="1">
     <widget class="QLabel" name="legend0">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>20</height>
+      </size>
      </property>
      <property name="font">
       <font>
@@ -257,7 +296,7 @@ margin:1px;</string>
      </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>0</width>
+       <width>5</width>
        <height>20</height>
       </size>
      </property>
@@ -266,10 +305,16 @@ margin:1px;</string>
    <item row="0" column="2">
     <widget class="QLabel" name="legend1">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>20</height>
+      </size>
      </property>
      <property name="font">
       <font>
@@ -296,10 +341,16 @@ margin:1px;</string>
    <item row="0" column="8">
     <widget class="QLabel" name="legend3">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>20</height>
+      </size>
      </property>
      <property name="font">
       <font>
@@ -333,8 +384,8 @@ margin:1px;</string>
      </property>
      <property name="minimumSize">
       <size>
-       <width>40</width>
-       <height>0</height>
+       <width>45</width>
+       <height>25</height>
       </size>
      </property>
      <property name="focusPolicy">
@@ -364,10 +415,16 @@ margin:1px;</string>
    <item row="0" column="9">
     <widget class="QLabel" name="legend4">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>20</height>
+      </size>
      </property>
      <property name="font">
       <font>
@@ -384,7 +441,7 @@ font:bold;
 margin:1px;</string>
      </property>
      <property name="text">
-      <string>Rev.</string>
+      <string>Rev</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -402,7 +459,7 @@ margin:1px;</string>
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>0</height>
+       <height>25</height>
       </size>
      </property>
      <property name="focusPolicy">
@@ -418,6 +475,12 @@ margin:1px;</string>
    </item>
    <item row="1" column="8">
     <widget class="QSpinBox" name="actuatorMax">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>25</height>
+      </size>
+     </property>
      <property name="focusPolicy">
       <enum>Qt::StrongFocus</enum>
      </property>

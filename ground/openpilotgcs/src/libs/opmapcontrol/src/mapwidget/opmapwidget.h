@@ -2,7 +2,7 @@
 ******************************************************************************
 *
 * @file       opmapwidget.h
-* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
 * @brief      The Map Widget, this is the part exposed to the user
 * @see        The GNU Public License (GPL) Version 3
 * @defgroup   OPMapWidget
@@ -41,6 +41,9 @@
 #include "gpsitem.h"
 #include "homeitem.h"
 #include "mapripper.h"
+#include "waypointline.h"
+#include "waypointcircle.h"
+#include "waypointitem.h"
 namespace mapcontrol
 {
     class UAVItem;
@@ -279,6 +282,15 @@ namespace mapcontrol
         */
         WayPointItem* WPCreate(internals::PointLatLng const& coord,int const& altitude, QString const& description);
         /**
+        * @brief Creates a new WayPoint
+        *
+        * @param coord the offset in meters to the home position
+        * @param altitude the Altitude of the WayPoint
+        * @param description the description of the WayPoint
+        * @return WayPointItem a pointer to the WayPoint created
+        */
+        WayPointItem *WPCreate(const distBearingAltitude &relativeCoord, const QString &description);
+        /**
         * @brief Inserts a new WayPoint on the specified position
         *
         * @param position index of the WayPoint
@@ -311,6 +323,7 @@ namespace mapcontrol
         * @return WayPointItem a pointer to the WayPoint Inserted
         */
         WayPointItem* WPInsert(internals::PointLatLng const& coord,int const& altitude, QString const& description,int const& position);
+        WayPointItem *WPInsert(const distBearingAltitude &relative, const QString &description, const int &position);
 
         /**
         * @brief Deletes the WayPoint
@@ -340,6 +353,8 @@ namespace mapcontrol
 
         void SetShowCompass(bool const& value);
 
+        void setOverlayOpacity(qreal value);
+
         UAVItem* UAV;
         GPSItem* GPS;
         HomeItem* Home;
@@ -349,7 +364,18 @@ namespace mapcontrol
         bool ShowHome()const{return showhome;}
         void SetShowDiagnostics(bool const& value);
         void SetUavPic(QString UAVPic);
-    private:
+        WayPointLine * WPLineCreate(WayPointItem *from,WayPointItem *to, QColor color);
+        WayPointLine * WPLineCreate(HomeItem *from,WayPointItem *to, QColor color);
+        WayPointCircle *WPCircleCreate(WayPointItem *center, WayPointItem *radius,bool clockwise,QColor color);
+        WayPointCircle *WPCircleCreate(HomeItem *center, WayPointItem *radius,bool clockwise,QColor color);
+        void deleteAllOverlays();
+        void WPSetVisibleAll(bool value);
+        WayPointItem *magicWPCreate();
+        bool WPPresent();
+        void WPDelete(int number);
+        WayPointItem *WPFind(int number);
+        void setSelectedWP(QList<WayPointItem *> list);
+      private:
         internals::Core *core;
         MapGraphicItem *map;
         QGraphicsScene mscene;
@@ -366,6 +392,7 @@ namespace mapcontrol
         QTimer * diagTimer;
         QGraphicsTextItem * diagGraphItem;
         bool showDiag;
+        qreal overlayOpacity;
     private slots:
         void diagRefresh();
         //   WayPointItem* item;//apagar
@@ -398,6 +425,9 @@ namespace mapcontrol
         * @param waypoint WayPoint inserted
         */
         void WPReached(WayPointItem* waypoint);
+
+        void WPCreated(int const& number,WayPointItem* waypoint);
+
         /**
                * @brief Fires when a new WayPoint is inserted
                *
@@ -410,7 +440,10 @@ namespace mapcontrol
         *
         * @param number number of the deleted WayPoint
         */
-        void WPDeleted(int const& number);
+        void WPDeleted(int const& number,WayPointItem* waypoint);
+
+        void WPLocalPositionChanged(QPointF,WayPointItem*);
+        void WPManualCoordChange(WayPointItem*);
         /**
         * @brief Fires When a WayPoint is Reached
         *
@@ -469,11 +502,14 @@ namespace mapcontrol
         * @param number the number of tiles still in the queue
         */
         void OnTilesStillToLoad(int number);
+        void OnWayPointDoubleClicked(WayPointItem * waypoint);
+        void selectedWPChanged(QList<WayPointItem*>);
     public slots:
         /**
         * @brief Ripps the current selection to the DB
         */
         void RipMap();
+        void OnSelectionChanged();
 
     };
 }

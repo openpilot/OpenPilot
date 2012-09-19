@@ -247,14 +247,6 @@ FirmwareIAPObj::DataFields UAVObjectUtilManager::getFirmwareIap()
     if (!firmwareIap)
         return dummy;
 
-    // The code below will ask for the object update and wait for the updated to be received,
-    // or the timeout of the timer, set to 1 second.
-    QEventLoop loop;
-    connect(firmwareIap, SIGNAL(objectUpdated(UAVObject*)), &loop, SLOT(quit()));
-    QTimer::singleShot(1000, &loop, SLOT(quit())); // Create a timeout
-    firmwareIap->requestUpdate();
-    loop.exec();
-
     return firmwareIap->getData();
 }
 
@@ -276,7 +268,7 @@ QByteArray UAVObjectUtilManager::getBoardCPUSerial()
     QByteArray cpuSerial;
     FirmwareIAPObj::DataFields firmwareIapData = getFirmwareIap();
 
-    for (int i = 0; i < FirmwareIAPObj::CPUSERIAL_NUMELEM; i++)
+    for (unsigned int i = 0; i < FirmwareIAPObj::CPUSERIAL_NUMELEM; i++)
         cpuSerial.append(firmwareIapData.CPUSerial[i]);
 
     return cpuSerial;
@@ -296,7 +288,7 @@ QByteArray UAVObjectUtilManager::getBoardDescription()
     QByteArray ret;
     FirmwareIAPObj::DataFields firmwareIapData = getFirmwareIap();
 
-    for (int i = 0; i < FirmwareIAPObj::DESCRIPTION_NUMELEM; i++)
+    for (unsigned int i = 0; i < FirmwareIAPObj::DESCRIPTION_NUMELEM; i++)
         ret.append(firmwareIapData.Description[i]);
 
     return ret;

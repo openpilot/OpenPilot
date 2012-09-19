@@ -2,7 +2,7 @@
 ******************************************************************************
 *
 * @file       platecarreeprojectionpergo.cpp
-* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
 * @brief      
 * @see        The GNU Public License (GPL) Version 3
 * @defgroup   OPMapWidget
@@ -90,6 +90,7 @@ Size PlateCarreeProjectionPergo::GetTileMatrixMaxXY(const int &zoom)
 
 Size PlateCarreeProjectionPergo::GetTileMatrixMinXY(const int &zoom)
 {
+    Q_UNUSED(zoom)
     return Size(0, 0);
 }
 }

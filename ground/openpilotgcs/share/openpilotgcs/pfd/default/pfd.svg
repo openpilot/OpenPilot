@@ -14,7 +14,7 @@
    height="707.56323"
    id="svg2"
    version="1.1"
-   inkscape:version="0.48.1 "
+   inkscape:version="0.48.3.1 r9886"
    sodipodi:docname="pfd.svg"
    style="display:inline"
    inkscape:export-filename="H:\Documents\Hobbies\OpenPilot\SVN\artwork\PFD-2.png"
@@ -1616,13 +1616,13 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.73067675"
-     inkscape:cx="305.98471"
+     inkscape:cx="431.15187"
      inkscape:cy="372.16908"
      inkscape:document-units="px"
      inkscape:current-layer="layer3"
      showgrid="false"
-     inkscape:window-width="1366"
-     inkscape:window-height="706"
+     inkscape:window-width="1440"
+     inkscape:window-height="838"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
@@ -1715,7 +1715,7 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(230.4171,-254.91153)"
-     style="display:inline"
+     style="display:none"
      sodipodi:insensitive="true">
     <g
        id="world"
@@ -2097,13 +2097,13 @@
          id="speed-bg"
          width="110.05586"
          height="450"
-         x="-147.23766"
+         x="-209.23766"
          y="131.33096" />
       <path
          inkscape:connector-curvature="0"
          inkscape:label="#rect6927"
          style="fill:#000000;fill-opacity:0.78431373;stroke:#ffffff;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;display:inline"
-         d="m -146.39854,337.78541 78.912168,0 0,9.3094 10.606602,9.3094 -10.606602,9.3094 0.08512,9.3094 -78.997288,0 0,-37.2376 z"
+         d="m -208.39854,337.78541 78.91217,0 0,9.3094 10.6066,9.3094 -10.6066,9.3094 0.0851,9.3094 -78.99729,0 0,-37.2376 z"
          id="speed-window"
          sodipodi:nodetypes="cccccccc" />
       <g

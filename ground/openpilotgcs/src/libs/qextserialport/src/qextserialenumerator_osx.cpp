@@ -22,8 +22,7 @@ QextSerialEnumerator::~QextSerialEnumerator( )
 
 // static
 QList<QextPortInfo> QextSerialEnumerator::getPorts()
-{
-    QList<QextPortInfo> infoList;
+{    QList<QextPortInfo> infoList;
     io_iterator_t serialPortIterator = 0;
     kern_return_t kernResult = KERN_FAILURE;
     CFMutableDictionaryRef matchingDictionary;
@@ -43,18 +42,6 @@ QList<QextPortInfo> QextSerialEnumerator::getPorts()
     iterateServicesOSX(serialPortIterator, infoList);
     IOObjectRelease(serialPortIterator);
     serialPortIterator = 0;
-
-    if( !(matchingDictionary = IOServiceNameMatching("AppleUSBCDC")) ) {
-        qWarning("IOServiceNameMatching returned a NULL dictionary.");
-        return infoList;
-    }
-
-    if( IOServiceGetMatchingServices(kIOMasterPortDefault, matchingDictionary, &serialPortIterator) != KERN_SUCCESS ) {
-        qCritical() << "IOServiceGetMatchingServices failed, returned" << kernResult;
-        return infoList;
-    }
-    iterateServicesOSX(serialPortIterator, infoList);
-    IOObjectRelease(serialPortIterator);
 
     return infoList;
 }

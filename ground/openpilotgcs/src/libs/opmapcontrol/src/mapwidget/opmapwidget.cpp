@@ -2,7 +2,7 @@
 ******************************************************************************
 *
 * @file       opmapwidget.cpp
-* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
 * @brief      The Map Widget, this is the part exposed to the user
 * @see        The GNU Public License (GPL) Version 3
 * @defgroup   OPMapWidget
@@ -33,13 +33,18 @@
 namespace mapcontrol
 {
 
-    OPMapWidget::OPMapWidget(QWidget *parent, Configuration *config):QGraphicsView(parent),configuration(config),UAV(0),GPS(0),Home(0),followmouse(true),compass(0),showuav(false),showhome(false),showDiag(false),diagGraphItem(0),diagTimer(0)
+    OPMapWidget::OPMapWidget(QWidget *parent, Configuration *config):QGraphicsView(parent),configuration(config),UAV(0),GPS(0),Home(0)
+      ,followmouse(true),compass(0),showuav(false),showhome(false),diagTimer(0),diagGraphItem(0),showDiag(false),overlayOpacity(1)
     {
         setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         core=new internals::Core;
         map=new MapGraphicItem(core,config);
         mscene.addItem(map);
         this->setScene(&mscene);
+        Home=new HomeItem(map,this);
+        Home->setParentItem(map);
+        Home->setZValue(-1);
+        setStyleSheet("QToolTip {font-size:8pt; color:blue;opacity: 223; padding:2px; border-width:2px; border-style:solid; border-color: rgb(170, 170, 127);border-radius:4px }");
         this->adjustSize();
         connect(map,SIGNAL(zoomChanged(double,double,double)),this,SIGNAL(zoomChanged(double,double,double)));
         connect(map->core,SIGNAL(OnCurrentPositionChanged(internals::PointLatLng)),this,SIGNAL(OnCurrentPositionChanged(internals::PointLatLng)));
@@ -50,10 +55,12 @@ namespace mapcontrol
         connect(map->core,SIGNAL(OnTileLoadComplete()),this,SIGNAL(OnTileLoadComplete()));
         connect(map->core,SIGNAL(OnTileLoadStart()),this,SIGNAL(OnTileLoadStart()));
         connect(map->core,SIGNAL(OnTilesStillToLoad(int)),this,SIGNAL(OnTilesStillToLoad(int)));
+        connect(map,SIGNAL(wpdoubleclicked(WayPointItem*)),this,SIGNAL(OnWayPointDoubleClicked(WayPointItem*)));
+        connect(&mscene,SIGNAL(selectionChanged()),this,SLOT(OnSelectionChanged()));
         SetShowDiagnostics(showDiag);
         this->setMouseTracking(followmouse);
         SetShowCompass(true);
-
+        QPixmapCache::setCacheLimit(64*1024);
     }
     void OPMapWidget::SetShowDiagnostics(bool const& value)
     {
@@ -70,12 +77,24 @@ namespace mapcontrol
                 delete diagTimer;
                 diagTimer=0;
             }
+
+            if(GPS!=0)
+            {
+                delete GPS;
+                GPS=0;
+            }
         }
         else
         {
             diagTimer=new QTimer();
             connect(diagTimer,SIGNAL(timeout()),this,SLOT(diagRefresh()));
             diagTimer->start(500);
+            if(GPS==0)
+            {
+                GPS=new GPSItem(map,this);
+                GPS->setParentItem(map);
+                setOverlayOpacity(overlayOpacity);
+            }
         }
 
     }
@@ -85,8 +104,40 @@ namespace mapcontrol
             UAV->SetUavPic(UAVPic);
         if(GPS!=0)
             GPS->SetUavPic(UAVPic);
+    }
 
+    WayPointLine * OPMapWidget::WPLineCreate(WayPointItem *from, WayPointItem *to,QColor color)
+    {
+        if(!from|!to)
+            return NULL;
+        WayPointLine* ret= new WayPointLine(from,to,map,color);
+        ret->setOpacity(overlayOpacity);
+        return ret;
+    }
+    WayPointLine * OPMapWidget::WPLineCreate(HomeItem *from, WayPointItem *to,QColor color)
+    {
+        if(!from|!to)
+            return NULL;
+        WayPointLine* ret= new WayPointLine(from,to,map,color);
+        ret->setOpacity(overlayOpacity);
+        return ret;
+    }
+    WayPointCircle * OPMapWidget::WPCircleCreate(WayPointItem *center, WayPointItem *radius, bool clockwise,QColor color)
+    {
+        if(!center|!radius)
+            return NULL;
+        WayPointCircle* ret= new WayPointCircle(center,radius,clockwise,map,color);
+        ret->setOpacity(overlayOpacity);
+        return ret;
+    }
 
+    WayPointCircle *OPMapWidget::WPCircleCreate(HomeItem *center, WayPointItem *radius, bool clockwise,QColor color)
+    {
+        if(!center|!radius)
+            return NULL;
+        WayPointCircle* ret= new WayPointCircle(center,radius,clockwise,map,color);
+        ret->setOpacity(overlayOpacity);
+        return ret;
     }
     void OPMapWidget::SetShowUAV(const bool &value)
     {
@@ -96,47 +147,21 @@ namespace mapcontrol
             UAV->setParentItem(map);
             connect(this,SIGNAL(UAVLeftSafetyBouble(internals::PointLatLng)),UAV,SIGNAL(UAVLeftSafetyBouble(internals::PointLatLng)));
             connect(this,SIGNAL(UAVReachedWayPoint(int,WayPointItem*)),UAV,SIGNAL(UAVReachedWayPoint(int,WayPointItem*)));
+            UAV->setOpacity(overlayOpacity);
         }
         else if(!value)
         {
             if(UAV!=0)
             {
                 delete UAV;
-                UAV=0;
-            }
-
-        }
-        if(value && GPS==0)
-        {
-            GPS=new GPSItem(map,this);
-            GPS->setParentItem(map);
-        }
-        else if(!value)
-        {
-            if(GPS!=0)
-            {
-                delete GPS;
-                GPS=0;
+                UAV=NULL;
             }
 
         }
     }
     void OPMapWidget::SetShowHome(const bool &value)
     {
-        if(value && Home==0)
-        {
-            Home=new HomeItem(map,this);
-            Home->setParentItem(map);
-        }
-        else if(!value)
-        {
-            if(Home!=0)
-            {
-                delete Home;
-                Home=0;
-            }
-
-        }
+            Home->setVisible(value);
     }
 
     void OPMapWidget::resizeEvent(QResizeEvent *event)
@@ -161,14 +186,20 @@ namespace mapcontrol
     }
     OPMapWidget::~OPMapWidget()
     {
-        delete UAV;
-        delete Home;
-        delete map;
-        delete core;
-        delete configuration;
+        if(UAV)
+            delete UAV;
+        if(Home)
+            delete Home;
+        if(map)
+            delete map;
+        if(core)
+            delete core;
+        if(configuration)
+            delete configuration;
         foreach(QGraphicsItem* i,this->items())
         {
-            delete i;
+            if(i)
+                delete i;
         }
     }
     void OPMapWidget::closeEvent(QCloseEvent *event)
@@ -203,18 +234,33 @@ namespace mapcontrol
         WayPointItem* item=new WayPointItem(this->CurrentPosition(),0,map);
         ConnectWP(item);
         item->setParentItem(map);
+        int position=item->Number();
+        emit WPCreated(position,item);
+        return item;
+    }
+    WayPointItem* OPMapWidget::magicWPCreate()
+    {
+        WayPointItem* item=new WayPointItem(map,true);
+        item->SetShowNumber(false);
+        item->setParentItem(map);
         return item;
     }
     void OPMapWidget::WPCreate(WayPointItem* item)
     {
         ConnectWP(item);
         item->setParentItem(map);
+        int position=item->Number();
+        emit WPCreated(position,item);
+        setOverlayOpacity(overlayOpacity);
     }
     WayPointItem* OPMapWidget::WPCreate(internals::PointLatLng const& coord,int const& altitude)
     {
         WayPointItem* item=new WayPointItem(coord,altitude,map);
         ConnectWP(item);
         item->setParentItem(map);
+        int position=item->Number();
+        emit WPCreated(position,item);
+        setOverlayOpacity(overlayOpacity);
         return item;
     }
     WayPointItem* OPMapWidget::WPCreate(internals::PointLatLng const& coord,int const& altitude, QString const& description)
@@ -222,6 +268,19 @@ namespace mapcontrol
         WayPointItem* item=new WayPointItem(coord,altitude,description,map);
         ConnectWP(item);
         item->setParentItem(map);
+        int position=item->Number();
+        emit WPCreated(position,item);
+        setOverlayOpacity(overlayOpacity);
+        return item;
+    }
+    WayPointItem* OPMapWidget::WPCreate(const distBearingAltitude &relativeCoord, const QString &description)
+    {
+        WayPointItem* item=new WayPointItem(relativeCoord,description,map);
+        ConnectWP(item);
+        item->setParentItem(map);
+        int position=item->Number();
+        emit WPCreated(position,item);
+        setOverlayOpacity(overlayOpacity);
         return item;
     }
     WayPointItem* OPMapWidget::WPInsert(const int &position)
@@ -231,6 +290,7 @@ namespace mapcontrol
         ConnectWP(item);
         item->setParentItem(map);
         emit WPInserted(position,item);
+        setOverlayOpacity(overlayOpacity);
         return item;
     }
     void OPMapWidget::WPInsert(WayPointItem* item,const int &position)
@@ -239,7 +299,7 @@ namespace mapcontrol
         ConnectWP(item);
         item->setParentItem(map);
         emit WPInserted(position,item);
-
+        setOverlayOpacity(overlayOpacity);
     }
     WayPointItem* OPMapWidget::WPInsert(internals::PointLatLng const& coord,int const& altitude,const int &position)
     {
@@ -248,21 +308,87 @@ namespace mapcontrol
         ConnectWP(item);
         item->setParentItem(map);
         emit WPInserted(position,item);
+        setOverlayOpacity(overlayOpacity);
         return item;
     }
     WayPointItem* OPMapWidget::WPInsert(internals::PointLatLng const& coord,int const& altitude, QString const& description,const int &position)
     {
-        WayPointItem* item=new WayPointItem(coord,altitude,description,map);
+        internals::PointLatLng mcoord;
+        bool reloc=false;
+        if(mcoord==internals::PointLatLng(0,0))
+        {
+            mcoord=CurrentPosition();
+            reloc=true;
+        }
+        else
+            mcoord=coord;
+        WayPointItem* item=new WayPointItem(mcoord,altitude,description,map);
         item->SetNumber(position);
         ConnectWP(item);
         item->setParentItem(map);
         emit WPInserted(position,item);
+        if(reloc)
+            emit WPValuesChanged(item);
+        setOverlayOpacity(overlayOpacity);
+        return item;
+    }
+    WayPointItem* OPMapWidget::WPInsert(distBearingAltitude const& relative, QString const& description,const int &position)
+    {
+        WayPointItem* item=new WayPointItem(relative,description,map);
+        item->SetNumber(position);
+        ConnectWP(item);
+        item->setParentItem(map);
+        emit WPInserted(position,item);
+        setOverlayOpacity(overlayOpacity);
         return item;
     }
     void OPMapWidget::WPDelete(WayPointItem *item)
     {
-        emit WPDeleted(item->Number());
+        emit WPDeleted(item->Number(),item);
         delete item;
+    }
+    void OPMapWidget::WPDelete(int number)
+    {
+        foreach(QGraphicsItem* i,map->childItems())
+        {
+            WayPointItem* w=qgraphicsitem_cast<WayPointItem*>(i);
+            if(w)
+            {
+                if(w->Number()==number)
+                {
+                    emit WPDeleted(w->Number(),w);
+                    delete w;
+                    return;
+                }
+            }
+        }
+    }
+    WayPointItem * OPMapWidget::WPFind(int number)
+    {
+        foreach(QGraphicsItem* i,map->childItems())
+        {
+            WayPointItem* w=qgraphicsitem_cast<WayPointItem*>(i);
+            if(w)
+            {
+                if(w->Number()==number)
+                {
+                    return w;
+                }
+            }
+        }
+        return NULL;
+    }
+    void OPMapWidget::WPSetVisibleAll(bool value)
+    {
+        foreach(QGraphicsItem* i,map->childItems())
+        {
+            WayPointItem* w=qgraphicsitem_cast<WayPointItem*>(i);
+            if(w)
+            {
+                if(w->Number()!=-1)
+                    w->setVisible(value);
+            }
+        }
     }
     void OPMapWidget::WPDeleteAll()
     {
@@ -270,7 +396,44 @@ namespace mapcontrol
         {
             WayPointItem* w=qgraphicsitem_cast<WayPointItem*>(i);
             if(w)
-                delete w;
+            {
+                if(w->Number()!=-1)
+                {
+                    emit WPDeleted(w->Number(),w);
+                    delete w;
+                }
+            }
+        }
+    }
+    bool OPMapWidget::WPPresent()
+    {
+        foreach(QGraphicsItem* i,map->childItems())
+        {
+            WayPointItem* w=qgraphicsitem_cast<WayPointItem*>(i);
+            if(w)
+            {
+                if(w->Number()!=-1)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    void OPMapWidget::deleteAllOverlays()
+    {
+        foreach(QGraphicsItem* i,map->childItems())
+        {
+            WayPointLine* w=qgraphicsitem_cast<WayPointLine*>(i);
+            if(w)
+                w->deleteLater();
+            else
+            {
+                WayPointCircle* ww=qgraphicsitem_cast<WayPointCircle*>(i);
+                if(ww)
+                    ww->deleteLater();
+            }
         }
     }
     QList<WayPointItem*> OPMapWidget::WPSelected()
@@ -291,11 +454,13 @@ namespace mapcontrol
 
     void OPMapWidget::ConnectWP(WayPointItem *item)
     {
-        connect(item,SIGNAL(WPNumberChanged(int,int,WayPointItem*)),this,SIGNAL(WPNumberChanged(int,int,WayPointItem*)));
-        connect(item,SIGNAL(WPValuesChanged(WayPointItem*)),this,SIGNAL(WPValuesChanged(WayPointItem*)));
-        connect(this,SIGNAL(WPInserted(int,WayPointItem*)),item,SLOT(WPInserted(int,WayPointItem*)));
-        connect(this,SIGNAL(WPNumberChanged(int,int,WayPointItem*)),item,SLOT(WPRenumbered(int,int,WayPointItem*)));
-        connect(this,SIGNAL(WPDeleted(int)),item,SLOT(WPDeleted(int)));
+        connect(item,SIGNAL(WPNumberChanged(int,int,WayPointItem*)),this,SIGNAL(WPNumberChanged(int,int,WayPointItem*)),Qt::DirectConnection);
+        connect(item,SIGNAL(WPValuesChanged(WayPointItem*)),this,SIGNAL(WPValuesChanged(WayPointItem*)),Qt::DirectConnection);
+        connect(item,SIGNAL(localPositionChanged(QPointF,WayPointItem*)),this,SIGNAL(WPLocalPositionChanged(QPointF,WayPointItem*)),Qt::DirectConnection);
+        connect(item,SIGNAL(manualCoordChange(WayPointItem*)),this,SIGNAL(WPManualCoordChange(WayPointItem*)),Qt::DirectConnection);
+        connect(this,SIGNAL(WPInserted(int,WayPointItem*)),item,SLOT(WPInserted(int,WayPointItem*)),Qt::DirectConnection);
+        connect(this,SIGNAL(WPNumberChanged(int,int,WayPointItem*)),item,SLOT(WPRenumbered(int,int,WayPointItem*)),Qt::DirectConnection);
+        connect(this,SIGNAL(WPDeleted(int,WayPointItem*)),item,SLOT(WPDeleted(int,WayPointItem*)),Qt::DirectConnection);
     }
     void OPMapWidget::diagRefresh()
     {
@@ -329,18 +494,24 @@ namespace mapcontrol
             compass->setScale(0.1+0.05*(qreal)(this->size().width())/1000*(qreal)(this->size().height())/600);
             //    compass->setTransformOriginPoint(compass->boundingRect().width(),compass->boundingRect().height());
             compass->setFlag(QGraphicsItem::ItemIsMovable,true);
+            compass->setFlag(QGraphicsItem::ItemIsSelectable,true);
             mscene.addItem(compass);
             compass->setTransformOriginPoint(compass->boundingRect().width()/2,compass->boundingRect().height()/2);            
             compass->setPos(55-compass->boundingRect().width()/2,55-compass->boundingRect().height()/2);
             compass->setZValue(3);
             compass->setOpacity(0.7);
-            
         }
         if(!value && compass)
         {
             delete compass;
             compass=0;
         }
+    }
+
+    void OPMapWidget::setOverlayOpacity(qreal value)
+    {
+        map->setOverlayOpacity(value);
+        overlayOpacity=value;
     }
     void OPMapWidget::SetRotate(qreal const& value)
     {
@@ -352,5 +523,29 @@ namespace mapcontrol
     void OPMapWidget::RipMap()
     {
         new MapRipper(core,map->SelectedArea());
+    }
+
+    void OPMapWidget::setSelectedWP(QList<WayPointItem * >list)
+    {
+        this->scene()->clearSelection();
+        foreach(WayPointItem * wp,list)
+        {
+            wp->setSelected(true);
+        }
+    }
+
+    void OPMapWidget::OnSelectionChanged()
+    {
+        QList<QGraphicsItem*> list;
+        QList<WayPointItem*> wplist;
+        list=this->scene()->selectedItems();
+        foreach(QGraphicsItem* item,list)
+        {
+            WayPointItem * wp=qgraphicsitem_cast<WayPointItem*>(item);
+            if(wp)
+                wplist.append(wp);
+        }
+        if(wplist.length()>0)
+            emit selectedWPChanged(wplist);
     }
 }

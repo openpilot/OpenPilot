@@ -70,6 +70,16 @@ public:
         QList<shadow *> shadowsList;
     };
 
+    struct temphelper
+    {
+        quint32 objid;
+        quint32 objinstid;
+        bool operator==(const temphelper& lhs)
+        {
+            return (lhs.objid==this->objid && lhs.objinstid==this->objinstid);
+        }
+    };
+
     enum buttonTypeEnum {none,save_button,apply_button,reload_button,default_button,help_button};
     struct uiRelationAutomation
     {
@@ -93,12 +103,19 @@ public:
     UAVObjectManager* getObjectManager();
     static double listMean(QList<double> list);
 
-    void addUAVObject(QString objectName);
+    void addUAVObject(QString objectName, QList<int> *reloadGroups=NULL);
+    void addUAVObject(UAVObject * objectName, QList<int> *reloadGroups=NULL);
+
     void addWidget(QWidget * widget);
 
     void addUAVObjectToWidgetRelation(QString object,QString field,QWidget * widget,int index=0,double scale=1,bool isLimited=false,QList<int>* defaultReloadGroups=0,quint32 instID=0);
+    void addUAVObjectToWidgetRelation(UAVObject *obj, UAVObjectField * field, QWidget *widget, int index=0, double scale=1, bool isLimited=false, QList<int> *defaultReloadGroups=0, quint32 instID=0);
+
     void addUAVObjectToWidgetRelation(QString object,QString field,QWidget * widget,QString element,double scale,bool isLimited=false,QList<int>* defaultReloadGroups=0,quint32 instID=0);
+    void addUAVObjectToWidgetRelation(UAVObject *obj, UAVObjectField * field,QWidget * widget,QString element,double scale,bool isLimited=false,QList<int>* defaultReloadGroups=0,quint32 instID=0);
+
     void addUAVObjectToWidgetRelation(QString object, QString field, QWidget *widget, QString index);
+    void addUAVObjectToWidgetRelation(UAVObject *obj, UAVObjectField * field, QWidget *widget, QString index);
 
     //BUTTONS//
     void addApplySaveButtons(QPushButton * update,QPushButton * save);
@@ -120,6 +137,7 @@ public:
     void setOutOfLimitsStyle(QString style){outOfLimitsStyle=style;}
     void addHelpButton(QPushButton * button,QString url);
     void forceShadowUpdates();
+    void forceConnectedState();
 public slots:
     void onAutopilotDisconnect();
     void onAutopilotConnect();
@@ -139,17 +157,20 @@ signals:
     void autoPilotConnected();
     //fired when the autopilot disconnects
     void autoPilotDisconnected();
+    void defaultRequested(int group);
 private slots:
     void objectUpdated(UAVObject*);
     void defaultButtonClicked();
     void reloadButtonClicked();
 private:
+    int currentBoard;
     bool isConnected;
     bool allowWidgetUpdates;
     QStringList objectsList;
     QList <objectToWidget*> objOfInterest;
     ExtensionSystem::PluginManager *pm;
     UAVObjectManager *objManager;
+    UAVObjectUtilManager* utilMngr;
     smartSaveButton *smartsave;
     QMap<UAVObject *,bool> objectUpdates;
     QMap<int,QList<objectToWidget*> *> defaultReloadGroups;

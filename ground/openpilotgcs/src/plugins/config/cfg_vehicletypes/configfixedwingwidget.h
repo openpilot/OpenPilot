@@ -57,7 +57,7 @@ private:
     bool setupFrameVtail(QString airframeType);
 
     virtual void ResetActuators(GUIConfigDataUnion* configData);
-    virtual QStringList getChannelDescriptions();
+    static QStringList getChannelDescriptions();
 
 private slots:
     virtual void setupUI(QString airframeType);

@@ -154,9 +154,11 @@ void PIOS_Board_Init(void) {
 		PIOS_Assert(0);
 	}
 
+#if defined(PIOS_INCLUDE_SDCARD)
 	/* Enable and mount the SDCard */
 	PIOS_SDCARD_Init(pios_spi_sdcard_id);
 	PIOS_SDCARD_MountFS(0);
+#endif
 #endif /* PIOS_INCLUDE_SPI */
 
 	/* Initialize UAVObject libraries */

@@ -35,7 +35,7 @@
 /* Enable/Disable PiOS Modules */
 #define PIOS_INCLUDE_ADC
 #define PIOS_INCLUDE_DELAY
-#define PIOS_INCLUDE_I2C
+//#define PIOS_INCLUDE_I2C
 #define PIOS_INCLUDE_IRQ
 #define PIOS_INCLUDE_LED
 #define PIOS_INCLUDE_IAP
@@ -57,8 +57,8 @@
 #define PIOS_INCLUDE_COM_AUX
 #define PIOS_INCLUDE_GPS
 //#define PIOS_OVERO_SPI
-#define PIOS_INCLUDE_BMP085
-#define PIOS_INCLUDE_HMC5883
+//#define PIOS_INCLUDE_BMP085
+//#define PIOS_INCLUDE_HMC5883
 #define PIOS_INCLUDE_SDCARD
 //#define PIOS_INCLUDE_WAVE
 /* Supported receiver interfaces */

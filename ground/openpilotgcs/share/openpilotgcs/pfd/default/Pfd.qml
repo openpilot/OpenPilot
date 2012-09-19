@@ -48,6 +48,28 @@ Rectangle {
                 anchors.centerIn: parent
             }
 
+            SvgElementImage {
+                id: side_slip
+                elementName: "sideslip"
+                sceneSize: background.sceneSize
+                smooth: true
+
+                property real sideSlip: Accels.y
+                //smooth side slip changes, a low pass filter replacement
+                //accels are updated once per second
+                Behavior on sideSlip {
+                    SmoothedAnimation {
+                        duration: 1000
+                        velocity: -1
+                    }
+                }
+
+                anchors.horizontalCenter: foreground.horizontalCenter
+                //0.5 coefficient is empirical to limit indicator movement
+                anchors.horizontalCenterOffset: -sideSlip*width*0.5
+                y: scaledBounds.y * sceneItem.height
+            }
+
             Compass {
                 anchors.fill: parent
                 sceneSize: background.sceneSize

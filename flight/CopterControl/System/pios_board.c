@@ -61,11 +61,14 @@ uint32_t pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE];
 #define PIOS_COM_BRIDGE_RX_BUF_LEN 65
 #define PIOS_COM_BRIDGE_TX_BUF_LEN 12
 
+#define PIOS_COM_HKOSD_TX_BUF_LEN 22
+
 uint32_t pios_com_telem_rf_id;
 uint32_t pios_com_telem_usb_id;
 uint32_t pios_com_vcp_id;
 uint32_t pios_com_gps_id;
 uint32_t pios_com_bridge_id;
+uint32_t pios_com_hkosd_id;
 
 uint32_t pios_usb_rctx_id;
 
@@ -507,6 +510,25 @@ void PIOS_Board_Init(void) {
 			}
 		}
 		break;
+	case HWSETTINGS_CC_MAINPORT_OSDHK:
+		{
+			uint32_t pios_usart_hkosd_id;
+			if (PIOS_USART_Init(&pios_usart_hkosd_id, &pios_usart_hkosd_main_cfg)) {
+				PIOS_Assert(0);
+			}
+
+			uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_HKOSD_TX_BUF_LEN);
+			PIOS_Assert(tx_buffer);
+			uint32_t pios_com_hkosd_id;
+			if (PIOS_COM_Init(&pios_com_hkosd_id, &pios_usart_com_driver, pios_usart_hkosd_id,
+						NULL, 0,
+						tx_buffer, PIOS_COM_HKOSD_TX_BUF_LEN)) {
+				PIOS_Assert(0);
+			}
+
+			OsdHkConnect(pios_com_hkosd_id);
+		}
+		break;
 	}
 
 	/* Configure the flexi port */
@@ -623,6 +645,25 @@ void PIOS_Board_Init(void) {
 			}
 		}
 #endif	/* PIOS_INCLUDE_I2C */
+		break;
+	case HWSETTINGS_CC_FLEXIPORT_OSDHK:
+		{
+			uint32_t pios_usart_hkosd_id;
+			if (PIOS_USART_Init(&pios_usart_hkosd_id, &pios_usart_hkosd_flexi_cfg)) {
+				PIOS_Assert(0);
+			}
+
+			uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_HKOSD_TX_BUF_LEN);
+			PIOS_Assert(tx_buffer);
+			uint32_t pios_com_hkosd_id;
+			if (PIOS_COM_Init(&pios_com_hkosd_id, &pios_usart_com_driver, pios_usart_hkosd_id,
+						NULL, 0,
+						tx_buffer, PIOS_COM_HKOSD_TX_BUF_LEN)) {
+				PIOS_Assert(0);
+			}
+
+			OsdHkConnect(pios_com_hkosd_id);
+		}
 		break;
 	}
 

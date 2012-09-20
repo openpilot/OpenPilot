@@ -292,7 +292,6 @@ void ConfigInputWidget::openHelp()
 
     QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/x/04Cf", QUrl::StrictMode) );
 }
-
 void ConfigInputWidget::goToWizard()
 {
     QMessageBox msgBox;

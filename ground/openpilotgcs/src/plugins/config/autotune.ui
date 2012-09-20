@@ -1001,13 +1001,13 @@ border-radius: 4;
     <rect>
      <x>30</x>
      <y>440</y>
-     <width>371</width>
+     <width>401</width>
      <height>31</height>
     </rect>
    </property>
    <property name="text">
     <string>The buttons below change the autotuning settings which
-will alter thingsfor the next autotuning flight</string>
+will alter things for the next autotuning flight</string>
    </property>
   </widget>
   <widget class="QPushButton" name="useComputedValues">

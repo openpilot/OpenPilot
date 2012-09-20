@@ -174,6 +174,7 @@ plugin_logging.subdir = logging
 plugin_logging.depends = plugin_coreplugin
 plugin_logging.depends += plugin_uavobjects
 plugin_logging.depends += plugin_uavtalk
+plugin_logging.depends += plugin_scope
 SUBDIRS += plugin_logging
 
 #GCS Control of UAV gadget
@@ -217,6 +218,7 @@ SUBDIRS += plugin_uavsettingsimportexport
 plugin_uavobjectwidgetutils.subdir = uavobjectwidgetutils
 plugin_uavobjectwidgetutils.depends = plugin_coreplugin
 plugin_uavobjectwidgetutils.depends += plugin_uavobjects
+plugin_uavobjectwidgetutils.depends += plugin_uavobjectutil
 plugin_uavobjectwidgetutils.depends += plugin_uavsettingsimportexport
 SUBDIRS += plugin_uavobjectwidgetutils
 

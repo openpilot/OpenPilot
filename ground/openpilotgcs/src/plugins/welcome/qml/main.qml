@@ -47,12 +47,12 @@ Rectangle {
                 anchors.verticalCenterOffset: -2 //it looks better aligned to icons grid
 
                 //hide the logo on the very small screen to fit the buttons
-                visible: parent.availableWidth > width + parent.spacing + buttons.width
+                visible: parent.availableWidth > width + parent.spacing + buttons.width + wizard.width
             }
 
             Grid {
                 id: buttons
-                columns: 4
+                columns: 3
                 spacing: 4
                 anchors.verticalCenter: parent.verticalCenter
 
@@ -74,11 +74,6 @@ Rectangle {
                     onClicked: welcomePlugin.openPage("System")
                 }
 
-                WelcomePageButton {
-                    baseIconName: "bttn-vehwizard"
-                    onClicked: welcomePlugin.triggerAction("SetupWizardPlugin.ShowSetupWizard")
-                }
-
                WelcomePageButton {
                     baseIconName: "scopes"
                     label: "Scopes"
@@ -96,13 +91,15 @@ Rectangle {
                     label: "Firmware"
                     onClicked: welcomePlugin.openPage("Firmware")
                 }
-
-                WelcomePageButton {
-                    baseIconName: "bttn-txwizard"
-                    onClicked: welcomePlugin.triggerAction("ConfigPlugin.ShowInputWizard")
-        }
-
             } //icons grid
+
+            WelcomePageButton {
+                id: wizard
+                anchors.verticalCenter: parent.verticalCenter
+                baseIconName: "wizard"
+                onClicked: welcomePlugin.triggerAction("SetupWizardPlugin.ShowSetupWizard")
+            }
+
         } // images row
 
         CommunityPanel {

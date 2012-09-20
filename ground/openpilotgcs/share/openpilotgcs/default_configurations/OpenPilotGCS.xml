@@ -2459,11 +2459,11 @@
                   <type>uavGadget</type>
                 </side1>
                 <splitterOrientation>1</splitterOrientation>
-                <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAAsQAAAAIAAAEV)</splitterSizes>
+                <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAAYwAAAAIAAAB7)</splitterSizes>
                 <type>splitter</type>
               </side1>
               <splitterOrientation>1</splitterOrientation>
-              <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAArgAAAAIAAAHH)</splitterSizes>
+              <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAAZgAAAAIAAADf)</splitterSizes>
               <type>splitter</type>
             </side0>
             <side1>

@@ -1455,6 +1455,17 @@
           <enableVbo>false</enableVbo>
         </data>
       </CopterControl>
+      <CC3D>
+        <configInfo>
+          <locked>false</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <acFilename>%%DATAPATH%%models/boards/CC3D/CC3D.3ds</acFilename>
+          <bgFilename>%%DATAPATH%%models/backgrounds/default_background.png</bgFilename>
+          <enableVbo>false</enableVbo>
+        </data>
+      </CC3D>
       <Easyquad__PCT__20X>
         <configInfo>
           <locked>false</locked>
@@ -1609,6 +1620,17 @@
           <enableVbo>false</enableVbo>
         </data>
       </Scorpion__PCT__20Tricopter>
+      <MattL__PCT__27s__PCT__20Y6>
+        <configInfo>
+          <locked>false</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <acFilename>%%DATAPATH%%models/multi/mattL_Y6/mattL_Y6.3ds</acFilename>
+          <bgFilename>%%DATAPATH%%models/backgrounds/default_background.png</bgFilename>
+          <enableVbo>false</enableVbo>
+        </data>
+      </MattL__PCT__27s__PCT__20Y6>
       <Test__PCT__20Quad__PCT__20__PCT__2B>
         <configInfo>
           <locked>false</locked>
@@ -1631,6 +1653,17 @@
           <enableVbo>false</enableVbo>
         </data>
       </Test__PCT__20Quad__PCT__20X>
+      <Danker__PCT__27s__PCT__20Quad>
+        <configInfo>
+          <locked>false</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <acFilename>%%DATAPATH%%models/multi/dankers_quad/dankers_quad.3ds</acFilename>
+          <bgFilename>%%DATAPATH%%models/backgrounds/default_background.png</bgFilename>
+          <enableVbo>false</enableVbo>
+        </data>
+      </Danker__PCT__27s__PCT__20Quad>
     </ModelViewGadget>
     <OPMapGadget>
       <Google__PCT__20Sat>

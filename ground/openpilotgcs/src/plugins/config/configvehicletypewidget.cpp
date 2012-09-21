@@ -471,11 +471,10 @@ void ConfigVehicleTypeWidget::refreshWidgetsValues(UAVObject * o)
 {
     Q_UNUSED(o);
 
-    //if(!allObjectsUpdated())
-      //  return;
+    if(!allObjectsUpdated())
+        return;
 	
-	//WHAT DOES THIS DO?
-    bool dirty=isDirty(); //WHY IS THIS CALLED HERE AND THEN AGAIN SEVERAL LINES LATER IN setupAirframeUI()
+    bool dirty=isDirty();
 	
     // Get the Airframe type from the system settings:
     UAVDataObject* system = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("SystemSettings")));

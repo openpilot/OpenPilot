@@ -438,11 +438,21 @@ void quat_mult(const float q1[4], const float q2[4], float qout[4])
  * @brief Rotate a vector by a rotation matrix
  * @param[in] R a three by three rotation matrix (first index is row)
  * @param[in] vec the source vector
+ * @param[in] transpose If false use R, else if true use R'
  * @param[out] vec_out the output vector
  */
-void rot_mult(float R[3][3], const float vec[3], float vec_out[3]) 
+void rot_mult(float R[3][3], const float vec[3], float vec_out[3], bool transpose) 
 {
-	vec_out[0] = R[0][0] * vec[0] + R[0][1] * vec[1] + R[0][2] * vec[2];
-	vec_out[1] = R[1][0] * vec[0] + R[1][1] * vec[1] + R[1][2] * vec[2];
-	vec_out[2] = R[2][0] * vec[0] + R[2][1] * vec[1] + R[2][2] * vec[2];
+	if (!transpose){
+		vec_out[0] = R[0][0] * vec[0] + R[0][1] * vec[1] + R[0][2] * vec[2];
+		vec_out[1] = R[1][0] * vec[0] + R[1][1] * vec[1] + R[1][2] * vec[2];
+		vec_out[2] = R[2][0] * vec[0] + R[2][1] * vec[1] + R[2][2] * vec[2];
+	}
+	else {
+		vec_out[0] = R[0][0] * vec[0] + R[1][0] * vec[1] + R[2][0] * vec[2];
+		vec_out[1] = R[0][1] * vec[0] + R[1][1] * vec[1] + R[2][1] * vec[2];
+		vec_out[2] = R[0][2] * vec[0] + R[1][2] * vec[1] + R[2][2] * vec[2];
+		
+	}
+
 }

@@ -30,6 +30,8 @@
 #ifndef COORDINATECONVERSIONS_H_
 #define COORDINATECONVERSIONS_H_
 
+#include <stdbool.h>
+
     // ****** convert Lat,Lon,Alt to ECEF  ************
 void LLA2ECEF(float LLA[3], float ECEF[3]);
 
@@ -77,6 +79,6 @@ float VectorMagnitude(const float v[3]);
 void quat_inverse(float q[4]);
 void quat_copy(const float q[4], float qnew[4]);
 void quat_mult(const float q1[4], const float q2[4], float qout[4]);
-void rot_mult(float R[3][3], const float vec[3], float vec_out[3]);
+void rot_mult(float R[3][3], const float vec[3], float vec_out[3], bool transpose);
 
 #endif // COORDINATECONVERSIONS_H_

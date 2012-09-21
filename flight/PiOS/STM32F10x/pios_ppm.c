@@ -145,8 +145,8 @@ extern int32_t PIOS_PPM_Init(uint32_t * ppm_id, const struct pios_ppm_cfg * cfg)
 
 	for (uint8_t i = 0; i < PIOS_PPM_IN_MAX_NUM_CHANNELS; i++) {
 		/* Flush counter variables */
-		ppm_dev->CaptureValue[i] = 0;
-		ppm_dev->CaptureValueNewFrame[i] = 0;
+		ppm_dev->CaptureValue[i] = PIOS_RCVR_TIMEOUT;
+		ppm_dev->CaptureValueNewFrame[i] = PIOS_RCVR_TIMEOUT;
 
 	}
 

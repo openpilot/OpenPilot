@@ -42,11 +42,11 @@ extern int32_t PIOS_RCVR_Read(uint32_t rcvr_id, uint8_t channel);
 /*! Define error codes for PIOS_RCVR_Get */
 enum PIOS_RCVR_errors {
 	/*! Indicates that a failsafe condition or missing receiver detected for that channel */
-	PIOS_RCVR_TIMEOUT = 0,
+	PIOS_RCVR_TIMEOUT = -1,
 	/*! Channel is invalid for this driver (usually out of range supported) */
-	PIOS_RCVR_INVALID = -1,
+	PIOS_RCVR_INVALID = -2,
 	/*! Indicates that the driver for this channel has not been initialized */
-	PIOS_RCVR_NODRIVER = -2
+	PIOS_RCVR_NODRIVER = -3
 };
 
 #endif /* PIOS_RCVR_H */

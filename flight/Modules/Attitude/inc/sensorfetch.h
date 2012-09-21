@@ -5,8 +5,8 @@
  * @addtogroup Attitude Attitude Module
  * @{ 
  *
- * @file       attitude.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2011.
+ * @file       sensorfetch.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @brief      Acquires sensor data and fuses it into attitude estimate for CC
  *
  * @see        The GNU Public License (GPL) Version 3
@@ -27,35 +27,15 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef ATTITUDE_H
-#define ATTITUDE_H
+#ifndef SENSORFETCH_H
+#define SENSORFETCH_H
 
 #include "openpilot.h"
+#include "gyros.h"
+#include "accels.h"
 
-struct GlobalAttitudeVariables {
-	float accelKi;
-	float accelKp;
-	float yawBiasRate;
-	float gyroGain[3];
-	float gyroGain_ref;
-	float accelbias[3];
-	float gyro_correct_int[3];
-	float q[4];
-	float Rsb[3][3]; //Rotation matrix that transforms from the sensor frame to the body frame
-	bool rotate;
-	bool zero_during_arming;
-	bool bias_correct_gyro;	
-	uint8_t filter_choice;
-	
-	// For running trim flights
-	volatile bool trim_requested;
-	volatile int32_t trim_accels[3];
-	volatile int32_t trim_samples;
-	
-};
+int8_t getSensorsCC(float * prelim_accels, float * prelim_gyros, xQueueHandle *gyro_queue);
+int8_t getSensorsCC3D(float * prelim_accels, float * prelim_gyros);
 
 
-int32_t AttitudeInitialize(void);
-
-
-#endif // ATTITUDE_H
+#endif // SENSORFETCH_H

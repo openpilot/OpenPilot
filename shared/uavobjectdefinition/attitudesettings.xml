@@ -8,9 +8,10 @@
         <field name="AccelKp" units="channel" type="float" elements="1" defaultvalue="0.05"/>
         <field name="AccelKi" units="channel" type="float" elements="1" defaultvalue="0.0001"/>
         <field name="YawBiasRate" units="channel" type="float" elements="1" defaultvalue="0.000001"/>
-	<field name="ZeroDuringArming" units="channel" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="TRUE"/>
-	<field name="BiasCorrectGyro" units="channel" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="TRUE"/>
-	<field name="TrimFlight" units="channel" type="enum" elements="1" options="NORMAL,START,LOAD" defaultvalue="NORMAL"/>
+        <field name="ZeroDuringArming" units="channel" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="TRUE"/>
+        <field name="BiasCorrectGyro" units="channel" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="TRUE"/>
+        <field name="FilterChoice" units="channel" type="enum" elements="1" options="CCC,PREMERLANI,PREMERLANI_GPS" defaultvalue="CCC"/>
+        <field name="TrimFlight" units="channel" type="enum" elements="1" options="NORMAL,START,LOAD" defaultvalue="NORMAL"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

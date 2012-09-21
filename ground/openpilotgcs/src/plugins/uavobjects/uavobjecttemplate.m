@@ -126,7 +126,7 @@ $(SWITCHCODE)
 			if msgBytesLeft > 255
 				msgBytesLeft = 0;
 			end
-			bufferIdx=bufferIdx+msgBytesLeft;
+			bufferIdx=bufferIdx+double(msgBytesLeft);
 	end
 	catch
 		% One of the reads failed - indicates EOF

@@ -13,6 +13,7 @@
 #include "relaytuningsettings.h"
 #include "relaytuning.h"
 #include "stabilizationsettings.h"
+#include "hwsettings.h"
 
 ConfigAutotuneWidget::ConfigAutotuneWidget(QWidget *parent) :
     ConfigTaskWidget(parent)
@@ -27,6 +28,9 @@ ConfigAutotuneWidget::ConfigAutotuneWidget(QWidget *parent) :
     // Whenever any value changes compute new potential stabilization settings
     connect(m_autotune->rateTuning, SIGNAL(valueChanged(int)), this, SLOT(recomputeStabilization()));
     connect(m_autotune->attitudeTuning, SIGNAL(valueChanged(int)), this, SLOT(recomputeStabilization()));
+
+    addUAVObject("HwSettings");
+    addWidget(m_autotune->enableAutoTune);
 
     RelayTuning *relayTuning = RelayTuning::GetInstance(getObjectManager());
     Q_ASSERT(relayTuning);
@@ -133,4 +137,26 @@ void ConfigAutotuneWidget::recomputeStabilization()
     m_autotune->pitchRateKi->setText(QString().number(stabSettings.PitchRatePID[StabilizationSettings::PITCHRATEPID_KI]));
     m_autotune->pitchAttitudeKp->setText(QString().number(stabSettings.PitchPI[StabilizationSettings::PITCHPI_KP]));
     m_autotune->pitchAttitudeKi->setText(QString().number(stabSettings.PitchPI[StabilizationSettings::PITCHPI_KI]));
+}
+void ConfigAutotuneWidget::refreshWidgetsValues(UAVObject *obj)
+{
+    HwSettings *hwSettings = HwSettings::GetInstance(getObjectManager());
+    if(obj==hwSettings)
+    {
+        bool dirtyBack=isDirty();
+        HwSettings::DataFields hwSettingsData = hwSettings->getData();
+        m_autotune->enableAutoTune->setChecked(
+            hwSettingsData.OptionalModules[HwSettings::OPTIONALMODULES_AUTOTUNE] == HwSettings::OPTIONALMODULES_ENABLED);
+        setDirty(dirtyBack);
+    }
+    ConfigTaskWidget::refreshWidgetsValues(obj);
+}
+void ConfigAutotuneWidget::updateObjectsFromWidgets()
+{
+    HwSettings *hwSettings = HwSettings::GetInstance(getObjectManager());
+    HwSettings::DataFields hwSettingsData = hwSettings->getData();
+    hwSettingsData.OptionalModules[HwSettings::OPTIONALMODULES_AUTOTUNE] =
+         m_autotune->enableAutoTune->isChecked() ? HwSettings::OPTIONALMODULES_ENABLED : HwSettings::OPTIONALMODULES_DISABLED;
+    hwSettings->setData(hwSettingsData);
+    ConfigTaskWidget::updateObjectsFromWidgets();
 }

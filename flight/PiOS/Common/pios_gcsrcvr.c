@@ -121,6 +121,11 @@ extern int32_t PIOS_GCSRCVR_Init(uint32_t *gcsrcvr_id)
 	if (!gcsrcvr_dev)
 		return -1;
 
+	for (uint8_t i = 0; i < GCSRECEIVER_CHANNEL_NUMELEM; i++) {
+		/* Flush channels */
+		gcsreceiverdata.Channel[i] = PIOS_RCVR_TIMEOUT;
+	}
+
 	/* Register uavobj callback */
 	GCSReceiverConnectCallback (gcsreceiver_updated);
 

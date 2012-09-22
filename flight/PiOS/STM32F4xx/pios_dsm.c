@@ -349,7 +349,7 @@ static uint16_t PIOS_DSM_RxInCallback(uint32_t context,
  * \param[in] channel Number of the channel desired (zero based)
  * \output PIOS_RCVR_INVALID channel not available
  * \output PIOS_RCVR_TIMEOUT failsafe condition or missing receiver
- * \output >0 channel value
+ * \output >=0 channel value
  */
 static int32_t PIOS_DSM_Get(uint32_t rcvr_id, uint8_t channel)
 {

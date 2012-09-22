@@ -30,9 +30,9 @@
      </property>
      <widget class="QWidget" name="Preautotune_tab">
       <attribute name="title">
-       <string>Pre-autotune</string>
+       <string>Pre-Autotune</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_4">
+      <layout class="QGridLayout" name="gridLayout_5">
        <property name="leftMargin">
         <number>12</number>
        </property>
@@ -42,7 +42,33 @@
        <property name="bottomMargin">
         <number>12</number>
        </property>
-       <item>
+       <item row="1" column="0">
+        <spacer name="horizontalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="1" column="2">
+        <spacer name="horizontalSpacer_5">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="0" column="0" colspan="3">
         <widget class="QTextEdit" name="textEdit">
          <property name="frameShape">
           <enum>QFrame::StyledPanel</enum>
@@ -64,7 +90,17 @@ p, li { white-space: pre-wrap; }
 &lt;li style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Land and disarm.  (note - you &lt;span style=&quot; font-weight:600;&quot;&gt;MUST&lt;/span&gt; stay in autotune mode through this point, leaving autotune before disarming aborts the process)&lt;br /&gt;&lt;/li&gt;
 &lt;li style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;We'd recommend checking your stabilization settings before trying them out. &lt;br /&gt;&lt;/li&gt;
 &lt;li style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Test fly then new settings&lt;/li&gt;
-&lt;li style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;If you're ready to proceed, go to the next tab&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;li style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;If you're ready to proceed, click the &amp;quot;Enable Autotune Module&amp;quot; checkbox below this text, and go to the next tab.&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QCheckBox" name="enableAutoTune">
+         <property name="text">
+          <string>Enable Autotune Module</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
          </property>
         </widget>
        </item>

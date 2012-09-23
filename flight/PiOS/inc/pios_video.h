@@ -71,7 +71,7 @@ extern void PIOS_Vsync_ISR();
 #define GRAPHICS_LINE 25
 
 //top/left deadband
-#define GRAPHICS_HDEADBAND 72
+#define GRAPHICS_HDEADBAND 80
 #define GRAPHICS_VDEADBAND 0
 
 #define PAL

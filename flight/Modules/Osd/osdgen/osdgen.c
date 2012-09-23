@@ -2374,7 +2374,7 @@ void updateGraphics() {
 			draw_artificial_horizon(-attitude.Roll,attitude.Pitch,APPLY_HDEADBAND(x),APPLY_VDEADBAND(y),size);
 			hud_draw_vertical_scale((int)gpsData.Groundspeed, 20, +1, APPLY_HDEADBAND(GRAPHICS_RIGHT-(x-1)),
 					APPLY_VDEADBAND(y+(size/2)), size, 5, 10, 4, 7, 10, 100, HUD_VSCALE_FLAG_NO_NEGATIVE);
-			if(1)
+			if(OsdSettings.AltitudeSource == OSDSETTINGS_ALTITUDESOURCE_BARO)
 			{
 				hud_draw_vertical_scale((int)baro.Altitude, 50, -1, APPLY_HDEADBAND((x+size+1)),
 					APPLY_VDEADBAND(y+(size/2)), size, 10, 20, 4, 7, 10, 500, 0);
@@ -2434,7 +2434,7 @@ int32_t osdgenStart(void)
 	// Start gps task
 	vSemaphoreCreateBinary( osdSemaphore);
 	xTaskCreate(osdgenTask, (signed char *)"OSDGEN", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &osdgenTaskHandle);
-	//TaskMonitorAdd(TASKINFO_RUNNING_GPS, osdgenTaskHandle);
+	TaskMonitorAdd(TASKINFO_RUNNING_OSDGEN, osdgenTaskHandle);
 
 	return 0;
 }

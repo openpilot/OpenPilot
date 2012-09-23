@@ -1092,7 +1092,7 @@ margin:1px;</string>
 Typical value is 50% for + or X configuration on quads.</string>
                       </property>
                       <property name="minimum">
-                       <number>-100</number>
+                       <number>0</number>
                       </property>
                       <property name="maximum">
                        <number>100</number>

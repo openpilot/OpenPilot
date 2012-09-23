@@ -41,7 +41,7 @@
 // ****************
 // Private constants
 
-#define STACK_SIZE_BYTES 150
+#define STACK_SIZE_BYTES 200
 #define TASK_PRIORITY (tskIDLE_PRIORITY + 2)
 #define PACKET_QUEUE_SIZE PIOS_PH_WIN_SIZE
 #define MAX_PORT_DELAY 200
@@ -232,20 +232,8 @@ static int32_t RadioInitialize(void)
 	}
 
 	/* Initalize the RFM22B radio COM device. */
-	{
-		if (PIOS_RFM22B_Init(&pios_rfm22b_id, PIOS_RFM22_SPI_PORT, pios_rfm22b_cfg.slave_num, &pios_rfm22b_cfg)) {
-			return -1;
-		}
-		uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_RFM22B_RF_RX_BUF_LEN);
-		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_RFM22B_RF_TX_BUF_LEN);
-		PIOS_Assert(rx_buffer);
-		PIOS_Assert(tx_buffer);
-		if (PIOS_COM_Init(&pios_com_rfm22b_id, &pios_rfm22b_com_driver, pios_rfm22b_id,
-				  rx_buffer, PIOS_COM_RFM22B_RF_RX_BUF_LEN,
-				  tx_buffer, PIOS_COM_RFM22B_RF_TX_BUF_LEN)) {
-			PIOS_Assert(0);
-		}
-	}
+	if (PIOS_RFM22B_Init(&pios_rfm22b_id, PIOS_RFM22_SPI_PORT, pios_rfm22b_cfg.slave_num, &pios_rfm22b_cfg))
+		return -1;
 
 	// Initialize the packet handler
 	PacketHandlerConfig pios_ph_cfg = {
@@ -311,18 +299,9 @@ static void radioReceiveTask(void *parameters)
 		PIOS_WDG_UpdateFlag(PIOS_WDG_RADIORECEIVE);
 #endif /* PIOS_INCLUDE_WDG */
 
-		// Get a RX packet from the packet handler if required.
-		if (p == NULL)
-			p = PHGetRXPacket(pios_packet_handler);
-
-		if(p == NULL) {
-			// Wait a bit for a packet to come available.
-			vTaskDelay(5);
-			continue;
-		}
-
 		// Receive data from the radio port
-		rx_bytes = PIOS_COM_ReceiveBuffer(PIOS_COM_RADIO, (uint8_t*)p, PIOS_PH_MAX_PACKET, MAX_PORT_DELAY);
+		p = NULL;
+		rx_bytes = PIOS_RFM22B_Receive_Packet(pios_rfm22b_id, &p, MAX_PORT_DELAY);
 		if(rx_bytes == 0)
 			continue;
 		data->rxBytes += rx_bytes;

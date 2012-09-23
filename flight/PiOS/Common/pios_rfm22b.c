@@ -192,6 +192,9 @@ struct pios_rfm22b_dev {
 	// ISR pending
 	xSemaphoreHandle isrPending;
 
+	// Receive packet complete
+	xSemaphoreHandle rxsem;
+
 	// The COM callback functions.
 	pios_com_callback rx_in_cb;
 	uint32_t rx_in_context;
@@ -234,6 +237,17 @@ struct pios_rfm22b_dev {
 	// the tx data write index
 	uint16_t tx_data_wr;
 
+	// The current rx packet
+	PHPacketHandle rx_packet;
+	// The previous rx packet
+	PHPacketHandle rx_packet_prev;
+	// The next rx packet
+	PHPacketHandle rx_packet_next;
+	// the receive buffer write index
+	uint16_t rx_buffer_wr;
+	// the receive buffer write index
+	uint16_t rx_packet_len;
+	
 	// The frequency hopping step size
 	float frequency_step_size;
 	// current frequency hop channel
@@ -470,13 +484,6 @@ static const uint8_t ss_reg_2A[] = {  0xFF, 0xFF}; // rfm22_afc_limiter .. AFC_p
 static const uint8_t ss_reg_70[] = {  0x24, 0x2D}; // rfm22_modulation_mode_control1
 static const uint8_t ss_reg_71[] = {  0x2B, 0x23}; // rfm22_modulation_mode_control2
 
-// the current receive buffer in use (double buffer)
-volatile uint8_t rx_buffer_current;
-// the receive buffer .. received packet data is saved here
-volatile uint8_t rx_buffer[258] __attribute__ ((aligned(4)));
-// the receive buffer write index
-volatile uint16_t rx_buffer_wr;
-
 
 static bool PIOS_RFM22B_validate(struct pios_rfm22b_dev * rfm22b_dev)
 {
@@ -552,11 +559,21 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
 	// Bind the configuration to the device instance
 	rfm22b_dev->cfg = *cfg;
 
+	// Initialize the packets.
+	rfm22b_dev->rx_packet = NULL;
+	rfm22b_dev->rx_packet_next = NULL;
+	rfm22b_dev->rx_packet_prev = NULL;
+	rfm22b_dev->rx_packet_len = 0;
+	rfm22b_dev->tx_packet = NULL;
+
 	*rfm22b_id = (uint32_t)rfm22b_dev;
 	g_rfm22b_dev = rfm22b_dev;
 
 	// Create a semaphore to know if an ISR needs responding to
 	vSemaphoreCreateBinary( rfm22b_dev->isrPending );
+
+	// Create a semaphore to know when an rx packet is available
+	vSemaphoreCreateBinary( rfm22b_dev->rxsem );
 
 	// Create the packet queue.
 	rfm22b_dev->packetQueue = xQueueCreate(PACKET_QUEUE_SIZE, sizeof(PHPacketHandle));
@@ -710,6 +727,39 @@ bool PIOS_RFM22B_Send_Packet(uint32_t rfm22b_id, PHPacketHandle p, uint32_t max_
 
 	// Success
 	return true;
+}
+
+/**
+ * Receive a packet from the radio.
+ * \param[in] rfm22b_id  The rfm22b device.
+ * \param[in] p  A pointer to the packet handle.
+ * \param[in] max_delay  The maximum time to delay waiting for a packet.
+ * \return  The number of bytes received.
+ */
+uint32_t PIOS_RFM22B_Receive_Packet(uint32_t rfm22b_id, PHPacketHandle *p, uint32_t max_delay)
+{
+	struct pios_rfm22b_dev * rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
+	if (!PIOS_RFM22B_validate(rfm22b_dev))
+		return 0;
+
+	// Allocate the next Rx packet
+	if (rfm22b_dev->rx_packet_next == NULL)
+		rfm22b_dev->rx_packet_next = PHGetRXPacket(pios_packet_handler);
+
+	// Block on the semephore until the a packet has been received.
+	if (xSemaphoreTake(rfm22b_dev->rxsem,  max_delay / portTICK_RATE_MS) != pdTRUE)
+		return 0;
+
+	// Return the Rx packet if it's available.
+	uint32_t rx_len = 0;
+	if (rfm22b_dev->rx_packet_prev)
+	{
+		*p = rfm22b_dev->rx_packet_prev;
+		rfm22b_dev->rx_packet_prev = NULL;
+		rx_len = rfm22b_dev->rx_packet_len;
+	}
+
+	return rx_len;
 }
 
 /**
@@ -1127,7 +1177,7 @@ static enum pios_rfm22b_event rfm22_setRxMode(struct pios_rfm22b_dev *rfm22b_dev
 	TX_LED_OFF;
 
 	// empty the rx buffer
-	rx_buffer_wr = 0;
+	rfm22b_dev->rx_buffer_wr = 0;
 
 	// Clear the TX buffer.
 	rfm22b_dev->tx_data_rd = rfm22b_dev->tx_data_wr = 0;
@@ -1313,6 +1363,15 @@ static enum pios_rfm22b_event rfm22_detectSync(struct pios_rfm22b_dev *rfm22b_de
 
 static enum pios_rfm22b_event rfm22_rxData(struct pios_rfm22b_dev *rfm22b_dev)
 {
+	// Swap in the next packet buffer if required.
+	if (rfm22b_dev->rx_packet == NULL)
+	{
+		if (rfm22b_dev->rx_packet_next != NULL)
+			rfm22b_dev->rx_packet = rfm22b_dev->rx_packet_next;
+		else
+			return RFM22B_EVENT_ERROR;
+	}
+	uint8_t *rx_buffer = (uint8_t*)(rfm22b_dev->rx_packet);
 
 	// Read the device status registers
 	if (!rfm22_readStatus(rfm22b_dev))
@@ -1330,20 +1389,18 @@ static enum pios_rfm22b_event rfm22_rxData(struct pios_rfm22b_dev *rfm22b_dev)
 		uint16_t len = rfm22_read(RFM22_received_packet_length);
 
 		// The received packet is going to be larger than the specified length
-		if ((rx_buffer_wr + RX_FIFO_HI_WATERMARK) > len)
+		if ((rfm22b_dev->rx_buffer_wr + RX_FIFO_HI_WATERMARK) > len)
 			return RFM22B_EVENT_ERROR;
 
 		// Another packet length error.
-		if (((rx_buffer_wr + RX_FIFO_HI_WATERMARK) >= len) && !(rfm22b_dev->int_status1 & RFM22_is1_ipkvalid))
+		if (((rfm22b_dev->rx_buffer_wr + RX_FIFO_HI_WATERMARK) >= len) && !(rfm22b_dev->int_status1 & RFM22_is1_ipkvalid))
 			return RFM22B_EVENT_ERROR;
 
 		// Fetch the data from the RX FIFO
 		rfm22_claimBus();
 		rfm22_assertCs();
 		PIOS_SPI_TransferByte(rfm22b_dev->spi_id,RFM22_fifo_access & 0x7F);
-		rx_buffer_wr += (PIOS_SPI_TransferBlock(rfm22b_dev->spi_id,OUT_FF,
-							(uint8_t *) &rx_buffer[rx_buffer_wr],RX_FIFO_HI_WATERMARK,NULL) == 0) ?
-			RX_FIFO_HI_WATERMARK : 0;
+		rfm22b_dev->rx_buffer_wr += (PIOS_SPI_TransferBlock(rfm22b_dev->spi_id ,OUT_FF, (uint8_t *)&rx_buffer[rfm22b_dev->rx_buffer_wr], RX_FIFO_HI_WATERMARK, NULL) == 0) ? RX_FIFO_HI_WATERMARK : 0;
 		rfm22_deassertCs();
 		rfm22_releaseBus();
 	}
@@ -1360,36 +1417,38 @@ static enum pios_rfm22b_event rfm22_rxData(struct pios_rfm22b_dev *rfm22b_dev)
 		uint32_t len = rfm22_read(RFM22_received_packet_length);
 
 		// their must still be data in the RX FIFO we need to get
-		if (rx_buffer_wr < len)
+		if (rfm22b_dev->rx_buffer_wr < len)
 		{
-			int32_t bytes_to_read = len - rx_buffer_wr;
+			int32_t bytes_to_read = len - rfm22b_dev->rx_buffer_wr;
 			// Fetch the data from the RX FIFO
 			rfm22_claimBus();
 			rfm22_assertCs();
 			PIOS_SPI_TransferByte(rfm22b_dev->spi_id,RFM22_fifo_access & 0x7F);
-			rx_buffer_wr += (PIOS_SPI_TransferBlock(rfm22b_dev->spi_id,OUT_FF,
-				(uint8_t *) &rx_buffer[rx_buffer_wr],bytes_to_read,NULL) == 0) ?
-				bytes_to_read : 0;
+			rfm22b_dev->rx_buffer_wr += (PIOS_SPI_TransferBlock(rfm22b_dev->spi_id,OUT_FF, (uint8_t *)&rx_buffer[rfm22b_dev->rx_buffer_wr], bytes_to_read, NULL) == 0) ? bytes_to_read : 0;
 			rfm22_deassertCs();
 			rfm22_releaseBus();
 		}
 	
-		if (rx_buffer_wr != len)
+		if (rfm22b_dev->rx_buffer_wr != len)
 			return RFM22B_EVENT_ERROR;
 
 		// we have a valid received packet
 
-		if (rx_buffer_wr > 0)
+		if (rfm22b_dev->rx_buffer_wr > 0)
 		{
 			// Add the rssi and afc to the end of the packet.
-			rx_buffer[rx_buffer_wr++] = rfm22b_dev->rssi_dBm;
-			rx_buffer[rx_buffer_wr++] = rfm22b_dev->rx_packet_start_afc_Hz;
-			// Pass this packet on
-			bool need_yield = false;
-			if (rfm22b_dev->rx_in_cb)
-				(rfm22b_dev->rx_in_cb)(rfm22b_dev->rx_in_context, (uint8_t*)rx_buffer,
-						       rx_buffer_wr, NULL, &need_yield);
-			rx_buffer_wr = 0;
+			rx_buffer[rfm22b_dev->rx_buffer_wr++] = rfm22b_dev->rssi_dBm;
+			rx_buffer[rfm22b_dev->rx_buffer_wr++] = rfm22b_dev->rx_packet_start_afc_Hz;
+			// Swap the Rx packets.
+			if (rfm22b_dev->rx_packet_prev == NULL)
+			{
+				rfm22b_dev->rx_packet_prev = rfm22b_dev->rx_packet;
+				rfm22b_dev->rx_packet = rfm22b_dev->rx_packet_next;
+				rfm22b_dev->rx_packet_len = rfm22b_dev->rx_buffer_wr;
+				// Signal the receive thread.
+				xSemaphoreGive(rfm22b_dev->rxsem);
+			}
+			rfm22b_dev->rx_buffer_wr = 0;
 		}
 
 		// Start a new transaction
@@ -1528,11 +1587,9 @@ static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
 
 	rfm22b_dev->device_status = rfm22b_dev->int_status1 = rfm22b_dev->int_status2 = rfm22b_dev->ezmac_status = 0;
 
-	rx_buffer_current = 0;
-	rx_buffer_wr = 0;
+	rfm22b_dev->rx_buffer_wr = 0;
 
 	rfm22b_dev->tx_data_rd = rfm22b_dev->tx_data_wr = 0;
-	rfm22b_dev->tx_packet = NULL;
 
 	rfm22b_dev->frequency_hop_channel = 0;
 

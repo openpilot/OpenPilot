@@ -137,6 +137,9 @@ extern uint32_t pios_com_telem_rf_id;
 #define PIOS_COM_TELEM_RF               (pios_com_telem_rf_id)
 #define PIOS_COM_DEBUG                  PIOS_COM_TELEM_RF
 
+extern uint32_t pios_com_telem_fr_id;
+#define PIOS_COM_TELEM_FR               (pios_com_telem_fr_id)
+
 #if defined(PIOS_INCLUDE_GPS)
 extern uint32_t pios_com_gps_id;
 #define PIOS_COM_GPS                    (pios_com_gps_id)
